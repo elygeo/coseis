@@ -8,7 +8,7 @@
 % restart capable
 
 if initialize > 1
-  disp( 'Initialize visualization' )
+
   plotstyle = 'slice';
   plotinterval = 1;
   holdmovie = 1;
@@ -23,9 +23,6 @@ if initialize > 1
   glyphcut = .3;
   glyphexp = 1;
   dark = 1;
-  if dark, fg = [ 1 1 1 ]; bg = [ 0 0 0 ]; linewidth = 1;
-  else     fg = [ 0 0 0 ]; bg = [ 1 1 1 ]; linewidth = 2;
-  end
   colorexp = .5;
   ulim = -1;
   vlim = -1;
@@ -33,18 +30,19 @@ if initialize > 1
   xlim = 0;
   camdist = -1;
   look = 4;
-  viz3d = 0;
-  zoomed = 0;
-  itpause = nt;
-  if nrmdim, slicedim = nrmdim; else slicedim = 3; end
+
+  disp( 'Initialize visualization' )
   xhair = hypocenter - halo1;
-  right = [];
-  ftcam = [];
+  if nrmdim, slicedim = nrmdim; else slicedim = 3; end
+  if dark, fg = [ 1 1 1 ]; bg = [ 0 0 0 ]; linewidth = 1;
+  else     fg = [ 0 0 0 ]; bg = [ 1 1 1 ]; linewidth = 2;
+  end
   hhud = [];
   hmsg = [];
   hhelp = [];
   frame = {};
   showframe = 0;
+  itpause = nt;
   count = 0;
   helpon = 0;
   if ~ishandle(1), figure(1), end
@@ -99,6 +97,11 @@ delete( [ hhud hmsg hhelp ] )
 hhud = [];
 hmsg = [];
 hhelp = [];
+colorscale
+set( gcf, 'CurrentAxes', haxes(2) )
+text( .50, .05, titles( comp + 1 ) );
+text( .98, .98, sprintf( '%.3fs', it * dt ), 'Hor', 'right' )
+set( gcf, 'CurrentAxes', haxes(1) )
 
 lines = [ 1 1 1   -1 -1 -1 ];
 if nrmdim
@@ -134,20 +137,14 @@ end
 glyphtype = 1;
 if dosurf || isosurf, glyphtype = -1; end
 
-colorscale
-if nrmdim,            faultviz,   end
-if doglyph,           glyphviz,   end
-if doisosurf,         isosurfviz, end
-if domesh || dosurf,  surfviz,    end
-if length( lines ),   lineviz,    end
+lineviz
+if nrmdim,           faultviz,   end
+if doglyph,          glyphviz,   end
+if doisosurf,        isosurfviz, end
+if domesh || dosurf, surfviz,    end
+if look,             lookat,     end
 
 clear xg mg vg xga mga vga
-
-if look, lookat, end
-set( gcf, 'CurrentAxes', haxes(2) )
-text( .50, .05, titles( comp + 1 ) );
-text( .98, .98, sprintf( '%.3fs', it * dt ), 'Hor', 'right' )
-set( gcf, 'CurrentAxes', haxes(1) )
 
 % Save frame
 kids = get( haxes, 'Children' );
