@@ -162,7 +162,7 @@ j2     = i1(1):i2(1);
 k2     = i1(2):i2(2);
 l2     = i1(3):i2(3);
 % Zero slip condition
-tmp    = area .* ( mr(j1,k1,l1) + mr(j2,k2,l2) );
+tmp    = area .* ( m(j1,k1,l1,1) + m(j2,k2,l2,1) );
 i      = tmp ~= 0;
 tmp(i) = 1 ./ tmp(i);
 T      = T0 + repmat( tmp, [ 1 1 1 3 ] ) .* ...
@@ -210,8 +210,8 @@ i      = Ts > F;
 c(i)   = F(i) ./ Ts(i);
 T      = -T0 + Tn3 + Ts3 .* repmat( c, [ 1 1 1 3 ] );
 for i = 1:3
-  vv(j1,k1,l1,i) = vv(j1,k1,l1,i) + T(:,:,:,i) .* area .* mr(j1,k1,l1);
-  vv(j2,k2,l2,i) = vv(j2,k2,l2,i) - T(:,:,:,i) .* area .* mr(j2,k2,l2);
+  vv(j1,k1,l1,i) = vv(j1,k1,l1,i) + T(:,:,:,i) .* area .* m(j1,k1,l1,1);
+  vv(j2,k2,l2,i) = vv(j2,k2,l2,i) - T(:,:,:,i) .* area .* m(j2,k2,l2,1);
 end
 %vv(j2,k2,l2,:) = -vv(j1,k1,l1,:);
 slipv = v(j2,k2,l2,:) + vv(j2,k2,l2,:) - v(j1,k1,l1,:) - vv(j1,k1,l1,:);

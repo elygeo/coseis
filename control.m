@@ -88,7 +88,6 @@ case 'm'
   else
     edgecolor = 'none';
   end
-  keyboard
   set( tmp, 'EdgeColor', edgecolor )
   msg = [ 'edgecolor = ' edgecolor ];
 case 'f'

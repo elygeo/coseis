@@ -23,6 +23,8 @@ case 'constant'
   %if nrmdim, operator = 'rectangular'; end
 case 'staggered'
   operator = { 'staggered'  1 -1   1 -1   1 -1 };
+  staggerbc1 = 1; % normal v at the surface
+  staggerbc1 = 0; % horizontal v at the surface
 case 'map'
   operator = { 'som'  1 -1   1 -1   1 -1 };
   xx1 = x1 + .1 * (cos(x3./L3*2*pi)-sin(x2./L2*2*pi)) .* (L1-x1) + .1 * (L2-x2) .* (x1-L1);

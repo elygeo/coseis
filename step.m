@@ -22,49 +22,44 @@ Y(i) = 1 ./ Y(i);
 Y  = Y .* m(:,:,:,3) .* ( m(:,:,:,2) + m(:,:,:,3) );
 
 for iz = 1:size( operator, 1 )
-i1 = opi1(iz,:);
-i2 = opi2(iz,:);
-j  = i1(1):i2(1);
-k  = i1(1):i2(2);
-l  = i1(1):i2(3);
-for i = 1:3
-  switch operator{iz,1}
-  case 'som'
-    vv(j,k,l,i) = m(j,k,l,1) .* ...
-      ( dcng( S, ii(i,1), x, 1, j, k, l ) ...
-      + dcng( S, ii(i,2), x, 2, j, k, l ) ...
-      + dcng( S, ii(i,3), x, 3, j, k, l ) ...
-      + hgr( vv, h, Y, i, j, k, l ) );
-  case 'rectangular'
-    vv(j,k,l,i) = m(j,k,l,1) .* ...
-      ( dcnr( S, ii(i,1), x, 1, j, k, l ) ...
-      + dcnr( S, ii(i,2), x, 2, j, k, l ) ...
-      + dcnr( S, ii(i,3), x, 3, j, k, l ) ...
-      + hgr( vv, x, Y, i, j, k, l ) );
-  case 'constant'
-    vv(j,k,l,i) = m(j,k,l,1) .* ...
-      ( dh( S, ii(i,1), 1, j-1, k-1, l-1 ) ...
-      + dh( S, ii(i,2), 2, j-1, k-1, l-1 ) ...
-      + dh( S, ii(i,3), 3, j-1, k-1, l-1 ) ...
-      + hgr( vv, 1, Y, i, j, k, l ) );
-  case 'staggered'
-    i1 = opi1(iz,:) + 1;
-    i2 = opi2(iz,:) - 1; i2(i) = i2(i) - 1; d = 1 - eye( 3 ); % 2
-    i2 = opi2(iz,:) - 2; i2(i) = i2(i) + 1; d = eye( 3 );     % 1
-    j  = i1(1):i2(1);
-    k  = i1(1):i2(2);
-    l  = i1(1):i2(3);
-    vv(j,k,l,i) = m(j,k,l,1) .* ...
-      ( dhs4( S, ii(i,1), 1, j-d(i,1), k,        l        ) ...
-      + dhs4( S, ii(i,2), 2, j,        k-d(i,2), l        ) ...
-      + dhs4( S, ii(i,3), 3, j,        k,        l-d(i,3) ) );
-    %   0----x    v----.      .----yz     xx----u1
-    %  /|        /|   /|     /|   /|      /|   /|
-    % y |       .----. |   zx---w1 |    v1---xy |
-    %   z       | .--|-'    | xy-|-v1    | w1-|-zx
-    %           |/   |/     |/   |/      |/   |/
-    %           '----S     u1----xx     yz----'   
-    %                         (1)          (2)
+  i1 = opi1(iz,:);
+  i2 = opi2(iz,:);
+  j  = i1(1):i2(1);
+  k  = i1(1):i2(2);
+  l  = i1(1):i2(3);
+  for i = 1:3
+    switch operator{iz,1}
+    case 'som'
+      vv(j,k,l,i) = m(j,k,l,1) .* ...
+        ( dcng( S, ii(i,1), x, 1, j, k, l ) ...
+        + dcng( S, ii(i,2), x, 2, j, k, l ) ...
+        + dcng( S, ii(i,3), x, 3, j, k, l ) ...
+        + hgr( vv, h, Y, i, j, k, l ) );
+    case 'rectangular'
+      vv(j,k,l,i) = m(j,k,l,1) .* ...
+        ( dcnr( S, ii(i,1), x, 1, j, k, l ) ...
+        + dcnr( S, ii(i,2), x, 2, j, k, l ) ...
+        + dcnr( S, ii(i,3), x, 3, j, k, l ) ...
+        + hgr( vv, x, Y, i, j, k, l ) );
+    case 'constant'
+      vv(j,k,l,i) = m(j,k,l,1) .* ...
+        ( dh( S, ii(i,1), 1, j-1, k-1, l-1 ) ...
+        + dh( S, ii(i,2), 2, j-1, k-1, l-1 ) ...
+        + dh( S, ii(i,3), 3, j-1, k-1, l-1 ) ...
+        + hgr( vv, 1, Y, i, j, k, l ) );
+    case 'staggered'
+      i1 = opi1(iz,:) + 1;
+      if staggerbc1, i2 = opi2(iz,:) - 2; i2(i) = i2(i) + 1; d = eye( 3 );
+      else,          i2 = opi2(iz,:) - 1; i2(i) = i2(i) - 1; d = 1 - eye( 3 );
+      end
+      j  = i1(1):i2(1);
+      k  = i1(1):i2(2);
+      l  = i1(1):i2(3);
+      vv(j,k,l,i) = m(j,k,l,1) .* ...
+        ( dhs4( S, ii(i,1), 1, j-d(i,1), k,        l        ) ...
+        + dhs4( S, ii(i,2), 2, j,        k-d(i,2), l        ) ...
+        + dhs4( S, ii(i,3), 3, j,        k,        l-d(i,3) ) );
+    end
   end
 end
 clear Y
@@ -92,59 +87,54 @@ u = u + dt * v;
 wt(4) = toc;
 vv = u + dt * viscosity(1) .* v;
 for iz = 1:size( operator, 1 )
-i1 = opi1(iz,:);
-i2 = opi2(iz,:) - 1;
-j  = i1(1):i2(1);
-k  = i1(2):i2(2);
-l  = i1(3):i2(3);
-for a = 1:3
-  b = mod( a,   3 ) + 1;
-  c = mod( a+1, 3 ) + 1;
-  switch operator{iz,1}
-  case 'som'
-    S(j,k,l,a) = ...
-      dncg( vv, a, x, a, j, k, l );
-    S(j,k,l,a+3) = m(j,k,l,3) .* ( ...
-      dncg( vv, b, x, c, j, k, l ) + ...
-      dncg( vv, c, x, b, j, k, l ) );
-  case 'rectang'
-    S(j,k,l,a) = ...
-      dncr( vv, a, x, a, j, k, l );
-    S(j,k,l,a+3) = m(j,k,l,3) .* ( ...
-      dncr( vv, b, x, c, j, k, l ) + ...
-      dncr( vv, c, x, b, j, k, l ) );
-  case 'constant'
-    S(j,k,l,a) = ...
-      dh( vv, a, a, j, k, l );
-    S(j,k,l,a+3) = m(j,k,l,3) .* ( ...
-      dh( vv, b, c, j, k, l ) + ...
-      dh( vv, c, b, j, k, l ) );
-  case 'staggered'
-    %   0----x    v----.      .----yz     xx----u1
-    %  /|        /|   /|     /|   /|      /|   /|
-    % y |       .----. |   zx---w1 |    v1---xy |
-    %   z       | .--|-'    | xy-|-v1    | w1-|-zx
-    %           |/   |/     |/   |/      |/   |/
-    %           '----S     u1----xx     yz----'   
-    %                         (1)          (2)
-    i1 = opi(iz,:) + 1;
-    %i2 = opi2(iz,:) - 2; i2(a) = i2(a) + 1; d = zeros( 3 ); % 2
-    i2 = opi2(iz,:) - 1; i2(a) = i2(a) - 1; d = eye( 3 );   % 1
-    j  = i1(1):i2(1);
-    k  = i1(1):i2(2);
-    l  = i1(1):i2(3);
-    S(j,k,l,a+3) = m(j,k,l,3) .* ( ...
-      dhs4( vv, b, c, j-d(1,c), k-d(2,c), l-d(3,c) ) + ...
-      dhs4( vv, c, b, j-d(1,b), k-d(2,b), l-d(3,b) ) );
-    %i2 = opi2(iz,:) - 1; d = eye( 3 );   % 2
-    i2 = opi2(iz,:) - 2; d = zeros( 3 ); % 1
-    j  = i1(1):i2(1);
-    k  = i1(1):i2(2);
-    l  = i1(1):i2(3);
-    S(j,k,l,a) = ...
-      dhs4( vv, a, a, j-d(1,a), k-d(2,a), l-d(3,a) );
+  i1 = opi1(iz,:);
+  i2 = opi2(iz,:) - 1;
+  j  = i1(1):i2(1);
+  k  = i1(2):i2(2);
+  l  = i1(3):i2(3);
+  for a = 1:3
+    b = mod( a,   3 ) + 1;
+    c = mod( a+1, 3 ) + 1;
+    switch operator{iz,1}
+    case 'som'
+      S(j,k,l,a) = ...
+        dncg( vv, a, x, a, j, k, l );
+      S(j,k,l,a+3) = m(j,k,l,3) .* ( ...
+        dncg( vv, b, x, c, j, k, l ) + ...
+        dncg( vv, c, x, b, j, k, l ) );
+    case 'rectang'
+      S(j,k,l,a) = ...
+        dncr( vv, a, x, a, j, k, l );
+      S(j,k,l,a+3) = m(j,k,l,3) .* ( ...
+        dncr( vv, b, x, c, j, k, l ) + ...
+        dncr( vv, c, x, b, j, k, l ) );
+    case 'constant'
+      S(j,k,l,a) = ...
+        dh( vv, a, a, j, k, l );
+      S(j,k,l,a+3) = m(j,k,l,3) .* ( ...
+        dh( vv, b, c, j, k, l ) + ...
+        dh( vv, c, b, j, k, l ) );
+    case 'staggered'
+      i1 = opi(iz,:) + 1;
+      if staggerbc1, i2 = opi2(iz,:) - 1; i2(a) = i2(a) - 1; d = eye( 3 );
+      else           i2 = opi2(iz,:) - 2; i2(a) = i2(a) + 1; d = zeros( 3 );
+      end
+      j  = i1(1):i2(1);
+      k  = i1(1):i2(2);
+      l  = i1(1):i2(3);
+      S(j,k,l,a+3) = m(j,k,l,3) .* ( ...
+        dhs4( vv, b, c, j-d(1,c), k-d(2,c), l-d(3,c) ) + ...
+        dhs4( vv, c, b, j-d(1,b), k-d(2,b), l-d(3,b) ) );
+      if staggerbc1, i2 = opi2(iz,:) - 2; d = zeros( 3 );
+      else           i2 = opi2(iz,:) - 1; d = eye( 3 );
+      end
+      j  = i1(1):i2(1);
+      k  = i1(1):i2(2);
+      l  = i1(1):i2(3);
+      S(j,k,l,a) = ...
+        dhs4( vv, a, a, j-d(1,a), k-d(2,a), l-d(3,a) );
+    end
   end
-end
 end
 tmp = m(j,k,l,2) .* sum( S(j,k,l,1:3), 4 );
 for i = 1:3
