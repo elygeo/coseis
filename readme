@@ -1,0 +1,207 @@
+SORD - Support-Operator Rupture Dynamics
+Geoffrey Ely
+
+COORDINATE SYSTEM
+ 
+(x,y,z) -> (j,k,l)
+ 
+   0----x      N----.           .----yz         xx----u1
+  /|          /|   /|          /|   /|          /|   /|
+ y |         .----. |        zx---w1 |        v1---xy |
+   z         | .--|-'         | xy-|-v1        | w1-|-zx
+             |/   |/          |/   |/          |/   |/
+             '----C          u1----xx         yz----'
+          non-staggered    staggered (1)    staggered (2)
+
+Non-staggered Nodes:
+x  = node locations
+v  = velocity
+u  = displacement
+mr = mass ratio
+
+Non-staggered Cells
+S  = stress
+miu, lambda = elastic moduli
+
+
+COMPUTATIONAL CYCLE
+ 
+S = stress tensor
+A = acceleration vector
+V = velocity vector
+U = displacement vector
+lambda, mu = elastic moduli
+T = matrix transpose
+' = d/dt
+" = d^2/dt^2
+ 
+1. Add moment tensor source
+ 
+2. Linearized conservation of momentum, Newton's 2nd law
+   A   = divS/rho
+   a_i = s_ij,j/rho
+
+3. Fault boundary condition
+ 
+4. Update velocity and displacement
+   V'   = A
+   v'_i = a_i
+   U'   = V
+   u'_i = v_i
+
+5. Compute modified displacements
+   ~U   = U + dt*beta*V
+   ~u_i = u_i + dt*beta*v_i
+ 
+6. Compute modified strain
+   E    = [grad~U + (grad~U)T]/2
+   e_ij = [~u_i,j + ~u_j,i]/2
+ 
+7. Compute stress: viscoelastic solid constitutive law, Kelvin-Voight
+   model, linear, isotropic, spring and dashpot in parallel
+   S    = lambda*trace(E)*I + 2*mu*E
+   s_ij = lambda*e_kk*delta_ij + 2*mu*e_ij
+
+
+Combined
+   rho*U" = grad_(lambda*div.~U) + div.mu*[grad_~U + (grad_~U)^T]
+          = (lambda+mu)*grad_(div.~U) + mu*del^2 ~U
+            + (grad_lambda)*(div.~U) + grad_mu.[grad_~U + (grad_~U)^T]
+   rho*u"_i = (lambda*~u_j,j)_,i + [mu*(~u_i,j + ~u_j,i)]_,j
+            = (lambda+mu)*~u_j,j,i + mu*~u_i,j,j
+              + lambda_,i*~u_j,j + mu_,j*[~u_i,j + ~u_j,i]
+
+
+FAULT BOUNDARY CONDITION
+
+n   = fault normal vector, n points toward the positive side of the fault
+T   = traction exerted by the positive side
+T0  = initial traction
+Sn0 = initial normal component of stress
+R   = restoring force on a node
+m   = nodal mass
+a   = element area
+F   = friction, |Ts| cannot exceed friction
+
+Acceleration and velocity of the double nodes due to restoring forces
+and traction.
+
+- side acc   a0 = [R0 + a*(T-T0)]/m0	
++ side acc   a1 = [R1 - a*(T-T0)]/m1
+
+with no fault  a0 = a1 = (R0+R1)/(m0+m1)
+
+- side vel   v0(t2) = v0 + dt*[R0 + a*(T-T0)]/m0
++ side vel   v1(t2) = v1 + dt*[R1 - a*(T-T0)]/m1
+
+- side disp  u0(t2) = u0 + dt*{ v0(t0) + dt*[R0 + a*(T-T0)]/m0 }
++ side disp  u1(t2) = u1 + dt*{ v1(t0) + dt*[R1 - a*(T-T0)]/m1 }
+
+dv = v1(t2) - v0(t2)
+   = v1-v0 + dt*(R1/m1-R0/m0) - dt*a*(1/m1+1/m0)*(T-T0)
+
+du = u1(t2) - u0(t2)
+   = u1-u0 + dt*dv
+   = u1-u0 + dt*(v1-v0) + dt^2*(R1/m1-R0/m0) - dt^2*a*(1/m1+1/m0)*(T-T0)
+
+Zero relative velocity boundary condition
+
+0  = dv
+Tv = T0 + [v1-v0 + dt*(R1/m1-R0/m0)] / [dt*a*(1/m1+1/m0)]
+
+Zero relative normal displacement boundary condition
+
+0  = du
+Tu = T0 + [u1-u0 + dt*(v1-v0) + dt^2*(R1/m1-R0/m0)] / [dt^2*a*(1/m1+1/m0)]
+   = Tv + (u1-u0) / [dt^2*a*(1/m1+1/m0)]
+
+Shear component of traction is bounded by friction
+
+Ts  = Tv.(I-nn)
+Ts' = / Ts,         |Ts| <= F
+      \ F*Ts/|Ts|,  |Ts| >  F
+
+Fault glued shut
+
+Tn = Tv.n
+
+Normal component of traction is bounded by cohesion (fault can open)
+
+Tn  = Tu.n
+    = (Tv + u1-u0).n / [dt^2*a*(1/m1+1/m0)]
+Tn' = / Tn,     Tn <= cohes
+      \ cohes,  Tn >  cohes
+
+Total traction bounded by friction
+
+T' = Tn'.n + Ts'
+
+Update velocities
+
+v0(t2) = v0(t0) + dt*(R0 + a*(T'-T0))/m0
+v1(t2) = v1(t0) + dt*(R1 - a*(T'-T0))/m1
+
+DFM fault boundary condition
+T  = T0 + [R1*m0-R0*m1 + m1*m0*(v1-v0)/dt] / [a*(m1+m0)]
+
+
+SLIP-WEAKENING FRICTION LAW
+
+l    = slip length
+u(l) = coefficient of friction
+us   = coefficient of static friction
+ud   = coefficient of dynamic friction
+d0   = slip weakening distance
+
+F = u(l) * T.n + cohesion
+u(l) = / us - (us-ud)*l/d0,  l <= d0
+       \ ud,                 l >  d0
+
+
+       us +
+          |\
+ ^ T0/Sn0 + \
+ |        |  \
+ u     ud +   +---------
+          |
+          +---+---------
+             d0   l->
+
+
+Strength parameter
+s = (Tu - T0)/(T0 - Tf)
+
+Estimate critical radius needed for spontaneous rupture
+rc =~  miu*d0*(Tu - Tf)/(T0 - Tf)^2
+
+Estimate d0 needed to resolve breakdown zone
+d0 =~ (3 or 4)*dx*(Tu - Tf)/miu
+
+
+
+HOURGLASS CORRECTIONS
+
+Deformation Modes for hexahedron: 8 * 3 = 24 degrees of freedom
+
+Rigid Body: 6 = 3 translation + 3 rotation
+
+Uniform strain: 6
+
+   0----x      O----X      O----0      O----O
+  /|          /|   /|     /|   /|     /|   /|
+ y |         0----X |    X----X |    O----O |
+   z         | 0--|-X    | 0--|-O    | X--|-X
+             |/   |/     |/   |/     |/   |/ 
+             O----X      X----X      X----X  
+               Z1          Z2          Z3
+
+Nonuniform strain: 12 = 24 DOF - 6 rigid body - 6 uniform strain
+
+   O----O      O----X      O----X      O----X
+  /|   /|     /|   /|     /|   /|     /|   /|
+ X----X |    O----X |    X----O |    X----O |
+ | X--|-X    | X--|-O    | O--|-X    | X--|-O
+ |/   |/     |/   |/     |/   |/     |/   |/ 
+ O----O      X----O      X----O      O----X  
+  Z2 Z3       Z3 Z1       Z1 Z2      Z1 Z2 Z3
+
