@@ -35,6 +35,6 @@ for iz = 1:size( lines, 1 )
     xga = [ xga; xg; NaN NaN NaN ];
   end
 end
-hlines = plot3( xga(:,1), xga(:,2), xga(:,3) );
+hand = plot3( xga(:,1), xga(:,2), xga(:,3) );
 hold on
 

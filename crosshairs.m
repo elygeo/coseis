@@ -102,43 +102,48 @@ if length( mga( mga ~= 0 ) )
   if doglyph, reynoldsglyph, else, wireglyph, end
   hhud = [ hhud hglyph ];
 end
-points = [ halo1 + 1 halo1 + ncore ];
-points(slicedim)   = xhair(slicedim) + halo1(slicedim);
-points(slicedim+3) = xhair(slicedim) + halo1(slicedim) + cellfocus;
-if nrmdim & slicedim ~= nrmdim
-  points = [ points; points ];
-  points(1,nrmdim+3) = hypocenter(nrmdim);
-  points(2,nrmdim)   = hypocenter(nrmdim)+1;
-end
-xga = [];
-for iz = 1 : size( points, 1 )
-  i1 = points(iz,1:3);
-  i2 = points(iz,4:6);
-  i  = [ i1; i1+1; i2; i2-1 ];
-  if cellfocus
-    i1=[1 1 2 2; 1 1 2 2; 1 1 2 2; 1 1 2 2; 1 1 2 2; 1 1 2 2; 1 1 2 2; 1 1 2 2];
-    i2=[1 1 1 1; 1 1 1 1; 3 3 3 3; 3 3 3 3; 2 1 1 2; 4 3 3 4; 2 1 1 2; 4 3 3 4];
-    i3=[2 1 1 2; 4 3 3 4; 2 1 1 2; 4 3 3 4; 1 1 1 1; 1 1 1 1; 3 3 3 3; 3 3 3 3];
-  else
-    i1 = [ 1 1 1; 1 1 1; 1 1 1; 1 1 1 ];
-    i2 = [ 1 1 2; 1 1 2; 3 3 4; 3 3 4 ];
-    i3 = [ 2 1 1; 4 3 3; 2 1 1; 4 3 3 ];
+if dooutline
+  points = [ halo1 + 1 halo1 + ncore ];
+  points(slicedim)   = xhair(slicedim) + halo1(slicedim);
+  points(slicedim+3) = xhair(slicedim) + halo1(slicedim) + cellfocus;
+  if nrmdim & slicedim ~= nrmdim
+    points = [ points; points ];
+    points(1,nrmdim+3) = hypocenter(nrmdim);
+    points(2,nrmdim)   = hypocenter(nrmdim)+1;
   end
-  switch slicedim
-  case 1, j = i(i1); k = i(i2+4); l = i(i3+8);
-  case 2, j = i(i3); k = i(i1+4); l = i(i2+8);
-  case 3, j = i(i2); k = i(i3+4); l = i(i1+8);
+  for iz = 1 : size( points, 1 )
+    i1 = points(iz,1:3);
+    i2 = points(iz,4:6);
+    i  = [ i1; i1+1; i2; i2-1 ];
+    if cellfocus
+      i1 = [ 1 1 2 2; 1 1 2 2; 1 1 2 2; 1 1 2 2;
+             1 1 2 2; 1 1 2 2; 1 1 2 2; 1 1 2 2 ];
+      i2 = [ 1 1 1 1; 1 1 1 1; 3 3 3 3; 3 3 3 3;
+             2 1 1 2; 4 3 3 4; 2 1 1 2; 4 3 3 4 ];
+      i3 = [ 2 1 1 2; 4 3 3 4; 2 1 1 2; 4 3 3 4;
+             1 1 1 1; 1 1 1 1; 3 3 3 3; 3 3 3 3 ];
+    else
+      i1 = [ 1 1 1; 1 1 1; 1 1 1; 1 1 1 ];
+      i2 = [ 1 1 2; 1 1 2; 3 3 4; 3 3 4 ];
+      i3 = [ 2 1 1; 4 3 3; 2 1 1; 4 3 3 ];
+    end
+    switch slicedim
+    case 1, j = i(i1); k = i(i2+4); l = i(i3+8);
+    case 2, j = i(i3); k = i(i1+4); l = i(i2+8);
+    case 3, j = i(i2); k = i(i3+4); l = i(i1+8);
+    end
+    ii = sub2ind( n(1:3), j, k, l )';
+    ng = prod( n(1:3) );
+    clear xg
+    for i = 0:2
+      xg(:,:,i+1) = x(ii+i*ng) + xscl * u(ii+i*ng);
+    end
+    xg(end+1,:,:) = NaN;
+    ng = size( xg );
+    xg = reshape( xg, [ prod( ng(1:2) ) 3 ] );
+    xga = xg;
   end
-  ii = sub2ind( n(1:3), j, k, l )';
-  ng = prod( n(1:3) );
-  clear xg
-  for i = 0:2
-    xg(:,:,i+1) = x(ii+i*ng) + xscl * u(ii+i*ng);
-  end
-  xg(end+1,:,:) = NaN;
-  ng = size( xg );
-  xg = reshape( xg, [ prod( ng(1:2) ) 3 ] );
-  xga = [ xga; xg ];
+  hhud(end+1) = plot3( xg(:,1), xg(:,2), xg(:,3), 'Tag', 'outline' );
 end
 i1 = xhair + halo1;
 i = [ i1-1; i1; i1+1 ];
@@ -165,8 +170,7 @@ end
 xg(end+1,:,:) = NaN;
 ng = size( xg );
 xg = reshape( xg, [ prod( ng(1:2) ) 3 ] );
-xga = [ xga; xg ];
-hhud(end+1) = plot3( xga(:,1), xga(:,2), xga(:,3) );
+hhud(end+1) = plot3( xg(:,1), xg(:,2), xg(:,3) );
 xg = double( xg(il,:) );
 hhud(end+1:end+3) = text( xg(:,1), xg(:,2), xg(:,3), ['xyz']', 'Ver', 'middle');
 if showframe ~= nframe
@@ -174,9 +178,4 @@ if showframe ~= nframe
   set( [ frame{:} ], 'Visible', 'off' )
   set( [ frame{showframe} ], 'Visible', 'on' )
 end
-if zoomed
-  if ~viz3d, campos( campos + xhairtarg - camtarget ), end
-  camtarget( xhairtarg )
-end
-
 

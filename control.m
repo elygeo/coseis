@@ -40,6 +40,7 @@ case 'h'
         'Isosurfaces                            I'
         'Surfaces                               S'
         'Mesh                                   M'
+        'Outline                                O'
         'Replot                             Enter'
         'Clean Up                       Backspace'
         'Frame +/-                       - = Page'
@@ -91,30 +92,40 @@ case '4', comp = 4; colorscale; msg = titles( 5 );
 case '5', comp = 5; colorscale; msg = titles( 6 );
 case '6', comp = 6; colorscale; msg = titles( 7 );
 case 'comma'
-  camva( 1.25 * camva )
+  if ~km, camva( 1.25 * camva )
+  else    camva( 4 * camva )
+  end
 case 'period'
-  camva( .8 * camva )
+  if ~km, camva( .8 * camva )
+  else    camva( .25 * camva )
+  end
   if length( hhud )
     if ~viz3d, campos( campos + xhairtarg - camtarget ), end
     camtarget( xhairtarg )
   end
 case 'slash'
-  if ~km
-    if viz3d
-      camtarget( x0 )
-      camva( 30 );
-    else
-      look = 5;
-      lookat
-    end
+  if strcmp( camproj, 'orthographic' )
+    look = 2;
   else
-    camva( 180 * h / xmax )
-    if length( hhud )
-      if ~viz3d, campos( campos + xhairtarg - camtarget ), end
-      camtarget( xhairtarg )
-    end
+    look = 4;
   end
-case 'd', viz3d = ~viz3d; if viz3d, look = 4; else look = 5; end, lookat
+  lookat
+case 'd'
+  if strcmp( camproj, 'orthographic' )
+    camproj perspective
+  else
+    upvec = [ 0 0 0 ];
+    pos = [ 0 0 0 ];
+    v1 = camup;
+    v2 = camtarget - campos;
+    [ t, i1 ] = max( abs( v1 ) );
+    [ t, i2 ] = max( abs( v2 ) );
+    upvec(i1) = sign( v1(i1) );
+    pos(i2) = -sign( v2(i2) ) * norm( v2 );
+    camup( upvec )
+    campos( x0 + pos )
+    camproj orthographic
+  end
 case 'leftbracket'
   tmp = .8 * get( gca, 'CLim' );
   set( gca, 'CLim', tmp )
@@ -172,6 +183,14 @@ case 'v', field = 'v'; colorscale; msg = titles{ comp + 1};
 case 'w', field = 'w'; colorscale; msg = titles{ comp + 1};
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
+case 'o'
+  tmp = findobj( [ frame{ showframe } hhud ], 'Tag', 'outline' );
+  if length( tmp ), dooutline = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
+  dooutline = ~dooutline;
+  if dooutline, visible = 'on';  msg = 'Outline on';
+  else          visible = 'off'; msg = 'Outline off';
+  end
+  if length( tmp ), set( tmp, 'Visible', visible ), end
 case 'g'
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'glyph' );
   if length( tmp ), doglyph = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
@@ -198,13 +217,15 @@ case 'm'
   end
   if length( tmp ), set( tmp, 'EdgeColor', edgecolor ), end
 case 's'
-  tmp = findobj( [ frame{ showframe } ], 'Tag', 'surf' );
+  tmp  = findobj( [ frame{ showframe } ], 'Tag', 'surf' );
   if length( tmp ), dosurf = strcmp( get( tmp(1), 'FaceColor' ), 'flat' ); end
   dosurf = ~dosurf;
-  if dosurf, facecolor = 'flat'; msg = 'Surfaces on';
-  else       facecolor = 'none'; msg = 'Surfaces off';
+  if dosurf, facecolor = 'flat'; visible = 'on';  msg = 'Surfaces on';
+  else       facecolor = 'none'; visible = 'off'; msg = 'Surfaces off';
   end
   if length( tmp ), set( tmp, 'FaceColor', facecolor ), end
+  tmp = findobj( [ frame{ showframe } ], 'Tag', 'surfline' );
+  if length( tmp ), set( tmp, 'Visible', visible ), end
 case 'c'
   if ~km
     save checkpoint it slip u v vv trup

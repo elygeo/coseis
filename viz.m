@@ -18,6 +18,7 @@ if initialize > 1
   domesh = 0;
   dosurf = 1;
   doisosurf = 1;
+  dooutline = 1;
   isofrac = .5;
   doglyph = 1;
   glyphcut = .1;
@@ -70,7 +71,7 @@ if initialize > 1
     'DefaultTextFontSize', 18, ...
     'DefaultTextFontName', 'FixedWidth', ...
     'DefaultTextHitTest', 'off' )
-  haxes = axes( 'Position', [ 0 .08 1 .92 ] );
+  haxes = axes( 'Position', [ .02 .1 .96 .88 ] );
   cameramenu
   cameratoolbar
   cameratoolbar( 'SetMode', 'orbit' )
@@ -126,11 +127,19 @@ if doglyph,   glyphviz,   end
 if doisosurf, isosurfviz, end
 if domesh || dosurf
   switch newplot
-  case 'cube',  planes = volumes; surfviz
-  case 'slice', planes = slices;  surfviz, lines = slices; lineviz
+  case 'cube'
+    planes = volumes; surfviz
+  case 'slice'
+    planes = slices; surfviz
+    lines  = slices; lineviz, set( hand, 'Tag', 'surfline' )
   end
 end
-lines = volumes; lineviz
+if dooutline
+  lines = volumes;
+  lineviz
+  set( hand, 'Tag', 'outline' )
+  houtline = hand;
+end
 if look, lookat, end
 
 clear xg mg vg xga mga vga

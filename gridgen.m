@@ -112,5 +112,6 @@ for i = 1:3
   w1(:,:,:,i) = x(:,:,:,i) - x0(i);
 end
 s1 = sum( w1 .* w1, 4 );
+max( s1(:) )
 xmax = 2 * sqrt( double( max( s1(:) ) ) );
 
