@@ -3,6 +3,7 @@
 
 if initialize > 1
   hand = axes;
+  haxes(end+1) = hand;
   set( gcf, 'CurrentAxes', hand )
   axis( [ 0 1 0 1 ] );
   hold on
@@ -20,6 +21,11 @@ if initialize > 1
   return
 end
 
+uscl = ulim; if uscl < 0, uscl = umax; end;
+vscl = vlim; if vscl < 0, vscl = vmax; end;
+wscl = wlim; if wscl < 0, wscl = wmax; end;
+xscl = xlim; if xscl < 0, xscl = umax; end;
+if xscl, xscl = .5 * h / xscl; end
 cellfocus = 1;
 switch field
 case 'u', fscl = uscl; titles = { '|V|' 'Ux' 'Uy' 'Uz' }; cellfocus = 0;
@@ -44,7 +50,7 @@ if comp
   hh = 2 / ( size( cmap, 1 ) - 1 );
   x1 = -1 : hh : 1;
   x2 = -1 : .0001 : 1;
-  x2 = sign( x2 ) .* abs( x2 ) .^ cexp;
+  x2 = sign( x2 ) .* abs( x2 ) .^ colorexp;
   colormap( interp1( x1, cmap, x2 ) );
   set( haxes(2), 'Clim', [ 0 1 ] )
   set( hlegend(1), 'String', sprintf( '%g', -clim ) )
@@ -64,7 +70,7 @@ else
   hh = 1 / ( size( cmap, 1 ) - 1 );
   x1 = 0 : hh : 1;
   x2 = -1 : .0001 : 1;
-  x2 = abs( x2 ) .^ cexp;
+  x2 = abs( x2 ) .^ colorexp;
   colormap( interp1( x1, cmap, x2 ) );
   set( haxes(2), 'Clim', [ -1 1 ] )
   set( hlegend(1), 'String', '0' )

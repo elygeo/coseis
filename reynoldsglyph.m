@@ -4,7 +4,7 @@
 hand = [];
 if ~length( mga ) || ~fscl, return, end
 clear xg ng rg
-gscl = .5 * h * ( 1 / fscl ) ^ gexp;
+gscl = .5 * h * ( 1 / fscl ) ^ glyphexp;
 m = 16;
 switch size( mga, 2 )
 case 1
@@ -14,14 +14,14 @@ case 1
   dphi  = phi(2) - phi(1);
   sinf  = sin( phi );
   cosf  = cos( phi );
-  rr    = abs( cosf ) .^ gexp;
+  rr    = abs( cosf ) .^ glyphexp;
   vglyphr = cos( phi + dphi / 2 ) * row;
   xg(:,:,1) = ( rr .* sinf ) * cos( theta );
   xg(:,:,2) = ( rr .* sinf ) * sin( theta );
   xg(:,:,3) = ( rr .* cosf ) * row;
   xg( abs( xg ) < .00001 ) = 0;
   ng = xg;
-  ng(:,:,3) = ng(:,:,3) .* ( ( 1 - gexp / ( gexp+1 ) ./ cosf ./ cosf ) * row );
+  ng(:,:,3) = ng(:,:,3) .* ( ( 1 - glyphexp / ( glyphexp+1 ) ./ cosf ./ cosf ) * row );
   nn = size( xg );
   vglyphx = xg;
   vglyphn = ng;
@@ -31,7 +31,7 @@ case 1
     xg = vglyphx;
     ng = vglyphn;
     rg = sqrt( double( mga(ig) ) ) * vglyphr;
-    scl = gscl * mga(ig) ^ ( 0.5 * gexp );
+    scl = gscl * mga(ig) ^ ( 0.5 * glyphexp );
     vec = ones( 3 );
     if vg(1) || vg(2)
       vec = [ vg(2)   vg(1)*vg(3)            vg(1) 
@@ -70,7 +70,7 @@ case 3
     val = mga(ig,:);
     vec = reshape( vga(ig,:), [3 3] );
     vec(:,1) = cross( vec(:,2), vec(:,3) );
-    scl = gscl * abs( val(3) ) ^ ( gexp - 1 );
+    scl = gscl * abs( val(3) ) ^ ( glyphexp - 1 );
     rg = val * ( sphr .* sphr );
     %xg = scl * vec * diag( abs( val ) ) * sphr; % elipsoide
     xg = scl * vec * ( sphr .* repmat( rg, [ 3 1 ] ) );
@@ -105,15 +105,14 @@ otherwise
   error( 'size mga' )
 end
 set( hand, ...
+  'Tag', 'glyph' ...
+  'FaceColor', 'flat', ...
+  'EdgeColor', 'none', ...
   'AmbientStrength', .6, ...
   'DiffuseStrength', .6, ...
   'SpecularStrength', .9, ...
   'SpecularExponent', 10, ...
-  'FaceLighting', 'gouraud', ...
-  'EdgeColor', 'none', ...
-  'FaceColor', 'flat', ...
-  'Tag', 'glyph' ...
-)
+  'FaceLighting', 'phong' )
 
 %quiver3(xg(:,:,1),xg(:,:,2),xg(:,:,3),ng(:,:,1),ng(:,:,2),ng(:,:,3),'g')
 

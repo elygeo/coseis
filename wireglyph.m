@@ -3,11 +3,11 @@
 
 hand = [];
 if ~length( mga ) || ~fscl, return, end
-gscl = .5 * h * ( 1 / fscl ) ^ gexp;
+gscl = .5 * h * ( 1 / fscl ) ^ glyphexp;
 switch size( mga, 2 );
 case 1
   ng = size( mga, 1 );
-  mga = gscl * mga .^ ( 0.5 * gexp - 0.5 );
+  mga = gscl * mga .^ ( 0.5 * glyphexp - 0.5 );
   for i = 1:3
     vga(:,i) = vga(:,i) .* mga;
   end
@@ -36,7 +36,7 @@ case 1
     hand(2) = plot3( xg(:,1), xg(:,2), xg(:,3), 'Color', [1 .5 0] );
   end
 case 3
-  mga = gscl * sign( mga ) .* abs( mga ) .^ gexp;
+  mga = gscl * sign( mga ) .* abs( mga ) .^ glyphexp;
   for i = 1:3
     vga(:,i:3:end) = vga(:,i:3:end) .* mga;
   end

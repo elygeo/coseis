@@ -1,6 +1,9 @@
 %------------------------------------------------------------------------------%
 % PLAYMOVIE
 
+stereoangle = 4; % > 0 wall-eyed, < 0 cross-eyed
+stereoangle = 0; % > 0 wall-eyed, < 0 cross-eyed
+loopmovie = 0;
 nframe = length( frame )
 if play && nframe
   tmp = showframe;

@@ -191,18 +191,18 @@ case 's'
   if length( tmp ), set( tmp, 'FaceColor', facecolor ), end
 case 'g'
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'glyph' );
-  if length( tmp ), glyph = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
-  glyph = ~glyph;
-  if glyph, visible = 'on';  msg = 'Glyphs On';
-  else      visible = 'off'; msg = 'Glyphs Off';
+  if length( tmp ), doglyph = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
+  doglyph = ~doglyph;
+  if doglyph, visible = 'on';  msg = 'Glyphs On';
+  else        visible = 'off'; msg = 'Glyphs Off';
   end
   if length( tmp ), set( tmp, 'Visible', visible ), end
 case 'i'
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'isosurf' );
-  if length( tmp ), isosurf = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
-  isosurf = ~isosurf;
-  if isosurf, visible = 'on';  msg = 'Isosurfaces On';
-  else        visible = 'off'; msg = 'Isosurfaces Off';
+  if length( tmp ), doisosurf = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
+  doisosurf = ~doisosurf;
+  if doisosurf, visible = 'on';  msg = 'Isosurfaces On';
+  else          visible = 'off'; msg = 'Isosurfaces Off';
   end
   if length( tmp ), set( tmp, 'Visible', visible ), end
 case 'c'
@@ -349,15 +349,18 @@ if xhairmove
     lines(1,i) = [ 1  0 ];
     lines(2,i) = [ 0 -1 ];
   end
+  lineviz
+  set( hand, 'LineStyle', ':' );
+  hhud(end+1) = hand;
   j = xhair(1);
   k = xhair(2);
   l = xhair(3);
   if cellfocus
-    lines = [ lines
+    lines = [ 
       j k l   j+1 k+1 l+1
     ];
   else
-    lines = [ lines
+    lines = [ 
       j-1 k l   j+1 k l
       j k-1 l   j k+1 l
       j k l-1   j k l+1
@@ -365,7 +368,7 @@ if xhairmove
   end
   lines( lines == 0 ) = 1;
   lineviz
-  set( hand, 'Color', [ .5 .5 .5 ] );
+  set( hand );
   hhud(end+1) = hand;
   showframe = nframe;
   anim = 1;
