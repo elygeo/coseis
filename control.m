@@ -100,11 +100,13 @@ case 'period'
   end
 case 'slash'
   if ~km
-    if viz3d, camva( 30 )
-    else      camva( 23 )
+    if viz3d
+      camtarget( x0 )
+      camva( 30 );
+    else
+      look = 5;
+      lookat
     end
-    if ~viz3d, campos( campos + x0 - camtarget ), end
-    camtarget( x0 )
   else
     camva( 180 * h / xmax )
     if length( hhud )

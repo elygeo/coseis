@@ -36,7 +36,7 @@ else
       xhair(i) = xhair(i) + way;
     end
     if xhair(i) > nc(i), xhair(i) = nc(i);
-    elseif xhair(i) < 1,  xhair(i) = 1;
+    elseif xhair(i) < 1, xhair(i) = 1;
     end
   end
   slicedim = i;
@@ -88,8 +88,8 @@ case 'w'
   vec = vec(:,i);
   mga = val';
   vga = vec(:)';
-  tmp = [ val(3) wg s2(j,k,l) ];
-  msg = sprintf( '|W| %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e\n|W|f%9.2e', tmp );
+  tmp = [ sqrt( s2(j,k,l) ) val(3) wg ];
+  msg = sprintf( '|W|f%9.2e\n|W| %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e', tmp );
 end
 set( gcf, 'CurrentAxes', haxes(2) )
 hhud = text( .02, .98, msg, 'Hor', 'left', 'Ver', 'top' );

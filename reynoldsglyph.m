@@ -100,10 +100,13 @@ case 3
     ng(j1,j1,2) = vec1(:,:,3) .* vec2(:,:,1) - vec1(:,:,1) .* vec2(:,:,3);
     ng(j1,j1,3) = vec1(:,:,1) .* vec2(:,:,2) - vec1(:,:,2) .* vec2(:,:,1);
     rg = double( rg );
+    for i = 1:3
+      ng(:,:,i) = ng(:,:,i) .* -sign( rg );
+    end
     hglyph(ig) = surf( xg(:,:,1), xg(:,:,2), xg(:,:,3), rg, 'VertexNorm', ng );
     hold on
   end
-  set( hglyph, 'BackFaceLighting', 'reverselit' )
+  set( hglyph, 'BackFaceLighting', 'lit' )
 otherwise
   error( 'size mga' )
 end

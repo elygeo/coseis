@@ -25,6 +25,8 @@ if initialize
   msrcx = msrcradius - sqrt( s1( msrci ) );
   msrcx = msrcx / sum( msrcx );
   msrct = [];
+  s1(:) = 0;
+  w1(:) = 0;
   return
 end
 

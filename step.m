@@ -139,7 +139,7 @@ w2(:) = 0;
 for iii = 1:3
   s1 = u(:,:,:,iii) + gamma(1) .* v(:,:,:,iii);
   s2(:) = 0;
-  for ii = [ iii:3 1:iii-1 ]
+  for ii = 1:3
     for iz = 1:size( operator, 1 )
       bc = [ operator{iz,2:7} ];
       i1 = opi1(iz,:);
@@ -191,11 +191,10 @@ for iii = 1:3
       end
     end
     if ii == iii
-[ 111 iii ii ]
       w1(:,:,:,iii) = s2;
     else
-[ 222 iii ii ]
-      w2(:,:,:,iii) = w2(:,:,:,iii) + s2;
+      i = 6 - iii - ii;
+      w2(:,:,:,i) = w2(:,:,:,i) + s2;
     end
   end
 end
