@@ -1,7 +1,8 @@
 %------------------------------------------------------------------------------%
 % LINEVIZ
 
-linesi = [
+if ~length( lines ), return, end
+i = [
   1 2 3  4 2 3
   1 5 3  4 5 3
   1 2 6  4 2 6
@@ -18,7 +19,7 @@ linesi = [
 tmp = [];
 for iz = 1:size( lines, 1 )
   zone = lines(iz,:);
-  tmp = [ tmp; zone( linesi ) ];
+  tmp = [ tmp; zone( i ) ];
 end
 lines = unique( tmp,  'rows' );
 xga = [];

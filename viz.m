@@ -22,6 +22,7 @@ if initialize > 1
   doglyph = 1;
   glyphcut = .1;
   glyphexp = 1;
+  glyphtype = 1;
   dark = 1;
   colorexp = .5;
   ulim = -1;
@@ -45,12 +46,14 @@ if initialize > 1
   itpause = nt;
   count = 0;
   helpon = 0;
+  keypress = 'h';
+  keymod = '';
   if ~ishandle(1), figure(1), end
   set( 0, 'CurrentFigure', 1 )
   clf
   set( 1, ...
     'Color', background, ...
-    'KeyPressFcn', 'control', ...
+    'KeyPressFcn', 'ckey = get( gcf, ''CurrentKey'' ); cmod = get( gcf, ''CurrentMod'' ); control', ...
     'DefaultAxesPosition', [ 0 0 1 1 ], ...
     'DefaultAxesVisible', 'off', ...
     'DefaultAxesColorOrder', foreground, ...
@@ -100,45 +103,35 @@ set( gcf, 'CurrentAxes', haxes(2) )
 text( .50, .05, titles( comp + 1 ) );
 text( .98, .98, sprintf( '%.3fs', it * dt ), 'Hor', 'right' )
 set( gcf, 'CurrentAxes', haxes(1) )
-
-glyphtype = 1;
-%if dosurf || isosurf, glyphtype = -1; end
-lines = [ 1 1 1   -1 -1 -1 ];
+volumes = [ 1 1 1   -1 -1 -1 ];
 if nrmdim
-  lines = [ lines; lines ];
+  volumes = [ volumes; volumes ];
   i = nrmdim + [ 0 3 ];
-  lines(1,i) = [ 1  0 ];
-  lines(2,i) = [ 0 -1 ];
+  volumes(1,i) = [ 1  0 ];
+  volumes(2,i) = [ 0 -1 ];
 end
-planes = [];
-glyphs = lines;
-volumes = lines;
-switch newplot
-case 'initial'
-case 'outline'
-case 'cube', planes = lines;
-case 'slice'
-  planes = [ 1 1 1  -1 -1 -1 ];
-  planes(slicedim)   = xhair(slicedim);
-  planes(slicedim+3) = xhair(slicedim) + cellfocus;
-  if nrmdim & slicedim ~= nrmdim
-    planes = [ planes; planes ];
-    i = nrmdim + [ 0 3 ];
-    planes(1,i) = [ 1  0 ];
-    planes(2,i) = [ 0 -1 ];
-  else
-  end
-  lines = [ lines; planes ];
-otherwise
-  error( [ 'unknown plotstyle ' newplot ] )
+slices = [ 1 1 1   -1 -1 -1 ];
+slices(slicedim)   = xhair(slicedim);
+slices(slicedim+3) = xhair(slicedim) + cellfocus;
+if nrmdim & slicedim ~= nrmdim
+  slices = [ slices; slices ];
+  i = nrmdim + [ 0 3 ];
+  slices(1,i) = [ 1  0 ];
+  slices(2,i) = [ 0 -1 ];
 end
 
-lineviz
-if nrmdim,           faultviz,   end
-if doglyph,          glyphviz,   end
-if doisosurf,        isosurfviz, end
-if domesh || dosurf, surfviz,    end
-if look,             lookat,     end
+glyphs = volumes;
+if nrmdim,    faultviz,   end
+if doglyph,   glyphviz,   end
+if doisosurf, isosurfviz, end
+if domesh || dosurf
+  switch newplot
+  case 'cube',  planes = volumes; surfviz
+  case 'slice', planes = slices;  surfviz, lines = slices; lineviz
+  end
+end
+lines = volumes; lineviz
+if look, lookat, end
 
 clear xg mg vg xga mga vga
 

@@ -3,10 +3,10 @@
 
 if look
   zoomed = 0;
-  if camdist <= 0, camdist = 3 * xmax; end
+  if camdist <= 0, camdist = 1.5 * xmax; end
   pos   = [ 0 0 0 ];
   upvec = [ 0 0 0 ];
-  va = 20;
+  va = 23;
   a = sign( look );
   i = 1:3;
   i(downdim) = [];
@@ -36,12 +36,12 @@ if look
     upvec(i1) = sign( v1(i1) );
     pos(i2) = -a * sign( v2(i2) );
   end
-  campos( double( x0 + camdist * pos ) )
-  camtarget( double( x0 ) )
+  campos( x0 + camdist * pos )
+  camtarget( x0 )
   camup( upvec )
   if va, camva( va ), end
   camva( 'manual' );
-  %axis equal
+  axis vis3d
   look = 0;
 end
 

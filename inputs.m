@@ -5,9 +5,9 @@ model = 'agu';
 model = 'the3';
 model = 'agu';
 model = 'strikeslip';
-model = 'pointsrc';
 model = 'normal';
 model = 'kostrov';
+model = 'pointsrc';
 n = [ 21 21 21 ];
 nt = 20;
 dt = .5;
@@ -67,10 +67,12 @@ case 'pointsrc'
   msrctimefcn = 'sine';
   msrcradius = 1.5 * h;
   msrcnodealign = 1;
-  n = [ 20 20 20 ] + msrcnodealign; nt = 20;
   n = [ 6  6  6  ] + msrcnodealign; nt = 20;
+  n = [ 20 20 20 ] + msrcnodealign; nt = 20;
   grid = 'slant';
   grid = 'constant';
+  plotstyle = '';
+  plotstyle = 'slice';
 case 'strikeslip'
   n = 20 * [ 1 2 2 ] + 1;
   nt = 20;

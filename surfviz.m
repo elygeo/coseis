@@ -10,7 +10,7 @@ else       facecolor = 'none';
 end
 switch field
 case { 'u', 'v' }
-  planesi = [
+  i = [
     1 2 3  4 2 6
     1 5 3  4 5 6
     1 2 3  4 5 3
@@ -21,7 +21,7 @@ case { 'u', 'v' }
   tmp = [];
   for iz = 1:size( planes, 1 )
     zone = planes(iz,:);
-    tmp = [ tmp; zone( planesi ) ];
+    tmp = [ tmp; zone( i ) ];
   end
   planes = unique( tmp, 'rows' );
   for iz = 1:size( planes, 1 )
@@ -119,4 +119,6 @@ set( hsurf, ...
   'EdgeColor', edgecolor, ...
   'FaceColor', facecolor, ...
   'FaceLighting', 'none' );
+lines = planes;
+lineviz
 

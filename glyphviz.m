@@ -1,5 +1,5 @@
 %------------------------------------------------------------------------------%
-% GLYPHSELECT
+% GLYPHVIZ
 
 minmag = ( glyphcut * fscl ) ^ 2;
 if ~fscl, return, end

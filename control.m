@@ -1,14 +1,15 @@
 %------------------------------------------------------------------------------%
 % CONTROL
 
+if ~length( keypress )
+  keypress = get( gcf, 'CurrentKey' );
+  keymod   = get( gcf, 'CurrentMod' );
+end
+km = length( keymod );
 running = itstep;
-keypress = get( gcf, 'CurrentKey' );
-if initialize, keypress = 'h'; end
-km = length( get( gcf, 'CurrentMod' ) );
 nframe = length( frame );
 dframe = 0;
 itstep = 0;
-xhairmove = 0;
 set( 0, 'CurrentFigure', 1 )
 msg = '';
 newplot = '';
@@ -73,12 +74,12 @@ case 'delete'
     frame( showframe ) = [];
   end
   anim = 1;
-case 'downarrow',  if km, xhairmove = -3; else xhairmove = -1; end
-case 'uparrow',    if km, xhairmove = 3;  else xhairmove = 1;  end
-case 'leftarrow',  xhairmove = -2;
-case 'rightarrow', xhairmove = 2;
-case 'quote',      xhairmove = 4;
-case 'semicolon',  xhairmove = 5;
+case 'downarrow',  if km, xhairmove = -3; else xhairmove = -1; end, crosshairs
+case 'uparrow',    if km, xhairmove = 3;  else xhairmove = 1;  end, crosshairs
+case 'leftarrow',  xhairmove = -2; crosshairs
+case 'rightarrow', xhairmove = 2;  crosshairs
+case 'quote',      xhairmove = 4;  crosshairs
+case 'semicolon',  xhairmove = 5;  crosshairs
 case 'return',     newplot = plotstyle;
 case 'space', itstep = 1;       msg = 'Step';
 case 'r',     itstep = nt - it; msg = 'Run';
@@ -89,37 +90,28 @@ case '3', comp = 3; colorscale; msg = titles( 4 );
 case '4', comp = 4; colorscale; msg = titles( 5 );
 case '5', comp = 5; colorscale; msg = titles( 6 );
 case '6', comp = 6; colorscale; msg = titles( 7 );
-case 'comma',  camva( 1.25 * camva )
-case 'period', camva( .8 * camva )
-case 'slash'
-  zoomed = ~zoomed;
-  if zoomed
-    j = xhair(1) + halo1(1);
-    k = xhair(2) + halo1(2);
-    l = xhair(3) + halo1(3);
-    switch field
-    case 'v'
-      xg = x(j,k,l,:) + xscl * u(j,k,l,:);
-    case 'w'
-      xg = 0.125 * ( ( ...
-        x(j,k,l,:) + x(j+1,k+1,l+1,:) + ...
-        x(j+1,k,l,:) + x(j,k+1,l+1,:) + ...
-        x(j,k+1,l,:) + x(j+1,k,l+1,:) + ...
-        x(j,k,l+1,:) + x(j+1,k+1,l,:) ) + ...
-        xscl * ( ...
-        u(j,k,l,:) + u(j+1,k+1,l+1,:) + ...
-        u(j+1,k,l,:) + u(j,k+1,l+1,:) + ...
-        u(j,k+1,l,:) + u(j+1,k,l+1,:) + ...
-        u(j,k,l+1,:) + u(j+1,k+1,l,:) ) );
-    end
-    camva( camva * 2 * h / xmax );
-    targ = double( xg(:)' );
-  else
-    camva( camva / 2 / h * xmax );
-    targ = double( x0(:)' );
+case 'comma'
+  camva( 1.25 * camva )
+case 'period'
+  camva( .8 * camva )
+  if length( hhud )
+    if ~viz3d, campos( campos + xhairtarg - camtarget ), end
+    camtarget( xhairtarg )
   end
-  if ~viz3d, campos( campos + targ - camtarget ), end
-  camtarget( targ );
+case 'slash'
+  if ~km
+    if viz3d, camva( 30 )
+    else      camva( 23 )
+    end
+    if ~viz3d, campos( campos + x0 - camtarget ), end
+    camtarget( x0 )
+  else
+    camva( 180 * h / xmax )
+    if length( hhud )
+      if ~viz3d, campos( campos + xhairtarg - camtarget ), end
+      camtarget( xhairtarg )
+    end
+  end
 case 'd', viz3d = ~viz3d; if viz3d, look = 4; else look = 5; end, lookat
 case 'leftbracket'
   tmp = .8 * get( gca, 'CLim' );
@@ -253,147 +245,8 @@ case 'b'
   anim = 1;
 otherwise action = 0;
 end
-
-if xhairmove
-  way = sign( xhairmove );
-  xhairmove = abs( xhairmove );
-  nc = ncore - cellfocus;
-  if xhairmove == 4
-    xhair = hypocenter - halo1;
-    if nrmdim
-      slicedim = nrmdim;
-      if cellfocus, xhair(nrmdim) = xhair(nrmdim) + 1; end
-    end
-  elseif xhairmove == 5
-    xhair = hypocenter - halo1;
-    xhair(downdim) = 1;
-    slicedim = downdim;
-    if nrmdim && cellfocus
-      xhair(nrmdim) = xhair(nrmdim) + 1;
-    end
-  else
-    v1 = camup;
-    v3 = camtarget - campos;
-    v2 = cross( v3, v1 );
-    [ t, i1 ] = max( abs( v1 ) );
-    [ t, i2 ] = max( abs( v2 ) );
-    i3 = 1:3;
-    i3( [ i1 i2 ] ) = [];
-    i = [ i1 i2 i3 ];
-    tmp = [ sign( v1(i1) ) sign( v2(i2) ) sign( v3(i3) ) ];
-    way = way * tmp(xhairmove);
-    xhairmove = i(xhairmove);
-    i = abs( xhairmove );
-    if length( hhud )
-      xhair(i) = xhair(i) + way;
-      if cellfocus && nrmdim == i && xhair(i) == hypocenter(i) - halo1(i)
-        xhair(i) = xhair(i) + way;
-      end
-      if xhair(i) > nc(i), xhair(i) = nc(i);
-      elseif xhair(i) < 1,  xhair(i) = 1;
-      end
-    end
-    slicedim = i;
-  end
-  delete( [ hhud hhelp ] )
-  hhelp = [];
-  j = xhair(1) + halo1(1);
-  k = xhair(2) + halo1(2);
-  l = xhair(3) + halo1(3);
-  clear xg xga mga vga
-  if cellfocus
-    for i = 1:3
-      xg(i) = 0.125 * ( ...
-        x(j,k,l,i) + x(j+1,k+1,l+1,i) + ...
-        x(j+1,k,l,i) + x(j,k+1,l+1,i) + ...
-        x(j,k+1,l,i) + x(j+1,k,l+1,i) + ...
-        x(j,k,l+1,i) + x(j+1,k+1,l,i) );
-      xga(i) = xg(i) + 0.125 * xscl * ( ...
-        u(j,k,l,i) + u(j+1,k+1,l+1,i) + ...
-        u(j+1,k,l,i) + u(j,k+1,l+1,i) + ...
-        u(j,k+1,l,i) + u(j+1,k,l+1,i) + ...
-        u(j,k,l+1,i) + u(j+1,k+1,l,i) );
-    end
-  else
-    xg(1:3) = x(j,k,l,:);
-    xga(1:3) = x(j,k,l,:) + xscl * u(j,k,l,:);
-  end
-  switch field
-  case 'u'
-    vga(1:3) = u(j,k,l,:);
-    mga = sum( u(j,k,l,:) .* u(j,k,l,:), 4 );
-    tmp = [ vga sqrt( mga ) ];
-    msg = sprintf( '|U|%9.2e\nUx %9.2e\nUy %9.2e\nUz %9.2e', tmp );
-  case 'v'
-    vga(1:3) = v(j,k,l,:);
-    mga = s1(j,k,l);
-    tmp = [ vga sqrt( mga ) ];
-    msg = sprintf( '|V|%9.2e\nVx %9.2e\nVy %9.2e\nVz %9.2e', tmp );
-  case 'w'
-    c = [ 1 6 5; 6 2 4; 5 4 3 ];
-    clear wg
-    wg(1:3) = w1(j,k,l,:);
-    wg(4:6) = w2(j,k,l,:);
-    [ vec, val ] = eig( wg(c) );
-    val = diag( val );
-    [ tmp, i ] = sort( abs( val ) );
-    val = val(i);
-    vec = vec(:,i);
-    mga = val';
-    vga = vec(:)';
-    tmp = [ val(3) wg s2(j,k,l) ];
-    msg = sprintf( '|W| %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWzy %9.2e\n|W|f%9.2e', tmp );
-  end
-  set( gcf, 'CurrentAxes', haxes(2) )
-  hhud = text( .02, .98, msg, 'Hor', 'left', 'Ver', 'top' );
-  tmp = [ it j k l; it * dt xg ];
-  msg = sprintf( '%4d %8.3fs\n%4d %8.1fm\n%4d %8.1fm\n%4d %8.1fm', tmp );
-  hhud(2) = text( .98, .98, msg, 'Hor', 'right', 'Ver', 'top' );
-  msg = '';
-  set( gcf, 'CurrentAxes', haxes(1) )
-  if zoomed
-    targ = double( xga(:)' );
-    if ~viz3d, campos( campos + targ - camtarget ), end
-    camtarget( targ )
-  end
-  if length( mga( mga ~= 0 ) )
-    if doglyph, reynoldsglyph, else, wireglyph, end
-    hhud = [ hhud hglyph ];
-  end
-  lines = [ 1 1 1  -1 -1 -1 ];
-  lines(slicedim)   = xhair(slicedim);
-  lines(slicedim+3) = xhair(slicedim) + cellfocus;
-  if nrmdim & slicedim ~= nrmdim
-    lines = [ lines; lines ];
-    i = nrmdim + [ 0 3 ];
-    lines(1,i) = [ 1  0 ];
-    lines(2,i) = [ 0 -1 ];
-  end
-  lineviz
-  set( hlines, 'Color', 'y' );
-  hhud(end+1) = hlines;
-  j = xhair(1);
-  k = xhair(2);
-  l = xhair(3);
-  if cellfocus
-    lines = [ 
-      j k l   j+1 k+1 l+1
-    ];
-  else
-    lines = [ 
-      j-1 k l   j+1 k l
-      j k-1 l   j k+1 l
-      j k l-1   j k l+1
-    ];
-  end
-  lines( lines == 0 ) = 1;
-  lineviz
-  hhud(end+1) = hlines;
-  if showframe ~= nframe
-    showframe = nframe;
-    anim = 1;
-  end
-end
+keypress = '';
+keymod = '';
 
 % Message
 set( gcf, 'CurrentAxes', haxes(2) )

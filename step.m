@@ -28,14 +28,14 @@ for iii = 1:3
         switch operator{iz,1}
         case 'g', s1(j,k,l) = dcng( w1, ii, x, ii, j, k, l );
         case 'r', s1(j,k,l) = dcnr( w1, ii, x, ii, j, k, l );
-        case 'c', s1(j,k,l) = dh(   w1, ii,    ii, j-1, k-1, l-1 );
+        case 'h', s1(j,k,l) = dh(   w1, ii,    ii, j-1, k-1, l-1 );
         end
       else
         i = 6 - iii - ii;
         switch operator{iz,1}
         case 'g', s1(j,k,l) = dcng( w2, i, x, ii, j, k, l );
         case 'r', s1(j,k,l) = dcnr( w2, i, x, ii, j, k, l );
-        case 'c', s1(j,k,l) = dh(   w2, i,    ii, j-1, k-1, l-1 );
+        case 'h', s1(j,k,l) = dh(   w2, i,    ii, j-1, k-1, l-1 );
         end
       end
     end
@@ -135,9 +135,10 @@ u = u + dt * v;
 % Modified strain, E = gradU + dt*beta*gradV
 wt(4) = toc;
 c = [ 1 2 3; 2 3 1; 3 1 2 ];
+w2(:) = 0;
 for iii = 1:3
   s1 = u(:,:,:,iii) + gamma(1) .* v(:,:,:,iii);
-  s2(:,:,:) = 0;
+  s2(:) = 0;
   for ii = [ iii:3 1:iii-1 ]
     for iz = 1:size( operator, 1 )
       bc = [ operator{iz,2:7} ];
@@ -190,10 +191,11 @@ for iii = 1:3
       end
     end
     if ii == iii
-      w1(:,:,:,ii) = s2;
-      w2(:,:,:,ii) = 0;
+[ 111 iii ii ]
+      w1(:,:,:,iii) = s2;
     else
-      w2(:,:,:,ii) = w2(:,:,:,ii) + s2;
+[ 222 iii ii ]
+      w2(:,:,:,iii) = w2(:,:,:,iii) + s2;
     end
   end
 end
