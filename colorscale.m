@@ -30,6 +30,7 @@ switch field
 case 'u', fscl = uscl; titles = { '|V|' 'Ux' 'Uy' 'Uz' }; cellfocus = 0;
 case 'v', fscl = vscl; titles = { '|V|' 'Vx' 'Vy' 'Vz' }; cellfocus = 0;
 case 'w', fscl = wscl; titles = { '|W|' 'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
+otherwise error field
 end
 fscl = double( fscl );
 clim = fscl;

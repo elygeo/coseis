@@ -37,6 +37,7 @@ case 'delta',  msrct = 0 * time; msrct(1) = 1;
 case 'brune',  msrct = time .* exp( -time / domp ) ./ h ^ 3 ./ domp ^ 2;
 case 'sbrune', msrct = time .^ 2 .* exp( -time / domp ) / h ^ 3 / domp ^ 2;
 case 'sine',   msrct = sin( 2 * pi * time / domp );
+otherwise error msrctimefcn
 end
 o = prod( n );
 for i = 0:2

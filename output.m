@@ -25,7 +25,7 @@ if initialize
     case 'w',     c = { 'xx' 'yy' 'zz' 'yz' 'zx' 'xy' }; cells = 1;
     case 'uslip', c = { 'm' }; faultplane = 1;
     case 'vslip', c = { 'm' }; faultplane = 1;
-    otherwise, error( 'unknown out type' )
+    otherwise error outvar
     end
     outnc(iz) = length( c );
     if outint(iz) < 0, outint(iz) = outint(iz) + nt + 1; end
@@ -107,7 +107,7 @@ for iz = 1:size( out, 1 )
         end
       case 'uslip', fwrite( fid, uslip(j,k,l), 'float32' );
       case 'vslip', fwrite( fid, vslip(j,k,l), 'float32' );
-      otherwise, error( 'unknown out type' )
+      otherwise error outvar
       end
       fclose( fid );
     end

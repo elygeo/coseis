@@ -29,7 +29,7 @@ case 'h'
         'Run/Pause/Step             R Click Space'
         'Explore                       ; '' Arrows'
         'Color Scale                      [ ] \\ |'
-        'Zoom                               , . /'
+        'Zoom                               < > /'
         'Rotate                              Drag'
         'Component                            0-6'
         'Field                              U V W'
@@ -41,6 +41,7 @@ case 'h'
         'Surfaces                               S'
         'Mesh                                   M'
         'Outline                                O'
+        'Axis                                   A'
         'Replot                             Enter'
         'Clean Up                       Backspace'
         'Frame +/-                       - = Page'
@@ -232,6 +233,10 @@ case 's'
   if length( tmp ), set( tmp, 'FaceColor', facecolor ), end
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'surfline' );
   if length( tmp ), set( tmp, 'Visible', visible ), end
+case 'a'
+  if strcmp( get( gca, 'Visible' ), 'off' ), axis on
+  else axis off
+  end
 case 'c'
   if ~km
     save checkpoint it slip u v vv trup

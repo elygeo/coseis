@@ -11,5 +11,6 @@ case 2, df = c1 * ( f(j,k+1,l,i) - f(j,k,  l,i) ) ...
            + c2 * ( f(j,k+2,l,i) - f(j,k-1,l,i) );
 case 3, df = c1 * ( f(j,k,l+1,i) - f(j,k,l  ,i) ) ...
            + c2 * ( f(j,k,l+2,i) - f(j,k,l-1,i) );
+otherwise error a
 end
 

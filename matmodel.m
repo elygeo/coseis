@@ -88,8 +88,7 @@ for iz = 1:size( operator, 1 )
     j = i1(1):i2(1);
     s2(j,k,l) = h;
     s1(j,k,l) = h;
-  otherwise
-    error( [ 'unknown operator type: ' operator{iz,1} ] )
+  otherwise error operator
   end
   nn = [ n 3 ];
   nn(1) = npml;

@@ -15,6 +15,7 @@ case 3
 df = 1 / 4 * ...
 ((x(j,k+1,l,2)-x(j,k,l,2)).*(x(j+1,k,l,1)-x(j,k,l,1)).*...
 (f(j+1,k+1,l+1,i)+f(j,k+1,l+1,i)+f(j+1,k,l+1,i)+f(j,k,l+1,i)-f(j,k,l,i)-f(j+1,k,l,i)-f(j,k+1,l,i)-f(j+1,k+1,l,i)));
+otherwise error a
 end
 %flops: 3* 23+
 

@@ -54,6 +54,7 @@ for a = 1:3
     + x(j-1,k-1,l,b) .* ( x(j,k-1,l,c) - x(j-1,k,l,c) ) ...
     + x(j-1,k+1,l,b) .* ( x(j-1,k,l,c) - x(j,k+1,l,c) ) ...
     + x(j+1,k-1,l,b) .* ( x(j+1,k,l,c) - x(j,k-1,l,c) ) );
+  otherwise error ax
   end
 end
 

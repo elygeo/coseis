@@ -6,10 +6,6 @@ if initialize
 disp( 'Initialize fault' )
 nf = n;
 nf(nrmdim) = 1;
-halo1f = halo1;
-ncoref = ncore;
-halo1f(nrmdim) = 0;
-ncoref(nrmdim) = 1;
 fs    = repmat( 0, nf );
 fd    = repmat( 0, nf );
 dc    = repmat( 0, nf );
@@ -18,7 +14,9 @@ s0    = repmat( 0, [ nf 6 ] );
 t0nsd = repmat( 0, [ nf 3 ] );
 for iz = 1:size( friction, 1 )
   zone = friction(iz,5:10);
-  [ i1, i2 ] = zoneselect( zone, halo1f, ncoref, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
+  i1(nrmdim) = 1;
+  i2(nrmdim) = 1;
   j = i1(1):i2(1);
   k = i1(2):i2(2);
   l = i1(3):i2(3);
@@ -29,7 +27,9 @@ for iz = 1:size( friction, 1 )
 end
 for iz = 1:size( traction, 1 )
   zone = traction(iz,4:9);
-  [ i1, i2 ] = zoneselect( zone, halo1f, ncoref, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
+  i1(nrmdim) = 1;
+  i2(nrmdim) = 1;
   j = i1(1):i2(1);
   k = i1(2):i2(2);
   l = i1(3):i2(3);
@@ -39,7 +39,9 @@ for iz = 1:size( traction, 1 )
 end
 for iz = 1:size( stress, 1 )
   zone = stress(iz,7:12);
-  [ i1, i2 ] = zoneselect( zone, halo1f, ncoref, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
+  i1(nrmdim) = 1;
+  i2(nrmdim) = 1;
   j = i1(1):i2(1);
   k = i1(2):i2(2);
   l = i1(3):i2(3);
@@ -75,13 +77,28 @@ area = sqrt( area );
 tmp = area(j,k,l);
 i = tmp ~= 0;
 tmp(i) = 1 ./ tmp(i);
-if strcmp( operator, 'constant' ), area = area ./ h ^ 2; end
+s1(:) = 1;
+for iz = 1:size( operator, 1 )
+  zone = [ operator{iz,8:13} ];
+  [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
+  i1(nrmdim) = 1;
+  i2(nrmdim) = 1;
+  l = i1(3):i2(3);
+  k = i1(2):i2(2);
+  j = i1(1):i2(1);
+  switch operator{iz,1}
+  case { 'g', 'r' }, s1(j,k,l) = 1;
+  case { 'h', '4' }, s1(j,k,l) = 1 / h ^ 2;
+  otherwise error operator
+  end
+end
 for i = 1:3
   nrm(j,k,l,i) = nrm(j,k,l,i) .* tmp;
 end
-dipdim = downdim;
-strdim = 6 - dipdim - nrmdim;
-if nrmdim == dipdim
+if nrmdim ~= downdim
+  dipdim = downdim;
+  strdim = 6 - dipdim - nrmdim;
+else
   strdim = mod( nrmdim, 3 ) + 1;
   dipdim = 6 - strdim - nrmdim;
 end
@@ -144,6 +161,7 @@ rcritr = miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2;
 fprintf( 1, 'S: %g\n', strength )
 fprintf( 1, 'dc: %g > %g\n', dc0, dcr )
 fprintf( 1, 'rcrit: %g > %g\n', rcrit, rcritr )
+area = area .* s1;
 return
 
 end

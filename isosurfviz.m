@@ -13,7 +13,7 @@ for iz = 1:size( volumes, 1 )
   k = i1(2):i2(2);
   j = i1(1):i2(1);
   ng = i2 - i1 + 1;
-  if sum( ng > 1 ) < 3, error( 'bad volume' ), end
+  if sum( ng > 1 ) < 3, error volume, end
   switch field
   case 'u'
     if comp, vg = u(j,k,l,comp); 
@@ -28,6 +28,7 @@ for iz = 1:size( volumes, 1 )
     elseif comp,     vg = w1(j,k,l,comp); 
     else             vg = s2(j,k,l); 
     end
+  otherwise error field
   end
   if ~cellfocus
     xg = x(j,k,l,:) + xscl * u(j,k,l,:); 

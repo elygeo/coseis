@@ -90,6 +90,7 @@ case 'w'
   vga = vec(:)';
   tmp = [ sqrt( s2(j,k,l) ) val(3) wg ];
   msg = sprintf( '|W|f%9.2e\n|W| %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e', tmp );
+otherwise error field
 end
 set( gcf, 'CurrentAxes', haxes(2) )
 hhud = text( .02, .98, msg, 'Hor', 'left', 'Ver', 'top' );
@@ -102,77 +103,68 @@ if length( mga( mga ~= 0 ) )
   if doglyph, reynoldsglyph, else, wireglyph, end
   hhud = [ hhud hglyph ];
 end
-if dooutline
-  points = [ halo1 + 1 halo1 + ncore ];
-  points(slicedim)   = xhair(slicedim) + halo1(slicedim);
-  points(slicedim+3) = xhair(slicedim) + halo1(slicedim) + cellfocus;
-  if nrmdim & slicedim ~= nrmdim
-    points = [ points; points ];
-    points(1,nrmdim+3) = hypocenter(nrmdim);
-    points(2,nrmdim)   = hypocenter(nrmdim)+1;
-  end
-  for iz = 1 : size( points, 1 )
-    i1 = points(iz,1:3);
-    i2 = points(iz,4:6);
-    i  = [ i1; i1+1; i2; i2-1 ];
-    if cellfocus
-      i1 = [ 1 1 2 2; 1 1 2 2; 1 1 2 2; 1 1 2 2;
-             1 1 2 2; 1 1 2 2; 1 1 2 2; 1 1 2 2 ];
-      i2 = [ 1 1 1 1; 1 1 1 1; 3 3 3 3; 3 3 3 3;
-             2 1 1 2; 4 3 3 4; 2 1 1 2; 4 3 3 4 ];
-      i3 = [ 2 1 1 2; 4 3 3 4; 2 1 1 2; 4 3 3 4;
-             1 1 1 1; 1 1 1 1; 3 3 3 3; 3 3 3 3 ];
-    else
-      i1 = [ 1 1 1; 1 1 1; 1 1 1; 1 1 1 ];
-      i2 = [ 1 1 2; 1 1 2; 3 3 4; 3 3 4 ];
-      i3 = [ 2 1 1; 4 3 3; 2 1 1; 4 3 3 ];
-    end
-    switch slicedim
-    case 1, j = i(i1); k = i(i2+4); l = i(i3+8);
-    case 2, j = i(i3); k = i(i1+4); l = i(i2+8);
-    case 3, j = i(i2); k = i(i3+4); l = i(i1+8);
-    end
-    ii = sub2ind( n(1:3), j, k, l )';
-    ng = prod( n(1:3) );
-    clear xg
-    for i = 0:2
-      xg(:,:,i+1) = x(ii+i*ng) + xscl * u(ii+i*ng);
-    end
-    xg(end+1,:,:) = NaN;
-    ng = size( xg );
-    xg = reshape( xg, [ prod( ng(1:2) ) 3 ] );
-    xga = xg;
-  end
-  hhud(end+1) = plot3( xg(:,1), xg(:,2), xg(:,3), 'Tag', 'outline' );
-end
 i1 = xhair + halo1;
 i = [ i1-1; i1; i1+1 ];
 if cellfocus
-  i1 = [ 2 2 3 3; 2 2 3 3; 2 2 3 3; 2 2 3 3 ];
-  i2 = [ 2 2 2 2; 3 3 3 3; 3 2 2 3; 2 3 3 2 ];
-  i3 = [ 2 3 3 2; 3 2 2 3; 2 2 2 2; 3 3 3 3 ];
-  il = [ 4 11 2 ];
+  j = [ 1 1 1 1 1 2 2 2 2 2 2 1 1 2 2 1 ] + 1;
+  k = [ 1 1 2 2 1 1 1 2 2 1 1 1 2 2 2 2 ] + 1;
+  l = [ 1 2 2 1 1 1 2 2 1 1 2 2 2 2 1 1 ] + 1;
+  il = [ 6 4 2 ];
 else
-  i1 = [ 1 2 3; 2 2 2; 2 2 2 ];
-  i2 = [ 2 2 2; 1 2 3; 2 2 2 ];
-  i3 = [ 2 2 2; 2 2 2; 1 2 3 ];
-  il = [ 3 7 11 ];
+  j = [ 3 2 1 2 2 2 2 2 2 2 2 ];
+  k = [ 2 2 2 2 3 2 1 2 2 2 2 ];
+  l = [ 2 2 2 2 2 2 2 2 3 2 1 ];
+  il = [ 1 5 9 ];
 end
-j = i(i1);
-k = i(i2+3);
-l = i(i3+6);
+j = i(j);
+k = i(k+3);
+l = i(l+6);
 ii = sub2ind( n(1:3), j, k, l )';
 ng = prod( n(1:3) );
 clear xg
 for i = 0:2
-  xg(:,:,i+1) = x(ii+i*ng) + xscl * u(ii+i*ng);
+  xg(:,i+1) = x(ii+i*ng) + xscl * u(ii+i*ng);
 end
-xg(end+1,:,:) = NaN;
-ng = size( xg );
-xg = reshape( xg, [ prod( ng(1:2) ) 3 ] );
 hhud(end+1) = plot3( xg(:,1), xg(:,2), xg(:,3) );
 xg = double( xg(il,:) );
 hhud(end+1:end+3) = text( xg(:,1), xg(:,2), xg(:,3), ['123']', 'Ver', 'middle');
+if dooutline
+  points = [ halo1 + 1 halo1 + ncore ];
+  i1 = halo1 + 1;
+  i2 = halo1 + ncore;
+  i1(slicedim) = xhair(slicedim) + halo1(slicedim);
+  i2(slicedim) = xhair(slicedim) + halo1(slicedim) + cellfocus;
+  i  = [ i1; i1+1; i2; i2-1 ];
+  if cellfocus
+    i1 = [ 1 1 2 2; 1 1 2 2; 1 1 2 2; 1 1 2 2;
+           1 1 2 2; 1 1 2 2; 1 1 2 2; 1 1 2 2 ];
+    i2 = [ 1 1 1 1; 1 1 1 1; 3 3 3 3; 3 3 3 3;
+           2 1 1 2; 4 3 3 4; 2 1 1 2; 4 3 3 4 ];
+    i3 = [ 2 1 1 2; 4 3 3 4; 2 1 1 2; 4 3 3 4;
+           1 1 1 1; 1 1 1 1; 3 3 3 3; 3 3 3 3 ];
+  else
+    i1 = [ 1 1 1; 1 1 1; 1 1 1; 1 1 1 ];
+    i2 = [ 1 1 2; 1 1 2; 3 3 4; 3 3 4 ];
+    i3 = [ 2 1 1; 4 3 3; 2 1 1; 4 3 3 ];
+  end
+  switch slicedim
+  case 1, j = i(i1); k = i(i2+4); l = i(i3+8);
+  case 2, j = i(i3); k = i(i1+4); l = i(i2+8);
+  case 3, j = i(i2); k = i(i3+4); l = i(i1+8);
+  otherwise error slicedim
+  end
+  ii = sub2ind( n(1:3), j, k, l )';
+  ng = prod( n(1:3) );
+  clear xg
+  for i = 0:2
+    xg(:,:,i+1) = x(ii+i*ng) + xscl * u(ii+i*ng);
+  end
+  xg(end+1,:,:) = NaN;
+  ng = size( xg );
+  xg = reshape( xg, [ prod( ng(1:2) ) 3 ] );
+  hhud(end+1) = plot3( xg(:,1), xg(:,2), xg(:,3), 'Tag', 'outline' );
+end
+
 if showframe ~= nframe
   showframe = nframe;
   set( [ frame{:} ], 'Visible', 'off' )

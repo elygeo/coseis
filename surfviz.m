@@ -42,6 +42,7 @@ case { 'u', 'v' }
         if comp, vg = v(j,k,l,comp); 
         else     vg = sqrt( s1(j,k,l) );
         end
+      otherwise error field
       end
       xg = squeeze( xg );
       vg = squeeze( vg );
@@ -112,6 +113,7 @@ case 'w'
       hsurf(end+1) = surf( xg(:,:,1), xg(:,:,2), xg(:,:,3), double( vg ) );
     end
   end
+otherwise error field
 end
 set( hsurf, ...
   'Tag', 'surf', ...

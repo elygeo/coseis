@@ -76,8 +76,7 @@ case 3
       end
     end
   end
-otherwise
-  error( 'size of mga' )
+otherwise error mga
 end
 set( hglyph, 'Tag', 'glyph' );
 

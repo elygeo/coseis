@@ -29,6 +29,7 @@ for iii = 1:3
         case 'g', s1(j,k,l) = dcng( w1, ii, x, ii, j, k, l );
         case 'r', s1(j,k,l) = dcnr( w1, ii, x, ii, j, k, l );
         case 'h', s1(j,k,l) = dh(   w1, ii,    ii, j-1, k-1, l-1 );
+        otherwise error operator
         end
       else
         i = 6 - iii - ii;
@@ -36,6 +37,7 @@ for iii = 1:3
         case 'g', s1(j,k,l) = dcng( w2, i, x, ii, j, k, l );
         case 'r', s1(j,k,l) = dcnr( w2, i, x, ii, j, k, l );
         case 'h', s1(j,k,l) = dh(   w2, i,    ii, j-1, k-1, l-1 );
+        otherwise error operator
         end
       end
     end
@@ -75,6 +77,7 @@ for iii = 1:3
           s1(j,k,li) = f6(j,k,i,iii);
         end
       end
+      otherwise error ii
     end
     if iii == ii,
       w1(:,:,:,iii) = s1;
@@ -101,6 +104,7 @@ for i = 1:3
     case 'g', s2(j,k,l) = hgr( w2, h, y, i, j, k, l );
     case 'r', s2(j,k,l) = hgr( w2, x, y, i, j, k, l );
     case 'h', s2(j,k,l) = hgr( w2, 1, y, i, j, k, l );
+    otherwise error operator
     end
   end
   w1(:,:,:,i) = w1(:,:,:,i) + s2;
@@ -151,6 +155,7 @@ for iii = 1:3
       case 'g', s2(j,k,l) = dncg( s1, 1, x, ii, j, k, l );
       case 'r', s2(j,k,l) = dncr( s1, 1, x, ii, j, k, l );
       case 'h', s2(j,k,l) = dh(   s1, 1,    ii, j, k, l );
+      otherwise error operator
       end
     end
     for i = 1:npml-1
@@ -188,6 +193,7 @@ for iii = 1:3
           e6(j,k,i,iii) = dampc1(i) * s2(j,k,li) + dampc2(i) * e6(j,k,i,iii);
           s2(j,k,li) = e6(j,k,i,iii);
         end
+      otherwise error ii
       end
     end
     if ii == iii

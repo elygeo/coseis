@@ -75,7 +75,7 @@ if initialize > 1
   cameramenu
   cameratoolbar
   cameratoolbar( 'SetMode', 'orbit' )
-  cameratoolbar( 'SetCoordSys', 'x' )
+  cameratoolbar( 'SetCoordSys', 'z' )
   drawnow
   colorscale
   if ~exist( 'out/viz', 'dir' ), mkdir out/viz, end
@@ -132,13 +132,25 @@ if domesh || dosurf
   case 'slice'
     planes = slices; surfviz
     lines  = slices; lineviz, set( hand, 'Tag', 'surfline' )
+  otherwise error newplot
   end
 end
 if dooutline
   lines = volumes;
   lineviz
-  set( hand, 'Tag', 'outline' )
   houtline = hand;
+  i = halo1 + 1;
+  xg = double( squeeze( x(i(1),i(2),i(3),:) + xscl * u(i(1),i(2),i(3),:) ) );
+  xg = [ xg xg + xmax / 16 xg + xmax / 15 ];
+  j = [ 4 1 1 1 1 ];
+  k = [ 2 2 5 2 2 ];
+  l = [ 3 3 3 3 6 ];
+  houtline(2) = plot3( xg(j), xg(k), xg(l) );
+  j = [ 1 7 1 1 ];
+  k = [ 2 2 8 2 ];
+  l = [ 3 3 3 9 ];
+  houtline(3:6) = text( xg(j), xg(k), xg(l), ['oxyz']', 'Ver', 'middle' );
+  set( houtline, 'Tag', 'outline' )
 end
 if look, lookat, end
 
