@@ -2,61 +2,61 @@
 % GRIDGEN
 
 disp( 'Grid generation' )
-L = n - 3;
-if nrmdim, L(nrmdim) = L(nrmdim) - 1; end
-L1 = L(1);
-L2 = L(2);
-L3 = L(3);
-[x1, x2, x3] = ndgrid( 0:L1*one, 0:L2*one, 0:L3*one );
+nn = n - 3;
+if nrmdim, nn(nrmdim) = nn(nrmdim) - 1; end
+n1 = nn(1);
+n2 = nn(2);
+n3 = nn(3);
+[x1, x2, x3] = ndgrid( 0:n1*one, 0:n2*one, 0:n3*one );
 xx1 = x1;
 xx2 = x2;
 xx3 = x3;
 c = 0;
-c = 0.2 * L3;
-c = 0.01 * L3;
-c = 0.06 * L3;
-c = 0.1 * L3;
+c = 0.2 * n3;
+c = 0.01 * n3;
+c = 0.06 * n3;
+c = 0.1 * n3;
 rand( 'state', 0 )
 switch grid
 case 'constant'
-  operator = { 'constant'  1 -1   1 -1   1 -1 };
-  %if nrmdim, operator = 'rectangular'; end
+  operator = { 'h'  0 1 1  1 1 1   1 1 1  -1 -1 -1 };
+  %if nrmdim, operator = 'rec'; end
 case 'staggered'
-  operator = { 'staggered'  1 -1   1 -1   1 -1 };
+  operator = { '4'  0 1 1  1 1 1    1 1 1   -1 -1 -1 };
   staggerbc1 = 1; % normal v at the surface
   staggerbc1 = 0; % horizontal v at the surface
 case 'map'
-  operator = { 'som'  1 -1   1 -1   1 -1 };
-  xx1 = x1 + .1 * (cos(x3./L3*2*pi)-sin(x2./L2*2*pi)) .* (L1-x1) + .1 * (L2-x2) .* (x1-L1);
-  xx2 = x2 + c / 5 * (x2-L2/2) .* (L1-x1);
-  xx3 = x3 + c / 5 * (x3-L2/2) .* (L1-x1);
+  operator = { 'g'  0 1 1  1 1 1    1 1 1  -1 -1 -1 };
+  xx1 = x1 + .1 * (cos(x3./n3*2*pi)-sin(x2./n2*2*pi)) .* (n1-x1) + .1 * (n2-x2) .* (x1-n1);
+  xx2 = x2 + c / 5 * (x2-n2/2) .* (n1-x1);
+  xx3 = x3 + c / 5 * (x3-n2/2) .* (n1-x1);
 case 'normal'
-  operator = { 'som'  1 -1   1 -1   1 -1 };
-  xx1 = x1 + c * (x1./L1-1) .* atan(10*(x3./L3-.5));
-  xx3 = x3 - c * (x1./L1-.5) * 4 .* (.5-abs(x3./L3-.5));
+  operator = { 'g'  0 1 1  1 1 1    1 1 1  -1 -1 -1 };
+  xx1 = x1 + c * (x1./n1-1) .* atan(10*(x3./n3-.5));
+  xx3 = x3 - c * (x1./n1-.5) * 4 .* (.5-abs(x3./n3-.5));
   %moment = -[0 0 0 0 0 1e18];
   h = 1.5 * h;
 case 'curve'
-  operator = { 'som'  1 -1   1 -1   1 -1 };
-  dem = .2 * rand( [ 1 L2+1 L3+1 ] ) .* (-1.5-atan(10*(x3(1,:,:)./L3-.5))) + c*(x1(1,:,:)./L1-1).*atan( 10*(x3(1,:,:)./L3-.5) );
-  xx1 = x1 + (1-x1./L1) .* repmat(dem,[L1+1 1 1]);
-  xx2 = x2 + c * sin(x3./L3*2*pi) .* (.5-abs(x2./L2-.5));
-  xx3 = x3 - c * sin(x2./L2*2*pi) .* (.5-abs(x3./L3-.5));
+  operator = { 'g'  0 1 1  1 1 1    1 1 1  -1 -1 -1 };
+  dem = .2 * rand( [ 1 n2+1 n3+1 ] ) .* (-1.5-atan(10*(x3(1,:,:)./n3-.5))) + c*(x1(1,:,:)./n1-1).*atan( 10*(x3(1,:,:)./n3-.5) );
+  xx1 = x1 + (1-x1./n1) .* repmat(dem,[n1+1 1 1]);
+  xx2 = x2 + c * sin(x3./n3*2*pi) .* (.5-abs(x2./n2-.5));
+  xx3 = x3 - c * sin(x2./n2*2*pi) .* (.5-abs(x3./n3-.5));
   h = 1.5 * h;
 case 'spherical'
-  operator = { 'som'  1 -1   1 -1   1 -1 };
-  da = pi / 2 / max( [ L2 L3 ] );
-  %rr = 2 * L1 - x1 - 1 / da;
-  rr = 2 * L1 - x1;
-  a = ( x2 - L2 / 2 ) * da;
-  b = ( x3 - L3 / 2 ) * da;
+  operator = { 'g'  0 1 1  1 1 1    1 1 1  -1 -1 -1 };
+  da = pi / 2 / max( [ n2 n3 ] );
+  %rr = 2 * n1 - x1 - 1 / da;
+  rr = 2 * n1 - x1;
+  a = ( x2 - n2 / 2 ) * da;
+  b = ( x3 - n3 / 2 ) * da;
   xx1 = -rr ./ sqrt( 1 + tan(a).^2 + tan(b).^2 );
   xx2 = -tan(a) .* xx1;
   xx3 = -tan(b) .* xx1;
   xx1 = xx1 - min( xx1(:) );
   h = 1.5 * h;
 case 'slant'
-  operator = { 'som'  1 -1   1 -1   1 -1 };
+  operator = { 'g'  0 1 1  1 1 1    1 1 1  -1 -1 -1 };
   theta = 30 * pi / 180;
   xx1 = x1 * cos( theta );
   xx2 = x2 - x1 * sin( theta );
@@ -64,13 +64,13 @@ case 'slant'
   xx1 = scl * xx1;
   xx2 = scl * xx2;
 case 'stretch'
-  operator = { 'rectangular'  1 -1   1 -1   1 -1 };
+  operator = { 'r'  0 1 1  1 1 1    1 1 1  -1 -1 -1 };
   xx2 = 2 * x2;
 case 'hill'
-  operator = { 'som'  1 -1   1 -1   1 -1 };
-  xx1 = x1 - .25 * (L1-x1) .* exp(-((x2-L2/2).^2 + (x3-L3/2).^2) / ((L2 + L3)/10) ^ 2);
+  operator = { 'g'  0 1 1  1 1 1    1 1 1  -1 -1 -1 };
+  xx1 = x1 - .25 * (n1-x1) .* exp(-((x2-n2/2).^2 + (x3-n3/2).^2) / ((n2 + n3)/10) ^ 2);
 case 'rand'
-  operator = { 'som'  1 -1   1 -1   1 -1 };
+  operator = { 'g'  0 1 1  1 1 1    1 1 1  -1 -1 -1 };
   a = .2;
   %h = h / ( 1 - a );
   x1 = a * ( rand( size( x1 ) ) - .5 );
@@ -91,13 +91,12 @@ case 'rand'
   xx3 = xx3 + x3;
 otherwise, error( 'unknown grid type' )
 end
-if noise, operator = { 'som'  1 -1   1 -1   1 -1 }; end
-clear x1 x2 x3
+if noise, operator = { 'g'  0 1 1  1 1 1    1 1 1  -1 -1 -1 }; end
 %x = repmat( zero, [ n 3 ] );
-tmp = rand( [ L1 L2 L3 ] + 1 ); x(:,:,:,1) = xx1 + noise * ( tmp - .5 );
-tmp = rand( [ L1 L2 L3 ] + 1 ); x(:,:,:,2) = xx2 + noise * ( tmp - .5 );
-tmp = rand( [ L1 L2 L3 ] + 1 ); x(:,:,:,3) = xx3 + noise * ( tmp - .5 );
-clear xx1 xx2 xx3
+x1 = rand( [ n1 n2 n3 ] + 1 ); x(:,:,:,1) = xx1 + noise * ( x1 - .5 );
+x2 = rand( [ n1 n2 n3 ] + 1 ); x(:,:,:,2) = xx2 + noise * ( x2 - .5 );
+x3 = rand( [ n1 n2 n3 ] + 1 ); x(:,:,:,3) = xx3 + noise * ( x3 - .5 );
+clear x1 x2 x3 xx1 xx2 xx3
 x = x([1 1:end end],[1 1:end end],[1 1:end end],:);
 switch nrmdim
 case 1, x = x([1:hypocenter(1) hypocenter(1):end],:,:,:);
@@ -106,8 +105,8 @@ case 3, x = x(:,:,[1:hypocenter(3) hypocenter(3):end],:);
 end
 h = h / ( 1 - noise );
 x = h * x;
-r0 = min( reshape( x, [ prod(n) 3 ] ) );
-r1 = max( reshape( x, [ prod(n) 3 ] ) );
-rc = double( r1 + r0 ) / 2;
-L  = double( max( r1 - r0 ) );
+x1 = min( reshape( x, [ prod(n) 3 ] ) );
+x2 = max( reshape( x, [ prod(n) 3 ] ) );
+x0 = ( x1 + x2 ) / 2;
+xmax = max( x2 - x1 );
 

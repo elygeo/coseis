@@ -2,78 +2,43 @@
 % MOMENTSRC
 
 if initialize
-  source = [];
-  switch abs( srcgeom )
-  case 0,  a = [  0 0 ];
-  case 8,  a = [ -1 0 ];
-  case 32, a = [ -2 1 ];
-  case 1,  a = [  0 0 ];
-  case 7,  a = [ -1 1 ];
-  case 19, a = [ -1 1 ];
-  otherwise, error( 'unknown source geometry' )
+  l = 1:n(3)-1;
+  k = 1:n(2)-1;
+  j = 1:n(1)-1;
+  w1(j,k,l,:) = 0.125 * ( ...
+    x(j,k,l,:) + x(j+1,k+1,l+1,:) + ...
+    x(j+1,k,l,:) + x(j,k+1,l+1,:) + ...
+    x(j,k+1,l,:) + x(j+1,k,l+1,:) + ...
+    x(j,k,l+1,:) + x(j+1,k+1,l,:) );
+  l = hypocenter(3);
+  k = hypocenter(2);
+  j = hypocenter(1);
+  for i = 1:3
+    if msrcnodealign
+      w1(:,:,:,i) = w1(:,:,:,i) - x(j,k,l,i);
+    else
+      w1(:,:,:,i) = w1(:,:,:,i) - w1(j,k,l,i);
+    end
   end
-  if hypocenter + a(1) >= 2 & hypocenter + a(2) <= n, else
-    srcgeom, hypocenter, n
-    error( 'source geometry extends out of domain' )
-  end
+  s1 = sum( w1 .* w1, 4 );
+  msrci = find( s1 < msrcradius ^ 2 );
+  msrcx = msrcradius - sqrt( s1( msrci ) );
+  msrcx = msrcx / sum( msrcx );
+  msrct = [];
   return
 end
 
-moment = moment(:);
-if length( source ) < nt
-  % FIXME source time func no longer integrated
-  % time indexing goes Si vi Si+1 vi+1...
-  T = 8 * dt;
-  t = ( .5 : nt-.5 ) * dt;
-  switch 'brune'
-  case 'delta'
-    source = 0 * t; source(1) = 1;
-  case 'brune'
-    source = t .* exp( -t / T ) ./ h ^ 3 ./ T ^ 2;
-  case 'smoothbrune'
-    source = t .^ 2 .* exp( - t / T ) / h ^ 3 / T ^ 2;
-  case 'sin'
-    snt    = min( [ nt 9 ] );
-    source = zeros( 1, nt );
-    source(1:snt) = sin( ( 0 : snt-1 ) / ( snt - 1 ) * pi * 2 );
-  end
+domp = 8 * dt;
+time = ( .5 : it-.5 ) * dt;  % time indexing goes wi vi wi+1 vi+1 ...
+switch msrctimefcn
+case 'delta',  msrct = 0 * time; msrct(1) = 1;
+case 'brune',  msrct = time .* exp( -time / domp ) ./ h ^ 3 ./ domp ^ 2;
+case 'sbrune', msrct = time .^ 2 .* exp( -time / domp ) / h ^ 3 / domp ^ 2;
+case 'sine',   msrct = sin( 2 * pi * time / domp );
 end
-for i = 1:6
-  j = hypocenter(1);
-  k = hypocenter(2);
-  l = hypocenter(3);
-  a = [-1 1]; % S cell centered: 1,7,19,27
-  b = [-1 0]; % v node centered: 8, 32
-  c = [-2 1]; % v node centered: 32
-  r = 1;
-  if srcgeom < 0; % moment insead of moment rate?
-    srcgeom = -srcgeom;
-    r = 0;
-  end
-  switch srcgeom
-  case 0
-  case 8
-    S(j+b,k+b,l+b,i) = r*S(j+b,k+b,l+b,i) + source(it)*moment(i)/6;
-  case 32
-    S(j+b,k+b,l+b,i) = r*S(j+b,k+b,l+b,i) + source(it)*moment(i)/12;
-    S(j+c,k+b,l+b,i) = r*S(j+c,k+b,l+b,i) + source(it)*moment(i)/48;
-    S(j+b,k+c,l+b,i) = r*S(j+b,k+c,l+b,i) + source(it)*moment(i)/48;
-    S(j+b,k+b,l+c,i) = r*S(j+b,k+b,l+c,i) + source(it)*moment(i)/48;
-  case 1
-    S(j,k,l,i)       = r*S(j,k,l,i)       + source(it)*moment(i);
-  case 7
-    S(j,k,l,i)       = r*S(j,k,l,i)       + source(it)*moment(i)/2;
-    S(j+a,k,l,i)     = r*S(j+a,k,l,i)     + source(it)*moment(i)/12;
-    S(j,k+a,l,i)     = r*S(j,k+a,l,i)     + source(it)*moment(i)/12;
-    S(j,k,l+a,i)     = r*S(j,k,l+a,i)     + source(it)*moment(i)/12;
-  case 19
-    S(j,k,l,i)       = r*S(j,k,l,i)       + source(it)*moment(i)/6;
-    S(j+a,k,l,i)     = r*S(j+a,k,l,i)     + source(it)*moment(i)/18;
-    S(j,k+a,l,i)     = r*S(j,k+a,l,i)     + source(it)*moment(i)/18;
-    S(j,k,l+a,i)     = r*S(j,k,l+a,i)     + source(it)*moment(i)/18;
-    S(j+a,k+a,l,i)   = r*S(j+a,k+a,l,i)   + source(it)*moment(i)/24;
-    S(j,k+a,l+a,i)   = r*S(j,k+a,l+a,i)   + source(it)*moment(i)/24;
-    S(j+a,k,l+a,i)   = r*S(j+a,k,l+a,i)   + source(it)*moment(i)/24;
-  end
+o = prod( n );
+for i = 0:2
+  w1(msrci+o*i) = w1(msrci+o*i) + msrct(it) * msrcx * moment(i+1);
+  w2(msrci+o*i) = w2(msrci+o*i) + msrct(it) * msrcx * moment(i+4);
 end
 

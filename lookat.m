@@ -2,10 +2,11 @@
 % LOOKAT
 
 if look
+  zoomed = 0;
   pos   = [ 0 0 0 ];
   targ  = [ 0 0 0 ];
   upvec = [ 0 0 0 ];
-  va = 25;
+  va = 30;
   a = 3 * sign( look );
   i = 1:3;
   i(downdim) = [];
@@ -28,12 +29,12 @@ if look
     upvec(i1) = sign( v1(i1) );
     targ(i2) = a * sign( v2(i2) );
   end
-  campos( rc + Lscl * pos )
-  camtarget( rc + Lscl * targ )
+  campos( double( x0 + xscl * pos ) )
+  camtarget( double( x0 + xscl * targ ) )
   camup( upvec )
   if va, camva( va ), end
   camva( 'manual' );
-  axis equal
+  %axis equal
   look = 0;
 end
 

@@ -1,27 +1,29 @@
 SORD - Support-Operator Rupture Dynamics
 Geoffrey Ely
-
+gely@ucsd.edu
+ 
 COORDINATE SYSTEM
  
-(x,y,z) -> (j,k,l)
- 
-   0----x      N----.           .----yz         xx----u1
-  /|          /|   /|          /|   /|          /|   /|
- y |         .----. |        zx---w1 |        v1---xy |
-   z         | .--|-'         | xy-|-v1        | w1-|-zx
-             |/   |/          |/   |/          |/   |/
-             '----C          u1----xx         yz----'
-          non-staggered    staggered (1)    staggered (2)
-
-Non-staggered Nodes:
-x  = node locations
-v  = velocity
-u  = displacement
-mr = mass ratio
-
-Non-staggered Cells
-S  = stress
-miu, lambda = elastic moduli
+      v---------v                        o----x----o         w----1----w
+     /         /|                       /         /|        /         /|
+    /    .----. |            k         y    3----y |       2    z----2 |
+   /    /|   /| |           /         /    /|   /| z      /    /    /| 3
+  v----.----v | |     j----0         o----x----o | |     w----1----w | |
+  |    | w--|-' |          |         |    | w--|-1 |     |    |    | x |
+  |    |/   |/  v          |         |    |/   |/  o     |    |    |/  w
+  |    '----'  /           l         z    2----z  /      3    y----3  / 
+  |         | /                      |         | y       |         | y  
+  |         |/                       |         |/        |         |/   
+  v---------v                        o----x----o         w----1----w    
+                                                       
+  Non-staggered                      Staggered (1)       Staggered (2)
+                                   
+  v: v = velocity                    1 2 3: vx vy vz = velocity        
+     u = displacement                x y z: wyz wzx wxy = shear stress 
+     x = node locations                  w: wxx wyy wzz = normal stress
+     rho = density                          rho lam miu = material props
+  w: w = stress                             x = node locations (2) 
+     lam miu = elastic moduli            o: x = node locations (1) 
 
 
 COMPUTATIONAL CYCLE
@@ -30,12 +32,12 @@ S = stress tensor
 A = acceleration vector
 V = velocity vector
 U = displacement vector
-lambda, mu = elastic moduli
+lam miu = elastic moduli
 T = matrix transpose
 ' = d/dt
 " = d^2/dt^2
  
-1. Add moment tensor source
+1. Moment tensor source
  
 2. Linearized conservation of momentum, Newton's 2nd law
    A   = divS/rho
@@ -43,33 +45,35 @@ T = matrix transpose
 
 3. Fault boundary condition
  
-4. Update velocity and displacement
+4. Velocity
    V'   = A
    v'_i = a_i
+
+5. Displacement
    U'   = V
    u'_i = v_i
 
-5. Compute modified displacements
+6. Modified displacements
    ~U   = U + dt*beta*V
    ~u_i = u_i + dt*beta*v_i
  
-6. Compute modified strain
+7. Modified strain
    E    = [grad~U + (grad~U)T]/2
    e_ij = [~u_i,j + ~u_j,i]/2
  
-7. Compute stress: viscoelastic solid constitutive law, Kelvin-Voight
+8. Stress: viscoelastic solid constitutive law, Kelvin-Voight
    model, linear, isotropic, spring and dashpot in parallel
-   S    = lambda*trace(E)*I + 2*mu*E
-   s_ij = lambda*e_kk*delta_ij + 2*mu*e_ij
+   S    = lam*trace(E)*I + 2*miu*E
+   s_ij = lam*e_kk*delta_ij + 2*miu*e_ij
 
 
 Combined
-   rho*U" = grad_(lambda*div.~U) + div.mu*[grad_~U + (grad_~U)^T]
-          = (lambda+mu)*grad_(div.~U) + mu*del^2 ~U
-            + (grad_lambda)*(div.~U) + grad_mu.[grad_~U + (grad_~U)^T]
-   rho*u"_i = (lambda*~u_j,j)_,i + [mu*(~u_i,j + ~u_j,i)]_,j
-            = (lambda+mu)*~u_j,j,i + mu*~u_i,j,j
-              + lambda_,i*~u_j,j + mu_,j*[~u_i,j + ~u_j,i]
+   rho*U" = grad_(lam*div.~U) + div.miu*[grad_~U + (grad_~U)^T]
+          = (lam+miu)*grad_(div.~U) + miu*del^2 ~U
+            + (grad_lam)*(div.~U) + grad_miu.[grad_~U + (grad_~U)^T]
+   rho*u"_i = (lam*~u_j,j)_,i + [miu*(~u_i,j + ~u_j,i)]_,j
+            = (lam+miu)*~u_j,j,i + miu*~u_i,j,j
+              + lam_,i*~u_j,j + miu_,j*[~u_i,j + ~u_j,i]
 
 
 FAULT BOUNDARY CONDITION
@@ -204,4 +208,39 @@ Nonuniform strain: 12 = 24 DOF - 6 rigid body - 6 uniform strain
  |/   |/     |/   |/     |/   |/     |/   |/ 
  O----O      X----O      X----O      O----X  
   Z2 Z3       Z3 Z1       Z1 Z2      Z1 Z2 Z3
+
+
+PML absorbing boundary
+
+c1   =  8/15
+c2   = -3/100
+c3   =  1/1500
+t    = 3.5
+vs0  = 2/( 1/max(vs) + 1/min(vs) )
+d0   = t*vs0/h*( c1 + c2*npml + c3*npml^2 )
+d    = d0 * (i/npml)^2
+w    = 2 + d*dt
+
+     (v2 - v1)/dt +     d*(v2 + v1)/2 = divS/rho
+  (d/2 + 1/dt)*v2 +   (d/2 - 1/dt)*v1 = divS/rho
+(d*dt + 2)/2dt*v2 + (d*dt - 2)/2dt*v1 = divS/rho
+(d*dt + 2)*v2     + (d*dt - 2)*v1     = 2*dt*divS/rho
+(2 + d*dt)*v2 = (2 - d*dt)*v1 + 2*dt*divS/rho
+v2  = [ (2 - d*dt)*v1 + 2*dt*divS/rho ] / (2 + d*dt)
+v2  = [ (4 - w)*v1 + 2*dt*divS/rho ] / w
+
+
+Reynolds Glyph
+
+r = Sij ni nj
+
+Vector
+
+r = v^p * |cos(f)|^p
+x = r * [ sin(f) * cos(t)
+          sin(f) * sin(t)
+          cos(f) ]
+n = [ (p+1) * sin(f)^2 * cos(t)
+      (p+1) * sin(f)^2 * sin(t)
+      sin(f) / |cos(f)| * ( cos(f)^2 - p*sin(f)^2 ) ]
 

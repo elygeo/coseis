@@ -1,5 +1,6 @@
-%------------------------------------------------------------------------------%
-% STEP
+%------------------------------------------------------------------------------%% STEP
+
+if itstep < 1, itstep = 1; end
 
 while itstep
 
@@ -8,158 +9,221 @@ itstep = itstep - 1;
 it = it + 1;
 
 % Moment source
-if srcgeom, momentsrc, end
+if msrcradius, momentsrc, end
 
-% Acceleration on the nodes
-% regrid here possibly?
+% Restoring force, F = divS
 wt(1) = toc;
-vv = vv + dt * ( viscosity(2) - viscosity(1) ) .* v;
-ii = [ 1 6 5; 6 2 4; 5 4 3 ];
-
-Y  = m(:,:,:,2) + 2 * m(:,:,:,3);
-i  = Y ~= 0;
-Y(i) = 1 ./ Y(i);
-Y  = Y .* m(:,:,:,3) .* ( m(:,:,:,2) + m(:,:,:,3) );
-
-for iz = 1:size( operator, 1 )
-  i1 = opi1(iz,:);
-  i2 = opi2(iz,:);
-  j  = i1(1):i2(1);
-  k  = i1(1):i2(2);
-  l  = i1(1):i2(3);
-  for i = 1:3
-    switch operator{iz,1}
-    case 'som'
-      vv(j,k,l,i) = m(j,k,l,1) .* ...
-        ( dcng( S, ii(i,1), x, 1, j, k, l ) ...
-        + dcng( S, ii(i,2), x, 2, j, k, l ) ...
-        + dcng( S, ii(i,3), x, 3, j, k, l ) ...
-        + hgr( vv, h, Y, i, j, k, l ) );
-    case 'rectangular'
-      vv(j,k,l,i) = m(j,k,l,1) .* ...
-        ( dcnr( S, ii(i,1), x, 1, j, k, l ) ...
-        + dcnr( S, ii(i,2), x, 2, j, k, l ) ...
-        + dcnr( S, ii(i,3), x, 3, j, k, l ) ...
-        + hgr( vv, x, Y, i, j, k, l ) );
-    case 'constant'
-      vv(j,k,l,i) = m(j,k,l,1) .* ...
-        ( dh( S, ii(i,1), 1, j-1, k-1, l-1 ) ...
-        + dh( S, ii(i,2), 2, j-1, k-1, l-1 ) ...
-        + dh( S, ii(i,3), 3, j-1, k-1, l-1 ) ...
-        + hgr( vv, 1, Y, i, j, k, l ) );
-    case 'staggered'
-      i1 = opi1(iz,:) + 1;
-      if staggerbc1, i2 = opi2(iz,:) - 2; i2(i) = i2(i) + 1; d = eye( 3 );
-      else,          i2 = opi2(iz,:) - 1; i2(i) = i2(i) - 1; d = 1 - eye( 3 );
+c = [ 1 6 5; 6 2 4; 5 4 3 ];
+s1(:,:,:) = 0;
+for iii = 1:3
+  for ii = [ iii:3 1:iii-1 ];
+    for iz = 1:size( operator, 1 )
+      bc = [ operator{iz,2:7} ];
+      i1 = opi1(iz,:);
+      i2 = opi2(iz,:);
+      l = i1(3):i2(3);
+      k = i1(2):i2(2);
+      j = i1(1):i2(1);
+      if ii == iii
+        switch operator{iz,1}
+        case 'g', s1(j,k,l) = dcng( w1, ii, x, ii, j, k, l );
+        case 'r', s1(j,k,l) = dcnr( w1, ii, x, ii, j, k, l );
+        case 'c', s1(j,k,l) = dh(   w1, ii,    ii, j-1, k-1, l-1 );
+        end
+      else
+        i = 6 - iii - ii;
+        switch operator{iz,1}
+        case 'g', s1(j,k,l) = dcng( w2, i, x, ii, j, k, l );
+        case 'r', s1(j,k,l) = dcnr( w2, i, x, ii, j, k, l );
+        case 'c', s1(j,k,l) = dh(   w2, i,    ii, j-1, k-1, l-1 );
+        end
       end
-      j  = i1(1):i2(1);
-      k  = i1(1):i2(2);
-      l  = i1(1):i2(3);
-      vv(j,k,l,i) = m(j,k,l,1) .* ...
-        ( dhs4( S, ii(i,1), 1, j-d(i,1), k,        l        ) ...
-        + dhs4( S, ii(i,2), 2, j,        k-d(i,2), l        ) ...
-        + dhs4( S, ii(i,3), 3, j,        k,        l-d(i,3) ) );
+    end
+    for i = 1:npml
+      switch ii
+      case 1
+        if bc(1) == 1
+          ji = j(i);
+          f1(i,k,l,iii) = dampn1(i) * s1(ji,k,l) + dampn2(i) * f1(i,k,l,iii);
+          s1(ji,k,l) = f1(i,k,l,iii);
+        end
+        if bc(4) == 1
+          ji = j(end-i+1);
+          f4(i,k,l,iii) = dampn1(i) * s1(ji,k,l) + dampn2(i) * f4(i,k,l,iii);
+          s1(ji,k,l) = f4(i,k,l,iii);
+        end
+      case 2
+        if bc(2) == 1
+          ki = k(i);
+          f2(j,i,l,iii) = dampn1(i) * s1(j,ki,l) + dampn2(i) * f2(j,i,l,iii);
+          s1(j,ki,l) = f2(j,i,l,iii);
+        end
+        if bc(5) == 1
+          ki = k(end-i+1);
+          f5(j,i,l,iii) = dampn1(i) * s1(j,ki,l) + dampn2(i) * f5(j,i,l,iii);
+          s1(j,ki,l) = f5(j,i,l,iii);
+        end
+      case 3
+        if bc(3) == 1
+          li = l(i);
+          f3(j,k,i,iii) = dampn1(i) * s1(j,k,li) + dampn2(i) * f3(j,k,i,iii);
+          s1(j,k,li) = f3(j,k,i,iii);
+        end
+        if bc(6) == 1
+          li = l(end-i+1);
+          f6(j,k,i,iii) = dampn1(i) * s1(j,k,li) + dampn2(i) * f6(j,k,i,iii);
+          s1(j,k,li) = f6(j,k,i,iii);
+        end
+      end
+    end
+    if iii == ii,
+      w1(:,:,:,iii) = s1;
+    else
+      w1(:,:,:,iii) = w1(:,:,:,iii) + s1;
     end
   end
 end
-clear Y
+
+% Hourglass correction
+w2 = u + gamma(2) .* v;
+s2(:,:,:) = 0;
+for i = 1:3
+  for iz = 1:size( operator, 1 )
+    bc = [ operator{iz,2:7} ];
+    i1 = opi1(iz,:);
+    i2 = opi2(iz,:);
+    i1 = i1 + npml * bc(1:3);
+    i2 = i2 - npml * bc(4:6);
+    l = i1(3):i2(3);
+    k = i1(2):i2(2);
+    j = i1(1):i2(1);
+    switch operator{iz,1}
+    case 'g', s2(j,k,l) = hgr( w2, h, y, i, j, k, l );
+    case 'r', s2(j,k,l) = hgr( w2, x, y, i, j, k, l );
+    case 'h', s2(j,k,l) = hgr( w2, 1, y, i, j, k, l );
+    end
+  end
+  w1(:,:,:,i) = w1(:,:,:,i) + s2;
+end
+
+% Newton's Law, dV = F/m * dt
+for i = 1:3
+  w1(:,:,:,i) = w1(:,:,:,i) .* rho;
+end
 
 % Fault calculations
 wt(2) = toc;
 if nrmdim, fault, end
 
-% Update v, u, x
+% Velocity, V = V + dV
 wt(3) = toc;
-v = v + vv;
+v = v + w1;
 for iz = 1:size( locknodes, 1 )
-  i  = locknodes(iz,1:3) == 1;
-  i1 = locknodes(iz,4:2:8);
-  i2 = locknodes(iz,5:2:9);
-  j  = i1(1):i2(1);
-  k  = i1(2):i2(2);
-  l  = i1(3):i2(3);
+  i1 = locki(1,:,iz);
+  i2 = locki(2,:,iz);
+  i = locknodes(iz,1:3) == 1;
+  l = i1(3):i2(3);
+  k = i1(2):i2(2);
+  j = i1(1):i2(1);
   v(j,k,l,i) = 0;
 end
+
+% Displacement
 u = u + dt * v;
 %x = x + dt * x;
 
-% Stress in the cells
+% Modified strain, E = gradU + dt*beta*gradV
 wt(4) = toc;
-vv = u + dt * viscosity(1) .* v;
-for iz = 1:size( operator, 1 )
-  i1 = opi1(iz,:);
-  i2 = opi2(iz,:) - 1;
-  j  = i1(1):i2(1);
-  k  = i1(2):i2(2);
-  l  = i1(3):i2(3);
-  for a = 1:3
-    b = mod( a,   3 ) + 1;
-    c = mod( a+1, 3 ) + 1;
-    switch operator{iz,1}
-    case 'som'
-      S(j,k,l,a) = ...
-        dncg( vv, a, x, a, j, k, l );
-      S(j,k,l,a+3) = m(j,k,l,3) .* ( ...
-        dncg( vv, b, x, c, j, k, l ) + ...
-        dncg( vv, c, x, b, j, k, l ) );
-    case 'rectang'
-      S(j,k,l,a) = ...
-        dncr( vv, a, x, a, j, k, l );
-      S(j,k,l,a+3) = m(j,k,l,3) .* ( ...
-        dncr( vv, b, x, c, j, k, l ) + ...
-        dncr( vv, c, x, b, j, k, l ) );
-    case 'constant'
-      S(j,k,l,a) = ...
-        dh( vv, a, a, j, k, l );
-      S(j,k,l,a+3) = m(j,k,l,3) .* ( ...
-        dh( vv, b, c, j, k, l ) + ...
-        dh( vv, c, b, j, k, l ) );
-    case 'staggered'
-      i1 = opi(iz,:) + 1;
-      if staggerbc1, i2 = opi2(iz,:) - 1; i2(a) = i2(a) - 1; d = eye( 3 );
-      else           i2 = opi2(iz,:) - 2; i2(a) = i2(a) + 1; d = zeros( 3 );
+c = [ 1 2 3; 2 3 1; 3 1 2 ];
+for iii = 1:3
+  s1 = u(:,:,:,iii) + gamma(1) .* v(:,:,:,iii);
+  s2(:,:,:) = 0;
+  for ii = [ iii:3 1:iii-1 ]
+    for iz = 1:size( operator, 1 )
+      bc = [ operator{iz,2:7} ];
+      i1 = opi1(iz,:);
+      i2 = opi2(iz,:);
+      l = i1(3):i2(3)-1;
+      k = i1(2):i2(2)-1;
+      j = i1(1):i2(1)-1;
+      switch operator{iz,1}
+      case 'g', s2(j,k,l) = dncg( s1, 1, x, ii, j, k, l );
+      case 'r', s2(j,k,l) = dncr( s1, 1, x, ii, j, k, l );
+      case 'h', s2(j,k,l) = dh(   s1, 1,    ii, j, k, l );
       end
-      j  = i1(1):i2(1);
-      k  = i1(1):i2(2);
-      l  = i1(1):i2(3);
-      S(j,k,l,a+3) = m(j,k,l,3) .* ( ...
-        dhs4( vv, b, c, j-d(1,c), k-d(2,c), l-d(3,c) ) + ...
-        dhs4( vv, c, b, j-d(1,b), k-d(2,b), l-d(3,b) ) );
-      if staggerbc1, i2 = opi2(iz,:) - 2; d = zeros( 3 );
-      else           i2 = opi2(iz,:) - 1; d = eye( 3 );
+    end
+    for i = 1:npml-1
+      switch ii
+      case 1
+        if bc(1) == 1
+          ji = j(i);
+          e1(i,k,l,iii) = dampc1(i) * s2(ji,k,l) + dampc2(i) * e1(i,k,l,iii);
+          s2(ji,k,l) = e1(i,k,l,iii);
+        end
+        if bc(4) == 1
+          ji = j(end-i+1);
+          e4(i,k,l,iii) = dampc1(i) * s2(ji,k,l) + dampc2(i) * e4(i,k,l,iii);
+          s2(ji,k,l) = e4(i,k,l,iii);
+        end
+      case 2
+        if bc(2) == 1
+          ki = k(i);
+          e2(j,i,l,iii) = dampc1(i) * s2(j,ki,l) + dampc2(i) * e2(j,i,l,iii);
+          s2(j,ki,l) = e2(j,i,l,iii);
+        end
+        if bc(5) == 1
+          ki = k(end-i+1);
+          e5(j,i,l,iii) = dampc1(i) * s2(j,ki,l) + dampc2(i) * e5(j,i,l,iii);
+          s2(j,ki,l) = e5(j,i,l,iii);
+        end
+      case 3
+        if bc(3) == 1
+          li = l(i);
+          e3(j,k,i,iii) = dampc1(i) * s2(j,k,li) + dampc2(i) * e3(j,k,i,iii);
+          s2(j,k,li) = e3(j,k,i,iii);
+        end
+        if bc(6) == 1
+          li = l(end-i+1);
+          e6(j,k,i,iii) = dampc1(i) * s2(j,k,li) + dampc2(i) * e6(j,k,i,iii);
+          s2(j,k,li) = e6(j,k,i,iii);
+        end
       end
-      j  = i1(1):i2(1);
-      k  = i1(1):i2(2);
-      l  = i1(1):i2(3);
-      S(j,k,l,a) = ...
-        dhs4( vv, a, a, j-d(1,a), k-d(2,a), l-d(3,a) );
+    end
+    if ii == iii
+      w1(:,:,:,ii) = s2;
+      w2(:,:,:,ii) = 0;
+    else
+      w2(:,:,:,ii) = w2(:,:,:,ii) + s2;
     end
   end
 end
-tmp = m(j,k,l,2) .* sum( S(j,k,l,1:3), 4 );
+
+% Hook's Law, linear stress/strain relation, S = c:E
+s1 = lam .* sum( w1, 4 );
 for i = 1:3
-  S(j,k,l,i) = tmp + 2 * m(j,k,l,3) .* S(j,k,l,i);
+  w1(:,:,:,i) = 2 * miu .* w1(:,:,:,i) + s1;
+  w2(:,:,:,i) = miu .* w2(:,:,:,i);
 end
 
 % Data processing, viz, output
 wt(5) = toc;
-tmp = S .* S; tmp(:,:,:,4:6) = 2 * tmp(:,:,:,4:6);
-tmp = sum( tmp, 4 );    Smax = sqrt( max( tmp(:) ) );
-tmp = sum( u .* u, 4 ); umax = sqrt( max( tmp(:) ) );
-tmp = sum( v .* v, 4 ); vmax = sqrt( max( tmp(:) ) );
+s1 = sum( u .* u, 4 ); umax = sqrt( max( s1(:) ) );
+s1 = sum( v .* v, 4 ); vmax = sqrt( max( s1(:) ) );
+s2 = sum( w1 .* w1, 4 ) + 2 * sum( w2 .* w2, 4 );
+wmax = sqrt( max( s2(:) ) );
 if umax > h / 10
   disp( 'Warning: u !<< h' )
 end
-if truptol
+if nrmdim & truptol
   i = hypocenter;
   i(nrmdim) = 1;
-  j1 = i1(1):i2(1);
-  k1 = i1(2):i2(2);
   l1 = i1(3):i2(3);
-  j = i(1);
-  k = i(2);
+  k1 = i1(2):i2(2);
+  j1 = i1(1):i2(1);
   l = i(3);
-  i = slipv > truptol;
+  k = i(2);
+  j = i(1);
+  i = vslip > truptol;
   if find( i )
     trup( i & ( ~ trup ) ) = it * dt;
     tarrest = ( it + 1 ) * dt;
@@ -185,5 +249,5 @@ fprintf( 1, '%5d   %.2e %.2e %.2e %.2e %.2e\n', timing );
 
 end
 
-disp( 'stopped' )
+disp( 'paused' )
 

@@ -1,8 +1,11 @@
 %------------------------------------------------------------------------------%
 % SCONTOUR - contour on a surface
 
-function h = scontour( x, y, z, c, v )
+function h = scontour( xg, c, v )
 
+x = xg(:,:,1);
+y = xg(:,:,2);
+z = xg(:,:,3);
 [ xi, yi ] = ndgrid( 1:size(x,1), 1:size(x,2) );
 [ c, h ]   = contour( xi, yi, c, [ v v ], '-k' );
 delete( h );

@@ -10,7 +10,7 @@ if initialize
   end
   [ tmp1, tmp2, endian ] = computer;
   fid = fopen( 'out/endian', 'w' );
-  fprintf( fid, '%s', endian );
+  fprintf( fid, '%s\n', endian );
   fclose( fid );
   for iz = 1:size( out, 1 )
     outvar{iz} = out{iz,1};
@@ -20,64 +20,93 @@ if initialize
     switch outvar{iz}
     case 'u',     c = { 'x' 'y' 'z' };
     case 'v',     c = { 'x' 'y' 'z' }; 
-    case 'S',     c = { 'xx' 'yy' 'zz' 'yz' 'zx' 'xy' }; cells = 1;
-    case 'T',     c = { 'xx' 'yy' 'zz' 'yz' 'zx' 'xy' }; faultplane = 1;
-    case 'slipu', c = { 'm' }; faultplane = 1;
-    case 'slipv', c = { 'm' }; faultplane = 1;
+    case 'm',     c = { 'x' 'y' 'z' }; 
+    case 't',     c = { 'x' 'y' 'z' }; faultplane = 1;
+    case 'w',     c = { 'xx' 'yy' 'zz' 'yz' 'zx' 'xy' }; cells = 1;
+    case 'uslip', c = { 'm' }; faultplane = 1;
+    case 'vslip', c = { 'm' }; faultplane = 1;
     otherwise, error( 'unknown out type' )
     end
-    outc(iz) = length( c );
+    outnc(iz) = length( c );
     if outint(iz) < 0, outint(iz) = outint(iz) + nt + 1; end
-    [ i1, i2 ] = zoneselect( [ out{iz,3:8} ], 0, core, hypocenter, nrmdim );
+    zone = [ out{iz,3:8} ];
+    [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
     i2 = i2 - cells;
     if faultplane
       i1(nrmdim) = hypocenter(nrmdim);
       i2(nrmdim) = hypocenter(nrmdim);
     end
-    for i = 1:outc(iz)
+    for i = 1:outnc(iz)
       file = sprintf( 'out/%02d/%1d/', iz, i );
       mkdir( file )
     end
-    j = i1(1):i2(1);
-    k = i1(2):i2(2);
     l = i1(3):i2(3);
-    file = sprintf( 'out/%02d/mesh', iz );
-    fid = fopen( file, 'wl' );
-    fwrite( fid, shiftdim( x(j,k,l,:), 3 ), 'float32' );
-    fclose( fid );
+    k = i1(2):i2(2);
+    j = i1(1):i2(1);
+    if cells
+      switch nrmdim
+      case 1, j(hypocenter(1)) = [];
+      case 2, k(hypocenter(2)) = [];
+      case 3, l(hypocenter(3)) = [];
+      end
+    end
+    for i = 1:3
+      file = sprintf( 'out/%02d/mesh%1d', iz, i );
+      fid = fopen( file, 'w' );
+      if cells
+        fwrite( fid, 0.125 * ( ...
+          x(j,k,l,i) + x(j+1,k+1,l+1,i) + ...
+          x(j+1,k,l,i) + x(j,k+1,l+1,i) + ...
+          x(j,k+1,l,i) + x(j+1,k,l+1,i) + ...
+          x(j,k,l+1,i) + x(j+1,k+1,l,i) ), ...
+        'float32' );
+      else
+        fwrite( fid, x(j,k,l,i), 'float32' );
+      end
+      fclose( fid );
+    end
     file = sprintf( 'out/%02d/hdr', iz );
-    fid = fopen( file, 'wl' );
-    fprintf( fid, '%g ', [ outc(iz) i1 i2 1 1 1 outint(iz) h h h dt ] );
-    fprintf( fid, '\n%s %s\n', outvar{iz}, [ c{:} ] );
+    fid = fopen( file, 'w' );
+    fprintf( fid, '%g %g %g %g %g %g %g %s %s\n', ...
+      [ outnc(iz) i2-i1+1 outint(iz) nt dt ], outvar{iz}, [ c{:} ] );
     fclose( fid );
     if faultplane
       i1(nrmdim) = 1;
       i2(nrmdim) = 1;
     end
-    outi1(iz,:) = i1;
-    outi2(iz,:) = i2;
+    outi1(:,iz) = i1;
+    outi2(:,iz) = i2;
   end
   return
 end
 
-if ~mod( it, checkpoint ), save checkpoint it slip u v vv trup, end
+if ~mod( it, checkpoint ), save checkpoint it uslip u v vv trup, end
 for iz = 1:size( out, 1 )
   if mod( it, outint(iz) ) == 0
-    i1 = outi1(iz,:);
-    i2 = outi2(iz,:);
-    j = i1(1):i2(1);
-    k = i1(2):i2(2);
+    i1 = outi1(:,iz);
+    i2 = outi2(:,iz);
     l = i1(3):i2(3);
-    for i = 1:outc(iz)
+    k = i1(2):i2(2);
+    j = i1(1):i2(1);
+    for i = 1:outnc(iz)
       file = sprintf( 'out/%02d/%1d/%05d', iz, i, it );
       fid = fopen( file, 'wl' );
       switch outvar{iz}
       case 'u', fwrite( fid, u(j,k,l,i), 'float32' );
       case 'v', fwrite( fid, v(j,k,l,i), 'float32' );
-      case 'S', fwrite( fid, S(j,k,l,i), 'float32' );
-      case 'T', fwrite( fid, T(j,k,l,i), 'float32' );
-      case 'slipu', fwrite( fid, slipu(j,k,l), 'float32' );
-      case 'slipv', fwrite( fid, slipv(j,k,l), 'float32' );
+      case 'm', fwrite( fid, s1(j,k,l),  'float32' );
+      case 't', fwrite( fid, t(j,k,l,i), 'float32' );
+      case 's'
+        switch nrmdim
+        case 1, j(hypocenter(1)) = [];
+        case 2, k(hypocenter(2)) = [];
+        case 3, l(hypocenter(3)) = [];
+        end
+        if i <= 3, fwrite( fid, w1(j,k,l,i),   'float32' );
+        else       fwrite( fid, w2(j,k,l,i-3), 'float32' );
+        end
+      case 'uslip', fwrite( fid, uslip(j,k,l), 'float32' );
+      case 'vslip', fwrite( fid, vslip(j,k,l), 'float32' );
       otherwise, error( 'unknown out type' )
       end
       fclose( fid );
@@ -85,10 +114,10 @@ for iz = 1:size( out, 1 )
   end
 end
 fid = fopen( 'out/timestep', 'w' );
-fprintf( fid, '%g ', it );
+fprintf( fid, '%g\n', it );
 fclose( fid );
 file = sprintf( 'out/stats/%05d', it );
 fid = fopen( file, 'w' );
-fwrite( fid, [ umax vmax Smax ] );
+fprintf( fid, '%g %g %g\n', [ umax vmax wmax ] );
 fclose( fid );
 
