@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
 % GLYPHSELECT
 
-minmag = ( gcut * fscl ) ^ 2;
+minmag = ( glyphcut * fscl ) ^ 2;
 if ~fscl, return, end
 mga = [];
 vga = [];

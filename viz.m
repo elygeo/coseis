@@ -103,6 +103,8 @@ text( .50, .05, titles( comp + 1 ) );
 text( .98, .98, sprintf( '%.3fs', it * dt ), 'Hor', 'right' )
 set( gcf, 'CurrentAxes', haxes(1) )
 
+glyphtype = 1;
+if dosurf || isosurf, glyphtype = -1; end
 lines = [ 1 1 1   -1 -1 -1 ];
 if nrmdim
   lines = [ lines; lines ];
@@ -118,7 +120,6 @@ case 'initial'
 case 'outline'
 case 'cube', planes = lines;
 case 'slice'
-  vcut = .001;
   planes = [ 1 1 1  -1 -1 -1 ];
   planes(slicedim)   = xhair(slicedim);
   planes(slicedim+3) = xhair(slicedim) + cellfocus;
@@ -130,12 +131,9 @@ case 'slice'
   else
   end
   lines = [ lines; planes ];
-  glyphs = planes;
 otherwise
   error( [ 'unknown plotstyle ' newplot ] )
 end
-glyphtype = 1;
-if dosurf || isosurf, glyphtype = -1; end
 
 lineviz
 if nrmdim,           faultviz,   end
