@@ -104,7 +104,7 @@ text( .98, .98, sprintf( '%.3fs', it * dt ), 'Hor', 'right' )
 set( gcf, 'CurrentAxes', haxes(1) )
 
 glyphtype = 1;
-if dosurf || isosurf, glyphtype = -1; end
+%if dosurf || isosurf, glyphtype = -1; end
 lines = [ 1 1 1   -1 -1 -1 ];
 if nrmdim
   lines = [ lines; lines ];

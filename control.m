@@ -172,6 +172,22 @@ case 'x'
 case 'u', field = 'u'; colorscale; msg = titles{ comp + 1};
 case 'v', field = 'v'; colorscale; msg = titles{ comp + 1};
 case 'w', field = 'w'; colorscale; msg = titles{ comp + 1};
+case 'g'
+  tmp = findobj( [ frame{ showframe } ], 'Tag', 'glyph' );
+  if length( tmp ), doglyph = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
+  doglyph = ~doglyph;
+  if doglyph, visible = 'on';  msg = 'Glyphs On';
+  else        visible = 'off'; msg = 'Glyphs Off';
+  end
+  if length( tmp ), set( tmp, 'Visible', visible ), end
+case 'i'
+  tmp = findobj( [ frame{ showframe } ], 'Tag', 'isosurf' );
+  if length( tmp ), doisosurf = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
+  doisosurf = ~doisosurf;
+  if doisosurf, visible = 'on';  msg = 'Isosurfaces On';
+  else          visible = 'off'; msg = 'Isosurfaces Off';
+  end
+  if length( tmp ), set( tmp, 'Visible', visible ), end
 case 'm'
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'surf' );
   if length( tmp ), domesh = ~strcmp( get( tmp(1), 'EdgeColor' ), 'none' ); end
@@ -189,22 +205,6 @@ case 's'
   else       facecolor = 'none'; msg = 'Surfaces Off';
   end
   if length( tmp ), set( tmp, 'FaceColor', facecolor ), end
-case 'g'
-  tmp = findobj( [ frame{ showframe } ], 'Tag', 'glyph' );
-  if length( tmp ), doglyph = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
-  doglyph = ~doglyph;
-  if doglyph, visible = 'on';  msg = 'Glyphs On';
-  else        visible = 'off'; msg = 'Glyphs Off';
-  end
-  if length( tmp ), set( tmp, 'Visible', visible ), end
-case 'i'
-  tmp = findobj( [ frame{ showframe } ], 'Tag', 'isosurf' );
-  if length( tmp ), doisosurf = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
-  doisosurf = ~doisosurf;
-  if doisosurf, visible = 'on';  msg = 'Isosurfaces On';
-  else          visible = 'off'; msg = 'Isosurfaces Off';
-  end
-  if length( tmp ), set( tmp, 'Visible', visible ), end
 case 'c'
   if ~km
     save checkpoint it slip u v vv trup
