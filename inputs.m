@@ -103,6 +103,7 @@ case 'kostrov'
   grid = 'constant';
   n = [ 201 201 201 ]; nt = 400; plotstyle = '';
   n = [  41  41  41 ]; nt =  90; plotstyle = 'slice';
+  n = [  5  5  5 ]; nt =  10; plotstyle = 'slice';
   n = [  21  21  21 ]; nt =  90; plotstyle = 'slice';
   out = {
     'uslip' 1  0 0 0  0 -1 0

@@ -1,10 +1,10 @@
 %------------------------------------------------------------------------------%
 % REYNOLDSGLYPH
 
-hand = [];
+hglyph = [];
 if ~length( mga ) || ~fscl, return, end
 clear xg ng rg
-gscl = .5 * h * ( 1 / fscl ) ^ glyphexp;
+scl = .5 * h * ( 1 / fscl ) ^ glyphexp;
 m = 16;
 switch size( mga, 2 )
 case 1
@@ -26,33 +26,36 @@ case 1
   vglyphx = xg;
   vglyphn = ng;
   for ig = 1:size( vga, 1 )
-    vg = vga(ig,:);
+    mg = sqrt( double( mga(ig) ) );
+    vg = vga(ig,:) / mg;
     nn = size( vglyphx );
     xg = vglyphx;
     ng = vglyphn;
-    rg = sqrt( double( mga(ig) ) ) * vglyphr;
-    scl = gscl * mga(ig) ^ ( 0.5 * glyphexp );
+    rg = mg * vglyphr;
     vec = ones( 3 );
     if vg(1) || vg(2)
-      vec = [ vg(2)   vg(1)*vg(3)            vg(1) 
-             -vg(1)   vg(2)*vg(3)            vg(2) 
-                 0   -vg(1)*vg(1)-vg(2)*vg(2) vg(3) ];
-      val = scl ./ sqrt( sum( vec .* vec ) );
-      vec = vec .* [ val; val; val ];
+      vec = [ vg(2) vg(1)*vg(3)             vg(1) 
+             -vg(1) vg(2)*vg(3)             vg(2) 
+                 0 -vg(1)*vg(1)-vg(2)*vg(2) vg(3) ];
+      tmp = sqrt( sum( vec .* vec, 1 ) );
+      for i = 1:3
+        vec(i,:) = vec(i,:) ./ tmp;
+      end
+      vec = scl * mg ^ glyphexp * vec;
       xg = vec * reshape( xg, [ nn(1) * nn(2) 3 ] )';
       ng = vec * reshape( ng, [ nn(1) * nn(2) 3 ] )';
       xg = reshape( xg', nn );
       ng = reshape( ng', nn );
     else
-      xg = scl * xg;
+      xg = scl * mg ^ glyphexp * xg;
     end
     for i = 1:3
       xg(:,:,i) = xg(:,:,i) + xga(ig,i);
     end
-    hand(ig) = surf( xg(:,:,1), xg(:,:,2), xg(:,:,3), rg, 'VertexNormals', ng );
+    hglyph(ig) = surf( xg(:,:,1), xg(:,:,2), xg(:,:,3), rg, 'VertexNormals', ng );
     hold on
   end
-  set( hand, 'BackFaceLighting', 'lit' )
+  set( hglyph, 'BackFaceLighting', 'lit' )
 case 3
   theta = 2 * pi * ( 0 : 1 / m : 1 );
   row   = ones( size( theta ) );
@@ -70,10 +73,10 @@ case 3
     val = mga(ig,:);
     vec = reshape( vga(ig,:), [3 3] );
     vec(:,1) = cross( vec(:,2), vec(:,3) );
-    scl = gscl * abs( val(3) ) ^ ( glyphexp - 1 );
+    tmp = scl * abs( val(3) ) ^ ( glyphexp - 1 );
     rg = val * ( sphr .* sphr );
-    %xg = scl * vec * diag( abs( val ) ) * sphr; % elipsoide
-    xg = scl * vec * ( sphr .* repmat( rg, [ 3 1 ] ) );
+    %xg = tmp * vec * diag( abs( val ) ) * sphr; % elipsoide
+    xg = tmp * vec * ( sphr .* repmat( rg, [ 3 1 ] ) );
     xg = reshape( xg', [ m+1 m+1 3 ] );
     rg = reshape( rg, [ m+1 m+1 ] );
     i = 1:m;
@@ -97,15 +100,15 @@ case 3
     ng(j1,j1,2) = vec1(:,:,3) .* vec2(:,:,1) - vec1(:,:,1) .* vec2(:,:,3);
     ng(j1,j1,3) = vec1(:,:,1) .* vec2(:,:,2) - vec1(:,:,2) .* vec2(:,:,1);
     rg = double( rg );
-    hand(ig) = surf( xg(:,:,1), xg(:,:,2), xg(:,:,3), rg, 'VertexNormals', ng );
+    hglyph(ig) = surf( xg(:,:,1), xg(:,:,2), xg(:,:,3), rg, 'VertexNorm', ng );
     hold on
   end
-  set( hand, 'BackFaceLighting', 'reverselit' )
+  set( hglyph, 'BackFaceLighting', 'reverselit' )
 otherwise
   error( 'size mga' )
 end
-set( hand, ...
-  'Tag', 'glyph' ...
+set( hglyph, ...
+  'Tag', 'glyph', ...
   'FaceColor', 'flat', ...
   'EdgeColor', 'none', ...
   'AmbientStrength', .6, ...

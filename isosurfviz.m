@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
 % ISOSURFVIZ
 
-hand = [];
+hisosurf = [];
 if ~fscl, return, end
 isoval = isofrac * fscl;
 if comp, isoval = isoval * [ -1 1 ]; end
@@ -46,13 +46,13 @@ for iz = 1:size( volumes, 1 )
   vg = permute( vg, [2 1 3] );
   xg = permute( xg, [2 1 3 4] );
   for i = 1:length( isoval );
-    if comp, ival = abs( isoval(i) );
-    else,    ival = isoval(i) .* isoval(i);
-    end
+    ival = abs( isoval(i) );
+    if ~comp, ival = isoval(i) .* isoval(i); end
+    %if ~comp, vg = sqrt( vg ); end
     tmp = isosurface( xg(:,:,:,1), xg(:,:,:,2), xg(:,:,:,3), ...
       sign( isoval(i) ) * vg, ival );
     if ~isempty( tmp.vertices )
-      hand(end+1) = patch( tmp, ...
+      hisosurf(end+1) = patch( tmp, ...
         'CData', isoval(i), ...
         'Tag', 'isosurf', ...
         'EdgeColor', 'none', ...

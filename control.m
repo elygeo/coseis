@@ -52,7 +52,7 @@ case 'h'
       'Vertical',   'middle', ...
       'Margin', 10, ...
       'EdgeColor', 0.25 * [ 1 1 1 ], ...
-      'BackgroundColor', bg );
+      'BackgroundColor', background );
     set( gcf, 'CurrentAxes', haxes(1) )
   end
 case 'home',       anim = 1; showframe = 1;
@@ -68,7 +68,7 @@ case 'backspace'
 case 'delete'
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
-  if nframe
+  if nframe > 1
     delete( [ frame{showframe} ] )
     frame( showframe ) = [];
   end
@@ -161,8 +161,8 @@ case 'p'
   for i = 1:length( tmp ), if strcmp( plotstyle, tmp{i} ), break, end, end
   i = mod( i, length( tmp ) );
   plotstyle = tmp{i+1};
-  if i, msg = plotstyle;
-  else  msg = 'Plotting Off';
+  if i, msg = [ 'Plotstyle: ' plotstyle ];
+  else  msg = 'Plotting off';
   end
 case 'x'
   xlim = -~xlim;
@@ -170,39 +170,45 @@ case 'x'
   else     msg = 'Mesh distortion off';
   end
 case 'u', field = 'u'; colorscale; msg = titles{ comp + 1};
+  delete( [ hhud hmsg hhelp ] )
+  hhud = []; hmsg = []; hhelp = [];
 case 'v', field = 'v'; colorscale; msg = titles{ comp + 1};
+  delete( [ hhud hmsg hhelp ] )
+  hhud = []; hmsg = []; hhelp = [];
 case 'w', field = 'w'; colorscale; msg = titles{ comp + 1};
+  delete( [ hhud hmsg hhelp ] )
+  hhud = []; hmsg = []; hhelp = [];
 case 'g'
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'glyph' );
   if length( tmp ), doglyph = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
   doglyph = ~doglyph;
-  if doglyph, visible = 'on';  msg = 'Glyphs On';
-  else        visible = 'off'; msg = 'Glyphs Off';
+  if doglyph, visible = 'on';  msg = 'Glyphs on';
+  else        visible = 'off'; msg = 'Glyphs off';
   end
   if length( tmp ), set( tmp, 'Visible', visible ), end
 case 'i'
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'isosurf' );
   if length( tmp ), doisosurf = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
   doisosurf = ~doisosurf;
-  if doisosurf, visible = 'on';  msg = 'Isosurfaces On';
-  else          visible = 'off'; msg = 'Isosurfaces Off';
+  if doisosurf, visible = 'on';  msg = 'Isosurfaces on';
+  else          visible = 'off'; msg = 'Isosurfaces off';
   end
   if length( tmp ), set( tmp, 'Visible', visible ), end
 case 'm'
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'surf' );
   if length( tmp ), domesh = ~strcmp( get( tmp(1), 'EdgeColor' ), 'none' ); end
   domesh = ~domesh;
-  fg = get( 1, 'DefaultTextColor' );
-  if domesh, edgecolor = fg;     msg = 'Mesh On';
-  else       edgecolor = 'none'; msg = 'Mesh Off';
+  foreground = get( 1, 'DefaultTextColor' );
+  if domesh, edgecolor = foreground; msg = 'Mesh on';
+  else       edgecolor = 'none';     msg = 'Mesh off';
   end
   if length( tmp ), set( tmp, 'EdgeColor', edgecolor ), end
 case 's'
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'surf' );
   if length( tmp ), dosurf = strcmp( get( tmp(1), 'FaceColor' ), 'flat' ); end
   dosurf = ~dosurf;
-  if dosurf, facecolor = 'flat'; msg = 'Surfaces On';
-  else       facecolor = 'none'; msg = 'Surfaces Off';
+  if dosurf, facecolor = 'flat'; msg = 'Surfaces on';
+  else       facecolor = 'none'; msg = 'Surfaces off';
   end
   if length( tmp ), set( tmp, 'FaceColor', facecolor ), end
 case 'c'
@@ -254,11 +260,17 @@ if xhairmove
   nc = ncore - cellfocus;
   if xhairmove == 4
     xhair = hypocenter - halo1;
-    if nrmdim, slicedim = nrmdim; end
+    if nrmdim
+      slicedim = nrmdim;
+      if cellfocus, xhair(nrmdim) = xhair(nrmdim) + 1; end
+    end
   elseif xhairmove == 5
     xhair = hypocenter - halo1;
     xhair(downdim) = 1;
     slicedim = downdim;
+    if nrmdim && cellfocus
+      xhair(nrmdim) = xhair(nrmdim) + 1;
+    end
   else
     v1 = camup;
     v3 = camtarget - campos;
@@ -274,6 +286,9 @@ if xhairmove
     i = abs( xhairmove );
     if length( hhud )
       xhair(i) = xhair(i) + way;
+      if cellfocus && nrmdim == i && xhair(i) == hypocenter(i) - halo1(i)
+        xhair(i) = xhair(i) + way;
+      end
       if xhair(i) > nc(i), xhair(i) = nc(i);
       elseif xhair(i) < 1,  xhair(i) = 1;
       end
@@ -307,11 +322,13 @@ if xhairmove
   case 'u'
     vga(1:3) = u(j,k,l,:);
     mga = sum( u(j,k,l,:) .* u(j,k,l,:), 4 );
-    msg = sprintf( '|U|%9.2e\nUx %9.2e\nUy %9.2e\nUz %9.2e', mga, vga );
+    tmp = [ vga sqrt( mga ) ];
+    msg = sprintf( '|U|%9.2e\nUx %9.2e\nUy %9.2e\nUz %9.2e', tmp );
   case 'v'
     vga(1:3) = v(j,k,l,:);
     mga = s1(j,k,l);
-    msg = sprintf( '|V|%9.2e\nVx %9.2e\nVy %9.2e\nVz %9.2e', mga, vga );
+    tmp = [ vga sqrt( mga ) ];
+    msg = sprintf( '|V|%9.2e\nVx %9.2e\nVy %9.2e\nVz %9.2e', tmp );
   case 'w'
     c = [ 1 6 5; 6 2 4; 5 4 3 ];
     clear wg
@@ -324,7 +341,8 @@ if xhairmove
     vec = vec(:,i);
     mga = val';
     vga = vec(:)';
-    msg = sprintf( '|W| %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWzy %9.2e', val(3), wg );
+    tmp = [ val(3) wg s2(j,k,l) ];
+    msg = sprintf( '|W| %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWzy %9.2e\n|W|f%9.2e', tmp );
   end
   set( gcf, 'CurrentAxes', haxes(2) )
   hhud = text( .02, .98, msg, 'Hor', 'left', 'Ver', 'top' );
@@ -338,8 +356,10 @@ if xhairmove
     if ~viz3d, campos( campos + targ - camtarget ), end
     camtarget( targ )
   end
-  if glyph, reynoldsglyph, else, wireglyph, end
-  hhud = [ hhud hand ];
+  if length( mga( mga ~= 0 ) )
+    if doglyph, reynoldsglyph, else, wireglyph, end
+    hhud = [ hhud hglyph ];
+  end
   lines = [ 1 1 1  -1 -1 -1 ];
   lines(slicedim)   = xhair(slicedim);
   lines(slicedim+3) = xhair(slicedim) + cellfocus;
@@ -350,8 +370,8 @@ if xhairmove
     lines(2,i) = [ 0 -1 ];
   end
   lineviz
-  set( hand, 'LineStyle', ':' );
-  hhud(end+1) = hand;
+  set( hlines, 'Color', 'y' );
+  hhud(end+1) = hlines;
   j = xhair(1);
   k = xhair(2);
   l = xhair(3);
@@ -368,10 +388,11 @@ if xhairmove
   end
   lines( lines == 0 ) = 1;
   lineviz
-  set( hand );
-  hhud(end+1) = hand;
-  showframe = nframe;
-  anim = 1;
+  hhud(end+1) = hlines;
+  if showframe ~= nframe
+    showframe = nframe;
+    anim = 1;
+  end
 end
 
 % Message

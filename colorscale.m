@@ -2,9 +2,8 @@
 % COLORSCALE
 
 if initialize > 1
-  hand = axes;
-  haxes(end+1) = hand;
-  set( gcf, 'CurrentAxes', hand )
+  haxes(end+1) = axes;
+  set( gcf, 'CurrentAxes', haxes(end) )
   axis( [ 0 1 0 1 ] );
   hold on
   hlegend(3) = surf( [ 0 1 ], [ 0 .08 ], [ 0 0; 0 0 ], ...
@@ -21,10 +20,10 @@ if initialize > 1
   return
 end
 
-uscl = ulim; if uscl < 0, uscl = umax; end;
-vscl = vlim; if vscl < 0, vscl = vmax; end;
-wscl = wlim; if wscl < 0, wscl = wmax; end;
-xscl = xlim; if xscl < 0, xscl = umax; end;
+uscl = ulim; if uscl < 0, uscl = double( umax ); end;
+vscl = vlim; if vscl < 0, vscl = double( vmax ); end;
+wscl = wlim; if wscl < 0, wscl = double( wmax ); end;
+xscl = xlim; if xscl < 0, xscl = double( umax ); end;
 if xscl, xscl = .5 * h / xscl; end
 cellfocus = 1;
 switch field
@@ -32,9 +31,12 @@ case 'u', fscl = uscl; titles = { '|V|' 'Ux' 'Uy' 'Uz' }; cellfocus = 0;
 case 'v', fscl = vscl; titles = { '|V|' 'Vx' 'Vy' 'Vz' }; cellfocus = 0;
 case 'w', fscl = wscl; titles = { '|W|' 'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
 end
+fscl = double( fscl );
 clim = fscl;
 if ~clim, clim = 1; end
 set( gca, 'CLim', clim * [ -1 1 ] );
+poscolor = [ 1 .5 0 ];
+negcolor = [ 0 .5 1 ];
 if comp
   if dark
     cmap = [
