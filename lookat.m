@@ -22,7 +22,7 @@ if look
   case 3, pos(i(3)) = a;
   case 4, pos = [ a a a ] / 2; pos(i(2)) = a / sqrt( 2 );
     camproj( 'perspective' );
-    camva( 27 )
+    camva( 1.25 * camva )
   end
   camtarget( x0 )
   campos( x0 + camdist * pos )

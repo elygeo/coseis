@@ -100,7 +100,7 @@ case 'period'
   else    camva( .25 * camva )
   end
   if length( hhud )
-    if ~viz3d, campos( campos + xhairtarg - camtarget ), end
+    campos( campos + xhairtarg - camtarget )
     camtarget( xhairtarg )
   end
 case 'slash'
@@ -113,6 +113,7 @@ case 'slash'
 case 'd'
   if strcmp( camproj, 'orthographic' )
     camproj perspective
+    camva( 1.25 * camva )
   else
     upvec = [ 0 0 0 ];
     pos = [ 0 0 0 ];
@@ -123,17 +124,22 @@ case 'd'
     upvec(i1) = sign( v1(i1) );
     pos(i2) = -sign( v2(i2) ) * norm( v2 );
     camup( upvec )
-    campos( x0 + pos )
+    campos( camtarget + pos )
     camproj orthographic
+    camva( .8 * camva )
   end
 case 'leftbracket'
-  tmp = .8 * get( gca, 'CLim' );
+  if ~km, tmp = .8 * get( gca, 'CLim' );
+  else    tmp = .5 * get( gca, 'CLim' );
+  end
   set( gca, 'CLim', tmp )
   if ~comp, tmp(1) = 0; end
   set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
   set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
 case 'rightbracket'
-  tmp = 1.25 * get( gca, 'CLim' );
+  if ~km, tmp = 1.25 * get( gca, 'CLim' );
+  else    tmp = 2    * get( gca, 'CLim' );
+  end
   set( gca, 'CLim', tmp )
   if ~comp, tmp(1) = 0; end
   set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )

@@ -172,7 +172,7 @@ ng = size( xg );
 xg = reshape( xg, [ prod( ng(1:2) ) 3 ] );
 hhud(end+1) = plot3( xg(:,1), xg(:,2), xg(:,3) );
 xg = double( xg(il,:) );
-hhud(end+1:end+3) = text( xg(:,1), xg(:,2), xg(:,3), ['xyz']', 'Ver', 'middle');
+hhud(end+1:end+3) = text( xg(:,1), xg(:,2), xg(:,3), ['123']', 'Ver', 'middle');
 if showframe ~= nframe
   showframe = nframe;
   set( [ frame{:} ], 'Visible', 'off' )
