@@ -30,7 +30,7 @@ for iz = 1:size( lines, 1 )
   j = i1(1):i2(1);
   ng = i2 - i1 + 1;
   if sum( ng > 1 ) == 1
-    xg = squeeze( x(j,k,l,:) + uscl * u(j,k,l,:) );
+    xg = squeeze( x(j,k,l,:) + xscl * u(j,k,l,:) );
     xga = [ xga; xg; NaN NaN NaN ];
   end
 end

@@ -14,7 +14,7 @@ if msrcradius, momentsrc, end
 % Restoring force, F = divS
 wt(1) = toc;
 c = [ 1 6 5; 6 2 4; 5 4 3 ];
-s1(:,:,:) = 0;
+s1(:) = 0;
 for iii = 1:3
   for ii = [ iii:3 1:iii-1 ];
     for iz = 1:size( operator, 1 )

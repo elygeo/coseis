@@ -111,6 +111,8 @@ i = s2 ~= 0; s2(i) = 1 ./ s2(i);
 rho = rho .* s1;
 lam = lam .* s2;
 miu = miu .* s2;
+s1(:) = 0;
+s2(:) = 0;
 
 % PML damping
 c1 =  8/15;
