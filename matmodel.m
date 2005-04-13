@@ -45,10 +45,10 @@ miu0 = miu(j,k,l);
 gamma = dt * viscosity;
 vs0 = 1 / ( 1 / vsmin + 1 / vsmax );
 
-y = lam + 2 * lam;
+y = 6 * ( lam + 2 * lam );
 i = y ~= 0;
 y(i) = 1 ./ y(i);
-y = y .* miu .* ( lam + miu );
+y = y .* rho .* miu .* ( lam + miu );
 
 for iz = 1:size( operator, 1 )
   zone = [ operator{iz,8:13} ];
@@ -110,6 +110,8 @@ i = s2 ~= 0; s2(i) = 1 ./ s2(i);
 rho = rho .* s1;
 lam = lam .* s2;
 miu = miu .* s2;
+%y = y .* s1 .* s1;
+y = y / h ^ 2;
 s1(:) = 0;
 s2(:) = 0;
 

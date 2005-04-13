@@ -209,6 +209,8 @@ Nonuniform strain: 12 = 24 DOF - 6 rigid body - 6 uniform strain
  O----O      X----O      X----O      O----X  
   Z2 Z3       Z3 Z1       Z1 Z2      Z1 Z2 Z3
 
+Y = miu*(lam+miu)/6/(lam+2*miu)
+
 
 PML absorbing boundary
 

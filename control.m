@@ -27,18 +27,19 @@ case 'h'
       { 'SORD - Support-Operator Rupture Dynamics'
         ''
         'Run/Pause/Step             R Click Space'
-        'Explore                       ; '' Arrows'
+        'Explore                       C E Arrows'
         'Color Scale                      [ ] \\ |'
         'Zoom                               < > /'
         'Rotate                              Drag'
         'Component                            0-6'
         'Field                              U V W'
+        'Time Series                            T'
         'Mesh Distortion                        X'
         '3D/2D                                  D'
         'Plot Style                             P'
         'Glyphs                                 G'
         'Isosurfaces                            I'
-        'Surfaces                               S'
+        'Slices                                 S'
         'Mesh                                   M'
         'Outline                                O'
         'Axis                                   A'
@@ -47,7 +48,7 @@ case 'h'
         'Frame +/-                       - = Page'
         'First/Last Frame                Home End'
         'Delete Frame                         Del'
-        'Write/Read Checkpoint          C Shift+C'
+        'Write/Read Checkpoint          Q Shift+Q'
         'Build Movie                            B'
         'Help                                   H'
       }, ...
@@ -80,8 +81,8 @@ case 'downarrow',  if km, xhairmove = -3; else xhairmove = -1; end, crosshairs
 case 'uparrow',    if km, xhairmove = 3;  else xhairmove = 1;  end, crosshairs
 case 'leftarrow',  xhairmove = -2; crosshairs
 case 'rightarrow', xhairmove = 2;  crosshairs
-case 'quote',      xhairmove = 4;  crosshairs
-case 'semicolon',  xhairmove = 5;  crosshairs
+case 'c',          xhairmove = 4;  crosshairs
+case 'e',          xhairmove = 6;  crosshairs
 case 'return',     newplot = plotstyle;
 case 'space', itstep = 1;       msg = 'Step';
 case 'r',     itstep = nt - it; msg = 'Run';
@@ -237,9 +238,49 @@ case 'a'
   if strcmp( get( gca, 'Visible' ), 'off' ), axis on
   else axis off
   end
-case 'c'
+case 't'
+  for iz = 1:size( out, 1 )
+    i1 = outi1(:,iz)';
+    i2 = outi2(:,iz)';
+    if outint(iz) == 1 && strcmp( outvar{iz}, field ) ...
+      && sum( xhair >= i1 & xhair <= i2 ) == 3
+      nn = i2 - i1 + 1;
+      i = xhair - i1;
+      offset = 4 * ( 1 + i .* cumprod( [ 1 nn(1:2) ] ) );
+      ts = zeros( it + 1, 1 );
+      if comp
+        for itt = 2:it+1
+          file = sprintf( 'out/%02d/%1d/%05d', iz, comp, itt );
+          fid = fopen( file, 'wl' );
+          fseek( fid, offset, -1 )
+          ts(itt) = fread( fid );
+          close( fid )
+        end
+      else
+        for itt = 2:it+1
+          for i = 1:ncomp
+            file = sprintf( 'out/%02d/%1d/%05d', iz, i, itt );
+            fid = fopen( file, 'wl' );
+            fseek( fid, offset, -1 )
+            ts(itt) = ts(itt) + fread( fid ) ^ 2;
+            close( fid )
+          end
+        end
+        ts = sqrt( ts );
+      end
+      switch field
+      case 'v', time = ( 0 : it ) * dt + dt / 2;
+      otherwise time = ( 0 : it ) * dt
+      end
+      figure
+      plot( time, ts )
+    else
+      msg = 'no time series data at this location';
+    end
+  end
+case 'q'
   if ~km
-    save checkpoint it slip u v vv trup
+    save checkpoint it u v uslip trup
     delete( [ hhud hmsg hhelp ] )
     hhud = []; hmsg = []; hhelp = [];
     set( 1, 'UserData', nframe )
@@ -250,6 +291,7 @@ case 'c'
     msg = 'Checkpoint Saved';
   else
     load checkpoint
+    stepw
     delete(1)
     openfig( 'checkpoint' );
     haxes = get( 1, 'Children' );

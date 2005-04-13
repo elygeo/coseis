@@ -17,6 +17,15 @@ elseif xhairmove == 5
   if nrmdim && cellfocus
     xhair(nrmdim) = xhair(nrmdim) + 1;
   end
+elseif xhairmove == 6
+  maxi = hypocenter;
+  switch field
+  case 'u', maxi = umaxi;
+  case 'v', maxi = vmaxi;
+  case 'w', maxi = wmaxi;
+  end
+  [ j, k, l ] = ind2sub( n, maxi );
+  xhair = [ j k l ] - halo1;
 else
   v1 = camup;
   v3 = camtarget - campos;
@@ -88,8 +97,8 @@ case 'w'
   vec = vec(:,i);
   mga = val';
   vga = vec(:)';
-  tmp = [ sqrt( s2(j,k,l) ) val(3) wg ];
-  msg = sprintf( '|W|f%9.2e\n|W| %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e', tmp );
+  tmp = [ val([3 2 1])' wg ];
+  msg = sprintf( 'W1  %9.2e\nW2  %9.2e\nW3  %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e', tmp );
 otherwise error field
 end
 set( gcf, 'CurrentAxes', haxes(2) )
@@ -109,12 +118,16 @@ if cellfocus
   j = [ 1 1 1 1 1 2 2 2 2 2 2 1 1 2 2 1 ] + 1;
   k = [ 1 1 2 2 1 1 1 2 2 1 1 1 2 2 2 2 ] + 1;
   l = [ 1 2 2 1 1 1 2 2 1 1 2 2 2 2 1 1 ] + 1;
-  il = [ 6 4 2 ];
+  iorig = 1;
+  inan = [];
+  itext = [ 6 4 2 ];
 else
-  j = [ 3 2 1 2 2 2 2 2 2 2 2 ];
-  k = [ 2 2 2 2 3 2 1 2 2 2 2 ];
-  l = [ 2 2 2 2 2 2 2 2 3 2 1 ];
-  il = [ 1 5 9 ];
+  j = [ 3 2 1 1 2 2 2 1 2 2 2 ];
+  k = [ 2 2 2 1 3 2 1 1 2 2 2 ];
+  l = [ 2 2 2 1 2 2 2 1 3 2 1 ];
+  iorig = 2;
+  inan = [ 4 8 ];
+  itext = [ 1 5 9 ];
 end
 j = i(j);
 k = i(k+3);
@@ -125,10 +138,16 @@ clear xg
 for i = 0:2
   xg(:,i+1) = x(ii+i*ng) + xscl * u(ii+i*ng);
 end
+xg(inan,:) = NaN;
 hhud(end+1) = plot3( xg(:,1), xg(:,2), xg(:,3) );
-xg = double( xg(il,:) );
-hhud(end+1:end+3) = text( xg(:,1), xg(:,2), xg(:,3), ['123']', 'Ver', 'middle');
-if dooutline
+xgo = xg(iorig,:);
+xg  = xg(itext,:);
+for i = 1:3;
+  xg(:,i) = 1.1 * xg(:,i) - .1 * xgo(i);
+end
+xg = double( xg );
+hhud(end+1:end+3) = text( xg(:,1), xg(:,2), xg(:,3), ['jkl']', 'Ver', 'middle');
+if dooutline && ( domesh || dosurf )
   points = [ halo1 + 1 halo1 + ncore ];
   i1 = halo1 + 1;
   i2 = halo1 + ncore;

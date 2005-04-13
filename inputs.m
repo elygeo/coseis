@@ -4,16 +4,17 @@
 model = 'agu';
 model = 'the3';
 model = 'agu';
+model = 'normal';
 model = 'strikeslip';
+model = 'test';
 model = 'pointsrc';
 model = 'kostrov';
-model = 'normal';
 n = [ 21 21 21 ];
 nt = 20;
 dt = .5;
 h = 1;
+material = [ 1 sqrt(3) 1   1 1 1  -1 -1 -1 ];
 viscosity = [ 0 .3 ];
-material = [ 1 sqrt(3) 1   0 0 0  0 0 0   1 1 1  -1 -1 -1 ];
 noise = 0;
 nrmdim = 0;
 hypocenter = 0;
@@ -26,6 +27,7 @@ checkpoint = -1;
 symmetries = [];
 npml = 0;
 plotstyle = 'slice';
+grid = 'constant';
 locknodes = [
   1 1 1   1  1  1   1 -1 -1   % top
   1 1 1   1  1  1  -1  1 -1   % front
@@ -38,24 +40,24 @@ locknodes = [];
 out = {};
 switch model
 case { '', 'none' }
+case { 'test' }
+  viscosity = [ 0 0 ];
 case 'pointsrc'
-  if 0
-    moment = [ 1 1 1  0 0 0 ];
-  else
-    h = 100;
-    dt = 0.007;
-    material = [ 2670 6000 3464   1 1 1  -1 -1 -1 ];
-    moment = -1e14 * [ 0 0 0  0 0 1 ];
-    moment = -1e14 * [ 1 1 1  0 0 0 ];
-  end
+  viscosity = [ 0 0 ];
+  h = 100;
+  dt = 0.007;
+  material = [ 2670 6000 3464   1 1 1  -1 -1 -1 ];
+  moment = -1e14 * [ 0 0 0  0 0 1 ];
+  moment = -1e14 * [ 1 1 1  0 0 0 ];
   mSrcTimeFcn = 'delta';
   msrctimefcn = 'brune';
-  msrctimefcn = 'sbrune';
   msrctimefcn = 'sine';
-  msrcradius = 1.5 * h;
+  msrctimefcn = 'sbrune';
+  msrcradius = 2.5 * h;
   msrcnodealign = 1;
-  n = [ 20 20 20 ] + msrcnodealign; nt = 20;
   n = [ 6  6  6  ] + msrcnodealign; nt = 20;
+  n = [ 20 20 20 ] + msrcnodealign; nt = 20;
+  n = [ 50 50 10 ] + msrcnodealign; nt = 20;
   grid = 'slant';
   grid = 'constant';
   plotstyle = '';
@@ -65,9 +67,10 @@ case 'strikeslip'
   nt = 20;
   grid = 'normal';
   grid = 'hill';
-  grid = 'spherical';
   grid = 'curve';
   grid = 'constant';
+  grid = 'spherical';
+  nclramp = 10;
   nrmdim = 2;
   rcrit = 5;
   vrup = 1;
@@ -99,12 +102,10 @@ case 'kostrov'
     'vslip' 1  0 0 0  -1 0 0
   };
 case 'the2'
-  grid = 'constant';
   nrmdim = 2;
   rcrit = 0;
   nclramp = 10;
   vrup = 0;
-  truptol = .001
   material = [ 2670 6000 3464     1 1 1  -1 -1 -1 ];
   friction = [ 1e4 1e4 .4 0       1 1 1  -1 -1 -1 ];
   traction = [ -70e6 -120e6 0     1 1 1  -1 -1 -1 ];
@@ -131,10 +132,8 @@ case 'the2'
     friction = [ friction; 0.677 0.525 .4 0   16 0  1   -16 0 25 ];% CHECK!
     traction = [ traction; -81.6e6 -120e6 0   39 0 11   -39 0 15 ];% CHECK!
     hypocenter = [ 12 ceil( n(2:3) / 2 ) ];% CHECK!
-  otherwise error h
   end
 case 'the3'
-  grid = 'constant';
   nrmdim = 2;
   rcrit = 0;
   nclramp = 10;
@@ -166,7 +165,6 @@ case 'the3'
     friction = [ 0.677 0.525 .4 0   16 0 16   -16 0 40 ];% CHECK!
     traction = [ -81.6e6 -120e6 0   39 0 26   -39 0 30 ];% CHECK!
     hypocenter = [ 12 ceil( n(2:3) / 2 ) ];  % CHECK!
-  otherwise error h
   end
   symmetries = { 'xmirror' 1 1; 'x180' 2 0 };
 case 'normal'
@@ -206,7 +204,6 @@ case 'agu'
     rcrit = 1000;
     n  = [ 81 41 81 ]; nt = 120;
     n  = [ 41 21 41 ]; nt = 60;
-  otherwise error h
   end
   grid = 'stretch';
   grid = 'slant';

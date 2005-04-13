@@ -77,21 +77,6 @@ area = sqrt( area );
 tmp = area(j,k,l);
 i = tmp ~= 0;
 tmp(i) = 1 ./ tmp(i);
-s1(:) = 1;
-for iz = 1:size( operator, 1 )
-  zone = [ operator{iz,8:13} ];
-  [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
-  i1(nrmdim) = 1;
-  i2(nrmdim) = 1;
-  l = i1(3):i2(3);
-  k = i1(2):i2(2);
-  j = i1(1):i2(1);
-  switch operator{iz,1}
-  case { 'g', 'r' }, s1(j,k,l) = 1;
-  case { 'h', '4' }, s1(j,k,l) = 1 / h ^ 2;
-  otherwise error operator
-  end
-end
 for i = 1:3
   nrm(j,k,l,i) = nrm(j,k,l,i) .* tmp;
 end
@@ -144,6 +129,22 @@ r  = sqrt( r );
 if n(1) == 4, r = repmat( r(j,:,:), [ 4 1 1 ] ); end % 2D cases
 if n(2) == 4, r = repmat( r(:,k,:), [ 1 4 1 ] ); end % 2D cases
 if n(3) == 4, r = repmat( r(:,:,l), [ 1 1 4 ] ); end % 2D cases
+s1(j,k,l) = area(j,k,l);
+for iz = 1:size( operator, 1 )
+  zone = [ operator{iz,8:13} ];
+  [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
+  i1(nrmdim) = 1;
+  i2(nrmdim) = 1;
+  l1 = i1(3):i2(3);
+  k1 = i1(2):i2(2);
+  j1 = i1(1):i2(1);
+  switch operator{iz,1}
+  case { 'g', 'r' }, s1(j1,k1,l1) = area(j1,k1,l1);
+  case { 'h', '4' }, s1(j1,k1,l1) = area(j1,k1,l1) / h ^ 2;
+  otherwise error operator
+  end
+end
+area(j,k,l) = s1(j,k,l);
 i  = hypocenter;
 i(nrmdim) = 1;
 j  = i(1);
@@ -161,7 +162,6 @@ rcritr = miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2;
 fprintf( 1, 'S: %g\n', strength )
 fprintf( 1, 'dc: %g > %g\n', dc0, dcr )
 fprintf( 1, 'rcrit: %g > %g\n', rcrit, rcritr )
-area = area .* s1;
 return
 
 end
@@ -183,7 +183,7 @@ i2(nrmdim) = hypocenter(nrmdim) + 1;
 j2     = i1(1):i2(1);
 k2     = i1(2):i2(2);
 l2     = i1(3):i2(3);
-% Zero slip condition
+% Zero slip velocity condition
 tmp    = area .* ( rho(j1,k1,l1) + rho(j2,k2,l2) );
 i      = tmp ~= 0;
 tmp(i) = 1 ./ tmp(i);
@@ -235,8 +235,26 @@ for i = 1:3
   w1(j1,k1,l1,i) = w1(j1,k1,l1,i) + t(:,:,:,i) .* area .* rho(j1,k1,l1);
   w1(j2,k2,l2,i) = w1(j2,k2,l2,i) - t(:,:,:,i) .* area .* rho(j2,k2,l2);
 end
-vslip = v(j2,k2,l2,:) + w1(j2,k2,l2,1:3) - v(j1,k1,l1,:) - w1(j1,k1,l1,1:3);
+vslip = v(j2,k2,l2,:) + w1(j2,k2,l2,:) - v(j1,k1,l1,:) - w1(j1,k1,l1,:);
 vslip = sum( vslip .* vslip, 4 );
 vslip = sqrt( vslip );
-uslip  = uslip + dt * vslip;
+
+if truptol
+  i = hypocenter;
+  i(nrmdim) = 1;
+  l1 = i1(3):i2(3);
+  k1 = i1(2):i2(2);
+  j1 = i1(1):i2(1);
+  l = i(3);
+  k = i(2);
+  j = i(1);
+  i = vslip > truptol;
+  if find( i )
+    trup( i & ( ~ trup ) ) = ( it + .5 ) * dt;
+    tarrest = ( it + 1.5 ) * dt;
+    if i(j,k,l)
+      tarresthypo = tarrest;
+    end
+  end
+end
 

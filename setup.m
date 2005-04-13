@@ -46,8 +46,8 @@ itstep = nt;
 umax = 0;
 vmax = 0;
 wmax = 0;
-if readcheckpoint, load checkpoint, end
-disp( ' step   fault    v        s        viz/io  total' )
+if readcheckpoint, load checkpoint, stepw, end
+disp( ' Step   V        U        W        Viz/IO  Total' )
 if plotstyle
   viz
   control

@@ -16,8 +16,8 @@ if initialize > 1
   field = 'v';
   comp = 0;
   domesh = 0;
-  dosurf = 1;
-  doisosurf = 1;
+  dosurf = 0;
+  doisosurf = 0;
   dooutline = 1;
   isofrac = .5;
   doglyph = 1;
@@ -37,7 +37,7 @@ if initialize > 1
   xhair = hypocenter - halo1;
   if nrmdim, slicedim = nrmdim; else slicedim = 3; end
   if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
-  else     foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 2;
+  else     foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 1;
   end
   hhud = [];
   hmsg = [];
@@ -132,7 +132,6 @@ if domesh || dosurf
   case 'slice'
     planes = slices; surfviz
     lines  = slices; lineviz, set( hand, 'Tag', 'surfline' )
-  otherwise error newplot
   end
 end
 if dooutline
@@ -146,10 +145,10 @@ if dooutline
   k = [ 2 2 5 2 2 ];
   l = [ 3 3 3 3 6 ];
   houtline(2) = plot3( xg(j), xg(k), xg(l) );
-  j = [ 1 7 1 1 ];
-  k = [ 2 2 8 2 ];
-  l = [ 3 3 3 9 ];
-  houtline(3:6) = text( xg(j), xg(k), xg(l), ['oxyz']', 'Ver', 'middle' );
+  j = [ 7 1 1 ];
+  k = [ 2 8 2 ];
+  l = [ 3 3 9 ];
+  houtline(3:5) = text( xg(j), xg(k), xg(l), ['xyz']', 'Ver', 'middle' );
   set( houtline, 'Tag', 'outline' )
 end
 if look, lookat, end
