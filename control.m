@@ -253,31 +253,33 @@ case 'a'
   else axis off
   end
 case 't'
+  msg = 'no time series data at this location';
   for iz = 1:size( out, 1 )
     i1 = outi1(:,iz)';
     i2 = outi2(:,iz)';
+    i = xhair + halo1;
     if outint(iz) == 1 && strcmp( outvar{iz}, field ) ...
-      && sum( xhair >= i1 & xhair <= i2 ) == 3
+      && sum( i >= i1 & i <= i2 ) == 3
       nn = i2 - i1 + 1;
-      i = xhair - i1;
-      offset = 4 * ( 1 + i .* cumprod( [ 1 nn(1:2) ] ) );
+      i = i - i1;
+      offset = 4 * ( 1 + sum( i .* cumprod( [ 1 nn(1:2) ] ) ) );
       ts = zeros( it + 1, 1 );
       if comp
-        for itt = 2:it+1
+        for itt = 1:it
           file = sprintf( 'out/%02d/%1d/%05d', iz, comp, itt );
-          fid = fopen( file, 'wl' );
-          fseek( fid, offset, -1 )
-          ts(itt) = fread( fid );
-          close( fid )
+          fid = fopen( file, 'rl' );
+          fseek( fid, offset, -1 );
+          ts(itt+1) = fread( fid, 1, 'float32' );
+          fclose( fid );
         end
       else
-        for itt = 2:it+1
+        for itt = 1:it
           for i = 1:ncomp
             file = sprintf( 'out/%02d/%1d/%05d', iz, i, itt );
-            fid = fopen( file, 'wl' );
-            fseek( fid, offset, -1 )
-            ts(itt) = ts(itt) + fread( fid ) ^ 2;
-            close( fid )
+            fid = fopen( file, 'rl' );
+            fseek( fid, offset, -1 );
+            ts(itt+1) = ts(itt+1) + fread( fid, 1, 'float32' ) ^ 2;
+            fclose( fid );
           end
         end
         ts = sqrt( ts );
@@ -287,9 +289,21 @@ case 't'
       otherwise time = ( 0 : it ) * dt
       end
       figure
+      set( gcf, ...
+       'Color', background, ...
+       'DefaultAxesColorOrder', foreground, ...
+       'DefaultAxesColor', background, ...
+       'DefaultAxesXColor', foreground, ...
+       'DefaultAxesYColor', foreground, ...
+       'DefaultAxesZColor', foreground, ...
+       'DefaultLineColor', foreground, ...
+       'DefaultLineLinewidth', linewidth, ...
+       'DefaultTextColor', foreground )
       plot( time, ts )
-    else
-      msg = 'no time series data at this location';
+      ylabel( titles( comp + 1 ) )
+      xlabel( 'Time' )
+      set( 0, 'CurrentFigure', 1 )
+      msg = 'time series plot'
     end
   end
 case 'q'

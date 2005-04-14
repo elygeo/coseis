@@ -38,6 +38,10 @@ locknodes = [
 ];
 locknodes = [];
 out = {};
+out = {
+  'v' 1   1  1  1   -1 -1  1
+  'v' 1   1  0  1   -1  0  1
+};
 switch model
 case { '', 'none' }
 case { 'test' }
@@ -98,8 +102,10 @@ case 'kostrov'
   n = [  5  5  5 ]; nt =  10; plotstyle = 'slice';
   n = [  21  21  21 ]; nt =  90; plotstyle = 'slice';
   out = {
-    'uslip' 1  0 0 0  -1 0 0
-    'vslip' 1  0 0 0  -1 0 0
+    'v'     1   1  1  1   -1 -1  1
+    'v'     1   1 11  1   -1  0 -1
+    'uslip' 1   0  0  0   -1  0  0
+    'vslip' 1   0  0  0   -1  0  0
   };
 case 'the2'
   nrmdim = 2;

@@ -32,7 +32,7 @@ case 'v', fscl = vscl; titles = { '|V|' 'Vx' 'Vy' 'Vz' }; cellfocus = 0;
 case 'w', fscl = wscl; titles = { '|W|' 'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
 otherwise error field
 end
-ncomp = length( titles );
+ncomp = length( titles ) - 1;
 if comp > ncomp, comp = mod( comp, ncomp ); end
 fscl = double( fscl );
 clim = fscl;
