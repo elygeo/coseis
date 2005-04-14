@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
 % SETUP
 
-disp( 'SORD - Support-Operator Rupture Dynamics' )
+fprintf( 'SORD - Support-Operator Rupture Dynamics\n' )
 format short e
 format compact
 
@@ -31,7 +31,7 @@ if str2double( version( '-release' ) ) >= 14, one = single( 1 ); end
 zero = 0 * one;
 mem = whos( 'one' );
 mem = round( mem.bytes / 1024 ^ 2 * 21 * prod( n ) );
-fprintf( 1, 'Base memory usage: %d Mb\n', mem )
+fprintf( 'Base memory usage: %d Mb\n', mem )
 
 initialize = 2;
 if plotstyle, viz, end
@@ -47,12 +47,12 @@ umax = 0;
 vmax = 0;
 wmax = 0;
 if readcheckpoint, load checkpoint, stepw, end
-disp( ' Step   V        U        W        Viz/IO  Total' )
+fprintf( '    Step      V        U        W      Viz/IO   Total\n' )
+spacer = '>> ';
 if plotstyle
   viz
   control
   initialize = 0;
-  disp( 'paused' );
 else
   initialize = 0;
   step

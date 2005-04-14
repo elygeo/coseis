@@ -79,7 +79,3 @@ end
 % Moment source
 if msrcradius, momentsrc, end
 
-s2 = sum( w1 .* w1, 4 ) + 2 * sum( w2 .* w2, 4 );
-[ wmax, wmaxi ] = max( s2(:) );
-wmax = sqrt( wmax );
-

@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
 % MATMODEL
 
-disp('Material model')
+fprintf( 'Material model\n' )
 u   = repmat( zero, [ n 3 ] );
 v   = repmat( zero, [ n 3 ] );
 w1  = repmat( zero, [ n 3 ] );
@@ -25,7 +25,7 @@ for iz = 1:size( material, 1 )
   lam0  = rho0 .* ( vp .* vp - 2 * vs .* vs );
   nu    = .5 * lam0 / ( lam0 + miu0 );
   courant = dt * vp * sqrt( 3 ) / h;   % TODO: check, make general
-  fprintf( 1, 'courant: %g < 1\n', courant )
+  fprintf( 'courant: %g < 1\n', courant )
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
@@ -104,7 +104,7 @@ for iz = 1:size( operator, 1 )
   if bc(6), f6 = repmat( zero, nn ); e6 = repmat( zero, nn ); end
 end
 
-if s2(s2<0); disp( 'Negative cell volume!' ), end
+if s2(s2<0); fprinf( 'Negative cell volume!\n' ), end
 i = s1 ~= 0; s1(i) = 1 ./ s1(i);
 i = s2 ~= 0; s2(i) = 1 ./ s2(i);
 rho = rho .* s1;

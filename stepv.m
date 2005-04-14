@@ -123,7 +123,3 @@ for iz = 1:size( locknodes, 1 )
 end
 v = v + w1;
 
-s1 = sum( v .* v, 4 );
-[ vmax, vmaxi ] = max( s1(:) );
-vmax = sqrt( vmax );
-

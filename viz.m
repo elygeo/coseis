@@ -33,7 +33,7 @@ if initialize > 1
   camdist = -1;
   look = 4;
 
-  disp( 'Initialize visualization' )
+  fprintf( 'Initialize visualization\n' )
   xhair = hypocenter - halo1;
   if nrmdim, slicedim = nrmdim; else slicedim = 3; end
   if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;

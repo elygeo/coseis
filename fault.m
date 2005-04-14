@@ -3,7 +3,7 @@
 
 if initialize
 
-disp( 'Initialize fault' )
+fprintf( 'Initialize fault\n' )
 nf = n;
 nf(nrmdim) = 1;
 fs    = repmat( 0, nf );
@@ -209,7 +209,7 @@ tn1    = -tn;
 i      = tn1 < 0;
 if( find( i ) )
   tn1(i) = 0;
-  disp( 'fault opening!' )
+  fprintf( 'fault opening!\n' )
   %cohes1(i) = 0;  this is in DFM, but taken out to allow locking
 end
 c      = repmat( 1, size( dc ) );

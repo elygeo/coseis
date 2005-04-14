@@ -2,7 +2,7 @@
 % OUTPUT
 
 if initialize
-  disp( 'Initialize output' )
+  fprintf( 'Initialize output\n' )
   if checkpoint < 0, checkpoint = nt; end
   if ~readcheckpoint
     if exist( 'out', 'dir' ), rmdir( 'out', 's' ), end

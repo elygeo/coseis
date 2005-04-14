@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
 % GRIDGEN
 
-disp( 'Grid generation' )
+fprintf( 'Grid generation\n' )
 downdim = 3;
 if nrmdim && nrmdim ~= downdim
   dims = [ 6 - downdim - nrmdim nrmdim downdim ];

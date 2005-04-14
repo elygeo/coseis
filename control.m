@@ -105,30 +105,44 @@ case 'period'
     campos( campos + xhairtarg - camtarget )
     camtarget( xhairtarg )
   end
-case 'slash'
-  if strcmp( camproj, 'orthographic' )
-    look = 2;
-  else
-    look = 4;
-  end
-  lookat
 case 'd'
   if strcmp( camproj, 'orthographic' )
     camproj perspective
     camva( 1.25 * camva )
   else
+    camproj orthographic
+    camva( .8 * camva )
+    v1 = camup;
+    v2 = campos - camtarget;
     upvec = [ 0 0 0 ];
     pos = [ 0 0 0 ];
-    v1 = camup;
-    v2 = camtarget - campos;
     [ t, i1 ] = max( abs( v1 ) );
     [ t, i2 ] = max( abs( v2 ) );
     upvec(i1) = sign( v1(i1) );
-    pos(i2) = -sign( v2(i2) ) * norm( v2 );
+    pos(i2) = sign( v2(i2) ) * norm( v2 );
     camup( upvec )
     campos( camtarget + pos )
-    camproj orthographic
-    camva( .8 * camva )
+  end
+case 'slash'
+  if strcmp( camproj, 'orthographic' )
+    v1 = camup;
+    v2 = campos - camtarget;
+    upvec = [ 0 0 0 ];
+    pos = [ 0 0 0 ];
+    [ t, i1 ] = max( abs( v1 ) );
+    [ t, i2 ] = max( abs( v2 ) );
+    upvec(i1) = sign( v1(i1) );
+    pos(i2) = sign( v2(i2) ) * camdist;
+    camup( upvec )
+    camtarget( x0 )
+    campos( camtarget + pos )
+    camva( 22 )
+  else
+    v2 = campos - camtarget;
+    pos = camdist * v2 / norm( v2 );
+    camtarget( x0 )
+    campos( camtarget + pos )
+    camva( 27.5 )
   end
 case 'leftbracket'
   if ~km, tmp = .8 * get( gca, 'CLim' );
@@ -351,5 +365,9 @@ end
 drawnow
 
 if newplot, viz, end
-if itstep && ~running, step, end
+if itstep && ~running
+  spacer = '';
+  step
+  fprintf( '>> ' )
+end
 
