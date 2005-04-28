@@ -6,17 +6,11 @@ xhairmove = abs( xhairmove );
 nc = ncore - cellfocus;
 if xhairmove == 4
   xhair = hypocenter - halo1;
-  if nrmdim
-    slicedim = nrmdim;
-    if cellfocus, xhair(nrmdim) = xhair(nrmdim) + 1; end
-  end
+  if nrmdim, slicedim = nrmdim; end
 elseif xhairmove == 5
   xhair = hypocenter - halo1;
   xhair(downdim) = 1;
   slicedim = downdim;
-  if nrmdim && cellfocus
-    xhair(nrmdim) = xhair(nrmdim) + 1;
-  end
 elseif xhairmove == 6
   maxi = hypocenter;
   switch field
@@ -38,17 +32,14 @@ else
   tmp = [ sign( v1(i1) ) sign( v2(i2) ) sign( v3(i3) ) ];
   way = way * tmp(xhairmove);
   xhairmove = i(xhairmove);
-  i = abs( xhairmove );
-  if length( hhud )
-    xhair(i) = xhair(i) + way;
-    if cellfocus && nrmdim == i && xhair(i) == hypocenter(i) - halo1(i)
-      xhair(i) = xhair(i) + way;
-    end
-    if xhair(i) > nc(i), xhair(i) = nc(i);
-    elseif xhair(i) < 1, xhair(i) = 1;
-    end
-  end
-  slicedim = i;
+  slicedim = abs( xhairmove );
+  i = slicedim;
+  if length( hhud ), xhair(i) = xhair(i) + way; end
+  %if cellfocus && nrmdim == i && xhair(i) == hypocenter(i) - halo1(i)
+  %  xhair(i) = xhair(i) + way;
+  %end
+  xhair = min( xhair, nc );
+  xhair = max( xhair, 1 );
 end
 delete( [ hhud hhelp ] )
 hhelp = [];

@@ -45,9 +45,9 @@ if initialize
     j = i1(1):i2(1);
     if cells
       switch nrmdim
-      case 1, j(hypocenter(1)) = [];
-      case 2, k(hypocenter(2)) = [];
-      case 3, l(hypocenter(3)) = [];
+      case 1, j(j==hypocenter(1)) = [];
+      case 2, k(k==hypocenter(2)) = [];
+      case 3, l(l==hypocenter(3)) = [];
       end
     end
     for i = 1:3
@@ -96,11 +96,11 @@ for iz = 1:size( out, 1 )
       case 'v', fwrite( fid, v(j,k,l,i), 'float32' );
       case 'm', fwrite( fid, s1(j,k,l),  'float32' );
       case 't', fwrite( fid, t(j,k,l,i), 'float32' );
-      case 's'
+      case 'w'
         switch nrmdim
-        case 1, j(hypocenter(1)) = [];
-        case 2, k(hypocenter(2)) = [];
-        case 3, l(hypocenter(3)) = [];
+        case 1, j(j==hypocenter(1)) = [];
+        case 2, k(k==hypocenter(2)) = [];
+        case 3, l(l==hypocenter(3)) = [];
         end
         if i <= 3, fwrite( fid, w1(j,k,l,i),   'float32' );
         else       fwrite( fid, w2(j,k,l,i-3), 'float32' );

@@ -29,26 +29,13 @@ for iz = 1:size( material, 1 )
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
-  rho(j,k,l) = dt / rho0;
+  rho(j,k,l) = 1 / rho0;
   l = i1(3):i2(3)-1;
   k = i1(2):i2(2)-1;
   j = i1(1):i2(1)-1;
   lam(j,k,l) = lam0;
   miu(j,k,l) = miu0;
 end
-l = hypocenter(3);
-k = hypocenter(2);
-j = hypocenter(1);
-rho0 = dt / rho(j,k,l);
-lam0 = lam(j,k,l);
-miu0 = miu(j,k,l);
-gamma = dt * viscosity;
-vs0 = 1 / ( 1 / vsmin + 1 / vsmax );
-
-y = 6 * ( lam + 2 * lam );
-i = y ~= 0;
-y(i) = 1 ./ y(i);
-y = y .* rho .* miu .* ( lam + miu );
 
 for iz = 1:size( operator, 1 )
   zone = [ operator{iz,8:13} ];
@@ -57,13 +44,19 @@ for iz = 1:size( operator, 1 )
   opi1(iz,:) = i1;
   opi2(iz,:) = i2;
   switch operator{iz,1}
-  case { 'g', 'r' }
+  case { 'g', 'r', 'h' }
     l = i1(3):i2(3)-1;
     k = i1(2):i2(2)-1;
     j = i1(1):i2(1)-1;
+    switch nrmdim
+    case 1, j(j==hypocenter(1)) = [];
+    case 2, k(k==hypocenter(2)) = [];
+    case 3, l(l==hypocenter(3)) = [];
+    end
     switch operator{iz,1}
     case 'g', s2(j,k,l) = dncg( x, 1, x, 1, j, k, l );
     case 'r', s2(j,k,l) = dncr( x, 1, x, 1, j, k, l );
+    case 'h', s2(j,k,l) = h;
     end
     l = i1(3):i2(3);
     k = i1(2):i2(2);
@@ -73,15 +66,6 @@ for iz = 1:size( operator, 1 )
       s2(j-1,k,l) + s2(j,k-1,l-1) + ...
       s2(j,k-1,l) + s2(j-1,k,l-1) + ...
       s2(j,k,l-1) + s2(j-1,k-1,l) );
-  case 'h'
-    l = i1(3):i2(3)-1;
-    k = i1(2):i2(2)-1;
-    j = i1(1):i2(1)-1;
-    s2(j,k,l) = h;
-    l = i1(3):i2(3);
-    k = i1(2):i2(2);
-    j = i1(1):i2(1);
-    s1(j,k,l) = h;
   case '4'
     l = i1(3):i2(3);
     k = i1(2):i2(2);
@@ -103,15 +87,28 @@ for iz = 1:size( operator, 1 )
   if bc(3), f3 = repmat( zero, nn ); e3 = repmat( zero, nn ); end
   if bc(6), f6 = repmat( zero, nn ); e6 = repmat( zero, nn ); end
 end
-
 if s2(s2<0); fprinf( 'Negative cell volume!\n' ), end
 i = s1 ~= 0; s1(i) = 1 ./ s1(i);
 i = s2 ~= 0; s2(i) = 1 ./ s2(i);
-rho = rho .* s1;
+
+l = hypocenter(3);
+k = hypocenter(2);
+j = hypocenter(1);
+rho0 = 1 / rho(j,k,l);
+lam0 = lam(j,k,l);
+miu0 = miu(j,k,l);
+gamma = dt * viscosity;
+vs0 = 1 / ( 1 / vsmin + 1 / vsmax );
+
+hgy = 6 * ( lam + 2 * lam );
+i = hgy ~= 0;
+hgy(i) = 1 ./ hgy(i);
+hgy = hgy .* miu .* ( lam + miu );
+
+mdt = rho .* s1 * dt;
 lam = lam .* s2;
 miu = miu .* s2;
-%y = y .* s1 .* s1;
-y = y / h ^ 2;
+hgy = hgy / h ^ 2;
 s1(:) = 0;
 s2(:) = 0;
 

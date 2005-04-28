@@ -15,6 +15,11 @@ for iii = 1:3
       l = i1(3):i2(3)-1;
       k = i1(2):i2(2)-1;
       j = i1(1):i2(1)-1;
+      switch nrmdim
+      case 1, j(j==hypocenter(1)) = [];
+      case 2, k(k==hypocenter(2)) = [];
+      case 3, l(l==hypocenter(3)) = [];
+      end
       switch operator{iz,1}
       case 'g', s2(j,k,l) = dncg( s1, 1, x, ii, j, k, l );
       case 'r', s2(j,k,l) = dncr( s1, 1, x, ii, j, k, l );

@@ -77,35 +77,50 @@ for iii = 1:3
   end
 end
 
-% Newton's Law, dV = F/m * dt
+% Newton's Law, dV = F / m * dt
 for i = 1:3
-  w1(:,:,:,i) = w1(:,:,:,i) .* rho;
+  w1(:,:,:,i) = w1(:,:,:,i) .* mdt;
 end
 
 % Hourglass correction
-% TODO: have I done this correctly along the fault?
+bc = [ operator{1,2:7} ];
 w2 = u + gamma(2) .* v;
-s2(:,:,:) = 0;
+s1(:) = 0;
 for i = 1:3
-  iz = 1;
-  %for iz = 1:size( operator, 1 )
-    bc = [ operator{iz,2:7} ];
-    i1 = opi1(iz,:);
-    i2 = opi2(iz,:);
+  s2(:) = 0;
+  for iq = 1,4
+    i1 = opi1(1,:);
+    i2 = opi2(1,:);
     i1 = i1 + npml * bc(1:3);
     i2 = i2 - npml * bc(4:6);
+    l = i1(3):i2(3)-1;
+    k = i1(2):i2(2)-1;
+    j = i1(1):i2(1)-1;
+    s1(j,k,l) = hgh( w2, i, iq, j, k, l );
+    ii = hypocenter;
+    switch nrmdim
+    case 1
+      s1(ii(1),:,:)   = s1(ii(1),:,:) + s1(ii(1)+1,:,:);
+      s1(ii(1)+1,:,:) = s1(ii(1),:,:);
+    case 2
+      s1(:,ii(2),:)   = s1(:,ii(2),:) + s1(:,ii(2)+1,:)
+      s1(:,ii(2)+1,:) = s1(:,ii(2),:);
+    case 3
+      s1(:,:,ii(3))   = s1(:,:,ii(3)) + s1(:,:,ii(3)+1)
+      s1(:,:,ii(3)+1) = s1(:,:,ii(3));
+    end
+    s1 = s1 .* hgy;
     l = i1(3):i2(3);
     k = i1(2):i2(2);
     j = i1(1):i2(1);
-    s2(j,k,l) = hgr( w2, 1, y, i, j, k, l );
-    %switch operator{iz,1}
-    %case 'g', s2(j,k,l) = hgr( w2, h, y, i, j, k, l );
-    %case 'r', s2(j,k,l) = hgr( w2, x, y, i, j, k, l );
-    %case 'h', s2(j,k,l) = hgr( w2, 1, y, i, j, k, l );
-    %otherwise error operator
-    %end
-  %end
-  w1(:,:,:,i) = w1(:,:,:,i) + s2;
+    switch nrmdim
+    case 1, j(j==ii(1)) = [];
+    case 2, k(k==ii(2)) = [];
+    case 3, l(l==ii(2)) = [];
+    end
+    s2(j,k,l) = s2(j,k,l) + hgh( s1, 1, iq, j-1, k-1, l-1 );
+  end
+  w1(:,:,:,i) = w1(:,:,:,i) - s2 .* rho;
 end
 
 % Fault calculations

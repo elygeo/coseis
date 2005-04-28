@@ -242,8 +242,8 @@ case 's'
   tmp  = findobj( [ frame{ showframe } ], 'Tag', 'surf' );
   if length( tmp ), dosurf = strcmp( get( tmp(1), 'FaceColor' ), 'flat' ); end
   dosurf = ~dosurf;
-  if dosurf, facecolor = 'flat'; visible = 'on';  msg = 'Surfaces on';
-  else       facecolor = 'none'; visible = 'off'; msg = 'Surfaces off';
+  if dosurf, facecolor = 'flat'; visible = 'on';  msg = 'Slices on';
+  else       facecolor = 'none'; visible = 'off'; msg = 'Slices off';
   end
   if length( tmp ), set( tmp, 'FaceColor', facecolor ), end
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'surfline' );
@@ -252,60 +252,7 @@ case 'a'
   if strcmp( get( gca, 'Visible' ), 'off' ), axis on
   else axis off
   end
-case 't'
-  msg = 'no time series data at this location';
-  for iz = 1:size( out, 1 )
-    i1 = outi1(:,iz)';
-    i2 = outi2(:,iz)';
-    i = xhair + halo1;
-    if outint(iz) == 1 && strcmp( outvar{iz}, field ) ...
-      && sum( i >= i1 & i <= i2 ) == 3
-      nn = i2 - i1 + 1;
-      i = i - i1;
-      offset = 4 * ( 1 + sum( i .* cumprod( [ 1 nn(1:2) ] ) ) );
-      ts = zeros( it + 1, 1 );
-      if comp
-        for itt = 1:it
-          file = sprintf( 'out/%02d/%1d/%05d', iz, comp, itt );
-          fid = fopen( file, 'rl' );
-          fseek( fid, offset, -1 );
-          ts(itt+1) = fread( fid, 1, 'float32' );
-          fclose( fid );
-        end
-      else
-        for itt = 1:it
-          for i = 1:ncomp
-            file = sprintf( 'out/%02d/%1d/%05d', iz, i, itt );
-            fid = fopen( file, 'rl' );
-            fseek( fid, offset, -1 );
-            ts(itt+1) = ts(itt+1) + fread( fid, 1, 'float32' ) ^ 2;
-            fclose( fid );
-          end
-        end
-        ts = sqrt( ts );
-      end
-      switch field
-      case 'v', time = ( 0 : it ) * dt + dt / 2;
-      otherwise time = ( 0 : it ) * dt
-      end
-      figure
-      set( gcf, ...
-       'Color', background, ...
-       'DefaultAxesColorOrder', foreground, ...
-       'DefaultAxesColor', background, ...
-       'DefaultAxesXColor', foreground, ...
-       'DefaultAxesYColor', foreground, ...
-       'DefaultAxesZColor', foreground, ...
-       'DefaultLineColor', foreground, ...
-       'DefaultLineLinewidth', linewidth, ...
-       'DefaultTextColor', foreground )
-      plot( time, ts )
-      ylabel( titles( comp + 1 ) )
-      xlabel( 'Time' )
-      set( 0, 'CurrentFigure', 1 )
-      msg = 'time series plot'
-    end
-  end
+case 't', timeseriesviz
 case 'q'
   if ~km
     save checkpoint it u v uslip trup
