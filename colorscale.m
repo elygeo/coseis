@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
 % COLORSCALE
 
-if initialize > 1
+if initialize
   haxes(end+1) = axes;
   set( gcf, 'CurrentAxes', haxes(end) )
   axis( [ 0 1 0 1 ] );
@@ -11,13 +11,12 @@ if initialize > 1
     'EdgeColor', 'none', ...
     'FaceLighting', 'none', ...
     'EdgeLighting', 'none' );
+  hlegend(4) = plot( [ 0 1 ], [ .08 .08 ], 'Color', 0.5 * [ 1 1 1 ] );
   hlegend(1) = text( .1, .05, '0' );
   hlegend(2) = text( .9, .05, '1' );
-  hlegend(4) = plot( [ 0 1 ], [ .08 .08 ], 'Color', 0.5 * [ 1 1 1 ] );
   hlegend(5) = imagesc( [ .1 .9 ], [ .058 .06 ], 0:.001:1 );
   set( hlegend, 'HandleVisibility', 'off' )
   set( gcf, 'CurrentAxes', haxes(1) )
-  return
 end
 
 uscl = ulim; if uscl < 0, uscl = double( umax ); end;

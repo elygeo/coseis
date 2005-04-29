@@ -12,7 +12,6 @@ dframe = 0;
 itstep = 0;
 set( 0, 'CurrentFigure', 1 )
 msg = '';
-newplot = '';
 action = 1;
 anim = 0;
 
@@ -26,21 +25,21 @@ case 'h'
     hhelp = text( .5, .54, ...
       { 'SORD - Support-Operator Rupture Dynamics'
         ''
-        'Run/Pause/Step             R Click Space'
-        'Explore                       C E Arrows'
+        'Run/Step/Pause             R Space Click'
+        'Explore                       Arrows C E'
         'Color Scale                      [ ] \\ |'
         'Zoom                               < > /'
         'Rotate                              Drag'
-        'Component                            0-6'
         'Field                              U V W'
+        'Component                            0-6'
         'Time Series                            T'
-        'Mesh Distortion                        X'
         '3D/2D                                  D'
-        'Plot Style                             P'
+        'Plot Volumes/Slices                    P'
         'Glyphs                                 G'
         'Isosurfaces                            I'
-        'Slices                                 S'
+        'Surfaces                               S'
         'Mesh                                   M'
+        'Mesh Distortion                        X'
         'Outline                                O'
         'Axis                                   A'
         'Replot                             Enter'
@@ -65,7 +64,7 @@ case 'pageup',     anim = 1; dframe = -10;
 case 'pagedown',   anim = 1; dframe =  10;
 case 'hyphen',     anim = 1; dframe = -1;
 case 'equal',      anim = 1; dframe =  1;
-case 'insert',     newplot = plotstyle;
+case { 'insert', 'return' }, viz
 case 'backspace'
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
@@ -83,7 +82,6 @@ case 'leftarrow',  xhairmove = -2; crosshairs
 case 'rightarrow', xhairmove = 2;  crosshairs
 case 'c',          xhairmove = 4;  crosshairs
 case 'e',          xhairmove = 6;  crosshairs
-case 'return',     newplot = plotstyle;
 case 'space', itstep = 1;       msg = 'Step';
 case 'r',     itstep = nt - it; msg = 'Run';
 case '0', comp = 0; colorscale; msg = titles( 1 );
@@ -184,12 +182,9 @@ case 'backslash'
     set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
   end
 case 'p'
-  tmp = { '', 'outline', 'slice', 'cube' };
-  for i = 1:length( tmp ), if strcmp( plotstyle, tmp{i} ), break, end, end
-  i = mod( i, length( tmp ) );
-  plotstyle = tmp{i+1};
-  if i, msg = [ 'Plotstyle: ' plotstyle ];
-  else  msg = 'Plotting off';
+  volviz = ~volviz;
+  if volviz, msg = 'Plotting volumes';
+  else       msg = 'Plotting slices';
   end
 case 'x'
   xlim = -~xlim;
@@ -216,7 +211,7 @@ case 'o'
 case 'g'
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'glyph' );
   if length( tmp ), doglyph = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
-  doglyph = ~doglyph;
+  doglyph = ~doglyph * ( 1 + km );
   if doglyph, visible = 'on';  msg = 'Glyphs on';
   else        visible = 'off'; msg = 'Glyphs off';
   end
@@ -255,7 +250,9 @@ case 'a'
 case 't', timeseriesviz
 case 'q'
   if ~km
-    save checkpoint it u v uslip trup
+    if nrmdim, save checkpoint it u v uslip trup
+    else       save checkpoint it u v
+    end
     delete( [ hhud hmsg hhelp ] )
     hhud = []; hmsg = []; hhelp = [];
     set( 1, 'UserData', nframe )
@@ -325,7 +322,6 @@ end
 
 drawnow
 
-if newplot, viz, end
 if itstep && ~running
   spacer = '';
   step

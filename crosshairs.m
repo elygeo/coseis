@@ -100,7 +100,7 @@ hhud(2) = text( .98, .98, msg, 'Hor', 'right', 'Ver', 'top' );
 msg = '';
 set( gcf, 'CurrentAxes', haxes(1) )
 if length( mga( mga ~= 0 ) )
-  if doglyph, reynoldsglyph, else, wireglyph, end
+  reynoldsglyph
   hhud = [ hhud hglyph ];
 end
 i1 = xhair + halo1;
@@ -138,7 +138,7 @@ for i = 1:3;
 end
 xg = double( xg );
 hhud(end+1:end+3) = text( xg(:,1), xg(:,2), xg(:,3), ['jkl']', 'Ver', 'middle');
-if dooutline && ( domesh || dosurf )
+if dooutline && ~volviz
   points = [ halo1 + 1 halo1 + ncore ];
   i1 = halo1 + 1;
   i2 = halo1 + ncore;

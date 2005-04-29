@@ -23,7 +23,7 @@ while itstep
   vmax = sqrt( vmax );
   wmax = sqrt( wmax );
   if umax > h / 10
-    fprinf( 'Warning: u !<< h\n' )
+    fprintf( 'Warning: u !<< h\n' )
   end
   if length( out ), output, end
   if plotstyle, viz, end

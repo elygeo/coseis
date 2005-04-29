@@ -1,6 +1,14 @@
 %------------------------------------------------------------------------------%
 % SURFVIZ
 
+if volviz
+  planes = volumes;
+else
+  planes = slices;
+  lines  = slices;
+  lineviz
+  set( hand, 'Tag', 'surfline' )
+end
 hsurf = [];
 if domesh, edgecolor = get( 1, 'DefaultTextColor' );
 else       edgecolor = 'none';

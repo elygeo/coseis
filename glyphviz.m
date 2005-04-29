@@ -1,8 +1,11 @@
 %------------------------------------------------------------------------------%
 % GLYPHVIZ
 
-minmag = ( glyphcut * fscl ) ^ 2;
 if ~fscl, return, end
+if volviz, glyphs = volumes;
+else,      glyphs = slices;
+end
+minmag = ( glyphcut * fscl ) ^ 2;
 mga = [];
 vga = [];
 xga = [];
@@ -87,5 +90,9 @@ for iz = 1:size( glyphs, 1 )
   end
 end
 
-wireglyph
+if doglyph > 1
+  reynoldsglyph
+else
+  wireglyph
+end
 

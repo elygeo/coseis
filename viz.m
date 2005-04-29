@@ -8,19 +8,23 @@
 % restart capable
 
 if initialize > 1
-
-  plotstyle = 'slice';
+  if ~ishandle(1), figure(1), end
+  set( 0, 'CurrentFigure', 1 )
+  clf
+  return
+elseif initialize
+  volviz = 0;
   plotinterval = 1;
   holdmovie = 1;
   savemovie = 1;
   field = 'v';
   comp = 0;
+  doglyph = 0;
   domesh = 0;
   dosurf = 0;
   doisosurf = 0;
   dooutline = 1;
   isofrac = .5;
-  doglyph = 1;
   glyphcut = .1;
   glyphexp = 1;
   glyphtype = 1;
@@ -32,7 +36,6 @@ if initialize > 1
   xlim = 0;
   camdist = -1;
   look = 4;
-
   fprintf( 'Initialize visualization\n' )
   xhair = hypocenter - halo1;
   if nrmdim, slicedim = nrmdim; else slicedim = 3; end
@@ -43,15 +46,12 @@ if initialize > 1
   hmsg = [];
   hhelp = [];
   frame = {};
-  showframe = 0;
   itpause = nt;
+  showframe = 0;
   count = 0;
-  helpon = 0;
-  keypress = 'h';
   keymod = '';
-  if ~ishandle(1), figure(1), end
-  set( 0, 'CurrentFigure', 1 )
-  clf
+  keypress = 'h';
+  helpon = 0;
   set( 1, ...
     'Color', background, ...
     'KeyPressFcn', 'control', ...
@@ -76,20 +76,19 @@ if initialize > 1
   cameratoolbar
   cameratoolbar( 'SetMode', 'orbit' )
   cameratoolbar( 'SetCoordSys', 'z' )
-  drawnow
-  colorscale
-  if ~exist( 'out/viz', 'dir' ), mkdir out/viz, end
-  return
-elseif initialize
-  newplot = 'initial';
+else
+  if mod( it, plotinterval ), return, end
+  switch plotstyle
+  case 'hold'
+  case 'glyphs',     volviz = 1; doglyph = 1;
+  case 'slice',      volviz = 0; dosurf = 1;
+  case 'isosurface', volviz = 1; doisosurf = 1;
+  case 'cube',       volviz = 1; dosurf = 1;
+  end
+  plotstyle = 'hold';
 end
 
 set( 0, 'CurrentFigure', 1 )
-if newplot, else
-  if ~mod( it, plotinterval ), newplot = plotstyle;
-  else return
-  end
-end
 if holdmovie
   set( [ frame{:} ], 'Visible', 'off' )
   set( [ frame{:} ], 'HandleVisibility', 'off' )
@@ -104,6 +103,7 @@ set( gcf, 'CurrentAxes', haxes(2) )
 text( .50, .05, titles( comp + 1 ) );
 text( .98, .98, sprintf( '%.3fs', it * dt ), 'Hor', 'right' )
 set( gcf, 'CurrentAxes', haxes(1) )
+
 volumes = [ 1 1 1   -1 -1 -1 ];
 if nrmdim
   volumes = [ volumes; volumes ];
@@ -121,53 +121,23 @@ if nrmdim & slicedim ~= nrmdim
   slices(2,i) = [ 0 -1 ];
 end
 
-glyphs = volumes;
-if nrmdim,    faultviz,   end
-if doglyph,   glyphviz,   end
-if doisosurf, isosurfviz, end
-if domesh || dosurf
-  switch newplot
-  case 'cube'
-    planes = volumes; surfviz
-  case 'slice'
-    planes = slices; surfviz
-    lines  = slices; lineviz, set( hand, 'Tag', 'surfline' )
-  end
-end
-if dooutline
-  lines = volumes;
-  lineviz
-  houtline = hand;
-  i = halo1 + 1;
-  xg = double( squeeze( x(i(1),i(2),i(3),:) + xscl * u(i(1),i(2),i(3),:) ) );
-  xg = [ xg xg + xmax / 16 xg + xmax / 15 ];
-  j = [ 4 1 1 1 1 ];
-  k = [ 2 2 5 2 2 ];
-  l = [ 3 3 3 3 6 ];
-  houtline(2) = plot3( xg(j), xg(k), xg(l) );
-  j = [ 7 1 1 ];
-  k = [ 2 8 2 ];
-  l = [ 3 3 9 ];
-  houtline(3:5) = text( xg(j), xg(k), xg(l), ['xyz']', 'Ver', 'middle' );
-  set( houtline, 'Tag', 'outline' )
-end
-if look, lookat, end
+if nrmdim,           faultviz,   end
+if doglyph,          glyphviz,   end
+if doisosurf,        isosurfviz, end
+if domesh || dosurf, surfviz,    end
+if dooutline,        outlineviz, end
+if look,             lookat,     end
 
 clear xg mg vg xga mga vga
+drawnow
 
-% Save frame
 kids = get( haxes, 'Children' );
 kids = [ kids{1}; kids{2} ]';
 frame{end+1} = kids;
 showframe = length( frame );
-newplot = '';
-
-% Hardcopy
 if savemovie && ~holdmovie
   count = count + 1;
   file = sprintf( 'out/viz/%05d', count );
   saveas( gcf, file )
 end
-
-drawnow
 

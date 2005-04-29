@@ -80,7 +80,11 @@ if initialize
   return
 end
 
-if ~mod( it, checkpoint ), save checkpoint it u v uslip trup, end
+if ~mod( it, checkpoint )
+  if nrmdim, save checkpoint it u v uslip trup
+  else       save checkpoint it u v
+  end
+end
 for iz = 1:size( out, 1 )
   if mod( it, outint(iz) ) == 0
     i1 = outi1(:,iz);
