@@ -5,7 +5,7 @@ if ~fscl, return, end
 if volviz, glyphs = volumes;
 else,      glyphs = slices;
 end
-minmag = ( glyphcut * fscl ) ^ 2;
+minmag = glyphcut * fscl;
 mga = [];
 vga = [];
 xga = [];
@@ -19,7 +19,7 @@ for iz = 1:size( glyphs, 1 )
   j = i1(1):i2(1);
   switch field
   case 'u'
-    ii = find( sum( u(j,k,l,:) .* u(j,k,l,:), 4 ) > minmag );
+    ii = find( sum( u(j,k,l,:) .* u(j,k,l,:), 4 ) > minmag ^ 2 );
     if ii
       [ j, k, l ] = ind2sub( i2 - i1 + 1, ii );
       j = j + i1(1) - 1;
@@ -29,7 +29,7 @@ for iz = 1:size( glyphs, 1 )
       iii = sub2ind( size( s1 ), j, k, l );
       clear vg xg
       for i = 0:2
-        vg(:,i+1) = v(iii+i*ng);
+        vg(:,i+1) = u(iii+i*ng);
         xg(:,i+1) = x(iii+i*ng) + xscl * u(iii+i*ng);
       end
       mga = [ mga; sum( vg .* vg, 2 ) ];
@@ -37,7 +37,7 @@ for iz = 1:size( glyphs, 1 )
       xga = [ xga; xg ];
     end
   case 'v'
-    ii = find( s1(j,k,l) > minmag );
+    ii = find( s1(j,k,l) > minmag ^ 2 );
     if ii
       [ j, k, l ] = ind2sub( i2 - i1 + 1, ii );
       j = j + i1(1) - 1;
@@ -55,7 +55,7 @@ for iz = 1:size( glyphs, 1 )
       xga = [ xga; xg ];
     end
   case 'w'
-    ii = find( s2(j,k,l) > minmag );
+    ii = find( s2(j,k,l) > minmag ^ 2 );
     for iii = ii(:)'
       [ j, k, l ] = ind2sub( i2 - i1 + 1, iii );
       j = j + i1(1) - 1;

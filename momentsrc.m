@@ -30,7 +30,7 @@ if initialize
   return
 end
 
-domp = 8 * dt;
+domp = 4 * dt;
 time = ( .5 : it-.5 ) * dt;  % time indexing goes wi vi wi+1 vi+1 ...
 switch msrctimefcn
 case 'delta',  msrct = 0 * time; msrct(1) = 1;

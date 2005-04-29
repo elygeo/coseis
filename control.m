@@ -74,6 +74,7 @@ case 'delete'
   if nframe > 1
     delete( [ frame{showframe} ] )
     frame( showframe ) = [];
+    nframe = nframe - 1;
   end
   anim = 1;
 case 'downarrow',  if km, xhairmove = -3; else xhairmove = -1; end, crosshairs
@@ -307,7 +308,7 @@ set( gcf, 'CurrentAxes', haxes(1) )
 set( [ hhud hmsg hhelp ], 'HandleVisibility', 'off' )
 
 nframe = length( frame );
-if anim > 0 && nframe > 1
+if anim > 0
   showframe = showframe + dframe;
   showframe = max( showframe, 1 );
   showframe = min( showframe, nframe );

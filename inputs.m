@@ -2,13 +2,13 @@
 % INPUTS
 
 model = 'agu';
-model = 'the3';
 model = 'agu';
 model = 'normal';
-model = 'strikeslip';
 model = 'test';
-model = 'kostrov';
 model = 'pointsrc';
+model = 'kostrov';
+model = 'the3';
+model = 'strikeslip';
 n = [ 21 21 21 ];
 nt = 20;
 dt = .5;
@@ -62,20 +62,18 @@ case 'pointsrc'
   msrcradius = 2.5 * h;
   msrcnodealign = 1;
   n = [ 6  6  6  ] + msrcnodealign; nt = 20;
-  n = [ 20 20 20 ] + msrcnodealign; nt = 20;
   n = [ 50 50 10 ] + msrcnodealign; nt = 20;
+  n = [ 20 20 20 ] + msrcnodealign; nt = 20;
   grid = 'slant';
   grid = 'constant';
-  plotstyle = '';
-  plotstyle = 'slice';
 case 'strikeslip'
   n = 20 * [ 2 2 1 ] + 1;
   nt = 20;
   grid = 'normal';
   grid = 'hill';
   grid = 'curve';
-  grid = 'constant';
   grid = 'spherical';
+  grid = 'constant';
   nclramp = 10;
   nrmdim = 2;
   rcrit = 5;

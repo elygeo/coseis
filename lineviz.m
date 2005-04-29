@@ -19,13 +19,15 @@ i = [
 tmp = [];
 for iz = 1:size( lines, 1 )
   zone = lines(iz,:);
+  [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
+  zone = [ i1 i2 ];
   tmp = [ tmp; zone( i ) ];
 end
 lines = unique( tmp,  'rows' );
 xga = [];
 for iz = 1:size( lines, 1 )
-  zone = lines(iz,:);
-  [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
+  i1 = lines(iz,1:3);
+  i2 = lines(iz,4:6);
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);

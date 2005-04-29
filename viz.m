@@ -1,10 +1,7 @@
 %------------------------------------------------------------------------------%
 % VIZ
-% TODO
-% time series
 % range selector
 % initial plot: mesh, prestress, hypo
-% backward time
 % restart capable
 
 if initialize > 1
