@@ -324,7 +324,7 @@ end
 drawnow
 
 if itstep && ~running
-  spacer = '';
+  fprintf( '\b\b\b' )
   step
   fprintf( '>> ' )
 end

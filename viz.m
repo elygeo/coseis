@@ -8,6 +8,7 @@ if initialize > 1
   if ~ishandle(1), figure(1), end
   set( 0, 'CurrentFigure', 1 )
   clf
+  drawnow
   return
 elseif initialize
   volviz = 0;
@@ -33,7 +34,6 @@ elseif initialize
   xlim = 0;
   camdist = -1;
   look = 4;
-  fprintf( 'Initialize visualization\n' )
   xhair = hypocenter - halo1;
   if nrmdim, slicedim = nrmdim; else slicedim = 3; end
   if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;

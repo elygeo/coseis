@@ -55,7 +55,7 @@ case 'pointsrc'
   material = [ 2670 6000 3464   1 1 1  -1 -1 -1 ];
   moment = -1e14 * [ 0 0 0  0 0 1 ];
   moment = -1e14 * [ 1 1 1  0 0 0 ];
-  mSrcTimeFcn = 'delta';
+  msrctimefcn = 'delta';
   msrctimefcn = 'brune';
   msrctimefcn = 'sine';
   msrctimefcn = 'sbrune';

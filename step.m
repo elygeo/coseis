@@ -36,7 +36,6 @@ while itstep
   wt(5) = toc;
   dwt = wt(2:end) - wt(1:end-1);
   timing = [ it  dwt wt(end) ];
-  fprintf( '%s%5d   %.2e %.2e %.2e %.2e %.2e\n', spacer, timing );
-  spacer = '>> ';
+  fprintf( '%5d   %.2e %.2e %.2e %.2e %.2e\n', timing );
 end
 
