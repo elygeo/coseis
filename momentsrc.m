@@ -2,6 +2,12 @@
 % MOMENTSRC
 
 if initialize
+  if msrcradius && exist( 'msrcnodealign' ) && exist( 'msrctimefcn' ) ...
+  && sum( abs( moment ) )
+  else
+    msrcradius = 0;
+    return
+  end
   l = 1:n(3)-1;
   k = 1:n(2)-1;
   j = 1:n(1)-1;

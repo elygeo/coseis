@@ -112,6 +112,18 @@ hgy = hgy / h ^ 2;
 s1(:) = 0;
 s2(:) = 0;
 
+if length( locknodes )
+  locknodes(downdim,1:3) = 0;
+  if n(1) < 5, locknodes([1 4],1:3) = 0; end
+  if n(2) < 5, locknodes([2 5],1:3) = 0; end
+  if n(3) < 5, locknodes([3 6],1:3) = 0; end
+end
+for iz = 1:size( locknodes, 1 )
+  zone = locknodes(iz,4:9);
+  [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
+  locki(:,:,iz) = [ i1; i2 ];
+end
+
 % PML damping
 c1 =  8/15;
 c2 = -3/100;

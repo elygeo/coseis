@@ -13,18 +13,6 @@ ncore = n;
 n = n + halo1 + halo2;
 hypocenter = hypocenter + halo1;
 
-if length( locknodes )
-  locknodes(downdim,1:3) = 0;
-  if n(1) < 5, locknodes([1 4],1:3) = 0; end
-  if n(2) < 5, locknodes([2 5],1:3) = 0; end
-  if n(3) < 5, locknodes([3 6],1:3) = 0; end
-end
-for iz = 1:size( locknodes, 1 )
-  zone = locknodes(iz,4:9);
-  [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
-  locki(:,:,iz) = [ i1; i2 ];
-end
-
 readcheckpoint = 0;
 one = 1;
 if str2double( version( '-release' ) ) >= 14, one = single( 1 ); end
@@ -46,9 +34,11 @@ itstep = nt;
 umax = 0;
 vmax = 0;
 wmax = 0;
+
+v(2:end-1,10,2:end-1,1) = 2;
+
 if readcheckpoint, load checkpoint, stepw, end
 fprintf( '    Step      V        U        W      Viz/IO   Total\n' )
-spacer = '>> ';
 if plotstyle
   viz
   control
