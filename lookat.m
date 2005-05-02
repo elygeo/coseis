@@ -23,4 +23,5 @@ camup( upvec )
 axis equal
 axis vis3d
 look = 0;
+panviz = 0;
 

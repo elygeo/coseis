@@ -212,10 +212,10 @@ Nonuniform strain: 12 = 24 DOF - 6 rigid body - 6 uniform strain
 Y = miu*(lam+miu)/6/(lam+2*miu)
 
 Q = du/dv*dx^2*dy^2*Y
-f = dQ/dv/rho
+a = dQ/dv/rho
 
 Q = du/h*Y
-f = dQ/h/rho
+a = dQ/h/rho
 
 PML absorbing boundary
 

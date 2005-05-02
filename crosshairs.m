@@ -16,7 +16,7 @@ elseif xhairmove == 6
   switch field
   case 'u', maxi = umaxi;
   case 'v', maxi = vmaxi;
-  case 'w', maxi = wmaxi
+  case 'w', maxi = wmaxi;
   end
   [ j, k, l ] = ind2sub( n, maxi );
   xhair = [ j k l ] - halo1;
@@ -138,11 +138,11 @@ for i = 1:3;
 end
 xg = double( xg );
 hhud(end+1:end+3) = text( xg(:,1), xg(:,2), xg(:,3), ['jkl']', 'Ver', 'middle');
-if ~dooutline
+if panviz
   campos( campos + xhairtarg - camtarget )
   camtarget( xhairtarg )
 end
-if dooutline && ~volviz
+if dooutline && ~volviz && ( dosurf || domesh || doglyph  )
   points = [ halo1 + 1 halo1 + ncore ];
   i1 = halo1 + 1;
   i2 = halo1 + ncore;

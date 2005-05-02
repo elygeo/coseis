@@ -11,17 +11,11 @@ if initialize > 1
   drawnow
   return
 elseif initialize
-  volviz = 0;
   plotinterval = 1;
-  holdmovie = 1;
-  savemovie = 1;
+  holdmovie = 0;
+  savemovie = 0;
   field = 'v';
-  comp = 0;
-  doglyph = 0;
-  domesh = 0;
-  dosurf = 0;
-  doisosurf = 0;
-  dooutline = 1;
+  comp = 1;
   isofrac = .5;
   glyphcut = .1;
   glyphexp = 1;
@@ -73,17 +67,29 @@ elseif initialize
   cameratoolbar
   cameratoolbar( 'SetMode', 'orbit' )
   cameratoolbar( 'SetCoordSys', 'z' )
-else
-  if mod( it, plotinterval ), return, end
+end
+
+switch plotstyle
+case 'hold'
+otherwise
+  doglyph = 0;
+  domesh = 0;
+  dosurf = 0;
+  doisosurf = 0;
+  dooutline = 1;
+  volviz = 1;
   switch plotstyle
-  case 'hold'
-  case 'glyphs',     volviz = 1; doglyph = 1;
-  case 'slice',      volviz = 0; dosurf = 1;
-  case 'isosurface', volviz = 1; doisosurf = 1;
-  case 'cube',       volviz = 1; dosurf = 1;
+  case 'outline'
+  case 'slice',      dosurf = 1; volviz = 0;
+  case 'cube',       dosurf = 1;
+  case 'glyphs',     doglyph = 1;
+  case 'isosurface', doisosurf = 1;
+  otherwise error plotstyle
   end
   plotstyle = 'hold';
 end
+
+if mod( it, plotinterval ), return, end
 
 set( 0, 'CurrentFigure', 1 )
 if holdmovie

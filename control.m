@@ -96,6 +96,7 @@ case 'comma'
   if ~km, camva( 1.25 * camva )
   else    camva( 4 * camva )
   end
+  panviz = 0;
 case 'period'
   if ~km, camva( .8 * camva )
   else    camva( .25 * camva )
@@ -104,6 +105,7 @@ case 'period'
     campos( campos + xhairtarg - camtarget )
     camtarget( xhairtarg )
   end
+  panviz = 1;
 case 'd'
   if strcmp( camproj, 'orthographic' )
     camproj perspective
@@ -143,6 +145,7 @@ case 'slash'
     campos( camtarget + pos )
     camva( 27.5 )
   end
+  panviz = 0;
 case 'leftbracket'
   if ~km, tmp = .8 * get( gca, 'CLim' );
   else    tmp = .5 * get( gca, 'CLim' );
@@ -238,8 +241,8 @@ case 's'
   tmp  = findobj( [ frame{ showframe } ], 'Tag', 'surf' );
   if length( tmp ), dosurf = strcmp( get( tmp(1), 'FaceColor' ), 'flat' ); end
   dosurf = ~dosurf;
-  if dosurf, facecolor = 'flat'; visible = 'on';  msg = 'Slices on';
-  else       facecolor = 'none'; visible = 'off'; msg = 'Slices off';
+  if dosurf, facecolor = 'flat'; visible = 'on';  msg = 'Surfaces on';
+  else       facecolor = 'none'; visible = 'off'; msg = 'Surfaces off';
   end
   if length( tmp ), set( tmp, 'FaceColor', facecolor ), end
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'surfline' );

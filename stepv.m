@@ -86,7 +86,7 @@ end
 bc = [ operator{1,2:7} ];
 w2 = u + gamma(2) .* v;
 s1(:) = 0;
-for i = 1:0
+for i = 1:3
   s2(:) = 0;
   for iq = 1:4
     i1 = opi1(1,:);
@@ -118,7 +118,7 @@ for i = 1:0
     case 2, k(k==ii(2)) = [];
     case 3, l(l==ii(2)) = [];
     end
-    s2(j,k,l) = s2(j,k,l) - hgh( s1, 1, iq, j-1, k-1, l-1 );
+    s2(j,k,l) = s2(j,k,l) + hgh( s1, 1, iq, j-1, k-1, l-1 );
   end
   w1(:,:,:,i) = w1(:,:,:,i) - s2 .* rho;
 end

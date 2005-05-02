@@ -35,10 +35,10 @@ umax = 0;
 vmax = 0;
 wmax = 0;
 
-v(2:end-1,10,2:end-1,1) = 2;
 
 if readcheckpoint, load checkpoint, stepw, end
 fprintf( '    Step      V        U        W      Viz/IO   Total\n' )
+%w1(2:end-1,hypocenter(2),2:end-1,1) = 1;
 if plotstyle
   viz
   control

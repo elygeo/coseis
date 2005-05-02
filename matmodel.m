@@ -108,7 +108,7 @@ hgy = hgy .* miu .* ( lam + miu );
 mdt = rho .* s1 * dt;
 lam = lam .* s2;
 miu = miu .* s2;
-hgy = hgy / h ^ 2;
+hgy = hgy * dt / h ^ 2;
 s1(:) = 0;
 s2(:) = 0;
 

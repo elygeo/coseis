@@ -2,12 +2,13 @@
 % INPUTS
 
 model = 'normal';
-model = 'pointsrc';
 model = 'kostrov';
 model = 'strikeslip';
 model = '';
+model = 'the3';
+model = 'pointsrc';
 grid = 'constant';
-plotstyle = 'slice';
+plotstyle = 'outline';
 n = [ 21 21 21 ];
 nt = 20;
 h = 100;
@@ -48,13 +49,15 @@ out = {
 };
 switch model
 case ''
+  n = [ 4 4 4 ]; nt = 1;
 case 'pointsrc'
-  moment = -1e14 * [ 0 0 0   0 0 1 ];
   moment = -1e14 * [ 1 1 1   0 0 0 ];
   msrctimefcn = 'delta';
   msrctimefcn = 'sbrune';
   msrcradius = 2.5 * h;
+  msrcradius = 1.5 * h;
   msrcnodealign = 1;
+  viscosity = [ 0 .3 ];
 case 'strikeslip'
   nrmdim = 2;
   friction = [ 1 .5   .4 0   1 0 1   -1  0 -1 ];
