@@ -2,12 +2,11 @@
 % INPUTS
 
 model = 'normal';
+model = 'the3';
+model = '';
+model = 'pointsrc';
 model = 'kostrov';
 model = 'strikeslip';
-model = '';
-model = 'the3';
-model = 'pointsrc';
-grid = 'constant';
 plotstyle = 'outline';
 n = [ 21 21 21 ];
 nt = 20;
@@ -16,19 +15,19 @@ dt = .007;
 nu = .25;
 vp = 6000;
 vs = sqrt( vp ^ 2 * ( nu - .5 ) / ( nu - 1 ) );  % 3464.1
+grid = 'constant';
 nrmdim = 2;
 vrup = .9 * vs;
 rcrit = 1000;
 nclramp = 10;
-material = [ 2670  vp  vs    1 1 1  -1 -1 -1 ];
+material = [ 2670   vp vs     1 1 1   -1 -1 -1 ];
+friction = [ .6 .5   .25 0    1 1 1   -1 -1 -1 ];
+traction = [ -70e6 -120e6 0   1 1 1   -1 -1 -1 ];
+stress   = [];
 viscosity = [ 0 .3 ];
 noise = 0;
-nrmdim = 0;
 hypocenter = 0;
 msrcradius = 0;
-stress   = [];
-friction = [];
-traction = [];
 truptol = .001;
 checkpoint = -1;
 symmetries = [];
@@ -49,43 +48,31 @@ out = {
 };
 switch model
 case ''
-  n = [ 4 4 4 ]; nt = 1;
+  nrmdim = 0;
+  n = [ 3 3 3 ]; nt = 1;
 case 'pointsrc'
+  nrmdim = 0;
   moment = -1e14 * [ 1 1 1   0 0 0 ];
   msrctimefcn = 'delta';
   msrctimefcn = 'sbrune';
   msrcradius = 2.5 * h;
-  msrcradius = 1.5 * h;
   msrcnodealign = 1;
-  viscosity = [ 0 .3 ];
 case 'strikeslip'
-  nrmdim = 2;
-  friction = [ 1 .5   .4 0   1 0 1   -1  0 -1 ];
-  traction = [ 9e7 -1e8 0    1 0 1   -1  0 -1 ];
 case 'normal'
-  nrmdim = 2;
   grid = 'normal';
-  friction = [ 1 .5   .4 0   1 0 1   -1  0 -1 ];
-  traction = [ 0 -1e8 9e7    1 0 1   -1  0 -1 ];
+  traction = [ 0 -120e6 -70e6   1 0 1   -1  0 -1 ];
 case 'kostrov'
-  friction = [ 1e10 1   1e10 0   1 1 1  -1 -1 -1 ]; rcrit = 1e10;
+  rcrit = 1e10;
+  friction = [ 1e10 1   1e10 0   1 1 1  -1 -1 -1 ];
   traction = [ -100e6 -90e6 0    1 1 1  -1 -1 -1 ];
   grid = 'slant';
   grid = 'constant';
   n = [ 201 201 201 ]; nt = 400; plotstyle = '';
   n = [  21  21  21 ]; nt =  90; plotstyle = 'slice';
-case 'agu'
-  nrmdim = 2;
-  friction = [ .6 .5   .25 0    1 1 1   -1 -1 -1 ];
-  traction = [ -70e6 -120e6 0   1 1 1   -1 -1 -1 ];
-  grid = 'stretch';
-  grid = 'slant';
-  grid = 'constant';
 case 'luis'
   friction = [ .677 .525   .4 0   2 0 1   4 0 3 ];
   traction = [ -81.6e6 -120e6 0   3 0 2   3 0 2 ];
 case 'the2'
-  nrmdim = 2;
   rcrit = 0;
   vrup = 0;
   friction = [ 1e4 1e4   .4 0   1 1 1   -1 -1 -1 ];
@@ -115,7 +102,6 @@ case 'the2'
     hypocenter = [ 12 ceil( n(2:3) / 2 ) ]; % CHECK!
   end
 case 'the3'
-  nrmdim = 2;
   rcrit = 0;
   vrup = 0;
   friction = [ 1e4 1e4   0 0     1 1 1   -1 -1 -1 ];
@@ -140,11 +126,10 @@ case 'the3'
     dt = .05;
     nt = 150;
     n = [ 81 41 56 ] + 2;
-    friction = [ .677 .525   .4 0   16 0 16   -16 0 40 ]; % CHECK!
-    traction = [ -81.6e6 -120e6 0   39 0 26   -39 0 30 ]; % CHECK!
+    friction = [ friction; .677 .525   .4 0   16 0 16   -16 0 40 ]; % CHECK!
+    traction = [ traction; -81.6e6 -120e6 0   39 0 26   -39 0 30 ]; % CHECK!
     hypocenter = [ 12 ceil( n(2:3) / 2 ) ]; % CHECK!
   end
-  symmetries = { 'xmirror' 1 1; 'x180' 2 0 };
 otherwise error model
 end
 

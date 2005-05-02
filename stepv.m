@@ -96,7 +96,7 @@ for i = 1:3
     l = i1(3):i2(3)-1;
     k = i1(2):i2(2)-1;
     j = i1(1):i2(1)-1;
-    s1(j,k,l) = hgh( w2, i, iq, j, k, l );
+    s1(j,k,l) = hgh( 0, w2, i, iq, j, k, l );
     ii = hypocenter;
     switch nrmdim
     case 1
@@ -118,7 +118,7 @@ for i = 1:3
     case 2, k(k==ii(2)) = [];
     case 3, l(l==ii(2)) = [];
     end
-    s2(j,k,l) = s2(j,k,l) + hgh( s1, 1, iq, j-1, k-1, l-1 );
+    s2(j,k,l) = s2(j,k,l) + hgh( 1, s1, 1, iq, j-1, k-1, l-1 );
   end
   w1(:,:,:,i) = w1(:,:,:,i) - s2 .* rho;
 end

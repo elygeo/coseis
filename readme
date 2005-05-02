@@ -191,22 +191,22 @@ Rigid Body: 6 = 3 translation + 3 rotation
 
 Uniform strain: 6
 
-   0----x      O----X      O----0      O----O
+   0----x      .----O      .----.      .----.
   /|          /|   /|     /|   /|     /|   /|
- y |         0----X |    X----X |    O----O |
-   z         | 0--|-X    | 0--|-O    | X--|-X
+ y |         .----O |    O----O |    .----. |
+   z         | '--|-O    | '--|-'    | O--|-O
              |/   |/     |/   |/     |/   |/ 
-             O----X      X----X      X----X  
+             '----O      O----O      O----O  
                Z1          Z2          Z3
 
 Nonuniform strain: 12 = 24 DOF - 6 rigid body - 6 uniform strain
 
-   O----O      O----X      O----X      O----X
+   .----.      .----O      .----O      O----.
   /|   /|     /|   /|     /|   /|     /|   /|
- X----X |    O----X |    X----O |    X----O |
- | X--|-X    | X--|-O    | O--|-X    | X--|-O
+ O----O |    .----O |    O----. |    .----O |
+ | O--|-O    | O--|-'    | '--|-O    | '--|-O
  |/   |/     |/   |/     |/   |/     |/   |/ 
- O----O      X----O      X----O      O----X  
+ '----'      O----'      O----'      O----'  
   Z2 Z3       Z3 Z1       Z1 Z2      Z1 Z2 Z3
 
 Y = miu*(lam+miu)/6/(lam+2*miu)
