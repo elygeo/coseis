@@ -1,12 +1,6 @@
 %------------------------------------------------------------------------------%
 % INPUTS
 
-model = 'normal';
-model = 'the3';
-model = '';
-model = 'pointsrc';
-model = 'kostrov';
-model = 'strikeslip';
 plotstyle = 'outline';
 n = [ 21 21 21 ];
 nt = 20;
@@ -43,21 +37,35 @@ locknodes = [
 out = {
   'v' 1    1  1  1   -1 -1  1   % surface
   'w' 1    1  1  1   -1 -1  1   % surface
-  'v' 1    1  0  1   -1  0  1   % fault
-  'w' 1    1  0  1   -1  0  1   % fault
+  'v' 1    1  0  1   -1  0 -1   % fault
+  'w' 1    1  0  1   -1  0 -1   % fault
 };
+model = 'normal';
+model = 'the3';
+model = 'kostrov';
+model = 'pointsrc';
+model = '';
+model = 'strikeslip';
 switch model
 case ''
-  nrmdim = 0;
+  %nrmdim = 0;
   n = [ 3 3 3 ]; nt = 1;
 case 'pointsrc'
+  n = [ 11 31 11 ];
+  nt = 100;
   nrmdim = 0;
   moment = -1e14 * [ 1 1 1   0 0 0 ];
   msrctimefcn = 'delta';
   msrctimefcn = 'sbrune';
   msrcradius = 2.5 * h;
+  msrcradius = 0;
   msrcnodealign = 1;
+  npml = 0;
+  npml = 10;
+  locknodes = [];
+  plotstyle = 'slice';
 case 'strikeslip'
+  plotstyle = 'slice';
 case 'normal'
   grid = 'normal';
   traction = [ 0 -120e6 -70e6   1 0 1   -1  0 -1 ];

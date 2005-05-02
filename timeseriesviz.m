@@ -50,6 +50,7 @@ for iz = 1:size( out, 1 )
     end
     ylabel( field )
     xlabel( 'Time' )
+    title( num2str( xhair + halo1 ) )
     set( 0, 'CurrentFigure', 1 )
     if ncomp == 3 && 0
       figure

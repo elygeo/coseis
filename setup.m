@@ -37,12 +37,8 @@ wmax = 0;
 
 if readcheckpoint, load checkpoint, stepw, end
 fprintf( '    Step      V        U        W      Viz/IO   Total\n' )
-%j = hypocenter(1);
-%k = hypocenter(2);
-%l = hypocenter(3);
-%u(j,k,l,1) = 1;
-%hgy(:) = 1;
-%w1(2:end-1,hypocenter(2),2:end-1,1) = 1;
+k = hypocenter(2);
+u(2:end-1,k,2:end-1,1) = 1;
 if plotstyle
   viz
   control

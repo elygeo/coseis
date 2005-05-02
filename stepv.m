@@ -86,41 +86,40 @@ end
 bc = [ operator{1,2:7} ];
 w2 = u + gamma(2) .* v;
 s1(:) = 0;
-for i = 1:3
-  s2(:) = 0;
-  for iq = 1:4
-    i1 = opi1(1,:);
-    i2 = opi2(1,:);
-    i1 = i1 + npml * bc(1:3);
-    i2 = i2 - npml * bc(4:6);
-    l = i1(3):i2(3)-1;
-    k = i1(2):i2(2)-1;
-    j = i1(1):i2(1)-1;
-    s1(j,k,l) = hgh( 0, w2, i, iq, j, k, l );
-    ii = hypocenter;
-    switch nrmdim
-    case 1
-      s1(ii(1),:,:)   = s1(ii(1),:,:) + s1(ii(1)+1,:,:);
-      s1(ii(1)+1,:,:) = s1(ii(1),:,:);
-    case 2
-      s1(:,ii(2),:)   = s1(:,ii(2),:) + s1(:,ii(2)+1,:);
-      s1(:,ii(2)+1,:) = s1(:,ii(2),:);
-    case 3
-      s1(:,:,ii(3))   = s1(:,:,ii(3)) + s1(:,:,ii(3)+1);
-      s1(:,:,ii(3)+1) = s1(:,:,ii(3));
-    end
-    s1 = s1 .* hgy;
-    l = i1(3):i2(3);
-    k = i1(2):i2(2);
-    j = i1(1):i2(1);
-    switch nrmdim
-    case 1, j(j==ii(1)) = [];
-    case 2, k(k==ii(2)) = [];
-    case 3, l(l==ii(2)) = [];
-    end
-    s2(j,k,l) = s2(j,k,l) + hgh( 1, s1, 1, iq, j-1, k-1, l-1 );
+s2(:) = 0;
+for i  = 1:3
+for iq = 1:4
+  i1 = opi1(1,:);
+  i2 = opi2(1,:);
+  i1 = i1 + npml * bc(1:3);
+  i2 = i2 - npml * bc(4:6);
+  ii = hypocenter;
+  l = i1(3):i2(3)-1;
+  k = i1(2):i2(2)-1;
+  j = i1(1):i2(1)-1;
+  switch nrmdim
+  case 1, j(j==ii(1)) = [];
+  case 2, k(k==ii(2)) = [];
+  case 3, l(l==ii(3)) = [];
+  end
+  s1(j,k,l) = hgy(j,k,l) .* hgh( 0, w2, i, iq, j, k, l );
+  l = i1(3):i2(3);
+  k = i1(2):i2(2);
+  j = i1(1):i2(1);
+  s2(j,k,l) = hgh( 1, s1, 1, iq, j-1, k-1, l-1 );
+  switch nrmdim
+  case 1
+    s2(ii(1),:,:)   = s2(ii(1),:,:) + s2(ii(1)+1,:,:);
+    s2(ii(1)+1,:,:) = s2(ii(1),:,:);
+  case 2
+    s2(:,ii(2),:)   = s2(:,ii(2),:) + s2(:,ii(2)+1,:);
+    s2(:,ii(2)+1,:) = s2(:,ii(2),:);
+  case 3
+    s2(:,:,ii(3))   = s2(:,:,ii(3)) + s2(:,:,ii(3)+1);
+    s2(:,:,ii(3)+1) = s2(:,:,ii(3));
   end
   w1(:,:,:,i) = w1(:,:,:,i) - s2 .* rho;
+end
 end
 
 % Fault calculations
