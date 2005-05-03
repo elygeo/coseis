@@ -44,15 +44,13 @@ model = 'normal';
 model = 'the3';
 model = 'kostrov';
 model = '';
-model = 'pointsrc';
 model = 'strikeslip';
+model = 'pointsrc';
 switch model
 case ''
   %nrmdim = 0;
   n = [ 3 3 3 ]; nt = 1;
 case 'pointsrc'
-  n = [ 11 31 11 ];
-  n = [ 21 21 21 ];
   nt = 30;
   nrmdim = 0;
   moment = -1e14 * [ 1 1 1   0 0 0 ];
