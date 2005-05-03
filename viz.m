@@ -97,7 +97,7 @@ if holdmovie
   set( [ frame{:} ], 'HandleVisibility', 'off' )
 else
   delete( [ frame{:} ] )
-  frame = { [] };
+  frame = {};
 end
 delete( [ hhud hmsg hhelp ] )
 hhud = []; hmsg = []; hhelp = [];

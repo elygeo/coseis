@@ -129,7 +129,7 @@ r  = sqrt( r );
 if n(1) == 4, r = repmat( r(j,:,:), [ 4 1 1 ] ); end % 2D cases
 if n(2) == 4, r = repmat( r(:,k,:), [ 1 4 1 ] ); end % 2D cases
 if n(3) == 4, r = repmat( r(:,:,l), [ 1 1 4 ] ); end % 2D cases
-s1(j,k,l) = area(j,k,l);
+s1(j,k,l) = 1;
 for iz = 1:size( operator, 1 )
   zone = [ operator{iz,8:13} ];
   [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
@@ -139,12 +139,12 @@ for iz = 1:size( operator, 1 )
   k1 = i1(2):i2(2);
   j1 = i1(1):i2(1);
   switch operator{iz,1}
-  case { 'g', 'r' }, s1(j1,k1,l1) = area(j1,k1,l1);
-  case { 'h', '4' }, s1(j1,k1,l1) = area(j1,k1,l1) / h ^ 2;
+  case { 'g', 'r' }
+  case { 'h', '4' }, s1(j1,k1,l1) = 1 / h ^ 2;
   otherwise error operator
   end
 end
-area(j,k,l) = s1(j,k,l);
+area(j,k,l) = area(j,k,l) .* s1(j,k,l);
 i  = hypocenter;
 i(nrmdim) = 1;
 j  = i(1);
@@ -184,7 +184,7 @@ j2     = i1(1):i2(1);
 k2     = i1(2):i2(2);
 l2     = i1(3):i2(3);
 % Zero slip velocity condition
-tmp    = area .* ( rho(j1,k1,l1) + rho(j2,k2,l2) );
+tmp    = area .* ( mdt(j1,k1,l1) + mdt(j2,k2,l2) );
 i      = tmp ~= 0;
 tmp(i) = 1 ./ tmp(i);
 t      = t0 + repmat( tmp, [ 1 1 1 3 ] ) .* ...
@@ -232,8 +232,8 @@ i      = ts > ff;
 c(i)   = ff(i) ./ ts(i);
 t      = -t0 + tn3 + ts3 .* repmat( c, [ 1 1 1 3 ] );
 for i = 1:3
-  w1(j1,k1,l1,i) = w1(j1,k1,l1,i) + t(:,:,:,i) .* area .* rho(j1,k1,l1);
-  w1(j2,k2,l2,i) = w1(j2,k2,l2,i) - t(:,:,:,i) .* area .* rho(j2,k2,l2);
+  w1(j1,k1,l1,i) = w1(j1,k1,l1,i) + t(:,:,:,i) .* area .* mdt(j1,k1,l1);
+  w1(j2,k2,l2,i) = w1(j2,k2,l2,i) - t(:,:,:,i) .* area .* mdt(j2,k2,l2);
 end
 vslip = v(j2,k2,l2,:) + w1(j2,k2,l2,:) - v(j1,k1,l1,:) - w1(j1,k1,l1,:);
 vslip = sum( vslip .* vslip, 4 );

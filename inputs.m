@@ -44,8 +44,8 @@ model = 'normal';
 model = 'the3';
 model = 'kostrov';
 model = '';
-model = 'strikeslip';
 model = 'pointsrc';
+model = 'strikeslip';
 switch model
 case ''
   %nrmdim = 0;
