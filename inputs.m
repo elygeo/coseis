@@ -51,7 +51,8 @@ case ''
   %nrmdim = 0;
   n = [ 3 3 3 ]; nt = 1;
 case 'pointsrc'
-  nt = 30;
+n = [ 31 31 31 ];
+  nt = 60;
   nrmdim = 0;
   moment = -1e14 * [ 1 1 1   0 0 0 ];
   msrctimefcn = 'delta';
@@ -59,8 +60,8 @@ case 'pointsrc'
   msrcradius = 0;
   msrcradius = 2.5 * h;
   msrcnodealign = 1;
-  npml = 10;
   npml = 0;
+  npml = 10;
   plotstyle = 'slice';
 case 'strikeslip'
   plotstyle = 'slice';
