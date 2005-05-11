@@ -40,8 +40,8 @@ T = matrix transpose
 1. Moment tensor source
  
 2. Linearized conservation of momentum, Newton's 2nd law
-   A   = divS/rho
-   a_i = s_ij,j/rho
+   A    = divS/rho
+   a_i  = s_ij,j/rho
 
 3. Fault boundary condition
  
@@ -54,26 +54,27 @@ T = matrix transpose
    u'_i = v_i
 
 6. Modified displacements
-   ~U   = U + dt*beta*V
-   ~u_i = u_i + dt*beta*v_i
+   U~   = U + dt*beta*V
+   u~_i = u_i + dt*beta*v_i
  
 7. Modified strain
-   E    = [grad~U + (grad~U)T]/2
-   e_ij = [~u_i,j + ~u_j,i]/2
+   E    = [gradU~ + (gradU~)^T]/2
+   e_ij = [u~_i,j + u~_j,i]/2
  
 8. Stress: viscoelastic solid constitutive law, Kelvin-Voight
    model, linear, isotropic, spring and dashpot in parallel
+   S    = c:E
    S    = lam*trace(E)*I + 2*miu*E
    s_ij = lam*e_kk*delta_ij + 2*miu*e_ij
 
 
 Combined
-   rho*U" = grad_(lam*div.~U) + div.miu*[grad_~U + (grad_~U)^T]
-          = (lam+miu)*grad_(div.~U) + miu*del^2 ~U
-            + (grad_lam)*(div.~U) + grad_miu.[grad_~U + (grad_~U)^T]
-   rho*u"_i = (lam*~u_j,j)_,i + [miu*(~u_i,j + ~u_j,i)]_,j
-            = (lam+miu)*~u_j,j,i + miu*~u_i,j,j
-              + lam_,i*~u_j,j + miu_,j*[~u_i,j + ~u_j,i]
+   rho*U" = grad_(lam*div.U~) + div.miu*[grad_U~ + (grad_U~)^T]
+          = (lam+miu)*grad_(div.U~) + miu*del^2 U~
+            + (grad_lam)*(div.U~) + grad_miu.[grad_U~ + (grad_U~)^T]
+   rho*u"_i = (lam*u~_j,j)_,i + [miu*(u~_i,j + u~_j,i)]_,j
+            = (lam+miu)*u~_j,j,i + miu*u~_i,j,j
+              + lam_,i*u~_j,j + miu_,j*[u~_i,j + u~_j,i]
 
 
 FAULT BOUNDARY CONDITION
@@ -217,27 +218,63 @@ a = dQ/dv/rho
 Q = du/h*Y
 a = dQ/h/rho
 
-PML absorbing boundary
+PML ABSORBING BOUNDARY
 
+Damping operator
+D     = [ d(x)  0     0
+          0     d(y)  0
+          0     0     d(z) ]
+
+Partial derivative operator
+[del] = [ d/dx  0     0
+          0     d/dy  0
+          0     0     d/dz ]
+
+Olsen no PML
+F  = divS
+V' = F/rho
+G  = gradV
+S' = lam*trace(G)*I + miu*(G + G^T)
+
+SORD Hourglass
+F  = divS + hourglass
+V' = F/rho
+U' = V
+G  = grad(U + gamma*V)
+S  = lam*trace(G)*I + miu*(G + G^T)
+
+SORD PML
+P' + DP = [del]S
+F  = 1.P'
+V' = F/rho
+U' = V
+G' + DG = gradV
+S  = lam*trace(G)*I + miu*(G + G^T)
+
+PML Discretization
+(p2 - p1)/dt  + d*(p2 + p1)/2  = dS/dx
+(p2 - p1)*2   + d*(p2 + p1)*dt = 2*dt*dS/dx
+(d*dt + 2)*p2 + (d*dt - 2)*p1  = 2*dt*dS/dx
+p2 = (2 - d*dt)/(2 + d*dt)*p1 + 2*dt/(2 + d*dt)*dS/dx
+p2 = w1*p1 + w2*dS/dx
+f  = p2 - p1
+v2 = v1 + f * dt / rho
+u2 = u1 + v * dt
+g2 = w1*g1 + w2*dv/dx
+s  = c:g
+
+nmpl = PML thickness (in nodes)
+i    = node index counted from the PML interface
+d    = d0 * (i/npml)^2
+d0   = t*vs0/h*( c1 + c2*npml + c3*npml^2 )
+t    = 3.5
+vs0  = 2/( 1/max(vs) + 1/min(vs) )
 c1   =  8/15
 c2   = -3/100
 c3   =  1/1500
-t    = 3.5
-vs0  = 2/( 1/max(vs) + 1/min(vs) )
-d0   = t*vs0/h*( c1 + c2*npml + c3*npml^2 )
-d    = d0 * (i/npml)^2
-w    = 2 + d*dt
-
-     (v2 - v1)/dt +     d*(v2 + v1)/2 = divS/rho
-  (d/2 + 1/dt)*v2 +   (d/2 - 1/dt)*v1 = divS/rho
-(d*dt + 2)/2dt*v2 + (d*dt - 2)/2dt*v1 = divS/rho
-(d*dt + 2)*v2     + (d*dt - 2)*v1     = 2*dt*divS/rho
-(2 + d*dt)*v2 = (2 - d*dt)*v1 + 2*dt*divS/rho
-v2  = [ (2 - d*dt)*v1 + 2*dt*divS/rho ] / (2 + d*dt)
-v2  = [ (4 - w)*v1 + 2*dt*divS/rho ] / w
 
 
-Reynolds Glyph
+REYNOLDS GLYPH
 
 r = Sij ni nj
 

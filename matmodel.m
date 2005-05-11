@@ -76,16 +76,16 @@ for iz = 1:size( operator, 1 )
   end
   nn = [ n 3 ];
   nn(1) = npml;
-  if bc(1), f1 = repmat( zero, nn ); e1 = repmat( zero, nn ); end
-  if bc(4), f4 = repmat( zero, nn ); e4 = repmat( zero, nn ); end
+  if bc(1), p1 = repmat( zero, nn ); g1 = repmat( zero, nn ); end
+  if bc(4), p4 = repmat( zero, nn ); g4 = repmat( zero, nn ); end
   nn = [ n 3 ];
   nn(2) = npml;
-  if bc(2), f2 = repmat( zero, nn ); e2 = repmat( zero, nn ); end
-  if bc(5), f5 = repmat( zero, nn ); e5 = repmat( zero, nn ); end
+  if bc(2), p2 = repmat( zero, nn ); g2 = repmat( zero, nn ); end
+  if bc(5), p5 = repmat( zero, nn ); g5 = repmat( zero, nn ); end
   nn = [ n 3 ];
   nn(3) = npml;
-  if bc(3), f3 = repmat( zero, nn ); e3 = repmat( zero, nn ); end
-  if bc(6), f6 = repmat( zero, nn ); e6 = repmat( zero, nn ); end
+  if bc(3), p3 = repmat( zero, nn ); g3 = repmat( zero, nn ); end
+  if bc(6), p6 = repmat( zero, nn ); g6 = repmat( zero, nn ); end
 end
 if s2(s2<0); fprinf( 'Negative cell volume!\n' ), end
 i = s1 ~= 0; s1(i) = 1 ./ s1(i);

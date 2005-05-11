@@ -19,6 +19,7 @@ friction = [ .6 .5   .25 0    1 1 1   -1 -1 -1 ];
 traction = [ -70e6 -120e6 0   1 1 1   -1 -1 -1 ];
 stress   = [];
 viscosity = [ 0 .3 ];
+viscosity = [ 0 0 ];
 noise = 0;
 hypocenter = 0;
 msrcradius = 0;
@@ -42,10 +43,10 @@ out = {
 };
 model = 'normal';
 model = 'the3';
-model = 'kostrov';
 model = '';
 model = 'strikeslip';
 model = 'pointsrc';
+model = 'kostrov';
 switch model
 case ''
   %nrmdim = 0;
@@ -75,7 +76,7 @@ case 'kostrov'
   grid = 'slant';
   grid = 'constant';
   n = [ 201 201 201 ]; nt = 400; plotstyle = '';
-  n = [  21  21  21 ]; nt =  90; plotstyle = 'slice';
+  n = [  31  31  31 ]; nt =  90; plotstyle = 'slice';
 case 'luis'
   friction = [ .677 .525   .4 0   2 0 1   4 0 3 ];
   traction = [ -81.6e6 -120e6 0   3 0 2   3 0 2 ];
