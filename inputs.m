@@ -45,19 +45,20 @@ model = 'normal';
 model = 'the3';
 model = '';
 model = 'strikeslip';
-model = 'pointsrc';
 model = 'kostrov';
+model = 'pointsrc';
 switch model
 case ''
   %nrmdim = 0;
   n = [ 3 3 3 ]; nt = 1;
 case 'pointsrc'
-n = [ 31 31 31 ];
+  n = [ 41 41 21 ];
   nt = 60;
   nrmdim = 0;
   moment = -1e14 * [ 1 1 1   0 0 0 ];
   msrctimefcn = 'delta';
   msrctimefcn = 'sbrune';
+  msrctimefcn = 'sine';
   msrcradius = 0;
   msrcradius = 2.5 * h;
   msrcnodealign = 1;

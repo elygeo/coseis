@@ -59,26 +59,26 @@ for ii  = [ iii:3 1:iii-1 ];
         ki = k(i);
         s2(j,ki,l) = p2(j,i,l,iii);
         p2(j,i,l,iii) = dampn1(i) * s1(j,ki,l) + dampn2(i) * p2(j,i,l,iii);
-        s1(j,ki,l) = p2(j,i,l,iii) - s2(ji,k,l);
+        s1(j,ki,l) = p2(j,i,l,iii) - s2(j,ki,l);
       end
       if bc(5) == 1
         ki = k(end-i+1);
         s2(j,ki,l) = p5(j,i,l,iii);
         p5(j,i,l,iii) = dampn1(i) * s1(j,ki,l) + dampn2(i) * p5(j,i,l,iii);
-        s1(j,ki,l) = p5(j,i,l,iii) - s2(ji,k,l);
+        s1(j,ki,l) = p5(j,i,l,iii) - s2(j,ki,l);
       end
     case 3
       if bc(3) == 1
         li = l(i);
         s2(j,k,li) = p3(j,k,i,iii);
         p3(j,k,i,iii) = dampn1(i) * s1(j,k,li) + dampn2(i) * p3(j,k,i,iii);
-        s1(j,k,li) = p3(j,k,i,iii) - s2(ji,k,l);
+        s1(j,k,li) = p3(j,k,i,iii) - s2(j,k,li);
       end
       if bc(6) == 1
         li = l(end-i+1);
         s2(j,k,li) = p6(j,k,i,iii);
         p6(j,k,i,iii) = dampn1(i) * s1(j,k,li) + dampn2(i) * p6(j,k,i,iii);
-        s1(j,k,li) = p6(j,k,i,iii) - s2(ji,k,l);
+        s1(j,k,li) = p6(j,k,i,iii) - s2(j,k,li);
       end
     otherwise error ii
     end

@@ -43,6 +43,14 @@ for iii = 1:3
     case 3, l(l==hypocenter(3)) = [];
     end
     for i = 1:npml-1
+      if bc(1) == 1, ji = j(i);       s2(ji,k,l) = dh( u, 1, ii, ji, k, l ); end
+      if bc(4) == 1, ji = j(end-1+1); s2(ji,k,l) = dh( u, 1, ii, ji, k, l ); end
+      if bc(2) == 1, ki = k(i);       s2(j,ki,l) = dh( u, 1, ii, j, ki, l ); end
+      if bc(5) == 1, ki = k(end-i+1); s2(j,ki,l) = dh( u, 1, ii, j, ki, l ); end
+      if bc(3) == 1, li = l(i);       s2(j,k,li) = dh( u, 1, ii, j, k, li ); end
+      if bc(6) == 1, li = l(end-i+1); s2(j,k,li) = dh( u, 1, ii, j, k, li ); end
+    end
+    for i = 1:npml-1
       switch ii
       case 1
         if bc(1) == 1
@@ -60,26 +68,26 @@ for iii = 1:3
       case 2
         if bc(2) == 1
           ki = k(i);
-          s2(ji,k,l) = dh( v, 1, ii, ji, k, l );
+          s2(j,ki,l) = dh( v, 1, ii, j, ki, l );
           g2(j,i,l,iii) = dampc1(i) * s2(j,ki,l) + dampc2(i) * g2(j,i,l,iii);
           s2(j,ki,l) = g2(j,i,l,iii);
         end
         if bc(5) == 1
           ki = k(end-i+1);
-          s2(ji,k,l) = dh( v, 1, ii, ji, k, l );
+          s2(j,ki,l) = dh( v, 1, ii, j, ki, l );
           g5(j,i,l,iii) = dampc1(i) * s2(j,ki,l) + dampc2(i) * g5(j,i,l,iii);
           s2(j,ki,l) = g5(j,i,l,iii);
         end
       case 3
         if bc(3) == 1
           li = l(i);
-          s2(ji,k,l) = dh( v, 1, ii, ji, k, l );
+          s2(j,k,li) = dh( v, 1, ii, j, k, li );
           g3(j,k,i,iii) = dampc1(i) * s2(j,k,li) + dampc2(i) * g3(j,k,i,iii);
           s2(j,k,li) = g3(j,k,i,iii);
         end
         if bc(6) == 1
           li = l(end-i+1);
-          s2(ji,k,l) = dh( v, 1, ii, ji, k, l );
+          s2(j,k,li) = dh( v, 1, ii, j, k, li );
           g6(j,k,i,iii) = dampc1(i) * s2(j,k,li) + dampc2(i) * g6(j,k,i,iii);
           s2(j,k,li) = g6(j,k,i,iii);
         end

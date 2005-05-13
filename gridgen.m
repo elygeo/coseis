@@ -25,7 +25,7 @@ c = 0.1 * n1;
 rand( 'state', 0 )
 switch grid
 case 'constant'
-  operator = { 'h'  1 1 0  1 1 1   1 1 1  -1 -1 -1 };
+  operator = { 'h'  1 1 0  1 1 0   1 1 1  -1 -1 -1 };
 case 'staggered'
   operator = { '4'  1 1 0  1 1 1   1 1 1  -1 -1 -1 };
   staggerbc1 = 1; % normal v at the surface

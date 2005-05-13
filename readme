@@ -244,11 +244,19 @@ G  = grad(U + gamma*V)
 S  = lam*trace(G)*I + miu*(G + G^T)
 
 SORD PML
-P' + DP = [del]S
-F  = 1.P'
+if D == 0
+  F  = divS
+else
+  P' + DP = [del]S
+  F  = 1.P'
+end
 V' = F/rho
 U' = V
-G' + DG = gradV
+if D == 0
+  G = gradU
+else
+  G' + DG = gradV
+end
 S  = lam*trace(G)*I + miu*(G + G^T)
 
 PML Discretization
