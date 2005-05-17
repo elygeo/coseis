@@ -137,4 +137,5 @@ dampn1 = ( 2 - dt * dampn ) ./ ( 2 + dt * dampn );
 dampc1 = ( 2 - dt * dampc ) ./ ( 2 + dt * dampc );
 dampn2 = 2 * dt ./ ( 2 + dt * dampn );
 dampc2 = 2 * dt ./ ( 2 + dt * dampc );
+dampn2 = dampn2 - 1;
 

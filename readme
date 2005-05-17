@@ -263,12 +263,12 @@ PML Discretization
 (p2 - p1)/dt  + d*(p2 + p1)/2  = dS/dx
 (p2 - p1)*2   + d*(p2 + p1)*dt = 2*dt*dS/dx
 (d*dt + 2)*p2 + (d*dt - 2)*p1  = 2*dt*dS/dx
-p2 = (2 - d*dt)/(2 + d*dt)*p1 + 2*dt/(2 + d*dt)*dS/dx
-p2 = w1*p1 + w2*dS/dx
-f  = p2 - p1
-v2 = v1 + f * dt / rho
+(d*dt + 2)*(p2 - p1) + 2*d*dt*p1 = 2*dt*dS/dx
+p2 - p1 = - 2*d*dt/(2 + d*dt)*p1 + 2*dt/(2 + d*dt)*dS/dx
+v2 = v1 + (p2 - p1) / rho
 u2 = u1 + v * dt
-g2 = w1*g1 + w2*dv/dx
+(g2 - g1)/dt  + d*(g2 + g1)/2  = dv/dx
+g2 = (2 - d*dt)/(2 + d*dt)*g1 + 2*dt/(2 + d*dt)*dv/dx
 s  = c:g
 
 nmpl = PML thickness (in nodes)
