@@ -133,9 +133,8 @@ damp = tune * vs0 / h * ( c1 + ( c2 + c3 * npml ) * npml );
 i = npml:-1:1;
 dampn = damp * ( i ./ npml ) .^ 2;
 dampc = .5 * ( dampn(1:end-1) + dampn(2:end) );
-dampn1 = ( 2 - dt * dampn ) ./ ( 2 + dt * dampn );
-dampc1 = ( 2 - dt * dampc ) ./ ( 2 + dt * dampc );
-dampn2 = 2 * dt ./ ( 2 + dt * dampn );
-dampc2 = 2 * dt ./ ( 2 + dt * dampc );
-dampn2 = dampn2 - 1;
+dn1 = - 2 * dt * dampn   ./ ( 2 + dt * dampn );
+dc1 = ( 2 - dt * dampc ) ./ ( 2 + dt * dampc );
+dn2 = 2 * dt ./ ( 2 + dt * dampn );
+dc2 = 2 * dt ./ ( 2 + dt * dampc );
 

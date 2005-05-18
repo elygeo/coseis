@@ -37,6 +37,11 @@ for iz = 1:size( out, 1 )
         fclose( fid );
       end
     end
+    fcorner = vp / ( 6 * h );
+    nn = 2 * round( 1 / ( fcorner * dt ) );
+    b  = hanning( nn );
+    a  = sum( b );
+    xg = filter( b, a, xg );
     plot( time, xg )
     hold on
     for i = 1:ncomp
