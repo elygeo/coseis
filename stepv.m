@@ -41,7 +41,7 @@ for id = [ ic:3 1:ic-1 ];
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
-  i = 0:npml-1
+  i = 0:npml-1;
   if ic == id
     if bc(1), ji = j(i+1);   s2(ji,k,l) = dh( w1, ic, id, ji-1, k-1, l-1 ); end
     if bc(4), ji = j(end-i); s2(ji,k,l) = dh( w1, ic, id, ji-1, k-1, l-1 ); end
