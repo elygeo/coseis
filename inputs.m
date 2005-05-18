@@ -62,8 +62,8 @@ case 'pointsrc'
   msrcradius = 0;
   msrcradius = 2.5 * h;
   msrcnodealign = 1;
-  npml = 0;
   npml = 10;
+  npml = 0;
   plotstyle = 'slice';
 case 'strikeslip'
   plotstyle = 'slice';
