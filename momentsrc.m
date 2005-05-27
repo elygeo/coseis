@@ -49,10 +49,10 @@ end
 domp = 4 * dt;
 time = ( .5 : it-.5 ) * dt;  % time indexing goes wi vi wi+1 vi+1 ...
 switch msrctimefcn
-case 'delta',  msrct = 0 * time; msrct(1) = 1;
+case 'delta',  msrct = 0 * time; msrct(1) = 1 / dt;
 case 'brune',  msrct = time .* exp( -time / domp ) ./ domp ^ 2;
 case 'sbrune', msrct = time .^ 2 .* exp( -time / domp ) / 2 / domp ^ 3;
-case 'sine',   msrct = sin( 2 * pi * time / domp );
+case 'sine',   msrct = sin( 2 * pi * time / domp ) / dt;
 otherwise error msrctimefcn
 end
 o = prod( n );
