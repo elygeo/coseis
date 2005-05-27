@@ -33,6 +33,12 @@ if initialize
   msrct = [];
   s1(:) = 0;
   w1(:) = 0;
+  c = [ 1 6 5; 6 2 4; 5 4 3 ];
+  [ vec, val ] = eig( moment(c) );
+  m0 = max( abs( val(:) ) );
+  mw = 2 / 3 * log10( m0 ) - 10.7;
+  um = m0 / miu0 / h / h;
+  fprintf( 'Momnent Source\nM0: %g\nMw: %g\nD:  %g\n', m0, mw, um )
   return
 end
 

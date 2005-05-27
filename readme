@@ -218,6 +218,16 @@ a = dQ/dv/rho
 Q = du/h*Y
 a = dQ/h/rho
 
+
+MOMENT SOURCE
+
+Brune Source
+
+M   = -M0*H*e^(-t/T)*(t + T)/T
+M'  =  M0*H*e^(-t/T)*t/T^2
+M'' =  M0*H*e^(-t/T)*(T - t)/T^3
+
+
 PML ABSORBING BOUNDARY
 
 Damping operator
@@ -271,15 +281,15 @@ u2 = u1 + v * dt
 g2 = (2 - d*dt)/(2 + d*dt)*g1 + 2*dt/(2 + d*dt)*dv/dx
 s  = c:g
 
-nmpl = PML thickness (in nodes)
-i    = node index counted from the PML interface
-d    = d0 * (i/npml)^2
-d0   = t*vs0/h*( c1 + c2*npml + c3*npml^2 )
-t    = 3.5
-vs0  = 2/( 1/max(vs) + 1/min(vs) )
-c1   =  8/15
-c2   = -3/100
-c3   =  1/1500
+nb  = PML thickness (in nodes)
+i   = node index counted from the PML interface
+d   = d0 * (i/nb)^2
+d0  = t*vs0/h*( c1 + c2*nb + c3*nb^2 )
+t   = 3.5
+vs0 = 2/( 1/max(vs) + 1/min(vs) )
+c1  =  8/15
+c2  = -3/100
+c3  =  1/1500
 
 
 REYNOLDS GLYPH

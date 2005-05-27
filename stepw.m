@@ -43,7 +43,7 @@ for id = 1:3
   case 2, k(k==hypocenter(2)) = [];
   case 3, l(l==hypocenter(3)) = [];
   end
-  i = 0:npml-2;
+  i = 0:npml-1;
   switch id
   case { 2, 3 }
     if bc(1), ji = j(i+1);   s2(ji,k,l) = dh( u, ic, id, ji, k, l ); end
@@ -55,7 +55,7 @@ for id = 1:3
     if bc(3), li = l(i+1);   s2(j,k,li) = dh( u, ic, id, j, k, li ); end
     if bc(6), li = l(end-i); s2(j,k,li) = dh( u, ic, id, j, k, li ); end
   end
-  for i = 1:npml-1
+  for i = 1:npml
     switch id
     case 1
       if bc(1), ji = j(i);
