@@ -11,6 +11,9 @@ if initialize
   l = 1:n(3)-1;
   k = 1:n(2)-1;
   j = 1:n(1)-1;
+  s2(j,k,l) = dncg( x, 1, x, 1, j, k, l );
+  i = s2 ~= 0; s2(i) = 1 ./ s2(i);
+  w1(:) = 0;
   w1(j,k,l,:) = 0.125 * ( ...
     x(j,k,l,:) + x(j+1,k+1,l+1,:) + ...
     x(j+1,k,l,:) + x(j,k+1,l+1,:) + ...
@@ -30,6 +33,7 @@ if initialize
   msrci = find( s1 < msrcradius ^ 2 );
   msrcx = msrcradius - sqrt( s1( msrci ) );
   msrcx = msrcx / sum( msrcx );
+  msrcx = msrcx * dt .* s2( msrci );
   msrct = [];
   s1(:) = 0;
   w1(:) = 0;
@@ -46,8 +50,8 @@ domp = 4 * dt;
 time = ( .5 : it-.5 ) * dt;  % time indexing goes wi vi wi+1 vi+1 ...
 switch msrctimefcn
 case 'delta',  msrct = 0 * time; msrct(1) = 1;
-case 'brune',  msrct = time .* exp( -time / domp ) ./ h ^ 3 ./ domp ^ 2;
-case 'sbrune', msrct = time .^ 2 .* exp( -time / domp ) / h ^ 3 / domp ^ 2;
+case 'brune',  msrct = time .* exp( -time / domp ) ./ domp ^ 2;
+case 'sbrune', msrct = time .^ 2 .* exp( -time / domp ) / 2 / domp ^ 3;
 case 'sine',   msrct = sin( 2 * pi * time / domp );
 otherwise error msrctimefcn
 end
