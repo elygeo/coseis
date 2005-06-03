@@ -18,7 +18,6 @@ material = [ 2670   vp vs     1 1 1   -1 -1 -1 ];
 friction = [ .6 .5   .25 0    1 1 1   -1 -1 -1 ];
 traction = [ -70e6 -120e6 0   1 1 1   -1 -1 -1 ];
 stress   = [];
-viscosity = [ 0 0 ];
 viscosity = [ 0 .3 ];
 noise = 0;
 hypocenter = 0;
@@ -49,39 +48,29 @@ out = {
 };
 out = {
   'v' 1    1  1  1   -1 -1 -1
+  'w' 1    1  1  1   -1 -1 -1
 };
 model = 'normal';
 model = 'the3';
 model = '';
 model = 'strikeslip';
-model = 'kostrov';
 model = 'pointsrc';
+model = 'kostrov';
 switch model
 case ''
   %nrmdim = 0;
   n = [ 3 3 3 ]; nt = 1;
 case 'pointsrc'
-  viscosity = [ 0 0 ];
-  viscosity = [ 0 .5 ];
-  n = [ 41 41 21 ];
-  n = [ 41 41 41 ];
   nt = 100;
-  nrmdim = 0;
-  moment = -1e18 * [ 1 1 1   0 0 0 ];
-  srctimefcn = 'sine';
-  srctimefcn = 'delta';
-  srctimefcn = 'sbrune';
-  srctimefcn = 'brune';
-  msrcradius = 0;
+  n = [ 40 40 40 ]; msrcnodealign = 0;
+  n = [ 41 41 41 ]; msrcnodealign = 1;
   msrcradius = 2.5 * h;
-  msrcradius = 4.5 * h;
-  displacement = [ 0 0 1 ];
-  displacement = [ 0 1 0 ];
-  planewavedim = 0;
-  msrcnodealign = 1;
-  npml = 0;
+  msrcradius = 2 * h;
+  srctimefcn = 'brune';
+  moment = -1e18 * [ 1 1 1   0 0 0 ];
   npml = 10;
   plotstyle = 'slice';
+  nrmdim = 0;
 case 'strikeslip'
   plotstyle = 'slice';
 case 'normal'

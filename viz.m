@@ -25,7 +25,7 @@ elseif initialize
   ulim = -1;
   vlim = -1;
   wlim = -1;
-  xlim = -1;
+  xlim = 0;
   camdist = -1;
   look = 4;
   xhair = hypocenter - halo1;

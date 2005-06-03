@@ -13,7 +13,7 @@ for iz = 1:size( out, 1 )
     offset = 4 * sum( i .* cumprod( [ 1 nn(1:2) ] ) );
     switch field
     case 'v', time = ( 0 : it ) * dt + dt / 2;
-    otherwise time = ( 0 : it ) * dt
+    otherwise time = ( 0 : it ) * dt;
     end
     figure( ...
      'Color', background, ...
