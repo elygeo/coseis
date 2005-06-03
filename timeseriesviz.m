@@ -43,7 +43,8 @@ for iz = 1:size( out, 1 )
       b = .5 * ( 1 - cos( 2 * pi * (1:nn-1) / nn ) );  % hanning
       %b = [ b b(end-1:-1:1) ];
       a  = sum( b );
-      xg = filter( b, a, xg );
+      xg = filter( b, a, [ xg; zeros( nn-1, ncomp ) ] );
+      time = [ time time(end) + dt * ( 1 : nn - 1 ) ];
     end
     plot( time, xg )
     hold on
