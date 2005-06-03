@@ -4,9 +4,9 @@
 fprintf( 'Grid generation\n' )
 downdim = 3;
 if nrmdim && nrmdim ~= downdim
-  dims = [ 6 - downdim - nrmdim nrmdim downdim ];
+  crdsys = [ 6 - downdim - nrmdim nrmdim downdim ];
 else
-  dims = [ downdim+1:3 1:downdim ];
+  crdsys = [ downdim+1:3 1:downdim ];
 end
 nn = n - 3;
 if nrmdim, nn(nrmdim) = nn(nrmdim) - 1; end
@@ -25,7 +25,7 @@ c = 0.1 * n1;
 rand( 'state', 0 )
 switch grid
 case 'constant'
-  operator = { 'h'  1 1 0  1 1 0   1 1 1  -1 -1 -1 };
+  operator = { 'h'  1 1 0  1 1 1   1 1 1  -1 -1 -1 };
 case 'staggered'
   operator = { '4'  1 1 0  1 1 1   1 1 1  -1 -1 -1 };
   staggerbc1 = 1; % normal v at the surface

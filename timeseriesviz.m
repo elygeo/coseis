@@ -10,7 +10,7 @@ for iz = 1:size( out, 1 )
     && sum( i >= i1 & i <= i2 ) == 3
     nn = i2 - i1 + 1;
     i = i - i1;
-    offset = 4 * ( 1 + sum( i .* cumprod( [ 1 nn(1:2) ] ) ) );
+    offset = 4 * sum( i .* cumprod( [ 1 nn(1:2) ] ) );
     switch field
     case 'v', time = ( 0 : it ) * dt + dt / 2;
     otherwise time = ( 0 : it ) * dt
@@ -37,20 +37,25 @@ for iz = 1:size( out, 1 )
         fclose( fid );
       end
     end
-    fcorner = vp / ( 6 * h );
-    nn = 2 * round( 1 / ( fcorner * dt ) );
-    b  = hanning( nn );
-    a  = sum( b );
-    xg = filter( b, a, xg );
+    if km
+      fcorner = vp / ( 6 * h );
+      nn = 2 * round( 1 / ( fcorner * dt ) );
+      b = .5 * ( 1 - cos( 2 * pi * (1:nn-1) / nn ) );  % hanning
+      %b = [ b b(end-1:-1:1) ];
+      a  = sum( b );
+      xg = filter( b, a, xg );
+    end
     plot( time, xg )
     hold on
     for i = 1:ncomp
       [ tmp, ii ] = max( abs( xg(:,i) ) );
-      ii = max( 1, ii - 1 );
-      if xg(ii,i) > 0
-        text( time(ii), xg(ii,i), titles(i+1), 'Hor', 'right', 'Ver', 'bottom' )
+      iii = max( 1, ii - 1 );
+      xg1 = .5 * ( time(ii) + time(iii) );
+      xg2 = .5 * ( xg(ii,i) + xg(iii,i) );
+      if xg2 > 0
+        text( xg1, xg2, titles(i+1), 'Hor', 'right', 'Ver', 'bottom' )
       else
-        text( time(ii), xg(ii,i), titles(i+1), 'Hor', 'right', 'Ver', 'top' )
+        text( xg1, xg2, titles(i+1), 'Hor', 'right', 'Ver', 'top' )
       end
     end
     ylabel( field )

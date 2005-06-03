@@ -11,16 +11,16 @@ s2  = repmat( zero, n );
 rho = repmat( zero, n );
 miu = repmat( zero, n );
 lam = repmat( zero, n );
-vsmax = 0;
-vsmin = 0;
+matmax = material(1,1:3);
+matmin = material(1,1:3);
 for iz = 1:size( material, 1 )
   zone = material(iz,4:9);
   [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
   rho0  = material(iz,1);
   vp    = material(iz,2);
   vs    = material(iz,3);
-  vsmax = max( vsmax, vs );
-  vsmin = max( vsmin, vs );
+  matmax = max( matmax, material(iz,1:3) );
+  matmin = min( matmin, material(iz,1:3) );
   miu0  = rho0 .* vs .* vs;
   lam0  = rho0 .* ( vp .* vp - 2 * vs .* vs );
   nu    = .5 * lam0 / ( lam0 + miu0 );
@@ -98,7 +98,6 @@ rho0 = 1 / rho(j,k,l);
 lam0 = lam(j,k,l);
 miu0 = miu(j,k,l);
 gamma = dt * viscosity;
-vs0 = 1 / ( 1 / vsmin + 1 / vsmax );
 
 hgy = 6 * ( lam + 2 * lam );
 i = hgy ~= 0;
@@ -128,13 +127,15 @@ end
 c1 =  8/15;
 c2 = -3/100;
 c3 =  1/1500;
+tune = 0;
 tune = 3.5;
-damp = tune * vs0 / h * ( c1 + ( c2 + c3 * npml ) * npml );
+hmean = 2 * matmin .* matmax ./ ( matmin + matmax );
+damp = tune * hmean(3) / h * ( c1 + ( c2 + c3 * npml ) * npml );
 i = npml:-1:1;
 dampn = damp * ( i ./ npml ) .^ 2;
 dampc = .5 * ( dampn + [ dampn(2:end) 0 ] );
-dn1 = - 2 * dt * dampn   ./ ( 2 + dt * dampn );
+dn1 = - 2 * dampn   ./ ( 2 + dt * dampn );
 dc1 = ( 2 - dt * dampc ) ./ ( 2 + dt * dampc );
-dn2 = 2 * dt ./ ( 2 + dt * dampn );
+dn2 = 2 ./ ( 2 + dt * dampn );
 dc2 = 2 * dt ./ ( 2 + dt * dampc );
 

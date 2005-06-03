@@ -222,14 +222,14 @@ a = dQ/h/rho
 MOMENT SOURCE
 
 Brune Source
-M   = -M0 / T   * H * e^(-t/T) * (t + T) + M0
-M'  =  M0 / T^2 * H * e^(-t/T) *  t
-M'' = -M0 / T^3 * H * e^(-t/T) * (t - T)
+M   = -H * M0 / T   * e^(-t/T) * (t + T) + M0
+M'  =  H * M0 / T^2 * e^(-t/T) *  t
+M'' = -H * M0 / T^3 * e^(-t/T) * (t - T)
 
 Smooth Brune
-M   = -M0 / 2 / T^2 * H * e^(-t/T) * (t^2 + 2*t*T + 2*T^2) + M0
-M'  =  M0 / 2 / T^3 * H * e^(-t/T) *  t^2
-M'' = -M0 / 2 / T^4 * H * e^(-t/T) * (t^2 - 2*t*T)
+M   = -H * M0 / 2 / T^2 * e^(-t/T) * (t^2 + 2*t*T + 2*T^2) + M0
+M'  =  H * M0 / 2 / T^3 * e^(-t/T) *  t^2
+M'' = -H * M0 / 2 / T^4 * e^(-t/T) * (t^2 - 2*t*T)
 
 
 PML ABSORBING BOUNDARY
@@ -274,12 +274,11 @@ end
 S  = lam*trace(G)*I + miu*(G + G^T)
 
 PML Discretization
-(p2 - p1)/dt  + d*(p2 + p1)/2  = dS/dx
-(p2 - p1)*2   + d*(p2 + p1)*dt = 2*dt*dS/dx
-(d*dt + 2)*p2 + (d*dt - 2)*p1  = 2*dt*dS/dx
-(d*dt + 2)*(p2 - p1) + 2*d*dt*p1 = 2*dt*dS/dx
-p2 - p1 = - 2*d*dt/(2 + d*dt)*p1 + 2*dt/(2 + d*dt)*dS/dx
-v2 = v1 + (p2 - p1) / rho
+(p2 - p1)/dt   + d*(p2 + p1)/2 = dS/dx
+(p2 - p1)/dt*2 + d*(p2 + p1)   = 2*dS/dx
+(p2 - p1)/dt*(2 + d*dt) + 2*d*p1 = 2*dS/dx
+(p2 - p1)/dt = -2*d/(2 + d*dt)*p1 + 2/(2 + d*dt)*dS/dx
+v2 = v1 + (p2 - p1)/dt/rho
 u2 = u1 + v * dt
 (g2 - g1)/dt  + d*(g2 + g1)/2  = dv/dx
 g2 = (2 - d*dt)/(2 + d*dt)*g1 + 2*dt/(2 + d*dt)*dv/dx
@@ -290,7 +289,7 @@ i   = node index counted from the PML interface
 d   = d0 * (i/nb)^2
 d0  = t*vs0/h*( c1 + c2*nb + c3*nb^2 )
 t   = 3.5
-vs0 = 2/( 1/max(vs) + 1/min(vs) )
+vs0 = 2 / ( 1/max(vs) + 1/min(vs) )
 c1  =  8/15
 c2  = -3/100
 c3  =  1/1500

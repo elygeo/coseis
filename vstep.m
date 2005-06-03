@@ -14,8 +14,8 @@ for id = [ ic:3 1:ic-1 ];
     bc = [ operator{iz,2:7} ];
     i1 = opi1(iz,:);
     i2 = opi2(iz,:);
-    i1 = i1 + npml * bc(1:3);
-    i2 = i2 - npml * bc(4:6);
+    %i1 = i1 + npml * bc(1:3);
+    %i2 = i2 - npml * bc(4:6);
     l = i1(3):i2(3);
     k = i1(2):i2(2);
     j = i1(1):i2(1);
@@ -61,30 +61,30 @@ for id = [ ic:3 1:ic-1 ];
     switch id
     case 1
       if bc(1), ji = j(i);
-        s2(ji,k,l) = dn1(i) * s2(ji,k,l) + dn2(i) * p1(i,k,l,ic);
-        p1(i,k,l,ic) = p1(i,k,l,ic) + s2(ji,k,l);
+        s2(ji,k,l) = dn2(i) * s2(ji,k,l) + dn1(i) * p1(i,k,l,ic);
+        p1(i,k,l,ic) = p1(i,k,l,ic) + dt * s2(ji,k,l);
       end
       if bc(4), ji = j(end-i+1);
-        s2(ji,k,l) = dn1(i) * s2(ji,k,l) + dn2(i) * p4(i,k,l,ic);
-        p4(i,k,l,ic) = p4(i,k,l,ic) + s2(ji,k,l);
+        s2(ji,k,l) = dn2(i) * s2(ji,k,l) + dn1(i) * p4(i,k,l,ic);
+        p4(i,k,l,ic) = p4(i,k,l,ic) + dt * s2(ji,k,l);
       end
     case 2
       if bc(2), ki = k(i);
-        s2(j,ki,l) = dn1(i) * s2(j,ki,l) + dn2(i) * p2(j,i,l,ic);
-        p2(j,i,l,ic) = p2(j,i,l,ic) + s2(j,ki,l);
+        s2(j,ki,l) = dn2(i) * s2(j,ki,l) + dn1(i) * p2(j,i,l,ic);
+        p2(j,i,l,ic) = p2(j,i,l,ic) + dt * s2(j,ki,l);
       end
       if bc(5), ki = k(end-i+1);
-        s2(j,ki,l) = dn1(i) * s2(j,ki,l) + dn2(i) * p5(j,i,l,ic);
-        p5(j,i,l,ic) = p5(j,i,l,ic) + s2(j,ki,l);
+        s2(j,ki,l) = dn2(i) * s2(j,ki,l) + dn1(i) * p5(j,i,l,ic);
+        p5(j,i,l,ic) = p5(j,i,l,ic) + dt * s2(j,ki,l);
       end
     case 3
       if bc(3), li = l(i);
-        s2(j,k,li) = dn1(i) * s2(j,k,li) + dn2(i) * p3(j,k,i,ic);
-        p3(j,k,i,ic) = p3(j,k,i,ic) + s2(j,k,li);
+        s2(j,k,li) = dn2(i) * s2(j,k,li) + dn1(i) * p3(j,k,i,ic);
+        p3(j,k,i,ic) = p3(j,k,i,ic) + dt * s2(j,k,li);
       end
       if bc(6), li = l(end-i+1);
-        s2(j,k,li) = dn1(i) * s2(j,k,li) + dn2(i) * p6(j,k,i,ic);
-        p6(j,k,i,ic) = p6(j,k,i,ic) + s2(j,k,li);
+        s2(j,k,li) = dn2(i) * s2(j,k,li) + dn1(i) * p6(j,k,i,ic);
+        p6(j,k,i,ic) = p6(j,k,i,ic) + dt * s2(j,k,li);
       end
     otherwise error id
     end
@@ -106,13 +106,13 @@ end
 bc = [ operator{1,2:7} ];
 i1 = opi1(1,:);
 i2 = opi2(1,:);
-i1 = i1 + npml * bc(1:3);
-i2 = i2 - npml * bc(4:6);
+%i1 = i1 + npml * bc(1:3);
+%i2 = i2 - npml * bc(4:6);
 ih = hypocenter;
 s1(:) = 0;
 s2(:) = 0;
 w2 = u + gamma(2) .* v;
-for ic = 1:3
+for ic = 1:3*0
 for iq = 1:4
   l = i1(3):i2(3)-1;
   k = i1(2):i2(2)-1;
@@ -156,4 +156,6 @@ for iz = 1:size( locknodes, 1 )
   w1(j,k,l,i) = 0;
 end
 v = v + w1;
+
+if planewavedim, planewave, end
 

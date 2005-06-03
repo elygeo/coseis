@@ -2,7 +2,7 @@
 % MOMENTSRC
 
 if initialize
-  if msrcradius && exist( 'msrcnodealign' ) && exist( 'msrctimefcn' ) ...
+  if msrcradius && exist( 'msrcnodealign' ) && exist( 'srctimefcn' ) ...
   && sum( abs( moment ) )
   else
     msrcradius = 0;
@@ -33,7 +33,7 @@ if initialize
   msrci = find( s1 < msrcradius ^ 2 );
   msrcx = msrcradius - sqrt( s1( msrci ) );
   msrcx = msrcx / sum( msrcx );
-  msrcx = msrcx * dt .* s2( msrci );
+  msrcx = msrcx .* s2( msrci );
   msrct = [];
   s1(:) = 0;
   w1(:) = 0;
@@ -46,14 +46,14 @@ if initialize
   return
 end
 
-domp = 4 * dt;
+domp = 8 * dt;
 time = ( .5 : it-.5 ) * dt;  % time indexing goes wi vi wi+1 vi+1 ...
-switch msrctimefcn
-case 'delta',  msrct = 0 * time; msrct(1) = 1 / dt;
-case 'brune',  msrct = time .* exp( -time / domp ) ./ domp ^ 2;
-case 'sbrune', msrct = time .^ 2 .* exp( -time / domp ) / 2 / domp ^ 3;
-case 'sine',   msrct = sin( 2 * pi * time / domp ) / dt;
-otherwise error msrctimefcn
+switch srctimefcn
+case 'delta',  msrct = zeros( size( time ) ); msrct(1) = 1;
+case 'sine',   msrct = dt * sin( 2 * pi * time / domp ) * pi / domp;
+case 'brune',  msrct = dt * time .* exp( -time / domp ) / domp ^ 2;
+case 'sbrune', msrct = dt * time .^ 2 .* exp( -time / domp ) / 2 / domp ^ 3;
+otherwise error srctimefcn
 end
 o = prod( n );
 for i = 0:2

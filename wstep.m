@@ -15,8 +15,8 @@ for id = 1:3
     bc = [ operator{iz,2:7} ];
     i1 = opi1(iz,:);
     i2 = opi2(iz,:);
-    i1 = i1 + npml * bc(1:3);
-    i2 = i2 - npml * bc(4:6);
+    %i1 = i1 + npml * bc(1:3);
+    %i2 = i2 - npml * bc(4:6);
     l = i1(3):i2(3)-1;
     k = i1(2):i2(2)-1;
     j = i1(1):i2(1)-1;
@@ -59,29 +59,29 @@ for id = 1:3
     switch id
     case 1
       if bc(1), ji = j(i);
-        s2(ji,k,l) = dc1(i) * dh(v,ic,id,ji,k,l) + dc2(i) * g1(i,k,l,ic);
+        s2(ji,k,l) = dc2(i) * dh(v,ic,id,ji,k,l) + dc1(i) * g1(i,k,l,ic);
         g1(i,k,l,ic) = s2(ji,k,l);
       end
       if bc(4), ji = j(end-i+1);
-        s2(ji,k,l) = dc1(i) * dh(v,ic,id,ji,k,l) + dc2(i) * g4(i,k,l,ic);
+        s2(ji,k,l) = dc2(i) * dh(v,ic,id,ji,k,l) + dc1(i) * g4(i,k,l,ic);
         g4(i,k,l,ic) = s2(ji,k,l);
       end
     case 2
       if bc(2), ki = k(i);
-        s2(j,ki,l) = dc1(i) * dh(v,ic,id,j,ki,l) + dc2(i) * g2(j,i,l,ic);
+        s2(j,ki,l) = dc2(i) * dh(v,ic,id,j,ki,l) + dc1(i) * g2(j,i,l,ic);
         g2(j,i,l,ic) = s2(j,ki,l);
       end
       if bc(5), ki = k(end-i+1);
-        s2(j,ki,l) = dc1(i) * dh(v,ic,id,j,ki,l) + dc2(i) * g5(j,i,l,ic);
+        s2(j,ki,l) = dc2(i) * dh(v,ic,id,j,ki,l) + dc1(i) * g5(j,i,l,ic);
         g5(j,i,l,ic) = s2(j,ki,l);
       end
     case 3
       if bc(3), li = l(i);
-        s2(j,k,li) = dc1(i) * dh(v,ic,id,j,k,li) + dc2(i) * g3(j,k,i,ic);
+        s2(j,k,li) = dc2(i) * dh(v,ic,id,j,k,li) + dc1(i) * g3(j,k,i,ic);
         g3(j,k,i,ic) = s2(j,k,li);
       end
       if bc(6), li = l(end-i+1);
-        s2(j,k,li) = dc1(i) * dh(v,ic,id,j,k,li) + dc2(i) * g6(j,k,i,ic);
+        s2(j,k,li) = dc2(i) * dh(v,ic,id,j,k,li) + dc1(i) * g6(j,k,i,ic);
         g6(j,k,i,ic) = s2(j,k,li);
       end
     otherwise error id

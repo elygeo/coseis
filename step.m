@@ -8,12 +8,12 @@ while itstep
   wt = 0;
   itstep = itstep - 1;
   it = it + 1;
-  stepv
+  vstep
   wt(2) = toc;
   u = u + dt * v;
   if nrmdim, uslip = uslip + dt * vslip; end
   wt(3) = toc;
-  stepw
+  wstep
   wt(4) = toc;
   s1 = sum( u .* u, 4 ); [ umax, umaxi ] = max( s1(:) );
   s1 = sum( v .* v, 4 ); [ vmax, vmaxi ] = max( s1(:) );

@@ -11,7 +11,7 @@ function ret=cameratoolbar(varargin)
 % 
 %   CAMERATOOLBAR('SetMode' mode) sets the mode of the
 %   toolbar. Mode can be: 'orbit', 'orbitscenelight', 'pan',
-%   'dollyhv', 'dollyfb', 'zoom', 'roll', 'walk', 'nomode'.
+%   'dollyhv', 'dollyfb', 'zoom', 'roll', 'nomode'.
 %
 %   CAMERATOOLBAR('SetCoordSys' coordsys) sets the principal axis
 %   of the camera motion. coordsys can be: 'x', 'y', 'z', 'none'.
@@ -26,45 +26,56 @@ function ret=cameratoolbar(varargin)
 %   CAMERATOOLBAR('ResetSceneLight') resets the current scenelight.
 %   CAMERATOOLBAR('ResetTarget') resets the current camera target.
 %
-%   ret = CAMERATOOLBAR('GetMode') returns the current mode.
-%   ret = CAMERATOOLBAR('GetCoordSys') returns the current
+%   MODE = CAMERATOOLBAR('GetMode') returns the current mode.
+%   PAXIS = CAMERATOOLBAR('GetCoordSys') returns the current
 %   principal axis. 
-%   ret = CAMERATOOLBAR('GetVisible') returns the visibility.
-%   ret = CAMERATOOLBAR returns the handle to the toolbar.
+%   VIS = CAMERATOOLBAR('GetVisible') returns the visibility.
+%   H = CAMERATOOLBAR returns the handle to the toolbar.
 %
 %   CAMERATOOLBAR('Close') removes the toolbar.
+%
+%   CAMERATOOLBAR(FIG,...) specify figure handle as first argument.
 %
 %   Note: Rendering performance is affected by presence of OpenGL 
 %   hardware.
 %
 %   See also ROTATE3D, ZOOM.
 
-%   Copyright 1984-2002 The MathWorks, Inc.
-%   $Revision: 1.26.4.5 $  $Date: 2004/04/10 23:26:44 $
-
+%   Copyright 1984-2004 The MathWorks, Inc.
+%   $Revision: 1.26.4.9 $  $Date: 2004/08/23 23:18:05 $
 
 assignin( 'base', 'itstep', 0 )
 
 persistent walk_flag
-[hfig,haxes]=currenthandles;
 
-Udata = getUdata;
+% First argument might be figure handle
+if nargin>0 && isscalar(varargin{1}) && ishandle(varargin{1})
+   [hfig,haxes] = currenthandles(varargin{1});
+   vargin = {varargin{2:end}};
+   nin = nargin-1;
+else
+   [hfig,haxes] = currenthandles; % use gcf/gcbf
+   vargin = varargin;
+   nin = nargin;
+end
+
+Udata = getUdata(hfig);
 r = [];
 
-if nargin==0
+if nin==0
   if iscameraobj(haxes)
     axis(haxes,'vis3d')
   end
-  r = cameratoolbar('show');
-  cameratoolbar('setmode', 'orbit')
+  r = cameratoolbar(hfig,'show');
+  cameratoolbar(hfig,'setmode', 'orbit')
   arg = '';
 else
-  arg = lower(varargin{1});
+  arg = lower(vargin{1});
   if ~strcmp(arg, 'init') & ~strcmp(arg, 'motion') & ...
 	(length(arg)<3 | any(arg(1:3)~='get')) & ...
 	isempty(Udata)
-    r = cameratoolbar('init');
-    Udata = getUdata;
+    r = cameratoolbar(hfig,'init');
+    Udata = getUdata(hfig);
     %if ~strcmp(arg, 'nomode')
     %  scribeclearmode(hfig,'cameratoolbar', 'nomode');
     %end
@@ -97,7 +108,7 @@ case 'down'
 			%bashMsg='Axes camera settings optimized for 3-D camera movement.  Type ''axis normal'' to restore';
 			%disp(bashMsg);
 		end
-		Udata = getUdata;
+		Udata = getUdata(hfig);
                 pt = hgconvertunits(hfig,[0 0 get(hfig,'CurrentPoint')],...
                                     get(hfig,'Units'),'pixels',0);
                 pt = pt(3:4);
@@ -107,11 +118,11 @@ case 'down'
         Udata.buttondown = 1;
         Udata.moving = 0;
         
-        setUdata(Udata)
+        setUdata(hfig,Udata)
         
-        validateScenelights(haxes)
+        validateScenelights(hfig,haxes)
         %updateScenelightOnOff(haxes,Udata.scenelightOn);
-        if length(varargin)==1 | varargin{2}
+        if length(vargin)==1 | vargin{2}
             set(hfig, 'windowbuttonmotionfcn', 'cameratoolbar(''motion'')')
             set(hfig, 'windowbuttonupfcn', 'cameratoolbar(''up'')')
         end
@@ -128,32 +139,32 @@ case 'down'
 
     Udata.time = clock;
     mode = lower(Udata.mode);
-    setUdata(Udata)
+    setUdata(hfig,Udata)
 
     % Now perform the desired event from the rotation.
     switch mode
      case 'orbit'
-      orbitPangca(haxes,deltaPix, 'o');
+      orbitPangca(hfig,haxes,deltaPix, 'o');
      case 'orbitscenelight'
-      orbitLightgca(haxes,deltaPix);
+      orbitLightgca(hfig,haxes,deltaPix);
      case 'pan'
-      orbitPangca(haxes,deltaPix, 'p');
+      orbitPangca(hfig,haxes,deltaPix, 'p');
      case 'dollyhv'
-      dollygca(haxes,deltaPix);
+      dollygca(hfig,haxes,deltaPix);
      case 'zoom'
-      zoomgca(haxes,deltaPix);
+      zoomgca(hfig,haxes,deltaPix);
      case 'dollyfb'
-      forwardBackgca(haxes,deltaPix, 'c');
+      forwardBackgca(hfig,haxes,deltaPix, 'c');
      case 'roll'
-      rollgca(haxes,deltaPix, pt);
+      rollgca(hfig,haxes,deltaPix, pt);
      case 'walk'
       Udata.moving = 1;
-      setUdata(Udata)
+      setUdata(hfig,Udata)
       if isempty(walk_flag)
         walk_flag = 1;
-        walkgca(haxes,deltaPixStart,[]);
+        walkgca(hfig,haxes,deltaPixStart,[]);
       else
-        walkgca(haxes,deltaPixStart,1);
+        walkgca(hfig,haxes,deltaPixStart,1);
       end
     end
   end
@@ -177,21 +188,21 @@ case 'up'
   mode = lower(Udata.mode);
   clear walk_flag;
   
-  setUdata(Udata)
+  setUdata(hfig,Udata)
   % Scale down the deltas to get a reasonable speed.
   scaled_deltaPix = deltaPix/10;
   scaled_deltaPixStart = deltaPixStart/10;
   if etime(clock, Udata.time)<.5 & (speed_sense>=7) & (dist_sense>30) ...
    	& any(deltaPix) & ~strcmp('alt', get(hfig, 'selectiontype'))
     Udata.moving = 1;
-    setUdata(Udata)
+    setUdata(hfig,Udata)
     switch mode
       case 'orbit'
-	orbitPangca(haxes,scaled_deltaPix, 'o');
+	orbitPangca(hfig,haxes,scaled_deltaPix, 'o');
       case 'orbitscenelight'
 	orbitLightgca(haxes,scaled_deltaPix);
       case 'pan'
-	orbitPangca(haxes,scaled_deltaPix, 'p');
+	orbitPangca(hfig,haxes,scaled_deltaPix, 'p');
       %case 'roll'
 	%rollgca(haxes,deltaPix);
 	  case 'walk'
@@ -199,32 +210,32 @@ case 'up'
     end
   end
 case 'keymotion'
-   cameratoolbar('down',logical(0));
+   cameratoolbar(hfig,'down',logical(0));
    
-   Udata = getUdata;
+   Udata = getUdata(hfig);
    if isstruct(Udata) & isfield(Udata,'figLastPoint')
        if (etime(clock,Udata.time))<.3
            multFact=20;  %should rotate faster when the key is held down
        else
            multFact=5;
        end
-       set(hfig,'currentpoint',Udata.figLastLastPoint + multFact*varargin{2});
+       set(hfig,'currentpoint',Udata.figLastLastPoint + multFact*vargin{2});
        
-       cameratoolbar('motion');
-       cameratoolbar('up');
+       cameratoolbar(hfig,'motion');
+       cameratoolbar(hfig,'up');
    end
 case 'stopmoving'
   Udata.moving = 0;
-  setUdata(Udata)
+  setUdata(hfig,Udata)
 case 'updatetoolbar'
   updateToolbar(hfig)
 case 'setmodegui'
     %setmodegui differs from setmode in that setting the same
     %mode as the current mode will toggle it off
-    newmode = lower(varargin{2});
+    newmode = lower(vargin{2});
     if strcmp(Udata.mode, newmode)
-        cameratoolbar('nomode')
-        Udata = getUdata;
+        cameratoolbar(hfig,'nomode')
+        Udata = getUdata(hfig);
     else
         showInfoDlg(haxes);
         Udata.mode = newmode;
@@ -235,12 +246,12 @@ case 'setmodegui'
 			camproj(haxes,'perspective');
 		end
 	end
-    setUdata(Udata)
+    setUdata(hfig,Udata)
     updateToolbar(hfig)
 case 'setmode'
-    newmode = lower(varargin{2});
+    newmode = lower(vargin{2});
     if strcmp(newmode, 'nomode')
-        cameratoolbar nomode
+        cameratoolbar(hfig,'nomode')
     else
         Udata.mode = newmode;
         scribeclearmode(hfig,'cameratoolbar', 'nomode');
@@ -250,7 +261,7 @@ case 'setmode'
 				camproj(haxes,'perspective');
 			end
 		end
-		setUdata(Udata)
+		setUdata(hfig,Udata)
         updateToolbar(hfig)
 	end
 case 'keypress'
@@ -258,36 +269,36 @@ case 'keypress'
     
     switch get(hfig,'currentcharacter')
     case 'o'
-        cameratoolbar('setmode','orbit');
+        cameratoolbar(hfig,'setmode','orbit');
     case 'l'
-        cameratoolbar('setmode','orbitscenelight');
+        cameratoolbar(hfig,'setmode','orbitscenelight');
     case 'p'
-        cameratoolbar('setmode','pan');
+        cameratoolbar(hfig,'setmode','pan');
     case 'd'
-        cameratoolbar('setmode','dollyhv');
+        cameratoolbar(hfig,'setmode','dollyhv');
     case 'z'
-        cameratoolbar('setmode','zoom');
+        cameratoolbar(hfig,'setmode','zoom');
     case 'r'
-        cameratoolbar('setmode','roll');
+        cameratoolbar(hfig,'setmode','roll');
     case 'w'
-        cameratoolbar('setmode','walk');
+        cameratoolbar(hfig,'setmode','walk');
     case 'D'
-        cameratoolbar('setmode','dollyfb');
+        cameratoolbar(hfig,'setmode','dollyfb');
     case char(28) %left
-        cameratoolbar('keymotion',[-1  0]);
+        cameratoolbar(hfig,'keymotion',[-1  0]);
     case char(29) %right
-        cameratoolbar('keymotion',[ 1  0]);
+        cameratoolbar(hfig,'keymotion',[ 1  0]);
     case char(30) %up
-        cameratoolbar('keymotion',[ 0  1]);
+        cameratoolbar(hfig,'keymotion',[ 0  1]);
     case char(31) %down
-        cameratoolbar('keymotion',[ 0 -1]);
+        cameratoolbar(hfig,'keymotion',[ 0 -1]);
     case 'c'
         postContextMenu(hfig,haxes);
     end
 case 'setcoordsys'
-  newcoordsys = lower(varargin{2});
+  newcoordsys = lower(vargin{2});
   Udata.coordsys = newcoordsys;
-  setUdata(Udata)
+  setUdata(hfig,Udata)
   if iscameraobj(haxes)
 	  if length(Udata.coordsys)==1
 		  coordsysval =  lower(Udata.coordsys) - 'x' + 1;
@@ -304,16 +315,16 @@ case 'setcoordsys'
 		  % if not, set the up vector
 		  if any(crossSimple(d,campos(haxes)-camtarget(haxes)))
 			  camup(haxes,d)
-			  validateScenelights(haxes)
-			  updateScenelightPosition(haxes);
+			  validateScenelights(hfig,haxes)
+			  updateScenelightPosition(hfig,haxes);
 		  end  
 	  end
   end
   updateToolbar(hfig)  
 case 'togglescenelight'
   if iscameraobj(haxes)
-	  validateScenelights(haxes)
-	  Udata = getUdata;
+	  validateScenelights(hfig,haxes)
+	  Udata = getUdata(hfig);
 	  sl = Udata.scenelights;
 	  ax = haxes;
 	  if isempty(sl)
@@ -325,46 +336,46 @@ case 'togglescenelight'
 	  
 	  if ~val & strcmp(Udata.mode, 'orbitscenelight')
 		  Udata.mode = 'orbit';
-		  setUdata(Udata)
+		  setUdata(hfig,Udata)
 		  updateToolbar(hfig)
 	  end
-	  updateScenelightOnOff(haxes,val);
-	  updateScenelightPosition(haxes);
+	  updateScenelightOnOff(hfig,haxes,val);
+	  updateScenelightPosition(hfig,haxes);
   end
 case 'setprojection'
   if iscameraobj(haxes)
-	  camproj(haxes,lower(varargin{2}));
+	  camproj(haxes,lower(vargin{2}));
   end
 case 'resetscenelight'
   if iscameraobj(haxes)
-	  resetScenelight(haxes);
+	  resetScenelight(hfig,haxes);
   end
 case 'resetall'
   h = [Udata.scenelights.h]; delete(h(ishandle(h)));
-  initUdata;
+  initUdata(hfig);
   updateToolbar(hfig)
   cameratoolbar('resetcameraandscenelight');
 case 'resetcameraandscenelight'
   if iscameraobj(haxes)
-	  resetCameraProps(haxes)
-	  resetScenelight(haxes);
+	  resetCameraProps(hfig,haxes)
+	  resetScenelight(hfig,haxes);
   end
 case 'resetcamera'
   if iscameraobj(haxes)
-	  resetCameraProps(haxes);
+	  resetCameraProps(hfig,haxes);
   end
 case 'resettarget'
   if iscameraobj(haxes)
 	  camtarget(haxes,'auto');
-	  validateScenelights(haxes)
-	  updateScenelightPosition(haxes);
+	  validateScenelights(hfig,haxes)
+	  updateScenelightPosition(hfig,haxes);
   end
 case 'noreset'
-  r=cameratoolbar('show');
+  r=cameratoolbar(hfig,'show');
 case 'nomode'
   Udata.mode = '';
   restoreWindowCallbacks(hfig,Udata.wcb);
-  setUdata(Udata)
+  setUdata(hfig,Udata)
   updateToolbar(hfig)
   restoreWindowCursor(hfig,Udata.cursor);
   removeContextMenu(hfig);
@@ -379,13 +390,13 @@ case 'init'
   if ~emptyUdata    
     h = [Udata.scenelights.h]; delete(h(ishandle(h)));
   end
-  initUdata;
-  Udata = getUdata;
+  initUdata(hfig);
+  Udata = getUdata(hfig);
   if emptyUdata
     Udata.wcb = wcb;
     Udata.cursor = cursor;
   end
-  setUdata(Udata)
+  setUdata(hfig,Udata)
   updateToolbar(hfig)
 case 'show'
   set(Udata.mainToolbarHandle, 'visible', 'on');
@@ -420,9 +431,9 @@ case 'close'
   cameratoolbar('stopmoving')
   h = [Udata.scenelights.h]; delete(h(ishandle(h)));
   if ishandle(Udata.mainToolbarHandle) delete(Udata.mainToolbarHandle); end
-  setUdata([]);
+  setUdata(hfig,[]);
 case 'setaspectratio'
-	axis(haxes,lower(varargin{2}));
+	axis(haxes,lower(vargin{2}));
 end
 
 if nargout>0
@@ -431,9 +442,9 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function localDrawnow
+function localDrawnow(hfig)
 
-Udata = getUdata;
+Udata = getUdata(hfig);
 
 % Calling drawnow will result in hang, see g201318
 if Udata.moving == 1
@@ -445,8 +456,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function orbitPangca(haxes,xy, mode)
-Udata = getUdata;
+function orbitPangca(hfig,haxes,xy, mode)
+Udata = getUdata(hfig);
 
 %mode = 'o';  orbit
 %mode = 'p';  pan
@@ -487,7 +498,7 @@ flag = 1;
 
 while sum(abs(xy))> 0 & isstruct(Udata) & (flag | Udata.moving==1) & ishandle(haxes)
   flag = 0;
-  Udata = getUdata;
+  Udata = getUdata(hfig);
   
   if mode=='o' %orbit
     if coordsysval==0 %unconstrained
@@ -503,8 +514,8 @@ while sum(abs(xy))> 0 & isstruct(Udata) & (flag | Udata.moving==1) & ishandle(ha
     end
   end
   
-  updateScenelightPosition(haxes);
-  localDrawnow;
+  updateScenelightPosition(hfig,haxes);
+  localDrawnow(hfig);
 end
 
 
@@ -512,15 +523,15 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function orbitLightgca(haxes,xy)
-Udata = getUdata;
+function orbitLightgca(hfig,haxes,xy)
+Udata = getUdata(hfig);
 sl = Udata.scenelights;
 ax = haxes;
 index = find([sl.ax]==ax);
 
 if sum(abs(xy))> 0 & ~sl(index).on
-  updateScenelightOnOff(haxes,1);
-  Udata = getUdata;
+  updateScenelightOnOff(hfig,haxes,1);
+  Udata = getUdata(hfig);
   sl = Udata.scenelights;
 end
 
@@ -534,7 +545,7 @@ flag = 1;
 
 while sum(abs(xy))> 0 & isstruct(Udata) & (flag | Udata.moving==1) & ishandle(haxes)
     
-  Udata = getUdata;  
+  Udata = getUdata(hfig);  
   
   flag = 0;
   
@@ -554,17 +565,17 @@ while sum(abs(xy))> 0 & isstruct(Udata) & (flag | Udata.moving==1) & ishandle(ha
   sl(index).el = el;
 
   Udata.scenelights = sl;
-  setUdata(Udata)
-  updateScenelightPosition(haxes);
+  setUdata(hfig,Udata)
+  updateScenelightPosition(hfig,haxes);
   
-  localDrawnow
+  localDrawnow(hfig)
 end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function walkgca(haxes,xy1,walk_flag)
+function walkgca(hfig,haxes,xy1,walk_flag)
 persistent xy v up d cva q
 xy = xy1;
 
@@ -572,7 +583,7 @@ xy = xy1;
 %careful not to blow the recursion limit.  Here we check to see
 %if we are just shy of the limit.  If we are, stop walking.
 if length(dbstack)<get(0,'recursionlimit')-16
-	Udata = getUdata;
+	Udata = getUdata(hfig);
 	
 	coordsys = lower(Udata.coordsys);
 	if coordsys(1)=='n'
@@ -598,7 +609,7 @@ if length(dbstack)<get(0,'recursionlimit')-16
 
 	while sum(abs(xy))> 0 & isstruct(Udata) & recursionflag & Udata.moving==1 & ishandle(haxes)
 		
-        Udata = getUdata;
+        Udata = getUdata(hfig);
         
 		if coordsysval==0 %unconstrained
 			campan(haxes,xy(1)*cva/700, 0, 'camera')
@@ -616,9 +627,9 @@ if length(dbstack)<get(0,'recursionlimit')-16
 			v(coordsysval) = 0;
 		end
 		camdolly(haxes,v(1), v(2), v(3), 'movetarget', 'data')
-		updateScenelightPosition(haxes);
+		updateScenelightPosition(hfig,haxes);
 		if isempty(walk_flag)
-			localDrawnow;
+			localDrawnow(hfig);
 		else
 			drawnow expose
 			recursionflag = 0;
@@ -634,11 +645,11 @@ else
 	%Also, cameratoolbar('up') contains some checking for throws
 	%which we don't want here.
 	
-	hfig = ancestor(haxes,'figure');
+	hfig = hfig;
 	set(hfig, 'windowbuttonmotionfcn', '')
 	set(hfig, 'windowbuttonupfcn', '')
 	
-	Udata = getUdata;
+	Udata = getUdata(hfig);
 	Udata.buttondown = 0;
 	Udata.moving   = 0;
         pt = hgconvertunits(hfig,[0 0 get(hfig,'CurrentPoint')],...
@@ -647,30 +658,38 @@ else
 	deltaPix  = pt-Udata.figLastLastPoint;
 	deltaPixStart  = pt-Udata.figStartPoint;
 	Udata.figLastPoint = pt;
-	setUdata(Udata)
+	setUdata(hfig,Udata)
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function dollygca(haxes,xy)
+function dollygca(hfig,haxes,xy)
 camdolly(haxes,-xy(1), -xy(2), 0, 'movetarget', 'pixels')
-updateScenelightPosition(haxes);
-localDrawnow;
+updateScenelightPosition(hfig,haxes);
+localDrawnow(hfig);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function zoomgca(haxes,xy)
+function zoomgca(hfig,haxes,xy)
+
 q = max(-.9, min(.9, sum(xy)/70));
-camzoom(haxes,1+q);
-localDrawnow;
+
+% hueristic avoids small view angles which will crash on solaris
+MIN_VIEW_ANGLE = .001;  
+va = camva(haxes);
+
+if va>MIN_VIEW_ANGLE
+  camzoom(haxes,1+q);
+  localDrawnow(hfig);
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function forwardBackgca(haxes,xy, mode)
+function forwardBackgca(hfig,haxes,xy, mode)
 
 q = max(-.9, min(.9, sum(xy)/70));
 
@@ -680,18 +699,18 @@ else
   camdolly(haxes,0,0,q, 'f');
 end
 
-updateScenelightPosition(haxes);
-localDrawnow;
+updateScenelightPosition(hfig,haxes);
+localDrawnow(hfig);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function rollgca(haxes,dxy, pt)
-Udata = getUdata;
+function rollgca(hfig,haxes,dxy, pt)
+Udata = getUdata(hfig);
 
 % find the pixel center of the axes
-pos = hgconvertunits(ancestor(haxes,'figure'),get(haxes,'Position'),...
+pos = hgconvertunits(hfig,get(haxes,'Position'),...
                      get(haxes,'Units'),'pixels',get(haxes,'parent'));
 center = pos(1:2)+pos(3:4)/2;
 
@@ -712,13 +731,13 @@ flag = 1;
 
 while isstruct(Udata) & (flag | Udata.moving==1) & ishandle(haxes)
   flag = 0;
-  Udata = getUdata;
+  Udata = getUdata(hfig);
    
   camroll(haxes,theta);
   
-  updateScenelightPosition(haxes);
+  updateScenelightPosition(hfig,haxes);
 
-  localDrawnow
+  localDrawnow(hfig)
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -847,13 +866,13 @@ u(end+1) = uipushtool(props);
 Udata.stopMovingHandle = u;
 
 set(Udata.mainToolbarHandle, 'tag', 'CameraToolBar', 'visible', 'off','serializable','off');
-setUdata(Udata)
+setUdata(hfig,Udata)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function updateToolbar(hfig)
-Udata = getUdata;
+Udata = getUdata(hfig);
 
 set(Udata.ModeHandles, 'state', 'off')
 set(findall(Udata.ModeHandles, 'tag', Udata.mode), 'state', 'on');
@@ -874,9 +893,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function Udata = getUdata
-
-[hfig,haxes]=currenthandles;
+function Udata = getUdata(hfig)
 
 Udata = getappdata(hfig, 'ctb200jaz');
 
@@ -890,9 +907,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function setUdata(Udata)
-
-[hfig,haxes]=currenthandles;
+function setUdata(hfig,Udata)
 
 setappdata(hfig, 'ctb200jaz', Udata);
 
@@ -900,8 +915,8 @@ setappdata(hfig, 'ctb200jaz', Udata);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function initUdata
-Udata = getUdata;
+function initUdata(hfig)
+Udata = getUdata(hfig);
 
 Udata.mode = '';
 Udata.coordsys = 'z';
@@ -915,14 +930,14 @@ Udata.defaultAz = 30;
 Udata.defaultEl = 30;
 Udata.scenelights = struct('ax', {}, 'h', {}, 'on', {}, 'az', {}, 'el', {});
 
-setUdata(Udata);
+setUdata(hfig,Udata);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function updateScenelightPosition(haxes)
+function updateScenelightPosition(hfig,haxes)
 
-Udata = getUdata;
+Udata = getUdata(hfig);
 sl = Udata.scenelights;
 ax = haxes;
 index = find([sl.ax]==ax);
@@ -935,8 +950,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function updateScenelightOnOff(haxes,val)
-Udata = getUdata;
+function updateScenelightOnOff(hfig,haxes,val)
+Udata = getUdata(hfig);
 sl = Udata.scenelights;
 ax = haxes;
 index = find([sl.ax]==ax);
@@ -945,13 +960,13 @@ sl(index).on = val;
 set(sl(index).h, 'vis', bool2OnOff(val))
 
 Udata.scenelights = sl;
-setUdata(Udata);
+setUdata(hfig,Udata);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function validateScenelights(haxes)
-Udata = getUdata;
+function validateScenelights(hfig,haxes)
+Udata = getUdata(hfig);
 sl = Udata.scenelights;
 index = ~ishandle([sl.ax]); sl(index) = [];
 index = ~ishandle([sl.h]); sl(index) = [];
@@ -976,16 +991,16 @@ if ~ishandle(sl(index).h)
 end
 
 Udata.scenelights = sl;
-setUdata(Udata)
+setUdata(hfig,Udata)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function resetScenelight(haxes)
-validateScenelights(haxes)
+function resetScenelight(hfig,haxes)
+validateScenelights(hfig,haxes)
 
-Udata = getUdata;
+Udata = getUdata(hfig);
 sl = Udata.scenelights;
 ax = haxes;
 index = find([sl.ax]==ax);
@@ -994,9 +1009,9 @@ sl(index).az = Udata.defaultAz;
 sl(index).el = Udata.defaultEl;
 
 Udata.scenelights = sl;
-setUdata(Udata)
+setUdata(hfig,Udata)
 
-updateScenelightPosition(haxes);
+updateScenelightPosition(hfig,haxes);
   
 
   
@@ -1013,6 +1028,7 @@ end
 
 if ~CameratoolbarInfoDialogShown
     ax=haxes;
+    CameratoolbarInfoDialogShown=1;
     [selectedButton,dlgShown]=uigetpref('cameratoolbar','donotshowinfodlg',...
         'Aspect Ratio Adjustment',...
         {'Plots may change appearance so that aspect ratios remain'
@@ -1023,7 +1039,6 @@ if ~CameratoolbarInfoDialogShown
         'DefaultButton','OK',...
         'HelpString','Help',...
         'HelpFcn','helpview(fullfile(docroot,''mapfiles'',''visualize.map''), ''axes_aspect_ratio'');');
-    CameratoolbarInfoDialogShown=1;
 else
     dlgShown=0;
 end
@@ -1095,7 +1110,7 @@ c(3) = b(2)*a(1) - b(1)*a(2);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function resetCameraProps(haxes)
+function resetCameraProps(hfig,haxes)
 camva(haxes,'auto'); campos(haxes,'auto'); camtarget(haxes,'auto'); daspect(haxes,'auto'); camup(haxes,'auto'); 
 view(haxes,3);
 daspect(haxes,daspect(haxes)); camva(haxes,camva(haxes)); 
@@ -1150,18 +1165,18 @@ end
 hCameraMotion=findobj(h,'tag','CameraMotionMode');
 hCameraMotionChildren=get(hCameraMotion,'children');
 set(hCameraMotionChildren,'checked','off');
-hCameraMotionTarget=findobj(hCameraMotionChildren,'tag',['CameraMode_' cameratoolbar('getmode')]);
+hCameraMotionTarget=findobj(hCameraMotionChildren,'tag',['CameraMode_' cameratoolbar(hfig,'getmode')]);
 set(hCameraMotionTarget,'checked','on');
 
 %initialize camera principal axis check
 paxParent=findall(h,'tag','CameraPAx');
 paxItems=allchild(paxParent);
 offon={'off','on'};
-isActive=ismember(cameratoolbar('getmode'), {'orbit' 'pan' 'walk'});
+isActive=ismember(cameratoolbar(hfig,'getmode'), {'orbit' 'pan' 'walk'});
 set(paxItems,'checked','off','enable',offon{isActive+1});
 
 if isActive
-    currPAx=cameratoolbar('getcoordsys');
+    currPAx=cameratoolbar(hfig,'getcoordsys');
     activeItem=findall(paxItems,'tag',['figMenuAxis_' currPAx]);
     set(activeItem,'Checked','on');
 end
@@ -1214,14 +1229,17 @@ end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [hfig,haxes]=currenthandles
+function [hfig,haxes]=currenthandles(hfig)
 % Obtaining the correct handle to the current figure and axes in all cases:
 % handlevisibility ON-gcbf; OFF-gcbf/gcf.
 
-if ~isempty(gcbf)
-	hfig=gcbf;
-	haxes=get(gcbf,'CurrentAxes');
-else
-	hfig=gcf;
-	haxes=get(hfig,'CurrentAxes');
+if nargin<1
+    if ~isempty(gcbf)
+	   hfig=gcbf;
+    else
+	   hfig=gcf;
+    end
 end
+
+haxes = get(hfig,'CurrentAxes');
+

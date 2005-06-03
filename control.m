@@ -24,6 +24,7 @@ case 'h'
     set( gcf, 'CurrentAxes', haxes(2) )
     hhelp = text( .5, .54, ...
       { 'SORD - Support-Operator Rupture Dynamics'
+        'by Geoffrey Ely - gely@ucsd.edu'
         ''
         'Run/Step/Pause             R Space Click'
         'Explore                       Arrows C E'
@@ -267,7 +268,7 @@ case 'q'
     msg = 'Checkpoint Saved';
   else
     load checkpoint
-    stepw
+    wstep
     delete(1)
     openfig( 'checkpoint' );
     haxes = get( 1, 'Children' );

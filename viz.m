@@ -12,10 +12,10 @@ if initialize > 1
   return
 elseif initialize
   plotinterval = 1;
-  holdmovie = 0;
+  holdmovie = 1;
   savemovie = 0;
   field = 'v';
-  comp = 1;
+  comp = 0;
   isofrac = .5;
   glyphcut = .1;
   glyphexp = 1;
@@ -25,11 +25,11 @@ elseif initialize
   ulim = -1;
   vlim = -1;
   wlim = -1;
-  xlim = 0;
+  xlim = -1;
   camdist = -1;
   look = 4;
   xhair = hypocenter - halo1;
-  if nrmdim, slicedim = nrmdim; else slicedim = 3; end
+  if nrmdim, slicedim = nrmdim; else slicedim = crdsys(2); end
   if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
   else     foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 1;
   end

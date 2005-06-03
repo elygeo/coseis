@@ -18,11 +18,12 @@ material = [ 2670   vp vs     1 1 1   -1 -1 -1 ];
 friction = [ .6 .5   .25 0    1 1 1   -1 -1 -1 ];
 traction = [ -70e6 -120e6 0   1 1 1   -1 -1 -1 ];
 stress   = [];
-viscosity = [ .5 .5 ];
 viscosity = [ 0 0 ];
+viscosity = [ 0 .3 ];
 noise = 0;
 hypocenter = 0;
 msrcradius = 0;
+planewavedim = 0;
 truptol = .001;
 checkpoint = -1;
 symmetries = [];
@@ -35,11 +36,19 @@ locknodes = [
   1 1 1    1 -1  1   -1 -1 -1   % back
   1 1 1    1  1 -1   -1 -1 -1   % right
 ];
+locknodes = [];
 out = {
-  'v' 1    1  1  1   -1 -1  1   % surface
-  'w' 1    1  1  1   -1 -1  1   % surface
-  'v' 1    1  0  1   -1  0 -1   % fault
-  'w' 1    1  0  1   -1  0 -1   % fault
+  'v' 1    1  1  1   -1 -1  1
+  'w' 1    1  1  1   -1 -1  1
+  'v' 1    1  1  0   -1 -1  0
+  'w' 1    1  1  0   -1 -1  0
+  'v' 1    1  0  1   -1  0 -1
+  'w' 1    1  0  1   -1  0 -1
+  'v' 1    0  1  1    0 -1 -1
+  'w' 1    0  1  1    0 -1 -1
+};
+out = {
+  'v' 1    1  1  1   -1 -1 -1
 };
 model = 'normal';
 model = 'the3';
@@ -52,18 +61,26 @@ case ''
   %nrmdim = 0;
   n = [ 3 3 3 ]; nt = 1;
 case 'pointsrc'
+  viscosity = [ 0 0 ];
+  viscosity = [ 0 .5 ];
   n = [ 41 41 21 ];
-  nt = 60;
+  n = [ 41 41 41 ];
+  nt = 100;
   nrmdim = 0;
   moment = -1e18 * [ 1 1 1   0 0 0 ];
-  msrctimefcn = 'sine';
-  msrctimefcn = 'delta';
-  msrctimefcn = 'sbrune';
+  srctimefcn = 'sine';
+  srctimefcn = 'delta';
+  srctimefcn = 'sbrune';
+  srctimefcn = 'brune';
   msrcradius = 0;
   msrcradius = 2.5 * h;
+  msrcradius = 4.5 * h;
+  displacement = [ 0 0 1 ];
+  displacement = [ 0 1 0 ];
+  planewavedim = 0;
   msrcnodealign = 1;
-  npml = 10;
   npml = 0;
+  npml = 10;
   plotstyle = 'slice';
 case 'strikeslip'
   plotstyle = 'slice';
