@@ -12,11 +12,8 @@ s1 = u(:,:,:,ic) + gamma(1) .* v(:,:,:,ic);
 for id = 1:3
   ix = 6 - ic - id;
   for iz = 1:size( operator, 1 )
-    bc = [ operator{iz,2:7} ];
     i1 = opi1(iz,:);
     i2 = opi2(iz,:);
-    %i1 = i1 + npml * bc(1:3);
-    %i2 = i2 - npml * bc(4:6);
     l = i1(3):i2(3)-1;
     k = i1(2):i2(2)-1;
     j = i1(1):i2(1)-1;
@@ -32,9 +29,8 @@ for id = 1:3
     otherwise error operator
     end
   end
-  bc = [ operator{1,2:7} ];
-  i1 = opi1(1,:);
-  i2 = opi2(1,:);
+  i1 = halo1 + 1;
+  i2 = halo1 + ncore;
   l = i1(3):i2(3)-1;
   k = i1(2):i2(2)-1;
   j = i1(1):i2(1)-1;

@@ -27,6 +27,7 @@ truptol = .001;
 checkpoint = -1;
 symmetries = [];
 npml = 0;
+bc = [ 1 1 0   1 1 1 ];
 locknodes = [
   1 1 1    1  1  1    1 -1 -1   % top
   1 1 1    1  1  1   -1  1 -1   % front

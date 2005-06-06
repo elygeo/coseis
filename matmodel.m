@@ -38,58 +38,71 @@ for iz = 1:size( material, 1 )
 end
 
 for iz = 1:size( operator, 1 )
-  zone = [ operator{iz,8:13} ];
+  zone = [ operator{iz,2:7} ];
   [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
-  bc = [ operator{iz,2:7} ];
+  i1 = max( i1, i1pml );
+  i2 = min( i2, i2pml );
   opi1(iz,:) = i1;
   opi2(iz,:) = i2;
+  l = i1(3):i2(3);
+  k = i1(2):i2(2);
+  j = i1(1):i2(1);
   switch operator{iz,1}
-  case { 'g', 'r', 'h' }
-    l = i1(3):i2(3)-1;
-    k = i1(2):i2(2)-1;
-    j = i1(1):i2(1)-1;
-    switch nrmdim
-    case 1, j(j==hypocenter(1)) = [];
-    case 2, k(k==hypocenter(2)) = [];
-    case 3, l(l==hypocenter(3)) = [];
-    end
-    switch operator{iz,1}
-    case 'g', s2(j,k,l) = dncg( x, 1, x, 1, j, k, l );
-    case 'r', s2(j,k,l) = dncr( x, 1, x, 1, j, k, l );
-    case 'h', s2(j,k,l) = h;
-    end
-    l = i1(3):i2(3);
-    k = i1(2):i2(2);
-    j = i1(1):i2(1);
-    s1(j,k,l) = 0.125 * ( ...
-      s2(j,k,l) + s2(j-1,k-1,l-1) + ...
-      s2(j-1,k,l) + s2(j,k-1,l-1) + ...
-      s2(j,k-1,l) + s2(j-1,k,l-1) + ...
-      s2(j,k,l-1) + s2(j-1,k-1,l) );
-  case '4'
-    l = i1(3):i2(3);
-    k = i1(2):i2(2);
-    j = i1(1):i2(1);
-    s2(j,k,l) = h;
-    s1(j,k,l) = h;
+  case { 'g', 'r' }, w1(j,k,l,1) = 1;
+  case   'h',        w1(j,k,l,1) = h^2;
   otherwise error operator
   end
-  nn = [ n 3 ];
-  nn(1) = npml;
-  if bc(1), p1 = repmat( zero, nn ); g1 = repmat( zero, nn ); end
-  if bc(4), p4 = repmat( zero, nn ); g4 = repmat( zero, nn ); end
-  nn = [ n 3 ];
-  nn(2) = npml;
-  if bc(2), p2 = repmat( zero, nn ); g2 = repmat( zero, nn ); end
-  if bc(5), p5 = repmat( zero, nn ); g5 = repmat( zero, nn ); end
-  nn = [ n 3 ];
-  nn(3) = npml;
-  if bc(3), p3 = repmat( zero, nn ); g3 = repmat( zero, nn ); end
-  if bc(6), p6 = repmat( zero, nn ); g6 = repmat( zero, nn ); end
+  l = i1(3):i2(3)-1;
+  k = i1(2):i2(2)-1;
+  j = i1(1):i2(1)-1;
+  switch nrmdim
+  case 1, j(j==hypocenter(1)) = [];
+  case 2, k(k==hypocenter(2)) = [];
+  case 3, l(l==hypocenter(3)) = [];
+  end
+  switch operator{iz,1}
+  case { 'g', 'r' }, w2(j,k,l,1) = 1;
+  case   'h',        w2(j,k,l,1) = h^2;
+  otherwise error operator
+  end
 end
+i1 = i1full;
+i2 = i2full;
+l = i1(3):i2(3)-1;
+k = i1(2):i2(2)-1;
+j = i1(1):i2(1)-1;
+i = 0:npml-1;
+switch nrmdim
+case 1, j(j==hypocenter(1)) = [];
+case 2, k(k==hypocenter(2)) = [];
+case 3, l(l==hypocenter(3)) = [];
+end
+s2(j,k,l) = dncg( x, 1, x, 1, j, k, l );
 if s2(s2<0); fprinf( 'Negative cell volume!\n' ), end
-i = s1 ~= 0; s1(i) = 1 ./ s1(i);
-i = s2 ~= 0; s2(i) = 1 ./ s2(i);
+if bc(1), ji = j(i+1);   w2(ji,k,l) = h^2; end
+if bc(4), ji = j(end-i); w2(ji,k,l) = h^2; end
+if bc(2), ki = k(i+1);   w2(j,ki,l) = h^2; end
+if bc(5), ki = k(end-i); w2(j,ki,l) = h^2; end
+if bc(3), li = l(i+1);   w2(j,k,li) = h^2; end
+if bc(6), li = l(end-i); w2(j,k,li) = h^2; end
+l = i1(3):i2(3);
+k = i1(2):i2(2);
+j = i1(1):i2(1);
+s1(j,k,l,) = 0.125 * ( ...
+  s2(j,k,l) + s2(j-1,k-1,l-1) + ...
+  s2(j-1,k,l) + s2(j,k-1,l-1) + ...
+  s2(j,k-1,l) + s2(j-1,k,l-1) + ...
+  s2(j,k,l-1) + s2(j-1,k-1,l) );
+if bc(1), ji = j(i+1);   w1(ji,k,l) = h^2; end
+if bc(4), ji = j(end-i); w1(ji,k,l) = h^2; end
+if bc(2), ki = k(i+1);   w1(j,ki,l) = h^2; end
+if bc(5), ki = k(end-i); w1(j,ki,l) = h^2; end
+if bc(3), li = l(i+1);   w1(j,k,li) = h^2; end
+if bc(6), li = l(end-i); w1(j,k,li) = h^2; end
+i = s1 ~= 0; s1(i) = w1(i) ./ s1(i);
+i = s2 ~= 0; s2(i) = w2(i) ./ s2(i);
+w1(:) = 0;
+w2(:) = 0;
 
 l = hypocenter(3);
 k = hypocenter(2);
@@ -138,4 +151,16 @@ dn1 = - 2 * dampn   ./ ( 2 + dt * dampn );
 dc1 = ( 2 - dt * dampc ) ./ ( 2 + dt * dampc );
 dn2 = 2 ./ ( 2 + dt * dampn );
 dc2 = 2 * dt ./ ( 2 + dt * dampc );
+nn = [ n 3 ];
+nn(1) = npml;
+if bc(1), p1 = repmat( zero, nn ); g1 = repmat( zero, nn ); end
+if bc(4), p4 = repmat( zero, nn ); g4 = repmat( zero, nn ); end
+nn = [ n 3 ];
+nn(2) = npml;
+if bc(2), p2 = repmat( zero, nn ); g2 = repmat( zero, nn ); end
+if bc(5), p5 = repmat( zero, nn ); g5 = repmat( zero, nn ); end
+nn = [ n 3 ];
+nn(3) = npml;
+if bc(3), p3 = repmat( zero, nn ); g3 = repmat( zero, nn ); end
+if bc(6), p6 = repmat( zero, nn ); g6 = repmat( zero, nn ); end
 

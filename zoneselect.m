@@ -15,8 +15,8 @@ i = i1 == 0; i1(i) = hypocenter(i) + shift(i);
 i = i2 == 0; i2(i) = hypocenter(i);
 i = i1 < 0;  i1(i) = i1(i) + ncore(i) + 1;
 i = i2 < 0;  i2(i) = i2(i) + ncore(i) + 1;
-i1 = max( i1, 0 );
-i2 = min( i2, ncore + 1 );
+i1 = max( i1, 1 );
+i2 = min( i2, ncore );
 i1 = i1 + halo1;
 i2 = i2 + halo1;
 

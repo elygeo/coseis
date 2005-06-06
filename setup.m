@@ -12,6 +12,8 @@ halo2 = [ 1 1 1 ];
 ncore = n;
 n = n + halo1 + halo2;
 hypocenter = hypocenter + halo1;
+i1pml = halo1 + 1     + bc(1:3) * npml;
+i2pml = halo1 + ncore - bc(4:6) * npml;
 
 readcheckpoint = 0;
 one = 1;
