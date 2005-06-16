@@ -54,12 +54,12 @@ out = {
 model = 'normal';
 model = 'the3';
 model = 'strikeslip';
-model = 'pointsrc';
 model = 'kostrov';
+model = 'pointsrc';
 model = '';
 switch model
 case ''
-  %nrmdim = 0;
+  nrmdim = 0;
   n = [ 3 3 3 ]; nt = 1;
 case 'pointsrc'
   nt = 100;

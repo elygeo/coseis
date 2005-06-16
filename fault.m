@@ -204,7 +204,7 @@ cohes1 = cohes;
 tn1 = -tn;
 i = tn1 < 0;
 tn1(i) = 0;
-if find( i ), fprintf( 'fault opening!\n' ) end
+if find( i ), fprintf( 'fault opening!\n' ), end
 c = repmat( 1, size( dc ) );
 i = uslip < dc;
 c(i) = uslip(i) ./ dc(i);

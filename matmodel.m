@@ -57,6 +57,7 @@ for iz = 1:size( operator, 1 )
   case 'r', s2(j,k,l) = dnr( x, 1, x, 1, j, k, l );
   case 'h', s2(j,k,l) = h ^ 3;
   otherwise error operator
+  end
   i1 = max( i1, i1pml );
   i2 = min( i2, i2pml );
   opi1(iz,:) = i1;
@@ -87,8 +88,9 @@ case 3
   yn(:,:,ih(3)+1) = yn(:,:,ih(3));
 end
 i = yn ~= 0; yn(i) = dt * 8 ./ yn(i);
-yc = 6 * ( lam + 2 * lam );
-i = yc ~= 0; yc = yc .* miu .* ( lam + miu ) ./ yc(i) / h ^ 2;
+yc = h ^ 2 * 6 * ( lam + 2 * lam );
+i = yc ~= 0; yc(i) = 1 ./ yc(i);
+yc = yc .* miu .* ( lam + miu );
 
 s1 = s1 .* s2;
 rho(j,k,l) = ...
@@ -120,7 +122,6 @@ end
 c1 =  8/15;
 c2 = -3/100;
 c3 =  1/1500;
-tune = 0;
 tune = 3.5;
 hmean = 2 * matmin .* matmax ./ ( matmin + matmax );
 damp = tune * hmean(3) / h * ( c1 + ( c2 + c3 * npml ) * npml );
