@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
-% DNCG - node-to-cell general grid difference operator
+% DNG - node-to-cell general grid difference operator
 
-function df = dncg( f, i, x, a, j, k, l )
+function df = dng( f, i, x, a, j, k, l )
 b = mod( a,   3 ) + 1;
 c = mod( a + 1, 3 ) + 1;
 df = 1 / 12*...

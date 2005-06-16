@@ -9,7 +9,7 @@ nf(nrmdim) = 1;
 fs    = repmat( 0, nf );
 fd    = repmat( 0, nf );
 dc    = repmat( 0, nf );
-cohes = repmat( 1e10, nf );
+cohes = repmat( 1e9, nf );
 s0    = repmat( 0, [ nf 6 ] );
 t0nsd = repmat( 0, [ nf 3 ] );
 for iz = 1:size( friction, 1 )
@@ -69,9 +69,9 @@ i1 = halo1 + 1;
 i2 = halo1 + ncore;
 i1(nrmdim) = 1;
 i2(nrmdim) = 1;
-j  = i1(1):i2(1);
-k  = i1(2):i2(2);
-l  = i1(3):i2(3);
+j = i1(1):i2(1);
+k = i1(2):i2(2);
+l = i1(3):i2(3);
 i1(nrmdim) = hypocenter(nrmdim);
 i2(nrmdim) = hypocenter(nrmdim);
 j1 = i1(1):i2(1);
@@ -135,27 +135,11 @@ r  = sqrt( r );
 if n(1) == 4, r = repmat( r(j,:,:), [ 4 1 1 ] ); end % 2D cases
 if n(2) == 4, r = repmat( r(:,k,:), [ 1 4 1 ] ); end % 2D cases
 if n(3) == 4, r = repmat( r(:,:,l), [ 1 1 4 ] ); end % 2D cases
-s1(j,k,l) = 1;
-for iz = 1:size( operator, 1 )
-  i1 = opi1(iz,:);
-  i2 = opi2(iz,:);
-  i1(nrmdim) = 1;
-  i2(nrmdim) = 1;
-  l1 = i1(3):i2(3);
-  k1 = i1(2):i2(2);
-  j1 = i1(1):i2(1);
-  switch operator{iz,1}
-  case { 'g', 'r' }
-  case { 'h', '4' }, s1(j1,k1,l1) = 1 / h ^ 2;
-  otherwise error operator
-  end
-end
-area(j,k,l) = area(j,k,l) .* s1(j,k,l);
-i  = hypocenter;
+i = hypocenter;
 i(nrmdim) = 1;
-j  = i(1);
-k  = i(2);
-l  = i(3);
+j = i(1);
+k = i(2);
+l = i(3);
 tn0 = sum( t0(j,k,l,:) .* nrm(j,k,l,:) );
 ts0 = norm( shiftdim( t0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) );
 tn0 = max( -tn0, 0 );
@@ -177,69 +161,70 @@ end
 %t0 = 5;
 %tw = 1;
 %t0(2,:,hypocenter(2)) = exp(-((it*dt-t0)/tw)^2);
-i1     = [ 1 1 1 ];
-i2     = n;
+i1 = [ 1 1 1 ];
+i2 = n;
 i1(nrmdim) = hypocenter(nrmdim);
 i2(nrmdim) = hypocenter(nrmdim);
-j1     = i1(1):i2(1);
-k1     = i1(2):i2(2);
-l1     = i1(3):i2(3);
+j1 = i1(1):i2(1);
+k1 = i1(2):i2(2);
+l1 = i1(3):i2(3);
 i1(nrmdim) = hypocenter(nrmdim) + 1;
 i2(nrmdim) = hypocenter(nrmdim) + 1;
-j2     = i1(1):i2(1);
-k2     = i1(2):i2(2);
-l2     = i1(3):i2(3);
+j2 = i1(1):i2(1);
+k2 = i1(2):i2(2);
+l2 = i1(3):i2(3);
 % Zero slip velocity condition
-tmp    = area .* ( mdt(j1,k1,l1) + mdt(j2,k2,l2) );
-i      = tmp ~= 0;
+tmp = area .* ( rho(j1,k1,l1) + rho(j2,k2,l2) );
+i = tmp ~= 0;
 tmp(i) = 1 ./ tmp(i);
-t      = t0 + repmat( tmp, [ 1 1 1 3 ] ) .* ...
-            (  v(j2,k2,l2,:) -  v(j1,k1,l1,:) ...
-            + w1(j2,k2,l2,:) - w1(j1,k1,l1,:) );
-tn     = sum( t .* nrm, 4 );
-tn3    = repmat( tn, [ 1 1 1 3 ] ) .* nrm;
-ts3    = t - tn3;
-ts     = sum( ts3 .* ts3, 4 );
-ts     = sqrt( ts );
+for i = 1:3
+  t(:,:,:,i) = t0(:,:,:,i) + ...
+    tmp .* ( v(j2,k2,l2,i) - v(j1,k1,l1,i) + w1(j2,k2,l2,i) - w1(j1,k1,l1,i) );
+end
+tn = sum( t .* nrm, 4 );
+for i = 1:3
+  tn3(:,:,:,i) = tn .* nrm(:,:,:,i);
+end
+ts3 = t - tn3;
+ts = sum( ts3 .* ts3, 4 );
+ts = sqrt( ts );
 if 0 % Fault opening
-  t      = t + repmat( tmp, [ 1 1 1 3 ] ) .* ...
-            (  u(j2,k2,l2,:) -  u(j1,k1,l1,:) ) / dt;
-  tn     = sum( t .* nrm, 4 );
-  i      = tn > cohes(i);
-  tn(i)  = cohes(i);
-  tn3    = repmat( tn, [ 1 1 1 3 ] ) .* nrm;
+  for i = 1:3
+    t(:,:,:,i) = t(:,:,:,i) + tmp .* ( u(j2,k2,l2,i) - u(j1,k1,l1,i) ) / dt;
+  end
+  tn = sum( t .* nrm, 4 );
+  i = tn > cohes(i);
+  tn(i) = cohes(i);
+  for i = 1:3
+    tn3(:,:,:,i) = tn .* nrm(:,:,:,i);
+  end
 end
 % Friction Law
 cohes1 = cohes;
-tn1    = -tn;
-i      = tn1 < 0;
-if( find( i ) )
-  tn1(i) = 0;
-  fprintf( 'fault opening!\n' )
-  %cohes1(i) = 0;  this is in DFM, but taken out to allow locking
-end
-c      = repmat( 1, size( dc ) );
-i      = uslip < dc;
-c(i)   = uslip(i) ./ dc(i);
-ff     = ( ( 1 - c ) .* fs + c .* fd ) .* tn1 + cohes1;
+tn1 = -tn;
+i = tn1 < 0;
+tn1(i) = 0;
+if find( i ), fprintf( 'fault opening!\n' ) end
+c = repmat( 1, size( dc ) );
+i = uslip < dc;
+c(i) = uslip(i) ./ dc(i);
+ff = ( ( 1 - c ) .* fs + c .* fd ) .* tn1 + cohes1;
 % Nucleation
 if rcrit && vrup
-  c    = 1;
-  if nclramp
-    c  = min( ( it * dt - r / vrup ) / ( nclramp * dt ), 1 );
-  end
-  ff2  = ( 1 - c ) .* ts + c .* ( fd .* tn1 + cohes1 );
-  i    = r < min( rcrit, it * dt * vrup ) & ff2 < ff;
+  c = 1;
+  if nclramp, c = min( ( it * dt - r / vrup ) / ( nclramp * dt ), 1 ); end
+  ff2 = ( 1 - c ) .* ts + c .* ( fd .* tn1 + cohes1 );
+  i = r < min( rcrit, it * dt * vrup ) & ff2 < ff;
   ff(i) = ff2(i);
 end
 % Shear traction bounded by friction
-c      = repmat( 1, size( ff ) );
-i      = ts > ff;
-c(i)   = ff(i) ./ ts(i);
-t      = -t0 + tn3 + ts3 .* repmat( c, [ 1 1 1 3 ] );
+c = repmat( 1, size( ff ) );
+i = ts > ff;
+c(i) = ff(i) ./ ts(i);
 for i = 1:3
-  w1(j1,k1,l1,i) = w1(j1,k1,l1,i) + t(:,:,:,i) .* area .* mdt(j1,k1,l1);
-  w1(j2,k2,l2,i) = w1(j2,k2,l2,i) - t(:,:,:,i) .* area .* mdt(j2,k2,l2);
+  t(:,:,:,i) = -t0(:,:,:,i) + tn3(:,:,:,i) + c .* ts3(:,:,:,i);
+  w1(j1,k1,l1,i) = w1(j1,k1,l1,i) + t(:,:,:,i) .* area .* rho(j1,k1,l1);
+  w1(j2,k2,l2,i) = w1(j2,k2,l2,i) - t(:,:,:,i) .* area .* rho(j2,k2,l2);
 end
 vslip = v(j2,k2,l2,:) + w1(j2,k2,l2,:) - v(j1,k1,l1,:) - w1(j1,k1,l1,:);
 vslip = sum( vslip .* vslip, 4 );
@@ -258,9 +243,7 @@ if truptol
   if find( i )
     trup( i & ( ~ trup ) ) = ( it + .5 ) * dt;
     tarrest = ( it + 1.5 ) * dt;
-    if i(j,k,l)
-      tarresthypo = tarrest;
-    end
+    if i(j,k,l), tarresthypo = tarrest; end
   end
 end
 

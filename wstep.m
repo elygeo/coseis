@@ -23,9 +23,9 @@ for id = 1:3
     case 3, l(l==hypocenter(3)) = [];
     end
     switch operator{iz,1}
-    case 'g', s2(j,k,l) = dncg( s1, 1, x, id, j, k, l );
-    case 'r', s2(j,k,l) = dncr( s1, 1, x, id, j, k, l );
-    case 'h', s2(j,k,l) = dh(   s1, 1,    id, j, k, l );
+    case 'g', s2(j,k,l) = dng( s1, 1, x, id, j, k, l );
+    case 'r', s2(j,k,l) = dnr( s1, 1, x, id, j, k, l );
+    case 'h', s2(j,k,l) = dnh( s1, 1, h, id, j, k, l );
     otherwise error operator
     end
   end
@@ -42,42 +42,42 @@ for id = 1:3
   i = 0:npml-1;
   switch id
   case { 2, 3 }
-    if bc(1), ji = j(i+1);   s2(ji,k,l) = dh( u, ic, id, ji, k, l ); end
-    if bc(4), ji = j(end-i); s2(ji,k,l) = dh( u, ic, id, ji, k, l ); end
+    if bc(1), ji = j(i+1);   s2(ji,k,l) = dnh( u, ic, h, id, ji, k, l ); end
+    if bc(4), ji = j(end-i); s2(ji,k,l) = dnh( u, ic, h, id, ji, k, l ); end
   case { 3, 1 }
-    if bc(2), ki = k(i+1);   s2(j,ki,l) = dh( u, ic, id, j, ki, l ); end
-    if bc(5), ki = k(end-i); s2(j,ki,l) = dh( u, ic, id, j, ki, l ); end
+    if bc(2), ki = k(i+1);   s2(j,ki,l) = dnh( u, ic, h, id, j, ki, l ); end
+    if bc(5), ki = k(end-i); s2(j,ki,l) = dnh( u, ic, h, id, j, ki, l ); end
   case { 1, 2 }
-    if bc(3), li = l(i+1);   s2(j,k,li) = dh( u, ic, id, j, k, li ); end
-    if bc(6), li = l(end-i); s2(j,k,li) = dh( u, ic, id, j, k, li ); end
+    if bc(3), li = l(i+1);   s2(j,k,li) = dnh( u, ic, h, id, j, k, li ); end
+    if bc(6), li = l(end-i); s2(j,k,li) = dnh( u, ic, h, id, j, k, li ); end
   end
   for i = 1:npml
     switch id
     case 1
       if bc(1), ji = j(i);
-        s2(ji,k,l) = dc2(i) * dh(v,ic,id,ji,k,l) + dc1(i) * g1(i,k,l,ic);
+        s2(ji,k,l) = dc2(i) * dnh(v,ic,h,id,ji,k,l) + dc1(i) * g1(i,k,l,ic);
         g1(i,k,l,ic) = s2(ji,k,l);
       end
       if bc(4), ji = j(end-i+1);
-        s2(ji,k,l) = dc2(i) * dh(v,ic,id,ji,k,l) + dc1(i) * g4(i,k,l,ic);
+        s2(ji,k,l) = dc2(i) * dnh(v,ic,h,id,ji,k,l) + dc1(i) * g4(i,k,l,ic);
         g4(i,k,l,ic) = s2(ji,k,l);
       end
     case 2
       if bc(2), ki = k(i);
-        s2(j,ki,l) = dc2(i) * dh(v,ic,id,j,ki,l) + dc1(i) * g2(j,i,l,ic);
+        s2(j,ki,l) = dc2(i) * dnh(v,ic,h,id,j,ki,l) + dc1(i) * g2(j,i,l,ic);
         g2(j,i,l,ic) = s2(j,ki,l);
       end
       if bc(5), ki = k(end-i+1);
-        s2(j,ki,l) = dc2(i) * dh(v,ic,id,j,ki,l) + dc1(i) * g5(j,i,l,ic);
+        s2(j,ki,l) = dc2(i) * dnh(v,ic,h,id,j,ki,l) + dc1(i) * g5(j,i,l,ic);
         g5(j,i,l,ic) = s2(j,ki,l);
       end
     case 3
       if bc(3), li = l(i);
-        s2(j,k,li) = dc2(i) * dh(v,ic,id,j,k,li) + dc1(i) * g3(j,k,i,ic);
+        s2(j,k,li) = dc2(i) * dnh(v,ic,h,id,j,k,li) + dc1(i) * g3(j,k,i,ic);
         g3(j,k,i,ic) = s2(j,k,li);
       end
       if bc(6), li = l(end-i+1);
-        s2(j,k,li) = dc2(i) * dh(v,ic,id,j,k,li) + dc1(i) * g6(j,k,i,ic);
+        s2(j,k,li) = dc2(i) * dnh(v,ic,h,id,j,k,li) + dc1(i) * g6(j,k,i,ic);
         g6(j,k,i,ic) = s2(j,k,li);
       end
     otherwise error id

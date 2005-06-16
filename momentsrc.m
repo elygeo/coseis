@@ -8,11 +8,6 @@ if initialize
     msrcradius = 0;
     return
   end
-  l = 1:n(3)-1;
-  k = 1:n(2)-1;
-  j = 1:n(1)-1;
-  s2(j,k,l) = dncg( x, 1, x, 1, j, k, l );
-  i = s2 ~= 0; s2(i) = 1 ./ s2(i);
   w1(:) = 0;
   w1(j,k,l,:) = 0.125 * ( ...
     x(j,k,l,:) + x(j+1,k+1,l+1,:) + ...
@@ -33,10 +28,18 @@ if initialize
   msrci = find( s1 < msrcradius ^ 2 );
   msrcx = msrcradius - sqrt( s1( msrci ) );
   msrcx = msrcx / sum( msrcx );
-  msrcx = msrcx .* s2( msrci );
-  msrct = [];
-  s1(:) = 0;
   w1(:) = 0;
+  s1(:) = 0;
+  i1 = halo1 + 1;
+  i2 = halo1 + ncore;
+  l = i1(3):i1(3)-1;
+  k = i1(2):i1(2)-1;
+  j = i1(1):i1(1)-1;
+  s1(j,k,l) = dng( x, 1, x, 1, j, k, l );
+  i = s1 ~= 0; s1(i) = 1 ./ s1(i);
+  msrcx = msrcx .* s1( msrci );
+  s1(:) = 0;
+  msrct = [];
   c = [ 1 6 5; 6 2 4; 5 4 3 ];
   [ vec, val ] = eig( moment(c) );
   m0 = max( abs( val(:) ) );

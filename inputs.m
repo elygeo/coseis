@@ -53,10 +53,10 @@ out = {
 };
 model = 'normal';
 model = 'the3';
-model = '';
 model = 'strikeslip';
 model = 'pointsrc';
 model = 'kostrov';
+model = '';
 switch model
 case ''
   %nrmdim = 0;
@@ -78,6 +78,7 @@ case 'normal'
   grid = 'normal';
   traction = [ 0 -120e6 -70e6   1 0 1   -1  0 -1 ];
 case 'kostrov'
+  npml = 10;
   rcrit = 1e10;
   friction = [ 1e10 1   1e10 0   1 1 1  -1 -1 -1 ];
   traction = [ -100e6 -90e6 0    1 1 1  -1 -1 -1 ];

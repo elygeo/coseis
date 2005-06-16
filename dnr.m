@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
-% DNCR - node-to-cell rectangular grid difference operator
+% DNR - node-to-cell rectangular grid difference operator
 
-function df = dncr( f, i, x, a, j, k, l )
+function df = dnr( f, i, x, a, j, k, l )
 switch a
 case 1
 df = 1 / 4 * ...

@@ -26,32 +26,24 @@ for iz = 1:size( material, 1 )
   nu    = .5 * lam0 / ( lam0 + miu0 );
   courant = dt * vp * sqrt( 3 ) / h;   % TODO: check, make general
   fprintf( 'courant: %g < 1\n', courant )
-  l = i1(3):i2(3);
-  k = i1(2):i2(2);
-  j = i1(1):i2(1);
-  rho(j,k,l) = 1 / rho0;
   l = i1(3):i2(3)-1;
   k = i1(2):i2(2)-1;
   j = i1(1):i2(1)-1;
+  s1(j,k,l) = rho0;
   lam(j,k,l) = lam0;
   miu(j,k,l) = miu0;
 end
+l = hypocenter(3);
+k = hypocenter(2);
+j = hypocenter(1);
+rho0 = s1(j,k,l);
+lam0 = lam(j,k,l);
+miu0 = miu(j,k,l);
+gamma = dt * viscosity;
 
 for iz = 1:size( operator, 1 )
   zone = [ operator{iz,2:7} ];
   [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
-  i1 = max( i1, i1pml );
-  i2 = min( i2, i2pml );
-  opi1(iz,:) = i1;
-  opi2(iz,:) = i2;
-  l = i1(3):i2(3);
-  k = i1(2):i2(2);
-  j = i1(1):i2(1);
-  switch operator{iz,1}
-  case { 'g', 'r' }, w1(j,k,l,1) = 1;
-  case   'h',        w1(j,k,l,1) = h^2;
-  otherwise error operator
-  end
   l = i1(3):i2(3)-1;
   k = i1(2):i2(2)-1;
   j = i1(1):i2(1)-1;
@@ -61,66 +53,54 @@ for iz = 1:size( operator, 1 )
   case 3, l(l==hypocenter(3)) = [];
   end
   switch operator{iz,1}
-  case { 'g', 'r' }, w2(j,k,l,1) = 1;
-  case   'h',        w2(j,k,l,1) = h^2;
+  case 'g', s2(j,k,l) = dng( x, 1, x, 1, j, k, l );
+  case 'r', s2(j,k,l) = dnr( x, 1, x, 1, j, k, l );
+  case 'h', s2(j,k,l) = h ^ 3;
   otherwise error operator
-  end
+  i1 = max( i1, i1pml );
+  i2 = min( i2, i2pml );
+  opi1(iz,:) = i1;
+  opi2(iz,:) = i2;
 end
-i1 = i1full;
-i2 = i2full;
-l = i1(3):i2(3)-1;
-k = i1(2):i2(2)-1;
-j = i1(1):i2(1)-1;
-i = 0:npml-1;
-switch nrmdim
-case 1, j(j==hypocenter(1)) = [];
-case 2, k(k==hypocenter(2)) = [];
-case 3, l(l==hypocenter(3)) = [];
-end
-s2(j,k,l) = dncg( x, 1, x, 1, j, k, l );
-if s2(s2<0); fprinf( 'Negative cell volume!\n' ), end
-if bc(1), ji = j(i+1);   w2(ji,k,l) = h^2; end
-if bc(4), ji = j(end-i); w2(ji,k,l) = h^2; end
-if bc(2), ki = k(i+1);   w2(j,ki,l) = h^2; end
-if bc(5), ki = k(end-i); w2(j,ki,l) = h^2; end
-if bc(3), li = l(i+1);   w2(j,k,li) = h^2; end
-if bc(6), li = l(end-i); w2(j,k,li) = h^2; end
+
+i1 = halo1 + 1;
+i2 = halo1 + ncore;
 l = i1(3):i2(3);
 k = i1(2):i2(2);
 j = i1(1):i2(1);
-s1(j,k,l,) = 0.125 * ( ...
-  s2(j,k,l) + s2(j-1,k-1,l-1) + ...
-  s2(j-1,k,l) + s2(j,k-1,l-1) + ...
-  s2(j,k-1,l) + s2(j-1,k,l-1) + ...
-  s2(j,k,l-1) + s2(j-1,k-1,l) );
-if bc(1), ji = j(i+1);   w1(ji,k,l) = h^2; end
-if bc(4), ji = j(end-i); w1(ji,k,l) = h^2; end
-if bc(2), ki = k(i+1);   w1(j,ki,l) = h^2; end
-if bc(5), ki = k(end-i); w1(j,ki,l) = h^2; end
-if bc(3), li = l(i+1);   w1(j,k,li) = h^2; end
-if bc(6), li = l(end-i); w1(j,k,li) = h^2; end
-i = s1 ~= 0; s1(i) = w1(i) ./ s1(i);
-i = s2 ~= 0; s2(i) = w2(i) ./ s2(i);
-w1(:) = 0;
-w2(:) = 0;
 
-l = hypocenter(3);
-k = hypocenter(2);
-j = hypocenter(1);
-rho0 = 1 / rho(j,k,l);
-lam0 = lam(j,k,l);
-miu0 = miu(j,k,l);
-gamma = dt * viscosity;
+yn(j,k,l) = ...
+  s1(j,k,l) + s1(j-1,k-1,l-1) + ...
+  s1(j-1,k,l) + s1(j,k-1,l-1) + ...
+  s1(j,k-1,l) + s1(j-1,k,l-1) + ...
+  s1(j,k,l-1) + s1(j-1,k-1,l);
+ih = hypocenter;
+switch nrmdim
+case 1
+  yn(ih(1),:,:)   = yn(ih(1),:,:) + yn(ih(1)+1,:,:);
+  yn(ih(1)+1,:,:) = yn(ih(1),:,:);
+case 2
+  yn(:,ih(2),:)   = yn(:,ih(2),:) + yn(:,ih(2)+1,:);
+  yn(:,ih(2)+1,:) = yn(:,ih(2),:);
+case 3
+  yn(:,:,ih(3))   = yn(:,:,ih(3)) + yn(:,:,ih(3)+1);
+  yn(:,:,ih(3)+1) = yn(:,:,ih(3));
+end
+i = yn ~= 0; yn(i) = dt * 8 ./ yn(i);
+yc = 6 * ( lam + 2 * lam );
+i = yc ~= 0; yc = yc .* miu .* ( lam + miu ) ./ yc(i) / h ^ 2;
 
-hgy = 6 * ( lam + 2 * lam );
-i = hgy ~= 0;
-hgy(i) = 1 ./ hgy(i);
-hgy = hgy .* miu .* ( lam + miu );
-
-mdt = rho .* s1 * dt;
+s1 = s1 .* s2;
+rho(j,k,l) = ...
+  s1(j,k,l) + s1(j-1,k-1,l-1) + ...
+  s1(j-1,k,l) + s1(j,k-1,l-1) + ...
+  s1(j,k-1,l) + s1(j-1,k,l-1) + ...
+  s1(j,k,l-1) + s1(j-1,k-1,l);
+i = rho ~= 0; rho(i) = dt * 8 ./ rho(i);
+i = s2 ~= 0; s2(i) = 1 ./ s2(i);
 lam = lam .* s2;
 miu = miu .* s2;
-hgy = hgy * dt / h ^ 2;
+
 s1(:) = 0;
 s2(:) = 0;
 

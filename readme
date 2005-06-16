@@ -28,53 +28,29 @@ COORDINATE SYSTEM
 
 COMPUTATIONAL CYCLE
  
-S = stress tensor
-A = acceleration vector
-V = velocity vector
 U = displacement vector
-lam miu = elastic moduli
-T = matrix transpose
-' = d/dt
-" = d^2/dt^2
+V = velocity vector
+A = acceleration vector
+W = stress tensor
+rho = density
+c lam miu = elastic moduli
  
-1. Moment tensor source
- 
-2. Linearized conservation of momentum, Newton's 2nd law
-   A    = divS/rho
-   a_i  = s_ij,j/rho
-
-3. Fault boundary condition
- 
-4. Velocity
-   V'   = A
-   v'_i = a_i
-
-5. Displacement
-   U'   = V
-   u'_i = v_i
-
-6. Modified displacements
-   U~   = U + dt*beta*V
-   u~_i = u_i + dt*beta*v_i
- 
-7. Modified strain
-   E    = [gradU~ + (gradU~)^T]/2
-   e_ij = [u~_i,j + u~_j,i]/2
- 
-8. Stress: viscoelastic solid constitutive law, Kelvin-Voight
-   model, linear, isotropic, spring and dashpot in parallel
-   S    = c:E
-   S    = lam*trace(E)*I + 2*miu*E
-   s_ij = lam*e_kk*delta_ij + 2*miu*e_ij
-
-
-Combined
-   rho*U" = grad_(lam*div.U~) + div.miu*[grad_U~ + (grad_U~)^T]
-          = (lam+miu)*grad_(div.U~) + miu*del^2 U~
-            + (grad_lam)*(div.U~) + grad_miu.[grad_U~ + (grad_U~)^T]
-   rho*u"_i = (lam*u~_j,j)_,i + [miu*(u~_i,j + u~_j,i)]_,j
-            = (lam+miu)*u~_j,j,i + miu*u~_i,j,j
-              + lam_,i*u~_j,j + miu_,j*[u~_i,j + u~_j,i]
+Moment tensor source
+  W = W + M'*dt
+Linearized conservation of momentum, Newton's 2nd law
+  A = divW/rho
+  (Fault boundary condition)
+  V' = A
+  U' = V
+Modified displacement
+  U~ = U + dt*beta*V
+Strain
+  E = [gradU~ + (gradU~)^T]/2
+Stress-strain constitutive law
+  W = c:E
+Viscoelastic solid, Kelvin-Voight model, linear, isotropic,
+spring and dashpot in parallel
+  W = lam*trace(E)*I + 2*miu*E
 
 
 FAULT BOUNDARY CONDITION
@@ -82,72 +58,75 @@ FAULT BOUNDARY CONDITION
 n   = fault normal vector, n points toward the positive side of the fault
 T   = traction exerted by the positive side
 T0  = initial traction
-Sn0 = initial normal component of stress
+Wn0 = initial normal component of stress
 R   = restoring force on a node
 m   = nodal mass
-a   = element area
+s   = element area
 F   = friction, |Ts| cannot exceed friction
 
 Acceleration and velocity of the double nodes due to restoring forces
 and traction.
 
-- side acc   a0 = [R0 + a*(T-T0)]/m0	
-+ side acc   a1 = [R1 - a*(T-T0)]/m1
+with no fault
+A0 = A1 = (R0+R1)/(m0+m1)
 
-with no fault  a0 = a1 = (R0+R1)/(m0+m1)
+- side acc   A0 = [R0 + s*(T-T0)]/m0	
++ side acc   A1 = [R1 - s*(T-T0)]/m1
 
-- side vel   v0(t2) = v0 + dt*[R0 + a*(T-T0)]/m0
-+ side vel   v1(t2) = v1 + dt*[R1 - a*(T-T0)]/m1
+- side vel   V0_ = V0 + dt*[R0 + s*(T-T0)]/m0
++ side vel   V1_ = V1 + dt*[R1 - s*(T-T0)]/m1
 
-- side disp  u0(t2) = u0 + dt*{ v0(t0) + dt*[R0 + a*(T-T0)]/m0 }
-+ side disp  u1(t2) = u1 + dt*{ v1(t0) + dt*[R1 - a*(T-T0)]/m1 }
+- side disp  U0_ = U0 + dt*{ V0(t0) + dt*[R0 + s*(T-T0)]/m0 }
++ side disp  U1_ = U1 + dt*{ V1(t0) + dt*[R1 - s*(T-T0)]/m1 }
 
-dv = v1(t2) - v0(t2)
-   = v1-v0 + dt*(R1/m1-R0/m0) - dt*a*(1/m1+1/m0)*(T-T0)
+dA = A1 - A0
+   = (R1/m1-R0/m0) - s*(1/m1+1/m0)*(T-T0)
 
-du = u1(t2) - u0(t2)
-   = u1-u0 + dt*dv
-   = u1-u0 + dt*(v1-v0) + dt^2*(R1/m1-R0/m0) - dt^2*a*(1/m1+1/m0)*(T-T0)
+dV = V1_ - V0_
+   = V1-V0 + dt*dA
+   = V1-V0 + dt*(R1/m1-R0/m0) - dt*s*(1/m1+1/m0)*(T-T0)
+
+dU = U1_ - U0_
+   = U1-U0 + dt*dV
+   = U1-U0 + dt*(V1-V0) + dt^2*(R1/m1-R0/m0) - dt^2*s*(1/m1+1/m0)*(T-T0)
+
+Zero relative acceleration boundary condition
+dA = 0
+Ta = T0 + (R1/m1-R0/m0) / [s*(1/m1+1/m0)]
 
 Zero relative velocity boundary condition
-
-0  = dv
-Tv = T0 + [v1-v0 + dt*(R1/m1-R0/m0)] / [dt*a*(1/m1+1/m0)]
+dV = 0
+Tv = T0 + [V1-V0 + dt*(R1/m1-R0/m0)] / [dt*s*(1/m1+1/m0)]
+   = Ta + (V1-V0) / [dt*s*(1/m1+1/m0)]
 
 Zero relative normal displacement boundary condition
-
-0  = du
-Tu = T0 + [u1-u0 + dt*(v1-v0) + dt^2*(R1/m1-R0/m0)] / [dt^2*a*(1/m1+1/m0)]
-   = Tv + (u1-u0) / [dt^2*a*(1/m1+1/m0)]
+dU = 0
+Tu = T0 + [U1-U0 + dt*(V1-V0) + dt^2*(R1/m1-R0/m0)] / [dt^2*s*(1/m1+1/m0)]
+   = Tv + (U1-U0) / [dt^2*s*(1/m1+1/m0)]
 
 Shear component of traction is bounded by friction
-
-Ts  = Tv.(I-nn)
-Ts' = / Ts,         |Ts| <= F
+Ts = Tv.(I-nn)
+Ts~ = / Ts,         |Ts| <= F
       \ F*Ts/|Ts|,  |Ts| >  F
 
 Fault glued shut
-
 Tn = Tv.n
 
 Normal component of traction is bounded by cohesion (fault can open)
-
-Tn  = Tu.n
-    = (Tv + u1-u0).n / [dt^2*a*(1/m1+1/m0)]
-Tn' = / Tn,     Tn <= cohes
+Tn = Tu.n
+   = (Tv + U1-U0).n / [dt^2*s*(1/m1+1/m0)]
+Tn~ = / Tn,     Tn <= cohes
       \ cohes,  Tn >  cohes
 
 Total traction bounded by friction
-
-T' = Tn'.n + Ts'
+T~ = Tn~.n + Ts~
 
 Update velocities
-
-v0(t2) = v0(t0) + dt*(R0 + a*(T'-T0))/m0
-v1(t2) = v1(t0) + dt*(R1 - a*(T'-T0))/m1
+V0_ = V0 + dt*(R0 + s*(T~-T0))/m0
+V1_ = V1 + dt*(R1 - s*(T~-T0))/m1
 
 DFM fault boundary condition
-T  = T0 + [R1*m0-R0*m1 + m1*m0*(v1-v0)/dt] / [a*(m1+m0)]
+T = T0 + [R1*m0-R0*m1 + m1*m0*(v1-v0)/dt] / [s*(m1+m0)]
 
 
 SLIP-WEAKENING FRICTION LAW
@@ -165,7 +144,7 @@ u(l) = / us - (us-ud)*l/d0,  l <= d0
 
        us +
           |\
- ^ T0/Sn0 + \
+ ^ T0/Wn0 + \
  |        |  \
  u     ud +   +---------
           |
@@ -185,6 +164,32 @@ d0 =~ (3 or 4)*dx*(Tu - Tf)/miu
 
 
 HOURGLASS CORRECTIONS
+
+One of the first works in this direction was presented by Kosloff and Frazier (1978), but in their formulation it is necessary to solve 4 systems of 8 equations for distorted three-dimensional elements, and this is not cost efficient for dynamic analysis.
+Flanagan and Belytschko (1981), Belytschko (1983), and Belytschko, Ong, Liu and Kennedy (1984) presented a systematic and effective way to hourglass control, but in both formulations a parameter, to be defined by the user, is required.  
+Belytschko and Binderman (1993) implemented the hourglass control of the eight-node hexahedral element, where the stabilization parameter is not required, although the stabilization matrix still depends on the Poisson coefficient; the aspect was eliminated by Liu, Hu and Belytschko (1994).
+
+Kosloff, D. and Frazier, G. A.,1978, "Treatment of hourglass patterns in low-order finite element codes", Int. J. Num. Analyt. Meth. Geomech., vol. 2, pp. 57-72.
+
+
+***Flanagan, D. P. and Belytschko, T.,1981, "A uniform strain hexahedron and quadrilateral with orthogonal hourglass control", Int. J. Num. Meth. Engng., vol. 17, pp. 679-706.
+
+Belytschko, T.,1983, "Correction of article by D. P. Flanagan and T. Belytschko", Int. J. Num. Meth. Engng., vol. 19, pp. 467-468.
+
+Belytschko, T., Ong, J. S-J., Liu, W. K. and Keneddy, J. M., 1984, "Hourglass control in linear and nonlinear problems", Comp. Meth. Appl. Mech. Engng., vol. 43, pp. 251-276.
+
+
+
+***Belytschko, T. and Binderman, L. P., 1993, "Assumed strain stabilization of the eight-node hexahedral element", Comp. Meth. Appl. Mech. Engng., vol. 105, pp. 225-260.
+
+Liu, W. K., Hu,Y. K. and Belytschko, T.,1994, "Multiple quadrature underintegrated finite elements", Int. J. Num. Meth. Engng., vol. 37, pp. 3263-3289.
+
+
+From LS_DYNA theoretica manual:
+
+Belytschko, T., Wong, B. L. and Chiang, H. Y., 1992, "Advances in one-point quadrature", Int. J. Num. Meth. Engng., vol. 96, pp. 93-107.
+
+Wilkins et al, "A Method for Computer Simulation of Problems in Solid Mechanics and Gas Dynamics in Three Dimensions and Time", UC, LLNL, Rept. UCRL-51574 (1974)
 
 Deformation Modes for hexahedron: 8 * 3 = 24 degrees of freedom
 
@@ -212,12 +217,11 @@ Nonuniform strain: 12 = 24 DOF - 6 rigid body - 6 uniform strain
 
 Y = miu*(lam+miu)/6/(lam+2*miu)
 
-Q = du/dv*dx^2*dy^2*Y
-a = dQ/dv/rho
+Q = Y*dU*dx^2*dy^2/dv^2
+A = dQ/dv/rho
 
-Q = du/h*Y
-a = dQ/h/rho
-
+Q = Y*dU*/h^2
+A = dQ/h^3/rho
 
 MOMENT SOURCE
 
@@ -245,24 +249,24 @@ Partial derivative operator
           0     0     d/dz ]
 
 Olsen no PML
-F  = divS
+F = divW
 V' = F/rho
-G  = gradV
-S' = lam*trace(G)*I + miu*(G + G^T)
+G = gradV
+W' = lam*trace(G)*I + miu*(G + G^T)
 
 SORD Hourglass
-F  = divS + hourglass
+F = divW + hourglass
 V' = F/rho
 U' = V
-G  = grad(U + gamma*V)
-S  = lam*trace(G)*I + miu*(G + G^T)
+G = grad(U + gamma*V)
+W = lam*trace(G)*I + miu*(G + G^T)
 
 SORD PML
 if D == 0
-  F  = divS
+  F = divW
 else
-  P' + DP = [del]S
-  F  = 1.P'
+  P' + DP = [del]W
+  F = 1.P'
 end
 V' = F/rho
 U' = V
@@ -271,13 +275,13 @@ if D == 0
 else
   G' + DG = gradV
 end
-S  = lam*trace(G)*I + miu*(G + G^T)
+W = lam*trace(G)*I + miu*(G + G^T)
 
 PML Discretization
-(p2 - p1)/dt   + d*(p2 + p1)/2 = dS/dx
-(p2 - p1)/dt*2 + d*(p2 + p1)   = 2*dS/dx
-(p2 - p1)/dt*(2 + d*dt) + 2*d*p1 = 2*dS/dx
-(p2 - p1)/dt = -2*d/(2 + d*dt)*p1 + 2/(2 + d*dt)*dS/dx
+(p2 - p1)/dt   + d*(p2 + p1)/2 = dW/dx
+(p2 - p1)/dt*2 + d*(p2 + p1)   = 2*dW/dx
+(p2 - p1)/dt*(2 + d*dt) + 2*d*p1 = 2*dW/dx
+(p2 - p1)/dt = -2*d/(2 + d*dt)*p1 + 2/(2 + d*dt)*dW/dx
 v2 = v1 + (p2 - p1)/dt/rho
 u2 = u1 + v * dt
 (g2 - g1)/dt  + d*(g2 + g1)/2  = dv/dx
@@ -297,7 +301,7 @@ c3  =  1/1500
 
 REYNOLDS GLYPH
 
-r = Sij ni nj
+r = Wij ni nj
 
 Vector
 

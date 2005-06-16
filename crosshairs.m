@@ -69,13 +69,13 @@ switch field
 case 'u'
   vga(1:3) = u(j,k,l,:);
   mga = sum( u(j,k,l,:) .* u(j,k,l,:), 4 );
-  tmp = [ sqrt( mga ) vga mdt(j,k,l) ];
-  msg = sprintf( '|U| %9.2e\nUx  %9.2e\nUy  %9.2e\nUz  %9.2e\nmdt %9.2e', tmp );
+  tmp = [ sqrt( mga ) vga rho(j,k,l) ];
+  msg = sprintf( '|U| %9.2e\nUx  %9.2e\nUy  %9.2e\nUz  %9.2e\nrho %9.2e', tmp );
 case 'v'
   vga(1:3) = v(j,k,l,:);
   mga = s1(j,k,l);
-  tmp = [ sqrt( mga ) vga mdt(j,k,l) ];
-  msg = sprintf( '|V| %9.2e\nVx  %9.2e\nVy  %9.2e\nVz  %9.2e\nmdt %9.2e', tmp );
+  tmp = [ sqrt( mga ) vga rho(j,k,l) ];
+  msg = sprintf( '|V| %9.2e\nVx  %9.2e\nVy  %9.2e\nVz  %9.2e\nrho %9.2e', tmp );
 case 'w'
   c = [ 1 6 5; 6 2 4; 5 4 3 ];
   clear wg
