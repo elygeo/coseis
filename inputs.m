@@ -27,7 +27,7 @@ truptol = .001;
 checkpoint = -1;
 symmetries = [];
 npml = 0;
-bc = [ 1 1 0   1 1 1 ];
+bc = [ 1 1 1   1 1 1 ];
 locknodes = [
   1 1 1    1  1  1    1 -1 -1   % top
   1 1 1    1  1  1   -1  1 -1   % front
@@ -54,21 +54,28 @@ out = {
 model = 'normal';
 model = 'the3';
 model = 'strikeslip';
+model = '';
 model = 'kostrov';
 model = 'pointsrc';
-model = '';
 switch model
 case ''
   nrmdim = 0;
   n = [ 3 3 3 ]; nt = 1;
+case 'unit'
+  material = [ 1   1 1     1 1 1   -1 -1 -1 ];
+  viscosity = [ 0 .3 ];
+  npml = 2;
+  bc = [ 1 1 1   1 1 1 ];
 case 'pointsrc'
   nt = 100;
   n = [ 40 40 40 ]; msrcnodealign = 0;
+  n = [ 11 11 11 ]; msrcnodealign = 1;
   n = [ 41 41 41 ]; msrcnodealign = 1;
+  msrcradius = 0;
   msrcradius = 2.5 * h;
-  msrcradius = 2 * h;
   srctimefcn = 'brune';
   moment = -1e18 * [ 1 1 1   0 0 0 ];
+  npml = 0;
   npml = 10;
   plotstyle = 'slice';
   nrmdim = 0;

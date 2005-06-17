@@ -23,6 +23,7 @@ for iz = 1:size( material, 1 )
   matmin = min( matmin, material(iz,1:3) );
   miu0  = rho0 .* vs .* vs;
   lam0  = rho0 .* ( vp .* vp - 2 * vs .* vs );
+  yc0   = miu0 * ( lam0 + miu0 ) / 6 / ( lam0 + 2 * miu0 ) * 4 / h ^ 2;
   nu    = .5 * lam0 / ( lam0 + miu0 );
   courant = dt * vp * sqrt( 3 ) / h;   % TODO: check, make general
   fprintf( 'courant: %g < 1\n', courant )
@@ -32,6 +33,7 @@ for iz = 1:size( material, 1 )
   s1(j,k,l) = rho0;
   lam(j,k,l) = lam0;
   miu(j,k,l) = miu0;
+  yc(j,k,l) = yc0;
 end
 l = hypocenter(3);
 k = hypocenter(2);
@@ -70,35 +72,20 @@ l = i1(3):i2(3);
 k = i1(2):i2(2);
 j = i1(1):i2(1);
 
-yn(j,k,l) = ...
+yn(j,k,l) = 0.125 * ( ...
   s1(j,k,l) + s1(j-1,k-1,l-1) + ...
   s1(j-1,k,l) + s1(j,k-1,l-1) + ...
   s1(j,k-1,l) + s1(j-1,k,l-1) + ...
-  s1(j,k,l-1) + s1(j-1,k-1,l);
-ih = hypocenter;
-switch nrmdim
-case 1
-  yn(ih(1),:,:)   = yn(ih(1),:,:) + yn(ih(1)+1,:,:);
-  yn(ih(1)+1,:,:) = yn(ih(1),:,:);
-case 2
-  yn(:,ih(2),:)   = yn(:,ih(2),:) + yn(:,ih(2)+1,:);
-  yn(:,ih(2)+1,:) = yn(:,ih(2),:);
-case 3
-  yn(:,:,ih(3))   = yn(:,:,ih(3)) + yn(:,:,ih(3)+1);
-  yn(:,:,ih(3)+1) = yn(:,:,ih(3));
-end
-i = yn ~= 0; yn(i) = dt * 8 ./ yn(i);
-yc = h ^ 2 * 6 * ( lam + 2 * lam );
-i = yc ~= 0; yc(i) = 1 ./ yc(i);
-yc = yc .* miu .* ( lam + miu );
-
+  s1(j,k,l-1) + s1(j-1,k-1,l) );
 s1 = s1 .* s2;
-rho(j,k,l) = ...
+rho(j,k,l) = 0.125 * ( ...
   s1(j,k,l) + s1(j-1,k-1,l-1) + ...
   s1(j-1,k,l) + s1(j,k-1,l-1) + ...
   s1(j,k-1,l) + s1(j-1,k,l-1) + ...
-  s1(j,k,l-1) + s1(j-1,k-1,l);
-i = rho ~= 0; rho(i) = dt * 8 ./ rho(i);
+  s1(j,k,l-1) + s1(j-1,k-1,l) );
+i = yn  ~= 0; yn(i)  = dt ./ yn(i);
+i = rho ~= 0; rho(i) = dt ./ rho(i);
+
 i = s2 ~= 0; s2(i) = 1 ./ s2(i);
 lam = lam .* s2;
 miu = miu .* s2;

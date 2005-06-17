@@ -37,21 +37,21 @@ for id = [ ic:3 1:ic-1 ];
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
-  i = 0:npml-1;
+  i = 1:npml;
   if ic == id
-    if bc(1), ji = j(i+1);   s2(ji,k,l) = dch( w1, ic, h, id, ji, k, l ); end
-    if bc(4), ji = j(end-i); s2(ji,k,l) = dch( w1, ic, h, id, ji, k, l ); end
-    if bc(2), ki = k(i+1);   s2(j,ki,l) = dch( w1, ic, h, id, j, ki, l ); end
-    if bc(5), ki = k(end-i); s2(j,ki,l) = dch( w1, ic, h, id, j, ki, l ); end
-    if bc(3), li = l(i+1);   s2(j,k,li) = dch( w1, ic, h, id, j, k, li ); end
-    if bc(6), li = l(end-i); s2(j,k,li) = dch( w1, ic, h, id, j, k, li ); end
-  else
-    if bc(1), ji = j(i+1);   s2(ji,k,l) = dch( w2, ix, h, id, ji, k, l ); end
-    if bc(4), ji = j(end-i); s2(ji,k,l) = dch( w2, ix, h, id, ji, k, l ); end
-    if bc(2), ki = k(i+1);   s2(j,ki,l) = dch( w2, ix, h, id, j, ki, l ); end
-    if bc(5), ki = k(end-i); s2(j,ki,l) = dch( w2, ix, h, id, j, ki, l ); end
-    if bc(3), li = l(i+1);   s2(j,k,li) = dch( w2, ix, h, id, j, k, li ); end
-    if bc(6), li = l(end-i); s2(j,k,li) = dch( w2, ix, h, id, j, k, li ); end
+    if bc(1), ji = j(i);       s2(ji,k,l) = dch( w1, ic, h, id, ji, k, l ); end
+    if bc(4), ji = j(end-i+1); s2(ji,k,l) = dch( w1, ic, h, id, ji, k, l ); end
+    if bc(2), ki = k(i);       s2(j,ki,l) = dch( w1, ic, h, id, j, ki, l ); end
+    if bc(5), ki = k(end-i+1); s2(j,ki,l) = dch( w1, ic, h, id, j, ki, l ); end
+    if bc(3), li = l(i);       s2(j,k,li) = dch( w1, ic, h, id, j, k, li ); end
+    if bc(6), li = l(end-i+1); s2(j,k,li) = dch( w1, ic, h, id, j, k, li ); end
+  else                      
+    if bc(1), ji = j(i);       s2(ji,k,l) = dch( w2, ix, h, id, ji, k, l ); end
+    if bc(4), ji = j(end-i+1); s2(ji,k,l) = dch( w2, ix, h, id, ji, k, l ); end
+    if bc(2), ki = k(i);       s2(j,ki,l) = dch( w2, ix, h, id, j, ki, l ); end
+    if bc(5), ki = k(end-i+1); s2(j,ki,l) = dch( w2, ix, h, id, j, ki, l ); end
+    if bc(3), li = l(i);       s2(j,k,li) = dch( w2, ix, h, id, j, k, li ); end
+    if bc(6), li = l(end-i+1); s2(j,k,li) = dch( w2, ix, h, id, j, k, li ); end
   end
   for i = 1:npml
     switch id
@@ -120,17 +120,6 @@ for iq = 1:4
   k = i1(2):i2(2);
   j = i1(1):i2(1);
   s2(j,k,l) = yn(j,k,l) .* hch( s1, 1,  iq, j, k, l );
-  switch nrmdim
-  case 1
-    s2(ih(1),:,:)   = s2(ih(1),:,:) + s2(ih(1)+1,:,:);
-    s2(ih(1)+1,:,:) = s2(ih(1),:,:);
-  case 2
-    s2(:,ih(2),:)   = s2(:,ih(2),:) + s2(:,ih(2)+1,:);
-    s2(:,ih(2)+1,:) = s2(:,ih(2),:);
-  case 3
-    s2(:,:,ih(3))   = s2(:,:,ih(3)) + s2(:,:,ih(3)+1);
-    s2(:,:,ih(3)+1) = s2(:,:,ih(3));
-  end
   w1(:,:,:,ic) = w1(:,:,:,ic) - s2;
 end
 end
