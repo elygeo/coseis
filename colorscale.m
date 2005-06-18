@@ -26,7 +26,7 @@ xscl = xlim; if xscl < 0, xscl = double( umax ); end;
 if xscl, xscl = .5 * h / xscl; end
 cellfocus = 1;
 switch field
-case 'u', fscl = uscl; titles = { '|V|' 'Ux' 'Uy' 'Uz' }; cellfocus = 0;
+case 'u', fscl = uscl; titles = { '|U|' 'Ux' 'Uy' 'Uz' }; cellfocus = 0;
 case 'v', fscl = vscl; titles = { '|V|' 'Vx' 'Vy' 'Vz' }; cellfocus = 0;
 case 'w', fscl = wscl; titles = { '|W|' 'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
 otherwise error field

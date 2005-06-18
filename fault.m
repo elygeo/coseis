@@ -204,7 +204,6 @@ cohes1 = cohes;
 tn1 = -tn;
 i = tn1 < 0;
 tn1(i) = 0;
-if find( i ), fprintf( 'fault opening!\n' ), end
 c = repmat( 1, size( dc ) );
 i = uslip < dc;
 c(i) = uslip(i) ./ dc(i);
@@ -220,6 +219,7 @@ end
 % Shear traction bounded by friction
 c = repmat( 1, size( ff ) );
 i = ts > ff;
+if find( ff <= 0 ), fprintf( 'fault opening!\n' ), end
 c(i) = ff(i) ./ ts(i);
 for i = 1:3
   t(:,:,:,i) = -t0(:,:,:,i) + tn3(:,:,:,i) + c .* ts3(:,:,:,i);
