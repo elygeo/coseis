@@ -26,31 +26,20 @@ case 'h'
       { 'SORD - Support-Operator Rupture Dynamics'
         'by Geoffrey Ely - gely@ucsd.edu'
         ''
-        'Run/Step/Pause             R Space Click'
-        'Explore                       Arrows C E'
-        'Color Scale                      [ ] \\ |'
-        'Zoom                               < > /'
-        'Rotate                              Drag'
-        'Field                              U V W'
-        'Component                            0-6'
-        'Time Series                            T'
-        '3D/2D                                  D'
-        'Plot Volumes/Slices                    P'
-        'Glyphs                                 G'
-        'Isosurfaces                            I'
-        'Surfaces                               S'
-        'Mesh                                   M'
-        'Mesh Distortion                        X'
-        'Outline                                O'
-        'Axis                                   A'
-        'Replot                             Enter'
-        'Clean Up                       Backspace'
-        'Frame +/-                       - = Page'
-        'First/Last Frame                Home End'
-        'Delete Frame                         Del'
-        'Write/Read Checkpoint          Q Shift+Q'
-        'Build Movie                            B'
-        'Help                                   H'
+        'Help                           H     Build Movie                    B'
+        'Run/Step/Pause     R Space Click     Frame -/+               - = Page'
+        'Write/Read Checkpoint   Q Shft+Q     First/Last Frame        Home End'
+        '                                     Delete Frame                 Del'
+        'Field                      U V W     Replot                     Enter'
+        'Component                    0-6                                     '
+        'Volumes/Slices                 P     Explore               Arrows C E'
+        'Glyphs                         G     Time Series                    T'
+        'Isosurfaces                    I     Rotate                      Drag'
+        'Surfaces                       S     Zoom                       < > /'
+        'Outline                        O     3D/2D                          D'
+        'Mesh                           M     Axis                           A'
+        'Mesh Distortion                X     Color Scale              [ ] \\ |'
+        'Fault Plane                    F     Clean Up               Backspace'
       }, ...
       'Tag', 'help', ...
       'Vertical',   'middle', ...
@@ -84,8 +73,8 @@ case 'leftarrow',  xhairmove = -2; crosshairs
 case 'rightarrow', xhairmove = 2;  crosshairs
 case 'c',          xhairmove = 4;  crosshairs
 case 'e',          xhairmove = 6;  crosshairs
-case 'space', itstep = 1;       msg = 'Step';
-case 'r',     itstep = nt - it; msg = 'Run';
+case 'space', if km, itstep = 10; else itstep = 1; end, msg = 'Step';
+case 'r', itstep = nt - it; msg = 'Run';
 case '0', comp = 0; colorscale; msg = titles( 1 );
 case '1', comp = 1; colorscale; msg = titles( 2 );
 case '2', comp = 2; colorscale; msg = titles( 3 );
@@ -205,6 +194,14 @@ case 'v', field = 'v'; colorscale; msg = titles{ comp + 1};
 case 'w', field = 'w'; colorscale; msg = titles{ comp + 1};
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
+case 'f'
+  tmp = findobj( [ frame{ showframe } hhud ], 'Tag', 'fault' );
+  if length( tmp ), dofault = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
+  dofault = ~dofault;
+  if dofault, visible = 'on';  msg = 'Fault plane on';
+  else        visible = 'off'; msg = 'Fault plane off';
+  end
+  if length( tmp ), set( tmp, 'Visible', visible ), end
 case 'o'
   tmp = findobj( [ frame{ showframe } hhud ], 'Tag', 'outline' );
   if length( tmp ), dooutline = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
@@ -264,7 +261,7 @@ case 'q'
     for i = 1:nframe
       set( [ frame{i} ], 'UserData', i )
     end
-    saveas( 1, 'Checkpoint' )
+    saveas( 1, 'checkpoint' )
     msg = 'Checkpoint Saved';
   else
     load checkpoint

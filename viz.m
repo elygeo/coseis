@@ -72,6 +72,7 @@ end
 switch plotstyle
 case 'hold'
 otherwise
+  dofault = 0;
   doglyph = 0;
   domesh = 0;
   dosurf = 0;
@@ -80,6 +81,7 @@ otherwise
   volviz = 1;
   switch plotstyle
   case 'outline'
+  case 'fault',      dofault = 1;
   case 'slice',      dosurf = 1; volviz = 0;
   case 'cube',       dosurf = 1;
   case 'glyphs',     doglyph = 1;

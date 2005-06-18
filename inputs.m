@@ -27,7 +27,7 @@ truptol = .001;
 checkpoint = -1;
 symmetries = [];
 npml = 0;
-bc = [ 1 1 1   1 1 1 ];
+bc = [ 1 1 0   1 1 1 ];
 locknodes = [
   1 1 1    1  1  1    1 -1 -1   % top
   1 1 1    1  1  1   -1  1 -1   % front
@@ -38,16 +38,21 @@ locknodes = [
 ];
 locknodes = [];
 out = {
+  'u' 1    1  1  1   -1 -1  1
   'v' 1    1  1  1   -1 -1  1
   'w' 1    1  1  1   -1 -1  1
+  'u' 1    1  1  0   -1 -1  0
   'v' 1    1  1  0   -1 -1  0
   'w' 1    1  1  0   -1 -1  0
+  'u' 1    1  0  1   -1  0 -1
   'v' 1    1  0  1   -1  0 -1
   'w' 1    1  0  1   -1  0 -1
+  'u' 1    0  1  1    0 -1 -1
   'v' 1    0  1  1    0 -1 -1
   'w' 1    0  1  1    0 -1 -1
 };
 out = {
+  'u' 1    1  1  1   -1 -1 -1
   'v' 1    1  1  1   -1 -1 -1
   'w' 1    1  1  1   -1 -1 -1
 };
@@ -55,8 +60,8 @@ model = 'normal';
 model = 'the3';
 model = 'strikeslip';
 model = '';
-model = 'kostrov';
 model = 'pointsrc';
+model = 'kostrov';
 switch model
 case ''
   nrmdim = 0;
@@ -70,10 +75,12 @@ case 'pointsrc'
   nt = 100;
   n = [ 40 40 40 ]; msrcnodealign = 0;
   n = [ 11 11 11 ]; msrcnodealign = 1;
+  n = [ 81 81 21 ]; msrcnodealign = 1;
   n = [ 41 41 41 ]; msrcnodealign = 1;
   msrcradius = 0;
   msrcradius = 2.5 * h;
   srctimefcn = 'brune';
+  srctimefcn = 'sbrune';
   moment = -1e18 * [ 1 1 1   0 0 0 ];
   npml = 0;
   npml = 10;
@@ -85,6 +92,7 @@ case 'normal'
   grid = 'normal';
   traction = [ 0 -120e6 -70e6   1 0 1   -1  0 -1 ];
 case 'kostrov'
+  npml = 0;
   npml = 10;
   rcrit = 1e10;
   friction = [ 1e10 1   1e10 0   1 1 1  -1 -1 -1 ];
@@ -92,7 +100,7 @@ case 'kostrov'
   grid = 'slant';
   grid = 'constant';
   n = [ 201 201 201 ]; nt = 400; plotstyle = '';
-  n = [  31  31  31 ]; nt =  90; plotstyle = 'slice';
+  n = [  31  31  31 ]; nt =  90; plotstyle = 'fault';
 case 'luis'
   friction = [ .677 .525   .4 0   2 0 1   4 0 3 ];
   traction = [ -81.6e6 -120e6 0   3 0 2   3 0 2 ];

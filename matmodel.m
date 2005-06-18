@@ -11,6 +11,8 @@ s2  = repmat( zero, n );
 rho = repmat( zero, n );
 miu = repmat( zero, n );
 lam = repmat( zero, n );
+yc  = repmat( zero, n );
+yn  = repmat( zero, n );
 matmax = material(1,1:3);
 matmin = material(1,1:3);
 for iz = 1:size( material, 1 )
@@ -68,6 +70,19 @@ end
 
 i1 = halo1 + 1;
 i2 = halo1 + ncore;
+
+l = i1(3)-1:i2(3);
+k = i1(2)-1:i2(2);
+j = i1(1)-1:i2(1);
+
+if bc(1), ji = j(1);   s1(ji,k,l) = s1(ji+1,k,l); s2(ji,k,l) = s1(ji+1,k,l); end
+if bc(1), ji = j(1);   s1(ji,k,l) = s1(ji+1,k,l); s2(ji,k,l) = s1(ji+1,k,l); end
+if bc(4), ji = j(end); s1(ji,k,l) = s1(ji-1,k,l); s2(ji,k,l) = s1(ji-1,k,l); end
+if bc(2), ki = k(1);   s1(j,ki,l) = s1(j,ki+1,l); s2(j,ki,l) = s1(j,ki+1,l); end
+if bc(5), ki = k(end); s1(j,ki,l) = s1(j,ki-1,l); s2(j,ki,l) = s1(j,ki-1,l); end
+if bc(3), li = l(1);   s1(j,k,li) = s1(j,k,li+1); s2(j,k,li) = s1(j,k,li+1); end
+if bc(6), li = l(end); s1(j,k,li) = s1(j,k,li-1); s2(j,k,li) = s1(j,k,li-1); end
+
 l = i1(3):i2(3);
 k = i1(2):i2(2);
 j = i1(1):i2(1);
