@@ -59,8 +59,7 @@ for iz = 1:size( out, 1 )
       rg = sum( xg .* xg );
       rg = sqrt( rg );
       tg = tg - rg / vp;
-      i = find( tg > 0 );
-      if 0 && xg(1) || xg(2)
+      if ( xg(1) || xg(2) )
         rot = [ xg(1)  xg(2) xg(1)*xg(3)
                 xg(2) -xg(1) xg(2)*xg(3)
                 xg(3)     0 -xg(1)*xg(1)-xg(2)*xg(2) ];
@@ -68,10 +67,11 @@ for iz = 1:size( out, 1 )
         for i = 1:3
           rot(i,:) = rot(i,:) ./ tmp;
         end
-        vg = [ vg vg * rot ];
-        newtitles = { newtitles{:} 'Vr' 'Vh' 'Vv' };
+        vg = vg * rot;
+        newtitles = { 'Vr' 'Vh' 'Vv' };
       end
       vk = zeros( it+1, 1 );
+      i = find( tg > 0 );
       switch srctimefcn
       case 'brune'
         vk(i,1) = moment(1) / 4 / pi / rho0 / vp ^ 2 / domp ^ 2 / rg / vp * ...
@@ -84,7 +84,7 @@ for iz = 1:size( out, 1 )
       if km
         vk = filter( b, a, [ vk; zeros( nn - 1, 1 ) ] );
       end
-      %plot( time, vk, ':' )
+      plot( time, vk, ':' )
       hold on
     end
     plot( time, vg )
