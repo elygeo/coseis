@@ -1,6 +1,6 @@
 %------------------------------------------------------------------------------%
 % PLANEWAVE
-
+FIXME
 domp = 8 * dt;
 time = ( 1 : it ) * dt;  % time indexing goes wi vi wi+1 vi+1 ...
 switch srctimefcn

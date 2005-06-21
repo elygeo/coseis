@@ -53,17 +53,17 @@ if initialize
 end
 
 domp = 8 * dt;
-time = ( .5 : it-.5 ) * dt;  % time indexing goes wi vi wi+1 vi+1 ...
+time = ( .5 : it - .5 ) * dt;  % time indexing goes wi vi wi+1 vi+1 ...
 switch srctimefcn
-case 'delta',  msrct = zeros( size( time ) ); msrct(1) = 1;
-case 'sine',   msrct = dt * sin( 2 * pi * time / domp ) * pi / domp;
-case 'brune',  msrct = dt * time .* exp( -time / domp ) / domp ^ 2;
-case 'sbrune', msrct = dt * time .^ 2 .* exp( -time / domp ) / 2 / domp ^ 3;
+case 'delta',  msrcdf = zeros( size( time ) ); msrct(1) = 1 / dt;
+case 'brune',  msrcdf = time .* exp( -time / domp ) / domp ^ 2;
+case 'sbrune', msrcdf = time .^ 2 .* exp( -time / domp ) / 2 / domp ^ 3;
 otherwise error srctimefcn
 end
+msrcf = dt * cumsum( msrcdf );
 o = prod( n );
 for i = 0:2
-  w1(msrci+o*i) = w1(msrci+o*i) + msrct(it) * msrcx * moment(i+1);
-  w2(msrci+o*i) = w2(msrci+o*i) + msrct(it) * msrcx * moment(i+4);
+  w1(msrci+o*i) = w1(msrci+o*i) - msrcf(it) * msrcx * moment(i+1);
+  w2(msrci+o*i) = w2(msrci+o*i) - msrcf(it) * msrcx * moment(i+4);
 end
 

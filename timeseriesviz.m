@@ -27,36 +27,77 @@ for iz = 1:size( out, 1 )
      'DefaultLineLinewidth', linewidth, ...
      'DefaultTextHorizontalAlignment', 'center', ...
      'DefaultTextColor', foreground )
-    clear xg
+    clear vg
     for i = 1:ncomp
       for itt = 1:it
         file = sprintf( 'out/%02d/%1d/%05d', iz, i, itt );
         fid = fopen( file, 'rl' );
         fseek( fid, offset, -1 );
-        xg(itt+1,i) = fread( fid, 1, 'float32' );
+        vg(itt+1,i) = fread( fid, 1, 'float32' );
         fclose( fid );
       end
     end
+    tg = time;
+    newtitles = titles(2:end);
     if km
       fcorner = vp / ( 6 * h );
       nn = 2 * round( 1 / ( fcorner * dt ) );
       b = .5 * ( 1 - cos( 2 * pi * (1:nn-1) / nn ) );  % hanning
       %b = [ b b(end-1:-1:1) ];
       a  = sum( b );
-      xg = filter( b, a, [ xg; zeros( nn-1, ncomp ) ] );
+      vg = filter( b, a, [ vg; zeros( nn - 1, size( vg, 2 ) ) ] );
       time = [ time time(end) + dt * ( 1 : nn - 1 ) ];
     end
-    plot( time, xg )
+    if strcmp( model, 'explosion' ) && strcmp( field, 'v' )
+      j = xhair(1) + halo1(1);
+      k = xhair(2) + halo1(2);
+      l = xhair(3) + halo1(3);
+      j1 = hypocenter(1);
+      k1 = hypocenter(2);
+      l1 = hypocenter(3);
+      xg = squeeze( x(j,k,l,:) - x(j1,k1,l1,:) );
+      rg = sum( xg .* xg );
+      rg = sqrt( rg );
+      tg = tg - rg / vp;
+      i = find( tg > 0 );
+      if 0 && xg(1) || xg(2)
+        rot = [ xg(1)  xg(2) xg(1)*xg(3)
+                xg(2) -xg(1) xg(2)*xg(3)
+                xg(3)     0 -xg(1)*xg(1)-xg(2)*xg(2) ];
+        tmp = sqrt( sum( rot .* rot, 1 ) );
+        for i = 1:3
+          rot(i,:) = rot(i,:) ./ tmp;
+        end
+        vg = [ vg vg * rot ];
+        newtitles = { newtitles{:} 'Vr' 'Vh' 'Vv' };
+      end
+      vk = zeros( it+1, 1 );
+      switch srctimefcn
+      case 'brune'
+        vk(i,1) = moment(1) / 4 / pi / rho0 / vp ^ 2 / domp ^ 2 / rg / vp * ...
+        exp( -tg(i) / domp ) .* ( tg(i) * vp / rg - tg(i) / domp + 1 );
+      case 'sbrune'
+        vk(i,1) = moment(1) / 8 / pi / rho0 / vp ^ 2 / domp ^ 3 / rg / vp * ...
+        exp( -tg(i) / domp ) .* ( tg(i) * vp / rg - tg(i) / domp + 2 ) .* tg(i);
+      otherwise error srctimefcn
+      end
+      if km
+        vk = filter( b, a, [ vk; zeros( nn - 1, 1 ) ] );
+      end
+      %plot( time, vk, ':' )
+      hold on
+    end
+    plot( time, vg )
     hold on
-    for i = 1:ncomp
-      [ tmp, ii ] = max( abs( xg(:,i) ) );
+    for i = 1 : length( newtitles )
+      [ tmp, ii ] = max( abs( vg(:,i) ) );
       iii = max( 1, ii - 1 );
       xg1 = .5 * ( time(ii) + time(iii) );
-      xg2 = .5 * ( xg(ii,i) + xg(iii,i) );
+      xg2 = .5 * ( vg(ii,i) + vg(iii,i) );
       if xg2 > 0
-        text( xg1, xg2, titles(i+1), 'Hor', 'right', 'Ver', 'bottom' )
+        text( xg1, xg2, newtitles(i), 'Hor', 'right', 'Ver', 'bottom' )
       else
-        text( xg1, xg2, titles(i+1), 'Hor', 'right', 'Ver', 'top' )
+        text( xg1, xg2, newtitles(i), 'Hor', 'right', 'Ver', 'top' )
       end
     end
     ylabel( field )
@@ -67,9 +108,9 @@ for iz = 1:size( out, 1 )
       figure
       scl = .5 * h * ( 1 / fscl ) ^ glyphexp;
       for i = 1:3
-        xg(:,i) = xhairtarg(i) + scl * xg(:,i);
+        vg(:,i) = xhairtarg(i) + scl * vg(:,i);
       end
-      hglyph = plot3( xg(:,1), xg(:,2), xg(:,3) );
+      hglyph = plot3( vg(:,1), vg(:,2), vg(:,3) );
     end
     msg = '';
     return

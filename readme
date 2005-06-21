@@ -35,10 +35,9 @@ W = stress tensor
 rho = density
 c lam miu = elastic moduli
  
-Moment tensor source
-  W = W + M'*dt
 Linearized conservation of momentum, Newton's 2nd law
   A = divW/rho
+  (hourglass corrections)
   (Fault boundary condition)
   V' = A
   U' = V
@@ -51,6 +50,8 @@ Stress-strain constitutive law
 Viscoelastic solid, Kelvin-Voight model, linear, isotropic,
 spring and dashpot in parallel
   W = lam*trace(E)*I + 2*miu*E
+Moment tensor source
+  W = W + M'*dt
 
 
 FAULT BOUNDARY CONDITION
@@ -109,7 +110,7 @@ Ts = Tv.(I-nn)
 Ts~ = / Ts,         |Ts| <= F
       \ F*Ts/|Ts|,  |Ts| >  F
 
-Fault glued shut
+Fault cannot open
 Tn = Tv.n
 
 Normal component of traction is bounded by cohesion (fault can open)
@@ -160,6 +161,21 @@ rc =~  miu*d0*(Tu - Tf)/(T0 - Tf)^2
 
 Estimate d0 needed to resolve breakdown zone
 d0 =~ (3 or 4)*dx*(Tu - Tf)/miu
+
+
+
+KOSTROV SOLUTION
+
+Kostrov, 1964
+
+Circular crack expanding at a uniform rupture velocity
+
+vslip = C * dT / miu * vs * t / sqrt(t^2-(r/vrup)^2) * heaviside(t-r/vrup)
+
+dT   = stress drop
+vs   = sqrt( vp^2 / 3 )   (Poisson's ratio, nu = .25)
+vrup = 0.9 * vs
+C    = .81 for given nu and vrup (Dahlen, 1974)
 
 
 
@@ -225,15 +241,32 @@ A = dQ/h^3/rho
 
 MOMENT SOURCE
 
+del2phi - phi''/vp^2 = - 4*pi*delta(r)f(t)
+phi = -f(t - t/vp)/r
+
 Brune Source
-M   = -H * M0 / T   * e^(-t/T) * (t + T) + M0
-M'  =  H * M0 / T^2 * e^(-t/T) *  t
-M'' = -H * M0 / T^3 * e^(-t/T) * (t - T)
+M   = -M0 * H / T   * e^(-t/T) * (t + T) + M0
+M'  =  M0 * H / T^2 * e^(-t/T) *  t
+M'' = -M0 * H / T^3 * e^(-t/T) * (t - T)
+
+
 
 Smooth Brune
 M   = -H * M0 / 2 / T^2 * e^(-t/T) * (t^2 + 2*t*T + 2*T^2) + M0
 M'  =  H * M0 / 2 / T^3 * e^(-t/T) *  t^2
 M'' = -H * M0 / 2 / T^4 * e^(-t/T) * (t^2 - 2*t*T)
+
+
+george
+
+boo bruce dan chris
+
+lara curt mike
+
+nick chey kim beak
+
+brian an wade ian (jen)
+
 
 
 PML ABSORBING BOUNDARY

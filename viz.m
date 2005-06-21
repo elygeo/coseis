@@ -106,7 +106,11 @@ hhud = []; hmsg = []; hhelp = [];
 colorscale
 set( gcf, 'CurrentAxes', haxes(2) )
 text( .50, .05, titles( comp + 1 ) );
-text( .98, .98, sprintf( '%.3fs', it * dt ), 'Hor', 'right' )
+switch field
+case 'v', time = ( it - .5 ) * dt;
+otherwise time = it * dt;
+end
+text( .98, .98, sprintf( '%.3fs', time ), 'Hor', 'right' )
 set( gcf, 'CurrentAxes', haxes(1) )
 
 volumes = [ 1 1 1   -1 -1 -1 ];
