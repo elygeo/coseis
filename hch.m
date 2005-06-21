@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
 % HCH - hourglass corrections
 
-function hg = hgh( f, i, iq, j, k, l )
+function hg = hch( f, i, iq, j, k, l )
 
 switch iq
 case 1, hg = ...

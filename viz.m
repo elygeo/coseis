@@ -66,7 +66,7 @@ elseif initialize
     'DefaultTextHorizontalAlignment', 'center', ...
     'DefaultAxesPosition', [ 0 0 1 1 ], ...
     'DefaultAxesVisible', 'off' )
-  haxes = axes( 'Position', [ .02 .1 .96 .88 ] );
+  haxes = axes( 'Position', [ .02 .1 .96 .88 ], 'Tag', 'mainaxes' );
   cameramenu
   cameratoolbar
   cameratoolbar( 'SetMode', 'orbit' )

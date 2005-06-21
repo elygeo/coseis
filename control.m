@@ -255,28 +255,19 @@ case 'a'
 case 't', timeseriesviz
 case 'q'
   if ~km
-    if nrmdim, save checkpoint it u v uslip trup
-    else       save checkpoint it u v
+    save checkpoint it u umax v vmax uslip uslipmax trup p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6
+    if exist( 'checkpoint.out', 'dir' )
+      rmdir( 'checkpoint.out', 's' )
     end
-    delete( [ hhud hmsg hhelp ] )
-    hhud = []; hmsg = []; hhelp = [];
-    set( 1, 'UserData', nframe )
-    for i = 1:nframe
-      set( [ frame{i} ], 'UserData', i )
-    end
-    saveas( 1, 'checkpoint' )
+    copyfile( 'out', 'checkpoint.out' )
     msg = 'Checkpoint Saved';
   else
     load checkpoint
     wstep
-    delete(1)
-    openfig( 'checkpoint' );
-    haxes = get( 1, 'Children' );
-    nframe = get( 1, 'UserData' );
-    for i = 1:nframe
-      frame{i} = findobj( 1, 'UserData', i )';
+    if exist( 'out', 'dir' )
+      rmdir( 'out', 's' )
     end
-    showframe = nframe;
+    copyfile( 'checkpoint.out', 'out' )
     msg = 'Checkpoint Loaded';
   end
 case 'b'

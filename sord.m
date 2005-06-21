@@ -3,8 +3,8 @@
 
 %profile report
 %profile plot
-%profile clear
-%profile on
+profile clear
+profile on
 %dbstop if error
 
 clear all

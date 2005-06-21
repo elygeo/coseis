@@ -135,6 +135,8 @@ dc1 = ( 2 - dt * dampc ) ./ ( 2 + dt * dampc );
 dn2 = 2 ./ ( 2 + dt * dampn );
 dc2 = 2 * dt ./ ( 2 + dt * dampc );
 nn = [ n 3 ];
+p1 = []; p2 = []; p3 = []; p4 = []; p5 = []; p6 = [];
+g1 = []; g2 = []; g3 = []; g4 = []; g5 = []; g6 = [];
 nn(1) = npml;
 if bc(1), p1 = repmat( zero, nn ); g1 = repmat( zero, nn ); end
 if bc(4), p4 = repmat( zero, nn ); g4 = repmat( zero, nn ); end

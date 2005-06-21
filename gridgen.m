@@ -63,8 +63,9 @@ case 'spherical'
   h = 1.5 * h;
 case 'slant'
   operator = { 'g'  1 1 1  -1 -1 -1 };
-  theta = 30 * pi / 180;
-  scl = 1.25;
+  theta = 20 * pi / 180;
+  tmp = sqrt( cos( theta ) ^ 2 + ( 1 - sin( theta ) ) ^ 2 );
+  scl = sqrt( 2 ) / tmp
   x1 = s1 - s3 * sin( theta );
   x3 = s3 * cos( theta );
   x1 = scl * x1;

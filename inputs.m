@@ -73,8 +73,8 @@ case 'unit'
   bc = [ 1 1 1   1 1 1 ];
 case 'explosion'
   nt = 100;
-  grid = 'constant';
-  grid = 'slant';
+  bc = [ 0 1 0   0 1 0 ]; grid = 'slant';
+  bc = [ 1 1 1   1 1 1 ]; grid = 'constant';
   n = [ 40 40 40 ]; msrcnodealign = 0;
   n = [ 11 11 11 ]; msrcnodealign = 1;
   n = [ 41 41 41 ]; msrcnodealign = 1;
@@ -86,7 +86,6 @@ case 'explosion'
   npml = 10;
   plotstyle = 'slice';
   nrmdim = 0;
-  bc = [ 1 1 1   1 1 1 ];
   out = { 'v' 1    1  1  1    -1  0  0 };
 case 'strikeslip'
   plotstyle = 'slice';

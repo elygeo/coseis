@@ -8,7 +8,8 @@ c = [ 1 2 3; 2 3 1; 3 1 2 ];
 s2(:) = 0;
 w2(:) = 0;
 for ic = 1:3
-s1 = u(:,:,:,ic) + gamma(1) .* v(:,:,:,ic);
+%s1 = u(:,:,:,ic) + gamma(1) .* v(:,:,:,ic);
+s1 = u(:,:,:,ic);
 for id = 1:3
   ix = 6 - ic - id;
   for iz = 1:size( operator, 1 )
@@ -84,7 +85,7 @@ for id = 1:3
       end
       if bc(6), li = l(end-i+1);
         s2(j,k,li) = dnh( v, ic, h, id, j, k, li );
-        s2(j,k,li) = dc2(i) * s2(j,k,l) + dc1(i) * g6(j,k,i,ic);
+        s2(j,k,li) = dc2(i) * s2(j,k,li) + dc1(i) * g6(j,k,i,ic);
         g6(j,k,i,ic) = s2(j,k,li);
       end
     otherwise error id

@@ -17,7 +17,7 @@ i2pml = halo1 + ncore - bc(4:6) * npml;
 
 readcheckpoint = 0;
 one = 1;
-%if str2double( version( '-release' ) ) >= 14, one = single( 1 ); end
+if str2double( version( '-release' ) ) >= 14, one = single( 1 ); end
 zero = 0 * one;
 mem = whos( 'one' );
 mem = round( mem.bytes / 1024 ^ 2 * 21 * prod( n ) );
@@ -40,6 +40,8 @@ uslipmax = 0;
 vslipmax = 0;
 tnmax = 0;
 tsmax = 0;
+uslip = [];
+trup = [];
 
 if readcheckpoint, load checkpoint, wstep, end
 fprintf( '    Step      V        U        W      Viz/IO   Total\n' )
