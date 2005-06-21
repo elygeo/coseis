@@ -28,7 +28,7 @@ for iz = 1:size( volumes, 1 )
     elseif comp,     vg = w1(j,k,l,comp); 
     else             vg = s2(j,k,l); 
     end
-  otherwise error field
+  otherwise return
   end
   if ~cellfocus
     xg = x(j,k,l,:) + xscl * u(j,k,l,:); 

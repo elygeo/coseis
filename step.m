@@ -11,7 +11,13 @@ while itstep
   vstep
   wt(2) = toc;
   u = u + dt * v;
-  if nrmdim, uslip = uslip + dt * vslip; end
+  if nrmdim
+    uslip = uslip + dt * vslip;
+    uslipmax = max( abs( uslip(:) ) );
+    vslipmax = max( abs( vslip(:) ) );
+    tnmax = max( abs( tn(:) ) );
+    tsmax = max( abs( ts(:) ) );
+  end
   wt(3) = toc;
   wstep
   wt(4) = toc;

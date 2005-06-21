@@ -16,7 +16,7 @@ C    = .81;
 dT   = Ts0 - fd0 * Tn0;
 fcorner = vp / ( 6 * h );
 nn   = 2 * round( 1 / ( fcorner * dt ) );
-b    = hanning( nn );
+b    = .5 * ( 1 - cos( 2 * pi * (1:nn-1) / nn ) );  % hanning
 a    = sum( b );
 t    = ( 1 : nt )' * dt;
 fid  = fopen( 'out/01/mesh', 'r', endian );
@@ -36,7 +36,7 @@ for it = 1:nt
   vg(it,:) = fread( fid, inf, 'float32' );
   fclose( fid );
 end
-vg = filter( b, a, vg );
+%vg = filter( b, a, vg );
 
 if ~ishandle(3), figure(3), end
 set( 0, 'CurrentFigure', 3 )

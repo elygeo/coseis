@@ -185,13 +185,16 @@ case 'x'
   if xlim, msg = 'Mesh distortion on';
   else     msg = 'Mesh distortion off';
   end
-case 'u', field = 'u'; colorscale; msg = titles{ comp + 1};
+case 'u', if km, field = 'uslip'; else, field = 'u'; end 
+  colorscale; msg = titles{ comp + 1};
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
-case 'v', field = 'v'; colorscale; msg = titles{ comp + 1};
+case 'v', if km, field = 'vslip'; else, field = 'v'; end 
+  colorscale; msg = titles{ comp + 1};
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
-case 'w', field = 'w'; colorscale; msg = titles{ comp + 1};
+case 'w', if km, field = 't'; else, field = 'w'; end 
+  colorscale; msg = titles{ comp + 1};
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
 case 'f'

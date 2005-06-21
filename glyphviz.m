@@ -86,7 +86,7 @@ for iz = 1:size( glyphs, 1 )
       mga = [ mga; val' ];
       vga = [ vga; vec(:)' ];
     end
-  otherwise error field
+  otherwise return
   end
 end
 
