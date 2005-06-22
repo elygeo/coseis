@@ -58,10 +58,10 @@ out = {
 };
 model = 'normal';
 model = 'the3';
-model = 'strikeslip';
 model = '';
 model = 'explosion';
 model = 'kostrov';
+model = 'strikeslip';
 switch model
 case ''
   nrmdim = 0;
@@ -90,6 +90,9 @@ case 'explosion'
   nrmdim = 0;
   out = { 'v' 1    1  1  1    -1  0  0 };
 case 'strikeslip'
+  n = [ 41 41 41 ]; nt = 60;
+  grid = 'curve';
+  grid = 'constant';
   plotstyle = 'slice';
 case 'normal'
   grid = 'normal';
@@ -98,6 +101,7 @@ case 'kostrov'
   npml = 0;
   npml = 10;
   nclramp = 0;
+  nclramp = 10;
   bc = [ 0 0 0   0 0 0 ];
   bc = [ 0 1 0   0 1 0 ];
   rcrit = 1e10;
@@ -107,11 +111,12 @@ case 'kostrov'
   grid = 'constant';
   n = [ 201  41 201 ]; nt = 400; plotstyle = '';
   n = [ 101  41 101 ]; nt = 200; plotstyle = 'fault';
-  n = [  41  41  41 ]; nt =  90; plotstyle = 'fault';
   n = [  61  41  61 ]; nt = 120; plotstyle = 'fault';
+  n = [  41  41  41 ]; nt =  90; plotstyle = 'fault';
   out = {
     'uslip' 1    0  0  0   -1 -0 -0
     'vslip' 1    0  0  0   -1 -0 -0
+    'v'     1    1  1  1   -1 -0 -0
   };
 case 'luis'
   friction = [ .677 .525   .4 0   2 0 1   4 0 3 ];
