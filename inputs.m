@@ -59,9 +59,9 @@ out = {
 model = 'normal';
 model = 'the3';
 model = '';
-model = 'explosion';
 model = 'kostrov';
 model = 'strikeslip';
+model = 'explosion';
 switch model
 case ''
   nrmdim = 0;
@@ -72,10 +72,10 @@ case 'unit'
   npml = 2;
   bc = [ 1 1 1   1 1 1 ];
 case 'explosion'
-  nt = 200;
+  nt = 100;
+  bc = [ 1 1 0   1 1 1 ];
   bc = [ 0 1 0   0 1 0 ]; grid = 'slant';
   bc = [ 1 1 1   1 1 1 ]; grid = 'constant';
-  bc = [ 1 1 0   1 1 1 ];
   n = [ 40 40 40 ]; msrcnodealign = 0;
   n = [ 11 11 11 ]; msrcnodealign = 1;
   n = [ 61 41 61 ]; msrcnodealign = 1;
