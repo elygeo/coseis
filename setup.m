@@ -40,8 +40,6 @@ uslipmax = 0;
 vslipmax = 0;
 tnmax = 0;
 tsmax = 0;
-uslip = [];
-trup = [];
 
 if readcheckpoint, load checkpoint, wstep, end
 fprintf( '    Step      V        U        W      Viz/IO   Total\n' )

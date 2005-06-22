@@ -92,8 +92,8 @@ for iz = 1:size( out, 1 )
     for i = 1 : length( newtitles )
       [ tmp, ii ] = max( abs( vg(:,i) ) );
       iii = max( 1, ii - 1 );
-      xg1 = .5 * ( time(ii) + time(iii) );
-      xg2 = .5 * ( vg(ii,i) + vg(iii,i) );
+      xg1 = .5 * double( time(ii) + time(iii) );
+      xg2 = .5 * double( vg(ii,i) + vg(iii,i) );
       if xg2 > 0
         text( xg1, xg2, newtitles(i), 'Hor', 'right', 'Ver', 'bottom' )
       else
