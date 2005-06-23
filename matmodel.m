@@ -62,8 +62,6 @@ for iz = 1:size( operator, 1 )
   case 'h', s2(j,k,l) = h ^ 3;
   otherwise error operator
   end
-  i1 = max( i1, i1pml );
-  i2 = min( i2, i2pml );
   opi1(iz,:) = i1;
   opi2(iz,:) = i2;
 end

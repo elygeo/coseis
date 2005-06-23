@@ -72,8 +72,7 @@ case 'unit'
   npml = 2;
   bc = [ 1 1 1   1 1 1 ];
 case 'explosion'
-  nt = 100;
-  bc = [ 1 1 0   1 1 1 ];
+  nt = 120;
   bc = [ 0 1 0   0 1 0 ]; grid = 'slant';
   bc = [ 1 1 1   1 1 1 ]; grid = 'constant';
   n = [ 40 40 40 ]; msrcnodealign = 0;
@@ -81,6 +80,8 @@ case 'explosion'
   n = [ 61 41 61 ]; msrcnodealign = 1;
   n = [ 41 41 41 ]; msrcnodealign = 1;
   msrcradius = 1.5 * h;
+  viscosity = [ .3 .3 ];
+  viscosity = [ 0 .3 ];
   srctimefcn = 'brune';
   srctimefcn = 'sbrune';
   moment = 1e16 * [ 1 1 1   0 0 0 ];
