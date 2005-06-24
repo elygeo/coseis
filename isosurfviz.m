@@ -24,6 +24,11 @@ for iz = 1:size( volumes, 1 )
     else     vg = s1(j,k,l);
     end
   case 'w'
+    switch nrmdim
+    case 1, j(j==hypocenter(1)) = [];
+    case 2, k(k==hypocenter(2)) = [];
+    case 3, l(l==hypocenter(3)) = [];
+    end
     if     comp > 3, vg = w2(j,k,l,comp-3); 
     elseif comp,     vg = w1(j,k,l,comp); 
     else             vg = s2(j,k,l); 

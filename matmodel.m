@@ -48,54 +48,49 @@ gamma = dt * viscosity;
 for iz = 1:size( operator, 1 )
   zone = [ operator{iz,2:7} ];
   [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
+  opi1(iz,:) = i1;
+  opi2(iz,:) = i2;
   l = i1(3):i2(3)-1;
   k = i1(2):i2(2)-1;
   j = i1(1):i2(1)-1;
-  switch nrmdim
-  case 1, j(j==hypocenter(1)) = [];
-  case 2, k(k==hypocenter(2)) = [];
-  case 3, l(l==hypocenter(3)) = [];
-  end
-  switch operator{iz,1}
-  case 'g', s2(j,k,l) = dng( x, 1, x, 1, j, k, l );
-  case 'r', s2(j,k,l) = dnr( x, 1, x, 1, j, k, l );
-  case 'h', s2(j,k,l) = h ^ 3;
-  otherwise error operator
-  end
-  opi1(iz,:) = i1;
-  opi2(iz,:) = i2;
+  s2(j,k,l) = dfnc( operator{iz,1}, x, x, h, 1, 1, j, k, l );
+end
+switch nrmdim
+case 1, s2(hypcenter(1),:,:) = 0;
+case 2, s2(:,hypcenter(2),:) = 0;
+case 3, s2(:,:,hypcenter(3)) = 0;
 end
 
-i1 = halo1 + 1;
+i1 = halo1;
 i2 = halo1 + ncore;
-
-l = i1(3)-1:i2(3);
-k = i1(2)-1:i2(2);
-j = i1(1)-1:i2(1);
-
-if bc(1), ji = j(1);   s1(ji,k,l) = s1(ji+1,k,l); s2(ji,k,l) = s1(ji+1,k,l); end
-if bc(1), ji = j(1);   s1(ji,k,l) = s1(ji+1,k,l); s2(ji,k,l) = s1(ji+1,k,l); end
-if bc(4), ji = j(end); s1(ji,k,l) = s1(ji-1,k,l); s2(ji,k,l) = s1(ji-1,k,l); end
-if bc(2), ki = k(1);   s1(j,ki,l) = s1(j,ki+1,l); s2(j,ki,l) = s1(j,ki+1,l); end
-if bc(5), ki = k(end); s1(j,ki,l) = s1(j,ki-1,l); s2(j,ki,l) = s1(j,ki-1,l); end
-if bc(3), li = l(1);   s1(j,k,li) = s1(j,k,li+1); s2(j,k,li) = s1(j,k,li+1); end
-if bc(6), li = l(end); s1(j,k,li) = s1(j,k,li-1); s2(j,k,li) = s1(j,k,li-1); end
-
 l = i1(3):i2(3);
 k = i1(2):i2(2);
 j = i1(1):i2(1);
 
-yn(j,k,l) = 0.125 * ( ...
-  s1(j,k,l) + s1(j-1,k-1,l-1) + ...
-  s1(j-1,k,l) + s1(j,k-1,l-1) + ...
-  s1(j,k-1,l) + s1(j-1,k,l-1) + ...
-  s1(j,k,l-1) + s1(j-1,k-1,l) );
+if bc(1), ji = i1(1); s1(ji,k,l) = s1(ji+1,k,l); s2(ji,k,l) = s1(ji+1,k,l); end
+if bc(4), ji = i2(1); s1(ji,k,l) = s1(ji-1,k,l); s2(ji,k,l) = s1(ji-1,k,l); end
+if bc(2), ki = i1(2); s1(j,ki,l) = s1(j,ki+1,l); s2(j,ki,l) = s1(j,ki+1,l); end
+if bc(5), ki = i2(2); s1(j,ki,l) = s1(j,ki-1,l); s2(j,ki,l) = s1(j,ki-1,l); end
+if bc(3), li = i1(3); s1(j,k,li) = s1(j,k,li+1); s2(j,k,li) = s1(j,k,li+1); end
+if bc(6), li = i2(3); s1(j,k,li) = s1(j,k,li-1); s2(j,k,li) = s1(j,k,li-1); end
+
+i1 = halo1 + 1;
+i2 = halo1 + ncore;
+l = i1(3):i2(3);
+k = i1(2):i2(2);
+j = i1(1):i2(1);
+
+yn(j,k,l) = 0.125 * ...
+  ( s1(j,k,l) + s1(j-1,k-1,l-1) ...
+  + s1(j-1,k,l) + s1(j,k-1,l-1) ...
+  + s1(j,k-1,l) + s1(j-1,k,l-1) ...
+  + s1(j,k,l-1) + s1(j-1,k-1,l) );
 s1 = s1 .* s2;
-rho(j,k,l) = 0.125 * ( ...
-  s1(j,k,l) + s1(j-1,k-1,l-1) + ...
-  s1(j-1,k,l) + s1(j,k-1,l-1) + ...
-  s1(j,k-1,l) + s1(j-1,k,l-1) + ...
-  s1(j,k,l-1) + s1(j-1,k-1,l) );
+rho(j,k,l) = 0.125 * ...
+  ( s1(j,k,l) + s1(j-1,k-1,l-1) ...
+  + s1(j-1,k,l) + s1(j,k-1,l-1) ...
+  + s1(j,k-1,l) + s1(j-1,k,l-1) ...
+  + s1(j,k,l-1) + s1(j-1,k-1,l) );
 i = yn  ~= 0; yn(i)  = dt ./ yn(i);
 i = rho ~= 0; rho(i) = dt ./ rho(i);
 

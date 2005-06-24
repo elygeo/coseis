@@ -32,7 +32,7 @@ elseif initialize
   tslim = -1;
   camdist = -1;
   look = 4;
-  xhair = hypocenter - halo1;
+  xhair = hypocenter;
   if nrmdim, slicedim = nrmdim; else slicedim = crdsys(2); end
   if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
   else     foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 1;
@@ -125,8 +125,8 @@ if nrmdim
   volumes(2,i) = [ 0 -1 ];
 end
 slices = [ 1 1 1   -1 -1 -1 ];
-slices(slicedim)   = xhair(slicedim);
-slices(slicedim+3) = xhair(slicedim) + cellfocus;
+slices(slicedim)   = xhair(slicedim) - halo1(slicedim);
+slices(slicedim+3) = xhair(slicedim) - halo1(slicedim) + cellfocus;
 if nrmdim & slicedim ~= nrmdim
   slices = [ slices; slices ];
   i = nrmdim + [ 0 3 ];

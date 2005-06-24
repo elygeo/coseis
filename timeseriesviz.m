@@ -5,7 +5,7 @@ msg = 'no time series data at this location';
 for iz = 1:size( out, 1 )
   i1 = outi1(:,iz)';
   i2 = outi2(:,iz)';
-  i = xhair + halo1;
+  i = xhair;
   if outint(iz) == 1 && strcmp( outvar{iz}, field ) ...
     && sum( i >= i1 & i <= i2 ) == 3
     nn = i2 - i1 + 1;
@@ -49,9 +49,9 @@ for iz = 1:size( out, 1 )
       time = [ time time(end) + dt * ( 1 : nn - 1 ) ];
     end
     if strcmp( model, 'explosion' ) && strcmp( field, 'v' )
-      j = xhair(1) + halo1(1);
-      k = xhair(2) + halo1(2);
-      l = xhair(3) + halo1(3);
+      j = xhair(1);
+      k = xhair(2);
+      l = xhair(3);
       j1 = hypocenter(1);
       k1 = hypocenter(2);
       l1 = hypocenter(3);
@@ -102,7 +102,7 @@ for iz = 1:size( out, 1 )
     end
     ylabel( field )
     xlabel( 'Time' )
-    title( num2str( xhair + halo1 ) )
+    title( num2str( xhair ) )
     set( 0, 'CurrentFigure', 1 )
     if ncomp == 3 && 0
       figure

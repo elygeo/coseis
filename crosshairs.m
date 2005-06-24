@@ -3,12 +3,11 @@
 
 way = sign( xhairmove );
 xhairmove = abs( xhairmove );
-nc = ncore - cellfocus;
 if xhairmove == 4
-  xhair = hypocenter - halo1;
+  xhair = hypocenter;
   if nrmdim, slicedim = nrmdim; end
 elseif xhairmove == 5
-  xhair = hypocenter - halo1;
+  xhair = hypocenter;
   xhair(downdim) = 1;
   slicedim = downdim;
 elseif xhairmove == 6
@@ -19,7 +18,7 @@ elseif xhairmove == 6
   case 'w', maxi = wmaxi;
   end
   [ j, k, l ] = ind2sub( n, maxi );
-  xhair = [ j k l ] - halo1;
+  xhair = [ j k l ];
 else
   v1 = camup;
   v3 = camtarget - campos;
@@ -35,17 +34,14 @@ else
   slicedim = abs( xhairmove );
   i = slicedim;
   if length( hhud ), xhair(i) = xhair(i) + way; end
-  %if cellfocus && nrmdim == i && xhair(i) == hypocenter(i) - halo1(i)
-  %  xhair(i) = xhair(i) + way;
-  %end
-  xhair = min( xhair, nc );
-  xhair = max( xhair, 1 );
+  xhair = max( xhair, halo1 + 1 );
+  xhair = min( xhair, halo1 + ncore - cellfocus );
 end
 delete( [ hhud hhelp ] )
 hhelp = [];
-j = xhair(1) + halo1(1);
-k = xhair(2) + halo1(2);
-l = xhair(3) + halo1(3);
+j = xhair(1);
+k = xhair(2);
+l = xhair(3);
 clear xg xga mga vga
 if cellfocus
   for i = 1:3
@@ -103,7 +99,7 @@ if length( mga( mga ~= 0 ) )
   reynoldsglyph
   hhud = [ hhud hglyph ];
 end
-i1 = xhair + halo1;
+i1 = xhair;
 i = [ i1-1; i1; i1+1 ];
 if cellfocus
   j = [ 1 1 1 1 1 2 2 2 2 2 2 1 1 2 2 1 ] + 1;
@@ -146,8 +142,8 @@ if dooutline && ~volviz && ( dosurf || domesh || doglyph  )
   points = [ halo1 + 1 halo1 + ncore ];
   i1 = halo1 + 1;
   i2 = halo1 + ncore;
-  i1(slicedim) = xhair(slicedim) + halo1(slicedim);
-  i2(slicedim) = xhair(slicedim) + halo1(slicedim) + cellfocus;
+  i1(slicedim) = xhair(slicedim);
+  i2(slicedim) = xhair(slicedim) + cellfocus;
   i  = [ i1; i1+1; i2; i2-1 ];
   if cellfocus
     i1 = [ 1 1 2 2; 1 1 2 2; 1 1 2 2; 1 1 2 2;
