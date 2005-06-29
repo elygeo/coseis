@@ -2,7 +2,7 @@
 
 cd ..
 
-gtar -hzvc -f sord/save/sord.tgz sord/*.m sord/readme sord/tarball.sh
+gtar -hzvc -f sord/save/sord.tgz sord/*.m sord/readme sord/tarball.sh sord/*.f sord/makefile
 
 cd sord/save
 
