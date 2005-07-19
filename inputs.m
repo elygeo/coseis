@@ -27,6 +27,7 @@ case 'kostrov'
   n = [  61  41  61 120 ]; plotstyle = 'fault';
   n = [ 201  41 201 400 ]; plotstyle = '';
   n = [  41  41  41  90 ]; plotstyle = 'fault';
+  n = [  41  41  41  90 ]; plotstyle = '';
   out = {
     'uslip' 1    0  0  0   -1 -0 -0
     'vslip' 1    0  0  0   -1 -0 -0
