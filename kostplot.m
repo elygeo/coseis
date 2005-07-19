@@ -33,9 +33,9 @@ end
 
 c = .81;
 dtau = ts0 - fd0 * tn0;
-fcorner = vp / ( 8 * h );
-nn = 2 * round( 1 / ( fcorner * dt ) );
-b = .5 * ( 1 - cos( 2 * pi * (1:nn-1) / nn ) );  % hanning
+fcorner = vp / ( 8 * dx );
+n = 2 * round( 1 / ( fcorner * dt ) );
+b = .5 * ( 1 - cos( 2 * pi * ( 1 : n - 1 ) / n ) );  % hanning
 a = sum( b );
 tg = ( .5 : it - .5 )' * dt;
 xg = [];

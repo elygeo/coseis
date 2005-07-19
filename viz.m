@@ -125,8 +125,8 @@ if nrmdim
   volumes(2,i) = [ 0 -1 ];
 end
 slices = [ 1 1 1   -1 -1 -1 ];
-slices(slicedim)   = xhair(slicedim) - halo1(slicedim);
-slices(slicedim+3) = xhair(slicedim) - halo1(slicedim) + cellfocus;
+slices(slicedim)   = xhair(slicedim) - halo;
+slices(slicedim+3) = xhair(slicedim) - halo + cellfocus;
 if nrmdim & slicedim ~= nrmdim
   slices = [ slices; slices ];
   i = nrmdim + [ 0 3 ];

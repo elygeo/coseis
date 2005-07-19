@@ -1,0 +1,8 @@
+:g/./s|function|subroutine|gc
+:g/./s|switch|selectcase|gc
+:g/./s|case *\([^ ,]*\),\?|case(\1)\n|gc
+:g/./s|otherwise\(.*\)|case default\n\1\nend select|gc
+:g/./s|%|!|gc
+:g/./s|\.\.\.|\&|gc
+:g/./s|\.\*|\*|gc
+:g/./s|;$||gc

@@ -8,9 +8,9 @@ for iz = 1:size( out, 1 )
   i = xhair;
   if outint(iz) == 1 && strcmp( outvar{iz}, field ) ...
     && sum( i >= i1 & i <= i2 ) == 3
-    nn = i2 - i1 + 1;
+    n = i2 - i1 + 1;
     i = i - i1;
-    offset = 4 * sum( i .* cumprod( [ 1 nn(1:2) ] ) );
+    offset = 4 * sum( i .* cumprod( [ 1 n(1:2) ] ) );
     switch field
     case 'v', time = ( 0 : it ) * dt + dt / 2;
     otherwise time = ( 0 : it ) * dt;
@@ -40,13 +40,13 @@ for iz = 1:size( out, 1 )
     tg = time;
     newtitles = titles(2:end);
     if km
-      fcorner = vp / ( 6 * h );
-      nn = 2 * round( 1 / ( fcorner * dt ) );
-      b = .5 * ( 1 - cos( 2 * pi * (1:nn-1) / nn ) );  % hanning
+      fcorner = vp / ( 6 * dx );
+      n = 2 * round( 1 / ( fcorner * dt ) );
+      b = .5 * ( 1 - cos( 2 * pi * ( 1 : n - 1 ) / n ) );  % hanning
       %b = [ b b(end-1:-1:1) ];
       a  = sum( b );
-      vg = filter( b, a, [ vg; zeros( nn - 1, size( vg, 2 ) ) ] );
-      time = [ time time(end) + dt * ( 1 : nn - 1 ) ];
+      vg = filter( b, a, [ vg; zeros( n - 1, size( vg, 2 ) ) ] );
+      time = [ time time(end) + dt * ( 1 : n - 1 ) ];
     end
     if strcmp( model, 'explosion' ) && strcmp( field, 'v' )
       j = xhair(1);
@@ -82,7 +82,7 @@ for iz = 1:size( out, 1 )
       otherwise error srctimefcn
       end
       if km
-        vk = filter( b, a, [ vk; zeros( nn - 1, 1 ) ] );
+        vk = filter( b, a, [ vk; zeros( n - 1, 1 ) ] );
       end
       plot( time, vk, ':' )
       hold on
@@ -106,7 +106,7 @@ for iz = 1:size( out, 1 )
     set( 0, 'CurrentFigure', 1 )
     if ncomp == 3 && 0
       figure
-      scl = .5 * h * ( 1 / fscl ) ^ glyphexp;
+      scl = .5 * dx * ( 1 / fscl ) ^ glyphexp;
       for i = 1:3
         vg(:,i) = xhairtarg(i) + scl * vg(:,i);
       end

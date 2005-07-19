@@ -3,7 +3,7 @@
 
 hglyph = [];
 if ~length( mga ) || ~fscl, return, end
-scl = .5 * h * ( 1 / fscl ) ^ glyphexp;
+scl = .5 * dx * ( 1 / fscl ) ^ glyphexp;
 switch size( mga, 2 );
 case 1
   mga = scl * mga .^ ( 0.5 * glyphexp - 0.5 );

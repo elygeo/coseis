@@ -30,7 +30,7 @@ if initialize
     outnc(iz) = length( c );
     if outint(iz) < 0, outint(iz) = outint(iz) + nt + 1; end
     zone = [ out{iz,3:8} ];
-    [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
+    [ i1, i2 ] = zoneselect( zone, halo, np, hypocenter, nrmdim );
     i2 = i2 - cells;
     if faultplane
       i1(nrmdim) = hypocenter(nrmdim);

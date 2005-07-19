@@ -4,15 +4,16 @@
 if itstep < 1, itstep = 1; end
 
 while itstep
+  clear n
   tic
   wt = 0;
   itstep = itstep - 1;
   it = it + 1;
   vstep
   wt(2) = toc;
-  u = u + dt * v;
+  u(:,:,:,:) = u(:,:,:,:) + dt * v(:,:,:,:);
   if nrmdim
-    uslip = uslip + dt * vslip;
+    uslip(:,:,:,:) = uslip(:,:,:,:) + dt * vslip(:,:,:,:);
     uslipmax = max( abs( uslip(:) ) );
     vslipmax = max( abs( vslip(:) ) );
     tnmax = max( abs( tn(:) ) );
@@ -28,7 +29,7 @@ while itstep
   umax = sqrt( umax );
   vmax = sqrt( vmax );
   wmax = sqrt( wmax );
-  if umax > h / 10
+  if umax > dx / 10
     fprintf( 'Warning: u !<< h\n' )
   end
   if length( out ), output, end

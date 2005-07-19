@@ -10,12 +10,12 @@ if initialize
   end
   s1(:) = 0;
   w1(:) = 0;
-  i1 = halo1 + 1;
-  i2 = halo1 + ncore;
+  i1 = halo + [ 1 1 1 ];
+  i2 = halo + np;
   l = i1(3):i2(3)-1;
   k = i1(2):i2(2)-1;
   j = i1(1):i2(1)-1;
-  s1(j,k,l) = dfnc( 'g', x, x, h, 1, 1, j, k, l );
+  s1(j,k,l) = dfnc( 'g', x, x, dx, 1, 1, j, k, l );
   i = s1 ~= 0;
   s1(i) = 1 ./ s1(i);
   w1(j,k,l,:) = 0.125 * ...
@@ -47,7 +47,7 @@ if initialize
   [ vec, val ] = eig( moment(c) );
   m0 = max( abs( val(:) ) );
   mw = 2 / 3 * log10( m0 ) - 10.7;
-  um = m0 / miu0 / h / h;
+  um = m0 / miu0 / dx / dx;
   fprintf( 'Momnent Source\nM0: %g\nMw: %g\nD:  %g\n', m0, mw, um )
   return
 end
@@ -61,7 +61,7 @@ case 'sbrune', msrcdf = time .^ 2 .* exp( -time / domp ) / 2 / domp ^ 3;
 otherwise error srctimefcn
 end
 msrcf = dt * cumsum( msrcdf );
-o = prod( n );
+o = prod( m );
 for i = 0:2
   w1(msrci+o*i) = w1(msrci+o*i) - msrcf(it) * msrcx * moment(i+1);
   w2(msrci+o*i) = w2(msrci+o*i) - msrcf(it) * msrcx * moment(i+4);

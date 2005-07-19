@@ -27,7 +27,7 @@ uslipscl = usliplim; if uslipscl < 0, uslipscl = double( uslipmax ); end;
 vslipscl = vsliplim; if vslipscl < 0, vslipscl = double( vslipmax ); end;
 tnscl = tnlim; if tnscl < 0, tnscl = double( tnmax ); end;
 tsscl = tslim; if tsscl < 0, tsscl = double( tsmax ); end;
-if xscl, xscl = .5 * h / xscl; end
+if xscl, xscl = .5 * dx / xscl; end
 cellfocus = 1;
 switch field
 case 'u', fscl = uscl; titles = { '|U|' 'Ux' 'Uy' 'Uz' }; cellfocus = 0;

@@ -4,17 +4,24 @@
 if initialize
 
 fprintf( 'Initialize fault\n' )
-nf = n;
+nf = nm;
 nf(nrmdim) = 1;
-fs    = repmat( 0, nf );
-fd    = repmat( 0, nf );
-dc    = repmat( 0, nf );
-cohes = repmat( 1e9, nf );
-s0    = repmat( 0, [ nf 6 ] );
-t0nsd = repmat( 0, [ nf 3 ] );
+fs     = repmat( 0, nf );
+fd     = repmat( 0, nf );
+dc     = repmat( 0, nf );
+cohes  = repmat( 1e9, nf );
+s0     = repmat( 0, [ nf 6 ] );
+tt0nsd = repmat( 0, [ nf 3 ] );
+uslip  = repmat( 0, nf );
+vslip  = repmat( 0, nf );
+trup   = repmat( 0, nf );
+r      = repmat( 0, [ nf 3 ] );
+str    = repmat( 0, [ nf 3 ] );
+dip    = repmat( 0, [ nf 3 ] );
+tt0    = repmat( 0, [ nf 3 ] );
 for iz = 1:size( friction, 1 )
   zone = friction(iz,5:10);
-  [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( zone, halo, np, hypocenter, nrmdim );
   i1 = max( i1, i1pml );
   i2 = min( i2, i2pml );
   i1(nrmdim) = 1;
@@ -29,7 +36,7 @@ for iz = 1:size( friction, 1 )
 end
 for iz = 1:size( traction, 1 )
   zone = traction(iz,4:9);
-  [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( zone, halo, np, hypocenter, nrmdim );
   i1 = max( i1, i1pml );
   i2 = min( i2, i2pml );
   i1(nrmdim) = 1;
@@ -37,13 +44,13 @@ for iz = 1:size( traction, 1 )
   j = i1(1):i2(1);
   k = i1(2):i2(2);
   l = i1(3):i2(3);
-  t0nsd(j,k,l,1) = traction(iz,1);
-  t0nsd(j,k,l,2) = traction(iz,2);
-  t0nsd(j,k,l,3) = traction(iz,3);
+  tt0nsd(j,k,l,1) = traction(iz,1);
+  tt0nsd(j,k,l,2) = traction(iz,2);
+  tt0nsd(j,k,l,3) = traction(iz,3);
 end
 for iz = 1:size( stress, 1 )
   zone = stress(iz,7:12);
-  [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( zone, halo, np, hypocenter, nrmdim );
   i1 = max( i1, i1pml );
   i2 = min( i2, i2pml );
   i1(nrmdim) = 1;
@@ -58,15 +65,8 @@ for iz = 1:size( stress, 1 )
   s0(j,k,l,5) = stress(iz,5);
   s0(j,k,l,6) = stress(iz,6);
 end
-uslip = repmat( 0, nf );
-vslip = repmat( 0, nf );
-trup  = repmat( 0, nf );
-r     = repmat( 0, [ nf 3 ] );
-str   = repmat( 0, [ nf 3 ] );
-dip   = repmat( 0, [ nf 3 ] );
-t0    = repmat( 0, [ nf 3 ] );
-i1 = halo1 + 1;
-i2 = halo1 + ncore;
+i1 = halo + [ 1 1 1 ];
+i2 = halo + np;
 i1(nrmdim) = 1;
 i2(nrmdim) = 1;
 j = i1(1):i2(1);
@@ -119,13 +119,13 @@ for i = 1:3
 end
 c = [ 1 6 5; 6 2 4; 5 4 3 ];
 for i = 1:3
-  t0(j,k,l,i) = ...
+  tt0(j,k,l,i) = ...
     s0(j,k,l,c(1,i)) .* nrm(j,k,l,1) + ...
     s0(j,k,l,c(2,i)) .* nrm(j,k,l,2) + ...
     s0(j,k,l,c(3,i)) .* nrm(j,k,l,3) + ...
-    t0nsd(j,k,l,nrmdim) .* nrm(j,k,l,i) + ...
-    t0nsd(j,k,l,strdim) .* str(j,k,l,i) + ...
-    t0nsd(j,k,l,dipdim) .* dip(j,k,l,i);
+    tt0nsd(j,k,l,nrmdim) .* nrm(j,k,l,i) + ...
+    tt0nsd(j,k,l,strdim) .* str(j,k,l,i) + ...
+    tt0nsd(j,k,l,dipdim) .* dip(j,k,l,i);
 end
 for i = 1:3
   r(j,k,l,i) = x(j1,k1,l1,i) - x(hypocenter(1),hypocenter(2),hypocenter(3),i);
@@ -140,14 +140,14 @@ i(nrmdim) = 1;
 j = i(1);
 k = i(2);
 l = i(3);
-tn0 = sum( t0(j,k,l,:) .* nrm(j,k,l,:) );
-ts0 = norm( shiftdim( t0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) );
+tn0 = sum( tt0(j,k,l,:) .* nrm(j,k,l,:) );
+ts0 = norm( shiftdim( tt0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) );
 tn0 = max( -tn0, 0 );
 fs0 = fs(j,k,l);
 fd0 = fd(j,k,l);
 dc0 = dc(j,k,l);
 strength = ( tn0 * fs0 - ts0 ) ./ ( ts0 - tn0 * fd0 );
-dcr = 3 * h * tn0 * ( fs0 - fd0 ) / miu0;
+dcr = 3 * dx * tn0 * ( fs0 - fd0 ) / miu0;
 rcritr = miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2;
 fprintf( 1, 'S: %g\n', strength )
 fprintf( 1, 'dc: %g > %g\n', dc0, dcr )
@@ -158,11 +158,11 @@ end
 
 %------------------------------------------------------------------------------%
 
-%t0 = 5;
+%tt0 = 5;
 %tw = 1;
-%t0(2,:,hypocenter(2)) = exp(-((it*dt-t0)/tw)^2);
+%tt0(2,:,hypocenter(2)) = exp(-((it*dt-tt0)/tw)^2);
 i1 = [ 1 1 1 ];
-i2 = n;
+i2 = nm;
 i1(nrmdim) = hypocenter(nrmdim);
 i2(nrmdim) = hypocenter(nrmdim);
 j1 = i1(1):i2(1);
@@ -178,21 +178,21 @@ tmp = area .* ( rho(j1,k1,l1) + rho(j2,k2,l2) );
 i = tmp ~= 0;
 tmp(i) = 1 ./ tmp(i);
 for i = 1:3
-  t(:,:,:,i) = t0(:,:,:,i) + ...
+  tt(:,:,:,i) = tt0(:,:,:,i) + ...
     tmp .* ( v(j2,k2,l2,i) - v(j1,k1,l1,i) + w1(j2,k2,l2,i) - w1(j1,k1,l1,i) );
 end
-tn = sum( t .* nrm, 4 );
+tn = sum( tt .* nrm, 4 );
 for i = 1:3
   tn3(:,:,:,i) = tn .* nrm(:,:,:,i);
 end
-ts3 = t - tn3;
+ts3 = tt - tn3;
 ts = sum( ts3 .* ts3, 4 );
 ts = sqrt( ts );
 if 0 % Fault opening
   for i = 1:3
-    t(:,:,:,i) = t(:,:,:,i) + tmp .* ( u(j2,k2,l2,i) - u(j1,k1,l1,i) ) / dt;
+    tt(:,:,:,i) = tt(:,:,:,i) + tmp .* ( u(j2,k2,l2,i) - u(j1,k1,l1,i) ) / dt;
   end
-  tn = sum( t .* nrm, 4 );
+  tn = sum( tt .* nrm, 4 );
   i = tn > cohes(i);
   tn(i) = cohes(i);
   for i = 1:3
@@ -222,9 +222,9 @@ i = ts > ff;
 if find( ff <= 0 ), fprintf( 'fault opening!\n' ), end
 c(i) = ff(i) ./ ts(i);
 for i = 1:3
-  t(:,:,:,i) = -t0(:,:,:,i) + tn3(:,:,:,i) + c .* ts3(:,:,:,i);
-  w1(j1,k1,l1,i) = w1(j1,k1,l1,i) + t(:,:,:,i) .* area .* rho(j1,k1,l1);
-  w1(j2,k2,l2,i) = w1(j2,k2,l2,i) - t(:,:,:,i) .* area .* rho(j2,k2,l2);
+  tt(:,:,:,i) = -tt0(:,:,:,i) + tn3(:,:,:,i) + c .* ts3(:,:,:,i);
+  w1(j1,k1,l1,i) = w1(j1,k1,l1,i) + tt(:,:,:,i) .* area .* rho(j1,k1,l1);
+  w1(j2,k2,l2,i) = w1(j2,k2,l2,i) - tt(:,:,:,i) .* area .* rho(j2,k2,l2);
 end
 vslip = v(j2,k2,l2,:) + w1(j2,k2,l2,:) - v(j1,k1,l1,:) - w1(j1,k1,l1,:);
 vslip = sum( vslip .* vslip, 4 );

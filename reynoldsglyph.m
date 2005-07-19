@@ -4,7 +4,7 @@
 hglyph = [];
 if ~length( mga ) || ~fscl, return, end
 clear xg ng rg
-scl = .5 * h * ( 1 / fscl ) ^ glyphexp;
+scl = .5 * dx * ( 1 / fscl ) ^ glyphexp;
 m = 16;
 switch size( mga, 2 )
 case 1
@@ -22,13 +22,12 @@ case 1
   xg( abs( xg ) < .00001 ) = 0;
   ng = xg;
   ng(:,:,3) = ng(:,:,3) .* ( ( 1 - glyphexp / ( glyphexp+1 ) ./ cosf ./ cosf ) * row );
-  nn = size( xg );
   vglyphx = xg;
   vglyphn = ng;
   for ig = 1:size( vga, 1 )
     mg = sqrt( double( mga(ig) ) );
     vg = vga(ig,:) / mg;
-    nn = size( vglyphx );
+    n  = size( vglyphx );
     xg = vglyphx;
     ng = vglyphn;
     rg = mg * vglyphr;
@@ -42,10 +41,10 @@ case 1
         vec(i,:) = vec(i,:) ./ tmp;
       end
       vec = scl * mg ^ glyphexp * vec;
-      xg = vec * reshape( xg, [ nn(1) * nn(2) 3 ] )';
-      ng = vec * reshape( ng, [ nn(1) * nn(2) 3 ] )';
-      xg = reshape( xg', nn );
-      ng = reshape( ng', nn );
+      xg = vec * reshape( xg, [ n(1) * n(2) 3 ] )';
+      ng = vec * reshape( ng, [ n(1) * n(2) 3 ] )';
+      xg = reshape( xg', n );
+      ng = reshape( ng', n );
     else
       xg = scl * mg ^ glyphexp * xg;
     end
@@ -67,8 +66,8 @@ case 3
   xg(:,:,2) = sinf * sin( theta );
   xg(:,:,3) = cosf * row;
   xg( abs( xg ) < .00001 ) = 0;
-  nn = size( xg );
-  sphr = reshape( xg, [ nn(1) * nn(2) 3 ] )';
+  n = size( xg );
+  sphr = reshape( xg, [ n(1) * n(2) 3 ] )';
   for ig = 1:size( vga, 1 )
     val = mga(ig,:);
     vec = reshape( vga(ig,:), [3 3] );

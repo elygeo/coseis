@@ -8,15 +8,15 @@ if nrmdim && nrmdim ~= downdim
 else
   crdsys = [ downdim+1:3 1:downdim ];
 end
-nn = n - 3;
-if nrmdim, nn(nrmdim) = nn(nrmdim) - 1; end
-n1 = nn(1);
-n2 = nn(2);
-n3 = nn(3);
-[s1, s2, s3] = ndgrid( 0:n1*one, 0:n2*one, 0:n3*one );
-x1 = s1;
-x2 = s2;
-x3 = s3;
+n = np - 1;
+if nrmdim, n(nrmdim) = n(nrmdim) - 1; end
+n1 = n(1);
+n2 = n(2);
+n3 = n(3);
+[s1, s2, s3] = ndgrid( 0:n1*one, 0:n2*one, 0:n3*one ); % ALLOC
+x1 = s1; % ALLOC
+x2 = s2; % ALLOC
+x3 = s3; % ALLOC
 c = 0;
 c = 0.2 * n1;
 c = 0.01 * n1;
@@ -41,14 +41,14 @@ case 'normal'
   x3 = s3 + c * (s3./n3-1) .* atan(10*(s2./n2-.5));
   x3 = x3 - x3(1);
   %moment = -[0 0 0 0 0 1e18];
-  h = 1.5 * h;
+  dx = 1.5 * dx;
 case 'curve'
   operator = { 'g'  1 1 1  -1 -1 -1 };
   dem = .2 * rand( [ 1 n1+1 n2+1 ] ) .* (-1.5-atan(10*(s2(1,:,:)./n2-.5))) + c*(s3(1,:,:)./n3-1).*atan( 10*(s2(1,:,:)./n2-.5) );
   x1 = s1 + c * sin(s2./n2*2*pi) .* (.5-abs(s1./n1-.5));
   x2 = s2 - c * sin(s1./n1*2*pi) .* (.5-abs(s2./n2-.5));
   x3 = s3 + (1-s3./n3) .* repmat(dem,[n3+1 1 1]);
-  h = 1.5 * h;
+  dx = 1.5 * dx;
 case 'spherical'
   operator = { 'g'  1 1 1  -1 -1 -1 };
   da = pi / 2 / max( [ n1 n2 ] );
@@ -60,7 +60,7 @@ case 'spherical'
   x1 = -tan(a) .* x3;
   x2 = -tan(b) .* x3;
   x3 = x3 - min( x3(:) );
-  h = 1.5 * h;
+  dx = 1.5 * dx;
 case 'slant'
   operator = { 'g'  1 1 1  -1 -1 -1 };
   theta = 20 * pi / 180;
@@ -79,7 +79,7 @@ case 'hill'
 case 'rand'
   operator = { 'g'  1 1 1  -1 -1 -1 };
   a = .2;
-  %h = h / ( 1 - a );
+  %dx = dx / ( 1 - a );
   s1 = a * ( rand( size( s1 ) ) - .5 );
   s2 = a * ( rand( size( s2 ) ) - .5 );
   s3 = a * ( rand( size( s3 ) ) - .5 );
@@ -99,10 +99,10 @@ case 'rand'
 otherwise error grid
 end
 if noise, operator = { 'g'  1 1 1  -1 -1 -1 }; end
-%x = repmat( zero, [ n 3 ] );
-s1 = rand( [ n1 n2 n3 ] + 1 ); x(:,:,:,1) = x1 + noise * ( s1 - .5 );
-s2 = rand( [ n1 n2 n3 ] + 1 ); x(:,:,:,2) = x2 + noise * ( s2 - .5 );
-s3 = rand( [ n1 n2 n3 ] + 1 ); x(:,:,:,3) = x3 + noise * ( s3 - .5 );
+%x = repmat( zero, [ m 3 ] );
+s1 = rand( [ n1 n2 n3 ] + 1 ); x(:,:,:,1) = x1 + noise * ( s1 - .5 ); % ALLOC
+s2 = rand( [ n1 n2 n3 ] + 1 ); x(:,:,:,2) = x2 + noise * ( s2 - .5 ); % ALLOC
+s3 = rand( [ n1 n2 n3 ] + 1 ); x(:,:,:,3) = x3 + noise * ( s3 - .5 ); % ALLOC
 clear s1 s2 s3 x1 x2 x3
 x = x([1 1:end end],[1 1:end end],[1 1:end end],:);
 switch nrmdim
@@ -110,10 +110,10 @@ case 1, x = x([1:hypocenter(1) hypocenter(1):end],:,:,:);
 case 2, x = x(:,[1:hypocenter(2) hypocenter(2):end],:,:);
 case 3, x = x(:,:,[1:hypocenter(3) hypocenter(3):end],:);
 end
-h = h / ( 1 - noise );
-x = h * x;
-x1 = min( reshape( x, [ prod(n) 3 ] ) );
-x2 = max( reshape( x, [ prod(n) 3 ] ) );
+dx = dx / ( 1 - noise );
+x = dx * x;
+x1 = min( reshape( x, [ prod(nm) 3 ] ) );
+x2 = max( reshape( x, [ prod(nm) 3 ] ) );
 x0 = double( x1 + x2 ) / 2;
 for i = 1:3
   w1(:,:,:,i) = x(:,:,:,i) - x0(i);

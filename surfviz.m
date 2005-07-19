@@ -34,7 +34,7 @@ case { 'u', 'v' }
   planes = unique( tmp, 'rows' );
   for iz = 1:size( planes, 1 )
     zone = planes(iz,:);
-    [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
+    [ i1, i2 ] = zoneselect( zone, halo, np, hypocenter, nrmdim );
     l = i1(3):i2(3);
     k = i1(2):i2(2);
     j = i1(1):i2(1);
@@ -64,7 +64,7 @@ case { 'u', 'v' }
 case 'w'
   for iz = 1:size( planes, 1 )
     zone = planes(iz,:);
-    [ i1, i2 ] = zoneselect( zone, halo1, ncore, hypocenter, nrmdim );
+    [ i1, i2 ] = zoneselect( zone, halo, ncore, hypocenter, nrmdim );
     ng = i2 - i1 + 1;
     l = i1(3):i2(3);
     k = i1(2):i2(2);

@@ -5,22 +5,22 @@ fprintf( 'SORD - Support-Operator Rupture Dynamics\n' )
 format short e
 format compact
 
-if ~hypocenter, hypocenter = ceil( n / 2 ); end
-if nrmdim, n(nrmdim) = n(nrmdim) + 1; end
-halo1 = [ 1 1 1 ];
-halo2 = [ 1 1 1 ];
-ncore = n;
-n = n + halo1 + halo2;
-hypocenter = hypocenter + halo1;
-i1pml = halo1 + 1     + bc(1:3) * npml;
-i2pml = halo1 + ncore - bc(4:6) * npml;
+np = n(1:3);
+nt = n(4);
+if ~hypocenter, hypocenter = ceil( np / 2 ); end
+if nrmdim, np(nrmdim) = np(nrmdim) + 1; end
+halo = 1;
+nm = np + 2 * halo;
+hypocenter = hypocenter + halo;
+i1pml = halo + 1  + bc(1:3) * npml;
+i2pml = halo + np - bc(4:6) * npml;
 
 readcheckpoint = 0;
 one = 1;
 if str2double( version( '-release' ) ) >= 14, one = single( 1 ); end
 zero = 0 * one;
 mem = whos( 'one' );
-mem = round( mem.bytes / 1024 ^ 2 * 21 * prod( n ) );
+mem = round( mem.bytes / 1024 ^ 2 * 21 * prod( nm ) );
 fprintf( 'Base memory usage: %d Mb\n', mem )
 
 initialize = 2;

@@ -34,8 +34,8 @@ else
   slicedim = abs( xhairmove );
   i = slicedim;
   if length( hhud ), xhair(i) = xhair(i) + way; end
-  xhair = max( xhair, halo1 + 1 );
-  xhair = min( xhair, halo1 + ncore - cellfocus );
+  xhair = max( xhair, halo + 1 );
+  xhair = min( xhair, halo + np - cellfocus );
 end
 delete( [ hhud hhelp ] )
 hhelp = [];
@@ -119,8 +119,8 @@ end
 j = i(j);
 k = i(k+3);
 l = i(l+6);
-ii = sub2ind( n(1:3), j, k, l )';
-ng = prod( n(1:3) );
+ii = sub2ind( nm(1:3), j, k, l )';
+ng = prod( nm(1:3) );
 clear xg
 for i = 0:2
   xg(:,i+1) = x(ii+i*ng) + xscl * u(ii+i*ng);
@@ -139,9 +139,9 @@ if panviz
   camtarget( xhairtarg )
 end
 if dooutline && ~volviz && ( dosurf || domesh || doglyph  )
-  points = [ halo1 + 1 halo1 + ncore ];
-  i1 = halo1 + 1;
-  i2 = halo1 + ncore;
+  points = halo + [ 1 1 1 np ];
+  i1 = halo + [ 1 1 1 ];
+  i2 = halo + np;
   i1(slicedim) = xhair(slicedim);
   i2(slicedim) = xhair(slicedim) + cellfocus;
   i  = [ i1; i1+1; i2; i2-1 ];
@@ -163,8 +163,8 @@ if dooutline && ~volviz && ( dosurf || domesh || doglyph  )
   case 3, j = i(i2); k = i(i3+4); l = i(i1+8);
   otherwise error slicedim
   end
-  ii = sub2ind( n(1:3), j, k, l )';
-  ng = prod( n(1:3) );
+  ii = sub2ind( nm(1:3), j, k, l )';
+  ng = prod( nm(1:3) );
   clear xg
   for i = 0:2
     xg(:,:,i+1) = x(ii+i*ng) + xscl * u(ii+i*ng);
