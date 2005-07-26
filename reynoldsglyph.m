@@ -107,6 +107,7 @@ case 3
   end
   set( hglyph, 'BackFaceLighting', 'lit' )
 otherwise error mga
+clear n
 end
 set( hglyph, ...
   'Tag', 'glyph', ...

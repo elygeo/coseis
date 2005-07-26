@@ -113,6 +113,7 @@ for iz = 1:size( out, 1 )
       hglyph = plot3( vg(:,1), vg(:,2), vg(:,3) );
     end
     msg = '';
+    clear n
     return
   end
 end

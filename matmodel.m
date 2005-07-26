@@ -57,10 +57,11 @@ for iz = 1:size( operator, 1 )
   j = i1(1):i2(1)-1;
   s2(j,k,l) = dfnc( operator{iz,1}, x, x, dx, 1, 1, j, k, l );
 end
+i = hypocenter;
 switch nrmdim
-case 1, s2(hypocenter(1),:,:) = 0;
-case 2, s2(:,hypocenter(2),:) = 0;
-case 3, s2(:,:,hypocenter(3)) = 0;
+case 1, s2(i(1),:,:) = 0; yc(i(1),:,:) = 0;
+case 2, s2(:,i(2),:) = 0; yc(:,i(2),:) = 0;
+case 3, s2(:,:,i(3)) = 0; yc(:,:,i(3)) = 0;
 end
 
 i1 = halo + [ 0 0 0 ];
@@ -143,4 +144,5 @@ n = [ nm 3 ];
 n(3) = npml;
 if bc(3), p3 = repmat( zero, n ); g3 = repmat( zero, n ); end % ALLOC
 if bc(6), p6 = repmat( zero, n ); g6 = repmat( zero, n ); end % ALLOC
+clear n
 

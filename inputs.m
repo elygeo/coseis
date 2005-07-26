@@ -1,33 +1,31 @@
 %------------------------------------------------------------------------------%
-% sord
+% INPUTS
 
 defaults
 model = 'normal';
 model = 'the3';
 model = '';
 model = 'strikeslip';
+model = 'explosion';
 model = 'kostrov';
 switch model
 case ''
   nrmdim = 0;
   n = [ 3 3 3 1 ];
 case 'kostrov'
-  npml = 0;
   npml = 10;
   nclramp = 0;
-  nclramp = 10;
-  bc = [ 0 0 0   0 0 0 ];
+  viscosity = [ 0 .3 ];
   bc = [ 0 1 0   0 1 0 ];
-  rcrit = 1e10;
+  rcrit = 1e9;
   friction = [ 1e10 1   1e10 0   1 1 1  -1 -1 -1 ];
   traction = [ -100e6 -90e6 0    1 1 1  -1 -1 -1 ];
   grid = 'slant';
   grid = 'constant';
   n = [ 101  41 101 200 ]; plotstyle = 'fault';
-  n = [  61  41  61 120 ]; plotstyle = 'fault';
   n = [ 201  41 201 400 ]; plotstyle = '';
   n = [  41  41  41  90 ]; plotstyle = 'fault';
-  n = [  41  41  41  90 ]; plotstyle = '';
+  n = [  61  41  61 120 ]; plotstyle = 'fault';
   out = {
     'uslip' 1    0  0  0   -1 -0 -0
     'vslip' 1    0  0  0   -1 -0 -0
@@ -117,6 +115,22 @@ case 'the3'
     traction = [ traction; -81.6e6 -120e6 0   39 0 26   -39 0 30 ]; % CHECK!
     hypocenter = [ 12 ceil( n(2:3) / 2 ) ]; % CHECK!
   end
+case 'foam_ms'
+  nw = 1;  % no weak zone
+  nw = 11; % 20cm weak zone
+  bc = [ 0 0 0   0 0 0 ];
+  n = [ 111 221 141 999 ];
+  dx = .02;
+  dt = .00015;
+  vrup = 15;
+  rcrit = .4;
+  viscosity = [ .5 .5 ];
+  hypocenter = [ 111 111 71 ];
+  material = [ 16 56 30            1 1 1   -1 -1 -1 ];
+  fiction  = [ 0.6  0.6   .001 0   1 1 1   -1 -1 -1
+               1.85 2.3   .001 0   1 1 nw  -1 -1 -1 ];
+  traction = [  66 -330 0          1 1 1   -1 -1 -1
+               730 -330 0          1 1 nw  -1 -1 -1 ];
 otherwise error model
 end
 

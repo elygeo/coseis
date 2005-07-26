@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
 % KOSTROV
 
-if ~defined( dark )
+if ~exist( 'darl', 'var' )
   inputs
   dark = 1;
   if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
@@ -33,8 +33,9 @@ end
 
 c = .81;
 dtau = ts0 - fd0 * tn0;
-fcorner = vp / ( 8 * dx );
+fcorner = vp / ( 6 * dx );
 n = 2 * round( 1 / ( fcorner * dt ) );
+b = 1; % no filter
 b = .5 * ( 1 - cos( 2 * pi * ( 1 : n - 1 ) / n ) );  % hanning
 a = sum( b );
 tg = ( .5 : it - .5 )' * dt;
@@ -47,6 +48,7 @@ end
 ng = size( xg, 1 );
 xg = xg(2:end,:) - xg(1:end-1,:);
 xg = [ 0; cumsum( sqrt( sum( xg .* xg, 2 ) ) ) ];
+clear vg
 for i = 1:it
   file = sprintf( 'out/02/1/%05d', i );
   fid = fopen( file, 'r', endian );
@@ -85,6 +87,8 @@ for i = ix
 end
 xlabel( 'Time (s)' )
 ylabel( 'Slip Velocity (m/s)' )
+
+return
 
 if ~ishandle(4), figure(4), end
 set( 0, 'CurrentFigure', 4 )

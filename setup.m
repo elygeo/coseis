@@ -7,6 +7,7 @@ format compact
 
 np = n(1:3);
 nt = n(4);
+clear n
 if ~hypocenter, hypocenter = ceil( np / 2 ); end
 if nrmdim, np(nrmdim) = np(nrmdim) + 1; end
 halo = 1;

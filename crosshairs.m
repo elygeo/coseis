@@ -17,7 +17,7 @@ elseif xhairmove == 6
   case 'v', maxi = vmaxi;
   case 'w', maxi = wmaxi;
   end
-  [ j, k, l ] = ind2sub( n, maxi );
+  [ j, k, l ] = ind2sub( nm, maxi );
   xhair = [ j k l ];
 else
   v1 = camup;

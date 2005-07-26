@@ -2,7 +2,7 @@
 % DEFAULTS
 
 plotstyle = 'outline';
-np = [ 21 21 21 20 ];
+n  = [ 21 21 21 20 ];
 dx = 100;
 dt = .007;
 nu = .25;

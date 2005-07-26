@@ -8,8 +8,8 @@ if initialize
     msrcradius = 0;
     return
   end
-  s1(:) = 0;
-  w1(:) = 0;
+  s1(:,:,:) = 0;
+  w1(:,:,:,:) = 0;
   i1 = halo + [ 1 1 1 ];
   i2 = halo + np;
   l = i1(3):i2(3)-1;
@@ -33,15 +33,15 @@ if initialize
       w1(:,:,:,i) = w1(:,:,:,i) - w1(j1,k1,l1,i);
     end
   end
-  s2(:) = 2 * msrcradius ^ 2;
+  s2(:,:,:) = 2 * msrcradius ^ 2;
   s2(j,k,l) = sum( w1(j,k,l,:) .* w1(j,k,l,:), 4 );
   msrci = find( s2 < msrcradius ^ 2 );
   msrcx = msrcradius - sqrt( s2( msrci ) );
   msrcx = msrcx / sum( msrcx );
   msrcx = msrcx .* s1( msrci );
-  s1(:) = 0;
-  s2(:) = 0;
-  w1(:) = 0;
+  s1(:,:,:) = 0;
+  s2(:,:,:) = 0;
+  w1(:,:,:,:) = 0;
   msrct = [];
   c = [ 1 6 5; 6 2 4; 5 4 3 ];
   [ vec, val ] = eig( moment(c) );
@@ -61,7 +61,7 @@ case 'sbrune', msrcdf = time .^ 2 .* exp( -time / domp ) / 2 / domp ^ 3;
 otherwise error srctimefcn
 end
 msrcf = dt * cumsum( msrcdf );
-o = prod( m );
+o = prod( nm );
 for i = 0:2
   w1(msrci+o*i) = w1(msrci+o*i) - msrcf(it) * msrcx * moment(i+1);
   w2(msrci+o*i) = w2(msrci+o*i) - msrcf(it) * msrcx * moment(i+4);
