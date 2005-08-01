@@ -8,6 +8,7 @@ model = '';
 model = 'strikeslip';
 model = 'explosion';
 model = 'kostrov';
+model = 'boris';
 switch model
 case ''
   nrmdim = 0;
@@ -18,7 +19,7 @@ case 'kostrov'
   viscosity = [ 0 .3 ];
   bc = [ 0 1 0   0 1 0 ];
   rcrit = 1e9;
-  friction = [ 1e10 1   1e10 0   1 1 1  -1 -1 -1 ];
+  friction = [ 1e9 1   1e9 0   1 1 1  -1 -1 -1 ];
   traction = [ -100e6 -90e6 0    1 1 1  -1 -1 -1 ];
   grid = 'slant';
   grid = 'constant';
@@ -115,6 +116,23 @@ case 'the3'
     traction = [ traction; -81.6e6 -120e6 0   39 0 26   -39 0 30 ]; % CHECK!
     hypocenter = [ 12 ceil( n(2:3) / 2 ) ]; % CHECK!
   end
+case 'boris'
+  nrmdim = 3;
+  npml = 10;
+  bc = [ 0 0 0   0 0 0 ];
+  n = [ 200 200 200 400 ];
+  dx = .02;
+  dt = .00005;
+  vrup = 15;
+  rcrit = .4;
+  viscosity = [ .5 .5 ];
+  hypocenter = [ 100 100 100 ];
+  material = [ 16 56 30            1 1 1  -1 -1 -1 ];
+  fiction  = [ 1.85 2.4   .001 0   1 1 1  -1 -1 -1 ];
+  traction = [ 0 730 -330          1 1 1  -1 -1 -1 ];
+  out      = { 'v' 1               1 1 1  -1 -1 -1 };
+  out      = { 'v' 1               1 1 1  -0 -0 -0 };
+  plotstyle = '';
 case 'foam_ms'
   nw = 1;  % no weak zone
   nw = 11; % 20cm weak zone

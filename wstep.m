@@ -4,10 +4,10 @@
 % Gadient
 % G = grad(U + gamma*V)    non PML region
 % G' + DG = gradV          PML region
-s2(:,:,:) = 0;
-w2(:,:,:,:) = 0;
+s2(:) = 0;
+w2(:) = 0;
 for ic = 1:3
-s1(:,:,:) = u(:,:,:,ic) + gamma(1) .* v(:,:,:,ic);
+s1 = u(:,:,:,ic) + gamma(1) .* v(:,:,:,ic);
 for id = 1:3
   ix = 6 - ic - id;
   for iz = 1:size( operator, 1 )
@@ -80,19 +80,19 @@ for id = 1:3
     end
   end
   if ic == id
-    w1(:,:,:,ic) = s2(:,:,:);
+    w1(:,:,:,ic) = s2;
   else
-    w2(:,:,:,ix) = w2(:,:,:,ix) + s2(:,:,:);
+    w2(:,:,:,ix) = w2(:,:,:,ix) + s2;
   end
 end
 end
 
 % Hook's Law, linear stress/strain relation
 % W = lam*trace(G)*I + miu*(G + G^T)
-s1(:,:,:) = lam(:,:,:) .* ( w1(:,:,:,1) + w1(:,:,:,2) + w1(:,:,:,3) );
+s1 = lam .* sum( w1, 4 );
 for i = 1:3
-  w1(:,:,:,i) = 2 * miu(:,:,:) .* w1(:,:,:,i) + s1(:,:,:);
-  w2(:,:,:,i) =     miu(:,:,:) .* w2(:,:,:,i);
+  w1(:,:,:,i) = 2 * miu .* w1(:,:,:,i) + s1;
+  w2(:,:,:,i) =     miu .* w2(:,:,:,i);
 end
 
 % Moment source

@@ -4,7 +4,7 @@
 % Restoring force
 % P' + DP = [del]S, F = 1.P'             PML region
 % F = divS                               non PML region (D=0)
-s2(:,:,:) = 0;
+s2(:) = 0;
 for ic = 1:3
 for id = [ ic:3 1:ic-1 ];
   ix = 6 - ic - id;
@@ -53,24 +53,24 @@ for id = [ ic:3 1:ic-1 ];
     end
   end
   if ic == id
-    w1(:,:,:,ic) = s2(:,:,:);
+    w1(:,:,:,ic) = s2;
   else
-    w1(:,:,:,ic) = w1(:,:,:,ic) + s2(:,:,:);
+    w1(:,:,:,ic) = w1(:,:,:,ic) + s2;
   end
 end
 end
 
 % Newton's Law, dV = F / m * dt
 for i = 1:3
-  w1(:,:,:,i) = w1(:,:,:,i) .* rho(:,:,:);
+  w1(:,:,:,i) = w1(:,:,:,i) .* rho;
 end
 
 % Hourglass correction
 i1 = halo + [ 1 1 1 ];
 i2 = halo + np;
-s1(:,:,:) = 0;
-s2(:,:,:) = 0;
-w2(:,:,:,:) = u(:,:,:,:) + gamma(2) .* v(:,:,:,:);
+s1(:) = 0;
+s2(:) = 0;
+w2 = u + gamma(2) .* v;
 for ic = 1:3
 for iq = 1:4
   l = i1(3):i2(3)-1;
@@ -81,7 +81,7 @@ for iq = 1:4
   k = i1(2):i2(2);
   j = i1(1):i2(1);
   s2(j,k,l) = yn(j,k,l) .* hgcn( s1, 1, iq, j, k, l );
-  w1(:,:,:,ic) = w1(:,:,:,ic) - s2(:,:,:);
+  w1(:,:,:,ic) = w1(:,:,:,ic) - s2;
 end
 end
 
@@ -98,7 +98,7 @@ for iz = 1:size( locknodes, 1 )
   j = i1(1):i2(1);
   w1(j,k,l,i) = 0;
 end
-v(:,:,:,:) = v(:,:,:,:) + w1(:,:,:,:);
+v = v + w1;
 
 if planewavedim, planewave, end
 

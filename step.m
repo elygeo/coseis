@@ -11,9 +11,9 @@ while itstep
   it = it + 1;
   vstep
   wt(2) = toc;
-  u(:,:,:,:) = u(:,:,:,:) + dt * v(:,:,:,:);
+  u = u + dt * v;
   if nrmdim
-    uslip(:,:,:,:) = uslip(:,:,:,:) + dt * vslip(:,:,:,:);
+    uslip = uslip + dt * vslip;
     uslipmax = max( abs( uslip(:) ) );
     vslipmax = max( abs( vslip(:) ) );
     tnmax = max( abs( tn(:) ) );

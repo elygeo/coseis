@@ -2,25 +2,25 @@
 % DEFAULTS
 
 plotstyle = 'outline';
-n  = [ 21 21 21 20 ];
-dx = 100;
+n = [ 21 21 21 20 ];
+dx = 100.;
 dt = .007;
 nu = .25;
-vp = 6000;
+rho0 = 2670.;
+vp = 6000.;
 vs = sqrt( vp ^ 2 * ( nu - .5 ) / ( nu - 1 ) );  % 3464.1
 grid = 'constant';
 nrmdim = 2;
 vrup = .9 * vs;
-rcrit = 1000;
+rcrit = 1000.;
 nclramp = 10;
-material = [ 2670   vp vs     1 1 1   -1 -1 -1 ];
-friction = [ .6 .5   .25 0    1 1 1   -1 -1 -1 ];
-traction = [ -70e6 -120e6 0   1 1 1   -1 -1 -1 ];
+material = [ rho0 vp vs        1 1 1   -1 -1 -1 ];
+friction = [ .6 .5   .25 .0    1 1 1   -1 -1 -1 ];
+traction = [ -70e6 -120e6 0.   1 1 1   -1 -1 -1 ];
 stress   = [];
-viscosity = [ 0 .3 ];
-noise = 0;
+viscosity = [ .0 .3 ];
 hypocenter = 0;
-msrcradius = 0;
+msrcradius = 0.;
 planewavedim = 0;
 truptol = .001;
 checkpoint = -1;

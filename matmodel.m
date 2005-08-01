@@ -4,12 +4,6 @@
 fprintf( 'Material model\n' )
 % These will be single or double precision arrays depending on
 % what type 'zero' is.
-u   = repmat( zero, [ nm 3 ] ); % ALLOC
-v   = repmat( zero, [ nm 3 ] ); % ALLOC
-w1  = repmat( zero, [ nm 3 ] ); % ALLOC
-w2  = repmat( zero, [ nm 3 ] ); % ALLOC
-s1  = repmat( zero, nm ); % ALLOC
-s2  = repmat( zero, nm ); % ALLOC
 rho = repmat( zero, nm ); % ALLOC
 miu = repmat( zero, nm ); % ALLOC
 lam = repmat( zero, nm ); % ALLOC
@@ -25,20 +19,25 @@ for iz = 1:size( material, 1 )
   vs    = material(iz,3);
   matmax = max( matmax, material(iz,1:3) );
   matmin = min( matmin, material(iz,1:3) );
-  miu0  = rho0 .* vs .* vs;
-  lam0  = rho0 .* ( vp .* vp - 2 * vs .* vs );
+  miu0  = rho0 * vs * vs;
+  lam0  = rho0 * ( vp * vp - 2 * vs * vs );
   yc0   = miu0 * ( lam0 + miu0 ) / 6 / ( lam0 + 2 * miu0 ) * 4 / dx ^ 2;
   nu    = .5 * lam0 / ( lam0 + miu0 );
-  courant = dt * vp * sqrt( 3 ) / dx;   % TODO: check, make general
-  fprintf( 'courant: %g < 1\n', courant )
   l = i1(3):i2(3)-1;
   k = i1(2):i2(2)-1;
   j = i1(1):i2(1)-1;
+  switch nrmdim
+  case 1, j(j==hypocenter(1)) = [];
+  case 2, k(k==hypocenter(2)) = [];
+  case 3, l(l==hypocenter(3)) = [];
+  end
   s1(j,k,l) = rho0;
   lam(j,k,l) = lam0;
   miu(j,k,l) = miu0;
   yc(j,k,l) = yc0;
 end
+courant = dt * matmax(2) * sqrt( 3 ) / dx;   % TODO: check, make general
+fprintf( 'courant: %g < 1\n', courant )
 l = hypocenter(3);
 k = hypocenter(2);
 j = hypocenter(1);
