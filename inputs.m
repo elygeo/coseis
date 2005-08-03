@@ -7,8 +7,8 @@ model = 'the3';
 model = '';
 model = 'strikeslip';
 model = 'explosion';
-model = 'boris';
 model = 'kostrov';
+model = 'boris';
 switch model
 case ''
   nrmdim = 0;
