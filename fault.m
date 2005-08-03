@@ -107,9 +107,9 @@ tmp(i) = handed ./ tmp(i);
 for i = 1:3
   str(j,k,l,i) = str(j,k,l,i) .* tmp;
 end
-dip(:,:,:,1) = nrm(2) .* str(:,:,:,3) - nrm(3) .* str(:,:,:,2);
-dip(:,:,:,2) = nrm(3) .* str(:,:,:,1) - nrm(1) .* str(:,:,:,3);
-dip(:,:,:,3) = nrm(1) .* str(:,:,:,2) - nrm(2) .* str(:,:,:,1);
+dip(:,:,:,1) = nrm(:,:,:,2) .* str(:,:,:,3) - nrm(:,:,:,3) .* str(:,:,:,2);
+dip(:,:,:,2) = nrm(:,:,:,3) .* str(:,:,:,1) - nrm(:,:,:,1) .* str(:,:,:,3);
+dip(:,:,:,3) = nrm(:,:,:,1) .* str(:,:,:,2) - nrm(:,:,:,2) .* str(:,:,:,1);
 tmp = sum( dip(j,k,l,:) .* dip(j,k,l,:), 4 );
 tmp = sqrt( tmp );
 i = tmp ~= 0;
@@ -146,7 +146,7 @@ tn0 = max( -tn0, 0 );
 fs0 = fs(j,k,l);
 fd0 = fd(j,k,l);
 dc0 = dc(j,k,l);
-strength = ( tn0 * fs0 - ts0 ) ./ ( ts0 - tn0 * fd0 );
+strength = ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 );
 dcr = 3 * dx * tn0 * ( fs0 - fd0 ) / miu0;
 rcritr = miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2;
 fprintf( 1, 'S: %g\n', strength )

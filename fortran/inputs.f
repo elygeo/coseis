@@ -2,7 +2,7 @@
 ! INPUTS
 !------------------------------------------------------------------------------!
 
-module inputs
+module inputs_m
 
 integer np(3), nt, npml, bc(6)
 
@@ -10,8 +10,8 @@ subroutine inputs
 
 integer n, 
 
-npe = (/ 1 1 1 /)
-n = (/ 21 21 21 20 /)
+npe = (/ 1, 1, 1 /)
+n = (/ 21, 21, 21, 20 /)
 dx = 100.
 dt = .007
 nu = .25
@@ -23,26 +23,26 @@ nrmdim = 2
 vrup = .9 * vs
 rcrit = 1000.
 nclramp = 10
-material(1,:)  = (/ rho0 vp vs /)
-friction(1,:)  = (/ .6 .5   .25 0. /)
-traction(1,:)  = (/ -70e6 -120e6 0. /)
-stress(1,:)    = (/ 0. 0. 0. /)
+material(1,:)  = (/ rho0, vp, vs /)
+friction(1,:)  = (/ .6, .5,   .25, 0. /)
+traction(1,:)  = (/ -70e6, -120e6, 0. /)
+stress(1,:)    = (/ 0., 0., 0. /)
 nmat  = 1
 nfric = 1
 ntrac = 1
 nstress = 1
 nout = 0
-mati(1,:)    = (/ 1 1 1   -1 -1 -1/)
-frici(1,:)   = (/ 1 1 1   -1 -1 -1/)
-traci(1,:)   = (/ 1 1 1   -1 -1 -1/)
-stressi(1,:) = (/ 1 1 1   -1 -1 -1/)
+mati(1,:)    = (/ 1, 1, 1,   -1, -1, -1/)
+frici(1,:)   = (/ 1, 1, 1,   -1, -1, -1/)
+traci(1,:)   = (/ 1, 1, 1,   -1, -1, -1/)
+stressi(1,:) = (/ 1, 1, 1,   -1, -1, -1/)
 viscosity = (/ .0 .3 /)
 noise = 0.
 hypocenter = 0
 msrcradius = 0.
 checkpoint = -1
 npml = 0
-bc = (/ 1 1 0   1 1 1 /)
+bc = (/ 1, 1, 0,   1, 1, 1 /)
 
 open( 9, file='inputs' status='old' )
 do
@@ -121,6 +121,9 @@ lam = 0.
 miu = 0.
 yc  = 0.
 yn  = 0.
+
+!------------------------------------------------------------------------------!
+! MATMODEL
 matmax = material(1,1:3)
 matmin = material(1,1:3)
 do iz = 1, nmat
@@ -154,24 +157,26 @@ end do
 
 if ( checkpoint .eq. 0 )  checkpoint = ti2 + 1
 
+downdim = 3
+if ( nrmdim /= 0 .and. nrmdim /= downdim ) then
+  crdsys = (/ 6 - downdim - nrmdim, nrmdim, downdim /)
+else
+  forall( i=1:3 ) crdsys(i) = mod( downdim + i - 1, 3 ) + 1
+end if
+
 mype3d = 0
 core1 = 1
 core2 = ng
 nl = ng
 offset = 0
 
-if ( nfault .gt. m3s ) error( 'nfault too big' )
-if ( min( h(1), h(2), h(3) ) / maxvel .le. h(4) ) error( 'courant condition' )
-do i = 1, nfault
-  if ( kind0(i) .lt. 0 .or. kind0(i) .gt. 2 ) error( 'kind must be 0, 1 or 2' )
-end do
-
-return
-end
+end subroutine
 
 function error( string )
+
 character*(*) string
 write(0,*) 'DFM error: ', string
 stop
-end
+
+end function
 

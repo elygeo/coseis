@@ -1,11 +1,18 @@
 !------------------------------------------------------------------------------!
 ! DFCN - difference operator, cell to node
 
+module dfcn_m
+
+contains
+
 subroutine dfcn( op, df, f, x, dx, i, a, i1, i2 )
+
 implicit none
-character op
-real df(:,:,:,:), f(:,:,:,:), x(:,:,:,:), dx
-integer i, j, k, l, a, b, c, i1(3), i2(3)
+character, intent(in) :: op
+real, intent(in) :: f(:,:,:,:), x(:,:,:,:), dx
+real, intent(out) :: df(:,:,:,:)
+integer, intent(in) :: i, a, i1(3), i2(3)
+integer :: j, k, l, b
 
 select case(op)
 
@@ -119,6 +126,8 @@ df(j,k,l) = 1 / 12 * &
 end forall
 
 end select
-return
-end
+
+end subroutine
+
+end module
 

@@ -8,19 +8,21 @@ if nrmdim && nrmdim ~= downdim
 else
   crdsys = [ downdim+1:3 1:downdim ];
 end
-ll = one * np - 1;
-if nrmdim, ll(nrmdim) = ll(nrmdim) - 1; end
-l1 = ll(1);
-l2 = ll(2);
-l3 = ll(3);
+l1 = one * np(1) - 1;
+l2 = one * np(2) - 1;
+l3 = one * np(3) - 1;
 j = [ 0 0:l1 l1 ];
 k = [ 0 0:l2 l2 ];
 l = [ 0 0:l3 l3 ];
+i = hypocenter(nrmdim) + 1;
 switch nrmdim
-case 1, j = j([1:hypocenter(1) hypocenter(1):end]);
-case 2, k = k([1:hypocenter(2) hypocenter(2):end]);
-case 3, l = l([1:hypocenter(3) hypocenter(3):end]);
+case 1, j(i:end) = j(i:end) - 1;
+case 2, k(i:end) = k(i:end) - 1;
+case 3, l(i:end) = l(i:end) - 1;
 end
+l1 = j(end);
+l2 = k(end);
+l3 = l(end);
 [s1, s2, s3] = ndgrid( j, k, l ); % ALLOC
 x  = repmat( zero, [ nm 3 ] );    % ALLOC
 u  = repmat( zero, [ nm 3 ] );    % ALLOC
@@ -39,6 +41,18 @@ rand( 'state', 0 )
 switch grid
 case 'constant'
   operator = { 'h'  1 1 1  -1 -1 -1 };
+case 'stretch'
+  operator = { 'r'  1 1 1  -1 -1 -1 };
+  x(:,:,:,3) = 2 * x(:,:,:,3);
+case 'slant'
+  operator = { 'g'  1 1 1  -1 -1 -1 };
+  theta = 20 * pi / 180;
+  scl = sqrt( cos( theta ) ^ 2 + ( 1 - sin( theta ) ) ^ 2 );
+  scl = sqrt( 2 ) / scl
+  x(:,:,:,1) = x(:,:,:,1) - x(:,:,:,3) * sin( theta );
+  x(:,:,:,3) = x(:,:,:,3) * cos( theta );
+  x(:,:,:,1) = x(:,:,:,1) * scl;
+  x(:,:,:,3) = x(:,:,:,3) * scl;
 case 'map'
   operator = { 'g'  1 1 1  -1 -1 -1 };
   x(:,:,:,1) = s1 + c / 5 * (s1-l1/2) .* (l3-s3);
@@ -70,18 +84,6 @@ case 'spherical'
   x(:,:,:,2) = -tan(s2) .* x(:,:,:,3);
   x(:,:,:,3) = x(:,:,:,3) - min( min( min( x(:,:,:,3) ) ) );
   dx = 1.5 * dx;
-case 'slant'
-  operator = { 'g'  1 1 1  -1 -1 -1 };
-  theta = 20 * pi / 180;
-  tmp = sqrt( cos( theta ) ^ 2 + ( 1 - sin( theta ) ) ^ 2 );
-  scl = sqrt( 2 ) / tmp
-  x(:,:,:,1) = s1 - s3 * sin( theta );
-  x(:,:,:,3) = s3 * cos( theta );
-  x(:,:,:,1) = scl * x(:,:,:,1);
-  x(:,:,:,3) = scl * x(:,:,:,3);
-case 'stretch'
-  operator = { 'r'  1 1 1  -1 -1 -1 };
-  x(:,:,:,1) = 2 * s1;
 case 'hill'
   operator = { 'g'  1 1 1  -1 -1 -1 };
   x(:,:,:,3) = s3 - .25 * (l3-s3) .* exp(-((s1-l1/2).^2 + (s2-l2/2).^2) / ((l1 + l2)/10) ^ 2);
@@ -89,14 +91,14 @@ case 'rand'
   operator = { 'g'  1 1 1  -1 -1 -1 };
   a = .2;
   %dx = dx / ( 1 - a );
-  s1 = a * ( rand( size( s1 ) ) - .5 );
-  s2 = a * ( rand( size( s2 ) ) - .5 );
-  s3 = a * ( rand( size( s3 ) ) - .5 );
+  s1 = a * ( rand( nm ) - .5 );
+  s2 = a * ( rand( nm ) - .5 );
+  s3 = a * ( rand( nm ) - .5 );
   s1([1 2 end-1 end],:,:) = 0;
   s2(:,[1 2 end-1 end],:) = 0;
   s3(:,:,[1 2 end-1 end]) = 0;
   i = hypocenter;
-  switch 3
+  switch nrmdim
   case 1, s1(i(1)+[0 1],:,:) = 0;
   case 2, s2(:,i(2)+[0 1],:) = 0;
   case 3, s3(:,:,i(3)+[0 1]) = 0;
