@@ -7,8 +7,8 @@ model = 'the3';
 model = '';
 model = 'strikeslip';
 model = 'explosion';
-model = 'kostrov';
 model = 'boris';
+model = 'kostrov';
 switch model
 case ''
   nrmdim = 0;
@@ -26,12 +26,14 @@ case 'kostrov'
   n = [ 101  41 101 200 ]; plotstyle = 'fault';
   n = [ 201  41 201 400 ]; plotstyle = '';
   n = [  61  41  61 120 ]; plotstyle = 'fault';
+  n = [ 128 127 128 128 ]; plotstyle = '';
   n = [  41  41  41  90 ]; plotstyle = 'fault';
   out = {
-    'uslip' 1    0  0  0   -1 -0 -0
-    'vslip' 1    0  0  0   -1 -0 -0
-    'v'     1    1  1  1   -1 -0 -0
+    'uslip' 1    0 0 0   -1 -0 -0
+    'vslip' 1    0 0 0   -1 -0 -0
+    'v'     1    1 1 1   -1 -1 -1
   };
+  out = { 'v' 10  1 1 1   -1 -1 -1 };
 case 'explosion'
   bc = [ 0 1 0   0 1 0 ]; grid = 'slant';
   bc = [ 1 1 1   1 1 1 ]; grid = 'constant';
@@ -121,12 +123,12 @@ case 'boris'
   npml = 10;
   bc = [ 0 0 0   0 0 0 ];
   n = [ 220 220 220 400 ];
+  hypocenter = [ 110 110 110 ];
   dx = .02;
   dt = .00005;
   vrup = 15;
   rcrit = .4;
   viscosity = [ .5 .5 ];
-  hypocenter = [ 110 110 110 ];
   material = [ 16 56 30            1 1 1  -1 -1 -1 ];
   fiction  = [ 1.85 2.4   .001 0   1 1 1  -1 -1 -1 ];
   traction = [ 0 730 -330          1 1 1  -1 -1 -1 ];
