@@ -2,7 +2,7 @@
 
 cd ..
 
-gtar -hzvc -f sord/sord.tgz sord/*.m sord/readme sord/tarball.sh sord/fortran sord/makefile
+gtar -hzvc -f sord/sord.tgz sord/*.m sord/readme sord/tarball.sh sord/fortran
 
 cd sord
 
