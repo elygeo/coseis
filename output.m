@@ -12,6 +12,7 @@ if initialize
   fid = fopen( 'out/endian', 'w' );
   fprintf( fid, '%s\n', endian );
   fclose( fid );
+  storage = 0;
   for iz = 1:size( out, 1 )
     outvar{iz} = out{iz,1};
     outint(iz) = out{iz,2};
@@ -68,7 +69,7 @@ if initialize
     file = sprintf( 'out/%02d/hdr', iz );
     fid = fopen( file, 'w' );
     fprintf( fid, '%g %g %g %g %g %g %g %s %s\n', ...
-      [ outnc(iz) i2-i1+1 outint(iz) nt dt ], outvar{iz}, [ c{:} ] );
+      [ outnc(iz) i2-i1+1 outint(iz) nt dt ], outvar{iz}, [ c{:} ] )
     fclose( fid );
     if faultplane
       i1(nrmdim) = 1;
@@ -76,7 +77,10 @@ if initialize
     end
     outi1(:,iz) = i1;
     outi2(:,iz) = i2;
+    storage = storage + outnc(iz) * prod( i2 - i1 + 1 ) * ...
+      floor( nt / outint(iz) ) * 4 / 1024 / 1024;
   end
+  fprintf( 'Disk storage needed: %.1fMb', storage )
   return
 end
 
