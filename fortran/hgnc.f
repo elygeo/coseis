@@ -1,11 +1,18 @@
 !------------------------------------------------------------------------------!
 ! HGNC - hourglass corrections, node to cell
 
-subroutine hgnc( hg, f, i, iq, i1, i2 )
+module hgnc_m
 
 implicit none
-real hg(:,:,:,:), f(:,:,:,:)
-integer i, j, k, l, iq, i1(3), i2(3)
+
+contains
+
+subroutine hgnc( f, i, iq, i1, i2, hg )
+
+real, intent(in) :: f(:,:,:,:)
+real, intent(out) :: hg(:,:,:,:)
+integer, intent(in) :: i, iq, i1(3), i2(3)
+integer :: j, k, l
 
 selectcase(iq)
 case(1)
@@ -34,6 +41,7 @@ case(4)
   + f(j,k,l+1,i) - f(j+1,k+1,l,i);
 end select
 
-return
-end
+end subroutine
+
+end module
 

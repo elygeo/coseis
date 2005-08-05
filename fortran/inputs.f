@@ -4,11 +4,20 @@
 
 module inputs_m
 
-integer np(3), nt, npml, bc(6)
+implicit none
+integer, parameter :: nz = 256
+integer :: npe(3), np(3), nt, npml, bc(6), halo, nrmdim, nclramp, &
+  nmat, nfric, ntrac, nstress, nout, mati(nz, checkpoint
+real :: dx, dt, nu, rho0, vp, vs, vrup, rcrit, viscosity(2), msrcradius, &
+  material(nz,3), friction(nz,4,), traction(nz,3), stress(nz,3), oi
+character*256 grid
+
+contains
 
 subroutine inputs
 
-integer n, 
+integer :: n(4) 
+character*256 buff, key, a
 
 npe = (/ 1, 1, 1 /)
 n = (/ 21, 21, 21, 20 /)
@@ -36,9 +45,9 @@ mati(1,:)    = (/ 1, 1, 1,   -1, -1, -1/)
 frici(1,:)   = (/ 1, 1, 1,   -1, -1, -1/)
 traci(1,:)   = (/ 1, 1, 1,   -1, -1, -1/)
 stressi(1,:) = (/ 1, 1, 1,   -1, -1, -1/)
-viscosity = (/ .0 .3 /)
+viscosity = (/ .0, .3 /)
 noise = 0.
-hypocenter = 0
+hypocenter = (/ 0, 0, 0 /)
 msrcradius = 0.
 checkpoint = -1
 npml = 0
@@ -51,38 +60,25 @@ do
   read( buff, * ) key
   if ( key(1:1) .eq. '#' .or. key(1:1) .eq. '!' .or. key(1:1) .eq. '%' ) cycle
   selectcase( key )
-  case( 'nprocs' )
-    read( buff, * ) a, npe
-  case( 'n' )
-    read( buff, * ) a, n
-  case( 'nrmdim' )
-    read( buff, * ) a, nrmdim
-  case( 'hypocenter' )
-    read( buff, * ) a, hypocenter
-  case( 'dx' )
-    read( buff, * ) a, dx
-  case( 'dt' )
-    read( buff, * ) a, dt
-  case( 'checkpoint' )
-    read( buff, * ) a, checkpoint
-  case( 'out' )
-    nout = nout + 1
+  case( 'nprocs' );     read( buff, * ) a, npe
+  case( 'n' );          read( buff, * ) a, n
+  case( 'nrmdim' );     read( buff, * ) a, nrmdim
+  case( 'hypocenter' ); read( buff, * ) a, hypocenter
+  case( 'dx' );         read( buff, * ) a, dx
+  case( 'dt' );         read( buff, * ) a, dt
+  case( 'checkpoint' ); read( buff, * ) a, checkpoint
+  case( 'out' ); nout = nout + 1
     read( buff, * ) a, outvar(nout), outint(nout), outi(nout,:)
-  case( 'material' )
-    nmat = nmat + 1
+  case( 'material' ); nmat = nmat + 1
     read( buff, * ) a, material(nmat,:), mati(nmat,:)
-  case( 'friction' )
-    nfric = nfric + 1
+  case( 'friction' ); nfric = nfric + 1
     read( buff, * ) a, friction(nfric,:), frici(nfric,:)
-  case( 'traction' )
-    ntrac = ntrac + 1
+  case( 'traction' ); ntrac = ntrac + 1
     read( buff, * ) a, traction(ntrac,:), traci(ntrac,:)
-  case( 'stress' )
-    nstress = nstress + 1
+  case( 'stress' ); nstress = nstress + 1
     read( buff, * ) a, stress(nstress,:), stressi(nstress,:)
   case( '' )
-  case default
-    error( 'unrecognized input type: ' // key )
+  case default; error( 'unrecognized input type: ' // key )
   end select
 end do
 10 continue
@@ -172,11 +168,5 @@ offset = 0
 
 end subroutine
 
-function error( string )
-
-character*(*) string
-write(0,*) 'DFM error: ', string
-stop
-
-end function
+end module
 

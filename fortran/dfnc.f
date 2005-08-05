@@ -3,26 +3,28 @@
 
 module dfnc_m
 
+implicit none
+
 contains
 
 subroutine dfnc( op, df, f, x, dx, i, a, i1, i2 )
 
-implicit none
 character, intent(in) :: op
 real, intent(in) :: f(:,:,:,:), x(:,:,:,:), dx
 real, intent(out) :: df(:,:,:)
+real :: h
 integer, intent(in) :: i, a, i1(3), i2(3)
-integer :: j, k, l, b
+integer :: j, k, l, b, c
 
 select case(op)
 
 case('h') ! constant grid, flops: 1* 7+
 
-dx = 0.25 * dx * dx
+h = 0.25 * dx * dx
 select case(a)
 case(1)
   forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
-    df(j,k,l) = dx * &
+    df(j,k,l) = h * &
     ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
     - f(j,k+1,l+1,i) + f(j+1,k,l,i) &
     + f(j+1,k,l+1,i) - f(j,k+1,l,i) &
@@ -30,7 +32,7 @@ case(1)
   end forall
 case(2)
   forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
-    df(j,k,l) = dx * &
+    df(j,k,l) = h * &
     ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
     + f(j,k+1,l+1,i) - f(j+1,k,l,i) &
     - f(j+1,k,l+1,i) + f(j,k+1,l,i) &
@@ -38,7 +40,7 @@ case(2)
   end forall
 case(3)
   forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
-    df(j,k,l) = dx * &
+    df(j,k,l) = h * &
     ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
     + f(j,k+1,l+1,i) - f(j+1,k,l,i) &
     + f(j+1,k,l+1,i) - f(j,k+1,l,i) &
