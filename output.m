@@ -69,7 +69,7 @@ if initialize
     file = sprintf( 'out/%02d/hdr', iz );
     fid = fopen( file, 'w' );
     fprintf( fid, '%g %g %g %g %g %g %g %s %s\n', ...
-      [ outnc(iz) i2-i1+1 outint(iz) nt dt ], outvar{iz}, [ c{:} ] )
+      [ outnc(iz) i1 i2 outint(iz) nt dt ], outvar{iz}, [ c{:} ] )
     fclose( fid );
     if faultplane
       i1(nrmdim) = 1;

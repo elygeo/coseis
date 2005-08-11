@@ -95,8 +95,7 @@ else
 end
 down = [ 0 0 0 ];
 down(downdim) = 1;
-c = [ 0 1 -1; -1 0 1; 1 -1 0 ];
-handed = c(nrmdim,strdim);
+handed = mod( strdim - nrmdim + 1, 3 ) - 1;
 str(:,:,:,1) = down(2) .* nrm(:,:,:,3) - down(3) .* nrm(:,:,:,2);
 str(:,:,:,2) = down(3) .* nrm(:,:,:,1) - down(1) .* nrm(:,:,:,3);
 str(:,:,:,3) = down(1) .* nrm(:,:,:,2) - down(2) .* nrm(:,:,:,1);

@@ -85,11 +85,10 @@ end do
 close( 9 )
 
 halo = 1
-np = n(1:3)
+npg = n(1:3)
 nt = n(4)
-if( nrmdim /= 0 ) np(nrmdim) = np(nrmdim) + 1
-nm = ceiling( np / npe )
-nm = nm + 2 * halo
+if( nrmdim /= 0 ) npg(nrmdim) = npg(nrmdim) + 1
+np = ceiling( npg / npe )
 
 allocate(      &
   x(j,k,l,3),  &

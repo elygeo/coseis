@@ -14,6 +14,7 @@ real, intent(out) :: nrm(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3)
 integer :: i, j, k, l, a, b, c, nrmdim
 
+nrm = 0.
 do i = 1, 3; if ( i1(i) == i2(i) ) nrmdim = i; end do
 do a = 1, 3
   b = mod( a,   3 ) + 1
