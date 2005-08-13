@@ -1,14 +1,9 @@
 !------------------------------------------------------------------------------!
 ! SNORMALS - surface normals
 
-module snormals_m
-
-implicit none
-
-contains
-
 subroutine snormals( x, i1, i2, nrm )
 
+implicit none
 real, intent(in) :: x(:,:,:,:)
 real, intent(out) :: nrm(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3)
@@ -76,6 +71,4 @@ do a = 1, 3
 end do
 
 end subroutine
-
-end module
 

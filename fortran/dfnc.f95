@@ -1,14 +1,9 @@
 !------------------------------------------------------------------------------!
 ! DFNC - difference operators, node to cell
 
-module dfnc_m
-
-implicit none
-
-contains
-
 subroutine dfnc( op, df, f, x, dx, i, a, i1, i2 )
 
+implicit none
 character, intent(in) :: op
 real, intent(in) :: f(:,:,:,:), x(:,:,:,:), dx
 real, intent(out) :: df(:,:,:)
@@ -118,6 +113,4 @@ end forall
 end select
 
 end subroutine
-
-end module
 

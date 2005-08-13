@@ -1,35 +1,38 @@
 !------------------------------------------------------------------------------!
 ! FAULT
 
-module fault_m
+subroutine fault( init )
+use globals
+real, dimension(:,:,:) :: fs, fd, dc, cohes, area, r, tmp, tn, ts, ff, ff2
+real, dimension(:,:,:,:) :: nrm, tt0, str, dip, tt0nsd, w0, tt, tn3, ts3
+integer :: i, j, k, l, i1(3), i2(3), nf(3), down(3), handed, init
 
-implicit none
-private
-real, public :: uslip(:,:,:), vslip(:,:,:), trup(:,:,:)
-real :: fs(:,:,:), fd(:,:,:), dc(:,:,:), cohes(:,:,:), &
-  nrm(:,:,:,:), area(:,:,:), r(:,:,:), tt0(:,:,:,:), tmp(:,:,:)
-integer :: i, j, k, l, nf(3), n(3)
+init: if ( init == 0 ) then
 
-contains
-
-subroutine fault_init
-
-use snormals_m
-
-real ::  w0(:,:,:), str(:,:,:,:), dip(:,:,:,:)
-
-print '(a)', 'Initialize fault'
+if ( ipe == 0 ) print '(a)', 'Initialize fault'
+np = shape( x ) - 2 * halo
 nm = shape( x )
-npf = np
-npf(nrmdim) = 1
-nmf = npf + 2 * halo
-j = nmf(1)
-k = nmf(2)
-l = nmf(3)
-allocate( uslip(j,k,l), vslip(j,k,l), trup(j,k,l), &
-  fs(j,k,l), fd(j,k,l), dc(j,k,l), cohes(j,k,l), &
-  nrm(j,k,l,3), area(j,k,l), r(j,k,l), tt0(j,k,l,3), tmp(j,k,l), &
-  w0(j,k,l,6), str(j,k,l,3), dip(j,k,l,3) )
+nm(nrmdim) = 1
+j = nm(1)
+k = nm(2)
+l = nm(3)
+allocate(       &
+  uslip(j,k,l), &
+  vslip(j,k,l), &
+  trup(j,k,l),  &
+  fs(j,k,l),    &
+  fd(j,k,l),    &
+  dc(j,k,l),    &
+  cohes(j,k,l), &
+  area(j,k,l),  &
+  r(j,k,l),     &
+  tmp(j,k,l),   &
+  nrm(j,k,l,3), &
+  tt0(j,k,l,3), &
+  w0(j,k,l,6),  &
+  str(j,k,l,3), &
+  dip(j,k,l,3)  &
+)
 uslip = 0.
 vslip = 0.
 trup = 0.
@@ -62,7 +65,7 @@ do iz = 1, nfric
 end do
 ! normal vectors
 i1 = halo + (/ 1, 1, 1 /)
-i2 = halo + np
+i2 = halo + nm - 1
 call snormals( x, i1, i2, nrm )
 area = sqrt( sum( nrm * nrm, 4 ) )
 tmp = 0.
@@ -123,18 +126,18 @@ do iz = 1, nstress
   w0(j1:j2,k1:k2,l1:l2,5) = stress(iz,5)
   w0(j1:j2,k1:k2,l1:l2,6) = stress(iz,6)
 end do
-do a = 1, 3
-  b = mod( a , 3 ) + 4
-  c = mod( a + 1, 3 ) + 4
-  tt0(:,:,:,a) = tt0(:,:,:,a) + &
-    w0(:,:,:,a) * nrm(:,:,:,a) + &
-    w0(:,:,:,b) * nrm(:,:,:,c) + &
-    w0(:,:,:,c) * nrm(:,:,:,b)
+do i = 1, 3
+  j = mod( i , 3 ) + 4
+  k = mod( i + 1, 3 ) + 4
+  tt0(:,:,:,i) = tt0(:,:,:,i) + &
+    w0(:,:,:,i) * nrm(:,:,:,i) + &
+    w0(:,:,:,j) * nrm(:,:,:,k) + &
+    w0(:,:,:,k) * nrm(:,:,:,j)
 end do
-hypocloc = x(hypocenter(1),hypocenter(2),hypocenter(3))
-forall( i=1:3, j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
-  wf1(j,k,l,i) = x(j+j1,k+k1,l+l1,i) - hypoloc(i)
-end forall
+i1 = hypocenter
+do i = 1, 3
+  wf1(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - x(i1(1),i1(2),i1(3),i)
+end do
 r = sqrt( sum( wf1 * wf1, 4 ) )
 !if nm(1) == 4, r = repmat( r(j,:,:), [ 4 1 1 ] ); end ! 2D cases
 !if nm(2) == 4, r = repmat( r(:,k,:), [ 1 4 1 ] ); end ! 2D cases
@@ -154,7 +157,7 @@ print *, 'S', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 )
 print *, 'dc: ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / miu0
 print *, 'rcrit: ', rcrit, '>', miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2
 i1 = (/ 1, 1, 1 /)
-i2 = np + 2 * halo
+i2 = nm
 i1(nrmdim) = hypocenter(nrmdim)
 i2(nrmdim) = hypocenter(nrmdim)
 j1 = i1(1); k1 = i1(2); l1 = i1(3)
@@ -163,13 +166,12 @@ i1(nrmdim) = hypocenter(nrmdim) + 1
 i2(nrmdim) = hypocenter(nrmdim) + 1
 j3 = i3(1); k3 = i3(2); l3 = i3(3)
 j4 = i4(1); k4 = i4(2); l4 = i4(3)
-j = nmf(1); k = nmf(2); l = nmf(3)
+j  = nm(1); k  = nm(2); l  = nm(3)
 deallocate( tt0nsd, w0, str, dip )
-allocate( tt(j,k,l,3), tn3(j,k,l,3), tn(j,k,l), ts3(j,k,l,3), ts(j,k,l), ff(j,k,l), ff2(j,k,l) )
+allocate( tt(j,k,l,3), tn3(j,k,l,3), ts3(j,k,l,3), tn(j,k,l), ts(j,k,l), ff(j,k,l), ff2(j,k,l) )
+return
 
-end subroutine
-
-subroutine fault( it dt nclramp vrup v w1 rho hypocenter )
+end if init
 
 ! Zero slip velocity condition
 tmp = area * ( rho(j1:j2,k1:k2,l1:l2) + rho(j3:j4,k3:k4,l3:l4) )
@@ -180,17 +182,17 @@ do i = 1, 3
     - v(j1:j2,k1:k2,l1:l2,i) - w1(j1:j2,k1:k2,l1:l2,i) )
 end do
 tn = sum( tt * nrm, 4 )
-do i = 1, 3
-  tn3(:,:,:,i) = tn * nrm(:,:,:,i)
-end do
+do i = 1, 3; tn3(:,:,:,i) = tn * nrm(:,:,:,i); end do
 ts3 = tt - tn3
 ts = sqrt( sum( ts3 * ts3, 4 ) )
-!if 0 ! Fault opening 
-!  forall( i=1:3 ) tt(:,:,:,i) = tt(:,:,:,i) + tmp * &
+!if ( .false. ) then ! Fault opening 
+!  do i = 1, 3
+!    tt(:,:,:,i) = tt(:,:,:,i) + tmp * &
 !    ( u(j3:j4,k3:k4,l3:l4,i) - u(j1:j2,k1:k2,l1:l2,i) ) / dt
+!  end do
 !  tn = sum( tt * nrm, 4 )
 !  where( tn > cohes ) tn = cohes
-!  forall( i = 1:3 ) tn3(:,:,:,i) = tn * nrm(:,:,:,i)
+!  do i = 1, 3; tn3(:,:,:,i) = tn * nrm(:,:,:,i); end do
 !end if
 ! Friction Law
 tn = -tn
@@ -205,8 +207,8 @@ if ( rcrit > 0. .and. vrup > 0. )
   ff2 = ( 1 - c ) * ts + c * ( fd * tn + cohes )
   where ( r < min( rcrit, it * dt * vrup ) .and. ff2 < ff ) ff = ff2
 end if
+!if ( count( ff <= 0. ) > 0 ) print *, 'fault opening!'
 ! Shear traction bounded by friction
-!if find( ff <= 0 ), fprintf( 'fault opening!\n' ), end
 tmp = 1.
 where ( ts > ff ) tmp = ff / ts
 do i = 1, 3
@@ -219,10 +221,13 @@ end do
 tt = v(j3:j4,k3:k4,l3:l4,:) + w1(j3:j4,k3:k4,l3:l4,:) &
    - v(j1:j2,k1:k2,l1:l2,:) - w1(j1:j2,k1:k2,l1:l2,:)
 vslip = sqrt( sum( tt * tt, 4 ) )
+uslip = uslip + dt * vslip
+!uslipmax = maxval( abs( uslip ) )
+!vslipmax = maxval( abs( vslip ) )
+!tnmax = maxval( abs( tn ) )
+!tsmax = maxval( abs( ts ) )
 
 if ( truptol > 0. ) where ( trup = 0. .and. vslip > truptol ) trup = ( it + .5 ) * dt
 
 end subroutine
-
-end module
 
