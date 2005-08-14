@@ -23,18 +23,13 @@ for iz = 1:size( material, 1 )
   lam0  = rho0 * ( vp * vp - 2 * vs * vs );
   yc0   = miu0 * ( lam0 + miu0 ) / 6 / ( lam0 + 2 * miu0 ) * 4 / dx ^ 2;
   nu    = .5 * lam0 / ( lam0 + miu0 );
-  l = i1(3):i2(3)-1;
-  k = i1(2):i2(2)-1;
-  j = i1(1):i2(1)-1;
-  switch nrmdim
-  case 1, j(j==hypocenter(1)) = [];
-  case 2, k(k==hypocenter(2)) = [];
-  case 3, l(l==hypocenter(3)) = [];
-  end
-  s1(j,k,l) = rho0;
-  lam(j,k,l) = lam0;
-  miu(j,k,l) = miu0;
-  yc(j,k,l) = yc0;
+  j1 = i1(1); j2 = i2(1) - 1
+  k1 = i1(2); k2 = i2(2) - 1
+  l1 = i1(3); l2 = i2(3) - 1
+  s1(j1:j2,k1:k2,l1:l2) = rho0
+  lam(j1:j2,k1:k2,l1:l2) = lam0
+  miu(j1:j2,k1:k2,l1:l2) = miu0
+  yc(j1:j2,k1:k2,l1:l2) = yc0
 end
 courant = dt * matmax(2) * sqrt( 3 ) / dx;   % TODO: check, make general
 fprintf( 'courant: %g < 1\n', courant )
@@ -50,11 +45,11 @@ for iz = 1:size( operator, 1 )
   j = i1(1):i2(1)-1;
   s2(j,k,l) = dfnc( operator{iz,1}, x, x, dx, 1, 1, j, k, l );
 end
-i = hypocenter;
+i = hypocenter(nrmdim);
 switch nrmdim
-case 1, s2(i(1),:,:) = 0; yc(i(1),:,:) = 0;
-case 2, s2(:,i(2),:) = 0; yc(:,i(2),:) = 0;
-case 3, s2(:,:,i(3)) = 0; yc(:,:,i(3)) = 0;
+case 1, s2(i,:,:) = 0.; yc(i,:,:) = 0.;
+case 2, s2(:,i,:) = 0.; yc(:,i,:) = 0.;
+case 3, s2(:,:,i) = 0.; yc(:,:,i) = 0.;
 end
 
 i1 = halo + [ 0 0 0 ];
@@ -63,12 +58,12 @@ l = i1(3):i2(3);
 k = i1(2):i2(2);
 j = i1(1):i2(1);
 
-if bc(1), ji = i1(1); s1(ji,k,l) = s1(ji+1,k,l); s2(ji,k,l) = s1(ji+1,k,l); end
-if bc(4), ji = i2(1); s1(ji,k,l) = s1(ji-1,k,l); s2(ji,k,l) = s1(ji-1,k,l); end
-if bc(2), ki = i1(2); s1(j,ki,l) = s1(j,ki+1,l); s2(j,ki,l) = s1(j,ki+1,l); end
-if bc(5), ki = i2(2); s1(j,ki,l) = s1(j,ki-1,l); s2(j,ki,l) = s1(j,ki-1,l); end
-if bc(3), li = i1(3); s1(j,k,li) = s1(j,k,li+1); s2(j,k,li) = s1(j,k,li+1); end
-if bc(6), li = i2(3); s1(j,k,li) = s1(j,k,li-1); s2(j,k,li) = s1(j,k,li-1); end
+if bc(1), ji = i1(1); s1(ji,:,:) = s1(ji+1,:,:); s2(ji,:,:) = s1(ji+1,:,:); end
+if bc(4), ji = i2(1); s1(ji,:,:) = s1(ji-1,:,:); s2(ji,:,:) = s1(ji-1,:,:); end
+if bc(2), ki = i1(2); s1(:,ki,:) = s1(:,ki+1,:); s2(:,ki,:) = s1(:,ki+1,:); end
+if bc(5), ki = i2(2); s1(:,ki,:) = s1(:,ki-1,:); s2(:,ki,:) = s1(:,ki-1,:); end
+if bc(3), li = i1(3); s1(:,:,li) = s1(:,:,li+1); s2(:,:,li) = s1(:,:,li+1); end
+if bc(6), li = i2(3); s1(:,:,li) = s1(:,:,li-1); s2(:,:,li) = s1(:,:,li-1); end
 
 i1 = halo + [ 1 1 1 ];
 i2 = halo + np;

@@ -1,12 +1,10 @@
 !------------------------------------------------------------------------------!
 
 module globals
-  implicit none
 end module
 
 module mod2
   use globals
-  implicit none
   contains
     subroutine extsub
     x = 1.22
@@ -15,6 +13,10 @@ end module
 
 program main
   use mod2
+  real :: x(4) = (/ 1.1, 2.2, 3.3, 4.4 /)
+  integer :: i = 5, j = 4
+  logical :: z(3) = .true.
+print *, z
   call extsub
   contains
     subroutine intsub

@@ -4,7 +4,8 @@ module globals
 
 implicit none
 integer, parameter :: nz = 256
-integer :: n(4), npe(3), np(3), nt, npml, bc(6), halo, nrmdim, nclramp, &
+integer :: n(4), npe(3), np(3), nt, npml, bc(6), edge(6), halo, &
+  nrmdim, nclramp, &
   nmat, nfric, ntrac, nstress, nout, mati(nz,0), checkpoint, &
   nop, opi1(nz,3), opi2(nz,3) 
 real :: dx, dt, nu, rho0, vp, vs, vrup, rcrit, viscosity(2), msrcradius, &
