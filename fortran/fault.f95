@@ -19,8 +19,8 @@ if ( init == 0 ) then
   down = (/ 0, 0, 0 /)
   down(downdim) = 1
   handed = mod( strdim - nrmdim + 1, 3 ) - 1
-  i1 = max( i1core, i1pml )
-  i2 = min( i2core, i2pml )
+  i1 = i1node
+  i2 = i2node
   i1(nrmdim) = 1
   i2(nrmdim) = 1
   j1 = i1(1); j2 = i2(1)
@@ -52,7 +52,7 @@ if ( init == 0 ) then
   w0 = 0.
   tt0nsd = 0.
   do iz = 1, nfric
-    zoneselect( frici(iz,:), npg, hypocenter, nrmdim, i1, i2 )
+    zoneselect( i1, i2, frici(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1pml )
     i2 = min( i2, i2pml )
     i1(nrmdim) = 1
@@ -66,7 +66,7 @@ if ( init == 0 ) then
     cohes(j1:j2,k1:k2,l1:l2) = friction(iz,4)
   end do
   do iz = 1, ntrac
-    zoneselect( traci(iz,:), npg, hypocenter, nrmdim, i1, i2 )
+    zoneselect( i1, i2, traci(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1pml )
     i2 = min( i2, i2pml )
     i1(nrmdim) = 1
@@ -79,7 +79,7 @@ if ( init == 0 ) then
     tt0nsd(j1:j2,k1:k2,l1:l2,3) = traction(iz,3)
   end do
   do iz = 1, nstress
-    zoneselect( stressi(iz,:), npg, hypocenter, nrmdim, i1, i2 )
+    zoneselect( i1, i2, stressi(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1pml )
     i2 = min( i2, i2pml )
     i1(nrmdim) = 1
@@ -97,7 +97,7 @@ if ( init == 0 ) then
   ! normal vectors
   i1 = max( i1core, i1pml )
   i2 = min( i2core, i2pml )
-  call snormals( x, i1, i2, nrm )
+  call snormals( nrm, x, i1, i2 )
   area = sqrt( sum( nrm * nrm, 4 ) )
   tmp = 0.
   where ( area /= 0. ) tmp = 1. / area
@@ -152,8 +152,8 @@ if ( init == 0 ) then
   print *, 'dc: ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / miu0
   print *, 'rcrit: ', rcrit, '>', miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2
   deallocate( tt0nsd, w0, str, dip )
-  i1 = max( i1core, i1pml )
-  i2 = min( i2core, i2pml )
+  i1 = i1node
+  i2 = i2node
   i1(nrmdim) = 1
   i2(nrmdim) = 1
   j1 = i1(1); j2 = i2(1)
@@ -172,8 +172,8 @@ end if init
 
 !------------------------------------------------------------------------------!
 ! Zero slip velocity condition
-i1 = max( i1core, i1pml )
-i2 = min( i2core, i2pml )
+i1 = i1node
+i2 = i2node
 i1(nrmdim) = hypocenter(nrmdim)
 i2(nrmdim) = hypocenter(nrmdim)
 j1 = i1(1); j2 = i2(1)

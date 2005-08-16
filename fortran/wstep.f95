@@ -1,6 +1,6 @@
 !------------------------------------------------------------------------------!
-! STEPW
-subroutine stepw
+! WSTEP
+subroutine wstep
 
 integer :: i, j, k, l, i1(3), i2(3), ic, id, ix
 character :: op
@@ -15,58 +15,56 @@ s1 = u(:,:,:,ic) + gamma(1) .* v(:,:,:,ic)
 inner: do id = 1, 3
   ix = 6 - ic - id
   do iz = 1, size( oper, 1 )
-    op = oper(iz)
-    i1 = opi1(iz,:)
-    i2 = opi2(iz,:) - 1
-    i1 = max( i1, i1pml )
-    i2 = min( i2, i2pml - 1 )
-    call dfnc( s2, op, s1, x, dx, 1, id, i1, i2 )
+    call zoneselect( i1, i2, operi(iz,:), npg, offset, hypocenter )
+    i1 = max( i1, i1cell, i1pml )
+    i2 = min( i2, i2cell, i2pml - 1 )
+    call dfnc( s2, oper(iz), s1, x, dx, 1, id, i1, i2 )
   end do
   op = operator(1)
   do i = 1, npml
-    if ( id /= 1 .and. bc(1) ) then
-      i1 = halo + 1
-      i2 = halo + np - 1
+    if ( id /= 1 .and. bc(1) == 1 ) then
+      i1 = i1cell
+      i2 = i2cell
       j = i1(1) + i - 1
       i1(1) = j
       i2(1) = j
       call dfnc( s2, op, u, x, dx, ic, id, i1, i2 )
     end if
-    if ( id /= 1 .and. bc(4) ) then
-      i1 = halo + 1
-      i2 = halo + np - 1
+    if ( id /= 1 .and. bc(4) == 1 ) then
+      i1 = i1cell
+      i2 = i2cell
       j = i2(1) - i + 1
       i1(1) = j
       i2(1) = j
       call dfnc( s2, op, u, x, dx, ic, id, i1, i2 )
     end if
-    if ( id /= 2 .and. bc(2) ) then
-      i1 = halo + 1
-      i2 = halo + np - 1
+    if ( id /= 2 .and. bc(2) == 1 ) then
+      i1 = i1cell
+      i2 = i2cell
       k = i1(2) + i - 1
       i1(2) = k
       i2(2) = k
       call dfnc( s2, op, u, x, dx, ic, id, i1, i2 )
     end if
-    if ( id /= 2 .and. bc(5) ) then
-      i1 = halo + 1
-      i2 = halo + np - 1
+    if ( id /= 2 .and. bc(5) == 1 ) then
+      i1 = i1cell
+      i2 = i2cell
       k = i2(2) - i + 1
       i1(2) = k
       i2(2) = k
       call dfnc( s2, op, u, x, dx, ic, id, i1, i2 )
     end if
-    if ( id /= 3 .and. bc(3) ) then
-      i1 = halo + 1
-      i2 = halo + np - 1
+    if ( id /= 3 .and. bc(3) == 1 ) then
+      i1 = i1cell
+      i2 = i2cell
       l = i1(3) + i - 1
       i1(3) = l
       i2(3) = l
       call dfnc( s2, op, u, x, dx, ic, id, i1, i2 )
     end if
-    if ( id /= 3 .and. bc(6) ) then
-      i1 = halo + 1
-      i2 = halo + np - 1
+    if ( id /= 3 .and. bc(6) == 1 ) then
+      i1 = i1cell
+      i2 = i2cell
       l = i2(3) - i + 1
       i1(3) = l
       i2(3) = l
@@ -74,9 +72,9 @@ inner: do id = 1, 3
     end if
   end do
   do i = 1, npml
-    if ( id == 1 .and. bc(1) ) then
-      i1 = halo + 1
-      i2 = halo + np - 1
+    if ( id == 1 .and. bc(1) == 1 ) then
+      i1 = i1cell
+      i2 = i2cell
       j = i1(1) + i - 1
       i1(1) = j
       i2(1) = j
@@ -86,9 +84,9 @@ inner: do id = 1, 3
         g1(i,k,l,ic) = s2(j,k,l)
       end forall
     end if
-    if ( id == 1 .and. bc(4) ) then
-      i1 = halo + 1
-      i2 = halo + np - 1
+    if ( id == 1 .and. bc(4) == 1 ) then
+      i1 = i1cell
+      i2 = i2cell
       j = i2(1) - i + 1
       i1(1) = j
       i2(1) = j
@@ -98,9 +96,9 @@ inner: do id = 1, 3
         g4(i,k,l,ic) = s2(j,k,l)
       end forall
     end if
-    if ( id == 2 .and. bc(2) ) then
-      i1 = halo + 1
-      i2 = halo + np - 1
+    if ( id == 2 .and. bc(2) == 1 ) then
+      i1 = i1cell
+      i2 = i2cell
       k = i1(2) + i - 1
       i1(2) = k
       i2(2) = k
@@ -110,9 +108,9 @@ inner: do id = 1, 3
         g2(j,i,l,ic) = s2(j,k,l)
       end forall
     end if
-    if ( id == 2 .and. bc(5) ) then
-      i1 = halo + 1
-      i2 = halo + np - 1
+    if ( id == 2 .and. bc(5) == 1 ) then
+      i1 = i1cell
+      i2 = i2cell
       k = i2(2) - i + 1
       i1(2) = k
       i2(2) = k
@@ -122,9 +120,9 @@ inner: do id = 1, 3
         g5(j,i,l,ic) = s2(j,k,l)
       end forall
     end if
-    if ( id == 3 .and. bc(3) ) then
-      i1 = halo + 1
-      i2 = halo + np - 1
+    if ( id == 3 .and. bc(3) == 1 ) then
+      i1 = i1cell
+      i2 = i2cell
       l = i1(3) + i - 1
       i1(3) = l
       i2(3) = l
@@ -134,9 +132,9 @@ inner: do id = 1, 3
         g3(j,k,i,ic) = s2(j,k,l)
       end forall
     end if
-    if ( id == 3 .and. bc(6) ) then
-      i1 = halo + 1
-      i2 = halo + np - 1
+    if ( id == 3 .and. bc(6) == 1 ) then
+      i1 = i1cell
+      i2 = i2cell
       l = i2(3) - i + 1
       i1(3) = l
       i2(3) = l

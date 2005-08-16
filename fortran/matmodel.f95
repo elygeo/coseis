@@ -9,9 +9,9 @@ if ( ipe == 0 ) print '(a)', 'Material Model'
 matmax = material(1,1:3)
 matmin = material(1,1:3)
 do iz = 1, nmat
-  call zoneselect( mati(iz,:), npg, offset, hypocenter, i1, i2 )
-  i1 = max( i1, i1core + halo1 )
-  i2 = min( i2, i2core - halo2 )
+  call zoneselect( i1, i2, mati(iz,:), npg, offset, hypocenter )
+  i1 = max( i1, i1cell )
+  i2 = min( i2 - 1, i2cell )
   rho0 = material(iz,1)
   vp   = material(iz,2)
   vs   = material(iz,3)
@@ -21,9 +21,9 @@ do iz = 1, nmat
   lam0 = rho0 * ( vp * vp - 2 * vs * vs )
   yc0  = miu0 * ( lam0 + miu0 ) / 6 / ( lam0 + 2 * miu0 ) * 4 / dx ^ 2
   !nu  = .5 * lam0 / ( lam0 + miu0 )
-  j1 = i1(1); j2 = i2(1) - 1
-  k1 = i1(2); k2 = i2(2) - 1
-  l1 = i1(3); l2 = i2(3) - 1
+  j1 = i1(1); j2 = i2(1)
+  k1 = i1(2); k2 = i2(2)
+  l1 = i1(3); l2 = i2(3)
   s1(j1:j2,k1:k2,l1:l2) = rho0
   lam(j1:j2,k1:k2,l1:l2) = lam0
   miu(j1:j2,k1:k2,l1:l2) = miu0
@@ -33,15 +33,13 @@ courant = dt * matmax(2) * sqrt( 3 ) / dx   ! TODO: check, make general
 if ( ipe == 0 ) print *, 'courant: 1 > ', courant
 gamma = dt * viscosity
 
-do iz = 1, nop
+do iz = 1, noper
   call zoneselect( operi(iz,:), npg, offset, hypocenter, i1, i2 )
-  i1 = max( i1, i1core + halo1 )
-  i2 = min( i2, i2core - halo2 )
-  opi1(iz,:) = i1;
-  opi2(iz,:) = i2;
-  j1 = i1(1); j2 = i2(1) - 1
-  k1 = i1(2); k2 = i2(2) - 1
-  l1 = i1(3); l2 = i2(3) - 1
+  i1 = max( i1, i1cell )
+  i2 = min( i2 - 1, i2cell )
+  j1 = i1(1); j2 = i2(1)
+  k1 = i1(2); k2 = i2(2)
+  l1 = i1(3); l2 = i2(3)
   dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 );
 end do
 i = hypocenter(nrmdim)
@@ -63,32 +61,35 @@ if ( bc(6) == 1 ) s1(:,:,l2) = s1(:,:,l2-1); s2(:,:,l2) = s2(:,:,l2-1); end if
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-i1 = halo + [ 1 1 1 ];
-i2 = halo + np;
-l = i1(3):i2(3);
-k = i1(2):i2(2);
-j = i1(1):i2(1);
-
-yn(j,k,l) = 0.125 * ...
-  ( s1(j,k,l) + s1(j-1,k-1,l-1) ...
-  + s1(j-1,k,l) + s1(j,k-1,l-1) ...
-  + s1(j,k-1,l) + s1(j-1,k,l-1) ...
-  + s1(j,k,l-1) + s1(j-1,k-1,l) );
-s1 = s1 .* s2;
-rho(j,k,l) = 0.125 * ...
-  ( s1(j,k,l) + s1(j-1,k-1,l-1) ...
-  + s1(j-1,k,l) + s1(j,k-1,l-1) ...
-  + s1(j,k-1,l) + s1(j-1,k,l-1) ...
-  + s1(j,k,l-1) + s1(j-1,k-1,l) );
+j1 = i1node(1); j2 = i2node(1)
+k1 = i1node(2); k2 = i2node(2)
+l1 = i1node(3); l2 = i2node(3)
+forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  yn(j,k,l) = 0.125 * &
+  ( s1(j,k,l) + s1(j-1,k-1,l-1) &
+  + s1(j-1,k,l) + s1(j,k-1,l-1) &
+  + s1(j,k-1,l) + s1(j-1,k,l-1) &
+  + s1(j,k,l-1) + s1(j-1,k-1,l) )
+end forall
+s1 = s1 * s2
+forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  rho(j,k,l) = 0.125 * &
+  ( s1(j,k,l) + s1(j-1,k-1,l-1) &
+  + s1(j-1,k,l) + s1(j,k-1,l-1) &
+  + s1(j,k-1,l) + s1(j-1,k,l-1) &
+  + s1(j,k,l-1) + s1(j-1,k-1,l) )
+end forall
+where ( yn /= 0. )  yn  = dt / yn
+where ( rho /= 0. ) rho = dt / rho
 i = yn  ~= 0; yn(i)  = dt ./ yn(i);
 i = rho ~= 0; rho(i) = dt ./ rho(i);
 
-i = s2 ~= 0; s2(i) = 1 ./ s2(i);
-lam(:,:,:) = lam(:,:,:) .* s2(:,:,:);
-miu(:,:,:) = miu(:,:,:) .* s2(:,:,:);
+where ( s2 /= 0. )  s2  = 1 / s2
+lam = lam * s2
+miu = miu * s2
 
-s1(:,:,:) = 0;
-s2(:,:,:) = 0;
+s1 = 0.
+s2 = 0.
 
 if length( locknodes )
   locknodes(downdim,1:3) = 0;

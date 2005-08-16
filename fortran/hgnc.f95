@@ -1,17 +1,21 @@
 !------------------------------------------------------------------------------!
 ! HGNC - hourglass corrections, node to cell
 
-subroutine hgnc( f, i, iq, i1, i2, hg )
+subroutine hgnc( hg, f, i, iq, i1, i2 )
 
 implicit none
-real, intent(in) :: f(:,:,:,:)
 real, intent(out) :: hg(:,:,:,:)
+real, intent(in) :: f(:,:,:,:)
 integer, intent(in) :: i, iq, i1(3), i2(3)
-integer :: j, k, l
+integer :: j, j1, j2, k, k1, k2, l, l1, l2
+
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
 
 selectcase(iq)
 case(1)
-  forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     hg(j,k,l,1) = &
     - f(j,k,l,i) - f(j+1,k+1,l+1,i) &
     - f(j+1,k,l,i) - f(j,k+1,l+1,i) &
@@ -19,7 +23,7 @@ case(1)
     + f(j,k,l+1,i) + f(j+1,k+1,l,i);
   end forall
 case(2)
-  forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     hg(j,k,l,1) = &
     - f(j,k,l,i) - f(j+1,k+1,l+1,i) &
     + f(j+1,k,l,i) + f(j,k+1,l+1,i) &
@@ -27,7 +31,7 @@ case(2)
     + f(j,k,l+1,i) + f(j+1,k+1,l,i);
   end forall
 case(3)
-  forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     hg(j,k,l,1) = &
     - f(j,k,l,i) - f(j+1,k+1,l+1,i) &
     + f(j+1,k,l,i) + f(j,k+1,l+1,i) &
@@ -35,7 +39,7 @@ case(3)
     - f(j,k,l+1,i) - f(j+1,k+1,l,i);
   end forall
 case(4)
-  forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     hg(j,k,l,1) = &
     - f(j,k,l,i) + f(j+1,k+1,l+1,i) &
     + f(j+1,k,l,i) - f(j,k+1,l+1,i) &
