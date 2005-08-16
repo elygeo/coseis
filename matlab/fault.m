@@ -10,7 +10,7 @@ fs     = repmat( 0, nf );
 fd     = repmat( 0, nf );
 dc     = repmat( 0, nf );
 cohes  = repmat( 1e9, nf );
-s0     = repmat( 0, [ nf 6 ] );
+w0     = repmat( 0, [ nf 6 ] );
 tt0nsd = repmat( 0, [ nf 3 ] );
 uslip  = repmat( 0, nf );
 vslip  = repmat( 0, nf );
@@ -19,6 +19,9 @@ r      = repmat( 0, [ nf 3 ] );
 str    = repmat( 0, [ nf 3 ] );
 dip    = repmat( 0, [ nf 3 ] );
 tt0    = repmat( 0, [ nf 3 ] );
+nrm    = repmat( 0, [ nf 3 ] );
+str    = repmat( 0, [ nf 3 ] );
+dip    = repmat( 0, [ nf 3 ] );
 for iz = 1:size( friction, 1 )
   zone = friction(iz,5:10);
   [ i1, i2 ] = zoneselect( zone, halo, np, hypocenter, nrmdim );
@@ -26,13 +29,13 @@ for iz = 1:size( friction, 1 )
   i2 = min( i2, i2pml );
   i1(nrmdim) = 1;
   i2(nrmdim) = 1;
-  j = i1(1):i2(1);
-  k = i1(2):i2(2);
-  l = i1(3):i2(3);
-  fs(j,k,l)    = friction(iz,1);
-  fd(j,k,l)    = friction(iz,2);
-  dc(j,k,l)    = friction(iz,3);
-  cohes(j,k,l) = friction(iz,4);
+  j1 = i1(1); j2 = i2(1);
+  k1 = i1(2); k2 = i2(2);
+  l1 = i1(3); l2 = i2(3);
+  fs(j1:j2,k1:k2,l1:l2)    = friction(iz,1);
+  fd(j1:j2,k1:k2,l1:l2)    = friction(iz,2);
+  dc(j1:j2,k1:k2,l1:l2)    = friction(iz,3);
+  cohes(j1:j2,k1:k2,l1:l2) = friction(iz,4);
 end
 for iz = 1:size( traction, 1 )
   zone = traction(iz,4:9);
@@ -41,12 +44,12 @@ for iz = 1:size( traction, 1 )
   i2 = min( i2, i2pml );
   i1(nrmdim) = 1;
   i2(nrmdim) = 1;
-  j = i1(1):i2(1);
-  k = i1(2):i2(2);
-  l = i1(3):i2(3);
-  tt0nsd(j,k,l,1) = traction(iz,1);
-  tt0nsd(j,k,l,2) = traction(iz,2);
-  tt0nsd(j,k,l,3) = traction(iz,3);
+  j1 = i1(1); j2 = i2(1);
+  k1 = i1(2); k2 = i2(2);
+  l1 = i1(3); l2 = i2(3);
+  tt0nsd(j1:j2,k1:k2,l1:l2,1) = traction(iz,1);
+  tt0nsd(j1:j2,k1:k2,l1:l2,2) = traction(iz,2);
+  tt0nsd(j1:j2,k1:k2,l1:l2,3) = traction(iz,3);
 end
 for iz = 1:size( stress, 1 )
   zone = stress(iz,7:12);
@@ -55,36 +58,30 @@ for iz = 1:size( stress, 1 )
   i2 = min( i2, i2pml );
   i1(nrmdim) = 1;
   i2(nrmdim) = 1;
-  j = i1(1):i2(1);
-  k = i1(2):i2(2);
-  l = i1(3):i2(3);
-  s0(j,k,l,1) = stress(iz,1);
-  s0(j,k,l,2) = stress(iz,2);
-  s0(j,k,l,3) = stress(iz,3);
-  s0(j,k,l,4) = stress(iz,4);
-  s0(j,k,l,5) = stress(iz,5);
-  s0(j,k,l,6) = stress(iz,6);
+  j1 = i1(1); j2 = i2(1);
+  k1 = i1(2); k2 = i2(2);
+  l1 = i1(3); l2 = i2(3);
+  w0(j1:j2,k1:k2,l1:l2,1) = stress(iz,1);
+  w0(j1:j2,k1:k2,l1:l2,2) = stress(iz,2);
+  w0(j1:j2,k1:k2,l1:l2,3) = stress(iz,3);
+  w0(j1:j2,k1:k2,l1:l2,4) = stress(iz,4);
+  w0(j1:j2,k1:k2,l1:l2,5) = stress(iz,5);
+  w0(j1:j2,k1:k2,l1:l2,6) = stress(iz,6);
 end
 i1 = halo + [ 1 1 1 ];
 i2 = halo + np;
-i1(nrmdim) = 1;
-i2(nrmdim) = 1;
-j = i1(1):i2(1);
-k = i1(2):i2(2);
-l = i1(3):i2(3);
 i1(nrmdim) = hypocenter(nrmdim);
 i2(nrmdim) = hypocenter(nrmdim);
-j1 = i1(1):i2(1);
-k1 = i1(2):i2(2);
-l1 = i1(3):i2(3);
-nrm = snormals( x, j1, k1, l1 );
+j1 = i1(1); j2 = i2(1);
+k1 = i1(2); k2 = i2(2);
+l1 = i1(3); l2 = i2(3);
+nrm(j1:j2,k1:k2,l1:l2,:) = snormals( x, i1, i2 );
 area = sum( nrm .* nrm, 4 );
 area = sqrt( area );
-tmp = area(j,k,l);
-i = tmp ~= 0;
-tmp(i) = 1 ./ tmp(i);
+tmp = area;
+tmp(tmp~=0) = 1 ./ tmp(tmp~=0);
 for i = 1:3
-  nrm(j,k,l,i) = nrm(j,k,l,i) .* tmp;
+  nrm(:,:,:,i) = nrm(:,:,:,i) .* tmp;
 end
 if nrmdim ~= downdim
   dipdim = downdim;
@@ -99,41 +96,36 @@ handed = mod( strdim - nrmdim + 1, 3 ) - 1;
 str(:,:,:,1) = down(2) .* nrm(:,:,:,3) - down(3) .* nrm(:,:,:,2);
 str(:,:,:,2) = down(3) .* nrm(:,:,:,1) - down(1) .* nrm(:,:,:,3);
 str(:,:,:,3) = down(1) .* nrm(:,:,:,2) - down(2) .* nrm(:,:,:,1);
-tmp = sum( str(j,k,l,:) .* str(j,k,l,:), 4 );
+tmp = sum( str .* str, 4 );
 tmp = sqrt( tmp );
-i = tmp ~= 0;
-tmp(i) = handed ./ tmp(i);
+tmp(tmp~=0) = handed ./ tmp(tmp~=0);
 for i = 1:3
-  str(j,k,l,i) = str(j,k,l,i) .* tmp;
+  str(:,:,:,i) = str(:,:,:,i) .* tmp;
 end
 dip(:,:,:,1) = nrm(:,:,:,2) .* str(:,:,:,3) - nrm(:,:,:,3) .* str(:,:,:,2);
 dip(:,:,:,2) = nrm(:,:,:,3) .* str(:,:,:,1) - nrm(:,:,:,1) .* str(:,:,:,3);
 dip(:,:,:,3) = nrm(:,:,:,1) .* str(:,:,:,2) - nrm(:,:,:,2) .* str(:,:,:,1);
-tmp = sum( dip(j,k,l,:) .* dip(j,k,l,:), 4 );
+tmp = sum( dip .* dip, 4 );
 tmp = sqrt( tmp );
-i = tmp ~= 0;
-tmp(i) = handed ./ tmp(i);
+tmp(tmp~=0) = handed ./ tmp(tmp~=0);
 for i = 1:3
-  dip(j,k,l,i) = dip(j,k,l,i) .* tmp;
+  dip(:,:,:,i) = dip(:,:,:,i) .* tmp;
 end
 c = [ 1 6 5; 6 2 4; 5 4 3 ];
 for i = 1:3
-  tt0(j,k,l,i) = ...
-    s0(j,k,l,c(1,i)) .* nrm(j,k,l,1) + ...
-    s0(j,k,l,c(2,i)) .* nrm(j,k,l,2) + ...
-    s0(j,k,l,c(3,i)) .* nrm(j,k,l,3) + ...
-    tt0nsd(j,k,l,nrmdim) .* nrm(j,k,l,i) + ...
-    tt0nsd(j,k,l,strdim) .* str(j,k,l,i) + ...
-    tt0nsd(j,k,l,dipdim) .* dip(j,k,l,i);
+  tt0(:,:,:,i) = ...
+    w0(:,:,:,c(1,i)) .* nrm(:,:,:,1) + ...
+    w0(:,:,:,c(2,i)) .* nrm(:,:,:,2) + ...
+    w0(:,:,:,c(3,i)) .* nrm(:,:,:,3) + ...
+    tt0nsd(:,:,:,nrmdim) .* nrm(:,:,:,i) + ...
+    tt0nsd(:,:,:,strdim) .* str(:,:,:,i) + ...
+    tt0nsd(:,:,:,dipdim) .* dip(:,:,:,i);
 end
 for i = 1:3
-  r(j,k,l,i) = x(j1,k1,l1,i) - x(hypocenter(1),hypocenter(2),hypocenter(3),i);
+  r(:,:,:,i) = x(j1,k1,l1,i) - hypoloc(i);
 end
-r  = sum( r .* r, 4 );
-r  = sqrt( r );
-if np(1) == 2, r = repmat( r(j,:,:), [ 4 1 1 ] ); end % 2D cases
-if np(2) == 2, r = repmat( r(:,k,:), [ 1 4 1 ] ); end % 2D cases
-if np(3) == 2, r = repmat( r(:,:,l), [ 1 1 4 ] ); end % 2D cases
+r = sum( r .* r, 4 );
+r = sqrt( r );
 i = hypocenter;
 i(nrmdim) = 1;
 j = i(1);
@@ -160,25 +152,25 @@ end
 %tt0 = 5;
 %tw = 1;
 %tt0(2,:,hypocenter(2)) = exp(-((it*dt-tt0)/tw)^2);
-i1 = [ 1 1 1 ];
-i2 = nm;
+i1 = halo + [ 1 1 1 ];
+i2 = halo + np;
 i1(nrmdim) = hypocenter(nrmdim);
 i2(nrmdim) = hypocenter(nrmdim);
-j1 = i1(1):i2(1);
-k1 = i1(2):i2(2);
-l1 = i1(3):i2(3);
+j1 = i1(1); j2 = i2(1);
+k1 = i1(2); k2 = i2(2);
+l1 = i1(3); l2 = i2(3);
 i1(nrmdim) = hypocenter(nrmdim) + 1;
 i2(nrmdim) = hypocenter(nrmdim) + 1;
-j2 = i1(1):i2(1);
-k2 = i1(2):i2(2);
-l2 = i1(3):i2(3);
+j3 = i1(1); j4 = i2(1);
+k3 = i1(2); k4 = i2(2);
+l3 = i1(3); l4 = i2(3);
 % Zero slip velocity condition
-tmp = area .* ( rho(j1,k1,l1) + rho(j2,k2,l2) );
-i = tmp ~= 0;
-tmp(i) = 1 ./ tmp(i);
+tmp = area .* ( rho(j1:j2,k1:k2,l1:l2) + rho(j3:j4,k3:k4,l3:l4) );
+tmp(tmp~=0) = 1 ./ tmp(tmp~=0);
 for i = 1:3
-  tt(:,:,:,i) = tt0(:,:,:,i) + ...
-    tmp .* ( v(j2,k2,l2,i) - v(j1,k1,l1,i) + w1(j2,k2,l2,i) - w1(j1,k1,l1,i) );
+  tt(:,:,:,i) = tt0(:,:,:,i) + tmp *. ...
+    ( v(j3:j4,k3:k4,l3:l4,i) + w1(j3:j4,k3:k4,l3:l4,i) ...
+    - v(j1:j2,k1:k2,l1:l2,i) - w1(j1:j2,k1:k2,l1:l2,i) );
 end
 tn = sum( tt .* nrm, 4 );
 for i = 1:3
@@ -189,11 +181,11 @@ ts = sum( ts3 .* ts3, 4 );
 ts = sqrt( ts );
 if 0 % Fault opening
   for i = 1:3
-    tt(:,:,:,i) = tt(:,:,:,i) + tmp .* ( u(j2,k2,l2,i) - u(j1,k1,l1,i) ) / dt;
+    tt(:,:,:,i) = tt(:,:,:,i) + tmp .* ...
+    ( u(j3:j4,k3:k4,l3:l4,i) - u(j1:j2,k1:k2,l1:l2,i) ) / dt;
   end
   tn = sum( tt .* nrm, 4 );
-  i = tn > cohes(i);
-  tn(i) = cohes(i);
+  tn(tn>cohes) = cohes(tn>cohes);
   for i = 1:3
     tn3(:,:,:,i) = tn .* nrm(:,:,:,i);
   end
@@ -201,8 +193,7 @@ end
 % Friction Law
 cohes1 = cohes;
 tn1 = -tn;
-i = tn1 < 0;
-tn1(i) = 0;
+tn1(tn1<0) = 0;
 c = repmat( 1, size( dc ) );
 i = uslip < dc;
 c(i) = uslip(i) ./ dc(i);
@@ -222,22 +213,22 @@ if find( ff <= 0 ), fprintf( 'fault opening!\n' ), end
 c(i) = ff(i) ./ ts(i);
 for i = 1:3
   tt(:,:,:,i) = -tt0(:,:,:,i) + tn3(:,:,:,i) + c .* ts3(:,:,:,i);
-  w1(j1,k1,l1,i) = w1(j1,k1,l1,i) + tt(:,:,:,i) .* area .* rho(j1,k1,l1);
-  w1(j2,k2,l2,i) = w1(j2,k2,l2,i) - tt(:,:,:,i) .* area .* rho(j2,k2,l2);
+  w1(j1:j2,k1:k2,l1:l2,i) = ...
+  w1(j1:j2,k1:k2,l1:l2,i) + tt(:,:,:,i) *. area *. rho(j1:j2,k1:k2,l1:l2);
+  w1(j3:j4,k3:k4,l3:l4,i) = ...
+  w1(j3:j4,k3:k4,l3:l4,i) + tt(:,:,:,i) *. area *. rho(j3:j4,k3:k4,l3:l4);
 end
-vslip = v(j2,k2,l2,:) + w1(j2,k2,l2,:) - v(j1,k1,l1,:) - w1(j1,k1,l1,:);
-vslip = sum( vslip .* vslip, 4 );
+tt = v(j3:j4,k3:k4,l3:l4,:) + w1(j3:j4,k3:k4,l3:l4,:) ...
+   - v(j1:j2,k1:k2,l1:l2,:) - w1(j1:j2,k1:k2,l1:l2,:);
+vslip = sum( tt .* tt, 4 );
 vslip = sqrt( vslip );
 
 if truptol
-  i = hypocenter;
-  i(nrmdim) = 1;
-  l1 = i1(3):i2(3);
-  k1 = i1(2):i2(2);
-  j1 = i1(1):i2(1);
-  l = i(3);
-  k = i(2);
-  j = i(1);
+  i1 = hypocenter;
+  i1(nrmdim) = 1;
+  l = i1(3);
+  k = i1(2);
+  j = i1(1);
   i = vslip > truptol;
   if find( i )
     trup( i & ( ~ trup ) ) = ( it + .5 ) * dt;

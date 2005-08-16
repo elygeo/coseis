@@ -122,4 +122,5 @@ clear s3
 s1(:) = 0;
 s2(:) = 0;
 w1(:) = 0;
+hypoloc = x(hypocenter(1),hypocenter(2),hypocenter(3);
 

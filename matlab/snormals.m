@@ -1,11 +1,12 @@
 %------------------------------------------------------------------------------%
 % SNORMALS - surface normals
 
-function nrm = snormals( x, j, k, l )
-n  = [ length(j) length(k) length(l) ];
+function nrm = snormals( x, i1, i2 )
+j = i1(1):i2(1);
+k = i1(2):i2(2);
+l = i1(3):i2(3);
+n = i2 - i1 + 1;
 ax = find( n == 1 );
-n  = size( x );
-n(ax) = 1;
 zero = 0 * x(1);
 nrm = repmat( zero, n );
 for a = 1:3
