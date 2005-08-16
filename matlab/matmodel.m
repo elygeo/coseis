@@ -58,12 +58,12 @@ l = i1(3):i2(3);
 k = i1(2):i2(2);
 j = i1(1):i2(1);
 
-if bc(1), ji = i1(1); s1(ji,:,:) = s1(ji+1,:,:); s2(ji,:,:) = s1(ji+1,:,:); end
-if bc(4), ji = i2(1); s1(ji,:,:) = s1(ji-1,:,:); s2(ji,:,:) = s1(ji-1,:,:); end
-if bc(2), ki = i1(2); s1(:,ki,:) = s1(:,ki+1,:); s2(:,ki,:) = s1(:,ki+1,:); end
-if bc(5), ki = i2(2); s1(:,ki,:) = s1(:,ki-1,:); s2(:,ki,:) = s1(:,ki-1,:); end
-if bc(3), li = i1(3); s1(:,:,li) = s1(:,:,li+1); s2(:,:,li) = s1(:,:,li+1); end
-if bc(6), li = i2(3); s1(:,:,li) = s1(:,:,li-1); s2(:,:,li) = s1(:,:,li-1); end
+if bc(1), ji = i1(1); s1(ji,:,:) = s1(ji+1,:,:); s2(ji,:,:) = s2(ji+1,:,:); end
+if bc(4), ji = i2(1); s1(ji,:,:) = s1(ji-1,:,:); s2(ji,:,:) = s2(ji-1,:,:); end
+if bc(2), ki = i1(2); s1(:,ki,:) = s1(:,ki+1,:); s2(:,ki,:) = s2(:,ki+1,:); end
+if bc(5), ki = i2(2); s1(:,ki,:) = s1(:,ki-1,:); s2(:,ki,:) = s2(:,ki-1,:); end
+if bc(3), li = i1(3); s1(:,:,li) = s1(:,:,li+1); s2(:,:,li) = s2(:,:,li+1); end
+if bc(6), li = i2(3); s1(:,:,li) = s1(:,:,li-1); s2(:,:,li) = s2(:,:,li-1); end
 
 i1 = halo + [ 1 1 1 ];
 i2 = halo + np;
