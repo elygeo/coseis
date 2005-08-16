@@ -1,6 +1,5 @@
-!==============================================================================!
-! MPISETUP
 !------------------------------------------------------------------------------!
+! MPISETUP
 
 subroutine mpisetup( nreqs, req, comm3d )
 use globals
@@ -10,8 +9,6 @@ integer :: err, penmln, comm3d, i, hat, blens(3), displs(3), nreqs, &
   req(3*2*2), tag, way, side, gsize(4), lsize(4), start(4), types(3), nvars, &
   house, n
 logical :: period(3) = .false.
-
-!------------------------------------------------------------------------------!
 
 if ( comm3d == mpi_comm_null ) then
   print *, 'unused processor: ', ipe
@@ -74,6 +71,5 @@ end do ! way
 end if ! npe
 end do ! hat
 
-return
-end
+end subroutine
 
