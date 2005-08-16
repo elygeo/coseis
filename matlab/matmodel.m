@@ -23,9 +23,9 @@ for iz = 1:size( material, 1 )
   lam0  = rho0 * ( vp * vp - 2 * vs * vs );
   yc0   = miu0 * ( lam0 + miu0 ) / 6 / ( lam0 + 2 * miu0 ) * 4 / dx ^ 2;
   nu    = .5 * lam0 / ( lam0 + miu0 );
-  j1 = i1(1); j2 = i2(1) - 1
-  k1 = i1(2); k2 = i2(2) - 1
-  l1 = i1(3); l2 = i2(3) - 1
+  j1 = i1(1); j2 = i2(1) - 1;
+  k1 = i1(2); k2 = i2(2) - 1;
+  l1 = i1(3); l2 = i2(3) - 1;
   s1(j1:j2,k1:k2,l1:l2) = rho0
   lam(j1:j2,k1:k2,l1:l2) = lam0
   miu(j1:j2,k1:k2,l1:l2) = miu0
@@ -54,10 +54,6 @@ end
 
 i1 = halo + [ 0 0 0 ];
 i2 = halo + np;
-l = i1(3):i2(3);
-k = i1(2):i2(2);
-j = i1(1):i2(1);
-
 if bc(1), ji = i1(1); s1(ji,:,:) = s1(ji+1,:,:); s2(ji,:,:) = s2(ji+1,:,:); end
 if bc(4), ji = i2(1); s1(ji,:,:) = s1(ji-1,:,:); s2(ji,:,:) = s2(ji-1,:,:); end
 if bc(2), ki = i1(2); s1(:,ki,:) = s1(:,ki+1,:); s2(:,ki,:) = s2(:,ki+1,:); end

@@ -131,9 +131,9 @@ for i = 1:3
 end
 r  = sum( r .* r, 4 );
 r  = sqrt( r );
-if nm(1) == 4, r = repmat( r(j,:,:), [ 4 1 1 ] ); end % 2D cases
-if nm(2) == 4, r = repmat( r(:,k,:), [ 1 4 1 ] ); end % 2D cases
-if nm(3) == 4, r = repmat( r(:,:,l), [ 1 1 4 ] ); end % 2D cases
+if np(1) == 2, r = repmat( r(j,:,:), [ 4 1 1 ] ); end % 2D cases
+if np(2) == 2, r = repmat( r(:,k,:), [ 1 4 1 ] ); end % 2D cases
+if np(3) == 2, r = repmat( r(:,:,l), [ 1 1 4 ] ); end % 2D cases
 i = hypocenter;
 i(nrmdim) = 1;
 j = i(1);
