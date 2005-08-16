@@ -5,11 +5,11 @@ module globals
 implicit none
 integer, parameter :: nz = 256
 integer :: n(4), npe(3), np(3), nt, npml, bc(6), edge(6), halo, &
-  nrmdim, nclramp, &
+  nrmdim, nclramp, hypocenter(3), &
   nmat, nfric, ntrac, nstress, nout, mati(nz,0), checkpoint, &
   nop, opi1(nz,3), opi2(nz,3) 
 real :: dx, dt, nu, rho0, vp, vs, vrup, rcrit, viscosity(2), msrcradius, &
-  material(nz,3), friction(nz,4), traction(nz,3), stress(nz,3)
+  material(nz,3), friction(nz,4), traction(nz,3), stress(nz,3), hypoloc(3)
 real, allocatable, dimension(:) :: dn1, dn2
 real, allocatable, dimension(:,:,:) :: s1, s2, rho, lam, miu, yc, yn
 real, allocatable, dimension(:,:,:,:) :: x, u, v, w1, w2, &

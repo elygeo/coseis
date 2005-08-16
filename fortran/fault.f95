@@ -9,10 +9,23 @@ integer :: i, j, k, l, i1(3), i2(3), nf(3), down(3), handed, init
 
 if ( init == 0 ) then
   if ( ipe == 0 ) print '(a)', 'Initialize fault'
-  i1 = i1local; i1(nrmdim) = 1
-  i2 = i2local; i2(nrmdim) = 1
-  j1 = i1(1); k1 = i1(2); l1 = i1(3)
-  j2 = i2(1); k2 = i2(2); l2 = i2(3)
+  if ( nrmdim /= downdim ) then
+    dipdim = downdim
+    strdim = 6 - dipdim - nrmdim
+  else
+    strdim = mod( nrmdim, 3 ) + 1
+    dipdim = 6 - strdim - nrmdim
+  end if
+  down = (/ 0, 0, 0 /)
+  down(downdim) = 1
+  handed = mod( strdim - nrmdim + 1, 3 ) - 1
+  i1 = max( i1core, i1pml )
+  i2 = min( i2core, i2pml )
+  i1(nrmdim) = 1
+  i2(nrmdim) = 1
+  j1 = i1(1); j2 = i2(1)
+  k1 = i1(2); k2 = i2(2)
+  l1 = i1(3); l2 = i2(3)
   allocate( &
     uslip(j1:j2,k1:k2,l1:l2), &
     vslip(j1:j2,k1:k2,l1:l2), &
@@ -32,36 +45,58 @@ if ( init == 0 ) then
   uslip = 0.
   vslip = 0.
   trup = 0.
-  if ( nrmdim /= downdim ) then
-    dipdim = downdim
-    strdim = 6 - dipdim - nrmdim
-  else
-    strdim = mod( nrmdim, 3 ) + 1
-    dipdim = 6 - strdim - nrmdim
-  end if
-  down = (/ 0, 0, 0 /)
-  down(downdim) = 1
-  handed = mod( strdim - nrmdim + 1, 3 ) - 1
   fs = 0.
   fd = 0.
   dc = 0.
   cohes = 1e9
+  w0 = 0.
+  tt0nsd = 0.
   do iz = 1, nfric
-    zoneselect( frici(iz,:), halo, np, hypocenter, nrmdim, i1, i2 )
+    zoneselect( frici(iz,:), npg, hypocenter, nrmdim, i1, i2 )
     i1 = max( i1, i1pml )
     i2 = min( i2, i2pml )
     i1(nrmdim) = 1
     i2(nrmdim) = 1
-    j1 = i1(1); k1 = i1(2); l1 = i1(3)
-    j2 = i2(1); k2 = i2(2); l2 = i2(3)
+    j1 = i1(1); j2 = i2(1)
+    k1 = i1(2); k2 = i2(2)
+    l1 = i1(3); l2 = i2(3)
     fs(j1:j2,k1:k2,l1:l2)    = friction(iz,1)
     fd(j1:j2,k1:k2,l1:l2)    = friction(iz,2)
     dc(j1:j2,k1:k2,l1:l2)    = friction(iz,3)
     cohes(j1:j2,k1:k2,l1:l2) = friction(iz,4)
   end do
+  do iz = 1, ntrac
+    zoneselect( traci(iz,:), npg, hypocenter, nrmdim, i1, i2 )
+    i1 = max( i1, i1pml )
+    i2 = min( i2, i2pml )
+    i1(nrmdim) = 1
+    i2(nrmdim) = 1
+    j1 = i1(1); j2 = i2(1)
+    k1 = i1(2); k2 = i2(2)
+    l1 = i1(3); l2 = i2(3)
+    tt0nsd(j1:j2,k1:k2,l1:l2,1) = traction(iz,1)
+    tt0nsd(j1:j2,k1:k2,l1:l2,2) = traction(iz,2)
+    tt0nsd(j1:j2,k1:k2,l1:l2,3) = traction(iz,3)
+  end do
+  do iz = 1, nstress
+    zoneselect( stressi(iz,:), npg, hypocenter, nrmdim, i1, i2 )
+    i1 = max( i1, i1pml )
+    i2 = min( i2, i2pml )
+    i1(nrmdim) = 1
+    i2(nrmdim) = 1
+    j1 = i1(1); j2 = i2(1)
+    k1 = i1(2); k2 = i2(2)
+    l1 = i1(3); l2 = i2(3)
+    w0(j1:j2,k1:k2,l1:l2,1) = stress(iz,1)
+    w0(j1:j2,k1:k2,l1:l2,2) = stress(iz,2)
+    w0(j1:j2,k1:k2,l1:l2,3) = stress(iz,3)
+    w0(j1:j2,k1:k2,l1:l2,4) = stress(iz,4)
+    w0(j1:j2,k1:k2,l1:l2,5) = stress(iz,5)
+    w0(j1:j2,k1:k2,l1:l2,6) = stress(iz,6)
+  end do
   ! normal vectors
-  i1 = halo + (/ 1, 1, 1 /)
-  i2 = halo + nm - 1
+  i1 = max( i1core, i1pml )
+  i2 = min( i2core, i2pml )
   call snormals( x, i1, i2, nrm )
   area = sqrt( sum( nrm * nrm, 4 ) )
   tmp = 0.
@@ -87,57 +122,21 @@ if ( init == 0 ) then
   do i = 1, 3
     dip(:,:,:,i) = dip(:,:,:,i) * tmp
   end do
-  tt0nsd = 0.
-  do iz = 1, ntrac
-    zoneselect( traci(iz,:), halo, npf, hypocenter, nrmdim, i1, i2 )
-    i1 = max( i1, i1pml )
-    i2 = min( i2, i2pml )
-    i1(nrmdim) = 1
-    i2(nrmdim) = 1
-    j1 = i1(1); k1 = i1(2); l1 = i1(3)
-    j2 = i2(1); k2 = i2(2); l2 = i2(3)
-    tt0nsd(j1:j2,k1:k2,l1:l2,1) = traction(iz,1)
-    tt0nsd(j1:j2,k1:k2,l1:l2,2) = traction(iz,2)
-    tt0nsd(j1:j2,k1:k2,l1:l2,3) = traction(iz,3)
-  end do
   do i = 1, 3
+    j = mod( i , 3 ) + 1
+    k = mod( i + 1, 3 ) + 1
     tt0(:,:,:,i) = &
+      w0(:,:,:,i)   * nrm(:,:,:,i) + &
+      w0(:,:,:,j+3) * nrm(:,:,:,k) + &
+      w0(:,:,:,k+3) * nrm(:,:,:,j)
       tt0nsd(:,:,:,nrmdim) * nrm(:,:,:,i) + &
       tt0nsd(:,:,:,strdim) * str(:,:,:,i) + &
       tt0nsd(:,:,:,dipdim) * dip(:,:,:,i)
   end do
-  w0 = 0.
-  do iz = 1, nstress
-    zoneselect( stressi(iz,:), halo, npf, hypocenter, nrmdim, i1, i2 )
-    i1 = max( i1, i1pml )
-    i2 = min( i2, i2pml )
-    i1(nrmdim) = 1
-    i2(nrmdim) = 1
-    j1 = i1(1); k1 = i1(2); l1 = i1(3)
-    j2 = i2(1); k2 = i2(2); l2 = i2(3)
-    w0(j1:j2,k1:k2,l1:l2,1) = stress(iz,1)
-    w0(j1:j2,k1:k2,l1:l2,2) = stress(iz,2)
-    w0(j1:j2,k1:k2,l1:l2,3) = stress(iz,3)
-    w0(j1:j2,k1:k2,l1:l2,4) = stress(iz,4)
-    w0(j1:j2,k1:k2,l1:l2,5) = stress(iz,5)
-    w0(j1:j2,k1:k2,l1:l2,6) = stress(iz,6)
-  end do
   do i = 1, 3
-    j = mod( i , 3 ) + 4
-    k = mod( i + 1, 3 ) + 4
-    tt0(:,:,:,i) = tt0(:,:,:,i) + &
-      w0(:,:,:,i) * nrm(:,:,:,i) + &
-      w0(:,:,:,j) * nrm(:,:,:,k) + &
-      w0(:,:,:,k) * nrm(:,:,:,j)
-  end do
-  i1 = hypocenter
-  do i = 1, 3
-    wf1(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - x(i1(1),i1(2),i1(3),i)
+    wf1(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - hypoloc(i)
   end do
   r = sqrt( sum( wf1 * wf1, 4 ) )
-  !if nm(1) == 4, r = repmat( r(j,:,:), [ 4 1 1 ] ); end ! 2D cases
-  !if nm(2) == 4, r = repmat( r(:,k,:), [ 1 4 1 ] ); end ! 2D cases
-  !if nm(3) == 4, r = repmat( r(:,:,l), [ 1 1 4 ] ); end ! 2D cases
   i1 = hypocenter
   i1(nrmdim) = 1
   j = i1(1)
@@ -152,23 +151,39 @@ if ( init == 0 ) then
   print *, 'S', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 )
   print *, 'dc: ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / miu0
   print *, 'rcrit: ', rcrit, '>', miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2
-  i1 = (/ 1, 1, 1 /)
-  i2 = nm
-  i1(nrmdim) = hypocenter(nrmdim)
-  i2(nrmdim) = hypocenter(nrmdim)
-  j1 = i1(1); k1 = i1(2); l1 = i1(3)
-  j2 = i2(1); k2 = i2(2); l2 = i2(3)
-  i1(nrmdim) = hypocenter(nrmdim) + 1
-  i2(nrmdim) = hypocenter(nrmdim) + 1
-  j3 = i3(1); k3 = i3(2); l3 = i3(3)
-  j4 = i4(1); k4 = i4(2); l4 = i4(3)
-  j  = nm(1); k  = nm(2); l  = nm(3)
   deallocate( tt0nsd, w0, str, dip )
-  allocate( tt(j,k,l,3), tn3(j,k,l,3), ts3(j,k,l,3), tn(j,k,l), ts(j,k,l), ff(j,k,l), ff2(j,k,l) )
+  i1 = max( i1core, i1pml )
+  i2 = min( i2core, i2pml )
+  i1(nrmdim) = 1
+  i2(nrmdim) = 1
+  j1 = i1(1); j2 = i2(1)
+  k1 = i1(2); k2 = i2(2)
+  l1 = i1(3); l2 = i2(3)
+  allocate( &
+      tt(j1:j2,k1:k2,l1:l2,3), &
+      tn3(j1:j2,k1:k2,l1:l2,3), &
+      ts3(j1:j2,k1:k2,l1:l2,3), &
+      tn(j1:j2,k1:k2,l1:l2), &
+      ts(j1:j2,k1:k2,l1:l2), &
+      ff(j1:j2,k1:k2,l1:l2), &
+      ff2(j1:j2,k1:k2,l1:l2) )
   return
 end if init
 
+!------------------------------------------------------------------------------!
 ! Zero slip velocity condition
+i1 = max( i1core, i1pml )
+i2 = min( i2core, i2pml )
+i1(nrmdim) = hypocenter(nrmdim)
+i2(nrmdim) = hypocenter(nrmdim)
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+i1(nrmdim) = hypocenter(nrmdim) + 1
+i2(nrmdim) = hypocenter(nrmdim) + 1
+j3 = i1(1); j4 = i2(1)
+k3 = i1(2); k4 = i2(2)
+l3 = i1(3); l4 = i2(3)
 tmp = area * ( rho(j1:j2,k1:k2,l1:l2) + rho(j3:j4,k3:k4,l3:l4) )
 where ( tmp /= 0. ) tmp = 1. / tmp
 do i = 1, 3
@@ -197,17 +212,17 @@ where( uslip < dc ) ff = ff + ( 1. - uslip / dc ) * ( fs - fd )
 ff = ff * tn + cohes
 ! Nucleation
 if ( rcrit > 0. .and. vrup > 0. )
-  c = 1.
-  if ( nclramp > 0 ) c = min( ( it * dt - r / vrup ) / ( nclramp * dt ), 1 )
-  ff2 = ( 1 - c ) * ts + c * ( fd * tn + cohes )
+  ff2 = 1.
+  if ( nclramp > 0 ) ff2 = min( ( it * dt - r / vrup ) / ( nclramp * dt ), 1 )
+  ff2 = ( 1. - ff2 ) * ts + ff2 * ( fd * tn + cohes )
   where ( r < min( rcrit, it * dt * vrup ) .and. ff2 < ff ) ff = ff2
 end if
 !if ( any( ff <= 0. ) ) print *, 'fault opening!'
 ! Shear traction bounded by friction
-tmp = 1.
-where ( ts > ff ) tmp = ff / ts
+ff2 = 1.
+where ( ts > ff ) ff2 = ff / ts
 do i = 1, 3
-  tt(:,:,:,i) = -tt0(:,:,:,i) + tn3(:,:,:,i) + tmp * ts3(:,:,:,i)
+  tt(:,:,:,i) = -tt0(:,:,:,i) + tn3(:,:,:,i) + ff2 * ts3(:,:,:,i)
   w1(j1:j2,k1:k2,l1:l2,i) = &
   w1(j1:j2,k1:k2,l1:l2,i) + tt(:,:,:,i) * area * rho(j1:j2,k1:k2,l1:l2)
   w1(j3:j4,k3:k4,l3:l4,i) = &

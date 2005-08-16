@@ -6,6 +6,8 @@ use globals
 character*256 buff, key, a
 
 npe3d = 1
+ipe3d = 0
+ipe = 0
 npg = 21
 nt = 20
 dx = 100.
@@ -74,10 +76,6 @@ loop: do
   end select
 end do loop
 close( 9 )
-halo = 1
-edge = 1
-i1p = 1
-i2p = npg
 
 end subroutine
 

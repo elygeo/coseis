@@ -16,11 +16,10 @@ npe3d = npg / np; where ( mod( npg, np ) /= 0 ) npe3d = npe3d + 1
 call mpi_cart_create( mpi_comm_world, 3, npe3d, period, .true., comm3d, err )
 call mpi_comm_rank( mpi_comm_world, ipe, err )
 call mpi_cart_get( comm3d, 3, npe3d, period, ipe3d, err )
-i1p = np * ipe3d + 1
-i2p = np * ipe3d + np
-i2p = min( i2p, npg )
 call setup
 call output( 0 )
+call mpisetup
+call mpioutput( 0 )
 do i = 1, nout
   call mpi_comm_split( comm3d, outme(i), ipe, commout(i), err )
 end do

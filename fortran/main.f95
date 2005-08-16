@@ -8,6 +8,8 @@ real :: dwt(5)
 
 call inputs
 call setup
+call gridgen
+call matmodel
 call output( 0 )
 if ( ipe == 0 ) print '(a)', 'step  compute  commun   output   checkpnt total'
 it = 0
