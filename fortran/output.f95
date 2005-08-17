@@ -8,6 +8,9 @@ integer :: i, i1(3), i2(3), j, k, l, nc, reclen
 character(255) :: ofile
 
 call zoneselect( i1, i2, outi(iz,:), npg, hypocenter, nrmdim )
+i1 = max( i1, i1node )
+i2 = max( i2, i2node )
+if ( any ( i1 > i2 ) ) return
 j1 = i1(1); k1 = i1(2); l1 = i1(3)
 j2 = i2(1); k2 = i2(2); l2 = i2(3)
 select case ( outvar(iz) )
@@ -17,7 +20,7 @@ case('v'); nc = 3
 case default; stop 'Error: outvar'
 end select
 reclen = floatsize * product( i2 - i1 + 1 )
-do i = 1, outnc(iz)
+do i = 1, nc
   write( ofile, '(a,i2.2,a,i1,a,i5.5)' ) 'out/', iz, '/', i, '/', it
   open( 9, file=ofile, form='unformatted', access='direct', recl=reclen )
   select case ( outvar(iz) )
