@@ -102,13 +102,14 @@ end do
 if ( nrmdim /= 0 ) call fault( 1 )
 
 ! Velocity, V = V + dV
-!do iz = 1, size( locknodes, 1 )
-!  j1 = locki(1,1,iz); j2 = locki(2,1,iz)
-!  k1 = locki(1,2,iz); k2 = locki(2,2,iz)
-!  l1 = locki(1,3,iz); l2 = locki(2,3,iz)
-!  i = locknodes(iz,1:3) == 1
-!  forall( j=j1:j2, k=k1:k2, l=ll1:l2 ) w1(j,k,l,i) = 0
-!end do
+do iz = 1, nlock
+  zoneselect( i1, i2, locknodes(iz,4:9), npg, hypocenter, nrmdim )
+  j1 = i1(1,1,iz); j2 = i2(2,1,iz)
+  k1 = i1(1,2,iz); k2 = i2(2,2,iz)
+  l1 = i1(1,3,iz); l2 = i2(2,3,iz)
+  i1 = locknodes(iz,1:3) == 1
+  forall( j=j1:j2, k=k1:k2, l=ll1:l2 ) w1(j,k,l,i1) = 0
+end do
 
 v = v + w1
 u = u + dt * v
