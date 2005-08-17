@@ -15,14 +15,13 @@ inner: do iid = 1, 3
   id = mod( ic + iid - 1, 3 ) + 1
   ix = 6 - ic - id
   do iz = 1, size( oper, 1 )
-    op = oper(iz)
     call zoneselect( i1, i2, operi(iz,:), npg, offset, hypocenter )
     i1 = max( i1, i1node )
     i2 = min( i2, i2node )
-    if ic == id
-      call dfcn( s2, op, w1, x, dx, ic, id, i1, i2 )
+    if ( ic == id )
+      call dfcn( s2, oper(iz), w1, x, dx, ic, id, i1, i2 )
     else
-      call dfcn( s2, op, w2, x, dx, ix, id, i1, i2 )
+      call dfcn( s2, oper(iz), w2, x, dx, ix, id, i1, i2 )
     end if
   end do
   j1 = i1node(1); j2 = i2node(1)

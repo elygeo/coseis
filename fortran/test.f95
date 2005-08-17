@@ -17,8 +17,6 @@ program main
   integer :: i = 5, j = 4
   integer, allocatable :: al(:,:)
   logical :: z(3) = .true.
-  allocate( al(1:10,1:0) )
-  al = 2
   print *, 'asdf', al
   call extsub
   contains

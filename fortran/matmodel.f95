@@ -125,7 +125,7 @@ c3 =  1 / 1500
 tune = 3.5
 hmean = 2 * matmin * matmax / ( matmin + matmax )
 damp = tune * hmean(3) / dx * ( c1 + ( c2 + c3 * npml ) * npml )
-i = npml:-1:1
+! FIXME chech this
 do i = 1:npml
   dampn = damp * ( ( npml - i + 1 ) / npml ) ^ 2
   dampc = damp * .5 * ( ( ( 2 * ( npml - i ) + 1 ) / npml ) ^ 2

@@ -16,11 +16,10 @@ inner: do id = 1, 3
   ix = 6 - ic - id
   do iz = 1, size( oper, 1 )
     call zoneselect( i1, i2, operi(iz,:), npg, offset, hypocenter )
-    i1 = max( i1, i1cell, i1pml )
-    i2 = min( i2, i2cell, i2pml - 1 )
+    i1 = max( i1, i1cellpml )
+    i2 = min( i2 - 1, i2cellpml )
     call dfnc( s2, oper(iz), s1, x, dx, 1, id, i1, i2 )
   end do
-  op = operator(1)
   do i = 1, npml
     if ( id /= 1 .and. bc(1) == 1 ) then
       i1 = i1cell
@@ -28,7 +27,7 @@ inner: do id = 1, 3
       j = i1(1) + i - 1
       i1(1) = j
       i2(1) = j
-      call dfnc( s2, op, u, x, dx, ic, id, i1, i2 )
+      call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
     end if
     if ( id /= 1 .and. bc(4) == 1 ) then
       i1 = i1cell
@@ -36,7 +35,7 @@ inner: do id = 1, 3
       j = i2(1) - i + 1
       i1(1) = j
       i2(1) = j
-      call dfnc( s2, op, u, x, dx, ic, id, i1, i2 )
+      call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
     end if
     if ( id /= 2 .and. bc(2) == 1 ) then
       i1 = i1cell
@@ -44,7 +43,7 @@ inner: do id = 1, 3
       k = i1(2) + i - 1
       i1(2) = k
       i2(2) = k
-      call dfnc( s2, op, u, x, dx, ic, id, i1, i2 )
+      call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
     end if
     if ( id /= 2 .and. bc(5) == 1 ) then
       i1 = i1cell
@@ -52,7 +51,7 @@ inner: do id = 1, 3
       k = i2(2) - i + 1
       i1(2) = k
       i2(2) = k
-      call dfnc( s2, op, u, x, dx, ic, id, i1, i2 )
+      call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
     end if
     if ( id /= 3 .and. bc(3) == 1 ) then
       i1 = i1cell
@@ -60,7 +59,7 @@ inner: do id = 1, 3
       l = i1(3) + i - 1
       i1(3) = l
       i2(3) = l
-      call dfnc( s2, op, u, x, dx, ic, id, i1, i2 )
+      call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
     end if
     if ( id /= 3 .and. bc(6) == 1 ) then
       i1 = i1cell
@@ -68,7 +67,7 @@ inner: do id = 1, 3
       l = i2(3) - i + 1
       i1(3) = l
       i2(3) = l
-      call dfnc( s2, op, u, x, dx, ic, id, i1, i2 )
+      call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
     end if
   end do
   do i = 1, npml
@@ -78,7 +77,7 @@ inner: do id = 1, 3
       j = i1(1) + i - 1
       i1(1) = j
       i2(1) = j
-      call dfnc( s2, op, v, x, dx, ic, id, i1, i2 )
+      call dfnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
       forall( k=i1(2):i2(2), l=i1(3):i2(3) )
         s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g1(i,k,l,ic)
         g1(i,k,l,ic) = s2(j,k,l)
@@ -90,7 +89,7 @@ inner: do id = 1, 3
       j = i2(1) - i + 1
       i1(1) = j
       i2(1) = j
-      call dfnc( s2, op, v, x, dx, ic, id, i1, i2 )
+      call dfnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
       forall( k=i1(2):i2(2), l=i1(3):i2(3) )
         s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g4(i,k,l,ic)
         g4(i,k,l,ic) = s2(j,k,l)
@@ -102,7 +101,7 @@ inner: do id = 1, 3
       k = i1(2) + i - 1
       i1(2) = k
       i2(2) = k
-      call dfnc( s2, op, v, x, dx, ic, id, i1, i2 )
+      call dfnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
       forall( j=i1(1):i2(1), l=i1(3):i2(3) )
         s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g2(j,i,l,ic)
         g2(j,i,l,ic) = s2(j,k,l)
@@ -114,7 +113,7 @@ inner: do id = 1, 3
       k = i2(2) - i + 1
       i1(2) = k
       i2(2) = k
-      call dfnc( s2, op, v, x, dx, ic, id, i1, i2 )
+      call dfnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
       forall( j=i1(1):i2(1), l=i1(3):i2(3) )
         s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g5(j,i,l,ic)
         g5(j,i,l,ic) = s2(j,k,l)
@@ -126,7 +125,7 @@ inner: do id = 1, 3
       l = i1(3) + i - 1
       i1(3) = l
       i2(3) = l
-      call dfnc( s2, op, v, x, dx, ic, id, i1, i2 )
+      call dfnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
       forall( j=i1(1):i2(1), k=i1(2):i2(2) )
         s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g3(j,k,i,ic)
         g3(j,k,i,ic) = s2(j,k,l)
@@ -138,7 +137,7 @@ inner: do id = 1, 3
       l = i2(3) - i + 1
       i1(3) = l
       i2(3) = l
-      call dfnc( s2, op, v, x, dx, ic, id, i1, i2 )
+      call dfnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
       forall( j=i1(1):i2(1), k=i1(2):i2(2) )
         s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g6(j,k,i,ic)
         g6(j,k,i,ic) = s2(j,k,l)
