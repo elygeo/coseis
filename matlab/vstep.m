@@ -90,8 +90,8 @@ if nrmdim, fault, end
 
 % Velocity, V = V + dV
 for iz = 1:size( locknodes, 1 )
-  i1 = locki(1,:,iz);
-  i2 = locki(2,:,iz);
+  i1 = locki1(iz,:);
+  i2 = locki2(iz,:);
   i = locknodes(iz,1:3) == 1;
   l = i1(3):i2(3);
   k = i1(2):i2(2);

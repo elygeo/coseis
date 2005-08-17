@@ -75,8 +75,8 @@ if initialize
       i1(nrmdim) = 1;
       i2(nrmdim) = 1;
     end
-    outi1(:,iz) = i1;
-    outi2(:,iz) = i2;
+    outi1(iz,:) = i1;
+    outi2(iz,:) = i2;
     storage = storage + outnc(iz) * prod( i2 - i1 + 1 ) * ...
       floor( nt / outint(iz) ) * 4 / 1024 / 1024;
   end
@@ -91,8 +91,8 @@ if ~mod( it, checkpoint )
 end
 for iz = 1:size( out, 1 )
   if mod( it, outint(iz) ) == 0
-    i1 = outi1(:,iz);
-    i2 = outi2(:,iz);
+    i1 = outi1(iz,:);
+    i2 = outi2(iz,:);
     l = i1(3):i2(3);
     k = i1(2):i2(2);
     j = i1(1):i2(1);

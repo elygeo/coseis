@@ -3,8 +3,8 @@
 
 msg = 'no time series data at this location';
 for iz = 1:size( out, 1 )
-  i1 = outi1(:,iz)';
-  i2 = outi2(:,iz)';
+  i1 = outi1(iz,:);
+  i2 = outi2(iz,:);
   i = xhair;
   if outint(iz) == 1 && strcmp( outvar{iz}, field ) ...
     && sum( i >= i1 & i <= i2 ) == 3
