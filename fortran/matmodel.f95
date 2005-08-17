@@ -87,18 +87,6 @@ where ( s2 /= 0. )  s2  = 1 / s2
 lam = lam * s2
 miu = miu * s2
 
-!if length( locknodes )
-!  locknodes(downdim,1:3) = 0
-!  if n(1) < 5, locknodes([1 4],1:3) = 0; end
-!  if n(2) < 5, locknodes([2 5],1:3) = 0; end
-!  if n(3) < 5, locknodes([3 6],1:3) = 0; end
-!end
-!do iz = 1, nlock
-!  zone = locknodes(iz,4:9)
-!  zoneselect( i1, i2, zone, npg, hypocenter, nrmdim )
-!  locki(:,:,iz) = [ i1; i2 ]
-!end
-
 ! PML damping
 j1 = i1node(1); j2 = i2node(1)
 k1 = i1node(2); k2 = i2node(2)
