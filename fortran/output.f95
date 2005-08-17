@@ -9,7 +9,7 @@ character(255) :: ofile
 if ( init == 0 ) then
   if ( ipe == 0 ) print '(a)', 'Initialize output'
   do iz = 1, nout
-    call zoneselect( outi(iz,:), ng, nl, offset, hypocenter )
+    call zoneselect( i1, i2, outi(iz,:), ng, nl, offset, hypocenter )
     do i = 1, 3
       i1(i) = outgi1(i,iz)
       i2(i) = outgi2(i,iz)

@@ -9,7 +9,7 @@ if ( ipe == 0 ) print '(a)', 'Material Model'
 matmax = material(1,1:3)
 matmin = material(1,1:3)
 do iz = 1, nmat
-  call zoneselect( i1, i2, mati(iz,:), npg, offset, hypocenter )
+  call zoneselect( i1, i2, mati(iz,:), npg, hypocenter, nrmdim )
   i1 = max( i1, i1cell )
   i2 = min( i2 - 1, i2cell )
   rho0 = material(iz,1)
@@ -34,7 +34,7 @@ if ( ipe == 0 ) print *, 'courant: 1 > ', courant
 gamma = dt * viscosity
 
 do iz = 1, noper
-  call zoneselect( operi(iz,:), npg, offset, hypocenter, i1, i2 )
+  call zoneselect( i1, i2, operi(iz,:), npg, hypocenter, nrmdim )
   i1 = max( i1, i1cell )
   i2 = min( i2 - 1, i2cell )
   j1 = i1(1); j2 = i2(1)
@@ -93,9 +93,9 @@ miu = miu * s2
 !  if n(2) < 5, locknodes([2 5],1:3) = 0; end
 !  if n(3) < 5, locknodes([3 6],1:3) = 0; end
 !end
-!for iz = 1:size( locknodes, 1 )
+!do iz = 1, nlock
 !  zone = locknodes(iz,4:9)
-!  [ i1, i2 ] = zoneselect( zone, halo, np, hypocenter, nrmdim )
+!  zoneselect( i1, i2, zone, npg, hypocenter, nrmdim )
 !  locki(:,:,iz) = [ i1; i2 ]
 !end
 
