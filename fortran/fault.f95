@@ -6,8 +6,9 @@ subroutine fault( init )
 use globals
 implicit none
 real, allocatable, dimension(:,:,:) :: fs, fd, dc, cohes, area, r, tmp, tn, ts, ff, ff2
-real, allocatable, dimension(:,:,:,:) :: nrm, tt0, str, dip, tt0nsd, w0, tt, tn3, ts3
-integer :: i2(3), nf(3), down(3), handed, init, strdim, j3, j4, k3, k4, l3, l4
+real, allocatable, dimension(:,:,:,:) :: nrm, tt0, str, dip, tt0nsd, w0, tt, tn3, ts3, r3
+real :: fs0, fd0, dc0, tn0, ts0
+integer :: nf(3), down(3), handed, init, strdim, dipdim, j3, j4, k3, k4, l3, l4
 
 if ( init == 0 ) then
   if ( ipe == 0 ) print '(a)', 'Initialize fault'
@@ -133,7 +134,7 @@ if ( init == 0 ) then
     tt0(:,:,:,i) = &
       w0(:,:,:,i)   * nrm(:,:,:,i) + &
       w0(:,:,:,j+3) * nrm(:,:,:,k) + &
-      w0(:,:,:,k+3) * nrm(:,:,:,j)
+      w0(:,:,:,k+3) * nrm(:,:,:,j) + &
       tt0nsd(:,:,:,nrmdim) * nrm(:,:,:,i) + &
       tt0nsd(:,:,:,strdim) * str(:,:,:,i) + &
       tt0nsd(:,:,:,dipdim) * dip(:,:,:,i)
@@ -155,7 +156,7 @@ if ( init == 0 ) then
   dc0 = dc(j,k,l)
   print *, 'S', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 )
   print *, 'dc: ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / miu0
-  print *, 'rcrit: ', rcrit, '>', miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2
+  print *, 'rcrit: ', rcrit, '>', miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ** 2
   deallocate( tt0nsd, w0, str, dip, r3 )
   i1 = i1node
   i2 = i2node
@@ -173,7 +174,7 @@ if ( init == 0 ) then
       ff(j1:j2,k1:k2,l1:l2), &
       ff2(j1:j2,k1:k2,l1:l2) )
   return
-end if init
+end if
 
 !------------------------------------------------------------------------------!
 ! Zero slip velocity condition
@@ -216,7 +217,7 @@ ff = fd
 where( uslip < dc ) ff = ff + ( 1. - uslip / dc ) * ( fs - fd )
 ff = ff * tn + cohes
 ! Nucleation
-if ( rcrit > 0. .and. vrup > 0. )
+if ( rcrit > 0. .and. vrup > 0. ) then
   ff2 = 1.
   if ( nclramp > 0 ) ff2 = min( ( it * dt - r / vrup ) / ( nclramp * dt ), 1 )
   ff2 = ( 1. - ff2 ) * ts + ff2 * ( fd * tn + cohes )
