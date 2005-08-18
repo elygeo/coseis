@@ -3,7 +3,6 @@
 
 subroutine gridgen
 use globals
-integer :: i, j1, j2, k1, k2, l1, l2, i1(3)
 real :: theta, scl
 
 if ( ipe == 0 ) print '(a)', 'Grid generation'
@@ -13,6 +12,14 @@ i2 = i2core + nhalo
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
+allocate( &
+    x(j1:j2,k1:k2,l1:l2,3), &
+    u(j1:j2,k1:k2,l1:l2,3), &
+    v(j1:j2,k1:k2,l1:l2,3), &
+   w1(j1:j2,k1:k2,l1:l2,3), &
+   w2(j1:j2,k1:k2,l1:l2,3), &
+   s1(j1:j2,k1:k2,l1:l2), &
+   s2(j1:j2,k1:k2,l1:l2) )
 forall( i=j1:j2 ) x(i,:,:,1) = i - 1
 forall( i=k1:k2 ) x(:,i,:,2) = i - 1
 forall( i=l1:l2 ) x(:,:,i,3) = i - 1
@@ -23,18 +30,18 @@ case( 2 ); x(:,i:,:,2) = x(:,i:,:,2) - 1
 case( 3 ); x(:,:,i:,3) = x(:,:,i:,3) - 1
 end select
 hypoloc = hypocenter
-nop = 1
+noper = 1
 selectcase( grid )
-case 'constant'
-  op(1) = 'h'
-case 'stretch'
-  op(1) = 'r'
+case('constant')
+  oper(1) = 'h'
+case('stretch')
+  oper(1) = 'r'
   x(:,:,:,3) = 2. * x(:,:,:,3)
   hypoloc(3) = 2. * hypoloc(3)
-case 'slant'
-  op(1) = 'g'
+case('slant')
+  oper(1) = 'g'
   theta = 20. * pi / 180.
-  scl = sqrt( cos( theta ) ^ 2. + ( 1. - sin( theta ) ) ^ 2. )
+  scl = sqrt( cos( theta ) ** 2. + ( 1. - sin( theta ) ) ** 2. )
   scl = sqrt( 2. ) / scl
   x(:,:,:,1) = x(:,:,:,1) - x(:,:,:,3) * sin( theta );
   x(:,:,:,3) = x(:,:,:,3) * cos( theta );

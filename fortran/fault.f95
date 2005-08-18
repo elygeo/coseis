@@ -3,9 +3,10 @@
 
 subroutine fault( init )
 use globals
-real, dimension(:,:,:) :: fs, fd, dc, cohes, area, r, tmp, tn, ts, ff, ff2
-real, dimension(:,:,:,:) :: nrm, tt0, str, dip, tt0nsd, w0, tt, tn3, ts3
-integer :: i, j, k, l, i1(3), i2(3), nf(3), down(3), handed, init
+implicit none
+real, allocatable, dimension(:,:,:) :: fs, fd, dc, cohes, area, r, tmp, tn, ts, ff, ff2
+real, allocatable, dimension(:,:,:,:) :: nrm, tt0, str, dip, tt0nsd, w0, tt, tn3, ts3
+integer :: i2(3), nf(3), down(3), handed, init, strdim
 
 if ( init == 0 ) then
   if ( ipe == 0 ) print '(a)', 'Initialize fault'
@@ -52,7 +53,7 @@ if ( init == 0 ) then
   w0 = 0.
   tt0nsd = 0.
   do iz = 1, nfric
-    zoneselect( i1, i2, frici(iz,:), npg, hypocenter, nrmdim )
+    call zoneselect( i1, i2, frici(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1pml )
     i2 = min( i2, i2pml )
     i1(nrmdim) = 1
@@ -66,7 +67,7 @@ if ( init == 0 ) then
     cohes(j1:j2,k1:k2,l1:l2) = friction(iz,4)
   end do
   do iz = 1, ntrac
-    zoneselect( i1, i2, traci(iz,:), npg, hypocenter, nrmdim )
+    call zoneselect( i1, i2, traci(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1pml )
     i2 = min( i2, i2pml )
     i1(nrmdim) = 1
@@ -79,7 +80,7 @@ if ( init == 0 ) then
     tt0nsd(j1:j2,k1:k2,l1:l2,3) = traction(iz,3)
   end do
   do iz = 1, nstress
-    zoneselect( i1, i2, stressi(iz,:), npg, hypocenter, nrmdim )
+    call zoneselect( i1, i2, stressi(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1pml )
     i2 = min( i2, i2pml )
     i1(nrmdim) = 1

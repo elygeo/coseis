@@ -1,17 +1,19 @@
 !------------------------------------------------------------------------------!
 ! WSTEP
+
 subroutine wstep
 
-integer :: i, j, k, l, i1(3), i2(3), ic, id, ix
-character :: op
+use globals
+implicit none
+integer :: ic, id, ix, iz
 
 ! Gadient
-! G = grad(U + gamma*V)    non PML region
+! G = grad(U + gam*V)    non PML region
 ! G' + DG = gradV          PML region
 s2 = 0.
 w2 = 0.
 outer: do ic = 1, 3
-s1 = u(:,:,:,ic) + gamma(1) .* v(:,:,:,ic)
+s1 = u(:,:,:,ic) + gam(1) * v(:,:,:,ic)
 inner: do id = 1, 3
   ix = 6 - ic - id
   do iz = 1, size( oper, 1 )
@@ -165,7 +167,7 @@ end do
 
 s1 = sum( u * u, 4 ); umax = maxval( s1 ); umaxi = maxloc( s1 )
 s1 = sum( v * v, 4 ); vmax = maxval( s1 ); vmaxi = maxloc( s1 )
-s2 = sum( w1 * w1, 4 ) + 2 * sum( w2 * w2, 4 )
+s2 = sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 )
 wmax = maxval( s1 ); wmaxi = maxloc( s1 )
 umax = sqrt( umax )
 vmax = sqrt( vmax )

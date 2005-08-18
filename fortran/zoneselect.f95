@@ -2,7 +2,7 @@
 ! ZONESELECT
 
 subroutine zoneselect( i1, i2, zone, n, hypocenter, nrmdim )
-integer, intent(in) :: zone(6), n(3), i1p(3), i2p(3), hypocenter(3), nrmdim
+integer, intent(in) :: zone(6), n(3), hypocenter(3), nrmdim
 integer, intent(out) :: i1(3), i2(3)
 integer :: shift(3) = 0
 

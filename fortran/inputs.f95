@@ -2,11 +2,11 @@
 ! SETUP
 
 subroutine inputs
+
 use globals
 character*256 buff, key, a
 
-npe3d = 1
-ipe3d = 0
+npe3 = 1
 ipe = 0
 npg = 21
 nt = 20
@@ -49,7 +49,7 @@ loop: do
   if ( key(1:1) == '#' .or. key(1:1) == '!' .or. key(1:1) == '%' ) cycle loop
   selectcase( key )
   case( '' )
-  case( 'nprocs' );     read( buff, * ) a, npe3d
+  case( 'nprocs' );     read( buff, * ) a, npe3
   case( 'n' );          read( buff, * ) a, npg, nt
   case( 'nrmdim' );     read( buff, * ) a, nrmdim
   case( 'hypocenter' ); read( buff, * ) a, hypocenter
@@ -76,6 +76,16 @@ loop: do
   end select
 end do loop
 close( 9 )
+
+if( any( hypocenter == 0 ) ) hypocenter = npg / 2 + mod( npg, 2 )
+if( nrmdim /= 0 ) npg(nrmdim) = npg(nrmdim) + 1
+nhalo = 1
+i1node = 1
+i2node = npg
+i1cell = 1
+i2cell = npg - 1
+i1cellpml = i1cell + bc(1:3) * npml
+i2cellpml = i2cell - bc(4:6) * npml
 
 end subroutine
 

@@ -1,10 +1,11 @@
 !------------------------------------------------------------------------------!
 ! VSTEP
+
 subroutine vstep
+
 use globals
 implicit none
-integer i, j, k, l, i1(3), i2(3), ic, iid, id, ix, iz
-character op
+integer ic, iid, id, ix, iq, iz
 
 ! Restoring force
 ! P' + DP = [del]S, F = 1.P'             PML region
@@ -18,56 +19,58 @@ inner: do iid = 1, 3
     call zoneselect( i1, i2, operi(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1node )
     i2 = min( i2, i2node )
-    if ( ic == id )
+    if ( ic == id ) then
       call dfcn( s2, oper(iz), w1, x, dx, ic, id, i1, i2 )
     else
       call dfcn( s2, oper(iz), w2, x, dx, ix, id, i1, i2 )
     end if
   end do
-  j1 = i1node(1); j2 = i2node(1)
-  k1 = i1node(2); k2 = i2node(2)
-  l1 = i1node(3); l2 = i2node(3)
+  i1 = i1node
+  i2 = i2node
+  j1 = i1(1); j2 = i2(1)
+  k1 = i1(2); k2 = i2(2)
+  l1 = i1(3); l2 = i2(3)
   do i = 1, npml
-    if ( id == 1 .and. bc(1) ) then
+    if ( id == 1 .and. bc(1) == 1 ) then
       j = j1 + i - 1
       forall( k=k1:k2, l=l1:l2 )
-        s2(j,k,l,1) = dn2(i) * s2(j,k,l,1) + dn1(i) * p1(i,k,l,ic)
-        p1(i,k,l,ic) = p1(i,k,l,ic) + dt * s2(j,k,l,1)
+        s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p1(i,k,l,ic)
+        p1(i,k,l,ic) = p1(i,k,l,ic) + dt * s2(j,k,l)
       end forall
     end if
-    if ( id == 1 .and. bc(4) ) then
+    if ( id == 1 .and. bc(4) == 1 ) then
       j = j2 - i + 1
       forall( k=k1:k2, l=l1:l2 )
-        s2(j,k,l,1) = dn2(i) * s2(j,k,l,1) + dn1(i) * p4(i,k,l,ic)
-        p4(i,k,l,ic) = p4(i,k,l,ic) + dt * s2(j,k,l,1)
+        s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p4(i,k,l,ic)
+        p4(i,k,l,ic) = p4(i,k,l,ic) + dt * s2(j,k,l)
       end forall
     end if
-    if ( id == 2 .and. bc(2) ) then
+    if ( id == 2 .and. bc(2) == 1 ) then
       k = k1 + i - 1
       forall( j=j1:j2, l=l1:l2 )
         s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p2(j,i,l,ic)
-        p2(j,i,l,ic) = p2(j,i,l,ic) + dt * s2(j,k,l,1)
+        p2(j,i,l,ic) = p2(j,i,l,ic) + dt * s2(j,k,l)
       end forall
     end if
-    if ( id == 2 .and. bc(5) ) then
+    if ( id == 2 .and. bc(5) == 1 ) then
       k = k2 - i + 1
       forall( j=j1:j2, l=l1:l2 )
         s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p5(j,i,l,ic)
-        p5(j,i,l,ic) = p5(j,i,l,ic) + dt * s2(j,k,l,1)
+        p5(j,i,l,ic) = p5(j,i,l,ic) + dt * s2(j,k,l)
       end forall
     end if
-    if ( id == 3 .and. bc(3) ) then
+    if ( id == 3 .and. bc(3) == 1 ) then
       l = l1 + i - 1
       forall( j=j1:j2, k=k1:k2 )
         s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p3(j,k,i,ic)
-        p3(j,k,i,ic) = p3(j,k,i,ic) + dt * s2(j,k,l,1)
+        p3(j,k,i,ic) = p3(j,k,i,ic) + dt * s2(j,k,l)
       end forall
     end if
-    if ( id == 3 .and. bc(6) ) then
+    if ( id == 3 .and. bc(6) == 1 ) then
       l = l2 - i + 1
       forall( j=j1:j2, k=k1:k2 )
         s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p6(j,k,i,ic)
-        p6(j,k,i,ic) = p6(j,k,i,ic) + dt * s2(j,k,l,1)
+        p6(j,k,i,ic) = p6(j,k,i,ic) + dt * s2(j,k,l)
       end forall
     end if
   end do
@@ -87,7 +90,7 @@ end do
 ! Hourglass correction
 s1 = 0.
 s2 = 0.
-w2 = u + gamma(2) * v
+w2 = u + gam(2) * v
 do ic = 1, 3
 do iq = 1, 4
   call hgnc( s1, w2, ic, iq, i1cell, i2cell )
@@ -103,15 +106,30 @@ if ( nrmdim /= 0 ) call fault( 1 )
 
 ! Velocity, V = V + dV
 do iz = 1, nlock
-  zoneselect( i1, i2, locknodes(iz,4:9), npg, hypocenter, nrmdim )
-  j1 = i1(1,1,iz); j2 = i2(2,1,iz)
-  k1 = i1(1,2,iz); k2 = i2(2,2,iz)
-  l1 = i1(1,3,iz); l2 = i2(2,3,iz)
-  i1 = locknodes(iz,1:3) == 1
-  forall( j=j1:j2, k=k1:k2, l=ll1:l2 ) w1(j,k,l,i1) = 0
+  call zoneselect( i1, i2, locknodes(iz,4:9), npg, hypocenter, nrmdim )
+  i1 = max( i1, i1node )
+  i2 = min( i2, i2node )
+  j1 = i1(1); j2 = i2(1)
+  k1 = i1(2); k2 = i2(2)
+  l1 = i1(3); l2 = i2(3)
+  i1 = locknodes(iz,1:3)
+  do i = 1, 3
+    if ( i1(i) == 1 ) forall( j=j1:j2, k=k1:k2, l=l1:l2 ) w1(j,k,l,i) = 0
+  end do
 end do
 
 v = v + w1
+
+end subroutine
+
+!------------------------------------------------------------------------------!
+! USTEP
+
+subroutine ustep
+
+use globals
+implicit none
+
 u = u + dt * v
 
 end subroutine
