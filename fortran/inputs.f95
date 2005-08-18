@@ -1,9 +1,10 @@
 !------------------------------------------------------------------------------!
-! SETUP
+! INPUTS
 
 subroutine inputs
 
 use globals
+implicit none
 character*256 buff, key, a
 
 npe3 = 1
@@ -84,6 +85,8 @@ i1node = 1
 i2node = npg
 i1cell = 1
 i2cell = npg - 1
+i1nodepml = i1node + bc(1:3) * npml
+i2nodepml = i2node - bc(4:6) * npml
 i1cellpml = i1cell + bc(1:3) * npml
 i2cellpml = i2cell - bc(4:6) * npml
 

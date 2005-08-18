@@ -4,6 +4,7 @@
 subroutine output
 
 use globals
+implicit none
 integer, intent(in) :: iz
 integer :: io, i, i1(3), i2(3), j, j1, j2, k, k2, k2, l, l1, l2, nc, reclen
 character(255) :: ofile

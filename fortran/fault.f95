@@ -2,11 +2,12 @@
 ! FAULT
 
 subroutine fault( init )
+
 use globals
 implicit none
 real, allocatable, dimension(:,:,:) :: fs, fd, dc, cohes, area, r, tmp, tn, ts, ff, ff2
 real, allocatable, dimension(:,:,:,:) :: nrm, tt0, str, dip, tt0nsd, w0, tt, tn3, ts3
-integer :: i2(3), nf(3), down(3), handed, init, strdim
+integer :: i2(3), nf(3), down(3), handed, init, strdim, j3, j4, k3, k4, l3, l4
 
 if ( init == 0 ) then
   if ( ipe == 0 ) print '(a)', 'Initialize fault'
@@ -36,8 +37,9 @@ if ( init == 0 ) then
        dc(j1:j2,k1:k2,l1:l2), &
     cohes(j1:j2,k1:k2,l1:l2), &
      area(j1:j2,k1:k2,l1:l2), &
-        r(j1:j2,k1:k2,l1:l2), &
       tmp(j1:j2,k1:k2,l1:l2), &
+        r(j1:j2,k1:k2,l1:l2), &
+       r3(j1:j2,k1:k2,l1:l2,3), &
       nrm(j1:j2,k1:k2,l1:l2,3), &
       tt0(j1:j2,k1:k2,l1:l2,3), &
        w0(j1:j2,k1:k2,l1:l2,6), &
@@ -50,12 +52,10 @@ if ( init == 0 ) then
   fd = 0.
   dc = 0.
   cohes = 1e9
-  w0 = 0.
-  tt0nsd = 0.
   do iz = 1, nfric
     call zoneselect( i1, i2, frici(iz,:), npg, hypocenter, nrmdim )
-    i1 = max( i1, i1pml )
-    i2 = min( i2, i2pml )
+    i1 = max( i1, i1nodepml )
+    i2 = min( i2, i2nodepml )
     i1(nrmdim) = 1
     i2(nrmdim) = 1
     j1 = i1(1); j2 = i2(1)
@@ -66,10 +66,11 @@ if ( init == 0 ) then
     dc(j1:j2,k1:k2,l1:l2)    = friction(iz,3)
     cohes(j1:j2,k1:k2,l1:l2) = friction(iz,4)
   end do
+  tt0nsd = 0.
   do iz = 1, ntrac
     call zoneselect( i1, i2, traci(iz,:), npg, hypocenter, nrmdim )
-    i1 = max( i1, i1pml )
-    i2 = min( i2, i2pml )
+    i1 = max( i1, i1nodepml )
+    i2 = min( i2, i2nodepml )
     i1(nrmdim) = 1
     i2(nrmdim) = 1
     j1 = i1(1); j2 = i2(1)
@@ -79,10 +80,11 @@ if ( init == 0 ) then
     tt0nsd(j1:j2,k1:k2,l1:l2,2) = traction(iz,2)
     tt0nsd(j1:j2,k1:k2,l1:l2,3) = traction(iz,3)
   end do
+  w0 = 0.
   do iz = 1, nstress
     call zoneselect( i1, i2, stressi(iz,:), npg, hypocenter, nrmdim )
-    i1 = max( i1, i1pml )
-    i2 = min( i2, i2pml )
+    i1 = max( i1, i1nodepml )
+    i2 = min( i2, i2nodepml )
     i1(nrmdim) = 1
     i2(nrmdim) = 1
     j1 = i1(1); j2 = i2(1)
@@ -96,8 +98,8 @@ if ( init == 0 ) then
     w0(j1:j2,k1:k2,l1:l2,6) = stress(iz,6)
   end do
   ! normal vectors
-  i1 = max( i1core, i1pml )
-  i2 = min( i2core, i2pml )
+  i1 = i1node
+  i2 = i2node
   call snormals( nrm, x, i1, i2 )
   area = sqrt( sum( nrm * nrm, 4 ) )
   tmp = 0.
@@ -106,6 +108,7 @@ if ( init == 0 ) then
     nrm(:,:,:,i) = nrm(:,:,:,i) * tmp
   end do
   ! strike vectors
+  str = 0.
   str(:,:,:,1) = down(2) * nrm(:,:,:,3) - down(3) * nrm(:,:,:,2)
   str(:,:,:,2) = down(3) * nrm(:,:,:,1) - down(1) * nrm(:,:,:,3)
   str(:,:,:,3) = down(1) * nrm(:,:,:,2) - down(2) * nrm(:,:,:,1)
@@ -115,9 +118,10 @@ if ( init == 0 ) then
     str(:,:,:,i) = str(:,:,:,i) * tmp
   end do
   ! dip vectors
-  dip(:,:,:,1) = nrm(2) * str(:,:,:,3) - nrm(3) * str(:,:,:,2)
-  dip(:,:,:,2) = nrm(3) * str(:,:,:,1) - nrm(1) * str(:,:,:,3)
-  dip(:,:,:,3) = nrm(1) * str(:,:,:,2) - nrm(2) * str(:,:,:,1)
+  dip = 0.
+  dip(:,:,:,1) = nrm(:,:,:,2) * str(:,:,:,3) - nrm(:,:,:,3) * str(:,:,:,2)
+  dip(:,:,:,2) = nrm(:,:,:,3) * str(:,:,:,1) - nrm(:,:,:,1) * str(:,:,:,3)
+  dip(:,:,:,3) = nrm(:,:,:,1) * str(:,:,:,2) - nrm(:,:,:,2) * str(:,:,:,1)
   tmp = sqrt( sum( dip * dip, 4 ) )
   where ( tmp /= 0. ) tmp = handed / tmp
   do i = 1, 3
@@ -135,9 +139,9 @@ if ( init == 0 ) then
       tt0nsd(:,:,:,dipdim) * dip(:,:,:,i)
   end do
   do i = 1, 3
-    wf1(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - hypoloc(i)
+    r3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - hypoloc(i)
   end do
-  r = sqrt( sum( wf1 * wf1, 4 ) )
+  r = sqrt( sum( r3 * r3, 4 ) )
   i1 = hypocenter
   i1(nrmdim) = 1
   j = i1(1)
@@ -152,7 +156,7 @@ if ( init == 0 ) then
   print *, 'S', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 )
   print *, 'dc: ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / miu0
   print *, 'rcrit: ', rcrit, '>', miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2
-  deallocate( tt0nsd, w0, str, dip )
+  deallocate( tt0nsd, w0, str, dip, r3 )
   i1 = i1node
   i2 = i2node
   i1(nrmdim) = 1

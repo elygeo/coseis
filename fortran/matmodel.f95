@@ -1,7 +1,8 @@
 !------------------------------------------------------------------------------!
-! SETUP
+! MATMODEL - Material model setup
 
 subroutine matmodel
+
 use globals
 implicit none
 integer :: iz

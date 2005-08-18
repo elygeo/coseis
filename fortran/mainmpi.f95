@@ -2,7 +2,9 @@
 ! PARALLEL SORD
 
 program sord
+
 use globals
+implicit none
 include 'mpif.h'
 integer :: nreqs, req(12), comm3, commout(???), mpistatus( mpi_statis_size, 4 )
 integer :: i, wt(5), wt_rate, err

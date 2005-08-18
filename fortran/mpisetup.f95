@@ -2,7 +2,9 @@
 ! MPISETUP
 
 subroutine mpisetup( nreqs, req, comm3 )
+
 use globals
+implicit none
 include 'mpif.h'
 integer, intent(in) :: comm3
 integer, intent(out) :: nreqs = 0, req(12)

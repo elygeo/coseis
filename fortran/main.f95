@@ -2,7 +2,9 @@
 ! SORD
 
 program sord
+
 use globals
+implicit none
 integer :: wt(5), wt_rate
 real :: dwt(5)
 

@@ -2,9 +2,10 @@
 ! MPIOUTPUT
 
 subroutine mpioutput( iz, comm )
-use globals 
-include 'mpif.h'
 
+use globals 
+implicit none
+include 'mpif.h'
 integer :: i, iz, comm, err, ftype, mtype, fh, d = 0, nl(4), ng(4), start(4)
 integer :: mof = mpi_order_fortran, msi = mpi_status_ignore
 integer :: mode =  mpi_mode_create + mpi_mode_wronly + mpi_mode_excl

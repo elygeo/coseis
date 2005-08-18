@@ -1,8 +1,10 @@
 !------------------------------------------------------------------------------!
-! GRIDGEN
+! GRIDGEN - Grid generation
 
 subroutine gridgen
+
 use globals
+implicit none
 real :: theta, scl
 
 if ( ipe == 0 ) print '(a)', 'Grid generation'
