@@ -6,11 +6,12 @@ subroutine gridgen
 use globals
 implicit none
 real :: theta, scl
+real, parameter :: pi = 3.14159
 
 if ( ipe == 0 ) print '(a)', 'Grid generation'
 x = 0.
-i1 = i1core - nhalo
-i2 = i2core + nhalo
+i1 = i1node - nhalo
+i2 = i2node + nhalo
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)

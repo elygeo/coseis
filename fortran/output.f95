@@ -6,7 +6,7 @@ subroutine output
 use globals
 implicit none
 integer, intent(in) :: iz
-integer :: io, i, i1(3), i2(3), j, j1, j2, k, k2, k2, l, l1, l2, nc, reclen
+integer :: io, nc, reclen
 character(255) :: ofile
 
 do io = 1, nout
@@ -18,7 +18,7 @@ case('u'); nc = 3
 case('v'); nc = 3
 case default; stop 'Error: outvar'
 end select
-call zoneselect( i1, i2, outi(iz,:), npg, hypocenter, nrmdim )
+call zoneselect( i1, i2, iout(iz,:), npg, hypocenter, nrmdim )
 if ( any( i1 < i1node ) .or. any( i2 > i2node ) ) stop 'Output error'
 reclen = floatsize * product( i2 - i1 + 1 )
 j1 = i1(1); j2 = i2(1)

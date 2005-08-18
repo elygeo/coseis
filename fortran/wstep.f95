@@ -17,7 +17,7 @@ s1 = u(:,:,:,ic) + gam(1) * v(:,:,:,ic)
 inner: do id = 1, 3
   ix = 6 - ic - id
   do iz = 1, size( oper, 1 )
-    call zoneselect( i1, i2, operi(iz,:), npg, hypocenter, nrmdim )
+    call zoneselect( i1, i2, ioper(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1cellpml )
     i2 = min( i2 - 1, i2cellpml )
     call dfnc( s2, oper(iz), s1, x, dx, 1, id, i1, i2 )

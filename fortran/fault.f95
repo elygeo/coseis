@@ -5,10 +5,12 @@ subroutine fault( init )
 
 use globals
 implicit none
-real, allocatable, dimension(:,:,:) :: fs, fd, dc, cohes, area, r, tmp, tn, ts, ff, ff2
-real, allocatable, dimension(:,:,:,:) :: nrm, tt0, str, dip, tt0nsd, w0, tt, tn3, ts3, r3
+real, allocatable, dimension(:,:,:) :: &
+  fs, fd, dc, cohes, area, r, tmp, tn, ts, ff, ff2
+real, allocatable, dimension(:,:,:,:) :: &
+  nrm, tt0, str, dip, tt0nsd, w0, tt, tn3, ts3, r3
 real :: fs0, fd0, dc0, tn0, ts0
-integer :: nf(3), down(3), handed, init, strdim, dipdim, j3, j4, k3, k4, l3, l4
+integer :: nf(3), down(3), handed, init, downdim, strdim, dipdim, j3, j4, k3, k4, l3, l4, iz
 
 if ( init == 0 ) then
   if ( ipe == 0 ) print '(a)', 'Initialize fault'
@@ -54,7 +56,7 @@ if ( init == 0 ) then
   dc = 0.
   cohes = 1e9
   do iz = 1, nfric
-    call zoneselect( i1, i2, frici(iz,:), npg, hypocenter, nrmdim )
+    call zoneselect( i1, i2, ifric(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1nodepml )
     i2 = min( i2, i2nodepml )
     i1(nrmdim) = 1
@@ -69,7 +71,7 @@ if ( init == 0 ) then
   end do
   tt0nsd = 0.
   do iz = 1, ntrac
-    call zoneselect( i1, i2, traci(iz,:), npg, hypocenter, nrmdim )
+    call zoneselect( i1, i2, itrac(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1nodepml )
     i2 = min( i2, i2nodepml )
     i1(nrmdim) = 1
@@ -83,7 +85,7 @@ if ( init == 0 ) then
   end do
   w0 = 0.
   do iz = 1, nstress
-    call zoneselect( i1, i2, stressi(iz,:), npg, hypocenter, nrmdim )
+    call zoneselect( i1, i2, istress(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1nodepml )
     i2 = min( i2, i2nodepml )
     i1(nrmdim) = 1
@@ -149,7 +151,7 @@ if ( init == 0 ) then
   k = i1(2)
   l = i1(3)
   tn0 = sum( tt0(j,k,l,:) * nrm(j,k,l,:) )
-  ts0 = norm( shiftdim( tt0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) )
+  ts0 = sqrt( sum( ( tt0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) ** 2. ) )
   tn0 = max( -tn0, 0. )
   fs0 = fs(j,k,l)
   fd0 = fd(j,k,l)
@@ -219,7 +221,7 @@ ff = ff * tn + cohes
 ! Nucleation
 if ( rcrit > 0. .and. vrup > 0. ) then
   ff2 = 1.
-  if ( nclramp > 0 ) ff2 = min( ( it * dt - r / vrup ) / ( nclramp * dt ), 1 )
+  if ( nclramp > 0 ) ff2 = min( ( it * dt - r / vrup ) / ( nclramp * dt ), 1. )
   ff2 = ( 1. - ff2 ) * ts + ff2 * ( fd * tn + cohes )
   where ( r < min( rcrit, it * dt * vrup ) .and. ff2 < ff ) ff = ff2
 end if
@@ -243,7 +245,9 @@ uslip = uslip + dt * vslip
 !tnmax = maxval( abs( tn ) )
 !tsmax = maxval( abs( ts ) )
 
-if ( truptol > 0. ) where ( trup = 0. .and. vslip > truptol ) trup = ( it + .5 ) * dt
+if ( truptol > 0. ) then
+  where ( trup == 0. .and. vslip > truptol ) trup = ( it + .5 ) * dt
+end if
 
 end subroutine
 

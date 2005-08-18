@@ -17,7 +17,7 @@ case('u'); nc = 3
 case('v'); nc = 3
 case default; stop 'Error: outvar'
 end select
-call zoneselect( i1, i2, outi(iz,:), npg, hypocenter, nrmdim )
+call zoneselect( i1, i2, iout(iz,:), npg, hypocenter, nrmdim )
 i1g = i1
 i2g = i2
 i1 = max( i1, i1node )

@@ -23,7 +23,7 @@ allocate( &
 matmax = material(1,1:3)
 matmin = material(1,1:3)
 do iz = 1, nmat
-  call zoneselect( i1, i2, mati(iz,:), npg, hypocenter, nrmdim )
+  call zoneselect( i1, i2, imat(iz,:), npg, hypocenter, nrmdim )
   i1 = max( i1, i1cell )
   i2 = min( i2 - 1, i2cell )
   rho0 = material(iz,1)
@@ -48,7 +48,7 @@ if ( ipe == 0 ) print *, 'courant: 1 > ', courant
 gam = dt * viscosity
 
 do iz = 1, noper
-  call zoneselect( i1, i2, operi(iz,:), npg, hypocenter, nrmdim )
+  call zoneselect( i1, i2, ioper(iz,:), npg, hypocenter, nrmdim )
   i1 = max( i1, i1cell )
   i2 = min( i2 - 1, i2cell )
   j1 = i1(1); j2 = i2(1)

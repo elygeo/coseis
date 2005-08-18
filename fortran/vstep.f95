@@ -16,7 +16,7 @@ inner: do iid = 1, 3
   id = mod( ic + iid - 1, 3 ) + 1
   ix = 6 - ic - id
   do iz = 1, size( oper, 1 )
-    call zoneselect( i1, i2, operi(iz,:), npg, hypocenter, nrmdim )
+    call zoneselect( i1, i2, ioper(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1node )
     i2 = min( i2, i2node )
     if ( ic == id ) then
@@ -106,7 +106,7 @@ if ( nrmdim /= 0 ) call fault( 1 )
 
 ! Velocity, V = V + dV
 do iz = 1, nlock
-  call zoneselect( i1, i2, locki(iz,:), npg, hypocenter, nrmdim )
+  call zoneselect( i1, i2, ilock(iz,:), npg, hypocenter, nrmdim )
   i1 = max( i1, i1node )
   i2 = min( i2, i2node )
   j1 = i1(1); j2 = i2(1)
