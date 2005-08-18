@@ -5,7 +5,8 @@ subroutine inputs
 
 use globals
 implicit none
-character*256 buff, key, a
+integer :: iostat
+character(256) :: buff, key, a
 
 npe3 = 1
 ipe = 0
@@ -16,7 +17,7 @@ dt = .007
 nu = .25
 rho0 = 2670.
 vp = 6000.
-vs = sqrt( vp ^ 2 * ( nu - .5 ) / ( nu - 1 ) )  ! 3464.1
+vs = sqrt( vp * vp * ( nu - .5 ) / ( nu - 1 ) )  ! 3464.1
 grid = 'constant'
 nrmdim = 2
 vrup = .9 * vs
@@ -30,18 +31,19 @@ nmat  = 1
 nfric = 1
 ntrac = 1
 nstress = 1
+nlock = 0
 nout = 0
-mati(1,:)    = (/ 1, 1, 1,   -1, -1, -1/)
-frici(1,:)   = (/ 1, 1, 1,   -1, -1, -1/)
-traci(1,:)   = (/ 1, 1, 1,   -1, -1, -1/)
-stressi(1,:) = (/ 1, 1, 1,   -1, -1, -1/)
+imat(1,:)    = (/ 1, 1, 1,   -1, -1, -1/)
+ifric(1,:)   = (/ 1, 1, 1,   -1, -1, -1/)
+itrac(1,:)   = (/ 1, 1, 1,   -1, -1, -1/)
+istress(1,:) = (/ 1, 1, 1,   -1, -1, -1/)
 viscosity = (/ .0, .3 /)
 hypocenter = 0
 msrcradius = 0.
 checkpoint = -1
 npml = 0
 bc = (/ 1, 1, 0,   1, 1, 1 /)
-open( 9, file='inputs' status='old' )
+open( 9, file='inputs', status='old' )
 loop: do
   read( 9,'(a)', iostat=iostat ) buff
   if ( iostat /= 0 ) exit loop
@@ -58,22 +60,25 @@ loop: do
   case( 'dt' );         read( buff, * ) a, dt
   case( 'bc' );         read( buff, * ) a, bc
   case( 'checkpoint' ); read( buff, * ) a, checkpoint
+  case( 'locknodes' )
+    nlock = nlock + 1
+    read( buff, * ) a, locknodes(nlock,:), ilock(nlock,:)
   case( 'out' )
     nout = nout + 1
-    read( buff, * ) a, outvar(nout), outint(nout), outi(nout,:)
+    read( buff, * ) a, outvar(nout), outint(nout), iout(nout,:)
   case( 'material' )
     nmat = nmat + 1
-    read( buff, * ) a, material(nmat,:), mati(nmat,:)
+    read( buff, * ) a, material(nmat,:), imat(nmat,:)
   case( 'friction' )
     nfric = nfric + 1
-    read( buff, * ) a, friction(nfric,:), frici(nfric,:)
+    read( buff, * ) a, friction(nfric,:), ifric(nfric,:)
   case( 'traction' )
     ntrac = ntrac + 1
-    read( buff, * ) a, traction(ntrac,:), traci(ntrac,:)
+    read( buff, * ) a, traction(ntrac,:), itrac(ntrac,:)
   case( 'stress' )
     nstress = nstress + 1
-    read( buff, * ) a, stress(nstress,:), stressi(nstress,:)
-  case default; stop( 'unrecognized input type: ' // key )
+    read( buff, * ) a, stress(nstress,:), istress(nstress,:)
+  case default; stop 'input error'
   end select
 end do loop
 close( 9 )

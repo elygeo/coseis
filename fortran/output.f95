@@ -5,11 +5,10 @@ subroutine output
 
 use globals
 implicit none
-integer, intent(in) :: iz
-integer :: io, nc, reclen
+integer :: iz, nc, reclen, floatsize = 4
 character(255) :: ofile
 
-do io = 1, nout
+do iz = 1, nout
 if ( mod( it, outint(i) ) == 0 ) then
 
 select case ( outvar(iz) )

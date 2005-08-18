@@ -2,7 +2,7 @@
 # SORD Makefile
 
 FC = f95
-OBJECT = zoneselect.o globals.o dfnc.o dfcn.o hgnc.o hgcn.o vstep.o wstep.o fault.o matmodel.o gridgen.o snormals.o main.o
+OBJECT = globals.o inputs.o output.o zoneselect.o dfnc.o dfcn.o hgnc.o hgcn.o vstep.o wstep.o fault.o matmodel.o gridgen.o snormals.o main.o
 
 sord: $(OBJECT)
 	$(FC) $(OBJECT) -o sord $(LDFLAGS)
