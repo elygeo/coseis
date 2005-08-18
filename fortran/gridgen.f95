@@ -9,7 +9,6 @@ real :: theta, scl
 real, parameter :: pi = 3.14159
 
 if ( ipe == 0 ) print '(a)', 'Grid generation'
-x = 0.
 i1 = i1node - nhalo
 i2 = i2node + nhalo
 j1 = i1(1); j2 = i2(1)
@@ -23,6 +22,7 @@ allocate( &
    w2(j1:j2,k1:k2,l1:l2,3), &
    s1(j1:j2,k1:k2,l1:l2), &
    s2(j1:j2,k1:k2,l1:l2) )
+x = 0.
 forall( i=j1:j2 ) x(i,:,:,1) = i - 1
 forall( i=k1:k2 ) x(:,i,:,2) = i - 1
 forall( i=l1:l2 ) x(:,:,i,3) = i - 1

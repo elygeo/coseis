@@ -8,6 +8,8 @@ implicit none
 integer :: wt(5), wt_rate
 real :: dwt(5)
 
+print '(a)', 'SORD - Support Opperator Rupture Dynamics'
+print '(a)', 'Geoffrey Ely gely@ucsd.edu'
 call inputs
 call gridgen
 call matmodel

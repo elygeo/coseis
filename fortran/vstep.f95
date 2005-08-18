@@ -93,10 +93,8 @@ s2 = 0.
 w2 = u + gam(2) * v
 do ic = 1, 3
 do iq = 1, 4
-  call hgnc( s1, w2, ic, iq, i1cell, i2cell )
-  s1 = yc * s1
-  call hgcn( s2, s1,  1, iq, i1node, i2node )
-  s2 = yn * s2
+  call hgnc( s1, w2, ic, iq, i1cell, i2cell ); s1 = yc * s1
+  call hgcn( s2, s1,  1, iq, i1node, i2node ); s2 = yn * s2
   w1(:,:,:,ic) = w1(:,:,:,ic) - s2
 end do
 end do
