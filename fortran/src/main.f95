@@ -14,7 +14,8 @@ call gridgen
 call matmodel
 call fault( 0 )
 
-print '(a)', '  Step     V        U        W       I/O    Total'
+print '(a)', 'Main time loop'
+print '(a)', 'Step     V        U        W       I/O    Total'
 
 it = 0
 
@@ -31,7 +32,7 @@ do while ( it < nt )
   call system_clock( wt(5) )
   dwt(1:4) = real( wt(2:5) - wt(1:4) ) / real( wt_rate )
   dwt(5)   = real( wt(5)   - wt(1)   ) / real( wt_rate )
-  print '(i6,x,5(e9.2))', it, dwt
+  print '(i4,x,5(e9.2))', it, dwt
 end do
 
 end program

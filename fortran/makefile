@@ -3,7 +3,7 @@
 
 FC = f95
 FFLAGS = -O3
-FFLAGS = -g
+FFLAGS = -ggdb
 OBJECT = \
   globals.o \
   dfcn.o \
@@ -27,6 +27,6 @@ sord: $(OBJECT) makefile
 clean:
 	-rm *.o *.mod
 
-%.o: %.f95
+%.o: src/%.f95 makefile
 	$(FC) $(FFLAGS) -c $< -o $@
 

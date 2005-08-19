@@ -46,7 +46,7 @@ do iz = 1, nmat
   yc(j1:j2,k1:k2,l1:l2) = yc0
 end do
 courant = dt * matmax(2) * sqrt( 3. ) / dx   ! TODO: check, make general
-if ( verb > 0 ) print '(a,e9.2)', 'courant: 1 > ', courant
+if ( verb > 0 ) print '(a,e8.2)', 'Courant: 1 > ', courant
 gam = dt * viscosity
 
 do iz = 1, noper

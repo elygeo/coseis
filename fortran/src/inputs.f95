@@ -45,7 +45,7 @@ msrcradius = 0.
 checkpoint = -1
 npml = 0
 bc = (/ 1, 1, 0,   1, 1, 1 /)
-open( 9, file='inputs', status='old' )
+open( 9, file='in', status='old' )
 loop: do
   read( 9,'(a)', iostat=iostat ) buff
   if ( iostat /= 0 ) exit loop

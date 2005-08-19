@@ -10,7 +10,7 @@ save
 integer :: iz, nc, reclen, floatsize = 4
 character(255) :: ofile
 
-if ( it == 0 ) then
+if ( it == 1 ) then
   call system( 'rm -r out; mkdir out' )
   do iz = 1, nout
     write( ofile, '(a,i2.2)' ) 'mkdir out/', iz
@@ -29,10 +29,10 @@ if ( it == 0 ) then
 end if
 
 do iz = 1, nout
-if ( mod( it, outint(i) ) == 0 ) then
+if ( mod( it, outint(iz) ) == 0 ) then
 
 call zoneselect( i1, i2, iout(iz,:), npg, hypocenter, nrmdim )
-if ( any( i1 < i1node ) .or. any( i2 > i2node ) ) stop 'output error'
+if ( any( i1 < i1node .or. i2 > i2node .or. i2 < i1 ) ) stop 'output error'
 reclen = floatsize * product( i2 - i1 + 1 )
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)

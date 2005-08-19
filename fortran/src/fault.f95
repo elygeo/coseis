@@ -153,19 +153,21 @@ if ( init == 0 ) then
   end do
   r = sqrt( sum( r3 * r3, 4 ) )
   i1 = hypocenter
-  i1(nrmdim) = 1
-  j = i1(1)
-  k = i1(2)
-  l = i1(3)
-  tn0 = sum( tt0(j,k,l,:) * nrm(j,k,l,:) )
-  ts0 = sqrt( sum( ( tt0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) ** 2. ) )
-  tn0 = max( -tn0, 0. )
-  fs0 = fs(j,k,l)
-  fd0 = fd(j,k,l)
-  dc0 = dc(j,k,l)
-  print *, 'S', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 )
-  print *, 'dc: ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / miu0
-  print *, 'rcrit: ', rcrit, '>', miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ** 2
+  if ( all( i1 >= i1node .and. i2 <= i2node ) ) then
+    i1(nrmdim) = 1
+    j = i1(1)
+    k = i1(2)
+    l = i1(3)
+    tn0 = sum( tt0(j,k,l,:) * nrm(j,k,l,:) )
+    ts0 = sqrt( sum( ( tt0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) ** 2. ) )
+    tn0 = max( -tn0, 0. )
+    fs0 = fs(j,k,l)
+    fd0 = fd(j,k,l)
+    dc0 = dc(j,k,l)
+    print '(a,e10.3)', 'S:    ', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 )
+    print '(2(a,e10.3,x))', 'dc:   ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / miu0
+    print '(2(a,e10.3,x))', 'rcrit:', rcrit, '>', miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ** 2
+  end if
   deallocate( tt0nsd, w0, str, dip, r3 )
   i1 = i1node
   i2 = i2node

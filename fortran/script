@@ -2,22 +2,20 @@
 
 while getopts ncfgmpdbB opt; do
   case $opt in
-  n) dryrun="yes" ;;
-  c) compilecode="yes" ;;
-  f) recompile="yes" ;;
-  g) debug="yes" ;;
-  m) forcempi="yes" ;;
-  p) nompiio="yes" ;;
-  d) deleteout="yes" ;;
-  b) background="yes" ;;
+  n) dryrun=yes ;;
+  c) compilecode=yes ;;
+  f) recompile=yes ;;
+  g) debug=yes ;;
+  m) forcempi=yes ;;
+  b) background=yes ;;
   B) background="" ;;
   esac
 done
 
-[ -e out -a "$deleteout" = "yes" ] && rm -r out
-[ -e out ] || mkdir out
+[ -e meta ] && rm -r meta
+[ -e meta ] || mkdir meta
 
-if [ "$background" = "yes" ]; then
+if [ "$background" = yes ]; then
   "$0" "$@" -B < /dev/null >& log &
   echo "kill -INT $!" > cancel.sh; chmod u+x cancel.sh
   echo "SORD running in background, for progress type:"
@@ -26,67 +24,46 @@ if [ "$background" = "yes" ]; then
 fi
 echo "SORD - Support Opperator Rupture Dynamics"
 date
-shift `expr $OPTIND - 1`
+shift $( expr $OPTIND - 1 )
 
 if [ "$compilecode$dryrun" = "" ]; then
-  compilecode="yes"
-  runcode="yes"
+  compilecode=yes
+  runcode=yes
 fi
 
-rundir=`/bin/pwd`
-infile="input"
+rundir=$( bin/pwd )
+infile="in"
 [ -r "$infile" ] || exit
 
 me="$0"
 [ -f "$me" ] || me=`which "$0"`
 if [ -L "$me" ]; then
   tmp=`ls -l "$me" | sed 's/^.*-> //'`
-  [ ${tmp:0:1} = / ] || tmp="`dirname $me`/$tmp"
+  [ ${tmp:0:1} = / ] || tmp="$( dirname $me )/$tmp"
   me="$tmp"
 fi
-cd `dirname "$me"`
+cd $( dirname "$me" )
 srcdir=`/bin/pwd`
-srcbase=`basename "$srcdir"`
+srcbase=$( basename "$srcdir" )
 if [ "$srcdir" = "$rundir" ]; then
   echo "Error: please do not run SORD from the source code directory"
   exit
 fi
 cd "$rundir"
 
-#cp "${srcdir}/readme_data" out/readme
-#[ -f metadata.in ] || cp "${srcdir}/metadata_default" metadata.in
-#cp metadata.in out/
-#cp "$infile" out/
-
 nout=0
 while read key params; do
   set -- $params
   case "$key" in
-  #*) ;;
-  n)          n=( $1 $2 $3 $4 ) ;;
-  parallel)   p=( $1 $2 $3 ) ;;
-  checkpoint) [ -e out/ckp ] || mkdir out/ckp ;;
-  out)      
-    nout=$(( nout + 1 ))
-    case $field in
-    u) fields=3 ;;
-    v) fields=3 ;;
-    S) fields=6 ;;
-    m) fields=1 ;;
-    f) fields=3 ;;
-    esac
-    dir=$( echo $nout | awk '{ printf "out/%02d", $1 }' )
-    [ -e $dir ] || mkdir $dir
-    for (( i=1; i<=fields; i++ )); do
-      dir=$( echo $nout $i | awk '{ printf "out/%02d/%1d", $1, $2 }' )
-      [ -e $dir ] || mkdir $dir
-    done
+  n)     n=( $1 $2 $3 $4 ) ;;
+  nproc) p=( $1 $2 $3 ) ;;
   esac
 done < "$infile"
 
+floatsize=4
 points=$(( n[1] * n[2] * n[3] ));
 procs=$(( p[1] * p[2] * p[3] ));
-ram=$(( points / procs * 4 * 23 / 1024 / 1024 ))
+ram=$(( points / procs * floatsize * 22 / 1024 / 1024 ))
 wt=$(( points / procs / 40000 + 1 ))
 if [ $wt -gt 5400 ]; then wt="$(( wt / 3600 + 1 )):00:00"
 elif [ $wt -gt 90 ]; then wt="$(( wt / 60 + 1 )):00"
@@ -116,7 +93,7 @@ ppn=2;
 [ "$ppn" -gt "$procs" ] && ppn="$procs"
 nodes=`echo $procs $ppn | awk '{ x = int($1/$2); print x + ($1>x*$2) }'`
 
-cat <<- END > pbscript
+cat <<- END > submit.sh
 	#!/bin/csh
 	#PBS -q dque
 	#PBS -N sord_job
@@ -129,25 +106,25 @@ cat <<- END > pbscript
 END
 
 if [ "$procs" = "1" ]; then
-	echo "time ./sord_bin" >> pbscript
+	echo "time ./sord_bin" >> submit.sh
 else
-	echo "time mpirun -v -machinefile \$PBS_NODEFILE -np $procs ./sord_bin" >> pbscript
+	echo "time mpirun -v -machinefile \$PBS_NODEFILE -np $procs ./sord_bin" >> submit.sh
 fi
 
 cat <<- END > run.sh
 	echo To submit job:
-	echo qsub pbscript
+	echo qsub submit.sh
 END
 ;;
 
 #------------------#
 babieca)
 
-ppn=2;
+ppn=2
 [ "$ppn" -gt "$procs" ] && ppn="$procs"
-nodes=`echo $procs $procpernode | awk '{ x = int($1/$2); print x + ($1 > x*$2) }'`
+nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
 
-cat <<- END > pbscript
+cat <<- END > submit.sh
 	#!/bin/sh
 	#PBS -q workq
 	#PBS -N sord_job
@@ -159,15 +136,15 @@ cat <<- END > pbscript
 	cd $rundir
 END
 
-if [ "$procs" = "1" ]; then
-	echo "time ./sord_bin" >> pbscript
+if [ "$procs" = 1 ]; then
+	echo "time ./sord_bin" >> submit.sh
 else
-	echo "time mpiexec -np $procs ./sord_bin" >> pbscript
+	echo "time mpiexec -np $procs ./sord_bin" >> submit.sh
 fi
 
 cat <<- END > run.sh
 	echo batch submission \\(up to 19 procs\\):
-	echo qsub pbscript
+	echo qsub submit.sh
 	echo
 	echo to run interactively \(you really should use the batch system\):
 	echo mpirun -np $procs $rundir/sord_bin
@@ -181,8 +158,8 @@ datastar)
 
 ppn=8;
 [ "$ppn" -gt "$procs" ] && ppn="$procs"
-nodes=`echo $procs $ppn | awk '{ x = int($1/$2); print x + ($1>x*$2) }'`
-cat <<- END > llscript
+nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
+cat <<- END > submit.sh
 	#!/usr/bin/bash
 	#@ environment = COPY_ALL;\\
 	AIXTHREAD_COND_DEBUG=OFF;\\
@@ -232,7 +209,7 @@ END
 chmod u+x interactive.sh
 cat <<- END > run.sh
 	echo batch submition \\(up to 1408 procs, 2816 GB\\):
-	echo llsubmit llscript
+	echo llsubmit submit.sh
 	echo
 	echo run interactively \\(up to 32 procs, 64 GB\\):
 	echo ssh dspoe
@@ -251,13 +228,13 @@ fi
 *)
 
 if [ "$debug" = "yes" ]; then
-	if [ "$procs" = "1" -a "$forcempi" != "yes" ]; then
+	if [ "$procs" = 1 -a "$forcempi" != yes ]; then
 		echo "ddd ./sord_bin" > run.sh
 	else
 		echo "mpirun -dbg=ddd -np $procs ./sord_bin" > run.sh
 	fi
 else
-	if [ "$procs" = "1" -a "$forcempi" != "yes" ]; then
+	if [ "$procs" = 1 -a "$forcempi" != yes ]; then
 		echo "time ./sord_bin" > run.sh
 	else
 		echo "time mpirun -np $procs ./sord_bin" > run.sh
@@ -271,58 +248,15 @@ chmod u+x run.sh
 
 #------------------------------------------------------------------------------#
 
-cat << END | perl -e '
-while (<>) {
-  if( /\s*([^#]\S*)\s*=\s*(\S.*)/ ) {
-    $key = $1;
-    $val = $2;
-    $fallback{$key} = $val
-  }
-}
-#use Data::Dumper;
-#print STDERR Dumper(\%fallback);
-open( FILE, "metadata.in" );
-while( <FILE> ) {
-  if( /\s*([^#]\S*)\s*=\s*(.*)/ ) {
-    $key = $1;
-    $val = $2;
-    if ( ! "$val" && $fallback{$key} ) { $val = $fallback{$key} }
-    print "$key = $val\n";
-  } else { print }
-}
-' > "out/metadata"
-DC.publisher.Name = $name
-DC.publisher.Email = ${LOGNAME}@${HOSTNAME}
-DC.date.created = $date
-DC.creator.Name = $name
-DC.creator.Email = ${LOGNAME}@${HOSTNAME}
-DC.contributor = $name
-RunID.Submitter.Name = $name
-RunID.Investigator.Name = $name
-RunID.Date.Submitted = $date
-SystemID.HostName = ${HOSTNAME}
-SystemID.OS.Name = $osname
-SystemID.OS.Version = `uname -r`
-SystemID.OS.Description = `uname -a`
-SystemID.Compiler.Name =
-SystemID.Compiler.Version =
-SystemID.Compiler.Description =
-SystemID.NumberOfProcessors = $procs
-ProgramInfo.Version.User = $date
-PhysicalInputs.Volume.MaxX = ${L[1]}
-PhysicalInputs.Volume.MaxY = ${L[2]}
-PhysicalInputs.Volume.MaxZ = ${L[3]}
-PhysicalInputs.TimeSeries.EndTime = ${L[4]}
-NumericalInputs.InputFile.Name = $infile
-NumericalInputs.TimeSeries.NumberOfSteps = ${n[4]}
-NumericalInputs.TimeSeries.TimeIncrement = ${h[4]}
-NumericalInputs.3DData.NumPointsXdirection = ${n[1]}
-NumericalInputs.3DData.NumPointsYdirection = ${n[2]}
-NumericalInputs.3DData.NumPointsZdirection = ${n[3]}
-NumericalInputs.3DData.GridIncrement.Xdirection = ${h[1]}
-NumericalInputs.3DData.GridIncrement.Ydirection = ${h[2]}
-NumericalInputs.3DData.GridIncrement.Zdirection = ${h[3]}
-END
+$name
+${LOGNAME}@${HOSTNAME}
+$date
+${HOSTNAME}
+$osname
+`uname -r`
+`uname -a`
+$procs
+$date
 
 #------------------------------------------------------------------------------#
 
@@ -375,11 +309,11 @@ END
 
 #------------------------------------------------------------------------------#
 
-if [ "$runcode" = "yes" ]; then
+if [ "$runcode" = yes ]; then
 
 cd "$rundir"
-perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > out/endian
-cp "${srcdir}/${srcbase}.tgz" out/
+perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > meta/endian
+cp "${srcdir}/${srcbase}.tgz" meta/
 cp -f "${srcdir}/sord_bin" .
 ./run.sh || :
 rm -f cancel.sh

@@ -35,9 +35,10 @@ case( 3 ); x(:,:,i:,3) = x(:,:,i:,3) - 1
 end select
 hypoloc = hypocenter
 noper = 1
+ioper(1,:) = (/ 1, 1, 1, -1, -1, -1 /)
+oper(1) = 'h'
 selectcase( grid )
 case('constant')
-  oper(1) = 'h'
 case('stretch')
   oper(1) = 'r'
   x(:,:,:,3) = 2. * x(:,:,:,3)
@@ -55,7 +56,7 @@ case('slant')
   hypoloc(3) = hypoloc(3) * cos( theta );
   hypoloc(1) = hypoloc(1) * scl;
   hypoloc(3) = hypoloc(3) * scl;
-case default; stop 'Error: grid'
+case default; stop 'bad grid name'
 end select
 x = x * dx
 hypoloc = hypoloc * dx
