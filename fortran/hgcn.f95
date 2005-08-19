@@ -1,6 +1,8 @@
 !------------------------------------------------------------------------------!
 ! HGCN - hourglass corrections, cell to node
 
+module hgcn_mod
+contains
 subroutine hgcn( hg, f, i, iq, i1, i2 )
 
 implicit none
@@ -49,4 +51,5 @@ case(4)
 end select
 
 end subroutine
+end module
 

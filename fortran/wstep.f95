@@ -2,11 +2,14 @@
 ! WSTEP
 
 subroutine wstep
-
 use globals
+use dfnc_mod
+use utils
+
 implicit none
 integer :: ic, id, ix, iz
 
+if ( verb > 1 ) print '(a)', 'Wstep'
 ! Gadient
 ! G = grad(U + gam*V)    non PML region
 ! G' + DG = gradV          PML region
@@ -16,7 +19,7 @@ outer: do ic = 1, 3
 s1 = u(:,:,:,ic) + gam(1) * v(:,:,:,ic)
 inner: do id = 1, 3
   ix = 6 - ic - id
-  do iz = 1, size( oper, 1 )
+  do iz = 1, noper
     call zoneselect( i1, i2, ioper(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1cellpml )
     i2 = min( i2 - 1, i2cellpml )

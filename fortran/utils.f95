@@ -1,6 +1,8 @@
 !------------------------------------------------------------------------------!
-! ZONESELECT
+! UTILS
 
+module utils
+contains
 subroutine zoneselect( i1, i2, zone, n, hypocenter, nrmdim )
 
 implicit none
@@ -17,4 +19,5 @@ where ( i1 <= 0 ) i1 = i1 + n + 1
 where ( i2 <= 0 ) i1 = i2 + n + 1
 
 end subroutine
+end module
 

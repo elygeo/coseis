@@ -2,20 +2,25 @@
 ! VSTEP
 
 subroutine vstep
-
 use globals
+use dfcn_mod
+use hgnc_mod
+use hgcn_mod
+use utils
+
 implicit none
 integer ic, iid, id, ix, iq, iz
 
 ! Restoring force
 ! P' + DP = [del]S, F = 1.P'             PML region
 ! F = divS                               non PML region (D=0)
+if ( verb > 1 ) print '(a)', 'Vstep'
 s2 = 0.
 outer: do ic  = 1, 3
 inner: do iid = 1, 3
   id = mod( ic + iid - 1, 3 ) + 1
   ix = 6 - ic - id
-  do iz = 1, size( oper, 1 )
+  do iz = 1, noper
     call zoneselect( i1, i2, ioper(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1node )
     i2 = min( i2, i2node )
@@ -100,7 +105,7 @@ end do
 end do
 
 ! Fault calculations
-if ( nrmdim /= 0 ) call fault( 1 )
+call fault( 1 )
 
 ! Velocity, V = V + dV
 do iz = 1, nlock

@@ -2,25 +2,31 @@
 # SORD Makefile
 
 FC = f95
-OPTFLAGS = -O3
-OPTFLAGS = -g
-SRC = \
-  globals.f95 \
-  main.f95 \
-  inputs.f95 \
-  gridgen.f95 \
-  matmodel.f95 \
-  vstep.f95 \
-  wstep.f95 \
-  output.f95 \
-  dfcn.f95 \
-  dfnc.f95 \
-  hgcn.f95 \
-  hgnc.f95 \
-  fault.f95 \
-  snormals.f95 \
-  zoneselect.f95
+FFLAGS = -O3
+FFLAGS = -g
+OBJECT = \
+  globals.o \
+  dfcn.o \
+  dfnc.o \
+  hgcn.o \
+  hgnc.o \
+  snormals.o \
+  utils.o \
+  main.o \
+  inputs.o \
+  gridgen.o \
+  matmodel.o \
+  vstep.o \
+  wstep.o \
+  output.o \
+  fault.o
 
-sord: $(SRC) makefile
-	$(FC) $(OPTFLAGS) $(SRC) -o sord
+sord: $(OBJECT) makefile
+	$(FC) $(FFLAGS) $(OBJECT) -o sord
+
+clean:
+	-rm *.o *.mod
+
+%.o: %.f95
+	$(FC) $(FFLAGS) -c $< -o $@
 

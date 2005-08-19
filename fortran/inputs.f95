@@ -2,12 +2,14 @@
 ! INPUTS
 
 subroutine inputs
-
 use globals
+use utils
+
 implicit none
 integer :: iostat
 character(256) :: buff, key, a
 
+if ( verb > 0 ) print '(a)', 'Reading input file'
 npe3 = 1
 ipe = 0
 npg = 21
@@ -55,7 +57,12 @@ loop: do
   case( 'nprocs' );     read( buff, * ) a, npe3
   case( 'n' );          read( buff, * ) a, npg, nt
   case( 'nrmdim' );     read( buff, * ) a, nrmdim
+  case( 'npml' );       read( buff, * ) a, npml
+  case( 'grid' );       read( buff, * ) a, grid
+  case( 'rcrit' );      read( buff, * ) a, rcrit
   case( 'hypocenter' ); read( buff, * ) a, hypocenter
+  case( 'viscosity' );  read( buff, * ) a, viscosity
+  case( 'nclramp' );    read( buff, * ) a, nclramp
   case( 'dx' );         read( buff, * ) a, dx
   case( 'dt' );         read( buff, * ) a, dt
   case( 'bc' );         read( buff, * ) a, bc
@@ -78,7 +85,7 @@ loop: do
   case( 'stress' )
     nstress = nstress + 1
     read( buff, * ) a, stress(nstress,:), istress(nstress,:)
-  case default; stop 'input error'
+  case default; print '(a)', 'bad key: ' // trim( key ); stop
   end select
 end do loop
 close( 9 )

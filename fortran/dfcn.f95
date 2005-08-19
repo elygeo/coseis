@@ -1,14 +1,16 @@
 !------------------------------------------------------------------------------!
 ! DFCN - difference operator, cell to node
 
-subroutine dfcn( op, df, f, x, dx, i, a, i1, i2 )
+module dfcn_mod
+contains
+subroutine dfcn( df, op, f, x, dx, i, a, i1, i2 )
 
 implicit none
+real, intent(out) :: df(:,:,:)
 character, intent(in) :: op
 real, intent(in) :: f(:,:,:,:), x(:,:,:,:), dx
-real, intent(out) :: df(:,:,:)
-real :: h
 integer, intent(in) :: i, a, i1(3), i2(3)
+real :: h
 integer :: j, j1, j2, k, k1, k2, l, l1, l2, b, c
 
 j1 = i1(1); j2 = i2(1)
@@ -129,4 +131,5 @@ end forall
 end select
 
 end subroutine
+end module
 

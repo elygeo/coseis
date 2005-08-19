@@ -2,13 +2,15 @@
 ! MATMODEL - Material model setup
 
 subroutine matmodel
-
 use globals
+use utils
+use dfnc_mod
+
 implicit none
 integer :: iz
 real :: matmin(3), matmax(3), hmean(3), tune, c1, c2, c3, damp, dampn, dampc, yc0, courant
 
-if ( ipe == 0 ) print '(a)', 'Material Model'
+if ( verb > 0 ) print '(a)', 'Material Model'
 i1 = i1node - nhalo
 i2 = i2node + nhalo
 j1 = i1(1); j2 = i2(1)
@@ -44,7 +46,7 @@ do iz = 1, nmat
   yc(j1:j2,k1:k2,l1:l2) = yc0
 end do
 courant = dt * matmax(2) * sqrt( 3. ) / dx   ! TODO: check, make general
-if ( ipe == 0 ) print '(a,e9.2)', 'courant: 1 > ', courant
+if ( verb > 0 ) print '(a,e9.2)', 'courant: 1 > ', courant
 gam = dt * viscosity
 
 do iz = 1, noper
@@ -120,7 +122,7 @@ if ( bc(2) == 1 ) allocate( g2(j1:k2,1:npml,l1:l2,3) )
 if ( bc(5) == 1 ) allocate( g5(j1:k2,1:npml,l1:l2,3) )
 if ( bc(3) == 1 ) allocate( g3(j1:k2,k1:k2,1:npml,3) )
 if ( bc(6) == 1 ) allocate( g6(j1:k2,k1:k2,1:npml,3) )
-allocate( dc1(npml), dn2(npml), dc1(npml), dc2(npml) )
+allocate( dn1(npml), dn2(npml), dc1(npml), dc2(npml) )
 c1 =  8. / 15.
 c2 = -3. / 100.
 c3 =  1. / 1500.

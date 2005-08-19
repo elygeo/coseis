@@ -8,7 +8,8 @@ implicit none
 real :: theta, scl
 real, parameter :: pi = 3.14159
 
-if ( ipe == 0 ) print '(a)', 'Grid generation'
+if ( verb > 0 ) print '(a)', 'Grid generation'
+downdim = 3
 i1 = i1node - nhalo
 i2 = i2node + nhalo
 j1 = i1(1); j2 = i2(1)

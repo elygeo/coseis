@@ -1,6 +1,8 @@
 !------------------------------------------------------------------------------!
 ! SNORMALS - surface normals
 
+module snormals_mod
+contains
 subroutine snormals( nrm, x, i1, i2 )
 
 implicit none
@@ -13,6 +15,7 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 nrm = 0.
+nrmdim = 0
 do i = 1, 3
   if ( i1(i) == i2(i) ) nrmdim = i
 end do
@@ -71,9 +74,10 @@ do a = 1, 3
       + x(j-1,k+1,l,b) * ( x(j-1,k,l,c) - x(j,k+1,l,c) ) &
       + x(j+1,k-1,l,b) * ( x(j+1,k,l,c) - x(j,k-1,l,c) ) )
     end forall
-  case default; stop 'Error: snormals'
+  case default; stop 'snormals'
   end select
 end do
 
 end subroutine
+end module
 

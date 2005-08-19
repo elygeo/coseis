@@ -2,18 +2,22 @@
 ! FAULT
 
 subroutine fault( init )
-
 use globals
+use snormals_mod
+use utils
+
 implicit none
+save
 real, allocatable, dimension(:,:,:) :: &
   fs, fd, dc, cohes, area, r, tmp, tn, ts, ff, ff2
 real, allocatable, dimension(:,:,:,:) :: &
   nrm, tt0, str, dip, tt0nsd, w0, tt, tn3, ts3, r3
 real :: fs0, fd0, dc0, tn0, ts0
-integer :: nf(3), down(3), handed, init, downdim, strdim, dipdim, j3, j4, k3, k4, l3, l4, iz
+integer :: down(3), handed, init, strdim, dipdim, j3, j4, k3, k4, l3, l4, iz
 
+if ( nrmdim == 0 ) return
 if ( init == 0 ) then
-  if ( ipe == 0 ) print '(a)', 'Initialize fault'
+  if ( verb > 0 ) print '(a)', 'Initialize fault'
   if ( nrmdim /= downdim ) then
     dipdim = downdim
     strdim = 6 - dipdim - nrmdim
@@ -46,6 +50,7 @@ if ( init == 0 ) then
       nrm(j1:j2,k1:k2,l1:l2,3), &
       tt0(j1:j2,k1:k2,l1:l2,3), &
        w0(j1:j2,k1:k2,l1:l2,6), &
+   tt0nsd(j1:j2,k1:k2,l1:l2,3), &
       str(j1:j2,k1:k2,l1:l2,3), &
       dip(j1:j2,k1:k2,l1:l2,3) )
   uslip = 0.
@@ -103,6 +108,8 @@ if ( init == 0 ) then
   ! normal vectors
   i1 = i1node
   i2 = i2node
+  i1(nrmdim) = 1
+  i2(nrmdim) = 1
   call snormals( nrm, x, i1, i2 )
   area = sqrt( sum( nrm * nrm, 4 ) )
   tmp = 0.
@@ -180,6 +187,7 @@ end if
 
 !------------------------------------------------------------------------------!
 ! Zero slip velocity condition
+if ( verb > 1 ) print '(a)', 'Fault'
 i1 = i1node
 i2 = i2node
 i1(nrmdim) = hypocenter(nrmdim)
@@ -225,7 +233,7 @@ if ( rcrit > 0. .and. vrup > 0. ) then
   ff2 = ( 1. - ff2 ) * ts + ff2 * ( fd * tn + cohes )
   where ( r < min( rcrit, it * dt * vrup ) .and. ff2 < ff ) ff = ff2
 end if
-!if ( any( ff <= 0. ) ) print *, 'fault opening!'
+!if ( any( ff <= 0. ) .and. verb > 0 ) print *, 'fault opening!'
 ! Shear traction bounded by friction
 ff2 = 1.
 where ( ts > ff ) ff2 = ff / ts
