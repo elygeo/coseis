@@ -2,7 +2,7 @@
 
 cd ..
 
-gtar -hzvc -f fsord/fsord.tgz fsord/src fsord/makefile fsord/script fsord/tarball.sh
+gtar -hzvc -f fsord/fsord.tgz fsord/*.f95 fsord/makefile fsord/script fsord/tarball.sh
 
 cd fsord
 

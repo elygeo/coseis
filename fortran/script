@@ -1,57 +1,126 @@
 #!/bin/bash -e
 
-while getopts ncfgmpdbB opt; do
+debug=no
+mpi=no
+logging=no
+while getopts gpl opt; do
   case $opt in
-  n) dryrun=yes ;;
-  c) compilecode=yes ;;
-  f) recompile=yes ;;
   g) debug=yes ;;
-  m) forcempi=yes ;;
-  b) background=yes ;;
-  B) background="" ;;
+  p) mpi=yes ;;
+  l) logging=yes ;;
   esac
 done
-
-[ -e meta ] && rm -r meta
-[ -e meta ] || mkdir meta
-
-if [ "$background" = yes ]; then
-  "$0" "$@" -B < /dev/null >& log &
-  echo "kill -INT $!" > cancel.sh; chmod u+x cancel.sh
-  echo "SORD running in background, for progress type:"
-  echo "cat log; tail -0f log"
+if [ "$logging" != yes ]; then
+  "$0" "$@" -l | tee -a log
   exit
 fi
+
 echo "SORD - Support Opperator Rupture Dynamics"
 date
-shift $( expr $OPTIND - 1 )
-
-if [ "$compilecode$dryrun" = "" ]; then
-  compilecode=yes
-  runcode=yes
-fi
-
-rundir=$( bin/pwd )
 infile="in"
 [ -r "$infile" ] || exit
+if [ -e out ]; then
+  echo "out/ exists"
+  exit
+else
+  mkdir out
+fi
+
+osname=$( uname )
+if [ "$PBS_DEFAULT" ];         then machine="teragrid"
+elif [ "$osname" = AIX ];      then machine="datastar"
+elif [ "$HOSTNAME" = master ]; then machine="babieca"
+fi
+
 
 me="$0"
-[ -f "$me" ] || me=`which "$0"`
+[ -f "$me" ] || me=$( which "$0" )
 if [ -L "$me" ]; then
-  tmp=`ls -l "$me" | sed 's/^.*-> //'`
+  tmp=$( ls -l "$me" | sed 's/^.*-> //' )
   [ ${tmp:0:1} = / ] || tmp="$( dirname $me )/$tmp"
   me="$tmp"
 fi
 cd $( dirname "$me" )
-srcdir=`/bin/pwd`
+srcdir=$( /bin/pwd )
 srcbase=$( basename "$srcdir" )
 if [ "$srcdir" = "$rundir" ]; then
   echo "Error: please do not run SORD from the source code directory"
   exit
 fi
-cd "$rundir"
 
-nout=0
+#------------------------------------------------------------------------------#
+
+cd "$srcdir"
+
+FC="f95"
+CC="cc"
+OPTFLAGS="-O"
+OBJECT=" \
+  globals.o \
+  dfcn.o \
+  dfnc.o \
+  hgcn.o \
+  hgnc.o \
+  snormals.o \
+  utils.o \
+  inputs.o \
+  gridgen.o \
+  matmodel.o \
+  vstep.o \
+  wstep.o \
+  output.o \
+  fault.o "
+if [ $mpi = yes ]; then
+  FC=mpif95
+  CC=mpicc
+  OBJECT="$OBJECT pmain.o mpisetup.o mpioutput.o"
+else
+  OBJECT="$OBJECT main.o"
+fi
+[ $debug = yes ] && OPTFLAGS=-g
+if [ "$osname" = Linux ]; then
+  OPTFLAGS="-I$srcdir"
+  OBJECT="$OBJECT gnutrapfpe.o"
+  [ "$points" -gt 10000 -a "$degub" != yes ] && OPTFLAGS=-O3
+elif [ "$osname" = SunOS ]; then
+  OPTFLAGS="-fast"
+elif [ "$machine" = datastar ]; then
+  FC="mpxlf90_r"
+  CC="mpcc_r"
+  OPTFLAGS="-O3 -qstrict -qarch=pwr4 -qtune=pwr4 -q64"
+  [ $debug = yes ] && OPTFLAGS="-g -qflttrap"
+fi
+[ "$machine" = babieca -a $mpi = no ] && FC=pgf95
+cat << END > tmp
+FC       = $FC
+CC       = $CC
+FFLAGS   = $OPTFLAGS
+LDFLAGS  = $OPTFLAGS
+OBJECT   = $OBJECT
+
+sord_bin: \$(OBJECT)
+	\$(FC) \$(OBJECT) -o sord_bin \$(LDFLAGS)
+	./tarball.sh
+
+\$(OBJECT): makefile
+
+clean:
+	rm *.o
+
+%.o: src/%.f95 makefile
+        \$(FC) \$(FFLAGS) -c \$< -o \$@
+END
+[ ! -f makefile ] && touch makefile
+[ "$( diff tmp makefile )" != "" ] && mv tmp makefile
+gmake
+
+#------------------------------------------------------------------------------#
+
+name=$( finger $LOGNAME | sed -n 's/^.*e: //p' )
+date=$( date )
+endian=$( perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' )
+rundir=$( bin/pwd )
+fullosname=$( uname -a )
 while read key params; do
   set -- $params
   case "$key" in
@@ -59,7 +128,6 @@ while read key params; do
   nproc) p=( $1 $2 $3 ) ;;
   esac
 done < "$infile"
-
 floatsize=4
 points=$(( n[1] * n[2] * n[3] ));
 procs=$(( p[1] * p[2] * p[3] ));
@@ -73,16 +141,19 @@ echo "Processors: $procs"
 echo "Ram per proc: $ram"
 echo "Wall clock: $wt"
 
-
 #------------------------------------------------------------------------------#
 
-name=`finger $LOGNAME | sed -n 's/^.*e: //p'`
-date=`date`
-osname=`uname`
-if [ "$PBS_DEFAULT" ];           then machine="teragrid"
-elif [ "$osname" = "AIX" ];      then machine="datastar"
-elif [ "$HOSTNAME" = "master" ]; then machine="babieca"
-fi
+cd "$rundir"
+
+cat << END > out/meta
+date:     $date
+name:     $name
+logname:  ${LOGNAME}
+hostname: ${HOSTNAME}
+osname:   $fullosname
+procs:    $procs
+END
+
 
 case $machine in
 
@@ -90,8 +161,8 @@ case $machine in
 teragrid)
 
 ppn=2;
-[ "$ppn" -gt "$procs" ] && ppn="$procs"
-nodes=`echo $procs $ppn | awk '{ x = int($1/$2); print x + ($1>x*$2) }'`
+[ $ppn -gt $procs ] && ppn=$procs
+nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
 
 cat <<- END > submit.sh
 	#!/bin/csh
@@ -105,7 +176,7 @@ cat <<- END > submit.sh
 	cd $rundir
 END
 
-if [ "$procs" = "1" ]; then
+if [ $mpi = no ]; then
 	echo "time ./sord_bin" >> submit.sh
 else
 	echo "time mpirun -v -machinefile \$PBS_NODEFILE -np $procs ./sord_bin" >> submit.sh
@@ -121,7 +192,7 @@ END
 babieca)
 
 ppn=2
-[ "$ppn" -gt "$procs" ] && ppn="$procs"
+[ $ppn -gt $procs ] && ppn=$procs
 nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
 
 cat <<- END > submit.sh
@@ -136,7 +207,7 @@ cat <<- END > submit.sh
 	cd $rundir
 END
 
-if [ "$procs" = 1 ]; then
+if [ $mpi = no ]; then
 	echo "time ./sord_bin" >> submit.sh
 else
 	echo "time mpiexec -np $procs ./sord_bin" >> submit.sh
@@ -157,7 +228,7 @@ END
 datastar)
 
 ppn=8;
-[ "$ppn" -gt "$procs" ] && ppn="$procs"
+[ $ppn -gt $procs ] && ppn=$procs
 nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
 cat <<- END > submit.sh
 	#!/usr/bin/bash
@@ -176,7 +247,7 @@ cat <<- END > submit.sh
 	MP_POLLING_INTERVAL=100000;\\
 	MP_PULSE=0;\\
 	MP_SHARED_MEMORY=yes;\\
-	MP_SINGLE_THREAD=$nompiio;\\
+	MP_SINGLE_THREAD=no;\\
 	RT_GRQ=ON;\\
 	SPINLOOPTIME=0;\\
 	YIELDLOOPTIME=0;
@@ -218,7 +289,7 @@ cat <<- END > run.sh
 	echo other useful commands:
 	echo llcancel \\<jobID\\>, llq, llq -s \\<jovID\\>, showq, reslist
 END
-if [ `pwd | grep -v gpfs` ]; then
+if [ $( pwd | grep -v gpfs ) ]; then
 	echo "Error: please run dfm from a subdirectory of /gpfs/"
 	exit
 fi
@@ -227,7 +298,7 @@ fi
 #------------------#
 *)
 
-if [ "$debug" = "yes" ]; then
+if [ "$debug" = yes ]; then
 	if [ "$procs" = 1 -a "$forcempi" != yes ]; then
 		echo "ddd ./sord_bin" > run.sh
 	else
@@ -248,66 +319,8 @@ chmod u+x run.sh
 
 #------------------------------------------------------------------------------#
 
-$name
-${LOGNAME}@${HOSTNAME}
-$date
-${HOSTNAME}
-$osname
-`uname -r`
-`uname -a`
-$procs
-$date
-
 #------------------------------------------------------------------------------#
 
-cd "$srcdir"
-
-FC="f95"
-CC="cc"
-OPTFLAGS="-O"
-OBJECT="main.o input.o output.o step.o elastic.o fault.o"
-if [ "$procs" != "1" -o "$forcempi" = "yes" ]; then
-  FC="mpif95"
-  CC="mpicc"
-  OBJECT="$OBJECT mpisetup.o mpioutput.o"
-fi
-[ "$debug" = "yes" ] && OPTFLAGS="-g"
-if [ "$osname" = "Linux" ]; then
-  OPTFLAGS="-I$srcdir"
-  OBJECT="$OBJECT gnutrapfpe.o"
-  [ "$points" -gt 10000 ] && OPTFLAGS="-I$srcdir -O3"
-  [ "$debug" = "yes" ]    && OPTFLAGS="-I$srcdir -g"
-elif [ "$osname" = "SunOS" ]; then
-  FC="f90"
-  OPTFLAGS="-fast"
-  [ "$debug" = "yes" ] && OPTFLAGS="-g"
-elif [ "$machine" = "datastar" ]; then
-  FC="mpxlf90_r"
-  CC="mpcc_r"
-  OPTFLAGS="-O3 -qstrict -qarch=pwr4 -qtune=pwr4 -q64"
-  #OPTFLAGS="-O3 -qstrict -qarch=pwr3 -qtune=pwr3 -qcache=auto -bmaxdata:0x80000000 -bmaxstack:0x10000000"
-  [ "$debug" = "yes" ] && OPTFLAGS="-g -qflttrap"
-fi
-[ "$machine" = "babieca" -a "$procs" = "1" -a "$forcempi" != "yes" ] && FC="pgf95"
-cat << END > tmp
-FC       = $FC
-CC       = $CC
-FFLAGS   = $OPTFLAGS
-LDFLAGS  = $OPTFLAGS
-OBJECT   = $OBJECT
-sord_bin: \$(OBJECT)
-	\$(FC) \$(OBJECT) -o sord_bin \$(LDFLAGS)
-	./tarball.sh
-\$(OBJECT): com.f makefile
-clean:
-	rm *.o
-END
-[ ! -f "makefile" ] && touch makefile
-[ "`diff tmp makefile`" != "" ] && mv tmp makefile
-[ "$recompile" = "yes" ] && make clean
-[ "$compilecode" = "yes" ] && gmake
-
-#------------------------------------------------------------------------------#
 
 if [ "$runcode" = yes ]; then
 
