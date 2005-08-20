@@ -56,23 +56,21 @@ loop: do
   case( '' )
   case( 'nprocs' );     read( buff, * ) a, npe3
   case( 'n' );          read( buff, * ) a, npg, nt
-  case( 'nrmdim' );     read( buff, * ) a, nrmdim
-  case( 'npml' );       read( buff, * ) a, npml
-  case( 'grid' );       read( buff, * ) a, grid
-  case( 'rcrit' );      read( buff, * ) a, rcrit
-  case( 'hypocenter' ); read( buff, * ) a, hypocenter
-  case( 'viscosity' );  read( buff, * ) a, viscosity
-  case( 'nclramp' );    read( buff, * ) a, nclramp
   case( 'dx' );         read( buff, * ) a, dx
   case( 'dt' );         read( buff, * ) a, dt
   case( 'bc' );         read( buff, * ) a, bc
+  case( 'npml' );       read( buff, * ) a, npml
+  case( 'grid' );       read( buff, * ) a, grid
+  case( 'viscosity' );  read( buff, * ) a, viscosity
+  case( 'nrmdim' );     read( buff, * ) a, nrmdim
+  case( 'hypocenter' ); read( buff, * ) a, hypocenter
+  case( 'rcrit' );      read( buff, * ) a, rcrit
+  case( 'nclramp' );    read( buff, * ) a, nclramp
   case( 'checkpoint' ); read( buff, * ) a, checkpoint
+  case( 'verbose' );    read( buff, * ) a, verb
   case( 'locknodes' )
     nlock = nlock + 1
     read( buff, * ) a, locknodes(nlock,:), ilock(nlock,:)
-  case( 'out' )
-    nout = nout + 1
-    read( buff, * ) a, outvar(nout), outint(nout), iout(nout,:)
   case( 'material' )
     nmat = nmat + 1
     read( buff, * ) a, material(nmat,:), imat(nmat,:)
@@ -85,6 +83,9 @@ loop: do
   case( 'stress' )
     nstress = nstress + 1
     read( buff, * ) a, stress(nstress,:), istress(nstress,:)
+  case( 'out' )
+    nout = nout + 1
+    read( buff, * ) a, outvar(nout), outint(nout), iout(nout,:)
   case default; print '(a)', 'bad key: ' // trim( key ); stop
   end select
 end do loop
