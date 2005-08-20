@@ -14,7 +14,7 @@ while getopts spgl opt; do
 done
 
 if [ "$logging" = no ]; then
-  "$0" "$@" -l | tee -a log
+  "$0" "$@" -l 2>&1 | tee log
   exit
 fi
 
@@ -61,6 +61,7 @@ Wall clock: $wt
 END
 
 #------------------------------------------------------------------------------#
+# Create makefile and compile code
 
 cd $( dirname "$rundir" )
 srcdir=$( /bin/pwd )
@@ -123,8 +124,8 @@ FC     = $FC
 CC     = $CC
 FFLAGS = $OPTFLAGS
 OBJECT = $OBJECT
-sord_bin: \$(OBJECT)
-	\$(FC) \$(FFLAGS) \$(OBJECT) -o sord_bin
+sord: \$(OBJECT)
+	\$(FC) \$(FFLAGS) \$(OBJECT) -o sord
 	./tarball.sh
 
 clean:
@@ -139,6 +140,7 @@ END
 gmake
 
 #------------------------------------------------------------------------------#
+# Save metadata and sorce code
 
 cd "$rundir"
 
@@ -153,10 +155,12 @@ hostname: ${HOSTNAME}
 osname:   $( uname -a )
 procs:    $procs
 END
+srcbase=$( basename "$srcdir" )
 cp "${srcdir}/${srcbase}.tgz" meta/
-cp -f "${srcdir}/sord_bin" .
+cp -f "${srcdir}/sord" .
 
 #------------------------------------------------------------------------------#
+# Machine specific batch submission and run commands
 
 case $machine in
 
@@ -169,7 +173,7 @@ nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
 cmd=""
 [ $mpi = yes ] && cmd="mpirun -v -machinefile \$PBS_NODEFILE -np $procs"
 
-cat << END > submit.sh
+cat << END > batch.sh
 #!/bin/csh
 #PBS -q dque
 #PBS -N sord_job
@@ -179,13 +183,15 @@ cat << END > submit.sh
 #PBS -e stderr
 #PBS -V
 cd $rundir
-time $cmd ./sord_bin
+time $cmd ./sord
 END
 
-cat << END | tee -a notes
-To submit job:
-qsub submit.sh
+cat << END > submit.sh
+#!/bin/bash
+# teragrid batch submission
+qsub batch.sh
 END
+
 ;;
 
 #------------------#
@@ -195,9 +201,9 @@ ppn=2
 [ $ppn -gt $procs ] && ppn=$procs
 nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
 cmd=""
-[ $mpi = no ] && cmd="mpiexec -np $procs"
+[ $mpi = yes ] && cmd="mpiexec -np $procs"
 
-cat << END > submit.sh
+cat << END > batch.sh
 #!/bin/sh
 #PBS -q workq
 #PBS -N sord_job
@@ -207,20 +213,22 @@ cat << END > submit.sh
 #PBS -V
 sleep 2
 cd $rundir
-time $cmd ./sord_bin" >> submit.sh
+time $cmd ./sord
 END
 
-cat << END | tee -a notes
-babieca notes
-
-batch submission (up to 19 procs):
-qsub submit.sh
-
-to run interactively (you really should use the batch system):
-mpirun -np $procs ./sord_bin
-
-other useful commands: pbsnodes -a, pingd, qstat, qdel
+cat << END > submit.sh
+#!/bin/bash
+# babieca batch submission (up to 19 procs):
+# other useful commands: pbsnodes -a, pingd, qstat, qdel
+qsub batch.sh
 END
+
+cat << END > run.sh
+#!/bin/bash
+# run interactively (you really should use the batch system)
+mpirun -np $procs ./sord | tee -a log
+END
+
 ;;
 
 #------------------#
@@ -230,7 +238,7 @@ ppn=8;
 [ $ppn -gt $procs ] && ppn=$procs
 nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
 
-cat << END > submit.sh
+cat << END > batch.sh
 #!/bin/bash
 #@ environment = COPY_ALL;\\
 AIXTHREAD_COND_DEBUG=OFF;\\
@@ -266,29 +274,26 @@ YIELDLOOPTIME=0;
 #@ initialdir = $rundir
 #@ queue
 cd $rundir
-poe ./sord_bin
+poe ./sord
 END
 
-cat << END > interactive.sh
+cat << END > submit.sh
 #!/bin/bash
+# datastar batch submition (up to 1408 procs, 2816 GB):
+# other useful commands:
+# llcancel <jobID>, llq, llq -s <jovID>, showq, reslist
+llsubmit batch.sh
+END
+
+cat << END > run.sh
+#!/bin/bash
+# datastar interactive (up to 32 procs, 64 GB):
 if [ \`hostname\` != ds100 ]; then
-  echo "Error: you must be logged in to dspoe to run interactively"
+  echo "Error: to run interactively you must first ssh dspoe"
   exit
 fi
-poe ./sord_bin -tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_single
-#totalview poe -a ./sord_bin -tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_single
-END
-
-cat << END | tee -a notes
-batch submition (up to 1408 procs, 2816 GB):
-llsubmit submit.sh
-
-run interactively (up to 32 procs, 64 GB):
-ssh dspoe
-./interactive.sh
-
-other useful commands:
-llcancel <jobID>, llq, llq -s <jovID>, showq, reslist
+poe ./sord -tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_single | tee -a log
+#totalview poe -a ./sord -tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_single
 END
 
 if [ $( pwd | grep -v gpfs ) ]; then
@@ -302,15 +307,15 @@ fi
 
 if [ $debug = yes ]; then
   if [ $mpi = no ]; then
-    echo "ddd ./sord_bin" > run.sh
+    echo "ddd ./sord" > run.sh
   else
-    echo "mpirun -dbg=ddd -np $procs ./sord_bin" > run.sh
+    echo "mpirun -dbg=ddd -np $procs ./sord" > run.sh
   fi
 else
   if [ $mpi = no ]; then
-    echo "time ./sord_bin" > run.sh
+    echo "time ./sord | tee -a log" > run.sh
   else
-    echo "time mpirun -np $procs ./sord_bin" > run.sh
+    echo "time mpirun -np $procs ./sord | tee -a log" > run.sh
   fi
 fi
 bash run.sh

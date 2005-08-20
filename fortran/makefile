@@ -1,32 +1,13 @@
-#------------------------------------------------------------------------------#
-# SORD Makefile
-
-FC = f95
+FC     = mpif95
+CC     = mpicc
 FFLAGS = -O3
-FFLAGS = -ggdb
-OBJECT = \
-  globals.o \
-  dfcn.o \
-  dfnc.o \
-  hgcn.o \
-  hgnc.o \
-  snormals.o \
-  utils.o \
-  main.o \
-  inputs.o \
-  gridgen.o \
-  matmodel.o \
-  vstep.o \
-  wstep.o \
-  output.o \
-  fault.o
-
-sord: $(OBJECT) makefile
-	$(FC) $(FFLAGS) $(OBJECT) -o sord
+OBJECT =    globals.o   dfcn.o   dfnc.o   hgcn.o   hgnc.o   snormals.o   utils.o   inputs.o   gridgen.o   matmodel.o   vstep.o   wstep.o   output.o   fault.o  pmain.o mpisetup.o mpioutput.o
+sord_bin: $(OBJECT)
+	$(FC) $(FFLAGS) $(OBJECT) -o sord_bin
+	./tarball.sh
 
 clean:
-	-rm *.o *.mod
+	rm *.o *.mod
 
 %.o: src/%.f95 makefile
-	$(FC) $(FFLAGS) -c $< -o $@
-
+        $(FC) $(FFLAGS) -c $< -o $@
