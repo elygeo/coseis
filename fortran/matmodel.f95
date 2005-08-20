@@ -24,6 +24,10 @@ allocate( &
    yc(j1:j2,k1:k2,l1:l2) )
 matmax = material(1,1:3)
 matmin = material(1,1:3)
+s1 = 0.
+lam = 0.
+miu = 0.
+yc = 0.
 do iz = 1, nmat
   call zoneselect( i1, i2, imat(iz,:), npg, hypocenter, nrmdim )
   i1 = max( i1, i1cell )
@@ -50,6 +54,7 @@ courant = dt * matmax(2) * sqrt( 3. ) / dx   ! TODO: check, make general
 if ( verb > 0 ) print '(a,e8.2)', 'Courant: 1 > ', courant
 gam = dt * viscosity
 
+s2 = 0.
 do iz = 1, noper
   call zoneselect( i1, i2, ioper(iz,:), npg, hypocenter, nrmdim )
   i1 = max( i1, i1cell )
@@ -83,6 +88,7 @@ i2 = i2node
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
+yn = 0.
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   yn(j,k,l) = 0.125 * &
   ( s1(j,k,l) + s1(j-1,k-1,l-1) &
@@ -91,6 +97,7 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   + s1(j,k,l-1) + s1(j-1,k-1,l) )
 end forall
 s1 = s1 * s2
+rho = 0.
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   rho(j,k,l) = 0.125 * &
   ( s1(j,k,l) + s1(j-1,k-1,l-1) &
