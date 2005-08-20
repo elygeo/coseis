@@ -327,13 +327,13 @@ else
     echo "time mpirun -np $procs ./sord | tee -a log" > run.sh
   fi
 fi
-bash run.sh
 
 ;;
 
 esac
 
+chmod u+x *.sh
+
 #------------------------------------------------------------------------------#
 
-chmod u+x *.sh
 
