@@ -11,7 +11,7 @@ use utils
 implicit none
 integer ic, iid, id, ix, iq, iz
 
-print *, 'GAM', gam
+print *, miu
 
 ! Restoring force
 ! P' + DP = [del]S, F = 1.P'             PML region
