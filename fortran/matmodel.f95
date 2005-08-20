@@ -115,21 +115,27 @@ miu = miu * s2
 j1 = i1node(1); j2 = i2node(1)
 k1 = i1node(2); k2 = i2node(2)
 l1 = i1node(3); l2 = i2node(3)
-allocate( p1(npml*bc(1),k1:k2,l1:l2,3) )
-allocate( p4(npml*bc(4),k1:k2,l1:l2,3) )
-allocate( p2(j1:k2,npml*bc(2),l1:l2,3) )
-allocate( p5(j1:k2,npml*bc(5),l1:l2,3) )
-allocate( p3(j1:k2,k1:k2,npml*bc(3),3) )
-allocate( p6(j1:k2,k1:k2,npml*bc(6),3) )
+allocate( p1( npml*bc(1), k1:k2, l1:l2, 3 ) )
+allocate( p4( npml*bc(4), k1:k2, l1:l2, 3 ) )
+allocate( p2( j1:k2, npml*bc(2), l1:l2, 3 ) )
+allocate( p5( j1:k2, npml*bc(5), l1:l2, 3 ) )
+allocate( p3( j1:k2, k1:k2, npml*bc(3), 3 ) )
+allocate( p6( j1:k2, k1:k2, npml*bc(6), 3 ) )
 j1 = i1cell(1); j2 = i2cell(1)
 k1 = i1cell(2); k2 = i2cell(2)
 l1 = i1cell(3); l2 = i2cell(3)
-allocate( g1(npml*bc(1),k1:k2,l1:l2,3) )
-allocate( g4(npml*bc(4),k1:k2,l1:l2,3) )
-allocate( g2(j1:k2,npml*bc(2),l1:l2,3) )
-allocate( g5(j1:k2,npml*bc(5),l1:l2,3) )
-allocate( g3(j1:k2,k1:k2,npml*bc(3),3) )
-allocate( g6(j1:k2,k1:k2,npml*bc(6),3) )
+allocate( g1( npml*bc(1), k1:k2, l1:l2, 3 ) )
+allocate( g4( npml*bc(4), k1:k2, l1:l2, 3 ) )
+allocate( g2( j1:k2, npml*bc(2), l1:l2, 3 ) )
+allocate( g5( j1:k2, npml*bc(5), l1:l2, 3 ) )
+allocate( g3( j1:k2, k1:k2, npml*bc(3), 3 ) )
+allocate( g6( j1:k2, k1:k2, npml*bc(6), 3 ) )
+p1 = 0. ; g1 = 0.
+p2 = 0. ; g2 = 0.
+p3 = 0. ; g3 = 0.
+p4 = 0. ; g4 = 0.
+p5 = 0. ; g5 = 0.
+p6 = 0. ; g6 = 0.
 allocate( dn1(npml), dn2(npml), dc1(npml), dc2(npml) )
 c1 =  8. / 15.
 c2 = -3. / 100.
