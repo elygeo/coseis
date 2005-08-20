@@ -13,6 +13,7 @@ call inputs
 call gridgen
 call matmodel
 call fault( 0 )
+call output
 
 print '(a)', 'Main time loop'
 print '(a)', 'Step     V        U        W       I/O    Total'
