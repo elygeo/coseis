@@ -60,8 +60,8 @@ if ( doit ) then
     case('x'); write( 9, rec=1 ) x(j1:j2,k1:k2,l1:l2,i)
     case('u'); write( 9, rec=1 ) u(j1:j2,k1:k2,l1:l2,i)
     case('v'); write( 9, rec=1 ) v(j1:j2,k1:k2,l1:l2,i)
-    case('uslip'); write( 9, rec=1 ) uslip(j1:j2,k1:k2,l1:l2,i)
-    case('vslip'); write( 9, rec=1 ) vslip(j1:j2,k1:k2,l1:l2,i)
+    case('uslip'); write( 9, rec=1 ) uslip(j1:j2,k1:k2,l1:l2)
+    case('vslip'); write( 9, rec=1 ) vslip(j1:j2,k1:k2,l1:l2)
     case default; print '(a)', 'outvar ' // outvar(iz); stop
     end select
     close( 9 )
@@ -74,16 +74,15 @@ end if
 end do
 
 if ( mod( it, checkpoint ) == 0 ) then
-  write( ofile, '(a,i5.5)') 'out/ckp/', ti
+  write( ofile, '(a,i5.5)') 'out/ckp/', it
   reclen = floatsize * ( size(v) + size(u) + size(uslip) &
    + size(p1) + size(p2) + size(p3) + size(p4) + size(p5) + size(p6) &
    + size(g1) + size(g2) + size(g3) + size(g4) + size(g5) + size(g6) )
   open ( 9, file=ofile, form='unformatted', access='direct', recl=reclen )
   write( 9, rec=1 ) u, v, uslip, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   close( 9 )
-  write( outfile, '(a,i5.5,a)' ) 'out/ckp/', mype, '.hdr'
-  open( 9, file=outfile )
-  write( 9, * ) ti
+  open( 9, file='out/ckp/hdr' )
+  write( 9, * ) it
   close( 9 )
 end if
 

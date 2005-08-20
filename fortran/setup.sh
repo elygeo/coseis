@@ -25,6 +25,9 @@ rundir=$( /bin/pwd )
 infile="in"
 [ -r "$infile" ] || exit
 
+n=( 1 1 1 1 )
+p=( 1 1 1 )
+
 while read key params; do
   set -- $params
   case "$key" in
@@ -34,8 +37,8 @@ while read key params; do
 done < "$infile"
 
 floatsize=4
-points=$(( n[1] * n[2] * n[3] ));
-procs=$(( p[1] * p[2] * p[3] ));
+points=$(( n[0] * n[1] * n[2] ));
+procs=$(( p[0] * p[1] * p[2] ));
 ram=$(( points / procs * floatsize * 22 / 1024 / 1024 ))
 wt=$(( points / procs / 40000 + 1 ))
 
@@ -53,7 +56,7 @@ elif [ "${HOSTNAME:0:2}" = tg ]; then machine="teragrid"
 elif [ "$HOSTNAME" = master ];   then machine="babieca"
 fi
 
-echo << END
+cat << END
 Total points: $points
 Processors: $procs
 Ram per proc: $ram
@@ -66,30 +69,34 @@ END
 cd $( dirname "$rundir" )
 srcdir=$( /bin/pwd )
 
-OBJECT=" \
-  globals.o \
-  dfcn.o \
-  dfnc.o \
-  hgcn.o \
-  hgnc.o \
-  snormals.o \
-  utils.o \
-  inputs.o \
-  gridgen.o \
-  matmodel.o \
-  vstep.o \
-  wstep.o \
-  output.o \
-  fault.o "
+OBJECT="\\
+  globals.o \\
+  dfcn.o \\
+  dfnc.o \\
+  hgcn.o \\
+  hgnc.o \\
+  snormals.o \\
+  utils.o \\
+  inputs.o \\
+  gridgen.o \\
+  matmodel.o \\
+  vstep.o \\
+  wstep.o \\
+  output.o \\
+  fault.o"
 
 OPTFLAGS=-O
 
 if [ $mpi = no ]; then
-  OBJECT="$OBJECT main.o"
+  OBJECT="$OBJECT \\
+  main.o"
   FC=f95
   CC=cc
 else
-  OBJECT="$OBJECT pmain.o mpisetup.o mpioutput.o"
+  OBJECT="$OBJECT \\
+  pmain.o \\
+  mpisetup.o \\
+  mpioutput.o"
   FC=mpif95
   CC=mpicc
 fi
@@ -120,19 +127,21 @@ babieca)
 esac
 
 cat << END > tmp
-FC     = $FC
-CC     = $CC
+FC = $FC
+CC = $CC
 FFLAGS = $OPTFLAGS
 OBJECT = $OBJECT
-sord: \$(OBJECT)
+
+sord: \$(OBJECT) makefile
 	\$(FC) \$(FFLAGS) \$(OBJECT) -o sord
 	./tarball.sh
 
 clean:
 	rm *.o *.mod
 
-%.o: src/%.f95 makefile
-        \$(FC) \$(FFLAGS) -c \$< -o \$@
+%.o: %.f95 makefile
+	\$(FC) \$(FFLAGS) -c \$< -o \$@
+
 END
 
 [ ! -f makefile ] && touch makefile
