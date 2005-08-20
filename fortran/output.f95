@@ -73,6 +73,7 @@ if ( doit ) then
 end if
 end do
 
+if ( checkpoint < 0 ) checkpoint = nt + checkpoint + 1
 if ( mod( it, checkpoint ) == 0 ) then
   write( ofile, '(a,i5.5)') 'out/ckp/', it
   reclen = floatsize * ( size(v) + size(u) + size(uslip) &
