@@ -104,6 +104,7 @@ fi
 case $osname in
 Linux)
   OPTFLAGS=-O3
+  OPTFLAGS=
   ;;
 SunOS)
   OPTFLAGS=-fast
