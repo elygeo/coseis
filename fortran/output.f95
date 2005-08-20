@@ -12,7 +12,7 @@ character(255) :: ofile
 logical :: doit
 
 if ( it == 0 ) then
-call system( 'rm -r out; mkdir out' )
+call system( 'rm -fr out; mkdir out' )
 do iz = 1, nout
   write( ofile, '(a,i2.2)' ) 'mkdir out/', iz
   call system( ofile )
