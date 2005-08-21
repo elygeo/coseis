@@ -23,6 +23,7 @@ case 'test'
     'yn'  0   1 1 1   -1 -1 -1
     'yc'  0   1 1 1   -1 -1 -1
   };
+  plotstyle = '';
 case 'kostrov'
   npml = 10;
   npml = 0;
