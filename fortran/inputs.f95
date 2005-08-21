@@ -7,7 +7,7 @@ use utils
 
 implicit none
 integer :: iostat
-character(256) :: buff, key, a
+character(256) :: a, key, switch, switchcase
 
 if ( verb > 0 ) print '(a)', 'Reading input file'
 npe3 = 1
@@ -35,10 +35,10 @@ ntrac = 1
 nstress = 1
 nlock = 0
 nout = 0
-imat(1,:)    = (/ 1, 1, 1,   -1, -1, -1/)
-ifric(1,:)   = (/ 1, 1, 1,   -1, -1, -1/)
-itrac(1,:)   = (/ 1, 1, 1,   -1, -1, -1/)
-istress(1,:) = (/ 1, 1, 1,   -1, -1, -1/)
+imat(1,:)    = (/ 1, 1, 1,   -1, -1, -1 /)
+ifric(1,:)   = (/ 1, 1, 1,   -1, -1, -1 /)
+itrac(1,:)   = (/ 1, 1, 1,   -1, -1, -1 /)
+istress(1,:) = (/ 1, 1, 1,   -1, -1, -1 /)
 viscosity = (/ .0, .3 /)
 hypocenter = 0
 msrcradius = 0.
@@ -47,45 +47,52 @@ npml = 0
 bc = (/ 1, 1, 0,   1, 1, 1 /)
 open( 9, file='in', status='old' )
 loop: do
-  read( 9,'(a)', iostat=iostat ) buff
+  read( 9,'(a)', iostat=iostat ) a
   if ( iostat /= 0 ) exit loop
-  if ( buff == ' ' ) cycle loop
-  read( buff, * ) key
+  if ( a == ' ' ) cycle loop
+  read( a, * ) key
   if ( key(1:1) == '#' .or. key(1:1) == '!' .or. key(1:1) == '%' ) cycle loop
   selectcase( key )
+  case( 'switch' );     read( a, * ) key, switch
+  case( 'case' );       read( a, * ) key, switchcase
+  end select
+  if ( switch /= switchcase ) cycle loop
+  selectcase( key )
   case( '' )
-  case( 'nprocs' );     read( buff, * ) a, npe3
-  case( 'n' );          read( buff, * ) a, npg, nt
-  case( 'dx' );         read( buff, * ) a, dx
-  case( 'dt' );         read( buff, * ) a, dt
-  case( 'bc' );         read( buff, * ) a, bc
-  case( 'npml' );       read( buff, * ) a, npml
-  case( 'grid' );       read( buff, * ) a, grid
-  case( 'viscosity' );  read( buff, * ) a, viscosity
-  case( 'nrmdim' );     read( buff, * ) a, nrmdim
-  case( 'hypocenter' ); read( buff, * ) a, hypocenter
-  case( 'rcrit' );      read( buff, * ) a, rcrit
-  case( 'nclramp' );    read( buff, * ) a, nclramp
-  case( 'checkpoint' ); read( buff, * ) a, checkpoint
-  case( 'verbose' );    read( buff, * ) a, verb
+  case( 'switch' )
+  case( 'case' )
+  case( 'nprocs' );     read( a, * ) key, npe3
+  case( 'n' );          read( a, * ) key, npg, nt
+  case( 'dx' );         read( a, * ) key, dx
+  case( 'dt' );         read( a, * ) key, dt
+  case( 'bc' );         read( a, * ) key, bc
+  case( 'npml' );       read( a, * ) key, npml
+  case( 'grid' );       read( a, * ) key, grid
+  case( 'viscosity' );  read( a, * ) key, viscosity
+  case( 'nrmdim' );     read( a, * ) key, nrmdim
+  case( 'hypocenter' ); read( a, * ) key, hypocenter
+  case( 'rcrit' );      read( a, * ) key, rcrit
+  case( 'nclramp' );    read( a, * ) key, nclramp
+  case( 'checkpoint' ); read( a, * ) key, checkpoint
+  case( 'verbose' );    read( a, * ) key, verb
   case( 'locknodes' )
     nlock = nlock + 1
-    read( buff, * ) a, locknodes(nlock,:), ilock(nlock,:)
+    read( a, * ) key, locknodes(nlock,:), ilock(nlock,:)
   case( 'material' )
     nmat = nmat + 1
-    read( buff, * ) a, material(nmat,:), imat(nmat,:)
+    read( a, * ) key, material(nmat,:), imat(nmat,:)
   case( 'friction' )
     nfric = nfric + 1
-    read( buff, * ) a, friction(nfric,:), ifric(nfric,:)
+    read( a, * ) key, friction(nfric,:), ifric(nfric,:)
   case( 'traction' )
     ntrac = ntrac + 1
-    read( buff, * ) a, traction(ntrac,:), itrac(ntrac,:)
+    read( a, * ) key, traction(ntrac,:), itrac(ntrac,:)
   case( 'stress' )
     nstress = nstress + 1
-    read( buff, * ) a, stress(nstress,:), istress(nstress,:)
+    read( a, * ) key, stress(nstress,:), istress(nstress,:)
   case( 'out' )
     nout = nout + 1
-    read( buff, * ) a, outvar(nout), outint(nout), iout(nout,:)
+    read( a, * ) key, outvar(nout), outint(nout), iout(nout,:)
   case default; print '(a)', 'bad key: ' // trim( key ); stop
   end select
 end do loop

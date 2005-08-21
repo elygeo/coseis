@@ -12,12 +12,12 @@ character(255) :: ofile
 logical :: doit, fault(nz) = .false., outcell(nz) = .false.
 
 if ( it == 0 ) then
-if ( verb > 0 ) print *, 'Initialize output'
+if ( verb > 0 ) print '(a)', 'Initialize output'
 if ( checkpoint < 0 ) checkpoint = nt + checkpoint + 1
 call system( 'rm -fr out; mkdir out; mkdir out/ckp; mkdir out/stats' )
 do iz = 1, nout
   select case ( outvar(iz) )
-  case('x'); print *, 'YES'; outnc(iz) = 3
+  case('x'); outnc(iz) = 3
   case('u'); outnc(iz) = 3
   case('v'); outnc(iz) = 3
   case('w'); outnc(iz) = 6; outcell(iz) = .true.
