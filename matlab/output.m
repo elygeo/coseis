@@ -12,51 +12,48 @@ if initialize
   fid = fopen( 'out/endian', 'w' );
   fprintf( fid, '%s\n', endian );
   fclose( fid );
-  storage = 0;
   for iz = 1:size( out, 1 )
     outvar{iz} = out{iz,1};
     outint(iz) = out{iz,2};
-    cells = 0;
-    faultplane = 0;
+    outnc(iz)    = 1;
+    outcell(iz)  = 0;
+    outfault(iz) = 0;
     switch outvar{iz}
-    case 'x',     c = { 'x' 'y' 'z' };
-    case 'u',     c = { 'x' 'y' 'z' };
-    case 'v',     c = { 'x' 'y' 'z' }; 
-    case 'm',     c = { 'x' 'y' 'z' }; 
-    case 't',     c = { 'x' 'y' 'z' }; faultplane = 1;
-    case 'w',     c = { 'xx' 'yy' 'zz' 'yz' 'zx' 'xy' }; cells = 1;
-    case 'uslip', c = { 'm' }; faultplane = 1;
-    case 'vslip', c = { 'm' }; faultplane = 1;
-    otherwise error outvar
+    case 'x', outnc(iz) = 3;
+    case 'u', outnc(iz) = 3;
+    case 'v', outnc(iz) = 3;
+    case 'w', outnc(iz) = 6; outcell(iz) = 1;
+    case '|w|', outcell(iz) = 1;
+    case 'lam'; outcell(iz) = 1;
+    case 'miu'; outcell(iz) = 1;
+    case 'yc';  outcell(iz) = 1;
+    case 'uslip', outfault(iz) = 1;
+    case 'vslip', outfault(iz) = 1;
+    case 'trup',  outfault(iz) = 1;
     end
-    outnc(iz) = length( c );
     for i = 1:outnc(iz)
       file = sprintf( 'out/%02d/%1d/', iz, i );
       mkdir( file )
     end
     if outint(iz) < 0, outint(iz) = outint(iz) + nt + 1; end
-    zone = [ out{iz,3:8} ];
-    [ i1, i2 ] = zoneselect( zone, halo, np, hypocenter, nrmdim );
-    i2 = i2 - cells;
-    if faultplane
+    [ i1, i2 ] = zoneselect( [out{iz,3:8}], halo, np, hypocenter, nrmdim );
+    i2 = i2 - outcell(iz);
+    if outfault(iz)
       i1(nrmdim) = 1;
       i2(nrmdim) = 1;
     end
     outi1(iz,:) = i1;
     outi2(iz,:) = i2;
-    storage = storage + outnc(iz) * prod( i2 - i1 + 1 ) * ...
-      floor( nt / outint(iz) ) * 4 / 1024 / 1024;
   end
-  fprintf( 'Disk storage needed: %.1fMb', storage )
   return
 end
 
-if ~mod( it, checkpoint )
-  if nrmdim, save checkpoint it u v uslip trup
-  else       save checkpoint it u v
-  end
-end
 for iz = 1:size( out, 1 )
+  if ( it == 0 | outint(iz) == 0 ) then
+    doit = it == outint(iz)
+  else
+    doit = mod( it, outint(iz) ) == 0
+  end
   if mod( it, outint(iz) ) == 0
     i1 = outi1(iz,:);
     i2 = outi2(iz,:);
@@ -67,22 +64,22 @@ for iz = 1:size( out, 1 )
       file = sprintf( 'out/%02d/%1d/%05d', iz, i, it );
       fid = fopen( file, 'wl' );
       switch outvar{iz}
-      case 'x', fwrite( fid, x(j,k,l,i), 'float32' );
-      case 'u', fwrite( fid, u(j,k,l,i), 'float32' );
-      case 'v', fwrite( fid, v(j,k,l,i), 'float32' );
-      case 'm', fwrite( fid, s1(j,k,l),  'float32' );
-      case 't', fwrite( fid, t(j,k,l,i), 'float32' );
+      case 'x',     fwrite( fid, x(j,k,l,i),    'float32' );
+      case 'u',     fwrite( fid, u(j,k,l,i),    'float32' );
+      case 'v',     fwrite( fid, v(j,k,l,i),    'float32' );
       case 'w'
-        switch nrmdim
-        case 1, j(j==hypocenter(1)) = [];
-        case 2, k(k==hypocenter(2)) = [];
-        case 3, l(l==hypocenter(3)) = [];
-        end
-        if i <= 3, fwrite( fid, w1(j,k,l,i),   'float32' );
-        else       fwrite( fid, w2(j,k,l,i-3), 'float32' );
-        end
-      case 'uslip', fwrite( fid, uslip(j,k,l), 'float32' );
-      case 'vslip', fwrite( fid, vslip(j,k,l), 'float32' );
+        if i < 4,   fwrite( fid, w1(j,k,l,i),   'float32' ); end
+        if i > 3,   fwrite( fid, w2(j,k,l,i-3), 'float32' ); end
+      case '|v|',   fwrite( fid, s1(j,k,l),     'float32' );
+      case '|w|',   fwrite( fid, s2(j,k,l),     'float32' );
+      case 'rho',   fwrite( fid, rho(j,k,l),    'float32' );
+      case 'lam',   fwrite( fid, lam(j,k,l),    'float32' );
+      case 'miu',   fwrite( fid, miu(j,k,l),    'float32' );
+      case 'yn',    fwrite( fid, yn(j,k,l),     'float32' );
+      case 'yc',    fwrite( fid, yc(j,k,l),     'float32' );
+      case 'uslip', fwrite( fid, uslip(j,k,l),  'float32' );
+      case 'vslip', fwrite( fid, vslip(j,k,l),  'float32' );
+      case 'trup',  fwrite( fid, trup(j,k,l),   'float32' );
       otherwise error outvar
       end
       fclose( fid );
@@ -90,15 +87,23 @@ for iz = 1:size( out, 1 )
     file = sprintf( 'out/%02d/hdr', iz );
     fid = fopen( file, 'w' );
     fprintf( fid, '%g %g %g %g %g %g %g %s %s\n', ...
-      [ outnc(iz) i1 i2 outint(iz) it dt dx ], outvar{iz}, [ c{:} ] )
+      [ outnc(iz) i1 i2 outint(iz) it dt dx ], outvar{iz} )
     fclose( fid );
   end
 end
-fid = fopen( 'out/timestep', 'w' );
-fprintf( fid, '%g\n', it );
-fclose( fid );
+
+if ~mod( it, checkpoint )
+  if nrmdim, save checkpoint it u v uslip trup
+  else       save checkpoint it u v
+  end
+end
+
 file = sprintf( 'out/stats/%05d', it );
 fid = fopen( file, 'w' );
 fprintf( fid, '%g %g %g\n', [ umax vmax wmax ] );
+fclose( fid );
+
+fid = fopen( 'out/timestep', 'w' );
+fprintf( fid, '%g\n', it );
 fclose( fid );
 

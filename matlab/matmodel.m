@@ -26,10 +26,10 @@ for iz = 1:size( material, 1 )
   j1 = i1(1); j2 = i2(1) - 1;
   k1 = i1(2); k2 = i2(2) - 1;
   l1 = i1(3); l2 = i2(3) - 1;
-  s1(j1:j2,k1:k2,l1:l2) = rho0
-  lam(j1:j2,k1:k2,l1:l2) = lam0
-  miu(j1:j2,k1:k2,l1:l2) = miu0
-  yc(j1:j2,k1:k2,l1:l2) = yc0
+  s1(j1:j2,k1:k2,l1:l2) = rho0;
+  lam(j1:j2,k1:k2,l1:l2) = lam0;
+  miu(j1:j2,k1:k2,l1:l2) = miu0;
+  yc(j1:j2,k1:k2,l1:l2) = yc0;
 end
 courant = dt * matmax(2) * sqrt( 3 ) / dx;   % TODO: check, make general
 fprintf( 'courant: %g < 1\n', courant )
