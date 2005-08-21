@@ -4,14 +4,15 @@
 module globals
 
 implicit none
-integer, parameter :: nz = 255
-character :: oper(nz), outvar(nz)
+integer, parameter :: nz = 256
+character :: oper(nz)
+character(8) :: outvar(nz)
 real :: material(nz,3), friction(nz,4), traction(nz,3), stress(nz,6)
 integer :: locknodes(nz,3), noper, nlock, nout, nmat, nfric, ntrac, nstress
 integer :: outint(nz)
 integer, dimension(nz,6) :: ioper, ilock, iout, imat, ifric, itrac, istress
 
-character(255) :: grid
+character(256) :: grid
 integer :: &
   n(4), np(3), npg(3), nhalo, npml, bc(6), &
   nt, it, checkpoint, ipe, npe3(3), &
