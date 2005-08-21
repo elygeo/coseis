@@ -67,9 +67,6 @@ END
 #------------------------------------------------------------------------------#
 # Create makefile and compile code
 
-cd $( dirname "$rundir" )
-srcdir=$( /bin/pwd )
-
 OBJECT="\\
   globals.o \\
   dfcn.o \\
@@ -153,22 +150,22 @@ gmake
 #------------------------------------------------------------------------------#
 # Save metadata and sorce code
 
-cd "$rundir"
-
 [ -e meta ] && rm -fr meta
 mkdir meta
 perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > meta/endian
 cat << END > meta/data
-date:     $( date )
 name:     $( finger $LOGNAME | sed -n 's/^.*e: //p' )
 logname:  ${LOGNAME}
+date:     $( date )
+machine:  $machine
 hostname: ${HOSTNAME}
 osname:   $( uname -a )
+points:   $points
 procs:    $procs
 END
-srcbase=$( basename "$srcdir" )
-cp "${srcdir}/${srcbase}.tgz" meta/
-cp -f "${srcdir}/sord" .
+srcbase=$( basename "$rundir" )
+cp "${srcbase}.tgz" meta/
+cp -f sord meta/
 
 #------------------------------------------------------------------------------#
 # Machine specific batch submission and run commands
