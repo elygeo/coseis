@@ -1,6 +1,6 @@
 FC = f95
 CC = cc
-FFLAGS = 
+FFLAGS = -g
 OBJECT = \
   globals.o \
   dfcn.o \
