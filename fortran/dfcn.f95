@@ -17,6 +17,8 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
+print *, 1234, op, dx, i, a, i1, i2
+
 select case(op)
 
 case('h') ! constant grid, flops: 1* 7+

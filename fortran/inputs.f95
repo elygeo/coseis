@@ -7,7 +7,7 @@ use utils
 
 implicit none
 integer :: iostat
-character(256) :: a, key, switch, switchcase
+character(256) :: a, key, switch = 'default', switchcase = 'default'
 
 if ( verb > 0 ) print '(a)', 'Reading input file'
 npe3 = 1
