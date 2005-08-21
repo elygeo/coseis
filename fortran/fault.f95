@@ -1,7 +1,7 @@
 !------------------------------------------------------------------------------!
 ! FAULT
 
-subroutine fault( init )
+subroutine fault
 use globals
 use snormals_mod
 use utils
@@ -13,10 +13,11 @@ real, allocatable, dimension(:,:,:) :: &
 real, allocatable, dimension(:,:,:,:) :: &
   nrm, tt0, str, dip, tt0nsd, w0, tt, tn3, ts3, r3
 real :: fs0, fd0, dc0, tn0, ts0
-integer :: down(3), handed, init, strdim, dipdim, j3, j4, k3, k4, l3, l4, iz
+integer :: down(3), handed, init = 0, strdim, dipdim, j3, j4, k3, k4, l3, l4, iz
 
 if ( nrmdim == 0 ) return
 if ( init == 0 ) then
+  init = 1
   if ( verb > 0 ) print '(a)', 'Initialize fault'
   if ( nrmdim /= downdim ) then
     dipdim = downdim

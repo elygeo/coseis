@@ -12,7 +12,7 @@ print '(a)', 'SORD - Support Opperator Rupture Dynamics'
 call inputs
 call gridgen
 call matmodel
-call fault( 0 )
+call fault
 call output
 
 print '(a)', 'Main time loop'

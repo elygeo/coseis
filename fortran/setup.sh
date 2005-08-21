@@ -15,7 +15,8 @@ while getopts spgl opt; do
 done
 
 if [ "$logging" = no ]; then
-  "$0" "$@" -l 2>&1 | tee log
+  #"$0" "$@" -l 2>&1 | tee log
+  script -c "$0 $@ -l"
   exit
 fi
 

@@ -105,7 +105,7 @@ end do
 end do
 
 ! Fault calculations
-call fault( 1 )
+call fault
 
 ! Velocity, V = V + dV
 do iz = 1, nlock
