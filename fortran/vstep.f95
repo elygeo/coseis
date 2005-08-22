@@ -25,6 +25,9 @@ inner: do iid = 1, 3
     call zoneselect( i1, i2, ioper(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1node )
     i2 = min( i2, i2node )
+    call dfcn( s2, oper(iz), w1, x, dx, 1, 3, i1, i2 )
+print *, 1234
+    call dfcn( s2, oper(iz), w2, x, dx, 1, 3, i1, i2 )
     if ( ic == id ) then
 print *, ic, id
       call dfcn( s2, oper(iz), w1, x, dx, ic, id, i1, i2 )
