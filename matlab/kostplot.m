@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
 % KOSTROV
 
-if ~exist( 'darl', 'var' )
+if ~exist( 'dark', 'var' )
   inputs
   dark = 1;
   if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
