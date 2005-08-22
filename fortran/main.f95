@@ -30,7 +30,7 @@ do while ( it < nt )
   call system_clock( wt(2) )
   call output
   call system_clock( wt(3) )
-  dwt(1:2) = real( (/ wt(2:3) - wt(1:2), wt(3) /) ) / real( wt_rate )
+  dwt = real( (/ wt(2:3) - wt(1:2), wt(3) /) ) / real( wt_rate )
   print '(i4,x,5(e9.2))', it, dwt, umax, vmax
 end do
 
