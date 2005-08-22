@@ -24,20 +24,10 @@ inner: do iid = 1, 3
     call zoneselect( i1, i2, ioper(iz,:), npg, hypocenter, nrmdim )
     i1 = max( i1, i1node )
     i2 = min( i2, i2node )
-    call dfcn( s2, oper(iz), w2, x, dx, 2, 3, i1, i2 ); print *, 11
-    call dfcn( s2, oper(iz), w2, x, dx, 2, 1, i1, i2 ); print *, 5
-    call dfcn( s2, oper(iz), w2, x, dx, 3, 3, i1, i2 ); print *, 9
-    call dfcn( s2, oper(iz), w2, x, dx, 1, 2, i1, i2 ); print *, 2
-    call dfcn( s2, oper(iz), w2, x, dx, 1, 3, i1, i2 ); print *, 3
-    call dfcn( s2, oper(iz), w2, x, dx, 2, 1, i1, i2 ); print *, 4
-    call dfcn( s2, oper(iz), w2, x, dx, 2, 3, i1, i2 ); print *, 6
-    call dfcn( s2, oper(iz), w2, x, dx, 3, 1, i1, i2 ); print *, 7
-    call dfcn( s2, oper(iz), w2, x, dx, 3, 2, i1, i2 ); print *, 8
-    if ( ic == id ) then
 print *, ic, id
+    if ( ic == id ) then
       call dfcn( s2, oper(iz), w1, x, dx, ic, id, i1, i2 )
     else
-print *, ix, id, 'die'
       call dfcn( s2, oper(iz), w2, x, dx, ix, id, i1, i2 )
     end if
   end do
