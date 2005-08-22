@@ -15,21 +15,14 @@ i2 = i2node + nhalo
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-allocate( w1(j1:j2,k1:k2,l1:l2,1:3) )
-allocate( w2(j1:j2,k1:k2,l1:l2,1:3) )
-allocate( v(j1:j2,k1:k2,l1:l2,1:3) )
-allocate( x(j1:j2,k1:k2,l1:l2,1:3) )
-allocate( u(j1:j2,k1:k2,l1:l2,1:3) )
-!allocate( &
-!    u(j1:j2,k1:k2,l1:l2,1:3), &
-!    v(j1:j2,k1:k2,l1:l2,1:3), &
-!   w1(j1:j2,k1:k2,l1:l2,1:3), &
-!   w2(j1:j2,k1:k2,l1:l2,1:3), &
-!    x(j1:j2,k1:k2,l1:l2,1:3) &
-!)
 allocate( &
    s1(j1:j2,k1:k2,l1:l2), &
-   s2(j1:j2,k1:k2,l1:l2) )
+   s2(j1:j2,k1:k2,l1:l2), &
+   w1(j1:j2,k1:k2,l1:l2,3), &
+   w2(j1:j2,k1:k2,l1:l2,3), &
+    x(j1:j2,k1:k2,l1:l2,3), &
+    u(j1:j2,k1:k2,l1:l2,3), &
+    v(j1:j2,k1:k2,l1:l2,3) )
 x = 0.
 forall( i=j1:j2 ) x(i,:,:,1) = i - 1
 forall( i=k1:k2 ) x(:,i,:,2) = i - 1
