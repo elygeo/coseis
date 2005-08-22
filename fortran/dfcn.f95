@@ -17,7 +17,7 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
-print *, 1234, i, a, i1, i2
+print *, 'aaa', i, a, i1, i2
 
 select case(op)
 
