@@ -17,7 +17,7 @@ call output
 
 print '(a)', 'Main time loop'
 print '(a)', 'Step     V        U        W       I/O    Total'
-print '(a)', 'Iter  Compute  In/Out   Elapsed |U|max   |V|max'
+print '(a)', 'Iter  Compute  In/Out   Elapsed  |U|max   |V|max'
 
 it = 0
 
