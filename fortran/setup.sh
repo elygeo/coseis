@@ -3,22 +3,18 @@
 
 mpi=guess
 debug=no
-logging=no
+log=yes
 
 while getopts spgl opt; do
   case $opt in
   s) mpi=no ;;
   p) mpi=yes ;;
   g) debug=yes ;;
-  l) logging=yes ;;
+  l) log=yes ;;
   esac
 done
 
-if [ "$logging" = no ]; then
-  #"$0" "$@" -l 2>&1 | tee log
-  script -c "$0 $@ -l"
-  exit
-fi
+[ $log = yes ] && exec 2>&1 > >( tee log )
 
 echo "SORD - Support Opperator Rupture Dynamics"
 date
