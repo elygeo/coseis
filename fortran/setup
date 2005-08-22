@@ -10,7 +10,7 @@ date
 infile="in"
 [ -r "$infile" ] || exit
 rundir=$( /bin/pwd )
-rm -rf run.sh submit.sh batch.sh
+rm -rf run submit batchjob
 
 mpi=guess
 debug=no
@@ -128,7 +128,7 @@ OBJECT = $OBJECT
 
 sord: \$(OBJECT) makefile
 	\$(FC) \$(FFLAGS) \$(OBJECT) -o sord
-	./tarball.sh
+	./tarball
 
 clean:
 	rm *.o *.mod
@@ -183,7 +183,7 @@ nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
 [ $debug = no  ] && cmd="poe"
 [ $debug = yes ] && cmd="totalview poe -a"
 
-cat << END > run.sh
+cat << END > run
 #!/bin/bash -e
 # datastar interactive (up to 32 procs, 64 GB):
 if [ \$( hostname ) != ds100 ]; then
@@ -193,15 +193,15 @@ fi
 time $cmd ./sord -tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_single
 END
 
-cat << END > submit.sh
+cat << END > submit
 #!/bin/bash -e
 # datastar batch submition (up to 1408 procs, 2816 GB):
 # other useful commands:
 # llcancel <jobID>, llq, llq -s <jovID>, showq, reslist
-llsubmit batch.sh
+llsubmit batchjob
 END
 
-cat << END > batch.sh
+cat << END > batchjob
 #!/bin/bash
 #@ environment = COPY_ALL;\\
 AIXTHREAD_COND_DEBUG=OFF;\\
@@ -240,6 +240,8 @@ cd $rundir
 poe ./sord
 END
 
+chmod u+x run submit batchjob
+
 ;;
 
 #------------------#
@@ -252,13 +254,13 @@ nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
 cmd=""
 [ $mpi = yes ] && cmd="mpirun -v -machinefile \$PBS_NODEFILE -np $procs"
 
-cat << END > submit.sh
+cat << END > submit
 #!/bin/bash -e
 # teragrid batch submission
-qsub batch.sh
+qsub batchjob
 END
 
-cat << END > batch.sh
+cat << END > batchjob
 #!/bin/bash
 #PBS -q dque
 #PBS -N sord_job
@@ -270,6 +272,8 @@ cat << END > batch.sh
 cd $rundir
 time $cmd ./sord
 END
+
+chmod u+x submit batchjob
 
 ;;
 
@@ -283,19 +287,19 @@ nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
 cmd=""
 [ $mpi = yes ] && cmd="mpiexec -np $procs"
 
-cat << END > run.sh
+cat << END > run
 #!/bin/bash -e
 time $cmd ./sord
 END
 
-cat << END > submit.sh
+cat << END > submit
 #!/bin/bash -e
 # babieca batch submission (up to 19 procs):
 # other useful commands: pbsnodes -a, pingd, qstat, qdel
-qsub batch.sh
+qsub batchjob
 END
 
-cat << END > batch.sh
+cat << END > batchjob
 #!/bin/bash
 #PBS -q workq
 #PBS -N sord_job
@@ -308,6 +312,8 @@ cd $rundir
 time $cmd ./sord
 END
 
+chmod u+x run submit batchjob
+
 ;;
 
 #------------------#
@@ -318,22 +324,23 @@ END
 [ $debug = yes -a $mpi = no  ] && cmd="ddd"
 [ $debug = yes -a $mpi = yes ] && cmd="mpirun -np $procs -dbg=ddd"
 
-cat << END > run.sh
+cat << END > run
 #!/bin/bash -e
 time $cmd ./sord
 END
 
-cat << END > submit.sh
+cat << END > submit
 #!/bin/bash -e
-nohup unbuffer ./run.sh | tee out.log &
+nohup unbuffer ./run | tee out.log &
 END
+
+chmod u+x run submit
 
 ;;
 
 esac
 
-[ $debug = yes ] && rm -rf submit.sh batch.sh
-chmod u+x *.sh
+[ $debug = yes ] && rm -rf submit batchjob
 
 #------------------------------------------------------------------------------#
 

@@ -2,7 +2,7 @@
 
 cd ..
 
-gtar -hzc -f fsord/fsord.tgz fsord/*.f95 fsord/setup.sh fsord/tarball.sh
+gtar -hzc -f fsord/fsord.tgz fsord/*.f95 fsord/setup fsord/tarball
 
 cd fsord
 

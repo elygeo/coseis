@@ -19,10 +19,11 @@ allocate( &
    s1(j1:j2,k1:k2,l1:l2), &
    s2(j1:j2,k1:k2,l1:l2), &
    w1(j1:j2,k1:k2,l1:l2,3), &
-   w2(j1:j2,k1:k2,l1:l2,3), &
     x(j1:j2,k1:k2,l1:l2,3), &
-    u(j1:j2,k1:k2,l1:l2,3), &
-    v(j1:j2,k1:k2,l1:l2,3) )
+!   u(j1:j2,k1:k2,l1:l2,3), &
+    v(j1:j2,k1:k2,l1:l2,3), &
+   w2(j1:j2,k1:k2,l1:l2,3) &
+ )
 x = 0.
 forall( i=j1:j2 ) x(i,:,:,1) = i - 1
 forall( i=k1:k2 ) x(:,i,:,2) = i - 1
