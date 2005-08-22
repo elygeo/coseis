@@ -17,6 +17,7 @@ integer ic, iid, id, ix, iq, iz
 if ( verb > 1 ) print '(a)', 'Vstep'
 s2 = 0.
 outer: do ic  = 1, 3
+print *, ic
 inner: do iid = 1, 3
   id = mod( ic + iid - 2, 3 ) + 1
   ix = 6 - ic - id
@@ -25,10 +26,10 @@ inner: do iid = 1, 3
     i1 = max( i1, i1node )
     i2 = min( i2, i2node )
     if ( ic == id ) then
-print *, '222', ic, id
+print *, ic, id
       call dfcn( s2, oper(iz), w1, x, dx, ic, id, i1, i2 )
     else
-print *, '333', ic, id, ix
+print *, ix, id
       call dfcn( s2, oper(iz), w2, x, dx, ix, id, i1, i2 )
     end if
   end do
