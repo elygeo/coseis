@@ -20,7 +20,8 @@ allocate( &
     u(j1:j2,k1:k2,l1:l2,3), &
     v(j1:j2,k1:k2,l1:l2,3), &
    w2(j1:j2,k1:k2,l1:l2,3), &
-   w1(j1:j2,k1:k2,l1:l2,3), &
+   w1(j1:j2,k1:k2,l1:l2,3) )
+allocate( &
    s1(j1:j2,k1:k2,l1:l2), &
    s2(j1:j2,k1:k2,l1:l2) )
 x = 0.
