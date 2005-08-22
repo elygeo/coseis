@@ -18,7 +18,6 @@ if ( verb > 1 ) print '(a)', 'Vstep'
 s2 = 0.
 outer: do ic  = 1, 3
 inner: do iid = 1, 3
-print *, '111', ic, iid
   id = mod( ic + iid - 2, 3 ) + 1
   ix = 6 - ic - id
   do iz = 1, noper
@@ -29,7 +28,7 @@ print *, '111', ic, iid
 print *, '222', ic, id
       call dfcn( s2, oper(iz), w1, x, dx, ic, id, i1, i2 )
     else
-print *, '333', ix, id
+print *, '333', ic, id, ix
       call dfcn( s2, oper(iz), w2, x, dx, ix, id, i1, i2 )
     end if
   end do
