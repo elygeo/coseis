@@ -140,6 +140,7 @@ END
 
 [ ! -f makefile ] && touch makefile
 [ "$( diff tmp makefile )" != "" ] && mv tmp makefile
+rm -f tmp
 gmake
 
 #------------------------------------------------------------------------------#
