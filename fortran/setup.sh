@@ -1,31 +1,28 @@
 #!/bin/bash -e
 #------------------------------------------------------------------------------#
 
+exec 2>&1 > >( tee log )
+
+echo "SORD setup"
+date
+
+infile="in"
+[ -r "$infile" ] || exit
+rundir=$( /bin/pwd )
+rm -rf run.sh submit.sh batch.sh
+
 mpi=guess
 debug=no
-log=yes
-
 while getopts spgl opt; do
   case $opt in
   s) mpi=no ;;
   p) mpi=yes ;;
   g) debug=yes ;;
-  l) log=yes ;;
   esac
 done
 
-[ $log = yes ] && exec 2>&1 > >( tee log )
-
-echo "SORD - Support Opperator Rupture Dynamics"
-date
-rundir=$( /bin/pwd )
-
-infile="in"
-[ -r "$infile" ] || exit
-
 n=( 1 1 1 1 )
 p=( 1 1 1 )
-
 while read key params; do
   set -- $params
   case "$key" in
@@ -170,78 +167,37 @@ cp -f sord meta/
 case $machine in
 
 #------------------#
-teragrid)
-
-ppn=2;
-[ $ppn -gt $procs ] && ppn=$procs
-nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
-cmd=""
-[ $mpi = yes ] && cmd="mpirun -v -machinefile \$PBS_NODEFILE -np $procs"
-
-cat << END > batch.sh
-#!/bin/csh
-#PBS -q dque
-#PBS -N sord_job
-#PBS -l nodes=$nodes:ppn=$ppn
-#PBS -l walltime=$wt
-#PBS -o stdout
-#PBS -e stderr
-#PBS -V
-cd $rundir
-time $cmd ./sord
-END
-
-cat << END > submit.sh
-#!/bin/bash
-# teragrid batch submission
-qsub batch.sh
-END
-
-;;
-
-#------------------#
-babieca)
-
-ppn=2
-[ $ppn -gt $procs ] && ppn=$procs
-nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
-cmd=""
-[ $mpi = yes ] && cmd="mpiexec -np $procs"
-
-cat << END > batch.sh
-#!/bin/sh
-#PBS -q workq
-#PBS -N sord_job
-#PBS -l nodes=$nodes:ppn=$ppn
-#PBS -o stdout
-#PBS -e stderr
-#PBS -V
-sleep 2
-cd $rundir
-time $cmd ./sord
-END
-
-cat << END > submit.sh
-#!/bin/bash
-# babieca batch submission (up to 19 procs):
-# other useful commands: pbsnodes -a, pingd, qstat, qdel
-qsub batch.sh
-END
-
-cat << END > run.sh
-#!/bin/bash
-# run interactively (you really should use the batch system)
-mpirun -np $procs ./sord | tee -a log
-END
-
-;;
-
-#------------------#
 datastar)
+
+if [ $( pwd | grep -v gpfs ) ]; then
+  echo "must be run from a subdirectory of /gpfs/"
+  exit
+fi
 
 ppn=8;
 [ $ppn -gt $procs ] && ppn=$procs
 nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
+
+[ $debug = no  ] && cmd="poe"
+[ $debug = yes ] && cmd="totalview poe -a"
+
+cat << END > run.sh
+#!/bin/bash -e
+# datastar interactive (up to 32 procs, 64 GB):
+if [ \$( hostname ) != ds100 ]; then
+  echo "ssh dspoe to run interactively"
+  exit
+fi
+time $cmd ./sord -tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_single
+END
+
+cat << END > submit.sh
+#!/bin/bash -e
+# datastar batch submition (up to 1408 procs, 2816 GB):
+# other useful commands:
+# llcancel <jobID>, llq, llq -s <jovID>, showq, reslist
+llsubmit batch.sh
+END
 
 cat << END > batch.sh
 #!/bin/bash
@@ -274,60 +230,107 @@ YIELDLOOPTIME=0;
 #@ network.MPI = sn_single,not_shared,US,HIGH
 #@ notification = always
 #@ job_name = job.dfm
-#@ output = stdout
-#@ error = stderr
+#@ output = outlog
+#@ error = errlog
 #@ initialdir = $rundir
 #@ queue
 cd $rundir
 poe ./sord
 END
 
+;;
+
+#------------------#
+teragrid)
+
+ppn=2;
+[ $ppn -gt $procs ] && ppn=$procs
+nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
+
+cmd=""
+[ $mpi = yes ] && cmd="mpirun -v -machinefile \$PBS_NODEFILE -np $procs"
+
 cat << END > submit.sh
-#!/bin/bash
-# datastar batch submition (up to 1408 procs, 2816 GB):
-# other useful commands:
-# llcancel <jobID>, llq, llq -s <jovID>, showq, reslist
-llsubmit batch.sh
+#!/bin/bash -e
+# teragrid batch submission
+qsub batch.sh
 END
+
+cat << END > batch.sh
+#!/bin/bash
+#PBS -q dque
+#PBS -N sord_job
+#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -l walltime=$wt
+#PBS -o outlog
+#PBS -e errlog
+#PBS -V
+cd $rundir
+time $cmd ./sord
+END
+
+;;
+
+#------------------#
+babieca)
+
+ppn=2
+[ $ppn -gt $procs ] && ppn=$procs
+nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
+
+cmd=""
+[ $mpi = yes ] && cmd="mpiexec -np $procs"
 
 cat << END > run.sh
-#!/bin/bash
-# datastar interactive (up to 32 procs, 64 GB):
-if [ \`hostname\` != ds100 ]; then
-  echo "Error: to run interactively you must first ssh dspoe"
-  exit
-fi
-poe ./sord -tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_single | tee -a log
-#totalview poe -a ./sord -tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_single
+#!/bin/bash -e
+time $cmd ./sord
 END
 
-if [ $( pwd | grep -v gpfs ) ]; then
-  echo "Error: must run from a subdirectory of /gpfs/"
-  exit
-fi
+cat << END > submit.sh
+#!/bin/bash -e
+# babieca batch submission (up to 19 procs):
+# other useful commands: pbsnodes -a, pingd, qstat, qdel
+qsub batch.sh
+END
+
+cat << END > batch.sh
+#!/bin/bash
+#PBS -q workq
+#PBS -N sord_job
+#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -o outlog
+#PBS -e errlog
+#PBS -V
+sleep 2
+cd $rundir
+time $cmd ./sord
+END
+
 ;;
 
 #------------------#
 *)
 
-if [ $debug = yes ]; then
-  if [ $mpi = no ]; then
-    echo "ddd ./sord" > run.sh
-  else
-    echo "mpirun -dbg=ddd -np $procs ./sord" > run.sh
-  fi
-else
-  if [ $mpi = no ]; then
-    echo "time ./sord | tee -a log" > run.sh
-  else
-    echo "time mpirun -np $procs ./sord | tee -a log" > run.sh
-  fi
-fi
+[ $debug = no  -a $mpi = no  ] && cmd=""
+[ $debug = no  -a $mpi = yes ] && cmd="mpirun -np $procs"
+[ $debug = yes -a $mpi = no  ] && cmd="ddd"
+[ $debug = yes -a $mpi = yes ] && cmd="mpirun -np $procs -dbg=ddd"
+
+cat << END > run.sh
+#!/bin/bash -e
+time $cmd ./sord
+END
+
+cat << END > submit.sh
+#!/bin/bash -e
+nohup unbuffer ./run.sh | tee -a log &
+END
 
 ;;
 
 esac
 
+[ $debug = yes ] && rm -rf submit.sh batch.sh
 chmod u+x *.sh
 
 #------------------------------------------------------------------------------#
