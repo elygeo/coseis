@@ -1,7 +1,8 @@
 #!/bin/bash -e
 #------------------------------------------------------------------------------#
+# SORD setup script - Geoffrey Ely
 
-exec 2>&1 > >( tee log )
+exec 2>&1 > >( tee setup.log )
 
 echo "SORD setup"
 date
@@ -230,8 +231,8 @@ YIELDLOOPTIME=0;
 #@ network.MPI = sn_single,not_shared,US,HIGH
 #@ notification = always
 #@ job_name = job.dfm
-#@ output = outlog
-#@ error = errlog
+#@ output = out.log
+#@ error = err.log
 #@ initialdir = $rundir
 #@ queue
 cd $rundir
@@ -262,8 +263,8 @@ cat << END > batch.sh
 #PBS -N sord_job
 #PBS -l nodes=$nodes:ppn=$ppn
 #PBS -l walltime=$wt
-#PBS -o outlog
-#PBS -e errlog
+#PBS -o out.log
+#PBS -e err.log
 #PBS -V
 cd $rundir
 time $cmd ./sord
@@ -298,8 +299,8 @@ cat << END > batch.sh
 #PBS -q workq
 #PBS -N sord_job
 #PBS -l nodes=$nodes:ppn=$ppn
-#PBS -o outlog
-#PBS -e errlog
+#PBS -o out.log
+#PBS -e err.log
 #PBS -V
 sleep 2
 cd $rundir
@@ -323,7 +324,7 @@ END
 
 cat << END > submit.sh
 #!/bin/bash -e
-nohup unbuffer ./run.sh | tee -a log &
+nohup unbuffer ./run.sh | tee out.log &
 END
 
 ;;
