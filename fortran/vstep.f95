@@ -29,7 +29,7 @@ inner: do iid = 1, 3
 print *, ic, id
       call dfcn( s2, oper(iz), w1, x, dx, ic, id, i1, i2 )
     else
-print *, ix, id
+print *, ix, id, 'die'
       call dfcn( s2, oper(iz), w2, x, dx, ix, id, i1, i2 )
     end if
   end do
