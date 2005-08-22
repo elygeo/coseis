@@ -19,7 +19,7 @@ s2 = 0.
 outer: do ic  = 1, 3
 inner: do iid = 1, 3
 print *, '111', ic, iid
-  id = mod( ic + iid - 1, 3 ) + 1
+  id = mod( ic + iid - 2, 3 ) + 1
   ix = 6 - ic - id
   do iz = 1, noper
     call zoneselect( i1, i2, ioper(iz,:), npg, hypocenter, nrmdim )
