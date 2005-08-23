@@ -10,23 +10,22 @@ real, parameter :: pi = 3.14159
 
 if ( verb > 0 ) print '(a)', 'Grid generation'
 downdim = 3
-i1 = i1node - nhalo
-i2 = i2node + nhalo
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
+i2 = nl + 2 * nhalo
+j = i2(1)
+k = i2(2)
+l = i2(3)
 allocate( &
-   s1(j1:j2,k1:k2,l1:l2), &
-   s2(j1:j2,k1:k2,l1:l2), &
-   w1(j1:j2,k1:k2,l1:l2,3), &
-   w2(j1:j2,k1:k2,l1:l2,3), &
-    x(j1:j2,k1:k2,l1:l2,3), &
-    v(j1:j2,k1:k2,l1:l2,3), &
-    u(j1:j2,k1:k2,l1:l2,3) )
+   s1(j,k,l), &
+   s2(j,k,l), &
+   w1(j,k,l,3), &
+   w2(j,k,l,3), &
+    x(j,k,l,3), &
+    v(j,k,l,3), &
+    u(j,k,l,3) )
 x = 0.
-forall( i=j1:j2 ) x(i,:,:,1) = i - 1
-forall( i=k1:k2 ) x(:,i,:,2) = i - 1
-forall( i=l1:l2 ) x(:,:,i,3) = i - 1
+forall( i=1:j ) x(i,:,:,1) = i - 1 - offset(1)
+forall( i=1:k ) x(:,i,:,2) = i - 1 - offset(2)
+forall( i=1:l ) x(:,:,i,3) = i - 1 - offset(3)
 if ( nrmdim /= 0 ) then
   i = hypocenter(nrmdim) + 1
   select case( nrmdim )
@@ -35,7 +34,7 @@ if ( nrmdim /= 0 ) then
   case( 3 ); x(:,:,i:,3) = x(:,:,i:,3) - 1
   end select
 end if
-hypoloc = hypocenter
+hypoloc = hypocenter - 1 - offset
 noper = 1
 ioper(1,:) = (/ 1, 1, 1, -1, -1, -1 /)
 oper(1) = 'h'

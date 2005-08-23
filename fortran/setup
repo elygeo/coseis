@@ -27,9 +27,15 @@ np3=( 1 1 1 )
 while read key params; do
   set -- $params
   case "$key" in
-  n)      ng=( $1 $2 $3 ) ;;
-  nprocs) np3=( $1 $2 $3 ) ;;
+  switch) swtich=$1 ;;
+  case)   case=$1 ;;
   esac
+  if [ "$switch" = "$case" ]; then
+    case "$key" in
+    n)      ng=( $1 $2 $3 ) ;;
+    nprocs) np3=( $1 $2 $3 ) ;;
+    esac
+  fi
 done < "$infile"
 
 floatsize=4
@@ -90,7 +96,7 @@ else
   pmain.o \\
   mpisetup.o \\
   mpioutput.o"
-  FC=mpif95
+  FC=mpif90
   CC=mpicc
 fi
 

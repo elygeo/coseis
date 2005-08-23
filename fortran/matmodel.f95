@@ -11,18 +11,11 @@ integer :: iz
 real :: matmin(3), matmax(3), hmean(3), tune, c1, c2, c3, damp, dampn, dampc, yc0, courant
 
 if ( verb > 0 ) print '(a)', 'Material Model'
-i1 = i1node - nhalo
-i2 = i2node + nhalo
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-print *, i1, i2
-allocate( &
-  rho(j1:j2,k1:k2,l1:l2), &
-   yn(j1:j2,k1:k2,l1:l2), &
-  lam(j1:j2,k1:k2,l1:l2), &
-  miu(j1:j2,k1:k2,l1:l2), &
-   yc(j1:j2,k1:k2,l1:l2) )
+i2 = nl + 2 * nhalo
+j = i2(1)
+k = i2(2)
+l = i2(3)
+allocate( rho(j,k,l), yn(j,k,l), lam(j,k,l), miu(j,k,l), yc(j,k,l) )
 matmax = material(1,1:3)
 matmin = material(1,1:3)
 s1 = 0.
@@ -30,7 +23,7 @@ lam = 0.
 miu = 0.
 yc = 0.
 do iz = 1, nmat
-  call zoneselect( i1, i2, imat(iz,:), ng, hypocenter, nrmdim )
+  call zoneselect( i1, i2, imat(iz,:), ng, offset, hypocenter, nrmdim )
   i1 = max( i1, i1cell )
   i2 = min( i2 - 1, i2cell )
   rho0 = material(iz,1)
@@ -56,13 +49,13 @@ gam = dt * viscosity
 
 s2 = 0.
 do iz = 1, noper
-  call zoneselect( i1, i2, ioper(iz,:), ng, hypocenter, nrmdim )
+  call zoneselect( i1, i2, ioper(iz,:), ng, offset, hypocenter, nrmdim )
   i1 = max( i1, i1cell )
   i2 = min( i2 - 1, i2cell )
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
-  call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
+  call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2, i1halo )
 end do
 
 print *, 1234, i1, i2
@@ -81,17 +74,16 @@ if ( nrmdim /=0 ) then
   end select
 end if
 
-i1 = i1node - nhalo
-i2 = i2node + nhalo
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-if(bc(1)==1) then; s1(j1,:,:) = s1(j1+1,:,:); s2(j1,:,:) = s2(j1+1,:,:); end if
-if(bc(4)==1) then; s1(j2,:,:) = s1(j2-1,:,:); s2(j2,:,:) = s2(j2-1,:,:); end if
-if(bc(2)==1) then; s1(:,k1,:) = s1(:,k1+1,:); s2(:,k1,:) = s2(:,k1+1,:); end if
-if(bc(5)==1) then; s1(:,k2,:) = s1(:,k2-1,:); s2(:,k2,:) = s2(:,k2-1,:); end if
-if(bc(3)==1) then; s1(:,:,l1) = s1(:,:,l1+1); s2(:,:,l1) = s2(:,:,l1+1); end if
-if(bc(6)==1) then; s1(:,:,l2) = s1(:,:,l2-1); s2(:,:,l2) = s2(:,:,l2-1); end if
+i2 = nl + 2 * nhalo
+j1 = i2(1); j2 = i2(1) - 1
+k1 = i2(2); k2 = i2(2) - 1
+l1 = i2(3); l2 = i2(3) - 1
+if( bc(1) == 1 ) then; s1(1,:,: ) = s1(2,:,: ); s2(1,:,: ) = s2(2,:,: ); end if
+if( bc(4) == 1 ) then; s1(j1,:,:) = s1(j2,:,:); s2(j1,:,:) = s2(j2,:,:); end if
+if( bc(2) == 1 ) then; s1(:,1,: ) = s1(:,2,: ); s2(:,1,: ) = s2(:,2,: ); end if
+if( bc(5) == 1 ) then; s1(:,k1,:) = s1(:,k2,:); s2(:,k1,:) = s2(:,k2,:); end if
+if( bc(3) == 1 ) then; s1(:,:,1 ) = s1(:,:,2 ); s2(:,:,1 ) = s2(:,:,2 ); end if
+if( bc(6) == 1 ) then; s1(:,:,l1) = s1(:,:,l2); s2(:,:,l1) = s2(:,:,l2); end if
 
 i1 = i1node
 i2 = i2node
@@ -116,7 +108,6 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   + s1(j,k,l-1) + s1(j-1,k-1,l) )
 end forall
 
-
 where ( yn /= 0. )  yn  = dt / yn
 where ( rho /= 0. ) rho = dt / rho
 where ( s2 /= 0. )  s2  = 1 / s2
@@ -124,30 +115,24 @@ lam = lam * s2
 miu = miu * s2
 
 ! PML damping
-j1 = i1node(1); j2 = i2node(1)
-k1 = i1node(2); k2 = i2node(2)
-l1 = i1node(3); l2 = i2node(3)
-allocate( p1( npml*bc(1), k1:k2, l1:l2, 3 ) )
-allocate( p4( npml*bc(4), k1:k2, l1:l2, 3 ) )
-allocate( p2( j1:k2, npml*bc(2), l1:l2, 3 ) )
-allocate( p5( j1:k2, npml*bc(5), l1:l2, 3 ) )
-allocate( p3( j1:k2, k1:k2, npml*bc(3), 3 ) )
-allocate( p6( j1:k2, k1:k2, npml*bc(6), 3 ) )
-j1 = i1cell(1); j2 = i2cell(1)
-k1 = i1cell(2); k2 = i2cell(2)
-l1 = i1cell(3); l2 = i2cell(3)
-allocate( g1( npml*bc(1), k1:k2, l1:l2, 3 ) )
-allocate( g4( npml*bc(4), k1:k2, l1:l2, 3 ) )
-allocate( g2( j1:k2, npml*bc(2), l1:l2, 3 ) )
-allocate( g5( j1:k2, npml*bc(5), l1:l2, 3 ) )
-allocate( g3( j1:k2, k1:k2, npml*bc(3), 3 ) )
-allocate( g6( j1:k2, k1:k2, npml*bc(6), 3 ) )
-p1 = 0. ; g1 = 0.
-p2 = 0. ; g2 = 0.
-p3 = 0. ; g3 = 0.
-p4 = 0. ; g4 = 0.
-p5 = 0. ; g5 = 0.
-p6 = 0. ; g6 = 0.
+i2 = nl + 2 * nhalo
+j = i2(1)
+k = i2(2)
+l = i2(3)
+i1 = npml * bc(1:3)
+i2 = npml * bc(4:6)
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+allocate( &
+  p1(j1,k,l,3), p2(j,k1,l,3), p3(j,k,l1,3), &
+  g1(j1,k,l,3), g2(j,k1,l,3), g3(j,k,l1,3), &
+  p4(j2,k,l,3), p5(j,k2,l,3), p6(j,k,l2,3), &
+  g4(j2,k,l,3), g5(j,k2,l,3), g6(j,k,l2,3) )
+p1 = 0.; p2 = 0.; p3 = 0.
+p4 = 0.; p5 = 0.; p6 = 0. 
+g1 = 0.; g2 = 0.; g3 = 0.
+g4 = 0.; g5 = 0.; g6 = 0.
 allocate( dn1(npml), dn2(npml), dc1(npml), dc2(npml) )
 c1 =  8. / 15.
 c2 = -3. / 100.

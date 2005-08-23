@@ -32,31 +32,15 @@ if ( init == 0 ) then
   down = (/ 0, 0, 0 /)
   down(downdim) = 1
   handed = mod( strdim - nrmdim + 1, 3 ) - 1
-  i1 = i1node
-  i2 = i2node
-  i1(nrmdim) = 1
+  i2 = i2halo
   i2(nrmdim) = 1
-  j1 = i1(1); j2 = i2(1)
-  k1 = i1(2); k2 = i2(2)
-  l1 = i1(3); l2 = i2(3)
-  allocate( &
-    uslip(j1:j2,k1:k2,l1:l2), &
-    vslip(j1:j2,k1:k2,l1:l2), &
-     trup(j1:j2,k1:k2,l1:l2), &
-       fs(j1:j2,k1:k2,l1:l2), &
-       fd(j1:j2,k1:k2,l1:l2), &
-       dc(j1:j2,k1:k2,l1:l2), &
-    cohes(j1:j2,k1:k2,l1:l2), &
-     area(j1:j2,k1:k2,l1:l2), &
-      tmp(j1:j2,k1:k2,l1:l2), &
-        r(j1:j2,k1:k2,l1:l2), &
-       r3(j1:j2,k1:k2,l1:l2,3), &
-      nrm(j1:j2,k1:k2,l1:l2,3), &
-      tt0(j1:j2,k1:k2,l1:l2,3), &
-       w0(j1:j2,k1:k2,l1:l2,6), &
-   tt0nsd(j1:j2,k1:k2,l1:l2,3), &
-      str(j1:j2,k1:k2,l1:l2,3), &
-      dip(j1:j2,k1:k2,l1:l2,3) )
+  j = i1(1)
+  k = i1(2)
+  l = i1(3)
+  allocate( uslip(j,k,l), vslip(j,k,l), trup(j,k,l), fs(j,k,l), fd(j,k,l), &
+    dc(j,k,l), cohes(j,k,l), area(j,k,l), tmp(j,k,l), r(j,k,l), r3(j,k,l,3), &
+    nrm(j,k,l,3), tt0(j,k,l,3), w0(j,k,l,6), tt0nsd(j,k,l,3), str(j,k,l,3), &
+    dip(j,k,l,3) )
   uslip = 0.
   vslip = 0.
   trup = 0.
@@ -173,21 +157,13 @@ if ( init == 0 ) then
     print '(2(a,e10.3,x))', 'rcrit:', rcrit, '>', miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ** 2
   end if
   deallocate( tt0nsd, w0, str, dip, r3 )
-  i1 = i1node
-  i2 = i2node
-  i1(nrmdim) = 1
+  i2 = i2halo
   i2(nrmdim) = 1
-  j1 = i1(1); j2 = i2(1)
-  k1 = i1(2); k2 = i2(2)
-  l1 = i1(3); l2 = i2(3)
-  allocate( &
-      tt(j1:j2,k1:k2,l1:l2,3), &
-      tn3(j1:j2,k1:k2,l1:l2,3), &
-      ts3(j1:j2,k1:k2,l1:l2,3), &
-      tn(j1:j2,k1:k2,l1:l2), &
-      ts(j1:j2,k1:k2,l1:l2), &
-      ff(j1:j2,k1:k2,l1:l2), &
-      ff2(j1:j2,k1:k2,l1:l2) )
+  j = i1(1)
+  k = i1(2)
+  l = i1(3)
+  allocate( tt(j,k,l,3), tn3(j,k,l,3), ts3(j,k,l,3), tn(j,k,l), ts(j,k,l), &
+    ff(j,k,l), ff2(j,k,l) )
   return
 end if
 
@@ -195,8 +171,8 @@ end if
 ! Zero slip velocity condition
 if ( nrmdim == 0 ) return
 if ( verb > 1 ) print '(a)', 'Fault'
-i1 = i1node
-i2 = i2node
+i1 = i1halo
+i2 = i2halo
 i1(nrmdim) = hypocenter(nrmdim)
 i2(nrmdim) = hypocenter(nrmdim)
 j1 = i1(1); j2 = i2(1)
