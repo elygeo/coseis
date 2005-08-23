@@ -86,8 +86,8 @@ for iz = 1:size( out, 1 )
     end
     file = sprintf( 'out/%02d/hdr', iz );
     fid = fopen( file, 'w' );
-    fprintf( fid, '%g ', [ outnc(iz) i1 i2 outint(iz) it dt dx ] )
-    fprintf( fid, '%s\n', outvar{iz} )
+    fprintf( fid, '%g ', [ outnc(iz) i1 i2 outint(iz) it dt dx ] );
+    fprintf( fid, '%s\n', outvar{iz} );
     fclose( fid );
   end
 end
