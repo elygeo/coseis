@@ -48,6 +48,13 @@ case(3)
     - f(j+1,k+1,l,i) + f(j,k,l+1,i) )
   end forall
 end select
+ 
+print *, 1234, i1, i2
+do l = l1, l2
+do k = k1, k2
+  print *, df(:,k,l)
+end do
+end do
 
 case('r') ! rectangular grid, flops: 3* 9+
 
