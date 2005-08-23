@@ -23,17 +23,17 @@ if ( init == 0 ) then
   do iz = 1, nout
     if ( outint(iz) < 0 ) outint(iz) = nt + outint(iz) + 1
     select case( outvar(iz) )
-    case( 'x' ); outnc(iz) = 3
-    case( 'u' ); outnc(iz) = 3
-    case( 'v' ); outnc(iz) = 3
-    case( 'w' ); outnc(iz) = 6; outcell(iz) = .true.
-    case( '|w|' ); outcell(iz) = .true.
-    case( 'miu' ); outcell(iz) = .true.
-    case( 'lam' ); outcell(iz) = .true.
-    case( 'yc' );  outcell(iz) = .true.
+    case( 'x'     ); outnc(iz) = 3
+    case( 'u'     ); outnc(iz) = 3
+    case( 'v'     ); outnc(iz) = 3
+    case( 'w'     ); outnc(iz) = 6; outcell(iz) = .true.
+    case( '|w|'   ); outcell(iz) = .true.
+    case( 'miu'   ); outcell(iz) = .true.
+    case( 'lam'   ); outcell(iz) = .true.
+    case( 'yc'    ); outcell(iz) = .true.
     case( 'uslip' ); fault(iz) = .true.
     case( 'vslip' ); fault(iz) = .true.
-    case( 'trup' );  fault(iz) = .true.
+    case( 'trup'  ); fault(iz) = .true.
     end select
     if ( it == 0 ) then
       write( ofile, '(a,i2.2)' ) 'mkdir out/', iz
@@ -68,22 +68,22 @@ do iz = 1, nout
       write( ofile, '(a,i2.2,a,i1,a,i5.5)' ) 'out/', iz, '/', i, '/', it
       open( 9, file=ofile, form='unformatted', access='direct', status='replace', recl=reclen )
       select case( outvar(iz) )
-      case( 'x' );     write( 9, rec=1 ) x(j1:j2,k1:k2,l1:l2,i)
-      case( 'u' );     write( 9, rec=1 ) u(j1:j2,k1:k2,l1:l2,i)
-      case( 'v' );     write( 9, rec=1 ) v(j1:j2,k1:k2,l1:l2,i)
-      case( 'w' );
-        if ( i < 4 )   write( 9, rec=1 ) w1(j1:j2,k1:k2,l1:l2,i)
-        if ( i > 3 )   write( 9, rec=1 ) w2(j1:j2,k1:k2,l1:l2,i-3)
-      case( '|v|' );   write( 9, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
-      case( '|w|' );   write( 9, rec=1 ) s2(j1:j2,k1:k2,l1:l2)
-      case( 'rho' );   write( 9, rec=1 ) rho(j1:j2,k1:k2,l1:l2)
-      case( 'lam' );   write( 9, rec=1 ) lam(j1:j2,k1:k2,l1:l2)
-      case( 'miu' );   write( 9, rec=1 ) rho(j1:j2,k1:k2,l1:l2)
-      case( 'yn' );    write( 9, rec=1 ) yn(j1:j2,k1:k2,l1:l2)
-      case( 'yc' );    write( 9, rec=1 ) yc(j1:j2,k1:k2,l1:l2)
+      case( 'w'     );
+        if ( i < 4 )   write( 9, rec=1 )    w1(j1:j2,k1:k2,l1:l2,i)
+        if ( i > 3 )   write( 9, rec=1 )    w2(j1:j2,k1:k2,l1:l2,i-3)
+      case( 'x'     ); write( 9, rec=1 )     x(j1:j2,k1:k2,l1:l2,i)
+      case( 'u'     ); write( 9, rec=1 )     u(j1:j2,k1:k2,l1:l2,i)
+      case( 'v'     ); write( 9, rec=1 )     v(j1:j2,k1:k2,l1:l2,i)
+      case( '|v|'   ); write( 9, rec=1 )    s1(j1:j2,k1:k2,l1:l2)
+      case( '|w|'   ); write( 9, rec=1 )    s2(j1:j2,k1:k2,l1:l2)
+      case( 'rho'   ); write( 9, rec=1 )   rho(j1:j2,k1:k2,l1:l2)
+      case( 'lam'   ); write( 9, rec=1 )   lam(j1:j2,k1:k2,l1:l2)
+      case( 'miu'   ); write( 9, rec=1 )   rho(j1:j2,k1:k2,l1:l2)
+      case( 'yn'    ); write( 9, rec=1 )    yn(j1:j2,k1:k2,l1:l2)
+      case( 'yc'    ); write( 9, rec=1 )    yc(j1:j2,k1:k2,l1:l2)
       case( 'uslip' ); write( 9, rec=1 ) uslip(j1:j2,k1:k2,l1:l2)
       case( 'vslip' ); write( 9, rec=1 ) vslip(j1:j2,k1:k2,l1:l2)
-      case( 'trup' );  write( 9, rec=1 ) trup(j1:j2,k1:k2,l1:l2)
+      case( 'trup'  ); write( 9, rec=1 )  trup(j1:j2,k1:k2,l1:l2)
       case default; print '(a)', 'outvar ' // outvar(iz); stop
       end select
       close( 9 )
