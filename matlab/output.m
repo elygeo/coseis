@@ -17,7 +17,7 @@ if initialize
     outint(iz) = out{iz,2};
     outnc(iz)    = 1;
     outcell(iz)  = 0;
-    outfault(iz) = 0;
+    outfault(iz) = 0
     switch outvar{iz}
     case 'x', outnc(iz) = 3;
     case 'u', outnc(iz) = 3;
