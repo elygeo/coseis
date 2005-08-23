@@ -49,10 +49,10 @@ if initialize
 end
 
 for iz = 1:size( out, 1 )
-  if ( it == 0 | outint(iz) == 0 ) then
-    doit = it == outint(iz)
+  if ( it == 0 | outint(iz) == 0 )
+    doit = it == outint(iz);
   else
-    doit = mod( it, outint(iz) ) == 0
+    doit = mod( it, outint(iz) ) == 0;
   end
   if mod( it, outint(iz) ) == 0
     i1 = outi1(iz,:);

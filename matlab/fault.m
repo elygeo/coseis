@@ -152,8 +152,8 @@ end
 %tt0 = 5;
 %tw = 1;
 %tt0(2,:,hypocenter(2)) = exp(-((it*dt-tt0)/tw)^2);
-i1 = halo + [ 1 1 1 ];
-i2 = halo + np;
+i1 = [ 1 1 1 ];
+i2 = nm;
 i1(nrmdim) = hypocenter(nrmdim);
 i2(nrmdim) = hypocenter(nrmdim);
 j1 = i1(1); j2 = i2(1);
