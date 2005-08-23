@@ -22,7 +22,7 @@ end do
 do a = 1, 3
   b = mod( a,   3 ) + 1
   c = mod( a+1, 3 ) + 1
-  selectcase ( nrmdim )
+  select case( nrmdim )
   case( 1 )
     j = i1(1)
     forall( k=k1:k2, l=l1:l2 )

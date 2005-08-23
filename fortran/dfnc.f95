@@ -17,13 +17,13 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
-select case(op)
+select case( op )
 
-case('h') ! constant grid, flops: 1* 7+
+case( 'h' ) ! constant grid, flops: 1* 7+
 
 h = 0.25 * dx * dx
-select case(a)
-case(1)
+select case( a )
+case( 1 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     df(j,k,l) = h * &
     ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
@@ -31,7 +31,7 @@ case(1)
     + f(j+1,k,l+1,i) - f(j,k+1,l,i) &
     + f(j+1,k+1,l,i) - f(j,k,l+1,i) )
   end forall
-case(2)
+case( 2 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     df(j,k,l) = h * &
     ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
@@ -39,7 +39,7 @@ case(2)
     - f(j+1,k,l+1,i) + f(j,k+1,l,i) &
     + f(j+1,k+1,l,i) - f(j,k,l+1,i))
   end forall
-case(3)
+case( 3 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     df(j,k,l) = h * &
     ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
@@ -49,17 +49,10 @@ case(3)
   end forall
 end select
  
-print *, 1234, i1, i2
-do l = l1, l2
-do k = k1, k2
-  print *, df(:,k,l)
-end do
-end do
+case( 'r' ) ! rectangular grid, flops: 3* 9+
 
-case('r') ! rectangular grid, flops: 3* 9+
-
-selectcase(a)
-case(1)
+select case( a )
+case( 1 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     df(j,k,l) = 0.25 * &
     ( ( x(j,k+1,l,2) - x(j,k,l,2) ) &
@@ -69,7 +62,7 @@ case(1)
       + f(j+1,k,l+1,i) - f(j,k+1,l,i) &
       + f(j+1,k+1,l  ,i) - f(j,k,l+1,i) ) )
   end forall
-case(2)
+case( 2 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     df(j,k,l) = 0.25 * &
     ( ( x(j,k,l+1,3) - x(j,k,l,3) ) &
@@ -79,7 +72,7 @@ case(2)
       - f(j+1,k,l+1,i) + f(j,k+1,l,i) &
       + f(j+1,k+1,l,i) - f(j,k,l+1,i) ) )
   end forall
-case(3)
+case( 3 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     df(j,k,l) = 0.25 * &
     ( ( x(j+1,k,l,1) - x(j,k,l,1) ) &
@@ -91,7 +84,7 @@ case(3)
   end forall
 end select
 
-case('g') ! general grid, flops: 57* 112+
+case( 'g' ) ! general grid, flops: 57* 112+
 
 b = mod( a, 3 ) + 1
 c = mod( a + 1, 3 ) + 1

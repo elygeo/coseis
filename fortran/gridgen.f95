@@ -29,7 +29,7 @@ forall( i=k1:k2 ) x(:,i,:,2) = i - 1
 forall( i=l1:l2 ) x(:,:,i,3) = i - 1
 if ( nrmdim /= 0 ) then
   i = hypocenter(nrmdim) + 1
-  selectcase( nrmdim )
+  select case( nrmdim )
   case( 1 ); x(i:,:,:,1) = x(i:,:,:,1) - 1
   case( 2 ); x(:,i:,:,2) = x(:,i:,:,2) - 1
   case( 3 ); x(:,:,i:,3) = x(:,:,i:,3) - 1
@@ -39,13 +39,13 @@ hypoloc = hypocenter
 noper = 1
 ioper(1,:) = (/ 1, 1, 1, -1, -1, -1 /)
 oper(1) = 'h'
-selectcase( grid )
-case('constant')
-case('stretch')
+select case( grid )
+case( 'constant' )
+case( 'stretch' )
   oper(1) = 'r'
   x(:,:,:,3) = 2. * x(:,:,:,3)
   hypoloc(3) = 2. * hypoloc(3)
-case('slant')
+case( 'slant' )
   oper(1) = 'g'
   theta = 20. * pi / 180.
   scl = sqrt( cos( theta ) ** 2. + ( 1. - sin( theta ) ) ** 2. )

@@ -62,22 +62,22 @@ do iz = 1, noper
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
-  call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
+  call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2, offset )
 end do
 
 print *, 1234, i1, i2
 do l = l1, l2
 do k = k1, k2
-  print *, s2(:,k-1,l-1)
+  print *, s2(:,k,l)
 end do
 end do
 
 if ( nrmdim /=0 ) then
   i = hypocenter(nrmdim)
-  select case ( nrmdim )
-  case(1); s2(i,:,:) = 0; yc(i,:,:) = 0
-  case(2); s2(:,i,:) = 0; yc(:,i,:) = 0
-  case(3); s2(:,:,i) = 0; yc(:,:,i) = 0
+  select case( nrmdim )
+  case( 1 ); s2(i,:,:) = 0; yc(i,:,:) = 0
+  case( 2 ); s2(:,i,:) = 0; yc(:,i,:) = 0
+  case( 3 ); s2(:,:,i) = 0; yc(:,:,i) = 0
   end select
 end if
 

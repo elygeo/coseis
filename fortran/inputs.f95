@@ -52,12 +52,12 @@ loop: do
   if ( a == ' ' ) cycle loop
   read( a, * ) key
   if ( key(1:1) == '#' .or. key(1:1) == '!' .or. key(1:1) == '%' ) cycle loop
-  selectcase( key )
+  select case( key )
   case( 'switch' );     read( a, * ) key, switch
   case( 'case' );       read( a, * ) key, switchcase
   end select
   if ( switch /= switchcase ) cycle loop
-  selectcase( key )
+  select case( key )
   case( '' )
   case( 'switch' )
   case( 'case' )
@@ -101,6 +101,7 @@ close( 9 )
 if( any( hypocenter == 0 ) ) hypocenter = npg / 2 + mod( npg, 2 )
 if( nrmdim /= 0 ) npg(nrmdim) = npg(nrmdim) + 1
 nhalo = 1
+offset = -nhalo
 i1node = 1
 i2node = npg
 i1cell = 1
