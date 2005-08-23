@@ -12,13 +12,12 @@ if initialize
   fid = fopen( 'out/endian', 'w' );
   fprintf( fid, '%s\n', endian );
   fclose( fid );
-out
   for iz = 1:size( out, 1 )
     outvar{iz} = out{iz,1};
-    outint(iz) = out{iz,2}
+    outint(iz) = out{iz,2};
     outnc(iz)    = 1;
     outcell(iz)  = 0;
-    outfault(iz) = 0
+    outfault(iz) = 0;
     switch outvar{iz}
     case 'x', outnc(iz) = 3;
     case 'u', outnc(iz) = 3;
@@ -49,6 +48,7 @@ out
   return
 end
 
+out
 for iz = 1:size( out, 1 )
   if ( it == 0 | outint(iz) == 0 ) then
     doit = it == outint(iz)
@@ -107,4 +107,5 @@ fclose( fid );
 fid = fopen( 'out/timestep', 'w' );
 fprintf( fid, '%g\n', it );
 fclose( fid );
+out
 
