@@ -66,9 +66,9 @@ do iz = 1, noper
   call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
 end do
 
-do l = l1, l2
-do k = k1, k2
-  print *, s2(j1:j2,k,l)
+do l = l1-1, l2+1
+do k = k1-1, k2+1
+  print *, s2(:,k,l)
 end do
 end do
 
