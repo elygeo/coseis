@@ -48,6 +48,8 @@ do iz = 1, nmat
   lam(j1:j2,k1:k2,l1:l2) = lam0
   miu(j1:j2,k1:k2,l1:l2) = miu0
   yc(j1:j2,k1:k2,l1:l2) = yc0
+print *, i1, i2
+print *, s1
 end do
 courant = dt * matmax(2) * sqrt( 3. ) / dx   ! TODO: check, make general
 if ( verb > 0 ) print '(a,e8.2)', 'Courant: 1 > ', courant
