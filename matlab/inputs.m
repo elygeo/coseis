@@ -4,18 +4,15 @@
 defaults
 model = 'normal';
 model = 'the3';
-model = '';
 model = 'strikeslip';
 model = 'explosion';
 model = 'boris';
 model = 'kostrov';
 model = 'test';
 switch model
-case ''
-  nrmdim = 0;
-  n = [ 3 3 3 1 ];
 case 'test'
-  n = [ 4 3 4 1 ];
+  nrmdim = 0;
+  n = [ 4 4 4 1 ];
   out = {
     'x' 0     1 1 1   -1 -1 -1
     'rho' 0   1 1 1   -1 -1 -1
