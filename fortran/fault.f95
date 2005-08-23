@@ -15,9 +15,12 @@ real, allocatable, dimension(:,:,:,:) :: &
 real :: fs0, fd0, dc0, tn0, ts0
 integer :: down(3), handed, init = 0, strdim, dipdim, j3, j4, k3, k4, l3, l4, iz
 
-if ( nrmdim == 0 ) return
 if ( init == 0 ) then
   init = 1
+  if ( nrmdim == 0 ) then
+    allocate( uslip(0,0,0) )
+    return
+  end if
   if ( verb > 0 ) print '(a)', 'Initialize fault'
   if ( nrmdim /= downdim ) then
     dipdim = downdim
@@ -190,6 +193,7 @@ end if
 
 !------------------------------------------------------------------------------!
 ! Zero slip velocity condition
+if ( nrmdim == 0 ) return
 if ( verb > 1 ) print '(a)', 'Fault'
 i1 = i1node
 i2 = i2node
