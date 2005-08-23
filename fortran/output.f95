@@ -57,6 +57,7 @@ do iz = 1, nout
     if ( any( i1 < i1node .or. i2 > i2node .or. i2 < i1 ) ) stop 'output error'
     if ( outcell(iz) ) i2 = i2 - 1
     if ( fault(iz) ) i1(nrmdim) = 1; i2(nrmdim) = 1
+print *, i1, i2, fault(iz)
     reclen = floatsize * product( i2 - i1 + 1 )
     j1 = i1(1); j2 = i2(1)
     k1 = i1(2); k2 = i2(2)
