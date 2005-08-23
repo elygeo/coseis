@@ -12,7 +12,7 @@ model = 'test';
 switch model
 case 'test'
   nrmdim = 0;
-  material = [ 1   1 1     1 1 1   -1 -1 -1 ];
+  %material = [ 1   1 1     1 1 1   -1 -1 -1 ];
   n = [ 4 4 4 1 ];
   out = {
     'x' 0     1 1 1   -1 -1 -1
