@@ -214,9 +214,9 @@ c(i) = ff(i) ./ ts(i);
 for i = 1:3
   tt(:,:,:,i) = -tt0(:,:,:,i) + tn3(:,:,:,i) + c .* ts3(:,:,:,i);
   w1(j1:j2,k1:k2,l1:l2,i) = ...
-  w1(j1:j2,k1:k2,l1:l2,i) + tt(:,:,:,i) *. area *. rho(j1:j2,k1:k2,l1:l2);
+  w1(j1:j2,k1:k2,l1:l2,i) + tt(:,:,:,i) .* area .* rho(j1:j2,k1:k2,l1:l2);
   w1(j3:j4,k3:k4,l3:l4,i) = ...
-  w1(j3:j4,k3:k4,l3:l4,i) + tt(:,:,:,i) *. area *. rho(j3:j4,k3:k4,l3:l4);
+  w1(j3:j4,k3:k4,l3:l4,i) + tt(:,:,:,i) .* area .* rho(j3:j4,k3:k4,l3:l4);
 end
 tt = v(j3:j4,k3:k4,l3:l4,:) + w1(j3:j4,k3:k4,l3:l4,:) ...
    - v(j1:j2,k1:k2,l1:l2,:) - w1(j1:j2,k1:k2,l1:l2,:);
