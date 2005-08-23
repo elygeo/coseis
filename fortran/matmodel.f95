@@ -108,6 +108,13 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   + s1(j,k-1,l) + s1(j-1,k,l-1) &
   + s1(j,k,l-1) + s1(j-1,k-1,l) )
 end forall
+
+do l = l1, l2
+do k = k1, k2
+  print *, rho(j1:j2,k,l)
+end do
+end do
+
 where ( yn /= 0. )  yn  = dt / yn
 where ( rho /= 0. ) rho = dt / rho
 where ( s2 /= 0. )  s2  = 1 / s2
