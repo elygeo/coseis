@@ -10,9 +10,9 @@ integer :: iostat
 character(256) :: a, key, switch = 'default', switchcase = 'default'
 
 if ( verb > 0 ) print '(a)', 'Reading input file'
-npe3 = 1
-ipe = 0
-npg = 21
+np = 1
+ip = 0
+ng = 21
 nt = 20
 dx = 100.
 dt = .007
@@ -58,11 +58,7 @@ loop: do
   end select
   if ( switch /= switchcase ) cycle loop
   select case( key )
-  case( '' )
-  case( 'switch' )
-  case( 'case' )
-  case( 'nprocs' );     read( a, * ) key, npe3
-  case( 'n' );          read( a, * ) key, npg, nt
+  case( 'n' );          read( a, * ) key, ng, nt
   case( 'dx' );         read( a, * ) key, dx
   case( 'dt' );         read( a, * ) key, dt
   case( 'bc' );         read( a, * ) key, bc
@@ -73,8 +69,6 @@ loop: do
   case( 'hypocenter' ); read( a, * ) key, hypocenter
   case( 'rcrit' );      read( a, * ) key, rcrit
   case( 'nclramp' );    read( a, * ) key, nclramp
-  case( 'checkpoint' ); read( a, * ) key, checkpoint
-  case( 'verbose' );    read( a, * ) key, verb
   case( 'locknodes' )
     nlock = nlock + 1
     read( a, * ) key, locknodes(nlock,:), ilock(nlock,:)
@@ -93,19 +87,25 @@ loop: do
   case( 'out' )
     nout = nout + 1
     read( a, * ) key, outvar(nout), outint(nout), iout(nout,:)
+  case( 'checkpoint' ); read( a, * ) key, checkpoint
+  case( 'nprocs' );     read( a, * ) key, np
+  case( 'verbose' );    read( a, * ) key, verb
+  case( 'switch' )
+  case( 'case' )
+  case( '' )
   case default; print '(a)', 'bad key: ' // trim( key ); stop
   end select
 end do loop
 close( 9 )
 
-if( any( hypocenter == 0 ) ) hypocenter = npg / 2 + mod( npg, 2 )
-if( nrmdim /= 0 ) npg(nrmdim) = npg(nrmdim) + 1
+if( any( hypocenter == 0 ) ) hypocenter = ng / 2 + mod( ng, 2 )
+if( nrmdim /= 0 ) ng(nrmdim) = ng(nrmdim) + 1
 nhalo = 1
 offset = -nhalo
 i1node = 1
-i2node = npg
+i2node = ng
 i1cell = 1
-i2cell = npg - 1
+i2cell = ng - 1
 i1nodepml = i1node + bc(1:3) * npml
 i2nodepml = i2node - bc(4:6) * npml
 i1cellpml = i1cell + bc(1:3) * npml

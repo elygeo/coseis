@@ -22,28 +22,28 @@ while getopts spgl opt; do
   esac
 done
 
-n=( 1 1 1 1 )
-p=( 1 1 1 )
+ng=( 1 1 1 )
+np3=( 1 1 1 )
 while read key params; do
   set -- $params
   case "$key" in
-  n)     n=( $1 $2 $3 $4 ) ;;
-  nproc) p=( $1 $2 $3 ) ;;
+  n)      ng=( $1 $2 $3 ) ;;
+  nprocs) np3=( $1 $2 $3 ) ;;
   esac
 done < "$infile"
 
 floatsize=4
-points=$(( n[0] * n[1] * n[2] ));
-procs=$(( p[0] * p[1] * p[2] ));
-ram=$(( points / procs * floatsize * 22 / 1024 / 1024 ))
-wt=$(( points / procs / 40000 + 1 ))
+nprocs=$(( np3[0] * np3[1] * np3[2] ));
+npoints=$(( ng[0] * ng[1] * ng[2] ));
+ram=$(( npoints / nprocs * floatsize * 22 / 1024 / 1024 ))
+wt=$(( npoints / nprocs / 40000 + 1 ))
 
 if   [ $wt -gt 5400 ]; then wt="$(( wt / 3600 + 1 )):00:00"
 elif [ $wt -gt 90   ]; then wt="$(( wt /   60 + 1 )):00"
 fi
 
-[ $mpi = guess -a $procs -eq 1 ] && mpi=no
-[ $mpi = guess -a $procs -gt 1 ] && mpi=yes
+[ $mpi = guess -a $nprocs -eq 1 ] && mpi=no
+[ $mpi = guess -a $nprocs -gt 1 ] && mpi=yes
 
 osname=$( uname )
 
@@ -53,10 +53,10 @@ elif [ "$HOSTNAME" = master ];   then machine="babieca"
 fi
 
 cat << END
-Total points: $points
-Processors: $procs
-Ram per proc: $ram
-Wall clock: $wt
+points: $npoints
+procs: $nprocs
+ram per proc: $ram
+wall time limit: $wt
 END
 
 #------------------------------------------------------------------------------#
@@ -156,8 +156,8 @@ date:     $( date )
 machine:  $machine
 hostname: ${HOSTNAME}
 osname:   $( uname -a )
-points:   $points
-procs:    $procs
+npoints:  $npoints
+nprocs:   $nprocs
 END
 srcbase=$( basename "$rundir" )
 cp "${srcbase}.tgz" meta/
@@ -177,8 +177,8 @@ if [ $( pwd | grep -v gpfs ) ]; then
 fi
 
 ppn=8;
-[ $ppn -gt $procs ] && ppn=$procs
-nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
+[ $ppn -gt $nprocs ] && ppn=$nprocs
+nodes=$(( nprocs / ppn + ( nprocs % ppn > 0 ? 1 : 0 ) ))
 
 [ $debug = no  ] && cmd="poe"
 [ $debug = yes ] && cmd="totalview poe -a"
@@ -248,11 +248,11 @@ chmod u+x run submit batchjob
 teragrid)
 
 ppn=2;
-[ $ppn -gt $procs ] && ppn=$procs
-nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
+[ $ppn -gt $nprocs ] && ppn=$nprocs
+nodes=$(( nprocs / ppn + ( nprocs % ppn > 0 ? 1 : 0 ) ))
 
 cmd=""
-[ $mpi = yes ] && cmd="mpirun -v -machinefile \$PBS_NODEFILE -np $procs"
+[ $mpi = yes ] && cmd="mpirun -v -machinefile \$PBS_NODEFILE -np $nprocs"
 
 cat << END > submit
 #!/bin/bash -e
@@ -281,11 +281,11 @@ chmod u+x submit batchjob
 babieca)
 
 ppn=2
-[ $ppn -gt $procs ] && ppn=$procs
-nodes=$(( procs / ppn + ( procs % ppn > 0 ? 1 : 0 ) ))
+[ $ppn -gt $nprocs ] && ppn=$nprocs
+nodes=$(( nprocs / ppn + ( nprocs % ppn > 0 ? 1 : 0 ) ))
 
 cmd=""
-[ $mpi = yes ] && cmd="mpiexec -np $procs"
+[ $mpi = yes ] && cmd="mpiexec -np $nprocs"
 
 cat << END > run
 #!/bin/bash -e
@@ -320,9 +320,9 @@ chmod u+x run submit batchjob
 *)
 
 [ $debug = no  -a $mpi = no  ] && cmd=""
-[ $debug = no  -a $mpi = yes ] && cmd="mpirun -np $procs"
+[ $debug = no  -a $mpi = yes ] && cmd="mpirun -np $nprocs"
 [ $debug = yes -a $mpi = no  ] && cmd="ddd"
-[ $debug = yes -a $mpi = yes ] && cmd="mpirun -np $procs -dbg=ddd"
+[ $debug = yes -a $mpi = yes ] && cmd="mpirun -np $nprocs -dbg=ddd"
 
 cat << END > run
 #!/bin/bash -e

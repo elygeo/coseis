@@ -30,7 +30,7 @@ lam = 0.
 miu = 0.
 yc = 0.
 do iz = 1, nmat
-  call zoneselect( i1, i2, imat(iz,:), npg, hypocenter, nrmdim )
+  call zoneselect( i1, i2, imat(iz,:), ng, hypocenter, nrmdim )
   i1 = max( i1, i1cell )
   i2 = min( i2 - 1, i2cell )
   rho0 = material(iz,1)
@@ -56,7 +56,7 @@ gam = dt * viscosity
 
 s2 = 0.
 do iz = 1, noper
-  call zoneselect( i1, i2, ioper(iz,:), npg, hypocenter, nrmdim )
+  call zoneselect( i1, i2, ioper(iz,:), ng, hypocenter, nrmdim )
   i1 = max( i1, i1cell )
   i2 = min( i2 - 1, i2cell )
   j1 = i1(1); j2 = i2(1)
