@@ -62,7 +62,7 @@ do iz = 1, noper
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
-  call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2, offset )
+  call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
 end do
 
 print *, 1234, i1, i2
