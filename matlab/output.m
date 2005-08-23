@@ -48,7 +48,6 @@ if initialize
   return
 end
 
-out
 for iz = 1:size( out, 1 )
   if ( it == 0 | outint(iz) == 0 ) then
     doit = it == outint(iz)
@@ -107,5 +106,4 @@ fclose( fid );
 fid = fopen( 'out/timestep', 'w' );
 fprintf( fid, '%g\n', it );
 fclose( fid );
-out
 

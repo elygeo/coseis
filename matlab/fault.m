@@ -1,6 +1,7 @@
 %------------------------------------------------------------------------------%
 % FAULT
 
+initialize
 if initialize
 
 fprintf( 'Initialize fault\n' )
