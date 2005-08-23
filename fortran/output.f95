@@ -56,6 +56,7 @@ do iz = 1, nout
     call zoneselect( i1, i2, iout(iz,:), npg, hypocenter, nrmdim )
     if ( any( i1 < i1node .or. i2 > i2node .or. i2 < i1 ) ) stop 'output error'
     if ( outcell(iz) ) i2 = i2 - 1
+print *, i1, i2, fault(iz)
     if ( fault(iz) ) i1(nrmdim) = 1; i2(nrmdim) = 1
 print *, i1, i2, fault(iz)
     reclen = floatsize * product( i2 - i1 + 1 )
