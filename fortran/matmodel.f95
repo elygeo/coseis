@@ -65,13 +65,14 @@ do iz = 1, noper
   call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
 end do
 
-i = hypocenter(nrmdim)
-print *, nrmdim, i
-select case ( nrmdim )
-case(1); s2(i,:,:) = 0; yc(i,:,:) = 0
-case(2); s2(:,i,:) = 0; yc(:,i,:) = 0
-case(3); s2(:,:,i) = 0; yc(:,:,i) = 0
-end select
+if ( nrmdim /=0 ) then
+  i = hypocenter(nrmdim)
+  select case ( nrmdim )
+  case(1); s2(i,:,:) = 0; yc(i,:,:) = 0
+  case(2); s2(:,i,:) = 0; yc(:,i,:) = 0
+  case(3); s2(:,:,i) = 0; yc(:,:,i) = 0
+  end select
+end if
 
 i1 = i1node - nhalo
 i2 = i2node + nhalo

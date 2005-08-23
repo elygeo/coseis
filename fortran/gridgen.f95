@@ -27,12 +27,14 @@ x = 0.
 forall( i=j1:j2 ) x(i,:,:,1) = i - 1
 forall( i=k1:k2 ) x(:,i,:,2) = i - 1
 forall( i=l1:l2 ) x(:,:,i,3) = i - 1
-i = hypocenter(nrmdim) + 1
-selectcase( nrmdim )
-case( 1 ); x(i:,:,:,1) = x(i:,:,:,1) - 1
-case( 2 ); x(:,i:,:,2) = x(:,i:,:,2) - 1
-case( 3 ); x(:,:,i:,3) = x(:,:,i:,3) - 1
-end select
+if ( nrmdim /= 0 ) then
+  i = hypocenter(nrmdim) + 1
+  selectcase( nrmdim )
+  case( 1 ); x(i:,:,:,1) = x(i:,:,:,1) - 1
+  case( 2 ); x(:,i:,:,2) = x(:,i:,:,2) - 1
+  case( 3 ); x(:,:,i:,3) = x(:,:,i:,3) - 1
+  end select
+end if
 hypoloc = hypocenter
 noper = 1
 ioper(1,:) = (/ 1, 1, 1, -1, -1, -1 /)
