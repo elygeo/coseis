@@ -54,11 +54,6 @@ courant = dt * matmax(2) * sqrt( 3. ) / dx   ! TODO: check, make general
 if ( verb > 0 ) print '(a,e8.2)', 'Courant: 1 > ', courant
 gam = dt * viscosity
 
-do l = l1, l2
-do k = k1, k2
-  print *, s1(j1:j2,k,l)
-end do
-end do
 
 s2 = 0.
 do iz = 1, noper
@@ -69,6 +64,12 @@ do iz = 1, noper
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
   call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
+end do
+
+do l = l1, l2
+do k = k1, k2
+  print *, s2(j1:j2,k,l)
+end do
 end do
 
 if ( nrmdim /=0 ) then
