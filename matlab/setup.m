@@ -48,8 +48,10 @@ if plotstyle
   viz
   control
   initialize = 0;
+  output
 else
   initialize = 0;
+  output
   step
 end
 

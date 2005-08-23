@@ -54,7 +54,7 @@ for iz = 1:size( out, 1 )
   else
     doit = mod( it, outint(iz) ) == 0;
   end
-  if mod( it, outint(iz) ) == 0
+  if doit
     i1 = outi1(iz,:);
     i2 = outi2(iz,:);
     l = i1(3):i2(3);
@@ -86,8 +86,8 @@ for iz = 1:size( out, 1 )
     end
     file = sprintf( 'out/%02d/hdr', iz );
     fid = fopen( file, 'w' );
-    fprintf( fid, '%g %g %g %g %g %g %g %s %s\n', ...
-      [ outnc(iz) i1 i2 outint(iz) it dt dx ], outvar{iz} )
+    fprintf( fid, '%g ', [ outnc(iz) i1 i2 outint(iz) it dt dx ] )
+    fprintf( fid, '%s\n', outvar{iz} )
     fclose( fid );
   end
 end
