@@ -16,6 +16,7 @@ i2 = i2node + nhalo
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
+print *, i1, i2
 allocate( &
   rho(j1:j2,k1:k2,l1:l2), &
    yn(j1:j2,k1:k2,l1:l2), &
@@ -49,7 +50,11 @@ do iz = 1, nmat
   miu(j1:j2,k1:k2,l1:l2) = miu0
   yc(j1:j2,k1:k2,l1:l2) = yc0
 print *, i1, i2
-print *, s1
+do l = l1,l2
+do k = k1,k2
+print *, s1(:,k,l)
+end do
+end do
 end do
 courant = dt * matmax(2) * sqrt( 3. ) / dx   ! TODO: check, make general
 if ( verb > 0 ) print '(a,e8.2)', 'Courant: 1 > ', courant
