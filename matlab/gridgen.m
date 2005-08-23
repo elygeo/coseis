@@ -14,11 +14,13 @@ l3 = one * np(3) - 1;
 j = -halo : l1 + halo;
 k = -halo : l2 + halo;
 l = -halo : l3 + halo;
-i = hypocenter(nrmdim) + halo;
-switch nrmdim
-case 1, j(i:end) = j(i:end) - 1;
-case 2, k(i:end) = k(i:end) - 1;
-case 3, l(i:end) = l(i:end) - 1;
+if nrmdim
+  i = hypocenter(nrmdim) + halo;
+  switch nrmdim
+  case 1, j(i:end) = j(i:end) - 1;
+  case 2, k(i:end) = k(i:end) - 1;
+  case 3, l(i:end) = l(i:end) - 1;
+  end
 end
 l1 = j(end-halo);
 l2 = k(end-halo);
