@@ -54,6 +54,12 @@ courant = dt * matmax(2) * sqrt( 3. ) / dx   ! TODO: check, make general
 if ( verb > 0 ) print '(a,e8.2)', 'Courant: 1 > ', courant
 gam = dt * viscosity
 
+do l = l1, l2
+do k = k1, k2
+  print *, s1(j1:j2,k,l)
+end do
+end do
+
 s2 = 0.
 do iz = 1, noper
   call zoneselect( i1, i2, ioper(iz,:), npg, hypocenter, nrmdim )
@@ -109,11 +115,6 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   + s1(j,k,l-1) + s1(j-1,k-1,l) )
 end forall
 
-do l = l1, l2
-do k = k1, k2
-  print *, rho(j1:j2,k,l)
-end do
-end do
 
 where ( yn /= 0. )  yn  = dt / yn
 where ( rho /= 0. ) rho = dt / rho
