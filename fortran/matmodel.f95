@@ -49,12 +49,6 @@ do iz = 1, nmat
   lam(j1:j2,k1:k2,l1:l2) = lam0
   miu(j1:j2,k1:k2,l1:l2) = miu0
   yc(j1:j2,k1:k2,l1:l2) = yc0
-print *, i1, i2
-do l = l1,l2
-do k = k1,k2
-print *, l, k, s1(j1:j2,k,l)
-end do
-end do
 end do
 courant = dt * matmax(2) * sqrt( 3. ) / dx   ! TODO: check, make general
 if ( verb > 0 ) print '(a,e8.2)', 'Courant: 1 > ', courant
@@ -70,7 +64,9 @@ do iz = 1, noper
   l1 = i1(3); l2 = i2(3)
   call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
 end do
+
 i = hypocenter(nrmdim)
+print *, nrmdim, i
 select case ( nrmdim )
 case(1); s2(i,:,:) = 0; yc(i,:,:) = 0
 case(2); s2(:,i,:) = 0; yc(:,i,:) = 0
