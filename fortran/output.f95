@@ -95,7 +95,7 @@ do iz = 1, nout
   end if
 end do
 
-if ( mod( it, checkpoint ) == 0 ) then
+if ( it /= 0 .and. mod( it, checkpoint ) == 0 ) then
   reclen = floatsize * ( size(v) + size(u) + size(uslip) &
    + size(p1) + size(p2) + size(p3) + size(p4) + size(p5) + size(p6) &
    + size(g1) + size(g2) + size(g3) + size(g4) + size(g5) + size(g6) )
