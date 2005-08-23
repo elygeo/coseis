@@ -45,11 +45,13 @@ for iz = 1:size( operator, 1 )
   j = i1(1):i2(1)-1;
   s2(j,k,l) = dfnc( operator{iz,1}, x, x, dx, 1, 1, j, k, l );
 end
-i = hypocenter(nrmdim);
-switch nrmdim
-case 1, s2(i,:,:) = 0.; yc(i,:,:) = 0.;
-case 2, s2(:,i,:) = 0.; yc(:,i,:) = 0.;
-case 3, s2(:,:,i) = 0.; yc(:,:,i) = 0.;
+if nrmdim
+  i = hypocenter(nrmdim);
+  switch nrmdim
+  case 1, s2(i,:,:) = 0.; yc(i,:,:) = 0.;
+  case 2, s2(:,i,:) = 0.; yc(:,i,:) = 0.;
+  case 3, s2(:,:,i) = 0.; yc(:,:,i) = 0.;
+  end
 end
 
 i1 = halo + [ 0 0 0 ];
