@@ -1,7 +1,6 @@
 %------------------------------------------------------------------------------%
 % FAULT
 
-initialize
 if initialize
 
 fprintf( 'Initialize fault\n' )
@@ -169,7 +168,7 @@ l3 = i1(3); l4 = i2(3);
 tmp = area .* ( rho(j1:j2,k1:k2,l1:l2) + rho(j3:j4,k3:k4,l3:l4) );
 tmp(tmp~=0) = 1 ./ tmp(tmp~=0);
 for i = 1:3
-  tt(:,:,:,i) = tt0(:,:,:,i) + tmp *. ...
+  tt(:,:,:,i) = tt0(:,:,:,i) + tmp .* ...
     ( v(j3:j4,k3:k4,l3:l4,i) + w1(j3:j4,k3:k4,l3:l4,i) ...
     - v(j1:j2,k1:k2,l1:l2,i) - w1(j1:j2,k1:k2,l1:l2,i) );
 end
