@@ -12,9 +12,10 @@ if initialize
   fid = fopen( 'out/endian', 'w' );
   fprintf( fid, '%s\n', endian );
   fclose( fid );
+out
   for iz = 1:size( out, 1 )
     outvar{iz} = out{iz,1};
-    outint(iz) = out{iz,2};
+    outint(iz) = out{iz,2}
     outnc(iz)    = 1;
     outcell(iz)  = 0;
     outfault(iz) = 0
