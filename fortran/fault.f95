@@ -21,7 +21,7 @@ if ( init == 0 ) then
     allocate( uslip(0,0,0) )
     return
   end if
-  if ( verb > 0 ) print '(a)', 'Initialize fault'
+  if ( verb > 1 ) print '(a)', 'Initialize fault'
   if ( nrmdim /= downdim ) then
     dipdim = downdim
     strdim = 6 - dipdim - nrmdim

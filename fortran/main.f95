@@ -3,34 +3,21 @@
 program sord
 use globals
 
-implicit none
-integer :: wt(3), wt_rate
-real :: dwt(2)
-
 print '(a)', 'SORD - Support Opperator Rupture Dynamics'
-call system_clock( count_rate=wt_rate )
-call inputs
+
+call input
+call init
 call gridgen
 call matmodel
 call fault
-call output
-
-print '(a)', 'Main time loop'
-print '(a)', 'Iter  Compute  In/Out   |U|max   |V|max'
-
-it = 0
 
 do while ( it < nt )
   it = it + 1;
-  call system_clock( wt(1) )
-  call vstep
-  call ustep
-  call wstep
-  call system_clock( wt(2) )
-  call output
-  call system_clock( wt(3) )
-  dwt = real( wt(2:3) - wt(1:2) ) / real( wt_rate )
-  print '(i4,x,5(e9.2))', it, dwt, umax, vmax
+  call system_clock( wt(1) ); call vstep
+  call system_clock( wt(2) ); call output( 1 )
+  call system_clock( wt(3) ); call ustep
+  call system_clock( wt(4) ); call wstep
+  call system_clock( wt(5) ); call output( 2 )
 end do
 
 end program

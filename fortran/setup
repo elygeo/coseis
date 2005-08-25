@@ -76,7 +76,8 @@ OBJECT="\\
   hgnc.o \\
   snormals.o \\
   utils.o \\
-  inputs.o \\
+  input.o \\
+  init.o \\
   gridgen.o \\
   matmodel.o \\
   vstep.o \\

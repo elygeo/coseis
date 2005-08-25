@@ -11,6 +11,8 @@ use utils
 implicit none
 integer ic, iid, id, ix, iq, iz
 
+call system_clock( wt(1) )
+
 ! Restoring force
 ! P' + DP = [del]S, F = 1.P'             PML region
 ! F = divS                               non PML region (D=0)
@@ -107,7 +109,7 @@ end do
 ! Fault calculations
 call fault
 
-! Velocity, V = V + dV
+! Locked nodes
 do iz = 1, nlock
   call zoneselect( i1, i2, ilock(iz,:), ng, offset, hypocenter, nrmdim )
   i1 = max( i1, i1node )
@@ -121,7 +123,14 @@ do iz = 1, nlock
   end do
 end do
 
+! Velocity, V = V + dV
 v = v + w1
+
+! Magnitudes
+s1 = sqrt( sum( w1 * w1, 4 ) ) / dt
+s2 = sqrt( sum( v * v, 4 ) )
+amax = maxval( s1 ); amaxi = maxloc( s1 )
+vmax = maxval( s2 ); vmaxi = maxloc( s2 )
 
 end subroutine
 

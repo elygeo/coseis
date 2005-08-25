@@ -1,102 +1,118 @@
 !------------------------------------------------------------------------------!
 ! OUTPUT
 
-subroutine output
+subroutine output( thispass )
 use globals
 use utils
 
 implicit none
 save
-integer :: iz, nc, reclen, floatsize = 4, outnc(nz) = 1, init = 0
+integer, intent(in) :: thispass
+integer :: iz, nc, reclen, floatsize = 4, pass
 character(255) :: ofile
-logical :: doit, fault(nz) = .false., outcell(nz) = .false.
+logical :: fault, cell, static, init = .true., outinit(nz) = .true.
 
-if ( init == 0 ) then
-  init = 1
-  if ( verb > 0 ) print '(a)', 'Initialize output'
-  if ( checkpoint < 0 ) checkpoint = nt + checkpoint + 1
+if ( init ) then
+  init = .false.
+  if ( verb > 1 ) print '(a)', 'Initialize output'
   if ( it == 0 ) then
     call system( 'rm -fr out; mkdir out; mkdir out/ckp; mkdir out/stats' )
   else
     ! FIXME read checkpoint
   end if
-  do iz = 1, nout
-    if ( outint(iz) < 0 ) outint(iz) = nt + outint(iz) + 1
-    select case( outvar(iz) )
-    case( 'x'     ); outnc(iz) = 3
-    case( 'u'     ); outnc(iz) = 3
-    case( 'v'     ); outnc(iz) = 3
-    case( 'w'     ); outnc(iz) = 6; outcell(iz) = .true.
-    case( '|w|'   ); outcell(iz) = .true.
-    case( 'miu'   ); outcell(iz) = .true.
-    case( 'lam'   ); outcell(iz) = .true.
-    case( 'yc'    ); outcell(iz) = .true.
-    case( 'uslip' ); fault(iz) = .true.
-    case( 'vslip' ); fault(iz) = .true.
-    case( 'trup'  ); fault(iz) = .true.
-    end select
-    if ( it == 0 ) then
-      write( ofile, '(a,i2.2)' ) 'mkdir out/', iz
-      call system( ofile )
-      do i = 1, outnc(iz)
-        write( ofile, '(a,i2.2,a,i1)' ) 'mkdir out/', iz, '/', i
-        call system( ofile )
-      end do
-    end if
-  end do
 end if
 
-do iz = 1, nout
-  if ( it == 0 .or. outint(iz) == 0 ) then
-    doit = it == outint(iz)
-  else
-    doit = mod( it, outint(iz) ) == 0
+outer: do iz = 1, nout
+  if ( outit(iz) < 0 ) outit(iz) = nt + outit(iz) + 1
+  if ( outit(iz) == 0 .or. mod( it, outit(iz) ) /= 0 ) cycle outer
+  pass = 2
+  cell = .false.
+  fault = .false.
+  static = .false.
+  select case( outvar(iz) )
+  case( 'a'   ); nc = 3; pass = 1
+  case( 'v'   ); nc = 3; pass = 1
+  case( 'u'   ); nc = 3
+  case( 'w'   ); nc = 6; cell = .true.
+  case( '|a|' ); pass = 1
+  case( '|v|' ); pass = 1
+  case( '|u|' ) 
+  case( '|w|' ); cell = .true.
+  case( 'x'   ); static = .true.; nc = 3
+  case( 'rho' ); static = .true.
+  case( 'yn'  ); static = .true.
+  case( 'lam' ); static = .true.; cell = .true.
+  case( 'miu' ); static = .true.; cell = .true.
+  case( 'yc'  ); static = .true.; cell = .true.
+  case( 'uslip' ); fault = .true.
+  case( 'vslip' ); fault = .true.
+  case( 'trup'  ); fault = .true.
+  end select
+  if ( fault .and. nrmdim == 0 ) then
+    outit(iz) = 0
+    cycle outer
   end if
-  if ( doit ) then
-    call zoneselect( i1, i2, iout(iz,:), ng, offset, hypocenter, nrmdim )
-    if ( any( i1 < i1node .or. i2 > i2node .or. i2 < i1 ) ) stop 'output error'
-    if ( outcell(iz) ) i2 = i2 - 1
-    if ( fault(iz) ) then
-      i1(nrmdim) = 1
-      i2(nrmdim) = 1
-    end if
-    reclen = floatsize * product( i2 - i1 + 1 )
-    j1 = i1(1); j2 = i2(1)
-    k1 = i1(2); k2 = i2(2)
-    l1 = i1(3); l2 = i2(3)
-    do i = 1, outnc(iz)
-      write( ofile, '(a,i2.2,a,i1,a,i5.5)' ) 'out/', iz, '/', i, '/', it
-      open( 9, file=ofile, form='unformatted', access='direct', status='replace', recl=reclen )
-      select case( outvar(iz) )
-      case( 'w'     );
-        if ( i < 4 )   write( 9, rec=1 )    w1(j1:j2,k1:k2,l1:l2,i)
-        if ( i > 3 )   write( 9, rec=1 )    w2(j1:j2,k1:k2,l1:l2,i-3)
-      case( 'x'     ); write( 9, rec=1 )     x(j1:j2,k1:k2,l1:l2,i)
-      case( 'u'     ); write( 9, rec=1 )     u(j1:j2,k1:k2,l1:l2,i)
-      case( 'v'     ); write( 9, rec=1 )     v(j1:j2,k1:k2,l1:l2,i)
-      case( '|v|'   ); write( 9, rec=1 )    s1(j1:j2,k1:k2,l1:l2)
-      case( '|w|'   ); write( 9, rec=1 )    s2(j1:j2,k1:k2,l1:l2)
-      case( 'rho'   ); write( 9, rec=1 )   rho(j1:j2,k1:k2,l1:l2)
-      case( 'lam'   ); write( 9, rec=1 )   lam(j1:j2,k1:k2,l1:l2)
-      case( 'miu'   ); write( 9, rec=1 )   rho(j1:j2,k1:k2,l1:l2)
-      case( 'yn'    ); write( 9, rec=1 )    yn(j1:j2,k1:k2,l1:l2)
-      case( 'yc'    ); write( 9, rec=1 )    yc(j1:j2,k1:k2,l1:l2)
-      case( 'uslip' ); write( 9, rec=1 ) uslip(j1:j2,k1:k2,l1:l2)
-      case( 'vslip' ); write( 9, rec=1 ) vslip(j1:j2,k1:k2,l1:l2)
-      case( 'trup'  ); write( 9, rec=1 )  trup(j1:j2,k1:k2,l1:l2)
-      case default; print '(a)', 'outvar ' // outvar(iz); stop
-      end select
-      close( 9 )
+  if ( pass /= thispass ) cycle outer
+  if ( outinit(iz) ) then
+    outinit(iz) = .false.
+    write( ofile, '(a,i2.2)' ) 'mkdir out/', iz
+    call system( ofile )
+    do i = 1, nc
+      write( ofile, '(a,i2.2,a,i1)' ) 'mkdir out/', iz, '/', i
+      call system( ofile )
     end do
-    write( ofile, '(a,i2.2,a)' ) 'out/', iz, '/hdr'
-    open(  9, file=ofile )
-    write( 9, * ) outnc(iz), i1-offset, i2-offset, outint(iz), it, dt, dx, &
-      outvar(iz)
-    close( 9 )
   end if
-end do
+  call zoneselect( i1, i2, iout(iz,:), ng, offset, hypocenter, nrmdim )
+  if ( any( i1 < i1node .or. i2 > i2node .or. i2 < i1 ) ) stop 'output error'
+  if ( cell ) i2 = i2 - 1
+  if ( fault ) then
+    i1(nrmdim) = 1
+    i2(nrmdim) = 1
+  end if
+  j1 = i1(1); j2 = i2(1)
+  k1 = i1(2); k2 = i2(2)
+  l1 = i1(3); l2 = i2(3)
+  reclen = floatsize * product( i2 - i1 + 1 )
+  inner: do i = 1, nc
+    write( ofile, '(a,i2.2,a,i1,a,i5.5)' ) 'out/', iz, '/', i, '/', it
+    open( 9, file=ofile, form='unformatted', access='direct', status='replace', recl=reclen )
+    select case( outvar(iz) )
+    case( 'a'     ); write( 9, rec=1 ) w1(j1:j2,k1:k2,l1:l2,i)
+    case( 'v'     ); write( 9, rec=1 ) v(j1:j2,k1:k2,l1:l2,i)
+    case( 'u'     ); write( 9, rec=1 ) u(j1:j2,k1:k2,l1:l2,i)
+    case( 'w'     );
+      if ( i < 4 )   write( 9, rec=1 ) w1(j1:j2,k1:k2,l1:l2,i)
+      if ( i > 3 )   write( 9, rec=1 ) w2(j1:j2,k1:k2,l1:l2,i-3)
+    case( '|a|'   ); write( 9, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
+    case( '|v|'   ); write( 9, rec=1 ) s2(j1:j2,k1:k2,l1:l2)
+    case( '|u|'   ); write( 9, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
+    case( '|w|'   ); write( 9, rec=1 ) s2(j1:j2,k1:k2,l1:l2)
+    case( 'x'     ); write( 9, rec=1 ) x(j1:j2,k1:k2,l1:l2,i)
+    case( 'rho'   ); write( 9, rec=1 ) rho(j1:j2,k1:k2,l1:l2)
+    case( 'lam'   ); write( 9, rec=1 ) lam(j1:j2,k1:k2,l1:l2)
+    case( 'miu'   ); write( 9, rec=1 ) rho(j1:j2,k1:k2,l1:l2)
+    case( 'yn'    ); write( 9, rec=1 ) yn(j1:j2,k1:k2,l1:l2)
+    case( 'yc'    ); write( 9, rec=1 ) yc(j1:j2,k1:k2,l1:l2)
+    case( 'uslip' ); write( 9, rec=1 ) uslip(j1:j2,k1:k2,l1:l2)
+    case( 'vslip' ); write( 9, rec=1 ) vslip(j1:j2,k1:k2,l1:l2)
+    case( 'trup'  ); write( 9, rec=1 ) trup(j1:j2,k1:k2,l1:l2)
+    case default; print '(a)', 'outvar ' // outvar(iz); stop
+    end select
+    close( 9 )
+    if ( static ) outit(iz) = 0
+  end do inner
+  write( ofile, '(a,i2.2,a)' ) 'out/', iz, '/hdr'
+  open(  9, file=ofile )
+  write( 9, * ) nc, i1-offset, i2-offset, outit(iz), it, dt, dx
+  write( 9, * ) outvar(iz)
+  close( 9 )
+end do outer
 
+if ( pass == 1 ) return
+
+if ( checkpoint < 0 ) checkpoint = nt + checkpoint + 1
 if ( it /= 0 .and. mod( it, checkpoint ) == 0 ) then
+  if ( verb > 1 ) print '(a)', 'Writing checkpoint file'
   reclen = floatsize * ( size(v) + size(u) + size(uslip) &
    + size(p1) + size(p2) + size(p3) + size(p4) + size(p5) + size(p6) &
    + size(g1) + size(g2) + size(g3) + size(g4) + size(g5) + size(g6) )
@@ -109,9 +125,14 @@ if ( it /= 0 .and. mod( it, checkpoint ) == 0 ) then
   close( 9 )
 end if
 
+call system_clock( wt(6) )
+dwt(1:5) = real( wt(2:6) - wt(1:5) ) / real( wt_rate )
+dwt(6)   = real( wt(6)   - wt(1) )   / real( wt_rate )
+if ( verb > 0 ) print '(i4,x,10(e9.2))', it, amax, vmax, umax, wmax, dwt
+
 write( ofile, '(a,i5.5)' ) 'out/stats/', it
 open(  9, file=ofile )
-write( 9, * ) umax, vmax, wmax
+write( 9, * ) it, amax, vmax, umax, wmax, dwt
 close( 9 )
 
 open(  9, file='out/timestep' )

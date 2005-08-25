@@ -168,13 +168,11 @@ end do
 ! Moment source
 !if msrcradius, momentsrc, end
 
-s1 = sum( u * u, 4 ); umax = maxval( s1 ); umaxi = maxloc( s1 )
-s1 = sum( v * v, 4 ); vmax = maxval( s1 ); vmaxi = maxloc( s1 )
-s2 = sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 )
+! Magnitudes
+s1 = sqrt( sum( u * u, 4 ) )
+s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
+umax = maxval( s1 ); umaxi = maxloc( s1 )
 wmax = maxval( s2 ); wmaxi = maxloc( s2 )
-umax = sqrt( umax )
-vmax = sqrt( vmax )
-wmax = sqrt( wmax )
 if ( umax > dx / 10. ) print *, 'Warning: u !<< dx\n'
 
 end subroutine
