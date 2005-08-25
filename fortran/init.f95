@@ -1,6 +1,8 @@
 !------------------------------------------------------------------------------!
 ! INIT
 
+module init_m
+contains
 subroutine init
 use globals
 
@@ -23,4 +25,5 @@ i2cellpml = i2cell - bc(4:6) * npml
 ip = 0
 
 end subroutine
+end module
 
