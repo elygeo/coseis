@@ -100,17 +100,15 @@ for iz = 1:size( locknodes, 1 )
 end
 v = v + w1;
 
-% peak acceleration
+% add plane wave
+if planewavedim, planewave, end
+
+% Magnitudes
 s1 = sum( w1 .* w1, 4 ); [ amax, amaxi ] = max( s1(:) );
 s2 = sum( v .* v, 4 );   [ vmax, vmaxi ] = max( s2(:) );
 amax = sqrt( amax ) / dt;
 vmax = sqrt( vmax );
 
-% add plane wave
-if planewavedim, planewave, end
-
 % Displacement
 u = u + dt * v;
-
-laststep = 'v';
 

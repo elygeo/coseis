@@ -51,7 +51,7 @@ if initialize
 end
 
 for iz = 1:size( out, 1 )
-  if outint(iz) & ~mod( it, outint(iz) ) & pass(iz) == laststep
+  if outint(iz) & ~mod( it, outint(iz) ) & pass(iz) == thispass
     [ i1, i2 ] = zoneselect( [out{iz,3:8}], halo, np, hypocenter, nrmdim );
     if outcell(iz); i2 = i2 - 1; end
     if outfault(iz)
@@ -98,7 +98,7 @@ for iz = 1:size( out, 1 )
   end
 end
 
-if laststep == 'v', return, end
+if thispass == 1, return, end
 
 if checkpoint & ~mod( it, checkpoint )
   if nrmdim, save checkpoint it u v uslip trup

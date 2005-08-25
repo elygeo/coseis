@@ -1,23 +1,23 @@
 #!/bin/bash -e
 
-rundir=$( pwd )
+
+files="
+  sord/readme
+  sord/fortran/*.f95
+  sord/fortran/sord
+  sord/fortran/tarball
+  sord/fortran/in
+  sord/fortran/defaults
+  sord/matlab/*.m
+  sord/matlab/sord
+  sord/matlab/tarball
+  sord/matlab/batchjob"
 
 cd ../..
 
-gtar -zcvf sord/sord.tgz \
-  sord/readme \
-  sord/fortran/*.f95 \
-  sord/fortran/sord \
-  sord/fortran/tarball \
-  sord/fortran/in \
-  sord/fortran/defaults \
-  sord/matlab/sord \
-  sord/matlab/batchjob \
-  sord/matlab/*.m
-
-cd sord
+tar zcvf sord/sord.tgz $files
 
 tag=$( date +%Y-%m-%d-%H-%M-%S )
 
-cp sord.tgz "save/sord-$tag.tgz"
+cp sord/sord.tgz "sord/save/sord-$tag.tgz"
 

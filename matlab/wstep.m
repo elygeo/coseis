@@ -98,7 +98,7 @@ end
 % Moment source
 if msrcradius, momentsrc, end
 
-% Stats
+% Magnitudes
 s1 = sum( u .* u, 4 );
 s2 = sum( w1 .* w1, 4 ) + 2 * sum( w2 .* w2, 4 );
 [ umax, umaxi ] = max( s1(:) );
@@ -109,4 +109,3 @@ if umax > dx / 10
   fprintf( 'Warning: u !<< dx\n' )
 end
 
-laststep = 'w';
