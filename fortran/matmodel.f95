@@ -63,7 +63,7 @@ end do
 print *, 1234, i1, i2
 do l = l1, l2
 do k = k1, k2
-  print *, s1(:,k,l)
+  print *, s1(j1:j2,k,l)
 end do
 end do
 
