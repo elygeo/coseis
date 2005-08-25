@@ -11,10 +11,9 @@ gtar -zcvf sord/sord.tgz \
   sord/fortran/tarball \
   sord/fortran/in \
   sord/fortran/defaults \
-  sord/matlab/*.m \
   sord/matlab/sord \
-  sord/matlab/tarball
   sord/matlab/batchjob \
+  sord/matlab/*.m
 
 cd sord
 
