@@ -44,6 +44,7 @@ inner: do
   case( 'nrmdim' );     read( a, * ) key, nrmdim
   case( 'hypocenter' ); read( a, * ) key, hypocenter
   case( 'rcrit' );      read( a, * ) key, rcrit
+  case( 'vrup' );       read( a, * ) key, vrup
   case( 'nclramp' );    read( a, * ) key, nclramp
   case( 'locknodes' )
     nlock = nlock + 1
