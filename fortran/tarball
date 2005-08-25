@@ -1,12 +1,14 @@
 #!/bin/bash -e
 
-cd ..
+rundir=$( pwd )
+
+cd ../..
 
 gtar -zcvf sord/sord.tgz \
   sord/readme \
-  sord/tarball \
   sord/fortran/*.f95 \
   sord/fortran/sord \
+  sord/fortran/tarball \
   sord/fortran/in \
   sord/fortran/defaults \
   sord/matlab/sord \
