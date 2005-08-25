@@ -11,20 +11,20 @@ end
 l1 = one * np(1) - 1;
 l2 = one * np(2) - 1;
 l3 = one * np(3) - 1;
-j = -halo : l1 + halo;
-k = -halo : l2 + halo;
-l = -halo : l3 + halo;
+j = -nhalo : l1 + nhalo;
+k = -nhalo : l2 + nhalo;
+l = -nhalo : l3 + nhalo;
 if nrmdim
-  i = hypocenter(nrmdim) + halo;
+  i = hypocenter(nrmdim) + nhalo;
   switch nrmdim
   case 1, j(i:end) = j(i:end) - 1;
   case 2, k(i:end) = k(i:end) - 1;
   case 3, l(i:end) = l(i:end) - 1;
   end
 end
-l1 = j(end-halo);
-l2 = k(end-halo);
-l3 = l(end-halo);
+l1 = j(end-nhalo);
+l2 = k(end-nhalo);
+l3 = l(end-nhalo);
 [s1, s2, s3] = ndgrid( j, k, l ); % ALLOC
 x  = repmat( zero, [ nm 3 ] );    % ALLOC
 u  = repmat( zero, [ nm 3 ] );    % ALLOC

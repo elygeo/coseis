@@ -34,8 +34,8 @@ else
   slicedim = abs( xhairmove );
   i = slicedim;
   if length( hhud ), xhair(i) = xhair(i) + way; end
-  xhair = max( xhair, halo + 1 );
-  xhair = min( xhair, halo + np - cellfocus );
+  xhair = max( xhair, nhalo + 1 );
+  xhair = min( xhair, nhalo + np - cellfocus );
 end
 delete( [ hhud hhelp ] )
 hhelp = [];
@@ -139,9 +139,9 @@ if panviz
   camtarget( xhairtarg )
 end
 if dooutline && ~volviz && ( dosurf || domesh || doglyph  )
-  points = halo + [ 1 1 1 np ];
-  i1 = halo + [ 1 1 1 ];
-  i2 = halo + np;
+  points = nhalo + [ 1 1 1 np ];
+  i1 = nhalo + [ 1 1 1 ];
+  i2 = nhalo + np;
   i1(slicedim) = xhair(slicedim);
   i2(slicedim) = xhair(slicedim) + cellfocus;
   i  = [ i1; i1+1; i2; i2-1 ];

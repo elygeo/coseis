@@ -21,8 +21,8 @@ for id = [ ic:3 1:ic-1 ];
       s2(j,k,l) = dfcn( op, w2, x, dx, ix, id, j, k, l );
     end
   end
-  i1 = halo + [ 1 1 1 ];
-  i2 = halo + np;
+  i1 = nhalo + [ 1 1 1 ];
+  i2 = nhalo + np;
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
@@ -66,8 +66,8 @@ for i = 1:3
 end
 
 % Hourglass correction
-i1 = halo + [ 1 1 1 ];
-i2 = halo + np;
+i1 = nhalo + [ 1 1 1 ];
+i2 = nhalo + np;
 s1(:) = 0;
 s2(:) = 0;
 w2 = u + gamma(2) .* v;
@@ -100,5 +100,17 @@ for iz = 1:size( locknodes, 1 )
 end
 v = v + w1;
 
+% peak acceleration
+s1 = sum( w1 .* w1, 4 ); [ amax, amaxi ] = max( s1(:) );
+s2 = sum( v .* v, 4 );   [ vmax, vmaxi ] = max( s2(:) );
+amax = sqrt( amax ) / dt;
+vmax = sqrt( vmax );
+
+% add plane wave
 if planewavedim, planewave, end
+
+% Displacement
+u = u + dt * v;
+
+laststep = 'v';
 

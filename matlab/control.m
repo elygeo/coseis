@@ -1,6 +1,8 @@
 %------------------------------------------------------------------------------%
 % CONTROL
 
+if ~gui, return, end
+
 if ~length( keypress )
   keypress = get( gcf, 'CurrentKey' );
   keymod   = get( gcf, 'CurrentMod' );

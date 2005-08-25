@@ -4,7 +4,7 @@
 lines = volumes;
 lineviz
 houtline = hand;
-i = halo + 1;
+i = nhalo + 1;
 xg = double( squeeze( x(i,i,i,:) + xscl * u(i,i,i,:) ) );
 xg = [ xg xg + xmax / 16 xg + xmax / 15 ];
 j = [ 4 1 1 1 1 ];

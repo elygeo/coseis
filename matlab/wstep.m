@@ -22,8 +22,8 @@ for id = 1:3
     s2(j,k,l) = dfnc( op, s1, x, dx, 1, id, j, k, l );
   end
   op = operator{1,1};
-  i1 = halo + [ 1 1 1 ];
-  i2 = halo + np - 1;
+  i1 = nhalo + [ 1 1 1 ];
+  i2 = nhalo + np - 1;
   j = i1(1):i2(1);
   k = i1(2):i2(2);
   l = i1(3):i2(3);
@@ -98,3 +98,15 @@ end
 % Moment source
 if msrcradius, momentsrc, end
 
+% Stats
+s1 = sum( u .* u, 4 );
+s2 = sum( w1 .* w1, 4 ) + 2 * sum( w2 .* w2, 4 );
+[ umax, umaxi ] = max( s1(:) );
+[ wmax, wmaxi ] = max( s2(:) );
+umax = sqrt( umax );
+wmax = sqrt( wmax );
+if umax > dx / 10
+  fprintf( 'Warning: u !<< dx\n' )
+end
+
+laststep = 'w';

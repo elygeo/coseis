@@ -13,7 +13,7 @@ matmax = material(1,1:3);
 matmin = material(1,1:3);
 for iz = 1:size( material, 1 )
   zone = material(iz,4:9);
-  [ i1, i2 ] = zoneselect( zone, halo, np, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
   rho0  = material(iz,1);
   vp    = material(iz,2);
   vs    = material(iz,3);
@@ -37,7 +37,7 @@ gamma = dt * viscosity;
 
 for iz = 1:size( operator, 1 )
   zone = [ operator{iz,2:7} ];
-  [ i1, i2 ] = zoneselect( zone, halo, np, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
   opi1(iz,:) = i1;
   opi2(iz,:) = i2;
   l = i1(3):i2(3)-1;
@@ -54,8 +54,8 @@ if nrmdim
   end
 end
 
-i1 = halo + [ 0 0 0 ];
-i2 = halo + np;
+i1 = nhalo + [ 0 0 0 ];
+i2 = nhalo + np;
 if bc(1), i = i1(1); s1(i,:,:) = s1(i+1,:,:); s2(i,:,:) = s2(i+1,:,:); end
 if bc(4), i = i2(1); s1(i,:,:) = s1(i-1,:,:); s2(i,:,:) = s2(i-1,:,:); end
 if bc(2), i = i1(2); s1(:,i,:) = s1(:,i+1,:); s2(:,i,:) = s2(:,i+1,:); end
@@ -63,8 +63,8 @@ if bc(5), i = i2(2); s1(:,i,:) = s1(:,i-1,:); s2(:,i,:) = s2(:,i-1,:); end
 if bc(3), i = i1(3); s1(:,:,i) = s1(:,:,i+1); s2(:,:,i) = s2(:,:,i+1); end
 if bc(6), i = i2(3); s1(:,:,i) = s1(:,:,i-1); s2(:,:,i) = s2(:,:,i-1); end
 
-i1 = halo + [ 1 1 1 ];
-i2 = halo + np;
+i1 = nhalo + [ 1 1 1 ];
+i2 = nhalo + np;
 l = i1(3):i2(3);
 k = i1(2):i2(2);
 j = i1(1):i2(1);
@@ -97,7 +97,7 @@ if length( locknodes )
 end
 for iz = 1:size( locknodes, 1 )
   zone = locknodes(iz,4:9);
-  [ i1, i2 ] = zoneselect( zone, halo, np, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
   locki1(iz,:) = i1;
   locki2(iz,:) = i2;
 end

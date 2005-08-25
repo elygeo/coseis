@@ -1,0 +1,21 @@
+#!/bin/bash -e
+
+cd ..
+
+gtar -hzc -f sord/sord.tgz \
+  sord/readme \
+  sord/tarball \
+  sord/fortran/*.f95 \
+  sord/fortran/sord \
+  sord/fortran/in \
+  sord/fortran/defaults \
+  sord/matlab/sord \
+  sord/matlab/batchjob \
+  sord/matlab/*.m
+
+cd sord
+
+tag=$( date +%Y-%m-%d-%H-%M-%S )
+
+cp sord.tgz "save/sord-$tag.tgz"
+

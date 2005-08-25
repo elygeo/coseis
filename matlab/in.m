@@ -1,14 +1,13 @@
 %------------------------------------------------------------------------------%
-% INPUTS
+% IN
 
-defaults
 model = 'normal';
 model = 'the3';
 model = 'strikeslip';
 model = 'explosion';
 model = 'boris';
-model = 'kostrov';
 model = 'test';
+model = 'kostrov';
 switch model
 case 'test'
   nrmdim = 0;

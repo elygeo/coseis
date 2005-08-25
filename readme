@@ -1,0 +1,368 @@
+--------------------------------------------------------------------------------
+
+SORD: Support-Operator Rupture Dynamics
+
+Sord models spontaneous rupture on a fault within a 3D isotropic viscoelastic
+solid.  The equations of motion are approximated with second order a
+Support-Operator method on a logically rectangular mesh.  The fault is modeled
+with a slip-weakening, frictional, internal boundary condition. 
+
+Author:
+Geoffrey Ely
+Institute of Geophysics and Planetary Physics
+Scripps Institution of Oceanography
+University of California, San Diego
+9500 Gilman Dr.
+La Jolla, CA 92093-0225
+gely@ucsd.edu
+
+To run the Fortran code:
+  cd fortran
+  edit 'in'
+  ./sord
+
+  For a new machine, you may have to modify 'setup' for the proper
+  compiling and batch submission parameters.
+
+  The parallel version requires MPI
+
+To run the Matlab version:
+  cd matlab
+  edit 'in.m'
+  ./sord
+
+--------------------------------------------------------------------------------
+
+COORDINATE SYSTEM
+ 
+      v---------v                        o----x----o         w----1----w
+     /         /|                       /         /|        /         /|
+    /    .----. |            k         y    3----y |       2    z----2 |
+   /    /|   /| |           /         /    /|   /| z      /    /    /| 3
+  v----.----v | |     j----0         o----x----o | |     w----1----w | |
+  |    | w--|-' |          |         |    | w--|-1 |     |    |    | x |
+  |    |/   |/  v          |         |    |/   |/  o     |    |    |/  w
+  |    '----'  /           l         z    2----z  /      3    y----3  / 
+  |         | /                      |         | y       |         | y  
+  |         |/                       |         |/        |         |/   
+  v---------v                        o----x----o         w----1----w    
+                                                       
+  Non-staggered                      Staggered (1)       Staggered (2)
+                                   
+  v: v = velocity                    1 2 3: vx vy vz = velocity        
+     u = displacement                x y z: wyz wzx wxy = shear stress 
+     x = node locations                  w: wxx wyy wzz = normal stress
+     rho = density                          rho lam miu = material props
+  w: w = stress                             x = node locations (2) 
+     lam miu = elastic moduli            o: x = node locations (1) 
+
+
+COMPUTATIONAL CYCLE
+ 
+U = displacement vector
+V = velocity vector
+A = acceleration vector
+W = stress tensor
+rho = density
+c lam miu = elastic moduli
+ 
+Linearized conservation of momentum, Newton's 2nd law
+  A = divW/rho
+  (hourglass corrections)
+  (Fault boundary condition)
+  V' = A
+  U' = V
+Modified displacement
+  U~ = U + dt*beta*V
+Strain
+  E = [gradU~ + (gradU~)^T]/2
+Stress-strain constitutive law
+  W = c:E
+Viscoelastic solid, Kelvin-Voight model, linear, isotropic,
+spring and dashpot in parallel
+  W = lam*trace(E)*I + 2*miu*E
+Moment tensor source
+  W = W + M'*dt
+
+
+FAULT BOUNDARY CONDITION
+
+n   = fault normal vector, n points toward the positive side of the fault
+T   = traction exerted by the positive side
+T0  = initial traction
+Wn0 = initial normal component of stress
+R   = restoring force on a node
+m   = nodal mass
+s   = element area
+F   = friction, |Ts| cannot exceed friction
+
+Acceleration and velocity of the double nodes due to restoring forces
+and traction.
+
+with no fault
+A0 = A1 = (R0+R1)/(m0+m1)
+
+- side acc   A0 = [R0 + s*(T-T0)]/m0	
++ side acc   A1 = [R1 - s*(T-T0)]/m1
+
+- side vel   V0_ = V0 + dt*[R0 + s*(T-T0)]/m0
++ side vel   V1_ = V1 + dt*[R1 - s*(T-T0)]/m1
+
+- side disp  U0_ = U0 + dt*{ V0(t0) + dt*[R0 + s*(T-T0)]/m0 }
++ side disp  U1_ = U1 + dt*{ V1(t0) + dt*[R1 - s*(T-T0)]/m1 }
+
+dA = A1 - A0
+   = (R1/m1-R0/m0) - s*(1/m1+1/m0)*(T-T0)
+
+dV = V1_ - V0_
+   = V1-V0 + dt*dA
+   = V1-V0 + dt*(R1/m1-R0/m0) - dt*s*(1/m1+1/m0)*(T-T0)
+
+dU = U1_ - U0_
+   = U1-U0 + dt*dV
+   = U1-U0 + dt*(V1-V0) + dt^2*(R1/m1-R0/m0) - dt^2*s*(1/m1+1/m0)*(T-T0)
+
+Zero relative acceleration boundary condition
+dA = 0
+Ta = T0 + (R1/m1-R0/m0) / [s*(1/m1+1/m0)]
+
+Zero relative velocity boundary condition
+dV = 0
+Tv = T0 + [V1-V0 + dt*(R1/m1-R0/m0)] / [dt*s*(1/m1+1/m0)]
+   = Ta + (V1-V0) / [dt*s*(1/m1+1/m0)]
+
+Zero relative normal displacement boundary condition
+dU = 0
+Tu = T0 + [U1-U0 + dt*(V1-V0) + dt^2*(R1/m1-R0/m0)] / [dt^2*s*(1/m1+1/m0)]
+   = Tv + (U1-U0) / [dt^2*s*(1/m1+1/m0)]
+
+Shear component of traction is bounded by friction
+Ts = Tv.(I-nn)
+Ts~ = / Ts,         |Ts| <= F
+      \ F*Ts/|Ts|,  |Ts| >  F
+
+Fault cannot open
+Tn = Tv.n
+
+Normal component of traction is bounded by cohesion (fault can open)
+Tn = Tu.n
+   = (Tv + U1-U0).n / [dt^2*s*(1/m1+1/m0)]
+Tn~ = / Tn,     Tn <= cohes
+      \ cohes,  Tn >  cohes
+
+Total traction bounded by friction
+T~ = Tn~.n + Ts~
+
+Update velocities
+V0_ = V0 + dt*(R0 + s*(T~-T0))/m0
+V1_ = V1 + dt*(R1 - s*(T~-T0))/m1
+
+DFM fault boundary condition
+T = T0 + [R1*m0-R0*m1 + m1*m0*(v1-v0)/dt] / [s*(m1+m0)]
+
+
+SLIP-WEAKENING FRICTION LAW
+
+l    = slip length
+u(l) = coefficient of friction
+us   = coefficient of static friction
+ud   = coefficient of dynamic friction
+d0   = slip weakening distance
+
+F = u(l) * T.n + cohesion
+u(l) = / us - (us-ud)*l/d0,  l <= d0
+       \ ud,                 l >  d0
+
+
+       us +
+          |\
+ ^ T0/Wn0 + \
+ |        |  \
+ u     ud +   +---------
+          |
+          +---+---------
+             d0   l->
+
+
+Strength parameter
+s = (Tu - T0)/(T0 - Tf)
+
+Estimate critical radius needed for spontaneous rupture
+rc =~  miu*d0*(Tu - Tf)/(T0 - Tf)^2
+
+Estimate d0 needed to resolve breakdown zone
+d0 =~ (3 or 4)*dx*(Tu - Tf)/miu
+
+
+
+KOSTROV SOLUTION
+
+Kostrov, 1964
+
+Circular crack expanding at a uniform rupture velocity
+
+vslip = C * dT / miu * vs * t / sqrt(t^2-(r/vrup)^2) * heaviside(t-r/vrup)
+
+dT   = stress drop
+vs   = sqrt( vp^2 / 3 )   (Poisson's ratio, nu = .25)
+vrup = 0.9 * vs
+C    = .81 for given nu and vrup (Dahlen, 1974)
+
+
+
+HOURGLASS CORRECTIONS
+
+One of the first works in this direction was presented by Kosloff and Frazier (1978), but in their formulation it is necessary to solve 4 systems of 8 equations for distorted three-dimensional elements, and this is not cost efficient for dynamic analysis.
+Flanagan and Belytschko (1981), Belytschko (1983), and Belytschko, Ong, Liu and Kennedy (1984) presented a systematic and effective way to hourglass control, but in both formulations a parameter, to be defined by the user, is required.  
+Belytschko and Binderman (1993) implemented the hourglass control of the eight-node hexahedral element, where the stabilization parameter is not required, although the stabilization matrix still depends on the Poisson coefficient; the aspect was eliminated by Liu, Hu and Belytschko (1994).
+
+Kosloff, D. and Frazier, G. A.,1978, "Treatment of hourglass patterns in low-order finite element codes", Int. J. Num. Analyt. Meth. Geomech., vol. 2, pp. 57-72.
+
+
+***Flanagan, D. P. and Belytschko, T.,1981, "A uniform strain hexahedron and quadrilateral with orthogonal hourglass control", Int. J. Num. Meth. Engng., vol. 17, pp. 679-706.
+
+Belytschko, T.,1983, "Correction of article by D. P. Flanagan and T. Belytschko", Int. J. Num. Meth. Engng., vol. 19, pp. 467-468.
+
+Belytschko, T., Ong, J. S-J., Liu, W. K. and Keneddy, J. M., 1984, "Hourglass control in linear and nonlinear problems", Comp. Meth. Appl. Mech. Engng., vol. 43, pp. 251-276.
+
+
+
+***Belytschko, T. and Binderman, L. P., 1993, "Assumed strain stabilization of the eight-node hexahedral element", Comp. Meth. Appl. Mech. Engng., vol. 105, pp. 225-260.
+
+Liu, W. K., Hu,Y. K. and Belytschko, T.,1994, "Multiple quadrature underintegrated finite elements", Int. J. Num. Meth. Engng., vol. 37, pp. 3263-3289.
+
+
+From LS_DYNA theoretica manual:
+
+Belytschko, T., Wong, B. L. and Chiang, H. Y., 1992, "Advances in one-point quadrature", Int. J. Num. Meth. Engng., vol. 96, pp. 93-107.
+
+Wilkins et al, "A Method for Computer Simulation of Problems in Solid Mechanics and Gas Dynamics in Three Dimensions and Time", UC, LLNL, Rept. UCRL-51574 (1974)
+
+Deformation Modes for hexahedron: 8 * 3 = 24 degrees of freedom
+
+Rigid Body: 6 = 3 translation + 3 rotation
+
+Uniform strain: 6
+
+   0----x      .----O      .----.      .----.
+  /|          /|   /|     /|   /|     /|   /|
+ y |         .----O |    O----O |    .----. |
+   z         | '--|-O    | '--|-'    | O--|-O
+             |/   |/     |/   |/     |/   |/ 
+             '----O      O----O      O----O  
+               Z1          Z2          Z3
+
+Nonuniform strain: 12 = 24 DOF - 6 rigid body - 6 uniform strain
+
+   .----.      .----O      .----O      O----.
+  /|   /|     /|   /|     /|   /|     /|   /|
+ O----O |    .----O |    O----. |    .----O |
+ | O--|-O    | O--|-'    | '--|-O    | '--|-O
+ |/   |/     |/   |/     |/   |/     |/   |/ 
+ '----'      O----'      O----'      O----'  
+  Z2 Z3       Z3 Z1       Z1 Z2      Z1 Z2 Z3
+
+Y = miu*(lam+miu)/6/(lam+2*miu)
+
+Q = Y*dU*dx^2*dy^2/dv^2
+A = dQ/dv/rho
+
+Q = Y*dU*/h^2
+A = dQ/h^3/rho
+
+MOMENT SOURCE
+
+del2phi - phi''/vp^2 = - 4*pi*delta(r)f(t)
+phi = -f(t - t/vp)/r
+
+Brune Source
+M   = -M0 * H / T   * e^(-t/T) * (t + T) + M0
+M'  =  M0 * H / T^2 * e^(-t/T) *  t
+M'' = -M0 * H / T^3 * e^(-t/T) * (t - T)
+
+
+
+Smooth Brune
+M   = -H * M0 / 2 / T^2 * e^(-t/T) * (t^2 + 2*t*T + 2*T^2) + M0
+M'  =  H * M0 / 2 / T^3 * e^(-t/T) *  t^2
+M'' = -H * M0 / 2 / T^4 * e^(-t/T) * (t^2 - 2*t*T)
+
+
+
+PML ABSORBING BOUNDARY
+
+Damping operator
+D     = [ d(x)  0     0
+          0     d(y)  0
+          0     0     d(z) ]
+
+Partial derivative operator
+[del] = [ d/dx  0     0
+          0     d/dy  0
+          0     0     d/dz ]
+
+Olsen no PML
+F = divW
+V' = F/rho
+G = gradV
+W' = lam*trace(G)*I + miu*(G + G^T)
+
+SORD Hourglass
+F = divW + hourglass
+V' = F/rho
+U' = V
+G = grad(U + gamma*V)
+W = lam*trace(G)*I + miu*(G + G^T)
+
+SORD PML
+if D == 0
+  F = divW
+else
+  P' + DP = [del]W
+  F = 1.P'
+end
+V' = F/rho
+U' = V
+if D == 0
+  G = gradU
+else
+  G' + DG = gradV
+end
+W = lam*trace(G)*I + miu*(G + G^T)
+
+PML Discretization
+(p2 - p1)/dt   + d*(p2 + p1)/2 = dW/dx
+(p2 - p1)/dt*2 + d*(p2 + p1)   = 2*dW/dx
+(p2 - p1)/dt*(2 + d*dt) + 2*d*p1 = 2*dW/dx
+(p2 - p1)/dt = -2*d/(2 + d*dt)*p1 + 2/(2 + d*dt)*dW/dx
+v2 = v1 + (p2 - p1)/dt/rho
+u2 = u1 + v * dt
+(g2 - g1)/dt  + d*(g2 + g1)/2  = dv/dx
+g2 = (2 - d*dt)/(2 + d*dt)*g1 + 2*dt/(2 + d*dt)*dv/dx
+s  = c:g
+
+nb  = PML thickness (in nodes)
+i   = node index counted from the PML interface
+d   = d0 * (i/nb)^2
+d0  = t*vs0/h*( c1 + c2*nb + c3*nb^2 )
+t   = 3.5
+vs0 = 2 / ( 1/max(vs) + 1/min(vs) )
+c1  =  8/15
+c2  = -3/100
+c3  =  1/1500
+
+
+REYNOLDS GLYPH
+
+r = Wij ni nj
+
+Vector
+
+r = v^p * |cos(f)|^p
+x = r * [ sin(f) * cos(t)
+          sin(f) * sin(t)
+          cos(f) ]
+n = [ (p+1) * sin(f)^2 * cos(t)
+      (p+1) * sin(f)^2 * sin(t)
+      sin(f) / |cos(f)| * ( cos(f)^2 - p*sin(f)^2 ) ]
+

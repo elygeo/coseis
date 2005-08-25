@@ -1,6 +1,8 @@
 %------------------------------------------------------------------------------%
 % FAULT
 
+if ~nrmdim; return; end
+
 if initialize
 
 fprintf( 'Initialize fault\n' )
@@ -24,7 +26,7 @@ str    = repmat( 0, [ nf 3 ] );
 dip    = repmat( 0, [ nf 3 ] );
 for iz = 1:size( friction, 1 )
   zone = friction(iz,5:10);
-  [ i1, i2 ] = zoneselect( zone, halo, np, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
   i1 = max( i1, i1pml );
   i2 = min( i2, i2pml );
   i1(nrmdim) = 1;
@@ -39,7 +41,7 @@ for iz = 1:size( friction, 1 )
 end
 for iz = 1:size( traction, 1 )
   zone = traction(iz,4:9);
-  [ i1, i2 ] = zoneselect( zone, halo, np, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
   i1 = max( i1, i1pml );
   i2 = min( i2, i2pml );
   i1(nrmdim) = 1;
@@ -53,7 +55,7 @@ for iz = 1:size( traction, 1 )
 end
 for iz = 1:size( stress, 1 )
   zone = stress(iz,7:12);
-  [ i1, i2 ] = zoneselect( zone, halo, np, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
   i1 = max( i1, i1pml );
   i2 = min( i2, i2pml );
   i1(nrmdim) = 1;
@@ -68,8 +70,8 @@ for iz = 1:size( stress, 1 )
   w0(j1:j2,k1:k2,l1:l2,5) = stress(iz,5);
   w0(j1:j2,k1:k2,l1:l2,6) = stress(iz,6);
 end
-i1 = halo + [ 1 1 1 ];
-i2 = halo + np;
+i1 = nhalo + [ 1 1 1 ];
+i2 = nhalo + np;
 i1(nrmdim) = hypocenter(nrmdim);
 i2(nrmdim) = hypocenter(nrmdim);
 j1 = i1(1); j2 = i2(1);
@@ -143,6 +145,10 @@ rcritr = miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2;
 fprintf( 1, 'S: %g\n', strength )
 fprintf( 1, 'dc: %g > %g\n', dc0, dcr )
 fprintf( 1, 'rcrit: %g > %g\n', rcrit, rcritr )
+uslipmax = 0;
+vslipmax = 0;
+tnmax = 0;
+tsmax = 0;
 return
 
 end
@@ -222,6 +228,12 @@ tt = v(j3:j4,k3:k4,l3:l4,:) + w1(j3:j4,k3:k4,l3:l4,:) ...
    - v(j1:j2,k1:k2,l1:l2,:) - w1(j1:j2,k1:k2,l1:l2,:);
 vslip = sum( tt .* tt, 4 );
 vslip = sqrt( vslip );
+
+uslip = uslip + dt * vslip;
+uslipmax = max( abs( uslip(:) ) );
+vslipmax = max( abs( vslip(:) ) );
+tnmax = max( abs( tn(:) ) );
+tsmax = max( abs( ts(:) ) );
 
 if truptol
   i1 = hypocenter;

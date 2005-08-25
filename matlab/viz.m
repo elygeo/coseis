@@ -4,7 +4,10 @@
 % initial plot: mesh, prestress, hypo
 % restart capable
 
+if plotstyle, else return, end
+
 if initialize > 1
+  initialize = 1
   if ~ishandle(1), figure(1), end
   set( 0, 'CurrentFigure', 1 )
   clf
@@ -125,8 +128,8 @@ if nrmdim
   volumes(2,i) = [ 0 -1 ];
 end
 slices = [ 1 1 1   -1 -1 -1 ];
-slices(slicedim)   = xhair(slicedim) - halo;
-slices(slicedim+3) = xhair(slicedim) - halo + cellfocus;
+slices(slicedim)   = xhair(slicedim) - nhalo;
+slices(slicedim+3) = xhair(slicedim) - nhalo + cellfocus;
 if nrmdim & slicedim ~= nrmdim
   slices = [ slices; slices ];
   i = nrmdim + [ 0 3 ];

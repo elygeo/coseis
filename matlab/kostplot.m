@@ -2,7 +2,8 @@
 % KOSTROV
 
 if ~exist( 'dark', 'var' )
-  inputs
+  defaults
+  in
   dark = 1;
   if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
   else     foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 1;

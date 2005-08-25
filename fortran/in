@@ -1,0 +1,119 @@
+#------------------------------------------------------------------------------#
+# SORD input file
+
+switch kostrov
+switch test
+case simple
+
+  nrmdim   0
+  n   3 3 3   1
+  out   x   0   1 1 1   -1 -1 -1
+  out   v   1   1 1 1   -1 -1 -1
+
+case test
+
+  n   4 4 4   0
+  bc   0 0 0   0 0 0
+  nrmdim   0
+  out   x       0   1 1 1   -1 -1 -1
+  out   rho     0   1 1 1   -1 -1 -1
+  out   yn      0   1 1 1   -1 -1 -1
+  out   lam     0   1 1 1   -1 -1 -1
+  out   miu     0   1 1 1   -1 -1 -1
+  out   yc      0   1 1 1   -1 -1 -1
+
+case kostrov
+
+  n   128 127 128   128
+  n    41  41  41    10
+  npml   10
+  npml   0
+  nclramp   0
+  viscosity   .0 .3
+  bc   0 1 0   0 1 0
+  rcrit   1e9
+  friction   1e9 1. 1e9 0.     1 1 1   -1 -1 -1
+  traction   -100e6 -90e6 0.   1 1 1   -1 -1 -1
+  grid   slant
+  grid   constant
+  out   uslip   1    0 0 0   -1 -1 -1
+  out   vslip   1    0 0 0   -1 -1 -1
+  out   x       0    1 1 1   -1 -1 -1
+  out   v       10   1 1 1   -1 -1 -1
+
+case example
+
+  # Example to illustate parameter input. 
+
+  # n: ng(3) nt: number of mesh nodes and number of timesteps
+    n   21 21 21   40
+
+  # dx: spacial step size
+    dx   100.
+
+  # grid: grid generation scheme
+    grid   slant
+
+  # bc(6): boundarty conditions for sides j1, k1, l1, j2, k2, l2
+  # 0 = free surface, 1 = PML absorbing boundary
+    bc   1 1 0   1 1 1   # FS at the z=1, absorbing on other 5 surfaces
+
+  # npml: number of pml damping zones
+    npml   10
+
+  # viscosity(2): viscocity for (1) stress and (2) hourglass calculations
+    viscosity   .0 .3
+
+  # material: rho, vp, vs, zone(6) : density, p-wave speed, s-wave speed
+  # Paramenters with a zone(6) specification can be given multiple times.  
+  # Zones are specified by points i1=(j1 k1 l1) and i2=(j2 k2 l2).  
+  # A negative zone boundary counts inward from the extent of the mesh (ng).  
+  # A zone boundary of 0 indicates the hypocenter location.
+    material   2670. 6000. 3461.1   1 1 1   -1 -1 -1   # entire volume
+    material   267. 600. 346.1      1 1 1   -1 -1 10   # surface layer
+
+  # nrmdim: direction normal to the fault plane, 0 = no fault
+    nrmdim   2
+
+  # hypocenter(3) : node location of the hypocenter, 0 = mesh logical center
+    hypocenter = 0 0 35
+
+  # rcrit: nucleation radius
+    rcrit   1000.
+
+  # vrup: nucleation rupture velocity
+    vrup    3117.7
+
+  # nclramp: number of timesteps for nucleation strength relaxation
+    nclramp   10
+
+  # friction: fs fd dc cohes zone(6): coefficients of static & dynamic
+  # friction, slip-weakening distance, cohesion
+    friction   .6 .5    .25    0.   1 1 1   -1 -1 -1   # entire fault surface
+
+  # stress: w0(6) zone(6): prestress on fault: Sxx Syy Szz Syz Szx Sxy
+  # combined with tt0nsd for total pretraction
+    stress   -120e6 -120e6 -120e6 0. 0. 0.   1 1 1   -1 -1 -1
+
+  # traction: tt0nsd(3) zone(6): pretraction on the fault resolved on to the
+  # normal, strike, and dip componets of the fault surface
+  # combined with w0 for total pretraction
+    traction   -70e6 0. 0.   10 10 1   -10 -10 10
+
+  # out: outvar outint zone(6): binary file output
+  # outvar: x, u, v, |v|, w, |w|, uslip, vslip, trup, rho, lam, miu, yn, yc
+  # outint: output interval, negative = count back from nt
+  # static variable (e.g. rho) are only written at timestep 1
+    out   v       10  1 1 1   -1 -1 -1   # velocity field every 10 time steps
+    out   uslip   -1  1 1 1   -1 -1 -1   # final slip on the fault
+
+  # checkpoint: interval for writing checkpoint restart files
+  # negative = count back from nt, 0 = no checkpointing
+    checkpoint   -1   # write checkpoint at the last time step
+
+  # np(3): number of processors along each axis for parallel processing
+    nprocs   2 1 4   # 8 total processors
+
+  # verbose: level of diagnostic output
+    verbose   2
+

@@ -2,6 +2,7 @@
 % DEFAULTS
 
 plotstyle = 'outline';
+gui = 1;
 n = [ 21 21 21 20 ];
 dx = 100.;
 dt = .007;
@@ -23,36 +24,24 @@ hypocenter = 0;
 msrcradius = 0.;
 planewavedim = 0;
 truptol = .001;
-checkpoint = -1;
+checkpoint = 0;
 symmetries = [];
 npml = 0;
 bc = [ 1 1 0   1 1 1 ];
-locknodes = [
-  1 1 1    1  1  1    1 -1 -1   % top
-  1 1 1    1  1  1   -1  1 -1   % front
-  1 1 1    1  1  1   -1 -1  1   % left
-  1 1 1   -1  1  1   -1 -1 -1   % bottom
-  1 1 1    1 -1  1   -1 -1 -1   % back
-  1 1 1    1  1 -1   -1 -1 -1   % right
-];
 locknodes = [];
 out = {
-  'u' 1    1  1  1   -1 -1  1
-  'v' 1    1  1  1   -1 -1  1
-  'w' 1    1  1  1   -1 -1  1
-  'u' 1    1  1  0   -1 -1  0
-  'v' 1    1  1  0   -1 -1  0
-  'w' 1    1  1  0   -1 -1  0
-  'u' 1    1  0  1   -1  0 -1
-  'v' 1    1  0  1   -1  0 -1
-  'w' 1    1  0  1   -1  0 -1
-  'u' 1    0  1  1    0 -1 -1
-  'v' 1    0  1  1    0 -1 -1
-  'w' 1    0  1  1    0 -1 -1
+  'u'   1    1  1  1   -1 -1  1   % surface
+  'v'   1    1  1  1   -1 -1  1   % surface
+  'w'   1    1  1  1   -1 -1  1   % surface
+  'u'   1    1  1  0   -1 -1  0   % depth plane
+  'v'   1    1  1  0   -1 -1  0   % depth plane
+  'w'   1    1  1  0   -1 -1  0   % depth plane
+  'u'   1    1  0  1   -1  0 -1   % fault plane
+  'v'   1    1  0  1   -1  0 -1   % fault plane
+  'w'   1    1  0  1   -1  0 -1   % fault plane
+  'u'   1    0  1  1    0 -1 -1   % cross section
+  'v'   1    0  1  1    0 -1 -1   % cross section
+  'w'   1    0  1  1    0 -1 -1   % cross section
 };
-out = {
-  'u' 1    1  1  1    0  0  0
-  'v' 1    1  1  1    0  0  0
-  'w' 1    1  1  1    0  0  0
-};
+out = {};
 
