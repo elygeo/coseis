@@ -1,10 +1,11 @@
 !------------------------------------------------------------------------------!
 ! WSTEP
 
+module wstep_m
 subroutine wstep
-use globals
-use dfnc_mod
-use utils
+use globals_m
+use dfnc_m
+use utils_m
 
 implicit none
 integer :: ic, id, ix, iz
@@ -176,4 +177,5 @@ wmax = maxval( s2 ); wmaxi = maxloc( s2 )
 if ( umax > dx / 10. ) print *, 'Warning: u !<< dx\n'
 
 end subroutine
+end module
 

@@ -4,9 +4,9 @@
 module fault_m
 contains
 subroutine fault
-use globals
-use snormals_mod
-use utils
+use globals_m
+use snormals_m
+use utils_m
 
 implicit none
 save

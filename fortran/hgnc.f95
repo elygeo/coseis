@@ -1,7 +1,7 @@
 !------------------------------------------------------------------------------!
 ! HGNC - hourglass corrections, node to cell
 
-module hgnc_mod
+module hgnc_m
 contains
 subroutine hgnc( hg, f, i, iq, i1, i2 )
 

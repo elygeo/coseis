@@ -1,7 +1,7 @@
 !------------------------------------------------------------------------------!
 ! DFNC - difference operators, node to cell
 
-module dfnc_mod
+module dfnc_m
 contains
 subroutine dfnc( df, op, f, x, dx, i, a, i1, i2 )
 

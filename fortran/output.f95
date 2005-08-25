@@ -4,8 +4,8 @@
 module output_m
 contains
 subroutine output( thispass )
-use globals
-use utils
+use globals_m
+use utils_m
 
 implicit none
 save

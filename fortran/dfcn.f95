@@ -1,7 +1,7 @@
 !------------------------------------------------------------------------------!
 ! DFCN - difference operator, cell to node
 
-module dfcn_mod
+module dfcn_m
 contains
 subroutine dfcn( df, op, f, x, dx, i, a, i1, i2 )
 

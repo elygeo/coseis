@@ -2,12 +2,14 @@
 ! MAIN
 
 program sord
-use globals
+use globals_m
 use input_m
 use init_m
 use gridgen_m
 use matmodel_m
 use fault_m
+use vstep_m
+use wstep_m
 use output_m
 
 print '(a)', 'SORD - Support Opperator Rupture Dynamics'

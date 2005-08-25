@@ -1,7 +1,7 @@
 !------------------------------------------------------------------------------!
 ! UTILS
 
-module utils
+module utils_m
 contains
 subroutine zoneselect( i1, i2, zone, ng, offset, hypocenter, nrmdim )
 

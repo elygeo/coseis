@@ -1,7 +1,7 @@
 !------------------------------------------------------------------------------!
 ! SNORMALS - surface normals
 
-module snormals_mod
+module snormals_m
 contains
 subroutine snormals( nrm, x, i1, i2 )
 

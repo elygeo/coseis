@@ -4,7 +4,7 @@
 module init_m
 contains
 subroutine init
-use globals
+use globals_m
 
 it = 0
 call system_clock( count_rate=wt_rate )

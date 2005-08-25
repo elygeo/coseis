@@ -4,8 +4,8 @@
 module input_m
 contains
 subroutine input
-use globals
-use utils
+use globals_m
+use utils_m
 
 implicit none
 integer :: iostat, ifile

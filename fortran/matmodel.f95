@@ -4,9 +4,9 @@
 module matmodel_m
 contains
 subroutine matmodel
-use globals
-use utils
-use dfnc_mod
+use globals_m
+use utils_m
+use dfnc_m
 
 implicit none
 integer :: iz

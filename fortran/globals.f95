@@ -1,7 +1,7 @@
 !------------------------------------------------------------------------------!
 ! GLOBALS
 
-module globals
+module globals_m
 
 implicit none
 integer, parameter :: nz = 256

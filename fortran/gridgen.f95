@@ -4,8 +4,8 @@
 module gridgen_m
 contains
 subroutine gridgen
+use globals_m
 
-use globals
 implicit none
 real :: theta, scl
 real, parameter :: pi = 3.14159

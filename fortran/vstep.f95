@@ -1,12 +1,13 @@
 !------------------------------------------------------------------------------!
 ! VSTEP
 
+module vstep_m
 subroutine vstep
-use globals
-use dfcn_mod
-use hgnc_mod
-use hgcn_mod
-use utils
+use globals_m
+use dfcn_m
+use hgnc_m
+use hgcn_m
+use utils_m
 use fault_m
 
 implicit none
@@ -146,4 +147,5 @@ implicit none
 u = u + dt * v
 
 end subroutine
+end module
 
