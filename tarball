@@ -2,7 +2,7 @@
 
 cd ..
 
-gtar -hzc -f sord/sord.tgz \
+gtar -vhzc -f sord/sord.tgz \
   sord/readme \
   sord/tarball \
   sord/fortran/*.f95 \
