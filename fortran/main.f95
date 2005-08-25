@@ -4,6 +4,8 @@ program sord
 use globals
 use input_m
 use init_m
+use gridgen_m
+use matmodel_m
 use fault_m
 use output_m
 

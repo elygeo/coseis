@@ -1,6 +1,8 @@
 !------------------------------------------------------------------------------!
 ! GRIDGEN - Grid generation
 
+module gridgen_m
+contains
 subroutine gridgen
 
 use globals
@@ -63,4 +65,5 @@ x = x * dx
 hypoloc = hypoloc * dx
 
 end subroutine
+end module
 

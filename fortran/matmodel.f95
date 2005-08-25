@@ -1,6 +1,8 @@
 !------------------------------------------------------------------------------!
 ! MATMODEL - Material model setup
 
+module matmodel_m
+contains
 subroutine matmodel
 use globals
 use utils
@@ -151,4 +153,5 @@ do i = 1, npml
 end do
 
 end subroutine
+end module
 
