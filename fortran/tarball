@@ -13,7 +13,7 @@ tar zcvf sord/sord.tgz \
   sord/fortran/defaults \
   sord/matlab/*.m \
   sord/matlab/sord \
-  sord/matlab/tarball
+  sord/matlab/tarball \
   sord/matlab/batchjob
 
 cd sord
