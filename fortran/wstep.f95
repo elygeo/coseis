@@ -2,6 +2,7 @@
 ! WSTEP
 
 module wstep_m
+contains
 subroutine wstep
 use globals_m
 use dfnc_m

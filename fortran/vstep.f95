@@ -2,6 +2,7 @@
 ! VSTEP
 
 module vstep_m
+contains
 subroutine vstep
 use globals_m
 use dfcn_m
@@ -140,8 +141,8 @@ end subroutine
 ! USTEP
 
 subroutine ustep
+use globals_m
 
-use globals
 implicit none
 
 u = u + dt * v
