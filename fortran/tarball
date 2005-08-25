@@ -14,7 +14,7 @@ gtar -zcvf sord/sord.tgz \
   sord/matlab/*.m \
   sord/matlab/sord \
   sord/matlab/tarball
-  sord/matlab/batchjob \
+  sord/matlab/batchjob
 
 cd sord
 
