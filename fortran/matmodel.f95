@@ -60,13 +60,6 @@ do iz = 1, noper
   call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
 end do
 
-print *, 1234, i1, i2
-do l = l1, l2
-do k = k1, k2
-  print *, s2(j1:j2,k,l)
-end do
-end do
-
 if ( nrmdim /=0 ) then
   i = hypocenter(nrmdim)
   select case( nrmdim )
@@ -115,6 +108,13 @@ where ( rho /= 0. ) rho = dt / rho
 where ( s2 /= 0. )  s2  = 1 / s2
 lam = lam * s2
 miu = miu * s2
+
+print *, 1234, i1, i2
+do l = l1, l2
+do k = k1, k2
+  print *, miu(j1:j2,k,l)
+end do
+end do
 
 ! PML damping
 i2 = nl + 2 * nhalo
