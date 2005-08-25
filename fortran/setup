@@ -80,10 +80,11 @@ OBJECT="\\
   init.o \\
   gridgen.o \\
   matmodel.o \\
+  fault.o \\
   vstep.o \\
   wstep.o \\
   output.o \\
-  fault.o"
+"
 
 OPTFLAGS=-O
 

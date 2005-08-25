@@ -1,6 +1,8 @@
 !------------------------------------------------------------------------------!
 ! FAULT
 
+module fault_m
+contains
 subroutine fault
 use globals
 use snormals_mod
@@ -13,10 +15,11 @@ real, allocatable, dimension(:,:,:) :: &
 real, allocatable, dimension(:,:,:,:) :: &
   nrm, tt0, str, dip, tt0nsd, w0, tt, tn3, ts3, r3
 real :: fs0, fd0, dc0, tn0, ts0
-integer :: down(3), handed, init = 0, strdim, dipdim, j3, j4, k3, k4, l3, l4, iz
+integer :: down(3), handed, strdim, dipdim, j3, j4, k3, k4, l3, l4, iz
+logical :: init = .true.
 
-if ( init == 0 ) then
-  init = 1
+if ( init ) then
+  init = .false.
   if ( nrmdim == 0 ) then
     allocate( uslip(0,0,0) )
     return
@@ -155,8 +158,7 @@ if ( init == 0 ) then
   deallocate( tt0nsd, w0, str, dip, r3 )
   allocate( tt(j,k,l,3), tn3(j,k,l,3), ts3(j,k,l,3), tn(j,k,l), &
     ts(j,k,l), ff(j,k,l), ff2(j,k,l) )
-  return
-  i1 = hypocenter
+  i1 = hypocenter - offset
   if ( all( i1 >= i1node .and. i2 <= i2node ) ) then
     i1(nrmdim) = 1
     j = i1(1)
@@ -172,6 +174,7 @@ if ( init == 0 ) then
     print '(2(a,e10.3,x))', 'dc:   ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / miu0
     print '(2(a,e10.3,x))', 'rcrit:', rcrit, '>', miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ** 2
   end if
+  return
 end if
 
 !------------------------------------------------------------------------------!
@@ -248,4 +251,5 @@ if ( truptol > 0. ) then
 end if
 
 end subroutine
+end module
 

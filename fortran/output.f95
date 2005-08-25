@@ -1,6 +1,8 @@
 !------------------------------------------------------------------------------!
 ! OUTPUT
 
+module output_m
+contains
 subroutine output( thispass )
 use globals
 use utils
@@ -14,7 +16,7 @@ logical :: fault, cell, static, init = .true., outinit(nz) = .true.
 
 if ( init ) then
   init = .false.
-  if ( verb > 1 ) print '(a)', 'Initialize output'
+  if ( verb > 0 ) print '(a)', 'Initialize output'
   if ( it == 0 ) then
     call system( 'rm -fr out; mkdir out; mkdir out/ckp; mkdir out/stats' )
   else
@@ -140,4 +142,5 @@ write( 9, * ) it
 close( 9 )
 
 end subroutine
+end module
 

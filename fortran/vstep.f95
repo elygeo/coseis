@@ -7,6 +7,7 @@ use dfcn_mod
 use hgnc_mod
 use hgcn_mod
 use utils
+use fault_m
 
 implicit none
 integer ic, iid, id, ix, iq, iz

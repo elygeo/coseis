@@ -2,6 +2,9 @@
 
 program sord
 use globals
+use output_m
+use fault_m
+use input_m
 
 print '(a)', 'SORD - Support Opperator Rupture Dynamics'
 

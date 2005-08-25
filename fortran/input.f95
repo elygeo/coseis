@@ -1,6 +1,8 @@
 !------------------------------------------------------------------------------!
 ! INPUT
 
+module input_m
+contains
 subroutine input
 use globals
 use utils
@@ -78,4 +80,5 @@ close( 9 )
 end do outer
 
 end subroutine
+end module
 
