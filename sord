@@ -44,8 +44,8 @@ np3=( 1 1 1 )
 while read key params; do
   set -- $params
   case "$key" in
-  switch) swtich=$1 ;;
-  case)   case=$1 ;;
+  switch) swtich=$2 ;;
+  case)   case=$2 ;;
   esac
   if [ "$switch" = "$case" ]; then
     case "$key" in

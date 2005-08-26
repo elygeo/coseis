@@ -17,11 +17,8 @@ logical :: fault, cell, static, init = .true., outinit(nz) = .true.
 if ( init ) then
   init = .false.
   if ( verb > 0 ) print '(a)', 'Initialize output'
-  if ( it == 0 ) then
-    call system( 'rm -fr out; mkdir out; mkdir out/ckp; mkdir out/stats' )
-  else
-    ! FIXME read checkpoint
-  end if
+  ! FIXME read checkpoint
+  call system( 'rm -fr out; mkdir out; mkdir out/ckp; mkdir out/stats' )
 end if
 
 outer: do iz = 1, nout
@@ -114,7 +111,7 @@ end do outer
 if ( pass == 1 ) return
 
 if ( checkpoint < 0 ) checkpoint = nt + checkpoint + 1
-if ( it /= 0 .and. mod( it, checkpoint ) == 0 ) then
+if ( checkpoint /= 0 .and. mod( it, checkpoint ) == 0 ) then
   if ( verb > 1 ) print '(a)', 'Writing checkpoint file'
   reclen = floatsize * ( size(v) + size(u) + size(uslip) &
    + size(p1) + size(p2) + size(p3) + size(p4) + size(p5) + size(p6) &
@@ -131,7 +128,7 @@ end if
 call system_clock( wt(6) )
 dwt(1:5) = real( wt(2:6) - wt(1:5) ) / real( wt_rate )
 dwt(6)   = real( wt(6)   - wt(1) )   / real( wt_rate )
-if ( verb > 0 ) print '(i4,x,10(e9.2))', it, amax, vmax, umax, wmax, dwt
+if ( verb > 0 ) print '(i4,x,10(e10.2))', it, amax, vmax, umax, wmax, dwt(6)
 
 write( ofile, '(a,i5.5)' ) 'out/stats/', it
 open(  9, file=ofile )
