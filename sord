@@ -2,7 +2,7 @@
 #------------------------------------------------------------------------------#
 # SORD setup script - Geoffrey Ely
 
-exec 2>&1 > >( tee sord.log )
+#exec 2>&1 > >( tee sord.log )
 
 echo "SORD setup"
 date

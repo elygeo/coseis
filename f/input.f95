@@ -29,7 +29,7 @@ inner: do
   if ( iostat /= 0 ) exit inner
   if ( a == ' ' ) cycle inner
   read( a, * ) key
-  if ( key(1:1) == '#' .or. key(1:1) == '!' .or. key(1:1) == '%' ) cycle inner
+  if ( key(1:1) == '#' ) cycle inner
   select case( key )
   case( 'switch' );     read( a, * ) key, switch
   case( 'case' );       read( a, * ) key, switchcase

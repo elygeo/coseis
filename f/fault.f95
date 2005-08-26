@@ -221,6 +221,7 @@ where( uslip < dc ) ff = ff + ( 1. - uslip / dc ) * ( fs - fd )
 ff = ff * tn + cohes
 ! Nucleation
 if ( rcrit > 0. .and. vrup > 0. ) then
+print *, 1234
   ff2 = 1.
   if ( nclramp > 0 ) ff2 = min( ( it * dt - r / vrup ) / ( nclramp * dt ), 1. )
   ff2 = ( 1. - ff2 ) * ts + ff2 * ( fd * tn + cohes )
