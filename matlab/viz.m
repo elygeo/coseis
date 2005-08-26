@@ -6,14 +6,15 @@
 
 if plotstyle, else return, end
 
-if initialize > 1
-  initialize = 1
+if init == 1
+  init = 0;
   if ~ishandle(1), figure(1), end
   set( 0, 'CurrentFigure', 1 )
   clf
   drawnow
   return
-elseif initialize
+elseif init
+  init = 0;
   plotinterval = 1;
   holdmovie = 1;
   savemovie = 0;

@@ -12,17 +12,16 @@ yn  = repmat( zero, nm ); % ALLOC
 matmax = material(1,1:3);
 matmin = material(1,1:3);
 for iz = 1:size( material, 1 )
-  zone = material(iz,4:9);
-  [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
-  rho0  = material(iz,1);
-  vp    = material(iz,2);
-  vs    = material(iz,3);
+  [ i1, i2 ] = zoneselect( imat(iz,:), nhalo, np, hypocenter, nrmdim );
+  rho0 = material(iz,1);
+  vp   = material(iz,2);
+  vs   = material(iz,3);
   matmax = max( matmax, material(iz,1:3) );
   matmin = min( matmin, material(iz,1:3) );
-  miu0  = rho0 * vs * vs;
-  lam0  = rho0 * ( vp * vp - 2 * vs * vs );
-  yc0   = miu0 * ( lam0 + miu0 ) / 6 / ( lam0 + 2 * miu0 ) * 4 / dx ^ 2;
-  nu    = .5 * lam0 / ( lam0 + miu0 );
+  miu0 = rho0 * vs * vs;
+  lam0 = rho0 * ( vp * vp - 2 * vs * vs );
+  yc0  = miu0 * ( lam0 + miu0 ) / 6 / ( lam0 + 2 * miu0 ) * 4 / dx ^ 2;
+  nu   = .5 * lam0 / ( lam0 + miu0 );
   j1 = i1(1); j2 = i2(1) - 1;
   k1 = i1(2); k2 = i2(2) - 1;
   l1 = i1(3); l2 = i2(3) - 1;
@@ -36,14 +35,12 @@ fprintf( 'courant: %g < 1\n', courant )
 gamma = dt * viscosity;
 
 for iz = 1:size( operator, 1 )
-  zone = [ operator{iz,2:7} ];
-  [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
-  opi1(iz,:) = i1;
-  opi2(iz,:) = i2;
+  [ i1, i2 ] = zoneselect( ioper(iz,:), nhalo, np, hypocenter, nrmdim );
+  op = operator(iz)
   l = i1(3):i2(3)-1;
   k = i1(2):i2(2)-1;
   j = i1(1):i2(1)-1;
-  s2(j,k,l) = dfnc( operator{iz,1}, x, x, dx, 1, 1, j, k, l );
+  s2(j,k,l) = dfnc( op, x, x, dx, 1, 1, j, k, l );
 end
 if nrmdim
   i = hypocenter(nrmdim);

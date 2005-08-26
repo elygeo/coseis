@@ -39,15 +39,16 @@ c = 0.2 * l1;
 c = 0.01 * l1;
 c = 0.06 * l1;
 c = 0.1 * l1;
+ioper = [ 1 1 1  -1 -1 -1 ];
 rand( 'state', 0 )
 switch grid
 case 'constant'
-  operator = { 'h'  1 1 1  -1 -1 -1 };
+  operator = 'h';
 case 'stretch'
-  operator = { 'r'  1 1 1  -1 -1 -1 };
+  operator = 'r';
   x(:,:,:,3) = 2 * x(:,:,:,3);
 case 'slant'
-  operator = { 'g'  1 1 1  -1 -1 -1 };
+  operator = 'g';
   theta = 20 * pi / 180;
   scl = sqrt( cos( theta ) ^ 2 + ( 1 - sin( theta ) ) ^ 2 );
   scl = sqrt( 2 ) / scl
@@ -56,26 +57,26 @@ case 'slant'
   x(:,:,:,1) = x(:,:,:,1) * scl;
   x(:,:,:,3) = x(:,:,:,3) * scl;
 case 'map'
-  operator = { 'g'  1 1 1  -1 -1 -1 };
+  operator = 'g';
   x(:,:,:,1) = s1 + c / 5 * (s1-l1/2) .* (l3-s3);
   x(:,:,:,2) = s2 + c / 5 * (s2-l1/2) .* (l3-s3);
   x(:,:,:,3) = s3 + .1 * (cos(s2./l2*2*pi)-sin(s1./l1*2*pi)) .* (l3-s3) + .1 * (l1-s1) .* (s3-l3);
 case 'normal'
-  operator = { 'g'  1 1 1  -1 -1 -1 };
+  operator = 'g';
   x(:,:,:,2) = s2 - c * (s3./l3-.5) * 4 .* (.5-abs(s2./l2-.5));
   x(:,:,:,3) = s3 + c * (s3./l3-1) .* atan(10*(s2./l2-.5));
   x(:,:,:,3) = x(:,:,:,3) - x(1,1,1,3);
   %moment = -[0 0 0 0 0 1e18];
   dx = 1.5 * dx;
 case 'curve'
-  operator = { 'g'  1 1 1  -1 -1 -1 };
+  operator = 'g';
   dem = .2 * rand( [ 1 l1+1 l2+1 ] ) .* (-1.5-atan(10*(s2(1,:,:)./l2-.5))) + c*(s3(1,:,:)./l3-1).*atan( 10*(s2(1,:,:)./l2-.5) );
   x(:,:,:,1) = s1 + c * sin(s2./l2*2*pi) .* (.5-abs(s1./l1-.5));
   x(:,:,:,2) = s2 - c * sin(s1./l1*2*pi) .* (.5-abs(s2./l2-.5));
   x(:,:,:,3) = s3 + (1-s3./l3) .* repmat(dem,[l3+1 1 1]);
   dx = 1.5 * dx;
 case 'spherical'
-  operator = { 'g'  1 1 1  -1 -1 -1 };
+  operator = 'g';
   da = pi / 2 / max( [ l1 l2 ] );
   %s3 = 2 * l3 - s3 - 1 / da;
   s3 = 2 * l3 - s3;
@@ -87,10 +88,10 @@ case 'spherical'
   x(:,:,:,3) = x(:,:,:,3) - min( min( min( x(:,:,:,3) ) ) );
   dx = 1.5 * dx;
 case 'hill'
-  operator = { 'g'  1 1 1  -1 -1 -1 };
+  operator = 'g';
   x(:,:,:,3) = s3 - .25 * (l3-s3) .* exp(-((s1-l1/2).^2 + (s2-l2/2).^2) / ((l1 + l2)/10) ^ 2);
 case 'rand'
-  operator = { 'g'  1 1 1  -1 -1 -1 };
+  operator = 'g';
   a = .2;
   %dx = dx / ( 1 - a );
   s1 = a * ( rand( nm ) - .5 );

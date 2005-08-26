@@ -9,9 +9,8 @@ for ic = 1:3
 for id = [ ic:3 1:ic-1 ];
   ix = 6 - ic - id;
   for iz = 1:size( operator, 1 )
-    op = operator{iz,1};
-    i1 = opi1(iz,:);
-    i2 = opi2(iz,:);
+    [ i1, i2 ] = zoneselect( ioper(iz,:), nhalo, np, hypocenter, nrmdim );
+    op = operator(iz);
     j = i1(1):i2(1);
     k = i1(2):i2(2);
     l = i1(3):i2(3);
@@ -90,9 +89,8 @@ if nrmdim, fault, end
 
 % Velocity, V = V + dV
 for iz = 1:size( locknodes, 1 )
-  i1 = locki1(iz,:);
-  i2 = locki2(iz,:);
-  i = locknodes(iz,1:3) == 1;
+  [ i1, i2 ] = zoneselect( ilock(iz,:), nhalo, np, hypocenter, nrmdim );
+  i = locknodes(iz,:) == 1;
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);

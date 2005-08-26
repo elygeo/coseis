@@ -3,8 +3,9 @@
 
 if ~nrmdim; return; end
 
-if initialize
+if init
 
+init = 0;
 fprintf( 'Initialize fault\n' )
 nf = nm;
 nf(nrmdim) = 1;
@@ -25,8 +26,7 @@ nrm    = repmat( 0, [ nf 3 ] );
 str    = repmat( 0, [ nf 3 ] );
 dip    = repmat( 0, [ nf 3 ] );
 for iz = 1:size( friction, 1 )
-  zone = friction(iz,5:10);
-  [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( ifric(iz,:), nhalo, np, hypocenter, nrmdim );
   i1 = max( i1, i1pml );
   i2 = min( i2, i2pml );
   i1(nrmdim) = 1;
@@ -40,8 +40,7 @@ for iz = 1:size( friction, 1 )
   cohes(j1:j2,k1:k2,l1:l2) = friction(iz,4);
 end
 for iz = 1:size( traction, 1 )
-  zone = traction(iz,4:9);
-  [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( itrac(iz,:), nhalo, np, hypocenter, nrmdim );
   i1 = max( i1, i1pml );
   i2 = min( i2, i2pml );
   i1(nrmdim) = 1;
@@ -54,8 +53,7 @@ for iz = 1:size( traction, 1 )
   tt0nsd(j1:j2,k1:k2,l1:l2,3) = traction(iz,3);
 end
 for iz = 1:size( stress, 1 )
-  zone = stress(iz,7:12);
-  [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( istress(iz,:), nhalo, np, hypocenter, nrmdim );
   i1 = max( i1, i1pml );
   i2 = min( i2, i2pml );
   i1(nrmdim) = 1;

@@ -3,7 +3,8 @@
 
 if ~msrcradius; return; end
 
-if initialize
+if init
+  init = 0;
   if msrcradius && exist( 'msrcnodealign' ) && exist( 'srctimefcn' ) ...
   && sum( abs( moment ) )
   else

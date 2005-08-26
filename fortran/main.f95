@@ -4,7 +4,7 @@
 program sord
 use globals_m
 use input_m
-use init_m
+use setup_m
 use gridgen_m
 use matmodel_m
 use fault_m
@@ -15,7 +15,7 @@ use output_m
 print '(a)', 'SORD - Support Opperator Rupture Dynamics'
 
 call input
-call init
+call setup
 call gridgen
 call matmodel
 call fault

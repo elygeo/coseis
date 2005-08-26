@@ -27,6 +27,7 @@ end if
 outer: do iz = 1, nout
   if ( outit(iz) < 0 ) outit(iz) = nt + outit(iz) + 1
   if ( outit(iz) == 0 .or. mod( it, outit(iz) ) /= 0 ) cycle outer
+  nc = 1
   pass = 2
   cell = .false.
   fault = .false.

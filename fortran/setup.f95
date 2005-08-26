@@ -1,9 +1,9 @@
 !------------------------------------------------------------------------------!
-! INIT
+! SETUP
 
-module init_m
+module setup_m
 contains
-subroutine init
+subroutine setup
 use globals_m
 
 it = 0

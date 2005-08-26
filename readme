@@ -16,19 +16,22 @@ University of California, San Diego
 La Jolla, CA 92093-0225
 gely@ucsd.edu
 
+There is a Matlab and a Fortran version of the code.  The Matlab version has 
+integrated visualization and is good for testing small problems.  The Fortran 
+version is for large problems and is parallelized with MPI.  Both version use 
+a common input and output format.
+
 To run the Fortran code:
   cd fortran
   edit 'in'
   ./sord
 
-  For a new machine, you may have to modify 'setup' for the proper
+  For a new machine, you may have to modify the 'sord' script for the proper
   compiling and batch submission parameters.
-
-  The parallel version requires MPI
 
 To run the Matlab version:
   cd matlab
-  edit 'in.m'
+  edit 'in'
   ./sord
 
 --------------------------------------------------------------------------------
