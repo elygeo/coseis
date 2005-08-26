@@ -2,7 +2,7 @@
 
 SORD: Support-Operator Rupture Dynamics
 
-Sord models spontaneous rupture on a fault within a 3D isotropic viscoelastic
+SORD models spontaneous rupture on a fault within a 3D isotropic viscoelastic
 solid.  The equations of motion are approximated with second order a
 Support-Operator method on a logically rectangular mesh.  The fault is modeled
 with a slip-weakening, frictional, internal boundary condition. 
