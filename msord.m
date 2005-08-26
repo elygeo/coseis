@@ -11,6 +11,8 @@ fprintf( 'SORD - Support-Operator Rupture Dynamics\n' )
 
 clear all
 
+addpath( 'm' )
+
 input
 setup
 init = 1; viz

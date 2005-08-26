@@ -22,17 +22,15 @@ version is for large problems and is parallelized with MPI.  Both version use
 a common input and output format.
 
 To run the Fortran code:
-  cd fortran
   edit 'in'
-  ./sord
+  ./fsord
 
   For a new machine, you may have to modify the 'sord' script for the proper
   compiling and batch submission parameters.
 
 To run the Matlab version:
-  cd matlab
   edit 'in'
-  ./sord
+  ./msord
 
 --------------------------------------------------------------------------------
 

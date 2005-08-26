@@ -1,5 +1,0 @@
-#!/bin/bash -e
-
-unset DISPLAY
-nohup matlab -r "sord, quit" | tee out.log &
-
