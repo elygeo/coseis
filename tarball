@@ -1,0 +1,20 @@
+#!/bin/bash -e
+
+
+files="
+  sord/readme
+  sord/tarball
+  sord/fsord
+  sord/f
+  sord/msord
+  sord/m
+"
+
+cd ..
+
+tar zcvf sord/sord.tgz $files
+
+tag=$( date +%Y-%m-%d-%H-%M-%S )
+
+cp sord/sord.tgz "sord/save/sord-$tag.tgz"
+

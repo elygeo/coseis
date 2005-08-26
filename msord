@@ -1,4 +1,4 @@
 #!/bin/bash -e
 
-matlab -r msord
+matlab -r "addpath m; sord"
 

@@ -76,21 +76,21 @@ END
 # Create makefile and compile code
 
 OBJECT="\\
-  f/globals.o \\
-  f/dfcn.o \\
-  f/dfnc.o \\
-  f/hgcn.o \\
-  f/hgnc.o \\
-  f/snormals.o \\
-  f/utils.o \\
-  f/input.o \\
-  f/init.o \\
-  f/gridgen.o \\
-  f/matmodel.o \\
-  f/fault.o \\
-  f/vstep.o \\
-  f/wstep.o \\
-  f/output.o"
+  globals.o \\
+  dfcn.o \\
+  dfnc.o \\
+  hgcn.o \\
+  hgnc.o \\
+  snormals.o \\
+  utils.o \\
+  input.o \\
+  setup.o \\
+  gridgen.o \\
+  matmodel.o \\
+  fault.o \\
+  vstep.o \\
+  wstep.o \\
+  output.o"
 
 OPTFLAGS=-O
 
@@ -147,7 +147,10 @@ sord-bin: \$(OBJECT) makefile
 clean:
 	rm -f *.o *.mod
 
-%.o: %.f95 makefile
+realclean: clean
+	rm -f sord-bin out makefile batchjob
+
+%.o: f/%.f95 makefile
 	\$(FC) \$(FFLAGS) -c \$< -o \$@
 
 END
