@@ -1,18 +1,21 @@
 #!/bin/bash -e
 
+echo "Making SORD tarball"
 
 files="
   sord/readme
-  sord/tarball
+  sord/defaults
+  sord/in
   sord/fsord
-  sord/f
   sord/msord
+  sord/tarball
+  sord/f
   sord/m
 "
 
 cd ..
 
-tar zcvf sord/sord.tgz $files
+tar zcf sord/sord.tgz $files
 
 tag=$( date +%Y-%m-%d-%H-%M-%S )
 

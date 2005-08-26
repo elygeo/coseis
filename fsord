@@ -148,7 +148,7 @@ clean:
 	rm -f *.o *.mod
 
 realclean: clean
-	rm -f sord-bin out makefile batchjob
+	rm -f sord-bin out makefile batchjob sord.log
 
 %.o: f/%.f95 makefile
 	\$(FC) \$(FFLAGS) -c \$< -o \$@
@@ -177,7 +177,7 @@ npoints:  $npoints
 nprocs:   $nprocs
 END
 srcbase=$( basename "$rundir" )
-cp ../sord.tgz meta/
+cp sord.tgz meta/
 cp -f sord-bin meta/
 
 #------------------------------------------------------------------------------#
