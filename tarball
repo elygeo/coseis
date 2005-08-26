@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-echo "Making SORD tarball"
+echo "making tarball"
 
 files="
   sord/readme
