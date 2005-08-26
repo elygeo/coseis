@@ -3,14 +3,13 @@
 echo "making tarball"
 
 files="
-  sord/readme
+  sord/README
   sord/defaults
   sord/in
-  sord/fsord
-  sord/msord
+  sord/sord
   sord/tarball
-  sord/f
-  sord/m
+  sord/f/*.f95
+  sord/m/*.m
 "
 
 cd ..

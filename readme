@@ -16,18 +16,21 @@ University of California, San Diego
 La Jolla, CA 92093-0225
 gely@ucsd.edu
 
-There is a Matlab and a Fortran version of the code.  The Matlab version has 
-integrated visualization and is good for testing small problems.  The Fortran 
-version is for large problems and is parallelized with MPI. 
+There are two versions, one written in Fortran and one in Matlab.  The Matlab 
+version has integrated visualization and is good for testing small problems.  
+The Fortran version is best for large problems and is parallelized with MPI. 
+To run SORD:
 
-To run the Fortran code:
-  ./fsord
+  more defaults
+  vi in
+  ./sord
 
-  For a new machine, you may have to modify the 'sord' script for the proper
-  compiling and batch submission parameters.
+When porting to a new machine, you may have to modify the 'sord' script for 
+the proper compiling and batch submission parameters.
 
-To run the Matlab version:
-  ./msord
+To run the matlab version:
+
+  ./sord -m
 
 --------------------------------------------------------------------------------
 

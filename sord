@@ -15,14 +15,24 @@ rm -rf batchjob
 mpi=guess
 debug=no
 batch=no
-while getopts spgb opt; do
+matlab=no
+showhelp=mo
+while getopts spgbfmh opt; do
   case $opt in
     s) mpi=no ;;
     p) mpi=yes ;;
     g) debug=yes ;;
     b) batch=yes ;;
+    f) matlab=no ;;
+    m) matlab=yes ;;
+    h) showhelp=yes ;;
   esac
 done
+
+if [ matlab = yes ]; then
+  matlab -r "addpath m; sord"
+  exit
+fi
 
 if [ $debug = yes -a $batch = yes ]; then
   echo "can't debug in batch mode"
