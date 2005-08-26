@@ -21,7 +21,7 @@ case test
 case kostrov 
   n            127 127 127   200
   n            41  41  41    80
-  n            4 4 4   5
+  n            3 3 3   1
   grid         slant
   grid         constant
   viscosity   .0 .3

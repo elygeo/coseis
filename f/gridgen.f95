@@ -5,6 +5,7 @@ module gridgen_m
 contains
 subroutine gridgen
 use globals_m
+use utils_m
 
 implicit none
 real :: theta, scl
@@ -12,6 +13,7 @@ real, parameter :: pi = 3.14159
 
 if ( verb > 0 ) print '(a)', 'Grid generation'
 downdim = 3
+i1 = 1
 i2 = nl + 2 * nhalo
 j = i2(1)
 k = i2(2)

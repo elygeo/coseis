@@ -72,9 +72,6 @@ i1 = nhalo + [ 1 1 1 ];
 i2 = nhalo + np;
 i1(nrmdim) = hypocenter(nrmdim);
 i2(nrmdim) = hypocenter(nrmdim);
-j1 = i1(1); j2 = i2(1);
-k1 = i1(2); k2 = i2(2);
-l1 = i1(3); l2 = i2(3);
 nrm(:,:,:,:) = snormals( x, i1, i2 );
 area = sum( nrm .* nrm, 4 );
 area = sqrt( area );
@@ -121,8 +118,15 @@ for i = 1:3
     tt0nsd(:,:,:,strdim) .* str(:,:,:,i) + ...
     tt0nsd(:,:,:,dipdim) .* dip(:,:,:,i);
 end
+i1 = [ 1 1 1 ];
+i2 = np + 2 * nhalo;
+i1(nrmdim) = hypocenter(nrmdim);
+i2(nrmdim) = hypocenter(nrmdim);
+j1 = i1(1); j2 = i2(1);
+k1 = i1(2); k2 = i2(2);
+l1 = i1(3); l2 = i2(3);
 for i = 1:3
-  r(:,:,:,i) = x(j1,k1,l1,i) - hypoloc(i);
+  r(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - hypoloc(i);
 end
 r = sum( r .* r, 4 );
 r = sqrt( r );

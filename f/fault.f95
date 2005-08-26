@@ -15,7 +15,9 @@ real, allocatable, dimension(:,:,:) :: &
 real, allocatable, dimension(:,:,:,:) :: &
   nrm, tt0, str, dip, tt0nsd, w0, tt, tn3, ts3, r3
 real :: fs0, fd0, dc0, tn0, ts0
-integer :: down(3), handed, strdim, dipdim, j3, j4, k3, k4, l3, l4, iz
+integer :: down(3), handed, strdim, dipdim, iz, &
+  j3, j4, k3, k4, l3, l4, &
+  j5, j6, k5, k6, l5, l6
 logical :: init = .true.
 
 if ( init ) then
@@ -99,8 +101,8 @@ if ( init ) then
   ! normal vectors
   i1 = i1node
   i2 = i2node
-  i1(nrmdim) = 1
-  i2(nrmdim) = 1
+  i1(nrmdim) = hypocenter(nrmdim)
+  i2(nrmdim) = hypocenter(nrmdim)
   call snormals( nrm, x, i1, i2 )
   area = sqrt( sum( nrm * nrm, 4 ) )
   tmp = 0.
@@ -108,6 +110,9 @@ if ( init ) then
   do i = 1, 3
     nrm(:,:,:,i) = nrm(:,:,:,i) * tmp
   end do
+print *, 'n1'; call print4d( nrm, i1, i2, 1 )
+print *, 'n2'; call print4d( nrm, i1, i2, 2 )
+print *, 'n3'; call print4d( nrm, i1, i2, 3 )
   ! strike vectors
   str = 0.
   str(:,:,:,1) = down(2) * nrm(:,:,:,3) - down(3) * nrm(:,:,:,2)
@@ -141,6 +146,9 @@ if ( init ) then
   end do
   i1 = 1
   i2 = nl + 2 * nhalo
+print *, 'x1'; call print4d( x, i1, i2, 1 )
+print *, 'x2'; call print4d( x, i1, i2, 2 )
+print *, 'x3'; call print4d( x, i1, i2, 3 )
   i1(nrmdim) = hypocenter(nrmdim)
   i2(nrmdim) = hypocenter(nrmdim)
   j1 = i1(1); j2 = i2(1)
@@ -193,6 +201,11 @@ i2(nrmdim) = hypocenter(nrmdim) + 1
 j3 = i1(1); j4 = i2(1)
 k3 = i1(2); k4 = i2(2)
 l3 = i1(3); l4 = i2(3)
+i1(nrmdim) = 1
+i2(nrmdim) = 1
+j5 = i1(1); j6 = i2(1)
+k5 = i1(2); k6 = i2(2)
+l5 = i1(3); l6 = i2(3)
 tmp = area * ( rho(j1:j2,k1:k2,l1:l2) + rho(j3:j4,k3:k4,l3:l4) )
 where ( tmp /= 0. ) tmp = 1. / tmp
 do i = 1, 3
@@ -221,7 +234,6 @@ where( uslip < dc ) ff = ff + ( 1. - uslip / dc ) * ( fs - fd )
 ff = ff * tn + cohes
 ! Nucleation
 if ( rcrit > 0. .and. vrup > 0. ) then
-print *, 1234
   ff2 = 1.
   if ( nclramp > 0 ) ff2 = min( ( it * dt - r / vrup ) / ( nclramp * dt ), 1. )
   ff2 = ( 1. - ff2 ) * ts + ff2 * ( fd * tn + cohes )

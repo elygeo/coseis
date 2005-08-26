@@ -301,7 +301,7 @@ time $cmd ./sord-bin
 END
 chmod u+x batchjob
 
-[ $batch = no ] && time $cmd ./sord-bin
+[ $batch = no ] && $cmd ./sord-bin
 
 ;;
 
@@ -340,7 +340,7 @@ time $cmd ./sord-bin
 END
 chmod u+x batchjob
 
-[ $batch = no ] && time $cmd ./sord-bin
+[ $batch = no ] && $cmd ./sord-bin
 
 ;;
 
@@ -360,7 +360,7 @@ nohup unbuffer $cmd ./sord-bin | tee out.log &
 END
 chmod u+x batchjob
 
-[ $batch = no ] && time $cmd ./sord-bin
+[ $batch = no ] && $cmd ./sord-bin
 
 ;;
 

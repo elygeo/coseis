@@ -108,7 +108,7 @@ outer: do iz = 1, nout
   close( 9 )
 end do outer
 
-if ( pass == 1 ) return
+if ( thispass == 1 ) return
 
 if ( checkpoint < 0 ) checkpoint = nt + checkpoint + 1
 if ( checkpoint /= 0 .and. mod( it, checkpoint ) == 0 ) then
