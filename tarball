@@ -17,7 +17,3 @@ cd ..
 
 tar zcf sord/sord.tgz $files
 
-tag=$( date +%Y-%m-%d-%H-%M-%S )
-
-cp sord/sord.tgz "sord/save/sord-$tag.tgz"
-
