@@ -29,7 +29,7 @@ while getopts spgbfmh opt; do
   esac
 done
 
-if [ matlab = yes ]; then
+if [ $matlab = yes ]; then
   matlab -r "addpath m; sord"
   exit
 fi
@@ -87,12 +87,12 @@ END
 
 OBJECT="\\
   globals.o \\
+  utils.o \\
   dfcn.o \\
   dfnc.o \\
   hgcn.o \\
   hgnc.o \\
   snormals.o \\
-  utils.o \\
   input.o \\
   setup.o \\
   gridgen.o \\
@@ -158,7 +158,7 @@ clean:
 	rm -f *.o *.mod
 
 realclean: clean
-	rm -f sord-bin out makefile batchjob sord.log
+	rm -r sord-bin makefile batchjob sord.log
 
 %.o: f/%.f95 makefile
 	\$(FC) \$(FFLAGS) -c \$< -o \$@

@@ -26,7 +26,7 @@ if ( init ) then
     allocate( uslip(0,0,0) )
     return
   end if
-  if ( verb > 1 ) print '(a)', 'Initialize fault'
+  if ( verb > 0 ) print '(a)', 'Initialize fault'
   if ( nrmdim /= downdim ) then
     dipdim = downdim
     strdim = 6 - dipdim - nrmdim
@@ -110,9 +110,6 @@ if ( init ) then
   do i = 1, 3
     nrm(:,:,:,i) = nrm(:,:,:,i) * tmp
   end do
-print *, 'n1'; call print4d( nrm, i1, i2, 1 )
-print *, 'n2'; call print4d( nrm, i1, i2, 2 )
-print *, 'n3'; call print4d( nrm, i1, i2, 3 )
   ! strike vectors
   str = 0.
   str(:,:,:,1) = down(2) * nrm(:,:,:,3) - down(3) * nrm(:,:,:,2)
@@ -146,9 +143,6 @@ print *, 'n3'; call print4d( nrm, i1, i2, 3 )
   end do
   i1 = 1
   i2 = nl + 2 * nhalo
-print *, 'x1'; call print4d( x, i1, i2, 1 )
-print *, 'x2'; call print4d( x, i1, i2, 2 )
-print *, 'x3'; call print4d( x, i1, i2, 3 )
   i1(nrmdim) = hypocenter(nrmdim)
   i2(nrmdim) = hypocenter(nrmdim)
   j1 = i1(1); j2 = i2(1)
@@ -167,7 +161,7 @@ print *, 'x3'; call print4d( x, i1, i2, 3 )
   allocate( tt(j,k,l,3), tn3(j,k,l,3), ts3(j,k,l,3), tn(j,k,l), &
     ts(j,k,l), ff(j,k,l), ff2(j,k,l) )
   i1 = hypocenter - offset
-  if ( all( i1 >= i1node .and. i2 <= i2node ) ) then
+  if ( all( i1 >= i1node .and. i1 <= i2node ) ) then
     i1(nrmdim) = 1
     j = i1(1)
     k = i1(2)
@@ -178,9 +172,9 @@ print *, 'x3'; call print4d( x, i1, i2, 3 )
     fs0 = fs(j,k,l)
     fd0 = fd(j,k,l)
     dc0 = dc(j,k,l)
-    print '(a,e10.3)', 'S:    ', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 )
-    print '(2(a,e10.3,x))', 'dc:   ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / miu0
-    print '(2(a,e10.3,x))', 'rcrit:', rcrit, '>', miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ** 2
+    print '(a,e11.3)', 'S:    ', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 )
+    print '(2(a,e11.3,x))', 'dc:   ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / miu0
+    print '(2(a,e11.3,x))', 'rcrit:', rcrit, '>', miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ** 2
   end if
   return
 end if

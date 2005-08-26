@@ -12,21 +12,12 @@ real :: theta, scl
 real, parameter :: pi = 3.14159
 
 if ( verb > 0 ) print '(a)', 'Grid generation'
+x = 0.
 downdim = 3
-i1 = 1
 i2 = nl + 2 * nhalo
 j = i2(1)
 k = i2(2)
 l = i2(3)
-allocate( &
-   s1(j,k,l), &
-   s2(j,k,l), &
-   w1(j,k,l,3), &
-   w2(j,k,l,3), &
-    x(j,k,l,3), &
-    v(j,k,l,3), &
-    u(j,k,l,3) )
-x = 0.
 forall( i=1:j ) x(i,:,:,1) = i - 1 - offset(1)
 forall( i=1:k ) x(:,i,:,2) = i - 1 - offset(2)
 forall( i=1:l ) x(:,:,i,3) = i - 1 - offset(3)

@@ -13,17 +13,12 @@ integer :: iz
 real :: matmin(3), matmax(3), hmean(3), tune, c1, c2, c3, damp, dampn, dampc, yc0, courant
 
 if ( verb > 0 ) print '(a)', 'Material Model'
-i2 = nl + 2 * nhalo
-j = i2(1)
-k = i2(2)
-l = i2(3)
-allocate( rho(j,k,l), yn(j,k,l), lam(j,k,l), miu(j,k,l), yc(j,k,l) )
-matmax = material(1,1:3)
-matmin = material(1,1:3)
 s1 = 0.
 lam = 0.
 miu = 0.
 yc = 0.
+matmax = material(1,1:3)
+matmin = material(1,1:3)
 do iz = 1, nmat
   call zoneselect( i1, i2, imat(iz,:), ng, offset, hypocenter, nrmdim )
   i1 = max( i1, i1cell )
@@ -110,39 +105,19 @@ lam = lam * s2
 miu = miu * s2
 
 ! PML damping
-i2 = nl + 2 * nhalo
-j = i2(1)
-k = i2(2)
-l = i2(3)
-i1 = npml * bc(1:3)
-i2 = npml * bc(4:6)
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-allocate( &
-  p1(j1,k,l,3), p2(j,k1,l,3), p3(j,k,l1,3), &
-  g1(j1,k,l,3), g2(j,k1,l,3), g3(j,k,l1,3), &
-  p4(j2,k,l,3), p5(j,k2,l,3), p6(j,k,l2,3), &
-  g4(j2,k,l,3), g5(j,k2,l,3), g6(j,k,l2,3) )
-p1 = 0.; p2 = 0.; p3 = 0.
-p4 = 0.; p5 = 0.; p6 = 0. 
-g1 = 0.; g2 = 0.; g3 = 0.
-g4 = 0.; g5 = 0.; g6 = 0.
-allocate( dn1(npml), dn2(npml), dc1(npml), dc2(npml) )
 c1 =  8. / 15.
 c2 = -3. / 100.
 c3 =  1. / 1500.
 tune = 3.5
 hmean = 2. * matmin * matmax / ( matmin + matmax )
 damp = tune * hmean(3) / dx * ( c1 + ( c2 + c3 * npml ) * npml )
-! FIXME chech this
 do i = 1, npml
-  dampn = damp * ( ( npml - i + 1. ) / npml ) ** 2.
-  dampc = damp * .5 * ( ( 2. * ( npml - i ) + 1. ) / npml ) ** 2.
-  dn1(i) = - 2. * dampn   / ( 2. + dt * dampn )
-  dc1(i) = ( 2. - dt * dampc ) / ( 2. + dt * dampc )
-  dn2(i) = 2. / ( 2. + dt * dampn )
-  dc2(i) = 2. * dt / ( 2. + dt * dampc )
+  dampn = damp * ( i / npml ) ** 2.
+  dampc = damp * .5 * ( i + i - 1. ) / npml ) ** 2.
+  dn1(npml-i+1) = - 2. * dampn   / ( 2. + dt * dampn )
+  dc1(npml-i+1) = ( 2. - dt * dampc ) / ( 2. + dt * dampc )
+  dn2(npml-i+1) = 2. / ( 2. + dt * dampn )
+  dc2(npml-i+1) = 2. * dt / ( 2. + dt * dampc )
 end do
 
 end subroutine

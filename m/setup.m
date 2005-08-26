@@ -10,7 +10,7 @@ nhalo = 1;
 offset = nhalo * [ 1 1 1 ];
 np = n(1:3);
 i = hypocenter == 0;
-hypocenter(i) = ceil( np(i) / 2 )
+hypocenter(i) = ceil( np(i) / 2 );
 hypocenter = hypocenter + offset;
 if nrmdim, np(nrmdim) = np(nrmdim) + 1; end
 nm = np + 2 * nhalo;
@@ -36,6 +36,29 @@ fprintf( 'Base memory usage: %d Mb\n', mem )
 
 if plotstyle; else gui = 0; end
 if get( 0, 'ScreenDepth' ) == 0; gui = 0; end
+
+% Allocate arrays - single or double precision arrays depending on 'zero'.
+n = [ nm 3 ];
+x   = repmat( zero, n );
+u   = repmat( zero, n );
+v   = repmat( zero, n );
+w1  = repmat( zero, n );
+w2  = repmat( zero, n );
+rho = repmat( zero, nm );
+miu = repmat( zero, nm );
+lam = repmat( zero, nm );
+yc  = repmat( zero, nm );
+yn  = repmat( zero, nm );
+n = [ nm 3 ];
+n(1) = npml * bc(1); p1 = repmat( zero, n ); g1 = repmat( zero, n );
+n(1) = npml * bc(4); p4 = repmat( zero, n ); g4 = repmat( zero, n );
+n = [ nm 3 ];
+n(2) = npml * bc(2); p2 = repmat( zero, n ); g2 = repmat( zero, n )
+n(2) = npml * bc(5); p5 = repmat( zero, n ); g5 = repmat( zero, n )
+n = [ nm 3 ];
+n(3) = npml * bc(3); p3 = repmat( zero, n ); g3 = repmat( zero, n )
+n(3) = npml * bc(6); p6 = repmat( zero, n ); g6 = repmat( zero, n )
+clear n
 
 tic
 format short e

@@ -21,7 +21,7 @@ for id = 1:3
     l = i1(3):i2(3);
     s2(j,k,l) = dfnc( op, s1, x, dx, 1, id, j, k, l );
   end
-  op = operator{1,1};
+  op = operator(1);
   i1 = nhalo + [ 1 1 1 ];
   i2 = nhalo + np - 1;
   j = i1(1):i2(1);

@@ -1,6 +1,9 @@
 %------------------------------------------------------------------------------%
 % INPUT
 
+planewavedim = 0;
+plotstyle = '';
+truptol = .001;
 material  = []; imat    = [];
 friction  = []; ifric   = [];
 traction  = []; itrac   = [];

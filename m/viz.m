@@ -4,7 +4,7 @@
 % initial plot: mesh, prestress, hypo
 % restart capable
 
-if plotstyle, else return, end
+if plotstyle, else init = 0; return, end
 
 if init == 1
   init = 0;

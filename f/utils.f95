@@ -21,39 +21,58 @@ i2 = i2 + offset
 end subroutine
 
 subroutine print3d( a, i1, i2 )
+implicit none
 real, intent(in) :: a(:,:,:)
 integer, intent(in) :: i1(3), i2(3)
-integer :: j, k, l, j1, j2, k1, k2, l1, l2
+integer :: i, j, k, l, j1, j2, k1, k2, l1, l2, flat
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-if ( j1 /= j2 ) then
-  do l = l1, l2; print *, l
-  do k = k1, k2; print *, a(j1:j2,k,l)
+flat = 0
+do i = 1, 3
+  if ( i1(i) == i2(i) ) flat = i
+end do
+select case( flat )
+case( 0 )
+  do l = l1, l2; print *, 'l = ', l
+  do j = j1, j2; print *, a(j,k1:k2,l)
   end do
   end do
-else
-  do l = l1, l2; print *, a(j1,k1:k2,l)
+case( 1 )
+  do k = k1, k2; print *, a(j1:j2,k,l1:l2)
   end do
-end if
+case default
+  do j = j1, j2; print *, a(j,k1:k2,l1:l2)
+  end do
+end select
 end subroutine
 
-subroutine print4d( a, i1, i2, i )
+subroutine print4d( a, i1, i2, ia )
+implicit none
 real, intent(in) :: a(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3), i
-integer :: j, k, l, j1, j2, k1, k2, l1, l2
+integer, intent(in) :: i1(3), i2(3), ia
+integer :: i, j, k, l, j1, j2, k1, k2, l1, l2, flat
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-if ( j1 /= j2 ) then
-  do l = l1, l2; print *, l
-  do k = k1, k2; print *, a(j1:j2,k,l,i)
+flat = 0
+do i = 1, 3
+  if ( i1(i) == i2(i) ) flat = i
+end do
+print *, 'i = ', ia
+select case( flat )
+case( 0 )
+  do l = l1, l2; print *, 'l = ', l
+  do j = j1, j2; print *, a(j,k1:k2,l,ia)
   end do
   end do
-else
-  do l = l1, l2; print *, a(j1,k1:k2,l,i)
+case( 1 )
+  do k = k1, k2; print *, a(j1:j2,k,l1:l2,ia)
   end do
-end if
+case default
+  do j = j1, j2; print *, a(j,k1:k2,l1:l2,ia)
+  end do
+end select
 end subroutine
 
 end module

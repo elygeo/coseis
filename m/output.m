@@ -19,7 +19,7 @@ if init
   return
 end
 
-for iz = 1:size( out, 1 )
+for iz = 1:size( outit, 1 )
   if outit(iz) < 0, outit(iz) = outit(iz) + nt + 1; end
   if ~outit(iz) | mod( it, outit(iz) ), continue, end
   nc = 1;
@@ -56,7 +56,7 @@ for iz = 1:size( out, 1 )
       mkdir( file )
     end
   end
-  [ i1, i2 ] = zoneselect( iout[iz,:], nhalo, np, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( iout(iz,:), nhalo, np, hypocenter, nrmdim );
   if cell; i2 = i2 - 1; end
   if isfault
     i1(nrmdim) = 1;
@@ -108,12 +108,15 @@ if checkpoint & ~mod( it, checkpoint )
   end
 end
 
+wt(6) = toc;
 dwt = wt(2:end) - wt(1:end-1);
-timing = [ it  dwt wt(end) ];
+dwt(end+1) = wt(end) - wt(1);
+
+fprintf( '%4d %13.6e %13.6e %13.6e %13.6e %9.2e\n', [ it amax vmax umax wmax dwt(end) ] );
 
 file = sprintf( 'out/stats/%05d', it );
 fid = fopen( file, 'w' );
-fprintf( fid, '%5d   %g %g %g %g %.2e %.2e %.2e %.2e\n', [ it amax vmax umax wmax dwt ] );
+fprintf( fid, '%g', [ it amax vmax umax wmax dwt ] );
 fclose( fid );
 
 fid = fopen( 'out/timestep', 'w' );

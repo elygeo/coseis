@@ -2,13 +2,6 @@
 % MATMODEL
 
 fprintf( 'Material model\n' )
-% These will be single or double precision arrays depending on
-% what type 'zero' is.
-rho = repmat( zero, nm ); % ALLOC
-miu = repmat( zero, nm ); % ALLOC
-lam = repmat( zero, nm ); % ALLOC
-yc  = repmat( zero, nm ); % ALLOC
-yn  = repmat( zero, nm ); % ALLOC
 matmax = material(1,1:3);
 matmin = material(1,1:3);
 for iz = 1:size( material, 1 )
@@ -36,7 +29,7 @@ gamma = dt * viscosity;
 
 for iz = 1:size( operator, 1 )
   [ i1, i2 ] = zoneselect( ioper(iz,:), nhalo, np, hypocenter, nrmdim );
-  op = operator(iz)
+  op = operator(iz);
   l = i1(3):i2(3)-1;
   k = i1(2):i2(2)-1;
   j = i1(1):i2(1)-1;
@@ -77,56 +70,25 @@ rho(j,k,l) = 0.125 * ...
   + s1(j-1,k,l) + s1(j,k-1,l-1) ...
   + s1(j,k-1,l) + s1(j-1,k,l-1) ...
   + s1(j,k,l-1) + s1(j-1,k-1,l) );
-yn(yn~=0) = dt ./ yn(yn~=0);
-rho(rho~=0) = dt ./ rho(rho~=0);
-s2(s2~=0) = 1 ./ s2(s2~=0);
+i = yn  ~= 0; yn(i)  = dt ./ yn(i);
+i = rho ~= 0; rho(i) = dt ./ rho(i);
+i = s2  ~= 0; s2(i)  = 1 ./ s2(i);
 lam = lam .* s2;
 miu = miu .* s2;
 
-s1(:) = 0;
-s2(:) = 0;
-
-if length( locknodes )
-  locknodes(downdim,1:3) = 0;
-  if n(1) < 5, locknodes([1 4],1:3) = 0; end
-  if n(2) < 5, locknodes([2 5],1:3) = 0; end
-  if n(3) < 5, locknodes([3 6],1:3) = 0; end
-end
-for iz = 1:size( locknodes, 1 )
-  zone = locknodes(iz,4:9);
-  [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
-  locki1(iz,:) = i1;
-  locki2(iz,:) = i2;
-end
-
 % PML damping
-p1 = []; p2 = []; p3 = []; p4 = []; p5 = []; p6 = [];
-g1 = []; g2 = []; g3 = []; g4 = []; g5 = []; g6 = [];
-n = [ nm 3 ];
-n(1) = npml;
-if bc(1), p1 = repmat( zero, n ); g1 = repmat( zero, n ); end % ALLOC
-if bc(4), p4 = repmat( zero, n ); g4 = repmat( zero, n ); end % ALLOC
-n = [ nm 3 ];
-n(2) = npml;
-if bc(2), p2 = repmat( zero, n ); g2 = repmat( zero, n ); end % ALLOC
-if bc(5), p5 = repmat( zero, n ); g5 = repmat( zero, n ); end % ALLOC
-n = [ nm 3 ];
-n(3) = npml;
-if bc(3), p3 = repmat( zero, n ); g3 = repmat( zero, n ); end % ALLOC
-if bc(6), p6 = repmat( zero, n ); g6 = repmat( zero, n ); end % ALLOC
-clear n
-c1 =  8 / 15;
-c2 = -3 / 100;
-c3 =  1 / 1500;
+c1 =  8. / 15.;
+c2 = -3. / 100.;
+c3 =  1. / 1500.;
 tune = 3.5;
-hmean = 2 * matmin .* matmax ./ ( matmin + matmax );
+hmean = 2. * matmin .* matmax ./ ( matmin + matmax );
 damp = tune * hmean(3) / dx * ( c1 + ( c2 + c3 * npml ) * npml );
-i = npml:-1:1;
-dampn = damp * ( i ./ npml ) .^ 2;
-% dampc = .5 * ( dampn + [ dampn(2:end) 0 ] );
-dampc = damp * .5 * ( ( i + i - 1 ) / npml ) .^ 2;
-dn1 = - 2 * dampn   ./ ( 2 + dt * dampn );
-dc1 = ( 2 - dt * dampc ) ./ ( 2 + dt * dampc );
-dn2 = 2 ./ ( 2 + dt * dampn );
-dc2 = 2 * dt ./ ( 2 + dt * dampc );
+do i = 1:npml
+  dampn = damp * ( i ./ npml ) .^ 2.;
+  dampc = damp * .5 * ( ( i + i - 1. ) / npml ) .^ 2.;
+  dn1(npml-i+1) = - 2. * dampn   ./ ( 2. + dt * dampn );
+  dc1(npml-i+1) = ( 2. - dt * dampc ) ./ ( 2. + dt * dampc );
+  dn2(npml-i+1) = 2. ./ ( 2. + dt * dampn );
+  dc2(npml-i+1) = 2. * dt ./ ( 2. + dt * dampc );
+end
 

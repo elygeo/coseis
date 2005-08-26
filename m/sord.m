@@ -14,12 +14,12 @@ clear all
 input
 setup
 init = 1; viz
-init = 1; output
 gridgen
 matmodel
 init = 1; fault
 init = 1; momentsrc
 init = 2; viz
+init = 1; output
 
 if gui
   control
