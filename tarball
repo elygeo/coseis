@@ -4,8 +4,8 @@ echo "making tarball"
 
 files="
   sord/README
-  sord/defaults
   sord/in
+  sord/in.*
   sord/sord
   sord/tarball
   sord/f/*.f95

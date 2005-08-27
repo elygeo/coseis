@@ -19,6 +19,8 @@ if ( init ) then
   if ( verb > 0 ) print '(a)', 'Initialize output'
   ! FIXME read checkpoint
   call system( 'rm -fr out; mkdir out; mkdir out/ckp; mkdir out/stats' )
+  if ( verb > 0 ) print '(a)', &
+  'Step  Amax          Vmax          Umax          Wmax          WallTime'
 end if
 
 outer: do iz = 1, nout
@@ -62,8 +64,8 @@ outer: do iz = 1, nout
       call system( ofile )
     end do
   end if
-  call zoneselect( i1, i2, iout(iz,:), ng, offset, hypocenter, nrmdim )
-  if ( any( i1 < i1node .or. i2 > i2node .or. i2 < i1 ) ) stop 'output error'
+  call zoneselect( i1, i2, iout(iz,:), nn, offset, hypocenter, nrmdim )
+  if ( any( i1 < i1node .or. i2 > i2node .or. i2 < i1 ) ) stop 'outrange'
   if ( cell ) i2 = i2 - 1
   if ( fault ) then
     i1(nrmdim) = 1
@@ -96,7 +98,7 @@ outer: do iz = 1, nout
     case( 'uslip' ); write( 9, rec=1 ) uslip(j1:j2,k1:k2,l1:l2)
     case( 'vslip' ); write( 9, rec=1 ) vslip(j1:j2,k1:k2,l1:l2)
     case( 'trup'  ); write( 9, rec=1 ) trup(j1:j2,k1:k2,l1:l2)
-    case default; print '(a)', 'outvar ' // outvar(iz); stop
+    case default; stop 'outvar'
     end select
     close( 9 )
     if ( static ) outit(iz) = 0
@@ -129,11 +131,11 @@ call system_clock( wt(6) )
 dwt(1:5) = real( wt(2:6) - wt(1:5) ) / real( wt_rate )
 dwt(6)   = real( wt(6)   - wt(1) )   / real( wt_rate )
 
-if ( verb > 0 ) print '(i4,4e14.6,e9.2)', it, amax, vmax, umax, wmax, dwt(6)
+if ( verb > 0 ) print '(i4,4e14.6,e10.2)', it, amax, vmax, umax, wmax, dwt(6)
 
 write( ofile, '(a,i5.5)' ) 'out/stats/', it
 open(  9, file=ofile )
-write( 9, '(4e14.6,6e9.2)' ) amax, vmax, umax, wmax, dwt
+write( 9, '(4e14.6,6e10.2)' ) amax, vmax, umax, wmax, dwt
 close( 9 )
 
 open(  9, file='out/timestep' )

@@ -17,8 +17,6 @@ if init
   j = i1(1):i2(1);
   s1(:,:,:) = 0.;
   s1(j,k,l) = dfnc( 'g', x, x, dx, 1, 1, j, k, l );
-  i = s1 ~= 0.;
-  s1(i) = 1 ./ s1(i);
   w1(:) = 2 * msrcradius;
   w1(j,k,l,:) = 0.125 * ...
     ( x(j,k,l,:) + x(j+1,k+1,l+1,:) ...
@@ -30,9 +28,9 @@ if init
   end
   s2 = msrcradius - sqrt( sum( w1 .* w1, 4 ) );
   msrci = find( s2 > 0. );
+  msrcv = s1( msrci );
   msrcx = s2( msrci );
-  msrcx = msrcx / sum( msrcx );
-  msrcx = msrcx .* s1( msrci );
+  msrcx = msrcx / sum( msrcx ) ./ msrcv;
   msrct = [];
   c = [ 1 6 5; 6 2 4; 5 4 3 ];
   [ vec, val ] = eig( moment(c) );
@@ -52,7 +50,7 @@ case 'sbrune', msrcdf = time .^ 2 .* exp( -time / domp ) / 2 / domp ^ 3;
 otherwise error srctimefcn
 end
 msrcf = dt * cumsum( msrcdf );
-o = prod( nn + 2 * nhalo );
+o = prod( nm );
 for i = 0:2
   w1(msrci+o*i) = w1(msrci+o*i) - msrcf(it) * msrcx * moment(i+1);
   w2(msrci+o*i) = w2(msrci+o*i) - msrcf(it) * msrcx * moment(i+4);

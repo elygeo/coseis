@@ -6,26 +6,28 @@ contains
 subroutine setup
 use globals_m
 
+implicit none
+
 it = 0
 
 ip = 0
 nhalo = 1
 offset = nhalo
-where( hypocenter == 0 ) hypocenter = ng / 2 + mod( ng, 2 )
+where( hypocenter == 0 ) hypocenter = nn / 2 + mod( nn, 2 )
 hypocenter = hypocenter + offset
-if( nrmdim /= 0 ) ng(nrmdim) = ng(nrmdim) + 1
-nl = ng
+if( nrmdim /= 0 ) nn(nrmdim) = nn(nrmdim) + 1
+nm = nn + 2 * nhalo
 i1node = nhalo + 1
-i2node = nhalo + nl
+i2node = nhalo + nn
 i1cell = nhalo + 1
-i2cell = nhalo + nl - 1
+i2cell = nhalo + nn - 1
 i1nodepml = i1node + bc(1:3) * npml
 i2nodepml = i2node - bc(4:6) * npml
 i1cellpml = i1cell + bc(1:3) * npml
 i2cellpml = i2cell - bc(4:6) * npml
 
 i1 = 1
-i2 = nl + 2 * nhalo
+i2 = nm
 j = i2(1)
 k = i2(2)
 l = i2(3)

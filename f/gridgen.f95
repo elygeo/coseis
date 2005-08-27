@@ -14,7 +14,7 @@ real, parameter :: pi = 3.14159
 if ( verb > 0 ) print '(a)', 'Grid generation'
 x = 0.
 downdim = 3
-i2 = nl + 2 * nhalo
+i2 = nm
 j = i2(1)
 k = i2(2)
 l = i2(3)
@@ -52,7 +52,7 @@ case( 'slant' )
   xhypo(1)   = xhypo(1)   * scl;
   x(:,:,:,3) = x(:,:,:,3) * scl;
   xhypo(3)   = xhypo(3)   * scl;
-case default; stop 'bad grid name'
+case default; stop 'grid'
 end select
 x = x * dx
 xhypo = xhypo * dx

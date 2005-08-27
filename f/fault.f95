@@ -38,7 +38,7 @@ end if
 down = (/ 0, 0, 0 /)
 down(downdim) = 1
 handed = mod( strdim - nrmdim + 1, 3 ) - 1
-i2 = nl + 2 * nhalo
+i2 = nm
 i2(nrmdim) = 1
 j = i2(1)
 k = i2(2)
@@ -55,7 +55,7 @@ fd = 0.
 dc = 0.
 cohes = 1e9
 do iz = 1, nfric
-  call zoneselect( i1, i2, ifric(iz,:), ng, offset, hypocenter, nrmdim )
+  call zoneselect( i1, i2, ifric(iz,:), nn, offset, hypocenter, nrmdim )
   i1 = max( i1, i1nodepml )
   i2 = min( i2, i2nodepml )
   i1(nrmdim) = 1
@@ -70,7 +70,7 @@ do iz = 1, nfric
 end do
 tt0nsd = 0.
 do iz = 1, ntrac
-  call zoneselect( i1, i2, itrac(iz,:), ng, offset, hypocenter, nrmdim )
+  call zoneselect( i1, i2, itrac(iz,:), nn, offset, hypocenter, nrmdim )
   i1 = max( i1, i1nodepml )
   i2 = min( i2, i2nodepml )
   i1(nrmdim) = 1
@@ -84,7 +84,7 @@ do iz = 1, ntrac
 end do
 w0 = 0.
 do iz = 1, nstress
-  call zoneselect( i1, i2, istress(iz,:), ng, offset, hypocenter, nrmdim )
+  call zoneselect( i1, i2, istress(iz,:), nn, offset, hypocenter, nrmdim )
   i1 = max( i1, i1nodepml )
   i2 = min( i2, i2nodepml )
   i1(nrmdim) = 1
@@ -143,7 +143,7 @@ do i = 1, 3
     tt0nsd(:,:,:,dipdim) * dip(:,:,:,i)
 end do
 i1 = 1
-i2 = nl + 2 * nhalo
+i2 = nm
 i1(nrmdim) = hypocenter(nrmdim)
 i2(nrmdim) = hypocenter(nrmdim)
 j1 = i1(1); j2 = i2(1)
@@ -153,7 +153,7 @@ do i = 1, 3
   r3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i)
 end do
 r = sqrt( sum( r3 * r3, 4 ) )
-i2 = nl + 2 * nhalo
+i2 = nm
 i2(nrmdim) = 1
 j = i2(1)
 k = i2(2)
@@ -186,7 +186,7 @@ end if
 if ( nrmdim == 0 ) return
 if ( verb > 1 ) print '(a)', 'Fault'
 i1 = 1
-i2 = nl + 2 * nhalo
+i2 = nm
 i1(nrmdim) = hypocenter(nrmdim)
 i2(nrmdim) = hypocenter(nrmdim)
 j1 = i1(1); j2 = i2(1)

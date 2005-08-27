@@ -7,26 +7,25 @@ subroutine momentsrc
 use globals_m
 use dfnc_m
 
+implicit none
 save
 logical :: init = .true.
 integer, allocatable :: jj(:), kk(:), ll(:)
-real, allocatable :: msrcx(:)
+real, allocatable :: msrcx(:), msrcv(:)
 integer :: nsrc, ic
-real :: time, domp, msrcdf, msrcf
+real :: time, domp, msrcdf, msrcf, fact
 
 if ( msrcradius <= 0. ) return
 
 if ( init ) then
   init = .false.
+  if( verb > 0 ) print '(a)', 'Initialize moment source'
   i1 = i1cell
   i2 = i2cell
-  s1(:,:,:) = 0.
   call dfnc( s1, 'g', x, x, dx, 1, 1, i1, i2 )
-  where( s1 /= 0. ) s1 = 1. / s1
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
-  w1 = 2. * msrcradius
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     w1(j,k,l,:) = 0.125 * &
     ( x(j,k,l,:) + x(j+1,k+1,l+1,:) &
@@ -37,20 +36,28 @@ if ( init ) then
   do i = 1, 3
     w1(:,:,:,i) = w1(:,:,:,i) - xhypo(i)
   end do
-  s2 = msrcradius - sqrt( sum( w1 * w1, 4 ) )
+  s2 = -1.
+  w1 = w1 * w1
+  s2(j1:j2,k1:k2,l1:l2) = msrcradius - sqrt( sum( w1(j1:j2,k1:k2,l1:l2,:), 4 ) )
   nsrc = count( s2 > 0. )
-  allocate( jj(nsrc), kk(nsrc), ll(nsrc), msrcx(nsrc) ) 
+  allocate( jj(nsrc), kk(nsrc), ll(nsrc), msrcx(nsrc), msrcv(nsrc) ) 
   msrcx = pack( s2, s2 > 0. )
-  msrcx = msrcx / sum( msrcx )
-  msrcx = msrcx * pack( s1, s2 > 0. )
+  msrcv = pack( s1, s2 > 0. )
+  msrcx = msrcx / sum( msrcx ) / msrcv
   msrcf = 0.
-  i2 = nl + 2 * nhalo
-  j2 = i2(1)
-  k2 = i2(2)
-  l2 = i2(3)
-  jj = pack( (/ (((j,j=1,j2),k=1,k2),l=1,l2) /), s2 > 0. ) 
-  kk = pack( (/ (((k,j=1,j2),k=1,k2),l=1,l2) /), s2 > 0. ) 
-  ll = pack( (/ (((l,j=1,j2),k=1,k2),l=1,l2) /), s2 > 0. ) 
+  i = 0
+  do l = l1, l2
+  do k = k1, k2
+  do j = j1, j2
+    if ( s2(j,k,l) > 0. ) then
+      i = i + 1
+      jj(i) = j
+      kk(i) = k
+      ll(i) = l
+    end if
+  end do
+  end do
+  end do
   return
   ! c = [ 1 6 5; 6 2 4; 5 4 3 ]
   ! [ vec, val ] = eig( moment(c) )
@@ -66,6 +73,7 @@ select case( srctimefcn )
 case( 'delta' );  msrcdf = 0.; if ( it == 1 ) msrcdf = 1. / dt
 case( 'brune' );  msrcdf = time * exp( -time / domp ) / domp ** 2.
 case( 'sbrune' ); msrcdf = time ** 2. * exp( -time / domp ) / 2. / domp ** 3.
+case default; stop 'srctimefcn'
 end select
 msrcf = msrcf + dt * msrcdf
 

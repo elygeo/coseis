@@ -17,7 +17,7 @@ real :: dwt(6)
 
 character(256) :: grid, srctimefcn
 integer :: &
-  n(4), nl(3), ng(3), nhalo, offset(3), npml, bc(6), &
+  n(4), nn(3), nm(3), nhalo, offset(3), npml, bc(6), &
   nt, it, checkpoint, ip, np(3), &
   hypocenter(3), nrmdim, downdim, nclramp, &
   amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), verb = 1, &

@@ -159,6 +159,8 @@ SunOS)
   ;;
 esac
 
+[ "$npoints" -lt 100000 ] && OPTFLAGS=
+
 if [ $debug = yes ]; then
   OPTFLAGS=-g
 fi

@@ -1,7 +1,6 @@
 #------------------------------------------------------------------------------#
 # SORD Defaults
-# Be careful editing this file.
-# All parameters beside 'out' must be specified at least once
+# Be careful editing this file, better to make changes in 'in'
 
 # n: ng(3) nt: number of mesh nodes and number of timesteps
   n            21 21 21   20

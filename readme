@@ -1,38 +1,39 @@
---------------------------------------------------------------------------------
 
 SORD: Support-Operator Rupture Dynamics
 
-SORD models spontaneous rupture on a fault within a 3D isotropic viscoelastic
-solid.  The equations of motion are approximated with second order a
-Support-Operator method on a logically rectangular mesh.  The fault is modeled
-with a slip-weakening, frictional, internal boundary condition. 
+  SORD models spontaneous rupture on a fault within a 3D isotropic
+  viscoelastic solid.  The equations of motion are approximated with second
+  order a Support-Operator method on a logically rectangular mesh.  The fault
+  is modeled with a slip-weakening, frictional, internal boundary condition.
+  There are two versions, one written in Fortran and one in Matlab.  The
+  Matlab version has integrated visualization and is good for testing small
+  problems.  The Fortran version is best for large problems and is
+  parallelized with MPI. 
 
-Author:
-Geoffrey Ely
-Institute of Geophysics and Planetary Physics
-Scripps Institution of Oceanography
-University of California, San Diego
-9500 Gilman Dr.
-La Jolla, CA 92093-0225
-gely@ucsd.edu
+AUTHOR
 
-There are two versions, one written in Fortran and one in Matlab.  The Matlab 
-version has integrated visualization and is good for testing small problems.  
-The Fortran version is best for large problems and is parallelized with MPI. 
-To run SORD:
+  Geoffrey Ely
+  Institute of Geophysics and Planetary Physics
+  Scripps Institution of Oceanography
+  University of California, San Diego
+  9500 Gilman Dr.
+  La Jolla, CA 92093-0225
+  gely@ucsd.edu
 
-  more defaults
-  vi in
+RUNNING SORD
+
+  see example input 'in.defaults'
+  edit input file 'in'
   ./sord
 
-When porting to a new machine, you may have to modify the 'sord' script for 
-the proper compiling and batch submission parameters.
+  options:
+  -m  use Matlab backend
+  -g  run in debugger
+  -b  batch mode, compinle don't run
+  -r  run on remote host, edit sord script to set host
 
-To run the matlab version:
-
-  ./sord -m
-
---------------------------------------------------------------------------------
+  When porting to a new machine, you may have to modify the 'sord' script for 
+  the proper compiling and batch submission parameters.
 
 COORDINATE SYSTEM
  

@@ -11,7 +11,7 @@ stress    = []; istress = [];
 locknodes = []; ilock   = [];
 outvar    = {}; iout    = []; outit = [];
 
-for file = { 'defaults', 'in' }
+for file = { 'in.defaults', 'in' }
 in = textread( file{1}, '%s', 'delimiter', '\n', 'commentstyle', 'shell' );
 caseswitch = '';
 switchcase = '';

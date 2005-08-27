@@ -5,7 +5,6 @@ module input_m
 contains
 subroutine input
 use globals_m
-use utils_m
 
 implicit none
 integer :: iostat, ifile
@@ -21,7 +20,7 @@ nout = 0
 if ( verb > 0 ) print '(a)', 'Reading input file'
 outer: do ifile = 1, 2
 select case( ifile )
-case( 1 ); open( 9, file='defaults', status='old' )
+case( 1 ); open( 9, file='in.defaults', status='old' )
 case( 2 ); open( 9, file='in', status='old' )
 end select
 inner: do
@@ -36,7 +35,7 @@ inner: do
   end select
   if ( switch /= switchcase ) cycle inner
   select case( key )
-  case( 'n' );          read( a, * ) key, ng, nt
+  case( 'n' );          read( a, * ) key, nn, nt
   case( 'dx' );         read( a, * ) key, dx
   case( 'dt' );         read( a, * ) key, dt
   case( 'bc' );         read( a, * ) key, bc
