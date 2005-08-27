@@ -2,6 +2,7 @@
 % SNORMALS - surface normals
 
 function nrm = snormals( x, i1, i2 )
+
 j = i1(1):i2(1);
 k = i1(2):i2(2);
 l = i1(3):i2(3);

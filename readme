@@ -1,5 +1,6 @@
-
+--------------------------------------------------------------------------------
 SORD: Support-Operator Rupture Dynamics
+--------------------------------------------------------------------------------
 
   SORD models spontaneous rupture on a fault within a 3D isotropic
   viscoelastic solid.  The equations of motion are approximated with second
@@ -20,20 +21,22 @@ AUTHOR
   La Jolla, CA 92093-0225
   gely@ucsd.edu
 
-RUNNING SORD
+USAGE
 
-  see example input 'in.defaults'
-  edit input file 'in'
-  ./sord
+  See 'in.defaults' for examples, and edit input file 'in'.
+  Then run the sord script:
 
-  options:
-  -m  use Matlab backend
-  -g  run in debugger
-  -b  batch mode, compinle don't run
-  -r  run on remote host, edit sord script to set host
+    ./sord
 
-  When porting to a new machine, you may have to modify the 'sord' script for 
-  the proper compiling and batch submission parameters.
+  Sript options:
+    -m  use Matlab backend (default is Fortran)
+    -g  run in debugger
+    -b  batch mode, compinle don't run
+    -r  run on remote host, edit sord script to set host
+
+  When porting to a new machine, you may have to modify the sord script for 
+  the proper compiling and batch submission parameters.  For the parallel
+  version you will need MPI installed.
 
 COORDINATE SYSTEM
  

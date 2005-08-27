@@ -1,4 +1,8 @@
+%------------------------------------------------------------------------------%
+% CAMERATOOLBAR
+
 function ret=cameratoolbar(varargin)
+
 %CAMERATOOLBAR  Interactively manipulate camera.
 %   CAMERATOOLBAR creates a new toolbar that enables interactive 
 %   manipulation of a scene's camera and light by dragging the 

@@ -1,5 +1,6 @@
 %------------------------------------------------------------------------------%
 % VIZ
+
 % range selector
 % initial plot: mesh, prestress, hypo
 % restart capable
