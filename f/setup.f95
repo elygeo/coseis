@@ -44,8 +44,14 @@ allocate( &
   p4(j2,k,l,3), p5(j,k2,l,3), p6(j,k,l2,3), &
   g4(j2,k,l,3), g5(j,k2,l,3), g6(j,k,l2,3), &
   dn1(npml), dn2(npml), dc1(npml), dc2(npml) )
-u = 0.
+x = 0.
 v = 0.
+u = 0.
+rho = 0.
+lam = 0.
+miu = 0.
+yn = 0.
+yc = 0.
 p1 = 0.; p2 = 0.; p3 = 0.
 p4 = 0.; p5 = 0.; p6 = 0.
 g1 = 0.; g2 = 0.; g3 = 0.

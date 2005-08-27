@@ -13,12 +13,9 @@ integer :: iz
 real :: matmin(3), matmax(3), hmean(3), tune, c1, c2, c3, damp, dampn, dampc, yc0, courant
 
 if ( verb > 0 ) print '(a)', 'Material Model'
-s1 = 0.
-lam = 0.
-miu = 0.
-yc = 0.
 matmax = material(1,1:3)
 matmin = material(1,1:3)
+s1 = 0.
 do iz = 1, nmat
   call zoneselect( i1, i2, imat(iz,:), ng, offset, hypocenter, nrmdim )
   i1 = max( i1, i1cell )
@@ -64,7 +61,7 @@ if ( nrmdim /=0 ) then
   end select
 end if
 
-i2 = nl + 2 * nhalo
+i2 = nl + 2 * nhalo - 1
 j1 = i2(1); j2 = i2(1) - 1
 k1 = i2(2); k2 = i2(2) - 1
 l1 = i2(3); l2 = i2(3) - 1
@@ -80,7 +77,7 @@ i2 = i2node
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-yn = 0.
+
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   yn(j,k,l) = 0.125 * &
   ( s1(j,k,l) + s1(j-1,k-1,l-1) &
@@ -89,7 +86,7 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   + s1(j,k,l-1) + s1(j-1,k-1,l) )
 end forall
 s1 = s1 * s2
-rho = 0.
+
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   rho(j,k,l) = 0.125 * &
   ( s1(j,k,l) + s1(j-1,k-1,l-1) &
@@ -113,7 +110,7 @@ hmean = 2. * matmin * matmax / ( matmin + matmax )
 damp = tune * hmean(3) / dx * ( c1 + ( c2 + c3 * npml ) * npml )
 do i = 1, npml
   dampn = damp * ( i / npml ) ** 2.
-  dampc = damp * .5 * ( i + i - 1. ) / npml ) ** 2.
+  dampc = damp * .5 * ( ( i + i - 1. ) / npml ) ** 2.
   dn1(npml-i+1) = - 2. * dampn   / ( 2. + dt * dampn )
   dc1(npml-i+1) = ( 2. - dt * dampc ) / ( 2. + dt * dampc )
   dn2(npml-i+1) = 2. / ( 2. + dt * dampn )

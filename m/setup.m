@@ -18,9 +18,9 @@ i1pml = nhalo + 1  + bc(1:3) * npml;
 i2pml = nhalo + np - bc(4:6) * npml;
 
 nl = np;
-i1node = nhalo + 1;
+i1node = nhalo + [ 1 1 1 ];
 i2node = nhalo + nl;
-i1cell = nhalo + 1;
+i1cell = nhalo + [ 1 1 1 ];
 i2cell = nhalo + nl - 1;
 i1nodepml = i1node + bc(1:3) * npml;
 i2nodepml = i2node - bc(4:6) * npml;
@@ -53,11 +53,11 @@ n = [ nm 3 ];
 n(1) = npml * bc(1); p1 = repmat( zero, n ); g1 = repmat( zero, n );
 n(1) = npml * bc(4); p4 = repmat( zero, n ); g4 = repmat( zero, n );
 n = [ nm 3 ];
-n(2) = npml * bc(2); p2 = repmat( zero, n ); g2 = repmat( zero, n )
-n(2) = npml * bc(5); p5 = repmat( zero, n ); g5 = repmat( zero, n )
+n(2) = npml * bc(2); p2 = repmat( zero, n ); g2 = repmat( zero, n );
+n(2) = npml * bc(5); p5 = repmat( zero, n ); g5 = repmat( zero, n );
 n = [ nm 3 ];
-n(3) = npml * bc(3); p3 = repmat( zero, n ); g3 = repmat( zero, n )
-n(3) = npml * bc(6); p6 = repmat( zero, n ); g6 = repmat( zero, n )
+n(3) = npml * bc(3); p3 = repmat( zero, n ); g3 = repmat( zero, n );
+n(3) = npml * bc(6); p6 = repmat( zero, n ); g6 = repmat( zero, n );
 clear n
 
 tic

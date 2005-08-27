@@ -16,8 +16,8 @@ mpi=guess
 debug=no
 batch=no
 matlab=no
-showhelp=mo
-while getopts spgbfmh opt; do
+remote=no
+while getopts spgbfmrl opt; do
   case $opt in
     s) mpi=no ;;
     p) mpi=yes ;;
@@ -25,11 +25,27 @@ while getopts spgbfmh opt; do
     b) batch=yes ;;
     f) matlab=no ;;
     m) matlab=yes ;;
-    h) showhelp=yes ;;
+    r) remote=yes ;;
+    l) remote=no ;;
   esac
 done
 
+if [ $remote = yes ]; then
+  host="gach.ucsd.edu"
+  host="phim.ucsd.edu"
+  echo "running on remote host $host"
+  ssh-add -L > /dev/null || ssh-add
+  ./tarball
+  scp sord.tgz $host:
+  ssh -x $host "tar zxf sord.tgz && cd sord && ./sord $@ -l"
+  exit
+fi
+
 if [ $matlab = yes ]; then
+  ./tarball
+  [ -e meta ] && rm -fr meta
+  mkdir meta
+  perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > meta/endian
   matlab -r "addpath m; sord"
   exit
 fi
@@ -120,8 +136,8 @@ fi
 
 case $osname in
 Linux)
+  FC=gfortran
   OPTFLAGS=-O3
-  OPTFLAGS=
   ;;
 SunOS)
   OPTFLAGS=-fast

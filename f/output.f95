@@ -129,11 +129,11 @@ call system_clock( wt(6) )
 dwt(1:5) = real( wt(2:6) - wt(1:5) ) / real( wt_rate )
 dwt(6)   = real( wt(6)   - wt(1) )   / real( wt_rate )
 
-if ( verb > 0 ) print '(i4,4(e14.6),e10.2)', it, amax, vmax, umax, wmax, dwt(6)
+if ( verb > 0 ) print '(i4,4e14.6,e9.2)', it, amax, vmax, umax, wmax, dwt(6)
 
 write( ofile, '(a,i5.5)' ) 'out/stats/', it
 open(  9, file=ofile )
-write( 9, * ) it, amax, vmax, umax, wmax, dwt
+write( 9, '(4e14.6,6e9.2)' ) amax, vmax, umax, wmax, dwt
 close( 9 )
 
 open(  9, file='out/timestep' )

@@ -149,7 +149,7 @@ if ( init ) then
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
   do i = 1, 3
-    r3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - hypoloc(i)
+    r3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xh(1,1,1,i)
   end do
   r = sqrt( sum( r3 * r3, 4 ) )
   i2 = nl + 2 * nhalo

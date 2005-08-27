@@ -11,16 +11,16 @@ if init
     msrcradius = 0;
     return
   end
+  i1 = i1cell;
+  i2 = i2cell;
+  l = i1(3):i2(3);
+  k = i1(2):i2(2);
+  j = i1(1):i2(1);
   s1(:,:,:) = 0;
-  w1(:,:,:,:) = 0;
-  i1 = nhalo + [ 1 1 1 ];
-  i2 = nhalo + np;
-  l = i1(3):i2(3)-1;
-  k = i1(2):i2(2)-1;
-  j = i1(1):i2(1)-1;
   s1(j,k,l) = dfnc( 'g', x, x, dx, 1, 1, j, k, l );
   i = s1 ~= 0;
   s1(i) = 1 ./ s1(i);
+  w1(:) = 2 * msrcradius;
   w1(j,k,l,:) = 0.125 * ...
     ( x(j,k,l,:) + x(j+1,k+1,l+1,:) ...
     + x(j+1,k,l,:) + x(j,k+1,l+1,:) ...
@@ -36,8 +36,7 @@ if init
       w1(:,:,:,i) = w1(:,:,:,i) - w1(j1,k1,l1,i);
     end
   end
-  s2(:,:,:) = 2 * msrcradius ^ 2;
-  s2(j,k,l) = sum( w1(j,k,l,:) .* w1(j,k,l,:), 4 );
+  s2 = sum( w1 .* w1, 4 );
   msrci = find( s2 < msrcradius ^ 2 );
   msrcx = msrcradius - sqrt( s2( msrci ) );
   msrcx = msrcx / sum( msrcx );
