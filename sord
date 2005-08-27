@@ -1,10 +1,7 @@
 #!/bin/bash -e
 #------------------------------------------------------------------------------#
-# SORD setup script - Geoffrey Ely
 
-#exec 2>&1 > >( tee sord.log )
-
-echo "SORD setup"
+echo "SORD Support-Opperator Rupture Dynamics"
 date
 
 infile="in"
@@ -41,14 +38,43 @@ if [ $remote = yes ]; then
   exit
 fi
 
+#------------------------------------------------------------------------------#
+# Metadata
+
+[ -e meta ] && rm -fr meta
+mkdir meta
+
+osname=$( uname )
+
+if   [ "${HOSTNAME:0:2}" = ds ]; then machine="datastar"
+elif [ "${HOSTNAME:0:2}" = tg ]; then machine="teragrid"
+elif [ "$HOSTNAME" = master ];   then machine="babieca"
+fi
+
+cat << END > meta/data
+name:     $( finger $LOGNAME | sed -n 's/^.*e: //p' )
+logname:  ${LOGNAME}
+date:     $( date )
+machine:  $machine
+hostname: ${HOSTNAME}
+osname:   $( uname -a )
+END
+
+perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > meta/endian
+
+./tarball
+cp sord.tgz meta/
+
+#------------------------------------------------------------------------------#
+# Matlab backend
+
 if [ $matlab = yes ]; then
-  ./tarball
-  [ -e meta ] && rm -fr meta
-  mkdir meta
-  perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > meta/endian
   matlab -r "addpath m; sord"
   exit
 fi
+
+#------------------------------------------------------------------------------#
+# Fortran backend
 
 if [ $debug = yes -a $batch = yes ]; then
   echo "can't debug in batch mode"
@@ -77,26 +103,14 @@ npoints=$(( ng[0] * ng[1] * ng[2] ));
 ram=$(( npoints / nprocs * floatsize * 22 / 1024 / 1024 ))
 wt=$(( npoints / nprocs / 40000 + 1 ))
 
+echo "RAM usage: $ram Mb"
+
 if   [ $wt -gt 5400 ]; then wt="$(( wt / 3600 + 1 )):00:00"
 elif [ $wt -gt 90   ]; then wt="$(( wt /   60 + 1 )):00"
 fi
 
 [ $mpi = guess -a $nprocs -eq 1 ] && mpi=no
 [ $mpi = guess -a $nprocs -gt 1 ] && mpi=yes
-
-osname=$( uname )
-
-if   [ "${HOSTNAME:0:2}" = ds ]; then machine="datastar"
-elif [ "${HOSTNAME:0:2}" = tg ]; then machine="teragrid"
-elif [ "$HOSTNAME" = master ];   then machine="babieca"
-fi
-
-cat << END
-points: $npoints
-procs: $nprocs
-ram per proc: $ram
-wall time limit: $wt
-END
 
 #------------------------------------------------------------------------------#
 # Create makefile and compile code
@@ -114,6 +128,7 @@ OBJECT="\\
   gridgen.o \\
   matmodel.o \\
   fault.o \\
+  momentsrc.o \\
   vstep.o \\
   wstep.o \\
   output.o"
@@ -168,13 +183,12 @@ OBJECT = $OBJECT
 
 sord-bin: \$(OBJECT) makefile
 	\$(FC) \$(FFLAGS) \$(OBJECT) -o sord-bin
-	./tarball
 
 clean:
-	rm -f *.o *.mod
+	rm -f *.o *.mod matlab_workspace.mat
 
 realclean: clean
-	rm -r sord-bin makefile batchjob sord.log
+	rm -f sord-bin makefile batchjob
 
 %.o: f/%.f95 makefile
 	\$(FC) \$(FFLAGS) -c \$< -o \$@
@@ -185,26 +199,6 @@ END
 [ "$( diff tmp makefile )" != "" ] && mv tmp makefile
 rm -f tmp
 gmake
-
-#------------------------------------------------------------------------------#
-# Save metadata and sorce code
-
-[ -e meta ] && rm -fr meta
-mkdir meta
-perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > meta/endian
-cat << END > meta/data
-name:     $( finger $LOGNAME | sed -n 's/^.*e: //p' )
-logname:  ${LOGNAME}
-date:     $( date )
-machine:  $machine
-hostname: ${HOSTNAME}
-osname:   $( uname -a )
-npoints:  $npoints
-nprocs:   $nprocs
-END
-srcbase=$( basename "$rundir" )
-cp sord.tgz meta/
-cp -f sord-bin meta/
 
 #------------------------------------------------------------------------------#
 # Machine specific batch submission and run commands

@@ -25,7 +25,7 @@ case 1
   vglyphx = xg;
   vglyphn = ng;
   for ig = 1:size( vga, 1 )
-    mg = sqrt( double( mga(ig) ) );
+    mg = double( mga(ig) );
     vg = vga(ig,:) / mg;
     n  = size( vglyphx );
     xg = vglyphx;

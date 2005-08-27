@@ -4,8 +4,10 @@
 lines = volumes;
 lineviz
 houtline = hand;
-i = nhalo + 1;
-xg = double( squeeze( x(i,i,i,:) + xscl * u(i,i,i,:) ) );
+j = i1node(1);
+k = i1node(2);
+l = i1node(3);
+xg = double( squeeze( x(j,k,l,:) + xscl * u(j,k,l,:) ) );
 xg = [ xg xg + xmax / 16 xg + xmax / 15 ];
 j = [ 4 1 1 1 1 ];
 k = [ 2 2 5 2 2 ];

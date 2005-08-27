@@ -6,7 +6,8 @@ if ~length( mga ) || ~fscl, return, end
 scl = .5 * dx * ( 1 / fscl ) ^ glyphexp;
 switch size( mga, 2 );
 case 1
-  mga = scl * mga .^ ( 0.5 * glyphexp - 0.5 );
+  %mga = scl * mga .^ ( glyphexp - 1 ); % CHECK
+  mga = scl * mga .^ glyphexp; % CHECK
   for i = 1:3
     vga(:,i) = vga(:,i) .* mga;
   end

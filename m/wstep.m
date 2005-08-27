@@ -11,19 +11,18 @@ s1 = u(:,:,:,ic) + gamma(1) .* v(:,:,:,ic);
 for id = 1:3
   ix = 6 - ic - id;
   for iz = 1:size( operator, 1 )
-    [ i1, i2 ] = zoneselect( ioper(iz,:), nhalo, np, hypocenter, nrmdim );
+    [ i1, i2 ] = zoneselect( ioper(iz,:), nn, offset, hypocenter, nrmdim );
     op = operator(iz);
-    i2 = i2 - 1;
     i1 = max( i1, i1pml );
-    i2 = min( i2, i2pml - 1 );
+    i2 = min( i2 - 1, i2pml - 1 );
     j = i1(1):i2(1);
     k = i1(2):i2(2);
     l = i1(3):i2(3);
     s2(j,k,l) = dfnc( op, s1, x, dx, 1, id, j, k, l );
   end
   op = operator(1);
-  i1 = nhalo + [ 1 1 1 ];
-  i2 = nhalo + np - 1;
+  i1 = i1cell;
+  i2 = i2cell;
   j = i1(1):i2(1);
   k = i1(2):i2(2);
   l = i1(3):i2(3);
@@ -101,10 +100,10 @@ if msrcradius, momentsrc, end
 % Magnitudes
 s1 = sum( u .* u, 4 );
 s2 = sum( w1 .* w1, 4 ) + 2 * sum( w2 .* w2, 4 );
+s1 = sqrt( s1 );
+s2 = sqrt( s2 );
 [ umax, umaxi ] = max( s1(:) );
 [ wmax, wmaxi ] = max( s2(:) );
-umax = sqrt( umax );
-wmax = sqrt( wmax );
 if umax > dx / 10
   fprintf( 'Warning: u !<< dx\n' )
 end

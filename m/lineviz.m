@@ -19,7 +19,7 @@ i = [
 tmp = [];
 for iz = 1:size( lines, 1 )
   zone = lines(iz,:);
-  [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( zone, nn, offset, hypocenter, nrmdim );
   zone = [ i1 i2 ];
   tmp = [ tmp; zone( i ) ];
 end

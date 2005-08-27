@@ -1,6 +1,7 @@
 %------------------------------------------------------------------------------%
 % Setup
 
+nn = n(1:3);
 nt = n(4);
 it = 0;
 itstep = nt;
@@ -8,20 +9,18 @@ readcheckpoint = 0;
 
 nhalo = 1;
 offset = nhalo * [ 1 1 1 ];
-np = n(1:3);
 i = hypocenter == 0;
-hypocenter(i) = ceil( np(i) / 2 );
+hypocenter(i) = ceil( nn(i) / 2 );
 hypocenter = hypocenter + offset;
-if nrmdim, np(nrmdim) = np(nrmdim) + 1; end
-nm = np + 2 * nhalo;
+if nrmdim, nn(nrmdim) = nn(nrmdim) + 1; end
+nm = nn + 2 * nhalo;
 i1pml = nhalo + 1  + bc(1:3) * npml;
-i2pml = nhalo + np - bc(4:6) * npml;
+i2pml = nhalo + nn - bc(4:6) * npml;
 
-nl = np;
 i1node = nhalo + [ 1 1 1 ];
-i2node = nhalo + nl;
+i2node = nhalo + nn;
 i1cell = nhalo + [ 1 1 1 ];
-i2cell = nhalo + nl - 1;
+i2cell = nhalo + nn - 1;
 i1nodepml = i1node + bc(1:3) * npml;
 i2nodepml = i2node - bc(4:6) * npml;
 i1cellpml = i1cell + bc(1:3) * npml;
@@ -38,12 +37,11 @@ if plotstyle; else gui = 0; end
 if get( 0, 'ScreenDepth' ) == 0; gui = 0; end
 
 % Allocate arrays - single or double precision arrays depending on 'zero'.
-n = [ nm 3 ];
-x   = repmat( zero, n );
-u   = repmat( zero, n );
-v   = repmat( zero, n );
-w1  = repmat( zero, n );
-w2  = repmat( zero, n );
+x   = repmat( zero, [ nm 3 ] );
+u   = repmat( zero, [ nm 3 ] );
+v   = repmat( zero, [ nm 3 ] );
+w1  = repmat( zero, [ nm 3 ] );
+w2  = repmat( zero, [ nm 3 ] );
 rho = repmat( zero, nm );
 miu = repmat( zero, nm );
 lam = repmat( zero, nm );

@@ -12,7 +12,7 @@ xga = [];
 c = [ 1 6 5; 6 2 4; 5 4 3 ];
 for iz = 1:size( glyphs, 1 )
   zone = glyphs(iz,:);
-  [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( zone, nn, offset, hypocenter, nrmdim );
   if cellfocus, i2 = i2 - 1; end
   l = i1(3):i2(3);
   k = i1(2):i2(2);
@@ -32,12 +32,12 @@ for iz = 1:size( glyphs, 1 )
         vg(:,i+1) = u(iii+i*ng);
         xg(:,i+1) = x(iii+i*ng) + xscl * u(iii+i*ng);
       end
-      mga = [ mga; sum( vg .* vg, 2 ) ];
+      mga = [ mga; sqrt( sum( vg .* vg, 2 ) ) ];
       vga = [ vga; vg ];
       xga = [ xga; xg ];
     end
   case 'v'
-    ii = find( s1(j,k,l) > minmag ^ 2 );
+    ii = find( s1(j,k,l) > minmag );
     if ii
       [ j, k, l ] = ind2sub( i2 - i1 + 1, ii );
       j = j + i1(1) - 1;
@@ -55,7 +55,7 @@ for iz = 1:size( glyphs, 1 )
       xga = [ xga; xg ];
     end
   case 'w'
-    ii = find( s2(j,k,l) > minmag ^ 2 );
+    ii = find( s2(j,k,l) > minmag );
     for iii = ii(:)'
       [ j, k, l ] = ind2sub( i2 - i1 + 1, iii );
       j = j + i1(1) - 1;

@@ -5,10 +5,9 @@ if ~msrcradius; return; end
 
 if init
   init = 0;
-  if msrcradius && exist( 'msrcnodealign' ) && exist( 'srctimefcn' ) ...
-  && sum( abs( moment ) )
+  if msrcradius && exist( 'srctimefcn' ) && sum( abs( moment ) )
   else
-    msrcradius = 0;
+    msrcradius = 0.;
     return
   end
   i1 = i1cell;
@@ -16,9 +15,9 @@ if init
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
-  s1(:,:,:) = 0;
+  s1(:,:,:) = 0.;
   s1(j,k,l) = dfnc( 'g', x, x, dx, 1, 1, j, k, l );
-  i = s1 ~= 0;
+  i = s1 ~= 0.;
   s1(i) = 1 ./ s1(i);
   w1(:) = 2 * msrcradius;
   w1(j,k,l,:) = 0.125 * ...
@@ -26,24 +25,14 @@ if init
     + x(j+1,k,l,:) + x(j,k+1,l+1,:) ...
     + x(j,k+1,l,:) + x(j+1,k,l+1,:) ...
     + x(j,k,l+1,:) + x(j+1,k+1,l,:) );
-  l1 = hypocenter(3);
-  k1 = hypocenter(2);
-  j1 = hypocenter(1);
   for i = 1:3
-    if msrcnodealign
-      w1(:,:,:,i) = w1(:,:,:,i) - x(j1,k1,l1,i);
-    else
-      w1(:,:,:,i) = w1(:,:,:,i) - w1(j1,k1,l1,i);
-    end
+    w1(:,:,:,i) = w1(:,:,:,i) - xhypo(i);
   end
-  s2 = sum( w1 .* w1, 4 );
-  msrci = find( s2 < msrcradius ^ 2 );
-  msrcx = msrcradius - sqrt( s2( msrci ) );
+  s2 = msrcradius - sqrt( sum( w1 .* w1, 4 ) );
+  msrci = find( s2 > 0. );
+  msrcx = s2( msrci );
   msrcx = msrcx / sum( msrcx );
   msrcx = msrcx .* s1( msrci );
-  s1(:,:,:) = 0;
-  s2(:,:,:) = 0;
-  w1(:,:,:,:) = 0;
   msrct = [];
   c = [ 1 6 5; 6 2 4; 5 4 3 ];
   [ vec, val ] = eig( moment(c) );
@@ -63,7 +52,7 @@ case 'sbrune', msrcdf = time .^ 2 .* exp( -time / domp ) / 2 / domp ^ 3;
 otherwise error srctimefcn
 end
 msrcf = dt * cumsum( msrcdf );
-o = prod( nm );
+o = prod( nn + 2 * nhalo );
 for i = 0:2
   w1(msrci+o*i) = w1(msrci+o*i) - msrcf(it) * msrcx * moment(i+1);
   w2(msrci+o*i) = w2(msrci+o*i) - msrcf(it) * msrcx * moment(i+4);

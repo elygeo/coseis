@@ -11,7 +11,7 @@ save
 logical :: init = .true.
 integer, allocatable :: jj(:), kk(:), ll(:)
 real, allocatable :: msrcx(:)
-integer :: n
+integer :: nsrc, ic
 real :: time, domp, msrcdf, msrcf
 
 if ( msrcradius <= 0. ) return
@@ -34,35 +34,23 @@ if ( init ) then
     + x(j,k+1,l,:) + x(j+1,k,l+1,:) &
     + x(j,k,l+1,:) + x(j+1,k+1,l,:) );
   end forall
-  do i = 1:3
+  do i = 1, 3
     w1(:,:,:,i) = w1(:,:,:,i) - xhypo(i)
   end do
   s2 = msrcradius - sqrt( sum( w1 * w1, 4 ) )
-  n = count( s2 > 0. )
-  allocate( msrci(n,3), msrcx(n) ) 
-  ii = 0
-  do l = l1, l2
-  do k = k1, k2
-  do j = j1, j2
-    if ( s2(j,k,l) > 0. ) then
-      ii = ii + 1
-      jj(ii) = j
-      kk(ii) = k
-      ll(ii) = l
-      msrcx(ii) = s2(j,k,l)
-    end if
-  end do
-  end do
-  end do
+  nsrc = count( s2 > 0. )
+  allocate( jj(nsrc), kk(nsrc), ll(nsrc), msrcx(nsrc) ) 
+  msrcx = pack( s2, s2 > 0. )
   msrcx = msrcx / sum( msrcx )
-  n = ii
-  do ii = 1, n
-    j = jj(ii)
-    k = kk(ii)
-    l = ll(ii)
-    msrcx(ii) = msrcx(ii) * s1(j,k,l)
-  end do
+  msrcx = msrcx * pack( s1, s2 > 0. )
   msrcf = 0.
+  i2 = nl + 2 * nhalo
+  j2 = i2(1)
+  k2 = i2(2)
+  l2 = i2(3)
+  jj = pack( (/ (((j,j=1,j2),k=1,k2),l=1,l2) /), s2 > 0. ) 
+  kk = pack( (/ (((k,j=1,j2),k=1,k2),l=1,l2) /), s2 > 0. ) 
+  ll = pack( (/ (((l,j=1,j2),k=1,k2),l=1,l2) /), s2 > 0. ) 
   return
   ! c = [ 1 6 5; 6 2 4; 5 4 3 ]
   ! [ vec, val ] = eig( moment(c) )
@@ -78,17 +66,16 @@ select case( srctimefcn )
 case( 'delta' );  msrcdf = 0.; if ( it == 1 ) msrcdf = 1. / dt
 case( 'brune' );  msrcdf = time * exp( -time / domp ) / domp ** 2.
 case( 'sbrune' ); msrcdf = time ** 2. * exp( -time / domp ) / 2. / domp ** 3.
-case default; error srctimefcn
 end select
 msrcf = msrcf + dt * msrcdf
 
-do i  = 1, 3
-do ii = 1, n
-  j = jj(ii)
-  k = kk(ii)
-  l = ll(ii)
-  w1(j,k,l,i) = w1(j,k,l,i) - msrcf(ii) * msrcx * moment(i)
-  w2(j,k,l,i) = w2(j,k,l,i) - msrcf(ii) * msrcx * moment(i+3)
+do ic = 1, 3
+do i = 1, nsrc
+  j = jj(i)
+  k = kk(i)
+  l = ll(i)
+  w1(j,k,l,ic) = w1(j,k,l,ic) - msrcf * msrcx(i) * moment(ic)
+  w2(j,k,l,ic) = w2(j,k,l,ic) - msrcf * msrcx(i) * moment(ic+3)
 end do
 end do
 

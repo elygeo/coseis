@@ -3,8 +3,8 @@
 
 if ~nrmdim, return, end
 
-i1 = nhalo + [ 1 1 1 ];
-i2 = nhalo + np;
+i1 = i1node;
+i2 = i2node;
 i1(nrmdim) = hypocenter(nrmdim);
 i2(nrmdim) = hypocenter(nrmdim);
 j = i1(1):i2(1);

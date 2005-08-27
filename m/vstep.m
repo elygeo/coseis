@@ -4,12 +4,12 @@
 % Restoring force
 % P' + DP = [del]S, F = 1.P'             PML region
 % F = divS                               non PML region (D=0)
-s2(:) = 0;
+s2(:) = 0.;
 for ic = 1:3
 for id = [ ic:3 1:ic-1 ];
   ix = 6 - ic - id;
   for iz = 1:size( operator, 1 )
-    [ i1, i2 ] = zoneselect( ioper(iz,:), nhalo, np, hypocenter, nrmdim );
+    [ i1, i2 ] = zoneselect( ioper(iz,:), nn, offset, hypocenter, nrmdim );
     op = operator(iz);
     j = i1(1):i2(1);
     k = i1(2):i2(2);
@@ -20,8 +20,8 @@ for id = [ ic:3 1:ic-1 ];
       s2(j,k,l) = dfcn( op, w2, x, dx, ix, id, j, k, l );
     end
   end
-  i1 = nhalo + [ 1 1 1 ];
-  i2 = nhalo + np;
+  i1 = i1node;
+  i2 = i2node;
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
@@ -65,17 +65,19 @@ for i = 1:3
 end
 
 % Hourglass correction
-i1 = nhalo + [ 1 1 1 ];
-i2 = nhalo + np;
-s1(:) = 0;
-s2(:) = 0;
+s1(:) = 0.;
+s2(:) = 0.;
 w2 = u + gamma(2) .* v;
 for ic = 1:3
 for iq = 1:4
-  l = i1(3):i2(3)-1;
-  k = i1(2):i2(2)-1;
-  j = i1(1):i2(1)-1;
+  i1 = i1cell;
+  i2 = i2cell;
+  l = i1(3):i2(3);
+  k = i1(2):i2(2);
+  j = i1(1):i2(1);
   s1(j,k,l) = yc(j,k,l) .* hgnc( w2, ic, iq, j, k, l );
+  i1 = i1node;
+  i2 = i2node;
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
@@ -85,27 +87,31 @@ end
 end
 
 % Fault calculations
-if nrmdim, fault, end
+fault
 
-% Velocity, V = V + dV
+% Locked nodes
 for iz = 1:size( locknodes, 1 )
-  [ i1, i2 ] = zoneselect( ilock(iz,:), nhalo, np, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( ilock(iz,:), nn, offset, hypocenter, nrmdim );
   i = locknodes(iz,:) == 1;
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
   w1(j,k,l,i) = 0;
 end
+
+% Velocity, V = V + dV
 v = v + w1;
 
 % add plane wave
 if planewavedim, planewave, end
 
 % Magnitudes
-s1 = sum( w1 .* w1, 4 ); [ amax, amaxi ] = max( s1(:) );
-s2 = sum( v .* v, 4 );   [ vmax, vmaxi ] = max( s2(:) );
-amax = sqrt( amax ) / dt;
-vmax = sqrt( vmax );
+s1 = sum( w1 .* w1, 4 );
+s2 = sum( v .* v, 4 );
+s1 = sqrt( s1 ) / dt;
+s2 = sqrt( s2 );
+[ amax, amaxi ] = max( s1(:) );
+[ vmax, vmaxi ] = max( s2(:) );
 
 % Displacement
 u = u + dt * v;

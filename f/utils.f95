@@ -4,18 +4,27 @@
 module utils_m
 contains
 
-subroutine zoneselect( i1, i2, zone, ng, offset, hypocenter, nrmdim )
+subroutine zoneselect( i1, i2, zone, nn, offset, hypocenter, nrmdim )
 implicit none
 integer, intent(out) :: i1(3), i2(3)
-integer, intent(in) :: zone(6), ng(3), offset(3), hypocenter(3), nrmdim
+integer, intent(in) :: zone(6), nn(3), offset(3), hypocenter(3), nrmdim
 integer :: shift(3) = 0
 i1 = zone(1:3)
 i2 = zone(4:6)
 if ( nrmdim /= 0 ) shift(nrmdim) = 1
-where ( i1 == 0 ) i1 = hypocenter + shift
-where ( i2 == 0 ) i2 = max( hypocenter, i1 )
-where ( i1 <= 0 ) i1 = i1 + ng + 1
-where ( i2 <= 0 ) i2 = i2 + ng + 1
+where ( i1 == 0 .and. i2 == 0 )
+  i1 = hypocenter - offset
+  i2 = hypocenter - offset + shift
+elsewhere 
+  where     ( i1 == 0 ) i1 = hypocenter - offset + shift
+  elsewhere ( i1 <= 0 ) i1 = i1 + nn + 1
+  end where
+  where     ( i2 == 0 ) i2 = hypocenter - offset
+  elsewhere ( i2 <= 0 ) i2 = i2 + nn + 1
+  end where
+end where
+i1 = max( i1, 1 )
+i2 = min( i2, nn )
 i1 = i1 + offset
 i2 = i2 + offset
 end subroutine

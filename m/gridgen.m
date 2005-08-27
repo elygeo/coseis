@@ -8,9 +8,9 @@ if nrmdim && nrmdim ~= downdim
 else
   crdsys = [ downdim+1:3 1:downdim ];
 end
-l1 = one * np(1) - 1;
-l2 = one * np(2) - 1;
-l3 = one * np(3) - 1;
+l1 = one * nn(1) - 1;
+l2 = one * nn(2) - 1;
+l3 = one * nn(3) - 1;
 j = -nhalo : l1 + nhalo;
 k = -nhalo : l2 + nhalo;
 l = -nhalo : l3 + nhalo;
@@ -108,8 +108,8 @@ case 'rand'
 otherwise error grid
 end
 x = dx * x;
-x1 = min( reshape( x, [ prod(nm) 3 ] ) );
-x2 = max( reshape( x, [ prod(nm) 3 ] ) );
+x1 = min( reshape( x, [ prod( nm ) 3 ] ) );
+x2 = max( reshape( x, [ prod( nm ) 3 ] ) );
 x0 = double( x1 + x2 ) / 2;
 for i = 1:3
   w1(:,:,:,i) = x(:,:,:,i) - x0(i);
@@ -120,5 +120,5 @@ clear s3
 s1(:) = 0;
 s2(:) = 0;
 w1(:) = 0;
-hypoloc = x(hypocenter(1),hypocenter(2),hypocenter(3),:);
+xhypo = x(hypocenter(1),hypocenter(2),hypocenter(3),:);
 

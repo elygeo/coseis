@@ -56,7 +56,7 @@ for iz = 1:size( outit, 1 )
       mkdir( file )
     end
   end
-  [ i1, i2 ] = zoneselect( iout(iz,:), nhalo, np, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( iout(iz,:), nn, offset, hypocenter, nrmdim );
   if cell; i2 = i2 - 1; end
   if isfault
     i1(nrmdim) = 1;
@@ -75,10 +75,10 @@ for iz = 1:size( outit, 1 )
     case 'w'
       if i < 4,   fwrite( fid, w1(j,k,l,i),       'float32' ); end
       if i > 3,   fwrite( fid, w2(j,k,l,i-3),     'float32' ); end
-    case '|a|',   fwrite( fid, sqrt( s1(j,k,l) / dt ), 'float32' );
-    case '|v|',   fwrite( fid, sqrt( s2(j,k,l) ), 'float32' );
-    case '|u|',   fwrite( fid, sqrt( s1(j,k,l) ), 'float32' );
-    case '|w|',   fwrite( fid, sqrt( s2(j,k,l) ), 'float32' );
+    case '|a|',   fwrite( fid, s1(j,k,l),         'float32' );
+    case '|v|',   fwrite( fid, s2(j,k,l),         'float32' );
+    case '|u|',   fwrite( fid, s1(j,k,l),         'float32' );
+    case '|w|',   fwrite( fid, s2(j,k,l),         'float32' );
     case 'x',     fwrite( fid, x(j,k,l,i),        'float32' );
     case 'rho',   fwrite( fid, rho(j,k,l),        'float32' );
     case 'yn',    fwrite( fid, yn(j,k,l),         'float32' );

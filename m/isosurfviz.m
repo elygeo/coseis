@@ -7,7 +7,7 @@ isoval = isofrac * fscl;
 if comp, isoval = isoval * [ -1 1 ]; end
 for iz = 1:size( volumes, 1 )
   zone = volumes(iz,:);
-  [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
+  [ i1, i2 ] = zoneselect( zone, nn, offset, hypocenter, nrmdim );
   if cellfocus, i2 = i2 - 1; end
   l = i1(3):i2(3);
   k = i1(2):i2(2);
@@ -17,7 +17,7 @@ for iz = 1:size( volumes, 1 )
   switch field
   case 'u'
     if comp, vg = u(j,k,l,comp); 
-    else     vg = sum( u(j,k,l,:) .^ 2, 4 )
+    else     vg = sqrt( sum( u(j,k,l,:) .* u(j,k,l,:), 4 ) )
     end
   case 'v'
     if comp, vg = v(j,k,l,comp); 
@@ -53,8 +53,6 @@ for iz = 1:size( volumes, 1 )
   xg = permute( xg, [2 1 3 4] );
   for i = 1:length( isoval );
     ival = abs( isoval(i) );
-    if ~comp, ival = isoval(i) .* isoval(i); end
-    %if ~comp, vg = sqrt( vg ); end
     tmp = isosurface( xg(:,:,:,1), xg(:,:,:,2), xg(:,:,:,3), ...
       sign( isoval(i) ) * vg, ival );
     if ~isempty( tmp.vertices )

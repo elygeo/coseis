@@ -97,7 +97,7 @@ end forall
 
 where ( yn /= 0. )  yn  = dt / yn
 where ( rho /= 0. ) rho = dt / rho
-where ( s2 /= 0. )  s2  = 1 / s2
+where ( s2 /= 0. )  s2  = 1. / s2
 lam = lam * s2
 miu = miu * s2
 

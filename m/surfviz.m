@@ -34,7 +34,7 @@ case { 'u', 'v' }
   planes = unique( tmp, 'rows' );
   for iz = 1:size( planes, 1 )
     zone = planes(iz,:);
-    [ i1, i2 ] = zoneselect( zone, nhalo, np, hypocenter, nrmdim );
+    [ i1, i2 ] = zoneselect( zone, nn, offset, hypocenter, nrmdim );
     l = i1(3):i2(3);
     k = i1(2):i2(2);
     j = i1(1):i2(1);
@@ -48,7 +48,7 @@ case { 'u', 'v' }
         end
       case 'v'
         if comp, vg = v(j,k,l,comp); 
-        else     vg = sqrt( s1(j,k,l) );
+        else     vg = s1(j,k,l);
         end
       otherwise error field
       end
@@ -64,7 +64,8 @@ case { 'u', 'v' }
 case 'w'
   for iz = 1:size( planes, 1 )
     zone = planes(iz,:);
-    [ i1, i2 ] = zoneselect( zone, nhalo, ncore, hypocenter, nrmdim );
+    [ i1, i2 ] = zoneselect( zone, nn, offset, hypocenter, nrmdim );
+    i2 = i2 - 1; % CHECK
     ng = i2 - i1 + 1;
     l = i1(3):i2(3);
     k = i1(2):i2(2);
@@ -73,7 +74,7 @@ case 'w'
       xg = x(j(1),k,l,:) + xscl * u(j(1),k,l,:); 
       if     comp > 3, vg = w2(j(1),k,l,comp-3);
       elseif comp,     vg = w1(j(1),k,l,comp);
-      else             vg = sqrt( s2(j(1),k,l) );
+      else             vg = s2(j(1),k,l);
       end
       xg = squeeze( xg );
       vg = squeeze( vg );
@@ -82,7 +83,7 @@ case 'w'
       xg = x(j(end),k,l,:) + xscl * u(j(end),k,l,:); 
       if     comp > 3, vg = w2(j(end-1),k,l,comp-3);
       elseif comp,     vg = w1(j(end-1),k,l,comp);
-      else             vg = sqrt( s2(j(end-1),k,l) );
+      else             vg = s2(j(end-1),k,l);
       end
       xg = squeeze( xg );
       vg = squeeze( vg );
@@ -90,7 +91,7 @@ case 'w'
       xg = x(j,k(1),l,:) + xscl * u(j,k(1),l,:); 
       if     comp > 3, vg = w2(j,k(1),l,comp-3);
       elseif comp,     vg = w1(j,k(1),l,comp);
-      else             vg = sqrt( s2(j,k(1),l) );
+      else             vg = s2(j,k(1),l);
       end
       xg = squeeze( xg );
       vg = squeeze( vg );
@@ -98,7 +99,7 @@ case 'w'
       xg = x(j,k(end),l,:) + xscl * u(j,k(end),l,:); 
       if     comp > 3, vg = w2(j,k(end-1),l,comp-3);
       elseif comp,     vg = w1(j,k(end-1),l,comp);
-      else             vg = sqrt( s2(j,k(end-1),l) );
+      else             vg = s2(j,k(end-1),l);
       end
       xg = squeeze( xg );
       vg = squeeze( vg );
@@ -106,7 +107,7 @@ case 'w'
       xg = x(j,k,l(1),:) + xscl * u(j,k,l(1),:); 
       if     comp > 3, vg = w2(j,k,l(1),comp-3);
       elseif comp,     vg = w1(j,k,l(1),comp);
-      else             vg = sqrt( s2(j,k,l(1)) );
+      else             vg = s2(j,k,l(1));
       end
       xg = squeeze( xg );
       vg = squeeze( vg );
@@ -114,7 +115,7 @@ case 'w'
       xg = x(j,k,l(end),:) + xscl * u(j,k,l(end),:); 
       if     comp > 3, vg = w2(j,k,l(end-1),comp-3);
       elseif comp,     vg = w1(j,k,l(end-1),comp);
-      else             vg = sqrt( s2(j,k,l(end-1)) );
+      else             vg = s2(j,k,l(end-1));
       end
       xg = squeeze( xg );
       vg = squeeze( vg );
