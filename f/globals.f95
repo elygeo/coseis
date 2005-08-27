@@ -15,7 +15,7 @@ integer, dimension(nz,6) :: ioper, ilock, iout, imat, ifric, itrac, istress
 integer :: wt(6), wt_rate
 real :: dwt(6)
 
-character(256) :: grid
+character(256) :: grid, srctimefcn
 integer :: &
   n(4), nl(3), ng(3), nhalo, offset(3), npml, bc(6), &
   nt, it, checkpoint, ip, np(3), &
@@ -27,8 +27,8 @@ integer :: &
   i2(3), j2, k2, l2, &
   i, j, k, l
 real :: &
-  dx, dt, nu, rho0, vp, vs, miu0, lam0, vrup, rcrit, truptol, &
-  viscosity(2), gam(2), msrcradius, amax, vmax, umax, wmax, xh(2,2,2,3)
+  dx, dt, nu, rho0, vp, vs, miu0, lam0, vrup, rcrit, truptol, moment(6), &
+  viscosity(2), gam(2), msrcradius, amax, vmax, umax, wmax, xhypo(3)
 
 real, allocatable, dimension(:) :: dn1, dn2, dc1, dc2
 real, allocatable, dimension(:,:,:) :: uslip, vslip, trup

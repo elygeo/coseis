@@ -5,6 +5,7 @@ module wstep_m
 contains
 subroutine wstep
 use globals_m
+use momentsrc_m
 use dfnc_m
 use utils_m
 
@@ -168,7 +169,7 @@ do i = 1, 3
 end do
 
 ! Moment source
-!if msrcradius, momentsrc, end
+call momentsrc
 
 ! Magnitudes
 s1 = sqrt( sum( u * u, 4 ) )

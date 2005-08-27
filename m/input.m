@@ -42,7 +42,9 @@ for i = 1:length( in )
   case 'rcrit',      rcrit      = strread( a, '%n' )';
   case 'vrup',       vrup       = strread( a, '%n' )';
   case 'nclramp',    nclramp    = strread( a, '%n' )';
+  case 'moment',     moment     = strread( a, '%n' )';
   case 'msrcradius', msrcradius = strread( a, '%n' )';
+  case 'srctimefcn', srctimefcn = key{2};
   case 'checkpoint', checkpoint = strread( a, '%n' )';
   case 'verbose',    verb       = strread( a, '%n' )';
   case 'locknodes'

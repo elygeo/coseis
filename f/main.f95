@@ -9,6 +9,7 @@ use setup_m
 use gridgen_m
 use matmodel_m
 use fault_m
+use momentsrc_m
 use vstep_m
 use wstep_m
 use output_m
@@ -20,6 +21,7 @@ call setup
 call gridgen
 call matmodel
 call fault
+call momentsrc
 
 do while ( it < nt )
   it = it + 1;

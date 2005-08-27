@@ -12,9 +12,9 @@ logical :: init = .true.
 integer, allocatable :: jj(:), kk(:), ll(:)
 real, allocatable :: msrcx(:)
 integer :: n
-real :: time, msrcdf, msrcf
+real :: time, domp, msrcdf, msrcf
 
-if ( msrcradius == 0. ) return
+if ( msrcradius <= 0. ) return
 
 if ( init ) then
   init = .false.
@@ -35,40 +35,41 @@ if ( init ) then
     + x(j,k,l+1,:) + x(j+1,k+1,l,:) );
   end forall
   do i = 1:3
-    if msrcnodealign
-      w1(:,:,:,i) = w1(:,:,:,i) - xh(1,1,1,i)
-    else
-      w1(:,:,:,i) = w1(:,:,:,i) - 0.125 * sum( xh(:,:,:,i) )
-    end if
+    w1(:,:,:,i) = w1(:,:,:,i) - xhypo(i)
   end do
   s2 = msrcradius - sqrt( sum( w1 * w1, 4 ) )
   n = count( s2 > 0. )
   allocate( msrci(n,3), msrcx(n) ) 
-  i = 0
+  ii = 0
   do l = l1, l2
   do k = k1, k2
   do j = j1, j2
     if ( s2(j,k,l) > 0. ) then
-      i = i + 1
-      jj(i) = j
-      kk(i) = k
-      ll(i) = l
-      msrcx(i) = s2(j,k,l)
+      ii = ii + 1
+      jj(ii) = j
+      kk(ii) = k
+      ll(ii) = l
+      msrcx(ii) = s2(j,k,l)
     end if
   end do
   end do
   end do
-  n = i
   msrcx = msrcx / sum( msrcx )
-  forall( i=1:n ) msrcx(i) = msrcx(i) * s1(jj(i),kk(i),ll(i))
+  n = ii
+  do ii = 1, n
+    j = jj(ii)
+    k = kk(ii)
+    l = ll(ii)
+    msrcx(ii) = msrcx(ii) * s1(j,k,l)
+  end do
+  msrcf = 0.
+  return
   ! c = [ 1 6 5; 6 2 4; 5 4 3 ]
   ! [ vec, val ] = eig( moment(c) )
   ! m0 = max( abs( val(:) ) )
   ! mw = 2 / 3 * log10( m0 ) - 10.7
   ! um = m0 / miu0 / dx / dx
   ! fprintf( 'Momnent Source\nM0: !g\nMw: !g\nD:  !g\n', m0, mw, um )
-  return
-  msrcf = 0.
 end if
 
 domp = 8 * dt
@@ -81,10 +82,16 @@ case default; error srctimefcn
 end select
 msrcf = msrcf + dt * msrcdf
 
-do i = 0, 2
-  w1(msrci+o*i) = w1(msrci+o*i) - msrcf(it) * msrcx * moment(i+1)
-  w2(msrci+o*i) = w2(msrci+o*i) - msrcf(it) * msrcx * moment(i+4)
+do i  = 1, 3
+do ii = 1, n
+  j = jj(ii)
+  k = kk(ii)
+  l = ll(ii)
+  w1(j,k,l,i) = w1(j,k,l,i) - msrcf(ii) * msrcx * moment(i)
+  w2(j,k,l,i) = w2(j,k,l,i) - msrcf(ii) * msrcx * moment(i+3)
+end do
 end do
 
 end subroutine
 end module
+

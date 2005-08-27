@@ -62,8 +62,14 @@
 # nclramp: number of timesteps for nucleation strength relaxation
   nclramp      10
 
-# Moment source radius
-  msrcradius   0.
+# moment(6): moment source rate: Mxx, Myy, Mzz, Myz, Mzx, Mxy
+  moment       0. 0. 0. 0. 0. 0.
+
+# msrcradius: moment source radius, negative = no moment source
+  msrcradius   -1.
+
+# srctimefcn: moment source time function: delta, brune or sbrune
+  srctimefcn   brune
 
 # out: outvar outit zone(6): binary file output
 # outvar choices: a, v, u, w, |a|, |v|, |u|, |w|,  

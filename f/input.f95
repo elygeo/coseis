@@ -49,6 +49,8 @@ inner: do
   case( 'vrup' );       read( a, * ) key, vrup
   case( 'nclramp' );    read( a, * ) key, nclramp
   case( 'msrcradius' ); read( a, * ) key, msrcradius
+  case( 'moment' );     read( a, * ) key, moment
+  case( 'srctimefcn' ); read( a, * ) key, srctimefcn
   case( 'locknodes' )
     nlock = nlock + 1
     read( a, * ) key, locknodes(nlock,:), ilock(nlock,:)
