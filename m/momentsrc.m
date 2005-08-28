@@ -5,6 +5,7 @@ if ~msrcradius; return; end
 
 if init
   init = 0;
+  fprintf( 'Initialize moment source\n' )
   if msrcradius && exist( 'srctimefcn' ) && sum( abs( moment ) )
   else
     msrcradius = 0.;
@@ -37,7 +38,7 @@ if init
   m0 = max( abs( val(:) ) );
   mw = 2 / 3 * log10( m0 ) - 10.7;
   um = m0 / miu0 / dx / dx;
-  fprintf( 'Momnent Source\nM0: %g\nMw: %g\nD:  %g\n', m0, mw, um )
+  fprintf( 'M0: %g\nMw: %g\nD:  %g\n', m0, mw, um )
   return
 end
 

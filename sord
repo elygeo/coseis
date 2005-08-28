@@ -4,11 +4,6 @@
 echo "SORD Support-Opperator Rupture Dynamics"
 date
 
-infile="in"
-[ -r "$infile" ] || exit
-rundir=$( /bin/pwd )
-rm -rf batchjob
-
 mpi=guess
 debug=no
 batch=no
@@ -27,6 +22,7 @@ while getopts spgbfmrl opt; do
   esac
 done
 
+# run on remote host
 if [ $remote = yes ]; then
   host="gach.ucsd.edu"
   host="phim.ucsd.edu"
@@ -69,19 +65,33 @@ cp sord.tgz meta/
 # Matlab backend
 
 if [ $matlab = yes ]; then
-  matlab -r "addpath m; sord"
-  exit
+
+cat << END > batchjob
+#!/bin/bash -e
+unset DISPLAY
+nohup matlab -r "addpath m, sord, quit" > out.log &
+END
+chmod u+x batchjob
+
+[ $batch = no ] && matlab -r "addpath m; sord"
+
+exit
+
 fi
 
 #------------------------------------------------------------------------------#
 # Fortran backend
 
+rm -rf batchjob
 if [ $debug = yes -a $batch = yes ]; then
   echo "can't debug in batch mode"
   exit
 fi
 
-ng=( 1 1 1 )
+# read input
+for file in "in.defaults in"; do
+[ -r "$file" ] || exit
+nn=( 1 1 1 )
 np3=( 1 1 1 )
 while read key params; do
   set -- $params
@@ -91,19 +101,21 @@ while read key params; do
   esac
   if [ "$switch" = "$case" ]; then
     case "$key" in
-      n)      ng=( $1 $2 $3 ) ;;
+      n)      nn=( $1 $2 $3 ); nt=$4 ;;
       nprocs) np3=( $1 $2 $3 ) ;;
     esac
   fi
-done < "$infile"
+done < "$file"
+done
 
 floatsize=4
-nprocs=$(( np3[0] * np3[1] * np3[2] ));
-npoints=$(( ng[0] * ng[1] * ng[2] ));
-ram=$(( npoints / nprocs * floatsize * 22 / 1024 / 1024 ))
-wt=$(( npoints / nprocs / 40000 + 1 ))
+nvars=22
+rate=40000
 
-echo "RAM usage: $ram Mb"
+nprocs=$(( np3[0] * np3[1] * np3[2] ));
+npoints=$(( nn[0] * nn[1] * nn[2] ));
+ram=$(( npoints / nprocs * floatsize * nvars / 1024 / 1024 ))
+wt=$(( nt * npoints / nprocs / rate + 1 ))
 
 if   [ $wt -gt 5400 ]; then wt="$(( wt / 3600 + 1 )):00:00"
 elif [ $wt -gt 90   ]; then wt="$(( wt /   60 + 1 )):00"
@@ -111,6 +123,9 @@ fi
 
 [ $mpi = guess -a $nprocs -eq 1 ] && mpi=no
 [ $mpi = guess -a $nprocs -gt 1 ] && mpi=yes
+
+echo "RAM usage: $ram Mb"
+echo "Run time: $wt"
 
 #------------------------------------------------------------------------------#
 # Create makefile and compile code
@@ -207,7 +222,7 @@ gmake
 
 case $machine in
 
-#------------------#
+#--------------------------------------#
 datastar)
 
 cat << END
@@ -237,6 +252,7 @@ case $debug$mpi in
   yesyes) cmd="totalview poe -a ./sord-bin $opts" ;;
 esac
 
+rundir=$( /bin/pwd )
 cat << END > batchjob
 #!/bin/bash
 #@ environment = COPY_ALL;\\
@@ -281,7 +297,7 @@ chmod u+x batchjob
 
 ;;
 
-#------------------#
+#--------------------------------------#
 teragrid)
 
 cat << END
@@ -317,7 +333,7 @@ chmod u+x batchjob
 
 ;;
 
-#------------------#
+#--------------------------------------#
 babieca)
 
 cat << END
@@ -356,7 +372,7 @@ chmod u+x batchjob
 
 ;;
 
-#------------------#
+#--------------------------------------#
 *)
 
 case $debug$mpi in

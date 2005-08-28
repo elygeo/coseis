@@ -19,6 +19,9 @@ if ( init ) then
   if ( verb > 0 ) print '(a)', 'Initialize output'
   ! FIXME read checkpoint
   call system( 'rm -fr out; mkdir out; mkdir out/ckp; mkdir out/stats' )
+  open(  9, file='out/xhypo' )
+  write( 9, * ) xhypo
+  close( 9 )
   if ( verb > 0 ) print '(a)', &
   'Step  Amax          Vmax          Umax          Wmax          WallTime'
 end if

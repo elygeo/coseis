@@ -15,6 +15,9 @@ if init
   fid = fopen( 'out/endian', 'w' );
   fprintf( fid, '%s\n', endian );
   fclose( fid );
+  fid = fopen( 'out/xhypo', 'w' );
+  fprintf( fid, '%g %g %g\n', xhypo );
+  fclose( fid );
   outinit = ones( size( outit ) );
   return
 end
@@ -95,7 +98,7 @@ for iz = 1:size( outit, 1 )
   end
   file = sprintf( 'out/%02d/hdr', iz );
   fid = fopen( file, 'w' );
-  fprintf( fid, '%g ', [ nc i1 i2 outit(iz) it dt dx ] );
+  fprintf( fid, '%g ', [ nc i1-offset i2-offset outit(iz) it dt dx ] );
   fprintf( fid, '%s\n', outvar{iz} );
   fclose( fid );
 end
@@ -112,11 +115,13 @@ wt(6) = toc;
 dwt = wt(2:end) - wt(1:end-1);
 dwt(end+1) = wt(end) - wt(1);
 
-fprintf( '%4d %13.6e %13.6e %13.6e %13.6e %9.2e\n', [ it amax vmax umax wmax dwt(end) ] );
+fmt = '%4d %13.6e %13.6e %13.6e %13.6e %9.2e\n';
+fprintf( fmt, [ it amax vmax umax wmax dwt(end) ] );
 
 file = sprintf( 'out/stats/%05d', it );
 fid = fopen( file, 'w' );
-fprintf( fid, '%g', [ it amax vmax umax wmax dwt ] );
+fmt = '%13.6e %13.6e %13.6e %13.6e %9.2e %9.2e %9.2e %9.2e %9.2e %9.2e\n';
+fprintf( fid, fmt, [ amax vmax umax wmax dwt ] );
 fclose( fid );
 
 fid = fopen( 'out/timestep', 'w' );

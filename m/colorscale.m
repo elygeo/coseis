@@ -1,7 +1,8 @@
 %------------------------------------------------------------------------------%
 % COLORSCALE
 
-if initialize
+if ~exist( 'hlegend', 'var' )
+  inti = 0;
   haxes(end+1) = axes;
   set( gcf, 'CurrentAxes', haxes(end) )
   axis( [ 0 1 0 1 ] );

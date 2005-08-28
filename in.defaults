@@ -30,7 +30,7 @@
 # FS at z=1, absorbing on other 5 surfaces
   bc           1 1 0   1 1 1
 
-# npml: number of pml damping zones
+# npml: number of pml damping zones, 10 or 20 is typical
   npml         0
 
 # nrmdim: direction normal to the fault plane, 0 = no fault

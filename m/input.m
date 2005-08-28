@@ -1,8 +1,8 @@
 %------------------------------------------------------------------------------%
 % INPUT
 
+plotstyle = 'outline';
 planewavedim = 0;
-plotstyle = '';
 truptol = .001;
 material  = []; imat    = [];
 friction  = []; ifric   = [];
