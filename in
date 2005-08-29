@@ -7,8 +7,8 @@ switch explosion
 case simple
   nrmdim       0
   n            3 3 3   1
-  out x        0   +1 +1 +1   -1 -1 -1
-  out v        1   +1 +1 +1   -1 -1 -1
+  out x        0   1 1 1   -1 -1 -1
+  out v        1   1 1 1   -1 -1 -1
 case test
   n            4 4 4   1
   bc           0 0 0   0 0 0
@@ -57,6 +57,8 @@ case explosion
   npml         0
   npml         10
   nrmdim       0
+  out x        1   1 0 1   -1 0 -1
+  out v        1   1 0 1   -1 0 -1
   out x        1   0 0 11     0 0 11
   out v        1   0 0 11     0 0 11
   out x        1   0 11 11    0 11 11

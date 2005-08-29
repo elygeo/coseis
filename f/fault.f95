@@ -24,7 +24,9 @@ if ( init ) then
 
 init = .false.
 if ( nrmdim == 0 ) then
-  allocate( uslip(0,0,0) )
+  allocate( uslip(1,1,1), vslip(1,1,1), trup(0,0,0) )
+  uslip = 0.
+  vslip = 0.
   return
 end if
 if ( verb > 0 ) print '(a)', 'Initialize fault'
@@ -202,12 +204,12 @@ i2(nrmdim) = 1
 j5 = i1(1); j6 = i2(1)
 k5 = i1(2); k6 = i2(2)
 l5 = i1(3); l6 = i2(3)
-tmp = area * ( rho(j1:j2,k1:k2,l1:l2) + rho(j3:j4,k3:k4,l3:l4) )
+tmp = dt * area * ( rho(j1:j2,k1:k2,l1:l2) + rho(j3:j4,k3:k4,l3:l4) )
 where ( tmp /= 0. ) tmp = 1. / tmp
 do i = 1, 3
   tt(:,:,:,i) = tt0(:,:,:,i) + tmp * &
-    ( v(j3:j4,k3:k4,l3:l4,i) + w1(j3:j4,k3:k4,l3:l4,i) &
-    - v(j1:j2,k1:k2,l1:l2,i) - w1(j1:j2,k1:k2,l1:l2,i) )
+    ( v(j3:j4,k3:k4,l3:l4,i) + dt * w1(j3:j4,k3:k4,l3:l4,i) &
+    - v(j1:j2,k1:k2,l1:l2,i) - dt * w1(j1:j2,k1:k2,l1:l2,i) )
 end do
 tn = sum( tt * nrm, 4 )
 do i = 1, 3; tn3(:,:,:,i) = tn * nrm(:,:,:,i); end do
@@ -240,20 +242,15 @@ end if
 ff2 = 1.
 where ( ts > ff ) ff2 = ff / ts
 do i = 1, 3
-  tt(:,:,:,i) = -tt0(:,:,:,i) + tn3(:,:,:,i) + ff2 * ts3(:,:,:,i)
+  tt(:,:,:,i) = tn3(:,:,:,i) + ff2 * ts3(:,:,:,i) - tt0(:,:,:,i)
   w1(j1:j2,k1:k2,l1:l2,i) = &
   w1(j1:j2,k1:k2,l1:l2,i) + tt(:,:,:,i) * area * rho(j1:j2,k1:k2,l1:l2)
   w1(j3:j4,k3:k4,l3:l4,i) = &
   w1(j3:j4,k3:k4,l3:l4,i) + tt(:,:,:,i) * area * rho(j3:j4,k3:k4,l3:l4)
 end do
-tt = v(j3:j4,k3:k4,l3:l4,:) + w1(j3:j4,k3:k4,l3:l4,:) &
-   - v(j1:j2,k1:k2,l1:l2,:) - w1(j1:j2,k1:k2,l1:l2,:)
+tt = v(j3:j4,k3:k4,l3:l4,:) + dt * w1(j3:j4,k3:k4,l3:l4,:) &
+   - v(j1:j2,k1:k2,l1:l2,:) - dt * w1(j1:j2,k1:k2,l1:l2,:)
 vslip = sqrt( sum( tt * tt, 4 ) )
-uslip = uslip + dt * vslip
-!uslipmax = maxval( abs( uslip ) )
-!vslipmax = maxval( abs( vslip ) )
-!tnmax = maxval( abs( tn ) )
-!tsmax = maxval( abs( ts ) )
 
 if ( truptol > 0. ) then
   where ( trup == 0. .and. vslip > truptol ) trup = ( it + .5 ) * dt

@@ -13,7 +13,7 @@ logical :: init = .true.
 integer, allocatable :: jj(:), kk(:), ll(:)
 real, allocatable :: msrcx(:), msrcv(:)
 integer :: nsrc, ic
-real :: time, domp, msrcdf, msrcf, fact
+real :: time, msrcf
 
 if ( msrcradius <= 0. ) return
 
@@ -44,7 +44,6 @@ if ( init ) then
   msrcx = pack( s2, s2 > 0. )
   msrcv = pack( s1, s2 > 0. )
   msrcx = msrcx / sum( msrcx ) / msrcv
-  msrcf = 0.
   i = 0
   do l = l1, l2
   do k = k1, k2
@@ -67,15 +66,26 @@ if ( init ) then
   ! fprintf( 'Momnent Source\nM0: !g\nMw: !g\nD:  !g\n', m0, mw, um )
 end if
 
-domp = 8 * dt
-time = it - .5 * dt
-select case( srctimefcn )
-case( 'delta' );  msrcdf = 0.; if ( it == 1 ) msrcdf = 1. / dt
-case( 'brune' );  msrcdf = time * exp( -time / domp ) / domp ** 2.
-case( 'sbrune' ); msrcdf = time ** 2. * exp( -time / domp ) / 2. / domp ** 3.
-case default; stop 'srctimefcn'
-end select
-msrcf = msrcf + dt * msrcdf
+
+if ( .false. ) ! increment stress
+  time = ( it - .5 ) * dt
+  select case( srctimefcn )
+  case( 'delta' );  msrcf = 0.; if ( it == 1 ) msrcf = 1. / dt
+  case( 'brune' );  msrcf = exp( -time / domp ) / domp ** 2. * time
+  case( 'sbrune' ); msrcf = exp( -time / domp ) / domp ** 3. * time * time / 2.
+  case default; stop 'srctimefcn'
+  end select
+  msrcf = dt * msrcf
+else ! direct stress
+  time = it * dt
+  select case( srctimefcn )
+  case( 'delta' );  msrcf = 1.; if ( it == 1 ) msrcf = 1.
+  case( 'brune' );  msrcf = 1. - exp( -time / domp ) / domp * ( time + domp )
+  case( 'sbrune' ); msrcf = 1. - exp( -time / domp ) / domp * &
+    ( time + domp + time * time / domp / 2. )
+  case default; stop 'srctimefcn'
+  end select
+end if
 
 do ic = 1, 3
 do i = 1, nsrc

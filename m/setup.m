@@ -30,16 +30,22 @@ one = 1;
 if str2double( version( '-release' ) ) >= 14, one = single( 1 ); end
 zero = 0 * one;
 
+pass = 'v';
+breakon = 'v';
 gui = 1;
 if get( 0, 'ScreenDepth' ) == 0; gui = 0; end
 
-umax = 0;
-vmax = 0;
-wmax = 0;
+amax = 0; amaxi = 1;
+vmax = 0; vmaxi = 1;
+umax = 0; umaxi = 1;
+wmax = 0; wmaxi = 1;
 uslipmax = 0;
 vslipmax = 0;
 tnmax = 0;
 tsmax = 0;
+vslip = 0;
+uslip = 0;
+trup = 0;
 
 % Allocate arrays - single or double precision arrays depending on 'zero'.
 x   = repmat( zero, [ nm 3 ] );

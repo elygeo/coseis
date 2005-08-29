@@ -45,15 +45,16 @@ osname=$( uname )
 if   [ "${HOSTNAME:0:2}" = ds ]; then machine="datastar"
 elif [ "${HOSTNAME:0:2}" = tg ]; then machine="teragrid"
 elif [ "$HOSTNAME" = master ];   then machine="babieca"
+else machine=$HOSTNAME
 fi
 
 cat << END > meta/data
-name:     $( finger $LOGNAME | sed -n 's/^.*e: //p' )
-logname:  ${LOGNAME}
-date:     $( date )
-machine:  $machine
-hostname: ${HOSTNAME}
-osname:   $( uname -a )
+login:   $LOGNAME
+name:    $( finger $LOGNAME | sed -n 's/^.*e: //p' )
+date:    $( date )
+machine: $machine
+host:    $HOSTNAME
+os:      $( uname -a )
 END
 
 perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > meta/endian
@@ -73,7 +74,7 @@ nohup matlab -r "addpath m, sord, quit" > out.log &
 END
 chmod u+x batchjob
 
-[ $batch = no ] && matlab -r "addpath m; sord"
+[ $batch = no ] && matlab -nodesktop -nosplash -r "addpath m; sord"
 
 exit
 
@@ -89,7 +90,7 @@ if [ $debug = yes -a $batch = yes ]; then
 fi
 
 # read input
-for file in "in.defaults in"; do
+for file in in.defaults in; do
 [ -r "$file" ] || exit
 nn=( 1 1 1 )
 np3=( 1 1 1 )

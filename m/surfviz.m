@@ -17,7 +17,7 @@ if dosurf, facecolor = 'flat';
 else       facecolor = 'none';
 end
 switch field
-case { 'u', 'v' }
+case { 'a', 'v', 'u' }
   i = [
     1 2 3  4 2 6
     1 5 3  4 5 6
@@ -42,12 +42,16 @@ case { 'u', 'v' }
     if sum( ng > 1 ) == 2
       xg = x(j,k,l,:) + xscl * u(j,k,l,:); 
       switch field
-      case 'u'
-        if comp, vg = u(j,k,l,comp); 
-        else     vg = sqrt( sum( u(j,k,l,:) .* u(j,k,l,:), 4 ) );
+      case 'a'
+        if comp, vg = w1(j,k,l,comp); 
+        else     vg = s1(j,k,l);
         end
       case 'v'
         if comp, vg = v(j,k,l,comp); 
+        else     vg = s2(j,k,l);
+        end
+      case 'u'
+        if comp, vg = u(j,k,l,comp); 
         else     vg = s1(j,k,l);
         end
       otherwise error field

@@ -25,11 +25,10 @@ call momentsrc
 
 do while ( it < nt )
   it = it + 1;
-  call system_clock( wt(1) ); call vstep
-  call system_clock( wt(2) ); call output( 1 )
-  call system_clock( wt(3) ); call ustep
-  call system_clock( wt(4) ); call wstep
-  call system_clock( wt(5) ); call output( 2 )
+  call system_clock( wt(1) ); call wstep
+  call system_clock( wt(2) ); call output( 'w' )
+  call system_clock( wt(3) ); call vstep
+  call system_clock( wt(4) ); call output( 'v' )
 end do
 
 end program

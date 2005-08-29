@@ -27,8 +27,9 @@ integer :: &
   i2(3), j2, k2, l2, &
   i, j, k, l
 real :: &
-  dx, dt, nu, rho0, vp, vs, miu0, lam0, vrup, rcrit, truptol, moment(6), &
-  viscosity(2), gam(2), msrcradius, amax, vmax, umax, wmax, xhypo(3)
+  dx, dt, viscosity(2), gam(2), vrup, rcrit, moment(6), msrcradius, domp, &
+  amax, vmax, umax, wmax, vslipmax, uslipmax, xhypo(3), &
+  nu, rho0, vp, vs, miu0, lam0, truptol
 
 real, allocatable, dimension(:) :: dn1, dn2, dc1, dc2
 real, allocatable, dimension(:,:,:) :: uslip, vslip, trup

@@ -13,13 +13,18 @@ implicit none
 integer :: ic, id, ix, iz
 
 if ( verb > 1 ) print '(a)', 'Wstep'
+
+! Displacement
+u = u + dt * v
+uslip = uslip + dt * vslip
+
 ! Gadient
 ! G = grad(U + gam*V)    non PML region
 ! G' + DG = gradV          PML region
 s2 = 0.
 w2 = 0.
 outer: do ic = 1, 3
-s1 = u(:,:,:,ic) + gam(1) * v(:,:,:,ic)
+s1 = u(:,:,:,ic) + dt * viscosity(1) * v(:,:,:,ic)
 inner: do id = 1, 3
   ix = 6 - ic - id
   do iz = 1, noper
@@ -176,6 +181,7 @@ s1 = sqrt( sum( u * u, 4 ) )
 s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
 umax = maxval( s1 ); umaxi = maxloc( s1 )
 wmax = maxval( s2 ); wmaxi = maxloc( s2 )
+uslipmax = maxval( abs( uslip ) )
 if ( umax > dx / 10. ) print *, 'Warning: u !<< dx\n'
 
 end subroutine

@@ -1,5 +1,5 @@
 %------------------------------------------------------------------------------%
-% STEPV
+% VSTEP
 
 % Restoring force
 % P' + DP = [del]S, F = 1.P'             PML region
@@ -100,7 +100,7 @@ for iz = 1:size( locknodes, 1 )
 end
 
 % Velocity, V = V + dV
-v = v + w1;
+v = v + dt * w1;
 
 % add plane wave
 if planewavedim, planewave, end
@@ -112,7 +112,4 @@ s1 = sqrt( s1 ) / dt;
 s2 = sqrt( s2 );
 [ amax, amaxi ] = max( s1(:) );
 [ vmax, vmaxi ] = max( s2(:) );
-
-% Displacement
-u = u + dt * v;
 

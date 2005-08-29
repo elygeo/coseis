@@ -14,8 +14,6 @@ use fault_m
 implicit none
 integer ic, iid, id, ix, iq, iz
 
-call system_clock( wt(1) )
-
 ! Restoring force
 ! P' + DP = [del]S, F = 1.P'             PML region
 ! F = divS                               non PML region (D=0)
@@ -92,7 +90,7 @@ inner: do iid = 1, 3
 end do inner
 end do outer
 
-! Newton's Law, dV = F / m * dt
+! Newton's Law, A = F / m
 do i = 1, 3
   w1(:,:,:,i) = w1(:,:,:,i) * rho
 end do
@@ -100,7 +98,7 @@ end do
 ! Hourglass correction
 s1 = 0.
 s2 = 0.
-w2 = u + gam(2) * v
+w2 = u + dt * viscosity(2) * v
 do ic = 1, 3
 do iq = 1, 4
   call hgnc( s1, w2, ic, iq, i1cell, i2cell ); s1 = yc * s1
@@ -108,7 +106,6 @@ do iq = 1, 4
   w1(:,:,:,ic) = w1(:,:,:,ic) - s2
 end do
 end do
-
 
 ! Fault calculations
 call fault
@@ -127,26 +124,15 @@ do iz = 1, nlock
   end do
 end do
 
-! Velocity, V = V + dV
-v = v + w1
+! Velocity, V = V + dt * A
+v = v + dt * w1
 
 ! Magnitudes
 s1 = sqrt( sum( w1 * w1, 4 ) ) / dt
 s2 = sqrt( sum( v * v, 4 ) )
 amax = maxval( s1 ); amaxi = maxloc( s1 )
 vmax = maxval( s2 ); vmaxi = maxloc( s2 )
-
-end subroutine
-
-!------------------------------------------------------------------------------!
-! USTEP
-
-subroutine ustep
-use globals_m
-
-implicit none
-
-u = u + dt * v
+vslipmax = maxval( abs( vslip ) )
 
 end subroutine
 end module

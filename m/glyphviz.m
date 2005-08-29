@@ -18,36 +18,54 @@ for iz = 1:size( glyphs, 1 )
   k = i1(2):i2(2);
   j = i1(1):i2(1);
   switch field
-  case 'u'
-    ii = find( sum( u(j,k,l,:) .* u(j,k,l,:), 4 ) > minmag ^ 2 );
-    if ii
-      [ j, k, l ] = ind2sub( i2 - i1 + 1, ii );
-      j = j + i1(1) - 1;
-      k = k + i1(2) - 1;
-      l = l + i1(3) - 1;
-      ng = prod( size( s1 ) );
-      iii = sub2ind( size( s1 ), j, k, l );
-      clear vg xg
-      for i = 0:2
-        vg(:,i+1) = u(iii+i*ng);
-        xg(:,i+1) = x(iii+i*ng) + xscl * u(iii+i*ng);
-      end
-      mga = [ mga; sqrt( sum( vg .* vg, 2 ) ) ];
-      vga = [ vga; vg ];
-      xga = [ xga; xg ];
-    end
-  case 'v'
+  case 'a'
     ii = find( s1(j,k,l) > minmag );
     if ii
       [ j, k, l ] = ind2sub( i2 - i1 + 1, ii );
       j = j + i1(1) - 1;
       k = k + i1(2) - 1;
       l = l + i1(3) - 1;
-      ng = prod( size( s1 ) );
-      iii = sub2ind( size( s1 ), j, k, l );
+      ng = prod( nm );
+      iii = sub2ind( nm, j, k, l );
+      clear vg xg
+      for i = 0:2
+        vg(:,i+1) = w1(iii+i*ng);
+        xg(:,i+1) = x(iii+i*ng) + xscl * u(iii+i*ng);
+      end
+      mga = [ mga; s1(iii) ];
+      vga = [ vga; vg ];
+      xga = [ xga; xg ];
+    end
+  case 'v'
+    ii = find( s2(j,k,l) > minmag );
+    if ii
+      [ j, k, l ] = ind2sub( i2 - i1 + 1, ii );
+      j = j + i1(1) - 1;
+      k = k + i1(2) - 1;
+      l = l + i1(3) - 1;
+      ng = prod( nm );
+      iii = sub2ind( nm, j, k, l );
       clear vg xg
       for i = 0:2
         vg(:,i+1) = v(iii+i*ng);
+        xg(:,i+1) = x(iii+i*ng) + xscl * u(iii+i*ng);
+      end
+      mga = [ mga; s2(iii) ];
+      vga = [ vga; vg ];
+      xga = [ xga; xg ];
+    end
+  case 'u'
+    ii = find( s1(j,k,l) > minmag );
+    if ii
+      [ j, k, l ] = ind2sub( i2 - i1 + 1, ii );
+      j = j + i1(1) - 1;
+      k = k + i1(2) - 1;
+      l = l + i1(3) - 1;
+      ng = prod( nm );
+      iii = sub2ind( nm, j, k, l );
+      clear vg xg
+      for i = 0:2
+        vg(:,i+1) = u(iii+i*ng);
         xg(:,i+1) = x(iii+i*ng) + xscl * u(iii+i*ng);
       end
       mga = [ mga; s1(iii) ];

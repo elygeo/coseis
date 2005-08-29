@@ -13,9 +13,11 @@ elseif xhairmove == 5
 elseif xhairmove == 6
   maxi = hypocenter;
   switch field
-  case 'u', maxi = umaxi;
+  case 'a', maxi = amaxi;
   case 'v', maxi = vmaxi;
+  case 'u', maxi = umaxi;
   case 'w', maxi = wmaxi;
+  otherwise error xhfield
   end
   [ j, k, l ] = ind2sub( nm, maxi );
   xhair = [ j k l ];
@@ -62,17 +64,29 @@ else
 end
 xhairtarg = double( xga(:)' );
 switch field
-case 'u'
-  vga(1:3) = u(j,k,l,:);
-  mga = sum( u(j,k,l,:) .* u(j,k,l,:), 4 );
-  tmp = [ sqrt( mga ) vga rho(j,k,l) ];
-  msg = sprintf( '|U| %9.2e\nUx  %9.2e\nUy  %9.2e\nUz  %9.2e\nrho %9.2e', tmp );
-case 'v'
-  vga(1:3) = v(j,k,l,:);
+case 'a'
+  onpass = 1;
+  vga(1:3) = w1(j,k,l,:);
   mga = s1(j,k,l);
-  tmp = [ sqrt( mga ) vga rho(j,k,l) ];
+  tmp = [ mga vga rho(j,k,l) ];
+  msg = sprintf( '|A| %9.2e\nAx  %9.2e\nAy  %9.2e\nAz  %9.2e\nrho %9.2e', tmp );
+  time = it * dt;
+case 'v'
+  onpass = 0;
+  vga(1:3) = v(j,k,l,:);
+  mga = sqrt( sum( v(j,k,l,:) .* v(j,k,l,:), 4 ) );
+  tmp = [ mga vga rho(j,k,l) ];
   msg = sprintf( '|V| %9.2e\nVx  %9.2e\nVy  %9.2e\nVz  %9.2e\nrho %9.2e', tmp );
+  time = ( it + .5 ) * dt;
+case 'u'
+  onpass = 0;
+  vga(1:3) = u(j,k,l,:);
+  mga = sqrt( sum( u(j,k,l,:) .* u(j,k,l,:) ), 4 );
+  tmp = [ mga vga rho(j,k,l) ];
+  msg = sprintf( '|U| %9.2e\nUx  %9.2e\nUy  %9.2e\nUz  %9.2e\nrho %9.2e', tmp );
+  time = it * dt;
 case 'w'
+  onpass = 2;
   c = [ 1 6 5; 6 2 4; 5 4 3 ];
   clear wg
   wg(1:3) = w1(j,k,l,:);
@@ -86,18 +100,23 @@ case 'w'
   vga = vec(:)';
   tmp = [ val([3 2 1])' wg lam(j,k,l) miu(j,k,l) ];
   msg = sprintf( 'W1  %9.2e\nW2  %9.2e\nW3  %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e\nlam %9.2e\nmiu %9.2e', tmp );
-otherwise error field
+  time = it * dt;
+otherwise error xhfield
 end
 set( gcf, 'CurrentAxes', haxes(2) )
-hhud = text( .02, .98, msg, 'Hor', 'left', 'Ver', 'top' );
-tmp = [ it j k l; it * dt xg ];
+if ~onpass | onpass == pass
+  hhud = text( .02, .98, msg, 'Hor', 'left', 'Ver', 'top' );
+end
+tmp = [ it j k l; time xg ];
 msg = sprintf( '%4d %8.3fs\n%4d %8.1fm\n%4d %8.1fm\n%4d %8.1fm', tmp );
 hhud(2) = text( .98, .98, msg, 'Hor', 'right', 'Ver', 'top' );
 msg = '';
 set( gcf, 'CurrentAxes', haxes(1) )
+if ~onpass | onpass == pass
 if length( mga( mga ~= 0 ) )
   reynoldsglyph
   hhud = [ hhud hglyph ];
+end
 end
 i1 = xhair;
 i = [ i1-1; i1; i1+1 ];

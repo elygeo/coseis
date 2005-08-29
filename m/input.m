@@ -21,7 +21,7 @@ for i = 1:length( in )
   a   = strread( in{i}, '%*s %[^#]' );
   a   = a{1};
   switch key{1}
-  case 'switch', switchcase = key{2};
+  case 'switch', switchcase = key{2}; model = key{2};
   case 'case',   caseswitch = key{2};
   end
   if ~strcmp( caseswitch, switchcase ), continue, end
@@ -45,6 +45,7 @@ for i = 1:length( in )
   case 'moment',     moment     = strread( a, '%n' )';
   case 'msrcradius', msrcradius = strread( a, '%n' )';
   case 'srctimefcn', srctimefcn = key{2};
+  case 'domp',       domp       = strread( a, '%n' )';
   case 'checkpoint', checkpoint = strread( a, '%n' )';
   case 'verbose',    verb       = strread( a, '%n' )';
   case 'locknodes'
@@ -68,7 +69,7 @@ for i = 1:length( in )
     stress     = [ stress;   a(1:6)  ];
     istress    = [ istress;  a(7:12) ];
   case 'out'
-    outvar = { outvar{:} key{2} };
+    outvar = { outvar{:} key{2} }';
     a = strread( a, '%*s %[^#]' );
     a = strread( a{1}, '%n' )';
     outit  = [ outit; a(1) ];

@@ -18,7 +18,7 @@ action = 1;
 anim = 0;
 
 switch keypress
-case 'h'
+case 'f1'
   if length( hhelp )
     delete( hhelp )
     hhelp = [];
@@ -28,18 +28,18 @@ case 'h'
       { 'SORD - Support-Operator Rupture Dynamics'
         'by Geoffrey Ely - gely@ucsd.edu'
         ''
-        'Help                           H     Build Movie                    B'
+        'Help                          F1     Build Movie                    B'
         'Run/Step/Pause     R Space Click     Frame -/+               - = Page'
         'Write/Read Checkpoint   Q Shft+Q     First/Last Frame        Home End'
         '                                     Delete Frame                 Del'
-        'Field                      U V W     Replot                     Enter'
+        'Field                    A V U W     Replot                     Enter'
         'Component                    0-6                                     '
-        'Volumes/Slices                 P     Explore               Arrows C E'
+        'Volumes/Slices                 P     Explore               Arrows H E'
         'Glyphs                         G     Time Series                    T'
         'Isosurfaces                    I     Rotate                      Drag'
         'Surfaces                       S     Zoom                       < > /'
         'Outline                        O     3D/2D                          D'
-        'Mesh                           M     Axis                           A'
+        'Mesh                           M     Length Scale                   L'
         'Mesh Distortion                X     Color Scale              [ ] \\ |'
         'Fault Plane                    F     Clean Up               Backspace'
       }, ...
@@ -73,7 +73,7 @@ case 'downarrow',  if km, xhairmove = -3; else xhairmove = -1; end, crosshairs
 case 'uparrow',    if km, xhairmove = 3;  else xhairmove = 1;  end, crosshairs
 case 'leftarrow',  xhairmove = -2; crosshairs
 case 'rightarrow', xhairmove = 2;  crosshairs
-case 'c',          xhairmove = 4;  crosshairs
+case 'h',          xhairmove = 4;  crosshairs
 case 'e',          xhairmove = 6;  crosshairs
 case 'space', if km, itstep = 10; else itstep = 1; end, msg = 'Step';
 case 'r', itstep = nt - it; msg = 'Run';
@@ -187,11 +187,15 @@ case 'x'
   if xlim, msg = 'Mesh distortion on';
   else     msg = 'Mesh distortion off';
   end
-case 'u', if km, field = 'uslip'; else, field = 'u'; end 
+case 'a', field = 'a';
   colorscale; msg = titles{ comp + 1};
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
 case 'v', if km, field = 'vslip'; else, field = 'v'; end 
+  colorscale; msg = titles{ comp + 1};
+  delete( [ hhud hmsg hhelp ] )
+  hhud = []; hmsg = []; hhelp = [];
+case 'u', if km, field = 'uslip'; else, field = 'u'; end 
   colorscale; msg = titles{ comp + 1};
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
@@ -239,7 +243,8 @@ case 'm'
   if domesh, edgecolor = foreground; msg = 'Mesh on';
   else       edgecolor = 'none';     msg = 'Mesh off';
   end
-  if length( tmp ), set( tmp, 'EdgeColor', edgecolor ), end
+  msg = 'not turning on mesh because of Matlab bug';
+  %if length( tmp ), set( tmp, 'EdgeColor', edgecolor ), end
 case 's'
   tmp  = findobj( [ frame{ showframe } ], 'Tag', 'surf' );
   if length( tmp ), dosurf = strcmp( get( tmp(1), 'FaceColor' ), 'flat' ); end
@@ -250,14 +255,14 @@ case 's'
   if length( tmp ), set( tmp, 'FaceColor', facecolor ), end
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'surfline' );
   if length( tmp ), set( tmp, 'Visible', visible ), end
-case 'a'
+case 'l'
   if strcmp( get( gca, 'Visible' ), 'off' ), axis on
   else axis off
   end
 case 't', timeseriesviz
 case 'q'
   if ~km
-    save checkpoint it u umax v vmax uslip uslipmax trup p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6
+    save checkpoint it u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 vslip uslip trup 
     if exist( 'checkpoint.out', 'dir' )
       rmdir( 'checkpoint.out', 's' )
     end

@@ -1,4 +1,4 @@
-%------------------------------------------------------------------------------%
+%----------------------------------------------------------------------------%
 % MOMENTSRC
 
 if ~msrcradius; return; end
@@ -32,25 +32,35 @@ if init
   msrcv = s1( msrci );
   msrcx = s2( msrci );
   msrcx = msrcx / sum( msrcx ) ./ msrcv;
-  msrct = [];
   c = [ 1 6 5; 6 2 4; 5 4 3 ];
   [ vec, val ] = eig( moment(c) );
   m0 = max( abs( val(:) ) );
-  mw = 2 / 3 * log10( m0 ) - 10.7;
+  mw = 2. / 3. * log10( m0 ) - 10.7;
   um = m0 / miu0 / dx / dx;
   fprintf( 'M0: %g\nMw: %g\nD:  %g\n', m0, mw, um )
   return
 end
 
-domp = 8 * dt;
-time = ( .5 : it - .5 ) * dt;  % time indexing goes wi vi wi+1 vi+1 ...
-switch srctimefcn
-case 'delta',  msrcdf = zeros( size( time ) ); msrct(1) = 1 / dt;
-case 'brune',  msrcdf = time .* exp( -time / domp ) / domp ^ 2;
-case 'sbrune', msrcdf = time .^ 2 .* exp( -time / domp ) / 2 / domp ^ 3;
-otherwise error srctimefcn
+% time indexing goes wi vi wi+1 vi+1 ...
+if 0 % increment stress
+  time = ( it + .5 ) * dt;
+  switch srctimefcn
+  case 'delta',  msrcf = 0.; if it == 1, msrcf = 1. / dt; end
+  case 'brune',  msrcf = exp( -time / domp ) / domp ^ 2. * time;
+  case 'sbrune', msrcf = exp( -time / domp ) / domp ^ 3. * time * time / 2.;
+  otherwise error srctimefcn
+  end
+  msrcf = dt * msrcf
+else % direct stress
+  time = it * dt;
+  switch srctimefcn
+  case 'delta',  msrcf = 1.; if it == 1, msrcf = 1.; end
+  case 'brune',  msrcf = 1. - exp( -time / domp ) / domp * ( time + domp );
+  case 'sbrune', msrcf = 1. - exp( -time / domp ) / domp * ...
+    ( time + domp + time * time / domp / 2. );
+  otherwise error srctimefcn
+  end
 end
-msrcf = dt * cumsum( msrcdf );
 o = prod( nm );
 for i = 0:2
   w1(msrci+o*i) = w1(msrci+o*i) - msrcf(it) * msrcx * moment(i+1);

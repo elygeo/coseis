@@ -4,6 +4,10 @@
 if init
   init = 0;
   fprintf( 'Initialize output\n' )
+  s1(:) = 0.;
+  s2(:) = 0.;
+  w1(:) = 0.;
+  w2(:) = 0.;
   if checkpoint < 0, checkpoint = nt + checkpoint + 1; end
   if ~readcheckpoint
     if exist( 'out', 'dir' ), rmdir( 'out', 's' ), end
@@ -19,6 +23,7 @@ if init
   fprintf( fid, '%g %g %g\n', xhypo );
   fclose( fid );
   outinit = ones( size( outit ) );
+  fprintf( 'Step  Vmax          Vslipmax      WallTime\n' )
   return
 end
 
@@ -26,19 +31,19 @@ for iz = 1:size( outit, 1 )
   if outit(iz) < 0, outit(iz) = outit(iz) + nt + 1; end
   if ~outit(iz) | mod( it, outit(iz) ), continue, end
   nc = 1;
-  pass = 2;
+  onpass = 'v';
   cell = 0;
   isfault = 0;
   static = 0;
   switch outvar{iz}
-  case 'a',   nc = 3; pass = 1;
-  case 'v',   nc = 3; pass = 1;
-  case 'u',   nc = 3;
-  case 'w',   nc = 6; cell = 1;
-  case '|a|', pass = 1;
-  case '|v|', pass = 1;
-  case '|u|'
-  case '|w|', cell = 1;
+  case 'a',   nc = 3;
+  case 'v',   nc = 3;
+  case 'u',   nc = 3; onpass = 'w';
+  case 'w',   nc = 6; onpass = 'w'; cell = 1;
+  case '|a|'
+  case '|v|'
+  case '|u|', onpass = 'w';
+  case '|w|', onpass = 'w'; cell = 1;
   case 'x',   static = 1; nc = 3;
   case 'rho', static = 1;
   case 'yn',  static = 1;
@@ -51,7 +56,7 @@ for iz = 1:size( outit, 1 )
   otherwise error output
   end
   if isfault & ~nrmdim; outit(iz) = 0; end
-  if pass ~= thispass, continue, end
+  if onpass ~= pass, continue, end
   if outinit(iz)
     outinit(iz) = 0;
     for i = 1:nc
@@ -103,34 +108,22 @@ for iz = 1:size( outit, 1 )
   fclose( fid );
 end
 
-if thispass == 1, return, end
+if pass == 'w', return, end
 
 if checkpoint & ~mod( it, checkpoint )
-  if nrmdim, save checkpoint it u v uslip trup
-  else       save checkpoint it u v
-  end
+  save checkpoint it v u vslip uslip trup
 end
-
-wt(6) = toc;
-dwt = wt(2:end) - wt(1:end-1);
-dwt(end+1) = wt(end) - wt(1);
-
-fmt = '%4d %13.6e %13.6e %13.6e %13.6e %9.2e\n';
-fprintf( fmt, [ it amax vmax umax wmax dwt(end) ] );
-
-file = sprintf( 'out/stats/%05d', it );
-fid = fopen( file, 'w' );
-fmt = '%13.6e %13.6e %13.6e %13.6e %9.2e %9.2e %9.2e %9.2e %9.2e %9.2e\n';
-fprintf( fid, fmt, [ amax vmax umax wmax dwt ] );
-fclose( fid );
 
 fid = fopen( 'out/timestep', 'w' );
 fprintf( fid, '%g\n', it );
 fclose( fid );
 
-if exist( './pause', 'file' )
-  fprintf( 'pause file found\n' )
-  delete pause
-  save
-  itstep = 0;
-end
+file = sprintf( 'out/stats/%05d', it );
+fid = fopen( file, 'w' );
+fmt = '%13.6e %13.6e %13.6e %13.6e %13.6e %13.6e %9.2e %9.2e %9.2e %9.2e %9.2e\n';
+fprintf( fid, fmt, [ amax vmax umax wmax vslipmax uslipmax sum( wt ) wt ] );
+fclose( fid );
+
+fmt = '%4d %13.6e %13.6e %9.2e\n';
+fprintf( fmt, [ it vmax vslipmax sum( wt ) ] );
+

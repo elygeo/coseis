@@ -3,14 +3,15 @@
 
 module output_m
 contains
-subroutine output( thispass )
+subroutine output( pass )
 use globals_m
 use utils_m
 
 implicit none
 save
-integer, intent(in) :: thispass
-integer :: iz, nc, reclen, floatsize = 4, pass
+character, intent(in) :: pass
+character :: onpass
+integer :: iz, nc, reclen, floatsize = 4
 character(255) :: ofile
 logical :: fault, cell, static, init = .true., outinit(nz) = .true.
 
@@ -23,26 +24,26 @@ if ( init ) then
   write( 9, * ) xhypo
   close( 9 )
   if ( verb > 0 ) print '(a)', &
-  'Step  Amax          Vmax          Umax          Wmax          WallTime'
+  'Step  Vmax          Vspilmax      WallTime'
 end if
 
 outer: do iz = 1, nout
   if ( outit(iz) < 0 ) outit(iz) = nt + outit(iz) + 1
   if ( outit(iz) == 0 .or. mod( it, outit(iz) ) /= 0 ) cycle outer
   nc = 1
-  pass = 2
+  onpass = 'v'
   cell = .false.
   fault = .false.
   static = .false.
   select case( outvar(iz) )
-  case( 'a'   ); nc = 3; pass = 1
-  case( 'v'   ); nc = 3; pass = 1
-  case( 'u'   ); nc = 3
-  case( 'w'   ); nc = 6; cell = .true.
-  case( '|a|' ); pass = 1
-  case( '|v|' ); pass = 1
-  case( '|u|' ) 
-  case( '|w|' ); cell = .true.
+  case( 'a'   ); nc = 3;
+  case( 'v'   ); nc = 3;
+  case( 'u'   ); nc = 3; onpass = 'w';
+  case( 'w'   ); nc = 6; onpass = 'w'; cell = .true.
+  case( '|a|' )
+  case( '|v|' )
+  case( '|u|' ); onpass = 'w'; 
+  case( '|w|' ); onpass = 'w'; cell = .true.
   case( 'x'   ); static = .true.; nc = 3
   case( 'rho' ); static = .true.
   case( 'yn'  ); static = .true.
@@ -57,7 +58,7 @@ outer: do iz = 1, nout
     outit(iz) = 0
     cycle outer
   end if
-  if ( pass /= thispass ) cycle outer
+  if ( onpass /= pass ) cycle outer
   if ( outinit(iz) ) then
     outinit(iz) = .false.
     write( ofile, '(a,i2.2)' ) 'mkdir out/', iz
@@ -113,37 +114,38 @@ outer: do iz = 1, nout
   close( 9 )
 end do outer
 
-if ( thispass == 1 ) return
+if ( pass == 'w' ) return
 
 if ( checkpoint < 0 ) checkpoint = nt + checkpoint + 1
 if ( checkpoint /= 0 .and. mod( it, checkpoint ) == 0 ) then
   if ( verb > 1 ) print '(a)', 'Writing checkpoint file'
-  reclen = floatsize * ( size(v) + size(u) + size(uslip) &
+  reclen = floatsize * ( 2 * size(u) + 3 * size(uslip) &
    + size(p1) + size(p2) + size(p3) + size(p4) + size(p5) + size(p6) &
    + size(g1) + size(g2) + size(g3) + size(g4) + size(g5) + size(g6) )
   write( ofile, '(a,i5.5)') 'out/ckp/', it
   open( 9, file=ofile, form='unformatted', access='direct', status='replace', recl=reclen )
-  write( 9, rec=1 ) u, v, uslip, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
+  write( 9, rec=1 ) u, v, vslip, uslip, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   close( 9 )
   open( 9, file='out/ckp/hdr' )
   write( 9, * ) it
   close( 9 )
 end if
 
-call system_clock( wt(6) )
-dwt(1:5) = real( wt(2:6) - wt(1:5) ) / real( wt_rate )
-dwt(6)   = real( wt(6)   - wt(1) )   / real( wt_rate )
-
-if ( verb > 0 ) print '(i4,4e14.6,e10.2)', it, amax, vmax, umax, wmax, dwt(6)
-
-write( ofile, '(a,i5.5)' ) 'out/stats/', it
-open(  9, file=ofile )
-write( 9, '(4e14.6,6e10.2)' ) amax, vmax, umax, wmax, dwt
-close( 9 )
-
 open(  9, file='out/timestep' )
 write( 9, * ) it
 close( 9 )
+
+call system_clock( wt(5) )
+
+dwt(1)   = real( wt(5)   - wt(1) )   / real( wt_rate )
+dwt(2:5) = real( wt(2:5) - wt(1:4) ) / real( wt_rate )
+
+write( ofile, '(a,i5.5)' ) 'out/stats/', it
+open(  9, file=ofile )
+write( 9, '(6e14.6,5e10.2)' ) amax, vmax, umax, wmax, vslipmax, uslipmax, dwt
+close( 9 )
+
+if ( verb > 0 ) print '(i4,2e14.6,e10.2)', it, vmax, vslipmax, dwt(1)
 
 end subroutine
 end module

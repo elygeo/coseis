@@ -179,14 +179,14 @@ i2(nrmdim) = hypocenter(nrmdim) + 1;
 j3 = i1(1); j4 = i2(1);
 k3 = i1(2); k4 = i2(2);
 l3 = i1(3); l4 = i2(3);
-% Zero slip velocity condition
-tmp = area .* ( rho(j1:j2,k1:k2,l1:l2) + rho(j3:j4,k3:k4,l3:l4) );
+% Zero slip velocity boundary condition
+tmp = dt * area .* ( rho(j1:j2,k1:k2,l1:l2) + rho(j3:j4,k3:k4,l3:l4) );
 ii = tmp ~= 0.;
 tmp(ii) = 1 ./ tmp(ii);
 for i = 1:3
   tt(:,:,:,i) = tt0(:,:,:,i) + tmp .* ...
-    ( v(j3:j4,k3:k4,l3:l4,i) + w1(j3:j4,k3:k4,l3:l4,i) ...
-    - v(j1:j2,k1:k2,l1:l2,i) - w1(j1:j2,k1:k2,l1:l2,i) );
+    ( v(j3:j4,k3:k4,l3:l4,i) + dt * w1(j3:j4,k3:k4,l3:l4,i) ...
+    - v(j1:j2,k1:k2,l1:l2,i) - dt * w1(j1:j2,k1:k2,l1:l2,i) );
 end
 tn = sum( tt .* nrm, 4 );
 for i = 1:3
@@ -229,19 +229,17 @@ i = ts > ff;
 if find( ff <= 0 ), fprintf( 'fault opening!\n' ), end
 c(i) = ff(i) ./ ts(i);
 for i = 1:3
-  tt(:,:,:,i) = -tt0(:,:,:,i) + tn3(:,:,:,i) + c .* ts3(:,:,:,i);
+  tt(:,:,:,i) = tn3(:,:,:,i) + c .* ts3(:,:,:,i) - tt0(:,:,:,i);
   w1(j1:j2,k1:k2,l1:l2,i) = ...
   w1(j1:j2,k1:k2,l1:l2,i) + tt(:,:,:,i) .* area .* rho(j1:j2,k1:k2,l1:l2);
   w1(j3:j4,k3:k4,l3:l4,i) = ...
   w1(j3:j4,k3:k4,l3:l4,i) + tt(:,:,:,i) .* area .* rho(j3:j4,k3:k4,l3:l4);
 end
-tt = v(j3:j4,k3:k4,l3:l4,:) + w1(j3:j4,k3:k4,l3:l4,:) ...
-   - v(j1:j2,k1:k2,l1:l2,:) - w1(j1:j2,k1:k2,l1:l2,:);
+tt = v(j3:j4,k3:k4,l3:l4,:) + dt * w1(j3:j4,k3:k4,l3:l4,:) ...
+   - v(j1:j2,k1:k2,l1:l2,:) - dt * w1(j1:j2,k1:k2,l1:l2,:);
 vslip = sum( tt .* tt, 4 );
 vslip = sqrt( vslip );
 
-uslip = uslip + dt * vslip;
-uslipmax = max( abs( uslip(:) ) );
 vslipmax = max( abs( vslip(:) ) );
 tnmax = max( abs( tn(:) ) );
 tsmax = max( abs( ts(:) ) );

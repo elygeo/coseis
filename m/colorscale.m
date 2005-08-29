@@ -20,8 +20,9 @@ if ~exist( 'hlegend', 'var' )
   set( gcf, 'CurrentAxes', haxes(1) )
 end
 
-uscl = ulim; if uscl < 0, uscl = double( umax ); end;
+ascl = alim; if ascl < 0, ascl = double( amax ); end;
 vscl = vlim; if vscl < 0, vscl = double( vmax ); end;
+uscl = ulim; if uscl < 0, uscl = double( umax ); end;
 wscl = wlim; if wscl < 0, wscl = double( wmax ); end;
 xscl = xlim; if xscl < 0, xscl = double( umax ); end;
 uslipscl = usliplim; if uslipscl < 0, uslipscl = double( uslipmax ); end;
@@ -29,15 +30,18 @@ vslipscl = vsliplim; if vslipscl < 0, vslipscl = double( vslipmax ); end;
 tnscl = tnlim; if tnscl < 0, tnscl = double( tnmax ); end;
 tsscl = tslim; if tsscl < 0, tsscl = double( tsmax ); end;
 if xscl, xscl = .5 * dx / xscl; end
-cellfocus = 1;
+cellfocus = 0;
+breakon = 'v';
 switch field
-case 'u', fscl = uscl; titles = { '|U|' 'Ux' 'Uy' 'Uz' }; cellfocus = 0;
-case 'v', fscl = vscl; titles = { '|V|' 'Vx' 'Vy' 'Vz' }; cellfocus = 0;
+case 'a', fscl = ascl; titles = { '|A|' 'Ax' 'Ay' 'Az' };
+case 'v', fscl = vscl; titles = { '|V|' 'Vx' 'Vy' 'Vz' };
+case 'u', fscl = uscl; titles = { '|U|' 'Ux' 'Uy' 'Uz' }; breakon = 'w';
 case 'w', fscl = wscl; titles = { '|W|' 'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
-case 'uslip', fscl = uslipscl; titles = { 'Uslip' }; cellfocus = 0;
-case 'vslip', fscl = vslipscl; titles = { 'Vslip' }; cellfocus = 0;
-case 'tn', fscl = tnscl; titles = { 'Tn' }; cellfocus = 0;
-case 'ts', fscl = tsscl; titles = { 'Ts' }; cellfocus = 0;
+  breakon = 'w'; cellfocus = 1;
+case 'uslip', fscl = uslipscl; titles = { 'Uslip' };
+case 'vslip', fscl = vslipscl; titles = { 'Vslip' };
+case 'tn', fscl = tnscl; titles = { 'Tn' };
+case 'ts', fscl = tsscl; titles = { 'Ts' };
 otherwise error field
 end
 ncomp = length( titles ) - 1;

@@ -15,12 +15,16 @@ for iz = 1:size( volumes, 1 )
   ng = i2 - i1 + 1;
   if sum( ng > 1 ) < 3, error volume, end
   switch field
-  case 'u'
-    if comp, vg = u(j,k,l,comp); 
-    else     vg = sqrt( sum( u(j,k,l,:) .* u(j,k,l,:), 4 ) )
+  case 'a'
+    if comp, vg = w1(j,k,l,comp); 
+    else     vg = s1(j,k,l);
     end
   case 'v'
     if comp, vg = v(j,k,l,comp); 
+    else     vg = s2(j,k,l);
+    end
+  case 'u'
+    if comp, vg = u(j,k,l,comp); 
     else     vg = s1(j,k,l);
     end
   case 'w'

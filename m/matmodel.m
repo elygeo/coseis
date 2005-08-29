@@ -78,8 +78,8 @@ rho(j,k,l) = 0.125 * ...
   + s1(j,k-1,l) + s1(j-1,k,l-1) ...
   + s1(j,k,l-1) + s1(j-1,k-1,l) );
 
-i = yn  ~= 0.; yn(i)  = dt ./ yn(i);
-i = rho ~= 0.; rho(i) = dt ./ rho(i);
+i = yn  ~= 0.; yn(i)  = 1. ./ yn(i);
+i = rho ~= 0.; rho(i) = 1. ./ rho(i);
 i = s2  ~= 0.; s2(i)  = 1. ./ s2(i);
 lam = lam .* s2;
 miu = miu .* s2;

@@ -1,6 +1,8 @@
 %------------------------------------------------------------------------------%
 % REYNOLDSGLYPH
 
+mga
+
 hglyph = [];
 if ~length( mga ) || ~fscl, return, end
 clear xg ng rg

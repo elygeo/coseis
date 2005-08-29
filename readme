@@ -158,6 +158,10 @@ Tn~ = / Tn,     Tn <= cohes
 Total traction bounded by friction
 T~ = Tn~.n + Ts~
 
+Update accelerations
+A0_ = (R0 + s*(T~-T0))/m0
+A1_ = (R1 - s*(T~-T0))/m1
+
 Update velocities
 V0_ = V0 + dt*(R0 + s*(T~-T0))/m0
 V1_ = V1 + dt*(R1 - s*(T~-T0))/m1
@@ -275,22 +279,22 @@ A = dQ/dv/rho
 Q = Y*dU*/h^2
 A = dQ/h^3/rho
 
+
+
 MOMENT SOURCE
 
 del2phi - phi''/vp^2 = - 4*pi*delta(r)f(t)
 phi = -f(t - t/vp)/r
 
 Brune Source
-M   = -M0 * H / T   * e^(-t/T) * (t + T) + M0
-M'  =  M0 * H / T^2 * e^(-t/T) *  t
-M'' = -M0 * H / T^3 * e^(-t/T) * (t - T)
-
-
+M   = -H * M0 * e^(-t/T) / T   * (t + T) + M0
+M'  =  H * M0 * e^(-t/T) / T^2 *  t
+M'' = -H * M0 * e^(-t/T) / T^3 * (t - T)
 
 Smooth Brune
-M   = -H * M0 / 2 / T^2 * e^(-t/T) * (t^2 + 2*t*T + 2*T^2) + M0
-M'  =  H * M0 / 2 / T^3 * e^(-t/T) *  t^2
-M'' = -H * M0 / 2 / T^4 * e^(-t/T) * (t^2 - 2*t*T)
+M   = -H * M0 * e^(-t/t) / T^2 / 2 * (t^2 + 2*t*T + 2*T^2) + M0
+M'  =  H * M0 * e^(-t/t) / T^3 / 2 *  t^2
+M'' = -H * M0 * e^(-t/t) / T^4 / 2 * (t^2 - 2*t*T)
 
 
 

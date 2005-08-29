@@ -50,6 +50,7 @@ inner: do
   case( 'msrcradius' ); read( a, * ) key, msrcradius
   case( 'moment' );     read( a, * ) key, moment
   case( 'srctimefcn' ); read( a, * ) key, srctimefcn
+  case( 'domp' );       read( a, * ) key, domp
   case( 'locknodes' )
     nlock = nlock + 1
     read( a, * ) key, locknodes(nlock,:), ilock(nlock,:)

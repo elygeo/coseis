@@ -3,13 +3,20 @@
 
 if itstep < 1, itstep = 1; end
 
-while itstep
+while 1
   itstep = itstep - 1;
-  it = it + 1;
-  wt(1) = toc; vstep
-  wt(2) = toc; thispass = 1; output
-  wt(3) = toc; wstep
-  wt(4) = toc; viz
-  wt(5) = toc; thispass = 2; output
+  if pass ~= 'w'
+    pass = 'w';
+    it = it + 1;
+    tic; wstep; wt(1) = toc;
+    tic; viz; output; wt(2) = toc;
+    if ~itstep & breakon == 'w', break, end
+  end
+  if pass ~= 'v'
+    pass = 'v';
+    tic; vstep; wt(3) = toc;
+    tic; viz; output; wt(4) = toc;
+    if ~itstep & breakon == 'v', break, end
+  end
 end
 

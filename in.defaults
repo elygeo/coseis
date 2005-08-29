@@ -9,32 +9,38 @@
   dx           100.
 
 # dt: time step size
+# for stability, be sure to satisfy the Courant condition dt*Vp*sqrt(3) < dx
   dt           .007
 
 # grid: grid generation scheme
-  grid         constant 
+# grid         slant
+  grid         constant
 
 # material: rho, vp, vs, zone(6) : density, p-wave speed, s-wave speed
 # Parameters with a zone(6) specification can be given multiple times.  
 # Zones are specified by points i1=(j1 k1 l1) and i2=(j2 k2 l2).  
 # A negative zone boundary counts inward from the extent of the mesh (ng).  
 # A zone boundary of 0 indicates the hypocenter location.
-  material     2670. 6000. 3464.1   1 1 1   -1 -1 -1
+# Order maters. Zones con overwrite some or all of previous ones.
 # material     267. 600. 346.1      1 1 1   -1 -1 10  # low vel surface layer
+  material     2670. 6000. 3464.1   1 1 1   -1 -1 -1
 
 # viscosity(2): viscosity for (1) stress and (2) hourglass calculations
   viscosity    .0 .3
 
 # bc(6): boundary conditions for sides j1, k1, l1, j2, k2, l2
 # 0 = free surface, 1 = PML absorbing boundary
-# FS at z=1, absorbing on other 5 surfaces
-  bc           1 1 0   1 1 1
+# bc           1 1 1   1 1 1   # absorbing boundary on all sides
+  bc           1 1 0   1 1 1   # free surface at z=1
 
-# npml: number of pml damping zones, 10 or 20 is typical
-  npml         0
+# npml: number of pml damping zones
+# npml         10
+# npml         20
+  npml         0   # no PML damping
 
-# nrmdim: direction normal to the fault plane, 0 = no fault
-  nrmdim       2
+# nrmdim: direction normal to the fault plane
+# nrmdim       0   # no fault
+  nrmdim       2   # constant y fault plane
 
 # friction: fs fd dc cohes zone(6): coefficients of static & dynamic friction, 
 # slip-weakening distance, cohesion
@@ -56,7 +62,7 @@
   rcrit        1000.
 
 # vrup: nucleation rupture velocity
-  vrup         3117.7
+  vrup         3117.7   # .9 * Vs
 
 # nclramp: number of timesteps for nucleation strength relaxation
   nclramp      10
@@ -64,27 +70,35 @@
 # moment(6): moment source rate: Mxx, Myy, Mzz, Myz, Mzx, Mxy
   moment       0. 0. 0. 0. 0. 0.
 
-# msrcradius: moment source radius, negative = no moment source
-  msrcradius   -1.
+# msrcradius: moment source radius
+# msrcradius   150.  # eight cells around hypocenter
+  msrcradius   -1.   # no moment source
 
 # srctimefcn: moment source time function: delta, brune or sbrune
   srctimefcn   brune
+
+# domp: dominant period for moment source time function
+  domp         .056   # 8 * dt
 
 # out: outvar outit zone(6): binary file output
 # outvar choices: a, v, u, w, |a|, |v|, |u|, |w|,  
 #   rho, lam, miu, yn, yc, uslip, vslip, trup, 
 # outit: output interval, negative = count back from nt
 # static variables (e.g. rho) are only written once
-# out v        10  1 1 1   -1 -1 -1   # velocity field every 10 time steps
-# out uslip    -1  1 1 1   -1 -1 -1   # final slip on the fault
+# out v        10   1 1 1   -1 -1 -1   # velocity field every 10 time steps
+# out uslip    -1   1 1 1   -1 -1 -1   # final slip on the fault
 
 # checkpoint: interval for writing checkpoint restart files
-# negative = count back from nt, 0 = no checkpointing
-  checkpoint   0
+# checkpoint   -1    # checkpoint after final step
+# checkpoint   100   # checkpoint every 100 time steps
+  checkpoint   0     # no checkpointing
 
 # np(3): number of processors along each axis for parallel processing
-  nprocs       1 1 1
+# nprocs       2 1 3   # 6 total processors
+  nprocs       1 1 1   # no parallelization
 
 # verbose: level of diagnostic output
-  verbose      1
+# verbose      0   # run quietly
+# verbose      2   # more output
+  verbose      1   # standard output
 

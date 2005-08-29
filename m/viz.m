@@ -32,8 +32,9 @@ elseif init
   glyphtype = 1;
   dark = 1;
   colorexp = .5;
-  ulim = -1;
+  alim = -1;
   vlim = -1;
+  ulim = -1;
   wlim = -1;
   xlim = 0;
   usliplim = -1;
@@ -55,7 +56,7 @@ elseif init
   showframe = 0;
   count = 0;
   keymod = '';
-  keypress = 'h';
+  keypress = 'f1';
   helpon = 0;
   set( 1, ...
     'Color', background, ...
@@ -106,6 +107,15 @@ otherwise
 end
 
 if mod( it, plotinterval ), return, end
+time = it * dt;
+switch field
+case 'a', onpass = 'v';
+case 'v', onpass = 'v'; time = ( it + .5 ) * dt;
+case 'u', onpass = 'w';
+case 'w', onpass = 'w';
+otherwise error vizfield
+end
+if onpass ~= pass, return, end
 
 set( 0, 'CurrentFigure', 1 )
 if holdmovie
@@ -120,10 +130,6 @@ hhud = []; hmsg = []; hhelp = [];
 colorscale
 set( gcf, 'CurrentAxes', haxes(2) )
 text( .50, .05, titles( comp + 1 ) );
-switch field
-case 'v', time = ( it - .5 ) * dt;
-otherwise time = it * dt;
-end
 text( .98, .98, sprintf( '%.3fs', time ), 'Hor', 'right' )
 set( gcf, 'CurrentAxes', haxes(1) )
 

@@ -117,8 +117,6 @@ end
 s1 = sum( w1 .* w1, 4 );
 xmax = 2 * sqrt( double( max( s1(:) ) ) );
 clear s3
-s1(:) = 0;
-s2(:) = 0;
-w1(:) = 0;
 xhypo = x(hypocenter(1),hypocenter(2),hypocenter(3),:);
+xhypo = xhypo(:)';
 
