@@ -63,7 +63,7 @@ else % direct stress
 end
 o = prod( nm );
 for i = 0:2
-  w1(msrci+o*i) = w1(msrci+o*i) - msrcf(it) * msrcx * moment(i+1);
-  w2(msrci+o*i) = w2(msrci+o*i) - msrcf(it) * msrcx * moment(i+4);
+  w1(msrci+o*i) = w1(msrci+o*i) - msrcf * msrcx * moment(i+1);
+  w2(msrci+o*i) = w2(msrci+o*i) - msrcf * msrcx * moment(i+4);
 end
 

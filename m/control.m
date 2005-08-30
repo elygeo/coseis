@@ -28,20 +28,22 @@ case 'f1'
       { 'SORD - Support-Operator Rupture Dynamics'
         'by Geoffrey Ely - gely@ucsd.edu'
         ''
-        'Help                          F1     Build Movie                    B'
-        'Run/Step/Pause     R Space Click     Frame -/+               - = Page'
-        'Write/Read Checkpoint   Q Shft+Q     First/Last Frame        Home End'
-        '                                     Delete Frame                 Del'
-        'Field                    A V U W     Replot                     Enter'
-        'Component                    0-6                                     '
-        'Volumes/Slices                 P     Explore               Arrows H E'
-        'Glyphs                         G     Time Series                    T'
-        'Isosurfaces                    I     Rotate                      Drag'
-        'Surfaces                       S     Zoom                       < > /'
-        'Outline                        O     3D/2D                          D'
-        'Mesh                           M     Length Scale                   L'
-        'Mesh Distortion                X     Color Scale              [ ] \\ |'
-        'Fault Plane                    F     Clean Up               Backspace'
+        'Help               F1    Acceleration      A    Zoom            < >'
+        'Run                 R    Velocity          V    Reset Zoom        /'
+        'Pause           Click    Displacement      U    3D/2D             D'
+        'Step            Space    Stress            W    Length Scale      L'
+        'Step 10     Alt-Space    Slip          Alt-U    Color Scale     [ ]'
+        'Checkpoint          C    Slip rate     Alt-V    Round CS          \\'
+        'Restart         Alt-Q    Magnitude         0    Reset CS      Alt-\\'
+        '                         Component       1-6                       '
+        'Rotate           Drag    Volumes/Slices    P    Build Movie       B'
+        'Explore        Arrows    Glyphs            G    Frame -1          -'
+        'Hypocenter          H    Isosurfaces       I    Frame +1          ='
+        'Extremum            E    Surfaces          S    Frame -10      PgUp'
+        'Replot          Enter    Outline           O    Frame +10      PgDn'
+        'Clean Up    Backspace    Mesh              M    First Frame    Home'
+        'Time Series         T    U Distortion      X    Last Frame      End'
+        'Filtered TS     Alt-T    Fault Plane       F    Delete Frame    Del'
       }, ...
       'Tag', 'help', ...
       'Vertical',   'middle', ...
@@ -77,6 +79,7 @@ case 'h',          xhairmove = 4;  crosshairs
 case 'e',          xhairmove = 6;  crosshairs
 case 'space', if km, itstep = 10; else itstep = 1; end, msg = 'Step';
 case 'r', itstep = nt - it; msg = 'Run';
+case 'q', if km, sord, return, end
 case '0', comp = 0; colorscale; msg = titles( 1 );
 case '1', comp = 1; colorscale; msg = titles( 2 );
 case '2', comp = 2; colorscale; msg = titles( 3 );
@@ -187,22 +190,26 @@ case 'x'
   if xlim, msg = 'Mesh distortion on';
   else     msg = 'Mesh distortion off';
   end
-case 'a', field = 'a';
-  colorscale; msg = titles{ comp + 1};
-  delete( [ hhud hmsg hhelp ] )
-  hhud = []; hmsg = []; hhelp = [];
-case 'v', if km, field = 'vslip'; else, field = 'v'; end 
-  colorscale; msg = titles{ comp + 1};
-  delete( [ hhud hmsg hhelp ] )
-  hhud = []; hmsg = []; hhelp = [];
 case 'u', if km, field = 'uslip'; else, field = 'u'; end 
   colorscale; msg = titles{ comp + 1};
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
+  if pass == 'v', msg = [ msg ' step code once for viz' ]; end
 case 'w', if km, field = 't'; else, field = 'w'; end 
   colorscale; msg = titles{ comp + 1};
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
+  if pass == 'v', msg = [ msg ' step code once for viz' ]; end
+case 'a', field = 'a';
+  colorscale; msg = titles{ comp + 1};
+  delete( [ hhud hmsg hhelp ] )
+  hhud = []; hmsg = []; hhelp = [];
+  if pass == 'w', msg = [ msg ' step code once for viz' ]; end
+case 'v', if km, field = 'vslip'; else, field = 'v'; end 
+  colorscale; msg = titles{ comp + 1};
+  delete( [ hhud hmsg hhelp ] )
+  hhud = []; hmsg = []; hhelp = [];
+  if pass == 'w', msg = [ msg ' step code once for viz' ]; end
 case 'f'
   tmp = findobj( [ frame{ showframe } hhud ], 'Tag', 'fault' );
   if length( tmp ), dofault = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
@@ -260,7 +267,7 @@ case 'l'
   else axis off
   end
 case 't', timeseriesviz
-case 'q'
+case 'c'
   if ~km
     save checkpoint it u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 vslip uslip trup 
     if exist( 'checkpoint.out', 'dir' )
