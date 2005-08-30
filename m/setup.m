@@ -47,6 +47,9 @@ vslip = 0;
 uslip = 0;
 trup = 0;
 
+% Star-P
+p = 1;
+nm = nm*p;
 % Allocate arrays - single or double precision arrays depending on 'zero'.
 x   = repmat( zero, [ nm 3 ] );
 u   = repmat( zero, [ nm 3 ] );
@@ -71,10 +74,12 @@ n(3) = npml * bc(3); p3 = repmat( zero, n ); g3 = repmat( zero, n );
 n(3) = npml * bc(6); p6 = repmat( zero, n ); g6 = repmat( zero, n );
 
 mem = whos;
-mem = round( sum( [ mem.bytes ] ) / 1024 ^ 2 );
-fprintf( 'RAM usage (not including viz & other overhead): %d Mb\n', mem )
+mem = sum( [ mem.bytes ] );
+ram = mem / 1024 ^ 2;
+wt = mem / 7000000;
+fprintf( 'RAM usage: %.0fMb\n', ram )
+fprintf( 'Run time: %.0fs * %d = %.0fm\n', wt, nt, wt * nt / 60 )
 
-tic
 format short e
 format compact
 

@@ -106,10 +106,8 @@ v = v + dt * w1;
 if planewavedim, planewave, end
 
 % Magnitudes
-s1 = sum( w1 .* w1, 4 );
-s2 = sum( v .* v, 4 );
-s1 = sqrt( s1 ) / dt;
-s2 = sqrt( s2 );
+s1 = sqrt( sum( w1 .* w1, 4 ) );
+s2 = sqrt( sum( v .* v, 4 ) );
 [ amax, amaxi ] = max( s1(:) );
 [ vmax, vmaxi ] = max( s2(:) );
 

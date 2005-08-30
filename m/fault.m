@@ -84,8 +84,7 @@ i2 = i2node;
 i1(nrmdim) = hypocenter(nrmdim);
 i2(nrmdim) = hypocenter(nrmdim);
 nrm(:,:,:,:) = snormals( x, i1, i2 );
-area = sum( nrm .* nrm, 4 );
-area = sqrt( area );
+area = sqrt( sum( nrm .* nrm, 4 ) );
 tmp = area;
 ii = tmp ~= 0.;
 tmp(ii) = 1 ./ tmp(ii);
@@ -96,8 +95,7 @@ end
 str(:,:,:,1) = down(2) .* nrm(:,:,:,3) - down(3) .* nrm(:,:,:,2);
 str(:,:,:,2) = down(3) .* nrm(:,:,:,1) - down(1) .* nrm(:,:,:,3);
 str(:,:,:,3) = down(1) .* nrm(:,:,:,2) - down(2) .* nrm(:,:,:,1);
-tmp = sum( str .* str, 4 );
-tmp = sqrt( tmp );
+tmp = sqrt( sum( str .* str, 4 ) );
 ii = tmp ~= 0.;
 tmp(ii) = handed ./ tmp(ii);
 for i = 1:3
@@ -107,8 +105,7 @@ end
 dip(:,:,:,1) = nrm(:,:,:,2) .* str(:,:,:,3) - nrm(:,:,:,3) .* str(:,:,:,2);
 dip(:,:,:,2) = nrm(:,:,:,3) .* str(:,:,:,1) - nrm(:,:,:,1) .* str(:,:,:,3);
 dip(:,:,:,3) = nrm(:,:,:,1) .* str(:,:,:,2) - nrm(:,:,:,2) .* str(:,:,:,1);
-tmp = sum( dip .* dip, 4 );
-tmp = sqrt( tmp );
+tmp = sqrt( sum( dip .* dip, 4 ) );
 ii = tmp ~= 0.;
 tmp(ii) = handed ./ tmp(ii);
 for i = 1:3
@@ -135,8 +132,7 @@ l1 = i1(3); l2 = i2(3);
 for i = 1:3
   r(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i);
 end
-r = sum( r .* r, 4 );
-r = sqrt( r );
+r = sqrt( sum( r .* r, 4 ) );
 i = hypocenter;
 i(nrmdim) = 1;
 j = i(1);
@@ -193,8 +189,7 @@ for i = 1:3
   tn3(:,:,:,i) = tn .* nrm(:,:,:,i);
 end
 ts3 = tt - tn3;
-ts = sum( ts3 .* ts3, 4 );
-ts = sqrt( ts );
+ts = sqrt( sum( ts3 .* ts3, 4 ) );
 %if 0 % Fault opening
 %  for i = 1:3
 %    tt(:,:,:,i) = tt(:,:,:,i) + tmp .* ...
@@ -237,8 +232,7 @@ for i = 1:3
 end
 tt = v(j3:j4,k3:k4,l3:l4,:) + dt * w1(j3:j4,k3:k4,l3:l4,:) ...
    - v(j1:j2,k1:k2,l1:l2,:) - dt * w1(j1:j2,k1:k2,l1:l2,:);
-vslip = sum( tt .* tt, 4 );
-vslip = sqrt( vslip );
+vslip = sqrt( sum( tt .* tt, 4 ) );
 
 vslipmax = max( abs( vslip(:) ) );
 tnmax = max( abs( tn(:) ) );

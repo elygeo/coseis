@@ -47,7 +47,6 @@ case explosion
   bc           0 1 0   0 1 0
   grid         constant
   bc           1 1 1   1 1 1
-  bc           0 0 0   0 0 0
   msrcradius    150.
   viscosity    .3 .3
   viscosity    .0 .3
@@ -59,6 +58,9 @@ case explosion
   nrmdim       0
   out x        1   1 0 1   -1 0 -1
   out v        1   1 0 1   -1 0 -1
+  out a        1   1 0 1   -1 0 -1
+  out u        1   1 0 1   -1 0 -1
+  out w        1   1 0 1   -1 0 -1
   out x        1   0 0 11     0 0 11
   out v        1   0 0 11     0 0 11
   out x        1   0 11 11    0 11 11

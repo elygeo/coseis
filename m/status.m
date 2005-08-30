@@ -12,7 +12,6 @@ if init
   if ~readcheckpoint
     if exist( 'out', 'dir' ), rmdir( 'out', 's' ), end
     mkdir( 'out/stats/' )
-    wtall = 0;
   else
     % FIXME read checkpoint
   end
@@ -24,7 +23,7 @@ if init
   fprintf( fid, '%g %g %g\n', xhypo );
   fclose( fid );
   outinit = ones( size( outit ) );
-  fprintf( 'Step  Amax          Vmax          Umax          WallTime\n' )
+  fprintf( 'Step  Vmax          Vslipmax      WallTime\n' )
   tic
   return
 end
@@ -112,15 +111,9 @@ end
 
 if pass == 'w', return, end
 
-wt(4) = toc;
-
-tic
 if checkpoint & ~mod( it, checkpoint )
-  save checkpoint it u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 vslip uslip trup wtall
+  save checkpoint it v u vslip uslip trup
 end
-wt(5) = toc;
-
-wtall = wtall + sum( wt );
 
 fid = fopen( 'out/timestep', 'w' );
 fprintf( fid, '%g\n', it );
@@ -128,12 +121,10 @@ fclose( fid );
 
 file = sprintf( 'out/stats/%05d', it );
 fid = fopen( file, 'w' );
-fprintf( fid, '%12.6e  ', [ amax vmax umax wmax vslipmax uslipmax ] );
-fprintf( fid, '%8.2e  ', [ sum( wt ) wt ] );
-fprintf( fid, '\n' );
+fmt = '%13.6e %13.6e %13.6e %13.6e %13.6e %13.6e %9.2e %9.2e %9.2e %9.2e %9.2e\n';
+fprintf( fid, fmt, [ amax vmax umax wmax vslipmax uslipmax sum( wt ) wt ] );
 fclose( fid );
 
-fprintf( '%4d  ', it )
-fprintf( '%12.6e  ', [ amax vmax umax ] )
-fprintf( '%s\n', datestr( wtall / 3600 / 24, 13 ) )
+fmt = '%4d %13.6e %13.6e %9.2e\n';
+fprintf( fmt, [ it vmax vslipmax sum( wt ) ] );
 

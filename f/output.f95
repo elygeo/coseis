@@ -11,7 +11,8 @@ implicit none
 save
 character, intent(in) :: pass
 character :: onpass
-integer :: iz, nc, reclen, floatsize = 4
+integer :: iz, nc, reclen, floatsize = 4, wt_rate
+real :: dwt(6)
 character(255) :: ofile
 logical :: fault, cell, static, init = .true., outinit(nz) = .true.
 
@@ -23,6 +24,7 @@ if ( init ) then
   open(  9, file='out/xhypo' )
   write( 9, * ) xhypo
   close( 9 )
+  call system_clock( count_rate=wt_rate )
   if ( verb > 0 ) print '(a)', &
   'Step  Vmax          Vspilmax      WallTime'
 end if
@@ -36,14 +38,14 @@ outer: do iz = 1, nout
   fault = .false.
   static = .false.
   select case( outvar(iz) )
-  case( 'a'   ); nc = 3;
-  case( 'v'   ); nc = 3;
-  case( 'u'   ); nc = 3; onpass = 'w';
-  case( 'w'   ); nc = 6; onpass = 'w'; cell = .true.
   case( '|a|' )
   case( '|v|' )
+  case( 'a'   ); nc = 3
+  case( 'v'   ); nc = 3
   case( '|u|' ); onpass = 'w'; 
   case( '|w|' ); onpass = 'w'; cell = .true.
+  case( 'u'   ); onpass = 'w'; nc = 3
+  case( 'w'   ); onpass = 'w'; nc = 6; cell = .true.
   case( 'x'   ); static = .true.; nc = 3
   case( 'rho' ); static = .true.
   case( 'yn'  ); static = .true.
@@ -83,16 +85,16 @@ outer: do iz = 1, nout
     write( ofile, '(a,i2.2,a,i1,a,i5.5)' ) 'out/', iz, '/', i, '/', it
     open( 9, file=ofile, form='unformatted', access='direct', status='replace', recl=reclen )
     select case( outvar(iz) )
+    case( '|a|'   ); write( 9, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
+    case( '|v|'   ); write( 9, rec=1 ) s2(j1:j2,k1:k2,l1:l2)
     case( 'a'     ); write( 9, rec=1 ) w1(j1:j2,k1:k2,l1:l2,i)
     case( 'v'     ); write( 9, rec=1 ) v(j1:j2,k1:k2,l1:l2,i)
+    case( '|u|'   ); write( 9, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
+    case( '|w|'   ); write( 9, rec=1 ) s2(j1:j2,k1:k2,l1:l2)
     case( 'u'     ); write( 9, rec=1 ) u(j1:j2,k1:k2,l1:l2,i)
     case( 'w'     );
       if ( i < 4 )   write( 9, rec=1 ) w1(j1:j2,k1:k2,l1:l2,i)
       if ( i > 3 )   write( 9, rec=1 ) w2(j1:j2,k1:k2,l1:l2,i-3)
-    case( '|a|'   ); write( 9, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
-    case( '|v|'   ); write( 9, rec=1 ) s2(j1:j2,k1:k2,l1:l2)
-    case( '|u|'   ); write( 9, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
-    case( '|w|'   ); write( 9, rec=1 ) s2(j1:j2,k1:k2,l1:l2)
     case( 'x'     ); write( 9, rec=1 ) x(j1:j2,k1:k2,l1:l2,i)
     case( 'rho'   ); write( 9, rec=1 ) rho(j1:j2,k1:k2,l1:l2)
     case( 'lam'   ); write( 9, rec=1 ) lam(j1:j2,k1:k2,l1:l2)
@@ -116,6 +118,8 @@ end do outer
 
 if ( pass == 'w' ) return
 
+call system_clock( wt(5) )
+
 if ( checkpoint < 0 ) checkpoint = nt + checkpoint + 1
 if ( checkpoint /= 0 .and. mod( it, checkpoint ) == 0 ) then
   if ( verb > 1 ) print '(a)', 'Writing checkpoint file'
@@ -131,18 +135,18 @@ if ( checkpoint /= 0 .and. mod( it, checkpoint ) == 0 ) then
   close( 9 )
 end if
 
+call system_clock( wt(6) )
+
 open(  9, file='out/timestep' )
 write( 9, * ) it
 close( 9 )
 
-call system_clock( wt(5) )
-
-dwt(1)   = real( wt(5)   - wt(1) )   / real( wt_rate )
-dwt(2:5) = real( wt(2:5) - wt(1:4) ) / real( wt_rate )
+dwt(1)   = real( wt(6)   - wt(1) )   / real( wt_rate )
+dwt(2:5) = real( wt(2:5) - wt(1:5) ) / real( wt_rate )
 
 write( ofile, '(a,i5.5)' ) 'out/stats/', it
 open(  9, file=ofile )
-write( 9, '(6e14.6,5e10.2)' ) amax, vmax, umax, wmax, vslipmax, uslipmax, dwt
+write( 9, '(6e14.6,6e10.2)' ) amax, vmax, umax, wmax, vslipmax, uslipmax, dwt
 close( 9 )
 
 if ( verb > 0 ) print '(i4,2e14.6,e10.2)', it, vmax, vslipmax, dwt(1)

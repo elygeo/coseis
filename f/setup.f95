@@ -59,8 +59,6 @@ p4 = 0.; p5 = 0.; p6 = 0.
 g1 = 0.; g2 = 0.; g3 = 0.
 g4 = 0.; g5 = 0.; g6 = 0.
 
-call system_clock( count_rate=wt_rate )
-
 end subroutine
 end module
 

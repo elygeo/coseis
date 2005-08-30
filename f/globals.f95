@@ -12,8 +12,7 @@ integer :: locknodes(nz,3), noper, nlock, nout, nmat, nfric, ntrac, nstress
 integer :: outit(nz)
 integer, dimension(nz,6) :: ioper, ilock, iout, imat, ifric, itrac, istress
 
-integer :: wt(6), wt_rate
-real :: dwt(6)
+integer :: wt(6)
 
 character(256) :: grid, srctimefcn
 integer :: &

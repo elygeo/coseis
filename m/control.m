@@ -199,12 +199,12 @@ case 'w', if km, field = 't'; else, field = 'w'; end
   colorscale; msg = titles{ comp + 1};
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
-  if pass == 'v', msg = [ msg ' step code once for viz' ]; end
+  if pass == 'v', msg = [ msg ' not in memory, step code once' ]; end
 case 'a', field = 'a';
   colorscale; msg = titles{ comp + 1};
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
-  if pass == 'w', msg = [ msg ' step code once for viz' ]; end
+  if pass == 'w', msg = [ msg ' not in memory, step code once' ]; end
 case 'v', if km, field = 'vslip'; else, field = 'v'; end 
   colorscale; msg = titles{ comp + 1};
   delete( [ hhud hmsg hhelp ] )
@@ -269,7 +269,7 @@ case 'l'
 case 't', timeseriesviz
 case 'c'
   if ~km
-    save checkpoint it u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 vslip uslip trup 
+    save checkpoint it u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 vslip uslip trup wtall
     if exist( 'checkpoint.out', 'dir' )
       rmdir( 'checkpoint.out', 's' )
     end
