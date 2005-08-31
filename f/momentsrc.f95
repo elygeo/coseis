@@ -67,7 +67,7 @@ if ( init ) then
 end if
 
 
-if ( .false. ) ! increment stress
+if ( .false. ) then ! increment stress
   time = ( it - .5 ) * dt
   select case( srctimefcn )
   case( 'delta' );  msrcf = 0.; if ( it == 1 ) msrcf = 1. / dt

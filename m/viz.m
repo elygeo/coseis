@@ -82,6 +82,7 @@ elseif init
   cameratoolbar
   cameratoolbar( 'SetMode', 'orbit' )
   cameratoolbar( 'SetCoordSys', 'z' )
+  return
 end
 
 switch plotstyle
@@ -93,14 +94,14 @@ otherwise
   dosurf = 0;
   doisosurf = 0;
   dooutline = 1;
-  volviz = 1;
+  volviz = 0;
   switch plotstyle
   case 'outline'
   case 'fault',      dofault = 1;
-  case 'slice',      dosurf = 1; volviz = 0;
-  case 'cube',       dosurf = 1;
+  case 'slice',      dosurf = 1;
+  case 'cube',       dosurf = 1; volviz = 1;
   case 'glyphs',     doglyph = 1;
-  case 'isosurface', doisosurf = 1;
+  case 'isosurface', doisosurf = 1; volviz = 1;
   otherwise error plotstyle
   end
   plotstyle = 'hold';

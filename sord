@@ -1,7 +1,7 @@
 #!/bin/bash -e
 #------------------------------------------------------------------------------#
 
-echo "SORD Support-Opperator Rupture Dynamics"
+echo "SORD - Support Operator Rupture Dynamics"
 date
 
 mpi=guess
@@ -37,6 +37,7 @@ fi
 #------------------------------------------------------------------------------#
 # Metadata
 
+rm -f batchjob
 [ -e meta ] && rm -fr meta
 mkdir meta
 
@@ -48,6 +49,49 @@ elif [ "$HOSTNAME" = master ];   then machine="babieca"
 else machine=$HOSTNAME
 fi
 
+perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > meta/endian
+
+./tarball
+cp sord.tgz meta/
+
+for file in in.defaults in; do
+[ -r "$file" ] || exit
+nn3=( 1 1 1 )
+np3=( 1 1 1 )
+while read key params; do
+  set -- $params
+  case "$key" in
+  switch) swtich=$2 ;;
+  case)   case=$2 ;;
+  esac
+  if [ "$switch" = "$case" ]; then
+    case "$key" in
+      n)  nn3=( $1 $2 $3 ); nt=$4 ;;
+      np) np3=( $1 $2 $3 ) ;;
+    esac
+  fi
+done < "$file"
+done
+nn=$(( nn3[0] * nn3[1] * nn3[2] ));
+np=$(( np3[0] * np3[1] * np3[2] ));
+[ $matlab = yes ] && np=1
+
+floatsize=4
+nvars=22
+ram=$(( nn / np * floatsize * nvars / 1024 / 1024 ))
+
+rate=250000
+[ $matlab = yes ] && rate=70000
+wt=$(( nt * nn / np / rate + 1 ))
+hh=$(( wt / 3600 ))
+mm=$(( wt % 3600 / 60 ))
+ss=$(( wt % 60 ))
+[ $hh -ge 1 ] && ss=0
+wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
+
+echo "RAM usage: at least ${ram}Mb"
+echo "Run time: at least $wt"
+
 cat << END > meta/data
 login:   $LOGNAME
 name:    $( finger $LOGNAME | sed -n 's/^.*e: //p' )
@@ -56,11 +100,6 @@ machine: $machine
 host:    $HOSTNAME
 os:      $( uname -a )
 END
-
-perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > meta/endian
-
-./tarball
-cp sord.tgz meta/
 
 #------------------------------------------------------------------------------#
 # Matlab backend
@@ -83,53 +122,13 @@ fi
 #------------------------------------------------------------------------------#
 # Fortran backend
 
-rm -rf batchjob
+[ $mpi = guess -a $np -eq 1 ] && mpi=no
+[ $mpi = guess -a $np -gt 1 ] && mpi=yes
+
 if [ $debug = yes -a $batch = yes ]; then
   echo "can't debug in batch mode"
   exit
 fi
-
-# read input
-for file in in.defaults in; do
-[ -r "$file" ] || exit
-nn=( 1 1 1 )
-np3=( 1 1 1 )
-while read key params; do
-  set -- $params
-  case "$key" in
-  switch) swtich=$2 ;;
-  case)   case=$2 ;;
-  esac
-  if [ "$switch" = "$case" ]; then
-    case "$key" in
-      n)      nn=( $1 $2 $3 ); nt=$4 ;;
-      nprocs) np3=( $1 $2 $3 ) ;;
-    esac
-  fi
-done < "$file"
-done
-
-floatsize=4
-nvars=22
-rate=40000
-
-nprocs=$(( np3[0] * np3[1] * np3[2] ));
-npoints=$(( nn[0] * nn[1] * nn[2] ));
-ram=$(( npoints / nprocs * floatsize * nvars / 1024 / 1024 ))
-wt=$(( nt * npoints / nprocs / rate + 1 ))
-
-if   [ $wt -gt 5400 ]; then wt="$(( wt / 3600 + 1 )):00:00"
-elif [ $wt -gt 90   ]; then wt="$(( wt /   60 + 1 )):00"
-fi
-
-[ $mpi = guess -a $nprocs -eq 1 ] && mpi=no
-[ $mpi = guess -a $nprocs -gt 1 ] && mpi=yes
-
-echo "RAM usage: $ram Mb"
-echo "Run time: $wt"
-
-#------------------------------------------------------------------------------#
-# Create makefile and compile code
 
 OBJECT="\\
   globals.o \\
@@ -175,7 +174,7 @@ SunOS)
   ;;
 esac
 
-[ "$npoints" -lt 100000 ] && OPTFLAGS=
+#[ "$nn" -lt 100000 ] && OPTFLAGS=
 
 if [ $debug = yes ]; then
   OPTFLAGS=-g
@@ -241,9 +240,17 @@ other useful commands:
 END
 [ $( pwd | grep -v gpfs ) ] || exit
 
+rate=100000
+wt=$(( nt * nn / np / rate + 1 ))
+hh=$(( wt / 3600 ))
+mm=$(( wt % 3600 / 60 ))
+ss=$(( wt % 60 ))
+[ $hh -ge 1 ] && ss=0
+wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
+
 ppn=8;
-[ $ppn -gt $nprocs ] && ppn=$nprocs
-nodes=$(( nprocs / ppn + ( nprocs % ppn > 0 ? 1 : 0 ) ))
+[ $ppn -gt $np ] && ppn=$np
+nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
 opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_single"
 
 case $debug$mpi in
@@ -307,13 +314,21 @@ batch submission:
 qsub batchjob
 END
 
+rate=100000
+wt=$(( nt * nn / np / rate + 1 ))
+hh=$(( wt / 3600 ))
+mm=$(( wt % 3600 / 60 ))
+ss=$(( wt % 60 ))
+[ $hh -ge 1 ] && ss=0
+wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
+
 ppn=2;
-[ $ppn -gt $nprocs ] && ppn=$nprocs
-nodes=$(( nprocs / ppn + ( nprocs % ppn > 0 ? 1 : 0 ) ))
+[ $ppn -gt $np ] && ppn=$np
+nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
 
 case $mpi in
   no)  cmd="" ;;
-  yes) cmd="mpirun -v -machinefile \$PBS_NODEFILE -np $nprocs" ;;
+  yes) cmd="mpirun -v -machinefile \$PBS_NODEFILE -np $np" ;;
 esac
 
 cat << END > batchjob
@@ -345,14 +360,14 @@ other useful commands: pbsnodes -a, pingd, qstat, qdel
 END
 
 ppn=2
-[ $ppn -gt $nprocs ] && ppn=$nprocs
-nodes=$(( nprocs / ppn + ( nprocs % ppn > 0 ? 1 : 0 ) ))
+[ $ppn -gt $np ] && ppn=$np
+nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
 
 case $debug$mpi in
   nono)   cmd="";;
-  noyes)  cmd="mpiexec -np $nprocs" ;;
+  noyes)  cmd="mpiexec -np $np" ;;
   yesno)  cmd="gdb" ;;
-  yesyes) cmd="mpiexec -np $nprocs -dbg=ddd" ;;
+  yesyes) cmd="mpiexec -np $np -dbg=ddd" ;;
 esac
 
 cat << END > batchjob
@@ -378,9 +393,9 @@ chmod u+x batchjob
 
 case $debug$mpi in
   nono)   cmd="" ;;
-  noyes)  cmd="mpirun -np $nprocs" ;;
+  noyes)  cmd="mpirun -np $np" ;;
   yesno)  cmd="ddd" ;;
-  yesyes) cmd="mpirun -np $nprocs -dbg=ddd" ;;
+  yesyes) cmd="mpirun -np $np -dbg=ddd" ;;
 esac
 
 cat << END > batchjob

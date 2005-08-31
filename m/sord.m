@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
 % SORD
 
-fprintf( 'SORD - Support-Operator Rupture Dynamics\n' )
+fprintf( 'SORD - Matlab version\n' )
 
 %profile report
 %profile plot
@@ -18,7 +18,7 @@ gridgen
 matmodel
 init = 1; fault
 init = 1; momentsrc
-init = 2; viz
+init = 2; viz, viz
 init = 1; output
 
 if gui

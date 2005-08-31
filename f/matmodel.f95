@@ -10,7 +10,7 @@ use dfnc_m
 
 implicit none
 integer :: iz
-real :: matmin(3), matmax(3), hmean(3), tune, c1, c2, c3, damp, dampn, dampc, yc0, courant
+real :: matmin(3), matmax(3), hmean(3), tune, c1, c2, c3, damp, dampn, dampc, yc0, courant, pmlp
 
 if ( verb > 0 ) print '(a)', 'Material Model'
 matmax = material(1,1:3)
@@ -38,7 +38,7 @@ do iz = 1, nmat
   yc(j1:j2,k1:k2,l1:l2) = yc0
 end do
 courant = dt * matmax(2) * sqrt( 3. ) / dx   ! TODO: check, make general
-if ( verb > 0 ) print '(a,e8.2)', 'Courant: 1 > ', courant
+if ( verb > 0 ) print '(a,f.2)', 'Courant: 1 > ', courant
 gam = dt * viscosity
 
 s2 = 0.
@@ -106,15 +106,16 @@ c1 =  8. / 15.
 c2 = -3. / 100.
 c3 =  1. / 1500.
 tune = 3.5
+pmlp = 2
 hmean = 2. * matmin * matmax / ( matmin + matmax )
-damp = tune * hmean(3) / dx * ( c1 + ( c2 + c3 * npml ) * npml )
+damp = tune * hmean(3) / dx * ( c1 + ( c2 + c3 * npml ) * npml ) / npml ** pmlp
 do i = 1, npml
-  dampn = damp * ( i / npml ) ** 2.
-  dampc = damp * .5 * ( ( i + i - 1. ) / npml ) ** 2.
-  dn1(npml-i+1) = - 2. * dampn   / ( 2. + dt * dampn )
+  dampn = damp *   i ** pmlp
+  dampc = damp * ( i ** pmlp + ( i - 1 ) ** pmlp ) / 2.
+  dn1(npml-i+1) = - 2. * dampn        / ( 2. + dt * dampn )
   dc1(npml-i+1) = ( 2. - dt * dampc ) / ( 2. + dt * dampc )
-  dn2(npml-i+1) = 2. / ( 2. + dt * dampn )
-  dc2(npml-i+1) = 2. * dt / ( 2. + dt * dampc )
+  dn2(npml-i+1) =   2.                / ( 2. + dt * dampn )
+  dc2(npml-i+1) =   2. * dt           / ( 2. + dt * dampc )
 end do
 
 end subroutine

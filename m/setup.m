@@ -73,13 +73,6 @@ n = [ nm 3 ];
 n(3) = npml * bc(3); p3 = repmat( zero, n ); g3 = repmat( zero, n );
 n(3) = npml * bc(6); p6 = repmat( zero, n ); g6 = repmat( zero, n );
 
-mem = whos;
-mem = sum( [ mem.bytes ] );
-ram = mem / 1024 ^ 2;
-wt = mem / 7000000;
-fprintf( 'RAM usage: %.0fMb\n', ram )
-fprintf( 'Run time: %.0fs * %d = %.0fm\n', wt, nt, wt * nt / 60 )
-
 format short e
 format compact
 

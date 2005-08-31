@@ -14,7 +14,7 @@ use vstep_m
 use wstep_m
 use output_m
 
-print '(a)', 'SORD - Support Opperator Rupture Dynamics'
+print '(a)', 'SORD - Fortran Version'
 
 call input
 call setup

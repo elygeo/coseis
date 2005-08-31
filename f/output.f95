@@ -11,9 +11,9 @@ implicit none
 save
 character, intent(in) :: pass
 character :: onpass
-integer :: iz, nc, reclen, floatsize = 4, wt_rate
-real :: dwt(6)
-character(255) :: ofile
+integer :: iz, nc, reclen, floatsize = 4, wt_rate, hh, mm, ss
+real :: dwt(4), wtall = 0.
+character(255) :: s
 logical :: fault, cell, static, init = .true., outinit(nz) = .true.
 
 if ( init ) then
@@ -26,7 +26,7 @@ if ( init ) then
   close( 9 )
   call system_clock( count_rate=wt_rate )
   if ( verb > 0 ) print '(a)', &
-  'Step  Vmax          Vspilmax      WallTime'
+  'Step  Amax       Vmax       Umax       Compute    I/O'
 end if
 
 outer: do iz = 1, nout
@@ -63,16 +63,17 @@ outer: do iz = 1, nout
   if ( onpass /= pass ) cycle outer
   if ( outinit(iz) ) then
     outinit(iz) = .false.
-    write( ofile, '(a,i2.2)' ) 'mkdir out/', iz
-    call system( ofile )
+    write( s, '(a,i2.2)' ) 'mkdir out/', iz
+    call system( s )
     do i = 1, nc
-      write( ofile, '(a,i2.2,a,i1)' ) 'mkdir out/', iz, '/', i
-      call system( ofile )
+      write( s, '(a,i2.2,a,i1)' ) 'mkdir out/', iz, '/', i
+      call system( s )
     end do
   end if
   call zoneselect( i1, i2, iout(iz,:), nn, offset, hypocenter, nrmdim )
-  if ( any( i1 < i1node .or. i2 > i2node .or. i2 < i1 ) ) stop 'outrange'
+  if ( any( i1 < i1node .or. i2 > i2node ) ) stop 'out range'
   if ( cell ) i2 = i2 - 1
+  if ( any( i2 < i1 ) ) stop 'out range'
   if ( fault ) then
     i1(nrmdim) = 1
     i2(nrmdim) = 1
@@ -82,8 +83,8 @@ outer: do iz = 1, nout
   l1 = i1(3); l2 = i2(3)
   reclen = floatsize * product( i2 - i1 + 1 )
   inner: do i = 1, nc
-    write( ofile, '(a,i2.2,a,i1,a,i5.5)' ) 'out/', iz, '/', i, '/', it
-    open( 9, file=ofile, form='unformatted', access='direct', status='replace', recl=reclen )
+    write( s, '(a,i2.2,a,i1,a,i5.5)' ) 'out/', iz, '/', i, '/', it
+    open( 9, file=s, form='unformatted', access='direct', status='replace', recl=reclen )
     select case( outvar(iz) )
     case( '|a|'   ); write( 9, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
     case( '|v|'   ); write( 9, rec=1 ) s2(j1:j2,k1:k2,l1:l2)
@@ -109,8 +110,8 @@ outer: do iz = 1, nout
     close( 9 )
     if ( static ) outit(iz) = 0
   end do inner
-  write( ofile, '(a,i2.2,a)' ) 'out/', iz, '/hdr'
-  open(  9, file=ofile )
+  write( s, '(a,i2.2,a)' ) 'out/', iz, '/hdr'
+  open(  9, file=s )
   write( 9, * ) nc, i1-offset, i2-offset, outit(iz), it, dt, dx
   write( 9, * ) outvar(iz)
   close( 9 )
@@ -118,16 +119,14 @@ end do outer
 
 if ( pass == 'w' ) return
 
-call system_clock( wt(5) )
-
 if ( checkpoint < 0 ) checkpoint = nt + checkpoint + 1
 if ( checkpoint /= 0 .and. mod( it, checkpoint ) == 0 ) then
   if ( verb > 1 ) print '(a)', 'Writing checkpoint file'
   reclen = floatsize * ( 2 * size(u) + 3 * size(uslip) &
    + size(p1) + size(p2) + size(p3) + size(p4) + size(p5) + size(p6) &
    + size(g1) + size(g2) + size(g3) + size(g4) + size(g5) + size(g6) )
-  write( ofile, '(a,i5.5)') 'out/ckp/', it
-  open( 9, file=ofile, form='unformatted', access='direct', status='replace', recl=reclen )
+  write( s, '(a,i5.5)') 'out/ckp/', it
+  open( 9, file=s, form='unformatted', access='direct', status='replace', recl=reclen )
   write( 9, rec=1 ) u, v, vslip, uslip, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   close( 9 )
   open( 9, file='out/ckp/hdr' )
@@ -135,21 +134,19 @@ if ( checkpoint /= 0 .and. mod( it, checkpoint ) == 0 ) then
   close( 9 )
 end if
 
-call system_clock( wt(6) )
-
 open(  9, file='out/timestep' )
 write( 9, * ) it
 close( 9 )
 
-dwt(1)   = real( wt(6)   - wt(1) )   / real( wt_rate )
-dwt(2:5) = real( wt(2:5) - wt(1:5) ) / real( wt_rate )
+call system_clock( wt(5) )
+dwt(1:4) = real( wt(2:5) - wt(1:4) ) / real( wt_rate )
 
-write( ofile, '(a,i5.5)' ) 'out/stats/', it
-open(  9, file=ofile )
-write( 9, '(6e14.6,6e10.2)' ) amax, vmax, umax, wmax, vslipmax, uslipmax, dwt
+write( s, '(a,i5.5)' ) 'out/stats/', it
+open(  9, file=s )
+write( 9, '(8es14.6)' ) amax, vmax, umax, wmax, dwt
 close( 9 )
 
-if ( verb > 0 ) print '(i4,2e14.6,e10.2)', it, vmax, vslipmax, dwt(1)
+if ( verb > 0 ) print '(i4,5es10.2)', it, amax, vmax, umax, dwt(1:2) + dwt(3:4)
 
 end subroutine
 end module

@@ -42,6 +42,7 @@ case explosion
   n            61 41 61   120
   n            3  3  3    1
   n            8  8  8    1
+  n            100 100 100   10
   n            41 41 41   120
   grid         slant
   bc           0 1 0   0 1 0
@@ -56,15 +57,15 @@ case explosion
   npml         0
   npml         10
   nrmdim       0
-  out x        1   1 0 1   -1 0 -1
-  out v        1   1 0 1   -1 0 -1
-  out a        1   1 0 1   -1 0 -1
-  out u        1   1 0 1   -1 0 -1
-  out w        1   1 0 1   -1 0 -1
-  out x        1   0 0 11     0 0 11
-  out v        1   0 0 11     0 0 11
-  out x        1   0 11 11    0 11 11
-  out v        1   0 11 11    0 11 11
-  out x        1   11 11 11   11 11 11
-  out v        1   11 11 11   11 11 11
+  out v        1   1 1 1   0 0 0
+# out x        1   1 0 1   -1 0 -1
+# out v        1   1 0 1   -1 0 -1
+# out a        1   1 0 1   -1 0 -1
+# out u        1   1 0 1   -1 0 -1
+# out x        1   0 0 11     0 0 11
+# out v        1   0 0 11     0 0 11
+# out x        1   0 11 11    0 11 11
+# out v        1   0 11 11    0 11 11
+# out x        1   11 11 11   11 11 11
+# out v        1   11 11 11   11 11 11
 

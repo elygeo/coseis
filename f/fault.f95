@@ -175,9 +175,9 @@ if ( all( i1 >= i1node .and. i1 <= i2node ) ) then
   fs0 = fs(j,k,l)
   fd0 = fd(j,k,l)
   dc0 = dc(j,k,l)
-  print '(a,e11.3)', 'S:    ', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 )
-  print '(2(a,e11.3,x))', 'dc:   ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / miu0
-  print '(2(a,e11.3,x))', 'rcrit:', rcrit, '>', miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ** 2
+  print '(a,es10.2)', 'S:    ', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 )
+  print '(2(a,es10.2,x))', 'dc:   ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / miu0
+  print '(2(a,es10.2,x))', 'rcrit:', rcrit, '>', miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ** 2
 end if
 return
 
