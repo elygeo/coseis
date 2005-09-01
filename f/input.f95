@@ -70,7 +70,7 @@ inner: do
     nout = nout + 1
     read( s, * ) key, outvar(nout), outit(nout), iout(nout,:)
   case( 'checkpoint' ); read( s, * ) key, checkpoint
-  case( 'nprocs' );     read( s, * ) key, np
+  case( 'np' );         read( s, * ) key, np
   case( 'verbose' );    read( s, * ) key, verb
   case( 'switch' )
   case( 'case' )

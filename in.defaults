@@ -94,8 +94,8 @@
   checkpoint   0     # no checkpointing
 
 # np(3): number of processors along each axis for parallel processing
-# nprocs       2 1 3   # 6 total processors
-  nprocs       1 1 1   # no parallelization
+# np           2 1 3   # 6 total processors
+  np           1 1 1   # no parallelization
 
 # verbose: level of diagnostic output
 # verbose      0   # run quietly

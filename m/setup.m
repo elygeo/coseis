@@ -26,10 +26,6 @@ i2nodepml = i2node - bc(4:6) * npml;
 i1cellpml = i1cell + bc(1:3) * npml;
 i2cellpml = i2cell - bc(4:6) * npml;
 
-one = 1;
-if str2double( version( '-release' ) ) >= 14, one = single( 1 ); end
-zero = 0 * one;
-
 pass = 'v';
 breakon = 'v';
 gui = 1;
@@ -47,9 +43,15 @@ vslip = 0;
 uslip = 0;
 trup = 0;
 
+% Precision
+one = 1;
+if str2double( version( '-release' ) ) >= 14, one = single( 1 ); end
+zero = 0 * one;
+
 % Star-P
 p = 1;
-nm = nm*p;
+nm = nm * p;
+
 % Allocate arrays - single or double precision arrays depending on 'zero'.
 x   = repmat( zero, [ nm 3 ] );
 u   = repmat( zero, [ nm 3 ] );

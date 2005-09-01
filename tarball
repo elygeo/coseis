@@ -1,18 +1,26 @@
 #!/bin/bash -e
 
-echo "making tarball"
+version=$( date +%Y-%m-%d-%H-%M-%S )
+
+echo $version
+echo $version > VERSION
 
 files="
-  sord/README
-  sord/in
-  sord/in.*
-  sord/sord
-  sord/tarball
-  sord/f/*.f95
-  sord/m/*.m
+  README
+  VERSION
+  in
+  in.*
+  sord
+  tarball
+  f/
+  m/
 "
 
-cd ..
+mkdir sord-$version
 
-tar zcf sord/sord.tgz $files
+cp -al $files sord-$version
+
+tar zcf sord-$version.tgz sord-$version
+
+rm -rf sord-$version
 

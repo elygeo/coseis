@@ -3,7 +3,7 @@
 
 switch test
 switch kostrov
-switch explosion
+switch pmltest
 case simple
   nrmdim       0
   n            3 3 3   1
@@ -38,34 +38,18 @@ case kostrov
   out vslip    1    0 0 0    0  0 -1
   out x        1    1 0 1   -1  0 -1
   out vslip    1    1 0 1   -1  0 -1
-case explosion
-  n            61 41 61   120
-  n            3  3  3    1
-  n            8  8  8    1
-  n            100 100 100   10
+case pmltest
   n            41 41 41   120
-  grid         slant
-  bc           0 1 0   0 1 0
-  grid         constant
+  n            61 61 61   120
+  hypocenter   21 21 21
   bc           1 1 1   1 1 1
+  bc           1 1 1   0 0 0
+  grid         constant
   msrcradius    150.
-  viscosity    .3 .3
   viscosity    .0 .3
-  srctimefcn   brune
   srctimefcn   sbrune
   moment       1e16 1e16 1e16   0. 0. 0.
-  npml         0
   npml         10
   nrmdim       0
-  out v        1   1 1 1   0 0 0
-# out x        1   1 0 1   -1 0 -1
-# out v        1   1 0 1   -1 0 -1
-# out a        1   1 0 1   -1 0 -1
-# out u        1   1 0 1   -1 0 -1
-# out x        1   0 0 11     0 0 11
-# out v        1   0 0 11     0 0 11
-# out x        1   0 11 11    0 11 11
-# out v        1   0 11 11    0 11 11
-# out x        1   11 11 11   11 11 11
-# out v        1   11 11 11   11 11 11
+  out v        1   0 0 0   31 31 31
 
