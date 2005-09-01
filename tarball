@@ -18,9 +18,11 @@ files="
 
 mkdir sord-$version
 
-cp -al $files sord-$version
+cp -al $files sord-$version/
 
-tar zcf sord-$version.tgz sord-$version
+tar zcf sord.tgz sord-$version/
 
 rm -rf sord-$version
+
+[ "x$1" = x-s ] && cp sord.tgz save/sord-$version.tgz
 
