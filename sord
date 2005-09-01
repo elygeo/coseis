@@ -28,9 +28,9 @@ if [ $remote = yes ]; then
   host="phim.ucsd.edu"
   echo "running on remote host $host"
   ssh-add -L > /dev/null || ssh-add
-  version=$( ./tarball )
-  scp sord-$version.tgz $host:
-  ssh -x $host "tar zxf sord-$version.tgz && cd sord-$version && ./sord $@ -l"
+  $version=$( ./tarball )
+  scp sord.tgz $host:
+  ssh -x $host "tar zxf sord.tgz && cd sord-$version && ./sord $@ -l"
   exit
 fi
 
@@ -51,8 +51,10 @@ fi
 
 perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > meta/endian
 
-version=$( ./tarball )
-cp sord-$version.tgz meta/
+./tarball
+echo NOOOOOOOO
+cp sord.tgz meta/
+cp in meta/
 
 for file in in.defaults in; do
 [ -r "$file" ] || exit
@@ -205,7 +207,7 @@ clean:
 	rm -f *.o *.mod matlab_workspace.mat
 
 realclean: clean
-	rm -f sord-bin makefile batchjob sord*tgz
+	rm -f sord-bin makefile batchjob
 
 %.o: f/%.f95 makefile
 	\$(FC) \$(FFLAGS) -c \$< -o \$@

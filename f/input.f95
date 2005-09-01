@@ -7,8 +7,15 @@ subroutine input
 use globals_m
 
 implicit none
-integer :: iz
+integer :: iz,junk  = 1
 character(256) :: s, key, switch = 'default', switchcase = 'default'
+
+print *, junk
+if ( junk == 1 ) then
+  junk = 0
+  call input
+end if
+stop junk
 
 nmat  = 0
 nfric = 0
