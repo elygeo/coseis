@@ -5,7 +5,7 @@ module output_m
 contains
 subroutine output( pass )
 use globals_m
-use utils_m
+use zone_m
 
 implicit none
 save
@@ -93,7 +93,7 @@ if ( outinit(iz) ) then
     call system( str )
   end do
 end if
-call zoneselect( i1, i2, iout(iz,:), nn, offset, hypocenter, nrmdim )
+call zone( i1, i2, iout(iz,:), nn, offset, hypocenter, nrmdim )
 if ( any( i1 < i1node .or. i2 > i2node ) ) stop 'out range'
 if ( cell ) i2 = i2 - 1
 if ( any( i2 < i1 ) ) stop 'out range'

@@ -18,10 +18,9 @@ i = [
 ];
 tmp = [];
 for iz = 1:size( lines, 1 )
-  zone = lines(iz,:);
-  [ i1, i2 ] = zoneselect( zone, nn, offset, hypocenter, nrmdim );
-  zone = [ i1 i2 ];
-  tmp = [ tmp; zone( i ) ];
+  [ i1, i2 ] = zone( lines(iz,:), nn, offset, hypocenter, nrmdim );
+  izone = [ i1 i2 ];
+  tmp = [ tmp; izone( i ) ];
 end
 lines = unique( tmp,  'rows' );
 xga = [];

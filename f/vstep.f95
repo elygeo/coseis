@@ -8,7 +8,7 @@ use globals_m
 use dfcn_m
 use hgnc_m
 use hgcn_m
-use utils_m
+use zone_m
 use fault_m
 
 implicit none
@@ -24,7 +24,7 @@ inner: do iid = 1, 3
   id = mod( ic + iid - 2, 3 ) + 1
   ix = 6 - ic - id
   do iz = 1, noper
-    call zoneselect( i1, i2, ioper(iz,:), nn, offset, hypocenter, nrmdim )
+    call zone( i1, i2, ioper(iz,:), nn, offset, hypocenter, nrmdim )
     i1 = max( i1, i1node )
     i2 = min( i2, i2node )
     if ( ic == id ) then
@@ -112,7 +112,7 @@ call fault
 
 ! Locked nodes
 do iz = 1, nlock
-  call zoneselect( i1, i2, ilock(iz,:), nn, offset, hypocenter, nrmdim )
+  call zone( i1, i2, ilock(iz,:), nn, offset, hypocenter, nrmdim )
   i1 = max( i1, i1node )
   i2 = min( i2, i2node )
   j1 = i1(1); j2 = i2(1)

@@ -7,7 +7,7 @@ subroutine wstep
 use globals_m
 use momentsrc_m
 use dfnc_m
-use utils_m
+use zone_m
 
 implicit none
 integer :: ic, id, ix, iz
@@ -28,7 +28,7 @@ s1 = u(:,:,:,ic) + dt * viscosity(1) * v(:,:,:,ic)
 inner: do id = 1, 3
   ix = 6 - ic - id
   do iz = 1, noper
-    call zoneselect( i1, i2, ioper(iz,:), nn, offset, hypocenter, nrmdim )
+    call zone( i1, i2, ioper(iz,:), nn, offset, hypocenter, nrmdim )
     i1 = max( i1, i1cellpml )
     i2 = min( i2 - 1, i2cellpml )
     call dfnc( s2, oper(iz), s1, x, dx, 1, id, i1, i2 )

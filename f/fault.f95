@@ -6,7 +6,7 @@ contains
 subroutine fault
 use globals_m
 use snormals_m
-use utils_m
+use zone_m
 
 implicit none
 save
@@ -64,7 +64,7 @@ fd = 0.
 dc = 0.
 cohes = 1e9
 do iz = 1, nfric
-  call zoneselect( i1, i2, ifric(iz,:), nn, offset, hypocenter, nrmdim )
+  call zone( i1, i2, ifric(iz,:), nn, offset, hypocenter, nrmdim )
   i1 = max( i1, i1nodepml )
   i2 = min( i2, i2nodepml )
   i1(nrmdim) = 1
@@ -81,7 +81,7 @@ end do
 ! Pretraction
 tt0nsd = 0.
 do iz = 1, ntrac
-  call zoneselect( i1, i2, itrac(iz,:), nn, offset, hypocenter, nrmdim )
+  call zone( i1, i2, itrac(iz,:), nn, offset, hypocenter, nrmdim )
   i1 = max( i1, i1nodepml )
   i2 = min( i2, i2nodepml )
   i1(nrmdim) = 1
@@ -97,7 +97,7 @@ end do
 ! Prestress
 w0 = 0.
 do iz = 1, nstress
-  call zoneselect( i1, i2, istress(iz,:), nn, offset, hypocenter, nrmdim )
+  call zone( i1, i2, istress(iz,:), nn, offset, hypocenter, nrmdim )
   i1 = max( i1, i1nodepml )
   i2 = min( i2, i2nodepml )
   i1(nrmdim) = 1

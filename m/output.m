@@ -71,7 +71,7 @@ for iz = 1:size( outit, 1 )
       mkdir( file )
     end
   end
-  [ i1, i2 ] = zoneselect( iout(iz,:), nn, offset, hypocenter, nrmdim );
+  [ i1, i2 ] = zone( iout(iz,:), nn, offset, hypocenter, nrmdim );
   if cell; i2 = i2 - 1; end
   if isfault
     i1(nrmdim) = 1;

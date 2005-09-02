@@ -1,18 +1,18 @@
 !------------------------------------------------------------------------------!
-! UTILS
+! ZONE
 
-module utils_m
+module zone_m
 contains
-subroutine zoneselect( i1, i2, zone, nn, offset, hypocenter, nrmdim )
+subroutine zone( i1, i2, izone, nn, offset, hypocenter, nrmdim )
 
 implicit none
 integer, intent(out) :: i1(3), i2(3)
-integer, intent(in) :: zone(6), nn(3), offset(3), hypocenter(3), nrmdim
+integer, intent(in) :: izone(6), nn(3), offset(3), hypocenter(3), nrmdim
 integer :: shift(3)
 logical :: m0(3), m1(3), m2(3), m3(3), m4(3)
 
-i1 = zone(1:3)
-i2 = zone(4:6)
+i1 = izone(1:3)
+i2 = izone(4:6)
 shift = 0
 if ( nrmdim /= 0 ) shift(nrmdim) = 1
 m0 = i1 == 0 .and. i2 == 0

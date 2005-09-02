@@ -135,7 +135,7 @@ fi
 
 OBJECT="\\
   globals.o \\
-  utils.o \\
+  zone.o \\
   dfcn.o \\
   dfnc.o \\
   hgcn.o \\

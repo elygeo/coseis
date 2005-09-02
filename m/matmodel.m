@@ -6,7 +6,7 @@ matmax = material(1,1:3);
 matmin = material(1,1:3);
 s1(:) = 0.;
 for iz = 1:size( material, 1 )
-  [ i1, i2 ] = zoneselect( imat(iz,:), nn, offset, hypocenter, nrmdim );
+  [ i1, i2 ] = zone( imat(iz,:), nn, offset, hypocenter, nrmdim );
   i2 = i2 - 1;
   rho0 = material(iz,1);
   vp   = material(iz,2);
@@ -30,7 +30,7 @@ fprintf( 'Courant: %g < 1\n', courant )
 
 s2(:) = 0.;
 for iz = 1:size( operator, 1 )
-  [ i1, i2 ] = zoneselect( ioper(iz,:), nn, offset, hypocenter, nrmdim );
+  [ i1, i2 ] = zone( ioper(iz,:), nn, offset, hypocenter, nrmdim );
   i2 = i2 - 1;
   op = operator(iz);
   l = i1(3):i2(3);

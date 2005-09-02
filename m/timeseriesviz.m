@@ -23,7 +23,7 @@ if ~exist( 'w1', 'var' ) % not running from in sord
     iz = 0;
     while iz < nout
       iz = iz + 1;
-      [ i1, i2 ] = zoneselect( iout(iz,:), nn, offset, hypocenter, nrmdim );
+      [ i1, i2 ] = zone( iout(iz,:), nn, offset, hypocenter, nrmdim );
       if strcmp( outvar{iz}, field ) && sum( xhair >= i1 & xhair <= i2 ) == 3
         found = 1;
         break
@@ -48,7 +48,7 @@ iz = 0;
 msg = 'no time series data at this location';
 while iz < nout
   iz = iz + 1;
-  [ i1, i2 ] = zoneselect( iout(iz,:), nn, offset, hypocenter, nrmdim );
+  [ i1, i2 ] = zone( iout(iz,:), nn, offset, hypocenter, nrmdim );
   if strcmp( outvar{iz}, field ) && sum( xhair >= i1 & xhair <= i2 ) == 3 && outit(iz) == 1
     msg = '';
     break

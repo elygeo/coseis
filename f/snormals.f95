@@ -4,7 +4,6 @@
 module snormals_m
 contains
 subroutine snormals( nrm, x, i1, i2 )
-use utils_m
 
 implicit none
 real, intent(out) :: nrm(:,:,:,:)

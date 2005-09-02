@@ -42,7 +42,7 @@ dip    = repmat( 0, [ nf 3 ] );
 
 % Friction model
 for iz = 1:size( friction, 1 )
-  [ i1, i2 ] = zoneselect( ifric(iz,:), nn, offset, hypocenter, nrmdim );
+  [ i1, i2 ] = zone( ifric(iz,:), nn, offset, hypocenter, nrmdim );
   i1 = max( i1, i1pml );
   i2 = min( i2, i2pml );
   i1(nrmdim) = 1;
@@ -58,7 +58,7 @@ end
 
 % Pretraction
 for iz = 1:size( traction, 1 )
-  [ i1, i2 ] = zoneselect( itrac(iz,:), nn, offset, hypocenter, nrmdim );
+  [ i1, i2 ] = zone( itrac(iz,:), nn, offset, hypocenter, nrmdim );
   i1 = max( i1, i1pml );
   i2 = min( i2, i2pml );
   i1(nrmdim) = 1;
@@ -73,7 +73,7 @@ end
 
 % Prestress
 for iz = 1:size( stress, 1 )
-  [ i1, i2 ] = zoneselect( istress(iz,:), nn, offset, hypocenter, nrmdim );
+  [ i1, i2 ] = zone( istress(iz,:), nn, offset, hypocenter, nrmdim );
   i1 = max( i1, i1pml );
   i2 = min( i2, i2pml );
   i1(nrmdim) = 1;

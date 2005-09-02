@@ -28,13 +28,12 @@ case { 'a', 'v', 'u' }
   ];
   tmp = [];
   for iz = 1:size( planes, 1 )
-    zone = planes(iz,:);
-    tmp = [ tmp; zone( i ) ];
+    izone = planes(iz,:);
+    tmp = [ tmp; izone( i ) ];
   end
   planes = unique( tmp, 'rows' );
   for iz = 1:size( planes, 1 )
-    zone = planes(iz,:);
-    [ i1, i2 ] = zoneselect( zone, nn, offset, hypocenter, nrmdim );
+    [ i1, i2 ] = zone( planes(iz,:), nn, offset, hypocenter, nrmdim );
     l = i1(3):i2(3);
     k = i1(2):i2(2);
     j = i1(1):i2(1);
@@ -67,8 +66,7 @@ case { 'a', 'v', 'u' }
   end
 case 'w'
   for iz = 1:size( planes, 1 )
-    zone = planes(iz,:);
-    [ i1, i2 ] = zoneselect( zone, nn, offset, hypocenter, nrmdim );
+    [ i1, i2 ] = zone( planes(iz,:), nn, offset, hypocenter, nrmdim );
     i2 = i2 - 1; % CHECK
     ng = i2 - i1 + 1;
     l = i1(3):i2(3);

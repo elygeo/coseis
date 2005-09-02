@@ -5,7 +5,7 @@ module matmodel_m
 contains
 subroutine matmodel
 use globals_m
-use utils_m
+use zone_m
 use dfnc_m
 
 implicit none
@@ -17,7 +17,7 @@ matmax = material(1,1:3)
 matmin = material(1,1:3)
 s1 = 0.
 do iz = 1, nmat
-  call zoneselect( i1, i2, imat(iz,:), nn, offset, hypocenter, nrmdim )
+  call zone( i1, i2, imat(iz,:), nn, offset, hypocenter, nrmdim )
   i1 = max( i1, i1cell )
   i2 = min( i2 - 1, i2cell )
   rho0 = material(iz,1)
@@ -43,7 +43,7 @@ gam = dt * viscosity
 
 s2 = 0.
 do iz = 1, noper
-  call zoneselect( i1, i2, ioper(iz,:), nn, offset, hypocenter, nrmdim )
+  call zone( i1, i2, ioper(iz,:), nn, offset, hypocenter, nrmdim )
   i1 = max( i1, i1cell )
   i2 = min( i2 - 1, i2cell )
   j1 = i1(1); j2 = i2(1)
