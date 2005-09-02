@@ -1,55 +1,13 @@
-#------------------------------------------------------------------------------#
-# SORD input file
-
-switch test
-switch kostrov
-switch pmltest
-case simple
-  nrmdim       0
-  n            3 3 3   1
-  out x        0   1 1 1   -1 -1 -1
-  out v        1   1 1 1   -1 -1 -1
-case test
-  n            4 4 4   1
-  bc           0 0 0   0 0 0
-  nrmdim       0
-  out x        0   1 1 1   -1 -1 -1
-  out rho      0   1 1 1   -1 -1 -1
-  out yn       0   1 1 1   -1 -1 -1
-  out lam      0   1 1 1   -1 -1 -1
-  out miu      0   1 1 1   -1 -1 -1
-  out yc       0   1 1 1   -1 -1 -1
-case kostrov
-  n            41  41  41    80
-  n            127 127 127   300
-  n            61  61  61    150
-  n            3 3 3   1
-  grid         slant
-  grid         constant
-  viscosity   .0 .3
-  bc           0 1 0   0 1 0
-  npml         0
-  nrmdim       2
-  friction     1e9 1. 1e9 0.     1 1 1   -1 -1 -1
-  traction     -100e6 -90e6 0.   1 1 1   -1 -1 -1
-  rcrit        1e9
-  nclramp      0
-  out x        1    0 0 0    0  0 -1
-  out vslip    1    0 0 0    0  0 -1
-  out x        1    1 0 1   -1  0 -1
-  out vslip    1    1 0 1   -1  0 -1
-case pmltest
-  n            41 41 41   120
-  n            61 61 61   120
-  hypocenter   21 21 21
-  bc           1 1 1   1 1 1
-  bc           1 1 1   0 0 0
-  grid         constant
-  msrcradius    150.
-  viscosity    .0 .3
-  srctimefcn   sbrune
-  moment       1e16 1e16 1e16   0. 0. 0.
-  npml         10
-  nrmdim       0
-  out v        1   0 0 0   31 31 31
-
+  hypocenter	21 21 21
+  grid		constant
+  msrcradius	150.
+  viscosity	.0 .3
+  srctimefcn	sbrune
+  moment	1e16 1e16 1e16   0. 0. 0.
+  npml		10
+  nrmdim	0
+  out v		1   0 0 0   41 41 41
+  n		41 41 41   120
+  bc		1 1 1   0 0 0
+  domp		.056
+  domp		.028

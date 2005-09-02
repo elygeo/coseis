@@ -14,6 +14,7 @@ files="
   tarball
   f/
   m/
+  models/
 "
 
 mkdir sord-$version
@@ -24,5 +25,5 @@ tar zcf sord.tgz sord-$version/
 
 rm -rf sord-$version
 
-[ "x$1" = x-s ] && cp sord.tgz save/sord-$version.tgz
+if [ "x$1" = x-s ]; then cp sord.tgz save/sord-$version.tgz; fi
 

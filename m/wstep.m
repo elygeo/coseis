@@ -104,8 +104,8 @@ if msrcradius, momentsrc, end
 % Magnitudes
 s1 = sqrt( sum( u .* u, 4 ) );
 s2 = sqrt( sum( w1 .* w1, 4 ) + 2 * sum( w2 .* w2, 4 ) );
-[ umax, umaxi ] = max( s1(:) );
-[ wmax, wmaxi ] = max( s2(:) );
+[ umax, iumax ] = max( s1(:) );
+[ wmax, iwmax ] = max( s2(:) );
 uslipmax = max( abs( uslip(:) ) );
 
 if umax > dx / 10

@@ -31,10 +31,10 @@ breakon = 'v';
 gui = 1;
 if get( 0, 'ScreenDepth' ) == 0; gui = 0; end
 
-amax = 0; amaxi = 1;
-vmax = 0; vmaxi = 1;
-umax = 0; umaxi = 1;
-wmax = 0; wmaxi = 1;
+amax = 0; iamax = 1;
+vmax = 0; ivmax = 1;
+umax = 0; iumax = 1;
+wmax = 0; iwmax = 1;
 uslipmax = 0;
 vslipmax = 0;
 tnmax = 0;

@@ -23,7 +23,7 @@ AUTHOR
 
 USAGE
 
-  See 'in.defaults' for examples, and edit input file 'in'.
+  See 'in.defaults' and 'models/' for examples, and edit input file 'in'.
   Then run the sord script:
 
     ./sord

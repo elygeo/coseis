@@ -7,6 +7,8 @@ if init
 
 init = 0;
 fprintf( 'Initialize fault\n' )
+
+% Orientations
 if nrmdim ~= downdim
   dipdim = downdim;
   strdim = 6 - dipdim - nrmdim;
@@ -17,6 +19,8 @@ end
 down = [ 0 0 0 ];
 down(downdim) = 1;
 handed = mod( strdim - nrmdim + 1, 3 ) - 1;
+
+% Allocate arrays
 nf = nm;
 nf(nrmdim) = 1;
 fs     = repmat( 0, nf );
@@ -35,6 +39,8 @@ tt0    = repmat( 0, [ nf 3 ] );
 nrm    = repmat( 0, [ nf 3 ] );
 str    = repmat( 0, [ nf 3 ] );
 dip    = repmat( 0, [ nf 3 ] );
+
+% Friction model
 for iz = 1:size( friction, 1 )
   [ i1, i2 ] = zoneselect( ifric(iz,:), nn, offset, hypocenter, nrmdim );
   i1 = max( i1, i1pml );
@@ -49,6 +55,8 @@ for iz = 1:size( friction, 1 )
   dc(j1:j2,k1:k2,l1:l2)    = friction(iz,3);
   cohes(j1:j2,k1:k2,l1:l2) = friction(iz,4);
 end
+
+% Pretraction
 for iz = 1:size( traction, 1 )
   [ i1, i2 ] = zoneselect( itrac(iz,:), nn, offset, hypocenter, nrmdim );
   i1 = max( i1, i1pml );
@@ -62,6 +70,8 @@ for iz = 1:size( traction, 1 )
   tt0nsd(j1:j2,k1:k2,l1:l2,2) = traction(iz,2);
   tt0nsd(j1:j2,k1:k2,l1:l2,3) = traction(iz,3);
 end
+
+% Prestress
 for iz = 1:size( stress, 1 )
   [ i1, i2 ] = zoneselect( istress(iz,:), nn, offset, hypocenter, nrmdim );
   i1 = max( i1, i1pml );
@@ -78,7 +88,8 @@ for iz = 1:size( stress, 1 )
   w0(j1:j2,k1:k2,l1:l2,5) = stress(iz,5);
   w0(j1:j2,k1:k2,l1:l2,6) = stress(iz,6);
 end
-% normal vectors
+
+% Normal vectors
 i1 = i1node;
 i2 = i2node;
 i1(nrmdim) = hypocenter(nrmdim);
@@ -91,7 +102,8 @@ tmp(ii) = 1 ./ tmp(ii);
 for i = 1:3
   nrm(:,:,:,i) = nrm(:,:,:,i) .* tmp;
 end
-% stike vectors
+
+% Stike vectors
 str(:,:,:,1) = down(2) .* nrm(:,:,:,3) - down(3) .* nrm(:,:,:,2);
 str(:,:,:,2) = down(3) .* nrm(:,:,:,1) - down(1) .* nrm(:,:,:,3);
 str(:,:,:,3) = down(1) .* nrm(:,:,:,2) - down(2) .* nrm(:,:,:,1);
@@ -101,7 +113,8 @@ tmp(ii) = handed ./ tmp(ii);
 for i = 1:3
   str(:,:,:,i) = str(:,:,:,i) .* tmp;
 end
-% dip vectors
+
+% Dip vectors
 dip(:,:,:,1) = nrm(:,:,:,2) .* str(:,:,:,3) - nrm(:,:,:,3) .* str(:,:,:,2);
 dip(:,:,:,2) = nrm(:,:,:,3) .* str(:,:,:,1) - nrm(:,:,:,1) .* str(:,:,:,3);
 dip(:,:,:,3) = nrm(:,:,:,1) .* str(:,:,:,2) - nrm(:,:,:,2) .* str(:,:,:,1);
@@ -111,6 +124,8 @@ tmp(ii) = handed ./ tmp(ii);
 for i = 1:3
   dip(:,:,:,i) = dip(:,:,:,i) .* tmp;
 end
+
+% Total pretraction
 for i = 1:3
   j = mod( i , 3 ) + 1;
   k = mod( i + 1, 3 ) + 1;
@@ -122,6 +137,8 @@ for i = 1:3
     tt0nsd(:,:,:,strdim) .* str(:,:,:,i) + ...
     tt0nsd(:,:,:,dipdim) .* dip(:,:,:,i);
 end
+
+% Hypocentral radius
 i1 = [ 1 1 1 ];
 i2 = nm;
 i1(nrmdim) = hypocenter(nrmdim);
@@ -133,6 +150,8 @@ for i = 1:3
   r(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i);
 end
 r = sqrt( sum( r .* r, 4 ) );
+
+% Output some useful info
 i = hypocenter;
 i(nrmdim) = 1;
 j = i(1);
@@ -150,19 +169,18 @@ rcritr = miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2;
 fprintf( 1, 'S: %g\n', strength )
 fprintf( 1, 'dc: %g > %g\n', dc0, dcr )
 fprintf( 1, 'rcrit: %g > %g\n', rcrit, rcritr )
+
 uslipmax = 0;
 vslipmax = 0;
 tnmax = 0;
 tsmax = 0;
+
 return
 
 end
 
 %------------------------------------------------------------------------------%
 
-%tt0 = 5;
-%tw = 1;
-%tt0(2,:,hypocenter(2)) = exp(-((it*dt-tt0)/tw)^2);
 i1 = [ 1 1 1 ];
 i2 = nm;
 i1(nrmdim) = hypocenter(nrmdim);
@@ -175,6 +193,7 @@ i2(nrmdim) = hypocenter(nrmdim) + 1;
 j3 = i1(1); j4 = i2(1);
 k3 = i1(2); k4 = i2(2);
 l3 = i1(3); l4 = i2(3);
+
 % Zero slip velocity boundary condition
 tmp = dt * area .* ( rho(j1:j2,k1:k2,l1:l2) + rho(j3:j4,k3:k4,l3:l4) );
 ii = tmp ~= 0.;
@@ -184,23 +203,15 @@ for i = 1:3
     ( v(j3:j4,k3:k4,l3:l4,i) + dt * w1(j3:j4,k3:k4,l3:l4,i) ...
     - v(j1:j2,k1:k2,l1:l2,i) - dt * w1(j1:j2,k1:k2,l1:l2,i) );
 end
+
+% Decompose traction to normal and sear components
 tn = sum( tt .* nrm, 4 );
 for i = 1:3
   tn3(:,:,:,i) = tn .* nrm(:,:,:,i);
 end
 ts3 = tt - tn3;
 ts = sqrt( sum( ts3 .* ts3, 4 ) );
-%if 0 % Fault opening
-%  for i = 1:3
-%    tt(:,:,:,i) = tt(:,:,:,i) + tmp .* ...
-%    ( u(j3:j4,k3:k4,l3:l4,i) - u(j1:j2,k1:k2,l1:l2,i) ) / dt;
-%  end
-%  tn = sum( tt .* nrm, 4 );
-%  tn(tn>cohes) = cohes(tn>cohes);
-%  for i = 1:3
-%    tn3(:,:,:,i) = tn .* nrm(:,:,:,i);
-%  end
-%end
+
 % Friction Law
 cohes1 = cohes;
 tn1 = -tn;
@@ -210,6 +221,7 @@ c = repmat( 1, size( dc ) );
 i = uslip < dc;
 c(i) = uslip(i) ./ dc(i);
 ff = ( ( 1 - c ) .* fs + c .* fd ) .* tn1 + cohes1;
+
 % Nucleation
 if rcrit && vrup
   c = 1.;
@@ -218,11 +230,14 @@ if rcrit && vrup
   i = r < min( rcrit, it * dt * vrup ) & ff2 < ff;
   ff(i) = ff2(i);
 end
+
 % Shear traction bounded by friction
 c = repmat( 1, size( ff ) );
 i = ts > ff;
-if find( ff <= 0 ), fprintf( 'fault opening!\n' ), end
 c(i) = ff(i) ./ ts(i);
+if find( ff <= 0 ), fprintf( 'fault opening!\n' ), end
+
+% Update acceleration
 for i = 1:3
   tt(:,:,:,i) = tn3(:,:,:,i) + c .* ts3(:,:,:,i) - tt0(:,:,:,i);
   w1(j1:j2,k1:k2,l1:l2,i) = ...
@@ -230,6 +245,8 @@ for i = 1:3
   w1(j3:j4,k3:k4,l3:l4,i) = ...
   w1(j3:j4,k3:k4,l3:l4,i) + tt(:,:,:,i) .* area .* rho(j3:j4,k3:k4,l3:l4);
 end
+
+% Vslip
 tt = v(j3:j4,k3:k4,l3:l4,:) + dt * w1(j3:j4,k3:k4,l3:l4,:) ...
    - v(j1:j2,k1:k2,l1:l2,:) - dt * w1(j1:j2,k1:k2,l1:l2,:);
 vslip = sqrt( sum( tt .* tt, 4 ) );
@@ -238,6 +255,7 @@ vslipmax = max( abs( vslip(:) ) );
 tnmax = max( abs( tn(:) ) );
 tsmax = max( abs( ts(:) ) );
 
+% Rupture time
 if truptol
   i1 = hypocenter;
   i1(nrmdim) = 1;

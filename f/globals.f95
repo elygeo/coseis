@@ -19,14 +19,14 @@ integer :: &
   n(4), nn(3), nm(3), nhalo, offset(3), npml, bc(6), &
   nt, it, checkpoint, ip, np(3), &
   hypocenter(3), nrmdim, downdim, nclramp, &
-  amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), verb = 1, &
+  iamax(3), ivmax(3), iumax(3), iwmax(3), verb = 1, &
   i1node(3), i1cell(3), i1nodepml(3), i1cellpml(3), &
   i2node(3), i2cell(3), i2nodepml(3), i2cellpml(3), &
   i1(3), j1, k1, l1, &
   i2(3), j2, k2, l2, &
   i, j, k, l
 real :: &
-  dx, dt, viscosity(2), gam(2), vrup, rcrit, moment(6), msrcradius, domp, &
+  dx, dt, viscosity(2), vrup, rcrit, moment(6), msrcradius, domp, &
   amax, vmax, umax, wmax, vslipmax, uslipmax, xhypo(3), &
   nu, rho0, vp, vs, miu0, lam0, truptol
 

@@ -16,7 +16,8 @@ use output_m
 
 print '(a)', 'SORD - Fortran Version'
 
-call input
+call input( 'in.defaults' )
+call input( 'in' )
 call setup
 call gridgen
 call matmodel

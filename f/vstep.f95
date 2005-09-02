@@ -130,8 +130,8 @@ v = v + dt * w1
 ! Magnitudes
 s1 = sqrt( sum( w1 * w1, 4 ) ) / dt
 s2 = sqrt( sum( v * v, 4 ) )
-amax = maxval( s1 ); amaxi = maxloc( s1 )
-vmax = maxval( s2 ); vmaxi = maxloc( s2 )
+iamax = maxloc( s1 ); amax = s1(iamax(1),iamax(2),iamax(3))
+ivmax = maxloc( s2 ); vmax = s2(ivmax(1),ivmax(2),ivmax(3))
 vslipmax = maxval( abs( vslip ) )
 
 end subroutine

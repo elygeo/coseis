@@ -34,10 +34,12 @@ if [ $remote = yes ]; then
   exit
 fi
 
+rm -f batchjob
+[ ! -f meta/in -o "$( diff in meta/in )" != "" ] && rm -rf out
+
 #------------------------------------------------------------------------------#
 # Metadata
 
-rm -f batchjob
 [ -e meta ] && rm -fr meta
 mkdir meta
 
@@ -52,7 +54,6 @@ fi
 perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > meta/endian
 
 ./tarball
-echo NOOOOOOOO
 cp sord.tgz meta/
 cp in meta/
 

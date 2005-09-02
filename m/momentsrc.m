@@ -32,6 +32,8 @@ if init
   msrcv = s1( msrci );
   msrcx = s2( msrci );
   msrcx = msrcx / sum( msrcx ) ./ msrcv;
+  s1(:) = 0.;
+  s2(:) = 0.;
   c = [ 1 6 5; 6 2 4; 5 4 3 ];
   [ vec, val ] = eig( moment(c) );
   m0 = max( abs( val(:) ) );

@@ -2,6 +2,11 @@
 % TIMESERIESVIZ
 
 nout = size( outvar, 1 );
+explosion = ...
+  msrcradius > 0. & ...
+  moment(1:3) == moment(1) & ...
+  moment(4:6) == 0. & ...
+  nrmdim == 0;
 
 if ~exist( 'w1', 'var' ) % not running from in sord
   addpath m
@@ -13,7 +18,7 @@ if ~exist( 'w1', 'var' ) % not running from in sord
   ncomp = 3;
   offset = [ 0 0 0 ];
   xhypo = textread( 'out/xhypo', '', 1 );
-  if strcmp( model, 'explosion' ) && strcmp( field, 'v' )
+  if explosion & strcmp( field, 'v' )
     found = 0;
     iz = 0;
     while iz < nout
@@ -43,7 +48,7 @@ iz = 0;
 msg = 'no time series data at this location';
 while iz < nout
   iz = iz + 1;
-  [ i1, i2 ] = zoneselect( iout(iz,:), nn, offset, hypocenter, nrmdim )
+  [ i1, i2 ] = zoneselect( iout(iz,:), nn, offset, hypocenter, nrmdim );
   if strcmp( outvar{iz}, field ) && sum( xhair >= i1 & xhair <= i2 ) == 3 && outit(iz) == 1
     msg = '';
     break
@@ -93,7 +98,7 @@ figure( ...
  'DefaultLineLinewidth', linewidth, ...
  'DefaultTextHorizontalAlignment', 'center', ...
  'DefaultTextColor', foreground )
-if strcmp( model, 'explosion' ) && strcmp( field, 'v' )
+if explosion & strcmp( field, 'v' )
   xg = xhairtarg - xhypo;
   rg = sqrt( sum( xg .* xg ) );
   tg = tg - rg / vp;

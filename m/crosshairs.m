@@ -11,15 +11,15 @@ elseif xhairmove == 5
   xhair(downdim) = 1;
   slicedim = downdim;
 elseif xhairmove == 6
-  maxi = hypocenter;
+  imax = hypocenter;
   switch field
-  case 'a', maxi = amaxi;
-  case 'v', maxi = vmaxi;
-  case 'u', maxi = umaxi;
-  case 'w', maxi = wmaxi;
+  case 'a', imax = iamax;
+  case 'v', imax = ivmax;
+  case 'u', imax = iumax;
+  case 'w', imax = iwmax;
   otherwise error xhfield
   end
-  [ j, k, l ] = ind2sub( nm, maxi );
+  [ j, k, l ] = ind2sub( nm, imax );
   xhair = [ j k l ];
 else
   v1 = camup;
@@ -105,7 +105,7 @@ otherwise error xhfield
 end
 set( gcf, 'CurrentAxes', haxes(2) )
 hhud = text( .02, .98, msg, 'Hor', 'left', 'Ver', 'top' );
-tmp = [ it j k l; time xg ];
+tmp = [ it xhair-offset; time xg ];
 msg = sprintf( '%4d %8.3fs\n%4d %8.1fm\n%4d %8.1fm\n%4d %8.1fm', tmp );
 hhud(2) = text( .98, .98, msg, 'Hor', 'right', 'Ver', 'top' );
 msg = '';
