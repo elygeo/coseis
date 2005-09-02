@@ -11,7 +11,7 @@ implicit none
 save
 character, intent(in) :: pass
 character :: onpass
-integer :: iz, nc, reclen, ckplen, floatsize = 4, wt_rate, hh, mm, ss, err
+integer :: iz, nc, reclen, wt_rate, hh, mm, ss, err
 real :: dwt(4)
 character(255) :: str
 logical :: fault, cell, static, init = .true., outinit(nz) = .true.
@@ -27,13 +27,11 @@ else
   read( 9, * ) it
   close( 9 )
 end if
-ckplen = floatsize * ( 2 * size(u) + 3 * size(uslip) &
-  + size(p1) + size(p2) + size(p3) + size(p4) + size(p5) + size(p6) &
-  + size(g1) + size(g2) + size(g3) + size(g4) + size(g5) + size(g6) )
 if ( it /= 0 ) then
   if ( verb > 0 ) print '(a,i5)', 'Checkpoint found, starting from step ', it
   write( str, '(a,i5.5)') 'out/ckp/', it
-  open( 9, file=str, form='unformatted', access='direct', recl=ckplen, status='old' )
+  inquire( iolength=reclen ) u, v, vslip, uslip, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
+  open( 9, file=str, form='unformatted', access='direct', recl=reclen, status='old' )
   read( 9, rec=1 ) u, v, vslip, uslip, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   close( 9 )
 end if
@@ -54,7 +52,7 @@ end if inittrue
 izloop: do iz = 1, nout
 
 if ( outit(iz) < 0 ) outit(iz) = nt + outit(iz) + 1
-if ( outit(iz) == 0 .or. mod( it, outit(iz) ) /= 0 ) cycle outer
+if ( outit(iz) == 0 .or. mod( it, outit(iz) ) /= 0 ) cycle izloop
 nc = 1
 onpass = 'v'
 cell = .false.
@@ -81,9 +79,9 @@ case( 'trup'  ); fault = .true.
 end select
 if ( fault .and. nrmdim == 0 ) then
   outit(iz) = 0
-  cycle outer
+  cycle izloop
 end if
-if ( onpass /= pass ) cycle outer
+if ( onpass /= pass ) cycle izloop
 if ( outinit(iz) ) then
   outinit(iz) = .false.
   write( str, '(a,i2.2)' ) 'mkdir out/', iz
@@ -104,7 +102,7 @@ end if
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-reclen = floatsize * product( i2 - i1 + 1 )
+inquire( iolength=reclen ) s1(j1:j2,k1:k2,l1:l2)
 iloop: do i = 1, nc
   write( str, '(a,i2.2,a,i1,a,i5.5)' ) 'out/', iz, '/', i, '/', it
   open( 9, file=str, form='unformatted', access='direct', status='replace', recl=reclen )
@@ -141,13 +139,14 @@ close( 9 )
 
 end do izloop
 
-!------------------------------------------------------------------------------!
-
 if ( pass == 'w' ) return
+
+!------------------------------------------------------------------------------!
 
 if ( checkpoint /= 0 .and. mod( it, checkpoint ) == 0 ) then
   if ( verb > 1 ) print '(a)', 'Writing checkpoint file'
   write( str, '(a,i5.5)') 'out/ckp/', it
+  inquire( iolength=reclen ) u, v, vslip, uslip, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   open( 9, file=str, form='unformatted', access='direct', status='replace', recl=reclen )
   write( 9, rec=1 ) u, v, vslip, uslip, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   close( 9 )

@@ -23,6 +23,7 @@ call gridgen
 call matmodel
 call fault
 call momentsrc
+call output( 'v' )
 
 do while ( it < nt )
   it = it + 1;

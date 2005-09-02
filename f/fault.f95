@@ -23,6 +23,8 @@ logical :: init = .true.
 inittrue: if ( init ) then
 
 init = .false.
+
+! Check for no fault
 if ( nrmdim == 0 ) then
   allocate( uslip(1,1,1), vslip(1,1,1), trup(0,0,0) )
   uslip = 0.
@@ -212,6 +214,7 @@ if ( nrmdim == 0 ) return
 
 if ( verb > 1 ) print '(a)', 'Fault'
 
+! Indices
 i1 = 1
 i2 = nm
 i1(nrmdim) = hypocenter(nrmdim)
