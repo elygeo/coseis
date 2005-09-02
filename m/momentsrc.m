@@ -28,9 +28,9 @@ if init
     w1(:,:,:,i) = w1(:,:,:,i) - xhypo(i);
   end
   s2 = msrcradius - sqrt( sum( w1 .* w1, 4 ) );
-  msrci = find( s2 > 0. );
-  msrcv = s1( msrci );
-  msrcx = s2( msrci );
+  imsrc = find( s2 > 0. );
+  msrcv = s1( imsrc );
+  msrcx = s2( imsrc );
   msrcx = msrcx / sum( msrcx ) ./ msrcv;
   s1(:) = 0.;
   s2(:) = 0.;
@@ -65,7 +65,7 @@ else % direct stress
 end
 o = prod( nm );
 for i = 0:2
-  w1(msrci+o*i) = w1(msrci+o*i) - msrcf * msrcx * moment(i+1);
-  w2(msrci+o*i) = w2(msrci+o*i) - msrcf * msrcx * moment(i+4);
+  w1(imsrc+o*i) = w1(imsrc+o*i) - msrcf * msrcx * moment(i+1);
+  w2(imsrc+o*i) = w2(imsrc+o*i) - msrcf * msrcx * moment(i+4);
 end
 

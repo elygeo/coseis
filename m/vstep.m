@@ -67,7 +67,7 @@ end
 % Hourglass correction
 s1(:) = 0.;
 s2(:) = 0.;
-w2 = u + gamma(2) .* v;
+w2 = u + dt * viscosity(2) * v;
 for ic = 1:3
 for iq = 1:4
   i1 = i1cell;

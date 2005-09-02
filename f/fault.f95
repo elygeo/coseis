@@ -207,7 +207,9 @@ return
 end if inittrue
 
 !------------------------------------------------------------------------------!
+
 if ( nrmdim == 0 ) return
+
 if ( verb > 1 ) print '(a)', 'Fault'
 
 i1 = 1

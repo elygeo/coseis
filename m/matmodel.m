@@ -27,7 +27,6 @@ for iz = 1:size( material, 1 )
 end
 courant = dt * matmax(2) * sqrt( 3 ) / dx;   % TODO: check, make general
 fprintf( 'Courant: %g < 1\n', courant )
-gamma = dt * viscosity;
 
 s2(:) = 0.;
 for iz = 1:size( operator, 1 )
