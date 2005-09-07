@@ -57,9 +57,9 @@ COORDINATE SYSTEM
   v: v = velocity                    1 2 3: vx vy vz = velocity        
      u = displacement                x y z: wyz wzx wxy = shear stress 
      x = node locations                  w: wxx wyy wzz = normal stress
-     rho = density                          rho lam miu = material props
+     rho = density                          rho lam mu = material props
   w: w = stress                             x = node locations (2) 
-     lam miu = elastic moduli            o: x = node locations (1) 
+     lam mu = elastic moduli            o: x = node locations (1) 
 
 
 COMPUTATIONAL CYCLE
@@ -69,7 +69,7 @@ V = velocity vector
 A = acceleration vector
 W = stress tensor
 rho = density
-c lam miu = elastic moduli
+c lam mu = elastic moduli
  
 Linearized conservation of momentum, Newton's 2nd law
   A = divW/rho
@@ -85,7 +85,7 @@ Stress-strain constitutive law
   W = c:E
 Viscoelastic solid, Kelvin-Voight model, linear, isotropic,
 spring and dashpot in parallel
-  W = lam*trace(E)*I + 2*miu*E
+  W = lam*trace(E)*I + 2*mu*E
 Moment tensor source
   W = W + M'*dt
 
@@ -152,8 +152,8 @@ Tn = Tv.n
 Normal component of traction is bounded by cohesion (fault can open)
 Tn = Tu.n
    = (Tv + U1-U0).n / [dt^2*s*(1/m1+1/m0)]
-Tn~ = / Tn,     Tn <= cohes
-      \ cohes,  Tn >  cohes
+Tn~ = / Tn,  Tn <= co
+      \ co,  Tn >  co
 
 Total traction bounded by friction
 T~ = Tn~.n + Ts~
@@ -172,22 +172,22 @@ T = T0 + [R1*m0-R0*m1 + m1*m0*(v1-v0)/dt] / [s*(m1+m0)]
 
 SLIP-WEAKENING FRICTION LAW
 
-l    = slip length
-u(l) = coefficient of friction
-us   = coefficient of static friction
-ud   = coefficient of dynamic friction
-d0   = slip weakening distance
+l     = slip length
+mu(l) = coefficient of friction
+mus   = coefficient of static friction
+mud   = coefficient of dynamic friction
+d0    = slip weakening distance
 
-F = u(l) * T.n + cohesion
-u(l) = / us - (us-ud)*l/d0,  l <= d0
-       \ ud,                 l >  d0
+F = mu(l) * T.n + co
+mu(l) = / mus - (us-ud)*l/d0,  l <= d0
+        \ mud,                 l >  d0
 
 
-       us +
+      mus +
           |\
  ^ T0/Wn0 + \
  |        |  \
- u     ud +   +---------
+ u    mud +   +---------
           |
           +---+---------
              d0   l->
@@ -197,10 +197,10 @@ Strength parameter
 s = (Tu - T0)/(T0 - Tf)
 
 Estimate critical radius needed for spontaneous rupture
-rc =~  miu*d0*(Tu - Tf)/(T0 - Tf)^2
+rc =~ mu*d0*(Tu - Tf)/(T0 - Tf)^2
 
 Estimate d0 needed to resolve breakdown zone
-d0 =~ (3 or 4)*dx*(Tu - Tf)/miu
+d0 =~ (3 or 4)*dx*(Tu - Tf)/mu
 
 
 
@@ -210,7 +210,7 @@ Kostrov, 1964
 
 Circular crack expanding at a uniform rupture velocity
 
-vslip = C * dT / miu * vs * t / sqrt(t^2-(r/vrup)^2) * heaviside(t-r/vrup)
+vslip = C * dT / mu * vs * t / sqrt(t^2-(r/vrup)^2) * heaviside(t-r/vrup)
 
 dT   = stress drop
 vs   = sqrt( vp^2 / 3 )   (Poisson's ratio, nu = .25)
@@ -271,7 +271,7 @@ Nonuniform strain: 12 = 24 DOF - 6 rigid body - 6 uniform strain
  '----'      O----'      O----'      O----'  
   Z2 Z3       Z3 Z1       Z1 Z2      Z1 Z2 Z3
 
-Y = miu*(lam+miu)/6/(lam+2*miu)
+Y = mu*(lam+mu)/6/(lam+2*mu)
 
 Q = Y*dU*dx^2*dy^2/dv^2
 A = dQ/dv/rho
@@ -314,14 +314,14 @@ Olsen no PML
 F = divW
 V' = F/rho
 G = gradV
-W' = lam*trace(G)*I + miu*(G + G^T)
+W' = lam*trace(G)*I + mu*(G + G^T)
 
 SORD Hourglass
 F = divW + hourglass
 V' = F/rho
 U' = V
 G = grad(U + gamma*V)
-W = lam*trace(G)*I + miu*(G + G^T)
+W = lam*trace(G)*I + mu*(G + G^T)
 
 SORD PML
 if D == 0
@@ -337,7 +337,7 @@ if D == 0
 else
   G' + DG = gradV
 end
-W = lam*trace(G)*I + miu*(G + G^T)
+W = lam*trace(G)*I + mu*(G + G^T)
 
 PML Discretization
 (p2 - p1)/dt   + d*(p2 + p1)/2 = dW/dx

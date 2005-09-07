@@ -17,7 +17,6 @@ integer ic, iid, id, ix, iq, iz
 ! Restoring force
 ! P' + DP = [del]S, F = 1.P'             PML region
 ! F = divS                               non PML region (D=0)
-if ( verb > 1 ) print '(a)', 'Vstep'
 s2 = 0.
 outer: do ic  = 1, 3
 inner: do iid = 1, 3

@@ -39,7 +39,7 @@ l1 = i1(3); l2 = i2(3)
 allocate( &
   x(j,k,l,3), v(j,k,l,3), u(j,k,l,3), &
   w1(j,k,l,3), w2(j,k,l,3), &
-  rho(j,k,l), lam(j,k,l), miu(j,k,l), yn(j,k,l), yc(j,k,l), &
+  rho(j,k,l), lam(j,k,l), mu(j,k,l), yn(j,k,l), yc(j,k,l), &
   s1(j,k,l), s2(j,k,l), &
   p1(j1,k,l,3), p2(j,k1,l,3), p3(j,k,l1,3), &
   g1(j1,k,l,3), g2(j,k1,l,3), g3(j,k,l1,3), &
@@ -51,13 +51,29 @@ v = 0.
 u = 0.
 rho = 0.
 lam = 0.
-miu = 0.
+mu = 0.
 yn = 0.
 yc = 0.
 p1 = 0.; p2 = 0.; p3 = 0.
 p4 = 0.; p5 = 0.; p6 = 0.
 g1 = 0.; g2 = 0.; g3 = 0.
 g4 = 0.; g5 = 0.; g6 = 0.
+
+if ( nrmdim == 0 ) then
+  i2 = 0
+else
+  i2(nrmdim) = 1
+end if
+j = i2(1)
+k = i2(2)
+l = i2(3)
+allocate( uslip(j,k,l), vslip(j,k,l), trup(j,k,l), fs(j,k,l), fd(j,k,l), &
+  dc(j,k,l), cohes(j,k,l), area(j,k,l), f1(j,k,l), f2(j,k,l), r(j,k,l), &
+  nrm(j,k,l,3), t0(j,k,l,3), t1(j,k,l,3), t2(j,k,l,3), t3(j,k,l,3), &
+  tn(j,k,l), ts(j,k,l) )
+uslip = 0.
+vslip = 0.
+trup = 0.
 
 end subroutine
 end module

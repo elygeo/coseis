@@ -15,12 +15,12 @@ real, allocatable :: msrcx(:), msrcv(:)
 integer :: nsrc, ic
 real :: time, msrcf
 
-! if ( msrcradius <= 0. ) return
+if ( msrcradius <= 0. ) return
 
 inittrue: if ( init ) then
 
 init = .false.
-! if( verb > 0 ) print '(a)', 'Initialize moment source'
+if( ip == 0 ) print '(a)', 'Initialize moment source'
 
 i1 = i1cell
 i2 = i2cell
@@ -79,7 +79,7 @@ return
 ! [ vec, val ] = eig( moment(c) )
 ! m0 = max( abs( val(:) ) )
 ! mw = 2 / 3 * log10( m0 ) - 10.7
-! um = m0 / miu0 / dx / dx
+! um = m0 / mu0 / dx / dx
 ! fprintf( 'Momnent Source\nM0: !g\nMw: !g\nD:  !g\n', m0, mw, um )
 
 end if inittrue

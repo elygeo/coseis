@@ -1,9 +1,12 @@
 %------------------------------------------------------------------------------%
 % WSTEP - Increment displacement and stress
 
+% Fault
+uslip = uslip + dt * vslip;
+uslipmax = max( abs( uslip(:) ) );
+
 % Displacement
 u = u + dt * v;
-uslip = uslip + dt * vslip;
 
 % Gadient
 % G = grad(U + gamma*V)    non PML region
@@ -106,7 +109,6 @@ s1 = sqrt( sum( u .* u, 4 ) );
 s2 = sqrt( sum( w1 .* w1, 4 ) + 2 * sum( w2 .* w2, 4 ) );
 [ umax, iumax ] = max( s1(:) );
 [ wmax, iwmax ] = max( s2(:) );
-uslipmax = max( abs( uslip(:) ) );
 
 if umax > dx / 10
   fprintf( 'Warning: u !<< dx\n' )

@@ -12,11 +12,14 @@ use zone_m
 implicit none
 integer :: ic, id, ix, iz
 
-if ( verb > 1 ) print '(a)', 'Wstep'
+! Fault
+if ( nrmdim /= 0 ) then
+  uslip = uslip + dt * vslip
+  uslipmax = maxval( abs( uslip ) )
+end if
 
 ! Displacement
 u = u + dt * v
-uslip = uslip + dt * vslip
 
 ! Gadient
 ! G = grad(U + gam*V)    non PML region
@@ -166,11 +169,11 @@ end do inner
 end do outer
 
 ! Hook's Law, linear stress/strain relation
-! W = lam*trace(G)*I + miu*(G + G^T)
+! W = lam*trace(G)*I + mu*(G + G^T)
 s1 = lam * sum( w1, 4 )
 do i = 1, 3
-  w1(:,:,:,i) = 2. * miu * w1(:,:,:,i) + s1
-  w2(:,:,:,i) =      miu * w2(:,:,:,i)
+  w1(:,:,:,i) = 2. * mu * w1(:,:,:,i) + s1
+  w2(:,:,:,i) =      mu * w2(:,:,:,i)
 end do
 
 ! Moment source
@@ -181,7 +184,6 @@ s1 = sqrt( sum( u * u, 4 ) )
 s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
 iumax = maxloc( s1 ); umax = s1(iumax(1),iumax(2),iumax(3))
 iwmax = maxloc( s2 ); wmax = s2(iwmax(1),iwmax(2),iwmax(3))
-uslipmax = maxval( abs( uslip ) )
 if ( umax > dx / 10. ) print *, 'Warning: u !<< dx\n'
 
 end subroutine
