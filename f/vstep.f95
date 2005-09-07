@@ -89,21 +89,22 @@ inner: do iid = 1, 3
 end do inner
 end do outer
 
-! Newton's Law, A = F / m
-do i = 1, 3
-  w1(:,:,:,i) = w1(:,:,:,i) * rho
-end do
-
 ! Hourglass correction
 s1 = 0.
 s2 = 0.
 w2 = u + dt * viscosity(2) * v
 do ic = 1, 3
 do iq = 1, 4
-  call hgnc( s1, w2, ic, iq, i1cell, i2cell ); s1 = yc * s1
-  call hgcn( s2, s1,  1, iq, i1node, i2node ); s2 = yn * s2
+  call hgnc( s1, w2, ic, iq, i1cell, i2cell )
+  s1 = y * s1
+  call hgcn( s2, s1,  1, iq, i1node, i2node )
   w1(:,:,:,ic) = w1(:,:,:,ic) - s2
 end do
+end do
+
+! Newton's Law, A = F / m
+do i = 1, 3
+  w1(:,:,:,i) = w1(:,:,:,i) * rho
 end do
 
 ! Fault calculations

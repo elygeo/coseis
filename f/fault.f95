@@ -43,13 +43,13 @@ if ( fricdir == '' ) then
     co(j1:j2,k1:k2,l1:l2) = friction(iz,4)
   end do
 else
-  i1 = i1node
-  i2 = i2node
+  i1 = i1cell
+  i2 = i2cell + 1
   i2(nrmdim) = 1
-  call bread( 'fs', fricdir // '/fs', i1, i2, 0 )
-  call bread( 'fd', fricdir // '/fd', i1, i2, 0 )
-  call bread( 'dc', fricdir // '/dc', i1, i2, 0 )
-  call bread( 'co', fricdir // '/co', i1, i2, 0 )
+  call bread( 'fs', fricdir, i1, i2 )
+  call bread( 'fd', fricdir, i1, i2 )
+  call bread( 'dc', fricdir, i1, i2 )
+  call bread( 'co', fricdir, i1, i2 )
 end if
 
 ! Prestress
@@ -73,15 +73,15 @@ if ( stressdir == '' ) then
     t2(j1:j2,k1:k2,l1:l2,6) = stress(iz,6)
   end do
 else
-  i1 = i1node
-  i2 = i2node
+  i1 = i1cell
+  i2 = i2cell + 1
   i2(nrmdim) = 1
-  call bread( 't1', stressdir // '/t11', i1, i2, 1 )
-  call bread( 't1', stressdir // '/t12', i1, i2, 2 )
-  call bread( 't1', stressdir // '/t13', i1, i2, 3 )
-  call bread( 't2', stressdir // '/t21', i1, i2, 1 )
-  call bread( 't2', stressdir // '/t22', i1, i2, 2 )
-  call bread( 't2', stressdir // '/t23', i1, i2, 3 )
+  call bread( 'xx', stressdir, i1, i2 )
+  call bread( 'yy', stressdir, i1, i2 )
+  call bread( 'zz', stressdir, i1, i2 )
+  call bread( 'yz', stressdir, i1, i2 )
+  call bread( 'zx', stressdir, i1, i2 )
+  call bread( 'xy', stressdir, i1, i2 )
 end if
 
 ! Pretraction
@@ -101,12 +101,12 @@ if ( tracdir == '' ) then
     t3(j1:j2,k1:k2,l1:l2,3) = traction(iz,3)
   end do
 else
-  i1 = i1node
-  i2 = i2node
+  i1 = i1cell
+  i2 = i2cell + 1
   i2(nrmdim) = 1
-  call bread( 't0', tracdir // '/t01', i1, i2, 1 )
-  call bread( 't0', tracdir // '/t02', i1, i2, 2 )
-  call bread( 't0', tracdir // '/t03', i1, i2, 3 )
+  call bread( 'tn', tracdir, i1, i2 )
+  call bread( 'ts', tracdir, i1, i2 )
+  call bread( 'td', tracdir, i1, i2 )
 end if
 
 ! Normal vectors
@@ -188,8 +188,8 @@ end do
 r = sqrt( sum( t3 * t3, 4 ) )
 
 ! Output some info
-i1 = hypocenter
-if ( all( i1 >= i1node .and. i1 <= i2node ) ) then
+if ( hypop ) then
+  i1 = hypocenter
   i1(nrmdim) = 1
   j = i1(1)
   k = i1(2)

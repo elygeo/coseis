@@ -13,15 +13,24 @@ real, parameter :: pi = 3.14159
 if ( ip == 0 ) print '(a)', 'Grid generation'
 x = 0.
 downdim = 3
+noper = 1
+ioper(1,:) = (/ 1, 1, 1, -1, -1, -1 /)
 
-if ( griddir == '' ) then
-  i2 = nm
-  j = i2(1)
-  k = i2(2)
-  l = i2(3)
-  forall( i=1:j ) x(i,:,:,1)  = i - 1 - offset(1)
-  forall( i=1:k ) x(:,i,:,2)  = i - 1 - offset(2)
-  forall( i=1:l ) x(:,:,i,3)  = i - 1 - offset(3)
+i1 = i1cell
+i2 = i2cell + 1
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+
+if ( griddir /= '' ) then
+  oper(1) = 'g'
+  call bread( 'x1', griddir, i1, i2 )
+  call bread( 'x2', griddir, i1, i2 )
+  call bread( 'x3', griddir, i1, i2 )
+else
+  forall( i=j1:j2 ) x(i,:,:,1)  = i - 1 - offset(1)
+  forall( i=k1:k2 ) x(:,i,:,2)  = i - 1 - offset(2)
+  forall( i=l1:l2 ) x(:,:,i,3)  = i - 1 - offset(3)
   if ( nrmdim /= 0 ) then
     i = hypocenter(nrmdim) + 1
     select case( nrmdim )
@@ -30,11 +39,9 @@ if ( griddir == '' ) then
     case( 3 ); x(:,:,i:,3) = x(:,:,i:,3) - 1
     end select
   end if
-  noper = 1
-  ioper(1,:) = (/ 1, 1, 1, -1, -1, -1 /)
-  oper(1) = 'h'
   select case( grid )
   case( 'constant' )
+    oper(1) = 'h'
   case( 'stretch' )
     oper(1) = 'r'
     x(:,:,:,3) = 2. * x(:,:,:,3)
@@ -50,17 +57,23 @@ if ( griddir == '' ) then
   case default; stop 'grid'
   end select
   x = x * dx
-else
-  ! TODO extent to halo
-  i1 = i1node
-  i2 = i2node
-  call bread( 'x', fricdir // '/x1', i1, i2, 0 )
-  call bread( 'x', fricdir // '/x2', i1, i2, 0 )
-  call bread( 'x', fricdir // '/x3', i1, i2, 0 )
 end if
 
+! Dulicate Edge nodes into halo
+j1 = i2(1); j2 = i2(1) - 1
+k1 = i2(2); k2 = i2(2) - 1
+l1 = i2(3); l2 = i2(3) - 1
+if( bc(1) == 0 ) x(1,:,: ,:) = x(2,:,: ,:)
+if( bc(4) == 0 ) x(j1,:,:,:) = x(j2,:,:,:)
+if( bc(2) == 0 ) x(:,1,: ,:) = x(:,2,: ,:)
+if( bc(5) == 0 ) x(:,k1,:,:) = x(:,k2,:,:)
+if( bc(3) == 0 ) x(:,:,1 ,:) = x(:,:,2 ,:)
+if( bc(6) == 0 ) x(:,:,l1,:) = x(:,:,l2,:)
+
+! Test for hypocenter
 i1 = hypocenter
 if ( all( i1 >= i1node .and. i1 <= i2node ) ) then
+  hypop = .true.
   j = i1(1)
   k = i1(2)
   l = i1(3)

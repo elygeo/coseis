@@ -21,25 +21,27 @@ i1node = nhalo + 1
 i2node = nhalo + nn
 i1cell = nhalo + 1
 i2cell = nhalo + nn - 1
-i1nodepml = i1node + bc(1:3) * npml
-i2nodepml = i2node - bc(4:6) * npml
-i1cellpml = i1cell + bc(1:3) * npml
-i2cellpml = i2cell - bc(4:6) * npml
+where ( bc(1:3) == 1 ) i1nodepml = i1node + npml
+where ( bc(4:6) == 1 ) i2nodepml = i2node - npml
+where ( bc(1:3) == 1 ) i1cellpml = i1cell + npml
+where ( bc(4:6) == 1 ) i2cellpml = i2cell - npml
 
 i1 = 1
 i2 = nm
 j = i2(1)
 k = i2(2)
 l = i2(3)
-i1 = npml * bc(1:3)
-i2 = npml * bc(4:6)
+i1 = 0
+i2 = 0
+where ( bc(1:3) == 1 ) i1 = npml
+where ( bc(4:6) == 1 ) i2 = npml
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 allocate( &
   x(j,k,l,3), v(j,k,l,3), u(j,k,l,3), &
   w1(j,k,l,3), w2(j,k,l,3), &
-  rho(j,k,l), lam(j,k,l), mu(j,k,l), yn(j,k,l), yc(j,k,l), &
+  rho(j,k,l), lam(j,k,l), mu(j,k,l), y(j,k,l), &
   s1(j,k,l), s2(j,k,l), &
   p1(j1,k,l,3), p2(j,k1,l,3), p3(j,k,l1,3), &
   g1(j1,k,l,3), g2(j,k1,l,3), g3(j,k,l1,3), &
@@ -52,8 +54,7 @@ u = 0.
 rho = 0.
 lam = 0.
 mu = 0.
-yn = 0.
-yc = 0.
+y = 0.
 p1 = 0.; p2 = 0.; p3 = 0.
 p4 = 0.; p5 = 0.; p6 = 0.
 g1 = 0.; g2 = 0.; g3 = 0.

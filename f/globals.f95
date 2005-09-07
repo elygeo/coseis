@@ -32,11 +32,13 @@ character :: oper(nz)
 character(16) :: outvar(nz), grid='', srctimefcn=''
 character(64) :: matdir='', fricdir='', tracdir='', stressdir='', griddir=''
 
+logical :: hypop = .false.
+
 real, allocatable, dimension(:) :: &
   dn1, dn2, dc1, dc2
 
 real, allocatable, dimension(:,:,:) :: &
-  s1, s2, rho, lam, mu, yc, yn, &
+  s1, s2, rho, lam, mu, y, &
   uslip, vslip, trup, fs, fd, dc, co, area, r, tn, ts, f1, f2
 
 real, allocatable, dimension(:,:,:,:) :: &

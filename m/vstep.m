@@ -59,7 +59,7 @@ for id = [ ic:3 1:ic-1 ];
 end
 end
 
-% Newton's Law, dV = F / m * dt
+% Newton's Law, A = F / m
 for i = 1:3
   w1(:,:,:,i) = w1(:,:,:,i) .* rho;
 end

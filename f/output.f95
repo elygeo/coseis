@@ -67,10 +67,9 @@ case( 'u'   ); onpass = 'w'; nc = 3
 case( 'w'   ); onpass = 'w'; nc = 6; cell = .true.
 case( 'x'   ); static = .true.; nc = 3
 case( 'rho' ); static = .true.
-case( 'yn'  ); static = .true.
 case( 'lam' ); static = .true.; cell = .true.
 case( 'mu' );  static = .true.; cell = .true.
-case( 'yc'  ); static = .true.; cell = .true.
+case( 'y'   ); static = .true.; cell = .true.
 case( 'uslip' ); fault = .true.
 case( 'vslip' ); fault = .true.
 case( 'trup'  ); fault = .true.
