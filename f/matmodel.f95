@@ -15,10 +15,16 @@ real :: matmin(3), matmax(3), hmean(3), tune, c1, c2, c3, damp, dampn, dampc, co
 if ( ip == 0 ) print '(a)', 'Material Model'
 
 ! Material arrays
-if ( matdir = '' ) then
-  rho = 0.
-  s1 = 0.
-  s2 = 0.
+rho = 0.
+s1 = 0.
+s2 = 0.
+if ( matdir /= '' ) then
+  i1 = i1cell
+  i2 = i2cell + 1
+  call bread( 'rho', matdir, i1, i2 )
+  call bread( 'vp',  matdir, i1, i2 )
+  call bread( 'vs',  matdir, i1, i2 )
+else
   do iz = 1, nmat
     call zone( i1, i2, imat(iz,:), nn, offset, hypocenter, nrmdim )
     i1 = max( i1, i1cell )
@@ -30,12 +36,6 @@ if ( matdir = '' ) then
     s1(j1:j2,k1:k2,l1:l2)  = material(iz,2)
     s2(j1:j2,k1:k2,l1:l2)  = material(iz,3)
   end do
-else
-  i1 = i1cell
-  i2 = i2cell + 1
-  call bread( 'rho', matdir, i1, i2 )
-  call bread( 'vp',  matdir, i1, i2 )
-  call bread( 'vs',  matdir, i1, i2 )
 end if
 matmin(1) = minval( rho ); matmax(1) = maxval( rho )
 matmin(2) = minval( s1  ); matmax(2) = maxval( s1  )
@@ -90,8 +90,8 @@ if ( nrmdim /=0 ) then
   end select
 end if
 
-! Edge cell volumes are NOT zero for PML
-i2 = nm - 1
+! Ghost cell volumes are NOT zero for PML
+i2 = i2cell + 1
 j1 = i2(1); j2 = i2(1) - 1
 k1 = i2(2); k2 = i2(2) - 1
 l1 = i2(3); l2 = i2(3) - 1

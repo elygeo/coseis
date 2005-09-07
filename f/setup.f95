@@ -69,7 +69,7 @@ j = i2(1)
 k = i2(2)
 l = i2(3)
 allocate( uslip(j,k,l), vslip(j,k,l), trup(j,k,l), fs(j,k,l), fd(j,k,l), &
-  dc(j,k,l), cohes(j,k,l), area(j,k,l), f1(j,k,l), f2(j,k,l), r(j,k,l), &
+  dc(j,k,l), co(j,k,l), area(j,k,l), f1(j,k,l), f2(j,k,l), r(j,k,l), &
   nrm(j,k,l,3), t0(j,k,l,3), t1(j,k,l,3), t2(j,k,l,3), t3(j,k,l,3), &
   tn(j,k,l), ts(j,k,l) )
 uslip = 0.

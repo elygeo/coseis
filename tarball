@@ -21,7 +21,7 @@ mkdir sord-$version
 
 cp -al $files sord-$version/
 
-tar vzcf sord.tgz sord-$version/
+tar zcf sord.tgz sord-$version/
 
 rm -rf sord-$version
 

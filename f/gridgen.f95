@@ -22,6 +22,7 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
+x = 0.
 if ( griddir /= '' ) then
   oper(1) = 'g'
   call bread( 'x1', griddir, i1, i2 )
@@ -59,7 +60,8 @@ else
   x = x * dx
 end if
 
-! Dulicate Edge nodes into halo
+! Duplicate edge nodes into halo
+i2 = i2node + 1
 j1 = i2(1); j2 = i2(1) - 1
 k1 = i2(2); k2 = i2(2) - 1
 l1 = i2(3); l2 = i2(3) - 1

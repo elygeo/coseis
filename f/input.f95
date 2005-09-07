@@ -17,7 +17,6 @@ ntrac = 0
 nstress = 0
 nlock = 0
 nout = 0
-nin = 0
 
 if ( ip == 0 ) print '(a,a)', 'Reading file: ', infile
 open( 9, file=infile, status='old' )
@@ -26,13 +25,14 @@ loop: do
   if ( i /= 0 ) exit loop
   str = adjustl( str )
   if ( str(1:1) == '#' .or. str == ' ' ) cycle loop
-  read( str // ' #', * ) key1, key2, key3
+  str = str // ' #'
+  read( str, * ) key1, key2, key3
   select case( key1 )
   case( 'switch' );     switchcase = key2
   case( 'case' );       caseswitch = key2
   end select
   if ( caseswitch /= switchcase ) cycle loop
-  select case( key1 )
+  a2: select case( key1 )
   case( 'grid' );       grid       = key2
   case( 'srctimefcn' ); srctimefcn = key2
   case( 'n' );          read( str, * ) key1, nn, nt
@@ -68,20 +68,21 @@ loop: do
     nout = nout + 1
     read( str, * ) key1, outvar(nout), outit(nout), iout(nout,:)
   case( 'read' )
-    select case( key2 )
-    case( 'grid' );     griddir = key3
-    case( 'material' ); matdir = key3
-    case( 'friction' ); fricdir = key3
-    case( 'traction' ); tracdir = key3
+    a3: select case( key2 )
+    case( 'grid' );     griddir   = key3
+    case( 'material' ); matdir    = key3
+    case( 'friction' ); fricdir   = key3
+    case( 'traction' ); tracdir   = key3
     case( 'stress' );   stressdir = key3
     case default; print '(3(a,x))', 'bad key:', key1, key2; stop
+    end select a3
   case( 'checkpoint' ); read( str, * ) key1, checkpoint
   case( 'np' );         read( str, * ) key1, np
   case( 'switch' )
   case( 'case' )
   case( '' )
   case default; print '(2(a,x))', 'bad key:', key1; stop
-  end select
+  end select a2
 end do loop
 close( 9 )
 
