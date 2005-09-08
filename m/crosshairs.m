@@ -98,8 +98,8 @@ case 'w'
     vec = vec(:,i);
     mga = val';
     vga = vec(:)';
-    tmp = [ val([3 2 1])' wg lam(j,k,l) miu(j,k,l) ];
-    msg = sprintf( 'W1  %9.2e\nW2  %9.2e\nW3  %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e\nlam %9.2e\nmiu %9.2e', tmp );
+    tmp = [ val([3 2 1])' wg lam(j,k,l) mu(j,k,l) ];
+    msg = sprintf( 'W1  %9.2e\nW2  %9.2e\nW3  %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e\nlam %9.2e\nmu  %9.2e', tmp );
   end
 otherwise error xhfield
 end

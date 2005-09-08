@@ -5,8 +5,9 @@ module matmodel_m
 contains
 subroutine matmodel
 use globals_m
-use zone_m
 use dfnc_m
+use zone_m
+use bread_m
 
 implicit none
 integer :: iz
@@ -49,8 +50,10 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
 ! Lame parameters
-mu  = 0.; s2 = rho * s2 * s2
-lam = 0.; s1 = rho * ( s1 * s1 ) - 2. * s2
+s2 = rho * s2 * s2
+s1 = rho * ( s1 * s1 ) - 2. * s2
+mu  = 0.
+lam = 0.
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   lam(j,k,l) = 0.125 * &
   ( s1(j,k,l) + s1(j+1,k+1,l+1) &
@@ -66,10 +69,10 @@ end forall
 
 ! Check Courant stability condition. TODO: make general, global
 courant = dt * matmax(2) * sqrt( 3. ) / dx
-if ( ip == 0 ) print '(a,f5.2)', 'Courant: 1 > ', courant
+if ( ip == 0 ) print '(a,es10.4)', 'Courant: 1 > ', courant
 
 ! Cell volume
-s1 = 0.
+s2 = 0.
 do iz = 1, noper
   call zone( i1, i2, ioper(iz,:), nn, offset, hypocenter, nrmdim )
   i1 = max( i1, i1cell )
@@ -77,7 +80,7 @@ do iz = 1, noper
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
-  call dfnc( s1, oper(iz), x, x, dx, 1, 1, i1, i2 )
+  call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
 end do
 
 ! Make sure cell volumes and Y are zero on the fault
@@ -103,8 +106,8 @@ if( bc(3) == 1 ) s2(:,:,1 ) = s2(:,:,2 )
 if( bc(6) == 1 ) s2(:,:,l1) = s2(:,:,l2)
 
 ! Nodes
-i1 = i1cell
-i2 = i2cell
+i1 = i1node
+i2 = i2node
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
@@ -120,16 +123,23 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
 end forall
 
 ! Node mass reciprocal
-rho = rho * s1
-where ( rho /= 0. ) rho = 1. / rho
+where ( rho /= 0. .and. s1 /= 0 )
+  rho = 1. / rho / s1
+end where
 
 ! Cell hourglass constant
-y = mu * ( lam + mu ) / ( lam + 2. * mu ) * dx / 12.
+y = 0.
+where ( lam /= 0. .and. mu /= 0 ) 
+   y = mu * ( lam + mu ) / ( lam + 2. * mu ) * dx / 12.
+end where
 
-! Lame / cell volume
-where ( s2 /= 0. )  s2  = 1. / s2
-lam = lam * s2
-mu = mu * s2
+! Lame params
+where ( s2 /= 0. )
+  lam = lam / s2
+  mu = mu / s2
+end where
+
+print '(5g12.4)', y
 
 ! PML damping
 c1 =  8. / 15.

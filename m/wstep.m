@@ -94,11 +94,11 @@ end
 end
 
 % Hook's Law, linear stress/strain relation
-% W = lam*trace(G)*I + miu*(G + G^T)
+% W = lam*trace(G)*I + mu*(G + G^T)
 s1 = lam .* sum( w1, 4 );
 for i = 1:3
-  w1(:,:,:,i) = 2 * miu .* w1(:,:,:,i) + s1;
-  w2(:,:,:,i) =     miu .* w2(:,:,:,i);
+  w1(:,:,:,i) = 2 * mu .* w1(:,:,:,i) + s1;
+  w2(:,:,:,i) =     mu .* w2(:,:,:,i);
 end
 
 % Moment source

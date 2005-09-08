@@ -29,7 +29,7 @@ if init
   fprintf( 'RAM usage: %.0fMb\n', ram )
   fprintf( 'Run time: at least %s\n', datestr( nt * wt / 3600 / 24, 13 ) )
   outinit = ones( size( outit ) );
-  fprintf('Step  Amax      Vmax      Umax      Copmute   I/O/Viz\n')
+  fprintf('Step  Amax        Vmax        Umax        Copmute     I/O/Viz\n')
   tic
   return
 end
@@ -47,7 +47,7 @@ for iz = 1:size( outit, 1 )
   case 'rho', static = 1;
   case 'yn',  static = 1;
   case 'lam', static = 1; cell = 1;
-  case 'miu', static = 1; cell = 1;
+  case 'mu',  static = 1; cell = 1;
   case 'yc',  static = 1; cell = 1;
   case '|u|', onpass = 'w';
   case '|w|', onpass = 'w'; cell = 1;
@@ -88,7 +88,7 @@ for iz = 1:size( outit, 1 )
     case 'rho',   fwrite( fid, rho(j,k,l),        'float32' );
     case 'yn',    fwrite( fid, yn(j,k,l),         'float32' );
     case 'lam',   fwrite( fid, lam(j,k,l),        'float32' );
-    case 'miu',   fwrite( fid, miu(j,k,l),        'float32' );
+    case 'mu',    fwrite( fid, mu(j,k,l),         'float32' );
     case 'yc',    fwrite( fid, yc(j,k,l),         'float32' );
     case '|u|',   fwrite( fid, s1(j,k,l),         'float32' );
     case '|w|',   fwrite( fid, s2(j,k,l),         'float32' );
@@ -129,11 +129,11 @@ wt(4) = toc;
 
 file = sprintf( 'out/stats/%05d', it );
 fid = fopen( file, 'w' );
-fprintf( fid, '  %12.6e', [ amax vmax umax wmax vslipmax uslipmax wt ] );
+fprintf( fid, '%14.6e', [ amax vmax umax wmax vslipmax uslipmax wt ] );
 fprintf( fid, '\n' );
 fclose( fid );
 
 fprintf( '%4d', it )
-fprintf( '  %8.2e', [ amax vmax umax wt(1:2) + wt(3:4) ] )
+fprintf( '%12.4e', [ amax vmax umax wt(1:2) + wt(3:4) ] )
 fprintf( '\n' )
 

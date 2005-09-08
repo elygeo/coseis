@@ -141,6 +141,8 @@ OBJECT="\\
   hgcn.o \\
   hgnc.o \\
   snormals.o \\
+  bread.o \\
+  bwrite.o \\
   input.o \\
   setup.o \\
   gridgen.o \\
@@ -177,7 +179,7 @@ SunOS)
   ;;
 esac
 
-#[ "$nn" -lt 100000 ] && OPTFLAGS=
+[ "$nn" -lt 100000 ] && OPTFLAGS=-g
 
 if [ $debug = yes ]; then
   OPTFLAGS=-g
@@ -202,7 +204,7 @@ FFLAGS = $OPTFLAGS
 OBJECT = $OBJECT
 
 sord-bin: \$(OBJECT) makefile
-	\$(FC) \$(FFLAGS) \$(OBJECT) -o sord-bin
+	\$(FC) -llapack \$(FFLAGS) \$(OBJECT) -o sord-bin
 
 clean:
 	rm -f *.o *.mod matlab_workspace.mat

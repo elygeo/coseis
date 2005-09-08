@@ -12,8 +12,8 @@ save
 logical :: init = .true.
 integer, allocatable :: jj(:), kk(:), ll(:)
 real, allocatable :: msrcx(:), msrcv(:)
-integer :: nsrc, ic
-real :: time, msrcf
+integer :: nsrc, ic, eiginfo
+real :: time, msrcf, m0, mm(3,3), eigval(3), eigwork(8)
 
 if ( msrcradius <= 0. ) return
 
@@ -73,14 +73,20 @@ end do
 end do
 end do
 
-return
+! Print some info, requires LAPACK for eigenvalue calculation
+mm(1,1) = moment(1)
+mm(2,2) = moment(2)
+mm(3,3) = moment(3)
+mm(2,3) = moment(4)
+mm(1,3) = moment(5)
+mm(1,2) = moment(6)
+call ssyev( 'N', 'U', 3, mm, 3, eigval, eigwork, size(eigwork), eiginfo )
+m0 = maxval( abs( eigval ) )
+print *, 'M0: ', m0
+print *, 'Mw: ', 2. / 3. * log10( m0 ) - 10.7
+print *, 'D:  ', m0 / mu0 / dx / dx
 
-! c = [ 1 6 5; 6 2 4; 5 4 3 ]
-! [ vec, val ] = eig( moment(c) )
-! m0 = max( abs( val(:) ) )
-! mw = 2 / 3 * log10( m0 ) - 10.7
-! um = m0 / mu0 / dx / dx
-! fprintf( 'Momnent Source\nM0: !g\nMw: !g\nD:  !g\n', m0, mw, um )
+return
 
 end if inittrue
 

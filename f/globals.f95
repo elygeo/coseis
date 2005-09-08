@@ -9,7 +9,7 @@ integer, parameter :: nz = 256
 
 integer :: &
   nn(3), nm(3), nhalo, offset(3), npml, bc(6), &
-  nt, it, checkpoint, ip, np(3), wt(3), &
+  nt, it, checkpoint, ip, np(3), wt(5), &
   hypocenter(3), nrmdim, downdim, nclramp, &
   outit(nz), &
   locknodes(nz,3), noper, nlock, nout, nmat, nfric, ntrac, nstress, &

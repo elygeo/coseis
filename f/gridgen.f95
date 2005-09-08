@@ -5,6 +5,7 @@ module gridgen_m
 contains
 subroutine gridgen
 use globals_m
+use bread_m
 
 implicit none
 real :: theta, scl

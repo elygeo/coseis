@@ -3,13 +3,13 @@
 
 module bread_m
 contains
-subroutine bread( var, dir, ii1, ii2, ii )
+subroutine bread( var, dir, ii1, ii2 )
 use globals_m
 
 implicit none
 character(8), intent(in) :: var
-character(256), intent(in) :: dir
-integer, intent(in) :: ii1(3), ii2(3), ii
+character(256) :: dir
+integer, intent(in) :: ii1(3), ii2(3)
 integer :: reclen
 
 dir = trim( dir ) // '/' // var

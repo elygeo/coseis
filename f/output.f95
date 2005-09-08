@@ -5,8 +5,8 @@ module output_m
 contains
 subroutine output( pass )
 use globals_m
-use binaryio_m
 use zone_m
+use bwrite_m
 
 implicit none
 save
@@ -21,7 +21,7 @@ if ( init ) then
   init = .false.
   if ( ip == 0 ) then
     print '(a)', 'Initialize output'
-    print '(a)', 'Step  Amax       Vmax       Umax       Compute    I/O'
+    print '(a)', 'Step  Amax        Vmax        Umax        Compute     I/O'
   end if
   if ( it == 0 ) then
     if ( ip == 0 ) then
@@ -139,7 +139,7 @@ if ( ip == 0 ) then
   open(  9, file=str, status='replace' )
   write( 9, '(8es14.6)' ) amax, vmax, umax, wmax, dwt
   close( 9 )
-  print '(i4,5es10.2)', it, amax, vmax, umax, dwt(1:2) + dwt(3:4)
+  print '(i4,5es12.4)', it, amax, vmax, umax, dwt(1:2) + dwt(3:4)
 end if
 
 end subroutine

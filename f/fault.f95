@@ -7,6 +7,7 @@ subroutine fault
 use globals_m
 use snormals_m
 use zone_m
+use bread_m
 
 implicit none
 save
@@ -200,9 +201,9 @@ if ( hypop ) then
   fs0 = fs(j,k,l)
   fd0 = fd(j,k,l)
   dc0 = dc(j,k,l)
-  print '(a,es10.2)', 'S:    ', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 )
-  print '(2(a,es10.2,x))', 'dc:   ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / mu0
-  print '(2(a,es10.2,x))', 'rcrit:', rcrit, '>', mu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ** 2
+  print '(a,es12.4)', 'S:    ', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 )
+  print '(2(a,es12.4,x))', 'dc:   ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / mu0
+  print '(2(a,es12.4,x))', 'rcrit:', rcrit, '>', mu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ** 2
 end if
 
 return

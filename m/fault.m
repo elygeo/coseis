@@ -164,8 +164,8 @@ fs0 = fs(j,k,l);
 fd0 = fd(j,k,l);
 dc0 = dc(j,k,l);
 strength = ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 );
-dcr = 3 * dx * tn0 * ( fs0 - fd0 ) / miu0;
-rcritr = miu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2;
+dcr = 3 * dx * tn0 * ( fs0 - fd0 ) / mu0;
+rcritr = mu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2;
 fprintf( 1, 'S: %g\n', strength )
 fprintf( 1, 'dc: %g > %g\n', dc0, dcr )
 fprintf( 1, 'rcrit: %g > %g\n', rcrit, rcritr )

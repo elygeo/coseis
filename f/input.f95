@@ -3,14 +3,17 @@
 
 module input_m
 contains
-subroutine input( infile )
+subroutine input
 use globals_m
 
 implicit none
-character*(*), intent(in) :: infile
+integer :: iz
+character(16) :: infile(2)
 character(256) :: str
 character(32) :: key1, key2, key3, switchcase = 'start', caseswitch = 'start'
 
+infile(1) = 'in.defaults'
+infile(2) = 'in'
 nmat  = 0
 nfric = 0
 ntrac = 0
@@ -18,14 +21,15 @@ nstress = 0
 nlock = 0
 nout = 0
 
-if ( ip == 0 ) print '(a,a)', 'Reading file: ', infile
-open( 9, file=infile, status='old' )
+izloop: do iz = 1, 2
+if ( ip == 0 ) print '(a,a)', 'Reading file: ', infile(iz)
+open( 9, file=infile(iz), status='old' )
 loop: do
   read( 9,'(a)', iostat=i ) str
   if ( i /= 0 ) exit loop
   str = adjustl( str )
   if ( str(1:1) == '#' .or. str == ' ' ) cycle loop
-  str = str // ' #'
+  str(255:256) = ' #'
   read( str, * ) key1, key2, key3
   select case( key1 )
   case( 'switch' );     switchcase = key2
@@ -49,21 +53,37 @@ loop: do
   case( 'msrcradius' ); read( str, * ) key1, msrcradius
   case( 'moment' );     read( str, * ) key1, moment
   case( 'domp' );       read( str, * ) key1, domp
+  case( 'material' )
+    if ( key2 == 'read' ) then
+      matdir = key3
+    else
+      nmat = nmat + 1
+      read( str, * ) key1, material(nmat,:), imat(nmat,:)
+    end if
+  case( 'friction' )
+    if ( key2 == 'read' ) then
+      fricdir = key3
+    else
+      nfric = nfric + 1
+      read( str, * ) key1, friction(nfric,:), ifric(nfric,:)
+    end if
+  case( 'stress' )
+    if ( key2 == 'read' ) then
+      stressdir = key3
+    else
+      nstress = nstress + 1
+      read( str, * ) key1, stress(nstress,:), istress(nstress,:)
+    end if
+  case( 'traction' )
+    if ( key2 == 'read' ) then
+      tracdir = key3
+    else
+      ntrac = ntrac + 1
+      read( str, * ) key1, traction(ntrac,:), itrac(ntrac,:)
+    end if
   case( 'locknodes' )
     nlock = nlock + 1
     read( str, * ) key1, locknodes(nlock,:), ilock(nlock,:)
-  case( 'material' )
-    nmat = nmat + 1
-    read( str, * ) key1, material(nmat,:), imat(nmat,:)
-  case( 'friction' )
-    nfric = nfric + 1
-    read( str, * ) key1, friction(nfric,:), ifric(nfric,:)
-  case( 'traction' )
-    ntrac = ntrac + 1
-    read( str, * ) key1, traction(ntrac,:), itrac(ntrac,:)
-  case( 'stress' )
-    nstress = nstress + 1
-    read( str, * ) key1, stress(nstress,:), istress(nstress,:)
   case( 'out' )
     nout = nout + 1
     read( str, * ) key1, outvar(nout), outit(nout), iout(nout,:)
@@ -85,6 +105,7 @@ loop: do
   end select a2
 end do loop
 close( 9 )
+end do izloop
 
 end subroutine
 end module

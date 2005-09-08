@@ -12,18 +12,9 @@
 # for stability, be sure to satisfy the Courant condition dt*Vp*sqrt(3) < dx
   dt		.007
 
-# grid: grid generation scheme
+# grid: generation scheme
 # grid		slant
   grid		constant
-
-# material: rho, vp, vs, zone(6) : density, p-wave speed, s-wave speed
-# Parameters with a zone(6) specification can be given multiple times.  
-# Zones are specified by points i1=(j1 k1 l1) and i2=(j2 k2 l2).  
-# A negative zone boundary counts inward from the extent of the mesh (ng).  
-# A zone boundary of 0 indicates the hypocenter location.
-# Order maters. Zones con overwrite some or all of previous ones.
-# material	267. 600. 346.1      1 1 1   -1 -1 10  # low vel surface layer
-  material	2670. 6000. 3464.1   1 1 1   -1 -1 -1
 
 # viscosity(2): viscosity for (1) stress and (2) hourglass calculations
   viscosity	.0 .3
@@ -42,18 +33,32 @@
 # nrmdim	0   # no fault
   nrmdim	2   # constant y fault plane
 
+# material: rho vp vs zone(6): density, p-wave speed, s-wave speed.
+# Parameters with a zone(6) specification can be given multiple times.  
+# Zones are specified by points i1=(j1 k1 l1) and i2=(j2 k2 l2).  
+# A negative zone boundary counts inward from the extent of the mesh (ng).  
+# A zone boundary of 0 indicates the hypocenter location.
+# Order maters. Zones con overwrite some or all of previous ones.
+# You may specify 'read' followed by a dirctory name to read material files
+# from disk.  This overrides any parameters.
+# material	read   data/scecvm/   # read from disk
+# material	267. 600. 346.1      1 1 1   -1 -1 10  # low vel surface layer
+  material	2670. 6000. 3464.1   1 1 1   -1 -1 -1
+
 # friction: fs fd dc co zone(6): coefficients of static & dynamic friction, 
 # slip-weakening distance, cohesion
+# stress	read   data/friction/   # read from disk
   friction	.6  .5    .25  0.    1 1 1   -1 -1 -1
 
-# traction: t3(3) zone(6): pretraction on the fault resolved on to the
-# normal, strike, and dip components of the fault surface
-# combined with stress for total pretraction
-  traction	-70e6  -120e6  0.    1 1 1   -1 -1 -1
-
-# stress: t1(3) t2(3) zone(6): prestress on fault: Sxx Syy Szz Syz Szx Sxy
-# combined with traction for total pretraction
+# stress: xx yy zz yz zx xy zone(6): prestress on fault: Sxx Syy Szz Syz Szx Sxy
+# Combined with traction for total pretraction.
+# stress	read   data/stress/   # read from disk
   stress	0. 0. 0. 0. 0. 0.    1 1 1   -1 -1 -1
+
+# traction: tn ts td zone(6): normal, strike, and dip components initial 
+# traction on the fault.  Combined with stress for total pretraction.
+# stress	read   data/traction/   # read from disk
+  traction	-70e6  -120e6  0.    1 1 1   -1 -1 -1
 
 # hypocenter(3) : node location of the hypocenter, 0 = mesh logical center
   hypocenter	0 0 0

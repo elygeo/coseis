@@ -13,16 +13,16 @@ for iz = 1:size( material, 1 )
   vs   = material(iz,3);
   matmax = max( matmax, material(iz,1:3) );
   matmin = min( matmin, material(iz,1:3) );
-  miu0 = rho0 * vs * vs;
+  mu0 = rho0 * vs * vs;
   lam0 = rho0 * ( vp * vp - 2 * vs * vs );
-  yc0  = miu0 * ( lam0 + miu0 ) / 6 / ( lam0 + 2 * miu0 ) * 4 / dx ^ 2;
-  nu   = .5 * lam0 / ( lam0 + miu0 );
+  yc0  = mu0 * ( lam0 + mu0 ) / 6 / ( lam0 + 2 * mu0 ) * 4 / dx ^ 2;
+  nu   = .5 * lam0 / ( lam0 + mu0 );
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
   s1(j1:j2,k1:k2,l1:l2) = rho0;
   lam(j1:j2,k1:k2,l1:l2) = lam0;
-  miu(j1:j2,k1:k2,l1:l2) = miu0;
+  mu(j1:j2,k1:k2,l1:l2) = mu0;
   yc(j1:j2,k1:k2,l1:l2) = yc0;
 end
 courant = dt * matmax(2) * sqrt( 3 ) / dx;   % TODO: check, make general
@@ -81,7 +81,10 @@ i = yn  ~= 0.; yn(i)  = 1. ./ yn(i);
 i = rho ~= 0.; rho(i) = 1. ./ rho(i);
 i = s2  ~= 0.; s2(i)  = 1. ./ s2(i);
 lam = lam .* s2;
-miu = miu .* s2;
+mu = mu .* s2;
+
+s1(:) = 0.;
+s2(:) = 0.;
 
 % PML damping
 c1 =  8. / 15.;
