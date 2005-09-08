@@ -73,16 +73,16 @@ if( bc(5) == 0 ) x(:,k1,:,:) = x(:,k2,:,:)
 if( bc(3) == 0 ) x(:,:,1 ,:) = x(:,:,2 ,:)
 if( bc(6) == 0 ) x(:,:,l1,:) = x(:,:,l2,:)
 
-! Test for hypocenter
+! Test if hypocenter is located on this processor
 i1 = hypocenter
 if ( all( i1 >= i1node .and. i1 <= i2node ) ) then
   hypop = .true.
   j = i1(1)
   k = i1(2)
   l = i1(3)
-  xhypo(1) = x(j,k,l,1);
-  xhypo(2) = x(j,k,l,2);
-  xhypo(3) = x(j,k,l,3);
+  x0(1) = x(j,k,l,1);
+  x0(2) = x(j,k,l,2);
+  x0(3) = x(j,k,l,3);
 end if
 
 end subroutine

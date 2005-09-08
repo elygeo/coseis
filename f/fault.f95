@@ -184,7 +184,7 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 do i = 1, 3
-  t3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i)
+  t3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - x0(i)
 end do
 r = sqrt( sum( t3 * t3, 4 ) )
 
@@ -201,9 +201,9 @@ if ( hypop ) then
   fs0 = fs(j,k,l)
   fd0 = fd(j,k,l)
   dc0 = dc(j,k,l)
-  print '(a,es12.4)', 'S:    ', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 )
-  print '(2(a,es12.4,x))', 'dc:   ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / mu0
-  print '(2(a,es12.4,x))', 'rcrit:', rcrit, '>', mu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ** 2
+  print '(a,es12.4)', '  S:    ', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 )
+  print '(2(a,es12.4,x))', '  dc:   ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / mu0
+  print '(2(a,es12.4,x))', '  rcrit:', rcrit, '>', mu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ** 2
 end if
 
 return

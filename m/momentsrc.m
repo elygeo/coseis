@@ -6,7 +6,7 @@ if ~msrcradius; return; end
 if init
 
 init = 0;
-fprintf( 'Initialize moment source\n' )
+fprintf( 'Moment source\n' )
 if msrcradius && exist( 'srctimefcn' ) && sum( abs( moment ) )
 else
   msrcradius = 0.;
@@ -53,7 +53,9 @@ c = [ 1 6 5; 6 2 4; 5 4 3 ];
 m0 = max( abs( val(:) ) );
 mw = 2. / 3. * log10( m0 ) - 10.7;
 um = m0 / mu0 / dx / dx;
-fprintf( 'M0: %g\nMw: %g\nD:  %g\n', m0, mw, um )
+fprintf( '  M0:%12.4e\n', m0 )
+fprintf( '  Mw:%12.4e\n', mw )
+fprintf( '  D: %12.4e\n', um )
 
 return
 

@@ -20,7 +20,7 @@ if ( msrcradius <= 0. ) return
 inittrue: if ( init ) then
 
 init = .false.
-if( ip == 0 ) print '(a)', 'Initialize moment source'
+if( ip == 0 ) print '(a)', 'Moment source'
 
 i1 = i1cell
 i2 = i2cell
@@ -42,7 +42,7 @@ end forall
 
 ! Cell center hypocentral distance
 do i = 1, 3
-  w1(:,:,:,i) = w1(:,:,:,i) - xhypo(i)
+  w1(:,:,:,i) = w1(:,:,:,i) - x0(i)
 end do
 
 ! Find cells within msrcradius
@@ -82,9 +82,9 @@ mm(1,3) = moment(5)
 mm(1,2) = moment(6)
 call ssyev( 'N', 'U', 3, mm, 3, eigval, eigwork, size(eigwork), eiginfo )
 m0 = maxval( abs( eigval ) )
-print *, 'M0: ', m0
-print *, 'Mw: ', 2. / 3. * log10( m0 ) - 10.7
-print *, 'D:  ', m0 / mu0 / dx / dx
+print '(a,es12.4)', '  M0:', m0
+print '(a,es12.4)', '  Mw:', 2. / 3. * log10( m0 ) - 10.7
+print '(a,es12.4)', '  D: ', m0 / mu0 / dx / dx
 
 return
 

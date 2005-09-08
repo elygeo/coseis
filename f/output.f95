@@ -26,8 +26,8 @@ if ( init ) then
   if ( it == 0 ) then
     if ( ip == 0 ) then
       call system( 'rm -fr out; mkdir out; mkdir out/ckp; mkdir out/stats' )
-      open(  9, file='out/xhypo' )
-      write( 9, * ) xhypo
+      open(  9, file='out/x0' )
+      write( 9, * ) x0
       close( 9 )
     end if
   else

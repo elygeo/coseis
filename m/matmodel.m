@@ -26,7 +26,7 @@ for iz = 1:size( material, 1 )
   yc(j1:j2,k1:k2,l1:l2) = yc0;
 end
 courant = dt * matmax(2) * sqrt( 3 ) / dx;   % TODO: check, make general
-fprintf( 'Courant: %g < 1\n', courant )
+fprintf( '  Courant: 1 >%11.4e\n', courant )
 
 s2(:) = 0.;
 for iz = 1:size( operator, 1 )

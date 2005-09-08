@@ -69,7 +69,7 @@ end forall
 
 ! Check Courant stability condition. TODO: make general, global
 courant = dt * matmax(2) * sqrt( 3. ) / dx
-if ( ip == 0 ) print '(a,es10.4)', 'Courant: 1 > ', courant
+if ( ip == 0 ) print '(a,es11.4)', '  Courant: 1 >', courant
 
 ! Cell volume
 s2 = 0.
@@ -122,24 +122,24 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   + s2(j,k,l-1) + s2(j-1,k-1,l) )
 end forall
 
-! Node mass reciprocal
-where ( rho /= 0. .and. s1 /= 0 )
-  rho = 1. / rho / s1
-end where
-
-! Cell hourglass constant
+! Hourglass constant
 y = 0.
 where ( lam /= 0. .and. mu /= 0 ) 
    y = mu * ( lam + mu ) / ( lam + 2. * mu ) * dx / 12.
 end where
 
-! Lame params
+! Save mu at hypocenter
+i1 = hypocenter
+if ( hypop ) mu0 = mu( i1(1), i1(2), i1(3) )
+
+! Divide by volumes
+where ( s1 /= 0. .and. rho /= 0. )
+  rho = 1. / rho / s1
+end where
 where ( s2 /= 0. )
   lam = lam / s2
   mu = mu / s2
 end where
-
-print '(5g12.4)', y
 
 ! PML damping
 c1 =  8. / 15.

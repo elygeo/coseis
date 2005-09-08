@@ -25,8 +25,8 @@ integer, dimension(nz,6) :: ioper, ilock, iout, imat, ifric, itrac, istress
 real :: &
   material(nz,3), friction(nz,4), traction(nz,3), stress(nz,6), &
   dx, dt, viscosity(2), vrup, rcrit, moment(6), msrcradius, domp, &
-  amax, vmax, umax, wmax, vslipmax, uslipmax, xhypo(3), &
-  nu, rho0, vp, vs, mu0, lam0, truptol
+  amax, vmax, umax, wmax, vslipmax, uslipmax, x0(3), &
+  vp, vs, mu0, truptol
 
 character :: oper(nz)
 character(16) :: outvar(nz), grid='', srctimefcn=''
