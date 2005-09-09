@@ -12,7 +12,7 @@ real :: theta, scl
 real, parameter :: pi = 3.14159
 
 if ( ip == 0 ) print '(a)', 'Grid generation'
-x = 0.
+
 downdim = 3
 noper = 1
 ioper(1,:) = (/ 1, 1, 1, -1, -1, -1 /)
@@ -62,10 +62,10 @@ else
 end if
 
 ! Duplicate edge nodes into halo
-i2 = i2node + 1
-j1 = i2(1); j2 = i2(1) - 1
-k1 = i2(2); k2 = i2(2) - 1
-l1 = i2(3); l2 = i2(3) - 1
+i2 = i2node
+j1 = i2(1) + 1; j2 = i2(1)
+k1 = i2(2) + 1; k2 = i2(2)
+l1 = i2(3) + 1; l2 = i2(3)
 if( bc(1) == 0 ) x(1,:,: ,:) = x(2,:,: ,:)
 if( bc(4) == 0 ) x(j1,:,:,:) = x(j2,:,:,:)
 if( bc(2) == 0 ) x(:,1,: ,:) = x(:,2,: ,:)

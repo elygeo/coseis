@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! MAIN
+! SORD
 
 program sord
 
@@ -14,7 +14,8 @@ use vstep_m
 use wstep_m
 use output_m
 
-print '(a)', 'SORD - Fortran Version'
+print '(a)', ''
+print '(a)', 'SORD - Support Operator Rupture Dynamics'
 
 call input
 call setup
@@ -23,6 +24,8 @@ call matmodel
 call fault
 call momentsrc
 call output( 'v' )
+
+print '(5es12.4)', w1, s1, s2, w2
 
 do while ( it < nt )
   it = it + 1;

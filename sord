@@ -1,7 +1,7 @@
 #!/bin/bash -e
 #------------------------------------------------------------------------------#
 
-echo "SORD - Support Operator Rupture Dynamics"
+echo "SORD setup"
 date
 
 mpi=guess
@@ -21,6 +21,7 @@ while getopts spgbfmrl opt; do
     l) remote=no ;;
   esac
 done
+shift $(( OPTIND - 1 ))
 
 # run on remote host
 if [ $remote = yes ]; then
@@ -157,12 +158,12 @@ OPTFLAGS=-O
 
 if [ $mpi = no ]; then
   OBJECT="$OBJECT \\
-  main.o"
+  sord.o"
   FC=f95
   CC=cc
 else
   OBJECT="$OBJECT \\
-  pmain.o \\
+  psord.o \\
   mpisetup.o \\
   mpioutput.o"
   FC=mpif90

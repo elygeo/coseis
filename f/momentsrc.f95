@@ -29,15 +29,17 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
 ! Cell volumes
+s1 = 0.
 call dfnc( s1, 'g', x, x, dx, 1, 1, i1, i2 )
 
 ! Cell center locations
+w1 = 2 * msrcradius
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   w1(j,k,l,:) = 0.125 * &
-  ( x(j,k,l,:) + x(j+1,k+1,l+1,:) &
-  + x(j+1,k,l,:) + x(j,k+1,l+1,:) &
-  + x(j,k+1,l,:) + x(j+1,k,l+1,:) &
-  + x(j,k,l+1,:) + x(j+1,k+1,l,:) );
+    ( x(j,k,l,:) + x(j+1,k+1,l+1,:) &
+    + x(j+1,k,l,:) + x(j,k+1,l+1,:) &
+    + x(j,k+1,l,:) + x(j+1,k,l+1,:) &
+    + x(j,k,l+1,:) + x(j+1,k+1,l,:) );
 end forall
 
 ! Cell center hypocentral distance
@@ -46,11 +48,8 @@ do i = 1, 3
 end do
 
 ! Find cells within msrcradius
-s2 = -1.
-w1 = w1 * w1
-s2(j1:j2,k1:k2,l1:l2) = msrcradius - sqrt( sum( w1(j1:j2,k1:k2,l1:l2,:), 4 ) )
+s2 = msrcradius - sqrt( sum( w1 * w1, 4 ) )
 nsrc = count( s2 > 0. )
-
 allocate( jj(nsrc), kk(nsrc), ll(nsrc), msrcx(nsrc), msrcv(nsrc) ) 
 
 ! Spatial weighting function
@@ -73,6 +72,9 @@ end do
 end do
 end do
 
+s1 = 0.
+s2 = 0.
+
 ! Print some info, requires LAPACK for eigenvalue calculation
 mm(1,1) = moment(1)
 mm(2,2) = moment(2)
@@ -92,6 +94,7 @@ end if inittrue
 
 !------------------------------------------------------------------------------!
 
+! time indexing goes wi vi wi+1 vi+1 ...
 if ( .false. ) then ! increment stress
   time = ( it - .5 ) * dt
   select case( srctimefcn )

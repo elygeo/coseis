@@ -19,7 +19,7 @@ k = i1(2):i2(2);
 j = i1(1):i2(1);
 
 % Cell volumes
-s1(:,:,:) = 0.;
+s1(:) = 0.;
 s1(j,k,l) = dfnc( 'g', x, x, dx, 1, 1, j, k, l );
 
 % Cell center locations

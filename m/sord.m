@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
 % SORD
 
-fprintf( 'SORD - Matlab version\n' )
+fprintf( '\nSORD - Support Operator Rupture Dynamics\n' )
 
 %profile report
 %profile plot

@@ -67,11 +67,10 @@ case { 'a', 'v', 'u' }
 case 'w'
   for iz = 1:size( planes, 1 )
     [ i1, i2 ] = zone( planes(iz,:), nn, offset, hypocenter, nrmdim );
-    i2 = i2 - 1; % CHECK
-    ng = i2 - i1 + 1;
     l = i1(3):i2(3);
     k = i1(2):i2(2);
     j = i1(1):i2(1);
+    ng = i2 - i1 + 1;
     if sum( ng > 1 ) == 3
       xg = x(j(1),k,l,:) + xscl * u(j(1),k,l,:); 
       if     comp > 3, vg = w2(j(1),k,l,comp-3);

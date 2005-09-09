@@ -6,8 +6,8 @@ SORD - Support Operator Rupture Dynamics
   viscoelastic solid.  The equations of motion are approximated with second
   order a Support-Operator method on a logically rectangular mesh.  The fault
   is modeled with a slip-weakening, frictional, internal boundary condition.
-  There are two versions, one written in Fortran and one in Matlab.  The
-  Matlab version has integrated visualization and is good for testing small
+  There are two versions, one written in Fortran and one in MATLAB.  The
+  MATLAB version has integrated visualization and is good for testing small
   problems.  The Fortran version is best for large problems and is
   parallelized with MPI. 
 
@@ -29,7 +29,7 @@ USAGE
     ./sord
 
   Sript options:
-    -m  use Matlab backend (default is Fortran)
+    -m  use MATLAB backend (default is Fortran)
     -g  run in debugger
     -b  batch mode, compinle don't run
     -r  run on remote host, edit sord script to set host

@@ -13,7 +13,7 @@ implicit none
 integer :: iz
 real :: matmin(3), matmax(3), hmean(3), tune, c1, c2, c3, damp, dampn, dampc, courant, pmlp
 
-if ( ip == 0 ) print '(a)', 'Material Model'
+if ( ip == 0 ) print '(a)', 'Material model'
 
 ! Material arrays
 rho = 0.
@@ -52,8 +52,8 @@ l1 = i1(3); l2 = i2(3)
 ! Lame parameters
 s2 = rho * s2 * s2
 s1 = rho * ( s1 * s1 ) - 2. * s2
-mu  = 0.
 lam = 0.
+mu = 0.
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   lam(j,k,l) = 0.125 * &
   ( s1(j,k,l) + s1(j+1,k+1,l+1) &

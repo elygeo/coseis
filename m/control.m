@@ -25,7 +25,7 @@ case 'f1'
   else
     set( gcf, 'CurrentAxes', haxes(2) )
     hhelp = text( .5, .54, ...
-      { 'SORD - Support-Operator Rupture Dynamics'
+      { 'SORD - Support Operator Rupture Dynamics'
         'by Geoffrey Ely - gely@ucsd.edu'
         ''
         'Help               F1    Acceleration      A    Zoom            < >'
