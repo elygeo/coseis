@@ -22,7 +22,7 @@ elseif init
   init = 0;
   fprintf( 'Initialize visualization\n' )
   plotinterval = 1;
-  holdmovie = 1;
+  holdmovie = 0;
   savemovie = 0;
   field = 'v';
   comp = 0;

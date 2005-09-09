@@ -56,12 +56,6 @@ mu(j,k,l) = 0.125 * ...
   + s2(j,k+1,l) + s2(j+1,k,l+1) ...
   + s2(j,k,l+1) + s2(j+1,k+1,l) );
 
-% Hourglass constant
-y = 12. * dx * dx * ( lam + 2. * mu );
-i = y ~= 0.;
-y(i) = 1. ./ y(i);
-y = mu .* ( lam + mu ) .* y;
-
 % Cell volume
 s2(:) = 0.;
 for iz = 1:size( operator, 1 )
@@ -74,29 +68,18 @@ for iz = 1:size( operator, 1 )
   s2(j,k,l) = dfnc( op, x, x, dx, 1, 1, j, k, l );
 end
 
-% Make sure cell volumes and Y are zero on the fault
+% Make sure cell volumes are zero on the fault
 if nrmdim
   i = hypocenter(nrmdim);
   switch nrmdim
-  case 1, s2(i,:,:) = 0.; y(i,:,:) = 0.;
-  case 2, s2(:,i,:) = 0.; y(:,i,:) = 0.;
-  case 3, s2(:,:,i) = 0.; y(:,:,i) = 0.;
+  case 1, s2(i,:,:) = 0.;
+  case 2, s2(:,i,:) = 0.;
+  case 3, s2(:,:,i) = 0.;
   end
 end
 
-% Ghost cell volumes are NOT zero for PML
-i2 = nm - 1;
-j1 = i2(1); j2 = i2(1);
-k1 = i2(2); k2 = i2(2);
-l1 = i2(3); l2 = i2(3);
-if bc(1), s2(1,:,: ) = s2(2,:,: ); end
-if bc(4), s2(j1,:,:) = s2(j2,:,:); end
-if bc(2), s2(:,1,: ) = s2(:,2,: ); end
-if bc(5), s2(:,k1,:) = s2(:,k2,:); end
-if bc(3), s2(:,:,1 ) = s2(:,:,2 ); end
-if bc(6), s2(:,:,l1) = s2(:,:,l2); end
-
 % Node volume
+s1(:) = 0.;
 i1 = i1node;
 i2 = i2node;
 l = i1(3):i2(3);
@@ -108,12 +91,15 @@ s1(j,k,l) = 0.125 * ...
   + s2(j,k-1,l) + s2(j-1,k,l-1) ...
   + s2(j,k,l-1) + s2(j-1,k-1,l) );
 
-% Multipy Y by cell volume
-y = y .* s2;
+% Hourglass constant Y. FIXME off by factor of 8?
+y = 6. * dx * dx * ( lam + 2. * mu );
+i = y ~= 0.;
+y(i) = 1. ./ y(i);
+y = 4. * mu .* ( lam + mu ) .* y .* s2;
 
 % Devide Lame constants by cell volume
-i = s2  ~= 0.;
-s2(i)  = 1. ./ s2(i);
+i = s2 ~= 0.;
+s2(i) = 1. ./ s2(i);
 lam = lam .* s2;
 mu = mu .* s2;
 

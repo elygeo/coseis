@@ -77,10 +77,6 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     + s2(j,k,l+1) + s2(j+1,k+1,l) )
 end forall
 
-! Hourglass constant
-y = 12. * ( lam + 2. * mu )
-where ( y /= 0. ) y = dx * mu * ( lam + mu ) / y
-
 ! Cell volume
 s2 = 0.
 do iz = 1, noper
@@ -93,35 +89,23 @@ do iz = 1, noper
   call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
 end do
 
-! Make sure cell volumes and Y are zero on the fault
+! Make sure cell volumes are zero on the fault
 if ( nrmdim /=0 ) then
   i = hypocenter(nrmdim)
   select case( nrmdim )
-  case( 1 ); s2(i,:,:) = 0; y(i,:,:) = 0
-  case( 2 ); s2(:,i,:) = 0; y(:,i,:) = 0
-  case( 3 ); s2(:,:,i) = 0; y(:,:,i) = 0
+  case( 1 ); s2(i,:,:) = 0;
+  case( 2 ); s2(:,i,:) = 0;
+  case( 3 ); s2(:,:,i) = 0;
   end select
 end if
 
-! Ghost cell volumes are NOT zero for PML
-i2 = i2cell + 1
-j1 = i2(1); j2 = i2(1) - 1
-k1 = i2(2); k2 = i2(2) - 1
-l1 = i2(3); l2 = i2(3) - 1
-if( bc(1) == 1 ) s2(1,:,: ) = s2(2,:,: )
-if( bc(4) == 1 ) s2(j1,:,:) = s2(j2,:,:)
-if( bc(2) == 1 ) s2(:,1,: ) = s2(:,2,: )
-if( bc(5) == 1 ) s2(:,k1,:) = s2(:,k2,:)
-if( bc(3) == 1 ) s2(:,:,1 ) = s2(:,:,2 )
-if( bc(6) == 1 ) s2(:,:,l1) = s2(:,:,l2)
-
 ! Node volume
+s1 = 0.
 i1 = i1node
 i2 = i2node
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-s1 = 0.
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   s1(j,k,l) = 0.125 * &
     ( s2(j,k,l) + s2(j-1,k-1,l-1) &
@@ -130,7 +114,11 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     + s2(j,k,l-1) + s2(j-1,k-1,l) )
 end forall
 
-! Divide by cell volume
+! Hourglass constant Y. FIXME off by factor of 8?
+y = 6. * dx * dx * ( lam + 2. * mu )
+where ( y /= 0. ) y = 4. * mu * ( lam + mu ) / y * s2
+
+! Divide Lame contants by cell volume
 where ( s2 /= 0. ) s2 = 1. / s2
 lam = lam * s2
 mu = mu * s2
