@@ -40,9 +40,9 @@ else
 end if
 
 ! Material extremes TODO: make global
-where( rho > 0. ) matmin(1) = minval( rho ); matmax(1) = maxval( rho )
-where( s1 > 0. )  matmin(2) = minval( s1 );  matmax(2) = maxval( s1 )
-where( s2 > 0. )  matmin(3) = minval( s2 );  matmax(3) = maxval( s2 )
+matmin(1) = minval( rho, rho > 0. ); matmax(1) = maxval( rho )
+matmin(2) = minval( s1, s1 > 0. );   matmax(2) = maxval( s1 )
+matmin(3) = minval( s2, s2 > 0. );   matmax(3) = maxval( s2 )
 
 ! Check Courant stability condition. TODO: make general
 courant = dt * matmax(2) * sqrt( 3. ) / dx

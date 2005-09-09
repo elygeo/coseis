@@ -31,7 +31,7 @@ USAGE
   Sript options:
     -m  use MATLAB backend (default is Fortran)
     -g  run in debugger
-    -b  batch mode, compinle don't run
+    -b  batch mode, compile, don't run
     -r  run on remote host, edit sord script to set host
 
   When porting to a new machine, you may have to modify the sord script for 
