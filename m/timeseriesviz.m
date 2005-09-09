@@ -11,6 +11,7 @@ explosion = ...
 if ~exist( 'w1', 'var' ) % not running from in sord
   addpath m
   input
+  xhair = [ 30 30 30 ];
   % init = 1; viz
   % init = 2; viz
   km = 0;

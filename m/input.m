@@ -5,17 +5,13 @@ plotstyle = '';
 plotstyle = 'slice';
 planewavedim = 0;
 truptol = .001;
-material  = []; imat    = [];
-friction  = []; ifric   = [];
-traction  = []; itrac   = [];
-stress    = []; istress = [];
+material  = []; imat    = []; matdir = '';
+friction  = []; ifric   = []; fricdir = '';
+traction  = []; itrac   = []; tracdir = '';
+stress    = []; istress = []; stressdir = '';
 locknodes = []; ilock   = [];
 outvar    = {}; iout    = []; outit = [];
-stressdir = '';
-tracdir = '';
-fricdir = '';
-matdir = '';
-meshdir = '';
+griddir = '';
 
 for file = { 'defaults.in', 'in' }
 fprintf( 'Reading file: %s\n', file{1} )
@@ -66,7 +62,7 @@ for i = 1:length( in )
       val = strread( str, '%n' )';
       material  = [ material;  val(1:3)  ];
       imat      = [ imat;      val(4:9)  ];
-    end if
+    end
   case 'friction'
     if strcmp( key{2}, 'read' )
       fircdir = key{3};
@@ -74,7 +70,7 @@ for i = 1:length( in )
       val = strread( str, '%n' )';
       friction   = [ friction; val(1:4)  ];
       ifric      = [ ifric;    val(5:10) ];
-    end if
+    end
   case 'traction'
     if strcmp( key{2}, 'read' )
       tracdir = key{3};
@@ -82,7 +78,7 @@ for i = 1:length( in )
       val = strread( str, '%n' )';
       traction   = [ traction; val(1:3)  ];
       itrac      = [ itrac;    val(4:9)  ];
-    end if
+    end
   case 'stress'
     if strcmp( key{2}, 'read' )
       stressdir = key{3};
@@ -90,7 +86,7 @@ for i = 1:length( in )
       val = strread( str, '%n' )';
       stress     = [ stress;   val(1:6)  ];
       istress    = [ istress;  val(7:12) ];
-    end if
+    end
   case 'locknodes'
     val = strread( str, '%n' )';
     locknodes = [ locknodes; val(1:3)  ];

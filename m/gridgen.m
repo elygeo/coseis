@@ -124,7 +124,7 @@ x(:,[1 end],:,:) = x(:,[2 end-1],:,:);
 x(:,:,[1 end],:) = x(:,:,[2 end-1],:);
 
 x = dx * x;
-i1 = hypocenter(1);
+i1 = hypocenter;
 x0 = x(i1(1),i1(2),i1(3),:);
 x0 = x0(:)';
 
