@@ -59,6 +59,11 @@ for id = [ ic:3 1:ic-1 ];
 end
 end
 
+% Newton's Law, A = F / m
+for i = 1:3
+  w1(:,:,:,i) = w1(:,:,:,i) .* rho;
+end
+
 % Hourglass correction
 s1(:) = 0.;
 s2(:) = 0.;
@@ -70,20 +75,15 @@ for iq = 1:4
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
-  s1(j,k,l) = y(j,k,l) .* hgnc( w2, ic, iq, j, k, l );
+  s1(j,k,l) = yc(j,k,l) .* hgnc( w2, ic, iq, j, k, l );
   i1 = i1node;
   i2 = i2node;
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
-  s2(j,k,l) = hgcn( s1, 1, iq, j, k, l );
+  s2(j,k,l) = yn(j,k,l) .* hgcn( s1, 1, iq, j, k, l );
   w1(:,:,:,ic) = w1(:,:,:,ic) - s2;
 end
-end
-
-% Newton's Law, A = F / m
-for i = 1:3
-  w1(:,:,:,i) = w1(:,:,:,i) .* rho;
 end
 
 % Fault calculations

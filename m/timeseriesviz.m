@@ -77,7 +77,7 @@ tg = time;
 newtitles = titles(2:end);
 
 if km
-  fcorner = vp / ( 6 * dx );
+  fcorner = 6000 / ( 6 * dx );
   n = 2 * round( 1 / ( fcorner * dt ) );
   b = .5 * ( 1 - cos( 2 * pi * ( 1 : n - 1 ) / n ) );  % hanning
   %b = [ b b(end-1:-1:1) ];

@@ -42,8 +42,8 @@
 # You may specify 'read' followed by a dirctory name to read material files
 # from disk.  This overrides any parameters.
 # material	read   data/scecvm/   # read from disk
-# material	267. 600. 346.1      1 1 1   -1 -1 10  # low vel surface layer
-  material	2670. 6000. 3464.1   1 1 1   -1 -1 -1
+# material	267. 600. 346.41016    1 1 1   -1 -1 10  # low vel surface layer
+  material	2670. 6000. 3464.1016  1 1 1   -1 -1 -1
 
 # friction: fs fd dc co zone(6): coefficients of static & dynamic friction, 
 # slip-weakening distance, cohesion

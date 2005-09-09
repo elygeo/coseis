@@ -25,8 +25,6 @@ call fault
 call momentsrc
 call output( 'v' )
 
-print '(5es12.4)', w1, s1, s2, w2
-
 do while ( it < nt )
   it = it + 1;
   call system_clock( wt(1) ); call wstep

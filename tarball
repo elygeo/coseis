@@ -9,12 +9,11 @@ files="
   README
   VERSION
   in
-  in.*
+  *.in
   sord
   tarball
   f/
   m/
-  models/
 "
 
 mkdir sord-$version

@@ -83,6 +83,7 @@ else % direct stress
   otherwise error srctimefcn
   end
 end
+
 o = prod( nm );
 for i = 0:2
   w1(imsrc+o*i) = w1(imsrc+o*i) - msrcf * msrcx * moment(i+1);

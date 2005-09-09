@@ -42,34 +42,42 @@ matmin(1) = minval( rho ); matmax(1) = maxval( rho )
 matmin(2) = minval( s1  ); matmax(2) = maxval( s1  )
 matmin(3) = minval( s2  ); matmax(3) = maxval( s2  )
 
-! Cells
+! Check Courant stability condition. TODO: make general, global
+courant = dt * matmax(2) * sqrt( 3. ) / dx
+if ( ip == 0 ) print '(a,es11.4)', '  Courant: 1 >', courant
+
+! Lame parameters
+s2 = rho * s2 * s2
+s1 = rho * ( s1 * s1 ) - 2. * s2
+
+! Save mu at hypocenter
+i1 = hypocenter
+if ( hypop ) mu0 = mu( i1(1), i1(2), i1(3) )
+
+! Average Lame parameters on cell centers
+lam = 0.
+mu = 0.
 i1 = i1cell
 i2 = i2cell
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-
-! Lame parameters
-s2 = rho * s2 * s2
-s1 = rho * ( s1 * s1 ) - 2. * s2
-lam = 0.
-mu = 0.
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   lam(j,k,l) = 0.125 * &
-  ( s1(j,k,l) + s1(j+1,k+1,l+1) &
-  + s1(j+1,k,l) + s1(j,k+1,l+1) &
-  + s1(j,k+1,l) + s1(j+1,k,l+1) &
-  + s1(j,k,l+1) + s1(j+1,k+1,l) )
+    ( s1(j,k,l) + s1(j+1,k+1,l+1) &
+    + s1(j+1,k,l) + s1(j,k+1,l+1) &
+    + s1(j,k+1,l) + s1(j+1,k,l+1) &
+    + s1(j,k,l+1) + s1(j+1,k+1,l) )
   mu(j,k,l) = 0.125 * &
-  ( s2(j,k,l) + s2(j+1,k+1,l+1) &
-  + s2(j+1,k,l) + s2(j,k+1,l+1) &
-  + s2(j,k+1,l) + s2(j+1,k,l+1) &
-  + s2(j,k,l+1) + s2(j+1,k+1,l) )
+    ( s2(j,k,l) + s2(j+1,k+1,l+1) &
+    + s2(j+1,k,l) + s2(j,k+1,l+1) &
+    + s2(j,k+1,l) + s2(j+1,k,l+1) &
+    + s2(j,k,l+1) + s2(j+1,k+1,l) )
 end forall
 
-! Check Courant stability condition. TODO: make general, global
-courant = dt * matmax(2) * sqrt( 3. ) / dx
-if ( ip == 0 ) print '(a,es11.4)', '  Courant: 1 >', courant
+! Hourglass constant
+y = 12. * ( lam + 2. * mu )
+where ( y /= 0. ) y = dx * mu * ( lam + mu ) / y
 
 ! Cell volume
 s2 = 0.
@@ -105,41 +113,32 @@ if( bc(5) == 1 ) s2(:,k1,:) = s2(:,k2,:)
 if( bc(3) == 1 ) s2(:,:,1 ) = s2(:,:,2 )
 if( bc(6) == 1 ) s2(:,:,l1) = s2(:,:,l2)
 
-! Nodes
+! Node volume
 i1 = i1node
 i2 = i2node
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-
-! Node volume
 s1 = 0.
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   s1(j,k,l) = 0.125 * &
-  ( s2(j,k,l) + s2(j-1,k-1,l-1) &
-  + s2(j-1,k,l) + s2(j,k-1,l-1) &
-  + s2(j,k-1,l) + s2(j-1,k,l-1) &
-  + s2(j,k,l-1) + s2(j-1,k-1,l) )
+    ( s2(j,k,l) + s2(j-1,k-1,l-1) &
+    + s2(j-1,k,l) + s2(j,k-1,l-1) &
+    + s2(j,k-1,l) + s2(j-1,k,l-1) &
+    + s2(j,k,l-1) + s2(j-1,k-1,l) )
 end forall
 
-! Hourglass constant
-y = 0.
-where ( lam /= 0. .and. mu /= 0 ) 
-   y = mu * ( lam + mu ) / ( lam + 2. * mu ) * dx / 12.
-end where
+! Divide by cell volume
+where ( s2 /= 0. ) s2 = 1. / s2
+lam = lam * s2
+mu = mu * s2
 
-! Save mu at hypocenter
-i1 = hypocenter
-if ( hypop ) mu0 = mu( i1(1), i1(2), i1(3) )
+! Node mass ratio
+rho = rho * s1
+where ( rho /= 0. ) rho = 1. / rho
 
-! Divide by volumes
-where ( s1 /= 0. .and. rho /= 0. )
-  rho = 1. / rho / s1
-end where
-where ( s2 /= 0. )
-  lam = lam / s2
-  mu = mu / s2
-end where
+s1 = 0.
+s2 = 0.
 
 ! PML damping
 c1 =  8. / 15.

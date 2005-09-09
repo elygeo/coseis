@@ -12,7 +12,7 @@ stress    = []; istress = [];
 locknodes = []; ilock   = [];
 outvar    = {}; iout    = []; outit = [];
 
-for file = { 'in.defaults', 'in' }
+for file = { 'defaults.in', 'in' }
 fprintf( 'Reading file: %s\n', file{1} )
 in = textread( file{1}, '%s', 'delimiter', '\n', 'commentstyle', 'shell' );
 caseswitch = '';

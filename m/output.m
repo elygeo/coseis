@@ -45,10 +45,9 @@ for iz = 1:size( outit, 1 )
   switch outvar{iz}
   case 'x',   static = 1; nc = 3;
   case 'rho', static = 1;
-  case 'yn',  static = 1;
   case 'lam', static = 1; cell = 1;
   case 'mu',  static = 1; cell = 1;
-  case 'yc',  static = 1; cell = 1;
+  case 'y',   static = 1; cell = 1;
   case '|u|', onpass = 'w';
   case '|w|', onpass = 'w'; cell = 1;
   case 'u',   onpass = 'w'; nc = 3;
@@ -86,10 +85,9 @@ for iz = 1:size( outit, 1 )
     switch outvar{iz}
     case 'x',     fwrite( fid, x(j,k,l,i),        'float32' );
     case 'rho',   fwrite( fid, rho(j,k,l),        'float32' );
-    case 'yn',    fwrite( fid, yn(j,k,l),         'float32' );
     case 'lam',   fwrite( fid, lam(j,k,l),        'float32' );
     case 'mu',    fwrite( fid, mu(j,k,l),         'float32' );
-    case 'yc',    fwrite( fid, yc(j,k,l),         'float32' );
+    case 'y',     fwrite( fid, y(j,k,l),          'float32' );
     case '|u|',   fwrite( fid, s1(j,k,l),         'float32' );
     case '|w|',   fwrite( fid, s2(j,k,l),         'float32' );
     case 'u',     fwrite( fid, u(j,k,l,i),        'float32' );            
@@ -129,7 +127,7 @@ wt(4) = toc;
 
 file = sprintf( 'out/stats/%05d', it );
 fid = fopen( file, 'w' );
-fprintf( fid, '%14.6e', [ amax vmax umax wmax vslipmax uslipmax wt ] );
+fprintf( fid, '%16.7e', [ amax vmax umax wmax vslipmax uslipmax wt ] );
 fprintf( fid, '\n' );
 fclose( fid );
 

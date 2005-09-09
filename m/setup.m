@@ -61,10 +61,11 @@ w2  = repmat( zero, [ nm 3 ] );
 s1  = repmat( zero, nm );
 s2  = repmat( zero, nm );
 rho = repmat( zero, nm );
-mu  = repmat( zero, nm );
 lam = repmat( zero, nm );
-yc  = repmat( zero, nm );
-yn  = repmat( zero, nm );
+mu  = repmat( zero, nm );
+y   = repmat( zero, nm );
+yn  = repmat( zero, nm ); % FIXME
+yc  = repmat( zero, nm ); % FIXME
 n = [ nm 3 ];
 n(1) = npml * bc(1); p1 = repmat( zero, n ); g1 = repmat( zero, n );
 n(1) = npml * bc(4); p4 = repmat( zero, n ); g4 = repmat( zero, n );
@@ -75,6 +76,4 @@ n = [ nm 3 ];
 n(3) = npml * bc(3); p3 = repmat( zero, n ); g3 = repmat( zero, n );
 n(3) = npml * bc(6); p6 = repmat( zero, n ); g6 = repmat( zero, n );
 
-format short e
-format compact
 

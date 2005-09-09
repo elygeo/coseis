@@ -12,7 +12,7 @@ character(16) :: infile(2)
 character(256) :: str
 character(32) :: key1, key2, key3, switchcase = 'start', caseswitch = 'start'
 
-infile(1) = 'in.defaults'
+infile(1) = 'defaults.in'
 infile(2) = 'in'
 nmat  = 0
 nfric = 0
@@ -87,15 +87,6 @@ loop: do
   case( 'out' )
     nout = nout + 1
     read( str, * ) key1, outvar(nout), outit(nout), iout(nout,:)
-  case( 'read' )
-    a3: select case( key2 )
-    case( 'grid' );     griddir   = key3
-    case( 'material' ); matdir    = key3
-    case( 'friction' ); fricdir   = key3
-    case( 'traction' ); tracdir   = key3
-    case( 'stress' );   stressdir = key3
-    case default; print '(3(a,x))', 'bad key:', key1, key2; stop
-    end select a3
   case( 'checkpoint' ); read( str, * ) key1, checkpoint
   case( 'np' );         read( str, * ) key1, np
   case( 'switch' )

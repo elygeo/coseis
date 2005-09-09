@@ -53,8 +53,8 @@ nsrc = count( s2 > 0. )
 allocate( jj(nsrc), kk(nsrc), ll(nsrc), msrcx(nsrc), msrcv(nsrc) ) 
 
 ! Spatial weighting function
-msrcx = pack( s2, s2 > 0. )
 msrcv = pack( s1, s2 > 0. )
+msrcx = pack( s2, s2 > 0. )
 msrcx = msrcx / sum( msrcx ) / msrcv
 
 ! Index map
