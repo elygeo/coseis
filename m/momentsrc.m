@@ -39,7 +39,7 @@ end
 s2 = msrcradius - sqrt( sum( w1 .* w1, 4 ) );
 imsrc = find( s2 > 0. );
 
-% Spatail weighting function
+% Spatial weighting function
 msrcv = s1( imsrc );
 msrcx = s2( imsrc );
 msrcx = msrcx / sum( msrcx ) ./ msrcv;

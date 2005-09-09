@@ -29,7 +29,7 @@ if init
   fprintf( 'RAM usage: %.0fMb\n', ram )
   fprintf( 'Run time: at least %s\n', datestr( nt * wt / 3600 / 24, 13 ) )
   outinit = ones( size( outit ) );
-  fprintf('Step  Amax        Vmax        Umax        Copmute     I/O/Viz\n')
+  fprintf('Step  Amax        Vmax        Umax        Compute     I/O/Viz\n')
   tic
   return
 end

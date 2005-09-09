@@ -21,7 +21,7 @@ end if
 ! Displacement
 u = u + dt * v
 
-! Gadient
+! Gradient
 ! G = grad(U + gam*V)    non PML region
 ! G' + DG = gradV          PML region
 s2 = 0.

@@ -91,13 +91,13 @@ s1(j,k,l) = 0.125 * ...
   + s2(j,k-1,l) + s2(j-1,k,l-1) ...
   + s2(j,k,l-1) + s2(j-1,k-1,l) );
 
-% Hourglass constant Y. FIXME off by factor of 8?
+% Hourglass constant. FIXME off by factor of 8?
 y = 6. * dx * dx * ( lam + 2. * mu );
 i = y ~= 0.;
 y(i) = 1. ./ y(i);
 y = 4. * mu .* ( lam + mu ) .* y .* s2;
 
-% Devide Lame constants by cell volume
+% Divide Lame parameters by cell volume
 i = s2 ~= 0.;
 s2(i) = 1. ./ s2(i);
 lam = lam .* s2;

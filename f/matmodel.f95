@@ -56,7 +56,7 @@ s1 = rho * ( s1 * s1 ) - 2. * s2
 i1 = hypocenter
 if ( hypop ) mu0 = mu( i1(1), i1(2), i1(3) )
 
-! Average Lame parameters on cell centers
+! Average Lame parameters onto cell centers
 lam = 0.
 mu = 0.
 i1 = i1cell
@@ -118,7 +118,7 @@ end forall
 y = 6. * dx * dx * ( lam + 2. * mu )
 where ( y /= 0. ) y = 4. * mu * ( lam + mu ) / y * s2
 
-! Divide Lame contants by cell volume
+! Divide Lame parameters by cell volume
 where ( s2 /= 0. ) s2 = 1. / s2
 lam = lam * s2
 mu = mu * s2

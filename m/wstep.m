@@ -8,7 +8,7 @@ uslipmax = max( abs( uslip(:) ) );
 % Displacement
 u = u + dt * v;
 
-% Gadient
+% Gradient
 % G = grad(U + gamma*V)    non PML region
 % G' + DG = gradV          PML region
 s2(:) = 0;
