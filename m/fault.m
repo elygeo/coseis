@@ -41,52 +41,64 @@ str    = repmat( 0, [ nf 3 ] );
 dip    = repmat( 0, [ nf 3 ] );
 
 % Friction model
-for iz = 1:size( friction, 1 )
-  [ i1, i2 ] = zone( ifric(iz,:), nn, offset, hypocenter, nrmdim );
-  i1 = max( i1, i1pml );
-  i2 = min( i2, i2pml );
-  i1(nrmdim) = 1;
-  i2(nrmdim) = 1;
-  j1 = i1(1); j2 = i2(1);
-  k1 = i1(2); k2 = i2(2);
-  l1 = i1(3); l2 = i2(3);
-  fs(j1:j2,k1:k2,l1:l2)    = friction(iz,1);
-  fd(j1:j2,k1:k2,l1:l2)    = friction(iz,2);
-  dc(j1:j2,k1:k2,l1:l2)    = friction(iz,3);
-  cohes(j1:j2,k1:k2,l1:l2) = friction(iz,4);
+if fricdir
+  error
+else
+  for iz = 1:size( friction, 1 )
+    [ i1, i2 ] = zone( ifric(iz,:), nn, offset, hypocenter, nrmdim );
+    i1 = max( i1, i1pml );
+    i2 = min( i2, i2pml );
+    i1(nrmdim) = 1;
+    i2(nrmdim) = 1;
+    j1 = i1(1); j2 = i2(1);
+    k1 = i1(2); k2 = i2(2);
+    l1 = i1(3); l2 = i2(3);
+    fs(j1:j2,k1:k2,l1:l2)    = friction(iz,1);
+    fd(j1:j2,k1:k2,l1:l2)    = friction(iz,2);
+    dc(j1:j2,k1:k2,l1:l2)    = friction(iz,3);
+    cohes(j1:j2,k1:k2,l1:l2) = friction(iz,4);
+  end
 end
 
 % Pretraction
-for iz = 1:size( traction, 1 )
-  [ i1, i2 ] = zone( itrac(iz,:), nn, offset, hypocenter, nrmdim );
-  i1 = max( i1, i1pml );
-  i2 = min( i2, i2pml );
-  i1(nrmdim) = 1;
-  i2(nrmdim) = 1;
-  j1 = i1(1); j2 = i2(1);
-  k1 = i1(2); k2 = i2(2);
-  l1 = i1(3); l2 = i2(3);
-  tt0nsd(j1:j2,k1:k2,l1:l2,1) = traction(iz,1);
-  tt0nsd(j1:j2,k1:k2,l1:l2,2) = traction(iz,2);
-  tt0nsd(j1:j2,k1:k2,l1:l2,3) = traction(iz,3);
+if tracdir
+  error
+else
+  for iz = 1:size( traction, 1 )
+    [ i1, i2 ] = zone( itrac(iz,:), nn, offset, hypocenter, nrmdim );
+    i1 = max( i1, i1pml );
+    i2 = min( i2, i2pml );
+    i1(nrmdim) = 1;
+    i2(nrmdim) = 1;
+    j1 = i1(1); j2 = i2(1);
+    k1 = i1(2); k2 = i2(2);
+    l1 = i1(3); l2 = i2(3);
+    tt0nsd(j1:j2,k1:k2,l1:l2,1) = traction(iz,1);
+    tt0nsd(j1:j2,k1:k2,l1:l2,2) = traction(iz,2);
+    tt0nsd(j1:j2,k1:k2,l1:l2,3) = traction(iz,3);
+  end
 end
 
 % Prestress
-for iz = 1:size( stress, 1 )
-  [ i1, i2 ] = zone( istress(iz,:), nn, offset, hypocenter, nrmdim );
-  i1 = max( i1, i1pml );
-  i2 = min( i2, i2pml );
-  i1(nrmdim) = 1;
-  i2(nrmdim) = 1;
-  j1 = i1(1); j2 = i2(1);
-  k1 = i1(2); k2 = i2(2);
-  l1 = i1(3); l2 = i2(3);
-  w0(j1:j2,k1:k2,l1:l2,1) = stress(iz,1);
-  w0(j1:j2,k1:k2,l1:l2,2) = stress(iz,2);
-  w0(j1:j2,k1:k2,l1:l2,3) = stress(iz,3);
-  w0(j1:j2,k1:k2,l1:l2,4) = stress(iz,4);
-  w0(j1:j2,k1:k2,l1:l2,5) = stress(iz,5);
-  w0(j1:j2,k1:k2,l1:l2,6) = stress(iz,6);
+if stressdir
+  error
+else
+  for iz = 1:size( stress, 1 )
+    [ i1, i2 ] = zone( istress(iz,:), nn, offset, hypocenter, nrmdim );
+    i1 = max( i1, i1pml );
+    i2 = min( i2, i2pml );
+    i1(nrmdim) = 1;
+    i2(nrmdim) = 1;
+    j1 = i1(1); j2 = i2(1);
+    k1 = i1(2); k2 = i2(2);
+    l1 = i1(3); l2 = i2(3);
+    w0(j1:j2,k1:k2,l1:l2,1) = stress(iz,1);
+    w0(j1:j2,k1:k2,l1:l2,2) = stress(iz,2);
+    w0(j1:j2,k1:k2,l1:l2,3) = stress(iz,3);
+    w0(j1:j2,k1:k2,l1:l2,4) = stress(iz,4);
+    w0(j1:j2,k1:k2,l1:l2,5) = stress(iz,5);
+    w0(j1:j2,k1:k2,l1:l2,6) = stress(iz,6);
+  end
 end
 
 % Normal vectors
@@ -147,7 +159,7 @@ j1 = i1(1); j2 = i2(1);
 k1 = i1(2); k2 = i2(2);
 l1 = i1(3); l2 = i2(3);
 for i = 1:3
-  r(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i);
+  r(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - x0(i);
 end
 r = sqrt( sum( r .* r, 4 ) );
 

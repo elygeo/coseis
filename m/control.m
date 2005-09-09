@@ -130,13 +130,13 @@ case 'slash'
     upvec(i1) = sign( v1(i1) );
     pos(i2) = sign( v2(i2) ) * camdist;
     camup( upvec )
-    camtarget( x0 )
+    camtarget( xcenter )
     campos( camtarget + pos )
     camva( 22 )
   else
     v2 = campos - camtarget;
     pos = camdist * v2 / norm( v2 );
-    camtarget( x0 )
+    camtarget( xcenter )
     campos( camtarget + pos )
     camva( 27.5 )
   end

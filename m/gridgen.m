@@ -9,14 +9,26 @@ else
   crdsys = [ downdim+1:3 1:downdim ];
 end
 
+x(:) = 0.;
 i1 = i1node;
 i2 = i2node;
 j1 = i1(1); j2 = i2(1);
 k1 = i1(2); k2 = i2(2);
 l1 = i1(3); l2 = i2(3);
 
+ioper = [ 1 1 1  -1 -1 -1 ];
+rand( 'state', 0 )
+
+%------------------------------------------------------------------------------%
+if griddir
+
+operator = 'g';
+error
+
+%------------------------------------------------------------------------------%
+else
+
 % Basic mesh
-x(:) = 0.;
 for i = j1:j2, x(i,:,:,1) = i - 1 - nhalo; end
 for i = k1:k2, x(:,i,:,2) = i - 1 - nhalo; end
 for i = l1:l2, x(:,:,i,3) = i - 1 - nhalo; end
@@ -40,9 +52,6 @@ c = 0.2 * l1;
 c = 0.01 * l1;
 c = 0.06 * l1;
 c = 0.1 * l1;
-
-ioper = [ 1 1 1  -1 -1 -1 ];
-rand( 'state', 0 )
 
 switch grid
 case 'constant'
@@ -106,20 +115,24 @@ case 'rand'
 otherwise error grid
 end
 
+end
+%------------------------------------------------------------------------------%
+
 % Duplicate edge nodes into halo
 x([1 end],:,:,:) = x([2 end-1],:,:,:);
 x(:,[1 end],:,:) = x(:,[2 end-1],:,:);
 x(:,:,[1 end],:) = x(:,:,[2 end-1],:);
 
 x = dx * x;
-xhypo = x(hypocenter(1),hypocenter(2),hypocenter(3),:);
-xhypo = xhypo(:)';
+i1 = hypocenter(1);
+x0 = x(i1(1),i1(2),i1(3),:);
+x0 = x0(:)';
 
 x1 = min( reshape( x, [ prod( nm ) 3 ] ) );
 x2 = max( reshape( x, [ prod( nm ) 3 ] ) );
-x0 = double( x1 + x2 ) / 2;
+xcenter = double( x1 + x2 ) / 2;
 for i = 1:3
-  w1(:,:,:,i) = x(:,:,:,i) - x0(i);
+  w1(:,:,:,i) = x(:,:,:,i) - xcenter(i);
 end
 s1 = sum( w1 .* w1, 4 );
 xmax = 2 * sqrt( double( max( s1(:) ) ) );

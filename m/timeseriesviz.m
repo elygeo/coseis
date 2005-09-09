@@ -17,7 +17,7 @@ if ~exist( 'w1', 'var' ) % not running from in sord
   field = 'v';
   ncomp = 3;
   offset = [ 0 0 0 ];
-  xhypo = textread( 'out/xhypo', '', 1 );
+  x0 = textread( 'out/x0', '', 1 );
   if explosion & strcmp( field, 'v' )
     found = 0;
     iz = 0;
@@ -99,7 +99,7 @@ figure( ...
  'DefaultTextHorizontalAlignment', 'center', ...
  'DefaultTextColor', foreground )
 if explosion & strcmp( field, 'v' )
-  xg = xhairtarg - xhypo;
+  xg = xhairtarg - x0;
   rg = sqrt( sum( xg .* xg ) );
   tg = tg - rg / vp;
   if ( xg(1) || xg(2) )

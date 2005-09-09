@@ -17,8 +17,8 @@ case 4, pos = [ a a a ] / 2; pos(crdsys(2)) = a / sqrt( 2 );
   camva( 1.25 * camva )
 otherwise error look
 end
-camtarget( x0 )
-campos( x0 + camdist * pos )
+camtarget( xcenter )
+campos( xcenter + camdist * pos )
 camup( upvec )
 axis equal
 axis vis3d

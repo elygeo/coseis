@@ -32,7 +32,7 @@ w1(j,k,l,:) = 0.125 * ...
 
 % Cell hypocenter distance
 for i = 1:3
-  w1(:,:,:,i) = w1(:,:,:,i) - xhypo(i);
+  w1(:,:,:,i) = w1(:,:,:,i) - x0(i);
 end
 
 % Find cells within msrcradius

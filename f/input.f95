@@ -37,8 +37,6 @@ loop: do
   end select
   if ( caseswitch /= switchcase ) cycle loop
   a2: select case( key1 )
-  case( 'grid' );       grid       = key2
-  case( 'srctimefcn' ); srctimefcn = key2
   case( 'n' );          read( str, * ) key1, nn, nt
   case( 'dx' );         read( str, * ) key1, dx
   case( 'dt' );         read( str, * ) key1, dt
@@ -53,6 +51,13 @@ loop: do
   case( 'msrcradius' ); read( str, * ) key1, msrcradius
   case( 'moment' );     read( str, * ) key1, moment
   case( 'domp' );       read( str, * ) key1, domp
+  case( 'srctimefcn' ); srctimefcn = key2
+  case( 'grid' );
+    grid = key2
+    if ( grid == 'read' ) then
+      griddir = key3
+    else
+    end if
   case( 'material' )
     if ( key2 == 'read' ) then
       matdir = key3

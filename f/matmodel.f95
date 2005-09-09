@@ -39,12 +39,12 @@ else
   end do
 end if
 
-! Material extremes
+! Material extremes TODO: make global
 where( rho > 0. ) matmin(1) = minval( rho ); matmax(1) = maxval( rho )
 where( s1 > 0. )  matmin(2) = minval( s1 );  matmax(2) = maxval( s1 )
 where( s2 > 0. )  matmin(3) = minval( s2 );  matmax(3) = maxval( s2 )
 
-! Check Courant stability condition. TODO: make general, global
+! Check Courant stability condition. TODO: make general
 courant = dt * matmax(2) * sqrt( 3. ) / dx
 if ( ip == 0 ) print '(a,es11.4)', '  Courant: 1 >', courant
 
@@ -88,8 +88,6 @@ do iz = 1, noper
   l1 = i1(3); l2 = i2(3)
   call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
 end do
-
-! Make sure cell volumes are zero on the fault
 if ( nrmdim /=0 ) then
   i = hypocenter(nrmdim)
   select case( nrmdim )
@@ -114,7 +112,7 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     + s2(j,k,l-1) + s2(j-1,k-1,l) )
 end forall
 
-! Hourglass constant Y. FIXME off by factor of 8?
+! Hourglass constant - FIXME off by factor of 8?
 y = 6. * dx * dx * ( lam + 2. * mu )
 where ( y /= 0. ) y = 4. * mu * ( lam + mu ) / y * s2
 

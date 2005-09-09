@@ -19,8 +19,8 @@ if init
   fid = fopen( 'out/endian', 'w' );
   fprintf( fid, '%s\n', endian );
   fclose( fid );
-  fid = fopen( 'out/xhypo', 'w' );
-  fprintf( fid, '%g %g %g\n', xhypo );
+  fid = fopen( 'out/x0', 'w' );
+  fprintf( fid, '%g %g %g\n', x0 );
   fclose( fid );
   mem = whos;
   mem = sum( [ mem.bytes ] );
