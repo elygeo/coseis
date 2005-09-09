@@ -19,9 +19,11 @@ for iz = 1:size( material, 1 )
   vp   = material(iz,2);
   vs   = material(iz,3);
 end
-matmin(1) = min( rho(:) ); matmax(1) = max( rho(:) );
-matmin(2) = min( s1(:)  ); matmax(2) = max( s1(:)  );
-matmin(3) = min( s2(:)  ); matmax(3) = max( s2(:)  );
+
+% Matrial extremes
+i = rho > 0.; matmin(1) = min( rho(i) ); matmax(1) = max( rho(i) );
+i = s1 > 0.;  matmin(2) = min( s1(i) );  matmax(2) = max( s1(i) );
+i = s2 > 0.;  matmin(3) = min( s2(i) );  matmax(3) = max( s2(i) );
 
 % Check Courant stability condition. TODO: check, make general
 courant = dt * matmax(2) * sqrt( 3 ) / dx;
@@ -59,10 +61,6 @@ y = 12. * dx * dx * ( lam + 2. * mu );
 i = y ~= 0.;
 y(i) = 1. ./ y(i);
 y = mu .* ( lam + mu ) .* y;
-
-% TODO
-yn = rho;
-yc = y;
 
 % Cell volume
 s2(:) = 0.;

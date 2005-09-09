@@ -1,3 +1,5 @@
+# Test PML boundary conditions
+
   hypocenter	21 21 21
   grid		constant
   msrcradius	150.
@@ -10,4 +12,5 @@
   nrmdim	0
   out v		1   0 0 0   31 31 31
   n		41 41 41   120
-  bc		1 1 1   0 0 0
+  bc		1 1 1   1 1 1
+

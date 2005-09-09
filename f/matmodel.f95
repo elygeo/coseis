@@ -38,9 +38,11 @@ else
     s2(j1:j2,k1:k2,l1:l2)  = material(iz,3)
   end do
 end if
-matmin(1) = minval( rho ); matmax(1) = maxval( rho )
-matmin(2) = minval( s1  ); matmax(2) = maxval( s1  )
-matmin(3) = minval( s2  ); matmax(3) = maxval( s2  )
+
+! Material extremes
+where( rho > 0. ) matmin(1) = minval( rho ); matmax(1) = maxval( rho )
+where( s1 > 0. )  matmin(2) = minval( s1 );  matmax(2) = maxval( s1 )
+where( s2 > 0. )  matmin(3) = minval( s2 );  matmax(3) = maxval( s2 )
 
 ! Check Courant stability condition. TODO: make general, global
 courant = dt * matmax(2) * sqrt( 3. ) / dx
