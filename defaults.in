@@ -3,7 +3,7 @@
 # Be careful editing this file, better to make changes in 'in'
 
 # n: ng(3) nt: number of mesh nodes and number of timesteps
-  n		21 21 21   20
+  n		41 41 41   40
 
 # dx: spacial step size
   dx		100.
@@ -25,9 +25,9 @@
   bc		1 1 0   1 1 1   # free surface at z=1
 
 # npml: number of pml damping zones
-# npml		10
+# npml		0   # no PML damping
 # npml		20
-  npml		0   # no PML damping
+  npml		10
 
 # nrmdim: direction normal to the fault plane
 # nrmdim	0   # no fault

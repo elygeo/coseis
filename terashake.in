@@ -1,0 +1,17 @@
+#------------------------------------------------------------------------------#
+# SORD input file - Terashake
+
+  out v		1   1 1 1   -1 -1 1
+
+  switch low
+  case low
+    n		300  150  40    600
+    dx		2000.
+    dt		.14
+    #grid	read ts/low
+  case full
+    n		3000 1500 400   6000
+    dx		200.
+    dt		.014
+    grid	read ts/full
+

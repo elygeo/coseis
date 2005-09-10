@@ -26,7 +26,7 @@ if ( init ) then
   if ( it == 0 ) then
     if ( ip == 0 ) then
       call system( 'rm -fr out; mkdir out; mkdir out/ckp; mkdir out/stats' )
-      open(  9, file='out/x0' )
+      open(  9, file='out/x0', status='new' )
       write( 9, * ) x0
       close( 9 )
     end if
@@ -35,7 +35,11 @@ if ( init ) then
     write( str, '(a,i5.5,i5.5)') 'out/ckp/', it, ip
     inquire( iolength=reclen ) u, v, vslip, uslip, trup, &
       p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
-    open( 9, file=str, form='unformatted', access='direct', recl=reclen, &
+    open( 9, &
+      file=str, &
+      recl=reclen, &
+      form='unformatted', &
+      access='direct', &
       status='old' )
     read( 9, rec=1 ) u, v, vslip, uslip, trup, &
       p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
@@ -99,7 +103,27 @@ if ( ip == 0 .and. outinit(iz) ) then
 end if
 do i = 1, nc
   write( str, '(a,i2.2,a,i1,a,i5.5)' ) 'out/', iz, '/', i, '/', it
-  call bwrite( outvar(iz), str, i1, i2, i )
+  select case( var )
+  case( 'a'     ); call bwrite( str, w1(:,:,:,i),   i1, i2 )
+  case( 'v'     ); call bwrite( str, v(:,:,:,i),    i1, i2 )
+  case( 'u'     ); call bwrite( str, u(:,:,:,i),    i1, i2 )
+  case( 'w'     );
+    if ( i < 4 )   call bwrite( str, w1(:,:,:,i),   i1, i2 )
+    if ( i > 3 )   call bwrite( str, w2(:,:,:,i-3), i1, i2 )
+  case( 'x'     ); call bwrite( str, x(:,:,:,i),    i1, i2 )
+  case( '|a|'   ); call bwrite( str, s1,            i1, i2 )
+  case( '|v|'   ); call bwrite( str, s2,            i1, i2 )
+  case( '|u|'   ); call bwrite( str, s1,            i1, i2 )
+  case( '|w|'   ); call bwrite( str, s2,            i1, i2 )
+  case( 'rho'   ); call bwrite( str, rho,           i1, i2 )
+  case( 'lam'   ); call bwrite( str, lam,           i1, i2 )
+  case( 'mu'    ); call bwrite( str, mu,            i1, i2 )
+  case( 'y'     ); call bwrite( str, y,             i1, i2 )
+  case( 'uslip' ); call bwrite( str, uslip,         i1, i2 )
+  case( 'vslip' ); call bwrite( str, vslip,         i1, i2 )
+  case( 'trup'  ); call bwrite( str, trup,          i1, i2 )
+  case default; stop 'var'
+  end select
 end do
 if ( ip == 0 ) then
   write( str, '(a,i2.2,a)' ) 'out/', iz, '/hdr'
@@ -119,8 +143,12 @@ if ( checkpoint /= 0 .and. mod( it, checkpoint ) == 0 ) then
   write( str, '(a,i5.5,i5.5)') 'out/ckp/', it, ip
   inquire( iolength=reclen ) u, v, vslip, uslip, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
-  open( 9, file=str, form='unformatted', access='direct', status='replace', &
-    recl=reclen )
+  open( 9, &
+    file=str, &
+    recl=reclen, &
+    form='unformatted', &
+    access='direct', &
+    status='replace' )
   write( 9, rec=1 ) u, v, vslip, uslip, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   close( 9 )

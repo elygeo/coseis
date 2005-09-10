@@ -87,7 +87,7 @@ cp sord.tgz meta/
 cp in meta/
 
 floatsize=4
-nvars=22
+nvars=21
 ram=$(( nn / np * floatsize * nvars / 1024 / 1024 ))
 
 rate=250000

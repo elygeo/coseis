@@ -7,6 +7,25 @@ implicit none
 
 integer, parameter :: nz = 256
 
+real, allocatable, dimension(:,:,:,:) :: &
+  p1, p2, p3, p4, p5, p6, &
+  g1, g2, g3, g4, g5, g6, &
+  x, u, v, w1, w2, &
+  nrm, t0, t1, t2, t3
+
+real, allocatable, dimension(:,:,:) :: &
+  s1, s2, rho, lam, mu, y, &
+  uslip, vslip, trup, fs, fd, dc, co, area, r, tn, ts, f1, f2
+
+real, allocatable, dimension(:) :: &
+  dn1, dn2, dc1, dc2
+
+real :: &
+  material(nz,3), friction(nz,4), traction(nz,3), stress(nz,6), &
+  dx, dt, viscosity(2), vrup, rcrit, moment(6), msrcradius, domp, &
+  amax, vmax, umax, wmax, vslipmax, uslipmax, x0(3), &
+  vp, vs, mu0, truptol
+
 integer :: &
   nn(3), nm(3), nhalo, offset(3), npml, bc(6), &
   nt, it, checkpoint, ip, np(3), wt(5), &
@@ -22,30 +41,11 @@ integer :: &
 
 integer, dimension(nz,6) :: ioper, ilock, iout, imat, ifric, itrac, istress
 
-real :: &
-  material(nz,3), friction(nz,4), traction(nz,3), stress(nz,6), &
-  dx, dt, viscosity(2), vrup, rcrit, moment(6), msrcradius, domp, &
-  amax, vmax, umax, wmax, vslipmax, uslipmax, x0(3), &
-  vp, vs, mu0, truptol
-
 character :: oper(nz)
 character(16) :: outvar(nz), grid='', srctimefcn=''
 character(64) :: matdir='', fricdir='', tracdir='', stressdir='', griddir=''
 
 logical :: hypop = .false.
-
-real, allocatable, dimension(:) :: &
-  dn1, dn2, dc1, dc2
-
-real, allocatable, dimension(:,:,:) :: &
-  s1, s2, rho, lam, mu, y, &
-  uslip, vslip, trup, fs, fd, dc, co, area, r, tn, ts, f1, f2
-
-real, allocatable, dimension(:,:,:,:) :: &
-  p1, p2, p3, p4, p5, p6, &
-  g1, g2, g3, g4, g5, g6, &
-  x, u, v, w1, w2, &
-  nrm, t0, t1, t2, t3
 
 end module
 

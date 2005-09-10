@@ -13,8 +13,7 @@ implicit none
 save
 real :: fs0, fd0, dc0, tn0, ts0
 integer :: down(3), handed, strdim, dipdim, iz, &
-  j3, j4, k3, k4, l3, l4, &
-  j5, j6, k5, k6, l5, l6
+  j3, j4, k3, k4, l3, l4
 logical :: init = .true.
 
 inittrue: if ( init ) then
@@ -148,7 +147,6 @@ down(downdim) = 1
 handed = mod( strdim - nrmdim + 1, 3 ) - 1
 
 ! Strike vectors
-t1 = 0.
 t1(:,:,:,1) = down(2) * nrm(:,:,:,3) - down(3) * nrm(:,:,:,2)
 t1(:,:,:,2) = down(3) * nrm(:,:,:,1) - down(1) * nrm(:,:,:,3)
 t1(:,:,:,3) = down(1) * nrm(:,:,:,2) - down(2) * nrm(:,:,:,1)
@@ -159,7 +157,6 @@ do i = 1, 3
 end do
 
 ! Dip vectors
-t2 = 0.
 t2(:,:,:,1) = nrm(:,:,:,2) * t1(:,:,:,3) - nrm(:,:,:,3) * t1(:,:,:,2)
 t2(:,:,:,2) = nrm(:,:,:,3) * t1(:,:,:,1) - nrm(:,:,:,1) * t1(:,:,:,3)
 t2(:,:,:,3) = nrm(:,:,:,1) * t1(:,:,:,2) - nrm(:,:,:,2) * t1(:,:,:,1)
@@ -197,12 +194,12 @@ if ( hypop ) then
   j = i1(1)
   k = i1(2)
   l = i1(3)
-  tn0 = sum( t0(j,k,l,:) * nrm(j,k,l,:) )
-  ts0 = sqrt( sum( ( t0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) ** 2. ) )
-  tn0 = max( -tn0, 0. )
   fs0 = fs(j,k,l)
   fd0 = fd(j,k,l)
   dc0 = dc(j,k,l)
+  tn0 = sum( t0(j,k,l,:) * nrm(j,k,l,:) )
+  ts0 = sqrt( sum( ( t0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) ** 2. ) )
+  tn0 = max( -tn0, 0. )
   print '(a,es12.4)', '  S:    ', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 )
   print '(2(a,es12.4,x))', '  dc:   ', dc0, '>', 3 * dx * tn0 * ( fs0 - fd0 ) / mu0
   print '(2(a,es12.4,x))', '  rcrit:', rcrit, '>', mu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ** 2
@@ -229,11 +226,6 @@ i2(nrmdim) = hypocenter(nrmdim) + 1
 j3 = i1(1); j4 = i2(1)
 k3 = i1(2); k4 = i2(2)
 l3 = i1(3); l4 = i2(3)
-i1(nrmdim) = 1
-i2(nrmdim) = 1
-j5 = i1(1); j6 = i2(1)
-k5 = i1(2); k6 = i2(2)
-l5 = i1(3); l6 = i2(3)
 
 ! Zero slip velocity condition
 f1 = dt * area * ( rho(j1:j2,k1:k2,l1:l2) + rho(j3:j4,k3:k4,l3:l4) )
