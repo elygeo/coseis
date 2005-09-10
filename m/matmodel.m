@@ -13,17 +13,9 @@ if matdir
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
-  bendian = textread( [ matdir '/endian' ], '%c' );
-  bendian = bendian(1);
-  fid = fopen( [ matdir '/rho', 'r', bendian );
-  rho(j1:j2,k1:k2,l1:l2) = fread( fid, inf, 'float32' );
-  fclose( fid );
-  fid = fopen( [ matdir '/vp', 'r', bendian );
-  s1(j1:j2,k1:k2,l1:l2) = fread( fid, inf, 'float32' );
-  fclose( fid );
-  fid = fopen( [ matdir '/vs', 'r', bendian );
-  s2(j1:j2,k1:k2,l1:l2) = fread( fid, inf, 'float32' );
-  fclose( fid );
+  rho(j1:j2,k1:k2,l1:l2) = fread( matdir, 'rho' );
+  s1(j1:j2,k1:k2,l1:l2)  = fread( matdir, 'vp' );
+  s2(j1:j2,k1:k2,l1:l2)  = fread( matdir, 'vs' );
 else
   for iz = 1:size( material, 1 )
     [ i1, i2 ] = zone( imat(iz,:), nn, offset, hypocenter, nrmdim );
@@ -33,9 +25,6 @@ else
     rho(j1:j2,k1:k2,l1:l2) = material(iz,1);
     s1(j1:j2,k1:k2,l1:l2)  = material(iz,2);
     s2(j1:j2,k1:k2,l1:l2)  = material(iz,3);
-    rho0 = material(iz,1);
-    vp   = material(iz,2);
-    vs   = material(iz,3);
   end
 end
 

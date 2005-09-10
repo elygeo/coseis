@@ -1,24 +1,31 @@
 %------------------------------------------------------------------------------%
 % TIMESERIESVIZ
 
+% test if running from SORD
+
+if ~exist( 'w1', 'var' )
+  addpath m
+  input
+end
+
 nout = size( outvar, 1 );
 explosion = ...
   msrcradius > 0. & ...
   moment(1:3) == moment(1) & ...
   moment(4:6) == 0. & ...
-  nrmdim == 0;
+  nrmdim == 0 & ...
+  length( griddir ) == 0;
 
-if ~exist( 'w1', 'var' ) % not running from in sord
-  addpath m
-  input
+if ~exist( 'w1', 'var' )
   xhair = [ 30 30 30 ];
-  % init = 1; viz
-  % init = 2; viz
+  nn = n(1:3);
   km = 0;
   field = 'v';
   ncomp = 3;
   offset = [ 0 0 0 ];
-  x0 = textread( 'out/x0', '', 1 );
+  it = textread( 'out/timestep' );
+  endian = textread( 'meta/endian', '%c', 1 );
+  x0 = textread( 'out/x0', '%f', 3 )';
   if explosion & strcmp( field, 'v' )
     found = 0;
     iz = 0;
@@ -41,6 +48,10 @@ if ~exist( 'w1', 'var' ) % not running from in sord
       xhairtarg(i) = fread( fid, 1, 'float32' );
       fclose( fid );
     end
+  end
+  dark = 1;
+  if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
+  else     foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 1;
   end
 end
 
@@ -75,7 +86,7 @@ case 'v', time = ( 0 : it ) * dt + dt / 2;
 otherwise time = ( 0 : it ) * dt;
 end
 tg = time;
-newtitles = titles(2:end);
+newtitles = { 'Vx' 'Vy' 'Vz' };
 
 if km
   fcorner = 6000 / ( 6 * dx );
@@ -88,18 +99,20 @@ if km
 end
 
 figure( ...
- 'Color', background, ...
- 'KeyPressFcn', 'delete(gcbf)', ...
- 'DefaultAxesColorOrder', foreground, ...
- 'DefaultAxesColor', background, ...
- 'DefaultAxesXColor', foreground, ...
- 'DefaultAxesYColor', foreground, ...
- 'DefaultAxesZColor', foreground, ...
- 'DefaultLineColor', foreground, ...
- 'DefaultLineLinewidth', linewidth, ...
- 'DefaultTextHorizontalAlignment', 'center', ...
- 'DefaultTextColor', foreground )
+  'Color', background, ...
+  'KeyPressFcn', 'delete(gcbf)', ...
+  'DefaultAxesColorOrder', foreground, ...
+  'DefaultAxesColor', background, ...
+  'DefaultAxesXColor', foreground, ...
+  'DefaultAxesYColor', foreground, ...
+  'DefaultAxesZColor', foreground, ...
+  'DefaultLineColor', foreground, ...
+  'DefaultLineLinewidth', linewidth, ...
+  'DefaultTextHorizontalAlignment', 'center', ...
+  'DefaultTextColor', foreground )
 if explosion & strcmp( field, 'v' )
+  rho0 = material(end,1);
+  vp = material(end,2);
   xg = xhairtarg - x0;
   rg = sqrt( sum( xg .* xg ) );
   tg = tg - rg / vp;
@@ -130,6 +143,7 @@ if explosion & strcmp( field, 'v' )
   end
   plot( time, vk, ':' )
   hold on
+asdf
 end
 
 plot( time, vg )

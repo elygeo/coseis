@@ -73,7 +73,7 @@
   nclramp	10
 
 # moment(6): moment source rate: Mxx, Myy, Mzz, Myz, Mzx, Mxy
-  moment	0. 0. 0. 0. 0. 0.
+  moment	1e16 1e16 1e16   0. 0. 0.   # explosion source
 
 # msrcradius: moment source radius
 # msrcradius	150.  # eight cells around hypocenter

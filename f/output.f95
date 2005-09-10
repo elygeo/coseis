@@ -103,7 +103,7 @@ if ( ip == 0 .and. outinit(iz) ) then
 end if
 do i = 1, nc
   write( str, '(a,i2.2,a,i1,a,i5.5)' ) 'out/', iz, '/', i, '/', it
-  select case( var )
+  select case( outvar(iz) )
   case( 'a'     ); call bwrite( str, w1(:,:,:,i),   i1, i2 )
   case( 'v'     ); call bwrite( str, v(:,:,:,i),    i1, i2 )
   case( 'u'     ); call bwrite( str, u(:,:,:,i),    i1, i2 )

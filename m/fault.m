@@ -18,10 +18,10 @@ if fricdir
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
-  fs(j1:j2,k1:k2,l1:l2) = bread( matdir, 'fs' );
-  fd(j1:j2,k1:k2,l1:l2) = bread( matdir, 'fd' );
-  dc(j1:j2,k1:k2,l1:l2) = bread( matdir, 'dc' );
-  co(j1:j2,k1:k2,l1:l2) = bread( matdir, 'co' );
+  fs(j1:j2,k1:k2,l1:l2) = bread( fricdir, 'fs' );
+  fd(j1:j2,k1:k2,l1:l2) = bread( fricdir, 'fd' );
+  dc(j1:j2,k1:k2,l1:l2) = bread( fricdir, 'dc' );
+  co(j1:j2,k1:k2,l1:l2) = bread( fricdir, 'co' );
 else
   for iz = 1:size( friction, 1 )
     [ i1, i2 ] = zone( ifric(iz,:), nn, offset, hypocenter, nrmdim );

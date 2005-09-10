@@ -24,7 +24,7 @@ real :: &
   material(nz,3), friction(nz,4), traction(nz,3), stress(nz,6), &
   dx, dt, viscosity(2), vrup, rcrit, moment(6), msrcradius, domp, &
   amax, vmax, umax, wmax, vslipmax, uslipmax, x0(3), &
-  vp, vs, mu0, truptol
+  mu0, truptol
 
 integer :: &
   nn(3), nm(3), nhalo, offset(3), npml, bc(6), &

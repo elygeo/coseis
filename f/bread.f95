@@ -7,8 +7,8 @@ subroutine bread( s1, filename, var, i1, i2 )
 
 implicit none
 real, intent(out) :: s1(:,:,:)
-character(256), intent(inout) :: filename
-character(8), intent(in) :: var
+character*(*), intent(inout) :: filename
+character*(*), intent(in) :: var
 integer, intent(in) :: i1(3), i2(3)
 integer :: j1, j2, k1, k2, l1, l2
 integer :: reclen

@@ -23,8 +23,8 @@ if ( matdir /= '' ) then
   i1 = i1cell
   i2 = i2cell + 1
   call bread( rho, matdir, 'rho', i1, i2 )
-  call bread( vp,  matdir, 'vp',  i1, i2 )
-  call bread( vs,  matdir, 'vs',  i1, i2 )
+  call bread( s1,  matdir, 'vp',  i1, i2 )
+  call bread( s2,  matdir, 'vs',  i1, i2 )
 else
   do iz = 1, nmat
     call zone( i1, i2, imat(iz,:), nn, offset, hypocenter, nrmdim )
