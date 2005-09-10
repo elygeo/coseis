@@ -26,7 +26,7 @@ nf(nrmdim) = 1;
 fs     = repmat( 0, nf );
 fd     = repmat( 0, nf );
 dc     = repmat( 0, nf );
-cohes  = repmat( 1e9, nf );
+co     = repmat( 1e9, nf );
 w0     = repmat( 0, [ nf 6 ] );
 tt0nsd = repmat( 0, [ nf 3 ] );
 uslip  = repmat( 0, nf );
@@ -42,40 +42,41 @@ dip    = repmat( 0, [ nf 3 ] );
 
 % Friction model
 if fricdir
-  error
+  i1 = i1nodepml;
+  i2 = i2nodepml;
+  i1(nrmdim) = 1;
+  i2(nrmdim) = 1;
+  j1 = i1(1); j2 = i2(1);
+  k1 = i1(2); k2 = i2(2);
+  l1 = i1(3); l2 = i2(3);
+  bendian = textread( [ matdir '/endian' ], '%c' );
+  bendian = bendian(1);
+  fid = fopen( [ matdir '/fs', 'r', bendian );
+  fs(j1:j2,k1:k2,l1:l2) = fread( fid, inf, 'float32' );
+  fclose( fid );
+  fid = fopen( [ matdir '/fd', 'r', bendian );
+  fd(j1:j2,k1:k2,l1:l2) = fread( fid, inf, 'float32' );
+  fclose( fid );
+  fid = fopen( [ matdir '/dc', 'r', bendian );
+  dc(j1:j2,k1:k2,l1:l2) = fread( fid, inf, 'float32' );
+  fclose( fid );
+  fid = fopen( [ matdir '/co', 'r', bendian );
+  co(j1:j2,k1:k2,l1:l2) = fread( fid, inf, 'float32' );
+  fclose( fid );
 else
   for iz = 1:size( friction, 1 )
     [ i1, i2 ] = zone( ifric(iz,:), nn, offset, hypocenter, nrmdim );
-    i1 = max( i1, i1pml );
-    i2 = min( i2, i2pml );
+    i1 = max( i1, i1nodepml );
+    i2 = min( i2, i2nodepml );
     i1(nrmdim) = 1;
     i2(nrmdim) = 1;
     j1 = i1(1); j2 = i2(1);
     k1 = i1(2); k2 = i2(2);
     l1 = i1(3); l2 = i2(3);
-    fs(j1:j2,k1:k2,l1:l2)    = friction(iz,1);
-    fd(j1:j2,k1:k2,l1:l2)    = friction(iz,2);
-    dc(j1:j2,k1:k2,l1:l2)    = friction(iz,3);
-    cohes(j1:j2,k1:k2,l1:l2) = friction(iz,4);
-  end
-end
-
-% Pretraction
-if tracdir
-  error
-else
-  for iz = 1:size( traction, 1 )
-    [ i1, i2 ] = zone( itrac(iz,:), nn, offset, hypocenter, nrmdim );
-    i1 = max( i1, i1pml );
-    i2 = min( i2, i2pml );
-    i1(nrmdim) = 1;
-    i2(nrmdim) = 1;
-    j1 = i1(1); j2 = i2(1);
-    k1 = i1(2); k2 = i2(2);
-    l1 = i1(3); l2 = i2(3);
-    tt0nsd(j1:j2,k1:k2,l1:l2,1) = traction(iz,1);
-    tt0nsd(j1:j2,k1:k2,l1:l2,2) = traction(iz,2);
-    tt0nsd(j1:j2,k1:k2,l1:l2,3) = traction(iz,3);
+    fs(j1:j2,k1:k2,l1:l2) = friction(iz,1);
+    fd(j1:j2,k1:k2,l1:l2) = friction(iz,2);
+    dc(j1:j2,k1:k2,l1:l2) = friction(iz,3);
+    co(j1:j2,k1:k2,l1:l2) = friction(iz,4);
   end
 end
 
@@ -98,6 +99,25 @@ else
     w0(j1:j2,k1:k2,l1:l2,4) = stress(iz,4);
     w0(j1:j2,k1:k2,l1:l2,5) = stress(iz,5);
     w0(j1:j2,k1:k2,l1:l2,6) = stress(iz,6);
+  end
+end
+
+% Pretraction
+if tracdir
+  error
+else
+  for iz = 1:size( traction, 1 )
+    [ i1, i2 ] = zone( itrac(iz,:), nn, offset, hypocenter, nrmdim );
+    i1 = max( i1, i1pml );
+    i2 = min( i2, i2pml );
+    i1(nrmdim) = 1;
+    i2(nrmdim) = 1;
+    j1 = i1(1); j2 = i2(1);
+    k1 = i1(2); k2 = i2(2);
+    l1 = i1(3); l2 = i2(3);
+    tt0nsd(j1:j2,k1:k2,l1:l2,1) = traction(iz,1);
+    tt0nsd(j1:j2,k1:k2,l1:l2,2) = traction(iz,2);
+    tt0nsd(j1:j2,k1:k2,l1:l2,3) = traction(iz,3);
   end
 end
 
@@ -225,20 +245,19 @@ ts3 = tt - tn3;
 ts = sqrt( sum( ts3 .* ts3, 4 ) );
 
 % Friction Law
-cohes1 = cohes;
 tn1 = -tn;
 ii = tn1 < 0.;
 tn1(ii) = 0.;
 c = repmat( 1, size( dc ) );
 i = uslip < dc;
 c(i) = uslip(i) ./ dc(i);
-ff = ( ( 1 - c ) .* fs + c .* fd ) .* tn1 + cohes1;
+ff = ( ( 1 - c ) .* fs + c .* fd ) .* tn1 + co;
 
 % Nucleation
 if rcrit && vrup
   c = 1.;
   if nclramp, c = min( ( it * dt - r / vrup ) / ( nclramp * dt ), 1. ); end
-  ff2 = ( 1. - c ) .* ts + c .* ( fd .* tn1 + cohes1 );
+  ff2 = ( 1. - c ) .* ts + c .* ( fd .* tn1 + co );
   i = r < min( rcrit, it * dt * vrup ) & ff2 < ff;
   ff(i) = ff2(i);
 end

@@ -81,7 +81,7 @@ for iz = 1:size( outit, 1 )
   j = i1(1):i2(1);
   for i = 1:nc
     file = sprintf( 'out/%02d/%1d/%05d', iz, i, it );
-    fid = fopen( file, 'wl' );
+    fid = fopen( file, 'w' );
     switch outvar{iz}
     case 'x',     fwrite( fid, x(j,k,l,i),        'float32' );
     case 'rho',   fwrite( fid, rho(j,k,l),        'float32' );

@@ -76,17 +76,19 @@ s1 = 0.
 s2 = 0.
 
 ! Print some info, requires LAPACK for eigenvalue calculation
-mm(1,1) = moment(1)
-mm(2,2) = moment(2)
-mm(3,3) = moment(3)
-mm(2,3) = moment(4)
-mm(1,3) = moment(5)
-mm(1,2) = moment(6)
-call ssyev( 'N', 'U', 3, mm, 3, eigval, eigwork, size(eigwork), eiginfo )
-m0 = maxval( abs( eigval ) )
-print '(a,es12.4)', '  M0:', m0
-print '(a,es12.4)', '  Mw:', 2. / 3. * log10( m0 ) - 10.7
-print '(a,es12.4)', '  D: ', m0 / mu0 / dx / dx
+if ( hypop ) then
+  mm(1,1) = moment(1)
+  mm(2,2) = moment(2)
+  mm(3,3) = moment(3)
+  mm(2,3) = moment(4)
+  mm(1,3) = moment(5)
+  mm(1,2) = moment(6)
+  call ssyev( 'N', 'U', 3, mm, 3, eigval, eigwork, size(eigwork), eiginfo )
+  m0 = maxval( abs( eigval ) )
+  print '(a,es12.4)', '  M0:', m0
+  print '(a,es12.4)', '  Mw:', 2. / 3. * log10( m0 ) - 10.7
+  print '(a,es12.4)', '  D: ', m0 / mu0 / dx / dx
+end if
 
 return
 

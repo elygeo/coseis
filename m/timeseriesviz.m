@@ -36,7 +36,7 @@ if ~exist( 'w1', 'var' ) % not running from in sord
     goffset = 4 * sum( i .* cumprod( [ 1 n(1:2) ] ) );
     for i = 1:3
       file = sprintf( 'out/%02d/%1d/00001', iz, i );
-      fid = fopen( file, 'rl' );
+      fid = fopen( file, 'r', endian );
       fseek( fid, goffset, -1 );
       xhairtarg(i) = fread( fid, 1, 'float32' );
       fclose( fid );
@@ -63,7 +63,7 @@ clear vg
 for i = 1:ncomp
 for itt = 1:it
   file = sprintf( 'out/%02d/%1d/%05d', iz, i, itt );
-  fid = fopen( file, 'rl' );
+  fid = fopen( file, 'r', endian );
   fseek( fid, goffset, -1 );
   vg(itt+1,i) = fread( fid, 1, 'float32' );
   fclose( fid );

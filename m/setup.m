@@ -14,8 +14,6 @@ hypocenter(i) = ceil( nn(i) / 2 );
 hypocenter = hypocenter + offset;
 if nrmdim, nn(nrmdim) = nn(nrmdim) + 1; end
 nm = nn + 2 * nhalo;
-i1pml = nhalo + 1  + bc(1:3) * npml;
-i2pml = nhalo + nn - bc(4:6) * npml;
 
 i1node = nhalo + [ 1 1 1 ];
 i2node = nhalo + nn;

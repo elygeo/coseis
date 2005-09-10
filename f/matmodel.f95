@@ -22,9 +22,9 @@ s2 = 0.
 if ( matdir /= '' ) then
   i1 = i1cell
   i2 = i2cell + 1
-  call bread( 'rho', matdir, i1, i2 )
-  call bread( 'vp',  matdir, i1, i2 )
-  call bread( 'vs',  matdir, i1, i2 )
+  call bread( rho, matdir, 'rho', i1, i2 )
+  call bread( vp,  matdir, 'vp',  i1, i2 )
+  call bread( vs,  matdir, 'vs',  i1, i2 )
 else
   do iz = 1, nmat
     call zone( i1, i2, imat(iz,:), nn, offset, hypocenter, nrmdim )
@@ -53,8 +53,10 @@ s2 = rho * s2 * s2
 s1 = rho * ( s1 * s1 ) - 2. * s2
 
 ! Save mu at hypocenter
-i1 = hypocenter
-if ( hypop ) mu0 = mu( i1(1), i1(2), i1(3) )
+if ( hypop ) then
+  i1 = hypocenter
+  if ( hypop ) mu0 = mu( i1(1), i1(2), i1(3) )
+end if
 
 ! Average Lame parameters onto cell centers
 lam = 0.

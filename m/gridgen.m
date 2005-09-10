@@ -23,7 +23,17 @@ rand( 'state', 0 )
 if griddir
 
 operator = 'g';
-error
+bendian = textread( [ griddir '/endian' ], '%c' );
+bendian = bendian(1);
+fid = fopen( [ griddir '/x1', 'r', bendian );
+x(j1:j2,k1:k2,l1:l2,1) = fread( fid, inf, 'float32' );
+fclose( fid );
+fid = fopen( [ griddir '/x2', 'r', bendian );
+x(j1:j2,k1:k2,l1:l2,2) = fread( fid, inf, 'float32' );
+fclose( fid );
+fid = fopen( [ griddir '/x3', 'r', bendian );
+x(j1:j2,k1:k2,l1:l2,3) = fread( fid, inf, 'float32' );
+fclose( fid );
 
 %------------------------------------------------------------------------------%
 else

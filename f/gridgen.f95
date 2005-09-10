@@ -26,9 +26,10 @@ l1 = i1(3); l2 = i2(3)
 x = 0.
 if ( griddir /= '' ) then
   oper(1) = 'g'
-  call bread( 'x1', griddir, i1, i2 )
-  call bread( 'x2', griddir, i1, i2 )
-  call bread( 'x3', griddir, i1, i2 )
+  s1 = 0.
+  call bread( s1, griddir, 'x1', i1, i2 ); x(:,:,:,1) = s1
+  call bread( s1, griddir, 'x2', i1, i2 ); x(:,:,:,2) = s1
+  call bread( s1, griddir, 'x3', i1, i2 ); x(:,:,:,3) = s1
 else
   forall( i=j1:j2 ) x(i,:,:,1)  = i - 1 - offset(1)
   forall( i=k1:k2 ) x(:,i,:,2)  = i - 1 - offset(2)

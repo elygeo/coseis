@@ -7,7 +7,23 @@ fprintf( 'Material model\n' )
 rho(:) = 0.;
 s1(:) = 0.;
 s2(:) = 0.;
-if griddir
+if matdir
+  i1 = i1cell;
+  i2 = i2cell + 1;
+  j1 = i1(1); j2 = i2(1);
+  k1 = i1(2); k2 = i2(2);
+  l1 = i1(3); l2 = i2(3);
+  bendian = textread( [ matdir '/endian' ], '%c' );
+  bendian = bendian(1);
+  fid = fopen( [ matdir '/rho', 'r', bendian );
+  rho(j1:j2,k1:k2,l1:l2) = fread( fid, inf, 'float32' );
+  fclose( fid );
+  fid = fopen( [ matdir '/vp', 'r', bendian );
+  s1(j1:j2,k1:k2,l1:l2) = fread( fid, inf, 'float32' );
+  fclose( fid );
+  fid = fopen( [ matdir '/vs', 'r', bendian );
+  s2(j1:j2,k1:k2,l1:l2) = fread( fid, inf, 'float32' );
+  fclose( fid );
 else
   for iz = 1:size( material, 1 )
     [ i1, i2 ] = zone( imat(iz,:), nn, offset, hypocenter, nrmdim );

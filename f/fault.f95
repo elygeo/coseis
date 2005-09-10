@@ -32,10 +32,10 @@ if ( fricdir /= '' ) then
   i1 = i1cell
   i2 = i2cell + 1
   i2(nrmdim) = 1
-  call bread( 'fs', fricdir, i1, i2 )
-  call bread( 'fd', fricdir, i1, i2 )
-  call bread( 'dc', fricdir, i1, i2 )
-  call bread( 'co', fricdir, i1, i2 )
+  call bread( fs, fricdir, 'fs', i1, i2 )
+  call bread( fd, fricdir, 'fd', i1, i2 )
+  call bread( dc, fricdir, 'dc', i1, i2 )
+  call bread( co, fricdir, 'co', i1, i2 )
 else
   do iz = 1, nfric
     call zone( i1, i2, ifric(iz,:), nn, offset, hypocenter, nrmdim )
@@ -54,18 +54,19 @@ else
 end if
 
 ! Prestress
-t1 = 0.
-t2 = 0.
+t1 = 0;
+t2 = 0;
 if ( stressdir /= '' ) then
+  s1 = 0.
   i1 = i1cell
   i2 = i2cell + 1
   i2(nrmdim) = 1
-  call bread( 'xx', stressdir, i1, i2 )
-  call bread( 'yy', stressdir, i1, i2 )
-  call bread( 'zz', stressdir, i1, i2 )
-  call bread( 'yz', stressdir, i1, i2 )
-  call bread( 'zx', stressdir, i1, i2 )
-  call bread( 'xy', stressdir, i1, i2 )
+  call bread( s1, stressdir, 'xx', i1, i2 ); t1(:,:,:,1) = s1
+  call bread( s1, stressdir, 'yy', i1, i2 ); t1(:,:,:,2) = s1
+  call bread( s1, stressdir, 'zz', i1, i2 ); t1(:,:,:,3) = s1
+  call bread( s1, stressdir, 'yz', i1, i2 ); t2(:,:,:,1) = s1
+  call bread( s1, stressdir, 'zx', i1, i2 ); t2(:,:,:,2) = s1
+  call bread( s1, stressdir, 'xy', i1, i2 ); t2(:,:,:,3) = s1
 else
   do iz = 1, nstress
     call zone( i1, i2, istress(iz,:), nn, offset, hypocenter, nrmdim )
@@ -88,12 +89,13 @@ end if
 ! Pretraction
 t3 = 0.
 if ( tracdir == '' ) then
+  s1 = 0.
   i1 = i1cell
   i2 = i2cell + 1
   i2(nrmdim) = 1
-  call bread( 'tn', tracdir, i1, i2 )
-  call bread( 'ts', tracdir, i1, i2 )
-  call bread( 'td', tracdir, i1, i2 )
+  call bread( s1, tracdir, 'tn', i1, i2 ); t3(:,:,:,1) = s1
+  call bread( s1, tracdir, 'ts', i1, i2 ); t3(:,:,:,2) = s1
+  call bread( s1, tracdir, 'td', i1, i2 ); t3(:,:,:,3) = s1
 else
   do iz = 1, ntrac
     call zone( i1, i2, itrac(iz,:), nn, offset, hypocenter, nrmdim )
