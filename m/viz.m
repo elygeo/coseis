@@ -37,8 +37,8 @@ elseif init
   ulim = -1;
   wlim = -1;
   xlim = 0;
-  usliplim = -1;
-  vsliplim = -1;
+  uslim = -1;
+  vslim = -1;
   tnlim = -1;
   tslim = -1;
   camdist = -1;

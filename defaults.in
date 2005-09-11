@@ -89,12 +89,11 @@
   domp		.056   # 8 * dt
 
 # out: outvar outit zone(6): binary file output
-# outvar choices: a, v, u, w, |a|, |v|, |u|, |w|,  
-#   rho, lam, miu, yn, yc, uslip, vslip, trup, 
+# outvar choices: a, v, u, w, am, vm, um, wm, rho, lam, miu, y, us, vs, trup, 
 # outit: output interval, negative = count back from nt
 # static variables (e.g. rho) are only written once
 # out v		10   1 1 1   -1 -1 -1   # velocity field every 10 time steps
-# out uslip	-1   1 1 1   -1 -1 -1   # final slip on the fault
+# out us	-1   1 1 1   -1 -1 -1   # final slip on the fault
 
 # checkpoint: interval for writing checkpoint restart files
 # checkpoint	0     # no checkpointing

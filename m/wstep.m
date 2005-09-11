@@ -1,12 +1,9 @@
 %------------------------------------------------------------------------------%
 % WSTEP - Increment displacement and stress
 
-% Fault
-uslip = uslip + dt * vslip;
-uslipmax = max( abs( uslip(:) ) );
-
-% Displacement
+% Displacement & Slip
 u = u + dt * v;
+us = us + dt * vs;
 
 % Gradient
 % G = grad(U + gamma*V)    non PML region
@@ -20,8 +17,8 @@ for id = 1:3
   for iz = 1:size( operator, 1 )
     [ i1, i2 ] = zone( ioper(iz,:), nn, offset, hypocenter, nrmdim );
     op = operator(iz);
-    i1 = max( i1, i1pml );
-    i2 = min( i2 - 1, i2pml - 1 );
+    i1 = max( i1, i1cellpml );
+    i2 = min( i2 - 1, i2cellpml );
     j = i1(1):i2(1);
     k = i1(2):i2(2);
     l = i1(3):i2(3);
@@ -109,6 +106,7 @@ s1 = sqrt( sum( u .* u, 4 ) );
 s2 = sqrt( sum( w1 .* w1, 4 ) + 2 * sum( w2 .* w2, 4 ) );
 [ umax, iumax ] = max( s1(:) );
 [ wmax, iwmax ] = max( s2(:) );
+[ usmax, iusmax ] = max( abs( us(:) ) );
 
 if umax > dx / 10
   fprintf( 'Warning: u !<< dx\n' )

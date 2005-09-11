@@ -148,7 +148,7 @@ f1 = sqrt( sum( t1 .* t1, 4 ) );
 ii = f1 ~= 0.;
 f1(ii) = handed ./ f1(ii);
 for i = 1:3
-  t1(:,:,:,i) = t1(:,:,:,i) .* tmp;
+  t1(:,:,:,i) = t1(:,:,:,i) .* f1;
 end
 
 % Dip vectors
@@ -195,12 +195,12 @@ dc0 = dc(j,k,l);
 tn0 = sum( t0(j,k,l,:) .* nrm(j,k,l,:) );
 ts0 = norm( shiftdim( t0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) );
 tn0 = max( -tn0, 0 );
-fprintf( 'S:    %12.4e\n', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 ) )
-fprintf( 'dc:   %12.4e>%12.4e\n', dc0, 3 * dx * tn0 * ( fs0 - fd0 ) / mu0 )
-fprintf( 'rcrit:%12.4e>%12.4e\n', rcrit, mu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2 )
+fprintf( '  S:    %11.4e\n', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 ) )
+fprintf( '  dc:   %11.4e >%11.4e\n', dc0, 3 * dx * tn0 * ( fs0 - fd0 ) / mu0 )
+fprintf( '  rcrit:%11.4e >%11.4e\n', rcrit, mu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2 )
 
-uslipmax = 0;
-vslipmax = 0;
+usmax = 0;
+vsmax = 0;
 tnmax = 0;
 tsmax = 0;
 
@@ -228,7 +228,7 @@ f1 = dt * area .* ( rho(j1:j2,k1:k2,l1:l2) + rho(j3:j4,k3:k4,l3:l4) );
 ii = f1 ~= 0.;
 f1(ii) = 1 ./ f1(ii);
 for i = 1:3
-  t3(:,:,:,i) = tt0(:,:,:,i) + f1 .* ...
+  t3(:,:,:,i) = t0(:,:,:,i) + f1 .* ...
     ( v(j3:j4,k3:k4,l3:l4,i) + dt .* w1(j3:j4,k3:k4,l3:l4,i) ...
     - v(j1:j2,k1:k2,l1:l2,i) - dt .* w1(j1:j2,k1:k2,l1:l2,i) );
 end
@@ -244,19 +244,18 @@ ts = sqrt( sum( t2 .* t2, 4 ) );
 tsmax = max( abs( ts(:) ) );
 
 % Friction Law
-tn = -tn;
-ii = tn < 0.;
+ii = tn > 0.;
 tn(ii) = 0.;
 f1 = fd
-ii = uslip < dc;
-f1 = f1(ii) + ( 1. - uslip(ii) ./ dc(ii) ) .* ( fs(ii) - fd(ii) );
-f1 = f1 .* tn + co;
+ii = us < dc;
+f1 = f1(ii) + ( 1. - us(ii) ./ dc(ii) ) .* ( fs(ii) - fd(ii) );
+f1 = f1 .* -tn + co;
 
 % Nucleation
 if rcrit && vrup
   f2(:) = 1.;
   if nclramp, f2 = min( ( it * dt - r / vrup ) / ( nclramp * dt ), 1. ); end
-  f2 = ( 1. - f2 ) .* ts + f2 .* ( fd .* tn + co);
+  f2 = ( 1. - f2 ) .* ts + f2 .* ( fd .* -tn + co);
   ii = r < min( rcrit, it * dt * vrup ) & f2 < f1;
   f1(ii) = f2(ii);
 end
@@ -279,8 +278,7 @@ end
 % Vslip
 t2 = v(j3:j4,k3:k4,l3:l4,:) + dt * w1(j3:j4,k3:k4,l3:l4,:) ...
    - v(j1:j2,k1:k2,l1:l2,:) - dt * w1(j1:j2,k1:k2,l1:l2,:);
-vslip = sqrt( sum( t2 .* t2, 4 ) );
-vslipmax = max( abs( vslip(:) ) );
+vs = sqrt( sum( t2 .* t2, 4 ) );
 
 % Rupture time
 if truptol
@@ -289,7 +287,7 @@ if truptol
   l = i1(3);
   k = i1(2);
   j = i1(1);
-  i = vslip > truptol;
+  i = vs > truptol;
   if find( i )
     trup( i & ( ~ trup ) ) = ( it + .5 ) * dt;
     tarrest = ( it + 1.5 ) * dt;

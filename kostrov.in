@@ -1,10 +1,10 @@
 #------------------------------------------------------------------------------#
-# SORD input file
+# Kostrov
 
+  dir		kostrov
   n		41  41  41    80
   n		127 127 127   300
   n		61  61  61    150
-  n		3 3 3   1
   grid		slant
   grid		constant
   viscosity	.0 .3
@@ -16,7 +16,7 @@
   rcrit		1e9
   nclramp	0
   out x		1    0 0 0    0  0 -1
-  out vslip	1    0 0 0    0  0 -1
+  out vs	1    0 0 0    0  0 -1
   out x		1    1 0 1   -1  0 -1
-  out vslip	1    1 0 1   -1  0 -1
+  out vs	1    1 0 1   -1  0 -1
 

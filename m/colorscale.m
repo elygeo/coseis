@@ -25,8 +25,8 @@ vscl = vlim; if vscl < 0, vscl = double( vmax ); end;
 uscl = ulim; if uscl < 0, uscl = double( umax ); end;
 wscl = wlim; if wscl < 0, wscl = double( wmax ); end;
 xscl = xlim; if xscl < 0, xscl = double( umax ); end;
-uslipscl = usliplim; if uslipscl < 0, uslipscl = double( uslipmax ); end;
-vslipscl = vsliplim; if vslipscl < 0, vslipscl = double( vslipmax ); end;
+usscl = uslim; if usscl < 0, usscl = double( usmax ); end;
+vsscl = vslim; if vsscl < 0, vsscl = double( vsmax ); end;
 tnscl = tnlim; if tnscl < 0, tnscl = double( tnmax ); end;
 tsscl = tslim; if tsscl < 0, tsscl = double( tsmax ); end;
 if xscl, xscl = .5 * dx / xscl; end
@@ -38,8 +38,8 @@ case 'v', fscl = vscl; titles = { '|V|' 'Vx' 'Vy' 'Vz' };
 case 'u', fscl = uscl; titles = { '|U|' 'Ux' 'Uy' 'Uz' }; breakon = 'w';
 case 'w', fscl = wscl; titles = { '|W|' 'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
   breakon = 'w'; cellfocus = 1;
-case 'uslip', fscl = uslipscl; titles = { 'Uslip' };
-case 'vslip', fscl = vslipscl; titles = { 'Vslip' };
+case 'us', fscl = usscl; titles = { 'Uslip' };
+case 'vs', fscl = vsscl; titles = { 'Vslip' };
 case 'tn', fscl = tnscl; titles = { 'Tn' };
 case 'ts', fscl = tsscl; titles = { 'Ts' };
 otherwise error field

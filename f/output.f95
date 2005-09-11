@@ -15,7 +15,7 @@ character :: onpass
 integer :: iz, nc, reclen, wt_rate, hh, mm, ss, n(3), err, it0
 real :: dwt(4)
 character(160) :: str
-logical :: fault, cell, static, init = .true., outinit(nz) = .true.
+logical :: fault, cell, static, init = .true.
 
 if ( init ) then
   init = .false.
@@ -39,7 +39,7 @@ if ( init ) then
     if ( ip == 0 ) print '(a,i6)', 'Checkpoint found, starting from step ', it
     outinit = .false.
     write( str, '(a,a,i6.6,i6.6)' ) trim( dir ), 'ckp/', ip, it
-    inquire( iolength=reclen ) u, v, vslip, uslip, trup, &
+    inquire( iolength=reclen ) u, v, vs, us, trup, &
       p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
     open( 9, &
       file=str, &
@@ -47,7 +47,7 @@ if ( init ) then
       form='unformatted', &
       access='direct', &
       status='old' )
-    read( 9, rec=1 ) u, v, vslip, uslip, trup, &
+    read( 9, rec=1 ) v, u, vs, us, trup, &
       p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
     close( 9 )
   end if
@@ -70,22 +70,23 @@ cell = .false.
 fault = .false.
 static = .false.
 select case( outvar(iz) )
-case( '|a|'  )
-case( '|v|'  )
-case( 'a'    ); nc = 3
-case( 'v'    ); nc = 3
-case( '|u|'  ); onpass = 'w'; 
-case( '|w|'  ); onpass = 'w'; cell = .true.
-case( 'u'    ); onpass = 'w'; nc = 3
-case( 'w'    ); onpass = 'w'; nc = 6; cell = .true.
-case( 'x'    ); static = .true.; nc = 3
 case( 'rho'  ); static = .true.
 case( 'lam'  ); static = .true.; cell = .true.
 case( 'mu'   ); static = .true.; cell = .true.
 case( 'y'    ); static = .true.; cell = .true.
-case( 'uslip' ); fault = .true.
-case( 'vslip' ); fault = .true.
-case( 'trup'  ); fault = .true.
+case( 'x'    ); static = .true.; nc = 3
+case( 'a'    ); nc = 3
+case( 'v'    ); nc = 3
+case( 'u'    ); onpass = 'w'; nc = 3
+case( 'w'    ); onpass = 'w'; nc = 6; cell = .true.
+case( 'am'   )
+case( 'vm'   )
+case( 'um'   ); onpass = 'w'; 
+case( 'wm'   ); onpass = 'w'; cell = .true.
+case( 'vs'   ); fault = .true.
+case( 'us'   ); fault = .true.
+case( 'trup' ); fault = .true.
+case default; stop 'var'
 end select
 if ( fault .and. nrmdim == 0 ) then
   outit(iz) = 0
@@ -102,27 +103,27 @@ if ( fault ) then
   i2(nrmdim) = 1
 end if
 do i = 1, nc
-  write( str, '(a,i2.2,a,i1,i6.6)' ) trim( dir ), iz, '/', i, it
+  write( str, '(a,i2.2,a,a,i1,i6.6)' ) &
+    trim( dir ), iz, '/', trim( outvar(iz), i, it
   select case( outvar(iz) )
-  case( 'a'     ); call bwrite4( str, w1,    i1, i2, i )
-  case( 'v'     ); call bwrite4( str, v,     i1, i2, i )
-  case( 'u'     ); call bwrite4( str, u,     i1, i2, i )
-  case( 'w'     );
-    if ( i < 4 )   call bwrite4( str, w1,    i1, i2, i )
-    if ( i > 3 )   call bwrite4( str, w2,    i1, i2, i-3 )
-  case( 'x'     ); call bwrite4( str, x,     i1, i2, i )
-  case( '|a|'   ); call bwrite3( str, s1,    i1, i2 )
-  case( '|v|'   ); call bwrite3( str, s2,    i1, i2 )
-  case( '|u|'   ); call bwrite3( str, s1,    i1, i2 )
-  case( '|w|'   ); call bwrite3( str, s2,    i1, i2 )
-  case( 'rho'   ); call bwrite3( str, rho,   i1, i2 )
-  case( 'lam'   ); call bwrite3( str, lam,   i1, i2 )
-  case( 'mu'    ); call bwrite3( str, mu,    i1, i2 )
-  case( 'y'     ); call bwrite3( str, y,     i1, i2 )
-  case( 'uslip' ); call bwrite3( str, uslip, i1, i2 )
-  case( 'vslip' ); call bwrite3( str, vslip, i1, i2 )
-  case( 'trup'  ); call bwrite3( str, trup,  i1, i2 )
-  case default; stop 'var'
+  case( 'rho'  ); call bwrite3( str, rho,  i1, i2 )
+  case( 'lam'  ); call bwrite3( str, lam,  i1, i2 )
+  case( 'mu'   ); call bwrite3( str, mu,   i1, i2 )
+  case( 'y'    ); call bwrite3( str, y,    i1, i2 )
+  case( 'x'    ); call bwrite4( str, x,    i1, i2, i )
+  case( 'a'    ); call bwrite4( str, w1,   i1, i2, i )
+  case( 'v'    ); call bwrite4( str, v,    i1, i2, i )
+  case( 'u'    ); call bwrite4( str, u,    i1, i2, i )
+  case( 'w'    );
+    if ( i < 4 )  call bwrite4( str, w1,   i1, i2, i )
+    if ( i > 3 )  call bwrite4( str, w2,   i1, i2, i-3 )
+  case( 'am'   ); call bwrite3( str, s1,   i1, i2 )
+  case( 'vm'   ); call bwrite3( str, s2,   i1, i2 )
+  case( 'um'   ); call bwrite3( str, s1,   i1, i2 )
+  case( 'wm'   ); call bwrite3( str, s2,   i1, i2 )
+  case( 'vs'   ); call bwrite3( str, vs,   i1, i2 )
+  case( 'us'   ); call bwrite3( str, us,   i1, i2 )
+  case( 'trup' ); call bwrite3( str, trup, i1, i2 )
   end select
 end do
 if ( ip == 0 ) then
@@ -140,7 +141,7 @@ if ( pass == 'w' ) return
 !------------------------------------------------------------------------------!
 
 if ( checkpoint /= 0 .and. mod( it, checkpoint ) == 0 ) then
-  inquire( iolength=reclen ) u, v, vslip, uslip, trup, &
+  inquire( iolength=reclen ) v, u, vs, us, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   write( str, '(a,a,i6.6,i6.6)') trim( dir ), 'ckp/', ip, it
   open( 9, &
@@ -149,7 +150,7 @@ if ( checkpoint /= 0 .and. mod( it, checkpoint ) == 0 ) then
     form='unformatted', &
     access='direct', &
     status='replace' )
-  write( 9, rec=1 ) u, v, vslip, uslip, trup, &
+  write( 9, rec=1 ) v, u, vs, us, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   close( 9 )
   write( str, '(a,a,i6.6,a)' ) trim( dir ), 'ckp/', ip, '.hdr'
@@ -171,7 +172,6 @@ if ( ip == 0 ) then
   close( 9 )
   print '(i6,5es12.4)', it, amax, vmax, umax, dwt(1:2) + dwt(3:4)
 end if
-
 
 end subroutine
 end module

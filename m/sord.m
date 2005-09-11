@@ -13,6 +13,7 @@ clear all
 
 input
 setup
+arrays
 init = 1; viz
 gridgen
 matmodel

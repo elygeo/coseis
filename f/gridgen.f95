@@ -6,6 +6,7 @@ contains
 subroutine gridgen
 use globals_m
 use binio_m
+use optimize_m
 
 implicit none
 real :: theta, scl, width(3)
@@ -26,10 +27,11 @@ l1 = i1(3); l2 = i2(3)
 
 x = 0.
 if ( griddir /= '' ) then
-  s1 = 0.
+  grid = ''
   call bread4( griddir, 'x1', x, i1, i2, 1 )
   call bread4( griddir, 'x2', x, i1, i2, 2 )
   call bread4( griddir, 'x3', x, i1, i2, 3 )
+  call optimize
 else
   forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - offset(1) )
   forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - 1 - offset(2) )
@@ -37,16 +39,15 @@ else
   if ( nrmdim /= 0 ) then
     i = hypocenter(nrmdim) + 1
     select case( nrmdim )
-    case( 1 ); x(i:,:,:,1) = x(i:,:,:,1) - 1
-    case( 2 ); x(:,i:,:,2) = x(:,i:,:,2) - 1
-    case( 3 ); x(:,:,i:,3) = x(:,:,i:,3) - 1
+    case( 1 ); x(i+1:j2,:,:,1) = x(i:,:,:,1) - dx
+    case( 2 ); x(:,i+1:k2,:,2) = x(:,i:,:,2) - dx
+    case( 3 ); x(:,:,i+1:l2,3) = x(:,:,i:,3) - dx
     end select
   end if
 end if
 
 select case( grid )
 case( '' )
-  oper(1) = 'g'
 case( 'constant' )
   oper(1) = 'h'
 case( 'stretch' )

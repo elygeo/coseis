@@ -34,14 +34,14 @@ else
   for i = k1:k2, x(:,i,:,2) = dx * ( i - 1 - nhalo ); end
   for i = l1:l2, x(:,:,i,3) = dx * ( i - 1 - nhalo ); end
   if nrmdim
-    i = hypocenter(nrmdim) + 1;
+    i = hypocenter(nrmdim);
     switch nrmdim
-    case 1, x(i:end,:,:) = x(i:end,:,:) - 1;
-    case 2, x(:,i:end,:) = x(:,i:end,:) - 1;
-    case 3, x(:,:,i:end) = x(:,:,i:end) - 1;
+    case 1, x(i+1:end,:,:) = x(i:end-1,:,:);
+    case 2, x(:,i+1:end,:) = x(:,i:end-1,:);
+    case 3, x(:,:,i+1:end) = x(:,:,i:end-1);
     end
   end
-end if
+end
 
 switch grid
 case ''

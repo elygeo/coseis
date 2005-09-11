@@ -87,7 +87,7 @@ perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > "$dir/meta/end
 
 ./tarball
 cp sord.tgz "$dir/meta/"
-cp "$dir/in" "$dir/meta/"
+cp "in" "$dir/meta/"
 
 floatsize=4
 nvars=21
@@ -151,6 +151,7 @@ OBJECT="\\
   setup.o \\
   arrays.o \\
   gridgen.o \\
+  optimize.o \\
   matmodel.o \\
   pml.o \\
   fault.o \\

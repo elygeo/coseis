@@ -12,6 +12,7 @@ stress    = []; istress = []; stressdir = '';
 locknodes = []; ilock   = [];
 outvar    = {}; iout    = []; outit = [];
 grid      = ''; griddir = '';
+dir       = '';
 
 for file = { 'defaults.in', 'in' }
 fprintf( 'Reading file: %s\n', file{1} )
@@ -33,6 +34,7 @@ for i = 1:length( in )
   case 'switch'
   case 'case'
   case 'np'
+  case 'dir',        dir        = key{2};
   case 'n',          n          = strread( str, '%n' )';
   case 'dx',         dx         = strread( str, '%n' )';
   case 'dt',         dt         = strread( str, '%n' )';
@@ -107,7 +109,7 @@ for i = 1:length( in )
     val = strread( str{1}, '%n' )';
     outit  = [ outit; val(1) ];
     iout   = [ iout; val(2:7) ];
-  otherwise error input
+  otherwise error( in{i} )
   end
 end
 end

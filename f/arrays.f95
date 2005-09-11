@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! SETUP
+! ARRAYS
 
 module arrays_m
 contains
@@ -21,33 +21,33 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 allocate( &
-  x(j,k,l,3), &
-  v(j,k,l,3), &
-  u(j,k,l,3), &
-  w1(j,k,l,3), &
-  w2(j,k,l,3), &
-  rho(j,k,l), &
-  lam(j,k,l), &
-  mu(j,k,l), &
-  y(j,k,l), &
-  s1(j,k,l), &
-  s2(j,k,l), &
-  p1(j1,k,l,3), &
-  p2(j,k1,l,3), &
-  p3(j,k,l1,3), &
-  p4(j2,k,l,3), &
-  p5(j,k2,l,3), &
-  p6(j,k,l2,3), &
-  g1(j1,k,l,3), &
-  g2(j,k1,l,3), &
-  g3(j,k,l1,3), &
-  g4(j2,k,l,3), &
-  g5(j,k2,l,3), &
-  g6(j,k,l2,3), &
-  dn1(npml), &
-  dn2(npml), &
-  dc1(npml), &
-  dc2(npml) )
+  ! 3D static variables
+  rho(j,k,l),   & ! density
+  lam(j,k,l),   & ! Lame parameter
+  mu(j,k,l),    & ! Lame parameter
+  y(j,k,l),     & ! Hourglass constant
+  x(j,k,l,3),   & ! node locations
+  ! 3D simulation state
+  v(j,k,l,3),   & ! velocity
+  u(j,k,l,3),   & ! displacement
+  ! 3D temporaty storage
+  w1(j,k,l,3),  & ! stress, acceleration
+  w2(j,k,l,3),  & ! stress
+  s1(j,k,l),    &
+  s2(j,k,l),    &
+  ! PML state
+  p1(j1,k,l,3), & ! PML momentum
+  p2(j,k1,l,3), & ! PML momentum
+  p3(j,k,l1,3), & ! PML momentum
+  p4(j2,k,l,3), & ! PML momentum
+  p5(j,k2,l,3), & ! PML momentum
+  p6(j,k,l2,3), & ! PML momentum
+  g1(j1,k,l,3), & ! PML gradient
+  g2(j,k1,l,3), & ! PML gradient
+  g3(j,k,l1,3), & ! PML gradient
+  g4(j2,k,l,3), & ! PML gradient
+  g5(j,k2,l,3), & ! PML gradient
+  g6(j,k,l2,3)  ) ! PML gradient
 
 ! Fault arrays
 if ( nrmdim /= 0 ) then
@@ -60,28 +60,31 @@ j = i2(1)
 k = i2(2)
 l = i2(3)
 allocate( &
-  nrm(j,k,l,3), &
-  t0(j,k,l,3), &
-  t1(j,k,l,3), &
-  t2(j,k,l,3), &
-  t3(j,k,l,3), &
-  uslip(j,k,l), &
-  vslip(j,k,l), &
-  trup(j,k,l), &
-  area(j,k,l), &
-  fs(j,k,l), &
-  fd(j,k,l), &
-  dc(j,k,l), &
-  co(j,k,l), &
-  r(j,k,l), &
-  f1(j,k,l), &
-  f2(j,k,l), &
-  tn(j,k,l), &
-  ts(j,k,l) )
+  ! Fault static variables
+  fs(j,k,l),    & ! coef of sliding friction
+  fd(j,k,l),    & ! coef of dynamic friction
+  dc(j,k,l),    & ! slip weakening distance
+  co(j,k,l),    & ! cohesion
+  area(j,k,l),  & ! fault element area
+  r(j,k,l),     & ! radius to hypocenter
+  nrm(j,k,l,3), & ! fault normal vectors
+  t0(j,k,l,3),  & ! initial traction
+  ! Fault simulation state
+  vs(j,k,l),    & ! slip velocity
+  us(j,k,l),    & ! slip
+  trup(j,k,l),  & ! rupture time
+  ! Fault temporary storage
+  t1(j,k,l,3),  & ! stress input, normal taction
+  t2(j,k,l,3),  & ! stress input, shear traction
+  t3(j,k,l,3),  & ! traction input, total traction
+  tn(j,k,l),    & ! normal traction
+  ts(j,k,l),    & ! shear traction
+  f1(j,k,l),    & ! friction
+  f2(j,k,l)     ) ! friction
 
-! Initial values
-v = 0.
-u = 0.
+! Initial state
+v  = 0.
+u  = 0.
 p1 = 0.
 p2 = 0.
 p3 = 0.
@@ -94,8 +97,8 @@ g3 = 0.
 g4 = 0.
 g5 = 0.
 g6 = 0.
-uslip = 0.
-vslip = 0.
+us = 0.
+vs = 0.
 trup = 0.
 
 end subroutine

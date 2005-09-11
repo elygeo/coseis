@@ -12,23 +12,18 @@ use zone_m
 implicit none
 integer :: ic, id, ix, iz
 
-! Fault
-if ( nrmdim /= 0 ) then
-  uslip = uslip + dt * vslip
-  uslipmax = maxval( abs( uslip ) )
-end if
-
-! Displacement
+! Update displacement & slip
 u = u + dt * v
+us = us + dt * vs
 
 ! Gradient
 ! G = grad(U + gam*V)    non PML region
 ! G' + DG = gradV          PML region
 s2 = 0.
 w2 = 0.
-outer: do ic = 1, 3
+icloop: do ic = 1, 3
 s1 = u(:,:,:,ic) + dt * viscosity(1) * v(:,:,:,ic)
-inner: do id = 1, 3
+idloop: do id = 1, 3
   ix = 6 - ic - id
   do iz = 1, noper
     call zone( i1, i2, ioper(iz,:), nn, offset, hypocenter, nrmdim )
@@ -165,8 +160,8 @@ inner: do id = 1, 3
   else
     w2(:,:,:,ix) = w2(:,:,:,ix) + s2
   end if
-end do inner
-end do outer
+end do idloop
+end do icloop
 
 ! Hook's Law, linear stress/strain relation
 ! W = lam*trace(G)*I + mu*(G + G^T)
@@ -182,8 +177,10 @@ call momentsrc
 ! Magnitudes
 s1 = sqrt( sum( u * u, 4 ) )
 s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
-iumax = maxloc( s1 ); umax = s1(iumax(1),iumax(2),iumax(3))
-iwmax = maxloc( s2 ); wmax = s2(iwmax(1),iwmax(2),iwmax(3))
+iumax  = maxloc( s1 ); umax  = s1(iumax(1),iumax(2),iumax(3))
+iwmax  = maxloc( s2 ); wmax  = s2(iwmax(1),iwmax(2),iwmax(3))
+iusmax = maxloc( us ); usmax = us(iusmax(1),iusmax(2),iusmax(3))
+
 if ( umax > dx / 10. ) print *, 'Warning: u !<< dx\n'
 
 end subroutine

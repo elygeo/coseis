@@ -242,17 +242,16 @@ t2 = t3 - t1
 ts = sqrt( sum( t2 * t2, 4 ) )
 
 ! Friction Law
-tn = -tn
-where( tn < 0. ) tn = 0.
+where( tn > 0. ) tn = 0.
 f1 = fd
-where( uslip < dc ) f1 = f1 + ( 1. - uslip / dc ) * ( fs - fd )
-f1 = f1 * tn + co
+where( us < dc ) f1 = f1 + ( 1. - us / dc ) * ( fs - fd )
+f1 = f1 * -tn + co
 
 ! Nucleation
 if ( rcrit > 0. .and. vrup > 0. ) then
   f2 = 1.
   if ( nclramp > 0 ) f2 = min( ( it * dt - r / vrup ) / ( nclramp * dt ), 1. )
-  f2 = ( 1. - f2 ) * ts + f2 * ( fd * tn + co )
+  f2 = ( 1. - f2 ) * ts + f2 * ( fd * -tn + co )
   where ( r < min( rcrit, it * dt * vrup ) .and. f2 < f1 ) f1 = f2
 end if
 if ( any( f1 <= 0. ) ) print *, 'fault opening!'
@@ -270,14 +269,14 @@ do i = 1, 3
   w1(j3:j4,k3:k4,l3:l4,i) + t3(:,:,:,i) * area * rho(j3:j4,k3:k4,l3:l4)
 end do
 
-! Vslip
+! Update slip velocity
 t2 = v(j3:j4,k3:k4,l3:l4,:) + dt * w1(j3:j4,k3:k4,l3:l4,:) &
    - v(j1:j2,k1:k2,l1:l2,:) - dt * w1(j1:j2,k1:k2,l1:l2,:)
-vslip = sqrt( sum( t2 * t2, 4 ) )
+vs = sqrt( sum( t2 * t2, 4 ) )
 
 ! Rupture time
 if ( truptol > 0. ) then
-  where ( trup == 0. .and. vslip > truptol ) trup = ( it + .5 ) * dt
+  where ( trup == 0. .and. vs > truptol ) trup = ( it + .5 ) * dt
 end if
 
 end subroutine

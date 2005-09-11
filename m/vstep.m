@@ -111,4 +111,5 @@ s1 = sqrt( sum( w1 .* w1, 4 ) );
 s2 = sqrt( sum( v .* v, 4 ) );
 [ amax, iamax ] = max( s1(:) );
 [ vmax, ivmax ] = max( s2(:) );
+[ vsmax, ivsmax ] = max( abs( vs(:) ) );
 

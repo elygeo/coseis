@@ -2,9 +2,7 @@
 % TIMESERIESVIZ
 
 % test if running from SORD
-if exist( 'w1', 'var' )
-  outdir = './';
-else
+if ~exist( 'w1', 'var' )
   addpath m
   input
 end
@@ -83,6 +81,7 @@ end
 tg = time;
 newtitles = { 'Vx' 'Vy' 'Vz' };
 
+% fileter
 if km
   fcorner = 6000 / ( 6 * dx );
   n = 2 * round( 1 / ( fcorner * dt ) );
@@ -105,12 +104,14 @@ figure( ...
   'DefaultLineLinewidth', linewidth, ...
   'DefaultTextHorizontalAlignment', 'center', ...
   'DefaultTextColor', foreground )
+
+% for explosion source we have analytical solution
 if explosion & strcmp( field, 'v' )
   rho0 = material(end,1);
-  vp = material(end,2);
+  vp0 = material(end,2);
   xg = xhairtarg - x0;
   rg = sqrt( sum( xg .* xg ) );
-  tg = tg - rg / vp;
+  tg = tg - rg / vp0;
   if ( xg(1) || xg(2) )
     rot = [ xg(1)  xg(2) xg(1)*xg(3)
             xg(2) -xg(1) xg(2)*xg(3)
@@ -126,11 +127,11 @@ if explosion & strcmp( field, 'v' )
   i = find( tg > 0 );
   switch srctimefcn
   case 'brune'
-    vk(i,1) = moment(1) / 4 / pi / rho0 / vp ^ 2 / domp ^ 2 / rg / vp * ...
-    exp( -tg(i) / domp ) .* ( tg(i) * vp / rg - tg(i) / domp + 1 );
+    vk(i,1) = moment(1) / 4 / pi / rho0 / vp0 ^ 2 / domp ^ 2 / rg / vp0 * ...
+    exp( -tg(i) / domp ) .* ( tg(i) * vp0 / rg - tg(i) / domp + 1 );
   case 'sbrune'
-    vk(i,1) = moment(1) / 8 / pi / rho0 / vp ^ 2 / domp ^ 3 / rg / vp * ...
-    exp( -tg(i) / domp ) .* ( tg(i) * vp / rg - tg(i) / domp + 2 ) .* tg(i);
+    vk(i,1) = moment(1) / 8 / pi / rho0 / vp0 ^ 2 / domp ^ 3 / rg / vp0 * ...
+    exp( -tg(i) / domp ) .* ( tg(i) * vp0 / rg - tg(i) / domp + 2 ) .* tg(i);
   otherwise error srctimefcn
   end
   if km

@@ -1,7 +1,7 @@
 %----------------------------------------------------------------------------%
 % MOMENTSRC
 
-if ~msrcradius; return; end
+if msrcradius <= 0.; return; end
 
 if init
 

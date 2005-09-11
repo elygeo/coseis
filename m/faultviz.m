@@ -18,8 +18,8 @@ k = i1(2):i2(2);
 l = i1(3):i2(3);
 if dofault
   switch field
-  case 'u', vg = uslip(j,k,l);
-  case 'v', vg = vslip(j,k,l);
+  case 'u', vg = us(j,k,l);
+  case 'v', vg = vs(j,k,l);
   case 'w', if comp == nrmdim, vg = tn(j,k,l); else, vg = ts(j,k,l); end
   otherwise error field
   end
@@ -43,9 +43,9 @@ if rcrit
     hh = scontour( xg, squeeze( r(j,k,l) ), min( rcrit, ( it - nclramp ) * dt * vrup ) );
   end
 end
-scontour( xg, uslip(j,k,l), dc0 );
-scontour( xg, uslip(j,k,l), .01 * dc0 );
-switch model
+scontour( xg, us(j,k,l), dc0 );
+scontour( xg, us(j,k,l), .01 * dc0 );
+switch dir
 case { 'the2', 'the3' }
   scontour( xg, fd(j,k,l), 10 );
 end

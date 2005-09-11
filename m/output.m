@@ -16,7 +16,6 @@ if init
       file = sprintf( 'out/%02d/', iz );
       mkdir( file )
     end
-  end
   else
     % FIXME read checkpoint
   end
@@ -33,7 +32,6 @@ if init
   wt = mem / 7000000;
   fprintf( 'RAM usage: %.0fMb\n', ram )
   fprintf( 'Run time: at least %s\n', datestr( nt * wt / 3600 / 24, 13 ) )
-  outinit = ones( size( outit ) );
   fprintf('  Step  Amax        Vmax        Umax        Compute     I/O/Viz\n')
   tic
   return
@@ -48,23 +46,23 @@ for iz = 1:size( outit, 1 )
   isfault = 0;
   static = 0;
   switch outvar{iz}
-  case 'x',   static = 1; nc = 3;
-  case 'rho', static = 1;
-  case 'lam', static = 1; cell = 1;
-  case 'mu',  static = 1; cell = 1;
-  case 'y',   static = 1; cell = 1;
-  case '|u|', onpass = 'w';
-  case '|w|', onpass = 'w'; cell = 1;
-  case 'u',   onpass = 'w'; nc = 3;
-  case 'w',   onpass = 'w'; nc = 6; cell = 1;
-  case '|a|'
-  case '|v|'
-  case 'a',   nc = 3;
-  case 'v',   nc = 3;
-  case 'vslip', isfault = 1;
-  case 'uslip', isfault = 1;
-  case 'trup',  isfault = 1;
-  otherwise error output
+  case 'rho',  static = 1;
+  case 'lam',  static = 1; cell = 1;
+  case 'mu',   static = 1; cell = 1;
+  case 'y',    static = 1; cell = 1;
+  case 'x',    static = 1; nc = 3;
+  case 'a',    nc = 3;
+  case 'v',    nc = 3;
+  case 'u',    onpass = 'w'; nc = 3;
+  case 'w',    onpass = 'w'; nc = 6; cell = 1;
+  case 'am'
+  case 'vm'
+  case 'um',   onpass = 'w';
+  case 'wm',   onpass = 'w'; cell = 1;
+  case 'vs',   isfault = 1;
+  case 'us',   isfault = 1;
+  case 'trup', isfault = 1;
+  otherwise error( [ 'outvar: ' outvar{iz} ] )
   end
   if isfault & ~nrmdim; outit(iz) = 0; end
   if onpass ~= pass, continue, end
@@ -81,25 +79,25 @@ for iz = 1:size( outit, 1 )
     file = sprintf( 'out/%02d/%1d%06d', iz, i, it );
     fid = fopen( file, 'w' );
     switch outvar{iz}
-    case 'x',     fwrite( fid, x(j,k,l,i),        'float32' );
-    case 'rho',   fwrite( fid, rho(j,k,l),        'float32' );
-    case 'lam',   fwrite( fid, lam(j,k,l),        'float32' );
-    case 'mu',    fwrite( fid, mu(j,k,l),         'float32' );
-    case 'y',     fwrite( fid, y(j,k,l),          'float32' );
-    case '|u|',   fwrite( fid, s1(j,k,l),         'float32' );
-    case '|w|',   fwrite( fid, s2(j,k,l),         'float32' );
-    case 'u',     fwrite( fid, u(j,k,l,i),        'float32' );            
+    case 'rho',  fwrite( fid, rho(j,k,l),    'float32' );
+    case 'lam',  fwrite( fid, lam(j,k,l),    'float32' );
+    case 'mu',   fwrite( fid, mu(j,k,l),     'float32' );
+    case 'y',    fwrite( fid, y(j,k,l),      'float32' );
+    case 'x',    fwrite( fid, x(j,k,l,i),    'float32' );
+    case 'a',    fwrite( fid, w1(j,k,l,i),   'float32' );
+    case 'v',    fwrite( fid, v(j,k,l,i),    'float32' );
+    case 'u',    fwrite( fid, u(j,k,l,i),    'float32' );            
     case 'w'
-      if i < 4,   fwrite( fid, w1(j,k,l,i),       'float32' ); end
-      if i > 3,   fwrite( fid, w2(j,k,l,i-3),     'float32' ); end
-    case '|a|',   fwrite( fid, s1(j,k,l),         'float32' );
-    case '|v|',   fwrite( fid, s2(j,k,l),         'float32' );
-    case 'a',     fwrite( fid, w1(j,k,l,i) / dt,  'float32' );
-    case 'v',     fwrite( fid, v(j,k,l,i),        'float32' );
-    case 'vslip', fwrite( fid, vslip(j,k,l),      'float32' );
-    case 'uslip', fwrite( fid, uslip(j,k,l),      'float32' );
-    case 'trup',  fwrite( fid, trup(j,k,l),       'float32' );
-    otherwise error outvar
+      if i < 4,  fwrite( fid, w1(j,k,l,i),   'float32' ); end
+      if i > 3,  fwrite( fid, w2(j,k,l,i-3), 'float32' ); end
+    case 'am',   fwrite( fid, s1(j,k,l),     'float32' );
+    case 'vm',   fwrite( fid, s2(j,k,l),     'float32' );
+    case 'um',   fwrite( fid, s1(j,k,l),     'float32' );
+    case 'wm',   fwrite( fid, s2(j,k,l),     'float32' );
+    case 'vs',   fwrite( fid, vs(j,k,l),     'float32' );
+    case 'us',   fwrite( fid, us(j,k,l),     'float32' );
+    case 'trup', fwrite( fid, trup(j,k,l),   'float32' );
+    otherwise error( [ 'outvar: ' outvar{iz} ] )
     end
     fclose( fid );
     if static, outit(iz) = 0; end
@@ -114,7 +112,7 @@ end
 if pass == 'w', return, end
 
 if checkpoint & ~mod( it, checkpoint )
-  save checkpoint it u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 vslip uslip trup
+  save checkpoint it u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 vs us trup
 end
 
 fid = fopen( 'out/timestep', 'w' );
@@ -125,7 +123,7 @@ wt(4) = toc;
 
 file = sprintf( 'out/stats/%06d', it );
 fid = fopen( file, 'w' );
-fprintf( fid, '%16.7e', [ amax vmax umax wmax vslipmax uslipmax wt ] );
+fprintf( fid, '%16.7e', [ amax vmax umax wmax vsmax usmax wt ] );
 fprintf( fid, '\n' );
 fclose( fid );
 

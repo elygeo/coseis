@@ -18,8 +18,8 @@ integer ic, iid, id, ix, iq, iz
 ! P' + DP = [del]S, F = 1.P'             PML region
 ! F = divS                               non PML region (D=0)
 s2 = 0.
-outer: do ic  = 1, 3
-inner: do iid = 1, 3
+icloop: do ic  = 1, 3
+idloop: do iid = 1, 3
   id = mod( ic + iid - 2, 3 ) + 1
   ix = 6 - ic - id
   do iz = 1, noper
@@ -86,8 +86,8 @@ inner: do iid = 1, 3
   else
     w1(:,:,:,ic) = w1(:,:,:,ic) + s2
   end if
-end do inner
-end do outer
+end do idloop
+end do icloop
 
 ! Hourglass correction
 s1 = 0.
@@ -124,15 +124,15 @@ do iz = 1, nlock
   end do
 end do
 
-! Velocity, V = V + dt * A
+! Update velocity
 v = v + dt * w1
 
 ! Magnitudes
 s1 = sqrt( sum( w1 * w1, 4 ) )
 s2 = sqrt( sum( v * v, 4 ) )
-iamax = maxloc( s1 ); amax = s1(iamax(1),iamax(2),iamax(3))
-ivmax = maxloc( s2 ); vmax = s2(ivmax(1),ivmax(2),ivmax(3))
-vslipmax = maxval( abs( vslip ) )
+iamax  = maxloc( s1 ); amax  = s1(iamax(1),iamax(2),iamax(3))
+ivmax  = maxloc( s2 ); vmax  = s2(ivmax(1),ivmax(2),ivmax(3))
+ivsmax = maxloc( vs ); vsmax = vs(ivsmax(1),ivsmax(2),ivsmax(3))
 
 end subroutine
 end module
