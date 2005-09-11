@@ -19,7 +19,6 @@ logical :: fault, cell, static, init = .true., outinit(nz) = .true.
 
 if ( init ) then
   init = .false.
-  dir = trim( dir ) // '/out/'
   if ( it == 0 ) then
     if ( ip == 0 ) then
       print '(a)', 'Initialize output'
@@ -30,12 +29,16 @@ if ( init ) then
       close( 9 )
       call system( 'mkdir ' // trim( dir ) // 'ckp' )
       call system( 'mkdir ' // trim( dir ) // 'stats' )
+      do iz = 1, nout
+        write( str, '(a,i2.2)' ) trim( dir ), iz
+        call system( 'mkdir ' // str )
+      end do
     end if
     if ( checkpoint < 0 ) checkpoint = checkpoint + nt + 1
   else
     if ( ip == 0 ) print '(a,i6)', 'Checkpoint found, starting from step ', it
     outinit = .false.
-    write( str, '(a,a,i6.6,i6.6)' ) trim( dir ), 'ckp/', it, ip
+    write( str, '(a,a,i6.6,i6.6)' ) trim( dir ), 'ckp/', ip, it
     inquire( iolength=reclen ) u, v, vslip, uslip, trup, &
       p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
     open( 9, &
@@ -67,19 +70,19 @@ cell = .false.
 fault = .false.
 static = .false.
 select case( outvar(iz) )
-case( '|a|' )
-case( '|v|' )
-case( 'a'   ); nc = 3
-case( 'v'   ); nc = 3
-case( '|u|' ); onpass = 'w'; 
-case( '|w|' ); onpass = 'w'; cell = .true.
-case( 'u'   ); onpass = 'w'; nc = 3
-case( 'w'   ); onpass = 'w'; nc = 6; cell = .true.
-case( 'x'   ); static = .true.; nc = 3
-case( 'rho' ); static = .true.
-case( 'lam' ); static = .true.; cell = .true.
-case( 'mu' );  static = .true.; cell = .true.
-case( 'y'   ); static = .true.; cell = .true.
+case( '|a|'  )
+case( '|v|'  )
+case( 'a'    ); nc = 3
+case( 'v'    ); nc = 3
+case( '|u|'  ); onpass = 'w'; 
+case( '|w|'  ); onpass = 'w'; cell = .true.
+case( 'u'    ); onpass = 'w'; nc = 3
+case( 'w'    ); onpass = 'w'; nc = 6; cell = .true.
+case( 'x'    ); static = .true.; nc = 3
+case( 'rho'  ); static = .true.
+case( 'lam'  ); static = .true.; cell = .true.
+case( 'mu'   ); static = .true.; cell = .true.
+case( 'y'    ); static = .true.; cell = .true.
 case( 'uslip' ); fault = .true.
 case( 'vslip' ); fault = .true.
 case( 'trup'  ); fault = .true.
@@ -98,17 +101,8 @@ if ( fault ) then
   i1(nrmdim) = 1
   i2(nrmdim) = 1
 end if
-if ( ip == 0 .and. outinit(iz) ) then
-  outinit(iz) = .false.
-  write( str, '(a,i2.2)' ) trim( dir ), iz
-  call system( 'mkdir ' // str )
-  do i = 1, nc
-    write( str, '(a,i2.2,a,i1)' ) trim( dir ), iz, '/', i
-    call system( 'mkdir ' // str )
-  end do
-end if
 do i = 1, nc
-  write( str, '(a,i2.2,a,i1,a,i6.6)' ) trim( dir ), iz, '/', i, '/', it
+  write( str, '(a,i2.2,a,i1,i6.6)' ) trim( dir ), iz, '/', i, it
   select case( outvar(iz) )
   case( 'a'     ); call bwrite4( str, w1,    i1, i2, i )
   case( 'v'     ); call bwrite4( str, v,     i1, i2, i )
@@ -146,9 +140,9 @@ if ( pass == 'w' ) return
 !------------------------------------------------------------------------------!
 
 if ( checkpoint /= 0 .and. mod( it, checkpoint ) == 0 ) then
-  write( str, '(a,a,i6.6,i6.6)') trim( dir ), 'ckp/', it, ip
   inquire( iolength=reclen ) u, v, vslip, uslip, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
+  write( str, '(a,a,i6.6,i6.6)') trim( dir ), 'ckp/', ip, it
   open( 9, &
     file=str, &
     recl=reclen, &

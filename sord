@@ -55,7 +55,7 @@ while read key params; do
   esac
   if [ "$switch" = "$case" ]; then
     case "$key" in
-      dir) dir=$1
+      dir) dir=$1 ;;
       n)   nn3=( $1 $2 $3 ); nt=$4 ;;
       np)  np3=( $1 $2 $3 ) ;;
     esac
@@ -149,6 +149,7 @@ OBJECT="\\
   binio.o \\
   input.o \\
   setup.o \\
+  arrays.o \\
   gridgen.o \\
   matmodel.o \\
   pml.o \\

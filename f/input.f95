@@ -11,17 +11,8 @@ integer :: iz, err
 character(160) :: infile(2), str, key1, key2, key3, &
   switchcase = 'start', caseswitch = 'start'
 
-write( str, '(a,a,i6.6,a)' ) dir, 'ckp/', ip, '.hdr'
-open( 9, file=str, status='old', iostat=err )
-if ( err == 0 ) then
-  read( 9, * ) it
-  close( 9 )
-else
-  it = 0
-end if
-
 infile(1) = 'defaults.in'
-infile(2) = trim( dir ) // '/in'
+infile(2) = 'in'
 
 nmat  = 0
 nfric = 0
@@ -46,7 +37,7 @@ loop: do
   end select
   if ( caseswitch /= switchcase ) cycle loop
   a2: select case( key1 )
-  case( 'dir' );        read( str, * ) key1, dir
+  case( 'dir' );        dir = trim( key2 ) // '/'
   case( 'n' );          read( str, * ) key1, nn, nt
   case( 'dx' );         read( str, * ) key1, dx
   case( 'dt' );         read( str, * ) key1, dt
@@ -117,6 +108,21 @@ loop: do
 end do loop
 close( 9 )
 end do izloop
+
+dir = trim( dir ) // 'out/'
+
+write( str, '(a,a,i6.6,a)' ) trim( dir ), 'ckp/', ip, '.hdr'
+open( 9, file=str, status='old', iostat=err )
+if ( err == 0 ) then
+  read( 9, * ) it
+  close( 9 )
+else
+  it = 0
+end if
+
+nhalo = 1
+if( nrmdim /= 0 ) nn(nrmdim) = nn(nrmdim) + 1
+
 
 end subroutine
 end module

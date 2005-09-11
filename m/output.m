@@ -12,6 +12,11 @@ if init
   if ~readcheckpoint
     if exist( 'out', 'dir' ), rmdir( 'out', 's' ), end
     mkdir( 'out/stats/' )
+    for iz = 1:size( outit, 1 )
+      file = sprintf( 'out/%02d/', iz );
+      mkdir( file )
+    end
+  end
   else
     % FIXME read checkpoint
   end
@@ -63,13 +68,6 @@ for iz = 1:size( outit, 1 )
   end
   if isfault & ~nrmdim; outit(iz) = 0; end
   if onpass ~= pass, continue, end
-  if outinit(iz)
-    outinit(iz) = 0;
-    for i = 1:nc
-      file = sprintf( 'out/%02d/%1d/', iz, i );
-      mkdir( file )
-    end
-  end
   [ i1, i2 ] = zone( iout(iz,:), nn, offset, hypocenter, nrmdim );
   if cell; i2 = i2 - 1; end
   if isfault
@@ -80,7 +78,7 @@ for iz = 1:size( outit, 1 )
   k = i1(2):i2(2);
   j = i1(1):i2(1);
   for i = 1:nc
-    file = sprintf( 'out/%02d/%1d/%06d', iz, i, it );
+    file = sprintf( 'out/%02d/%1d%06d', iz, i, it );
     fid = fopen( file, 'w' );
     switch outvar{iz}
     case 'x',     fwrite( fid, x(j,k,l,i),        'float32' );

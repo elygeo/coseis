@@ -6,6 +6,7 @@ program sord
 use globals_m
 use input_m
 use setup_m
+use arrays_m
 use gridgen_m
 use matmodel_m
 use pml_m
@@ -20,6 +21,7 @@ print '(a)', 'SORD - Support Operator Rupture Dynamics'
 
 call input
 call setup
+call arrays
 call gridgen
 call matmodel
 call pml

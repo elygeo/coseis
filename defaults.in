@@ -2,6 +2,9 @@
 # SORD Defaults
 # Be careful editing this file, better to make changes in 'in'
 
+# dir: directory where output is written
+# dir		model1
+
 # n: ng(3) nt: number of mesh nodes and number of timesteps
   n		41 41 41   40
 

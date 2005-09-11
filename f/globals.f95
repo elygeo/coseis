@@ -5,7 +5,7 @@ module globals_m
 
 implicit none
 
-integer, parameter :: nz = 64
+integer, parameter :: nz = 80
 
 real, allocatable, dimension(:,:,:,:) :: &
   p1, p2, p3, p4, p5, p6, &

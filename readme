@@ -23,17 +23,16 @@ AUTHOR
 
 USAGE
 
-  See 'in.defaults' and 'models/' for examples, and edit input file 'in'.
-  Then run the sord script:
+  ./sord file.in
 
-    ./sord
+  See 'defaults.in' and '*.in' for input explanation and examples.
 
-  Sript options:
+  Options:
     -m  use MATLAB backend (default is Fortran)
-    -g  run in debugger
-    -c  checkpoint restart 
     -n  setup only, don't compile or run
+    -d  delete output from previous run before starting
     -r  dispatch to remote host, edit sord script to set host
+    -g  run in debugger
 
   When porting to a new machine, you may have to modify the sord script for 
   the proper compiling and batch submission parameters.  For the parallel
