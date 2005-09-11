@@ -13,29 +13,24 @@ if matdir
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
-  rho(j1:j2,k1:k2,l1:l2) = fread( matdir, 'rho' );
-  s1(j1:j2,k1:k2,l1:l2)  = fread( matdir, 'vp' );
-  s2(j1:j2,k1:k2,l1:l2)  = fread( matdir, 'vs' );
-else
-  for iz = 1:size( material, 1 )
-    [ i1, i2 ] = zone( imat(iz,:), nn, offset, hypocenter, nrmdim );
-    j1 = i1(1); j2 = i2(1);
-    k1 = i1(2); k2 = i2(2);
-    l1 = i1(3); l2 = i2(3);
-    rho(j1:j2,k1:k2,l1:l2) = material(iz,1);
-    s1(j1:j2,k1:k2,l1:l2)  = material(iz,2);
-    s2(j1:j2,k1:k2,l1:l2)  = material(iz,3);
-  end
+  rho(j1:j2,k1:k2,l1:l2) = bread( matdir, 'rho' );
+  s1(j1:j2,k1:k2,l1:l2)  = bread( matdir, 'vp' );
+  s2(j1:j2,k1:k2,l1:l2)  = bread( matdir, 'vs' );
+end
+for iz = 1:size( material, 1 )
+  [ i1, i2 ] = zone( imat(iz,:), nn, offset, hypocenter, nrmdim );
+  j1 = i1(1); j2 = i2(1);
+  k1 = i1(2); k2 = i2(2);
+  l1 = i1(3); l2 = i2(3);
+  rho(j1:j2,k1:k2,l1:l2) = material(iz,1);
+  s1(j1:j2,k1:k2,l1:l2)  = material(iz,2);
+  s2(j1:j2,k1:k2,l1:l2)  = material(iz,3);
 end
 
 % Matrial extremes
 i = rho > 0.; matmin(1) = min( rho(i) ); matmax(1) = max( rho(i) );
 i = s1 > 0.;  matmin(2) = min( s1(i) );  matmax(2) = max( s1(i) );
 i = s2 > 0.;  matmin(3) = min( s2(i) );  matmax(3) = max( s2(i) );
-
-% Check Courant stability condition. TODO: check, make general
-courant = dt * matmax(2) * sqrt( 3 ) / dx;
-fprintf( '  Courant: 1 >%11.4e\n', courant )
 
 % Lame parameters
 s2 = rho .* s2 .* s2;
@@ -118,23 +113,4 @@ rho(i) = 1. ./ rho(i);
 
 s1(:) = 0.;
 s2(:) = 0.;
-
-% PML damping
-if npml
-  c1 =  8. / 15.;
-  c2 = -3. / 100.;
-  c3 =  1. / 1500.;
-  tune = 3.5;
-  pmlp = 2.;
-  hmean = 2. * matmin .* matmax ./ ( matmin + matmax );
-  damp = tune * hmean(3) / dx * ( c1 + ( c2 + c3 * npml ) * npml ) / npml^pmlp;
-  for i = 1:npml
-    dampn = damp *   i ^ pmlp;
-    dampc = damp * ( i ^ pmlp + ( i - 1 ) ^ pmlp ) / 2.;
-    dn1(npml-i+1) = - 2. * dampn        / ( 2. + dt * dampn );
-    dc1(npml-i+1) = ( 2. - dt * dampc ) / ( 2. + dt * dampc );
-    dn2(npml-i+1) =   2.                / ( 2. + dt * dampn );
-    dc2(npml-i+1) =   2. * dt           / ( 2. + dt * dampc );
-  end
-end
 

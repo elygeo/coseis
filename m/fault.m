@@ -9,6 +9,9 @@ init = 0;
 fprintf( 'Initialize fault\n' )
 
 % Friction model
+fs(:) = 0;
+fd(:) = 0;
+dc(:) = 0;
 co(:) = 1e9;
 if fricdir
   i1 = i1nodepml;
@@ -22,24 +25,25 @@ if fricdir
   fd(j1:j2,k1:k2,l1:l2) = bread( fricdir, 'fd' );
   dc(j1:j2,k1:k2,l1:l2) = bread( fricdir, 'dc' );
   co(j1:j2,k1:k2,l1:l2) = bread( fricdir, 'co' );
-else
-  for iz = 1:size( friction, 1 )
-    [ i1, i2 ] = zone( ifric(iz,:), nn, offset, hypocenter, nrmdim );
-    i1 = max( i1, i1nodepml );
-    i2 = min( i2, i2nodepml );
-    i1(nrmdim) = 1;
-    i2(nrmdim) = 1;
-    j1 = i1(1); j2 = i2(1);
-    k1 = i1(2); k2 = i2(2);
-    l1 = i1(3); l2 = i2(3);
-    fs(j1:j2,k1:k2,l1:l2) = friction(iz,1);
-    fd(j1:j2,k1:k2,l1:l2) = friction(iz,2);
-    dc(j1:j2,k1:k2,l1:l2) = friction(iz,3);
-    co(j1:j2,k1:k2,l1:l2) = friction(iz,4);
-  end
+end
+for iz = 1:size( friction, 1 )
+  [ i1, i2 ] = zone( ifric(iz,:), nn, offset, hypocenter, nrmdim );
+  i1 = max( i1, i1nodepml );
+  i2 = min( i2, i2nodepml );
+  i1(nrmdim) = 1;
+  i2(nrmdim) = 1;
+  j1 = i1(1); j2 = i2(1);
+  k1 = i1(2); k2 = i2(2);
+  l1 = i1(3); l2 = i2(3);
+  fs(j1:j2,k1:k2,l1:l2) = friction(iz,1);
+  fd(j1:j2,k1:k2,l1:l2) = friction(iz,2);
+  dc(j1:j2,k1:k2,l1:l2) = friction(iz,3);
+  co(j1:j2,k1:k2,l1:l2) = friction(iz,4);
 end
 
 % Prestress
+t1(:) = 0.;
+t2(:) = 0.;
 if stressdir
   i1 = i1nodepml;
   i2 = i2nodepml;
@@ -54,26 +58,26 @@ if stressdir
   t2(j1:j2,k1:k2,l1:l2,1) = bread( stressdir, 'yz' );
   t2(j1:j2,k1:k2,l1:l2,2) = bread( stressdir, 'zx' );
   t2(j1:j2,k1:k2,l1:l2,3) = bread( stressdir, 'xy' );
-else
-  for iz = 1:size( stress, 1 )
-    [ i1, i2 ] = zone( istress(iz,:), nn, offset, hypocenter, nrmdim );
-    i1 = max( i1, i1pml );
-    i2 = min( i2, i2pml );
-    i1(nrmdim) = 1;
-    i2(nrmdim) = 1;
-    j1 = i1(1); j2 = i2(1);
-    k1 = i1(2); k2 = i2(2);
-    l1 = i1(3); l2 = i2(3);
-    t1(j1:j2,k1:k2,l1:l2,1) = stress(iz,1);
-    t1(j1:j2,k1:k2,l1:l2,2) = stress(iz,2);
-    t1(j1:j2,k1:k2,l1:l2,3) = stress(iz,3);
-    t2(j1:j2,k1:k2,l1:l2,1) = stress(iz,4);
-    t2(j1:j2,k1:k2,l1:l2,2) = stress(iz,5);
-    t2(j1:j2,k1:k2,l1:l2,3) = stress(iz,6);
-  end
+end
+for iz = 1:size( stress, 1 )
+  [ i1, i2 ] = zone( istress(iz,:), nn, offset, hypocenter, nrmdim );
+  i1 = max( i1, i1nodepml );
+  i2 = min( i2, i2nodepml );
+  i1(nrmdim) = 1;
+  i2(nrmdim) = 1;
+  j1 = i1(1); j2 = i2(1);
+  k1 = i1(2); k2 = i2(2);
+  l1 = i1(3); l2 = i2(3);
+  t1(j1:j2,k1:k2,l1:l2,1) = stress(iz,1);
+  t1(j1:j2,k1:k2,l1:l2,2) = stress(iz,2);
+  t1(j1:j2,k1:k2,l1:l2,3) = stress(iz,3);
+  t2(j1:j2,k1:k2,l1:l2,1) = stress(iz,4);
+  t2(j1:j2,k1:k2,l1:l2,2) = stress(iz,5);
+  t2(j1:j2,k1:k2,l1:l2,3) = stress(iz,6);
 end
 
 % Pretraction
+t3(:) = 0.;
 if tracdir
   i1 = i1nodepml;
   i2 = i2nodepml;
@@ -85,20 +89,19 @@ if tracdir
   t3(j1:j2,k1:k2,l1:l2,1) = bread( tracdir, 'tn' );
   t3(j1:j2,k1:k2,l1:l2,2) = bread( tracdir, 'ts' );
   t3(j1:j2,k1:k2,l1:l2,3) = bread( tracdir, 'td' );
-else
-  for iz = 1:size( traction, 1 )
-    [ i1, i2 ] = zone( itrac(iz,:), nn, offset, hypocenter, nrmdim );
-    i1 = max( i1, i1pml );
-    i2 = min( i2, i2pml );
-    i1(nrmdim) = 1;
-    i2(nrmdim) = 1;
-    j1 = i1(1); j2 = i2(1);
-    k1 = i1(2); k2 = i2(2);
-    l1 = i1(3); l2 = i2(3);
-    t3(j1:j2,k1:k2,l1:l2,1) = traction(iz,1);
-    t3(j1:j2,k1:k2,l1:l2,2) = traction(iz,2);
-    t3(j1:j2,k1:k2,l1:l2,3) = traction(iz,3);
-  end
+end
+for iz = 1:size( traction, 1 )
+  [ i1, i2 ] = zone( itrac(iz,:), nn, offset, hypocenter, nrmdim );
+  i1 = max( i1, i1nodepml );
+  i2 = min( i2, i2nodepml );
+  i1(nrmdim) = 1;
+  i2(nrmdim) = 1;
+  j1 = i1(1); j2 = i2(1);
+  k1 = i1(2); k2 = i2(2);
+  l1 = i1(3); l2 = i2(3);
+  t3(j1:j2,k1:k2,l1:l2,1) = traction(iz,1);
+  t3(j1:j2,k1:k2,l1:l2,2) = traction(iz,2);
+  t3(j1:j2,k1:k2,l1:l2,3) = traction(iz,3);
 end
 
 % Normal vectors

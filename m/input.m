@@ -11,7 +11,7 @@ traction  = []; itrac   = []; tracdir = '';
 stress    = []; istress = []; stressdir = '';
 locknodes = []; ilock   = [];
 outvar    = {}; iout    = []; outit = [];
-griddir = '';
+grid      = ''; griddir = '';
 
 for file = { 'defaults.in', 'in' }
 fprintf( 'Reading file: %s\n', file{1} )
@@ -51,13 +51,17 @@ for i = 1:length( in )
   case 'verbose',    verb       = strread( str, '%n' )';
   case 'srctimefcn', srctimefcn = key{2};
   case 'grid'
-    grid = key{2};
     if strcmp( grid, 'read' )
+      grid = '';
       griddir = key{3};
+    else
+      grid = key{2};
     end
   case 'material'
     if strcmp( key{2}, 'read' )
       matdir = key{3};
+      material  = [ ];
+      imat      = [ ];
     else
       val = strread( str, '%n' )';
       material  = [ material;  val(1:3)  ];
@@ -66,6 +70,8 @@ for i = 1:length( in )
   case 'friction'
     if strcmp( key{2}, 'read' )
       fircdir = key{3};
+      friction   = [ ];
+      ifric      = [ ];
     else
       val = strread( str, '%n' )';
       friction   = [ friction; val(1:4)  ];
@@ -74,6 +80,8 @@ for i = 1:length( in )
   case 'traction'
     if strcmp( key{2}, 'read' )
       tracdir = key{3};
+      traction   = [ ];
+      itrac      = [ ];
     else
       val = strread( str, '%n' )';
       traction   = [ traction; val(1:3)  ];
@@ -82,6 +90,8 @@ for i = 1:length( in )
   case 'stress'
     if strcmp( key{2}, 'read' )
       stressdir = key{3};
+      stress     = [ ];
+      istress    = [ ];
     else
       val = strread( str, '%n' )';
       stress     = [ stress;   val(1:6)  ];

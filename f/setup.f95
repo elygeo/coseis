@@ -11,7 +11,6 @@ implicit none
 ip = 0
 
 ! Setup indices
-it = 0
 nhalo = 1
 offset = nhalo
 where( hypocenter == 0 ) hypocenter = nn / 2 + mod( nn, 2 )

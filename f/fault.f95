@@ -7,7 +7,7 @@ subroutine fault
 use globals_m
 use snormals_m
 use zone_m
-use bread_m
+use binio_m
 
 implicit none
 save
@@ -31,26 +31,25 @@ if ( fricdir /= '' ) then
   i1 = i1cell
   i2 = i2cell + 1
   i2(nrmdim) = 1
-  call bread( fs, fricdir, 'fs', i1, i2 )
-  call bread( fd, fricdir, 'fd', i1, i2 )
-  call bread( dc, fricdir, 'dc', i1, i2 )
-  call bread( co, fricdir, 'co', i1, i2 )
-else
-  do iz = 1, nfric
-    call zone( i1, i2, ifric(iz,:), nn, offset, hypocenter, nrmdim )
-    i1 = max( i1, i1nodepml )
-    i2 = min( i2, i2nodepml )
-    i1(nrmdim) = 1
-    i2(nrmdim) = 1
-    j1 = i1(1); j2 = i2(1)
-    k1 = i1(2); k2 = i2(2)
-    l1 = i1(3); l2 = i2(3)
-    fs(j1:j2,k1:k2,l1:l2) = friction(iz,1)
-    fd(j1:j2,k1:k2,l1:l2) = friction(iz,2)
-    dc(j1:j2,k1:k2,l1:l2) = friction(iz,3)
-    co(j1:j2,k1:k2,l1:l2) = friction(iz,4)
-  end do
+  call bread3( fricdir, 'fs', fs, i1, i2 )
+  call bread3( fricdir, 'fd', fd, i1, i2 )
+  call bread3( fricdir, 'dc', dc, i1, i2 )
+  call bread3( fricdir, 'co', co, i1, i2 )
 end if
+do iz = 1, nfric
+  call zone( i1, i2, ifric(iz,:), nn, offset, hypocenter, nrmdim )
+  i1 = max( i1, i1nodepml )
+  i2 = min( i2, i2nodepml )
+  i1(nrmdim) = 1
+  i2(nrmdim) = 1
+  j1 = i1(1); j2 = i2(1)
+  k1 = i1(2); k2 = i2(2)
+  l1 = i1(3); l2 = i2(3)
+  fs(j1:j2,k1:k2,l1:l2) = friction(iz,1)
+  fd(j1:j2,k1:k2,l1:l2) = friction(iz,2)
+  dc(j1:j2,k1:k2,l1:l2) = friction(iz,3)
+  co(j1:j2,k1:k2,l1:l2) = friction(iz,4)
+end do
 
 ! Prestress
 t1 = 0;
@@ -60,30 +59,29 @@ if ( stressdir /= '' ) then
   i1 = i1cell
   i2 = i2cell + 1
   i2(nrmdim) = 1
-  call bread( s1, stressdir, 'xx', i1, i2 ); t1(:,:,:,1) = s1
-  call bread( s1, stressdir, 'yy', i1, i2 ); t1(:,:,:,2) = s1
-  call bread( s1, stressdir, 'zz', i1, i2 ); t1(:,:,:,3) = s1
-  call bread( s1, stressdir, 'yz', i1, i2 ); t2(:,:,:,1) = s1
-  call bread( s1, stressdir, 'zx', i1, i2 ); t2(:,:,:,2) = s1
-  call bread( s1, stressdir, 'xy', i1, i2 ); t2(:,:,:,3) = s1
-else
-  do iz = 1, nstress
-    call zone( i1, i2, istress(iz,:), nn, offset, hypocenter, nrmdim )
-    i1 = max( i1, i1nodepml )
-    i2 = min( i2, i2nodepml )
-    i1(nrmdim) = 1
-    i2(nrmdim) = 1
-    j1 = i1(1); j2 = i2(1)
-    k1 = i1(2); k2 = i2(2)
-    l1 = i1(3); l2 = i2(3)
-    t1(j1:j2,k1:k2,l1:l2,1) = stress(iz,1)
-    t1(j1:j2,k1:k2,l1:l2,2) = stress(iz,2)
-    t1(j1:j2,k1:k2,l1:l2,3) = stress(iz,3)
-    t2(j1:j2,k1:k2,l1:l2,4) = stress(iz,4)
-    t2(j1:j2,k1:k2,l1:l2,5) = stress(iz,5)
-    t2(j1:j2,k1:k2,l1:l2,6) = stress(iz,6)
-  end do
+  call bread4( stressdir, 'xx', t1, i1, i2, 1 )
+  call bread4( stressdir, 'yy', t1, i1, i2, 2 )
+  call bread4( stressdir, 'zz', t1, i1, i2, 3 )
+  call bread4( stressdir, 'yz', t2, i1, i2, 1 )
+  call bread4( stressdir, 'zx', t2, i1, i2, 2 )
+  call bread4( stressdir, 'xy', t2, i1, i2, 3 )
 end if
+do iz = 1, nstress
+  call zone( i1, i2, istress(iz,:), nn, offset, hypocenter, nrmdim )
+  i1 = max( i1, i1nodepml )
+  i2 = min( i2, i2nodepml )
+  i1(nrmdim) = 1
+  i2(nrmdim) = 1
+  j1 = i1(1); j2 = i2(1)
+  k1 = i1(2); k2 = i2(2)
+  l1 = i1(3); l2 = i2(3)
+  t1(j1:j2,k1:k2,l1:l2,1) = stress(iz,1)
+  t1(j1:j2,k1:k2,l1:l2,2) = stress(iz,2)
+  t1(j1:j2,k1:k2,l1:l2,3) = stress(iz,3)
+  t2(j1:j2,k1:k2,l1:l2,4) = stress(iz,4)
+  t2(j1:j2,k1:k2,l1:l2,5) = stress(iz,5)
+  t2(j1:j2,k1:k2,l1:l2,6) = stress(iz,6)
+end do
 
 ! Pretraction
 t3 = 0.
@@ -92,24 +90,23 @@ if ( tracdir == '' ) then
   i1 = i1cell
   i2 = i2cell + 1
   i2(nrmdim) = 1
-  call bread( s1, tracdir, 'tn', i1, i2 ); t3(:,:,:,1) = s1
-  call bread( s1, tracdir, 'ts', i1, i2 ); t3(:,:,:,2) = s1
-  call bread( s1, tracdir, 'td', i1, i2 ); t3(:,:,:,3) = s1
-else
-  do iz = 1, ntrac
-    call zone( i1, i2, itrac(iz,:), nn, offset, hypocenter, nrmdim )
-    i1 = max( i1, i1nodepml )
-    i2 = min( i2, i2nodepml )
-    i1(nrmdim) = 1
-    i2(nrmdim) = 1
-    j1 = i1(1); j2 = i2(1)
-    k1 = i1(2); k2 = i2(2)
-    l1 = i1(3); l2 = i2(3)
-    t3(j1:j2,k1:k2,l1:l2,1) = traction(iz,1)
-    t3(j1:j2,k1:k2,l1:l2,2) = traction(iz,2)
-    t3(j1:j2,k1:k2,l1:l2,3) = traction(iz,3)
-  end do
+  call bread4( tracdir, 'tn', t3, i1, i2, 1 )
+  call bread4( tracdir, 'ts', t3, i1, i2, 2 )
+  call bread4( tracdir, 'td', t3, i1, i2, 3 )
 end if
+do iz = 1, ntrac
+  call zone( i1, i2, itrac(iz,:), nn, offset, hypocenter, nrmdim )
+  i1 = max( i1, i1nodepml )
+  i2 = min( i2, i2nodepml )
+  i1(nrmdim) = 1
+  i2(nrmdim) = 1
+  j1 = i1(1); j2 = i2(1)
+  k1 = i1(2); k2 = i2(2)
+  l1 = i1(3); l2 = i2(3)
+  t3(j1:j2,k1:k2,l1:l2,1) = traction(iz,1)
+  t3(j1:j2,k1:k2,l1:l2,2) = traction(iz,2)
+  t3(j1:j2,k1:k2,l1:l2,3) = traction(iz,3)
+end do
 
 ! Normal vectors
 i1 = i1node

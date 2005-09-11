@@ -94,9 +94,9 @@
 # out uslip	-1   1 1 1   -1 -1 -1   # final slip on the fault
 
 # checkpoint: interval for writing checkpoint restart files
-# checkpoint	-1    # checkpoint after final step
+# checkpoint	0     # no checkpointing
 # checkpoint	100   # checkpoint every 100 time steps
-  checkpoint	0     # no checkpointing
+  checkpoint	-1    # checkpoint after final step
 
 # np(3): number of processors along each axis for parallel processing
 # np		2 1 3   # 6 total processors

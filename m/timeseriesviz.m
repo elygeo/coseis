@@ -2,13 +2,13 @@
 % TIMESERIESVIZ
 
 % test if running from SORD
-
-if ~exist( 'w1', 'var' )
+if exist( 'w1', 'var' )
+  outdir = './';
+else
   addpath m
   input
 end
 
-nout = size( outvar, 1 );
 explosion = ...
   msrcradius > 0. & ...
   moment(1:3) == moment(1) & ...
@@ -17,22 +17,18 @@ explosion = ...
   length( griddir ) == 0;
 
 if ~exist( 'w1', 'var' )
-  xhair = [ 30 30 30 ];
   nn = n(1:3);
-  km = 0;
-  field = 'v';
-  ncomp = 3;
   offset = [ 0 0 0 ];
-  it = textread( 'out/timestep' );
-  endian = textread( 'meta/endian', '%c', 1 );
-  x0 = textread( 'out/x0', '%f', 3 )';
+  it = textread( [ dir 'out/timestep' ] );
+  x0 = textread( [ dir 'out/x0' ], '%f', 3 )';
+  endian = textread( [ dir 'meta/endian' ], '%c', 1 );
   if explosion & strcmp( field, 'v' )
     found = 0;
     iz = 0;
-    while iz < nout
+    while iz < size( outvar, 1 )
       iz = iz + 1;
       [ i1, i2 ] = zone( iout(iz,:), nn, offset, hypocenter, nrmdim );
-      if strcmp( outvar{iz}, field ) && sum( xhair >= i1 & xhair <= i2 ) == 3
+      if strcmp( outvar{iz}, 'x' ) && sum( xhair >= i1 & xhair <= i2 ) == 3
         found = 1;
         break
       end
@@ -42,14 +38,13 @@ if ~exist( 'w1', 'var' )
     i = xhair - i1;
     goffset = 4 * sum( i .* cumprod( [ 1 n(1:2) ] ) );
     for i = 1:3
-      file = sprintf( 'out/%02d/%1d/00001', iz, i );
+      file = sprintf( [ dir 'out/%02d/%1d/000001' ], iz, i );
       fid = fopen( file, 'r', endian );
       fseek( fid, goffset, -1 );
       xhairtarg(i) = fread( fid, 1, 'float32' );
       fclose( fid );
     end
   end
-  dark = 1;
   if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
   else     foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 1;
   end
@@ -58,7 +53,7 @@ end
 % read time series
 iz = 0;
 msg = 'no time series data at this location';
-while iz < nout
+while iz < size( outvar, 1 )
   iz = iz + 1;
   [ i1, i2 ] = zone( iout(iz,:), nn, offset, hypocenter, nrmdim );
   if strcmp( outvar{iz}, field ) && sum( xhair >= i1 & xhair <= i2 ) == 3 && outit(iz) == 1
@@ -73,7 +68,7 @@ goffset = 4 * sum( i .* cumprod( [ 1 n(1:2) ] ) );
 clear vg
 for i = 1:ncomp
 for itt = 1:it
-  file = sprintf( 'out/%02d/%1d/%05d', iz, i, itt );
+  file = sprintf( [ dir 'out/%02d/%1d/%06d' ], iz, i, itt );
   fid = fopen( file, 'r', endian );
   fseek( fid, goffset, -1 );
   vg(itt+1,i) = fread( fid, 1, 'float32' );
@@ -143,7 +138,6 @@ if explosion & strcmp( field, 'v' )
   end
   plot( time, vk, ':' )
   hold on
-asdf
 end
 
 plot( time, vg )

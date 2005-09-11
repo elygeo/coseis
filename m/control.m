@@ -26,7 +26,6 @@ case 'f1'
     set( gcf, 'CurrentAxes', haxes(2) )
     hhelp = text( .5, .54, ...
       { 'SORD - Support Operator Rupture Dynamics'
-        'by Geoffrey Ely - gely@ucsd.edu'
         ''
         'Help               F1    Acceleration      A    Zoom            < >'
         'Run                 R    Velocity          V    Reset Zoom        /'
@@ -291,7 +290,7 @@ case 'b'
     h0 = gca;
     delete( get( h0, 'Children' ) )
     for i = 1:count
-      file = sprintf( 'out/viz/%05d', i );
+      file = sprintf( 'out/viz/%06d', i );
       openfig( file, 'new', 'invisible' );
       frame{i} = copyobj( get( gca, 'Children' ), h0 )';
       delete( gcf )

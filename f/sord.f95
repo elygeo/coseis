@@ -8,6 +8,7 @@ use input_m
 use setup_m
 use gridgen_m
 use matmodel_m
+use pml_m
 use fault_m
 use momentsrc_m
 use vstep_m
@@ -21,6 +22,7 @@ call input
 call setup
 call gridgen
 call matmodel
+call pml
 call fault
 call momentsrc
 call output( 'v' )

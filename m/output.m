@@ -29,7 +29,7 @@ if init
   fprintf( 'RAM usage: %.0fMb\n', ram )
   fprintf( 'Run time: at least %s\n', datestr( nt * wt / 3600 / 24, 13 ) )
   outinit = ones( size( outit ) );
-  fprintf('Step  Amax        Vmax        Umax        Compute     I/O/Viz\n')
+  fprintf('  Step  Amax        Vmax        Umax        Compute     I/O/Viz\n')
   tic
   return
 end
@@ -80,7 +80,7 @@ for iz = 1:size( outit, 1 )
   k = i1(2):i2(2);
   j = i1(1):i2(1);
   for i = 1:nc
-    file = sprintf( 'out/%02d/%1d/%05d', iz, i, it );
+    file = sprintf( 'out/%02d/%1d/%06d', iz, i, it );
     fid = fopen( file, 'w' );
     switch outvar{iz}
     case 'x',     fwrite( fid, x(j,k,l,i),        'float32' );
@@ -125,13 +125,13 @@ fclose( fid );
 
 wt(4) = toc;
 
-file = sprintf( 'out/stats/%05d', it );
+file = sprintf( 'out/stats/%06d', it );
 fid = fopen( file, 'w' );
 fprintf( fid, '%16.7e', [ amax vmax umax wmax vslipmax uslipmax wt ] );
 fprintf( fid, '\n' );
 fclose( fid );
 
-fprintf( '%4d', it )
+fprintf( '%6d', it )
 fprintf( '%12.4e', [ amax vmax umax wt(1:2) + wt(3:4) ] )
 fprintf( '\n' )
 

@@ -20,7 +20,7 @@ if ( msrcradius <= 0. ) return
 inittrue: if ( init ) then
 
 init = .false.
-if( ip == 0 ) print '(a)', 'Moment source'
+if ( ip == 0 ) print '(a)', 'Moment source'
 
 i1 = i1cell
 i2 = i2cell

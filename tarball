@@ -8,7 +8,6 @@ echo $version > VERSION
 files="
   README
   VERSION
-  in
   *.in
   sord
   tarball

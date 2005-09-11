@@ -31,8 +31,9 @@ USAGE
   Sript options:
     -m  use MATLAB backend (default is Fortran)
     -g  run in debugger
-    -b  batch mode, compile, don't run
-    -r  run on remote host, edit sord script to set host
+    -c  checkpoint restart 
+    -n  setup only, don't compile or run
+    -r  dispatch to remote host, edit sord script to set host
 
   When porting to a new machine, you may have to modify the sord script for 
   the proper compiling and batch submission parameters.  For the parallel

@@ -2,26 +2,27 @@
 #------------------------------------------------------------------------------#
 
 echo -e "\nSORD setup"
-date
 
 mpi=guess
 debug=no
-batch=no
+dryrun=no
 matlab=no
+deleteout=no
 remote=no
-while getopts spgbfmrl opt; do
+while getopts spgnmrld opt; do
   case $opt in
     s) mpi=no ;;
     p) mpi=yes ;;
     g) debug=yes ;;
-    b) batch=yes ;;
-    f) matlab=no ;;
+    n) dryrun=yes ;;
     m) matlab=yes ;;
+    d) deleteout=yes ;;
     r) remote=yes ;;
     l) remote=no ;;
   esac
 done
 shift $(( OPTIND - 1 ))
+[ -n "$1" ] && cp "$1" "in"
 
 # run on remote host
 if [ $remote = yes ]; then
@@ -38,9 +39,10 @@ fi
 #------------------------------------------------------------------------------#
 # REad input
 
+dir="."
 nn3=( 1 1 1 )
 np3=( 1 1 1 )
-for file in defaults.in in; do
+for file in "defaults.in" "in"; do
 if [ ! -f "$file" ]; then
   echo "file not found: $file"
   exit
@@ -48,13 +50,14 @@ fi
 while read key params; do
   set -- $params
   case "$key" in
-  switch) swtich=$2 ;;
-  case)   case=$2 ;;
+    switch) swtich=$2 ;;
+    case)   case=$2 ;;
   esac
   if [ "$switch" = "$case" ]; then
     case "$key" in
-      n)  nn3=( $1 $2 $3 ); nt=$4 ;;
-      np) np3=( $1 $2 $3 ) ;;
+      dir) dir=$1
+      n)   nn3=( $1 $2 $3 ); nt=$4 ;;
+      np)  np3=( $1 $2 $3 ) ;;
     esac
   fi
 done < "$file"
@@ -63,14 +66,14 @@ nn=$(( nn3[0] * nn3[1] * nn3[2] ));
 np=$(( np3[0] * np3[1] * np3[2] ));
 [ $matlab = yes ] && np=1
 
-rm -f batchjob
-[ ! -f meta/in -o "$( diff in meta/in )" != "" ] && rm -rf out
-[ -e meta ] && rm -fr meta
-
 #------------------------------------------------------------------------------#
 # Metadata
 
-mkdir meta
+[ $deleteout == yes ] && rm -rf "$dir/out"
+[ -d "$dir/out" ] || mkdir "$dir/out"
+rm -f batchjob
+rm -rf "$dir/meta"
+mkdir "$dir/meta"
 
 osname=$( uname )
 
@@ -80,11 +83,11 @@ elif [ "$HOSTNAME" = master ];   then machine="babieca"
 else machine=$HOSTNAME
 fi
 
-perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > meta/endian
+perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > "$dir/meta/endian"
 
 ./tarball
-cp sord.tgz meta/
-cp in meta/
+cp sord.tgz "$dir/meta/"
+cp "$dir/in" "$dir/meta/"
 
 floatsize=4
 nvars=21
@@ -102,7 +105,7 @@ wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
 echo "RAM usage: at least ${ram}Mb"
 echo "Run time: at least $wt"
 
-cat << END > meta/data
+cat << END > "$dir/meta/data"
 login:   $LOGNAME
 name:    $( finger $LOGNAME | sed -n 's/^.*e: //p' )
 date:    $( date )
@@ -123,7 +126,7 @@ nohup matlab -r "addpath m, sord, quit" > out.log &
 END
 chmod u+x batchjob
 
-[ $batch = no ] && matlab -nodesktop -nosplash -r "addpath m; sord"
+[ $dryrun = no ] && matlab -nodesktop -nosplash -r "addpath m; sord"
 
 exit
 
@@ -135,11 +138,6 @@ fi
 [ $mpi = guess -a $np -eq 1 ] && mpi=no
 [ $mpi = guess -a $np -gt 1 ] && mpi=yes
 
-if [ $debug = yes -a $batch = yes ]; then
-  echo "can't debug in batch mode"
-  exit
-fi
-
 OBJECT="\\
   globals.o \\
   zone.o \\
@@ -148,12 +146,12 @@ OBJECT="\\
   hgcn.o \\
   hgnc.o \\
   snormals.o \\
-  bread.o \\
-  bwrite.o \\
+  binio.o \\
   input.o \\
   setup.o \\
   gridgen.o \\
   matmodel.o \\
+  pml.o \\
   fault.o \\
   momentsrc.o \\
   vstep.o \\
@@ -186,7 +184,7 @@ SunOS)
   ;;
 esac
 
-[ "$nn" -lt 100000 ] && OPTFLAGS=-g
+[ $nn -lt 10000 ] && OPTFLAGS=-g
 
 if [ $debug = yes ]; then
   OPTFLAGS=-g
@@ -227,7 +225,7 @@ END
 [ ! -f makefile ] && touch makefile
 [ "$( diff tmp makefile )" != "" ] && mv tmp makefile
 rm -f tmp
-gmake
+[ $dryrun = no ] && gmake
 
 #------------------------------------------------------------------------------#
 # Machine specific batch submission and run commands
@@ -252,6 +250,7 @@ other useful commands:
 END
 [ $( pwd | grep -v gpfs ) ] || exit
 
+# batch
 rate=100000
 wt=$(( nt * nn / np / rate + 1 ))
 hh=$(( wt / 3600 ))
@@ -259,19 +258,10 @@ mm=$(( wt % 3600 / 60 ))
 ss=$(( wt % 60 ))
 [ $hh -ge 1 ] && ss=0
 wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
-
 ppn=8;
 [ $ppn -gt $np ] && ppn=$np
 nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
 opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_single"
-
-case $debug$mpi in
-  nono)   cmd="./fsord" ;;
-  noyes)  cmd="poe ./fsord $opts" ;;
-  yesno)  cmd="totalview poe -a ./fsord $opts" ;;
-  yesyes) cmd="totalview poe -a ./fsord $opts" ;;
-esac
-
 rundir=$( /bin/pwd )
 cat << END > batchjob
 #!/bin/bash
@@ -309,11 +299,18 @@ YIELDLOOPTIME=0;
 #@ initialdir = $rundir
 #@ queue
 cd $rundir
-poe ./fsord
+poe ./fsord $opts
 END
 chmod u+x batchjob
 
-[ $batch = no -a $( hostname ) = ds100 ] && $cmd
+# interactive
+[ $( hostname ) = ds100 ] || dryrun=yes
+case $dryrun$debug$mpi in
+  nonono)   ./fsord ;;
+  nonoyes)  poe ./fsord $opts ;;
+  noyesno)  totalview poe -a ./fsord $opts ;;
+  noyesyes) totalview poe -a ./fsord $opts ;;
+esac
 
 ;;
 
@@ -326,6 +323,7 @@ batch submission:
 qsub batchjob
 END
 
+# batch
 rate=100000
 wt=$(( nt * nn / np / rate + 1 ))
 hh=$(( wt / 3600 ))
@@ -333,16 +331,9 @@ mm=$(( wt % 3600 / 60 ))
 ss=$(( wt % 60 ))
 [ $hh -ge 1 ] && ss=0
 wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
-
 ppn=2;
 [ $ppn -gt $np ] && ppn=$np
 nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
-
-case $mpi in
-  no)  cmd="" ;;
-  yes) cmd="mpirun -v -machinefile \$PBS_NODEFILE -np $np" ;;
-esac
-
 cat << END > batchjob
 #!/bin/bash
 #PBS -q dque
@@ -353,11 +344,15 @@ cat << END > batchjob
 #PBS -e err.log
 #PBS -V
 cd $rundir
-time $cmd ./fsord
+time mpirun -v -machinefile \$PBS_NODEFILE -np $np ./fsord
 END
 chmod u+x batchjob
 
-[ $batch = no ] && $cmd ./fsord
+case $dryrun$debug$mpi in
+  nonono)   ./fsord ;;
+  noyesno)  gdb ./fsord ;;
+  noyesyes) time mpirun -v -machinefile \$PBS_NODEFILE -np $np ./fsord ;;
+esac
 
 ;;
 
@@ -371,17 +366,10 @@ qsub batchjob
 other useful commands: pbsnodes -a, pingd, qstat, qdel
 END
 
+# batch
 ppn=2
 [ $ppn -gt $np ] && ppn=$np
 nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
-
-case $debug$mpi in
-  nono)   cmd="";;
-  noyes)  cmd="mpiexec -np $np" ;;
-  yesno)  cmd="gdb" ;;
-  yesyes) cmd="mpiexec -np $np -dbg=ddd" ;;
-esac
-
 cat << END > batchjob
 #!/bin/bash
 #PBS -q workq
@@ -392,35 +380,44 @@ cat << END > batchjob
 #PBS -V
 sleep 2
 cd $rundir
-time $cmd ./fsord
+time mpiexec -np $np ./fsord
 END
 chmod u+x batchjob
 
-[ $batch = no ] && $cmd ./fsord
+# interactive
+case $dryrun$debug$mpi in
+  nonono)   ./fsord ;;
+  noyesno)  gdb ./fsord ;;
+  nonoyes)  mpiexec -np $np ./fsord ;;
+  noyesyes) mpiexec -np $np -dbg=gdb ./fsord ;;
+esac
 
 ;;
 
 #--------------------------------------#
 *)
 
-case $debug$mpi in
-  nono)   cmd="" ;;
-  noyes)  cmd="mpirun -np $np" ;;
-  yesno)  cmd="ddd" ;;
-  yesyes) cmd="mpirun -np $np -dbg=ddd" ;;
+# batch
+case $mpi in
+  no)  cmd="" ;;
+  yes) cmd="mpirun -np $np" ;;
 esac
-
 cat << END > batchjob
 #!/bin/bash
-nohup unbuffer $cmd ./fsord | tee out.log &
+nohup $cmd ./fsord > out.log &
 END
 chmod u+x batchjob
 
-[ $batch = no ] && $cmd ./fsord
+# interactive
+case $dryrun$debug$mpi in
+  nonono)   ./fsord ;;
+  noyesno)  ddd ./fsord ;;
+  nonoyes)  mpirun -np $np ./fsord ;;
+  noyesyes) mpirun -np $np -dbg=ddd ./fsord ;;
+esac
 
 ;;
 
 esac
 
 #------------------------------------------------------------------------------#
-

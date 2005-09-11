@@ -16,6 +16,7 @@ setup
 init = 1; viz
 gridgen
 matmodel
+pml
 init = 1; fault
 init = 1; momentsrc
 init = 2; viz, viz

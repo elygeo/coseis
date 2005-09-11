@@ -70,7 +70,8 @@ for iq = 1:4
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
-  s1(j,k,l) = y(j,k,l) .* hgnc( w2, ic, iq, j, k, l );
+  s1(j,k,l) = hgnc( w2, ic, iq, j, k, l );
+  s1 = y .* s1;
   i1 = i1node;
   i2 = i2node;
   l = i1(3):i2(3);
@@ -99,7 +100,7 @@ for iz = 1:size( locknodes, 1 )
   w1(j,k,l,i) = 0;
 end
 
-% Velocity, V = V + dV
+% Velocity, V = V + dt * A
 v = v + dt * w1;
 
 % add plane wave

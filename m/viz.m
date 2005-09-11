@@ -168,7 +168,7 @@ frame{end+1} = kids;
 showframe = length( frame );
 if savemovie && ~holdmovie
   count = count + 1;
-  file = sprintf( 'out/viz/%05d', count );
+  file = sprintf( 'out/viz/%06d', count );
   saveas( gcf, file )
 end
 
