@@ -104,7 +104,7 @@ case 'rand'
   case 3, w1(:,:,i(3)+[0 1],3) = 0;
   end
   x = x(:,:,:,1) + w1;
-otherwise error grid
+otherwise error 'grid'
 end
 
 % Duplicate edge nodes into halo

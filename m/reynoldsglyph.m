@@ -106,7 +106,7 @@ case 3
     hold on
   end
   set( hglyph, 'BackFaceLighting', 'lit' )
-otherwise error mga
+otherwise error 'mga'
 clear n
 end
 set( hglyph, ...

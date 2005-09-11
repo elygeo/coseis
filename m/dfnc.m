@@ -27,7 +27,7 @@ case 3
   + f(j,k+1,l+1,i) - f(j+1,k,l,i) ...
   + f(j+1,k,l+1,i) - f(j,k+1,l,i) ...
   - f(j+1,k+1,l,i) + f(j,k,l+1,i) );
-otherwise error a
+otherwise error 'a'
 end
 
 case 'r' % rectangular grid, flops: 3* 9+
@@ -57,7 +57,7 @@ case 3
     + f(j,k+1,l+1,i) - f(j+1,k,l,i)  ...
     + f(j+1,k,l+1,i) - f(j,k+1,l,i)  ...
     - f(j+1,k+1,l,i) + f(j,k,l+1,i) ) );
-otherwise error a
+otherwise error 'a'
 end
 
 case 'g' % general grid, flops: 57* 112+
@@ -89,6 +89,8 @@ df = 1 / 12 * ...
 +x(j,k,l+1,c).*((x(j+1,k+1,l+1,b)-x(j,k,l,b)).*(f(j+1,k,l+1,i)-f(j,k+1,l+1,i))+x(j,k,l,b).*(f(j,k+1,l,i)-f(j+1,k,l,i))...
       +(x(j+1,k,l,b)-x(j,k+1,l+1,b)).*(f(j,k,l,i)-f(j+1,k,l+1,i))+x(j,k+1,l+1,b).*(f(j+1,k+1,l+1,i)-f(j,k+1,l,i))...
       +(x(j,k+1,l,b)-x(j+1,k,l+1,b)).*(f(j,k+1,l+1,i)-f(j,k,l,i))+x(j+1,k,l+1,b).*(f(j+1,k,l,i)-f(j+1,k+1,l+1,i))));
+
+otherwise error 'operator'
 
 end
 

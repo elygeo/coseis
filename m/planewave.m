@@ -9,7 +9,7 @@ case 'delta',  psrct = zeros( size( time ) ); psrct(1) = 1 / dt;
 case 'sine',   psrct = sin( 2 * pi * time / domp ) * pi / domp;
 case 'brune',  psrct = time .* exp( -time / domp ) / domp ^ 2;
 case 'sbrune', psrct = time .^ 2 .* exp( -time / domp ) / 2 / domp ^ 3;
-otherwise error srctimefcn
+otherwise error 'srctimefcn'
 end
 for i = 1:3
   switch planewavedim

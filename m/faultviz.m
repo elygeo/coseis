@@ -45,8 +45,5 @@ if rcrit
 end
 scontour( xg, us(j,k,l), dc0 );
 scontour( xg, us(j,k,l), .01 * dc0 );
-switch dir
-case { 'the2', 'the3' }
-  scontour( xg, fd(j,k,l), 10 );
-end
+scontour( xg, co(j,k,l), 1e8 );
 

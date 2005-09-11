@@ -7,7 +7,7 @@ j = i1(1):i2(1);
 k = i1(2):i2(2);
 l = i1(3):i2(3);
 ax = find( i1 == i2 );
-if ( length( ax ) ~= 1 ); error snormals; end
+if ( length( ax ) ~= 1 ); error 'snormals'; end
 n = size( x );
 n(ax) = 1;
 nrm = repmat( 0 * x(1), n );
@@ -57,7 +57,7 @@ for a = 1:3
     + x(j-1,k-1,l,b) .* ( x(j,k-1,l,c) - x(j-1,k,l,c) ) ...
     + x(j-1,k+1,l,b) .* ( x(j-1,k,l,c) - x(j,k+1,l,c) ) ...
     + x(j+1,k-1,l,b) .* ( x(j+1,k,l,c) - x(j,k-1,l,c) ) );
-  otherwise error ax
+  otherwise error 'ax'
   end
 end
 

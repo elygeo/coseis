@@ -15,7 +15,7 @@ case 3, pos(crdsys(3)) = a; upvec(crdsys(2)) = a;
 case 4, pos = [ a a a ] / 2; pos(crdsys(2)) = a / sqrt( 2 );
   camproj( 'perspective' );
   camva( 1.25 * camva )
-otherwise error look
+otherwise error 'look'
 end
 camtarget( xcenter )
 campos( xcenter + camdist * pos )

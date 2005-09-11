@@ -70,7 +70,7 @@ if 0 % increment stress
   case 'delta',  msrcf = 0.; if it == 1, msrcf = 1. / dt; end
   case 'brune',  msrcf = exp( -time / domp ) / domp ^ 2. * time;
   case 'sbrune', msrcf = exp( -time / domp ) / domp ^ 3. * time * time / 2.;
-  otherwise error srctimefcn
+  otherwise error 'srctimefcn'
   end
   msrcf = dt * msrcf
 else % direct stress
@@ -80,7 +80,7 @@ else % direct stress
   case 'brune',  msrcf = 1. - exp( -time / domp ) / domp * ( time + domp );
   case 'sbrune', msrcf = 1. - exp( -time / domp ) / domp * ...
     ( time + domp + time * time / domp / 2. );
-  otherwise error srctimefcn
+  otherwise error 'srctimefcn'
   end
 end
 

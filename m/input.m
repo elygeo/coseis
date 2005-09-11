@@ -12,7 +12,6 @@ stress    = []; istress = []; stressdir = '';
 locknodes = []; ilock   = [];
 outvar    = {}; iout    = []; outit = [];
 grid      = ''; griddir = '';
-dir       = '';
 
 for file = { 'defaults.in', 'in' }
 fprintf( 'Reading file: %s\n', file{1} )

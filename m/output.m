@@ -11,10 +11,10 @@ if init
   if checkpoint < 0, checkpoint = nt + checkpoint + 1; end
   if exist( 'out/checkpoint.mat', 'file' )
     load out/checkpoint
-    if size( rho ) == nm, else error 'reading checkpoint', end
+    if size( rho ) == nm, else error 'Checkpoint', end
     fprintf( 'Checkpoint found, starting from step %g\n', it )
   else
-    if exist( 'out', 'dir' ), error 'previous output found', end
+    if exist( 'out', 'dir' ), error 'Previous run exists', end
     mkdir( 'out/stats/' )
     for iz = 1:size( outit, 1 )
       file = sprintf( 'out/%02d/', iz );

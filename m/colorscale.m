@@ -20,11 +20,11 @@ if ~exist( 'hlegend', 'var' )
   set( gcf, 'CurrentAxes', haxes(1) )
 end
 
-ascl = alim; if ascl < 0, ascl = double( amax ); end;
-vscl = vlim; if vscl < 0, vscl = double( vmax ); end;
-uscl = ulim; if uscl < 0, uscl = double( umax ); end;
-wscl = wlim; if wscl < 0, wscl = double( wmax ); end;
-xscl = xlim; if xscl < 0, xscl = double( umax ); end;
+ascl  = alim;  if ascl  < 0, ascl  = double( amax );  end;
+vscl  = vlim;  if vscl  < 0, vscl  = double( vmax );  end;
+uscl  = ulim;  if uscl  < 0, uscl  = double( umax );  end;
+wscl  = wlim;  if wscl  < 0, wscl  = double( wmax );  end;
+xscl  = xlim;  if xscl  < 0, xscl  = double( umax );  end;
 usscl = uslim; if usscl < 0, usscl = double( usmax ); end;
 vsscl = vslim; if vsscl < 0, vsscl = double( vsmax ); end;
 tnscl = tnlim; if tnscl < 0, tnscl = double( tnmax ); end;
@@ -42,7 +42,7 @@ case 'us', fscl = usscl; titles = { 'Uslip' };
 case 'vs', fscl = vsscl; titles = { 'Vslip' };
 case 'tn', fscl = tnscl; titles = { 'Tn' };
 case 'ts', fscl = tsscl; titles = { 'Ts' };
-otherwise error field
+otherwise error 'field'
 end
 ncomp = length( titles ) - 1;
 if comp > ncomp, comp = mod( comp, ncomp ); end

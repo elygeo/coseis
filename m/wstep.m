@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
 % WSTEP - Increment displacement and stress
 
-% Displacement & Slip
+% Update displacement & slip
 u = u + dt * v;
 us = us + dt * vs;
 

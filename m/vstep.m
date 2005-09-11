@@ -100,11 +100,8 @@ for iz = 1:size( locknodes, 1 )
   w1(j,k,l,i) = 0;
 end
 
-% Velocity, V = V + dt * A
+% Update velocity
 v = v + dt * w1;
-
-% add plane wave
-if planewavedim, planewave, end
 
 % Magnitudes
 s1 = sqrt( sum( w1 .* w1, 4 ) );

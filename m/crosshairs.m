@@ -17,7 +17,7 @@ elseif xhairmove == 6
   case 'v', imax = ivmax;
   case 'u', imax = iumax;
   case 'w', imax = iwmax;
-  otherwise error xhfield
+  otherwise error 'xhfield'
   end
   [ j, k, l ] = ind2sub( nm, imax );
   xhair = [ j k l ];
@@ -101,7 +101,7 @@ case 'w'
     tmp = [ val([3 2 1])' wg lam(j,k,l) mu(j,k,l) ];
     msg = sprintf( 'W1  %9.2e\nW2  %9.2e\nW3  %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e\nlam %9.2e\nmu  %9.2e', tmp );
   end
-otherwise error xhfield
+otherwise error 'xhfield'
 end
 set( gcf, 'CurrentAxes', haxes(2) )
 hhud = text( .02, .98, msg, 'Hor', 'left', 'Ver', 'top' );
@@ -175,7 +175,7 @@ if dooutline && ~volviz && ( dosurf || domesh || doglyph  )
   case 1, j = i(i1); k = i(i2+4); l = i(i3+8);
   case 2, j = i(i3); k = i(i1+4); l = i(i2+8);
   case 3, j = i(i2); k = i(i3+4); l = i(i1+8);
-  otherwise error slicedim
+  otherwise error 'slicedim'
   end
   ii = sub2ind( nm(1:3), j, k, l )';
   ng = prod( nm(1:3) );

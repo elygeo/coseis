@@ -77,7 +77,7 @@ case 3
       end
     end
   end
-otherwise error mga
+otherwise error 'mga'
 end
 set( hglyph, 'Tag', 'glyph' );
 

@@ -102,7 +102,7 @@ otherwise
   case 'cube',       dosurf = 1; volviz = 1;
   case 'glyphs',     doglyph = 1;
   case 'isosurface', doisosurf = 1; volviz = 1;
-  otherwise error plotstyle
+  otherwise error 'plot style'
   end
   plotstyle = 'hold';
 end
@@ -114,7 +114,7 @@ case 'a', onpass = 'v';
 case 'v', onpass = 'v'; time = ( it + .5 ) * dt;
 case 'u', onpass = 'w';
 case 'w', onpass = 'w';
-otherwise error vizfield
+otherwise error 'viz field'
 end
 if onpass ~= pass, return, end
 
