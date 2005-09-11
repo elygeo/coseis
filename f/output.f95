@@ -22,15 +22,17 @@ if ( init ) then
   if ( it == 0 ) then
     if ( ip == 0 ) then
       print '(a)', 'Initialize output'
-      call system( 'mkdir ' // trim( dir ) )
-      str = trim( dir ) // 'x0'
-      open(  9, file=str, status='new' )
+      open(  9, file='out/x0', status='new', iostat=err )
+      if ( err / 0 ) then
+        print '(a)', 'error: previous output found. use -d flag to overwrite'
+        stop
+      else
       write( 9, * ) x0
       close( 9 )
-      call system( 'mkdir ' // trim( dir ) // 'ckp' )
-      call system( 'mkdir ' // trim( dir ) // 'stats' )
+      call system( 'mkdir out/ckp' )
+      call system( 'mkdir out/stats' )
       do iz = 1, nout
-        write( str, '(a,i2.2)' ) trim( dir ), iz
+        write( str, '(a,i2.2)' ) 'out/', iz
         call system( 'mkdir ' // str )
       end do
     end if
@@ -38,7 +40,7 @@ if ( init ) then
   else
     if ( ip == 0 ) print '(a,i6)', 'Checkpoint found, starting from step ', it
     outinit = .false.
-    write( str, '(a,a,i6.6,i6.6)' ) trim( dir ), 'ckp/', ip, it
+    write( str, '(a,i6.6,i6.6)' ) 'out/ckp/', ip, it
     inquire( iolength=reclen ) u, v, vs, us, trup, &
       p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
     open( 9, &
@@ -104,7 +106,7 @@ if ( fault ) then
 end if
 do i = 1, nc
   write( str, '(a,i2.2,a,a,i1,i6.6)' ) &
-    trim( dir ), iz, '/', trim( outvar(iz), i, it
+    'out/', iz, '/', trim( outvar(iz) ), i, it
   select case( outvar(iz) )
   case( 'rho'  ); call bwrite3( str, rho,  i1, i2 )
   case( 'lam'  ); call bwrite3( str, lam,  i1, i2 )
@@ -127,7 +129,7 @@ do i = 1, nc
   end select
 end do
 if ( ip == 0 ) then
-  write( str, '(a,i2.2,a)' ) trim( dir ), iz, '/hdr'
+  write( str, '(a,i2.2,a)' ) 'out/', iz, '/hdr'
   open(  9, file=str, status='replace' )
   write( 9, * ) nc, i1-offset, i2-offset, outit(iz), it, dt, dx
   write( 9, * ) outvar(iz)
@@ -143,7 +145,7 @@ if ( pass == 'w' ) return
 if ( checkpoint /= 0 .and. mod( it, checkpoint ) == 0 ) then
   inquire( iolength=reclen ) v, u, vs, us, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
-  write( str, '(a,a,i6.6,i6.6)') trim( dir ), 'ckp/', ip, it
+  write( str, '(a,i6.6,i6.6)') 'out/ckp/', ip, it
   open( 9, &
     file=str, &
     recl=reclen, &
@@ -153,20 +155,19 @@ if ( checkpoint /= 0 .and. mod( it, checkpoint ) == 0 ) then
   write( 9, rec=1 ) v, u, vs, us, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   close( 9 )
-  write( str, '(a,a,i6.6,a)' ) trim( dir ), 'ckp/', ip, '.hdr'
+  write( str, '(a,i6.6,a)' ) 'out/ckp/', ip, '.hdr'
   open( 9, file=str, status='replace' )
   write( 9, * ) it
   close( 9 )
 end if
 
 if ( ip == 0 ) then
-  str = trim( dir ) // 'timestep'
-  open(  9, file=str, status='replace' )
+  open(  9, file='out/timestep', status='replace' )
   write( 9, * ) it
   close( 9 )
   call system_clock( wt(5) )
   dwt(1:4) = real( wt(2:5) - wt(1:4) ) / real( wt_rate )
-  write( str, '(a,a,i6.6)' ) trim( dir ), 'stats/', it
+  write( str, '(a,i6.6)' ) 'out/stats/', it
   open(  9, file=str, status='replace' )
   write( 9, '(8es16.7)' ) amax, vmax, umax, wmax, dwt
   close( 9 )

@@ -39,7 +39,6 @@ fi
 #------------------------------------------------------------------------------#
 # REad input
 
-dir="."
 nn3=( 1 1 1 )
 np3=( 1 1 1 )
 for file in "defaults.in" "in"; do
@@ -55,7 +54,6 @@ while read key params; do
   esac
   if [ "$switch" = "$case" ]; then
     case "$key" in
-      dir) dir=$1 ;;
       n)   nn3=( $1 $2 $3 ); nt=$4 ;;
       np)  np3=( $1 $2 $3 ) ;;
     esac
@@ -69,11 +67,9 @@ np=$(( np3[0] * np3[1] * np3[2] ));
 #------------------------------------------------------------------------------#
 # Metadata
 
-[ $deleteout == yes ] && rm -rf "$dir/out"
-[ -d "$dir/out" ] || mkdir "$dir/out"
+[ $deleteout == yes ] && rm -rf out
+[ -e out ] || mkdir out
 rm -f batchjob
-rm -rf "$dir/meta"
-mkdir "$dir/meta"
 
 osname=$( uname )
 
@@ -83,11 +79,11 @@ elif [ "$HOSTNAME" = master ];   then machine="babieca"
 else machine=$HOSTNAME
 fi
 
-perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > "$dir/meta/endian"
+perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > out/endian
 
 ./tarball
-cp sord.tgz "$dir/meta/"
-cp "in" "$dir/meta/"
+cp sord.tgz out/
+cp "in" out/
 
 floatsize=4
 nvars=21
@@ -105,7 +101,7 @@ wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
 echo "RAM usage: at least ${ram}Mb"
 echo "Run time: at least $wt"
 
-cat << END > "$dir/meta/data"
+cat << END > out/meta
 login:   $LOGNAME
 name:    $( finger $LOGNAME | sed -n 's/^.*e: //p' )
 date:    $( date )

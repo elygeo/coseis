@@ -34,7 +34,6 @@ for i = 1:length( in )
   case 'switch'
   case 'case'
   case 'np'
-  case 'dir',        dir        = key{2};
   case 'n',          n          = strread( str, '%n' )';
   case 'dx',         dx         = strread( str, '%n' )';
   case 'dt',         dt         = strread( str, '%n' )';

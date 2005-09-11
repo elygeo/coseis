@@ -9,15 +9,17 @@ if init
   w1(:) = 0.;
   w2(:) = 0.;
   if checkpoint < 0, checkpoint = nt + checkpoint + 1; end
-  if ~readcheckpoint
-    if exist( 'out', 'dir' ), rmdir( 'out', 's' ), end
+  if exist( 'out/checkpoint.mat', 'file' )
+    load out/checkpoint
+    if size( rho ) == nm, else error 'reading checkpoint', end
+    fprintf( 'Checkpoint found, starting from step %g\n', it )
+  else
+    if exist( 'out', 'dir' ), error 'previous output found', end
     mkdir( 'out/stats/' )
     for iz = 1:size( outit, 1 )
       file = sprintf( 'out/%02d/', iz );
       mkdir( file )
     end
-  else
-    % FIXME read checkpoint
   end
   [ tmp1, tmp2, endian ] = computer;
   fid = fopen( 'out/endian', 'w' );
@@ -112,7 +114,7 @@ end
 if pass == 'w', return, end
 
 if checkpoint & ~mod( it, checkpoint )
-  save checkpoint it u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 vs us trup
+  save out/checkpoint it u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 vs us trup
 end
 
 fid = fopen( 'out/timestep', 'w' );

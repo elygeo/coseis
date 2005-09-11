@@ -40,7 +40,7 @@ integer, dimension(nz,6) :: ioper, ilock, iout, imat, ifric, itrac, istress
 
 character :: oper(nz)
 character(8) :: outvar(nz)
-character(160) :: grid = '', srctimefcn = '', dir = '', &
+character(160) :: grid = '', srctimefcn = '', &
   matdir = '', fricdir = '', tracdir='', stressdir = '', griddir = ''
 
 logical :: hypop = .false.

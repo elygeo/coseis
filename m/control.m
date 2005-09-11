@@ -78,7 +78,7 @@ case 'h',          xhairmove = 4;  crosshairs
 case 'e',          xhairmove = 6;  crosshairs
 case 'space', if km, itstep = 10; else itstep = 1; end, msg = 'Step';
 case 'r', itstep = nt - it; msg = 'Run';
-case 'q', if km, sord, return, end
+case 'q', if km, rmdir( 'out', 's' ), sord, return, end
 case '0', comp = 0; colorscale; msg = titles( 1 );
 case '1', comp = 1; colorscale; msg = titles( 2 );
 case '2', comp = 2; colorscale; msg = titles( 3 );
@@ -268,19 +268,10 @@ case 'l'
 case 't', timeseriesviz
 case 'c'
   if ~km
-    save checkpoint it u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 vs us trup
-    if exist( 'checkpoint.out', 'dir' )
-      rmdir( 'checkpoint.out', 's' )
-    end
-    copyfile( 'out', 'checkpoint.out' )
+    save checkpoint it v u vs us trup p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6
     msg = 'Checkpoint Saved';
   else
     load checkpoint
-    wstep
-    if exist( 'out', 'dir' )
-      rmdir( 'out', 's' )
-    end
-    copyfile( 'checkpoint.out', 'out' )
     msg = 'Checkpoint Loaded';
   end
 case 'b'

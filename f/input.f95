@@ -37,7 +37,6 @@ loop: do
   end select
   if ( caseswitch /= switchcase ) cycle loop
   a2: select case( key1 )
-  case( 'dir' );        dir = trim( key2 ) // '/'
   case( 'n' );          read( str, * ) key1, nn, nt
   case( 'dx' );         read( str, * ) key1, dx
   case( 'dt' );         read( str, * ) key1, dt
@@ -109,9 +108,7 @@ end do loop
 close( 9 )
 end do izloop
 
-dir = trim( dir ) // 'out/'
-
-write( str, '(a,a,i6.6,a)' ) trim( dir ), 'ckp/', ip, '.hdr'
+write( str, '(a,i6.6,a)' ) 'out/ckp/', ip, '.hdr'
 open( 9, file=str, status='old', iostat=err )
 if ( err == 0 ) then
   read( 9, * ) it

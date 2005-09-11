@@ -1,7 +1,6 @@
 #------------------------------------------------------------------------------#
 # Test PML boundary conditions
 
-  dir		pmltest
   hypocenter	21 21 21
   grid		constant
   msrcradius	150.
