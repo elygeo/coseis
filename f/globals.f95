@@ -5,7 +5,7 @@ module globals_m
 
 implicit none
 
-integer, parameter :: nz = 100, maxpml = 100
+integer, parameter :: nz = 80
 
 real, allocatable, dimension(:,:,:,:) :: &
   x, v, u, w1, w2, &
@@ -19,26 +19,26 @@ real, allocatable, dimension(:,:,:) :: &
 real :: &
   material(nz,3), friction(nz,4), traction(nz,3), stress(nz,6), &
   dx, dt, viscosity(2), vrup, rcrit, moment(6), msrcradius, domp, &
-  amax, vmax, umax, wmax, vsmax, usmax, x0(3), &
-  mu0, truptol, matmin(3), matmax(3), &
-  dn1(maxpml), dn2(maxpml), dc1(maxpml), dc2(maxpml)
+  amax, vmax, umax, wmax, vsmax, usmax, &
+  mu0, truptol, matmin(3), matmax(3), x0(3)
+
+real, dimension(80) :: dn1, dn2, dc1, dc2
+
+integer, dimension(3) :: &
+  nn, nm, nf, np, offset, hypocenter, &
+  iamax, ivmax, iumax, iwmax, ivsmax, iusmax, &
+  i1, i1node, i1cell, i1nodepml, i1cellpml, &
+  i2, i2node, i2cell, i2nodepml, i2cellpml
+
+integer, dimension(nz,6) :: ilock, iout, imat, ifric, itrac, istress
 
 integer :: &
-  nn(3), nm(3), nf(3), nhalo, offset(3), npml, bc(6), &
-  nt, it, checkpoint, np(3), ip, wt(5), &
-  hypocenter(3), nrmdim, downdim, nclramp, &
-  outit(nz), &
-  locknodes(nz,3), noper, nlock, nout, nmat, nfric, ntrac, nstress, &
-  iamax(3), ivmax(3), iumax(3), iwmax(3), ivsmax(3), iusmax(3), &
-  i1node(3), i1cell(3), i1nodepml(3), i1cellpml(3), &
-  i2node(3), i2cell(3), i2nodepml(3), i2cellpml(3), &
-  i1(3), j1, k1, l1, &
-  i2(3), j2, k2, l2, &
-  i, j, k, l
+  ip, nhalo, i, j, k, l, j1, k1, l1, j2, k2, l2, &
+  nt, it, checkpoint, npml, bc(6), nrmdim, downdim, nclramp, wt(5), &
+  noper, i1oper(2,3), i2oper(2,3), nlock, locknodes(nz,3), nout, outit(nz), &
+  nmat, nfric, ntrac, nstress
 
-integer, dimension(nz,6) :: ioper, ilock, iout, imat, ifric, itrac, istress
-
-character :: oper(nz)
+character :: oper(2)
 character(8) :: outvar(nz)
 character(160) :: grid = '', srctimefcn = '', &
   matdir = '', fricdir = '', tracdir='', stressdir = '', griddir = ''

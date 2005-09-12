@@ -12,9 +12,8 @@ stress    = []; istress = []; stressdir = '';
 locknodes = []; ilock   = [];
 outvar    = {}; iout    = []; outit = [];
 grid      = ''; griddir = '';
-infile    = textread( 'infile', '%s' );
 
-for file = { 'in/defaults' infile{1} }
+for file = { 'in/defaults' 'input' }
 
 fprintf( 'Reading file: %s\n', file{1} )
 in = textread( file{1}, '%s', 'delimiter', '\n', 'commentstyle', 'shell' );

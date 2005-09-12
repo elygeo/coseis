@@ -26,9 +26,8 @@ s1 = u(:,:,:,ic) + dt * viscosity(1) * v(:,:,:,ic)
 idloop: do id = 1, 3
   ix = 6 - ic - id
   do iz = 1, noper
-    call zone( i1, i2, ioper(iz,:), nn, offset, hypocenter, nrmdim )
-    i1 = max( i1, i1cellpml )
-    i2 = min( i2 - 1, i2cellpml )
+    i1 = max( i1oper(iz,:),     i1cellpml )
+    i2 = min( i2oper(iz,:) - 1, i2cellpml )
     call dfnc( s2, oper(iz), s1, x, dx, 1, id, i1, i2 )
   end do
   do i = 1, npml
@@ -181,7 +180,7 @@ iumax  = maxloc( s1 ); umax  = s1(iumax(1),iumax(2),iumax(3))
 iwmax  = maxloc( s2 ); wmax  = s2(iwmax(1),iwmax(2),iwmax(3))
 iusmax = maxloc( us ); usmax = us(iusmax(1),iusmax(2),iusmax(3))
 
-if ( umax > dx / 10. ) print *, 'Warning: u !<< dx\n'
+if ( umax > dx / 10. ) print *, 'Warning: u !<< dx'
 
 end subroutine
 end module

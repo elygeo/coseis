@@ -12,9 +12,7 @@ character(160) :: infile(2), str, key1, key2, key3, &
   switchcase = 'start', caseswitch = 'start'
 
 infile(1) = 'in/defaults'
-open( 9, file='infile', status='old' )
-read( 9, '(a)' ) infile(2)
-close( 9 )
+infile(2) = 'input'
 
 nmat  = 0
 nfric = 0
@@ -104,7 +102,7 @@ loop: do
   case( 'switch' )
   case( 'case' )
   case( '' )
-  case default; print '(2(a,x))', 'bad key:', key1; stop
+  case default; print '(2(a,x))', 'Bad key:', key1; stop
   end select a2
 end do loop
 close( 9 )

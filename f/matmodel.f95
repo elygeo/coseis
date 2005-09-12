@@ -76,12 +76,8 @@ end forall
 ! Cell volume
 s2 = 0.
 do iz = 1, noper
-  call zone( i1, i2, ioper(iz,:), nn, offset, hypocenter, nrmdim )
-  i1 = max( i1, i1cell )
-  i2 = min( i2 - 1, i2cell )
-  j1 = i1(1); j2 = i2(1)
-  k1 = i1(2); k2 = i2(2)
-  l1 = i1(3); l2 = i2(3)
+  i1 = max( i1oper(iz,:),     i1cell )
+  i2 = min( i2oper(iz,:) - 1, i2cell )
   call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
 end do
 if ( nrmdim /=0 ) then

@@ -25,7 +25,7 @@ inittrue: if ( init ) then
       print '(a)', 'Initialize output'
       open(  9, file='out/x0', status='new', iostat=err )
       if ( err /= 0 ) then
-        print '(a)', 'error: previous output found. use -d flag to overwrite'
+        print '(a)', 'Error: previous output found. use -d flag to overwrite'
         stop
       end if
       write( 9, * ) x0

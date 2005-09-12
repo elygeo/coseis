@@ -22,9 +22,7 @@ while getopts spgnmrld opt; do
   esac
 done
 shift $(( OPTIND - 1 ))
-[ -n "$1" ] && echo "$1" > infile
-[ -f infile ]
-infile=$( cat infile )
+[ -n "$1" ] && ln -s "$1" input
 
 # run on remote host
 if [ $remote = yes ]; then
@@ -43,7 +41,7 @@ fi
 
 nn3=( 1 1 1 )
 np3=( 1 1 1 )
-for file in "in/defaults" "$infile"; do
+for file in "in/defaults" "input"; do
 if [ ! -f "$file" ]; then
   echo "file not found: $file"
   exit
@@ -81,11 +79,10 @@ elif [ "$HOSTNAME" = master ];   then machine="babieca"
 else machine=$HOSTNAME
 fi
 
-perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > out/endian
-
 ./tarball
 cp sord.tgz out/
-cp "$infile" out/in
+cp input out/
+perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > out/endian
 
 floatsize=4
 nvars=21
@@ -185,6 +182,7 @@ SunOS)
 esac
 
 [ $nn -lt 10000 ] && OPTFLAGS=-g
+OPTFLAGS=-g
 
 if [ $debug = yes ]; then
   OPTFLAGS=-g
@@ -215,7 +213,7 @@ clean:
 	rm -f *.o *.mod matlab_workspace.mat
 
 realclean: clean
-	rm -f fsord makefile batchjob sord.tgz infile
+	rm -f fsord makefile batchjob sord.tgz
 
 %.o: f/%.f95 makefile
 	\$(FC) \$(FFLAGS) -c \$< -o \$@

@@ -30,6 +30,7 @@ co = 1e9
 if ( fricdir /= '' ) then
   i1 = i1cell
   i2 = i2cell + 1
+  i1(nrmdim) = 1
   i2(nrmdim) = 1
   call bread3( fricdir, 'fs', fs, i1, i2 )
   call bread3( fricdir, 'fd', fd, i1, i2 )
@@ -58,6 +59,7 @@ if ( stressdir /= '' ) then
   s1 = 0.
   i1 = i1cell
   i2 = i2cell + 1
+  i1(nrmdim) = 1
   i2(nrmdim) = 1
   call bread4( stressdir, 'xx', t1, i1, i2, 1 )
   call bread4( stressdir, 'yy', t1, i1, i2, 2 )
@@ -85,10 +87,11 @@ end do
 
 ! Pretraction
 t3 = 0.
-if ( tracdir == '' ) then
+if ( tracdir /= '' ) then
   s1 = 0.
   i1 = i1cell
   i2 = i2cell + 1
+  i1(nrmdim) = 1
   i2(nrmdim) = 1
   call bread4( tracdir, 'tn', t3, i1, i2, 1 )
   call bread4( tracdir, 'ts', t3, i1, i2, 2 )
@@ -254,7 +257,7 @@ if ( rcrit > 0. .and. vrup > 0. ) then
   f2 = ( 1. - f2 ) * ts + f2 * ( fd * -tn + co )
   where ( r < min( rcrit, it * dt * vrup ) .and. f2 < f1 ) f1 = f2
 end if
-if ( any( f1 <= 0. ) ) print *, 'fault opening!'
+if ( any( f1 <= 0. ) ) print *, 'Fault opening!'
 
 ! Shear traction bounded by friction
 f2 = 1.

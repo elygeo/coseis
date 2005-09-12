@@ -15,9 +15,6 @@ real, parameter :: pi = 3.14159
 if ( ip == 0 ) print '(a)', 'Grid generation'
 
 downdim = 3
-noper = 1
-ioper(1,:) = (/ 1, 1, 1, -1, -1, -1 /)
-
 width = ( nn - 1 ) * dx
 i1 = i1cell
 i2 = i2cell + 1
@@ -27,7 +24,6 @@ l1 = i1(3); l2 = i2(3)
 
 x = 0.
 if ( griddir /= '' ) then
-  grid = ''
   call bread4( griddir, 'x1', x, i1, i2, 1 )
   call bread4( griddir, 'x2', x, i1, i2, 2 )
   call bread4( griddir, 'x3', x, i1, i2, 3 )
@@ -44,12 +40,15 @@ else
     case( 3 ); x(:,:,i+1:l2,3) = x(:,:,i:,3) - dx
     end select
   end if
+  noper = 1
+  oper(1) = 'h'
+  i1oper(1,:) = i1cell
+  i2oper(1,:) = i2cell + 1
 end if
 
 select case( grid )
 case( '' )
 case( 'constant' )
-  oper(1) = 'h'
 case( 'stretch' )
   oper(1) = 'r'
   x(:,:,:,3) = 2. * x(:,:,:,3)
