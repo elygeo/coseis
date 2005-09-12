@@ -22,7 +22,7 @@ while getopts spgnmrld opt; do
   esac
 done
 shift $(( OPTIND - 1 ))
-[ -n "$1" ] && ln -s "$1" input
+[ -n "$1" ] && ln -s "$1" 'in'
 
 # run on remote host
 if [ $remote = yes ]; then
@@ -37,28 +37,22 @@ if [ $remote = yes ]; then
 fi
 
 #------------------------------------------------------------------------------#
-# REad input
+# Read input
 
 nn3=( 1 1 1 )
 np3=( 1 1 1 )
-for file in "in/defaults" "input"; do
-if [ ! -f "$file" ]; then
-  echo "file not found: $file"
-  exit
-fi
-while read key params; do
-  set -- $params
-  case "$key" in
-    switch) swtich=$2 ;;
-    case)   case=$2 ;;
-  esac
-  if [ "$switch" = "$case" ]; then
+for file in 'defaults' 'in'; do
+  if [ ! -f "$file" ]; then
+    echo "file not found: $file"
+    exit
+  fi
+  while read key params; do
+    set -- $params
     case "$key" in
       n)   nn3=( $1 $2 $3 ); nt=$4 ;;
       np)  np3=( $1 $2 $3 ) ;;
     esac
-  fi
-done < "$file"
+  done < "$file"
 done
 nn=$(( nn3[0] * nn3[1] * nn3[2] ));
 np=$(( np3[0] * np3[1] * np3[2] ));
@@ -81,7 +75,7 @@ fi
 
 ./tarball
 cp sord.tgz out/
-cp input out/
+cp 'in' out/
 perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > out/endian
 
 floatsize=4
@@ -142,7 +136,7 @@ OBJECT="\\
   hgnc.o \\
   snormals.o \\
   binio.o \\
-  input.o \\
+  readin.o \\
   setup.o \\
   arrays.o \\
   optimize.o \\

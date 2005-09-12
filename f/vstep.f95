@@ -18,8 +18,8 @@ integer ic, iid, id, ix, iq, iz
 ! P' + DP = [del]S, F = 1.P'             PML region
 ! F = divS                               non PML region (D=0)
 s2 = 0.
-icloop: do ic  = 1, 3
-idloop: do iid = 1, 3
+docomponent:  do ic  = 1, 3
+doderivative: do iid = 1, 3
   id = mod( ic + iid - 2, 3 ) + 1
   ix = 6 - ic - id
   do iz = 1, noper
@@ -85,8 +85,8 @@ idloop: do iid = 1, 3
   else
     w1(:,:,:,ic) = w1(:,:,:,ic) + s2
   end if
-end do idloop
-end do icloop
+end do doderivative
+end do docomponent
 
 ! Hourglass correction
 s1 = 0.

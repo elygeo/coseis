@@ -17,7 +17,7 @@ real :: dwt(4)
 character(160) :: str
 logical :: fault, cell, static, init = .true.
 
-inittrue: if ( init ) then
+ifinit: if ( init ) then
   init = .false.
   if ( checkpoint < 0 ) checkpoint = checkpoint + nt + 1
   if ( it == 0 ) then
@@ -57,11 +57,11 @@ inittrue: if ( init ) then
     print '(a)', '  Step  Amax        Vmax        Umax        Compute     I/O'
   end if
   return
-end if inittrue
+end if ifinit
 
 !------------------------------------------------------------------------------!
 
-izloop: do iz = 1, nout
+doiz: do iz = 1, nout
 
 if ( outit(iz) < 0 ) outit(iz) = nt + outit(iz) + 1
 if ( outit(iz) == 0 .or. mod( it, outit(iz) ) /= 0 ) cycle izloop
@@ -117,6 +117,7 @@ do i = 1, nc
   case( 'vs'   ); call bwrite3( str, vs,   i1, i2 )
   case( 'us'   ); call bwrite3( str, us,   i1, i2 )
   case( 'trup' ); call bwrite3( str, trup, i1, i2 )
+  case default; stop 'var'
   end select
 end do
 if ( ip == 0 ) then
@@ -127,7 +128,7 @@ if ( ip == 0 ) then
   close( 9 )
 end if
 
-end do izloop
+end do doiz
 
 if ( pass == 'w' ) return
 

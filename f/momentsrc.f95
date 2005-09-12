@@ -17,7 +17,7 @@ real :: time, msrcf, m0, mm(3,3), eigval(3), eigwork(8)
 
 if ( msrcradius <= 0. ) return
 
-inittrue: if ( init ) then
+ifinit: if ( init ) then
 
 init = .false.
 if ( ip == 0 ) print '(a)', 'Moment source'
@@ -92,7 +92,7 @@ end if
 
 return
 
-end if inittrue
+end if ifinit
 
 !------------------------------------------------------------------------------!
 

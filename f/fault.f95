@@ -16,7 +16,7 @@ integer :: down(3), handed, strdim, dipdim, iz, &
   j3, j4, k3, k4, l3, l4
 logical :: init = .true.
 
-inittrue: if ( init ) then
+ifinit: if ( init ) then
 
 init = .false.
 if ( nrmdim == 0 ) return
@@ -207,7 +207,7 @@ end if
 
 return
 
-end if inittrue
+end if ifinit
 
 !------------------------------------------------------------------------------!
 

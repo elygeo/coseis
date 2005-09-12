@@ -7,7 +7,7 @@ if exist( 'w1', 'var' )
 else
   addpath m
   copyfile( [ outdir 'in' ], 'in' )
-  input
+  readin
 end
 
 explosion = ...

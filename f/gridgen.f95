@@ -41,7 +41,6 @@ else
     end select
   end if
   noper = 1
-  oper(1) = 'h'
   i1oper(1,:) = i1cell
   i2oper(1,:) = i2cell + 1
 end if
@@ -49,6 +48,7 @@ end if
 select case( grid )
 case( '' )
 case( 'constant' )
+  oper(1) = 'h'
 case( 'stretch' )
   oper(1) = 'r'
   x(:,:,:,3) = 2. * x(:,:,:,3)

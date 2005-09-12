@@ -1,18 +1,17 @@
 !------------------------------------------------------------------------------!
-! INPUT
+! READIN
 
-module input_m
+module readin_m
 contains
-subroutine input
+subroutine readin
 use globals_m
 
 implicit none
 integer :: iz, err
-character(160) :: infile(2), str, key1, key2, key3, &
-  switchcase = 'start', caseswitch = 'start'
+character(160) :: infile(2), str, key1, key2, key3
 
-infile(1) = 'in/defaults'
-infile(2) = 'input'
+infile(1) = 'defaults'
+infile(2) = 'in'
 
 nmat  = 0
 nfric = 0
@@ -21,22 +20,18 @@ nstress = 0
 nlock = 0
 nout = 0
 
-izloop: do iz = 1, 2
+dofile: do iz = 1, 2
 if ( ip == 0 ) print '(a,a)', 'Reading file: ', trim( infile(iz) )
 open( 9, file=infile(iz), status='old' )
-loop: do
+doline: do
   read( 9, '(a)', iostat=i ) str
-  if ( i /= 0 ) exit loop
+  if ( i /= 0 ) exit doline
   str = adjustl( str )
-  if ( str(1:1) == '#' .or. str == ' ' ) cycle loop
+  if ( str(1:1) == '#' .or. str == ' ' ) cycle doline
   str(159:160) = ' #'
   read( str, * ) key1, key2, key3
-  select case( key1 )
-  case( 'switch' );     switchcase = key2
-  case( 'case' );       caseswitch = key2
-  end select
-  if ( caseswitch /= switchcase ) cycle loop
-  a2: select case( key1 )
+  selectkey: select case( key1 )
+  case( '' )
   case( 'n' );          read( str, * ) key1, nn, nt
   case( 'dx' );         read( str, * ) key1, dx
   case( 'dt' );         read( str, * ) key1, dt
@@ -51,6 +46,8 @@ loop: do
   case( 'msrcradius' ); read( str, * ) key1, msrcradius
   case( 'moment' );     read( str, * ) key1, moment
   case( 'domp' );       read( str, * ) key1, domp
+  case( 'checkpoint' ); read( str, * ) key1, checkpoint
+  case( 'np' );         read( str, * ) key1, np
   case( 'srctimefcn' ); srctimefcn = key2
   case( 'grid' );
     if ( key2 == 'read' ) then
@@ -97,16 +94,11 @@ loop: do
   case( 'out' )
     nout = nout + 1
     read( str, * ) key1, outvar(nout), outit(nout), iout(nout,:)
-  case( 'checkpoint' ); read( str, * ) key1, checkpoint
-  case( 'np' );         read( str, * ) key1, np
-  case( 'switch' )
-  case( 'case' )
-  case( '' )
   case default; print '(2(a,x))', 'Bad key:', key1; stop
-  end select a2
-end do loop
+  end select selectkey
+end do doline
 close( 9 )
-end do izloop
+end do dofile
 
 write( str, '(a,i6.6,a)' ) 'out/ckp/', ip, '.hdr'
 open( 9, file=str, status='old', iostat=err )
@@ -119,7 +111,6 @@ end if
 
 nhalo = 1
 if( nrmdim /= 0 ) nn(nrmdim) = nn(nrmdim) + 1
-
 
 end subroutine
 end module

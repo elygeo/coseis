@@ -21,9 +21,9 @@ us = us + dt * vs
 ! G' + DG = gradV          PML region
 s2 = 0.
 w2 = 0.
-icloop: do ic = 1, 3
+docomponent:  do ic = 1, 3
 s1 = u(:,:,:,ic) + dt * viscosity(1) * v(:,:,:,ic)
-idloop: do id = 1, 3
+doderivative: do id = 1, 3
   ix = 6 - ic - id
   do iz = 1, noper
     i1 = max( i1oper(iz,:),     i1cellpml )
@@ -159,8 +159,8 @@ idloop: do id = 1, 3
   else
     w2(:,:,:,ix) = w2(:,:,:,ix) + s2
   end if
-end do idloop
-end do icloop
+end do doderivative
+end do docomponent
 
 ! Hook's Law, linear stress/strain relation
 ! W = lam*trace(G)*I + mu*(G + G^T)

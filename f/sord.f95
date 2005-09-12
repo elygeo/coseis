@@ -4,7 +4,7 @@
 program sord
 
 use globals_m
-use input_m
+use readin_m
 use setup_m
 use arrays_m
 use gridgen_m
@@ -19,7 +19,7 @@ use output_m
 print '(a)', ''
 print '(a)', 'SORD - Support Operator Rupture Dynamics'
 
-call input
+call readin
 call setup
 call arrays
 call gridgen

@@ -25,7 +25,7 @@ USAGE
 
   ./sord file.in
 
-  See 'defaults.in' and '*.in' for input explanation and examples.
+  See 'defaults' and the 'in' directory for input explanation and examples.
 
   Options:
     -m  use MATLAB backend (default is Fortran)

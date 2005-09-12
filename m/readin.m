@@ -13,12 +13,10 @@ locknodes = []; ilock   = [];
 outvar    = {}; iout    = []; outit = [];
 grid      = ''; griddir = '';
 
-for file = { 'in/defaults' 'input' }
+for file = { 'defaults' 'in' }
 
 fprintf( 'Reading file: %s\n', file{1} )
 in = textread( file{1}, '%s', 'delimiter', '\n', 'commentstyle', 'shell' );
-caseswitch = '';
-switchcase = '';
 
 for i = 1:length( in )
   if in{i}, else continue, end
@@ -26,14 +24,7 @@ for i = 1:length( in )
   str = strread( in{i}, '%*s %[^#]' );
   str = str{1};
   switch key{1}
-  case 'switch', switchcase = key{2};
-  case 'case',   caseswitch = key{2};
-  end
-  if ~strcmp( caseswitch, switchcase ), continue, end
-  switch key{1}
   case ''
-  case 'switch'
-  case 'case'
   case 'np'
   case 'n',          n          = strread( str, '%n' )';
   case 'dx',         dx         = strread( str, '%n' )';

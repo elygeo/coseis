@@ -10,9 +10,11 @@ files="
   VERSION
   tarball
   sord
+  defaults
+  in
+  infiles/
   f/
   m/
-  in/
 "
 
 mkdir sord-$version
