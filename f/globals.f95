@@ -13,7 +13,7 @@ real, allocatable, dimension(:,:,:,:) :: &
   nrm, t0, t1, t2, t3
 
 real, allocatable, dimension(:,:,:) :: &
-  rho, lam, mu, y, s1, s2, &
+  mr, lm, mu, y, s1, s2, &
   fs, fd, dc, co, area, r, us, vs, trup, tn, ts, f1, f2
 
 real :: &

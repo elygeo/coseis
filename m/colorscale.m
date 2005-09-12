@@ -46,6 +46,7 @@ otherwise error 'field'
 end
 ncomp = length( titles ) - 1;
 if comp > ncomp, comp = mod( comp, ncomp ); end
+msg = titles{ comp + 1 };
 fscl = double( fscl );
 clim = fscl;
 if ~clim, clim = 1; end

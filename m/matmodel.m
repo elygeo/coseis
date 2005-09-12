@@ -4,7 +4,7 @@
 fprintf( 'Material model\n' )
 
 % Material arrays
-rho(:) = 0.;
+mr(:) = 0.;
 s1(:) = 0.;
 s2(:) = 0.;
 if matdir
@@ -13,42 +13,42 @@ if matdir
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
-  rho(j1:j2,k1:k2,l1:l2) = bread( matdir, 'rho' );
-  s1(j1:j2,k1:k2,l1:l2)  = bread( matdir, 'vp' );
-  s2(j1:j2,k1:k2,l1:l2)  = bread( matdir, 'vs' );
+  mr(j1:j2,k1:k2,l1:l2) = bread( matdir, 'rho' );
+  s1(j1:j2,k1:k2,l1:l2) = bread( matdir, 'vp' );
+  s2(j1:j2,k1:k2,l1:l2) = bread( matdir, 'vs' );
 end
 for iz = 1:size( material, 1 )
   [ i1, i2 ] = zone( imat(iz,:), nn, offset, hypocenter, nrmdim );
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
-  rho(j1:j2,k1:k2,l1:l2) = material(iz,1);
-  s1(j1:j2,k1:k2,l1:l2)  = material(iz,2);
-  s2(j1:j2,k1:k2,l1:l2)  = material(iz,3);
+  mr(j1:j2,k1:k2,l1:l2) = material(iz,1);
+  s1(j1:j2,k1:k2,l1:l2) = material(iz,2);
+  s2(j1:j2,k1:k2,l1:l2) = material(iz,3);
 end
 
 % Matrial extremes
-i = rho > 0.; matmin(1) = min( rho(i) ); matmax(1) = max( rho(i) );
-i = s1 > 0.;  matmin(2) = min( s1(i) );  matmax(2) = max( s1(i) );
-i = s2 > 0.;  matmin(3) = min( s2(i) );  matmax(3) = max( s2(i) );
+i = mr > 0.; matmin(1) = min( mr(i) ); matmax(1) = max( mr(i) );
+i = s1 > 0.; matmin(2) = min( s1(i) ); matmax(2) = max( s1(i) );
+i = s2 > 0.; matmin(3) = min( s2(i) ); matmax(3) = max( s2(i) );
 
 % Lame parameters
-s2 = rho .* s2 .* s2;
-s1 = rho .* ( s1 .* s1 ) - 2. .* s2;
+s2 = mr .* s2 .* s2;
+s1 = mr .* ( s1 .* s1 ) - 2. .* s2;
 
 % Save mu at hypocenter
 i1 = hypocenter;
 mu0 = s2( i1(1), i1(2), i1(3) );
 
 % Average Lame parameters on cell centers
-lam(:) = 0.;
-m(:)  = 0.;
+lm(:) = 0.;
+mu(:) = 0.;
 i1 = i1cell;
 i2 = i2cell;
 l = i1(3):i2(3);
 k = i1(2):i2(2);
 j = i1(1):i2(1);
-lam(j,k,l) = 0.125 * ...
+lm(j,k,l) = 0.125 * ...
   ( s1(j,k,l) + s1(j+1,k+1,l+1) ...
   + s1(j+1,k,l) + s1(j,k+1,l+1) ...
   + s1(j,k+1,l) + s1(j+1,k,l+1) ...
@@ -95,21 +95,21 @@ s1(j,k,l) = 0.125 * ...
   + s2(j,k,l-1) + s2(j-1,k-1,l) );
 
 % Hourglass constant. FIXME off by factor of 8?
-y = 6. * dx * dx * ( lam + 2. * mu );
+y = 6. * dx * dx * ( lm + 2. * mu );
 i = y ~= 0.;
 y(i) = 1. ./ y(i);
-y = 4. * mu .* ( lam + mu ) .* y .* s2;
+y = 4. * mu .* ( lm + mu ) .* y .* s2;
 
 % Divide Lame parameters by cell volume
 i = s2 ~= 0.;
 s2(i) = 1. ./ s2(i);
-lam = lam .* s2;
+lm = lm .* s2;
 mu = mu .* s2;
 
 % Node mass ratio
-rho = rho .* s1;
-i = rho ~= 0.;
-rho(i) = 1. ./ rho(i);
+mr = mr .* s1;
+i = mr ~= 0.;
+mr(i) = 1. ./ mr(i);
 
 s1(:) = 0.;
 s2(:) = 0.;

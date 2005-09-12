@@ -22,10 +22,10 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 allocate( &
   ! 3D static variables
-  rho(j,k,l),   & ! density
-  lam(j,k,l),   & ! Lame parameter
+  mr(j,k,l),    & ! mass ratio
+  lm(j,k,l),    & ! Lame parameter
   mu(j,k,l),    & ! Lame parameter
-  y(j,k,l),     & ! Hourglass constant
+  yy(j,k,l),    & ! Hourglass constant
   x(j,k,l,3),   & ! node locations
   ! 3D simulation state
   v(j,k,l,3),   & ! velocity

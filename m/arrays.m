@@ -23,8 +23,8 @@ end
 nf3 = [ nf 3 ];
 
 % 3D static variables
-rho  = repmat( zero, nm );  % denstity
-lam  = repmat( zero, nm );  % Lame parameter
+mr   = repmat( zero, nm );  % mass ratio
+lm   = repmat( zero, nm );  % Lame parameter
 mu   = repmat( zero, nm );  % Lame parameter
 y    = repmat( zero, nm );  % hourglass constant
 x    = repmat( zero, nm3 ); % node locations
@@ -36,8 +36,8 @@ u    = repmat( zero, nm3 ); % displacement
 % 3D temporary stotage
 w1   = repmat( zero, nm3 ); % stress, acceleration
 w2   = repmat( zero, nm3 ); % stress
-s1   = repmat( zero, nm );  %
-s2   = repmat( zero, nm );  %
+s1   = repmat( zero, nm );
+s2   = repmat( zero, nm );
 
 % PML state
 p1   = repmat( zero, nj1 ); % PML momentum

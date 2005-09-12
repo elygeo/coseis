@@ -10,6 +10,7 @@ fprintf( '\nSORD - Support Operator Rupture Dynamics\n' )
 %dbstop if error
 
 clear all
+if exist( 'out', 'dir' ), rmdir( 'out', 's' ), end
 
 input
 setup

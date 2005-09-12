@@ -104,7 +104,7 @@ end do
 
 ! Newton's Law, A = F / m
 do i = 1, 3
-  w1(:,:,:,i) = w1(:,:,:,i) * rho
+  w1(:,:,:,i) = w1(:,:,:,i) * mr
 end do
 
 ! Fault calculations

@@ -72,10 +72,6 @@ cell = .false.
 fault = .false.
 static = .false.
 select case( outvar(iz) )
-case( 'rho'  ); static = .true.
-case( 'lam'  ); static = .true.; cell = .true.
-case( 'mu'   ); static = .true.; cell = .true.
-case( 'y'    ); static = .true.; cell = .true.
 case( 'x'    ); static = .true.; nc = 3
 case( 'a'    ); nc = 3
 case( 'v'    ); nc = 3
@@ -108,10 +104,6 @@ do i = 1, nc
   write( str, '(a,i2.2,a,a,i1,i6.6)' ) &
     'out/', iz, '/', trim( outvar(iz) ), i, it
   select case( outvar(iz) )
-  case( 'rho'  ); call bwrite3( str, rho,  i1, i2 )
-  case( 'lam'  ); call bwrite3( str, lam,  i1, i2 )
-  case( 'mu'   ); call bwrite3( str, mu,   i1, i2 )
-  case( 'y'    ); call bwrite3( str, y,    i1, i2 )
   case( 'x'    ); call bwrite4( str, x,    i1, i2, i )
   case( 'a'    ); call bwrite4( str, w1,   i1, i2, i )
   case( 'v'    ); call bwrite4( str, v,    i1, i2, i )

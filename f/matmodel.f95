@@ -15,15 +15,15 @@ integer :: iz
 if ( ip == 0 ) print '(a)', 'Material model'
 
 ! Material arrays
-rho = 0.
+mr = 0.
 s1 = 0.
 s2 = 0.
 if ( matdir /= '' ) then
   i1 = i1cell
   i2 = i2cell + 1
-  call bread3( matdir, 'rho', rho, i1, i2 )
-  call bread3( matdir, 'vp',  s1,  i1, i2 )
-  call bread3( matdir, 'vs',  s2,  i1, i2 )
+  call bread3( matdir, 'rho', mr, i1, i2 )
+  call bread3( matdir, 'vp',  s1, i1, i2 )
+  call bread3( matdir, 'vs',  s2, i1, i2 )
 end if
 do iz = 1, nmat
   call zone( i1, i2, imat(iz,:), nn, offset, hypocenter, nrmdim )
@@ -32,19 +32,19 @@ do iz = 1, nmat
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
-  rho(j1:j2,k1:k2,l1:l2) = material(iz,1)
+  mr(j1:j2,k1:k2,l1:l2) = material(iz,1)
   s1(j1:j2,k1:k2,l1:l2)  = material(iz,2)
   s2(j1:j2,k1:k2,l1:l2)  = material(iz,3)
 end do
 
 ! Material extremes
-matmin(1) = minval( rho, rho > 0. ); matmax(1) = maxval( rho )
-matmin(2) = minval( s1, s1 > 0. );   matmax(2) = maxval( s1 )
-matmin(3) = minval( s2, s2 > 0. );   matmax(3) = maxval( s2 )
+matmin(1) = minval( mr, mr > 0. ); matmax(1) = maxval( mr )
+matmin(2) = minval( s1, s1 > 0. ); matmax(2) = maxval( s1 )
+matmin(3) = minval( s2, s2 > 0. ); matmax(3) = maxval( s2 )
 
 ! Lame parameters
-s2 = rho * s2 * s2
-s1 = rho * ( s1 * s1 ) - 2. * s2
+s2 = mr * s2 * s2
+s1 = mr * ( s1 * s1 ) - 2. * s2
 
 ! Save mu at hypocenter
 if ( hypop ) then
@@ -53,7 +53,7 @@ if ( hypop ) then
 end if
 
 ! Average Lame parameters onto cell centers
-lam = 0.
+lm = 0.
 mu = 0.
 i1 = i1cell
 i2 = i2cell
@@ -61,7 +61,7 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-  lam(j,k,l) = 0.125 * &
+  lm(j,k,l) = 0.125 * &
     ( s1(j,k,l) + s1(j+1,k+1,l+1) &
     + s1(j+1,k,l) + s1(j,k+1,l+1) &
     + s1(j,k+1,l) + s1(j+1,k,l+1) &
@@ -109,17 +109,17 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
 end forall
 
 ! Hourglass constant - FIXME off by factor of 8?
-y = 6. * dx * dx * ( lam + 2. * mu )
-where ( y /= 0. ) y = 4. * mu * ( lam + mu ) / y * s2
+yy = 6. * dx * dx * ( lm + 2. * mu )
+where ( yy /= 0. ) yy = 4. * mu * ( lm + mu ) / yy * s2
 
 ! Divide Lame parameters by cell volume
 where ( s2 /= 0. ) s2 = 1. / s2
-lam = lam * s2
+lm = lm * s2
 mu = mu * s2
 
 ! Node mass ratio
-rho = rho * s1
-where ( rho /= 0. ) rho = 1. / rho
+mr = mr * s1
+where ( mr /= 0. ) mr = 1. / mr
 
 s1 = 0.
 s2 = 0.

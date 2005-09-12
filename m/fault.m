@@ -12,7 +12,7 @@ fprintf( 'Initialize fault\n' )
 fs(:) = 0;
 fd(:) = 0;
 dc(:) = 0;
-co(:) = 1e9;
+co(:) = 1e3;
 if fricdir
   i1 = i1nodepml;
   i2 = i2nodepml;
@@ -109,7 +109,7 @@ i1 = i1node;
 i2 = i2node;
 i1(nrmdim) = hypocenter(nrmdim);
 i2(nrmdim) = hypocenter(nrmdim);
-nrm(:,:,:,:) = snormals( x, i1, i2 );
+nrm = snormals( x, i1, i2 );
 area = sqrt( sum( nrm .* nrm, 4 ) );
 f1 = area;
 ii = f1 ~= 0.;
@@ -224,7 +224,7 @@ k3 = i1(2); k4 = i2(2);
 l3 = i1(3); l4 = i2(3);
 
 % Zero slip velocity boundary condition
-f1 = dt * area .* ( rho(j1:j2,k1:k2,l1:l2) + rho(j3:j4,k3:k4,l3:l4) );
+f1 = dt * area .* ( mr(j1:j2,k1:k2,l1:l2) + mr(j3:j4,k3:k4,l3:l4) );
 ii = f1 ~= 0.;
 f1(ii) = 1 ./ f1(ii);
 for i = 1:3
@@ -268,11 +268,9 @@ if find( f2 <= 0. ), fprintf( 'fault opening!\n' ), end
 
 % Update acceleration
 for i = 1:3
-  t3(:,:,:,i) = t1(:,:,:,i) + f2 .* t2(:,:,:,i) - t0(:,:,:,i);
-  w1(j1:j2,k1:k2,l1:l2,i) = ...
-  w1(j1:j2,k1:k2,l1:l2,i) + t3(:,:,:,i) .* area .* rho(j1:j2,k1:k2,l1:l2);
-  w1(j3:j4,k3:k4,l3:l4,i) = ...
-  w1(j3:j4,k3:k4,l3:l4,i) + t3(:,:,:,i) .* area .* rho(j3:j4,k3:k4,l3:l4);
+f1 = area .* ( t1(:,:,:,i) + f2 .* t2(:,:,:,i) - t0(:,:,:,i) );
+w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f1 .* mr(j1:j2,k1:k2,l1:l2);
+w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f1 .* mr(j3:j4,k3:k4,l3:l4);
 end
 
 % Vslip

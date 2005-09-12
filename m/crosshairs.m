@@ -69,21 +69,21 @@ case 'a'
   if pass == 'w', mga = []; msg = ''; else
     vga(1:3) = w1(j,k,l,:);
     mga = s1(j,k,l);
-    tmp = [ mga vga rho(j,k,l) ];
-    msg = sprintf( '|A| %9.2e\nAx  %9.2e\nAy  %9.2e\nAz  %9.2e\nrho %9.2e', tmp );
+    tmp = [ mga vga mr(j,k,l) ];
+    msg = sprintf( '|A| %9.2e\nAx  %9.2e\nAy  %9.2e\nAz  %9.2e\nmr  %9.2e', tmp );
   end
 case 'v'
   time = ( it + .5 ) * dt;
   vga(1:3) = v(j,k,l,:);
   mga = sqrt( sum( v(j,k,l,:) .* v(j,k,l,:), 4 ) );
-  tmp = [ mga vga rho(j,k,l) ];
-  msg = sprintf( '|V| %9.2e\nVx  %9.2e\nVy  %9.2e\nVz  %9.2e\nrho %9.2e', tmp );
+  tmp = [ mga vga mr(j,k,l) ];
+  msg = sprintf( '|V| %9.2e\nVx  %9.2e\nVy  %9.2e\nVz  %9.2e\nmr  %9.2e', tmp );
 case 'u'
   time = it * dt;
   vga(1:3) = u(j,k,l,:);
   mga = sqrt( sum( u(j,k,l,:) .* u(j,k,l,:), 4 ) );
-  tmp = [ mga vga rho(j,k,l) ];
-  msg = sprintf( '|U| %9.2e\nUx  %9.2e\nUy  %9.2e\nUz  %9.2e\nrho %9.2e', tmp );
+  tmp = [ mga vga mr(j,k,l) ];
+  msg = sprintf( '|U| %9.2e\nUx  %9.2e\nUy  %9.2e\nUz  %9.2e\nmr  %9.2e', tmp );
 case 'w'
   time = it * dt;
   if pass == 'v', mga = []; msg = ''; else
@@ -98,8 +98,8 @@ case 'w'
     vec = vec(:,i);
     mga = val';
     vga = vec(:)';
-    tmp = [ val([3 2 1])' wg lam(j,k,l) mu(j,k,l) ];
-    msg = sprintf( 'W1  %9.2e\nW2  %9.2e\nW3  %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e\nlam %9.2e\nmu  %9.2e', tmp );
+    tmp = [ val([3 2 1])' wg lm(j,k,l) mu(j,k,l) ];
+    msg = sprintf( 'W1  %9.2e\nW2  %9.2e\nW3  %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e\nlm  %9.2e\nmu  %9.2e', tmp );
   end
 otherwise error 'xhfield'
 end
@@ -108,7 +108,7 @@ hhud = text( .02, .98, msg, 'Hor', 'left', 'Ver', 'top' );
 tmp = [ it xhair-offset; time xg ];
 msg = sprintf( '%4d %8.3fs\n%4d %8.1fm\n%4d %8.1fm\n%4d %8.1fm', tmp );
 hhud(2) = text( .98, .98, msg, 'Hor', 'right', 'Ver', 'top' );
-msg = '';
+msg = 'Explore';
 set( gcf, 'CurrentAxes', haxes(1) )
 if length( mga( mga ~= 0 ) )
   reynoldsglyph

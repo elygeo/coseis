@@ -34,4 +34,5 @@ i1nodepml = i1node + bc(1:3) * npml; % FIXME
 i2nodepml = i2node - bc(4:6) * npml; % FIXME
 i1cellpml = i1cell + bc(1:3) * npml; % FIXME
 i2cellpml = i2cell - bc(4:6) * npml; % FIXME
+if i1nodepml <= i2nodepml, else error 'model too small for PML', end
 

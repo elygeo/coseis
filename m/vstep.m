@@ -84,7 +84,7 @@ end
 
 % Newton's Law, A = F / m
 for i = 1:3
-  w1(:,:,:,i) = w1(:,:,:,i) .* rho;
+  w1(:,:,:,i) = w1(:,:,:,i) .* mr;
 end
 
 % Fault calculations

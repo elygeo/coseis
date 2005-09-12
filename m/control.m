@@ -8,6 +8,7 @@ if ~length( keypress )
   keymod   = get( gcf, 'CurrentMod' );
 end
 km = length( keymod );
+keymod = '';
 running = itstep;
 nframe = length( frame );
 dframe = 0;
@@ -18,17 +19,51 @@ action = 1;
 anim = 0;
 
 switch keypress
-case 'home',       anim = 1; showframe = 1;
-case 'end',        anim = 1; showframe = nframe;
-case 'pageup',     anim = 1; dframe = -10;
-case 'pagedown',   anim = 1; dframe =  10;
-case 'hyphen',     anim = 1; dframe = -1;
-case 'equal',      anim = 1; dframe =  1;
+case 'f1'
+  if length( hhelp )
+    delete( hhelp )
+    hhelp = [];
+  else
+    set( gcf, 'CurrentAxes', haxes(2) )
+    hhelp = text( .5, .54, ...
+      { 'SORD - Support Operator Rupture Dynamics'
+        ''
+        'Help               F1    Acceleration      A    Zoom            < >'
+        'Run                 R    Velocity          V    Reset Zoom        /'
+        'Pause           Click    Displacement      U    3D/2D             D'
+        'Step            Space    Stress            W    Length Scale      L'
+        'Step 10    Ctrl-Space    Slip          Alt-U    Color Scale     [ ]'
+        'Checkpoint          C    Slip rate     Alt-V    Round CS          \\'
+        'Restart    Crtl-Alt-Q    Magnitude         0    Reset CS      Alt-\\'
+        'Clean restart   Alt-Q    Component       1-6                       '
+        'Rotate           Drag    Volumes/Slices    P    Build Movie       B'
+        'Explore        Arrows    Glyphs            G    Frame -1          -'
+        'Hypocenter          H    Isosurfaces       I    Frame +1          ='
+        'Extremum            E    Surfaces          S    Frame -10      PgUp'
+        'Replot          Enter    Outline           O    Frame +10      PgDn'
+        'Clean Up    Backspace    Mesh              M    First Frame    Home'
+        'Time Series         T    U Distortion      X    Last Frame      End'
+        'Filtered TS     Alt-T    Fault Plane       F    Delete Frame    Del'
+      }, ...
+      'Tag', 'help', ...
+      'Vertical',   'middle', ...
+      'Margin', 10, ...
+      'EdgeColor', 0.5 * [ 1 1 1 ], ...
+      'BackgroundColor', background );
+    set( gcf, 'CurrentAxes', haxes(1) )
+  end
+case 'home',       anim = 1; showframe = 1; msg = 'First Frame';
+case 'end',        anim = 1; showframe = nframe; msg = 'Last Frame';
+case 'pageup',     anim = 1; dframe = -10; msg = 'Frame -10';
+case 'pagedown',   anim = 1; dframe =  10; msg = 'Frame +10';
+case 'hyphen',     anim = 1; dframe = -1;  msg = 'Frame -1';
+case 'equal',      anim = 1; dframe =  1;  msg = 'Frame +1';
 case { 'insert', 'return' }, viz
 case 'backspace'
   delete( [ hhud hmsg hhelp ] )
-  hhud = []; hmsg = []; hhelp = [];
+  hhud = []; hmsg = []; hhelp = []; msg = '';
 case 'delete'
+  msg = 'Delete Frame';
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
   if nframe > 1
@@ -41,8 +76,8 @@ case 'downarrow',  if km, xhairmove = -3; else xhairmove = -1; end, crosshairs
 case 'uparrow',    if km, xhairmove = 3;  else xhairmove = 1;  end, crosshairs
 case 'leftarrow',  xhairmove = -2; crosshairs
 case 'rightarrow', xhairmove = 2;  crosshairs
-case 'h',          xhairmove = 4;  crosshairs
-case 'e',          xhairmove = 6;  crosshairs
+case 'h',          xhairmove = 4;  crosshairs; msg = 'Hypocenter';
+case 'e',          xhairmove = 6;  crosshairs; msg = 'Extreme value';
 case 'space', if km, itstep = 10; else itstep = 1; end, msg = 'Step';
 case 'r', itstep = nt - it; msg = 'Run';
 case 'q'
@@ -51,19 +86,21 @@ case 'q'
     sord
     return
   end
-case '0', comp = 0; colorscale; msg = titles( 1 );
-case '1', comp = 1; colorscale; msg = titles( 2 );
-case '2', comp = 2; colorscale; msg = titles( 3 );
-case '3', comp = 3; colorscale; msg = titles( 4 );
-case '4', comp = 4; colorscale; msg = titles( 5 );
-case '5', comp = 5; colorscale; msg = titles( 6 );
-case '6', comp = 6; colorscale; msg = titles( 7 );
+case '0', comp = 0; colorscale
+case '1', comp = 1; colorscale
+case '2', comp = 2; colorscale
+case '3', comp = 3; colorscale
+case '4', comp = 4; colorscale
+case '5', comp = 5; colorscale
+case '6', comp = 6; colorscale
 case 'comma'
+  msg = 'Zoom out';
   if ~km, camva( 1.25 * camva )
   else    camva( 4 * camva )
   end
   panviz = 0;
 case 'period'
+  msg = 'Zoom In';
   if ~km, camva( .8 * camva )
   else    camva( .25 * camva )
   end
@@ -74,9 +111,11 @@ case 'period'
   panviz = 1;
 case 'd'
   if strcmp( camproj, 'orthographic' )
+    msg  = 'Perspective';
     camproj perspective
     camva( 1.25 * camva )
   else
+    msg  = 'Orthographic';
     camproj orthographic
     camva( .8 * camva )
     v1 = camup;
@@ -91,6 +130,7 @@ case 'd'
     campos( camtarget + pos )
   end
 case 'slash'
+  msg = 'Zoom Reset';
   if strcmp( camproj, 'orthographic' )
     v1 = camup;
     v2 = campos - camtarget;
@@ -113,6 +153,7 @@ case 'slash'
   end
   panviz = 0;
 case 'leftbracket'
+  msg = 'Decrease Color Range';
   if ~km, tmp = .8 * get( gca, 'CLim' );
   else    tmp = .5 * get( gca, 'CLim' );
   end
@@ -121,6 +162,7 @@ case 'leftbracket'
   set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
   set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
 case 'rightbracket'
+  msg = 'Increase Color Range';
   if ~km, tmp = 1.25 * get( gca, 'CLim' );
   else    tmp = 2    * get( gca, 'CLim' );
   end
@@ -130,12 +172,14 @@ case 'rightbracket'
   set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
 case 'backslash'
   if km
+    msg = 'Round Color Scale';
     tmp = clim * [ -1 1 ];
     set( gca, 'CLim', tmp )
     if ~comp, tmp(1) = 0; end
     set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
     set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
   else
+    msg = 'Reset Color Scale';
     tmp = get( gca, 'CLim' );
     tmp = tmp(2);
     exp10 = floor( log10( tmp ) );
@@ -162,22 +206,22 @@ case 'x'
   else     msg = 'Mesh distortion off';
   end
 case 'u', if km, field = 'us'; else, field = 'u'; end 
-  colorscale; msg = titles{ comp + 1};
+  colorscale
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
   if pass == 'v', msg = [ msg ' step code once for viz' ]; end
 case 'w', if km, field = 't'; else, field = 'w'; end 
-  colorscale; msg = titles{ comp + 1};
+  colorscale
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
   if pass == 'v', msg = [ msg ' not in memory, step code once' ]; end
 case 'a', field = 'a';
-  colorscale; msg = titles{ comp + 1};
+  colorscale
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
   if pass == 'w', msg = [ msg ' not in memory, step code once' ]; end
 case 'v', if km, field = 'vs'; else, field = 'v'; end 
-  colorscale; msg = titles{ comp + 1};
+  colorscale
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
   if pass == 'w', msg = [ msg ' step code once for viz' ]; end
@@ -234,8 +278,8 @@ case 's'
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'surfline' );
   if length( tmp ), set( tmp, 'Visible', visible ), end
 case 'l'
-  if strcmp( get( gca, 'Visible' ), 'off' ), axis on
-  else axis off
+  if strcmp( get( gca, 'Visible' ), 'off' ), axis on, msg = 'Axis On';
+  else axis off, msg = 'Axis Off';
   end
 case 't', timeseriesviz
 case 'c'
@@ -248,6 +292,7 @@ case 'c'
   end
 case 'b'
   if savemovie && ~holdmovie
+    msg = 'Build Movie';
     delete( [ hhud hmsg hhelp ] )
     hhud = []; hmsg = []; hhelp = [];
     h0 = gca;
@@ -260,45 +305,13 @@ case 'b'
     end
     holdmovie = 1;
     showframe = length( frame );
-  end
-  msg = 'Build Movie';
-  anim = 1;
-otherwise
-  if length( hhelp )
-    delete( hhelp )
-    hhelp = [];
   else
-    set( gcf, 'CurrentAxes', haxes(2) )
-    hhelp = text( .5, .54, ...
-      { 'SORD - Support Operator Rupture Dynamics'
-        ''
-        'Help               F1    Acceleration      A    Zoom            < >'
-        'Run                 R    Velocity          V    Reset Zoom        /'
-        'Pause           Click    Displacement      U    3D/2D             D'
-        'Step            Space    Stress            W    Length Scale      L'
-        'Step 10    Ctrl-Space    Slip          Alt-U    Color Scale     [ ]'
-        'Checkpoint          C    Slip rate     Alt-V    Round CS          \\'
-        'Restart    Crtl-Alt-Q    Magnitude         0    Reset CS      Alt-\\'
-        'Clean restart   Alt-Q    Component       1-6                       '
-        'Rotate           Drag    Volumes/Slices    P    Build Movie       B'
-        'Explore        Arrows    Glyphs            G    Frame -1          -'
-        'Hypocenter          H    Isosurfaces       I    Frame +1          ='
-        'Extremum            E    Surfaces          S    Frame -10      PgUp'
-        'Replot          Enter    Outline           O    Frame +10      PgDn'
-        'Clean Up    Backspace    Mesh              M    First Frame    Home'
-        'Time Series         T    U Distortion      X    Last Frame      End'
-        'Filtered TS     Alt-T    Fault Plane       F    Delete Frame    Del'
-      }, ...
-      'Tag', 'help', ...
-      'Vertical',   'middle', ...
-      'Margin', 10, ...
-      'EdgeColor', 0.5 * [ 1 1 1 ], ...
-      'BackgroundColor', background );
-    set( gcf, 'CurrentAxes', haxes(1) )
+    msg = 'Can''t Build Movie';
   end
+  anim = 1;
+otherwise, action = 0; msg = '';
 end
 keypress = '';
-keymod = '';
 
 % Message
 set( gcf, 'CurrentAxes', haxes(2) )

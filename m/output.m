@@ -11,7 +11,7 @@ if init
   if checkpoint < 0, checkpoint = nt + checkpoint + 1; end
   if exist( 'out/checkpoint.mat', 'file' )
     load out/checkpoint
-    if size( rho ) == nm, else error 'Checkpoint', end
+    if size( mr ) == nm, else error 'Checkpoint', end
     fprintf( 'Checkpoint found, starting from step %g\n', it )
   else
     if exist( 'out', 'dir' ), error 'Previous run exists', end
@@ -48,10 +48,6 @@ for iz = 1:size( outit, 1 )
   isfault = 0;
   static = 0;
   switch outvar{iz}
-  case 'rho',  static = 1;
-  case 'lam',  static = 1; cell = 1;
-  case 'mu',   static = 1; cell = 1;
-  case 'y',    static = 1; cell = 1;
   case 'x',    static = 1; nc = 3;
   case 'a',    nc = 3;
   case 'v',    nc = 3;
@@ -81,10 +77,6 @@ for iz = 1:size( outit, 1 )
     file = sprintf( 'out/%02d/%s%1d%06d', iz, outvar{iz}, i, it );
     fid = fopen( file, 'w' );
     switch outvar{iz}
-    case 'rho',  fwrite( fid, rho(j,k,l),    'float32' );
-    case 'lam',  fwrite( fid, lam(j,k,l),    'float32' );
-    case 'mu',   fwrite( fid, mu(j,k,l),     'float32' );
-    case 'y',    fwrite( fid, y(j,k,l),      'float32' );
     case 'x',    fwrite( fid, x(j,k,l,i),    'float32' );
     case 'a',    fwrite( fid, w1(j,k,l,i),   'float32' );
     case 'v',    fwrite( fid, v(j,k,l,i),    'float32' );
