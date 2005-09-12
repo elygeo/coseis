@@ -24,7 +24,7 @@ real :: &
   dn1(maxpml), dn2(maxpml), dc1(maxpml), dc2(maxpml)
 
 integer :: &
-  nn(3), nm(3), nhalo, offset(3), npml, bc(6), &
+  nn(3), nm(3), nf(3), nhalo, offset(3), npml, bc(6), &
   nt, it, checkpoint, np(3), ip, wt(5), &
   hypocenter(3), nrmdim, downdim, nclramp, &
   outit(nz), &

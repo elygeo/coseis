@@ -9,8 +9,12 @@ use globals_m
 implicit none
 
 ip = 0
-
 nm = nn + 2 * nhalo
+nf = 0
+if( nrmdim /= 0 ) then
+  nf = nm
+  nf(nrmdim) = 1
+end if
 i1node = nhalo + 1
 i2node = nhalo + nn
 i1cell = nhalo + 1

@@ -173,7 +173,7 @@ end do
 
 ! Hypocentral radius
 i1 = 1
-i2 = nm
+i2 = nf
 i1(nrmdim) = hypocenter(nrmdim)
 i2(nrmdim) = hypocenter(nrmdim)
 j1 = i1(1); j2 = i2(1)
@@ -212,7 +212,7 @@ if ( nrmdim == 0 ) return
 
 ! Indices
 i1 = 1
-i2 = nm
+i2 = nf
 i1(nrmdim) = hypocenter(nrmdim)
 i2(nrmdim) = hypocenter(nrmdim)
 j1 = i1(1); j2 = i2(1)

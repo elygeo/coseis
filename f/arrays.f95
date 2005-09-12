@@ -25,7 +25,7 @@ allocate( &
   mr(j,k,l),    & ! mass ratio
   lm(j,k,l),    & ! Lame parameter
   mu(j,k,l),    & ! Lame parameter
-  yy(j,k,l),    & ! Hourglass constant
+  y(j,k,l),     & ! Hourglass constant
   x(j,k,l,3),   & ! node locations
   ! 3D simulation state
   v(j,k,l,3),   & ! velocity
@@ -50,12 +50,7 @@ allocate( &
   g6(j,k,l2,3)  ) ! PML gradient
 
 ! Fault arrays
-if ( nrmdim /= 0 ) then
-  i2 = nm
-  i2(nrmdim) = 1
-else
-  i2 = 0
-end if
+i2 = nf
 j = i2(1)
 k = i2(2)
 l = i2(3)

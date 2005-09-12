@@ -23,6 +23,7 @@ while getopts spgnmrld opt; do
 done
 shift $(( OPTIND - 1 ))
 [ -n "$1" ] && echo "$1" > infile
+[ -f infile ]
 infile=$( cat infile )
 
 # run on remote host
