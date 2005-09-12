@@ -44,7 +44,7 @@ hhelp = [];
 j = xhair(1);
 k = xhair(2);
 l = xhair(3);
-clear xg xga mga vga
+clear xg xga
 if cellfocus
   for i = 1:3
     xg(i) = 0.125 * ( ...
@@ -63,30 +63,39 @@ else
   xga(1:3) = x(j,k,l,:) + xscl * u(j,k,l,:);
 end
 xhairtarg = double( xga(:)' );
+mga = [];
+vga = [];
+msg = '';
+time = it * dt;
 switch field
+case 'vs'
+  time = ( it + .5 ) * dt;
+  i = [ j k l ];
+  if nrmdim, i(nrmdim) = 1; end
+  j = i(1); k = i(2); l = i(3);
+  msg = sprintf( 'Vs %9.2e', vs(j,k,l) );
+case 'us'
+  i = [ j k l ];
+  if nrmdim, i(nrmdim) = 1; end
+  tmp = [ us(j,k,l) fd(j,k,l) fs(j,k,l), dc(j,k,l) co(j,k,l) ];
+  msg = sprintf( 'Us %9.2e', us(j,k,l) );
 case 'a'
-  time = it * dt;
-  if pass == 'w', mga = []; msg = ''; else
+  if pass ~= 'w'
     vga(1:3) = w1(j,k,l,:);
-    mga = s1(j,k,l);
-    tmp = [ mga vga mr(j,k,l) ];
-    msg = sprintf( '|A| %9.2e\nAx  %9.2e\nAy  %9.2e\nAz  %9.2e\nmr  %9.2e', tmp );
+    mga = sqrt( sum( vga .* vga ) );
+    msg = sprintf( '|A| %9.2e\nAx  %9.2e\nAy  %9.2e\nAz  %9.2e', [ mga vga ] );
   end
 case 'v'
   time = ( it + .5 ) * dt;
   vga(1:3) = v(j,k,l,:);
-  mga = sqrt( sum( v(j,k,l,:) .* v(j,k,l,:), 4 ) );
-  tmp = [ mga vga mr(j,k,l) ];
-  msg = sprintf( '|V| %9.2e\nVx  %9.2e\nVy  %9.2e\nVz  %9.2e\nmr  %9.2e', tmp );
+  mga = sqrt( sum( vga .* vga ) );
+  msg = sprintf( '|V| %9.2e\nVx  %9.2e\nVy  %9.2e\nVz  %9.2e', [ mga vga ] );
 case 'u'
-  time = it * dt;
   vga(1:3) = u(j,k,l,:);
-  mga = sqrt( sum( u(j,k,l,:) .* u(j,k,l,:), 4 ) );
-  tmp = [ mga vga mr(j,k,l) ];
-  msg = sprintf( '|U| %9.2e\nUx  %9.2e\nUy  %9.2e\nUz  %9.2e\nmr  %9.2e', tmp );
+  mga = sqrt( sum( vga .* vga ) );
+  msg = sprintf( '|U| %9.2e\nUx  %9.2e\nUy  %9.2e\nUz  %9.2e', [ mga vga ] );
 case 'w'
-  time = it * dt;
-  if pass == 'v', mga = []; msg = ''; else
+  if pass ~= 'v'
     c = [ 1 6 5; 6 2 4; 5 4 3 ];
     clear wg
     wg(1:3) = w1(j,k,l,:);
@@ -98,8 +107,8 @@ case 'w'
     vec = vec(:,i);
     mga = val';
     vga = vec(:)';
-    tmp = [ val([3 2 1])' wg lam(j,k,l) mu(j,k,l) ];
-    msg = sprintf( 'W1  %9.2e\nW2  %9.2e\nW3  %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e\nlam %9.2e\nmu  %9.2e', tmp );
+    tmp = [ val([3 2 1])' wg ];
+    msg = sprintf( 'W1  %9.2e\nW2  %9.2e\nW3  %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e', tmp );
   end
 otherwise error 'xhfield'
 end

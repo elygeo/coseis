@@ -21,6 +21,7 @@ in = textread( file{1}, '%s', 'delimiter', '\n', 'commentstyle', 'shell' );
 for i = 1:length( in )
   if in{i}, else continue, end
   key = strread( in{i}, '%s', 'commentstyle', 'shell' );
+  if strcmp( key{1}, 'stop' ), break, end
   str = strread( in{i}, '%*s %[^#]' );
   str = str{1};
   switch key{1}

@@ -281,7 +281,7 @@ case 'l'
   if strcmp( get( gca, 'Visible' ), 'off' ), axis on, msg = 'Axis On';
   else axis off, msg = 'Axis Off';
   end
-case 't', timeseriesviz
+case 't', dofilter = km; tsviz
 case 'c'
   if ~km
     save checkpoint it v u vs us trup p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6

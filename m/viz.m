@@ -114,6 +114,8 @@ case 'a', onpass = 'v';
 case 'v', onpass = 'v'; time = ( it + .5 ) * dt;
 case 'u', onpass = 'w';
 case 'w', onpass = 'w';
+case 'vs', onpass = 'v'; time = ( it + .5 ) * dt;
+case 'us', onpass = 'w';
 otherwise error 'viz field'
 end
 if onpass ~= pass, return, end

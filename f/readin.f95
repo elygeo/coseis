@@ -32,6 +32,7 @@ doline: do
   read( str, * ) key1, key2, key3
   selectkey: select case( key1 )
   case( '' )
+  case( 'stop' );       exit doline
   case( 'n' );          read( str, * ) key1, nn, nt
   case( 'dx' );         read( str, * ) key1, dx
   case( 'dt' );         read( str, * ) key1, dt

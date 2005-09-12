@@ -7,6 +7,7 @@ p = 1;
 pass = 'v';
 breakon = 'v';
 gui = 1;
+outdir = 'out/';
 if get( 0, 'ScreenDepth' ) == 0; gui = 0; end
 
 % Precision

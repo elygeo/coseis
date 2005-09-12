@@ -46,12 +46,16 @@ for file in 'defaults' 'in'; do
     echo "file not found: $file"
     exit
   fi
+  readmore=yes
   while read key params; do
     set -- $params
-    case "$key" in
-      n)   nn3=( $1 $2 $3 ); nt=$4 ;;
-      np)  np3=( $1 $2 $3 ) ;;
-    esac
+    if [ $readmore = yes ]; then
+      case "$key" in
+        n)    nn3=( $1 $2 $3 ); nt=$4 ;;
+        np)   np3=( $1 $2 $3 ) ;;
+        stop) readmore=no ;;
+      esac
+    fi
   done < "$file"
 done
 nn=$(( nn3[0] * nn3[1] * nn3[2] ));

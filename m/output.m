@@ -96,9 +96,15 @@ for iz = 1:size( outit, 1 )
     fclose( fid );
     if static, outit(iz) = 0; end
   end
+  i1 = i1 - offset;
+  i2 = i2 - offset;
+  if isfault
+    i1(nrmdim) = 1;
+    i2(nrmdim) = 1;
+  end
   file = sprintf( 'out/%02d/hdr', iz );
   fid = fopen( file, 'w' );
-  fprintf( fid, '%g ', [ nc i1-offset i2-offset outit(iz) it dt dx ] );
+  fprintf( fid, '%g ', [ nc i1 i2 outit(iz) it dt dx ] );
   fprintf( fid, '%s\n', outvar{iz} );
   fclose( fid );
 end

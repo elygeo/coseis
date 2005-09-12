@@ -64,7 +64,7 @@ end if ifinit
 doiz: do iz = 1, nout
 
 if ( outit(iz) < 0 ) outit(iz) = nt + outit(iz) + 1
-if ( outit(iz) == 0 .or. mod( it, outit(iz) ) /= 0 ) cycle izloop
+if ( outit(iz) == 0 .or. mod( it, outit(iz) ) /= 0 ) cycle doiz
 nc = 1
 onpass = 'v'
 cell = .false.
@@ -87,14 +87,21 @@ case default; stop 'var'
 end select
 if ( fault .and. nrmdim == 0 ) then
   outit(iz) = 0
-  cycle izloop
+  cycle doiz
 end if
-if ( onpass /= pass ) cycle izloop
+if ( onpass /= pass ) cycle doiz
 if ( static ) outit(iz) = 0
 call zone( i1, i2, iout(iz,:), nn, offset, hypocenter, nrmdim )
 if ( any( i1 < i1node .or. i2 > i2node ) ) stop 'out range'
 if ( cell ) i2 = i2 - 1
 if ( any( i2 < i1 ) ) stop 'out range'
+if ( ip == 0 ) then
+  write( str, '(a,i2.2,a)' ) 'out/', iz, '/hdr'
+  open(  9, file=str, status='replace' )
+  write( 9, * ) nc, i1-offset, i2-offset, outit(iz), it, dt, dx
+  write( 9, * ) outvar(iz)
+  close( 9 )
+end if
 if ( fault ) then
   i1(nrmdim) = 1
   i2(nrmdim) = 1
@@ -120,13 +127,6 @@ do i = 1, nc
   case default; stop 'var'
   end select
 end do
-if ( ip == 0 ) then
-  write( str, '(a,i2.2,a)' ) 'out/', iz, '/hdr'
-  open(  9, file=str, status='replace' )
-  write( 9, * ) nc, i1-offset, i2-offset, outit(iz), it, dt, dx
-  write( 9, * ) outvar(iz)
-  close( 9 )
-end if
 
 end do doiz
 
