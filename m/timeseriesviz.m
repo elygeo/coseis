@@ -39,7 +39,7 @@ if ~exist( 'w1', 'var' )
     i = xhair - i1;
     goffset = 4 * sum( i .* cumprod( [ 1 n(1:2) ] ) );
     for i = 1:3
-      file = sprintf( [ outdir '%02d/%1d000001' ], iz, i );
+      file = sprintf( [ outdir '%02d/x%1d000001' ], iz, i );
       fid = fopen( file, 'r', endian );
       fseek( fid, goffset, -1 );
       xhairtarg(i) = fread( fid, 1, 'float32' );
@@ -69,7 +69,7 @@ goffset = 4 * sum( i .* cumprod( [ 1 n(1:2) ] ) );
 clear vg
 for i = 1:ncomp
 for itt = 1:it
-  file = sprintf( [ outdir '%02d/%1d%06d' ], iz, i, itt );
+  file = sprintf( [ outdir '%02d/%s%1d%06d' ], iz, outvar{iz}, i, itt );
   fid = fopen( file, 'r', endian );
   fseek( fid, goffset, -1 );
   vg(itt+1,i) = fread( fid, 1, 'float32' );

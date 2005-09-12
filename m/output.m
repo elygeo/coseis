@@ -78,7 +78,7 @@ for iz = 1:size( outit, 1 )
   k = i1(2):i2(2);
   j = i1(1):i2(1);
   for i = 1:nc
-    file = sprintf( 'out/%02d/%1d%06d', iz, i, it );
+    file = sprintf( 'out/%02d/%s%1d%06d', iz, outvar{iz}, i, it );
     fid = fopen( file, 'w' );
     switch outvar{iz}
     case 'rho',  fwrite( fid, rho(j,k,l),    'float32' );
@@ -125,7 +125,7 @@ wt(4) = toc;
 
 file = sprintf( 'out/stats/%06d', it );
 fid = fopen( file, 'w' );
-fprintf( fid, '%16.7e', [ amax vmax umax wmax vsmax usmax wt ] );
+fprintf( fid, '%15.7e', [ amax vmax umax wmax vsmax usmax wt ] );
 fprintf( fid, '\n' );
 fclose( fid );
 

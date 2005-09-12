@@ -22,7 +22,8 @@ while getopts spgnmrld opt; do
   esac
 done
 shift $(( OPTIND - 1 ))
-[ -n "$1" ] && cp "$1" "in"
+[ -n "$1" ] && echo "$1" > infile
+infile=$( cat infile )
 
 # run on remote host
 if [ $remote = yes ]; then
@@ -30,7 +31,7 @@ if [ $remote = yes ]; then
   host="phim.ucsd.edu"
   echo "running on remote host $host"
   ssh-add -L > /dev/null || ssh-add
-  $version=$( ./tarball )
+  version=$( ./tarball )
   scp sord.tgz $host:
   ssh -x $host "tar zxf sord.tgz && cd sord-$version && ./sord $@ -l"
   exit
@@ -41,7 +42,7 @@ fi
 
 nn3=( 1 1 1 )
 np3=( 1 1 1 )
-for file in "defaults.in" "in"; do
+for file in "defaults.in" "$infile"; do
 if [ ! -f "$file" ]; then
   echo "file not found: $file"
   exit
@@ -83,7 +84,7 @@ perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > out/endian
 
 ./tarball
 cp sord.tgz out/
-cp "in" out/
+cp "$infile" out/in
 
 floatsize=4
 nvars=21

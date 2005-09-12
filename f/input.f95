@@ -12,7 +12,9 @@ character(160) :: infile(2), str, key1, key2, key3, &
   switchcase = 'start', caseswitch = 'start'
 
 infile(1) = 'defaults.in'
-infile(2) = 'in'
+open( 9, file='infile', status='old' )
+read( infile(2) )
+close( 9 )
 
 nmat  = 0
 nfric = 0

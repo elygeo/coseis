@@ -169,7 +169,7 @@ if ( ip == 0 ) then
   dwt(1:4) = real( wt(2:5) - wt(1:4) ) / real( wt_rate )
   write( str, '(a,i6.6)' ) 'out/stats/', it
   open(  9, file=str, status='replace' )
-  write( 9, '(8es16.7)' ) amax, vmax, umax, wmax, dwt
+  write( 9, '(8es15.7)' ) amax, vmax, umax, wmax, dwt
   close( 9 )
   print '(i6,5es12.4)', it, amax, vmax, umax, dwt(1:2) + dwt(3:4)
 end if

@@ -12,12 +12,15 @@ stress    = []; istress = []; stressdir = '';
 locknodes = []; ilock   = [];
 outvar    = {}; iout    = []; outit = [];
 grid      = ''; griddir = '';
+infile    = textread( 'infile', '%s' );
 
-for file = { 'defaults.in', 'in' }
+for file = { 'defaults.in' infile{1} }
+
 fprintf( 'Reading file: %s\n', file{1} )
 in = textread( file{1}, '%s', 'delimiter', '\n', 'commentstyle', 'shell' );
 caseswitch = '';
 switchcase = '';
+
 for i = 1:length( in )
   if in{i}, else continue, end
   key = strread( in{i}, '%s', 'commentstyle', 'shell' );
@@ -110,5 +113,6 @@ for i = 1:length( in )
   otherwise error( in{i} )
   end
 end
+
 end
  

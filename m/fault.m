@@ -246,9 +246,9 @@ tsmax = max( abs( ts(:) ) );
 % Friction Law
 ii = tn > 0.;
 tn(ii) = 0.;
-f1 = fd
+f1 = fd;
 ii = us < dc;
-f1 = f1(ii) + ( 1. - us(ii) ./ dc(ii) ) .* ( fs(ii) - fd(ii) );
+f1(ii) = f1(ii) + ( 1. - us(ii) ./ dc(ii) ) .* ( fs(ii) - fd(ii) );
 f1 = f1 .* -tn + co;
 
 % Nucleation

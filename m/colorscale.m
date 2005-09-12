@@ -70,7 +70,7 @@ if comp
   end
   hh = 2 / ( size( cmap, 1 ) - 1 );
   x1 = -1 : hh : 1;
-  x2 = -1 : .0001 : 1;
+  x2 = -1 : .0005 : 1;
   x2 = sign( x2 ) .* abs( x2 ) .^ colorexp;
   colormap( interp1( x1, cmap, x2 ) );
   set( haxes(2), 'Clim', [ 0 1 ] )
@@ -90,7 +90,7 @@ else
   end
   hh = 1 / ( size( cmap, 1 ) - 1 );
   x1 = 0 : hh : 1;
-  x2 = -1 : .0001 : 1;
+  x2 = -1 : .0005 : 1;
   x2 = abs( x2 ) .^ colorexp;
   colormap( interp1( x1, cmap, x2 ) );
   set( haxes(2), 'Clim', [ -1 1 ] )

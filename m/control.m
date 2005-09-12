@@ -18,39 +18,6 @@ action = 1;
 anim = 0;
 
 switch keypress
-case 'f1'
-  if length( hhelp )
-    delete( hhelp )
-    hhelp = [];
-  else
-    set( gcf, 'CurrentAxes', haxes(2) )
-    hhelp = text( .5, .54, ...
-      { 'SORD - Support Operator Rupture Dynamics'
-        ''
-        'Help               F1    Acceleration      A    Zoom            < >'
-        'Run                 R    Velocity          V    Reset Zoom        /'
-        'Pause           Click    Displacement      U    3D/2D             D'
-        'Step            Space    Stress            W    Length Scale      L'
-        'Step 10    Ctrl-Space    Slip          Alt-U    Color Scale     [ ]'
-        'Checkpoint          C    Slip rate     Alt-V    Round CS          \\'
-        'Restart         Alt-Q    Magnitude         0    Reset CS      Alt-\\'
-        '                         Component       1-6                       '
-        'Rotate           Drag    Volumes/Slices    P    Build Movie       B'
-        'Explore        Arrows    Glyphs            G    Frame -1          -'
-        'Hypocenter          H    Isosurfaces       I    Frame +1          ='
-        'Extremum            E    Surfaces          S    Frame -10      PgUp'
-        'Replot          Enter    Outline           O    Frame +10      PgDn'
-        'Clean Up    Backspace    Mesh              M    First Frame    Home'
-        'Time Series         T    U Distortion      X    Last Frame      End'
-        'Filtered TS     Alt-T    Fault Plane       F    Delete Frame    Del'
-      }, ...
-      'Tag', 'help', ...
-      'Vertical',   'middle', ...
-      'Margin', 10, ...
-      'EdgeColor', 0.5 * [ 1 1 1 ], ...
-      'BackgroundColor', background );
-    set( gcf, 'CurrentAxes', haxes(1) )
-  end
 case 'home',       anim = 1; showframe = 1;
 case 'end',        anim = 1; showframe = nframe;
 case 'pageup',     anim = 1; dframe = -10;
@@ -78,7 +45,12 @@ case 'h',          xhairmove = 4;  crosshairs
 case 'e',          xhairmove = 6;  crosshairs
 case 'space', if km, itstep = 10; else itstep = 1; end, msg = 'Step';
 case 'r', itstep = nt - it; msg = 'Run';
-case 'q', if km, rmdir( 'out', 's' ), sord, return, end
+case 'q'
+  if km
+    if km == 1, rmdir( 'out', 's' ), end
+    sord
+    return
+  end
 case '0', comp = 0; colorscale; msg = titles( 1 );
 case '1', comp = 1; colorscale; msg = titles( 2 );
 case '2', comp = 2; colorscale; msg = titles( 3 );
@@ -291,7 +263,39 @@ case 'b'
   end
   msg = 'Build Movie';
   anim = 1;
-otherwise action = 0;
+otherwise
+  if length( hhelp )
+    delete( hhelp )
+    hhelp = [];
+  else
+    set( gcf, 'CurrentAxes', haxes(2) )
+    hhelp = text( .5, .54, ...
+      { 'SORD - Support Operator Rupture Dynamics'
+        ''
+        'Help               F1    Acceleration      A    Zoom            < >'
+        'Run                 R    Velocity          V    Reset Zoom        /'
+        'Pause           Click    Displacement      U    3D/2D             D'
+        'Step            Space    Stress            W    Length Scale      L'
+        'Step 10    Ctrl-Space    Slip          Alt-U    Color Scale     [ ]'
+        'Checkpoint          C    Slip rate     Alt-V    Round CS          \\'
+        'Restart    Crtl-Alt-Q    Magnitude         0    Reset CS      Alt-\\'
+        'Clean restart   Alt-Q    Component       1-6                       '
+        'Rotate           Drag    Volumes/Slices    P    Build Movie       B'
+        'Explore        Arrows    Glyphs            G    Frame -1          -'
+        'Hypocenter          H    Isosurfaces       I    Frame +1          ='
+        'Extremum            E    Surfaces          S    Frame -10      PgUp'
+        'Replot          Enter    Outline           O    Frame +10      PgDn'
+        'Clean Up    Backspace    Mesh              M    First Frame    Home'
+        'Time Series         T    U Distortion      X    Last Frame      End'
+        'Filtered TS     Alt-T    Fault Plane       F    Delete Frame    Del'
+      }, ...
+      'Tag', 'help', ...
+      'Vertical',   'middle', ...
+      'Margin', 10, ...
+      'EdgeColor', 0.5 * [ 1 1 1 ], ...
+      'BackgroundColor', background );
+    set( gcf, 'CurrentAxes', haxes(1) )
+  end
 end
 keypress = '';
 keymod = '';
