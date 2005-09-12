@@ -43,7 +43,7 @@ case 'f1'
         'Replot          Enter    Outline           O    Frame +10      PgDn'
         'Clean Up    Backspace    Mesh              M    First Frame    Home'
         'Time Series         T    U Distortion      X    Last Frame      End'
-        'Filtered TS     Alt-T    Fault Plane       F    Delete Frame    Del'
+        'Filtered TS     Alt-T                           Delete Frame    Del'
       }, ...
       'Tag', 'help', ...
       'Vertical',   'middle', ...
@@ -225,14 +225,6 @@ case 'v', if km, field = 'vs'; else, field = 'v'; end
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
   if pass == 'w', msg = [ msg ' step code once for viz' ]; end
-case 'f'
-  tmp = findobj( [ frame{ showframe } hhud ], 'Tag', 'fault' );
-  if length( tmp ), dofault = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
-  dofault = ~dofault;
-  if dofault, visible = 'on';  msg = 'Fault plane on';
-  else        visible = 'off'; msg = 'Fault plane off';
-  end
-  if length( tmp ), set( tmp, 'Visible', visible ), end
 case 'o'
   tmp = findobj( [ frame{ showframe } hhud ], 'Tag', 'outline' );
   if length( tmp ), dooutline = strcmp( get( tmp(1), 'Visible' ), 'on' ); end

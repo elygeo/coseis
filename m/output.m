@@ -11,7 +11,7 @@ if init
   if checkpoint < 0, checkpoint = nt + checkpoint + 1; end
   if exist( 'out/checkpoint.mat', 'file' )
     load out/checkpoint
-    if size( mr ) == nm, else error 'Checkpoint', end
+    if any( size( mr ) ~= nm ), error 'Checkpoint', end
     fprintf( 'Checkpoint found, starting from step %g\n', it )
   else
     if exist( 'out', 'dir' ), error 'Previous run exists', end

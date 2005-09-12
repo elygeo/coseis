@@ -23,13 +23,11 @@ rand( 'state', 0 )
 
 x(:) = 0.;
 if griddir
-  % load mesh
   operator = 'g';
   x(j1:j2,k1:k2,l1:l2,1) = bread( griddir, 'x1' );
   x(j1:j2,k1:k2,l1:l2,2) = bread( griddir, 'x2' );
   x(j1:j2,k1:k2,l1:l2,3) = bread( griddir, 'x3' );
 else
-  % Basic mesh
   for i = j1:j2, x(i,:,:,1) = dx * ( i - 1 - nhalo ); end
   for i = k1:k2, x(:,i,:,2) = dx * ( i - 1 - nhalo ); end
   for i = l1:l2, x(:,:,i,3) = dx * ( i - 1 - nhalo ); end

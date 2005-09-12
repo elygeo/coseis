@@ -32,16 +32,17 @@ tsscl = tslim; if tsscl < 0, tsscl = double( tsmax ); end;
 if xscl, xscl = .5 * dx / xscl; end
 cellfocus = 0;
 breakon = 'v';
+isfault = 1;
 switch field
 case 'a',  fscl = ascl;  titles = { '|A|' 'Ax' 'Ay' 'Az' };
 case 'v',  fscl = vscl;  titles = { '|V|' 'Vx' 'Vy' 'Vz' };
 case 'u',  fscl = uscl;  titles = { '|U|' 'Ux' 'Uy' 'Uz' }; breakon = 'w';
 case 'w',  fscl = wscl;  breakon = 'w'; cellfocus = 1;
            titles = { '|W|' 'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
-case 'us', fscl = usscl; titles = { 'Us' 'Us' };
-case 'vs', fscl = vsscl; titles = { 'Vs' 'Vs' };
-case 'tn', fscl = tnscl; titles = { 'Tn' 'Tn' };
-case 'ts', fscl = tsscl; titles = { 'Ts' 'Ts' };
+case 'us', fscl = usscl; titles = { 'Us' 'Us' }; isfault = 1;
+case 'vs', fscl = vsscl; titles = { 'Vs' 'Vs' }; isfault = 1;
+case 'tn', fscl = tnscl; titles = { 'Tn' 'Tn' }; isfault = 1;
+case 'ts', fscl = tsscl; titles = { 'Ts' 'Ts' }; isfault = 1;
 otherwise error 'field'
 end
 ncomp = length( titles ) - 1;

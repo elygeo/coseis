@@ -12,7 +12,7 @@ for iz = 1:size( volumes, 1 )
   k = i1(2):i2(2);
   j = i1(1):i2(1);
   ng = i2 - i1 + 1;
-  if sum( ng > 1 ) < 3, error 'volume', end
+  if any( ng <= 1 ), error 'volume', end
   switch field
   case 'a'
     if comp, vg = w1(j,k,l,comp); 

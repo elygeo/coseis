@@ -17,7 +17,34 @@ if dosurf, facecolor = 'flat';
 else       facecolor = 'none';
 end
 switch field
-case { 'a', 'v', 'u' }
+case { 'vs', 'us', 'tn', 'ts' }
+  i1 = i1node;
+  i2 = i2node;
+  i1(nrmdim) = hypocenter(nrmdim);
+  i2(nrmdim) = hypocenter(nrmdim);
+  l = i1(3):i2(3);
+  k = i1(2):i2(2);
+  j = i1(1):i2(1);
+  xg = x(j,k,l,:) + xscl * u(j,k,l,:); 
+  i1(nrmdim) = 1;
+  i2(nrmdim) = 1;
+  l = i1(3):i2(3);
+  k = i1(2):i2(2);
+  j = i1(1):i2(1);
+  switch field
+  case 'vs', vg = vs(j,k,l)
+  case 'us', vg = us(j,k,l)
+  case 'tn', vg = tn(j,k,l)
+  case 'ts', vg = ts(j,k,l)
+  end
+  xg = squeeze( xg );
+  vg = squeeze( vg );
+  vg = .25 * ( ...
+    vg(1:end-1,1:end-1) + vg(2:end,1:end-1) + ...
+    vg(1:end-1,2:end)   + vg(2:end,2:end) ); 
+  hsurf(end+1) = surf( xg(:,:,1), xg(:,:,2), xg(:,:,3), double( vg ) );
+  hold on
+case { 'a', 'v', 'u', 'mr' }
   i = [
     1 2 3  4 2 6
     1 5 3  4 5 6
@@ -41,6 +68,7 @@ case { 'a', 'v', 'u' }
     if sum( ng > 1 ) == 2
       xg = x(j,k,l,:) + xscl * u(j,k,l,:); 
       switch field
+      case 'mr',  vg = mr(j,k,l);
       case 'a'
         if comp, vg = w1(j,k,l,comp); 
         else     vg = s1(j,k,l);
@@ -71,7 +99,7 @@ case 'w'
     k = i1(2):i2(2);
     j = i1(1):i2(1);
     ng = i2 - i1 + 1;
-    if sum( ng > 1 ) == 3
+    if all( ng > 1 )
       xg = x(j(1),k,l,:) + xscl * u(j(1),k,l,:); 
       if     comp > 3, vg = w2(j(1),k,l,comp-3);
       elseif comp,     vg = w1(j(1),k,l,comp);
@@ -123,7 +151,7 @@ case 'w'
       hsurf(end+1) = surf( xg(:,:,1), xg(:,:,2), xg(:,:,3), double( vg ) );
     end
   end
-otherwise error 'field'
+otherwise return
 end
 set( hsurf, ...
   'Tag', 'surf', ...
