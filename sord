@@ -42,7 +42,7 @@ fi
 
 nn3=( 1 1 1 )
 np3=( 1 1 1 )
-for file in "defaults.in" "$infile"; do
+for file in "in/defaults" "$infile"; do
 if [ ! -f "$file" ]; then
   echo "file not found: $file"
   exit
@@ -214,7 +214,7 @@ clean:
 	rm -f *.o *.mod matlab_workspace.mat
 
 realclean: clean
-	rm -f fsord makefile batchjob sord.tgz
+	rm -f fsord makefile batchjob sord.tgz infile
 
 %.o: f/%.f95 makefile
 	\$(FC) \$(FFLAGS) -c \$< -o \$@

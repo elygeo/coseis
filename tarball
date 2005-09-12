@@ -8,11 +8,11 @@ echo $version > VERSION
 files="
   README
   VERSION
-  *.in
-  sord
   tarball
+  sord
   f/
   m/
+  in/
 "
 
 mkdir sord-$version

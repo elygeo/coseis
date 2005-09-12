@@ -11,7 +11,7 @@ integer :: iz, err
 character(160) :: infile(2), str, key1, key2, key3, &
   switchcase = 'start', caseswitch = 'start'
 
-infile(1) = 'defaults.in'
+infile(1) = 'in/defaults'
 open( 9, file='infile', status='old' )
 read( infile(2) )
 close( 9 )
