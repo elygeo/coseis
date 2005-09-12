@@ -148,8 +148,8 @@ OBJECT="\\
   input.o \\
   setup.o \\
   arrays.o \\
-  gridgen.o \\
   optimize.o \\
+  gridgen.o \\
   matmodel.o \\
   pml.o \\
   fault.o \\

@@ -53,7 +53,7 @@ if ( hypop ) then
 end if
 
 ! Average Lame parameters onto cell centers
-lm = 0.
+lam = 0.
 mu = 0.
 i1 = i1cell
 i2 = i2cell
@@ -61,7 +61,7 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-  lm(j,k,l) = 0.125 * &
+  lam(j,k,l) = 0.125 * &
     ( s1(j,k,l) + s1(j+1,k+1,l+1) &
     + s1(j+1,k,l) + s1(j,k+1,l+1) &
     + s1(j,k+1,l) + s1(j+1,k,l+1) &
@@ -109,12 +109,12 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
 end forall
 
 ! Hourglass constant - FIXME off by factor of 8?
-yy = 6. * dx * dx * ( lm + 2. * mu )
-where ( yy /= 0. ) yy = 4. * mu * ( lm + mu ) / yy * s2
+y = 6. * dx * dx * ( lam + 2. * mu )
+where ( y /= 0. ) y = 4. * mu * ( lam + mu ) / y * s2
 
 ! Divide Lame parameters by cell volume
 where ( s2 /= 0. ) s2 = 1. / s2
-lm = lm * s2
+lam = lam * s2
 mu = mu * s2
 
 ! Node mass ratio

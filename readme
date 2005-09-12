@@ -59,7 +59,7 @@ COORDINATE SYSTEM
      x = node locations                  w: wxx wyy wzz = normal stress
      rho = density                          rho lam mu = material props
   w: w = stress                             x = node locations (2) 
-     lam mu = elastic moduli            o: x = node locations (1) 
+     lam mu = elastic moduli             o: x = node locations (1) 
 
 
 COMPUTATIONAL CYCLE

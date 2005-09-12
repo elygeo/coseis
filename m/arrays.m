@@ -24,7 +24,7 @@ nf3 = [ nf 3 ];
 
 % 3D static variables
 mr   = repmat( zero, nm );  % mass ratio
-lm   = repmat( zero, nm );  % Lame parameter
+lam  = repmat( zero, nm );  % Lame parameter
 mu   = repmat( zero, nm );  % Lame parameter
 y    = repmat( zero, nm );  % hourglass constant
 x    = repmat( zero, nm3 ); % node locations

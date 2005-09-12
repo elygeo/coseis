@@ -13,7 +13,7 @@ character(160) :: infile(2), str, key1, key2, key3, &
 
 infile(1) = 'in/defaults'
 open( 9, file='infile', status='old' )
-read( infile(2) )
+read( 9, '(a)' ) infile(2)
 close( 9 )
 
 nmat  = 0
@@ -27,7 +27,7 @@ izloop: do iz = 1, 2
 if ( ip == 0 ) print '(a,a)', 'Reading file: ', trim( infile(iz) )
 open( 9, file=infile(iz), status='old' )
 loop: do
-  read( 9,'(a)', iostat=i ) str
+  read( 9, '(a)', iostat=i ) str
   if ( i /= 0 ) exit loop
   str = adjustl( str )
   if ( str(1:1) == '#' .or. str == ' ' ) cycle loop

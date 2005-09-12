@@ -23,7 +23,7 @@ l1 = i1(3); l2 = i2(3)
 allocate( &
   ! 3D static variables
   mr(j,k,l),    & ! mass ratio
-  lm(j,k,l),    & ! Lame parameter
+  lam(j,k,l),   & ! Lame parameter
   mu(j,k,l),    & ! Lame parameter
   y(j,k,l),     & ! Hourglass constant
   x(j,k,l,3),   & ! node locations

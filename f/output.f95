@@ -17,16 +17,17 @@ real :: dwt(4)
 character(160) :: str
 logical :: fault, cell, static, init = .true.
 
-if ( init ) then
+inittrue: if ( init ) then
   init = .false.
+  if ( checkpoint < 0 ) checkpoint = checkpoint + nt + 1
   if ( it == 0 ) then
     if ( ip == 0 ) then
       print '(a)', 'Initialize output'
       open(  9, file='out/x0', status='new', iostat=err )
-      if ( err / 0 ) then
+      if ( err /= 0 ) then
         print '(a)', 'error: previous output found. use -d flag to overwrite'
         stop
-      else
+      end if
       write( 9, * ) x0
       close( 9 )
       call system( 'mkdir out/ckp' )
@@ -36,10 +37,8 @@ if ( init ) then
         call system( 'mkdir ' // str )
       end do
     end if
-    if ( checkpoint < 0 ) checkpoint = checkpoint + nt + 1
   else
     if ( ip == 0 ) print '(a,i6)', 'Checkpoint found, starting from step ', it
-    outinit = .false.
     write( str, '(a,i6.6,i6.6)' ) 'out/ckp/', ip, it
     inquire( iolength=reclen ) u, v, vs, us, trup, &
       p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
@@ -58,7 +57,7 @@ if ( init ) then
     print '(a)', '  Step  Amax        Vmax        Umax        Compute     I/O'
   end if
   return
-end if
+end if inittrue
 
 !------------------------------------------------------------------------------!
 

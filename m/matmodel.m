@@ -41,14 +41,14 @@ i1 = hypocenter;
 mu0 = s2( i1(1), i1(2), i1(3) );
 
 % Average Lame parameters on cell centers
-lm(:) = 0.;
+lam(:) = 0.;
 mu(:) = 0.;
 i1 = i1cell;
 i2 = i2cell;
 l = i1(3):i2(3);
 k = i1(2):i2(2);
 j = i1(1):i2(1);
-lm(j,k,l) = 0.125 * ...
+lam(j,k,l) = 0.125 * ...
   ( s1(j,k,l) + s1(j+1,k+1,l+1) ...
   + s1(j+1,k,l) + s1(j,k+1,l+1) ...
   + s1(j,k+1,l) + s1(j+1,k,l+1) ...
@@ -95,15 +95,15 @@ s1(j,k,l) = 0.125 * ...
   + s2(j,k,l-1) + s2(j-1,k-1,l) );
 
 % Hourglass constant. FIXME off by factor of 8?
-y = 6. * dx * dx * ( lm + 2. * mu );
+y = 6. * dx * dx * ( lam + 2. * mu );
 i = y ~= 0.;
 y(i) = 1. ./ y(i);
-y = 4. * mu .* ( lm + mu ) .* y .* s2;
+y = 4. * mu .* ( lam + mu ) .* y .* s2;
 
 % Divide Lame parameters by cell volume
 i = s2 ~= 0.;
 s2(i) = 1. ./ s2(i);
-lm = lm .* s2;
+lam = lam .* s2;
 mu = mu .* s2;
 
 % Node mass ratio

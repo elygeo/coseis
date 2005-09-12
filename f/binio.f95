@@ -61,10 +61,10 @@ l1 = i1(3); l2 = i2(3)
 inquire( iolength=reclen ) s1(j1:j2,k1:k2,l1:l2)
 open( 9, &
   file=filename, &
+  recl=reclen, &
   form='unformatted', &
   access='direct', &
-  status='old', &
-  recl=reclen )
+  status='old' )
 read( 9, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
 close( 9 )
 end subroutine
@@ -84,10 +84,10 @@ l1 = i1(3); l2 = i2(3)
 inquire( iolength=reclen ) w1(j1:j2,k1:k2,l1:l2,i)
 open( 9, &
   file=filename, &
+  recl=reclen, &
   form='unformatted', &
   access='direct', &
-  status='old', &
-  recl=reclen )
+  status='old' )
 read( 9, rec=1 ) w1(j1:j2,k1:k2,l1:l2,i)
 close( 9 )
 end subroutine
