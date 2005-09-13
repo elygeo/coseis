@@ -29,9 +29,9 @@
 # npml		20
   npml		10
 
-# nrmdim: direction normal to the fault plane
-# nrmdim	0   # no fault
-  nrmdim	2   # constant y fault plane
+# inrm: direction normal to the fault plane
+# inrm		0   # no fault
+  inrm		2   # constant y fault plane
 
 # material: rho vp vs zone(6): density, p-wave speed, s-wave speed.
 # Parameters with a zone(6) specification can be given multiple times.  
@@ -60,7 +60,7 @@
 # stress	read   data/traction/   # read from disk
   traction	-70e6  -120e6  0.    1 1 1   -1 -1 -1
 
-# hypocenter(3) : node location of the hypocenter, 0 = mesh logical center
+# hypocenter: i0(3): node location of the hypocenter, 0 = mesh logical center
   hypocenter	0 0 0
 
 # rcrit: nucleation radius

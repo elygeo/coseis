@@ -19,7 +19,7 @@ logical :: fault, cell, static, init = .true.
 
 ifinit: if ( init ) then
   init = .false.
-  if ( checkpoint < 0 ) checkpoint = checkpoint + nt + 1
+  if ( itcheck < 0 ) itcheck = itcheck + nt + 1
   if ( it == 0 ) then
     if ( ip == 0 ) then
       print '(a)', 'Initialize output'
@@ -63,8 +63,8 @@ end if ifinit
 
 doiz: do iz = 1, nout
 
-if ( outit(iz) < 0 ) outit(iz) = nt + outit(iz) + 1
-if ( outit(iz) == 0 .or. mod( it, outit(iz) ) /= 0 ) cycle doiz
+if ( itout(iz) < 0 ) itout(iz) = nt + itout(iz) + 1
+if ( itout(iz) == 0 .or. mod( it, itout(iz) ) /= 0 ) cycle doiz
 nc = 1
 onpass = 'v'
 cell = .false.
@@ -85,26 +85,26 @@ case( 'us'   ); fault = .true.
 case( 'trup' ); fault = .true.
 case default; stop 'var'
 end select
-if ( fault .and. nrmdim == 0 ) then
-  outit(iz) = 0
+if ( fault .and. inrm == 0 ) then
+  itout(iz) = 0
   cycle doiz
 end if
 if ( onpass /= pass ) cycle doiz
-if ( static ) outit(iz) = 0
-call zone( i1, i2, iout(iz,:), nn, offset, hypocenter, nrmdim )
+if ( static ) itout(iz) = 0
+call zone( i1, i2, iout(iz,:), nn, offset, i0, inrm )
 if ( any( i1 < i1node .or. i2 > i2node ) ) stop 'out range'
 if ( cell ) i2 = i2 - 1
 if ( any( i2 < i1 ) ) stop 'out range'
 if ( ip == 0 ) then
   write( str, '(a,i2.2,a)' ) 'out/', iz, '/hdr'
   open(  9, file=str, status='replace' )
-  write( 9, * ) nc, i1-offset, i2-offset, outit(iz), it, dt, dx
+  write( 9, * ) nc, i1-offset, i2-offset, itout(iz), it, dt, dx
   write( 9, * ) outvar(iz)
   close( 9 )
 end if
 if ( fault ) then
-  i1(nrmdim) = 1
-  i2(nrmdim) = 1
+  i1(inrm) = 1
+  i2(inrm) = 1
 end if
 do i = 1, nc
   write( str, '(a,i2.2,a,a,i1,i6.6)' ) &
@@ -134,7 +134,7 @@ if ( pass == 'w' ) return
 
 !------------------------------------------------------------------------------!
 
-if ( checkpoint /= 0 .and. mod( it, checkpoint ) == 0 ) then
+if ( itcheck /= 0 .and. mod( it, itcheck ) == 0 ) then
   inquire( iolength=reclen ) v, u, vs, us, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   write( str, '(a,i6.6,i6.6)') 'out/ckp/', ip, it

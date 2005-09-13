@@ -3,7 +3,7 @@
 
 if volviz
   planes = volumes;
-else
+elseif ~isfault
   planes = slices;
   lines  = slices;
   lineviz
@@ -20,22 +20,22 @@ switch field
 case { 'vs', 'us', 'tn', 'ts' }
   i1 = i1node;
   i2 = i2node;
-  i1(nrmdim) = hypocenter(nrmdim);
-  i2(nrmdim) = hypocenter(nrmdim);
+  i1(inrm) = i0(inrm);
+  i2(inrm) = i0(inrm);
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
   xg = x(j,k,l,:) + xscl * u(j,k,l,:); 
-  i1(nrmdim) = 1;
-  i2(nrmdim) = 1;
+  i1(inrm) = 1;
+  i2(inrm) = 1;
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
   switch field
-  case 'vs', vg = vs(j,k,l)
-  case 'us', vg = us(j,k,l)
-  case 'tn', vg = tn(j,k,l)
-  case 'ts', vg = ts(j,k,l)
+  case 'vs', vg = vs(j,k,l);
+  case 'us', vg = us(j,k,l);
+  case 'tn', vg = tn(j,k,l);
+  case 'ts', vg = ts(j,k,l);
   end
   xg = squeeze( xg );
   vg = squeeze( vg );
@@ -60,7 +60,7 @@ case { 'a', 'v', 'u', 'mr' }
   end
   planes = unique( tmp, 'rows' );
   for iz = 1:size( planes, 1 )
-    [ i1, i2 ] = zone( planes(iz,:), nn, offset, hypocenter, nrmdim );
+    [ i1, i2 ] = zone( planes(iz,:), nn, offset, i0, inrm );
     l = i1(3):i2(3);
     k = i1(2):i2(2);
     j = i1(1):i2(1);
@@ -94,7 +94,7 @@ case { 'a', 'v', 'u', 'mr' }
   end
 case 'w'
   for iz = 1:size( planes, 1 )
-    [ i1, i2 ] = zone( planes(iz,:), nn, offset, hypocenter, nrmdim );
+    [ i1, i2 ] = zone( planes(iz,:), nn, offset, i0, inrm );
     l = i1(3):i2(3);
     k = i1(2):i2(2);
     j = i1(1):i2(1);

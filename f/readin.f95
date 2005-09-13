@@ -39,15 +39,15 @@ doline: do
   case( 'bc' );         read( str, * ) key1, bc
   case( 'npml' );       read( str, * ) key1, npml
   case( 'viscosity' );  read( str, * ) key1, viscosity
-  case( 'nrmdim' );     read( str, * ) key1, nrmdim
-  case( 'hypocenter' ); read( str, * ) key1, hypocenter
+  case( 'faultnorm' );  read( str, * ) key1, inrm
+  case( 'hypocenter' ); read( str, * ) key1, i0
   case( 'rcrit' );      read( str, * ) key1, rcrit
   case( 'vrup' );       read( str, * ) key1, vrup
   case( 'nclramp' );    read( str, * ) key1, nclramp
   case( 'msrcradius' ); read( str, * ) key1, msrcradius
   case( 'moment' );     read( str, * ) key1, moment
   case( 'domp' );       read( str, * ) key1, domp
-  case( 'checkpoint' ); read( str, * ) key1, checkpoint
+  case( 'checkpoint' ); read( str, * ) key1, itcheck
   case( 'np' );         read( str, * ) key1, np
   case( 'srctimefcn' ); srctimefcn = key2
   case( 'grid' );
@@ -94,7 +94,7 @@ doline: do
     read( str, * ) key1, locknodes(nlock,:), ilock(nlock,:)
   case( 'out' )
     nout = nout + 1
-    read( str, * ) key1, outvar(nout), outit(nout), iout(nout,:)
+    read( str, * ) key1, outvar(nout), itout(nout), iout(nout,:)
   case default; print '(2(a,x))', 'Bad key:', key1; stop
   end select selectkey
 end do doline
@@ -111,7 +111,7 @@ else
 end if
 
 nhalo = 1
-if( nrmdim /= 0 ) nn(nrmdim) = nn(nrmdim) + 1
+if( inrm /= 0 ) nn(inrm) = nn(inrm) + 1
 
 end subroutine
 end module

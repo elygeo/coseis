@@ -9,7 +9,7 @@ implicit none
 real, intent(out) :: hg(:,:,:)
 real, intent(in) :: f(:,:,:,:)
 integer, intent(in) :: i, iq, i1(3), i2(3)
-integer :: j, j1, j2, k, k1, k2, l, l1, l2
+integer :: j, k, l, j1, k1, l1, j2, k2, l2
 
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)

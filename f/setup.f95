@@ -11,9 +11,9 @@ implicit none
 ip = 0
 nm = nn + 2 * nhalo
 nf = 0
-if( nrmdim /= 0 ) then
+if( inrm /= 0 ) then
   nf = nm
-  nf(nrmdim) = 1
+  nf(inrm) = 1
 end if
 i1node = nhalo + 1
 i2node = nhalo + nn
@@ -28,9 +28,9 @@ where ( bc(4:6) == 1 ) i2nodepml = i2node - npml
 where ( bc(1:3) == 1 ) i1cellpml = i1cell + npml
 where ( bc(4:6) == 1 ) i2cellpml = i2cell - npml
 
-where( hypocenter == 0 ) hypocenter = nn / 2 + mod( nn, 2 )
+where( i0 == 0 ) i0 = nn / 2 + mod( nn, 2 )
 offset = nhalo
-hypocenter = hypocenter + offset
+i0 = i0 + offset
 
 end subroutine
 end module

@@ -2,11 +2,11 @@
 % GRIDGEN
 
 fprintf( 'Grid generation\n' )
-downdim = 3;
-if nrmdim && nrmdim ~= downdim
-  crdsys = [ 6 - downdim - nrmdim nrmdim downdim ];
+idown = 3;
+if inrm && inrm ~= idown
+  crdsys = [ 6 - idown - inrm inrm idown ];
 else
-  crdsys = [ downdim+1:3 1:downdim ];
+  crdsys = [ idown+1:3 1:idown ];
 end
 
 l1 = ( nn(1) - 1 ) * dx;
@@ -31,9 +31,9 @@ else
   for i = j1:j2, x(i,:,:,1) = dx * ( i - 1 - nhalo ); end
   for i = k1:k2, x(:,i,:,2) = dx * ( i - 1 - nhalo ); end
   for i = l1:l2, x(:,:,i,3) = dx * ( i - 1 - nhalo ); end
-  if nrmdim
-    i = hypocenter(nrmdim);
-    switch nrmdim
+  if inrm
+    i = i0(inrm);
+    switch inrm
     case 1, x(i+1:end,:,:) = x(i:end-1,:,:);
     case 2, x(:,i+1:end,:) = x(:,i:end-1,:);
     case 3, x(:,:,i+1:end) = x(:,:,i:end-1);
@@ -95,8 +95,8 @@ case 'rand'
   w1([2 end-1],:,:,1) = 0;
   w1(:,[2 end-1],:,2) = 0;
   w1(:,:,[2 end-1],3) = 0;
-  i = hypocenter;
-  switch nrmdim
+  i = i0;
+  switch inrm
   case 1, w1(i(1)+[0 1],:,:,1) = 0;
   case 2, w1(:,i(2)+[0 1],:,2) = 0;
   case 3, w1(:,:,i(3)+[0 1],3) = 0;
@@ -110,8 +110,8 @@ x([1 end],:,:,:) = x([2 end-1],:,:,:);
 x(:,[1 end],:,:) = x(:,[2 end-1],:,:);
 x(:,:,[1 end],:) = x(:,:,[2 end-1],:);
 
-i1 = hypocenter;
-x0 = x(i1(1),i1(2),i1(3),:);
+% hypocenter location
+x0 = x(i0(1),i0(2),i0(3),:);
 x0 = x0(:)';
 
 x1 = min( reshape( x, [ prod( nm ) 3 ] ) );

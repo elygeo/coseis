@@ -18,7 +18,7 @@ if matdir
   s2(j1:j2,k1:k2,l1:l2) = bread( matdir, 'vs' );
 end
 for iz = 1:size( material, 1 )
-  [ i1, i2 ] = zone( imat(iz,:), nn, offset, hypocenter, nrmdim );
+  [ i1, i2 ] = zone( imat(iz,:), nn, offset, i0, inrm );
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
@@ -37,8 +37,7 @@ s2 = mr .* s2 .* s2;
 s1 = mr .* ( s1 .* s1 ) - 2. .* s2;
 
 % Save mu at hypocenter
-i1 = hypocenter;
-mu0 = s2( i1(1), i1(2), i1(3) );
+mu0 = s2( i0(1), i0(2), i0(3) );
 
 % Average Lame parameters on cell centers
 lam(:) = 0.;
@@ -62,7 +61,7 @@ mu(j,k,l) = 0.125 * ...
 % Cell volume
 s2(:) = 0.;
 for iz = 1:size( operator, 1 )
-  [ i1, i2 ] = zone( ioper(iz,:), nn, offset, hypocenter, nrmdim );
+  [ i1, i2 ] = zone( ioper(iz,:), nn, offset, i0, inrm );
   i2 = i2 - 1;
   op = operator(iz);
   l = i1(3):i2(3);
@@ -72,9 +71,9 @@ for iz = 1:size( operator, 1 )
 end
 
 % Make sure cell volumes are zero on the fault
-if nrmdim
-  i = hypocenter(nrmdim);
-  switch nrmdim
+if inrm
+  i = i0(inrm);
+  switch inrm
   case 1, s2(i,:,:) = 0.;
   case 2, s2(:,i,:) = 0.;
   case 3, s2(:,:,i) = 0.;

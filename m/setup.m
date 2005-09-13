@@ -22,10 +22,10 @@ itstep = nt;
 it = 0;
 nhalo = 1;
 offset = nhalo * [ 1 1 1 ];
-i = hypocenter == 0;
-hypocenter(i) = ceil( nn(i) / 2 );
-hypocenter = hypocenter + offset;
-if nrmdim, nn(nrmdim) = nn(nrmdim) + 1; end
+i = i0 == 0;
+i0(i) = ceil( nn(i) / 2 );
+i0 = i0 + offset;
+if inrm, nn(inrm) = nn(inrm) + 1; end
 nm = nn * p + 2 * nhalo;
 i1node = nhalo + [ 1 1 1 ];
 i2node = nhalo + nn;

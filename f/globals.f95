@@ -25,7 +25,7 @@ real :: &
 real, dimension(80) :: dn1, dn2, dc1, dc2
 
 integer, dimension(3) :: &
-  nn, nm, nf, np, offset, hypocenter, &
+  nn, nm, nf, np, offset, i0, &
   iamax, ivmax, iumax, iwmax, ivsmax, iusmax, &
   i1, i1node, i1cell, i1nodepml, i1cellpml, &
   i2, i2node, i2cell, i2nodepml, i2cellpml
@@ -33,9 +33,9 @@ integer, dimension(3) :: &
 integer, dimension(nz,6) :: ilock, iout, imat, ifric, itrac, istress
 
 integer :: &
-  ip, nhalo, i, j, k, l, j1, k1, l1, j2, k2, l2, &
-  nt, it, checkpoint, npml, bc(6), nrmdim, downdim, nclramp, wt(5), &
-  noper, i1oper(2,3), i2oper(2,3), nlock, locknodes(nz,3), nout, outit(nz), &
+  ip, nhalo, i, j, k, l, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4, &
+  nt, it, itcheck, npml, bc(6), inrm, idown, nclramp, wt(5), &
+  noper, i1oper(2,3), i2oper(2,3), nlock, locknodes(nz,3), nout, itout(nz), &
   nmat, nfric, ntrac, nstress
 
 character :: oper(2)

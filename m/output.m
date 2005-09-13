@@ -8,15 +8,15 @@ if init
   s2(:) = 0.;
   w1(:) = 0.;
   w2(:) = 0.;
-  if checkpoint < 0, checkpoint = nt + checkpoint + 1; end
-  if exist( 'out/checkpoint.mat', 'file' )
-    load out/checkpoint
+  if itcheck < 0, itcheck = nt + itcheck + 1; end
+  if exist( 'out/ckp.mat', 'file' )
+    load out/ckp
     if any( size( mr ) ~= nm ), error 'Checkpoint', end
     fprintf( 'Checkpoint found, starting from step %g\n', it )
   else
     if exist( 'out', 'dir' ), error 'Previous run exists', end
     mkdir( 'out/stats/' )
-    for iz = 1:size( outit, 1 )
+    for iz = 1:size( itout, 1 )
       file = sprintf( 'out/%02d/', iz );
       mkdir( file )
     end
@@ -39,9 +39,9 @@ if init
   return
 end
 
-for iz = 1:size( outit, 1 )
-  if outit(iz) < 0, outit(iz) = outit(iz) + nt + 1; end
-  if ~outit(iz) | mod( it, outit(iz) ), continue, end
+for iz = 1:size( itout, 1 )
+  if itout(iz) < 0, itout(iz) = itout(iz) + nt + 1; end
+  if ~itout(iz) | mod( it, itout(iz) ), continue, end
   nc = 1;
   onpass = 'v';
   cell = 0;
@@ -62,13 +62,13 @@ for iz = 1:size( outit, 1 )
   case 'trup', isfault = 1;
   otherwise error( [ 'outvar: ' outvar{iz} ] )
   end
-  if isfault & ~nrmdim; outit(iz) = 0; end
+  if isfault & ~inrm; itout(iz) = 0; end
   if onpass ~= pass, continue, end
-  [ i1, i2 ] = zone( iout(iz,:), nn, offset, hypocenter, nrmdim );
+  [ i1, i2 ] = zone( iout(iz,:), nn, offset, i0, inrm );
   if cell; i2 = i2 - 1; end
   if isfault
-    i1(nrmdim) = 1;
-    i2(nrmdim) = 1;
+    i1(inrm) = 1;
+    i2(inrm) = 1;
   end
   l = i1(3):i2(3);
   k = i1(2):i2(2);
@@ -94,25 +94,25 @@ for iz = 1:size( outit, 1 )
     otherwise error( [ 'outvar: ' outvar{iz} ] )
     end
     fclose( fid );
-    if static, outit(iz) = 0; end
+    if static, itout(iz) = 0; end
   end
   i1 = i1 - offset;
   i2 = i2 - offset;
   if isfault
-    i1(nrmdim) = 1;
-    i2(nrmdim) = 1;
+    i1(inrm) = 1;
+    i2(inrm) = 1;
   end
   file = sprintf( 'out/%02d/hdr', iz );
   fid = fopen( file, 'w' );
-  fprintf( fid, '%g ', [ nc i1 i2 outit(iz) it dt dx ] );
+  fprintf( fid, '%g ', [ nc i1 i2 itout(iz) it dt dx ] );
   fprintf( fid, '%s\n', outvar{iz} );
   fclose( fid );
 end
 
 if pass == 'w', return, end
 
-if checkpoint & ~mod( it, checkpoint )
-  save out/checkpoint it u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 vs us trup
+if itcheck & ~mod( it, itcheck )
+  save out/ckp it u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 vs us trup
 end
 
 fid = fopen( 'out/timestep', 'w' );

@@ -105,8 +105,8 @@ case 'period'
   else    camva( .25 * camva )
   end
   if length( hhud )
-    campos( campos + xhairtarg - camtarget )
-    camtarget( xhairtarg )
+    campos( campos + xxhair - camtarget )
+    camtarget( xxhair )
   end
   panviz = 1;
 case 'd'

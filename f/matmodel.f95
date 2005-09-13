@@ -26,7 +26,7 @@ if ( matdir /= '' ) then
   call bread3( matdir, 'vs',  s2, i1, i2 )
 end if
 do iz = 1, nmat
-  call zone( i1, i2, imat(iz,:), nn, offset, hypocenter, nrmdim )
+  call zone( i1, i2, imat(iz,:), nn, offset, i0, inrm )
   i1 = max( i1, i1cell )
   i2 = min( i2, i2cell + 1 )
   j1 = i1(1); j2 = i2(1)
@@ -47,10 +47,7 @@ s2 = mr * s2 * s2
 s1 = mr * ( s1 * s1 ) - 2. * s2
 
 ! Save mu at hypocenter
-if ( hypop ) then
-  i1 = hypocenter
-  if ( hypop ) mu0 = s2( i1(1), i1(2), i1(3) )
-end if
+if ( hypop ) mu0 = s2(i0(1),i0(2),i0(3))
 
 ! Average Lame parameters onto cell centers
 lam = 0.
@@ -80,9 +77,9 @@ do iz = 1, noper
   i2 = min( i2oper(iz,:) - 1, i2cell )
   call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
 end do
-if ( nrmdim /=0 ) then
-  i = hypocenter(nrmdim)
-  select case( nrmdim )
+if ( inrm /=0 ) then
+  i = i0(inrm)
+  select case( inrm )
   case( 1 ); s2(i,:,:) = 0;
   case( 2 ); s2(:,i,:) = 0;
   case( 3 ); s2(:,:,i) = 0;

@@ -12,14 +12,13 @@ use binio_m
 implicit none
 save
 real :: fs0, fd0, dc0, tn0, ts0
-integer :: down(3), handed, strdim, dipdim, iz, &
-  j3, j4, k3, k4, l3, l4
+integer :: down(3), handed, istr, idip, iz
 logical :: init = .true.
 
 ifinit: if ( init ) then
 
 init = .false.
-if ( nrmdim == 0 ) return
+if ( inrm == 0 ) return
 if ( ip == 0 ) print '(a)', 'Initialize fault'
 
 ! Friction model
@@ -30,19 +29,19 @@ co = 1e9
 if ( fricdir /= '' ) then
   i1 = i1cell
   i2 = i2cell + 1
-  i1(nrmdim) = 1
-  i2(nrmdim) = 1
+  i1(inrm) = 1
+  i2(inrm) = 1
   call bread3( fricdir, 'fs', fs, i1, i2 )
   call bread3( fricdir, 'fd', fd, i1, i2 )
   call bread3( fricdir, 'dc', dc, i1, i2 )
   call bread3( fricdir, 'co', co, i1, i2 )
 end if
 do iz = 1, nfric
-  call zone( i1, i2, ifric(iz,:), nn, offset, hypocenter, nrmdim )
+  call zone( i1, i2, ifric(iz,:), nn, offset, i0, inrm )
   i1 = max( i1, i1nodepml )
   i2 = min( i2, i2nodepml )
-  i1(nrmdim) = 1
-  i2(nrmdim) = 1
+  i1(inrm) = 1
+  i2(inrm) = 1
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
@@ -59,8 +58,8 @@ if ( stressdir /= '' ) then
   s1 = 0.
   i1 = i1cell
   i2 = i2cell + 1
-  i1(nrmdim) = 1
-  i2(nrmdim) = 1
+  i1(inrm) = 1
+  i2(inrm) = 1
   call bread4( stressdir, 'xx', t1, i1, i2, 1 )
   call bread4( stressdir, 'yy', t1, i1, i2, 2 )
   call bread4( stressdir, 'zz', t1, i1, i2, 3 )
@@ -69,11 +68,11 @@ if ( stressdir /= '' ) then
   call bread4( stressdir, 'xy', t2, i1, i2, 3 )
 end if
 do iz = 1, nstress
-  call zone( i1, i2, istress(iz,:), nn, offset, hypocenter, nrmdim )
+  call zone( i1, i2, istress(iz,:), nn, offset, i0, inrm )
   i1 = max( i1, i1nodepml )
   i2 = min( i2, i2nodepml )
-  i1(nrmdim) = 1
-  i2(nrmdim) = 1
+  i1(inrm) = 1
+  i2(inrm) = 1
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
@@ -91,18 +90,18 @@ if ( tracdir /= '' ) then
   s1 = 0.
   i1 = i1cell
   i2 = i2cell + 1
-  i1(nrmdim) = 1
-  i2(nrmdim) = 1
+  i1(inrm) = 1
+  i2(inrm) = 1
   call bread4( tracdir, 'tn', t3, i1, i2, 1 )
   call bread4( tracdir, 'ts', t3, i1, i2, 2 )
   call bread4( tracdir, 'td', t3, i1, i2, 3 )
 end if
 do iz = 1, ntrac
-  call zone( i1, i2, itrac(iz,:), nn, offset, hypocenter, nrmdim )
+  call zone( i1, i2, itrac(iz,:), nn, offset, i0, inrm )
   i1 = max( i1, i1nodepml )
   i2 = min( i2, i2nodepml )
-  i1(nrmdim) = 1
-  i2(nrmdim) = 1
+  i1(inrm) = 1
+  i2(inrm) = 1
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
@@ -114,8 +113,8 @@ end do
 ! Normal vectors
 i1 = i1node
 i2 = i2node
-i1(nrmdim) = hypocenter(nrmdim)
-i2(nrmdim) = hypocenter(nrmdim)
+i1(inrm) = i0(inrm)
+i2(inrm) = i0(inrm)
 call snormals( nrm, x, i1, i2 )
 area = sqrt( sum( nrm * nrm, 4 ) )
 f1 = 0.
@@ -135,16 +134,16 @@ do i = 1, 3
 end do
 
 ! Find orientations
-if ( nrmdim /= downdim ) then
-  dipdim = downdim
-  strdim = 6 - dipdim - nrmdim
+if ( inrm /= idown ) then
+  idip = idown
+  istr = 6 - idip - inrm
 else
-  strdim = mod( nrmdim, 3 ) + 1
-  dipdim = 6 - strdim - nrmdim
+  istr = mod( inrm, 3 ) + 1
+  idip = 6 - istr - inrm
 end if
 down = (/ 0, 0, 0 /)
-down(downdim) = 1
-handed = mod( strdim - nrmdim + 1, 3 ) - 1
+down(idown) = 1
+handed = mod( istr - inrm + 1, 3 ) - 1
 
 ! Strike vectors
 t1(:,:,:,1) = down(2) * nrm(:,:,:,3) - down(3) * nrm(:,:,:,2)
@@ -169,16 +168,16 @@ end do
 ! Total pretraction
 do i = 1, 3
   t0(:,:,:,i) = t0(:,:,:,i) + &
-    t3(:,:,:,nrmdim) * nrm(:,:,:,i) + &
-    t3(:,:,:,strdim) * t1(:,:,:,i) + &
-    t3(:,:,:,dipdim) * t2(:,:,:,i)
+    t3(:,:,:,inrm) * nrm(:,:,:,i) + &
+    t3(:,:,:,istr) * t1(:,:,:,i) + &
+    t3(:,:,:,idip) * t2(:,:,:,i)
 end do
 
 ! Hypocentral radius
 i1 = 1
 i2 = nf
-i1(nrmdim) = hypocenter(nrmdim)
-i2(nrmdim) = hypocenter(nrmdim)
+i1(inrm) = i0(inrm)
+i2(inrm) = i0(inrm)
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
@@ -189,8 +188,8 @@ r = sqrt( sum( t3 * t3, 4 ) )
 
 ! Output some info
 if ( hypop ) then
-  i1 = hypocenter
-  i1(nrmdim) = 1
+  i1 = i0
+  i1(inrm) = 1
   j = i1(1)
   k = i1(2)
   l = i1(3)
@@ -211,18 +210,18 @@ end if ifinit
 
 !------------------------------------------------------------------------------!
 
-if ( nrmdim == 0 ) return
+if ( inrm == 0 ) return
 
 ! Indices
 i1 = 1
 i2 = nf
-i1(nrmdim) = hypocenter(nrmdim)
-i2(nrmdim) = hypocenter(nrmdim)
+i1(inrm) = i0(inrm)
+i2(inrm) = i0(inrm)
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-i1(nrmdim) = hypocenter(nrmdim) + 1
-i2(nrmdim) = hypocenter(nrmdim) + 1
+i1(inrm) = i0(inrm) + 1
+i2(inrm) = i0(inrm) + 1
 j3 = i1(1); j4 = i2(1)
 k3 = i1(2); k4 = i2(2)
 l3 = i1(3); l4 = i2(3)

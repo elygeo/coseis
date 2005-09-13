@@ -14,9 +14,9 @@ nk2 = nm3; nk2(2) = i2(2);
 nl1 = nm3; nl1(3) = i1(3);
 nl2 = nm3; nl2(3) = i2(3);
 
-if nrmdim
+if inrm
   nf = nm;
-  nf(nrmdim) = 1;
+  nf(inrm) = 1;
 else
   nf = [ 0 0 0 ];
 end

@@ -43,8 +43,8 @@ elseif init
   tslim = -1;
   camdist = -1;
   look = 4;
-  xhair = hypocenter;
-  if nrmdim, slicedim = nrmdim; else slicedim = crdsys(2); end
+  ixhair = i0;
+  if inrm, islice = inrm; else islice = crdsys(2); end
   if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
   else     foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 1;
   end
@@ -135,24 +135,24 @@ text( .98, .98, sprintf( '%.3fs', time ), 'Hor', 'right' )
 set( gcf, 'CurrentAxes', haxes(1) )
 
 volumes = [ 1 1 1   -1 -1 -1 ];
-if nrmdim
+if inrm
   volumes = [ volumes; volumes ];
-  i = nrmdim + [ 0 3 ];
+  i = inrm + [ 0 3 ];
   volumes(1,i) = [ 1  0 ];
   volumes(2,i) = [ 0 -1 ];
 end
 slices = [ 1 1 1   -1 -1 -1 ];
-i = slicedim;
-slices(i)   = xhair(i) - offset(i);
-slices(i+3) = xhair(i) - offset(i) + cellfocus;
-if nrmdim & slicedim ~= nrmdim
+i = islice;
+slices(i)   = ixhair(i) - offset(i);
+slices(i+3) = ixhair(i) - offset(i) + cellfocus;
+if inrm & islice ~= inrm
   slices = [ slices; slices ];
-  i = nrmdim + [ 0 3 ];
+  i = inrm + [ 0 3 ];
   slices(1,i) = [ 1  0 ];
   slices(2,i) = [ 0 -1 ];
 end
 
-if nrmdim,           faultviz,   end
+if inrm,           faultviz,   end
 if doglyph,          glyphviz,   end
 if doisosurf,        isosurfviz, end
 if domesh || dosurf, surfviz,    end

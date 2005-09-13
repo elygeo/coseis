@@ -9,21 +9,21 @@ implicit none
 real, intent(out) :: nrm(:,:,:,:)
 real, intent(in) :: x(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3)
-integer :: i, j, j1, j2, k, k1, k2, l, l1, l2, a, b, c, nrmdim
+integer :: i, j, k, l, j1, k1, l1, j2, k2, l2, a, b, c, inrm
 
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 nrm = 0.
-nrmdim = 0
+inrm = 0
 do i = 1, 3
-  if ( i1(i) == i2(i) ) nrmdim = i
+  if ( i1(i) == i2(i) ) inrm = i
 end do
 
 do a = 1, 3
   b = mod( a,   3 ) + 1
   c = mod( a+1, 3 ) + 1
-  select case( nrmdim )
+  select case( inrm )
   case( 1 )
     j = i1(1)
     forall( k=k1:k2, l=l1:l2 )

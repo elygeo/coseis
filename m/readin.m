@@ -3,14 +3,14 @@
 
 plotstyle = '';
 plotstyle = 'slice';
-planewavedim = 0;
+iplanewave = 0;
 truptol = .001;
 material  = []; imat    = []; matdir = '';
 friction  = []; ifric   = []; fricdir = '';
 traction  = []; itrac   = []; tracdir = '';
 stress    = []; istress = []; stressdir = '';
 locknodes = []; ilock   = [];
-outvar    = {}; iout    = []; outit = [];
+outvar    = {}; iout    = []; itout = [];
 grid      = ''; griddir = '';
 
 for file = { 'defaults' 'in' }
@@ -33,16 +33,15 @@ for i = 1:length( in )
   case 'bc',         bc         = strread( str, '%n' )';
   case 'npml',       npml       = strread( str, '%n' )';
   case 'viscosity',  viscosity  = strread( str, '%n' )';
-  case 'nrmdim',     nrmdim     = strread( str, '%n' )';
-  case 'hypocenter', hypocenter = strread( str, '%n' )';
+  case 'faultnorm',  inrm       = strread( str, '%n' )';
+  case 'hypocenter', i0         = strread( str, '%n' )';
   case 'rcrit',      rcrit      = strread( str, '%n' )';
   case 'vrup',       vrup       = strread( str, '%n' )';
   case 'nclramp',    nclramp    = strread( str, '%n' )';
   case 'moment',     moment     = strread( str, '%n' )';
   case 'msrcradius', msrcradius = strread( str, '%n' )';
   case 'domp',       domp       = strread( str, '%n' )';
-  case 'checkpoint', checkpoint = strread( str, '%n' )';
-  case 'verbose',    verb       = strread( str, '%n' )';
+  case 'checkpoint', itcheck    = strread( str, '%n' )';
   case 'srctimefcn', srctimefcn = key{2};
   case 'grid'
     if strcmp( grid, 'read' )
@@ -99,7 +98,7 @@ for i = 1:length( in )
     outvar = { outvar{:} key{2} }';
     str = strread( str, '%*s %[^#]' );
     val = strread( str{1}, '%n' )';
-    outit  = [ outit; val(1) ];
+    itout  = [ itout; val(1) ];
     iout   = [ iout; val(2:7) ];
   otherwise error( in{i} )
   end

@@ -111,7 +111,7 @@ call fault
 
 ! Locked nodes
 do iz = 1, nlock
-  call zone( i1, i2, ilock(iz,:), nn, offset, hypocenter, nrmdim )
+  call zone( i1, i2, ilock(iz,:), nn, offset, i0, inrm )
   i1 = max( i1, i1node )
   i2 = min( i2, i2node )
   j1 = i1(1); j2 = i2(1)

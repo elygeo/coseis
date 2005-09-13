@@ -9,7 +9,7 @@ for ic = 1:3
 for id = [ ic:3 1:ic-1 ];
   ix = 6 - ic - id;
   for iz = 1:size( operator, 1 )
-    [ i1, i2 ] = zone( ioper(iz,:), nn, offset, hypocenter, nrmdim );
+    [ i1, i2 ] = zone( ioper(iz,:), nn, offset, i0, inrm );
     op = operator(iz);
     j = i1(1):i2(1);
     k = i1(2):i2(2);
@@ -92,7 +92,7 @@ fault
 
 % Locked nodes
 for iz = 1:size( locknodes, 1 )
-  [ i1, i2 ] = zone( ilock(iz,:), nn, offset, hypocenter, nrmdim );
+  [ i1, i2 ] = zone( ilock(iz,:), nn, offset, i0, inrm );
   i = locknodes(iz,:) == 1;
   l = i1(3):i2(3);
   k = i1(2):i2(2);

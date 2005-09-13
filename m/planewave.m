@@ -12,10 +12,10 @@ case 'sbrune', psrct = time .^ 2 .* exp( -time / domp ) / 2 / domp ^ 3;
 otherwise error 'srctimefcn'
 end
 for i = 1:3
-  switch planewavedim
-  case 1, v(hypocenter(1),:,:,i) = psrct(it) * displacement(i);
-  case 2, v(:,hypocenter(2),:,i) = psrct(it) * displacement(i);
-  case 3, v(:,:,hypocenter(3),i) = psrct(it) * displacement(i);
+  switch iplanewave
+  case 1, v(i0(1),:,:,i) = psrct(it) * displacement(i);
+  case 2, v(:,i0(2),:,i) = psrct(it) * displacement(i);
+  case 3, v(:,:,i0(3),i) = psrct(it) * displacement(i);
   end
 end
 

@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
 % FAULT
 
-if ~nrmdim; return; end
+if ~inrm; return; end
 
 if init
 
@@ -16,8 +16,8 @@ co(:) = 1e3;
 if fricdir
   i1 = i1nodepml;
   i2 = i2nodepml;
-  i1(nrmdim) = 1;
-  i2(nrmdim) = 1;
+  i1(inrm) = 1;
+  i2(inrm) = 1;
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
@@ -27,11 +27,11 @@ if fricdir
   co(j1:j2,k1:k2,l1:l2) = bread( fricdir, 'co' );
 end
 for iz = 1:size( friction, 1 )
-  [ i1, i2 ] = zone( ifric(iz,:), nn, offset, hypocenter, nrmdim );
+  [ i1, i2 ] = zone( ifric(iz,:), nn, offset, i0, inrm );
   i1 = max( i1, i1nodepml );
   i2 = min( i2, i2nodepml );
-  i1(nrmdim) = 1;
-  i2(nrmdim) = 1;
+  i1(inrm) = 1;
+  i2(inrm) = 1;
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
@@ -47,8 +47,8 @@ t2(:) = 0.;
 if stressdir
   i1 = i1nodepml;
   i2 = i2nodepml;
-  i1(nrmdim) = 1;
-  i2(nrmdim) = 1;
+  i1(inrm) = 1;
+  i2(inrm) = 1;
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
@@ -60,11 +60,11 @@ if stressdir
   t2(j1:j2,k1:k2,l1:l2,3) = bread( stressdir, 'xy' );
 end
 for iz = 1:size( stress, 1 )
-  [ i1, i2 ] = zone( istress(iz,:), nn, offset, hypocenter, nrmdim );
+  [ i1, i2 ] = zone( istress(iz,:), nn, offset, i0, inrm );
   i1 = max( i1, i1nodepml );
   i2 = min( i2, i2nodepml );
-  i1(nrmdim) = 1;
-  i2(nrmdim) = 1;
+  i1(inrm) = 1;
+  i2(inrm) = 1;
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
@@ -81,8 +81,8 @@ t3(:) = 0.;
 if tracdir
   i1 = i1nodepml;
   i2 = i2nodepml;
-  i1(nrmdim) = 1;
-  i2(nrmdim) = 1;
+  i1(inrm) = 1;
+  i2(inrm) = 1;
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
@@ -91,11 +91,11 @@ if tracdir
   t3(j1:j2,k1:k2,l1:l2,3) = bread( tracdir, 'td' );
 end
 for iz = 1:size( traction, 1 )
-  [ i1, i2 ] = zone( itrac(iz,:), nn, offset, hypocenter, nrmdim );
+  [ i1, i2 ] = zone( itrac(iz,:), nn, offset, i0, inrm );
   i1 = max( i1, i1nodepml );
   i2 = min( i2, i2nodepml );
-  i1(nrmdim) = 1;
-  i2(nrmdim) = 1;
+  i1(inrm) = 1;
+  i2(inrm) = 1;
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
@@ -107,8 +107,8 @@ end
 % Normal vectors
 i1 = i1node;
 i2 = i2node;
-i1(nrmdim) = hypocenter(nrmdim);
-i2(nrmdim) = hypocenter(nrmdim);
+i1(inrm) = i0(inrm);
+i2(inrm) = i0(inrm);
 nrm = snormals( x, i1, i2 );
 area = sqrt( sum( nrm .* nrm, 4 ) );
 f1 = area;
@@ -129,16 +129,16 @@ for i = 1:3
 end
 
 % Find orientations
-if nrmdim ~= downdim
-  dipdim = downdim;
-  strdim = 6 - dipdim - nrmdim;
+if inrm ~= idown
+  idip = idown;
+  istr = 6 - idip - inrm;
 else
-  strdim = mod( nrmdim, 3 ) + 1;
-  dipdim = 6 - strdim - nrmdim;
+  istr = mod( inrm, 3 ) + 1;
+  idip = 6 - istr - inrm;
 end
 down = [ 0 0 0 ];
-down(downdim) = 1;
-handed = mod( strdim - nrmdim + 1, 3 ) - 1;
+down(idown) = 1;
+handed = mod( istr - inrm + 1, 3 ) - 1;
 
 % Stike vectors
 t1(:,:,:,1) = down(2) .* nrm(:,:,:,3) - down(3) .* nrm(:,:,:,2);
@@ -165,16 +165,16 @@ end
 % Total pretraction
 for i = 1:3
   t0(:,:,:,i) = t0(:,:,:,i) + ...
-    t3(:,:,:,nrmdim) .* nrm(:,:,:,i) + ...
-    t3(:,:,:,strdim) .* t1(:,:,:,i) + ...
-    t3(:,:,:,dipdim) .* t2(:,:,:,i);
+    t3(:,:,:,inrm) .* nrm(:,:,:,i) + ...
+    t3(:,:,:,istr) .* t1(:,:,:,i) + ...
+    t3(:,:,:,idip) .* t2(:,:,:,i);
 end
 
 % Hypocentral radius
 i1 = [ 1 1 1 ];
 i2 = nm;
-i1(nrmdim) = hypocenter(nrmdim);
-i2(nrmdim) = hypocenter(nrmdim);
+i1(inrm) = i0(inrm);
+i2(inrm) = i0(inrm);
 j1 = i1(1); j2 = i2(1);
 k1 = i1(2); k2 = i2(2);
 l1 = i1(3); l2 = i2(3);
@@ -184,8 +184,8 @@ end
 r = sqrt( sum( t3 .* t3, 4 ) );
 
 % Output some info
-i1 = hypocenter;
-i1(nrmdim) = 1;
+i1 = i0;
+i1(inrm) = 1;
 j = i1(1);
 k = i1(2);
 l = i1(3);
@@ -212,13 +212,13 @@ end
 
 i1 = [ 1 1 1 ];
 i2 = nm;
-i1(nrmdim) = hypocenter(nrmdim);
-i2(nrmdim) = hypocenter(nrmdim);
+i1(inrm) = i0(inrm);
+i2(inrm) = i0(inrm);
 j1 = i1(1); j2 = i2(1);
 k1 = i1(2); k2 = i2(2);
 l1 = i1(3); l2 = i2(3);
-i1(nrmdim) = hypocenter(nrmdim) + 1;
-i2(nrmdim) = hypocenter(nrmdim) + 1;
+i1(inrm) = i0(inrm) + 1;
+i2(inrm) = i0(inrm) + 1;
 j3 = i1(1); j4 = i2(1);
 k3 = i1(2); k4 = i2(2);
 l3 = i1(3); l4 = i2(3);
@@ -280,8 +280,8 @@ vs = sqrt( sum( t2 .* t2, 4 ) );
 
 % Rupture time
 if truptol
-  i1 = hypocenter;
-  i1(nrmdim) = 1;
+  i1 = i0;
+  i1(inrm) = 1;
   l = i1(3);
   k = i1(2);
   j = i1(1);

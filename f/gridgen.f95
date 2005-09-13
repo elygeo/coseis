@@ -14,7 +14,7 @@ real, parameter :: pi = 3.14159
 
 if ( ip == 0 ) print '(a)', 'Grid generation'
 
-downdim = 3
+idown = 3
 width = ( nn - 1 ) * dx
 i1 = i1cell
 i2 = i2cell + 1
@@ -32,9 +32,9 @@ else
   forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - offset(1) )
   forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - 1 - offset(2) )
   forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - 1 - offset(3) )
-  if ( nrmdim /= 0 ) then
-    i = hypocenter(nrmdim) + 1
-    select case( nrmdim )
+  if ( inrm /= 0 ) then
+    i = i0(inrm) + 1
+    select case( inrm )
     case( 1 ); x(i+1:j2,:,:,1) = x(i:,:,:,1) - dx
     case( 2 ); x(:,i+1:k2,:,2) = x(:,i:,:,2) - dx
     case( 3 ); x(:,:,i+1:l2,3) = x(:,:,i:,3) - dx
@@ -77,15 +77,9 @@ if( bc(3) == 0 ) x(:,:,1 ,:) = x(:,:,2 ,:)
 if( bc(6) == 0 ) x(:,:,l1,:) = x(:,:,l2,:)
 
 ! Test if hypocenter is located on this processor and save location
-i1 = hypocenter
 if ( all( i1 >= i1node .and. i1 <= i2node ) ) then
   hypop = .true.
-  j = i1(1)
-  k = i1(2)
-  l = i1(3)
-  x0(1) = x(j,k,l,1);
-  x0(2) = x(j,k,l,2);
-  x0(3) = x(j,k,l,3);
+  x0 = x(i0(1),i0(2),i0(3),:);
 end if
 
 end subroutine

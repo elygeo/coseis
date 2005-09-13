@@ -23,9 +23,9 @@ AUTHOR
 
 USAGE
 
-  ./sord file.in
+  ./sord infile
 
-  See 'defaults' and the 'in' directory for input explanation and examples.
+  See 'defaults' and the 'infiles' directory for input explanation and examples.
 
   Options:
     -m  use MATLAB backend (default is Fortran)

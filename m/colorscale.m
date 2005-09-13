@@ -32,7 +32,7 @@ tsscl = tslim; if tsscl < 0, tsscl = double( tsmax ); end;
 if xscl, xscl = .5 * dx / xscl; end
 cellfocus = 0;
 breakon = 'v';
-isfault = 1;
+isfault = 0;
 switch field
 case 'a',  fscl = ascl;  titles = { '|A|' 'Ax' 'Ay' 'Az' };
 case 'v',  fscl = vscl;  titles = { '|V|' 'Vx' 'Vy' 'Vz' };
