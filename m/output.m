@@ -64,7 +64,7 @@ for iz = 1:size( itout, 1 )
   end
   if isfault & ~inrm; itout(iz) = 0; end
   if onpass ~= pass, continue, end
-  [ i1, i2 ] = zone( iout(iz,:), nn, offset, i0, inrm );
+  [ i1, i2 ] = zone( iout(iz,:), nn, noff, i0, inrm );
   if cell; i2 = i2 - 1; end
   if isfault
     i1(inrm) = 1;
@@ -96,8 +96,8 @@ for iz = 1:size( itout, 1 )
     fclose( fid );
     if static, itout(iz) = 0; end
   end
-  i1 = i1 - offset;
-  i2 = i2 - offset;
+  i1 = i1 - noff;
+  i2 = i2 - noff;
   if isfault
     i1(inrm) = 1;
     i2(inrm) = 1;

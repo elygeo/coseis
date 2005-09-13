@@ -60,7 +60,7 @@ case { 'a', 'v', 'u', 'mr' }
   end
   planes = unique( tmp, 'rows' );
   for iz = 1:size( planes, 1 )
-    [ i1, i2 ] = zone( planes(iz,:), nn, offset, i0, inrm );
+    [ i1, i2 ] = zone( planes(iz,:), nn, noff, i0, inrm );
     l = i1(3):i2(3);
     k = i1(2):i2(2);
     j = i1(1):i2(1);
@@ -94,7 +94,7 @@ case { 'a', 'v', 'u', 'mr' }
   end
 case 'w'
   for iz = 1:size( planes, 1 )
-    [ i1, i2 ] = zone( planes(iz,:), nn, offset, i0, inrm );
+    [ i1, i2 ] = zone( planes(iz,:), nn, noff, i0, inrm );
     l = i1(3):i2(3);
     k = i1(2):i2(2);
     j = i1(1):i2(1);

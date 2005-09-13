@@ -37,7 +37,7 @@ if ( fricdir /= '' ) then
   call bread3( fricdir, 'co', co, i1, i2 )
 end if
 do iz = 1, nfric
-  call zone( i1, i2, ifric(iz,:), nn, offset, i0, inrm )
+  call zone( i1, i2, ifric(iz,:), nn, noff, i0, inrm )
   i1 = max( i1, i1nodepml )
   i2 = min( i2, i2nodepml )
   i1(inrm) = 1
@@ -68,7 +68,7 @@ if ( stressdir /= '' ) then
   call bread4( stressdir, 'xy', t2, i1, i2, 3 )
 end if
 do iz = 1, nstress
-  call zone( i1, i2, istress(iz,:), nn, offset, i0, inrm )
+  call zone( i1, i2, istress(iz,:), nn, noff, i0, inrm )
   i1 = max( i1, i1nodepml )
   i2 = min( i2, i2nodepml )
   i1(inrm) = 1
@@ -97,7 +97,7 @@ if ( tracdir /= '' ) then
   call bread4( tracdir, 'td', t3, i1, i2, 3 )
 end if
 do iz = 1, ntrac
-  call zone( i1, i2, itrac(iz,:), nn, offset, i0, inrm )
+  call zone( i1, i2, itrac(iz,:), nn, noff, i0, inrm )
   i1 = max( i1, i1nodepml )
   i2 = min( i2, i2nodepml )
   i1(inrm) = 1
@@ -252,7 +252,7 @@ f1 = f1 * -tn + co
 ! Nucleation
 if ( rcrit > 0. .and. vrup > 0. ) then
   f2 = 1.
-  if ( nclramp > 0 ) f2 = min( ( it * dt - r / vrup ) / ( nclramp * dt ), 1. )
+  if ( nramp > 0 ) f2 = min( ( it * dt - r / vrup ) / ( nramp * dt ), 1. )
   f2 = ( 1. - f2 ) * ts + f2 * ( fd * -tn + co )
   where ( r < min( rcrit, it * dt * vrup ) .and. f2 < f1 ) f1 = f2
 end if

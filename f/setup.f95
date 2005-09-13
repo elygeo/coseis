@@ -29,8 +29,8 @@ where ( bc(1:3) == 1 ) i1cellpml = i1cell + npml
 where ( bc(4:6) == 1 ) i2cellpml = i2cell - npml
 
 where( i0 == 0 ) i0 = nn / 2 + mod( nn, 2 )
-offset = nhalo
-i0 = i0 + offset
+noff = nhalo
+i0 = i0 + noff
 
 end subroutine
 end module

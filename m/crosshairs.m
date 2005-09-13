@@ -114,7 +114,7 @@ otherwise error 'field'
 end
 set( gcf, 'CurrentAxes', haxes(2) )
 hhud = text( .02, .98, msg, 'Hor', 'left', 'Ver', 'top' );
-tmp = [ it ixhair-offset; time xg ];
+tmp = [ it ixhair-noff; time xg ];
 msg = sprintf( '%4d %8.3fs\n%4d %8.1fm\n%4d %8.1fm\n%4d %8.1fm', tmp );
 hhud(2) = text( .98, .98, msg, 'Hor', 'right', 'Ver', 'top' );
 msg = 'Explore';

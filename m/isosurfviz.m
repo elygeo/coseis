@@ -6,7 +6,7 @@ if ~fscl, return, end
 isoval = isofrac * fscl;
 if comp, isoval = isoval * [ -1 1 ]; end
 for iz = 1:size( volumes, 1 )
-  [ i1, i2 ] = zone( volumes(iz,:), nn, offset, i0, inrm );
+  [ i1, i2 ] = zone( volumes(iz,:), nn, noff, i0, inrm );
   if cellfocus, i2 = i2 - 1; end
   l = i1(3):i2(3);
   k = i1(2):i2(2);

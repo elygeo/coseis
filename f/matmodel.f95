@@ -26,7 +26,7 @@ if ( matdir /= '' ) then
   call bread3( matdir, 'vs',  s2, i1, i2 )
 end if
 do iz = 1, nmat
-  call zone( i1, i2, imat(iz,:), nn, offset, i0, inrm )
+  call zone( i1, i2, imat(iz,:), nn, noff, i0, inrm )
   i1 = max( i1, i1cell )
   i2 = min( i2, i2cell + 1 )
   j1 = i1(1); j2 = i2(1)

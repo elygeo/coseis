@@ -91,14 +91,14 @@ if ( fault .and. inrm == 0 ) then
 end if
 if ( onpass /= pass ) cycle doiz
 if ( static ) itout(iz) = 0
-call zone( i1, i2, iout(iz,:), nn, offset, i0, inrm )
+call zone( i1, i2, iout(iz,:), nn, noff, i0, inrm )
 if ( any( i1 < i1node .or. i2 > i2node ) ) stop 'out range'
 if ( cell ) i2 = i2 - 1
 if ( any( i2 < i1 ) ) stop 'out range'
 if ( ip == 0 ) then
   write( str, '(a,i2.2,a)' ) 'out/', iz, '/hdr'
   open(  9, file=str, status='replace' )
-  write( 9, * ) nc, i1-offset, i2-offset, itout(iz), it, dt, dx
+  write( 9, * ) nc, i1-noff, i2-noff, itout(iz), it, dt, dx
   write( 9, * ) outvar(iz)
   close( 9 )
 end if

@@ -143,8 +143,8 @@ if inrm
 end
 slices = [ 1 1 1   -1 -1 -1 ];
 i = islice;
-slices(i)   = ixhair(i) - offset(i);
-slices(i+3) = ixhair(i) - offset(i) + cellfocus;
+slices(i)   = ixhair(i) - noff(i);
+slices(i+3) = ixhair(i) - noff(i) + cellfocus;
 if inrm & islice ~= inrm
   slices = [ slices; slices ];
   i = inrm + [ 0 3 ];

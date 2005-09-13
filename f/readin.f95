@@ -41,15 +41,14 @@ doline: do
   case( 'viscosity' );  read( str, * ) key1, viscosity
   case( 'faultnorm' );  read( str, * ) key1, inrm
   case( 'hypocenter' ); read( str, * ) key1, i0
-  case( 'rcrit' );      read( str, * ) key1, rcrit
-  case( 'vrup' );       read( str, * ) key1, vrup
-  case( 'nclramp' );    read( str, * ) key1, nclramp
-  case( 'msrcradius' ); read( str, * ) key1, msrcradius
+  case( 'rcrit' );      read( str, * ) key1, vrup, rcrit
+  case( 'vrup' );       read( str, * ) key1, vrup, rcrit
+  case( 'nramp' );      read( str, * ) key1, nramp
+  case( 'rsource' );    read( str, * ) key1, rsource
+  case( 'sourcef' );    read( str, * ) key1, sourcef, domp
   case( 'moment' );     read( str, * ) key1, moment
-  case( 'domp' );       read( str, * ) key1, domp
   case( 'checkpoint' ); read( str, * ) key1, itcheck
   case( 'np' );         read( str, * ) key1, np
-  case( 'srctimefcn' ); srctimefcn = key2
   case( 'grid' );
     if ( key2 == 'read' ) then
       grid = ''

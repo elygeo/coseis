@@ -27,22 +27,21 @@ for i = 1:length( in )
   switch key{1}
   case ''
   case 'np'
-  case 'n',          n          = strread( str, '%n' )';
-  case 'dx',         dx         = strread( str, '%n' )';
-  case 'dt',         dt         = strread( str, '%n' )';
-  case 'bc',         bc         = strread( str, '%n' )';
-  case 'npml',       npml       = strread( str, '%n' )';
-  case 'viscosity',  viscosity  = strread( str, '%n' )';
-  case 'faultnorm',  inrm       = strread( str, '%n' )';
-  case 'hypocenter', i0         = strread( str, '%n' )';
-  case 'rcrit',      rcrit      = strread( str, '%n' )';
-  case 'vrup',       vrup       = strread( str, '%n' )';
-  case 'nclramp',    nclramp    = strread( str, '%n' )';
-  case 'moment',     moment     = strread( str, '%n' )';
-  case 'msrcradius', msrcradius = strread( str, '%n' )';
-  case 'domp',       domp       = strread( str, '%n' )';
-  case 'checkpoint', itcheck    = strread( str, '%n' )';
-  case 'srctimefcn', srctimefcn = key{2};
+  case 'n',           n          = strread( str, '%n' )';
+  case 'dx',          dx         = strread( str, '%n' )';
+  case 'dt',          dt         = strread( str, '%n' )';
+  case 'bc',          bc         = strread( str, '%n' )';
+  case 'npml',        npml       = strread( str, '%n' )';
+  case 'viscosity',   viscosity  = strread( str, '%n' )';
+  case 'faultnormal', inrm       = strread( str, '%n' )';
+  case 'hypocenter',  i0         = strread( str, '%n' )';
+  case 'checkpoint',  itcheck    = strread( str, '%n' )';
+  case 'moment',      moment     = strread( str, '%n' )';
+  case 'nramp',       nramp      = strread( str, '%n' )';
+  case 'vrup',        vrup       = strread( str, '%n' )';
+  case 'rcrit',       rcrit      = strread( str, '%n' )';
+  case 'sourcef',     [ sourcef domp ] = strread( str, '%s %n' )';
+  case 'rsource',     rsource = strread( str, '%n' )';
   case 'grid'
     if strcmp( grid, 'read' )
       grid = '';

@@ -29,9 +29,9 @@ if ( griddir /= '' ) then
   call bread4( griddir, 'x3', x, i1, i2, 3 )
   call optimize
 else
-  forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - offset(1) )
-  forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - 1 - offset(2) )
-  forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - 1 - offset(3) )
+  forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - noff(1) )
+  forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - 1 - noff(2) )
+  forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - 1 - noff(3) )
   if ( inrm /= 0 ) then
     i = i0(inrm) + 1
     select case( inrm )

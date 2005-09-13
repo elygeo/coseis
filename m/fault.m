@@ -27,7 +27,7 @@ if fricdir
   co(j1:j2,k1:k2,l1:l2) = bread( fricdir, 'co' );
 end
 for iz = 1:size( friction, 1 )
-  [ i1, i2 ] = zone( ifric(iz,:), nn, offset, i0, inrm );
+  [ i1, i2 ] = zone( ifric(iz,:), nn, noff, i0, inrm );
   i1 = max( i1, i1nodepml );
   i2 = min( i2, i2nodepml );
   i1(inrm) = 1;
@@ -60,7 +60,7 @@ if stressdir
   t2(j1:j2,k1:k2,l1:l2,3) = bread( stressdir, 'xy' );
 end
 for iz = 1:size( stress, 1 )
-  [ i1, i2 ] = zone( istress(iz,:), nn, offset, i0, inrm );
+  [ i1, i2 ] = zone( istress(iz,:), nn, noff, i0, inrm );
   i1 = max( i1, i1nodepml );
   i2 = min( i2, i2nodepml );
   i1(inrm) = 1;
@@ -91,7 +91,7 @@ if tracdir
   t3(j1:j2,k1:k2,l1:l2,3) = bread( tracdir, 'td' );
 end
 for iz = 1:size( traction, 1 )
-  [ i1, i2 ] = zone( itrac(iz,:), nn, offset, i0, inrm );
+  [ i1, i2 ] = zone( itrac(iz,:), nn, noff, i0, inrm );
   i1 = max( i1, i1nodepml );
   i2 = min( i2, i2nodepml );
   i1(inrm) = 1;
