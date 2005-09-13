@@ -40,7 +40,7 @@ integer :: &
 
 character :: oper(2)
 character(8) :: outvar(nz)
-character(160) :: grid = '', sourcef = '', &
+character(160) :: grid = '', srctimef = '', &
   matdir = '', fricdir = '', tracdir='', stressdir = '', griddir = ''
 
 logical :: hypop = .false.

@@ -99,21 +99,21 @@ end if ifinit
 ! time indexing goes wi vi wi+1 vi+1 ...
 if ( .false. ) then ! increment stress
   time = ( it - .5 ) * dt
-  select case( sourcef )
+  select case( srctimef )
   case( 'delta' );  msrcf = 0.; if ( it == 1 ) msrcf = 1. / dt
   case( 'brune' );  msrcf = exp( -time / domp ) / domp ** 2. * time
   case( 'sbrune' ); msrcf = exp( -time / domp ) / domp ** 3. * time * time / 2.
-  case default; stop 'srctimefcn'
+  case default; stop 'srctimef'
   end select
   msrcf = dt * msrcf
 else ! direct stress
   time = it * dt
-  select case( sourcef )
+  select case( srctimef )
   case( 'delta' );  msrcf = 1.; if ( it == 1 ) msrcf = 1.
   case( 'brune' );  msrcf = 1. - exp( -time / domp ) / domp * ( time + domp )
   case( 'sbrune' ); msrcf = 1. - exp( -time / domp ) / domp * &
     ( time + domp + time * time / domp / 2. )
-  case default; stop 'srctimefcn'
+  case default; stop 'srctimef'
   end select
 end if
 

@@ -99,7 +99,7 @@ for i = 1:3
 end
 
 % Moment source
-if msrcradius, momentsrc, end
+momentsrc
 
 % Magnitudes
 s1 = sqrt( sum( u .* u, 4 ) );

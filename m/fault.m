@@ -254,7 +254,7 @@ f1 = f1 .* -tn + co;
 % Nucleation
 if rcrit && vrup
   f2(:) = 1.;
-  if nclramp, f2 = min( ( it * dt - r / vrup ) / ( nclramp * dt ), 1. ); end
+  if nramp, f2 = min( ( it * dt - r / vrup ) / ( nramp * dt ), 1. ); end
   f2 = ( 1. - f2 ) .* ts + f2 .* ( fd .* -tn + co);
   ii = r < min( rcrit, it * dt * vrup ) & f2 < f1;
   f1(ii) = f2(ii);

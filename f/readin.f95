@@ -32,23 +32,22 @@ doline: do
   read( str, * ) key1, key2, key3
   selectkey: select case( key1 )
   case( '' )
-  case( 'stop' );       exit doline
-  case( 'n' );          read( str, * ) key1, nn, nt
-  case( 'dx' );         read( str, * ) key1, dx
-  case( 'dt' );         read( str, * ) key1, dt
-  case( 'bc' );         read( str, * ) key1, bc
-  case( 'npml' );       read( str, * ) key1, npml
-  case( 'viscosity' );  read( str, * ) key1, viscosity
-  case( 'faultnorm' );  read( str, * ) key1, inrm
-  case( 'hypocenter' ); read( str, * ) key1, i0
-  case( 'rcrit' );      read( str, * ) key1, vrup, rcrit
-  case( 'vrup' );       read( str, * ) key1, vrup, rcrit
-  case( 'nramp' );      read( str, * ) key1, nramp
-  case( 'rsource' );    read( str, * ) key1, rsource
-  case( 'sourcef' );    read( str, * ) key1, sourcef, domp
-  case( 'moment' );     read( str, * ) key1, moment
-  case( 'checkpoint' ); read( str, * ) key1, itcheck
-  case( 'np' );         read( str, * ) key1, np
+  case( 'n' );           read( str, * ) key1, nn, nt
+  case( 'dx' );          read( str, * ) key1, dx
+  case( 'dt' );          read( str, * ) key1, dt
+  case( 'bc' );          read( str, * ) key1, bc
+  case( 'npml' );        read( str, * ) key1, npml
+  case( 'viscosity' );   read( str, * ) key1, viscosity
+  case( 'faultnormal' ); read( str, * ) key1, inrm
+  case( 'hypocenter' );  read( str, * ) key1, i0
+  case( 'rcrit' );       read( str, * ) key1, rcrit
+  case( 'vrup' );        read( str, * ) key1, vrup
+  case( 'nramp' );       read( str, * ) key1, nramp
+  case( 'rsource' );     read( str, * ) key1, rsource
+  case( 'srctimef' );    read( str, * ) key1, srctimef, domp
+  case( 'moment' );      read( str, * ) key1, moment
+  case( 'checkpoint' );  read( str, * ) key1, itcheck
+  case( 'np' );          read( str, * ) key1, np
   case( 'grid' );
     if ( key2 == 'read' ) then
       grid = ''

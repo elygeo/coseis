@@ -18,8 +18,8 @@ k = i1(2):i2(2);
 l = i1(3):i2(3);
 if rcrit
   hh = scontour( xg, squeeze( r(j,k,l) ), min( rcrit, it * dt * vrup ) );
-  if nclramp
-    hh = scontour( xg, squeeze( r(j,k,l) ), min( rcrit, ( it - nclramp ) * dt * vrup ) );
+  if nramp
+    hh = scontour( xg, squeeze( r(j,k,l) ), min( rcrit, ( it - nramp ) * dt * vrup ) );
   end
 end
 scontour( xg, us(j,k,l), dc0 );

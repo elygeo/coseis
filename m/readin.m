@@ -3,7 +3,6 @@
 
 plotstyle = '';
 plotstyle = 'slice';
-iplanewave = 0;
 truptol = .001;
 material  = []; imat    = []; matdir = '';
 friction  = []; ifric   = []; fricdir = '';
@@ -21,7 +20,6 @@ in = textread( file{1}, '%s', 'delimiter', '\n', 'commentstyle', 'shell' );
 for i = 1:length( in )
   if in{i}, else continue, end
   key = strread( in{i}, '%s', 'commentstyle', 'shell' );
-  if strcmp( key{1}, 'stop' ), break, end
   str = strread( in{i}, '%*s %[^#]' );
   str = str{1};
   switch key{1}
@@ -40,7 +38,7 @@ for i = 1:length( in )
   case 'nramp',       nramp      = strread( str, '%n' )';
   case 'vrup',        vrup       = strread( str, '%n' )';
   case 'rcrit',       rcrit      = strread( str, '%n' )';
-  case 'sourcef',     [ sourcef domp ] = strread( str, '%s %n' )';
+  case 'srctimef',    [ srctimef, domp ] = strread( str, '%s %n' );
   case 'rsource',     rsource = strread( str, '%n' )';
   case 'grid'
     if strcmp( grid, 'read' )

@@ -17,7 +17,7 @@
   hypocenter	0 0 0			# 0 = logical center
 # rsource	150.			# moment source radius (8 nodes)
   rsource	-1.			# no moment source
-  sourcef	brune   .056		# source time fcn & dominant period
+  srctimef	brune   .056		# source time fcn & dominant period
   moment	1e16 1e16 1e16 0. 0. 0.	# explosion
 # faultnormal	0			# no fault
   faultnormal	2			# constant y fault plane
