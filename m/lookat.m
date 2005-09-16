@@ -1,22 +1,31 @@
 %------------------------------------------------------------------------------%
 % LOOKAT
 
-if camdist <= 0, camdist = 1.5 * xmax; end
+i = abs( look );
 a = -sign( look );
-pos = [ 0 0 0 ];
 upvec = [ 0 0 0 ];
-upvec(crdsys(3)) = -1;
-camproj( 'orthographic' );
-camva( 22 )
-switch abs( look )
-case 1, pos(crdsys(1)) = a;
-case 2, pos(crdsys(2)) = a;
-case 3, pos(crdsys(3)) = a; upvec(crdsys(2)) = a;
-case 4, pos = [ a a a ] / 2; pos(crdsys(2)) = a / sqrt( 2 );
+upvec(crdsys(3)) = up;
+switch i
+case { 1, 2, 3 }
+  camproj( 'orthographic' );
+  camva( 22 )
+  pos = [ 0 0 0 ];
+  pos(i) = a;
+  if ( i == crdsys(3) )
+    upvec = [ 0 0 0 ];
+    upvec(crdsys(2)) = a;
+  end
+case 4
   camproj( 'perspective' );
-  camva( 1.25 * camva )
+  camva( 1.25 * 22 )
+  pos = [ a a a ] / 2;
+  pos(crdsys(2)) = a / sqrt( 2 );
 otherwise error 'look'
 end
+if camdist <= 0
+  camdist = 1.5 * xmax;
+end
+
 camtarget( xcenter )
 campos( xcenter + camdist * pos )
 camup( upvec )

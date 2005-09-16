@@ -79,8 +79,8 @@ end do doi
 ! Normal vectors
 i1 = i1node
 i2 = i2node
-i1(ifn) = i0(ifn)
-i2(ifn) = i0(ifn)
+i1(ifn) = ihypo(ifn)
+i2(ifn) = ihypo(ifn)
 call snormals( nrm, x, i1, i2 )
 area = sqrt( sum( nrm * nrm, 4 ) )
 f1 = area
@@ -99,7 +99,18 @@ do i = 1, 3
     t2(:,:,:,k) * nrm(:,:,:,j)
 end do
 
+! Coordinate system
+idip = abs( upward )
+if ( idip /= ifn ) then
+  istrike = 6 - ifn - idip
+else
+  istrike = mod( ifn, 3 ) + 1
+  idip = 6 - ifn - istrike
+end if
+
 ! Strike vectors
+upvector = 0.
+upvector(idip) = 1.
 t1(:,:,:,1) = upvector(2) * nrm(:,:,:,3) - upvector(3) * nrm(:,:,:,2)
 t1(:,:,:,2) = upvector(3) * nrm(:,:,:,1) - upvector(1) * nrm(:,:,:,3)
 t1(:,:,:,3) = upvector(1) * nrm(:,:,:,2) - upvector(2) * nrm(:,:,:,1)
@@ -119,12 +130,6 @@ do i = 1, 3
   t2(:,:,:,i) = t2(:,:,:,i) * f1
 end do
 
-! Coordinate system
-vector = upvector
-vector(ifn) = 0.
-idip = maxloc( abs( vector ) )
-istrike = 6 - idip - ifn
-
 ! Total pretraction
 do i = 1, 3
   t0(:,:,:,i) = t0(:,:,:,i) + &
@@ -136,19 +141,19 @@ end do
 ! Hypocentral radius
 i1 = 1
 i2 = nm
-i1(ifn) = i0(ifn)
-i2(ifn) = i0(ifn)
+i1(ifn) = ihypo(ifn)
+i2(ifn) = ihypo(ifn)
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 do i = 1, 3
-  t3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - x0(i)
+  t3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i)
 end do
 r = sqrt( sum( t3 * t3, 4 ) )
 
 ! Informational output
-if ( hypop ) then
-  i1 = i0
+if ( all( i1hypo >= i1node .and. i1hypo <= i2node ) ) then
+  i1 = ihypo
   i1(ifn) = 1
   j = i1(1)
   k = i1(2)
@@ -160,8 +165,8 @@ if ( hypop ) then
   ts0 = sqrt( sum( ( t0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) ** 2. ) )
   tn0 = max( -tn0, 0. )
   print '(a,es12.4)', '  S:    ', ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 )
-  print '(2(a,es12.4,x))', '  dc:   ', dc0, '>', 3 * abs( dx ) * tn0 * ( mus0 - mud0 ) / mu0
-  print '(2(a,es12.4,x))', '  rcrit:', rcrit, '>', mu0 * tn0 * ( mus0 - mud0 ) * dc0 / ( ts0 - tn0 * mud0 ) ** 2
+  print '(2(a,es12.4,x))', '  dc:   ', dc0, '>', 3 * abs( dx ) * tn0 * ( mus0 - mud0 ) / muhypo
+  print '(2(a,es12.4,x))', '  rcrit:', rcrit, '>', muhypo * tn0 * ( mus0 - mud0 ) * dc0 / ( ts0 - tn0 * mud0 ) ** 2
 end if
 
 return
@@ -175,13 +180,13 @@ if ( ifn == 0 ) return
 ! Indices
 i1 = 1
 i2 = nm
-i1(ifn) = i0(ifn)
-i2(ifn) = i0(ifn)
+i1(ifn) = ihypo(ifn)
+i2(ifn) = ihypo(ifn)
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-i1(ifn) = i0(ifn) + 1
-i2(ifn) = i0(ifn) + 1
+i1(ifn) = ihypo(ifn) + 1
+i2(ifn) = ihypo(ifn) + 1
 j3 = i1(1); j4 = i2(1)
 k3 = i1(2); k4 = i2(2)
 l3 = i1(3); l4 = i2(3)

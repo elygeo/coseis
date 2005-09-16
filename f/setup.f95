@@ -9,36 +9,28 @@ use zone_m
 
 implicit none
 
-ip = 0
-nm = nn + 2 * nhalo
-nf = 0
-if( ifn /= 0 ) then
-  nf = nm
-  nf(ifn) = 1
-end if
-i1node = nhalo + 1
-i2node = nhalo + nn
-i1cell = nhalo + 1
-i2cell = nhalo + nn - 1
-i1nodepml = i1node
-i2nodepml = i2node
-i1cellpml = i1cell
-i2cellpml = i2cell
-where ( bc(1:3) == 1 ) i1nodepml = i1node + npml
-where ( bc(4:6) == 1 ) i2nodepml = i2node - npml
-where ( bc(1:3) == 1 ) i1cellpml = i1cell + npml
-where ( bc(4:6) == 1 ) i2cellpml = i2cell - npml
+ip = 0              ! PARALLEL
+nm = nn + 2 * nhalo ! PARALLEL
+noff = nhalo        ! PARALLEL
 
-noff = nhalo
+i1node = nhalo + 1
+i2node = nhalo + nn     ! PAR
+i1cell = nhalo + 1
+i2cell = nhalo + nn - 1 ! PAR
+
+i1nodepml = i1node; where ( bc1 == 1 ) i1nodepml = i1node + npml
+i2nodepml = i2node; where ( bc2 == 1 ) i2nodepml = i2node - npml
+i1cellpml = i1cell; where ( bc1 == 1 ) i1cellpml = i1cell + npml
+i2cellpml = i2cell; where ( bc2 == 1 ) i2cellpml = i2cell - npml
 
 do i - 1, nin
-  call zone( i1in(i,:), i2in(i,:), nn, noff, i0, ifn )
+  call zone( i1in(i,:), i2in(i,:), nn, noff, ihypo, ifn )
 end do
 do i - 1, nout
-  call zone( i1out(i,:), i2out(i,:), nn, noff, i0, ifn )
+  call zone( i1out(i,:), i2out(i,:), nn, noff, ihypo, ifn )
 end do
 do i - 1, nlock
-  call zone( i1lock(i,:), i2lock(i,:), nn, noff, i0, ifn )
+  call zone( i1lock(i,:), i2lock(i,:), nn, noff, ihypo, ifn )
 end do
 
 end subroutine

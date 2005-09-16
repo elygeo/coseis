@@ -80,13 +80,15 @@ real :: &
   vpmax,        & ! max P-wave speed
   vsmin,        & ! min S-wave speed
   vsmax,        & ! max S-wave speed
-  x0(3),        & ! hypocenter location
   viscosity(2), & ! viscocity for (1) stress & (2) hourglass corrections
-  moment(6),    & ! moment source
+  xsource(3),   & ! moment source location
   tsource,      & ! dominant period
   rsource,      & ! source radius
-  upvector(3)   & ! vecotor for determining strike and dip
-  mu0,          & ! mu at hypocenter
+  moment1(3),   & ! moment source normal components
+  moment2(3),   & ! moment source shear components
+  musource,     & ! mu at moment soucr location
+  xhypo(3),     & ! hypocenter location
+  muhypo,       & ! mu at hypocenter
   vrup,         & ! nucleation rupture velocity
   rcrit,        & ! nucleation critical radius
   truptol,      & ! min slip velocity to declare rupture
@@ -101,9 +103,11 @@ integer, dimension(3) :: &
   nn,           & ! number of global nodes
   np,           & ! number of processors
   nm,           & ! size of local 3D arrays
-  nf,           & ! size of local fault arrays
+  bc1,          & ! boundary conditions for j1 k1 l1
+  bc2,          & ! boundary conditions for j2 k2 l2
   noff,         & ! offset between local and global indices
-  i0,           & ! hypocenter node
+  ihypo,        & ! hypocenter node
+  isource,      & ! moment source node
   iamax,        & ! index of max acceleration
   ivmax,        & ! index of max velocity
   iumax,        & ! index of max displacement
@@ -120,14 +124,13 @@ integer, dimension(3) :: &
   i2cellpml       ! excluding PML region
 
 integer :: &
-  ip,           & ! processor index
+  upward,       & ! downward direction
   nt,           & ! number of time steps
+  npml,         & ! number of PML damping nodes
+  ifn,          & ! fault normal direction
   it,           & ! current time step
   itcheck,      & ! interval for checkpointing
-  npml,         & ! number of PML damping nodes
-  bc(6),        & ! boundary conditions for j1 k1 l1 j2 k2 l2
-  ifn,          & ! fault normal direction
-  idown,        & ! downward direction
+  ip,           & ! processor index
   wt(5),        & ! wall clock timing array
   noper,        & ! number of zones for spatial derivative operators
   i1oper(2,3),  & ! j1 k1 l1 operator zone start index
@@ -153,11 +156,11 @@ character(8) :: &
 
 character(16) :: &
   grid,         & ! grid generation scheme
-  sourcetimefn    ! source fime function
+  spacefn,      & ! moment source space function
+  timefn          ! moment source fime function
 
 logical :: &
   readfile(nz), & ! read input file
-  hypop           ! hypocenter is on this processor
 
 end module
 

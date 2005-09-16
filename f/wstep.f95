@@ -31,7 +31,7 @@ doderivative: do id = 1, 3
     call dfnc( s2, oper(iz), s1, x, dx, 1, id, i1, i2 )
   end do
   do i = 1, npml
-    if ( id /= 1 .and. bc(1) == 1 ) then
+    if ( id /= 1 .and. bc1(1) == 1 ) then
       i1 = i1cell
       i2 = i2cell
       j = i1(1) + i - 1
@@ -39,7 +39,7 @@ doderivative: do id = 1, 3
       i2(1) = j
       call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
     end if
-    if ( id /= 1 .and. bc(4) == 1 ) then
+    if ( id /= 1 .and. bc2(1) == 1 ) then
       i1 = i1cell
       i2 = i2cell
       j = i2(1) - i + 1
@@ -47,7 +47,7 @@ doderivative: do id = 1, 3
       i2(1) = j
       call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
     end if
-    if ( id /= 2 .and. bc(2) == 1 ) then
+    if ( id /= 2 .and. bc1(2) == 1 ) then
       i1 = i1cell
       i2 = i2cell
       k = i1(2) + i - 1
@@ -55,7 +55,7 @@ doderivative: do id = 1, 3
       i2(2) = k
       call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
     end if
-    if ( id /= 2 .and. bc(5) == 1 ) then
+    if ( id /= 2 .and. bc2(2) == 1 ) then
       i1 = i1cell
       i2 = i2cell
       k = i2(2) - i + 1
@@ -63,7 +63,7 @@ doderivative: do id = 1, 3
       i2(2) = k
       call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
     end if
-    if ( id /= 3 .and. bc(3) == 1 ) then
+    if ( id /= 3 .and. bc1(3) == 1 ) then
       i1 = i1cell
       i2 = i2cell
       l = i1(3) + i - 1
@@ -71,7 +71,7 @@ doderivative: do id = 1, 3
       i2(3) = l
       call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
     end if
-    if ( id /= 3 .and. bc(6) == 1 ) then
+    if ( id /= 3 .and. bc2(3) == 1 ) then
       i1 = i1cell
       i2 = i2cell
       l = i2(3) - i + 1
@@ -81,7 +81,7 @@ doderivative: do id = 1, 3
     end if
   end do
   do i = 1, npml
-    if ( id == 1 .and. bc(1) == 1 ) then
+    if ( id == 1 .and. bc1(1) == 1 ) then
       i1 = i1cell
       i2 = i2cell
       j = i1(1) + i - 1
@@ -93,7 +93,7 @@ doderivative: do id = 1, 3
         g1(i,k,l,ic) = s2(j,k,l)
       end forall
     end if
-    if ( id == 1 .and. bc(4) == 1 ) then
+    if ( id == 1 .and. bc2(1) == 1 ) then
       i1 = i1cell
       i2 = i2cell
       j = i2(1) - i + 1
@@ -105,7 +105,7 @@ doderivative: do id = 1, 3
         g4(i,k,l,ic) = s2(j,k,l)
       end forall
     end if
-    if ( id == 2 .and. bc(2) == 1 ) then
+    if ( id == 2 .and. bc1(2) == 1 ) then
       i1 = i1cell
       i2 = i2cell
       k = i1(2) + i - 1
@@ -117,7 +117,7 @@ doderivative: do id = 1, 3
         g2(j,i,l,ic) = s2(j,k,l)
       end forall
     end if
-    if ( id == 2 .and. bc(5) == 1 ) then
+    if ( id == 2 .and. bc2(2) == 1 ) then
       i1 = i1cell
       i2 = i2cell
       k = i2(2) - i + 1
@@ -129,7 +129,7 @@ doderivative: do id = 1, 3
         g5(j,i,l,ic) = s2(j,k,l)
       end forall
     end if
-    if ( id == 3 .and. bc(3) == 1 ) then
+    if ( id == 3 .and. bc1(3) == 1 ) then
       i1 = i1cell
       i2 = i2cell
       l = i1(3) + i - 1
@@ -141,7 +141,7 @@ doderivative: do id = 1, 3
         g3(j,k,i,ic) = s2(j,k,l)
       end forall
     end if
-    if ( id == 3 .and. bc(6) == 1 ) then
+    if ( id == 3 .and. bc2(3) == 1 ) then
       i1 = i1cell
       i2 = i2cell
       l = i2(3) - i + 1

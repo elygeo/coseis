@@ -14,20 +14,24 @@ character :: onpass
 integer :: iz, nc, reclen, wt_rate, hh, mm, ss, n(3), err, it0
 real :: dwt(4)
 character(160) :: str
-logical :: fault, cell, static, init = .true.
+logical :: fault, cell, static, init = .true., test
 
 ifinit: if ( init ) then
   init = .false.
   if ( itcheck < 0 ) itcheck = itcheck + nt + 1
   if ( it == 0 ) then
     if ( ip == 0 ) then
-      print '(a)', 'Initialize output'
-      open(  9, file='out/x0', status='new', iostat=err )
+      inquire( file='out/timestep', exist=test )
       if ( err /= 0 ) then
         print '(a)', 'Error: previous output found. use -d flag to overwrite'
         stop
       end if
-      write( 9, * ) x0
+      print '(a)', 'Initialize output'
+      open(  9, file='out/xhypo', status='new' )
+      write( 9, * ) xhypo
+      close( 9 )
+      open(  9, file='out/xsource', status='new' )
+      write( 9, * ) xsource
       close( 9 )
       call system( 'mkdir out/ckp' )
       call system( 'mkdir out/stats' )

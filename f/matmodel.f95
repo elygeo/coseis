@@ -49,7 +49,12 @@ s2 = mr * s2 * s2
 s1 = mr * ( s1 * s1 ) - 2. * s2
 
 ! Save mu at hypocenter
-if ( hypop ) mu0 = s2(i0(1),i0(2),i0(3))
+if ( all( i1hypo >= i1cell .and. i1hypo <= i2cell + 1 ) ) then
+  j = i1(1)
+  k = i1(2)
+  l = i1(3)
+  muhypo = s2(j,k,l)
+end if
 
 ! Average Lame parameters onto cell centers
 lam = 0.
@@ -80,7 +85,7 @@ do iz = 1, noper
   call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
 end do
 if ( ifn /=0 ) then
-  i = i0(ifn)
+  i = ihypo(ifn)
   select case( ifn )
   case( 1 ); s2(i,:,:) = 0;
   case( 2 ); s2(:,i,:) = 0;

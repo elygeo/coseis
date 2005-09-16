@@ -11,9 +11,9 @@ implicit none
 save
 logical :: init = .true.
 integer, allocatable :: jj(:), kk(:), ll(:)
-real, allocatable :: msrcx(:), msrcv(:)
-integer :: i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc, ic, eiginfo
-real :: msrcf, m0, mm(3,3), eigval(3), eigwork(8)
+real, allocatable :: srcfr(:)
+integer :: i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc, ic, eiginfo, i1(3), i2(3)
+real :: srcft, m0, mm(3,3), eigval(3), eigwork(8)
 
 if ( rsource <= 0. ) return
 
@@ -42,27 +42,31 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     + x(j,k,l+1,:) + x(j+1,k+1,l,:) );
 end forall
 
-! Cell center hypocentral distance
+! Find radius to cell from source location
 do i = 1, 3
-  w1(:,:,:,i) = w1(:,:,:,i) - x0(i)
+  w1(:,:,:,i) = w1(:,:,:,i) - xsource(i)
 end do
+s2 = sqrt( sum( w1 * w1, 4 ) )
+isrc = minloc( s2 )
+nsrc = count( s2 <= rsource )
+allocate( srcfr(nrsc), jj(nsrc), kk(nsrc), ll(nsrc) ) 
 
-! Find cells within source radius
-s2 = rsource - sqrt( sum( w1 * w1, 4 ) )
-nsrc = count( s2 > 0. )
-allocate( jj(nsrc), kk(nsrc), ll(nsrc), msrcx(nsrc), msrcv(nsrc) ) 
+! Spatial weighting
+select case( spacefn )
+case( 'box'  ); srcfr = 1.
+case( 'tent' ); srcfr = pack( s2, s2 <= rsource )
+case default; stop 'spacefn'
+end select
 
-! Spatial weighting function
-msrcv = pack( s1, s2 > 0. )
-msrcx = pack( s2, s2 > 0. )
-msrcx = msrcx / sum( msrcx ) / msrcv
+! Normalize and devide by cell volume
+srcfr = srcfr / sum( srcfr ) / pack( s1, s2 <= rsource )
 
 ! Index map
 i = 0
 do l = l1, l2
 do k = k1, k2
 do j = j1, j2
-if ( s2(j,k,l) > 0. ) then
+if ( s2(j,k,l) <= rsource ) then
   i = i + 1
   jj(i) = j
   kk(i) = k
@@ -76,15 +80,19 @@ s1 = 0.
 s2 = 0.
 
 ! Print some info, requires LAPACK for eigenvalue calculation
-if ( hypop ) then
-  mm(1,1) = moment(1)
-  mm(2,2) = moment(2)
-  mm(3,3) = moment(3)
-  mm(2,3) = moment(4)
-  mm(1,3) = moment(5)
-  mm(1,2) = moment(6)
+if ( all( isrc >= i1node .and. isrc <= i2node ) ) then
+  mm(1,1) = moment1(1)
+  mm(2,2) = moment1(2)
+  mm(3,3) = moment1(3)
+  mm(2,3) = moment2(1)
+  mm(1,3) = moment2(2)
+  mm(1,2) = moment2(3)
   call ssyev( 'N', 'U', 3, mm, 3, eigval, eigwork, size(eigwork), eiginfo )
   m0 = maxval( abs( eigval ) )
+  j = isrc(1)
+  k = isrc(2)
+  l = isrc(3)
+  mu0 = mu(j,k,l) * s1(j,k,l)
   print '(a,es12.4)', '  M0:', m0
   print '(a,es12.4)', '  Mw:', 2. / 3. * log10( m0 ) - 10.7
   print '(a,es12.4)', '  D: ', m0 / mu0 / dx / dx
@@ -96,12 +104,12 @@ end if ifinit
 
 !------------------------------------------------------------------------------!
 
-select case( sourcetimefn )
-case( 'delta'  ); msrcf = 1.; if ( it == 1 ) msrcf = 1.
-case( 'brune'  ); msrcf = 1. - exp( -t / tsource ) / tsource * ( t + tsource )
-case( 'sbrune' ); msrcf = 1. - exp( -t / tsource ) / tsource * &
+select case( timefn )
+case( 'delta'  ); srct = 1.; if ( it == 1 ) srcft = 1.
+case( 'brune'  ); srct = 1. - exp( -t / tsource ) / tsource * ( t + tsource )
+case( 'sbrune' ); srct = 1. - exp( -t / tsource ) / tsource * &
   ( t + tsource + t * t / tsource / 2. )
-case default; stop 'sourcetimefn'
+case default; stop 'timefn'
 end select
 
 do ic = 1, 3
@@ -109,8 +117,8 @@ do i = 1, nsrc
   j = jj(i)
   k = kk(i)
   l = ll(i)
-  w1(j,k,l,ic) = w1(j,k,l,ic) - msrcf * msrcx(i) * moment(ic)
-  w2(j,k,l,ic) = w2(j,k,l,ic) - msrcf * msrcx(i) * moment(ic+3)
+  w1(j,k,l,ic) = w1(j,k,l,ic) - srcft * srcfr(i) * moment1(ic)
+  w2(j,k,l,ic) = w2(j,k,l,ic) - srcft * srcfr(i) * moment2(ic)
 end do
 end do
 

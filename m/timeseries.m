@@ -4,12 +4,11 @@
 % test if running from SORD
 if ~exist( 'w1', 'var' )
   addpath m
-  copyfile( [ outdir 'in' ], 'in' )
   readin
   nn = n(1:3);
   noff = [ 0 0 0 ];
-  it = textread( [ outdir 'timestep' ] );
-  x0 = textread( [ outdir 'x0' ], '%f', 3 )';
+  it     = textread( [ outdir 'timestep' ] );
+  x0     = textread( [ outdir 'x0' ], '%f', 3 )';
   endian = textread( [ outdir 'endian' ], '%c', 1 );
 end
 
@@ -20,7 +19,7 @@ iz = 0;
 % test if we have data saved for desired location
 while iz < size( outvar, 1 )
   iz = iz + 1;
-  [ i1, i2 ] = zone( iout(iz,:), nn, noff, i0, inrm );
+  [ i1, i2 ] = zone( i1out(iz,:), i2out(iz,:), nn, noff, i0, ifn );
   if strcmp( outvar{iz}, field ) & all( ixhair >= i1 & ixhair <= i2 ) & outit(iz) == 1
     msg = '';
     break

@@ -36,42 +36,42 @@ doderivative: do iid = 1, 3
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
   do i = 1, npml
-    if ( id == 1 .and. bc(1) == 1 ) then
+    if ( id == 1 .and. bc1(1) == 1 ) then
       j = j1 + i - 1
       forall( k=k1:k2, l=l1:l2 )
         s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p1(i,k,l,ic)
         p1(i,k,l,ic) = p1(i,k,l,ic) + dt * s2(j,k,l)
       end forall
     end if
-    if ( id == 1 .and. bc(4) == 1 ) then
+    if ( id == 1 .and. bc2(1) == 1 ) then
       j = j2 - i + 1
       forall( k=k1:k2, l=l1:l2 )
         s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p4(i,k,l,ic)
         p4(i,k,l,ic) = p4(i,k,l,ic) + dt * s2(j,k,l)
       end forall
     end if
-    if ( id == 2 .and. bc(2) == 1 ) then
+    if ( id == 2 .and. bc1(2) == 1 ) then
       k = k1 + i - 1
       forall( j=j1:j2, l=l1:l2 )
         s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p2(j,i,l,ic)
         p2(j,i,l,ic) = p2(j,i,l,ic) + dt * s2(j,k,l)
       end forall
     end if
-    if ( id == 2 .and. bc(5) == 1 ) then
+    if ( id == 2 .and. bc2(2) == 1 ) then
       k = k2 - i + 1
       forall( j=j1:j2, l=l1:l2 )
         s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p5(j,i,l,ic)
         p5(j,i,l,ic) = p5(j,i,l,ic) + dt * s2(j,k,l)
       end forall
     end if
-    if ( id == 3 .and. bc(3) == 1 ) then
+    if ( id == 3 .and. bc1(3) == 1 ) then
       l = l1 + i - 1
       forall( j=j1:j2, k=k1:k2 )
         s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p3(j,k,i,ic)
         p3(j,k,i,ic) = p3(j,k,i,ic) + dt * s2(j,k,l)
       end forall
     end if
-    if ( id == 3 .and. bc(6) == 1 ) then
+    if ( id == 3 .and. bc2(3) == 1 ) then
       l = l2 - i + 1
       forall( j=j1:j2, k=k1:k2 )
         s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p6(j,k,i,ic)

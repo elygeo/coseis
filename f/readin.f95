@@ -37,6 +37,7 @@ doline: do
   case( 'dx' );           read( str, * ) key1, dx
   case( 'dt' );           read( str, * ) key1, dt
   case( 'grid' );         grid = key2
+  case( 'upward' );       read( str, * ) key1, upward
   case( 'rho' );          inzone = .true.
   case( 'vp' );           inzone = .true.
   case( 'vs' );           inzone = .true.
@@ -46,14 +47,15 @@ doline: do
     read( str, * ) key1, lock(i,:), i1lock(i,:), i2lock(i,:)
   case( 'viscosity' );    read( str, * ) key1, viscosity
   case( 'npml' );         read( str, * ) key1, npml
-  case( 'bc' );           read( str, * ) key1, bc
-  case( 'hypocenter' );   read( str, * ) key1, x0
-  case( 'moment' );       read( str, * ) key1, moment
-  case( 'sourcetimefn' ); sourcetimefn = key2
-  case( 'tsource' );      read( str, * ) key1, tsource
+  case( 'bc' );           read( str, * ) key1, bc1, bc2
+  case( 'xsource' );      read( str, * ) key1, xsource
+  case( 'spacefn' );      spacefn = key2
+  case( 'timefn' );       timefn = key2
   case( 'rsource' );      read( str, * ) key1, rsource
+  case( 'tsource' );      read( str, * ) key1, tsource
+  case( 'moment' );       read( str, * ) key1, moment
+  case( 'ihypo' );        read( str, * ) key1, ihypo
   case( 'faultnormal' );  read( str, * ) key1, ifn
-  case( 'upvector' );     read( str, * ) key1, upvecotor
   case( 'mus' );          inzone = .true.
   case( 'mud' );          inzone = .true.
   case( 'dc' );           inzone = .true.
