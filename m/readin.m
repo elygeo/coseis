@@ -4,11 +4,7 @@
 plotstyle = '';
 plotstyle = 'slice';
 truptol = .001;
-material  = []; imat    = []; matdir = '';
-friction  = []; ifric   = []; fricdir = '';
-traction  = []; itrac   = []; tracdir = '';
-stress    = []; istress = []; stressdir = '';
-locknodes = []; ilock   = [];
+lock      = []; ilock   = [];
 outvar    = {}; iout    = []; itout = [];
 grid      = ''; griddir = '';
 
@@ -18,86 +14,66 @@ fprintf( 'Reading file: %s\n', file{1} )
 in = textread( file{1}, '%s', 'delimiter', '\n', 'commentstyle', 'shell' );
 
 for i = 1:length( in )
-  if in{i}, else continue, end
-  key = strread( in{i}, '%s', 'commentstyle', 'shell' );
-  str = strread( in{i}, '%*s %[^#]' );
-  str = str{1};
-  switch key{1}
+  %if in{i}, else continue, end
+  str = strread( in{i}, '%[^#]' );
+  [ key, str ] = strtok( str{1} );
+  inzone = 0;
+  switch key
   case ''
-  case 'np'
-  case 'n',           n          = strread( str, '%n' )';
-  case 'dx',          dx         = strread( str, '%n' )';
-  case 'dt',          dt         = strread( str, '%n' )';
-  case 'bc',          bc         = strread( str, '%n' )';
-  case 'npml',        npml       = strread( str, '%n' )';
-  case 'viscosity',   viscosity  = strread( str, '%n' )';
-  case 'faultnormal', inrm       = strread( str, '%n' )';
-  case 'hypocenter',  i0         = strread( str, '%n' )';
-  case 'checkpoint',  itcheck    = strread( str, '%n' )';
-  case 'moment',      moment     = strread( str, '%n' )';
-  case 'nramp',       nramp      = strread( str, '%n' )';
-  case 'vrup',        vrup       = strread( str, '%n' )';
-  case 'rcrit',       rcrit      = strread( str, '%n' )';
-  case 'srctimef',    [ srctimef, domp ] = strread( str, '%s %n' );
-  case 'rsource',     rsource = strread( str, '%n' )';
-  case 'grid'
-    if strcmp( grid, 'read' )
-      grid = '';
-      griddir = key{3};
-    else
-      grid = key{2};
-    end
-  case 'material'
-    if strcmp( key{2}, 'read' )
-      matdir = key{3};
-      material  = [ ];
-      imat      = [ ];
-    else
-      val = strread( str, '%n' )';
-      material  = [ material;  val(1:3)  ];
-      imat      = [ imat;      val(4:9)  ];
-    end
-  case 'friction'
-    if strcmp( key{2}, 'read' )
-      fircdir = key{3};
-      friction   = [ ];
-      ifric      = [ ];
-    else
-      val = strread( str, '%n' )';
-      friction   = [ friction; val(1:4)  ];
-      ifric      = [ ifric;    val(5:10) ];
-    end
-  case 'traction'
-    if strcmp( key{2}, 'read' )
-      tracdir = key{3};
-      traction   = [ ];
-      itrac      = [ ];
-    else
-      val = strread( str, '%n' )';
-      traction   = [ traction; val(1:3)  ];
-      itrac      = [ itrac;    val(4:9)  ];
-    end
-  case 'stress'
-    if strcmp( key{2}, 'read' )
-      stressdir = key{3};
-      stress     = [ ];
-      istress    = [ ];
-    else
-      val = strread( str, '%n' )';
-      stress     = [ stress;   val(1:6)  ];
-      istress    = [ istress;  val(7:12) ];
-    end
-  case 'locknodes'
-    val = strread( str, '%n' )';
-    locknodes = [ locknodes; val(1:3)  ];
-    ilock     = [ ilock;     val(4:9)  ];
-  case 'out'
-    outvar = { outvar{:} key{2} }';
-    str = strread( str, '%*s %[^#]' );
-    val = strread( str{1}, '%n' )';
-    itout  = [ itout; val(1) ];
-    iout   = [ iout; val(2:7) ];
+  case 'n',             n                = strread( str, '%u' )';
+  case 'dx',            dx               = strread( str, '%f' )';
+  case 'dt',            dt               = strread( str, '%f' )';
+  case 'grid',          grid             = strtok( str );
+  case 'rho',           inzone           = 1;
+  case 'vp',            inzone           = 1;
+  case 'vs',            inzone           = 1;
+  case 'lock',          val              = strread( str, '%u' )';
+    lock(end+1,:)   = val(1:3);
+    i1lock(end+1,:) = val(4:6);
+    i2lock(end+1,:) = val(7:9);
+  case 'viscosity',     viscosity        = strread( str, '%f' )';
+  case 'npml',          npml             = strread( str, '%u' )';
+  case 'bc',            bc               = strread( str, '%u' )';
+  case 'hypocenter',    x0               = strread( str, '%f' )';
+  case 'moment',        moment           = strread( str, '%f' )';
+  case 'sourcetimefn',  sourcetimefn     = strtok( str );
+  case 'tsource',       tsource          = strread( str, '%f' )';
+  case 'rsource',       rsource          = strread( str, '%f' )';
+  case 'faultnormal',   ifn              = strread( str, '%u' )';
+  case 'upvector',      upvector         = strread( str, '%f' )';
+  case 'mus',           inzone           = 1;
+  case 'mud',           inzone           = 1;
+  case 'dc',            inzone           = 1;
+  case 'cohesion',      inzone           = 1;
+  case 'tnormal',       inzone           = 1;
+  case 'tstrike',       inzone           = 1;
+  case 'tdip',          inzone           = 1;
+  case 'cohesion',      inzone           = 1;
+  case 'sxx',           inzone           = 1;
+  case 'syy',           inzone           = 1;
+  case 'szz',           inzone           = 1;
+  case 'syz',           inzone           = 1;
+  case 'szx',           inzone           = 1;
+  case 'sxy',           inzone           = 1;
+  case 'vrup',          vrup             = strread( str, '%f' )';
+  case 'rcrit',         rcrit            = strread( str, '%f' )';
+  case 'trelax',        trelax           = strread( str, '%f' )';
+  case 'np',            np               = strread( str, '%u' );
+  case 'checkpoint',    itcheck          = strread( str, '%u' )';
+  case 'out',           [ key, str ]     = strtok( str );
+    val            = strread( str, '%u' )';
+    outkey{end+1}  = key;
+    itout(end+1,:) = val(1);
+    i1out(end+1,:) = val(2:4);
+    i2out(end+1,:) = val(5:7);
   otherwise error( in{i} )
+  end
+  if inzone
+    [ key, str ]  = strtok( str );
+    val           = strread( str, '%u' )';
+    inkey{end+1}  = key;
+    i1in(end+1,:) = val(1:3);
+    i2in(end+1,:) = val(4:6);
   end
 end
 

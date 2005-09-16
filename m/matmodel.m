@@ -7,37 +7,42 @@ fprintf( 'Material model\n' )
 mr(:) = 0.;
 s1(:) = 0.;
 s2(:) = 0.;
-if matdir
+for i = 1:size( inkey, 1 )
+if ( readfile(i) )
   i1 = i1cell;
   i2 = i2cell + 1;
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
-  mr(j1:j2,k1:k2,l1:l2) = bread( matdir, 'rho' );
-  s1(j1:j2,k1:k2,l1:l2) = bread( matdir, 'vp' );
-  s2(j1:j2,k1:k2,l1:l2) = bread( matdir, 'vs' );
-end
-for iz = 1:size( material, 1 )
-  [ i1, i2 ] = zone( imat(iz,:), nn, noff, i0, inrm );
+  switch inkey{i}
+  case 'rho', mr(j1:j2,k1:k2,l1:l2) = bread( 'data/rho' );
+  case 'vp',  s1(j1:j2,k1:k2,l1:l2) = bread( 'data/vp' );
+  case 'vs',  s2(j1:j2,k1:k2,l1:l2) = bread( 'data/vs' );
+  end
+else
+  i1 = i1in(i,:);
+  i2 = i2in(i,:);
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
-  mr(j1:j2,k1:k2,l1:l2) = material(iz,1);
-  s1(j1:j2,k1:k2,l1:l2) = material(iz,2);
-  s2(j1:j2,k1:k2,l1:l2) = material(iz,3);
+  switch inkey{i}
+  case 'rho', mr(j1:j2,k1:k2,l1:l2) = inval(iz);
+  case 'vp',  s1(j1:j2,k1:k2,l1:l2) = inval(iz);
+  case 'vs',  s2(j1:j2,k1:k2,l1:l2) = inval(iz);
+  end
+end
 end
 
 % Matrial extremes
-i = mr > 0.; matmin(1) = min( mr(i) ); matmax(1) = max( mr(i) );
-i = s1 > 0.; matmin(2) = min( s1(i) ); matmax(2) = max( s1(i) );
-i = s2 > 0.; matmin(3) = min( s2(i) ); matmax(3) = max( s2(i) );
+i = s1 > 0.; vpmin = min( s1(i) ); vpmax = max( s1 );
+i = s2 > 0.; vsmin = min( s2(i) ); vpmax = max( s2 );
 
 % Lame parameters
 s2 = mr .* s2 .* s2;
 s1 = mr .* ( s1 .* s1 ) - 2. .* s2;
 
 % Save mu at hypocenter
-mu0 = s2( i0(1), i0(2), i0(3) );
+mu0 = s2(i0(1),i0(2),i0(3));
 
 % Average Lame parameters on cell centers
 lam(:) = 0.;
@@ -60,10 +65,10 @@ mu(j,k,l) = 0.125 * ...
 
 % Cell volume
 s2(:) = 0.;
-for iz = 1:size( operator, 1 )
-  [ i1, i2 ] = zone( ioper(iz,:), nn, noff, i0, inrm );
+for iz = 1:size( oper, 1 )
+  [ i1, i2 ] = zone( ioper(iz,:), nn, noff, i0, ifn );
   i2 = i2 - 1;
-  op = operator(iz);
+  op = oper(iz);
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
@@ -71,9 +76,9 @@ for iz = 1:size( operator, 1 )
 end
 
 % Make sure cell volumes are zero on the fault
-if inrm
-  i = i0(inrm);
-  switch inrm
+if ifn
+  i = i0(ifn);
+  switch ifn
   case 1, s2(i,:,:) = 0.;
   case 2, s2(:,i,:) = 0.;
   case 3, s2(:,:,i) = 0.;

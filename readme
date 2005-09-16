@@ -375,3 +375,17 @@ n = [ (p+1) * sin(f)^2 * cos(t)
       (p+1) * sin(f)^2 * sin(t)
       sin(f) / |cos(f)| * ( cos(f)^2 - p*sin(f)^2 ) ]
 
+
+COURANT STABILITY CONDITION
+
+  dt * vp * sqrt(3) / dx   >    1
+
+  A = divW/rho
+  V' = A
+  U' = V
+  U~ = U + dt*beta*V
+  E = [gradU~ + (gradU~)^T]/2
+  W = lam*trace(E)*I + 2*mu*E
+
+  mu  = rho * vs^2
+  lam = rho * ( vp^2 - 2vs^2 )

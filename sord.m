@@ -12,6 +12,7 @@ fprintf( '\nSORD - Support Operator Rupture Dynamics\n' )
 clear all
 if exist( 'out', 'dir' ), rmdir( 'out', 's' ), end
 
+addpath m
 readin
 setup
 arrays

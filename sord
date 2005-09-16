@@ -111,11 +111,11 @@ if [ $matlab = yes ]; then
 cat << END > batchjob
 #!/bin/bash -e
 unset DISPLAY
-nohup matlab -r "addpath m, sord, quit" > out.log &
+nohup matlab -r "sord, quit" > out.log &
 END
 chmod u+x batchjob
 
-[ $dryrun = no ] && matlab -nodesktop -nosplash -r "addpath m; sord"
+[ $dryrun = no ] && matlab -nodesktop -nosplash -r sord
 
 exit
 

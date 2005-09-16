@@ -9,6 +9,7 @@ use dfnc_m
 
 implicit none
 real :: tol, test
+integer :: i, j, k, l, j1, k1, l1, j2, k2, l2
 
 ! Grid gradient
 i1 = i1cell
@@ -56,7 +57,7 @@ tol = 10. * epsilon( dx )
 ! dx/dy = dx/dz = dy/dz = dy/dx = dz/dx = dz/dy = 0
 ! dx/dx = dy/dy = dz/dz
 noper = 1
-oper(1) = 'h'
+oper = 'h'
 i1oper(1,:) = i1cell
 i2oper(1,:) = i2cell + 1
 
@@ -77,20 +78,17 @@ do i = k2, k1, -1; i2(2) = i; if ( any( s1(:,i,:) > tol ) ) exit; end do
 do i = l1, l2;     i1(3) = i; if ( any( s1(:,:,i) > tol ) ) exit; end do
 do i = l2, l1, -1; i2(3) = i; if ( any( s1(:,:,i) > tol ) ) exit; end do
 
-noper = 2
-oper(1) = 'r'
-oper(2) = 'g'
+oper = 'rg'
 i1oper(2,:) = i1
 i2oper(2,:) = i2 + 1
 test = product( i2 - i1 + 2 ) / product( i2cell - i1cell + 2 )
 
 if ( all( i2 > i1 ) .and. test > .8 ) then
-  noper = 1
-  oper(1) = 'g'
+  oper = 'g'
 else if ( all( i2 <= i1 ) ) then
-  noper = 1
-  oper(1) = 'r'
+  oper = 'r'
 end if
+noper = len_trim( oper )
 
 end subroutine
 end module

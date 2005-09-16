@@ -1,8 +1,9 @@
 %------------------------------------------------------------------------------%
 % WSTEP - Increment displacement and stress
 
-% Update displacement & slip
-u = u + dt * v;
+% Time integration
+t  = t  + dt / 2.;
+u  = u  + dt * v;
 us = us + dt * vs;
 
 % Gradient
@@ -14,17 +15,17 @@ for ic = 1:3
 s1 = u(:,:,:,ic) + dt * viscosity(1) * v(:,:,:,ic);
 for id = 1:3
   ix = 6 - ic - id;
-  for iz = 1:size( operator, 1 )
+  for iz = 1:size( oper, 1 )
     [ i1, i2 ] = zone( ioper(iz,:), nn, noff, i0, inrm );
-    op = operator(iz);
+    op = oper(iz);
     i1 = max( i1, i1cellpml );
     i2 = min( i2 - 1, i2cellpml );
     j = i1(1):i2(1);
     k = i1(2):i2(2);
     l = i1(3):i2(3);
-    s2(j,k,l) = dfnc( op, s1, x, dx, 1, id, j, k, l );
+    s2(j,k,l) = dfnc( oper(iz), s1, x, dx, 1, id, j, k, l );
   end
-  op = operator(1);
+  op = oper(1);
   i1 = i1cell;
   i2 = i2cell;
   j = i1(1):i2(1);

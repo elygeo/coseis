@@ -5,7 +5,6 @@ module output_m
 contains
 subroutine output( pass )
 use globals_m
-use zone_m
 use binio_m
 
 implicit none
@@ -54,7 +53,7 @@ ifinit: if ( init ) then
   end if
   call system_clock( count_rate=wt_rate )
   if ( ip == 0 ) then
-    print '(a)', '  Step  Amax        Vmax        Umax        Compute     I/O'
+    print '(a)', 'Time       Amax        Vmax        Umax        Compute     I/O'
   end if
   return
 end if ifinit
@@ -85,26 +84,26 @@ case( 'us'   ); fault = .true.
 case( 'trup' ); fault = .true.
 case default; stop 'var'
 end select
-if ( fault .and. inrm == 0 ) then
+if ( fault .and. ifn == 0 ) then
   itout(iz) = 0
   cycle doiz
 end if
 if ( onpass /= pass ) cycle doiz
 if ( static ) itout(iz) = 0
-call zone( i1, i2, iout(iz,:), nn, noff, i0, inrm )
-if ( any( i1 < i1node .or. i2 > i2node ) ) stop 'out range'
+i1 = i1out(iz,:)
+i2 = i2out(iz,:)
 if ( cell ) i2 = i2 - 1
 if ( any( i2 < i1 ) ) stop 'out range'
 if ( ip == 0 ) then
   write( str, '(a,i2.2,a)' ) 'out/', iz, '/hdr'
   open(  9, file=str, status='replace' )
-  write( 9, * ) nc, i1-noff, i2-noff, itout(iz), it, dt, dx
+  write( 9, * ) nc, i1-noff, i2-noff, itout(iz), it, t, dx
   write( 9, * ) outvar(iz)
   close( 9 )
 end if
 if ( fault ) then
-  i1(inrm) = 1
-  i2(inrm) = 1
+  i1(ifn) = 1
+  i2(ifn) = 1
 end if
 do i = 1, nc
   write( str, '(a,i2.2,a,a,i1,i6.6)' ) &
@@ -161,9 +160,9 @@ if ( ip == 0 ) then
   dwt(1:4) = real( wt(2:5) - wt(1:4) ) / real( wt_rate )
   write( str, '(a,i6.6)' ) 'out/stats/', it
   open(  9, file=str, status='replace' )
-  write( 9, '(8es15.7)' ) amax, vmax, umax, wmax, dwt
+  write( 9, '(8es15.7)' ) t, amax, vmax, umax, wmax, dwt
   close( 9 )
-  print '(i6,5es12.4)', it, amax, vmax, umax, dwt(1:2) + dwt(3:4)
+  print '(6es12.4)', t, amax, vmax, umax, dwt(1:2) + dwt(3:4)
 end if
 
 end subroutine

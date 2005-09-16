@@ -3,18 +3,16 @@
 
 module zone_m
 contains
-subroutine zone( i1, i2, izone, nn, noff, i0, inrm )
+subroutine zone( i1, i2, nn, noff, i0, ifn )
 
 implicit none
-integer, intent(out) :: i1(3), i2(3)
-integer, intent(in) :: izone(6), nn(3), noff(3), i0(3), inrm
+integer, intent(inout) :: i1(3), i2(3)
+integer, intent(in) :: nn(3), noff(3), i0(3), ifn
 integer :: nshift(3)
 logical :: m0(3), m1(3), m2(3), m3(3), m4(3)
 
-i1 = izone(1:3)
-i2 = izone(4:6)
 nshift = 0
-if ( inrm /= 0 ) nshift(inrm) = 1
+if ( ifn /= 0 ) nshift(ifn) = 1
 m0 = i1 == 0 .and. i2 == 0
 m1 = i1 == 0 .and. i2 /= 0
 m2 = i1 /= 0 .and. i2 == 0

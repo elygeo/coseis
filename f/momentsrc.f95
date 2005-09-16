@@ -12,8 +12,8 @@ save
 logical :: init = .true.
 integer, allocatable :: jj(:), kk(:), ll(:)
 real, allocatable :: msrcx(:), msrcv(:)
-integer :: nsrc, ic, eiginfo
-real :: time, msrcf, m0, mm(3,3), eigval(3), eigwork(8)
+integer :: i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc, ic, eiginfo
+real :: msrcf, m0, mm(3,3), eigval(3), eigwork(8)
 
 if ( rsource <= 0. ) return
 
@@ -47,7 +47,7 @@ do i = 1, 3
   w1(:,:,:,i) = w1(:,:,:,i) - x0(i)
 end do
 
-! Find cells within rsource
+! Find cells within source radius
 s2 = rsource - sqrt( sum( w1 * w1, 4 ) )
 nsrc = count( s2 > 0. )
 allocate( jj(nsrc), kk(nsrc), ll(nsrc), msrcx(nsrc), msrcv(nsrc) ) 
@@ -96,26 +96,13 @@ end if ifinit
 
 !------------------------------------------------------------------------------!
 
-! time indexing goes wi vi wi+1 vi+1 ...
-if ( .false. ) then ! increment stress
-  time = ( it - .5 ) * dt
-  select case( srctimef )
-  case( 'delta' );  msrcf = 0.; if ( it == 1 ) msrcf = 1. / dt
-  case( 'brune' );  msrcf = exp( -time / domp ) / domp ** 2. * time
-  case( 'sbrune' ); msrcf = exp( -time / domp ) / domp ** 3. * time * time / 2.
-  case default; stop 'srctimef'
-  end select
-  msrcf = dt * msrcf
-else ! direct stress
-  time = it * dt
-  select case( srctimef )
-  case( 'delta' );  msrcf = 1.; if ( it == 1 ) msrcf = 1.
-  case( 'brune' );  msrcf = 1. - exp( -time / domp ) / domp * ( time + domp )
-  case( 'sbrune' ); msrcf = 1. - exp( -time / domp ) / domp * &
-    ( time + domp + time * time / domp / 2. )
-  case default; stop 'srctimef'
-  end select
-end if
+select case( sourcetimefn )
+case( 'delta'  ); msrcf = 1.; if ( it == 1 ) msrcf = 1.
+case( 'brune'  ); msrcf = 1. - exp( -t / tsource ) / tsource * ( t + tsource )
+case( 'sbrune' ); msrcf = 1. - exp( -t / tsource ) / tsource * &
+  ( t + tsource + t * t / tsource / 2. )
+case default; stop 'sourcetimefn'
+end select
 
 do ic = 1, 3
 do i = 1, nsrc

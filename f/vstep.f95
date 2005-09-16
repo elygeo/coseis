@@ -8,11 +8,10 @@ use globals_m
 use dfcn_m
 use hgnc_m
 use hgcn_m
-use zone_m
 use fault_m
 
 implicit none
-integer ic, iid, id, ix, iq, iz
+integer :: i, j, k, l, j1, k1, l1, j2, k2, l2, ic, iid, id, ix, iq, iz
 
 ! Restoring force
 ! P' + DP = [del]S, F = 1.P'             PML region
@@ -110,21 +109,22 @@ end do
 call fault
 
 ! Locked nodes
-do iz = 1, nlock
-  call zone( i1, i2, ilock(iz,:), nn, noff, i0, inrm )
-  i1 = max( i1, i1node )
-  i2 = min( i2, i2node )
+do i = 1, nlock
+  i1 = max( i1lock(i,), i2node )
+  i2 = min( i2lock(i,), i2node )
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
-  i1 = locknodes(iz,:)
+  i1 = lock(i,:)
   do i = 1, 3
     if ( i1(i) == 1 ) forall( j=j1:j2, k=k1:k2, l=l1:l2 ) w1(j,k,l,i) = 0.
   end do
 end do
 
-! Update velocity
-v = v + dt * w1
+! Time integeration
+t  =  t  + dt / 2.
+v  =  v  + dt * w1
+!vs = vs + dt * f1
 
 ! Magnitudes
 s1 = sqrt( sum( w1 * w1, 4 ) )

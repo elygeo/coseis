@@ -1,114 +1,78 @@
 %------------------------------------------------------------------------------%
 % FAULT
 
-if ~inrm; return; end
+if ~ifn; return; end
 
 if init
 
 init = 0;
 fprintf( 'Initialize fault\n' )
 
-% Friction model
-fs(:) = 0;
-fd(:) = 0;
+% Input
+mus(:) = 0;
+mud(:) = 0;
 dc(:) = 0;
 co(:) = 1e3;
-if fricdir
-  i1 = i1nodepml;
-  i2 = i2nodepml;
-  i1(inrm) = 1;
-  i2(inrm) = 1;
-  j1 = i1(1); j2 = i2(1);
-  k1 = i1(2); k2 = i2(2);
-  l1 = i1(3); l2 = i2(3);
-  fs(j1:j2,k1:k2,l1:l2) = bread( fricdir, 'fs' );
-  fd(j1:j2,k1:k2,l1:l2) = bread( fricdir, 'fd' );
-  dc(j1:j2,k1:k2,l1:l2) = bread( fricdir, 'dc' );
-  co(j1:j2,k1:k2,l1:l2) = bread( fricdir, 'co' );
-end
-for iz = 1:size( friction, 1 )
-  [ i1, i2 ] = zone( ifric(iz,:), nn, noff, i0, inrm );
-  i1 = max( i1, i1nodepml );
-  i2 = min( i2, i2nodepml );
-  i1(inrm) = 1;
-  i2(inrm) = 1;
-  j1 = i1(1); j2 = i2(1);
-  k1 = i1(2); k2 = i2(2);
-  l1 = i1(3); l2 = i2(3);
-  fs(j1:j2,k1:k2,l1:l2) = friction(iz,1);
-  fd(j1:j2,k1:k2,l1:l2) = friction(iz,2);
-  dc(j1:j2,k1:k2,l1:l2) = friction(iz,3);
-  co(j1:j2,k1:k2,l1:l2) = friction(iz,4);
-end
-
-% Prestress
 t1(:) = 0.;
 t2(:) = 0.;
-if stressdir
-  i1 = i1nodepml;
-  i2 = i2nodepml;
-  i1(inrm) = 1;
-  i2(inrm) = 1;
-  j1 = i1(1); j2 = i2(1);
-  k1 = i1(2); k2 = i2(2);
-  l1 = i1(3); l2 = i2(3);
-  t1(j1:j2,k1:k2,l1:l2,1) = bread( stressdir, 'xx' );
-  t1(j1:j2,k1:k2,l1:l2,2) = bread( stressdir, 'yy' );
-  t1(j1:j2,k1:k2,l1:l2,3) = bread( stressdir, 'zz' );
-  t2(j1:j2,k1:k2,l1:l2,1) = bread( stressdir, 'yz' );
-  t2(j1:j2,k1:k2,l1:l2,2) = bread( stressdir, 'zx' );
-  t2(j1:j2,k1:k2,l1:l2,3) = bread( stressdir, 'xy' );
-end
-for iz = 1:size( stress, 1 )
-  [ i1, i2 ] = zone( istress(iz,:), nn, noff, i0, inrm );
-  i1 = max( i1, i1nodepml );
-  i2 = min( i2, i2nodepml );
-  i1(inrm) = 1;
-  i2(inrm) = 1;
-  j1 = i1(1); j2 = i2(1);
-  k1 = i1(2); k2 = i2(2);
-  l1 = i1(3); l2 = i2(3);
-  t1(j1:j2,k1:k2,l1:l2,1) = stress(iz,1);
-  t1(j1:j2,k1:k2,l1:l2,2) = stress(iz,2);
-  t1(j1:j2,k1:k2,l1:l2,3) = stress(iz,3);
-  t2(j1:j2,k1:k2,l1:l2,1) = stress(iz,4);
-  t2(j1:j2,k1:k2,l1:l2,2) = stress(iz,5);
-  t2(j1:j2,k1:k2,l1:l2,3) = stress(iz,6);
-end
-
-% Pretraction
 t3(:) = 0.;
-if tracdir
+for i = 1:size( inkey, 1 )
+if ( readfile(i) )
   i1 = i1nodepml;
   i2 = i2nodepml;
-  i1(inrm) = 1;
-  i2(inrm) = 1;
+  i1(ifn) = 1;
+  i2(ifn) = 1;
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
-  t3(j1:j2,k1:k2,l1:l2,1) = bread( tracdir, 'tn' );
-  t3(j1:j2,k1:k2,l1:l2,2) = bread( tracdir, 'ts' );
-  t3(j1:j2,k1:k2,l1:l2,3) = bread( tracdir, 'td' );
-end
-for iz = 1:size( traction, 1 )
-  [ i1, i2 ] = zone( itrac(iz,:), nn, noff, i0, inrm );
+  endian = textread( 'data/endian', '%c', 1 );
+  switch inkey(i)
+  case 'mus',      mus(j1:j2,k1:k2,l1:l2)  = bread( 'data/mus',      endian );
+  case 'mud',      mud(j1:j2,k1:k2,l1:l2)  = bread( 'data/mud',      endian );
+  case 'dc',       dc(j1:j2,k1:k2,l1:l2)   = bread( 'data/dc',       endian );
+  case 'cohesion', co(j1:j2,k1:k2,l1:l2)   = bread( 'data/cohesion', endian );
+  case 'sxx',      t1(j1:j2,k1:k2,l1:l2,1) = bread( 'data/sxx',      endian );
+  case 'syy',      t1(j1:j2,k1:k2,l1:l2,2) = bread( 'data/syy',      endian );
+  case 'szz',      t1(j1:j2,k1:k2,l1:l2,3) = bread( 'data/szz',      endian );
+  case 'syz',      t2(j1:j2,k1:k2,l1:l2,1) = bread( 'data/syz',      endian );
+  case 'szx',      t2(j1:j2,k1:k2,l1:l2,2) = bread( 'data/szx',      endian );
+  case 'sxy',      t2(j1:j2,k1:k2,l1:l2,3) = bread( 'data/sxy',      endian );
+  case 'tnormal',  t3(j1:j2,k1:k2,l1:l2,1) = bread( 'data/tnormal',  endian );
+  case 'tstrike',  t3(j1:j2,k1:k2,l1:l2,2) = bread( 'data/tstrike',  endian );
+  case 'tdip',     t3(j1:j2,k1:k2,l1:l2,3) = bread( 'data/tdip',     endian );
+  end
+else
+  [ i1, i2 ] = zone( i1in(iz,:), i2in(iz,:), nn, noff, i0, ifn );
   i1 = max( i1, i1nodepml );
   i2 = min( i2, i2nodepml );
-  i1(inrm) = 1;
-  i2(inrm) = 1;
+  i1(ifn) = 1;
+  i2(ifn) = 1;
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
-  t3(j1:j2,k1:k2,l1:l2,1) = traction(iz,1);
-  t3(j1:j2,k1:k2,l1:l2,2) = traction(iz,2);
-  t3(j1:j2,k1:k2,l1:l2,3) = traction(iz,3);
+  switch inkey(i)
+  case 'mus',      mus(j1:j2,k1:k2,l1:l2)  = inval(i);
+  case 'mud',      mud(j1:j2,k1:k2,l1:l2)  = inval(i);
+  case 'dc',       dc(j1:j2,k1:k2,l1:l2)   = inval(i);
+  case 'cohesion', co(j1:j2,k1:k2,l1:l2)   = inval(i);
+  case 'sxx',      t1(j1:j2,k1:k2,l1:l2,1) = inval(i);
+  case 'syy',      t1(j1:j2,k1:k2,l1:l2,2) = inval(i);
+  case 'szz',      t1(j1:j2,k1:k2,l1:l2,3) = inval(i);
+  case 'syz',      t2(j1:j2,k1:k2,l1:l2,1) = inval(i);
+  case 'szx',      t2(j1:j2,k1:k2,l1:l2,2) = inval(i);
+  case 'sxy',      t2(j1:j2,k1:k2,l1:l2,3) = inval(i);
+  case 'tnormal',  t3(j1:j2,k1:k2,l1:l2,1) = inval(i);
+  case 'tstrike',  t3(j1:j2,k1:k2,l1:l2,2) = inval(i);
+  case 'tdip',     t3(j1:j2,k1:k2,l1:l2,3) = inval(i);
+  end
+end
 end
 
 % Normal vectors
 i1 = i1node;
 i2 = i2node;
-i1(inrm) = i0(inrm);
-i2(inrm) = i0(inrm);
+i1(ifn) = i0(ifn);
+i2(ifn) = i0(ifn);
 nrm = snormals( x, i1, i2 );
 area = sqrt( sum( nrm .* nrm, 4 ) );
 f1 = area;
@@ -128,53 +92,47 @@ for i = 1:3
     t2(:,:,:,k) .* nrm(:,:,:,j);
 end
 
-% Find orientations
-if inrm ~= idown
-  idip = idown;
-  istr = 6 - idip - inrm;
-else
-  istr = mod( inrm, 3 ) + 1;
-  idip = 6 - istr - inrm;
-end
-down = [ 0 0 0 ];
-down(idown) = 1;
-handed = mod( istr - inrm + 1, 3 ) - 1;
-
 % Stike vectors
-t1(:,:,:,1) = down(2) .* nrm(:,:,:,3) - down(3) .* nrm(:,:,:,2);
-t1(:,:,:,2) = down(3) .* nrm(:,:,:,1) - down(1) .* nrm(:,:,:,3);
-t1(:,:,:,3) = down(1) .* nrm(:,:,:,2) - down(2) .* nrm(:,:,:,1);
+t1(:,:,:,1) = upvector(2) .* nrm(:,:,:,3) - upvector(3) .* nrm(:,:,:,2);
+t1(:,:,:,2) = upvector(3) .* nrm(:,:,:,1) - upvector(1) .* nrm(:,:,:,3);
+t1(:,:,:,3) = upvector(1) .* nrm(:,:,:,2) - upvector(2) .* nrm(:,:,:,1);
 f1 = sqrt( sum( t1 .* t1, 4 ) );
 ii = f1 ~= 0.;
-f1(ii) = handed ./ f1(ii);
+f1(ii) = 1. ./ f1(ii);
 for i = 1:3
   t1(:,:,:,i) = t1(:,:,:,i) .* f1;
 end
 
 % Dip vectors
-t2(:,:,:,1) = nrm(:,:,:,2) .* t1(:,:,:,3) - nrm(:,:,:,3) .* t1(:,:,:,2);
-t2(:,:,:,2) = nrm(:,:,:,3) .* t1(:,:,:,1) - nrm(:,:,:,1) .* t1(:,:,:,3);
-t2(:,:,:,3) = nrm(:,:,:,1) .* t1(:,:,:,2) - nrm(:,:,:,2) .* t1(:,:,:,1);
+t2(:,:,:,1) = t1(:,:,:,2) .* nrm(:,:,:,3) - t1(:,:,:,3) .* nrm(:,:,:,2);
+t2(:,:,:,2) = t1(:,:,:,3) .* nrm(:,:,:,1) - t1(:,:,:,1) .* nrm(:,:,:,3);
+t2(:,:,:,3) = t1(:,:,:,1) .* nrm(:,:,:,2) - t1(:,:,:,2) .* nrm(:,:,:,1);
 f1 = sqrt( sum( t1 .* t1, 4 ) );
 ii = f1 ~= 0.;
-f1(ii) = handed ./ f1(ii);
+f1(ii) = 1. ./ f1(ii);
 for i = 1:3
   t2(:,:,:,i) = t2(:,:,:,i) .* f1;
 end
 
+% Coordinate system
+vector = upvector;
+vector(ifn) = 0;
+[ i, idip ] = max( abs( vector ) );
+istrike = 6 - idip - ifn;
+
 % Total pretraction
 for i = 1:3
   t0(:,:,:,i) = t0(:,:,:,i) + ...
-    t3(:,:,:,inrm) .* nrm(:,:,:,i) + ...
-    t3(:,:,:,istr) .* t1(:,:,:,i) + ...
-    t3(:,:,:,idip) .* t2(:,:,:,i);
+    t3(:,:,:,ifn)     .* nrm(:,:,:,i) + ...
+    t3(:,:,:,istrike) .* t1(:,:,:,i) + ...
+    t3(:,:,:,idip)    .* t2(:,:,:,i);
 end
 
 % Hypocentral radius
 i1 = [ 1 1 1 ];
 i2 = nm;
-i1(inrm) = i0(inrm);
-i2(inrm) = i0(inrm);
+i1(ifn) = i0(ifn);
+i2(ifn) = i0(ifn);
 j1 = i1(1); j2 = i2(1);
 k1 = i1(2); k2 = i2(2);
 l1 = i1(3); l2 = i2(3);
@@ -183,26 +141,21 @@ for i = 1:3
 end
 r = sqrt( sum( t3 .* t3, 4 ) );
 
-% Output some info
+% Informational output
 i1 = i0;
-i1(inrm) = 1;
+i1(ifn) = 1;
 j = i1(1);
 k = i1(2);
 l = i1(3);
-fs0 = fs(j,k,l);
-fd0 = fd(j,k,l);
+mus0 = mus(j,k,l);
+mud0 = mud(j,k,l);
 dc0 = dc(j,k,l);
 tn0 = sum( t0(j,k,l,:) .* nrm(j,k,l,:) );
 ts0 = norm( shiftdim( t0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) );
 tn0 = max( -tn0, 0 );
-fprintf( '  S:    %11.4e\n', ( tn0 * fs0 - ts0 ) / ( ts0 - tn0 * fd0 ) )
-fprintf( '  dc:   %11.4e >%11.4e\n', dc0, 3 * dx * tn0 * ( fs0 - fd0 ) / mu0 )
-fprintf( '  rcrit:%11.4e >%11.4e\n', rcrit, mu0 * tn0 * ( fs0 - fd0 ) * dc0 / ( ts0 - tn0 * fd0 ) ^ 2 )
-
-usmax = 0;
-vsmax = 0;
-tnmax = 0;
-tsmax = 0;
+fprintf( '  S:    %11.4e\n', ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 ) )
+fprintf( '  dc:   %11.4e >%11.4e\n', dc0, 3 * dx * tn0 * ( mus0 - mud0 ) / mu0 )
+fprintf( '  rcrit:%11.4e >%11.4e\n', rcrit, mu0 * tn0 * ( mus0 - mud0 ) * dc0 / ( ts0 - tn0 * mud0 ) ^ 2 )
 
 return
 
@@ -212,13 +165,13 @@ end
 
 i1 = [ 1 1 1 ];
 i2 = nm;
-i1(inrm) = i0(inrm);
-i2(inrm) = i0(inrm);
+i1(ifn) = i0(ifn);
+i2(ifn) = i0(ifn);
 j1 = i1(1); j2 = i2(1);
 k1 = i1(2); k2 = i2(2);
 l1 = i1(3); l2 = i2(3);
-i1(inrm) = i0(inrm) + 1;
-i2(inrm) = i0(inrm) + 1;
+i1(ifn) = i0(ifn) + 1;
+i2(ifn) = i0(ifn) + 1;
 j3 = i1(1); j4 = i2(1);
 k3 = i1(2); k4 = i2(2);
 l3 = i1(3); l4 = i2(3);
@@ -246,16 +199,16 @@ tsmax = max( abs( ts(:) ) );
 % Friction Law
 ii = tn > 0.;
 tn(ii) = 0.;
-f1 = fd;
+f1 = mud;
 ii = us < dc;
-f1(ii) = f1(ii) + ( 1. - us(ii) ./ dc(ii) ) .* ( fs(ii) - fd(ii) );
+f1(ii) = f1(ii) + ( 1. - us(ii) ./ dc(ii) ) .* ( mus(ii) - mud(ii) );
 f1 = f1 .* -tn + co;
 
 % Nucleation
 if rcrit && vrup
   f2(:) = 1.;
   if nramp, f2 = min( ( it * dt - r / vrup ) / ( nramp * dt ), 1. ); end
-  f2 = ( 1. - f2 ) .* ts + f2 .* ( fd .* -tn + co);
+  f2 = ( 1. - f2 ) .* ts + f2 .* ( mud .* -tn + co);
   ii = r < min( rcrit, it * dt * vrup ) & f2 < f1;
   f1(ii) = f2(ii);
 end
@@ -281,7 +234,7 @@ vs = sqrt( sum( t2 .* t2, 4 ) );
 % Rupture time
 if truptol
   i1 = i0;
-  i1(inrm) = 1;
+  i1(ifn) = 1;
   l = i1(3);
   k = i1(2);
   j = i1(1);

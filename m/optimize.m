@@ -29,13 +29,12 @@ missfit = ...
   sum( w2 ) + ...
   sum( abs( w1(:,:,:,1) - w1(:,:,:,2) ) ) ...
   sum( abs( w1(:,:,:,1) - w1(:,:,:,3) ) )
-if misfit < tol
-  oper(1) = 'h';
-  return
-else
-  oper(1) = 'r';
-end
+
 ioper(1,:) = [ 1 1 1   -1 -1 -1 ];
+if misfit < tol
+  oper = 'h';
+  return
+end
 
 % rectangular grid. find minimal region where:
 % dx/dy = dx/dz = dy/dz = dy/dx = dz/dx = dz/dy = 0
@@ -52,10 +51,10 @@ for i = l2:-1:l1, i2(3) = i; if find( s1(:,:,i) ) > tol ) break, end, end
 
 % asign operators
 if prod( i2 - i1 + 1 ) > .9 * prod( i2cell - i2cell + 1 )
-  oper(1) = 'g';
+  oper = 'g';
 else if i2 >= i1
-  oper(2) = 'g';
   noper = 2;
+  oper = 'rg';
   ioper(2,:) = [ i1 i2 + 1 ];
 end
 

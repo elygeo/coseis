@@ -7,20 +7,21 @@ subroutine pml
 use globals_m
 
 implicit none
-real :: hmean(3), tune, c1, c2, c3, damp, dampn, dampc, courant, pmlp
+real :: hmean, tune, c1, c2, c3, damp, dampn, dampc, courant, pmlp
 
 ! Check Courant stability condition. TODO: make general
-courant = dt * matmax(2) * sqrt( 3. ) / dx
+courant = dt * vpmax * sqrt( 3. ) / abs( dx )
 if ( ip == 0 ) print '(a,es11.4)', '  Courant: 1 >', courant
 
 ! PML damping
+allocate( dn1(npml), dn2(npml), dc1(npml), dc2(npml) )
 c1 =  8. / 15.
 c2 = -3. / 100.
 c3 =  1. / 1500.
 tune = 3.5
 pmlp = 2
-hmean = 2. * matmin * matmax / ( matmin + matmax )
-damp = tune * hmean(3) / dx * ( c1 + ( c2 + c3 * npml ) * npml ) / npml ** pmlp
+hmean = 2. * vsmin * vsmax / ( vsmin + vsmax )
+damp = tune * hmean / dx * ( c1 + ( c2 + c3 * npml ) * npml ) / npml ** pmlp
 do i = 1, npml
   dampn = damp *   i ** pmlp
   dampc = damp * ( i ** pmlp + ( i - 1 ) ** pmlp ) / 2.

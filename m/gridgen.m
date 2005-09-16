@@ -2,16 +2,7 @@
 % GRIDGEN
 
 fprintf( 'Grid generation\n' )
-idown = 3;
-if inrm && inrm ~= idown
-  crdsys = [ 6 - idown - inrm inrm idown ];
-else
-  crdsys = [ idown+1:3 1:idown ];
-end
 
-l1 = ( nn(1) - 1 ) * dx;
-l2 = ( nn(2) - 1 ) * dx;
-l3 = ( nn(3) - 1 ) * dx;
 i1 = i1node;
 i2 = i2node;
 j1 = i1(1); j2 = i2(1);
@@ -21,19 +12,21 @@ l1 = i1(3); l2 = i2(3);
 ioper = [ 1 1 1  -1 -1 -1 ];
 rand( 'state', 0 )
 
+% Read grid files or creat basic rectangular mesh
 x(:) = 0.;
 if griddir
-  operator = 'g';
-  x(j1:j2,k1:k2,l1:l2,1) = bread( griddir, 'x1' );
-  x(j1:j2,k1:k2,l1:l2,2) = bread( griddir, 'x2' );
-  x(j1:j2,k1:k2,l1:l2,3) = bread( griddir, 'x3' );
+  oper = 'g';
+  endian = textread( 'data/endian', '%c', 1 );
+  x(j1:j2,k1:k2,l1:l2,1) = bread( 'data/x1', endian );
+  x(j1:j2,k1:k2,l1:l2,2) = bread( 'data/x2', endian );
+  x(j1:j2,k1:k2,l1:l2,3) = bread( 'data/x3', endian );
 else
   for i = j1:j2, x(i,:,:,1) = dx * ( i - 1 - nhalo ); end
   for i = k1:k2, x(:,i,:,2) = dx * ( i - 1 - nhalo ); end
   for i = l1:l2, x(:,:,i,3) = dx * ( i - 1 - nhalo ); end
-  if inrm
-    i = i0(inrm);
-    switch inrm
+  if ifn
+    i = i0(ifn);
+    switch ifn
     case 1, x(i+1:end,:,:) = x(i:end-1,:,:);
     case 2, x(:,i+1:end,:) = x(:,i:end-1,:);
     case 3, x(:,:,i+1:end) = x(:,:,i:end-1);
@@ -41,67 +34,86 @@ else
   end
 end
 
+% Coordinate system
+[ i, l ] = max( abs( upvector ) );
+if ~ifn | ifn == l
+  k = mod( l + 2, 3 ) + 1;
+else
+  k = ifn;
+end
+j = 6 - k - l;
+up = sign( upvector(l) );
+crdsys = [ j k l ];
+
+% Dimensions
+lj = x(j2,k2,l2,j);
+lk = x(j2,k2,l2,k);
+ll = x(j2,k2,l2,l);
+
+% Mesh models
 switch grid
 case ''
 case 'constant'
-  operator = 'h';
+  oper = 'h';
 case 'stretch'
-  operator = 'r';
-  x(:,:,:,3) = 2 * x(:,:,:,3);
+  oper = 'r';
+  x(:,:,:,l) = 2 * x(:,:,:,l);
 case 'slant'
-  operator = 'g';
+  oper = 'g';
   theta = 20 * pi / 180;
   scl = sqrt( cos( theta ) ^ 2 + ( 1 - sin( theta ) ) ^ 2 );
   scl = sqrt( 2 ) / scl
-  x(:,:,:,1) = x(:,:,:,1) - x(:,:,:,3) * sin( theta );
-  x(:,:,:,3) = x(:,:,:,3) * cos( theta );
-  x(:,:,:,1) = x(:,:,:,1) * scl;
-  x(:,:,:,3) = x(:,:,:,3) * scl;
+  x(:,:,:,j) = x(:,:,:,j) - x(:,:,:,l) * sin( theta );
+  x(:,:,:,l) = x(:,:,:,l) * cos( theta );
+  x(:,:,:,j) = x(:,:,:,j) * scl;
+  x(:,:,:,l) = x(:,:,:,l) * scl;
 case 'hill'
-  operator = 'g';
-  s1 = ( x(:,:,:,1) - l1/2 ) .^ 2 + ( x(:,:,:,2) - l2/2 ) .^ 2;
-  s1 = exp( -s1 / ( ( l1 + l2 ) / 10 ) ^ 2 );
-  x(:,:,:,3) = x(:,:,:,3) - .25 * ( l3 - x(:,:,:,3) ) .* s1;
+  oper = 'g';
+  s1 = ( x(:,:,:,j) - .5 * lj ) .^ 2 + ( x(:,:,:,k) - .5 * lk ) .^ 2;
+  s1 = exp( -s1 / ( ( lj + lk ) / 10 ) ^ 2 );
+  x(:,:,:,l) = x(:,:,:,l) - .25 * ( ll - x(:,:,:,l) ) .* s1;
 case 'normal'
-  operator = 'g';
-  c = 0.1 * l1;
-  s1 = x(:,:,:,3) / l3 - .5;
-  s2 = x(:,:,:,2) / l2 - .5;
-  x(:,:,:,2) = x(:,:,:,2) - c * s1 * 4 .* ( .5 - abs( s2 ) );
-  x(:,:,:,3) = x(:,:,:,3) + c * ( s1 - .5 ) .* atan( 10* s2 );
-  x(:,:,:,3) = x(:,:,:,3) - x(2,2,2,3);
+  oper = 'g';
+  c = 0.1 * lj;
+  s1 = x(:,:,:,l) / ll - .5;
+  s2 = x(:,:,:,k) / lk - .5;
+  x(:,:,:,k) = x(:,:,:,k) - c * s1 * 4. .* ( .5 - abs( s2 ) );
+  x(:,:,:,l) = x(:,:,:,l) + c * ( s1 - .5 ) .* atan( 10. * s2 );
+  x(:,:,:,l) = x(:,:,:,l) - x(2,2,2,3);
   x = 1.5 * x;
 case 'curve'
-  operator = 'g';
-  c = 0.1 * l1;
-  s1 = x(:,:,:,1) / l1;
-  s2 = x(:,:,:,2) / l2;
-  x(:,:,:,1) = s1 + c * sin( s2 * 2 * pi ) .* ( .5 - abs( s1 - .5 ) );
-  x(:,:,:,2) = s2 - c * sin( s1 * 2 * pi ) .* ( .5 - abs( s2 - .5 ) );
+  oper = 'g';
+  c = 0.1 * lj;
+  s1 = x(:,:,:,j) / lj;
+  s2 = x(:,:,:,k) / lk;
+  x(:,:,:,j) = s1 + c * sin( s2 * 2. * pi ) .* ( .5 - abs( s1 - .5 ) );
+  x(:,:,:,k) = s2 - c * sin( s1 * 2. * pi ) .* ( .5 - abs( s2 - .5 ) );
   x = 1.5 * x;
 case 'spherical'
-  operator = 'g';
-  da = pi / 2 / max( [ l1 l2 ] );
-  s1 = tan( ( x(:,:,:,1) - l1 / 2 ) * da );
-  s2 = tan( ( x(:,:,:,2) - l2 / 2 ) * da );
-  x(:,:,:,3) = ( 2 * l3 - x(:,:,:,3) ) ./ sqrt( 1 + s1 .* s1 + s2 .* s2 );
-  x(:,:,:,1) = - s1 .* x(:,:,:,3);
-  x(:,:,:,2) = - s2 .* x(:,:,:,3);
-  x(:,:,:,3) = x(:,:,:,3) - min( min( min( x(:,:,:,3) ) ) );
+  oper = 'g';
+  da = pi / 2. / max( [ lj lk ] );
+  s1 = tan( ( x(:,:,:,j) - lj / 2. ) * da );
+  s2 = tan( ( x(:,:,:,k) - lk / 2. ) * da );
+  x(:,:,:,l) = ( 2 * ll - x(:,:,:,l) ) ./ sqrt( 1 + s1 .* s1 + s2 .* s2 );
+  x(:,:,:,j) = - s1 .* x(:,:,:,l);
+  x(:,:,:,k) = - s2 .* x(:,:,:,l);
+  x(:,:,:,l) = x(:,:,:,l) - min( min( min( x(:,:,:,l) ) ) );
   x = 1.5 * x;
 case 'rand'
-  operator = 'g';
+  oper = 'g';
   w1 = .2 * ( rand( [ nm 3 ] ) - .5 );
   w1([2 end-1],:,:,1) = 0;
   w1(:,[2 end-1],:,2) = 0;
   w1(:,:,[2 end-1],3) = 0;
-  i = i0;
-  switch inrm
-  case 1, w1(i(1)+[0 1],:,:,1) = 0;
-  case 2, w1(:,i(2)+[0 1],:,2) = 0;
-  case 3, w1(:,:,i(3)+[0 1],3) = 0;
-  end
-  x = x(:,:,:,1) + w1;
+  j = i0(1);
+  k = i0(2);
+  l = i0(3);
+  switch ifn
+  case 1, w1(j+[0 1],:,:,1) = 0;
+  case 2, w1(:,k+[0 1],:,2) = 0;
+  case 3, w1(:,:,l+[0 1],3) = 0;
+  und
+  x = x + w1;
 otherwise error 'grid'
 end
 

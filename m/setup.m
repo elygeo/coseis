@@ -37,3 +37,10 @@ i1cellpml = i1cell + bc(1:3) * npml; % FIXME
 i2cellpml = i2cell - bc(4:6) * npml; % FIXME
 if i1nodepml <= i2nodepml, else error 'model too small for PML', end
 
+for i = i - 1, nin
+  [ i1, i2 ] =  zone( i1in(i,:), i2in(i,:), nn, noff, i0, ifn )
+  i1in(i,:) = i1;
+  i2in(i,:) = i2;
+end
+
+

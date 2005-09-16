@@ -35,7 +35,7 @@ hold on
 for i = 1 : length( tstitles ) - 1
   [ tmp, ii ] = max( abs( vg(:,i) ) );
   iii = max( 1, ii - 1 );
-  xg1 = .5 * double( time(ii) + time(iii) );
+  xg1 = .5 * double( tg(ii) + tg(iii) );
   xg2 = .5 * double( vg(ii,i) + vg(iii,i) );
   if xg2 > 0
     text( xg1, xg2, tstitles(i), 'Hor', 'right', 'Ver', 'bottom' )

@@ -5,15 +5,16 @@ module setup_m
 contains
 subroutine setup
 use globals_m
+use zone_m
 
 implicit none
 
 ip = 0
 nm = nn + 2 * nhalo
 nf = 0
-if( inrm /= 0 ) then
+if( ifn /= 0 ) then
   nf = nm
-  nf(inrm) = 1
+  nf(ifn) = 1
 end if
 i1node = nhalo + 1
 i2node = nhalo + nn
@@ -28,9 +29,17 @@ where ( bc(4:6) == 1 ) i2nodepml = i2node - npml
 where ( bc(1:3) == 1 ) i1cellpml = i1cell + npml
 where ( bc(4:6) == 1 ) i2cellpml = i2cell - npml
 
-where( i0 == 0 ) i0 = nn / 2 + mod( nn, 2 )
 noff = nhalo
-i0 = i0 + noff
+
+do i - 1, nin
+  call zone( i1in(i,:), i2in(i,:), nn, noff, i0, ifn )
+end do
+do i - 1, nout
+  call zone( i1out(i,:), i2out(i,:), nn, noff, i0, ifn )
+end do
+do i - 1, nlock
+  call zone( i1lock(i,:), i2lock(i,:), nn, noff, i0, ifn )
+end do
 
 end subroutine
 end module

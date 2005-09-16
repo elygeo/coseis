@@ -1,41 +1,62 @@
 #------------------------------------------------------------------------------#
 # SORD Defaults
 
-# np		2 1 3			# 6 processors
-  np		1 1 1			# no parallelization
-  n		41 41 41   40		# number of mesh nodes and timesteps
-  dx		100.			# spatial step size
-  dt		.007			# time step size
-# grid		read	mesh/		# read files: x1 x2 x3
-# grid		slant			# skewed mesh
-  grid		constant		# regular mesh
-# bc		1 1 1   1 1 1		# absorbing boundary on all sides
-  bc		1 1 0   1 1 1		# free surface at z=1
-# npml		0			# no PML damping
-  npml		10			# 10 PML nodes
-  viscosity	.0 .3			# stress (1) & hourglass (2)
-  hypocenter	0 0 0			# 0 = logical center
-# rsource	150.			# moment source radius (8 nodes)
-  rsource	-1.			# no moment source
-  srctimef	brune   .056		# source time fcn & dominant period
-  moment	1e16 1e16 1e16 0. 0. 0.	# explosion
-# faultnormal	0			# no fault
-  faultnormal	2			# constant y fault plane
-  vrup		3117.7			# nucleation rupture velocity .9*Vs
-  rcrit		1000.			# nucleation critical radius
-  nramp		10			# nucleation relaxation time steps
-# material	read	scecvm/		# read files: rho vp vs
-# friction	read	faultdata/	# read files: fs fd dc co
-# stress	read	faultdata/	# read files: xx yy zz yz zx xy
-# traction	read	faultdata/	# read files: tn ts td
-# material	267.  600.  346.41016	1 1 1  -1 -1 10   # surface layer
-  material	2670. 6000. 3464.1016	1 1 1  -1 -1 -1   # entire mesh
-  friction	.6 .5   .25 0.		1 1 1  -1 -1 -1   # entire mesh
-  stress	0. 0. 0. 0. 0. 0.	1 1 1  -1 -1 -1   # entire mesh
-  traction	-70e6  -120e6  0.	1 1 1  -1 -1 -1   # entire mesh
-# out v		10   1 1 1   -1 -1 -1	# write v every 10 steps
-# out us	-1   1 1 1   -1 -1 -1	# write final fault slip
-# checkpoint	0			# no checkpointing
-# checkpoint	100			# checkpoint every 100 steps
-  checkpoint	-1			# checkpoint before finishing
+# Wave model parameters
+  n		41 41 41   40			# nx ny nz   nt
+  dx		100.				# spatial step size
+  dt		.007				# time step size
+# grid		slant				# skewed mesh
+# grid		read				# read files: x1 x2 x3
+  grid		constant			# regular mesh
+  downward	3				# positive z is down
+  rho		2670.		1 1 1 -1 -1 -1	# density
+  vp		6000.		1 1 1 -1 -1 -1	# P-wave speed
+  vs		3464.1016	1 1 1 -1 -1 -1	# S-wave speed
+# vp		600.		1 1 1 10 -1 -1	# low velocity surface layer
+# vs		346.		1 1 1 10 -1 -1	# low velocity surface layer
+# lock		1 1 0		1 1 1 -1 -1 -1	# lock v1 & v2, v3 is free
+  viscosity	.0 .3				# stress (1) & hourglass (2)
+# npml		0				# no PML absorbing boundary
+  npml		10				# 10 PML nodes
+# bc		1 1 1   1 1 1			# absorbing on all sides
+  bc		1 1 1   1 1 0			# free surface at z=nz
+
+# Moment source parameters
+  hypocenter	2000. 2000. 2000.		#
+  moment	1e16 1e16 1e16 0. 0. 0.		# explosion
+  sourcetimefn	brune				# source time function
+  tsource	.056				# 8*dt dominant period
+# rsource	150.				# 8 node source radius
+  rsource	-1.				# no moment source
+
+# Fault parameters
+  hypocenter	2000. 2000. 2000.		# 
+# faultnormal	0				# no fault
+  faultnormal	2				# constant y fault plane
+  mus		.6		1 1 1 -1 -1 -1	# coef of static friction
+  mud		.5		1 1 1 -1 -1 -1	# coef of static friction
+  dc		.25		1 1 1 -1 -1 -1	# slip-weakening distance
+  cohesion	0.		1 1 1 -1 -1 -1	# cohesion
+  tnormal	-70e6		1 1 1 -1 -1 -1	# pretraction on near side
+  tstrike	-120e6		1 1 1 -1 -1 -1	# pretraction on near side
+  tdip		0.		1 1 1 -1 -1 -1	# pretraction on near side
+  upvector	0. 0. 1.			# for finding strike & dip
+# sxx		0.		1 1 1 -1 -1 -1	# prestress
+# syy		0.		1 1 1 -1 -1 -1	# prestress
+# szz		0.		1 1 1 -1 -1 -1	# prestress
+# syz		0.		1 1 1 -1 -1 -1	# prestress
+# szx		0.		1 1 1 -1 -1 -1	# prestress
+# sxy		0.		1 1 1 -1 -1 -1	# prestress
+  vrup		3117.7				# nucleation rupture velocity
+  rcrit		1000.				# nucleation critical radius
+  trelax	.07				# nucleation relaxation time
+
+# Code execution and output parameters
+# np		2 1 3				# 6 processors
+  np		1 1 1				# no parallelization
+# checkpoint	0				# no checkpointing
+# checkpoint	100				# checkpoint every 100 steps
+  checkpoint	-1				# checkpoint before finishing
+# out v		10		1 1 1 -1 -1 -1	# write v every 10 steps
+# out us	-1  		1 1 1 -1 -1 -1	# write final fault slip
 

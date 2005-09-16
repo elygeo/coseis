@@ -7,7 +7,7 @@ if init
 
 init = 0;
 fprintf( 'Moment source\n' )
-if rsource && exist( 'srctimef' ) && sum( abs( moment ) )
+if rsource && sum( abs( moment ) )
 else
   rsource = 0.;
   return
@@ -35,11 +35,11 @@ for i = 1:3
   w1(:,:,:,i) = w1(:,:,:,i) - x0(i);
 end
 
-% Find cells within rsource
+% Find cells within source radius
 s2 = rsource - sqrt( sum( w1 .* w1, 4 ) );
 imsrc = find( s2 > 0. );
 
-% Spatial weighting function
+% Weight by distance from hypocenter
 msrcv = s1( imsrc );
 msrcx = s2( imsrc );
 msrcx = msrcx / sum( msrcx ) ./ msrcv;
@@ -63,25 +63,12 @@ end
 
 %----------------------------------------------------------------------------%
 
-% time indexing goes wi vi wi+1 vi+1 ...
-if 0 % increment stress
-  time = ( it + .5 ) * dt;
-  switch srctimef
-  case 'delta',  msrcf = 0.; if it == 1, msrcf = 1. / dt; end
-  case 'brune',  msrcf = exp( -time / domp ) / domp ^ 2. * time;
-  case 'sbrune', msrcf = exp( -time / domp ) / domp ^ 3. * time * time / 2.;
-  otherwise error 'srctimef'
-  end
-  msrcf = dt * msrcf
-else % direct stress
-  time = it * dt;
-  switch srctimef
-  case 'delta',  msrcf = 1.; if it == 1, msrcf = 1.; end
-  case 'brune',  msrcf = 1. - exp( -time / domp ) / domp * ( time + domp );
-  case 'sbrune', msrcf = 1. - exp( -time / domp ) / domp * ...
-    ( time + domp + time * time / domp / 2. );
-  otherwise error 'srctimef'
-  end
+switch sourcetimefn
+case 'delta',  msrcf = 1.; if it == 1, msrcf = 1.; end
+case 'brune',  msrcf = 1. - exp( -t / tsource ) / tsource * ( t + tsource );
+case 'sbrune', msrcf = 1. - exp( -t / tsource ) / tsource * ...
+  ( t + tsource + t * t / tsource / 2. );
+otherwise error 'sourcetimefn'
 end
 
 o = prod( nm );

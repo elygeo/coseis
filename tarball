@@ -10,6 +10,7 @@ files="
   VERSION
   tarball
   sord
+  sord.m
   defaults
   in
   infiles/

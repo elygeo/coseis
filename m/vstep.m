@@ -8,16 +8,15 @@ s2(:) = 0.;
 for ic = 1:3
 for id = [ ic:3 1:ic-1 ];
   ix = 6 - ic - id;
-  for iz = 1:size( operator, 1 )
-    [ i1, i2 ] = zone( ioper(iz,:), nn, noff, i0, inrm );
-    op = operator(iz);
+  for iz = 1:size( oper, 1 )
+    [ i1, i2 ] = zone( i1oper(iz,:), i2oper(iz,:), nn, noff, i0, inrm );
     j = i1(1):i2(1);
     k = i1(2):i2(2);
     l = i1(3):i2(3);
     if ic == id
-      s2(j,k,l) = dfcn( op, w1, x, dx, ic, id, j, k, l );
+      s2(j,k,l) = dfcn( oper(iz), w1, x, dx, ic, id, j, k, l );
     else
-      s2(j,k,l) = dfcn( op, w2, x, dx, ix, id, j, k, l );
+      s2(j,k,l) = dfcn( oper(iz), w2, x, dx, ix, id, j, k, l );
     end
   end
   i1 = i1node;
@@ -100,7 +99,8 @@ for iz = 1:size( locknodes, 1 )
   w1(j,k,l,i) = 0;
 end
 
-% Update velocity
+% Time integration
+t = t + dt / 2.;
 v = v + dt * w1;
 
 % Magnitudes

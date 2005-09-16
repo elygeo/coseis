@@ -66,10 +66,8 @@ xxhair = double( xga(:)' );
 mga = [];
 vga = [];
 msg = '';
-time = it * dt;
 switch field
 case 'vs'
-  time = ( it + .5 ) * dt;
   i = [ j k l ];
   if inrm, i(inrm) = 1; end
   j = i(1); k = i(2); l = i(3);
@@ -77,7 +75,7 @@ case 'vs'
 case 'us'
   i = [ j k l ];
   if inrm, i(inrm) = 1; end
-  tmp = [ us(j,k,l) fd(j,k,l) fs(j,k,l), dc(j,k,l) co(j,k,l) ];
+  j = i(1); k = i(2); l = i(3);
   msg = sprintf( 'Us %9.2e', us(j,k,l) );
 case 'a'
   if pass ~= 'w'
@@ -86,7 +84,6 @@ case 'a'
     msg = sprintf( '|A| %9.2e\nAx  %9.2e\nAy  %9.2e\nAz  %9.2e', [ mga vga ] );
   end
 case 'v'
-  time = ( it + .5 ) * dt;
   vga(1:3) = v(j,k,l,:);
   mga = sqrt( sum( vga .* vga ) );
   msg = sprintf( '|V| %9.2e\nVx  %9.2e\nVy  %9.2e\nVz  %9.2e', [ mga vga ] );
@@ -114,7 +111,7 @@ otherwise error 'field'
 end
 set( gcf, 'CurrentAxes', haxes(2) )
 hhud = text( .02, .98, msg, 'Hor', 'left', 'Ver', 'top' );
-tmp = [ it ixhair-noff; time xg ];
+tmp = [ it ixhair-noff; t xg ];
 msg = sprintf( '%4d %8.3fs\n%4d %8.1fm\n%4d %8.1fm\n%4d %8.1fm', tmp );
 hhud(2) = text( .98, .98, msg, 'Hor', 'right', 'Ver', 'top' );
 msg = 'Explore';

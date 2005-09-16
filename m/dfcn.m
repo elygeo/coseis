@@ -1,9 +1,9 @@
 %------------------------------------------------------------------------------%
 % DFCN - difference operator, cell to node
 
-function df = dfcn( operator, f, x, dx, i, a, j, k, l )
+function df = dfcn( oper, f, x, dx, i, a, j, k, l )
 
-switch operator
+switch oper
 
 case 'h' % constant grid, flops: 1* 7+
 
@@ -102,6 +102,6 @@ df = 1 / 12 * ...
  +x(j,k-1,l+1,c).*(x(j,k-1,l,b)-x(j,k,l+1,b)).*(f(j-1,k-1,l,i)-f(j,k-1,l,i)) ...
  +x(j,k+1,l-1,c).*(x(j,k+1,l,b)-x(j,k,l-1,b)).*(f(j-1,k,l-1,i)-f(j,k,l-1,i)));
 
-otherwise error 'operator'
+otherwise error 'oper'
 
 end

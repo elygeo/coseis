@@ -10,7 +10,7 @@ if init
   w2(:) = 0.;
   if itcheck < 0, itcheck = nt + itcheck + 1; end
   if exist( 'out/ckp.mat', 'file' )
-    load out/ckp
+    load 'out/ckp'
     if any( size( mr ) ~= nm ), error 'Checkpoint', end
     fprintf( 'Checkpoint found, starting from step %g\n', it )
   else
@@ -34,7 +34,7 @@ if init
   wt = mem / 7000000;
   fprintf( 'RAM usage: %.0fMb\n', ram )
   fprintf( 'Run time: at least %s\n', datestr( nt * wt / 3600 / 24, 13 ) )
-  fprintf('  Step  Amax        Vmax        Umax        Compute     I/O/Viz\n')
+  fprintf('Time      Amax        Vmax        Umax        Compute     I/O/Viz\n')
   tic
   return
 end
@@ -62,13 +62,13 @@ for iz = 1:size( itout, 1 )
   case 'trup', isfault = 1;
   otherwise error( [ 'outvar: ' outvar{iz} ] )
   end
-  if isfault & ~inrm; itout(iz) = 0; end
+  if isfault & ~ifn; itout(iz) = 0; end
   if onpass ~= pass, continue, end
-  [ i1, i2 ] = zone( iout(iz,:), nn, noff, i0, inrm );
+  [ i1, i2 ] = zone( i1out(iz,:), i2out(iz,:), nn, noff, i0, ifn );
   if cell; i2 = i2 - 1; end
   if isfault
-    i1(inrm) = 1;
-    i2(inrm) = 1;
+    i1(ifn) = 1;
+    i2(ifn) = 1;
   end
   l = i1(3):i2(3);
   k = i1(2):i2(2);
@@ -99,12 +99,12 @@ for iz = 1:size( itout, 1 )
   i1 = i1 - noff;
   i2 = i2 - noff;
   if isfault
-    i1(inrm) = 1;
-    i2(inrm) = 1;
+    i1(ifn) = 1;
+    i2(ifn) = 1;
   end
   file = sprintf( 'out/%02d/hdr', iz );
   fid = fopen( file, 'w' );
-  fprintf( fid, '%g ', [ nc i1 i2 itout(iz) it dt dx ] );
+  fprintf( fid, '%g ', [ nc i1 i2 itout(iz) it t dx ] );
   fprintf( fid, '%s\n', outvar{iz} );
   fclose( fid );
 end
@@ -112,7 +112,7 @@ end
 if pass == 'w', return, end
 
 if itcheck & ~mod( it, itcheck )
-  save out/ckp it u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 vs us trup
+  save 'out/ckp' it t u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 vs us trup
 end
 
 fid = fopen( 'out/timestep', 'w' );
@@ -123,11 +123,10 @@ wt(4) = toc;
 
 file = sprintf( 'out/stats/%06d', it );
 fid = fopen( file, 'w' );
-fprintf( fid, '%15.7e', [ amax vmax umax wmax vsmax usmax wt ] );
+fprintf( fid, '%15.7e', [ t amax vmax umax wmax vsmax usmax wt ] );
 fprintf( fid, '\n' );
 fclose( fid );
 
-fprintf( '%6d', it )
-fprintf( '%12.4e', [ amax vmax umax wt(1:2) + wt(3:4) ] )
+fprintf( '%12.4e', [ t amax vmax umax wt(1:2) + wt(3:4) ] )
 fprintf( '\n' )
 

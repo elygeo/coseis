@@ -7,13 +7,13 @@ subroutine wstep
 use globals_m
 use momentsrc_m
 use dfnc_m
-use zone_m
 
 implicit none
-integer :: ic, id, ix, iz
+integer :: i, j, k, l, ic, id, ix, iz
 
-! Update displacement & slip
-u = u + dt * v
+! Time integration
+t  = t  + .5 * dt
+u  = u  + dt * v
 us = us + dt * vs
 
 ! Gradient
