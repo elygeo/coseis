@@ -16,7 +16,7 @@ for iz = 1:size( glyphs, 1 )
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
-  switch field
+  switch vizfield
   case 'a'
     ii = find( s1(j,k,l) > minmag );
     if ii

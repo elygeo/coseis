@@ -207,6 +207,7 @@ d0 =~ (3 or 4)*dx*(Tu - Tf)/mu
 KOSTROV SOLUTION
 
 Kostrov, 1964
+Day, 1982, p 717
 
 Circular crack expanding at a uniform rupture velocity
 
@@ -283,19 +284,29 @@ A = dQ/h^3/rho
 
 MOMENT SOURCE
 
-del2phi - phi''/vp^2 = - 4*pi*delta(r)f(t)
-phi = -f(t - t/vp)/r
+del^2*phi - phi'' / vp^2  =  -4*pi*delta(r) * f(t)
+phi  =  -f(t-r/vp) / r
+U    =  del*phi   =  f(t-r/vp)  / r^2  +  f'(t-r/vp)  / r/vp
+V    =  del*phi'  =  f'(t-r/vp) / r^2  +  f''(t-r/vp) / r/vp
+M    =  -4 * pi * rho * vp^2 * f
 
 Brune Source
 M   = -H * M0 * e^(-t/T) / T   * (t + T) + M0
 M'  =  H * M0 * e^(-t/T) / T^2 *  t
 M'' = -H * M0 * e^(-t/T) / T^3 * (t - T)
 
+       H * M0 * e^(-t/T) * ( t*vp/r - t/T + 1 )
+V   =  ----------------------------------------
+       4 * pi * rho * vp^2 * T^2 * r * vp
+
 Smooth Brune
 M   = -H * M0 * e^(-t/t) / T^2 / 2 * (t^2 + 2*t*T + 2*T^2) + M0
 M'  =  H * M0 * e^(-t/t) / T^3 / 2 *  t^2
 M'' = -H * M0 * e^(-t/t) / T^4 / 2 * (t^2 - 2*t*T)
 
+       H * M0 * e^(-t/T) * ( t*vp/r - t/T + 2 ) * t
+V   =  ----------------------------------------
+       8 * pi * rho * vp^2 * T^3 * r * vp
 
 
 PML ABSORBING BOUNDARY
@@ -388,4 +399,6 @@ COURANT STABILITY CONDITION
   W = lam*trace(E)*I + 2*mu*E
 
   mu  = rho * vs^2
-  lam = rho * ( vp^2 - 2vs^2 )
+  lam = rho * ( vp^2 - 2*vs^2 )
+
+

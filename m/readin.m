@@ -4,9 +4,10 @@
 plotstyle = '';
 plotstyle = 'slice';
 truptol = .001;
-lock      = []; ilock   = [];
-outvar    = {}; iout    = []; itout = [];
-grid      = ''; griddir = '';
+inkey   = {}; i1in    = []; i2in   = []; inval = [];
+outkey  = {}; i1out   = []; i2out  = []; ditout = [];
+lock    = []; i1lock  = []; i2lock = [];
+grid    = '';
 
 for file = { 'defaults' 'in' }
 
@@ -60,22 +61,25 @@ for i = 1:length( in )
   case 'vrup',         vrup         = strread( str, '%f' )';
   case 'rcrit',        rcrit        = strread( str, '%f' )';
   case 'trelax',       trelax       = strread( str, '%f' )';
+  case 'truptol',      truptol      = strread( str, '%f' )';
   case 'np',           np           = strread( str, '%u' );
   case 'checkpoint',   itcheck      = strread( str, '%u' )';
-  case 'out',          [ key, str ] = strtok( str );
-    val            = strread( str, '%u' )';
-    outkey{end+1}  = key;
-    itout(end+1,:) = val(1);
-    i1out(end+1,:) = val(2:4);
-    i2out(end+1,:) = val(5:7);
+  case 'out'
+    [ key, str ] = strtok( str );
+    val = strread( str, '%u' )';
+    outkey{end+1}   = key;
+    ditout(end+1,:) = val(1);
+    i1out(end+1,:)  = val(2:4);
+    i2out(end+1,:)  = val(5:7);
   otherwise error( in{i} )
   end
   if inzone
     [ key, str ]  = strtok( str );
-    val           = strread( str, '%u' )';
+    val = strread( str, '%u' )';
     inkey{end+1}  = key;
-    i1in(end+1,:) = val(1:3);
-    i2in(end+1,:) = val(4:6);
+    inval(end+1)  = val(1);
+    i1in(end+1,:) = val(2:4);
+    i2in(end+1,:) = val(5:7);
   end
 end
 

@@ -6,10 +6,12 @@
 % F = divS                               non PML region (D=0)
 s2(:) = 0.;
 for ic = 1:3
-for id = [ ic:3 1:ic-1 ];
+for iid = 1:3
+  id = mod( ic + iid - 2, 3 ) + 1;
   ix = 6 - ic - id;
   for iz = 1:size( oper, 1 )
-    [ i1, i2 ] = zone( i1oper(iz,:), i2oper(iz,:), nn, noff, i0, inrm );
+    i1 = max( i1oper(iz,:), i1node );
+    i2 = min( i2oper(iz,:), i2node );
     j = i1(1):i2(1);
     k = i1(2):i2(2);
     l = i1(3):i2(3);
@@ -25,27 +27,33 @@ for id = [ ic:3 1:ic-1 ];
   k = i1(2):i2(2);
   j = i1(1):i2(1);
   for i = 1:npml
-    if id == 1 && bc(1), ji = i1(1) + i - 1;
+    if id == 1 && bc1(1) == 1
+      ji = i1(1) + i - 1;
       s2(ji,k,l) = dn2(i) * s2(ji,k,l) + dn1(i) * p1(i,k,l,ic);
       p1(i,k,l,ic) = p1(i,k,l,ic) + dt * s2(ji,k,l);
     end
-    if id == 1 && bc(4), ji = i2(1) - i + 1;
+    if id == 1 && bc2(1) == 1
+      ji = i2(1) - i + 1;
       s2(ji,k,l) = dn2(i) * s2(ji,k,l) + dn1(i) * p4(i,k,l,ic);
       p4(i,k,l,ic) = p4(i,k,l,ic) + dt * s2(ji,k,l);
     end
-    if id == 2 && bc(2), ki = i1(2) + i - 1;
+    if id == 2 && bc1(2) == 1
+      ki = i1(2) + i - 1;
       s2(j,ki,l) = dn2(i) * s2(j,ki,l) + dn1(i) * p2(j,i,l,ic);
       p2(j,i,l,ic) = p2(j,i,l,ic) + dt * s2(j,ki,l);
     end
-    if id == 2 && bc(5), ki = i2(2) - i + 1;
+    if id == 2 && bc2(2) == 1
+      ki = i2(2) - i + 1;
       s2(j,ki,l) = dn2(i) * s2(j,ki,l) + dn1(i) * p5(j,i,l,ic);
       p5(j,i,l,ic) = p5(j,i,l,ic) + dt * s2(j,ki,l);
     end
-    if id == 3 && bc(3), li = i1(3) + i - 1;
+    if id == 3 && bc1(3) == 1
+      li = i1(3) + i - 1;
       s2(j,k,li) = dn2(i) * s2(j,k,li) + dn1(i) * p3(j,k,i,ic);
       p3(j,k,i,ic) = p3(j,k,i,ic) + dt * s2(j,k,li);
     end
-    if id == 3 && bc(6), li = i2(3) - i + 1;
+    if id == 3 && bc2(3) == 1
+      li = i2(3) - i + 1;
       s2(j,k,li) = dn2(i) * s2(j,k,li) + dn1(i) * p6(j,k,i,ic);
       p6(j,k,i,ic) = p6(j,k,i,ic) + dt * s2(j,k,li);
     end
@@ -90,17 +98,18 @@ end
 fault
 
 % Locked nodes
-for iz = 1:size( locknodes, 1 )
-  [ i1, i2 ] = zone( ilock(iz,:), nn, noff, i0, inrm );
-  i = locknodes(iz,:) == 1;
+for iz = 1:size( lock, 1 )
+  i1 = max( i1lock(iz,), i2node );
+  i2 = min( i2lock(iz,), i2node );
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
-  w1(j,k,l,i) = 0;
+  i = lock(iz,:) == 1;
+  w1(j,k,l,i) = 0.;
 end
 
 % Time integration
-t = t + dt / 2.;
+t = t + .5 * dt;
 v = v + dt * w1;
 
 % Magnitudes

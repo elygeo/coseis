@@ -13,7 +13,7 @@ logical :: init = .true.
 integer, allocatable :: jj(:), kk(:), ll(:)
 real, allocatable :: srcfr(:)
 integer :: i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc, ic, eiginfo, i1(3), i2(3)
-real :: srcft, m0, mm(3,3), eigval(3), eigwork(8)
+real :: srcft, m0, mw, d, mm(3,3), eigval(3), eigwork(8)
 
 if ( rsource <= 0. ) return
 
@@ -22,6 +22,7 @@ ifinit: if ( init ) then
 init = .false.
 if ( ip == 0 ) print '(a)', 'Moment source'
 
+! Indices
 i1 = i1cell
 i2 = i2cell
 j1 = i1(1); j2 = i2(1)
@@ -47,14 +48,13 @@ do i = 1, 3
   w1(:,:,:,i) = w1(:,:,:,i) - xsource(i)
 end do
 s2 = sqrt( sum( w1 * w1, 4 ) )
-isrc = minloc( s2 )
 nsrc = count( s2 <= rsource )
 allocate( srcfr(nrsc), jj(nsrc), kk(nsrc), ll(nsrc) ) 
 
 ! Spatial weighting
 select case( spacefn )
 case( 'box'  ); srcfr = 1.
-case( 'tent' ); srcfr = pack( s2, s2 <= rsource )
+case( 'tent' ); srcfr = rsource - pack( s2, s2 <= rsource )
 case default; stop 'spacefn'
 end select
 
@@ -79,8 +79,8 @@ end do
 s1 = 0.
 s2 = 0.
 
-! Print some info, requires LAPACK for eigenvalue calculation
-if ( all( isrc >= i1node .and. isrc <= i2node ) ) then
+! Metadata, requires LAPACK for eigenvalue calculation
+if ( all( ihypo >= i1node .and. ihypo <= i2node ) ) then
   mm(1,1) = moment1(1)
   mm(2,2) = moment1(2)
   mm(3,3) = moment1(3)
@@ -89,13 +89,23 @@ if ( all( isrc >= i1node .and. isrc <= i2node ) ) then
   mm(1,2) = moment2(3)
   call ssyev( 'N', 'U', 3, mm, 3, eigval, eigwork, size(eigwork), eiginfo )
   m0 = maxval( abs( eigval ) )
-  j = isrc(1)
-  k = isrc(2)
-  l = isrc(3)
-  mu0 = mu(j,k,l) * s1(j,k,l)
-  print '(a,es12.4)', '  M0:', m0
-  print '(a,es12.4)', '  Mw:', 2. / 3. * log10( m0 ) - 10.7
-  print '(a,es12.4)', '  D: ', m0 / mu0 / dx / dx
+  mw = 2. / 3. * log10( m0 ) - 10.7
+  d = m0 / ( rho * vs * vs * dx * dx )
+  open(  9, file='out/sourcemeta.m', status='new' )
+  write( 9, * ) 'xsource = [ ', xsource,         ' ];'
+  write( 9, * ) 'rsource = ',   rsource,           ';'
+  write( 9, * ) 'tsource = ',   tsource,           ';'
+  write( 9, * ) 'spacefn = ''', trim( spacefn ), ''';'
+  write( 9, * ) 'timefn  = ''', trim( timefn ),  ''';'
+  write( 9, * ) 'moment1 = [ ', moment1,         ' ];'
+  write( 9, * ) 'moment2 = [ ', moment2,         ' ];'
+  write( 9, * ) 'rho     = ',   rho,               ';'
+  write( 9, * ) 'vp      = ',   vp,                ';'
+  write( 9, * ) 'vs      = ',   vs,                ';'
+  write( 9, * ) 'm0      = ',   m0,                ';'
+  write( 9, * ) 'mw      = ',   mw,                ';'
+  write( 9, * ) 'd       = ',   d,                 ';'
+  close( 9 )
 end if
 
 return
@@ -104,6 +114,7 @@ end if ifinit
 
 !------------------------------------------------------------------------------!
 
+! Source time function
 select case( timefn )
 case( 'delta'  ); srct = 1.; if ( it == 1 ) srcft = 1.
 case( 'brune'  ); srct = 1. - exp( -t / tsource ) / tsource * ( t + tsource )
@@ -112,6 +123,7 @@ case( 'sbrune' ); srct = 1. - exp( -t / tsource ) / tsource * &
 case default; stop 'timefn'
 end select
 
+! Add to stress variables
 do ic = 1, 3
 do i = 1, nsrc
   j = jj(i)

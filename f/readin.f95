@@ -77,21 +77,21 @@ doline: do
   case( 'out' );
     nout = nout + 1
     i = nout
-    read( str, * ) key1, outkey(i), itout(i), i1out(i,:), i2out(i,:)
+    read( str, * ) key1, fieldout(i), ditout(i), i1out(i,:), i2out(i,:)
   case default; print '(2a)', 'Bad input: ', trim( str ); stop
   end select selectkey
   if ( inzone ) 
     nin = nin + 1
     i = nin
     if ( key2 == 'read' ) then
-      readfile(nin) = .true.
+      in_readfile(nin) = .true.
     else
       readfile(nin) = .false.
-      read( str, * ) inkey(i), inval(i), i1in(i,:), i2in(i,:)
+      read( str, * ) fieldin(i), valin(i), i1in(i,:), i2in(i,:)
       if ( err /= 0 ) then
         i1in(nz,:) = 1
         i2in(nz,:) = -1
-        read( str, *, iostat=err ) inkey(i), inval(i)
+        read( str, *, iostat=err ) fieldin(i), valin(i)
       end if
     end if
   end if

@@ -16,7 +16,7 @@ end
 if dosurf, facecolor = 'flat';
 else       facecolor = 'none';
 end
-switch field
+switch vizfield
 case { 'vs', 'us', 'tn', 'ts' }
   i1 = i1node;
   i2 = i2node;
@@ -31,7 +31,7 @@ case { 'vs', 'us', 'tn', 'ts' }
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
-  switch field
+  switch vizfield
   case 'vs', vg = vs(j,k,l);
   case 'us', vg = us(j,k,l);
   case 'tn', vg = tn(j,k,l);
@@ -67,7 +67,7 @@ case { 'a', 'v', 'u', 'mr' }
     ng = i2 - i1 + 1;
     if sum( ng > 1 ) == 2
       xg = x(j,k,l,:) + xscl * u(j,k,l,:); 
-      switch field
+      switch vizfield
       case 'mr',  vg = mr(j,k,l);
       case 'a'
         if comp, vg = w1(j,k,l,comp); 
@@ -81,7 +81,7 @@ case { 'a', 'v', 'u', 'mr' }
         if comp, vg = u(j,k,l,comp); 
         else     vg = s1(j,k,l);
         end
-      otherwise error 'field'
+      otherwise error 'vizfield'
       end
       xg = squeeze( xg );
       vg = squeeze( vg );

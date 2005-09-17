@@ -3,46 +3,47 @@
 
 fprintf( 'Grid generation\n' )
 
-i1 = i1node;
-i2 = i2node;
+% Indices
+i1 = i1cell;
+i2 = i2cell + 1;
 j1 = i1(1); j2 = i2(1);
 k1 = i1(2); k2 = i2(2);
 l1 = i1(3); l2 = i2(3);
-
-ioper = [ 1 1 1  -1 -1 -1 ];
-rand( 'state', 0 )
+i1oper = [ 1 1 1 ];
+i2oper = [ -1 -1 -1 ];
 
 % Read grid files or creat basic rectangular mesh
 x(:) = 0.;
-if griddir
+switch grid
+case 'read'
   oper = 'g';
   endian = textread( 'data/endian', '%c', 1 );
   x(j1:j2,k1:k2,l1:l2,1) = bread( 'data/x1', endian );
   x(j1:j2,k1:k2,l1:l2,2) = bread( 'data/x2', endian );
   x(j1:j2,k1:k2,l1:l2,3) = bread( 'data/x3', endian );
-else
-  for i = j1:j2, x(i,:,:,1) = dx * ( i - 1 - nhalo ); end
-  for i = k1:k2, x(:,i,:,2) = dx * ( i - 1 - nhalo ); end
-  for i = l1:l2, x(:,:,i,3) = dx * ( i - 1 - nhalo ); end
+otherwise
+  for i = j1:j2, x(i,:,:,1) = dx * ( i - 1 - noff(1) ); end
+  for i = k1:k2, x(:,i,:,2) = dx * ( i - 1 - noff(2) ); end
+  for i = l1:l2, x(:,:,i,3) = dx * ( i - 1 - noff(3) ); end
   if ifn
-    i = i0(ifn);
+    i = ihypo(ifn);
     switch ifn
-    case 1, x(i+1:end,:,:) = x(i:end-1,:,:);
-    case 2, x(:,i+1:end,:) = x(:,i:end-1,:);
-    case 3, x(:,:,i+1:end) = x(:,:,i:end-1);
+    case 1, x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:);
+    case 2, x(:,i+1:k2,:,:) = x(:,i:k2-1,:,:);
+    case 3, x(:,:,i+1:l2,:) = x(:,:,i:l2-1,:);
     end
   end
 end
 
 % Coordinate system
-[ i, l ] = max( abs( upvector ) );
+l = abs( upward );
+up = sign( upward );
 if ~ifn | ifn == l
-  k = mod( l + 2, 3 ) + 1;
+  k = mod( l + 1, 3 ) + 1;
 else
   k = ifn;
 end
 j = 6 - k - l;
-up = sign( upvector(l) );
 crdsys = [ j k l ];
 
 % Dimensions
@@ -52,7 +53,7 @@ ll = x(j2,k2,l2,l);
 
 % Mesh models
 switch grid
-case ''
+case 'read'
 case 'constant'
   oper = 'h';
 case 'stretch'
@@ -102,30 +103,37 @@ case 'spherical'
 case 'rand'
   oper = 'g';
   w1 = .2 * ( rand( [ nm 3 ] ) - .5 );
-  w1([2 end-1],:,:,1) = 0;
-  w1(:,[2 end-1],:,2) = 0;
-  w1(:,:,[2 end-1],3) = 0;
-  j = i0(1);
-  k = i0(2);
-  l = i0(3);
+  w1(j1,:,:,1) = 0.; w1(j2,:,:,1) = 0.;
+  w1(:,k1,:,2) = 0.; w1(:,k2,:,2) = 0.;
+  w1(:,:,l1,3) = 0.; w1(:,:,l2,3) = 0.;
+  j = ihypo(1);
+  k = ihypo(2);
+  l = ihypo(3);
   switch ifn
-  case 1, w1(j+[0 1],:,:,1) = 0;
-  case 2, w1(:,k+[0 1],:,2) = 0;
-  case 3, w1(:,:,l+[0 1],3) = 0;
-  und
+  case 1, w1(j,:,:,1) = 0.; w1(j+1,:,:,1) = 0.;
+  case 2, w1(:,k,:,2) = 0.; w1(:,k+1,:,2) = 0.;
+  case 3, w1(:,:,k,3) = 0.; w1(:,:,k+1,3) = 0.;
+  end
   x = x + w1;
 otherwise error 'grid'
 end
 
 % Duplicate edge nodes into halo
-x([1 end],:,:,:) = x([2 end-1],:,:,:);
-x(:,[1 end],:,:) = x(:,[2 end-1],:,:);
-x(:,:,[1 end],:) = x(:,:,[2 end-1],:);
+if( bc1(1) ~= -1 ) x(j1-1,:,:,:) = x(j1,:,:,:)
+if( bc2(1) ~= -1 ) x(j2+1,:,:,:) = x(j2,:,:,:)
+if( bc1(2) ~= -1 ) x(:,j1-1,:,:) = x(:,j1,:,:)
+if( bc2(2) ~= -1 ) x(:,k2+1,:,:) = x(:,k2,:,:)
+if( bc1(3) ~= -1 ) x(:,:,j1-1,:) = x(:,:,j1,:)
+if( bc2(3) ~= -1 ) x(:,:,l2+1,:) = x(:,:,l2,:)
 
-% hypocenter location
-x0 = x(i0(1),i0(2),i0(3),:);
-x0 = x0(:)';
+% Hypocenter location
+j = ihypo(1);
+k = ihypo(2);
+l = ihypo(3);
+xhypo = x(j,k,l,:);
+xhypo = xhypo(:)';
 
+% Grid dimensions
 x1 = min( reshape( x, [ prod( nm ) 3 ] ) );
 x2 = max( reshape( x, [ prod( nm ) 3 ] ) );
 xcenter = double( x1 + x2 ) / 2;

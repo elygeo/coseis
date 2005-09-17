@@ -94,7 +94,7 @@ wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
 echo "RAM usage: at least ${ram}Mb"
 echo "Run time: at least $wt"
 
-cat << END > out/meta
+cat << END > out/meta.run
 login:   $LOGNAME
 name:    $( finger $LOGNAME | sed -n 's/^.*e: //p' )
 date:    $( date )

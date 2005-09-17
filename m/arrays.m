@@ -47,8 +47,8 @@ trup = f1;                       % **rupture time
 
 i1 = [ 0 0 0 ];
 i2 = [ 0 0 0 ];
-i = bc(1:3) == 1; i1(i) = npml;
-i = bc(4:6) == 1; i2(i) = npml;
+i = bc1 == 1; i1(i) = npml;
+i = bc2 == 1; i2(i) = npml;
 nj1 = [ nm 3 ]; nj1(1) = i1(1);
 nj2 = [ nm 3 ]; nj2(1) = i2(1);
 nk1 = [ nm 3 ]; nk1(2) = i1(2);

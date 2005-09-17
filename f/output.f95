@@ -11,13 +11,16 @@ implicit none
 save
 character, intent(in) :: pass
 character :: onpass
-integer :: iz, nc, reclen, wt_rate, hh, mm, ss, n(3), err, it0
+integer :: iz, nc, reclen, wt_rate, hh, mm, ss, n(3), err
 real :: dwt(4)
+character :: endian
 character(160) :: str
 logical :: fault, cell, static, init = .true., test
 
 ifinit: if ( init ) then
   init = .false.
+  endian = 'l'
+  if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
   if ( itcheck < 0 ) itcheck = itcheck + nt + 1
   if ( it == 0 ) then
     if ( ip == 0 ) then
@@ -27,18 +30,19 @@ ifinit: if ( init ) then
         stop
       end if
       print '(a)', 'Initialize output'
-      open(  9, file='out/xhypo', status='new' )
-      write( 9, * ) xhypo
-      close( 9 )
-      open(  9, file='out/xsource', status='new' )
-      write( 9, * ) xsource
-      close( 9 )
       call system( 'mkdir out/ckp' )
       call system( 'mkdir out/stats' )
       do iz = 1, nout
         write( str, '(a,i2.2)' ) 'out/', iz
         call system( 'mkdir ' // str )
       end do
+      write( str, '(a,i2.2,a)' ) 'out/meta.m'
+      open(  9, file=str, status='new' )
+      write( 9, * ) 'n      = [ ', nn, nt  ' ];'
+      write( 9, * ) 'dx     =   ', dx        ';'
+      write( 9, * ) 'upward =   ', upward,   ';'
+      write( 9, * ) 'nout   =   ', nout,     ';'
+      close( 9 )
     end if
   else
     if ( ip == 0 ) print '(a,i6)', 'Checkpoint found, starting from step ', it
@@ -66,14 +70,14 @@ end if ifinit
 
 doiz: do iz = 1, nout
 
-if ( itout(iz) < 0 ) itout(iz) = nt + itout(iz) + 1
-if ( itout(iz) == 0 .or. mod( it, itout(iz) ) /= 0 ) cycle doiz
+if ( out_dit(iz) < 0 ) out_dit(iz) = nt + out_dit(iz) + 1
+if ( out_dit(iz) == 0 .or. mod( it, out_dit(iz) ) /= 0 ) cycle doiz
 nc = 1
 onpass = 'v'
 cell = .false.
 fault = .false.
 static = .false.
-select case( outvar(iz) )
+select case( out_field(iz) )
 case( 'x'    ); static = .true.; nc = 3
 case( 'a'    ); nc = 3
 case( 'v'    ); nc = 3
@@ -83,35 +87,45 @@ case( 'am'   )
 case( 'vm'   )
 case( 'um'   ); onpass = 'w'; 
 case( 'wm'   ); onpass = 'w'; cell = .true.
-case( 'vs'   ); fault = .true.
-case( 'us'   ); fault = .true.
+case( 'sv'   ); fault = .true.
+case( 'sl'   ); fault = .true.
 case( 'trup' ); fault = .true.
 case default; stop 'var'
 end select
 if ( fault .and. ifn == 0 ) then
-  itout(iz) = 0
+  out_dit(iz) = 0
   cycle doiz
 end if
 if ( onpass /= pass ) cycle doiz
-if ( static ) itout(iz) = 0
-i1 = i1out(iz,:)
-i2 = i2out(iz,:)
+if ( static ) out_dit(iz) = 0
+i1 = out_i1(iz,:)
+i2 = out_i2(iz,:)
 if ( cell ) i2 = i2 - 1
 if ( any( i2 < i1 ) ) stop 'out range'
+
+! Metadata
 if ( ip == 0 ) then
-  write( str, '(a,i2.2,a)' ) 'out/', iz, '/hdr'
+  write( str, '(a,i2.2,a)' ) 'out/', iz, '/outmeta.m'
   open(  9, file=str, status='replace' )
-  write( 9, * ) nc, i1-noff, i2-noff, itout(iz), it, t, dx
-  write( 9, * ) outvar(iz)
+  write( 9, * ) 'field.name = ''', fieldout(iz), ''';'
+  write( 9, * ) 'field.nc   =   ', nc,             ';'
+  write( 9, * ) 'field.i1   = [ ', i1 - noff,    ' ];'
+  write( 9, * ) 'field.i2   = [ ', i2 - noff,    ' ];'
+  write( 9, * ) 'field.itfield   =   ', it,             ';'
+  write( 9, * ) 'field.dit  =   ', ditout(iz),     ';'
+  write( 9, * ) 'field.tfield    =   ', t,              ';'
   close( 9 )
 end if
+
 if ( fault ) then
   i1(ifn) = 1
   i2(ifn) = 1
 end if
+
+! Binary output
 do i = 1, nc
   write( str, '(a,i2.2,a,a,i1,i6.6)' ) &
-    'out/', iz, '/', trim( outvar(iz) ), i, it
+    'out/', iz, '/', trim( out_field(iz) ), i, it
   select case( outvar(iz) )
   case( 'x'    ); call bwrite4( str, x,    i1, i2, i )
   case( 'a'    ); call bwrite4( str, w1,   i1, i2, i )
@@ -124,8 +138,8 @@ do i = 1, nc
   case( 'vm'   ); call bwrite3( str, s2,   i1, i2 )
   case( 'um'   ); call bwrite3( str, s1,   i1, i2 )
   case( 'wm'   ); call bwrite3( str, s2,   i1, i2 )
-  case( 'vs'   ); call bwrite3( str, vs,   i1, i2 )
-  case( 'us'   ); call bwrite3( str, us,   i1, i2 )
+  case( 'sv'   ); call bwrite3( str, sv,   i1, i2 )
+  case( 'sl'   ); call bwrite3( str, sl,    i1, i2 )
   case( 'trup' ); call bwrite3( str, trup, i1, i2 )
   case default; stop 'var'
   end select
@@ -137,6 +151,7 @@ if ( pass == 'w' ) return
 
 !------------------------------------------------------------------------------!
 
+! Checkpoint
 if ( itcheck /= 0 .and. mod( it, itcheck ) == 0 ) then
   inquire( iolength=reclen ) v, u, vs, us, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
@@ -156,6 +171,7 @@ if ( itcheck /= 0 .and. mod( it, itcheck ) == 0 ) then
   close( 9 )
 end if
 
+! Metadata
 if ( ip == 0 ) then
   open(  9, file='out/timestep', status='replace' )
   write( 9, * ) it

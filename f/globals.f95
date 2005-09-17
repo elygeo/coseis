@@ -5,6 +5,9 @@ module globals_m
 
 implicit none
 
+real, parameter :: &
+  pi = 3.14159
+
 integer, parameter :: &
   nz = 80,      & ! max number of input and output zones
   nhalo = 1       ! number of ghost nodes
@@ -64,8 +67,8 @@ real, allocatable, dimension(:,:,:) :: &
   co,           & ! cohesion
   area,         & ! fault element area
   r,            & ! radius to hypocenter
-  vs,           & ! **slip velocity mangitude
-  us,           & ! **slip path length
+  sv,           & ! **slip velocity mangitude
+  sl,           & ! **slip path length
   trup,         & ! **rupture time
   tn,           & ! temporary storage
   ts,           & ! temporary storage
@@ -76,19 +79,22 @@ real :: &
   t,            & ! **time
   dt,           & ! time step
   dx,           & ! spatial step
-  vpmin,        & ! min P-wave speed
-  vpmax,        & ! max P-wave speed
-  vsmin,        & ! min S-wave speed
-  vsmax,        & ! max S-wave speed
+  rho1,         & ! minimum density
+  vp1,          & ! minimum P-wave speed
+  vs1,          & ! minimum S-wave speed
+  rho2,         & ! maximum density
+  vp2,          & ! maximum P-wave speed
+  vs2,          & ! maximum S-wave speed
+  rho,          & ! hypocenter density
+  vp,           & ! hypocenter S-wave speed
+  vs,           & ! hypocenter P-wave speed
   viscosity(2), & ! viscocity for (1) stress & (2) hourglass corrections
   xsource(3),   & ! moment source location
   tsource,      & ! dominant period
   rsource,      & ! source radius
   moment1(3),   & ! moment source normal components
   moment2(3),   & ! moment source shear components
-  musource,     & ! mu at moment soucr location
   xhypo(3),     & ! hypocenter location
-  muhypo,       & ! mu at hypocenter
   vrup,         & ! nucleation rupture velocity
   rcrit,        & ! nucleation critical radius
   truptol,      & ! min slip velocity to declare rupture
@@ -96,8 +102,8 @@ real :: &
   vmax,         & ! max velocity
   umax,         & ! max displacement
   wmax,         & ! max stress (Frobenius norm)
-  vsmax,        & ! max slip velocity
-  usmax,        & ! max slip
+  svmax,        & ! max slip velocity
+  slmax           ! max slip
 
 integer, dimension(3) :: &
   nn,           & ! number of global nodes
@@ -112,8 +118,8 @@ integer, dimension(3) :: &
   ivmax,        & ! index of max velocity
   iumax,        & ! index of max displacement
   iwmax,        & ! index of max stress
-  ivsmax,       & ! index of max slip velocity
-  iusmax,       & ! index of max slip
+  isvmax,       & ! index of max slip velocity
+  islmax,       & ! index of max slip length
   i1node,       & ! node calculations start index
   i2node,       & ! node calculations end index
   i1nodepml,    & ! excluding PML region
@@ -124,7 +130,7 @@ integer, dimension(3) :: &
   i2cellpml       ! excluding PML region
 
 integer :: &
-  upward,       & ! downward direction
+  upward,       & ! upward direction
   nt,           & ! number of time steps
   npml,         & ! number of PML damping nodes
   ifn,          & ! fault normal direction
@@ -160,7 +166,7 @@ character(16) :: &
   timefn          ! moment source fime function
 
 logical :: &
-  readfile(nz), & ! read input file
+  readfile(nz)    ! read input file
 
 end module
 

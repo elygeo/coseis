@@ -24,7 +24,9 @@ figure( ...
   'DefaultTextHorizontalAlignment', 'center', ...
   'DefaultTextColor', foreground )
 
+tstitles = titles;
 if explosion & strcmp( field, 'v' )
+  tstitles = { '|V|' 'Vr' 'Vh' 'Vv' };
   plot( time, vk, ':' )
   hold on
 end

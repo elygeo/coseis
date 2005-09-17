@@ -12,12 +12,12 @@ elseif xhairmove == 5
   islice = idown;
 elseif xhairmove == 6
   imax = i0;
-  switch field
+  switch vizfield
   case 'a', imax = iamax;
   case 'v', imax = ivmax;
   case 'u', imax = iumax;
   case 'w', imax = iwmax;
-  otherwise error 'field'
+  otherwise error 'vizfield'
   end
   [ j, k, l ] = ind2sub( nm, imax );
   ixhair = [ j k l ];
@@ -66,7 +66,7 @@ xxhair = double( xga(:)' );
 mga = [];
 vga = [];
 msg = '';
-switch field
+switch vizfield
 case 'vs'
   i = [ j k l ];
   if inrm, i(inrm) = 1; end
@@ -107,7 +107,7 @@ case 'w'
     tmp = [ val([3 2 1])' wg ];
     msg = sprintf( 'W1  %9.2e\nW2  %9.2e\nW3  %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e', tmp );
   end
-otherwise error 'field'
+otherwise error 'vizfield'
 end
 set( gcf, 'CurrentAxes', haxes(2) )
 hhud = text( .02, .98, msg, 'Hor', 'left', 'Ver', 'top' );

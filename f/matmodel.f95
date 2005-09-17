@@ -41,20 +41,23 @@ end if ifreadfile
 end do doi
 
 ! Material extremes
-vpmin = minval( s1, s1 > 0. ); vpmax = maxval( s1 )
-vsmin = minval( s2, s2 > 0. ); vsmax = maxval( s2 )
+rho1 = minval( mr, mr > 0. ); rho2 = maxval( mr )
+vp1  = minval( s1, s1 > 0. ); vp2  = maxval( s1 )
+vs1  = minval( s2, s2 > 0. ); vs2  = maxval( s2 )
 
-! Lame parameters
-s2 = mr * s2 * s2
-s1 = mr * ( s1 * s1 ) - 2. * s2
-
-! Save mu at hypocenter
+! Hypocenter values
 if ( all( i1hypo >= i1cell .and. i1hypo <= i2cell + 1 ) ) then
   j = i1(1)
   k = i1(2)
   l = i1(3)
-  muhypo = s2(j,k,l)
+  rho = mr(j,k,l)
+  vp  = s1(j,k,l)
+  vs  = s2(j,k,l)
 end if
+
+! Lame parameters
+s2 = mr * s2 * s2
+s1 = mr * ( s1 * s1 ) - 2. * s2
 
 ! Average Lame parameters onto cell centers
 lam = 0.

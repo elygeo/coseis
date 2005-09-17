@@ -34,15 +34,21 @@ end
 end
 
 % Matrial extremes
-i = s1 > 0.; vpmin = min( s1(i) ); vpmax = max( s1 );
-i = s2 > 0.; vsmin = min( s2(i) ); vpmax = max( s2 );
+i = mr > 0.; rhomin = min( mr(i) ); rhomax = max( mr );
+i = s1 > 0.; vpmin  = min( s1(i) ); vpmax  = max( s1 );
+i = s2 > 0.; vsmin  = min( s2(i) ); vpmax  = max( s2 );
+
+% Hypocenter properties
+j = ihypo(1);
+k = ihypo(2);
+l = ihypo(3);
+rho = mr(j,k,l);
+vp  = s1(j,k,l);
+vs  = s2(j,k,l);
 
 % Lame parameters
 s2 = mr .* s2 .* s2;
 s1 = mr .* ( s1 .* s1 ) - 2. .* s2;
-
-% Save mu at hypocenter
-mu0 = s2(i0(1),i0(2),i0(3));
 
 % Average Lame parameters on cell centers
 lam(:) = 0.;

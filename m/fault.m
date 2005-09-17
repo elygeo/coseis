@@ -42,7 +42,7 @@ if ( readfile(i) )
   case 'tdip',     t3(j1:j2,k1:k2,l1:l2,3) = bread( 'data/tdip',     endian );
   end
 else
-  [ i1, i2 ] = zone( i1in(iz,:), i2in(iz,:), nn, noff, i0, ifn );
+  [ i1, i2 ] = zone( i1in(iz,:), i2in(iz,:), nn, noff, ihypo, ifn );
   i1 = max( i1, i1nodepml );
   i2 = min( i2, i2nodepml );
   i1(ifn) = 1;
@@ -71,8 +71,8 @@ end
 % Normal vectors
 i1 = i1node;
 i2 = i2node;
-i1(ifn) = i0(ifn);
-i2(ifn) = i0(ifn);
+i1(ifn) = ihypo(ifn);
+i2(ifn) = ihypo(ifn);
 nrm = snormals( x, i1, i2 );
 area = sqrt( sum( nrm .* nrm, 4 ) );
 f1 = area;
@@ -131,18 +131,18 @@ end
 % Hypocentral radius
 i1 = [ 1 1 1 ];
 i2 = nm;
-i1(ifn) = i0(ifn);
-i2(ifn) = i0(ifn);
+i1(ifn) = ihypo(ifn);
+i2(ifn) = ihypo(ifn);
 j1 = i1(1); j2 = i2(1);
 k1 = i1(2); k2 = i2(2);
 l1 = i1(3); l2 = i2(3);
 for i = 1:3
-  t3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - x0(i);
+  t3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i);
 end
 r = sqrt( sum( t3 .* t3, 4 ) );
 
-% Informational output
-i1 = i0;
+% Metadata
+i1 = ihypo;
 i1(ifn) = 1;
 j = i1(1);
 k = i1(2);
@@ -153,10 +153,24 @@ dc0 = dc(j,k,l);
 tn0 = sum( t0(j,k,l,:) .* nrm(j,k,l,:) );
 ts0 = norm( shiftdim( t0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) );
 tn0 = max( -tn0, 0 );
-fprintf( '  S:    %11.4e\n', ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 ) )
-fprintf( '  dc:   %11.4e >%11.4e\n', dc0, 3 * dx * tn0 * ( mus0 - mud0 ) / mu0 )
-fprintf( '  rcrit:%11.4e >%11.4e\n', rcrit, mu0 * tn0 * ( mus0 - mud0 ) * dc0 / ( ts0 - tn0 * mud0 ) ^ 2 )
-
+ess = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 );
+dcmin = 3 * dx * tn0 * ( mus0 - mud0 ) / mu0;
+rcritmin = mu0 * tn0 * ( mus0 - mud0 ) * dc0 / ( ts0 - tn0 * mud0 ) ^ 2.;
+fid = fopen( 'out/faultmeta', 'w' );
+fprintf( fid, 'ihypo    %g %g %g\n', ihypo - noff );
+fprintf( fid, 'xhypo    %g %g %g\n', xhypo        );
+fprintf( fid, 'mus      %g\n',       mus0         );
+fprintf( fid, 'mud      %g\n',       mud0         );
+fprintf( fid, 'dc       %g\n',       dc0          );
+fprintf( fid, 'dcmin    %g\n',       dcmin        );
+fprintf( fid, 'tnormal  %g\n',       tn0          );
+fprintf( fid, 'tshear   %g\n',       ts0          );
+fprintf( fid, 'S        %g\n',       ess          );
+fprintf( fid, 'vrup     %g\n',       vrup         );
+fprintf( fid, 'rcrit    %g\n',       rcrit        );
+fprintf( fid, 'rcritmin %g\n',       rcrit        );
+fprintf( fid, 'trelax   %g\n',       trelax       );
+close( fid )
 return
 
 end
@@ -165,13 +179,13 @@ end
 
 i1 = [ 1 1 1 ];
 i2 = nm;
-i1(ifn) = i0(ifn);
-i2(ifn) = i0(ifn);
+i1(ifn) = ihypo(ifn);
+i2(ifn) = ihypo(ifn);
 j1 = i1(1); j2 = i2(1);
 k1 = i1(2); k2 = i2(2);
 l1 = i1(3); l2 = i2(3);
-i1(ifn) = i0(ifn) + 1;
-i2(ifn) = i0(ifn) + 1;
+i1(ifn) = ihypo(ifn) + 1;
+i2(ifn) = ihypo(ifn) + 1;
 j3 = i1(1); j4 = i2(1);
 k3 = i1(2); k4 = i2(2);
 l3 = i1(3); l4 = i2(3);
@@ -233,7 +247,7 @@ vs = sqrt( sum( t2 .* t2, 4 ) );
 
 % Rupture time
 if truptol
-  i1 = i0;
+  i1 = ihypo;
   i1(ifn) = 1;
   l = i1(3);
   k = i1(2);

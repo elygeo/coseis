@@ -12,6 +12,8 @@ else
   rsource = 0.;
   return
 end
+
+% Indeices
 i1 = i1cell;
 i2 = i2cell;
 l = i1(3):i2(3);
@@ -32,30 +34,43 @@ w1(j,k,l,:) = 0.125 * ...
 
 % Cell hypocenter distance
 for i = 1:3
-  w1(:,:,:,i) = w1(:,:,:,i) - x0(i);
+  w1(:,:,:,i) = w1(:,:,:,i) - xsource(i);
 end
-
-% Find cells within source radius
-s2 = rsource - sqrt( sum( w1 .* w1, 4 ) );
-imsrc = find( s2 > 0. );
+s2 = sqrt( sum( w1 .* w1, 4 ) );
+[ junk, isource ] = min( s2(:) );
+isrc = find( s2 <= rsource );
 
 % Weight by distance from hypocenter
-msrcv = s1( imsrc );
-msrcx = s2( imsrc );
-msrcx = msrcx / sum( msrcx ) ./ msrcv;
+clear srcfr
+switch spacefn
+case 'box',  srcfr = ones( size( isrc ) );
+case 'tent', srcfr = rsource - s2( isrc );
+end
+
+% Normalize and devide by cell volume
+srcfr = srcfr / sum( srcfr ) ./ s1( isrc );
 
 s1(:) = 0.;
 s2(:) = 0.;
 
-% Useful info
+% Metadata
 c = [ 1 6 5; 6 2 4; 5 4 3 ];
 [ vec, val ] = eig( moment(c) );
 m0 = max( abs( val(:) ) );
 mw = 2. / 3. * log10( m0 ) - 10.7;
-um = m0 / mu0 / dx / dx;
-fprintf( '  M0:%12.4e\n', m0 )
-fprintf( '  Mw:%12.4e\n', mw )
-fprintf( '  D: %12.4e\n', um )
+d  = m0 / ( rho * vs * vs * dx * dx );
+fid = fopen( 'out/sourcemeta', 'w' );
+fprintf( fid, 'xsource   %g %g %g\n',          xsource          );
+fprintf( fid, 'rsource   %g\n',                rsource          );
+fprintf( fid, 'tsource   %g\n',                tsource          );
+fprintf( fid, 'spacefn   %s\n',                spacefn          );
+fprintf( fid, 'timefn    %s\n',                timefn           );
+fprintf( fid, 'moment    %g %g %g %g %g %g\n', moment1, moment2 );
+fprintf( fid, 'vp        %g\n',                vp               );
+fprintf( fid, 'm0        %g\n',                m0               );
+fprintf( fid, 'mw        %g\n',                mw               );
+fprintf( fid, 'd         %g\n',                d                );
+close( fid )
 
 return
 
@@ -73,7 +88,7 @@ end
 
 o = prod( nm );
 for i = 0:2
-  w1(imsrc+o*i) = w1(imsrc+o*i) - msrcf * msrcx * moment(i+1);
-  w2(imsrc+o*i) = w2(imsrc+o*i) - msrcf * msrcx * moment(i+4);
+  w1(isrc+o*i) = w1(isrc+o*i) - srcft * srcfr * moment(i+1);
+  w2(isrc+o*i) = w2(isrc+o*i) - srcft * srcfr * moment(i+4);
 end
 

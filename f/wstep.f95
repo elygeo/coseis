@@ -14,10 +14,10 @@ integer :: i, j, k, l, ic, id, ix, iz
 ! Time integration
 t  = t  + .5 * dt
 u  = u  + dt * v
-us = us + dt * vs
+sl = sl + dt * sv
 
 ! Gradient
-! G = grad(U + gam*V)    non PML region
+! G = grad(U + gamma*V)    non PML region
 ! G' + DG = gradV          PML region
 s2 = 0.
 w2 = 0.
@@ -178,7 +178,7 @@ s1 = sqrt( sum( u * u, 4 ) )
 s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
 iumax  = maxloc( s1 ); umax  = s1(iumax(1),iumax(2),iumax(3))
 iwmax  = maxloc( s2 ); wmax  = s2(iwmax(1),iwmax(2),iwmax(3))
-iusmax = maxloc( us ); usmax = us(iusmax(1),iusmax(2),iusmax(3))
+islmax = maxloc( s );  slmax = s(islmax(1),islmax(2),islmax(3))
 
 if ( umax > dx / 10. ) print *, 'Warning: u !<< dx'
 

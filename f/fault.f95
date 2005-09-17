@@ -151,7 +151,7 @@ do i = 1, 3
 end do
 r = sqrt( sum( t3 * t3, 4 ) )
 
-! Informational output
+! Metadata
 if ( all( i1hypo >= i1node .and. i1hypo <= i2node ) ) then
   i1 = ihypo
   i1(ifn) = 1
@@ -164,9 +164,24 @@ if ( all( i1hypo >= i1node .and. i1hypo <= i2node ) ) then
   tn0 = sum( t0(j,k,l,:) * nrm(j,k,l,:) )
   ts0 = sqrt( sum( ( t0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) ** 2. ) )
   tn0 = max( -tn0, 0. )
-  print '(a,es12.4)', '  S:    ', ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 )
-  print '(2(a,es12.4,x))', '  dc:   ', dc0, '>', 3 * abs( dx ) * tn0 * ( mus0 - mud0 ) / muhypo
-  print '(2(a,es12.4,x))', '  rcrit:', rcrit, '>', muhypo * tn0 * ( mus0 - mud0 ) * dc0 / ( ts0 - tn0 * mud0 ) ** 2
+  ess = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 )
+  dcmin = 3 * abs( dx ) * tn0 * ( mus0 - mud0 ) / muhypo
+  rcritmin = muhypo * tn0 * ( mus0 - mud0 ) * dc0 / ( ts0 - tn0 * mud0 ) ** 2
+  open(  9, file='out/faultmeta.m', status='new' )
+  write( 9, * ) 'ihypo    = [ ', ihypo - noff, ' ];'
+  write( 9, * ) 'xhypo    = [ ', xhypo,        ' ];'
+  write( 9, * ) 'mus0     =   ', mus0,           ';'
+  write( 9, * ) 'mud0     =   ', mud0,           ';'
+  write( 9, * ) 'dc0      =   ', dc0,            ';'
+  write( 9, * ) 'dcmin    =   ', dcmin,          ';'
+  write( 9, * ) 'tn0      =   ', tn0,            ';'
+  write( 9, * ) 'ts0      =   ', ts0,            ';'
+  write( 9, * ) 'ess      =   ', ess,            ';'
+  write( 9, * ) 'vrup     =   ', vrup,           ';'
+  write( 9, * ) 'rcrit    =   ', rcrit,          ';'
+  write( 9, * ) 'rcritmin =   ', rcritmin,       ';'
+  write( 9, * ) 'trelax   =   ', trelax,         ';'
+  close( 9 )
 end if
 
 return
@@ -211,7 +226,7 @@ ts = sqrt( sum( t2 * t2, 4 ) )
 ! Friction Law
 where( tn > 0. ) tn = 0.
 f1 = mud
-where( us < dc ) f1 = f1 + ( 1. - us / dc ) * ( mus - mud )
+where( sl < dc ) f1 = f1 + ( 1. - sl / dc ) * ( mus - mud )
 f1 = f1 * -tn + co
 
 ! Nucleation
@@ -238,7 +253,7 @@ end do
 ! Time integratioin for slip velocity
 t1 = v(j3:j4,k3:k4,l3:l4,:) + dt * w1(j3:j4,k3:k4,l3:l4,:) &
    - v(j1:j2,k1:k2,l1:l2,:) - dt * w1(j1:j2,k1:k2,l1:l2,:)
-vs = sqrt( sum( t1 * t1, 4 ) )
+sv = sqrt( sum( t1 * t1, 4 ) )
 
 ! Rupture time
 if ( truptol > 0. ) then

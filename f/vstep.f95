@@ -109,29 +109,28 @@ end do
 call fault
 
 ! Locked nodes
-do i = 1, nlock
-  i1 = max( i1lock(i,), i2node )
-  i2 = min( i2lock(i,), i2node )
+do iz = 1, nlock
+  i1 = max( i1lock(iz,), i2node )
+  i2 = min( i2lock(iz,), i2node )
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
-  i1 = lock(i,:)
+  i1 = lock(iz,:)
   do i = 1, 3
     if ( i1(i) == 1 ) forall( j=j1:j2, k=k1:k2, l=l1:l2 ) w1(j,k,l,i) = 0.
   end do
 end do
 
 ! Time integeration
-t  =  t  + dt / 2.
-v  =  v  + dt * w1
-!vs = vs + dt * f1
+t = t + .5 * dt
+v = v + dt * w1
 
 ! Magnitudes
 s1 = sqrt( sum( w1 * w1, 4 ) )
 s2 = sqrt( sum( v * v, 4 ) )
 iamax  = maxloc( s1 ); amax  = s1(iamax(1),iamax(2),iamax(3))
 ivmax  = maxloc( s2 ); vmax  = s2(ivmax(1),ivmax(2),ivmax(3))
-ivsmax = maxloc( vs ); vsmax = vs(ivsmax(1),ivsmax(2),ivsmax(3))
+isvmax = maxloc( vs ); svmax = sv(isvmax(1),isvmax(2),isvmax(3))
 
 end subroutine
 end module

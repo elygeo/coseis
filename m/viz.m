@@ -24,7 +24,7 @@ elseif init
   plotinterval = 1;
   holdmovie = 0;
   savemovie = 0;
-  field = 'v';
+  vizfield = 'v';
   comp = 0;
   isofrac = .5;
   glyphcut = .1;
@@ -107,14 +107,14 @@ end
 
 if mod( it, plotinterval ), return, end
 time = it * dt;
-switch field
+switch vizfield
 case 'a', onpass = 'v';
 case 'v', onpass = 'v'; time = ( it + .5 ) * dt;
 case 'u', onpass = 'w';
 case 'w', onpass = 'w';
 case 'vs', onpass = 'v'; time = ( it + .5 ) * dt;
 case 'us', onpass = 'w';
-otherwise error 'viz field'
+otherwise error 'viz vizfield'
 end
 if onpass ~= pass, return, end
 

@@ -13,7 +13,7 @@ for iz = 1:size( volumes, 1 )
   j = i1(1):i2(1);
   ng = i2 - i1 + 1;
   if any( ng <= 1 ), error 'volume', end
-  switch field
+  switch vizfield
   case 'a'
     if comp, vg = w1(j,k,l,comp); 
     else     vg = s1(j,k,l);

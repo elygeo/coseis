@@ -58,8 +58,6 @@ tol = 10. * epsilon( dx )
 ! dx/dx = dy/dy = dz/dz
 noper = 1
 oper = 'h'
-i1oper(1,:) = i1cell
-i2oper(1,:) = i2cell + 1
 
 if ( test < tol ) return
 
@@ -77,10 +75,10 @@ do i = k1, k2;     i1(2) = i; if ( any( s1(:,i,:) > tol ) ) exit; end do
 do i = k2, k1, -1; i2(2) = i; if ( any( s1(:,i,:) > tol ) ) exit; end do
 do i = l1, l2;     i1(3) = i; if ( any( s1(:,:,i) > tol ) ) exit; end do
 do i = l2, l1, -1; i2(3) = i; if ( any( s1(:,:,i) > tol ) ) exit; end do
-
-oper = 'rg'
 i1oper(2,:) = i1
 i2oper(2,:) = i2 + 1
+
+oper = 'rg'
 test = product( i2 - i1 + 2 ) / product( i2cell - i1cell + 2 )
 
 if ( all( i2 > i1 ) .and. test > .8 ) then
@@ -88,6 +86,7 @@ if ( all( i2 > i1 ) .and. test > .8 ) then
 else if ( all( i2 <= i1 ) ) then
   oper = 'r'
 end if
+
 noper = len_trim( oper )
 
 end subroutine

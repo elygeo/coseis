@@ -205,22 +205,22 @@ case 'x'
   if xlim, msg = 'Mesh distortion on';
   else     msg = 'Mesh distortion off';
   end
-case 'u', if km, field = 'us'; else, field = 'u'; end 
+case 'u', if km, vizfield = 'us'; else, vizfield = 'u'; end 
   colorscale
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
   if pass == 'v', msg = [ msg ' step code once for viz' ]; end
-case 'w', if km, field = 't'; else, field = 'w'; end 
+case 'w', if km, vizfield = 't'; else, vizfield = 'w'; end 
   colorscale
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
   if pass == 'v', msg = [ msg ' not in memory, step code once' ]; end
-case 'a', field = 'a';
+case 'a', vizfield = 'a';
   colorscale
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
   if pass == 'w', msg = [ msg ' not in memory, step code once' ]; end
-case 'v', if km, field = 'vs'; else, field = 'v'; end 
+case 'v', if km, vizfield = 'vs'; else, vizfield = 'v'; end 
   colorscale
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
