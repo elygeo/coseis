@@ -34,9 +34,9 @@ end
 end
 
 % Matrial extremes
-i = mr > 0.; rhomin = min( mr(i) ); rhomax = max( mr );
-i = s1 > 0.; vpmin  = min( s1(i) ); vpmax  = max( s1 );
-i = s2 > 0.; vsmin  = min( s2(i) ); vpmax  = max( s2 );
+i = mr > 0.; rho1 = min( mr(i) ); rho2 = max( mr );
+i = s1 > 0.; vp1  = min( s1(i) ); vp2  = max( s1 );
+i = s2 > 0.; vs1  = min( s2(i) ); vp2  = max( s2 );
 
 % Hypocenter properties
 j = ihypo(1);

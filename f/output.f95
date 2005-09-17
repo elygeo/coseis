@@ -40,6 +40,9 @@ ifinit: if ( init ) then
       open(  9, file=str, status='new' )
       write( 9, * ) 'n      = [ ', nn, nt  ' ];'
       write( 9, * ) 'dx     =   ', dx        ';'
+      write( 9, * ) 'rho    =   ', rho       ';'
+      write( 9, * ) 'vp     =   ', vp        ';'
+      write( 9, * ) 'vs     =   ', vs        ';'
       write( 9, * ) 'upward =   ', upward,   ';'
       write( 9, * ) 'nout   =   ', nout,     ';'
       close( 9 )
@@ -105,15 +108,15 @@ if ( any( i2 < i1 ) ) stop 'out range'
 
 ! Metadata
 if ( ip == 0 ) then
-  write( str, '(a,i2.2,a)' ) 'out/', iz, '/outmeta.m'
+  write( str, '(a,i2.2,a)' ) 'out/', iz, '/meta.m'
   open(  9, file=str, status='replace' )
-  write( 9, * ) 'field.name = ''', fieldout(iz), ''';'
-  write( 9, * ) 'field.nc   =   ', nc,             ';'
-  write( 9, * ) 'field.i1   = [ ', i1 - noff,    ' ];'
-  write( 9, * ) 'field.i2   = [ ', i2 - noff,    ' ];'
-  write( 9, * ) 'field.itfield   =   ', it,             ';'
-  write( 9, * ) 'field.dit  =   ', ditout(iz),     ';'
-  write( 9, * ) 'field.tfield    =   ', t,              ';'
+  write( 9, * ) 'field = ''', fieldout(iz), ''';'
+  write( 9, * ) 'nc    =   ', nc,             ';'
+  write( 9, * ) 'i1    = [ ', i1 - noff,    ' ];'
+  write( 9, * ) 'i2    = [ ', i2 - noff,    ' ];'
+  write( 9, * ) 'dit   =   ', ditout(iz),     ';'
+  write( 9, * ) 'itout =   ', it,             ';'
+  write( 9, * ) 'tout  =   ', t,              ';'
   close( 9 )
 end if
 

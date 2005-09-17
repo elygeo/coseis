@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
 % TSVIZ
 
-if ~exist( 'w1', 'var' )
+if ~exist( 'sordrunning', 'var' )
   if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
   else     foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 1;
   end
@@ -24,15 +24,19 @@ figure( ...
   'DefaultTextHorizontalAlignment', 'center', ...
   'DefaultTextColor', foreground )
 
-tstitles = titles;
-if explosion & strcmp( field, 'v' )
-  tstitles = { '|V|' 'Vr' 'Vh' 'Vv' };
-  plot( time, vk, ':' )
+plot( tg, vg )
+hold on
+if haveanalytical
+  plot( ta, va, ':' )
   hold on
 end
 
-plot( time, vg )
-hold on
+tstitles = titles;
+if explosion
+  switch vizfield
+  case 'v', tstitles = { '|V|' 'Vr' 'Vh' 'Vv' };
+  end
+end
 
 for i = 1 : length( tstitles ) - 1
   [ tmp, ii ] = max( abs( vg(:,i) ) );

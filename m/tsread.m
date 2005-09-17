@@ -1,10 +1,11 @@
 %------------------------------------------------------------------------------%
 % TSREAD - read timeseries
-% input: vizfield xhair outdir iz noff
+% input: vizfield xhair iz
 % output: tg vg
 
-file = sprintf( 'out/%02d/outmeta', iz );
-eval( file )
+% Get metadata
+meta = sprintf( 'out/%02d/meta', iz );
+eval( meta )
 
 % File offset
 n = i2 - i1 + 1;
@@ -13,7 +14,7 @@ skip = 4 * sum( i .* cumprod( [ 1 n(1:2) ] ) );
 
 % Check if file holds desired data
 msg = '';
-if any( i < 0 | i >= n ) | interval > 1 | vizfield ~= field
+if any( i < 0 | i >= n ) | dit > 1 | vizfield ~= field
   msg='Timeseries data not available for this location';
   return
 end
@@ -34,9 +35,10 @@ end
 
 if itout == 1, return, end
 
+% Add zero time sample
 vg = [ zeros(1,nc); vg ];
 
-% time
+% Time sequence
 switch field
 case 'v', tg = [ 0; tg ];
 otherwise tg = .5 * [ -tg(1); tg(1); tg(1:end-1) + tg(2:end) ];

@@ -161,6 +161,7 @@ character(8) :: &
   outkey(nz)      ! output variable
 
 character(16) :: &
+  model,        & ! model ID
   grid,         & ! grid generation scheme
   spacefn,      & ! moment source space function
   timefn          ! moment source fime function

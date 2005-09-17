@@ -71,16 +71,14 @@ if cell; i2 = i2 - 1; end
 % Metadata
 file = sprintf( 'out/%02d/meta', iz );
 fid = fopen( file, 'w' );
-fprintf( fid, ' field  %s\n',       outkey{iz} );
-fprintf( fid, ' nc     %g\n',       nc         );
-fprintf( fid, ' i1     %g %g %g\n', i1 - noff  );
-fprintf( fid, ' i2     %g %g %g\n', i2 - noff  );
-fprintf( fid, ' dx     %g\n',       dx         );
-fprintf( fid, ' nt     %g\n',       it         );
-fprintf( fid, ' dit    %g\n',       ditout(iz)  );
-fprintf( fid, ' t      %g\n',       t          );
-fprintf( fid, ' upward %g\n',       upward     );
-fprintf( fid, ' endian %s\n',       endian     );
+fprintf( fid, ' field  %s\n',       outfield{iz} );
+fprintf( fid, ' nc     %g\n',       nc           );
+fprintf( fid, ' i1     %g %g %g\n', i1 - noff    );
+fprintf( fid, ' i2     %g %g %g\n', i2 - noff    );
+fprintf( fid, ' itout  %g\n',       it           );
+fprintf( fid, ' dit    %g\n',       ditout(iz)   );
+fprintf( fid, ' tout   %g\n',       t            );
+fprintf( fid, ' endian %s\n',       endian       );
 fclose( fid );
 
 if isfault

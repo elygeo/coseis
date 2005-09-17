@@ -13,18 +13,19 @@ if ~exist( 'sordrunning', 'var' )
   eval( 'out/meta' )
   eval( 'out/sourcemeta' )
   eval( 'out/faultmeta' )
+  if ~exist( 'vizfield', 'var' ), vizfield = 'v'; end
+  if ~exist( 'dofilter', 'var' ), dofilter = 1;   end
+  if ~exist( 'xhair', 'var' ), xhair = [ 1 1 1 ]; end
 end
-if ~exist( 'vizfield', 'var' ), vizfield = 'v'; end
-if ~exist( 'dofilter', 'var' ), dofilter = 1;   end
 
-% test if we have data saved for desired location
+% Test if we have data saved for desired location
 for iz = 1:nout
   tsread
 end
 if msg, return, end
 if ntg == 1, return, end
 
-% filter
+% Filter
 if dofilter
   fcorner = vp / ( 8 * dx );
   n = 2 * round( 1 / ( fcorner * dt ) );
@@ -34,13 +35,7 @@ if dofilter
   tg = [ tg tg(end) + dt * ( 1 : n - 1 ) ];
 end
 
-pointsource = ~ifn;
-
-nu = 
-kostrov = ifn & ...
-  
-
-% for point source, rotate to r,h,v coords
+% For moment source, rotate to r,h,v coords
 if ~ifn
   if exist( 'sordrunning', 'var' )
     xg = xxhair - xhypo;
@@ -69,32 +64,36 @@ if ~ifn
   end
 end
 
-% explosion analytical solution
-if ~ifn & strcmp( field, 'v' )
+% Find analytical solution for known problems
+haveanalytical = 1;
+switch model
+case 'explosion'
+  haveanalytical = 1;
+  tdom = tsource;
   switch timefcn
   case 'brune'
-    va = m0 * exp( -tg/tsource ) .* ( tg*vp/rg - tg/tsource + 1 ) ...
-       / ( 4. * pi * rho * alpha * alpha * tsource^2 * rg * alpha );
+    va = m0 * exp( -tg / tdom ) .* ( tg * vp / rg - tg / tdom + 1 ) ...
+       / ( 4. * pi * rho * vp * vp * tdom ^ 2 * rg * vp );
   case 'sbrune'
-    va = m0 * exp( -tg/tsource ) .* ( tg*vp/rg - tg/tsource + 2 ) .* tg ...
-       / ( 8. * pi * rho * alpha * alpha * tsource^3 * rg * alpha );
+    va = m0 * exp( -tg / tdom ) .* ( tg * vp / rg - tg / tdom + 2 ) .* tg ...
+       / ( 8. * pi * rho * vp * vp * tdom ^ 3 * rg * vp );
   otherwise va = 0;
   end
-  ta = tg + rg / alpha;
-  if dofilter
-    va = filter( b, a, [ va; zeros( n - 1, 1 ) ] );
-  end
-end
-
-% kostrov analytical solution
-if ifn
-  nu = 
-  miu0 = rho * vs0 ^ 2;
+  ta = tg + rg / vp;
+case 'kostrov'
   c = .81;
   dtau = ts0 - mud0 * tn0;
-  ta = xg / vrup;
-  vk = c * dtau / miu0 * vs0 * ( tg + ta ) ./ sqrt( tg .* ( tg + 2 * ta ) );
-  vk = filter( b, a, vk );
-  plot( tg + ta, vk, ':' )
+  va = c * dtau / rho / vs * ( tg + rg / vrup ) ...
+     ./ sqrt( tg .* ( tg + 2 * rg / vrup ) );
+  va = filter( b, a, vk );
+  ta = tg + rg / vrup;
+otherwise
+  haveanalytical = 0;
+  return
+end
+
+% Filter
+if dofilter
+  va = filter( b, a, [ va; zeros( n - 1, 1 ) ] );
 end
 

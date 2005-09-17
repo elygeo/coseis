@@ -21,6 +21,7 @@ for i = 1:length( in )
   inzone = 0;
   switch key
   case ''
+  case 'grid',         model        = strtok( str );
   case 'n',            n            = strread( str, '%u' )';
     nn = n(1:3);
     nt = n(4);

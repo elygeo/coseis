@@ -69,7 +69,7 @@ V = velocity vector
 A = acceleration vector
 W = stress tensor
 rho = density
-c lam mu = elastic moduli
+c lamda mu = elastic moduli
  
 Linearized conservation of momentum, Newton's 2nd law
   A = divW/rho
@@ -85,7 +85,7 @@ Stress-strain constitutive law
   W = c:E
 Viscoelastic solid, Kelvin-Voight model, linear, isotropic,
 spring and dashpot in parallel
-  W = lam*trace(E)*I + 2*mu*E
+  W = lamda*trace(E)*I + 2*mu*E
 Moment tensor source
   W = W + M'*dt
 
@@ -211,12 +211,14 @@ Day, 1982, p 717
 
 Circular crack expanding at a uniform rupture velocity
 
-vslip = C * dT / mu * vs * t / sqrt(t^2-(r/vrup)^2) * heaviside(t-r/vrup)
+vslip = H(T) * C * dtau / mu * vs * (T + r/vrup) / sqrt(T * (T + 2*r/vrup))
 
-dT   = stress drop
-vs   = sqrt( vp^2 / 3 )   (Poisson's ratio, nu = .25)
+T    = reduced time t - r/vrup
+H    = unit step function
+C    = .81   for nu = .25 and vrup = .9*vs (Dahlen, 1974)
+dtau = stress drop
+mu   = rho * vs^2
 vrup = 0.9 * vs
-C    = .81 for given nu and vrup (Dahlen, 1974)
 
 
 
@@ -272,7 +274,7 @@ Nonuniform strain: 12 = 24 DOF - 6 rigid body - 6 uniform strain
  '----'      O----'      O----'      O----'  
   Z2 Z3       Z3 Z1       Z1 Z2      Z1 Z2 Z3
 
-Y = mu*(lam+mu)/6/(lam+2*mu)
+Y = mu*(lamda+mu)/6/(lamda+2*mu)
 
 Q = Y*dU*dx^2*dy^2/dv^2
 A = dQ/dv/rho
@@ -325,14 +327,14 @@ Olsen no PML
 F = divW
 V' = F/rho
 G = gradV
-W' = lam*trace(G)*I + mu*(G + G^T)
+W' = lamda*trace(G)*I + mu*(G + G^T)
 
 SORD Hourglass
 F = divW + hourglass
 V' = F/rho
 U' = V
 G = grad(U + gamma*V)
-W = lam*trace(G)*I + mu*(G + G^T)
+W = lamda*trace(G)*I + mu*(G + G^T)
 
 SORD PML
 if D == 0
@@ -348,7 +350,7 @@ if D == 0
 else
   G' + DG = gradV
 end
-W = lam*trace(G)*I + mu*(G + G^T)
+W = lamda*trace(G)*I + mu*(G + G^T)
 
 PML Discretization
 (p2 - p1)/dt   + d*(p2 + p1)/2 = dW/dx
@@ -387,6 +389,19 @@ n = [ (p+1) * sin(f)^2 * cos(t)
       sin(f) / |cos(f)| * ( cos(f)^2 - p*sin(f)^2 ) ]
 
 
+ELASTIC MODULI
+
+  Lame parameters
+  mu    = rho * vs^2
+  lamda = rho * ( vp^2 - 2*vs^2 )
+
+  Poisson's ratio
+  nu = .5 * lamda / ( lamda + mu )
+  nu = .5 * (vp^2 - 2*vs^2) / (vp^2 - vs^2)
+  nu =  0          fluid
+  nu = .25 to .3   crustal rocks
+  nu = .25         Poisson solid vp/vs = sqrt(3)
+
 COURANT STABILITY CONDITION
 
   dt * vp * sqrt(3) / dx   >    1
@@ -396,9 +411,7 @@ COURANT STABILITY CONDITION
   U' = V
   U~ = U + dt*beta*V
   E = [gradU~ + (gradU~)^T]/2
-  W = lam*trace(E)*I + 2*mu*E
+  W = lamda*trace(E)*I + 2*mu*E
 
-  mu  = rho * vs^2
-  lam = rho * ( vp^2 - 2*vs^2 )
 
 

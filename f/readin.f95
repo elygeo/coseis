@@ -33,6 +33,7 @@ doline: do
   inzone = .false.
   selectkey: select case( key1 )
   case( '' )
+  case( 'model' );        model = key2
   case( 'n' );            read( str, * ) key1, nn, nt
   case( 'dx' );           read( str, * ) key1, dx
   case( 'dt' );           read( str, * ) key1, dt

@@ -214,8 +214,8 @@ tsmax = max( abs( ts(:) ) );
 ii = tn > 0.;
 tn(ii) = 0.;
 f1 = mud;
-ii = us < dc;
-f1(ii) = f1(ii) + ( 1. - us(ii) ./ dc(ii) ) .* ( mus(ii) - mud(ii) );
+ii = sl < dc;
+f1(ii) = f1(ii) + ( 1. - sl(ii) ./ dc(ii) ) .* ( mus(ii) - mud(ii) );
 f1 = f1 .* -tn + co;
 
 % Nucleation
@@ -243,7 +243,7 @@ end
 % Vslip
 t2 = v(j3:j4,k3:k4,l3:l4,:) + dt * w1(j3:j4,k3:k4,l3:l4,:) ...
    - v(j1:j2,k1:k2,l1:l2,:) - dt * w1(j1:j2,k1:k2,l1:l2,:);
-vs = sqrt( sum( t2 .* t2, 4 ) );
+sv = sqrt( sum( t2 .* t2, 4 ) );
 
 % Rupture time
 if truptol
