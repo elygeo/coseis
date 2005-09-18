@@ -43,9 +43,9 @@
   mus		.6	    1 1 1   -1 -1 -1	# coef of static friction
   mud		.5	    1 1 1   -1 -1 -1	# coef of static friction
   dc		.25	    1 1 1   -1 -1 -1	# slip-weakening distance
-  cohesion	0.	    1 1 1   -1 -1 -1	# cohesion
-  tnormal	-70e6	    1 1 1   -1 -1 -1	# pretraction on near side
-  tstrike	-120e6	    1 1 1   -1 -1 -1	# pretraction on near side
+  co		0.	    1 1 1   -1 -1 -1	# cohesion
+  tnrm		-70e6	    1 1 1   -1 -1 -1	# pretraction on near side
+  tstr		-120e6	    1 1 1   -1 -1 -1	# pretraction on near side
   tdip		0.	    1 1 1   -1 -1 -1	# pretraction on near side
 # sxx		0.	    1 1 1   -1 -1 -1	# prestress
 # syy		0.	    1 1 1   -1 -1 -1	# prestress

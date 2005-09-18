@@ -9,7 +9,7 @@ use dfnc_m
 use binio_m
 
 implicit none
-integer :: iz, i, j, k, l, j1, k1, l1, j2, k2, l2
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, iz
 
 if ( ip == 0 ) print '(a)', 'Material model'
 
@@ -21,7 +21,7 @@ doi: do i = 1, nin
 ifreadfile: if ( readfile(i) ) then
   i1 = i1cell
   i2 = i2cell + 1
-  select case ( inkey(i) )
+  select case ( fieldin(i) )
   case ( 'rho' ); call bread3( 'data/rho', mr, i1, i2 )
   case ( 'vp'  ); call bread3( 'data/vp',  s1, i1, i2 )
   case ( 'vs'  ); call bread3( 'data/vs',  s2, i1, i2 )
@@ -32,7 +32,7 @@ else
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
-  select case ( inkey(i) )
+  select case ( fieldin(i) )
   case ( 'rho' ); mr(j1:j2,k1:k2,l1:l2) = inval(i)
   case ( 'vp'  ); s1(j1:j2,k1:k2,l1:l2) = inval(i)
   case ( 'vs'  ); s2(j1:j2,k1:k2,l1:l2) = inval(i)

@@ -1,4 +1,5 @@
 #------------------------------------------------------------------------------#
+# Kostrov
 
   model		kostrov
   n		127 127 127   300
@@ -9,9 +10,9 @@
   mus		1e9
   dc		1e9
   rcrit		1e9
-  cohesion	0.
-  tnormal	-100e6
-  tstrike	-90e6
+  co		0.
+  tnrm		-100e6
+  tstr		-90e6
   tdip		0.
   vrup		3117.7
   trelax	0.

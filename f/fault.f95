@@ -11,8 +11,8 @@ use binio_m
 implicit none
 save
 real :: mus0, mud0, dc0, tn0, ts0, vector(3)
-integer :: i, j, k, l, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4, &
-  iz, idip, istrike
+integer :: i, j, k, l, i1(3), j1, k1, l1, i1(3), j2, k2, l2, &
+  j3, k3, l3, j4, k4, l4, iz, idip, istr
 logical :: init = .true.
 
 ifinit: if ( init ) then
@@ -36,19 +36,19 @@ ifreadfile: if ( readfile(i) ) then
   i1(ifn) = 1
   i2(ifn) = 1
   select case ( inkey(i) )
-  case ( 'mus'      ); call bread3( 'data/mus',       mus, i1, i2 )
-  case ( 'mud'      ); call bread3( 'data/mud',       mud, i1, i2 )
-  case ( 'dc'       ); call bread3( 'data/dc',        dc, i1, i2 )
-  case ( 'cohesion' ); call bread3( 'data/cohesion',  co, i1, i2 )
-  case ( 'sxx'      ); call bread4( 'data/sxx',       t1, i1, i2, 1 )
-  case ( 'syy'      ); call bread4( 'data/syy',       t1, i1, i2, 2 )
-  case ( 'szz'      ); call bread4( 'data/szz',       t1, i1, i2, 3 )
-  case ( 'syz'      ); call bread4( 'data/syz',       t2, i1, i2, 1 )
-  case ( 'szx'      ); call bread4( 'data/szx',       t2, i1, i2, 2 )
-  case ( 'sxy'      ); call bread4( 'data/szy',       t2, i1, i2, 3 )
-  case ( 'tnornal'  ); call bread4( 'data/tnormal',   t3, i1, i2, 1 )
-  case ( 'tstrike'  ); call bread4( 'data/tstrike',   t3, i1, i2, 2 )
-  case ( 'tdip'     ); call bread4( 'data/tdip',      t3, i1, i2, 3 )
+  case ( 'mus'  ); call bread3( 'data/mus',  mus, i1, i2 )
+  case ( 'mud'  ); call bread3( 'data/mud',  mud, i1, i2 )
+  case ( 'dc'   ); call bread3( 'data/dc',   dc, i1, i2 )
+  case ( 'co'   ); call bread3( 'data/co',   co, i1, i2 )
+  case ( 'sxx'  ); call bread4( 'data/sxx',  t1, i1, i2, 1 )
+  case ( 'syy'  ); call bread4( 'data/syy',  t1, i1, i2, 2 )
+  case ( 'szz'  ); call bread4( 'data/szz',  t1, i1, i2, 3 )
+  case ( 'syz'  ); call bread4( 'data/syz',  t2, i1, i2, 1 )
+  case ( 'szx'  ); call bread4( 'data/szx',  t2, i1, i2, 2 )
+  case ( 'sxy'  ); call bread4( 'data/szy',  t2, i1, i2, 3 )
+  case ( 'tnrm' ); call bread4( 'data/tnrm', t3, i1, i2, 1 )
+  case ( 'tstr' ); call bread4( 'data/tstr', t3, i1, i2, 2 )
+  case ( 'tdip' ); call bread4( 'data/tdip', t3, i1, i2, 3 )
   end select
 else
   i1 = max( i1in(i,:), i1cell )
@@ -59,19 +59,19 @@ else
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
   select case ( inkey(i) )
-  case ( 'mus'      ); mus(j1:j2,k1:k2,l1:l2)  = inval(i)
-  case ( 'mud'      ); mud(j1:j2,k1:k2,l1:l2)  = inval(i)
-  case ( 'dc'       ); dc(j1:j2,k1:k2,l1:l2)   = inval(i)
-  case ( 'cohesion' ); co(j1:j2,k1:k2,l1:l2)   = inval(i)
-  case ( 'sxx'      ); t1(j1:j2,k1:k2,l1:l2,1) = inval(i)
-  case ( 'syy'      ); t1(j1:j2,k1:k2,l1:l2,2) = inval(i)
-  case ( 'szz'      ); t1(j1:j2,k1:k2,l1:l2,3) = inval(i)
-  case ( 'syz'      ); t2(j1:j2,k1:k2,l1:l2,1) = inval(i)
-  case ( 'szx'      ); t2(j1:j2,k1:k2,l1:l2,2) = inval(i)
-  case ( 'sxy'      ); t2(j1:j2,k1:k2,l1:l2,3) = inval(i)
-  case ( 'tnormal'  ); t3(j1:j2,k1:k2,l1:l2,1) = inval(i)
-  case ( 'tstrike'  ); t3(j1:j2,k1:k2,l1:l2,2) = inval(i)
-  case ( 'tdip'     ); t3(j1:j2,k1:k2,l1:l2,3) = inval(i)
+  case ( 'mus'  ); mus(j1:j2,k1:k2,l1:l2)  = inval(i)
+  case ( 'mud'  ); mud(j1:j2,k1:k2,l1:l2)  = inval(i)
+  case ( 'dc'   ); dc(j1:j2,k1:k2,l1:l2)   = inval(i)
+  case ( 'co'   ); co(j1:j2,k1:k2,l1:l2)   = inval(i)
+  case ( 'sxx'  ); t1(j1:j2,k1:k2,l1:l2,1) = inval(i)
+  case ( 'syy'  ); t1(j1:j2,k1:k2,l1:l2,2) = inval(i)
+  case ( 'szz'  ); t1(j1:j2,k1:k2,l1:l2,3) = inval(i)
+  case ( 'syz'  ); t2(j1:j2,k1:k2,l1:l2,1) = inval(i)
+  case ( 'szx'  ); t2(j1:j2,k1:k2,l1:l2,2) = inval(i)
+  case ( 'sxy'  ); t2(j1:j2,k1:k2,l1:l2,3) = inval(i)
+  case ( 'tnrm' ); t3(j1:j2,k1:k2,l1:l2,1) = inval(i)
+  case ( 'tstr' ); t3(j1:j2,k1:k2,l1:l2,2) = inval(i)
+  case ( 'tdip' ); t3(j1:j2,k1:k2,l1:l2,3) = inval(i)
   end select
 end if ifreadfile
 end do doi
@@ -102,10 +102,10 @@ end do
 ! Coordinate system
 idip = abs( upward )
 if ( idip /= ifn ) then
-  istrike = 6 - ifn - idip
+  istr = 6 - ifn - idip
 else
-  istrike = mod( ifn, 3 ) + 1
-  idip = 6 - ifn - istrike
+  istr = mod( ifn, 3 ) + 1
+  idip = 6 - ifn - istr
 end if
 
 ! Strike vectors
@@ -133,9 +133,9 @@ end do
 ! Total pretraction
 do i = 1, 3
   t0(:,:,:,i) = t0(:,:,:,i) + &
-    t3(:,:,:,ifn)     * nrm(:,:,:,i) + &
-    t3(:,:,:,istrike) * t1(:,:,:,i) + &
-    t3(:,:,:,idip)    * t2(:,:,:,i)
+    t3(:,:,:,ifn)  * nrm(:,:,:,i) + &
+    t3(:,:,:,istr) * t1(:,:,:,i) + &
+    t3(:,:,:,idip) * t2(:,:,:,i)
 end do
 
 ! Hypocentral radius

@@ -7,7 +7,7 @@ subroutine arrays
 use globals_m
 
 implicit none
-integer :: i, j, k, l, j1, k1, l1, j2, k2, l2
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2
 
 i2 = nm
 j = i2(1)
@@ -80,8 +80,8 @@ allocate(       &
   co(j,k,l),    &
   area(j,k,l),  &
   r(j,k,l),     &
-  vs(j,k,l),    &
-  us(j,k,l),    &
+  sv(j,k,l),    &
+  sl(j,k,l),    &
   trup(j,k,l),  &
   tn(j,k,l),    &
   ts(j,k,l),    &
@@ -91,8 +91,8 @@ allocate(       &
 ! Initial state
 v    =  0.
 u    =  0.
-us   =  0.
-vs   =  0.
+sv   =  0.
+sl   =  0.
 trup =  0.
 p1   =  0.
 p2   =  0.

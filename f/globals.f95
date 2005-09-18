@@ -45,7 +45,7 @@ real, allocatable, dimension(:,:,:,:) :: &
   g6              ! **l2 pml gradient
 
 ! PML damping
-real, dimension(:) :: &
+real, allocatable, dimension(:) :: &
   dn1,          & ! pml node damping -2*d     / (2+d*dt)
   dn2,          & ! pml node damping  2       / (2+d*dt)
   dc1,          & ! pml cell damping (2-d*dt) / (2+d*dt)
@@ -79,6 +79,7 @@ real :: &
   t,            & ! **time
   dt,           & ! time step
   dx,           & ! spatial step
+  valin(nz),    & ! input value
   rho1,         & ! minimum density
   vp1,          & ! minimum P-wave speed
   vs1,          & ! minimum S-wave speed
@@ -97,6 +98,7 @@ real :: &
   xhypo(3),     & ! hypocenter location
   vrup,         & ! nucleation rupture velocity
   rcrit,        & ! nucleation critical radius
+  trelax,       & ! nucleation relaxation time
   truptol,      & ! min slip velocity to declare rupture
   amax,         & ! max acceleration
   vmax,         & ! max velocity
@@ -151,14 +153,14 @@ integer :: &
   nout,         & ! number of zones for output
   i1out(nz,3),  & ! j1 k1 l1 input zone start index
   i2out(nz,3),  & ! j2 k2 l2 input zone end index
-  itout(nz)       ! interval for writing output
+  ditout(nz)      ! interval for writing output
 
 character(2) :: &
   oper            ! spatial derivative operators
 
 character(8) :: &
-  inkey(nz),    & ! input variable
-  outkey(nz)      ! output variable
+  fieldin(nz),  & ! input variable
+  fieldout(nz)    ! output variable
 
 character(16) :: &
   model,        & ! model ID

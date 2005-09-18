@@ -12,7 +12,8 @@ save
 logical :: init = .true.
 integer, allocatable :: jj(:), kk(:), ll(:)
 real, allocatable :: srcfr(:)
-integer :: i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc, ic, eiginfo, i1(3), i2(3)
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, &
+  nsrc, ic, eiginfo
 real :: srcft, m0, mw, d, mm(3,3), eigval(3), eigwork(8)
 
 if ( rsource <= 0. ) return

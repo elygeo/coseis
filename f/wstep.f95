@@ -9,7 +9,7 @@ use momentsrc_m
 use dfnc_m
 
 implicit none
-integer :: i, j, k, l, ic, id, ix, iz
+integer :: i, j, k, l, i1(3), i2(3), ic, id, ix, iz
 
 ! Time integration
 t  = t  + .5 * dt

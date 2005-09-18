@@ -50,7 +50,7 @@ ifinit: if ( init ) then
   else
     if ( ip == 0 ) print '(a,i6)', 'Checkpoint found, starting from step ', it
     write( str, '(a,i6.6,i6.6)' ) 'out/ckp/', ip, it
-    inquire( iolength=reclen ) u, v, vs, us, trup, &
+    inquire( iolength=reclen ) v, u, sv, sl, trup, &
       p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
     open( 9, &
       file=str, &
@@ -58,7 +58,7 @@ ifinit: if ( init ) then
       form='unformatted', &
       access='direct', &
       status='old' )
-    read( 9, rec=1 ) v, u, vs, us, trup, &
+    read( 9, rec=1 ) v, u, sv, sl, trup, &
       p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
     close( 9 )
   end if
@@ -156,7 +156,7 @@ if ( pass == 'w' ) return
 
 ! Checkpoint
 if ( itcheck /= 0 .and. mod( it, itcheck ) == 0 ) then
-  inquire( iolength=reclen ) v, u, vs, us, trup, &
+  inquire( iolength=reclen ) v, u, sv, sl, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   write( str, '(a,i6.6,i6.6)') 'out/ckp/', ip, it
   open( 9, &
@@ -165,7 +165,7 @@ if ( itcheck /= 0 .and. mod( it, itcheck ) == 0 ) then
     form='unformatted', &
     access='direct', &
     status='replace' )
-  write( 9, rec=1 ) v, u, vs, us, trup, &
+  write( 9, rec=1 ) v, u, sv, sl, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   close( 9 )
   write( str, '(a,i6.6,a)' ) 'out/ckp/', ip, '.hdr'

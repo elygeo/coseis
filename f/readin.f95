@@ -7,14 +7,16 @@ subroutine readin
 use globals_m
 
 implicit none
-integer :: iz, err
+integer :: i, iz, err
 character(160) :: infile(2), str, key1, key2
 logical :: inzone
 
 infile(1) = 'defaults'
 infile(2) = 'in'
+model = 'none'
 grid = 'none'
-srctimef = 'none'
+timefn = 'none'
+spacefn = 'none'
 nin = 0
 nout = 0
 nlock = 0
@@ -54,15 +56,15 @@ doline: do
   case( 'timefn' );       timefn = key2
   case( 'rsource' );      read( str, * ) key1, rsource
   case( 'tsource' );      read( str, * ) key1, tsource
-  case( 'moment' );       read( str, * ) key1, moment
+  case( 'moment' );       read( str, * ) key1, moment1, moment2
   case( 'ihypo' );        read( str, * ) key1, ihypo
   case( 'faultnormal' );  read( str, * ) key1, ifn
   case( 'mus' );          inzone = .true.
   case( 'mud' );          inzone = .true.
   case( 'dc' );           inzone = .true.
-  case( 'cohesion' );     inzone = .true.
-  case( 'tnormal' );      inzone = .true.
-  case( 'tstrike' );      inzone = .true.
+  case( 'co' );           inzone = .true.
+  case( 'tnrm' );         inzone = .true.
+  case( 'tstr' );         inzone = .true.
   case( 'tdip' );         inzone = .true.
   case( 'sxx' );          inzone = .true.
   case( 'syy' );          inzone = .true.
@@ -81,11 +83,11 @@ doline: do
     read( str, * ) key1, fieldout(i), ditout(i), i1out(i,:), i2out(i,:)
   case default; print '(2a)', 'Bad input: ', trim( str ); stop
   end select selectkey
-  if ( inzone ) 
+  if ( inzone ) then
     nin = nin + 1
     i = nin
     if ( key2 == 'read' ) then
-      in_readfile(nin) = .true.
+      readfile(nin) = .true.
     else
       readfile(nin) = .false.
       read( str, * ) fieldin(i), valin(i), i1in(i,:), i2in(i,:)
@@ -102,7 +104,7 @@ close( 9 )
 end do dofile
 
 i = max( nout, max( nout, nlock ) )
-if ( nin > nz .or. nout > nz .or nlock > nz ) then
+if ( nin > nz .or. nout > nz .or. nlock > nz ) then
   print *, 'Error: make nz at least max: ', nin, nout, nlock
   stop
 end if

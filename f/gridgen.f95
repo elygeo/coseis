@@ -10,8 +10,7 @@ use optimize_m
 
 implicit none
 real :: theta, scl
-real, parameter :: pi = 3.14159
-integer :: i, j, k, l, j1, k1, l1, j2, k2, l2, up
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up
 real :: lj, lk, ll
 
 if ( ip == 0 ) print '(a)', 'Grid generation'
@@ -27,7 +26,7 @@ i2oper(1,:) = i2
 
 ! Read grid files or creat basic rectangular mesh
 x = 0.
-if ( grid = 'read' ) then
+if ( grid == 'read' ) then
   call bread4( 'data/x1', x, i1, i2, 1 )
   call bread4( 'data/x2', x, i1, i2, 2 )
   call bread4( 'data/x3', x, i1, i2, 3 )
@@ -52,7 +51,7 @@ end if
 ! Coordinate system
 l  = abs( upward )
 up = sign( 1, upward )
-if ( ifn == 0 .or. ifn == l )
+if ( ifn == 0 .or. ifn == l ) then
   k = mod( l + 1, 3 ) + 1
 else
   k = ifn
@@ -112,7 +111,7 @@ if( bc1(3) /= -1 ) x(:,:,j1-1,:) = x(:,:,j1,:)
 if( bc2(3) /= -1 ) x(:,:,l2+1,:) = x(:,:,l2,:)
 
 ! Find hypocenter location
-if ( all( i1hypo >= i1node .and. i1hypo <= i2node ) ) then
+if ( all( ihypo >= i1node .and. ihypo <= i2node ) ) then
   j = ihypo(1)
   k = ihypo(2)
   l = ihypo(3)
