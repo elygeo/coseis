@@ -414,4 +414,35 @@ COURANT STABILITY CONDITION
   W = lamda*trace(E)*I + 2*mu*E
 
 
+DOMAIN DECOMPOSITION
+
+                  .---. 1
+                  |   | 1
+  +---+ 1         +---+ i1node
+  | x | 1         | x | i1cell
+  +---+           +---+
+  | x |           | x |                   
+  +---+           +---+ i2node    .---. 1
+  | x |           | x | i2cell    | x | i1cell
+  +---+           +---+ m         +---+ i1node
+  | x |                           | x |
+  +---+ npml                      +---+
+  | x | npml                      | x |
+  o---o                           o---o
+  | x |                           | x |
+  o---o                           o---o
+  | x |                           | x |
+  o---o                           o---o
+  | x | n-npml                    | x |
+  +---+ n-npml+1                  +---+
+  | x |                           | x |
+  +---+           .---. 1         +---+ i2node
+  | x |           | x | i1cell    | x | i2cell
+  +---+           +---+ i1node    '---' m 
+  | x |           | x |
+  +---+           +---+
+  | x | n-1       | x | i2cell
+  +---+ n         +---+ i2node
+                  |   | m-1
+                  '---' m
 

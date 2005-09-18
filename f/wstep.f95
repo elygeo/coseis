@@ -17,8 +17,9 @@ u  = u  + dt * v
 sl = sl + dt * sv
 
 ! Gradient
-! G = grad(U + gamma*V)    non PML region
-! G' + DG = gradV          PML region
+! G = grad(U + gamma*V)    non-PML region
+! G = gradU                PML region, non-damped direction
+! G' + DG = gradV          PML region, damped direction
 s2 = 0.
 w2 = 0.
 docomponent:  do ic = 1, 3
