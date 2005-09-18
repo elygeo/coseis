@@ -4,6 +4,18 @@
 module binio_m
 contains
 
+subroutine init
+end subroutine
+
+subroutine finalize
+end subroutine
+
+subroutine parallel
+end subroutine
+
+subroutine swaphalo
+end subroutine
+
 subroutine bwrite3( filename, s1, i1, i2 )
 implicit none
 character*(*), intent(in) :: filename

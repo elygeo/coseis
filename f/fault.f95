@@ -10,7 +10,7 @@ use binio_m
 
 implicit none
 save
-real :: mus0, mud0, dc0, tn0, ts0, vector(3)
+real :: mus0, mud0, dc0, dctest, tn0, ts0, s, rctest, vector(3)
 integer :: i, j, k, l, i1(3), j1, k1, l1, i1(3), j2, k2, l2, &
   j3, k3, l3, j4, k4, l4, iz, idip, istr
 logical :: init = .true.
@@ -164,23 +164,19 @@ if ( all( i1hypo >= i1node .and. i1hypo <= i2node ) ) then
   tn0 = sum( t0(j,k,l,:) * nrm(j,k,l,:) )
   ts0 = sqrt( sum( ( t0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) ** 2. ) )
   tn0 = max( -tn0, 0. )
-  ess = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 )
-  dcmin = 3 * abs( dx ) * tn0 * ( mus0 - mud0 ) / muhypo
-  rcritmin = muhypo * tn0 * ( mus0 - mud0 ) * dc0 / ( ts0 - tn0 * mud0 ) ** 2
+  s = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 )
+  dctest = 3 * abs( dx ) * tn0 * ( mus0 - mud0 ) / ( rho * vs * vs )
+  rctest = rho * vs * vs * tn0 * ( mus0 - mud0 ) * dc0 &
+    / ( ts0 - tn0 * mud0 ) ** 2
   open(  9, file='out/faultmeta.m', status='new' )
-  write( 9, * ) 'ihypo    = [ ', ihypo - noff, ' ];'
-  write( 9, * ) 'xhypo    = [ ', xhypo,        ' ];'
-  write( 9, * ) 'mus0     =   ', mus0,           ';'
-  write( 9, * ) 'mud0     =   ', mud0,           ';'
-  write( 9, * ) 'dc0      =   ', dc0,            ';'
-  write( 9, * ) 'dcmin    =   ', dcmin,          ';'
-  write( 9, * ) 'tn0      =   ', tn0,            ';'
-  write( 9, * ) 'ts0      =   ', ts0,            ';'
-  write( 9, * ) 'ess      =   ', ess,            ';'
-  write( 9, * ) 'vrup     =   ', vrup,           ';'
-  write( 9, * ) 'rcrit    =   ', rcrit,          ';'
-  write( 9, * ) 'rcritmin =   ', rcritmin,       ';'
-  write( 9, * ) 'trelax   =   ', trelax,         ';'
+  write( 9, * ) 'mus0   =   ', mus0,   ';'
+  write( 9, * ) 'mud0   =   ', mud0,   ';'
+  write( 9, * ) 'dc0    =   ', dc0,    ';'
+  write( 9, * ) 'dctest =   ', dctest, ';'
+  write( 9, * ) 'tn0    =   ', tn0,    ';'
+  write( 9, * ) 'ts0    =   ', ts0,    ';'
+  write( 9, * ) 's      =   ', s,      ';'
+  write( 9, * ) 'rctest =   ', rctest, ';'
   close( 9 )
 end if
 

@@ -12,7 +12,7 @@ save
 character, intent(in) :: pass
 character :: onpass
 integer :: iz, nc, reclen, wt_rate, hh, mm, ss, n(3), err
-real :: dwt(4)
+real :: dwt(4), courant
 character :: endian
 character(160) :: str
 logical :: fault, cell, static, init = .true., test
@@ -36,15 +36,33 @@ ifinit: if ( init ) then
         write( str, '(a,i2.2)' ) 'out/', iz
         call system( 'mkdir ' // str )
       end do
+    end if
+    courant = dt * vp2 * sqrt( 3. ) / abs( dx )
+    if ( all( ihypo >= i1node .and. ihypo <= i2node ) ) then
       write( str, '(a,i2.2,a)' ) 'out/meta.m'
       open(  9, file=str, status='new' )
-      write( 9, * ) 'n      = [ ', nn, nt  ' ];'
-      write( 9, * ) 'dx     =   ', dx        ';'
-      write( 9, * ) 'rho    =   ', rho       ';'
-      write( 9, * ) 'vp     =   ', vp        ';'
-      write( 9, * ) 'vs     =   ', vs        ';'
-      write( 9, * ) 'upward =   ', upward,   ';'
-      write( 9, * ) 'nout   =   ', nout,     ';'
+      write( 9, * ) 'n       = [ ', nn, nt           ' ];'
+      write( 9, * ) 'dx      =   ', dx                 ';'
+      write( 9, * ) 'dt      =   ', dt                 ';'
+      write( 9, * ) 'rho     =   ', rho                ';'
+      write( 9, * ) 'vp      =   ', vp                 ';'
+      write( 9, * ) 'vs      =   ', vs                 ';'
+      write( 9, * ) 'courant =   ', courant,           ';'
+      write( 9, * ) 'grid    =   ', grid,              ';'
+      write( 9, * ) 'upward  =   ', upward,            ';'
+      write( 9, * ) 'xsource = [ ', xsource,         ' ];'
+      write( 9, * ) 'rfunc   = ''', trim( rfunc ),   ''';'
+      write( 9, * ) 'rsource =   ', rsource,           ';'
+      write( 9, * ) 'tfunc   = ''', trim( tfunc ),   ''';'
+      write( 9, * ) 'tsource =   ', tsource,           ';'
+      write( 9, * ) 'moment1 = [ ', moment1,         ' ];'
+      write( 9, * ) 'moment2 = [ ', moment2,         ' ];'
+      write( 9, * ) 'ihypo   = [ ', ihypo - noff,    ' ];'
+      write( 9, * ) 'xhypo   = [ ', xhypo,           ' ];'
+      write( 9, * ) 'vrup    =   ', vrup,              ';'
+      write( 9, * ) 'rcrit   =   ', rcrit,             ';'
+      write( 9, * ) 'trelax  =   ', trelax,            ';'
+      write( 9, * ) 'nout    =   ', nout,              ';'
       close( 9 )
     end if
   else

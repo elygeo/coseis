@@ -57,7 +57,7 @@ tol = 10. * epsilon( dx )
 ! dx/dy = dx/dz = dy/dz = dy/dx = dz/dx = dz/dy = 0
 ! dx/dx = dy/dy = dz/dz
 noper = 1
-oper = 'h'
+oper(1) = 'h'
 
 if ( test < tol ) return
 
@@ -75,19 +75,19 @@ do i = k1, k2;     i1(2) = i; if ( any( s1(:,i,:) > tol ) ) exit; end do
 do i = k2, k1, -1; i2(2) = i; if ( any( s1(:,i,:) > tol ) ) exit; end do
 do i = l1, l2;     i1(3) = i; if ( any( s1(:,:,i) > tol ) ) exit; end do
 do i = l2, l1, -1; i2(3) = i; if ( any( s1(:,:,i) > tol ) ) exit; end do
-i1oper(2,:) = i1
-i2oper(2,:) = i2 + 1
-
-oper = 'rg'
 test = product( i2 - i1 + 2 ) / product( i2cell - i1cell + 2 )
 
 if ( all( i2 > i1 ) .and. test > .8 ) then
-  oper = 'g'
+  oper(1) = 'g'
 else if ( all( i2 <= i1 ) ) then
-  oper = 'r'
+  oper(1) = 'r'
+else
+  noper = 2
+  oper(1) = 'r'
+  oper(2) = 'g'
+  i1oper(2,:) = i1
+  i2oper(2,:) = i2 + 1
 end if
-
-noper = len_trim( oper )
 
 end subroutine
 end module

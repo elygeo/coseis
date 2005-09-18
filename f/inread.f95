@@ -52,9 +52,9 @@ doline: do
   case( 'npml' );         read( str, * ) key1, npml
   case( 'bc' );           read( str, * ) key1, bc1, bc2
   case( 'xsource' );      read( str, * ) key1, xsource
-  case( 'spacefn' );      spacefn = key2
-  case( 'timefn' );       timefn = key2
+  case( 'rfunc' );        rfunc = key2
   case( 'rsource' );      read( str, * ) key1, rsource
+  case( 'tfunc' );        tfunc = key2
   case( 'tsource' );      read( str, * ) key1, tsource
   case( 'moment' );       read( str, * ) key1, moment1, moment2
   case( 'ihypo' );        read( str, * ) key1, ihypo

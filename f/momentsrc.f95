@@ -12,8 +12,7 @@ save
 logical :: init = .true.
 integer, allocatable :: jj(:), kk(:), ll(:)
 real, allocatable :: srcfr(:)
-integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, &
-  nsrc, ic, eiginfo
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, nsrc, ic
 real :: srcft, m0, mw, d, mm(3,3), eigval(3), eigwork(8)
 
 if ( rsource <= 0. ) return
@@ -53,10 +52,10 @@ nsrc = count( s2 <= rsource )
 allocate( srcfr(nrsc), jj(nsrc), kk(nsrc), ll(nsrc) ) 
 
 ! Spatial weighting
-select case( spacefn )
+select case( rfunc )
 case( 'box'  ); srcfr = 1.
 case( 'tent' ); srcfr = rsource - pack( s2, s2 <= rsource )
-case default; stop 'spacefn'
+case default; stop 'rfunc'
 end select
 
 ! Normalize and devide by cell volume
@@ -88,26 +87,17 @@ if ( all( ihypo >= i1node .and. ihypo <= i2node ) ) then
   mm(2,3) = moment2(1)
   mm(1,3) = moment2(2)
   mm(1,2) = moment2(3)
-  call ssyev( 'N', 'U', 3, mm, 3, eigval, eigwork, size(eigwork), eiginfo )
+  call ssyev( 'N', 'U', 3, mm, 3, eigval, eigwork, size(eigwork), i )
   m0 = maxval( abs( eigval ) )
   mw = 2. / 3. * log10( m0 ) - 10.7
   d = m0 / ( rho * vs * vs * dx * dx )
   open(  9, file='out/sourcemeta.m', status='new' )
-  write( 9, * ) 'xsource = [ ', xsource,         ' ];'
-  write( 9, * ) 'rsource = ',   rsource,           ';'
-  write( 9, * ) 'tsource = ',   tsource,           ';'
-  write( 9, * ) 'spacefn = ''', trim( spacefn ), ''';'
-  write( 9, * ) 'timefn  = ''', trim( timefn ),  ''';'
-  write( 9, * ) 'moment1 = [ ', moment1,         ' ];'
-  write( 9, * ) 'moment2 = [ ', moment2,         ' ];'
-  write( 9, * ) 'rho     = ',   rho,               ';'
-  write( 9, * ) 'vp      = ',   vp,                ';'
-  write( 9, * ) 'vs      = ',   vs,                ';'
-  write( 9, * ) 'm0      = ',   m0,                ';'
-  write( 9, * ) 'mw      = ',   mw,                ';'
-  write( 9, * ) 'd       = ',   d,                 ';'
+  write( 9, * ) 'm0 = ', m0, ';'
+  write( 9, * ) 'mw = ', mw, ';'
+  write( 9, * ) 'd  = ', d,  ';'
   close( 9 )
 end if
+
 
 return
 
@@ -116,12 +106,12 @@ end if ifinit
 !------------------------------------------------------------------------------!
 
 ! Source time function
-select case( timefn )
+select case( tfunc )
 case( 'delta'  ); srct = 1.; if ( it == 1 ) srcft = 1.
 case( 'brune'  ); srct = 1. - exp( -t / tsource ) / tsource * ( t + tsource )
 case( 'sbrune' ); srct = 1. - exp( -t / tsource ) / tsource * &
   ( t + tsource + t * t / tsource / 2. )
-case default; stop 'timefn'
+case default; stop 'tfunc'
 end select
 
 ! Add to stress variables

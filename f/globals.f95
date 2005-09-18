@@ -139,7 +139,7 @@ integer :: &
   it,           & ! current time step
   itcheck,      & ! interval for checkpointing
   ip,           & ! processor index
-  wt(5),        & ! wall clock timing array
+  wt(6),        & ! wall clock timing array
   noper,        & ! number of zones for spatial derivative operators
   i1oper(2,3),  & ! j1 k1 l1 operator zone start index
   i2oper(2,3),  & ! j2 k2 l2 operator zone end index
@@ -155,8 +155,8 @@ integer :: &
   i2out(nz,3),  & ! j2 k2 l2 input zone end index
   ditout(nz)      ! interval for writing output
 
-character(2) :: &
-  oper            ! spatial derivative operators
+character :: &
+  oper(2)         ! spatial derivative operators
 
 character(8) :: &
   fieldin(nz),  & ! input variable
@@ -165,8 +165,8 @@ character(8) :: &
 character(16) :: &
   model,        & ! model ID
   grid,         & ! grid generation scheme
-  spacefn,      & ! moment source space function
-  timefn          ! moment source fime function
+  rfunc,        & ! moment source space function
+  tfunc           ! moment source fime function
 
 logical :: &
   readfile(nz)    ! read input file

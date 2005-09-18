@@ -16,14 +16,19 @@ use vstep_m
 use wstep_m
 use output_m
 
+integer :: err
+
 print '(a)', ''
 print '(a)', 'SORD - Support Operator Rupture Dynamics'
 
+call init
 call inread
+call parallel
 call setup
 call arrays
 call gridgen
 call matmodel
+call swaphalo
 call pml
 call fault
 call momentsrc
@@ -35,7 +40,10 @@ do while ( it < nt )
   call system_clock( wt(2) ); call output( 'w' )
   call system_clock( wt(3) ); call vstep
   call system_clock( wt(4) ); call output( 'v' )
+  call system_clock( wt(5) ); call swaphalo
 end do
+
+call finalize
 
 end program
 
