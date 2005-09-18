@@ -1,9 +1,9 @@
 !------------------------------------------------------------------------------!
-! READIN
+! INREAD
 
-module readin_m
+module inread_m
 contains
-subroutine readin
+subroutine inread
 use globals_m
 
 implicit none
@@ -90,11 +90,11 @@ doline: do
       readfile(nin) = .true.
     else
       readfile(nin) = .false.
-      read( str, * ) fieldin(i), valin(i), i1in(i,:), i2in(i,:)
+      read( str, * ) fieldin(i), inval(i), i1in(i,:), i2in(i,:)
       if ( err /= 0 ) then
         i1in(nz,:) = 1
         i2in(nz,:) = -1
-        read( str, *, iostat=err ) fieldin(i), valin(i)
+        read( str, *, iostat=err ) fieldin(i), inval(i)
       end if
     end if
   end if

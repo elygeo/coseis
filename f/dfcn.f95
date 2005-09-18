@@ -3,11 +3,11 @@
 
 module dfcn_m
 contains
-subroutine dfcn( df, op, f, x, dx, i, a, i1, i2 )
+subroutine dfcn( df, oper, f, x, dx, i, a, i1, i2 )
 
 implicit none
 real, intent(out) :: df(:,:,:)
-character, intent(in) :: op
+character, intent(in) :: oper
 real, intent(in) :: f(:,:,:,:), x(:,:,:,:), dx
 integer, intent(in) :: i, a, i1(3), i2(3)
 real :: h
@@ -17,7 +17,7 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
-select case( op )
+select case( oper )
 
 case( 'h' ) ! constant grid, flops: 1* 7+
 

@@ -13,7 +13,7 @@ clear all
 if exist( 'out', 'dir' ), rmdir( 'out', 's' ), end
 
 addpath m
-readin
+inread
 setup
 arrays
 init = 1; viz

@@ -46,7 +46,7 @@ vp1  = minval( s1, s1 > 0. ); vp2  = maxval( s1 )
 vs1  = minval( s2, s2 > 0. ); vs2  = maxval( s2 )
 
 ! Hypocenter values
-if ( all( i1hypo >= i1cell .and. i1hypo <= i2cell + 1 ) ) then
+if ( all( ihypo >= i1cell .and. ihypo <= i2cell + 1 ) ) then
   j = i1(1)
   k = i1(2)
   l = i1(3)

@@ -79,7 +79,7 @@ real :: &
   t,            & ! **time
   dt,           & ! time step
   dx,           & ! spatial step
-  valin(nz),    & ! input value
+  inval(nz),    & ! input value
   rho1,         & ! minimum density
   vp1,          & ! minimum P-wave speed
   vs1,          & ! minimum S-wave speed

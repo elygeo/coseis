@@ -136,7 +136,7 @@ OBJECT="\\
   hgnc.o \\
   snormals.o \\
   binio.o \\
-  readin.o \\
+  inread.o \\
   setup.o \\
   arrays.o \\
   optimize.o \\
