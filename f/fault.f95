@@ -35,20 +35,20 @@ ifreadfile: if ( readfile(i) ) then
   i2 = i2node
   i1(ifn) = 1
   i2(ifn) = 1
-  select case ( inkey(i) )
-  case ( 'mus'  ); call bread3( 'data/mus',  mus, i1, i2 )
-  case ( 'mud'  ); call bread3( 'data/mud',  mud, i1, i2 )
-  case ( 'dc'   ); call bread3( 'data/dc',   dc, i1, i2 )
-  case ( 'co'   ); call bread3( 'data/co',   co, i1, i2 )
-  case ( 'sxx'  ); call bread4( 'data/sxx',  t1, i1, i2, 1 )
-  case ( 'syy'  ); call bread4( 'data/syy',  t1, i1, i2, 2 )
-  case ( 'szz'  ); call bread4( 'data/szz',  t1, i1, i2, 3 )
-  case ( 'syz'  ); call bread4( 'data/syz',  t2, i1, i2, 1 )
-  case ( 'szx'  ); call bread4( 'data/szx',  t2, i1, i2, 2 )
-  case ( 'sxy'  ); call bread4( 'data/szy',  t2, i1, i2, 3 )
-  case ( 'tnrm' ); call bread4( 'data/tnrm', t3, i1, i2, 1 )
-  case ( 'tstr' ); call bread4( 'data/tstr', t3, i1, i2, 2 )
-  case ( 'tdip' ); call bread4( 'data/tdip', t3, i1, i2, 3 )
+  select case ( fieldin(i) )
+  case ( 'mus'  ); call pread3( 'data/mus',  mus, i1, i2 )
+  case ( 'mud'  ); call pread3( 'data/mud',  mud, i1, i2 )
+  case ( 'dc'   ); call pread3( 'data/dc',   dc, i1, i2 )
+  case ( 'co'   ); call pread3( 'data/co',   co, i1, i2 )
+  case ( 'sxx'  ); call pread4( 'data/sxx',  t1, i1, i2, 1 )
+  case ( 'syy'  ); call pread4( 'data/syy',  t1, i1, i2, 2 )
+  case ( 'szz'  ); call pread4( 'data/szz',  t1, i1, i2, 3 )
+  case ( 'syz'  ); call pread4( 'data/syz',  t2, i1, i2, 1 )
+  case ( 'szx'  ); call pread4( 'data/szx',  t2, i1, i2, 2 )
+  case ( 'sxy'  ); call pread4( 'data/szy',  t2, i1, i2, 3 )
+  case ( 'tnrm' ); call pread4( 'data/tnrm', t3, i1, i2, 1 )
+  case ( 'tstr' ); call pread4( 'data/tstr', t3, i1, i2, 2 )
+  case ( 'tdip' ); call pread4( 'data/tdip', t3, i1, i2, 3 )
   end select
 else
   i1 = max( i1in(i,:), i1node )
@@ -58,7 +58,7 @@ else
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
-  select case ( inkey(i) )
+  select case ( fieldin(i) )
   case ( 'mus'  ); mus(j1:j2,k1:k2,l1:l2)  = inval(i)
   case ( 'mud'  ); mud(j1:j2,k1:k2,l1:l2)  = inval(i)
   case ( 'dc'   ); dc(j1:j2,k1:k2,l1:l2)   = inval(i)
@@ -169,14 +169,14 @@ if ( all( i1hypo >= i1node .and. i1hypo <= i2node ) ) then
   rctest = rho * vs * vs * tn0 * ( mus0 - mud0 ) * dc0 &
     / ( ts0 - tn0 * mud0 ) ** 2
   open(  9, file='out/faultmeta.m', status='new' )
-  write( 9, * ) 'mus0   =   ', mus0,   ';'
-  write( 9, * ) 'mud0   =   ', mud0,   ';'
-  write( 9, * ) 'dc0    =   ', dc0,    ';'
-  write( 9, * ) 'dctest =   ', dctest, ';'
-  write( 9, * ) 'tn0    =   ', tn0,    ';'
-  write( 9, * ) 'ts0    =   ', ts0,    ';'
-  write( 9, * ) 's      =   ', s,      ';'
-  write( 9, * ) 'rctest =   ', rctest, ';'
+  write( 9, * ) 'mus0   = ', mus0,   ';% static friction at hypocenter'
+  write( 9, * ) 'mud0   = ', mud0,   ';% dynamic friction at hypocenter'
+  write( 9, * ) 'dc0    = ', dc0,    ';% dc at hypocenter'
+  write( 9, * ) 'dctest = ', dctest, ';% breakdown resolution test'
+  write( 9, * ) 'tn0    = ', tn0,    ';% normal traction at hypocenter'
+  write( 9, * ) 'ts0    = ', ts0,    ';% shear traction at hypocenter'
+  write( 9, * ) 's      = ', s,      ';% strength paramater'
+  write( 9, * ) 'rctest = ', rctest, ';% remmomended rcrit for nucleation'
   close( 9 )
 end if
 

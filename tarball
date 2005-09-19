@@ -11,8 +11,8 @@ files="
   tarball
   sord
   sord.m
-  defaults
-  in
+  defaults.m
+  in.m
   infiles/
   f/
   m/

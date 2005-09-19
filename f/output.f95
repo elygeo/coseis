@@ -5,7 +5,7 @@ module output_m
 contains
 subroutine output( pass )
 use globals_m
-use binio_m
+use parallel_m
 
 implicit none
 save
@@ -37,32 +37,16 @@ ifinit: if ( init ) then
         call system( 'mkdir ' // str )
       end do
     end if
-    courant = dt * vp2 * sqrt( 3. ) / abs( dx )
     if ( all( ihypo >= i1node .and. ihypo <= i2node ) ) then
+      courant = dt * vp2 * sqrt( 3. ) / abs( dx )
       write( str, '(a,i2.2,a)' ) 'out/meta.m'
       open(  9, file=str, status='new' )
-      write( 9, * ) 'n       = [ ', nn, nt           ' ];'
-      write( 9, * ) 'dx      =   ', dx                 ';'
-      write( 9, * ) 'dt      =   ', dt                 ';'
-      write( 9, * ) 'rho     =   ', rho                ';'
-      write( 9, * ) 'vp      =   ', vp                 ';'
-      write( 9, * ) 'vs      =   ', vs                 ';'
-      write( 9, * ) 'courant =   ', courant,           ';'
-      write( 9, * ) 'grid    =   ', grid,              ';'
-      write( 9, * ) 'upward  =   ', upward,            ';'
-      write( 9, * ) 'xsource = [ ', xsource,         ' ];'
-      write( 9, * ) 'rfunc   = ''', trim( rfunc ),   ''';'
-      write( 9, * ) 'rsource =   ', rsource,           ';'
-      write( 9, * ) 'tfunc   = ''', trim( tfunc ),   ''';'
-      write( 9, * ) 'tsource =   ', tsource,           ';'
-      write( 9, * ) 'moment1 = [ ', moment1,         ' ];'
-      write( 9, * ) 'moment2 = [ ', moment2,         ' ];'
-      write( 9, * ) 'ihypo   = [ ', ihypo - noff,    ' ];'
-      write( 9, * ) 'xhypo   = [ ', xhypo,           ' ];'
-      write( 9, * ) 'vrup    =   ', vrup,              ';'
-      write( 9, * ) 'rcrit   =   ', rcrit,             ';'
-      write( 9, * ) 'trelax  =   ', trelax,            ';'
-      write( 9, * ) 'nout    =   ', nout,              ';'
+      write( 9, * ) 'rho     =   ', rho      ';% density'
+      write( 9, * ) 'vp      =   ', vp       ';% hypocenter Vp'
+      write( 9, * ) 'vs      =   ', vs       ';% hypocenter Vp'
+      write( 9, * ) 'courant =   ', courant, ';% stability condition'
+      write( 9, * ) 'xhypo   = [ ', xhypo, ' ];% hypocenter location'
+      write( 9, * ) 'nout    =   ', nout,    ';% number of outputs'
       close( 9 )
     end if
   else
@@ -126,13 +110,13 @@ if ( cell ) i2 = i2 - 1
 if ( ip == 0 ) then
   write( str, '(a,i2.2,a)' ) 'out/', iz, '/meta.m'
   open(  9, file=str, status='replace' )
-  write( 9, * ) 'field = ''', fieldout(iz), ''';'
-  write( 9, * ) 'nc    =   ', nc,             ';'
-  write( 9, * ) 'i1    = [ ', i1 - noff,    ' ];'
-  write( 9, * ) 'i2    = [ ', i2 - noff,    ' ];'
-  write( 9, * ) 'dit   =   ', ditout(iz),     ';'
-  write( 9, * ) 'itout =   ', it,             ';'
-  write( 9, * ) 'tout  =   ', t,              ';'
+  write( 9, * ) 'field = ''', fieldout(iz), ''';% variable name'
+  write( 9, * ) 'nc    =   ', nc,             ';% number of components'
+  write( 9, * ) 'i1    = [ ', i1 - noff,    ' ];% start index'
+  write( 9, * ) 'i2    = [ ', i2 - noff,    ' ];% end index'
+  write( 9, * ) 'dit   =   ', ditout(iz),     ';% interval'
+  write( 9, * ) 'itout =   ', it,             ';% time step'
+  write( 9, * ) 'tout  =   ', t,              ';% time'
   close( 9 )
 end if
 
@@ -148,20 +132,20 @@ do i = 1, nc
   write( str, '(a,i2.2,a,a,i1,i6.6)' ) &
     'out/', iz, '/', trim( out_field(iz) ), i, it
   select case( outvar(iz) )
-  case( 'x'    ); call bwrite4( str, x,    i1, i2, i )
-  case( 'a'    ); call bwrite4( str, w1,   i1, i2, i )
-  case( 'v'    ); call bwrite4( str, v,    i1, i2, i )
-  case( 'u'    ); call bwrite4( str, u,    i1, i2, i )
+  case( 'x'    ); call pwrite4( str, x,    i1, i2, i )
+  case( 'a'    ); call pwrite4( str, w1,   i1, i2, i )
+  case( 'v'    ); call pwrite4( str, v,    i1, i2, i )
+  case( 'u'    ); call pwrite4( str, u,    i1, i2, i )
   case( 'w'    );
-    if ( i < 4 )  call bwrite4( str, w1,   i1, i2, i )
-    if ( i > 3 )  call bwrite4( str, w2,   i1, i2, i-3 )
-  case( 'am'   ); call bwrite3( str, s1,   i1, i2 )
-  case( 'vm'   ); call bwrite3( str, s2,   i1, i2 )
-  case( 'um'   ); call bwrite3( str, s1,   i1, i2 )
-  case( 'wm'   ); call bwrite3( str, s2,   i1, i2 )
-  case( 'sv'   ); call bwrite3( str, sv,   i1, i2 )
-  case( 'sl'   ); call bwrite3( str, sl,    i1, i2 )
-  case( 'trup' ); call bwrite3( str, trup, i1, i2 )
+    if ( i < 4 )  call pwrite4( str, w1,   i1, i2, i )
+    if ( i > 3 )  call pwrite4( str, w2,   i1, i2, i-3 )
+  case( 'am'   ); call pwrite3( str, s1,   i1, i2 )
+  case( 'vm'   ); call pwrite3( str, s2,   i1, i2 )
+  case( 'um'   ); call pwrite3( str, s1,   i1, i2 )
+  case( 'wm'   ); call pwrite3( str, s2,   i1, i2 )
+  case( 'sv'   ); call pwrite3( str, sv,   i1, i2 )
+  case( 'sl'   ); call pwrite3( str, sl,    i1, i2 )
+  case( 'trup' ); call pwrite3( str, trup, i1, i2 )
   case default; stop 'var'
   end select
 end do

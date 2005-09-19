@@ -1,24 +1,54 @@
+!------------------------------------------------------------------------------!
+! PARALLEL IO
 
-! SWAPHALO
-
-subroutine swaphalo
-use globals
+module io_m
 use mpi
 
 implicit none
 save
-integer :: nreqs, req(12), comm, commout(nz), mpistatus( mpi_statis_size, 4 )
-integer :: i, err
-integer, intent(in) :: stage
-integer, intent(out) :: nreqs = 0, req(12)
-integer :: err, i, ng(4), nl(4), istart(4) = 0, ape1, ape2, vsub
-logical :: period(3) = .false., init = .true.
+integer :: comm
+logical :: period(3) = .false.
+
+contains
+
+! Find rank
+subroutine prank( np, ip3 )
+integer, intent(in) :: np
+integer, intent(out) :: ip3
+call mpi_cart_create( mpi_comm_world, 3, np, period, .true., comm, err )
+call mpi_cart_get( comm, 3, np, period, ip3, err )
+end subroutine
+
+! Parallel integer minimum
+subroutine pimin( val )
+integer, intent(inout) :: val
+integer :: tmp
+tmp = val
+mpi_allreduce( tmp, val, 1, mpi_integer, mpi_min, comm, err )
+end subroutine
+
+! Parallel real minimum
+subroutine prmin( val )
+real, intent(inout) :: val
 real :: tmp
+tmp = lval
+mpi_allreduce( tmp, val, 1, mpi_real, mpi_min, comm, err )
+end subroutine
 
+! Parallel real maximum
+subroutine prmax( val )
+real, intent(inout) :: val
+real :: tmp
+tmp = val
+mpi_allreduce( tmp, val, 1, mpi_real, mpi_max, comm, err )
+end subroutine
 
-i = it;    mpi_allreduce( i, it, 1, mpi_integer, mpi_min, comm, err )
-tmp = vs1; mpi_allreduce( tmp, vs1, 1, mpi_real, mpi_min, comm, err )
-tmp = vs2; mpi_allreduce( tmp, vs2, 1, mpi_real, mpi_max, comm, err )
+! Swap halo
+subroutine swaphalo
+use globals
+
+integer :: nreqs, req(12), commout(nz), mpistatus( mpi_statis_size, 4 )
+integer :: i, ng(4), nl(4), istart(4) = 0, ape1, ape2, vsub
 
 do i = 1, nout
   call mpi_comm_split( comm, outme(i), ip, commout(i), err )
@@ -55,29 +85,23 @@ if ( np(i) > 1 ) then
 end if
 end do
 
-  do i = 1, nreqs, 4
-    call mpi_startall( 4, req(i), err )
-    call mpi_waitall( 4, req(i), mpistatus, err )
-  end do
-call mpi_finalize( err )
+do i = 1, nreqs, 4
+  call mpi_startall( 4, req(i), err )
+  call mpi_waitall( 4, req(i), mpistatus, err )
+end do
 
 !------------------------------------------------------------------------------!
-! BWRITE
+! PWRITE
 
-module bwrite_m
+module pwrite_m
 contains
-subroutine bwrite( filename, s1, i1, i2 )
-use mpi
-use sordmpi_m
+subroutine pwrite( filename, s1, i1, i2 )
 
 implicit none
-include 'mpif.h'
-
 character*(*), intent(in) :: filename
 real, intent(in) :: s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3)
-
-integer :: comm, err, ftype, mtype, fh, d = 0, nl(3), ng(3), istart(3)
+integer :: ftype, mtype, fh, d = 0, nl(3), ng(3), istart(3)
 integer :: mof = mpi_order_fortran, msi = mpi_status_ignore
 integer :: mode =  mpi_mode_create + mpi_mode_wronly + mpi_mode_excl
 

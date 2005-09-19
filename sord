@@ -22,7 +22,7 @@ while getopts spgnmrld opt; do
   esac
 done
 shift $(( OPTIND - 1 ))
-[ -n "$1" ] && ln -s "$1" 'in'
+[ -n "$1" ] && ln -s "$1" 'in.m'
 
 # run on remote host
 if [ $remote = yes ]; then
@@ -41,19 +41,22 @@ fi
 
 nn3=( 1 1 1 )
 np3=( 1 1 1 )
-for file in 'defaults' 'in'; do
+for file in 'defaults.m' 'in.m'; do
   if [ ! -f "$file" ]; then
     echo "file not found: $file"
     exit
   fi
-  while read key params; do
+  while read key1 key2 params; do
+  echo read key1 key2 params
     set -- $params
     case "$key" in
-      n)    nn3=( $1 $2 $3 ); nt=$4 ;;
-      np)   np3=( $1 $2 $3 ) ;;
+      nn) nn3=( $2 $3 $4 ) ;;
+      nt) nt=$1 ;;
+      np) np3=( $2 $3 $4 ) ;;
     esac
   done < "$file"
 done
+exit
 nn=$(( nn3[0] * nn3[1] * nn3[2] ));
 np=$(( np3[0] * np3[1] * np3[2] ));
 [ $matlab = yes ] && np=1
@@ -75,7 +78,7 @@ fi
 
 ./tarball
 cp sord.tgz out/
-cp 'in' out/
+cp 'in.m' out/
 perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > out/endian
 
 floatsize=4

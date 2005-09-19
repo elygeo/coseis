@@ -20,9 +20,6 @@ if init
       file = sprintf( 'out/%02d/', iz );
       mkdir( file )
     end
-    fid = fopen( 'out/modelmeta', 'w' );
-    fprintf( fid, 'upward %g\n', upward );
-    fclose( fid );
   end
   [ tmp1, tmp2, endian ] = computer;
   fid = fopen( 'out/endian', 'w' );

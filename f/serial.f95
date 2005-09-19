@@ -1,21 +1,20 @@
 !------------------------------------------------------------------------------!
-! BINIO
+! SERIAL
 
-module binio_m
+module parallel_m
 contains
 
-subroutine init
-end subroutine
+! Parallelization hooks do nothing in serial version
+subroutine init;          end subroutine
+subroutine finalize;      end subroutine
+subroutine prank;         end subroutine
+subroutine parallel;      end subroutine
+subroutine swaphalo;      end subroutine
+subroutine pimin( ival ); end subroutine
+subroutine prmin( rval ); end subroutine
+subroutine prmax( rval ); end subroutine
 
-subroutine finalize
-end subroutine
-
-subroutine parallel
-end subroutine
-
-subroutine swaphalo
-end subroutine
-
+! Write scalar field
 subroutine bwrite3( filename, s1, i1, i2 )
 implicit none
 character*(*), intent(in) :: filename
@@ -38,6 +37,7 @@ write( 9, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
 close( 9 )
 end subroutine
 
+! Write vector field
 subroutine bwrite4( filename, w1, i1, i2, i )
 implicit none
 character*(*), intent(in) :: filename
@@ -60,6 +60,7 @@ write( 9, rec=1 ) w1(j1:j2,k1:k2,l1:l2,i)
 close( 9 )
 end subroutine
 
+! Read scalar field
 subroutine bread3( filename, s1, i1, i2 )
 implicit none
 character*(*), intent(in) :: filename
@@ -82,6 +83,7 @@ read( 9, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
 close( 9 )
 end subroutine
 
+! Read vector field
 subroutine bread4( filename, w1, i1, i2, i )
 implicit none
 character*(*), intent(in) :: filename

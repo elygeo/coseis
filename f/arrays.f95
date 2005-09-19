@@ -33,8 +33,8 @@ allocate(       &
 
 i1 = 0
 i2 = 0
-where ( bc1 == 1 ) i1 = min( nl, npml )
-where ( bc2 == 1 ) i2 = min( nl, npml )
+where ( bc1 == 1 ) i1 = npml
+where ( bc2 == 1 ) i2 = npml
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)

@@ -49,5 +49,10 @@ for i = i - 1, nout
   i1out(i,:) = i1;
   i2out(i,:) = i2;
 end
+for i = i - 1, nlock
+  [ i1, i2 ] =  zone( i1lock(i,:), i2lock(i,:), nn, noff, ihypo, ifn )
+  i1lock(i,:) = i1;
+  i2lock(i,:) = i2;
+end
 
 

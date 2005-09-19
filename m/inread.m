@@ -4,85 +4,46 @@
 plotstyle = '';
 plotstyle = 'slice';
 truptol = .001;
-inkey   = {}; i1in    = []; i2in   = []; inval = [];
-outkey  = {}; i1out   = []; i2out  = []; ditout = [];
-lock    = []; i1lock  = []; i2lock = [];
-grid    = '';
+nin = 0;
+nout = 0;
+nlock = 0;
 
-for file = { 'defaults' 'in' }
+for file = { 'defaults.m' 'in.m' }
 
 fprintf( 'Reading file: %s\n', file{1} )
-in = textread( file{1}, '%s', 'delimiter', '\n', 'commentstyle', 'shell' );
+in = textread( file{1}, '%s', 'delimiter', '\n' );
 
 for i = 1:length( in )
-  %if in{i}, else continue, end
-  str = strread( in{i}, '%[^#]' );
-  [ key, str ] = strtok( str{1} );
-  inzone = 0;
+  if in{i}, else continue, end
+  eval( in{i} )
+  key = strtok( in{i} );
   switch key
-  case ''
-  case 'grid',         model        = strtok( str );
-  case 'n',            n            = strread( str, '%u' )';
-    nn = n(1:3);
-    nt = n(4);
-  case 'dx',           dx           = strread( str, '%f' )';
-  case 'dt',           dt           = strread( str, '%f' )';
-  case 'grid',         grid         = strtok( str );
-  case 'rho',          inzone       = 1;
-  case 'vp',           inzone       = 1;
-  case 'vs',           inzone       = 1;
-  case 'lock',         val          = strread( str, '%u' )';
-    lock(end+1,:)   = val(1:3);
-    i1lock(end+1,:) = val(4:6);
-    i2lock(end+1,:) = val(7:9);
-  case 'viscosity',    viscosity    = strread( str, '%f' )';
-  case 'npml',         npml         = strread( str, '%u' )';
-  case 'bc',           bc           = strread( str, '%u' )';
-  case 'hypocenter',   x0           = strread( str, '%f' )';
-  case 'moment',       moment       = strread( str, '%f' )';
-  case 'sourcetimefn', sourcetimefn = strtok( str );
-  case 'tsource',      tsource      = strread( str, '%f' )';
-  case 'rsource',      rsource      = strread( str, '%f' )';
-  case 'faultnormal',  ifn          = strread( str, '%u' )';
-  case 'upvector',     upvector     = strread( str, '%f' )';
-  case 'mus',          inzone       = 1;
-  case 'mud',          inzone       = 1;
-  case 'dc',           inzone       = 1;
-  case 'cohesion',     inzone       = 1;
-  case 'tnormal',      inzone       = 1;
-  case 'tstrike',      inzone       = 1;
-  case 'tdip',         inzone       = 1;
-  case 'cohesion',     inzone       = 1;
-  case 'sxx',          inzone       = 1;
-  case 'syy',          inzone       = 1;
-  case 'szz',          inzone       = 1;
-  case 'syz',          inzone       = 1;
-  case 'szx',          inzone       = 1;
-  case 'sxy',          inzone       = 1;
-  case 'vrup',         vrup         = strread( str, '%f' )';
-  case 'rcrit',        rcrit        = strread( str, '%f' )';
-  case 'trelax',       trelax       = strread( str, '%f' )';
-  case 'truptol',      truptol      = strread( str, '%f' )';
-  case 'np',           np           = strread( str, '%u' );
-  case 'checkpoint',   itcheck      = strread( str, '%u' )';
+  case { 'rho', 'vp', 'vs', ...
+         'mus', 'mud', 'dc', 'co', ...
+         'tnrm', 'tstr', 'tdip', ...
+         'sxx', 'syy', 'szz', ...
+         'syz', 'szx', 'sxy' }
+    eval( [ 'in =' key ';' ] )
+    nin = nin + 1;
+    fieldin{nin} = key;
+    inval(nin)   = in(1);
+    i1in(nin,:)  = in(2:4);
+    i2in(nin,:)  = in(5:7);
+  case 'lock'
+    nlock = nlock + 1;
+    locki0(nlock,:) = lock(1:3);
+    i1lock(nlock,:) = lock(4:6);
+    i2lock(nlock,:) = lock(7:9);
   case 'out'
-    [ key, str ] = strtok( str );
-    val = strread( str, '%u' )';
-    outkey{end+1}   = key;
-    ditout(end+1,:) = val(1);
-    i1out(end+1,:)  = val(2:4);
-    i2out(end+1,:)  = val(5:7);
-  otherwise error( in{i} )
+    nout = nout + 1;
+    fieldout{nout} = out{1};
+    ditout(nout,:) = out{2};
+    i1out(nout,:)  = [ out{3:5} ];
+    i2out(nout,:)  = [ out{6:8} ];
   end
-  if inzone
-    [ key, str ]  = strtok( str );
-    val = strread( str, '%u' )';
-    inkey{end+1}  = key;
-    inval(end+1)  = val(1);
-    i1in(end+1,:) = val(2:4);
-    i2in(end+1,:) = val(5:7);
   end
 end
+lock = lock0;
 
 end
  

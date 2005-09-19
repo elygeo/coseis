@@ -5,6 +5,7 @@ module matmodel_m
 contains
 subroutine matmodel
 use globals_m
+use parallel_m
 use dfnc_m
 use binio_m
 
@@ -22,9 +23,9 @@ ifreadfile: if ( readfile(i) ) then
   i1 = i1cell
   i2 = i2cell + 1
   select case ( fieldin(i) )
-  case ( 'rho' ); call bread3( 'data/rho', mr, i1, i2 )
-  case ( 'vp'  ); call bread3( 'data/vp',  s1, i1, i2 )
-  case ( 'vs'  ); call bread3( 'data/vs',  s2, i1, i2 )
+  case ( 'rho' ); call pread3( 'data/rho', mr, i1, i2 )
+  case ( 'vp'  ); call pread3( 'data/vp',  s1, i1, i2 )
+  case ( 'vs'  ); call pread3( 'data/vs',  s2, i1, i2 )
   end select
 else
   i1 = max( i1in(i,:), i1cell )
@@ -41,9 +42,20 @@ end if ifreadfile
 end do doi
 
 ! Material extremes
-rho1 = minval( mr, mr > 0. ); rho2 = maxval( mr )
-vp1  = minval( s1, s1 > 0. ); vp2  = maxval( s1 )
-vs1  = minval( s2, s2 > 0. ); vs2  = maxval( s2 )
+rho1 = minval( mr, mr > 0. )
+vp1  = minval( s1, s1 > 0. )
+vs1  = minval( s2, s2 > 0. )
+rho2 = maxval( mr )
+vp2  = maxval( s1 )
+vs2  = maxval( s2 )
+
+! Extremes over all processors
+prmin( rho1 )
+prmin( vp1 )
+prmin( vs1 )
+prmax( rho2 )
+prmax( vp2 )
+prmax( vs2 )
 
 ! Hypocenter values
 if ( all( ihypo >= i1node .and. ihypo <= i2node ) ) then
