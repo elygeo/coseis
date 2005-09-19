@@ -91,14 +91,14 @@ end if ifinit
 
 doiz: do iz = 1, nout
 
-if ( out_dit(iz) < 0 ) out_dit(iz) = nt + out_dit(iz) + 1
-if ( out_dit(iz) == 0 .or. mod( it, out_dit(iz) ) /= 0 ) cycle doiz
+if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
+if ( ditout(iz) == 0 .or. mod( it, ditout(iz) ) /= 0 ) cycle doiz
 nc = 1
 onpass = 'v'
 cell = .false.
 fault = .false.
 static = .false.
-select case( out_field(iz) )
+select case( fieldout(iz) )
 case( 'x'    ); static = .true.; nc = 3
 case( 'a'    ); nc = 3
 case( 'v'    ); nc = 3
@@ -118,11 +118,9 @@ if ( fault .and. ifn == 0 ) then
   cycle doiz
 end if
 if ( onpass /= pass ) cycle doiz
-if ( static ) out_dit(iz) = 0
-i1 = out_i1(iz,:)
-i2 = out_i2(iz,:)
+i1 = i1out(iz,:)
+i2 = i2out(iz,:)
 if ( cell ) i2 = i2 - 1
-if ( any( i2 < i1 ) ) stop 'out range'
 
 ! Metadata
 if ( ip == 0 ) then
@@ -138,6 +136,8 @@ if ( ip == 0 ) then
   close( 9 )
 end if
 
+if ( any( i2 < i1 ) ) stop 'out range'
+if ( static ) ditout(iz) = 0
 if ( fault ) then
   i1(ifn) = 1
   i2(ifn) = 1

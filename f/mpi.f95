@@ -1,4 +1,7 @@
-subroutine setup
+
+! SWAPHALO
+
+subroutine swaphalo
 use globals
 use mpi
 
@@ -10,55 +13,15 @@ integer, intent(in) :: stage
 integer, intent(out) :: nreqs = 0, req(12)
 integer :: err, i, ng(4), nl(4), istart(4) = 0, ape1, ape2, vsub
 logical :: period(3) = .false., init = .true.
-real :: x00(3), matmin0(3), matmax0(3)
-integer :: it0
-
-nl = nn / np; where ( mod( nn, np ) /= 0 ) nl = nl + 1
-nl = max( nl, nn - noff ) broken!!!!
-np = nn / nl; where ( mod( nn, nl ) /= 0 ) np = np + 1
+real :: tmp
 
 
-call mpi_cart_create( mpi_comm_world, 3, np, period, .true., comm3, err )
-call mpi_cart_get( comm, 3, np, period, ip3, err )
-
-! figure out if fault is on processor
-! set bc depending on ip3
-
-nm = nl + 2 * nhalo
-i1node = nhalo + 1
-i2node = nhalo + nl
-i1cell = nhalo + 1
-i2cell = nhalo + nl - 1
-where( ip3 /= 0      ) i1cell = i1cell - nhalo
-where( ip3 /= np - 1 ) i2cell = i2cell + nhalo
-i1nodepml = max( i1node, 1      + bc(1:3) * npml )
-i2nodepml = min( i2node, nn     - bc(4:6) * npml )
-i1cellpml = max( i1cell, 1      + bc(1:3) * npml )
-i2cellpml = min( i2cell, nn - 1 - bc(4:6) * npml )
-
-offset = nl * ip3 + nhalo
-where( hypocenter == 0 ) hypocenter = nn / 2 + mod( nn, 2 )
-
-! now run along now and alloacter arrays
-end subroutine
-
-!------------------------------------------------------------------------------!
-! SWAPHALO
-subroutine swaphalo
-use globals
-use mpi
-
-x00 = x0
-it0 = it
-matmin0 = matmin
-matmax0 = matmax
-mpi_broadcast( x0 ... )
-mpi_allreduce( it0, it, 1, mpi_integer, mpi_min, comm3d, err )
-mpi_allreduce( matmin0, matmin, 3, mpi_real, mpi_min, comm3d, err )
-mpi_allreduce( matmax0, matmax, 3, mpi_real, mpi_max, comm3d, err )
+i = it;    mpi_allreduce( i, it, 1, mpi_integer, mpi_min, comm, err )
+tmp = vs1; mpi_allreduce( tmp, vs1, 1, mpi_real, mpi_min, comm, err )
+tmp = vs2; mpi_allreduce( tmp, vs2, 1, mpi_real, mpi_max, comm, err )
 
 do i = 1, nout
-  call mpi_comm_split( comm3, outme(i), ip, commout(i), err )
+  call mpi_comm_split( comm, outme(i), ip, commout(i), err )
 end do
 
 if ( comm3 == mpi_comm_null ) then

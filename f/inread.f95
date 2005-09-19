@@ -119,6 +119,8 @@ else
 end if
 
 if( ifn /= 0 ) nn(ifn) = nn(ifn) + 1
+nl = nn / np; where ( mod( nn, np ) /= 0 ) nl = nl + 1
+np = nn / nl; where ( mod( nn, nl ) /= 0 ) np = np + 1
 
 end subroutine
 end module

@@ -31,8 +31,8 @@ t2 = 0.
 t3 = 0.
 doi: do i = 1, nin
 ifreadfile: if ( readfile(i) ) then
-  i1 = i1cell
-  i2 = i2cell + 1
+  i1 = i1node
+  i2 = i2node
   i1(ifn) = 1
   i2(ifn) = 1
   select case ( inkey(i) )
@@ -51,8 +51,8 @@ ifreadfile: if ( readfile(i) ) then
   case ( 'tdip' ); call bread4( 'data/tdip', t3, i1, i2, 3 )
   end select
 else
-  i1 = max( i1in(i,:), i1cell )
-  i2 = min( i2in(i,:), i2cell + 1 )
+  i1 = max( i1in(i,:), i1node )
+  i2 = min( i2in(i,:), i2node )
   i1(ifn) = 1
   i2(ifn) = 1
   j1 = i1(1); j2 = i2(1)
