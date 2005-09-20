@@ -228,9 +228,9 @@ f1 = f1 * -tn + co
 ! Nucleation
 if ( rcrit > 0. .and. vrup > 0. ) then
   f2 = 1.
-  if ( trelax > 0. ) f2 = min( ( it * dt - r / vrup ) / trelax, 1. )
+  if ( trelax > 0. ) f2 = min( ( t - r / vrup ) / trelax, 1. )
   f2 = ( 1. - f2 ) * ts + f2 * ( mud * -tn + co )
-  where ( r < min( rcrit, it * dt * vrup ) .and. f2 < f1 ) f1 = f2
+  where ( r < min( rcrit, t * vrup ) .and. f2 < f1 ) f1 = f2
 end if
 if ( any( f1 <= 0. ) ) print *, 'Fault opening!'
 

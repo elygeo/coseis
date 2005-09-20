@@ -28,11 +28,11 @@
 
 % Moment source parameters
   xsource	= [ 2000. 2000. 2000. ]		;% source location
-% spacefn	= 'box'				;% uniform spatial weighting
-  spacefn	= 'tent'			;% tapered spatial weighting
-% timefn	= 'delta'			;% impulse time function
-% timefn	= 'sbrune'			;% smooth Brune time fn
-  timefn	= 'brune'			;% Brune time fn
+% rfunc		= 'box'				;% uniform spatial weighting
+  rfunc		= 'tent'			;% tapered spatial weighting
+% tfunc		= 'delta'			;% impulse time function
+% tfunc		= 'sbrune'			;% smooth Brune time fn
+  tfunc		= 'brune'			;% Brune time fn
 % rsource	= 150.				;% 1.5*dt = 8 nodes
   rsource	= -1.				;% no moment source
   tsource	= .056				;% dominant period of 8*dt

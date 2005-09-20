@@ -221,9 +221,9 @@ f1 = f1 .* -tn + co;
 % Nucleation
 if rcrit && vrup
   f2(:) = 1.;
-  if nramp, f2 = min( ( it * dt - r / vrup ) / ( nramp * dt ), 1. ); end
+  if nramp, f2 = min( ( t - r / vrup ) / ( nramp * dt ), 1. ); end
   f2 = ( 1. - f2 ) .* ts + f2 .* ( mud .* -tn + co);
-  ii = r < min( rcrit, it * dt * vrup ) & f2 < f1;
+  ii = r < min( rcrit, t * vrup ) & f2 < f1;
   f1(ii) = f2(ii);
 end
 
