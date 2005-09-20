@@ -154,7 +154,7 @@ end do
 r = sqrt( sum( t3 * t3, 4 ) )
 
 ! Metadata
-if ( all( i1hypo >= i1node .and. i1hypo <= i2node ) ) then
+if ( hypoproc ) then
   i1 = ihypo
   i1(ifn) = 1
   j = i1(1)

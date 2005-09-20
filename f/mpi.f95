@@ -30,35 +30,23 @@ call mpi_comm_rank( comm, ip, err  )
 call mpi_cart_get( comm, 3, np, period, ip3, err )
 end subroutine
 
-! Parallel integer broadcast
-subroutine pibcast( val, root )
-integer, intent(inout) :: val
-mpi_bcast( tmp, 1, mpi_integer, root, comm, err )
-end subroutine
-
 ! Parallel integer minimum
-subroutine pimin( val )
-integer, intent(inout) :: val
-integer :: tmp
-tmp = val
-mpi_allreduce( tmp, val, 1, mpi_integer, mpi_min, comm, err )
-end subroutine
+function pimin( l ) result( g )
+integer :: l, g
+mpi_allreduce( l, g, 1, mpi_integer, mpi_min, comm, err )
+end function
 
 ! Parallel real minimum
-subroutine prmin( val )
-real, intent(inout) :: val
-real :: tmp
-tmp = lval
-mpi_allreduce( tmp, val, 1, mpi_real, mpi_min, comm, err )
-end subroutine
+function prmin( l ) result( g )
+real :: l, g
+mpi_allreduce( l, g, 1, mpi_real, mpi_min, comm, err )
+end function
 
 ! Parallel real maximum
-subroutine prmax( val )
-real, intent(inout) :: val
-real :: tmp
-tmp = val
-mpi_allreduce( tmp, val, 1, mpi_real, mpi_max, comm, err )
-end subroutine
+function prmax( l ) result( g )
+real :: l, g
+mpi_allreduce( l, g, 1, mpi_real, mpi_max, comm, err )
+end function
 
 ! Swap halo
 subroutine swaphalo

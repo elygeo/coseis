@@ -1,1 +1,1 @@
-infiles/kostrov
+infiles/kostrov.m

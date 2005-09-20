@@ -146,6 +146,7 @@ if ( ip == 0 ) then
   close( 9 )
 end if
 
+! FIXME
 if ( any( i2 < i1 ) ) stop 'out range'
 if ( static ) ditout(iz) = 0
 if ( fault ) then

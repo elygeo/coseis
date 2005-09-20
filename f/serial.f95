@@ -4,14 +4,14 @@
 module parallel_m
 contains
 
-! Parallelization hooks do nothing in serial version
-subroutine init;          end subroutine
-subroutine finalize;      end subroutine
-subroutine prank;         end subroutine
-subroutine pimin( ival ); end subroutine
-subroutine prmin( rval ); end subroutine
-subroutine prmax( rval ); end subroutine
-subroutine swaphalo;      end subroutine
+! Parallelization hooks do very little in serial version
+subroutine init;     end subroutine
+subroutine finalize; end subroutine
+subroutine prank;    end subroutine
+subroutine swaphalo; end subroutine
+function pimin( l ) result( g ); integer :: l, g; g = l; end function
+function prmin( l ) result( g ); real    :: l, g; g = l; end function
+function prmax( l ) result( g ); real    :: l, g; g = l; end function
 
 ! Write scalar field
 subroutine pwrite3( filename, s1, i1, i2 )

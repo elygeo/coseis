@@ -5,8 +5,9 @@ module gridgen_m
 contains
 subroutine gridgen
 use globals_m
-use binio_m
+use parallel_m
 use optimize_m
+use zone_m
 
 implicit none
 real :: theta, scl
@@ -18,9 +19,18 @@ if ( ip == 0 ) print '(a)', 'Grid generation'
 ! Indices
 i1 = i1cell
 i2 = i2cell + 1
+
+! No split nodes just yet
+if ( ifn ) then
+  if ( i1(ifn) > ifault ) i1(ifn) = i1(ifn) - 1
+  if ( i2(ifn) > ifault ) i2(ifn) = i2(ifn) - 1
+end if
+
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
+
+!FIXME
 i1oper(1,:) = i1
 i2oper(1,:) = i2
 
@@ -35,14 +45,6 @@ else
   forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - noff(1) )
   forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - 1 - noff(2) )
   forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - 1 - noff(3) )
-  if ( ifn /= 0 ) then
-    i = ihypo(ifn) + 1
-    select case( ifn )
-    case( 1 ); x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:)
-    case( 2 ); x(:,i+1:k2,:,:) = x(:,i:k2-1,:,:)
-    case( 3 ); x(:,:,i+1:l2,:) = x(:,:,i:l2-1,:)
-    end select
-  end if
   noper = 1
   i1oper(1,:) = i1cell
   i2oper(1,:) = i2cell + 1
@@ -110,15 +112,26 @@ if( ip3(2) == np(2) - 1 ) x(:,k2+1,:,:) = x(:,k2,:,:)
 if( ip3(3) == 0         ) x(:,:,j1-1,:) = x(:,:,j1,:)
 if( ip3(3) == np(3) - 1 ) x(:,:,l2+1,:) = x(:,:,l2,:)
 
-! Find hypocenter node, FIXME do this before splitting nodes!
+! Find hypocenter node
 do i = 1, 3
   w1(:,:,:,i) = w1(:,:,:,i) - xhypo(i)
 end do
 s1 = sqrt( sum( w1 * w1, 4 ) )
 ihypo  = minloc( s1 );
-if ( ifn ) ihypo(ifn) = ifault
+if ( ifn /= 0 .and. ihypo(ifn) /= ifault ) then
+  ihypo(ifn) = ifault
+  if ( ip == 0 ) print '(a)', 'Warning: hypocenter not on fault!'
+end if
 
-! FIXME split nodes here
+! Split nodes
+if ( ifn /= 0 ) then
+  i = ihypo(ifn) + 1
+  select case( ifn )
+  case( 1 ); x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:)
+  case( 2 ); x(:,i+1:k2,:,:) = x(:,i:k2-1,:,:)
+  case( 3 ); x(:,:,i+1:l2,:) = x(:,:,i:l2-1,:)
+  end select
+end if
 
 ! Input zones
 if ( nin > nz ) stop 'too many input zone, make nz bigger'

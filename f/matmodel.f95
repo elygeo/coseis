@@ -48,8 +48,6 @@ vs1  = minval( s2, s2 > 0. )
 rho2 = maxval( mr )
 vp2  = maxval( s1 )
 vs2  = maxval( s2 )
-
-! Extremes over all processors
 prmin( rho1 )
 prmin( vp1 )
 prmin( vs1 )
@@ -58,12 +56,14 @@ prmax( vp2 )
 prmax( vs2 )
 
 ! Hypocenter values
-j = ihypo(1)
-k = ihypo(2)
-l = ihypo(3)
-rho = mr(j,k,l)
-vp  = s1(j,k,l)
-vs  = s2(j,k,l)
+if ( hypoproc ) then
+  j = ihypo(1)
+  k = ihypo(2)
+  l = ihypo(3)
+  rho = mr(j,k,l)
+  vp  = s1(j,k,l)
+  vs  = s2(j,k,l)
+end if
 
 ! Lame parameters
 s2 = mr * s2 * s2

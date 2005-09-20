@@ -160,9 +160,13 @@ call momentsrc
 ! Magnitudes
 s1 = sqrt( sum( u * u, 4 ) )
 s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
-iumax  = maxloc( s1 ); umax  = s1(iumax(1),iumax(2),iumax(3))
-iwmax  = maxloc( s2 ); wmax  = s2(iwmax(1),iwmax(2),iwmax(3))
-islmax = maxloc( s );  slmax = s(islmax(1),islmax(2),islmax(3))
+umax  = maxval( s1 )
+wmax  = maxval( s2 )
+slmax = maxval( sl )
+prmax( umax )
+prmax( wmax )
+prmax( slmax )
+
 
 if ( umax > dx / 10. ) print *, 'Warning: u !<< dx'
 

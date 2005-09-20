@@ -80,7 +80,7 @@ s1 = 0.
 s2 = 0.
 
 ! Metadata, requires LAPACK for eigenvalue calculation
-if ( all( ihypo >= i1node .and. ihypo <= i2node ) ) then
+if ( hypoproc ) then
   mm(1,1) = moment1(1)
   mm(2,2) = moment1(2)
   mm(3,3) = moment1(3)

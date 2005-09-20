@@ -168,6 +168,7 @@ character(16) :: &
   tfunc           ! moment source fime function
 
 logical :: &
+  hypoproc,     & ! hypocenter on this processor
   readfile(nz)    ! read input file
 
 end module
