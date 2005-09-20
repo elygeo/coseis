@@ -11,22 +11,24 @@ integer :: i, iz, err
 character(160) :: infile(2), str, key1, key2
 logical :: inzone
 
-infile(1) = 'defaults'
-infile(2) = 'in'
 nin = 0
 nout = 0
 nlock = 0
+infile(1) = 'defaults'
+infile(2) = 'in'
 
+! Read files
 dofile: do iz = 1, 2
 
-! Open input file
 open( 9, file=infile(iz), status='old' )
 if ( ip == 0 ) print '(a,a)', 'Reading file: ', trim( infile(iz) )
 
+! Read lines
 doline: do
 
-! Read one line from file, strip comments and MATLAB characters
 read( 9, '(a)', iostat=err ) str
+
+! Strip comments and MATLAB characters
 if ( err /= 0 ) exit doline
 i = index( str, '%' )
 str(1:) = ' '
@@ -37,7 +39,7 @@ do
 end do
 if ( str == ' ' ) cycle doline
 
-! Select input key
+! Assign by input key
 inzone = .false.
 read( str, * ) key1, key2
 selectkey: select case( key1 )
@@ -113,27 +115,6 @@ end do doline
 close( 9 )
 
 end do dofile
-
-! Check for overruns
-if ( nin > nz .or. nout > nz .or. nlock > nz ) then
-  print *, 'Error: make nz at least max: ', nin, nout, nlock
-  stop
-end if
-
-! Look for previus checkpoint files
-write( str, '(a,i6.6,a)' ) 'out/ckp/', ip, '.hdr'
-open( 9, file=str, status='old', iostat=err )
-if ( err == 0 ) then
-  read( 9, * ) it
-  close( 9 )
-else
-  it = 0
-end if
-
-! Partition for parallelization
-if( ifn /= 0 ) nn(ifn) = nn(ifn) + 1
-nl = nn / np; where ( mod( nn, np ) /= 0 ) nl = nl + 1
-np = nn / nl; where ( mod( nn, nl ) /= 0 ) np = np + 1
 
 end subroutine
 end module

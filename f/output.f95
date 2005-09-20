@@ -18,65 +18,91 @@ character(160) :: str
 logical :: fault, cell, static, init = .true., test
 
 ifinit: if ( init ) then
-  init = .false.
-  endian = 'l'
-  if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
-  if ( itcheck < 0 ) itcheck = itcheck + nt + 1
-  if ( it == 0 ) then
-    if ( ip == 0 ) then
-      inquire( file='out/timestep', exist=test )
-      if ( err /= 0 ) then
-        print '(a)', 'Error: previous output found. use -d flag to overwrite'
-        stop
-      end if
-      print '(a)', 'Initialize output'
-      call system( 'mkdir out/ckp' )
-      call system( 'mkdir out/stats' )
-      do iz = 1, nout
-        write( str, '(a,i2.2)' ) 'out/', iz
-        call system( 'mkdir ' // str )
-      end do
+
+init = .false.
+endian = 'l'
+if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
+if ( itcheck < 0 ) itcheck = itcheck + nt + 1
+call system_clock( count_rate=wt_rate )
+
+! Look for previus checkpoint files
+write( str, '(a,i6.6,a)' ) 'out/ckp/', ip, '.hdr'
+open( 9, file=str, status='old', iostat=err )
+if ( err == 0 ) then
+  read( 9, * ) it
+  close( 9 )
+else
+  it = 0
+end if
+pimin( it )
+
+! Read checkpoint file if found, if not, setup output
+if ( it /= 0 ) then
+  if ( ip == 0 ) print '(a,i6)', 'Checkpoint found, starting from step ', it
+  i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
+  write( str, '(a,i6.6,i6.6)' ) 'out/ckp/', i, it
+  inquire( iolength=reclen ) v, u, sv, sl, trup, &
+    p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
+  open( 9, &
+    file=str, &
+    recl=reclen, &
+    form='unformatted', &
+    access='direct', &
+    status='old' )
+  read( 9, rec=1 ) v, u, sv, sl, trup, &
+    p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
+  close( 9 )
+else
+  if ( ip == 0 ) then
+    inquire( file='out/timestep', exist=test )
+    if ( err /= 0 ) then
+      print '(a)', 'Error: previous output found. use -d flag to overwrite'
+      stop
     end if
-    if ( all( ihypo >= i1node .and. ihypo <= i2node ) ) then
-      courant = dt * vp2 * sqrt( 3. ) / abs( dx )
-      write( str, '(a,i2.2,a)' ) 'out/meta.m'
-      open(  9, file=str, status='new' )
-      write( 9, * ) 'rho     =   ', rho      ';% density'
-      write( 9, * ) 'vp      =   ', vp       ';% hypocenter Vp'
-      write( 9, * ) 'vs      =   ', vs       ';% hypocenter Vp'
-      write( 9, * ) 'courant =   ', courant, ';% stability condition'
-      write( 9, * ) 'xhypo   = [ ', xhypo, ' ];% hypocenter location'
-      write( 9, * ) 'nout    =   ', nout,    ';% number of outputs'
-      close( 9 )
-    end if
-  else
-    if ( ip == 0 ) print '(a,i6)', 'Checkpoint found, starting from step ', it
-    write( str, '(a,i6.6,i6.6)' ) 'out/ckp/', ip, it
-    inquire( iolength=reclen ) v, u, sv, sl, trup, &
-      p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
-    open( 9, &
-      file=str, &
-      recl=reclen, &
-      form='unformatted', &
-      access='direct', &
-      status='old' )
-    read( 9, rec=1 ) v, u, sv, sl, trup, &
-      p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
+    print '(a)', 'Initialize output'
+    call system( 'mkdir out/ckp' )
+    call system( 'mkdir out/stats' )
+    do iz = 1, nout
+      write( str, '(a,i2.2)' ) 'out/', iz
+      call system( 'mkdir ' // str )
+    end do
+  end if
+  if ( all( ihypo >= i1node .and. ihypo <= i2node ) ) then
+    courant = dt * vp2 * sqrt( 3. ) / abs( dx )
+    write( str, '(a,i2.2,a)' ) 'out/meta.m'
+    open(  9, file=str, status='new' )
+    write( 9, * ) 'rho1    =   ', rho1     ';% minimum density'
+    write( 9, * ) 'vp1     =   ', vp1      ';% minimum Vp'
+    write( 9, * ) 'vs1     =   ', vs1      ';% minimum Vp'
+    write( 9, * ) 'rho2    =   ', rho2     ';% maximum density'
+    write( 9, * ) 'vp2     =   ', vp2      ';% maximum Vp'
+    write( 9, * ) 'vs2     =   ', vs2      ';% maximum Vp'
+    write( 9, * ) 'rho     =   ', rho      ';% hypocenter density'
+    write( 9, * ) 'vp      =   ', vp       ';% hypocenter Vp'
+    write( 9, * ) 'vs      =   ', vs       ';% hypocenter Vp'
+    write( 9, * ) 'courant =   ', courant, ';% stability condition'
+    write( 9, * ) 'xhypo   = [ ', xhypo, ' ];% hypocenter location'
+    write( 9, * ) 'nout    =   ', nout,    ';% number output zones'
     close( 9 )
   end if
-  call system_clock( count_rate=wt_rate )
-  if ( ip == 0 ) then
-    print '(a)', 'Time       Amax        Vmax        Umax        Compute     I/O'
-  end if
-  return
+end if
+
+if ( ip == 0 ) then
+  print '(a)', 'Time       Amax        Vmax        Umax        Compute     I/O'
+end if
+
+return
+
 end if ifinit
 
 !------------------------------------------------------------------------------!
 
+! Write output
 doiz: do iz = 1, nout
 
 if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
 if ( ditout(iz) == 0 .or. mod( it, ditout(iz) ) /= 0 ) cycle doiz
+
 nc = 1
 onpass = 'v'
 cell = .false.
@@ -156,11 +182,12 @@ if ( pass == 'w' ) return
 
 !------------------------------------------------------------------------------!
 
-! Checkpoint
+! Write checkpoint
 if ( itcheck /= 0 .and. mod( it, itcheck ) == 0 ) then
   inquire( iolength=reclen ) v, u, sv, sl, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
-  write( str, '(a,i6.6,i6.6)') 'out/ckp/', ip, it
+  i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
+  write( str, '(a,i6.6,i6.6)') 'out/ckp/', i, it
   open( 9, &
     file=str, &
     recl=reclen, &

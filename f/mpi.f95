@@ -1,7 +1,7 @@
 !------------------------------------------------------------------------------!
-! PARALLEL IO
+! MPI
 
-module io_m
+module parallel_m
 use mpi
 
 implicit none
@@ -11,12 +11,29 @@ logical :: period(3) = .false.
 
 contains
 
+! Initialize
+subroutine init
+call mpi_init( err )
+end subroutine
+
+! Finalize
+subroutine finalize
+call mpi_finalize( err )
+end subroutine
+
 ! Find rank
-subroutine prank( np, ip3 )
+subroutine prank( np, ip, ip3 )
 integer, intent(in) :: np
-integer, intent(out) :: ip3
+integer, intent(out) :: ip, ip3
 call mpi_cart_create( mpi_comm_world, 3, np, period, .true., comm, err )
+call mpi_comm_rank( comm, ip, err  )
 call mpi_cart_get( comm, 3, np, period, ip3, err )
+end subroutine
+
+! Parallel integer broadcast
+subroutine pibcast( val, root )
+integer, intent(inout) :: val
+mpi_bcast( tmp, 1, mpi_integer, root, comm, err )
 end subroutine
 
 ! Parallel integer minimum

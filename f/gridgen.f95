@@ -103,14 +103,15 @@ case default; stop 'grid'
 end select
 
 ! Duplicate edge nodes into halo, but not for decomp edges
-if( bc1(1) /= -1 ) x(j1-1,:,:,:) = x(j1,:,:,:)
-if( bc2(1) /= -1 ) x(j2+1,:,:,:) = x(j2,:,:,:)
-if( bc1(2) /= -1 ) x(:,j1-1,:,:) = x(:,j1,:,:)
-if( bc2(2) /= -1 ) x(:,k2+1,:,:) = x(:,k2,:,:)
-if( bc1(3) /= -1 ) x(:,:,j1-1,:) = x(:,:,j1,:)
-if( bc2(3) /= -1 ) x(:,:,l2+1,:) = x(:,:,l2,:)
+if( ip3(1) == 0         ) x(j1-1,:,:,:) = x(j1,:,:,:)
+if( ip3(1) == np(1) - 1 ) x(j2+1,:,:,:) = x(j2,:,:,:)
+if( ip3(2) == 0         ) x(:,j1-1,:,:) = x(:,j1,:,:)
+if( ip3(2) == np(2) - 1 ) x(:,k2+1,:,:) = x(:,k2,:,:)
+if( ip3(3) == 0         ) x(:,:,j1-1,:) = x(:,:,j1,:)
+if( ip3(3) == np(3) - 1 ) x(:,:,l2+1,:) = x(:,:,l2,:)
 
 ! Find hypocenter location
+hypoproc = ihypo / nl
 if ( all( ihypo >= i1node .and. ihypo <= i2node ) ) then
   j = ihypo(1)
   k = ihypo(2)

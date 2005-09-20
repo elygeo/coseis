@@ -8,14 +8,13 @@ contains
 subroutine init;          end subroutine
 subroutine finalize;      end subroutine
 subroutine prank;         end subroutine
-subroutine parallel;      end subroutine
-subroutine swaphalo;      end subroutine
 subroutine pimin( ival ); end subroutine
 subroutine prmin( rval ); end subroutine
 subroutine prmax( rval ); end subroutine
+subroutine swaphalo;      end subroutine
 
 ! Write scalar field
-subroutine bwrite3( filename, s1, i1, i2 )
+subroutine pwrite3( filename, s1, i1, i2 )
 implicit none
 character*(*), intent(in) :: filename
 real, intent(in) :: s1(:,:,:)
@@ -38,7 +37,7 @@ close( 9 )
 end subroutine
 
 ! Write vector field
-subroutine bwrite4( filename, w1, i1, i2, i )
+subroutine pwrite4( filename, w1, i1, i2, i )
 implicit none
 character*(*), intent(in) :: filename
 real, intent(in) :: w1(:,:,:,:)
@@ -61,7 +60,7 @@ close( 9 )
 end subroutine
 
 ! Read scalar field
-subroutine bread3( filename, s1, i1, i2 )
+subroutine pread3( filename, s1, i1, i2 )
 implicit none
 character*(*), intent(in) :: filename
 real, intent(out) :: s1(:,:,:)
@@ -84,7 +83,7 @@ close( 9 )
 end subroutine
 
 ! Read vector field
-subroutine bread4( filename, w1, i1, i2, i )
+subroutine pread4( filename, w1, i1, i2, i )
 implicit none
 character*(*), intent(in) :: filename
 real, intent(out) :: w1(:,:,:,:)

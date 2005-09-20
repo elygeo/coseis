@@ -414,37 +414,41 @@ COURANT STABILITY CONDITION
   W = lamda*trace(E)*I + 2*mu*E
 
 
-DOMAIN DECOMPOSITION
+DOMAIN DECOMPOSITION DIAGRAM
 
-                  .---. 1
-                  |   | 1
-  o---o 1         o---o i1node
-  | o | 1         | o | i1cell
-  o---o           o---o
-  | o |           | o |                   
-  o---o           o---o i2node        .---. 1
-  | o |           | o | i2cell        | o | i1cell
-  o---o           '---' nm            o---o i1node
-  | o |                               | o |
-  o---o i1pml                         o---o
-  | o |                               | o |
-  x---x                               x---x
-  |[x]|                               |[x]|
-  x---x                               x---x
-  |[x]|                               |[x]|
-  x---x                               x---x
-  |[x]|                               |[x]|
-  x---x                               x---x
-  | o |                               | o |
-  o---o i2pml                         o---o
-  | o |                               | o |
-  o---o           .---. 1             o---o i2node
-  | o |           | o | i1cell        | o | i2cell
-  o---o           o---o i1node        '---' nm 
-  | o |           | o |
-  o---o           o---o
-  | o | nn-1      | o | i2cell
-  o---o nn        o---o i2node
-                  |   | nm-1
-                  '---' nm
+                          .---. 1    1
+  Surface                 |   |
+  ------- o---o 1         o---o i1node
+          | o | 1         | o | i1cell
+          o---o           o---o
+          | o |           | o |
+          o---o           o---o i2node   .---. 1    -2ZZ
+    PML   | o |           | o | i2cell   | o | i1cell
+          o---o           '---' nm=5     o---o i1node
+          | o |                          | o |
+          o---o i1pml                    o---o
+  ------- | o | i1pml                    | o |
+  ------- x---x i1pml+1   .---. 1        x---x i2node
+          |[x]| i1pml+1   |[x]| i1cell   |[x]| i2cell
+          x---x           x---x i1node   '---' nm=5  
+          |[x]|           |[x]|
+          x---x           x---x
+  Elastic |[x]|           |[x]|
+          x---x           x---x i2node   .---. 1     
+          |[x]|           |[x]| i2cell   |[x]| i1cell
+          x---x           '---' nm=5     x---x i1node
+          |[x]| i2pml-2                  | o |
+  ------- x---x i2pml-1                  o---o
+  ------- | o | i2pml-1                  | o |
+          o---o i2pml     .---. 1        o---o i2node
+          | o |           | o | i1cell   | o | i2cell
+          o---o           o---o i1node   '---' nm    
+    PML   | o |           | o |
+          o---o           o---o
+          | o |           | o | i2cell
+          o---o           o---o i2node   .---. 1     
+          | o | 15        | o |          | o | i1cell i2cell
+  ------- o---o nn=16     '---' nm=5     o---o i1node i2node
+  Surface                                |   |
+                                         '---' nm=3         
 
