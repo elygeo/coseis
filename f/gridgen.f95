@@ -110,14 +110,34 @@ if( ip3(2) == np(2) - 1 ) x(:,k2+1,:,:) = x(:,k2,:,:)
 if( ip3(3) == 0         ) x(:,:,j1-1,:) = x(:,:,j1,:)
 if( ip3(3) == np(3) - 1 ) x(:,:,l2+1,:) = x(:,:,l2,:)
 
-! Find hypocenter location
-hypoproc = ihypo / nl
-if ( all( ihypo >= i1node .and. ihypo <= i2node ) ) then
-  j = ihypo(1)
-  k = ihypo(2)
-  l = ihypo(3)
-  xhypo = x(j,k,l,:)
-end if
+! Find hypocenter node, FIXME do this before splitting nodes!
+do i = 1, 3
+  w1(:,:,:,i) = w1(:,:,:,i) - xhypo(i)
+end do
+s1 = sqrt( sum( w1 * w1, 4 ) )
+ihypo  = minloc( s1 );
+if ( ifn ) ihypo(ifn) = ifault
+
+! FIXME split nodes here
+
+! Input zones
+if ( nin > nz ) stop 'too many input zone, make nz bigger'
+do i = 1, nin
+  call zone( i1in(i,:), i2in(i,:), nn, noff, ihypo, ifn )
+end do
+
+! Output zones
+if ( nout > nz ) stop 'too many output zones, make nz bigger'
+do i = 1, nout
+  call zone( i1out(i,:), i2out(i,:), nn, noff, ihypo, ifn )
+end do
+
+! Locked nodes
+if ( nlock > nz ) stop 'too many lock zones, make nz bigger'
+do i = 1, nlock
+  call zone( i1lock(i,:), i2lock(i,:), nn, noff, ihypo, ifn )
+end do
+
 
 end subroutine
 end module

@@ -58,14 +58,12 @@ prmax( vp2 )
 prmax( vs2 )
 
 ! Hypocenter values
-if ( all( ihypo >= i1node .and. ihypo <= i2node ) ) then
-  j = i1(1)
-  k = i1(2)
-  l = i1(3)
-  rho = mr(j,k,l)
-  vp  = s1(j,k,l)
-  vs  = s2(j,k,l)
-end if
+j = ihypo(1)
+k = ihypo(2)
+l = ihypo(3)
+rho = mr(j,k,l)
+vp  = s1(j,k,l)
+vs  = s2(j,k,l)
 
 ! Lame parameters
 s2 = mr * s2 * s2

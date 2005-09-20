@@ -19,6 +19,7 @@ ifinit: if ( init ) then
 
 init = .false.
 if ( ifn == 0 ) return
+if ( ifault + noff
 if ( ip == 0 ) print '(a)', 'Initialize fault'
 
 ! Input
@@ -51,6 +52,7 @@ ifreadfile: if ( readfile(i) ) then
   case ( 'tdip' ); call pread4( 'data/tdip', t3, i1, i2, 3 )
   end select
 else
+  call zone( i1in(i,:), i2in(i,:), nn, noff, ihypo, ifn )
   i1 = max( i1in(i,:), i1node )
   i2 = min( i2in(i,:), i2node )
   i1(ifn) = 1

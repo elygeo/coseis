@@ -90,12 +90,11 @@ real :: &
   vp,           & ! hypocenter S-wave speed
   vs,           & ! hypocenter P-wave speed
   viscosity(2), & ! viscocity for (1) stress & (2) hourglass corrections
-  xsource(3),   & ! moment source location
+  xhypo(3),     & ! hypocenter location
   tsource,      & ! dominant period
   rsource,      & ! source radius
   moment1(3),   & ! moment source normal components
   moment2(3),   & ! moment source shear components
-  xhypo(3),     & ! hypocenter location
   vrup,         & ! nucleation rupture velocity
   rcrit,        & ! nucleation critical radius
   trelax,       & ! nucleation relaxation time
@@ -115,7 +114,6 @@ integer, dimension(3) :: &
   bc2,          & ! boundary conditions for j2 k2 l2
   noff,         & ! offset between local and global indices
   ihypo,        & ! hypocenter node
-  isource,      & ! moment source node
   iamax,        & ! index of max acceleration
   ivmax,        & ! index of max velocity
   iumax,        & ! index of max displacement
@@ -136,6 +134,7 @@ integer :: &
   nt,           & ! number of time steps
   npml,         & ! number of PML damping nodes
   ifn,          & ! fault normal direction
+  ifault,       % ! fault plane index
   it,           & ! current time step
   itcheck,      & ! interval for checkpointing
   ip,           & ! processor index

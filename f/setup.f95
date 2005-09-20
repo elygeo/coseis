@@ -26,14 +26,6 @@ call prank( np, ip, ip3 )
 ! Offset: add to global index to get memory index
 noff = nhalo - nl * ip3
 
-! Hypocenter
-where( ihypo == 0 ) ihypo = nn / 2 + mod( nn, 2 )
-phypo = ihypo / nl
-ihypo = ihypo + noff
-
-! Test if this processor holds the fault
-if ( ifn /= 0 ) if ( phypo(ifn) /= ip3(ifn) ) ifn = 0
-
 ! Trim extra nodes off last processor
 nl = min( nl, nn + noff - nhalo )
 nm = nl + 2 * nhalo
@@ -54,23 +46,11 @@ i2pml = nn + 1 + noff;
 where( bc1 == 1 ) i1pml = i1pml + npml
 where( bc2 == 1 ) i2pml = i2pml - npml
 
-! Input zones
-if ( nin > nz ) stop 'too many input zone, make nz bigger'
-do i = 1, nin
-  call zone( i1in(i,:), i2in(i,:), nn, noff, ihypo, ifn )
-end do
-
-! Output zones
-if ( nout > nz ) stop 'too many output zones, make nz bigger'
-do i = 1, nout
-  call zone( i1out(i,:), i2out(i,:), nn, noff, ihypo, ifn )
-end do
-
-! Locked nodes
-if ( nlock > nz ) stop 'too many lock zones, make nz bigger'
-do i = 1, nlock
-  call zone( i1lock(i,:), i2lock(i,:), nn, noff, ihypo, ifn )
-end do
+! Fault plane
+if ( ifn /= 0 ) then
+  if ( ifault == 0 ) ifault = nn(ifn) / 2 + mod( nn( ifn, 2 ) )
+  ifault = ifault + noff(ifn)
+end if
 
 end subroutine
 end module

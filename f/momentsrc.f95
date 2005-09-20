@@ -45,7 +45,7 @@ end forall
 
 ! Find radius to cell from source location
 do i = 1, 3
-  w1(:,:,:,i) = w1(:,:,:,i) - xsource(i)
+  w1(:,:,:,i) = w1(:,:,:,i) - xhypo(i)
 end do
 s2 = sqrt( sum( w1 * w1, 4 ) )
 nsrc = count( s2 <= rsource )
@@ -107,9 +107,9 @@ end if ifinit
 
 ! Source time function
 select case( tfunc )
-case( 'delta'  ); srct = 1.; if ( it == 1 ) srcft = 1.
-case( 'brune'  ); srct = 1. - exp( -t / tsource ) / tsource * ( t + tsource )
-case( 'sbrune' ); srct = 1. - exp( -t / tsource ) / tsource * &
+case( 'delta'  ); srcft = 1.
+case( 'brune'  ); srcft = 1. - exp( -t / tsource ) / tsource * ( t + tsource )
+case( 'sbrune' ); srcft = 1. - exp( -t / tsource ) / tsource * &
   ( t + tsource + t * t / tsource / 2. )
 case default; stop 'tfunc'
 end select
