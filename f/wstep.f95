@@ -83,7 +83,7 @@ doderivative: do id = 1, 3
     i1(1) = j1
     call dfnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
     do j = i1(1), i2(1)
-    i = nn(1) - j + noff(1) + 1
+    i = nn(1) - j + noff(1)
     forall( k=i1(2):i2(2), l=i1(3):i2(3) )
       s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g4(i,k,l,ic)
       g4(i,k,l,ic) = s2(j,k,l)
@@ -107,7 +107,7 @@ doderivative: do id = 1, 3
     i1(2) = k1
     call dfnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
     do k = i1(2), i2(2)
-    i = nn(2) - k + noff(2) + 1
+    i = nn(2) - k + noff(2)
     forall( j=i1(1):i2(1), l=i1(3):i2(3) )
       s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g5(j,i,l,ic)
       g5(j,i,l,ic) = s2(j,k,l)
@@ -131,7 +131,7 @@ doderivative: do id = 1, 3
     i2(3) = l2
     call dfnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
     do l = i1(3), i2(3)
-    i = nn(3) - l + noff(3) + 1
+    i = nn(3) - l + noff(3)
     forall( j=i1(1):i2(1), k=i1(2):i2(2) )
       s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g6(j,k,i,ic)
       g6(j,k,i,ic) = s2(j,k,l)
