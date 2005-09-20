@@ -416,13 +416,13 @@ COURANT STABILITY CONDITION
 
 DOMAIN DECOMPOSITION DIAGRAM
 
-                          .---. 1    1
+                          .---. 1     
   Surface                 |   |
   ------- o---o 1         o---o i1node
           | o | 1         | o | i1cell
           o---o           o---o
           | o |           | o |
-          o---o           o---o i2node   .---. 1    -2ZZ
+          o---o           o---o i2node   .---. 1     
     PML   | o |           | o | i2cell   | o | i1cell
           o---o           '---' nm=5     o---o i1node
           | o |                          | o |
