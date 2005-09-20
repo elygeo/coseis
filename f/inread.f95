@@ -8,40 +8,25 @@ use globals_m
 
 implicit none
 integer :: i, iz, err
-character(160) :: infile(2), str, key1, key2
+character(160) :: str, key1, key2
 logical :: inzone
 
+if ( ip == 0 ) print '(a)', 'Reading input'
+
+open( 9, file='in', status='old' )
 nin = 0
 nout = 0
 nlock = 0
-infile(1) = 'defaults'
-infile(2) = 'in'
 
-! Read files
-dofile: do iz = 1, 2
-
-open( 9, file=infile(iz), status='old' )
-if ( ip == 0 ) print '(a,a)', 'Reading file: ', trim( infile(iz) )
-
-! Read lines
+! Read file line by line
 doline: do
 
 read( 9, '(a)', iostat=err ) str
-
-! Strip comments and MATLAB characters
 if ( err /= 0 ) exit doline
-i = index( str, '%' )
-str(1:) = ' '
-do
-  i = scan( str, "{}=[]';" )
-  if ( i == 0 ) exit
-  str(i:i) = ' '
-end do
-if ( str == ' ' ) cycle doline
-
-! Assign by input key
-inzone = .false.
 read( str, * ) key1, key2
+inzone = .false.
+
+! Select input key
 selectkey: select case( key1 )
 case( 'model' );       model = key2
 case( 'grid' );        grid  = key2
@@ -114,8 +99,6 @@ end if
 end do doline
 
 close( 9 )
-
-end do dofile
 
 end subroutine
 end module

@@ -13,7 +13,7 @@
   grid		= 'constant'			;% regular mesh
 % upward	= 3				;% positive z up
   upward	= -2				;% negative y up
-  rho	 	= [ 2670.     1 1 1  -1 -1 -1 ]	;% **density
+  rho		= [ 2670.     1 1 1  -1 -1 -1 ]	;% **density
   vp		= [ 6000.     1 1 1  -1 -1 -1 ]	;% **P-wave speed
   vs		= [ 3464.1016 1 1 1  -1 -1 -1 ]	;% **S-wave speed
 % vp		= [ 600.      1 1 1  10 -1 -1 ]	;% **low velocity surface layer

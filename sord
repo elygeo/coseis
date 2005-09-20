@@ -39,7 +39,7 @@ fi
 #------------------------------------------------------------------------------#
 # Read input
 
-sed "s/%.*$//;  s/;/;\n/g; s/[]={}';[]*//g;/^$/d" "defaults.m" "in.m" > tmp
+sed "s/%.*$//; s/;/;\n/g; s/[]={}';[]*//g;/^$/d" "defaults.m" "in.m" > tmp
 nn3=( 1 1 1 )
 np3=( 1 1 1 )
 while read key1 key2 params; do
