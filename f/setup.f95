@@ -1,9 +1,9 @@
 !------------------------------------------------------------------------------!
-! SETUP
+! INDICES
 
-module setup_m
+module indices_m
 contains
-subroutine setup
+subroutine indices
 use globals_m
 use parallel_m
 use zone_m

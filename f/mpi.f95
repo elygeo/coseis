@@ -6,7 +6,7 @@ use mpi
 
 implicit none
 save
-integer :: comm, err, mof = mpi_order_fortran, msi = mpi_status_ignore
+integer :: err, comm, mof = mpi_order_fortran, msi = mpi_status_ignore
 logical :: period(3) = .false.
 
 contains

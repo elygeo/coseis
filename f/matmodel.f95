@@ -22,9 +22,9 @@ ifreadfile: if ( readfile(i) ) then
   i1 = i1cell
   i2 = i2cell + 1
   select case ( fieldin(i) )
-  case ( 'rho' ); call pread3( 'data/rho', mr, i1, i2, n, noff )
-  case ( 'vp'  ); call pread3( 'data/vp',  s1, i1, i2, n, noff )
-  case ( 'vs'  ); call pread3( 'data/vs',  s2, i1, i2, n, noff )
+  case ( 'rho' ); call ioscalar( 'r', 'data/rho', mr, i1, i2, n, noff )
+  case ( 'vp'  ); call ioscalar( 'r', 'data/vp',  s1, i1, i2, n, noff )
+  case ( 'vs'  ); call ioscalar( 'r', 'data/vs',  s2, i1, i2, n, noff )
   end select
 else
   i1 = max( i1in(i,:), i1cell )

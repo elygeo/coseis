@@ -5,9 +5,19 @@ module locknodes_m
 contains
 subroutine locknodes
 use globals_m
+use zone_m
 
 implicit none
+save
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, iz
+logical :: init = .true.
+
+if ( init ) then
+  if ( nlock > nz ) stop 'too many lock zones, make nz bigger'
+  do i = 1, nlock
+    call zone( i1lock(i,:), i2lock(i,:), nn, noff, ihypo, ifn )
+  end do
+end if
 
 do iz = 1, nlock
   i1 = max( i1lock(iz,), i2node )

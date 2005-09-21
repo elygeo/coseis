@@ -138,7 +138,7 @@ integer :: &
   ifault,       % ! fault plane index
   it,           & ! current time step
   itcheck,      & ! interval for checkpointing
-  ip,           & ! processor index
+  ip,           & ! processor rank
   wt(6),        & ! wall clock timing array
   noper,        & ! number of zones for spatial derivative operators
   i1oper(2,3),  & ! j1 k1 l1 operator zone start index

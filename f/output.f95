@@ -116,40 +116,37 @@ end if
 ! Write output
 doiz: do iz = 1, nout
 
+field = fieldout(iz)
 if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
 if ( ditout(iz) == 0 .or. mod( it, ditout(iz) ) /= 0 ) cycle doiz
 
 nc = 1
-onpass = 'a'
-cell = .false.
 fault = .false.
-static = .false.
-select case( fieldout(iz) )
-case( 'x'    ); static = .true.; nc = 3
-case( 'a'    ); nc = 3
+onpass = 'a'
+
+select case( field )
+case( 'x'    ); nc = 3
+case( 'a'    ); nc = 3; onpass = 'a';
 case( 'v'    ); nc = 3
-case( 'u'    ); onpass = 'w'; nc = 3
-case( 'w'    ); onpass = 'w'; nc = 6; cell = .true.
-case( 'am'   )
-case( 'vm'   )
+case( 'u'    ); nc = 3
+case( 'w'    ); nc = 6; onpass = 'w';
 case( 'um'   ); onpass = 'w'; 
-case( 'wm'   ); onpass = 'w'; cell = .true.
+case( 'wm'   ); onpass = 'w';
 case( 'sv'   ); fault = .true.
 case( 'sl'   ); fault = .true.
 case( 'trup' ); fault = .true.
-case default; stop 'var'
 end select
-if ( fault .and. ifn == 0 ) then
-  out_dit(iz) = 0
-  cycle doiz
-end if
+
 if ( onpass /= pass ) cycle doiz
+
 i1 = i1out(iz,:)
 i2 = i2out(iz,:)
-if ( cell ) i2 = i2 - 1
+if ( field(1:1) = 'w' ) i2 = i2 - 1
+
+! FIXME global size, then bounds on local size
 
 ! Metadata
-if ( ip == 0 ) then
+if ( ipout(iz) == 0 ) then
   write( str, '(a,i2.2,a)' ) 'out/', iz, '/meta.m'
   open(  9, file=str, status='replace' )
   write( 9, * ) 'field = ''', fieldout(iz), ''';% variable name'
@@ -162,11 +159,11 @@ if ( ip == 0 ) then
   close( 9 )
 end if
 
-if ( any( i2 < i1 ) ) then
-  ditout(iz) = 0
-  cycle doiz
-end if
-if ( static ) ditout(iz) = 0
+! call iosplit FIXME
+if ( any( i2 < i1 ) ) ditout(iz) = 0
+call iosplit( iz, ditout(iz) )
+if ( ditout(iz) == 0 ) cycle doiz
+if ( fieldout(iz) == 'x' ) ditout(iz) = 0
 if ( fault ) then
   i1(ifn) = 1
   i2(ifn) = 1
@@ -176,22 +173,22 @@ end if
 do i = 1, nc
   write( str, '(a,i2.2,a,a,i1,i6.6)' ) &
     'out/', iz, '/', trim( out_field(iz) ), i, it
-  select case( outvar(iz) )
-  case( 'x'    ); call pwrite4( str, x,    i1, i2, i,   n, noff )
-  case( 'a'    ); call pwrite4( str, w1,   i1, i2, i,   n, noff )
-  case( 'v'    ); call pwrite4( str, v,    i1, i2, i,   n, noff )
-  case( 'u'    ); call pwrite4( str, u,    i1, i2, i,   n, noff )
+  select case( fieldout(iz) )
+  case( 'x'    ); call iovector( 'w', str, x,  i,    i1, i2, n, noff, iz )
+  case( 'a'    ); call iovector( 'w', str, w1, i,    i1, i2, n, noff, iz )
+  case( 'v'    ); call iovector( 'w', str, v,  i,    i1, i2, n, noff, iz )
+  case( 'u'    ); call iovector( 'w', str, u,  i,    i1, i2, n, noff, iz )
   case( 'w'    );
-    if ( i < 4 )  call pwrite4( str, w1,   i1, i2, i,   n, noff )
-    if ( i > 3 )  call pwrite4( str, w2,   i1, i2, i-3, n, noff )
-  case( 'am'   ); call pwrite3( str, s1,   i1, i2,      n, noff )
-  case( 'vm'   ); call pwrite3( str, s2,   i1, i2,      n, noff )
-  case( 'um'   ); call pwrite3( str, s1,   i1, i2,      n, noff )
-  case( 'wm'   ); call pwrite3( str, s2,   i1, i2,      n, noff )
-  case( 'sv'   ); call pwrite3( str, sv,   i1, i2,      n, noff )
-  case( 'sl'   ); call pwrite3( str, sl,   i1, i2,      n, noff )
-  case( 'trup' ); call pwrite3( str, trup, i1, i2,      n, noff )
-  case default; stop 'var'
+    if ( i < 4 )  call iovector( 'w', str, w1, i,    i1, i2, n, noff, iz )
+    if ( i > 3 )  call iovector( 'w', str, w2, i-3,  i1, i2, n, noff, iz )
+  case( 'am'   ); call ioscalar( 'w', str, s1,       i1, i2, n, noff, iz )
+  case( 'vm'   ); call ioscalar( 'w', str, s2,       i1, i2, n, noff, iz )
+  case( 'um'   ); call ioscalar( 'w', str, s1,       i1, i2, n, noff, iz )
+  case( 'wm'   ); call ioscalar( 'w', str, s2,       i1, i2, n, noff, iz )
+  case( 'sv'   ); call ioscalar( 'w', str, sv,       i1, i2, n, noff, iz )
+  case( 'sl'   ); call ioscalar( 'w', str, sl,       i1, i2, n, noff, iz )
+  case( 'trup' ); call ioscalar( 'w', str, trup,     i1, i2, n, noff, iz )
+  case default; stop 'fieldout'
   end select
 end do
 

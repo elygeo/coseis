@@ -37,9 +37,9 @@ i2oper(1,:) = i2
 ! Read grid files or creat basic rectangular mesh
 x = 0.
 if ( grid == 'read' ) then
-  call bread4( 'data/x1', x, i1, i2, 1, n, noff )
-  call bread4( 'data/x2', x, i1, i2, 2, n, noff )
-  call bread4( 'data/x3', x, i1, i2, 3, n, noff )
+  call iovector( 'r', 'data/x1', x, i1, i2, 1, n, noff )
+  call iovector( 'r', 'data/x2', x, i1, i2, 2, n, noff )
+  call iovector( 'r', 'data/x3', x, i1, i2, 3, n, noff )
   call optimize
 else
   forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - noff(1) )
@@ -138,19 +138,6 @@ if ( nin > nz ) stop 'too many input zone, make nz bigger'
 do i = 1, nin
   call zone( i1in(i,:), i2in(i,:), nn, noff, ihypo, ifn )
 end do
-
-! Output zones
-if ( nout > nz ) stop 'too many output zones, make nz bigger'
-do i = 1, nout
-  call zone( i1out(i,:), i2out(i,:), nn, noff, ihypo, ifn )
-end do
-
-! Locked nodes
-if ( nlock > nz ) stop 'too many lock zones, make nz bigger'
-do i = 1, nlock
-  call zone( i1lock(i,:), i2lock(i,:), nn, noff, ihypo, ifn )
-end do
-
 
 end subroutine
 end module
