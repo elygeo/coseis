@@ -32,7 +32,7 @@ call gridgen
 call matmodel
 call momentsrc
 call fault
-call swaphalo
+call swaphalo( w1 )
 call output( 'a' )
 
 ! Main loop
@@ -42,7 +42,7 @@ do while ( it < nt )
   call momentsrc
   call output( 'w' ) 
   call divw
-  call swaphalo
+  call swaphalo( w1 )
   call fault
   call locknodes
   call output( 'a' )

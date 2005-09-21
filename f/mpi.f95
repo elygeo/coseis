@@ -6,7 +6,7 @@ use mpi
 
 implicit none
 save
-integer :: comm, err
+integer :: comm, err, mof = mpi_order_fortran, msi = mpi_status_ignore
 logical :: period(3) = .false.
 
 contains
@@ -53,54 +53,55 @@ integer :: l, g
 mpi_allreduce( l, g, 1, mpi_integer, mpi_min, comm, err )
 end function
 
-!------------------------------------------------------------------------------!
-! Swap halo
-
-subroutine swaphalo
-use globals
-
-save
-integer :: nreqs, req(12), commout(nz), mpistatus( mpi_statis_size, 4 )
-integer :: i, ng(4), nl(4), i0(4), adjacent1, adjacent2, slice(12)
-logical :: init = .true.
-
-ifinit: if ( init ) then
-
 FIXME
 do i = 1, nout
   call mpi_comm_split( comm, outme(i), ip, commout(i), err )
 end do
 
-ng(1:3) = nm
-ng(4) = 3
+!------------------------------------------------------------------------------!
+! Swap halo
+
+subroutine swaphalo( w1 )
+
+save
+real, intent(in) :: w1(:,:,:,:)
+integer :: nhalo, ng(4), nl(4), i0(4), i, adjacent1, adjacent2, slice(12), &
+  nr, req(12), mpistatus( mpi_statis_size, 4 )
+logical :: init = .true.
+
+ifinit: if ( init ) then
+
+nhalo = 1
+ng(1) = size( w1, 1 )
+ng(2) = size( w1, 2 )
+ng(3) = size( w1, 3 )
+ng(4) = size( w1, 4 )
 nr = 0
 
 do i = 1, 3
-if ( np(i) > 1 ) then
   call mpi_cart_shift( comm, i-1, 1, adjacent1, adjacent2, err )
-  nl = i2node - i1node + 1 + 2 * nhalo
+  nl = ng
   nl(i) = nhalo
   nr = nr + 1
-  i0 = i1node - nhalo - 1
+  i0 = 0
   call mpi_type_create_subarray( 4, ng, nl, i0, mof, mpi_real, slice(nr), err )
-  call mpi_type_commit( slice, err )
+  call mpi_type_commit( slice(nr), err )
   call mpi_recv_init( w1, 1, slice, adjacent1, 1, comm, req(nr), err )
   nr = nr + 1
-  i0(i) = i2node(i)
+  i0(i) = ng(i) - nhalo
   call mpi_type_create_subarray( 4, ng, nl, i0, mof, mpi_real, slice(nr), err )
-  call mpi_type_commit( slice, err )
+  call mpi_type_commit( slice(nr), err )
   call mpi_recv_init( w1, 1, slice, adjacent2, 2, comm, req(nr), err )
   nr = nr + 1
-  i0(i) = i1node(i) - 1
+  i0(i) = nhalo
   call mpi_type_create_subarray( 4, ng, nl, i0, mof, mpi_real, slice(nr), err )
-  call mpi_type_commit( slice, err )
+  call mpi_type_commit( slice(nr), err )
   call mpi_send_init( w1, 1, slice, adjacent1, 2, comm, req(nr), err )
   nr = nr + 1
-  i0(i) = i2node(i) - nhalo
+  i0(i) = ng(i) - 2 * nhalo
   call mpi_type_create_subarray( 4, ng, nl, i0, mof, mpi_real, slice(nr), err )
-  call mpi_type_commit( slice, err )
+  call mpi_type_commit( slice(nr), err )
   call mpi_send_init( w1, 1, slice, adjacent2, 1, comm, req(nr), err )
-end if
 end do
 
 return
@@ -121,7 +122,6 @@ character*(*), intent(in) :: filename
 real, intent(in) :: s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3)
 integer :: ftype, mtype, fh, d = 0, nl(3), ng(3), istart(3)
-integer :: mof = mpi_order_fortran, msi = mpi_status_ignore
 integer :: mode =  mpi_mode_create + mpi_mode_wronly + mpi_mode_excl
 
 i1 = max( i1, i1node )
