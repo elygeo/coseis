@@ -1,29 +1,42 @@
 !------------------------------------------------------------------------------!
 ! INREAD
 
-module inread_m
+module inread_m( filename )
 contains
 subroutine inread
 use globals_m
 
 implicit none
-integer :: i, iz, err
+character*(*), intent(in) :: filename
 character(160) :: str, key1, key2
+integer :: i, iz, err
 logical :: inzone
 
 if ( ip == 0 ) print '(a)', ''
 if ( ip == 0 ) print '(a)', 'SORD - Support Operator Rupture Dynamics'
 
-open( 9, file='in', status='old' )
+open( 9, file=filename, status='old' )
 nin = 0
 nout = 0
 nlock = 0
 
-! Read file line by line
 doline: do
 
+! Read line
 read( 9, '(a)', iostat=err ) str
 if ( err /= 0 ) exit doline
+
+! Strip comments and MATLAB characters
+i = index( str, '%' )
+str(1:) = ' '
+do
+  i = scan( str, "{}=[]';" )
+  if ( i == 0 ) exit
+  str(i:i) = ' '
+end do
+
+! Read tokens
+if ( str == ' ' ) cycle doline
 read( str, * ) key1, key2
 inzone = .false.
 

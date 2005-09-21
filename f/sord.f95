@@ -22,7 +22,10 @@ use steptime_m
 
 ! Initialization
 call init
-call inread
+if ( ip == 0 ) print '(a)', ''
+if ( ip == 0 ) print '(a)', 'SORD - Support Operator Rupture Dynamics'
+call inread( 'defaults.m' )
+call inread( 'in.m' )
 call setup
 call arrays
 call gridgen

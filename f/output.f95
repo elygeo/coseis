@@ -120,7 +120,7 @@ if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
 if ( ditout(iz) == 0 .or. mod( it, ditout(iz) ) /= 0 ) cycle doiz
 
 nc = 1
-onpass = 'v'
+onpass = 'a'
 cell = .false.
 fault = .false.
 static = .false.
@@ -177,20 +177,20 @@ do i = 1, nc
   write( str, '(a,i2.2,a,a,i1,i6.6)' ) &
     'out/', iz, '/', trim( out_field(iz) ), i, it
   select case( outvar(iz) )
-  case( 'x'    ); call pwrite4( str, x,    i1, i2, i )
-  case( 'a'    ); call pwrite4( str, w1,   i1, i2, i )
-  case( 'v'    ); call pwrite4( str, v,    i1, i2, i )
-  case( 'u'    ); call pwrite4( str, u,    i1, i2, i )
+  case( 'x'    ); call pwrite4( str, x,    i1, i2, i,   n, noff )
+  case( 'a'    ); call pwrite4( str, w1,   i1, i2, i,   n, noff )
+  case( 'v'    ); call pwrite4( str, v,    i1, i2, i,   n, noff )
+  case( 'u'    ); call pwrite4( str, u,    i1, i2, i,   n, noff )
   case( 'w'    );
-    if ( i < 4 )  call pwrite4( str, w1,   i1, i2, i )
-    if ( i > 3 )  call pwrite4( str, w2,   i1, i2, i-3 )
-  case( 'am'   ); call pwrite3( str, s1,   i1, i2 )
-  case( 'vm'   ); call pwrite3( str, s2,   i1, i2 )
-  case( 'um'   ); call pwrite3( str, s1,   i1, i2 )
-  case( 'wm'   ); call pwrite3( str, s2,   i1, i2 )
-  case( 'sv'   ); call pwrite3( str, sv,   i1, i2 )
-  case( 'sl'   ); call pwrite3( str, sl,    i1, i2 )
-  case( 'trup' ); call pwrite3( str, trup, i1, i2 )
+    if ( i < 4 )  call pwrite4( str, w1,   i1, i2, i,   n, noff )
+    if ( i > 3 )  call pwrite4( str, w2,   i1, i2, i-3, n, noff )
+  case( 'am'   ); call pwrite3( str, s1,   i1, i2,      n, noff )
+  case( 'vm'   ); call pwrite3( str, s2,   i1, i2,      n, noff )
+  case( 'um'   ); call pwrite3( str, s1,   i1, i2,      n, noff )
+  case( 'wm'   ); call pwrite3( str, s2,   i1, i2,      n, noff )
+  case( 'sv'   ); call pwrite3( str, sv,   i1, i2,      n, noff )
+  case( 'sl'   ); call pwrite3( str, sl,   i1, i2,      n, noff )
+  case( 'trup' ); call pwrite3( str, trup, i1, i2,      n, noff )
   case default; stop 'var'
   end select
 end do
