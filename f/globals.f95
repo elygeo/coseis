@@ -109,8 +109,8 @@ real :: &
 integer, dimension(3) :: &
   n,            & ! number of global nodes, double nodes counted once
   nn,           & ! number of global nodes, double nodes counted twice
-  np,           & ! number of processors
   nm,           & ! size of local 3D arrays
+  np,           & ! number of processors
   bc1,          & ! boundary conditions for j1 k1 l1
   bc2,          & ! boundary conditions for j2 k2 l2
   noff,         & ! offset between local and global indices

@@ -9,7 +9,7 @@ use parallel_m
 use zone_m
 
 implicit none
-integer :: i
+integer :: i, nl(3)
 
 ! Double nodes for fault
 nn = n

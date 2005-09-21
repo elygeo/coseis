@@ -59,40 +59,55 @@ end function
 subroutine swaphalo
 use globals
 
+save
 integer :: nreqs, req(12), commout(nz), mpistatus( mpi_statis_size, 4 )
-integer :: i, ng(4), nl(4), istart(4) = 0, ape1, ape2, vsub
+integer :: i, ng(4), nl(4), i0(4), adjacent1, adjacent2, slice(12)
+logical :: init = .true.
 
+ifinit: if ( init ) then
+
+FIXME
 do i = 1, nout
   call mpi_comm_split( comm, outme(i), ip, commout(i), err )
 end do
 
-nreqs = count( np > 1 ) * 4
-ng = size( v )
+ng(1:3) = nm
+ng(4) = 3
+nr = 0
+
 do i = 1, 3
 if ( np(i) > 1 ) then
-  call mpi_cart_shift( comm3, i-1, 1, ape1, ape2, err )
-  nl = ng
+  call mpi_cart_shift( comm, i-1, 1, adjacent1, adjacent2, err )
+  nl = i2node - i1node + 1 + 2 * nhalo
   nl(i) = nhalo
-  istart = i1node - nhalo
-  call mpi_type_create_subarray( 4, ng, nl, istart, mof, mpi_real, vsub, err )
-  call mpi_type_commit( vsub, err )
-  call mpi_recv_init( v(j,k,l,:), 1, vsub, ape1, 1, comm3, req(4*i-3), err )
-  istart(i) = i2node(i) + nhalo
-  call mpi_type_create_subarray( 4, ng, nl, istart, mof, mpi_real, vsub, err )
-  call mpi_type_commit( vsub, err )
-  call mpi_recv_init( v(j,k,l,:), 1, vsub, ape2, 2, comm3, req(4*i-2), err )
-  istart(i) = i1node(i)
-  call mpi_type_create_subarray( 4, ng, nl, istart, mof, mpi_real, vsub, err )
-  call mpi_type_commit( vsub, err )
-  call mpi_send_init( v(j,k,l,:), 1, vsub, ape1, 2, comm3, req(4*i-1), err )
-  istart(i) = i2node(i)
-  call mpi_type_create_subarray( 4, ng, nl, istart, mof, mpi_real, vsub, err )
-  call mpi_type_commit( vsub, err )
-  call mpi_send_init( v(j,k,l,:), 1, vsub, ape2, 1, comm3, req(4*i-0), err )
+  nr = nr + 1
+  i0 = i1node - nhalo - 1
+  call mpi_type_create_subarray( 4, ng, nl, i0, mof, mpi_real, slice(nr), err )
+  call mpi_type_commit( slice, err )
+  call mpi_recv_init( w1, 1, slice, adjacent1, 1, comm, req(nr), err )
+  nr = nr + 1
+  i0(i) = i2node(i)
+  call mpi_type_create_subarray( 4, ng, nl, i0, mof, mpi_real, slice(nr), err )
+  call mpi_type_commit( slice, err )
+  call mpi_recv_init( w1, 1, slice, adjacent2, 2, comm, req(nr), err )
+  nr = nr + 1
+  i0(i) = i1node(i) - 1
+  call mpi_type_create_subarray( 4, ng, nl, i0, mof, mpi_real, slice(nr), err )
+  call mpi_type_commit( slice, err )
+  call mpi_send_init( w1, 1, slice, adjacent1, 2, comm, req(nr), err )
+  nr = nr + 1
+  i0(i) = i2node(i) - nhalo
+  call mpi_type_create_subarray( 4, ng, nl, i0, mof, mpi_real, slice(nr), err )
+  call mpi_type_commit( slice, err )
+  call mpi_send_init( w1, 1, slice, adjacent2, 1, comm, req(nr), err )
 end if
 end do
 
-do i = 1, nreqs, 4
+return
+
+end if init
+
+do i = 1, nr, 4
   call mpi_startall( 4, req(i), err )
   call mpi_waitall( 4, req(i), mpistatus, err )
 end do

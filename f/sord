@@ -40,17 +40,17 @@ fi
 # Read input
 
 sed "s/%.*$//; s/;/;\n/g; s/[]={}';[]*//g;/^$/d" "defaults.m" "in.m" > tmp
-n3=( 1 1 1 )
+nn3=( 1 1 1 )
 np3=( 1 1 1 )
 while read key1 key2 params; do
   set -- $params
   case "$key" in
-    n)  n3=( $1 $2 $3 ) ;;
+    n)  nn3=( $1 $2 $3 ) ;;
     nt) nt=$1 ;;
     np) np3=( $1 $2 $3 ) ;;
   esac
 done < tmp
-n=$(( n3[0] * n3[1] * n3[2] ));
+nn=$(( nn3[0] * nn3[1] * nn3[2] ));
 np=$(( np3[0] * np3[1] * np3[2] ));
 [ $matlab = yes ] && np=1
 
@@ -76,11 +76,11 @@ perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > out/endian
 
 floatsize=4
 nvars=21
-ram=$(( n / np * floatsize * nvars / 1024 / 1024 ))
+ram=$(( nn / np * floatsize * nvars / 1024 / 1024 ))
 
 rate=250000
 [ $matlab = yes ] && rate=70000
-wt=$(( nt * n / np / rate + 1 ))
+wt=$(( nt * nn / np / rate + 1 ))
 hh=$(( wt / 3600 ))
 mm=$(( wt % 3600 / 60 ))
 ss=$(( wt % 60 ))
@@ -172,7 +172,7 @@ SunOS)
   ;;
 esac
 
-[ $n -lt 10000 ] && OPTFLAGS=-g
+[ $nn -lt 10000 ] && OPTFLAGS=-g
 OPTFLAGS=-g
 
 if [ $debug = yes ]; then
@@ -241,7 +241,7 @@ END
 
 # batch
 rate=100000
-wt=$(( nt * n / np / rate + 1 ))
+wt=$(( nt * nn / np / rate + 1 ))
 hh=$(( wt / 3600 ))
 mm=$(( wt % 3600 / 60 ))
 ss=$(( wt % 60 ))
@@ -314,7 +314,7 @@ END
 
 # batch
 rate=100000
-wt=$(( nt * n / np / rate + 1 ))
+wt=$(( nt * nn / np / rate + 1 ))
 hh=$(( wt / 3600 ))
 mm=$(( wt % 3600 / 60 ))
 ss=$(( wt % 60 ))
