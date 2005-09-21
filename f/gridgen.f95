@@ -5,7 +5,7 @@ module gridgen_m
 contains
 subroutine gridgen
 use globals_m
-use parallel_m
+use parallelio_m
 use optimize_m
 use zone_m
 

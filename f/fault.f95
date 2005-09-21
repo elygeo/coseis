@@ -6,7 +6,7 @@ contains
 subroutine fault
 use globals_m
 use snormals_m
-use binio_m
+use parallelio_m
 
 implicit none
 save

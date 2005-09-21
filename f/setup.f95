@@ -20,9 +20,9 @@ nl = nn / np; where ( mod( nn, np ) /= 0 ) nl = nl + 1
 np = nn / nl; where ( mod( nn, nl ) /= 0 ) np = np + 1
 
 ! Find processor rank
-ip = 0
+ip  = 0
 ip3 = 0
-call prank( np, ip, ip3 )
+call rank( np, ip, ip3 )
 
 ! Offset: add to global index to get memory index
 noff = nhalo - nl * ip3

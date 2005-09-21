@@ -5,9 +5,8 @@ module matmodel_m
 contains
 subroutine matmodel
 use globals_m
-use parallel_m
+use parallelio_m
 use dfnc_m
-use binio_m
 
 implicit none
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, iz

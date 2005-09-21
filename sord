@@ -152,12 +152,14 @@ OPTFLAGS=-O
 
 if [ $mpi = no ]; then
   OBJECT="$OBJECT \\
-  serial.o"
+  serial.o\\
+  serialio.o"
   FC=f95
   CC=cc
 else
   OBJECT="$OBJECT \\
-  mpi.o"
+  mpi.o\\
+  mpiio.o"
   FC=mpif90
   CC=mpicc
 fi

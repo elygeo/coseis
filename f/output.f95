@@ -5,7 +5,7 @@ module output_m
 contains
 subroutine output( pass )
 use globals_m
-use parallel_m
+use parallelio_m
 
 implicit none
 save

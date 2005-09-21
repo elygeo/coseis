@@ -11,36 +11,33 @@ logical :: period(3) = .false.
 
 contains
 
-! Initialize
-subroutine init
-call mpi_init( err )
-end subroutine
-
-! Finalize
-subroutine finalize
-call mpi_finalize( err )
-end subroutine
+subroutine init;     call mpi_init( err );     end subroutine
+subroutine finalize; call mpi_finalize( err ); end subroutine
 
 ! Real minimum
-function pmin( l ) result( g )
-real :: l, g
-mpi_allreduce( l, g, 1, mpi_real, mpi_min, comm, err )
+function pmin( rl ) result( rg )
+implicit none
+real :: rl, rg
+mpi_allreduce( rl, rg, 1, mpi_real, mpi_min, comm, err )
 end function
 
 ! Real maximum
-function pmax( l ) result( g )
-real :: l, g
-mpi_allreduce( l, g, 1, mpi_real, mpi_max, comm, err )
+function pmax( rl ) result( rg )
+implicit none
+real :: rl, rg
+mpi_allreduce( rl, rg, 1, mpi_real, mpi_max, comm, err )
 end function
 
 ! Integer minimum
 function pmini( l ) result( g )
+implicit none
 integer :: l, g
 mpi_allreduce( l, g, 1, mpi_integer, mpi_min, comm, err )
 end function
 
 ! Processor rank
-subroutine prank( np, ip, ip3 )
+subroutine rank( np, ip, ip3 )
+implicit none
 integer, intent(in) :: np
 integer, intent(out) :: ip, ip3
 call mpi_cart_create( mpi_comm_world, 3, np, period, .true., comm, err )
@@ -55,6 +52,7 @@ end subroutine
 
 ! Swap halo
 subroutine swaphalo( w1 )
+implicit none
 save
 real, intent(in) :: w1(:,:,:,:)
 integer :: nhalo, ng(4), nl(4), i0(4), i, adjacent1, adjacent2, slice(12), &
@@ -95,65 +93,6 @@ do i = 1, nr, 4
   call mpi_startall( 4, req(i), err )
   call mpi_waitall( 4, req(i), mpistatus, err )
 end do
-
-FIXME
-do i = 1, nout
-  call mpi_comm_split( comm, outme(i), ip, commout(i), err )
-end do
-
-! Write vector component
-subroutine pwrite3( filename, w1, i1, i2, i, nn, noff )
-implicit none
-character*(*), intent(in) :: filename
-real, intent(in) :: w1(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3), nn(3), noff, i
-integer :: ftype, mtype, fh, d = 0, nl(4), ng(4), i0(4), &
-  mode = mpi_mode_create + mpi_mode_wronly + mpi_mode_excl
-call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, err )
-ng = (/ nn,            3     /)
-nl = (/ i2 - i1 + 1,   1     /)
-i0 = (/ i1 - 1 - noff, i - 1 /)
-call mpi_type_create_subarray( 4, ng, nl, i0, mof, mpi_real, ftype, err )
-call mpi_type_commit( ftype, err )
-ng = (/ size(w1,1), size(w1,2), size(w1,3), size(w1,4) /)
-nl = (/ i2 - i1 + 1,   1     /)
-i0 = (/ i1 - 1,        i - 1 /)
-call mpi_type_create_subarray( 4, ng, nl, i0, mof, mpi_real, mtype, err )
-call mpi_type_commit( mtype, err )
-call mpi_file_open( comm, filename, mode, mpi_info_null, fh, err )
-call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, err )
-call mpi_file_write_all( fh, w1, 1, mtype, msi, err )
-call mpi_file_close( fh )
-call mpi_type_free( mtype, err )
-call mpi_type_free( ftype, err )
-end subroutine
-
-! Write scalar field
-subroutine pwrite3( filename, s1, i1, i2, nn, noff )
-implicit none
-character*(*), intent(in) :: filename
-real, intent(in) :: s1(:,:,:)
-integer, intent(in) :: i1(3), i2(3), nn(3), noff
-integer :: ftype, mtype, fh, d = 0, nl(3), ng(3), i0(3), &
-  mode = mpi_mode_create + mpi_mode_wronly + mpi_mode_excl
-call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, err )
-ng = nn
-nl = i2 - i1 + 1
-i0 = i1 - 1 - noff
-call mpi_type_create_subarray( 3, nn, nl, i0, mof, mpi_real, ftype, err )
-call mpi_type_commit( ftype, err )
-ng = (/ size(w1,1), size(w1,2), size(w1,3) /)
-nl = i2 - i1 + 1
-i0 = i1 - 1
-call mpi_type_create_subarray( 4, ng, nl, i0, mof, mpi_real, mtype, err )
-call mpi_type_commit( mtype, err )
-call mpi_file_open( comm, filename, mode, mpi_info_null, fh, err )
-call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, err )
-call mpi_file_write_all( fh, s1, 1, mtype, msi, err )
-call mpi_file_close( fh )
-call mpi_type_free( mtype, err )
-call mpi_type_free( ftype, err )
-end subroutine
 
 end module
 
