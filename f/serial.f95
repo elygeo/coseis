@@ -35,7 +35,7 @@ write( 9, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
 close( 9 )
 end subroutine
 
-! Write vector field
+! Write vector component
 subroutine pwrite4( filename, w1, i1, i2, i, n, noff )
 implicit none
 character*(*), intent(in) :: filename
@@ -79,7 +79,7 @@ read( 9, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
 close( 9 )
 end subroutine
 
-! Read vector field
+! Read vector component
 subroutine pread4( filename, w1, i1, i2, i, n, noff )
 implicit none
 character*(*), intent(in) :: filename
