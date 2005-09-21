@@ -428,17 +428,15 @@ DOMAIN DECOMPOSITION DIAGRAM
           | o |                          | o |
           o---o i1pml                    o---o
   ------- | o | i1pml                    | o |
-  ------- x---x i1pml+1   .---. 1        x---x i2node
-          |[x]| i1pml+1   |[x]| i1cell   |[x]| i2cell
+          x---x i1pml+1   .---. 1        x---x i2node
+  Elastic |[x]| i1pml+1   |[x]| i1cell   |[x]| i2cell
           x---x           x---x i1node   '---' nm=5  
           |[x]|           |[x]|
-          x---x           x---x
-  Elastic |[x]|           |[x]|
-          x---x           x---x i2node   .---. 1     
+  Fault-> xx-xx           xx-xx i2node   .---. 1     
           |[x]|           |[x]| i2cell   |[x]| i1cell
           x---x           '---' nm=5     x---x i1node
-          |[x]| i2pml-2                  | o |
-  ------- x---x i2pml-1                  o---o
+  Elastic |[x]| i2pml-2                  | o |
+          x---x i2pml-1                  o---o
   ------- | o | i2pml-1                  | o |
           o---o i2pml     .---. 1        o---o i2node
           | o |           | o | i1cell   | o | i2cell
@@ -449,6 +447,6 @@ DOMAIN DECOMPOSITION DIAGRAM
           o---o           o---o i2node   .---. 1     
           | o | 15        | o |          | o | i1cell i2cell
   ------- o---o nn=16     '---' nm=5     o---o i1node i2node
-  Surface                                |   |
+  Surface       n=15                     |   |
                                          '---' nm=3         
 

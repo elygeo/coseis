@@ -37,9 +37,9 @@ i2oper(1,:) = i2
 ! Read grid files or creat basic rectangular mesh
 x = 0.
 if ( grid == 'read' ) then
-  call bread4( 'data/x1', x, i1, i2, 1 )
-  call bread4( 'data/x2', x, i1, i2, 2 )
-  call bread4( 'data/x3', x, i1, i2, 3 )
+  call bread4( 'data/x1', x, i1, i2, 1, n, noff )
+  call bread4( 'data/x2', x, i1, i2, 2, n, noff )
+  call bread4( 'data/x3', x, i1, i2, 3, n, noff )
   call optimize
 else
   forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - noff(1) )
@@ -61,9 +61,9 @@ end if
 j = 6 - k - l
 
 ! Dimensions
-lj = x(j2,k2,l2,j)
-lk = x(j2,k2,l2,k)
-ll = x(j2,k2,l2,l)
+lj = dx * ( n(1) - 1 )
+lk = dx * ( n(2) - 1 )
+ll = dx * ( n(3) - 1 )
 
 ! Mesh models
 select case( grid )

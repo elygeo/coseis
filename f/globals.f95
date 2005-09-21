@@ -107,7 +107,8 @@ real :: &
   slmax           ! max slip
 
 integer, dimension(3) :: &
-  nn,           & ! number of global nodes
+  n,            & ! number of global nodes, double nodes counted once
+  nn,           & ! number of global nodes, double nodes counted twice
   np,           & ! number of processors
   nm,           & ! size of local 3D arrays
   bc1,          & ! boundary conditions for j1 k1 l1

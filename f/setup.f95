@@ -12,6 +12,7 @@ implicit none
 integer :: i
 
 ! Double nodes for fault
+nn = n
 if( ifn /= 0 ) nn(ifn) = nn(ifn) + 1
 
 ! Partition for parallelization

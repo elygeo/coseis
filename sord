@@ -125,38 +125,39 @@ fi
 
 OBJECT="\\
   globals.o \\
-  zone.o \\
   dfcn.o \\
   dfnc.o \\
   hgcn.o \\
   hgnc.o \\
   snormals.o \\
-  binio.o \\
+  zone.o \\
+  serial.o \\
   inread.o \\
   setup.o \\
   arrays.o \\
   optimize.o \\
   gridgen.o \\
   matmodel.o \\
-  pml.o \\
-  fault.o \\
   momentsrc.o \\
-  vstep.o \\
-  wstep.o \\
-  output.o"
+  fault.o \\
+  output.o \\
+  pml.o \\
+  gradu.o \\
+  divw.o \\
+  locknodes.o \\
+  steptime.o \\
+  sord.o"
 
 OPTFLAGS=-O
 
 if [ $mpi = no ]; then
   OBJECT="$OBJECT \\
-  sord.o"
+  serial.o"
   FC=f95
   CC=cc
 else
   OBJECT="$OBJECT \\
-  psord.o \\
-  mpisetup.o \\
-  mpioutput.o"
+  mpi.o"
   FC=mpif90
   CC=mpicc
 fi
