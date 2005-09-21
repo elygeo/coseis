@@ -34,7 +34,7 @@ if ( err == 0 ) then
 else
   it = 0
 end if
-pimin( it )
+it = pmini( it )
 
 ! Read checkpoint file if found, if not, setup output
 if ( it /= 0 ) then
@@ -67,7 +67,7 @@ else
       call system( 'mkdir ' // str )
     end do
   end if
-  if ( all( ihypo >= i1node .and. ihypo <= i2node ) ) then
+  if ( hypoproc ) then
     courant = dt * vp2 * sqrt( 3. ) / abs( dx )
     write( str, '(a,i2.2,a)' ) 'out/meta.m'
     open(  9, file=str, status='new' )
@@ -88,7 +88,7 @@ else
 end if
 
 if ( ip == 0 ) then
-  print '(a)', 'Time       Amax        Vmax        Umax        Compute     I/O'
+  print '(a)', 'Time       Amax        Vmax        Umax        Wall Time'
 end if
 
 return
@@ -96,6 +96,22 @@ return
 end if ifinit
 
 !------------------------------------------------------------------------------!
+
+! Magnitudes
+if ( pass == 'w' )
+  s1 = sqrt( sum( u * u, 4 ) )
+  s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
+  umax  = pmax( maxval( s1 ) )
+  wmax  = pmax( maxval( s2 ) )
+  if ( umax > dx / 10. ) print *, 'Warning: u !<< dx'
+else
+  s1 = sqrt( sum( w1 * w1, 4 ) )
+  s2 = sqrt( sum( v * v, 4 ) )
+  amax  = pmax( maxval( s1 ) )
+  vmax  = pmax( maxval( s2 ) )
+  svmax = pmax( maxval( sv ) )
+  slmax = pmax( maxval( sl ) )
+end if
 
 ! Write output
 doiz: do iz = 1, nout
@@ -146,8 +162,10 @@ if ( ip == 0 ) then
   close( 9 )
 end if
 
-! FIXME
-if ( any( i2 < i1 ) ) stop 'out range'
+if ( any( i2 < i1 ) ) then
+  ditout(iz) = 0
+  cycle doiz
+end if
 if ( static ) ditout(iz) = 0
 if ( fault ) then
   i1(ifn) = 1
@@ -209,13 +227,14 @@ if ( ip == 0 ) then
   open(  9, file='out/timestep', status='replace' )
   write( 9, * ) it
   close( 9 )
-  call system_clock( wt(5) )
-  dwt(1:4) = real( wt(2:5) - wt(1:4) ) / real( wt_rate )
+  call system_clock( wt(2) )
+  dwt = real( wt(2) - wt(1) ) / real( wt_rate )
+  wt(1) = wt(2)
   write( str, '(a,i6.6)' ) 'out/stats/', it
   open(  9, file=str, status='replace' )
-  write( 9, '(8es15.7)' ) t, amax, vmax, umax, wmax, dwt
+  write( 9, '(8es15.7)' ) t, amax, vmax, umax, wmax, svmax, slmax, dwt
   close( 9 )
-  print '(6es12.4)', t, amax, vmax, umax, dwt(1:2) + dwt(3:4)
+  print '(6es12.4)', t, amax, vmax, umax, dwt
 end if
 
 end subroutine

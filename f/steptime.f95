@@ -1,18 +1,19 @@
 !------------------------------------------------------------------------------!
-! TIME
+! STEPTIME
 
-module time_m
+module steptime_m
 contains
-subroutine time
+subroutine steptime
 use globals_m
 
 implicit none
-integer :: i, j, k, l, i1(3), i2(3)
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2
 
 ! Time integration
-t = t + dt
-v = v + dt * w1
-u = u + dt * v
+it = it + 1
+t  = t  + dt
+v  = v  + dt * w1
+u  = u  + dt * v
 
 ! Fault time integration
 if ( ifn /= 0 ) then
@@ -28,6 +29,8 @@ if ( ifn /= 0 ) then
   j3 = i1(1); j4 = i2(1)
   k3 = i1(2); k4 = i2(2)
   l3 = i1(3); l4 = i2(3)
+  t1 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
+  sv = sqrt( sum( t1 * t1, 4 ) )
   sl = sl + dt * sv
 end if
 

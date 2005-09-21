@@ -11,7 +11,8 @@ integer :: i, iz, err
 character(160) :: str, key1, key2
 logical :: inzone
 
-if ( ip == 0 ) print '(a)', 'Reading input'
+if ( ip == 0 ) print '(a)', ''
+if ( ip == 0 ) print '(a)', 'SORD - Support Operator Rupture Dynamics'
 
 open( 9, file='in', status='old' )
 nin = 0
@@ -44,7 +45,6 @@ case( 'xhypo' );       read( str, * ) key1, xhypo
 case( 'rsource' );     read( str, * ) key1, rsource
 case( 'tsource' );     read( str, * ) key1, tsource
 case( 'moment' );      read( str, * ) key1, moment1, moment2
-case( 'ihypo' );       read( str, * ) key1, ihypo
 case( 'faultnormal' ); read( str, * ) key1, ifn
 case( 'faultplane' );  read( str, * ) key1, ifault
 case( 'vrup' );        read( str, * ) key1, vrup

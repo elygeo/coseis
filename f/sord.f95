@@ -3,46 +3,50 @@
 
 program sord
 
+! Modules
 use globals_m
 use inread_m
+use parallel_m
 use setup_m
 use arrays_m
 use gridgen_m
 use matmodel_m
-use pml_m
-use fault_m
-use momentsrc_m
-use vstep_m
-use wstep_m
 use output_m
+use pml_m
+use gradu_m
+use momentsrc_m
+use divw_m
+use fault_m
+use locknodes_m
+use steptime_m
 
-integer :: err
-
-print '(a)', ''
-print '(a)', 'SORD - Support Operator Rupture Dynamics'
-
+! Initialization
 call init
 call inread
-call parallel
 call setup
 call arrays
 call gridgen
 call matmodel
-call swaphalo
-call pml
-call fault
 call momentsrc
-call output( 'v' )
+call fault
+call swaphalo
+call output( 'a' )
 
+! Main loop
 do while ( it < nt )
-  it = it + 1;
-  call system_clock( wt(1) ); call wstep
-  call system_clock( wt(2) ); call output( 'w' )
-  call system_clock( wt(3) ); call vstep
-  call system_clock( wt(4) ); call output( 'v' )
-  call system_clock( wt(5) ); call swaphalo
+  call pml
+  call gradu
+  call momentsrc
+  call output( 'w' ) 
+  call divw
+  call swaphalo
+  call fault
+  call locknodes
+  call output( 'a' )
+  call steptime
 end do
 
+! Finsh up
 call finalize
 
 end program

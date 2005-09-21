@@ -9,9 +9,9 @@ subroutine init;     end subroutine
 subroutine finalize; end subroutine
 subroutine prank;    end subroutine
 subroutine swaphalo; end subroutine
-function pimin( l ) result( g ); integer :: l, g; g = l; end function
-function prmin( l ) result( g ); real    :: l, g; g = l; end function
-function prmax( l ) result( g ); real    :: l, g; g = l; end function
+function pmin( l ) result( g ); real :: l, g; g = l; end function
+function pmax( l ) result( g ); real :: l, g; g = l; end function
+function pmini( l ) result( g ); integer :: l, g; g = l; end function
 
 ! Write scalar field
 subroutine pwrite3( filename, s1, i1, i2 )

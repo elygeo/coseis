@@ -31,19 +31,19 @@ call mpi_cart_get( comm, 3, np, period, ip3, err )
 end subroutine
 
 ! Parallel integer minimum
-function pimin( l ) result( g )
+function pmini( l ) result( g )
 integer :: l, g
 mpi_allreduce( l, g, 1, mpi_integer, mpi_min, comm, err )
 end function
 
 ! Parallel real minimum
-function prmin( l ) result( g )
+function pmin( l ) result( g )
 real :: l, g
 mpi_allreduce( l, g, 1, mpi_real, mpi_min, comm, err )
 end function
 
 ! Parallel real maximum
-function prmax( l ) result( g )
+function pmax( l ) result( g )
 real :: l, g
 mpi_allreduce( l, g, 1, mpi_real, mpi_max, comm, err )
 end function

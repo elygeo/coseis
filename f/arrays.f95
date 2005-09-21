@@ -54,6 +54,9 @@ allocate(       &
   p6(j,k,l2,3), &
   g6(j,k,l2,3)  )
 
+! PML damping
+allocate( dn1(npml), dn2(npml), dc1(npml), dc2(npml) )
+
 if ( ifn > 0 ) then
   i2 = nm
   i2(ifn) = 1
