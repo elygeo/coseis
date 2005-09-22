@@ -450,3 +450,16 @@ DOMAIN DECOMPOSITION DIAGRAM
   Surface       n=15                     |   |
                                          '---' nm=3         
 
+
+INSTALLING MPICH2
+
+gforker
+
+/configure --enable-f90 --with-device=ch3:shm
+make
+make install
+
+cd
+echo "secretword=<secretword>" > .mpd.conf
+chmod 600 .mpd.conf
+

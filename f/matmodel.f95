@@ -7,6 +7,7 @@ subroutine matmodel
 use globals_m
 use parallelio_m
 use dfnc_m
+use zone_m
 
 implicit none
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, iz
@@ -27,6 +28,7 @@ ifreadfile: if ( readfile(i) ) then
   case ( 'vs'  ); call ioscalar( 'r', 'data/vs',  s2, i1, i2, n, noff )
   end select
 else
+  call zone( i1in(i,:), i2in(i,:), nn, noff, ihypo, ifn )
   i1 = max( i1in(i,:), i1cell )
   i2 = min( i2in(i,:), i2cell + 1 )
   j1 = i1(1); j2 = i2(1)

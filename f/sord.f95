@@ -7,7 +7,7 @@ program sord
 use globals_m
 use inread_m
 use parallel_m
-use indices_m
+use setup_m
 use arrays_m
 use gridgen_m
 use matmodel_m
@@ -26,7 +26,7 @@ if ( ip == 0 ) print '(a)', ''
 if ( ip == 0 ) print '(a)', 'SORD - Support Operator Rupture Dynamics'
 call inread( 'defaults.m' )
 call inread( 'in.m' )
-call indices
+call setup
 call arrays
 call gridgen
 call matmodel

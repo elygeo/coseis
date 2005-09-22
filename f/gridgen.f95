@@ -133,12 +133,6 @@ if ( ifn /= 0 ) then
   end select
 end if
 
-! Input zones
-if ( nin > nz ) stop 'too many input zone, make nz bigger'
-do i = 1, nin
-  call zone( i1in(i,:), i2in(i,:), nn, noff, ihypo, ifn )
-end do
-
 end subroutine
 end module
 

@@ -87,6 +87,47 @@ else
   end if
 end if
 
+!Initialize output
+if ( nout > nz ) stop 'too many output zones, make nz bigger'
+
+doinit: do iz = 1, nout
+
+nc = 1
+fault = .false.
+field = fieldout(iz)
+select case( field )
+case( 'x'    ); nc = 3
+case( 'a'    ); nc = 3
+case( 'v'    ); nc = 3
+case( 'u'    ); nc = 3
+case( 'w'    ); nc = 6
+case( 'sv'   ); fault = .true.
+case( 'sl'   ); fault = .true.
+case( 'trup' ); fault = .true.
+end select
+
+if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
+call zone( i1out(i,:), i2out(i,:), nn, noff, ihypo, ifn )
+if ( field(1:1) = 'w' ) i2out(i,:) = i2out(i,:) - 1
+i1 = i1out(iz,:)
+i2 = i2out(iz,:)
+
+if ( ipout(iz) == 0 ) then
+  write( str, '(a,i2.2,a)' ) 'out/', iz, '/meta.m'
+  open(  9, file=str, status='replace' )
+  write( 9, * ) 'field = ''', fieldout(iz), ''';% variable name'
+  write( 9, * ) 'nc    =   ', nc,             ';% number of components'
+  write( 9, * ) 'i1    = [ ', i1 - noff,    ' ];% start index'
+  write( 9, * ) 'i2    = [ ', i2 - noff,    ' ];% end index'
+  write( 9, * ) 'dit   =   ', ditout(iz),     ';% interval'
+  close( 9 )
+end if
+
+if ( any( i2 < i1 ) ) ditout(iz) = 0
+call iosplit( iz, ditout(iz) )
+
+end do doinit
+
 if ( ip == 0 ) then
   print '(a)', 'Time       Amax        Vmax        Umax        Wall Time'
 end if
@@ -116,54 +157,21 @@ end if
 ! Write output
 doiz: do iz = 1, nout
 
-field = fieldout(iz)
-if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
 if ( ditout(iz) == 0 .or. mod( it, ditout(iz) ) /= 0 ) cycle doiz
 
-nc = 1
-fault = .false.
 onpass = 'a'
-
-select case( field )
-case( 'x'    ); nc = 3
-case( 'a'    ); nc = 3; onpass = 'a';
-case( 'v'    ); nc = 3
-case( 'u'    ); nc = 3
-case( 'w'    ); nc = 6; onpass = 'w';
-case( 'um'   ); onpass = 'w'; 
-case( 'wm'   ); onpass = 'w';
-case( 'sv'   ); fault = .true.
-case( 'sl'   ); fault = .true.
-case( 'trup' ); fault = .true.
-end select
 
 if ( onpass /= pass ) cycle doiz
 
 i1 = i1out(iz,:)
 i2 = i2out(iz,:)
-if ( field(1:1) = 'w' ) i2 = i2 - 1
 
 ! FIXME global size, then bounds on local size
 
-! Metadata
-if ( ipout(iz) == 0 ) then
-  write( str, '(a,i2.2,a)' ) 'out/', iz, '/meta.m'
-  open(  9, file=str, status='replace' )
-  write( 9, * ) 'field = ''', fieldout(iz), ''';% variable name'
-  write( 9, * ) 'nc    =   ', nc,             ';% number of components'
-  write( 9, * ) 'i1    = [ ', i1 - noff,    ' ];% start index'
-  write( 9, * ) 'i2    = [ ', i2 - noff,    ' ];% end index'
-  write( 9, * ) 'dit   =   ', ditout(iz),     ';% interval'
-  write( 9, * ) 'itout =   ', it,             ';% time step'
-  write( 9, * ) 'tout  =   ', t,              ';% time'
-  close( 9 )
-end if
-
-! call iosplit FIXME
-if ( any( i2 < i1 ) ) ditout(iz) = 0
-call iosplit( iz, ditout(iz) )
 if ( ditout(iz) == 0 ) cycle doiz
+
 if ( fieldout(iz) == 'x' ) ditout(iz) = 0
+
 if ( fault ) then
   i1(ifn) = 1
   i2(ifn) = 1

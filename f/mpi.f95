@@ -6,7 +6,7 @@ use mpi
 
 implicit none
 save
-integer :: err, comm, mof = mpi_order_fortran, msi = mpi_status_ignore
+integer :: err, comm, root, mof = mpi_order_fortran, msi = mpi_status_ignore
 logical :: period(3) = .false.
 
 contains
@@ -14,30 +14,78 @@ contains
 subroutine init;     call mpi_init( err );     end subroutine
 subroutine finalize; call mpi_finalize( err ); end subroutine
 
-! Real minimum
-function pmin( rl ) result( rg )
-implicit none
-real :: rl, rg
-mpi_allreduce( rl, rg, 1, mpi_real, mpi_min, comm, err )
-end function
-
-! Real maximum
-function pmax( rl ) result( rg )
-implicit none
-real :: rl, rg
-mpi_allreduce( rl, rg, 1, mpi_real, mpi_max, comm, err )
-end function
-
 ! Integer minimum
-function pmini( l ) result( g )
-implicit none
-integer :: l, g
-mpi_allreduce( l, g, 1, mpi_integer, mpi_min, comm, err )
-end function
+subroutine allmini( il, ig )
+integer, intent(in) :: il
+integer, intent(out) :: ig
+call mpi_allreduce( il, ig, 1, mpi_integer, mpi_min, comm, err )
+end subroutine
+
+! Real minimum & location, root proc get result
+subroutine pminloc( r, rmax, imax, noff, iroot )
+real, intent(in) :: r(:,:,:)
+real, intent(out) :: rmax
+integer, intent(in) :: iroot
+integer, intent(out) :: imax(3)
+imax = minloc( r )
+rmax = r(imax(1),imax(2),imax(3))
+imax = imax - noff
+call mpi_reduce( rmax, 1, mpi_real, mpi_min, iroot, comm, err )
+call mpi_rendrecv_replace( imax, 3, mpi_integer, iroot, ip, 0, ip, 0, err )
+end subroutine
+
+! Real maximum & location, root proc get result
+subroutine pmaxloc( r, rmax, imax, iroot )
+real, intent(in) :: r(:,:,:)
+real, intent(out) :: rmax
+integer, intent(in) :: iroot
+integer, intent(out) :: imax(3)
+real :: rl
+imax = maxloc( r )
+rmax = r(imax(1),imax(2),imax(3))
+imax = imax - noff
+call mpi_reduce( rmax, 1, mpi_real, mpi_max, iroot, comm, err )
+call mpi_rendrecv_replace( imax, 3, mpi_integer, iroot, ip, 0, ip, 0, err )
+end subroutine
+
+! Real minimum & location
+subroutine allminloc( r, rmax, imax, noff, iroot )
+real, intent(in) :: r(:,:,:)
+real, intent(out) :: rmax
+integer, intent(out) :: imax(3), iroot
+real :: lpair(2), gpair(2)
+integer :: ip
+imax = minloc( r )
+lpair(1) = r(i(1),i(2),i(3))
+imax = imax - noff
+call mpi_comm_rank( comm, ip, err  )
+lpair(2) = ip
+call mpi_allreduce( lpair, gpair, 2, mpi_real, mpi_minloc, comm, err )
+rmax  = gpair(1)
+iroot = gpair(2)
+call mpi_bcast( imax, 3, mpi_integer, iroot, comm, err )
+end subroutine
+
+! Real maximum & location
+subroutine allmaxloc( r, rmax, imax, noff, iroot )
+real, intent(in) :: r(:,:,:)
+real, intent(out) :: rmax
+integer, intent(out) :: imax(3), iroot
+real :: lpair(2), gpair(2)
+integer :: ip
+imax = maxloc( r )
+lpair(1) = r(imax(1),imax(2),imax(3))
+imax = imax - noff
+call mpi_comm_rank( comm, ip, err  )
+lpair(2) = ip
+call mpi_allreduce( lpair, gpair, 2, mpi_real, mpi_maxloc, comm, err )
+rmax  = gpair(1)
+iroot = gpair(2)
+call mpi_bcast( imax, 3, mpi_integer, iroot, comm, err )
+end subroutine
 
 ! Processor rank
 subroutine rank( np, ip, ip3 )
-implicit none
 integer, intent(in) :: np
 integer, intent(out) :: ip, ip3
 call mpi_cart_create( mpi_comm_world, 3, np, period, .true., comm, err )
@@ -52,7 +100,6 @@ end subroutine
 
 ! Swap halo
 subroutine swaphalo( w1 )
-implicit none
 save
 real, intent(in) :: w1(:,:,:,:)
 integer :: nhalo, ng(4), nl(4), i0(4), i, adjacent1, adjacent2, slice(12), &
