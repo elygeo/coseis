@@ -12,9 +12,9 @@ use zone_m
 implicit none
 real :: theta, scl
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up
-real :: lj, lk, ll
+real :: lj, lk, ll, rhypo
 
-if ( ip == 0 ) print '(a)', 'Grid generation'
+if ( master ) print '(a)', 'Grid generation'
 
 ! Indices
 i1 = i1cell
@@ -117,15 +117,17 @@ do i = 1, 3
   w1(:,:,:,i) = w1(:,:,:,i) - xhypo(i)
 end do
 s1 = sqrt( sum( w1 * w1, 4 ) )
-ihypo  = minloc( s1 );
-if ( ifn /= 0 .and. ihypo(ifn) /= ifault ) then
-  ihypo(ifn) = ifault
-  if ( ip == 0 ) print '(a)', 'Warning: hypocenter not on fault!'
-end if
+ihypo = minloc( s1 )
+rhypo = s1(ihypo(1),ihypo(2),ihypo(3))
+call allrmin( rhypo, ihypo, noff, imaster )
+if ( ip == imaster ) master = .true.
+if ( rhypo > dx ) print '(a)', 'Warning: external hypocenter'
 
-! Split nodes
+! Fault plane split nodes
+ifault = ifault - noff
 if ( ifn /= 0 ) then
-  i = ihypo(ifn) + 1
+  if ( ihypo(ifn) /= ifault ) print '(a)', 'Warning: hypocenter not on fault'
+  i = ifault
   select case( ifn )
   case( 1 ); x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:)
   case( 2 ); x(:,i+1:k2,:,:) = x(:,i:k2-1,:,:)

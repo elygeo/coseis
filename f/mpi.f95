@@ -6,88 +6,27 @@ use mpi
 
 implicit none
 save
-integer :: err, comm, root, mof = mpi_order_fortran, msi = mpi_status_ignore
+integer :: ip, ip3(3), comm, err, &
+  mof = mpi_order_fortran, &
+  msi = mpi_status_ignore
 logical :: period(3) = .false.
 
 contains
 
-subroutine init;     call mpi_init( err );     end subroutine
-subroutine finalize; call mpi_finalize( err ); end subroutine
-
-! Integer minimum
-subroutine allmini( il, ig )
-integer, intent(in) :: il
-integer, intent(out) :: ig
-call mpi_allreduce( il, ig, 1, mpi_integer, mpi_min, comm, err )
-end subroutine
-
-! Real minimum & location, root proc get result
-subroutine pminloc( r, rmax, imax, noff, iroot )
-real, intent(in) :: r(:,:,:)
-real, intent(out) :: rmax
-integer, intent(in) :: iroot
-integer, intent(out) :: imax(3)
-imax = minloc( r )
-rmax = r(imax(1),imax(2),imax(3))
-imax = imax - noff
-call mpi_reduce( rmax, 1, mpi_real, mpi_min, iroot, comm, err )
-call mpi_rendrecv_replace( imax, 3, mpi_integer, iroot, ip, 0, ip, 0, err )
-end subroutine
-
-! Real maximum & location, root proc get result
-subroutine pmaxloc( r, rmax, imax, iroot )
-real, intent(in) :: r(:,:,:)
-real, intent(out) :: rmax
-integer, intent(in) :: iroot
-integer, intent(out) :: imax(3)
-real :: rl
-imax = maxloc( r )
-rmax = r(imax(1),imax(2),imax(3))
-imax = imax - noff
-call mpi_reduce( rmax, 1, mpi_real, mpi_max, iroot, comm, err )
-call mpi_rendrecv_replace( imax, 3, mpi_integer, iroot, ip, 0, ip, 0, err )
-end subroutine
-
-! Real minimum & location
-subroutine allminloc( r, rmax, imax, noff, iroot )
-real, intent(in) :: r(:,:,:)
-real, intent(out) :: rmax
-integer, intent(out) :: imax(3), iroot
-real :: lpair(2), gpair(2)
-integer :: ip
-imax = minloc( r )
-lpair(1) = r(i(1),i(2),i(3))
-imax = imax - noff
+subroutine init
+call mpi_init( err )
 call mpi_comm_rank( comm, ip, err  )
-lpair(2) = ip
-call mpi_allreduce( lpair, gpair, 2, mpi_real, mpi_minloc, comm, err )
-rmax  = gpair(1)
-iroot = gpair(2)
-call mpi_bcast( imax, 3, mpi_integer, iroot, comm, err )
+if ( ip == 0 ) master = .true.
 end subroutine
 
-! Real maximum & location
-subroutine allmaxloc( r, rmax, imax, noff, iroot )
-real, intent(in) :: r(:,:,:)
-real, intent(out) :: rmax
-integer, intent(out) :: imax(3), iroot
-real :: lpair(2), gpair(2)
-integer :: ip
-imax = maxloc( r )
-lpair(1) = r(imax(1),imax(2),imax(3))
-imax = imax - noff
-call mpi_comm_rank( comm, ip, err  )
-lpair(2) = ip
-call mpi_allreduce( lpair, gpair, 2, mpi_real, mpi_maxloc, comm, err )
-rmax  = gpair(1)
-iroot = gpair(2)
-call mpi_bcast( imax, 3, mpi_integer, iroot, comm, err )
+! Finalize
+subroutine finalize
+call mpi_finalize( err )
 end subroutine
 
 ! Processor rank
-subroutine rank( np, ip, ip3 )
+subroutine rank( np )
 integer, intent(in) :: np
-integer, intent(out) :: ip, ip3
 call mpi_cart_create( mpi_comm_world, 3, np, period, .true., comm, err )
 if ( comm == mpi_comm_null ) then
   print *, 'Unused processor: ', ip
@@ -96,6 +35,67 @@ if ( comm == mpi_comm_null ) then
 end if
 call mpi_cart_get( comm, 3, np, period, ip3, err )
 call mpi_comm_rank( comm, ip, err  )
+if ( ip == 0 ) master = .true.
+end subroutine
+
+! Integer minimum
+subroutine imin( i )
+integer, intent(inout) :: i
+integer :: ii
+call mpi_allreduce( i, ii, 1, mpi_integer, mpi_min, comm, err )
+i = ii
+end subroutine
+
+! Real global minimum, location, & root processor, broadcast to all
+subroutine allrmin( rmin, imin, noff, iroot )
+real, intent(inout) :: rmin
+integer, intent(inout) :: imin(3), iroot
+integer, intent(in) :: noff
+real :: local(2), global(2)
+local(1) = rmin
+local(2) = ip
+call mpi_allreduce( local, global, 2, mpi_real, mpi_minloc, comm, err )
+rmin  = global(1)
+iroot = global(2)
+ihypo = ihypo - noff
+call mpi_bcast( imin, 3, mpi_integer, iroot, comm, err )
+ihypo = ihypo + noff
+end subroutine
+
+! Real global minimum & location, send to master
+subroutine rmin( rmin, imin, noff, imaster )
+real, intent(inout) :: rmin
+integer, intent(inout) :: imin(3)
+integer, intent(in) :: noff, imaster
+real :: local(2), global(2)
+local(1) = rmin
+local(2) = ip
+call mpi_reduce( local, global, 2, mpi_real, mpi_minloc, imaster, comm, err )
+rmin  = global(1)
+ipmin = global(2)
+if ( ip = ipmaster .or. ip = ipmin ) then
+  ihypo = ihypo - noff
+  call mpi_rendrecv_replace( imin, 3, mpi_integer, imaster, 0, ip, 0, comm, msi, err )
+  ihypo = ihypo + noff
+end if
+end subroutine
+
+! Real global maximum & location, send to master
+subroutine rmax( rmax, imax, noff, imaster )
+real, intent(inout) :: rmax
+integer, intent(inout) :: imax(3)
+integer, intent(in) :: noff, imaster
+real :: local(2), global(2)
+local(1) = rmax
+local(2) = ip
+call mpi_reduce( local, global, 2, mpi_real, mpi_maxloc, imaster, comm, err )
+rmax  = global(1)
+ipmax = global(2)
+if ( ip = ipmaster .or. ip = ipmax ) then
+  ihypo = ihypo - noff
+  call mpi_rendrecv_replace( imax, 3, mpi_integer, imaster, 0, ip, 0, comm, msi, err )
+  ihypo = ihypo + noff
+end if
 end subroutine
 
 ! Swap halo

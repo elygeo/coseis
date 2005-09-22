@@ -98,13 +98,7 @@ real :: &
   vrup,         & ! nucleation rupture velocity
   rcrit,        & ! nucleation critical radius
   trelax,       & ! nucleation relaxation time
-  truptol,      & ! min slip velocity to declare rupture
-  amax,         & ! max acceleration
-  vmax,         & ! max velocity
-  umax,         & ! max displacement
-  wmax,         & ! max stress (Frobenius norm)
-  svmax,        & ! max slip velocity
-  slmax           ! max slip
+  truptol         ! min slip velocity to declare rupture
 
 integer, dimension(3) :: &
   n,            & ! number of global nodes, double nodes counted once
@@ -115,12 +109,6 @@ integer, dimension(3) :: &
   bc2,          & ! boundary conditions for j2 k2 l2
   noff,         & ! offset between local and global indices
   ihypo,        & ! hypocenter node
-  iamax,        & ! index of max acceleration
-  ivmax,        & ! index of max velocity
-  iumax,        & ! index of max displacement
-  iwmax,        & ! index of max stress
-  isvmax,       & ! index of max slip velocity
-  islmax,       & ! index of max slip length
   i1node,       & ! node calculations start index
   i2node,       & ! node calculations end index
   i1nodepml,    & ! excluding PML region
@@ -135,7 +123,7 @@ integer :: &
   nt,           & ! number of time steps
   npml,         & ! number of PML damping nodes
   ifn,          & ! fault normal direction
-  ifault,       % ! fault plane index
+  ifault,       & ! fault plane
   it,           & ! current time step
   itcheck,      & ! interval for checkpointing
   ip,           & ! processor rank
@@ -169,7 +157,7 @@ character(16) :: &
   tfunc           ! moment source fime function
 
 logical :: &
-  hypoproc,     & ! hypocenter on this processor
+  master,       & ! master processor
   readfile(nz)    ! read input file
 
 end module

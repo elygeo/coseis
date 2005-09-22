@@ -20,7 +20,7 @@ if ( rsource <= 0. ) return
 ifinit: if ( init ) then
 
 init = .false.
-if ( ip == 0 ) print '(a)', 'Moment source'
+if ( master ) print '(a)', 'Moment source'
 
 ! Indices
 i1 = i1cell

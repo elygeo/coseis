@@ -12,9 +12,6 @@ character(160) :: str, key1, key2
 integer :: i, iz, err
 logical :: inzone
 
-if ( ip == 0 ) print '(a)', ''
-if ( ip == 0 ) print '(a)', 'SORD - Support Operator Rupture Dynamics'
-
 open( 9, file=filename, status='old' )
 nin = 0
 nout = 0

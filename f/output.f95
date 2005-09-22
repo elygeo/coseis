@@ -9,21 +9,19 @@ use parallelio_m
 
 implicit none
 save
+real :: dwt(4), courant, amax, vmax, umax, wmax, svmax, slmax,
+integer :: iz, nc, reclen, wt_rate, hh, mm, ss, n(3), err, &
+  iamax(3), ivmax(3), iumax(3), iwmax(3), isvmax(3), islmax(3)
 character, intent(in) :: pass
-character :: onpass
-integer :: iz, nc, reclen, wt_rate, hh, mm, ss, n(3), err
-real :: dwt(4), courant
-character :: endian
+character :: onpass, endian
 character(160) :: str
 logical :: fault, cell, static, init = .true., test
 
 ifinit: if ( init ) then
 
 init = .false.
-endian = 'l'
-if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
-if ( itcheck < 0 ) itcheck = itcheck + nt + 1
 call system_clock( count_rate=wt_rate )
+if ( itcheck < 0 ) itcheck = itcheck + nt + 1
 
 ! Look for previus checkpoint files
 write( str, '(a,i6.6,a)' ) 'out/ckp/', ip, '.hdr'
@@ -34,11 +32,11 @@ if ( err == 0 ) then
 else
   it = 0
 end if
-it = pmini( it )
+call imin( it )
 
 ! Read checkpoint file if found, if not, setup output
 if ( it /= 0 ) then
-  if ( ip == 0 ) print '(a,i6)', 'Checkpoint found, starting from step ', it
+  if ( master ) print '(a,i6)', 'Checkpoint found, starting from step ', it
   i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
   write( str, '(a,i6.6,i6.6)' ) 'out/ckp/', i, it
   inquire( iolength=reclen ) v, u, sv, sl, trup, &
@@ -53,7 +51,7 @@ if ( it /= 0 ) then
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   close( 9 )
 else
-  if ( ip == 0 ) then
+  if ( master ) then
     inquire( file='out/timestep', exist=test )
     if ( err /= 0 ) then
       print '(a)', 'Error: previous output found. use -d flag to overwrite'
@@ -66,23 +64,24 @@ else
       write( str, '(a,i2.2)' ) 'out/', iz
       call system( 'mkdir ' // str )
     end do
-  end if
-  if ( hypoproc ) then
     courant = dt * vp2 * sqrt( 3. ) / abs( dx )
+    endian = 'l'
+    if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
     write( str, '(a,i2.2,a)' ) 'out/meta.m'
     open(  9, file=str, status='new' )
-    write( 9, * ) 'rho1    =   ', rho1     ';% minimum density'
-    write( 9, * ) 'vp1     =   ', vp1      ';% minimum Vp'
-    write( 9, * ) 'vs1     =   ', vs1      ';% minimum Vp'
-    write( 9, * ) 'rho2    =   ', rho2     ';% maximum density'
-    write( 9, * ) 'vp2     =   ', vp2      ';% maximum Vp'
-    write( 9, * ) 'vs2     =   ', vs2      ';% maximum Vp'
-    write( 9, * ) 'rho     =   ', rho      ';% hypocenter density'
-    write( 9, * ) 'vp      =   ', vp       ';% hypocenter Vp'
-    write( 9, * ) 'vs      =   ', vs       ';% hypocenter Vp'
-    write( 9, * ) 'courant =   ', courant, ';% stability condition'
-    write( 9, * ) 'xhypo   = [ ', xhypo, ' ];% hypocenter location'
-    write( 9, * ) 'nout    =   ', nout,    ';% number output zones'
+    write( 9, * ) 'rho1    =   ', rho1      ';% minimum density'
+    write( 9, * ) 'vp1     =   ', vp1       ';% minimum Vp'
+    write( 9, * ) 'vs1     =   ', vs1       ';% minimum Vp'
+    write( 9, * ) 'rho2    =   ', rho2      ';% maximum density'
+    write( 9, * ) 'vp2     =   ', vp2       ';% maximum Vp'
+    write( 9, * ) 'vs2     =   ', vs2       ';% maximum Vp'
+    write( 9, * ) 'rho     =   ', rho       ';% hypocenter density'
+    write( 9, * ) 'vp      =   ', vp        ';% hypocenter Vp'
+    write( 9, * ) 'vs      =   ', vs        ';% hypocenter Vp'
+    write( 9, * ) 'courant =   ', courant,  ';% stability condition'
+    write( 9, * ) 'xhypo   = [ ', xhypo, '  ];% hypocenter location'
+    write( 9, * ) 'nout    =   ', nout,     ';% number output zones'
+    write( 9, * ) 'endian  = ''', endian, ''';% byte ordert'
     close( 9 )
   end if
 end if
@@ -128,7 +127,7 @@ call iosplit( iz, ditout(iz) )
 
 end do doinit
 
-if ( ip == 0 ) then
+if ( master ) then
   print '(a)', 'Time       Amax        Vmax        Umax        Wall Time'
 end if
 
@@ -142,16 +141,26 @@ end if ifinit
 if ( pass == 'w' )
   s1 = sqrt( sum( u * u, 4 ) )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
-  umax  = pmax( maxval( s1 ) )
-  wmax  = pmax( maxval( s2 ) )
+  i1 = maxloc( s1 ); umax  = s1(i1(1),i1(2),i1(3)); iumax  = i1 - noff 
+  i1 = maxloc( s2 ); wmax  = s2(i1(1),i1(2),i1(3)); iwmax  = i1 - noff
+  call rmax( umax, iumax, imaster )
+  call rmax( wmax, iwmax, imaster )
   if ( umax > dx / 10. ) print *, 'Warning: u !<< dx'
 else
   s1 = sqrt( sum( w1 * w1, 4 ) )
   s2 = sqrt( sum( v * v, 4 ) )
-  amax  = pmax( maxval( s1 ) )
-  vmax  = pmax( maxval( s2 ) )
-  svmax = pmax( maxval( sv ) )
-  slmax = pmax( maxval( sl ) )
+  i1 = maxloc( s1 ); amax  = s1(i1(1),i1(2),i1(3)); iamax  = i1 - noff 
+  i1 = maxloc( s2 ); vmax  = s2(i1(1),i1(2),i1(3)); ivmax  = i1 - noff
+  call rmax( amax, iamax, imaster )
+  call rmax( vmax, ivmax, imaster )
+  if ( ifn /= 0 ) then
+    i1 = maxloc( sv ); svmax = sv(i1(1),i1(2),i1(3)); isvmax = i1 - noff
+    i1 = maxloc( sl ); slmax = sv(i1(1),i1(2),i1(3)); islmax = i1 - noff
+    isvmax(ifn) = ifault
+    islmax(ifn) = ifault
+    call rmax( svmax, isvmax, imaster )
+    call rmax( slmax, islmax, imaster )
+  end if
 end if
 
 ! Write output
@@ -228,16 +237,29 @@ if ( itcheck /= 0 .and. mod( it, itcheck ) == 0 ) then
 end if
 
 ! Metadata
-if ( ip == 0 ) then
+if ( master ) then
   open(  9, file='out/timestep', status='replace' )
   write( 9, * ) it
   close( 9 )
   call system_clock( wt(2) )
   dwt = real( wt(2) - wt(1) ) / real( wt_rate )
   wt(1) = wt(2)
-  write( str, '(a,i6.6)' ) 'out/stats/', it
+  write( str, '(a,i6.6,a)' ) 'out/stats/', it, '.m'
   open(  9, file=str, status='replace' )
-  write( 9, '(8es15.7)' ) t, amax, vmax, umax, wmax, svmax, slmax, dwt
+  write( 9, * ) t, amax, vmax, umax, wmax, svmax, slmax, dwt
+  write( 9, * ) 't      = ', t,      ';% time'
+  write( 9, * ) 'amax   = ', amax,   ';% max acceleration'
+  write( 9, * ) 'vmax   = ', amax,   ';% max velocity'
+  write( 9, * ) 'umax   = ', amax,   ';% max displacement'
+  write( 9, * ) 'wmax   = ', amax,   ';% max stress (frobenius norm)'
+  write( 9, * ) 'svmax  = ', slmax,  ';% max slip velocity'
+  write( 9, * ) 'slmax  = ', slmax,  ';% max slip path length'
+  write( 9, * ) 'iamax  = ', iamax,  ';% max acceleration node'
+  write( 9, * ) 'ivmax  = ', ivmax,  ';% max velocity node'
+  write( 9, * ) 'iumax  = ', ivmax,  ';% max displacement node'
+  write( 9, * ) 'iwmax  = ', iamax,  ';% max stress node'
+  write( 9, * ) 'isvmax = ', islmax, ';% max slip velocity node'
+  write( 9, * ) 'islmax = ', islmax, ';% max slip path length node'
   close( 9 )
   print '(6es12.4)', t, amax, vmax, umax, dwt
 end if

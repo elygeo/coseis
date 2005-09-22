@@ -22,8 +22,8 @@ use steptime_m
 
 ! Initialization
 call init
-if ( ip == 0 ) print '(a)', ''
-if ( ip == 0 ) print '(a)', 'SORD - Support Operator Rupture Dynamics'
+if ( master ) print '(a)', ''
+if ( master ) print '(a)', 'SORD - Support Operator Rupture Dynamics'
 call inread( 'defaults.m' )
 call inread( 'in.m' )
 call setup

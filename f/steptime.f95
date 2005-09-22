@@ -32,6 +32,9 @@ if ( ifn /= 0 ) then
   t1 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
   sv = sqrt( sum( t1 * t1, 4 ) )
   sl = sl + dt * sv
+  if ( truptol > 0. ) then
+    where ( trup == 0. .and. vs > truptol ) trup = t
+  end if
 end if
 
 end subroutine

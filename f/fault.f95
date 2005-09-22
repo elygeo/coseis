@@ -19,8 +19,7 @@ ifinit: if ( init ) then
 
 init = .false.
 if ( ifn == 0 ) return
-if ( ifault + noff
-if ( ip == 0 ) print '(a)', 'Initialize fault'
+if ( master ) print '(a)', 'Initialize fault'
 
 ! Input
 mus = 0.
@@ -154,7 +153,7 @@ end do
 r = sqrt( sum( t3 * t3, 4 ) )
 
 ! Metadata
-if ( hypoproc ) then
+if ( master ) then
   i1 = ihypo
   i1(ifn) = 1
   j = i1(1)
@@ -246,17 +245,6 @@ do i = 1, 3
   w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f1 * mr(j1:j2,k1:k2,l1:l2)
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f1 * mr(j3:j4,k3:k4,l3:l4)
 end do
-
-! FIXME probably should do locked nodes here or move time integration out
-! Time integratioin for slip velocity
-t1 = v(j3:j4,k3:k4,l3:l4,:) + dt * w1(j3:j4,k3:k4,l3:l4,:) &
-   - v(j1:j2,k1:k2,l1:l2,:) - dt * w1(j1:j2,k1:k2,l1:l2,:)
-sv = sqrt( sum( t1 * t1, 4 ) )
-
-! Rupture time
-if ( truptol > 0. ) then
-  where ( trup == 0. .and. vs > truptol ) trup = t
-end if
 
 end subroutine
 end module
