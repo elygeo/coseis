@@ -2,13 +2,13 @@
 ! Setup model dimensions
 
 module setup_m
-implicit none
-contains
-subroutine setup
 use globals_m
 use collective_m
 use zone_m
+contains
+subroutine setup
 
+implicit none
 integer :: i, nl(3)
 
 ! Double nodes for fault

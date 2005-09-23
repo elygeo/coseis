@@ -2,11 +2,11 @@
 ! Read input
 
 module inread_m
-implicit none
+use globals_m
 contains
 subroutine inread( filename )
-use globals_m
 
+implicit none
 character*(*), intent(in) :: filename
 character(160) :: str, key1, key2
 integer :: i, iz, err

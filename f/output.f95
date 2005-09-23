@@ -2,20 +2,21 @@
 ! Write output
 
 module output_m
-implicit none
+use globals_m
+use collective_m
+use collectiveio_m
 contains
 subroutine output( pass )
-use globals_m
-use collectiveio_m
 
+implicit none
 save
-real :: dtwall(4), courant, amax, vmax, umax, wmax, svmax, slmax,
-integer :: iz, nc, reclen, twall_rate, hh, mm, ss, n(3), err, &
+real :: dtwall(4), courant, amax, vmax, umax, wmax, svmax, slmax
+integer :: iz, nc, reclen, twall_rate, err, &
   iamax(3), ivmax(3), iumax(3), iwmax(3), isvmax(3), islmax(3)
 character, intent(in) :: pass
 character :: onpass, endian
 character(160) :: str
-logical :: fault, cell, static, init = .true., test
+logical :: fault, static, init = .true., test
 
 ifinit: if ( init ) then
 
@@ -69,22 +70,22 @@ else
     if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
     write( str, '(a,i2.2,a)' ) 'out/meta.m'
     open(  9, file=str, status='new' )
-    write( 9, * ) ' rho1    =   ', rho1      ';% minimum density'
-    write( 9, * ) ' vp1     =   ', vp1       ';% minimum Vp'
-    write( 9, * ) ' vs1     =   ', vs1       ';% minimum Vp'
-    write( 9, * ) ' rho2    =   ', rho2      ';% maximum density'
-    write( 9, * ) ' vp2     =   ', vp2       ';% maximum Vp'
-    write( 9, * ) ' vs2     =   ', vs2       ';% maximum Vp'
-    write( 9, * ) ' rho     =   ', rho       ';% hypocenter density'
-    write( 9, * ) ' vp      =   ', vp        ';% hypocenter Vp'
-    write( 9, * ) ' vs      =   ', vs        ';% hypocenter Vp'
+    write( 9, * ) ' rho1    =   ', rho1,     ';% minimum density'
+    write( 9, * ) ' vp1     =   ', vp1,      ';% minimum Vp'
+    write( 9, * ) ' vs1     =   ', vs1,      ';% minimum Vp'
+    write( 9, * ) ' rho2    =   ', rho2,     ';% maximum density'
+    write( 9, * ) ' vp2     =   ', vp2,      ';% maximum Vp'
+    write( 9, * ) ' vs2     =   ', vs2,      ';% maximum Vp'
+    write( 9, * ) ' rho     =   ', rho,      ';% hypocenter density'
+    write( 9, * ) ' vp      =   ', vp,       ';% hypocenter Vp'
+    write( 9, * ) ' vs      =   ', vs,       ';% hypocenter Vp'
     write( 9, * ) ' courant =   ', courant,  ';% stability condition'
     write( 9, * ) ' xhypo   = [ ', xhypo, '  ];% hypocenter location'
     write( 9, * ) ' nout    =   ', nout,     ';% number output zones'
     write( 9, * ) ' endian  = ''', endian, ''';% byte ordert'
     close( 9 )
   end if
-end if restart
+end if ifrestart
 
 ! Initialize output
 
@@ -116,7 +117,7 @@ if ( fault ) then
     i2out(iz,ifn) = ihypo(ifn)
   end if
 end if
-if ( field(1:1) = 'w' ) i2out(i,:) = i2out(i,:) - 1
+if ( field(1:1) == 'w' ) i2out(i,:) = i2out(i,:) - 1
 
 if ( master ) then
   write( str, '(a,i2.2,a)' ) 'out/', iz, '/meta.m'

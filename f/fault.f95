@@ -2,16 +2,17 @@
 ! Fault boundary condition
 
 module fault_m
-implicit none
-contains
-subroutine fault
 use globals_m
 use surfnormals_m
+use collective_m
 use collectiveio_m
+contains
+subroutine fault
 
+implicit none
 save
-real :: mus0, mud0, dc0, dctest, tn0, ts0, s, rctest, vector(3)
-integer :: i, j, k, l, i1(3), j1, k1, l1, i1(3), j2, k2, l2, &
+real :: mus0, mud0, dc0, dctest, tn0, ts0, s, rctest, upvector(3)
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, &
   j3, k3, l3, j4, k4, l4, iz, idip, istr
 logical :: init = .true.
 
@@ -36,53 +37,53 @@ co = 1e9
 t1 = 0.
 t2 = 0.
 t3 = 0.
-doi: do i = 1, nin
-ifreadfile: if ( readfile(i) ) then
+doiz: do iz = 1, nin
+ifreadfile: if ( readfile(iz) ) then
   i1 = i1node
   i2 = i2node
   i1(ifn) = 1
   i2(ifn) = 1
-  select case ( fieldin(i) )
-  case ( 'mus'  ); call ioscalar( 'r', 'data/mus',  mus,   i1, i2, n, noff )
-  case ( 'mud'  ); call ioscalar( 'r', 'data/mud',  mud,   i1, i2, n, noff )
-  case ( 'dc'   ); call ioscalar( 'r', 'data/dc',   dc,    i1, i2, n, noff )
-  case ( 'co'   ); call ioscalar( 'r', 'data/co',   co,    i1, i2, n, noff )
-  case ( 'sxx'  ); call iovector( 'r', 'data/sxx',  t1, 1, i1, i2, n, noff )
-  case ( 'syy'  ); call iovector( 'r', 'data/syy',  t1, 2, i1, i2, n, noff )
-  case ( 'szz'  ); call iovector( 'r', 'data/szz',  t1, 3, i1, i2, n, noff )
-  case ( 'syz'  ); call iovector( 'r', 'data/syz',  t2, 1, i1, i2, n, noff )
-  case ( 'szx'  ); call iovector( 'r', 'data/szx',  t2, 2, i1, i2, n, noff )
-  case ( 'sxy'  ); call iovector( 'r', 'data/szy',  t2, 3, i1, i2, n, noff )
-  case ( 'tnrm' ); call iovector( 'r', 'data/tnrm', t3, 1, i1, i2, n, noff )
-  case ( 'tstr' ); call iovector( 'r', 'data/tstr', t3, 2, i1, i2, n, noff )
-  case ( 'tdip' ); call iovector( 'r', 'data/tdip', t3, 3, i1, i2, n, noff )
+  select case ( fieldin(iz) )
+  case ( 'mus'  ); call ioscalar( 'r', 'data/mus',  mus,   i1, i2, n, noff, 0 )
+  case ( 'mud'  ); call ioscalar( 'r', 'data/mud',  mud,   i1, i2, n, noff, 0 )
+  case ( 'dc'   ); call ioscalar( 'r', 'data/dc',   dc,    i1, i2, n, noff, 0 )
+  case ( 'co'   ); call ioscalar( 'r', 'data/co',   co,    i1, i2, n, noff, 0 )
+  case ( 'sxx'  ); call iovector( 'r', 'data/sxx',  t1, 1, i1, i2, n, noff, 0 )
+  case ( 'syy'  ); call iovector( 'r', 'data/syy',  t1, 2, i1, i2, n, noff, 0 )
+  case ( 'szz'  ); call iovector( 'r', 'data/szz',  t1, 3, i1, i2, n, noff, 0 )
+  case ( 'syz'  ); call iovector( 'r', 'data/syz',  t2, 1, i1, i2, n, noff, 0 )
+  case ( 'szx'  ); call iovector( 'r', 'data/szx',  t2, 2, i1, i2, n, noff, 0 )
+  case ( 'sxy'  ); call iovector( 'r', 'data/szy',  t2, 3, i1, i2, n, noff, 0 )
+  case ( 'tnrm' ); call iovector( 'r', 'data/tnrm', t3, 1, i1, i2, n, noff, 0 )
+  case ( 'tstr' ); call iovector( 'r', 'data/tstr', t3, 2, i1, i2, n, noff, 0 )
+  case ( 'tdip' ); call iovector( 'r', 'data/tdip', t3, 3, i1, i2, n, noff, 0 )
   end select
 else
-  call zone( i1in(i,:), i2in(i,:), n, noff, ihypo, ifn )
-  i1 = max( i1in(i,:), i1node )
-  i2 = min( i2in(i,:), i2node )
+  call zone( i1in(iz,:), i2in(iz,:), nn, nnoff, ihypo, ifn )
+  i1 = max( i1in(iz,:), i1node )
+  i2 = min( i2in(iz,:), i2node )
   i1(ifn) = 1
   i2(ifn) = 1
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
   select case ( fieldin(i) )
-  case ( 'mus'  ); mus(j1:j2,k1:k2,l1:l2)  = inval(i)
-  case ( 'mud'  ); mud(j1:j2,k1:k2,l1:l2)  = inval(i)
-  case ( 'dc'   ); dc(j1:j2,k1:k2,l1:l2)   = inval(i)
-  case ( 'co'   ); co(j1:j2,k1:k2,l1:l2)   = inval(i)
-  case ( 'sxx'  ); t1(j1:j2,k1:k2,l1:l2,1) = inval(i)
-  case ( 'syy'  ); t1(j1:j2,k1:k2,l1:l2,2) = inval(i)
-  case ( 'szz'  ); t1(j1:j2,k1:k2,l1:l2,3) = inval(i)
-  case ( 'syz'  ); t2(j1:j2,k1:k2,l1:l2,1) = inval(i)
-  case ( 'szx'  ); t2(j1:j2,k1:k2,l1:l2,2) = inval(i)
-  case ( 'sxy'  ); t2(j1:j2,k1:k2,l1:l2,3) = inval(i)
-  case ( 'tnrm' ); t3(j1:j2,k1:k2,l1:l2,1) = inval(i)
-  case ( 'tstr' ); t3(j1:j2,k1:k2,l1:l2,2) = inval(i)
-  case ( 'tdip' ); t3(j1:j2,k1:k2,l1:l2,3) = inval(i)
+  case ( 'mus'  ); mus(j1:j2,k1:k2,l1:l2)  = inval(iz)
+  case ( 'mud'  ); mud(j1:j2,k1:k2,l1:l2)  = inval(iz)
+  case ( 'dc'   ); dc(j1:j2,k1:k2,l1:l2)   = inval(iz)
+  case ( 'co'   ); co(j1:j2,k1:k2,l1:l2)   = inval(iz)
+  case ( 'sxx'  ); t1(j1:j2,k1:k2,l1:l2,1) = inval(iz)
+  case ( 'syy'  ); t1(j1:j2,k1:k2,l1:l2,2) = inval(iz)
+  case ( 'szz'  ); t1(j1:j2,k1:k2,l1:l2,3) = inval(iz)
+  case ( 'syz'  ); t2(j1:j2,k1:k2,l1:l2,1) = inval(iz)
+  case ( 'szx'  ); t2(j1:j2,k1:k2,l1:l2,2) = inval(iz)
+  case ( 'sxy'  ); t2(j1:j2,k1:k2,l1:l2,3) = inval(iz)
+  case ( 'tnrm' ); t3(j1:j2,k1:k2,l1:l2,1) = inval(iz)
+  case ( 'tstr' ); t3(j1:j2,k1:k2,l1:l2,2) = inval(iz)
+  case ( 'tdip' ); t3(j1:j2,k1:k2,l1:l2,3) = inval(iz)
   end select
 end if ifreadfile
-end do doi
+end do doiz
 
 ! Normal vectors
 i1 = i1node

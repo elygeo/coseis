@@ -132,6 +132,7 @@ do i = 1, nr, 4
   call mpi_startall( 4, req(i), err )
   call mpi_waitall( 4, req(i), mpistatus, err )
 end do
+end subroutine
 
 end module
 

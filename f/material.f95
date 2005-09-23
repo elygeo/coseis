@@ -2,15 +2,15 @@
 ! Set up material arrays
 
 module material_m
-implicit none
-contains
-subroutine material
 use globals_m
 use collective_m
 use collectiveio_m
 use diffnc_m
 use zone_m
+contains
+subroutine material
 
+implicit none
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, iz
 
 if ( master ) print '(a)', 'Material model'

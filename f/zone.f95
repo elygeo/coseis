@@ -2,10 +2,10 @@
 ! Zone selection
 
 module zone_m
-implicit none
 contains
 subroutine zone( i1, i2, nn, nnoff, ihypo, ifn )
 
+implicit none
 integer, intent(inout) :: i1(3), i2(3)
 integer, intent(in) :: nn(3), nnoff(3), ihypo(3), ifn
 integer :: nshift(3)

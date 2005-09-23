@@ -2,13 +2,13 @@
 ! Moment source added to stress
 
 module momentsource_m
-implicit none
-contains
-subroutine momentsource
 use globals_m
 use collective_m
 use diffnc_m
+contains
+subroutine momentsource
 
+implicit none
 save
 logical :: init = .true.
 integer, allocatable :: jj(:), kk(:), ll(:)
@@ -50,7 +50,7 @@ do i = 1, 3
 end do
 s2 = sqrt( sum( w1 * w1, 4 ) )
 nsrc = count( s2 <= rsource )
-allocate( srcfr(nrsc), jj(nsrc), kk(nsrc), ll(nsrc) ) 
+allocate( srcfr(nsrc), jj(nsrc), kk(nsrc), ll(nsrc) ) 
 
 ! Spatial weighting
 select case( rfunc )
