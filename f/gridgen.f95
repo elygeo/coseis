@@ -105,7 +105,7 @@ if( ip3(3) == np(3) - 1 ) x(:,:,l2+1,:) = x(:,:,l2,:)
 
 ! Fault plane split nodes
 if ( ifn /= 0 ) then
-if ( i1(ifn) <= ihypo(ifn) .and. i2(ifn) > ihypo(ifn) ) then
+if ( ihypo(ifn) >= i1(ifn) .and. ihypo(ifn) < i2(ifn) ) then
   i = ihypo(ifn)
   select case( ifn )
   case( 1 ); x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:)
