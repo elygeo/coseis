@@ -145,7 +145,7 @@ OBJECT="\\
   gradu.o \\
   divw.o \\
   locknodes.o \\
-  steptime.o \\
+  timestep.o \\
   sord.o"
 
 OPTFLAGS=-O

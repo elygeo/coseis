@@ -1,9 +1,9 @@
 !------------------------------------------------------------------------------!
-! STEPTIME
+! TIMESTEP
 
-module steptime_m
+module timestep_m
 contains
-subroutine steptime
+subroutine timestep
 use globals_m
 
 implicit none

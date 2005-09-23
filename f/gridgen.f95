@@ -19,6 +19,9 @@ if ( master ) print '(a)', 'Grid generation'
 ! Indices
 i1 = i1cell
 i2 = i2cell + 1
+i1oper(1,:) = i1
+i2oper(1,:) = i2
+noper = 1
 
 ! No split nodes yet
 ! FIXME
@@ -31,24 +34,17 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
-!FIXME
-i1oper(1,:) = i1
-i2oper(1,:) = i2
-
 ! Read grid files or creat basic rectangular mesh
 x = 0.
 if ( grid == 'read' ) then
+  oper = 'o'
   call iovector( 'r', 'data/x1', x, i1, i2, 1, n, noff )
   call iovector( 'r', 'data/x2', x, i1, i2, 2, n, noff )
   call iovector( 'r', 'data/x3', x, i1, i2, 3, n, noff )
-  call optimize
 else
   forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - noff(1) )
   forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - 1 - noff(2) )
   forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - 1 - noff(3) )
-  noper = 1
-  i1oper(1,:) = i1cell
-  i2oper(1,:) = i2cell + 1
 end if
 
 ! Coordinate system
@@ -114,23 +110,29 @@ if( ip3(3) == 0         ) x(:,:,j1-1,:) = x(:,:,j1,:)
 if( ip3(3) == np(3) - 1 ) x(:,:,l2+1,:) = x(:,:,l2,:)
 
 ! Fault plane split nodes
+! FIXME
 if ( ifn /= 0 ) then
-  i = ihypo(ifn)
-  select case( ifn )
-  case( 1 ); x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:)
-  case( 2 ); x(:,i+1:k2,:,:) = x(:,i:k2-1,:,:)
-  case( 3 ); x(:,:,i+1:l2,:) = x(:,:,i:l2-1,:)
-  end select
+  if ( i1(ifn) <= ihypo(ifn) .and. i2(ifn) > ihypo(ifn) ) then
+    i = ihypo(ifn)
+    select case( ifn )
+    case( 1 ); x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:)
+    case( 2 ); x(:,i+1:k2,:,:) = x(:,i:k2-1,:,:)
+    case( 3 ); x(:,:,i+1:l2,:) = x(:,:,i:l2-1,:)
+    end select
+  end if
 end if
 
+if ( oper(1) == 'o' ) call optimize
+
 ! Hypocenter location
-if ( master ) then
-  j = ihypo(1)
-  k = ihypo(2)
-  l = ihypo(3)
-  if ( any( abs( x(j,k,l,:) - xhypo ) ) > abs( dx ) ) then
-    print *, 'Warning: x(ihypo) and xhypo differ: ', x(j,k,l,:), xhypo
+if ( all( xhypo < 0. ) ) then
+  if ( master ) then
+    j = ihypo(1)
+    k = ihypo(2)
+    l = ihypo(3)
+    xhypo = x(j,k,l,:)
   end if
+  call bcast( xhypo )
 end if
 
 end subroutine

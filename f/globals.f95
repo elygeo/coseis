@@ -127,7 +127,6 @@ integer :: &
   it,           & ! current time step
   itcheck,      & ! interval for checkpointing
   dostats,      & ! stats collectioin is collective--not highly scalable
-  ip,           & ! processor rank
   wt(6),        & ! wall clock timing array
   noper,        & ! number of zones for spatial derivative operators
   i1oper(2,3),  & ! j1 k1 l1 operator zone start index
@@ -158,7 +157,6 @@ character(16) :: &
   tfunc           ! moment source fime function
 
 logical :: &
-  master,       & ! master processor
   readfile(nz)    ! read input file
 
 end module

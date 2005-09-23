@@ -18,7 +18,7 @@ use momentsrc_m
 use divw_m
 use fault_m
 use locknodes_m
-use steptime_m
+use timestep_m
 
 ! Initialization
 call init
@@ -46,7 +46,7 @@ do while ( it < nt )
   call fault
   call locknodes
   call output( 'a' )
-  call steptime
+  call timestep
 end do
 
 ! Finsh up

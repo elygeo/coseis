@@ -21,8 +21,7 @@ np = nn / nl; where ( mod( nn, nl ) /= 0 ) np = np + 1
 
 ! Hypocenter
 where ( ihypo == 0 ) ihypo = n / 2 + 1
-! FIXME
-imaster = ihypo / nl
+ip3master = ( ihypo - 1 ) / nl
 
 ! Find processor rank
 call rank( np )

@@ -135,7 +135,7 @@ return
 
 end if ifinit
 
-!------------------------------------------------------------------------------!
+!--------------------------------------!
 
 ! Magnitudes
 if ( pass == 'w' )
@@ -148,8 +148,8 @@ if ( pass == 'w' )
     wmax = s2(i1(1),i1(2),i1(3))
     iumax = i1 - noff 
     iwmax = i1 - noff
-    call rmax( umax, iumax, imaster )
-    call rmax( wmax, iwmax, imaster )
+    call rmax( umax, iumax )
+    call rmax( wmax, iwmax )
     if ( umax > dx / 10. ) print *, 'Warning: u !<< dx'
   end if
 else
@@ -162,8 +162,8 @@ else
     vmax  = s2(i1(1),i1(2),i1(3))
     iamax  = i1 - noff 
     ivmax  = i1 - noff
-    call rmax( amax, iamax, imaster )
-    call rmax( vmax, ivmax, imaster )
+    call rmax( amax, iamax )
+    call rmax( vmax, ivmax )
     if ( ifn /= 0 ) then
       i1 = maxloc( sv )
       i1 = maxloc( sl )
@@ -173,8 +173,8 @@ else
       islmax = i1 - noff
       isvmax(ifn) = ihypo(ifn)
       islmax(ifn) = ihypo(ifn)
-      call rmax( svmax, isvmax, imaster )
-      call rmax( slmax, islmax, imaster )
+      call rmax( svmax, isvmax )
+      call rmax( slmax, islmax )
     end if
   end if
 end if
@@ -230,7 +230,7 @@ end do doiz
 
 if ( pass == 'w' ) return
 
-!------------------------------------------------------------------------------!
+!--------------------------------------!
 
 ! Write checkpoint
 if ( itcheck /= 0 .and. mod( it, itcheck ) == 0 ) then

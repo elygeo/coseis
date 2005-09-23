@@ -6,16 +6,15 @@ use mpi
 
 implicit none
 save
-integer :: ip, ip3(3), comm, err, &
-  mof = mpi_order_fortran, &
-  msi = mpi_status_ignore
-logical :: period(3) = .false.
+integer :: ip, ip3(3), ipmaster, ip3master(3), comm, err
+logical :: master, period(3) = .false.
 
 contains
 
 subroutine init
 call mpi_init( err )
-call mpi_comm_rank( comm, ip, err  )
+call mpi_comm_rank( mpi_comm_world, ip, err  )
+master = .false.
 if ( ip == 0 ) master = .true.
 end subroutine
 
@@ -25,17 +24,27 @@ call mpi_finalize( err )
 end subroutine
 
 ! Processor rank
-subroutine rank( np )
-integer, intent(in) :: np
+subroutine rank( np, ip3master )
+integer, intent(in) :: np(3), ip3master(3)
 call mpi_cart_create( mpi_comm_world, 3, np, period, .true., comm, err )
 if ( comm == mpi_comm_null ) then
   print *, 'Unused processor: ', ip
   call mpi_finalize( err )
   stop
 end if
-call mpi_cart_get( comm, 3, np, period, ip3, err )
 call mpi_comm_rank( comm, ip, err  )
-if ( ip == 0 ) master = .true.
+call mpi_cart_coords( comm, ip, 3, ip3, err )
+call mpi_cart_rank( comm, ip3master, ipmaster, err )
+master = .false.
+if ( ip == ipmaster ) master = .true.
+end subroutine
+
+! Integer minimum
+subroutine bcast( r )
+real, intent(inout) :: r(:)
+integer :: i
+i = size(r)
+call mpi_bcast( r, i, mpi_real, ipmaster, comm, err )
 end subroutine
 
 ! Integer minimum
@@ -46,54 +55,38 @@ call mpi_allreduce( i, ii, 1, mpi_integer, mpi_min, comm, err )
 i = ii
 end subroutine
 
-! Real global minimum, location, & root processor, broadcast to all
-subroutine allrmin( rmin, imin, noff, iroot )
+! Real global minimum & location, send to master
+subroutine rmin( rmin, imin, noff )
 real, intent(inout) :: rmin
-integer, intent(inout) :: imin(3), iroot
+integer, intent(inout) :: imin(3)
 integer, intent(in) :: noff
 real :: local(2), global(2)
 local(1) = rmin
 local(2) = ip
-call mpi_allreduce( local, global, 2, mpi_real, mpi_minloc, comm, err )
-rmin  = global(1)
-iroot = global(2)
-ihypo = ihypo - noff
-call mpi_bcast( imin, 3, mpi_integer, iroot, comm, err )
-ihypo = ihypo + noff
-end subroutine
-
-! Real global minimum & location, send to master
-subroutine rmin( rmin, imin, noff, imaster )
-real, intent(inout) :: rmin
-integer, intent(inout) :: imin(3)
-integer, intent(in) :: noff, imaster
-real :: local(2), global(2)
-local(1) = rmin
-local(2) = ip
-call mpi_reduce( local, global, 2, mpi_real, mpi_minloc, imaster, comm, err )
+call mpi_reduce( local, global, 2, mpi_real, mpi_minloc, ipmaster, comm, err )
 rmin  = global(1)
 ipmin = global(2)
 if ( ip = ipmaster .or. ip = ipmin ) then
   ihypo = ihypo - noff
-  call mpi_rendrecv_replace( imin, 3, mpi_integer, imaster, 0, ip, 0, comm, msi, err )
+  call mpi_rendrecv_replace( imin, 3, mpi_integer, ipmaster, 0, ip, 0, comm, mpi_status_ignore, err )
   ihypo = ihypo + noff
 end if
 end subroutine
 
 ! Real global maximum & location, send to master
-subroutine rmax( rmax, imax, noff, imaster )
+subroutine rmax( rmax, imax, noff )
 real, intent(inout) :: rmax
 integer, intent(inout) :: imax(3)
-integer, intent(in) :: noff, imaster
+integer, intent(in) :: noff
 real :: local(2), global(2)
 local(1) = rmax
 local(2) = ip
-call mpi_reduce( local, global, 2, mpi_real, mpi_maxloc, imaster, comm, err )
+call mpi_reduce( local, global, 2, mpi_real, mpi_maxloc, ipmaster, comm, err )
 rmax  = global(1)
 ipmax = global(2)
 if ( ip = ipmaster .or. ip = ipmax ) then
   ihypo = ihypo - noff
-  call mpi_rendrecv_replace( imax, 3, mpi_integer, imaster, 0, ip, 0, comm, msi, err )
+  call mpi_rendrecv_replace( imax, 3, mpi_integer, ipmaster, 0, ip, 0, comm, mpi_status_ignore, err )
   ihypo = ihypo + noff
 end if
 end subroutine
@@ -105,6 +98,7 @@ real, intent(in) :: w1(:,:,:,:)
 integer :: nhalo, ng(4), nl(4), i0(4), i, adjacent1, adjacent2, slice(12), &
   nr, req(12), mpistatus( mpi_statis_size, 4 )
 logical :: init = .true.
+integer :: mof = mpi_order_fortran
 ifinit: if ( init ) then
 nhalo = 1
 ng = (/ size(w1,1), size(w1,2), size(w1,3), size(w1,4) /)
