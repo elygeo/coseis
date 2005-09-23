@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! PML
+! Calculate PML damping parameters
 
 module pml_m
 implicit none

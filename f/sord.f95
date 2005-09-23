@@ -21,7 +21,7 @@ use locknodes_m
 use timestep_m
 
 ! Initialization
-call init
+call initialize
 if ( master ) print '(a)', ''
 if ( master ) print '(a)', 'SORD - Support Operator Rupture Dynamics'
 call inread( 'defaults.m' )
@@ -49,7 +49,7 @@ do while ( it < nt )
   call timestep
 end do
 
-! Finsh up
+! Finish up
 call finalize
 
 end program

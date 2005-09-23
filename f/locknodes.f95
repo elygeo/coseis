@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! LOCKNODES
+! Lock nodes by setting acceleration to zero
 
 module locknodes_m
 implicit none

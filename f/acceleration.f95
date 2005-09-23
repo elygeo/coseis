@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! ACCELERATION
+! Acceleration calculation
 
 module acceleration_m
 implicit none

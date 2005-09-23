@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! DIFFNC - difference operators, node to cell
+! Difference operators, node to cell
 
 module diffnc_m
 implicit none

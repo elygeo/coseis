@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! SURFNORMALS
+! Find surface normals
 
 module surfnormals_m
 implicit none

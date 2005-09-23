@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! HOURGLASSCN - hourglass corrections, cell to node
+! Hourglass corrections, cell to node
 
 module hourglasscn_m
 implicit none

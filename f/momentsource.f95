@@ -1,11 +1,12 @@
 !------------------------------------------------------------------------------!
-! MOMENTSOURCE
+! Moment source added to stress
 
 module momentsource_m
 implicit none
 contains
 subroutine momentsource
 use globals_m
+use collective_m
 use diffnc_m
 
 save
@@ -58,7 +59,7 @@ case( 'tent' ); srcfr = rsource - pack( s2, s2 <= rsource )
 case default; stop 'rfunc'
 end select
 
-! Normalize and devide by cell volume
+! Normalize and divide by cell volume
 srcfr = srcfr / sum( srcfr ) / pack( s1, s2 <= rsource )
 
 ! Index map

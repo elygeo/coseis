@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! GRIDGEN - Grid generation
+! Grid generation
 
 module gridgen_m
 implicit none
@@ -18,7 +18,6 @@ real :: lj, lk, ll, rhypo
 if ( master ) print '(a)', 'Grid generation'
 
 ! Indices
-! FIXME n max
 i1 = i1cell
 i2 = i2cell + 1
 i1oper(1,:) = i1
@@ -29,7 +28,7 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
-! Read grid files or creat basic rectangular mesh
+! Read grid files or create basic rectangular mesh
 x = 0.
 if ( grid == 'read' ) then
   oper = 'o'

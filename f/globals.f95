@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! GLOBALS
+! Global variables
 
 module globals_m
 
@@ -67,7 +67,7 @@ real, allocatable, dimension(:,:,:) :: &
   co,           & ! cohesion
   area,         & ! fault element area
   r,            & ! radius to hypocenter
-  sv,           & ! **slip velocity mangitude
+  sv,           & ! **slip velocity magnitude
   sl,           & ! **slip path length
   trup,         & ! **rupture time
   tn,           & ! temporary storage
@@ -89,7 +89,7 @@ real :: &
   rho,          & ! hypocenter density
   vp,           & ! hypocenter S-wave speed
   vs,           & ! hypocenter P-wave speed
-  viscosity(2), & ! viscocity for (1) stress & (2) hourglass corrections
+  viscosity(2), & ! viscosity for (1) stress & (2) hourglass corrections
   xhypo(3),     & ! hypocenter location
   tsource,      & ! dominant period
   rsource,      & ! source radius
@@ -151,7 +151,7 @@ character(16) :: &
   model,        & ! model ID
   grid,         & ! grid generation scheme
   rfunc,        & ! moment source space function
-  tfunc           ! moment source fime function
+  tfunc           ! moment source time function
 
 logical :: &
   readfile(nz)    ! read input file

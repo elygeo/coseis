@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! TIMESTEP
+! Time integration
 
 module timestep_m
 implicit none

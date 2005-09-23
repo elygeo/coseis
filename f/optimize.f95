@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! OPTIMIZE
+! Assign fast operators to rectangular mesh portions
 
 module optimize_m
 implicit none

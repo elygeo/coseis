@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! OUTPUT
+! Write output
 
 module output_m
 implicit none
@@ -23,7 +23,7 @@ init = .false.
 call system_clock( count_rate=twall_rate )
 if ( itcheck < 0 ) itcheck = itcheck + nt + 1
 
-! Look for previus checkpoint files
+! Look for previous checkpoint files
 write( str, '(a,i6.6,a)' ) 'out/ckp/', ip, '.hdr'
 open( 9, file=str, status='old', iostat=err )
 if ( err == 0 ) then

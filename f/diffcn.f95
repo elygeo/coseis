@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! DIFFCN - difference operator, cell to node
+! Difference operator, cell to node
 
 module diffcn_m
 implicit none

@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! STRESS
+! Stress calculation
 
 module stress_m
 implicit none

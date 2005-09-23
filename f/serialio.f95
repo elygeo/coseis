@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! SERIALIO
+! Binary input and output
 
 module collectiveio_m
 implicit none
@@ -10,7 +10,7 @@ subroutine iosplit( iz, ditout )
 integer, intent(in) :: iz, ditout
 end subroutine
 
-! Input/ouput scalar field
+! Input/output scalar field
 subroutine ioscalar( io, filename, s1, i1, i2, n, nnoff, iz )
 character*(*), intent(in) :: io, filename
 real, intent(inout) :: s1(:,:,:)
@@ -43,7 +43,7 @@ case( 'w' )
 end select
 end subroutine
 
-! Input/ouput vector component
+! Input/output vector component
 subroutine iovector( io, filename, w1, i, i1, i2, n, nnoff, iz )
 character*(*), intent(in) :: io, filename
 real, intent(inout) :: w1(:,:,:,:)

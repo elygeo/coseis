@@ -1,11 +1,12 @@
 !------------------------------------------------------------------------------!
-! MATERIAL
+! Set up material arrays
 
 module material_m
 implicit none
 contains
 subroutine material
 use globals_m
+use collective_m
 use collectiveio_m
 use diffnc_m
 use zone_m
@@ -25,13 +26,13 @@ vp2 = 0.
 vs1 = 1e9
 vs2 = 0.
 
-doi: do i = 1, nin
+doiz: do iz = 1, nin
 
 ifreadfile: if ( readfile(i) ) then
 
 i1 = i1cell
 i2 = i2cell + 1
-select case ( fieldin(i) )
+select case ( fieldin(iz) )
 case ( 'rho' ); call ioscalar( 'r', 'data/rho', mr, i1, i2, n, noff, 0 )
 case ( 'vp'  ); call ioscalar( 'r', 'data/vp',  s1, i1, i2, n, noff, 0 )
 case ( 'vs'  ); call ioscalar( 'r', 'data/vs',  s2, i1, i2, n, noff, 0 )
@@ -41,17 +42,17 @@ if ( ihypo(ifn) >= i1(ifn) .and. ihypo(ifn) < i2(ifn) ) then
   i = ihypo(ifn)
   select case( ifn )
   case( 1 )
-    mr(i+1:j2,:,:,:) = mr(i:j2-1,:,:,:)
-    s1(i+1:j2,:,:,:) = s1(i:j2-1,:,:,:)
-    s2(i+1:j2,:,:,:) = s2(i:j2-1,:,:,:)
+    mr(i+1:j2,:,:) = mr(i:j2-1,:,:)
+    s1(i+1:j2,:,:) = s1(i:j2-1,:,:)
+    s2(i+1:j2,:,:) = s2(i:j2-1,:,:)
   case( 2 )
-    mr(:,i+1:k2,:,:) = mr(:,i:k2-1,:,:)
-    s1(:,i+1:k2,:,:) = s1(:,i:k2-1,:,:)
-    s2(:,i+1:k2,:,:) = s2(:,i:k2-1,:,:)
+    mr(:,i+1:k2,:) = mr(:,i:k2-1,:)
+    s1(:,i+1:k2,:) = s1(:,i:k2-1,:)
+    s2(:,i+1:k2,:) = s2(:,i:k2-1,:)
   case( 3 )
-    mr(:,:,i+1:l2,:) = mr(:,:,i:l2-1,:)
-    s1(:,:,i+1:l2,:) = s1(:,:,i:l2-1,:)
-    s2(:,:,i+1:l2,:) = s2(:,:,i:l2-1,:)
+    mr(:,:,i+1:l2) = mr(:,:,i:l2-1)
+    s1(:,:,i+1:l2) = s1(:,:,i:l2-1)
+    s2(:,:,i+1:l2) = s2(:,:,i:l2-1)
   end select
 end if
 end if
@@ -70,30 +71,30 @@ if ( vs > vs2 )   print *, 'Warning: vs excedes max: ',  vs, vs2
 
 else
 
-call zone( i1in(i,:), i2in(i,:), nn, nnoff, ihypo, ifn )
-i1 = max( i1in(i,:), i1cell )
-i2 = min( i2in(i,:), i2cell + 1 )
+call zone( i1in(iz,:), i2in(iz,:), nn, nnoff, ihypo, ifn )
+i1 = max( i1in(iz,:), i1cell )
+i2 = min( i2in(iz,:), i2cell + 1 )
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 select case ( fieldin(i) )
 case ( 'rho' )
-  mr(j1:j2,k1:k2,l1:l2) = inval(i)
-  rho1 = min( rho1, inval(i) )
-  rho2 = max( rho2, inval(i) )
+  mr(j1:j2,k1:k2,l1:l2) = inval(iz)
+  rho1 = min( rho1, inval(iz) )
+  rho2 = max( rho2, inval(iz) )
 case ( 'vp'  )
-  s1(j1:j2,k1:k2,l1:l2) = inval(i)
-  vp1 = min( rho1, inval(i) )
-  vp2 = max( rho2, inval(i) )
+  s1(j1:j2,k1:k2,l1:l2) = inval(iz)
+  vp1 = min( rho1, inval(iz) )
+  vp2 = max( rho2, inval(iz) )
 case ( 'vs'  )
-  s2(j1:j2,k1:k2,l1:l2) = inval(i)
-  vs1 = min( rho1, inval(i) )
-  vs2 = max( rho2, inval(i) )
+  s2(j1:j2,k1:k2,l1:l2) = inval(iz)
+  vs1 = min( rho1, inval(iz) )
+  vs2 = max( rho2, inval(iz) )
 end select
 
 end if ifreadfile
 
-end do doi
+end do doiz
 
 ! Fault plane split nodes
 

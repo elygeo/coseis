@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! SERIAL - dummy routines that provide hooks for parallelizaion
+! Dummy routines providing hooks for parallelizaion
 
 module collective_m
 implicit none
@@ -7,7 +7,7 @@ integer :: ip3(3) = 0, ip3master(3) = 0
 logical :: master = .true.
 contains
 
-subroutine init
+subroutine initialize
 end subroutine
 
 subroutine finalize

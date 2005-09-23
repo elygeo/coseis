@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! FAULT
+! Fault boundary condition
 
 module fault_m
 implicit none

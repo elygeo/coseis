@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! ARRAYS
+! Allocate arrays
 
 module arrays_m
 implicit none

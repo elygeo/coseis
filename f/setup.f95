@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------!
-! SETUP
+! Setup model dimensions
 
 module setup_m
 implicit none
