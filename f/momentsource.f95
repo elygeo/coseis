@@ -5,7 +5,7 @@ module momentsrc_m
 contains
 subroutine momentsrc
 use globals_m
-use dfnc_m
+use diffnc_m
 
 implicit none
 save
@@ -31,7 +31,7 @@ l1 = i1(3); l2 = i2(3)
 
 ! Cell volumes
 s1 = 0.
-call dfnc( s1, 'g', x, x, dx, 1, 1, i1, i2 )
+call diffnc( s1, 'g', x, x, dx, 1, 1, i1, i2 )
 
 ! Cell center locations
 w1 = 2 * rsource

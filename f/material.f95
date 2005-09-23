@@ -1,12 +1,12 @@
 !------------------------------------------------------------------------------!
-! MATMODEL - Material model setup
+! MATERIAL
 
-module matmodel_m
+module material_m
 contains
-subroutine matmodel
+subroutine material
 use globals_m
 use parallelio_m
-use dfnc_m
+use diffnc_m
 use zone_m
 
 implicit none
@@ -109,7 +109,7 @@ s2 = 0.
 do iz = 1, noper
   i1 = max( i1oper(iz,:),     i1cell )
   i2 = min( i2oper(iz,:) - 1, i2cell )
-  call dfnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
+  call diffnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
 end do
 if ( ifn /=0 ) then
   i = ihypo(ifn)

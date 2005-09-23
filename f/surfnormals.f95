@@ -1,9 +1,9 @@
 !------------------------------------------------------------------------------!
-! SNORMALS - surface normals
+! SURFNORMALS
 
-module snormals_m
+module surfnormals_m
 contains
-subroutine snormals( nrm, x, i1, i2 )
+subroutine surfnormals( nrm, x, i1, i2 )
 
 implicit none
 real, intent(out) :: nrm(:,:,:,:)
@@ -75,7 +75,7 @@ do a = 1, 3
       + x(j-1,k+1,l,b) * ( x(j-1,k,l,c) - x(j,k+1,l,c) ) &
       + x(j+1,k-1,l,b) * ( x(j+1,k,l,c) - x(j,k-1,l,c) ) )
     end forall
-  case default; stop 'snormals'
+  case default; stop 'surfnormals'
   end select
 end do
 

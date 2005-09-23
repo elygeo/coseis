@@ -125,11 +125,11 @@ fi
 
 OBJECT="\\
   globals.o \\
-  dfcn.o \\
-  dfnc.o \\
-  hgcn.o \\
-  hgnc.o \\
-  snormals.o \\
+  diffcn.o \\
+  diffnc.o \\
+  hourglasscn.o \\
+  hourglassnc.o \\
+  surfnormals.o \\
   zone.o \\
   serial.o \\
   inread.o \\
@@ -137,13 +137,13 @@ OBJECT="\\
   arrays.o \\
   optimize.o \\
   gridgen.o \\
-  matmodel.o \\
-  momentsrc.o \\
+  material.o \\
+  momentsource.o \\
   fault.o \\
   output.o \\
   pml.o \\
-  gradu.o \\
-  divw.o \\
+  stress.o \\
+  acceleration.o \\
   locknodes.o \\
   timestep.o \\
   sord.o"

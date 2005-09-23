@@ -39,8 +39,8 @@ master = .false.
 if ( ip == ipmaster ) master = .true.
 end subroutine
 
-! Integer minimum
-subroutine bcast( r )
+! Broadcast
+subroutine broadcast( r )
 real, intent(inout) :: r(:)
 integer :: i
 i = size(r)
@@ -48,7 +48,7 @@ call mpi_bcast( r, i, mpi_real, ipmaster, comm, err )
 end subroutine
 
 ! Integer minimum
-subroutine imin( i )
+subroutine globalmin( i )
 integer, intent(inout) :: i
 integer :: ii
 call mpi_allreduce( i, ii, 1, mpi_integer, mpi_min, comm, err )
@@ -56,7 +56,7 @@ i = ii
 end subroutine
 
 ! Real global minimum & location, send to master
-subroutine rmin( rmin, imin, noff )
+subroutine globalminloc( rmin, imin, noff )
 real, intent(inout) :: rmin
 integer, intent(inout) :: imin(3)
 integer, intent(in) :: noff
@@ -74,7 +74,7 @@ end if
 end subroutine
 
 ! Real global maximum & location, send to master
-subroutine rmax( rmax, imax, noff )
+subroutine globalmaxloc( rmax, imax, noff )
 real, intent(inout) :: rmax
 integer, intent(inout) :: imax(3)
 integer, intent(in) :: noff

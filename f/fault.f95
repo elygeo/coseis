@@ -5,7 +5,7 @@ module fault_m
 contains
 subroutine fault
 use globals_m
-use snormals_m
+use surfnormals_m
 use parallelio_m
 
 implicit none
@@ -82,7 +82,7 @@ i1 = i1node
 i2 = i2node
 i1(ifn) = ihypo(ifn)
 i2(ifn) = ihypo(ifn)
-call snormals( nrm, x, i1, i2 )
+call surfnormals( nrm, x, i1, i2 )
 area = sqrt( sum( nrm * nrm, 4 ) )
 f1 = area
 where ( f1 /= 0. ) f1 = 1. / f1
@@ -220,7 +220,7 @@ end do
 t2 = t3 - t1
 ts = sqrt( sum( t2 * t2, 4 ) )
 
-! Friction Law
+! Slip-weakening friction law
 where( tn > 0. ) tn = 0.
 f1 = mud
 where( sl < dc ) f1 = f1 + ( 1. - sl / dc ) * ( mus - mud )
@@ -233,6 +233,7 @@ if ( rcrit > 0. .and. vrup > 0. ) then
   f2 = ( 1. - f2 ) * ts + f2 * ( mud * -tn + co )
   where ( r < min( rcrit, t * vrup ) .and. f2 < f1 ) f1 = f2
 end if
+
 if ( any( f1 <= 0. ) ) print *, 'Fault opening!'
 
 ! Shear traction bounded by friction

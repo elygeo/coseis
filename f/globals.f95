@@ -123,10 +123,8 @@ integer :: &
   nt,           & ! number of time steps
   npml,         & ! number of PML damping nodes
   ifn,          & ! fault normal direction
-  ifault,       & ! fault plane
   it,           & ! current time step
   itcheck,      & ! interval for checkpointing
-  dostats,      & ! stats collectioin is collective--not highly scalable
   wt(6),        & ! wall clock timing array
   noper,        & ! number of zones for spatial derivative operators
   i1oper(2,3),  & ! j1 k1 l1 operator zone start index

@@ -5,7 +5,6 @@ module optimize_m
 contains
 subroutine optimize
 use globals_m
-use dfnc_m
 
 implicit none
 real :: tol, test

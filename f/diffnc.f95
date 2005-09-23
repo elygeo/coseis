@@ -1,9 +1,9 @@
 !------------------------------------------------------------------------------!
-! DFNC - difference operators, node to cell
+! DIFFNC - difference operators, node to cell
 
-module dfnc_m
+module diffnc_m
 contains
-subroutine dfnc( df, oper, f, x, dx, i, a, i1, i2 )
+subroutine diffnc( df, oper, f, x, dx, i, a, i1, i2 )
 
 implicit none
 real, intent(out) :: df(:,:,:)

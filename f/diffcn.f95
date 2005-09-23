@@ -1,9 +1,9 @@
 !------------------------------------------------------------------------------!
-! DFCN - difference operator, cell to node
+! DIFFCN - difference operator, cell to node
 
-module dfcn_m
+module diffcn_m
 contains
-subroutine dfcn( df, oper, f, x, dx, i, a, i1, i2 )
+subroutine diffcn( df, oper, f, x, dx, i, a, i1, i2 )
 
 implicit none
 real, intent(out) :: df(:,:,:)

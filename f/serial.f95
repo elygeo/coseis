@@ -9,14 +9,14 @@ logical :: master = .true.
 
 contains
 
-subroutine init;                  end subroutine
-subroutine finalize;              end subroutine
-subroutine rank( np );            end subroutine
-subroutine bcast( r );            end subroutine
-subroutine imin( i );             end subroutine
-subroutine rmin( rmin, imin );    end subroutine
-subroutine rmax( rmax, imax );    end subroutine
-subroutine swaphalo( w1, nhalo ); end subroutine
+subroutine init;                             end subroutine
+subroutine finalize;                         end subroutine
+subroutine rank( np );                       end subroutine
+subroutine broadcast( r );                   end subroutine
+subroutine globalmin( i );                   end subroutine
+subroutine globalminloc( rmin, imin, noff ); end subroutine
+subroutine globalmaxloc( rmax, imax, noff ); end subroutine
+subroutine swaphalo( w1, nhalo );            end subroutine
 
 end module
 

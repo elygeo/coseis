@@ -1,11 +1,11 @@
 !------------------------------------------------------------------------------!
-! DIVW
+! ACCELERATION
 
-module divw_m
+module acceleration_m
 contains
-subroutine divw
+subroutine acceleration
 use globals_m
-use dfcn_m
+use diffcn_m
 use hgnc_m
 use hgcn_m
 
@@ -16,6 +16,7 @@ integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, &
 s2 = 0.
 
 docomponent:  do ic  = 1, 3
+
 doderivative: do iid = 1, 3
 
 id = mod( ic + iid - 2, 3 ) + 1
@@ -26,9 +27,9 @@ do iz = 1, noper
   i1 = max( i1oper(iz,:), i1node )
   i2 = min( i2oper(iz,:), i2node )
   if ( ic == id ) then
-    call dfcn( s2, oper(iz), w1, x, dx, ic, id, i1, i2 )
+    call diffcn( s2, oper(iz), w1, x, dx, ic, id, i1, i2 )
   else
-    call dfcn( s2, oper(iz), w2, x, dx, ix, id, i1, i2 )
+    call diffcn( s2, oper(iz), w2, x, dx, ix, id, i1, i2 )
   end if
 end do
 
@@ -95,6 +96,7 @@ else
 end if
 
 end do doderivative
+
 end do docomponent
 
 ! Hourglass correction
@@ -103,9 +105,9 @@ s2 = 0.
 w2 = u + dt * viscosity(2) * v
 do ic = 1, 3
 do iq = 1, 4
-  call hgnc( s1, w2, ic, iq, i1cell, i2cell )
+  call hourglassnc( s1, w2, ic, iq, i1cell, i2cell )
   s1 = y * s1
-  call hgcn( s2, s1,  1, iq, i1node, i2node )
+  call hourglasscn( s2, s1,  1, iq, i1node, i2node )
   w1(:,:,:,ic) = w1(:,:,:,ic) - s2
 end do
 end do

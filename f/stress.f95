@@ -5,7 +5,7 @@ module gradu_m
 contains
 subroutine gradu
 use globals_m
-use dfnc_m
+use diffnc_m
 
 implicit none
 integer :: i, j, k, l, i1(3), i2(3), ic, id, ix, iz
@@ -14,7 +14,9 @@ s2 = 0.
 w2 = 0.
 
 docomponent:  do ic = 1, 3
+
 s1 = u(:,:,:,ic) + dt * viscosity(1) * v(:,:,:,ic)
+
 doderivative: do id = 1, 3
 
 ix = 6 - ic - id
@@ -23,7 +25,7 @@ ix = 6 - ic - id
 do iz = 1, noper
   i1 = max( max( i1oper(iz,:), i1pml + 1 ),     i1cell )
   i2 = min( min( i2oper(iz,:), i2pml - 1 ) - 1, i2cell )
-  call dfnc( s2, oper(iz), s1, x, dx, 1, id, i1, i2 )
+  call diffnc( s2, oper(iz), s1, x, dx, 1, id, i1, i2 )
 end do
 
 ! PML coordinates
@@ -38,31 +40,31 @@ if ( id /= 1 ) then
   i1 = i1cell
   i2 = i2cell
   i2(1) = j2
-  call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
   i1 = i1cell
   i2 = i2cell
   i1(1) = j1
-  call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
 end if
 if ( id /= 2 ) then
   i1 = i1cell
   i2 = i2cell
   i2(2) = k2
-  call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
   i1 = i1cell
   i2 = i2cell
   i1(2) = k1
-  call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
 end if
 if ( id /= 3 ) then
   i1 = i1cell
   i2 = i2cell
   i2(3) = l2
-  call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
   i1 = i1cell
   i2 = i2cell
   i1(3) = l1
-  call dfnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
 end if
 
 ! PML region, damped direction: G' + DG = gradV
@@ -70,7 +72,7 @@ if ( id == 1 ) then
   i1 = i1cell
   i2 = i2cell
   i2(1) = j2
-  call dfnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
   do j = i1(1), i2(1)
   i = j - noff(1)
   forall( k=i1(2):i2(2), l=i1(3):i2(3) )
@@ -81,7 +83,7 @@ if ( id == 1 ) then
   i1 = i1cell
   i2 = i2cell
   i1(1) = j1
-  call dfnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
   do j = i1(1), i2(1)
   i = nn(1) - j + noff(1)
   forall( k=i1(2):i2(2), l=i1(3):i2(3) )
@@ -94,7 +96,7 @@ if ( id == 2 ) then
   i1 = i1cell
   i2 = i2cell
   i2(2) = k2
-  call dfnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
   do k = i1(2), i2(2)
   i = k - noff(2)
   forall( j=i1(1):i2(1), l=i1(3):i2(3) )
@@ -105,7 +107,7 @@ if ( id == 2 ) then
   i1 = i1cell
   i2 = i2cell
   i1(2) = k1
-  call dfnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
   do k = i1(2), i2(2)
   i = nn(2) - k + noff(2)
   forall( j=i1(1):i2(1), l=i1(3):i2(3) )
@@ -118,7 +120,7 @@ if ( id == 3 ) then
   i1 = i1cell
   i2 = i2cell
   i2(3) = l2
-  call dfnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
   do l = i1(3), i2(3)
   i = l - noff(3)
   forall( j=i1(1):i2(1), k=i1(2):i2(2) )
@@ -129,7 +131,7 @@ if ( id == 3 ) then
   i1 = i1cell
   i2 = i2cell
   i2(3) = l2
-  call dfnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
   do l = i1(3), i2(3)
   i = nn(3) - l + noff(3)
   forall( j=i1(1):i2(1), k=i1(2):i2(2) )
@@ -147,6 +149,7 @@ else
 end if
 
 end do doderivative
+
 end do docomponent
 
 ! Hook's Law, linear stress/strain relation

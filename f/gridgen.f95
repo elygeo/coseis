@@ -136,7 +136,7 @@ if ( all( xhypo < 0. ) ) then
     l = ihypo(3)
     xhypo = x(j,k,l,:)
   end if
-  call bcast( xhypo )
+  call broadcast( xhypo )
 end if
 
 end subroutine

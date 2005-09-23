@@ -32,14 +32,14 @@ if ( err == 0 ) then
 else
   it = 0
 end if
-call imin( it )
+call globalmin( it )
 
-! Read checkpoint file if found, if not, setup output
-if ( it /= 0 ) then
+! Read checkpoint file if found, if not setup output
+ifrestart: if ( it /= 0 ) then
   if ( master ) print '(a,i6)', 'Checkpoint found, starting from step ', it
   i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
   write( str, '(a,i6.6,i6.6)' ) 'out/ckp/', i, it
-  inquire( iolength=reclen ) v, u, sv, sl, trup, &
+  inquire( iolength=reclen ) t, v, u, sl, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   open( 9, &
     file=str, &
@@ -47,7 +47,7 @@ if ( it /= 0 ) then
     form='unformatted', &
     access='direct', &
     status='old' )
-  read( 9, rec=1 ) v, u, sv, sl, trup, &
+  read( 9, rec=1 ) t, v, u, sl, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   close( 9 )
 else
@@ -84,7 +84,7 @@ else
     write( 9, * ) 'endian  = ''', endian, ''';% byte ordert'
     close( 9 )
   end if
-end if
+end if restart
 
 !Initialize output
 if ( nout > nz ) stop 'too many output zones, make nz bigger'
@@ -141,43 +141,32 @@ end if ifinit
 if ( pass == 'w' )
   s1 = sqrt( sum( u * u, 4 ) )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
-  if ( dostats == 1 ) then
-    i1 = maxloc( s1 )
-    i1 = maxloc( s2 )
-    umax = s1(i1(1),i1(2),i1(3))
-    wmax = s2(i1(1),i1(2),i1(3))
-    iumax = i1 - noff 
-    iwmax = i1 - noff
-    call rmax( umax, iumax )
-    call rmax( wmax, iwmax )
-    if ( umax > dx / 10. ) print *, 'Warning: u !<< dx'
-  end if
+  i1 = maxloc( s1 )
+  i1 = maxloc( s2 )
+  umax = s1(i1(1),i1(2),i1(3))
+  wmax = s2(i1(1),i1(2),i1(3))
+  call globalmaxloc( umax, iumax, noff )
+  call globalmaxloc( wmax, iwmax, noff )
+  if ( umax > dx / 10. ) print *, 'Warning: u !<< dx'
 else
   s1 = sqrt( sum( w1 * w1, 4 ) )
   s2 = sqrt( sum( v * v, 4 ) )
-  if ( dostats == 1 ) then
-    i1 = maxloc( s1 )
-    i1 = maxloc( s2 )
-    amax  = s1(i1(1),i1(2),i1(3))
-    vmax  = s2(i1(1),i1(2),i1(3))
-    iamax  = i1 - noff 
-    ivmax  = i1 - noff
-    call rmax( amax, iamax )
-    call rmax( vmax, ivmax )
-    if ( ifn /= 0 ) then
-      i1 = maxloc( sv )
-      i1 = maxloc( sl )
-      svmax = sv(i1(1),i1(2),i1(3))
-      slmax = sv(i1(1),i1(2),i1(3))
-      isvmax = i1 - noff
-      islmax = i1 - noff
-      isvmax(ifn) = ihypo(ifn)
-      islmax(ifn) = ihypo(ifn)
-      call rmax( svmax, isvmax )
-      call rmax( slmax, islmax )
-    end if
+  i1 = maxloc( s1 )
+  i1 = maxloc( s2 )
+  amax  = s1(i1(1),i1(2),i1(3))
+  vmax  = s2(i1(1),i1(2),i1(3))
+  call globalmaxloc( amax, iamax, noff )
+  call globalmaxloc( vmax, ivmax, noff )
+  if ( ifn /= 0 ) then
+    i1 = maxloc( sv )
+    i1 = maxloc( sl )
+    svmax = sv(i1(1),i1(2),i1(3))
+    slmax = sv(i1(1),i1(2),i1(3))
+    isvmax(ifn) = ihypo(ifn)
+    islmax(ifn) = ihypo(ifn)
+    call globalmaxloc( svmax, isvmax, noff )
+    call globalmaxloc( slmax, islmax, noff )
   end if
-end if
 end if
 
 ! Write output
@@ -234,7 +223,7 @@ if ( pass == 'w' ) return
 
 ! Write checkpoint
 if ( itcheck /= 0 .and. mod( it, itcheck ) == 0 ) then
-  inquire( iolength=reclen ) v, u, sv, sl, trup, &
+  inquire( iolength=reclen ) t, v, u, sl, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
   write( str, '(a,i6.6,i6.6)') 'out/ckp/', i, it
@@ -244,7 +233,7 @@ if ( itcheck /= 0 .and. mod( it, itcheck ) == 0 ) then
     form='unformatted', &
     access='direct', &
     status='replace' )
-  write( 9, rec=1 ) v, u, sv, sl, trup, &
+  write( 9, rec=1 ) t, v, u, sl, trup, &
     p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
   close( 9 )
   write( str, '(a,i6.6,a)' ) 'out/ckp/', ip, '.hdr'
@@ -264,21 +253,19 @@ if ( master ) then
   write( str, '(a,i6.6,a)' ) 'out/stats/', it, '.m'
   open(  9, file=str, status='replace' )
   write( 9, * ) t, amax, vmax, umax, wmax, svmax, slmax, dwt
-  write( 9, * ) 't      = ', t,      ';% time'
-  if ( dostats == 1 ) then
-    write( 9, * ) 'amax   = ', amax,   ';% max acceleration'
-    write( 9, * ) 'vmax   = ', amax,   ';% max velocity'
-    write( 9, * ) 'umax   = ', amax,   ';% max displacement'
-    write( 9, * ) 'wmax   = ', amax,   ';% max stress (frobenius norm)'
-    write( 9, * ) 'svmax  = ', slmax,  ';% max slip velocity'
-    write( 9, * ) 'slmax  = ', slmax,  ';% max slip path length'
-    write( 9, * ) 'iamax  = ', iamax,  ';% max acceleration node'
-    write( 9, * ) 'ivmax  = ', ivmax,  ';% max velocity node'
-    write( 9, * ) 'iumax  = ', ivmax,  ';% max displacement node'
-    write( 9, * ) 'iwmax  = ', iamax,  ';% max stress node'
-    write( 9, * ) 'isvmax = ', islmax, ';% max slip velocity node'
-    write( 9, * ) 'islmax = ', islmax, ';% max slip path length node'
-  end if
+  write( 9, * ) 't      = ', t,             ';% time'
+  write( 9, * ) 'amax   = ', amax,          ';% max acceleration'
+  write( 9, * ) 'vmax   = ', vmax,          ';% max velocity'
+  write( 9, * ) 'umax   = ', umax,          ';% max displacement'
+  write( 9, * ) 'wmax   = ', wmax,          ';% max stress (frobenius norm)'
+  write( 9, * ) 'svmax  = ', svmax,         ';% max slip velocity'
+  write( 9, * ) 'slmax  = ', slmax,         ';% max slip path length'
+  write( 9, * ) 'iamax  = ', iamax - noff,  ';% max acceleration node'
+  write( 9, * ) 'ivmax  = ', ivmax - noff,  ';% max velocity node'
+  write( 9, * ) 'iumax  = ', iumax - noff,  ';% max displacement node'
+  write( 9, * ) 'iwmax  = ', iamax - noff,  ';% max stress node'
+  write( 9, * ) 'isvmax = ', isvmax - noff, ';% max slip velocity node'
+  write( 9, * ) 'islmax = ', islmax - noff, ';% max slip path length node'
   close( 9 )
 end if
 
