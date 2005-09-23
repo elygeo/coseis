@@ -141,26 +141,43 @@ end if ifinit
 if ( pass == 'w' )
   s1 = sqrt( sum( u * u, 4 ) )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
-  i1 = maxloc( s1 ); umax  = s1(i1(1),i1(2),i1(3)); iumax  = i1 - noff 
-  i1 = maxloc( s2 ); wmax  = s2(i1(1),i1(2),i1(3)); iwmax  = i1 - noff
-  call rmax( umax, iumax, imaster )
-  call rmax( wmax, iwmax, imaster )
-  if ( umax > dx / 10. ) print *, 'Warning: u !<< dx'
+  if ( dostats == 1 ) then
+    i1 = maxloc( s1 )
+    i1 = maxloc( s2 )
+    umax = s1(i1(1),i1(2),i1(3))
+    wmax = s2(i1(1),i1(2),i1(3))
+    iumax = i1 - noff 
+    iwmax = i1 - noff
+    call rmax( umax, iumax, imaster )
+    call rmax( wmax, iwmax, imaster )
+    if ( umax > dx / 10. ) print *, 'Warning: u !<< dx'
+  end if
 else
   s1 = sqrt( sum( w1 * w1, 4 ) )
   s2 = sqrt( sum( v * v, 4 ) )
-  i1 = maxloc( s1 ); amax  = s1(i1(1),i1(2),i1(3)); iamax  = i1 - noff 
-  i1 = maxloc( s2 ); vmax  = s2(i1(1),i1(2),i1(3)); ivmax  = i1 - noff
-  call rmax( amax, iamax, imaster )
-  call rmax( vmax, ivmax, imaster )
-  if ( ifn /= 0 ) then
-    i1 = maxloc( sv ); svmax = sv(i1(1),i1(2),i1(3)); isvmax = i1 - noff
-    i1 = maxloc( sl ); slmax = sv(i1(1),i1(2),i1(3)); islmax = i1 - noff
-    isvmax(ifn) = ifault
-    islmax(ifn) = ifault
-    call rmax( svmax, isvmax, imaster )
-    call rmax( slmax, islmax, imaster )
+  if ( dostats == 1 ) then
+    i1 = maxloc( s1 )
+    i1 = maxloc( s2 )
+    amax  = s1(i1(1),i1(2),i1(3))
+    vmax  = s2(i1(1),i1(2),i1(3))
+    iamax  = i1 - noff 
+    ivmax  = i1 - noff
+    call rmax( amax, iamax, imaster )
+    call rmax( vmax, ivmax, imaster )
+    if ( ifn /= 0 ) then
+      i1 = maxloc( sv )
+      i1 = maxloc( sl )
+      svmax = sv(i1(1),i1(2),i1(3))
+      slmax = sv(i1(1),i1(2),i1(3))
+      isvmax = i1 - noff
+      islmax = i1 - noff
+      isvmax(ifn) = ihypo(ifn)
+      islmax(ifn) = ihypo(ifn)
+      call rmax( svmax, isvmax, imaster )
+      call rmax( slmax, islmax, imaster )
+    end if
   end if
+end if
 end if
 
 ! Write output
@@ -248,20 +265,21 @@ if ( master ) then
   open(  9, file=str, status='replace' )
   write( 9, * ) t, amax, vmax, umax, wmax, svmax, slmax, dwt
   write( 9, * ) 't      = ', t,      ';% time'
-  write( 9, * ) 'amax   = ', amax,   ';% max acceleration'
-  write( 9, * ) 'vmax   = ', amax,   ';% max velocity'
-  write( 9, * ) 'umax   = ', amax,   ';% max displacement'
-  write( 9, * ) 'wmax   = ', amax,   ';% max stress (frobenius norm)'
-  write( 9, * ) 'svmax  = ', slmax,  ';% max slip velocity'
-  write( 9, * ) 'slmax  = ', slmax,  ';% max slip path length'
-  write( 9, * ) 'iamax  = ', iamax,  ';% max acceleration node'
-  write( 9, * ) 'ivmax  = ', ivmax,  ';% max velocity node'
-  write( 9, * ) 'iumax  = ', ivmax,  ';% max displacement node'
-  write( 9, * ) 'iwmax  = ', iamax,  ';% max stress node'
-  write( 9, * ) 'isvmax = ', islmax, ';% max slip velocity node'
-  write( 9, * ) 'islmax = ', islmax, ';% max slip path length node'
+  if ( dostats == 1 ) then
+    write( 9, * ) 'amax   = ', amax,   ';% max acceleration'
+    write( 9, * ) 'vmax   = ', amax,   ';% max velocity'
+    write( 9, * ) 'umax   = ', amax,   ';% max displacement'
+    write( 9, * ) 'wmax   = ', amax,   ';% max stress (frobenius norm)'
+    write( 9, * ) 'svmax  = ', slmax,  ';% max slip velocity'
+    write( 9, * ) 'slmax  = ', slmax,  ';% max slip path length'
+    write( 9, * ) 'iamax  = ', iamax,  ';% max acceleration node'
+    write( 9, * ) 'ivmax  = ', ivmax,  ';% max velocity node'
+    write( 9, * ) 'iumax  = ', ivmax,  ';% max displacement node'
+    write( 9, * ) 'iwmax  = ', iamax,  ';% max stress node'
+    write( 9, * ) 'isvmax = ', islmax, ';% max slip velocity node'
+    write( 9, * ) 'islmax = ', islmax, ';% max slip path length node'
+  end if
   close( 9 )
-  print '(6es12.4)', t, amax, vmax, umax, dwt
 end if
 
 end subroutine

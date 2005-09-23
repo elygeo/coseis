@@ -18,6 +18,12 @@ if ( master ) print '(a)', 'Material model'
 mr = 0.
 s1 = 0.
 s2 = 0.
+rho1 = 1e9
+rho2 = 0.
+vp1 = 1e9
+vp2 = 0.
+vs1 = 1e9
+vs2 = 0.
 doi: do i = 1, nin
 ifreadfile: if ( readfile(i) ) then
   i1 = i1cell
@@ -27,6 +33,18 @@ ifreadfile: if ( readfile(i) ) then
   case ( 'vp'  ); call ioscalar( 'r', 'data/vp',  s1, i1, i2, n, noff )
   case ( 'vs'  ); call ioscalar( 'r', 'data/vs',  s2, i1, i2, n, noff )
   end select
+  rho = minval( mr, mr > 0. )
+  vp = minval( s1, s1 > 0. )
+  vs = minval( s2, s2 > 0. )
+  if ( rho < rho1 ) print *, 'Warning: rho excedes min: ', rho, rho1
+  if ( vp < vp1 )   print *, 'Warning: vp excedes min: ', vp, vp1
+  if ( vs < vs1 )   print *, 'Warning: vs excedes min: ', vs, vs1
+  rho = maxval( mr )
+  vp  = maxval( s1 )
+  vs  = maxval( s2 )
+  if ( rho > rho2 ) print *, 'Warning: rho excedes max: ', rho, rho2
+  if ( vp > vp2 )   print *, 'Warning: vp excedes max: ', vp, vp2
+  if ( vs > vs2 )   print *, 'Warning: vs excedes max: ', vs, vs2
 else
   call zone( i1in(i,:), i2in(i,:), nn, noff, ihypo, ifn )
   i1 = max( i1in(i,:), i1cell )
@@ -35,29 +53,24 @@ else
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
   select case ( fieldin(i) )
-  case ( 'rho' ); mr(j1:j2,k1:k2,l1:l2) = inval(i)
-  case ( 'vp'  ); s1(j1:j2,k1:k2,l1:l2) = inval(i)
-  case ( 'vs'  ); s2(j1:j2,k1:k2,l1:l2) = inval(i)
+  case ( 'rho' )
+    mr(j1:j2,k1:k2,l1:l2) = inval(i)
+    rho1 = min( rho1, inval(i) )
+    rho2 = max( rho2, inval(i) )
+  case ( 'vp'  )
+    s1(j1:j2,k1:k2,l1:l2) = inval(i)
+    vp1 = min( rho1, inval(i) )
+    vp2 = max( rho2, inval(i) )
+  case ( 'vs'  )
+    s2(j1:j2,k1:k2,l1:l2) = inval(i)
+    vs1 = min( rho1, inval(i) )
+    vs2 = max( rho2, inval(i) )
   end select
 end if ifreadfile
 end do doi
 
-! Material extremes
-rho1 = minval( mr, mr > 0. )
-vp1  = minval( s1, s1 > 0. )
-vs1  = minval( s2, s2 > 0. )
-rho2 = maxval( mr )
-vp2  = maxval( s1 )
-vs2  = maxval( s2 )
-prmin( rho1 )
-prmin( vp1 )
-prmin( vs1 )
-prmax( rho2 )
-prmax( vp2 )
-prmax( vs2 )
-
 ! Hypocenter values
-if ( hypoproc ) then
+if ( master ) then
   j = ihypo(1)
   k = ihypo(2)
   l = ihypo(3)
@@ -122,7 +135,7 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     + s2(j,k,l-1) + s2(j-1,k-1,l) )
 end forall
 
-! Hourglass constant - FIXME off by factor of 8?
+! Hourglass constant
 y = 6. * dx * dx * ( lam + 2. * mu )
 where ( y /= 0. ) y = 4. * mu * ( lam + mu ) / y * s2
 

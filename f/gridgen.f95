@@ -20,10 +20,11 @@ if ( master ) print '(a)', 'Grid generation'
 i1 = i1cell
 i2 = i2cell + 1
 
-! No split nodes just yet
+! No split nodes yet
+! FIXME
 if ( ifn ) then
-  if ( i1(ifn) > ifault ) i1(ifn) = i1(ifn) - 1
-  if ( i2(ifn) > ifault ) i2(ifn) = i2(ifn) - 1
+  if ( i1(ifn) > ihypo(ifn) ) i1(ifn) = i1(ifn) - 1
+  if ( i2(ifn) > ihypo(ifn) ) i2(ifn) = i2(ifn) - 1
 end if
 
 j1 = i1(1); j2 = i2(1)
@@ -112,27 +113,24 @@ if( ip3(2) == np(2) - 1 ) x(:,k2+1,:,:) = x(:,k2,:,:)
 if( ip3(3) == 0         ) x(:,:,j1-1,:) = x(:,:,j1,:)
 if( ip3(3) == np(3) - 1 ) x(:,:,l2+1,:) = x(:,:,l2,:)
 
-! Find hypocenter node
-do i = 1, 3
-  w1(:,:,:,i) = w1(:,:,:,i) - xhypo(i)
-end do
-s1 = sqrt( sum( w1 * w1, 4 ) )
-ihypo = minloc( s1 )
-rhypo = s1(ihypo(1),ihypo(2),ihypo(3))
-call allrmin( rhypo, ihypo, noff, imaster )
-if ( ip == imaster ) master = .true.
-if ( rhypo > dx ) print '(a)', 'Warning: external hypocenter'
-
 ! Fault plane split nodes
-ifault = ifault - noff
 if ( ifn /= 0 ) then
-  if ( ihypo(ifn) /= ifault ) print '(a)', 'Warning: hypocenter not on fault'
-  i = ifault
+  i = ihypo(ifn)
   select case( ifn )
   case( 1 ); x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:)
   case( 2 ); x(:,i+1:k2,:,:) = x(:,i:k2-1,:,:)
   case( 3 ); x(:,:,i+1:l2,:) = x(:,:,i:l2-1,:)
   end select
+end if
+
+! Hypocenter location
+if ( master ) then
+  j = ihypo(1)
+  k = ihypo(2)
+  l = ihypo(3)
+  if ( any( abs( x(j,k,l,:) - xhypo ) ) > abs( dx ) ) then
+    print *, 'Warning: x(ihypo) and xhypo differ: ', x(j,k,l,:), xhypo
+  end if
 end if
 
 end subroutine

@@ -19,6 +19,11 @@ if( ifn /= 0 ) nn(ifn) = nn(ifn) + 1
 nl = nn / np; where ( mod( nn, np ) /= 0 ) nl = nl + 1
 np = nn / nl; where ( mod( nn, nl ) /= 0 ) np = np + 1
 
+! Hypocenter
+where ( ihypo == 0 ) ihypo = n / 2 + 1
+! FIXME
+imaster = ihypo / nl
+
 ! Find processor rank
 call rank( np )
 

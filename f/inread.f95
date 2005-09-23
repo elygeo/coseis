@@ -56,11 +56,12 @@ case( 'rsource' );     read( str, * ) key1, rsource
 case( 'tsource' );     read( str, * ) key1, tsource
 case( 'moment' );      read( str, * ) key1, moment1, moment2
 case( 'faultnormal' ); read( str, * ) key1, ifn
-case( 'faultplane' );  read( str, * ) key1, ifault
+case( 'ihypo' );       read( str, * ) key1, ihypo
 case( 'vrup' );        read( str, * ) key1, vrup
 case( 'rcrit' );       read( str, * ) key1, rcrit
 case( 'trelax' );      read( str, * ) key1, trelax
 case( 'np' );          read( str, * ) key1, np
+case( 'dostats' );     read( str, * ) key1, dostats
 case( 'itcheck' );     read( str, * ) key1, itcheck
 case( 'rho' );         inzone = .true.
 case( 'vp' );          inzone = .true.
