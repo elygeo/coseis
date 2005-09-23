@@ -41,14 +41,14 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 if ( id == 1 ) then
   do j = i1node(1), j2
-  i = j - noff(1)
+  i = j - nnoff(1)
   forall( k=k1:k2, l=l1:l2 )
     s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p1(i,k,l,ic)
     p1(i,k,l,ic) = p1(i,k,l,ic) + dt * s2(j,k,l)
   end forall
   end do
   do j = j1, i2node(1)
-  i = nn(1) - j + noff(1) + 1
+  i = nn(1) - j + nnoff(1) + 1
   forall( k=k1:k2, l=l1:l2 )
     s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p4(i,k,l,ic)
     p4(i,k,l,ic) = p4(i,k,l,ic) + dt * s2(j,k,l)
@@ -57,14 +57,14 @@ if ( id == 1 ) then
 end if
 if ( id == 2 ) then
   do k = i1node(2), k2
-  i = k - noff(2)
+  i = k - nnoff(2)
   forall( j=j1:j2, l=l1:l2 )
     s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p2(j,i,l,ic)
     p2(j,i,l,ic) = p2(j,i,l,ic) + dt * s2(j,k,l)
   end forall
   end do
   do k = k1, i2node(2)
-  i = nn(2) - k + noff(2) + 1
+  i = nn(2) - k + nnoff(2) + 1
   forall( j=j1:j2, l=l1:l2 )
     s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p5(j,i,l,ic)
     p5(j,i,l,ic) = p5(j,i,l,ic) + dt * s2(j,k,l)
@@ -73,14 +73,14 @@ if ( id == 2 ) then
 end if
 if ( id == 3 ) then
   do l = i1node(3), l2
-  i = l - noff(3)
+  i = l - nnoff(3)
   forall( j=j1:j2, k=k1:k2 )
     s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p3(j,k,i,ic)
     p3(j,k,i,ic) = p3(j,k,i,ic) + dt * s2(j,k,l)
   end forall
   end do
   do l = l1, i2node(3)
-  i = nn(3) - l + noff(3) + 1
+  i = nn(3) - l + nnoff(3) + 1
   forall( j=j1:j2, k=k1:k2 )
     s2(j,k,l) = dn2(i) * s2(j,k,l) + dn1(i) * p6(j,k,i,ic)
     p6(j,k,i,ic) = p6(j,k,i,ic) + dt * s2(j,k,l)

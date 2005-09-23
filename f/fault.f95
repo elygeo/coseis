@@ -15,11 +15,18 @@ integer :: i, j, k, l, i1(3), j1, k1, l1, i1(3), j2, k2, l2, &
   j3, k3, l3, j4, k4, l4, iz, idip, istr
 logical :: init = .true.
 
+if ( ifn == 0 ) return
+
 ifinit: if ( init ) then
 
 init = .false.
-if ( ifn == 0 ) return
 if ( master ) print '(a)', 'Initialize fault'
+
+! Test if fault plane exists on this processor
+if ( ihypo(ifn) < i1node(ifn) .or. ihypo(ifn) > i2node(ifn) ) then
+  ifn = 0
+  return
+end if
 
 ! Input
 mus = 0.
@@ -51,7 +58,7 @@ ifreadfile: if ( readfile(i) ) then
   case ( 'tdip' ); call iovector( 'r', 'data/tdip', t3, 3, i1, i2, n, noff )
   end select
 else
-  call zone( i1in(i,:), i2in(i,:), nn, noff, ihypo, ifn )
+  call zone( i1in(i,:), i2in(i,:), n, noff, ihypo, ifn )
   i1 = max( i1in(i,:), i1node )
   i2 = min( i2in(i,:), i2node )
   i1(ifn) = 1
@@ -185,9 +192,7 @@ return
 
 end if ifinit
 
-!------------------------------------------------------------------------------!
-
-if ( ifn == 0 ) return
+!--------------------------------------!
 
 ! Indices
 i1 = 1

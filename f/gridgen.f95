@@ -11,28 +11,18 @@ use zone_m
 
 implicit none
 real :: theta, scl
-integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up, noffset(3)
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up
 real :: lj, lk, ll, rhypo
 
 if ( master ) print '(a)', 'Grid generation'
 
 ! Indices
+! FIXME n max
 i1 = i1cell
 i2 = i2cell + 1
 i1oper(1,:) = i1
 i2oper(1,:) = i2
 noper = 1
-
-! Account for split nodes
-noffset = noff
-if ( ifn ) then
-  i = ihypo(ifn)
-  if ( i1(ifn) > i ) then
-    noffset(ifn) = noffset(ifn) + 1
-  else if ( i2(ifn) > i ) then
-    i2(ifn) = i2(ifn) - 1
-  end if
-end if
 
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
@@ -42,13 +32,13 @@ l1 = i1(3); l2 = i2(3)
 x = 0.
 if ( grid == 'read' ) then
   oper = 'o'
-  call iovector( 'r', 'data/x1', x, i1, i2, 1, n, noffset )
-  call iovector( 'r', 'data/x2', x, i1, i2, 2, n, noffset )
-  call iovector( 'r', 'data/x3', x, i1, i2, 3, n, noffset )
+  call iovector( 'r', 'data/x1', x, i1, i2, 1, n, noff )
+  call iovector( 'r', 'data/x2', x, i1, i2, 2, n, noff )
+  call iovector( 'r', 'data/x3', x, i1, i2, 3, n, noff )
 else
-  forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - noffset(1) )
-  forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - 1 - noffset(2) )
-  forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - 1 - noffset(3) )
+  forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - noff(1) )
+  forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - 1 - noff(2) )
+  forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - 1 - noff(3) )
 end if
 
 ! Coordinate system
@@ -115,14 +105,14 @@ if( ip3(3) == np(3) - 1 ) x(:,:,l2+1,:) = x(:,:,l2,:)
 
 ! Fault plane split nodes
 if ( ifn /= 0 ) then
+if ( i1(ifn) <= ihypo(ifn) .and. i2(ifn) > ihypo(ifn) ) then
   i = ihypo(ifn)
-  if ( i1(ifn) <= i .and. i2(ifn) > i ) then
-    select case( ifn )
-    case( 1 ); x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:)
-    case( 2 ); x(:,i+1:k2,:,:) = x(:,i:k2-1,:,:)
-    case( 3 ); x(:,:,i+1:l2,:) = x(:,:,i:l2-1,:)
-    end select
-  end if
+  select case( ifn )
+  case( 1 ); x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:)
+  case( 2 ); x(:,i+1:k2,:,:) = x(:,i:k2-1,:,:)
+  case( 3 ); x(:,:,i+1:l2,:) = x(:,:,i:l2-1,:)
+  end select
+end if
 end if
 
 ! Assign fast operators to rectangular mesh portions

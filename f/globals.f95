@@ -107,7 +107,8 @@ integer, dimension(3) :: &
   np,           & ! number of processors
   bc1,          & ! boundary conditions for j1 k1 l1
   bc2,          & ! boundary conditions for j2 k2 l2
-  noff,         & ! offset between local and global indices
+  noff,         & ! offset between local and global indices single fault nodes
+  nnoff,        & ! offset between local and global indices double fault nodes
   ihypo,        & ! hypocenter node
   i1node,       & ! node calculations start index
   i2node,       & ! node calculations end index

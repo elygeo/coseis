@@ -24,7 +24,11 @@ vp1 = 1e9
 vp2 = 0.
 vs1 = 1e9
 vs2 = 0.
+
+!FIXME split nodes
+
 doi: do i = 1, nin
+
 ifreadfile: if ( readfile(i) ) then
   i1 = i1cell
   i2 = i2cell + 1
@@ -67,6 +71,7 @@ else
     vs2 = max( rho2, inval(i) )
   end select
 end if ifreadfile
+
 end do doi
 
 ! Hypocenter values

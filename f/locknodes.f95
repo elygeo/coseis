@@ -15,7 +15,7 @@ logical :: init = .true.
 if ( init ) then
   if ( nlock > nz ) stop 'too many lock zones, make nz bigger'
   do i = 1, nlock
-    call zone( i1lock(i,:), i2lock(i,:), nn, noff, ihypo, ifn )
+    call zone( i1lock(i,:), i2lock(i,:), nn, nnoff, ihypo, ifn )
   end do
 end if
 

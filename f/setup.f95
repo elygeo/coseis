@@ -27,7 +27,11 @@ ip3master = ( ihypo - 1 ) / nl
 call rank( np )
 
 ! Offset: add to global index to get memory index
-noff = nhalo - nl * ip3
+nnoff = nhalo - nl * ip3
+noff = nnoff
+if ( ifn ) then
+if ( i1(ifn) > ihypo(ifn) )
+where( ihypo < 1 ) noff = noff + 1
 
 ! Trim extra nodes off last processor
 nl = min( nl, nn + noff - nhalo )
