@@ -2,13 +2,13 @@
 ! SETUP
 
 module setup_m
+implicit none
 contains
 subroutine setup
 use globals_m
-use parallel_m
+use collective_m
 use zone_m
 
-implicit none
 integer :: i, nl(3)
 
 ! Double nodes for fault
@@ -29,7 +29,7 @@ call rank( np )
 ! Offset: add to global index to get memory index
 nnoff = nhalo - nl * ip3
 noff = nnoff
-if ( ifn ) then
+if ( ifn /= 0 ) then
   if ( ihypo(ifn) < 1 ) noff = noff + 1
 end if
 

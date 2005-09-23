@@ -1,22 +1,44 @@
 !------------------------------------------------------------------------------!
-! SERIAL
-! This module provides hooks for parallelization.
+! SERIAL - dummy routines that provide hooks for parallelizaion
 
-module parallel_m
-
-integer :: ip3(3) = 0, ip3master(0) = 0
+module collective_m
+implicit none
+integer :: ip3(3) = 0, ip3master(3) = 0
 logical :: master = .true.
-
 contains
 
-subroutine init;                              end subroutine
-subroutine finalize;                          end subroutine
-subroutine rank( np );                        end subroutine
-subroutine broadcast( r );                    end subroutine
-subroutine globalmin( i );                    end subroutine
-subroutine globalminloc( rmin, imin, nnoff ); end subroutine
-subroutine globalmaxloc( rmax, imax, nnoff ); end subroutine
-subroutine swaphalo( w1, nhalo );             end subroutine
+subroutine init
+end subroutine
+
+subroutine finalize
+end subroutine
+
+subroutine rank( np )
+integer :: np(3)
+end subroutine
+
+subroutine broadcast( r )
+real :: r(:)
+end subroutine
+
+subroutine globalmin( i )
+integer :: i
+end subroutine
+
+subroutine globalminloc( rmin, imin, nnoff )
+real :: rmin
+integer :: imin(3), nnoff(3)
+end subroutine
+
+subroutine globalmaxloc( rmax, imax, nnoff )
+real :: rmax
+integer :: imax(3), nnoff(3)
+end subroutine
+
+subroutine swaphalo( w1, nhalo )
+real :: w1(:,:,:,:)
+integer :: nhalo
+end subroutine
 
 end module
 

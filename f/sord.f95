@@ -6,7 +6,7 @@ program sord
 ! Modules
 use globals_m
 use inread_m
-use parallel_m
+use collective_m
 use setup_m
 use arrays_m
 use gridgen_m

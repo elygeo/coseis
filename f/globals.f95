@@ -112,12 +112,10 @@ integer, dimension(3) :: &
   ihypo,        & ! hypocenter node
   i1node,       & ! node calculations start index
   i2node,       & ! node calculations end index
-  i1nodepml,    & ! excluding PML region
-  i2nodepml,    & ! excluding PML region
   i1cell,       & ! cell calculations start index
   i2cell,       & ! cell calculations end index
-  i1cellpml,    & ! excluding PML region
-  i2cellpml       ! excluding PML region
+  i1pml,        & ! PML boundary
+  i2pml           ! PML boundary
 
 integer :: &
   upward,       & ! upward direction

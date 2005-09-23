@@ -2,14 +2,15 @@
 ! GRIDGEN - Grid generation
 
 module gridgen_m
+implicit none
 contains
 subroutine gridgen
 use globals_m
-use parallelio_m
+use collective_m
+use collectiveio_m
 use optimize_m
 use zone_m
 
-implicit none
 real :: theta, scl
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up
 real :: lj, lk, ll, rhypo
@@ -32,9 +33,9 @@ l1 = i1(3); l2 = i2(3)
 x = 0.
 if ( grid == 'read' ) then
   oper = 'o'
-  call iovector( 'r', 'data/x1', x, i1, i2, 1, n, noff )
-  call iovector( 'r', 'data/x2', x, i1, i2, 2, n, noff )
-  call iovector( 'r', 'data/x3', x, i1, i2, 3, n, noff )
+  call iovector( 'r', 'data/x1', x, 1, i1, i2, n, noff, 0 )
+  call iovector( 'r', 'data/x2', x, 2, i1, i2, n, noff, 0 )
+  call iovector( 'r', 'data/x3', x, 3, i1, i2, n, noff, 0 )
 else
   forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - noff(1) )
   forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - 1 - noff(2) )

@@ -1,16 +1,19 @@
 !------------------------------------------------------------------------------!
-! SERIAL
+! SERIALIO
 
-module parallelio_m
+module collectiveio_m
+implicit none
 contains
 
-subroutine iosplit( iz, itout ); end subroutine
+! Placeholder for split collective parallel output
+subroutine iosplit( iz, ditout )
+integer, intent(in) :: iz, ditout
+end subroutine
 
 ! Input/ouput scalar field
 subroutine ioscalar( io, filename, s1, i1, i2, n, nnoff, iz )
-implicit none
 character*(*), intent(in) :: io, filename
-real, intent(in) :: s1(:,:,:)
+real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), n(3), nnoff(3), iz
 integer :: j1, k1, l1, j2, k2, l2, reclen
 j1 = i1(1); j2 = i2(1)
@@ -42,9 +45,8 @@ end subroutine
 
 ! Input/ouput vector component
 subroutine iovector( io, filename, w1, i, i1, i2, n, nnoff, iz )
-implicit none
 character*(*), intent(in) :: io, filename
-real, intent(in) :: w1(:,:,:,:)
+real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i, n(3), nnoff(3), iz
 integer :: j1, k1, l1, j2, k2, l2, reclen
 j1 = i1(1); j2 = i2(1)

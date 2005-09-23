@@ -2,14 +2,14 @@
 ! MATERIAL
 
 module material_m
+implicit none
 contains
 subroutine material
 use globals_m
-use parallelio_m
+use collectiveio_m
 use diffnc_m
 use zone_m
 
-implicit none
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, iz
 
 if ( master ) print '(a)', 'Material model'
@@ -32,9 +32,9 @@ ifreadfile: if ( readfile(i) ) then
 i1 = i1cell
 i2 = i2cell + 1
 select case ( fieldin(i) )
-case ( 'rho' ); call ioscalar( 'r', 'data/rho', mr, i1, i2, n, noff )
-case ( 'vp'  ); call ioscalar( 'r', 'data/vp',  s1, i1, i2, n, noff )
-case ( 'vs'  ); call ioscalar( 'r', 'data/vs',  s2, i1, i2, n, noff )
+case ( 'rho' ); call ioscalar( 'r', 'data/rho', mr, i1, i2, n, noff, 0 )
+case ( 'vp'  ); call ioscalar( 'r', 'data/vp',  s1, i1, i2, n, noff, 0 )
+case ( 'vs'  ); call ioscalar( 'r', 'data/vs',  s2, i1, i2, n, noff, 0 )
 end select
 if ( ifn /= 0 ) then
 if ( ihypo(ifn) >= i1(ifn) .and. ihypo(ifn) < i2(ifn) ) then

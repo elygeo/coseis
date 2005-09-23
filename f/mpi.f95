@@ -1,14 +1,12 @@
 !------------------------------------------------------------------------------!
 ! MPI
 
-module parallel_m
+module collective_m
 use mpi
-
 implicit none
 save
 integer :: ip, ip3(3), ipmaster, ip3master(3), comm, err
 logical :: master, period(3) = .false.
-
 contains
 
 subroutine init

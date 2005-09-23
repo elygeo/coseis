@@ -2,6 +2,7 @@
 ! ACCELERATION
 
 module acceleration_m
+implicit none
 contains
 subroutine acceleration
 use globals_m
@@ -9,7 +10,6 @@ use diffcn_m
 use hgnc_m
 use hgcn_m
 
-implicit none
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, &
   ic, iid, id, ix, iq, iz
 

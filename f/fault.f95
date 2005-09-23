@@ -2,13 +2,13 @@
 ! FAULT
 
 module fault_m
+implicit none
 contains
 subroutine fault
 use globals_m
 use surfnormals_m
-use parallelio_m
+use collectiveio_m
 
-implicit none
 save
 real :: mus0, mud0, dc0, dctest, tn0, ts0, s, rctest, vector(3)
 integer :: i, j, k, l, i1(3), j1, k1, l1, i1(3), j2, k2, l2, &
@@ -177,14 +177,14 @@ if ( master ) then
   rctest = rho * vs * vs * tn0 * ( mus0 - mud0 ) * dc0 &
     / ( ts0 - tn0 * mud0 ) ** 2
   open(  9, file='out/faultmeta.m', status='new' )
-  write( 9, * ) 'mus0   = ', mus0,   ';% static friction at hypocenter'
-  write( 9, * ) 'mud0   = ', mud0,   ';% dynamic friction at hypocenter'
-  write( 9, * ) 'dc0    = ', dc0,    ';% dc at hypocenter'
-  write( 9, * ) 'dctest = ', dctest, ';% breakdown resolution test'
-  write( 9, * ) 'tn0    = ', tn0,    ';% normal traction at hypocenter'
-  write( 9, * ) 'ts0    = ', ts0,    ';% shear traction at hypocenter'
-  write( 9, * ) 's      = ', s,      ';% strength paramater'
-  write( 9, * ) 'rctest = ', rctest, ';% remmomended rcrit for nucleation'
+  write( 9, * ) ' mus0   = ', mus0,   '; % static friction at hypocenter'
+  write( 9, * ) ' mud0   = ', mud0,   '; % dynamic friction at hypocenter'
+  write( 9, * ) ' dc0    = ', dc0,    '; % dc at hypocenter'
+  write( 9, * ) ' dctest = ', dctest, '; % breakdown resolution test'
+  write( 9, * ) ' tn0    = ', tn0,    '; % normal traction at hypocenter'
+  write( 9, * ) ' ts0    = ', ts0,    '; % shear traction at hypocenter'
+  write( 9, * ) ' s      = ', s,      '; % strength paramater'
+  write( 9, * ) ' rctest = ', rctest, '; % remmomended rcrit for nucleation'
   close( 9 )
 end if
 

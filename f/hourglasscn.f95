@@ -1,11 +1,11 @@
 !------------------------------------------------------------------------------!
-! HGCN - hourglass corrections, cell to node
+! HOURGLASSCN - hourglass corrections, cell to node
 
-module hgcn_m
-contains
-subroutine hgcn( hg, f, i, iq, i1, i2 )
-
+module hourglasscn_m
 implicit none
+contains
+subroutine hourglasscn( hg, f, i, iq, i1, i2 )
+
 real, intent(out) :: hg(:,:,:)
 real, intent(in) :: f(:,:,:,:)
 integer, intent(in) :: i, iq, i1(3), i2(3)

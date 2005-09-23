@@ -1,24 +1,21 @@
 !------------------------------------------------------------------------------!
 ! MPIIO
 
-module parallelio_m
+module collectiveio_m
 use mpi
-use parallel_m
-
+use collective_m
+implicit none
 integer :: commout(nz)
-
 contains
 
 ! Split communicator
 subroutine iosplit( iz, ditout )
-implicit none
 integer, intent(in) :: iz, ditout
 call mpi_comm_split( comm, ditout, 0, commout(iz), err )
 end subroutine
 
 ! Input/output scalar
 subroutine ioscalar( io, filename, s1, i1, i2, nn, nnoff, iz )
-implicit none
 character*(*), intent(in) :: io, filename
 real, intent(in) :: s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), nn(3), nnoff, iz
@@ -54,7 +51,6 @@ end subroutine
 
 ! Input/output vector component
 subroutine iovector( io, filename, w1, i, i1, i2, nn, nnoff, iz )
-implicit none
 character*(*), intent(in) :: io, filename
 real, intent(in) :: w1(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), nn(3), nnoff, i, iz

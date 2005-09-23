@@ -1,13 +1,13 @@
 !------------------------------------------------------------------------------!
-! MOMENTSRC
+! MOMENTSOURCE
 
-module momentsrc_m
+module momentsource_m
+implicit none
 contains
-subroutine momentsrc
+subroutine momentsource
 use globals_m
 use diffnc_m
 
-implicit none
 save
 logical :: init = .true.
 integer, allocatable :: jj(:), kk(:), ll(:)
@@ -92,9 +92,9 @@ if ( master ) then
   mw = 2. / 3. * log10( m0 ) - 10.7
   d = m0 / ( rho * vs * vs * dx * dx )
   open(  9, file='out/sourcemeta.m', status='new' )
-  write( 9, * ) 'm0 = ', m0, ';'
-  write( 9, * ) 'mw = ', mw, ';'
-  write( 9, * ) 'd  = ', d,  ';'
+  write( 9, * ) ' m0 = ', m0, '; % moment'
+  write( 9, * ) ' mw = ', mw, '; % moment magnitude'
+  write( 9, * ) ' d  = ', d,  '; % displacement for cell sized fault'
   close( 9 )
 end if
 

@@ -2,10 +2,10 @@
 ! SURFNORMALS
 
 module surfnormals_m
+implicit none
 contains
 subroutine surfnormals( nrm, x, i1, i2 )
 
-implicit none
 real, intent(out) :: nrm(:,:,:,:)
 real, intent(in) :: x(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3)

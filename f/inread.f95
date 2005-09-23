@@ -1,12 +1,12 @@
 !------------------------------------------------------------------------------!
 ! INREAD
 
-module inread_m( filename )
+module inread_m
+implicit none
 contains
-subroutine inread
+subroutine inread( filename )
 use globals_m
 
-implicit none
 character*(*), intent(in) :: filename
 character(160) :: str, key1, key2
 integer :: i, iz, err
@@ -61,7 +61,6 @@ case( 'vrup' );        read( str, * ) key1, vrup
 case( 'rcrit' );       read( str, * ) key1, rcrit
 case( 'trelax' );      read( str, * ) key1, trelax
 case( 'np' );          read( str, * ) key1, np
-case( 'dostats' );     read( str, * ) key1, dostats
 case( 'itcheck' );     read( str, * ) key1, itcheck
 case( 'rho' );         inzone = .true.
 case( 'vp' );          inzone = .true.

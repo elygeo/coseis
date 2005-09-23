@@ -2,10 +2,10 @@
 ! DIFFCN - difference operator, cell to node
 
 module diffcn_m
+implicit none
 contains
 subroutine diffcn( df, oper, f, x, dx, i, a, i1, i2 )
 
-implicit none
 real, intent(out) :: df(:,:,:)
 character, intent(in) :: oper
 real, intent(in) :: f(:,:,:,:), x(:,:,:,:), dx
