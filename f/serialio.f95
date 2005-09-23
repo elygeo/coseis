@@ -7,11 +7,11 @@ contains
 subroutine iosplit( iz, itout ); end subroutine
 
 ! Input/ouput scalar field
-subroutine ioscalar( io, filename, s1, i1, i2, n, noff, iz )
+subroutine ioscalar( io, filename, s1, i1, i2, n, nnoff, iz )
 implicit none
 character*(*), intent(in) :: io, filename
 real, intent(in) :: s1(:,:,:)
-integer, intent(in) :: i1(3), i2(3), n(3), noff(3), iz
+integer, intent(in) :: i1(3), i2(3), n(3), nnoff(3), iz
 integer :: j1, k1, l1, j2, k2, l2, reclen
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
@@ -41,11 +41,11 @@ end select
 end subroutine
 
 ! Input/ouput vector component
-subroutine iovector( io, filename, w1, i, i1, i2, n, noff, iz )
+subroutine iovector( io, filename, w1, i, i1, i2, n, nnoff, iz )
 implicit none
 character*(*), intent(in) :: io, filename
 real, intent(in) :: w1(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3), i, n(3), noff(3), iz
+integer, intent(in) :: i1(3), i2(3), i, n(3), nnoff(3), iz
 integer :: j1, k1, l1, j2, k2, l2, reclen
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)

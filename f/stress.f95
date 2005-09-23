@@ -74,7 +74,7 @@ if ( id == 1 ) then
   i2(1) = j2
   call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
   do j = i1(1), i2(1)
-  i = j - noff(1)
+  i = j - nnoff(1)
   forall( k=i1(2):i2(2), l=i1(3):i2(3) )
     s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g1(i,k,l,ic)
     g1(i,k,l,ic) = s2(j,k,l)
@@ -85,7 +85,7 @@ if ( id == 1 ) then
   i1(1) = j1
   call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
   do j = i1(1), i2(1)
-  i = nn(1) - j + noff(1)
+  i = nn(1) - j + nnoff(1)
   forall( k=i1(2):i2(2), l=i1(3):i2(3) )
     s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g4(i,k,l,ic)
     g4(i,k,l,ic) = s2(j,k,l)
@@ -98,7 +98,7 @@ if ( id == 2 ) then
   i2(2) = k2
   call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
   do k = i1(2), i2(2)
-  i = k - noff(2)
+  i = k - nnoff(2)
   forall( j=i1(1):i2(1), l=i1(3):i2(3) )
     s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g2(j,i,l,ic)
     g2(j,i,l,ic) = s2(j,k,l)
@@ -109,7 +109,7 @@ if ( id == 2 ) then
   i1(2) = k1
   call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
   do k = i1(2), i2(2)
-  i = nn(2) - k + noff(2)
+  i = nn(2) - k + nnoff(2)
   forall( j=i1(1):i2(1), l=i1(3):i2(3) )
     s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g5(j,i,l,ic)
     g5(j,i,l,ic) = s2(j,k,l)
@@ -122,7 +122,7 @@ if ( id == 3 ) then
   i2(3) = l2
   call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
   do l = i1(3), i2(3)
-  i = l - noff(3)
+  i = l - nnoff(3)
   forall( j=i1(1):i2(1), k=i1(2):i2(2) )
     s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g3(j,k,i,ic)
     g3(j,k,i,ic) = s2(j,k,l)
@@ -133,7 +133,7 @@ if ( id == 3 ) then
   i2(3) = l2
   call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
   do l = i1(3), i2(3)
-  i = nn(3) - l + noff(3)
+  i = nn(3) - l + nnoff(3)
   forall( j=i1(1):i2(1), k=i1(2):i2(2) )
     s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g6(j,k,i,ic)
     g6(j,k,i,ic) = s2(j,k,l)

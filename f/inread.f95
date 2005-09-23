@@ -43,7 +43,7 @@ case( 'model' );       model = key2
 case( 'grid' );        grid  = key2
 case( 'rfunc' );       rfunc = key2
 case( 'tfunc' );       tfunc = key2
-case( 'n' );           read( str, * ) key1, n
+case( 'nn' );          read( str, * ) key1, nn
 case( 'nt' );          read( str, * ) key1, nt
 case( 'dx' );          read( str, * ) key1, dx
 case( 'dt' );          read( str, * ) key1, dt

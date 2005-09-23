@@ -56,10 +56,10 @@ i = ii
 end subroutine
 
 ! Real global minimum & location, send to master
-subroutine globalminloc( rmin, imin, noff )
+subroutine globalminloc( rmin, imin, nnoff )
 real, intent(inout) :: rmin
 integer, intent(inout) :: imin(3)
-integer, intent(in) :: noff
+integer, intent(in) :: nnoff
 real :: local(2), global(2)
 local(1) = rmin
 local(2) = ip
@@ -67,17 +67,17 @@ call mpi_reduce( local, global, 2, mpi_real, mpi_minloc, ipmaster, comm, err )
 rmin  = global(1)
 ipmin = global(2)
 if ( ip = ipmaster .or. ip = ipmin ) then
-  ihypo = ihypo - noff
+  ihypo = ihypo - nnoff
   call mpi_rendrecv_replace( imin, 3, mpi_integer, ipmaster, 0, ip, 0, comm, mpi_status_ignore, err )
-  ihypo = ihypo + noff
+  ihypo = ihypo + nnoff
 end if
 end subroutine
 
 ! Real global maximum & location, send to master
-subroutine globalmaxloc( rmax, imax, noff )
+subroutine globalmaxloc( rmax, imax, nnoff )
 real, intent(inout) :: rmax
 integer, intent(inout) :: imax(3)
-integer, intent(in) :: noff
+integer, intent(in) :: nnoff
 real :: local(2), global(2)
 local(1) = rmax
 local(2) = ip
@@ -85,9 +85,9 @@ call mpi_reduce( local, global, 2, mpi_real, mpi_maxloc, ipmaster, comm, err )
 rmax  = global(1)
 ipmax = global(2)
 if ( ip = ipmaster .or. ip = ipmax ) then
-  ihypo = ihypo - noff
+  ihypo = ihypo - nnoff
   call mpi_rendrecv_replace( imax, 3, mpi_integer, ipmaster, 0, ip, 0, comm, mpi_status_ignore, err )
-  ihypo = ihypo + noff
+  ihypo = ihypo + nnoff
 end if
 end subroutine
 

@@ -12,8 +12,8 @@ implicit none
 integer :: i, nl(3)
 
 ! Double nodes for fault
-nn = n
-if( ifn /= 0 ) nn(ifn) = nn(ifn) + 1
+n = nn
+if( ifn /= 0 ) n(ifn) = n(ifn) - 1
 
 ! Partition for parallelization
 nl = nn / np; where ( mod( nn, np ) /= 0 ) nl = nl + 1
@@ -30,11 +30,11 @@ call rank( np )
 nnoff = nhalo - nl * ip3
 noff = nnoff
 if ( ifn ) then
-if ( i1(ifn) > ihypo(ifn) )
-where( ihypo < 1 ) noff = noff + 1
+  if ( ihypo(ifn) < 1 ) noff = noff + 1
+end if
 
 ! Trim extra nodes off last processor
-nl = min( nl, nn + noff - nhalo )
+nl = min( nl, nn + nnoff - nhalo )
 nm = nl + 2 * nhalo
 
 ! Node region
@@ -48,8 +48,8 @@ where( ip3 /= 0      ) i1cell = i1cell - nhalo
 where( ip3 /= np - 1 ) i2cell = i2cell + nhalo
 
 ! PML region
-i1pml = 0      + noff;
-i2pml = nn + 1 + noff;
+i1pml = 0      + nnoff;
+i2pml = nn + 1 + nnoff;
 where( bc1 == 1 ) i1pml = i1pml + npml
 where( bc2 == 1 ) i2pml = i2pml - npml
 

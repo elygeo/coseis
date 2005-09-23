@@ -4,7 +4,7 @@
 
 % Wave model parameters
   model		= 'defaults'			;% model identifier
-  n		= [ 41 41 41 ]			;% nx ny nz
+  nn		= [ 41 41 42 ]			;% nx ny nz double nodes counted
   nt		= 40				;% time steps
   dx		= 100.				;% spatial step size
   dt		= .007				;% time step size

@@ -107,7 +107,7 @@ case( 'trup' ); fault = .true.
 end select
 
 if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
-call zone( i1out(i,:), i2out(i,:), nn, noff, ihypo, ifn )
+call zone( i1out(i,:), i2out(i,:), nn, nnoff, ihypo, ifn )
 if ( fault ) then
   if ( ifn == 0 ) then
     ditout(iz) = 0
@@ -121,11 +121,11 @@ if ( field(1:1) = 'w' ) i2out(i,:) = i2out(i,:) - 1
 if ( master ) then
   write( str, '(a,i2.2,a)' ) 'out/', iz, '/meta.m'
   open(  9, file=str, status='replace' )
-  write( 9, * ) 'field = ''', fieldout(iz),       ''';% variable name'
-  write( 9, * ) 'nc    =   ', nc,                   ';% number of components'
-  write( 9, * ) 'i1    = [ ', i1out(iz,:) - noff, ' ];% start index'
-  write( 9, * ) 'i2    = [ ', i2out(iz,:) - noff, ' ];% end index'
-  write( 9, * ) 'dit   =   ', ditout(iz),           ';% interval'
+  write( 9, * ) 'field = ''', fieldout(iz),        '''; % variable name'
+  write( 9, * ) 'nc    = ',   nc,                    '; % number of components'
+  write( 9, * ) 'i1    = [ ', i1out(iz,:) - nnoff, ' ]; % start index'
+  write( 9, * ) 'i2    = [ ', i2out(iz,:) - nnoff, ' ]; % end index'
+  write( 9, * ) 'dit   = ',   ditout(iz),            '; % interval'
   close( 9 )
 end if
 
@@ -152,8 +152,8 @@ if ( pass == 'w' )
   i1 = maxloc( s2 )
   umax = s1(i1(1),i1(2),i1(3))
   wmax = s2(i1(1),i1(2),i1(3))
-  call globalmaxloc( umax, umaxi, noff )
-  call globalmaxloc( wmax, wmaxi, noff )
+  call globalmaxloc( umax, umaxi, nnoff )
+  call globalmaxloc( wmax, wmaxi, nnoff )
   if ( umax > dx / 10. ) print *, 'Warning: u !<< dx'
 else
   s1 = sqrt( sum( w1 * w1, 4 ) )
@@ -162,8 +162,8 @@ else
   i1 = maxloc( s2 )
   amax  = s1(i1(1),i1(2),i1(3))
   vmax  = s2(i1(1),i1(2),i1(3))
-  call globalmaxloc( amax, amaxi, noff )
-  call globalmaxloc( vmax, vmaxi, noff )
+  call globalmaxloc( amax, amaxi, nnoff )
+  call globalmaxloc( vmax, vmaxi, nnoff )
   if ( ifn /= 0 ) then
     i1 = maxloc( sv )
     i1 = maxloc( sl )
@@ -171,8 +171,8 @@ else
     slmax = sv(i1(1),i1(2),i1(3))
     isvmax(ifn) = ihypo(ifn)
     islmax(ifn) = ihypo(ifn)
-    call globalmaxloc( svmax, svmaxi, noff )
-    call globalmaxloc( slmax, slmaxi, noff )
+    call globalmaxloc( svmax, svmaxi, nnoff )
+    call globalmaxloc( slmax, slmaxi, nnoff )
   end if
 end if
 
@@ -204,20 +204,20 @@ do i = 1, nc
   write( str, '(a,i2.2,a,a,i1,i6.6)' ) &
     'out/', iz, '/', trim( out_field(iz) ), i, it
   select case( fieldout(iz) )
-  case( 'x'    ); call iovector( 'w', str, x,  i,    i1, i2, n, noff, iz )
-  case( 'a'    ); call iovector( 'w', str, w1, i,    i1, i2, n, noff, iz )
-  case( 'v'    ); call iovector( 'w', str, v,  i,    i1, i2, n, noff, iz )
-  case( 'u'    ); call iovector( 'w', str, u,  i,    i1, i2, n, noff, iz )
+  case( 'x'    ); call iovector( 'w', str, x,  i,    i1, i2, n, nnoff, iz )
+  case( 'a'    ); call iovector( 'w', str, w1, i,    i1, i2, n, nnoff, iz )
+  case( 'v'    ); call iovector( 'w', str, v,  i,    i1, i2, n, nnoff, iz )
+  case( 'u'    ); call iovector( 'w', str, u,  i,    i1, i2, n, nnoff, iz )
   case( 'w'    );
-    if ( i < 4 )  call iovector( 'w', str, w1, i,    i1, i2, n, noff, iz )
-    if ( i > 3 )  call iovector( 'w', str, w2, i-3,  i1, i2, n, noff, iz )
-  case( 'am'   ); call ioscalar( 'w', str, s1,       i1, i2, n, noff, iz )
-  case( 'vm'   ); call ioscalar( 'w', str, s2,       i1, i2, n, noff, iz )
-  case( 'um'   ); call ioscalar( 'w', str, s1,       i1, i2, n, noff, iz )
-  case( 'wm'   ); call ioscalar( 'w', str, s2,       i1, i2, n, noff, iz )
-  case( 'sv'   ); call ioscalar( 'w', str, sv,       i1, i2, n, noff, iz )
-  case( 'sl'   ); call ioscalar( 'w', str, sl,       i1, i2, n, noff, iz )
-  case( 'trup' ); call ioscalar( 'w', str, trup,     i1, i2, n, noff, iz )
+    if ( i < 4 )  call iovector( 'w', str, w1, i,    i1, i2, n, nnoff, iz )
+    if ( i > 3 )  call iovector( 'w', str, w2, i-3,  i1, i2, n, nnoff, iz )
+  case( 'am'   ); call ioscalar( 'w', str, s1,       i1, i2, n, nnoff, iz )
+  case( 'vm'   ); call ioscalar( 'w', str, s2,       i1, i2, n, nnoff, iz )
+  case( 'um'   ); call ioscalar( 'w', str, s1,       i1, i2, n, nnoff, iz )
+  case( 'wm'   ); call ioscalar( 'w', str, s2,       i1, i2, n, nnoff, iz )
+  case( 'sv'   ); call ioscalar( 'w', str, sv,       i1, i2, n, nnoff, iz )
+  case( 'sl'   ); call ioscalar( 'w', str, sl,       i1, i2, n, nnoff, iz )
+  case( 'trup' ); call ioscalar( 'w', str, trup,     i1, i2, n, nnoff, iz )
   case default; stop 'fieldout'
   end select
 end do
@@ -260,21 +260,21 @@ if ( master ) then
   print '(5es14.6)', t, amax, vmax, umax, dtwall
   write( str, '(a,i6.6,a)' ) 'out/stats/', it, '.m'
   open(  9, file=str, status='replace' )
-  write( 9, * ) 't      = ', t,             ';% time'
-  write( 9, * ) 'dt     = ', dt,            ';% timestep size'
-  write( 9, * ) 'dtwall = ', dtwall,        ';% wall clock time for this step'
-  write( 9, * ) 'amax   = ', amax,          ';% max acceleration'
-  write( 9, * ) 'amaxi  = ', amaxi - noff,  ';% max acceleration location'
-  write( 9, * ) 'vmax   = ', vmax,          ';% max velocity'
-  write( 9, * ) 'vmaxi  = ', vmaxi - noff,  ';% max velocity location'
-  write( 9, * ) 'umax   = ', umax,          ';% max displacement'
-  write( 9, * ) 'umaxi  = ', umaxi - noff,  ';% max displacement location'
-  write( 9, * ) 'wmax   = ', wmax,          ';% max stress (frobenius norm)'
-  write( 9, * ) 'wmaxi  = ', wmaxi - noff,  ';% max stress location'
-  write( 9, * ) 'svmax  = ', svmax,         ';% max slip velocity'
-  write( 9, * ) 'svmaxi = ', svmaxi - noff, ';% max slip velocity location'
-  write( 9, * ) 'slmax  = ', slmax,         ';% max slip path length'
-  write( 9, * ) 'slmaxi = ', slmaxi - noff, ';% max slip path length location'
+  write( 9, * ) 't      = ',   t,                '; % time'
+  write( 9, * ) 'dt     = ',   dt,               '; % timestep size'
+  write( 9, * ) 'dtwall = ',   dtwall,           '; % wall time per step'
+  write( 9, * ) 'amax   = ',   amax,             '; % max acceleration'
+  write( 9, * ) 'amaxi  = [ ', amaxi - nnoff,  ' ]; % max acceleration loc'
+  write( 9, * ) 'vmax   = ',   vmax,             '; % max velocity'
+  write( 9, * ) 'vmaxi  = [ ', vmaxi - nnoff,  ' ]; % max velocity loc'
+  write( 9, * ) 'umax   = ',   umax,             '; % max displacement'
+  write( 9, * ) 'umaxi  = [ ', umaxi - nnoff,  ' ]; % max displacement loc'
+  write( 9, * ) 'wmax   = ',   wmax,             '; % max stress Frobenius norm'
+  write( 9, * ) 'wmaxi  = [ ', wmaxi - nnoff,    '; % max stress loc'
+  write( 9, * ) 'svmax  = ',   svmax,            '; % max slip velocity'
+  write( 9, * ) 'svmaxi = [ ', svmaxi - nnoff, ' ]; % max slip velocity loc'
+  write( 9, * ) 'slmax  = ',   slmax,            '; % max slip path length'
+  write( 9, * ) 'slmaxi = [ ', slmaxi - nnoff, ' ]; % max slip path length loc'
   close( 9 )
 end if
 
