@@ -11,7 +11,7 @@ use zone_m
 
 implicit none
 real :: theta, scl
-integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up, noffset(3)
 real :: lj, lk, ll, rhypo
 
 if ( master ) print '(a)', 'Grid generation'
@@ -23,11 +23,15 @@ i1oper(1,:) = i1
 i2oper(1,:) = i2
 noper = 1
 
-! No split nodes yet
-! FIXME
+! Account for split nodes
+noffset = noff
 if ( ifn ) then
-  if ( i1(ifn) > ihypo(ifn) ) i1(ifn) = i1(ifn) - 1
-  if ( i2(ifn) > ihypo(ifn) ) i2(ifn) = i2(ifn) - 1
+  i = ihypo(ifn)
+  if ( i1(ifn) > i ) then
+    noffset(ifn) = noffset(ifn) + 1
+  else if ( i2(ifn) > i ) then
+    i2(ifn) = i2(ifn) - 1
+  end if
 end if
 
 j1 = i1(1); j2 = i2(1)
@@ -38,13 +42,13 @@ l1 = i1(3); l2 = i2(3)
 x = 0.
 if ( grid == 'read' ) then
   oper = 'o'
-  call iovector( 'r', 'data/x1', x, i1, i2, 1, n, noff )
-  call iovector( 'r', 'data/x2', x, i1, i2, 2, n, noff )
-  call iovector( 'r', 'data/x3', x, i1, i2, 3, n, noff )
+  call iovector( 'r', 'data/x1', x, i1, i2, 1, n, noffset )
+  call iovector( 'r', 'data/x2', x, i1, i2, 2, n, noffset )
+  call iovector( 'r', 'data/x3', x, i1, i2, 3, n, noffset )
 else
-  forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - noff(1) )
-  forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - 1 - noff(2) )
-  forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - 1 - noff(3) )
+  forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - noffset(1) )
+  forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - 1 - noffset(2) )
+  forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - 1 - noffset(3) )
 end if
 
 ! Coordinate system
@@ -110,10 +114,9 @@ if( ip3(3) == 0         ) x(:,:,j1-1,:) = x(:,:,j1,:)
 if( ip3(3) == np(3) - 1 ) x(:,:,l2+1,:) = x(:,:,l2,:)
 
 ! Fault plane split nodes
-! FIXME
 if ( ifn /= 0 ) then
-  if ( i1(ifn) <= ihypo(ifn) .and. i2(ifn) > ihypo(ifn) ) then
-    i = ihypo(ifn)
+  i = ihypo(ifn)
+  if ( i1(ifn) <= i .and. i2(ifn) > i ) then
     select case( ifn )
     case( 1 ); x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:)
     case( 2 ); x(:,i+1:k2,:,:) = x(:,i:k2-1,:,:)
@@ -122,6 +125,7 @@ if ( ifn /= 0 ) then
   end if
 end if
 
+! Assign fast operators to rectangular mesh portions
 if ( oper(1) == 'o' ) call optimize
 
 ! Hypocenter location

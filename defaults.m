@@ -25,9 +25,10 @@
 % bc		= [ 1 1 1   1 1 1 ]		;% absorbing on all sides
 % bc		= [ 1 1 1   1 1 0 ]		;% free surface at l=nz
   bc		= [ 1 0 1   1 1 1 ]		;% free surface at k=1
+  ihypo		= [ 0 0 0 ]			;% 0=default center mesh node
+  xhypo		= [ -1. -1. -1. ]		;% <0=defualt x(ihypo)
 
 % Moment source parameters
-  xhypo		= [ 2000. 2000. 2000. ]		;% source location
 % rfunc		= 'box'				;% uniform spatial weighting
   rfunc		= 'tent'			;% tapered spatial weighting
 % tfunc		= 'delta'			;% impulse time function
@@ -42,7 +43,6 @@
 % faultnormal	= 0				;% no fault
 % faultnormal	= 2				;% constant k fault plane
   faultnormal	= 3				;% constant l fault plane
-  fautlplane	= 0				;% 0=center of the mesh
   mus		= [ .6        1 1 1  -1 -1 -1 ]	;% **coef of static friction
   mud		= [ .5        1 1 1  -1 -1 -1 ]	;% **coef of static friction
   dc		= [ .25       1 1 1  -1 -1 -1 ]	;% **slip-weakening distance
