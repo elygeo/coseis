@@ -101,14 +101,12 @@ real :: &
   truptol         ! min slip velocity to declare rupture
 
 integer, dimension(3) :: &
-  n,            & ! number of global nodes, double nodes counted once
-  nn,           & ! number of global nodes, double nodes counted twice
+  nn,           & ! number of global nodes, count double nodes twice
   nm,           & ! size of local 3D arrays
   np,           & ! number of processors
   bc1,          & ! boundary conditions for j1 k1 l1
   bc2,          & ! boundary conditions for j2 k2 l2
-  noff,         & ! offset between local and global indices single fault nodes
-  nnoff,        & ! offset between local and global indices double fault nodes
+  nnoff,        & ! offset between local and global indices
   ihypo,        & ! hypocenter node
   i1node,       & ! node calculations start index
   i2node,       & ! node calculations end index
@@ -118,13 +116,12 @@ integer, dimension(3) :: &
   i2pml           ! PML boundary
 
 integer :: &
-  upward,       & ! upward direction
   nt,           & ! number of time steps
-  npml,         & ! number of PML damping nodes
-  ifn,          & ! fault normal direction
   it,           & ! current time step
   itcheck,      & ! interval for checkpointing
-  wt(6),        & ! wall clock timing array
+  npml,         & ! number of PML damping nodes
+  upward,       & ! upward direction
+  ifn,          & ! fault normal direction
   noper,        & ! number of zones for spatial derivative operators
   i1oper(2,3),  & ! j1 k1 l1 operator zone start index
   i2oper(2,3),  & ! j2 k2 l2 operator zone end index
@@ -132,13 +129,13 @@ integer :: &
   i1in(nz,3),   & ! j1 k1 l1 input start index
   i2in(nz,3),   & ! j1 k1 l1 input end index
   nlock,        & ! number of zones for locking velocity
+  lock(nz,3),   & ! flag for locking v1 v2 v3
   i1lock(nz,3), & ! j1 k1 l1 lock zone start index
   i2lock(nz,3), & ! j2 k2 l2 lock zone end index
-  lock(nz,3),   & ! flag for locking v1 v2 v3
   nout,         & ! number of zones for output
+  ditout(nz),   & ! interval for writing output
   i1out(nz,3),  & ! j1 k1 l1 input zone start index
-  i2out(nz,3),  & ! j2 k2 l2 input zone end index
-  ditout(nz)      ! interval for writing output
+  i2out(nz,3)     ! j2 k2 l2 input zone end index
 
 character :: &
   oper(2)         ! spatial derivative operators

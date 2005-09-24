@@ -22,15 +22,16 @@ call mpi_finalize( err )
 end subroutine
 
 ! Processor rank
-subroutine rank( np, ip3master )
-integer, intent(in) :: np(3), ip3master(3)
+subroutine rank( np )
+integer, intent(in) :: np(3)
 call mpi_cart_create( mpi_comm_world, 3, np, period, .true., comm, err )
 if ( comm == mpi_comm_null ) then
   print *, 'Unused processor: ', ip
   call mpi_finalize( err )
   stop
 end if
-call mpi_comm_rank( comm, ip, err  )
+!call mpi_comm_rank( comm, ip, err  )
+ip = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
 call mpi_cart_coords( comm, ip, 3, ip3, err )
 call mpi_cart_rank( comm, ip3master, ipmaster, err )
 master = .false.

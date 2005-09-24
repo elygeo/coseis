@@ -3,7 +3,7 @@
 
 module collective_m
 implicit none
-integer :: ip3(3) = 0, ip3master(3) = 0
+integer :: ip, ip3(3), ip3master(3)
 logical :: master = .true.
 contains
 
@@ -15,6 +15,8 @@ end subroutine
 
 subroutine rank( np )
 integer :: np(3)
+ip = 0
+ip3 = 0
 end subroutine
 
 subroutine broadcast( r )

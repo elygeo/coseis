@@ -11,10 +11,6 @@ subroutine setup
 implicit none
 integer :: i, nl(3)
 
-! Double nodes for fault
-n = nn
-if( ifn /= 0 ) n(ifn) = n(ifn) - 1
-
 ! Partition for parallelization
 nl = nn / np; where ( mod( nn, np ) /= 0 ) nl = nl + 1
 np = nn / nl; where ( mod( nn, nl ) /= 0 ) np = np + 1
@@ -28,10 +24,6 @@ call rank( np )
 
 ! Offset: add to global index to get memory index
 nnoff = nhalo - nl * ip3
-noff = nnoff
-if ( ifn /= 0 ) then
-  if ( ihypo(ifn) < 1 ) noff = noff + 1
-end if
 
 ! Trim extra nodes off last processor
 nl = min( nl, nn + nnoff - nhalo )

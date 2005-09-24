@@ -18,7 +18,7 @@ logical :: init = .true.
 
 if ( ifn == 0 ) return
 
-ifinit: if ( init ) then
+ifinit: if ( init ) then !--------------------------------------!
 
 init = .false.
 if ( master ) print '(a)', 'Initialize fault'
@@ -191,9 +191,7 @@ end if
 
 return
 
-end if ifinit
-
-!--------------------------------------!
+end if ifinit !--------------------------------------!
 
 ! Indices
 i1 = 1

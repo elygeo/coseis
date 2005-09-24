@@ -11,7 +11,7 @@ contains
 subroutine material
 
 implicit none
-integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, iz
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, iz, n(3), noff(3)
 
 if ( master ) print '(a)', 'Material model'
 
@@ -27,16 +27,27 @@ vs1 = 1e9
 vs2 = 0.
 
 doiz: do iz = 1, nin
+ifreadfile: if ( readfile(i) ) then !--------------------------------------!
 
-ifreadfile: if ( readfile(i) ) then
-
+! Single node indexing
+n = nn
+noff = nnoff
+if ( ifn /= 0 ) then
+  n(ifn) = n(ifn) - 1
+  if ( ihypo(ifn) < 1 ) noff = noff + 1
+end if
 i1 = i1cell
 i2 = i2cell + 1
+
+! Read binary files
 select case ( fieldin(iz) )
 case ( 'rho' ); call ioscalar( 'r', 'data/rho', mr, i1, i2, n, noff, 0 )
 case ( 'vp'  ); call ioscalar( 'r', 'data/vp',  s1, i1, i2, n, noff, 0 )
 case ( 'vs'  ); call ioscalar( 'r', 'data/vs',  s2, i1, i2, n, noff, 0 )
+case default; stop 'fieldin'
 end select
+
+! Create double nodes
 if ( ifn /= 0 ) then
 if ( ihypo(ifn) >= i1(ifn) .and. ihypo(ifn) < i2(ifn) ) then
   i = ihypo(ifn)
@@ -56,6 +67,8 @@ if ( ihypo(ifn) >= i1(ifn) .and. ihypo(ifn) < i2(ifn) ) then
   end select
 end if
 end if
+
+! Check extreme values
 rho = minval( mr, mr > 0. )
 vp = minval( s1, s1 > 0. )
 vs = minval( s2, s2 > 0. )
@@ -69,14 +82,17 @@ if ( rho > rho2 ) print *, 'Warning: rho excedes max: ', rho, rho2
 if ( vp > vp2 )   print *, 'Warning: vp excedes max: ',  vp, vp2
 if ( vs > vs2 )   print *, 'Warning: vs excedes max: ',  vs, vs2
 
-else
+else !--------------------------------------!
 
+! Assign by zones
 call zone( i1in(iz,:), i2in(iz,:), nn, nnoff, ihypo, ifn )
 i1 = max( i1in(iz,:), i1cell )
 i2 = min( i2in(iz,:), i2cell + 1 )
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
+
+! Find extreme values
 select case ( fieldin(i) )
 case ( 'rho' )
   mr(j1:j2,k1:k2,l1:l2) = inval(iz)
@@ -90,13 +106,11 @@ case ( 'vs'  )
   s2(j1:j2,k1:k2,l1:l2) = inval(iz)
   vs1 = min( rho1, inval(iz) )
   vs2 = max( rho2, inval(iz) )
+case default; stop 'fieldin'
 end select
 
-end if ifreadfile
-
+end if ifreadfile !--------------------------------------!
 end do doiz
-
-! Fault plane split nodes
 
 ! Hypocenter values
 if ( master ) then

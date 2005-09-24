@@ -12,7 +12,7 @@ subroutine gridgen
 
 implicit none
 real :: theta, scl
-integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up, n(3), noff(3)
 real :: lj, lk, ll, rhypo
 
 if ( master ) print '(a)', 'Grid generation'
@@ -20,26 +20,22 @@ if ( master ) print '(a)', 'Grid generation'
 ! Indices
 i1 = i1cell
 i2 = i2cell + 1
-i1oper(1,:) = i1
-i2oper(1,:) = i2
-noper = 1
-
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
-! Read grid files or create basic rectangular mesh
-x = 0.
-if ( grid == 'read' ) then
-  oper = 'o'
-  call iovector( 'r', 'data/x1', x, 1, i1, i2, n, noff, 0 )
-  call iovector( 'r', 'data/x2', x, 2, i1, i2, n, noff, 0 )
-  call iovector( 'r', 'data/x3', x, 3, i1, i2, n, noff, 0 )
-else
-  forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - noff(1) )
-  forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - 1 - noff(2) )
-  forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - 1 - noff(3) )
+! Single node indexing
+n = nn
+noff = nnoff
+if ( ifn /= 0 ) then
+  n(ifn) = n(ifn) - 1
+  if ( ihypo(ifn) < 1 ) noff = noff + 1
 end if
+
+! Dimensions
+lj = dx * ( n(1) - 1 )
+lk = dx * ( n(2) - 1 )
+ll = dx * ( n(3) - 1 )
 
 ! Coordinate system
 l  = abs( upward )
@@ -51,14 +47,22 @@ else
 end if
 j = 6 - k - l
 
-! Dimensions
-lj = dx * ( n(1) - 1 )
-lk = dx * ( n(2) - 1 )
-ll = dx * ( n(3) - 1 )
+! Read grid files or create basic rectangular mesh
+x = 0.
+if ( grid == 'read' ) then
+  call iovector( 'r', 'data/x1', x, 1, i1, i2, n, noff, 0 )
+  call iovector( 'r', 'data/x2', x, 2, i1, i2, n, noff, 0 )
+  call iovector( 'r', 'data/x3', x, 3, i1, i2, n, noff, 0 )
+else
+  forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - noff(1) )
+  forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - 1 - noff(2) )
+  forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - 1 - noff(3) )
+end if
 
-! Mesh models
+! Mesh type
 select case( grid )
 case( 'read' )
+  oper = 'o'
 case( 'constant' )
   oper = 'h'
 case( 'stretch' )
@@ -103,7 +107,7 @@ if( ip3(2) == np(2) - 1 ) x(:,k2+1,:,:) = x(:,k2,:,:)
 if( ip3(3) == 0         ) x(:,:,j1-1,:) = x(:,:,j1,:)
 if( ip3(3) == np(3) - 1 ) x(:,:,l2+1,:) = x(:,:,l2,:)
 
-! Fault plane split nodes
+! Create fault double nodes
 if ( ifn /= 0 ) then
 if ( ihypo(ifn) >= i1(ifn) .and. ihypo(ifn) < i2(ifn) ) then
   i = ihypo(ifn)
@@ -116,6 +120,9 @@ end if
 end if
 
 ! Assign fast operators to rectangular mesh portions
+noper = 1
+i1oper(1,:) = i1
+i2oper(1,:) = i2
 if ( oper(1) == 'o' ) call optimize
 
 ! Hypocenter location

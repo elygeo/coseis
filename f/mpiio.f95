@@ -15,16 +15,17 @@ call mpi_comm_split( comm, ditout, 0, commout(iz), err )
 end subroutine
 
 ! Input/output scalar
-subroutine ioscalar( io, filename, s1, i1, i2, nn, nnoff, iz )
+subroutine ioscalar( io, filename, s1, i1, i2, n, noff, iz )
 character*(*), intent(in) :: io, filename
 real, intent(in) :: s1(:,:,:)
-integer, intent(in) :: i1(3), i2(3), nn(3), nnoff, iz
-integer :: ftype, mtype, fh, d=0, nl(3), ng(3), i0(3), mode
+integer, intent(in) :: i1(3), i2(3), n(3), noff, iz
+integer :: ftype, mtype, fh, d=0, nl(3), ng(3), i0(3), mode, &
+  mof = mpi_order_fortran
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, err )
-ng = nn
+ng = n
 nl = i2 - i1 + 1
-i0 = i1 - 1 - nnoff
-call mpi_type_create_subarray( 3, nn, nl, i0, mof, mpi_real, ftype, err )
+i0 = i1 - 1 - noff
+call mpi_type_create_subarray( 3, ng, nl, i0, mof, mpi_real, ftype, err )
 call mpi_type_commit( ftype, err )
 ng = (/ size(w1,1), size(w1,2), size(w1,3) /)
 nl = i2 - i1 + 1
@@ -50,20 +51,21 @@ call mpi_type_free( ftype, err )
 end subroutine
 
 ! Input/output vector component
-subroutine iovector( io, filename, w1, i, i1, i2, nn, nnoff, iz )
+subroutine iovector( io, filename, w1, i, i1, i2, n, noff, iz )
 character*(*), intent(in) :: io, filename
 real, intent(in) :: w1(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3), nn(3), nnoff, i, iz
-integer :: ftype, mtype, fh, d = 0, nl(4), ng(4), i0(4), mode
+integer, intent(in) :: i1(3), i2(3), n(3), noff, i, iz
+integer :: ftype, mtype, fh, d = 0, nl(4), ng(4), i0(4), mode, &
+  mof = mpi_order_fortran
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, err )
-ng = (/ nn,             3     /)
-nl = (/ i2 - i1 + 1,    1     /)
-i0 = (/ i1 - 1 - nnoff, i - 1 /)
+ng = (/ n,             3     /)
+nl = (/ i2 - i1 + 1,   1     /)
+i0 = (/ i1 - 1 - noff, i - 1 /)
 call mpi_type_create_subarray( 4, ng, nl, i0, mof, mpi_real, ftype, err )
 call mpi_type_commit( ftype, err )
 ng = (/ size(w1,1), size(w1,2), size(w1,3), size(w1,4) /)
-nl = (/ i2 - i1 + 1,    1     /)
-i0 = (/ i1 - 1,         i - 1 /)
+nl = (/ i2 - i1 + 1,   1     /)
+i0 = (/ i1 - 1,        i - 1 /)
 call mpi_type_create_subarray( 4, ng, nl, i0, mof, mpi_real, mtype, err )
 call mpi_type_commit( mtype, err )
 select case( io )

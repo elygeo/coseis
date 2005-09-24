@@ -11,20 +11,20 @@ subroutine output( pass )
 implicit none
 save
 real :: dtwall(4), courant, amax, vmax, umax, wmax, svmax, slmax
-integer :: iz, nc, reclen, twall_rate, err, &
-  iamax(3), ivmax(3), iumax(3), iwmax(3), isvmax(3), islmax(3)
+integer :: i, i1(3), i2(3), iz, nc, n(3), noff(3), reclen, twall(2), err, &
+  twall_rate, amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3)
 character, intent(in) :: pass
 character :: onpass, endian
 character(160) :: str
 logical :: fault, static, init = .true., test
 
-ifinit: if ( init ) then
+ifinit: if ( init ) then !--------------------------------------!
 
 init = .false.
 call system_clock( count_rate=twall_rate )
 if ( itcheck < 0 ) itcheck = itcheck + nt + 1
 
-! Look for previous checkpoint files
+! Look for checkpoint
 write( str, '(a,i6.6,a)' ) 'out/ckp/', ip, '.hdr'
 open( 9, file=str, status='old', iostat=err )
 if ( err == 0 ) then
@@ -35,68 +35,69 @@ else
 end if
 call globalmin( it )
 
-! Read checkpoint file if found, if not setup output
-ifrestart: if ( it /= 0 ) then
-  if ( master ) print '(a,i6)', 'Checkpoint found, starting from step ', it
-  i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
-  write( str, '(a,i6.6,i6.6)' ) 'out/ckp/', i, it
-  inquire( iolength=reclen ) &
-    t, v, u, sl, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
-  open( 9, &
-    file=str, &
-    recl=reclen, &
-    form='unformatted', &
-    access='direct', &
-    status='old' )
-  read( 9, rec=1 ) &
-    t, v, u, sl, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
-  close( 9 )
-else
-  if ( master ) then
-    inquire( file='out/timestep', exist=test )
-    if ( err /= 0 ) then
-      print '(a)', 'Error: previous output found. use -d flag to overwrite'
-      stop
-    end if
-    print '(a)', 'Initialize output'
-    call system( 'mkdir out/ckp' )
-    call system( 'mkdir out/stats' )
-    do iz = 1, nout
-      write( str, '(a,i2.2)' ) 'out/', iz
-      call system( 'mkdir ' // str )
-    end do
-    courant = dt * vp2 * sqrt( 3. ) / abs( dx )
-    endian = 'l'
-    if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
-    write( str, '(a,i2.2,a)' ) 'out/meta.m'
-    open(  9, file=str, status='new' )
-    write( 9, * ) ' rho1    =   ', rho1,     ';% minimum density'
-    write( 9, * ) ' vp1     =   ', vp1,      ';% minimum Vp'
-    write( 9, * ) ' vs1     =   ', vs1,      ';% minimum Vp'
-    write( 9, * ) ' rho2    =   ', rho2,     ';% maximum density'
-    write( 9, * ) ' vp2     =   ', vp2,      ';% maximum Vp'
-    write( 9, * ) ' vs2     =   ', vs2,      ';% maximum Vp'
-    write( 9, * ) ' rho     =   ', rho,      ';% hypocenter density'
-    write( 9, * ) ' vp      =   ', vp,       ';% hypocenter Vp'
-    write( 9, * ) ' vs      =   ', vs,       ';% hypocenter Vp'
-    write( 9, * ) ' courant =   ', courant,  ';% stability condition'
-    write( 9, * ) ' xhypo   = [ ', xhypo, '  ];% hypocenter location'
-    write( 9, * ) ' nout    =   ', nout,     ';% number output zones'
-    write( 9, * ) ' endian  = ''', endian, ''';% byte ordert'
-    close( 9 )
-  end if
-end if ifrestart
+ifrestart: if ( it /= 0 ) then !------------------!
 
-! Initialize output
+! Read checkpoint
+if ( master ) print '(a,i6)', 'Checkpoint found, starting from step ', it
+write( str, '(a,i6.6,i6.6)' ) 'out/ckp/', ip, it
+inquire( iolength=reclen ) &
+  t, v, u, sl, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
+open( 9, &
+  file=str, &
+  recl=reclen, &
+  form='unformatted', &
+  access='direct', &
+  status='old' )
+read( 9, rec=1 ) &
+  t, v, u, sl, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
+close( 9 )
+
+else if ( master ) then !------------------!
+
+! Check for previus run
+inquire( file='out/timestep', exist=test )
+if ( err /= 0 ) then
+  print '(a)', 'Error: previous output found. use -d flag to overwrite'
+  stop
+end if
+print '(a)', 'Initialize output'
+
+! Create directories
+call system( 'mkdir out/ckp' )
+call system( 'mkdir out/stats' )
+do iz = 1, nout
+  write( str, '(a,i2.2)' ) 'out/', iz
+  call system( 'mkdir ' // str )
+end do
+
+! Metadata
+endian = 'l'
+if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
+courant = dt * vp2 * sqrt( 3. ) / abs( dx )
+write( str, '(a,i2.2,a)' ) 'out/meta.m'
+open(  9, file=str, status='new' )
+write( 9, * ) ' rho1    =   ', rho1,     ';% minimum density'
+write( 9, * ) ' vp1     =   ', vp1,      ';% minimum Vp'
+write( 9, * ) ' vs1     =   ', vs1,      ';% minimum Vp'
+write( 9, * ) ' rho2    =   ', rho2,     ';% maximum density'
+write( 9, * ) ' vp2     =   ', vp2,      ';% maximum Vp'
+write( 9, * ) ' vs2     =   ', vs2,      ';% maximum Vp'
+write( 9, * ) ' rho     =   ', rho,      ';% hypocenter density'
+write( 9, * ) ' vp      =   ', vp,       ';% hypocenter Vp'
+write( 9, * ) ' vs      =   ', vs,       ';% hypocenter Vp'
+write( 9, * ) ' courant =   ', courant,  ';% stability condition'
+write( 9, * ) ' xhypo   = [ ', xhypo, '  ];% hypocenter location'
+write( 9, * ) ' nout    =   ', nout,     ';% number output zones'
+write( 9, * ) ' endian  = ''', endian, ''';% byte ordert'
+close( 9 )
+
+end if ifrestart !------------------!
 
 if ( nout > nz ) stop 'too many output zones, make nz bigger'
 
-doizinit: do iz = 1, nout
+doizinit: do iz = 1, nout !------------------!
 
-nc = 1
-fault = .false.
-field = fieldout(iz)
-select case( field )
+select case( fieldout(iz) )
 case( 'x'    ); nc = 3
 case( 'a'    ); nc = 3
 case( 'v'    ); nc = 3
@@ -105,6 +106,7 @@ case( 'w'    ); nc = 6
 case( 'sv'   ); fault = .true.
 case( 'sl'   ); fault = .true.
 case( 'trup' ); fault = .true.
+case default; nc = 1; fault = .false.
 end select
 
 if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
@@ -117,13 +119,14 @@ if ( fault ) then
     i2out(iz,ifn) = ihypo(ifn)
   end if
 end if
-if ( field(1:1) == 'w' ) i2out(i,:) = i2out(i,:) - 1
+if ( fieldout(iz)(1:1) == 'w' ) i2out(i,:) = i2out(i,:) - 1
 
+! Metadata
 if ( master ) then
   write( str, '(a,i2.2,a)' ) 'out/', iz, '/meta.m'
   open(  9, file=str, status='replace' )
   write( 9, * ) ' field = ''', fieldout(iz),        '''; % variable name'
-  write( 9, * ) ' nc    = ',   nc,                    '; % number of components'
+  write( 9, * ) ' nc    = ',   nc,                    '; % # of components'
   write( 9, * ) ' i1    = [ ', i1out(iz,:) - nnoff, ' ]; % start index'
   write( 9, * ) ' i2    = [ ', i2out(iz,:) - nnoff, ' ]; % end index'
   write( 9, * ) ' dit   = ',   ditout(iz),            '; % interval'
@@ -133,7 +136,7 @@ end if
 if ( any( i2 < i1 ) ) ditout(iz) = 0
 call iosplit( iz, ditout(iz) )
 
-end do doizinit
+end do doizinit !------------------!
 
 if ( master ) then
   print '(a)', 'Time       Amax        Vmax        Umax        Wall Time'
@@ -141,12 +144,10 @@ end if
 
 return
 
-end if ifinit
-
-!--------------------------------------!
+end if ifinit !--------------------------------------!
 
 ! Magnitudes
-if ( pass == 'w' )
+if ( pass == 'w' ) then
   s1 = sqrt( sum( u * u, 4 ) )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
   i1 = maxloc( s1 )
@@ -182,16 +183,17 @@ doiz: do iz = 1, nout
 
 if ( ditout(iz) == 0 .or. mod( it, ditout(iz) ) /= 0 ) cycle doiz
 
-onpass = 'a'
-
+! Select pass
+select case( fieldout(iz)(1:1) )
+case( 'w' );  onpass = 'w'
+case( 'u' );  onpass = 'w'
+case default; onpass = 'a'
+end select
 if ( onpass /= pass ) cycle doiz
 
 i1 = i1out(iz,:)
 i2 = i2out(iz,:)
-
-! FIXME global size, then bounds on local size
-
-if ( ditout(iz) == 0 ) cycle doiz
+n = i2 - i1 + 1
 
 if ( fieldout(iz) == 'x' ) ditout(iz) = 0
 
@@ -227,14 +229,11 @@ end do doiz
 
 if ( pass == 'w' ) return
 
-!--------------------------------------!
-
 ! Write checkpoint
 if ( itcheck /= 0 .and. mod( it, itcheck ) == 0 ) then
   inquire( iolength=reclen ) &
     t, v, u, sl, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
-  i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
-  write( str, '(a,i6.6,i6.6)') 'out/ckp/', i, it
+  write( str, '(a,i6.6,i6.6)') 'out/ckp/', ip, it
   open( 9, &
     file=str, &
     recl=reclen, &

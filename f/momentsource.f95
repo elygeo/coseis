@@ -18,7 +18,7 @@ real :: srcft, m0, mw, d, mm(3,3), eigval(3), eigwork(8)
 
 if ( rsource <= 0. ) return
 
-ifinit: if ( init ) then
+ifinit: if ( init ) then !--------------------------------------!
 
 init = .false.
 if ( master ) print '(a)', 'Moment source'
@@ -99,12 +99,9 @@ if ( master ) then
   close( 9 )
 end if
 
-
 return
 
-end if ifinit
-
-!------------------------------------------------------------------------------!
+end if ifinit !--------------------------------------!
 
 ! Source time function
 select case( tfunc )
