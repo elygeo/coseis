@@ -140,6 +140,7 @@ OBJECT="\\
   material.o \\
   momentsource.o \\
   fault.o \\
+  checkpoint.o \\
   output.o \\
   pml.o \\
   stress.o \\

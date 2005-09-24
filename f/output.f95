@@ -5,6 +5,7 @@ module output_m
 use globals_m
 use collective_m
 use collectiveio_m
+use checkpoint_m
 contains
 subroutine output( pass )
 
@@ -21,125 +22,103 @@ logical :: fault, static, init = .true., test
 ifinit: if ( init ) then !--------------------------------------!
 
 init = .false.
-call system_clock( count_rate=twall_rate )
-if ( itcheck < 0 ) itcheck = itcheck + nt + 1
-
-! Look for checkpoint
-write( str, '(a,i6.6,a)' ) 'out/ckp/', ip, '.hdr'
-open( 9, file=str, status='old', iostat=err )
-if ( err == 0 ) then
-  read( 9, * ) it
-  close( 9 )
-else
-  it = 0
-end if
-call globalmin( it )
-
-ifrestart: if ( it /= 0 ) then !------------------!
-
-! Read checkpoint
-if ( master ) print '(a,i6)', 'Checkpoint found, starting from step ', it
-write( str, '(a,i6.6,i6.6)' ) 'out/ckp/', ip, it
-inquire( iolength=reclen ) &
-  t, v, u, sl, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
-open( 9, &
-  file=str, &
-  recl=reclen, &
-  form='unformatted', &
-  access='direct', &
-  status='old' )
-read( 9, rec=1 ) &
-  t, v, u, sl, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
-close( 9 )
-
-else if ( master ) then !------------------!
-
-! Check for previus run
-inquire( file='out/timestep', exist=test )
-if ( err /= 0 ) then
-  print '(a)', 'Error: previous output found. use -d flag to overwrite'
-  stop
-end if
-print '(a)', 'Initialize output'
-
-! Create directories
-call system( 'mkdir out/ckp' )
-call system( 'mkdir out/stats' )
-do iz = 1, nout
-  write( str, '(a,i2.2)' ) 'out/', iz
-  call system( 'mkdir ' // str )
-end do
-
-! Metadata
-endian = 'l'
-if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
-courant = dt * vp2 * sqrt( 3. ) / abs( dx )
-write( str, '(a,i2.2,a)' ) 'out/meta.m'
-open(  9, file=str, status='new' )
-write( 9, * ) ' rho1    =   ', rho1,     ';% minimum density'
-write( 9, * ) ' vp1     =   ', vp1,      ';% minimum Vp'
-write( 9, * ) ' vs1     =   ', vs1,      ';% minimum Vp'
-write( 9, * ) ' rho2    =   ', rho2,     ';% maximum density'
-write( 9, * ) ' vp2     =   ', vp2,      ';% maximum Vp'
-write( 9, * ) ' vs2     =   ', vs2,      ';% maximum Vp'
-write( 9, * ) ' rho     =   ', rho,      ';% hypocenter density'
-write( 9, * ) ' vp      =   ', vp,       ';% hypocenter Vp'
-write( 9, * ) ' vs      =   ', vs,       ';% hypocenter Vp'
-write( 9, * ) ' courant =   ', courant,  ';% stability condition'
-write( 9, * ) ' xhypo   = [ ', xhypo, '  ];% hypocenter location'
-write( 9, * ) ' nout    =   ', nout,     ';% number output zones'
-write( 9, * ) ' endian  = ''', endian, ''';% byte ordert'
-close( 9 )
-
-end if ifrestart !------------------!
-
 if ( nout > nz ) stop 'too many output zones, make nz bigger'
+call readcheckpoint
 
-doizinit: do iz = 1, nout !------------------!
+ifit0: if ( it == 0 .and. master ) then
 
-select case( fieldout(iz) )
-case( 'x'    ); nc = 3
-case( 'a'    ); nc = 3
-case( 'v'    ); nc = 3
-case( 'u'    ); nc = 3
-case( 'w'    ); nc = 6
-case( 'sv'   ); fault = .true.
-case( 'sl'   ); fault = .true.
-case( 'trup' ); fault = .true.
-case default; nc = 1; fault = .false.
-end select
+  print '(a)', 'Initialize output'
 
-if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
-call zone( i1out(i,:), i2out(i,:), nn, nnoff, ihypo, ifn )
-if ( fault ) then
-  if ( ifn == 0 ) then
-    ditout(iz) = 0
-  else
-    i1out(iz,ifn) = ihypo(ifn)
-    i2out(iz,ifn) = ihypo(ifn)
+  ! Check for previus run
+  inquire( file='out/timestep', exist=test )
+  if ( err /= 0 ) then
+    print '(a)', 'Error: previous output found. use -d flag to overwrite'
+    stop
   end if
-end if
-if ( fieldout(iz)(1:1) == 'w' ) i2out(i,:) = i2out(i,:) - 1
-
-! Metadata
-if ( master ) then
-  write( str, '(a,i2.2,a)' ) 'out/', iz, '/meta.m'
-  open(  9, file=str, status='replace' )
-  write( 9, * ) ' field = ''', fieldout(iz),        '''; % variable name'
-  write( 9, * ) ' nc    = ',   nc,                    '; % # of components'
-  write( 9, * ) ' i1    = [ ', i1out(iz,:) - nnoff, ' ]; % start index'
-  write( 9, * ) ' i2    = [ ', i2out(iz,:) - nnoff, ' ]; % end index'
-  write( 9, * ) ' dit   = ',   ditout(iz),            '; % interval'
+ 
+  ! Create directories
+  call system( 'mkdir out/ckp' )
+  call system( 'mkdir out/stats' )
+  do iz = 1, nout
+    write( str, '(a,i2.2)' ) 'out/', iz
+    call system( 'mkdir ' // str )
+  end do
+ 
+  ! Metadata
+  endian = 'l'
+  if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
+  courant = dt * vp2 * sqrt( 3. ) / abs( dx )
+  write( str, '(a,i2.2,a)' ) 'out/meta.m'
+  open(  9, file=str, status='new' )
+  write( 9, * ) ' rho1    = ',   rho1,     '; % minimum density'
+  write( 9, * ) ' vp1     = ',   vp1,      '; % minimum Vp'
+  write( 9, * ) ' vs1     = ',   vs1,      '; % minimum Vp'
+  write( 9, * ) ' rho2    = ',   rho2,     '; % maximum density'
+  write( 9, * ) ' vp2     = ',   vp2,      '; % maximum Vp'
+  write( 9, * ) ' vs2     = ',   vs2,      '; % maximum Vp'
+  write( 9, * ) ' rho     = ',   rho,      '; % hypocenter density'
+  write( 9, * ) ' vp      = ',   vp,       '; % hypocenter Vp'
+  write( 9, * ) ' vs      = ',   vs,       '; % hypocenter Vp'
+  write( 9, * ) ' courant = ',   courant,  '; % stability condition'
+  write( 9, * ) ' xhypo   = [ ', xhypo,  ' ]; % hypocenter location'
+  write( 9, * ) ' nout    = ',   nout,     '; % number output zones'
+  write( 9, * ) ' endian  = ''', endian, '''; % byte ordert'
   close( 9 )
-end if
 
-if ( any( i2 < i1 ) ) ditout(iz) = 0
-call iosplit( iz, ditout(iz) )
+end if ifit0
 
-end do doizinit !------------------!
+doiz0: do iz = 1, nout
 
+  ! Properties
+  nc = 1; fault = .false.
+  select case( fieldout(iz) )
+  case( 'x'    ); nc = 3
+  case( 'a'    ); nc = 3
+  case( 'v'    ); nc = 3
+  case( 'u'    ); nc = 3
+  case( 'w'    ); nc = 6
+  case( 'sv'   ); fault = .true.
+  case( 'sl'   ); fault = .true.
+  case( 'trup' ); fault = .true.
+  end select
+  
+  ! Interval 
+  if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
+
+  ! Zone
+  call zone( i1out(i,:), i2out(i,:), nn, nnoff, ihypo, ifn )
+  if ( fault ) then
+    if ( ifn == 0 ) then
+      ditout(iz) = 0
+    else
+      i1out(iz,ifn) = ihypo(ifn)
+      i2out(iz,ifn) = ihypo(ifn)
+    end if
+  end if
+  if ( fieldout(iz)(1:1) == 'w' ) i2out(i,:) = i2out(i,:) - 1
+ 
+  ! Metadata
+  if ( master ) then
+    write( str, '(a,i2.2,a)' ) 'out/', iz, '/meta.m'
+    open(  9, file=str, status='replace' )
+    write( 9, * ) ' field = ''', fieldout(iz),        '''; % variable name'
+    write( 9, * ) ' nc    = ',   nc,                    '; % # of components'
+    write( 9, * ) ' i1    = [ ', i1out(iz,:) - nnoff, ' ]; % start index'
+    write( 9, * ) ' i2    = [ ', i2out(iz,:) - nnoff, ' ]; % end index'
+    write( 9, * ) ' dit   = ',   ditout(iz),            '; % interval'
+    close( 9 )
+  end if
+ 
+  ! Split collective i/o
+  if ( any( i2 < i1 ) ) ditout(iz) = 0
+  call iosplit( iz, ditout(iz) )
+
+end do doiz0
+
+! Column names
 if ( master ) then
-  print '(a)', 'Time       Amax        Vmax        Umax        Wall Time'
+  print '(a)', 'Timestep Time     Amax        Vmax        Umax        Wall Time'
+  call system_clock( count_rate=twall_rate )
 end if
 
 return
@@ -178,76 +157,72 @@ else
   end if
 end if
 
-! Write output
-doiz: do iz = 1, nout
+doiz: do iz = 1, nout !--------------------------------------!
 
 if ( ditout(iz) == 0 .or. mod( it, ditout(iz) ) /= 0 ) cycle doiz
 
-! Select pass
-select case( fieldout(iz)(1:1) )
-case( 'w' );  onpass = 'w'
-case( 'u' );  onpass = 'w'
-case default; onpass = 'a'
+! Properties
+nc = 1; fault = .false.; onpass = 'a'
+select case( fieldout(iz) )
+case( 'x'    ); nc = 3
+case( 'a'    ); nc = 3
+case( 'v'    ); nc = 3
+case( 'u'    ); nc = 3; onpass = 'w'
+case( 'w'    ); nc = 6; onpass = 'w'
+case( 'um'   ); onpass = 'w'
+case( 'wm'   ); onpass = 'w'
+case( 'sv'   ); fault = .true.
+case( 'sl'   ); fault = .true.
+case( 'trup' ); fault = .true.
 end select
-if ( onpass /= pass ) cycle doiz
 
+! Select pass
+if ( pass /= onpass ) cycle doiz
+
+! Mesh is static, so only write first time arround
+if ( fieldout(iz) == 'x' ) ditout(iz) = 0
+
+! Indices
 i1 = i1out(iz,:)
 i2 = i2out(iz,:)
 n = i2 - i1 + 1
-
-if ( fieldout(iz) == 'x' ) ditout(iz) = 0
-
 if ( fault ) then
   i1(ifn) = 1
   i2(ifn) = 1
 end if
+i1 = max( i1, i1node )
+i2 = min( i2, i2node )
 
 ! Binary output
 do i = 1, nc
   write( str, '(a,i2.2,a,a,i1,i6.6)' ) &
     'out/', iz, '/', trim( out_field(iz) ), i, it
   select case( fieldout(iz) )
-  case( 'x'    ); call iovector( 'w', str, x,  i,    i1, i2, n, nnoff, iz )
-  case( 'a'    ); call iovector( 'w', str, w1, i,    i1, i2, n, nnoff, iz )
-  case( 'v'    ); call iovector( 'w', str, v,  i,    i1, i2, n, nnoff, iz )
-  case( 'u'    ); call iovector( 'w', str, u,  i,    i1, i2, n, nnoff, iz )
+  case( 'x'    ); call iovector( 'w', str, x,  i,   i1, i2, n, nnoff, iz )
+  case( 'a'    ); call iovector( 'w', str, w1, i,   i1, i2, n, nnoff, iz )
+  case( 'v'    ); call iovector( 'w', str, v,  i,   i1, i2, n, nnoff, iz )
+  case( 'u'    ); call iovector( 'w', str, u,  i,   i1, i2, n, nnoff, iz )
   case( 'w'    );
-    if ( i < 4 )  call iovector( 'w', str, w1, i,    i1, i2, n, nnoff, iz )
-    if ( i > 3 )  call iovector( 'w', str, w2, i-3,  i1, i2, n, nnoff, iz )
-  case( 'am'   ); call ioscalar( 'w', str, s1,       i1, i2, n, nnoff, iz )
-  case( 'vm'   ); call ioscalar( 'w', str, s2,       i1, i2, n, nnoff, iz )
-  case( 'um'   ); call ioscalar( 'w', str, s1,       i1, i2, n, nnoff, iz )
-  case( 'wm'   ); call ioscalar( 'w', str, s2,       i1, i2, n, nnoff, iz )
-  case( 'sv'   ); call ioscalar( 'w', str, sv,       i1, i2, n, nnoff, iz )
-  case( 'sl'   ); call ioscalar( 'w', str, sl,       i1, i2, n, nnoff, iz )
-  case( 'trup' ); call ioscalar( 'w', str, trup,     i1, i2, n, nnoff, iz )
+    if ( i < 4 )  call iovector( 'w', str, w1, i,   i1, i2, n, nnoff, iz )
+    if ( i > 3 )  call iovector( 'w', str, w2, i-3, i1, i2, n, nnoff, iz )
+  case( 'am'   ); call ioscalar( 'w', str, s1,      i1, i2, n, nnoff, iz )
+  case( 'vm'   ); call ioscalar( 'w', str, s2,      i1, i2, n, nnoff, iz )
+  case( 'um'   ); call ioscalar( 'w', str, s1,      i1, i2, n, nnoff, iz )
+  case( 'wm'   ); call ioscalar( 'w', str, s2,      i1, i2, n, nnoff, iz )
+  case( 'sv'   ); call ioscalar( 'w', str, sv,      i1, i2, n, nnoff, iz )
+  case( 'sl'   ); call ioscalar( 'w', str, sl,      i1, i2, n, nnoff, iz )
+  case( 'trup' ); call ioscalar( 'w', str, trup,    i1, i2, n, nnoff, iz )
   case default; stop 'fieldout'
   end select
 end do
 
-end do doiz
+end do doiz !--------------------------------------!
 
+! Stop if not on acceleration pass
 if ( pass == 'w' ) return
 
-! Write checkpoint
-if ( itcheck /= 0 .and. mod( it, itcheck ) == 0 ) then
-  inquire( iolength=reclen ) &
-    t, v, u, sl, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
-  write( str, '(a,i6.6,i6.6)') 'out/ckp/', ip, it
-  open( 9, &
-    file=str, &
-    recl=reclen, &
-    form='unformatted', &
-    access='direct', &
-    status='replace' )
-  write( 9, rec=1 ) &
-    t, v, u, sl, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
-  close( 9 )
-  write( str, '(a,i6.6,a)' ) 'out/ckp/', ip, '.hdr'
-  open( 9, file=str, status='replace' )
-  write( 9, * ) it
-  close( 9 )
-end if
+! Checkpoint
+call writecheckpoint
 
 ! Metadata
 if ( master ) then
