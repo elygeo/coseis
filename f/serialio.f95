@@ -22,7 +22,7 @@ l1 = i1(3); l2 = i2(3)
 inquire( iolength=reclen ) s1(j1:j2,k1:k2,l1:l2)
 if ( reclen == 0 ) return
 select case( io )
-case ( 'r' )
+case( 'r' )
   open( 9, &
     file=filename, &
     recl=reclen, &
@@ -55,7 +55,7 @@ l1 = i1(3); l2 = i2(3)
 inquire( iolength=reclen ) w1(j1:j2,k1:k2,l1:l2,i)
 if ( reclen == 0 ) return
 select case( io )
-case ( 'r' )
+case( 'r' )
   open( 9, &
     file=filename, &
     recl=reclen, &

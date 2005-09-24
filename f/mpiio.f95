@@ -33,7 +33,7 @@ i0 = i1 - 1
 call mpi_type_create_subarray( 3, ng, nl, i0, mof, mpi_real, mtype, err )
 call mpi_type_commit( mtype, err )
 select case( io )
-case ( 'r' )
+case( 'r' )
   mode = mpi_mode_rdonly
   call mpi_file_open( comm, filename, mode, mpi_info_null, fh, err )
   call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, err )
@@ -69,7 +69,7 @@ i0 = (/ i1 - 1,        i - 1 /)
 call mpi_type_create_subarray( 4, ng, nl, i0, mof, mpi_real, mtype, err )
 call mpi_type_commit( mtype, err )
 select case( io )
-case ( 'r' )
+case( 'r' )
   mode = mpi_mode_rdonly
   call mpi_file_open( comm, filename, mode, mpi_info_null, fh, err )
   call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, err )

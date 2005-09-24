@@ -150,8 +150,8 @@ else
     i1 = maxloc( sl )
     svmax = sv(i1(1),i1(2),i1(3))
     slmax = sv(i1(1),i1(2),i1(3))
-    isvmax(ifn) = ihypo(ifn)
-    islmax(ifn) = ihypo(ifn)
+    svmaxi(ifn) = ihypo(ifn)
+    slmaxi(ifn) = ihypo(ifn)
     call globalmaxloc( svmax, svmaxi, nnoff )
     call globalmaxloc( slmax, slmaxi, nnoff )
   end if
@@ -196,7 +196,7 @@ i2 = min( i2, i2node )
 ! Binary output
 do i = 1, nc
   write( str, '(a,i2.2,a,a,i1,i6.6)' ) &
-    'out/', iz, '/', trim( out_field(iz) ), i, it
+    'out/', iz, '/', trim( fieldout(iz) ), i, it
   select case( fieldout(iz) )
   case( 'x'    ); call iovector( 'w', str, x,  i,   i1, i2, n, nnoff, iz )
   case( 'a'    ); call iovector( 'w', str, w1, i,   i1, i2, n, nnoff, iz )

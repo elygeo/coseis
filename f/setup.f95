@@ -9,13 +9,15 @@ contains
 subroutine setup
 
 implicit none
-integer :: i, nl(3)
+integer :: i, nl(3), n(3)
 
 ! Partition for parallelization
 nl = nn / np; where ( mod( nn, np ) /= 0 ) nl = nl + 1
 np = nn / nl; where ( mod( nn, nl ) /= 0 ) np = np + 1
 
 ! Hypocenter
+n = nn
+if ( ifn /= 0 ) n(ifn) = n(ifn) - 1
 where ( ihypo == 0 ) ihypo = n / 2 + 1
 ip3master = ( ihypo - 1 ) / nl
 

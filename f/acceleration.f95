@@ -4,8 +4,8 @@
 module acceleration_m
 use globals_m
 use diffcn_m
-use hgnc_m
-use hgcn_m
+use hourglassnc_m
+use hourglasscn_m
 contains
 subroutine acceleration
 

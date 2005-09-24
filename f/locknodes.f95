@@ -20,8 +20,8 @@ if ( init ) then
 end if
 
 do iz = 1, nlock
-  i1 = max( i1lock(iz,), i2node )
-  i2 = min( i2lock(iz,), i2node )
+  i1 = max( i1lock(iz,:), i2node )
+  i2 = min( i2lock(iz,:), i2node )
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)

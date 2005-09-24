@@ -7,6 +7,7 @@ contains
 subroutine pml
 
 implicit none
+integer :: i
 real :: hmean, tune, c1, c2, c3, damp, dampn, dampc, pmlp
 
 ! PML damping

@@ -40,10 +40,10 @@ i1 = i1cell
 i2 = i2cell + 1
 
 ! Read binary files
-select case ( fieldin(iz) )
-case ( 'rho' ); call ioscalar( 'r', 'data/rho', mr, i1, i2, n, noff, 0 )
-case ( 'vp'  ); call ioscalar( 'r', 'data/vp',  s1, i1, i2, n, noff, 0 )
-case ( 'vs'  ); call ioscalar( 'r', 'data/vs',  s2, i1, i2, n, noff, 0 )
+select case( fieldin(iz) )
+case( 'rho' ); call ioscalar( 'r', 'data/rho', mr, i1, i2, n, noff, 0 )
+case( 'vp'  ); call ioscalar( 'r', 'data/vp',  s1, i1, i2, n, noff, 0 )
+case( 'vs'  ); call ioscalar( 'r', 'data/vs',  s2, i1, i2, n, noff, 0 )
 case default; stop 'fieldin'
 end select
 
@@ -93,16 +93,16 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
 ! Find extreme values
-select case ( fieldin(i) )
-case ( 'rho' )
+select case( fieldin(i) )
+case( 'rho' )
   mr(j1:j2,k1:k2,l1:l2) = inval(iz)
   rho1 = min( rho1, inval(iz) )
   rho2 = max( rho2, inval(iz) )
-case ( 'vp'  )
+case( 'vp'  )
   s1(j1:j2,k1:k2,l1:l2) = inval(iz)
   vp1 = min( rho1, inval(iz) )
   vp2 = max( rho2, inval(iz) )
-case ( 'vs'  )
+case( 'vs'  )
   s2(j1:j2,k1:k2,l1:l2) = inval(iz)
   vs1 = min( rho1, inval(iz) )
   vs2 = max( rho2, inval(iz) )
