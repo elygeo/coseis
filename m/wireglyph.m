@@ -1,5 +1,5 @@
 %------------------------------------------------------------------------------%
-% WIREGLYPH
+% Wire glyph
 
 hglyph = [];
 if ~length( mga ) || ~fscl, return, end

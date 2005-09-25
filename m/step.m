@@ -1,22 +1,28 @@
 %------------------------------------------------------------------------------%
-% STEP
+% Step
 
 if itstep < 1, itstep = 1; end
 
 while 1
   itstep = itstep - 1;
+  pml
   if pass ~= 'w'
     pass = 'w';
-    it = it + 1;
-    tic, wstep, wt(1) = toc;
-    tic, viz, output, wt(2) = toc;
+    stress
+    momentsource
+    output
+    viz
     if ~itstep & breakon == 'w', break, end
   end
-  if pass ~= 'v'
-    pass = 'v';
-    tic, vstep, wt(3) = toc;
-    tic, viz, output
-    if ~itstep & breakon == 'v', break, end
+  if pass ~= 'a'
+    pass = 'a';
+    acceleration
+    fault
+    locknodes
+    output
+    viz
+    timestep
+    if ~itstep & breakon == 'a', break, end
   end
 end
 

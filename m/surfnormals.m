@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
-% SNORMALS - surface normals
+% Surface normals
 
-function nrm = snormals( x, i1, i2 )
+function nrm = surfnormals( x, i1, i2 )
 
 j = i1(1):i2(1);
 k = i1(2):i2(2);

@@ -1,10 +1,5 @@
 %------------------------------------------------------------------------------%
-% WSTEP - Increment displacement and stress
-
-% Time integration
-t  = t  + .5 * dt;
-u  = u  + dt * v;
-us = us + dt * vs;
+% Stress calculations
 
 % Gradient
 % G = grad(U + gamma*V)    non PML region
@@ -108,16 +103,4 @@ for i = 1:3
   w1(:,:,:,i) = 2 * mu .* w1(:,:,:,i) + s1;
   w2(:,:,:,i) =     mu .* w2(:,:,:,i);
 end
-
-% Moment source
-momentsrc
-
-% Magnitudes
-s1 = sqrt( sum( u .* u, 4 ) );
-s2 = sqrt( sum( w1 .* w1, 4 ) + 2 * sum( w2 .* w2, 4 ) );
-[ umax, iumax ] = max( s1(:) );
-[ wmax, iwmax ] = max( s2(:) );
-[ usmax, iusmax ] = max( abs( us(:) ) );
-
-if umax > dx / 10., fprintf( 'Warning: u !<< dx\n' ), end
 

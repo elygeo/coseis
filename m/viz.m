@@ -1,5 +1,5 @@
 %------------------------------------------------------------------------------%
-% VIZ
+% Viz
 
 % range selector
 % initial plot: mesh, prestress, hypo

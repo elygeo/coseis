@@ -1,5 +1,5 @@
 %------------------------------------------------------------------------------%
-% REYNOLDSGLYPH
+% Reynolds Glyph
 
 hglyph = [];
 if ~length( mga ) || ~fscl, return, end

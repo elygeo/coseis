@@ -1,5 +1,5 @@
 %------------------------------------------------------------------------------%
-% GLYPHVIZ
+% Glyph vizualization
 
 if ~fscl, return, end
 if volviz, glyphs = volumes;

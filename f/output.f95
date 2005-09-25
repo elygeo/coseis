@@ -8,6 +8,7 @@ use collectiveio_m
 use checkpoint_m
 contains
 subroutine output( pass )
+use zone_m
 
 implicit none
 save

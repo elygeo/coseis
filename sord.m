@@ -10,18 +10,17 @@ fprintf( '\nSORD - Support Operator Rupture Dynamics\n' )
 %dbstop if error
 
 clear all
-if exist( 'out', 'dir' ), rmdir( 'out', 's' ), end
-
 addpath m
+
+clean
 inread
 setup
 arrays
 init = 1; viz
 gridgen
-matmodel
-pml
+matetial
 init = 1; fault
-init = 1; momentsrc
+init = 1; momentsource
 init = 2; viz, viz
 init = 1; output
 

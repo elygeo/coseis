@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
-% DFCN - difference operator, cell to node
+% Difference operator, cell to node
 
-function df = dfcn( oper, f, x, dx, i, a, j, k, l )
+function df = diffcn( oper, f, x, dx, i, a, j, k, l )
 
 switch oper
 

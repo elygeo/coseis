@@ -1,5 +1,5 @@
 %------------------------------------------------------------------------------%
-% OUTPUT
+% Output
 
 if init
   init = 0;
@@ -25,6 +25,7 @@ if init
   fid = fopen( 'out/endian', 'w' );
   fprintf( fid, '%s\n', endian );
   fclose( fid );
+  courant = dt * matmax(2) * sqrt( 3 ) / dx;
   mem = whos;
   mem = sum( [ mem.bytes ] );
   ram = mem / 1024 ^ 2;
@@ -34,6 +35,22 @@ if init
   fprintf('Time      Amax        Vmax        Umax        Compute     I/O/Viz\n')
   tic
   return
+end
+
+% Magnitudes
+if ( pass == 'w' ) then
+  s1 = sqrt( sum( u .* u, 4 ) );
+  s2 = sqrt( sum( w1 .* w1, 4 ) + 2 * sum( w2 .* w2, 4 ) );
+  [ umax, iumax ] = max( s1(:) );
+  [ wmax, iwmax ] = max( s2(:) );
+  [ usmax, iusmax ] = max( abs( us(:) ) );
+  if umax > dx / 10., fprintf( 'Warning: u !<< dx\n' ), end
+else
+  s1 = sqrt( sum( w1 .* w1, 4 ) );
+  s2 = sqrt( sum( v .* v, 4 ) );
+  [ amax, iamax ] = max( s1(:) );
+  [ vmax, ivmax ] = max( s2(:) );
+  [ vsmax, ivsmax ] = max( abs( vs(:) ) );
 end
 
 for iz = 1:size( ditout, 1 )

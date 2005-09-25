@@ -1,5 +1,5 @@
 %------------------------------------------------------------------------------%
-% ISOSURFVIZ
+% Isosurface viz
 
 hisosurf = [];
 if ~fscl, return, end

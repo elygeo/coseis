@@ -1,5 +1,5 @@
 %------------------------------------------------------------------------------%
-% TSREAD - read timeseries
+% Read time series
 % input: vizfield xhair iz
 % output: tg vg
 

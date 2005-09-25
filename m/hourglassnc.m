@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
-% HGNC - hourglass corrections, node to cell
+% Hourglass corrections, node to cell
 
-function hg = hgnc( f, i, iq, j, k, l )
+function hg = hourglassnc( f, i, iq, j, k, l )
 
 switch iq
 case 1, hg = ...

@@ -1,11 +1,6 @@
 %------------------------------------------------------------------------------%
-% PML
-
-% Check Courant stability condition. TODO: check, make general
-courant = dt * matmax(2) * sqrt( 3 ) / dx;
-fprintf( '  Courant: 1 >%11.4e\n', courant )
-
 % PML damping
+
 if npml
   c1 =  8. / 15.;
   c2 = -3. / 100.;

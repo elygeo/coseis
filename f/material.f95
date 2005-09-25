@@ -68,19 +68,13 @@ if ( ihypo(ifn) >= i1(ifn) .and. ihypo(ifn) < i2(ifn) ) then
 end if
 end if
 
-! Check extreme values
-rho = minval( mr, mr > 0. )
-vp = minval( s1, s1 > 0. )
-vs = minval( s2, s2 > 0. )
-if ( rho < rho1 ) print *, 'Warning: rho excedes min: ', rho, rho1
-if ( vp < vp1 )   print *, 'Warning: vp excedes min: ',  vp, vp1
-if ( vs < vs1 )   print *, 'Warning: vs excedes min: ',  vs, vs1
-rho = maxval( mr )
-vp  = maxval( s1 )
-vs  = maxval( s2 )
-if ( rho > rho2 ) print *, 'Warning: rho excedes max: ', rho, rho2
-if ( vp > vp2 )   print *, 'Warning: vp excedes max: ',  vp, vp2
-if ( vs > vs2 )   print *, 'Warning: vs excedes max: ',  vs, vs2
+! Limit extreme values
+where ( mr < rho1 ) mr = rho1
+where ( mr > rho2 ) mr = rho2
+where ( s1 < vp1 ) s1 = vp1
+where ( s1 > vp2 ) s1 = vp2
+where ( s2 < vs1 ) s2 = vs1
+where ( s2 > vs2 ) s2 = vs2
 
 else !--------------------------------------!
 

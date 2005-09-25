@@ -1,5 +1,5 @@
 %------------------------------------------------------------------------------%
-% TSVIZ
+% Timeseries viz
 
 if ~exist( 'sordrunning', 'var' )
   if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;

@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
-% DFNC - difference operators, node to cell
+% Difference operators, node to cell
 
-function df = dfnc( oper, f, x, dx, i, a, j, k, l )
+function df = diffnc( oper, f, x, dx, i, a, j, k, l )
 
 switch oper
 

@@ -14,7 +14,7 @@ logical :: init = .true.
 integer, allocatable :: jj(:), kk(:), ll(:)
 real, allocatable :: srcfr(:)
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, nsrc, ic
-real :: srcft, m0, mw, d, mm(3,3), eigval(3), eigwork(8)
+real :: srcft
 
 if ( rsource <= 0. ) return
 
@@ -79,25 +79,6 @@ end do
 
 s1 = 0.
 s2 = 0.
-
-! Metadata, requires LAPACK for eigenvalue calculation
-if ( master ) then
-  mm(1,1) = moment1(1)
-  mm(2,2) = moment1(2)
-  mm(3,3) = moment1(3)
-  mm(2,3) = moment2(1)
-  mm(1,3) = moment2(2)
-  mm(1,2) = moment2(3)
-  call ssyev( 'N', 'U', 3, mm, 3, eigval, eigwork, size(eigwork), i )
-  m0 = maxval( abs( eigval ) )
-  mw = 2. / 3. * log10( m0 ) - 10.7
-  d = m0 / ( rho * vs * vs * dx * dx )
-  open(  9, file='out/sourcemeta.m', status='new' )
-  write( 9, * ) ' m0 = ', m0, '; % moment'
-  write( 9, * ) ' mw = ', mw, '; % moment magnitude'
-  write( 9, * ) ' d  = ', d,  '; % displacement for cell sized fault'
-  close( 9 )
-end if
 
 return
 

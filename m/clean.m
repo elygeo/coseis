@@ -1,4 +1,4 @@
 % erase SORD output
 
-rmdir( 'out', 's' )
+if exist( 'out', 'dir' ), rmdir( 'out', 's' ), end
 

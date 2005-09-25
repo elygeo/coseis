@@ -1,5 +1,5 @@
 %------------------------------------------------------------------------------%
-% TIMESERIES
+% Time series
 % input: field xhair
 % output: tg vg ta va
 % search through outpur for desired timeseries data
@@ -11,7 +11,6 @@ clear tg xg vg va ta
 % Read metadata if SORD not running
 if ~exist( 'sordrunning', 'var' )
   eval( 'out/meta' )
-  eval( 'out/sourcemeta' )
   eval( 'out/faultmeta' )
   if ~exist( 'vizfield', 'var' ), vizfield = 'v'; end
   if ~exist( 'dofilter', 'var' ), dofilter = 1;   end
@@ -70,6 +69,11 @@ switch model
 case 'explosion'
   haveanalytical = 1;
   tdom = tsource;
+  c = [ 1 6 5; 6 2 4; 5 4 3 ];
+  [ vec, val ] = eig( moment(c) );
+  m0 = max( abs( val(:) ) );
+  mw = 2. / 3. * log10( m0 ) - 10.7;
+  d  = m0 / ( rho * vs * vs * dx * dx );
   switch timefcn
   case 'brune'
     va = m0 * exp( -tg / tdom ) .* ( tg * vp / rg - tg / tdom + 1 ) ...

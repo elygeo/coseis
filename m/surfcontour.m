@@ -1,7 +1,7 @@
 %------------------------------------------------------------------------------%
-% SCONTOUR - contour on a surface
+% Surface contouring
 
-function h = scontour( xg, c, v )
+function h = ssurfcontour( xg, c, v )
 
 x = xg(:,:,1);
 y = xg(:,:,2);
@@ -44,3 +44,4 @@ for i = 1:size( ci, 1 )
        ( z(j0+k0) + dx .* ( z(j1+k0) - z(j0+k0) ) ) .* ( 1 - dy ) ];
 end
 h = plot3( xx, yy, zz, '-' );
+
