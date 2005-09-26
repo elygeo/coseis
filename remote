@@ -1,0 +1,31 @@
+#!/bin/bash -e
+
+account="ux451302@dslogin.sdsc.edu"
+account="gely@phim.ucsd.edu"
+account="gely@moho.sdsu.edu"
+
+echo "Connecting to: $account"
+
+ssh-add -L > /dev/null || ssh-add
+
+files="
+  README
+  VERSION
+  sord
+  tarball
+  remote
+  sord.m
+  defaults.m
+  in.m
+  infiles
+  f
+  m
+"
+
+rfiles=$( echo $files | sed 's|\([^ ]\+\)|sord/\1|g' )
+
+case "$1" in
+get) rsync -auPb -e ssh --backup-dir=old $account:"$rfiles" . ;;
+*)   rsync -auP  -e ssh --delete $files "$account:sord" ;;
+esac
+

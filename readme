@@ -31,7 +31,7 @@ USAGE
     -m  use MATLAB backend (default is Fortran)
     -n  setup only, don't compile or run
     -d  delete output from previous run before starting
-    -r  dispatch to remote host, edit sord script to set host
+    -r  dispatch to remote host, edit 'remote' to set host
     -g  run in debugger
 
   When porting to a new machine, you may have to modify the sord script for 

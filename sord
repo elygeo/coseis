@@ -21,19 +21,13 @@ while getopts spgnmrld opt; do
     l) remote=no ;;
   esac
 done
-exit
 shift $(( OPTIND - 1 ))
 [ -n "$1" ] && ln -sf "$1" 'in.m'
 
 # run on remote host
 if [ $remote = yes ]; then
-  host="gach.ucsd.edu"
-  host="phim.ucsd.edu"
-  echo "running on remote host $host"
-  ssh-add -L > /dev/null || ssh-add
-  version=$( ./tarball )
-  scp sord.tgz $host:
-  ssh -x $host "tar zxf sord.tgz && cd sord-$version && ./sord $@ -l"
+  ./remote put
+  ssh -x $host "cd sord && ./sord $@ -l"
   exit
 fi
 
@@ -70,6 +64,7 @@ fi
 
 ./tarball
 cp sord.tgz out/
+cp 'defaults.m' out/
 cp 'in.m' out/
 perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > out/endian
 

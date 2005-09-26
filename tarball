@@ -8,23 +8,25 @@ echo $version > VERSION
 files="
   README
   VERSION
-  tarball
   sord
+  tarball
+  remote
   sord.m
   defaults.m
   in.m
-  infiles/
-  f/
-  m/
+  infiles
+  f
+  m
 "
 
 mkdir sord-$version
 
-cp -al $files sord-$version/
+cp -al $files sord-$version/ || cp -rp $files sord-$version/
 
-tar zcf sord.tgz sord-$version/
+#tar zcf sord.tgz sord-$version/
+tar cf - sord-$version/ | gzip > sord.tgz
 
 rm -rf sord-$version
 
-if [ "x$1" = x-s ]; then cp sord.tgz save/sord-$version.tgz; fi
+if [ "x$1" = "x-s" ]; then cp sord.tgz save/sord-$version.tgz; fi
 
