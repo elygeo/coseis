@@ -9,6 +9,7 @@ use collective_m
 use inread_m
 use setup_m
 use arrays_m
+use checkpoint_m
 use gridgen_m
 use material_m
 use output_m
@@ -28,6 +29,7 @@ call inread( 'defaults.m' )
 call inread( 'in.m' )
 call setup
 call arrays
+call readcheckpoint
 call gridgen
 call material
 call momentsource
@@ -46,6 +48,7 @@ do while ( it < nt )
   call fault
   call locknodes
   call output( 'a' )
+  call writecheckpoint
   call timestep
 end do
 

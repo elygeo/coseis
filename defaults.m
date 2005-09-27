@@ -64,7 +64,6 @@
 % Code execution and output parameters
 % np		= [ 2 1 3 ]			;% 6 total processors
   np		= [ 1 1 1 ]			;% no parallelization
-  dostats	= 1				;% collect peak values
 % itcheck	= 0				;% no checkpointing
 % itcheck	= 100				;% checkpoint every 100 steps
   itcheck	= -1				;% checkpoint before finishing

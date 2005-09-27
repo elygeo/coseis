@@ -3,6 +3,7 @@
 
 echo -e "\nSORD setup"
 
+# Get command line options
 mpi=guess
 debug=no
 dryrun=no
@@ -19,20 +20,36 @@ while getopts spgnmrld opt; do
   esac
 done
 shift $(( OPTIND - 1 ))
+
+# Link input file specified on command line
 [ -n "$1" ] && ln -sf "$1" 'in.m'
 
-#------------------------------------------------------------------------------#
-# Read input
-
+# Strip MATLAB caracters
 sed "s/%.*$//; s/;/;\n/g; s/[]={}';[]*//g;/^$/d" "defaults.m" "in.m" > tmp
+
+# Read input
+nout=0
 while read key params; do
   set -- $params
   case "$key" in
-    nt) nt=$1 ;;
-    nn) nn3=( $1 $2 $3 ) ;;
-    np) np3=( $1 $2 $3 ) ;;
+    nt)  nt=$1 ;;
+    nn)  nn3=( $1 $2 $3 ) ;;
+    np)  np3=( $1 $2 $3 ) ;;
+    out) nout=$(( nout + 1 )) ;;
   esac
 done < tmp
+
+# Create output folders
+[ $deleteout == yes ] && rm -rf out
+[ -e out ]       || mkdir out
+[ -e out/ckp ]   || mkdir out/ckp
+[ -e out/stats ] || mkdir out/stats
+for (( i=1; i<=nout; i++ )); do
+  dir=$( echo $nout | awk '{ printf "out/%02d", $1 }' )
+  [ -e $dir ] || mkdir $dir
+done
+
+# Problem size
 nn=$(( nn3[0] * nn3[1] * nn3[2] ));
 np=$(( np3[0] * np3[1] * np3[2] ));
 [ $matlab = yes ] && np=1
@@ -40,28 +57,26 @@ np=$(( np3[0] * np3[1] * np3[2] ));
 #------------------------------------------------------------------------------#
 # Metadata
 
-[ $deleteout == yes ] && rm -rf out
-[ -e out ] || mkdir out
-rm -f batchjob
-
 osname=$( uname )
 
+# Identify machine
 if   [ "${HOSTNAME:0:2}" = ds ]; then machine="datastar"
 elif [ "${HOSTNAME:0:2}" = tg ]; then machine="teragrid"
 elif [ "$HOSTNAME" = master ];   then machine="babieca"
 else machine=$HOSTNAME
 fi
 
+# Save source, input files & byte order
 ./tarball
 cp sord.tgz out/
 cp 'defaults.m' out/
 cp 'in.m' out/
 perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > out/endian
 
+# RAM usage and run time estimate
 floatsize=4
 nvars=21
 ram=$(( nn / np * floatsize * nvars / 1024 / 1024 ))
-
 rate=250000
 [ $matlab = yes ] && rate=70000
 wt=$(( nt * nn / np / rate + 1 ))
@@ -70,10 +85,10 @@ mm=$(( wt % 3600 / 60 ))
 ss=$(( wt % 60 ))
 [ $hh -ge 1 ] && ss=0
 wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
-
 echo "RAM usage: at least ${ram}Mb"
 echo "Run time: at least $wt"
 
+# Write metadata
 cat << END > out/meta.run
 login:   $LOGNAME
 name:    $( finger $LOGNAME | sed -n 's/^.*e: //p' )
@@ -104,9 +119,7 @@ fi
 #------------------------------------------------------------------------------#
 # Fortran backend
 
-[ $mpi = guess -a $np -eq 1 ] && mpi=no
-[ $mpi = guess -a $np -gt 1 ] && mpi=yes
-
+# Common routines
 OBJECT="\\
   globals.o \\
   diffcn.o \\
@@ -132,8 +145,10 @@ OBJECT="\\
   timestep.o \\
   sord.o"
 
-OPTFLAGS=-O
+[ $mpi = guess -a $np -eq 1 ] && mpi=no
+[ $mpi = guess -a $np -gt 1 ] && mpi=yes
 
+# Serial or MPI version
 if [ $mpi = no ]; then
   OBJECT="\\
   serial.o\\
@@ -150,6 +165,8 @@ else
   CC=mpicc
 fi
 
+# Optimization flags
+OPTFLAGS=-O
 case $osname in
 Linux)
   FC=gfortran
@@ -159,46 +176,42 @@ SunOS)
   OPTFLAGS=-fast
   ;;
 esac
-
 [ $nn -lt 10000 ] && OPTFLAGS=-g
 OPTFLAGS=-g
-
 if [ $debug = yes ]; then
   OPTFLAGS=-g
 fi
 
+# Machine specific options
 case $machine in
 datastar)
   FC=mpxlf95_r
   CC=mpcc_r
-  OPTFLAGS="-qsuffix=f=f95 -O3 -qstrict -qarch=pwr4 -qtune=pwr4 -q64"
-  [ $debug = yes ] && OPTFLAGS="-g -qflttrap"
+  OPTFLAGS="-qsuffix=f=f95 -q64 -O3 -qarch=pwr4 -qtune=pwr4"
+  [ $debug = yes ] && OPTFLAGS="-qsuffix=f=f95 -q64 -g -qflttrap -C"
   ;;
 babieca)
   [ $mpi = no ] && FC=pgf95
   ;;
 esac
 
+# Write makefile
 cat << END > tmp
 FC = $FC
 CC = $CC
 FFLAGS = $OPTFLAGS
 OBJECT = $OBJECT
-
 fsord: \$(OBJECT) makefile
 	\$(FC) -L/usr/lib/ \$(FFLAGS) \$(OBJECT) -o fsord
-
 clean:
 	rm -f *.o *.mod matlab_workspace.mat
-
 realclean: clean
 	rm -f fsord makefile batchjob sord.tgz
-
 %.o: f/%.f95 makefile
 	\$(FC) \$(FFLAGS) -c \$< -o \$@
-
 END
 
+# Compile SORD
 [ ! -f makefile ] && touch makefile
 [ "$( diff tmp makefile )" != "" ] && mv tmp makefile
 rm -f tmp
@@ -207,27 +220,31 @@ rm -f tmp
 #------------------------------------------------------------------------------#
 # Machine specific batch submission and run commands
 
+rm -f batchjob
+
 case $machine in
 
-#--------------------------------------#
-datastar)
+datastar) #--------------------------------------#
 
 cat << END
-configuring for datastar
-must be run from a subdirectory of /gpfs/
-interactive (up to 32 procs, 64 GB, must be logged into dspoe)
-batch submition (up to 1408 procs, 2816 GB):
+Datastar 8-way, p655+ nodes
+run from a subdirectory of /gpfs/
+dspoe.sdsc.edu: inpteractive
+  4GB?, 40proc?, 2hr limit
+dslogin.sdsc.edu: compiling and batch submition
+  3672GB, 2176proc, 18hr limit
   llsubmit batchjob
 other useful commands:
   llcancel <jobID>
   llq
-  llq -s <jovID>
-  showq
-  reslist
+  llq -s <jobID>
+  show_q
+  show_bf # backfill openings
+  reslist # check allocation
 END
 [ $( pwd | grep -v gpfs ) ] || exit
 
-# batch
+# Batch
 rate=100000
 wt=$(( nt * nn / np / rate + 1 ))
 hh=$(( wt / 3600 ))
@@ -238,7 +255,7 @@ wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
 ppn=8;
 [ $ppn -gt $np ] && ppn=$np
 nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
-opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_single"
+opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
 rundir=$( /bin/pwd )
 cat << END > batchjob
 #!/bin/bash
@@ -250,7 +267,7 @@ AIXTHREAD_SCOPE=S;\\
 MP_ADAPTER_USE=dedicated;\\
 MP_CPU_USE=unique;\\
 MP_CSS_INTERRUPT=no;\\
-MP_EAGER_LIMIT=65536;\\
+MP_EAGER_LIMIT=64K;\\
 MP_EUIDEVELOP=min;\\
 MP_EUIDEVICE=sn_single;\\
 MP_EUILIB=us;\\
@@ -280,7 +297,7 @@ poe ./fsord $opts
 END
 chmod u+x batchjob
 
-# interactive
+# Interactive
 [ $( hostname ) = ds100 ] || dryrun=yes
 case $dryrun$debug$mpi in
   nonono)   ./fsord ;;
@@ -291,8 +308,7 @@ esac
 
 ;;
 
-#--------------------------------------#
-teragrid)
+teragrid) #--------------------------------------#
 
 cat << END
 configureing for Teragrid
@@ -300,7 +316,7 @@ batch submission:
 qsub batchjob
 END
 
-# batch
+# Batch
 rate=100000
 wt=$(( nt * nn / np / rate + 1 ))
 hh=$(( wt / 3600 ))
@@ -325,6 +341,7 @@ time mpirun -v -machinefile \$PBS_NODEFILE -np $np ./fsord
 END
 chmod u+x batchjob
 
+# Interactive
 case $dryrun$debug$mpi in
   nonono)   ./fsord ;;
   noyesno)  gdb ./fsord ;;
@@ -333,9 +350,9 @@ esac
 
 ;;
 
-#--------------------------------------#
-babieca)
+babieca) #--------------------------------------#
 
+# Info
 cat << END
 configuring for babieca
 batch submission (up to 19 procs):
@@ -343,7 +360,7 @@ qsub batchjob
 other useful commands: pbsnodes -a, pingd, qstat, qdel
 END
 
-# batch
+# Batch
 ppn=2
 [ $ppn -gt $np ] && ppn=$np
 nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
@@ -361,7 +378,7 @@ time mpiexec -np $np ./fsord
 END
 chmod u+x batchjob
 
-# interactive
+# Interactive
 case $dryrun$debug$mpi in
   nonono)   ./fsord ;;
   noyesno)  gdb ./fsord ;;
@@ -371,10 +388,9 @@ esac
 
 ;;
 
-#--------------------------------------#
-*)
+*) #--------------------------------------#
 
-# batch
+# Batch
 case $mpi in
   no)  cmd="" ;;
   yes) cmd="mpirun -np $np" ;;
@@ -385,7 +401,7 @@ nohup $cmd ./fsord > out.log &
 END
 chmod u+x batchjob
 
-# interactive
+# Interactive
 case $dryrun$debug$mpi in
   nonono)   ./fsord ;;
   noyesno)  ddd ./fsord ;;
@@ -395,6 +411,4 @@ esac
 
 ;;
 
-esac
-
-#------------------------------------------------------------------------------#
+esac #--------------------------------------#

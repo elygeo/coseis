@@ -5,7 +5,7 @@ account="moho.sdsu.edu"
 account="ux451302@dslogin.sdsc.edu"
 account="altai.sdsu.edu"
 
-echo "Connecting to: $account"
+echo -e "\n$account"
 
 ssh-add -L > /dev/null || ssh-add
 

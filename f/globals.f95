@@ -126,14 +126,14 @@ integer :: &
   noper,        & ! number of zones for spatial derivative operators
   i1oper(2,3),  & ! j1 k1 l1 operator zone start index
   i2oper(2,3),  & ! j2 k2 l2 operator zone end index
-  nin,          & ! number of zones for input
+  nin = 0,      & ! number of zones for input
   i1in(nz,3),   & ! j1 k1 l1 input start index
   i2in(nz,3),   & ! j1 k1 l1 input end index
-  nlock,        & ! number of zones for locking velocity
+  nlock = 0,    & ! number of zones for locking velocity
   lock(nz,3),   & ! flag for locking v1 v2 v3
   i1lock(nz,3), & ! j1 k1 l1 lock zone start index
   i2lock(nz,3), & ! j2 k2 l2 lock zone end index
-  nout,         & ! number of zones for output
+  nout = 0,     & ! number of zones for output
   ditout(nz),   & ! interval for writing output
   i1out(nz,3),  & ! j1 k1 l1 input zone start index
   i2out(nz,3)     ! j2 k2 l2 input zone end index

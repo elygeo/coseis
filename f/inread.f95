@@ -12,10 +12,9 @@ character(16) :: key1, key2
 integer :: i, iz, err
 logical :: inzone
 
+if ( master ) print '(2a)', 'Reading file: ', filename
+
 open( 9, file=filename, status='old' )
-nin = 0
-nout = 0
-nlock = 0
 
 doline: do
 
@@ -25,7 +24,7 @@ if ( err /= 0 ) exit doline
 
 ! Strip comments and MATLAB characters
 i = index( str, '%' )
-str(1:) = ' '
+str(i:) = ' '
 do
   i = scan( str, "{}=[]';" )
   if ( i == 0 ) exit
@@ -60,7 +59,7 @@ case( 'ihypo' );       read( str, * ) key1, ihypo
 case( 'vrup' );        read( str, * ) key1, vrup
 case( 'rcrit' );       read( str, * ) key1, rcrit
 case( 'trelax' );      read( str, * ) key1, trelax
-case( 'np' );          read( str, * ) key1, np; print *, 'HHHH', np
+case( 'np' );          read( str, * ) key1, np
 case( 'itcheck' );     read( str, * ) key1, itcheck
 case( 'rho' );         inzone = .true.
 case( 'vp' );          inzone = .true.

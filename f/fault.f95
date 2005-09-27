@@ -177,7 +177,7 @@ if ( master ) then
   dctest = 3 * abs( dx ) * tn0 * ( mus0 - mud0 ) / ( rho * vs * vs )
   rctest = rho * vs * vs * tn0 * ( mus0 - mud0 ) * dc0 &
     / ( ts0 - tn0 * mud0 ) ** 2
-  open(  9, file='out/faultmeta.m', status='new' )
+  open(  9, file='out/faultmeta.m', status='replace' )
   write( 9, * ) ' mus0   = ', mus0,   '; % static friction at hypocenter'
   write( 9, * ) ' mud0   = ', mud0,   '; % dynamic friction at hypocenter'
   write( 9, * ) ' dc0    = ', dc0,    '; % dc at hypocenter'

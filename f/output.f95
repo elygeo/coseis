@@ -5,14 +5,13 @@ module output_m
 use globals_m
 use collective_m
 use collectiveio_m
-use checkpoint_m
 contains
 subroutine output( pass )
 use zone_m
 
 implicit none
 save
-real :: dtwall(4), courant, amax, vmax, umax, wmax, svmax, slmax
+real :: dtwall, courant, amax, vmax, umax, wmax, svmax, slmax
 integer :: i, i1(3), i2(3), iz, nc, n(3), noff(3), reclen, twall(2), err, &
   twall_rate, amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3)
 character, intent(in) :: pass
@@ -23,7 +22,6 @@ ifinit: if ( init ) then !--------------------------------------!
 
 init = .false.
 if ( nout > nz ) stop 'too many output zones, make nz bigger'
-call readcheckpoint
 
 ifit0: if ( it == 0 .and. master ) then
 
@@ -36,20 +34,12 @@ ifit0: if ( it == 0 .and. master ) then
     stop
   end if
  
-  ! Create directories
-  call system( 'mkdir out/ckp' )
-  call system( 'mkdir out/stats' )
-  do iz = 1, nout
-    write( str, '(a,i2.2)' ) 'out/', iz
-    call system( 'mkdir ' // str )
-  end do
- 
   ! Metadata
   endian = 'l'
   if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
   courant = dt * vp2 * sqrt( 3. ) / abs( dx )
   write( str, '(a,i2.2,a)' ) 'out/meta.m'
-  open(  9, file=str, status='new' )
+  open(  9, file=str, status='replace' )
   write( 9, * ) ' rho1    = ',   rho1,     '; % minimum density'
   write( 9, * ) ' vp1     = ',   vp1,      '; % minimum Vp'
   write( 9, * ) ' vs1     = ',   vs1,      '; % minimum Vp'
@@ -117,7 +107,7 @@ end do doiz0
 
 ! Column names
 if ( master ) then
-  print '(a)', 'Timestep Time     Amax        Vmax        Umax        Wall Time'
+  print '(a)', '  Step  Amax          Vmax          Umax          Wall Time'
   call system_clock( count_rate=twall_rate )
 end if
 
@@ -221,15 +211,12 @@ end do doiz !--------------------------------------!
 ! Stop if not on acceleration pass
 if ( pass == 'w' ) return
 
-! Checkpoint
-call writecheckpoint
-
 ! Metadata
 if ( master ) then
   call system_clock( twall(2) )
   dtwall = real( twall(2) - twall(1) ) / real( twall_rate )
   twall(1) = twall(2)
-  print '(i6,5es14.6)', it, t, amax, vmax, umax, dtwall
+  print '(i6,5es14.6)', it, amax, vmax, umax, dtwall
   open(  9, file='out/timestep', status='replace' )
   write( 9, '(i6,5es14.6)' ) it, t, amax, vmax, umax, dtwall
   close( 9 )

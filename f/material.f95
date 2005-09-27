@@ -26,7 +26,7 @@ vs1 = 1e9
 vs2 = 0.
 
 doiz: do iz = 1, nin
-ifreadfile: if ( readfile(i) ) then !--------------------------------------!
+ifreadfile: if ( readfile(iz) ) then !--------------------------------------!
 
 ! Single node indexing
 n = nn
