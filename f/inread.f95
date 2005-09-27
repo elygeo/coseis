@@ -8,7 +8,7 @@ subroutine inread( filename )
 
 implicit none
 character*(*), intent(in) :: filename
-character(160) :: str, key1, key2
+character(16) :: key1, key2
 integer :: i, iz, err
 logical :: inzone
 
@@ -60,7 +60,7 @@ case( 'ihypo' );       read( str, * ) key1, ihypo
 case( 'vrup' );        read( str, * ) key1, vrup
 case( 'rcrit' );       read( str, * ) key1, rcrit
 case( 'trelax' );      read( str, * ) key1, trelax
-case( 'np' );          read( str, * ) key1, np
+case( 'np' );          read( str, * ) key1, np; print *, 'HHHH', np
 case( 'itcheck' );     read( str, * ) key1, itcheck
 case( 'rho' );         inzone = .true.
 case( 'vp' );          inzone = .true.

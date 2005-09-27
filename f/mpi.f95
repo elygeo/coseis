@@ -4,12 +4,12 @@
 module collective_m
 use mpi
 implicit none
-save
-integer :: ip, ip3(3), ipmaster, ip3master(3), comm, err
-logical :: master, period(3) = .false.
+integer, private :: comm, ip, ipmaster
 contains
 
-subroutine init
+subroutine initialize( master )
+logical, intent(out) :: master
+integer :: err
 call mpi_init( err )
 call mpi_comm_rank( mpi_comm_world, ip, err  )
 master = .false.
@@ -22,26 +22,32 @@ call mpi_finalize( err )
 end subroutine
 
 ! Processor rank
-subroutine rank( np )
+subroutine rank( np, ip3 )
 integer, intent(in) :: np(3)
+integer, intent(out) :: ip3(3)
+integer :: ip, err
+logical :: period(3) = .false.
 call mpi_cart_create( mpi_comm_world, 3, np, period, .true., comm, err )
 if ( comm == mpi_comm_null ) then
+  call mpi_comm_rank( mpi_comm_world, ip, err  )
   print *, 'Unused processor: ', ip
   call mpi_finalize( err )
   stop
 end if
-!call mpi_comm_rank( comm, ip, err  )
-ip = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
+call mpi_comm_rank( comm, ip, err  )
 call mpi_cart_coords( comm, ip, 3, ip3, err )
+end subroutine
+
+! Set master processor
+subroutine setmaster( ip3master )
+integer, intent(in) :: ip3master(3)
 call mpi_cart_rank( comm, ip3master, ipmaster, err )
-master = .false.
-if ( ip == ipmaster ) master = .true.
 end subroutine
 
 ! Broadcast
 subroutine broadcast( r )
 real, intent(inout) :: r(:)
-integer :: i
+integer :: i, err
 i = size(r)
 call mpi_bcast( r, i, mpi_real, ipmaster, comm, err )
 end subroutine
@@ -49,7 +55,7 @@ end subroutine
 ! Integer minimum
 subroutine globalmin( i )
 integer, intent(inout) :: i
-integer :: ii
+integer :: ii, err
 call mpi_allreduce( i, ii, 1, mpi_integer, mpi_min, comm, err )
 i = ii
 end subroutine
@@ -59,6 +65,7 @@ subroutine globalminloc( rmin, imin, nnoff )
 real, intent(inout) :: rmin
 integer, intent(inout) :: imin(3)
 integer, intent(in) :: nnoff
+integer :: err
 real :: local(2), global(2)
 local(1) = rmin
 local(2) = ip
@@ -77,6 +84,7 @@ subroutine globalmaxloc( rmax, imax, nnoff )
 real, intent(inout) :: rmax
 integer, intent(inout) :: imax(3)
 integer, intent(in) :: nnoff
+integer :: err
 real :: local(2), global(2)
 local(1) = rmax
 local(2) = ip
@@ -97,7 +105,7 @@ real, intent(in) :: w1(:,:,:,:)
 integer :: nhalo, ng(4), nl(4), i0(4), i, adjacent1, adjacent2, slice(12), &
   nr, req(12), mpistatus( mpi_statis_size, 4 )
 logical :: init = .true.
-integer :: mof = mpi_order_fortran
+integer :: mof = mpi_order_fortran, err
 ifinit: if ( init ) then
 nhalo = 1
 ng = (/ size(w1,1), size(w1,2), size(w1,3), size(w1,4) /)

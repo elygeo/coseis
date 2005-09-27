@@ -9,20 +9,24 @@ contains
 subroutine setup
 
 implicit none
-integer :: i, nl(3), n(3)
+integer :: nl(3), n(3), ip3master(3)
 
 ! Partition for parallelization
 nl = nn / np; where ( mod( nn, np ) /= 0 ) nl = nl + 1
 np = nn / nl; where ( mod( nn, nl ) /= 0 ) np = np + 1
 
+! Processor rank
+call rank( np, ip3 )
+
 ! Hypocenter
 n = nn
 if ( ifn /= 0 ) n(ifn) = n(ifn) - 1
 where ( ihypo == 0 ) ihypo = n / 2 + 1
-ip3master = ( ihypo - 1 ) / nl
 
-! Find processor rank
-call rank( np )
+! Master processor holds the hypocenter
+ip3master = ( ihypo - 1 ) / nl
+call setmaster( ip3master )
+if ( all( ip3 == ip3master ) ) master = .true.
 
 ! Offset: add to global index to get memory index
 nnoff = nhalo - nl * ip3

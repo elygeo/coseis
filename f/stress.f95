@@ -14,9 +14,7 @@ s2 = 0.
 w2 = 0.
 
 docomponent:  do ic = 1, 3
-
 s1 = u(:,:,:,ic) + dt * viscosity(1) * v(:,:,:,ic)
-
 doderivative: do id = 1, 3
 
 ix = 6 - ic - id
@@ -25,7 +23,7 @@ ix = 6 - ic - id
 do iz = 1, noper
   i1 = max( max( i1oper(iz,:), i1pml + 1 ),     i1cell )
   i2 = min( min( i2oper(iz,:), i2pml - 1 ) - 1, i2cell )
-  call diffnc( s2, oper(iz), s1, x, dx, 1, id, i1, i2 )
+!  call diffnc( s2, oper(iz), s1, x, dx, 1, id, i1, i2 )
 end do
 
 ! PML coordinates
@@ -149,7 +147,6 @@ else
 end if
 
 end do doderivative
-
 end do docomponent
 
 ! Hook's Law, linear stress/strain relation

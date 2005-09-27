@@ -3,7 +3,6 @@
 
 module momentsource_m
 use globals_m
-use collective_m
 use diffnc_m
 contains
 subroutine momentsource

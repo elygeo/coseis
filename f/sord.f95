@@ -5,8 +5,8 @@ program sord
 
 ! Modules
 use globals_m
-use inread_m
 use collective_m
+use inread_m
 use setup_m
 use arrays_m
 use gridgen_m
@@ -21,7 +21,7 @@ use locknodes_m
 use timestep_m
 
 ! Initialization
-call initialize
+call initialize( master )
 if ( master ) print '(a)', ''
 if ( master ) print '(a)', 'SORD - Support Operator Rupture Dynamics'
 call inread( 'defaults.m' )

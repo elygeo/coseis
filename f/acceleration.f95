@@ -105,7 +105,7 @@ do ic = 1, 3
 do iq = 1, 4
   call hourglassnc( s1, w2, ic, iq, i1cell, i2cell )
   s1 = y * s1
-  call hourglasscn( s2, s1,  1, iq, i1node, i2node )
+!  call hourglasscn( s2, s1,  1, iq, i1node, i2node )
   w1(:,:,:,ic) = w1(:,:,:,ic) - s2
 end do
 end do

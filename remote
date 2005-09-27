@@ -1,8 +1,9 @@
 #!/bin/bash -e
 
+account="phim.ucsd.edu"
+account="moho.sdsu.edu"
 account="ux451302@dslogin.sdsc.edu"
-account="gely@phim.ucsd.edu"
-account="gely@moho.sdsu.edu"
+account="altai.sdsu.edu"
 
 echo "Connecting to: $account"
 
@@ -25,7 +26,7 @@ files="
 rfiles=$( echo $files | sed 's|\([^ ]\+\)|sord/\1|g' )
 
 case "$1" in
-get) rsync -auPb -e ssh --backup-dir=old $account:"$rfiles" . ;;
-*)   rsync -auP  -e ssh --delete $files "$account:sord" ;;
+get) rsync -avub -e ssh --backup-dir=old $account:"$rfiles" . ;;
+*)   rsync -avu  -e ssh --delete $files "$account:sord" ;;
 esac
 

@@ -5,7 +5,7 @@ module collectiveio_m
 use mpi
 use collective_m
 implicit none
-integer :: commout(nz)
+integer, private :: commout(nz)
 contains
 
 ! Split communicator

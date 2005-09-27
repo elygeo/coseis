@@ -3,7 +3,6 @@
 
 module material_m
 use globals_m
-use collective_m
 use collectiveio_m
 use diffnc_m
 use zone_m

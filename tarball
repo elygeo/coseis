@@ -21,7 +21,8 @@ files="
 
 mkdir sord-$version
 
-cp -al $files sord-$version/ || cp -rp $files sord-$version/
+cp -al $files sord-$version/ 2> /dev/null || \
+cp -rp $files sord-$version/
 
 #tar zcf sord.tgz sord-$version/
 tar cf - sord-$version/ | gzip > sord.tgz

@@ -3,20 +3,24 @@
 
 module collective_m
 implicit none
-integer :: ip, ip3(3), ip3master(3)
-logical :: master = .true.
 contains
 
-subroutine initialize
+subroutine initialize( master )
+logical, intent(out) :: master
+master = .true.
 end subroutine
 
 subroutine finalize
 end subroutine
 
-subroutine rank( np )
-integer :: np(3)
-ip = 0
+subroutine rank( np, ip3 )
+integer, intent(in) :: np(3)
+integer, intent(out) :: ip3(3)
 ip3 = 0
+end subroutine
+
+subroutine setmaster( ip3master )
+integer, intent(in) :: ip3master(3)
 end subroutine
 
 subroutine broadcast( r )

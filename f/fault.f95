@@ -3,9 +3,9 @@
 
 module fault_m
 use globals_m
-use surfnormals_m
-use collective_m
 use collectiveio_m
+use surfnormals_m
+use zone_m
 contains
 subroutine fault
 
@@ -228,13 +228,13 @@ ts = sqrt( sum( t2 * t2, 4 ) )
 where( tn > 0. ) tn = 0.
 f1 = mud
 where( sl < dc ) f1 = f1 + ( 1. - sl / dc ) * ( mus - mud )
-f1 = f1 * -tn + co
+f1 = -tn * f1 + co
 
 ! Nucleation
 if ( rcrit > 0. .and. vrup > 0. ) then
   f2 = 1.
   if ( trelax > 0. ) f2 = min( ( t - r / vrup ) / trelax, 1. )
-  f2 = ( 1. - f2 ) * ts + f2 * ( mud * -tn + co )
+  f2 = ( 1. - f2 ) * ts + f2 * ( -tn * mud + co )
   where ( r < min( rcrit, t * vrup ) .and. f2 < f1 ) f1 = f2
 end if
 

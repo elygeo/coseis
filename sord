@@ -8,7 +8,6 @@ debug=no
 dryrun=no
 matlab=no
 deleteout=no
-remote=no
 while getopts spgnmrld opt; do
   case $opt in
     s) mpi=no ;;
@@ -17,19 +16,10 @@ while getopts spgnmrld opt; do
     n) dryrun=yes ;;
     m) matlab=yes ;;
     d) deleteout=yes ;;
-    r) remote=yes ;;
-    l) remote=no ;;
   esac
 done
 shift $(( OPTIND - 1 ))
 [ -n "$1" ] && ln -sf "$1" 'in.m'
-
-# run on remote host
-if [ $remote = yes ]; then
-  ./remote put
-  ssh -x $host "cd sord && ./sord $@ -l"
-  exit
-fi
 
 #------------------------------------------------------------------------------#
 # Read input
@@ -125,7 +115,6 @@ OBJECT="\\
   hourglassnc.o \\
   surfnormals.o \\
   zone.o \\
-  serial.o \\
   inread.o \\
   setup.o \\
   arrays.o \\
@@ -182,7 +171,7 @@ case $machine in
 datastar)
   FC=mpxlf95_r
   CC=mpcc_r
-  OPTFLAGS="-O3 -qstrict -qarch=pwr4 -qtune=pwr4 -q64"
+  OPTFLAGS="-qsuffix=f=f95 -O3 -qstrict -qarch=pwr4 -qtune=pwr4 -q64"
   [ $debug = yes ] && OPTFLAGS="-g -qflttrap"
   ;;
 babieca)

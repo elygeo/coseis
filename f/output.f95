@@ -17,7 +17,6 @@ integer :: i, i1(3), i2(3), iz, nc, n(3), noff(3), reclen, twall(2), err, &
   twall_rate, amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3)
 character, intent(in) :: pass
 character :: onpass, endian
-character(160) :: str
 logical :: fault, static, init = .true., test
 
 ifinit: if ( init ) then !--------------------------------------!
@@ -232,7 +231,7 @@ if ( master ) then
   twall(1) = twall(2)
   print '(i6,5es14.6)', it, t, amax, vmax, umax, dtwall
   open(  9, file='out/timestep', status='replace' )
-  write( 9, '(i6,5es14.6)' ), it, t, amax, vmax, umax, dtwall
+  write( 9, '(i6,5es14.6)' ) it, t, amax, vmax, umax, dtwall
   close( 9 )
   write( str, '(a,i6.6,a)' ) 'out/stats/', it, '.m'
   open(  9, file=str, status='replace' )
