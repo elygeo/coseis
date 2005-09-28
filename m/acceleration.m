@@ -3,13 +3,11 @@
 
 s2(:) = 0.;
 
-for ic = 1:3
-for iid = 1:3
+% Loop over component and derivative direction
+for ic  = 1:3
+for iid = 1:3; id = mod( ic + iid - 2, 3 ) + 1;
 
-id = mod( ic + iid - 2, 3 ) + 1;
-ix = 6 - ic - id;
-
-% Non-PML region: F = divS
+% Elastic region: F = divS
 for iz = 1:size( oper, 1 )
   i1 = max( i1oper(iz,:), i1node );
   i2 = min( i2oper(iz,:), i2node );
@@ -19,7 +17,8 @@ for iz = 1:size( oper, 1 )
   if ic == id
     s2(j,k,l) = dfcn( oper(iz), w1, x, dx, ic, id, j, k, l );
   else
-    s2(j,k,l) = dfcn( oper(iz), w2, x, dx, ix, id, j, k, l );
+    i = 6 - ic - id;
+    s2(j,k,l) = dfcn( oper(iz), w2, x, dx, i, id, j, k, l );
   end
 end
 
@@ -61,6 +60,8 @@ for i = 1:npml
     p6(j,k,i,ic) = p6(j,k,i,ic) + dt * s2(j,k,li);
   end
 end
+
+% Add contribution to force vector
 if ic == id
   w1(:,:,:,ic) = s2;
 else
@@ -81,19 +82,19 @@ for iq = 1:4
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
-  s1(j,k,l) = hgnc( w2, ic, iq, j, k, l );
+  s1(j,k,l) = hourglassnc( w2, ic, iq, j, k, l );
   s1 = y .* s1;
   i1 = i1node;
   i2 = i2node;
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
-  s2(j,k,l) = hgcn( s1, 1, iq, j, k, l );
+  s2(j,k,l) = hourglasscn( s1, iq, j, k, l );
   w1(:,:,:,ic) = w1(:,:,:,ic) - s2;
 end
 end
 
-% Newton's Law, A = F / m
+% Newton's Law: A = F / m
 for i = 1:3
   w1(:,:,:,i) = w1(:,:,:,i) .* mr;
 end

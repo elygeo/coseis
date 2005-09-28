@@ -10,25 +10,23 @@ contains
 subroutine acceleration
 
 implicit none
-integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, &
-  ic, iid, id, ix, iq, iz
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, ic, iid, id, iz, iq
 
 s1 = 0.
 
-docomponent:  do ic  = 1, 3
-doderivative: do iid = 1, 3
+! Loop over component and derivative direction
+doic: do ic  = 1, 3
+doid: do iid = 1, 3; id = mod( ic + iid - 2, 3 ) + 1
 
-id = mod( ic + iid - 2, 3 ) + 1
-ix = 6 - ic - id
-
-! Non-PML region: F = divS
+! Elastic region: F = divS
 do iz = 1, noper
   i1 = max( i1oper(iz,:), i1node )
   i2 = min( i2oper(iz,:), i2node )
   if ( ic == id ) then
     call diffcn( s1, oper(iz), w1, x, dx, ic, id, i1, i2 )
   else
-    call diffcn( s1, oper(iz), w2, x, dx, ix, id, i1, i2 )
+    i = 6 - ic - id
+    call diffcn( s1, oper(iz), w2, x, dx, i, id, i1, i2 )
   end if
 end do
 
@@ -94,8 +92,8 @@ else
   w1(:,:,:,ic) = w1(:,:,:,ic) + s1
 end if
 
-end do doderivative
-end do docomponent
+end do doid
+end do doic
 
 ! Hourglass correction
 w2 = u + dt * viscosity(2) * v
@@ -110,7 +108,7 @@ do iq = 1, 4
 end do
 end do
 
-! Newton's Law, A = F / m
+! Newton's Law: A = F / m
 do i = 1, 3
   w1(:,:,:,i) = w1(:,:,:,i) * mr
 end do

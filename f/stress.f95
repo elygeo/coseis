@@ -8,20 +8,18 @@ contains
 subroutine stress
 
 implicit none
-integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, ic, iid, id, ix, iz
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, ic, iid, id, iz
 
 ! Modified displacement
 w1 = u + dt * v * viscosity(1)
 w2 = 0.
 s1 = 0.
 
-docomponent:  do ic  = 1, 3
-doderivative: do iid = 1, 3
+! Loop over component and derivative direction
+doic: do ic  = 1, 3
+doid: do iid = 1, 3; id = mod( ic + iid - 1, 3 ) + 1
 
-id = mod( ic + iid - 1, 3 ) + 1
-ix = 6 - ic - id
-
-! Non-PML region: G = grad(U + gamma*V)
+! Elastic region: G = grad(U + gamma*V)
 do iz = 1, noper
   i1 = max( max( i1oper(iz,:), i1pml + 1 ),     i1cell )
   i2 = min( min( i2oper(iz,:), i2pml - 1 ) - 1, i2cell )
@@ -141,18 +139,18 @@ if ( id == 3 ) then
   end do
 end if
 
-! Add to stress components
+! Add contribution to strain
 if ( ic == id ) then
   w1(:,:,:,ic) = s1
 else
-  w2(:,:,:,ix) = w2(:,:,:,ix) + s1
+  i = 6 - ic - id
+  w2(:,:,:,i) = w2(:,:,:,i) + s1
 end if
 
-end do doderivative
-end do docomponent
+end do doid
+end do doic
 
-! Hook's Law, linear stress/strain relation
-! W = lam*trace(G)*I + mu*(G + G^T)
+! Hook's Law: W = lam*trace(G)*I + mu*(G + G^T)
 s1 = lam * sum( w1, 4 )
 do i = 1, 3
   w1(:,:,:,i) = 2. * mu * w1(:,:,:,i) + s1
