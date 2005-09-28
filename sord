@@ -44,7 +44,9 @@ done < tmp
 [ -e out ]       || mkdir out
 [ -e out/ckp ]   || mkdir out/ckp
 [ -e out/stats ] || mkdir out/stats
-for (( i=1; i<=nout; i++ )); do
+i=0
+while [ $i -le $nout ]; do
+  i=$(( i + 1 ))
   dir=$( echo $nout | awk '{ printf "out/%02d", $1 }' )
   [ -e $dir ] || mkdir $dir
 done

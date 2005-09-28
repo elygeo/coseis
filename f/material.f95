@@ -43,7 +43,6 @@ select case( fieldin(iz) )
 case( 'rho' ); call ioscalar( 'r', 'data/rho', mr, i1, i2, n, noff, 0 )
 case( 'vp'  ); call ioscalar( 'r', 'data/vp',  s1, i1, i2, n, noff, 0 )
 case( 'vs'  ); call ioscalar( 'r', 'data/vs',  s2, i1, i2, n, noff, 0 )
-case default; stop 'fieldin'
 end select
 
 ! Create double nodes
@@ -99,7 +98,6 @@ case( 'vs'  )
   s2(j1:j2,k1:k2,l1:l2) = inval(iz)
   vs1 = min( rho1, inval(iz) )
   vs2 = max( rho2, inval(iz) )
-case default; stop 'fieldin'
 end select
 
 end if ifreadfile !--------------------------------------!
