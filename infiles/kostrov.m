@@ -6,6 +6,7 @@
   bc		= [ 0 1 0   0 1 0 ]		;
   faultnormal	= 3				;
   mus		= 1e9				;
+  mud		= 0.				;
   dc		= 1e9				;
   co		= 0.				;
   tnrm		= -100e6			;

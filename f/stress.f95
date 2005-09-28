@@ -8,22 +8,24 @@ contains
 subroutine stress
 
 implicit none
-integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, ic, id, ix, iz
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, ic, iid, id, ix, iz
 
-s2 = 0.
+! Modified displacement
+w1 = u + dt * v * viscosity(1)
 w2 = 0.
+s1 = 0.
 
-docomponent:  do ic = 1, 3
-s1 = u(:,:,:,ic) + dt * viscosity(1) * v(:,:,:,ic)
-doderivative: do id = 1, 3
+docomponent:  do ic  = 1, 3
+doderivative: do iid = 1, 3
 
+id = mod( ic + iid - 1, 3 ) + 1
 ix = 6 - ic - id
 
 ! Non-PML region: G = grad(U + gamma*V)
 do iz = 1, noper
   i1 = max( max( i1oper(iz,:), i1pml + 1 ),     i1cell )
   i2 = min( min( i2oper(iz,:), i2pml - 1 ) - 1, i2cell )
-!  call diffnc( s2, oper(iz), s1, x, dx, 1, id, i1, i2 )
+  call diffnc( s1, oper(iz), w1, x, dx, ic, id, i1, i2 )
 end do
 
 ! PML coordinates
@@ -38,31 +40,31 @@ if ( id /= 1 ) then
   i1 = i1cell
   i2 = i2cell
   i2(1) = j2
-  call diffnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
   i1 = i1cell
   i2 = i2cell
   i1(1) = j1
-  call diffnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
 end if
 if ( id /= 2 ) then
   i1 = i1cell
   i2 = i2cell
   i2(2) = k2
-  call diffnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
   i1 = i1cell
   i2 = i2cell
   i1(2) = k1
-  call diffnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
 end if
 if ( id /= 3 ) then
   i1 = i1cell
   i2 = i2cell
   i2(3) = l2
-  call diffnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
   i1 = i1cell
   i2 = i2cell
   i1(3) = l1
-  call diffnc( s2, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
 end if
 
 ! PML region, damped direction: G' + DG = gradV
@@ -70,23 +72,23 @@ if ( id == 1 ) then
   i1 = i1cell
   i2 = i2cell
   i2(1) = j2
-  call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
   do j = i1(1), i2(1)
   i = j - nnoff(1)
   forall( k=i1(2):i2(2), l=i1(3):i2(3) )
-    s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g1(i,k,l,ic)
-    g1(i,k,l,ic) = s2(j,k,l)
+    s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g1(i,k,l,ic)
+    g1(i,k,l,ic) = s1(j,k,l)
   end forall
   end do
   i1 = i1cell
   i2 = i2cell
   i1(1) = j1
-  call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
   do j = i1(1), i2(1)
   i = nn(1) - j + nnoff(1)
   forall( k=i1(2):i2(2), l=i1(3):i2(3) )
-    s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g4(i,k,l,ic)
-    g4(i,k,l,ic) = s2(j,k,l)
+    s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g4(i,k,l,ic)
+    g4(i,k,l,ic) = s1(j,k,l)
   end forall
   end do
 end if
@@ -94,23 +96,23 @@ if ( id == 2 ) then
   i1 = i1cell
   i2 = i2cell
   i2(2) = k2
-  call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
   do k = i1(2), i2(2)
   i = k - nnoff(2)
   forall( j=i1(1):i2(1), l=i1(3):i2(3) )
-    s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g2(j,i,l,ic)
-    g2(j,i,l,ic) = s2(j,k,l)
+    s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g2(j,i,l,ic)
+    g2(j,i,l,ic) = s1(j,k,l)
   end forall
   end do
   i1 = i1cell
   i2 = i2cell
   i1(2) = k1
-  call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
   do k = i1(2), i2(2)
   i = nn(2) - k + nnoff(2)
   forall( j=i1(1):i2(1), l=i1(3):i2(3) )
-    s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g5(j,i,l,ic)
-    g5(j,i,l,ic) = s2(j,k,l)
+    s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g5(j,i,l,ic)
+    g5(j,i,l,ic) = s1(j,k,l)
   end forall
   end do
 end if
@@ -118,32 +120,32 @@ if ( id == 3 ) then
   i1 = i1cell
   i2 = i2cell
   i2(3) = l2
-  call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
   do l = i1(3), i2(3)
   i = l - nnoff(3)
   forall( j=i1(1):i2(1), k=i1(2):i2(2) )
-    s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g3(j,k,i,ic)
-    g3(j,k,i,ic) = s2(j,k,l)
+    s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g3(j,k,i,ic)
+    g3(j,k,i,ic) = s1(j,k,l)
   end forall
   end do
   i1 = i1cell
   i2 = i2cell
   i2(3) = l2
-  call diffnc( s2, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
   do l = i1(3), i2(3)
   i = nn(3) - l + nnoff(3)
   forall( j=i1(1):i2(1), k=i1(2):i2(2) )
-    s2(j,k,l) = dc2(i) * s2(j,k,l) + dc1(i) * g6(j,k,i,ic)
-    g6(j,k,i,ic) = s2(j,k,l)
+    s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g6(j,k,i,ic)
+    g6(j,k,i,ic) = s1(j,k,l)
   end forall
   end do
 end if
 
 ! Add to stress components
 if ( ic == id ) then
-  w1(:,:,:,ic) = s2
+  w1(:,:,:,ic) = s1
 else
-  w2(:,:,:,ix) = w2(:,:,:,ix) + s2
+  w2(:,:,:,ix) = w2(:,:,:,ix) + s1
 end if
 
 end do doderivative

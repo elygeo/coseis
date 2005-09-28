@@ -12,7 +12,7 @@ use zone_m
 implicit none
 save
 real :: dtwall, courant, amax, vmax, umax, wmax, svmax, slmax
-integer :: i, i1(3), i2(3), iz, nc, n(3), noff(3), reclen, twall(2), err, &
+integer :: i, i1(3), i2(3), iz, nc, n(3), noff(3), reclen, twall(2), &
   twall_rate, amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3)
 character, intent(in) :: pass
 character :: onpass, endian
@@ -29,7 +29,7 @@ ifit0: if ( it == 0 .and. master ) then
 
   ! Check for previus run
   inquire( file='out/timestep', exist=test )
-  if ( err /= 0 ) then
+  if ( test ) then
     print '(a)', 'Error: previous output found. use -d flag to overwrite'
     stop
   end if
@@ -41,18 +41,18 @@ ifit0: if ( it == 0 .and. master ) then
   write( str, '(a,i2.2,a)' ) 'out/meta.m'
   open(  9, file=str, status='replace' )
   write( 9, * ) ' rho1    = ',   rho1,     '; % minimum density'
-  write( 9, * ) ' vp1     = ',   vp1,      '; % minimum Vp'
-  write( 9, * ) ' vs1     = ',   vs1,      '; % minimum Vp'
   write( 9, * ) ' rho2    = ',   rho2,     '; % maximum density'
-  write( 9, * ) ' vp2     = ',   vp2,      '; % maximum Vp'
-  write( 9, * ) ' vs2     = ',   vs2,      '; % maximum Vp'
   write( 9, * ) ' rho     = ',   rho,      '; % hypocenter density'
+  write( 9, * ) ' vp1     = ',   vp1,      '; % minimum Vp'
+  write( 9, * ) ' vp2     = ',   vp2,      '; % maximum Vp'
   write( 9, * ) ' vp      = ',   vp,       '; % hypocenter Vp'
-  write( 9, * ) ' vs      = ',   vs,       '; % hypocenter Vp'
+  write( 9, * ) ' vs1     = ',   vs1,      '; % minimum Vs'
+  write( 9, * ) ' vs2     = ',   vs2,      '; % maximum Vs'
+  write( 9, * ) ' vs      = ',   vs,       '; % hypocenter Vs'
   write( 9, * ) ' courant = ',   courant,  '; % stability condition'
   write( 9, * ) ' xhypo   = [ ', xhypo,  ' ]; % hypocenter location'
   write( 9, * ) ' nout    = ',   nout,     '; % number output zones'
-  write( 9, * ) ' endian  = ''', endian, '''; % byte ordert'
+  write( 9, * ) ' endian  = ''', endian, '''; % byte order'
   close( 9 )
 
 end if ifit0

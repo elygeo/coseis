@@ -11,7 +11,7 @@ subroutine fault
 
 implicit none
 save
-real :: mus0, mud0, dc0, dctest, tn0, ts0, s, rctest, upvector(3)
+real :: mus0, mud0, dc0, lc, tn0, ts0, s, rctest, upvector(3)
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, &
   j3, k3, l3, j4, k4, l4, iz, idip, istr
 logical :: init = .true.
@@ -67,7 +67,7 @@ else
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
-  select case ( fieldin(i) )
+  select case ( fieldin(iz) )
   case( 'mus'  ); mus(j1:j2,k1:k2,l1:l2)  = inval(iz)
   case( 'mud'  ); mud(j1:j2,k1:k2,l1:l2)  = inval(iz)
   case( 'dc'   ); dc(j1:j2,k1:k2,l1:l2)   = inval(iz)
@@ -174,18 +174,18 @@ if ( master ) then
   ts0 = sqrt( sum( ( t0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) ** 2. ) )
   tn0 = max( -tn0, 0. )
   s = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 )
-  dctest = 3 * abs( dx ) * tn0 * ( mus0 - mud0 ) / ( rho * vs * vs )
+  lc =  dc0 * ( rho * vs * vs ) / tn0 / ( mus0 - mud0 )
   rctest = rho * vs * vs * tn0 * ( mus0 - mud0 ) * dc0 &
     / ( ts0 - tn0 * mud0 ) ** 2
   open(  9, file='out/faultmeta.m', status='replace' )
   write( 9, * ) ' mus0   = ', mus0,   '; % static friction at hypocenter'
   write( 9, * ) ' mud0   = ', mud0,   '; % dynamic friction at hypocenter'
   write( 9, * ) ' dc0    = ', dc0,    '; % dc at hypocenter'
-  write( 9, * ) ' dctest = ', dctest, '; % breakdown resolution test'
   write( 9, * ) ' tn0    = ', tn0,    '; % normal traction at hypocenter'
   write( 9, * ) ' ts0    = ', ts0,    '; % shear traction at hypocenter'
   write( 9, * ) ' s      = ', s,      '; % strength paramater'
-  write( 9, * ) ' rctest = ', rctest, '; % remmomended rcrit for nucleation'
+  write( 9, * ) ' lc     = ', lc,     '; % breakdown width'
+  write( 9, * ) ' rctest = ', rctest, '; % rcrit for spontaneous rupture'
   close( 9 )
 end if
 
@@ -218,6 +218,7 @@ end do
 
 ! Decompose traction to normal and shear components
 tn = sum( t3 * nrm, 4 )
+if ( any( tn > 0. ) ) print *, 'Fault opening!'
 do i = 1, 3
   t1(:,:,:,i) = tn * nrm(:,:,:,i)
 end do
@@ -237,8 +238,6 @@ if ( rcrit > 0. .and. vrup > 0. ) then
   f2 = ( 1. - f2 ) * ts + f2 * ( -tn * mud + co )
   where ( r < min( rcrit, t * vrup ) .and. f2 < f1 ) f1 = f2
 end if
-
-if ( any( f1 <= 0. ) ) print *, 'Fault opening!'
 
 ! Shear traction bounded by friction
 f2 = 1.

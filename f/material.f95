@@ -26,7 +26,33 @@ vs1 = 1e9
 vs2 = 0.
 
 doiz: do iz = 1, nin
-ifreadfile: if ( readfile(iz) ) then !--------------------------------------!
+ifreadfile: if ( .not. readfile(iz) ) then !-----------------------------------!
+
+! Assign by zones
+call zone( i1in(iz,:), i2in(iz,:), nn, nnoff, ihypo, ifn )
+i1 = max( i1in(iz,:), i1cell )
+i2 = min( i2in(iz,:), i2cell + 1 )
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+
+! Find extreme values
+select case( fieldin(iz) )
+case( 'rho' )
+  mr(j1:j2,k1:k2,l1:l2) = inval(iz)
+  rho1 = min( rho1, inval(iz) )
+  rho2 = max( rho2, inval(iz) )
+case( 'vp'  )
+  s1(j1:j2,k1:k2,l1:l2) = inval(iz)
+  vp1 = min( vp1, inval(iz) )
+  vp2 = max( vp2, inval(iz) )
+case( 'vs'  )
+  s2(j1:j2,k1:k2,l1:l2) = inval(iz)
+  vs1 = min( vs1, inval(iz) )
+  vs2 = max( vs2, inval(iz) )
+end select
+
+else !-------------------------------------------------------------------------!
 
 ! Single node indexing
 n = nn
@@ -74,33 +100,7 @@ where ( s1 > vp2 ) s1 = vp2
 where ( s2 < vs1 ) s2 = vs1
 where ( s2 > vs2 ) s2 = vs2
 
-else !--------------------------------------!
-
-! Assign by zones
-call zone( i1in(iz,:), i2in(iz,:), nn, nnoff, ihypo, ifn )
-i1 = max( i1in(iz,:), i1cell )
-i2 = min( i2in(iz,:), i2cell + 1 )
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-
-! Find extreme values
-select case( fieldin(i) )
-case( 'rho' )
-  mr(j1:j2,k1:k2,l1:l2) = inval(iz)
-  rho1 = min( rho1, inval(iz) )
-  rho2 = max( rho2, inval(iz) )
-case( 'vp'  )
-  s1(j1:j2,k1:k2,l1:l2) = inval(iz)
-  vp1 = min( rho1, inval(iz) )
-  vp2 = max( rho2, inval(iz) )
-case( 'vs'  )
-  s2(j1:j2,k1:k2,l1:l2) = inval(iz)
-  vs1 = min( rho1, inval(iz) )
-  vs2 = max( rho2, inval(iz) )
-end select
-
-end if ifreadfile !--------------------------------------!
+end if ifreadfile !------------------------------------------------------------!
 end do doiz
 
 ! Hypocenter values

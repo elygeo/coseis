@@ -300,7 +300,10 @@ END
 chmod u+x batchjob
 
 # Interactive
-[ $( hostname ) = ds100 ] || dryrun=yes
+if [ $( hostname ) != ds100 ]; then
+  echo "loging to dspoe.sdsc.edu to run interactively"
+  dryrun=yes
+fi
 case $dryrun$debug$mpi in
   nonono)   ./fsord ;;
   nonoyes)  poe ./fsord $opts ;;

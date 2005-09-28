@@ -176,11 +176,11 @@ l     = slip length
 mu(l) = coefficient of friction
 mus   = coefficient of static friction
 mud   = coefficient of dynamic friction
-d0    = slip weakening distance
+dc    = slip weakening distance
 
 F = mu(l) * T.n + co
-mu(l) = / mus - (us-ud)*l/d0,  l <= d0
-        \ mud,                 l >  d0
+mu(l) = / mus - (us-ud)*l/dc,  l <= dc
+        \ mud,                 l >  dc
 
 
       mus +
@@ -190,17 +190,20 @@ mu(l) = / mus - (us-ud)*l/d0,  l <= d0
  u    mud +   +---------
           |
           +---+---------
-             d0   l->
+             dc   l->
 
 
 Strength parameter
 s = (Tu - T0)/(T0 - Tf)
 
 Estimate critical radius needed for spontaneous rupture
-rc =~ mu*d0*(Tu - Tf)/(T0 - Tf)^2
+rc =~ mu*dc*(Tu - Tf)/(T0 - Tf)^2
 
-Estimate d0 needed to resolve breakdown zone
-d0 =~ (3 or 4)*dx*(Tu - Tf)/mu
+Breakdown zone width
+lc = dc*mu/(Tu - Tf)
+
+Estimate dc needed to resolve breakdown zone
+dc =~ (3 or 4)*dx*(Tu - Tf)/mu
 
 
 
