@@ -186,12 +186,12 @@ esac
 case $machine in
 datastar)
   case $mpi in
-  no)  FC="xlf95_r" ;;
-  yes) FC="mpxlf95_r" ;;
+  no)  FC="xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg" ;;
+  yes) FC="mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg" ;;
   esac 
   case $debug in
-  no)  FFLAGS="-qsuffix=f=f90 -q64 -O3 -qstrict -qarch=pwr4 -qtune=pwr4" ;;
-  yes) FFLAGS="-qsuffix=f=f90 -q64 -g -C -qflttrap -qsigtrap" ;;
+  no)  FFLAGS="-O3 -qstrict -qarch=pwr4 -qtune=pwr4" ;;
+  yes) FFLAGS="-g -u -C -qflttrap -qsigtrap -qlanglvl=95pure" ;;
   esac
   ;;
 teragrid)

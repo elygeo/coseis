@@ -20,7 +20,7 @@ end subroutine
 subroutine ioscalar( io, filename, s1, i1, i2, n, noff, iz )
 character*(*), intent(in) :: io, filename
 real, intent(in) :: s1(:,:,:)
-integer, intent(in) :: i1(3), i2(3), n(3), noff, iz
+integer, intent(in) :: i1(3), i2(3), n(3), noff(3), iz
 integer :: ftype, mtype, fh, d=0, nl(3), ng(3), i0(3), mode, err, &
   mof = mpi_order_fortran
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, err )
@@ -56,7 +56,7 @@ end subroutine
 subroutine iovector( io, filename, w1, i, i1, i2, n, noff, iz )
 character*(*), intent(in) :: io, filename
 real, intent(in) :: w1(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3), n(3), noff, i, iz
+integer, intent(in) :: i, i1(3), i2(3), n(3), noff(3), iz
 integer :: ftype, mtype, fh, d = 0, nl(4), ng(4), i0(4), mode, err, &
   mof = mpi_order_fortran
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, err )
