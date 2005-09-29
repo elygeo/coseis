@@ -101,7 +101,7 @@ doiz0: do iz = 1, nout
  
   ! Split collective i/o
   if ( any( i2 < i1 ) ) ditout(iz) = 0
-  call iosplit( iz, ditout(iz) )
+  call iosplit( iz, nout, ditout(iz) )
 
 end do doiz0
 

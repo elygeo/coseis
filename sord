@@ -158,8 +158,8 @@ no)  FC="f95";    OBJECT="serial.o serialio.o $OBJECT" ;;
 yes) FC="mpif90"; OBJECT="mpi.o mpiio.o $OBJECT" ;;
 esac
 case $debug in
-no)  OPTFLAGS="-O" ;;
-yes) OPTFLAGS="-g" ;;
+no)  FFLAGS="-O" ;;
+yes) FFLAGS="-g" ;;
 esac
 
 # OS specific
@@ -170,24 +170,14 @@ Linux)
   yes) FC="mpif90" ;;
   esac
   case $debug in
-  no)  OPTFLAGS="-O3" ;;
-  yes) OPTFLAGS="-g -pedantic -std=f95 -Wall -W -fimplicit-none";;
+  no)  FFLAGS="-O3" ;;
+  yes) FFLAGS="-g -pedantic -std=f95 -Wall -W -fimplicit-none" ;;
   esac
-  ;;
-AIX)
-  case $mpi in
-  no)  FC="xlf95_r" ;;
-  yes) FC="mpxlf95_r" ;;
-  esac 
   ;;
 SunOS)
-  case $mpi in
-  no)  FC="gfortran" ;;
-  yes) FC="mpif90" ;;
-  esac
   case $debug in
-  no)  OPTFLAGS="-fast" ;;
-  yes) OPTFLAGS="-g" ;;
+  no)  FFLAGS="-fast" ;;
+  yes) FFLAGS="-g" ;;
   esac
   ;;
 esac
@@ -195,9 +185,23 @@ esac
 # Machine specific
 case $machine in
 datastar)
+  case $mpi in
+  no)  FC="xlf95_r" ;;
+  yes) FC="mpxlf95_r" ;;
+  esac 
   case $debug in
-  no)  OPTFLAGS="-qsuffix=f=f95 -q64 -O3 -qstrict -qarch=pwr4 -qtune=pwr4" ;;
-  yes) OPTFLAGS="-qsuffix=f=f95 -q64 -g -C -qflttrap -qsigtrap" ;;
+  no)  FFLAGS="-qsuffix=f=f90 -q64 -O3 -qstrict -qarch=pwr4 -qtune=pwr4" ;;
+  yes) FFLAGS="-qsuffix=f=f90 -q64 -g -C -qflttrap -qsigtrap" ;;
+  esac
+  ;;
+teragrid)
+  case $mpi in
+  no)  FC="ifort" ;;
+  yes) FC="mpif90" ;;
+  esac
+  case $debug in
+  no)  FFLAGS="-O3" ;;
+  yes) FFLAGS="-g -CB -warn -traceback" ;;
   esac
   ;;
 babieca)
@@ -211,7 +215,7 @@ esac
 # Write makefile
 cat << END > tmp
 FC = $FC
-FFLAGS = $OPTFLAGS
+FFLAGS = $FFLAGS
 OBJECT = $OBJECT
 fsord: \$(OBJECT) makefile
 	\$(FC) -L/usr/lib/ \$(FFLAGS) \$(OBJECT) -o fsord
@@ -219,7 +223,7 @@ clean:
 	rm -f *.o *.mod matlab_workspace.mat
 realclean: clean
 	rm -f fsord makefile batchjob sord.tgz
-%.o: f/%.f95 makefile
+%.o: f/%.f90 makefile
 	\$(FC) \$(FFLAGS) -c \$< -o \$@
 END
 

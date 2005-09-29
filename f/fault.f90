@@ -11,7 +11,7 @@ subroutine fault
 
 implicit none
 save
-real :: mus0, mud0, dc0, lc, tn0, ts0, s, rctest, upvector(3)
+real :: mus0, mud0, dc0, lc, tn0, ts0, s, rctest, vertical(3)
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, &
   j3, k3, l3, j4, k4, l4, iz, idip, istr
 logical :: init = .true.
@@ -37,7 +37,7 @@ co = 1e9
 t1 = 0.
 t2 = 0.
 t3 = 0.
-print *, i1node, i2node
+
 doiz: do iz = 1, nin
 ifreadfile: if ( readfile(iz) ) then
   i1 = i1node
@@ -116,13 +116,14 @@ else
   istr = mod( ifn, 3 ) + 1
   idip = 6 - ifn - istr
 end if
+!handed = mod( istr - ifn + 1, 3 ) - 1
 
 ! Strike vectors
-upvector = 0.
-upvector(idip) = 1.
-t1(:,:,:,1) = upvector(2) * nrm(:,:,:,3) - upvector(3) * nrm(:,:,:,2)
-t1(:,:,:,2) = upvector(3) * nrm(:,:,:,1) - upvector(1) * nrm(:,:,:,3)
-t1(:,:,:,3) = upvector(1) * nrm(:,:,:,2) - upvector(2) * nrm(:,:,:,1)
+vertical = 0.
+vertical(idip) = 1.
+t1(:,:,:,1) = vertical(2) * nrm(:,:,:,3) - vertical(3) * nrm(:,:,:,2)
+t1(:,:,:,2) = vertical(3) * nrm(:,:,:,1) - vertical(1) * nrm(:,:,:,3)
+t1(:,:,:,3) = vertical(1) * nrm(:,:,:,2) - vertical(2) * nrm(:,:,:,1)
 f1 = sqrt( sum( t1 * t1, 4 ) )
 where ( f1 /= 0. ) f1 = 1. / f1
 do i = 1, 3
@@ -139,14 +140,6 @@ do i = 1, 3
   t2(:,:,:,i) = t2(:,:,:,i) * f1
 end do
 
-print *, minval( t3(:,:,:,1) )
-print *, minval( t3(:,:,:,2) )
-print *, minval( t3(:,:,:,3) )
-print *, upvector
-print *, nrm(2,2,1,:)
-print *, t1(2,2,1,:)
-print *, t2(2,2,1,:)
-
 ! Total pretraction
 do i = 1, 3
   t0(:,:,:,i) = t0(:,:,:,i) + &
@@ -156,9 +149,11 @@ do i = 1, 3
 end do
 
 print *, ifn, istr, idip
-print *, minval( t0(:,:,:,1) )
-print *, minval( t0(:,:,:,2) )
-print *, minval( t0(:,:,:,3) )
+print *, t3(2,2,1,:)
+print *, nrm(2,2,1,:)
+print *, t1(2,2,1,:)
+print *, t2(2,2,1,:)
+print *, t0(2,2,1,:)
 
 ! Hypocentral radius
 i1 = 1

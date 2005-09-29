@@ -4,7 +4,8 @@
 module collective_m
 use mpi
 implicit none
-integer, private :: comm, ip, ipmaster
+integer :: comm
+integer, private :: ip, ipmaster
 contains
 
 subroutine initialize( master )
@@ -18,6 +19,7 @@ end subroutine
 
 ! Finalize
 subroutine finalize
+integer :: err
 call mpi_finalize( err )
 end subroutine
 
@@ -41,6 +43,7 @@ end subroutine
 ! Set master processor
 subroutine setmaster( ip3master )
 integer, intent(in) :: ip3master(3)
+integer :: err
 call mpi_cart_rank( comm, ip3master, ipmaster, err )
 end subroutine
 
@@ -65,17 +68,17 @@ subroutine globalminloc( rmin, imin, nnoff )
 real, intent(inout) :: rmin
 integer, intent(inout) :: imin(3)
 integer, intent(in) :: nnoff
-integer :: err
+integer :: err, ipmin
 real :: local(2), global(2)
 local(1) = rmin
 local(2) = ip
 call mpi_reduce( local, global, 2, mpi_real, mpi_minloc, ipmaster, comm, err )
 rmin  = global(1)
 ipmin = global(2)
-if ( ip = ipmaster .or. ip = ipmin ) then
-  ihypo = ihypo - nnoff
-  call mpi_rendrecv_replace( imin, 3, mpi_integer, ipmaster, 0, ip, 0, comm, mpi_status_ignore, err )
-  ihypo = ihypo + nnoff
+if ( ip == ipmaster .or. ip == ipmin ) then
+  imin = imin - nnoff
+  call mpi_sendrecv_replace( imin, 3, mpi_integer, ipmaster, 0, ip, 0, comm, mpi_status_ignore, err )
+  imin = imin + nnoff
 end if
 end subroutine
 
@@ -84,17 +87,17 @@ subroutine globalmaxloc( rmax, imax, nnoff )
 real, intent(inout) :: rmax
 integer, intent(inout) :: imax(3)
 integer, intent(in) :: nnoff
-integer :: err
+integer :: err, ipmax
 real :: local(2), global(2)
 local(1) = rmax
 local(2) = ip
 call mpi_reduce( local, global, 2, mpi_real, mpi_maxloc, ipmaster, comm, err )
 rmax  = global(1)
 ipmax = global(2)
-if ( ip = ipmaster .or. ip = ipmax ) then
-  ihypo = ihypo - nnoff
-  call mpi_rendrecv_replace( imax, 3, mpi_integer, ipmaster, 0, ip, 0, comm, mpi_status_ignore, err )
-  ihypo = ihypo + nnoff
+if ( ip == ipmaster .or. ip == ipmax ) then
+  imax = imax - nnoff
+  call mpi_sendrecv_replace( imax, 3, mpi_integer, ipmaster, 0, ip, 0, comm, mpi_status_ignore, err )
+  imax = imax + nnoff
 end if
 end subroutine
 
@@ -103,7 +106,7 @@ subroutine swaphalo( w1 )
 save
 real, intent(in) :: w1(:,:,:,:)
 integer :: nhalo, ng(4), nl(4), i0(4), i, adjacent1, adjacent2, slice(12), &
-  nr, req(12), mpistatus( mpi_statis_size, 4 )
+  nr, req(12), mpistatus( mpi_status_size, 4 )
 logical :: init = .true.
 integer :: mof = mpi_order_fortran, err
 ifinit: if ( init ) then
@@ -136,7 +139,7 @@ do i = 1, 3
   call mpi_send_init( w1, 1, slice(nr), adjacent2, 1, comm, req(nr), err )
 end do
 return
-end if init
+end if ifinit
 do i = 1, nr, 4
   call mpi_startall( 4, req(i), err )
   call mpi_waitall( 4, req(i), mpistatus, err )

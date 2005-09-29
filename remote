@@ -1,8 +1,8 @@
 #!/bin/bash -e
 
 account="phim.ucsd.edu"
-account="moho.sdsu.edu"
 account="altai.sdsu.edu"
+account="ux451302@tg-login.sdsc.edu"
 account="ux451302@dslogin.sdsc.edu"
 
 echo -e "\n$account"

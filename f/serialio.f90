@@ -6,10 +6,10 @@ implicit none
 contains
 
 ! Placeholder for split collective parallel output
-subroutine iosplit( iz, ditout )
-integer, intent(in) :: iz, ditout
+subroutine iosplit( iz, nout, ditout )
+integer, intent(in) :: iz, nout, ditout
 integer :: i
-i = iz + ditout
+i = iz + nout + ditout ! silence compiler warnings
 end subroutine
 
 ! Input/output scalar field

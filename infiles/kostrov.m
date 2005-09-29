@@ -2,8 +2,10 @@
 
   model		= 'kostrov'			;
   nn		= [ 41  41  42  ]		;
+  nn		= [ 3   3   4   ]		;
   nt		= 100				;
   bc		= [ 0 0 1   0 0 1 ]		;
+  bc		= [ 0 0 0   0 0 0 ]		;
   faultnormal	= 3				;
   upward	= -2				;
   mus		= 1e9				;
