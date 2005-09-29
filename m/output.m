@@ -79,20 +79,17 @@ otherwise error( [ 'outvar: ' outvar{iz} ] )
 end
 if isfault & ~ifn; ditout(iz) = 0; end
 if onpass ~= pass, continue, end
-[ i1, i2 ] = zone( i1out(iz,:), i2out(iz,:), nn, noff, i0, ifn );
+[ i1, i2 ] = zone( i1out(iz,:), i2out(iz,:), nn, nnoff, i0, ifn );
 if cell; i2 = i2 - 1; end
 
 % Metadata
-file = sprintf( 'out/%02d/meta', iz );
+file = sprintf( 'out/%02d/meta.m', iz );
 fid = fopen( file, 'w' );
-fprintf( fid, ' field  %s\n',       outfield{iz} );
-fprintf( fid, ' nc     %g\n',       nc           );
-fprintf( fid, ' i1     %g %g %g\n', i1 - noff    );
-fprintf( fid, ' i2     %g %g %g\n', i2 - noff    );
-fprintf( fid, ' itout  %g\n',       it           );
-fprintf( fid, ' dit    %g\n',       ditout(iz)   );
-fprintf( fid, ' tout   %g\n',       t            );
-fprintf( fid, ' endian %s\n',       endian       );
+fprintf( fid, ' field = ''%s'';\n',       outfield{iz} );
+fprintf( fid, ' nc    = %g;\n',           nc           );
+fprintf( fid, ' i1    = [ %g %g %g ];\n', i1 - nnoff   );
+fprintf( fid, ' i2    = [ %g %g %g ];\n', i2 - nnoff   );
+fprintf( fid, ' dit   = %g;\n',           ditout(iz)   );
 fclose( fid );
 
 if isfault

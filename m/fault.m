@@ -42,7 +42,7 @@ if ( readfile(i) )
   case 'tdip',     t3(j1:j2,k1:k2,l1:l2,3) = bread( 'data/tdip',     endian );
   end
 else
-  [ i1, i2 ] = zone( i1in(iz,:), i2in(iz,:), nn, noff, ihypo, ifn );
+  [ i1, i2 ] = zone( i1in(iz,:), i2in(iz,:), nn, nnoff, ihypo, ifn );
   i1 = max( i1, i1nodepml );
   i2 = min( i2, i2nodepml );
   i1(ifn) = 1;
@@ -153,23 +153,19 @@ dc0 = dc(j,k,l);
 tn0 = sum( t0(j,k,l,:) .* nrm(j,k,l,:) );
 ts0 = norm( shiftdim( t0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) );
 tn0 = max( -tn0, 0 );
-ess = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 );
-dcmin = 3 * dx * tn0 * ( mus0 - mud0 ) / mu0;
-rcritmin = mu0 * tn0 * ( mus0 - mud0 ) * dc0 / ( ts0 - tn0 * mud0 ) ^ 2.;
-fid = fopen( 'out/faultmeta', 'w' );
-fprintf( fid, 'ihypo    %g %g %g\n', ihypo - noff );
-fprintf( fid, 'xhypo    %g %g %g\n', xhypo        );
-fprintf( fid, 'mus      %g\n',       mus0         );
-fprintf( fid, 'mud      %g\n',       mud0         );
-fprintf( fid, 'dc       %g\n',       dc0          );
-fprintf( fid, 'dcmin    %g\n',       dcmin        );
-fprintf( fid, 'tnormal  %g\n',       tn0          );
-fprintf( fid, 'tshear   %g\n',       ts0          );
-fprintf( fid, 'S        %g\n',       ess          );
-fprintf( fid, 'vrup     %g\n',       vrup         );
-fprintf( fid, 'rcrit    %g\n',       rcrit        );
-fprintf( fid, 'rcritmin %g\n',       rcrit        );
-fprintf( fid, 'trelax   %g\n',       trelax       );
+s = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 );
+lc =  dc0 * ( rho * vs * vs ) / tn0 / ( mus0 - mud0 );
+rctest = rho * vs * vs * tn0 * ( mus0 - mud0 ) * dc0 ...
+  / ( ts0 - tn0 * mud0 ) ^ 2.;
+fid = fopen( 'out/faultmeta.m', 'w' );
+fprintf( fid, 'mus0   = %g;\n', mus0   );
+fprintf( fid, 'mud0   = %g;\n', mud0   );
+fprintf( fid, 'dc0    = %g;\n', dc0    );
+fprintf( fid, 'tn0    = %g;\n', tn0    );
+fprintf( fid, 'ts0    = %g;\n', ts0    );
+fprintf( fid, 's      = %g;\n', s      );
+fprintf( fid, 'lc     = %g;\n', lc     );
+fprintf( fid, 'rctest = %g;\n', rctest );
 close( fid )
 return
 

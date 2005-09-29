@@ -52,6 +52,6 @@ end
 
 ylabel( field )
 xlabel( 'Time' )
-title( num2str( ixhair ) )
+title( num2str( point ) )
 set( 0, 'CurrentFigure', 1 )
 

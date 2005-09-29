@@ -1,6 +1,6 @@
 %------------------------------------------------------------------------------%
 % Read time series
-% input: vizfield xhair iz
+% input: vizfield sensor iz
 % output: tg vg
 
 % Get metadata
@@ -9,7 +9,7 @@ eval( meta )
 
 % File offset
 n = i2 - i1 + 1;
-i = ixhair - i1;
+i = sensor - i1;
 skip = 4 * sum( i .* cumprod( [ 1 n(1:2) ] ) );
 
 % Check if file holds desired data

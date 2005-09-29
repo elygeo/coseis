@@ -37,6 +37,7 @@ co = 1e9
 t1 = 0.
 t2 = 0.
 t3 = 0.
+print *, i1node, i2node
 doiz: do iz = 1, nin
 ifreadfile: if ( readfile(iz) ) then
   i1 = i1node
@@ -59,7 +60,6 @@ ifreadfile: if ( readfile(iz) ) then
   case( 'tdip' ); call iovector( 'r', 'data/tdip', t3, 3, i1, i2, nn, nnoff, 0 )
   end select
 else
-  call zone( i1in(iz,:), i2in(iz,:), nn, nnoff, ihypo, ifn )
   i1 = max( i1in(iz,:), i1node )
   i2 = min( i2in(iz,:), i2node )
   i1(ifn) = 1
@@ -139,6 +139,14 @@ do i = 1, 3
   t2(:,:,:,i) = t2(:,:,:,i) * f1
 end do
 
+print *, minval( t3(:,:,:,1) )
+print *, minval( t3(:,:,:,2) )
+print *, minval( t3(:,:,:,3) )
+print *, upvector
+print *, nrm(2,2,1,:)
+print *, t1(2,2,1,:)
+print *, t2(2,2,1,:)
+
 ! Total pretraction
 do i = 1, 3
   t0(:,:,:,i) = t0(:,:,:,i) + &
@@ -146,6 +154,11 @@ do i = 1, 3
     t3(:,:,:,istr) * t1(:,:,:,i) + &
     t3(:,:,:,idip) * t2(:,:,:,i)
 end do
+
+print *, ifn, istr, idip
+print *, minval( t0(:,:,:,1) )
+print *, minval( t0(:,:,:,2) )
+print *, minval( t0(:,:,:,3) )
 
 ! Hypocentral radius
 i1 = 1

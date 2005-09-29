@@ -1,10 +1,9 @@
 %------------------------------------------------------------------------------%
 % Time series
-% input: field xhair
+% input: field sensor dofilter
 % output: tg vg ta va
 % search through outpur for desired timeseries data
 % try to find analytica solution as well if known
-% input: field xhair dofilter
 
 clear tg xg vg va ta
 
@@ -14,7 +13,7 @@ if ~exist( 'sordrunning', 'var' )
   eval( 'out/faultmeta' )
   if ~exist( 'vizfield', 'var' ), vizfield = 'v'; end
   if ~exist( 'dofilter', 'var' ), dofilter = 1;   end
-  if ~exist( 'xhair', 'var' ), xhair = [ 1 1 1 ]; end
+  if ~exist( 'sensor', 'var' ), sensor = [ 1 1 1 ]; end
 end
 
 % Test if we have data saved for desired location
@@ -37,7 +36,7 @@ end
 % For moment source, rotate to r,h,v coords
 if ~ifn
   if exist( 'sordrunning', 'var' )
-    xg = xxhair - xhypo;
+    xg = xcursor - xhypo;
   else
     vfsave = vizfield;
     vgsave = vg;

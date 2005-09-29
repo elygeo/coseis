@@ -12,7 +12,8 @@ subroutine gridgen
 
 implicit none
 real :: theta, scl
-integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up, n(3), noff(3)
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up, n(3), &
+  noff(3), idoublenode
 real :: lj, lk, ll, rhypo
 
 if ( master ) print '(a)', 'Grid generation'
@@ -29,7 +30,11 @@ n = nn
 noff = nnoff
 if ( ifn /= 0 ) then
   n(ifn) = n(ifn) - 1
-  if ( ihypo(ifn) < 1 ) noff = noff + 1
+  if ( ihypo(ifn) < 1 ) then
+    noff = noff + 1
+  else if ( ihypo(ifn) <= i2cell(ifn) ) then
+    idoublenode = ifn
+  end if
 end if
 
 ! Dimensions
@@ -108,16 +113,12 @@ if( ip3(3) == 0         ) x(:,:,j1-1,:) = x(:,:,j1,:)
 if( ip3(3) == np(3) - 1 ) x(:,:,l2+1,:) = x(:,:,l2,:)
 
 ! Create fault double nodes
-if ( ifn /= 0 ) then
-if ( ihypo(ifn) >= i1(ifn) .and. ihypo(ifn) < i2(ifn) ) then
-  i = ihypo(ifn)
-  select case( ifn )
-  case( 1 ); x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:)
-  case( 2 ); x(:,i+1:k2,:,:) = x(:,i:k2-1,:,:)
-  case( 3 ); x(:,:,i+1:l2,:) = x(:,:,i:l2-1,:)
-  end select
-end if
-end if
+if ( ifn /= 0 ) i = ihypo(ifn)
+select case( idoublenode )
+case( 1 ); x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:)
+case( 2 ); x(:,i+1:k2,:,:) = x(:,i:k2-1,:,:)
+case( 3 ); x(:,:,i+1:l2,:) = x(:,:,i:l2-1,:)
+end select
 
 ! Assign fast operators to rectangular mesh portions
 noper = 1

@@ -7,25 +7,25 @@ fprintf( 'Material model\n' )
 mr(:) = 0.;
 s1(:) = 0.;
 s2(:) = 0.;
-for i = 1:size( inkey, 1 )
-if ( readfile(i) )
+for iz = 1:size( fieldin, 1 )
+if ( readfile(iz) )
   i1 = i1cell;
   i2 = i2cell + 1;
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
-  switch inkey{i}
+  switch fieldin{iz}
   case 'rho', mr(j1:j2,k1:k2,l1:l2) = bread( 'data/rho' );
   case 'vp',  s1(j1:j2,k1:k2,l1:l2) = bread( 'data/vp' );
   case 'vs',  s2(j1:j2,k1:k2,l1:l2) = bread( 'data/vs' );
   end
 else
-  i1 = i1in(i,:);
-  i2 = i2in(i,:);
+  i1 = i1in(iz,:);
+  i2 = i2in(iz,:);
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
-  switch inkey{i}
+  switch fieldin{iz}
   case 'rho', mr(j1:j2,k1:k2,l1:l2) = inval(iz);
   case 'vp',  s1(j1:j2,k1:k2,l1:l2) = inval(iz);
   case 'vs',  s2(j1:j2,k1:k2,l1:l2) = inval(iz);

@@ -21,10 +21,13 @@ files="
 
 mkdir sord-$version
 
-cp -al $files sord-$version/ 2> /dev/null || \
-cp -rp $files sord-$version/
+case $( uname ) in
+Linux) cp="cp -al" ;;
+*)     cp="cp -Rp" ;;
+esac
 
-#tar zcf sord.tgz sord-$version/
+$cp $files sord-$version/
+
 tar cf - sord-$version/ | gzip > sord.tgz
 
 rm -rf sord-$version

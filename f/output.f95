@@ -76,7 +76,7 @@ doiz0: do iz = 1, nout
   if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
 
   ! Zone
-  call zone( i1out(i,:), i2out(i,:), nn, nnoff, ihypo, ifn )
+  call zone( i1out(iz,:), i2out(iz,:), nn, nnoff, ihypo, ifn )
   if ( fault ) then
     if ( ifn == 0 ) then
       ditout(iz) = 0
@@ -85,17 +85,17 @@ doiz0: do iz = 1, nout
       i2out(iz,ifn) = ihypo(ifn)
     end if
   end if
-  if ( fieldout(iz)(1:1) == 'w' ) i2out(i,:) = i2out(i,:) - 1
+  if ( fieldout(iz)(1:1) == 'w' ) i2out(iz,:) = i2out(iz,:) - 1
  
   ! Metadata
   if ( master ) then
     write( str, '(a,i2.2,a)' ) 'out/', iz, '/meta.m'
     open(  9, file=str, status='replace' )
-    write( 9, * ) ' field = ''', fieldout(iz),        '''; % variable name'
-    write( 9, * ) ' nc    = ',   nc,                    '; % # of components'
-    write( 9, * ) ' i1    = [ ', i1out(iz,:) - nnoff, ' ]; % start index'
-    write( 9, * ) ' i2    = [ ', i2out(iz,:) - nnoff, ' ]; % end index'
-    write( 9, * ) ' dit   = ',   ditout(iz),            '; % interval'
+    write( 9, * ) ' field = ''', trim( fieldout(iz) ), '''; % variable name'
+    write( 9, * ) ' nc    = ',   nc,                     '; % # of components'
+    write( 9, * ) ' i1    = [ ', i1out(iz,:) - nnoff,  ' ]; % start index'
+    write( 9, * ) ' i2    = [ ', i2out(iz,:) - nnoff,  ' ]; % end index'
+    write( 9, * ) ' dit   = ',   ditout(iz),             '; % interval'
     close( 9 )
   end if
  

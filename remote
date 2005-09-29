@@ -27,6 +27,6 @@ rfiles=$( echo $files | sed 's|\([^ ]\+\)|sord/\1|g' )
 
 case "$1" in
 get) rsync -avub -e ssh --backup-dir=old $account:"$rfiles" . ;;
-*)   rsync -avu  -e ssh --delete $files "$account:sord" ;;
+*)   rsync -av   -e ssh --delete $files "$account:sord" ;;
 esac
 

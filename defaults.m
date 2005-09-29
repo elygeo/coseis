@@ -56,7 +56,6 @@
 % syz		= [ 0.        1 1 1  -1 -1 -1 ]	;% **prestress
 % szx		= [ 0.        1 1 1  -1 -1 -1 ]	;% **prestress
 % sxy		= [ 0.        1 1 1  -1 -1 -1 ]	;% **prestress
-  xhypo		= [ 2000. 2000. 2000. ]		;% nucleation location
   vrup		= 3117.6914			;% nucleation rupture velocity
   rcrit		= 1000.				;% nucleation critical radius
   trelax	= .07				;% nucleation relaxation time

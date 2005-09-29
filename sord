@@ -6,14 +6,16 @@ echo -e "\nSORD setup"
 # Get command line options
 mpi=guess
 debug=no
+debugger=no
 dryrun=no
 matlab=no
 deleteout=no
-while getopts spgnmrld opt; do
+while getopts spgGnmd opt; do
   case $opt in
     s) mpi=no ;;
     p) mpi=yes ;;
     g) debug=yes ;;
+    G) debug=yes; debugger=yes ;;
     n) dryrun=yes ;;
     m) matlab=yes ;;
     d) deleteout=yes ;;
@@ -47,7 +49,7 @@ done < tmp
 i=0
 while [ $i -le $nout ]; do
   i=$(( i + 1 ))
-  dir=$( echo $nout | awk '{ printf "out/%02d", $1 }' )
+  dir=$( echo $i | awk '{ printf "out/%02d", $1 }' )
   [ -e $dir ] || mkdir $dir
 done
 
@@ -157,29 +159,32 @@ if [ $mpi = no ]; then
   serialio.o\\
   $OBJECT"
   FC=f95
-  CC=cc
 else
   OBJECT="\\
   mpi.o\\
   mpiio.o\\
   $OBJECT"
   FC=mpif90
-  CC=mpicc
 fi
 
-# Optimization flags
+# OS specific options
 OPTFLAGS=-O
 case $osname in
 Linux)
   FC=gfortran
   OPTFLAGS=-O3
   ;;
+AIX)
+  case $mpi in
+  no)  FC=xlf95_r ;;
+  yes) FC=mpxlf95_r ;;
+  esac 
+  ;;
 SunOS)
   OPTFLAGS=-fast
   ;;
 esac
-[ $nn -lt 10000 ] && OPTFLAGS=-g
-OPTFLAGS=-g
+[ $nn -lt 10000 ] && OPTFLAGS=
 if [ $debug = yes ]; then
   OPTFLAGS=-g
 fi
@@ -187,10 +192,11 @@ fi
 # Machine specific options
 case $machine in
 datastar)
-  FC=mpxlf95_r
-  CC=mpcc_r
-  OPTFLAGS="-qsuffix=f=f95 -q64 -O3 -qarch=pwr4 -qtune=pwr4"
-  [ $debug = yes ] && OPTFLAGS="-qsuffix=f=f95 -q64 -g -qflttrap -C"
+  if [ $debug = no ]; then
+    OPTFLAGS="-qsuffix=f=f95 -q64 -O3 -qstrict -qarch=pwr4 -qtune=pwr4"
+  else
+    OPTFLAGS="-qsuffix=f=f95 -q64 -g -C -qflttrap -qsigtrap"
+  fi
   ;;
 babieca)
   [ $mpi = no ] && FC=pgf95
@@ -200,7 +206,6 @@ esac
 # Write makefile
 cat << END > tmp
 FC = $FC
-CC = $CC
 FFLAGS = $OPTFLAGS
 OBJECT = $OBJECT
 fsord: \$(OBJECT) makefile
@@ -304,7 +309,7 @@ if [ $( hostname ) != ds100 ]; then
   echo "loging to dspoe.sdsc.edu to run interactively"
   dryrun=yes
 fi
-case $dryrun$debug$mpi in
+case $dryrun$debugger$mpi in
   nonono)   ./fsord ;;
   nonoyes)  poe ./fsord $opts ;;
   noyesno)  totalview poe -a ./fsord $opts ;;
@@ -347,7 +352,7 @@ END
 chmod u+x batchjob
 
 # Interactive
-case $dryrun$debug$mpi in
+case $dryrun$debugger$mpi in
   nonono)   ./fsord ;;
   noyesno)  gdb ./fsord ;;
   noyesyes) time mpirun -v -machinefile \$PBS_NODEFILE -np $np ./fsord ;;
@@ -384,7 +389,7 @@ END
 chmod u+x batchjob
 
 # Interactive
-case $dryrun$debug$mpi in
+case $dryrun$debugger$mpi in
   nonono)   ./fsord ;;
   noyesno)  gdb ./fsord ;;
   nonoyes)  mpiexec -np $np ./fsord ;;
@@ -407,7 +412,7 @@ END
 chmod u+x batchjob
 
 # Interactive
-case $dryrun$debug$mpi in
+case $dryrun$debugger$mpi in
   nonono)   ./fsord ;;
   noyesno)  ddd ./fsord ;;
   nonoyes)  mpirun -np $np ./fsord ;;

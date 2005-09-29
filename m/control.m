@@ -72,12 +72,12 @@ case 'delete'
     nframe = nframe - 1;
   end
   anim = 1;
-case 'downarrow',  if km, xhairmove = -3; else xhairmove = -1; end, crosshairs
-case 'uparrow',    if km, xhairmove = 3;  else xhairmove = 1;  end, crosshairs
-case 'leftarrow',  xhairmove = -2; crosshairs
-case 'rightarrow', xhairmove = 2;  crosshairs
-case 'h',          xhairmove = 4;  crosshairs; msg = 'Hypocenter';
-case 'e',          xhairmove = 6;  crosshairs; msg = 'Extreme value';
+case 'downarrow',  if km, cursormove = -3; else cursormove = -1; end, cursor
+case 'uparrow',    if km, cursormove = 3;  else cursormove = 1;  end, cursor
+case 'leftarrow',  cursormove = -2; cursor
+case 'rightarrow', cursormove = 2;  cursor
+case 'h',          cursormove = 4;  cursor; msg = 'Hypocenter';
+case 'e',          cursormove = 6;  cursor; msg = 'Extreme value';
 case 'space', if km, itstep = 10; else itstep = 1; end, msg = 'Step';
 case 'r', itstep = nt - it; msg = 'Run';
 case 'q'
@@ -105,8 +105,8 @@ case 'period'
   else    camva( .25 * camva )
   end
   if length( hhud )
-    campos( campos + xxhair - camtarget )
-    camtarget( xxhair )
+    campos( campos + xcursor - camtarget )
+    camtarget( xcursor )
   end
   panviz = 1;
 case 'd'
@@ -273,7 +273,7 @@ case 'l'
   if strcmp( get( gca, 'Visible' ), 'off' ), axis on, msg = 'Axis On';
   else axis off, msg = 'Axis Off';
   end
-case 't', dofilter = km; tsviz
+case 't', dofilter = km; sensor = icursor; tsviz
 case 'c'
   if ~km
     save checkpoint it v u vs us trup p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6

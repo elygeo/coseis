@@ -1,16 +1,16 @@
 %------------------------------------------------------------------------------%
 % CROSSHAIRS
 
-way = sign( xhairmove );
-xhairmove = abs( xhairmove );
-if xhairmove == 4
-  ixhair = i0;
+way = sign( cursormove );
+cursormove = abs( cursormove );
+if cursormove == 4
+  icursor = i0;
   if inrm, islice = inrm; end
-elseif xhairmove == 5
-  ixhair = i0;
-  ixhair(idown) = 1;
+elseif cursormove == 5
+  icursor = i0;
+  icursor(idown) = 1;
   islice = idown;
-elseif xhairmove == 6
+elseif cursormove == 6
   imax = i0;
   switch vizfield
   case 'a', imax = iamax;
@@ -20,7 +20,7 @@ elseif xhairmove == 6
   otherwise error 'vizfield'
   end
   [ j, k, l ] = ind2sub( nm, imax );
-  ixhair = [ j k l ];
+  icursor = [ j k l ];
 else
   v1 = camup;
   v3 = camtarget - campos;
@@ -31,19 +31,19 @@ else
   i3( [ i1 i2 ] ) = [];
   i = [ i1 i2 i3 ];
   tmp = [ sign( v1(i1) ) sign( v2(i2) ) sign( v3(i3) ) ];
-  way = way * tmp(xhairmove);
-  xhairmove = i(xhairmove);
-  islice = abs( xhairmove );
+  way = way * tmp(cursormove);
+  cursormove = i(cursormove);
+  islice = abs( cursormove );
   i = islice;
-  if length( hhud ), ixhair(i) = ixhair(i) + way; end
-  ixhair = max( ixhair, i1node );
-  ixhair = min( ixhair, i2node - cellfocus );
+  if length( hhud ), icursor(i) = icursor(i) + way; end
+  icursor = max( icursor, i1node );
+  icursor = min( icursor, i2node - cellfocus );
 end
 delete( [ hhud hhelp ] )
 hhelp = [];
-j = ixhair(1);
-k = ixhair(2);
-l = ixhair(3);
+j = icursor(1);
+k = icursor(2);
+l = icursor(3);
 clear xg xga
 if cellfocus
   for i = 1:3
@@ -62,7 +62,7 @@ else
   xg(1:3) = x(j,k,l,:);
   xga(1:3) = x(j,k,l,:) + xscl * u(j,k,l,:);
 end
-xxhair = double( xga(:)' );
+xcursor = double( xga(:)' );
 mga = [];
 vga = [];
 msg = '';
@@ -111,7 +111,7 @@ otherwise error 'vizfield'
 end
 set( gcf, 'CurrentAxes', haxes(2) )
 hhud = text( .02, .98, msg, 'Hor', 'left', 'Ver', 'top' );
-tmp = [ it ixhair-noff; t xg ];
+tmp = [ it icursor-noff; t xg ];
 msg = sprintf( '%4d %8.3fs\n%4d %8.1fm\n%4d %8.1fm\n%4d %8.1fm', tmp );
 hhud(2) = text( .98, .98, msg, 'Hor', 'right', 'Ver', 'top' );
 msg = 'Explore';
@@ -120,7 +120,7 @@ if length( mga( mga ~= 0 ) )
   reynoldsglyph
   hhud = [ hhud hglyph ];
 end
-i1 = ixhair;
+i1 = icursor;
 i = [ i1-1; i1; i1+1 ];
 if cellfocus
   j = [ 1 1 1 1 1 2 2 2 2 2 2 1 1 2 2 1 ] + 1;
@@ -156,14 +156,14 @@ end
 xg = double( xg );
 hhud(end+1:end+3) = text( xg(:,1), xg(:,2), xg(:,3), ['jkl']', 'Ver', 'middle');
 if panviz
-  campos( campos + xxhair - camtarget )
-  camtarget( xxhair )
+  campos( campos + xcursor - camtarget )
+  camtarget( xcursor )
 end
 if dooutline && ~volviz && ( dosurf || domesh || doglyph  )
   i1 = i1node;
   i2 = i2node;
-  i1(islice) = ixhair(islice);
-  i2(islice) = ixhair(islice) + cellfocus;
+  i1(islice) = icursor(islice);
+  i2(islice) = icursor(islice) + cellfocus;
   i  = [ i1; i1+1; i2; i2-1 ];
   if cellfocus
     i1 = [ 1 1 2 2; 1 1 2 2; 1 1 2 2; 1 1 2 2;

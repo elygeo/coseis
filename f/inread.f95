@@ -24,7 +24,12 @@ if ( err /= 0 ) exit doline
 
 ! Strip comments and MATLAB characters
 i = index( str, '%' )
-str(i:) = ' '
+if ( i > 0 ) str(i:) = ' '
+if ( str == ' ' ) cycle doline
+
+!if ( master ) print '(a)', trim( str )
+
+! Strip MATLAB characters
 do
   i = scan( str, "{}=[]';" )
   if ( i == 0 ) exit
@@ -32,7 +37,6 @@ do
 end do
 
 ! Read tokens
-if ( str == ' ' ) cycle doline
 read( str, * ) key1, key2
 inzone = .false.
 
@@ -94,12 +98,14 @@ if ( inzone ) then
   i = nin
   if ( key2 == 'read' ) then
     readfile(nin) = .true.
+    i1in(i,:) = 1
+    i2in(i,:) = -1
   else
     readfile(nin) = .false.
-    read( str, * ) fieldin(i), inval(i), i1in(i,:), i2in(i,:)
+    read( str, *, iostat=err ) fieldin(i), inval(i), i1in(i,:), i2in(i,:)
     if ( err /= 0 ) then
-      i1in(nz,:) = 1
-      i2in(nz,:) = -1
+      i1in(i,:) = 1
+      i2in(i,:) = -1
       read( str, *, iostat=err ) fieldin(i), inval(i)
     end if
   end if

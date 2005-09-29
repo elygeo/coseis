@@ -43,7 +43,7 @@ elseif init
   tslim = -1;
   camdist = -1;
   look = 4;
-  ixhair = i0;
+  icursor = ihypo;
   if inrm, islice = inrm; else islice = crdsys(2); end
   if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
   else     foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 1;
@@ -147,8 +147,8 @@ if inrm
 end
 slices = [ 1 1 1   -1 -1 -1 ];
 i = islice;
-slices(i)   = ixhair(i) - noff(i);
-slices(i+3) = ixhair(i) - noff(i) + cellfocus;
+slices(i)   = icursor(i) - nnoff(i);
+slices(i+3) = icursor(i) - nnoff(i) + cellfocus;
 if inrm & islice ~= inrm
   slices = [ slices; slices ];
   i = inrm + [ 0 3 ];
