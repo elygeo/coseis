@@ -14,7 +14,7 @@ implicit none
 real :: theta, scl
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up, n(3), &
   noff(3), idoublenode
-real :: lj, lk, ll, rhypo
+real :: lj, lk, ll
 
 if ( master ) print '(a)', 'Grid generation'
 

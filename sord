@@ -152,54 +152,59 @@ OBJECT="\\
 [ $mpi = guess -a $np -eq 1 ] && mpi=no
 [ $mpi = guess -a $np -gt 1 ] && mpi=yes
 
-# Serial or MPI version
-if [ $mpi = no ]; then
-  OBJECT="\\
-  serial.o\\
-  serialio.o\\
-  $OBJECT"
-  FC=f95
-else
-  OBJECT="\\
-  mpi.o\\
-  mpiio.o\\
-  $OBJECT"
-  FC=mpif90
-fi
+# Defaults
+case $mpi in
+no)  FC="f95";    OBJECT="serial.o serialio.o $OBJECT" ;;
+yes) FC="mpif90"; OBJECT="mpi.o mpiio.o $OBJECT" ;;
+esac
+case $debug in
+no)  OPTFLAGS="-O" ;;
+yes) OPTFLAGS="-g" ;;
+esac
 
-# OS specific options
-OPTFLAGS=-O
+# OS specific
 case $osname in
 Linux)
-  FC=gfortran
-  OPTFLAGS=-O3
+  case $mpi in
+  no)  FC="gfortran" ;;
+  yes) FC="mpif90" ;;
+  esac
+  case $debug in
+  no)  OPTFLAGS="-O3" ;;
+  yes) OPTFLAGS="-g -pedantic -std=f95 -Wall -W -fimplicit-none";;
+  esac
   ;;
 AIX)
   case $mpi in
-  no)  FC=xlf95_r ;;
-  yes) FC=mpxlf95_r ;;
+  no)  FC="xlf95_r" ;;
+  yes) FC="mpxlf95_r" ;;
   esac 
   ;;
 SunOS)
-  OPTFLAGS=-fast
+  case $mpi in
+  no)  FC="gfortran" ;;
+  yes) FC="mpif90" ;;
+  esac
+  case $debug in
+  no)  OPTFLAGS="-fast" ;;
+  yes) OPTFLAGS="-g" ;;
+  esac
   ;;
 esac
-[ $nn -lt 10000 ] && OPTFLAGS=
-if [ $debug = yes ]; then
-  OPTFLAGS=-g
-fi
 
-# Machine specific options
+# Machine specific
 case $machine in
 datastar)
-  if [ $debug = no ]; then
-    OPTFLAGS="-qsuffix=f=f95 -q64 -O3 -qstrict -qarch=pwr4 -qtune=pwr4"
-  else
-    OPTFLAGS="-qsuffix=f=f95 -q64 -g -C -qflttrap -qsigtrap"
-  fi
+  case $debug in
+  no)  OPTFLAGS="-qsuffix=f=f95 -q64 -O3 -qstrict -qarch=pwr4 -qtune=pwr4" ;;
+  yes) OPTFLAGS="-qsuffix=f=f95 -q64 -g -C -qflttrap -qsigtrap" ;;
+  esac
   ;;
 babieca)
-  [ $mpi = no ] && FC=pgf95
+  case $mpi in
+  no)  FC="pgf95" ;;
+  yes) FC="mpif90" ;;
+  esac
   ;;
 esac
 
@@ -306,7 +311,7 @@ chmod u+x batchjob
 
 # Interactive
 if [ $( hostname ) != ds100 ]; then
-  echo "loging to dspoe.sdsc.edu to run interactively"
+  echo "login to dspoe.sdsc.edu to run interactively"
   dryrun=yes
 fi
 case $dryrun$debugger$mpi in

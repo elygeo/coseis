@@ -147,9 +147,9 @@ end do
 if ( ifn /=0 ) then
   i = ihypo(ifn)
   select case( ifn )
-  case( 1 ); s2(i,:,:) = 0;
-  case( 2 ); s2(:,i,:) = 0;
-  case( 3 ); s2(:,:,i) = 0;
+  case( 1 ); s2(i,:,:) = 0.;
+  case( 2 ); s2(:,i,:) = 0.;
+  case( 3 ); s2(:,:,i) = 0.;
   end select
 end if
 

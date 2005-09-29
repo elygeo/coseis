@@ -8,6 +8,8 @@ contains
 ! Placeholder for split collective parallel output
 subroutine iosplit( iz, ditout )
 integer, intent(in) :: iz, ditout
+integer :: i
+i = iz + ditout
 end subroutine
 
 ! Input/output scalar field
@@ -41,6 +43,7 @@ case( 'w' )
   write( 9, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
   close( 9 )
 end select
+j1 = n(1) + noff(1) + iz
 end subroutine
 
 ! Input/output vector component
@@ -74,6 +77,7 @@ case( 'w' )
   write( 9, rec=1 ) w1(j1:j2,k1:k2,l1:l2,i)
   close( 9 )
 end select
+j1 = n(1) + noff(1) + iz
 end subroutine
 
 end module

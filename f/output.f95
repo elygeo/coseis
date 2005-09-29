@@ -12,11 +12,11 @@ use zone_m
 implicit none
 save
 real :: dtwall, courant, amax, vmax, umax, wmax, svmax, slmax
-integer :: i, i1(3), i2(3), iz, nc, n(3), noff(3), reclen, twall(2), &
-  twall_rate, amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3)
+integer :: i, i1(3), i2(3), iz, nc, n(3), twall(2), twall_rate, &
+  amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3)
 character, intent(in) :: pass
 character :: onpass, endian
-logical :: fault, static, init = .true., test
+logical :: fault, init = .true., test
 
 ifinit: if ( init ) then !--------------------------------------!
 

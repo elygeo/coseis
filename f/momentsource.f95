@@ -34,7 +34,7 @@ s1 = 0.
 call diffnc( s1, 'g', x, x, dx, 1, 1, i1, i2 )
 
 ! Cell center locations
-w1 = 2 * rsource
+w1 = 2. * rsource
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   w1(j,k,l,:) = 0.125 * &
     ( x(j,k,l,:) + x(j+1,k+1,l+1,:) &

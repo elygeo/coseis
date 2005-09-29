@@ -9,7 +9,7 @@ subroutine inread( filename )
 implicit none
 character*(*), intent(in) :: filename
 character(16) :: key1, key2
-integer :: i, iz, err
+integer :: i, err
 logical :: inzone
 
 if ( master ) print '(2a)', 'Reading file: ', filename
