@@ -7,16 +7,18 @@ echo -e "\nSORD setup"
 mpi=guess
 debug=no
 debugger=no
-dryrun=no
+compile=yes
+run=yes
 matlab=no
 deleteout=no
-while getopts spgGnmd opt; do
+while getopts spgGcnmd opt; do
   case $opt in
     s) mpi=no ;;
     p) mpi=yes ;;
     g) debug=yes ;;
     G) debug=yes; debugger=yes ;;
-    n) dryrun=yes ;;
+    c) run=no ;;
+    n) run=no; compile=no ;;
     m) matlab=yes ;;
     d) deleteout=yes ;;
   esac
@@ -114,7 +116,7 @@ nohup matlab -r "sord, quit" > out.log &
 END
 chmod u+x batchjob
 
-[ $dryrun = no ] && matlab -nodesktop -nosplash -r sord
+[ $run = yes ] && matlab -nodesktop -nosplash -r sord
 
 exit
 
@@ -191,7 +193,7 @@ datastar)
   esac 
   case $debug in
   no)  FFLAGS="-O3 -qstrict -qarch=pwr4 -qtune=pwr4" ;;
-  yes) FFLAGS="-g -u -C -qflttrap -qsigtrap -qlanglvl=95pure" ;;
+  yes) FFLAGS="-g -C -qflttrap -qsigtrap -qlanglvl=95pure" ;;
   esac
   ;;
 teragrid)
@@ -231,7 +233,7 @@ END
 [ ! -f makefile ] && touch makefile
 [ "$( diff tmp makefile )" != "" ] && mv tmp makefile
 rm -f tmp
-[ $dryrun = no ] && gmake
+[ $compile = yes ] && gmake
 
 #------------------------------------------------------------------------------#
 # Machine specific batch submission and run commands
@@ -316,13 +318,13 @@ chmod u+x batchjob
 # Interactive
 if [ $( hostname ) != ds100 ]; then
   echo "login to dspoe.sdsc.edu to run interactively"
-  dryrun=yes
+  run=no
 fi
-case $dryrun$debugger$mpi in
-  nonono)   ./fsord ;;
-  nonoyes)  poe ./fsord $opts ;;
-  noyesno)  totalview poe -a ./fsord $opts ;;
-  noyesyes) totalview poe -a ./fsord $opts ;;
+case $run$debugger$mpi in
+  yesnono)   ./fsord ;;
+  yesnoyes)  poe ./fsord $opts ;;
+  yesyesno)  totalview poe -a ./fsord $opts ;;
+  yesyesyes) totalview poe -a ./fsord $opts ;;
 esac
 
 ;;
@@ -361,10 +363,10 @@ END
 chmod u+x batchjob
 
 # Interactive
-case $dryrun$debugger$mpi in
-  nonono)   ./fsord ;;
-  noyesno)  gdb ./fsord ;;
-  noyesyes) time mpirun -v -machinefile \$PBS_NODEFILE -np $np ./fsord ;;
+case $run$debugger$mpi in
+  yesnono)   ./fsord ;;
+  yesyesno)  gdb ./fsord ;;
+  yesyesyes) time mpirun -v -machinefile \$PBS_NODEFILE -np $np ./fsord ;;
 esac
 
 ;;
@@ -398,11 +400,11 @@ END
 chmod u+x batchjob
 
 # Interactive
-case $dryrun$debugger$mpi in
-  nonono)   ./fsord ;;
-  noyesno)  gdb ./fsord ;;
-  nonoyes)  mpiexec -np $np ./fsord ;;
-  noyesyes) mpiexec -np $np -dbg=gdb ./fsord ;;
+case $run$debugger$mpi in
+  yesnono)   ./fsord ;;
+  yesyesno)  gdb ./fsord ;;
+  yesnoyes)  mpiexec -np $np ./fsord ;;
+  yesyesyes) mpiexec -np $np -dbg=gdb ./fsord ;;
 esac
 
 ;;
@@ -421,11 +423,11 @@ END
 chmod u+x batchjob
 
 # Interactive
-case $dryrun$debugger$mpi in
-  nonono)   ./fsord ;;
-  noyesno)  ddd ./fsord ;;
-  nonoyes)  mpirun -np $np ./fsord ;;
-  noyesyes) mpirun -np $np -dbg=ddd ./fsord ;;
+case $run$debugger$mpi in
+  yesnono)   ./fsord ;;
+  yesyesno)  ddd ./fsord ;;
+  yesnoyes)  mpirun -np $np ./fsord ;;
+  yesyesyes) mpirun -np $np -dbg=ddd ./fsord ;;
 esac
 
 ;;

@@ -67,7 +67,7 @@ end subroutine
 subroutine globalminloc( rmin, imin, nnoff )
 real, intent(inout) :: rmin
 integer, intent(inout) :: imin(3)
-integer, intent(in) :: nnoff
+integer, intent(in) :: nnoff(3)
 integer :: err, ipmin
 real :: local(2), global(2)
 local(1) = rmin
@@ -86,7 +86,7 @@ end subroutine
 subroutine globalmaxloc( rmax, imax, nnoff )
 real, intent(inout) :: rmax
 integer, intent(inout) :: imax(3)
-integer, intent(in) :: nnoff
+integer, intent(in) :: nnoff(3)
 integer :: err, ipmax
 real :: local(2), global(2)
 local(1) = rmax
@@ -102,15 +102,14 @@ end if
 end subroutine
 
 ! Swap halo
-subroutine swaphalo( w1 )
-save
+subroutine swaphalo( w1, nhalo )
 real, intent(in) :: w1(:,:,:,:)
-integer :: nhalo, ng(4), nl(4), i0(4), i, adjacent1, adjacent2, slice(12), &
-  nr, req(12), mpistatus( mpi_status_size, 4 )
-logical :: init = .true.
-integer :: mof = mpi_order_fortran, err
+integer, intent(in) :: nhalo
+integer :: ng(4), nl(4), i0(4), i, adjacent1, adjacent2, slice(12), &
+  mpistatus( mpi_status_size, 4 ), mof = mpi_order_fortran, err
+logical, save :: init = .true.
+integer, save :: nr, req(12)
 ifinit: if ( init ) then
-nhalo = 1
 ng = (/ size(w1,1), size(w1,2), size(w1,3), size(w1,4) /)
 nr = 0
 do i = 1, 3
