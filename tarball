@@ -4,6 +4,7 @@ version=$( date +%Y-%m-%d-%H-%M-%S )
 
 echo $version
 echo $version > VERSION
+rm -f f/mpif.h
 
 files="
   README

@@ -453,7 +453,7 @@ DOMAIN DECOMPOSITION DIAGRAM
   Surface       n=15                     |   |
                                          '---' nm=3         
 
-MPICH  INSTALL
+MPICH INSTALL - does not work w/ gfortran
   ./configure -prefix=/usr/local --with-device=ch_shmem --with-romio
 
 MPICH2 INSTALL

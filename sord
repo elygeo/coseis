@@ -242,7 +242,7 @@ rm -f tmp
 #------------------------------------------------------------------------------#
 # Machine specific batch submission and run commands
 
-rm -f batchjob
+rm -f batchjob f/mpif.h
 
 case $machine in
 
