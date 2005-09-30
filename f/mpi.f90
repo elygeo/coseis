@@ -2,8 +2,9 @@
 ! MPI routines
 
 module collective_m
-use mpi
+!use mpi
 implicit none
+include 'mpif.h'
 integer :: comm
 integer, private :: ip, ipmaster
 contains

@@ -7,7 +7,7 @@ contains
 subroutine inread( filename )
 
 implicit none
-character*(*), intent(in) :: filename
+character(*), intent(in) :: filename
 character(16) :: key1, key2
 integer :: i, err
 logical :: inzone

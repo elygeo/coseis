@@ -28,7 +28,7 @@ esac
 
 $cp $files sord-$version/
 
-tar cf - sord-$version/ | gzip > sord.tgz
+tar cvf - sord-$version/ | gzip > sord.tgz
 
 rm -rf sord-$version
 

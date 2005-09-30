@@ -14,7 +14,7 @@ end subroutine
 
 ! Input/output scalar field
 subroutine ioscalar( io, filename, s1, i1, i2, n, noff, iz )
-character*(*), intent(in) :: io, filename
+character(*), intent(in) :: io, filename
 real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), n(3), noff(3), iz
 integer :: j1, k1, l1, j2, k2, l2, reclen
@@ -48,7 +48,7 @@ end subroutine
 
 ! Input/output vector component
 subroutine iovector( io, filename, w1, i, i1, i2, n, noff, iz )
-character*(*), intent(in) :: io, filename
+character(*), intent(in) :: io, filename
 real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: i, i1(3), i2(3), n(3), noff(3), iz
 integer :: j1, k1, l1, j2, k2, l2, reclen

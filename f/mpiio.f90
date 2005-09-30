@@ -2,7 +2,7 @@
 ! MPIIO
 
 module collectiveio_m
-use mpi
+!use mpi
 use collective_m
 implicit none
 integer, private, allocatable :: commout(:)
@@ -18,7 +18,7 @@ end subroutine
 
 ! Input/output scalar
 subroutine ioscalar( io, filename, s1, i1, i2, n, noff, iz )
-character*(*), intent(in) :: io, filename
+character(*), intent(in) :: io, filename
 real, intent(in) :: s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), n(3), noff(3), iz
 integer :: ftype, mtype, fh, d=0, nl(3), ng(3), i0(3), mode, err, &
@@ -54,7 +54,7 @@ end subroutine
 
 ! Input/output vector component
 subroutine iovector( io, filename, w1, i, i1, i2, n, noff, iz )
-character*(*), intent(in) :: io, filename
+character(*), intent(in) :: io, filename
 real, intent(in) :: w1(:,:,:,:)
 integer, intent(in) :: i, i1(3), i2(3), n(3), noff(3), iz
 integer :: ftype, mtype, fh, d = 0, nl(4), ng(4), i0(4), mode, err, &

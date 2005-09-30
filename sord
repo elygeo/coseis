@@ -169,7 +169,11 @@ case $osname in
 Linux)
   case $mpi in
   no)  FC="gfortran" ;;
-  yes) FC="mpif90" ;;
+  yes)
+    FC="mpif90"
+    mpidir=$( dirname $( dirname $( which mpif90 ) ) )
+    cp $mpidir/include/mpif.h f/
+  ;;
   esac
   case $debug in
   no)  FFLAGS="-O3" ;;
@@ -179,7 +183,7 @@ Linux)
 SunOS)
   case $debug in
   no)  FFLAGS="-fast" ;;
-  yes) FFLAGS="-g" ;;
+  yes) FFLAGS="-g -u -C" ;;
   esac
   ;;
 esac
@@ -222,7 +226,7 @@ OBJECT = $OBJECT
 fsord: \$(OBJECT) makefile
 	\$(FC) -L/usr/lib/ \$(FFLAGS) \$(OBJECT) -o fsord
 clean:
-	rm -f *.o *.mod matlab_workspace.mat
+	rm -f *.o *.mod f/mpif.h matlab_workspace.mat
 realclean: clean
 	rm -f fsord makefile batchjob sord.tgz
 %.o: f/%.f90 makefile
