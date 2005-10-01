@@ -49,7 +49,7 @@ done < tmp
 [ -e out/ckp ]   || mkdir out/ckp
 [ -e out/stats ] || mkdir out/stats
 i=0
-while [ $i -le $nout ]; do
+while [ $i -lt $nout ]; do
   i=$(( i + 1 ))
   dir=$( echo $i | awk '{ printf "out/%02d", $1 }' )
   [ -e $dir ] || mkdir $dir
@@ -96,13 +96,13 @@ echo "RAM usage: at least ${ram}Mb"
 echo "Run time: at least $wt"
 
 # Write metadata
-cat << END > out/meta.run
-login:   $LOGNAME
-name:    $( finger $LOGNAME | sed -n 's/^.*e: //p' )
-date:    $( date )
-machine: $machine
-host:    $HOSTNAME
-os:      $( uname -a )
+cat << END > out/runmeta.m
+login = '$LOGNAME' ;
+name = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )' ;
+date = '$( date )' ;
+machine = '$machine' ;
+host = '$HOSTNAME' ;
+os = '$( uname -a )' ;
 END
 
 #------------------------------------------------------------------------------#
@@ -175,7 +175,7 @@ Linux)
   esac
   case $debug in
   no)  FFLAGS="-O3" ;;
-  yes) FFLAGS="-g -pedantic -std=f95 -Wall -W -fimplicit-none" ;;
+  yes) FFLAGS="-g -W -pedantic -std=f95 -fimplicit-none" ;;
   esac
   ;;
 SunOS)

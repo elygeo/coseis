@@ -10,13 +10,14 @@ subroutine output( pass )
 use zone_m
 
 implicit none
-save
-real :: dtwall, courant, amax, vmax, umax, wmax, svmax, slmax
-integer :: i, i1(3), i2(3), iz, nc, n(3), twall(2), twall_rate, &
+real :: courant, amax, vmax, umax, wmax, svmax, slmax, dtwall
+integer :: i, i1(3), i2(3), n(3), nc, iz, &
   amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3)
+integer, save :: twall_rate, twall(2)
+logical :: fault, test
+logical, save :: init = .true.
 character, intent(in) :: pass
 character :: onpass, endian
-logical :: fault, init = .true., test
 
 ifinit: if ( init ) then !--------------------------------------!
 
@@ -40,19 +41,20 @@ ifit0: if ( it == 0 .and. master ) then
   courant = dt * vp2 * sqrt( 3. ) / abs( dx )
   write( str, '(a,i2.2,a)' ) 'out/meta.m'
   open(  9, file=str, status='replace' )
-  write( 9, * ) ' rho1    = ',   rho1,     '; % minimum density'
-  write( 9, * ) ' rho2    = ',   rho2,     '; % maximum density'
-  write( 9, * ) ' rho     = ',   rho,      '; % hypocenter density'
-  write( 9, * ) ' vp1     = ',   vp1,      '; % minimum Vp'
-  write( 9, * ) ' vp2     = ',   vp2,      '; % maximum Vp'
-  write( 9, * ) ' vp      = ',   vp,       '; % hypocenter Vp'
-  write( 9, * ) ' vs1     = ',   vs1,      '; % minimum Vs'
-  write( 9, * ) ' vs2     = ',   vs2,      '; % maximum Vs'
-  write( 9, * ) ' vs      = ',   vs,       '; % hypocenter Vs'
-  write( 9, * ) ' courant = ',   courant,  '; % stability condition'
-  write( 9, * ) ' xhypo   = [ ', xhypo,  ' ]; % hypocenter location'
-  write( 9, * ) ' nout    = ',   nout,     '; % number output zones'
-  write( 9, * ) ' endian  = ''', endian, '''; % byte order'
+  write( 9, * ) ' rho1 = ', rho1, '; % minimum density'
+  write( 9, * ) ' rho2 = ', rho2, '; % maximum density'
+  write( 9, * ) ' rho  = ', rho,  '; % hypocenter density'
+  write( 9, * ) ' vp1  = ', vp1,  '; % minimum Vp'
+  write( 9, * ) ' vp2  = ', vp2,  '; % maximum Vp'
+  write( 9, * ) ' vp   = ', vp,   '; % hypocenter Vp'
+  write( 9, * ) ' vs1  = ', vs1,  '; % minimum Vs'
+  write( 9, * ) ' vs2  = ', vs2,  '; % maximum Vs'
+  write( 9, * ) ' vs   = ', vs,   '; % hypocenter Vs'
+  write( 9, * ) ' courant = ', courant, '; % stability condition'
+  write( 9, * ) ' ihypo = [ ', ihypo, ' ]; % hypocenter node'
+  write( 9, * ) ' xhypo = [ ', xhypo, ' ]; % hypocenter location'
+  write( 9, * ) ' nout = ', nout, '; % number output zones'
+  write( 9, * ) ' endian = ''', endian, '''; % byte order'
   close( 9 )
 
 end if ifit0
@@ -76,26 +78,28 @@ doiz0: do iz = 1, nout
   if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
 
   ! Zone
-  call zone( i1out(iz,:), i2out(iz,:), nn, nnoff, ihypo, ifn )
+  call zone( i1, i2, i1out(iz,:), i2out(iz,:), nn, nnoff, ihypo, ifn )
   if ( fault ) then
     if ( ifn == 0 ) then
       ditout(iz) = 0
     else
-      i1out(iz,ifn) = ihypo(ifn)
-      i2out(iz,ifn) = ihypo(ifn)
+      i1(ifn) = ihypo(ifn)
+      i2(ifn) = ihypo(ifn)
     end if
   end if
-  if ( fieldout(iz)(1:1) == 'w' ) i2out(iz,:) = i2out(iz,:) - 1
+  if ( fieldout(iz)(1:1) == 'w' ) i2 = i2 - 1
+  i1out(iz,:) = i1
+  i2out(iz,:) = i2
  
   ! Metadata
   if ( master ) then
     write( str, '(a,i2.2,a)' ) 'out/', iz, '/meta.m'
     open(  9, file=str, status='replace' )
     write( 9, * ) ' field = ''', trim( fieldout(iz) ), '''; % variable name'
-    write( 9, * ) ' nc    = ',   nc,                     '; % # of components'
-    write( 9, * ) ' i1    = [ ', i1out(iz,:) - nnoff,  ' ]; % start index'
-    write( 9, * ) ' i2    = [ ', i2out(iz,:) - nnoff,  ' ]; % end index'
-    write( 9, * ) ' dit   = ',   ditout(iz),             '; % interval'
+    write( 9, * ) ' nc  = ', nc, '; % # of components'
+    write( 9, * ) ' dit = ', ditout(iz), '; % interval'
+    write( 9, * ) ' i1 = [ ', i1 - nnoff, ' ]; % start index'
+    write( 9, * ) ' i2 = [ ', i2 - nnoff, ' ]; % end index'
     close( 9 )
   end if
  
@@ -107,7 +111,7 @@ end do doiz0
 
 ! Column names
 if ( master ) then
-  print '(a)', '  Step  Amax          Vmax          Umax          Wall Time'
+  print *, '       Step  Amax           Vmax           Umax          Wall Time'
   call system_clock( count_rate=twall_rate )
 end if
 
@@ -216,9 +220,10 @@ if ( master ) then
   call system_clock( twall(2) )
   dtwall = real( twall(2) - twall(1) ) / real( twall_rate )
   twall(1) = twall(2)
-  print '(i6,5es14.6)', it, amax, vmax, umax, dtwall
+  !print '(i6,5es14.6)', it, amax, vmax, umax, dtwall
+  print *, it, amax, vmax, umax, dtwall
   open(  9, file='out/timestep', status='replace' )
-  write( 9, '(i6,5es14.6)' ) it, t, amax, vmax, umax, dtwall
+  write( 9, * ) it, t, amax, vmax, umax, dtwall
   close( 9 )
   write( str, '(a,i6.6,a)' ) 'out/stats/', it, '.m'
   open(  9, file=str, status='replace' )

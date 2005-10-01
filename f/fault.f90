@@ -10,11 +10,11 @@ contains
 subroutine fault
 
 implicit none
-save
 real :: mus0, mud0, dc0, lc, tn0, ts0, s, rctest
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, &
-  j3, k3, l3, j4, k4, l4, iz, side
-logical :: init = .true.
+  j3, k3, l3, j4, k4, l4, iz
+integer, save :: side
+logical, save :: init = .true.
 
 if ( ifn == 0 ) return
 
@@ -60,8 +60,9 @@ ifreadfile: if ( readfile(iz) ) then
   case( 'td'  ); call iovector( 'r', 'data/td',  t3, 3, i1, i2, nn, nnoff, 0 )
   end select
 else
-  i1 = max( i1in(iz,:), i1node )
-  i2 = min( i2in(iz,:), i2node )
+  call zone( i1, i2, i1in(iz,:), i2in(iz,:), nn, nnoff, ihypo, ifn )
+  i1 = max( i1, i1node )
+  i2 = min( i2, i2node )
   i1(ifn) = 1
   i2(ifn) = 1
   j1 = i1(1); j2 = i2(1)
