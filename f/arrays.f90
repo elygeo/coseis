@@ -68,12 +68,12 @@ k = i2(2)
 l = i2(3)
 
 ! Fault vectors
-allocate(       &
-  nrm(j,k,l,3), &
-  t0(j,k,l,3),  &
-  t1(j,k,l,3),  &
-  t2(j,k,l,3),  &
-  t3(j,k,l,3)   )
+allocate(        &
+  nhat(j,k,l,3), &
+  t0(j,k,l,3),   &
+  t1(j,k,l,3),   &
+  t2(j,k,l,3),   &
+  t3(j,k,l,3)    )
 
 ! Fault scalars
 allocate(       &

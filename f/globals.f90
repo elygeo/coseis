@@ -53,7 +53,7 @@ real, allocatable, dimension(:) :: &
 
 ! Fault vectors
 real, allocatable, dimension(:,:,:,:) :: &
-  nrm,          & ! fault surface normals
+  nhat,         & ! fault surface normals
   t0,           & ! initial traction
   t1,           & ! temporary storage
   t2,           & ! temporary storage
@@ -91,6 +91,7 @@ real :: &
   vs,           & ! hypocenter P-wave speed
   viscosity(2), & ! viscosity for (1) stress & (2) hourglass corrections
   xhypo(3),     & ! hypocenter location
+  upvector(3),  & ! upward direction
   tsource,      & ! dominant period
   rsource,      & ! source radius
   moment1(3),   & ! moment source normal components
@@ -121,7 +122,6 @@ integer :: &
   it,           & ! current time step
   itcheck,      & ! interval for checkpointing
   npml,         & ! number of PML damping nodes
-  upward,       & ! upward direction
   ifn,          & ! fault normal direction
   noper,        & ! number of zones for spatial derivative operators
   i1oper(2,3),  & ! j1 k1 l1 operator zone start index

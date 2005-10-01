@@ -11,14 +11,14 @@ subroutine fault
 
 implicit none
 save
-real :: mus0, mud0, dc0, lc, tn0, ts0, s, rctest, vertical(3)
+real :: mus0, mud0, dc0, lc, tn0, ts0, s, rctest
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, &
-  j3, k3, l3, j4, k4, l4, iz, idip, istr
+  j3, k3, l3, j4, k4, l4, iz
 logical :: init = .true.
 
 if ( ifn == 0 ) return
 
-ifinit: if ( init ) then !--------------------------------------!
+ifinit: if ( init ) then !-----------------------------------------------------!
 
 init = .false.
 if ( master ) print '(a)', 'Initialize fault'
@@ -45,19 +45,19 @@ ifreadfile: if ( readfile(iz) ) then
   i1(ifn) = 1
   i2(ifn) = 1
   select case( fieldin(iz) )
-  case( 'mus'  ); call ioscalar( 'r', 'data/mus',  mus,   i1, i2, nn, nnoff, 0 )
-  case( 'mud'  ); call ioscalar( 'r', 'data/mud',  mud,   i1, i2, nn, nnoff, 0 )
-  case( 'dc'   ); call ioscalar( 'r', 'data/dc',   dc,    i1, i2, nn, nnoff, 0 )
-  case( 'co'   ); call ioscalar( 'r', 'data/co',   co,    i1, i2, nn, nnoff, 0 )
-  case( 'sxx'  ); call iovector( 'r', 'data/sxx',  t1, 1, i1, i2, nn, nnoff, 0 )
-  case( 'syy'  ); call iovector( 'r', 'data/syy',  t1, 2, i1, i2, nn, nnoff, 0 )
-  case( 'szz'  ); call iovector( 'r', 'data/szz',  t1, 3, i1, i2, nn, nnoff, 0 )
-  case( 'syz'  ); call iovector( 'r', 'data/syz',  t2, 1, i1, i2, nn, nnoff, 0 )
-  case( 'szx'  ); call iovector( 'r', 'data/szx',  t2, 2, i1, i2, nn, nnoff, 0 )
-  case( 'sxy'  ); call iovector( 'r', 'data/szy',  t2, 3, i1, i2, nn, nnoff, 0 )
-  case( 'tnrm' ); call iovector( 'r', 'data/tnrm', t3, 1, i1, i2, nn, nnoff, 0 )
-  case( 'tstr' ); call iovector( 'r', 'data/tstr', t3, 2, i1, i2, nn, nnoff, 0 )
-  case( 'tdip' ); call iovector( 'r', 'data/tdip', t3, 3, i1, i2, nn, nnoff, 0 )
+  case( 'mus' ); call ioscalar( 'r', 'data/mus', mus,   i1, i2, nn, nnoff, 0 )
+  case( 'mud' ); call ioscalar( 'r', 'data/mud', mud,   i1, i2, nn, nnoff, 0 )
+  case( 'dc'  ); call ioscalar( 'r', 'data/dc',  dc,    i1, i2, nn, nnoff, 0 )
+  case( 'co'  ); call ioscalar( 'r', 'data/co',  co,    i1, i2, nn, nnoff, 0 )
+  case( 'sxx' ); call iovector( 'r', 'data/sxx', t1, 1, i1, i2, nn, nnoff, 0 )
+  case( 'syy' ); call iovector( 'r', 'data/syy', t1, 2, i1, i2, nn, nnoff, 0 )
+  case( 'szz' ); call iovector( 'r', 'data/szz', t1, 3, i1, i2, nn, nnoff, 0 )
+  case( 'syz' ); call iovector( 'r', 'data/syz', t2, 1, i1, i2, nn, nnoff, 0 )
+  case( 'szx' ); call iovector( 'r', 'data/szx', t2, 2, i1, i2, nn, nnoff, 0 )
+  case( 'sxy' ); call iovector( 'r', 'data/szy', t2, 3, i1, i2, nn, nnoff, 0 )
+  case( 'tn'  ); call iovector( 'r', 'data/tn',  t3, 1, i1, i2, nn, nnoff, 0 )
+  case( 'th'  ); call iovector( 'r', 'data/th',  t3, 2, i1, i2, nn, nnoff, 0 )
+  case( 'td'  ); call iovector( 'r', 'data/td',  t3, 3, i1, i2, nn, nnoff, 0 )
   end select
 else
   i1 = max( i1in(iz,:), i1node )
@@ -68,19 +68,19 @@ else
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
   select case ( fieldin(iz) )
-  case( 'mus'  ); mus(j1:j2,k1:k2,l1:l2)  = inval(iz)
-  case( 'mud'  ); mud(j1:j2,k1:k2,l1:l2)  = inval(iz)
-  case( 'dc'   ); dc(j1:j2,k1:k2,l1:l2)   = inval(iz)
-  case( 'co'   ); co(j1:j2,k1:k2,l1:l2)   = inval(iz)
-  case( 'sxx'  ); t1(j1:j2,k1:k2,l1:l2,1) = inval(iz)
-  case( 'syy'  ); t1(j1:j2,k1:k2,l1:l2,2) = inval(iz)
-  case( 'szz'  ); t1(j1:j2,k1:k2,l1:l2,3) = inval(iz)
-  case( 'syz'  ); t2(j1:j2,k1:k2,l1:l2,1) = inval(iz)
-  case( 'szx'  ); t2(j1:j2,k1:k2,l1:l2,2) = inval(iz)
-  case( 'sxy'  ); t2(j1:j2,k1:k2,l1:l2,3) = inval(iz)
-  case( 'tnrm' ); t3(j1:j2,k1:k2,l1:l2,1) = inval(iz)
-  case( 'tstr' ); t3(j1:j2,k1:k2,l1:l2,2) = inval(iz)
-  case( 'tdip' ); t3(j1:j2,k1:k2,l1:l2,3) = inval(iz)
+  case( 'mus' ); mus(j1:j2,k1:k2,l1:l2)  = inval(iz)
+  case( 'mud' ); mud(j1:j2,k1:k2,l1:l2)  = inval(iz)
+  case( 'dc'  ); dc(j1:j2,k1:k2,l1:l2)   = inval(iz)
+  case( 'co'  ); co(j1:j2,k1:k2,l1:l2)   = inval(iz)
+  case( 'sxx' ); t1(j1:j2,k1:k2,l1:l2,1) = inval(iz)
+  case( 'syy' ); t1(j1:j2,k1:k2,l1:l2,2) = inval(iz)
+  case( 'szz' ); t1(j1:j2,k1:k2,l1:l2,3) = inval(iz)
+  case( 'syz' ); t2(j1:j2,k1:k2,l1:l2,1) = inval(iz)
+  case( 'szx' ); t2(j1:j2,k1:k2,l1:l2,2) = inval(iz)
+  case( 'sxy' ); t2(j1:j2,k1:k2,l1:l2,3) = inval(iz)
+  case( 'tn'  ); t3(j1:j2,k1:k2,l1:l2,1) = inval(iz)
+  case( 'th'  ); t3(j1:j2,k1:k2,l1:l2,2) = inval(iz)
+  case( 'td'  ); t3(j1:j2,k1:k2,l1:l2,3) = inval(iz)
   end select
 end if ifreadfile
 end do doiz
@@ -90,40 +90,28 @@ i1 = i1node
 i2 = i2node
 i1(ifn) = ihypo(ifn)
 i2(ifn) = ihypo(ifn)
-call surfnormals( nrm, x, i1, i2 )
-area = sqrt( sum( nrm * nrm, 4 ) )
+call surfnormals( nhat, x, i1, i2 )
+area = sqrt( sum( nhat * nhat, 4 ) )
 f1 = area
 where ( f1 /= 0. ) f1 = 1. / f1
 do i = 1, 3
-  nrm(:,:,:,i) = nrm(:,:,:,i) * f1
+  nhat(:,:,:,i) = nhat(:,:,:,i) * f1
 end do
 
 ! Resolve prestress onto fault
 do i = 1, 3
-  j = mod( i , 3 ) + 1
-  k = mod( i + 1, 3 ) + 1
+  j = modulo( i , 3 ) + 1
+  k = modulo( i + 1, 3 ) + 1
   t0(:,:,:,i) = &
-    t1(:,:,:,i) * nrm(:,:,:,i) + &
-    t2(:,:,:,j) * nrm(:,:,:,k) + &
-    t2(:,:,:,k) * nrm(:,:,:,j)
+    t1(:,:,:,i) * nhat(:,:,:,i) + &
+    t2(:,:,:,j) * nhat(:,:,:,k) + &
+    t2(:,:,:,k) * nhat(:,:,:,j)
 end do
 
-! Coordinate system
-idip = abs( upward )
-if ( idip /= ifn ) then
-  istr = 6 - ifn - idip
-else
-  istr = mod( ifn, 3 ) + 1
-  idip = 6 - ifn - istr
-end if
-!handed = mod( istr - ifn + 1, 3 ) - 1
-
 ! Strike vectors
-vertical = 0.
-vertical(idip) = 1.
-t1(:,:,:,1) = vertical(2) * nrm(:,:,:,3) - vertical(3) * nrm(:,:,:,2)
-t1(:,:,:,2) = vertical(3) * nrm(:,:,:,1) - vertical(1) * nrm(:,:,:,3)
-t1(:,:,:,3) = vertical(1) * nrm(:,:,:,2) - vertical(2) * nrm(:,:,:,1)
+t1(:,:,:,1) = nhat(:,:,:,2) * upvector(3) - nhat(:,:,:,3) * upvector(2)
+t1(:,:,:,2) = nhat(:,:,:,3) * upvector(1) - nhat(:,:,:,1) * upvector(3)
+t1(:,:,:,3) = nhat(:,:,:,1) * upvector(2) - nhat(:,:,:,2) * upvector(1)
 f1 = sqrt( sum( t1 * t1, 4 ) )
 where ( f1 /= 0. ) f1 = 1. / f1
 do i = 1, 3
@@ -131,9 +119,9 @@ do i = 1, 3
 end do
 
 ! Dip vectors
-t2(:,:,:,1) = t1(:,:,:,2) * nrm(:,:,:,3) - t1(:,:,:,3) * nrm(:,:,:,2)
-t2(:,:,:,2) = t1(:,:,:,3) * nrm(:,:,:,1) - t1(:,:,:,1) * nrm(:,:,:,3)
-t2(:,:,:,3) = t1(:,:,:,1) * nrm(:,:,:,2) - t1(:,:,:,2) * nrm(:,:,:,1)
+t2(:,:,:,1) = nhat(:,:,:,2) * t1(:,:,:,3) - nhat(:,:,:,3) * t1(:,:,:,2)
+t2(:,:,:,2) = nhat(:,:,:,3) * t1(:,:,:,1) - nhat(:,:,:,1) * t1(:,:,:,3)
+t2(:,:,:,3) = nhat(:,:,:,1) * t1(:,:,:,2) - nhat(:,:,:,2) * t1(:,:,:,1)
 f1 = sqrt( sum( t2 * t2, 4 ) )
 where ( f1 /= 0. ) f1 = 1. / f1
 do i = 1, 3
@@ -143,14 +131,13 @@ end do
 ! Total pretraction
 do i = 1, 3
   t0(:,:,:,i) = t0(:,:,:,i) + &
-    t3(:,:,:,ifn)  * nrm(:,:,:,i) + &
-    t3(:,:,:,istr) * t1(:,:,:,i) + &
-    t3(:,:,:,idip) * t2(:,:,:,i)
+    t3(:,:,:,1) * nhat(:,:,:,i) + &
+    t3(:,:,:,2) * t1(:,:,:,i) + &
+    t3(:,:,:,3) * t2(:,:,:,i)
 end do
 
-print *, ifn, istr, idip
 print *, t3(2,2,1,:)
-print *, nrm(2,2,1,:)
+print *, nhat(2,2,1,:)
 print *, t1(2,2,1,:)
 print *, t2(2,2,1,:)
 print *, t0(2,2,1,:)
@@ -178,8 +165,8 @@ if ( master ) then
   mus0 = mus(j,k,l)
   mud0 = mud(j,k,l)
   dc0 = dc(j,k,l)
-  tn0 = sum( t0(j,k,l,:) * nrm(j,k,l,:) )
-  ts0 = sqrt( sum( ( t0(j,k,l,:) - tn0 * nrm(j,k,l,:) ) ** 2. ) )
+  tn0 = sum( t0(j,k,l,:) * nhat(j,k,l,:) )
+  ts0 = sqrt( sum( ( t0(j,k,l,:) - tn0 * nhat(j,k,l,:) ) ** 2. ) )
   tn0 = max( -tn0, 0. )
   s = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 )
   lc =  dc0 * ( rho * vs * vs ) / tn0 / ( mus0 - mud0 )
@@ -199,7 +186,7 @@ end if
 
 return
 
-end if ifinit !--------------------------------------!
+end if ifinit !----------------------------------------------------------------!
 
 ! Indices
 i1 = 1
@@ -225,10 +212,10 @@ do i = 1, 3
 end do
 
 ! Decompose traction to normal and shear components
-tn = sum( t3 * nrm, 4 )
+tn = sum( t3 * nhat, 4 )
 if ( any( tn > 0. ) ) print *, 'Fault opening!'
 do i = 1, 3
-  t1(:,:,:,i) = tn * nrm(:,:,:,i)
+  t1(:,:,:,i) = tn * nhat(:,:,:,i)
 end do
 t2 = t3 - t1
 ts = sqrt( sum( t2 * t2, 4 ) )

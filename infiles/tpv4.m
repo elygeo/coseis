@@ -9,9 +9,9 @@
   mud		= 1.				;
   dc		= 1e9				;
   co		= 0.				;
-  tnrm		= -100e6			;
-  tstr		= -90e6				;
-  tdip		= 0.				;
+  tn		= -100e6			;
+  th		= -90e6				;
+  td		= 0.				;
   vrup		= 3117.7			;
   rcrit		= 1e9				;
   trelax	= 0.				;

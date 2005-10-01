@@ -149,7 +149,7 @@ end if
 
 doiz: do iz = 1, nout !--------------------------------------!
 
-if ( ditout(iz) == 0 .or. mod( it, ditout(iz) ) /= 0 ) cycle doiz
+if ( ditout(iz) == 0 .or. modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 
 ! Properties
 nc = 1; fault = .false.; onpass = 'a'

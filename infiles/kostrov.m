@@ -8,14 +8,13 @@
   bc		= [ 0 0 1   0 0 1 ]		;
   bc		= [ 0 0 0   0 0 0 ]		;
   faultnormal	= 3				;
-  upward	= -2				;
   mus		= 1e9				;
   mud		= 0.				;
   dc		= 1e9				;
   co		= 0.				;
-  tnrm		= -100e6			;
-  tstr		= -90e6				;
-  tdip		= 0.				;
+  tn		= -100e6			;
+  th		= -90e6				;
+  td		= 0.				;
   vrup		= 3117.6914			;
   rcrit		= 1e9				;
   trelax	= 0.				;

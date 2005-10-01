@@ -2,7 +2,7 @@
 
   model		= 'terashake'			;
   out		= { 'v' 1   1 1 1   -1 -1 1 }	;
-  upward	= 3				;
+  upvector	= [ 0 0 1 ];			;
   faultnormal	= 2				;
 
   nn		= [ 3001 1502 401 ]		;

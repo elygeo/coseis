@@ -43,10 +43,12 @@ lk = dx * ( n(2) - 1 )
 ll = dx * ( n(3) - 1 )
 
 ! Coordinate system
-l  = abs( upward )
-up = sign( 1, upward )
+print *, 999999, maxloc( abs( upvector ) )
+!l = maxloc( abs( upvector ) )
+l = 1
+up = sign( 1., upvector(l) )
 if ( ifn == 0 .or. ifn == l ) then
-  k = mod( l + 1, 3 ) + 1
+  k = modulo( l + 1, 3 ) + 1
 else
   k = ifn
 end if

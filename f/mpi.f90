@@ -1,14 +1,19 @@
 !------------------------------------------------------------------------------!
 ! MPI routines
 
-module collective_m
-!use mpi
-implicit none
+! MPICH mpi module is broken, so make one
+module mpi_m
 include 'mpif.h'
+end module
+
+module collective_m
+use mpi_m
+implicit none
 integer :: comm
 integer, private :: ip, ipmaster
 contains
 
+! Initialize
 subroutine initialize( master )
 logical, intent(out) :: master
 integer :: err

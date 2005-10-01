@@ -54,6 +54,7 @@ while [ $i -le $nout ]; do
   dir=$( echo $i | awk '{ printf "out/%02d", $1 }' )
   [ -e $dir ] || mkdir $dir
 done
+rm -f batchjob f/mpif.h
 
 # Problem size
 nn=$(( nn3[0] * nn3[1] * nn3[2] ));
@@ -169,10 +170,7 @@ case $osname in
 Linux)
   case $mpi in
   no)  FC="gfortran" ;;
-  yes)
-    FC="mpif90"
-    mpidir=$( dirname $( dirname $( which mpif90 ) ) )
-    cp $mpidir/include/mpif.h f/
+  yes) FC="mpif90"
   ;;
   esac
   case $debug in
@@ -218,6 +216,13 @@ babieca)
   ;;
 esac
 
+# If using MPICH, work around broken mpif90
+if [ $FC == mpif90 ]; then
+  mpidir=$( dirname $( dirname $( which mpif90 ) ) )
+  echo cp $mpidir/include/mpif.h f/
+  cp $mpidir/include/mpif.h f/
+fi
+
 # Write makefile
 cat << END > tmp
 FC = $FC
@@ -241,8 +246,6 @@ rm -f tmp
 
 #------------------------------------------------------------------------------#
 # Machine specific batch submission and run commands
-
-rm -f batchjob f/mpif.h
 
 case $machine in
 

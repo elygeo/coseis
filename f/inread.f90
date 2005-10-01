@@ -50,7 +50,7 @@ case( 'nn' );          read( str, * ) key1, nn
 case( 'nt' );          read( str, * ) key1, nt
 case( 'dx' );          read( str, * ) key1, dx
 case( 'dt' );          read( str, * ) key1, dt
-case( 'upward' );      read( str, * ) key1, upward
+case( 'upvector' );    read( str, * ) key1, upvector
 case( 'viscosity' );   read( str, * ) key1, viscosity
 case( 'npml' );        read( str, * ) key1, npml
 case( 'bc' );          read( str, * ) key1, bc1, bc2
@@ -72,9 +72,9 @@ case( 'mus' );         inzone = .true.
 case( 'mud' );         inzone = .true.
 case( 'dc' );          inzone = .true.
 case( 'co' );          inzone = .true.
-case( 'tnrm' );        inzone = .true.
-case( 'tstr' );        inzone = .true.
-case( 'tdip' );        inzone = .true.
+case( 'tn' );          inzone = .true.
+case( 'th' );          inzone = .true.
+case( 'td' );          inzone = .true.
 case( 'sxx' );         inzone = .true.
 case( 'syy' );         inzone = .true.
 case( 'szz' );         inzone = .true.

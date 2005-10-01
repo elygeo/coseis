@@ -11,8 +11,8 @@
 % grid		= 'slant'			;% skewed mesh
 % grid		= 'read'			;% read files: x1 x2 x3
   grid		= 'constant'			;% regular mesh
-% upward	= 3				;% positive z up
-  upward	= -2				;% negative y up
+% upvector	= [ 0 0 1 ];			;% positive z up
+  upvector	= [ 0 -1 0 ];			;% negative y up
   rho		= [ 2670.     1 1 1  -1 -1 -1 ]	;% **density
   vp		= [ 6000.     1 1 1  -1 -1 -1 ]	;% **P-wave speed
   vs		= [ 3464.1016 1 1 1  -1 -1 -1 ]	;% **S-wave speed
@@ -47,9 +47,9 @@
   mud		= [ .5        1 1 1  -1 -1 -1 ]	;% **coef of static friction
   dc		= [ .25       1 1 1  -1 -1 -1 ]	;% **slip-weakening distance
   co		= [ 0.        1 1 1  -1 -1 -1 ]	;% **cohesion
-  tnrm		= [ -70e6     1 1 1  -1 -1 -1 ]	;% **pretraction on near side
-  tstr		= [ -120e6    1 1 1  -1 -1 -1 ]	;% **pretraction on near side
-  tdip		= [ 0.        1 1 1  -1 -1 -1 ]	;% **pretraction on near side
+  tn		= [ -70e6     1 1 1  -1 -1 -1 ]	;% **pretraction on near side
+  th		= [ -120e6    1 1 1  -1 -1 -1 ]	;% **pretraction on near side
+  td		= [ 0.        1 1 1  -1 -1 -1 ]	;% **pretraction on near side
 % sxx		= [ 0.        1 1 1  -1 -1 -1 ]	;% **prestress
 % syy		= [ 0.        1 1 1  -1 -1 -1 ]	;% **prestress
 % szz		= [ 0.        1 1 1  -1 -1 -1 ]	;% **prestress

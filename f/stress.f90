@@ -17,7 +17,7 @@ s1 = 0.
 
 ! Loop over component and derivative direction
 doic: do ic  = 1, 3
-doid: do iid = 1, 3; id = mod( ic + iid - 1, 3 ) + 1
+doid: do iid = 1, 3; id = modulo( ic + iid - 1, 3 ) + 1
 
 ! Elastic region: G = grad(U + gamma*V)
 do iz = 1, noper
