@@ -39,7 +39,8 @@ end subroutine
 ! Write checkpoint
 subroutine writecheckpoint
 integer :: i, reclen
-if ( itcheck == 0 .or. modulo( it, itcheck ) /= 0 ) return
+if ( itcheck == 0 ) return
+if ( modulo( it, itcheck ) /= 0 ) return
 i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
 inquire( iolength=reclen ) &
   t, v, u, sl, trup, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6

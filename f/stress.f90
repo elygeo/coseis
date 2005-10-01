@@ -128,7 +128,7 @@ if ( id == 3 ) then
   end do
   i1 = i1cell
   i2 = i2cell
-  i2(3) = l2
+  i1(3) = l1
   call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
   do l = i1(3), i2(3)
   i = nn(3) - l + nnoff(3)
