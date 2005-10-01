@@ -181,7 +181,7 @@ Linux)
 SunOS)
   case $debug in
   no)  FFLAGS="-fast" ;;
-  yes) FFLAGS="-g -u -C" ;;
+  yes) FFLAGS="-g -w4 -u -C" ;;
   esac
   ;;
 esac

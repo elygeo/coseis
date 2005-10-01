@@ -10,12 +10,11 @@ subroutine output( pass )
 use zone_m
 
 implicit none
-real :: courant, amax, vmax, umax, wmax, svmax, slmax, dtwall
-integer :: i, i1(3), i2(3), n(3), nc, iz, &
-  amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3)
-integer, save :: twall_rate, twall(2)
-logical :: fault, test
-logical, save :: init = .true.
+save
+real :: amax, vmax, umax, wmax, svmax, slmax, courant, dtwall
+integer :: amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3), &
+  i, i1(3), i2(3), n(3), nc, iz, twall_rate, twall(2)
+logical :: fault, test, init = .true.
 character, intent(in) :: pass
 character :: onpass, endian
 
@@ -78,7 +77,9 @@ doiz0: do iz = 1, nout
   if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
 
   ! Zone
-  call zone( i1, i2, i1out(iz,:), i2out(iz,:), nn, nnoff, ihypo, ifn )
+  i1 = i1out(iz,:)
+  i2 = i2out(iz,:)
+  call zone( i1, i2, nn, nnoff, ihypo, ifn )
   if ( fault ) then
     if ( ifn == 0 ) then
       ditout(iz) = 0
@@ -123,27 +124,27 @@ end if ifinit !--------------------------------------!
 if ( pass == 'w' ) then
   s1 = sqrt( sum( u * u, 4 ) )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
-  i1 = maxloc( s1 )
-  i1 = maxloc( s2 )
-  umax = s1(i1(1),i1(2),i1(3))
-  wmax = s2(i1(1),i1(2),i1(3))
+  umaxi = maxloc( s1 )
+  wmaxi = maxloc( s2 )
+  umax = s1(umaxi(1),umaxi(2),umaxi(3))
+  wmax = s2(wmaxi(1),wmaxi(2),wmaxi(3))
   call globalmaxloc( umax, umaxi, nnoff )
   call globalmaxloc( wmax, wmaxi, nnoff )
   if ( umax > dx / 10. ) print *, 'Warning: u !<< dx'
 else
   s1 = sqrt( sum( w1 * w1, 4 ) )
   s2 = sqrt( sum( v * v, 4 ) )
-  i1 = maxloc( s1 )
-  i1 = maxloc( s2 )
-  amax  = s1(i1(1),i1(2),i1(3))
-  vmax  = s2(i1(1),i1(2),i1(3))
+  amaxi = maxloc( s1 )
+  vmaxi = maxloc( s2 )
+  amax = s1(amaxi(1),amaxi(2),amaxi(3))
+  vmax = s2(vmaxi(1),vmaxi(2),vmaxi(3))
   call globalmaxloc( amax, amaxi, nnoff )
   call globalmaxloc( vmax, vmaxi, nnoff )
   if ( ifn /= 0 ) then
-    i1 = maxloc( sv )
-    i1 = maxloc( sl )
-    svmax = sv(i1(1),i1(2),i1(3))
-    slmax = sv(i1(1),i1(2),i1(3))
+    svmaxi = maxloc( sv )
+    slmaxi = maxloc( sl )
+    svmax = sv(svmaxi(1),svmaxi(2),svmaxi(3))
+    slmax = sv(slmaxi(1),slmaxi(2),slmaxi(3))
     svmaxi(ifn) = ihypo(ifn)
     slmaxi(ifn) = ihypo(ifn)
     call globalmaxloc( svmax, svmaxi, nnoff )
@@ -231,16 +232,16 @@ if ( master ) then
   write( 9, * ) ' dt     = ',   dt,               '; % timestep size'
   write( 9, * ) ' dtwall = ',   dtwall,           '; % wall time per step'
   write( 9, * ) ' amax   = ',   amax,             '; % max acceleration'
-  write( 9, * ) ' amaxi  = [ ', amaxi - nnoff,  ' ]; % max acceleration loc'
   write( 9, * ) ' vmax   = ',   vmax,             '; % max velocity'
-  write( 9, * ) ' vmaxi  = [ ', vmaxi - nnoff,  ' ]; % max velocity loc'
   write( 9, * ) ' umax   = ',   umax,             '; % max displacement'
-  write( 9, * ) ' umaxi  = [ ', umaxi - nnoff,  ' ]; % max displacement loc'
   write( 9, * ) ' wmax   = ',   wmax,             '; % max stress Frobenius nrm'
-  write( 9, * ) ' wmaxi  = [ ', wmaxi - nnoff,    '; % max stress loc'
   write( 9, * ) ' svmax  = ',   svmax,            '; % max slip velocity'
-  write( 9, * ) ' svmaxi = [ ', svmaxi - nnoff, ' ]; % max slip velocity loc'
   write( 9, * ) ' slmax  = ',   slmax,            '; % max slip path length'
+  write( 9, * ) ' amaxi  = [ ', amaxi - nnoff,  ' ]; % max acceleration loc'
+  write( 9, * ) ' vmaxi  = [ ', vmaxi - nnoff,  ' ]; % max velocity loc'
+  write( 9, * ) ' umaxi  = [ ', umaxi - nnoff,  ' ]; % max displacement loc'
+  write( 9, * ) ' wmaxi  = [ ', wmaxi - nnoff,  ' ]; % max stress loc'
+  write( 9, * ) ' svmaxi = [ ', svmaxi - nnoff, ' ]; % max slip velocity loc'
   write( 9, * ) ' slmaxi = [ ', slmaxi - nnoff, ' ]; % max slip path length loc'
   close( 9 )
 end if

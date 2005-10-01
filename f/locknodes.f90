@@ -13,8 +13,10 @@ logical, save :: init = .true.
 
 if ( init ) then
   if ( nlock > nz ) stop 'too many lock zones, make nz bigger'
-  do i = 1, nlock
-    call zone( i1, i2, i1lock(i,:), i2lock(i,:), nn, nnoff, ihypo, ifn )
+  do iz = 1, nlock
+    i1 = i1lock(iz,:)
+    i2 = i2lock(iz,:)
+    call zone( i1, i2, nn, nnoff, ihypo, ifn )
     i1lock(iz,:) = max( i1, i2node )
     i2lock(iz,:) = min( i2, i2node )
   end do

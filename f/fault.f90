@@ -60,7 +60,9 @@ ifreadfile: if ( readfile(iz) ) then
   case( 'td'  ); call iovector( 'r', 'data/td',  t3, 3, i1, i2, nn, nnoff, 0 )
   end select
 else
-  call zone( i1, i2, i1in(iz,:), i2in(iz,:), nn, nnoff, ihypo, ifn )
+  i1 = i1in(iz,:)
+  i2 = i2in(iz,:)
+  call zone( i1, i2, nn, nnoff, ihypo, ifn )
   i1 = max( i1, i1node )
   i2 = min( i2, i2node )
   i1(ifn) = 1

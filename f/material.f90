@@ -42,7 +42,9 @@ end if
 doiz: do iz = 1, nin
 
 ! Indices
-call zone( i1, i2, i1in(iz,:), i2in(iz,:), nn, nnoff, ihypo, ifn )
+i1 = i1in(iz,:)
+i2 = i2in(iz,:)
+call zone( i1, i2, nn, nnoff, ihypo, ifn )
 i1 = max( i1, i1cell )
 i2 = min( i2, i2cell + 1 )
 j1 = i1(1); j2 = i2(1)
