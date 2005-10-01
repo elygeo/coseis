@@ -13,6 +13,7 @@ integer :: nl(3), n(3), ip3master(3)
 
 ! Hypocenter
 n = nn
+ifn = abs( faultnormal )
 if ( ifn /= 0 ) n(ifn) = n(ifn) - 1
 where ( ihypo == 0 ) ihypo = ( n + 1 ) / 2
 

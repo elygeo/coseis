@@ -42,6 +42,7 @@ inzone = .false.
 
 ! Select input key
 selectkey: select case( key1 )
+case( 'return' );      exit doline
 case( 'model' );       model = key2
 case( 'grid' );        grid  = key2
 case( 'rfunc' );       rfunc = key2
@@ -58,7 +59,7 @@ case( 'xhypo' );       read( str, * ) key1, xhypo
 case( 'rsource' );     read( str, * ) key1, rsource
 case( 'tsource' );     read( str, * ) key1, tsource
 case( 'moment' );      read( str, * ) key1, moment1, moment2
-case( 'faultnormal' ); read( str, * ) key1, ifn
+case( 'faultnormal' ); read( str, * ) key1, faultnormal
 case( 'ihypo' );       read( str, * ) key1, ihypo
 case( 'vrup' );        read( str, * ) key1, vrup
 case( 'rcrit' );       read( str, * ) key1, rcrit

@@ -206,6 +206,34 @@ Estimate dc needed to resolve breakdown zone
 dc =~ (3 or 4)*dx*(Tu - Tf)/mu
 
 
+PRETRACTION
+
+  u = upward pointing unit normal
+
+  Consider either of the two fault walls:
+  n = local surface normal, points towards the oposing fault wall
+  h = n x u, horizontal unit normal (strike), points to the right on
+             the near wall, left on the far wall.
+  d = n x h, dip unit normal, for a vertical fault d = -u
+
+       .------------ 
+      /  n u       /
+     /    \|      /
+    /   h--+     /
+   /      /     /
+  /      d     /
+  ------------'
+
+  Pre-traction:
+  T0 = Tn*n + Th*h + Td*d
+  Tn < 0 compresive traction
+  Tn > 0 opening traction
+  Th > 0 right-lateral slip
+  Th < 0 left-lateral slip
+
+  When T0 is applied to the near wall, and -T0 applied to the far wall:
+  Td > 0 far side moves down (is there a name for this?)
+  Td < 0 far side moves up
 
 KOSTROV SOLUTION
 

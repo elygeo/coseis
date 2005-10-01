@@ -13,7 +13,7 @@ implicit none
 save
 real :: mus0, mud0, dc0, lc, tn0, ts0, s, rctest
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, &
-  j3, k3, l3, j4, k4, l4, iz
+  j3, k3, l3, j4, k4, l4, iz, side
 logical :: init = .true.
 
 if ( ifn == 0 ) return
@@ -86,6 +86,7 @@ end if ifreadfile
 end do doiz
 
 ! Normal vectors
+side = sign( 1, faultnormal )
 i1 = i1node
 i2 = i2node
 i1(ifn) = ihypo(ifn)
@@ -93,7 +94,7 @@ i2(ifn) = ihypo(ifn)
 call surfnormals( nhat, x, i1, i2 )
 area = sqrt( sum( nhat * nhat, 4 ) )
 f1 = area
-where ( f1 /= 0. ) f1 = 1. / f1
+where ( f1 /= 0. ) f1 = side / f1
 do i = 1, 3
   nhat(:,:,:,i) = nhat(:,:,:,i) * f1
 end do
@@ -135,12 +136,6 @@ do i = 1, 3
     t3(:,:,:,2) * t1(:,:,:,i) + &
     t3(:,:,:,3) * t2(:,:,:,i)
 end do
-
-print *, t3(2,2,1,:)
-print *, nhat(2,2,1,:)
-print *, t1(2,2,1,:)
-print *, t2(2,2,1,:)
-print *, t0(2,2,1,:)
 
 ! Hypocentral radius
 i1 = 1
@@ -206,7 +201,7 @@ l3 = i1(3); l4 = i2(3)
 f1 = dt * area * ( mr(j1:j2,k1:k2,l1:l2) + mr(j3:j4,k3:k4,l3:l4) )
 where ( f1 /= 0. ) f1 = 1. / f1
 do i = 1, 3
-  t3(:,:,:,i) = t0(:,:,:,i) + f1 * &
+  t3(:,:,:,i) = t0(:,:,:,i) + f1 * side * &
     ( v(j3:j4,k3:k4,l3:l4,i) + dt * w1(j3:j4,k3:k4,l3:l4,i) &
     - v(j1:j2,k1:k2,l1:l2,i) - dt * w1(j1:j2,k1:k2,l1:l2,i) )
 end do
@@ -240,7 +235,7 @@ where ( ts > f1 ) f2 = f1 / ts
 
 ! Update acceleration
 do i = 1, 3
-  f1 = area * ( t1(:,:,:,i) + f2 * t2(:,:,:,i) - t0(:,:,:,i) )
+  f1 = area * side * ( t1(:,:,:,i) + f2 * t2(:,:,:,i) - t0(:,:,:,i) )
   w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f1 * mr(j1:j2,k1:k2,l1:l2)
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f1 * mr(j3:j4,k3:k4,l3:l4)
 end do

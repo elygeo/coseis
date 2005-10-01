@@ -122,7 +122,8 @@ integer :: &
   it,           & ! current time step
   itcheck,      & ! interval for checkpointing
   npml,         & ! number of PML damping nodes
-  ifn,          & ! fault normal direction
+  faultnormal,  & ! fault normal direction
+  ifn,          & ! fault normal component=abs(faultnormal)
   noper,        & ! number of zones for spatial derivative operators
   i1oper(2,3),  & ! j1 k1 l1 operator zone start index
   i2oper(2,3),  & ! j2 k2 l2 operator zone end index
