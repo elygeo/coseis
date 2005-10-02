@@ -112,7 +112,7 @@ end do doiz0
 
 ! Column names
 if ( master ) then
-  print *, '       Step  Amax           Vmax           Umax          Wall Time'
+  print *,'       Step  Amax           Vmax           Umax            Wall Time'
   call system_clock( count_rate=twall_rate )
 end if
 

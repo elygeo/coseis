@@ -7,10 +7,10 @@ contains
 subroutine inread( filename )
 
 implicit none
-character(*), intent(in) :: filename
-character(16) :: key1, key2
 integer :: i, err
 logical :: inzone
+character(*), intent(in) :: filename
+character(16) :: key1, key2
 
 if ( master ) print '(2a)', 'Reading file: ', filename
 
@@ -41,7 +41,7 @@ read( str, * ) key1, key2
 inzone = .false.
 
 ! Select input key
-selectkey: select case( key1 )
+select case( key1 )
 case( 'return' );      exit doline
 case( 'model' );       model = key2
 case( 'grid' );        grid  = key2
@@ -91,7 +91,7 @@ case( 'lock' );
   i = nlock
   read( str, * ) key1, lock(i,:), i1lock(i,:), i2lock(i,:)
 case default; print '(2a)', 'Bad input: ', trim( str ); stop
-end select selectkey
+end select
 
 ! Input zone
 if ( inzone ) then

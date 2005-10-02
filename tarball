@@ -16,7 +16,7 @@ files="
   $version/sord.m
   $version/defaults.m
   $version/in.m
-  $version/infiles
+  $version/in
   $version/f
   $version/m
 "

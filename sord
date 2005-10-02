@@ -174,7 +174,7 @@ Linux)
   ;;
   esac
   case $debug in
-  no)  FFLAGS="-O3" ;;
+  no) FFLAGS="" ;;
   yes) FFLAGS="-g -W -pedantic -std=f95 -fimplicit-none" ;;
   esac
   ;;
@@ -194,7 +194,7 @@ datastar)
   yes) FC="mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg" ;;
   esac 
   case $debug in
-  no)  FFLAGS="-O3 -qstrict -qarch=pwr4 -qtune=pwr4" ;;
+  no)  FFLAGS="-O5" ;;
   yes) FFLAGS="-g -C -qflttrap -qsigtrap -qlanglvl=95pure" ;;
   esac
   ;;
@@ -237,7 +237,7 @@ END
 [ "$( diff tmp makefile )" != "" ] && mv tmp makefile
 rm -f tmp
 [ $compile = yes ] && gmake
-rm -f *.mod f/mpif.h
+rm -f *.o *.mod f/mpif.h
 
 #------------------------------------------------------------------------------#
 # Machine specific batch submission and run commands

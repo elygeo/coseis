@@ -1,9 +1,9 @@
 #!/bin/bash -e
 
 account="phim.ucsd.edu"
-account="ux451302@dslogin.sdsc.edu"
 account="ux451302@tg-login.sdsc.edu"
 account="altai.sdsu.edu"
+account="ux451302@dslogin.sdsc.edu"
 
 echo -e "\n$account"
 
@@ -18,7 +18,7 @@ files="
   sord.m
   defaults.m
   in.m
-  infiles
+  in
   f
   m
 "
