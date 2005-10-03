@@ -4,24 +4,24 @@
 echo -e "\nSORD setup"
 
 # Get command line options
-mpi=guess
-debug=no
-debugger=no
-compile=yes
-run=yes
-matlab=no
-deleteout=no
+parallel=
+fflags=O
+debugger=
+compile=c
+run=r
+matlab=
+deleteout=
 while getopts spgGcnmd opt; do
-  case $opt in
-    s) mpi=no ;;
-    p) mpi=yes ;;
-    g) debug=yes ;;
-    G) debug=yes; debugger=yes ;;
-    c) run=no ;;
-    n) run=no; compile=no ;;
-    m) matlab=yes ;;
-    d) deleteout=yes ;;
-  esac
+case $opt in
+  s) parallel=s ;;
+  p) parallel=p ;;
+  g) fflags=g ;;
+  G) fflags=g; debugger=G ;;
+  c) run= ;;
+  n) run= ; compile= ;;
+  m) matlab=m ;;
+  d) deleteout=d ;;
+esac
 done
 shift $(( OPTIND - 1 ))
 
@@ -34,17 +34,17 @@ sed "s/%.*$//; s/;/;\n/g; s/[]={}';[]*//g;/^$/d" 'defaults.m' 'in.m' > tmp
 # Read input
 nout=0
 while read key params; do
-  set -- $params
-  case "$key" in
-    nt)  nt=$1 ;;
-    nn)  nn3=( $1 $2 $3 ) ;;
-    np)  np3=( $1 $2 $3 ) ;;
-    out) nout=$(( nout + 1 )) ;;
-  esac
+set -- $params
+case "$key" in
+  nt)  nt=$1 ;;
+  nn)  nn3=( $1 $2 $3 ) ;;
+  np)  np3=( $1 $2 $3 ) ;;
+  out) nout=$(( nout + 1 )) ;;
+esac
 done < tmp
 
 # Create output folders
-[ $deleteout == yes ] && rm -rf out
+[ $deleteout ] && rm -rf out
 [ -e out ]       || mkdir out
 [ -e out/ckp ]   || mkdir out/ckp
 [ -e out/stats ] || mkdir out/stats
@@ -54,12 +54,12 @@ while [ $i -lt $nout ]; do
   dir=$( echo $i | awk '{ printf "out/%02d", $1 }' )
   [ -e $dir ] || mkdir $dir
 done
-rm -f batchjob f/mpif.h
+rm -f batchjob
 
 # Problem size
 nn=$(( nn3[0] * nn3[1] * nn3[2] ));
 np=$(( np3[0] * np3[1] * np3[2] ));
-[ $matlab = yes ] && np=1
+[ $matlab ] && np=1
 
 #------------------------------------------------------------------------------#
 # Metadata
@@ -67,10 +67,10 @@ np=$(( np3[0] * np3[1] * np3[2] ));
 osname=$( uname )
 
 # Identify machine
-if   [ "${HOSTNAME:0:2}" = ds ]; then machine="datastar"
-elif [ "${HOSTNAME:0:2}" = tg ]; then machine="teragrid"
-elif [ "$HOSTNAME" = master ];   then machine="babieca"
-else machine=$HOSTNAME
+if   [ "${HOSTNAME:0:2}" = ds ]; then machine=DataStar
+elif [ "${HOSTNAME:0:2}" = tg ]; then machine=TeraGrid
+elif [ "$HOSTNAME" = master ];   then machine=Babieca
+else machine=$osname
 fi
 
 # Save source, input files & byte order
@@ -85,7 +85,7 @@ floatsize=4
 nvars=21
 ram=$(( nn / np * floatsize * nvars / 1024 / 1024 ))
 rate=250000
-[ $matlab = yes ] && rate=70000
+[ $matlab ] && rate=70000
 wt=$(( nt * nn / np / rate + 1 ))
 hh=$(( wt / 3600 ))
 mm=$(( wt % 3600 / 60 ))
@@ -97,37 +97,77 @@ echo "Run time: at least $wt"
 
 # Write metadata
 cat << END > out/runmeta.m
-login = '$LOGNAME' ;
-name = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )' ;
-date = '$( date )' ;
+login   = '$LOGNAME' ;
+name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )' ;
+date    = '$( date )' ;
 machine = '$machine' ;
-host = '$HOSTNAME' ;
-os = '$( uname -a )' ;
+host    = '$HOSTNAME' ;
+os      = '$( uname -a )' ;
 END
 
 #------------------------------------------------------------------------------#
 # Matlab backend
 
-if [ $matlab = yes ]; then
+if [ $matlab ]; then
 
 cat << END > batchjob
 #!/bin/bash -e
 unset DISPLAY
-nohup matlab -r "sord, quit" > out.log &
+nohup matlab -r 'sord, quit' > out.log &
 END
 chmod u+x batchjob
 
-[ $run = yes ] && matlab -nodesktop -nosplash -r sord
+[ $run ] && matlab -nodesktop -nosplash -r sord
 
 exit
 
 fi
 
 #------------------------------------------------------------------------------#
-# Fortran backend
+# Compile Fortran
 
-# Common routines
-SRC="\\
+[ $parallel ] || [ $np -eq 1 ] && parallel=s
+[ $parallel ] || [ $np -gt 1 ] && parallel=p
+
+# Defaults
+sfc='f95'
+pfc='mpif90'
+oflags='-O'
+gflags='-g'
+
+# Machine specific
+case $machine in
+  Linux)
+    sfc='gfortran'
+    oflags=
+    gflags='-g -W -pedantic -std=f95 -fimplicit-none'
+    ;;
+  SunOS)
+    oflags='-fast'
+    gflags='-g -w4 -u -C'
+    ;;
+  DataStar)
+    sfc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
+    pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
+    oflags='-O5'
+    gflags='-g -C -qflttrap -qsigtrap -qlanglvl=95pure'
+    ;;
+  TeraGrid)
+    sfc='ifort'
+    oflags='-fast'
+    gflags='-g -CB -warn -traceback'
+    ;;
+  Babieca)
+    sfc='pgf95'
+    ;;
+esac
+case $fflags in
+  O) fflags=$oflags ;;
+  g) fflags=$gflags ;;
+esac
+
+# Source files
+common="
   f/globals.f90 \\
   f/diffcn.f90 \\
   f/diffnc.f90 \\
@@ -151,100 +191,45 @@ SRC="\\
   f/locknodes.f90 \\
   f/timestep.f90 \\
   f/sord.f90"
-
-[ $mpi = guess -a $np -eq 1 ] && mpi=no
-[ $mpi = guess -a $np -gt 1 ] && mpi=yes
-
-# Defaults
-case $mpi in
-no)  FC="f95";    SRC="f/serial.f90 f/serialio.f90 $SRC" ;;
-yes) FC="mpif90"; SRC="f/mpi.f90 f/mpiio.f90 $SRC" ;;
-esac
-case $debug in
-no)  FFLAGS="-O" ;;
-yes) FFLAGS="-g" ;;
-esac
-
-# OS specific
-case $osname in
-Linux)
-  case $mpi in
-  no)  FC="gfortran" ;;
-  yes) FC="mpif90"
-  ;;
-  esac
-  case $debug in
-  no) FFLAGS="" ;;
-  yes) FFLAGS="-g -W -pedantic -std=f95 -fimplicit-none" ;;
-  esac
-  ;;
-SunOS)
-  case $debug in
-  no)  FFLAGS="-fast" ;;
-  yes) FFLAGS="-g -w4 -u -C" ;;
-  esac
-  ;;
-esac
-
-# Machine specific
-case $machine in
-datastar)
-  case $mpi in
-  no)  FC="xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg" ;;
-  yes) FC="mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg" ;;
-  esac 
-  case $debug in
-  no)  FFLAGS="-O5" ;;
-  yes) FFLAGS="-g -C -qflttrap -qsigtrap -qlanglvl=95pure" ;;
-  esac
-  ;;
-teragrid)
-  case $mpi in
-  no)  FC="ifort" ;;
-  yes) FC="mpif90" ;;
-  esac
-  case $debug in
-  no)  FFLAGS="-fast" ;;
-  yes) FFLAGS="-g -CB -warn -traceback" ;;
-  esac
-  ;;
-babieca)
-  case $mpi in
-  no)  FC="pgf95" ;;
-  yes) FC="mpif90" ;;
-  esac
-  ;;
-esac
-
-# If using MPICH, work around broken mpif90
-if [ "$FC" = mpif90 ]; then
-  mpidir=$( dirname $( dirname $( which mpif90 ) ) )
-  echo cp $mpidir/include/mpif.h f/
-  cp $mpidir/include/mpif.h f/
-fi
+serial="
+  f/serial.f90 \\
+  f/serialio.f90"
+mpi="
+  f/mpi.f90 \\
+  f/mpiio.f90"
 
 # Write makefile
 cat << END > tmp
-FC = $FC
-FFLAGS = $FFLAGS
-SRC = $SRC
-fsord: \$(SRC) makefile
-	\$(FC) \$(FFLAGS) \$(SRC) -o fsord
+COMMON = $common
+SERIAL = $serial
+MPI = $mpi
+fsord: fsord.f90 makefile
+        $sfc $fflags fsord.f90 -o fsord
+psord: psord.f90 makefile
+        $pfc $fflags psord.f90 -o psord
+fsord.f90: \$(SERIAL) \$(COMMON)
+	cat \$(SERIAL) \$(COMMON) > fsord.f90
+psord.f90: \$(MPI) \$(COMMON)
+	cat \$(MPI) \$(COMMON) > psord.f90
+clean:
+	rm -f *.o *.mod
 END
-
-# Compile SORD
 [ ! -f makefile ] && touch makefile
 [ "$( diff tmp makefile )" != "" ] && mv tmp makefile
-rm -f tmp
-[ $compile = yes ] && gmake
-rm -f *.o *.mod f/mpif.h
+
+# Compile
+case $compile$parallel in
+  cs) gmake fsord ;;
+  cp) gmake psord ;;
+esac
+rm -f tmp *.o *.mod
 
 #------------------------------------------------------------------------------#
-# Machine specific batch submission and run commands
+# Batch submission and run commands
 
 case $machine in
 
-datastar) #--------------------------------------#
+DataStar) #--------------------------------------#
 
 cat << END
 Datastar 8-way, p655+ nodes
@@ -272,7 +257,7 @@ mm=$(( wt % 3600 / 60 ))
 ss=$(( wt % 60 ))
 [ $hh -ge 1 ] && ss=0
 wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
-ppn=8;
+ppn=8
 [ $ppn -gt $np ] && ppn=$np
 nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
 opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
@@ -313,25 +298,25 @@ YIELDLOOPTIME=0;
 #@ initialdir = $rundir
 #@ queue
 cd $rundir
-poe ./fsord $opts
+poe ./psord $opts
 END
 chmod u+x batchjob
 
 # Interactive
 if [ $( hostname ) != ds100 ]; then
-  echo "login to dspoe.sdsc.edu to run interactively"
-  run=no
+  echo 'login to dspoe.sdsc.edu to run interactively'
+  run=
 fi
-case $run$debugger$mpi in
-  yesnono)   ./fsord ;;
-  yesnoyes)  poe ./fsord $opts ;;
-  yesyesno)  totalview poe -a ./fsord $opts ;;
-  yesyesyes) totalview poe -a ./fsord $opts ;;
+case $run$parallel$debugger in
+  rs)  ./fsord ;;
+  rp)  poe ./psord $opts ;;
+  rsG) totalview poe -a ./fsord $opts ;;
+  rpG) totalview poe -a ./psord $opts ;;
 esac
 
 ;;
 
-teragrid) #--------------------------------------#
+TeraGrid) #--------------------------------------#
 
 cat << END
 configureing for Teragrid
@@ -347,7 +332,7 @@ mm=$(( wt % 3600 / 60 ))
 ss=$(( wt % 60 ))
 [ $hh -ge 1 ] && ss=0
 wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
-ppn=2;
+ppn=2
 [ $ppn -gt $np ] && ppn=$np
 nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
 cat << END > batchjob
@@ -360,24 +345,24 @@ cat << END > batchjob
 #PBS -e err.log
 #PBS -V
 cd $rundir
-time mpirun -v -machinefile \$PBS_NODEFILE -np $np ./fsord
+time mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord
 END
 chmod u+x batchjob
 
 # Interactive
-case $run$debugger$mpi in
-  yesnono)   ./fsord ;;
-  yesyesno)  gdb ./fsord ;;
-  yesyesyes) time mpirun -v -machinefile \$PBS_NODEFILE -np $np ./fsord ;;
+case $run$parallel$debugger in
+  rs)  ./fsord ;;
+  rsG) gdb ./fsord ;;
+  rp)  time mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord ;;
 esac
 
 ;;
 
-babieca) #--------------------------------------#
+Babieca) #--------------------------------------#
 
 # Info
 cat << END
-configuring for babieca
+configuring for Babieca
 batch submission (up to 19 procs):
 qsub batchjob
 other useful commands: pbsnodes -a, pingd, qstat, qdel
@@ -397,16 +382,16 @@ cat << END > batchjob
 #PBS -V
 sleep 2
 cd $rundir
-time mpiexec -np $np ./fsord
+time mpiexec -np $np ./psord
 END
 chmod u+x batchjob
 
 # Interactive
-case $run$debugger$mpi in
-  yesnono)   ./fsord ;;
-  yesyesno)  gdb ./fsord ;;
-  yesnoyes)  mpiexec -np $np ./fsord ;;
-  yesyesyes) mpiexec -np $np -dbg=gdb ./fsord ;;
+case $run$parallel$debugger in
+  rs)  ./fsord ;;
+  rsG) gdb ./fsord ;;
+  rp)  mpiexec -np $np ./psord ;;
+  rpG) mpiexec -np $np -dbg=gdb ./psord ;;
 esac
 
 ;;
@@ -414,24 +399,21 @@ esac
 *) #--------------------------------------#
 
 # Batch
-case $mpi in
-  no)  cmd="" ;;
-  yes) cmd="mpirun -np $np" ;;
-esac
 cat << END > batchjob
 #!/bin/bash
-nohup $cmd ./fsord > out.log &
+nohup mpirun -np $np ./psord > out.log &
 END
 chmod u+x batchjob
 
 # Interactive
-case $run$debugger$mpi in
-  yesnono)   ./fsord ;;
-  yesyesno)  ddd ./fsord ;;
-  yesnoyes)  mpirun -np $np ./fsord ;;
-  yesyesyes) mpirun -np $np -dbg=ddd ./fsord ;;
+case $run$parallel$debugger in
+  rs)  ./fsord ;;
+  rsG) ddd ./fsord ;;
+  rp)  mpirun -np $np ./psord ;;
+  rpG) mpirun -np $np -dbg=ddd ./psord ;;
 esac
 
 ;;
 
 esac #--------------------------------------#
+
