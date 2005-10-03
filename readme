@@ -25,14 +25,15 @@ USAGE
 
   ./sord infile
 
-  See 'defaults' and the 'infiles' directory for input explanation and examples.
+  See 'defaults.m' and 'in/' for examples.
 
   Options:
     -m  use MATLAB backend (default is Fortran)
-    -n  setup only, don't compile or run
+    -c  setup and compile, do not run
+    -n  setup only, do not compile or run
+    -g  use debugging and syntax checking flags
+    -G  run in debugger
     -d  delete output from previous run before starting
-    -r  dispatch to remote host, edit 'remote' to set host
-    -g  run in debugger
 
   When porting to a new machine, you may have to modify the sord script for 
   the proper compiling and batch submission parameters.  For the parallel
