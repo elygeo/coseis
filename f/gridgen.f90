@@ -12,7 +12,7 @@ subroutine gridgen
 
 implicit none
 real :: theta, scl
-integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up, n(3), &
+integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up(1), n(3), &
   noff(3), idoublenode
 real :: lj, lk, ll
 
@@ -43,15 +43,9 @@ lk = dx * ( n(2) - 1 )
 ll = dx * ( n(3) - 1 )
 
 ! Coordinate system
-print *, 999999, maxloc( abs( upvector ) )
-!l = maxloc( abs( upvector ) )
-l = 1
+l = sum( maxloc( abs( upvector ) ) )
 up = sign( 1., upvector(l) )
-if ( ifn == 0 .or. ifn == l ) then
-  k = modulo( l + 1, 3 ) + 1
-else
-  k = ifn
-end if
+k = modulo( l + 1, 3 ) + 1
 j = 6 - k - l
 
 ! Read grid files or create basic rectangular mesh
@@ -85,8 +79,6 @@ case( 'slant' )
   x(:,:,:,j) = x(:,:,:,j) * scl;
   x(:,:,:,l) = x(:,:,:,l) * scl;
 case( 'rand' )
-  ! note: does not work for domain decomposition
-  ! would have to swap edge values
   oper = 'g'
   call random_number( w1 )
   w1 = .2 * ( w1 - .5 )
@@ -102,6 +94,7 @@ case( 'rand' )
   case( 3 ); w1(:,:,k,3) = 0.; w1(:,:,k+1,3) = 0.
   end select
   x = x + w1
+  call swaphalo( x, nhalo )
 case( 'spherical' )
 case default; stop 'grid'
 end select

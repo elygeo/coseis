@@ -21,6 +21,8 @@ files="
   $version/m
 "
 
+rm -f f/*.mod
+
 tar chf - $files | gzip > sord.tgz
 
 rm $version

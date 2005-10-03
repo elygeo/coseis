@@ -4,26 +4,33 @@
 echo -e "\nSORD setup"
 
 # Get command line options
-parallel=
+mode=guess
 fflags=O
-debugger=
-compile=c
-run=r
-matlab=
+compile=yes
+run=yes
+debug=
 deleteout=
-while getopts spgGcnmd opt; do
+while getopts spmcngGd opt; do
 case $opt in
-  s) parallel=s ;;
-  p) parallel=p ;;
-  g) fflags=g ;;
-  G) fflags=g; debugger=G ;;
+  s) mode=serial ;;
+  p) mode=parallel ;;
+  m) mode=matlab ;;
   c) run= ;;
   n) run= ; compile= ;;
-  m) matlab=m ;;
-  d) deleteout=d ;;
+  g) fflags=g ;;
+  G) fflags=g; debug=g ;;
+  d) deleteout=yes ;;
 esac
 done
 shift $(( OPTIND - 1 ))
+
+# Identify machine
+osname=$( uname )
+if   [ "${HOSTNAME:0:2}" = ds ]; then machine=DataStar
+elif [ "${HOSTNAME:0:2}" = tg ]; then machine=TeraGrid
+elif [ "$HOSTNAME" = master ];   then machine=Babieca
+else machine=$osname
+fi
 
 # Copy input file specified on command line
 [ -n "$1" ] && cp -f "$1" 'in.m'
@@ -64,20 +71,8 @@ np=$(( np3[0] * np3[1] * np3[2] ));
 #------------------------------------------------------------------------------#
 # Metadata
 
-osname=$( uname )
-
-# Identify machine
-if   [ "${HOSTNAME:0:2}" = ds ]; then machine=DataStar
-elif [ "${HOSTNAME:0:2}" = tg ]; then machine=TeraGrid
-elif [ "$HOSTNAME" = master ];   then machine=Babieca
-else machine=$osname
-fi
-
 # Save source, input files & byte order
-./tarball
-cp sord.tgz out/
-cp 'defaults.m' out/
-cp 'in.m' out/
+cp 'defaults.m' 'in.m' out/
 perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > out/endian
 
 # RAM usage and run time estimate
@@ -85,7 +80,7 @@ floatsize=4
 nvars=21
 ram=$(( nn / np * floatsize * nvars / 1024 / 1024 ))
 rate=250000
-[ $matlab ] && rate=70000
+[ $mode = matlab ] && rate=70000
 wt=$(( nt * nn / np / rate + 1 ))
 hh=$(( wt / 3600 ))
 mm=$(( wt % 3600 / 60 ))
@@ -108,7 +103,7 @@ END
 #------------------------------------------------------------------------------#
 # Matlab backend
 
-if [ $matlab ]; then
+if [ $mode = matlab ]; then
 
 cat << END > batchjob
 #!/bin/bash -e
@@ -116,6 +111,9 @@ unset DISPLAY
 nohup matlab -r 'sord, quit' > out.log &
 END
 chmod u+x batchjob
+
+./tarball
+cp sord.tgz out/
 
 [ $run ] && matlab -nodesktop -nosplash -r sord
 
@@ -126,11 +124,11 @@ fi
 #------------------------------------------------------------------------------#
 # Compile Fortran
 
-[ ! $parallel ] && [ $np -eq 1 ] && parallel=s
-[ ! $parallel ] && [ $np -gt 1 ] && parallel=p
+[ $mode = guess ] && [ $np -eq 1 ] && mode=serial
+[ $mode = guess ] && [ $np -gt 1 ] && mode=parallel
 
 # Defaults
-sfc='f95'
+fc='f95'
 pfc='mpif90'
 oflags='-O'
 gflags='-g'
@@ -138,7 +136,7 @@ gflags='-g'
 # Machine specific
 case $machine in
   Linux)
-    sfc='gfortran'
+    fc='gfortran'
     oflags=
     gflags='-g -W -pedantic -std=f95 -fimplicit-none'
     ;;
@@ -147,18 +145,18 @@ case $machine in
     gflags='-g -w4 -u -C'
     ;;
   DataStar)
-    sfc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
+    fc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
     pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
     oflags='-O5'
     gflags='-g -C -qflttrap -qsigtrap -qlanglvl=95pure'
     ;;
   TeraGrid)
-    sfc='ifort'
+    fc='ifort'
     oflags='-fast'
     gflags='-g -CB -warn -traceback'
     ;;
   Babieca)
-    sfc='pgf95'
+    fc='pgf95'
     ;;
 esac
 case $fflags in
@@ -168,62 +166,67 @@ esac
 
 # Source files
 common="\\
-  f/globals.f90 \\
-  f/diffcn.f90 \\
-  f/diffnc.f90 \\
-  f/hourglasscn.f90 \\
-  f/hourglassnc.f90 \\
-  f/surfnormals.f90 \\
-  f/zone.f90 \\
-  f/inread.f90 \\
-  f/setup.f90 \\
-  f/arrays.f90 \\
-  f/optimize.f90 \\
-  f/gridgen.f90 \\
-  f/material.f90 \\
-  f/momentsource.f90 \\
-  f/fault.f90 \\
-  f/checkpoint.f90 \\
-  f/output.f90 \\
-  f/pml.f90 \\
-  f/stress.f90 \\
-  f/acceleration.f90 \\
-  f/locknodes.f90 \\
-  f/timestep.f90 \\
-  f/sord.f90"
+  globals.f90 \\
+  diffcn.f90 \\
+  diffnc.f90 \\
+  hourglasscn.f90 \\
+  hourglassnc.f90 \\
+  surfnormals.f90 \\
+  zone.f90 \\
+  inread.f90 \\
+  setup.f90 \\
+  arrays.f90 \\
+  optimize.f90 \\
+  gridgen.f90 \\
+  material.f90 \\
+  momentsource.f90 \\
+  fault.f90 \\
+  checkpoint.f90 \\
+  output.f90 \\
+  pml.f90 \\
+  stress.f90 \\
+  acceleration.f90 \\
+  locknodes.f90 \\
+  timestep.f90 \\
+  sord.f90"
 serial="\\
-  f/serial.f90 \\
-  f/serialio.f90"
+  serial.f90 \\
+  serialio.f90"
 mpi="\\
-  f/mpi.f90 \\
-  f/mpiio.f90"
+  mpi.f90 \\
+  mpiio.f90"
 
 # Write makefile
 cat << END > tmp
+FC = $fc
+PFC = $pfc
+FFLAGS = $fflags
 COMMON = $common
 SERIAL = $serial
 MPI = $mpi
-fsord: fsord.f90 makefile
-	$sfc $fflags fsord.f90 -o fsord
-psord: psord.f90 makefile
-	$pfc $fflags psord.f90 -o psord
-fsord.f90: \$(SERIAL) \$(COMMON)
-	cat \$(SERIAL) \$(COMMON) > fsord.f90
-psord.f90: \$(MPI) \$(COMMON)
-	cat \$(MPI) \$(COMMON) > psord.f90
+VPATH = f
+fsord: makefile \$(SERIAL) \$(COMMON)
+	cd f; \$(FC) \$(FFLAGS) \$(SERIAL) \$(COMMON) -o ../fsord
+psord: makefile \$(MPI) \$(COMMON)
+	cd f; \$(PFC) \$(FFLAGS) \$(MPI) \$(COMMON) -o ../psord
+sord.tgz: clean
+	./tarball
 clean:
-	rm -f tmp *.mod
+	rm -f tmp f/*.mod
 realclean: clean
-	rm -f makefile fsord.f90 psord.f90 fsord psord batchjob
+	rm -f makefile fsord psord batchjob
+.PHONY: clean realclean
 END
 [ ! -f makefile ] && touch makefile
 [ "$( diff tmp makefile )" != "" ] && mv tmp makefile
 
 # Compile
-case $compile$parallel in
-  cs) gmake fsord clean ;;
-  cp) gmake psord clean ;;
+if [ $compile ]; then
+case $mode in
+  serial)   gmake fsord sord.tgz ;;
+  parallel) gmake psord sord.tgz ;;
 esac
+fi
 
 #------------------------------------------------------------------------------#
 # Batch submission and run commands
@@ -233,20 +236,20 @@ case $machine in
 DataStar) #--------------------------------------#
 
 cat << END
-Datastar 8-way, p655+ nodes
-run from a subdirectory of /gpfs/
-dspoe.sdsc.edu: inpteractive
-  4GB?, 40proc?, 2hr limit
-dslogin.sdsc.edu: compiling and batch submition
-  3672GB, 2176proc, 18hr limit
+DataStar 8-way p655+ nodes
+dspoe.sdsc.edu: 4GB?, 40proc?, 2hr limit
+dslogin.sdsc.edu: 3672GB, 2176proc, 18hr limit
+Useful commands:
   llsubmit batchjob
-other useful commands:
   llcancel <jobID>
   llq
   llq -s <jobID>
   show_q
   show_bf # backfill openings
   reslist # check allocation
+Always run from a subdirectory of /gpfs/
+Login to dslogin.sdsc.edu to submit batch jobs
+Login to dspoe.sdsc.edu to run interactively
 END
 [ $( pwd | grep -v gpfs ) ] || exit
 
@@ -304,15 +307,13 @@ END
 chmod u+x batchjob
 
 # Interactive
-if [ $( hostname ) != ds100 ]; then
-  echo 'login to dspoe.sdsc.edu to run interactively'
-  run=
-fi
-case $run$parallel$debugger in
-  rs)  ./fsord ;;
-  rp)  poe ./psord $opts ;;
-  rsG) totalview poe -a ./fsord $opts ;;
-  rpG) totalview poe -a ./psord $opts ;;
+[ $run ] || exit
+[ $HOSTNAME = ds100 ] || exit
+case $mode$debug in
+  serial)    ./fsord ;;
+  parallel)  poe ./psord $opts ;;
+  serialg)   totalview poe -a ./fsord $opts ;;
+  parallelg) totalview poe -a ./psord $opts ;;
 esac
 
 ;;
@@ -320,9 +321,23 @@ esac
 TeraGrid) #--------------------------------------#
 
 cat << END
-configureing for Teragrid
-batch submission:
-qsub batchjob
+SDSC TeraGrid: http://www.sdsc.edu/teragrid/guide.html
+Useful commands:
+  qsub batchjob
+  qstat -a
+  qdel PBS_JOBID
+  qstat -r
+  qstat -f PBS_JOBID
+  qstat -q
+  qstat -Q
+  qstat -B
+  pbsnodes -a 
+  show_q
+  show_res
+  showq
+  show_bf
+Always run from a subdirectory of /gpfs/
+Login to tg-c127, tg-c128, tg-c129 or  tg-130 to run interactively
 END
 
 # Batch
@@ -346,15 +361,17 @@ cat << END > batchjob
 #PBS -e err.log
 #PBS -V
 cd $rundir
-time mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord
+mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord
 END
 chmod u+x batchjob
 
 # Interactive
-case $run$parallel$debugger in
-  rs)  ./fsord ;;
-  rsG) gdb ./fsord ;;
-  rp)  time mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord ;;
+[ $run ] || exit
+[ ${HOSTNAME:0:5} = 'tg-c1' ] || exit
+case $mode$debug in
+  serial)   ./fsord ;;
+  serialg)  gdb ./fsord ;;
+  parallel) mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord ;;
 esac
 
 ;;
@@ -363,10 +380,13 @@ Babieca) #--------------------------------------#
 
 # Info
 cat << END
-configuring for Babieca
-batch submission (up to 19 procs):
-qsub batchjob
-other useful commands: pbsnodes -a, pingd, qstat, qdel
+Babieca: up to 19 procs
+Useful commands:
+  qsub batchjob
+  pbsnodes -a
+  pingd
+  qstat
+  qdel
 END
 
 # Batch
@@ -383,16 +403,17 @@ cat << END > batchjob
 #PBS -V
 sleep 2
 cd $rundir
-time mpiexec -np $np ./psord
+mpiexec -np $np ./psord
 END
 chmod u+x batchjob
 
 # Interactive
-case $run$parallel$debugger in
-  rs)  ./fsord ;;
-  rsG) gdb ./fsord ;;
-  rp)  mpiexec -np $np ./psord ;;
-  rpG) mpiexec -np $np -dbg=gdb ./psord ;;
+[ $run ] || exit
+case $mode$debug in
+  serial)    ./fsord ;;
+  serialg)   gdb ./fsord ;;
+  parallel)  mpiexec -np $np ./psord ;;
+  parallelg) mpiexec -np $np -dbg=gdb ./psord ;;
 esac
 
 ;;
@@ -407,11 +428,12 @@ END
 chmod u+x batchjob
 
 # Interactive
-case $run$parallel$debugger in
-  rs)  ./fsord ;;
-  rsG) ddd ./fsord ;;
-  rp)  mpirun -np $np ./psord ;;
-  rpG) mpirun -np $np -dbg=ddd ./psord ;;
+[ $run ] || exit
+case $mode$debug in
+  serial)    ./fsord ;;
+  serialg)   ddd ./fsord ;;
+  parallel)  mpirun -np $np ./psord ;;
+  parallelg) mpirun -np $np -dbg=ddd ./psord ;;
 esac
 
 ;;
