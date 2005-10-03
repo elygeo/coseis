@@ -126,8 +126,8 @@ fi
 #------------------------------------------------------------------------------#
 # Compile Fortran
 
-[ $parallel ] || [ $np -eq 1 ] && parallel=s
-[ $parallel ] || [ $np -gt 1 ] && parallel=p
+[ ! $parallel ] && [ $np -eq 1 ] && parallel=s
+[ ! $parallel ] && [ $np -gt 1 ] && parallel=p
 
 # Defaults
 sfc='f95'
@@ -167,7 +167,7 @@ case $fflags in
 esac
 
 # Source files
-common="
+common="\\
   f/globals.f90 \\
   f/diffcn.f90 \\
   f/diffnc.f90 \\
@@ -191,10 +191,10 @@ common="
   f/locknodes.f90 \\
   f/timestep.f90 \\
   f/sord.f90"
-serial="
+serial="\\
   f/serial.f90 \\
   f/serialio.f90"
-mpi="
+mpi="\\
   f/mpi.f90 \\
   f/mpiio.f90"
 
@@ -204,25 +204,26 @@ COMMON = $common
 SERIAL = $serial
 MPI = $mpi
 fsord: fsord.f90 makefile
-        $sfc $fflags fsord.f90 -o fsord
+	$sfc $fflags fsord.f90 -o fsord
 psord: psord.f90 makefile
-        $pfc $fflags psord.f90 -o psord
+	$pfc $fflags psord.f90 -o psord
 fsord.f90: \$(SERIAL) \$(COMMON)
 	cat \$(SERIAL) \$(COMMON) > fsord.f90
 psord.f90: \$(MPI) \$(COMMON)
 	cat \$(MPI) \$(COMMON) > psord.f90
 clean:
-	rm -f *.o *.mod
+	rm -f tmp *.mod
+realclean: clean
+	rm -f makefile fsord.f90 psord.f90 fsord psord batchjob
 END
 [ ! -f makefile ] && touch makefile
 [ "$( diff tmp makefile )" != "" ] && mv tmp makefile
 
 # Compile
 case $compile$parallel in
-  cs) gmake fsord ;;
-  cp) gmake psord ;;
+  cs) gmake fsord clean ;;
+  cp) gmake psord clean ;;
 esac
-rm -f tmp *.o *.mod
 
 #------------------------------------------------------------------------------#
 # Batch submission and run commands
