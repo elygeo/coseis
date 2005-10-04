@@ -7,9 +7,9 @@ eval( 'defaults' )
 eval( 'in' )
 eval( 'out/timestep' )
 eval( sprintf( 'out/%02d/meta', iz ) )
+msg = '';
 
 % Time slice
-msg = '';
 itg = dit:dit:it;
 if sensor(4)
 if find( sensor(4) == itg )
@@ -20,6 +20,12 @@ else
 end
 end
 tg = dt * itg;
+
+% Component
+ic = 1:nc
+if sensor(5)
+if find( sensor(5) == ic )
+  ic
 
 % Array slice
 ng = i2 - i1 + 1;
@@ -36,12 +42,12 @@ if any( i1 < 0 | i2 >= ng ) | vizfield ~= field
 end
 
 % Offsets
+seek = 4 * i1(1) + ng(1) * ( i1(2) + ng(2) * i1(3) )
 nl = i2 - i1 + 1;
-n = prod( nl );
 i = min( find( ~i0 ) );
 block = sprintf( '%d*float32', prod( nl(1:i) ) );
 skip = 4 * Z
-seek = 4 * i1(1) + ng(1) * ( i1(2) + ng(2) * i1(3) )
+n = prod( nl );
 
 % Read data
 vg = zeros( [ nl 1 nc ] );
