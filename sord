@@ -227,6 +227,7 @@ case $mode in
   parallel) gmake psord sord.tgz ;;
 esac
 fi
+echo ''
 
 #------------------------------------------------------------------------------#
 # Batch submission and run commands
@@ -245,8 +246,9 @@ Useful commands:
   llq
   llq -s <jobID>
   show_q
-  show_bf # backfill openings
-  reslist # check allocation
+  show_bf
+  reslist
+  showq
 Always run from a subdirectory of /gpfs/
 Login to dslogin.sdsc.edu to submit batch jobs
 Login to dspoe.sdsc.edu to run interactively

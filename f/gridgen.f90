@@ -2,10 +2,8 @@
 ! Grid generation
 
 module gridgen_m
-use globals_m
-use collective_m
-use collectiveio_m
 use optimize_m
+use collectiveio_m
 use zone_m
 contains
 subroutine gridgen

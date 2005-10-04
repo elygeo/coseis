@@ -15,7 +15,7 @@ contains
 
 ! Initialize
 subroutine initialize( master )
-logical, intent(out) :: master
+logical, intent(inout) :: master
 integer :: e
 call mpi_init( e )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
@@ -74,7 +74,7 @@ subroutine globalminloc( rmin, imin, nnoff )
 real, intent(inout) :: rmin
 integer, intent(inout) :: imin(3)
 integer, intent(in) :: nnoff(3)
-integer :: ipmin, e, s = mpi_status_ignore
+integer :: e, ipmin
 real :: local(2), global(2)
 local(1) = rmin
 local(2) = ip
@@ -83,7 +83,7 @@ rmin  = global(1)
 ipmin = global(2)
 if ( ip == ipmaster .or. ip == ipmin ) then
   imin = imin - nnoff
-  call mpi_sendrecv_replace( imin, 3, mpi_integer, ipmaster, 0, ip, 0, c, s, e )
+  call mpi_sendrecv_replace( imin, 3, mpi_integer, ipmaster, 0, ip, 0, c, mpi_status_ignore, e )
   imin = imin + nnoff
 end if
 end subroutine
@@ -93,7 +93,7 @@ subroutine globalmaxloc( rmax, imax, nnoff )
 real, intent(inout) :: rmax
 integer, intent(inout) :: imax(3)
 integer, intent(in) :: nnoff(3)
-integer :: ipmax, e, s = mpi_status_ignore
+integer :: e, ipmax
 real :: local(2), global(2)
 local(1) = rmax
 local(2) = ip
@@ -102,7 +102,7 @@ rmax  = global(1)
 ipmax = global(2)
 if ( ip == ipmaster .or. ip == ipmax ) then
   imax = imax - nnoff
-  call mpi_sendrecv_replace( imax, 3, mpi_integer, ipmaster, 0, ip, 0, c, s, e )
+  call mpi_sendrecv_replace( imax, 3, mpi_integer, ipmaster, 0, ip, 0, c, mpi_status_ignore, e )
   imax = imax + nnoff
 end if
 end subroutine
@@ -111,8 +111,7 @@ end subroutine
 subroutine swaphalo( w1, nhalo )
 real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: nhalo
-integer :: i, e, left, right, ng(4), nl(4), isend(4), irecv(4), &
-  tsend, trecv, s = mpi_status_ignore, o = mpi_order_fortran
+integer :: i, e, left, right, ng(4), nl(4), isend(4), irecv(4), tsend, trecv
 ng = (/ size(w1,1), size(w1,2), size(w1,3), size(w1,4) /)
 do i = 1, 3
   call mpi_cart_shift( c, i-1, 1, left, right, e )
@@ -121,20 +120,20 @@ do i = 1, 3
   isend = 0
   irecv = 0
   isend(i) = ng(i) - 2 * nhalo
-  call mpi_type_create_subarray( 4, ng, nl, isend, o, mpi_real, tsend, e )
-  call mpi_type_create_subarray( 4, ng, nl, irecv, o, mpi_real, trecv, e )
+  call mpi_type_create_subarray( 4, ng, nl, isend, mpi_order_fortran, mpi_real, tsend, e )
+  call mpi_type_create_subarray( 4, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_send_recv( w1, 1, tsend, right, 0, w1, 1, trecv, left, 0, c, s, e )
+  call mpi_sendrecv( w1, 1, tsend, right, 0, w1, 1, trecv, left, 0, c, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
   isend(i) = nhalo
   irecv(i) = ng(i) - nhalo
-  call mpi_type_create_subarray( 4, ng, nl, isend, o, mpi_real, tsend, e )
-  call mpi_type_create_subarray( 4, ng, nl, irecv, o, mpi_real, trecv, e )
+  call mpi_type_create_subarray( 4, ng, nl, isend, mpi_order_fortran, mpi_real, tsend, e )
+  call mpi_type_create_subarray( 4, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_send_recv( w1, 1, tsend, left, 1, w1, 1, trecv, right, 1, c, s, e )
+  call mpi_sendrecv( w1, 1, tsend, left, 1, w1, 1, trecv, right, 1, c, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
 end do

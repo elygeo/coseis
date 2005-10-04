@@ -3,7 +3,6 @@
 
 module output_m
 use globals_m
-use collective_m
 use collectiveio_m
 contains
 subroutine output( pass )
@@ -222,10 +221,9 @@ if ( master ) then
   call system_clock( twall(2) )
   dtwall = real( twall(2) - twall(1) ) / real( twall_rate )
   twall(1) = twall(2)
-  !print '(i6,5es14.6)', it, amax, vmax, umax, dtwall
   print *, it, amax, vmax, umax, dtwall
-  open(  9, file='out/timestep', status='replace' )
-  write( 9, * ) it, t, amax, vmax, umax, dtwall
+  open(  9, file='out/timestep.m', status='replace' )
+  write( 9, * ) ' it = ', it, '; % time-step'
   close( 9 )
   write( str, '(a,i6.6,a)' ) 'out/stats/', it, '.m'
   open(  9, file=str, status='replace' )
