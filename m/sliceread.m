@@ -1,6 +1,6 @@
 %------------------------------------------------------------------------------%
-% Read 4D slice
-% input: sensor(4) iz
+% Read 5D slice
+% input: iz slice(5) vizfield
 
 % Read metadata
 eval( 'defaults' )

@@ -5,8 +5,8 @@ hisosurf = [];
 if ~fscl, return, end
 isoval = isofrac * fscl;
 if comp, isoval = isoval * [ -1 1 ]; end
-for iz = 1:size( volumes, 1 )
-  [ i1, i2 ] = zone( volumes(iz,:), nn, nnoff, ihypo, ifn );
+for iz = 1:size( i1volume, 1 )
+  [ i1, i2 ] = zone( i1volume(iz,:), i2volume(iz,:), nn, nnoff, ihypo, ifn );
   if cellfocus, i2 = i2 - 1; end
   l = i1(3):i2(3);
   k = i1(2):i2(2);

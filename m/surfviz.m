@@ -2,65 +2,56 @@
 % Surface viz
 
 if volviz
-  planes = volumes;
+  i1plane = i1volume;
+  i2plane = i2volume;
 elseif ~isfault
-  planes = slices;
-  lines  = slices;
+  i1plane = i1slice;
+  i2plane = i2slice;
+  i1line = i1slice;
+  i2line = i2slice;
   lineviz
   set( hand, 'Tag', 'surfline' )
 end
 hsurf = [];
+
 if domesh, edgecolor = get( 1, 'DefaultTextColor' );
 else       edgecolor = 'none';
 end
+
 if dosurf, facecolor = 'flat';
 else       facecolor = 'none';
 end
-switch vizfield
-case { 'vs', 'us', 'tn', 'ts' }
-  i1 = i1node;
-  i2 = i2node;
-  i1(ifn) = ihypo(ifn);
-  i2(ifn) = ihypo(ifn);
-  l = i1(3):i2(3);
-  k = i1(2):i2(2);
-  j = i1(1):i2(1);
-  xg = x(j,k,l,:) + xscl * u(j,k,l,:); 
-  i1(ifn) = 1;
-  i2(ifn) = 1;
-  l = i1(3):i2(3);
-  k = i1(2):i2(2);
-  j = i1(1):i2(1);
-  switch vizfield
-  case 'vs', vg = vs(j,k,l);
-  case 'us', vg = us(j,k,l);
-  case 'tn', vg = tn(j,k,l);
-  case 'ts', vg = ts(j,k,l);
+
+tmp = [];
+
+for iz = 1:size( i1plane, 1 )
+for i = 1:3
+  i0 = [ 0 0 0 ];
+  [ i1, i2 ] = zone( i1plane(iz,:), i2plane(iz,:), nn, nnoff, ihypo, ifn );
+  if isfault
+    i1(ifn) = ihypo(ifn);
+    i2(ifn) = ihypo(ifn);
   end
-  xg = squeeze( xg );
-  vg = squeeze( vg );
-  vg = .25 * ( ...
-    vg(1:end-1,1:end-1) + vg(2:end,1:end-1) + ...
-    vg(1:end-1,2:end)   + vg(2:end,2:end) ); 
-  hsurf(end+1) = surf( xg(:,:,1), xg(:,:,2), xg(:,:,3), double( vg ) );
-  hold on
-case { 'a', 'v', 'u', 'mr' }
-  i = [
-    1 2 3  4 2 6
-    1 5 3  4 5 6
-    1 2 3  4 5 3
-    1 2 6  4 5 6
-    1 2 3  1 5 6
-    4 2 3  4 5 6
-  ];
-  tmp = [];
-  for iz = 1:size( planes, 1 )
-    izone = planes(iz,:);
-    tmp = [ tmp; izone( i ) ];
+  i1(i) = i2(i);
+  tmp = [ tmp; i0 i1 i2 ];
+  i0(i) = cellfocus;
+  [ i1, i2 ] = zone( i1plane(iz,:), i2plane(iz,:), nn, nnoff, ihypo, ifn );
+  if isfault
+    i1(ifn) = ihypo(ifn);
+    i2(ifn) = ihypo(ifn);
   end
-  planes = unique( tmp, 'rows' );
-  for iz = 1:size( planes, 1 )
-    [ i1, i2 ] = zone( planes(iz,:), nn, nnoff, ihypo, ifn );
+  i2(i) = i1(i);
+  tmp = [ tmp; i0 i1 i2 ];
+end
+end
+
+tmp = unique( tmp, 'rows' );
+i0plane = tmp(:,1:3);
+i1plane = tmp(:,4:6);
+i2plane = tmp(:,7:9);
+
+
+  for iz = 1:size( i1plane, 1 )
     l = i1(3):i2(3);
     k = i1(2):i2(2);
     j = i1(1):i2(1);
@@ -68,7 +59,6 @@ case { 'a', 'v', 'u', 'mr' }
     if sum( ng > 1 ) == 2
       xg = x(j,k,l,:) + xscl * u(j,k,l,:); 
       switch vizfield
-      case 'mr',  vg = mr(j,k,l);
       case 'a'
         if comp, vg = w1(j,k,l,comp); 
         else     vg = s1(j,k,l);
@@ -94,7 +84,7 @@ case { 'a', 'v', 'u', 'mr' }
   end
 case 'w'
   for iz = 1:size( planes, 1 )
-    [ i1, i2 ] = zone( planes(iz,:), nn, nnoff, ihypo, ifn );
+    [ i1, i2 ] = zone( i1plane(iz,:), i2plane(iz,:), nn, nnoff, ihypo, ifn );
     l = i1(3):i2(3);
     k = i1(2):i2(2);
     j = i1(1):i2(1);

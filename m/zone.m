@@ -1,10 +1,8 @@
 %------------------------------------------------------------------------------%
 % Zone
 
-function [ i1, i2 ] = zone( izone, nn, noff, ihypo, ifn )
+function [ i1, i2 ] = zone( i1, i2, nn, noff, ihypo, ifn )
 
-i1 = izone(1:3);
-i2 = izone(4:6);
 shift = [ 0 0 0 ];
 if ifn, shift(ifn) = 1; end
 m0 = i1 == 0 & i2 == 0;

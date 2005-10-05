@@ -2,8 +2,8 @@
 % Glyph vizualization
 
 if ~fscl, return, end
-if volviz, glyphs = volumes;
-else,      glyphs = slices;
+if volviz, i1glyph = i1volume; i2glyph = i2volume;
+else,      i1glyph = i1slice;  i2glyph = i2slice;
 end
 minmag = glyphcut * fscl;
 mga = [];
@@ -11,7 +11,7 @@ vga = [];
 xga = [];
 c = [ 1 6 5; 6 2 4; 5 4 3 ];
 for iz = 1:size( glyphs, 1 )
-  [ i1, i2 ] = zone( glyphs(iz,:), nn, noff, ihypo, ifn );
+  [ i1, i2 ] = zone( i1glyph(iz,:), i2glyph(iz,:), nn, noff, ihypo, ifn );
   if cellfocus, i2 = i2 - 1; end
   l = i1(3):i2(3);
   k = i1(2):i2(2);

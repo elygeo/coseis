@@ -113,11 +113,11 @@ if mod( it, plotinterval ), return, end
 time = it * dt;
 switch vizfield
 case 'a', onpass = 'v';
-case 'v', onpass = 'v'; time = ( it + .5 ) * dt;
+case 'v', onpass = 'v'; time = ( it + .5 ) * dt; % CHECK
 case 'u', onpass = 'w';
 case 'w', onpass = 'w';
-case 'vs', onpass = 'v'; time = ( it + .5 ) * dt;
-case 'us', onpass = 'w';
+case 'sv', onpass = 'v'; time = ( it + .5 ) * dt; % CHECK
+case 'sl', onpass = 'v';
 otherwise error 'viz vizfield'
 end
 if onpass ~= pass, return, end
@@ -138,25 +138,27 @@ text( .50, .05, titles( comp + 1 ) );
 text( .98, .98, sprintf( '%.3fs', time ), 'Hor', 'right' )
 set( gcf, 'CurrentAxes', haxes(1) )
 
-volumes = [ 1 1 1   -1 -1 -1 ];
+i1volume =  [ 1 1 1 ];
+i2volume = -[ 1 1 1 ];
 if ifn
-  volumes = [ volumes; volumes ];
-  i = ifn + [ 0 3 ];
-  volumes(1,i) = [ 1  0 ];
-  volumes(2,i) = [ 0 -1 ];
+  i1volume = [ i1volume; i1volume ];
+  i2volume = [ i2volume; i2volume ];
+  i1volume(2,ifn) = 0;
+  i2volume(1,ifn) = 0;
 end
-slices = [ 1 1 1   -1 -1 -1 ];
+i1slice =  [ 1 1 1 ];
+i2slice = -[ 1 1 1 ];
 i = islice;
-slices(i)   = icursor(i) - nnoff(i);
-slices(i+3) = icursor(i) - nnoff(i) + cellfocus;
+i1slices(i) = icursor(i) - nnoff(i);
+i2slices(i) = icursor(i) - nnoff(i) + cellfocus;
 if ifn & islice ~= ifn
-  slices = [ slices; slices ];
-  i = ifn + [ 0 3 ];
-  slices(1,i) = [ 1  0 ];
-  slices(2,i) = [ 0 -1 ];
+  i1slice = [ i1slice; i1slice ];
+  i2slice = [ i2slice; i2slice ];
+  i1slice(2,ifn) = 0;
+  i2slice(1,ifn) = 0;
 end
 
-if ifn,           faultviz,   end
+if ifn,              faultviz,   end
 if doglyph,          glyphviz,   end
 if doisosurf,        isosurfviz, end
 if domesh || dosurf, surfviz,    end
