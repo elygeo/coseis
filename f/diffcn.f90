@@ -19,7 +19,7 @@ l1 = i1(3); l2 = i2(3)
 
 select case( oper )
 
-case( 'h' ) ! constant grid, flops: 1* 7+
+case( 'h' ) ! Constant grid, flops: 1* 7+
 
 h = 0.25 * dx * dx
 select case( a )
@@ -49,7 +49,7 @@ case( 3 )
   end forall
 end select
 
-case( 'r' ) ! rectangular grid, flops: 7* 11+
+case( 'r' ) ! Rectangular grid, flops: 7* 11+
 
 select case( a )
 case( 1 )
@@ -84,7 +84,7 @@ case( 3 )
   end forall
 end select
 
-case( 'g' ) ! general grid, flops: 55* 90+
+case( 'g' ) ! General grid, flops: 55* 90+
 
 b = modulo( a, 3 ) + 1
 c = modulo( a + 1, 3 ) + 1

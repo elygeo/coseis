@@ -72,7 +72,7 @@ mu(j,k,l) = 0.125 * ...
 % Cell volume
 s2(:) = 0.;
 for iz = 1:size( oper, 1 )
-  [ i1, i2 ] = zone( ioper(iz,:), nn, noff, i0, ifn );
+  [ i1, i2 ] = zone( ioper(iz,:), nn, noff, ihypo, ifn );
   i2 = i2 - 1;
   op = oper(iz);
   l = i1(3):i2(3);
@@ -83,7 +83,7 @@ end
 
 % Make sure cell volumes are zero on the fault
 if ifn
-  i = i0(ifn);
+  i = ihypo(ifn);
   switch ifn
   case 1, s2(i,:,:) = 0.;
   case 2, s2(:,i,:) = 0.;

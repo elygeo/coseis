@@ -41,16 +41,16 @@ end
 if ( pass == 'w' ) then
   s1 = sqrt( sum( u .* u, 4 ) );
   s2 = sqrt( sum( w1 .* w1, 4 ) + 2 * sum( w2 .* w2, 4 ) );
-  [ umax, iumax ] = max( s1(:) );
-  [ wmax, iwmax ] = max( s2(:) );
-  [ usmax, iusmax ] = max( abs( us(:) ) );
+  [ umax, umaxi ] = max( s1(:) );
+  [ wmax, wmaxi ] = max( s2(:) );
   if umax > dx / 10., fprintf( 'Warning: u !<< dx\n' ), end
 else
   s1 = sqrt( sum( w1 .* w1, 4 ) );
   s2 = sqrt( sum( v .* v, 4 ) );
-  [ amax, iamax ] = max( s1(:) );
-  [ vmax, ivmax ] = max( s2(:) );
-  [ vsmax, ivsmax ] = max( abs( vs(:) ) );
+  [ amax, amaxi ] = max( s1(:) );
+  [ vmax, vmaxi ] = max( s2(:) );
+  [ slmax, slmaxi ] = max( abs( sl(:) ) );
+  [ svmax, svmaxi ] = max( abs( sv(:) ) );
 end
 
 for iz = 1:size( ditout, 1 )
@@ -72,24 +72,24 @@ case 'am'
 case 'vm'
 case 'um',   onpass = 'w';
 case 'wm',   onpass = 'w'; cell = 1;
-case 'vs',   isfault = 1;
-case 'us',   isfault = 1;
+case 'sl',   isfault = 1;
+case 'sv',   isfault = 1;
 case 'trup', isfault = 1;
 otherwise error( [ 'outvar: ' outvar{iz} ] )
 end
 if isfault & ~ifn; ditout(iz) = 0; end
 if onpass ~= pass, continue, end
-[ i1, i2 ] = zone( i1out(iz,:), i2out(iz,:), nn, nnoff, i0, ifn );
+[ i1, i2 ] = zone( i1out(iz,:), i2out(iz,:), nn, nnoff, ihypo, ifn );
 if cell; i2 = i2 - 1; end
 
 % Metadata
 file = sprintf( 'out/%02d/meta.m', iz );
 fid = fopen( file, 'w' );
-fprintf( fid, ' field = ''%s'';\n',       outfield{iz} );
-fprintf( fid, ' nc    = %g;\n',           nc           );
-fprintf( fid, ' i1    = [ %g %g %g ];\n', i1 - nnoff   );
-fprintf( fid, ' i2    = [ %g %g %g ];\n', i2 - nnoff   );
-fprintf( fid, ' dit   = %g;\n',           ditout(iz)   );
+fprintf( fid, '  field = ''%s'' ;\n',       outfield{iz} );
+fprintf( fid, '  nc    = %g ;\n',           nc           );
+fprintf( fid, '  i1    = [ %g %g %g ] ;\n', i1 - nnoff   );
+fprintf( fid, '  i2    = [ %g %g %g ] ;\n', i2 - nnoff   );
+fprintf( fid, '  dit   = %g ;\n',           ditout(iz)   );
 fclose( fid );
 
 if isfault
@@ -136,7 +136,7 @@ if itcheck & ~mod( it, itcheck )
 end
 
 fid = fopen( 'out/timestep', 'w' );
-fprintf( fid, '%g\n', it );
+fprintf( fid, '  it = %g ;\n', it );
 fclose( fid );
 
 wt(4) = toc;

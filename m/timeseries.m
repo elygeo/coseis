@@ -1,6 +1,6 @@
 %------------------------------------------------------------------------------%
 % Time series
-% input: field sensor dofilter
+% input: vizfield sensor dofilter
 % output: tg vg ta va
 % search through outpur for desired timeseries data
 % try to find analytica solution as well if known
@@ -17,8 +17,12 @@ if ~exist( 'sordrunning', 'var' )
 end
 
 % Test if we have data saved for desired location
+i1 = sensor;
+i2 = sensor;
+itg = 0;
+ic = 0;
 for iz = 1:nout
-  tsread
+  subarray
 end
 if msg, return, end
 if ntg == 1, return, end

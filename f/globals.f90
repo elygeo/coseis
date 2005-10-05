@@ -131,7 +131,7 @@ integer :: &
   i1in(nz,3),   & ! j1 k1 l1 input start index
   i2in(nz,3),   & ! j1 k1 l1 input end index
   nlock = 0,    & ! number of zones for locking velocity
-  lock(nz,3),   & ! flag for locking v1 v2 v3
+  ilock(nz,3),  & ! flag for locking v1 v2 v3
   i1lock(nz,3), & ! j1 k1 l1 lock zone start index
   i2lock(nz,3), & ! j2 k2 l2 lock zone end index
   nout = 0,     & ! number of zones for output

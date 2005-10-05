@@ -28,9 +28,8 @@ do iz = 1, nlock
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
-  i1 = lock(iz,:)
   do i = 1, 3
-    if ( i1(i) == 1 ) w1(j1:j2,k1:k2,l1:l2,i) = 0.
+    if ( ilock(iz,i) == 1 ) w1(j1:j2,k1:k2,l1:l2,i) = 0.
   end do
 end do
 

@@ -4,14 +4,14 @@
 way = sign( cursormove );
 cursormove = abs( cursormove );
 if cursormove == 4
-  icursor = i0;
-  if inrm, islice = inrm; end
+  icursor = ihypo;
+  if ifn, islice = ifn; end
 elseif cursormove == 5
-  icursor = i0;
+  icursor = ihypo;
   icursor(idown) = 1;
   islice = idown;
 elseif cursormove == 6
-  imax = i0;
+  imax = ihypo;
   switch vizfield
   case 'a', imax = iamax;
   case 'v', imax = ivmax;
@@ -69,12 +69,12 @@ msg = '';
 switch vizfield
 case 'vs'
   i = [ j k l ];
-  if inrm, i(inrm) = 1; end
+  if ifn, i(ifn) = 1; end
   j = i(1); k = i(2); l = i(3);
   msg = sprintf( 'Vs %9.2e', vs(j,k,l) );
 case 'us'
   i = [ j k l ];
-  if inrm, i(inrm) = 1; end
+  if ifn, i(ifn) = 1; end
   j = i(1); k = i(2); l = i(3);
   msg = sprintf( 'Us %9.2e', us(j,k,l) );
 case 'a'

@@ -18,7 +18,7 @@ i = [
 ];
 tmp = [];
 for iz = 1:size( lines, 1 )
-  [ i1, i2 ] = zone( lines(iz,:), nn, noff, i0, inrm );
+  [ i1, i2 ] = zone( lines(iz,:), nn, noff, ihypo, ifn );
   izone = [ i1 i2 ];
   tmp = [ tmp; izone( i ) ];
 end

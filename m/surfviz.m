@@ -20,14 +20,14 @@ switch vizfield
 case { 'vs', 'us', 'tn', 'ts' }
   i1 = i1node;
   i2 = i2node;
-  i1(inrm) = i0(inrm);
-  i2(inrm) = i0(inrm);
+  i1(ifn) = ihypo(ifn);
+  i2(ifn) = ihypo(ifn);
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
   xg = x(j,k,l,:) + xscl * u(j,k,l,:); 
-  i1(inrm) = 1;
-  i2(inrm) = 1;
+  i1(ifn) = 1;
+  i2(ifn) = 1;
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
@@ -60,7 +60,7 @@ case { 'a', 'v', 'u', 'mr' }
   end
   planes = unique( tmp, 'rows' );
   for iz = 1:size( planes, 1 )
-    [ i1, i2 ] = zone( planes(iz,:), nn, nnoff, i0, inrm );
+    [ i1, i2 ] = zone( planes(iz,:), nn, nnoff, ihypo, ifn );
     l = i1(3):i2(3);
     k = i1(2):i2(2);
     j = i1(1):i2(1);
@@ -94,7 +94,7 @@ case { 'a', 'v', 'u', 'mr' }
   end
 case 'w'
   for iz = 1:size( planes, 1 )
-    [ i1, i2 ] = zone( planes(iz,:), nn, nnoff, i0, inrm );
+    [ i1, i2 ] = zone( planes(iz,:), nn, nnoff, ihypo, ifn );
     l = i1(3):i2(3);
     k = i1(2):i2(2);
     j = i1(1):i2(1);

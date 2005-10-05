@@ -5,19 +5,20 @@ if ~ifn; return; end
 
 if init
 
-init = 0;
+init = 0 ;
 fprintf( 'Initialize fault\n' )
 
 % Input
-mus(:) = 0;
-mud(:) = 0;
-dc(:) = 0;
-co(:) = 1e3;
-t1(:) = 0.;
-t2(:) = 0.;
-t3(:) = 0.;
-for i = 1:size( inkey, 1 )
-if ( readfile(i) )
+mus(:) = 0. ;
+mud(:) = 0. ;
+dc(:) = 0. ;
+co(:) = 1e3 ;
+t1(:) = 0. ;
+t2(:) = 0. ;
+t3(:) = 0. ;
+
+for iz = 1:nin
+if ( readfile(iz) )
   i1 = i1nodepml;
   i2 = i2nodepml;
   i1(ifn) = 1;
@@ -26,20 +27,20 @@ if ( readfile(i) )
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
   endian = textread( 'data/endian', '%c', 1 );
-  switch inkey(i)
-  case 'mus',      mus(j1:j2,k1:k2,l1:l2)  = bread( 'data/mus',      endian );
-  case 'mud',      mud(j1:j2,k1:k2,l1:l2)  = bread( 'data/mud',      endian );
-  case 'dc',       dc(j1:j2,k1:k2,l1:l2)   = bread( 'data/dc',       endian );
-  case 'cohesion', co(j1:j2,k1:k2,l1:l2)   = bread( 'data/cohesion', endian );
-  case 'sxx',      t1(j1:j2,k1:k2,l1:l2,1) = bread( 'data/sxx',      endian );
-  case 'syy',      t1(j1:j2,k1:k2,l1:l2,2) = bread( 'data/syy',      endian );
-  case 'szz',      t1(j1:j2,k1:k2,l1:l2,3) = bread( 'data/szz',      endian );
-  case 'syz',      t2(j1:j2,k1:k2,l1:l2,1) = bread( 'data/syz',      endian );
-  case 'szx',      t2(j1:j2,k1:k2,l1:l2,2) = bread( 'data/szx',      endian );
-  case 'sxy',      t2(j1:j2,k1:k2,l1:l2,3) = bread( 'data/sxy',      endian );
-  case 'tnormal',  t3(j1:j2,k1:k2,l1:l2,1) = bread( 'data/tnormal',  endian );
-  case 'tstrike',  t3(j1:j2,k1:k2,l1:l2,2) = bread( 'data/tstrike',  endian );
-  case 'tdip',     t3(j1:j2,k1:k2,l1:l2,3) = bread( 'data/tdip',     endian );
+  switch inkey(iz)
+  case 'mus', mus(j1:j2,k1:k2,l1:l2)  = bread( 'data/mus', endian );
+  case 'mud', mud(j1:j2,k1:k2,l1:l2)  = bread( 'data/mud', endian );
+  case 'dc',  dc(j1:j2,k1:k2,l1:l2)   = bread( 'data/dc',  endian );
+  case 'co',  co(j1:j2,k1:k2,l1:l2)   = bread( 'data/co',  endian );
+  case 'sxx', t1(j1:j2,k1:k2,l1:l2,1) = bread( 'data/sxx', endian );
+  case 'syy', t1(j1:j2,k1:k2,l1:l2,2) = bread( 'data/syy', endian );
+  case 'szz', t1(j1:j2,k1:k2,l1:l2,3) = bread( 'data/szz', endian );
+  case 'syz', t2(j1:j2,k1:k2,l1:l2,1) = bread( 'data/syz', endian );
+  case 'szx', t2(j1:j2,k1:k2,l1:l2,2) = bread( 'data/szx', endian );
+  case 'sxy', t2(j1:j2,k1:k2,l1:l2,3) = bread( 'data/sxy', endian );
+  case 'tn',  t3(j1:j2,k1:k2,l1:l2,1) = bread( 'data/tn',  endian );
+  case 'th',  t3(j1:j2,k1:k2,l1:l2,2) = bread( 'data/th',  endian );
+  case 'td',  t3(j1:j2,k1:k2,l1:l2,3) = bread( 'data/td',  endian );
   end
 else
   [ i1, i2 ] = zone( i1in(iz,:), i2in(iz,:), nn, nnoff, ihypo, ifn );
@@ -50,20 +51,20 @@ else
   j1 = i1(1); j2 = i2(1);
   k1 = i1(2); k2 = i2(2);
   l1 = i1(3); l2 = i2(3);
-  switch inkey(i)
-  case 'mus',      mus(j1:j2,k1:k2,l1:l2)  = inval(i);
-  case 'mud',      mud(j1:j2,k1:k2,l1:l2)  = inval(i);
-  case 'dc',       dc(j1:j2,k1:k2,l1:l2)   = inval(i);
-  case 'cohesion', co(j1:j2,k1:k2,l1:l2)   = inval(i);
-  case 'sxx',      t1(j1:j2,k1:k2,l1:l2,1) = inval(i);
-  case 'syy',      t1(j1:j2,k1:k2,l1:l2,2) = inval(i);
-  case 'szz',      t1(j1:j2,k1:k2,l1:l2,3) = inval(i);
-  case 'syz',      t2(j1:j2,k1:k2,l1:l2,1) = inval(i);
-  case 'szx',      t2(j1:j2,k1:k2,l1:l2,2) = inval(i);
-  case 'sxy',      t2(j1:j2,k1:k2,l1:l2,3) = inval(i);
-  case 'tnormal',  t3(j1:j2,k1:k2,l1:l2,1) = inval(i);
-  case 'tstrike',  t3(j1:j2,k1:k2,l1:l2,2) = inval(i);
-  case 'tdip',     t3(j1:j2,k1:k2,l1:l2,3) = inval(i);
+  switch inkey(iz)
+  case 'mus', mus(j1:j2,k1:k2,l1:l2)  = inval(iz);
+  case 'mud', mud(j1:j2,k1:k2,l1:l2)  = inval(iz);
+  case 'dc',  dc(j1:j2,k1:k2,l1:l2)   = inval(iz);
+  case 'co',  co(j1:j2,k1:k2,l1:l2)   = inval(iz);
+  case 'sxx', t1(j1:j2,k1:k2,l1:l2,1) = inval(iz);
+  case 'syy', t1(j1:j2,k1:k2,l1:l2,2) = inval(iz);
+  case 'szz', t1(j1:j2,k1:k2,l1:l2,3) = inval(iz);
+  case 'syz', t2(j1:j2,k1:k2,l1:l2,1) = inval(iz);
+  case 'szx', t2(j1:j2,k1:k2,l1:l2,2) = inval(iz);
+  case 'sxy', t2(j1:j2,k1:k2,l1:l2,3) = inval(iz);
+  case 'tn',  t3(j1:j2,k1:k2,l1:l2,1) = inval(iz);
+  case 'th',  t3(j1:j2,k1:k2,l1:l2,2) = inval(iz);
+  case 'td',  t3(j1:j2,k1:k2,l1:l2,3) = inval(iz);
   end
 end
 end

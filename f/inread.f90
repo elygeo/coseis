@@ -89,7 +89,7 @@ case( 'out' );
 case( 'lock' );
   nlock = nlock + 1
   i = nlock
-  read( str, * ) key1, lock(i,:), i1lock(i,:), i2lock(i,:)
+  read( str, * ) key1, ilock(i,:), i1lock(i,:), i2lock(i,:)
 case default; print '(2a)', 'Bad input: ', trim( str ); stop
 end select
 

@@ -20,7 +20,7 @@ for i = 1:length( in )
   switch key
   case { 'rho', 'vp', 'vs', ...
          'mus', 'mud', 'dc', 'co', ...
-         'tnrm', 'tstr', 'tdip', ...
+         'tn', 'th', 'td', ...
          'sxx', 'syy', 'szz', ...
          'syz', 'szx', 'sxy' }
     eval( [ 'in =' key ';' ] )
@@ -31,7 +31,7 @@ for i = 1:length( in )
     i2in(nin,:)  = in(5:7);
   case 'lock'
     nlock = nlock + 1;
-    locki0(nlock,:) = lock(1:3);
+    ilock(nlock,:) = lock(1:3);
     i1lock(nlock,:) = lock(4:6);
     i2lock(nlock,:) = lock(7:9);
   case 'out'
@@ -43,7 +43,6 @@ for i = 1:length( in )
   end
   end
 end
-lock = lock0;
 
 end
  

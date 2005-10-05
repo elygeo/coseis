@@ -46,7 +46,10 @@ seek = 4 * i1(1) + ng(1) * ( i1(2) + ng(2) * i1(3) )
 nl = i2 - i1 + 1;
 i = min( find( ~i0 ) );
 block = sprintf( '%d*float32', prod( nl(1:i) ) );
-skip = 4 * Z
+switch i0(2)
+0) skip = 4 * ( ng(1) - nl(1) );
+1) skip = 4 * ( ng(1) * ng(2) - nl(1) );
+end
 n = prod( nl );
 
 % Read data

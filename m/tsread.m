@@ -32,12 +32,5 @@ end
 
 if itout == 1, return, end
 
-% Add zero time sample
-vg = [ zeros(1,nc); vg ];
-
-% Time sequence
-switch field
-case 'v', tg = dt * ( 0:itout );
-otherwise tg = dt * ( :itout );
-end
+tg = dt * ( 0:itout );
 

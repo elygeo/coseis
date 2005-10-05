@@ -6,7 +6,7 @@ if ~fscl, return, end
 isoval = isofrac * fscl;
 if comp, isoval = isoval * [ -1 1 ]; end
 for iz = 1:size( volumes, 1 )
-  [ i1, i2 ] = zone( volumes(iz,:), nn, nnoff, i0, inrm );
+  [ i1, i2 ] = zone( volumes(iz,:), nn, nnoff, ihypo, ifn );
   if cellfocus, i2 = i2 - 1; end
   l = i1(3):i2(3);
   k = i1(2):i2(2);
@@ -27,10 +27,10 @@ for iz = 1:size( volumes, 1 )
     else     vg = s1(j,k,l);
     end
   case 'w'
-    switch inrm
-    case 1, j(j==i0(1)) = [];
-    case 2, k(k==i0(2)) = [];
-    case 3, l(l==i0(3)) = [];
+    switch ifn
+    case 1, j(j==ihypo(1)) = [];
+    case 2, k(k==ihypo(2)) = [];
+    case 3, l(l==ihypo(3)) = [];
     end
     if     comp > 3, vg = w2(j,k,l,comp-3); 
     elseif comp,     vg = w1(j,k,l,comp); 

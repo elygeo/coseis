@@ -44,7 +44,7 @@ elseif init
   camdist = -1;
   look = 4;
   icursor = ihypo;
-  if inrm, islice = inrm; else islice = crdsys(2); end
+  if ifn, islice = ifn; else islice = crdsys(2); end
   if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
   else     foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 1;
   end
@@ -139,9 +139,9 @@ text( .98, .98, sprintf( '%.3fs', time ), 'Hor', 'right' )
 set( gcf, 'CurrentAxes', haxes(1) )
 
 volumes = [ 1 1 1   -1 -1 -1 ];
-if inrm
+if ifn
   volumes = [ volumes; volumes ];
-  i = inrm + [ 0 3 ];
+  i = ifn + [ 0 3 ];
   volumes(1,i) = [ 1  0 ];
   volumes(2,i) = [ 0 -1 ];
 end
@@ -149,14 +149,14 @@ slices = [ 1 1 1   -1 -1 -1 ];
 i = islice;
 slices(i)   = icursor(i) - nnoff(i);
 slices(i+3) = icursor(i) - nnoff(i) + cellfocus;
-if inrm & islice ~= inrm
+if ifn & islice ~= ifn
   slices = [ slices; slices ];
-  i = inrm + [ 0 3 ];
+  i = ifn + [ 0 3 ];
   slices(1,i) = [ 1  0 ];
   slices(2,i) = [ 0 -1 ];
 end
 
-if inrm,           faultviz,   end
+if ifn,           faultviz,   end
 if doglyph,          glyphviz,   end
 if doisosurf,        isosurfviz, end
 if domesh || dosurf, surfviz,    end

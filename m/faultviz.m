@@ -1,18 +1,18 @@
 %------------------------------------------------------------------------------%
 % Fault vizualization
 
-if ~inrm, return, end
+if ~ifn, return, end
 
 i1 = i1node;
 i2 = i2node;
-i1(inrm) = i0(inrm);
-i2(inrm) = i0(inrm);
+i1(ifn) = ihypo(ifn);
+i2(ifn) = ihypo(ifn);
 j = i1(1):i2(1);
 k = i1(2):i2(2);
 l = i1(3):i2(3);
 xg = squeeze( x(j,k,l,:) + xscl * u(j,k,l,:) ); 
-i1(inrm) = 1;
-i2(inrm) = 1;
+i1(ifn) = 1;
+i2(ifn) = 1;
 j = i1(1):i2(1);
 k = i1(2):i2(2);
 l = i1(3):i2(3);
