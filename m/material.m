@@ -3,40 +3,40 @@
 
 fprintf( 'Material model\n' )
 
-% Material arrays
+FIXME
+
+% Input
 mr(:) = 0.;
 s1(:) = 0.;
 s2(:) = 0.;
-for iz = 1:size( fieldin, 1 )
-if ( readfile(iz) )
-  i1 = i1cell;
-  i2 = i2cell + 1;
-  j1 = i1(1); j2 = i2(1);
-  k1 = i1(2); k2 = i2(2);
-  l1 = i1(3); l2 = i2(3);
-  switch fieldin{iz}
-  case 'rho', mr(j1:j2,k1:k2,l1:l2) = bread( 'data/rho' );
-  case 'vp',  s1(j1:j2,k1:k2,l1:l2) = bread( 'data/vp' );
-  case 'vs',  s2(j1:j2,k1:k2,l1:l2) = bread( 'data/vs' );
-  end
-else
-  i1 = i1in(iz,:);
-  i2 = i2in(iz,:);
-  j1 = i1(1); j2 = i2(1);
-  k1 = i1(2); k2 = i2(2);
-  l1 = i1(3); l2 = i2(3);
-  switch fieldin{iz}
-  case 'rho', mr(j1:j2,k1:k2,l1:l2) = inval(iz);
-  case 'vp',  s1(j1:j2,k1:k2,l1:l2) = inval(iz);
-  case 'vs',  s2(j1:j2,k1:k2,l1:l2) = inval(iz);
-  end
-end
-end
+rho1 = 1e9;
+rho2 = 0.;
+vp1 = 1e9;
+vp2 = 0.;
+vs1 = 1e9;
+vs2 = 0.;
 
-% Matrial extremes
-i = mr > 0.; rho1 = min( mr(i) ); rho2 = max( mr );
-i = s1 > 0.; vp1  = min( s1(i) ); vp2  = max( s1 );
-i = s2 > 0.; vs1  = min( s2(i) ); vp2  = max( s2 );
+for iz = 1:size( fieldin, 1 )
+if readfile(iz), error 'read not implemented', end
+[ i1, i2 ] = zone( i1in(iz,:), i2in(iz,:), nn, nnoff, ihypo, ifn );
+j1 = i1(1); j2 = i2(1);
+k1 = i1(2); k2 = i2(2);
+l1 = i1(3); l2 = i2(3);
+switch fieldin{iz}
+case 'rho'
+  mr(j1:j2,k1:k2,l1:l2) = inval(iz);
+  rho1 = min( rho1, inval(iz) );
+  rho2 = max( rho2, inval(iz) );
+case 'vp'
+  s1(j1:j2,k1:k2,l1:l2) = inval(iz);
+  vp1 = min( vp1, inval(iz) );
+  vp2 = max( vp2, inval(iz) );
+case 'vs'
+  s2(j1:j2,k1:k2,l1:l2) = inval(iz);
+  vs1 = min( vs1, inval(iz) );
+  vs2 = max( vs2, inval(iz) );
+end
+end
 
 % Hypocenter properties
 j = ihypo(1);
@@ -72,16 +72,13 @@ mu(j,k,l) = 0.125 * ...
 % Cell volume
 s2(:) = 0.;
 for iz = 1:size( oper, 1 )
-  [ i1, i2 ] = zone( ioper(iz,:), nn, noff, ihypo, ifn );
+  [ i1, i2 ] = zone( i1oper(iz,:), i2oper(iz,:), nn, noff, ihypo, ifn );
   i2 = i2 - 1;
-  op = oper(iz);
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
-  s2(j,k,l) = dfnc( op, x, x, dx, 1, 1, j, k, l );
+  s2(j,k,l) = dfnc( oper(iz), x, x, dx, 1, 1, j, k, l );
 end
-
-% Make sure cell volumes are zero on the fault
 if ifn
   i = ihypo(ifn);
   switch ifn

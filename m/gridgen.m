@@ -8,51 +8,41 @@ i2 = i2cell + 1;
 j1 = i1(1); j2 = i2(1);
 k1 = i1(2); k2 = i2(2);
 l1 = i1(3); l2 = i2(3);
-i1oper = [ 1 1 1 ];
-i2oper = [ -1 -1 -1 ];
+
+% Single node indexing
+n = nn;
+if ifn, n(ifn) = n(ifn) - 1; end
+
+% Dimensions
+lj = dx * ( n(1) - 1 );
+lk = dx * ( n(2) - 1 );
+ll = dx * ( n(3) - 1 );
+
+% Coordinate system
+[ tmp, l ] = max( abs( upvector ) );
+up = sign( upvector(l) );
+k = mod( l + 1, 3 ) + 1;
+j = 6 - k - l;
+crdsys = [ j k l ];
 
 % Read grid files or creat basic rectangular mesh
 x(:) = 0.;
 switch grid
 case 'read'
-  oper = 'g';
   endian = textread( 'data/endian', '%c', 1 );
   x(j1:j2,k1:k2,l1:l2,1) = bread( 'data/x1', endian );
   x(j1:j2,k1:k2,l1:l2,2) = bread( 'data/x2', endian );
   x(j1:j2,k1:k2,l1:l2,3) = bread( 'data/x3', endian );
 otherwise
-  for i = j1:j2, x(i,:,:,1) = dx * ( i - 1 - noff(1) ); end
-  for i = k1:k2, x(:,i,:,2) = dx * ( i - 1 - noff(2) ); end
-  for i = l1:l2, x(:,:,i,3) = dx * ( i - 1 - noff(3) ); end
-  if ifn
-    i = ihypo(ifn);
-    switch ifn
-    case 1, x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:);
-    case 2, x(:,i+1:k2,:,:) = x(:,i:k2-1,:,:);
-    case 3, x(:,:,i+1:l2,:) = x(:,:,i:l2-1,:);
-    end
-  end
+  for i = j1:j2, x(i,:,:,1) = dx * ( i - 1 ); end
+  for i = k1:k2, x(:,i,:,2) = dx * ( i - 1 ); end
+  for i = l1:l2, x(:,:,i,3) = dx * ( i - 1 ); end
 end
-
-% Coordinate system
-l = abs( upward );
-up = sign( upward );
-if ~ifn | ifn == l
-  k = mod( l + 1, 3 ) + 1;
-else
-  k = ifn;
-end
-j = 6 - k - l;
-crdsys = [ j k l ];
-
-% Dimensions
-lj = x(j2,k2,l2,j);
-lk = x(j2,k2,l2,k);
-ll = x(j2,k2,l2,l);
 
 % Mesh models
 switch grid
 case 'read'
+  oper = 'g';
 case 'constant'
   oper = 'h';
 case 'stretch'
@@ -118,12 +108,25 @@ otherwise error 'grid'
 end
 
 % Duplicate edge nodes into halo
-if( bc1(1) ~= -1 ) x(j1-1,:,:,:) = x(j1,:,:,:)
-if( bc2(1) ~= -1 ) x(j2+1,:,:,:) = x(j2,:,:,:)
-if( bc1(2) ~= -1 ) x(:,j1-1,:,:) = x(:,j1,:,:)
-if( bc2(2) ~= -1 ) x(:,k2+1,:,:) = x(:,k2,:,:)
-if( bc1(3) ~= -1 ) x(:,:,j1-1,:) = x(:,:,j1,:)
-if( bc2(3) ~= -1 ) x(:,:,l2+1,:) = x(:,:,l2,:)
+x(j1-1,:,:,:) = x(j1,:,:,:);
+x(j2+1,:,:,:) = x(j2,:,:,:);
+x(:,j1-1,:,:) = x(:,j1,:,:);
+x(:,k2+1,:,:) = x(:,k2,:,:);
+x(:,:,j1-1,:) = x(:,:,j1,:);
+x(:,:,l2+1,:) = x(:,:,l2,:);
+
+% Create fault double nodes
+if ifn, i = ihypo(ifn); end
+switch ifn
+case 1, x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:);
+case 2, x(:,i+1:k2,:,:) = x(:,i:k2-1,:,:);
+case 3, x(:,:,i+1:l2,:) = x(:,:,i:l2-1,:);
+end
+
+% Assign operator
+noper = 1;
+i1oper =  [ 1 1 1 ];
+i2oper = -[ 1 1 1 ];
 
 % Hypocenter location
 j = ihypo(1);

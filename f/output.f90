@@ -39,20 +39,20 @@ ifit0: if ( it == 0 .and. master ) then
   courant = dt * vp2 * sqrt( 3. ) / abs( dx )
   write( str, '(a,i2.2,a)' ) 'out/meta.m'
   open(  9, file=str, status='replace' )
-  write( 9, * ) ' endian = ''', endian, ''' ; % byte order'
-  write( 9, * ) ' nout = ', nout, '; % number output zones'
-  write( 9, * ) ' rho1 = ', rho1, '; % minimum density'
-  write( 9, * ) ' rho2 = ', rho2, '; % maximum density'
-  write( 9, * ) ' rho  = ', rho,  '; % hypocenter density'
-  write( 9, * ) ' vp1  = ', vp1,  '; % minimum Vp'
-  write( 9, * ) ' vp2  = ', vp2,  '; % maximum Vp'
-  write( 9, * ) ' vp   = ', vp,   '; % hypocenter Vp'
-  write( 9, * ) ' vs1  = ', vs1,  '; % minimum Vs'
-  write( 9, * ) ' vs2  = ', vs2,  '; % maximum Vs'
-  write( 9, * ) ' vs   = ', vs,   '; % hypocenter Vs'
-  write( 9, * ) ' courant = ', courant, '; % stability condition'
-  write( 9, * ) ' ihypo = [', ihypo, '] ; % hypocenter node'
-  write( 9, * ) ' xhypo = [', xhypo, '] ; % hypocenter location'
+  write( 9, * ) ' endian = ''', endian, '''; % byte order'
+  write( 9, * ) ' nout = ',     nout,     '; % number output zones'
+  write( 9, * ) ' rho1 = ',     rho1,     '; % minimum density'
+  write( 9, * ) ' rho2 = ',     rho2,     '; % maximum density'
+  write( 9, * ) ' rho  = ',     rho,      '; % hypocenter density'
+  write( 9, * ) ' vp1  = ',     vp1,      '; % minimum Vp'
+  write( 9, * ) ' vp2  = ',     vp2,      '; % maximum Vp'
+  write( 9, * ) ' vp   = ',     vp,       '; % hypocenter Vp'
+  write( 9, * ) ' vs1  = ',     vs1,      '; % minimum Vs'
+  write( 9, * ) ' vs2  = ',     vs2,      '; % maximum Vs'
+  write( 9, * ) ' vs   = ',     vs,       '; % hypocenter Vs'
+  write( 9, * ) ' courant = ',  courant,  '; % stability condition'
+  write( 9, * ) ' ihypo = [',   ihypo,   ']; % hypocenter node'
+  write( 9, * ) ' xhypo = [',   xhypo,   ']; % hypocenter location'
   close( 9 )
 
 end if ifit0
@@ -95,11 +95,11 @@ doiz0: do iz = 1, nout
   if ( master ) then
     write( str, '(a,i2.2,a)' ) 'out/', iz, '/meta.m'
     open(  9, file=str, status='replace' )
-    write( 9, * ) ' field = ''', trim( fieldout(iz) ), ''' ; % variable name'
-    write( 9, * ) ' nc  = ', nc, '; % # of components'
-    write( 9, * ) ' dit = ', ditout(iz), '; % interval'
-    write( 9, * ) ' i1 = [', i1 - nnoff, '] ; % start index'
-    write( 9, * ) ' i2 = [', i2 - nnoff, '] ; % end index'
+    write( 9, * ) ' field = ''', trim( fieldout(iz) ), '''; % variable name'
+    write( 9, * ) ' nc  = ',  nc,          '; % # of components'
+    write( 9, * ) ' dit = ',  ditout(iz),  '; % interval'
+    write( 9, * ) ' i1  = [', i1 - nnoff, ']; % start index'
+    write( 9, * ) ' i2  = [', i2 - nnoff, ']; % end index'
     close( 9 )
   end if
  
@@ -227,21 +227,21 @@ if ( master ) then
   close( 9 )
   write( str, '(a,i6.6,a)' ) 'out/stats/', it, '.m'
   open(  9, file=str, status='replace' )
-  write( 9, * ) ' t      = ',   t,               '; % time'
-  write( 9, * ) ' dt     = ',   dt,              '; % timestep size'
-  write( 9, * ) ' dtwall = ',   dtwall,          '; % wall time per step'
-  write( 9, * ) ' amax   = ',   amax,            '; % max acceleration'
-  write( 9, * ) ' vmax   = ',   vmax,            '; % max velocity'
-  write( 9, * ) ' umax   = ',   umax,            '; % max displacement'
-  write( 9, * ) ' wmax   = ',   wmax,            '; % max stress Frobenius nrm'
-  write( 9, * ) ' svmax  = ',   svmax,           '; % max slip velocity'
-  write( 9, * ) ' slmax  = ',   slmax,           '; % max slip path length'
-  write( 9, * ) ' amaxi  = [', amaxi - nnoff,  '] ; % max acceleration loc'
-  write( 9, * ) ' vmaxi  = [', vmaxi - nnoff,  '] ; % max velocity loc'
-  write( 9, * ) ' umaxi  = [', umaxi - nnoff,  '] ; % max displacement loc'
-  write( 9, * ) ' wmaxi  = [', wmaxi - nnoff,  '] ; % max stress loc'
-  write( 9, * ) ' svmaxi = [', svmaxi - nnoff, '] ; % max slip velocity loc'
-  write( 9, * ) ' slmaxi = [', slmaxi - nnoff, '] ; % max slip path length loc'
+  write( 9, * ) ' t      = ',   t,              '; % time'
+  write( 9, * ) ' dt     = ',   dt,             '; % timestep size'
+  write( 9, * ) ' dtwall = ',   dtwall,         '; % wall time per step'
+  write( 9, * ) ' amax   = ',   amax,           '; % max acceleration'
+  write( 9, * ) ' vmax   = ',   vmax,           '; % max velocity'
+  write( 9, * ) ' umax   = ',   umax,           '; % max displacement'
+  write( 9, * ) ' wmax   = ',   wmax,           '; % max stress Frobenius nrm'
+  write( 9, * ) ' svmax  = ',   svmax,          '; % max slip velocity'
+  write( 9, * ) ' slmax  = ',   slmax,          '; % max slip path length'
+  write( 9, * ) ' amaxi  = [', amaxi - nnoff,  ']; % max acceleration loc'
+  write( 9, * ) ' vmaxi  = [', vmaxi - nnoff,  ']; % max velocity loc'
+  write( 9, * ) ' umaxi  = [', umaxi - nnoff,  ']; % max displacement loc'
+  write( 9, * ) ' wmaxi  = [', wmaxi - nnoff,  ']; % max stress loc'
+  write( 9, * ) ' svmaxi = [', svmaxi - nnoff, ']; % max slip velocity loc'
+  write( 9, * ) ' slmaxi = [', slmaxi - nnoff, ']; % max slip path length loc'
   close( 9 )
 end if
 

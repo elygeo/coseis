@@ -23,12 +23,21 @@ for i = 1:length( in )
          'tn', 'th', 'td', ...
          'sxx', 'syy', 'szz', ...
          'syz', 'szx', 'sxy' }
-    eval( [ 'in =' key ';' ] )
     nin = nin + 1;
     fieldin{nin} = key;
-    inval(nin)   = in(1);
-    i1in(nin,:)  = in(2:4);
-    i2in(nin,:)  = in(5:7);
+    i1in(nin,:) =  [ 1 1 1 ];
+    i2in(nin,:) = -[ 1 1 1 ];
+    if strcmp( key(2), 'read' )
+      readfile(iz) = 1;
+    else
+      readfile(iz) = 0;
+      eval( [ 'key =' key ';' ] )
+      inval(nin) = key(1);
+      if length(key) > 3
+        i1in(nin,:) = key(2:4);
+        i2in(nin,:) = key(5:7);
+      end
+    end
   case 'lock'
     nlock = nlock + 1;
     ilock(nlock,:) = lock(1:3);

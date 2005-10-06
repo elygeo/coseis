@@ -88,6 +88,18 @@ else
 end if ifreadfile
 end do doiz
 
+! Lock fault in PML region
+i1 = i1pml + 1
+i2 = i2pml - 1
+i1(ifn) = 1
+i2(ifn) = 1
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+f1 = co
+co = 1e9
+co(j1:j2,k1:k2,l1:l2) = f1(j1:j2,k1:k2,l1:l2)
+
 ! Normal vectors
 side = sign( 1, faultnormal )
 i1 = i1node

@@ -26,13 +26,29 @@ if init
   fprintf( fid, '%s\n', endian );
   fclose( fid );
   courant = dt * matmax(2) * sqrt( 3 ) / dx;
+  fid = fopen( 'out/meta.m', 'w' );
+  fprintf( fid, '  endian = ''%s''; % byte order\n',             endian );
+  fprintf( fid, '  nout = %g; % number output zones\n',          nout );
+  fprintf( fid, '  rho1 = %g; % minimum density\n',              rho1 );
+  fprintf( fid, '  rho2 = %g; % maximum density\n',              rho2 );
+  fprintf( fid, '  rho  = %g; % hypocenter density\n',           rho );
+  fprintf( fid, '  vp1  = %g; % minimum Vp\n',                   vp1 );
+  fprintf( fid, '  vp2  = %g; % maximum Vp\n',                   vp2 );
+  fprintf( fid, '  vp   = %g; % hypocenter Vp\n',                vp );
+  fprintf( fid, '  vs1  = %g; % minimum Vs\n',                   vs1 );
+  fprintf( fid, '  vs2  = %g; % maximum Vs\n',                   vs2 );
+  fprintf( fid, '  vs   = %g; % hypocenter Vs\n',                vs );
+  fprintf( fid, '  courant = %g; % stability condition\n',       courant );
+  fprintf( fid, '  ihypo = [%g %g %g]; % hypocenter node\n',     ihypo );
+  fprintf( fid, '  xhypo = [%g %g %g]; % hypocenter location\n', xhypo );
+  fclose( fid );
   mem = whos;
   mem = sum( [ mem.bytes ] );
   ram = mem / 1024 ^ 2;
   wt = mem / 7000000;
   fprintf( 'RAM usage: %.0fMb\n', ram )
   fprintf( 'Run time: at least %s\n', datestr( nt * wt / 3600 / 24, 13 ) )
-  fprintf('Time      Amax        Vmax        Umax        Compute     I/O/Viz\n')
+  fprintf('   Step      Amax        Vmax        Umax        Wall Time\n')
   tic
   return
 end
@@ -62,7 +78,7 @@ onpass = 'v';
 cell = 0;
 isfault = 0;
 static = 0;
-switch outvar{iz}
+switch fieldout{iz}
 case 'x',    static = 1; nc = 3;
 case 'a',    nc = 3;
 case 'v',    nc = 3;
@@ -75,7 +91,7 @@ case 'wm',   onpass = 'w'; cell = 1;
 case 'sl',   isfault = 1;
 case 'sv',   isfault = 1;
 case 'trup', isfault = 1;
-otherwise error( [ 'outvar: ' outvar{iz} ] )
+otherwise error( [ 'fieldout: ' fieldout{iz} ] )
 end
 if isfault & ~ifn; ditout(iz) = 0; end
 if onpass ~= pass, continue, end
@@ -85,11 +101,11 @@ if cell; i2 = i2 - 1; end
 % Metadata
 file = sprintf( 'out/%02d/meta.m', iz );
 fid = fopen( file, 'w' );
-fprintf( fid, '  field = ''%s'' ;\n',       outfield{iz} );
-fprintf( fid, '  nc    = %g ;\n',           nc           );
-fprintf( fid, '  i1    = [ %g %g %g ] ;\n', i1 - nnoff   );
-fprintf( fid, '  i2    = [ %g %g %g ] ;\n', i2 - nnoff   );
-fprintf( fid, '  dit   = %g ;\n',           ditout(iz)   );
+fprintf( fid, '  field = ''%s''; % varial name\n',   outfield{iz} );
+fprintf( fid, '  nc  = %g; % # of components\n',     nc );
+fprintf( fid, '  dit = %g; % interval\n',            ditout(iz) );
+fprintf( fid, '  i1  = [%g %g %g]; % start index\n', i1 - nnoff );
+fprintf( fid, '  i2  = [%g %g %g]; % end index\n',   i2 - nnoff );
 fclose( fid );
 
 if isfault
@@ -102,9 +118,9 @@ l = i1(3):i2(3);
 k = i1(2):i2(2);
 j = i1(1):i2(1);
 for i = 1:nc
-  file = sprintf( 'out/%02d/%s%1d%06d', iz, outvar{iz}, i, it );
+  file = sprintf( 'out/%02d/%s%1d%06d', iz, fieldout{iz}, i, it );
   fid = fopen( file, 'w' );
-  switch outvar{iz}
+  switch fieldout{iz}
   case 'x',    fwrite( fid, x(j,k,l,i),    'float32' );
   case 'a',    fwrite( fid, w1(j,k,l,i),   'float32' );
   case 'v',    fwrite( fid, v(j,k,l,i),    'float32' );
@@ -116,10 +132,10 @@ for i = 1:nc
   case 'vm',   fwrite( fid, s2(j,k,l),     'float32' );
   case 'um',   fwrite( fid, s1(j,k,l),     'float32' );
   case 'wm',   fwrite( fid, s2(j,k,l),     'float32' );
-  case 'vs',   fwrite( fid, vs(j,k,l),     'float32' );
-  case 'us',   fwrite( fid, us(j,k,l),     'float32' );
+  case 'sv',   fwrite( fid, sv(j,k,l),     'float32' );
+  case 'sl',   fwrite( fid, sl(j,k,l),     'float32' );
   case 'trup', fwrite( fid, trup(j,k,l),   'float32' );
-  otherwise error( [ 'outvar: ' outvar{iz} ] )
+  otherwise error( [ 'fieldout: ' fieldout{iz} ] )
   end
   fclose( fid );
   if static, ditout(iz) = 0; end
@@ -132,18 +148,18 @@ if pass == 'w', return, end
 %------------------------------------------------------------------------------%
 
 if itcheck & ~mod( it, itcheck )
-  save 'out/ckp' it t u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 vs us trup
+  save 'out/ckp' it t u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 sv sl trup
 end
 
 fid = fopen( 'out/timestep', 'w' );
-fprintf( fid, '  it = %g ;\n', it );
+fprintf( fid, '  it = %g;\n', it );
 fclose( fid );
 
-wt(4) = toc;
+wt = toc; tic
 
 file = sprintf( 'out/stats/%06d', it );
 fid = fopen( file, 'w' );
-fprintf( fid, '%15.7e', [ t amax vmax umax wmax vsmax usmax wt ] );
+fprintf( fid, '%15.7e', [ t amax vmax umax wmax wt ] );
 fprintf( fid, '\n' );
 fclose( fid );
 

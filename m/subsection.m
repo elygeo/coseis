@@ -1,6 +1,6 @@
 %------------------------------------------------------------------------------%
 % 5D subsection
-% input: iz i1s i2s fieldin nn it
+% input: nout i1s i2s fieldin nn it
 
 % Array slice
 i = i1s < 0; i1s(i) = i1s(i) + nn(i) + 1;
@@ -38,23 +38,31 @@ if ~exist( 'sordrunning', 'var' ) & i1s(4) == it
   return
 end
 
-% Read saved data from disk
 if all( n ~= 1 ), error 'trying to read 5 dimensions', end
 if prod(n) > 1e8, error 'too big', end
-eval( sprintf( 'out/%02d/meta', iz ) )
+
 i1g = [ i1 1 1 ];
 i2g = [ i2 nt nc ];
-i1s = i1s - i1g + 1;
-i2s = i2s - i1g + 1;
 ng = i2g - i1g + 1;
 
-% Check if file holds desired data
-if any( i1s < 1 | i2s > ng ) | vizfield ~= field | ( n(4) > 1 & dit > 1 )
+% Look for file with desired data
+found = 0;
+for iz = 1:nout
+  eval( sprintf( 'out/%02d/meta', iz ) )
+  if all( i1s >= i1g & i2s <= i2g ) & vizfield == field & ...
+FIXME:     ( n(4) == 1 | dit == 1 )
+     found = 1;
+     break
+  end
+end
+
+if ~found
   msg = 'No data available for this location';
   return
-else
-  msg = '';
 end
+
+i1s = i1s - i1g + 1;
+i2s = i2s - i1g + 1;
 
 % Read data
 vg = zeros( n );
