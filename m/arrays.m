@@ -1,5 +1,4 @@
-%------------------------------------------------------------------------------%
-% ARRAYS
+% Arrays
 
 % 3D vectors
 w1   = repmat( zero, [ nm 3 ] ); % temporary storage

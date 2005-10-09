@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! Binary input and output
-
 module collectiveio_m
 use collective_m
 implicit none

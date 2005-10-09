@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! Calculate PML damping parameters
-
 module pml_m
 use globals_m
 contains

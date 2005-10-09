@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! Setup model dimensions
-
 module setup_m
 use globals_m
 use collective_m

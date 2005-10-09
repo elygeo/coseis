@@ -1,11 +1,9 @@
-!------------------------------------------------------------------------------!
-! MPI routines
-
 ! MPICH mpi module is broken, so make one
 module mpi_m
 include 'mpif.h'
 end module
 
+! MPI routines
 module collective_m
 use mpi_m
 implicit none

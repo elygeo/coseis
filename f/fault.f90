@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! Fault boundary condition
-
 module fault_m
 use globals_m
 use collectiveio_m

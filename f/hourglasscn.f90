@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! Hourglass corrections, cell to node
-
 module hourglasscn_m
 contains
 subroutine hourglasscn( hg, f, iq, i1, i2 )

@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! Checkpointing
-
 module checkpoint_m
 use globals_m
 use collective_m

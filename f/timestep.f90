@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
-! Time integration
-
+! Time Step
 module timestep_m
 use globals_m
 contains

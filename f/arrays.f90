@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! Allocate arrays
-
 module arrays_m
 use globals_m
 contains

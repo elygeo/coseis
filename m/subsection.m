@@ -1,14 +1,15 @@
-%------------------------------------------------------------------------------%
-% 5D subsection
-% input: nout i1s i2s fieldin nn it
+% Extract 4D slice
+% input: iz i1s i2s fieldin it
 
 % Array slice
-i = i1s < 0; i1s(i) = i1s(i) + nn(i) + 1;
-i = i2s < 0; i2s(i) = i2s(i) + nn(i) + 1
+i = i1s(1:3) < 0; i1s(i) = i1s(i) + nn(i) + 1;
+i = i2s(1:3) < 0; i2s(i) = i2s(i) + nn(i) + 1
 n = i2s - i1s + 1;
+if all( n ~= 1 ), error 'trying to read 5 dimensions', end
+if prod(n) > 1e8, error 'too big', end
 
 % Use in memory data if available
-if ~exist( 'sordrunning', 'var' ) & i1s(4) == it
+if exist( 'sordrunning', 'var' ) & i1s(4) == it
   l = i1s(3):i2s(3);
   k = i1s(2):i2s(2);
   j = i1s(1):i2s(1);
@@ -38,33 +39,29 @@ if ~exist( 'sordrunning', 'var' ) & i1s(4) == it
   return
 end
 
-if all( n ~= 1 ), error 'trying to read 5 dimensions', end
-if prod(n) > 1e8, error 'too big', end
-
-i1g = [ i1 1 1 ];
-i2g = [ i2 nt nc ];
-ng = i2g - i1g + 1;
-
 % Look for file with desired data
+eval( 'out/meta' )
+if ~iz, iz = 1:nout; end
 found = 0;
-for iz = 1:nout
+for iz = iz
   eval( sprintf( 'out/%02d/meta', iz ) )
-  if all( i1s >= i1g & i2s <= i2g ) & vizfield == field & ...
-FIXME:     ( n(4) == 1 | dit == 1 )
-     found = 1;
-     break
-  end
+  i1g = [ i1 1 1 ];
+  i2g = [ i2 it nc ];
+  found = vizfield == field && ...
+          all( i1s >= i1g ) && ...
+          all( i2s <= i2g ) && ...
+          ( dit == 1 || ( n(4) == 1 && find( i1s(4) == dit:dit:it ) ) );
+  if found, break, end
 end
-
 if ~found
   msg = 'No data available for this location';
   return
 end
 
+% Read data
+ng = i2g - i1g + 1;
 i1s = i1s - i1g + 1;
 i2s = i2s - i1g + 1;
-
-% Read data
 vg = zeros( n );
 block = sprintf( '%d*float32', n(1) );
 skip = 4 * ( ng(1) - n(1) );

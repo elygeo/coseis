@@ -1,4 +1,3 @@
-%------------------------------------------------------------------------------%
 % Time series
 % input: vizfield sensor dofilter
 % output: tg vg ta va
@@ -11,21 +10,18 @@ clear tg xg vg va ta
 if ~exist( 'sordrunning', 'var' )
   eval( 'out/meta' )
   eval( 'out/faultmeta' )
+  eval( 'out/timestep' )
   if ~exist( 'vizfield', 'var' ), vizfield = 'v'; end
   if ~exist( 'dofilter', 'var' ), dofilter = 1;   end
   if ~exist( 'sensor', 'var' ), sensor = [ 1 1 1 ]; end
 end
 
-% Test if we have data saved for desired location
-i1 = sensor;
-i2 = sensor;
-itg = 0;
-ic = 0;
-for iz = 1:nout
-  subarray
-end
+iz = 0;
+i1s = [ sensor 1 1 ];
+i2s = [ sensor it 1 ];
+subarray
 if msg, return, end
-if ntg == 1, return, end
+if ng(4) == 1, return, end
 
 % Filter
 if dofilter

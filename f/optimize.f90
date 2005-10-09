@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! Assign fast operators to rectangular mesh portions
-
 module optimize_m
 use globals_m
 contains

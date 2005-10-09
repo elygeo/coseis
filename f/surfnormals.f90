@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! Find surface normals
-
 module surfnormals_m
 contains
 subroutine surfnormals( nhat, x, i1, i2 )

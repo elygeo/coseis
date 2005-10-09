@@ -1,5 +1,4 @@
-%------------------------------------------------------------------------------%
-% Read 5D slice
+% Extract 4D slice
 % input: iz slice(5) vizfield
 
 % Read metadata

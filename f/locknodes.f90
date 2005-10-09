@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! Lock nodes by setting acceleration to zero
-
 module locknodes_m
 use globals_m
 use zone_m

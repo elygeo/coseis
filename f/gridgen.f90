@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! Grid generation
-
 module gridgen_m
 use optimize_m
 use collectiveio_m

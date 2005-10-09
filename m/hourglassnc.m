@@ -1,4 +1,3 @@
-%------------------------------------------------------------------------------%
 % Hourglass corrections, node to cell
 
 function hg = hourglassnc( f, i, iq, j, k, l )

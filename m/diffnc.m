@@ -1,4 +1,3 @@
-%------------------------------------------------------------------------------%
 % Difference operators, node to cell
 
 function df = diffnc( oper, f, x, dx, i, a, j, k, l )

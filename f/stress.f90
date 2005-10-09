@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! Stress calculation
-
 module stress_m
 use globals_m
 use diffnc_m

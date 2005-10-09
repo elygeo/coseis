@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
-! Difference operators, cell to node
-
+! Difference operator, cell to node
 module diffcn_m
 contains
 subroutine diffcn( df, oper, f, x, dx, i, a, i1, i2 )
@@ -19,8 +17,8 @@ l1 = i1(3); l2 = i2(3)
 
 select case( oper )
 
-case( 'h' ) ! Constant grid, flops: 1* 7+
-
+! Constant grid, flops: 1* 7+
+case( 'h' )
 h = 0.25 * dx * dx
 select case( a )
 case( 1 )
@@ -49,8 +47,8 @@ case( 3 )
   end forall
 end select
 
-case( 'r' ) ! Rectangular grid, flops: 7* 11+
-
+! Rectangular grid, flops: 7* 11+
+case( 'r' )
 select case( a )
 case( 1 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
@@ -84,8 +82,8 @@ case( 3 )
   end forall
 end select
 
-case( 'g' ) ! General grid, flops: 55* 90+
-
+! General grid, flops: 55* 90+
+case( 'g' )
 b = modulo( a, 3 ) + 1
 c = modulo( a + 1, 3 ) + 1
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )

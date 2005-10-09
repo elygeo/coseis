@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! Acceleration calculation
-
 module acceleration_m
 use globals_m
 use diffcn_m

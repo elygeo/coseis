@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! Write output
-
 module output_m
 use globals_m
 use collectiveio_m
@@ -17,7 +15,7 @@ logical :: fault, test, init = .true.
 character, intent(in) :: pass
 character :: onpass, endian
 
-ifinit: if ( init ) then !--------------------------------------!
+ifinit: if ( init ) then !-----------------------------------------------------!
 
 init = .false.
 if ( nout > nz ) stop 'too many output zones, make nz bigger'
@@ -117,7 +115,7 @@ end if
 
 return
 
-end if ifinit !--------------------------------------!
+end if ifinit !----------------------------------------------------------------!
 
 ! Magnitudes
 if ( pass == 'w' ) then
@@ -151,7 +149,7 @@ else
   end if
 end if
 
-doiz: do iz = 1, nout !--------------------------------------!
+doiz: do iz = 1, nout !--------------------------------------------------------!
 
 if ( ditout(iz) == 0 ) cycle doiz
 if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
@@ -211,7 +209,7 @@ do i = 1, nc
   end select
 end do
 
-end do doiz !--------------------------------------!
+end do doiz !------------------------------------------------------------------!
 
 ! Stop if not on acceleration pass
 if ( pass == 'w' ) return

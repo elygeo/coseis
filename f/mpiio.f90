@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! MPIIO
-
 module collectiveio_m
 use mpi_m
 use collective_m

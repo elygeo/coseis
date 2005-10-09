@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
 ! Moment source added to stress
-
 module momentsource_m
 use globals_m
 use diffnc_m
@@ -16,7 +14,7 @@ real :: srcft
 
 if ( rsource <= 0. ) return
 
-ifinit: if ( init ) then !--------------------------------------!
+ifinit: if ( init ) then !-----------------------------------------------------!
 
 init = .false.
 if ( master ) print '(a)', 'Moment source'
@@ -80,7 +78,7 @@ s2 = 0.
 
 return
 
-end if ifinit !--------------------------------------!
+end if ifinit !----------------------------------------------------------------!
 
 ! Source time function
 select case( tfunc )

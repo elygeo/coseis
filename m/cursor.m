@@ -1,5 +1,4 @@
-%------------------------------------------------------------------------------%
-% CROSSHAIRS
+% Data cursor
 
 way = sign( cursormove );
 cursormove = abs( cursormove );

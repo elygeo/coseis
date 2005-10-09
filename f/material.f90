@@ -1,6 +1,4 @@
-!------------------------------------------------------------------------------!
-! Set up material arrays
-
+! Material model
 module material_m
 use globals_m
 use collectiveio_m
