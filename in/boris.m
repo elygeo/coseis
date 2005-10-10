@@ -1,4 +1,5 @@
-  model = 'boris';
+% Test run for Boris
+
   nn = [ 221 221 222 ];
   nt = 400;
   dx = .007;

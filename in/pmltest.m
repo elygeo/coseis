@@ -1,4 +1,6 @@
-  model = 'pmltest';
+% PML damping test
+
+  model = 'explosion';
   nn = [ 81 81 81 ];
   nn = [ 41 41 41 ];
   ihypo = [ 21 21 21 ];

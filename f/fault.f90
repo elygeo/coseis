@@ -229,9 +229,9 @@ t2 = t3 - t1
 ts = sqrt( sum( t2 * t2, 4 ) )
 
 ! Slip-weakening friction law
-where( tn > 0. ) tn = 0.
+where ( tn > 0. ) tn = 0.
 f1 = mud
-where( sl < dc ) f1 = f1 + ( 1. - sl / dc ) * ( mus - mud )
+where ( sl < dc ) f1 = f1 + ( 1. - sl / dc ) * ( mus - mud )
 f1 = -tn * f1 + co
 
 ! Nucleation

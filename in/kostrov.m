@@ -1,3 +1,5 @@
+% Kostrov constant rupture velocity test
+
   model = 'kostrov';
 
   nn = [ 3 3 4 ];

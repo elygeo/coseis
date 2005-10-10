@@ -245,18 +245,23 @@ if ( master ) then
   write( 9, * ) ' svmaxi = [', svmaxi - nnoff, ']; % max slip velocity loc'
   write( 9, * ) ' slmaxi = [', slmaxi - nnoff, ']; % max slip path length loc'
   close( 9 )
-  if ( it == nt - 1 ) then
-    j = ihypo(1)
-    k = ihypo(2)
-    l = ihypo(3)
+  if ( ifn /= 0 .and. it == nt - 1 ) then
+    i1 = ihypo
+    i1(ifn) = 1
+    j = i1(1)
+    k = i1(2)
+    l = i1(3)
     tarresthypo = trup(j,k,l) + trise(j,k,l)
     i1 = maxloc( trup + trise )
-    tarrest = trup(i1(1),i1(2),i1(3)) + trise(i1(1),i1(2),i1(3))
+    j = i1(1)
+    k = i1(2)
+    l = i1(3)
+    tarrest = trup(j,k,l) + trise(j,k,l)
     call globalmaxloc( tarrest, i1, nnoff )
     open(  9, file='out/arrest.m', status='replace' )
-    write( 9, * ) ' tarresthypo = ', tarresthypo,  ';'
-    write( 9, * ) ' tarrest     = ', tarrest,      ';'
     write( 9, * ) ' iarrest     = [', i1 - nnoff, '];'
+    write( 9, * ) ' tarrest     = ', tarrest,      ';'
+    write( 9, * ) ' tarresthypo = ', tarresthypo,  ';'
     close( 9 )
   end if
 end if

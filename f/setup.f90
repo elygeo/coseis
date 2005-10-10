@@ -18,8 +18,8 @@ where ( ihypo == 0 ) ihypo = ( n + 1 ) / 2
 ! PML region
 i1pml = 0
 i2pml = nn + 1
-where( bc1 == 1 ) i1pml = i1pml + npml
-where( bc2 == 1 ) i2pml = i2pml - npml
+where ( bc1 == 1 ) i1pml = i1pml + npml
+where ( bc2 == 1 ) i2pml = i2pml - npml
 if ( any( i1pml >= i2pml ) ) stop 'model too small for PML'
 
 ! Partition for parallelization
@@ -53,8 +53,8 @@ i2node = nhalo + nl
 ! Cell region
 i1cell = nhalo + 1
 i2cell = nhalo + nl - 1
-where( ip3 /= 0      ) i1cell = i1cell - nhalo
-where( ip3 /= np - 1 ) i2cell = i2cell + nhalo
+where ( ip3 /= 0      ) i1cell = i1cell - nhalo
+where ( ip3 /= np - 1 ) i2cell = i2cell + nhalo
 
 end subroutine
 end module

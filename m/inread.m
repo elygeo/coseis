@@ -2,7 +2,6 @@
 
 plotstyle = '';
 plotstyle = 'slice';
-truptol = .001;
 nin = 0;
 nout = 0;
 nlock = 0;

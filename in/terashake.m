@@ -1,4 +1,5 @@
-  model = 'terashake';
+% Terashake
+
   out = { 'v' 1   1 1 1   -1 -1 1 };
   upvector = [ 0 0 1 ];
   faultnormal = 2;
