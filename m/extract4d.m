@@ -1,4 +1,4 @@
-% Extract 4D slice
+% Extract 4D slice from memory or disk
 % input: iz i1s i2s fieldin it
 
 % Array slice
@@ -40,20 +40,25 @@ if exist( 'sordrunning', 'var' ) & i1s(4) == it
 end
 
 % Look for file with desired data
-run 'out/meta'
+cwd = pwd;
+cd 'out'
+meta
 if ~iz, iz = 1:nout; end
 found = 0;
 for iz = iz
-  run( sprintf( 'out/%02d/meta', iz ) )
+  cd( sprintf( '%02d', iz ) )
+  meta
   i1g = [ i1 1 1 ];
   i2g = [ i2 it nc ];
-  found = vizfield == field && ...
+  found = strcmp( vizfield, field ) && ...
           all( i1s >= i1g ) && ...
           all( i2s <= i2g ) && ...
           ( dit == 1 || ( n(4) == 1 && find( i1s(4) == dit:dit:it ) ) );
   if found, break, end
+  cd ..
 end
 if ~found
+  cd( cwd )
   msg = 'No data available for this location';
   return
 end
@@ -69,7 +74,7 @@ j = i1s(1);
 k = i1s(2);
 for i   = i1s(5):i2s(5)
 for itg = i1s(4):i2s(4)
-  file = sprintf( 'out/%02d/%s%1d%06d', iz, field, i, itg );
+  file = sprintf( '%s%1d%06d', field, i, itg );
   fid = fopen( file, 'r', endian );
   for l = i1s(3):i2s(3)
     seek = 4 * ( j - 1 + ng(1) * ( k - 1 + ng(2) * ( l - 1 ) ) );
@@ -79,4 +84,5 @@ for itg = i1s(4):i2s(4)
   fclose( fid );
 end
 end
+cd( cwd )
 

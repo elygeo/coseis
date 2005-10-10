@@ -93,7 +93,7 @@ case 'trup',  isfault = 1;
 case 'trise', isfault = 1;
 otherwise error( [ 'fieldout: ' fieldout{iz} ] )
 end
-if isfault & ~ifn; ditout(iz) = 0; end
+if isfault && ~ifn; ditout(iz) = 0; end
 if onpass ~= pass, continue, end
 [ i1, i2 ] = zone( i1out(iz,:), i2out(iz,:), nn, nnoff, ihypo, ifn );
 if cell; i2 = i2 - 1; end
@@ -148,7 +148,7 @@ if pass == 'w', return, end
 
 %------------------------------------------------------------------------------%
 
-if itcheck & ~mod( it, itcheck )
+if itcheck && ~mod( it, itcheck )
   save 'out/ckp' it t u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 sv sl trup trise
 end
 

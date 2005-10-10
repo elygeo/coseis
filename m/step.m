@@ -11,7 +11,7 @@ while 1
     momentsource
     output
     viz
-    if ~itstep & breakon == 'w', break, end
+    if ~itstep && breakon == 'w', break, end
   end
   if pass ~= 'a'
     pass = 'a';
@@ -21,7 +21,7 @@ while 1
     output
     viz
     timestep
-    if ~itstep & breakon == 'a', break, end
+    if ~itstep && breakon == 'a', break, end
   end
 end
 

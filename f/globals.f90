@@ -98,7 +98,7 @@ real :: &
   vrup,         & ! nucleation rupture velocity
   rcrit,        & ! nucleation critical radius
   trelax,       & ! nucleation relaxation time
-  svtol           ! slip velocity tolerance to declare rupture
+  svtol           ! slip velocity for determining rupture time
 
 integer, dimension(3) :: &
   nn,           & ! number of global nodes, count double nodes twice

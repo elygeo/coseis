@@ -57,6 +57,7 @@
   vrup = 3117.6914;			% nucleation rupture velocity
   rcrit = 1000.;			% nucleation critical radius
   trelax = .07;				% nucleation relaxation time
+  svtol = .001;				% slip velocity considered rupturing
 
 % Code execution and output parameters
 % np = [ 2 1 3 ];			% 6 processors

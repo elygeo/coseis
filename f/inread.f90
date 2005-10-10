@@ -62,6 +62,7 @@ case( 'ihypo' );       read( str, * ) key1, ihypo
 case( 'vrup' );        read( str, * ) key1, vrup
 case( 'rcrit' );       read( str, * ) key1, rcrit
 case( 'trelax' );      read( str, * ) key1, trelax
+case( 'svtol' );       read( str, * ) key1, svtol
 case( 'np' );          read( str, * ) key1, np
 case( 'itcheck' );     read( str, * ) key1, itcheck
 case( 'rho' );         inzone = .true.

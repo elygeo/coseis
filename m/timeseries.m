@@ -8,9 +8,14 @@ clear tg xg vg va ta
 
 % Read metadata if SORD not running
 if ~exist( 'sordrunning', 'var' )
-  run 'out/meta'
-  run 'out/faultmeta'
-  run 'out/timestep'
+  cwd = pwd;
+  cd 'out'
+  defaults
+  in
+  meta
+  faultmeta
+  timestep
+  cd( cwd )
   if ~exist( 'vizfield', 'var' ), vizfield = 'v'; end
   if ~exist( 'dofilter', 'var' ), dofilter = 1;   end
   if ~exist( 'sensor', 'var' ), sensor = [ 1 1 1 ]; end
@@ -19,7 +24,7 @@ end
 iz = 0;
 i1s = [ sensor 1 1 ];
 i2s = [ sensor it 1 ];
-subarray
+extract4d
 if msg, return, end
 if ng(4) == 1, return, end
 
@@ -34,7 +39,7 @@ if dofilter
 end
 
 % For moment source, rotate to r,h,v coords
-if ~ifn
+if ~abs( faultnormal )
   if exist( 'sordrunning', 'var' )
     xg = xcursor - xhypo;
   else
@@ -84,6 +89,7 @@ case 'explosion'
   end
   ta = tg + rg / vp;
 case 'kostrov'
+  haveanalytical = 1;
   c = .81;
   dtau = ts0 - mud0 * tn0;
   va = c * dtau / rho / vs * ( tg + rg / vrup ) ...
