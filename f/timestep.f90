@@ -28,9 +28,18 @@ if ( ifn /= 0 ) then
   k3 = i1(2); k4 = i2(2)
   l3 = i1(3); l4 = i2(3)
   t1 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
-  sv = sqrt( sum( t1 * t1, 4 ) )
+  f1 = sqrt( sum( t1 * t1, 4 ) )
+  where ( trup > 1e8 .and. f1 > svtol )
+    trup = t - dt * ( .5 + ( svtol - f1 ) / ( sv - f1 ) )
+  elsewhere ( sv > svtol )
+    where ( f1 < svtol )
+      trise = t - dt * ( .5 + ( svtol - f1 ) / ( sv - f1 ) ) - trup
+    elsewhere
+      trise = 1e9
+    end where
+  end where
+  sv = f1
   sl = sl + dt * sv
-  where ( trup == 0. .and. sv > truptol ) trup = t
 end if
 
 end subroutine

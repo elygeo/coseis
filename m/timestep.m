@@ -31,9 +31,9 @@ if ifn, then
     j = i1(1);
     i = vs > truptol;
     if find( i )
-      trup( i & ( ~ trup ) ) = ( it + .5 ) * dt;
-      tarrest = ( it + 1.5 ) * dt;
+      tarrest = t;
       if i(j,k,l), tarresthypo = tarrest; end
+      trup( i & ( ~ trup ) ) = t;
     end
   end
 end if

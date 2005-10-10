@@ -8,9 +8,9 @@ clear tg xg vg va ta
 
 % Read metadata if SORD not running
 if ~exist( 'sordrunning', 'var' )
-  eval( 'out/meta' )
-  eval( 'out/faultmeta' )
-  eval( 'out/timestep' )
+  run 'out/meta'
+  run 'out/faultmeta'
+  run 'out/timestep'
   if ~exist( 'vizfield', 'var' ), vizfield = 'v'; end
   if ~exist( 'dofilter', 'var' ), dofilter = 1;   end
   if ~exist( 'sensor', 'var' ), sensor = [ 1 1 1 ]; end

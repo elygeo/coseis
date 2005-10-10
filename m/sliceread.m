@@ -2,10 +2,10 @@
 % input: iz slice(5) vizfield
 
 % Read metadata
-eval( 'defaults' )
-eval( 'in' )
-eval( 'out/timestep' )
-eval( sprintf( 'out/%02d/meta', iz ) )
+run 'defaults'
+run 'in'
+run 'out/timestep'
+run( sprintf( 'out/%02d/meta', iz ) )
 msg = '';
 
 % Time slice

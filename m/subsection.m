@@ -40,11 +40,11 @@ if exist( 'sordrunning', 'var' ) & i1s(4) == it
 end
 
 % Look for file with desired data
-eval( 'out/meta' )
+run 'out/meta'
 if ~iz, iz = 1:nout; end
 found = 0;
 for iz = iz
-  eval( sprintf( 'out/%02d/meta', iz ) )
+  run( sprintf( 'out/%02d/meta', iz ) )
   i1g = [ i1 1 1 ];
   i2g = [ i2 it nc ];
   found = vizfield == field && ...

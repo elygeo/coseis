@@ -144,7 +144,7 @@ l1 = i1(3); l2 = i2(3);
 for i = 1:3
   t3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i);
 end
-r = sqrt( sum( t3 .* t3, 4 ) );
+rhypo = sqrt( sum( t3 .* t3, 4 ) );
 
 % Metadata
 i1 = ihypo;
@@ -222,9 +222,9 @@ f1 = -tn .* f1 + co;
 % Nucleation
 if rcrit > 0. && vrup > 0.
   f2(:) = 1.;
-  if nramp, f2 = min( ( t - r / vrup ) / trelax, 1. ); end
+  if nramp, f2 = min( ( t - rhypo / vrup ) / trelax, 1. ); end
   f2 = ( 1. - f2 ) .* ts + f2 .* ( -tn .* mud + co);
-  ii = r < min( rcrit, t * vrup ) & f2 < f1;
+  ii = rhypo < min( rcrit, t * vrup ) & f2 < f1;
   f1(ii) = f2(ii);
 end
 

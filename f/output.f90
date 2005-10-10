@@ -8,7 +8,8 @@ use zone_m
 
 implicit none
 save
-real :: amax, vmax, umax, wmax, svmax, slmax, courant, dtwall
+real :: amax, vmax, umax, wmax, svmax, slmax, courant, dtwall, tarrest, &
+  tarresthypo
 integer :: amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3), &
   i, i1(3), i2(3), n(3), nc, iz, twall_rate, twall(2)
 logical :: fault, test, init = .true.
@@ -60,14 +61,15 @@ doiz0: do iz = 1, nout
   ! Properties
   nc = 1; fault = .false.
   select case( fieldout(iz) )
-  case( 'x'    ); nc = 3
-  case( 'a'    ); nc = 3
-  case( 'v'    ); nc = 3
-  case( 'u'    ); nc = 3
-  case( 'w'    ); nc = 6
-  case( 'sv'   ); fault = .true.
-  case( 'sl'   ); fault = .true.
-  case( 'trup' ); fault = .true.
+  case( 'x'     ); nc = 3
+  case( 'a'     ); nc = 3
+  case( 'v'     ); nc = 3
+  case( 'u'     ); nc = 3
+  case( 'w'     ); nc = 6
+  case( 'sv'    ); fault = .true.
+  case( 'sl'    ); fault = .true.
+  case( 'trup'  ); fault = .true.
+  case( 'trise' ); fault = .true.
   end select
   
   ! Interval 
@@ -157,16 +159,17 @@ if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 ! Properties
 nc = 1; fault = .false.; onpass = 'a'
 select case( fieldout(iz) )
-case( 'x'    ); nc = 3
-case( 'a'    ); nc = 3
-case( 'v'    ); nc = 3
-case( 'u'    ); nc = 3; onpass = 'w'
-case( 'w'    ); nc = 6; onpass = 'w'
-case( 'um'   ); onpass = 'w'
-case( 'wm'   ); onpass = 'w'
-case( 'sv'   ); fault = .true.
-case( 'sl'   ); fault = .true.
-case( 'trup' ); fault = .true.
+case( 'x'     ); nc = 3
+case( 'a'     ); nc = 3
+case( 'v'     ); nc = 3
+case( 'u'     ); nc = 3; onpass = 'w'
+case( 'w'     ); nc = 6; onpass = 'w'
+case( 'um'    ); onpass = 'w'
+case( 'wm'    ); onpass = 'w'
+case( 'sv'    ); fault = .true.
+case( 'sl'    ); fault = .true.
+case( 'trup'  ); fault = .true.
+case( 'trise' ); fault = .true.
 end select
 
 ! Select pass
@@ -191,20 +194,21 @@ do i = 1, nc
   write( str, '(a,i2.2,a,a,i1,i6.6)' ) &
     'out/', iz, '/', trim( fieldout(iz) ), i, it
   select case( fieldout(iz) )
-  case( 'x'    ); call iovector( 'w', str, x,  i,   i1, i2, n, nnoff, iz )
-  case( 'a'    ); call iovector( 'w', str, w1, i,   i1, i2, n, nnoff, iz )
-  case( 'v'    ); call iovector( 'w', str, v,  i,   i1, i2, n, nnoff, iz )
-  case( 'u'    ); call iovector( 'w', str, u,  i,   i1, i2, n, nnoff, iz )
-  case( 'w'    );
-    if ( i < 4 )  call iovector( 'w', str, w1, i,   i1, i2, n, nnoff, iz )
-    if ( i > 3 )  call iovector( 'w', str, w2, i-3, i1, i2, n, nnoff, iz )
-  case( 'am'   ); call ioscalar( 'w', str, s1,      i1, i2, n, nnoff, iz )
-  case( 'vm'   ); call ioscalar( 'w', str, s2,      i1, i2, n, nnoff, iz )
-  case( 'um'   ); call ioscalar( 'w', str, s1,      i1, i2, n, nnoff, iz )
-  case( 'wm'   ); call ioscalar( 'w', str, s2,      i1, i2, n, nnoff, iz )
-  case( 'sv'   ); call ioscalar( 'w', str, sv,      i1, i2, n, nnoff, iz )
-  case( 'sl'   ); call ioscalar( 'w', str, sl,      i1, i2, n, nnoff, iz )
-  case( 'trup' ); call ioscalar( 'w', str, trup,    i1, i2, n, nnoff, iz )
+  case( 'x'     ); call iovector( 'w', str, x,  i,   i1, i2, n, nnoff, iz )
+  case( 'a'     ); call iovector( 'w', str, w1, i,   i1, i2, n, nnoff, iz )
+  case( 'v'     ); call iovector( 'w', str, v,  i,   i1, i2, n, nnoff, iz )
+  case( 'u'     ); call iovector( 'w', str, u,  i,   i1, i2, n, nnoff, iz )
+  case( 'w'     );
+    if ( i < 4 )   call iovector( 'w', str, w1, i,   i1, i2, n, nnoff, iz )
+    if ( i > 3 )   call iovector( 'w', str, w2, i-3, i1, i2, n, nnoff, iz )
+  case( 'am'    ); call ioscalar( 'w', str, s1,      i1, i2, n, nnoff, iz )
+  case( 'vm'    ); call ioscalar( 'w', str, s2,      i1, i2, n, nnoff, iz )
+  case( 'um'    ); call ioscalar( 'w', str, s1,      i1, i2, n, nnoff, iz )
+  case( 'wm'    ); call ioscalar( 'w', str, s2,      i1, i2, n, nnoff, iz )
+  case( 'sv'    ); call ioscalar( 'w', str, sv,      i1, i2, n, nnoff, iz )
+  case( 'sl'    ); call ioscalar( 'w', str, sl,      i1, i2, n, nnoff, iz )
+  case( 'trup'  ); call ioscalar( 'w', str, trup,    i1, i2, n, nnoff, iz )
+  case( 'trise' ); call ioscalar( 'w', str, trise,   i1, i2, n, nnoff, iz )
   case default; stop 'fieldout'
   end select
 end do
@@ -241,6 +245,20 @@ if ( master ) then
   write( 9, * ) ' svmaxi = [', svmaxi - nnoff, ']; % max slip velocity loc'
   write( 9, * ) ' slmaxi = [', slmaxi - nnoff, ']; % max slip path length loc'
   close( 9 )
+  if ( it == nt - 1 )
+    j = ihypo(1)
+    k = ihypo(2)
+    l = ihypo(3)
+    tarresthypo = trup(j,k,l) + trise(j,k,l)
+    i1 = maxloc( trup + trise )
+    tarrest = trup(i1(1),i1(2),i1(3)) + trise(i1(1),i1(2),i1(3))
+    call globalmaxloc( tarrest, i1, nnoff )
+    open(  9, file='out/arrest.m', status='replace' )
+    write( 9, * ) ' tarresthypo = ', tarresthypo,  ';'
+    write( 9, * ) ' tarrest     = ', tarrest,      ';'
+    write( 9, * ) ' iarrest     = [', i1 - nnoff, '];'
+    close( 9 )
+  end if
 end if
 
 end subroutine

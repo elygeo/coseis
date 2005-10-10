@@ -68,6 +68,7 @@ real, allocatable, dimension(:,:,:) :: &
   sv,           & ! **slip velocity magnitude
   sl,           & ! **slip path length
   trup,         & ! **rupture time
+  trise,        & ! **rise time
   tn,           & ! temporary storage
   ts,           & ! temporary storage
   f1,           & ! temporary storage
@@ -97,7 +98,7 @@ real :: &
   vrup,         & ! nucleation rupture velocity
   rcrit,        & ! nucleation critical radius
   trelax,       & ! nucleation relaxation time
-  truptol         ! min slip velocity to declare rupture
+  svtol           ! slip velocity tolerance to declare rupture
 
 integer, dimension(3) :: &
   nn,           & ! number of global nodes, count double nodes twice

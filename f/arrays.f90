@@ -80,34 +80,36 @@ allocate(       &
   dc(j,k,l),    &
   co(j,k,l),    &
   area(j,k,l),  &
-  r(j,k,l),     &
+  rhypo(j,k,l), &
   sv(j,k,l),    &
   sl(j,k,l),    &
   trup(j,k,l),  &
+  trise(j,k,l), &
   tn(j,k,l),    &
   ts(j,k,l),    &
   f1(j,k,l),    &
   f2(j,k,l)     )
 
 ! Initial state
-t    =  0.
-v    =  0.
-u    =  0.
-sl   =  0.
-sv   =  0.
-trup =  0.
-p1   =  0.
-p2   =  0.
-p3   =  0.
-p4   =  0.
-p5   =  0.
-p6   =  0.
-g1   =  0.
-g2   =  0.
-g3   =  0.
-g4   =  0.
-g5   =  0.
-g6   =  0.
+t     =  0.
+v     =  0.
+u     =  0.
+sl    =  0.
+sv    =  0.
+trup  =  1e9
+trise =  0.
+p1    =  0.
+p2    =  0.
+p3    =  0.
+p4    =  0.
+p5    =  0.
+p6    =  0.
+g1    =  0.
+g2    =  0.
+g3    =  0.
+g4    =  0.
+g5    =  0.
+g6    =  0.
 
 end subroutine
 end module
