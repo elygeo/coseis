@@ -21,7 +21,7 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 inquire( iolength=reclen ) s1(j1:j2,k1:k2,l1:l2)
-if ( reclen == 0 ) return
+if ( reclen == 0 ) stop 'zero sized output'
 select case( io )
 case( 'r' )
   open( 9, &
@@ -55,7 +55,7 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 inquire( iolength=reclen ) w1(j1:j2,k1:k2,l1:l2,i)
-if ( reclen == 0 ) return
+if ( reclen == 0 ) stop 'zero sized output'
 select case( io )
 case( 'r' )
   open( 9, &

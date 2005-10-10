@@ -33,11 +33,11 @@ if ( ifn /= 0 ) then
     where ( trup < 0. .and. f1 > svtol )
       trup = t - dt * ( .5 + ( svtol - f1 ) / ( sv - f1 ) )
     elsewhere ( sv > svtol )
-      where ( f1 < svtol )
-        trise = t - dt * ( .5 + ( svtol - f1 ) / ( sv - f1 ) ) - trup
-      elsewhere
-        trise = -1.
-      end where
+     !where ( f1 < svtol )
+     !  trise = t - dt * ( .5 + ( svtol - f1 ) / ( sv - f1 ) ) - trup
+     !elsewhere
+     !  trise = -1.
+     !end where
     end where
   end if
   sv = f1

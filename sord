@@ -92,12 +92,12 @@ echo "Run time: at least $wt"
 
 # Write metadata
 cat << END > out/runmeta.m
-login   = '$LOGNAME' ;
-name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )' ;
-date    = '$( date )' ;
-machine = '$machine' ;
-host    = '$HOSTNAME' ;
-os      = '$( uname -a )' ;
+login   = '$LOGNAME';
+name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )';
+date    = '$( date )';
+machine = '$machine';
+host    = '$HOSTNAME';
+os      = '$( uname -a )';
 END
 
 #------------------------------------------------------------------------------#
