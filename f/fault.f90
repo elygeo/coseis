@@ -161,7 +161,7 @@ l1 = i1(3); l2 = i2(3)
 do i = 1, 3
   t3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i)
 end do
-r = sqrt( sum( t3 * t3, 4 ) )
+rhypo = sqrt( sum( t3 * t3, 4 ) )
 
 ! Metadata
 if ( master ) then
@@ -237,9 +237,9 @@ f1 = -tn * f1 + co
 ! Nucleation
 if ( rcrit > 0. .and. vrup > 0. ) then
   f2 = 1.
-  if ( trelax > 0. ) f2 = min( ( t - r / vrup ) / trelax, 1. )
+  if ( trelax > 0. ) f2 = min( ( t - rhypo / vrup ) / trelax, 1. )
   f2 = ( 1. - f2 ) * ts + f2 * ( -tn * mud + co )
-  where ( r < min( rcrit, t * vrup ) .and. f2 < f1 ) f1 = f2
+  where ( rhypo < min( rcrit, t * vrup ) .and. f2 < f1 ) f1 = f2
 end if
 
 ! Shear traction bounded by friction

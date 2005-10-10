@@ -64,7 +64,7 @@ real, allocatable, dimension(:,:,:) :: &
   dc,           & ! slip weakening distance
   co,           & ! cohesion
   area,         & ! fault element area
-  r,            & ! radius to hypocenter
+  rhypo,        & ! radius to hypocenter
   sv,           & ! **slip velocity magnitude
   sl,           & ! **slip path length
   trup,         & ! **rupture time
