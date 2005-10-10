@@ -42,8 +42,8 @@ area  = f1;				% fault element area
 rhypo = f1;				% radius to hypocenter
 vs    = f1;				% **slip velocity
 us    = f1;				% **slip
-trup  = f1 - 1e9;			% **rupture time
-trise = f1 + 1e9;			% **rise time
+trup  = f1 - 1.;			% **rupture time
+trise = f1 - 1.;			% **rise time
 
 i1 = [ 0 0 0 ];
 i2 = [ 0 0 0 ];

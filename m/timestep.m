@@ -1,4 +1,5 @@
 % Time integration
+
 it = it + 1;
 t  = t  + dt;
 v  = v  + dt * w1;
@@ -19,22 +20,16 @@ if ifn, then
   k3 = i1(2); k4 = i2(2);
   l3 = i1(3); l4 = i2(3);
   t1 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:);
-  sv = sqrt( sum( t1 * t1, 4 ) );
-  sl = sl + dt * sv;
-  where ( trup == 0. .and. sv > truptol ) trup = t;
-  % Rupture time
-  if truptol
-    i1 = ihypo;
-    i1(ifn) = 1;
-    l = i1(3);
-    k = i1(2);
-    j = i1(1);
-    i = vs > truptol;
-    if find( i )
-      tarrest = t;
-      if i(j,k,l), tarresthypo = tarrest; end
-      trup( i & ( ~ trup ) ) = t;
-    end
+  f1 = sqrt( sum( t1 * t1, 4 ) );
+  if svtol > 0.
+    i = trup < 0. & f1 > svtol;
+    trup(i) = t - dt * ( .5 + (svtol - f1(i)) ./ (sv(i) - f1(i)) );
+    i = sv > svtol & f1 < svtol;
+    trise(i) = t - dt * ( .5 + (svtol - f1(i)) ./ (sv(i) - f1(i)) ) - trup(i);
+    i = sv > svtol & f1 > svtol;
+    trise(i) = -1.
   end
+  sv = f1;
+  sl = sl + dt * sv;
 end if
 

@@ -1,3 +1,5 @@
+% Zone selection
+
 function [ i1, i2 ] = zone( i1, i2, nn, noff, ihypo, ifn )
 
 shift = [ 0 0 0 ];

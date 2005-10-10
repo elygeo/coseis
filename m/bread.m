@@ -1,3 +1,5 @@
+% Binary read
+
 function s1 = bread( filename, endian )
 
 endian = textread( 'data/endian', '%c', 1 );
