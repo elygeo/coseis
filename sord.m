@@ -1,7 +1,4 @@
-%------------------------------------------------------------------------------%
-% SORD
-
-fprintf( '\nSORD - Support Operator Rupture Dynamics\n' )
+% SORD - main program
 
 %profile report
 %profile plot
@@ -12,17 +9,20 @@ fprintf( '\nSORD - Support Operator Rupture Dynamics\n' )
 clear all
 addpath m
 
+fprintf( '\nSORD - Support Operator Rupture Dynamics\n' )
+
 clean
 inread
 setup
 arrays
-init = 1; viz
+viz
 gridgen
 matetial
-init = 1; fault
-init = 1; momentsource
-init = 2; viz, viz
-init = 1; output
+fault
+momentsource
+output
+viz
+viz
 
 if gui
   control

@@ -3,6 +3,7 @@
 % Star-P
 p = 1;
 
+init = 1;
 pass = 'v';
 breakon = 'v';
 gui = 1;

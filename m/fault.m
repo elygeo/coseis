@@ -4,7 +4,6 @@ if ~ifn; return; end
 
 if init
 
-init = 0;
 fprintf( 'Initialize fault\n' )
 
 % Input
@@ -172,6 +171,7 @@ fprintf( fid, 's      = %g; % strength paramater\n',             s      );
 fprintf( fid, 'lc     = %g; % breakdown width\n',                lc     );
 fprintf( fid, 'rctest = %g; % rcrit for spontaneous rupture \n', rctest );
 close( fid )
+
 return
 
 end

@@ -38,8 +38,8 @@ case 'v',  fscl = vscl;  titles = { '|V|' 'Vx' 'Vy' 'Vz' };
 case 'u',  fscl = uscl;  titles = { '|U|' 'Ux' 'Uy' 'Uz' }; breakon = 'w';
 case 'w',  fscl = wscl;  breakon = 'w'; cellfocus = 1;
            titles = { '|W|' 'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
-case 'us', fscl = usscl; titles = { 'Us' 'Us' }; isfault = 1;
-case 'vs', fscl = vsscl; titles = { 'Vs' 'Vs' }; isfault = 1;
+case 'sl', fscl = usscl; titles = { 'lslip' 'lslip' }; isfault = 1;
+case 'sv', fscl = vsscl; titles = { 'Vslip' 'Vslip' }; isfault = 1;
 case 'tn', fscl = tnscl; titles = { 'Tn' 'Tn' }; isfault = 1;
 case 'ts', fscl = tsscl; titles = { 'Ts' 'Ts' }; isfault = 1;
 otherwise error 'field'

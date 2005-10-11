@@ -1,7 +1,6 @@
 % Output
 
 if init
-  init = 0;
   fprintf( 'Initialize output\n' )
   s1(:) = 0.;
   s2(:) = 0.;

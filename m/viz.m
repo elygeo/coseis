@@ -4,21 +4,22 @@
 % initial plot: mesh, prestress, hypo
 % restart capable
 
+if init, init = init + 1; end
+if init > 3, init = 0; end
+
 if plotstyle, else
-  init = 0;
   gui = 0;
   return
 end
 
-if init == 1
-  init = 0;
+switch init
+case 2
   if ~ishandle(1), figure(1), end
   set( 0, 'CurrentFigure', 1 )
   clf
   drawnow
   return
-elseif init
-  init = 0;
+case 3
   fprintf( 'Initialize visualization\n' )
   plotinterval = 1;
   holdmovie = 0;
@@ -176,6 +177,4 @@ if savemovie && ~holdmovie
   file = sprintf( 'out/viz/%06d', count );
   saveas( gcf, file )
 end
-
-init = 0;
 

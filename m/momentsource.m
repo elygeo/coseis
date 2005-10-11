@@ -4,7 +4,6 @@ if rsource <= 0.; return; end
 
 if init
 
-init = 0;
 fprintf( 'Moment source\n' )
 
 % Indeices
