@@ -31,7 +31,7 @@ USAGE
     -m  use MATLAB backend (default is Fortran)
     -c  setup and compile, do not run
     -n  setup only, do not compile or run
-    -g  use debugging and syntax checking flags
+    -g  compile with debugging and syntax checking flags
     -G  run in debugger
     -d  delete output from previous run before starting
 
@@ -41,26 +41,26 @@ USAGE
 
 COORDINATE SYSTEM
  
-      v---------v                        o----x----o         w----1----w
-     /         /|                       /         /|        /         /|
-    /    .----. |            k         y    3----y |       2    z----2 |
-   /    /|   /| |           /         /    /|   /| z      /    /    /| 3
-  v----.----v | |     j----0         o----x----o | |     w----1----w | |
-  |    | w--|-' |          |         |    | w--|-1 |     |    |    | x |
-  |    |/   |/  v          |         |    |/   |/  o     |    |    |/  w
-  |    '----'  /           l         z    2----z  /      3    y----3  / 
-  |         | /                      |         | y       |         | y  
-  |         |/                       |         |/        |         |/   
-  v---------v                        o----x----o         w----1----w    
-                                                       
-  Non-staggered                      Staggered (1)       Staggered (2)
-                                   
-  v: v = velocity                    1 2 3: vx vy vz = velocity        
-     u = displacement                x y z: wyz wzx wxy = shear stress 
-     x = node locations                  w: wxx wyy wzz = normal stress
-     rho = density                          rho lam mu = material props
-  w: w = stress                             x = node locations (2) 
-     lam mu = elastic moduli             o: x = node locations (1) 
+      v---------v                   o----x----o         w----1----w
+     /         /|                  /         /|        /         /|
+    .----.    / |       l         z----2    z |       3----y    3 |
+   /|   /|   /  |      /         /|   /|   /  y      /|   /    /  2
+  v----.----v   |     0----j    o----x----o   |     w----1----w   |
+  | '--|-w  |   |     |         | 1--|-w  |   |     | x  |    |   |
+  |/   |/   |   v     |         |/   |/   |   o     |/   |    |   w
+  '----'    |  /      k         y----3    y  /      2----z    2  / 
+  |         | /                 |         | z       |         | 3  
+  |         |/                  |         |/        |         |/   
+  v---------v                   o----x----o         w----1----w    
+
+  Non-staggered                 Staggered (1)       Staggered (2)
+                               
+  v: v = velocity               1 2 3: vx vy vz = velocity        
+     u = displacement           x y z: wyz wzx wxy = shear stress 
+     x = node locations             w: wxx wyy wzz = normal stress
+     rho = density                     rho lam mu = material props
+  w: w = stress                        x = node locations (2) 
+     lam mu = elastic moduli        o: x = node locations (1) 
 
 
 COMPUTATIONAL CYCLE
@@ -288,22 +288,22 @@ Rigid Body: 6 = 3 translation + 3 rotation
 
 Uniform strain: 6
 
-   0----x      .----O      .----.      .----.
-  /|          /|   /|     /|   /|     /|   /|
- y |         .----O |    O----O |    .----. |
-   z         | '--|-O    | '--|-'    | O--|-O
-             |/   |/     |/   |/     |/   |/ 
-             '----O      O----O      O----O  
+   l           .----O      .----.      0----0
+  /           /|   /|     /|   /|     /|   /|
+ 0----j      .----O |    .----. |    .----. |
+ |           | '--|-O    | 0--|-0    | O--|-O
+ |           |/   |/     |/   |/     |/   |/ 
+ k           '----O      O----O      '----'  
                Z1          Z2          Z3
 
 Nonuniform strain: 12 = 24 DOF - 6 rigid body - 6 uniform strain
 
-   .----.      .----O      .----O      O----.
+   0----0      0----.      .----0      .----0
   /|   /|     /|   /|     /|   /|     /|   /|
- O----O |    .----O |    O----. |    .----O |
- | O--|-O    | O--|-'    | '--|-O    | '--|-O
+ .----. |    .----0 |    .----0 |    0----. |
+ | '--|-'    | 0--|-'    | 0--|-'    | 0--|-'
  |/   |/     |/   |/     |/   |/     |/   |/ 
- '----'      O----'      O----'      O----'  
+ 0----0      '----0      0----'      '----0  
   Z2 Z3       Z3 Z1       Z1 Z2      Z1 Z2 Z3
 
 Y = mu*(lamda+mu)/6/(lamda+2*mu)
