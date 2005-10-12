@@ -8,7 +8,6 @@ if haveanalytical
 end
 
 n = length( labels ) - 1;
-if n > 1
 for i = 1 : n
   [ tmp, ii ] = max( abs( vg(:,i) ) );
   iii = max( 1, ii - 1 );
@@ -19,7 +18,6 @@ for i = 1 : n
   else
     text( xg1, xg2, labels(i+1), 'Hor', 'right', 'Ver', 'top' )
   end
-end
 end
 
 ylabel( labels(1) )

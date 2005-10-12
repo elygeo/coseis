@@ -4,7 +4,7 @@
 % search through outpur for desired timeseries data
 % try to find analytica solution as well if known
 
-clear tg xg vg va ta
+clear tg xg rg vg va ta
 
 % Read metadata if SORD not running
 if ~exist( 'sordrunning', 'var' )
@@ -98,8 +98,7 @@ if dofilter
   n = 2 * round( 1 / ( fcorner * dt ) );
   b = .5 * ( 1 - cos( 2 * pi * ( 1 : n - 1 ) / n ) );  % hanning
   a  = sum( b );
-  vg = filter( b, a, [ vg; zeros( n - 1, size( vg, 2 ) ) ] );
-  tg = [ tg tg(end) + dt * ( 1 : n - 1 ) ];
+  vg = filter( b, a, vg );
 end
 
 % Find analytical solution for known cases
@@ -118,6 +117,9 @@ if explosion
   end
   if dofilter, va = filter( b, a, va ); end
   ta = tg + rg / vp;
+  i = ta <= tg(end);
+  ta = ta(i);
+  va = va(i);
 elseif kostrov
   c = .81;
   dtau = ts0 - mud0 * tn0;
@@ -125,6 +127,9 @@ elseif kostrov
      ./ sqrt( tg .* ( tg + 2 * rg / vrup ) );
   if dofilter, va = filter( b, a, va ); end
   ta = tg + rg / vrup;
+  i = ta <= tg(end);
+  ta = ta(i);
+  va = va(i);
 end
 
 % Labels
@@ -138,8 +143,8 @@ case 'am',    labels = { 'Acceleration'  '|A|' };
 case 'vm',    labels = { 'cceleration'   '|V|' };
 case 'um',    labels = { 'Displacement'  '|U|' };
 case 'wm',    labels = { 'Stress'        '|W|' };
-case 'sv',    labels = { 'Slip Velocity' sprintf( 'r=%g', rg ) };
-case 'sl',    labels = { 'Slip Length'   sprintf( 'r=%g', rg ) };
+case 'sv',    labels = { 'Slip Velocity' 'Vslip' };
+case 'sl',    labels = { 'Slip Length'   'lslip' };
 case 'tn',    labels = { 'Normal Traction' 'Tn' };
 case 'ts',    labels = { 'Shear Traction'  'Ts' };
 case 'trup',  labels = { 'Rupture Time'  'trup' };
