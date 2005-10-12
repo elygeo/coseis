@@ -77,19 +77,19 @@ cell = 0;
 isfault = 0;
 static = 0;
 switch fieldout{iz}
-case 'x',     static = 1; nc = 3;
-case 'a',     nc = 3;
-case 'v',     nc = 3;
-case 'u',     onpass = 'w'; nc = 3;
-case 'w',     onpass = 'w'; nc = 6; cell = 1;
-case 'am'     
-case 'vm'     
-case 'um',    onpass = 'w';
-case 'wm',    onpass = 'w'; cell = 1;
-case 'sl',    isfault = 1;
-case 'sv',    isfault = 1;
-case 'trup',  isfault = 1;
-case 'trise', isfault = 1;
+case 'x',    static = 1; nc = 3;
+case 'a',    nc = 3;
+case 'v',    nc = 3;
+case 'u',    onpass = 'w'; nc = 3;
+case 'w',    onpass = 'w'; nc = 6; cell = 1;
+case 'am'
+case 'vm'
+case 'um',   onpass = 'w';
+case 'wm',   onpass = 'w'; cell = 1;
+case 'sl',   isfault = 1;
+case 'sv',   isfault = 1;
+case 'trup', isfault = 1;
+case 'tarr', isfault = 1;
 otherwise error( [ 'fieldout: ' fieldout{iz} ] )
 end
 if isfault && ~ifn; ditout(iz) = 0; end
@@ -100,11 +100,11 @@ if cell; i2 = i2 - 1; end
 % Metadata
 file = sprintf( 'out/%02d/meta.m', iz );
 fid = fopen( file, 'w' );
-fprintf( fid, '  field = ''%s''; % varial name\n',   outfield{iz} );
-fprintf( fid, '  nc  = %g; % # of components\n',     nc );
-fprintf( fid, '  dit = %g; % interval\n',            ditout(iz) );
-fprintf( fid, '  i1  = [%g %g %g]; % start index\n', i1 - nnoff );
-fprintf( fid, '  i2  = [%g %g %g]; % end index\n',   i2 - nnoff );
+fprintf( fid, 'field = ''%s''; % varial name\n',   outfield{iz} );
+fprintf( fid, 'nc    =  %g; % # of components\n',     nc );
+fprintf( fid, 'dit   =  %g; % interval\n',            ditout(iz) );
+fprintf( fid, 'i1    = [%g %g %g]; % start index\n', i1 - nnoff );
+fprintf( fid, 'i2    = [%g %g %g]; % end index\n',   i2 - nnoff );
 fclose( fid );
 
 if isfault
@@ -120,21 +120,21 @@ for i = 1:nc
   file = sprintf( 'out/%02d/%s%1d%06d', iz, fieldout{iz}, i, it );
   fid = fopen( file, 'w' );
   switch fieldout{iz}
-  case 'x',     fwrite( fid, x(j,k,l,i),    'float32' );
-  case 'a',     fwrite( fid, w1(j,k,l,i),   'float32' );
-  case 'v',     fwrite( fid, v(j,k,l,i),    'float32' );
-  case 'u',     fwrite( fid, u(j,k,l,i),    'float32' );            
-  case 'w'      
-    if i < 4,   fwrite( fid, w1(j,k,l,i),   'float32' ); end
-    if i > 3,   fwrite( fid, w2(j,k,l,i-3), 'float32' ); end
-  case 'am',    fwrite( fid, s1(j,k,l),     'float32' );
-  case 'vm',    fwrite( fid, s2(j,k,l),     'float32' );
-  case 'um',    fwrite( fid, s1(j,k,l),     'float32' );
-  case 'wm',    fwrite( fid, s2(j,k,l),     'float32' );
-  case 'sv',    fwrite( fid, sv(j,k,l),     'float32' );
-  case 'sl',    fwrite( fid, sl(j,k,l),     'float32' );
-  case 'trup',  fwrite( fid, trup(j,k,l),   'float32' );
-  case 'trise', fwrite( fid, trise(j,k,l),  'float32' );
+  case 'x',    fwrite( fid, x(j,k,l,i),    'float32' );
+  case 'a',    fwrite( fid, w1(j,k,l,i),   'float32' );
+  case 'v',    fwrite( fid, v(j,k,l,i),    'float32' );
+  case 'u',    fwrite( fid, u(j,k,l,i),    'float32' );            
+  case 'w'
+    if i < 4,  fwrite( fid, w1(j,k,l,i),   'float32' ); end
+    if i > 3,  fwrite( fid, w2(j,k,l,i-3), 'float32' ); end
+  case 'am',   fwrite( fid, s1(j,k,l),     'float32' );
+  case 'vm',   fwrite( fid, s2(j,k,l),     'float32' );
+  case 'um',   fwrite( fid, s1(j,k,l),     'float32' );
+  case 'wm',   fwrite( fid, s2(j,k,l),     'float32' );
+  case 'sv',   fwrite( fid, sv(j,k,l),     'float32' );
+  case 'sl',   fwrite( fid, sl(j,k,l),     'float32' );
+  case 'trup', fwrite( fid, trup(j,k,l),   'float32' );
+  case 'tarr', fwrite( fid, tarr(j,k,l),   'float32' );
   otherwise error( [ 'fieldout: ' fieldout{iz} ] )
   end
   fclose( fid );
@@ -148,7 +148,7 @@ if pass == 'w', return, end
 %------------------------------------------------------------------------------%
 
 if itcheck && ~mod( it, itcheck )
-  save 'out/ckp' it t u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 sv sl trup trise
+  save 'out/ckp' it t u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 sv sl trup tarr
 end
 
 fid = fopen( 'out/timestep', 'w' );

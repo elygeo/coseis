@@ -22,12 +22,12 @@ if ifn, then
   t1 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:);
   f1 = sqrt( sum( t1 * t1, 4 ) );
   if svtol > 0.
-    i = trup < 0. & f1 > svtol;
+    i = f1 >= svtol & trup > 1e8;
     trup(i) = t - dt * ( .5 + (svtol - f1(i)) ./ (sv(i) - f1(i)) );
-    i = sv > svtol & f1 < svtol;
-    trise(i) = t - dt * ( .5 + (svtol - f1(i)) ./ (sv(i) - f1(i)) ) - trup(i);
-    i = sv > svtol & f1 > svtol;
-    trise(i) = -1.
+    i = f1 >= svtol;
+    tarr(i) = 1e9
+    i = sv >= svtol & f1 < svtol;
+    tarr(i) = t - dt * ( .5 + (svtol - f1(i)) ./ (sv(i) - f1(i)) );
   end
   sv = f1;
   sl = sl + dt * sv;

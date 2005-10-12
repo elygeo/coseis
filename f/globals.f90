@@ -68,7 +68,7 @@ real, allocatable, dimension(:,:,:) :: &
   sv,           & ! **slip velocity magnitude
   sl,           & ! **slip path length
   trup,         & ! **rupture time
-  trise,        & ! **rise time
+  tarr,         & ! **rise time
   tn,           & ! temporary storage
   ts,           & ! temporary storage
   f1,           & ! temporary storage

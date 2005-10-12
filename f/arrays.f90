@@ -84,7 +84,7 @@ allocate(       &
   sv(j,k,l),    &
   sl(j,k,l),    &
   trup(j,k,l),  &
-  trise(j,k,l), &
+  tarr(j,k,l),  &
   tn(j,k,l),    &
   ts(j,k,l),    &
   f1(j,k,l),    &
@@ -97,7 +97,7 @@ u     =  0.
 sl    =  0.
 sv    =  0.
 trup  =  1e9
-trise =  0.
+tarr  =  0.
 p1    =  0.
 p2    =  0.
 p3    =  0.

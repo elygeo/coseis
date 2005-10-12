@@ -30,12 +30,13 @@ if ( ifn /= 0 ) then
   t1 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
   f1 = sqrt( sum( t1 * t1, 4 ) )
   if ( svtol > 0. ) then
-    where ( trup > 1e8 .and. f1 >= svtol )
+    where ( f1 >= svtol .and. trup > 1e8 )
       trup = t - dt * ( .5 + ( svtol - f1 ) / ( sv - f1 ) )
-    elsewhere ( sv >= svtol .and. f1 < svtol )
-      trise = t - dt * ( .5 + ( svtol - f1 ) / ( sv - f1 ) ) - trup
+    end where
+    where ( f1 >= svtol )
+      tarr = 1e9
     elsewhere ( sv >= svtol )
-      trise = 1e9
+      tarr = t - dt * ( .5 + ( svtol - f1 ) / ( sv - f1 ) )
     end where
   end if
   sv = f1

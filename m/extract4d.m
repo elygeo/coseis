@@ -14,26 +14,26 @@ if exist( 'sordrunning', 'var' ) & i1s(4) == it
   l = i1s(3):i2s(3);
   i = i1s(5):i2s(5);
   switch vizfield
-  case 'x',     vg = x(j,k,l,i);
-  case 'a',     vg = w1(j,k,l,i);
-  case 'v',     vg = v(j,k,l,i);
-  case 'u',     vg = u(j,k,l,i);
+  case 'x',    vg = x(j,k,l,i);
+  case 'a',    vg = w1(j,k,l,i);
+  case 'v',    vg = v(j,k,l,i);
+  case 'u',    vg = u(j,k,l,i);
   case 'w'
     i1 = find(i<4);
     i2 = find(i>3) - 3;
     vg = zeros( n([1 2 3 5]) );
     vg(:,:,:,i1)   = w1(j,k,l,i1);
     vg(:,:,:,i2+3) = w2(j,k,l,i2);
-  case 'am',    vg = s1(j,k,l);
-  case 'vm',    vg = s2(j,k,l);
-  case 'um',    vg = s1(j,k,l);
-  case 'wm',    vg = s2(j,k,l);
-  case 'sv',    vg = sv(j,k,l);
-  case 'sl',    vg = sl(j,k,l);
-  case 'tn',    vg = tn(j,k,l);
-  case 'ts',    vg = ts(j,k,l);
-  case 'trup',  vg = trup(j,k,l);
-  case 'trise', vg = trise(j,k,l);
+  case 'am',   vg = s1(j,k,l);
+  case 'vm',   vg = s2(j,k,l);
+  case 'um',   vg = s1(j,k,l);
+  case 'wm',   vg = s2(j,k,l);
+  case 'sv',   vg = sv(j,k,l);
+  case 'sl',   vg = sl(j,k,l);
+  case 'tn',   vg = tn(j,k,l);
+  case 'ts',   vg = ts(j,k,l);
+  case 'trup', vg = trup(j,k,l);
+  case 'tarr', vg = tarr(j,k,l);
   otherwise error 'fieldin'
   end
   return
