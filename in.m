@@ -1,6 +1,8 @@
+% Kostrov test
+
   nn = [ 41 41 42 ];
-  nn = [ 81 81 42 ];
-  nt = 400;
+  nn = [ 81 81 82 ];
+  nt = 300;
   bc = [ 0 0 1   0 0 1 ];
 
   faultnormal = 3;
