@@ -88,7 +88,10 @@ if pointsource
     for i = 1:3
       rot(i,:) = rot(i,:) ./ tmp;
     end
-    vg = vg * rot;
+    switch nc
+    case 3, vg = vg * rot;
+    case 6
+    end
   end
 end
 
@@ -152,7 +155,7 @@ case 'tarr', labels = { 'Arrest Time'   'tarr' };
 otherwise error 'vizfield'
 end
 
-if explosion
+if pointsource
   switch vizfield
   case 'x',   labels = { 'Position'     'r' 'h' 'v' };
   case 'a',   labels = { 'Acceleration' 'Ar' 'Ah' 'Az' };

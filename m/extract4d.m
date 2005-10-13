@@ -1,5 +1,5 @@
 % Extract 4D slice from memory or disk
-% input: iz i1s i2s fieldin it
+% input: iz i1s i2s fieldin it outdir
 
 % Array slice
 msg = '';
@@ -8,7 +8,9 @@ i = i1s < 0; i1s(i) = i1s(i) + n(i) + 1;
 i = i2s < 0; i2s(i) = i2s(i) + n(i) + 1;
 
 % Use in memory data if available
-if exist( 'sordrunning', 'var' ) & i1s(4) == it
+if exist( 'sordrunning', 'var' )
+outdir = 'out';
+if i1s(4) == it
   j = i1s(1):i2s(1);
   k = i1s(2):i2s(2);
   l = i1s(3):i2s(3);
@@ -38,13 +40,15 @@ if exist( 'sordrunning', 'var' ) & i1s(4) == it
   end
   return
 end
+end
 
 % Look for file with desired data
 n = i2s - i1s + 1;
 if all( n ~= 1 ), error 'trying to read 5 dimensions', end
 if prod(n) > 1e8, error 'too big', end
+if ~exist( 'outdir', 'var' ) , outdir = 'out'; end
 cwd = pwd;
-cd 'out'
+cd( outdir )
 meta
 if ~iz, iz = 1:nout; end
 found = 0;

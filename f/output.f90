@@ -245,7 +245,6 @@ if ( master ) then
   write( 9, * ) 'slmaxi = [', slmaxi - nnoff, ']; % max slip path length loc'
   close( 9 )
   if ( ifn /= 0 .and. it == nt - 1 ) then
-    tarrhypo = tarr(j,k,l)
     i1 = maxloc( tarr )
     j = i1(1)
     k = i1(2)

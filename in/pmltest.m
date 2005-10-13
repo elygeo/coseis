@@ -1,11 +1,10 @@
 % PML damping test
 
-  model = 'explosion';
   nn = [ 81 81 81 ];
   nn = [ 41 41 41 ];
   ihypo = [ 21 21 21 ];
-  bc = [ 1 1 1   1 1 1 ];
   bc = [ 1 1 1   0 0 0 ];
+  bc = [ 1 1 1   1 1 1 ];
   nt = 200;
   faultnormal = 0;
   rsource = 150.;

@@ -6,51 +6,36 @@ isoval = isofrac * fscl;
 if comp, isoval = isoval * [ -1 1 ]; end
 for iz = 1:size( i1volume, 1 )
   [ i1, i2 ] = zone( i1volume(iz,:), i2volume(iz,:), nn, nnoff, ihypo, ifn );
-  if cellfocus, i2 = i2 - 1; end
-  l = i1(3):i2(3);
-  k = i1(2):i2(2);
-  j = i1(1):i2(1);
-  ng = i2 - i1 + 1;
-  if any( ng <= 1 ), error 'volume', end
-  switch vizfield
-  case 'a'
-    if comp, vg = w1(j,k,l,comp); 
-    else     vg = s1(j,k,l);
-    end
-  case 'v'
-    if comp, vg = v(j,k,l,comp); 
-    else     vg = s2(j,k,l);
-    end
-  case 'u'
-    if comp, vg = u(j,k,l,comp); 
-    else     vg = s1(j,k,l);
-    end
-  case 'w'
-    switch ifn
-    case 1, j(j==ihypo(1)) = [];
-    case 2, k(k==ihypo(2)) = [];
-    case 3, l(l==ihypo(3)) = [];
-    end
-    if     comp > 3, vg = w2(j,k,l,comp-3); 
-    elseif comp,     vg = w1(j,k,l,comp); 
-    else             vg = s2(j,k,l); 
-    end
-  otherwise return
-  end
-  if ~cellfocus
-    xg = x(j,k,l,:) + xscl * u(j,k,l,:); 
+  vfsave = vizfield;
+  if xscl > 0.
+    vizfield = 'u';
+    i1s = [ i1 it ];
+    i2s = [ i2 it ];
+    extract4d
+    xg = xscl * vg;
   else
-    xg = 0.125 * ( ( ...
-      x(j,k,l,:) + x(j+1,k+1,l+1,:) + ...
-      x(j+1,k,l,:) + x(j,k+1,l+1,:) + ...
-      x(j,k+1,l,:) + x(j+1,k,l+1,:) + ...
-      x(j,k,l+1,:) + x(j+1,k+1,l,:) ) + ...
-      xscl * ( ...
-      u(j,k,l,:) + u(j+1,k+1,l+1,:) + ...
-      u(j+1,k,l,:) + u(j,k+1,l+1,:) + ...
-      u(j,k+1,l,:) + u(j+1,k,l+1,:) + ...
-      u(j,k,l+1,:) + u(j+1,k+1,l,:) ) );
+    xg = 0;
   end
+  vizfield = 'x';
+  i1s = [ i1 0 ];
+  i2s = [ i2 0 ];
+  extract4d
+  xg = xg + vg;
+  if cellfocus
+    i2 = i2 - 1;
+    l = i1(3):i2(3);
+    k = i1(2):i2(2);
+    j = i1(1):i2(1);
+    xg = 0.125 * ( ...
+      xg(j,k,l,:) + xg(j+1,k+1,l+1,:) + ...
+      xg(j+1,k,l,:) + xg(j,k+1,l+1,:) + ...
+      xg(j,k+1,l,:) + xg(j+1,k,l+1,:) + ...
+      xg(j,k,l+1,:) + xg(j+1,k+1,l,:) );
+  end
+  vizfield = vfsave;
+  i1s = [ i1 it ];
+  i2s = [ i2 it ];
+  extract4d
   vg = permute( vg, [2 1 3] );
   xg = permute( xg, [2 1 3 4] );
   for i = 1:length( isoval );

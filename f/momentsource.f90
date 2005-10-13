@@ -51,12 +51,14 @@ allocate( srcfr(nsrc), jj(nsrc), kk(nsrc), ll(nsrc) )
 ! Spatial weighting
 select case( rfunc )
 case( 'box'  ); srcfr = 1.
-case( 'tent' ); srcfr = rsource - pack( s2, s2 <= rsource )
+case( 'tent' ); srcfr = rsource !- pack( s2, s2 <= rsource )
 case default; stop 'rfunc'
 end select
 
 ! Normalize and divide by cell volume
-srcfr = srcfr / sum( srcfr ) / pack( s1, s2 <= rsource )
+! srcfr = srcfr / sum( srcfr ) / pack( s1, s2 <= rsource )
+print *, 1234
+!srcfr = pack( s2, s2 <= rsource )
 
 ! Index map
 i = 0
