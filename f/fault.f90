@@ -22,7 +22,8 @@ init = .false.
 if ( master ) print '(a)', 'Initialize fault'
 
 ! Test if fault plane exists on this processor
-if ( ihypo(ifn) < i1node(ifn) .or. ihypo(ifn) > i2node(ifn) ) then
+i = ihypo(ifn)
+if ( i < i1node(ifn) .or. i > i2node(ifn) ) then
   ifn = 0
   return
 end if

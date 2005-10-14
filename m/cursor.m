@@ -1,15 +1,18 @@
 % Data cursor
 
+% Movement
 way = sign( cursormove );
 cursormove = abs( cursormove );
-if cursormove == 4
+switch cursormove
+case 0
+case 4
   icursor = ihypo;
   if ifn, islice = ifn; end
-elseif cursormove == 5
+case 5
   icursor = ihypo;
   icursor(idown) = 1;
   islice = idown;
-elseif cursormove == 6
+case 6
   imax = ihypo;
   switch vizfield
   case 'a', imax = iamax;
@@ -20,7 +23,7 @@ elseif cursormove == 6
   end
   [ j, k, l ] = ind2sub( nm, imax );
   icursor = [ j k l ];
-else
+otherwise
   v1 = camup;
   v3 = camtarget - campos;
   v2 = cross( v3, v1 );
@@ -32,82 +35,93 @@ else
   tmp = [ sign( v1(i1) ) sign( v2(i2) ) sign( v3(i3) ) ];
   way = way * tmp(cursormove);
   cursormove = i(cursormove);
-  islice = abs( cursormove );
-  i = islice;
+  i = abs( cursormove );
   if length( hhud ), icursor(i) = icursor(i) + way; end
   icursor = max( icursor, i1node );
   icursor = min( icursor, i2node - cellfocus );
 end
 delete( [ hhud hhelp ] )
 hhelp = [];
-j = icursor(1);
-k = icursor(2);
-l = icursor(3);
-clear xg xga
+
+% Position
+vizfield = 'x';
+i1s = [ icursor - nnoff 0 ];
+i2s = [ icursor - nnoff + cellfocus 0 ];
+ic = 0;
+get4dsection
+if msg, error( msg ), end
 if cellfocus
-  for i = 1:3
-    xg(i) = 0.125 * ( ...
-      x(j,k,l,i) + x(j+1,k+1,l+1,i) + ...
-      x(j+1,k,l,i) + x(j,k+1,l+1,i) + ...
-      x(j,k+1,l,i) + x(j+1,k,l+1,i) + ...
-      x(j,k,l+1,i) + x(j+1,k+1,l,i) );
-    xga(i) = xg(i) + 0.125 * xscl * ( ...
-      u(j,k,l,i) + u(j+1,k+1,l+1,i) + ...
-      u(j+1,k,l,i) + u(j,k+1,l+1,i) + ...
-      u(j,k+1,l,i) + u(j+1,k,l+1,i) + ...
-      u(j,k,l+1,i) + u(j+1,k+1,l,i) );
-  end
-else
-  xg(1:3) = x(j,k,l,:);
-  xga(1:3) = x(j,k,l,:) + xscl * u(j,k,l,:);
+  vg = 0.125 * ( ...
+    vg(1,1,1,:) + vg(2,2,2,:) + ...
+    vg(2,1,1,:) + vg(1,2,2,:) + ...
+    vg(1,2,1,:) + vg(2,1,2,:) + ...
+    vg(1,1,2,:) + vg(2,2,1,:) );
 end
-xcursor = double( xga(:)' );
-mga = [];
-vga = [];
+xg = vg(:)';
+
+% Displacement
+if xscl <= 0.
+  vg = 0;
+else
+  vizfield = 'u';
+  i1s = [ icursor - nnoff it ];
+  i2s = [ icursor - nnoff + cellfocus it ];
+  ic = 0;
+  get4dsection
+  if msg, error( msg ), end
+  if cellfocus
+    vg = 0.125 * ( ...
+      vg(1,1,1,:) + vg(2,2,2,:) + ...
+      vg(2,1,1,:) + vg(1,2,2,:) + ...
+      vg(1,2,1,:) + vg(2,1,2,:) + ...
+      vg(1,1,2,:) + vg(2,2,1,:) );
+  end
+  vg = vg(:)';
+end
+xcursor = double( xg + xscl * vg );
+
+% Value
+vizfield = vfsave;
+i1s = [ icursor - nnoff it ];
+i2s = [ icursor - nnoff + cellfocus it ];
+ic = 0;
+get4dsection
+if msg, error( msg ), end
+vg = vg(:)';
+
+% Magnitude
+switch length( vg )
+case 3
+  mg = sum( sqrt( vg .* vg ) );
+case 6
+  c = [ 1 6 5; 6 2 4; 5 4 3 ];
+  [ vec, val ] = eig( vg(c) );
+  val = diag( val );
+  [ tmp, i ] = sort( abs( val ) );
+  val = val(i);
+  vec = vec(:,i);
+  mg = val';
+  wg = vec(:)';
+end
+
 msg = '';
 switch vizfield
-case 'vs'
-  i = [ j k l ];
-  if ifn, i(ifn) = 1; end
-  j = i(1); k = i(2); l = i(3);
-  msg = sprintf( 'Vs %9.2e', vs(j,k,l) );
-case 'us'
-  i = [ j k l ];
-  if ifn, i(ifn) = 1; end
-  j = i(1); k = i(2); l = i(3);
-  msg = sprintf( 'Us %9.2e', us(j,k,l) );
-case 'a'
-  if pass ~= 'w'
-    vga(1:3) = w1(j,k,l,:);
-    mga = sqrt( sum( vga .* vga ) );
-    msg = sprintf( '|A| %9.2e\nAx  %9.2e\nAy  %9.2e\nAz  %9.2e', [ mga vga ] );
-  end
-case 'v'
-  vga(1:3) = v(j,k,l,:);
-  mga = sqrt( sum( vga .* vga ) );
-  msg = sprintf( '|V| %9.2e\nVx  %9.2e\nVy  %9.2e\nVz  %9.2e', [ mga vga ] );
-case 'u'
-  vga(1:3) = u(j,k,l,:);
-  mga = sqrt( sum( vga .* vga ) );
-  msg = sprintf( '|U| %9.2e\nUx  %9.2e\nUy  %9.2e\nUz  %9.2e', [ mga vga ] );
-case 'w'
-  if pass ~= 'v'
-    c = [ 1 6 5; 6 2 4; 5 4 3 ];
-    clear wg
-    wg(1:3) = w1(j,k,l,:);
-    wg(4:6) = w2(j,k,l,:);
-    [ vec, val ] = eig( wg(c) );
-    val = diag( val );
-    [ tmp, i ] = sort( abs( val ) );
-    val = val(i);
-    vec = vec(:,i);
-    mga = val';
-    vga = vec(:)';
-    tmp = [ val([3 2 1])' wg ];
-    msg = sprintf( 'W1  %9.2e\nW2  %9.2e\nW3  %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e', tmp );
-  end
+case 'vs',
+  msg = sprintf( 'Vs %9.2e', vg );
+case 'us',
+  msg = sprintf( 'Us %9.2e', vg );
+case 'a',
+  msg = sprintf( '|A| %9.2e\nAx  %9.2e\nAy  %9.2e\nAz  %9.2e', [ mg vg ] );
+case 'v',
+  msg = sprintf( '|V| %9.2e\nVx  %9.2e\nVy  %9.2e\nVz  %9.2e', [ mg vg ] );
+case 'u',
+  msg = sprintf( '|U| %9.2e\nUx  %9.2e\nUy  %9.2e\nUz  %9.2e', [ mg vg ] );
+case 'w',
+  tmp = [ mg([3 2 1])' vg ];
+  msg = sprintf( 'W1  %9.2e\nW2  %9.2e\nW3  %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e', tmp );
 otherwise error 'vizfield'
 end
+
 set( gcf, 'CurrentAxes', haxes(2) )
 hhud = text( .02, .98, msg, 'Hor', 'left', 'Ver', 'top' );
 tmp = [ it icursor-noff; t xg ];
@@ -115,50 +129,26 @@ msg = sprintf( '%4d %8.3fs\n%4d %8.1fm\n%4d %8.1fm\n%4d %8.1fm', tmp );
 hhud(2) = text( .98, .98, msg, 'Hor', 'right', 'Ver', 'top' );
 msg = 'Explore';
 set( gcf, 'CurrentAxes', haxes(1) )
+
 if length( mga( mga ~= 0 ) )
   reynoldsglyph
   hhud = [ hhud hglyph ];
 end
-i1 = icursor;
-i = [ i1-1; i1; i1+1 ];
-if cellfocus
-  j = [ 1 1 1 1 1 2 2 2 2 2 2 1 1 2 2 1 ] + 1;
-  k = [ 1 1 2 2 1 1 1 2 2 1 1 1 2 2 2 2 ] + 1;
-  l = [ 1 2 2 1 1 1 2 2 1 1 2 2 2 2 1 1 ] + 1;
-  iorig = 1;
-  inan = [];
-  itext = [ 6 4 2 ];
-else
-  j = [ 3 2 1 1 2 2 2 1 2 2 2 ];
-  k = [ 2 2 2 1 3 2 1 1 2 2 2 ];
-  l = [ 2 2 2 1 2 2 2 1 3 2 1 ];
-  iorig = 2;
-  inan = [ 4 8 ];
-  itext = [ 1 5 9 ];
-end
-j = i(j);
-k = i(k+3);
-l = i(l+6);
-ii = sub2ind( nm(1:3), j, k, l )';
-ng = prod( nm(1:3) );
-clear xg
-for i = 0:2
-  xg(:,i+1) = x(ii+i*ng) + xscl * u(ii+i*ng);
-end
+
+xg = xcursor + dx * [ 
+  -1 1 NaN  0 0 NaN  0 0
+   0 0 NaN -1 1 NaN  0 0
+   0 0 NaN  0 0 NaN -1 1 ]';
 xg(inan,:) = NaN;
 hhud(end+1) = plot3( xg(:,1), xg(:,2), xg(:,3) );
-xgo = xg(iorig,:);
-xg  = xg(itext,:);
-for i = 1:3;
-  xg(:,i) = 1.1 * xg(:,i) - .1 * xgo(i);
-end
-xg = double( xg );
-hhud(end+1:end+3) = text( xg(:,1), xg(:,2), xg(:,3), ['jkl']', 'Ver', 'middle');
+
+xg = double( xg([2 5 8],:) );
+hhud(end+1:end+3) = text( xg(:,1), xg(:,2), xg(:,3), ['xyz']', 'Ver', 'middle');
 if panviz
   campos( campos + xcursor - camtarget )
   camtarget( xcursor )
 end
-if dooutline && ~volviz && ( dosurf || domesh || doglyph  )
+if dooutline && ~volviz && dosurf
   i1 = i1node;
   i2 = i2node;
   i1(islice) = icursor(islice);

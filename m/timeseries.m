@@ -35,19 +35,17 @@ kostrov = ...
   trelax == 0.;
 
 % Find sensor location if needed
+vfsave = vizfield;
 if pointsource || explosion || kostrov
   if exist( 'sordrunning', 'var' )
     xg = xcursor - xhypo;
     rg = sqrt( sum( xg .* xg ) );
   else
-    vfsave = vizfield;
     vizfield = 'x';
     i1s = [ sensor 0 ];
     i2s = [ sensor 0 ];
     ic = 0;
-    iz = 0;
-    extract4d
-    vizfield = vfsave;
+    get4dsection
     if msg
       fprintf( 'Warning: cannot locate sensor for analytical solution\n' )
       pointsource = 0;
@@ -61,7 +59,7 @@ if pointsource || explosion || kostrov
 end
 
 % Time
-if any( strcmp( vizfield, { 'v' 'vm' 'sv' } ) )
+if any( strcmp( vfsave, { 'v' 'vm' 'sv' } ) )
   it0 = 1;
   tg = ( it0 : it ) * dt - .5 * dt;
 else
@@ -70,11 +68,11 @@ else
 end
 
 % Extract data
+vizfield = vfsave;
 i1s = [ sensor it0 ];
 i2s = [ sensor it  ];
 ic = 0;
-iz = 0;
-extract4d
+get4dsection
 if msg, return, end
 vg = squeeze( vg );
 
@@ -89,8 +87,16 @@ if pointsource
       rot(i,:) = rot(i,:) ./ tmp;
     end
     switch nc
-    case 3, vg = vg * rot;
+    case 3
+      vg = vg * rot;
     case 6
+      vg = [ ...
+         vg([1 6 5]) * rot(:,1) ...
+         vg([6 2 4]) * rot(:,2) ...
+         vg([5 4 3]) * rot(:,3) ...
+         vg([5 4 3]) * rot(:,2) ...
+         vg([1 6 5]) * rot(:,3) ...
+         vg([6 2 4]) * rot(:,1) ]'
     end
   end
 end
@@ -137,30 +143,31 @@ end
 
 % Labels
 switch vizfield
-case 'x',    labels = { 'Position'      'x' 'y' 'z' };
-case 'a',    labels = { 'Acceleration'  'Ax' 'Ay' 'Az' };
-case 'v',    labels = { 'Velocity'      'Vx' 'Vy' 'Vz' };
-case 'u',    labels = { 'Displacement'  'Ux' 'Uy' 'Uz' };
-case 'w',    labels = { 'Stress'        'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
-case 'am',   labels = { 'Acceleration'  '|A|' };
-case 'vm',   labels = { 'cceleration'   '|V|' };
-case 'um',   labels = { 'Displacement'  '|U|' };
-case 'wm',   labels = { 'Stress'        '|W|' };
-case 'sv',   labels = { 'Slip Velocity' 'Vslip' };
-case 'sl',   labels = { 'Slip Length'   'lslip' };
+case 'x',    labels = { 'Position'        'x' 'y' 'z' };
+case 'a',    labels = { 'Acceleration'    'Ax' 'Ay' 'Az' };
+case 'v',    labels = { 'Velocity'        'Vx' 'Vy' 'Vz' };
+case 'u',    labels = { 'Displacement'    'Ux' 'Uy' 'Uz' };
+case 'w',    labels = { 'Stress' 'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
+case 'am',   labels = { 'Acceleration'    '|A|' };
+case 'vm',   labels = { 'cceleration'     '|V|' };
+case 'um',   labels = { 'Displacement'    '|U|' };
+case 'wm',   labels = { 'Stress'          '|W|' };
+case 'sv',   labels = { 'Slip Velocity'   'Vslip' };
+case 'sl',   labels = { 'Slip Length'     'lslip' };
 case 'tn',   labels = { 'Normal Traction' 'Tn' };
 case 'ts',   labels = { 'Shear Traction'  'Ts' };
-case 'trup', labels = { 'Rupture Time'  'trup' };
-case 'tarr', labels = { 'Arrest Time'   'tarr' };
+case 'trup', labels = { 'Rupture Time'    'trup' };
+case 'tarr', labels = { 'Arrest Time'     'tarr' };
 otherwise error 'vizfield'
 end
 
 if pointsource
   switch vizfield
   case 'x',   labels = { 'Position'     'r' 'h' 'v' };
-  case 'a',   labels = { 'Acceleration' 'Ar' 'Ah' 'Az' };
-  case 'v',   labels = { 'Velocity'     'Vr' 'Vh' 'Vz' };
-  case 'u',   labels = { 'Displacement' 'Ur' 'Uh' 'Uz' };
+  case 'a',   labels = { 'Acceleration' 'Ar' 'Ah' 'Av' };
+  case 'v',   labels = { 'Velocity'     'Vr' 'Vh' 'Vv' };
+  case 'u',   labels = { 'Displacement' 'Ur' 'Uh' 'Uv' };
+  case 'w',   labels = { 'Stress' 'Wrr' 'Whh' 'Wvv' 'Whv' 'Wvr' 'Wrh' };
   end
 end
 

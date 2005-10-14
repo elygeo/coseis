@@ -11,7 +11,7 @@ for iz = 1:size( i1volume, 1 )
     vizfield = 'u';
     i1s = [ i1 it ];
     i2s = [ i2 it ];
-    extract4d
+    get4dsection
     xg = xscl * vg;
   else
     xg = 0;
@@ -19,7 +19,7 @@ for iz = 1:size( i1volume, 1 )
   vizfield = 'x';
   i1s = [ i1 0 ];
   i2s = [ i2 0 ];
-  extract4d
+  get4dsection
   xg = xg + vg;
   if cellfocus
     i2 = i2 - 1;
@@ -35,7 +35,7 @@ for iz = 1:size( i1volume, 1 )
   vizfield = vfsave;
   i1s = [ i1 it ];
   i2s = [ i2 it ];
-  extract4d
+  get4dsection
   vg = permute( vg, [2 1 3] );
   xg = permute( xg, [2 1 3 4] );
   for i = 1:length( isoval );

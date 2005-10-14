@@ -71,7 +71,7 @@ mu(j,k,l) = 0.125 * ...
 % Cell volume
 s2(:) = 0.;
 for iz = 1:size( oper, 1 )
-  [ i1, i2 ] = zone( i1oper(iz,:), i2oper(iz,:), nn, noff, ihypo, ifn );
+  [ i1, i2 ] = zone( i1oper(iz,:), i2oper(iz,:), nn, nnoff, ihypo, ifn );
   i2 = i2 - 1;
   l = i1(3):i2(3);
   k = i1(2):i2(2);

@@ -16,6 +16,7 @@ set( 0, 'CurrentFigure', 1 )
 msg = '';
 action = 1;
 anim = 0;
+ditviz = 0;
 
 switch keypress
 case 'f1'
@@ -27,22 +28,22 @@ case 'f1'
     hhelp = text( .5, .54, ...
       { 'SORD - Support Operator Rupture Dynamics'
         ''
-        'Help               F1    Acceleration      A    Zoom            < >'
-        'Run                 R    Velocity          V    Reset Zoom        /'
-        'Pause           Click    Displacement      U    3D/2D             D'
-        'Step            Space    Stress            W    Length Scale      L'
-        'Step 10    Ctrl-Space    Slip          Alt-U    Color Scale     [ ]'
-        'Checkpoint          C    Slip rate     Alt-V    Round CS          \\'
-        'Restart    Crtl-Alt-Q    Magnitude         0    Reset CS      Alt-\\'
-        'Clean restart   Alt-Q    Component       1-6                       '
-        'Rotate           Drag    Volumes/Slices    P    Build Movie       B'
-        'Explore        Arrows    Glyphs            G    Frame -1          -'
-        'Hypocenter          H    Isosurfaces       I    Frame +1          ='
-        'Extremum            E    Surfaces          S    Frame -10      PgUp'
-        'Replot          Enter    Outline           O    Frame +10      PgDn'
-        'Clean Up    Backspace    Mesh              M    First Frame    Home'
-        'Time Series         T    U Distortion      X    Last Frame      End'
-        'Filtered TS     Alt-T                           Delete Frame    Del'
+        'Run                  R    Help             F1    Zoom            < >'
+        'Pause            Click    Acceleration      A    Reset Zoom        /'
+        'Step             Space    Velocity          V    Perspective       P'
+        'Step 10     Ctrl-Space    Displacement      U    Length Scale      X'
+        'Checkpoint           C    Stress            W    Color Scale     [ ]'
+        'Restart     Crtl-Alt-Q    Slip          Alt-U    Round CS          \\'
+        'Clean restart    Alt-Q    Slip rate     Alt-V    Reset CS      Alt-\\'
+        'Rotate            Drag    Magnitude         0                       '
+        'Explore         Arrows    Component       1-6    Build Movie       B'
+        'Hypocenter           H    Volumes/Slices    P    Frame -1          -'
+        'Extremum             E    Glyphs            G    Frame +1          ='
+        'Slice Direction  J K L    Isosurfaces       I    Frame -10      PgUp'
+        'Replot           Enter    Surfaces          S    Frame +10      PgDn'
+        'Clean Up     Backspace    Outline           O    First Frame    Home'
+        'Time Series          T    Mesh              M    Last Frame      End'
+        'Filtered TS      Alt-T    U Distortion      D    Delete Frame    Del'
       }, ...
       'Tag', 'help', ...
       'Vertical',   'middle', ...
@@ -73,10 +74,13 @@ case 'delete'
   anim = 1;
 case 'downarrow',  if km, cursormove = -3; else cursormove = -1; end, cursor
 case 'uparrow',    if km, cursormove = 3;  else cursormove = 1;  end, cursor
-case 'leftarrow',  cursormove = -2; cursor
-case 'rightarrow', cursormove = 2;  cursor
+case 'leftarrow',  if km, ditviz = -1; else cursormove = -2; cursor, end
+case 'rightarrow', if km, ditviz = 1;  else cursormove = 2;  cursor, end
 case 'h',          cursormove = 4;  cursor; msg = 'Hypocenter';
 case 'e',          cursormove = 6;  cursor; msg = 'Extreme value';
+case 'j', islice = 1; cursormove = 0; cursor
+case 'k', islice = 2; cursormove = 0; cursor
+case 'l', islice = 3; cursormove = 0; cursor
 case 'space', if km, itstep = 10; else itstep = 1; end, msg = 'Step';
 case 'r', itstep = nt - it; msg = 'Run';
 case 'q'
@@ -108,7 +112,7 @@ case 'period'
     camtarget( xcursor )
   end
   panviz = 1;
-case 'd'
+case 'p'
   if strcmp( camproj, 'orthographic' )
     msg  = 'Perspective';
     camproj perspective
@@ -194,12 +198,12 @@ case 'backslash'
     set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
     set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
   end
-case 'p'
+case 'z'
   volviz = ~volviz;
   if volviz, msg = 'Plotting volumes';
   else       msg = 'Plotting slices';
   end
-case 'x'
+case 'd'
   xlim = -~xlim;
   if xlim, msg = 'Mesh distortion on';
   else     msg = 'Mesh distortion off';
@@ -268,7 +272,7 @@ case 's'
   if length( tmp ), set( tmp, 'FaceColor', facecolor ), end
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'surfline' );
   if length( tmp ), set( tmp, 'Visible', visible ), end
-case 'l'
+case 'x'
   if strcmp( get( gca, 'Visible' ), 'off' ), axis on, msg = 'Axis On';
   else axis off, msg = 'Axis Off';
   end
@@ -303,6 +307,14 @@ case 'b'
 otherwise, action = 0; msg = '';
 end
 keypress = '';
+
+% Viz timestep
+if ditviz
+  itviz = itviz + ditviz;
+  itviz = max( 0, itviz );
+  itviz = min( it, itviz );
+  msg = num2str( itviz );
+end
 
 % Message
 set( gcf, 'CurrentAxes', haxes(2) )

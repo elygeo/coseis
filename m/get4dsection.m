@@ -1,13 +1,15 @@
 % Extract 4D slice from memory or disk
-% input: iz i1s i2s fieldin it outdir
+% input: vizfield i1s i2s ic outdir     nn it iz nout sordrunning
+% ouput: gg msg
 
 % Array slice
+gg = 0;
 msg = '';
 n = [ nn it ];
 i = i1s < 0; i1s(i) = i1s(i) + n(i) + 1;
 i = i2s < 0; i2s(i) = i2s(i) + n(i) + 1;
 
-% Use in memory data if available
+% Use data in memory if available
 if exist( 'sordrunning', 'var' )
 outdir = 'out';
 if i1s(4) == it
@@ -16,27 +18,27 @@ if i1s(4) == it
   l = i1s(3):i2s(3);
   i = i1s(5):i2s(5);
   switch vizfield
-  case 'x',    vg = x(j,k,l,i);
-  case 'a',    vg = w1(j,k,l,i);
-  case 'v',    vg = v(j,k,l,i);
-  case 'u',    vg = u(j,k,l,i);
+  case 'x',    gg = x(j,k,l,i);
+  case 'a',    gg = w1(j,k,l,i);
+  case 'v',    gg = v(j,k,l,i);
+  case 'u',    gg = u(j,k,l,i);
   case 'w'
     i1 = find(i<4);
     i2 = find(i>3) - 3;
-    vg = zeros( n([1 2 3 5]) );
-    vg(:,:,:,i1)   = w1(j,k,l,i1);
-    vg(:,:,:,i2+3) = w2(j,k,l,i2);
-  case 'am',   vg = s1(j,k,l);
-  case 'vm',   vg = s2(j,k,l);
-  case 'um',   vg = s1(j,k,l);
-  case 'wm',   vg = s2(j,k,l);
-  case 'sv',   vg = sv(j,k,l);
-  case 'sl',   vg = sl(j,k,l);
-  case 'tn',   vg = tn(j,k,l);
-  case 'ts',   vg = ts(j,k,l);
-  case 'trup', vg = trup(j,k,l);
-  case 'tarr', vg = tarr(j,k,l);
-  otherwise error 'fieldin'
+    gg = zeros( n([1 2 3 5]) );
+    gg(:,:,:,i1)   = w1(j,k,l,i1);
+    gg(:,:,:,i2+3) = w2(j,k,l,i2);
+  case 'am',   gg = s1(j,k,l);
+  case 'vm',   gg = s2(j,k,l);
+  case 'um',   gg = s1(j,k,l);
+  case 'wm',   gg = s2(j,k,l);
+  case 'sv',   gg = sv(j,k,l);
+  case 'sl',   gg = sl(j,k,l);
+  case 'tn',   gg = tn(j,k,l);
+  case 'ts',   gg = ts(j,k,l);
+  case 'trup', gg = trup(j,k,l);
+  case 'tarr', gg = tarr(j,k,l);
+  otherwise error 'vizfield'
   end
   return
 end
@@ -71,7 +73,7 @@ if ~found
 end
 
 % Read data
-vg = zeros( n );
+gg = zeros( n );
 ng = i2g - i1g + 1;
 i0 = i1s - i1g;
 block = sprintf( '%d*float32', n(1) );
@@ -84,7 +86,7 @@ for itg = 1:n(4)
   for l = 1:n(3)
     seek = 4 * ( i0(1) + ng(1) * ( i0(2) + ng(2) * ( i0(3) + l - 1 ) ) );
     fseek( fid, seek, 'bof' );
-    vg(:,:,l,itg,i) = fread( fid, n(1)*n(2), block, skip, endian );
+    gg(:,:,l,itg,i) = fread( fid, n(1)*n(2), block, skip, endian );
   end
   fclose( fid );
 end
