@@ -28,22 +28,22 @@ case 'f1'
     hhelp = text( .5, .54, ...
       { 'SORD - Support Operator Rupture Dynamics'
         ''
-        'Run                  R    Help             F1    Zoom            < >'
-        'Pause            Click    Acceleration      A    Reset Zoom        /'
-        'Step             Space    Velocity          V    Perspective       P'
-        'Step 10     Ctrl-Space    Displacement      U    Length Scale      X'
-        'Checkpoint           C    Stress            W    Color Scale     [ ]'
-        'Restart     Crtl-Alt-Q    Slip          Alt-U    Round CS          \\'
-        'Clean restart    Alt-Q    Slip rate     Alt-V    Reset CS      Alt-\\'
-        'Rotate            Drag    Magnitude         0                       '
-        'Explore         Arrows    Component       1-6    Build Movie       B'
-        'Hypocenter           H    Volumes/Slices    P    Frame -1          -'
-        'Extremum             E    Glyphs            G    Frame +1          ='
-        'Slice Direction  J K L    Isosurfaces       I    Frame -10      PgUp'
-        'Replot           Enter    Surfaces          S    Frame +10      PgDn'
-        'Clean Up     Backspace    Outline           O    First Frame    Home'
-        'Time Series          T    Mesh              M    Last Frame      End'
-        'Filtered TS      Alt-T    U Distortion      D    Delete Frame    Del'
+        'Help                F1    Acceleration      A    Zoom            < >'
+        'Rotate            Drag    Velocity          V    Reset Zoom        /'
+        'Explore         Arrows    Displacement      U    Perspective       P'
+        'Hypocenter           H    Stress            W    Length Scale      X'
+        'Extremum             E    Slip          Alt-U    Color Scale     [ ]'
+        'Slice Direction  J K L    Slip rate     Alt-V    Round CS          \\'
+        'Replot           Enter    Magnitude         0    Reset CS      Alt-\\'
+        'Clean Up     Backspace    Component       1-6                       '
+        'Time Series          T    Volumes/Slices    Z    Build Movie       B'
+        'Filtered TS      Alt-T    Glyphs            G    Frame -1          -'
+        '                          Isosurfaces       I    Frame +1          ='
+        '                          Surfaces          S    Frame -10      PgUp'
+        '                          Outline           O    Frame +10      PgDn'
+        '                          Mesh              M    First Frame    Home'
+        '                          U Distortion      D    Last Frame      End'
+        '                                                 Delete Frame    Del'
       }, ...
       'Tag', 'help', ...
       'Vertical',   'middle', ...
@@ -74,21 +74,13 @@ case 'delete'
   anim = 1;
 case 'downarrow',  if km, cursormove = -3; else cursormove = -1; end, cursor
 case 'uparrow',    if km, cursormove = 3;  else cursormove = 1;  end, cursor
-case 'leftarrow',  if km, ditviz = -1; else cursormove = -2; cursor, end
-case 'rightarrow', if km, ditviz = 1;  else cursormove = 2;  cursor, end
-case 'h',          cursormove = 4;  cursor; msg = 'Hypocenter';
-case 'e',          cursormove = 6;  cursor; msg = 'Extreme value';
-case 'j', islice = 1; cursormove = 0; cursor
-case 'k', islice = 2; cursormove = 0; cursor
-case 'l', islice = 3; cursormove = 0; cursor
-case 'space', if km, itstep = 10; else itstep = 1; end, msg = 'Step';
-case 'r', itstep = nt - it; msg = 'Run';
-case 'q'
-  if km
-    if km == 1, rmdir( 'out', 's' ), end
-    sord
-    return
-  end
+case 'leftarrow',  if km, cursormove = -4; else cursormove = -2; end, cursor
+case 'rightarrow', if km, cursormove = 4;  else cursormove = 2;  end, cursor
+case 'j', cursormove = 0; islice = 1; cursor
+case 'k', cursormove = 0; islice = 2; cursor
+case 'l', cursormove = 0; islice = 3; cursor
+case 'h', cursormove = 5; cursor; msg = 'Hypocenter';
+case 'e', cursormove = 7; cursor; msg = 'Extreme value';
 case '0', comp = 0; colorscale
 case '1', comp = 1; colorscale
 case '2', comp = 2; colorscale
@@ -208,26 +200,26 @@ case 'd'
   if xlim, msg = 'Mesh distortion on';
   else     msg = 'Mesh distortion off';
   end
-case 'u', if km, vizfield = 'us'; else, vizfield = 'u'; end 
+case 'u'
+  if km, vizfield = 'sl'; else, vizfield = 'u'; end 
   colorscale
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
-  if pass == 'v', msg = [ msg ' step code once for viz' ]; end
-case 'w', if km, vizfield = 't'; else, vizfield = 'w'; end 
+case 'w'
+  if km, vizfield = 't'; else, vizfield = 'w'; end 
   colorscale
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
-  if pass == 'v', msg = [ msg ' not in memory, step code once' ]; end
-case 'a', vizfield = 'a';
+case 'a'
+  vizfield = 'a';
   colorscale
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
-  if pass == 'w', msg = [ msg ' not in memory, step code once' ]; end
-case 'v', if km, vizfield = 'vs'; else, vizfield = 'v'; end 
+case 'v'
+  if km, vizfield = 'sv'; else, vizfield = 'v'; end 
   colorscale
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
-  if pass == 'w', msg = [ msg ' step code once for viz' ]; end
 case 'o'
   tmp = findobj( [ frame{ showframe } hhud ], 'Tag', 'outline' );
   if length( tmp ), dooutline = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
@@ -277,14 +269,6 @@ case 'x'
   else axis off, msg = 'Axis Off';
   end
 case 't', dofilter = km; sensor = icursor; tsviz
-case 'c'
-  if ~km
-    save checkpoint it v u vs us trup p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6
-    msg = 'Checkpoint Saved';
-  else
-    load checkpoint
-    msg = 'Checkpoint Loaded';
-  end
 case 'b'
   if savemovie && ~holdmovie
     msg = 'Build Movie';
@@ -307,14 +291,6 @@ case 'b'
 otherwise, action = 0; msg = '';
 end
 keypress = '';
-
-% Viz timestep
-if ditviz
-  itviz = itviz + ditviz;
-  itviz = max( 0, itviz );
-  itviz = min( it, itviz );
-  msg = num2str( itviz );
-end
 
 % Message
 set( gcf, 'CurrentAxes', haxes(2) )
@@ -341,10 +317,4 @@ if anim > 0
 end
 
 drawnow
-
-if itstep && ~running
-  fprintf( '\b\b\b' )
-  step
-  fprintf( '>> ' )
-end
 

@@ -1,27 +1,11 @@
 % Viz
 
-% range selector
-% initial plot: mesh, prestress, hypo
-% restart capable
-
-if init, init = init + 1; end
-if init > 3, init = 0; end
-
-if plotstyle, else
-  gui = 0;
-  return
-end
-
-switch init
-case 2
+if init
+  init = 0;
   if ~ishandle(1), figure(1), end
   set( 0, 'CurrentFigure', 1 )
   clf
   drawnow
-  return
-case 3
-  fprintf( 'Initialize visualization\n' )
-  plotinterval = 1;
   holdmovie = 0;
   savemovie = 0;
   vizfield = 'v';
@@ -108,19 +92,6 @@ otherwise
   end
   plotstyle = 'hold';
 end
-
-if mod( it, plotinterval ), return, end
-time = it * dt;
-switch vizfield
-case 'a', onpass = 'v';
-case 'v', onpass = 'v'; time = ( it + .5 ) * dt; % CHECK
-case 'u', onpass = 'w';
-case 'w', onpass = 'w';
-case 'sv', onpass = 'v'; time = ( it + .5 ) * dt; % CHECK
-case 'sl', onpass = 'v';
-otherwise error 'viz vizfield'
-end
-if onpass ~= pass, return, end
 
 set( 0, 'CurrentFigure', 1 )
 if holdmovie

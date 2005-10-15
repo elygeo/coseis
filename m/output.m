@@ -147,9 +147,7 @@ if pass == 'w', return, end
 
 %------------------------------------------------------------------------------%
 
-if itcheck && ~mod( it, itcheck )
-  save 'out/ckp' it t u v p1 p2 p3 p4 p5 p6 g1 g2 g3 g4 g5 g6 sv sl trup tarr
-end
+if itcheck && ~mod( it, itcheck ), checkpoint, end
 
 fid = fopen( 'out/timestep', 'w' );
 fprintf( fid, '  it = %g;\n', it );

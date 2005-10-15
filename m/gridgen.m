@@ -1,5 +1,4 @@
 % Grid generation
-
 fprintf( 'Grid generation\n' )
 
 % Indices

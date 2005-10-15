@@ -1,7 +1,5 @@
 % Input
 
-plotstyle = '';
-plotstyle = 'slice';
 nin = 0;
 nout = 0;
 nlock = 0;

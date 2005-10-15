@@ -15,18 +15,10 @@ clean
 inread
 setup
 arrays
-viz
 gridgen
 matetial
 fault
 momentsource
 output
-viz
-viz
-
-if gui
-  control
-else
-  step
-end
+step
 

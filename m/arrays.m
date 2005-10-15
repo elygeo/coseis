@@ -72,12 +72,4 @@ g6  = repmat( zero, nl2 );		% **l2 pml gradient
 
 % Initial values
 t = 0.;
-amax  = 0.;
-vmax  = 0.;
-umax  = 0.;
-wmax  = 0.;
-vsmax = 0.;
-usmax = 0.;
-tnmax = 0.;
-tsmax = 0.;
 

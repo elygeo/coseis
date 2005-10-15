@@ -5,14 +5,14 @@ way = sign( cursormove );
 cursormove = abs( cursormove );
 switch cursormove
 case 0
-case 4
+case 5
   icursor = ihypo;
   if ifn, islice = ifn; end
-case 5
+case 6
   icursor = ihypo;
   icursor(idown) = 1;
   islice = idown;
-case 6
+case 7
   imax = ihypo;
   switch vizfield
   case 'a', imax = iamax;
@@ -37,62 +37,58 @@ otherwise
   cursormove = i(cursormove);
   i = abs( cursormove );
   if length( hhud ), icursor(i) = icursor(i) + way; end
-  icursor = max( icursor, i1node );
-  icursor = min( icursor, i2node - cellfocus );
+  icursor = max( icursor, 1 );
+  icursor = min( icursor, nn - cellfocus );
 end
 delete( [ hhud hhelp ] )
 hhelp = [];
 
-% Position
-vizfield = 'x';
-i1s = [ icursor - nnoff 0 ];
-i2s = [ icursor - nnoff + cellfocus 0 ];
-ic = 0;
-get4dsection
-if msg, error( msg ), end
-if cellfocus
-  vg = 0.125 * ( ...
-    vg(1,1,1,:) + vg(2,2,2,:) + ...
-    vg(2,1,1,:) + vg(1,2,2,:) + ...
-    vg(1,2,1,:) + vg(2,1,2,:) + ...
-    vg(1,1,2,:) + vg(2,2,1,:) );
+if showframe ~= nframe
+  showframe = nframe;
+  set( [ frame{:} ], 'Visible', 'off' )
+  set( [ frame{showframe} ], 'Visible', 'on' )
 end
-xg = vg(:)';
 
-% Displacement
-if xscl <= 0.
-  vg = 0;
+if all( icursor == ithold ) || all( icursor >= i1hold & icursor <= i2hold )
 else
-  vizfield = 'u';
-  i1s = [ icursor - nnoff it ];
-  i2s = [ icursor - nnoff + cellfocus it ];
-  ic = 0;
-  get4dsection
-  if msg, error( msg ), end
-  if cellfocus
-    vg = 0.125 * ( ...
-      vg(1,1,1,:) + vg(2,2,2,:) + ...
-      vg(2,1,1,:) + vg(1,2,2,:) + ...
-      vg(1,2,1,:) + vg(2,1,2,:) + ...
-      vg(1,1,2,:) + vg(2,2,1,:) );
-  end
-  vg = vg(:)';
+  msg = num2str( icursor );
+  return
 end
-xcursor = double( xg + xscl * vg );
 
-% Value
-vizfield = vfsave;
-i1s = [ icursor - nnoff it ];
-i2s = [ icursor - nnoff + cellfocus it ];
-ic = 0;
-get4dsection
-if msg, error( msg ), end
-vg = vg(:)';
+j = icursor(1);
+k = icursor(2);
+l = icursor(3);
+if strcmp( grid, 'contant' )
+  xg = ( icursor - 1 ) * dx;
+elseif ~cellfocus
+  xg = x(j,k,l,:);
+else
+  xg = 0.125 * ( ...
+    x(j,k,l,:) + x(j+1,k+1,l+1,:) + ...
+    x(j+1,k,l,:) + x(j,k+1,l+1,:) + ...
+    x(j,k+1,l,:) + x(j+1,k,l+1,:) + ...
+    x(j,k,l+1,:) + x(j+1,k+1,l,:) );
+end
+if xscl <= 0.
+  ug = 0.;
+elseif ~cellfocus
+  ug = u(j,k,l,:);
+else
+  ug = 0.125 * ( ...
+    u(j,k,l,:) + u(j+1,k+1,l+1,:) + ...
+    u(j+1,k,l,:) + u(j,k+1,l+1,:) + ...
+    u(j,k+1,l,:) + u(j+1,k,l+1,:) + ...
+    u(j,k,l+1,:) + u(j+1,k+1,l,:) );
+end
+vg = v(j,k,l,:);
+nc = size( vg, 4 );
 
-% Magnitude
-switch length( vg )
+switch nc
+case 1
+  msg = sprintf( 'Vs %9.2e', vg );
 case 3
   mg = sum( sqrt( vg .* vg ) );
+  msg = sprintf( '|V| %9.2e\nVx  %9.2e\nVy  %9.2e\nVz  %9.2e', [ mg vg ] );
 case 6
   c = [ 1 6 5; 6 2 4; 5 4 3 ];
   [ vec, val ] = eig( vg(c) );
@@ -101,30 +97,14 @@ case 6
   val = val(i);
   vec = vec(:,i);
   mg = val';
-  wg = vec(:)';
-end
-
-msg = '';
-switch vizfield
-case 'vs',
-  msg = sprintf( 'Vs %9.2e', vg );
-case 'us',
-  msg = sprintf( 'Us %9.2e', vg );
-case 'a',
-  msg = sprintf( '|A| %9.2e\nAx  %9.2e\nAy  %9.2e\nAz  %9.2e', [ mg vg ] );
-case 'v',
-  msg = sprintf( '|V| %9.2e\nVx  %9.2e\nVy  %9.2e\nVz  %9.2e', [ mg vg ] );
-case 'u',
-  msg = sprintf( '|U| %9.2e\nUx  %9.2e\nUy  %9.2e\nUz  %9.2e', [ mg vg ] );
-case 'w',
+  vg = vec(:)';
   tmp = [ mg([3 2 1])' vg ];
   msg = sprintf( 'W1  %9.2e\nW2  %9.2e\nW3  %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e', tmp );
-otherwise error 'vizfield'
 end
 
 set( gcf, 'CurrentAxes', haxes(2) )
 hhud = text( .02, .98, msg, 'Hor', 'left', 'Ver', 'top' );
-tmp = [ it icursor-noff; t xg ];
+tmp = [ it icursor; t xg ];
 msg = sprintf( '%4d %8.3fs\n%4d %8.1fm\n%4d %8.1fm\n%4d %8.1fm', tmp );
 hhud(2) = text( .98, .98, msg, 'Hor', 'right', 'Ver', 'top' );
 msg = 'Explore';
@@ -135,11 +115,11 @@ if length( mga( mga ~= 0 ) )
   hhud = [ hhud hglyph ];
 end
 
+xcursor = double( xg(:) + xscl * ug(:) )';
 xg = xcursor + dx * [ 
   -1 1 NaN  0 0 NaN  0 0
    0 0 NaN -1 1 NaN  0 0
    0 0 NaN  0 0 NaN -1 1 ]';
-xg(inan,:) = NaN;
 hhud(end+1) = plot3( xg(:,1), xg(:,2), xg(:,3) );
 
 xg = double( xg([2 5 8],:) );
@@ -182,11 +162,5 @@ if dooutline && ~volviz && dosurf
   ng = size( xg );
   xg = reshape( xg, [ prod( ng(1:2) ) 3 ] );
   hhud(end+1) = plot3( xg(:,1), xg(:,2), xg(:,3), 'Tag', 'outline' );
-end
-
-if showframe ~= nframe
-  showframe = nframe;
-  set( [ frame{:} ], 'Visible', 'off' )
-  set( [ frame{showframe} ], 'Visible', 'on' )
 end
 

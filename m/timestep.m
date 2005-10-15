@@ -1,5 +1,6 @@
 % Time integration
 
+itstep = itstep - 1;
 it = it + 1;
 t  = t  + dt;
 v  = v  + dt * w1;

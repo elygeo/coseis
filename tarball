@@ -13,12 +13,12 @@ files="
   $version/sord
   $version/tarball
   $version/remote
-  $version/sord.m
   $version/defaults.m
   $version/in.m
   $version/in
   $version/f
   $version/m
+  $version/viz
 "
 
 rm -f f/*.mod

@@ -10,7 +10,7 @@ i = i1s < 0; i1s(i) = i1s(i) + n(i) + 1;
 i = i2s < 0; i2s(i) = i2s(i) + n(i) + 1;
 
 % Use data in memory if available
-if exist( 'sordrunning', 'var' )
+if exist( 'sordrunning', 'var' ) || any( strcmp( vizfield, holding ) )
 outdir = 'out';
 if i1s(4) == it
   j = i1s(1):i2s(1);
