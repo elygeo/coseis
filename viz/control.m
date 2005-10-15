@@ -1,14 +1,11 @@
 % GUI Control
 
-if ~gui, return, end
-
 if ~length( keypress )
   keypress = get( gcf, 'CurrentKey' );
   keymod   = get( gcf, 'CurrentMod' );
 end
 km = length( keymod );
 keymod = '';
-running = itstep;
 nframe = length( frame );
 dframe = 0;
 itstep = 0;

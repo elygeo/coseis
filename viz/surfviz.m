@@ -57,20 +57,8 @@ i2plane = tmp(:,7:9);
     ng = i2 - i1 + 1;
     if sum( ng > 1 ) == 2
       xg = x(j,k,l,:) + xscl * u(j,k,l,:); 
-      switch vizfield
-      case 'a'
-        if comp, vg = w1(j,k,l,comp); 
-        else     vg = s1(j,k,l);
-        end
-      case 'v'
-        if comp, vg = v(j,k,l,comp); 
-        else     vg = s2(j,k,l);
-        end
-      case 'u'
-        if comp, vg = u(j,k,l,comp); 
-        else     vg = s1(j,k,l);
-        end
-      otherwise error 'vizfield'
+      if comp, vg = v(j,k,l,comp); 
+      else     vg = s(j,k,l);
       end
       xg = squeeze( xg );
       vg = squeeze( vg );

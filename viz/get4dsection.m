@@ -1,5 +1,5 @@
-% Extract 4D slice from memory or disk
-% input: vizfield i1s i2s ic outdir     nn it iz nout sordrunning
+% Extract 4D slice from saved data
+% input: vizfield i1s i2s ic outdir     nn it nout
 % ouput: gg msg
 
 % Array slice
@@ -9,41 +9,6 @@ n = [ nn it ];
 i = i1s < 0; i1s(i) = i1s(i) + n(i) + 1;
 i = i2s < 0; i2s(i) = i2s(i) + n(i) + 1;
 
-% Use data in memory if available
-if exist( 'sordrunning', 'var' ) || any( strcmp( vizfield, holding ) )
-outdir = 'out';
-if i1s(4) == it
-  j = i1s(1):i2s(1);
-  k = i1s(2):i2s(2);
-  l = i1s(3):i2s(3);
-  i = i1s(5):i2s(5);
-  switch vizfield
-  case 'x',    gg = x(j,k,l,i);
-  case 'a',    gg = w1(j,k,l,i);
-  case 'v',    gg = v(j,k,l,i);
-  case 'u',    gg = u(j,k,l,i);
-  case 'w'
-    i1 = find(i<4);
-    i2 = find(i>3) - 3;
-    gg = zeros( n([1 2 3 5]) );
-    gg(:,:,:,i1)   = w1(j,k,l,i1);
-    gg(:,:,:,i2+3) = w2(j,k,l,i2);
-  case 'am',   gg = s1(j,k,l);
-  case 'vm',   gg = s2(j,k,l);
-  case 'um',   gg = s1(j,k,l);
-  case 'wm',   gg = s2(j,k,l);
-  case 'sv',   gg = sv(j,k,l);
-  case 'sl',   gg = sl(j,k,l);
-  case 'tn',   gg = tn(j,k,l);
-  case 'ts',   gg = ts(j,k,l);
-  case 'trup', gg = trup(j,k,l);
-  case 'tarr', gg = tarr(j,k,l);
-  otherwise error 'vizfield'
-  end
-  return
-end
-end
-
 % Look for file with desired data
 n = i2s - i1s + 1;
 if all( n ~= 1 ), error 'trying to read 5 dimensions', end
@@ -52,9 +17,8 @@ if ~exist( 'outdir', 'var' ) , outdir = 'out'; end
 cwd = pwd;
 cd( outdir )
 meta
-if ~iz, iz = 1:nout; end
 found = 0;
-for iz = iz
+for iz = 1:nout
   cd( sprintf( '%02d', iz ) )
   meta
   i1g = [ i1 0 ];

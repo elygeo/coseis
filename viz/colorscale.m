@@ -30,18 +30,16 @@ tnscl = tnlim; if tnscl < 0, tnscl = double( tnmax ); end;
 tsscl = tslim; if tsscl < 0, tsscl = double( tsmax ); end;
 if xscl, xscl = .5 * dx / xscl; end
 cellfocus = 0;
-breakon = 'v';
 isfault = 0;
 switch field
 case 'a',  fscl = ascl;  titles = { '|A|' 'Ax' 'Ay' 'Az' };
 case 'v',  fscl = vscl;  titles = { '|V|' 'Vx' 'Vy' 'Vz' };
 case 'u',  fscl = uscl;  titles = { '|U|' 'Ux' 'Uy' 'Uz' }; breakon = 'w';
-case 'w',  fscl = wscl;  breakon = 'w'; cellfocus = 1;
-           titles = { '|W|' 'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
-case 'sl', fscl = usscl; titles = { 'lslip' 'lslip' }; isfault = 1;
-case 'sv', fscl = vsscl; titles = { 'Vslip' 'Vslip' }; isfault = 1;
-case 'tn', fscl = tnscl; titles = { 'Tn' 'Tn' }; isfault = 1;
-case 'ts', fscl = tsscl; titles = { 'Ts' 'Ts' }; isfault = 1;
+case 'w',  fscl = wscl;  cellfocus = 1; titles = { '|W|' 'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
+case 'sl', fscl = usscl; titles = { 'lslip' }; isfault = 1;
+case 'sv', fscl = vsscl; titles = { 'Vslip' }; isfault = 1;
+case 'tn', fscl = tnscl; titles = { 'Tn' }; isfault = 1;
+case 'ts', fscl = tsscl; titles = { 'Ts' }; isfault = 1;
 otherwise error 'field'
 end
 ncomp = length( titles ) - 1;

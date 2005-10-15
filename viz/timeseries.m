@@ -7,17 +7,15 @@
 clear tg xg rg vg va ta
 
 % Read metadata if SORD not running
-if ~exist( 'sordrunning', 'var' )
-  if ~exist( 'dofilter', 'var' ), dofilter = 0; end
-  cwd = pwd;
-  cd 'out'
-  defaults
-  in
-  meta
-  faultmeta
-  timestep
-  cd( cwd )
-end
+if ~exist( 'dofilter', 'var' ), dofilter = 0; end
+cwd = pwd;
+cd 'out'
+defaults
+in
+meta
+faultmeta
+timestep
+cd( cwd )
 
 % Test for special cases
 pointsource = ... 
@@ -37,24 +35,19 @@ kostrov = ...
 % Find sensor location if needed
 vfsave = vizfield;
 if pointsource || explosion || kostrov
-  if exist( 'sordrunning', 'var' )
-    xg = xcursor - xhypo;
-    rg = sqrt( sum( xg .* xg ) );
+  vizfield = 'x';
+  i1s = [ sensor 0 ];
+  i2s = [ sensor 0 ];
+  ic = 0;
+  get4dsection
+  if msg
+    fprintf( 'Warning: cannot locate sensor for analytical solution\n' )
+    pointsource = 0;
+    explosion = 0;
+    kostrov = 0;
   else
-    vizfield = 'x';
-    i1s = [ sensor 0 ];
-    i2s = [ sensor 0 ];
-    ic = 0;
-    get4dsection
-    if msg
-      fprintf( 'Warning: cannot locate sensor for analytical solution\n' )
-      pointsource = 0;
-      explosion = 0;
-      kostrov = 0;
-    else
-      xg = squeeze( vg )' - xhypo;
-      rg = sqrt( sum( xg .* xg ) );
-    end
+    xg = squeeze( vg )' - xhypo;
+    rg = sqrt( sum( xg .* xg ) );
   end
 end
 
@@ -147,7 +140,7 @@ case 'x',    labels = { 'Position'        'x' 'y' 'z' };
 case 'a',    labels = { 'Acceleration'    'Ax' 'Ay' 'Az' };
 case 'v',    labels = { 'Velocity'        'Vx' 'Vy' 'Vz' };
 case 'u',    labels = { 'Displacement'    'Ux' 'Uy' 'Uz' };
-case 'w',    labels = { 'Stress' 'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
+case 'w',    labels = { 'Stress'          'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
 case 'am',   labels = { 'Acceleration'    '|A|' };
 case 'vm',   labels = { 'cceleration'     '|V|' };
 case 'um',   labels = { 'Displacement'    '|U|' };
