@@ -11,8 +11,8 @@ case 1
     vga(:,i) = vga(:,i) .* mga;
   end
   ng = size( mga, 1 );
-  if glyphtype < 0
-    clear xg
+  switch glyphtype
+  case 'wire'
     xg        = xga - vga;
     xg(:,:,2) = xga + vga;
     xg(:,:,3) = NaN;
@@ -20,7 +20,7 @@ case 1
     xg = reshape( xg, [ 3 * ng 3 ] );
     hglyph = plot3( xg(:,1), xg(:,2), xg(:,3) );
     hold on
-  else
+  case 'colorwire'
     xg        = xga;
     xg(:,:,2) = xga - vga;
     xg(:,:,3) = NaN;
@@ -42,7 +42,8 @@ case 3
   end
   for ii = 1:3
     i = 3 * ii + ( -2 : 0 );
-    if glyphtype < 0
+    switch glyphtype
+    case 'wire'
       ng = size( mga, 1 );
       xg        = xga - vga(:,i);
       xg(:,:,2) = xga + vga(:,i);
@@ -51,7 +52,7 @@ case 3
       xg = reshape( xg, [ 3 * ng 3 ] );
       hglyph(end+1) = plot3( xg(:,1), xg(:,2), xg(:,3) );
       hold on
-    else
+    case 'colorwire'
       ig = find( mga(:,ii) < 0 );
       if ig
         ng = size( ig, 1 );

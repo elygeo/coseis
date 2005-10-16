@@ -6,13 +6,16 @@ meta
 
 vizfield = 'v';
 comp = 0;
+i1viz = [ 1 1 1 ];
+i2viz = nn;
 icursor = ihypo;
 flim = -1;
 xlim = 0;
 isofrac = .5;
 glyphcut = .1;
 glyphexp = 1;
-glyphtype = 1;
+glyphtype = 'wire';
+glyphtype = 'colorwire';
 colorexp = .5;
 holdmovie = 0;
 savemovie = 0;
@@ -40,8 +43,6 @@ set( 0, 'CurrentFigure', 1 )
 clf
 set( 1, ...
   'Color', background, ...
-  'KeyPressFcn', 'control', ...
-  'WindowButtonDownFcn', 'itstep = 0;', ...
   'DefaultAxesColorOrder', foreground, ...
   'DefaultAxesColor', background, ...
   'DefaultAxesXColor', foreground, ...
@@ -71,13 +72,12 @@ hhud = [];
 hmsg = [];
 hhelp = [];
 frame = {};
-itpause = nt;
 showframe = 0;
 count = 0;
+render
+
 keymod = '';
 helpon = 0;
-
 keypress = 'f1';
-render
 control
 

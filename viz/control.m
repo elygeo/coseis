@@ -197,26 +197,10 @@ case 'd'
   if xlim, msg = 'Mesh distortion on';
   else     msg = 'Mesh distortion off';
   end
-case 'u'
-  if km, vizfield = 'sl'; else, vizfield = 'u'; end 
-  colorscale
-  delete( [ hhud hmsg hhelp ] )
-  hhud = []; hmsg = []; hhelp = [];
-case 'w'
-  if km, vizfield = 't'; else, vizfield = 'w'; end 
-  colorscale
-  delete( [ hhud hmsg hhelp ] )
-  hhud = []; hmsg = []; hhelp = [];
-case 'a'
-  vizfield = 'a';
-  colorscale
-  delete( [ hhud hmsg hhelp ] )
-  hhud = []; hmsg = []; hhelp = [];
-case 'v'
-  if km, vizfield = 'sv'; else, vizfield = 'v'; end 
-  colorscale
-  delete( [ hhud hmsg hhelp ] )
-  hhud = []; hmsg = []; hhelp = [];
+case '1', if km, vizfield = 'am'; else, vizfield = 'a'; end, msg = vizfield;
+case 'v', if km, vizfield = 'vm'; else, vizfield = 'v'; end, msg = vizfield;
+case 'u', if km, vizfield = 'um'; else, vizfield = 'u'; end, msg = vizfield;
+case 'w', if km, vizfield = 'wm'; else, vizfield = 'w'; end, msg = vizfield;
 case 'o'
   tmp = findobj( [ frame{ showframe } hhud ], 'Tag', 'outline' );
   if length( tmp ), dooutline = strcmp( get( tmp(1), 'Visible' ), 'on' ); end

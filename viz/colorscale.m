@@ -19,39 +19,12 @@ if ~exist( 'hlegend', 'var' )
   set( gcf, 'CurrentAxes', haxes(1) )
 end
 
-ascl  = alim;  if ascl  < 0, ascl  = double( amax );  end;
-vscl  = vlim;  if vscl  < 0, vscl  = double( vmax );  end;
-uscl  = ulim;  if uscl  < 0, uscl  = double( umax );  end;
-wscl  = wlim;  if wscl  < 0, wscl  = double( wmax );  end;
-xscl  = xlim;  if xscl  < 0, xscl  = double( umax );  end;
-usscl = uslim; if usscl < 0, usscl = double( usmax ); end;
-vsscl = vslim; if vsscl < 0, vsscl = double( vsmax ); end;
-tnscl = tnlim; if tnscl < 0, tnscl = double( tnmax ); end;
-tsscl = tslim; if tsscl < 0, tsscl = double( tsmax ); end;
-if xscl, xscl = .5 * dx / xscl; end
-cellfocus = 0;
-isfault = 0;
-switch field
-case 'a',  fscl = ascl;  titles = { '|A|' 'Ax' 'Ay' 'Az' };
-case 'v',  fscl = vscl;  titles = { '|V|' 'Vx' 'Vy' 'Vz' };
-case 'u',  fscl = uscl;  titles = { '|U|' 'Ux' 'Uy' 'Uz' }; breakon = 'w';
-case 'w',  fscl = wscl;  cellfocus = 1; titles = { '|W|' 'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
-case 'sl', fscl = usscl; titles = { 'lslip' }; isfault = 1;
-case 'sv', fscl = vsscl; titles = { 'Vslip' }; isfault = 1;
-case 'tn', fscl = tnscl; titles = { 'Tn' }; isfault = 1;
-case 'ts', fscl = tsscl; titles = { 'Ts' }; isfault = 1;
-otherwise error 'field'
-end
-ncomp = length( titles ) - 1;
-if comp > ncomp, comp = mod( comp, ncomp ); end
-msg = titles{ comp + 1 };
-fscl = double( fscl );
 clim = fscl;
 if ~clim, clim = 1; end
 set( gca, 'CLim', clim * [ -1 1 ] );
 poscolor = [ 1 .5 0 ];
 negcolor = [ 0 .5 1 ];
-if comp
+if ic
   if dark
     cmap = [
       0 0 0 1 1
