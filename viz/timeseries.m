@@ -96,7 +96,7 @@ end
 
 % Filter
 if dofilter
-  fcorner = vp / ( 8 * dx );
+  fcorner = vp0 / ( 8 * dx );
   n = 2 * round( 1 / ( fcorner * dt ) );
   b = .5 * ( 1 - cos( 2 * pi * ( 1 : n - 1 ) / n ) );  % hanning
   a  = sum( b );
@@ -110,22 +110,22 @@ if explosion
   tdom = tsource;
   switch timefcn
   case 'brune'
-    va = m0 * exp( -tg / tdom ) .* ( tg * vp / rg - tg / tdom + 1 ) ...
-       / ( 4. * pi * rho * vp * vp * tdom ^ 2 * rg * vp );
+    va = m0 * exp( -tg / tdom ) .* ( tg * vp0 / rg - tg / tdom + 1 ) ...
+       / ( 4. * pi * rho0 * vp0 ^ 3 * tdom ^ 2 * rg );
   case 'sbrune'
-    va = m0 * exp( -tg / tdom ) .* ( tg * vp / rg - tg / tdom + 2 ) .* tg ...
-       / ( 8. * pi * rho * vp * vp * tdom ^ 3 * rg * vp );
+    va = m0 * exp( -tg / tdom ) .* ( tg * vp0 / rg - tg / tdom + 2 ) .* tg ...
+       / ( 8. * pi * rho0 * vp0 ^ 3 * tdom ^ 3 * rg );
   otherwise va = 0;
   end
   if dofilter, va = filter( b, a, va ); end
-  ta = tg + rg / vp;
+  ta = tg + rg / vp0;
   i = ta <= tg(end);
   ta = ta(i);
   va = va(i);
 elseif kostrov
   c = .81;
   dtau = ts0 - mud0 * tn0;
-  va = c * dtau / rho / vs * ( tg + rg / vrup ) ...
+  va = c * dtau / rho0 / vs0 * ( tg + rg / vrup ) ...
      ./ sqrt( tg .* ( tg + 2 * rg / vrup ) );
   if dofilter, va = filter( b, a, va ); end
   ta = tg + rg / vrup;

@@ -1,31 +1,32 @@
 % Reynolds Glyph
 
 hglyph = [];
-if ~length( mga ) || ~fscl, return, end
+if ~length( vga ) || ~fscl, return, end
 clear xg ng rg
 scl = .5 * dx * ( 1 / fscl ) ^ glyphexp;
 m = 16;
-switch size( mga, 2 )
-case 1
+switch size( vga, 2 )
+case 3
   theta = 2 * pi * ( 0 : 2 / m : 1 );
   row   = ones( size( theta ) );
   phi   = pi * ( 0 : 1 / m : 1 )';
   dphi  = phi(2) - phi(1);
   sinf  = sin( phi );
   cosf  = cos( phi );
-  rr    = abs( cosf ) .^ glyphexp;
+  rg    = abs( cosf ) .^ glyphexp;
   vglyphr = cos( phi + dphi / 2 ) * row;
-  xg(:,:,1) = ( rr .* sinf ) * cos( theta );
-  xg(:,:,2) = ( rr .* sinf ) * sin( theta );
-  xg(:,:,3) = ( rr .* cosf ) * row;
+  xg(:,:,1) = ( rg .* sinf ) * cos( theta );
+  xg(:,:,2) = ( rg .* sinf ) * sin( theta );
+  xg(:,:,3) = ( rg .* cosf ) * row;
   xg( abs( xg ) < .00001 ) = 0;
   ng = xg;
   ng(:,:,3) = ng(:,:,3) .* ( ( 1 - glyphexp / ( glyphexp+1 ) ./ cosf ./ cosf ) * row );
   vglyphx = xg;
   vglyphn = ng;
   for ig = 1:size( vga, 1 )
-    mg = double( mga(ig) );
-    vg = vga(ig,:) / mg;
+    vg = vga(ig,:);
+    mg = sqrt( sum( vg .* vg ) );
+    vg = vg / mg;
     n  = size( vglyphx );
     xg = vglyphx;
     ng = vglyphn;
@@ -54,7 +55,7 @@ case 1
     hold on
   end
   set( hglyph, 'BackFaceLighting', 'lit' )
-case 3
+case 6
   theta = 2 * pi * ( 0 : 1 / m : 1 );
   row   = ones( size( theta ) );
   phi   = pi * ( 0 : 1 / m : 1 )';
@@ -67,9 +68,14 @@ case 3
   xg( abs( xg ) < .00001 ) = 0;
   n = size( xg );
   sphr = reshape( xg, [ n(1) * n(2) 3 ] )';
+  c = [ 1 6 5; 6 2 4; 5 4 3 ];
   for ig = 1:size( vga, 1 )
-    val = mga(ig,:);
-    vec = reshape( vga(ig,:), [3 3] );
+    wg = vga(ig,:);
+    [ vec, val ] = eig( wg(c) );
+    val = diag( val );
+    [ tmp, i ] = sort( abs( val ) );
+    val = val(i);
+    vec = vec(:,i);
     vec(:,1) = cross( vec(:,2), vec(:,3) );
     tmp = scl * abs( val(3) ) ^ ( glyphexp - 1 );
     rg = val * ( sphr .* sphr );
@@ -105,7 +111,7 @@ case 3
     hold on
   end
   set( hglyph, 'BackFaceLighting', 'lit' )
-otherwise error 'mga'
+otherwise error 'vga'
 clear n
 end
 set( hglyph, ...

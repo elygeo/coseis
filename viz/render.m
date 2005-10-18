@@ -1,10 +1,31 @@
 % Render
 
-fscl = flim; if fscl < 0, fscl = double( fmax ); end;
-xscl = xlim; if xscl < 0, xscl = double( umax ); end;
-if xscl, xscl = .5 * dx / xscl; end
-fscl = double( fscl );
-if ic > nc, ic = mod( ic, nc ); end
+i1 = i1viz;
+i2 = i2viz;
+i1(4) = it;
+i2(4) = it;
+if ~volviz
+  i = slicedim;
+  i1(i) = icursor(i);
+  i2(i) = icursor(i) + cellfocus;
+end
+
+[ x, msg ] = read4d( 'x', i1, i2, 0 );
+[ v, msg ] = read4d( field, i1, i2, 0 );
+if msg, error( msg ), end
+nc = size( f, 2 );
+if nc > 1
+  [ s, msg ] = read4d( [ field 'm' ], i1, i2, 0 );
+  if msg, error( msg ), end
+end
+
+fscl = flim;
+if fscl < 0
+  fscl = double( fmax );
+end
+if ic > nc
+  ic = mod( ic, nc );
+end
 
 set( 0, 'CurrentFigure', 1 )
 if holdmovie
@@ -22,36 +43,11 @@ text( .50, .05, titles( comp + 1 ) );
 text( .98, .98, sprintf( '%.3fs', t ), 'Hor', 'right' )
 set( gcf, 'CurrentAxes', haxes(1) )
 
-i = i1viz == 0; i1viz(i) = i1viz(i) + nn(i) + 1;
-i = i2viz == 0; i2viz(i) = i2viz(i) + nn(i) + 1;
-i1volume = i1viz;
-i2volume = i2viz;
-if ifn
-  i1volume = [ i1volume; i1volume ];
-  i2volume = [ i2volume; i2volume ];
-  i1volume(2,ifn) = ihypo(ifn);
-  i2volume(1,ifn) = ihypo(ifn);
-end
-i1slice = i1viz;
-i2slice = i2viz;
-i = islice;
-i1slice(i) = icursor(i) - nnoff(i);
-i2slice(i) = icursor(i) - nnoff(i) + cellfocus;
-if ifn && islice ~= ifn
-  i1slice = [ i1slice; i1slice ];
-  i2slice = [ i2slice; i2slice ];
-  i1slice(2,ifn) = 0;
-  i2slice(1,ifn) = 0;
-end
-
-if ifn,              faultviz,   end
 if doglyph,          glyphviz,   end
 if doisosurf,        isosurfviz, end
 if domesh || dosurf, surfviz,    end
-if dooutline,        outlineviz, end
-if look,             lookat,     end
+%if ifn,              faultviz,   end
 
-clear xg mg vg xga mga vga
 drawnow
 
 kids = get( haxes, 'Children' );

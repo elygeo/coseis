@@ -22,7 +22,6 @@ ll = dx * ( n(3) - 1 );
 up = sign( upvector(l) );
 k = mod( l + 1, 3 ) + 1;
 j = 6 - k - l;
-crdsys = [ j k l ];
 
 % Read grid files or creat basic rectangular mesh
 x(:) = 0.;
@@ -137,10 +136,10 @@ xhypo = xhypo(:)';
 % Grid dimensions
 x1 = min( reshape( x, [ prod( nm ) 3 ] ) );
 x2 = max( reshape( x, [ prod( nm ) 3 ] ) );
-xcenter = double( x1 + x2 ) / 2;
+xcenter = double( x1 + x2 ) / 2.;
 for i = 1:3
   w1(:,:,:,i) = x(:,:,:,i) - xcenter(i);
 end
 s1 = sum( w1 .* w1, 4 );
-xmax = 2 * sqrt( double( max( s1(:) ) ) );
+rmax = 2. * sqrt( double( max( s1(:) ) ) );
 

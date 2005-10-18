@@ -1,109 +1,35 @@
 % Glyph vizualization
 
-% Setup
 if ~fscl, return, end
-if volviz, i1glyph = i1volume; i2glyph = i2volume;
-else,      i1glyph = i1slice;  i2glyph = i2slice;
-end
+clear xga vga
 minmag = glyphcut * fscl;
-vfsave = vizfield;
-mga = [];
-vga = [];
-xga = [];
+n  = size( f );
+ng = prod( n(1:3) );
+ii = find( f(:,:,:,1) >= minmag );
 
-% Loop over zones
-for iz = 1:size( glyphs, 1 )
-
-% Zone selectioin
-[ i1z, i2z ] = zone( i1glyph(iz,:), i2glyph(iz,:), nn, nnoff, ihypo, ifn );
-n = i2z - i1z + 1 - cellfocus;
-ng = prod( n );
-
-% Magnitude
-vizfield = [ vfsave 'm' ];
-i1s = [ i1z it ];
-i2s = [ i2z - cellfocus it ];
-ic = 1;
-get4dsection
-if msg, return, end
-ii = find( gg >= minmag );
-mg = gg(ii);
-
-% Value
-vizfield = vfsave;
-i1s = [ i1z it ];
-i2s = [ i2z - cellfocus it ];
-ic = 0;
-get4dsection
-if msg, error( msg ), end
-nc = size( gg, 2 );
-clear vg
-for i = 1:nc
-  vg(:,i+1) = gg(ii+i*ng);
-end
-
-% Accumulate
-switch nc
-case 3
-  mga = [ mga; mg ];
-  vga = [ vga; vg ];
-case 6
-  c = [ 1 6 5; 6 2 4; 5 4 3 ];
-  for iii = ii
-    wg = vg(iii,:);
-    [ vec, val ] = eig( wg(c) );
-    val = diag( val );
-    [ tmp, i ] = sort( abs( val ) );
-    val = val(i);
-    vec = vec(:,i);
-    mga = [ mga; val' ];
-    vga = [ vga; vec(:)' ];
-  end
-end
-
-% Position
-vizfield = 'x';
-i1s = [ i1z 0 ];
-i2s = [ i2z 0 ];
-ic = 0;
-get4dsection
-if msg, error( msg ), end
-xg = gg;
-
-% Displacement distortion
-if xscl > 0.
-  vizfield = 'u';
-  i1s = [ i1z it ];
-  i2s = [ i2z it ];
-  ic = 0;
-  get4dsection
-  if msg, error( msg ), end
-  xg = xg + xscl * gg;
-end
-
-% Average at cell center
 if cellfocus
-  l = 1:n(1);
-  k = 1:n(2);
-  l = 1:n(3);
-  gg = 0.125 * ( ...
-    xg(j,k,l,:) + xg(j+1,k+1,l+1,:) + ...
-    xg(j+1,k,l,:) + xg(j,k+1,l+1,:) + ...
-    xg(j,k+1,l,:) + xg(j+1,k,l+1,:) + ...
-    xg(j,k,l+1,:) + xg(j+1,k+1,l,:) );
+  j = 1:n(1)-1;
+  k = 1:n(2)-1;
+  l = 1:n(3)-1;
+  xg = 0.125 * ( ...
+    x(j,k,l,:) + x(j+1,k+1,l+1,:) + ...
+    x(j+1,k,l,:) + x(j,k+1,l+1,:) + ...
+    x(j,k+1,l,:) + x(j+1,k,l+1,:) + ...
+    x(j,k,l+1,:) + x(j+1,k+1,l,:) );
+else
+  xg = x;
 end
 
-% Accumulate
-clear xg
 for i = 0:2
-  xg(:,i+1) = gg(ii+i*ng);
+  xga(:,i) = xg(ii+i*ng);
 end
-xga = [ xga; xg ];
-
-% End loop
+mga = f(ii);
+for i = 1:n(4)-1
+  vga(:,i) = f(ii+i*ng);
 end
 
-% Plot glyphs
+clear ii xg
+
 if doglyph > 1
   reynoldsglyph
 else

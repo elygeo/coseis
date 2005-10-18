@@ -18,7 +18,7 @@ if ( err == 0 ) then
 else
   it = 0
 end if
-call globalmin( it )
+call iglobalmin( it )
 if ( it == 0 ) return
 write( str, '(a,i6.6,i6.6)' ) 'out/ckp/', i, it
 inquire( iolength=reclen ) &

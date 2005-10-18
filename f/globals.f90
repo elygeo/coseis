@@ -79,17 +79,19 @@ real :: &
   dt,           & ! time step
   dx,           & ! spatial step
   inval(nz),    & ! input value
-  rho1,         & ! minimum density
-  vp1,          & ! minimum P-wave speed
-  vs1,          & ! minimum S-wave speed
-  rho2,         & ! maximum density
-  vp2,          & ! maximum P-wave speed
-  vs2,          & ! maximum S-wave speed
-  rho,          & ! hypocenter density
-  vp,           & ! hypocenter S-wave speed
-  vs,           & ! hypocenter P-wave speed
-  viscosity(2), & ! viscosity for (1) stress & (2) hourglass corrections
+  rho0,         & ! hypocenter density
+  rho1,         & ! min density
+  rho2,         & ! max density
+  vp0,          & ! hypocenter P-wave speed
+  vp1,          & ! min P-wave speed
+  vp2,          & ! max P-wave speed
+  vs0,          & ! hypocenter S-wave speed
+  vs1,          & ! min S-wave speed
+  vs2,          & ! max S-wave speed
   xhypo(3),     & ! hypocenter location
+  xcenter(3),   & ! mesh center
+  rmax(1)       & ! maximum distance from mesh center
+  viscosity(2), & ! viscosity for (1) stress & (2) hourglass corrections
   upvector(3),  & ! upward direction
   tsource,      & ! dominant period
   rsource,      & ! source radius

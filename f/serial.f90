@@ -34,9 +34,21 @@ r(1) = r(1)
 end subroutine
 
 ! Integer Minimum
-subroutine globalmin( i )
-integer, intent(inout) :: i
-i = i
+subroutine iglobalmin( imin )
+integer, intent(inout) :: imin
+imin = imin
+end subroutine
+
+! Real minimum
+subroutine globalmin( rmin )
+real, intent(inout) :: rmin(:)
+rmim = rmin
+end subroutine
+
+! Real maximum
+subroutine globalmax( rmax )
+real, intent(inout) :: rmax(:)
+rmax = rmax
 end subroutine
 
 ! Real global minimum & location, send to master

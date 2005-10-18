@@ -10,7 +10,7 @@ implicit none
 real :: theta, scl
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up(1), n(3), &
   noff(3), idoublenode
-real :: lj, lk, ll
+real :: lj, lk, ll, x1(3), x2(3)
 
 if ( master ) print '(a)', 'Grid generation'
 
@@ -127,6 +127,20 @@ if ( all( xhypo < 0. ) ) then
   end if
   call broadcast( xhypo )
 end if
+
+! Grid Dimensions
+do i = 1,3
+  x1(i) = minval( x(:,:,:,i) )
+  x2(i) = maxval( x(:,:,:,i) )
+end do
+call globalmin( x1 )
+call globalmax( x2 )
+xcenter = ( x1 + x2 ) / 2.
+do i = 1,3
+  w1(:,:,:,i) = x(:,:,:,i) - xcenter(i);
+end do
+s1 = sum( w1 * w1, 4 );
+rmax = 2. * sqrt( maxval( s1 ) )
 
 end subroutine
 end module

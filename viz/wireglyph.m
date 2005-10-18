@@ -3,8 +3,8 @@
 hglyph = [];
 if ~length( mga ) || ~fscl, return, end
 scl = .5 * dx * ( 1 / fscl ) ^ glyphexp;
-switch size( mga, 2 );
-case 1
+switch size( vga, 2 );
+case 3
   %mga = scl * mga .^ ( glyphexp - 1 ); % CHECK
   mga = scl * mga .^ glyphexp; % CHECK
   for i = 1:3
@@ -35,7 +35,20 @@ case 1
     xg = reshape( xg, [ 3 * ng 3 ] );
     hglyph(2) = plot3( xg(:,1), xg(:,2), xg(:,3), 'Color', poscolor );
   end
-case 3
+case 6
+  mga = [];
+  vga = [];
+FIXME
+  for ig = size( vga, 1 )
+    wg = vga(iii,:);
+    [ vec, val ] = eig( wg(c) );
+    val = diag( val );
+    [ tmp, i ] = sort( abs( val ) );
+    val = val(i);
+    vec = vec(:,i);
+    mga = [ mga; val' ];
+    vga = [ vga; vec(:)' ];
+  end
   mga = scl * sign( mga ) .* abs( mga ) .^ glyphexp;
   for i = 1:3
     vga(:,i:3:end) = vga(:,i:3:end) .* mga;

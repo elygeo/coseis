@@ -77,7 +77,7 @@ case 'j', cursormove = 0; islice = 1; cursor
 case 'k', cursormove = 0; islice = 2; cursor
 case 'l', cursormove = 0; islice = 3; cursor
 case 'h', cursormove = 5; cursor; msg = 'Hypocenter';
-case 'e', cursormove = 7; cursor; msg = 'Extreme value';
+case 'e', cursormove = 6; cursor; msg = 'Extreme value';
 case '0', comp = 0; colorscale
 case '1', comp = 1; colorscale
 case '2', comp = 2; colorscale

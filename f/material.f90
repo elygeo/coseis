@@ -64,7 +64,7 @@ case( 'rho' )
     case( 3 ); mr(:,:,i+1:l2) = mr(:,:,i:l2-1)
     end select
     where ( mr < rho1 ) mr = rho1
-    where ( mr > rho2 ) mr = rho2
+    where ( mr > rho1 ) mr = rho2
   end if
 case( 'vp'  )
   if ( .not. readfile(iz) ) then
@@ -107,9 +107,9 @@ if ( master ) then
   j = ihypo(1)
   k = ihypo(2)
   l = ihypo(3)
-  rho = mr(j,k,l)
-  vp  = s1(j,k,l)
-  vs  = s2(j,k,l)
+  rho0 = mr(j,k,l)
+  vp0  = s1(j,k,l)
+  vs0  = s2(j,k,l)
 end if
 
 ! Lame parameters

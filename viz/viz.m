@@ -4,13 +4,12 @@ clear all
 addpath m out
 meta
 
-vizfield = 'v';
-comp = 0;
-i1viz = [ 1 1 1 ];
-i2viz = nn;
+field = 'v';
+i1viz =  [ 1 1 1 1 ];
+i2viz = -[ 1 1 1 1 ];
+ic = 0;
 icursor = ihypo;
-flim = -1;
-xlim = 0;
+lim = -1;
 isofrac = .5;
 glyphcut = .1;
 glyphexp = 1;
@@ -20,19 +19,22 @@ colorexp = .5;
 holdmovie = 0;
 savemovie = 0;
 dark = 1;
-camdist = -1;
-look = 4;
 doglyph = 0;
 domesh = 0;
 dosurf = 0;
 doisosurf = 0;
-dooutline = 1;
+dooutline = 0;
 volviz = 0;
 
 ifn = abs( faultnormal );
 if ifn, islice = ifn;
 else [ tmp islice ] = max( abs( upvector ) );
 end
+n = [ nn nt ];
+i = i1viz == 0; i1viz(i) = ihypo(i);
+i = i2viz == 0; i2viz(i) = ihypo(i);
+i = i1viz < 0; i1viz(i) = i1viz(i) + n(i) + 1;
+i = i2viz < 0; i2viz(i) = i2viz(i) + n(i) + 1;
 
 if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
 else     foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 1;
@@ -74,7 +76,11 @@ hhelp = [];
 frame = {};
 showframe = 0;
 count = 0;
+
+%lineviz
 render
+lookat( 0, upvector, xcenter, rmax, -1 )
+panviz = 0;
 
 keymod = '';
 helpon = 0;

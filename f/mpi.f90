@@ -60,11 +60,31 @@ call mpi_bcast( r, i, mpi_real, ipmaster, c, e )
 end subroutine
 
 ! Integer minimum
-subroutine globalmin( i )
-integer, intent(inout) :: i
+subroutine iglobalmin( imin )
+integer, intent(inout) :: imin
 integer :: ii, e
-call mpi_allreduce( i, ii, 1, mpi_integer, mpi_min, c, e )
-i = ii
+call mpi_allreduce( imin, ii, 1, mpi_integer, mpi_min, c, e )
+imin = ii
+end subroutine
+
+! Real minimum
+subroutine globalmin( rmin )
+real, intent(inout) :: rmin(:)
+real :: r
+integer :: n, e
+n = size(rmin)
+call mpi_allreduce( rmin, r, n, mpi_real, mpi_min, c, e )
+rmin = r
+end subroutine
+
+! Real maximum
+subroutine globalmax( rmax )
+real, intent(inout) :: rmax(:)
+real :: r
+integer :: n, e
+n = size(rmax)
+call mpi_allreduce( rmax, r, n, mpi_real, mpi_max, c, e )
+rmax = r
 end subroutine
 
 ! Real global minimum & location, send to master
