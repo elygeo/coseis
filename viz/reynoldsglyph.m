@@ -1,4 +1,5 @@
 % Reynolds Glyph
+% input: vga, xga, fscl, glyphexp, dx
 
 hglyph = [];
 if ~length( vga ) || ~fscl, return, end

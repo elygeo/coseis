@@ -51,8 +51,8 @@ ifit0: if ( it == 0 .and. master ) then
   write( 9, * ) 'courant =  ',  courant,        '; % stability condition'
   write( 9, * ) 'ihypo   = [',  ihypo - nnoff, ']; % hypocenter node'
   write( 9, * ) 'xhypo   = [',  xhypo,         ']; % hypocenter location'
-  write( 9, * ) 'xcenter = [',  xhypo,         ']; % mesh center'
-  write( 9, * ) 'rmax    = [',  xhypo,         ']; % mesh radius'
+  write( 9, * ) 'xcenter = [',  xcenter,       ']; % mesh center'
+  write( 9, * ) 'rmax    =  ',  rmax,           '; % mesh radius'
   close( 9 )
 
 end if ifit0
@@ -228,7 +228,7 @@ if ( master ) then
   open(  9, file='out/timestep.m', status='replace' )
   write( 9, * ) 'it =  ', it, '; % time-step'
   close( 9 )
-  write( str, '(a,i6.6,a)' ) 'out/stats/', it, '.m'
+  write( str, '(a,i6.6,a)' ) 'out/stats/it', it, '.m'
   open(  9, file=str, status='replace' )
   write( 9, * ) 't      =  ', t,               '; % time'
   write( 9, * ) 'dt     =  ', dt,              '; % timestep size'

@@ -178,8 +178,8 @@ if ( master ) then
   ts0 = sqrt( sum( ( t0(j,k,l,:) - tn0 * nhat(j,k,l,:) ) ** 2. ) )
   tn0 = max( -tn0, 0. )
   s = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 )
-  lc =  dc0 * ( rho * vs * vs ) / tn0 / ( mus0 - mud0 )
-  rctest = rho * vs * vs * tn0 * ( mus0 - mud0 ) * dc0 &
+  lc =  dc0 * ( rho0 * vs0 ** 2. ) / tn0 / ( mus0 - mud0 )
+  rctest = rho0 * vs0 ** 2. * tn0 * ( mus0 - mud0 ) * dc0 &
     / ( ts0 - tn0 * mud0 ) ** 2
   open(  9, file='out/faultmeta.m', status='replace' )
   write( 9, * ) 'mus0   = ', mus0,   '; % static friction at hypocenter'

@@ -1,51 +1,67 @@
 % Surface viz
-% input: f, x, cellfocus, 
+function handle = surfviz( x, f, ic, cellfocus )
 
-%lineviz
-%set( hand, 'Tag', 'surfline' )
-hsurf = [];
+handle = [];
+n = size( x );
+if sum( n > 1 ) < 3
+  error
+end
+
+for i = 1, 3
+  if i == find( n == 1 )
+    i1 = [ 1 1 1 1 ];
+    i2 = n;
+    i2(i) = 1;
+    j = i1(1):i2(1);
+    k = i1(2):i2(2);
+    l = i1(3):i2(3);
+    x1 = squeeze( x(j,k,l,1) );
+    x2 = squeeze( x(j,k,l,2) );
+    x3 = squeeze( x(j,k,l,3) );
+    s1 = squeeze( f(j,k,l,ic) );
+    if ~cellfocus
+      s1(1:end-1,1:end-1) = .25 * ( ...
+        s1(1:end-1,1:end-1) + s1(2:end,1:end-1) + ...
+        s1(1:end-1,2:end)   + s1(2:end,2:end) ); 
+    end
+    handle(end+1) = surf( x1, x2, x3, double( s1 ) );
+    hold on
+  end
+  if all( n - cellfocus > 1 )
+    i1 = [ 1 1 1 1 ];
+    i1(i) = n(i);
+    i2 = n;
+    j = i1(1):i2(1);
+    k = i1(2):i2(2);
+    l = i1(3):i2(3);
+    x1 = squeeze( x(j,k,l,1) );
+    x2 = squeeze( x(j,k,l,2) );
+    x3 = squeeze( x(j,k,l,3) );
+    i1(i) = i1(i) - cellfocus;
+    i2(i) = i2(i) - cellfocus;
+    j = i1(1):i2(1);
+    k = i1(2):i2(2);
+    l = i1(3):i2(3);
+    s1 = squeeze( f(j,k,l,ic) );
+    if ~cellfocus
+      s1(1:end-1,1:end-1) = .25 * ( ...
+        s1(1:end-1,1:end-1) + s1(2:end,1:end-1) + ...
+        s1(1:end-1,2:end)   + s1(2:end,2:end) ); 
+    end
+    handle(end+1) = surf( x1, x2, x3, double( s1 ) );
+    hold on
+  end
+end
 
 if domesh, edgecolor = get( 1, 'DefaultTextColor' );
 else       edgecolor = 'none';
 end
+
 if dosurf, facecolor = 'flat';
 else       facecolor = 'none';
 end
 
-ii = find( i1
-for i = 1:3
-  if isfault
-    i1(ifn) = ihypo(ifn);
-    i2(ifn) = ihypo(ifn);
-  end
-  i1(i) = i2(i);
-  if isfault
-    i1(ifn) = ihypo(ifn);
-    i2(ifn) = ihypo(ifn);
-  end
-  i2(i) = i1(i);
-  tmp = [ tmp; i0 i1 i2 ];
-end
-
-l = i1(3):i2(3);
-k = i1(2):i2(2);
-j = i1(1):i2(1);
-ng = i2 - i1 + 1;
-if sum( ng > 1 ) == 2
-  xg = x(j,k,l,:)
-  if comp, vg = v(j,k,l,comp); 
-  else     vg = s(j,k,l);
-  end
-  xg = squeeze( xg );
-  vg = squeeze( vg );
-  vg = .25 * ( ...
-    vg(1:end-1,1:end-1) + vg(2:end,1:end-1) + ...
-    vg(1:end-1,2:end)   + vg(2:end,2:end) ); 
-  hsurf(end+1) = surf( xg(:,:,1), xg(:,:,2), xg(:,:,3), double( vg ) );
-  hold on
-end
-
-set( hsurf, ...
+set( handle, ...
   'Tag', 'surf', ...
   'LineWidth', linewidth / 4, ...
   'EdgeColor', edgecolor, ...

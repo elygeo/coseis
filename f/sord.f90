@@ -34,7 +34,7 @@ call swaphalo( w1, nhalo )
 call output( 'a' )
 
 ! Main loop
-do while ( it < nt )
+do while ( it <= nt )
   call pml
   call stress
   call momentsource

@@ -1,5 +1,5 @@
 
-switch vizfield
+switch field
 case 'x',    labels = { 'Position'        'x' 'y' 'z' };
 case 'a',    labels = { 'Acceleration'    'Ax' 'Ay' 'Az' };
 case 'v',    labels = { 'Velocity'        'Vx' 'Vy' 'Vz' };
@@ -18,9 +18,11 @@ case 'tarr', labels = { 'Arrest Time'     'tarr' };
 otherwise error 'vizfield'
 end
 
-switch vizfield(1)
+cellfocus = 0;
+switch field(1)
 case 'a', fmax = amax; fmaxi = amaxi;
 case 'v', fmax = vmax; fmaxi = vmaxi;
 case 'u', fmax = umax; fmaxi = umaxi;
 case 'w', fmax = wmax; fmaxi = wmaxi; cellfocus = 1;
 end
+

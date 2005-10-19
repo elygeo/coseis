@@ -140,7 +140,7 @@ do i = 1,3
   w1(:,:,:,i) = x(:,:,:,i) - xcenter(i);
 end do
 s1 = sum( w1 * w1, 4 );
-rmax = 2. * sqrt( maxval( s1 ) )
+rmax = sqrt( maxval( s1 ) )
 
 end subroutine
 end module

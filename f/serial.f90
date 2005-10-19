@@ -42,7 +42,7 @@ end subroutine
 ! Real minimum
 subroutine globalmin( rmin )
 real, intent(inout) :: rmin(:)
-rmim = rmin
+rmin = rmin
 end subroutine
 
 ! Real maximum

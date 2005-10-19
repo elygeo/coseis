@@ -1,30 +1,33 @@
 % Isosurface viz
+function handle = isosurfviz( x, f, ic, cellfocus, isoval )
 
-hisosurf = [];
-if ~fscl, return, end
-isoval = isofrac * fscl;
-if comp, isoval = isoval * [ -1 1 ]; end
 if cellfocus
-  n = i2 - i1 + 1;
-  l = 1:n(3);
-  k = 1:n(2);
+  n = size( x ) - 1;
   j = 1:n(1);
-  xg = 0.125 * ( ...
-    xg(j,k,l,:) + xg(j+1,k+1,l+1,:) + ...
-    xg(j+1,k,l,:) + xg(j,k+1,l+1,:) + ...
-    xg(j,k+1,l,:) + xg(j+1,k,l+1,:) + ...
-    xg(j,k,l+1,:) + xg(j+1,k+1,l,:) );
-else
-  xg = x;
+  k = 1:n(2);
+  l = 1:n(3);
+  x = 0.125 * ( ...
+    x(j,k,l,:) + x(j+1,k+1,l+1,:) + ...
+    x(j+1,k,l,:) + x(j,k+1,l+1,:) + ...
+    x(j,k+1,l,:) + x(j+1,k,l+1,:) + ...
+    x(j,k,l+1,:) + x(j+1,k+1,l,:) );
 end
-vg = permute( vg, [2 1 3] );
-xg = permute( xg, [2 1 3 4] );
+
+if ic
+  isoval = isoval * [ -1 1 ];
+else
+  ic = 1;
+end
+x = permute( x, [2 1 3 4] );
+f = permute( f, [2 1 3 4] );
+handle = [];
+
 for i = 1:length( isoval );
   ival = abs( isoval(i) );
-  tmp = isosurface( xg(:,:,:,1), xg(:,:,:,2), xg(:,:,:,3), ...
-    sign( isoval(i) ) * v(ic), ival );
+  tmp = isosurface( x(:,:,:,1), x(:,:,:,2), x(:,:,:,3), ...
+    f(:,:,:,ic) * sign( isoval(i) ), ival );
   if ~isempty( tmp.vertices )
-    hisosurf(end+1) = patch( tmp, ...
+    handle(end+1) = patch( tmp, ...
       'CData', isoval(i), ...
       'Tag', 'isosurf', ...
       'EdgeColor', 'none', ...

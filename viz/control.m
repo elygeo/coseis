@@ -78,13 +78,13 @@ case 'k', cursormove = 0; islice = 2; cursor
 case 'l', cursormove = 0; islice = 3; cursor
 case 'h', cursormove = 5; cursor; msg = 'Hypocenter';
 case 'e', cursormove = 6; cursor; msg = 'Extreme value';
-case '0', comp = 0; colorscale
-case '1', comp = 1; colorscale
-case '2', comp = 2; colorscale
-case '3', comp = 3; colorscale
-case '4', comp = 4; colorscale
-case '5', comp = 5; colorscale
-case '6', comp = 6; colorscale
+case '0', ic = 0; colorscale
+case '1', ic = 1; colorscale
+case '2', ic = 2; colorscale
+case '3', ic = 3; colorscale
+case '4', ic = 4; colorscale
+case '5', ic = 5; colorscale
+case '6', ic = 6; colorscale
 case 'comma'
   msg = 'Zoom out';
   if ~km, camva( 1.25 * camva )
@@ -150,7 +150,7 @@ case 'leftbracket'
   else    tmp = .5 * get( gca, 'CLim' );
   end
   set( gca, 'CLim', tmp )
-  if ~comp, tmp(1) = 0; end
+  if ~ic, tmp(1) = 0; end
   set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
   set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
 case 'rightbracket'
@@ -159,7 +159,7 @@ case 'rightbracket'
   else    tmp = 2    * get( gca, 'CLim' );
   end
   set( gca, 'CLim', tmp )
-  if ~comp, tmp(1) = 0; end
+  if ~ic, tmp(1) = 0; end
   set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
   set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
 case 'backslash'
@@ -167,7 +167,7 @@ case 'backslash'
     msg = 'Round Color Scale';
     tmp = clim * [ -1 1 ];
     set( gca, 'CLim', tmp )
-    if ~comp, tmp(1) = 0; end
+    if ~ic, tmp(1) = 0; end
     set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
     set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
   else
@@ -183,7 +183,7 @@ case 'backslash'
     end
     tmp = 2 ^ exp2 * 10 ^ exp10 * [ -1 1 ];
     set( gca, 'CLim', tmp )
-    if ~comp, tmp(1) = 0; end
+    if ~ic, tmp(1) = 0; end
     set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
     set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
   end
