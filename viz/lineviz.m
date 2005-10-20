@@ -1,6 +1,6 @@
 % Line viz
 
-function handle = lineviz( x )
+function h = lineviz( x )
 
 n = size( x );
 i = [ 1 1 1 n ];
@@ -36,6 +36,6 @@ for i = 1:size( ii, 1 )
   x3 = [ x3; shiftdim( x(j,k,l,3) ); NaN ];
 end
 
-handle = plot3( x1, x2, x3 );
+h = plot3( x1, x2, x3 );
 hold on
 

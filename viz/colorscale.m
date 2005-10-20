@@ -1,7 +1,7 @@
 % Color Scale
 
 if ~exist( 'hlegend', 'var' )
-  haxes(end+1) = axes;
+  haxes(end+1) = axes( 'HitTest', 'off' );
   set( gcf, 'CurrentAxes', haxes(end) )
   axis( [ 0 1 0 1 ] );
   hold on
@@ -10,12 +10,12 @@ if ~exist( 'hlegend', 'var' )
     'EdgeColor', 'none', ...
     'FaceLighting', 'none', ...
     'EdgeLighting', 'none' );
-  hlegend(4) = plot( [ 0 1 ], [ .08 .08 ], 'Color', 0.5 * [ 1 1 1 ] );
+  hlegend(4) = plot( [ 0 1 ], [ .08 .08 ], 'Color', .5 * [ 1 1 1 ] );
   hlegend(1) = text( .1, .05, '0' );
   hlegend(2) = text( .9, .05, '1' );
   hlegend(5) = imagesc( [ .1 .9 ], [ .058 .06 ], 0:.001:1 );
   set( hlegend,  'HitTest', 'off', 'HandleVisibility', 'off' )
-  set( haxes(2), 'HitTest', 'off' )
+  %set( haxes(2), 'HitTest', 'off' )
   set( gcf, 'CurrentAxes', haxes(1) )
 end
 
@@ -24,7 +24,7 @@ if ~clim, clim = 1; end
 set( gca, 'CLim', clim * [ -1 1 ] );
 poscolor = [ 1 .5 0 ];
 negcolor = [ 0 .5 1 ];
-if ic
+if icomp
   if dark
     cmap = [
       0 0 0 1 1

@@ -1,7 +1,7 @@
 % Surface viz
-function handle = surfviz( x, f, ic, cellfocus, domesh, dosurf )
+function h = surfviz( x, f, ic, cellfocus, domesh, dosurf )
 
-handle = [];
+h = [];
 n = size( x );
 if sum( n > 1 ) < 3, return, end
 
@@ -21,7 +21,7 @@ for iz = 1:size( ii, 1 )
   i2 = ii(iz,4:6);
   n = i2 - i1 + 1;
   if sum( n > 1 ) ~= 2, continue, end
-  i = find( n == 1 )
+  i = find( n == 1 );
   j = i1(1):i2(1);
   k = i1(2):i2(2);
   l = i1(3):i2(3);
@@ -41,6 +41,8 @@ for iz = 1:size( ii, 1 )
       s(1:end-1,1:end-1) + s(2:end,1:end-1) + ...
       s(1:end-1,2:end)   + s(2:end,2:end) ); 
   end
+  h(end+1) = surf( x1, x2, x3, s );
+  hold on
 end
 
 if domesh, edgecolor = get( 1, 'DefaultTextColor' );
@@ -51,7 +53,7 @@ if dosurf, facecolor = 'flat';
 else       facecolor = 'none';
 end
 
-set( handle, ...
+set( h, ...
   'Tag', 'surf', ...
   'LineWidth', .25, ...
   'EdgeColor', edgecolor, ...

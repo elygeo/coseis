@@ -1,8 +1,8 @@
 % Reynolds Glyph
 
-function handle = reynoldsglyph( xx, vv, fscl, glyphexp, dx )
+function h = reynoldsglyph( xx, vv, fscl, glyphexp, dx )
 
-handle = [];
+h = [];
 if ~length( vv ) || ~fscl, return, end
 scl = .5 * dx * ( 1 / fscl ) ^ glyphexp;
 np = 16;
@@ -54,7 +54,7 @@ case 3
     for i = 1:3
       x(:,:,i) = x(:,:,i) + xx(ig,i);
     end
-    handle(ig) = surf( x(:,:,1), x(:,:,2), x(:,:,3), r, 'VertexNormals', q );
+    h(ig) = surf( x(:,:,1), x(:,:,2), x(:,:,3), r, 'VertexNormals', q );
     hold on
   end
 case 6
@@ -107,13 +107,13 @@ case 6
     for i = 1:3
       q(:,:,i) = q(:,:,i) .* -sign( r );
     end
-    handle(ig) = surf( x(:,:,1), x(:,:,2), x(:,:,3), r, 'VertexNorm', q );
+    h(ig) = surf( x(:,:,1), x(:,:,2), x(:,:,3), r, 'VertexNorm', q );
     hold on
   end
 otherwise error 'vv'
 end
 
-set( handle, ...
+set( h, ...
   'BackFaceLighting', 'lit', ...
   'Tag', 'glyph', ...
   'FaceAlpha', .9, ...
@@ -125,5 +125,7 @@ set( handle, ...
   'SpecularExponent', 10, ...
   'FaceLighting', 'phong' )
 
-%quiver3(x(:,:,1),x(:,:,2),x(:,:,3),q(:,:,1),q(:,:,2),q(:,:,3),'g')
+if 0
+  quiver3( x(:,:,1), x(:,:,2), x(:,:,3), q(:,:,1), q(:,:,2), q(:,:,3), 'g' )
+end
 

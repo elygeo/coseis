@@ -1,5 +1,6 @@
 % GUI Control
 
+set( haxes(2), 'HandleVisibility', 'on' )
 if ~length( keypress )
   keypress = get( gcf, 'CurrentKey' );
   keymod   = get( gcf, 'CurrentMod' );
@@ -25,24 +26,19 @@ case 'f1'
   else
     set( gcf, 'CurrentAxes', haxes(2) )
     hhelp = text( .5, .54, ...
-      { 'SORD - Support Operator Rupture Dynamics'
-        ''
-        'Help                F1    Acceleration      A    Zoom            < >'
-        'Rotate            Drag    Velocity          V    Reset Zoom        /'
-        'Explore         Arrows    Displacement      U    Perspective       P'
-        'Hypocenter           H    Stress            W    Length Scale      X'
-        'Extremum             E    Slip          Alt-U    Color Scale     [ ]'
-        'Slice Direction  J K L    Slip rate     Alt-V    Round CS          \\'
-        'Replot           Enter    Magnitude         0    Reset CS      Alt-\\'
-        'Clean Up     Backspace    Component       1-6                       '
-        'Time Series          T    Volumes/Slices    Z    Build Movie       B'
-        'Filtered TS      Alt-T    Glyphs            G    Frame -1          -'
-        '                          Isosurfaces       I    Frame +1          ='
-        '                          Surfaces          S    Frame -10      PgUp'
-        '                          Outline           O    Frame +10      PgDn'
-        '                          Mesh              M    First Frame    Home'
-        '                          U Distortion      D    Last Frame      End'
-        '                                                 Delete Frame    Del'
+      { 'Acceleration      A   Zoom            < >   Time Series       T'
+        'Velocity          V   Zoom Out          /   Filtered TS   Alt-T'
+        'Displacement      U   Reset Zoom    Alt-/   Space-Time        Y'
+        'Stress            W   Perspective       P   Filtered ST   Alt-Y'
+        'Magnitude         0   Explore      Arrows                      '
+        'Component       1-6   Hypocenter        H   Build Movie       B'
+        'Volumes/Slices    Z   Extremum          E   Frame -1          -'
+        'Slice         J K L   Length Scale      X   Frame +1          ='
+        'Glyphs            G   Color Scale     [ ]   Frame -10      PgUp'
+        'Isosurfaces       I   Round CS          \\   Frame +10      PgDn'
+        'Surfaces          S   Reset CS      Alt-\\   First Frame    Home'
+        'Outline           O   Render        Enter   Last Frame      End'
+        'Mesh              M   Clean     Backspace   Delete Frame    Del'
       }, ...
       'Tag', 'help', ...
       'Vertical',   'middle', ...
@@ -51,12 +47,12 @@ case 'f1'
       'BackgroundColor', background );
     set( gcf, 'CurrentAxes', haxes(1) )
   end
-case 'home',       anim = 1; showframe = 1; msg = 'First Frame';
-case 'end',        anim = 1; showframe = nframe; msg = 'Last Frame';
-case 'pageup',     anim = 1; dframe = -10; msg = 'Frame -10';
-case 'pagedown',   anim = 1; dframe =  10; msg = 'Frame +10';
-case 'hyphen',     anim = 1; dframe = -1;  msg = 'Frame -1';
-case 'equal',      anim = 1; dframe =  1;  msg = 'Frame +1';
+case 'home',     anim = 1; showframe = 1; msg = 'First Frame';
+case 'end',      anim = 1; showframe = nframe; msg = 'Last Frame';
+case 'pageup',   anim = 1; dframe = -10; msg = 'Frame -10';
+case 'pagedown', anim = 1; dframe =  10; msg = 'Frame +10';
+case 'hyphen',   anim = 1; dframe = -1;  msg = 'Frame -1';
+case 'equal',    anim = 1; dframe =  1;  msg = 'Frame +1';
 case { 'insert', 'return' }, render
 case 'backspace'
   delete( [ hhud hmsg hhelp ] )
@@ -80,13 +76,13 @@ case 'k', cursormove = 0; islice = 2; cursor
 case 'l', cursormove = 0; islice = 3; cursor
 case 'h', cursormove = 5; cursor; msg = 'Hypocenter';
 case 'e', cursormove = 6; cursor; msg = 'Extreme value';
-case '0', ic = 0; colorscale
-case '1', ic = 1; colorscale
-case '2', ic = 2; colorscale
-case '3', ic = 3; colorscale
-case '4', ic = 4; colorscale
-case '5', ic = 5; colorscale
-case '6', ic = 6; colorscale
+case '0', icomp = 0; colorscale
+case '1', icomp = 1; colorscale
+case '2', icomp = 2; colorscale
+case '3', icomp = 3; colorscale
+case '4', icomp = 4; colorscale
+case '5', icomp = 5; colorscale
+case '6', icomp = 6; colorscale
 case 'comma'
   msg = 'Zoom out';
   if ~km, camva( 1.25 * camva )
@@ -126,24 +122,32 @@ case 'p'
 case 'slash'
   msg = 'Zoom Reset';
   if strcmp( camproj, 'orthographic' )
-    v1 = camup;
-    v2 = campos - camtarget;
-    upvec = [ 0 0 0 ];
-    pos = [ 0 0 0 ];
-    [ t, i1 ] = max( abs( v1 ) );
-    [ t, i2 ] = max( abs( v2 ) );
-    upvec(i1) = sign( v1(i1) );
-    pos(i2) = sign( v2(i2) ) * camdist;
-    camup( upvec )
-    camtarget( xcenter )
-    campos( camtarget + pos )
-    camva( 22 )
+    if km
+      lookat( 0, upvector, xcenter, camdist )
+    else
+      v1 = camup;
+      v2 = campos - camtarget;
+      upvec = [ 0 0 0 ];
+      pos = [ 0 0 0 ];
+      [ t, i1 ] = max( abs( v1 ) );
+      [ t, i2 ] = max( abs( v2 ) );
+      upvec(i1) = sign( v1(i1) );
+      pos(i2) = sign( v2(i2) ) * camdist;
+      camup( upvec )
+      camtarget( xcenter )
+      campos( camtarget + pos )
+      camva( 22 )
+    end
   else
-    v2 = campos - camtarget;
-    pos = camdist * v2 / norm( v2 );
-    camtarget( xcenter )
-    campos( camtarget + pos )
-    camva( 27.5 )
+    if km
+      lookat( islice, upvector, xcenter, camdist )
+    else
+      v2 = campos - camtarget;
+      pos = camdist * v2 / norm( v2 );
+      camtarget( xcenter )
+      campos( camtarget + pos )
+      camva( 27.5 )
+    end
   end
   panviz = 0;
 case 'leftbracket'
@@ -194,23 +198,15 @@ case 'z'
   if volviz, msg = 'Plotting volumes';
   else       msg = 'Plotting slices';
   end
-case 'd'
-  xlim = -~xlim;
-  if xlim, msg = 'Mesh distortion on';
-  else     msg = 'Mesh distortion off';
-  end
-case '1', if km, vizfield = 'am'; else, vizfield = 'a'; end, msg = vizfield;
+case 'a', if km, vizfield = 'am'; else, vizfield = 'a'; end, msg = vizfield;
 case 'v', if km, vizfield = 'vm'; else, vizfield = 'v'; end, msg = vizfield;
 case 'u', if km, vizfield = 'um'; else, vizfield = 'u'; end, msg = vizfield;
 case 'w', if km, vizfield = 'wm'; else, vizfield = 'w'; end, msg = vizfield;
 case 'o'
-  tmp = findobj( [ frame{ showframe } hhud ], 'Tag', 'outline' );
-  if length( tmp ), dooutline = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
   dooutline = ~dooutline;
-  if dooutline, visible = 'on';  msg = 'Outline on';
-  else          visible = 'off'; msg = 'Outline off';
+  if dooutline, set( houtline, 'Visible', 'on' ),  msg = 'Outline on';
+  else          set( houtline, 'Visible', 'off' ), msg = 'Outline off';
   end
-  if length( tmp ), set( tmp, 'Visible', visible ), end
 case 'g'
   tmp = findobj( [ frame{ showframe } ], 'Tag', 'glyph' );
   if length( tmp ), doglyph = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
@@ -256,12 +252,12 @@ case 'b'
     msg = 'Build Movie';
     delete( [ hhud hmsg hhelp ] )
     hhud = []; hmsg = []; hhelp = [];
-    h0 = gca;
-    delete( get( h0, 'Children' ) )
+    h = gca;
+    delete( get( h, 'Children' ) )
     for i = 1:count
       file = sprintf( 'out/viz/%06d', i );
       openfig( file, 'new', 'invisible' );
-      frame{i} = copyobj( get( gca, 'Children' ), h0 )';
+      frame{i} = copyobj( get( gca, 'Children' ), h )';
       delete( gcf )
     end
     holdmovie = 1;
@@ -298,3 +294,4 @@ if anim > 0
   set( [ frame{showframe} ], 'Visible', 'on' )
 end
 
+set( haxes(2), 'HandleVisibility', 'off' )

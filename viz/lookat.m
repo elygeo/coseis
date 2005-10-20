@@ -12,7 +12,7 @@ switch i
 case 0
   camproj( 'perspective' );
   camva( 27.5 )
-  pos(j) = .5;
+  pos(j) = -.5;
   pos(k) = -.5 * sqrt( 2 );
   pos(l) = .5 * sign( upvector(l) );
 case { 1, 2, 3 }

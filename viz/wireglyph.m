@@ -1,5 +1,7 @@
 % Wire glyph
 
+FIXME
+
 hglyph = [];
 if ~length( mga ) || ~fscl, return, end
 scl = .5 * dx * ( 1 / fscl ) ^ glyphexp;

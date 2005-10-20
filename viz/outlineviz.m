@@ -1,6 +1,6 @@
 % Outline viz
 
-function handle = outlineviz( nn, rmax )
+function h = outlineviz( nn, rmax )
 
 i = [ 1 1 1 nn ];
 ii = [
@@ -33,18 +33,18 @@ for iz = 1:size( ii, 1 )
   x3 = [ x3; shiftdim( x(:,:,:,1,3) ); NaN ];
 end
 
-handle = plot3( x1, x2, x3 );
+h = plot3( x1, x2, x3 );
 hold on
 
 x1 = x1(1) + rmax * ( [ .15 0 0 0 0 ] - .02 );
 x2 = x2(1) + rmax * ( [ 0 0 .15 0 0 ] - .02 );
 x3 = x3(1) + rmax * ( [ 0 0 0 0 .15 ] - .02 );
-handle(2) = plot3( x1, x2, x3 );
+h(2) = plot3( x1, x2, x3 );
 
 x1 = x1([1 3 5]) + rmax * [ .02 0 0 ];
 x2 = x2([1 3 5]) + rmax * [ 0 .02 0 ];
 x3 = x3([1 3 5]) + rmax * [ 0 0 .02 ];
-handle(3:5) = text( x1, x2, x3, ['xyz']', 'Ver', 'middle' );
+h(3:5) = text( x1, x2, x3, ['xyz']', 'Ver', 'middle' );
 
-set( handle, 'Tag', 'outline', 'HandleVisibility', 'off' )
+set( h, 'Tag', 'outline', 'HandleVisibility', 'off' )
 

@@ -1,5 +1,5 @@
 % Isosurface viz
-function handle = isosurfviz( x, f, ic, cellfocus, isoval )
+function h = isosurfviz( x, f, ic, cellfocus, isoval )
 
 if cellfocus
   n = size( x ) - 1;
@@ -20,14 +20,14 @@ else
 end
 x = permute( x, [2 1 3 4] );
 f = permute( f, [2 1 3 4] );
-handle = [];
+h = [];
 
 for i = 1:length( isoval );
   ival = abs( isoval(i) );
   tmp = isosurface( x(:,:,:,1), x(:,:,:,2), x(:,:,:,3), ...
     f(:,:,:,ic) * sign( isoval(i) ), ival );
   if ~isempty( tmp.vertices )
-    handle(end+1) = patch( tmp, ...
+    h(end+1) = patch( tmp, ...
       'CData', isoval(i), ...
       'Tag', 'isosurf', ...
       'EdgeColor', 'none', ...
