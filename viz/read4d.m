@@ -10,16 +10,10 @@ timestep
 % Look for file with desired data
 n = i2s - i1s + 1;
 found = 0;
-fieldin
-i1s
-i2s
 for iz = 1:nout
   file = sprintf( '%02d', iz );
   cd( file )
   meta
-i1
-i2
-field
   found = strcmp( fieldin, field ) && ...
           all( i1s >= [ i1 0  ] ) && ...
           all( i2s <= [ i2 it ] ) && ...

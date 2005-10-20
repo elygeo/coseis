@@ -16,6 +16,8 @@ anim = 0;
 ditviz = 0;
 
 switch keypress
+case 'message'
+  msg = message;
 case 'f1'
   if length( hhelp )
     delete( hhelp )
@@ -55,7 +57,7 @@ case 'pageup',     anim = 1; dframe = -10; msg = 'Frame -10';
 case 'pagedown',   anim = 1; dframe =  10; msg = 'Frame +10';
 case 'hyphen',     anim = 1; dframe = -1;  msg = 'Frame -1';
 case 'equal',      anim = 1; dframe =  1;  msg = 'Frame +1';
-case { 'insert', 'return' }, viz
+case { 'insert', 'return' }, render
 case 'backspace'
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = []; msg = '';
@@ -233,8 +235,7 @@ case 'm'
   if domesh, edgecolor = foreground; msg = 'Mesh on';
   else       edgecolor = 'none';     msg = 'Mesh off';
   end
-  msg = 'not turning on mesh because of Matlab bug';
-  %if length( tmp ), set( tmp, 'EdgeColor', edgecolor ), end
+  if length( tmp ), set( tmp, 'EdgeColor', edgecolor ), end
 case 's'
   tmp  = findobj( [ frame{ showframe } ], 'Tag', 'surf' );
   if length( tmp ), dosurf = strcmp( get( tmp(1), 'FaceColor' ), 'flat' ); end
@@ -296,6 +297,4 @@ if anim > 0
   set( [ frame{:} ], 'Visible', 'off' )
   set( [ frame{showframe} ], 'Visible', 'on' )
 end
-
-drawnow
 

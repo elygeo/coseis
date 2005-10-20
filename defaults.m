@@ -5,7 +5,7 @@
   nn = [ 41 41 42 ];			% nx ny nz double nodes counted
   nt = 40;				% number of time steps
   dx = 100.;				% spatial step length
-  dt = .007;				% time step length
+  dt = .0075;				% time step length
 % grid = 'slant';			% skewed mesh
 % grid = 'read';			% read files: data/x1 data/x2 data/x3
   grid = 'constant';			% regular mesh

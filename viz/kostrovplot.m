@@ -17,7 +17,5 @@ end
 
 return
 
-drawnow
-orient tall
 print -dpsc2 kost.ps
 

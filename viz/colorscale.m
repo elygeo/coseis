@@ -14,7 +14,8 @@ if ~exist( 'hlegend', 'var' )
   hlegend(1) = text( .1, .05, '0' );
   hlegend(2) = text( .9, .05, '1' );
   hlegend(5) = imagesc( [ .1 .9 ], [ .058 .06 ], 0:.001:1 );
-  set( hlegend, 'HitTest', 'off', 'HandleVisibility', 'off' )
+  set( hlegend,  'HitTest', 'off', 'HandleVisibility', 'off' )
+  set( haxes(2), 'HitTest', 'off' )
   set( gcf, 'CurrentAxes', haxes(1) )
 end
 

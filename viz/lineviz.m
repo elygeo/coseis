@@ -1,7 +1,10 @@
 % Line viz
 
-if ~length( lines ), return, end
-i = [
+function handle = lineviz( x )
+
+n = size( x );
+i = [ 1 1 1 n ];
+ii = [
   1 2 3  4 2 3
   1 5 3  4 5 3
   1 2 6  4 2 6
@@ -15,26 +18,24 @@ i = [
   1 5 3  1 5 6
   4 5 3  4 5 6
 ];
-tmp = [];
-for iz = 1:size( lines, 1 )
-  [ i1, i2 ] = zone( lines(iz,:), nn, nnoff, ihypo, ifn );
-  izone = [ i1 i2 ];
-  tmp = [ tmp; izone( i ) ];
-end
-lines = unique( tmp,  'rows' );
-xga = [];
-for iz = 1:size( lines, 1 )
-  i1 = lines(iz,1:3);
-  i2 = lines(iz,4:6);
-  l = i1(3):i2(3);
-  k = i1(2):i2(2);
+ii = unique( i(ii), 'rows' );
+x1 = [];
+x2 = [];
+x3 = [];
+
+for i = 1:size( ii, 1 )
+  i1 = ii(i,1:3);
+  i2 = ii(i,4:6);
+  n = i2 - i1 + 1;
+  if sum( n > 1 ) ~= 1, continue, end
   j = i1(1):i2(1);
-  ng = i2 - i1 + 1;
-  if sum( ng > 1 ) == 1
-    xg = squeeze( x(j,k,l,:) + xscl * u(j,k,l,:) );
-    xga = [ xga; xg; NaN NaN NaN ];
-  end
+  k = i1(2):i2(2);
+  l = i1(3):i2(3);
+  x1 = [ x1; shiftdim( x(j,k,l,1) ); NaN ];
+  x2 = [ x2; shiftdim( x(j,k,l,2) ); NaN ];
+  x3 = [ x3; shiftdim( x(j,k,l,3) ); NaN ];
 end
-hand = plot3( xga(:,1), xga(:,2), xga(:,3) );
+
+handle = plot3( x1, x2, x3 );
 hold on
 

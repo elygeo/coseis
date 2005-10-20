@@ -1,10 +1,10 @@
 
 switch field
-case 'x',    labels = { 'Position'        'x' 'y' 'z' };
-case 'a',    labels = { 'Acceleration'    'Ax' 'Ay' 'Az' };
-case 'v',    labels = { 'Velocity'        'Vx' 'Vy' 'Vz' };
-case 'u',    labels = { 'Displacement'    'Ux' 'Uy' 'Uz' };
-case 'w',    labels = { 'Stress'          'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
+case 'x',    labels = { 'Position'        'r' 'x' 'y' 'z' };
+case 'a',    labels = { 'Acceleration'    '|A|' 'Ax' 'Ay' 'Az' };
+case 'v',    labels = { 'Velocity'        '|V|' 'Vx' 'Vy' 'Vz' };
+case 'u',    labels = { 'Displacement'    '|U|' 'Ux' 'Uy' 'Uz' };
+case 'w',    labels = { 'Stress'          '|W|' 'Wxx' 'Wyy' 'Wzz' 'Wyz' 'Wzx' 'Wxy' };
 case 'am',   labels = { 'Acceleration'    '|A|' };
 case 'vm',   labels = { 'cceleration'     '|V|' };
 case 'um',   labels = { 'Displacement'    '|U|' };

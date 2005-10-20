@@ -1,32 +1,30 @@
 % Set projection
+function lookat( look, upvector, xcenter, camdist )
 
-function lookat( look, upvector, xcenter, rmax, camdist )
-
-[ tmp, l ] = max( abs( upvector ) );
-k = 6 - l - 1;
 upvec = upvector;
-up = sign( upvector(l) );
-a = -sign( look );
+[ tmp, l ] = max( abs( upvector ) );
+if l == 1, error, end
+j = 1;
+k = 6 - j - l;
 i = abs( look );
+
 switch i
 case 0
   camproj( 'perspective' );
-  camva( 1.25 * 22 )
-  pos = [ a a a ] / 2;
-  pos(k) = a / sqrt( 2 );
+  camva( 27.5 )
+  pos(j) = .5;
+  pos(k) = -.5 * sqrt( 2 );
+  pos(l) = .5 * sign( upvector(l) );
 case { 1, 2, 3 }
   camproj( 'orthographic' );
   camva( 22 )
   pos = [ 0 0 0 ];
-  pos(i) = a;
+  pos(i) = -sign( look );
   if all( cross( pos, upvec ) == 0 )
     upvec = [ 0 0 0 ];
-    upvec(k) = up;
+    upvec(k) = sign( look );
   end
 otherwise error 'look'
-end
-if camdist <= 0
-  camdist = 1.5 * rmax;
 end
 
 camtarget( xcenter )
