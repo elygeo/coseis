@@ -254,6 +254,8 @@ case 't'
   if length( vt )
     fig
     tsplot
+    zoom
+    zoom xon
   end
 case 'y', msg = 'Space-time not implemented yet';
 otherwise, action = 0; msg = '';
