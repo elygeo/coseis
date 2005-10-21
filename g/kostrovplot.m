@@ -1,8 +1,10 @@
 % Plot Kostrov results
 
 clear all
-addpath viz out
+addpath g
+cd 'out'
 meta
+cd '..'
 field = 'sv';
 dark = 1;
 fig

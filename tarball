@@ -18,14 +18,16 @@ files="
   $version/in
   $version/f
   $version/m
-  $version/viz
+  $version/g
 "
 
 rm -f f/*.mod
 
-tar chf - $files | gzip > sord.tgz
+tar cf - $files | gzip > sord.tgz
 
 rm $version
 
-if [ "x$1" = "x-s" ]; then cp sord.tgz save/$version.tgz; fi
+if [ "x$1" = "x-s" ]; then
+  cp sord.tgz save/$version.tgz
+fi
 

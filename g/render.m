@@ -78,7 +78,7 @@ if domesh || dosurf
   if icomp, surfviz( x, v, icomp, cellfocus, domesh, dosurf );
   else      surfviz( x, s, 1,     cellfocus, domesh, dosurf );
   end
-  lineviz( x );
+  if ~volviz, lineviz( x ); end
 end
 
 % Glyphs

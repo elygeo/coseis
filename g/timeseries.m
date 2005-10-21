@@ -8,14 +8,13 @@ clear tg xg rg vg va ta
 
 % Read metadata if SORD not running
 if ~exist( 'dofilter', 'var' ), dofilter = 0; end
-cwd = pwd;
 cd 'out'
 defaults
 in
 meta
 faultmeta
 currentstep
-cd( cwd )
+cd '..'
 
 % Test for special cases
 pointsource = ... 

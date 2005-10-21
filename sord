@@ -32,8 +32,8 @@ elif [ "$HOSTNAME" = master ];   then machine=Babieca
 else machine=$osname
 fi
 
-# Copy input file specified on command line
-[ -n "$1" ] && cp -f "$1" 'in.m'
+# Symling input file specified on command line
+[ -n "$1" ] && ln -sf "$1" 'in.m'
 
 # Strip MATLAB caracters
 sed "s/%.*$//; s/;/;\n/g; s/[]={}';[]*//g;/^$/d" 'defaults.m' 'in.m' > tmp
@@ -115,7 +115,7 @@ chmod u+x batchjob
 ./tarball
 cp sord.tgz out/
 
-[ $run ] && matlab -nodesktop -nosplash -r sord
+[ $run ] && matlab -nodesktop -nosplash -r "addpath m; sord"
 
 exit
 
