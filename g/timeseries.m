@@ -1,10 +1,10 @@
 % Time series
 % input: field icursor dofilter
-% output: tg vg ta va labels
+% output: tt vt ta va labels
 % search through outpur for desired timeseries data
 % try to find analytica solution as well if known
 
-clear tg xg rg vg va ta
+clear xg rg tt vt ta va
 
 % Read metadata if SORD not running
 if ~exist( 'dofilter', 'var' ), dofilter = 0; end
@@ -34,14 +34,14 @@ kostrov = ...
 % Find sensor location if needed
 vfsave = field;
 if pointsource || explosion || kostrov
-  [ xg, msg ] = read4d( 'x', [ sensor 0 ], [ sensor 0 ], 0 );
+  [ xsensor, msg ] = read4d( 'x', [ sensor 0 ], [ sensor 0 ], 0 );
   if msg
     fprintf( 'Warning: cannot locate sensor for analytical solution\n' )
     pointsource = 0;
     explosion = 0;
     kostrov = 0;
   else
-    xg = squeeze( vg )' - xhypo;
+    xg = squeeze( xsensor )' - xhypo;
     rg = sqrt( sum( xg .* xg ) );
   end
 end
@@ -49,16 +49,16 @@ end
 % Time
 if any( strcmp( vfsave, { 'v' 'vm' 'sv' } ) )
   it0 = 1;
-  tg = ( it0 : it ) * dt - .5 * dt;
+  tt = ( it0 : it ) * dt - .5 * dt;
 else
   it0 = 0;
-  tg = ( it0 : it ) * dt;
+  tt = ( it0 : it ) * dt;
 end
 
 % Extract data
-[ vg, msg ] = read4d( field, [ sensor it0 ], [ sensor it ], 0 );
+[ vt, msg ] = read4d( field, [ sensor it0 ], [ sensor it ], 0 );
 if msg, return, end
-vg = squeeze( vg );
+vt = squeeze( vt );
 
 % For point source, rotate to r,h,v coords
 if pointsource
@@ -72,15 +72,15 @@ if pointsource
     end
     switch nc
     case 3
-      vg = vg * rot;
+      vt = vt * rot;
     case 6
-      vg = [ ...
-         vg([1 6 5]) * rot(:,1) ...
-         vg([6 2 4]) * rot(:,2) ...
-         vg([5 4 3]) * rot(:,3) ...
-         vg([5 4 3]) * rot(:,2) ...
-         vg([1 6 5]) * rot(:,3) ...
-         vg([6 2 4]) * rot(:,1) ]'
+      vt = [ ...
+         vt([1 6 5]) * rot(:,1) ...
+         vt([6 2 4]) * rot(:,2) ...
+         vt([5 4 3]) * rot(:,3) ...
+         vt([5 4 3]) * rot(:,2) ...
+         vt([1 6 5]) * rot(:,3) ...
+         vt([6 2 4]) * rot(:,1) ]'
     end
   end
 end
@@ -91,7 +91,7 @@ if dofilter
   n = 2 * round( 1 / ( fcorner * dt ) );
   b = .5 * ( 1 - cos( 2 * pi * ( 1 : n - 1 ) / n ) );  % hanning
   a  = sum( b );
-  vg = filter( b, a, vg );
+  vt = filter( b, a, vt );
 end
 
 % Find analytical solution for known cases
@@ -101,26 +101,26 @@ if explosion
   tdom = tsource;
   switch timefcn
   case 'brune'
-    va = m0 * exp( -tg / tdom ) .* ( tg * vp0 / rg - tg / tdom + 1 ) ...
+    va = m0 * exp( -tt / tdom ) .* ( tt * vp0 / rg - tt / tdom + 1 ) ...
        / ( 4. * pi * rho0 * vp0 ^ 3 * tdom ^ 2 * rg );
   case 'sbrune'
-    va = m0 * exp( -tg / tdom ) .* ( tg * vp0 / rg - tg / tdom + 2 ) .* tg ...
+    va = m0 * exp( -tt / tdom ) .* ( tt * vp0 / rg - tt / tdom + 2 ) .* tt ...
        / ( 8. * pi * rho0 * vp0 ^ 3 * tdom ^ 3 * rg );
   otherwise va = 0;
   end
   if dofilter, va = filter( b, a, va ); end
-  ta = tg + rg / vp0;
-  i = ta <= tg(end);
+  ta = tt + rg / vp0;
+  i = ta <= tt(end);
   ta = ta(i);
   va = va(i);
 elseif kostrov
   c = .81;
   dtau = ts0 - mud0 * tn0;
-  va = c * dtau / rho0 / vs0 * ( tg + rg / vrup ) ...
-     ./ sqrt( tg .* ( tg + 2 * rg / vrup ) );
+  va = c * dtau / rho0 / vs0 * ( tt + rg / vrup ) ...
+     ./ sqrt( tt .* ( tt + 2 * rg / vrup ) );
   if dofilter, va = filter( b, a, va ); end
-  ta = tg + rg / vrup;
-  i = ta <= tg(end);
+  ta = tt + rg / vrup;
+  i = ta <= tt(end);
   ta = ta(i);
   va = va(i);
 end

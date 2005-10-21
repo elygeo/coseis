@@ -1,8 +1,14 @@
 % Outline viz
 
-function h = outlineviz( nn, ifn, ihypo, rmax )
+function h = outline( nn, ifn, ihypo, rmax )
 
-i = [
+izones = [ 1 1 1 nn ];
+if ifn
+  izones = [ izones; izones ];
+  izones(2,[0 3]+ifn) = ihypo(ifn);
+end
+
+ii = [
   1 2 3  4 2 3
   1 5 3  4 5 3
   1 2 6  4 2 6
@@ -17,10 +23,12 @@ i = [
   4 5 3  4 5 6
 ];
 
-i1 = [ 1 1 1 nn ];
-i2 = [ 1 1 1 nn ];
-i2([0 3]+ifn) = ihypo(ifn);
-ilines = unique( [ i1(i); i2(i) ], 'rows' );
+ilines = [];
+for iz = 1:size( izone, 1 )
+  i = izone(iz,:);
+  ilines = [ ilines; i(ii) ];
+end
+ilines = unique( ilines, 'rows' );
 
 x1 = [];
 x2 = [];

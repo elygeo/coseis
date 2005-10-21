@@ -7,7 +7,6 @@ i2 = i2viz;
 i1(ifn) = ihypo(ifn);
 i2(ifn) = ihypo(ifn);
 
-
 if rcrit
   i1(4) = 0;
   i2(4) = 0;

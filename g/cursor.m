@@ -36,7 +36,8 @@ if showframe ~= nframe
   set( [ frame{showframe} ], 'Visible', 'on' )
 end
 
-if ~docursor | any( icursor < i1s | icursor > i2s )
+if ~docursor || ...
+  ( any( icursor(1:3) ~= sensor ) && any( icursor < i1s | icursor > i2s ) )
   set( gcf, 'CurrentAxes', haxes(2) )
   tmp = icursor([4 1 2 3]);
   str = sprintf( '%4d          \n', tmp );

@@ -27,6 +27,7 @@ domesh = 0;
 dosurf = 1;
 doisosurf = 0;
 doglyph = 0;
+dofault = 1;
 volviz = 0;
 isofrac = .5;
 lim = -1;
@@ -35,12 +36,9 @@ i2viz = [ nn nt ];
 icursor = [ ihypo 0 ];
 ifn = abs( faultnormal );
 cellfocus = 0;
+sensor = 0;
 i1s = [ 1 1 1 1 ];
 i2s = [ 0 0 0 0 ];
-
-if ifn, islice = ifn;
-else    [ tmp islice ] = max( abs( upvector ) );
-end
 
 if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
 else     foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 1;
@@ -49,13 +47,13 @@ end
 if ~ishandle(1), figure(1), end
 set( 0, 'CurrentFigure', 1 )
 clf reset
+% 'Renderer', 'OpenGL', ...
 set( 1, ...
   'KeyPressFcn', 'control', ...
   'Name', 'SORD Data Explorer', ...
   'NumberTitle', 'off', ...
   'Menubar', 'none', ...
   'Toolbar', 'none', ...
-  'Renderer', 'OpenGL', ...
   'Color', background, ...
   'DefaultAxesColorOrder', foreground, ...
   'DefaultAxesColor', background, ...
@@ -74,8 +72,6 @@ set( 1, ...
   'DefaultAxesVisible', 'off' )
 haxes = axes( 'Position', [ .02 .1 .96 .88 ], 'Tag', 'mainaxes' );
 
-drawnow
-
 if 1
   [ tmp, l ] = max( abs( upvector ) );
   tmp = 'xyz';
@@ -92,8 +88,20 @@ count = 0;
 showframe = 0;
 houtline = [];
 
+if ifn
+  islice = ifn;
+  field = 'sv';
+  i1fault = i1viz;
+  i2fault = i2viz;
+  i1fault(ifn) = ihypo(ifn);
+  i2fault(ifn) = ihypo(ifn);
+else
+  dofault = 0;
+  [ tmp islice ] = max( abs( upvector ) );
+end
+
 if dooutline
-  houtline = outlineviz( nn, ifn, ihypo, rmax );
+  houtline = outline( nn, ifn, ihypo, rmax );
   set( houtline, 'HandleVisibility', 'off' )
 end
 
