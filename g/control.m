@@ -28,7 +28,7 @@ case 'f1'
     hhelp = text( .5, .54, ...
       { 'Acceleration      A   Zoom            < >   Time Series       T'
         'Velocity          V   Zoom Out          /   Filtered TS   Alt-T'
-        'Displacement      U   Reset Zoom    Alt-/   Space-Time        Y'
+        'Displacement      U   Reset View    Alt-/   Space-Time        Y'
         'Stress            W   Perspective       P   Filtered ST   Alt-Y'
         'Magnitude         0   Explore      Arrows   Step time     Space'
         'Component       1-6   Hypocenter        H   Render movie      R'
@@ -137,12 +137,17 @@ case 'p'
 case 'slash'
   panviz = 0;
   if km
-    msg = 'Zoom Reset';
+    msg = 'Reset View';
     if strcmp( camproj, 'orthographic' )
       lookat( islice, upvector, xcenter, camdist )
     else
       lookat( 0, upvector, xcenter, camdist )
     end
+    [ tmp, l ] = max( abs( upvector ) );
+    tmp = 'xyz';
+    cameratoolbar( 'SetMode', 'orbit' )
+    cameratoolbar( 'SetCoordSys', tmp(l) )
+    set( 1, 'KeyPressFcn', 'control' )
   else
     msg = 'Zoom Out';
     if strcmp( camproj, 'orthographic' )
@@ -172,7 +177,7 @@ case 'leftbracket'
   else    tmp = .5 * get( gca, 'CLim' );
   end
   set( gca, 'CLim', tmp )
-  if ~ic, tmp(1) = 0; end
+  if ~icomp, tmp(1) = 0; end
   set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
   set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
 case 'rightbracket'
@@ -181,7 +186,7 @@ case 'rightbracket'
   else    tmp = 2    * get( gca, 'CLim' );
   end
   set( gca, 'CLim', tmp )
-  if ~ic, tmp(1) = 0; end
+  if ~icomp, tmp(1) = 0; end
   set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
   set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
 case 'backslash'
@@ -189,7 +194,7 @@ case 'backslash'
     msg = 'Round Color Scale';
     tmp = clim * [ -1 1 ];
     set( gca, 'CLim', tmp )
-    if ~ic, tmp(1) = 0; end
+    if ~icomp, tmp(1) = 0; end
     set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
     set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
   else
@@ -205,7 +210,7 @@ case 'backslash'
     end
     tmp = 2 ^ exp2 * 10 ^ exp10 * [ -1 1 ];
     set( gca, 'CLim', tmp )
-    if ~ic, tmp(1) = 0; end
+    if ~icomp, tmp(1) = 0; end
     set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
     set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
   end
@@ -244,10 +249,12 @@ case 'x'
   else axis off, msg = 'Axis Off';
   end
 case 't'
-  dofilter = km;
   sensor = icursor(1:3);
-  timeseries
-  if ~msg, fig, tsplot, end
+  [ tt vt tta vta labels msg ] = timeseries( field, sensor, km );
+  if length( vt )
+    fig
+    tsplot
+  end
 case 'y', msg = 'Space-time not implemented yet';
 otherwise, action = 0; msg = '';
 end
@@ -270,6 +277,7 @@ if anim > 0
 end
 
 % Message
+set( 0, 'CurrentFigure', 1 )
 set( gcf, 'CurrentAxes', haxes(2) )
 if action, delete( hmsg ), hmsg = []; end
 if length( msg )

@@ -5,6 +5,7 @@ cd '/space/gely/sord'
 
 clear all
 addpath g
+
 cd 'out'
 defaults
 in
@@ -14,7 +15,7 @@ cd '..'
 field = 'v';
 icomp = 0;
 dark = 1;
-dit = 1;
+dit = 10;
 colorexp = .5;
 glyphcut = .1;
 glyphexp = 1;
@@ -37,8 +38,11 @@ icursor = [ ihypo 0 ];
 ifn = abs( faultnormal );
 cellfocus = 0;
 sensor = 0;
+fmax = 0;
 i1s = [ 1 1 1 1 ];
 i2s = [ 0 0 0 0 ];
+renderer = 'OpenGL';
+renderer = 'zbuffer';
 
 if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
 else     foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 1;
@@ -47,13 +51,11 @@ end
 if ~ishandle(1), figure(1), end
 set( 0, 'CurrentFigure', 1 )
 clf reset
-% 'Renderer', 'OpenGL', ...
 set( 1, ...
+  'Renderer', renderer, ...
   'KeyPressFcn', 'control', ...
-  'Name', 'SORD Data Explorer', ...
+  'Name', 'SORD DX', ...
   'NumberTitle', 'off', ...
-  'Menubar', 'none', ...
-  'Toolbar', 'none', ...
   'Color', background, ...
   'DefaultAxesColorOrder', foreground, ...
   'DefaultAxesColor', background, ...
@@ -70,15 +72,7 @@ set( 1, ...
   'DefaultTextHorizontalAlignment', 'center', ...
   'DefaultAxesPosition', [ 0 0 1 1 ], ...
   'DefaultAxesVisible', 'off' )
-haxes = axes( 'Position', [ .02 .1 .96 .88 ], 'Tag', 'mainaxes' );
-
-if 1
-  [ tmp, l ] = max( abs( upvector ) );
-  tmp = 'xyz';
-  cameratoolbar( 'SetMode', 'orbit' )
-  cameratoolbar( 'SetCoordSys', tmp(l) )
-  set( 1, 'KeyPressFcn', 'control' )
-end
+haxes = axes( 'Position', [ .02 .1 .96 .88 ] );
 
 hhud = [];
 hmsg = [];
@@ -108,6 +102,11 @@ end
 camdist = 3 * rmax;
 panviz = 0;
 lookat( 0, upvector, xcenter, camdist )
+[ tmp l ] = max( abs( upvector ) );
+tmp = 'xyz';
+cameratoolbar( 'SetMode', 'orbit' )
+cameratoolbar( 'SetCoordSys', tmp(l) )
+set( 1, 'KeyPressFcn', 'control' )
 
 fscl = 0;
 colorscale

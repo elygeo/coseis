@@ -1,13 +1,14 @@
 % Time series
-% input: field icursor dofilter
-% output: tt vt ta va labels
-% search through outpur for desired timeseries data
-% try to find analytica solution as well if known
+function [ tt vt tta vta labels msg ] = timeseries(  field, sensor, dofilter )
 
-clear xg rg tt vt ta va
+tt = [];
+vt = [];
+tta = [];
+vta = [];
+labels = {};
+msg = 'Time Series';
 
-% Read metadata if SORD not running
-if ~exist( 'dofilter', 'var' ), dofilter = 0; end
+% Read metadata
 cd 'out'
 defaults
 in
@@ -23,8 +24,8 @@ pointsource = ...
 explosion = ...
   strcmp( field, 'v' ) && ...
   ~faultnormal && ...
-  all( moment2 == 0 ) && ...
-  all( moment1 == moment1(1) );
+  all( moment(4:6) == 0 ) && ...
+  all( moment(1:3) == moment(1) );
 kostrov = ...
   strcmp( field, 'sv' ) && ...
   faultnormal && ...
@@ -32,11 +33,10 @@ kostrov = ...
   trelax == 0.;
 
 % Find sensor location if needed
-vfsave = field;
 if pointsource || explosion || kostrov
-  [ xsensor, msg ] = read4d( 'x', [ sensor 0 ], [ sensor 0 ], 0 );
+  [ xsensor msg ] = read4d( 'x', [ sensor 0 ], [ sensor 0 ], 0 );
   if msg
-    fprintf( 'Warning: cannot locate sensor for analytical solution\n' )
+    msg = 'Cannot locate sensor for analytical solution';
     pointsource = 0;
     explosion = 0;
     kostrov = 0;
@@ -47,7 +47,7 @@ if pointsource || explosion || kostrov
 end
 
 % Time
-if any( strcmp( vfsave, { 'v' 'vm' 'sv' } ) )
+if any( strcmp( field, { 'v' 'vm' 'sv' } ) )
   it0 = 1;
   tt = ( it0 : it ) * dt - .5 * dt;
 else
@@ -56,7 +56,7 @@ else
 end
 
 % Extract data
-[ vt, msg ] = read4d( field, [ sensor it0 ], [ sensor it ], 0 );
+[ vt msg ] = read4d( field, [ sensor it0 ], [ sensor it ], 0 );
 if msg, return, end
 vt = squeeze( vt );
 
@@ -95,34 +95,33 @@ if dofilter
 end
 
 % Find analytical solution for known cases
-haveanalytical = explosion || kostrov;
 if explosion
   m0 = moment1(1);
   tdom = tsource;
   switch timefcn
   case 'brune'
-    va = m0 * exp( -tt / tdom ) .* ( tt * vp0 / rg - tt / tdom + 1 ) ...
+    vta = m0 * exp( -tt / tdom ) .* ( tt * vp0 / rg - tt / tdom + 1 ) ...
        / ( 4. * pi * rho0 * vp0 ^ 3 * tdom ^ 2 * rg );
   case 'sbrune'
-    va = m0 * exp( -tt / tdom ) .* ( tt * vp0 / rg - tt / tdom + 2 ) .* tt ...
+    vta = m0 * exp( -tt / tdom ) .* ( tt * vp0 / rg - tt / tdom + 2 ) .* tt ...
        / ( 8. * pi * rho0 * vp0 ^ 3 * tdom ^ 3 * rg );
   otherwise va = 0;
   end
   if dofilter, va = filter( b, a, va ); end
-  ta = tt + rg / vp0;
-  i = ta <= tt(end);
-  ta = ta(i);
-  va = va(i);
+  tta = tt + rg / vp0;
+  i = tta <= tt(end);
+  tta = tta(i);
+  vta = vta(i);
 elseif kostrov
   c = .81;
   dtau = ts0 - mud0 * tn0;
-  va = c * dtau / rho0 / vs0 * ( tt + rg / vrup ) ...
+  vta = c * dtau / rho0 / vs0 * ( tt + rg / vrup ) ...
      ./ sqrt( tt .* ( tt + 2 * rg / vrup ) );
-  if dofilter, va = filter( b, a, va ); end
-  ta = tt + rg / vrup;
-  i = ta <= tt(end);
-  ta = ta(i);
-  va = va(i);
+  if dofilter, vta = filter( b, a, vta ); end
+  tta = tt + rg / vrup;
+  i = tta <= tt(end);
+  tta = tta(i);
+  vta = vta(i);
 end
 
 % Labels

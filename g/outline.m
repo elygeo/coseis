@@ -24,8 +24,8 @@ ii = [
 ];
 
 ilines = [];
-for iz = 1:size( izone, 1 )
-  i = izone(iz,:);
+for iz = 1:size( izones, 1 )
+  i = izones(iz,:);
   ilines = [ ilines; i(ii) ];
 end
 ilines = unique( ilines, 'rows' );

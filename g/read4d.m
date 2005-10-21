@@ -25,7 +25,7 @@ if found
   msg = '';
 else
   msg = 'No saved data found for this region';
-  f = 0;
+  f = [];
   cd( cwd )
   return
 end

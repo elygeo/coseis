@@ -18,7 +18,7 @@ lk = dx * ( n(2) - 1 );
 ll = dx * ( n(3) - 1 );
 
 % Coordinate system
-[ tmp, l ] = max( abs( upvector ) );
+[ tmp l ] = max( abs( upvector ) );
 up = sign( upvector(l) );
 k = mod( l + 1, 3 ) + 1;
 j = 6 - k - l;

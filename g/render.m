@@ -11,33 +11,32 @@ if ~volviz
     i2s(i) = i2s(i) + 1;
   end
 end
-
-% Read node locations
-i1s(4) = 0;
-i2s(4) = 0;
-[ x, msg ] = read4d( 'x', i1s, i2s, 0 );
-if msg, return, end
-
-% Read field data
 i1s(4) = icursor(4);
 i2s(4) = icursor(4);
-[ s, msg ] = read4d( field, i1s, i2s, 0 );
+
+% Read field data
+[ f msg ] = read4d( field, i1s, i2s, 0 );
 if msg, return, end
+
+% Read node locations
+[ x msg ] = read4d( 'x', [ i1s(1:3) 0 ], [ i2s(1:3) 0 ], 0 );
+if msg, error( msg ), end
 
 % Rearrange
 x = permute( x, [ 1 2 3 5 4 ] );
-s = permute( s, [ 1 2 3 5 4 ] );
-nc = size( s, 4 );
+f = permute( f, [ 1 2 3 5 4 ] );
+nc = size( f, 4 );
 if icomp > nc
   icomp = mod( icomp - 1, nc ) + 1;
 end
 
 % Magnitude
 switch nc
-case 1, icomp = 0;
-case 3, v = s; s = sqrt( sum( v .* v, 4 ) );
-case 6, v = s; s = sqrt( sum( v .* v, 4 ) + 2. * sum( v .* v, 4 ) );
+case 1, s = f; icomp = 0;
+case 3, v = f; s = sqrt( sum( v .* v, 4 ) );
+case 6, v = f; s = sqrt( sum( v .* v, 4 ) + 2. * sum( v .* v, 4 ) );
 end
+clear f
 
 % Read metadata
 cwd = pwd;

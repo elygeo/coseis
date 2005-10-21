@@ -157,7 +157,7 @@ dc0 = dc(j,k,l);
 tn0 = sum( t0(j,k,l,:) .* nhat(j,k,l,:) );
 ts0 = sqrt( sum( shiftdim( t0(j,k,l,:) - tn0 * nhat(j,k,l,:) ) ) );
 tn0 = max( -tn0, 0 );
-s = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 );
+ess = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 );
 lc =  dc0 * ( rho * vs * vs ) / tn0 / ( mus0 - mud0 );
 rctest = rho * vs * vs * tn0 * ( mus0 - mud0 ) * dc0 ...
   / ( ts0 - tn0 * mud0 ) ^ 2.;
@@ -167,7 +167,7 @@ fprintf( fid, 'mud0   = %g; % dynamic friction at hypocenter\n', mud0   );
 fprintf( fid, 'dc0    = %g; % dc at hypocenter\n',               dc0    );
 fprintf( fid, 'tn0    = %g; % normal traction at hypocenter\n',  tn0    );
 fprintf( fid, 'ts0    = %g; % shear traction at hypocenter\n',   ts0    );
-fprintf( fid, 's      = %g; % strength paramater\n',             s      );
+fprintf( fid, 'ess    = %g; % strength paramater\n',             ess    );
 fprintf( fid, 'lc     = %g; % breakdown width\n',                lc     );
 fprintf( fid, 'rctest = %g; % rcrit for spontaneous rupture \n', rctest );
 close( fid )

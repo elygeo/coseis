@@ -1,22 +1,26 @@
 % Timeseries viz
 
-plot( tg, vg )
+if ~length( vt ), return, end
+
+plot( tt, vt )
 hold on
-if haveanalytical
-  plot( ta, va, ':' )
+
+if length( tta )
+  plot( tta, vta, ':' )
   hold on
 end
 
 n = length( labels ) - 1;
+
 for i = 1 : n
-  [ tmp, ii ] = max( abs( vg(:,i) ) );
+  [ tmp, ii ] = max( abs( vt(:,i) ) );
   iii = max( 1, ii - 1 );
-  xg1 = .5 * double( tg(ii) + tg(iii) );
-  xg2 = .5 * double( vg(ii,i) + vg(iii,i) );
-  if xg2 > 0
-    text( xg1, xg2, labels(i+1), 'Hor', 'right', 'Ver', 'bottom' )
+  x1 = .5 * double( tt(ii) + tt(iii) );
+  x2 = .5 * double( vt(ii,i) + vt(iii,i) );
+  if x2 > 0
+    text( x1, x2, labels(i+1), 'Hor', 'right', 'Ver', 'bottom' )
   else
-    text( xg1, xg2, labels(i+1), 'Hor', 'right', 'Ver', 'top' )
+    text( x1, x2, labels(i+1), 'Hor', 'right', 'Ver', 'top' )
   end
 end
 

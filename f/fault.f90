@@ -8,7 +8,7 @@ contains
 subroutine fault
 
 implicit none
-real :: mus0, mud0, dc0, lc, tn0, ts0, s, rctest
+real :: mus0, mud0, dc0, lc, tn0, ts0, ess, rctest
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, &
   j3, k3, l3, j4, k4, l4, iz
 integer, save :: side
@@ -177,7 +177,7 @@ if ( master ) then
   tn0 = sum( t0(j,k,l,:) * nhat(j,k,l,:) )
   ts0 = sqrt( sum( ( t0(j,k,l,:) - tn0 * nhat(j,k,l,:) ) ** 2. ) )
   tn0 = max( -tn0, 0. )
-  s = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 )
+  ess = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 )
   lc =  dc0 * ( rho0 * vs0 ** 2. ) / tn0 / ( mus0 - mud0 )
   rctest = rho0 * vs0 ** 2. * tn0 * ( mus0 - mud0 ) * dc0 &
     / ( ts0 - tn0 * mud0 ) ** 2
@@ -187,7 +187,7 @@ if ( master ) then
   write( 9, * ) 'dc0    = ', dc0,    '; % dc at hypocenter'
   write( 9, * ) 'tn0    = ', tn0,    '; % normal traction at hypocenter'
   write( 9, * ) 'ts0    = ', ts0,    '; % shear traction at hypocenter'
-  write( 9, * ) 's      = ', s,      '; % strength paramater'
+  write( 9, * ) 'ess    = ', ess,    '; % strength paramater'
   write( 9, * ) 'lc     = ', lc,     '; % breakdown width'
   write( 9, * ) 'rctest = ', rctest, '; % rcrit for spontaneous rupture'
   close( 9 )
