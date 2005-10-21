@@ -225,7 +225,7 @@ if ( master ) then
   dtwall = real( twall(2) - twall(1) ) / real( twall_rate )
   twall(1) = twall(2)
   print *, it, amax, vmax, umax, dtwall
-  open(  9, file='out/timestep.m', status='replace' )
+  open(  9, file='out/currentstep.m', status='replace' )
   write( 9, * ) 'it =  ', it, '; % time-step'
   close( 9 )
   write( str, '(a,i6.6,a)' ) 'out/stats/it', it, '.m'

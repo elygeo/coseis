@@ -149,7 +149,7 @@ if pass == 'w', return, end
 
 if itcheck && ~mod( it, itcheck ), checkpoint, end
 
-fid = fopen( 'out/timestep', 'w' );
+fid = fopen( 'out/currentstep', 'w' );
 fprintf( fid, '  it = %g;\n', it );
 fclose( fid );
 

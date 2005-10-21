@@ -30,8 +30,8 @@ case 'f1'
         'Velocity          V   Zoom Out          /   Filtered TS   Alt-T'
         'Displacement      U   Reset Zoom    Alt-/   Space-Time        Y'
         'Stress            W   Perspective       P   Filtered ST   Alt-Y'
-        'Magnitude         0   Explore      Arrows                      '
-        'Component       1-6   Hypocenter        H   Build Movie       B'
+        'Magnitude         0   Explore      Arrows   Step time     Space'
+        'Component       1-6   Hypocenter        H   Render movie      R'
         'Volumes/Slices    Z   Extremum          E   Frame -1          -'
         'Slice         J K L   Length Scale      X   Frame +1          ='
         'Glyphs            G   Color Scale     [ ]   Frame -10      PgUp'
@@ -40,31 +40,53 @@ case 'f1'
         'Outline           O   Render        Enter   Last Frame      End'
         'Mesh              M   Clean     Backspace   Delete Frame    Del'
       }, ...
-      'Tag', 'help', ...
       'Vertical',   'middle', ...
       'Margin', 10, ...
       'EdgeColor', 0.5 * [ 1 1 1 ], ...
       'BackgroundColor', background );
     set( gcf, 'CurrentAxes', haxes(1) )
   end
-case 'home',     anim = 1; showframe = 1; msg = 'First Frame';
-case 'end',      anim = 1; showframe = nframe; msg = 'Last Frame';
-case 'pageup',   anim = 1; dframe = -10; msg = 'Frame -10';
-case 'pagedown', anim = 1; dframe =  10; msg = 'Frame +10';
-case 'hyphen',   anim = 1; dframe = -1;  msg = 'Frame -1';
-case 'equal',    anim = 1; dframe =  1;  msg = 'Frame +1';
+case 'a', if km, field = 'am'; else, field = 'a'; end, msg = field;
+case 'v', if km, field = 'vm'; else, field = 'v'; end, msg = field;
+case 'u', if km, field = 'um'; else, field = 'u'; end, msg = field;
+case 'w', if km, field = 'wm'; else, field = 'w'; end, msg = field;
+case '0', icomp = 0; colorscale
+case '1', icomp = 1; colorscale
+case '2', icomp = 2; colorscale
+case '3', icomp = 3; colorscale
+case '4', icomp = 4; colorscale
+case '5', icomp = 5; colorscale
+case '6', icomp = 6; colorscale
+case 'home',     anim = 1; showframe = 1;
+case 'end',      anim = 1; showframe = nframe;
+case 'pageup',   anim = 1; dframe = -10;
+case 'pagedown', anim = 1; dframe =  10;
+case 'hyphen',   anim = 1; dframe = -1;
+case 'equal',    anim = 1; dframe =  1;
 case { 'insert', 'return' }, render
+case 'space'
+  ditmul = 1;
+  if km, ditmul = 10; end
+  icursor(4) = icursor(4) + ditmul * dit;
+  render
+case 'r'
+  ditmul = 1;
+  if km, ditmul = 10; end
+  while icursor(4) + ditmul * dit <= nt;
+    icursor(4) = icursor(4) + ditmul * dit;
+    render
+  end
 case 'backspace'
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = []; msg = '';
 case 'delete'
-  msg = 'Delete Frame';
   delete( [ hhud hmsg hhelp ] )
   hhud = []; hmsg = []; hhelp = [];
   if nframe > 1
     delete( [ frame{showframe} ] )
     frame( showframe ) = [];
     nframe = nframe - 1;
+    msg = 'Delete ';
   end
   anim = 1;
 case 'downarrow',  if km, cursormove = -3; else cursormove = -1; end, cursor
@@ -76,13 +98,6 @@ case 'k', cursormove = 0; islice = 2; cursor
 case 'l', cursormove = 0; islice = 3; cursor
 case 'h', cursormove = 5; cursor; msg = 'Hypocenter';
 case 'e', cursormove = 6; cursor; msg = 'Extreme value';
-case '0', icomp = 0; colorscale
-case '1', icomp = 1; colorscale
-case '2', icomp = 2; colorscale
-case '3', icomp = 3; colorscale
-case '4', icomp = 4; colorscale
-case '5', icomp = 5; colorscale
-case '6', icomp = 6; colorscale
 case 'comma'
   msg = 'Zoom out';
   if ~km, camva( 1.25 * camva )
@@ -120,11 +135,17 @@ case 'p'
     campos( camtarget + pos )
   end
 case 'slash'
-  msg = 'Zoom Reset';
-  if strcmp( camproj, 'orthographic' )
-    if km
-      lookat( 0, upvector, xcenter, camdist )
+  panviz = 0;
+  if km
+    msg = 'Zoom Reset';
+    if strcmp( camproj, 'orthographic' )
+      lookat( islice, upvector, xcenter, camdist )
     else
+      lookat( 0, upvector, xcenter, camdist )
+    end
+  else
+    msg = 'Zoom Out';
+    if strcmp( camproj, 'orthographic' )
       v1 = camup;
       v2 = campos - camtarget;
       upvec = [ 0 0 0 ];
@@ -137,10 +158,6 @@ case 'slash'
       camtarget( xcenter )
       campos( camtarget + pos )
       camva( 22 )
-    end
-  else
-    if km
-      lookat( islice, upvector, xcenter, camdist )
     else
       v2 = campos - camtarget;
       pos = camdist * v2 / norm( v2 );
@@ -149,7 +166,6 @@ case 'slash'
       camva( 27.5 )
     end
   end
-  panviz = 0;
 case 'leftbracket'
   msg = 'Decrease Color Range';
   if ~km, tmp = .8 * get( gca, 'CLim' );
@@ -198,88 +214,46 @@ case 'z'
   if volviz, msg = 'Plotting volumes';
   else       msg = 'Plotting slices';
   end
-case 'a', if km, vizfield = 'am'; else, vizfield = 'a'; end, msg = vizfield;
-case 'v', if km, vizfield = 'vm'; else, vizfield = 'v'; end, msg = vizfield;
-case 'u', if km, vizfield = 'um'; else, vizfield = 'u'; end, msg = vizfield;
-case 'w', if km, vizfield = 'wm'; else, vizfield = 'w'; end, msg = vizfield;
 case 'o'
   dooutline = ~dooutline;
   if dooutline, set( houtline, 'Visible', 'on' ),  msg = 'Outline on';
   else          set( houtline, 'Visible', 'off' ), msg = 'Outline off';
   end
 case 'g'
-  tmp = findobj( [ frame{ showframe } ], 'Tag', 'glyph' );
-  if length( tmp ), doglyph = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
   doglyph = ~doglyph * ( 1 + km );
-  if doglyph, visible = 'on';  msg = 'Glyphs on';
-  else        visible = 'off'; msg = 'Glyphs off';
+  if doglyph, msg = 'Glyphs on';
+  else        msg = 'Glyphs off';
   end
-  if length( tmp ), set( tmp, 'Visible', visible ), end
 case 'i'
-  tmp = findobj( [ frame{ showframe } ], 'Tag', 'isosurf' );
-  if length( tmp ), doisosurf = strcmp( get( tmp(1), 'Visible' ), 'on' ); end
   doisosurf = ~doisosurf;
-  if doisosurf, visible = 'on';  msg = 'Isosurfaces on';
-  else          visible = 'off'; msg = 'Isosurfaces off';
+  if doisosurf, msg = 'Isosurfaces on';
+  else          msg = 'Isosurfaces off';
   end
-  if length( tmp ), set( tmp, 'Visible', visible ), end
 case 'm'
-  tmp = findobj( [ frame{ showframe } ], 'Tag', 'surf' );
-  if length( tmp ), domesh = ~strcmp( get( tmp(1), 'EdgeColor' ), 'none' ); end
   domesh = ~domesh;
-  foreground = get( 1, 'DefaultTextColor' );
-  if domesh, edgecolor = foreground; msg = 'Mesh on';
-  else       edgecolor = 'none';     msg = 'Mesh off';
+  if domesh, msg = 'Mesh on';
+  else       msg = 'Mesh off';
   end
-  if length( tmp ), set( tmp, 'EdgeColor', edgecolor ), end
 case 's'
-  tmp  = findobj( [ frame{ showframe } ], 'Tag', 'surf' );
-  if length( tmp ), dosurf = strcmp( get( tmp(1), 'FaceColor' ), 'flat' ); end
   dosurf = ~dosurf;
-  if dosurf, facecolor = 'flat'; visible = 'on';  msg = 'Surfaces on';
-  else       facecolor = 'none'; visible = 'off'; msg = 'Surfaces off';
+  if dosurf, msg = 'Surfaces on';
+  else       msg = 'Surfaces off';
   end
-  if length( tmp ), set( tmp, 'FaceColor', facecolor ), end
-  tmp = findobj( [ frame{ showframe } ], 'Tag', 'surfline' );
-  if length( tmp ), set( tmp, 'Visible', visible ), end
 case 'x'
   if strcmp( get( gca, 'Visible' ), 'off' ), axis on, msg = 'Axis On';
   else axis off, msg = 'Axis Off';
   end
-case 't', dofilter = km; sensor = icursor; tsviz
-case 'b'
-  if savemovie && ~holdmovie
-    msg = 'Build Movie';
-    delete( [ hhud hmsg hhelp ] )
-    hhud = []; hmsg = []; hhelp = [];
-    h = gca;
-    delete( get( h, 'Children' ) )
-    for i = 1:count
-      file = sprintf( 'out/viz/%06d', i );
-      openfig( file, 'new', 'invisible' );
-      frame{i} = copyobj( get( gca, 'Children' ), h )';
-      delete( gcf )
-    end
-    holdmovie = 1;
-    showframe = length( frame );
-  else
-    msg = 'Can''t Build Movie';
-  end
-  anim = 1;
+case 't'
+  dofilter = km;
+  sensor = icursor(1:3);
+  timeseries
+  if ~msg, fig, tsplot, end
+case 'y', msg = 'Space-time not implemented yet';
 otherwise, action = 0; msg = '';
 end
 keypress = '';
 
-% Message
-set( gcf, 'CurrentAxes', haxes(2) )
-if action, delete( hmsg ), hmsg = []; end
-if length( msg )
-  hmsg = text( .02, .1, msg, 'Hor', 'left', 'Ver', 'bottom' );
-  msg = '';
-end
-set( gcf, 'CurrentAxes', haxes(1) )
-set( [ hhud hmsg hhelp ], 'HandleVisibility', 'off' )
-
+% Frames
 nframe = length( frame );
 if anim > 0
   showframe = showframe + dframe;
@@ -292,6 +266,16 @@ if anim > 0
   end
   set( [ frame{:} ], 'Visible', 'off' )
   set( [ frame{showframe} ], 'Visible', 'on' )
+  msg = [ msg 'Frame ' num2str( showframe ) ];
 end
 
-set( haxes(2), 'HandleVisibility', 'off' )
+% Message
+set( gcf, 'CurrentAxes', haxes(2) )
+if action, delete( hmsg ), hmsg = []; end
+if length( msg )
+  hmsg = text( .02, .1, msg, 'Hor', 'left', 'Ver', 'bottom' );
+  msg = '';
+end
+set( gcf, 'CurrentAxes', haxes(1) )
+set( [ hhud hmsg hhelp haxes(2) ], 'HandleVisibility', 'off' )
+

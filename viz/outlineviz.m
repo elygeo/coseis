@@ -1,9 +1,8 @@
 % Outline viz
 
-function h = outlineviz( nn, rmax )
+function h = outlineviz( nn, ifn, ihypo, rmax )
 
-i = [ 1 1 1 nn ];
-ii = [
+i = [
   1 2 3  4 2 3
   1 5 3  4 5 3
   1 2 6  4 2 6
@@ -17,14 +16,19 @@ ii = [
   1 5 3  1 5 6
   4 5 3  4 5 6
 ];
-ii = unique( i(ii), 'rows' );
+
+i1 = [ 1 1 1 nn ];
+i2 = [ 1 1 1 nn ];
+i2([0 3]+ifn) = ihypo(ifn);
+ilines = unique( [ i1(i); i2(i) ], 'rows' );
+
 x1 = [];
 x2 = [];
 x3 = [];
 
-for iz = 1:size( ii, 1 )
-  i1 = ii(iz,1:3);
-  i2 = ii(iz,4:6);
+for iz = 1:size( ilines, 1 )
+  i1 = ilines(iz,1:3);
+  i2 = ilines(iz,4:6);
   n = i2 - i1 + 1;
   if sum( n > 1 ) ~= 1, continue, end
   [ x, msg ] = read4d( 'x', [ i1 0 ], [ i2 0 ], 0 );
@@ -46,5 +50,5 @@ x2 = x2([1 3 5]) + rmax * [ 0 .02 0 ];
 x3 = x3([1 3 5]) + rmax * [ 0 0 .02 ];
 h(3:5) = text( x1, x2, x3, ['xyz']', 'Ver', 'middle' );
 
-set( h, 'Tag', 'outline', 'HandleVisibility', 'off' )
+set( h, 'HandleVisibility', 'off' )
 

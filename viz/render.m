@@ -1,52 +1,28 @@
 % Render
 
-% Setup figure
-set( 0, 'CurrentFigure', 1 )
-if holdmovie
-  set( [ frame{:} ], 'Visible', 'off' )
-  set( [ frame{:} ], 'HandleVisibility', 'off' )
-else
-  delete( [ frame{:} ] )
-  frame = {};
-end
-delete( [ hhud hmsg hhelp ] )
-hhud = [];
-hmsg = [];
-hhelp = [];
-
-% Read metadata
-cwd = pwd;
-cd 'out'
-cd 'stats'
-file = sprintf( 'it%06d', icursor(4) );
-eval( file )
-cd( cwd )
-fieldinfo
-fscl = lim;
-if fscl < 0
-  fscl = double( fmax );
-end
-
 % Slice
 i1s = i1viz;
 i2s = i2viz;
 if ~volviz
   i = islice;
   i1s(i) = icursor(i);
-  i2s(i) = icursor(i) + cellfocus;
+  i2s(i) = icursor(i);
+  if strcmp( field(1), 'w' )
+    i2s(i) = i2s(i) + 1;
+  end
 end
 
 % Read node locations
 i1s(4) = 0;
 i2s(4) = 0;
 [ x, msg ] = read4d( 'x', i1s, i2s, 0 );
-if msg, error( msg ), end
+if msg, return, end
 
 % Read field data
 i1s(4) = icursor(4);
 i2s(4) = icursor(4);
 [ s, msg ] = read4d( field, i1s, i2s, 0 );
-if msg, error( msg ), end
+if msg, return, end
 
 % Rearrange
 x = permute( x, [ 1 2 3 5 4 ] );
@@ -63,6 +39,33 @@ case 3, v = s; s = sqrt( sum( v .* v, 4 ) );
 case 6, v = s; s = sqrt( sum( v .* v, 4 ) + 2. * sum( v .* v, 4 ) );
 end
 
+% Read metadata
+cwd = pwd;
+cd 'out'
+cd 'stats'
+file = sprintf( 'it%06d', icursor(4) );
+eval( file )
+cd( cwd )
+fieldinfo
+fscl = lim;
+if fscl < 0
+  fscl = fmax;
+end
+
+% Setup figure
+set( 0, 'CurrentFigure', 1 )
+if holdmovie
+  set( [ frame{:} ], 'Visible', 'off' )
+  set( [ frame{:} ], 'HandleVisibility', 'off' )
+else
+  delete( [ frame{:} ] )
+  frame = {};
+end
+delete( [ hhud hmsg hhelp ] )
+hhud = [];
+hmsg = [];
+hhelp = [];
+
 % Isosurfaces
 if doisosurf
   if icomp, isosurfviz( x, v, icomp, cellfocus, fscl * isofrac );
@@ -75,6 +78,7 @@ if domesh || dosurf
   if icomp, surfviz( x, v, icomp, cellfocus, domesh, dosurf );
   else      surfviz( x, s, 1,     cellfocus, domesh, dosurf );
   end
+  lineviz( x );
 end
 
 % Glyphs
@@ -93,6 +97,8 @@ set( gcf, 'CurrentAxes', haxes(2) )
 text( .50, .05, labels( icomp + 2 ) );
 text( .98, .98, sprintf( '%.3fs', t ), 'Hor', 'right' )
 set( gcf, 'CurrentAxes', haxes(1) )
+
+drawnow
 
 % Save frame
 kids = get( haxes, 'Children' );

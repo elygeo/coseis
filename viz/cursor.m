@@ -5,8 +5,8 @@ way = sign( cursormove );
 cursormove = abs( cursormove );
 switch cursormove
 case 0
-case 5, icursor = [ ihypo it ];
-case 6, icursor = [ fmaxi it ];
+case 5, icursor(1:3) = ihypo;
+case 6, icursor(1:3) = fmaxi;
 otherwise
   v1 = camup;
   v3 = camtarget - campos;

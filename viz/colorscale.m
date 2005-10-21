@@ -40,8 +40,8 @@ if icomp
       0 1 1 1 0
       1 1 1 0 0 ]';
   end
-  hh = 2 / ( size( cmap, 1 ) - 1 );
-  x1 = -1 : hh : 1;
+  h = 2 / ( size( cmap, 1 ) - 1 );
+  x1 = -1 : h : 1;
   x2 = -1 : .0005 : 1;
   x2 = sign( x2 ) .* abs( x2 ) .^ colorexp;
   colormap( interp1( x1, cmap, x2 ) );
@@ -60,8 +60,8 @@ else
       4 1 4 4 1 0
       4 4 4 1 1 0 ]' / 4;
   end
-  hh = 1 / ( size( cmap, 1 ) - 1 );
-  x1 = 0 : hh : 1;
+  h = 1 / ( size( cmap, 1 ) - 1 );
+  x1 = 0 : h : 1;
   x2 = -1 : .0005 : 1;
   x2 = abs( x2 ) .^ colorexp;
   colormap( interp1( x1, cmap, x2 ) );

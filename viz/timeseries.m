@@ -1,5 +1,5 @@
 % Time series
-% input: vizfield sensor dofilter
+% input: field icursor dofilter
 % output: tg vg ta va labels
 % search through outpur for desired timeseries data
 % try to find analytica solution as well if known
@@ -14,32 +14,28 @@ defaults
 in
 meta
 faultmeta
-timestep
+currentstep
 cd( cwd )
 
 % Test for special cases
 pointsource = ... 
-  any( strcmp( vizfield, { 'a' 'v' 'u' } ) ) && ...
+  any( strcmp( field, { 'a' 'v' 'u' } ) ) && ...
   ~faultnormal;
 explosion = ...
-  strcmp( vizfield, 'v' ) && ...
+  strcmp( field, 'v' ) && ...
   ~faultnormal && ...
   all( moment2 == 0 ) && ...
   all( moment1 == moment1(1) );
 kostrov = ...
-  strcmp( vizfield, 'sv' ) && ...
+  strcmp( field, 'sv' ) && ...
   faultnormal && ...
   rcrit > 1e8 && ...
   trelax == 0.;
 
 % Find sensor location if needed
-vfsave = vizfield;
+vfsave = field;
 if pointsource || explosion || kostrov
-  vizfield = 'x';
-  i1s = [ sensor 0 ];
-  i2s = [ sensor 0 ];
-  ic = 0;
-  get4dsection
+  [ xg, msg ] = read4d( 'x', [ sensor 0 ], [ sensor 0 ], 0 );
   if msg
     fprintf( 'Warning: cannot locate sensor for analytical solution\n' )
     pointsource = 0;
@@ -61,11 +57,7 @@ else
 end
 
 % Extract data
-vizfield = vfsave;
-i1s = [ sensor it0 ];
-i2s = [ sensor it  ];
-ic = 0;
-get4dsection
+[ vg, msg ] = read4d( field, [ sensor it0 ], [ sensor it ], 0 );
 if msg, return, end
 vg = squeeze( vg );
 
@@ -135,7 +127,7 @@ elseif kostrov
 end
 
 % Labels
-switch vizfield
+switch field
 case 'x',    labels = { 'Position'        'x' 'y' 'z' };
 case 'a',    labels = { 'Acceleration'    'Ax' 'Ay' 'Az' };
 case 'v',    labels = { 'Velocity'        'Vx' 'Vy' 'Vz' };
@@ -151,16 +143,16 @@ case 'tn',   labels = { 'Normal Traction' 'Tn' };
 case 'ts',   labels = { 'Shear Traction'  'Ts' };
 case 'trup', labels = { 'Rupture Time'    'trup' };
 case 'tarr', labels = { 'Arrest Time'     'tarr' };
-otherwise error 'vizfield'
+otherwise error 'field'
 end
 
 if pointsource
-  switch vizfield
-  case 'x',   labels = { 'Position'     'r' 'h' 'v' };
-  case 'a',   labels = { 'Acceleration' 'Ar' 'Ah' 'Av' };
-  case 'v',   labels = { 'Velocity'     'Vr' 'Vh' 'Vv' };
-  case 'u',   labels = { 'Displacement' 'Ur' 'Uh' 'Uv' };
-  case 'w',   labels = { 'Stress' 'Wrr' 'Whh' 'Wvv' 'Whv' 'Wvr' 'Wrh' };
+  switch field
+  case 'x',  labels = { 'Position'     'r' 'h' 'v' };
+  case 'a',  labels = { 'Acceleration' 'Ar' 'Ah' 'Av' };
+  case 'v',  labels = { 'Velocity'     'Vr' 'Vh' 'Vv' };
+  case 'u',  labels = { 'Displacement' 'Ur' 'Uh' 'Uv' };
+  case 'w',  labels = { 'Stress' 'Wrr' 'Whh' 'Wvv' 'Whv' 'Wvr' 'Wrh' };
   end
 end
 

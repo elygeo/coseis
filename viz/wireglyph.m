@@ -94,5 +94,4 @@ FIXME
   end
 otherwise error 'mga'
 end
-set( hglyph, 'Tag', 'glyph' );
 
