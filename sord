@@ -94,7 +94,8 @@ echo "Run time: at least $wt"
 cat << END > out/runmeta.m
 login   = '$LOGNAME';
 name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )';
-date    = '$( date )';
+rundate = '$( date )';
+rundir  = '$( /bin/pwd )';
 machine = '$machine';
 host    = '$HOSTNAME';
 os      = '$( uname -a )';
@@ -353,6 +354,7 @@ wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
 ppn=2
 [ $ppn -gt $np ] && ppn=$np
 nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
+rundir=$( /bin/pwd )
 cat << END > batchjob
 #!/bin/bash
 #PBS -q dque
@@ -395,6 +397,7 @@ END
 ppn=2
 [ $ppn -gt $np ] && ppn=$np
 nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
+rundir=$( /bin/pwd )
 cat << END > batchjob
 #!/bin/bash
 #PBS -q workq

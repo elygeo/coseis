@@ -14,6 +14,7 @@ c2 = -3. / 100.
 c3 =  1. / 1500.
 tune = 3.5
 pmlp = 2.
+!hmean = 2. * vp1 * vp2 / ( vp1 + vp2 )
 hmean = 2. * vs1 * vs2 / ( vs1 + vs2 )
 damp = tune * hmean / dx * ( c1 + ( c2 + c3 * npml ) * npml ) / npml ** pmlp
 do i = 1, npml
