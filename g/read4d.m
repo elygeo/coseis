@@ -2,10 +2,9 @@
 function [ f, msg ] = read4d( fieldin, i1s, i2s, ic )
 
 % Array slice
-cwd = pwd;
-cd 'out'
-meta
+rehash
 currentstep
+meta
 
 % Look for file with desired data
 n = i2s - i1s + 1;
@@ -19,14 +18,13 @@ for iz = 1:nout
           all( i2s <= [ i2 it ] ) && ...
           ( dit == 1 || ( n(4) == 1 && any( i1s(4) == 0:dit:it ) ) );
   if found, break, end
-  cd ..
+  cd '..'
 end
 if found
   msg = '';
 else
   msg = 'No saved data found for this region';
   f = [];
-  cd( cwd )
   return
 end
 
@@ -53,5 +51,5 @@ for it = 1:n(4)
   fclose( fid );
 end
 end
-cd( cwd )
+cd '..'
 

@@ -1,10 +1,9 @@
 % Plot Kostrov results
 
 clear all
-addpath g
-cd 'out'
+addpath ../g
+
 meta
-cd '..'
 dark = 1;
 fig
 

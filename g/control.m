@@ -71,9 +71,8 @@ case 'space'
   icursor(4) = icursor(4) + ditmul * dit;
   render
 case 'r'
-  cd 'out'
+  rehash
   currentstep
-  cd '..'
   ditmul = 1;
   if km, ditmul = 10; end
   while icursor(4) + ditmul * dit <= it;

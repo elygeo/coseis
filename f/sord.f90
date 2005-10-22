@@ -33,13 +33,6 @@ call fault
 call swaphalo( w1, nhalo )
 call output( 'a' )
 
-print *, 111
-print *, mr(2:4,2:4,2:4)
-print *, 222
-print *, mu(2:3,2:3,2:3)
-print *, 222
-print *, lam(2:3,2:3,2:3)
-
 ! Main loop
 do while ( it <= nt )
   call pml

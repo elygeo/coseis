@@ -9,13 +9,12 @@ labels = {};
 msg = 'Time Series';
 
 % Read metadata
-cd 'out'
+rehash
+currentstep
 defaults
 in
 meta
-currentstep
 if faultnormal, faultmeta, end
-cd '..'
 
 % Test for special cases
 pointsource = ... 

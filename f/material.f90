@@ -57,13 +57,10 @@ case( 'rho' )
     rho2 = max( rho2, inval(iz) )
   else
     call ioscalar( 'r', 'data/rho', mr, i1, i2, n, noff, 0 )
-    j = ihypo(1)
-    k = ihypo(2)
-    l = ihypo(3)
     select case( idoublenode )
-    case( 1 ); mr(j+1:j2,:,:) = mr(j:j2-1,:,:)
-    case( 2 ); mr(:,k+1:k2,:) = mr(:,k:k2-1,:)
-    case( 3 ); mr(:,:,l+1:l2) = mr(:,:,l:l2-1)
+    case( 1 ); j = ihypo(1); mr(j+1:j2,:,:) = mr(j:j2-1,:,:)
+    case( 2 ); k = ihypo(2); mr(:,k+1:k2,:) = mr(:,k:k2-1,:)
+    case( 3 ); l = ihypo(3); mr(:,:,l+1:l2) = mr(:,:,l:l2-1)
     end select
     where ( mr < rho1 ) mr = rho1
     where ( mr > rho1 ) mr = rho2
@@ -74,14 +71,11 @@ case( 'vp'  )
     vp1 = min( vp1, inval(iz) )
     vp2 = max( vp2, inval(iz) )
   else
-    call ioscalar( 'r', 'data/vp',  s1, i1, i2, n, noff, 0 )
-    j = ihypo(1)
-    k = ihypo(2)
-    l = ihypo(3)
+    call ioscalar( 'r', 'data/vp', s1, i1, i2, n, noff, 0 )
     select case( idoublenode )
-    case( 1 ); s1(j+1:j2,:,:) = s1(j:j2-1,:,:)
-    case( 2 ); s1(:,k+1:k2,:) = s1(:,k:k2-1,:)
-    case( 3 ); s1(:,:,l+1:l2) = s1(:,:,l:l2-1)
+    case( 1 ); j = ihypo(1); s1(j+1:j2,:,:) = s1(j:j2-1,:,:)
+    case( 2 ); k = ihypo(2); s1(:,k+1:k2,:) = s1(:,k:k2-1,:)
+    case( 3 ); l = ihypo(3); s1(:,:,l+1:l2) = s1(:,:,l:l2-1)
     end select
     where ( s1 < vp1 ) s1 = vp1
     where ( s1 > vp2 ) s1 = vp2
@@ -92,14 +86,11 @@ case( 'vs'  )
     vs1 = min( vs1, inval(iz) )
     vs2 = max( vs2, inval(iz) )
   else
-    call ioscalar( 'r', 'data/vs',  s2, i1, i2, n, noff, 0 )
-    j = ihypo(1)
-    k = ihypo(2)
-    l = ihypo(3)
+    call ioscalar( 'r', 'data/vs', s2, i1, i2, n, noff, 0 )
     select case( idoublenode )
-    case( 1 ); s2(j+1:j2,:,:) = s2(j:j2-1,:,:)
-    case( 2 ); s2(:,k+1:k2,:) = s2(:,k:k2-1,:)
-    case( 3 ); s2(:,:,l+1:l2) = s2(:,:,l:l2-1)
+    case( 1 ); j = ihypo(1); s2(j+1:j2,:,:) = s2(j:j2-1,:,:)
+    case( 2 ); k = ihypo(2); s2(:,k+1:k2,:) = s2(:,k:k2-1,:)
+    case( 3 ); l = ihypo(3); s2(:,:,l+1:l2) = s2(:,:,l:l2-1)
     end select
     where ( s2 < vs1 ) s2 = vs1
     where ( s2 > vs2 ) s2 = vs2

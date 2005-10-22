@@ -39,12 +39,10 @@ end
 clear f
 
 % Read metadata
-cwd = pwd;
-cd 'out'
 cd 'stats'
 file = sprintf( 'it%06d', icursor(4) );
 eval( file )
-cd( cwd )
+cd '..'
 fieldinfo
 fscl = lim;
 if fscl < 0
@@ -104,9 +102,4 @@ kids = get( haxes, 'Children' );
 kids = [ kids{1}; kids{2} ]';
 frame{end+1} = kids;
 showframe = length( frame );
-if savemovie && ~holdmovie
-  count = count + 1;
-  file = sprintf( 'out/viz/%06d', count );
-  saveas( gcf, file )
-end
 
