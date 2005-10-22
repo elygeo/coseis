@@ -29,9 +29,9 @@ n = nn
 noff = nnoff
 if ( ifn /= 0 ) then
   n(ifn) = n(ifn) - 1
-  if ( ihypo(ifn) < 1 ) then
+  if ( ihypo(ifn) < i1node(ifn) ) then
     noff = noff + 1
-  else if ( ihypo(ifn) <= i2cell(ifn) ) then
+  else if ( ihypo(ifn) < i2node(ifn) ) then
     idoublenode = ifn
   end if
 end if
@@ -43,8 +43,8 @@ doiz: do iz = 1, nin
 i1 = i1in(iz,:)
 i2 = i2in(iz,:)
 call zone( i1, i2, nn, nnoff, ihypo, ifn )
-i1 = max( i1, i1cell )
-i2 = min( i2, i2cell + 1 )
+i1 = max( i1, i1node )
+i2 = min( i2, i2node )
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
@@ -57,11 +57,13 @@ case( 'rho' )
     rho2 = max( rho2, inval(iz) )
   else
     call ioscalar( 'r', 'data/rho', mr, i1, i2, n, noff, 0 )
-    if ( ifn /= 0 ) i = ihypo(ifn)
+    j = ihypo(1)
+    k = ihypo(2)
+    l = ihypo(3)
     select case( idoublenode )
-    case( 1 ); mr(i+1:j2,:,:) = mr(i:j2-1,:,:)
-    case( 2 ); mr(:,i+1:k2,:) = mr(:,i:k2-1,:)
-    case( 3 ); mr(:,:,i+1:l2) = mr(:,:,i:l2-1)
+    case( 1 ); mr(j+1:j2,:,:) = mr(j:j2-1,:,:)
+    case( 2 ); mr(:,k+1:k2,:) = mr(:,k:k2-1,:)
+    case( 3 ); mr(:,:,l+1:l2) = mr(:,:,l:l2-1)
     end select
     where ( mr < rho1 ) mr = rho1
     where ( mr > rho1 ) mr = rho2
@@ -73,11 +75,13 @@ case( 'vp'  )
     vp2 = max( vp2, inval(iz) )
   else
     call ioscalar( 'r', 'data/vp',  s1, i1, i2, n, noff, 0 )
-    if ( ifn /= 0 ) i = ihypo(ifn)
+    j = ihypo(1)
+    k = ihypo(2)
+    l = ihypo(3)
     select case( idoublenode )
-    case( 1 ); s1(i+1:j2,:,:) = s1(i:j2-1,:,:)
-    case( 2 ); s1(:,i+1:k2,:) = s1(:,i:k2-1,:)
-    case( 3 ); s1(:,:,i+1:l2) = s1(:,:,i:l2-1)
+    case( 1 ); s1(j+1:j2,:,:) = s1(j:j2-1,:,:)
+    case( 2 ); s1(:,k+1:k2,:) = s1(:,k:k2-1,:)
+    case( 3 ); s1(:,:,l+1:l2) = s1(:,:,l:l2-1)
     end select
     where ( s1 < vp1 ) s1 = vp1
     where ( s1 > vp2 ) s1 = vp2
@@ -89,11 +93,13 @@ case( 'vs'  )
     vs2 = max( vs2, inval(iz) )
   else
     call ioscalar( 'r', 'data/vs',  s2, i1, i2, n, noff, 0 )
-    if ( ifn /= 0 ) i = ihypo(ifn)
+    j = ihypo(1)
+    k = ihypo(2)
+    l = ihypo(3)
     select case( idoublenode )
-    case( 1 ); s2(i+1:j2,:,:) = s2(i:j2-1,:,:)
-    case( 2 ); s2(:,i+1:k2,:) = s2(:,i:k2-1,:)
-    case( 3 ); s2(:,:,i+1:l2) = s2(:,:,i:l2-1)
+    case( 1 ); s2(j+1:j2,:,:) = s2(j:j2-1,:,:)
+    case( 2 ); s2(:,k+1:k2,:) = s2(:,k:k2-1,:)
+    case( 3 ); s2(:,:,l+1:l2) = s2(:,:,l:l2-1)
     end select
     where ( s2 < vs1 ) s2 = vs1
     where ( s2 > vs2 ) s2 = vs2
@@ -101,6 +107,10 @@ case( 'vs'  )
 end select
 
 end do doiz
+
+call swaphalo( mr, nhalo )
+call swaphalo( s1, nhalo )
+call swaphalo( s2, nhalo )
 
 ! Hypocenter values
 if ( master ) then
@@ -138,47 +148,43 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
 end forall
 
 ! Cell volume
-s2 = 0.
-do iz = 1, noper
-  i1 = max( i1oper(iz,:),     i1cell )
-  i2 = min( i2oper(iz,:) - 1, i2cell )
-  call diffnc( s2, oper(iz), x, x, dx, 1, 1, i1, i2 )
-end do
-if ( ifn /=0 ) then
-  i = ihypo(ifn)
-  select case( ifn )
-  case( 1 ); s2(i,:,:) = 0.;
-  case( 2 ); s2(:,i,:) = 0.;
-  case( 3 ); s2(:,:,i) = 0.;
-  end select
-end if
+s1 = 0.
+call diffnc( s1, 'g', x, x, dx, 1, 1, i1cell, i2cell )
+j = ihypo(1)
+k = ihypo(2)
+l = ihypo(3)
+select case( idoublenode )
+case( 1 ); s1(j,:,:) = 0.
+case( 2 ); s1(:,k,:) = 0.
+case( 3 ); s1(:,:,l) = 0.
+end select
 
 ! Node volume
-s1 = 0.
+s2 = 0.
 i1 = i1node
 i2 = i2node
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-  s1(j,k,l) = 0.125 * &
-    ( s2(j,k,l) + s2(j-1,k-1,l-1) &
-    + s2(j-1,k,l) + s2(j,k-1,l-1) &
-    + s2(j,k-1,l) + s2(j-1,k,l-1) &
-    + s2(j,k,l-1) + s2(j-1,k-1,l) )
+  s2(j,k,l) = 0.125 * &
+    ( s1(j,k,l) + s1(j-1,k-1,l-1) &
+    + s1(j-1,k,l) + s1(j,k-1,l-1) &
+    + s1(j,k-1,l) + s1(j-1,k,l-1) &
+    + s1(j,k,l-1) + s1(j-1,k-1,l) )
 end forall
 
 ! Hourglass constant
 y = 6. * dx * dx * ( lam + 2. * mu )
-where ( y /= 0. ) y = 4. * mu * ( lam + mu ) / y * s2
+where ( y /= 0. ) y = 4. * mu * ( lam + mu ) / y * s1
 
 ! Divide Lame parameters by cell volume
-where ( s2 /= 0. ) s2 = 1. / s2
-lam = lam * s2
-mu = mu * s2
+where ( s1 /= 0. ) s1 = 1. / s1
+lam = lam * s1
+mu = mu * s1
 
 ! Node mass ratio
-mr = mr * s1
+mr = mr * s2
 where ( mr /= 0. ) mr = 1. / mr
 
 s1 = 0.

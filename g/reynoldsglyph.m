@@ -30,6 +30,7 @@ case 3
   for ig = 1:size( vv, 1 )
     v = vv(ig,:);
     m = sqrt( sum( v .* v ) );
+    if m < sqrt( eps ), continue, end
     v = v / m;
     x = xglyph;
     q = qglyph;
@@ -110,7 +111,7 @@ case 6
     h(ig) = surf( x(:,:,1), x(:,:,2), x(:,:,3), r, 'VertexNorm', q );
     hold on
   end
-otherwise error 'vv'
+otherwise error 'size vv'
 end
 
 set( h, ...

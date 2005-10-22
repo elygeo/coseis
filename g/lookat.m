@@ -3,9 +3,9 @@ function lookat( look, upvector, xcenter, camdist )
 
 upvec = upvector;
 [ tmp, l ] = max( abs( upvector ) );
-if l == 1, error, end
 j = 1;
-k = 6 - j - l;
+if l == 1, j = 2; end
+k = 6 - l - j;
 i = abs( look );
 
 switch i
@@ -32,4 +32,5 @@ campos( xcenter + camdist * pos )
 camup( upvec )
 axis equal
 axis vis3d
+axis auto
 

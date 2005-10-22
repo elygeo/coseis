@@ -158,6 +158,8 @@ character(160) :: &
 
 logical :: &
   master,       & ! master processor flag
+  edge1(3),     & ! edge processor
+  edge2(3),     & ! edge processor
   readfile(nz)    ! read input file
 
 end module

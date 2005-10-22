@@ -1,5 +1,5 @@
 % Time series
-function [ tt vt tta vta labels msg ] = timeseries(  field, sensor, dofilter )
+function [ tt, vt, tta, vta, labels, msg ] = timeseries( field, sensor, dofilter )
 
 tt = [];
 vt = [];
@@ -13,8 +13,8 @@ cd 'out'
 defaults
 in
 meta
-faultmeta
 currentstep
+if faultnormal, faultmeta, end
 cd '..'
 
 % Test for special cases
@@ -24,8 +24,8 @@ pointsource = ...
 explosion = ...
   strcmp( field, 'v' ) && ...
   ~faultnormal && ...
-  all( moment(4:6) == 0 ) && ...
-  all( moment(1:3) == moment(1) );
+  all( moment2 == 0 ) && ...
+  all( moment1 == moment1(1) );
 kostrov = ...
   strcmp( field, 'sv' ) && ...
   faultnormal && ...
@@ -34,7 +34,7 @@ kostrov = ...
 
 % Find sensor location if needed
 if pointsource || explosion || kostrov
-  [ xsensor msg ] = read4d( 'x', [ sensor 0 ], [ sensor 0 ], 0 );
+  [ xsensor, msg ] = read4d( 'x', [ sensor 0 ], [ sensor 0 ], 0 );
   if msg
     msg = 'Cannot locate sensor for analytical solution';
     pointsource = 0;
@@ -56,9 +56,11 @@ else
 end
 
 % Extract data
-[ vt msg ] = read4d( field, [ sensor it0 ], [ sensor it ], 0 );
+[ vt, msg ] = read4d( field, [ sensor it0 ], [ sensor it ], 0 );
 if msg, return, end
-vt = squeeze( vt );
+nt = it - it0 + 1;
+nc = size( vt, 5 );
+vt = reshape( vt, nt, nc );
 
 % For point source, rotate to r,h,v coords
 if pointsource
@@ -95,19 +97,19 @@ if dofilter
 end
 
 % Find analytical solution for known cases
-if explosion
+if explosion && rg
   m0 = moment1(1);
   tdom = tsource;
-  switch timefcn
+  switch tfunc
   case 'brune'
     vta = m0 * exp( -tt / tdom ) .* ( tt * vp0 / rg - tt / tdom + 1 ) ...
        / ( 4. * pi * rho0 * vp0 ^ 3 * tdom ^ 2 * rg );
   case 'sbrune'
     vta = m0 * exp( -tt / tdom ) .* ( tt * vp0 / rg - tt / tdom + 2 ) .* tt ...
        / ( 8. * pi * rho0 * vp0 ^ 3 * tdom ^ 3 * rg );
-  otherwise va = 0;
+  otherwise vta = 0;
   end
-  if dofilter, va = filter( b, a, va ); end
+  if dofilter, vta = filter( b, a, vta ); end
   tta = tt + rg / vp0;
   i = tta <= tt(end);
   tta = tta(i);

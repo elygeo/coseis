@@ -15,8 +15,8 @@ real :: lj, lk, ll, x1(3), x2(3)
 if ( master ) print '(a)', 'Grid generation'
 
 ! Indices
-i1 = i1cell
-i2 = i2cell + 1
+i1 = i1node
+i2 = i2node
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
@@ -26,23 +26,12 @@ n = nn
 noff = nnoff
 if ( ifn /= 0 ) then
   n(ifn) = n(ifn) - 1
-  if ( ihypo(ifn) < 1 ) then
+  if ( ihypo(ifn) < i1node(ifn) ) then
     noff = noff + 1
-  else if ( ihypo(ifn) <= i2cell(ifn) ) then
+  else if ( ihypo(ifn) < i2node(ifn) ) then
     idoublenode = ifn
   end if
 end if
-
-! Dimensions
-lj = dx * ( n(1) - 1 )
-lk = dx * ( n(2) - 1 )
-ll = dx * ( n(3) - 1 )
-
-! Coordinate system
-l = sum( maxloc( abs( upvector ) ) )
-up = sign( 1., upvector(l) )
-k = modulo( l + 1, 3 ) + 1
-j = 6 - k - l
 
 ! Read grid files or create basic rectangular mesh
 x = 0.
@@ -55,6 +44,17 @@ else
   forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - 1 - noff(2) )
   forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - 1 - noff(3) )
 end if
+
+! Dimensions
+lj = dx * ( n(1) - 1 )
+lk = dx * ( n(2) - 1 )
+ll = dx * ( n(3) - 1 )
+
+! Coordinate system
+l = sum( maxloc( abs( upvector ) ) )
+up = sign( 1., upvector(l) )
+k = modulo( l + 1, 3 ) + 1
+j = 6 - k - l
 
 ! Mesh type
 select case( grid )
@@ -78,38 +78,39 @@ case( 'rand' )
   oper = 'g'
   call random_number( w1 )
   w1 = .2 * ( w1 - .5 )
-  w1(j1,:,:,1) = 0.; w1(j2,:,:,1) = 0.
-  w1(:,k1,:,2) = 0.; w1(:,k2,:,2) = 0.
-  w1(:,:,l1,3) = 0.; w1(:,:,l2,3) = 0.
-  j = ihypo(1)
-  k = ihypo(2)
-  l = ihypo(3)
-  select case( ifn )
-  case( 1 ); w1(j,:,:,1) = 0.; w1(j+1,:,:,1) = 0.
-  case( 2 ); w1(:,k,:,2) = 0.; w1(:,k+1,:,2) = 0.
-  case( 3 ); w1(:,:,k,3) = 0.; w1(:,:,k+1,3) = 0.
+  if( edge1(1) ) x(j1,:,:,1) = 0.
+  if( edge2(1) ) x(j2,:,:,1) = 0.
+  if( edge1(2) ) x(:,k1,:,2) = 0.
+  if( edge2(2) ) x(:,k2,:,2) = 0.
+  if( edge1(3) ) x(:,:,l1,3) = 0.
+  if( edge2(3) ) x(:,:,l2,3) = 0.
+  select case( idoublenode )
+  case( 1 ); i = ihypo(1); w1(i,:,:,1) = 0.
+  case( 2 ); i = ihypo(2); w1(:,i,:,2) = 0.
+  case( 3 ); i = ihypo(3); w1(:,:,i,3) = 0.
   end select
   x = x + w1
-  call swaphalo( x, nhalo )
 case( 'spherical' )
 case default; stop 'grid'
 end select
 
-! Duplicate edge nodes into halo, but not for decomp edges
-if( ip3(1) == 0         ) x(j1-1,:,:,:) = x(j1,:,:,:)
-if( ip3(1) == np(1) - 1 ) x(j2+1,:,:,:) = x(j2,:,:,:)
-if( ip3(2) == 0         ) x(:,j1-1,:,:) = x(:,j1,:,:)
-if( ip3(2) == np(2) - 1 ) x(:,k2+1,:,:) = x(:,k2,:,:)
-if( ip3(3) == 0         ) x(:,:,j1-1,:) = x(:,:,j1,:)
-if( ip3(3) == np(3) - 1 ) x(:,:,l2+1,:) = x(:,:,l2,:)
-
 ! Create fault double nodes
-if ( ifn /= 0 ) i = ihypo(ifn)
 select case( idoublenode )
-case( 1 ); x(i+1:j2,:,:,:) = x(i:j2-1,:,:,:)
-case( 2 ); x(:,i+1:k2,:,:) = x(:,i:k2-1,:,:)
-case( 3 ); x(:,:,i+1:l2,:) = x(:,:,i:l2-1,:)
+case( 1 ); j = ihypo(1); x(j+1:j2,:,:,:) = x(j:j2-1,:,:,:)
+case( 2 ); k = ihypo(2); x(:,k+1:k2,:,:) = x(:,k:k2-1,:,:)
+case( 3 ); l = ihypo(3); x(:,:,l+1:l2,:) = x(:,:,l:l2-1,:)
 end select
+
+! Fill in halo
+call swaphalo( x, nhalo )
+do i = 1, nhalo
+  if( edge1(1) ) x(j1-i,:,:,:) = x(j1,:,:,:)
+  if( edge2(1) ) x(j2+i,:,:,:) = x(j2,:,:,:)
+  if( edge1(2) ) x(:,k1-i,:,:) = x(:,k1,:,:)
+  if( edge2(2) ) x(:,k2+i,:,:) = x(:,k2,:,:)
+  if( edge1(3) ) x(:,:,l1-i,:) = x(:,:,l1,:)
+  if( edge2(3) ) x(:,:,l2+i,:) = x(:,:,l2,:)
+end do
 
 ! Assign fast operators to rectangular mesh portions
 noper = 1

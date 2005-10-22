@@ -63,16 +63,20 @@ case 'pageup',   anim = 1; dframe = -10;
 case 'pagedown', anim = 1; dframe =  10;
 case 'hyphen',   anim = 1; dframe = -1;
 case 'equal',    anim = 1; dframe =  1;
-case { 'insert', 'return' }, render
+case 'return',   render
+case 'q',        viz
 case 'space'
   ditmul = 1;
   if km, ditmul = 10; end
   icursor(4) = icursor(4) + ditmul * dit;
   render
 case 'r'
+  cd 'out'
+  currentstep
+  cd '..'
   ditmul = 1;
   if km, ditmul = 10; end
-  while icursor(4) + ditmul * dit <= nt;
+  while icursor(4) + ditmul * dit <= it;
     icursor(4) = icursor(4) + ditmul * dit;
     render
   end
@@ -93,11 +97,11 @@ case 'downarrow',  if km, cursormove = -3; else cursormove = -1; end, cursor
 case 'uparrow',    if km, cursormove = 3;  else cursormove = 1;  end, cursor
 case 'leftarrow',  if km, cursormove = -4; else cursormove = -2; end, cursor
 case 'rightarrow', if km, cursormove = 4;  else cursormove = 2;  end, cursor
-case 'j', cursormove = 0; islice = 1; cursor
-case 'k', cursormove = 0; islice = 2; cursor
-case 'l', cursormove = 0; islice = 3; cursor
 case 'h', cursormove = 5; cursor; msg = 'Hypocenter';
 case 'e', cursormove = 6; cursor; msg = 'Extreme value';
+case 'j', islice = 1; msg = 'j slice';
+case 'k', islice = 2; msg = 'k slice';
+case 'l', islice = 3; msg = 'l slice';
 case 'comma'
   msg = 'Zoom out';
   if ~km, camva( 1.25 * camva )
@@ -127,8 +131,8 @@ case 'p'
     v2 = campos - camtarget;
     upvec = [ 0 0 0 ];
     pos = [ 0 0 0 ];
-    [ t, i1 ] = max( abs( v1 ) );
-    [ t, i2 ] = max( abs( v2 ) );
+    [ tmp, i1 ] = max( abs( v1 ) );
+    [ tmp, i2 ] = max( abs( v2 ) );
     upvec(i1) = sign( v1(i1) );
     pos(i2) = sign( v2(i2) ) * norm( v2 );
     camup( upvec )
@@ -155,8 +159,8 @@ case 'slash'
       v2 = campos - camtarget;
       upvec = [ 0 0 0 ];
       pos = [ 0 0 0 ];
-      [ t, i1 ] = max( abs( v1 ) );
-      [ t, i2 ] = max( abs( v2 ) );
+      [ tmp, i1 ] = max( abs( v1 ) );
+      [ tmp, i2 ] = max( abs( v2 ) );
       upvec(i1) = sign( v1(i1) );
       pos(i2) = sign( v2(i2) ) * camdist;
       camup( upvec )
@@ -250,12 +254,13 @@ case 'x'
   end
 case 't'
   sensor = icursor(1:3);
-  [ tt vt tta vta labels msg ] = timeseries( field, sensor, km );
+  [ tt, vt, tta, vta, labels, msg ] = timeseries( field, sensor, km );
   if length( vt )
     fig
     tsplot
-    zoom
+    pan xon
     zoom xon
+    set( gcf, 'KeyPressFcn', 'delete(gcbf)' )
   end
 case 'y', msg = 'Space-time not implemented yet';
 otherwise, action = 0; msg = '';

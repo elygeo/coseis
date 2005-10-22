@@ -52,11 +52,13 @@ case( 'dt' );          read( str, * ) key1, dt
 case( 'upvector' );    read( str, * ) key1, upvector
 case( 'viscosity' );   read( str, * ) key1, viscosity
 case( 'npml' );        read( str, * ) key1, npml
-case( 'bc' );          read( str, * ) key1, bc1, bc2
+case( 'bc1' );         read( str, * ) key1, bc1
+case( 'bc2' );         read( str, * ) key1, bc2
 case( 'xhypo' );       read( str, * ) key1, xhypo
 case( 'rsource' );     read( str, * ) key1, rsource
 case( 'tsource' );     read( str, * ) key1, tsource
-case( 'moment' );      read( str, * ) key1, moment1, moment2
+case( 'moment1' );     read( str, * ) key1, moment1
+case( 'moment2' );     read( str, * ) key1, moment2
 case( 'faultnormal' ); read( str, * ) key1, faultnormal
 case( 'ihypo' );       read( str, * ) key1, ihypo
 case( 'vrup' );        read( str, * ) key1, vrup

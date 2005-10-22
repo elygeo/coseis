@@ -55,16 +55,16 @@ end
 if ( pass == 'w' ) then
   s1 = sqrt( sum( u .* u, 4 ) );
   s2 = sqrt( sum( w1 .* w1, 4 ) + 2 * sum( w2 .* w2, 4 ) );
-  [ umax umaxi ] = max( s1(:) );
-  [ wmax wmaxi ] = max( s2(:) );
+  [ umax, umaxi ] = max( s1(:) );
+  [ wmax, wmaxi ] = max( s2(:) );
   if umax > dx / 10., fprintf( 'Warning: u !<< dx\n' ), end
 else
   s1 = sqrt( sum( w1 .* w1, 4 ) );
   s2 = sqrt( sum( v .* v, 4 ) );
-  [ amax amaxi ] = max( s1(:) );
-  [ vmax vmaxi ] = max( s2(:) );
-  [ slmax slmaxi ] = max( abs( sl(:) ) );
-  [ svmax svmaxi ] = max( abs( sv(:) ) );
+  [ amax, amaxi ] = max( s1(:) );
+  [ vmax, vmaxi ] = max( s2(:) );
+  [ slmax, slmaxi ] = max( abs( sl(:) ) );
+  [ svmax, svmaxi ] = max( abs( sv(:) ) );
 end
 
 for iz = 1:size( ditout, 1 )

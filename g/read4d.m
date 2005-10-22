@@ -36,7 +36,6 @@ if ic == 0
 end
 m = i2 - i1 + 1;
 n = [ n length( ic ) ];
-if prod(n) > 1e8, error 'too big', end
 f = zeros( n );
 i0 = i1s - [ i1 0 ];
 skip = 4 * ( m(1) - n(1) );

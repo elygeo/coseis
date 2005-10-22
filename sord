@@ -137,7 +137,7 @@ gflags='-g'
 case $machine in
   Linux)
     fc='gfortran'
-    oflags=
+    oflags='-g -W -pedantic -std=f95 -fimplicit-none'
     gflags='-g -W -pedantic -std=f95 -fimplicit-none'
     ;;
   SunOS)

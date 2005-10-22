@@ -6,7 +6,7 @@ contains
 subroutine momentsource
 
 implicit none
-real, save, allocatable :: srcfr(:)
+real, save, allocatable :: srcfr(:), cellvol(:)
 integer, save, allocatable :: jj(:), kk(:), ll(:)
 logical, save :: init = .true.
 integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, nsrc, ic
@@ -46,19 +46,18 @@ do i = 1, 3
 end do
 s2 = sqrt( sum( w1 * w1, 4 ) )
 nsrc = count( s2 <= rsource )
-allocate( srcfr(nsrc), jj(nsrc), kk(nsrc), ll(nsrc) ) 
+allocate( srcfr(nsrc), cellvol(nsrc), jj(nsrc), kk(nsrc), ll(nsrc) )
 
 ! Spatial weighting
 select case( rfunc )
 case( 'box'  ); srcfr = 1.
-case( 'tent' ); srcfr = rsource !- pack( s2, s2 <= rsource )
+case( 'tent' ); srcfr = pack( s2, s2 <= rsource )
 case default; stop 'rfunc'
 end select
 
 ! Normalize and divide by cell volume
-! srcfr = srcfr / sum( srcfr ) / pack( s1, s2 <= rsource )
-print *, 1234
-!srcfr = pack( s2, s2 <= rsource )
+cellvol = pack( s1, s2 <= rsource )
+srcfr = srcfr / sum( srcfr ) / cellvol
 
 ! Index map
 i = 0
@@ -92,6 +91,7 @@ case default; stop 'tfunc'
 end select
 
 ! Add to stress variables
+nsrc = size( srcfr )
 do ic = 1, 3
 do i = 1, nsrc
   j = jj(i)

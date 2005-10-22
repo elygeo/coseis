@@ -20,9 +20,9 @@
   viscosity = [ .0 .3 ];		% stress (1) & hourglass (2)
 % npml = 0;				% no PML absorbing boundary
   npml = 10;				% 10 PML nodes
-% bc = [ 1 1 1   1 1 1 ];		% PML absorbing on all sides
-% bc = [ 1 1 1   1 1 0 ];		% free surface at l=nz
-  bc = [ 1 0 1   1 1 1 ];		% free surface at k=1
+  bc1 = [ 1 0 1 ];			% PML for j1 l1, free surface for k1
+  bc2 = [ 1 1 1 ];			% PML for j2 k2 l2
+% bc2 = [ 1 1 0 ];			% PML for j2 k2, free surface for l2
   ihypo	 = [ 0 0 0 ];			% 0: mesh center
   xhypo	 = [ -1. -1. -1. ];		% <0: x(ihypo)
 
@@ -35,7 +35,8 @@
 % rsource = 150.;			% source radius, 1.5*dt = 8 nodes
   rsource = -1.;			% no moment source
   tsource = .056;			% dominant period of 8*dt
-  moment = [ 1e16 1e16 1e16 0. 0. 0. ]; % explosion source
+  moment1 = [ 1e16 1e16 1e16 ];         % normal components, explosion source
+  moment2 = [ 0. 0. 0. ];               % shear components
 
 % Fault parameters;
 % faultnormal = 0;			% no fault

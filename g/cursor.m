@@ -4,7 +4,6 @@ docursor = 1;
 way = sign( cursormove );
 cursormove = abs( cursormove );
 switch cursormove
-case 0
 case 5, icursor(1:3) = ihypo;
 case 6, icursor(1:3) = fmaxi;
 otherwise
@@ -42,15 +41,15 @@ if showframe ~= nframe
 end
 
 if ~docursor || ...
-  any( icursor < i1s | icursor > i2s )
-  %( any( icursor < i1s | icursor > i2s ) && any( icursor(1:3) ~= sensor ) )
+  any( icursor < i1hold | icursor > i2hold )
+  %( any( icursor < i1hold | icursor > i2hold ) && any( icursor(1:3) ~= sensor ) )
   xcursor = xcenter;
   return
 end
 
-j = icursor(1) - i1s(1) + 1;
-k = icursor(2) - i1s(2) + 1;
-l = icursor(3) - i1s(3) + 1;
+j = icursor(1) - i1hold(1) + 1;
+k = icursor(2) - i1hold(2) + 1;
+l = icursor(3) - i1hold(3) + 1;
 
 if strcmp( grid, 'contant' )
   xx = ( icursor(1:3) - 1 ) * dx;
@@ -86,11 +85,11 @@ switch nc
 case 1
   str = sprintf( 'Vs %9.2e', s(j,k,l) );
 case 3
-  vv = shiftdim( v(j,k,l,:) );
+  vv = shiftdim( v(j,k,l,:) )';
   m = sum( sqrt( vv .* vv ) );
   str = sprintf( '|V| %9.2e\nVx  %9.2e\nVy  %9.2e\nVz  %9.2e', m, vv );
 case 6
-  vv = shiftdim( v(j,k,l,:) );
+  vv = shiftdim( v(j,k,l,:) )';
   c = [ 1 6 5; 6 2 4; 5 4 3 ];
   m = eig( vv(c) );
   [ tmp, i ] = sort( abs( m ), 'descend' );
@@ -100,7 +99,7 @@ end
 
 if nc > 1
   hglyph = reynoldsglyph( xx, vv, fscl, glyphexp, dx );
-  hhud(end+1) = [ hhud hglyph ];
+  hhud = [ hhud hglyph ];
 end
 
 set( gcf, 'CurrentAxes', haxes(2) )
