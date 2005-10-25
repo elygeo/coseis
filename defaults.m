@@ -30,8 +30,8 @@
 % rfunc = 'box';			% uniform spatial weighting
   rfunc = 'tent';			% tapered spatial weighting
 % tfunc = 'delta';			% impulse time function
-% tfunc = 'sbrune';			% smooth Brune time fn
-  tfunc = 'brune';			% Brune source time function
+% tfunc = 'brune';			% Brune source time function
+  tfunc = 'sbrune';			% smooth Brune source time function
 % rsource = 150.;			% source radius, 1.5*dt = 8 nodes
   rsource = -1.;			% no moment source
   tsource = .056;			% dominant period of 8*dt

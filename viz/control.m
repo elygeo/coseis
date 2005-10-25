@@ -1,31 +1,19 @@
 % GUI Control
 
-set( haxes(2), 'HandleVisibility', 'on' )
-if ~length( keypress )
-  keypress = get( gcf, 'CurrentKey' );
-  keymod   = get( gcf, 'CurrentMod' );
-end
+set( 0, 'CurrentFigure', 1 )
+keypress = get( gcf, 'CurrentKey' );
+keymod   = get( gcf, 'CurrentMod' );
 km = length( keymod );
-keymod = '';
 nframe = length( frame );
 dframe = 0;
-itstep = 0;
-set( 0, 'CurrentFigure', 1 )
 msg = '';
 action = 1;
 anim = 0;
-ditviz = 0;
 
 switch keypress
-case 'message'
-  msg = message;
 case 'f1'
-  if length( hhelp )
-    delete( hhelp )
-    hhelp = [];
-  else
-    set( gcf, 'CurrentAxes', haxes(2) )
-    hhelp = text( .5, .54, ...
+  if strcmp( get( hmsg(5), 'String' ), '' )
+    set( hmsg(5), 'String', ...
       { 'Acceleration      A   Zoom            < >   Time Series       T'
         'Velocity          V   Zoom Out          /   Filtered TS   Alt-T'
         'Displacement      U   Reset View    Alt-/   Space-Time        Y'
@@ -39,12 +27,9 @@ case 'f1'
         'Surfaces          S   Reset CS      Alt-\\   First Frame    Home'
         'Outline           O   Render        Enter   Last Frame      End'
         'Mesh              M   Clean     Backspace   Delete Frame    Del'
-      }, ...
-      'Vertical',   'middle', ...
-      'Margin', 10, ...
-      'EdgeColor', 0.5 * [ 1 1 1 ], ...
-      'BackgroundColor', background );
-    set( gcf, 'CurrentAxes', haxes(1) )
+      } )
+  else
+    set( hmsg(5), 'String', '' )
   end
 case 'a', if km, field = 'am'; else, field = 'a'; end, msg = field;
 case 'v', if km, field = 'vm'; else, field = 'v'; end, msg = field;
@@ -64,7 +49,7 @@ case 'pagedown', anim = 1; dframe =  10;
 case 'hyphen',   anim = 1; dframe = -1;
 case 'equal',    anim = 1; dframe =  1;
 case 'return',   render
-case 'q',        viz
+case 'q',        if km, sorddx, return, end
 case 'space'
   ditmul = 1;
   if km, ditmul = 10; end
@@ -80,11 +65,13 @@ case 'r'
     render
   end
 case 'backspace'
-  delete( [ hhud hmsg hhelp ] )
-  hhud = []; hmsg = []; hhelp = []; msg = '';
+  delete( hhud )
+  hhud = [];
+  set( hmsg, 'String', '' )
 case 'delete'
-  delete( [ hhud hmsg hhelp ] )
-  hhud = []; hmsg = []; hhelp = [];
+  delete( hhud )
+  hhud = [];
+  set( hmsg, 'String', '' )
   if nframe > 1
     delete( [ frame{showframe} ] )
     frame( showframe ) = [];
@@ -248,23 +235,25 @@ case 's'
   else       msg = 'Surfaces off';
   end
 case 'x'
-  if strcmp( get( gca, 'Visible' ), 'off' ), axis on, msg = 'Axis On';
-  else axis off, msg = 'Axis Off';
+  if strcmp( get( gca, 'Visible' ), 'off' )
+    axis on
+    msg = 'Axis On';
+  else
+    axis off
+    msg = 'Axis Off';
   end
 case 't'
   sensor = icursor(1:3);
   [ tt, vt, tta, vta, labels, msg ] = timeseries( field, sensor, km );
   if length( vt )
-    fig
+    tsfigure( dark )
     tsplot
     pan xon
     zoom xon
-    set( gcf, 'KeyPressFcn', 'delete(gcbf)' )
   end
 case 'y', msg = 'Space-time not implemented yet';
-otherwise, action = 0; msg = '';
+otherwise, action = 0;
 end
-keypress = '';
 
 % Frames
 nframe = length( frame );
@@ -273,9 +262,9 @@ if anim > 0
   showframe = max( showframe, 1 );
   showframe = min( showframe, nframe );
   if showframe == nframe
-    set( hhud, 'Visible', 'on' )
+    set( [ hhud hmsg(2:4) ], 'Visible', 'on' )
   else
-    set( hhud, 'Visible', 'off' )
+    set( [ hhud hmsg(2:4) ], 'Visible', 'off' )
   end
   set( [ frame{:} ], 'Visible', 'off' )
   set( [ frame{showframe} ], 'Visible', 'on' )
@@ -283,13 +272,5 @@ if anim > 0
 end
 
 % Message
-set( 0, 'CurrentFigure', 1 )
-set( gcf, 'CurrentAxes', haxes(2) )
-if action, delete( hmsg ), hmsg = []; end
-if length( msg )
-  hmsg = text( .02, .1, msg, 'Hor', 'left', 'Ver', 'bottom' );
-  msg = '';
-end
-set( gcf, 'CurrentAxes', haxes(1) )
-set( [ hhud hmsg hhelp haxes(2) ], 'HandleVisibility', 'off' )
+if action, set( hmsg(1), 'String', msg ), end
 

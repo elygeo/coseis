@@ -18,7 +18,7 @@ files="
   $version/in
   $version/f
   $version/m
-  $version/g
+  $version/viz
 "
 
 rm -f f/*.mod

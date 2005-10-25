@@ -228,7 +228,7 @@ if ( master ) then
   open(  9, file='out/currentstep.m', status='replace' )
   write( 9, * ) 'it =  ', it, '; % time-step'
   close( 9 )
-  write( str, '(a,i6.6,a)' ) 'out/stats/it', it, '.m'
+  write( str, '(a,i6.6,a)' ) 'out/stats/st', it, '.m'
   open(  9, file=str, status='replace' )
   write( 9, * ) 't      =  ', t,               '; % time'
   write( 9, * ) 'dt     =  ', dt,              '; % timestep size'

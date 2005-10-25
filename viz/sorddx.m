@@ -1,8 +1,6 @@
-% Viz
+% SORD Data Explorer
 
 clear all
-
-addpath ../g
 
 defaults
 in
@@ -58,11 +56,12 @@ set( 1, ...
   'DefaultAxesXColor', foreground, ...
   'DefaultAxesYColor', foreground, ...
   'DefaultAxesZColor', foreground, ...
+  'DefaultLineClipping', 'off', ...
   'DefaultLineColor', foreground, ...
   'DefaultLineLinewidth', linewidth, ...
-  'DefaultTextColor', foreground, ...
   'DefaultTextFontSize', 13, ...
   'DefaultTextFontName', 'FixedWidth', ...
+  'DefaultTextColor', foreground, ...
   'DefaultTextHitTest', 'off', ...
   'DefaultTextVerticalAlignment', 'top', ...
   'DefaultTextHorizontalAlignment', 'center', ...
@@ -70,13 +69,11 @@ set( 1, ...
   'DefaultAxesVisible', 'off' )
 haxes = axes( 'Position', [ .02 .1 .96 .88 ] );
 
+houtline = [];
 hhud = [];
-hmsg = [];
-hhelp = [];
 frame = {};
 count = 0;
 showframe = 0;
-houtline = [];
 
 if ifn
   islice = ifn;
@@ -94,7 +91,7 @@ else
 end
 
 if dooutline
-  houtline = outline( i1viz, i2viz, ifn, ihypo, rmax );
+  houtline = outline( i1viz, i2viz, ifn, ihypo, rmax, grid, dx );
   set( houtline, 'HandleVisibility', 'off' )
 end
 
@@ -108,11 +105,29 @@ cameratoolbar( 'SetCoordSys', tmp(l) )
 cameratoolbar( 'ToggleSceneLight' )
 set( 1, 'KeyPressFcn', 'control' )
 
-fscl = 0;
-colorscale
+haxes(2) = axes( 'HitTest', 'off' );
+axis( [ 0 1 0 1 ] );
+hold on
+hlegend(3) = surf( [ 0 1 ], [ 0 .08 ], [ 0 0; 0 0 ], ...
+  'FaceColor', background, ...
+  'EdgeColor', 'none', ...
+  'FaceLighting', 'none', ...
+  'EdgeLighting', 'none' );
+hlegend(4) = plot( [ 0 1 ], [ .08 .08 ], 'Color', .5 * [ 1 1 1 ] );
+hlegend(1) = text( .1, .05, '0' );
+hlegend(2) = text( .9, .05, '1' );
+hlegend(5) = imagesc( [ .1 .9 ], [ .058 .06 ], 0:.001:1 );
+set( hlegend,  'HitTest', 'off', 'HandleVisibility', 'off' )
+hmsg = text( .02, .1,  'Press F1 for help', 'Hor', 'left', 'Ver', 'bottom' );
+hmsg(2) = text( .98, .1,  '', 'Ver', 'bottom', 'Hor', 'right' );
+hmsg(3) = text( .02, .98, '', 'Ver', 'top',    'Hor', 'left'  );
+hmsg(4) = text( .98, .98, '', 'Ver', 'top',    'Hor', 'right' );
+hmsg(5) = text( .5, .54,  '', ...
+  'Visible', 'off', ...
+  'Vertical', 'middle', ...
+  'Margin', 10, ...
+  'EdgeColor', 0.5 * [ 1 1 1 ], ...
+  'BackgroundColor', background );
 
-keymod = '';
-keypress = 'message';
-message = 'Press F1 for help';
-control
+set( gcf, 'CurrentAxes', haxes(1) )
 

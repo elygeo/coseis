@@ -1,6 +1,6 @@
 % Outline viz
 
-function h = outline( i1, i2, ifn, ihypo, rmax )
+function h = outline( i1, i2, ifn, ihypo, rmax, grid, dx )
 
 x1 = rmax * ( [ .15 0 0 0 0 ] );
 x2 = rmax * ( [ 0 0 .15 0 0 ] );
@@ -51,11 +51,17 @@ for iz = 1:size( ilines, 1 )
   i2 = ilines(iz,4:6);
   n = i2 - i1 + 1;
   if sum( n > 1 ) ~= 1, continue, end
-  [ x msg ] = read4d( 'x', [ i1 0 ], [ i2 0 ], 0 );
-  if msg, continue, end
-  x1 = [ x1; shiftdim( x(:,:,:,1,1) ); NaN ];
-  x2 = [ x2; shiftdim( x(:,:,:,1,2) ); NaN ];
-  x3 = [ x3; shiftdim( x(:,:,:,1,3) ); NaN ];
+  if strcmp( grid, 'constant' )
+    x1 = [ x1; [ i1(1) - 1; i2(1) - 1 ] * dx; NaN ];
+    x2 = [ x2; [ i1(2) - 1; i2(2) - 1 ] * dx; NaN ];
+    x3 = [ x3; [ i1(3) - 1; i2(3) - 1 ] * dx; NaN ];
+  else
+    [ x msg ] = read4d( 'x', [ i1 0 ], [ i2 0 ], 0 );
+    if msg, continue, end
+    x1 = [ x1; shiftdim( x(:,:,:,1,1) ); NaN ];
+    x2 = [ x2; shiftdim( x(:,:,:,1,2) ); NaN ];
+    x3 = [ x3; shiftdim( x(:,:,:,1,3) ); NaN ];
+  end
 end
 
 if length( x1 )

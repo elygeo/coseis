@@ -40,7 +40,7 @@ clear f
 
 % Read metadata
 cd 'stats'
-file = sprintf( 'it%06d', icursor(4) );
+file = sprintf( 'st%06d', icursor(4) );
 eval( file )
 cd '..'
 fieldinfo
@@ -58,10 +58,9 @@ else
   delete( [ frame{:} ] )
   frame = {};
 end
-delete( [ hhud hmsg hhelp ] )
+delete( hhud )
 hhud = [];
-hmsg = [];
-hhelp = [];
+set( hmsg, 'String', '' )
 
 % Isosurfaces
 if doisosurf

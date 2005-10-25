@@ -52,9 +52,9 @@ done < tmp
 
 # Create output folders
 [ $deleteout ] && rm -rf out
-[ -e out ]       || mkdir out
-[ -e out/ckp ]   || mkdir out/ckp
-[ -e out/stats ] || mkdir out/stats
+[ -e out ]            || mkdir out
+[ -e out/checkpoint ] || mkdir out/checkpoint
+[ -e out/stats ]      || mkdir out/stats
 i=0
 while [ $i -lt $nout ]; do
   i=$(( i + 1 ))
@@ -73,7 +73,7 @@ np=$(( np3[0] * np3[1] * np3[2] ));
 
 # Save source, input files & byte order
 cp 'defaults.m' 'in.m' out/
-perl -e 'print pack('V',1) eq pack('L',1) ? "little\n":"big\n"' > out/endian
+perl -e 'print pack('V',1) eq pack('L',1) ? "l\n":"b\n"' > out/endian
 
 # RAM usage and run time estimate
 floatsize=4
@@ -99,6 +99,10 @@ rundir  = '$( /bin/pwd )';
 machine = '$machine';
 host    = '$HOSTNAME';
 os      = '$( uname -a )';
+END
+
+cat << END > out/viz.m
+addpath $( /bin/pwd )/viz
 END
 
 #------------------------------------------------------------------------------#
@@ -220,6 +224,7 @@ realclean: clean
 END
 [ ! -f makefile ] && touch makefile
 [ "$( diff tmp makefile )" != "" ] && mv tmp makefile
+rm -f tmp
 
 # Compile
 if [ $compile ]; then

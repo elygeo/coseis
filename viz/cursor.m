@@ -19,20 +19,16 @@ otherwise
   i = [ i1 i2 i3 4 ];
   cursormove = i(cursormove);
   i = abs( cursormove );
-  if length( hhud ), icursor(i) = icursor(i) + way; end
+  if ~strcmp( hmsg(2), '' ), icursor(i) = icursor(i) + way; end
   icursor = max( icursor, i1viz );
   icursor = min( icursor, i2viz - cellfocus * [ 1 1 1 0 ] );
 end
 
-delete( [ hhud hhelp ] )
+delete( hhud )
 hhud = [];
-hhelp = [];
+set( hmsg(2), 'String', sprintf( '%4d\n%4d\n%4d\n%4d', icursor ) )
+set( hmsg(5), 'String', '' )
 msg = 'Explore';
-
-set( gcf, 'CurrentAxes', haxes(2) )
-str = sprintf( '%4d\n%4d\n%4d\n%4d', icursor );
-hhud(end+1) = text( .98, .1, str, 'Hor', 'right', 'Ver', 'bottom' );
-set( gcf, 'CurrentAxes', haxes(1) )
 
 if showframe ~= nframe
   showframe = nframe;
@@ -69,12 +65,12 @@ xcursor = xx;
 x1 = xx(1) + dx * [ -1 1 NaN  0 0 NaN  0 0 ];
 x2 = xx(2) + dx * [  0 0 NaN -1 1 NaN  0 0 ];
 x3 = xx(3) + dx * [  0 0 NaN  0 0 NaN -1 1 ];
-hhud(end+1) = plot3( x1, x2, x3 );
+hhud(1) = plot3( x1, x2, x3 );
 
 x1 = xx(1) + [ dx 0 0 ];
 x2 = xx(2) + [ 0 dx 0 ];
 x3 = xx(3) + [ 0 0 dx ];
-hhud(end+1:end+3) = text( x1, x2, x3, ['xyz']', 'Ver', 'middle');
+hhud(2:4) = text( x1, x2, x3, ['xyz']', 'Ver', 'middle');
 
 if panviz
   campos( campos + xx - camtarget )
@@ -98,13 +94,9 @@ case 6
 end
 
 if nc > 1
-  hglyph = reynoldsglyph( xx, vv, fscl, glyphexp, dx );
-  hhud = [ hhud hglyph ];
+  hhud(5) = reynoldsglyph( xx, vv, fscl, glyphexp, dx );
 end
 
-set( gcf, 'CurrentAxes', haxes(2) )
-hhud(end+1) = text( .02, .98, str, 'Hor', 'left', 'Ver', 'top' );
-str = sprintf( 's\n%8.1fm\n%8.1fm\n%8.1fm', xx );
-hhud(end+1) = text( .98, .98, str, 'Hor', 'right', 'Ver', 'top' );
-set( gcf, 'CurrentAxes', haxes(1) )
+set( hmsg(3), str )
+set( hmsg(4), sprintf( 's\n%8.1fm\n%8.1fm\n%8.1fm', xx ) );
 
