@@ -1,8 +1,8 @@
 % Glyph vizualization
 
-if ~fscl, return, end
+if ~flim, return, end
 clear xga vga
-minmag = glyphcut * fscl;
+minmag = glyphcut * flim;
 n  = size( f );
 ng = prod( n(1:3) );
 ii = find( f(:,:,:,1) >= minmag );

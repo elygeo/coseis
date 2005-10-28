@@ -1,27 +1,21 @@
 % Data cursor
 
 docursor = 1;
-way = sign( cursormove );
-cursormove = abs( cursormove );
-switch cursormove
-case 5, icursor(1:3) = ihypo;
-case 6, icursor(1:3) = fmaxi;
-otherwise
-  v1 = camup;
+if any( dicursor ) && length( hmsg(2) )
+  v2 = camup;
   v3 = camtarget - campos;
-  v2 = cross( v3, v1 );
+  v1 = cross( v3, v2 );
   [ tmp, i1 ] = max( abs( v1 ) );
   [ tmp, i2 ] = max( abs( v2 ) );
-  i3 = 1:3;
-  i3( [ i1 i2 ] ) = [];
-  i = [ sign( v1(i1) ) sign( v2(i2) ) sign( v3(i3) ) 1 ];
-  way = way * i(cursormove);
-  i = [ i1 i2 i3 4 ];
-  cursormove = i(cursormove);
-  i = abs( cursormove );
-  if ~strcmp( hmsg(2), '' ), icursor(i) = icursor(i) + way; end
+  i3 = 6 - i1 - i2;
+  i = 1:4;
+  i([ i1 i2 i3 ]) = 1:3;
+  way = [ sign( v1(i1) ) sign( v2(i2) ) sign( v3(i3) ) 1 ];
+  icursor = icursor + way(i) .* dicursor(i);
+  rehash
+  currentstep
   icursor = max( icursor, i1viz );
-  icursor = min( icursor, i2viz - cellfocus * [ 1 1 1 0 ] );
+  icursor = min( icursor, [ i2viz(1:3) - cellfocus it ] );
 end
 
 delete( hhud )
@@ -30,6 +24,7 @@ set( hmsg(2), 'String', sprintf( '%4d\n%4d\n%4d\n%4d', icursor ) )
 set( hmsg(5), 'String', '' )
 msg = 'Explore';
 
+nframe = length( frame );
 if showframe ~= nframe
   showframe = nframe;
   set( [ frame{:} ], 'Visible', 'off' )
@@ -94,9 +89,9 @@ case 6
 end
 
 if nc > 1
-  hhud(5) = reynoldsglyph( xx, vv, fscl, glyphexp, dx );
+  hhud = [ hhud reynoldsglyph( xx, vv, flim, glyphexp, dx ) ];
 end
 
-set( hmsg(3), str )
-set( hmsg(4), sprintf( 's\n%8.1fm\n%8.1fm\n%8.1fm', xx ) );
+set( hmsg(3), 'String', str )
+set( hmsg(4), 'String', sprintf( 's\n%8.1fm\n%8.1fm\n%8.1fm', xx ) );
 

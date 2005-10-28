@@ -33,8 +33,10 @@ call fault
 call swaphalo( w1, nhalo )
 call output( 'a' )
 
+v(5,:,:,:) = 1
 ! Main loop
 do while ( it <= nt )
+print *, v(4:6,21,21,:)
   call pml
   call stress
   call momentsource

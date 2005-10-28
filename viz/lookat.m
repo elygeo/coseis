@@ -24,7 +24,7 @@ case { 1, 2, 3 }
     upvec = [ 0 0 0 ];
     upvec(k) = sign( look );
   end
-otherwise error 'look'
+otherwise, error 'look'
 end
 
 camtarget( xcenter )

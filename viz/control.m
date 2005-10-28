@@ -1,35 +1,33 @@
 % GUI Control
 
-set( 0, 'CurrentFigure', 1 )
 keypress = get( gcf, 'CurrentKey' );
 keymod   = get( gcf, 'CurrentMod' );
 km = length( keymod );
-nframe = length( frame );
-dframe = 0;
 msg = '';
 action = 1;
 anim = 0;
+cursormove = 0;
 
 switch keypress
-case 'f1'
-  if strcmp( get( hmsg(5), 'String' ), '' )
-    set( hmsg(5), 'String', ...
-      { 'Acceleration      A   Zoom            < >   Time Series       T'
-        'Velocity          V   Zoom Out          /   Filtered TS   Alt-T'
-        'Displacement      U   Reset View    Alt-/   Space-Time        Y'
-        'Stress            W   Perspective       P   Filtered ST   Alt-Y'
-        'Magnitude         0   Explore      Arrows   Step time     Space'
-        'Component       1-6   Hypocenter        H   Render movie      R'
-        'Volumes/Slices    Z   Extremum          E   Frame -1          -'
-        'Slice         J K L   Length Scale      X   Frame +1          ='
-        'Glyphs            G   Color Scale     [ ]   Frame -10      PgUp'
-        'Isosurfaces       I   Round CS          \\   Frame +10      PgDn'
-        'Surfaces          S   Reset CS      Alt-\\   First Frame    Home'
-        'Outline           O   Render        Enter   Last Frame      End'
-        'Mesh              M   Clean     Backspace   Delete Frame    Del'
-      } )
-  else
+case { 'h', 'f1' }
+  if length( get( hmsg(5), 'String' ) )
     set( hmsg(5), 'String', '' )
+  else
+    set( hmsg(5), 'String', ...
+      { 'Acceleration      A   XY-Cursor    Arrows   Zoom            < >'
+        'Velocity          V   Z-Cursor  PgUp PgDn   Zoom Out          /'
+        'Displacement      U   T-Cursor        ; ''   Reset View    Alt-/'
+        'Stress            W   Hypocenter     Home   Perspective       P'
+        'Magnitude         0   Extremum        End   Length Scale      X'
+        'Component       1-6   Render        Enter   Color Scale     [ ]'
+        'Volumes/Slices    Z   Render next   Space   Round CS          \\'
+        'Slice         J K L   Render sequence   R   Auto CS       Alt-\\'
+        'Glyphs            G   Snapshot        Ins                      '
+        'Isosurfaces       I   Time Series       T   Clean     Backspace'
+        'Surfaces          S   Filtered TS   Alt-T   Frame -1          -'
+        'Outline           O   Space-Time        Y   Frame +1          +'
+        'Mesh              M   Filtered ST   Alt-Y   Delete Frame    Del'
+      } )
   end
 case 'a', if km, field = 'am'; else, field = 'a'; end, msg = field;
 case 'v', if km, field = 'vm'; else, field = 'v'; end, msg = field;
@@ -42,52 +40,42 @@ case '3', icomp = 3; colorscale
 case '4', icomp = 4; colorscale
 case '5', icomp = 5; colorscale
 case '6', icomp = 6; colorscale
-case 'home',     anim = 1; showframe = 1;
-case 'end',      anim = 1; showframe = nframe;
-case 'pageup',   anim = 1; dframe = -10;
-case 'pagedown', anim = 1; dframe =  10;
-case 'hyphen',   anim = 1; dframe = -1;
-case 'equal',    anim = 1; dframe =  1;
-case 'return',   render
-case 'q',        if km, sorddx, return, end
-case 'space'
-  ditmul = 1;
-  if km, ditmul = 10; end
-  icursor(4) = icursor(4) + ditmul * dit;
-  render
+case 'j', islice = 1; msg = 'j slice';
+case 'k', islice = 2; msg = 'k slice';
+case 'l', islice = 3; msg = 'l slice';
+case 'q',          if km, sdx, return, end
+case 'leftarrow',  dicursor = [ -10^km 0 0 0 ]; cursor
+case 'rightarrow', dicursor = [  10^km 0 0 0 ]; cursor
+case 'downarrow',  dicursor = [ 0 -10^km 0 0 ]; cursor
+case 'uparrow',    dicursor = [ 0  10^km 0 0 ]; cursor
+case 'pagedown',   dicursor = [ 0 0 -10^km 0 ]; cursor
+case 'pageup',     dicursor = [ 0 0  10^km 0 ]; cursor
+case 'semicolon',  dicursor = [ 0 0 0 -10^km ]; cursor
+case 'quote',      dicursor = [ 0 0 0  10^km ]; cursor
+case 'home', dicursor = 0; icursor(1:3) = ihypo; cursor; msg = 'Hypocenter';
+case 'end',  dicursor = 0; icursor(1:3) = fmaxi; cursor; msg = 'Extreme value';
+case 'return',     render
+case 'space',      icursor(4) = icursor(4) + dit * 10 ^ km; render
+case 'insert',     snap( 'snap.png' )
 case 'r'
   rehash
   currentstep
-  ditmul = 1;
-  if km, ditmul = 10; end
-  while icursor(4) + ditmul * dit <= it;
-    icursor(4) = icursor(4) + ditmul * dit;
+  istep = dit * 10 ^ km;
+  count = 0;
+  if exist( 'movie', 'dir' ), rmdir( 'movie', 's' ), end
+  mkdir( 'movie' )
+  while icursor(4) + istep <= it;
+    count = count + 1;
+    icursor(4) = icursor(4) + istep;
+    rehash
+    currentstep
     render
+    snap( sprintf( 'movie/frame%06d.png', count ) )
   end
 case 'backspace'
   delete( hhud )
   hhud = [];
   set( hmsg, 'String', '' )
-case 'delete'
-  delete( hhud )
-  hhud = [];
-  set( hmsg, 'String', '' )
-  if nframe > 1
-    delete( [ frame{showframe} ] )
-    frame( showframe ) = [];
-    nframe = nframe - 1;
-    msg = 'Delete ';
-  end
-  anim = 1;
-case 'downarrow',  if km, cursormove = -3; else cursormove = -1; end, cursor
-case 'uparrow',    if km, cursormove = 3;  else cursormove = 1;  end, cursor
-case 'leftarrow',  if km, cursormove = -4; else cursormove = -2; end, cursor
-case 'rightarrow', if km, cursormove = 4;  else cursormove = 2;  end, cursor
-case 'h', cursormove = 5; cursor; msg = 'Hypocenter';
-case 'e', cursormove = 6; cursor; msg = 'Extreme value';
-case 'j', islice = 1; msg = 'j slice';
-case 'k', islice = 2; msg = 'k slice';
-case 'l', islice = 3; msg = 'l slice';
 case 'comma'
   msg = 'Zoom out';
   if ~km, camva( 1.25 * camva )
@@ -162,35 +150,38 @@ case 'slash'
     end
   end
 case 'leftbracket'
-  msg = 'Decrease Color Range';
-  if ~km, tmp = .8 * get( gca, 'CLim' );
-  else    tmp = .5 * get( gca, 'CLim' );
+  msg = 'Decrease Color Scale';
+  if ~km, clim = .8 * get( gca, 'CLim' );
+  else    clim = .5 * get( gca, 'CLim' );
   end
-  set( gca, 'CLim', tmp )
-  if ~icomp, tmp(1) = 0; end
-  set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
-  set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
+  lim = clim(2);
+  set( gca, 'CLim', clim )
+  if ~icomp, clim(1) = 0; end
+  set( hlegend(1), 'String', sprintf( '%g', clim(1) ) )
+  set( hlegend(2), 'String', sprintf( '%g', clim(2) ) )
 case 'rightbracket'
-  msg = 'Increase Color Range';
-  if ~km, tmp = 1.25 * get( gca, 'CLim' );
-  else    tmp = 2    * get( gca, 'CLim' );
+  msg = 'Increase Color Scale';
+  if ~km, clim = 1.25 * get( gca, 'CLim' );
+  else    clim = 2    * get( gca, 'CLim' );
   end
-  set( gca, 'CLim', tmp )
-  if ~icomp, tmp(1) = 0; end
-  set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
-  set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
+  lim = clim(2);
+  set( gca, 'CLim', clim )
+  if ~icomp, clim(1) = 0; end
+  set( hlegend(1), 'String', sprintf( '%g', clim(1) ) )
+  set( hlegend(2), 'String', sprintf( '%g', clim(2) ) )
 case 'backslash'
   if km
-    msg = 'Round Color Scale';
-    tmp = clim * [ -1 1 ];
-    set( gca, 'CLim', tmp )
-    if ~icomp, tmp(1) = 0; end
-    set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
-    set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
+    msg = 'Auto Color Scale';
+    lim = -1;
+    clim = fmax * [ -1 1 ];
+    set( gca, 'CLim', clim )
+    if ~icomp, clim(1) = 0; end
+    set( hlegend(1), 'String', sprintf( '%g', clim(1) ) )
+    set( hlegend(2), 'String', sprintf( '%g', clim(2) ) )
   else
-    msg = 'Reset Color Scale';
-    tmp = get( gca, 'CLim' );
-    tmp = tmp(2);
+    msg = 'Round Color Scale';
+    clim = get( gca, 'CLim' );
+    tmp = clim(2);
     exp10 = floor( log10( tmp ) );
     tmp = tmp / 10 ^ exp10;
     exp2 = ceil( log2( tmp ) );
@@ -198,11 +189,12 @@ case 'backslash'
       exp2 = 0;
       exp10 = exp10 + 1;
     end
-    tmp = 2 ^ exp2 * 10 ^ exp10 * [ -1 1 ];
-    set( gca, 'CLim', tmp )
-    if ~icomp, tmp(1) = 0; end
-    set( hlegend(1), 'String', sprintf( '%g', tmp(1) ) )
-    set( hlegend(2), 'String', sprintf( '%g', tmp(2) ) )
+    lim = 2 ^ exp2 * 10 ^ exp10;
+    clim = lim * [ -1 1 ];
+    set( gca, 'CLim', clim )
+    if ~icomp, clim(1) = 0; end
+    set( hlegend(1), 'String', sprintf( '%g', clim(1) ) )
+    set( hlegend(2), 'String', sprintf( '%g', clim(2) ) )
   end
 case 'z'
   volviz = ~volviz;
@@ -250,27 +242,11 @@ case 't'
     tsplot
     pan xon
     zoom xon
+    set( gcf, 'KeyPressFcn', 'delete(gcbf)' )
   end
 case 'y', msg = 'Space-time not implemented yet';
-otherwise, action = 0;
+otherwise, return
 end
 
-% Frames
-nframe = length( frame );
-if anim > 0
-  showframe = showframe + dframe;
-  showframe = max( showframe, 1 );
-  showframe = min( showframe, nframe );
-  if showframe == nframe
-    set( [ hhud hmsg(2:4) ], 'Visible', 'on' )
-  else
-    set( [ hhud hmsg(2:4) ], 'Visible', 'off' )
-  end
-  set( [ frame{:} ], 'Visible', 'off' )
-  set( [ frame{showframe} ], 'Visible', 'on' )
-  msg = [ msg 'Frame ' num2str( showframe ) ];
-end
-
-% Message
-if action, set( hmsg(1), 'String', msg ), end
+set( hmsg(1), 'String', msg )
 

@@ -1,8 +1,10 @@
 % Color Scale
 
-clim = fscl;
-if ~clim, clim = 1; end
-set( gca, 'CLim', clim * [ -1 1 ] );
+if flim, clim = flim;
+else     clim = 1;
+end
+
+set( gca, 'CLim', [ -1 1 ] * clim );
 poscolor = [ 1 .5 0 ];
 negcolor = [ 0 .5 1 ];
 if icomp
@@ -48,6 +50,6 @@ else
   colormap( interp1( x1, cmap, x2 ) );
   set( haxes(2), 'Clim', [ -1 1 ] )
   set( hlegend(1), 'String', '0' )
-  set( hlegend(2), 'String', sprintf( '%g',  clim ) )
+  set( hlegend(2), 'String', sprintf( '%g', clim ) )
 end
 

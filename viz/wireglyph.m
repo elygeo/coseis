@@ -3,8 +3,8 @@
 FIXME
 
 hglyph = [];
-if ~length( mga ) || ~fscl, return, end
-scl = .5 * dx * ( 1 / fscl ) ^ glyphexp;
+if ~length( mga ) || ~flim, return, end
+scl = .5 * dx * ( 1 / flim ) ^ glyphexp;
 switch size( vga, 2 );
 case 3
   %mga = scl * mga .^ ( glyphexp - 1 ); % CHECK
@@ -92,6 +92,6 @@ FIXME
       end
     end
   end
-otherwise error 'mga'
+otherwise, error 'mga'
 end
 

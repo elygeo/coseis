@@ -1,6 +1,7 @@
-% SORD Data Explorer
+% SDX: SORD Data Explorer
 
 clear all
+cd '/space/gely/sord/out'
 
 defaults
 in
@@ -48,7 +49,7 @@ clf reset
 set( 1, ...
   'Renderer', renderer, ...
   'KeyPressFcn', 'control', ...
-  'Name', 'SORD DX', ...
+  'Name', 'SDX', ...
   'NumberTitle', 'off', ...
   'Color', background, ...
   'DefaultAxesColorOrder', foreground, ...
@@ -86,7 +87,7 @@ else
   dofault = 0;
   [ tmp, l ] = max( abs( upvector ) );
   j = 1;
-  if l == 1, j == 2; end
+  if l == 1, j = 2; end
   islice = 6 - l - j;
 end
 
@@ -117,17 +118,15 @@ hlegend(4) = plot( [ 0 1 ], [ .08 .08 ], 'Color', .5 * [ 1 1 1 ] );
 hlegend(1) = text( .1, .05, '0' );
 hlegend(2) = text( .9, .05, '1' );
 hlegend(5) = imagesc( [ .1 .9 ], [ .058 .06 ], 0:.001:1 );
-set( hlegend,  'HitTest', 'off', 'HandleVisibility', 'off' )
 hmsg = text( .02, .1,  'Press F1 for help', 'Hor', 'left', 'Ver', 'bottom' );
 hmsg(2) = text( .98, .1,  '', 'Ver', 'bottom', 'Hor', 'right' );
 hmsg(3) = text( .02, .98, '', 'Ver', 'top',    'Hor', 'left'  );
 hmsg(4) = text( .98, .98, '', 'Ver', 'top',    'Hor', 'right' );
 hmsg(5) = text( .5, .54,  '', ...
-  'Visible', 'off', ...
   'Vertical', 'middle', ...
   'Margin', 10, ...
   'EdgeColor', 0.5 * [ 1 1 1 ], ...
   'BackgroundColor', background );
-
+set( [ hlegend hmsg ], 'HitTest', 'off', 'HandleVisibility', 'off' )
 set( gcf, 'CurrentAxes', haxes(1) )
 

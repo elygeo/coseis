@@ -1,6 +1,6 @@
 % Surface contouring
 
-function h = ssurfcontour( xg, c, v )
+function h = surfcontour( xg, c, v )
 
 x = xg(:,:,1);
 y = xg(:,:,2);

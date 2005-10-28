@@ -34,7 +34,8 @@ i2 = min( i1pml, i2node )
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-if ( id == 1 ) then
+select case( id )
+case( 1 )
   do j = i1node(1), j2
   i = j - nnoff(1)
   forall( k=k1:k2, l=l1:l2 )
@@ -49,8 +50,7 @@ if ( id == 1 ) then
     p4(i,k,l,ic) = p4(i,k,l,ic) + dt * s1(j,k,l)
   end forall
   end do
-end if
-if ( id == 2 ) then
+case( 2 )
   do k = i1node(2), k2
   i = k - nnoff(2)
   forall( j=j1:j2, l=l1:l2 )
@@ -65,8 +65,7 @@ if ( id == 2 ) then
     p5(j,i,l,ic) = p5(j,i,l,ic) + dt * s1(j,k,l)
   end forall
   end do
-end if
-if ( id == 3 ) then
+case( 3 )
   do l = i1node(3), l2
   i = l - nnoff(3)
   forall( j=j1:j2, k=k1:k2 )
@@ -81,7 +80,7 @@ if ( id == 3 ) then
     p6(j,k,i,ic) = p6(j,k,i,ic) + dt * s1(j,k,l)
   end forall
   end do
-end if
+end select
 
 ! Add contribution to force vector
 if ( ic == id ) then

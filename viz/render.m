@@ -44,28 +44,19 @@ file = sprintf( 'st%06d', icursor(4) );
 eval( file )
 cd '..'
 fieldinfo
-fscl = lim;
-if fscl < 0
-  fscl = fmax;
-end
+flim = lim;
+if flim < 0, flim = fmax; end
 
 % Setup figure
 set( 0, 'CurrentFigure', 1 )
-if holdmovie
-  set( [ frame{:} ], 'Visible', 'off' )
-  set( [ frame{:} ], 'HandleVisibility', 'off' )
-else
-  delete( [ frame{:} ] )
-  frame = {};
-end
-delete( hhud )
+delete( [ kids{1}; kids{2}; hhud ] );
 hhud = [];
 set( hmsg, 'String', '' )
 
 % Isosurfaces
 if doisosurf
-  if icomp, isosurfviz( x, v, icomp, cellfocus, fscl * isofrac );
-  else      isosurfviz( x, s, 1,     cellfocus, fscl * isofrac );
+  if icomp, isosurfviz( x, v, icomp, cellfocus, flim * isofrac );
+  else      isosurfviz( x, s, 1,     cellfocus, flim * isofrac );
   end
 end
 
@@ -95,10 +86,4 @@ text( .98, .98, sprintf( '%.3fs', t ), 'Hor', 'right' )
 set( gcf, 'CurrentAxes', haxes(1) )
 
 drawnow
-
-% Save frame
-kids = get( haxes, 'Children' );
-kids = [ kids{1}; kids{2} ]';
-frame{end+1} = kids;
-showframe = length( frame );
 

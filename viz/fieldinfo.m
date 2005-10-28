@@ -48,6 +48,6 @@ case 'sl'
   fmax  = slmax;
   fmaxi = slmaxi;
   labels = { 'Slip Length' 'lslip' };
-otherwise error 'field'
+otherwise, error 'field'
 end
 

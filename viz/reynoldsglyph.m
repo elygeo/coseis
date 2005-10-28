@@ -1,10 +1,10 @@
 % Reynolds Glyph
 
-function h = reynoldsglyph( xx, vv, fscl, glyphexp, dx )
+function h = reynoldsglyph( xx, vv, flim, glyphexp, dx )
 
 h = [];
-if ~length( vv ) || ~fscl, return, end
-scl = .5 * dx * ( 1 / fscl ) ^ glyphexp;
+if ~length( vv ) || ~flim, return, end
+scl = .5 * dx * ( 1 / flim ) ^ glyphexp;
 np = 16;
 
 switch size( vv, 2 )
@@ -35,7 +35,6 @@ case 3
     x = xglyph;
     q = qglyph;
     r = rglyph * m;
-    vec = ones( 3 );
     if v(1) || v(2)
       vec = [ v(2)   v(1)*v(3)             v(1) 
              -v(1)   v(2)*v(3)             v(2) 
@@ -62,7 +61,6 @@ case 6
   theta = 2 * pi * ( 0 : 1 / np : 1 );
   row   = ones( size( theta ) );
   phi   = pi * ( 0 : 1 / np : 1 )';
-  dphi  = phi(2) - phi(1);
   sinf  = sin( phi );
   cosf  = cos( phi );
   x(:,:,1) = sinf * cos( theta );
@@ -91,7 +89,7 @@ case 6
       x(:,:,i) = x(:,:,i) + xx(ig,i);
     end
     j0 = [ np 1:np     ];
-    j1 = [    1:np+1   ];
+    j1 =      1:np+1    ;
     j2 = [    2:np+1 2 ];
     vec1 = x(:,j0,:) - x(:,j2,:);
     vec2 = x(j0,:,:) - x(j2,:,:);
@@ -111,7 +109,7 @@ case 6
     h(ig) = surf( x(:,:,1), x(:,:,2), x(:,:,3), r, 'VertexNorm', q );
     hold on
   end
-otherwise error 'size vv'
+otherwise, error 'size vv'
 end
 
 set( h, ...

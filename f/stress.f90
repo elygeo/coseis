@@ -64,7 +64,8 @@ if ( id /= 3 ) then
 end if
 
 ! PML region, damped direction: G' + DG = gradV
-if ( id == 1 ) then
+select case( id )
+case( 1 )
   i1 = i1cell
   i2 = i2cell
   i2(1) = j2
@@ -87,8 +88,7 @@ if ( id == 1 ) then
     g4(i,k,l,ic) = s1(j,k,l)
   end forall
   end do
-end if
-if ( id == 2 ) then
+case( 2 )
   i1 = i1cell
   i2 = i2cell
   i2(2) = k2
@@ -111,8 +111,7 @@ if ( id == 2 ) then
     g5(j,i,l,ic) = s1(j,k,l)
   end forall
   end do
-end if
-if ( id == 3 ) then
+case( 3 )
   i1 = i1cell
   i2 = i2cell
   i2(3) = l2
@@ -135,7 +134,7 @@ if ( id == 3 ) then
     g6(j,k,i,ic) = s1(j,k,l)
   end forall
   end do
-end if
+end select
 
 ! Add contribution to strain
 if ( ic == id ) then

@@ -2,11 +2,9 @@
 function [ tt, vt, tta, vta, labels, msg ] = timeseries( field, sensor, dofilter )
 
 tt = [];
-vt = [];
 tta = [];
 vta = [];
 labels = {};
-msg = 'Time Series';
 
 % Read metadata
 rehash
@@ -35,7 +33,6 @@ kostrov = ...
 if pointsource || explosion || kostrov
   [ xsensor, msg ] = read4d( 'x', [ sensor 0 ], [ sensor 0 ], 0 );
   if msg
-    msg = 'Cannot locate sensor for analytical solution';
     pointsource = 0;
     explosion = 0;
     kostrov = 0;
@@ -44,6 +41,11 @@ if pointsource || explosion || kostrov
     rg = sqrt( sum( xg .* xg ) );
   end
 end
+
+% Extract data
+[ vt, msg ] = read4d( field, [ sensor it0 ], [ sensor it ], 0 );
+if msg, return, end
+msg = 'Time Series';
 
 % Time
 if any( strcmp( field, { 'v' 'vm' 'sv' } ) )
@@ -54,9 +56,6 @@ else
   tt = ( it0 : it ) * dt;
 end
 
-% Extract data
-[ vt, msg ] = read4d( field, [ sensor it0 ], [ sensor it ], 0 );
-if msg, return, end
 nt = it - it0 + 1;
 nc = size( vt, 5 );
 vt = reshape( vt, nt, nc );
@@ -81,7 +80,7 @@ if pointsource
          vt([5 4 3]) * rot(:,3) ...
          vt([5 4 3]) * rot(:,2) ...
          vt([1 6 5]) * rot(:,3) ...
-         vt([6 2 4]) * rot(:,1) ]'
+         vt([6 2 4]) * rot(:,1) ]';
     end
   end
 end
@@ -106,7 +105,7 @@ if explosion && rg
   case 'sbrune'
     vta = m0 * exp( -tt / tdom ) .* ( tt * vp0 / rg - tt / tdom + 2 ) .* tt ...
        / ( 8. * pi * rho0 * vp0 ^ 3 * tdom ^ 3 * rg );
-  otherwise vta = 0;
+  otherwise, vta = 0;
   end
   if dofilter, vta = filter( b, a, vta ); end
   tta = tt + rg / vp0;
@@ -142,7 +141,7 @@ case 'tn',   labels = { 'Normal Traction' 'Tn' };
 case 'ts',   labels = { 'Shear Traction'  'Ts' };
 case 'trup', labels = { 'Rupture Time'    'trup' };
 case 'tarr', labels = { 'Arrest Time'     'tarr' };
-otherwise error 'field'
+otherwise, error 'field'
 end
 
 if pointsource
