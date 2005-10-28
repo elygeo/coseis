@@ -18,15 +18,14 @@ case { 'h', 'f1' }
         'Velocity          V   Z-Cursor  PgUp PgDn   Zoom Out          /'
         'Displacement      U   T-Cursor        ; ''   Reset View    Alt-/'
         'Stress            W   Hypocenter     Home   Perspective       P'
-        'Magnitude         0   Extremum        End   Length Scale      X'
-        'Component       1-6   Render        Enter   Color Scale     [ ]'
-        'Volumes/Slices    Z   Render next   Space   Round CS          \\'
-        'Slice         J K L   Render sequence   R   Auto CS       Alt-\\'
-        'Glyphs            G   Snapshot        Ins                      '
-        'Isosurfaces       I   Time Series       T   Clean     Backspace'
-        'Surfaces          S   Filtered TS   Alt-T   Frame -1          -'
-        'Outline           O   Space-Time        Y   Frame +1          +'
-        'Mesh              M   Filtered ST   Alt-Y   Delete Frame    Del'
+        'Magnitude         0   Extremum        End   Color Scale     [ ]'
+        'Component       1-6   Render        Enter   Round CS          \\'
+        'Volumes/Slices    Z   Render next   Space   Auto CS       Alt-\\'
+        'Slice         J K L   Save snapshot   Ins   Time Series       T'
+        'Glyphs            G   Save movie        R   Filtered TS   Alt-T'
+        'Isosurfaces       I   Clean     Backspace   Space-Time        Y'
+        'Surfaces          S   Outline           O   Filtered ST   Alt-Y'
+        'Mesh              M   Length Scale      X                      '
       } )
   end
 case 'a', if km, field = 'am'; else, field = 'a'; end, msg = field;
@@ -58,19 +57,17 @@ case 'return',     render
 case 'space',      icursor(4) = icursor(4) + dit * 10 ^ km; render
 case 'insert',     snap( 'snap.png' )
 case 'r'
+  if ~exist( 'movie', 'dir' ), mkdir( 'movie' ), end
   rehash
   currentstep
   istep = dit * 10 ^ km;
-  count = 0;
-  if exist( 'movie', 'dir' ), rmdir( 'movie', 's' ), end
-  mkdir( 'movie' )
   while icursor(4) + istep <= it;
-    count = count + 1;
     icursor(4) = icursor(4) + istep;
     rehash
     currentstep
     render
-    snap( sprintf( 'movie/frame%06d.png', count ) )
+    drawnow
+    snap( sprintf( 'movie/frame%06d.png', icursor(4) ) )
   end
 case 'backspace'
   delete( hhud )

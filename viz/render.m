@@ -48,7 +48,8 @@ flim = lim;
 if flim < 0, flim = fmax; end
 
 % Setup figure
-set( 0, 'CurrentFigure', 1 )
+set( 0, 'CurrentFigure', hfig );
+kids = get( haxes, 'Children' );
 delete( [ kids{1}; kids{2}; hhud ] );
 hhud = [];
 set( hmsg, 'String', '' )
@@ -84,6 +85,4 @@ set( gcf, 'CurrentAxes', haxes(2) )
 text( .50, .05, labels( icomp + 2 ) );
 text( .98, .98, sprintf( '%.3fs', t ), 'Hor', 'right' )
 set( gcf, 'CurrentAxes', haxes(1) )
-
-drawnow
 

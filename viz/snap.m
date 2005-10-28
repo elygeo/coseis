@@ -1,9 +1,10 @@
 function snap( file )
 
-print -dtiff -r72 'tmp'
+print -dtiff -r240 'tmp'
 img = imread( 'tmp.tif' );
-img = imresize( img, m, 'bilinear' );
-imwrite( img, [ file '.png' ], 'png' );
+n = [ 480 640 ];
+img = imresize( img, n, 'bilinear' );
+imwrite( img, file );
 figure
 imshow( img )
 

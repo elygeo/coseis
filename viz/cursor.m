@@ -24,13 +24,6 @@ set( hmsg(2), 'String', sprintf( '%4d\n%4d\n%4d\n%4d', icursor ) )
 set( hmsg(5), 'String', '' )
 msg = 'Explore';
 
-nframe = length( frame );
-if showframe ~= nframe
-  showframe = nframe;
-  set( [ frame{:} ], 'Visible', 'off' )
-  set( [ frame{showframe} ], 'Visible', 'on' )
-end
-
 if ~docursor || ...
   any( icursor < i1hold | icursor > i2hold )
   %( any( icursor < i1hold | icursor > i2hold ) && any( icursor(1:3) ~= sensor ) )
