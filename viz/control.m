@@ -21,11 +21,11 @@ case { 'h', 'f1' }
         'Magnitude         0   Extremum        End   Color Scale     [ ]'
         'Component       1-6   Render        Enter   Round CS          \\'
         'Volumes/Slices    Z   Render next   Space   Auto CS       Alt-\\'
-        'Slice         J K L   Save snapshot   Ins   Time Series       T'
-        'Glyphs            G   Save movie        R   Filtered TS   Alt-T'
-        'Isosurfaces       I   Clean     Backspace   Space-Time        Y'
-        'Surfaces          S   Outline           O   Filtered ST   Alt-Y'
-        'Mesh              M   Length Scale      X                      '
+        'Slice         J K L   Save snapshot   Ins   Fold CS           C'
+        'Glyphs            G   Save movie        R   Dark/Light        D'
+        'Isosurfaces       I   Clean     Backspace   Time Series       T'
+        'Surfaces          S   Outline           O   Filtered TS   Alt-T'
+        'Mesh              M   Length Scale      X   Space-Time        Y'
       } )
   end
 case 'a', if km, field = 'am'; else, field = 'a'; end, msg = field;
@@ -55,20 +55,21 @@ case 'home', dicursor = 0; icursor(1:3) = ihypo; cursor; msg = 'Hypocenter';
 case 'end',  dicursor = 0; icursor(1:3) = fmaxi; cursor; msg = 'Extreme value';
 case 'return',     render
 case 'space',      icursor(4) = icursor(4) + dit * 10 ^ km; render
-case 'insert',     snap( 'snap.png' )
+case 'insert',     snap
 case 'r'
-  if ~exist( 'movie', 'dir' ), mkdir( 'movie' ), end
   rehash
   currentstep
   istep = dit * 10 ^ km;
-  while icursor(4) + istep <= it;
-    icursor(4) = icursor(4) + istep;
+  if ~exist( 'movie', 'dir' ), mkdir( 'movie' ), end
+  while icursor(4) <= it;
     rehash
     currentstep
     render
     drawnow
     snap( sprintf( 'movie/frame%06d.png', icursor(4) ) )
+    icursor(4) = icursor(4) + istep;
   end
+  icursor(4) = icursor(4) - istep;
 case 'backspace'
   delete( hhud )
   hhud = [];
@@ -193,6 +194,21 @@ case 'backslash'
     set( hlegend(1), 'String', sprintf( '%g', clim(1) ) )
     set( hlegend(2), 'String', sprintf( '%g', clim(2) ) )
   end
+case 'd'
+  dark = ~dark;
+  if dark, msg = 'Dark color scheme';
+  else     msg = 'Light color scheme';
+  end
+case 'c'
+  foldcs = ~foldcs;
+  if foldcs, msg = 'Folded color scale';
+  else       msg = 'Signed color scale';
+  end
+case 'd'
+  dark = ~dark;
+  if dark, msg = 'Dark color scheme';
+  else     msg = 'Light color scheme';
+  end
 case 'z'
   volviz = ~volviz;
   if volviz, msg = 'Plotting volumes';
@@ -237,8 +253,7 @@ case 't'
   if length( vt )
     tsfigure( dark )
     tsplot
-    pan xon
-    zoom xon
+    zoom
     set( gcf, 'KeyPressFcn', 'delete(gcbf)' )
   end
 case 'y', msg = 'Space-time not implemented yet';

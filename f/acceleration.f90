@@ -29,53 +29,50 @@ do iz = 1, noper
 end do
 
 ! PML region: P' + DP = [del]S, F = 1.P'
-i1 = max( i2pml, i1node )
-i2 = min( i1pml, i2node )
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
+i1 = i1node
+i2 = i2node
 select case( id )
 case( 1 )
-  do j = i1node(1), j2
+  do j = i1(1), i1pml(1)
   i = j - nnoff(1)
-  forall( k=k1:k2, l=l1:l2 )
+  forall( k=i1(2):i2(2), l=i1(3):i2(3) )
     s1(j,k,l) = dn2(i) * s1(j,k,l) + dn1(i) * p1(i,k,l,ic)
     p1(i,k,l,ic) = p1(i,k,l,ic) + dt * s1(j,k,l)
   end forall
   end do
-  do j = j1, i2node(1)
+  do j = i2pml(1), i2(1)
   i = nn(1) - j + nnoff(1) + 1
-  forall( k=k1:k2, l=l1:l2 )
+  forall( k=i1(2):i2(2), l=i1(3):i2(3) )
     s1(j,k,l) = dn2(i) * s1(j,k,l) + dn1(i) * p4(i,k,l,ic)
     p4(i,k,l,ic) = p4(i,k,l,ic) + dt * s1(j,k,l)
   end forall
   end do
 case( 2 )
-  do k = i1node(2), k2
+  do k = i1(2), i1pml(2)
   i = k - nnoff(2)
-  forall( j=j1:j2, l=l1:l2 )
+  forall( j=i1(1):i2(1), l=i1(3):i2(3) )
     s1(j,k,l) = dn2(i) * s1(j,k,l) + dn1(i) * p2(j,i,l,ic)
     p2(j,i,l,ic) = p2(j,i,l,ic) + dt * s1(j,k,l)
   end forall
   end do
-  do k = k1, i2node(2)
+  do k = i2pml(2), i2(2)
   i = nn(2) - k + nnoff(2) + 1
-  forall( j=j1:j2, l=l1:l2 )
+  forall( j=i1(1):i2(1), l=i1(3):i2(3) )
     s1(j,k,l) = dn2(i) * s1(j,k,l) + dn1(i) * p5(j,i,l,ic)
     p5(j,i,l,ic) = p5(j,i,l,ic) + dt * s1(j,k,l)
   end forall
   end do
 case( 3 )
-  do l = i1node(3), l2
+  do l = i1(3), i1pml(3)
   i = l - nnoff(3)
-  forall( j=j1:j2, k=k1:k2 )
+  forall( j=i1(1):i2(1), k=i1(2):i2(2) )
     s1(j,k,l) = dn2(i) * s1(j,k,l) + dn1(i) * p3(j,k,i,ic)
     p3(j,k,i,ic) = p3(j,k,i,ic) + dt * s1(j,k,l)
   end forall
   end do
-  do l = l1, i2node(3)
+  do l = i2pml(3), i2(3)
   i = nn(3) - l + nnoff(3) + 1
-  forall( j=j1:j2, k=k1:k2 )
+  forall( j=i1(1):i2(1), k=i1(2):i2(2) )
     s1(j,k,l) = dn2(i) * s1(j,k,l) + dn1(i) * p6(j,k,i,ic)
     p6(j,k,i,ic) = p6(j,k,i,ic) + dt * s1(j,k,l)
   end forall

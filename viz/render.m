@@ -50,7 +50,7 @@ if flim < 0, flim = fmax; end
 % Setup figure
 set( 0, 'CurrentFigure', hfig );
 kids = get( haxes, 'Children' );
-delete( [ kids{1}; kids{2}; hhud ] );
+delete( [ kids{1}' kids{2}' hhud ] );
 hhud = [];
 set( hmsg, 'String', '' )
 

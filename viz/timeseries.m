@@ -42,11 +42,6 @@ if pointsource || explosion || kostrov
   end
 end
 
-% Extract data
-[ vt, msg ] = read4d( field, [ sensor it0 ], [ sensor it ], 0 );
-if msg, return, end
-msg = 'Time Series';
-
 % Time
 if any( strcmp( field, { 'v' 'vm' 'sv' } ) )
   it0 = 1;
@@ -55,6 +50,11 @@ else
   it0 = 0;
   tt = ( it0 : it ) * dt;
 end
+
+% Extract data
+[ vt, msg ] = read4d( field, [ sensor it0 ], [ sensor it ], 0 );
+if msg, return, end
+msg = 'Time Series';
 
 nt = it - it0 + 1;
 nc = size( vt, 5 );

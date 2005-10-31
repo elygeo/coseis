@@ -24,42 +24,35 @@ do iz = 1, noper
   call diffnc( s1, oper(iz), w1, x, dx, ic, id, i1, i2 )
 end do
 
-! PML coordinates
-i1 = max( i2pml - 1, i1cell )
-i2 = min( i1pml,     i2cell )
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-
 ! PML region, non-damped directions: G = gradU
 if ( id /= 1 ) then
   i1 = i1cell
   i2 = i2cell
-  i2(1) = j2
+  i2(1) = i1pml(1)
   call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
   i1 = i1cell
   i2 = i2cell
-  i1(1) = j1
+  i1(1) = i2pml(1) - 1
   call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
 end if
 if ( id /= 2 ) then
   i1 = i1cell
   i2 = i2cell
-  i2(2) = k2
+  i2(2) = i1pml(2)
   call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
   i1 = i1cell
   i2 = i2cell
-  i1(2) = k1
+  i1(2) = i2pml(2) - 1
   call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
 end if
 if ( id /= 3 ) then
   i1 = i1cell
   i2 = i2cell
-  i2(3) = l2
+  i2(3) = i1pml(3)
   call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
   i1 = i1cell
   i2 = i2cell
-  i1(3) = l1
+  i1(3) = i2pml(3) - 1
   call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
 end if
 
@@ -68,7 +61,7 @@ select case( id )
 case( 1 )
   i1 = i1cell
   i2 = i2cell
-  i2(1) = j2
+  i2(1) = i1pml(1)
   call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
   do j = i1(1), i2(1)
   i = j - nnoff(1)
@@ -79,7 +72,7 @@ case( 1 )
   end do
   i1 = i1cell
   i2 = i2cell
-  i1(1) = j1
+  i1(1) = i2pml(1) - 1
   call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
   do j = i1(1), i2(1)
   i = nn(1) - j + nnoff(1)
@@ -91,7 +84,7 @@ case( 1 )
 case( 2 )
   i1 = i1cell
   i2 = i2cell
-  i2(2) = k2
+  i2(2) = i1pml(2)
   call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
   do k = i1(2), i2(2)
   i = k - nnoff(2)
@@ -102,7 +95,7 @@ case( 2 )
   end do
   i1 = i1cell
   i2 = i2cell
-  i1(2) = k1
+  i1(2) = i2pml(2) - 1
   call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
   do k = i1(2), i2(2)
   i = nn(2) - k + nnoff(2)
@@ -114,7 +107,7 @@ case( 2 )
 case( 3 )
   i1 = i1cell
   i2 = i2cell
-  i2(3) = l2
+  i2(3) = i1pml(3)
   call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
   do l = i1(3), i2(3)
   i = l - nnoff(3)
@@ -125,7 +118,7 @@ case( 3 )
   end do
   i1 = i1cell
   i2 = i2cell
-  i1(3) = l1
+  i1(3) = i2pml(3) - 1
   call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
   do l = i1(3), i2(3)
   i = nn(3) - l + nnoff(3)
