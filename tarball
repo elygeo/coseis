@@ -19,6 +19,7 @@ files="
   $version/f
   $version/m
   $version/viz
+  $version/scripts
 "
 
 rm -f f/*.mod

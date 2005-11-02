@@ -10,7 +10,12 @@ if length( tta )
   hold on
 end
 
+title( num2str( sensor ) )
+xlabel( 'Time' )
+
 n = length( labels ) - 1;
+
+if ~n, return, end
 
 for i = 1 : n
   [ tmp, ii ] = max( abs( vt(:,i) ) );
@@ -25,5 +30,4 @@ for i = 1 : n
 end
 
 ylabel( labels(1) )
-xlabel( 'Time' )
 
