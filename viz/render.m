@@ -50,9 +50,12 @@ if flim < 0, flim = fmax; end
 % Setup figure
 set( 0, 'CurrentFigure', hfig );
 kids = get( haxes, 'Children' );
-delete( [ kids{1}' kids{2}' hhud ] );
+delete( [ kids{1}; kids{2}; hhud' ] );
 hhud = [];
-set( hmsg, 'String', '' )
+colorscale
+set( hmsg,    'String', '' )
+set( htxt(3), 'String', labels( icomp + 2 ) )
+set( htxt(4), 'String', sprintf( '%.3fs', t ) )
 
 % Isosurfaces
 if doisosurf
@@ -76,13 +79,6 @@ end
 
 % Fault plane
 if ifn
-  %faultviz
+  faultviz
 end
-
-% Color scale
-colorscale
-set( gcf, 'CurrentAxes', haxes(2) )
-text( .50, .05, labels( icomp + 2 ) );
-text( .98, .98, sprintf( '%.3fs', t ), 'Hor', 'right' )
-set( gcf, 'CurrentAxes', haxes(1) )
 

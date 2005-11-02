@@ -155,8 +155,8 @@ case 'leftbracket'
   lim = clim(2);
   set( gca, 'CLim', clim )
   if ~icomp, clim(1) = 0; end
-  set( hlegend(1), 'String', sprintf( '%g', clim(1) ) )
-  set( hlegend(2), 'String', sprintf( '%g', clim(2) ) )
+  set( htxt(1), 'String', sprintf( '%g', clim(1) ) )
+  set( htxt(2), 'String', sprintf( '%g', clim(2) ) )
 case 'rightbracket'
   msg = 'Increase Color Scale';
   if ~km, clim = 1.25 * get( gca, 'CLim' );
@@ -165,8 +165,8 @@ case 'rightbracket'
   lim = clim(2);
   set( gca, 'CLim', clim )
   if ~icomp, clim(1) = 0; end
-  set( hlegend(1), 'String', sprintf( '%g', clim(1) ) )
-  set( hlegend(2), 'String', sprintf( '%g', clim(2) ) )
+  set( htxt(1), 'String', sprintf( '%g', clim(1) ) )
+  set( htxt(2), 'String', sprintf( '%g', clim(2) ) )
 case 'backslash'
   if km
     msg = 'Auto Color Scale';
@@ -174,8 +174,8 @@ case 'backslash'
     clim = fmax * [ -1 1 ];
     set( gca, 'CLim', clim )
     if ~icomp, clim(1) = 0; end
-    set( hlegend(1), 'String', sprintf( '%g', clim(1) ) )
-    set( hlegend(2), 'String', sprintf( '%g', clim(2) ) )
+    set( htxt(1), 'String', sprintf( '%g', clim(1) ) )
+    set( htxt(2), 'String', sprintf( '%g', clim(2) ) )
   else
     msg = 'Round Color Scale';
     clim = get( gca, 'CLim' );
@@ -191,8 +191,8 @@ case 'backslash'
     clim = lim * [ -1 1 ];
     set( gca, 'CLim', clim )
     if ~icomp, clim(1) = 0; end
-    set( hlegend(1), 'String', sprintf( '%g', clim(1) ) )
-    set( hlegend(2), 'String', sprintf( '%g', clim(2) ) )
+    set( htxt(1), 'String', sprintf( '%g', clim(1) ) )
+    set( htxt(2), 'String', sprintf( '%g', clim(2) ) )
   end
 case 'd'
   dark = ~dark;

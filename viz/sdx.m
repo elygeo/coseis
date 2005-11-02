@@ -1,7 +1,6 @@
 % SDX: SORD Data Explorer
 
 clear all
-cd '/space/gely/sord/out'
 
 defaults
 in
@@ -16,6 +15,7 @@ glyphcut = .1;
 glyphexp = 1;
 glyphtype = 'wire';
 glyphtype = 'colorwire';
+glyphtype = 'reynolds';
 holdmovie = 1;
 dooutline = 1;
 domesh = 0;
@@ -61,41 +61,56 @@ end
 
 hfig = gcf;
 clf reset
-haxes = axes( 'Position', [ .02 .1 .96 .88 ] );
-haxes(2) = axes( 'HitTest', 'off' );
+
+set( hfig, ...
+  'Renderer', renderer, ...
+  'KeyPressFcn', 'control', ...
+  'Name', 'SDX', ...
+  'NumberTitle', 'off', ...
+  'InvertHardcopy', 'off', ...
+  'DefaultLineLinewidth', 1, ...
+  'DefaultLineClipping', 'off', ...
+  'DefaultTextFontSize', 13, ...
+  'DefaultTextFontName', 'FixedWidth', ...
+  'DefaultTextFontWeight', 'bold' )
+
+haxes(1) = axes( 'Position', [ .02 .1 .96 .88 ] );
+haxes(2) = axes( 'Position', [ 0 0 1 1 ], 'HitTest', 'off' );
 axis( [ 0 1 0 1 ] );
 hold on
-hlegend(3) = surf( [ 0 1 ], [ 0 .08 ], [ 0 0; 0 0 ], ...
-  'FaceColor', background, ...
+hleg(1) = surf( [ 0 1 ], [ 0 .08 ], [ 0 0; 0 0 ], ...
   'EdgeColor', 'none', ...
   'FaceLighting', 'none', ...
   'EdgeLighting', 'none' );
-hlegend(4) = plot( [ 0 1 ], [ .08 .08 ], 'Color', .25 * [ 1 1 1 ] );
-hlegend(1) = text( .1, .05, '0' );
-hlegend(2) = text( .9, .05, '1' );
-hlegend(5) = imagesc( [ .1 .9 ], [ .058 .06 ], 0:.001:1 );
-hmsg = text( .02, .1,  'Press F1 for help', 'Hor', 'left', 'Ver', 'bottom' );
-hmsg(2) = text( .98, .1,  '', 'Ver', 'bottom', 'Hor', 'right' );
-hmsg(3) = text( .02, .98, '', 'Ver', 'top',    'Hor', 'left'  );
-hmsg(4) = text( .98, .98, '', 'Ver', 'top',    'Hor', 'right' );
-hmsg(5) = text( .5, .54,  '', ...
-  'Vertical', 'middle', ...
+hleg(2) = plot( [ 0 1 ], [ .08 .08 ], 'Color', .25 * [ 1 1 1 ] );
+hleg(3) = imagesc( [ .1 .9 ], [ .058 .06 ], 0:.001:1 );
+htxt(1) = text( .10, .05, '', 'Ver', 'top',    'Hor', 'center' );
+htxt(2) = text( .90, .05, '', 'Ver', 'top',    'Hor', 'center' );
+htxt(3) = text( .50, .05, '', 'Ver', 'top',    'Hor', 'center' );
+htxt(4) = text( .98, .98, '', 'Ver', 'top',    'Hor', 'right'  );
+hmsg(1) = text( .02, .10, '', 'Ver', 'bottom', 'Hor', 'left'   );
+hmsg(2) = text( .98, .10, '', 'Ver', 'bottom', 'Hor', 'right'  );
+hmsg(3) = text( .02, .98, '', 'Ver', 'top',    'Hor', 'left'   );
+hmsg(4) = text( .98, .98, '', 'Ver', 'top',    'Hor', 'right'  );
+hmsg(5) = text( .50, .54, '', 'Ver', 'middle', 'Hor', 'center', ...
   'FontWeight', 'normal', ...
   'Margin', 10, ...
-  'EdgeColor', 0.5 * [ 1 1 1 ], ...
-  'BackgroundColor', background );
-set( [ hlegend hmsg ], 'HitTest', 'off', 'HandleVisibility', 'off' )
-set( hfig, 'CurrentAxes', haxes(1) )
+  'EdgeColor', 0.25 * [ 1 1 1 ] );
+set( [ hleg htxt hmsg ], 'HitTest', 'off', 'HandleVisibility', 'off' )
+set( hmsg(1), 'String', 'Press F1 for help' )
 
-colorscale
+set( hfig, 'CurrentAxes', haxes(1) )
 
 if dooutline
   houtline = outline( i1viz, i2viz, ifn, ihypo, rmax, grid, dx );
   set( houtline, 'HandleVisibility', 'off' )
 end
 
-camdist = 3 * rmax;
+set( haxes, 'Visible', 'off' );
+colorscale
+
 panviz = 0;
+camdist = 3 * rmax;
 lookat( 0, upvector, xcenter, camdist )
 [ tmp, l ] = max( abs( upvector ) );
 tmp = 'xyz';

@@ -1,11 +1,10 @@
 % Plot Kostrov results
 
 clear all
-addpath ../g
 
 meta
 dark = 1;
-fig
+tsfigure
 
 dofilter = 1;
 for ir = 10:10:30
