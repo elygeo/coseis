@@ -76,7 +76,7 @@ for iz = 1:size( oper, 1 )
   l = i1(3):i2(3);
   k = i1(2):i2(2);
   j = i1(1):i2(1);
-  s2(j,k,l) = dfnc( oper(iz), x, x, dx, 1, 1, j, k, l );
+  s2(j,k,l) = diffnc( oper(iz), x, x, dx, 1, 1, j, k, l );
 end
 if ifn
   i = ihypo(ifn);

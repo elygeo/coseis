@@ -1,7 +1,7 @@
 % Stress calculations
 
 % Modified dislplacement
-w1 = u + dt * viscosity(1) * v;
+w1 = u + dt * v * viscosity(1);
 s1(:) = 0;
 w2(:) = 0;
 
@@ -16,79 +16,81 @@ for iz = 1:size( oper, 1 )
   j = i1(1):i2(1);
   k = i1(2):i2(2);
   l = i1(3):i2(3);
-  s1(j,k,l) = dfnc( oper(iz), w1, x, dx, ic, id, j, k, l );
+  s1(j,k,l) = diffnc( oper(iz), w1, x, dx, ic, id, j, k, l );
 end
-i1 = i1cell;
-i2 = i2cell;
-j = i1(1):i2(1);
-k = i1(2):i2(2);
-l = i1(3):i2(3);
 
 % PML region, non-damped directions: G = gradU
-for i = 1:npml
-  if id ~= 1 && bc1(1) == 1
-    ji = i1(1) + i - 1;
-    s1(ji,k,l) = dfnc( oper(1), u, x, dx, ic, id, ji, k, l );
-  end
-  if id ~= 1 && bc2(1) == 1
-    ji = i2(1) - i + 1;
-    s1(ji,k,l) = dfnc( oper(1), u, x, dx, ic, id, ji, k, l );
-  end
-  if id ~= 2 && bc1(2) == 1
-    ki = i1(2) + i - 1;
-    s1(j,ki,l) = dfnc( oper(1), u, x, dx, ic, id, j, ki, l );
-  end
-  if id ~= 2 && bc2(2) == 1
-    ki = i2(2) - i + 1;
-    s1(j,ki,l) = dfnc( oper(1), u, x, dx, ic, id, j, ki, l );
-  end
-  if id ~= 3 && bc1(3) == 1
-    li = i1(3) + i - 1;
-    s1(j,k,li) = dfnc( oper(1), u, x, dx, ic, id, j, k, li );
-  end
-  if id ~= 3 && bc2(3) == 1
-    li = i2(3) - i + 1;
-    s1(j,k,li) = dfnc( oper(1), u, x, dx, ic, id, j, k, li );
-  end
+if id ~= 1
+  k = i1cell(2):i2cell(2);
+  l = i1cell(3):i2cell(3);
+  j = i1cell(1):i1pml(1);
+  s1(j,k,l) = diffnc( oper(1), u, x, dx, ic, id, j, k, l );
+  j = i2pml(1)-1:i2cell(1);
+  s1(j,k,l) = diffnc( oper(1), u, x, dx, ic, id, j, k, l );
+end
+if id ~= 2
+  j = i1cell(1):i2cell(1);
+  l = i1cell(3):i2cell(3);
+  k = i1cell(2):i1pml(2);
+  s1(j,k,l) = diffnc( oper(1), u, x, dx, ic, id, j, k, l );
+  k = i2pml(2)-1:i2cell(2);
+  s1(j,k,l) = diffnc( oper(1), u, x, dx, ic, id, j, k, l );
+end
+if id ~= 3
+  j = i1cell(1):i2cell(1);
+  k = i1cell(2):i2cell(2);
+  l = i1cell(3):i1pml(3);
+  s1(j,k,l) = diffnc( oper(1), u, x, dx, ic, id, j, k, l );
+  l = i2pml(3)-1:i2cell(3);
+  s1(j,k,l) = diffnc( oper(1), u, x, dx, ic, id, j, k, l );
 end
 
 % PML region, damped direction: G' + DG = gradV
-for i = 1:npml
-  if id == 1 && bc1(1) == 1
-    ji = i1(1) + i - 1;
-    s1(ji,k,l) = dfnc( oper(1), v, x, dx, ic, id, ji, k, l );
-    s1(ji,k,l) = dc2(i) * s1(ji,k,l) + dc1(i) * g1(i,k,l,ic);
-    g1(i,k,l,ic) = s1(ji,k,l);
+switch id
+case 1
+  k = i1cell(2):i2cell(2);
+  l = i1cell(3):i2cell(3);
+  for j = i1cell(1):i1pml(1)
+    i = j - nnoff(1);
+    s1(j,k,l) = diffnc( oper(1), v, x, dx, ic, id, j, k, l );
+    s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g1(i,k,l,ic);
+    g1(i,k,l,ic) = s1(j,k,l);
   end
-  if id == 1 && bc2(1) == 1
-    ji = i2(1) - i + 1;
-    s1(ji,k,l) = dfnc( oper(1), v, x, dx, ic, id, ji, k, l );
-    s1(ji,k,l) = dc2(i) * s1(ji,k,l) + dc1(i) * g4(i,k,l,ic);
-    g4(i,k,l,ic) = s1(ji,k,l);
+  for j = i2pml(1)-1:i2cell(1)
+    i = nn(1) - j + nnoff(1);
+    s1(j,k,l) = diffnc( oper(1), v, x, dx, ic, id, j, k, l );
+    s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g4(i,k,l,ic);
+    g4(i,k,l,ic) = s1(j,k,l);
   end
-  if id == 2 && bc1(2) == 1
-    ki = i1(2) + i - 1;
-    s1(j,ki,l) = dfnc( oper(1), v, x, dx, ic, id, j, ki, l );
-    s1(j,ki,l) = dc2(i) * s1(j,ki,l) + dc1(i) * g2(j,i,l,ic);
-    g2(j,i,l,ic) = s1(j,ki,l);
+case 2
+  j = i1cell(1):i2cell(1);
+  l = i1cell(3):i2cell(3);
+  for k = i1cell(2):i1pml(2)
+    i = k - nnoff(2);
+    s1(j,k,l) = diffnc( oper(1), v, x, dx, ic, id, j, k, l );
+    s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g2(j,i,l,ic);
+    g2(j,i,l,ic) = s1(j,k,l);
   end
-  if id == 2 && bc2(2) == 1
-    ki = i2(2) - i + 1;
-    s1(j,ki,l) = dfnc( oper(1), v, x, dx, ic, id, j, ki, l );
-    s1(j,ki,l) = dc2(i) * s1(j,ki,l) + dc1(i) * g5(j,i,l,ic);
-    g5(j,i,l,ic) = s1(j,ki,l);
+  for k = i2pml(2)-1:i2cell(2)
+    i = nn(2) - k + nnoff(2);
+    s1(j,k,l) = diffnc( oper(1), v, x, dx, ic, id, j, k, l );
+    s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g5(j,i,l,ic);
+    g5(j,i,l,ic) = s1(j,k,l);
   end
-  if id == 3 && bc1(3) == 1
-    li = i1(3) + i - 1;
-    s1(j,k,li) = dfnc( oper(1), v, x, dx, ic, id, j, k, li );
-    s1(j,k,li) = dc2(i) * s1(j,k,li) + dc1(i) * g3(j,k,i,ic);
-    g3(j,k,i,ic) = s1(j,k,li);
+case 3
+  j = i1cell(1):i2cell(1);
+  k = i1cell(2):i2cell(2);
+  for l = i1cell(3):i1pml(3)
+    i = l - nnoff(3);
+    s1(j,k,l) = diffnc( oper(1), v, x, dx, ic, id, j, k, l );
+    s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g3(j,k,i,ic);
+    g3(j,k,i,ic) = s1(j,k,l);
   end
-  if id == 3 && bc2(3) == 1
-    li = i2(3) - i + 1;
-    s1(j,k,li) = dfnc( oper(1), v, x, dx, ic, id, j, k, li );
-    s1(j,k,li) = dc2(i) * s1(j,k,li) + dc1(i) * g6(j,k,i,ic);
-    g6(j,k,i,ic) = s1(j,k,li);
+  for l = i2pml(3)-1:i2cell(3)
+    i = nn(3) - l + nnoff(3);
+    s1(j,k,l) = diffnc( oper(1), v, x, dx, ic, id, j, k, l );
+    s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g6(j,k,i,ic);
+    g6(j,k,i,ic) = s1(j,k,l);
   end
 end
 

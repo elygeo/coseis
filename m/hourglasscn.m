@@ -1,5 +1,4 @@
 % Hourglass corrections, cell to node
-
 function hg = hourglasscn( f, iq, j, k, l )
 
 switch iq

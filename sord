@@ -117,7 +117,7 @@ nohup matlab -r 'sord, quit' > out.log &
 END
 chmod u+x batchjob
 
-./tarball
+sh/tarball
 cp sord.tgz out/
 
 [ $run ] && matlab -nodesktop -nosplash -r "addpath m; sord"
@@ -215,7 +215,7 @@ fsord: makefile \$(SERIAL) \$(COMMON)
 psord: makefile \$(MPI) \$(COMMON)
 	cd f; \$(PFC) \$(FFLAGS) \$(MPI) \$(COMMON) -o ../psord
 sord.tgz: clean
-	./tarball
+	sh/tarball
 clean:
 	rm -f tmp f/*.mod
 realclean: clean

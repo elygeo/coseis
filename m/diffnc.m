@@ -1,11 +1,10 @@
 % Difference operators, node to cell
-
 function df = diffnc( oper, f, x, dx, i, a, j, k, l )
 
 switch oper
 
-case 'h' % constant grid, flops: 1* 7+
-
+% Constant grid, flops: 1* 7+
+case 'h'
 dx = 0.25 * dx * dx;
 switch a
 case 1
@@ -29,8 +28,8 @@ case 3
 otherwise error 'a'
 end
 
-case 'r' % rectangular grid, flops: 3* 9+
-
+% Rectangular grid, flops: 3* 9+
+case 'r'
 switch a
 case 1
   df = 0.25 * ...
@@ -59,8 +58,8 @@ case 3
 otherwise error 'a'
 end
 
-case 'g' % general grid, flops: 57* 112+
-
+% General grid, flops: 57* 112+
+case 'g'
 b = mod( a, 3 ) + 1;
 c = mod( a + 1, 3 ) + 1;
 df = 1 / 12 * ...

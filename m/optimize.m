@@ -13,10 +13,10 @@ s2(:) = 0.;
 for i = 1:3
   j = mod( i , 3 ) + 1;
   k = mod( i + 1, 3 ) + 1;
-  s1(j1:j2,k1:k2,l1:l2) = dfnc( 'h', x, x, 1., i, i, i1, i2 );
+  s1(j1:j2,k1:k2,l1:l2) = diffnc( 'h', x, x, 1., i, i, i1, i2 );
   w1(:,:,:,i) = abs( s1 );
-  s1(j1:j2,k1:k2,l1:l2) = dfnc( 'h', x, x, 1., i, j, i1, i2 );
-  s2(j1:j2,k1:k2,l1:l2) = dfnc( 'h', x, x, 1., i, k, i1, i2 );
+  s1(j1:j2,k1:k2,l1:l2) = diffnc( 'h', x, x, 1., i, j, i1, i2 );
+  s2(j1:j2,k1:k2,l1:l2) = diffnc( 'h', x, x, 1., i, k, i1, i2 );
   w2(:,:,:,i) = abs( s1 ) + abs( s2 );
 end
 

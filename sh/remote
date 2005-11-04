@@ -1,8 +1,8 @@
 #!/bin/bash -e
 
-account="altai.sdsu.edu"
-account="phim.ucsd.edu"
 account="ux451302@dslogin.sdsc.edu"
+account="phim.ucsd.edu"
+account="altai.sdsu.edu"
 account="ux451302@tg-login.sdsc.edu"
 
 echo -e "\n$account"
@@ -11,11 +11,11 @@ ssh-add -L > /dev/null || ssh-add
 
 files="
   sord
-  tarball
   defaults.m
   in.m
   in
   f
+  sh
 "
 
 rfiles=$( echo $files | sed 's|\([^ ]\+\)|sord/\1|g' )

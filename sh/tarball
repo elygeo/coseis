@@ -11,15 +11,13 @@ files="
   $version/README
   $version/VERSION
   $version/sord
-  $version/tarball
-  $version/remote
   $version/defaults.m
   $version/in.m
   $version/in
+  $version/sh
   $version/f
   $version/m
   $version/viz
-  $version/scripts
 "
 
 rm -f f/*.mod
