@@ -30,7 +30,7 @@ call gridgen
 call material
 call momentsource
 call fault
-call swaphalo( w1, nhalo )
+call swaphalovector( w1, nhalo )
 call output( 'a' )
 
 ! Main loop
@@ -40,7 +40,7 @@ do while ( it <= nt )
   call momentsource
   call output( 'w' ) 
   call acceleration
-  call swaphalo( w1, nhalo )
+  call swaphalovector( w1, nhalo )
   call fault
   call locknodes
   call output( 'a' )

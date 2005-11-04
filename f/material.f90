@@ -99,9 +99,9 @@ end select
 
 end do doiz
 
-call swaphalo( mr, nhalo )
-call swaphalo( s1, nhalo )
-call swaphalo( s2, nhalo )
+call swaphaloscalar( mr, nhalo )
+call swaphaloscalar( s1, nhalo )
+call swaphaloscalar( s2, nhalo )
 
 ! Hypocenter values
 if ( master ) then

@@ -125,12 +125,44 @@ if ( ip == ipmaster .or. ip == ipmax ) then
 end if
 end subroutine
 
-! Swap halo
-subroutine swaphalo( w1, nhalo )
-real, intent(inout) :: w1(:,:,:,:)
+! Swap halo scalar
+subroutine swaphaloscalar( f, nhalo )
+real, intent(inout) :: f(:,:,:)
+integer, intent(in) :: nhalo
+integer :: i, e, left, right, ng(3), nl(3), isend(4), irecv(4), tsend, trecv
+ng = (/ size(f,1), size(f,2), size(f,3) /)
+do i = 1, 3
+  call mpi_cart_shift( c, i-1, 1, left, right, e )
+  nl = ng
+  nl(i) = nhalo
+  isend = 0
+  irecv = 0
+  isend(i) = ng(i) - 2 * nhalo
+  call mpi_type_create_subarray( 3, ng, nl, isend, mpi_order_fortran, mpi_real, tsend, e )
+  call mpi_type_create_subarray( 3, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
+  call mpi_type_commit( tsend, e )
+  call mpi_type_commit( trecv, e )
+  call mpi_sendrecv( f, 1, tsend, right, 0, f, 1, trecv, left, 0, c, mpi_status_ignore, e )
+  call mpi_type_free( tsend, e )
+  call mpi_type_free( trecv, e )
+  isend(i) = nhalo
+  irecv(i) = ng(i) - nhalo
+  call mpi_type_create_subarray( 3, ng, nl, isend, mpi_order_fortran, mpi_real, tsend, e )
+  call mpi_type_create_subarray( 3, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
+  call mpi_type_commit( tsend, e )
+  call mpi_type_commit( trecv, e )
+  call mpi_sendrecv( f, 1, tsend, left, 1, f, 1, trecv, right, 1, c, mpi_status_ignore, e )
+  call mpi_type_free( tsend, e )
+  call mpi_type_free( trecv, e )
+end do
+end subroutine
+
+! Swap halo vector
+subroutine swaphalovector( f, nhalo )
+real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: nhalo
 integer :: i, e, left, right, ng(4), nl(4), isend(4), irecv(4), tsend, trecv
-ng = (/ size(w1,1), size(w1,2), size(w1,3), size(w1,4) /)
+ng = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
 do i = 1, 3
   call mpi_cart_shift( c, i-1, 1, left, right, e )
   nl = ng
@@ -142,7 +174,7 @@ do i = 1, 3
   call mpi_type_create_subarray( 4, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( w1, 1, tsend, right, 0, w1, 1, trecv, left, 0, c, mpi_status_ignore, e )
+  call mpi_sendrecv( f, 1, tsend, right, 0, f, 1, trecv, left, 0, c, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
   isend(i) = nhalo
@@ -151,7 +183,7 @@ do i = 1, 3
   call mpi_type_create_subarray( 4, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( w1, 1, tsend, left, 1, w1, 1, trecv, right, 1, c, mpi_status_ignore, e )
+  call mpi_sendrecv( f, 1, tsend, left, 1, f, 1, trecv, right, 1, c, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
 end do

@@ -69,12 +69,21 @@ rmax = rmax
 imax = imax - nnoff + nnoff
 end subroutine
 
-! Swap halo
-subroutine swaphalo( w1, nhalo )
-real, intent(inout) :: w1(:,:,:,:)
+! Swap halo scalar
+subroutine swaphaloscalar( f, nhalo )
+real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: nhalo
 integer :: i
-w1(1,1,1,1) = w1(1,1,1,1)
+f(1,1,1) = f(1,1,1)
+i = nhalo
+end subroutine
+
+! Swap halo vector
+subroutine swaphalovector( f, nhalo )
+real, intent(inout) :: f(:,:,:,:)
+integer, intent(in) :: nhalo
+integer :: i
+f(1,1,1,1) = f(1,1,1,1)
 i = nhalo
 end subroutine
 

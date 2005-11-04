@@ -102,7 +102,7 @@ case( 3 ); l = ihypo(3); x(:,:,l+1:l2,:) = x(:,:,l:l2-1,:)
 end select
 
 ! Fill in halo
-call swaphalo( x, nhalo )
+call swaphalovector( x, nhalo )
 do i = 1, nhalo
   if( edge1(1) ) x(j1-i,:,:,:) = x(j1,:,:,:)
   if( edge2(1) ) x(j2+i,:,:,:) = x(j2,:,:,:)
