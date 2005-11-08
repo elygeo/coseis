@@ -36,7 +36,8 @@ fi
 [ -n "$1" ] && ln -sf "$1" 'in.m'
 
 # Strip MATLAB caracters
-sed "s/%.*$//; s/;/;\n/g; s/[]={}';[]*//g;/^$/d" 'defaults.m' 'in.m' > tmp
+sed "s/%.*$//; s/;/;\
+/g; s/[]={}';[]*//g; /^$/d" 'defaults.m' 'in.m' > tmp
 
 # Read input
 nout=0
@@ -153,6 +154,7 @@ case $machine in
     fc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
     pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
     oflags='-O5'
+    oflags='-O'
     gflags='-g -C -qflttrap -qsigtrap -qlanglvl=95pure'
     ;;
   TeraGrid)

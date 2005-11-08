@@ -60,13 +60,13 @@ case 'r'
   rehash
   currentstep
   istep = dit * 10 ^ km;
-  if ~exist( 'movie', 'dir' ), mkdir( 'movie' ), end
+  if km && ~exist( 'movie', 'dir' ), mkdir( 'movie' ), end
   while icursor(4) <= it;
     rehash
     currentstep
     render
     drawnow
-    snap( sprintf( 'movie/frame%06d.png', icursor(4) ) )
+    if km, snap( sprintf( 'movie/frame%06d.png', icursor(4) ) ), end
     icursor(4) = icursor(4) + istep;
   end
   icursor(4) = icursor(4) - istep;

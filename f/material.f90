@@ -27,6 +27,7 @@ vs2 = 0.
 ! Single node indexing
 n = nn
 noff = nnoff
+idoublenode = 0
 if ( ifn /= 0 ) then
   n(ifn) = n(ifn) - 1
   if ( ihypo(ifn) < i1node(ifn) ) then

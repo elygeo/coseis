@@ -24,6 +24,7 @@ l1 = i1(3); l2 = i2(3)
 ! Single node indexing
 n = nn
 noff = nnoff
+idoublenode = 0
 if ( ifn /= 0 ) then
   n(ifn) = n(ifn) - 1
   if ( ihypo(ifn) < i1node(ifn) ) then

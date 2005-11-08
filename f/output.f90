@@ -114,6 +114,7 @@ end do doiz0
 if ( master ) then
   print *,'       Step  Amax           Vmax           Umax            Wall Time'
   call system_clock( count_rate=twall_rate )
+  call system_clock( twall(1) )
 end if
 
 return
