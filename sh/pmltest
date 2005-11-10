@@ -3,6 +3,7 @@
 [ -x sord ]
 
 cat << END > 'in.m'
+  np = [ 1 1 1 ];
   faultnormal = 0;
   rsource = 150.;
   nt = 400;
@@ -12,6 +13,7 @@ cat << END > 'in.m'
   bc2 = [ 1 1 1 ];
   out = { 'x' 1   41 41 61   61 61 61 };
   out = { 'v' 1   41 41 61   61 61 61 };
+  out = { 'v' 100  1  1  1   -1 -1 -1 };
 END
 ./sord -d
 mv out runs/pmltest1

@@ -144,6 +144,7 @@ case $machine in
   Linux)
     fc='gfortran'
     oflags='-g -W -pedantic -std=f95 -fimplicit-none'
+    oflags="-fdefer-pop -fguess-branch-probability -fcprop-registers -floop-optimize -fif-conversion -fif-conversion2 -ftree-ccp -ftree-dce -ftree-dominator-opts -ftree-dse -ftree-ter -ftree-lrs -ftree-sra -ftree-copyrename -ftree-fre -ftree-ch -fmerge-constants -fomit-frame-pointer -fthread-jumps -fcrossjumping -foptimize-sibling-calls -fcse-follow-jumps -fcse-skip-blocks -fgcse -fgcse-lm -fexpensive-optimizations -fstrength-reduce -frerun-cse-after-loop -frerun-loop-opt -fcaller-saves -fforce-mem -fpeephole2 -fschedule-insns -fschedule-insns2 -fsched-interblock -fsched-spec -fregmove -fstrict-aliasing -fdelete-null-pointer-checks -freorder-blocks -freorder-functions -funit-at-a-time -falign-functions -falign-jumps -falign-loops -falign-labels -ftree-pre -finline-functions -funswitch-loops -fgcse-after-reload"
     gflags='-g -W -pedantic -std=f95 -fimplicit-none'
     ;;
   SunOS)
