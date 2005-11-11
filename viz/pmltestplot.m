@@ -1,32 +1,51 @@
 % Plot PML Test
 
-sensors = [
-  41 41 41
-  51 41 61
-  61 41 61
-  51 51 61
-  61 51 61
-  61 61 61
+loc = [
+  0  0  20
+  10 0  20
+  10 10 20
+  20 20 20
 ];
 
-n = size( sensors, 1 );
+n = size( loc, 1 );
 
 for i = 1:n
   tsfigure( 0 )
-  title( num2str( sensor ) )
-  subplot(2,1,1)
-  sensor = sensors(i,:);
-  cd 'pmltest1', [ t, v, ta, va ] = timeseries( 'v', sensor, 1 ); cd '..'
-  cd 'pmltest2', [ t, vb ]        = timeseries( 'v', sensor, 1 ); cd '..'
-  plot( t, v(:,1) )
-  hold on
-  plot( t, vb(:,1), '--' )
+  cd 'pmltest1'
+  meta
+  sensor = ihypo + loc(i,:);
+  [ t, v, ta, va, labels, msg ] = timeseries( 'v', sensor, 1 );
+  cd '..'
+  h1 = subplot(2,1,1);
   plot( ta, va, ':' )
-  xlabel( 'Time' )
+  hold on
+  plot( t, v(:,1), 'k' )
+  plot( t, v(:,2), 'r' )
+  plot( t, v(:,3), 'b' )
+  title( num2str( sensor ) )
   ylabel( 'Velocity' )
-  subplot(2,1,2)
-  plot( t, v(:,1) - vb(:,1) )
-  xlabel( 'Time' )
+  ylim( .03 * [ -1 1 ] )
+  h2 = subplot(2,1,2);
+  plot( ta, va, ':' )
+  hold on
+  plot( t, v(:,1), 'k' )
+  plot( t, v(:,2), 'r' )
+  plot( t, v(:,3), 'b' )
+  ylim( .0003 * [ -1 1 ] )
   ylabel( 'Velocity' )
+  xlabel( 'Time' )
+  cd 'pmltest2'
+  meta
+  sensor = ihypo + loc(i,:);
+  [ t, v, ta, va, labels, msg ] = timeseries( 'v', sensor, 1 );
+  cd '..'
+  axes( h1 )
+  plot( t, v(:,1), 'k--' )
+  plot( t, v(:,2), 'r--' )
+  plot( t, v(:,3), 'b--' )
+  axes( h2 )
+  plot( t, v(:,1), 'k--' )
+  plot( t, v(:,2), 'r--' )
+  plot( t, v(:,3), 'b--' )
 end
 

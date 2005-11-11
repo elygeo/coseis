@@ -62,10 +62,10 @@ vt = reshape( vt, nt, nc );
 
 % For point source, rotate to r,h,v coords
 if pointsource
-  if ( xg(1) || xg(2) )
-    rot = [ xg(1)  xg(2) xg(1)*xg(3)
-            xg(2) -xg(1) xg(2)*xg(3)
-            xg(3)     0 -xg(1)*xg(1)-xg(2)*xg(2) ];
+  if ( xg(2) || xg(3) )
+    rot = [ xg(1)     0 -xg(2)*xg(2)-xg(3)*xg(3)
+            xg(2) -xg(3) xg(1)*xg(2)
+            xg(3)  xg(2) xg(1)*xg(3) ];
     tmp = sqrt( sum( rot .* rot, 1 ) );
     for i = 1:3
       rot(i,:) = rot(i,:) ./ tmp;

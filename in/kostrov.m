@@ -1,18 +1,9 @@
 % Kostrov constant rupture velocity test
 
-  nn = [ 3 3 4 ];
-  nt = 1;
-  bc1 = [ 0 0 0 ];
-  bc2 = [ 0 0 0 ];
-
-  nn = [ 41 41 42 ];
-  nt = 200;
-
-  nn = [ 81 81 42 ];
-  nt = 300;
-  bc1 = [ 0 0 1 ];
-  bc2 = [ 0 0 1 ];
-
+  nt = 400;
+  nn = [ 121 121 42 ];
+  bc1 = [ 1 1 1 ];
+  bc2 = [ 1 1 1 ];
   faultnormal = 3;
   mus = 1e9;
   mud = 0.;
@@ -25,6 +16,7 @@
   rcrit = 1e9;
   trelax = 0.;
   out = { 'x'  1   1 1 0   -1 -1 0 };
+  out = { 'sl' 1   1 1 0   -1 -1 0 };
   out = { 'sv' 1   1 1 0   -1 -1 0 };
   out = { 'v'  20  1 1 1   -1 -1 -1 };
 

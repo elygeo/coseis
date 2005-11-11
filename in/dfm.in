@@ -1,0 +1,33 @@
+# material_type	vp vs rho betha yeild
+# slip_type	kind smin smax dzero gax gay gaz cohes
+# nucleation	jfocus kfocus rcrit rupvx rupvy
+#parallel	1	6
+n 		111	161	81	520
+h		300	300	300	.025
+gridexpansion	31 91	26 136	21 61	1 1.06  1.06 1.06  1.06 1.06
+material_type	6000	3464	2670	.3	1e12
+slip_plane			41
+#slip_type	0 1e4 1e4 0		0. -70e6 -120e6 0.	locked
+slip_type	0 1e4 0.525 0		0. -70e6 -120e6 0.	locked
+slip_type	0 0.525 0.677 .4	0. -70e6 -120e6 0.	dyn rup
+#slip_type	0 0.525 525 0		0. -81.24e6 -120e6 0.	the1 src
+slip_type	0 0.525 0.677 .4	0. -81.6e6 -120e6 0.	the2 src
+slip_zone	31 81	31 131	41	2
+slip_zone	51 61	76 86	41	3
+checkpoint				100
+
+# this for the rupture movie
+snap v		1 111	81 81	1 41	1	cross-section
+snap u		1 111	81 81	1 41	1	cross-section
+snap v		1 1	81 161	1 41	1	surface
+snap u		1 1	81 161	1 41	1	surface
+snap v		1 1	1 161	41 81	1	surface
+snap u		1 1	1 161	41 81	1	surface
+snap v		1 111	1 81	41 41	1	fault plane
+snap u		1 111	1 81	41 41	1	fault plane
+snap v		1 111	81 161	41 41	1	fault plane
+snap u		1 111	81 161	41 41	1	fault plane
+
+snap u		31 56	81 131	41 41	1	slip rate
+snap v		31 56	81 131	41 41	1	slip rate
+snap f		31 56	81 131	41 41	1	fault plane stress

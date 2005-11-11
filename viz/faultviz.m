@@ -12,10 +12,14 @@ i2(4) = 0;
 if msg, error( msg ), end
 
 if rcrit
-  r = sqrt( sum( x .* x, 5 ) );
-  scontour( x, r, min( rcrit, it * dt * vrup ) );
-  if nramp
-    scontour( x, r, min( rcrit, ( it - nramp ) * dt * vrup ) );
+  r = 0;
+  for i = 1:3
+    r = r + ( x(:,:,:,:,i) - xhypo(i) ) .* ( x(:,:,:,:,i) - xhypo(i) );
+  end
+  r = sqrt( r );
+  surfcontour( x, r, min( rcrit, icursor(4) * dt * vrup ) );
+  if trelax > 0.
+    surfcontour( x, r, min( rcrit, ( icursor(4) * dt - trelax ) * vrup ) );
   end
 end
 
@@ -24,6 +28,6 @@ i2(4) = it;
 [ sl, msg ] = read4d( 'sl', i1, i2, 0 );
 if msg, error( msg ), end
 
-scontour( x, sl, dc0 );
-scontour( x, sl, .01 * dc0 );
+surfcontour( x, sl, dc0 );
+surfcontour( x, sl, .01 * dc0 );
 

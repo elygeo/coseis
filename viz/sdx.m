@@ -5,6 +5,7 @@ clear all
 defaults
 in
 meta
+if faultnormal, faultmeta, end
 
 field = 'v';
 icomp = 0;

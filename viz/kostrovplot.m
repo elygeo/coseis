@@ -3,16 +3,18 @@
 clear all
 
 meta
-dark = 1;
-tsfigure
+tsfigure( 0 )
 
 dofilter = 1;
 for ir = 10:10:30
   sensor = ihypo + [ ir 0 0 ];
-  [ tt vt ta va ] = timeseries( 'sv', sensor, 1 );
-  labels{2} = sprintf( 'r=%g', rg );
-  tsplot
+  [ t, v, ta, va, labels, msg ] = timeseries( 'sv', sensor, 1 );
+  plot( t, v(:,1) )
+  hold on
+  plot( ta, va, ':' )
 end
+xlabel( 'Time' )
+ylabel( 'Slip Velocity' )
 
-%print -dpsc2 kost.ps
+print -dpsc2 kostrov.ps
 
