@@ -22,7 +22,7 @@ for i = 1:n
   plot( t, v(:,1), 'k' )
   plot( t, v(:,2), 'r' )
   plot( t, v(:,3), 'b' )
-  title( num2str( sensor ) )
+  title( num2str( loc(i,:) ) )
   ylabel( 'Velocity' )
   ylim( .03 * [ -1 1 ] )
   h2 = subplot(2,1,2);
@@ -47,5 +47,12 @@ for i = 1:n
   plot( t, v(:,1), 'k--' )
   plot( t, v(:,2), 'r--' )
   plot( t, v(:,3), 'b--' )
+  drawnow
+  file = sprintf( 'frame%d.ps', i );
+  print( '-dpsc2', file )
+  %print( '-depsc', file )
+  unix( [ 'ps2pdf ' file ] );
 end
+
+unix( 'pdftk frame*.pdf cat output pmltest.pdf' );
 

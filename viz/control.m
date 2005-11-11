@@ -57,16 +57,18 @@ case 'return',     render
 case 'space',      icursor(4) = icursor(4) + dit * 10 ^ km; render
 case 'insert',     snap
 case 'r'
+  anim = 1;
+  export = 0;
   rehash
   currentstep
   istep = dit * 10 ^ km;
-  if km && ~exist( 'movie', 'dir' ), mkdir( 'movie' ), end
-  while icursor(4) <= it;
+  if export && ~exist( 'movie', 'dir' ), mkdir( 'movie' ), end
+  while anim && icursor(4) <= it;
     rehash
     currentstep
     render
     drawnow
-    if km, snap( sprintf( 'movie/frame%06d.png', icursor(4) ) ), end
+    if export, snap( sprintf( 'movie/frame%06d.png', icursor(4) ) ), end
     icursor(4) = icursor(4) + istep;
   end
   icursor(4) = icursor(4) - istep;

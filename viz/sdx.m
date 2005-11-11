@@ -118,5 +118,6 @@ tmp = 'xyz';
 cameratoolbar( 'SetMode', 'orbit' )
 cameratoolbar( 'SetCoordSys', tmp(l) )
 cameratoolbar( 'ToggleSceneLight' )
-set( 1, 'KeyPressFcn', 'control' )
+set( 1, 'KeyPressFcn', 'control', ...
+  'WindowButtonDownFcn', 'anim = 0; cameratoolbar(''down'')' )
 
