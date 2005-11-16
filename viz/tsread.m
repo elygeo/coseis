@@ -1,5 +1,5 @@
 % Time series
-function [ tt, vt, tta, vta, labels, msg ] = timeseries( field, sensor, dofilter )
+function [ tt, vt, tta, vta, labels, msg ] = tsread( field, sensor, dofilter )
 
 tt = [];
 tta = [];
@@ -31,7 +31,7 @@ kostrov = ...
 
 % Find sensor location if needed
 if pointsource || explosion || kostrov
-  [ xsensor, msg ] = read4d( 'x', [ sensor 0 ], [ sensor 0 ], 0 );
+  [ xsensor, msg ] = read4d( 'x', [ sensor 0 ], [ sensor 0 ] );
   if msg
     pointsource = 0;
     explosion = 0;
@@ -52,7 +52,7 @@ else
 end
 
 % Extract data
-[ vt, msg ] = read4d( field, [ sensor it0 ], [ sensor it ], 0 );
+[ vt, msg ] = read4d( field, [ sensor it0 ], [ sensor it ] );
 if msg, return, end
 msg = 'Time Series';
 

@@ -1,5 +1,6 @@
 % Terashake
 
+  out = { 'x' 0   1 1 1   -1 -1 1 };
   out = { 'v' 1   1 1 1   -1 -1 1 };
   upvector = [ 0 0 1 ];
   faultnormal = 2;

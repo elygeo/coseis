@@ -4,6 +4,8 @@ account="phim.ucsd.edu"
 account="ux451302@tg-login.sdsc.edu"
 account="altai.sdsu.edu"
 account="ux451302@dslogin.sdsc.edu"
+account="babieca.sdsu.edu"
+account="moho.sdsu.edu"
 
 echo -e "\n$account"
 

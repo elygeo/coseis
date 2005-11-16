@@ -1,6 +1,5 @@
 ! MPIIO
 module collectiveio_m
-use mpi_m
 use collective_m
 implicit none
 integer, private, allocatable :: commout(:)

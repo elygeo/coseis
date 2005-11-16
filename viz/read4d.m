@@ -1,10 +1,44 @@
 % Extract 4D slice from saved data
-function [ f, msg ] = read4d( fieldin, i1s, i2s, ic )
+%function [ f, msg ] = read4d( fieldin, i1s, i2s, ic )
+function [ f, msg ] = read4d( varargin )
 
-% Array slice
+% Aguments
+if ~any( nargin == [ 1 3 4 ] ), error, end
+fieldin = varargin{1};
+i1s =  [ 1 1 1 1 ];
+i2s = -[ 1 1 1 1 ];
+ic = 0;
+if nargin > 1
+  i1s = varargin{2};
+  i2s = varargin{3};
+end
+if nargin > 3
+  ic = varargin{4};
+end
+
+% Metadata
 rehash
+defaults
+in
 currentstep
 meta
+
+% Slice
+i = [ ihypo 0 ];
+n = [ nn it ];
+shift = [ 0 0 0 0 ];
+if faultnormal, shift( abs( faultnormal) ) = 1; end
+m0 = i1s == 0 & i2s == 0;
+m1 = i1s == 0 & i2s ~= 0;
+m2 = i1s ~= 0 & i2s == 0;
+m3 = i1s < 0;
+m4 = i2s < 0;
+i1s(m0) = i(m0);
+i2s(m0) = i(m0) + shift(m0);
+i1s(m1) = i(m1) + shift(m1);
+i2s(m2) = i(m2);
+i1s(m3) = i1s(m3) + n(m3) + 1;
+i2s(m4) = i2s(m4) + n(m4) + 1;
 
 % Look for file with desired data
 n = i2s - i1s + 1;

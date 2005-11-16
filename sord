@@ -88,6 +88,7 @@ mm=$(( wt % 3600 / 60 ))
 ss=$(( wt % 60 ))
 [ $hh -ge 1 ] && ss=0
 wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
+echo "Machine: $machine"
 echo "RAM usage: at least ${ram}Mb"
 echo "Run time: at least $wt"
 
@@ -143,8 +144,8 @@ gflags='-g'
 case $machine in
   Linux)
     fc='gfortran'
-    oflags='-g -W -pedantic -std=f95 -fimplicit-none'
     oflags="-fdefer-pop -fguess-branch-probability -fcprop-registers -floop-optimize -fif-conversion -fif-conversion2 -ftree-ccp -ftree-dce -ftree-dominator-opts -ftree-dse -ftree-ter -ftree-lrs -ftree-sra -ftree-copyrename -ftree-fre -ftree-ch -fmerge-constants -fomit-frame-pointer -fthread-jumps -fcrossjumping -foptimize-sibling-calls -fcse-follow-jumps -fcse-skip-blocks -fgcse -fgcse-lm -fexpensive-optimizations -fstrength-reduce -frerun-cse-after-loop -frerun-loop-opt -fcaller-saves -fforce-mem -fpeephole2 -fschedule-insns -fschedule-insns2 -fsched-interblock -fsched-spec -fregmove -fstrict-aliasing -fdelete-null-pointer-checks -freorder-blocks -freorder-functions -funit-at-a-time -falign-functions -falign-jumps -falign-loops -falign-labels -ftree-pre -finline-functions -funswitch-loops -fgcse-after-reload"
+    oflags=''
     gflags='-g -W -pedantic -std=f95 -fimplicit-none'
     ;;
   SunOS)
@@ -164,7 +165,7 @@ case $machine in
     gflags='-g -CB -warn -traceback'
     ;;
   Babieca)
-    fc='pgf95'
+    fc='pgf90'
     ;;
 esac
 case $fflags in
@@ -245,23 +246,6 @@ case $machine in
 
 DataStar) #--------------------------------------#
 
-cat << END
-DataStar 8-way p655+ nodes
-dspoe.sdsc.edu: 4GB?, 40proc?, 2hr limit
-dslogin.sdsc.edu: 3672GB, 2176proc, 18hr limit
-Useful commands:
-  llsubmit batchjob
-  llcancel <jobID>
-  llq
-  llq -s <jobID>
-  show_q
-  show_bf
-  reslist
-  showq
-Always run from a subdirectory of /gpfs/
-Login to dslogin.sdsc.edu to submit batch jobs
-Login to dspoe.sdsc.edu to run interactively
-END
 [ $( pwd | grep -v gpfs ) ] || exit
 
 # Batch
@@ -330,26 +314,6 @@ esac
 
 TeraGrid) #--------------------------------------#
 
-cat << END
-SDSC TeraGrid: http://www.sdsc.edu/teragrid/guide.html
-Useful commands:
-  qsub batchjob
-  qstat -a
-  qdel PBS_JOBID
-  qstat -r
-  qstat -f PBS_JOBID
-  qstat -q
-  qstat -Q
-  qstat -B
-  pbsnodes -a 
-  show_q
-  show_res
-  showq
-  show_bf
-Always run from a subdirectory of /gpfs/
-Login to tg-c127, tg-c128, tg-c129 or  tg-130 to run interactively
-END
-
 # Batch
 rate=100000
 wt=$(( nt * nn / np / rate + 1 ))
@@ -389,17 +353,6 @@ esac
 
 Babieca) #--------------------------------------#
 
-# Info
-cat << END
-Babieca: up to 19 procs
-Useful commands:
-  qsub batchjob
-  pbsnodes -a
-  pingd
-  qstat
-  qdel
-END
-
 # Batch
 ppn=2
 [ $ppn -gt $np ] && ppn=$np
@@ -409,23 +362,35 @@ cat << END > batchjob
 #!/bin/bash
 #PBS -q workq
 #PBS -N sord_job
-#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -l nodes=$nodes:ppn=$ppn:mpi
 #PBS -o out.log
 #PBS -e err.log
 #PBS -V
 sleep 2
 cd $rundir
-mpiexec -np $np ./psord
+mpiexec -n $n ./psord
 END
 chmod u+x batchjob
 
 # Interactive
 [ $run ] || exit
+cat << END > machinefile
+node1:2
+node2:2
+node3:2
+node4:2
+node31:2
+node32:2
+node33:2
+node34:2
+node35:2
+node36:2
+END
 case $mode$debug in
   serial)    ./fsord ;;
   serialg)   gdb ./fsord ;;
-  parallel)  mpiexec -np $np ./psord ;;
-  parallelg) mpiexec -np $np -dbg=gdb ./psord ;;
+  parallel)  mpirun -np $np -machinefile machinefile ./psord ;;
+  parallelg) mpirun -np $np -machinefile machinefile -dbg=gdb ./psord ;;
 esac
 
 ;;

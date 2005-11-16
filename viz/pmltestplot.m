@@ -11,33 +11,34 @@ n = size( loc, 1 );
 
 for i = 1:n
   tsfigure( 0 )
+  orient tall
   cd 'pmltest1'
   meta
   sensor = ihypo + loc(i,:);
-  [ t, v, ta, va, labels, msg ] = timeseries( 'v', sensor, 1 );
+  [ t, v, ta, va, labels, msg ] = tsread( 'v', sensor, 1 );
   cd '..'
-  h1 = subplot(2,1,1);
+  h1 = axes( 'Position', [ 4/32 23/42 26/32 16/42 ] );
   plot( ta, va, ':' )
   hold on
   plot( t, v(:,1), 'k' )
   plot( t, v(:,2), 'r' )
   plot( t, v(:,3), 'b' )
-  title( num2str( loc(i,:) ) )
+  ylim( [ -.01 .03 ] )
   ylabel( 'Velocity' )
-  ylim( .03 * [ -1 1 ] )
-  h2 = subplot(2,1,2);
+  title( num2str( loc(i,:) ) )
+  h2 = axes( 'Position', [ 4/32 3/42 26/32 16/42 ] );
   plot( ta, va, ':' )
   hold on
   plot( t, v(:,1), 'k' )
   plot( t, v(:,2), 'r' )
   plot( t, v(:,3), 'b' )
-  ylim( .0003 * [ -1 1 ] )
+  ylim( [ -.001 .001 ] )
   ylabel( 'Velocity' )
   xlabel( 'Time' )
   cd 'pmltest2'
   meta
   sensor = ihypo + loc(i,:);
-  [ t, v, ta, va, labels, msg ] = timeseries( 'v', sensor, 1 );
+  [ t, v, ta, va, labels, msg ] = tsread( 'v', sensor, 1 );
   cd '..'
   axes( h1 )
   plot( t, v(:,1), 'k--' )

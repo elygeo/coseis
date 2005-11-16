@@ -75,6 +75,7 @@ doiz0: do iz = 1, nout
   
   ! Interval 
   if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
+  if ( fieldout(iz) == 'x' ) ditout(iz) = 0
 
   ! Zone
   i1 = i1out(iz,:)
@@ -82,7 +83,7 @@ doiz0: do iz = 1, nout
   call zone( i1, i2, nn, nnoff, ihypo, ifn )
   if ( fault ) then
     if ( ifn == 0 ) then
-      ditout(iz) = 0
+      ditout(iz) = -1
     else
       i1(ifn) = ihypo(ifn)
       i2(ifn) = ihypo(ifn)
@@ -105,7 +106,7 @@ doiz0: do iz = 1, nout
   end if
  
   ! Split collective i/o
-  if ( any( i2 < i1 ) ) ditout(iz) = 0
+  if ( any( i2 < i1 ) ) ditout(iz) = -1
   call iosplit( iz, nout, ditout(iz) )
 
 end do doiz0
@@ -155,7 +156,7 @@ end if
 
 doiz: do iz = 1, nout !--------------------------------------------------------!
 
-if ( ditout(iz) == 0 ) cycle doiz
+if ( ditout(iz) < 0 ) cycle doiz
 if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 
 ! Properties
@@ -177,8 +178,8 @@ end select
 ! Select pass
 if ( pass /= onpass ) cycle doiz
 
-! Mesh is static, so only write first time arround
-if ( fieldout(iz) == 'x' ) ditout(iz) = 0
+! If interval is zero, only write once
+if ( ditout(iz) == 0 ) ditout(iz) = -1
 
 ! Indices
 i1 = i1out(iz,:)

@@ -35,7 +35,8 @@ if ( ifn /= 0 ) then
     end where
     where ( f1 >= svtol )
       tarr = 1e9
-    elsewhere ( sv >= svtol )
+    end where
+    where ( f1 < svtol .and. sv >= svtol )
       tarr = t - dt * ( .5 + ( svtol - f1 ) / ( sv - f1 ) )
     end where
   end if

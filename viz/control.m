@@ -251,7 +251,7 @@ case 'x'
   end
 case 't'
   sensor = icursor(1:3);
-  [ tt, vt, tta, vta, labels, msg ] = timeseries( field, sensor, km );
+  [ tt, vt, tta, vta, labels, msg ] = tsread( field, sensor, km );
   if length( vt )
     tsfigure( dark )
     tsplot

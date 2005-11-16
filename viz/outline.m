@@ -56,7 +56,7 @@ for iz = 1:size( ilines, 1 )
     x2 = [ x2; [ i1(2) - 1; i2(2) - 1 ] * dx; NaN ];
     x3 = [ x3; [ i1(3) - 1; i2(3) - 1 ] * dx; NaN ];
   else
-    [ x msg ] = read4d( 'x', [ i1 0 ], [ i2 0 ], 0 );
+    [ x msg ] = read4d( 'x', [ i1 0 ], [ i2 0 ] );
     if msg, continue, end
     x1 = [ x1; shiftdim( x(:,:,:,1,1) ); NaN ];
     x2 = [ x2; shiftdim( x(:,:,:,1,2) ); NaN ];

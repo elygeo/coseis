@@ -7,9 +7,8 @@ SORD - Support Operator Rupture Dynamics
   order a Support-Operator method on a logically rectangular mesh.  The fault
   is modeled with a slip-weakening, frictional, internal boundary condition.
   There are two versions, one written in Fortran and one in MATLAB.  The
-  MATLAB version has integrated visualization and is good for testing small
-  problems.  The Fortran version is best for large problems and is
-  parallelized with MPI. 
+  MATLAB version is useful for testing small problems.  The Fortran version 
+  is best for large problems and is parallelized with MPI. 
 
 AUTHOR
 
@@ -38,6 +37,55 @@ USAGE
   When porting to a new machine, you may have to modify the sord script for 
   the proper compiling and batch submission parameters.  For the parallel
   version you will need MPI installed.
+
+MACHINE NOTES
+
+DataStar 8-way p655+ nodes
+  dspoe.sdsc.edu: 4GB?, 40proc?, 2hr limit
+  dslogin.sdsc.edu: 3672GB, 2176proc, 18hr limit
+  Useful commands:
+    llsubmit batchjob
+    llcancel <jobID>
+    llq
+    llq -s <jobID>
+    show_q
+    show_bf
+    reslist
+    showq
+  Always run from a subdirectory of /gpfs/
+  Login to dslogin.sdsc.edu to submit batch jobs
+  Login to dspoe.sdsc.edu to run interactively
+  
+SDSC TeraGrid
+  http://www.sdsc.edu/teragrid/guide.html
+  Useful commands:
+    qsub batchjob
+    qstat -a
+    qdel PBS_JOBID
+    qstat -r
+    qstat -f PBS_JOBID
+    qstat -q
+    qstat -Q
+    qstat -B
+    pbsnodes -a
+    show_q
+    show_res
+    showq
+    show_bf
+  Always run from a subdirectory of /gpfs/
+  Login to tg-c127, tg-c128, tg-c129 or  tg-130 to run interactively
+
+Babieca
+  nodes: 2 procs, 1 GB
+  10 interactive nodes
+  18 batch nodes
+  Useful commands:
+    qsub batchjob
+    pbsnodes -a
+    pingd
+    qstat
+    qdel
+
 
 COORDINATE SYSTEM
  
