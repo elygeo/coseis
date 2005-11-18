@@ -8,8 +8,8 @@ echo $version > VERSION
 ln -s . $version
 
 files="
-  $version/README
   $version/VERSION
+  $version/README
   $version/sord
   $version/defaults.m
   $version/in.m
@@ -20,7 +20,7 @@ files="
   $version/viz
 "
 
-rm -f f/*.mod
+rm -f f/*.o f/*.mod
 
 tar cf - $files | gzip > sord.tgz
 

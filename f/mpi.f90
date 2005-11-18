@@ -1,11 +1,6 @@
-! MPICH mpi module is broken, so make one
-module mpi_m
-include 'mpif.h'
-end module
-
 ! MPI routines
 module collective_m
-use mpi_m
+use mpi
 implicit none
 integer :: c
 integer, private :: ip, ipmaster
@@ -13,6 +8,7 @@ contains
 
 ! Initialize
 subroutine initialize( master )
+implicit none
 logical, intent(inout) :: master
 integer :: e
 call mpi_init( e )
@@ -23,15 +19,17 @@ end subroutine
 
 ! Finalize
 subroutine finalize
+implicit none
 integer :: e
 call mpi_finalize( e )
 end subroutine
 
 ! Processor rank
 subroutine rank( np, ip3 )
+implicit none
 integer, intent(in) :: np(3)
 integer, intent(out) :: ip3(3)
-integer :: ip, e
+integer :: e
 logical :: period(3) = .false.
 call mpi_cart_create( mpi_comm_world, 3, np, period, .true., c, e )
 if ( c == mpi_comm_null ) then
@@ -46,6 +44,7 @@ end subroutine
 
 ! Set master processor
 subroutine setmaster( ip3master )
+implicit none
 integer, intent(in) :: ip3master(3)
 integer :: e
 call mpi_cart_rank( c, ip3master, ipmaster, e )
@@ -53,6 +52,7 @@ end subroutine
 
 ! Broadcast
 subroutine broadcast( r )
+implicit none
 real, intent(inout) :: r(:)
 integer :: i, e
 i = size(r)
@@ -61,6 +61,7 @@ end subroutine
 
 ! Integer minimum
 subroutine iglobalmin( imin )
+implicit none
 integer, intent(inout) :: imin
 integer :: ii, e
 call mpi_allreduce( imin, ii, 1, mpi_integer, mpi_min, c, e )
@@ -69,6 +70,7 @@ end subroutine
 
 ! Real minimum
 subroutine globalmin( rmin )
+implicit none
 real, intent(inout) :: rmin(:)
 real :: r
 integer :: n, e
@@ -79,6 +81,7 @@ end subroutine
 
 ! Real maximum
 subroutine globalmax( rmax )
+implicit none
 real, intent(inout) :: rmax(:)
 real :: r
 integer :: n, e
@@ -89,6 +92,7 @@ end subroutine
 
 ! Real global minimum & location, send to master
 subroutine globalminloc( rmin, imin, nnoff )
+implicit none
 real, intent(inout) :: rmin
 integer, intent(inout) :: imin(3)
 integer, intent(in) :: nnoff(3)
@@ -96,7 +100,7 @@ integer :: e, ipmin
 real :: local(2), global(2)
 local(1) = rmin
 local(2) = ip
-call mpi_reduce( local, global, 2, mpi_real, mpi_minloc, ipmaster, c, e )
+call mpi_reduce( local, global, 1, mpi_2real, mpi_minloc, ipmaster, c, e )
 rmin  = global(1)
 ipmin = global(2)
 if ( ip == ipmaster .or. ip == ipmin ) then
@@ -108,6 +112,7 @@ end subroutine
 
 ! Real global maximum & location, send to master
 subroutine globalmaxloc( rmax, imax, nnoff )
+implicit none
 real, intent(inout) :: rmax
 integer, intent(inout) :: imax(3)
 integer, intent(in) :: nnoff(3)
@@ -115,7 +120,7 @@ integer :: e, ipmax
 real :: local(2), global(2)
 local(1) = rmax
 local(2) = ip
-call mpi_reduce( local, global, 2, mpi_real, mpi_maxloc, ipmaster, c, e )
+call mpi_reduce( local, global, 1, mpi_2real, mpi_maxloc, ipmaster, c, e )
 rmax  = global(1)
 ipmax = global(2)
 if ( ip == ipmaster .or. ip == ipmax ) then
@@ -127,6 +132,7 @@ end subroutine
 
 ! Swap halo scalar
 subroutine swaphaloscalar( f, nhalo )
+implicit none
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: nhalo
 integer :: i, e, left, right, ng(3), nl(3), isend(4), irecv(4), tsend, trecv
@@ -159,6 +165,7 @@ end subroutine
 
 ! Swap halo vector
 subroutine swaphalovector( f, nhalo )
+implicit none
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: nhalo
 integer :: i, e, left, right, ng(4), nl(4), isend(4), irecv(4), tsend, trecv

@@ -1,6 +1,13 @@
+! MPICH mpi module is broken, so make one
+!module mpi_m
+!include 'mpif.h'
+!end module
+
 ! Dummy routines providing hooks for parallelizaion
 module collective_m
+!use mpi
 implicit none
+include 'mpif.h'
 contains
 
 ! Initialize

@@ -156,7 +156,7 @@ case $machine in
     fc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
     pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
     oflags='-O5'
-    oflags='-O'
+    oflags='-O -qmaxmem=-1'
     gflags='-g -C -qflttrap -qsigtrap -qlanglvl=95pure'
     ;;
   TeraGrid)
@@ -221,7 +221,7 @@ psord: makefile \$(MPI) \$(COMMON)
 sord.tgz: clean
 	sh/tarball
 clean:
-	rm -f tmp f/*.mod
+	rm -f tmp f/*.o f/*.mod
 realclean: clean
 	rm -f makefile fsord psord batchjob
 .PHONY: clean realclean

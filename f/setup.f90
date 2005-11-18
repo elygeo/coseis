@@ -34,6 +34,7 @@ edge2 = ip3 == np - 1
 ! Master processor holds the hypocenter
 ip3master = ( ihypo - 1 ) / nl
 call setmaster( ip3master )
+master = .false.
 if ( all( ip3 == ip3master ) ) master = .true.
 
 ! Map global indices to local memory indices
