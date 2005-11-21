@@ -2,11 +2,13 @@
 
 function h = surfcontour( xg, c, v )
 
+xg = squeeze(xg);
+c  = squeeze(c);
 x = xg(:,:,1);
 y = xg(:,:,2);
 z = xg(:,:,3);
 [ xi, yi ] = ndgrid( 1:size(x,1), 1:size(x,2) );
-[ c, h ]   = contour( xi, yi, c, [ v v ], '-k' );
+[ c, h ] = contour( xi, yi, c, [ v v ], '-k' );
 delete( h );
 i  = 1;
 ci = [];

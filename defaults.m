@@ -46,8 +46,8 @@
   mud = .5;				% **coef of dynamic friction
   dc  = .25;				% **slip-weakening distance
   co  = 0.;				% **cohesion
-  tn  = -70e6;				% **normal pretraction
-  th  = -120e6;				% **horizontal (strike) pretraction
+  tn  = -120e6;				% **normal pretraction
+  th  = -70e6;				% **horizontal (strike) pretraction
   td  = 0.;				% **dip pretraction
 % sxx = 0.;				% **prestress Sxx
 % syy = 0.;				% **prestress Syy

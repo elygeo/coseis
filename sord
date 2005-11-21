@@ -131,6 +131,41 @@ fi
 #------------------------------------------------------------------------------#
 # Compile Fortran
 
+# Source files
+common="\\
+  globals.f90 \\
+  diffcn.f90 \\
+  diffnc.f90 \\
+  hourglasscn.f90 \\
+  hourglassnc.f90 \\
+  surfnormals.f90 \\
+  zone.f90 \\
+  inread.f90 \\
+  setup.f90 \\
+  arrays.f90 \\
+  optimize.f90 \\
+  gridgen.f90 \\
+  material.f90 \\
+  momentsource.f90 \\
+  fault.f90 \\
+  checkpoint.f90 \\
+  output.f90 \\
+  pml.f90 \\
+  stress.f90 \\
+  acceleration.f90 \\
+  locknodes.f90 \\
+  timestep.f90 \\
+  sord.f90"
+serial="\\
+  serial.f90 \\
+  serialio.f90"
+mpi="\\
+  mpi.f90 \\
+  mpiio.f90"
+mpi="\\
+  nomodmpi.f90 \\
+  nomodmpiio.f90"
+
 [ $mode = guess ] && [ $np -eq 1 ] && mode=serial
 [ $mode = guess ] && [ $np -gt 1 ] && mode=parallel
 
@@ -172,38 +207,6 @@ case $fflags in
   O) fflags=$oflags ;;
   g) fflags=$gflags ;;
 esac
-
-# Source files
-common="\\
-  globals.f90 \\
-  diffcn.f90 \\
-  diffnc.f90 \\
-  hourglasscn.f90 \\
-  hourglassnc.f90 \\
-  surfnormals.f90 \\
-  zone.f90 \\
-  inread.f90 \\
-  setup.f90 \\
-  arrays.f90 \\
-  optimize.f90 \\
-  gridgen.f90 \\
-  material.f90 \\
-  momentsource.f90 \\
-  fault.f90 \\
-  checkpoint.f90 \\
-  output.f90 \\
-  pml.f90 \\
-  stress.f90 \\
-  acceleration.f90 \\
-  locknodes.f90 \\
-  timestep.f90 \\
-  sord.f90"
-serial="\\
-  serial.f90 \\
-  serialio.f90"
-mpi="\\
-  mpi.f90 \\
-  mpiio.f90"
 
 # Write makefile
 cat << END > tmp

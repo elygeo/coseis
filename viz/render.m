@@ -59,8 +59,8 @@ set( htxt(4), 'String', sprintf( '%.3fs', t ) )
 
 % Isosurfaces
 if doisosurf
-  if icomp, isosurfviz( x, v, icomp, cellfocus, flim * isofrac );
-  else      isosurfviz( x, s, 1,     cellfocus, flim * isofrac );
+  if icomp, isosurfviz( x, v, icomp, cellfocus, flim * isofrac, volviz );
+  else      isosurfviz( x, s, 1,     cellfocus, flim * isofrac, volviz );
   end
 end
 

@@ -74,8 +74,8 @@ doiz0: do iz = 1, nout
   end select
   
   ! Interval 
-  if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
   if ( fieldout(iz) == 'x' ) ditout(iz) = 0
+  if ( ditout(iz) < 1 ) ditout(iz) = nt + ditout(iz) + 1
 
   ! Zone
   i1 = i1out(iz,:)
@@ -156,7 +156,7 @@ end if
 
 doiz: do iz = 1, nout !--------------------------------------------------------!
 
-if ( ditout(iz) < 0 ) cycle doiz
+if ( ditout(iz) < 1 ) cycle doiz
 if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 
 ! Properties
@@ -177,9 +177,6 @@ end select
 
 ! Select pass
 if ( pass /= onpass ) cycle doiz
-
-! If interval is zero, only write once
-if ( ditout(iz) == 0 ) ditout(iz) = -1
 
 ! Indices
 i1 = i1out(iz,:)
