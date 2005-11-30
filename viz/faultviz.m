@@ -6,8 +6,8 @@ i1 = i1viz;
 i2 = i2viz;
 i1(ifn) = ihypo(ifn);
 i2(ifn) = ihypo(ifn);
-i1(4) = 0;
-i2(4) = 0;
+i1(4) = 1;
+i2(4) = 1;
 [ xx, msg ] = read4d( 'x', i1, i2 );
 if msg, error( msg ), end
 

@@ -20,7 +20,7 @@ ifinit: if ( init ) then !-----------------------------------------------------!
 init = .false.
 if ( nout > nz ) stop 'too many output zones, make nz bigger'
 
-ifit0: if ( it == 0 .and. master ) then
+ifit0: if ( it == 1 .and. master ) then
 
   print '(a)', 'Initialize output'
 
@@ -50,7 +50,7 @@ ifit0: if ( it == 0 .and. master ) then
   write( 9, * ) 'vs2     =  ',  vs2,            '; % max Vs'
   write( 9, * ) 'courant =  ',  courant,        '; % stability condition'
   write( 9, * ) 'ihypo   = [',  ihypo - nnoff, ']; % hypocenter node'
-  write( 9, * ) 'xhypo   = [',  xhypo,         ']; % hypocenter location'
+  write( 9, * ) 'xhypo   = [',  xhypo,         ']; % hypocenter'
   write( 9, * ) 'xcenter = [',  xcenter,       ']; % mesh center'
   write( 9, * ) 'rmax    =  ',  rmax,           '; % mesh radius'
   close( 9 )
@@ -74,7 +74,6 @@ doiz0: do iz = 1, nout
   end select
   
   ! Interval 
-  if ( fieldout(iz) == 'x' ) ditout(iz) = 0
   if ( ditout(iz) < 1 ) ditout(iz) = nt + ditout(iz) + 1
 
   ! Zone
@@ -83,7 +82,7 @@ doiz0: do iz = 1, nout
   call zone( i1, i2, nn, nnoff, ihypo, ifn )
   if ( fault ) then
     if ( ifn == 0 ) then
-      ditout(iz) = -1
+      ditout(iz) = nt + 1
     else
       i1(ifn) = ihypo(ifn)
       i2(ifn) = ihypo(ifn)
@@ -106,7 +105,7 @@ doiz0: do iz = 1, nout
   end if
  
   ! Split collective i/o
-  if ( any( i2 < i1 ) ) ditout(iz) = -1
+  if ( any( i2 < i1 ) ) ditout(iz) = nt + 1
   call iosplit( iz, nout, ditout(iz) )
 
 end do doiz0
@@ -123,7 +122,8 @@ return
 end if ifinit !----------------------------------------------------------------!
 
 ! Magnitudes
-if ( pass == 'w' ) then
+select case( pass )
+case( 'w' )
   s1 = sqrt( sum( u * u, 4 ) )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
   umaxi = maxloc( s1 )
@@ -133,7 +133,7 @@ if ( pass == 'w' ) then
   call globalmaxloc( umax, umaxi, nnoff )
   call globalmaxloc( wmax, wmaxi, nnoff )
   if ( umax > dx / 10. ) print *, 'Warning: u !<< dx'
-else
+case( 'a' )
   s1 = sqrt( sum( w1 * w1, 4 ) )
   s2 = sqrt( sum( v * v, 4 ) )
   amaxi = maxloc( s1 )
@@ -152,11 +152,11 @@ else
     call globalmaxloc( svmax, svmaxi, nnoff )
     call globalmaxloc( slmax, slmaxi, nnoff )
   end if
-end if
+case default; stop 'pass'
+end select
 
 doiz: do iz = 1, nout !--------------------------------------------------------!
 
-if ( ditout(iz) < 1 ) cycle doiz
 if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 
 ! Properties
@@ -177,6 +177,9 @@ end select
 
 ! Select pass
 if ( pass /= onpass ) cycle doiz
+
+! X is static, only write once
+if ( fieldout(iz) == 'x' ) ditout(iz) = nt + 1
 
 ! Indices
 i1 = i1out(iz,:)
@@ -222,7 +225,6 @@ if ( pass == 'w' ) return
 if ( master ) then
   call system_clock( twall(2) )
   dtwall = real( twall(2) - twall(1) ) / real( twall_rate )
-  twall(1) = twall(2)
   print *, it, amax, vmax, umax, dtwall
   open(  9, file='out/currentstep.m', status='replace' )
   write( 9, * ) 'it =  ', it, '; % time-step'
@@ -231,6 +233,7 @@ if ( master ) then
   open(  9, file=str, status='replace' )
   write( 9, * ) 't      =  ', t,               '; % time'
   write( 9, * ) 'dt     =  ', dt,              '; % timestep size'
+  write( 9, * ) 'twall  = [', twall,          ']; % wall time'
   write( 9, * ) 'dtwall =  ', dtwall,          '; % wall time per step'
   write( 9, * ) 'amax   =  ', amax,            '; % max acceleration'
   write( 9, * ) 'vmax   =  ', vmax,            '; % max velocity'
@@ -243,8 +246,9 @@ if ( master ) then
   write( 9, * ) 'umaxi  = [', umaxi - nnoff,  ']; % max displacement loc'
   write( 9, * ) 'wmaxi  = [', wmaxi - nnoff,  ']; % max stress loc'
   write( 9, * ) 'svmaxi = [', svmaxi - nnoff, ']; % max slip velocity loc'
-  write( 9, * ) 'slmaxi = [', slmaxi - nnoff, ']; % max slip path length loc'
+  write( 9, * ) 'slmaxi = [', slmaxi - nnoff, ']; % max slip path loc'
   close( 9 )
+  twall(1) = twall(2)
   if ( ifn /= 0 .and. it == nt - 1 ) then
     i1 = maxloc( tarr )
     j = i1(1)

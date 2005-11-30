@@ -17,7 +17,7 @@ i2s(4) = icursor(4);
 % Read field data
 [ f, msg ] = read4d( field, i1s, i2s );
 if msg, return, end
-[ x, msg ] = read4d( 'x', [ i1s(1:3) 0 ], [ i2s(1:3) 0 ] );
+[ x, msg ] = read4d( 'x', [ i1s(1:3) 1 ], [ i2s(1:3) 1 ] );
 if msg, error( msg ), end
 i1hold = i1s;
 i2hold = i2s;

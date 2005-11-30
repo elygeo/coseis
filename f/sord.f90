@@ -19,7 +19,6 @@ use timestep_m
 
 ! Initialization
 call initialize( master )
-if ( master ) print '(a)', ''
 if ( master ) print '(a)', 'SORD - Support Operator Rupture Dynamics'
 call inread( 'defaults.m' )
 call inread( 'in.m' )
@@ -31,7 +30,7 @@ call material
 call momentsource
 call fault
 call swaphalovector( w1, nhalo )
-call output( 'a' )
+call output( 'i' )
 
 ! Main loop
 do while ( it <= nt )

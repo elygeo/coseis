@@ -1,5 +1,4 @@
 #!/bin/bash -e
-#------------------------------------------------------------------------------#
 
 echo -e "\nSORD setup"
 
@@ -7,10 +6,9 @@ echo -e "\nSORD setup"
 mode=guess
 fflags=O
 compile=yes
-run=yes
-debug=
+run=i
 deleteout=
-while getopts spmcngGd opt; do
+while getopts spmcngGbd opt; do
 case $opt in
   s) mode=serial ;;
   p) mode=parallel ;;
@@ -18,7 +16,8 @@ case $opt in
   c) run= ;;
   n) run= ; compile= ;;
   g) fflags=g ;;
-  G) fflags=g; debug=g ;;
+  G) fflags=g; run=g ;;
+  b) run=b ;;
   d) deleteout=yes ;;
 esac
 done
@@ -82,7 +81,8 @@ nvars=21
 ram=$(( nn / np * floatsize * nvars / 1024 / 1024 ))
 rate=250000
 [ $mode = matlab ] && rate=70000
-wt=$(( nt * nn / np / rate + 1 ))
+#wt=$(( nt * nn / np / rate + 1 )) # old bash can only handle 32 bits
+wt=$( echo $nt $nn $np $rate | awk '{ printf "%d", $1 * $2 / $3 / $4 + 1 }' )
 hh=$(( wt / 3600 ))
 mm=$(( wt % 3600 / 60 ))
 ss=$(( wt % 60 ))
@@ -162,9 +162,6 @@ serial="\\
 mpi="\\
   mpi.f90 \\
   mpiio.f90"
-mpi="\\
-  nomodmpi.f90 \\
-  nomodmpiio.f90"
 
 [ $mode = guess ] && [ $np -eq 1 ] && mode=serial
 [ $mode = guess ] && [ $np -gt 1 ] && mode=parallel
@@ -201,6 +198,7 @@ case $machine in
     ;;
   Babieca)
     fc='pgf90'
+    oflags='-fastsse -Mipa=fast'
     ;;
 esac
 case $fflags in
@@ -219,9 +217,9 @@ MPI = $mpi
 VPATH = f
 fsord: makefile \$(SERIAL) \$(COMMON)
 	cd f; \$(FC) \$(FFLAGS) \$(SERIAL) \$(COMMON) -o ../fsord
+	sh/tarball
 psord: makefile \$(MPI) \$(COMMON)
 	cd f; \$(PFC) \$(FFLAGS) \$(MPI) \$(COMMON) -o ../psord
-sord.tgz: clean
 	sh/tarball
 clean:
 	rm -f tmp f/*.o f/*.mod
@@ -236,10 +234,11 @@ rm -f tmp
 # Compile
 if [ $compile ]; then
 case $mode in
-  serial)   gmake fsord sord.tgz ;;
-  parallel) gmake psord sord.tgz ;;
+  serial)   gmake fsord ;;
+  parallel) gmake psord ;;
 esac
 fi
+cp sord.tgz out/
 echo ''
 
 #------------------------------------------------------------------------------#
@@ -258,7 +257,7 @@ hh=$(( wt / 3600 ))
 mm=$(( wt % 3600 / 60 ))
 ss=$(( wt % 60 ))
 [ $hh -ge 1 ] && ss=0
-wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
+wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d", $1, $2, $3 }' )
 ppn=8
 [ $ppn -gt $np ] && ppn=$np
 nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
@@ -304,13 +303,22 @@ END
 chmod u+x batchjob
 
 # Interactive
-[ $run ] || exit
 [ $HOSTNAME = ds100 ] || exit
-case $mode$debug in
-  serial)    ./fsord ;;
-  parallel)  poe ./psord $opts ;;
+case $mode$run in
+  seriali)   ./fsord ;;
   serialg)   totalview poe -a ./fsord $opts ;;
+  serialb)
+    nohup ./fsord > out.log &
+    echo "kill $!" > cancel.sh
+    chmod u+x cancel.sh
+  ;;
+  paralleli) poe ./psord $opts ;;
   parallelg) totalview poe -a ./psord $opts ;;
+  parallelb)
+    nohup poe ./psord $opts > out.log &
+    echo "kill $!" > cancel.sh
+    chmod u+x cancel.sh
+  ;;
 esac
 
 ;;
@@ -346,10 +354,20 @@ chmod u+x batchjob
 # Interactive
 [ $run ] || exit
 [ ${HOSTNAME:0:5} = 'tg-c1' ] || exit
-case $mode$debug in
-  serial)   ./fsord ;;
-  serialg)  gdb ./fsord ;;
-  parallel) mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord ;;
+case $mode$run in
+  seriali) ./fsord ;;
+  serialg) gdb ./fsord ;;
+  serialb)
+    nohup ./fsord > out.log &
+    echo "kill $!" > cancel.sh
+    chmod u+x cancel.sh
+    ;;
+  paralleli) mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord ;;
+  parallelb)
+    nohup mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord > out.log &
+    echo "kill $!" > cancel.sh
+    chmod u+x cancel.sh
+    ;;
 esac
 
 ;;
@@ -371,12 +389,11 @@ cat << END > batchjob
 #PBS -V
 sleep 2
 cd $rundir
-mpiexec -n $n ./psord
+mpiexec -n $np ./psord
 END
 chmod u+x batchjob
 
 # Interactive
-[ $run ] || exit
 cat << END > machinefile
 node1:2
 node2:2
@@ -389,31 +406,47 @@ node34:2
 node35:2
 node36:2
 END
-case $mode$debug in
-  serial)    ./fsord ;;
-  serialg)   gdb ./fsord ;;
-  parallel)  mpirun -np $np -machinefile machinefile ./psord ;;
-  parallelg) mpirun -np $np -machinefile machinefile -dbg=gdb ./psord ;;
+case $mode$run in
+  seriali) mpirun -machinefile machinefile ./fsord ;;
+  serialg) mpirun -machinefile machinefile -dbg=gdb ./fsord ;;
+  serialb)
+    nohup mpirun -machinefile machinefile ./fsord > out.log &
+    echo "kill $!" > cancel.sh
+    chmod u+x cancel.sh
+    ;;
+  paralleli) mpirun -machinefile machinefile -np $np ./psord ;;
+  parallelg) mpirun -machinefile machinefile -np $np -dbg=gdb ./psord ;;
+  parallelb)
+    nohup mpirun -machinefile machinefile -np $np ./psord > out.log &
+    echo "kill $!" > cancel.sh
+    chmod u+x cancel.sh
+    ;;
 esac
 
 ;;
 
 *) #--------------------------------------#
 
-# Batch
-cat << END > batchjob
-#!/bin/bash
-nohup mpirun -np $np ./psord > out.log &
-END
-chmod u+x batchjob
+#case $mode in
+#  parallel) mpdtrace > /dev/null || mpd & ;;
+#esac
 
 # Interactive
-[ $run ] || exit
-case $mode$debug in
-  serial)    ./fsord ;;
-  serialg)   ddd ./fsord ;;
-  parallel)  mpirun -np $np ./psord ;;
+case $mode$run in
+  seriali) ./fsord ;;
+  serialg) ddd ./fsord ;;
+  serialb)
+    nohup ./fsord > out.log &
+    echo "kill $!" > cancel.sh
+    chmod u+x cancel.sh
+    ;;
+  paralleli) mpirun -np $np ./psord ;;
   parallelg) mpirun -np $np -dbg=ddd ./psord ;;
+  parallelb)
+    nohup mpirun -np $np ./psord > out.log &
+    echo "kill $!" > cancel.sh
+    chmod u+x cancel.sh
+    ;;
 esac
 
 ;;

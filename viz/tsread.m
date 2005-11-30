@@ -31,7 +31,7 @@ kostrov = ...
 
 % Find sensor location if needed
 if pointsource || explosion || kostrov
-  [ xsensor, msg ] = read4d( 'x', [ sensor 0 ], [ sensor 0 ] );
+  [ xsensor, msg ] = read4d( 'x', [ sensor 1 ], [ sensor 1 ] );
   if msg
     pointsource = 0;
     explosion = 0;
@@ -44,11 +44,11 @@ end
 
 % Time
 if any( strcmp( field, { 'v' 'vm' 'sv' } ) )
-  it0 = 1;
-  tt = ( it0 : it ) * dt - .5 * dt;
+  it0 = 2;
+  tt = ( it0 : it ) * dt - 1.5 * dt;
 else
-  it0 = 0;
-  tt = ( it0 : it ) * dt;
+  it0 = 1;
+  tt = ( it0 : it ) * dt - dt;
 end
 
 % Extract data

@@ -28,12 +28,12 @@ volviz = 0;
 isofrac = .5;
 lim = -1;
 flim = 0;
-i1viz = [ 1 1 1 0 ];
+i1viz = [ 1 1 1 1 ];
 i2viz = [ nn nt ];
 renderer = 'OpenGL';
 renderer = 'zbuffer';
 
-icursor = [ ihypo 0 ];
+icursor = [ ihypo 1 ];
 ifn = abs( faultnormal );
 cellfocus = 0;
 sensor = 0;

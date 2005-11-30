@@ -8,7 +8,7 @@ contains
 ! Look for checkpoint and read if found
 subroutine readcheckpoint
 integer :: i, reclen, err
-if ( itcheck < 0 ) itcheck = itcheck + nt + 1
+if ( itcheck < 1 ) itcheck = itcheck + nt + 1
 i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
 write( str, '(a,i6.6)' ) 'out/checkpoint/it', i
 open( 9, file=str, status='old', iostat=err )
@@ -16,10 +16,10 @@ if ( err == 0 ) then
   read( 9, * ) it
   close( 9 )
 else
-  it = 0
+  it = 1
 end if
 call iglobalmin( it )
-if ( it == 0 ) return
+if ( it == 1 ) return
 write( str, '(a,i6.6,a,i6.6)' ) 'out/checkpoint/cp', it, '-', i
 inquire( iolength=reclen ) &
   t, v, u, sl, trup, tarr, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
@@ -37,7 +37,6 @@ end subroutine
 ! Write checkpoint
 subroutine writecheckpoint
 integer :: i, reclen
-if ( itcheck == 0 ) return
 if ( modulo( it, itcheck ) /= 0 ) return
 i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
 inquire( iolength=reclen ) &

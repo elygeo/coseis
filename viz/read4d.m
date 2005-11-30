@@ -24,7 +24,7 @@ currentstep
 meta
 
 % Slice
-i = [ ihypo 0 ];
+i = [ ihypo 1 ];
 n = [ nn it ];
 shift = [ 0 0 0 0 ];
 if faultnormal, shift( abs( faultnormal) ) = 1; end
@@ -48,9 +48,9 @@ for iz = 1:nout
   cd( file )
   meta
   found = strcmp( fieldin, field ) && ...
-          all( i1s >= [ i1 0  ] ) && ...
+          all( i1s >= [ i1 1  ] ) && ...
           all( i2s <= [ i2 it ] ) && ...
-          ( dit == 1 || ( n(4) == 1 && any( i1s(4) == 0:dit:it ) ) );
+          ( dit == 1 || ( n(4) == 1 && any( i1s(4) == 1:dit:it ) ) );
   if found, break, end
   cd '..'
 end
@@ -69,7 +69,7 @@ end
 m = i2 - i1 + 1;
 n = [ n length( ic ) ];
 f = zeros( n );
-i0 = i1s - [ i1 0 ];
+i0 = i1s - [ i1 1 ];
 skip = 4 * ( m(1) - n(1) );
 block = sprintf( '%d*float32', n(1) );
 for i  = 1:n(5)

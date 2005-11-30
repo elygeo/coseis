@@ -88,8 +88,8 @@ end if ifreadfile
 end do doiz
 
 ! Lock fault in PML region
-i1 = i1pml + 1
-i2 = i2pml - 1
+i1 = max( i1pml + 1, i1node )
+i2 = min( i2pml - 1, i2node )
 i1(ifn) = 1
 i2(ifn) = 1
 j1 = i1(1); j2 = i2(1)
