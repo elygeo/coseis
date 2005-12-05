@@ -47,10 +47,13 @@ for iz = 1:nout
   file = sprintf( '%02d', iz );
   cd( file )
   meta
-  found = strcmp( fieldin, field ) && ...
-          all( i1s >= [ i1 1  ] ) && ...
-          all( i2s <= [ i2 it ] ) && ...
-          ( dit == 1 || ( n(4) == 1 && any( i1s(4) == 1:dit:it ) ) );
+  test = [ 
+    strcmp( fieldin, field )
+    all( i1s >= [ i1 1  ] )
+    all( i2s <= [ i2 it ] )
+    ( dit == 1 || ( n(4) == 1 && any( i1s(4) == dit:dit:it ) ) )
+  ]';
+  found = all( test );
   if found, break, end
   cd '..'
 end
@@ -74,7 +77,7 @@ skip = 4 * ( m(1) - n(1) );
 block = sprintf( '%d*float32', n(1) );
 for i  = 1:n(5)
 for it = 1:n(4)
-  file = sprintf( '%s%1d%06d', field, ic(i), it + i0(4) - 1 );
+  file = sprintf( '%s%1d%06d', field, ic(i), it + i0(4) );
   fid = fopen( file, 'r', endian );
   for l = 1:n(3)
     seek = 4 * ( i0(1) + m(1) * ( i0(2) + m(2) * ( i0(3) + l - 1 ) ) );

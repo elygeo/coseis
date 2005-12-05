@@ -1,11 +1,11 @@
 #!/bin/bash -e
 
-account="phim.ucsd.edu"
 account="ux451302@tg-login.sdsc.edu"
-account="moho.sdsu.edu"
 account="altai.sdsu.edu"
-account="ux451302@dslogin.sdsc.edu"
 account="babieca.sdsu.edu"
+account="ux451302@dslogin.sdsc.edu"
+account="moho.sdsu.edu"
+account="phim.ucsd.edu"
 
 echo -e "\n$account"
 

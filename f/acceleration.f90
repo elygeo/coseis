@@ -33,14 +33,14 @@ i1 = i1node
 i2 = i2node
 select case( id )
 case( 1 )
-  do j = i1(1), i1pml(1)
+  do j = i1(1), min( i2(1), i1pml(1) )
   i = j - nnoff(1)
   forall( k=i1(2):i2(2), l=i1(3):i2(3) )
     s1(j,k,l) = dn2(i) * s1(j,k,l) + dn1(i) * p1(i,k,l,ic)
     p1(i,k,l,ic) = p1(i,k,l,ic) + dt * s1(j,k,l)
   end forall
   end do
-  do j = i2pml(1), i2(1)
+  do j = max( i1(1), i2pml(1) ), i2(1)
   i = nn(1) - j + nnoff(1) + 1
   forall( k=i1(2):i2(2), l=i1(3):i2(3) )
     s1(j,k,l) = dn2(i) * s1(j,k,l) + dn1(i) * p4(i,k,l,ic)
@@ -48,14 +48,14 @@ case( 1 )
   end forall
   end do
 case( 2 )
-  do k = i1(2), i1pml(2)
+  do k = i1(2), min( i2(2), i1pml(2) )
   i = k - nnoff(2)
   forall( j=i1(1):i2(1), l=i1(3):i2(3) )
     s1(j,k,l) = dn2(i) * s1(j,k,l) + dn1(i) * p2(j,i,l,ic)
     p2(j,i,l,ic) = p2(j,i,l,ic) + dt * s1(j,k,l)
   end forall
   end do
-  do k = i2pml(2), i2(2)
+  do k = max( i1(2), i2pml(2) ), i2(2)
   i = nn(2) - k + nnoff(2) + 1
   forall( j=i1(1):i2(1), l=i1(3):i2(3) )
     s1(j,k,l) = dn2(i) * s1(j,k,l) + dn1(i) * p5(j,i,l,ic)
@@ -63,14 +63,14 @@ case( 2 )
   end forall
   end do
 case( 3 )
-  do l = i1(3), i1pml(3)
+  do l = i1(3), min( i2(3), i1pml(3) )
   i = l - nnoff(3)
   forall( j=i1(1):i2(1), k=i1(2):i2(2) )
     s1(j,k,l) = dn2(i) * s1(j,k,l) + dn1(i) * p3(j,k,i,ic)
     p3(j,k,i,ic) = p3(j,k,i,ic) + dt * s1(j,k,l)
   end forall
   end do
-  do l = i2pml(3), i2(3)
+  do l = max( i1(3), i2pml(3) ), i2(3)
   i = nn(3) - l + nnoff(3) + 1
   forall( j=i1(1):i2(1), k=i1(2):i2(2) )
     s1(j,k,l) = dn2(i) * s1(j,k,l) + dn1(i) * p6(j,k,i,ic)

@@ -88,6 +88,7 @@ real :: &
   vs0,          & ! hypocenter S-wave speed
   vs1,          & ! min S-wave speed
   vs2,          & ! max S-wave speed
+  rexpand,      & ! grid expantion ratio
   xhypo(3),     & ! hypocenter location
   xcenter(3),   & ! mesh center
   rmax(1),      & ! maximum distance from mesh center
@@ -111,6 +112,8 @@ integer, dimension(3) :: &
   bc2,          & ! boundary conditions for j2 k2 l2
   nnoff,        & ! offset between local and global indices
   ihypo,        & ! hypocenter node
+  i1expand,     & ! grid expantion start index
+  i2expand,     & ! grid expantion end index
   i1node,       & ! node calculations start index
   i2node,       & ! node calculations end index
   i1cell,       & ! cell calculations start index

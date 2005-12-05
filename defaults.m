@@ -18,7 +18,7 @@
 % vs   = [ 346.    1 1 1  10 -1 -1 ];	% **low velocity surface layer
 % lock = [ 1 1 0   1 1 1  -1 -1 -1 ];	% **lock v1 & v2, v3 is free
   viscosity = [ .0 .3 ];		% stress (1) & hourglass (2)
-  viscosity = [ .1 .3 ];		% stress (1) & hourglass (2)
+  viscosity = [ .1 .35 ];		% stress (1) & hourglass (2)
 % npml = 0;				% no PML absorbing boundary
   npml = 10;				% 10 PML nodes
   bc1 = [ 1 0 1 ];			% PML for j1 l1, free surface for k1
@@ -26,6 +26,9 @@
 % bc2 = [ 1 1 0 ];			% PML for j2 k2, free surface for l2
   ihypo	 = [ 0 0 0 ];			% 0: mesh center
   xhypo	 = [ -1. -1. -1. ];		% <0: x(ihypo)
+  rexpand = 1.06;			% grid expansion ratio
+  i1expand = [  1  1  1 ];		% uniform zone start index
+  i2expand = [ -1 -1 -1 ];		% uniform zone end index
 
 % Moment source parameters
 % rfunc = 'box';			% uniform spatial weighting
@@ -64,9 +67,9 @@
 % Code execution and output parameters
 % np = [ 2 1 3 ];			% 6 processors
   np = [ 1 1 1 ];			% no parallelization
-% itcheck = 0;				% no checkpointing
 % itcheck = 100;			% checkpoint every 100 time steps
-  itcheck = -1;				% checkpoint just before finishing
+% itcheck = -1;				% checkpoint just before finishing
+  itcheck = 0;				% no checkpointing
 % out = { 'v'  10   1 1 1  -1 -1 -1 };	% **write v every 10 steps
 % out = { 'sl' -1   1 1 1  -1 -1 -1 };	% **write final slip length
 

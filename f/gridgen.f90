@@ -57,6 +57,38 @@ up = sign( 1., upvector(l) )
 k = modulo( l + 1, 3 ) + 1
 j = 6 - k - l
 
+! Grid expansion
+i1 = i1expand
+i2 = i2expand
+call zone( i1, i2, nn, nnoff, ihypo, ifn )
+do j = i1node(1), min( i2node(1), i1(1) - 1 )
+  i = i1(1) - j
+  x(j,:,:,1) = dx * ( i1(1) - ( 1 - rexpand ** ( i + 1 ) ) / ( 1 - rexpand ) )
+end do
+do j = max( i1node(1), i2(1) + 1 ), i2node(1)
+  i = j - i2(1)
+  x(j,:,:,1) = dx * ( i2(1) + ( 1 - rexpand ** ( i + 1 ) ) / ( 1 - rexpand ) )
+end do
+do k = i1node(2), min( i2node(2), i1(2) - 1 )
+  i = i1(2) - k
+  x(:,k,:,2) = dx * ( i1(2) - ( 1 - rexpand ** ( i + 1 ) ) / ( 1 - rexpand ) )
+end do
+do k = max( i1node(2), i2(2) + 1 ), i2node(2)
+  i = k - i2(2)
+  x(:,k,:,2) = dx * ( i2(2) + ( 1 - rexpand ** ( i + 1 ) ) / ( 1 - rexpand ) )
+end do
+do l = i1node(3), min( i2node(3), i1(3) - 1 )
+  i = i1(3) - l
+  x(j,:,l,3) = dx * ( l + i - ( 1 - rexpand ** ( i + 1 ) ) / ( 1 - rexpand ) )
+end do
+do l = max( i1node(3), i2(3) + 1 ), i2node(3)
+  i = l - i2(3)
+  x(:,:,l,3) = dx * ( i2(3) + ( 1 - rexpand ** ( i + 1 ) ) / ( 1 - rexpand ) )
+end do
+x(:,:,:,1) = x(:,:,:,1) - x(1,1,1,1)
+x(:,:,:,2) = x(:,:,:,2) - x(1,1,1,2)
+x(:,:,:,3) = x(:,:,:,3) - x(1,1,1,3)
+
 ! Mesh type
 select case( grid )
 case( 'read' )

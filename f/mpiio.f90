@@ -21,13 +21,12 @@ integer, intent(in) :: i1(3), i2(3), n(3), noff(3), iz
 integer :: ftype, mtype, fh, nl(3), ng(3), i0(3), e
 integer(kind=mpi_offset_kind) :: d = 0
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
-ng = n
 nl = i2 - i1 + 1
+ng = n
 i0 = i1 - 1 - noff
 call mpi_type_create_subarray( 3, ng, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
 ng = (/ size(s1,1), size(s1,2), size(s1,3) /)
-nl = i2 - i1 + 1
 i0 = i1 - 1
 call mpi_type_create_subarray( 3, ng, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
@@ -55,13 +54,12 @@ integer, intent(in) :: i, i1(3), i2(3), n(3), noff(3), iz
 integer :: ftype, mtype, fh, nl(4), ng(4), i0(4), e
 integer(kind=mpi_offset_kind) :: d = 0
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
-ng = (/ n,             3     /)
-nl = (/ i2 - i1 + 1,   1     /)
-i0 = (/ i1 - 1 - noff, i - 1 /)
-call mpi_type_create_subarray( 4, ng, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
+nl = (/ i2 - i1 + 1,   1 /)
+ng = (/ n,             1 /)
+i0 = (/ i1 - 1 - noff, 0 /)
+call mpi_type_create_subarray( 3, ng, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
 ng = (/ size(w1,1), size(w1,2), size(w1,3), size(w1,4) /)
-nl = (/ i2 - i1 + 1,   1     /)
 i0 = (/ i1 - 1,        i - 1 /)
 call mpi_type_create_subarray( 4, ng, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )

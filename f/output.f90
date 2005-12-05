@@ -10,8 +10,8 @@ implicit none
 save
 real :: amax, vmax, umax, wmax, svmax, slmax, courant, dtwall, tarrmax
 integer :: amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3), &
-  i, j, k, l, i1(3), i2(3), n(3), nc, iz, twall_rate, twall(2)
-logical :: fault, test, init = .true.
+  i, j, k, l, i1(3), i2(3), n(3), nc, iz, twall_rate, twall1, twall2
+logical :: fault, cell, test, init = .true.
 character, intent(in) :: pass
 character :: onpass, endian
 
@@ -25,7 +25,7 @@ ifit0: if ( it == 1 .and. master ) then
   print '(a)', 'Initialize output'
 
   ! Check for previus run
-  inquire( file='out/timestep', exist=test )
+  inquire( file='timestep', exist=test )
   if ( test ) then
     print '(a)', 'Error: previous output found. use -d flag to overwrite'
     stop
@@ -35,8 +35,7 @@ ifit0: if ( it == 1 .and. master ) then
   endian = 'l'
   if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
   courant = dt * vp2 * sqrt( 3. ) / abs( dx )
-  write( str, '(a,i2.2,a)' ) 'out/meta.m'
-  open(  9, file=str, status='replace' )
+  open(  9, file='meta.m', status='replace' )
   write( 9, * ) 'endian  = ''', endian,       '''; % byte order'
   write( 9, * ) 'nout    =  ',  nout,           '; % number output zones'
   write( 9, * ) 'rho0    =  ',  rho0,           '; % hypocenter density'
@@ -60,13 +59,16 @@ end if ifit0
 doiz0: do iz = 1, nout
 
   ! Properties
-  nc = 1; fault = .false.
+  nc = 1
+  fault = .false.
+  cell = .false.
   select case( fieldout(iz) )
   case( 'x'    ); nc = 3
   case( 'a'    ); nc = 3
   case( 'v'    ); nc = 3
   case( 'u'    ); nc = 3
-  case( 'w'    ); nc = 6
+  case( 'w'    ); nc = 6; cell = .true.
+  case( 'wm'   ); cell = .true.
   case( 'sv'   ); fault = .true.
   case( 'sl'   ); fault = .true.
   case( 'trup' ); fault = .true.
@@ -80,21 +82,15 @@ doiz0: do iz = 1, nout
   i1 = i1out(iz,:)
   i2 = i2out(iz,:)
   call zone( i1, i2, nn, nnoff, ihypo, ifn )
+  if ( cell ) i2 = i2 - 1
   if ( fault ) then
-    if ( ifn == 0 ) then
-      ditout(iz) = nt + 1
-    else
-      i1(ifn) = ihypo(ifn)
-      i2(ifn) = ihypo(ifn)
-    end if
+    i1(ifn) = ihypo(ifn)
+    i2(ifn) = ihypo(ifn)
   end if
-  if ( fieldout(iz)(1:1) == 'w' ) i2 = i2 - 1
-  i1out(iz,:) = i1
-  i2out(iz,:) = i2
  
   ! Metadata
   if ( master ) then
-    write( str, '(a,i2.2,a)' ) 'out/', iz, '/meta.m'
+    write( str, '(i2.2,a)' ) iz, '/meta.m'
     open(  9, file=str, status='replace' )
     write( 9, * ) 'field = ''', trim( fieldout(iz) ), '''; % variable name'
     write( 9, * ) 'nc    =  ',  nc,                     '; % # of components'
@@ -106,7 +102,11 @@ doiz0: do iz = 1, nout
  
   ! Split collective i/o
   if ( any( i2 < i1 ) ) ditout(iz) = nt + 1
+  ! if ( any( i2 < i1 ) .or. any( i1 ) ditout(iz) = nt + 1
+  ! if ( fault .and. ifn == 0 ) ditout(iz) = nt + 1
   call iosplit( iz, nout, ditout(iz) )
+  i1out(iz,:) = i1
+  i2out(iz,:) = i2
 
 end do doiz0
 
@@ -114,7 +114,7 @@ end do doiz0
 if ( master ) then
   print *,'       Step  Amax           Vmax           Umax            Wall Time'
   call system_clock( count_rate=twall_rate )
-  call system_clock( twall(1) )
+  call system_clock( twall2 )
 end if
 
 return
@@ -160,7 +160,9 @@ doiz: do iz = 1, nout !--------------------------------------------------------!
 if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 
 ! Properties
-nc = 1; fault = .false.; onpass = 'a'
+nc = 1
+fault = .false.
+onpass = 'a'
 select case( fieldout(iz) )
 case( 'x'    ); nc = 3
 case( 'a'    ); nc = 3
@@ -194,8 +196,7 @@ end if
 
 ! Binary output
 do i = 1, nc
-  write( str, '(a,i2.2,a,a,i1,i6.6)' ) &
-    'out/', iz, '/', trim( fieldout(iz) ), i, it
+  write( str, '(i2.2,a,a,i1,i6.6)' ) iz, '/', trim( fieldout(iz) ), i, it
   select case( fieldout(iz) )
   case( 'x'    ); call iovector( 'w', str, x,  i,   i1, i2, n, nnoff, iz )
   case( 'a'    ); call iovector( 'w', str, w1, i,   i1, i2, n, nnoff, iz )
@@ -223,17 +224,17 @@ if ( pass == 'w' ) return
 
 ! Metadata
 if ( master ) then
-  call system_clock( twall(2) )
-  dtwall = real( twall(2) - twall(1) ) / real( twall_rate )
+  twall1 = twall2
+  call system_clock( twall2 )
+  dtwall = real( twall2 - twall1 ) / real( twall_rate )
   print *, it, amax, vmax, umax, dtwall
-  open(  9, file='out/currentstep.m', status='replace' )
+  open(  9, file='currentstep.m', status='replace' )
   write( 9, * ) 'it =  ', it, '; % time-step'
   close( 9 )
-  write( str, '(a,i6.6,a)' ) 'out/stats/st', it, '.m'
+  write( str, '(a,i6.6,a)' ) 'stats/st', it, '.m'
   open(  9, file=str, status='replace' )
   write( 9, * ) 't      =  ', t,               '; % time'
   write( 9, * ) 'dt     =  ', dt,              '; % timestep size'
-  write( 9, * ) 'twall  = [', twall,          ']; % wall time'
   write( 9, * ) 'dtwall =  ', dtwall,          '; % wall time per step'
   write( 9, * ) 'amax   =  ', amax,            '; % max acceleration'
   write( 9, * ) 'vmax   =  ', vmax,            '; % max velocity'
@@ -248,7 +249,6 @@ if ( master ) then
   write( 9, * ) 'svmaxi = [', svmaxi - nnoff, ']; % max slip velocity loc'
   write( 9, * ) 'slmaxi = [', slmaxi - nnoff, ']; % max slip path loc'
   close( 9 )
-  twall(1) = twall(2)
   if ( ifn /= 0 .and. it == nt - 1 ) then
     i1 = maxloc( tarr )
     j = i1(1)
@@ -261,7 +261,7 @@ if ( master ) then
     j = i2(1)
     k = i2(2)
     l = i2(3)
-    open(  9, file='out/arrest.m', status='replace' )
+    open(  9, file='arrest.m', status='replace' )
     write( 9, * ) 'tarrmaxi = [', i1 - nnoff, ']; % location of last slip'
     write( 9, * ) 'tarrmax  =  ', tarrmax,     '; % fault arrest time'
     write( 9, * ) 'tarrhypo =  ', tarr(j,k,l), '; % hypocenter arrest time'

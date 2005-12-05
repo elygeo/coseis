@@ -10,7 +10,7 @@ subroutine readcheckpoint
 integer :: i, reclen, err
 if ( itcheck < 1 ) itcheck = itcheck + nt + 1
 i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
-write( str, '(a,i6.6)' ) 'out/checkpoint/it', i
+write( str, '(a,i6.6)' ) 'checkpoint/it', i
 open( 9, file=str, status='old', iostat=err )
 if ( err == 0 ) then
   read( 9, * ) it
@@ -20,7 +20,7 @@ else
 end if
 call iglobalmin( it )
 if ( it == 1 ) return
-write( str, '(a,i6.6,a,i6.6)' ) 'out/checkpoint/cp', it, '-', i
+write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', it, '-', i
 inquire( iolength=reclen ) &
   t, v, u, sl, trup, tarr, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
 open( 9, &
@@ -41,7 +41,7 @@ if ( modulo( it, itcheck ) /= 0 ) return
 i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
 inquire( iolength=reclen ) &
   t, v, u, sl, trup, tarr, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
-write( str, '(a,i6.6,a,i6.6)' ) 'out/checkpoint/cp', it, '-', i
+write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', it, '-', i
 open( 9, &
   file=str, &
   recl=reclen, &
@@ -51,7 +51,7 @@ open( 9, &
 write( 9, rec=1 ) &
   t, v, u, sl, trup, tarr, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
 close( 9 )
-write( str, '(a,i6.6)' ) 'out/checkpoint/it', i
+write( str, '(a,i6.6)' ) 'checkpoint/it', i
 open( 9, file=str, status='replace' )
 write( 9, * ) it
 close( 9 )

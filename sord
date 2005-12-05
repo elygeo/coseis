@@ -7,8 +7,7 @@ mode=guess
 fflags=O
 compile=yes
 run=i
-deleteout=
-while getopts spmcngGbd opt; do
+while getopts spmcngGb opt; do
 case $opt in
   s) mode=serial ;;
   p) mode=parallel ;;
@@ -18,20 +17,15 @@ case $opt in
   g) fflags=g ;;
   G) fflags=g; run=g ;;
   b) run=b ;;
-  d) deleteout=yes ;;
 esac
 done
 shift $(( OPTIND - 1 ))
 
-# Identify machine
-osname=$( uname )
-if   [ "${HOSTNAME:0:2}" = ds ]; then machine=DataStar
-elif [ "${HOSTNAME:0:2}" = tg ]; then machine=TeraGrid
-elif [ "$HOSTNAME" = master ];   then machine=Babieca
-else machine=$osname
-fi
+srcdir=$( /bin/pwd )
+rundir=$( /bin/pwd )/out/$( date +%Y-%m-%d-%H-%M-%S )
+[ -e $rundir ] || mkdir $rundir
 
-# Symling input file specified on command line
+# Symlink input file specified on command line
 [ -n "$1" ] && ln -sf "$1" 'in.m'
 
 # Strip MATLAB caracters
@@ -50,37 +44,72 @@ case "$key" in
 esac
 done < tmp
 
-# Create output folders
-[ $deleteout ] && rm -rf out
-[ -e out ]            || mkdir out
-[ -e out/checkpoint ] || mkdir out/checkpoint
-[ -e out/stats ]      || mkdir out/stats
-i=0
-while [ $i -lt $nout ]; do
-  i=$(( i + 1 ))
-  dir=$( echo $i | awk '{ printf "out/%02d", $1 }' )
-  [ -e $dir ] || mkdir $dir
-done
-rm -f batchjob
-
 # Problem size
 nn=$(( nn3[0] * nn3[1] * nn3[2] ));
 np=$(( np3[0] * np3[1] * np3[2] ));
-[ $matlab ] && np=1
+[ $mode = matlab ] && np=1
+[ $mode = guess ] && [ $np -eq 1 ] && mode=serial
+[ $mode = guess ] && [ $np -gt 1 ] && mode=parallel
 
-#------------------------------------------------------------------------------#
-# Metadata
+# Identify machine
+osname=$( uname )
+if   [ "${HOSTNAME:0:2}" = ds ]; then machine=DataStar
+elif [ "${HOSTNAME:0:2}" = tg ]; then machine=TeraGrid
+elif [ "$HOSTNAME" = master ];   then machine=Babieca
+else machine=$osname
+fi
 
-# Save source, input files & byte order
-cp 'defaults.m' 'in.m' out/
-perl -e 'print pack('V',1) eq pack('L',1) ? "l\n":"b\n"' > out/endian
+# Defaults
+fc='f95'
+pfc='mpif90'
+oflags='-O'
+gflags='-g'
+ppn=1
+rate=250000
 
-# RAM usage and run time estimate
+# Machine specific
+case $machine in
+  Linux)
+    fc='gfortran'
+    oflags="-fdefer-pop -fguess-branch-probability -fcprop-registers -floop-optimize -fif-conversion -fif-conversion2 -ftree-ccp -ftree-dce -ftree-dominator-opts -ftree-dse -ftree-ter -ftree-lrs -ftree-sra -ftree-copyrename -ftree-fre -ftree-ch -fmerge-constants -fomit-frame-pointer -fthread-jumps -fcrossjumping -foptimize-sibling-calls -fcse-follow-jumps -fcse-skip-blocks -fgcse -fgcse-lm -fexpensive-optimizations -fstrength-reduce -frerun-cse-after-loop -frerun-loop-opt -fcaller-saves -fforce-mem -fpeephole2 -fschedule-insns -fschedule-insns2 -fsched-interblock -fsched-spec -fregmove -fstrict-aliasing -fdelete-null-pointer-checks -freorder-blocks -freorder-functions -funit-at-a-time -falign-functions -falign-jumps -falign-loops -falign-labels -ftree-pre -finline-functions -funswitch-loops -fgcse-after-reload"
+    oflags=''
+    gflags='-g -W -pedantic -std=f95 -fimplicit-none'
+    ;;
+  SunOS)
+    oflags='-fast'
+    gflags='-g -w4 -u -C'
+    ;;
+  DataStar)
+    fc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
+    pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
+    oflags='-O5'
+    oflags='-O -qmaxmem=-1'
+    gflags='-g -C -qflttrap -qsigtrap -qlanglvl=95pure'
+    ppn=8
+    ;;
+  TeraGrid)
+    fc='ifort'
+    oflags='-fast'
+    gflags='-g -CB -warn -traceback'
+    ppn=2
+    ;;
+  Babieca)
+    fc='pgf90'
+    oflags='-fastsse -Mipa=fast'
+    ppn=2
+    ;;
+esac
+[ $mode = matlab ] && rate=$(( rate / 3 ))
+
+# Compute nodes
+[ $ppn -gt $np ] && ppn=$np
+nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
+
+# RAM usage and Wall time limit
 floatsize=4
 nvars=21
 ram=$(( nn / np * floatsize * nvars / 1024 / 1024 ))
-rate=250000
-[ $mode = matlab ] && rate=70000
+rate=$(( rate * 2 / 3 ))
 #wt=$(( nt * nn / np / rate + 1 )) # old bash can only handle 32 bits
 wt=$( echo $nt $nn $np $rate | awk '{ printf "%d", $1 * $2 / $3 / $4 + 1 }' )
 hh=$(( wt / 3600 ))
@@ -90,43 +119,7 @@ ss=$(( wt % 60 ))
 wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
 echo "Machine: $machine"
 echo "RAM usage: at least ${ram}Mb"
-echo "Run time: at least $wt"
-
-# Write metadata
-cat << END > out/runmeta.m
-login   = '$LOGNAME';
-name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )';
-rundate = '$( date )';
-rundir  = '$( /bin/pwd )';
-machine = '$machine';
-host    = '$HOSTNAME';
-os      = '$( uname -a )';
-END
-
-cat << END > out/viz.m
-addpath $( /bin/pwd )/viz
-END
-
-#------------------------------------------------------------------------------#
-# Matlab backend
-
-if [ $mode = matlab ]; then
-
-cat << END > batchjob
-#!/bin/bash -e
-unset DISPLAY
-nohup matlab -r 'sord, quit' > out.log &
-END
-chmod u+x batchjob
-
-sh/tarball
-cp sord.tgz out/
-
-[ $run ] && matlab -nodesktop -nosplash -r "addpath m; sord"
-
-exit
-
-fi
+echo "Wall time limit: $wt"
 
 #------------------------------------------------------------------------------#
 # Compile Fortran
@@ -163,44 +156,6 @@ mpi="\\
   mpi.f90 \\
   mpiio.f90"
 
-[ $mode = guess ] && [ $np -eq 1 ] && mode=serial
-[ $mode = guess ] && [ $np -gt 1 ] && mode=parallel
-
-# Defaults
-fc='f95'
-pfc='mpif90'
-oflags='-O'
-gflags='-g'
-
-# Machine specific
-case $machine in
-  Linux)
-    fc='gfortran'
-    oflags="-fdefer-pop -fguess-branch-probability -fcprop-registers -floop-optimize -fif-conversion -fif-conversion2 -ftree-ccp -ftree-dce -ftree-dominator-opts -ftree-dse -ftree-ter -ftree-lrs -ftree-sra -ftree-copyrename -ftree-fre -ftree-ch -fmerge-constants -fomit-frame-pointer -fthread-jumps -fcrossjumping -foptimize-sibling-calls -fcse-follow-jumps -fcse-skip-blocks -fgcse -fgcse-lm -fexpensive-optimizations -fstrength-reduce -frerun-cse-after-loop -frerun-loop-opt -fcaller-saves -fforce-mem -fpeephole2 -fschedule-insns -fschedule-insns2 -fsched-interblock -fsched-spec -fregmove -fstrict-aliasing -fdelete-null-pointer-checks -freorder-blocks -freorder-functions -funit-at-a-time -falign-functions -falign-jumps -falign-loops -falign-labels -ftree-pre -finline-functions -funswitch-loops -fgcse-after-reload"
-    oflags=''
-    gflags='-g -W -pedantic -std=f95 -fimplicit-none'
-    ;;
-  SunOS)
-    oflags='-fast'
-    gflags='-g -w4 -u -C'
-    ;;
-  DataStar)
-    fc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
-    pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
-    oflags='-O5'
-    oflags='-O -qmaxmem=-1'
-    gflags='-g -C -qflttrap -qsigtrap -qlanglvl=95pure'
-    ;;
-  TeraGrid)
-    fc='ifort'
-    oflags='-fast'
-    gflags='-g -CB -warn -traceback'
-    ;;
-  Babieca)
-    fc='pgf90'
-    oflags='-fastsse -Mipa=fast'
-    ;;
-esac
 case $fflags in
   O) fflags=$oflags ;;
   g) fflags=$gflags ;;
@@ -224,7 +179,7 @@ psord: makefile \$(MPI) \$(COMMON)
 clean:
 	rm -f tmp f/*.o f/*.mod
 realclean: clean
-	rm -f makefile fsord psord batchjob
+	rm -f makefile fsord psord
 .PHONY: clean realclean
 END
 [ ! -f makefile ] && touch makefile
@@ -234,15 +189,61 @@ rm -f tmp
 # Compile
 if [ $compile ]; then
 case $mode in
-  serial)   gmake fsord ;;
-  parallel) gmake psord ;;
+  serial)   gmake fsord; cp fsord $rundir ;;
+  parallel) gmake psord; cp psord $rundir ;;
 esac
 fi
-cp sord.tgz out/
 echo ''
 
+# Viz
+cat << END > viz.m
+addpath $srcdir/viz
+END
+
 #------------------------------------------------------------------------------#
-# Batch submission and run commands
+# Save source, input files & byte order
+cp 'defaults.m' 'in.m' 'sord.tgz' $rundir
+cd $rundir
+
+# Write metadata
+perl -e 'print pack('V',1) eq pack('L',1) ? "l\n":"b\n"' > endian
+cat << END > runmeta.m
+login   = '$LOGNAME';
+name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )';
+rundate = '$( date )';
+rundir  = '$rundir';
+machine = '$machine';
+host    = '$HOSTNAME';
+os      = '$( uname -a )';
+END
+
+# Create output folders
+[ -e checkpoint ] || mkdir checkpoint
+[ -e stats ]      || mkdir stats
+i=0
+while [ $i -lt $nout ]; do
+  i=$(( i + 1 ))
+  dir=$( echo $i | awk '{ printf "%02d", $1 }' )
+  [ -e $dir ] || mkdir $dir
+done
+
+#------------------------------------------------------------------------------#
+# Run MATLAB version
+
+if [ $mode = matlab ]; then
+case $run in
+  i) matlab -nodesktop -nosplash -r "addpath $srcdir/m; sord" ;;
+  b) nohup matlab -nodisplay -nojvm -r "addpath $srcdir/m; sord" > out.log & ;;
+     echo "#!/bin/bash" > cancel.sh
+     echo "kill $!" >> cancel.sh
+     chmod u+x cancel.sh
+  ;;
+esac
+exit
+fi
+
+#------------------------------------------------------------------------------#
+# Run Fortran version
 
 case $machine in
 
@@ -251,18 +252,7 @@ DataStar) #--------------------------------------#
 [ $( pwd | grep -v gpfs ) ] || exit
 
 # Batch
-rate=100000
-wt=$(( nt * nn / np / rate + 1 ))
-hh=$(( wt / 3600 ))
-mm=$(( wt % 3600 / 60 ))
-ss=$(( wt % 60 ))
-[ $hh -ge 1 ] && ss=0
-wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d", $1, $2, $3 }' )
-ppn=8
-[ $ppn -gt $np ] && ppn=$np
-nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
 opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
-rundir=$( /bin/pwd )
 cat << END > batchjob
 #!/bin/bash
 #@environment = COPY_ALL;\\
@@ -307,18 +297,10 @@ chmod u+x batchjob
 case $mode$run in
   seriali)   ./fsord ;;
   serialg)   totalview poe -a ./fsord $opts ;;
-  serialb)
-    nohup ./fsord > out.log &
-    echo "kill $!" > cancel.sh
-    chmod u+x cancel.sh
-  ;;
+  serialb)   nohup ./fsord > out.log & ;;
   paralleli) poe ./psord $opts ;;
   parallelg) totalview poe -a ./psord $opts ;;
-  parallelb)
-    nohup poe ./psord $opts > out.log &
-    echo "kill $!" > cancel.sh
-    chmod u+x cancel.sh
-  ;;
+  parallelb) nohup poe ./psord $opts > out.log & ;;
 esac
 
 ;;
@@ -326,17 +308,6 @@ esac
 TeraGrid) #--------------------------------------#
 
 # Batch
-rate=100000
-wt=$(( nt * nn / np / rate + 1 ))
-hh=$(( wt / 3600 ))
-mm=$(( wt % 3600 / 60 ))
-ss=$(( wt % 60 ))
-[ $hh -ge 1 ] && ss=0
-wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
-ppn=2
-[ $ppn -gt $np ] && ppn=$np
-nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
-rundir=$( /bin/pwd )
 cat << END > batchjob
 #!/bin/bash
 #PBS -q dque
@@ -355,18 +326,12 @@ chmod u+x batchjob
 [ $run ] || exit
 [ ${HOSTNAME:0:5} = 'tg-c1' ] || exit
 case $mode$run in
-  seriali) ./fsord ;;
-  serialg) gdb ./fsord ;;
-  serialb)
-    nohup ./fsord > out.log &
-    echo "kill $!" > cancel.sh
-    chmod u+x cancel.sh
-    ;;
+  seriali)   ./fsord ;;
+  serialg)   gdb ./fsord ;;
+  serialb)   nohup ./fsord > out.log & ;;
   paralleli) mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord ;;
   parallelb)
     nohup mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord > out.log &
-    echo "kill $!" > cancel.sh
-    chmod u+x cancel.sh
     ;;
 esac
 
@@ -375,10 +340,6 @@ esac
 Babieca) #--------------------------------------#
 
 # Batch
-ppn=2
-[ $ppn -gt $np ] && ppn=$np
-nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
-rundir=$( /bin/pwd )
 cat << END > batchjob
 #!/bin/bash
 #PBS -q workq
@@ -394,7 +355,7 @@ END
 chmod u+x batchjob
 
 # Interactive
-cat << END > machinefile
+[ -f machinefile ] || cat << END > machinefile
 node1:2
 node2:2
 node3:2
@@ -407,21 +368,16 @@ node35:2
 node36:2
 END
 case $mode$run in
-  seriali) mpirun -machinefile machinefile ./fsord ;;
-  serialg) mpirun -machinefile machinefile -dbg=gdb ./fsord ;;
-  serialb)
-    nohup mpirun -machinefile machinefile ./fsord > out.log &
-    echo "kill $!" > cancel.sh
-    chmod u+x cancel.sh
-    ;;
+  seriali)   mpirun -machinefile machinefile ./fsord ;;
+  serialg)   mpirun -machinefile machinefile -dbg=gdb ./fsord ;;
+  serialb)   nohup mpirun -machinefile machinefile ./fsord > out.log & ;;
   paralleli) mpirun -machinefile machinefile -np $np ./psord ;;
   parallelg) mpirun -machinefile machinefile -np $np -dbg=gdb ./psord ;;
-  parallelb)
-    nohup mpirun -machinefile machinefile -np $np ./psord > out.log &
-    echo "kill $!" > cancel.sh
-    chmod u+x cancel.sh
-    ;;
+  parallelb) nohup mpirun -machinefile machinefile -np $np ./psord > out.log &;;
 esac
+tail +$(( nodes + 1 )) machinefile > tmp
+head -$nodes machinefile >> tmp
+mv tmp machinefile
 
 ;;
 
@@ -433,23 +389,21 @@ esac
 
 # Interactive
 case $mode$run in
-  seriali) ./fsord ;;
-  serialg) ddd ./fsord ;;
-  serialb)
-    nohup ./fsord > out.log &
-    echo "kill $!" > cancel.sh
-    chmod u+x cancel.sh
-    ;;
-  paralleli) mpirun -np $np ./psord ;;
+  seriali)   nice ./fsord ;;
+  serialg)   ddd ./fsord ;;
+  serialb)   nice nohup ./fsord > out.log & ;;
+  paralleli) nice mpirun -np $np ./psord ;;
   parallelg) mpirun -np $np -dbg=ddd ./psord ;;
-  parallelb)
-    nohup mpirun -np $np ./psord > out.log &
-    echo "kill $!" > cancel.sh
-    chmod u+x cancel.sh
-    ;;
+  parallelb) nice nohup mpirun -np $np ./psord > out.log & ;;
 esac
 
 ;;
 
 esac #--------------------------------------#
+
+if [ x$run = xb ]; then
+  echo "#!/bin/bash" > cancel.sh
+  echo "kill $!" >> cancel.sh
+  chmod u+x cancel.sh
+fi
 
