@@ -12,11 +12,12 @@ i = iz + nout + ditout ! silence compiler warnings
 end subroutine
 
 ! Input/output scalar field
-subroutine ioscalar( io, filename, s1, i1, i2, n, noff, iz )
+subroutine ioscalar( io, filename, s1, i1, i2, i1l, i2l, iz )
 character(*), intent(in) :: io, filename
 real, intent(inout) :: s1(:,:,:)
-integer, intent(in) :: i1(3), i2(3), n(3), noff(3), iz
+integer, intent(in) :: i1(3), i2(3), i1l(3), i2l(3), iz
 integer :: j1, k1, l1, j2, k2, l2, reclen
+if ( any( i1 /= i2l .or. i2 /= i2l ) .or. iz <= 0 ) then stop 'output error'
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
@@ -42,15 +43,15 @@ case( 'w' )
   write( 9, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
   close( 9 )
 end select
-j1 = n(1) + noff(1) + iz
 end subroutine
 
 ! Input/output vector component
-subroutine iovector( io, filename, w1, i, i1, i2, n, noff, iz )
+subroutine iovector( io, filename, w1, i, i1, i2, i1l, i2l, iz )
 character(*), intent(in) :: io, filename
 real, intent(inout) :: w1(:,:,:,:)
-integer, intent(in) :: i, i1(3), i2(3), n(3), noff(3), iz
+integer, intent(in) :: i, i1(3), i2(3), i1l(3), i2l(3), iz
 integer :: j1, k1, l1, j2, k2, l2, reclen
+if ( any( i1 /= i2l .or. i2 /= i2l ) .or. iz <= 0 ) then stop 'output error'
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
@@ -76,7 +77,6 @@ case( 'w' )
   write( 9, rec=1 ) w1(j1:j2,k1:k2,l1:l2,i)
   close( 9 )
 end select
-j1 = n(1) + noff(1) + iz
 end subroutine
 
 end module

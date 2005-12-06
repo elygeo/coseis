@@ -10,7 +10,7 @@ implicit none
 save
 real :: amax, vmax, umax, wmax, svmax, slmax, courant, dtwall, tarrmax
 integer :: amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3), &
-  i, j, k, l, i1(3), i2(3), n(3), nc, iz, twall_rate, twall1, twall2
+  i, j, k, l, i1(3), i2(3), i1l(3), i2l(3), nc, iz, twall_rate, twall1, twall2
 logical :: fault, cell, test, init = .true.
 character, intent(in) :: pass
 character :: onpass, endian
@@ -87,6 +87,9 @@ doiz0: do iz = 1, nout
     i1(ifn) = ihypo(ifn)
     i2(ifn) = ihypo(ifn)
   end if
+  if ( any( i2 < i1 ) ) stop 'output error'
+  i1out(iz,:) = i1
+  i2out(iz,:) = i2
  
   ! Metadata
   if ( master ) then
@@ -101,12 +104,10 @@ doiz0: do iz = 1, nout
   end if
  
   ! Split collective i/o
-  if ( any( i2 < i1 ) ) ditout(iz) = nt + 1
-  ! if ( any( i2 < i1 ) .or. any( i1 ) ditout(iz) = nt + 1
-  ! if ( fault .and. ifn == 0 ) ditout(iz) = nt + 1
+  i1l = max( i1, i1node )
+  i2l = min( i2, i2node )
+  if ( any( i2l < i1l ) ditout(iz) = nt + 1
   call iosplit( iz, nout, ditout(iz) )
-  i1out(iz,:) = i1
-  i2out(iz,:) = i2
 
 end do doiz0
 
@@ -186,33 +187,34 @@ if ( fieldout(iz) == 'x' ) ditout(iz) = nt + 1
 ! Indices
 i1 = i1out(iz,:)
 i2 = i2out(iz,:)
-n = i2 - i1 + 1
-i1 = max( i1, i1node )
-i2 = min( i2, i2node )
+i1l = max( i1, i1node )
+i2l = min( i2, i2node )
 if ( fault ) then
   i1(ifn) = 1
   i2(ifn) = 1
+  i1l(ifn) = 1
+  i2l(ifn) = 1
 end if
 
 ! Binary output
 do i = 1, nc
   write( str, '(i2.2,a,a,i1,i6.6)' ) iz, '/', trim( fieldout(iz) ), i, it
   select case( fieldout(iz) )
-  case( 'x'    ); call iovector( 'w', str, x,  i,   i1, i2, n, nnoff, iz )
-  case( 'a'    ); call iovector( 'w', str, w1, i,   i1, i2, n, nnoff, iz )
-  case( 'v'    ); call iovector( 'w', str, v,  i,   i1, i2, n, nnoff, iz )
-  case( 'u'    ); call iovector( 'w', str, u,  i,   i1, i2, n, nnoff, iz )
+  case( 'x'    ); call iovector( 'w', str, x,  i,   i1, i2, i1l, i2l, iz )
+  case( 'a'    ); call iovector( 'w', str, w1, i,   i1, i2, i1l, i2l, iz )
+  case( 'v'    ); call iovector( 'w', str, v,  i,   i1, i2, i1l, i2l, iz )
+  case( 'u'    ); call iovector( 'w', str, u,  i,   i1, i2, i1l, i2l, iz )
   case( 'w'    );
-    if ( i < 4 )  call iovector( 'w', str, w1, i,   i1, i2, n, nnoff, iz )
-    if ( i > 3 )  call iovector( 'w', str, w2, i-3, i1, i2, n, nnoff, iz )
-  case( 'am'   ); call ioscalar( 'w', str, s1,      i1, i2, n, nnoff, iz )
-  case( 'vm'   ); call ioscalar( 'w', str, s2,      i1, i2, n, nnoff, iz )
-  case( 'um'   ); call ioscalar( 'w', str, s1,      i1, i2, n, nnoff, iz )
-  case( 'wm'   ); call ioscalar( 'w', str, s2,      i1, i2, n, nnoff, iz )
-  case( 'sv'   ); call ioscalar( 'w', str, sv,      i1, i2, n, nnoff, iz )
-  case( 'sl'   ); call ioscalar( 'w', str, sl,      i1, i2, n, nnoff, iz )
-  case( 'trup' ); call ioscalar( 'w', str, trup,    i1, i2, n, nnoff, iz )
-  case( 'tarr' ); call ioscalar( 'w', str, tarr,    i1, i2, n, nnoff, iz )
+    if ( i < 4 )  call iovector( 'w', str, w1, i,   i1, i2, i1l, i2l, iz )
+    if ( i > 3 )  call iovector( 'w', str, w2, i-3, i1, i2, i1l, i2l, iz )
+  case( 'am'   ); call ioscalar( 'w', str, s1,      i1, i2, i1l, i2l, iz )
+  case( 'vm'   ); call ioscalar( 'w', str, s2,      i1, i2, i1l, i2l, iz )
+  case( 'um'   ); call ioscalar( 'w', str, s1,      i1, i2, i1l, i2l, iz )
+  case( 'wm'   ); call ioscalar( 'w', str, s2,      i1, i2, i1l, i2l, iz )
+  case( 'sv'   ); call ioscalar( 'w', str, sv,      i1, i2, i1l, i2l, iz )
+  case( 'sl'   ); call ioscalar( 'w', str, sl,      i1, i2, i1l, i2l, iz )
+  case( 'trup' ); call ioscalar( 'w', str, trup,    i1, i2, i1l, i2l, iz )
+  case( 'tarr' ); call ioscalar( 'w', str, tarr,    i1, i2, i1l, i2l, iz )
   case default; stop 'fieldout'
   end select
 end do

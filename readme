@@ -510,9 +510,9 @@ DOMAIN DECOMPOSITION DIAGRAM
   ------- | o | i1pml                    | o |
           x---x i1pml+1   .---. 1        x---x i2node
   Elastic |[x]| i1pml+1   |[x]| i1cell   |[x]| i2cell
-          x---x           x---x i1node   '---' nm=5  
+          x---x           x---x i1node   '---' nm=5
           |[x]|           |[x]|
-  Fault-> xx-xx           xx-xx i2node   .---. 1     
+  Fault-> xx-xx           xx-xx i2node   .---. 1
           |[x]|           |[x]| i2cell   |[x]| i1cell
           x---x           '---' nm=5     x---x i1node
   Elastic |[x]| i2pml-2                  | o |
@@ -520,15 +520,15 @@ DOMAIN DECOMPOSITION DIAGRAM
   ------- | o | i2pml-1                  | o |
           o---o i2pml     .---. 1        o---o i2node
           | o |           | o | i1cell   | o | i2cell
-          o---o           o---o i1node   '---' nm    
+          o---o           o---o i1node   '---' nm
     PML   | o |           | o |
           o---o           o---o
-          | o |           | o | i2cell
-          o---o           o---o i2node   .---. 1     
-          | o | 15        | o |          | o | i1cell i2cell
+          | o |           | o |
+          o---o           o---o i2node   .---. 1
+          | o | 15        | o | i2cell   | o | i1cell i2cell
   ------- o---o nn=16     '---' nm=5     o---o i1node i2node
   Surface       n=15                     |   |
-                                         '---' nm=3         
+                                         '---' nm=3
 
 MPICH INSTALL - does not work w/ gfortran
   ./configure -prefix=/usr/local --with-device=ch_shmem --with-romio
