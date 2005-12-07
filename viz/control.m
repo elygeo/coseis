@@ -21,8 +21,8 @@ case { 'h', 'f1' }
         'Magnitude         0   Extremum        End   Color Scale     [ ]'
         'Component       1-6   Render        Enter   Round CS          \\'
         'Volumes/Slices    Z   Render next   Space   Auto CS       Alt-\\'
-        'Slice         J K L   Save snapshot   Ins   Fold CS           C'
-        'Glyphs            G   Save movie        R   Dark/Light        D'
+        'Slice         J K L   Save snapshot   Ins   Fold CS       Alt-C'
+        'Glyphs            G   Save movie        R   Color scheme      C'
         'Isosurfaces       I   Clean     Backspace   Time Series       T'
         'Surfaces          S   Outline           O   Filtered TS   Alt-T'
         'Mesh              M   Length Scale      X   Space-Time        Y'
@@ -196,20 +196,16 @@ case 'backslash'
     set( htxt(1), 'String', sprintf( '%g', clim(1) ) )
     set( htxt(2), 'String', sprintf( '%g', clim(2) ) )
   end
-case 'd'
-  dark = ~dark;
-  if dark, msg = 'Dark color scheme';
-  else     msg = 'Light color scheme';
-  end
 case 'c'
-  foldcs = ~foldcs;
-  if foldcs, msg = 'Folded color scale';
-  else       msg = 'Signed color scale';
-  end
-case 'd'
-  dark = ~dark;
-  if dark, msg = 'Dark color scheme';
-  else     msg = 'Light color scheme';
+  if ~km
+    list = { 'dark' 'light' 'b/w' };
+    colorscheme = mod( colorscheme + 1, 3 );
+    msg = [ 'Color scheme: ' list{colorscheme+1} ];
+  else
+    foldcs = ~foldcs;
+    if foldcs, msg = 'Folded color scale';
+    else       msg = 'Signed color scale';
+    end
   end
 case 'z'
   volviz = ~volviz;
@@ -253,7 +249,7 @@ case 't'
   sensor = icursor(1:3);
   [ tt, vt, tta, vta, labels, msg ] = tsread( field, sensor, km );
   if length( vt )
-    tsfigure( dark )
+    tsfigure( colorscheme )
     tsplot
     zoom
     set( gcf, 'KeyPressFcn', 'delete(gcbf)' )

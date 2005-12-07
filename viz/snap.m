@@ -6,6 +6,10 @@ case 1, file = varargin{1};
 otherwise, error
 end
 
+print -dtiff -r480 'tmp'
+
+exit
+
 print -dtiff -r240 'tmp'
 img = imread( 'tmp.tif' );
 n = [ 480 640 ];

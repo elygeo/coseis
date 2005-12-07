@@ -8,49 +8,49 @@ subroutine gridgen
 
 implicit none
 real :: theta, scl
-integer :: i1(3), i2(3), i1l(3), i2l(3), &
+integer :: i1(3), i2(3), i1l(3), i2l(3), n(3), noff(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, up(1)
 real :: x1(3), x2(3), lj, lk, ll
 
 if ( master ) print '(a)', 'Grid generation'
 
 ! Single node indexing
-i1  = 1  + nnoff
-i2  = nn + nnoff
+n = nn
+noff = nnoff
+idoublenode = 0
 i1l = i1node
 i2l = i2node
-idoublenode = 0
 if ( ifn /= 0 ) then
+  n(ifn) = n(ifn) - 1
   if ( ihypo(ifn) < i1l(ifn) ) then
-    i1(ifn) = i1(ifn) + 1
-  else
-    i2(ifn) = i2(ifn) - 1
-    if ( ihypo(ifn) < i2l(ifn) ) then
-      i2l(ifn) = i2l(ifn) - 1
-      idoublenode = ifn
-    end if
+    noff = noff + 1
+  else if ( ihypo(ifn) < i2l(ifn) ) then
+    i2l(ifn) = i2l(ifn) - 1
+    idoublenode = ifn
   end if
 end if
 j1 = i1l(1); j2 = i2l(1)
 k1 = i1l(2); k2 = i2l(2)
 l1 = i1l(3); l2 = i2l(3)
+i1 = 1 + noff
+i2 = n + noff
 
 ! Read grid files or create basic rectangular mesh
 x = 0.
-if ( grid == 'read' ) then
-  call iovector( 'r', 'data/x1', x, 1, i1, i2, i1l, i2l, 0 )
-  call iovector( 'r', 'data/x2', x, 2, i1, i2, i1l, i2l, 0 )
-  call iovector( 'r', 'data/x3', x, 3, i1, i2, i1l, i2l, 0 )
-else
+if ( grid /= 'read' ) then
   forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - i1(1) )
   forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - i1(2) )
   forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - i1(3) )
+else
+  call iovector( 'r', 'data/x1', x, 1, i1, i2, i1l, i2l, 0 )
+  call iovector( 'r', 'data/x2', x, 2, i1, i2, i1l, i2l, 0 )
+  call iovector( 'r', 'data/x3', x, 3, i1, i2, i1l, i2l, 0 )
 end if
 
 ! Dimensions
-lj = dx * ( i2(1) - i1(1) )
-lk = dx * ( i2(2) - i1(2) )
-ll = dx * ( i2(3) - i1(3) )
+lj = dx * ( n(1) - 1 )
+lk = dx * ( n(2) - 1 )
+ll = dx * ( n(3) - 1 )
 
 ! Coordinate system
 l = sum( maxloc( abs( upvector ) ) )
@@ -59,46 +59,41 @@ k = modulo( l + 1, 3 ) + 1
 j = 6 - k - l
 
 ! Grid expansion
-i1 = i1expand
-i2 = i2expand
-call zone( i1, i2, nn, nnoff, ihypo, ifn )
-if ( ifn /= 0 ) then
-  if ( ihypo(ifn) < i1l(ifn) ) then
-    i1(ifn) = i1(ifn) + 1
-  else
-    i2(ifn) = i2(ifn) - 1
-    if ( ihypo(ifn) < i2l(ifn) ) then
-      i2l(ifn) = i2l(ifn) - 1
-    end if
-  end if
+if ( rexpand > 1. ) then
+  i1 = i1expand
+  i2 = i2expand
+  call zone( i1, i2, n, noff, ihypo, 0 )
+  do j = i1l(1), min( i2l(1), i1(1) - 1 )
+    i = i1(1) - j
+    x(j,:,:,1) = x(j,1,1,1) + &
+      dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+  end do
+  do j = max( i1l(1), i2(1) + 1 ), i2l(1)
+    i = j - i2(1)
+    x(j,:,:,1) = x(j,1,1,1) - &
+      dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+  end do
+  do k = i1l(2), min( i2l(2), i1(2) - 1 )
+    i = i1(2) - k
+    x(:,k,:,2) = x(1,k,1,2) + &
+      dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+  end do
+  do k = max( i1l(2), i2(2) + 1 ), i2l(2)
+    i = k - i2(2)
+    x(:,k,:,2) = x(1,k,1,2) - &
+      dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+  end do
+  do l = i1l(3), min( i2l(3), i1(3) - 1 )
+    i = i1(3) - l
+    x(:,:,l,3) = x(1,1,l,3) + &
+      dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+  end do
+  do l = max( i1l(3), i2(3) + 1 ), i2l(3)
+    i = l - i2(3)
+    x(:,:,l,3) = x(1,1,l,3) - &
+      dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+  end do
 end if
-do j = i1node(1), min( i2node(1), i1(1) - 1 )
-  i = i1(1) - j
-  x(j,:,:,1) = dx * ( i1(1) - ( 1 - rexpand ** ( i + 1 ) ) / ( 1 - rexpand ) )
-end do
-do j = max( i1node(1), i2(1) + 1 ), i2node(1)
-  i = j - i2(1)
-  x(j,:,:,1) = dx * ( i2(1) + ( 1 - rexpand ** ( i + 1 ) ) / ( 1 - rexpand ) )
-end do
-do k = i1node(2), min( i2node(2), i1(2) - 1 )
-  i = i1(2) - k
-  x(:,k,:,2) = dx * ( i1(2) - ( 1 - rexpand ** ( i + 1 ) ) / ( 1 - rexpand ) )
-end do
-do k = max( i1node(2), i2(2) + 1 ), i2node(2)
-  i = k - i2(2)
-  x(:,k,:,2) = dx * ( i2(2) + ( 1 - rexpand ** ( i + 1 ) ) / ( 1 - rexpand ) )
-end do
-do l = i1node(3), min( i2node(3), i1(3) - 1 )
-  i = i1(3) - l
-  x(j,:,l,3) = dx * ( l + i - ( 1 - rexpand ** ( i + 1 ) ) / ( 1 - rexpand ) )
-end do
-do l = max( i1node(3), i2(3) + 1 ), i2node(3)
-  i = l - i2(3)
-  x(:,:,l,3) = dx * ( i2(3) + ( 1 - rexpand ** ( i + 1 ) ) / ( 1 - rexpand ) )
-end do
-x(:,:,:,1) = x(:,:,:,1) - x(1,1,1,1)
-x(:,:,:,2) = x(:,:,:,2) - x(1,1,1,2)
-x(:,:,:,3) = x(:,:,:,3) - x(1,1,1,3)
 
 ! Mesh type
 select case( grid )

@@ -1,12 +1,9 @@
 % Figure window
 
-function tsfigure( dark )
+function tsfigure( colorscheme )
 
-if ~exist( 'dark', 'var' ), dark = 1;
-end
-
-if dark, foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
-else     foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 1;
+if colorscheme, foreground = [ 0 0 0 ]; background = [ 1 1 1 ]; linewidth = 1;
+else            foreground = [ 1 1 1 ]; background = [ 0 0 0 ]; linewidth = 1;
 end
 
 figure

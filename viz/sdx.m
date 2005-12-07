@@ -9,7 +9,7 @@ if faultnormal, faultmeta, end
 
 field = 'v';
 icomp = 0;
-dark = 1;
+colorscheme = 0;
 dit = 1;
 colorexp = .5;
 glyphcut = .1;

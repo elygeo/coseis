@@ -51,7 +51,7 @@ for iz = 1:size( ilines, 1 )
   i2 = ilines(iz,4:6);
   n = i2 - i1 + 1;
   if sum( n > 1 ) ~= 1, continue, end
-  if strcmp( grid, 'constant' )
+  if strcmp( grid, 'constant' ) && 0
     x1 = [ x1; [ i1(1) - 1; i2(1) - 1 ] * dx; NaN ];
     x2 = [ x2; [ i1(2) - 1; i2(2) - 1 ] * dx; NaN ];
     x3 = [ x3; [ i1(3) - 1; i2(3) - 1 ] * dx; NaN ];
