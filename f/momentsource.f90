@@ -9,7 +9,7 @@ implicit none
 real, save, allocatable :: srcfr(:), cellvol(:)
 integer, save, allocatable :: jj(:), kk(:), ll(:)
 logical, save :: init = .true.
-integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, nsrc, ic
+integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc, ic
 real :: srcft
 
 if ( rsource <= 0. ) return

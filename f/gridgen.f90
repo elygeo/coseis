@@ -8,48 +8,49 @@ subroutine gridgen
 
 implicit none
 real :: theta, scl
-integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, up(1), n(3), &
-  noff(3), idoublenode
-real :: lj, lk, ll, x1(3), x2(3)
+integer :: i1(3), i2(3), i1l(3), i2l(3), &
+  i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, up(1)
+real :: x1(3), x2(3), lj, lk, ll
 
 if ( master ) print '(a)', 'Grid generation'
 
-! Indices
-i1 = i1node
-i2 = i2node
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-
 ! Single node indexing
-n = nn
-noff = nnoff
+i1  = 1  + nnoff
+i2  = nn + nnoff
+i1l = i1node
+i2l = i2node
 idoublenode = 0
 if ( ifn /= 0 ) then
-  n(ifn) = n(ifn) - 1
-  if ( ihypo(ifn) < i1node(ifn) ) then
-    noff = noff + 1
-  else if ( ihypo(ifn) < i2node(ifn) ) then
-    idoublenode = ifn
+  if ( ihypo(ifn) < i1l(ifn) ) then
+    i1(ifn) = i1(ifn) + 1
+  else
+    i2(ifn) = i2(ifn) - 1
+    if ( ihypo(ifn) < i2l(ifn) ) then
+      i2l(ifn) = i2l(ifn) - 1
+      idoublenode = ifn
+    end if
   end if
 end if
+j1 = i1l(1); j2 = i2l(1)
+k1 = i1l(2); k2 = i2l(2)
+l1 = i1l(3); l2 = i2l(3)
 
 ! Read grid files or create basic rectangular mesh
 x = 0.
 if ( grid == 'read' ) then
-  call iovector( 'r', 'data/x1', x, 1, i1, i2, n, noff, 0 )
-  call iovector( 'r', 'data/x2', x, 2, i1, i2, n, noff, 0 )
-  call iovector( 'r', 'data/x3', x, 3, i1, i2, n, noff, 0 )
+  call iovector( 'r', 'data/x1', x, 1, i1, i2, i1l, i2l, 0 )
+  call iovector( 'r', 'data/x2', x, 2, i1, i2, i1l, i2l, 0 )
+  call iovector( 'r', 'data/x3', x, 3, i1, i2, i1l, i2l, 0 )
 else
-  forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - 1 - noff(1) )
-  forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - 1 - noff(2) )
-  forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - 1 - noff(3) )
+  forall( i=j1:j2 ) x(i,:,:,1) = dx * ( i - i1(1) )
+  forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - i1(2) )
+  forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - i1(3) )
 end if
 
 ! Dimensions
-lj = dx * ( n(1) - 1 )
-lk = dx * ( n(2) - 1 )
-ll = dx * ( n(3) - 1 )
+lj = dx * ( i2(1) - i1(1) )
+lk = dx * ( i2(2) - i1(2) )
+ll = dx * ( i2(3) - i1(3) )
 
 ! Coordinate system
 l = sum( maxloc( abs( upvector ) ) )
@@ -61,6 +62,16 @@ j = 6 - k - l
 i1 = i1expand
 i2 = i2expand
 call zone( i1, i2, nn, nnoff, ihypo, ifn )
+if ( ifn /= 0 ) then
+  if ( ihypo(ifn) < i1l(ifn) ) then
+    i1(ifn) = i1(ifn) + 1
+  else
+    i2(ifn) = i2(ifn) - 1
+    if ( ihypo(ifn) < i2l(ifn) ) then
+      i2l(ifn) = i2l(ifn) - 1
+    end if
+  end if
+end if
 do j = i1node(1), min( i2node(1), i1(1) - 1 )
   i = i1(1) - j
   x(j,:,:,1) = dx * ( i1(1) - ( 1 - rexpand ** ( i + 1 ) ) / ( 1 - rexpand ) )
@@ -127,13 +138,6 @@ case( 'spherical' )
 case default; stop 'grid'
 end select
 
-! Create fault double nodes
-select case( idoublenode )
-case( 1 ); j = ihypo(1); x(j+1:j2,:,:,:) = x(j:j2-1,:,:,:)
-case( 2 ); k = ihypo(2); x(:,k+1:k2,:,:) = x(:,k:k2-1,:,:)
-case( 3 ); l = ihypo(3); x(:,:,l+1:l2,:) = x(:,:,l:l2-1,:)
-end select
-
 ! Fill in halo
 call swaphalovector( x, nhalo )
 do i = 1, nhalo
@@ -144,6 +148,13 @@ do i = 1, nhalo
   if( edge1(3) ) x(:,:,l1-i,:) = x(:,:,l1,:)
   if( edge2(3) ) x(:,:,l2+i,:) = x(:,:,l2,:)
 end do
+
+! Create fault double nodes
+select case( idoublenode )
+case( 1 ); j = ihypo(1); x(j+1:j2+1,:,:,:) = x(j:j2,:,:,:)
+case( 2 ); k = ihypo(2); x(:,k+1:k2+1,:,:) = x(:,k:k2,:,:)
+case( 3 ); l = ihypo(3); x(:,:,l+1:l2+1,:) = x(:,:,l:l2,:)
+end select
 
 ! Assign fast operators to rectangular mesh portions
 noper = 1

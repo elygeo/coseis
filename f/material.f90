@@ -8,8 +8,8 @@ contains
 subroutine material
 
 implicit none
-integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, iz, &
-  i1l(3), i2l(3), idoublenode
+integer :: i1(3), i2(3), i1l(3), i2l(3), &
+  i, j, k, l, j1, k1, l1, j2, k2, l2, iz, idoublenode
 
 if ( master ) print '(a)', 'Material model'
 
@@ -57,10 +57,12 @@ else
   if ( ifn /= 0 ) then
     if ( ihypo(ifn) < i1l(ifn) ) then
       i1(ifn) = i1(ifn) + 1
-    else if ( ihypo(ifn) < i2l(ifn) ) then
-      idoublenode = ifn
+    else
       i2(ifn) = i2(ifn) - 1
-      i2l(ifn) = i2l(ifn) - 1
+      if ( ihypo(ifn) < i2l(ifn) ) then
+        i2l(ifn) = i2l(ifn) - 1
+        idoublenode = ifn
+      end if
     end if
   end if
   j1 = i1l(1); j2 = i2l(1)
@@ -77,7 +79,7 @@ else
     where ( mr < rho1 ) mr = rho1
     where ( mr > rho1 ) mr = rho2
   case( 'vp'  )
-    call ioscalar( 'r', 'data/vp', s1, i1, i2, n, noff, 0 )
+    call ioscalar( 'r', 'data/vp', s1, i1, i2, i1l, i2l, 0 )
     select case( idoublenode )
     case( 1 ); j = ihypo(1); s1(j+1:j2+1,:,:) = s1(j:j2,:,:)
     case( 2 ); k = ihypo(2); s1(:,k+1:k2+1,:) = s1(:,k:k2,:)
@@ -86,7 +88,7 @@ else
     where ( s1 < vp1 ) s1 = vp1
     where ( s1 > vp2 ) s1 = vp2
   case( 'vs'  )
-    call ioscalar( 'r', 'data/vs', s2, i1, i2, n, noff, 0 )
+    call ioscalar( 'r', 'data/vs', s2, i1, i2, i1l, i2l, 0 )
     select case( idoublenode )
     case( 1 ); j = ihypo(1); s2(j+1:j2+1,:,:) = s2(j:j2,:,:)
     case( 2 ); k = ihypo(2); s2(:,k+1:k2+1,:) = s2(:,k:k2,:)

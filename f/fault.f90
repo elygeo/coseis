@@ -9,8 +9,8 @@ subroutine fault
 
 implicit none
 real :: mus0, mud0, dc0, lc, tn0, ts0, ess, rctest
-integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, &
-  j3, k3, l3, j4, k4, l4, iz
+integer :: i1(3), i2(3), &
+  i, j, k, l, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4, iz
 integer, save :: side
 logical, save :: init = .true.
 
@@ -181,7 +181,7 @@ if ( master ) then
   lc =  dc0 * ( rho0 * vs0 ** 2. ) / tn0 / ( mus0 - mud0 )
   rctest = rho0 * vs0 ** 2. * tn0 * ( mus0 - mud0 ) * dc0 &
     / ( ts0 - tn0 * mud0 ) ** 2
-  open(  9, file='out/faultmeta.m', status='replace' )
+  open(  9, file='faultmeta.m', status='replace' )
   write( 9, * ) 'mus0   = ', mus0,   '; % static friction at hypocenter'
   write( 9, * ) 'mud0   = ', mud0,   '; % dynamic friction at hypocenter'
   write( 9, * ) 'dc0    = ', dc0,    '; % dc at hypocenter'

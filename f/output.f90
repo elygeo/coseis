@@ -10,7 +10,7 @@ implicit none
 save
 real :: amax, vmax, umax, wmax, svmax, slmax, courant, dtwall, tarrmax
 integer :: amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3), &
-  i, j, k, l, i1(3), i2(3), i1l(3), i2l(3), nc, iz, twall_rate, twall1, twall2
+  i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, iz, twall_rate, twall1, twall2
 logical :: fault, cell, test, init = .true.
 character, intent(in) :: pass
 character :: onpass, endian
@@ -87,7 +87,7 @@ doiz0: do iz = 1, nout
     i1(ifn) = ihypo(ifn)
     i2(ifn) = ihypo(ifn)
   end if
-  if ( any( i2 < i1 ) ) stop 'output error'
+  if ( any( i2 < i1 ) ) stop 'error in output indices'
   i1out(iz,:) = i1
   i2out(iz,:) = i2
  
@@ -106,7 +106,7 @@ doiz0: do iz = 1, nout
   ! Split collective i/o
   i1l = max( i1, i1node )
   i2l = min( i2, i2node )
-  if ( any( i2l < i1l ) ditout(iz) = nt + 1
+  if ( any( i2l < i1l ) ) ditout(iz) = nt + 1
   call iosplit( iz, nout, ditout(iz) )
 
 end do doiz0

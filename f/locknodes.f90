@@ -6,7 +6,7 @@ contains
 subroutine locknodes
 
 implicit none
-integer :: i, i1(3), j1, k1, l1, i2(3), j2, k2, l2, iz
+integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, iz
 logical, save :: init = .true.
 
 if ( init ) then

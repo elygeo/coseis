@@ -6,7 +6,7 @@ contains
 subroutine stress
 
 implicit none
-integer :: i, j, k, l, i1(3), j1, k1, l1, i2(3), j2, k2, l2, ic, iid, id, iz
+integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, ic, iid, id, iz
 
 ! Modified displacement
 w1 = u + dt * v * viscosity(1)

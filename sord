@@ -7,7 +7,7 @@ mode=guess
 fflags=O
 compile=yes
 run=i
-while getopts spmcngGb opt; do
+while getopts spmcngGbd opt; do
 case $opt in
   s) mode=serial ;;
   p) mode=parallel ;;
@@ -17,12 +17,14 @@ case $opt in
   g) fflags=g ;;
   G) fflags=g; run=g ;;
   b) run=b ;;
+  d) rm -rf out
 esac
 done
 shift $(( OPTIND - 1 ))
 
 srcdir=$( /bin/pwd )
 rundir=$( /bin/pwd )/out/$( date +%Y-%m-%d-%H-%M-%S )
+[ -e out ] || mkdir out
 [ -e $rundir ] || mkdir $rundir
 
 # Symlink input file specified on command line
@@ -220,6 +222,7 @@ END
 # Create output folders
 [ -e checkpoint ] || mkdir checkpoint
 [ -e stats ]      || mkdir stats
+[ -e data ]       || ln -s ../../data
 i=0
 while [ $i -lt $nout ]; do
   i=$(( i + 1 ))
@@ -233,7 +236,7 @@ done
 if [ $mode = matlab ]; then
 case $run in
   i) matlab -nodesktop -nosplash -r "addpath $srcdir/m; sord" ;;
-  b) nohup matlab -nodisplay -nojvm -r "addpath $srcdir/m; sord" > out.log & ;;
+  b) nohup matlab -nodisplay -nojvm -r "addpath $srcdir/m; sord" > out.log &
      echo "#!/bin/bash" > cancel.sh
      echo "kill $!" >> cancel.sh
      chmod u+x cancel.sh
