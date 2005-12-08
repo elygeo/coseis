@@ -140,10 +140,6 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     + s2(j,k,l+1) + s2(j+1,k+1,l) )
 end forall
 
-do l = l1, l2; do k = k1, k2; print *, mr(j1:j2,k,l); end do; end do
-do l = l1, l2; do k = k1, k2; print *, s1(j1:j2,k,l); end do; end do
-do l = l1, l2; do k = k1, k2; print *, s2(j1:j2,k,l); end do; end do
-
 ! Cell volume
 s1 = 0.
 call diffnc( s1, 'g', x, x, dx, 1, 1, i1cell, i2cell )
