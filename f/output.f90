@@ -11,7 +11,7 @@ save
 real :: amax, vmax, umax, wmax, svmax, slmax, courant, dtwall, tarrmax
 integer :: amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3), &
   i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, iz, twall_rate, twall1, twall2
-logical :: fault, cell, test, init = .true.
+logical :: fault, static, cell, test, init = .true.
 character, intent(in) :: pass
 character :: onpass, endian
 
@@ -54,6 +54,55 @@ ifit0: if ( it == 1 .and. master ) then
   write( 9, * ) 'rmax    =  ',  rmax,           '; % mesh radius'
   close( 9 )
 
+  ! Diagnostic
+  open(  9, file='diagnostic.m', status='replace' )
+  write( 9, * ) 'grid      = ''', grid,   ''';'
+  write( 9, * ) 'rfunc     = ''', rfunc,  ''';'
+  write( 9, * ) 'tfunc     = ''', tfunc,  ''';'
+  write( 9, * ) 'dt        =  ', dt,        ';'
+  write( 9, * ) 'dx        =  ', dx,        ';'
+  write( 9, * ) 'tsource   =  ', tsource,   ';'
+  write( 9, * ) 'rsource   =  ', rsource,   ';'
+  write( 9, * ) 'rexpand   =  ', rexpand,   ';'
+  write( 9, * ) 'vrup      =  ', vrup,      ';'
+  write( 9, * ) 'rcrit     =  ', rcrit,     ';'
+  write( 9, * ) 'trelax    =  ', trelax,    ';'
+  write( 9, * ) 'svtol     =  ', svtol,     ';'
+  write( 9, * ) 'viscosity = [', viscosity,'];'
+  write( 9, * ) 'moment1   = [', moment1,  '];'
+  write( 9, * ) 'moment2   = [', moment2,  '];'
+  write( 9, * ) 'xcenter   = [', xcenter,  '];'
+  write( 9, * ) 'nt        =  ', nt,        ';'
+  write( 9, * ) 'itcheck   =  ', itcheck,   ';'
+  write( 9, * ) 'npml      =  ', npml,      ';'
+  write( 9, * ) 'ifn       =  ', ifn,       ';'
+  write( 9, * ) 'noper     =  ', noper,     ';'
+  write( 9, * ) 'oper      =  ', oper,     ';'
+  write( 9, * ) 'i1oper    = [', i1oper,   '];'
+  write( 9, * ) 'i2oper    = [', i2oper,   '];'
+  write( 9, * ) 'nin       =  ', nin,      ';'
+  write( 9, * ) 'nlock     =  ', nlock,     ';'
+  write( 9, * ) 'nout      =  ', nout,      ';'
+  write( 9, * ) 'nn        = [', nn,       '];'
+  write( 9, * ) 'nm        = [', nm,       '];'
+  write( 9, * ) 'np        = [', np,       '];'
+  write( 9, * ) 'ip3       = [', ip3,      '];'
+  write( 9, * ) 'bc1       = [', bc1,      '];'
+  write( 9, * ) 'bc2       = [', bc2,      '];'
+  write( 9, * ) 'nnoff     = [', nnoff,    '];'
+  write( 9, * ) 'i1expand  = [', i1expand, '];'
+  write( 9, * ) 'i2expand  = [', i2expand, '];'
+  write( 9, * ) 'i1node    = [', i1node,   '];'
+  write( 9, * ) 'i2node    = [', i2node,   '];'
+  write( 9, * ) 'i1cell    = [', i1cell,   '];'
+  write( 9, * ) 'i2cell    = [', i2cell,   '];'
+  write( 9, * ) 'i1pml     = [', i1pml,    '];'
+  write( 9, * ) 'i2pml     = [', i2pml,    '];'
+  write( 9, * ) 'master    =  ', master,    ';'
+  write( 9, * ) 'edge1     = [', edge1,    '];'
+  write( 9, * ) 'edge2     = [', edge2,    '];'
+  close( 9 )
+
 end if ifit0
 
 doiz0: do iz = 1, nout
@@ -69,10 +118,21 @@ doiz0: do iz = 1, nout
   case( 'u'    ); nc = 3
   case( 'w'    ); nc = 6; cell = .true.
   case( 'wm'   ); cell = .true.
+  case( 'mu'   ); cell = .true.
+  case( 'lam'  ); cell = .true.
+  case( 'y'    ); cell = .true.
+  case( 't0'   ); fault = .true.; nc = 3
+  case( 't3'   ); fault = .true.; nc = 3
+  case( 'mus'  ); fault = .true.
+  case( 'mud'  ); fault = .true.
+  case( 'dc'   ); fault = .true.
+  case( 'co'   ); fault = .true.
   case( 'sv'   ); fault = .true.
   case( 'sl'   ); fault = .true.
   case( 'trup' ); fault = .true.
   case( 'tarr' ); fault = .true.
+  case( 'tn'   ); fault = .true.
+  case( 'ts'   ); fault = .true.
   end select
   
   ! Interval 
@@ -163,26 +223,39 @@ if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 ! Properties
 nc = 1
 fault = .false.
+static = .false.
 onpass = 'a'
 select case( fieldout(iz) )
-case( 'x'    ); nc = 3
+case( 'x'    ); nc = 3; static = .true.
 case( 'a'    ); nc = 3
 case( 'v'    ); nc = 3
 case( 'u'    ); nc = 3; onpass = 'w'
 case( 'w'    ); nc = 6; onpass = 'w'
+case( 'mr'   ); static = .true.
+case( 'mu'   ); static = .true.
+case( 'lam'  ); static = .true.
+case( 'y'    ); static = .true.
 case( 'um'   ); onpass = 'w'
 case( 'wm'   ); onpass = 'w'
+case( 't0'   ); fault = .true.; nc = 3
+case( 't3'   ); fault = .true.; nc = 3
+case( 'mus'  ); fault = .true.; static = .true.
+case( 'mud'  ); fault = .true.; static = .true.
+case( 'dc'   ); fault = .true.; static = .true.
+case( 'co'   ); fault = .true.; static = .true.
 case( 'sv'   ); fault = .true.
 case( 'sl'   ); fault = .true.
 case( 'trup' ); fault = .true.
 case( 'tarr' ); fault = .true.
+case( 'tn'   ); fault = .true.
+case( 'ts'   ); fault = .true.
 end select
 
 ! Select pass
 if ( pass /= onpass ) cycle doiz
 
 ! X is static, only write once
-if ( fieldout(iz) == 'x' ) ditout(iz) = nt + 1
+if ( static ) ditout(iz) = nt + 1
 
 ! Indices
 i1 = i1out(iz,:)
@@ -211,10 +284,22 @@ do i = 1, nc
   case( 'vm'   ); call ioscalar( 'w', str, s2,      i1, i2, i1l, i2l, iz )
   case( 'um'   ); call ioscalar( 'w', str, s1,      i1, i2, i1l, i2l, iz )
   case( 'wm'   ); call ioscalar( 'w', str, s2,      i1, i2, i1l, i2l, iz )
+  case( 'mr'   ); call ioscalar( 'w', str, mr,      i1, i2, i1l, i2l, iz )
+  case( 'mu'   ); call ioscalar( 'w', str, mu,      i1, i2, i1l, i2l, iz )
+  case( 'lam'  ); call ioscalar( 'w', str, lam,     i1, i2, i1l, i2l, iz )
+  case( 'y'    ); call ioscalar( 'w', str, y,       i1, i2, i1l, i2l, iz )
+  case( 't0'   ); call iovector( 'w', str, t0, i,   i1, i2, i1l, i2l, iz )
+  case( 't3'   ); call iovector( 'w', str, t3, i,   i1, i2, i1l, i2l, iz )
+  case( 'mus'  ); call ioscalar( 'w', str, mus,     i1, i2, i1l, i2l, iz )
+  case( 'mud'  ); call ioscalar( 'w', str, mud,     i1, i2, i1l, i2l, iz )
+  case( 'dc'   ); call ioscalar( 'w', str, dc,      i1, i2, i1l, i2l, iz )
+  case( 'co'   ); call ioscalar( 'w', str, co,      i1, i2, i1l, i2l, iz )
   case( 'sv'   ); call ioscalar( 'w', str, sv,      i1, i2, i1l, i2l, iz )
   case( 'sl'   ); call ioscalar( 'w', str, sl,      i1, i2, i1l, i2l, iz )
   case( 'trup' ); call ioscalar( 'w', str, trup,    i1, i2, i1l, i2l, iz )
   case( 'tarr' ); call ioscalar( 'w', str, tarr,    i1, i2, i1l, i2l, iz )
+  case( 'tn'   ); call ioscalar( 'w', str, tn,      i1, i2, i1l, i2l, iz )
+  case( 'ts'   ); call ioscalar( 'w', str, ts,      i1, i2, i1l, i2l, iz )
   case default; stop 'fieldout'
   end select
 end do

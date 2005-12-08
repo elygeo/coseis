@@ -69,6 +69,10 @@ else
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
+print *, fieldin(iz)
+print *, i1
+print *, i2
+print *, inval(iz)
   select case ( fieldin(iz) )
   case( 'mus' ); mus(j1:j2,k1:k2,l1:l2)  = inval(iz)
   case( 'mud' ); mud(j1:j2,k1:k2,l1:l2)  = inval(iz)

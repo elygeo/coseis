@@ -18,7 +18,7 @@ i2s(4) = icursor(4);
 [ f, msg ] = read4d( field, i1s, i2s );
 if msg, return, end
 [ x, msg ] = read4d( 'x', [ i1s(1:3) 1 ], [ i2s(1:3) 1 ] );
-if msg, error 'no mesh data not found', end
+if msg, error 'no mesh data found', end
 i1hold = i1s;
 i2hold = i2s;
 
