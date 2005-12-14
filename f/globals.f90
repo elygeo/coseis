@@ -151,7 +151,6 @@ character(8) :: &
   fieldout(nz)    ! output variable
 
 character(16) :: &
-  model,        & ! model ID
   grid,         & ! grid generation scheme
   rfunc,        & ! moment source space function
   tfunc           ! moment source time function

@@ -41,7 +41,6 @@ inzone = .false.
 ! Select input key
 select case( key1 )
 case( 'return' );      exit doline
-case( 'model' );       model = key2
 case( 'grid' );        grid  = key2
 case( 'rfunc' );       rfunc = key2
 case( 'tfunc' );       tfunc = key2

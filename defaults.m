@@ -1,7 +1,6 @@
 % SORD Defaults
 
 % Wave model parameters
-  model = 'defaults';			% model ID
   nn = [ 41 41 42 ];			% nx ny nz double nodes counted
   nt = 40;				% number of time steps
   dx = 100.;				% spatial step length

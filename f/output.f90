@@ -18,92 +18,91 @@ character :: onpass, endian
 ifinit: if ( init ) then !-----------------------------------------------------!
 
 init = .false.
-if ( nout > nz ) stop 'too many output zones, make nz bigger'
 
-ifit0: if ( it == 1 .and. master ) then
+ifmaster: if ( master ) then
 
   print '(a)', 'Initialize output'
-
-  ! Check for previus run
+  if ( nout > nz ) stop 'too many output zones, make nz bigger'
   inquire( file='timestep', exist=test )
-  if ( test ) then
-    print '(a)', 'Error: previous output found. use -d flag to overwrite'
-    stop
-  end if
+  if ( test .and. it == 1 ) stop 'previous output found'
  
+  ! Diagnostic
+  open(  9, file='diagnostic.m', status='replace' )
+  write( 9, * ) 'ifn         =  ',  ifn,            ';'
+  write( 9, * ) 'nin         =  ',  nin,            ';'
+  write( 9, * ) 'nout        =  ',  nout,           ';'
+  write( 9, * ) 'nlock       =  ',  nlock,          ';'
+  write( 9, * ) 'noper       =  ',  noper,          ';'
+  write( 9, * ) 'master      =  ',  master,         ';'
+  write( 9, * ) 'nm          = [',  nm,            '];'
+  write( 9, * ) 'ip3         = [',  ip3,           '];'
+  write( 9, * ) 'nnoff       = [',  nnoff,         '];'
+  write( 9, * ) 'i1node      = [',  i1node,        '];'
+  write( 9, * ) 'i2node      = [',  i2node,        '];'
+  write( 9, * ) 'i1cell      = [',  i1cell,        '];'
+  write( 9, * ) 'i2cell      = [',  i2cell,        '];'
+  write( 9, * ) 'i1pml       = [',  i1pml,         '];'
+  write( 9, * ) 'i2pml       = [',  i2pml,         '];'
+  write( 9, * ) 'edge1       = [',  edge1,         '];'
+  write( 9, * ) 'edge2       = [',  edge2,         '];'
+  write( 9, * ) 'i1oper      = [',  i1oper,        '];'
+  write( 9, * ) 'i2oper      = [',  i2oper,        '];'
+  write( 9, * ) 'oper        =  ',  oper,           ';'
+  close( 9 )
+
   ! Metadata
   endian = 'l'
   if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
   courant = dt * vp2 * sqrt( 3. ) / abs( dx )
   open(  9, file='meta.m', status='replace' )
-  write( 9, * ) 'endian  = ''', endian,       '''; % byte order'
-  write( 9, * ) 'nout    =  ',  nout,           '; % number output zones'
-  write( 9, * ) 'rho0    =  ',  rho0,           '; % hypocenter density'
-  write( 9, * ) 'rho1    =  ',  rho1,           '; % min density'
-  write( 9, * ) 'rho2    =  ',  rho2,           '; % max density'
-  write( 9, * ) 'vp0     =  ',  vp0,            '; % hypocenter Vp'
-  write( 9, * ) 'vp1     =  ',  vp1,            '; % min Vp'
-  write( 9, * ) 'vp2     =  ',  vp2,            '; % max Vp'
-  write( 9, * ) 'vs0     =  ',  vs0,            '; % hypocenter Vs'
-  write( 9, * ) 'vs1     =  ',  vs1,            '; % min Vs'
-  write( 9, * ) 'vs2     =  ',  vs2,            '; % max Vs'
-  write( 9, * ) 'courant =  ',  courant,        '; % stability condition'
-  write( 9, * ) 'ihypo   = [',  ihypo - nnoff, ']; % hypocenter node'
-  write( 9, * ) 'xhypo   = [',  xhypo,         ']; % hypocenter'
-  write( 9, * ) 'xcenter = [',  xcenter,       ']; % mesh center'
-  write( 9, * ) 'rmax    =  ',  rmax,           '; % mesh radius'
+  write( 9, * ) 'nn          = [',  nn,            ']; % # of nodes'
+  write( 9, * ) 'nt          =  ',  nt,             '; % # of time steps'
+  write( 9, * ) 'dx          =  ',  dx,             '; % spatial step length'
+  write( 9, * ) 'dt          =  ',  dt,             '; % time step length'
+  write( 9, * ) 'grid        = ''', grid,         '''; % mesh type'
+  write( 9, * ) 'upvector    = [',  upvector,      ']; % vertical direction'
+  write( 9, * ) 'rho0        =  ',  rho0,           '; % hypocenter density'
+  write( 9, * ) 'rho1        =  ',  rho1,           '; % min density'
+  write( 9, * ) 'rho2        =  ',  rho2,           '; % max density'
+  write( 9, * ) 'vp0         =  ',  vp0,            '; % hypocenter Vp'
+  write( 9, * ) 'vp1         =  ',  vp1,            '; % min Vp'
+  write( 9, * ) 'vp2         =  ',  vp2,            '; % max Vp'
+  write( 9, * ) 'vs0         =  ',  vs0,            '; % hypocenter Vs'
+  write( 9, * ) 'vs1         =  ',  vs1,            '; % min Vs'
+  write( 9, * ) 'vs2         =  ',  vs2,            '; % max Vs'
+  write( 9, * ) 'viscosity   = [',  viscosity,     ']; % stress, hourglass'
+  write( 9, * ) 'npml        =  ',  npml,           '; % # of PML nodes'
+  write( 9, * ) 'bc1         = [',  bc1,           ']; % j1 k1 l1 boundary cond'
+  write( 9, * ) 'bc2         = [',  bc2,           ']; % j2 k2 l2 boundary cond'
+  write( 9, * ) 'ihypo       = [',  ihypo - nnoff, ']; % hypocenter node'
+  write( 9, * ) 'xhypo       = [',  xhypo,         ']; % hypocenter'
+  write( 9, * ) 'rexpand     =  ',  rexpand,        '; % grid expansion ratio'
+  write( 9, * ) 'i1expand    = [',  i1expand,      ']; % uniform start index'
+  write( 9, * ) 'i2expand    = [',  i2expand,      ']; % uniform end index'
+  write( 9, * ) 'rfunc       = ''', rfunc,        '''; % source space function'
+  write( 9, * ) 'tfunc       = ''', tfunc,        '''; % source time function'
+  write( 9, * ) 'tsource     =  ',  tsource,        '; % dominant period'
+  write( 9, * ) 'rsource     =  ',  rsource,        '; % souce size'
+  write( 9, * ) 'moment1     = [',  moment1,       ']; % normal components'
+  write( 9, * ) 'moment2     = [',  moment2,       ']; % shear components'
+  write( 9, * ) 'faultnormal =  ',  faultnormal,    '; % fault normal direction'
+  write( 9, * ) 'vrup        =  ',  vrup,           '; % nucl rupture velocity'
+  write( 9, * ) 'rcrit       =  ',  rcrit,          '; % nucl critical radius'
+  write( 9, * ) 'trelax      =  ',  trelax,         '; % nucl relaxation time'
+  write( 9, * ) 'svtol       =  ',  svtol,          '; % vslip for rupture'
+
+  write( 9, * ) 'np          = [',  np,            ']; % # of processors'
+  write( 9, * ) 'itcheck     =  ',  itcheck,        '; % checkpoint interval'
+  write( 9, * ) 'courant     =  ',  courant,        '; % stability condition'
+  write( 9, * ) 'rmax        =  ',  rmax,           '; % mesh radius'
+  write( 9, * ) 'xcenter     = [',  xcenter,       ']; % mesh center'
+  write( 9, * ) 'endian      = ''', endian,       '''; % byte order'
+
+  write( 9, * ) 'out         = {',  nout,           '; % # of output zones'
+
   close( 9 )
 
-  ! Diagnostic
-  open(  9, file='diagnostic.m', status='replace' )
-  write( 9, * ) 'grid      = ''', grid,   ''';'
-  write( 9, * ) 'rfunc     = ''', rfunc,  ''';'
-  write( 9, * ) 'tfunc     = ''', tfunc,  ''';'
-  write( 9, * ) 'dt        =  ', dt,        ';'
-  write( 9, * ) 'dx        =  ', dx,        ';'
-  write( 9, * ) 'tsource   =  ', tsource,   ';'
-  write( 9, * ) 'rsource   =  ', rsource,   ';'
-  write( 9, * ) 'rexpand   =  ', rexpand,   ';'
-  write( 9, * ) 'vrup      =  ', vrup,      ';'
-  write( 9, * ) 'rcrit     =  ', rcrit,     ';'
-  write( 9, * ) 'trelax    =  ', trelax,    ';'
-  write( 9, * ) 'svtol     =  ', svtol,     ';'
-  write( 9, * ) 'viscosity = [', viscosity,'];'
-  write( 9, * ) 'moment1   = [', moment1,  '];'
-  write( 9, * ) 'moment2   = [', moment2,  '];'
-  write( 9, * ) 'xcenter   = [', xcenter,  '];'
-  write( 9, * ) 'nt        =  ', nt,        ';'
-  write( 9, * ) 'itcheck   =  ', itcheck,   ';'
-  write( 9, * ) 'npml      =  ', npml,      ';'
-  write( 9, * ) 'ifn       =  ', ifn,       ';'
-  write( 9, * ) 'noper     =  ', noper,     ';'
-  write( 9, * ) 'oper      =  ', oper,     ';'
-  write( 9, * ) 'i1oper    = [', i1oper,   '];'
-  write( 9, * ) 'i2oper    = [', i2oper,   '];'
-  write( 9, * ) 'nin       =  ', nin,      ';'
-  write( 9, * ) 'nlock     =  ', nlock,     ';'
-  write( 9, * ) 'nout      =  ', nout,      ';'
-  write( 9, * ) 'nn        = [', nn,       '];'
-  write( 9, * ) 'nm        = [', nm,       '];'
-  write( 9, * ) 'np        = [', np,       '];'
-  write( 9, * ) 'ip3       = [', ip3,      '];'
-  write( 9, * ) 'bc1       = [', bc1,      '];'
-  write( 9, * ) 'bc2       = [', bc2,      '];'
-  write( 9, * ) 'nnoff     = [', nnoff,    '];'
-  write( 9, * ) 'i1expand  = [', i1expand, '];'
-  write( 9, * ) 'i2expand  = [', i2expand, '];'
-  write( 9, * ) 'i1node    = [', i1node,   '];'
-  write( 9, * ) 'i2node    = [', i2node,   '];'
-  write( 9, * ) 'i1cell    = [', i1cell,   '];'
-  write( 9, * ) 'i2cell    = [', i2cell,   '];'
-  write( 9, * ) 'i1pml     = [', i1pml,    '];'
-  write( 9, * ) 'i2pml     = [', i2pml,    '];'
-  write( 9, * ) 'master    =  ', master,    ';'
-  write( 9, * ) 'edge1     = [', edge1,    '];'
-  write( 9, * ) 'edge2     = [', edge2,    '];'
-  close( 9 )
-
-end if ifit0
+end if ifmaster
 
 doiz0: do iz = 1, nout
 
@@ -154,13 +153,13 @@ doiz0: do iz = 1, nout
   ! Metadata
   if ( master ) then
     write( str, '(i2.2,a)' ) iz, '/meta.m'
-    open(  9, file=str, status='replace' )
-    write( 9, * ) 'field = ''', trim( fieldout(iz) ), '''; % variable name'
-    write( 9, * ) 'nc    =  ',  nc,                     '; % # of components'
-    write( 9, * ) 'dit   =  ',  ditout(iz),             '; % interval'
-    write( 9, * ) 'i1    = [',  i1 - nnoff,            ']; % start index'
-    write( 9, * ) 'i2    = [',  i2 - nnoff,            ']; % end index'
-    close( 9 )
+    open(  8, file=str, status='replace' )
+    write( 8, * ) 'field = ''', trim( fieldout(iz) ), '''; % variable name'
+    write( 8, * ) 'nc    =  ',  nc,                     '; % # of components'
+    write( 8, * ) 'dit   =  ',  ditout(iz),             '; % interval'
+    write( 8, * ) 'i1    = [',  i1 - nnoff,            ']; % start index'
+    write( 8, * ) 'i2    = [',  i2 - nnoff,            ']; % end index'
+    close( 8 )
   end if
  
   ! Split collective i/o
