@@ -26,6 +26,8 @@ srcdir=$( /bin/pwd )
 rundir=$( /bin/pwd )/out/$( date +%Y-%m-%d-%H-%M-%S )
 [ -e out ] || mkdir out
 [ -e $rundir ] || mkdir $rundir
+rm -f current
+ln -s $rundir current
 
 # Symlink input file specified on command line
 [ -n "$1" ] && ln -sf "$1" 'in.m'

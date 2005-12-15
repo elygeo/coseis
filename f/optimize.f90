@@ -32,7 +32,6 @@ w1 = 0.
 w1(:,k1:k2,:,:) = abs( x(:,k1+1:k2+1,:,:) - x(:,k1:k2,:,:) )
 test = test + sum( abs( w1(:,k1:k2,:,2) - dx ) )
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-  w1(j,k,l,:) = abs( x(j,k+1,l,:) - x(j,k,l,:) )
   s1(j,k,l) = s1(j,k,l) + &
     w1(j,k,l,3) + w1(j+1,k,l+1,3) + w1(j+1,k,l,3) + w1(j,k,l+1,3) + &
     w1(j,k,l,1) + w1(j+1,k,l+1,1) + w1(j+1,k,l,1) + w1(j,k,l+1,1)
@@ -60,11 +59,6 @@ if ( test < tol ) return
 ! For rectangular grid:
 ! dx/dy = dx/dz = dy/dz = dy/dx = dz/dx = dz/dy = 0
 ! Find minimal bounding region of the non-rectangular cells
-i1 = i1cell
-i2 = i2cell
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
 do i = j1, j2;     i1(1) = i; if ( any( s1(i,:,:) > tol ) ) exit; end do
 do i = j2, j1, -1; i2(1) = i; if ( any( s1(i,:,:) > tol ) ) exit; end do
 do i = k1, k2;     i1(2) = i; if ( any( s1(:,i,:) > tol ) ) exit; end do

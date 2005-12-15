@@ -13,6 +13,7 @@ integer :: amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3), &
   i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, iz, twall_rate, twall1, twall2
 logical :: fault, static, cell, test, init = .true.
 character, intent(in) :: pass
+character(2) :: dig
 character :: onpass, endian
 
 ifinit: if ( init ) then !-----------------------------------------------------!
@@ -28,26 +29,26 @@ ifmaster: if ( master ) then
  
   ! Diagnostic
   open(  9, file='diagnostic.m', status='replace' )
-  write( 9, * ) 'ifn         =  ',  ifn,            ';'
-  write( 9, * ) 'nin         =  ',  nin,            ';'
-  write( 9, * ) 'nout        =  ',  nout,           ';'
-  write( 9, * ) 'nlock       =  ',  nlock,          ';'
-  write( 9, * ) 'noper       =  ',  noper,          ';'
-  write( 9, * ) 'master      =  ',  master,         ';'
-  write( 9, * ) 'nm          = [',  nm,            '];'
-  write( 9, * ) 'ip3         = [',  ip3,           '];'
-  write( 9, * ) 'nnoff       = [',  nnoff,         '];'
-  write( 9, * ) 'i1node      = [',  i1node,        '];'
-  write( 9, * ) 'i2node      = [',  i2node,        '];'
-  write( 9, * ) 'i1cell      = [',  i1cell,        '];'
-  write( 9, * ) 'i2cell      = [',  i2cell,        '];'
-  write( 9, * ) 'i1pml       = [',  i1pml,         '];'
-  write( 9, * ) 'i2pml       = [',  i2pml,         '];'
-  write( 9, * ) 'edge1       = [',  edge1,         '];'
-  write( 9, * ) 'edge2       = [',  edge2,         '];'
-  write( 9, * ) 'i1oper      = [',  i1oper,        '];'
-  write( 9, * ) 'i2oper      = [',  i2oper,        '];'
-  write( 9, * ) 'oper        =  ',  oper,           ';'
+  write( 9, * ) 'ifn         =  ', ifn,   ';'
+  write( 9, * ) 'nin         =  ', nin,   ';'
+  write( 9, * ) 'nout        =  ', nout,  ';'
+  write( 9, * ) 'nlock       =  ', nlock, ';'
+  write( 9, * ) 'noper       =  ', noper, ';'
+  write( 9, * ) 'nm          = [', nm,     '];'
+  write( 9, * ) 'ip3         = [', ip3,    '];'
+  write( 9, * ) 'nnoff       = [', nnoff,  '];'
+  write( 9, * ) 'i1node      = [', i1node, '];'
+  write( 9, * ) 'i2node      = [', i2node, '];'
+  write( 9, * ) 'i1cell      = [', i1cell, '];'
+  write( 9, * ) 'i2cell      = [', i2cell, '];'
+  write( 9, * ) 'i1pml       = [', i1pml,  '];'
+  write( 9, * ) 'i2pml       = [', i2pml,  '];'
+  write( 9, * ) 'i1oper      = [', i1oper, '];'
+  write( 9, * ) 'i2oper      = [', i2oper, '];'
+  write( 9, * ) 'edge1       = [', edge1,  '];'
+  write( 9, * ) 'edge2       = [', edge2,  '];'
+  write( 9, * ) 'master      =  ', master,  ';'
+  write( 9, * ) 'oper        = ''', oper, ''';'
   close( 9 )
 
   ! Metadata
@@ -55,53 +56,47 @@ ifmaster: if ( master ) then
   if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
   courant = dt * vp2 * sqrt( 3. ) / abs( dx )
   open(  9, file='meta.m', status='replace' )
-  write( 9, * ) 'nn          = [',  nn,            ']; % # of nodes'
-  write( 9, * ) 'nt          =  ',  nt,             '; % # of time steps'
-  write( 9, * ) 'dx          =  ',  dx,             '; % spatial step length'
-  write( 9, * ) 'dt          =  ',  dt,             '; % time step length'
-  write( 9, * ) 'grid        = ''', grid,         '''; % mesh type'
-  write( 9, * ) 'upvector    = [',  upvector,      ']; % vertical direction'
-  write( 9, * ) 'rho0        =  ',  rho0,           '; % hypocenter density'
-  write( 9, * ) 'rho1        =  ',  rho1,           '; % min density'
-  write( 9, * ) 'rho2        =  ',  rho2,           '; % max density'
-  write( 9, * ) 'vp0         =  ',  vp0,            '; % hypocenter Vp'
-  write( 9, * ) 'vp1         =  ',  vp1,            '; % min Vp'
-  write( 9, * ) 'vp2         =  ',  vp2,            '; % max Vp'
-  write( 9, * ) 'vs0         =  ',  vs0,            '; % hypocenter Vs'
-  write( 9, * ) 'vs1         =  ',  vs1,            '; % min Vs'
-  write( 9, * ) 'vs2         =  ',  vs2,            '; % max Vs'
-  write( 9, * ) 'viscosity   = [',  viscosity,     ']; % stress, hourglass'
-  write( 9, * ) 'npml        =  ',  npml,           '; % # of PML nodes'
-  write( 9, * ) 'bc1         = [',  bc1,           ']; % j1 k1 l1 boundary cond'
-  write( 9, * ) 'bc2         = [',  bc2,           ']; % j2 k2 l2 boundary cond'
-  write( 9, * ) 'ihypo       = [',  ihypo - nnoff, ']; % hypocenter node'
-  write( 9, * ) 'xhypo       = [',  xhypo,         ']; % hypocenter'
-  write( 9, * ) 'rexpand     =  ',  rexpand,        '; % grid expansion ratio'
-  write( 9, * ) 'i1expand    = [',  i1expand,      ']; % uniform start index'
-  write( 9, * ) 'i2expand    = [',  i2expand,      ']; % uniform end index'
-  write( 9, * ) 'rfunc       = ''', rfunc,        '''; % source space function'
-  write( 9, * ) 'tfunc       = ''', tfunc,        '''; % source time function'
-  write( 9, * ) 'tsource     =  ',  tsource,        '; % dominant period'
-  write( 9, * ) 'rsource     =  ',  rsource,        '; % souce size'
-  write( 9, * ) 'moment1     = [',  moment1,       ']; % normal components'
-  write( 9, * ) 'moment2     = [',  moment2,       ']; % shear components'
-  write( 9, * ) 'faultnormal =  ',  faultnormal,    '; % fault normal direction'
-  write( 9, * ) 'vrup        =  ',  vrup,           '; % nucl rupture velocity'
-  write( 9, * ) 'rcrit       =  ',  rcrit,          '; % nucl critical radius'
-  write( 9, * ) 'trelax      =  ',  trelax,         '; % nucl relaxation time'
-  write( 9, * ) 'svtol       =  ',  svtol,          '; % vslip for rupture'
-
-  write( 9, * ) 'np          = [',  np,            ']; % # of processors'
-  write( 9, * ) 'itcheck     =  ',  itcheck,        '; % checkpoint interval'
-  write( 9, * ) 'courant     =  ',  courant,        '; % stability condition'
-  write( 9, * ) 'rmax        =  ',  rmax,           '; % mesh radius'
-  write( 9, * ) 'xcenter     = [',  xcenter,       ']; % mesh center'
-  write( 9, * ) 'endian      = ''', endian,       '''; % byte order'
-
-  write( 9, * ) 'out         = {',  nout,           '; % # of output zones'
-
-  close( 9 )
-
+  write( 9, * ) 'dx           =  ', dx,      ';'
+  write( 9, * ) 'rsource      =  ', rsource, ';'
+  write( 9, * ) 'rcrit        =  ', rcrit,   ';'
+  write( 9, * ) 'rmax         =  ', rmax,    ';'
+  write( 9, * ) 'dt           =  ', dt,      ';'
+  write( 9, * ) 'tsource      =  ', tsource, ';'
+  write( 9, * ) 'trelax       =  ', trelax,  ';'
+  write( 9, * ) 'rho0         =  ', rho0,    ';'
+  write( 9, * ) 'rho1         =  ', rho1,    ';'
+  write( 9, * ) 'rho2         =  ', rho2,    ';'
+  write( 9, * ) 'vp0          =  ', vp0,     ';'
+  write( 9, * ) 'vp1          =  ', vp1,     ';'
+  write( 9, * ) 'vp2          =  ', vp2,     ';'
+  write( 9, * ) 'vs0          =  ', vs0,     ';'
+  write( 9, * ) 'vs1          =  ', vs1,     ';'
+  write( 9, * ) 'vs2          =  ', vs2,     ';'
+  write( 9, * ) 'vrup         =  ', vrup,    ';'
+  write( 9, * ) 'svtol        =  ', svtol,   ';'
+  write( 9, * ) 'rexpand      =  ', rexpand, ';'
+  write( 9, * ) 'courant      =  ', courant, ';'
+  write( 9, * ) 'viscosity    = [', viscosity, '];'
+  write( 9, * ) 'upvector     = [', upvector,  '];'
+  write( 9, * ) 'xcenter      = [', xcenter,   '];'
+  write( 9, * ) 'xhypo        = [', xhypo,     '];'
+  write( 9, * ) 'moment1      = [', moment1,   '];'
+  write( 9, * ) 'moment2      = [', moment2,   '];'
+  write( 9, * ) 'nt           =  ', nt,          ';'
+  write( 9, * ) 'itcheck      =  ', itcheck,     ';'
+  write( 9, * ) 'npml         =  ', npml,        ';'
+  write( 9, * ) 'faultnormal  =  ', faultnormal, ';'
+  write( 9, * ) 'nn           = [', nn,            '];'
+  write( 9, * ) 'ihypo        = [', ihypo - nnoff, '];'
+  write( 9, * ) 'i1expand     = [', i1expand,      '];'
+  write( 9, * ) 'i2expand     = [', i2expand,      '];'
+  write( 9, * ) 'bc1          = [', bc1,           '];'
+  write( 9, * ) 'bc2          = [', bc2,           '];'
+  write( 9, * ) 'np           = [', np,            '];'
+  write( 9, * ) 'grid         = ''', trim( grid ),  ''';'
+  write( 9, * ) 'rfunc        = ''', trim( rfunc ), ''';'
+  write( 9, * ) 'tfunc        = ''', trim( tfunc ), ''';'
+  write( 9, * ) 'endian       = ''', endian, ''';'
 end if ifmaster
 
 doiz0: do iz = 1, nout
@@ -152,13 +147,18 @@ doiz0: do iz = 1, nout
  
   ! Metadata
   if ( master ) then
+    write( dig, '(i2)' ) iz
+    write( 9, * ) 'fieldout(', dig, ') = ''', trim( fieldout(iz) ), ''';'
+    write( 9, * ) 'ditout(', dig, ')   =  ', ditout(iz), ';'
+    write( 9, * ) 'i1out(', dig, ',:)  = [', i1 - nnoff, '];'
+    write( 9, * ) 'i2out(', dig, ',:)  = [', i2 - nnoff, '];'
     write( str, '(i2.2,a)' ) iz, '/meta.m'
     open(  8, file=str, status='replace' )
-    write( 8, * ) 'field = ''', trim( fieldout(iz) ), '''; % variable name'
-    write( 8, * ) 'nc    =  ',  nc,                     '; % # of components'
-    write( 8, * ) 'dit   =  ',  ditout(iz),             '; % interval'
-    write( 8, * ) 'i1    = [',  i1 - nnoff,            ']; % start index'
-    write( 8, * ) 'i2    = [',  i2 - nnoff,            ']; % end index'
+    write( 8, * ) 'field = ''', trim( fieldout(iz) ), ''';'
+    write( 8, * ) 'nc = ', nc, ';'
+    write( 8, * ) 'dit = ', ditout(iz), ';'
+    write( 8, * ) 'i1 = [', i1 - nnoff, '];'
+    write( 8, * ) 'i2 = [', i2 - nnoff, '];'
     close( 8 )
   end if
  
@@ -172,6 +172,7 @@ end do doiz0
 
 ! Column names
 if ( master ) then
+  close( 9 )
   print *,'       Step  Amax           Vmax           Umax            Wall Time'
   call system_clock( count_rate=twall_rate )
   call system_clock( twall2 )
@@ -315,25 +316,25 @@ if ( master ) then
   dtwall = real( twall2 - twall1 ) / real( twall_rate )
   print *, it, amax, vmax, umax, dtwall
   open(  9, file='currentstep.m', status='replace' )
-  write( 9, * ) 'it =  ', it, '; % time-step'
+  write( 9, * ) 'it =  ', it, ';'
   close( 9 )
   write( str, '(a,i6.6,a)' ) 'stats/st', it, '.m'
   open(  9, file=str, status='replace' )
-  write( 9, * ) 't      =  ', t,               '; % time'
-  write( 9, * ) 'dt     =  ', dt,              '; % timestep size'
-  write( 9, * ) 'dtwall =  ', dtwall,          '; % wall time per step'
-  write( 9, * ) 'amax   =  ', amax,            '; % max acceleration'
-  write( 9, * ) 'vmax   =  ', vmax,            '; % max velocity'
-  write( 9, * ) 'umax   =  ', umax,            '; % max displacement'
-  write( 9, * ) 'wmax   =  ', wmax,            '; % max stress Frobenius nrm'
-  write( 9, * ) 'svmax  =  ', svmax,           '; % max slip velocity'
-  write( 9, * ) 'slmax  =  ', slmax,           '; % max slip path length'
-  write( 9, * ) 'amaxi  = [', amaxi - nnoff,  ']; % max acceleration loc'
-  write( 9, * ) 'vmaxi  = [', vmaxi - nnoff,  ']; % max velocity loc'
-  write( 9, * ) 'umaxi  = [', umaxi - nnoff,  ']; % max displacement loc'
-  write( 9, * ) 'wmaxi  = [', wmaxi - nnoff,  ']; % max stress loc'
-  write( 9, * ) 'svmaxi = [', svmaxi - nnoff, ']; % max slip velocity loc'
-  write( 9, * ) 'slmaxi = [', slmaxi - nnoff, ']; % max slip path loc'
+  write( 9, * ) 't      = ', t, ';'
+  write( 9, * ) 'dt     = ', dt, ';'
+  write( 9, * ) 'dtwall = ', dtwall, ';'
+  write( 9, * ) 'amax   = ', amax, ';'
+  write( 9, * ) 'vmax   = ', vmax, ';'
+  write( 9, * ) 'umax   = ', umax, ';'
+  write( 9, * ) 'wmax   = ', wmax, ';'
+  write( 9, * ) 'svmax  = ', svmax, ';'
+  write( 9, * ) 'slmax  = ', slmax, ';'
+  write( 9, * ) 'amaxi  = [', amaxi - nnoff, '];'
+  write( 9, * ) 'vmaxi  = [', vmaxi - nnoff, '];'
+  write( 9, * ) 'umaxi  = [', umaxi - nnoff, '];'
+  write( 9, * ) 'wmaxi  = [', wmaxi - nnoff, '];'
+  write( 9, * ) 'svmaxi = [', svmaxi - nnoff, '];'
+  write( 9, * ) 'slmaxi = [', slmaxi - nnoff, '];'
   close( 9 )
   if ( ifn /= 0 .and. it == nt - 1 ) then
     i1 = maxloc( tarr )
@@ -348,9 +349,9 @@ if ( master ) then
     k = i2(2)
     l = i2(3)
     open(  9, file='arrest.m', status='replace' )
-    write( 9, * ) 'tarrmaxi = [', i1 - nnoff, ']; % location of last slip'
-    write( 9, * ) 'tarrmax  =  ', tarrmax,     '; % fault arrest time'
-    write( 9, * ) 'tarrhypo =  ', tarr(j,k,l), '; % hypocenter arrest time'
+    write( 9, * ) 'tarrmaxi = [', i1 - nnoff, '];'
+    write( 9, * ) 'tarrmax  = ', tarrmax, ';'
+    write( 9, * ) 'tarrhypo = ', tarr(j,k,l), ';'
     close( 9 )
   end if
 end if

@@ -11,6 +11,7 @@ real :: theta, scl
 integer :: i1(3), i2(3), i1l(3), i2l(3), n(3), noff(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, up(1)
 real :: x1(3), x2(3), lj, lk, ll
+logical :: expand
 
 if ( master ) print '(a)', 'Grid generation'
 
@@ -63,6 +64,7 @@ if ( rexpand > 1. ) then
   i1 = i1expand
   i2 = i2expand
   call zone( i1, i2, n, noff, ihypo, 0 )
+  if ( any( i1l < i1 ) .or. any( i2 < i2l ) ) expand = .true.
   do j = i1l(1), min( i2l(1), i1(1) - 1 )
     i = i1(1) - j
     x(j,:,:,1) = x(j,1,1,1) + &
@@ -101,6 +103,7 @@ case( 'read' )
   oper = 'o'
 case( 'constant' )
   oper = 'h'
+  if ( expand ) oper = 'r'
 case( 'stretch' )
   oper = 'r'
   x(:,:,:,l) = 2. * x(:,:,:,l)
@@ -153,8 +156,8 @@ end select
 
 ! Assign fast operators to rectangular mesh portions
 noper = 1
-i1oper(1,:) = i1
-i2oper(1,:) = i2
+i1oper(1,:) = i1cell
+i2oper(1,:) = i2cell + 1
 if ( oper(1) == 'o' ) call optimize
 
 ! Hypocenter location
