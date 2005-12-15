@@ -18,10 +18,8 @@ end
 
 % Metadata
 rehash
-defaults
-in
-currentstep
 meta
+currentstep
 
 % Slice
 i = [ ihypo 1 ];
@@ -43,11 +41,14 @@ i2s(m4) = i2s(m4) + n(m4) + 1;
 % Look for file with desired data
 n = i2s - i1s + 1;
 found = 0;
+nout = size( out, 1 );
 for iz = 1:nout
-  file = sprintf( '%02d', iz );
-  cd( file )
-  meta
-  test = [ 
+  nc    = out{iz,1};
+  field = out{iz,2};
+  dit   = out{iz,3};
+  i1    = out{iz,4:6};
+  i2    = out{iz,7:9};
+  test  = [ 
     strcmp( fieldin, field )
     all( i1s >= [ i1 1  ] )
     all( i2s <= [ i2 it ] )
@@ -55,7 +56,6 @@ for iz = 1:nout
   ]';
   found = all( test );
   if found, break, end
-  cd '..'
 end
 if found
   msg = '';
@@ -66,6 +66,8 @@ else
 end
 
 % Read data
+file = sprintf( '%02d', iz );
+cd( file )
 if ic == 0
   ic = 1:nc;
 end

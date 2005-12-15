@@ -13,7 +13,7 @@ integer :: amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3), &
   i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, iz, twall_rate, twall1, twall2
 logical :: fault, static, cell, test, init = .true.
 character, intent(in) :: pass
-character(2) :: dig
+character(7) :: field
 character :: onpass, endian
 
 ifinit: if ( init ) then !-----------------------------------------------------!
@@ -56,47 +56,47 @@ ifmaster: if ( master ) then
   if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
   courant = dt * vp2 * sqrt( 3. ) / abs( dx )
   open(  9, file='meta.m', status='replace' )
-  write( 9, * ) 'dx           =  ', dx,      ';'
-  write( 9, * ) 'rsource      =  ', rsource, ';'
-  write( 9, * ) 'rcrit        =  ', rcrit,   ';'
-  write( 9, * ) 'rmax         =  ', rmax,    ';'
-  write( 9, * ) 'dt           =  ', dt,      ';'
-  write( 9, * ) 'tsource      =  ', tsource, ';'
-  write( 9, * ) 'trelax       =  ', trelax,  ';'
-  write( 9, * ) 'rho0         =  ', rho0,    ';'
-  write( 9, * ) 'rho1         =  ', rho1,    ';'
-  write( 9, * ) 'rho2         =  ', rho2,    ';'
-  write( 9, * ) 'vp0          =  ', vp0,     ';'
-  write( 9, * ) 'vp1          =  ', vp1,     ';'
-  write( 9, * ) 'vp2          =  ', vp2,     ';'
-  write( 9, * ) 'vs0          =  ', vs0,     ';'
-  write( 9, * ) 'vs1          =  ', vs1,     ';'
-  write( 9, * ) 'vs2          =  ', vs2,     ';'
-  write( 9, * ) 'vrup         =  ', vrup,    ';'
-  write( 9, * ) 'svtol        =  ', svtol,   ';'
-  write( 9, * ) 'rexpand      =  ', rexpand, ';'
-  write( 9, * ) 'courant      =  ', courant, ';'
-  write( 9, * ) 'viscosity    = [', viscosity, '];'
-  write( 9, * ) 'upvector     = [', upvector,  '];'
-  write( 9, * ) 'xcenter      = [', xcenter,   '];'
-  write( 9, * ) 'xhypo        = [', xhypo,     '];'
-  write( 9, * ) 'moment1      = [', moment1,   '];'
-  write( 9, * ) 'moment2      = [', moment2,   '];'
-  write( 9, * ) 'nt           =  ', nt,          ';'
-  write( 9, * ) 'itcheck      =  ', itcheck,     ';'
-  write( 9, * ) 'npml         =  ', npml,        ';'
-  write( 9, * ) 'faultnormal  =  ', faultnormal, ';'
-  write( 9, * ) 'nn           = [', nn,            '];'
-  write( 9, * ) 'ihypo        = [', ihypo - nnoff, '];'
-  write( 9, * ) 'i1expand     = [', i1expand,      '];'
-  write( 9, * ) 'i2expand     = [', i2expand,      '];'
-  write( 9, * ) 'bc1          = [', bc1,           '];'
-  write( 9, * ) 'bc2          = [', bc2,           '];'
-  write( 9, * ) 'np           = [', np,            '];'
-  write( 9, * ) 'grid         = ''', trim( grid ),  ''';'
-  write( 9, * ) 'rfunc        = ''', trim( rfunc ), ''';'
-  write( 9, * ) 'tfunc        = ''', trim( tfunc ), ''';'
-  write( 9, * ) 'endian       = ''', endian, ''';'
+  write( 9, * ) 'dx          =  ', dx,      ';'
+  write( 9, * ) 'rsource     =  ', rsource, ';'
+  write( 9, * ) 'rcrit       =  ', rcrit,   ';'
+  write( 9, * ) 'rmax        =  ', rmax,    ';'
+  write( 9, * ) 'dt          =  ', dt,      ';'
+  write( 9, * ) 'tsource     =  ', tsource, ';'
+  write( 9, * ) 'trelax      =  ', trelax,  ';'
+  write( 9, * ) 'rho0        =  ', rho0,    ';'
+  write( 9, * ) 'rho1        =  ', rho1,    ';'
+  write( 9, * ) 'rho2        =  ', rho2,    ';'
+  write( 9, * ) 'vp0         =  ', vp0,     ';'
+  write( 9, * ) 'vp1         =  ', vp1,     ';'
+  write( 9, * ) 'vp2         =  ', vp2,     ';'
+  write( 9, * ) 'vs0         =  ', vs0,     ';'
+  write( 9, * ) 'vs1         =  ', vs1,     ';'
+  write( 9, * ) 'vs2         =  ', vs2,     ';'
+  write( 9, * ) 'vrup        =  ', vrup,    ';'
+  write( 9, * ) 'svtol       =  ', svtol,   ';'
+  write( 9, * ) 'rexpand     =  ', rexpand, ';'
+  write( 9, * ) 'courant     =  ', courant, ';'
+  write( 9, * ) 'viscosity   = [', viscosity, '];'
+  write( 9, * ) 'upvector    = [', upvector,  '];'
+  write( 9, * ) 'xcenter     = [', xcenter,   '];'
+  write( 9, * ) 'xhypo       = [', xhypo,     '];'
+  write( 9, * ) 'moment1     = [', moment1,   '];'
+  write( 9, * ) 'moment2     = [', moment2,   '];'
+  write( 9, * ) 'nt          =  ', nt,          ';'
+  write( 9, * ) 'itcheck     =  ', itcheck,     ';'
+  write( 9, * ) 'npml        =  ', npml,        ';'
+  write( 9, * ) 'faultnormal =  ', faultnormal, ';'
+  write( 9, * ) 'nn          = [', nn,            '];'
+  write( 9, * ) 'ihypo       = [', ihypo - nnoff, '];'
+  write( 9, * ) 'i1expand    = [', i1expand,      '];'
+  write( 9, * ) 'i2expand    = [', i2expand,      '];'
+  write( 9, * ) 'bc1         = [', bc1,           '];'
+  write( 9, * ) 'bc2         = [', bc2,           '];'
+  write( 9, * ) 'np          = [', np,            '];'
+  write( 9, * ) 'grid        = ''', trim( grid ),  ''';'
+  write( 9, * ) 'rfunc       = ''', trim( rfunc ), ''';'
+  write( 9, * ) 'tfunc       = ''', trim( tfunc ), ''';'
+  write( 9, * ) 'endian      = ''', endian, ''';'
 end if ifmaster
 
 doiz0: do iz = 1, nout
@@ -147,19 +147,9 @@ doiz0: do iz = 1, nout
  
   ! Metadata
   if ( master ) then
-    write( dig, '(i2)' ) iz
-    write( 9, * ) 'fieldout(', dig, ') = ''', trim( fieldout(iz) ), ''';'
-    write( 9, * ) 'ditout(', dig, ')   =  ', ditout(iz), ';'
-    write( 9, * ) 'i1out(', dig, ',:)  = [', i1 - nnoff, '];'
-    write( 9, * ) 'i2out(', dig, ',:)  = [', i2 - nnoff, '];'
-    write( str, '(i2.2,a)' ) iz, '/meta.m'
-    open(  8, file=str, status='replace' )
-    write( 8, * ) 'field = ''', trim( fieldout(iz) ), ''';'
-    write( 8, * ) 'nc = ', nc, ';'
-    write( 8, * ) 'dit = ', ditout(iz), ';'
-    write( 8, * ) 'i1 = [', i1 - nnoff, '];'
-    write( 8, * ) 'i2 = [', i2 - nnoff, '];'
-    close( 8 )
+    write( field, * ) '''', trim( fieldout(iz) ), ''''
+    write( 9, '(a,i3,a,i1,a,7i7,a)' ) ' out{', iz, ',:}  = { ', nc, field, &
+      ditout(iz), i1 - nnoff, i2 - nnoff, ' };'
   end if
  
   ! Split collective i/o

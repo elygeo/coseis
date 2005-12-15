@@ -8,11 +8,9 @@ labels = {};
 
 % Read metadata
 rehash
-currentstep
-defaults
-in
 meta
 if faultnormal, faultmeta, end
+currentstep
 
 % Test for special cases
 pointsource = ... 

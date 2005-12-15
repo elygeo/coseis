@@ -146,7 +146,7 @@ integer :: &
 character :: &
   oper(2)         ! spatial derivative operators
 
-character(8) :: &
+character(4) :: &
   fieldin(nz),  & ! input variable
   fieldout(nz)    ! output variable
 
