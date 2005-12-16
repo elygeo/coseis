@@ -41,13 +41,14 @@ i2s(m4) = i2s(m4) + n(m4) + 1;
 % Look for file with desired data
 n = i2s - i1s + 1;
 found = 0;
+msg = '';
 nout = size( out, 1 );
 for iz = 1:nout
-  nc    = out{iz,1};
-  field = out{iz,2};
-  dit   = out{iz,3};
-  i1    = out{iz,4:6};
-  i2    = out{iz,7:9};
+  nc    = out{iz}{1};
+  field = out{iz}{2};
+  dit   = out{iz}{3};
+  i1    = [ out{iz}{4:6} ];
+  i2    = [ out{iz}{7:9} ];
   test  = [ 
     strcmp( fieldin, field )
     all( i1s >= [ i1 1  ] )
@@ -57,9 +58,7 @@ for iz = 1:nout
   found = all( test );
   if found, break, end
 end
-if found
-  msg = '';
-else
+if ~found
   msg = 'No saved data found for this region';
   f = [];
   return

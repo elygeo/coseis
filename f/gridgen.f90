@@ -61,9 +61,8 @@ j = 6 - k - l
 
 ! Grid expansion
 if ( rexpand > 1. ) then
-  i1 = i1expand
-  i2 = i2expand
-  call zone( i1, i2, n, noff, ihypo, 0 )
+  i1 = 1 + noff + n1expand
+  i2 = n + noff - n2expand
   if ( any( i1l < i1 ) .or. any( i2 < i2l ) ) expand = .true.
   do j = i1l(1), min( i2l(1), i1(1) - 1 )
     i = i1(1) - j

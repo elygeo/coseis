@@ -10,7 +10,8 @@ implicit none
 save
 real :: amax, vmax, umax, wmax, svmax, slmax, courant, dtwall, tarrmax
 integer :: amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3), &
-  i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, iz, twall_rate, twall1, twall2
+  i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, iz, &
+  twall_rate, twall_max, twall1, twall2
 logical :: fault, static, cell, test, init = .true.
 character, intent(in) :: pass
 character(7) :: field
@@ -26,29 +27,32 @@ ifmaster: if ( master ) then
   if ( nout > nz ) stop 'too many output zones, make nz bigger'
   inquire( file='timestep', exist=test )
   if ( test .and. it == 1 ) stop 'previous output found'
+  call system_clock( count_rate=twall_rate, count_max=twall_max )
  
   ! Diagnostic
   open(  9, file='diagnostic.m', status='replace' )
-  write( 9, * ) 'ifn         =  ', ifn,   ';'
-  write( 9, * ) 'nin         =  ', nin,   ';'
-  write( 9, * ) 'nout        =  ', nout,  ';'
-  write( 9, * ) 'nlock       =  ', nlock, ';'
-  write( 9, * ) 'noper       =  ', noper, ';'
-  write( 9, * ) 'nm          = [', nm,     '];'
-  write( 9, * ) 'ip3         = [', ip3,    '];'
-  write( 9, * ) 'nnoff       = [', nnoff,  '];'
-  write( 9, * ) 'i1node      = [', i1node, '];'
-  write( 9, * ) 'i2node      = [', i2node, '];'
-  write( 9, * ) 'i1cell      = [', i1cell, '];'
-  write( 9, * ) 'i2cell      = [', i2cell, '];'
-  write( 9, * ) 'i1pml       = [', i1pml,  '];'
-  write( 9, * ) 'i2pml       = [', i2pml,  '];'
-  write( 9, * ) 'i1oper      = [', i1oper, '];'
-  write( 9, * ) 'i2oper      = [', i2oper, '];'
-  write( 9, * ) 'edge1       = [', edge1,  '];'
-  write( 9, * ) 'edge2       = [', edge2,  '];'
-  write( 9, * ) 'master      =  ', master,  ';'
-  write( 9, * ) 'oper        = ''', oper, ''';'
+  write( 9, * ) 'ifn         =  ', ifn,        ';'
+  write( 9, * ) 'nin         =  ', nin,        ';'
+  write( 9, * ) 'nout        =  ', nout,       ';'
+  write( 9, * ) 'nlock       =  ', nlock,      ';'
+  write( 9, * ) 'noper       =  ', noper,      ';'
+  write( 9, * ) 'twall_rate  =  ', twall_rate, ';'
+  write( 9, * ) 'twall_max   =  ', twall_max,  ';'
+  write( 9, * ) 'nm          = [', nm,        '];'
+  write( 9, * ) 'ip3         = [', ip3,       '];'
+  write( 9, * ) 'nnoff       = [', nnoff,     '];'
+  write( 9, * ) 'i1node      = [', i1node,    '];'
+  write( 9, * ) 'i2node      = [', i2node,    '];'
+  write( 9, * ) 'i1cell      = [', i1cell,    '];'
+  write( 9, * ) 'i2cell      = [', i2cell,    '];'
+  write( 9, * ) 'i1pml       = [', i1pml,     '];'
+  write( 9, * ) 'i2pml       = [', i2pml,     '];'
+  write( 9, * ) 'i1oper      = [', i1oper,    '];'
+  write( 9, * ) 'i2oper      = [', i2oper,    '];'
+  write( 9, * ) 'edge1       = [', edge1,     '];'
+  write( 9, * ) 'edge2       = [', edge2,     '];'
+  write( 9, * ) 'master      =  ', master,     ';'
+  write( 9, * ) 'oper        = ''', oper,    ''';'
   close( 9 )
 
   ! Metadata
@@ -88,8 +92,8 @@ ifmaster: if ( master ) then
   write( 9, * ) 'faultnormal =  ', faultnormal, ';'
   write( 9, * ) 'nn          = [', nn,            '];'
   write( 9, * ) 'ihypo       = [', ihypo - nnoff, '];'
-  write( 9, * ) 'i1expand    = [', i1expand,      '];'
-  write( 9, * ) 'i2expand    = [', i2expand,      '];'
+  write( 9, * ) 'n1expand    = [', n1expand,      '];'
+  write( 9, * ) 'n2expand    = [', n2expand,      '];'
   write( 9, * ) 'bc1         = [', bc1,           '];'
   write( 9, * ) 'bc2         = [', bc2,           '];'
   write( 9, * ) 'np          = [', np,            '];'
@@ -148,7 +152,7 @@ doiz0: do iz = 1, nout
   ! Metadata
   if ( master ) then
     write( field, * ) '''', trim( fieldout(iz) ), ''''
-    write( 9, '(a,i3,a,i1,a,7i7,a)' ) ' out{', iz, ',:}  = { ', nc, field, &
+    write( 9, '(a,i3,a,i1,a,7i7,a)' ) ' out{', iz, '}    = { ', nc, field, &
       ditout(iz), i1 - nnoff, i2 - nnoff, ' };'
   end if
  
@@ -164,7 +168,6 @@ end do doiz0
 if ( master ) then
   close( 9 )
   print *,'       Step  Amax           Vmax           Umax            Wall Time'
-  call system_clock( count_rate=twall_rate )
   call system_clock( twall2 )
 end if
 
@@ -304,25 +307,29 @@ if ( master ) then
   twall1 = twall2
   call system_clock( twall2 )
   dtwall = real( twall2 - twall1 ) / real( twall_rate )
+  if ( dtwall < 0. ) &
+    dtwall = real( twall2 - twall1 + twall_max ) / real( twall_rate )
   print *, it, amax, vmax, umax, dtwall
   open(  9, file='currentstep.m', status='replace' )
   write( 9, * ) 'it =  ', it, ';'
   close( 9 )
   write( str, '(a,i6.6,a)' ) 'stats/st', it, '.m'
   open(  9, file=str, status='replace' )
-  write( 9, * ) 't      = ', t, ';'
-  write( 9, * ) 'dt     = ', dt, ';'
+  write( 9, * ) 'twall1 = ', twall1, ';'
+  write( 9, * ) 'twall2 = ', twall2, ';'
+  write( 9, * ) 't      = ', t,      ';'
+  write( 9, * ) 'dt     = ', dt,     ';'
   write( 9, * ) 'dtwall = ', dtwall, ';'
-  write( 9, * ) 'amax   = ', amax, ';'
-  write( 9, * ) 'vmax   = ', vmax, ';'
-  write( 9, * ) 'umax   = ', umax, ';'
-  write( 9, * ) 'wmax   = ', wmax, ';'
-  write( 9, * ) 'svmax  = ', svmax, ';'
-  write( 9, * ) 'slmax  = ', slmax, ';'
-  write( 9, * ) 'amaxi  = [', amaxi - nnoff, '];'
-  write( 9, * ) 'vmaxi  = [', vmaxi - nnoff, '];'
-  write( 9, * ) 'umaxi  = [', umaxi - nnoff, '];'
-  write( 9, * ) 'wmaxi  = [', wmaxi - nnoff, '];'
+  write( 9, * ) 'amax   = ', amax,   ';'
+  write( 9, * ) 'vmax   = ', vmax,   ';'
+  write( 9, * ) 'umax   = ', umax,   ';'
+  write( 9, * ) 'wmax   = ', wmax,   ';'
+  write( 9, * ) 'svmax  = ', svmax,  ';'
+  write( 9, * ) 'slmax  = ', slmax,  ';'
+  write( 9, * ) 'amaxi  = [', amaxi - nnoff,  '];'
+  write( 9, * ) 'vmaxi  = [', vmaxi - nnoff,  '];'
+  write( 9, * ) 'umaxi  = [', umaxi - nnoff,  '];'
+  write( 9, * ) 'wmaxi  = [', wmaxi - nnoff,  '];'
   write( 9, * ) 'svmaxi = [', svmaxi - nnoff, '];'
   write( 9, * ) 'slmaxi = [', slmaxi - nnoff, '];'
   close( 9 )

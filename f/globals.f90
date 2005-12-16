@@ -112,8 +112,8 @@ integer, dimension(3) :: &
   bc2,          & ! boundary conditions for j2 k2 l2
   nnoff,        & ! offset between local and global indices
   ihypo,        & ! hypocenter node
-  i1expand,     & ! grid expantion start index
-  i2expand,     & ! grid expantion end index
+  n1expand,     & ! # grid expantion nodes for j1 k1 l1
+  n2expand,     & ! # grid expantion nodes for j2 k2 l2
   i1node,       & ! node calculations start index
   i2node,       & ! node calculations end index
   i1cell,       & ! cell calculations start index

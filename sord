@@ -55,52 +55,60 @@ np=$(( np3[0] * np3[1] * np3[2] ));
 [ $mode = guess ] && [ $np -eq 1 ] && mode=serial
 [ $mode = guess ] && [ $np -gt 1 ] && mode=parallel
 
-# Identify machine
+# Compilter
 osname=$( uname )
-if   [ "${HOSTNAME:0:2}" = ds ]; then machine=DataStar
-elif [ "${HOSTNAME:0:2}" = tg ]; then machine=TeraGrid
-elif [ "$HOSTNAME" = master ];   then machine=Babieca
-else machine=$osname
-fi
-
-# Defaults
-fc='f95'
 pfc='mpif90'
-oflags='-O'
-gflags='-g'
+for compiler in f95 gfortran pgf90 ifort xlf95_r; do
+  which $compiler &> /dev/null && fc=$compiler
+done
+case $fc in
+xlf90_r)
+  fc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
+  pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
+  gflags='-g -C -qflttrap -qsigtrap -qlanglvl=95pure'
+  oflags='-O5'
+  oflags='-O -qmaxmem=-1'
+  ;;
+ifort)
+  gflags='-g -CB -warn -traceback'
+  oflags='-fast'
+  ;;
+pgf90)
+  gflags='-g'
+  oflags='-fastsse -Mipa=fast'
+  ;;
+gfortran)
+  gflags='-g -W -pedantic -std=f95 -fimplicit-none'
+  oflags="-fdefer-pop -fguess-branch-probability -fcprop-registers -floop-optimize -fif-conversion -fif-conversion2 -ftree-ccp -ftree-dce -ftree-dominator-opts -ftree-dse -ftree-ter -ftree-lrs -ftree-sra -ftree-copyrename -ftree-fre -ftree-ch -fmerge-constants -fomit-frame-pointer -fthread-jumps -fcrossjumping -foptimize-sibling-calls -fcse-follow-jumps -fcse-skip-blocks -fgcse -fgcse-lm -fexpensive-optimizations -fstrength-reduce -frerun-cse-after-loop -frerun-loop-opt -fcaller-saves -fforce-mem -fpeephole2 -fschedule-insns -fschedule-insns2 -fsched-interblock -fsched-spec -fregmove -fstrict-aliasing -fdelete-null-pointer-checks -freorder-blocks -freorder-functions -funit-at-a-time -falign-functions -falign-jumps -falign-loops -falign-labels -ftree-pre -finline-functions -funswitch-loops -fgcse-after-reload"
+  ;;
+f95)
+  gflags='-g'
+  oflags='-O'
+  if [ $osname = SunOS ]; then
+    gflags='-g -w4 -u -C'
+    oflags='-fast'
+  fi
+  ;;
+*)
+  echo "Error: no Fortran 95 compiler found"
+  exit
+esac
+
+# Host
+machine=$HOSTNAME
+if   [ "${machine:0:2}" = ds ]; then machine=datastar
+elif [ "${machine:0:2}" = tg ]; then machine=teragrid
+elif [ "$machine" = master ];   then machine=babieca
+fi
 ppn=1
 rate=250000
-
-# Machine specific
 case $machine in
-  Linux)
-    fc='gfortran'
-    oflags="-fdefer-pop -fguess-branch-probability -fcprop-registers -floop-optimize -fif-conversion -fif-conversion2 -ftree-ccp -ftree-dce -ftree-dominator-opts -ftree-dse -ftree-ter -ftree-lrs -ftree-sra -ftree-copyrename -ftree-fre -ftree-ch -fmerge-constants -fomit-frame-pointer -fthread-jumps -fcrossjumping -foptimize-sibling-calls -fcse-follow-jumps -fcse-skip-blocks -fgcse -fgcse-lm -fexpensive-optimizations -fstrength-reduce -frerun-cse-after-loop -frerun-loop-opt -fcaller-saves -fforce-mem -fpeephole2 -fschedule-insns -fschedule-insns2 -fsched-interblock -fsched-spec -fregmove -fstrict-aliasing -fdelete-null-pointer-checks -freorder-blocks -freorder-functions -funit-at-a-time -falign-functions -falign-jumps -falign-loops -falign-labels -ftree-pre -finline-functions -funswitch-loops -fgcse-after-reload"
-    gflags='-g -W -pedantic -std=f95 -fimplicit-none'
-    ;;
-  SunOS)
-    oflags='-fast'
-    gflags='-g -w4 -u -C'
-    ;;
-  DataStar)
-    fc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
-    pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
-    oflags='-O5'
-    oflags='-O -qmaxmem=-1'
-    gflags='-g -C -qflttrap -qsigtrap -qlanglvl=95pure'
-    ppn=8
-    ;;
-  TeraGrid)
-    fc='ifort'
-    oflags='-fast'
-    gflags='-g -CB -warn -traceback'
-    ppn=2
-    ;;
-  Babieca)
-    fc='pgf90'
-    oflags='-fastsse -Mipa=fast'
-    ppn=2
-    ;;
+  phat)     ;;
+  phim)     ;;
+  altai)    rate=177000 ;;
+  datastar) ppn=8 ;;
+  teragrid) ppn=2 ;;
+  babieca)  ppn=2 ;;
 esac
 [ $mode = matlab ] && rate=$(( rate / 3 ))
 
@@ -108,11 +116,10 @@ esac
 [ $ppn -gt $np ] && ppn=$np
 nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
 
-# RAM usage and Wall time limit
+# RAM and Wall time usage
 floatsize=4
 nvars=21
 ram=$(( nn / np * floatsize * nvars / 1024 / 1024 ))
-rate=$(( rate * 2 / 3 ))
 #wt=$(( nt * nn / np / rate + 1 )) # old bash can only handle 32 bits
 wt=$( echo $nt $nn $np $rate | awk '{ printf "%d", $1 * $2 / $3 / $4 + 1 }' )
 hh=$(( wt / 3600 ))
@@ -122,7 +129,16 @@ ss=$(( wt % 60 ))
 wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
 echo "Machine: $machine"
 echo "RAM usage: at least ${ram}Mb"
-echo "Wall time limit: $wt"
+echo "Wall time: $wt"
+
+# Wall time limit
+rate=$(( rate * 2 / 3 ))
+#wt=$(( nt * nn / np / rate + 1 )) # old bash can only handle 32 bits
+wt=$( echo $nt $nn $np $rate | awk '{ printf "%d", $1 * $2 / $3 / $4 + 1 }' )
+hh=$(( wt / 3600 ))
+mm=$(( wt % 3600 / 60 ))
+ss=$(( wt % 60 ))
+[ $hh -ge 1 ] && ss=0
 
 #------------------------------------------------------------------------------#
 # Compile Fortran
@@ -251,7 +267,7 @@ fi
 
 case $machine in
 
-DataStar) #--------------------------------------#
+datastar) #--------------------------------------#
 
 [ $( pwd | grep -v gpfs ) ] || exit
 
@@ -309,7 +325,7 @@ esac
 
 ;;
 
-TeraGrid) #--------------------------------------#
+teragrid) #--------------------------------------#
 
 # Batch
 cat << END > batchjob
@@ -341,7 +357,7 @@ esac
 
 ;;
 
-Babieca) #--------------------------------------#
+babieca) #--------------------------------------#
 
 # Batch
 cat << END > batchjob

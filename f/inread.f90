@@ -60,8 +60,8 @@ case( 'moment1' );     read( str, * ) key1, moment1
 case( 'moment2' );     read( str, * ) key1, moment2
 case( 'faultnormal' ); read( str, * ) key1, faultnormal
 case( 'rexpand' );     read( str, * ) key1, rexpand
-case( 'i1expand' );    read( str, * ) key1, i1expand
-case( 'i2expand' );    read( str, * ) key1, i2expand
+case( 'n1expand' );    read( str, * ) key1, n1expand
+case( 'n2expand' );    read( str, * ) key1, n2expand
 case( 'ihypo' );       read( str, * ) key1, ihypo
 case( 'vrup' );        read( str, * ) key1, vrup
 case( 'rcrit' );       read( str, * ) key1, rcrit

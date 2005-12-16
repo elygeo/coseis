@@ -27,8 +27,8 @@
   ihypo	 = [ 0 0 0 ];			% 0: mesh center
   xhypo	 = [ -1. -1. -1. ];		% <0: x(ihypo)
   rexpand = 1.06;			% grid expansion ratio
-  i1expand = [  1  1  1 ];		% uniform zone start index
-  i2expand = [ -1 -1 -1 ];		% uniform zone end index
+  n1expand = [ 0 0 0 ];			% # grid expantion nodes for j1 k1 l1
+  n2expand = [ 0 0 0 ];			% # grid expantion nodes for j2 k2 l2
 
 % Moment source parameters
 % rfunc = 'box';			% uniform spatial weighting

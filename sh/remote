@@ -1,12 +1,11 @@
 #!/bin/bash -e
 
 account="ux451302@tg-login.sdsc.edu"
-account="altai.sdsu.edu"
-account="babieca.sdsu.edu"
 account="ux451302@dslogin.sdsc.edu"
 account="moho.sdsu.edu"
 account="phim.ucsd.edu"
-account="localhost.ucsd.edu"
+account="babieca.sdsu.edu"
+account="altai.sdsu.edu"
 
 echo -e "\n$account"
 
@@ -25,8 +24,6 @@ files="
 "
 
 rfiles=$( echo $files | sed 's|\([^ ]\+\)|sord/\1|g' )
-echo $rfiles
-exit
 
 case "$1" in
 get) rsync -avub -e ssh --backup-dir=old $account:"$rfiles" . ;;
