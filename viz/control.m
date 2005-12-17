@@ -54,8 +54,19 @@ case 'quote',      dicursor = [ 0 0 0  10^km ]; cursor
 case 'home', dicursor = 0; icursor(1:3) = ihypo; cursor; msg = 'Hypocenter';
 case 'end',  dicursor = 0; icursor(1:3) = fmaxi; cursor; msg = 'Extreme value';
 case 'return',     render
-case 'space',      icursor(4) = icursor(4) + dit * 10 ^ km; render
 case 'insert',     snap
+case 'space'
+  rehash
+  currentstep
+  istep = dit * 10 ^ km;
+  if icursor(4) + istep <= it
+    icursor(4) = icursor(4) + istep;
+    render
+    while length( msg ) && icursor(4) < it
+      icursor(4) = icursor(4) + 1;
+      render
+    end
+  end
 case 'r'
   anim = 1;
   export = 0;

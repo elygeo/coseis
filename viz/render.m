@@ -56,6 +56,7 @@ colorscale
 set( hmsg,    'String', '' )
 set( htxt(3), 'String', labels( icomp + 2 ) )
 set( htxt(4), 'String', sprintf( '%.3fs', t ) )
+set( htxt(5), 'String', sprintf( '%d', icursor(4) ) )
 
 % Isosurfaces
 if doisosurf
