@@ -56,11 +56,17 @@ np=$(( np3[0] * np3[1] * np3[2] ));
 [ $mode = guess ] && [ $np -gt 1 ] && mode=parallel
 
 # Compilter
-osname=$( uname )
-pfc='mpif90'
-for compiler in f95 gfortran pgf90 ifort xlf95_r; do
-  which $compiler &> /dev/null && fc=$compiler
+IFS=":$IFS"
+for dir in $PATH; do
+for file in xlf95_r ifort pgf90 gfortran f95; do
+  if [ -x $dir/$file ]; then
+    fc=$file
+    break 2
+  fi
 done
+done
+
+pfc='mpif90'
 case $fc in
 xlf90_r)
   fc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
@@ -84,7 +90,7 @@ gfortran)
 f95)
   gflags='-g'
   oflags='-O'
-  if [ $osname = SunOS ]; then
+  if [ $( uname ) = SunOS ]; then
     gflags='-g -w4 -u -C'
     oflags='-fast'
   fi
@@ -162,8 +168,6 @@ common="\\
   fault.f90 \\
   checkpoint.f90 \\
   output.f90 \\
-  pml.f90 \\
-  stress.f90 \\
   acceleration.f90 \\
   locknodes.f90 \\
   timestep.f90 \\

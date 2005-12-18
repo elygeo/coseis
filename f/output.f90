@@ -53,6 +53,12 @@ ifmaster: if ( master ) then
   write( 9, * ) 'edge2       = [', edge2,     '];'
   write( 9, * ) 'master      =  ', master,     ';'
   write( 9, * ) 'oper        = ''', oper,    ''';'
+  do iz = 1, nin
+    write( 9,*) fieldin(iz), ' = [', inval(iz), i1in(iz,:), i2in(iz,:), '];'
+  end do
+  do iz = 1, nlock
+    write( 9,*) 'lock        = [', ilock(iz,:), i1lock(iz,:), i2lock(iz,:), '];'
+  end do
   close( 9 )
 
   ! Metadata
