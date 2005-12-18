@@ -35,15 +35,16 @@ do
 end do
 
 ! Read tokens
-read( str, * ) key1, key2
+print *, str
+read( str, * ) key1
 inzone = .false.
 
 ! Select input key
 select case( key1 )
 case( 'return' );      exit doline
-case( 'grid' );        grid  = key2
-case( 'rfunc' );       rfunc = key2
-case( 'tfunc' );       tfunc = key2
+case( 'grid' );        read( str, * ) key1, grid
+case( 'rfunc' );       read( str, * ) key1, rfunc
+case( 'tfunc' );       read( str, * ) key1, tfunc
 case( 'nn' );          read( str, * ) key1, nn
 case( 'nt' );          read( str, * ) key1, nt
 case( 'dx' );          read( str, * ) key1, dx
@@ -100,6 +101,7 @@ end select
 if ( inzone ) then
   nin = nin + 1
   i = nin
+  read( str, * ) key1, key2
   if ( key2 == 'read' ) then
     readfile(nin) = .true.
     i1in(i,:) = 1

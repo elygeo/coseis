@@ -168,6 +168,8 @@ common="\\
   fault.f90 \\
   checkpoint.f90 \\
   output.f90 \\
+  pml.f90 \\
+  stress.f90 \\
   acceleration.f90 \\
   locknodes.f90 \\
   timestep.f90 \\
