@@ -3,9 +3,9 @@
 if ~flim, return, end
 clear xga vga
 minmag = glyphcut * flim;
-n  = size( f );
+n  = size( v );
 ng = prod( n(1:3) );
-ii = find( f(:,:,:,1) >= minmag );
+ii = find( v(:,:,:,1) >= minmag );
 
 if cellfocus
   j = 1:n(1)-1;
@@ -20,12 +20,12 @@ else
   x1 = x;
 end
 
-for i = 0:2
-  xga(:,i) = x1(ii+i*ng);
+for i = 1:3
+  xga(:,i) = x1(ii+(i-1)*ng);
 end
-mga = f(ii);
+mga = s(ii);
 for i = 1:n(4)-1
-  vga(:,i) = f(ii+i*ng);
+  vga(:,i) = v(ii+i*ng);
 end
 
 clear ii x1

@@ -35,7 +35,6 @@ do
 end do
 
 ! Read tokens
-print *, str
 read( str, * ) key1
 inzone = .false.
 

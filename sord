@@ -45,6 +45,7 @@ case "$key" in
   nn)  nn3=( $1 $2 $3 ) ;;
   np)  np3=( $1 $2 $3 ) ;;
   out) nout=$(( nout + 1 )) ;;
+  return) break
 esac
 done < tmp
 
@@ -68,7 +69,7 @@ done
 
 pfc='mpif90'
 case $fc in
-xlf90_r)
+xlf95_r)
   fc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
   pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
   gflags='-g -C -qflttrap -qsigtrap -qlanglvl=95pure'
@@ -275,7 +276,7 @@ case $machine in
 
 datastar) #--------------------------------------#
 
-[ $( pwd | grep -v gpfs ) ] || exit
+if [ $( pwd | grep -v gpfs ) ] || exit
 
 # Batch
 opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
@@ -319,7 +320,10 @@ END
 chmod u+x batchjob
 
 # Interactive
-[ $HOSTNAME = ds100 ] || exit
+if [ "$run" -a $HOSTNAME != ds100 ]; then
+  echo "interactive jobs must be launched from dspoe"
+  exit
+fi
 case $mode$run in
   seriali)   ./fsord ;;
   serialg)   totalview poe -a ./fsord $opts ;;

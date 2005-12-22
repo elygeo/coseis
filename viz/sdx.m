@@ -87,7 +87,6 @@ htxt(1) = text( .10, .05, '', 'Ver', 'top',    'Hor', 'center' );
 htxt(2) = text( .90, .05, '', 'Ver', 'top',    'Hor', 'center' );
 htxt(3) = text( .50, .05, '', 'Ver', 'top',    'Hor', 'center' );
 htxt(4) = text( .98, .98, '', 'Ver', 'top',    'Hor', 'right'  );
-htxt(5) = text( .98, .10, '', 'Ver', 'bottom', 'Hor', 'right'  );
 hmsg(1) = text( .02, .10, '', 'Ver', 'bottom', 'Hor', 'left'   );
 hmsg(2) = text( .98, .10, '', 'Ver', 'bottom', 'Hor', 'right'  );
 hmsg(3) = text( .02, .98, '', 'Ver', 'top',    'Hor', 'left'   );
