@@ -23,9 +23,8 @@ init = .false.
 
 ifmaster: if ( master ) then
 
-  print '(a)', 'Initialize output'
   if ( nout > nz ) stop 'too many output zones, make nz bigger'
-  inquire( file='timestep', exist=test )
+  inquire( file='meta.m', exist=test )
   if ( test .and. it == 1 ) stop 'previous output found'
   call system_clock( count_rate=twall_rate, count_max=twall_max )
  
@@ -173,7 +172,6 @@ end do doiz0
 ! Column names
 if ( master ) then
   close( 9 )
-  print *,'       Step  Amax           Vmax           Umax            Wall Time'
   call system_clock( twall2 )
 end if
 
@@ -190,8 +188,8 @@ case( 'w' )
   wmaxi = maxloc( s2 )
   umax = s1(umaxi(1),umaxi(2),umaxi(3))
   wmax = s2(wmaxi(1),wmaxi(2),wmaxi(3))
-  call globalmaxloc( umax, umaxi, nnoff )
-  call globalmaxloc( wmax, wmaxi, nnoff )
+  call pmaxloc( umax, umaxi, nnoff )
+  call pmaxloc( wmax, wmaxi, nnoff )
   if ( umax > dx / 10. ) print *, 'Warning: u !<< dx'
 case( 'a' )
   s1 = sqrt( sum( w1 * w1, 4 ) )
@@ -200,8 +198,8 @@ case( 'a' )
   vmaxi = maxloc( s2 )
   amax = s1(amaxi(1),amaxi(2),amaxi(3))
   vmax = s2(vmaxi(1),vmaxi(2),vmaxi(3))
-  call globalmaxloc( amax, amaxi, nnoff )
-  call globalmaxloc( vmax, vmaxi, nnoff )
+  call pmaxloc( amax, amaxi, nnoff )
+  call pmaxloc( vmax, vmaxi, nnoff )
   if ( ifn /= 0 ) then
     svmaxi = maxloc( sv )
     slmaxi = maxloc( sl )
@@ -209,8 +207,8 @@ case( 'a' )
     slmax = sv(slmaxi(1),slmaxi(2),slmaxi(3))
     svmaxi(ifn) = ihypo(ifn)
     slmaxi(ifn) = ihypo(ifn)
-    call globalmaxloc( svmax, svmaxi, nnoff )
-    call globalmaxloc( slmax, slmaxi, nnoff )
+    call pmaxloc( svmax, svmaxi, nnoff )
+    call pmaxloc( slmax, slmaxi, nnoff )
   end if
 case default; stop 'pass'
 end select
@@ -305,8 +303,15 @@ end do
 
 end do doiz !------------------------------------------------------------------!
 
-! Stop if not on acceleration pass
+! Return if not on acceleration pass
 if ( pass == 'w' ) return
+
+! Check for stop file
+inquire( file='stop', exist=test )
+if ( test ) then
+  itcheck = it
+  nt = it
+end if
 
 ! Metadata
 if ( master ) then
@@ -315,23 +320,23 @@ if ( master ) then
   dtwall = real( twall2 - twall1 ) / real( twall_rate )
   if ( dtwall < 0. ) &
     dtwall = real( twall2 - twall1 + twall_max ) / real( twall_rate )
-  print *, it, amax, vmax, umax, dtwall
   open(  9, file='currentstep.m', status='replace' )
   write( 9, * ) 'it =  ', it, ';'
   close( 9 )
   write( str, '(a,i6.6,a)' ) 'stats/st', it, '.m'
   open(  9, file=str, status='replace' )
-  write( 9, * ) 'twall1 = ', twall1, ';'
-  write( 9, * ) 'twall2 = ', twall2, ';'
-  write( 9, * ) 't      = ', t,      ';'
-  write( 9, * ) 'dt     = ', dt,     ';'
-  write( 9, * ) 'dtwall = ', dtwall, ';'
-  write( 9, * ) 'amax   = ', amax,   ';'
-  write( 9, * ) 'vmax   = ', vmax,   ';'
-  write( 9, * ) 'umax   = ', umax,   ';'
-  write( 9, * ) 'wmax   = ', wmax,   ';'
-  write( 9, * ) 'svmax  = ', svmax,  ';'
-  write( 9, * ) 'slmax  = ', slmax,  ';'
+  write( 9, * ) 'it     =  ', it,     ';'
+  write( 9, * ) 'twall1 =  ', twall1, ';'
+  write( 9, * ) 'twall2 =  ', twall2, ';'
+  write( 9, * ) 't      =  ', t,      ';'
+  write( 9, * ) 'dt     =  ', dt,     ';'
+  write( 9, * ) 'dtwall =  ', dtwall, ';'
+  write( 9, * ) 'amax   =  ', amax,   ';'
+  write( 9, * ) 'vmax   =  ', vmax,   ';'
+  write( 9, * ) 'umax   =  ', umax,   ';'
+  write( 9, * ) 'wmax   =  ', wmax,   ';'
+  write( 9, * ) 'svmax  =  ', svmax,  ';'
+  write( 9, * ) 'slmax  =  ', slmax,  ';'
   write( 9, * ) 'amaxi  = [', amaxi - nnoff,  '];'
   write( 9, * ) 'vmaxi  = [', vmaxi - nnoff,  '];'
   write( 9, * ) 'umaxi  = [', umaxi - nnoff,  '];'
@@ -345,7 +350,7 @@ if ( master ) then
     k = i1(2)
     l = i1(3)
     tarrmax = tarr(j,k,l)
-    call globalmaxloc( tarrmax, i1, nnoff )
+    call pmaxloc( tarrmax, i1, nnoff )
     i2 = ihypo
     i2(ifn) = 1
     j = i2(1)

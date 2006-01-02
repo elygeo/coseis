@@ -17,7 +17,6 @@ if ( rsource <= 0. ) return
 ifinit: if ( init ) then !-----------------------------------------------------!
 
 init = .false.
-if ( master ) print '(a)', 'Moment source'
 
 ! Indices
 i1 = i1cell

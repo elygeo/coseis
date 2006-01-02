@@ -19,7 +19,6 @@ use timestep_m
 
 ! Initialization
 call initialize( master )
-if ( master ) print '(a)', 'SORD - Support Operator Rupture Dynamics'
 call inread( 'defaults.m' )
 call inread( 'in.m' )
 call setup

@@ -8,9 +8,7 @@ implicit none
 integer :: i, err
 logical :: inzone
 character(*), intent(in) :: filename
-character(16) :: key1, key2
-
-if ( master ) print '(2a)', 'Reading file: ', filename
+character(11) :: key1, key2
 
 open( 9, file=filename, status='old' )
 

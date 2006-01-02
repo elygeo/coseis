@@ -7,7 +7,7 @@ mode=guess
 fflags=O
 compile=yes
 run=i
-while getopts spmcngGbd opt; do
+while getopts spmcngGd opt; do
 case $opt in
   s) mode=serial ;;
   p) mode=parallel ;;
@@ -16,7 +16,6 @@ case $opt in
   n) run= ; compile= ;;
   g) fflags=g ;;
   G) fflags=g; run=g ;;
-  b) run=b ;;
   d) rm -rf out
 esac
 done
@@ -85,6 +84,7 @@ pgf90)
   oflags='-fastsse -Mipa=fast'
   ;;
 gfortran)
+  pfc='mpif90 -O0'
   gflags='-g -W -pedantic -std=f95 -fimplicit-none'
   oflags="-fdefer-pop -fguess-branch-probability -fcprop-registers -floop-optimize -fif-conversion -fif-conversion2 -ftree-ccp -ftree-dce -ftree-dominator-opts -ftree-dse -ftree-ter -ftree-lrs -ftree-sra -ftree-copyrename -ftree-fre -ftree-ch -fmerge-constants -fomit-frame-pointer -fthread-jumps -fcrossjumping -foptimize-sibling-calls -fcse-follow-jumps -fcse-skip-blocks -fgcse -fgcse-lm -fexpensive-optimizations -fstrength-reduce -frerun-cse-after-loop -frerun-loop-opt -fcaller-saves -fforce-mem -fpeephole2 -fschedule-insns -fschedule-insns2 -fsched-interblock -fsched-spec -fregmove -fstrict-aliasing -fdelete-null-pointer-checks -freorder-blocks -freorder-functions -funit-at-a-time -falign-functions -falign-jumps -falign-loops -falign-labels -ftree-pre -finline-functions -funswitch-loops -fgcse-after-reload"
   ;;
@@ -276,7 +276,10 @@ case $machine in
 
 datastar) #--------------------------------------#
 
-if [ $( pwd | grep -v gpfs ) ] || exit
+if [ $( pwd | grep -v gpfs ) ]; then
+  echo "jobs must be run from /gpfs"
+  exit
+fi
 
 # Batch
 opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
@@ -356,11 +359,9 @@ chmod u+x batchjob
 [ $run ] || exit
 [ ${HOSTNAME:0:5} = 'tg-c1' ] || exit
 case $mode$run in
-  seriali)   ./fsord ;;
   serialg)   gdb ./fsord ;;
-  serialb)   nohup ./fsord > out.log & ;;
-  paralleli) mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord ;;
-  parallelb)
+  seriali)   nohup ./fsord > out.log & ;;
+  paralleli)
     nohup mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord > out.log &
     ;;
 esac
@@ -398,12 +399,10 @@ node35:2
 node36:2
 END
 case $mode$run in
-  seriali)   mpirun -machinefile machinefile ./fsord ;;
   serialg)   mpirun -machinefile machinefile -dbg=gdb ./fsord ;;
-  serialb)   nohup mpirun -machinefile machinefile ./fsord > out.log & ;;
-  paralleli) mpirun -machinefile machinefile -np $np ./psord ;;
+  seriali)   nohup mpirun -machinefile machinefile ./fsord > out.log & ;;
   parallelg) mpirun -machinefile machinefile -np $np -dbg=gdb ./psord ;;
-  parallelb) nohup mpirun -machinefile machinefile -np $np ./psord > out.log &;;
+  paralleli) nohup mpirun -machinefile machinefile -np $np ./psord > out.log &;;
 esac
 tail +$(( nodes + 1 )) machinefile > tmp
 head -$nodes machinefile >> tmp
@@ -419,19 +418,17 @@ mv tmp machinefile
 
 # Interactive
 case $mode$run in
-  seriali)   nice ./fsord ;;
   serialg)   ddd ./fsord ;;
-  serialb)   nice nohup ./fsord > out.log & ;;
-  paralleli) nice mpirun -np $np ./psord ;;
+  seriali)   nice nohup ./fsord > out.log & ;;
   parallelg) mpirun -np $np -dbg=ddd ./psord ;;
-  parallelb) nice nohup mpirun -np $np ./psord > out.log & ;;
+  paralleli) nice nohup mpirun -np $np ./psord > out.log & ;;
 esac
 
 ;;
 
 esac #--------------------------------------#
 
-if [ x$run = xb ]; then
+if [ "$run" = i ]; then
   echo "#!/bin/bash" > cancel.sh
   echo "kill $!" >> cancel.sh
   chmod u+x cancel.sh

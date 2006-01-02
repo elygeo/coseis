@@ -18,7 +18,7 @@ if ( err == 0 ) then
 else
   it = 1
 end if
-call iglobalmin( it )
+call ipmin( it )
 if ( it == 1 ) return
 write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', it, '-', i
 inquire( iolength=reclen ) &

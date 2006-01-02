@@ -60,7 +60,7 @@ call mpi_bcast( r, i, mpi_real, ipmaster, c, e )
 end subroutine
 
 ! Integer minimum
-subroutine iglobalmin( imin )
+subroutine ipmin( imin )
 implicit none
 integer, intent(inout) :: imin
 integer :: ii, e
@@ -69,7 +69,7 @@ imin = ii
 end subroutine
 
 ! Real minimum
-subroutine globalmin( rmin )
+subroutine pmin( rmin )
 implicit none
 real, intent(inout) :: rmin(:)
 real :: r
@@ -80,7 +80,7 @@ rmin = r
 end subroutine
 
 ! Real maximum
-subroutine globalmax( rmax )
+subroutine pmax( rmax )
 implicit none
 real, intent(inout) :: rmax(:)
 real :: r
@@ -91,7 +91,7 @@ rmax = r
 end subroutine
 
 ! Real global minimum & location, send to master
-subroutine globalminloc( rmin, imin, nnoff )
+subroutine pminloc( rmin, imin, nnoff )
 implicit none
 real, intent(inout) :: rmin
 integer, intent(inout) :: imin(3)
@@ -111,7 +111,7 @@ end if
 end subroutine
 
 ! Real global maximum & location, send to master
-subroutine globalmaxloc( rmax, imax, nnoff )
+subroutine pmaxloc( rmax, imax, nnoff )
 implicit none
 real, intent(inout) :: rmax
 integer, intent(inout) :: imax(3)

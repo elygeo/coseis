@@ -34,25 +34,25 @@ r(1) = r(1)
 end subroutine
 
 ! Integer Minimum
-subroutine iglobalmin( imin )
+subroutine ipmin( imin )
 integer, intent(inout) :: imin
 imin = imin
 end subroutine
 
 ! Real minimum
-subroutine globalmin( rmin )
+subroutine pmin( rmin )
 real, intent(inout) :: rmin(:)
 rmin = rmin
 end subroutine
 
 ! Real maximum
-subroutine globalmax( rmax )
+subroutine pmax( rmax )
 real, intent(inout) :: rmax(:)
 rmax = rmax
 end subroutine
 
 ! Real global minimum & location, send to master
-subroutine globalminloc( rmin, imin, nnoff )
+subroutine pminloc( rmin, imin, nnoff )
 real, intent(inout) :: rmin
 integer, intent(inout) :: imin(3)
 integer, intent(in) :: nnoff(3)
@@ -61,7 +61,7 @@ imin = imin - nnoff + nnoff
 end subroutine
 
 ! Real global maximum & location, send to master
-subroutine globalmaxloc( rmax, imax, nnoff )
+subroutine pmaxloc( rmax, imax, nnoff )
 real, intent(inout) :: rmax
 integer, intent(inout) :: imax(3)
 integer, intent(in) :: nnoff(3)

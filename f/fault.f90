@@ -19,7 +19,6 @@ if ( ifn == 0 ) return
 ifinit: if ( init ) then !-----------------------------------------------------!
 
 init = .false.
-if ( master ) print '(a)', 'Initialize fault'
 
 ! Test if fault plane exists on this processor
 i = ihypo(ifn)

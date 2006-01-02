@@ -11,8 +11,6 @@ implicit none
 integer :: i1(3), i2(3), i1l(3), i2l(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, iz, idoublenode
 
-if ( master ) print '(a)', 'Material model'
-
 ! Input
 mr = 0.
 s1 = 0.

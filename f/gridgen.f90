@@ -13,8 +13,6 @@ integer :: i1(3), i2(3), i1l(3), i2l(3), n(3), noff(3), &
 real :: x1(3), x2(3), lj, lk, ll
 logical :: expand
 
-if ( master ) print '(a)', 'Grid generation'
-
 ! Single node indexing
 n = nn
 noff = nnoff
@@ -60,6 +58,7 @@ k = modulo( l + 1, 3 ) + 1
 j = 6 - k - l
 
 ! Grid expansion
+expand = .false.
 if ( rexpand > 1. ) then
   i1 = 1 + noff + n1expand
   i2 = n + noff - n2expand
@@ -175,8 +174,10 @@ do i = 1,3
   x1(i) = minval( x(:,:,:,i) )
   x2(i) = maxval( x(:,:,:,i) )
 end do
-call globalmin( x1 )
-call globalmax( x2 )
+print *, x1
+print *, x2
+call pmin( x1 )
+call pmax( x2 )
 xcenter = ( x1 + x2 ) / 2.
 do i = 1,3
   w1(:,:,:,i) = x(:,:,:,i) - xcenter(i);
