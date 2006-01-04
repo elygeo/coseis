@@ -10,7 +10,7 @@ implicit none
 real :: theta, scl
 integer :: i1(3), i2(3), i1l(3), i2l(3), n(3), noff(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, up(1)
-real :: x1(3), x2(3), lj, lk, ll
+real :: x1, x2, lj, lk, ll
 logical :: expand
 
 ! Single node indexing
@@ -171,15 +171,11 @@ end if
 
 ! Grid Dimensions
 do i = 1,3
-  x1(i) = minval( x(:,:,:,i) )
-  x2(i) = maxval( x(:,:,:,i) )
-end do
-print *, x1
-print *, x2
-call pmin( x1 )
-call pmax( x2 )
-xcenter = ( x1 + x2 ) / 2.
-do i = 1,3
+  x1 = minval( x(:,:,:,i) )
+  x2 = maxval( x(:,:,:,i) )
+  call pmin( x1 )
+  call pmax( x2 )
+  xcenter(i) = ( x1 + x2 ) / 2.
   w1(:,:,:,i) = x(:,:,:,i) - xcenter(i);
 end do
 s1 = sum( w1 * w1, 4 );

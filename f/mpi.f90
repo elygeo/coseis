@@ -71,22 +71,20 @@ end subroutine
 ! Real minimum
 subroutine pmin( rmin )
 implicit none
-real, intent(inout) :: rmin(:)
+real, intent(inout) :: rmin
 real :: r
-integer :: n, e
-n = size(rmin)
-call mpi_allreduce( rmin, r, n, mpi_real, mpi_min, c, e )
+integer :: e
+call mpi_allreduce( rmin, r, 1, mpi_real, mpi_min, c, e )
 rmin = r
 end subroutine
 
 ! Real maximum
 subroutine pmax( rmax )
 implicit none
-real, intent(inout) :: rmax(:)
+real, intent(inout) :: rmax
 real :: r
-integer :: n, e
-n = size(rmax)
-call mpi_allreduce( rmax, r, n, mpi_real, mpi_max, c, e )
+integer :: e
+call mpi_allreduce( rmax, r, 1, mpi_real, mpi_max, c, e )
 rmax = r
 end subroutine
 

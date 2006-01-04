@@ -41,13 +41,13 @@ end subroutine
 
 ! Real minimum
 subroutine pmin( rmin )
-real, intent(inout) :: rmin(:)
+real, intent(inout) :: rmin
 rmin = rmin
 end subroutine
 
 ! Real maximum
 subroutine pmax( rmax )
-real, intent(inout) :: rmax(:)
+real, intent(inout) :: rmax
 rmax = rmax
 end subroutine
 
