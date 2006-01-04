@@ -10,7 +10,7 @@ real, save, allocatable :: srcfr(:), cellvol(:)
 integer, save, allocatable :: jj(:), kk(:), ll(:)
 logical, save :: init = .true.
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc, ic
-real :: srcft
+real :: srcft, sumsrcfr
 
 if ( rsource <= 0. ) return
 
@@ -56,7 +56,9 @@ end select
 
 ! Normalize and divide by cell volume
 cellvol = pack( s1, s2 <= rsource )
-srcfr = srcfr / sum( srcfr ) / cellvol
+sumsrcfr = sum( srcfr )
+call psum( sumsrcfr )
+srcfr = srcfr / sumsrcfr / cellvol
 
 ! Index map
 i = 0

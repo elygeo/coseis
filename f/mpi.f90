@@ -68,6 +68,16 @@ call mpi_allreduce( imin, ii, 1, mpi_integer, mpi_min, c, e )
 imin = ii
 end subroutine
 
+! Real sum
+subroutine psum( rsum )
+implicit none
+real, intent(inout) :: rsum
+real :: r
+integer :: e
+call mpi_allreduce( rsum, r, 1, mpi_real, mpi_sum, c, e )
+rsum = r
+end subroutine
+
 ! Real minimum
 subroutine pmin( rmin )
 implicit none

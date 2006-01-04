@@ -39,6 +39,12 @@ integer, intent(inout) :: imin
 imin = imin
 end subroutine
 
+! Real sum
+subroutine psum( rsum )
+real, intent(inout) :: rsum
+rsum = rsum
+end subroutine
+
 ! Real minimum
 subroutine pmin( rmin )
 real, intent(inout) :: rmin
