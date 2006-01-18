@@ -23,8 +23,6 @@ if ( master ) then
   close( 9 )
 end if
 
-call mpi_barrier( c, i ) !FIXME
-
 ifinit: if ( init ) then !-----------------------------------------------------!
 
 init = .false.
@@ -195,21 +193,8 @@ case( 'w' )
   wmaxi = maxloc( s2 )
   umax = s1(umaxi(1),umaxi(2),umaxi(3))
   wmax = s2(wmaxi(1),wmaxi(2),wmaxi(3))
-open( 9, file='log', position='append' )
-write( 9, * ) ip, 'umax0 ', umax, umaxi
-close( 9 )
   call pmaxloc( umax, umaxi, nnoff )
-open( 9, file='log', position='append' )
-write( 9, * ) ip, 'umax1 ', umax, umaxi
-close( 9 )
-call mpi_barrier( c, i )
-open( 9, file='log', position='append' )
-write( 9, * ) ip, 'wmax0 ', wmax, wmaxi
-close( 9 )
   call pmaxloc( wmax, wmaxi, nnoff )
-open( 9, file='log', position='append' )
-write( 9, * ) ip, 'wmax1 ', wmax, wmaxi
-close( 9 )
   if ( master .and. umax > dx / 10. ) then
     open( 9, file='log', position='append' )
     write( 9, * ) 'warning: u !<< dx'

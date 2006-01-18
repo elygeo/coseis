@@ -37,7 +37,7 @@ r = r
 end subroutine
 
 ! Integer Minimum
-subroutine ipmin( i )
+subroutine pimin( i )
 integer, intent(inout) :: i
 i = i
 end subroutine

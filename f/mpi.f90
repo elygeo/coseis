@@ -122,21 +122,14 @@ local(2) = ip
 call mpi_allreduce( local, global, 1, mpi_2real, mpi_maxloc, c, e )
 r   = global(1)
 iip = global(2)
-if ( ( ip == ipmaster .or. ip == iip ) .and. iip /= ipmaster ) then
+i = i - nnoff
+if ( iip /= ipmaster .and. ip == iip ) then
+  call mpi_send( i, 3, mpi_integer, ipmaster, 0, c, e )
 end if
-if ( iip /= ipmaster ) then
-call mpi_barrier( c, e )
-open( 9, file='log', position='append' )
-write( 9, * ) ip, ipmaster, iip, c
-close( 9 )
-  i = i - nnoff
-  !call mpi_sendrecv_replace( i, 3, mpi_integer, ipmaster, 8, iip, 8, c, mpi_status_ignore, e )
-  call mpi_sendrecv_replace( i, 3, mpi_integer, ipmaster, 8, iip, 8, mpi_comm_world, mpi_status_ignore, e )
-  i = i + nnoff
-open( 9, file='log', position='append' )
-write( 9, * ) 'YES'
-close( 9 )
+if ( iip /= ipmaster .and. ip == ipmaster ) then
+  call mpi_recv( i, 3, mpi_integer, iip, 0, c, mpi_status_ignore, e )
 end if
+i = i + nnoff
 end subroutine
 
 ! Swap halo scalar
