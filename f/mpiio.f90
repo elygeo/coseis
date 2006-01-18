@@ -9,7 +9,7 @@ contains
 subroutine iosplit( iz, nout, ditout )
 integer, intent(in) :: iz, nout, ditout
 integer :: e
-if ( .not. allocated( commout ) ) allocate( commout(nout) )
+if ( .not. allocated( commout ) ) allocate( commout(nout+1) )
 call mpi_comm_split( c, ditout, 0, commout(iz), e )
 end subroutine
 

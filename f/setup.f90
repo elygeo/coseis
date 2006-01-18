@@ -9,6 +9,12 @@ subroutine setup
 implicit none
 integer :: nl(3), n(3), ip3master(3)
 
+if ( master ) then
+  open( 9, file='log', position='append' )
+  write( 9, * ) 'Setup'
+  close( 9 )
+end if
+
 ! Hypocenter
 n = nn
 ifn = abs( faultnormal )
@@ -27,7 +33,7 @@ nl = nn / np; where ( modulo( nn, np ) /= 0 ) nl = nl + 1
 np = nn / nl; where ( modulo( nn, nl ) /= 0 ) np = np + 1
 
 ! Processor rank
-call rank( np, ip3 )
+call rank( np, ip, ip3 )
 edge1 = ip3 == 0
 edge2 = ip3 == np - 1
 

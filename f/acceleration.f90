@@ -11,6 +11,12 @@ implicit none
 integer :: i1(3), i2(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, ic, iid, id, iz, iq
 
+if ( master ) then
+  open( 9, file='log', position='append' )
+  write( 9, * ) 'Acceleration calculation'
+  close( 9 )
+end if
+
 s1 = 0.
 
 ! Loop over component and derivative direction

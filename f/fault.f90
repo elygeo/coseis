@@ -11,10 +11,17 @@ implicit none
 real :: mus0, mud0, dc0, lc, tn0, ts0, ess, rctest
 integer :: i1(3), i2(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4, iz
+logical :: test
 integer, save :: side
 logical, save :: init = .true.
 
 if ( ifn == 0 ) return
+
+if ( master ) then
+  open( 9, file='log', position='append' )
+  write( 9, * ) 'Fault'
+  close( 9 )
+end if
 
 ifinit: if ( init ) then !-----------------------------------------------------!
 
@@ -221,7 +228,8 @@ end do
 
 ! Decompose traction to normal and shear components
 tn = sum( t3 * nhat, 4 )
-if ( any( tn > 0. ) ) print *, 'Fault opening!'
+test = any( tn > 0. )
+if ( test ) print *, 'Fault opening!'
 do i = 1, 3
   t1(:,:,:,i) = tn * nhat(:,:,:,i)
 end do

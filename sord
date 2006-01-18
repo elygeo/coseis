@@ -6,17 +6,19 @@ echo -e "\nSORD setup"
 mode=guess
 fflags=O
 compile=yes
-run=i
-while getopts spmcngGd opt; do
-case $opt in
+run=b
+while getopts spmicngGd opt; do
+case "$opt" in
   s) mode=serial ;;
   p) mode=parallel ;;
   m) mode=matlab ;;
+  i) run=i ;;
   c) run= ;;
   n) run= ; compile= ;;
   g) fflags=g ;;
   G) fflags=g; run=g ;;
-  d) rm -rf out
+  d) rm -rf out ;;
+  *) exit ;;
 esac
 done
 shift $(( OPTIND - 1 ))
@@ -260,7 +262,7 @@ done
 if [ $mode = matlab ]; then
 case $run in
   i) matlab -nodesktop -nosplash -r "addpath $srcdir/m; sord" ;;
-  b) nohup matlab -nodisplay -nojvm -r "addpath $srcdir/m; sord" > out.log &
+  b) nohup matlab -nodisplay -nojvm -r "addpath $srcdir/m; sord" > errors &
      echo "#!/bin/bash" > cancel.sh
      echo "kill $!" >> cancel.sh
      chmod u+x cancel.sh
@@ -330,10 +332,10 @@ fi
 case $mode$run in
   seriali)   ./fsord ;;
   serialg)   totalview poe -a ./fsord $opts ;;
-  serialb)   nohup ./fsord > out.log & ;;
+  serialb)   nohup ./fsord > errors & ;;
   paralleli) poe ./psord $opts ;;
   parallelg) totalview poe -a ./psord $opts ;;
-  parallelb) nohup poe ./psord $opts > out.log & ;;
+  parallelb) nohup poe ./psord $opts > errors & ;;
 esac
 
 ;;
@@ -359,10 +361,12 @@ chmod u+x batchjob
 [ $run ] || exit
 [ ${HOSTNAME:0:5} = 'tg-c1' ] || exit
 case $mode$run in
+  seriali)   ./fsord ;;
   serialg)   gdb ./fsord ;;
-  seriali)   nohup ./fsord > out.log & ;;
-  paralleli)
-    nohup mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord > out.log &
+  serialb)   nohup ./fsord > errors & ;;
+  paralleli) mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord ;;
+  parallelb)
+    nohup mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord > errors &
     ;;
 esac
 
@@ -399,10 +403,12 @@ node35:2
 node36:2
 END
 case $mode$run in
+  seriali)   mpirun -machinefile machinefile ./fsord ;;
   serialg)   mpirun -machinefile machinefile -dbg=gdb ./fsord ;;
-  seriali)   nohup mpirun -machinefile machinefile ./fsord > out.log & ;;
+  serialb)   nohup mpirun -machinefile machinefile ./fsord > errors & ;;
+  paralleli) mpirun -machinefile machinefile -np $np ./psord ;;
   parallelg) mpirun -machinefile machinefile -np $np -dbg=gdb ./psord ;;
-  paralleli) nohup mpirun -machinefile machinefile -np $np ./psord > out.log &;;
+  parallelb) nohup mpirun -machinefile machinefile -np $np ./psord > errors &;;
 esac
 tail +$(( nodes + 1 )) machinefile > tmp
 head -$nodes machinefile >> tmp
@@ -412,25 +418,27 @@ mv tmp machinefile
 
 *) #--------------------------------------#
 
-#case $mode in
-#  parallel) mpdtrace > /dev/null || mpd & ;;
-#esac
+[ "$mode" = parallel ] && mpich2version &> /dev/null && ( mpdtrace &> /dev/null || mpd & )
 
 # Interactive
 case $mode$run in
+  seriali)   ./fsord ;;
   serialg)   ddd ./fsord ;;
-  seriali)   nice nohup ./fsord > out.log & ;;
-  parallelg) mpirun -np $np -dbg=ddd ./psord ;;
-  paralleli) nice nohup mpirun -np $np ./psord > out.log & ;;
+  serialb)   nice nohup ./fsord > errors & ;;
+  paralleli) mpiexec -np $np ./psord ;;
+  parallelg) mpiexec -gdb -np $np ./psord ;;
+  parallelb) nice nohup mpiexec -np $np ./psord > errors & ;;
 esac
 
 ;;
 
 esac #--------------------------------------#
 
-if [ "$run" = i ]; then
+if [ "$run" = b ]; then
   echo "#!/bin/bash" > cancel.sh
   echo "kill $!" >> cancel.sh
   chmod u+x cancel.sh
+  sleep 1
+  tail -f current/errors
 fi
 

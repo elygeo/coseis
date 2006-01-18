@@ -4,8 +4,10 @@ implicit none
 contains
 
 ! Initialize
-subroutine initialize( master )
+subroutine initialize( ip, master )
 logical, intent(out) :: master
+integer, intent(out) :: ip
+ip = 0
 master = .true.
 end subroutine
 
@@ -14,10 +16,11 @@ subroutine finalize
 end subroutine
 
 ! Processor rank
-subroutine rank( np, ip3 )
+subroutine rank( np, ip, ip3 )
 integer, intent(in) :: np(3)
-integer, intent(out) :: ip3(3)
-ip3 = ip3 - np + np
+integer, intent(out) :: ip, ip3(3)
+ip = 0
+ip3 = np - np
 end subroutine
 
 ! Set master processor
@@ -30,49 +33,46 @@ end subroutine
 ! Broadcast
 subroutine broadcast( r )
 real, intent(inout) :: r(:)
-r(1) = r(1)
+r = r
 end subroutine
 
 ! Integer Minimum
-subroutine ipmin( imin )
-integer, intent(inout) :: imin
-imin = imin
+subroutine ipmin( i )
+integer, intent(inout) :: i
+i = i
 end subroutine
 
 ! Real sum
-subroutine psum( rsum )
-real, intent(inout) :: rsum
-rsum = rsum
+subroutine psum( r )
+real, intent(inout) :: r
+r = r
+end subroutine
+
+! Logical or
+subroutine plor( l )
+logical, intent(inout) :: l
+l = l
 end subroutine
 
 ! Real minimum
-subroutine pmin( rmin )
-real, intent(inout) :: rmin
-rmin = rmin
+subroutine pmin( r )
+real, intent(inout) :: r
+r = r
 end subroutine
 
 ! Real maximum
-subroutine pmax( rmax )
-real, intent(inout) :: rmax
-rmax = rmax
-end subroutine
-
-! Real global minimum & location, send to master
-subroutine pminloc( rmin, imin, nnoff )
-real, intent(inout) :: rmin
-integer, intent(inout) :: imin(3)
-integer, intent(in) :: nnoff(3)
-rmin = rmin
-imin = imin - nnoff + nnoff
+subroutine pmax( r )
+real, intent(inout) :: r
+r = r
 end subroutine
 
 ! Real global maximum & location, send to master
-subroutine pmaxloc( rmax, imax, nnoff )
-real, intent(inout) :: rmax
-integer, intent(inout) :: imax(3)
+subroutine pmaxloc( r, i, nnoff )
+real, intent(inout) :: r
+integer, intent(inout) :: i(3)
 integer, intent(in) :: nnoff(3)
-rmax = rmax
-imax = imax - nnoff + nnoff
+r = r
+i = i - nnoff + nnoff
 end subroutine
 
 ! Swap halo scalar

@@ -17,15 +17,22 @@ character, intent(in) :: pass
 character(7) :: field
 character :: onpass, endian
 
+if ( master ) then
+  open( 9, file='log', position='append' )
+  write( 9, * ) 'Output pass: ', pass
+  close( 9 )
+end if
+
+call mpi_barrier( c, i ) !FIXME
+
 ifinit: if ( init ) then !-----------------------------------------------------!
 
 init = .false.
-
 ifmaster: if ( master ) then
 
   if ( nout > nz ) stop 'too many output zones, make nz bigger'
   inquire( file='meta.m', exist=test )
-  if ( test .and. it == 1 ) stop 'previous output found'
+  if ( test .and. it == 1 ) stop 'error: previous output found'
   call system_clock( count_rate=twall_rate, count_max=twall_max )
  
   ! Diagnostic
@@ -150,7 +157,7 @@ doiz0: do iz = 1, nout
     i1(ifn) = ihypo(ifn)
     i2(ifn) = ihypo(ifn)
   end if
-  if ( any( i2 < i1 ) ) stop 'error in output indices'
+  if ( any( i2 < i1 ) ) stop 'output indices'
   i1out(iz,:) = i1
   i2out(iz,:) = i2
  
@@ -188,9 +195,26 @@ case( 'w' )
   wmaxi = maxloc( s2 )
   umax = s1(umaxi(1),umaxi(2),umaxi(3))
   wmax = s2(wmaxi(1),wmaxi(2),wmaxi(3))
+open( 9, file='log', position='append' )
+write( 9, * ) ip, 'umax0 ', umax, umaxi
+close( 9 )
   call pmaxloc( umax, umaxi, nnoff )
+open( 9, file='log', position='append' )
+write( 9, * ) ip, 'umax1 ', umax, umaxi
+close( 9 )
+call mpi_barrier( c, i )
+open( 9, file='log', position='append' )
+write( 9, * ) ip, 'wmax0 ', wmax, wmaxi
+close( 9 )
   call pmaxloc( wmax, wmaxi, nnoff )
-  if ( umax > dx / 10. ) print *, 'Warning: u !<< dx'
+open( 9, file='log', position='append' )
+write( 9, * ) ip, 'wmax1 ', wmax, wmaxi
+close( 9 )
+  if ( master .and. umax > dx / 10. ) then
+    open( 9, file='log', position='append' )
+    write( 9, * ) 'warning: u !<< dx'
+    close( 9 )
+  end if
 case( 'a' )
   s1 = sqrt( sum( w1 * w1, 4 ) )
   s2 = sqrt( sum( v * v, 4 ) )
@@ -210,7 +234,7 @@ case( 'a' )
     call pmaxloc( svmax, svmaxi, nnoff )
     call pmaxloc( slmax, slmaxi, nnoff )
   end if
-case default; stop 'pass'
+case default; stop 'output pass'
 end select
 
 doiz: do iz = 1, nout !--------------------------------------------------------!
@@ -219,7 +243,7 @@ if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 
 ! Properties
 nc = 1
-fault = .false.
+fault= .false.
 static = .false.
 onpass = 'a'
 select case( fieldout(iz) )
@@ -297,7 +321,7 @@ do i = 1, nc
   case( 'tarr' ); call ioscalar( 'w', str, tarr,    i1, i2, i1l, i2l, iz )
   case( 'tn'   ); call ioscalar( 'w', str, tn,      i1, i2, i1l, i2l, iz )
   case( 'ts'   ); call ioscalar( 'w', str, ts,      i1, i2, i1l, i2l, iz )
-  case default; stop 'fieldout'
+  case default; stop 'output fieldout'
   end select
 end do
 
@@ -344,13 +368,15 @@ if ( master ) then
   write( 9, * ) 'svmaxi = [', svmaxi - nnoff, '];'
   write( 9, * ) 'slmaxi = [', slmaxi - nnoff, '];'
   close( 9 )
-  if ( ifn /= 0 .and. it == nt - 1 ) then
-    i1 = maxloc( tarr )
-    j = i1(1)
-    k = i1(2)
-    l = i1(3)
-    tarrmax = tarr(j,k,l)
-    call pmaxloc( tarrmax, i1, nnoff )
+end if
+if ( ifn /= 0 .and. it == nt - 1 ) then
+  i1 = maxloc( tarr )
+  j = i1(1)
+  k = i1(2)
+  l = i1(3)
+  tarrmax = tarr(j,k,l)
+  call pmaxloc( tarrmax, i1, nnoff )
+  if ( master ) then
     i2 = ihypo
     i2(ifn) = 1
     j = i2(1)
@@ -363,6 +389,7 @@ if ( master ) then
     close( 9 )
   end if
 end if
+
 
 end subroutine
 end module

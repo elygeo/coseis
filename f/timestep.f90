@@ -7,6 +7,12 @@ subroutine timestep
 implicit none
 integer :: i1(3), i2(3), j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
+if ( master ) then
+  open( 9, file='log', position='append' )
+  write( 9, * ) 'Time step', it
+  close( 9 )
+end if
+
 ! Time integration
 it = it + 1
 t  = t  + dt

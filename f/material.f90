@@ -11,6 +11,12 @@ implicit none
 integer :: i1(3), i2(3), i1l(3), i2l(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, iz, idoublenode
 
+if ( master ) then
+  open( 9, file='log', position='append' )
+  write( 9, * ) 'Material model'
+  close( 9 )
+end if
+
 ! Input
 mr = 0.
 s1 = 0.

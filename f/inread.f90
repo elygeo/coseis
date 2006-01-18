@@ -10,6 +10,12 @@ logical :: inzone
 character(*), intent(in) :: filename
 character(11) :: key1, key2
 
+if ( master ) then
+  open( 9, file='log', position='append' )
+  write( 9, * ) 'Reading file: ', filename
+  close( 9 )
+end if
+
 open( 9, file=filename, status='old' )
 
 doline: do
@@ -22,8 +28,6 @@ if ( err /= 0 ) exit doline
 i = index( str, '%' )
 if ( i > 0 ) str(i:) = ' '
 if ( str == ' ' ) cycle doline
-
-!if ( master ) print '(a)', trim( str )
 
 ! Strip MATLAB characters
 do
@@ -91,7 +95,13 @@ case( 'lock' );
   nlock = nlock + 1
   i = nlock
   read( str, * ) key1, ilock(i,:), i1lock(i,:), i2lock(i,:)
-case default; print '(2a)', 'Bad input: ', trim( str ); stop
+case default
+  if ( master ) then
+    open( 9, file='log', position='append' )
+    write( 9, * ) 'Error: bad input: ', trim( str )
+    close( 9 )
+  end if
+  stop 'bad input'
 end select
 
 ! Input zone

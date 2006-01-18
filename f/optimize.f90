@@ -8,6 +8,12 @@ implicit none
 real :: tol, test
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2
 
+if ( master ) then
+  open( 9, file='log', position='append' )
+  write( 9, * ) 'Operator optimization'
+  close( 9 )
+end if
+
 ! Grid gradient
 i1 = i1cell
 i2 = i2cell

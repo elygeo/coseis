@@ -107,7 +107,7 @@ integer, dimension(3) :: &
   nn,           & ! number of global nodes, count double nodes twice
   nm,           & ! size of local 3D arrays
   np,           & ! number of processors
-  ip3,          & ! processor rank
+  ip3,          & ! 3D processor rank
   bc1,          & ! boundary conditions for j1 k1 l1
   bc2,          & ! boundary conditions for j2 k2 l2
   nnoff,        & ! offset between local and global indices
@@ -122,6 +122,7 @@ integer, dimension(3) :: &
   i2pml           ! PML boundary
 
 integer :: &
+  ip,           & ! processor rank
   nt,           & ! number of time steps
   it,           & ! current time step
   itcheck,      & ! interval for checkpointing

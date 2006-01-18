@@ -7,12 +7,14 @@ integer, private :: ip, ipmaster
 contains
 
 ! Initialize
-subroutine initialize( master )
+subroutine initialize( ipout, master )
 implicit none
-logical, intent(inout) :: master
+logical, intent(out) :: master
+integer, intent(out) :: ipout
 integer :: e
 call mpi_init( e )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
+ipout = ip
 master = .false.
 if ( ip == 0 ) master = .true.
 end subroutine
@@ -25,21 +27,20 @@ call mpi_finalize( e )
 end subroutine
 
 ! Processor rank
-subroutine rank( np, ip3 )
+subroutine rank( np, ipout, ip3 )
 implicit none
 integer, intent(in) :: np(3)
-integer, intent(out) :: ip3(3)
+integer, intent(out) :: ipout, ip3(3)
 integer :: e
 logical :: period(3) = .false.
 call mpi_cart_create( mpi_comm_world, 3, np, period, .true., c, e )
 if ( c == mpi_comm_null ) then
-  call mpi_comm_rank( mpi_comm_world, ip, e  )
-  print *, 'Unused processor: ', ip
   call mpi_finalize( e )
   stop
 end if
 call mpi_comm_rank( c, ip, e  )
 call mpi_cart_coords( c, ip, 3, ip3, e )
+ipout = ip
 end subroutine
 
 ! Set master processor
@@ -60,81 +61,81 @@ call mpi_bcast( r, i, mpi_real, ipmaster, c, e )
 end subroutine
 
 ! Integer minimum
-subroutine ipmin( imin )
+subroutine pimin( i )
 implicit none
-integer, intent(inout) :: imin
+integer, intent(inout) :: i
 integer :: ii, e
-call mpi_allreduce( imin, ii, 1, mpi_integer, mpi_min, c, e )
-imin = ii
+call mpi_allreduce( i, ii, 1, mpi_integer, mpi_min, c, e )
+i = ii
 end subroutine
 
 ! Real sum
-subroutine psum( rsum )
+subroutine psum( r )
 implicit none
-real, intent(inout) :: rsum
-real :: r
+real, intent(inout) :: r
+real :: rr
 integer :: e
-call mpi_allreduce( rsum, r, 1, mpi_real, mpi_sum, c, e )
-rsum = r
+call mpi_allreduce( r, rr, 1, mpi_real, mpi_sum, c, e )
+r = rr
+end subroutine
+
+! Logical or
+subroutine plor( l )
+implicit none
+logical, intent(inout) :: l
+logical :: ll
+integer :: e
+call mpi_allreduce( l, ll, 1, mpi_logical, mpi_lor, c, e )
+l = ll
 end subroutine
 
 ! Real minimum
-subroutine pmin( rmin )
+subroutine pmin( r )
 implicit none
-real, intent(inout) :: rmin
-real :: r
+real, intent(inout) :: r
+real :: rr
 integer :: e
-call mpi_allreduce( rmin, r, 1, mpi_real, mpi_min, c, e )
-rmin = r
+call mpi_allreduce( r, rr, 1, mpi_real, mpi_min, c, e )
+r = rr
 end subroutine
 
 ! Real maximum
-subroutine pmax( rmax )
+subroutine pmax( r )
 implicit none
-real, intent(inout) :: rmax
-real :: r
+real, intent(inout) :: r
+real :: rr
 integer :: e
-call mpi_allreduce( rmax, r, 1, mpi_real, mpi_max, c, e )
-rmax = r
-end subroutine
-
-! Real global minimum & location, send to master
-subroutine pminloc( rmin, imin, nnoff )
-implicit none
-real, intent(inout) :: rmin
-integer, intent(inout) :: imin(3)
-integer, intent(in) :: nnoff(3)
-integer :: e, ipmin
-real :: local(2), global(2)
-local(1) = rmin
-local(2) = ip
-call mpi_reduce( local, global, 1, mpi_2real, mpi_minloc, ipmaster, c, e )
-rmin  = global(1)
-ipmin = global(2)
-if ( ip == ipmaster .or. ip == ipmin ) then
-  imin = imin - nnoff
-  call mpi_sendrecv_replace( imin, 3, mpi_integer, ipmaster, 0, ip, 0, c, mpi_status_ignore, e )
-  imin = imin + nnoff
-end if
+call mpi_allreduce( r, rr, 1, mpi_real, mpi_max, c, e )
+r = rr
 end subroutine
 
 ! Real global maximum & location, send to master
-subroutine pmaxloc( rmax, imax, nnoff )
+subroutine pmaxloc( r, i, nnoff )
 implicit none
-real, intent(inout) :: rmax
-integer, intent(inout) :: imax(3)
+real, intent(inout) :: r
+integer, intent(inout) :: i(3)
 integer, intent(in) :: nnoff(3)
-integer :: e, ipmax
+integer :: e, iip
 real :: local(2), global(2)
-local(1) = rmax
+local(1) = r
 local(2) = ip
-call mpi_reduce( local, global, 1, mpi_2real, mpi_maxloc, ipmaster, c, e )
-rmax  = global(1)
-ipmax = global(2)
-if ( ip == ipmaster .or. ip == ipmax ) then
-  imax = imax - nnoff
-  call mpi_sendrecv_replace( imax, 3, mpi_integer, ipmaster, 0, ip, 0, c, mpi_status_ignore, e )
-  imax = imax + nnoff
+call mpi_allreduce( local, global, 1, mpi_2real, mpi_maxloc, c, e )
+r   = global(1)
+iip = global(2)
+if ( ( ip == ipmaster .or. ip == iip ) .and. iip /= ipmaster ) then
+end if
+if ( iip /= ipmaster ) then
+call mpi_barrier( c, e )
+open( 9, file='log', position='append' )
+write( 9, * ) ip, ipmaster, iip, c
+close( 9 )
+  i = i - nnoff
+  !call mpi_sendrecv_replace( i, 3, mpi_integer, ipmaster, 8, iip, 8, c, mpi_status_ignore, e )
+  call mpi_sendrecv_replace( i, 3, mpi_integer, ipmaster, 8, iip, 8, mpi_comm_world, mpi_status_ignore, e )
+  i = i + nnoff
+open( 9, file='log', position='append' )
+write( 9, * ) 'YES'
+close( 9 )
 end if
 end subroutine
 

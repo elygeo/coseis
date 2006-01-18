@@ -13,6 +13,12 @@ integer :: i1(3), i2(3), i1l(3), i2l(3), n(3), noff(3), &
 real :: x1, x2, lj, lk, ll
 logical :: expand
 
+if ( master ) then
+  open( 9, file='log', position='append' )
+  write( 9, * ) 'Grid generation'
+  close( 9 )
+end if
+
 ! Single node indexing
 n = nn
 noff = nnoff

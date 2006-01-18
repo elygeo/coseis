@@ -18,7 +18,14 @@ use locknodes_m
 use timestep_m
 
 ! Initialization
-call initialize( master )
+call initialize( ip, master )
+if ( master ) then
+  open( 9, file='log', position='append' )
+  write( 9, * ) 'SORD - Support Operator Rupture Dynamics'
+  close( 9 )
+end if
+
+! Setup
 call inread( 'defaults.m' )
 call inread( 'in.m' )
 call setup
@@ -47,6 +54,11 @@ do while ( it <= nt )
 end do
 
 ! Finish up
+if ( master ) then
+  open( 9, file='log', position='append' )
+  write( 9, * ) 'Finished'
+  close( 9 )
+end if
 call finalize
 
 end program

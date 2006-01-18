@@ -2,6 +2,7 @@
 module momentsource_m
 use globals_m
 use diffnc_m
+use collective_m
 contains
 subroutine momentsource
 
@@ -13,6 +14,12 @@ integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc, ic
 real :: srcft, sumsrcfr
 
 if ( rsource <= 0. ) return
+
+if ( master ) then
+  open( 9, file='log', position='append' )
+  write( 9, * ) 'Moment source'
+  close( 9 )
+end if
 
 ifinit: if ( init ) then !-----------------------------------------------------!
 
