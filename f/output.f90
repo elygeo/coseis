@@ -145,15 +145,20 @@ doiz0: do iz = 1, nout
   
   ! Interval 
   if ( ditout(iz) < 1 ) ditout(iz) = nt + ditout(iz) + 1
-
+ 
   ! Zone
   i1 = i1out(iz,:)
   i2 = i2out(iz,:)
   call zone( i1, i2, nn, nnoff, ihypo, ifn )
   if ( cell ) i2 = i2 - 1
   if ( fault ) then
-    i1(ifn) = ihypo(ifn)
-    i2(ifn) = ihypo(ifn)
+    if ( faultnormal /= 0 ) then
+      i = abs( faultnormal )
+      i1(i) = ihypo(i)
+      i2(i) = ihypo(i)
+    else
+      ditout(iz) = nt + 1
+    end if
   end if
   if ( any( i2 < i1 ) ) stop 'output indices'
   i1out(iz,:) = i1
@@ -171,9 +176,9 @@ doiz0: do iz = 1, nout
   i2l = min( i2, i2node )
   if ( any( i2l < i1l ) ) ditout(iz) = nt + 1
   call iosplit( iz, nout, ditout(iz) )
-
+ 
 end do doiz0
-
+ 
 ! Column names
 if ( master ) then
   close( 9 )
@@ -209,13 +214,14 @@ case( 'a' )
   vmax = s2(vmaxi(1),vmaxi(2),vmaxi(3))
   call pmaxloc( amax, amaxi, nnoff )
   call pmaxloc( vmax, vmaxi, nnoff )
-  if ( ifn /= 0 ) then
+  if ( faultnormal /= 0 ) then
     svmaxi = maxloc( sv )
     slmaxi = maxloc( sl )
     svmax = sv(svmaxi(1),svmaxi(2),svmaxi(3))
-    slmax = sv(slmaxi(1),slmaxi(2),slmaxi(3))
-    svmaxi(ifn) = ihypo(ifn)
-    slmaxi(ifn) = ihypo(ifn)
+    slmax = sl(slmaxi(1),slmaxi(2),slmaxi(3))
+    i = abs( faultnormal )
+    svmaxi(i) = ihypo(i)
+    slmaxi(i) = ihypo(i)
     call pmaxloc( svmax, svmaxi, nnoff )
     call pmaxloc( slmax, slmaxi, nnoff )
   end if
@@ -268,11 +274,12 @@ i1 = i1out(iz,:)
 i2 = i2out(iz,:)
 i1l = max( i1, i1node )
 i2l = min( i2, i2node )
-if ( fault ) then
-  i1(ifn) = 1
-  i2(ifn) = 1
-  i1l(ifn) = 1
-  i2l(ifn) = 1
+if ( fault .and. faultnormal /= 0 ) then
+  i = abs( faultnormal )
+  i1(i) = 1
+  i2(i) = 1
+  i1l(i) = 1
+  i2l(i) = 1
 end if
 
 ! Binary output
@@ -354,7 +361,7 @@ if ( master ) then
   write( 9, * ) 'slmaxi = [', slmaxi - nnoff, '];'
   close( 9 )
 end if
-if ( ifn /= 0 .and. it == nt - 1 ) then
+if ( faultnormal /= 0 .and. it == nt - 1 ) then
   i1 = maxloc( tarr )
   j = i1(1)
   k = i1(2)
@@ -363,7 +370,8 @@ if ( ifn /= 0 .and. it == nt - 1 ) then
   call pmaxloc( tarrmax, i1, nnoff )
   if ( master ) then
     i2 = ihypo
-    i2(ifn) = 1
+    i = abs( faultnormal )
+    i2(i) = 1
     j = i2(1)
     k = i2(2)
     l = i2(3)

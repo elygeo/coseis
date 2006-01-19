@@ -28,7 +28,7 @@ i2l = i2node
 if ( ifn /= 0 ) then
   n(ifn) = n(ifn) - 1
   if ( ihypo(ifn) < i1l(ifn) ) then
-    noff = noff + 1
+    noff(ifn) = noff(ifn) + 1
   else if ( ihypo(ifn) < i2l(ifn) ) then
     i2l(ifn) = i2l(ifn) - 1
     idoublenode = ifn

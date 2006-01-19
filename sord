@@ -23,10 +23,13 @@ esac
 done
 shift $(( OPTIND - 1 ))
 
+[ -f out/count ] && count=$( cat out/count )
+count=$(( count + 1 ))
 srcdir=$( /bin/pwd )
-rundir=$( /bin/pwd )/out/$( date +%Y-%m-%d-%H-%M-%S )
+rundir=$( /bin/pwd )/out/$count
 [ -e out ] || mkdir out
-[ -e $rundir ] || mkdir $rundir
+echo $count > out/count
+mkdir $rundir
 rm -f current
 ln -s $rundir current
 
@@ -438,7 +441,5 @@ if [ "$run" = b ]; then
   echo "#!/bin/bash" > cancel.sh
   echo "kill $!" >> cancel.sh
   chmod u+x cancel.sh
-  sleep 1
-  tail -f current/errors
 fi
 
