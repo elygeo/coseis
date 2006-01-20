@@ -1,7 +1,7 @@
 % Test
-  faultnormal = 1;
+  faultnormal = 3;
   np = [ 1 1 1 ];
-  np = [ 3 1 2 ];
+  np = [ 2 1 1 ];
   nn = [ 9 9 9 ];
   nn = [ 4 4 4 ];
   nt = 2;
