@@ -7,13 +7,14 @@ integer, private :: ip, ipmaster
 contains
 
 ! Initialize
-subroutine initialize( ipout, master )
+subroutine initialize( ipout, np0, master )
 implicit none
 logical, intent(out) :: master
-integer, intent(out) :: ipout
+integer, intent(out) :: ipout, np0
 integer :: e
 call mpi_init( e )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
+call mpi_comm_size( mpi_comm_world, np0, e  )
 ipout = ip
 master = .false.
 if ( ip == 0 ) master = .true.

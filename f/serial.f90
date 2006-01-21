@@ -4,10 +4,11 @@ implicit none
 contains
 
 ! Initialize
-subroutine initialize( ip, master )
+subroutine initialize( ip, np0, master )
 logical, intent(out) :: master
-integer, intent(out) :: ip
+integer, intent(out) :: ip, np0
 ip = 0
+np0 = 1
 master = .true.
 end subroutine
 

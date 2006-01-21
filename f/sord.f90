@@ -18,7 +18,7 @@ use locknodes_m
 use timestep_m
 
 ! Initialization
-call initialize( ip, master )
+call initialize( ip, np0, master )
 if ( master ) then
   open( 9, file='log', position='append' )
   write( 9, * ) 'SORD - Support Operator Rupture Dynamics'
@@ -42,6 +42,10 @@ call output( 'i' )
 do while ( it <= nt )
   call pml
   call stress
+open( 9, file='log', position='append' )
+write( 9, * ) 'AAA', ip, it
+write( 9, * ) w1
+close( 9 )
   call momentsource
   call output( 'w' ) 
   call acceleration

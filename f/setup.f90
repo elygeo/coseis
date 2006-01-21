@@ -29,6 +29,7 @@ where ( bc2 == 1 ) i2pml = i2pml - npml
 if ( any( i1pml >= i2pml ) ) stop 'model too small for PML'
 
 ! Partition for parallelization
+if ( np0 == 1 ) np = 1
 nl = nn / np; where ( modulo( nn, np ) /= 0 ) nl = nl + 1
 np = nn / nl; where ( modulo( nn, nl ) /= 0 ) np = np + 1
 

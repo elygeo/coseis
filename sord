@@ -23,12 +23,12 @@ esac
 done
 shift $(( OPTIND - 1 ))
 
-[ -f out/count ] && count=$( cat out/count )
+[ -f out/.count ] && count=$( cat out/.count )
 count=$(( count + 1 ))
 srcdir=$( /bin/pwd )
 rundir=$( /bin/pwd )/out/$count
 [ -e out ] || mkdir out
-echo $count > out/count
+echo $count > out/.count
 mkdir $rundir
 rm -f current
 ln -s $rundir current
@@ -421,7 +421,7 @@ mv tmp machinefile
 
 *) #--------------------------------------#
 
-[ "$mode" = parallel ] && mpich2version &> /dev/null && ( mpdtrace &> /dev/null || mpd & )
+[ "$mode" = parallel ] && mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon
 
 # Interactive
 case $mode$run in

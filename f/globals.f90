@@ -123,6 +123,7 @@ integer, dimension(3) :: &
 
 integer :: &
   ip,           & ! processor rank
+  np0,          & ! number of processors available
   nt,           & ! number of time steps
   it,           & ! current time step
   itcheck,      & ! interval for checkpointing
