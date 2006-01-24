@@ -1,9 +1,9 @@
 % Test
-  debug = 1;
-  faultnormal = 1;
-  np = [ 2 1 1 ];
+  debug = 0;
+  faultnormal = 2;
+  np = [ 3 4 2 ];
   nn = [ 4 4 4 ];
-  nt = 2;
+  nt = 3;
   mus = .5;
   vrup = -1.;
   out = { 'x'    1   1 1 1  -1 -1 -1 };
