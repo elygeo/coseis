@@ -48,37 +48,7 @@ do while ( it <= nt )
   call output( 'w' ) 
   call acceleration
   call swaphalovector( w1, nhalo )
-open( 9, file='log', position='append' )
-write( 9, * ) ip, 'X0'
-write( 9, * ) w1(:,:,:,1)
-close( 9 )
-call pimin( i )
-open( 9, file='log', position='append' )
-write( 9, * ) ip, 'Y0'
-write( 9, * ) w1(:,:,:,2)
-close( 9 )
-call pimin( i )
-open( 9, file='log', position='append' )
-write( 9, * ) ip, 'Z0'
-write( 9, * ) w1(:,:,:,3)
-close( 9 )
-call pimin( i )
   call fault
-open( 9, file='log', position='append' )
-write( 9, * ) ip, 'X'
-write( 9, * ) w1(:,:,:,1)
-close( 9 )
-call pimin( i )
-open( 9, file='log', position='append' )
-write( 9, * ) ip, 'Y'
-write( 9, * ) w1(:,:,:,2)
-close( 9 )
-call pimin( i )
-open( 9, file='log', position='append' )
-write( 9, * ) ip, 'Z'
-write( 9, * ) w1(:,:,:,3)
-close( 9 )
-call pimin( i )
   call locknodes
   call output( 'a' )
   call writecheckpoint

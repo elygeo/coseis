@@ -71,6 +71,7 @@ case( 'trelax' );      read( str, * ) key1, trelax
 case( 'svtol' );       read( str, * ) key1, svtol
 case( 'np' );          read( str, * ) key1, np
 case( 'itcheck' );     read( str, * ) key1, itcheck
+case( 'debug' );       read( str, * ) key1, debug
 case( 'rho' );         inzone = .true.
 case( 'vp' );          inzone = .true.
 case( 'vs' );          inzone = .true.

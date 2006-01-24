@@ -1,6 +1,7 @@
 % Test
+  debug = 1;
   faultnormal = 1;
-  np = [ 1 1 2 ];
+  np = [ 2 1 1 ];
   nn = [ 4 4 4 ];
   nt = 2;
   mus = .5;

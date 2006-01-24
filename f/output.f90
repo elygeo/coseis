@@ -26,15 +26,12 @@ end if
 ifinit: if ( init ) then !-----------------------------------------------------!
 
 init = .false.
-ifmaster: if ( master ) then
+inquire( file='meta.m', exist=test )
+if ( test .and. it == 1 ) stop 'error: previous output found'
 
-  if ( nout > nz ) stop 'too many output zones, make nz bigger'
-  inquire( file='meta.m', exist=test )
-  if ( test .and. it == 1 ) stop 'error: previous output found'
-  call system_clock( count_rate=twall_rate, count_max=twall_max )
- 
-  ! Diagnostic
-  open(  9, file='diagnostic.m', status='replace' )
+! Diagnostic
+if ( debug /= 0 ) then
+  open(  9, file='diagnostic.m', position='append' )
   write( 9, * ) 'ifn         =  ', ifn,        ';'
   write( 9, * ) 'nin         =  ', nin,        ';'
   write( 9, * ) 'nout        =  ', nout,       ';'
@@ -42,8 +39,9 @@ ifmaster: if ( master ) then
   write( 9, * ) 'noper       =  ', noper,      ';'
   write( 9, * ) 'twall_rate  =  ', twall_rate, ';'
   write( 9, * ) 'twall_max   =  ', twall_max,  ';'
-  write( 9, * ) 'nm          = [', nm,        '];'
+  write( 9, * ) 'ip          =  ', ip,         ';'
   write( 9, * ) 'ip3         = [', ip3,       '];'
+  write( 9, * ) 'nm          = [', nm,        '];'
   write( 9, * ) 'nnoff       = [', nnoff,     '];'
   write( 9, * ) 'i1node      = [', i1node,    '];'
   write( 9, * ) 'i2node      = [', i2node,    '];'
@@ -64,8 +62,11 @@ ifmaster: if ( master ) then
     write( 9,*) 'lock        = [', ilock(iz,:), i1lock(iz,:), i2lock(iz,:), '];'
   end do
   close( 9 )
+end if
 
-  ! Metadata
+! Metadata
+if ( master ) then
+  call system_clock( count_rate=twall_rate, count_max=twall_max )
   endian = 'l'
   if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
   courant = dt * vp2 * sqrt( 3. ) / abs( dx )
@@ -111,7 +112,9 @@ ifmaster: if ( master ) then
   write( 9, * ) 'rfunc       = ''', trim( rfunc ), ''';'
   write( 9, * ) 'tfunc       = ''', trim( tfunc ), ''';'
   write( 9, * ) 'endian      = ''', endian, ''';'
-end if ifmaster
+end if
+
+if ( nout > nz ) stop 'too many output zones, make nz bigger'
 
 doiz0: do iz = 1, nout
 

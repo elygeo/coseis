@@ -29,7 +29,7 @@ init = .false.
 
 ! Test if fault plane exists on this processor
 i = ihypo(ifn)
-if ( i < i1node(ifn) .or. i > i2node(ifn) ) then
+if ( i + 1 < i1node(ifn) .or. i > i2node(ifn) ) then
   ifn = 0
   return
 end if

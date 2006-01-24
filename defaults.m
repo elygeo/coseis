@@ -69,7 +69,8 @@
   np = [ 1 1 1 ];			% no parallelization
 % itcheck = 100;			% checkpoint every 100 time steps
 % itcheck = -1;				% checkpoint just before finishing
-  itcheck = 0;				% no checkpointing
+  itcheck = 0;				% checkpointing off
+  debug = 0;                            % debugging off
 % out = { 'v'  10   1 1 1  -1 -1 -1 };	% **write v every 10 steps
 % out = { 'sl' -1   1 1 1  -1 -1 -1 };	% **write final slip length
 

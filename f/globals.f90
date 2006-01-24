@@ -127,6 +127,7 @@ integer :: &
   nt,           & ! number of time steps
   it,           & ! current time step
   itcheck,      & ! interval for checkpointing
+  debug,        & ! debugging flag
   npml,         & ! number of PML damping nodes
   faultnormal,  & ! fault normal direction
   ifn,          & ! fault normal component=abs(faultnormal)

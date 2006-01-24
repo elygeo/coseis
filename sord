@@ -17,18 +17,18 @@ case "$opt" in
   n) run= ; compile= ;;
   g) fflags=g ;;
   G) fflags=g; run=g ;;
-  d) rm -rf out ;;
+  d) rm -rf out/* ;;
   *) exit ;;
 esac
 done
 shift $(( OPTIND - 1 ))
 
-[ -f out/.count ] && count=$( cat out/.count )
+[ -f out/count ] && count=$( cat out/count )
 count=$(( count + 1 ))
 srcdir=$( /bin/pwd )
 rundir=$( /bin/pwd )/out/$count
 [ -e out ] || mkdir out
-echo $count > out/.count
+echo $count > out/count
 mkdir $rundir
 rm -f current
 ln -s $rundir current
