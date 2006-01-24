@@ -17,6 +17,8 @@ use fault_m
 use locknodes_m
 use timestep_m
 
+integer i
+
 ! Initialization
 call initialize( ip, np0, master )
 if ( master ) then
@@ -42,15 +44,41 @@ call output( 'i' )
 do while ( it <= nt )
   call pml
   call stress
-open( 9, file='log', position='append' )
-write( 9, * ) 'AAA', ip, it
-write( 9, * ) w1
-close( 9 )
   call momentsource
   call output( 'w' ) 
   call acceleration
   call swaphalovector( w1, nhalo )
+open( 9, file='log', position='append' )
+write( 9, * ) ip, 'X0'
+write( 9, * ) w1(:,:,:,1)
+close( 9 )
+call pimin( i )
+open( 9, file='log', position='append' )
+write( 9, * ) ip, 'Y0'
+write( 9, * ) w1(:,:,:,2)
+close( 9 )
+call pimin( i )
+open( 9, file='log', position='append' )
+write( 9, * ) ip, 'Z0'
+write( 9, * ) w1(:,:,:,3)
+close( 9 )
+call pimin( i )
   call fault
+open( 9, file='log', position='append' )
+write( 9, * ) ip, 'X'
+write( 9, * ) w1(:,:,:,1)
+close( 9 )
+call pimin( i )
+open( 9, file='log', position='append' )
+write( 9, * ) ip, 'Y'
+write( 9, * ) w1(:,:,:,2)
+close( 9 )
+call pimin( i )
+open( 9, file='log', position='append' )
+write( 9, * ) ip, 'Z'
+write( 9, * ) w1(:,:,:,3)
+close( 9 )
+call pimin( i )
   call locknodes
   call output( 'a' )
   call writecheckpoint

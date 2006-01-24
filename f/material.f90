@@ -170,6 +170,7 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     + s1(j,k-1,l) + s1(j-1,k,l-1) &
     + s1(j,k,l-1) + s1(j-1,k-1,l) )
 end forall
+call swaphaloscalar( s2, nhalo )
 
 ! Hourglass constant
 y = 6. * dx * dx * ( lam + 2. * mu )

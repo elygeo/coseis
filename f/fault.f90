@@ -92,10 +92,14 @@ else
   end select
 end if ifreadfile
 end do doiz
+call swaphaloscalar( mus, nhalo )
+call swaphaloscalar( mud, nhalo )
+call swaphaloscalar( dc, nhalo )
+call swaphaloscalar( co, nhalo )
 
 ! Lock fault in PML region
-i1 = max( i1pml + 1, i1node )
-i2 = min( i2pml - 1, i2node )
+i1 = max( i1pml + 1, 1 )
+i2 = min( i2pml - 1, nm )
 i1(ifn) = 1
 i2(ifn) = 1
 j1 = i1(1); j2 = i2(1)
@@ -112,6 +116,7 @@ i2 = i2node
 i1(ifn) = ihypo(ifn)
 i2(ifn) = ihypo(ifn)
 call surfnormals( nhat, x, i1, i2 )
+call swaphalovector( nhat, nhalo )
 area = sqrt( sum( nhat * nhat, 4 ) )
 f1 = area
 where ( f1 /= 0. ) f1 = side / f1
@@ -156,6 +161,7 @@ do i = 1, 3
     t3(:,:,:,2) * t1(:,:,:,i) + &
     t3(:,:,:,3) * t2(:,:,:,i)
 end do
+call swaphalovector( t0, nhalo )
 
 ! Hypocentral radius
 i1 = 1

@@ -144,6 +144,7 @@ integer, intent(in) :: nhalo
 integer :: i, e, left, right, ng(3), nl(3), isend(4), irecv(4), tsend, trecv
 ng = (/ size(f,1), size(f,2), size(f,3) /)
 do i = 1, 3
+if ( ng(i) > 1 ) then
   call mpi_cart_shift( c, i-1, 1, left, right, e )
   nl = ng
   nl(i) = nhalo
@@ -166,6 +167,7 @@ do i = 1, 3
   call mpi_sendrecv( f, 1, tsend, left, 1, f, 1, trecv, right, 1, c, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
+end if
 end do
 end subroutine
 
@@ -177,6 +179,7 @@ integer, intent(in) :: nhalo
 integer :: i, e, left, right, ng(4), nl(4), isend(4), irecv(4), tsend, trecv
 ng = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
 do i = 1, 3
+if ( ng(i) > 1 ) then
   call mpi_cart_shift( c, i-1, 1, left, right, e )
   nl = ng
   nl(i) = nhalo
@@ -199,6 +202,7 @@ do i = 1, 3
   call mpi_sendrecv( f, 1, tsend, left, 1, f, 1, trecv, right, 1, c, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
+end if
 end do
 end subroutine
 

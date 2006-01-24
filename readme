@@ -27,7 +27,10 @@ USAGE
   See 'defaults.m' and 'in/' for examples.
 
   Options:
-    -m  use MATLAB backend (default is Fortran)
+    -s  serial Fortran 95 mode (default if np == 1)
+    -p  parallel Fortran/MPI mode (default if np > 1)
+    -m  MATLAB mode
+    -i  run interactively (default is to run in the background)
     -c  setup and compile, do not run
     -n  setup only, do not compile or run
     -g  compile with debugging and syntax checking flags
