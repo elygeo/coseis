@@ -1,11 +1,14 @@
 % PML test problem
 
-  np = [ 2 1 1 ];
+  np = [ 1 1 1 ];
+  gridtrans = [   1. 0. 0.; 0.  1. 0.; 0. 0.  1. ] /  1.; % no strain
+  gridtrans = [   2. 0. 0.; 0.  1. 0.; 0. 0.  1. ] /  1.; % 1D strain
+  gridtrans = [  25. 0. 9.; 0. 10. 0.; 0. 0. 16. ] / 10.; % 2D strain
+  gridtrans = [  12. 3. 3.; 0.  9. 1.; 0. 0.  8. ] /  6.; % 3D strain
   faultnormal = 0;
   rsource = 150.;
   nt = 1;
   nt = 100;
-  nt = 2;
   nn = [ 161 161 161 ];
   nn = [ 81 81 81 ];
   nn = [ 8 4 4 ];

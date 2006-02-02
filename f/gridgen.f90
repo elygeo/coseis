@@ -10,7 +10,7 @@ implicit none
 real :: theta, scl
 integer :: i1(3), i2(3), i1l(3), i2l(3), n(3), noff(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, up(1)
-real :: x1, x2, lj, lk, ll
+real :: x1, x2, lj, lk, ll, m(9)
 logical :: expand
 
 if ( master ) then
@@ -101,29 +101,17 @@ if ( rexpand > 1. ) then
   end do
 end if
 
-! Mesh type
-select case( grid )
-case( 'read' )
-  oper = 'o'
-case( 'constant' )
-  oper = 'h'
-  if ( expand ) oper = 'r'
-case( 'stretch' )
-  oper = 'r'
-  x(:,:,:,l) = 2. * x(:,:,:,l)
-case( 'slant' )
-  oper = 'g'
-  theta = 20. * pi / 180.
-  scl = sqrt( cos( theta ) ** 2. + ( 1. - sin( theta ) ) ** 2. )
-  scl = sqrt( 2. ) / scl
-  x(:,:,:,j) = x(:,:,:,j) - x(:,:,:,l) * sin( theta );
-  x(:,:,:,l) = x(:,:,:,l) * cos( theta );
-  x(:,:,:,j) = x(:,:,:,j) * scl;
-  x(:,:,:,l) = x(:,:,:,l) * scl;
-case( 'rand' )
-  oper = 'g'
+! Grid transformation
+m = sqrt( gridtrans(1:9) / gridtrans(10) )
+w1(:,:,:,1) = m(1) * x(:,:,:,1) + m(2) * x(:,:,:,2) + m(3) * x(:,:,:,3)
+w1(:,:,:,2) = m(4) * x(:,:,:,1) + m(5) * x(:,:,:,2) + m(6) * x(:,:,:,3)
+w1(:,:,:,3) = m(7) * x(:,:,:,1) + m(8) * x(:,:,:,2) + m(9) * x(:,:,:,3)
+x = w1
+
+! Random noise added to mesh
+if ( gridnoise > 0. ) then
   call random_number( w1 )
-  w1 = .2 * ( w1 - .5 )
+  w1 = gridnoise * ( w1 - .5 )
   if( edge1(1) ) x(j1,:,:,1) = 0.
   if( edge2(1) ) x(j2,:,:,1) = 0.
   if( edge1(2) ) x(:,k1,:,2) = 0.
@@ -136,9 +124,7 @@ case( 'rand' )
   case( 3 ); i = ihypo(3); w1(:,:,i,3) = 0.
   end select
   x = x + w1
-case( 'spherical' )
-case default; stop 'grid'
-end select
+end if
 
 ! Fill in halo
 call swaphalovector( x, nhalo )
@@ -162,7 +148,7 @@ end select
 noper = 1
 i1oper(1,:) = i1cell
 i2oper(1,:) = i2cell + 1
-if ( oper(1) == 'o' ) call optimize
+call optimize
 
 ! Hypocenter location
 if ( all( xhypo < 0. ) ) then

@@ -5,9 +5,9 @@
   nt = 40;				% number of time steps
   dx = 100.;				% spatial step length
   dt = .0075;				% time step length
-% grid = 'slant';			% skewed mesh
-% grid = 'read';			% read files: data/x1 data/x2 data/x3
   grid = 'constant';			% regular mesh
+  gridtrans = [ 1. 0. 0.; 0. 1. 0.; 0. 0. 1. ] / 1.; % grid tranformation
+  gridnoise = 0.			% Random noise added to mesh
 % upvector = [ 0 0 1 ];			% positive z up
   upvector = [ 0 -1 0 ];		% negative y up
   rho = 2670.;				% **density

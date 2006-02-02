@@ -31,7 +31,7 @@ if ( str == ' ' ) cycle doline
 
 ! Strip MATLAB characters
 do
-  i = scan( str, "{}=[]';" )
+  i = scan( str, "{}=[]/';" )
   if ( i == 0 ) exit
   str(i:i) = ' '
 end do
@@ -44,6 +44,8 @@ inzone = .false.
 select case( key1 )
 case( 'return' );      exit doline
 case( 'grid' );        read( str, * ) key1, grid
+case( 'gridtrans' );   read( str, * ) key1, gridtrans
+case( 'gridnoise' );   read( str, * ) key1, gridnoise
 case( 'rfunc' );       read( str, * ) key1, rfunc
 case( 'tfunc' );       read( str, * ) key1, tfunc
 case( 'nn' );          read( str, * ) key1, nn
