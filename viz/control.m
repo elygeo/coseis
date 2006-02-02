@@ -72,16 +72,15 @@ case 'r'
   export = 0;
   rehash
   currentstep
-it
   istep = dit * 10 ^ km;
   if export && ~exist( 'movie', 'dir' ), mkdir( 'movie' ), end
   while anim && icursor(4) <= it;
-    rehash
-    currentstep
     render
     drawnow
     if export, snap( sprintf( 'movie/frame%06d.png', icursor(4) ) ), end
-    icursor(4) = icursor(4) + istep;
+    icursor(4) = icursor(4) + istep
+    rehash
+    currentstep
   end
   icursor(4) = icursor(4) - istep;
 case 'backspace'

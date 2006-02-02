@@ -21,6 +21,7 @@ if msg, return, end
 if msg, error 'no mesh data found', end
 i1hold = i1s;
 i2hold = i2s;
+
 % Rearrange
 x = permute( x, [ 1 2 3 5 4 ] );
 s = permute( s, [ 1 2 3 5 4 ] );
