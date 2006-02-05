@@ -20,10 +20,10 @@
   viscosity = [ .1 .35 ];		% stress (1) & hourglass (2)
 % npml = 0;				% no PML absorbing boundary
   npml = 10;				% 10 PML nodes
-% bc1 = [ 1 0 1 ];			% PML for j1 l1, free surface for k1
-% bc2 = [ 1 1 1 ];			% PML for j2 k2 l2
-  bc1 = [ 0 0 0 ];			% PML for j1 l1, free surface for k1
-  bc2 = [ 0 0 0 ];			% PML for j2 k2 l2
+% boundary1 = [ 1 0 1 ];		% PML for j1 l1, free surface for k1
+% boundary2 = [ 1 1 1 ];		% PML for j2 k2 l2
+  boundary1 = [ 0 0 0 ];		% PML for j1 l1, free surface for k1
+  boundary2 = [ 0 0 0 ];		% PML for j2 k2 l2
   ihypo	 = [ 0 0 0 ];			% 0: mesh center
   xhypo	 = [ -1. -1. -1. ];		% <0: x(ihypo)
   rexpand = 1.06;			% grid expansion ratio

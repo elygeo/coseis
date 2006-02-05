@@ -105,6 +105,32 @@ end if
 
 end do doiz
 
+! Boundaries
+i1 = i1node
+i2 = i2node
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+do i = 1, nhalo
+  mr(j1-i,:,:) = mr(j1+1,:,:)
+  s1(j1-i,:,:) = s1(j1+1,:,:)
+  s2(j1-i,:,:) = s2(j1+1,:,:)
+  mr(j2+i,:,:) = mr(j2-1,:,:)
+  s1(j2+i,:,:) = s1(j2-1,:,:)
+  s2(j2+i,:,:) = s2(j2-1,:,:)
+  mr(:,k1-i,:) = mr(:,k1+1,:)
+  s1(:,k1-i,:) = s1(:,k1+1,:)
+  s2(:,k1-i,:) = s2(:,k1+1,:)
+  mr(:,k2+i,:) = mr(:,k2-1,:)
+  s1(:,k2+i,:) = s1(:,k2-1,:)
+  s2(:,k2+i,:) = s2(:,k2-1,:)
+  mr(:,:,l1-i) = mr(:,:,l1+1)
+  s1(:,:,l1-i) = s1(:,:,l1+1)
+  s2(:,:,l1-i) = s2(:,:,l1+1)
+  mr(:,:,l2+i) = mr(:,:,l2-1)
+  s1(:,:,l2+i) = s1(:,:,l2-1)
+  s2(:,:,l2+i) = s2(:,:,l2-1)
+end do
 call swaphaloscalar( mr, nhalo )
 call swaphaloscalar( s1, nhalo )
 call swaphaloscalar( s2, nhalo )

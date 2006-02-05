@@ -112,6 +112,8 @@ integer, dimension(3) :: &
   ip3,           & ! 3D processor rank
   bc1,           & ! boundary conditions for j1 k1 l1
   bc2,           & ! boundary conditions for j2 k2 l2
+  ibc1,          & ! internal boundary conditions for j1 k1 l1
+  ibc2,          & ! internal boundary conditions for j2 k2 l2
   nnoff,         & ! offset between local and global indices
   ihypo,         & ! hypocenter node
   n1expand,      & ! # grid expantion nodes for j1 k1 l1
@@ -165,8 +167,6 @@ character(160) :: &
 
 logical :: &
   master,        & ! master processor flag
-  edge1(3),      & ! edge processor
-  edge2(3),      & ! edge processor
   readfile(nz)     ! read input file
 
 end module

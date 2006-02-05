@@ -108,16 +108,25 @@ w1(:,:,:,2) = m(4) * x(:,:,:,1) + m(5) * x(:,:,:,2) + m(6) * x(:,:,:,3)
 w1(:,:,:,3) = m(7) * x(:,:,:,1) + m(8) * x(:,:,:,2) + m(9) * x(:,:,:,3)
 x = w1
 
+! Mesh type
+select case( grid )
+case( 'read' )
+case( 'constant' )
+case( 'hill' )
+case( 'spherical' )
+case default; stop 'grid'
+end select
+
 ! Random noise added to mesh
 if ( gridnoise > 0. ) then
   call random_number( w1 )
   w1 = gridnoise * ( w1 - .5 )
-  if( edge1(1) ) x(j1,:,:,1) = 0.
-  if( edge2(1) ) x(j2,:,:,1) = 0.
-  if( edge1(2) ) x(:,k1,:,2) = 0.
-  if( edge2(2) ) x(:,k2,:,2) = 0.
-  if( edge1(3) ) x(:,:,l1,3) = 0.
-  if( edge2(3) ) x(:,:,l2,3) = 0.
+  if ( ibc1(1) <= 1 ) w1(j1,:,:,1) = 0.
+  if ( ibc2(1) <= 1 ) w1(j2,:,:,1) = 0.
+  if ( ibc1(2) <= 1 ) w1(:,k1,:,2) = 0.
+  if ( ibc2(2) <= 1 ) w1(:,k2,:,2) = 0.
+  if ( ibc1(3) <= 1 ) w1(:,:,l1,3) = 0.
+  if ( ibc2(3) <= 1 ) w1(:,:,l2,3) = 0.
   select case( idoublenode )
   case( 1 ); i = ihypo(1); w1(i,:,:,1) = 0.
   case( 2 ); i = ihypo(2); w1(:,i,:,2) = 0.
@@ -126,16 +135,22 @@ if ( gridnoise > 0. ) then
   x = x + w1
 end if
 
-! Fill in halo
-call swaphalovector( x, nhalo )
+! Boundaries
 do i = 1, nhalo
-  if( edge1(1) ) x(j1-i,:,:,:) = x(j1,:,:,:)
-  if( edge2(1) ) x(j2+i,:,:,:) = x(j2,:,:,:)
-  if( edge1(2) ) x(:,k1-i,:,:) = x(:,k1,:,:)
-  if( edge2(2) ) x(:,k2+i,:,:) = x(:,k2,:,:)
-  if( edge1(3) ) x(:,:,l1-i,:) = x(:,:,l1,:)
-  if( edge2(3) ) x(:,:,l2+i,:) = x(:,:,l2,:)
+  x(j1-i,:,:,:) = x(j1+i,:,:,:)
+  x(j1-i,:,:,1) = 2. * x(j1,:,:,1) - x(j1+i,:,:,1)
+  x(j2+i,:,:,:) = x(j2-i,:,:,:)
+  x(j2+i,:,:,1) = 2. * x(j2,:,:,1) - x(j2-i,:,:,1)
+  x(:,k1-i,:,:) = x(:,k1+i,:,:)
+  x(:,k1-i,:,2) = 2. * x(:,k1,:,2) - x(:,k1+i,:,2)
+  x(:,k2+i,:,:) = x(:,k2-i,:,:)
+  x(:,k2+i,:,2) = 2. * x(:,k2,:,2) - x(:,k2-i,:,2)
+  x(:,:,l1-i,:) = x(:,:,l1+i,:)
+  x(:,:,l1-i,3) = 2. * x(:,:,l1,3) - x(:,:,l1+i,3)
+  x(:,:,l2+i,:) = x(:,:,l2-i,:)
+  x(:,:,l2+i,3) = 2. * x(:,:,l2,3) - x(:,:,l2-i,3)
 end do
+call swaphalovector( x, nhalo )
 
 ! Create fault double nodes
 select case( idoublenode )

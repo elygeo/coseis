@@ -35,8 +35,10 @@ np = nn / nl; where ( modulo( nn, nl ) /= 0 ) np = np + 1
 
 ! Processor rank
 call rank( np, ip, ip3 )
-edge1 = ip3 == 0
-edge2 = ip3 == np - 1
+ibc1 = bc1
+ibc2 = bc2
+where ( ip3 /= 0      ) ibc1 = 3
+where ( ip3 /= np - 1 ) ibc2 = 3
 
 ! Master processor holds the hypocenter
 ip3master = ( ihypo - 1 ) / nl
@@ -63,8 +65,8 @@ i2node = nhalo + nl
 ! Cell region
 i1cell = nhalo  
 i2cell = nhalo + nl
-where ( edge1 ) i1cell = i1cell + 1
-where ( edge2 ) i2cell = i2cell - 1
+where ( ibc1 >= 2 ) i1cell = i1cell + 1
+where ( ibc2 >= 2 ) i2cell = i2cell - 1
 
 end subroutine
 end module

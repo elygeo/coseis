@@ -30,8 +30,6 @@ rundir=$( /bin/pwd )/out/$count
 [ -e out ] || mkdir out
 echo $count > out/count
 mkdir $rundir
-rm -f current
-ln -s $rundir current
 
 # Symlink input file specified on command line
 [ -n "$1" ] && ln -sf "$1" 'in.m'

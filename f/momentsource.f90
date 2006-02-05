@@ -82,6 +82,7 @@ end do
 end do
 end do
 
+w1 = 0.
 s1 = 0.
 s2 = 0.
 

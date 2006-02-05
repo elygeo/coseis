@@ -43,40 +43,11 @@ case 'read'
   oper = 'g';
 case 'constant'
   oper = 'h';
-case 'stretch'
-  oper = 'r';
-  x(:,:,:,l) = 2 * x(:,:,:,l);
-case 'slant'
-  oper = 'g';
-  theta = 20 * pi / 180;
-  scl = sqrt( cos( theta ) ^ 2 + ( 1 - sin( theta ) ) ^ 2 );
-  scl = sqrt( 2 ) / scl
-  x(:,:,:,j) = x(:,:,:,j) - x(:,:,:,l) * sin( theta );
-  x(:,:,:,l) = x(:,:,:,l) * cos( theta );
-  x(:,:,:,j) = x(:,:,:,j) * scl;
-  x(:,:,:,l) = x(:,:,:,l) * scl;
 case 'hill'
   oper = 'g';
   s1 = ( x(:,:,:,j) - .5 * lj ) .^ 2 + ( x(:,:,:,k) - .5 * lk ) .^ 2;
   s1 = exp( -s1 / ( ( lj + lk ) / 10 ) ^ 2 );
   x(:,:,:,l) = x(:,:,:,l) - .25 * ( ll - x(:,:,:,l) ) .* s1;
-case 'normal'
-  oper = 'g';
-  c = 0.1 * lj;
-  s1 = x(:,:,:,l) / ll - .5;
-  s2 = x(:,:,:,k) / lk - .5;
-  x(:,:,:,k) = x(:,:,:,k) - c * s1 * 4. .* ( .5 - abs( s2 ) );
-  x(:,:,:,l) = x(:,:,:,l) + c * ( s1 - .5 ) .* atan( 10. * s2 );
-  x(:,:,:,l) = x(:,:,:,l) - x(2,2,2,3);
-  x = 1.5 * x;
-case 'curve'
-  oper = 'g';
-  c = 0.1 * lj;
-  s1 = x(:,:,:,j) / lj;
-  s2 = x(:,:,:,k) / lk;
-  x(:,:,:,j) = s1 + c * sin( s2 * 2. * pi ) .* ( .5 - abs( s1 - .5 ) );
-  x(:,:,:,k) = s2 - c * sin( s1 * 2. * pi ) .* ( .5 - abs( s2 - .5 ) );
-  x = 1.5 * x;
 case 'spherical'
   oper = 'g';
   da = pi / 2. / max( [ lj lk ] );

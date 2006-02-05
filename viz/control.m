@@ -78,7 +78,7 @@ case 'r'
     render
     drawnow
     if export, snap( sprintf( 'movie/frame%06d.png', icursor(4) ) ), end
-    icursor(4) = icursor(4) + istep
+    icursor(4) = icursor(4) + istep;
     rehash
     currentstep
   end

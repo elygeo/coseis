@@ -4,6 +4,7 @@ use globals_m
 use diffcn_m
 use hourglassnc_m
 use hourglasscn_m
+use collective_m
 contains
 subroutine acceleration
 
@@ -113,6 +114,34 @@ end do
 do i = 1, 3
   w1(:,:,:,i) = w1(:,:,:,i) * mr
 end do
+
+! Boundaries
+i1 = i1node
+i2 = i2node
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+do i = 1, nhalo
+  w1(j1-i,:,:,1) = -w1(j1+i,:,:,1)
+  w1(j1-i,:,:,2) =  w1(j1+i,:,:,2)
+  w1(j1-i,:,:,3) =  w1(j1+i,:,:,3)
+  w1(j2+i,:,:,1) = -w1(j2-i,:,:,1)
+  w1(j2+i,:,:,2) =  w1(j2-i,:,:,2)
+  w1(j2+i,:,:,3) =  w1(j2-i,:,:,3)
+  w1(:,k1-i,:,1) =  w1(:,k1+i,:,1)
+  w1(:,k1-i,:,2) = -w1(:,k1+i,:,2)
+  w1(:,k1-i,:,3) =  w1(:,k1+i,:,3)
+  w1(:,k2+i,:,1) =  w1(:,k2-i,:,1)
+  w1(:,k2+i,:,2) = -w1(:,k2-i,:,2)
+  w1(:,k2+i,:,3) =  w1(:,k2-i,:,3)
+  w1(:,:,l1-i,1) =  w1(:,:,l1+i,1)
+  w1(:,:,l1-i,2) =  w1(:,:,l1+i,2)
+  w1(:,:,l1-i,3) = -w1(:,:,l1+i,3)
+  w1(:,:,l2+i,1) =  w1(:,:,l2-i,1)
+  w1(:,:,l2+i,2) =  w1(:,:,l2-i,2)
+  w1(:,:,l2+i,3) = -w1(:,:,l2-i,3)
+end do
+call swaphalovector( w1, nhalo )
 
 end subroutine
 

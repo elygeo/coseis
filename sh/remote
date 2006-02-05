@@ -2,10 +2,10 @@
 
 account="ux451302@tg-login.sdsc.edu"
 account="moho.sdsu.edu"
-account="phim.ucsd.edu"
 account="babieca.sdsu.edu"
 account="altai.sdsu.edu"
 account="ux451302@dslogin.sdsc.edu"
+account="phim.ucsd.edu"
 
 echo -e "\n$account"
 
