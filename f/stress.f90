@@ -23,8 +23,6 @@ s1 = 0.
 doic: do ic  = 1, 3
 doid: do iid = 1, 3; id = modulo( ic + iid - 1, 3 ) + 1
 
-print *, 'icid', ic, id
-
 ! Elastic region: G = grad(U + gamma*V)
 do iz = 1, noper
   i1 = max( max( i1oper(iz,:), i1pml + 1 ),     i1cell )
@@ -64,9 +62,6 @@ if ( id /= 3 ) then
   call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
 end if
 
-print *, 's1-222'
-print *, s1
-
 ! PML region, damped direction: G' + DG = gradV
 select case( id )
 case( 1 )
@@ -96,7 +91,6 @@ case( 2 )
   i1 = i1cell
   i2 = i2cell
   i2(2) = min( i2(2), i1pml(2) )
-print *, 'asdf', i1, i2
   call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
   do k = i1(2), i2(2)
   i = k - nnoff(2)
@@ -108,7 +102,6 @@ print *, 'asdf', i1, i2
   i1 = i1cell
   i2 = i2cell
   i1(2) = max( i1(2), i2pml(2) - 1 )
-print *, 'asdf', i1, i2
   call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
   do k = i1(2), i2(2)
   i = nn(2) - k + nnoff(2)
@@ -141,9 +134,6 @@ case( 3 )
   end forall
   end do
 end select
-
-print *, 's1-333'
-print *, s1
 
 ! Add contribution to strain
 if ( ic == id ) then
