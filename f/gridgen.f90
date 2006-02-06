@@ -135,7 +135,7 @@ if ( gridnoise > 0. ) then
   x = x + w1
 end if
 
-! Boundaries
+! Halo
 do i = 1, nhalo
   x(j1-i,:,:,:) = x(j1+i,:,:,:)
   x(j1-i,:,:,1) = 2. * x(j1,:,:,1) - x(j1+i,:,:,1)

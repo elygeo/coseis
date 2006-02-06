@@ -105,7 +105,7 @@ end if
 
 end do doiz
 
-! Boundaries
+! Halo
 i1 = i1node
 i2 = i2node
 j1 = i1(1); j2 = i2(1)
@@ -199,8 +199,10 @@ end forall
 call swaphaloscalar( s2, nhalo )
 
 ! Hourglass constant
-y = 6. * dx * dx * ( lam + 2. * mu )
-where ( y /= 0. ) y = 4. * mu * ( lam + mu ) / y * s1
+y = 12. * ( lam + 2. * mu )
+where ( y /= 0. ) y = dx * mu * ( lam + mu ) / y
+! y = 12. * dx * dx * ( lam + 2. * mu )
+! where ( y /= 0. ) y = s1 * mu * ( lam + mu ) / y
 
 ! Divide Lame parameters by cell volume
 where ( s1 /= 0. ) s1 = 1. / s1

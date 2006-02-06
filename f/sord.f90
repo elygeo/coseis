@@ -39,11 +39,30 @@ call momentsource
 call fault
 call output( 'i' )
 
+print *, 'x'
+print *, x
+print *, 'mr'
+print *, mr
+print *, 'mu'
+print *, mu
+print *, 'lam'
+print *, lam
+
 ! Main loop
 do while ( it <= nt )
   call pml
   call stress
-  call momentsource
+!  call momentsource
+print *, 'u'
+print *, u
+print *, 'v'
+print *, v
+print *, 'w1'
+print *, w2
+print *, 'w2'
+print *, w2
+print *, 'w2'
+print *, w2(:,:,:,3)
   call output( 'w' ) 
   call acceleration
   call fault

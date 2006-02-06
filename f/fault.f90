@@ -176,6 +176,15 @@ do i = 1, 3
 end do
 rhypo = sqrt( sum( t3 * t3, 4 ) )
 
+! Symmetry
+if ( ibc2(ifn) == -1 ) then
+  select case( ifn )
+  case( 1 ); mr(i2node(1)+1,:,:) = mr(i2node(1),:,:)
+  case( 2 ); mr(:,i2node(2)+1,:) = mr(:,i2node(2),:)
+  case( 3 ); mr(:,:,i2node(3)+1) = mr(:,:,i2node(3))
+  end select
+end if
+
 ! Metadata
 if ( master ) then
   i1 = ihypo
