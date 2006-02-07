@@ -163,7 +163,7 @@ do i = 1, 3
 end do
 call swaphalovector( t0, nhalo )
 
-! Hypocentral radius
+! Indices
 i1 = 1
 i2 = nm
 i1(ifn) = ihypo(ifn)
@@ -171,19 +171,20 @@ i2(ifn) = ihypo(ifn)
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
+i1(ifn) = ihypo(ifn) + 1
+i2(ifn) = ihypo(ifn) + 1
+j3 = i1(1); j4 = i2(1)
+k3 = i1(2); k4 = i2(2)
+l3 = i1(3); l4 = i2(3)
+
+! Hypocentral radius
 do i = 1, 3
   t3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i)
 end do
 rhypo = sqrt( sum( t3 * t3, 4 ) )
 
-! Symmetry
-if ( ibc2(ifn) == -1 ) then
-  select case( ifn )
-  case( 1 ); mr(i2node(1)+1,:,:) = mr(i2node(1),:,:)
-  case( 2 ); mr(:,i2node(2)+1,:) = mr(:,i2node(2),:)
-  case( 3 ); mr(:,:,i2node(3)+1) = mr(:,:,i2node(3))
-  end select
-end if
+! Symmetric boundary
+if ( ibc2(ifn) == -1 ) mr(j3:j4,k3:k4,l3:l4) = mr(j1:j2,k1:k2,l1:l2)
 
 ! Metadata
 if ( master ) then
@@ -231,6 +232,12 @@ i2(ifn) = ihypo(ifn) + 1
 j3 = i1(1); j4 = i2(1)
 k3 = i1(2); k4 = i2(2)
 l3 = i1(3); l4 = i2(3)
+
+! Symmetric boundary
+if ( ibc2(ifn) == -1 ) then
+  w1(j3:j4,k3:k4,l3:l4,:)   = -w1(j1:j2,k1:k2,l1:l2,:)
+  w1(j3:j4,k3:k4,l3:l4,ifn) =  w1(j1:j2,k1:k2,l1:l2,ifn)
+end if
 
 ! Zero slip velocity condition
 f1 = dt * area * ( mr(j1:j2,k1:k2,l1:l2) + mr(j3:j4,k3:k4,l3:l4) )
