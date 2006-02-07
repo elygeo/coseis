@@ -59,12 +59,13 @@ if ( .not. readfile(iz) ) then
 else
   idoublenode = 0
   if ( ifn /= 0 ) then
-    if ( ihypo(ifn) < i1l(ifn) ) then
-      i1(ifn) = i1(ifn) + 1
+    i = ihypo(ifn)
+    if ( i < i1l(ifn) ) then
+      if ( i >= i1(ifn) ) i1(ifn) = i1(ifn) + 1
     else
-      if ( ihypo(ifn) <  i2(ifn)  ) i2(ifn) = i2(ifn) - 1
-      if ( ihypo(ifn) <  i2l(ifn) ) i2l(ifn) = i2l(ifn) - 1
-      if ( ihypo(ifn) <= i2l(ifn) ) idoublenode = ifn
+      if ( i <  i2(ifn) ) i2(ifn) = i2(ifn) - 1
+      if ( i <= i2l(ifn) ) idoublenode = ifn
+      if ( i <  i2l(ifn) ) i2l(ifn) = i2l(ifn) - 1
     end if
   end if
   j1 = i1l(1); j2 = i2l(1)
