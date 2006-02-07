@@ -62,11 +62,9 @@ else
     if ( ihypo(ifn) < i1l(ifn) ) then
       i1(ifn) = i1(ifn) + 1
     else
-      i2(ifn) = i2(ifn) - 1
-      if ( ihypo(ifn) < i2l(ifn) ) then
-        i2l(ifn) = i2l(ifn) - 1
-        idoublenode = ifn
-      end if
+      if ( ihypo(ifn) <  i2(ifn)  ) i2(ifn) = i2(ifn) - 1
+      if ( ihypo(ifn) <  i2l(ifn) ) i2l(ifn) = i2l(ifn) - 1
+      if ( ihypo(ifn) <= i2l(ifn) ) idoublenode = ifn
     end if
   end if
   j1 = i1l(1); j2 = i2l(1)

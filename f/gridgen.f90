@@ -8,9 +8,9 @@ subroutine gridgen
 
 implicit none
 real :: theta, scl
-integer :: i1(3), i2(3), i1l(3), i2l(3), n(3), noff(3), &
+integer :: i1(3), i2(3), i1l(3), i2l(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, up(1)
-real :: x1, x2, lj, lk, ll, m(9)
+real :: x1, x2, m(9)
 logical :: expand
 
 if ( master ) then
@@ -20,25 +20,23 @@ if ( master ) then
 end if
 
 ! Single node indexing
-n = nn
-noff = nnoff
 idoublenode = 0
+i1 = 1  + nnoff
+i2 = nn + nnoff
 i1l = i1node
 i2l = i2node
 if ( ifn /= 0 ) then
-  n(ifn) = n(ifn) - 1
   if ( ihypo(ifn) < i1l(ifn) ) then
-    noff(ifn) = noff(ifn) + 1
-  else if ( ihypo(ifn) < i2l(ifn) ) then
-    i2l(ifn) = i2l(ifn) - 1
-    idoublenode = ifn
+    i1(ifn) = i1(ifn) + 1
+  else
+    if ( ihypo(ifn) <  i2(ifn)  ) i2(ifn)  = i2(ifn)  - 1
+    if ( ihypo(ifn) <  i2l(ifn) ) i2l(ifn) = i2l(ifn) - 1
+    if ( ihypo(ifn) <= i2l(ifn) ) idoublenode = ifn
   end if
 end if
 j1 = i1l(1); j2 = i2l(1)
 k1 = i1l(2); k2 = i2l(2)
 l1 = i1l(3); l2 = i2l(3)
-i1 = 1 + noff
-i2 = n + noff
 
 ! Read grid files or create basic rectangular mesh
 x = 0.
@@ -52,11 +50,6 @@ else
   call iovector( 'r', 'data/x3', x, 3, i1, i2, i1l, i2l, 0 )
 end if
 
-! Dimensions
-lj = dx * ( n(1) - 1 )
-lk = dx * ( n(2) - 1 )
-ll = dx * ( n(3) - 1 )
-
 ! Coordinate system
 l = sum( maxloc( abs( upvector ) ) )
 up = sign( 1., upvector(l) )
@@ -66,8 +59,8 @@ j = 6 - k - l
 ! Grid expansion
 expand = .false.
 if ( rexpand > 1. ) then
-  i1 = 1 + noff + n1expand
-  i2 = n + noff - n2expand
+  i1 = i1 + n1expand
+  i2 = i2 - n2expand
   if ( any( i1l < i1 ) .or. any( i2 < i2l ) ) expand = .true.
   do j = i1l(1), min( i2l(1), i1(1) - 1 )
     i = i1(1) - j

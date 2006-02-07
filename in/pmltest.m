@@ -1,13 +1,13 @@
 % PML test problem
 
-  viscosity = [ 0 .7 ];
+  viscosity = [ 0 16 ];
   debug = 1;
   np = [ 1 1 1 ];
   faultnormal = 0;
   rsource = 150.;
   out = { 'x' 1  1 1 1   -1 -1 -1 };
   out = { 'v' 1  1 1 1   -1 -1 -1 };
-  nt = 400;
+  nt = 160;
 
   gridtrans = [   1. 0. 0.; 0.  1. 0.; 0. 0.  1. ] /  1.; % no strain
   ihypo = [ -1 -1 -1 ];
@@ -16,6 +16,7 @@
   bc1 = [ 0 0 0 ];
   nn = [ 81 81 81 ];
   bc1 = [ 1 1 1 ];
+  nn = [ 41 41 41 ];
   return
 
   gridtrans = [  25. 0. 9.; 0. 10. 0.; 0. 0. 16. ] / 10.; % 2D strain
