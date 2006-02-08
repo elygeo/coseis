@@ -5,6 +5,7 @@ use diffcn_m
 use hourglassnc_m
 use hourglasscn_m
 use collective_m
+use bc_m
 contains
 subroutine acceleration
 
@@ -116,80 +117,8 @@ do i = 1, 3
 end do
 
 ! Boundary conditions
-i1 = i1node
-i2 = i2node
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-do i = 1, nhalo
-  if ( ibc1(1) == 2 ) then
-    w1(j1-i,:,:,1) = -w1(j1+i-1,:,:,1)
-    w1(j1-i,:,:,2) =  w1(j1+i-1,:,:,2)
-    w1(j1-i,:,:,3) =  w1(j1+i-1,:,:,3)
-  elseif ( ibc1(1) == 3 ) then
-    w1(j1-i,:,:,1) = -w1(j1+i,:,:,1)
-    w1(j1-i,:,:,2) =  w1(j1+i,:,:,2)
-    w1(j1-i,:,:,3) =  w1(j1+i,:,:,3)
-  elseif ( ibc1(1) == 4 ) then
-    w1(j1-i,:,:,:) =  w1(j1,:,:,:)
-  end if
-  if ( ibc2(1) == 2 ) then
-    w1(j2+i,:,:,1) = -w1(j2-i+1,:,:,1)
-    w1(j2+i,:,:,2) =  w1(j2-i+1,:,:,2)
-    w1(j2+i,:,:,3) =  w1(j2-i+1,:,:,3)
-  elseif ( ibc2(1) == 3 ) then
-    w1(j2+i,:,:,1) = -w1(j2-i,:,:,1)
-    w1(j2+i,:,:,2) =  w1(j2-i,:,:,2)
-    w1(j2+i,:,:,3) =  w1(j2-i,:,:,3)
-  elseif ( ibc2(1) == 4 ) then
-    w1(j2+i,:,:,:) =  w1(j2,:,:,:)
-  end if
-  if ( ibc1(2) == 2 ) then
-    w1(:,k1-i,:,1) =  w1(:,k1+i-1,:,1)
-    w1(:,k1-i,:,2) = -w1(:,k1+i-1,:,2)
-    w1(:,k1-i,:,3) =  w1(:,k1+i-1,:,3)
-  elseif ( ibc1(2) == 3 ) then
-    w1(:,k1-i,:,1) =  w1(:,k1+i,:,1)
-    w1(:,k1-i,:,2) = -w1(:,k1+i,:,2)
-    w1(:,k1-i,:,3) =  w1(:,k1+i,:,3)
-  elseif ( ibc1(2) == 4 ) then
-    w1(:,k1-i,:,:) =  w1(:,k1,:,:)
-  end if
-  if ( ibc2(2) == 2 ) then
-    w1(:,k2+i,:,1) =  w1(:,k2-i+1,:,1)
-    w1(:,k2+i,:,2) = -w1(:,k2-i+1,:,2)
-    w1(:,k2+i,:,3) =  w1(:,k2-i+1,:,3)
-  elseif ( ibc2(2) == 3 ) then
-    w1(:,k2+i,:,1) =  w1(:,k2-i,:,1)
-    w1(:,k2+i,:,2) = -w1(:,k2-i,:,2)
-    w1(:,k2+i,:,3) =  w1(:,k2-i,:,3)
-  elseif ( ibc2(2) == 4 ) then
-    w1(:,k2+i,:,:) =  w1(:,k2,:,:)
-  end if
-  if ( ibc1(3) == 2 ) then
-    w1(:,:,l1-i,1) =  w1(:,:,l1+i-1,1)
-    w1(:,:,l1-i,2) =  w1(:,:,l1+i-1,2)
-    w1(:,:,l1-i,3) = -w1(:,:,l1+i-1,3)
-  elseif ( ibc1(3) == 3 ) then
-    w1(:,:,l1-i,1) =  w1(:,:,l1+i,1)
-    w1(:,:,l1-i,2) =  w1(:,:,l1+i,2)
-    w1(:,:,l1-i,3) = -w1(:,:,l1+i,3)
-  elseif ( ibc1(3) == 4 ) then
-    w1(:,:,l1-i,:) =  w1(:,:,l1,:)
-  end if
-  if ( ibc2(3) == 2 ) then
-    w1(:,:,l2+i,1) =  w1(:,:,l2-i+1,1)
-    w1(:,:,l2+i,2) =  w1(:,:,l2-i+1,2)
-    w1(:,:,l2+i,3) = -w1(:,:,l2-i+1,3)
-  elseif ( ibc2(3) == 3 ) then
-    w1(:,:,l2+i,1) =  w1(:,:,l2-i,1)
-    w1(:,:,l2+i,2) =  w1(:,:,l2-i,2)
-    w1(:,:,l2+i,3) = -w1(:,:,l2-i,3)
-  elseif ( ibc2(3) == 4 ) then
-    w1(:,:,l2+i,:) =  w1(:,:,l2,:)
-  end if
-end do
-call swaphalovector( w1, nhalo )
+call vectorbc( w1, ibc1, ibc2, nhalo )
+call vectorswaphalo( w1, nhalo )
 
 end subroutine
 

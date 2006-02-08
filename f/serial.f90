@@ -76,8 +76,8 @@ r = r
 i = i - nnoff + nnoff
 end subroutine
 
-! Swap halo scalar
-subroutine swaphaloscalar( f, nhalo )
+! Scalar swap halo
+subroutine scalarswaphalo( f, nhalo )
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: nhalo
 integer :: i
@@ -85,8 +85,8 @@ f(1,1,1) = f(1,1,1)
 i = nhalo
 end subroutine
 
-! Swap halo vector
-subroutine swaphalovector( f, nhalo )
+! Vector swap halor
+subroutine vectorswaphalo( f, nhalo )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: nhalo
 integer :: i

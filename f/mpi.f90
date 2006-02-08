@@ -136,8 +136,8 @@ end if
 i = i + nnoff
 end subroutine
 
-! Swap halo scalar
-subroutine swaphaloscalar( f, nhalo )
+! Scalar swap halo
+subroutine scalarswaphalo( f, nhalo )
 implicit none
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: nhalo
@@ -171,8 +171,8 @@ end if
 end do
 end subroutine
 
-! Swap halo vector
-subroutine swaphalovector( f, nhalo )
+! Vector swap halo
+subroutine vectorswaphalo( f, nhalo )
 implicit none
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: nhalo

@@ -3,6 +3,7 @@ module material_m
 use globals_m
 use collectiveio_m
 use diffnc_m
+use bc_m
 use zone_m
 contains
 subroutine material
@@ -105,94 +106,12 @@ end if
 end do doiz
 
 ! Boundary conditions
-i1 = i1node
-i2 = i2node
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-do i = 1, nhalo
-  if ( ibc1(1) == 2 ) then
-    mr(j1-i,:,:) = mr(j1+1-1,:,:)
-    s1(j1-i,:,:) = s1(j1+1-1,:,:)
-    s2(j1-i,:,:) = s2(j1+1-1,:,:)
-  elseif ( ibc1(1) == 3 ) then
-    mr(j1-i,:,:) = mr(j1+1,:,:)
-    s1(j1-i,:,:) = s1(j1+1,:,:)
-    s2(j1-i,:,:) = s2(j1+1,:,:)
-  elseif ( ibc1(1) == 4 ) then
-    mr(j1-i,:,:) = mr(j1,:,:)
-    s1(j1-i,:,:) = s1(j1,:,:)
-    s2(j1-i,:,:) = s2(j1,:,:)
-  end if
-  if ( ibc2(1) == 2 ) then
-    mr(j2+i,:,:) = mr(j2-1+1,:,:)
-    s1(j2+i,:,:) = s1(j2-1+1,:,:)
-    s2(j2+i,:,:) = s2(j2-1+1,:,:)
-  elseif ( ibc2(1) == 3 ) then
-    mr(j2+i,:,:) = mr(j2-1,:,:)
-    s1(j2+i,:,:) = s1(j2-1,:,:)
-    s2(j2+i,:,:) = s2(j2-1,:,:)
-  elseif ( ibc2(1) == 4 ) then
-    mr(j2+i,:,:) = mr(j2,:,:)
-    s1(j2+i,:,:) = s1(j2,:,:)
-    s2(j2+i,:,:) = s2(j2,:,:)
-  end if
-  if ( ibc1(2) == 2 ) then
-    mr(:,k1-i,:) = mr(:,k1+1-1,:)
-    s1(:,k1-i,:) = s1(:,k1+1-1,:)
-    s2(:,k1-i,:) = s2(:,k1+1-1,:)
-  elseif ( ibc1(2) == 3 ) then
-    mr(:,k1-i,:) = mr(:,k1+1,:)
-    s1(:,k1-i,:) = s1(:,k1+1,:)
-    s2(:,k1-i,:) = s2(:,k1+1,:)
-  elseif ( ibc1(2) == 4 ) then
-    mr(:,k1-i,:) = mr(:,k1,:)
-    s1(:,k1-i,:) = s1(:,k1,:)
-    s2(:,k1-i,:) = s2(:,k1,:)
-  end if
-  if ( ibc2(2) == 2 ) then
-    mr(:,k2+i,:) = mr(:,k2-1+1,:)
-    s1(:,k2+i,:) = s1(:,k2-1+1,:)
-    s2(:,k2+i,:) = s2(:,k2-1+1,:)
-  elseif ( ibc2(2) == 3 ) then
-    mr(:,k2+i,:) = mr(:,k2-1,:)
-    s1(:,k2+i,:) = s1(:,k2-1,:)
-    s2(:,k2+i,:) = s2(:,k2-1,:)
-  elseif ( ibc2(2) == 4 ) then
-    mr(:,k2+i,:) = mr(:,k2,:)
-    s1(:,k2+i,:) = s1(:,k2,:)
-    s2(:,k2+i,:) = s2(:,k2,:)
-  end if
-  if ( ibc1(3) == 2 ) then
-    mr(:,:,l1-i) = mr(:,:,l1+1-1)
-    s1(:,:,l1-i) = s1(:,:,l1+1-1)
-    s2(:,:,l1-i) = s2(:,:,l1+1-1)
-  elseif ( ibc1(3) == 3 ) then
-    mr(:,:,l1-i) = mr(:,:,l1+1)
-    s1(:,:,l1-i) = s1(:,:,l1+1)
-    s2(:,:,l1-i) = s2(:,:,l1+1)
-  elseif ( ibc1(3) == 4 ) then
-    mr(:,:,l1-i) = mr(:,:,l1)
-    s1(:,:,l1-i) = s1(:,:,l1)
-    s2(:,:,l1-i) = s2(:,:,l1)
-  end if
-  if ( ibc2(3) == 2 ) then
-    mr(:,:,l2+i) = mr(:,:,l2-1+1)
-    s1(:,:,l2+i) = s1(:,:,l2-1+1)
-    s2(:,:,l2+i) = s2(:,:,l2-1+1)
-  elseif ( ibc2(3) == 3 ) then
-    mr(:,:,l2+i) = mr(:,:,l2-1)
-    s1(:,:,l2+i) = s1(:,:,l2-1)
-    s2(:,:,l2+i) = s2(:,:,l2-1)
-  elseif ( ibc2(3) == 4 ) then
-    mr(:,:,l2+i) = mr(:,:,l2)
-    s1(:,:,l2+i) = s1(:,:,l2)
-    s2(:,:,l2+i) = s2(:,:,l2)
-  end if
-end do
-call swaphaloscalar( mr, nhalo )
-call swaphaloscalar( s1, nhalo )
-call swaphaloscalar( s2, nhalo )
+call scalarbc( mr, ibc1, ibc2, nhalo )
+call scalarbc( s1, ibc1, ibc2, nhalo )
+call scalarbc( s2, ibc1, ibc2, nhalo )
+call scalarswaphalo( mr, nhalo )
+call scalarswaphalo( s1, nhalo )
+call scalarswaphalo( s2, nhalo )
 
 ! Hypocenter values
 if ( master ) then
@@ -255,7 +174,7 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     + s1(j,k-1,l) + s1(j-1,k,l-1) &
     + s1(j,k,l-1) + s1(j-1,k-1,l) )
 end forall
-call swaphaloscalar( s2, nhalo )
+call scalarswaphalo( s2, nhalo )
 
 ! Hourglass constant
 y = 12. * ( lam + 2. * mu )

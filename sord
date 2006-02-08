@@ -161,6 +161,7 @@ common="\\
   hourglasscn.f90 \\
   hourglassnc.f90 \\
   surfnormals.f90 \\
+  bc.f90 \\
   zone.f90 \\
   inread.f90 \\
   setup.f90 \\

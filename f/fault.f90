@@ -3,6 +3,7 @@ module fault_m
 use globals_m
 use collectiveio_m
 use surfnormals_m
+use bc_m
 use zone_m
 contains
 subroutine fault
@@ -92,10 +93,14 @@ else
   end select
 end if ifreadfile
 end do doiz
-call swaphaloscalar( mus, nhalo )
-call swaphaloscalar( mud, nhalo )
-call swaphaloscalar( dc, nhalo )
-call swaphaloscalar( co, nhalo )
+call scalarbc( mus, ibc1, ibc2, nhalo )
+call scalarbc( mud, ibc1, ibc2, nhalo )
+call scalarbc( dc, ibc1, ibc2, nhalo )
+call scalarbc( co, ibc1, ibc2, nhalo )
+call scalarswaphalo( mus, nhalo )
+call scalarswaphalo( mud, nhalo )
+call scalarswaphalo( dc, nhalo )
+call scalarswaphalo( co, nhalo )
 
 ! Lock fault in PML region
 i1 = max( i1pml + 1, 1 )
@@ -116,7 +121,8 @@ i2 = i2node
 i1(ifn) = ihypo(ifn)
 i2(ifn) = ihypo(ifn)
 call surfnormals( nhat, x, i1, i2 )
-call swaphalovector( nhat, nhalo )
+call vectorbc( nhat, ibc1, ibc2, nhalo )
+call vectorswaphalo( nhat, nhalo )
 area = sqrt( sum( nhat * nhat, 4 ) )
 f1 = area
 where ( f1 /= 0. ) f1 = side / f1
@@ -161,7 +167,8 @@ do i = 1, 3
     t3(:,:,:,2) * t1(:,:,:,i) + &
     t3(:,:,:,3) * t2(:,:,:,i)
 end do
-call swaphalovector( t0, nhalo )
+call vectorbc( t0, ibc1, ibc2, nhalo )
+call vectorswaphalo( t0, nhalo )
 
 ! Indices
 i1 = 1
@@ -182,6 +189,8 @@ do i = 1, 3
   t3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i)
 end do
 rhypo = sqrt( sum( t3 * t3, 4 ) )
+
+! Boundary conditions
 
 ! Metadata
 if ( master ) then

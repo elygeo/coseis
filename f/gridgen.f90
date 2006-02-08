@@ -186,7 +186,7 @@ do i = 1, nhalo
     x(:,:,l2+i,:) = ( i + 1 ) * x(:,:,l2,:) - i * x(:,:,l2-1,:)
   end if
 end do
-call swaphalovector( x, nhalo )
+call vectorswaphalo( x, nhalo )
 
 ! Create fault double nodes
 select case( idoublenode )
