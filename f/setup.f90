@@ -39,8 +39,8 @@ if ( ifn /= 0 ) then
 end if
 ibc1 = bc1
 ibc2 = bc2
-where ( ip3 /= 0      ) ibc1 = 4
-where ( ip3 /= np - 1 ) ibc2 = 4
+where ( ip3 /= 0      ) ibc1 = 2
+where ( ip3 /= np - 1 ) ibc2 = 2
 
 ! Map global hypocenter index to local hypocenter index
 ihypo = ihypo + nnoff

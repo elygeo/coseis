@@ -123,45 +123,69 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 do i = 1, nhalo
   if ( ibc1(1) == 2 ) then
+    w1(j1-i,:,:,1) = -w1(j1+i-1,:,:,1)
+    w1(j1-i,:,:,2) =  w1(j1+i-1,:,:,2)
+    w1(j1-i,:,:,3) =  w1(j1+i-1,:,:,3)
+  elseif ( ibc1(1) == 3 ) then
     w1(j1-i,:,:,1) = -w1(j1+i,:,:,1)
     w1(j1-i,:,:,2) =  w1(j1+i,:,:,2)
     w1(j1-i,:,:,3) =  w1(j1+i,:,:,3)
-  elseif ( ibc1(1) == 3 ) then
+  elseif ( ibc1(1) == 4 ) then
     w1(j1-i,:,:,:) =  w1(j1,:,:,:)
   end if
   if ( ibc2(1) == 2 ) then
+    w1(j2+i,:,:,1) = -w1(j2-i+1,:,:,1)
+    w1(j2+i,:,:,2) =  w1(j2-i+1,:,:,2)
+    w1(j2+i,:,:,3) =  w1(j2-i+1,:,:,3)
+  elseif ( ibc2(1) == 3 ) then
     w1(j2+i,:,:,1) = -w1(j2-i,:,:,1)
     w1(j2+i,:,:,2) =  w1(j2-i,:,:,2)
     w1(j2+i,:,:,3) =  w1(j2-i,:,:,3)
-  elseif ( ibc2(1) == 3 ) then
+  elseif ( ibc2(1) == 4 ) then
     w1(j2+i,:,:,:) =  w1(j2,:,:,:)
   end if
   if ( ibc1(2) == 2 ) then
+    w1(:,k1-i,:,1) =  w1(:,k1+i-1,:,1)
+    w1(:,k1-i,:,2) = -w1(:,k1+i-1,:,2)
+    w1(:,k1-i,:,3) =  w1(:,k1+i-1,:,3)
+  elseif ( ibc1(2) == 3 ) then
     w1(:,k1-i,:,1) =  w1(:,k1+i,:,1)
     w1(:,k1-i,:,2) = -w1(:,k1+i,:,2)
     w1(:,k1-i,:,3) =  w1(:,k1+i,:,3)
-  elseif ( ibc1(2) == 3 ) then
+  elseif ( ibc1(2) == 4 ) then
     w1(:,k1-i,:,:) =  w1(:,k1,:,:)
   end if
   if ( ibc2(2) == 2 ) then
+    w1(:,k2+i,:,1) =  w1(:,k2-i+1,:,1)
+    w1(:,k2+i,:,2) = -w1(:,k2-i+1,:,2)
+    w1(:,k2+i,:,3) =  w1(:,k2-i+1,:,3)
+  elseif ( ibc2(2) == 3 ) then
     w1(:,k2+i,:,1) =  w1(:,k2-i,:,1)
     w1(:,k2+i,:,2) = -w1(:,k2-i,:,2)
     w1(:,k2+i,:,3) =  w1(:,k2-i,:,3)
-  elseif ( ibc2(2) == 3 ) then
+  elseif ( ibc2(2) == 4 ) then
     w1(:,k2+i,:,:) =  w1(:,k2,:,:)
   end if
   if ( ibc1(3) == 2 ) then
+    w1(:,:,l1-i,1) =  w1(:,:,l1+i-1,1)
+    w1(:,:,l1-i,2) =  w1(:,:,l1+i-1,2)
+    w1(:,:,l1-i,3) = -w1(:,:,l1+i-1,3)
+  elseif ( ibc1(3) == 3 ) then
     w1(:,:,l1-i,1) =  w1(:,:,l1+i,1)
     w1(:,:,l1-i,2) =  w1(:,:,l1+i,2)
     w1(:,:,l1-i,3) = -w1(:,:,l1+i,3)
-  elseif ( ibc1(3) == 3 ) then
+  elseif ( ibc1(3) == 4 ) then
     w1(:,:,l1-i,:) =  w1(:,:,l1,:)
   end if
   if ( ibc2(3) == 2 ) then
+    w1(:,:,l2+i,1) =  w1(:,:,l2-i+1,1)
+    w1(:,:,l2+i,2) =  w1(:,:,l2-i+1,2)
+    w1(:,:,l2+i,3) = -w1(:,:,l2-i+1,3)
+  elseif ( ibc2(3) == 3 ) then
     w1(:,:,l2+i,1) =  w1(:,:,l2-i,1)
     w1(:,:,l2+i,2) =  w1(:,:,l2-i,2)
     w1(:,:,l2+i,3) = -w1(:,:,l2-i,3)
-  elseif ( ibc2(3) == 3 ) then
+  elseif ( ibc2(3) == 4 ) then
     w1(:,:,l2+i,:) =  w1(:,:,l2,:)
   end if
 end do

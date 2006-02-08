@@ -183,9 +183,6 @@ do i = 1, 3
 end do
 rhypo = sqrt( sum( t3 * t3, 4 ) )
 
-! Symmetric boundary
-if ( ibc2(ifn) == -1 ) mr(j3:j4,k3:k4,l3:l4) = mr(j1:j2,k1:k2,l1:l2)
-
 ! Metadata
 if ( master ) then
   i1 = ihypo
@@ -234,7 +231,7 @@ k3 = i1(2); k4 = i2(2)
 l3 = i1(3); l4 = i2(3)
 
 ! Symmetric boundary
-if ( ibc2(ifn) == -1 ) then
+if ( ibc2(ifn) == 2 ) then
   w1(j3:j4,k3:k4,l3:l4,:)   = -w1(j1:j2,k1:k2,l1:l2,:)
   w1(j3:j4,k3:k4,l3:l4,ifn) =  w1(j1:j2,k1:k2,l1:l2,ifn)
 end if
