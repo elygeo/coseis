@@ -105,14 +105,6 @@ end if
 
 end do doiz
 
-! Boundary conditions
-call scalarbc( mr, ibc1, ibc2, nhalo )
-call scalarbc( s1, ibc1, ibc2, nhalo )
-call scalarbc( s2, ibc1, ibc2, nhalo )
-call scalarswaphalo( mr, nhalo )
-call scalarswaphalo( s1, nhalo )
-call scalarswaphalo( s2, nhalo )
-
 ! Hypocenter values
 if ( master ) then
   j = ihypo(1)
@@ -128,6 +120,10 @@ s2 = mr * s2 * s2
 s1 = mr * ( s1 * s1 ) - 2. * s2
 
 ! Average Lame parameters onto cell centers
+call scalarbc( s1, ibc1, ibc2, nhalo )
+call scalarbc( s2, ibc1, ibc2, nhalo )
+call scalarswaphalo( s1, nhalo )
+call scalarswaphalo( s2, nhalo )
 lam = 0.
 mu = 0.
 i1 = i1cell
@@ -174,7 +170,6 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     + s1(j,k-1,l) + s1(j-1,k,l-1) &
     + s1(j,k,l-1) + s1(j-1,k-1,l) )
 end forall
-call scalarswaphalo( s2, nhalo )
 
 ! Hourglass constant
 y = 12. * ( lam + 2. * mu )
@@ -190,6 +185,8 @@ mu = mu * s1
 ! Node mass ratio
 mr = mr * s2
 where ( mr /= 0. ) mr = 1. / mr
+call scalarbc( mr, ibc1, ibc2, nhalo )
+call scalarswaphalo( mr, nhalo )
 
 s1 = 0.
 s2 = 0.

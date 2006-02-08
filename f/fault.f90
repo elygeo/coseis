@@ -170,7 +170,7 @@ end do
 call vectorbc( t0, ibc1, ibc2, nhalo )
 call vectorswaphalo( t0, nhalo )
 
-! Indices
+! Hypocentral radius
 i1 = 1
 i2 = nm
 i1(ifn) = ihypo(ifn)
@@ -178,19 +178,10 @@ i2(ifn) = ihypo(ifn)
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-i1(ifn) = ihypo(ifn) + 1
-i2(ifn) = ihypo(ifn) + 1
-j3 = i1(1); j4 = i2(1)
-k3 = i1(2); k4 = i2(2)
-l3 = i1(3); l4 = i2(3)
-
-! Hypocentral radius
 do i = 1, 3
   t3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i)
 end do
 rhypo = sqrt( sum( t3 * t3, 4 ) )
-
-! Boundary conditions
 
 ! Metadata
 if ( master ) then
