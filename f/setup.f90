@@ -35,12 +35,12 @@ if ( all( ip3 == ip3master ) ) master = .true.
 
 ! Boundary conditions
 if ( ifn /= 0 ) then
-  if ( ihypo(ifn) == nn(ifn) ) bc2(ifn) = 2
+  if ( ihypo(ifn) == nn(ifn) ) bc2(ifn) = -2
 end if
 ibc1 = bc1
 ibc2 = bc2
-where ( ip3 /= 0      ) ibc1 = 2
-where ( ip3 /= np - 1 ) ibc2 = 2
+where ( ip3 /= 0      ) ibc1 = 9
+where ( ip3 /= np - 1 ) ibc2 = 9
 
 ! Map global hypocenter index to local hypocenter index
 ihypo = ihypo + nnoff

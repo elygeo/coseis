@@ -111,16 +111,20 @@ case( 'spherical' )
 case default; stop 'grid'
 end select
 
+! Boundary conditions
+i1 = abs( ibc1 )
+i2 = abs( ibc2 )
+
 ! Random noise added to mesh
 if ( gridnoise > 0. ) then
   call random_number( w1 )
   w1 = gridnoise * ( w1 - .5 )
-  if ( ibc1(1) <= 1 ) w1(j1,:,:,1) = 0.
-  if ( ibc2(1) <= 1 ) w1(j2,:,:,1) = 0.
-  if ( ibc1(2) <= 1 ) w1(:,k1,:,2) = 0.
-  if ( ibc2(2) <= 1 ) w1(:,k2,:,2) = 0.
-  if ( ibc1(3) <= 1 ) w1(:,:,l1,3) = 0.
-  if ( ibc2(3) <= 1 ) w1(:,:,l2,3) = 0.
+  if ( i1(1) <= 1 ) w1(j1,:,:,1) = 0.
+  if ( i2(1) <= 1 ) w1(j2,:,:,1) = 0.
+  if ( i1(2) <= 1 ) w1(:,k1,:,2) = 0.
+  if ( i2(2) <= 1 ) w1(:,k2,:,2) = 0.
+  if ( i1(3) <= 1 ) w1(:,:,l1,3) = 0.
+  if ( i2(3) <= 1 ) w1(:,:,l2,3) = 0.
   select case( idoublenode )
   case( 1 ); i = ihypo(1); w1(i,:,:,1) = 0.
   case( 2 ); i = ihypo(2); w1(:,i,:,2) = 0.
@@ -131,55 +135,55 @@ end if
 
 ! Boundary conditions
 do i = 1, nhalo
-  if ( ibc1(1) == 2 ) then
+  if ( i1(1) == 2 ) then
     x(j1-i,:,:,:) = x(j1+i-1,:,:,:)
     x(j1-i,:,:,1) = 2 * x(j1,:,:,1) - x(j1+i-1,:,:,1) - dx
-  elseif ( ibc1(1) == 3 ) then
+  elseif ( i1(1) == 3 ) then
     x(j1-i,:,:,:) = x(j1+i,:,:,:)
     x(j1-i,:,:,1) = 2 * x(j1,:,:,1) - x(j1+i,:,:,1)
   else
     x(j1-i,:,:,:) = ( i + 1 ) * x(j1,:,:,:) - i * x(j1+1,:,:,:)
   end if
-  if ( ibc2(1) == 2 ) then
+  if ( i2(1) == 2 ) then
     x(j2+i,:,:,:) = x(j2-i+1,:,:,:)
     x(j2+i,:,:,1) = 2 * x(j2,:,:,1) - x(j2-i+1,:,:,1) + dx
-  elseif ( ibc2(1) == 3 ) then
+  elseif ( i2(1) == 3 ) then
     x(j2+i,:,:,:) = x(j2-i,:,:,:)
     x(j2+i,:,:,1) = 2 * x(j2,:,:,1) - x(j2-i,:,:,1)
   else
     x(j2+i,:,:,:) = ( i + 1 ) * x(j2,:,:,:) - i * x(j2-1,:,:,:)
   end if
-  if ( ibc1(2) == 2 ) then
+  if ( i1(2) == 2 ) then
     x(:,k1-i,:,:) = x(:,k1+i-1,:,:)
     x(:,k1-i,:,2) = 2 * x(:,k1,:,2) - x(:,k1+i-1,:,2) - dx
-  elseif ( ibc1(2) == 3 ) then
+  elseif ( i1(2) == 3 ) then
     x(:,k1-i,:,:) = x(:,k1+i,:,:)
     x(:,k1-i,:,2) = 2 * x(:,k1,:,2) - x(:,k1+i,:,2)
   else
     x(:,k1-i,:,:) = ( i + 1 ) * x(:,k1,:,:) - i * x(:,k1+1,:,:)
   end if
-  if ( ibc2(2) == 2 ) then
+  if ( i2(2) == 2 ) then
     x(:,k2+i,:,:) = x(:,k2-i+1,:,:)
     x(:,k2+i,:,2) = 2 * x(:,k2,:,2) - x(:,k2-i+1,:,2) + dx
-  elseif ( ibc2(2) == 3 ) then
+  elseif ( i2(2) == 3 ) then
     x(:,k2+i,:,:) = x(:,k2-i,:,:)
     x(:,k2+i,:,2) = 2 * x(:,k2,:,2) - x(:,k2-i,:,2)
   else
     x(:,k2+i,:,:) = ( i + 1 ) * x(:,k2,:,:) - i * x(:,k2-1,:,:)
   end if
-  if ( ibc1(3) == 2 ) then
+  if ( i1(3) == 2 ) then
     x(:,:,l1-i,:) = x(:,:,l1+i-1,:)
     x(:,:,l1-i,3) = 2 * x(:,:,l1,3) - x(:,:,l1+i-1,3) - dx
-  elseif ( ibc1(3) == 3 ) then
+  elseif ( i1(3) == 3 ) then
     x(:,:,l1-i,:) = x(:,:,l1+i,:)
     x(:,:,l1-i,3) = 2 * x(:,:,l1,3) - x(:,:,l1+i,3)
   else
     x(:,:,l1-i,:) = ( i + 1 ) * x(:,:,l1,:) - i * x(:,:,l1+1,:)
   end if
-  if ( ibc2(3) == 2 ) then
+  if ( i2(3) == 2 ) then
     x(:,:,l2+i,:) = x(:,:,l2-i+1,:)
     x(:,:,l2+i,3) = 2 * x(:,:,l2,3) - x(:,:,l2-i+1,3) + dx
-  elseif ( ibc2(3) == 3 ) then
+  elseif ( i2(3) == 3 ) then
     x(:,:,l2+i,:) = x(:,:,l2-i,:)
     x(:,:,l2+i,3) = 2 * x(:,:,l2,3) - x(:,:,l2-i,3)
   else

@@ -233,12 +233,6 @@ j3 = i1(1); j4 = i2(1)
 k3 = i1(2); k4 = i2(2)
 l3 = i1(3); l4 = i2(3)
 
-! Symmetric boundary
-if ( ibc2(ifn) == 2 ) then
-  w1(j3:j4,k3:k4,l3:l4,:)   = -w1(j1:j2,k1:k2,l1:l2,:)
-  w1(j3:j4,k3:k4,l3:l4,ifn) =  w1(j1:j2,k1:k2,l1:l2,ifn)
-end if
-
 ! Zero slip velocity condition
 f1 = dt * area * ( mr(j1:j2,k1:k2,l1:l2) + mr(j3:j4,k3:k4,l3:l4) )
 where ( f1 /= 0. ) f1 = 1. / f1

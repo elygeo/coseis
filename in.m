@@ -1,1 +1,1 @@
-in/minifault.m
+in/t3.m
