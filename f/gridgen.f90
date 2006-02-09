@@ -114,6 +114,9 @@ end select
 ! Boundary conditions
 i1 = abs( ibc1 )
 i2 = abs( ibc2 )
+j = ihypo(1)
+k = ihypo(2)
+l = ihypo(3)
 
 ! Random noise added to mesh
 if ( gridnoise > 0. ) then
@@ -126,12 +129,24 @@ if ( gridnoise > 0. ) then
   if ( i1(3) <= 1 ) w1(:,:,l1,3) = 0.
   if ( i2(3) <= 1 ) w1(:,:,l2,3) = 0.
   select case( idoublenode )
-  case( 1 ); i = ihypo(1); w1(i,:,:,1) = 0.
-  case( 2 ); i = ihypo(2); w1(:,i,:,2) = 0.
-  case( 3 ); i = ihypo(3); w1(:,:,i,3) = 0.
+  case( 1 ); w1(j,:,:,1) = 0.
+  case( 2 ); w1(:,k,:,2) = 0.
+  case( 3 ); w1(:,:,l,3) = 0.
   end select
   x = x + w1
 end if
+
+! Create fault double nodes
+i1l = i1node
+i2l = i2node
+j1 = i1l(1); j2 = i2l(1)
+k1 = i1l(2); k2 = i2l(2)
+l1 = i1l(3); l2 = i2l(3)
+select case( idoublenode )
+case( 1 ); x(j+1:j2,:,:,:) = x(j:j2-1,:,:,:)
+case( 2 ); x(:,k+1:k2,:,:) = x(:,k:k2-1,:,:)
+case( 3 ); x(:,:,l+1:l2,:) = x(:,:,l:l2-1,:)
+end select
 
 ! Boundary conditions
 do i = 1, nhalo
@@ -192,13 +207,6 @@ do i = 1, nhalo
 end do
 call vectorswaphalo( x, nhalo )
 
-! Create fault double nodes
-select case( idoublenode )
-case( 1 ); j = ihypo(1); x(j+1:j2+1,:,:,:) = x(j:j2,:,:,:)
-case( 2 ); k = ihypo(2); x(:,k+1:k2+1,:,:) = x(:,k:k2,:,:)
-case( 3 ); l = ihypo(3); x(:,:,l+1:l2+1,:) = x(:,:,l:l2,:)
-end select
-
 ! Assign fast operators to rectangular mesh portions
 noper = 1
 i1oper(1,:) = i1cell
@@ -207,12 +215,7 @@ call optimize
 
 ! Hypocenter location
 if ( all( xhypo < 0. ) ) then
-  if ( master ) then
-    j = ihypo(1)
-    k = ihypo(2)
-    l = ihypo(3)
-    xhypo = x(j,k,l,:)
-  end if
+  if ( master ) xhypo = x(j,k,l,:)
   call broadcast( xhypo )
 end if
 
