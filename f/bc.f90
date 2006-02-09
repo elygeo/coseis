@@ -7,7 +7,6 @@ implicit none
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: ibc1(3), ibc2(3), nhalo
 integer :: i1(3), i2(3), n(3), i, j, k, l, j1, k1, l1, j2, k2, l2
-return
 n = (/ size(f,1), size(f,2), size(f,3) /)
 i1 = 1 + nhalo
 i2 = n - nhalo
@@ -57,7 +56,6 @@ implicit none
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: ibc1(3), ibc2(3), nhalo
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, n(3)
-return
 n = (/ size(f,1), size(f,2), size(f,3) /)
 i1 = 1 + nhalo
 i2 = n - nhalo

@@ -1,6 +1,5 @@
 % PML test problem
 
-  viscosity = [ 0 16 ];
   debug = 1;
   np = [ 1 1 1 ];
   faultnormal = 0;
