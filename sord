@@ -17,18 +17,17 @@ case "$opt" in
   n) run= ; compile= ;;
   g) fflags=g ;;
   G) fflags=g; run=g ;;
-  d) rm -rf out/* ;;
+  d) rm -rf out[0-9]*/ count;;
   *) exit ;;
 esac
 done
 shift $(( OPTIND - 1 ))
 
-[ -f out/count ] && count=$( cat out/count )
+[ -f count ] && count=$( cat count )
 count=$(( count + 1 ))
+echo $count > count
 srcdir=$( /bin/pwd )
-rundir=$( /bin/pwd )/out/$count
-[ -e out ] || mkdir out
-echo $count > out/count
+rundir=$( /bin/pwd )/out$count
 mkdir $rundir
 
 # Symlink input file specified on command line
@@ -225,10 +224,13 @@ esac
 fi
 echo ''
 
-# Viz
-cat << END > viz.m
-addpath $srcdir/viz
+# SDX
+echo "cd $srcdir" > viz/srcdir.m
+cat << END > sdx
+#!/bin/bash -e
+matlab -nodesktop -nosplash -r "addpath $srcdir/viz; sdx"
 END
+chmod u+x sdx
 
 #------------------------------------------------------------------------------#
 # Save source, input files & byte order
@@ -250,7 +252,7 @@ END
 # Create output folders
 [ -e checkpoint ] || mkdir checkpoint
 [ -e stats ]      || mkdir stats
-[ -e data ]       || ln -s ../../data
+[ -e data ]       || ln -s ../data
 i=0
 while [ $i -lt $nout ]; do
   i=$(( i + 1 ))

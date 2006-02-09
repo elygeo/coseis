@@ -93,6 +93,8 @@ else
   end select
 end if ifreadfile
 end do doiz
+
+!Boundary conditions
 call scalarbc( mus, ibc1, ibc2, nhalo )
 call scalarbc( mud, ibc1, ibc2, nhalo )
 call scalarbc( dc, ibc1, ibc2, nhalo )
