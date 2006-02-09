@@ -17,7 +17,7 @@ case "$opt" in
   n) run= ; compile= ;;
   g) fflags=g ;;
   G) fflags=g; run=g ;;
-  d) rm -rf out[0-9]*/ count;;
+  d) rm -rf r[0-9]*/ count;;
   *) exit ;;
 esac
 done
@@ -27,7 +27,7 @@ shift $(( OPTIND - 1 ))
 count=$(( count + 1 ))
 echo $count > count
 srcdir=$( /bin/pwd )
-rundir=$( /bin/pwd )/out$count
+rundir=$( /bin/pwd )/r$count
 mkdir $rundir
 
 # Symlink input file specified on command line
@@ -225,10 +225,10 @@ fi
 echo ''
 
 # SDX
-echo "cd $srcdir" > viz/srcdir.m
+echo "cd $rundir" > viz/rundir.m
 cat << END > sdx
 #!/bin/bash -e
-matlab -nodesktop -nosplash -r "addpath $srcdir/viz; sdx"
+matlab -nodesktop -nosplash -r "addpath $srcdir/viz; rundir; sdx"
 END
 chmod u+x sdx
 

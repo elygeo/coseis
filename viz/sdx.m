@@ -1,21 +1,7 @@
 % SDX: SORD Data Explorer
 
-if ~exist( 'meta.m', 'file' )
-  srcdir
-pwd
-  if exist( 'rundir', 'var' )
-    cd( rundir )
-pwd
-  elseif exist( 'count', 'file' )
-    count = textread( 'count' );
-    dir = [ 'out' num2str(count) ];
-    if exist( dir, 'dir' ); cd( dir ); end
-  end
-end
-
 clear all
 
-rundir = pwd;
 meta
 if faultnormal, faultmeta, end
 
