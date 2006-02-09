@@ -62,7 +62,7 @@ i2 = n - nhalo
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-if ( n(3) > 1 ) then
+if ( n(1) > 1 ) then
   select case( ibc1(1) )
   case( 2 )
     forall( i=1:nhalo )

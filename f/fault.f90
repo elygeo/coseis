@@ -200,6 +200,7 @@ if ( master ) then
   tn0 = max( -tn0, 0. )
   ess = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 )
   lc =  dc0 * ( rho0 * vs0 ** 2. ) / tn0 / ( mus0 - mud0 )
+  if ( tn0 * ( mus0 - mud0 ) == 0. ) lc = 0.
   rctest = rho0 * vs0 ** 2. * tn0 * ( mus0 - mud0 ) * dc0 &
     / ( ts0 - tn0 * mud0 ) ** 2
   open(  9, file='faultmeta.m', status='replace' )
