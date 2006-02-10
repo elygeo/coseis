@@ -1,12 +1,12 @@
 ! Setup model dimensions
 module setup_m
+implicit none
+contains
+
+subroutine setup
 use globals_m
 use collective_m
 use zone_m
-contains
-subroutine setup
-
-implicit none
 integer :: nl(3), n(3), ip3master(3)
 
 if ( master ) then
@@ -69,5 +69,6 @@ where ( ibc1 <= 1 ) i1cell = i1cell + 1
 where ( ibc2 <= 1 ) i2cell = i2cell - 1
 
 end subroutine
+
 end module
 

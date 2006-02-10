@@ -1,9 +1,9 @@
 ! Zone selection
 module zone_m
-contains
-subroutine zone( i1, i2, nn, nnoff, ihypo, ifn )
-
 implicit none
+contains
+
+subroutine zone( i1, i2, nn, nnoff, ihypo, ifn )
 integer, intent(inout) :: i1(3), i2(3)
 integer, intent(in) :: nn(3), nnoff(3), ihypo(3), ifn
 integer :: nshift(3)
@@ -32,5 +32,6 @@ i1 = i1 + nnoff
 i2 = i2 + nnoff
 
 end subroutine
+
 end module
 

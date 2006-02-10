@@ -1,10 +1,10 @@
 ! Time Step
 module timestep_m
-use globals_m
-contains
-subroutine timestep
-
 implicit none
+contains
+
+subroutine timestep
+use globals_m
 integer :: i1(3), i2(3), j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
 if ( master ) then
@@ -51,5 +51,6 @@ if ( ifn /= 0 ) then
 end if
 
 end subroutine
+
 end module
 

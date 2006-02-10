@@ -3,10 +3,10 @@ module gridgen_m
 use optimize_m
 use collectiveio_m
 use zone_m
-contains
-subroutine gridgen
-
 implicit none
+contains
+
+subroutine gridgen
 real :: theta, scl
 integer :: i1(3), i2(3), i1l(3), i2l(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, up(1)
@@ -241,15 +241,10 @@ if ( i2(3) == 3 ) then
 end if
 
 ! Create fault double nodes
-i1l = i1node
-i2l = i2node
-j1 = i1l(1); j2 = i2l(1)
-k1 = i1l(2); k2 = i2l(2)
-l1 = i1l(3); l2 = i2l(3)
 select case( idoublenode )
-case( 1 ); x(j+1:j2,:,:,:) = x(j:j2-1,:,:,:)
-case( 2 ); x(:,k+1:k2,:,:) = x(:,k:k2-1,:,:)
-case( 3 ); x(:,:,l+1:l2,:) = x(:,:,l:l2-1,:)
+case( 1 ); x(j+1:nm(1),:,:,:) = x(j:nm(1)-1,:,:,:)
+case( 2 ); x(:,k+1:nm(2),:,:) = x(:,k:nm(2)-1,:,:)
+case( 3 ); x(:,:,l+1:nm(3),:) = x(:,:,l:nm(3)-1,:)
 end select
 call vectorswaphalo( x, nhalo )
 
@@ -278,5 +273,6 @@ s1 = sum( w1 * w1, 4 );
 rmax = sqrt( maxval( s1 ) )
 
 end subroutine
+
 end module
 

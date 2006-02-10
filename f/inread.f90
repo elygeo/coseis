@@ -1,10 +1,10 @@
 ! Read input
 module inread_m
-use globals_m
-contains
-subroutine inread( filename )
-
 implicit none
+contains
+
+subroutine inread( filename )
+use globals_m
 integer :: i, err
 logical :: inzone
 character(*), intent(in) :: filename

@@ -1,10 +1,10 @@
 ! Calculate PML damping parameters
 module pml_m
-use globals_m
-contains
-subroutine pml
-
 implicit none
+contains
+
+subroutine pml
+use globals_m
 integer :: i
 real :: hmean, tune, c1, c2, c3, damp, dampn, dampc, pmlp
 
@@ -27,5 +27,6 @@ do i = 1, npml
 end do
 
 end subroutine
+
 end module
 

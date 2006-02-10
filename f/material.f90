@@ -1,14 +1,14 @@
 ! Material model
 module material_m
+implicit none
+contains
+
+subroutine material
 use globals_m
 use collectiveio_m
 use diffnc_m
 use bc_m
 use zone_m
-contains
-subroutine material
-
-implicit none
 integer :: i1(3), i2(3), i1l(3), i2l(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, iz, idoublenode
 
@@ -151,9 +151,9 @@ j = ihypo(1)
 k = ihypo(2)
 l = ihypo(3)
 select case( ifn )
-case( 1 ); s1(j,:,:) = 0.
-case( 2 ); s1(:,k,:) = 0.
-case( 3 ); s1(:,:,l) = 0.
+case( 1 ); s1(j,:,:) = 0.; lam(j,:,:) = 0.; mu(j,:,:) = 0.
+case( 2 ); s1(:,k,:) = 0.; lam(:,k,:) = 0.; mu(:,k,:) = 0.
+case( 3 ); s1(:,:,l) = 0.; lam(:,:,l) = 0.; mu(:,:,l) = 0.
 end select
 
 ! Node volume
@@ -192,5 +192,6 @@ s1 = 0.
 s2 = 0.
 
 end subroutine
+
 end module
 

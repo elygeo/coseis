@@ -1,29 +1,25 @@
 ! Moment source added to stress
 module momentsource_m
 use globals_m
+implicit none
+real, private, allocatable :: srcfr(:)
+integer, private, allocatable :: jj(:), kk(:), ll(:)
+contains
+
+! Moment source init
+subroutine momentsource_init
 use diffnc_m
 use collective_m
-contains
-subroutine momentsource
-
-implicit none
-real, save, allocatable :: srcfr(:), cellvol(:)
-integer, save, allocatable :: jj(:), kk(:), ll(:)
-logical, save :: init = .true.
-integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc, ic
-real :: srcft, sumsrcfr
+real, allocatable :: cellvol(:)
+integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, ic, nsrc
+real :: sumsrcfr
 
 if ( rsource <= 0. ) return
-
 if ( master ) then
   open( 9, file='log', position='append' )
-  write( 9, * ) 'Moment source'
+  write( 9, * ) 'Moment source initialize'
   close( 9 )
 end if
-
-ifinit: if ( init ) then !-----------------------------------------------------!
-
-init = .false.
 
 ! Indices
 i1 = i1cell
@@ -86,9 +82,20 @@ w1 = 0.
 s1 = 0.
 s2 = 0.
 
-return
+end subroutine
 
-end if ifinit !----------------------------------------------------------------!
+!------------------------------------------------------------------------------!
+! Add moment source
+subroutine momentsource
+integer :: i, j, k, l, ic, nsrc
+real :: srcft
+
+if ( rsource <= 0. ) return
+if ( master ) then
+  open( 9, file='log', position='append' )
+  write( 9, * ) 'Moment source'
+  close( 9 )
+end if
 
 ! Source time function
 select case( tfunc )
@@ -112,5 +119,6 @@ end do
 end do
 
 end subroutine
+
 end module
 

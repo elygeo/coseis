@@ -1,11 +1,11 @@
 ! Lock nodes by setting acceleration to zero
 module locknodes_m
+implicit none
+contains
+
+subroutine locknodes
 use globals_m
 use zone_m
-contains
-subroutine locknodes
-
-implicit none
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, iz
 logical, save :: init = .true.
 
@@ -32,5 +32,6 @@ do iz = 1, nlock
 end do
 
 end subroutine
+
 end module
 

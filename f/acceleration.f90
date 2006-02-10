@@ -1,15 +1,15 @@
 ! Acceleration calculation
 module acceleration_m
+implicit none
+contains
+
+subroutine acceleration
 use globals_m
 use diffcn_m
 use hourglassnc_m
 use hourglasscn_m
 use collective_m
 use bc_m
-contains
-subroutine acceleration
-
-implicit none
 integer :: i1(3), i2(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, ic, iid, id, iz, iq
 

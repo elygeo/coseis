@@ -225,6 +225,7 @@ fi
 echo ''
 
 # SDX
+echo "cd $srcdir" > viz/srcdir.m
 echo "cd $rundir" > viz/rundir.m
 cat << END > sdx
 #!/bin/bash -e

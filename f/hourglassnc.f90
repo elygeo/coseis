@@ -1,9 +1,9 @@
 ! Hourglass corrections, node to cell
 module hourglassnc_m
-contains
-subroutine hourglassnc( hg, f, i, iq, i1, i2 )
-
 implicit none
+contains
+
+subroutine hourglassnc( hg, f, i, iq, i1, i2 )
 real, intent(out) :: hg(:,:,:)
 real, intent(in) :: f(:,:,:,:)
 integer, intent(in) :: i, iq, i1(3), i2(3)
@@ -51,5 +51,6 @@ case( 4 )
 end select
 
 end subroutine
+
 end module
 

@@ -1,9 +1,9 @@
 ! Boundary conditions
 module bc_m
+implicit none
 contains
 
 subroutine scalarbc( f, ibc1, ibc2, nhalo )
-implicit none
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: ibc1(3), ibc2(3), nhalo
 integer :: i1(3), i2(3), n(3), i, j1, k1, l1, j2, k2, l2

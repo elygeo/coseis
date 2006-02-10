@@ -1,10 +1,10 @@
 ! Assign fast operators to rectangular mesh portions
 module optimize_m
-use globals_m
-contains
-subroutine optimize
-
 implicit none
+contains
+
+subroutine optimize
+use globals_m
 real :: tol, test
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2
 
@@ -86,5 +86,6 @@ else
 end if
 
 end subroutine
+
 end module
 

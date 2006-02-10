@@ -1,9 +1,9 @@
 ! Find surface normals
 module surfnormals_m
-contains
-subroutine surfnormals( nhat, x, i1, i2 )
-
 implicit none
+contains
+
+subroutine surfnormals( nhat, x, i1, i2 )
 real, intent(out) :: nhat(:,:,:,:)
 real, intent(in) :: x(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3)
@@ -78,5 +78,6 @@ do a = 1, 3
 end do
 
 end subroutine
+
 end module
 

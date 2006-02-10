@@ -8,7 +8,6 @@ contains
 
 ! Initialize
 subroutine initialize( ipout, np0, master )
-implicit none
 logical, intent(out) :: master
 integer, intent(out) :: ipout, np0
 integer :: e
@@ -22,14 +21,12 @@ end subroutine
 
 ! Finalize
 subroutine finalize
-implicit none
 integer :: e
 call mpi_finalize( e )
 end subroutine
 
 ! Processor rank
 subroutine rank( np, ipout, ip3 )
-implicit none
 integer, intent(in) :: np(3)
 integer, intent(out) :: ipout, ip3(3)
 integer :: e
@@ -49,7 +46,6 @@ end subroutine
 
 ! Set master processor
 subroutine setmaster( ip3master )
-implicit none
 integer, intent(in) :: ip3master(3)
 integer :: e
 call mpi_cart_rank( c, ip3master, ipmaster, e )
@@ -57,7 +53,6 @@ end subroutine
 
 ! Broadcast
 subroutine broadcast( r )
-implicit none
 real, intent(inout) :: r(:)
 integer :: i, e
 i = size(r)
@@ -66,7 +61,6 @@ end subroutine
 
 ! Integer minimum
 subroutine pimin( i )
-implicit none
 integer, intent(inout) :: i
 integer :: ii, e
 call mpi_allreduce( i, ii, 1, mpi_integer, mpi_min, c, e )
@@ -75,7 +69,6 @@ end subroutine
 
 ! Real sum
 subroutine psum( r )
-implicit none
 real, intent(inout) :: r
 real :: rr
 integer :: e
@@ -85,7 +78,6 @@ end subroutine
 
 ! Logical or
 subroutine plor( l )
-implicit none
 logical, intent(inout) :: l
 logical :: ll
 integer :: e
@@ -95,7 +87,6 @@ end subroutine
 
 ! Real minimum
 subroutine pmin( r )
-implicit none
 real, intent(inout) :: r
 real :: rr
 integer :: e
@@ -105,7 +96,6 @@ end subroutine
 
 ! Real maximum
 subroutine pmax( r )
-implicit none
 real, intent(inout) :: r
 real :: rr
 integer :: e
@@ -115,7 +105,6 @@ end subroutine
 
 ! Real global maximum & location, send to master
 subroutine pmaxloc( r, i, nnoff )
-implicit none
 real, intent(inout) :: r
 integer, intent(inout) :: i(3)
 integer, intent(in) :: nnoff(3)
@@ -138,7 +127,6 @@ end subroutine
 
 ! Scalar swap halo
 subroutine scalarswaphalo( f, nhalo )
-implicit none
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: nhalo
 integer :: i, e, left, right, ng(3), nl(3), isend(4), irecv(4), tsend, trecv
@@ -173,7 +161,6 @@ end subroutine
 
 ! Vector swap halo
 subroutine vectorswaphalo( f, nhalo )
-implicit none
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: nhalo
 integer :: i, e, left, right, ng(4), nl(4), isend(4), irecv(4), tsend, trecv

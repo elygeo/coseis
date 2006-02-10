@@ -2,30 +2,28 @@
 module output_m
 use globals_m
 use collectiveio_m
-contains
-subroutine output( pass )
-use zone_m
-
 implicit none
-save
-real :: amax, vmax, umax, wmax, svmax, slmax, courant, dtwall, tarrmax
-integer :: amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3), &
-  i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, iz, &
-  twall_rate, twall_max, twall1, twall2
-logical :: fault, static, cell, test, init = .true.
-character, intent(in) :: pass
+real, private :: amax, vmax, umax, wmax, svmax, slmax
+integer, private :: twall_rate, twall_max, twall1, twall2, &
+  amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3)
+contains
+
+! Ouput initialize
+subroutine output_init
+use zone_m
+real :: courant
+integer :: i1(3), i2(3), i, j, k, l, nc, iz
+character :: endian
 character(7) :: field
-character :: onpass, endian
+logical :: fault, test, cell
 
 if ( master ) then
   open( 9, file='log', position='append' )
-  write( 9, * ) 'Output pass: ', pass
+  write( 9, * ) 'Output initialize'
   close( 9 )
+  call system_clock( count_rate=twall_rate, count_max=twall_max )
 end if
 
-ifinit: if ( init ) then !-----------------------------------------------------!
-
-init = .false.
 inquire( file='meta.m', exist=test )
 if ( test .and. it == 1 ) stop 'error: previous output found'
 
@@ -66,7 +64,6 @@ end if
 
 ! Metadata
 if ( master ) then
-  call system_clock( count_rate=twall_rate, count_max=twall_max )
   endian = 'l'
   if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
   courant = dt * vp2 * sqrt( 3. ) / abs( dx )
@@ -176,22 +173,34 @@ doiz0: do iz = 1, nout
   end if
  
   ! Split collective i/o
-  i1l = max( i1, i1node )
-  i2l = min( i2, i2node )
-  if ( any( i2l < i1l ) ) ditout(iz) = nt + 1
+  i1 = max( i1, i1node )
+  i2 = min( i2, i2node )
+  if ( any( i2 < i1 ) ) ditout(iz) = nt + 1
   call iosplit( iz, nout, ditout(iz) )
  
 end do doiz0
  
-! Column names
+! Wall time
 if ( master ) then
   close( 9 )
   call system_clock( twall2 )
 end if
 
-return
+end subroutine
 
-end if ifinit !----------------------------------------------------------------!
+!------------------------------------------------------------------------------!
+subroutine output( pass )
+character, intent(in) :: pass
+character :: onpass
+real :: dtwall, tarrmax
+integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, iz
+logical :: fault, test, static
+
+if ( master ) then
+  open( 9, file='log', position='append' )
+  write( 9, * ) 'Output pass: ', pass
+  close( 9 )
+end if
 
 ! Magnitudes
 select case( pass )
@@ -387,7 +396,7 @@ if ( faultnormal /= 0 .and. it == nt - 1 ) then
   end if
 end if
 
-
 end subroutine
+
 end module
 

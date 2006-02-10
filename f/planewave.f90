@@ -1,10 +1,10 @@
 ! Moment source added to stress
 module bodysource_m
-use globals_m
-contains
-subroutine bodysource
-
 implicit none
+contains
+
+subroutine bodysource
+use globals_m
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2
 real :: srcft
 
@@ -39,5 +39,6 @@ do i = 1, 3
 end do
 
 end subroutine
+
 end module
 

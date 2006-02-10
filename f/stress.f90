@@ -1,11 +1,11 @@
 ! Stress calculation
 module stress_m
+implicit none
+contains
+
+subroutine stress
 use globals_m
 use diffnc_m
-contains
-subroutine stress
-
-implicit none
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, ic, iid, id, iz
 
 if ( master ) then
@@ -154,5 +154,6 @@ do i = 1, 3
 end do
 
 end subroutine
+
 end module
 

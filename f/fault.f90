@@ -2,31 +2,23 @@
 module fault_m
 use globals_m
 use collectiveio_m
-use surfnormals_m
-use bc_m
-use zone_m
-contains
-subroutine fault
-
 implicit none
+contains
+
+! Fault initialization
+subroutine fault_init
+use bc_m
+use surfnormals_m
+use zone_m
 real :: mus0, mud0, dc0, lc, tn0, ts0, ess, rctest
-integer :: i1(3), i2(3), &
-  i, j, k, l, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4, iz
-logical :: test
-integer, save :: side
-logical, save :: init = .true.
+integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
 
 if ( ifn == 0 ) return
-
 if ( master ) then
   open( 9, file='log', position='append' )
-  write( 9, * ) 'Fault'
+  write( 9, * ) 'Fault initialization'
   close( 9 )
 end if
-
-ifinit: if ( init ) then !-----------------------------------------------------!
-
-init = .false.
 
 ! Test if fault plane exists on this processor
 i = ihypo(ifn)
@@ -117,7 +109,6 @@ co = 1e9
 co(j1:j2,k1:k2,l1:l2) = f1(j1:j2,k1:k2,l1:l2)
 
 ! Normal vectors
-side = sign( 1, faultnormal )
 i1 = i1node
 i2 = i2node
 i1(ifn) = ihypo(ifn)
@@ -125,9 +116,9 @@ i2(ifn) = ihypo(ifn)
 call surfnormals( nhat, x, i1, i2 )
 call vectorbc( nhat, ibc1, ibc2, nhalo )
 call vectorswaphalo( nhat, nhalo )
-area = sqrt( sum( nhat * nhat, 4 ) )
+area = sign( 1, faultnormal ) * sqrt( sum( nhat * nhat, 4 ) )
 f1 = area
-where ( f1 /= 0. ) f1 = side / f1
+where ( f1 /= 0. ) f1 = 1. / f1
 do i = 1, 3
   nhat(:,:,:,i) = nhat(:,:,:,i) * f1
 end do
@@ -215,9 +206,20 @@ if ( master ) then
   close( 9 )
 end if
 
-return
+end subroutine
 
-end if ifinit !----------------------------------------------------------------!
+!------------------------------------------------------------------------------!
+subroutine fault
+integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, &
+  j3, k3, l3, j4, k4, l4
+logical :: test
+
+if ( ifn == 0 ) return
+if ( master ) then
+  open( 9, file='log', position='append' )
+  write( 9, * ) 'Fault'
+  close( 9 )
+end if
 
 ! Indices
 i1 = 1
@@ -237,7 +239,7 @@ l3 = i1(3); l4 = i2(3)
 f1 = dt * area * ( mr(j1:j2,k1:k2,l1:l2) + mr(j3:j4,k3:k4,l3:l4) )
 where ( f1 /= 0. ) f1 = 1. / f1
 do i = 1, 3
-  t3(:,:,:,i) = t0(:,:,:,i) + f1 * side * &
+  t3(:,:,:,i) = t0(:,:,:,i) + f1 * &
     ( v(j3:j4,k3:k4,l3:l4,i) + dt * w1(j3:j4,k3:k4,l3:l4,i) &
     - v(j1:j2,k1:k2,l1:l2,i) - dt * w1(j1:j2,k1:k2,l1:l2,i) )
 end do
@@ -272,11 +274,12 @@ where ( ts > f1 ) f2 = f1 / ts
 
 ! Update acceleration
 do i = 1, 3
-  f1 = area * side * ( t1(:,:,:,i) + f2 * t2(:,:,:,i) - t0(:,:,:,i) )
+  f1 = area * ( t1(:,:,:,i) + f2 * t2(:,:,:,i) - t0(:,:,:,i) )
   w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f1 * mr(j1:j2,k1:k2,l1:l2)
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f1 * mr(j3:j4,k3:k4,l3:l4)
 end do
 
 end subroutine
+
 end module
 

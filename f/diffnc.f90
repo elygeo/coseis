@@ -1,9 +1,10 @@
 ! Difference operator, node to cell
 module diffnc_m
+implicit none
 contains
+
 subroutine diffnc( df, oper, f, x, dx, i, a, i1, i2 )
 
-implicit none
 real, intent(out) :: df(:,:,:)
 character, intent(in) :: oper
 real, intent(in) :: f(:,:,:,:), x(:,:,:,:), dx
@@ -119,5 +120,6 @@ end forall
 end select
 
 end subroutine
+
 end module
 

@@ -1,10 +1,10 @@
 ! Allocate arrays
 module arrays_m
-use globals_m
-contains
-subroutine arrays
-
 implicit none
+contains
+
+subroutine arrays
+use globals_m
 integer :: i1(3), i2(3), j, k, l, j1, k1, l1, j2, k2, l2
 
 if ( master ) then
@@ -118,5 +118,6 @@ g5    =  0.
 g6    =  0.
 
 end subroutine
+
 end module
 
