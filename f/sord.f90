@@ -34,6 +34,7 @@ call setup
 call arrays
 call readcheckpoint
 call gridgen
+oper = 'h'
 call material
 call momentsource
 call fault

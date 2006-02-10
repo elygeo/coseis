@@ -11,7 +11,7 @@ real :: theta, scl
 integer :: i1(3), i2(3), i1l(3), i2l(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, up(1)
 real :: x1, x2, m(9)
-logical :: expand
+logical :: expand, lbc(3)
 
 if ( master ) then
   open( 9, file='log', position='append' )
@@ -136,6 +136,110 @@ if ( gridnoise > 0. ) then
   x = x + w1
 end if
 
+! Free surface BC
+if ( i1(1) <= 1 ) forall( i=1:nhalo ) x(j1-i,:,:,:) = x(j1,:,:,:)
+if ( i1(2) <= 1 ) forall( i=1:nhalo ) x(:,k1-i,:,:) = x(:,k1,:,:)
+if ( i1(3) <= 1 ) forall( i=1:nhalo ) x(:,:,l1-i,:) = x(:,:,l1,:)
+if ( i2(1) <= 1 ) forall( i=1:nhalo ) x(j2+i,:,:,:) = x(j2,:,:,:)
+if ( i2(2) <= 1 ) forall( i=1:nhalo ) x(:,k2+i,:,:) = x(:,k2,:,:)
+if ( i2(3) <= 1 ) forall( i=1:nhalo ) x(:,:,l2+i,:) = x(:,:,l2,:)
+
+! Continuing BC
+if ( i1(1) == 4 ) forall( i=1:nhalo ) x(j1-i,:,:,:) = (i+1) * x(j1,:,:,:) - i * x(j1+1,:,:,:)
+if ( i1(2) == 4 ) forall( i=1:nhalo ) x(:,k1-i,:,:) = (i+1) * x(:,k1,:,:) - i * x(:,k1+1,:,:)
+if ( i1(3) == 4 ) forall( i=1:nhalo ) x(:,:,l1-i,:) = (i+1) * x(:,:,l1,:) - i * x(:,:,l1+1,:)
+if ( i2(1) == 4 ) forall( i=1:nhalo ) x(j2+i,:,:,:) = (i+1) * x(j2,:,:,:) - i * x(j2-1,:,:,:)
+if ( i2(2) == 4 ) forall( i=1:nhalo ) x(:,k2+i,:,:) = (i+1) * x(:,k2,:,:) - i * x(:,k2-1,:,:)
+if ( i2(3) == 4 ) forall( i=1:nhalo ) x(:,:,l2+i,:) = (i+1) * x(:,:,l2,:) - i * x(:,:,l2-1,:)
+
+! Mirror on cell center BC
+if ( i1(1) == 2 ) then
+  forall( i=1:nhalo )
+    x(j1-i,:,:,1) = 2 * x(j1,:,:,1) - x(j1+i-1,:,:,1) - dx
+    x(j1-i,:,:,2) = x(j1+i-1,:,:,2)
+    x(j1-i,:,:,3) = x(j1+i-1,:,:,3)
+  end forall
+end if
+if ( i1(2) == 2 ) then
+  forall( i=1:nhalo )
+    x(:,k1-i,:,2) = 2 * x(:,k1,:,2) - x(:,k1+i-1,:,2) - dx
+    x(:,k1-i,:,3) = x(:,k1+i-1,:,3)
+    x(:,k1-i,:,1) = x(:,k1+i-1,:,1)
+  end forall
+end if
+if ( i1(3) == 2 ) then
+  forall( i=1:nhalo )
+    x(:,:,l1-i,3) = 2 * x(:,:,l1,3) - x(:,:,l1+i-1,3) - dx
+    x(:,:,l1-i,1) = x(:,:,l1+i-1,1)
+    x(:,:,l1-i,2) = x(:,:,l1+i-1,2)
+  end forall
+end if
+if ( i2(1) == 2 ) then
+  forall( i=1:nhalo )
+    x(j2+i,:,:,1) = 2 * x(j2,:,:,1) - x(j2-i+1,:,:,1) + dx
+    x(j2+i,:,:,2) = x(j2-i+1,:,:,2)
+    x(j2+i,:,:,3) = x(j2-i+1,:,:,3)
+  end forall
+end if
+if ( i2(2) == 2 ) then
+  forall( i=1:nhalo )
+    x(:,k2+i,:,2) = 2 * x(:,k2,:,2) - x(:,k2-i+1,:,2) + dx
+    x(:,k2+i,:,3) = x(:,k2-i+1,:,3)
+    x(:,k2+i,:,1) = x(:,k2-i+1,:,1)
+  end forall
+end if
+if ( i2(3) == 2 ) then
+  forall( i=1:nhalo )
+    x(:,:,l2+i,3) = 2 * x(:,:,l2,3) - x(:,:,l2-i+1,3) + dx
+    x(:,:,l2+i,1) = x(:,:,l2-i+1,1)
+    x(:,:,l2+i,2) = x(:,:,l2-i+1,2)
+  end forall
+end if
+
+! Mirror on node BC
+if ( i1(1) == 3 ) then
+  forall( i=1:nhalo )
+    x(j1-i,:,:,1) = 2 * x(j1,:,:,1) - x(j1+i,:,:,1)
+    x(j1-i,:,:,2) = x(j1+i,:,:,2)
+    x(j1-i,:,:,3) = x(j1+i,:,:,3)
+  end forall
+end if
+if ( i1(2) == 3 ) then
+  forall( i=1:nhalo )
+    x(:,k1-i,:,2) = 2 * x(:,k1,:,2) - x(:,k1+i,:,2)
+    x(:,k1-i,:,3) = x(:,k1+i,:,3)
+    x(:,k1-i,:,1) = x(:,k1+i,:,1)
+  end forall
+end if
+if ( i1(3) == 3 ) then
+  forall( i=1:nhalo )
+    x(:,:,l1-i,3) = 2 * x(:,:,l1,3) - x(:,:,l1+i,3)
+    x(:,:,l1-i,1) = x(:,:,l1+i,1)
+    x(:,:,l1-i,2) = x(:,:,l1+i,2)
+  end forall
+end if
+if ( i2(1) == 3 ) then
+  forall( i=1:nhalo )
+    x(j2+i,:,:,1) = 2 * x(j2,:,:,1) - x(j2-i,:,:,1)
+    x(j2+i,:,:,2) = x(j2-i,:,:,2)
+    x(j2+i,:,:,3) = x(j2-i,:,:,3)
+  end forall
+end if
+if ( i2(2) == 3 ) then
+  forall( i=1:nhalo )
+    x(:,k2+i,:,2) = 2 * x(:,k2,:,2) - x(:,k2-i,:,2)
+    x(:,k2+i,:,3) = x(:,k2-i,:,3)
+    x(:,k2+i,:,1) = x(:,k2-i,:,1)
+  end forall
+end if
+if ( i2(3) == 3 ) then
+  forall( i=1:nhalo )
+    x(:,:,l2+i,3) = 2 * x(:,:,l2,3) - x(:,:,l2-i,3)
+    x(:,:,l2+i,1) = x(:,:,l2-i,1)
+    x(:,:,l2+i,2) = x(:,:,l2-i,2)
+  end forall
+end if
+
 ! Create fault double nodes
 i1l = i1node
 i2l = i2node
@@ -147,64 +251,6 @@ case( 1 ); x(j+1:j2,:,:,:) = x(j:j2-1,:,:,:)
 case( 2 ); x(:,k+1:k2,:,:) = x(:,k:k2-1,:,:)
 case( 3 ); x(:,:,l+1:l2,:) = x(:,:,l:l2-1,:)
 end select
-
-! Boundary conditions
-do i = 1, nhalo
-  if ( i1(1) == 2 ) then
-    x(j1-i,:,:,:) = x(j1+i-1,:,:,:)
-    x(j1-i,:,:,1) = 2 * x(j1,:,:,1) - x(j1+i-1,:,:,1) - dx
-  elseif ( i1(1) == 3 ) then
-    x(j1-i,:,:,:) = x(j1+i,:,:,:)
-    x(j1-i,:,:,1) = 2 * x(j1,:,:,1) - x(j1+i,:,:,1)
-  else
-    x(j1-i,:,:,:) = ( i + 1 ) * x(j1,:,:,:) - i * x(j1+1,:,:,:)
-  end if
-  if ( i2(1) == 2 ) then
-    x(j2+i,:,:,:) = x(j2-i+1,:,:,:)
-    x(j2+i,:,:,1) = 2 * x(j2,:,:,1) - x(j2-i+1,:,:,1) + dx
-  elseif ( i2(1) == 3 ) then
-    x(j2+i,:,:,:) = x(j2-i,:,:,:)
-    x(j2+i,:,:,1) = 2 * x(j2,:,:,1) - x(j2-i,:,:,1)
-  else
-    x(j2+i,:,:,:) = ( i + 1 ) * x(j2,:,:,:) - i * x(j2-1,:,:,:)
-  end if
-  if ( i1(2) == 2 ) then
-    x(:,k1-i,:,:) = x(:,k1+i-1,:,:)
-    x(:,k1-i,:,2) = 2 * x(:,k1,:,2) - x(:,k1+i-1,:,2) - dx
-  elseif ( i1(2) == 3 ) then
-    x(:,k1-i,:,:) = x(:,k1+i,:,:)
-    x(:,k1-i,:,2) = 2 * x(:,k1,:,2) - x(:,k1+i,:,2)
-  else
-    x(:,k1-i,:,:) = ( i + 1 ) * x(:,k1,:,:) - i * x(:,k1+1,:,:)
-  end if
-  if ( i2(2) == 2 ) then
-    x(:,k2+i,:,:) = x(:,k2-i+1,:,:)
-    x(:,k2+i,:,2) = 2 * x(:,k2,:,2) - x(:,k2-i+1,:,2) + dx
-  elseif ( i2(2) == 3 ) then
-    x(:,k2+i,:,:) = x(:,k2-i,:,:)
-    x(:,k2+i,:,2) = 2 * x(:,k2,:,2) - x(:,k2-i,:,2)
-  else
-    x(:,k2+i,:,:) = ( i + 1 ) * x(:,k2,:,:) - i * x(:,k2-1,:,:)
-  end if
-  if ( i1(3) == 2 ) then
-    x(:,:,l1-i,:) = x(:,:,l1+i-1,:)
-    x(:,:,l1-i,3) = 2 * x(:,:,l1,3) - x(:,:,l1+i-1,3) - dx
-  elseif ( i1(3) == 3 ) then
-    x(:,:,l1-i,:) = x(:,:,l1+i,:)
-    x(:,:,l1-i,3) = 2 * x(:,:,l1,3) - x(:,:,l1+i,3)
-  else
-    x(:,:,l1-i,:) = ( i + 1 ) * x(:,:,l1,:) - i * x(:,:,l1+1,:)
-  end if
-  if ( i2(3) == 2 ) then
-    x(:,:,l2+i,:) = x(:,:,l2-i+1,:)
-    x(:,:,l2+i,3) = 2 * x(:,:,l2,3) - x(:,:,l2-i+1,3) + dx
-  elseif ( i2(3) == 3 ) then
-    x(:,:,l2+i,:) = x(:,:,l2-i,:)
-    x(:,:,l2+i,3) = 2 * x(:,:,l2,3) - x(:,:,l2-i,3)
-  else
-    x(:,:,l2+i,:) = ( i + 1 ) * x(:,:,l2,:) - i * x(:,:,l2-1,:)
-  end if
-end do
 call vectorswaphalo( x, nhalo )
 
 ! Assign fast operators to rectangular mesh portions
