@@ -86,16 +86,6 @@ else
 end if ifreadfile
 end do doiz
 
-!Boundary conditions
-call scalarbc( mus, ibc1, ibc2, nhalo )
-call scalarbc( mud, ibc1, ibc2, nhalo )
-call scalarbc( dc, ibc1, ibc2, nhalo )
-call scalarbc( co, ibc1, ibc2, nhalo )
-call scalarswaphalo( mus, nhalo )
-call scalarswaphalo( mud, nhalo )
-call scalarswaphalo( dc, nhalo )
-call scalarswaphalo( co, nhalo )
-
 ! Lock fault in PML region
 i1 = max( i1pml + 1, 1 )
 i2 = min( i2pml - 1, nm )
@@ -114,8 +104,6 @@ i2 = i2node
 i1(ifn) = ihypo(ifn)
 i2(ifn) = ihypo(ifn)
 call surfnormals( nhat, x, i1, i2 )
-call vectorbc( nhat, ibc1, ibc2, nhalo )
-call vectorswaphalo( nhat, nhalo )
 area = sign( 1, faultnormal ) * sqrt( sum( nhat * nhat, 4 ) )
 f1 = area
 where ( f1 /= 0. ) f1 = 1. / f1
@@ -160,8 +148,6 @@ do i = 1, 3
     t3(:,:,:,2) * t1(:,:,:,i) + &
     t3(:,:,:,3) * t2(:,:,:,i)
 end do
-call vectorbc( t0, ibc1, ibc2, nhalo )
-call vectorswaphalo( t0, nhalo )
 
 ! Hypocentral radius
 i1 = 1
@@ -175,6 +161,33 @@ do i = 1, 3
   t3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i)
 end do
 rhypo = sqrt( sum( t3 * t3, 4 ) )
+
+! Boundary conditions
+i1 = abs( ibc1 )
+i2 = abs( ibc2 )
+call scalarbc( mus, i1, i2, nhalo )
+call scalarbc( mud, i1, i2, nhalo )
+call scalarbc( dc, i1, i2, nhalo )
+call scalarbc( co, i1, i2, nhalo )
+call scalarbc( area, i1, i2, nhalo )
+call vectorbc( nhat, i1, i2, nhalo )
+tn = sum( t0 * nhat, 4 )
+do i = 1, 3
+  t1(:,:,:,i) = tn * nhat(:,:,:,i)
+end do
+t2 = t0 - t1
+call vectorbc( t1, i1, i2, nhalo )
+call vectorbc( t2, ibc1, ibc2, nhalo )
+t0 = t1 + t2
+
+! Halos
+call scalarswaphalo( mus, nhalo )
+call scalarswaphalo( mud, nhalo )
+call scalarswaphalo( dc, nhalo )
+call scalarswaphalo( co, nhalo )
+call scalarswaphalo( area, nhalo )
+call vectorswaphalo( nhat, nhalo )
+call vectorswaphalo( t0, nhalo )
 
 ! Metadata
 if ( master ) then

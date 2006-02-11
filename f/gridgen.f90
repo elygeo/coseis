@@ -1,12 +1,13 @@
 ! Grid generation
 module gridgen_m
-use optimize_m
-use collectiveio_m
-use zone_m
 implicit none
 contains
 
 subroutine gridgen
+use globals_m
+use optimize_m
+use collectiveio_m
+use zone_m
 real :: theta, scl
 integer :: i1(3), i2(3), i1l(3), i2l(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, up(1)

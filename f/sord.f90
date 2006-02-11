@@ -39,36 +39,14 @@ call momentsource_init
 call fault_init
 call output_init
 
-print *, 'x1'; print *, x(:,:,5:6,1)
-print *, 'x2'; print *, x(:,:,5:6,2)
-print *, 'x3'; print *, x(:,:,5:6,3)
-print *, 'mr'; print *, mr(:,:,5:6)
-print *, 'lam'; print *, lam(:,:,4:5)
-print *, 'mu'; print *, mu(:,:,4:5)
-print *, 'y'; print *, y(:,:,4:5)
 ! Main loop
 do while ( it <= nt )
   call pml
   call stress
-print *, it, '---------------------'
-print *, 'w1'; print *, w1(:,:,4:5,1)
-print *, 'w2'; print *, w1(:,:,4:5,2)
-print *, 'w3'; print *, w1(:,:,4:5,3)
-print *, 'w4'; print *, w2(:,:,4:5,1)
-print *, 'w5'; print *, w2(:,:,4:5,2)
-print *, 'w6'; print *, w2(:,:,4:5,3)
   call momentsource
   call output( 'w' ) 
   call acceleration
-print *, it, '---------------------'
-print *, 'a1'; print *, w1(:,:,5:6,1)
-print *, 'a2'; print *, w1(:,:,5:6,2)
-print *, 'a3'; print *, w1(:,:,5:6,3)
   call fault
-print *, it, '---------------------'
-print *, 'a1-'; print *, w1(:,:,5:6,1)
-print *, 'a2-'; print *, w1(:,:,5:6,2)
-print *, 'a3-'; print *, w1(:,:,5:6,3)
   call locknodes
   call output( 'a' )
   call writecheckpoint
