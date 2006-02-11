@@ -2,12 +2,12 @@
 module fault_m
 use globals_m
 use collectiveio_m
+use bc_m
 implicit none
 contains
 
 ! Fault initialization
 subroutine fault_init
-use bc_m
 use surfnormals_m
 use zone_m
 real :: mus0, mud0, dc0, lc, tn0, ts0, ess, rctest
@@ -163,22 +163,22 @@ end do
 rhypo = sqrt( sum( t3 * t3, 4 ) )
 
 ! Boundary conditions
-i1 = abs( ibc1 )
-i2 = abs( ibc2 )
-call scalarbc( mus, i1, i2, nhalo )
-call scalarbc( mud, i1, i2, nhalo )
-call scalarbc( dc, i1, i2, nhalo )
-call scalarbc( co, i1, i2, nhalo )
-call scalarbc( area, i1, i2, nhalo )
-call vectorbc( nhat, i1, i2, nhalo )
-tn = sum( t0 * nhat, 4 )
-do i = 1, 3
-  t1(:,:,:,i) = tn * nhat(:,:,:,i)
-end do
-t2 = t0 - t1
-call vectorbc( t1, i1, i2, nhalo )
-call vectorbc( t2, ibc1, ibc2, nhalo )
-t0 = t1 + t2
+!i1 = abs( ibc1 )
+!i2 = abs( ibc2 )
+!call scalarbc( mus, i1, i2, nhalo )
+!call scalarbc( mud, i1, i2, nhalo )
+!call scalarbc( dc, i1, i2, nhalo )
+!call scalarbc( co, i1, i2, nhalo )
+!call scalarbc( area, i1, i2, nhalo )
+!call vectorbc( nhat, i1, i2, nhalo )
+!tn = sum( t0 * nhat, 4 )
+!do i = 1, 3
+!  t1(:,:,:,i) = tn * nhat(:,:,:,i)
+!end do
+!t2 = t0 - t1
+!call vectorbc( t1, i1, i2, nhalo )
+!call vectorbc( t2, ibc1, ibc2, nhalo )
+!t0 = t1 + t2
 
 ! Halos
 call scalarswaphalo( mus, nhalo )
@@ -291,6 +291,7 @@ do i = 1, 3
   w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f1 * mr(j1:j2,k1:k2,l1:l2)
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f1 * mr(j3:j4,k3:k4,l3:l4)
 end do
+call vectorbc( w1, ibc1, ibc2, nhalo )
 
 end subroutine
 

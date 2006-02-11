@@ -65,8 +65,8 @@ i2node = nhalo + nl
 ! Cell region
 i1cell = nhalo  
 i2cell = nhalo + nl
-where ( ibc1 <= 1 ) i1cell = i1cell + 1
-where ( ibc2 <= 1 ) i2cell = i2cell - 1
+where ( abs( ibc1 ) <= 1 ) i1cell = i1cell + 1
+where ( abs( ibc2 ) <= 1 ) i2cell = i2cell - 1
 
 end subroutine
 
