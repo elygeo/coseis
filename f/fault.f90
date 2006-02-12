@@ -162,24 +162,6 @@ do i = 1, 3
 end do
 rhypo = sqrt( sum( t3 * t3, 4 ) )
 
-! Boundary conditions
-!i1 = abs( ibc1 )
-!i2 = abs( ibc2 )
-!call scalarbc( mus, i1, i2, nhalo )
-!call scalarbc( mud, i1, i2, nhalo )
-!call scalarbc( dc, i1, i2, nhalo )
-!call scalarbc( co, i1, i2, nhalo )
-!call scalarbc( area, i1, i2, nhalo )
-!call vectorbc( nhat, i1, i2, nhalo )
-!tn = sum( t0 * nhat, 4 )
-!do i = 1, 3
-!  t1(:,:,:,i) = tn * nhat(:,:,:,i)
-!end do
-!t2 = t0 - t1
-!call vectorbc( t1, i1, i2, nhalo )
-!call vectorbc( t2, ibc1, ibc2, nhalo )
-!t0 = t1 + t2
-
 ! Halos
 call scalarswaphalo( mus, nhalo )
 call scalarswaphalo( mud, nhalo )
