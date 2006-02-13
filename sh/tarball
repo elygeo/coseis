@@ -17,7 +17,6 @@ files="
   $version/sh
   $version/f
   $version/m
-  $version/viz
 "
 
 rm -f f/*.o f/*.mod

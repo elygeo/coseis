@@ -4,8 +4,9 @@ account="ux451302@tg-login.sdsc.edu"
 account="moho.sdsu.edu"
 account="babieca.sdsu.edu"
 account="ux451302@dslogin.sdsc.edu"
-account="phim.ucsd.edu"
 account="altai.sdsu.edu"
+account="phim.ucsd.edu"
+account="curl"
 
 echo -e "\n$account"
 
@@ -20,7 +21,6 @@ files="
   sh
   f
   m
-  viz
 "
 
 rfiles=$( echo $files | sed 's|\([^ ]\+\)|sord/\1|g' )

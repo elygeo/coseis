@@ -42,6 +42,7 @@ inzone = .false.
 
 ! Select input key
 select case( key1 )
+case( 'datadir' )
 case( 'return' );      exit doline
 case( 'grid' );        read( str, * ) key1, grid
 case( 'gridtrans' );   read( str, * ) key1, gridtrans

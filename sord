@@ -7,11 +7,10 @@ mode=guess
 fflags=O
 compile=yes
 run=b
-while getopts spmicngGd opt; do
+while getopts spicngGd opt; do
 case "$opt" in
   s) mode=serial ;;
   p) mode=parallel ;;
-  m) mode=matlab ;;
   i) run=i ;;
   c) run= ;;
   n) run= ; compile= ;;
@@ -46,6 +45,7 @@ case "$key" in
   nn)  nn3=( $1 $2 $3 ) ;;
   np)  np3=( $1 $2 $3 ) ;;
   out) nout=$(( nout + 1 )) ;;
+  datadir) echo ln -s "$1" "$rundir/data" ;;
   return) break
 esac
 done < tmp
@@ -53,7 +53,6 @@ done < tmp
 # Problem size
 nn=$(( nn3[0] * nn3[1] * nn3[2] ));
 np=$(( np3[0] * np3[1] * np3[2] ));
-[ $mode = matlab ] && np=1
 [ $mode = guess ] && [ $np -eq 1 ] && mode=serial
 [ $mode = guess ] && [ $np -gt 1 ] && mode=parallel
 
@@ -119,7 +118,6 @@ case $machine in
   teragrid) ppn=2 ;;
   babieca)  ppn=2 ;;
 esac
-[ $mode = matlab ] && rate=$(( rate / 3 ))
 
 # Compute nodes
 [ $ppn -gt $np ] && ppn=$np
@@ -225,11 +223,11 @@ fi
 echo ''
 
 # SDX
-echo "cd $srcdir" > viz/srcdir.m
-echo "cd $rundir" > viz/rundir.m
+echo "cd $srcdir" > m/srcdir.m
+echo "cd $rundir" > m/rundir.m
 cat << END > sdx
 #!/bin/bash -e
-matlab -nodesktop -nosplash -r "addpath $srcdir/viz; rundir; sdx"
+matlab -nodesktop -nosplash -r "addpath $srcdir/m; rundir; sdx"
 END
 chmod u+x sdx
 
@@ -262,22 +260,7 @@ while [ $i -lt $nout ]; do
 done
 
 #------------------------------------------------------------------------------#
-# Run MATLAB version
-
-if [ $mode = matlab ]; then
-case $run in
-  i) matlab -nodesktop -nosplash -r "addpath $srcdir/m; sord" ;;
-  b) nohup matlab -nodisplay -nojvm -r "addpath $srcdir/m; sord" > errors &
-     echo "#!/bin/bash" > cancel.sh
-     echo "kill $!" >> cancel.sh
-     chmod u+x cancel.sh
-  ;;
-esac
-exit
-fi
-
-#------------------------------------------------------------------------------#
-# Run Fortran version
+# Run
 
 case $machine in
 

@@ -3,9 +3,7 @@ module output_m
 use globals_m
 use collectiveio_m
 implicit none
-real, private :: amax, vmax, umax, wmax, svmax, slmax
-integer, private :: twall_rate, twall_max, twall1, twall2, &
-  amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3)
+integer, private :: twall_rate, twall_max, twall1, twall2
 contains
 
 ! Ouput initialize
@@ -21,11 +19,10 @@ if ( master ) then
   open( 9, file='log', position='append' )
   write( 9, * ) 'Output initialize'
   close( 9 )
+  inquire( file='meta.m', exist=test )
+  if ( test .and. it == 1 ) stop 'error: previous output found'
   call system_clock( count_rate=twall_rate, count_max=twall_max )
 end if
-
-inquire( file='meta.m', exist=test )
-if ( test .and. it == 1 ) stop 'error: previous output found'
 
 ! Diagnostic
 if ( debug /= 0 ) then
@@ -193,6 +190,8 @@ subroutine output( pass )
 character, intent(in) :: pass
 character :: onpass
 real :: dtwall, tarrmax
+real, save :: amax, vmax, umax, wmax, svmax, slmax
+integer, save :: amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3)
 integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, iz
 logical :: fault, test, static
 
