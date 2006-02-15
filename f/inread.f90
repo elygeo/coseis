@@ -113,19 +113,15 @@ if ( inzone ) then
   nin = nin + 1
   i = nin
   read( str, * ) key1, key2
-  if ( key2 == 'read' ) then
-    readfile(nin) = .true.
-    i1in(i,:) = 1
-    i2in(i,:) = -1
-  else
-    readfile(nin) = .false.
-    read( str, *, iostat=err ) fieldin(i), inval(i), i1in(i,:), i2in(i,:)
-    if ( err /= 0 ) then
-      i1in(i,:) = 1
-      i2in(i,:) = -1
-      read( str, *, iostat=err ) fieldin(i), inval(i)
-    end if
-  end if
+  intype(i) = key2(1:1)
+  i1in(i,:) = 1
+  i2in(i,:) = -1
+  select case( key2 )
+  case( 'read' )
+  case( 'zone' ); read( str,* ) fieldin(i), key2, inval(i), i1in(i,:), i2in(i,:)
+  case( 'cube' ); read( str,* ) fieldin(i), key2, inval(i), x1in(i,:), x2in(i,:)
+  default; intype(i) = 'z'; read( str,* ) fieldin(i), inval(i)
+  end select
 end if
 
 end do doline

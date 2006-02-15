@@ -9,7 +9,7 @@ use optimize_m
 use collectiveio_m
 use zone_m
 real :: theta, scl
-integer :: i1(3), i2(3), i1l(3), i2l(3), &
+integer :: i1(3), i2(3), i1l(3), i2l(3), n(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, up(1)
 real :: x1, x2, m(9)
 logical :: expand, lbc(3)
@@ -109,15 +109,38 @@ case( 'read' )
 case( 'constant' )
 case( 'hill' )
 case( 'spherical' )
-case default; stop 'grid'
 end select
 
+! Symmetry
+n = ( i2l - i1l + 1 ) / 2
+if ( symmetry(1) /= 0 ) then
+  if ( np3(1) /= 1 ) stop 'np(1) must be 1 for j symmetry'
+  forall( i=1:n(1) ) x(j2-i+1,:,:,:) = x(j1+i-1,:,:,:)
+  forall( i=1:n(1) ) 
+    x(j2-i+1,:,:,1) = x(j1+n(1),:,:,1) + x(j2-n(1),:,:,1) - x(j1+i-1,:,:,1)
+  end forall
+end if
+if ( symmetry(2) /= 0 ) then
+  if ( np3(2) /= 1 ) stop 'np(2) must be 1 for k symmetry'
+  forall( i=1:n(2) ) x(:,k2-i+1,:,:) = x(:,k1+i-1,:,:)
+  forall( i=1:n(2) )
+    x(:,k2-i+1,:,2) = 2 * x(:,k1+i-1,:,2) - x(:,k1+i-1,:,2)
+  end forall
+end if
+if ( symmetry(3) /= 0 ) then
+  if ( np3(3) /= 1 ) stop 'np(3) must be 1 for l symmetry'
+  forall( i=1:n(3) ) x(:,:,l2-i+1,:) = x(:,:,l1+i-1,:)
+  forall( i=1:n(3) )
+    x(:,:,l2-i+1,3) = 2 * x(:,:,l1+i-1,3) - x(:,:,l1+i-1,3)
+  end forall
+end if
+
 ! Boundary conditions
-i1 = abs( ibc1 )
-i2 = abs( ibc2 )
 j = ihypo(1)
 k = ihypo(2)
 l = ihypo(3)
+i1 = abs( ibc1 )
+i2 = abs( ibc2 )
 
 ! Random noise added to mesh
 if ( gridnoise > 0. ) then
@@ -156,42 +179,42 @@ if ( i2(3) == 4 ) forall( i=1:nhalo ) x(:,:,l2+i,:) = (i+1) * x(:,:,l2,:) - i * 
 ! Mirror on cell center BC
 if ( i1(1) == 2 ) then
   forall( i=1:nhalo )
-    x(j1-i,:,:,1) = 2 * x(j1,:,:,1) - x(j1+i-1,:,:,1) - dx
+    x(j1-i,:,:,1) = 3 * x(j1,:,:,1) - x(j1+1,:,:,1) - x(j1+i-1,:,:,1)
     x(j1-i,:,:,2) = x(j1+i-1,:,:,2)
     x(j1-i,:,:,3) = x(j1+i-1,:,:,3)
   end forall
 end if
 if ( i1(2) == 2 ) then
   forall( i=1:nhalo )
-    x(:,k1-i,:,2) = 2 * x(:,k1,:,2) - x(:,k1+i-1,:,2) - dx
+    x(:,k1-i,:,2) = 3 * x(:,k1,:,2) - x(:,k1+1,:,2) - x(:,k1+i-1,:,2)
     x(:,k1-i,:,3) = x(:,k1+i-1,:,3)
     x(:,k1-i,:,1) = x(:,k1+i-1,:,1)
   end forall
 end if
 if ( i1(3) == 2 ) then
   forall( i=1:nhalo )
-    x(:,:,l1-i,3) = 2 * x(:,:,l1,3) - x(:,:,l1+i-1,3) - dx
+    x(:,:,l1-i,3) = 3 * x(:,:,l1,3) - x(:,:,l1+1,3) - x(:,:,l1+i-1,3)
     x(:,:,l1-i,1) = x(:,:,l1+i-1,1)
     x(:,:,l1-i,2) = x(:,:,l1+i-1,2)
   end forall
 end if
 if ( i2(1) == 2 ) then
   forall( i=1:nhalo )
-    x(j2+i,:,:,1) = 2 * x(j2,:,:,1) - x(j2-i+1,:,:,1) + dx
+    x(j2+i,:,:,1) = 3 * x(j2,:,:,1) - x(j2-1,:,:,1) - x(j2-i+1,:,:,1)
     x(j2+i,:,:,2) = x(j2-i+1,:,:,2)
     x(j2+i,:,:,3) = x(j2-i+1,:,:,3)
   end forall
 end if
 if ( i2(2) == 2 ) then
   forall( i=1:nhalo )
-    x(:,k2+i,:,2) = 2 * x(:,k2,:,2) - x(:,k2-i+1,:,2) + dx
+    x(:,k2+i,:,2) = 3 * x(:,k2,:,2) - x(:,k2-1,:,2) - x(:,k2-i+1,:,2)
     x(:,k2+i,:,3) = x(:,k2-i+1,:,3)
     x(:,k2+i,:,1) = x(:,k2-i+1,:,1)
   end forall
 end if
 if ( i2(3) == 2 ) then
   forall( i=1:nhalo )
-    x(:,:,l2+i,3) = 2 * x(:,:,l2,3) - x(:,:,l2-i+1,3) + dx
+    x(:,:,l2+i,3) = 3 * x(:,:,l2,3) - x(:,:,l2-1,3) - x(:,:,l2-i+1,3)
     x(:,:,l2+i,1) = x(:,:,l2-i+1,1)
     x(:,:,l2+i,2) = x(:,:,l2-i+1,2)
   end forall

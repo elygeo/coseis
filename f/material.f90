@@ -9,6 +9,7 @@ use collectiveio_m
 use diffnc_m
 use bc_m
 use zone_m
+real :: x1(3), x2(3)
 integer :: i1(3), i2(3), i1l(3), i2l(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, iz, idoublenode
 
@@ -39,7 +40,8 @@ call zone( i1, i2, nn, nnoff, ihypo, ifn )
 i1l = max( i1, i1node )
 i2l = min( i2, i2node )
 
-if ( .not. readfile(iz) ) then
+select case( intype(iz) )
+case( 'z' )
   j1 = i1l(1); j2 = i2l(1)
   k1 = i1l(2); k2 = i2l(2)
   l1 = i1l(3); l2 = i2l(3)
@@ -57,7 +59,24 @@ if ( .not. readfile(iz) ) then
     vs1 = min( vs1, inval(iz) )
     vs2 = max( vs2, inval(iz) )
   end select
-else
+case( 'c' )
+  x1 = x1in(iz,:)
+  x2 = x2in(iz,:)
+  select case( fieldin(iz) )
+  case( 'rho' )
+    case( 'mus' ); call cube( mr, x, i1, i2, x1, x2, inval(iz) )
+    rho1 = min( rho1, inval(iz) )
+    rho2 = max( rho2, inval(iz) )
+  case( 'vp'  )
+    case( 'mus' ); call cube( s1, x, i1, i2, x1, x2, inval(iz) )
+    vp1 = min( vp1, inval(iz) )
+    vp2 = max( vp2, inval(iz) )
+  case( 'vs'  )
+    case( 'mus' ); call cube( s2, x, i1, i2, x1, x2, inval(iz) )
+    vs1 = min( vs1, inval(iz) )
+    vs2 = max( vs2, inval(iz) )
+  end select
+case( 'r' )
   idoublenode = 0
   if ( ifn /= 0 ) then
     i = ihypo(ifn)
@@ -101,7 +120,7 @@ else
     where ( s2 < vs1 ) s2 = vs1
     where ( s2 > vs2 ) s2 = vs2
   end select
-end if
+end select
 
 end do doiz
 

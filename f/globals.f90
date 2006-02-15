@@ -91,6 +91,8 @@ real :: &
   rexpand,       & ! grid expantion ratio
   gridtrans(10), & ! grid transformation
   gridnoise,     & ! random noise in grid
+  x1in(nz,3),    & ! input cube - near corner
+  x2in(nz,3),    & ! input cube - far corner 
   xhypo(3),      & ! hypocenter location
   xcenter(3),    & ! mesh center
   rmax(1),       & ! maximum distance from mesh center
@@ -110,14 +112,15 @@ integer, dimension(3) :: &
   nm,            & ! size of local 3D arrays
   np,            & ! number of processors
   ip3,           & ! 3D processor rank
-  bc1,           & ! boundary conditions for j1 k1 l1
-  bc2,           & ! boundary conditions for j2 k2 l2
-  ibc1,          & ! internal boundary conditions for j1 k1 l1
-  ibc2,          & ! internal boundary conditions for j2 k2 l2
+  bc1,           & ! boundary conditions - near side
+  bc2,           & ! boundary conditions - far side
+  ibc1,          & ! internal boundary conditions - near side
+  ibc2,          & ! internal boundary conditions - far side
   nnoff,         & ! offset between local and global indices
   ihypo,         & ! hypocenter node
-  n1expand,      & ! # grid expantion nodes for j1 k1 l1
-  n2expand,      & ! # grid expantion nodes for j2 k2 l2
+  symmetry,      & ! grid symmetry in j k l
+  n1expand,      & ! # grid expantion nodes - near side
+  n2expand,      & ! # grid expantion nodes - far side
   i1node,        & ! node calculations start index
   i2node,        & ! node calculations end index
   i1cell,        & ! cell calculations start index
@@ -151,7 +154,8 @@ integer :: &
   i2out(nz,3)      ! j2 k2 l2 input zone end index
 
 character :: &
-  oper(2)         ! spatial derivative operators
+  oper(2),       & ! spatial derivative operators, g=general, r=rect, h=const
+  intype(nz)       ! input type: z=zone, c=cube, r=read
 
 character(4) :: &
   fieldin(nz),   & ! input variable
@@ -166,8 +170,7 @@ character(160) :: &
   str              ! string for storing file names
 
 logical :: &
-  master,        & ! master processor flag
-  readfile(nz)     ! read input file
+  master           ! master processor flag
 
 end module
 

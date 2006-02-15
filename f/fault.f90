@@ -10,7 +10,7 @@ contains
 subroutine fault_init
 use surfnormals_m
 use zone_m
-real :: mus0, mud0, dc0, lc, tn0, ts0, ess, rctest
+real :: mus0, mud0, dc0, lc, tn0, ts0, ess, rctest, x1(3), x2(3), rr
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
 
 if ( ifn == 0 ) return
@@ -36,8 +36,9 @@ t1 = 0.
 t2 = 0.
 t3 = 0.
 
-doiz: do iz = 1, nin
-ifreadfile: if ( readfile(iz) ) then
+do iz = 1, nin
+select case( intype(iz) )
+case( 'r' )
   i1 = i1node
   i2 = i2node
   i1(ifn) = 1
@@ -57,7 +58,8 @@ ifreadfile: if ( readfile(iz) ) then
   case( 'th'  ); call iovector( 'r', 'data/th',  t3, 2, i1, i2, nn, nnoff, 0 )
   case( 'td'  ); call iovector( 'r', 'data/td',  t3, 3, i1, i2, nn, nnoff, 0 )
   end select
-else
+case( 'z' )
+  rr = inval(iz)
   i1 = i1in(iz,:)
   i2 = i2in(iz,:)
   call zone( i1, i2, nn, nnoff, ihypo, ifn )
@@ -69,22 +71,45 @@ else
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
   select case ( fieldin(iz) )
-  case( 'mus' ); mus(j1:j2,k1:k2,l1:l2)  = inval(iz)
-  case( 'mud' ); mud(j1:j2,k1:k2,l1:l2)  = inval(iz)
-  case( 'dc'  ); dc(j1:j2,k1:k2,l1:l2)   = inval(iz)
-  case( 'co'  ); co(j1:j2,k1:k2,l1:l2)   = inval(iz)
-  case( 'sxx' ); t1(j1:j2,k1:k2,l1:l2,1) = inval(iz)
-  case( 'syy' ); t1(j1:j2,k1:k2,l1:l2,2) = inval(iz)
-  case( 'szz' ); t1(j1:j2,k1:k2,l1:l2,3) = inval(iz)
-  case( 'syz' ); t2(j1:j2,k1:k2,l1:l2,1) = inval(iz)
-  case( 'szx' ); t2(j1:j2,k1:k2,l1:l2,2) = inval(iz)
-  case( 'sxy' ); t2(j1:j2,k1:k2,l1:l2,3) = inval(iz)
-  case( 'tn'  ); t3(j1:j2,k1:k2,l1:l2,1) = inval(iz)
-  case( 'th'  ); t3(j1:j2,k1:k2,l1:l2,2) = inval(iz)
-  case( 'td'  ); t3(j1:j2,k1:k2,l1:l2,3) = inval(iz)
+  case( 'mus' ); mus(j1:j2,k1:k2,l1:l2)  = rr
+  case( 'mud' ); mud(j1:j2,k1:k2,l1:l2)  = rr
+  case( 'dc'  ); dc(j1:j2,k1:k2,l1:l2)   = rr
+  case( 'co'  ); co(j1:j2,k1:k2,l1:l2)   = rr
+  case( 'sxx' ); t1(j1:j2,k1:k2,l1:l2,1) = rr
+  case( 'syy' ); t1(j1:j2,k1:k2,l1:l2,2) = rr
+  case( 'szz' ); t1(j1:j2,k1:k2,l1:l2,3) = rr
+  case( 'syz' ); t2(j1:j2,k1:k2,l1:l2,1) = rr
+  case( 'szx' ); t2(j1:j2,k1:k2,l1:l2,2) = rr
+  case( 'sxy' ); t2(j1:j2,k1:k2,l1:l2,3) = rr
+  case( 'tn'  ); t3(j1:j2,k1:k2,l1:l2,1) = rr
+  case( 'th'  ); t3(j1:j2,k1:k2,l1:l2,2) = rr
+  case( 'td'  ); t3(j1:j2,k1:k2,l1:l2,3) = rr
   end select
-end if ifreadfile
-end do doiz
+case( 'c' )
+  rr = inval(iz)
+  x1 = x1in(iz,:)
+  x2 = x2in(iz,:)
+  i1 = 1
+  i2 = nm
+  i1(ifn) = ihypo(ifn)
+  i2(ifn) = ihypo(ifn)
+  select case ( fieldin(iz) )
+  case( 'mus' ); call cube( mus, x, i1, i2, x1, x2, rr )
+  case( 'mud' ); call cube( mud, x, i1, i2, x1, x2, rr )
+  case( 'dc'  ); call cube( dc,  x, i1, i2, x1, x2, rr )
+  case( 'co'  ); call cube( co,  x, i1, i2, x1, x2, rr )
+  case( 'sxx' ); f1 = t1(:,:,:,1); call cube( f1, x, i1, i2, x1, x2, rr ); t1(:,:,:,1) = f1
+  case( 'syy' ); f1 = t1(:,:,:,2); call cube( f1, x, i1, i2, x1, x2, rr ); t1(:,:,:,2) = f1
+  case( 'szz' ); f1 = t1(:,:,:,3); call cube( f1, x, i1, i2, x1, x2, rr ); t1(:,:,:,3) = f1
+  case( 'syz' ); f1 = t2(:,:,:,1); call cube( f1, x, i1, i2, x1, x2, rr ); t2(:,:,:,1) = f1
+  case( 'szx' ); f1 = t2(:,:,:,2); call cube( f1, x, i1, i2, x1, x2, rr ); t2(:,:,:,2) = f1
+  case( 'sxy' ); f1 = t2(:,:,:,3); call cube( f1, x, i1, i2, x1, x2, rr ); t2(:,:,:,3) = f1
+  case( 'tn'  ); f1 = t3(:,:,:,1); call cube( f1, x, i1, i2, x1, x2, rr ); t3(:,:,:,1) = f1
+  case( 'th'  ); f1 = t3(:,:,:,2); call cube( f1, x, i1, i2, x1, x2, rr ); t3(:,:,:,2) = f1
+  case( 'td'  ); f1 = t3(:,:,:,3); call cube( f1, x, i1, i2, x1, x2, rr ); t3(:,:,:,3) = f1
+  end select
+end select
+end do
 
 ! Lock fault in PML region
 i1 = max( i1pml + 1, 1 )

@@ -225,11 +225,12 @@ echo ''
 # SDX
 echo "cd $srcdir" > m/srcdir.m
 echo "cd $rundir" > m/rundir.m
-cat << END > sdx
+echo "addpath $srcdir/m" > m/viz.m
+cat << END > viz
 #!/bin/bash -e
-matlab -nodesktop -nosplash -r "addpath $srcdir/m; rundir; sdx"
+matlab -nodesktop -nosplash -r "addpath $srcdir/m"
 END
-chmod u+x sdx
+chmod u+x viz
 
 #------------------------------------------------------------------------------#
 # Save source, input files & byte order
