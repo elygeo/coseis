@@ -13,8 +13,8 @@
   rho = 2670.;				% **density
   vp  = 6000.;				% **P-wave speed
   vs  = 3464.1016;			% **S-wave speed
-% vp   = [ 600.    1 1 1  10 -1 -1 ];	% **low velocity surface layer
-% vs   = [ 346.    1 1 1  10 -1 -1 ];	% **low velocity surface layer
+% vp = { 600. 'zone' 1 1 1  10 -1 -1 };	% **low velocity surface layer
+% vs = { 346. 'zone' 1 1 1  10 -1 -1 };	% **low velocity surface layer
 % lock = [ 1 1 0   1 1 1  -1 -1 -1 ];	% **lock v1 & v2, v3 is free
   viscosity = [ .0 .3 ];		% stress (1) & hourglass (2)
   viscosity = [ .1 .7 ];		% stress (1) & hourglass (2)
