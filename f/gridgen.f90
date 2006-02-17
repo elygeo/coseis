@@ -112,28 +112,30 @@ case( 'spherical' )
 end select
 
 ! Symmetry
-n = ( i2l - i1l + 1 ) / 2
-if ( symmetry(1) /= 0 ) then
-  if ( np3(1) /= 1 ) stop 'np(1) must be 1 for j symmetry'
-  forall( i=1:n(1) ) x(j2-i+1,:,:,:) = x(j1+i-1,:,:,:)
-  forall( i=1:n(1) ) 
-    x(j2-i+1,:,:,1) = x(j1+n(1),:,:,1) + x(j2-n(1),:,:,1) - x(j1+i-1,:,:,1)
-  end forall
-end if
-if ( symmetry(2) /= 0 ) then
-  if ( np3(2) /= 1 ) stop 'np(2) must be 1 for k symmetry'
-  forall( i=1:n(2) ) x(:,k2-i+1,:,:) = x(:,k1+i-1,:,:)
-  forall( i=1:n(2) )
-    x(:,k2-i+1,:,2) = 2 * x(:,k1+i-1,:,2) - x(:,k1+i-1,:,2)
-  end forall
-end if
-if ( symmetry(3) /= 0 ) then
-  if ( np3(3) /= 1 ) stop 'np(3) must be 1 for l symmetry'
-  forall( i=1:n(3) ) x(:,:,l2-i+1,:) = x(:,:,l1+i-1,:)
-  forall( i=1:n(3) )
-    x(:,:,l2-i+1,3) = 2 * x(:,:,l1+i-1,3) - x(:,:,l1+i-1,3)
-  end forall
-end if
+i1 = ( i1l + i2l ) / 2
+i2 = ( i1l + i2l + 1 ) / 2
+n  = ( i2l - i1l + 1 ) / 2
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+symmetry = max( min( symmetry, 1 ), -1 )
+where( i1 /= i2 ) symmetry = 2 * symmetry
+if( any( symmetry /= 0 .and. np3 /= 1 ) ) stop 'np(i) must = 1 for symmetry(i)'
+j = symmetry(1)
+k = symmetry(2)
+l = symmetry(3)
+if ( j > 0 ) forall( i=1:n(1) ) x(j2+i-1,:,:,:) = x(j1-i+1,:,:,:)
+if ( k > 0 ) forall( i=1:n(2) ) x(:,k2-i+1,:,:) = x(:,k1+i-1,:,:)
+if ( l > 0 ) forall( i=1:n(3) ) x(:,:,l2-i+1,:) = x(:,:,l1+i-1,:)
+if ( j < 0 ) forall( i=1:n(1) ) x(j2+i-1,:,:,:) = x(j1,:,:,:)
+if ( k < 0 ) forall( i=1:n(2) ) x(:,k2-i+1,:,:) = x(:,k1,:,:)
+if ( l < 0 ) forall( i=1:n(3) ) x(:,:,l2-i+1,:) = x(:,:,l1,:)
+if ( abs( j ) == 1 ) forall( i=1:n(1) ) x(j2+i-1,:,:,1) = -x(j1-i+1,:,:,1) + 2 * x(j1,:,:,1)
+if ( abs( k ) == 1 ) forall( i=1:n(2) ) x(:,k2+i-1,:,2) = -x(:,k1-i+1,:,2) + 2 * x(:,k1,:,2)
+if ( abs( l ) == 1 ) forall( i=1:n(3) ) x(:,:,l2+i-1,3) = -x(:,:,l1-i+1,3) + 2 * x(:,:,l1,3)
+if ( abs( j ) == 2 ) forall( i=1:n(1) ) x(j2+i-1,:,:,1) = -x(j1-i+1,:,:,1) + 3 * x(j1,:,:,1) - x(j1-1,:,:,1)
+if ( abs( k ) == 2 ) forall( i=1:n(2) ) x(:,k2+i-1,:,2) = -x(:,k1-i+1,:,2) + 3 * x(:,k1,:,2) - x(:,k1-1,:,2)
+if ( abs( l ) == 2 ) forall( i=1:n(3) ) x(:,:,l2+i-1,3) = -x(:,:,l1-i+1,3) + 3 * x(:,:,l1,3) - x(:,:,l1-1,3)
 
 ! Boundary conditions
 j = ihypo(1)

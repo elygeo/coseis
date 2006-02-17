@@ -13,30 +13,26 @@
   rho = 2670.;				% **density
   vp  = 6000.;				% **P-wave speed
   vs  = 3464.1016;			% **S-wave speed
-% vp = { 600. 'zone' 1 1 1  10 -1 -1 };	% **low velocity surface layer
-% vs = { 346. 'zone' 1 1 1  10 -1 -1 };	% **low velocity surface layer
 % lock = [ 1 1 0   1 1 1  -1 -1 -1 ];	% **lock v1 & v2, v3 is free
   viscosity = [ .0 .3 ];		% stress (1) & hourglass (2)
   viscosity = [ .1 .7 ];		% stress (1) & hourglass (2)
 % npml = 0;				% no PML absorbing boundary
   npml = 10;				% 10 PML nodes
-% bc1 = [ 1 0 1 ];			% PML for j1 l1, free surface for k1
-% bc2 = [ 1 1 1 ];			% PML for j2 k2 l2
-  bc1 = [ 0 0 0 ];			% PML for j1 l1, free surface for k1
-  bc2 = [ 0 0 0 ];			% PML for j2 k2 l2
-  ihypo	 = [ 0 0 0 ];			% 0: mesh center
-  xhypo	 = [ -1. -1. -1. ];		% <0: x(ihypo)
+  bc1 = [ 0 0 0 ];			% j1 k1 l1 boundary cond
+  bc2 = [ 0 0 0 ];			% j2 k2 l2 boundary cond
+  ihypo	 = [ 0 0 0 ];			% hypocenter node
+  xhypo	 = [ -1. -1. -1. ];		% hypocenter location
   rexpand = 1.06;			% grid expansion ratio
-  n1expand = [ 0 0 0 ];			% # grid expantion nodes for j1 k1 l1
-  n2expand = [ 0 0 0 ];			% # grid expantion nodes for j2 k2 l2
+  n1expand = [ 0 0 0 ];			% n grid expansion nodes for j1 k1 l1
+  n2expand = [ 0 0 0 ];			% n grid expansion nodes for j2 k2 l2
 
 % Moment source parameters
-% rfunc = 'box';			% uniform spatial weighting
-  rfunc = 'tent';			% tapered spatial weighting
-% tfunc = 'delta';			% impulse time function
-% tfunc = 'brune';			% Brune source time function
-  tfunc = 'sbrune';			% smooth Brune source time function
-% rsource = 150.;			% source radius, 1.5*dt = 8 nodes
+% rfunc = 'box';			% spatial weighting: uniform
+  rfunc = 'tent';			% spatial weighting: tapered
+% tfunc = 'delta';			% source time function: delta
+% tfunc = 'brune';			% source time function: Brune
+  tfunc = 'sbrune';			% source time function: smooth Brune
+% rsource = 150.;			% source radius: 1.5*dx = 8 nodes
   rsource = -1.;			% no moment source
   tsource = .056;			% dominant period of 8*dt
   moment1 = [ 1e16 1e16 1e16 ];         % normal components, explosion source
@@ -65,8 +61,7 @@
   svtol = .001;				% slip velocity considered rupturing
 
 % Code execution and output parameters
-% np = [ 2 1 3 ];			% 6 processors
-  np = [ 1 1 1 ];			% no parallelization
+  np = [ 1 1 1 ];			% number of processors in j k l
 % itcheck = 100;			% checkpoint every 100 time steps
 % itcheck = -1;				% checkpoint just before finishing
   itcheck = 0;				% checkpointing off
@@ -75,7 +70,7 @@
 % out = { 'sl' -1   1 1 1  -1 -1 -1 };	% **write final slip length
 
 % **optional zone argument, zones accumulate when specified multiple times
-%   zone = j1 k1 l1   j2 k2 l2
+%   'zone' j1 k1 l1   j2 k2 l2
 %   negative indices count inward from nn
 %   an index of zero is replaced by the hypocenter index
 
