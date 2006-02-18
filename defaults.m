@@ -40,7 +40,6 @@
 
 % Fault parameters;
 % faultnormal = 0;			% no fault
-% faultnormal = 2;			% constant k fault plane
   faultnormal = 3;			% constant l fault plane
   mus = .6;				% **coef of static friction
   mud = .5;				% **coef of dynamic friction
@@ -49,12 +48,12 @@
   tn  = -120e6;				% **normal pretraction
   th  = -70e6;				% **horizontal (strike) pretraction
   td  = 0.;				% **dip pretraction
-% sxx = 0.;				% **prestress Sxx
-% syy = 0.;				% **prestress Syy
-% szz = 0.;				% **prestress Szz
-% syz = 0.;				% **prestress Syz
-% szx = 0.;				% **prestress Szx
-% sxy = 0.;				% **prestress Sxy
+  sxx = 0.;				% **prestress Sxx
+  syy = 0.;				% **prestress Syy
+  szz = 0.;				% **prestress Szz
+  syz = 0.;				% **prestress Syz
+  szx = 0.;				% **prestress Szx
+  sxy = 0.;				% **prestress Sxy
   vrup = 3117.6914;			% nucleation rupture velocity
   rcrit = 1000.;			% nucleation critical radius
   trelax = .07;				% nucleation relaxation time

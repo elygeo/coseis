@@ -120,7 +120,7 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 symmetry = max( min( symmetry, 1 ), -1 )
 where( i1 /= i2 ) symmetry = 2 * symmetry
-if( any( symmetry /= 0 .and. np3 /= 1 ) ) stop 'np(i) must = 1 for symmetry(i)'
+if( any( symmetry /= 0 .and. np /= 1 ) ) stop 'np(i) must = 1 for symmetry(i)'
 j = symmetry(1)
 k = symmetry(2)
 l = symmetry(3)
