@@ -1,6 +1,6 @@
 % Fault test
 
-  debug = 0;
+  debug = 1;
   faultnormal = 3;
   dx  = 300;
   dt  = .024;
@@ -17,6 +17,7 @@
   th  = { -81.6e6 'zone' 3 3 0  6 6 0 };
   npml = 2;
   nt  = 2;
+  symmetry = [ 0 0 1 ];
   ihypo = [ 4 4 4 ];
   bc1   = [ 0 0 0 ];
   bc2   = [ 0 0 0 ];

@@ -267,7 +267,7 @@ end do
 ! Decompose traction to normal and shear components
 tn = sum( t3 * nhat, 4 )
 test = any( tn > 0. )
-if ( test ) print *, 'Fault opening!'
+if ( test ) print *, 'Fault opening!', it
 do i = 1, 3
   t1(:,:,:,i) = tn * nhat(:,:,:,i)
 end do

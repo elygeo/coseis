@@ -37,11 +37,12 @@
   dt  = .008;
   nt  = 100;
   mus = .677;
+  symmetry = [ 0 0 1 ];
   th  = { -81.6e6 'zone' 21 21 0   51 51 0 };
   td  = { -81.6e6 'zone' 21 21 0   51 51 0 };
   gridtrans = [   1. 1. 0.; 0.  1. 0.; 0. 0.  1. ] /  1.; % shear 3
-  gridtrans = [   1. 0. 1.; 0.  1. 0.; 0. 0.  1. ] /  1.; % shear 1
   gridtrans = [   1. 0. 0.; 0.  1. 1.; 0. 0.  1. ] /  1.; % shear 2
+  gridtrans = [   1. 0. 1.; 0.  1. 0.; 0. 0.  1. ] /  1.; % shear 1
   gridtrans = [   1. 0. 0.; 0.  1. 0.; 0. 0.  1. ] /  1.; % no strain
 return
 

@@ -88,6 +88,7 @@ if ( master ) then
   write( 9, * ) 'gridtrans   = [', gridtrans, '];'
   write( 9, * ) 'viscosity   = [', viscosity, '];'
   write( 9, * ) 'upvector    = [', upvector,  '];'
+  write( 9, * ) 'symmetry    = [', symmetry,  '];'
   write( 9, * ) 'xcenter     = [', xcenter,   '];'
   write( 9, * ) 'xhypo       = [', xhypo,     '];'
   write( 9, * ) 'moment1     = [', moment1,   '];'
