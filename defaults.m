@@ -7,6 +7,7 @@
   dt = .0075;				% time step length
   grid = 'constant';			% regular mesh
   gridtrans = [ 1. 0. 0.; 0. 1. 0.; 0. 0. 1. ] / 1.; % grid tranformation
+  symmetry = [ 0 0 0 ];			% grid symmetry
   gridnoise = 0.			% Random noise added to mesh
 % upvector = [ 0 0 1 ];			% positive z up
   upvector = [ 0 -1 0 ];		% negative y up

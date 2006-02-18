@@ -47,6 +47,7 @@ case( 'rfunc' );       rfunc = key
 case( 'tfunc' );       tfunc = key
 case( 'gridtrans' );   read( str, * ) gridtrans
 case( 'gridnoise' );   read( str, * ) gridnoise
+case( 'symmetry' );    read( str, * ) symmetry
 case( 'nn' );          read( str, * ) nn
 case( 'nt' );          read( str, * ) nt
 case( 'dx' );          read( str, * ) dx
@@ -100,7 +101,7 @@ case( 'lock' );
 case default
   if ( master ) then
     open( 9, file='log', position='append' )
-    write( 9, * ) 'Error: bad input: ', trim( str )
+    write( 9, * ) 'Error: bad input: ', trim( key ), ' ', trim( str )
     close( 9 )
   end if
   stop 'bad input'
