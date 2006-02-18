@@ -67,18 +67,18 @@ end
 
 switch nc
 case 1
-  str = sprintf( 'Vs %9.2e', s(j,k,l) );
+  str = sprintf( 'Vs %11.4e', s(j,k,l) );
 case 3
   vv = shiftdim( v(j,k,l,:) )';
   m = sum( sqrt( vv .* vv ) );
-  str = sprintf( '|V| %9.2e\nVx  %9.2e\nVy  %9.2e\nVz  %9.2e', m, vv );
+  str = sprintf( '|V| %11.4e\nVx  %11.4e\nVy  %11.4e\nVz  %11.4e', m, vv );
 case 6
   vv = shiftdim( v(j,k,l,:) )';
   c = [ 1 6 5; 6 2 4; 5 4 3 ];
   m = eig( vv(c) );
   [ tmp, i ] = sort( abs( m ), 'descend' );
   m = m(i);
-  str = sprintf( 'W1  %9.2e\nW2  %9.2e\nW3  %9.2e\nWxx %9.2e\nWyy %9.2e\nWzz %9.2e\nWyz %9.2e\nWzx %9.2e\nWxy %9.2e', m, vv );
+  str = sprintf( 'W1  %11.4e\nW2  %11.4e\nW3  %11.4e\nWxx %11.4e\nWyy %11.4e\nWzz %11.4e\nWyz %11.4e\nWzx %11.4e\nWxy %11.4e', m, vv );
 end
 
 if nc > 1
