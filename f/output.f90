@@ -354,8 +354,6 @@ if ( master ) then
   write( str, '(a,i6.6,a)' ) 'stats/st', it, '.m'
   open(  9, file=str, status='replace' )
   write( 9, * ) 'it     =  ', it,     ';'
-  write( 9, * ) 'twall1 =  ', twall1, ';'
-  write( 9, * ) 'twall2 =  ', twall2, ';'
   write( 9, * ) 't      =  ', t,      ';'
   write( 9, * ) 'dt     =  ', dt,     ';'
   write( 9, * ) 'dtwall =  ', dtwall, ';'

@@ -1,6 +1,6 @@
 % Fault test
 
-  debug = 1;
+  debug = 0;
   faultnormal = 3;
   dx  = 300;
   dt  = .024;
