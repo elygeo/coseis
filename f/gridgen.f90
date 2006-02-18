@@ -143,6 +143,9 @@ k = ihypo(2)
 l = ihypo(3)
 i1 = abs( ibc1 )
 i2 = abs( ibc2 )
+j1 = i1l(1); j2 = i2l(1)
+k1 = i1l(2); k2 = i2l(2)
+l1 = i1l(3); l2 = i2l(3)
 
 ! Random noise added to mesh
 if ( gridnoise > 0. ) then
