@@ -70,26 +70,33 @@ if 1
 end
 
 cd( cwd )
-i1 = [  1  1  1 900 ];
-i2 = [ -1 -1 -1 900 ];
+i1 = [  1  1  1 300 ];
+i2 = [ -1 -1 -1 300 ];
 meta
-i = abs( faultnormal );
-i1(i) = ihypo(i);
-i2(i) = ihypo(i);
+l = abs( faultnormal );
+j = max( 1, 3 - l );
+k = 6 - j - l;
+i1(l) = ihypo(l);
+i2(l) = ihypo(l);
 [ t, msg ] = read4d( 'trup', i1, i2 );
-t = squeeze( t )' + dt;
+t = squeeze( t ) + dt;
 i1(4) = 1;
 i2(4) = 1;
 [ x, msg ] = read4d( 'x', i1, i2 );
-x = squeeze( x );
-x1 = squeeze( x(:,:,:,1) )';
-%t = [ t  t(:,end:-1:1) ];
-%t = [ t; t(end:-1:1,:) ];
-%t = [ t  t(:,end-1:-1:1) ];
-%t = [ t; t(end-1:-1:1,:) ];
-x = dx / 1000 * ( 0:size(t,2)-1 );  x = x - .5 * x(end);
-y = dx / 1000 * ( 0:size(t,1)-1 );  y = y - .5 * y(end);
-[ c, h ] = contour( x, y, t, v );
+x = squeeze( x(:,:,:,[j k]) ) / 1000.;
+bc = abs( bc2([j k]) );
+n = size( t );
+j = 1:n(1);
+k = 1:n(2);
+switch bc(1)
+case 2; j = [ 1:n(1) n(1):-1:1 ];
+case 3; j = [ 1:n(1) n(1)-1:-1:1 ];
+end
+switch bc(2)
+case 2; k = [ 1:n(2) n(2):-1:1 ];
+case 3; k = [ 1:n(2) n(2)-1:-1:1 ];
+end
+[ c, h ] = contour( x(j,k,1), x(j,k,2), t(j,k), v );
 %clabel( c, h )
 delete( h );
 i  = 1;
