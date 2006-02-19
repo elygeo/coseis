@@ -28,10 +28,10 @@ case { 'h', 'f1' }
         'Mesh              M   Length Scale      X   Space-Time        Y'
       } )
   end
-case 'a', if km, field = 'am'; else, field = 'a'; end, msg = field;
-case 'v', if km, field = 'vm'; else, field = 'v'; end, msg = field;
-case 'u', if km, field = 'um'; else, field = 'u'; end, msg = field;
-case 'w', if km, field = 'wm'; else, field = 'w'; end, msg = field;
+case 'a', if km, field = 't0'; else, field = 'a'; end, msg = field;
+case 'v', if km, field = 'sv'; else, field = 'v'; end, msg = field;
+case 'u', if km, field = 'sl'; else, field = 'u'; end, msg = field;
+case 'w', if km, field = 't3'; else, field = 'w'; end, msg = field;
 case '0', icomp = 0; colorscale
 case '1', icomp = 1; colorscale
 case '2', icomp = 2; colorscale

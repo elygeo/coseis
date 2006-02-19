@@ -9,6 +9,7 @@ integer :: i, ii, n, err
 logical :: inzone
 character(*), intent(in) :: filename
 character(11) :: key
+character(160) :: line
 
 if ( master ) then
   open( 9, file='log', position='append' )
@@ -21,10 +22,11 @@ open( 9, file=filename, status='old' )
 doline: do
 
 ! Read line
-read( 9, '(a)', iostat=err ) str
+read( 9, '(a)', iostat=err ) line
 if ( err /= 0 ) exit doline
 
 ! Strip comments, tabs and MATLAB characters
+str = line
 i = index( str, '%' )
 if ( i > 0 ) str(i:) = ' '
 do
@@ -48,6 +50,7 @@ case( 'tfunc' );       tfunc = key
 case( 'gridtrans' );   read( str, * ) gridtrans
 case( 'gridnoise' );   read( str, * ) gridnoise
 case( 'symmetry' );    read( str, * ) symmetry
+case( 'origin' );      read( str, * ) origin
 case( 'nn' );          read( str, * ) nn
 case( 'nt' );          read( str, * ) nt
 case( 'dx' );          read( str, * ) dx
@@ -101,7 +104,7 @@ case( 'lock' );
 case default
   if ( master ) then
     open( 9, file='log', position='append' )
-    write( 9, * ) 'Error: bad input: ', trim( key ), ' ', trim( str )
+    write( 9, * ) 'Error: bad input: ', trim( line )
     close( 9 )
   end if
   stop 'bad input'

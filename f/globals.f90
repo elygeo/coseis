@@ -136,6 +136,7 @@ integer :: &
   itcheck,       & ! interval for checkpointing
   debug,         & ! debugging flag
   npml,          & ! number of PML damping nodes
+  origin,        & ! 1=first node, 0=hypocenter
   faultnormal,   & ! fault normal direction
   ifn,           & ! fault normal component=abs(faultnormal)
   noper,         & ! number of zones for spatial derivative operators

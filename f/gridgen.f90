@@ -289,6 +289,14 @@ if ( all( xhypo < 0. ) ) then
   call broadcast( xhypo )
 end if
 
+! Origin
+if ( origin == 0 ) then
+  x(:,:,:,1) = x(:,:,:,1) - xhypo(1)
+  x(:,:,:,2) = x(:,:,:,2) - xhypo(2)
+  x(:,:,:,3) = x(:,:,:,3) - xhypo(3)
+  xhypo = 0.
+end if
+
 ! Grid Dimensions
 do i = 1,3
   x1 = minval( x(:,:,:,i) )

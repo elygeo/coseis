@@ -70,18 +70,23 @@ if 1
 end
 
 cd( cwd )
-i1 = [ 21 21 21 900 ];
+i1 = [  1  1  1 900 ];
 i2 = [ -1 -1 -1 900 ];
 meta
 i = abs( faultnormal );
 i1(i) = ihypo(i);
 i2(i) = ihypo(i);
 [ t, msg ] = read4d( 'trup', i1, i2 );
-t = squeeze( t' ) + dt;
+t = squeeze( t )' + dt;
+i1(4) = 1;
+i2(4) = 1;
+[ x, msg ] = read4d( 'x', i1, i2 );
+x = squeeze( x );
+x1 = squeeze( x(:,:,:,1) )';
 %t = [ t  t(:,end:-1:1) ];
 %t = [ t; t(end:-1:1,:) ];
-t = [ t  t(:,end-1:-1:1) ];
-t = [ t; t(end-1:-1:1,:) ];
+%t = [ t  t(:,end-1:-1:1) ];
+%t = [ t; t(end-1:-1:1,:) ];
 x = dx / 1000 * ( 0:size(t,2)-1 );  x = x - .5 * x(end);
 y = dx / 1000 * ( 0:size(t,1)-1 );  y = y - .5 * y(end);
 [ c, h ] = contour( x, y, t, v );
