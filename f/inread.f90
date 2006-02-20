@@ -47,7 +47,7 @@ case( 'return' );      exit doline
 case( 'grid' );        grid = key
 case( 'rfunc' );       rfunc = key
 case( 'tfunc' );       tfunc = key
-case( 'gridtrans' );   read( str, * ) gridtrans
+case( 'affine' );      read( str, * ) affine
 case( 'gridnoise' );   read( str, * ) gridnoise
 case( 'symmetry' );    read( str, * ) symmetry
 case( 'origin' );      read( str, * ) origin

@@ -89,7 +89,7 @@ real :: &
   vs1,           & ! min S-wave speed
   vs2,           & ! max S-wave speed
   rexpand,       & ! grid expantion ratio
-  gridtrans(10), & ! grid transformation
+  affine(10),    & ! grid transformation
   gridnoise,     & ! random noise in grid
   x1in(nz,3),    & ! input cube - near corner
   x2in(nz,3),    & ! input cube - far corner 
