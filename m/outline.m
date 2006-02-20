@@ -2,18 +2,6 @@
 
 function h = outline( i1, i2, ifn, ihypo, rmax, grid, dx )
 
-x1 = rmax * ( [ .15 0 0 0 0 ] );
-x2 = rmax * ( [ 0 0 .15 0 0 ] );
-x3 = rmax * ( [ 0 0 0 0 .15 ] );
-h = plot3( x1, x2, x3 );
-hold on
-
-x1 = rmax * [ .17 0 0 ];
-x2 = rmax * [ 0 .17 0 ];
-x3 = rmax * [ 0 0 .17 ];
-h(2:4) = text( x1, x2, x3, ['xyz']', 'Ver', 'middle' );
-set( h, 'HandleVisibility', 'off' )
-
 izones = [ i1(1:3) i2(1:3) ];
 if ifn
   izones = [ izones; izones ];
@@ -58,8 +46,23 @@ for iz = 1:size( ilines, 1 )
   x3 = [ x3; shiftdim( x(:,:,:,1,3) ); NaN ];
 end
 
+x0 = [ 0 0 0 ];
 if length( x1 )
-  h(5) = plot3( x1, x2, x3 );
+  x0 = [ x1(1) x2(1) x3(1) ];
+  h = plot3( x1, x2, x3 );
   set( h, 'HandleVisibility', 'off' )
+  hold on
 end
+
+x1 = x0(1) + rmax * ( [ .15 0 0 0 0 ] );
+x2 = x0(2) + rmax * ( [ 0 0 .15 0 0 ] );
+x3 = x0(3) + rmax * ( [ 0 0 0 0 .15 ] );
+h(2) = plot3( x1, x2, x3 );
+hold on
+
+x1 = x0(1) + rmax * [ .17 0 0 ];
+x2 = x0(2) + rmax * [ 0 .17 0 ];
+x3 = x0(3) + rmax * [ 0 0 .17 ];
+h(3:5) = text( x1, x2, x3, ['xyz']', 'Ver', 'middle', 'Hor', 'center' );
+set( h, 'HandleVisibility', 'off' )
 

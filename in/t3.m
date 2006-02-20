@@ -61,14 +61,16 @@
 % shear 3 symmetric
   gridtrans = [ 1. 1. 0.; 0. 1. 0.; 0. 0. 1. ] / 1.;
   nn    = [ 401 101 61 ];
-  bc1   = [  0  1  1 ];
+  bc1   = [  0  0  1 ];
   bc2   = [  0  3 -3 ];
   ihypo = [  0 -1 -1 ];
 
 % shear 1 symmetric
   gridtrans = [ 1. 0. 0.; 0. 1. 1.; 0. 0. 1. ] / 1.;
   nn    = [ 176 201 61 ];
-  bc1   = [  1  0  1 ];
+  bc1   = [  1  0  0 ];
   bc2   = [ -3  0 -3 ];
   ihypo = [ -1  0 -1 ];
+  n1expand = [ 0 0 0 ];
+  n2expand = [ 0 0 0 ];
 

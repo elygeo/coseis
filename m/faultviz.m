@@ -11,7 +11,7 @@ i2(4) = 1;
 [ xx, msg ] = read4d( 'x', i1, i2 );
 if msg, error( msg ), end
 
-if rcrit
+if rcrit > 0. && vrup > .0
   r = 0;
   for i = 1:3
     r = r + ( xx(:,:,:,:,i) - xhypo(i) ) .* ( xx(:,:,:,:,i) - xhypo(i) );
@@ -30,4 +30,11 @@ if msg, error( msg ), end
 
 surfcontour( xx, sl, dc0 );
 surfcontour( xx, sl, .01 * dc0 );
+
+[ dc, msg ] = read4d( 'dc', i1, i2 );
+if msg
+else
+  h = surfcontour( xx, dc, 1 ); set( h, 'LineWidth', 2 )
+  h = surfcontour( xx, dc, 2 ); set( h, 'LineWidth', 2 )
+end
 

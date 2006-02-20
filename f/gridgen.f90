@@ -97,7 +97,7 @@ if ( rexpand > 1. ) then
 end if
 
 ! Grid transformation
-m = sqrt( gridtrans(1:9) / gridtrans(10) )
+m = sign( 1., gridtrans(1:9) ) * sqrt( abs( gridtrans(1:9) / gridtrans(10) ) )
 w1(:,:,:,1) = m(1) * x(:,:,:,1) + m(2) * x(:,:,:,2) + m(3) * x(:,:,:,3)
 w1(:,:,:,2) = m(4) * x(:,:,:,1) + m(5) * x(:,:,:,2) + m(6) * x(:,:,:,3)
 w1(:,:,:,3) = m(7) * x(:,:,:,1) + m(8) * x(:,:,:,2) + m(9) * x(:,:,:,3)

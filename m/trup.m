@@ -3,13 +3,13 @@ figure
 set( gcf, ...
   'Name', 'Rupture Time', ...
   'DefaultLineLinewidth', .001 );
-v = 0:0.5:12;
+v = 0:0.5:7;
 
 cwd = pwd;
 srcdir
 cd dalguer
 
-if 1
+if 0
   n = [ 601 301 ];
   dx = .05;
   fid = fopen( 'DFM005paper' );
@@ -17,7 +17,7 @@ if 1
   fclose( fid );
   x = dx * ( 0:n(1)-1 );  x = x - .5 * x(end);
   y = dx * ( 0:n(2)-1 );  y = y - .5 * y(end);
-  [ c, h ] = contour( x, y, t, v, 'k:', 'LineWidth', .1 );
+  [ c, h ] = contour( x, y, t, v );
   delete( h );
   i  = 1;
   while i < size( c, 2 )
@@ -49,7 +49,7 @@ if 1
   hold on
 end
 
-if 1
+if 0
   n = [ 300 150 ];
   dx = .1;
   fid = fopen( 'BI01paper' );
@@ -70,8 +70,8 @@ if 1
 end
 
 cd( cwd )
-i1 = [  1  1  1 300 ];
-i2 = [ -1 -1 -1 300 ];
+i1 = [  1  1  1 800 ];
+i2 = [ -1 -1 -1 800 ];
 meta
 l = abs( faultnormal );
 j = max( 1, 3 - l );
@@ -97,8 +97,7 @@ case 2; k = [ 1:n(2) n(2):-1:1 ];
 case 3; k = [ 1:n(2) n(2)-1:-1:1 ];
 end
 [ c, h ] = contour( x(j,k,1), x(j,k,2), t(j,k), v );
-%clabel( c, h )
-delete( h );
+set( h, 'Visible', 'off' )
 i  = 1;
 while i < size( c, 2 )
   n  = c(2,i);
@@ -106,6 +105,8 @@ while i < size( c, 2 )
   i  = i + n + 1;
 end
 plot( c(1,:), c(2,:), 'r' )
+clabel( c, h )
+%delete( h );
 
 axis equal;
 axis ij

@@ -29,6 +29,7 @@ flim = 0;
 i1viz = [ 1 1 1 1 ];
 i2viz = [ nn nt ];
 renderer = 'OpenGL';
+renderer = 'painters';
 renderer = 'zbuffer';
 
 icursor = [ ihypo 1 ];

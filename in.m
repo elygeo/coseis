@@ -1,1 +1,1 @@
-in/t3.m
+in/figs.m

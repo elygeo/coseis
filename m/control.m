@@ -21,8 +21,8 @@ case { 'h', 'f1' }
         'Magnitude         0   Extremum        End   Color Scale     [ ]'
         'Component       1-6   Render        Enter   Round CS          \\'
         'Volumes/Slices    Z   Render next   Space   Auto CS       Alt-\\'
-        'Slice         J K L   Save snapshot   Ins   Fold CS       Alt-C'
-        'Glyphs            G   Save movie        R   Color scheme      C'
+        'Slice         J K L   Save snapshot   Ins   Fold CS           C'
+        'Glyphs            G   Save movie        R   Color scheme  Alt-C'
         'Isosurfaces       I   Clean     Backspace   Time Series       T'
         'Surfaces          S   Outline           O   Filtered TS   Alt-T'
         'Mesh              M   Length Scale      X   Space-Time        Y'
@@ -208,14 +208,23 @@ case 'backslash'
     set( htxt(2), 'String', sprintf( '%g', clim(2) ) )
   end
 case 'c'
-  if ~km
-    list = { 'dark' 'light' 'b/w' };
-    colorscheme = mod( colorscheme + 1, 3 );
-    msg = [ 'Color scheme: ' list{colorscheme+1} ];
-  else
+  switch km
+  case 0
     foldcs = ~foldcs;
     if foldcs, msg = 'Folded color scale';
     else       msg = 'Signed color scale';
+    end
+  case 1
+    list = { 'dark' 'light' 'b/w' };
+    colorscheme = mod( colorscheme + 1, 3 );
+    msg = [ 'Color scheme: ' list{colorscheme+1} ];
+  case 2
+    if strcmp( get( hleg(1), 'Visible' ), 'off' )
+      set( [hleg htxt], 'Visible', 'on' ),  msg = 'Colorbar on';
+      set( haxes(1), 'Position', [ .02 .1 .96 .88 ] );
+    else
+      set( [hleg htxt], 'Visible', 'off' ), msg = 'Colorbar off';
+      set( haxes(1), 'Position', [ .02 .02 .96 .96 ] );
     end
   end
 case 'z'
