@@ -85,7 +85,7 @@ if ( master ) then
   write( 9, * ) 'svtol       =  ', svtol,   ';'
   write( 9, * ) 'rexpand     =  ', rexpand, ';'
   write( 9, * ) 'courant     =  ', courant, ';'
-  write( 9, * ) 'gridtrans   = [', gridtrans, '];'
+  write( 9, * ) 'affine      = [', affine,    '];'
   write( 9, * ) 'viscosity   = [', viscosity, '];'
   write( 9, * ) 'upvector    = [', upvector,  '];'
   write( 9, * ) 'symmetry    = [', symmetry,  '];'
