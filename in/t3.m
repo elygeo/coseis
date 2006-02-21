@@ -2,10 +2,11 @@
   faultnormal = 3;
   vrup = -1.;
   out = { 'x'    1      1 1 1   -1 -1 -1 };
-  out = { 'v'    10     1 1 1   -1 -1 -1 };
-  out = { 'sv'   1      1 1 1   -1 -1 -1 };
-  out = { 'sl'   1      1 1 1   -1 -1 -1 };
-  out = { 'trup' 100    1 1 1   -1 -1 -1 };
+  out = { 'v'    100    1 1 1   -1 -1 -1 };
+  out = { 'sv'   1      1 1 0   -1 -1  0 };
+  out = { 'sl'   1      1 1 0   -1 -1  0 };
+  out = { 'ts'   1      1 1 0   -1 -1  0 };
+  out = { 'trup' 100    1 1 0   -1 -1  0 };
   vp  = 6000.;
   vs  = 3464.;
   rho = 2670.;
@@ -22,67 +23,68 @@
   dx  = 100;
   dt  = .008;
   nt  = 900;
+  itcheck = -1;
 
-% no strain
+% 0. no strain
   affine = [ 1. 0. 0.; 0. 1. 0.; 0. 0. 1. ] / 1.;
   nn    = [ 176 101 61 ];
+  ihypo = [ -1 -1 -1 ];
   bc1   = [  1  0  1 ];
   bc2   = [ -3  3 -2 ];
-  ihypo = [ -1 -1 -1 ];
   n1expand = [ 0 0 0 ];
   n2expand = [ 0 0 0 ];
 
-% Yz-shear 1
+% 1a. yz-shear
   affine = [ 1. 0. 0.; 0. 1. 1.; 0. 0. 1. ] / 1.;
   nn    = [ 176 201 122 ];
+  ihypo = [ -1  0  0 ];
   bc1   = [  1  0  0 ];
   bc2   = [ -3  0  0 ];
-  ihypo = [ -1  0  0 ];
   n1expand = [ 0 0 0 ];
   n2expand = [ 0 0 0 ];
 
-% Xz-shear 2
+% 2a. xz-shear
   affine = [ 1. 0. 1.; 0. 1. 0.; 0. 0. 1. ] / 1.;
   nn    = [ 351 101 122 ];
+  ihypo = [  0 -1  0 ];
   bc1   = [  0  1  0 ];
   bc2   = [  0  3  0 ];
-  ihypo = [  0 -1  0 ];
   n1expand = [ 0 0 0 ];
   n2expand = [ 0 0 0 ];
 
-% Xy-shear 3
+% 3a. xy-shear
   affine = [ 1. 1. 0.; 0. 1. 0.; 0. 0. 1. ] / 1.;
   nn    = [ 401 201 61 ];
+  ihypo = [  0  0 -1 ];
   bc1   = [  0  0  1 ];
   bc2   = [  0  0 -3 ];
-  ihypo = [  0  0 -1 ];
   n1expand = [ 0 0 0 ];
   n2expand = [ 0 0 0 ];
 
-% Yz-shear 1 symmetric
+% 1b. symmetric yz-shear
   affine = [ 1. 0. 0.; 0. 1. 1.; 0. 0. 1. ] / 1.;
   nn    = [ 176 271 101 ];
+  ihypo = [ -1  0 -1 ];
   bc1   = [  1  0  0 ];
   bc2   = [ -3  0 -3 ];
-  ihypo = [ -1  0 -1 ];
   n1expand = [ 0 50 50 ];
-  n2expand = [ 0 50 0 ];
+  n2expand = [ 0 50  0 ];
 
-% Xy-shear 3 symmetric
+% 3b. symmetric xy-shear
   affine = [ 1. 1. 0.; 0. 1. 0.; 0. 0. 1. ] / 1.;
-  nn    = [ 401 101 61 ];
+  nn    = [ 471 136 61 ];
+  ihypo = [  0 -1 -1 ];
   bc1   = [  0  0  1 ];
   bc2   = [  0  3 -3 ];
-  ihypo = [  0 -1 -1 ];
-  n1expand = [ 0 0 0 ];
-  n2expand = [ 0 0 0 ];
+  n1expand = [ 50 50 0 ];
+  n2expand = [ 50  0 0 ];
 
-% Xz-shear 2 symmetric
+% 2b. symmetric xz-shear
   affine = [ 1. 0. 1.; 0. 1. 0.; 0. 0. 1. ] / 1.;
-  nn    = [ 351 101 61 ];
+  nn    = [ 421 101 101 ];
+  ihypo = [  0 -1 -1 ];
   bc1   = [  0  1  0 ];
   bc2   = [  0  3 -3 ];
-  ihypo = [  0 -1 -1 ];
-  n1expand = [ 0 0 0 ];
-  n2expand = [ 0 0 0 ];
+  n1expand = [ 50 0 50 ];
+  n2expand = [ 50 0  0 ];
 
