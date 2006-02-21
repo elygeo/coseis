@@ -315,6 +315,8 @@ do i = 1, nc
   case( 'lam'  ); call ioscalar( 'w', str, lam,     i1, i2, i1l, i2l, iz )
   case( 'y'    ); call ioscalar( 'w', str, y,       i1, i2, i1l, i2l, iz )
   case( 't0'   ); call iovector( 'w', str, t0, i,   i1, i2, i1l, i2l, iz )
+  case( 't1'   ); call iovector( 'w', str, t1, i,   i1, i2, i1l, i2l, iz )
+  case( 't2'   ); call iovector( 'w', str, t2, i,   i1, i2, i1l, i2l, iz )
   case( 't3'   ); call iovector( 'w', str, t3, i,   i1, i2, i1l, i2l, iz )
   case( 'mus'  ); call ioscalar( 'w', str, mus,     i1, i2, i1l, i2l, iz )
   case( 'mud'  ); call ioscalar( 'w', str, mud,     i1, i2, i1l, i2l, iz )
