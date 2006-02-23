@@ -17,13 +17,13 @@
   dx  = 100;
   dt  = .008;
   nt  = 900;
-  itcheck = 100;
+  itcheck = -1;
   out = { 'x'    1      1 1 1   -1 -1 -1 };
-  out = { 'v'    100    1 1 1   -1 -1 -1 };
-  out = { 'sv'   10     1 1 0   -1 -1  0 };
-  out = { 'sl'   10     1 1 0   -1 -1  0 };
+  out = { 'vm'   100    1 1 1   -1 -1 -1 };
+  out = { 'sv'   100    1 1 0   -1 -1  0 };
+  out = { 'sl'   100    1 1 0   -1 -1  0 };
 
-% 2b. symmetric xz-shear
+% 2b. xz-shear symmetric
   affine = [ 1. 0. 1.; 0. 1. 0.; 0. 0. 1. ] / 1.;
   nn    = [ 421 101 101 ];
   ihypo = [  0 -1 -1 ];
