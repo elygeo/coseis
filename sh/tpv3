@@ -1,0 +1,11 @@
+#!/bin/bash -e
+cat << END | nohup bash -e > run.errors &
+./sord -i in/tpv3-100-3b.m
+./sord -i in/tpv3-100-2b.m
+./sord -i in/tpv3-100-1b.m
+./sord -i in/tpv3-100-3a.m
+./sord -i in/tpv3-100-2a.m
+./sord -i in/tpv3-100-1a.m
+./sord -i in/tpv3-100-0.m
+END
+
