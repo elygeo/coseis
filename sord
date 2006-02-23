@@ -380,16 +380,18 @@ chmod u+x batchjob
 
 # Interactive
 [ -f machinefile ] || cat << END > machinefile
-node1:2
-node2:2
-node3:2
-node4:2
-node31:2
-node32:2
-node33:2
-node34:2
-node35:2
-node36:2
+node37:2
+node38:2
+node39:2
+node40:2
+node41:2
+node42:2
+node43:2
+node44:2
+node45:2
+node46:2
+node47:2
+node48:2
 END
 case $mode$run in
   seriali)   mpirun -machinefile machinefile ./fsord ;;

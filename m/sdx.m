@@ -1,6 +1,7 @@
 % SDX: SORD Data Explorer
 
 clear all
+format compact
 
 meta
 if faultnormal, faultmeta, end

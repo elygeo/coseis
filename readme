@@ -80,8 +80,8 @@ SDSC TeraGrid
 
 Babieca
   nodes: 2 procs, 1 GB
-  10 interactive nodes
-  18 batch nodes
+  36 batch nodes
+  12 interactive nodes
   Useful commands:
     qsub batchjob
     pbsnodes -a
