@@ -301,7 +301,7 @@ do ic = 1, nc
   write( str, '(i2.2,a,a,i1)' ) iz, '/', trim( fieldout(iz) ), ic
   if ( any( i1 /= i2 ) ) then
     ir = 1
-    write( str, '(a,i6.6)' ) trim( str ), it
+    write( str, '(i2.2,a,a,i1,i6.6)' ) iz, '/', trim( fieldout(iz) ), ic, it
   end if
   select case( fieldout(iz) )
   case( 'x'    ); call vectorio( 'w', str, x,  ic,   ir, i1, i2, i1l, i2l, iz )
