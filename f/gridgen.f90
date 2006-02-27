@@ -47,9 +47,9 @@ if ( grid /= 'read' ) then
   forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - i1(2) )
   forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - i1(3) )
 else
-  call iovector( 'r', 'data/x1', x, 1, i1, i2, i1l, i2l, 0 )
-  call iovector( 'r', 'data/x2', x, 2, i1, i2, i1l, i2l, 0 )
-  call iovector( 'r', 'data/x3', x, 3, i1, i2, i1l, i2l, 0 )
+  call vectorio( 'r', 'data/x1', x, 1, i1, i2, i1l, i2l, 0 )
+  call vectorio( 'r', 'data/x2', x, 2, i1, i2, i1l, i2l, 0 )
+  call vectorio( 'r', 'data/x3', x, 3, i1, i2, i1l, i2l, 0 )
 end if
 
 ! Coordinate system

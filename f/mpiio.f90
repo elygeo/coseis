@@ -13,8 +13,8 @@ if ( .not. allocated( commout ) ) allocate( commout(nout+1) )
 call mpi_comm_split( c, ditout, 0, commout(iz), e )
 end subroutine
 
-! Input/output scalar
-subroutine ioscalar( io, filename, s1, i1, i2, i1l, i2l, iz )
+! Scalar field input/output
+subroutine scalario( io, filename, s1, i1, i2, i1l, i2l, iz )
 character(*), intent(in) :: io, filename
 real, intent(in) :: s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), i1l(3), i2l(3), iz
@@ -46,8 +46,8 @@ call mpi_type_free( mtype, e )
 call mpi_type_free( ftype, e )
 end subroutine
 
-! Input/output vector component
-subroutine iovector( io, filename, w1, i, i1, i2, i1l, i2l, iz )
+! Vector field component input/output
+subroutine vectorio( io, filename, w1, i, i1, i2, i1l, i2l, iz )
 character(*), intent(in) :: io, filename
 real, intent(in) :: w1(:,:,:,:)
 integer, intent(in) :: i, i1(3), i2(3), i1l(3), i2l(3), iz

@@ -11,8 +11,8 @@ integer :: i
 i = iz + nout + ditout ! silence compiler warnings
 end subroutine
 
-! Input/output scalar field
-subroutine ioscalar( io, filename, s1, i1, i2, i1l, i2l, iz )
+! Scalar field input/output
+subroutine scalario( io, filename, s1, i1, i2, i1l, i2l, iz )
 character(*), intent(in) :: io, filename
 real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), i1l(3), i2l(3), iz
@@ -45,8 +45,8 @@ case( 'w' )
 end select
 end subroutine
 
-! Input/output vector component
-subroutine iovector( io, filename, w1, i, i1, i2, i1l, i2l, iz )
+! Vector component input/output
+subroutine vectorio( io, filename, w1, i, i1, i2, i1l, i2l, iz )
 character(*), intent(in) :: io, filename
 real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: i, i1(3), i2(3), i1l(3), i2l(3), iz

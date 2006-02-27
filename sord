@@ -252,7 +252,6 @@ END
 # Create output folders
 [ -e checkpoint ] || mkdir checkpoint
 [ -e stats ]      || mkdir stats
-[ -e data ]       || ln -s ../data
 i=0
 while [ $i -lt $nout ]; do
   i=$(( i + 1 ))

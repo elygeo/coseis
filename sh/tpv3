@@ -1,11 +1,25 @@
 #!/bin/bash -e
-cat << END | nohup bash -e > run.errors &
+
+cat << END > run-sord.sh 
+#!/bin/bash
 ./sord -i in/tpv3-100-3b.m
 ./sord -i in/tpv3-100-2b.m
-./sord -i in/tpv3-100-1b.m
 ./sord -i in/tpv3-100-3a.m
 ./sord -i in/tpv3-100-2a.m
+./sord -i in/tpv3-100-2ar.m
+./sord -i in/tpv3-100-1b.m
 ./sord -i in/tpv3-100-1a.m
 ./sord -i in/tpv3-100-0.m
 END
+
+chmod u+x run-sord.sh
+
+nohup ./run-sord.sh > run-errors &
+
+cat << END > run-cancel.sh
+#!/bin/bash
+kill $!
+END
+
+chmod u+x run-cancel.sh
 

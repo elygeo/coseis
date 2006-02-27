@@ -4,6 +4,10 @@ isfault = 1;
 cellfocus = 0;
 
 switch field
+case 'x'
+  fmax  = 2 * rmax;
+  fmaxi = nn;
+  labels = { 'Position' '|X|' 'X' 'Y' 'Z' };
 case 'a'
   fmax  = amax;
   fmaxi = amaxi;

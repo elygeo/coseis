@@ -96,6 +96,9 @@ switch bc(2)
 case 2; k = [ 1:n(2) n(2):-1:1 ];
 case 3; k = [ 1:n(2) n(2)-1:-1:1 ];
 end
+bc1
+bc2
+bc
 [ c, h ] = contour( x(j,k,1), x(j,k,2), t(j,k), v );
 set( h, 'Visible', 'off' )
 i  = 1;
