@@ -15,7 +15,7 @@ end subroutine
 subroutine scalario( io, filename, s1, ir, i1, i2, i1l, i2l, iz )
 character(*), intent(in) :: io, filename
 real, intent(inout) :: s1(:,:,:)
-integer, intent(in) :: i, i1(3), i2(3), i1l(3), i2l(3), iz
+integer, intent(in) :: ir, i1(3), i2(3), i1l(3), i2l(3), iz
 integer :: j1, k1, l1, j2, k2, l2, reclen
 character(7) :: stat
 if ( any( i1 /= i1l .or. i2 /= i2l ) .or. iz <= 0 ) stop 'scalario error'

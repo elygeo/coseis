@@ -10,7 +10,7 @@ contains
 subroutine output_init
 use zone_m
 real :: courant
-integer :: i1(3), i2(3), i, j, k, l, nc, ic, ir, iz
+integer :: i1(3), i2(3), i, nc, iz
 character :: endian
 character(7) :: field
 logical :: fault, test, cell
@@ -193,7 +193,7 @@ character :: onpass
 real :: dtwall, tarrmax
 real, save :: amax, vmax, umax, wmax, svmax, slmax
 integer, save :: amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3)
-integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, iz
+integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, ic, ir, iz
 logical :: fault, test, static
 
 if ( master ) then
