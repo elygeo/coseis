@@ -14,10 +14,10 @@ call mpi_comm_split( c, ditout, 0, commout(iz), e )
 end subroutine
 
 ! Scalar field input/output
-subroutine scalario( io, filename, s1, i1, i2, i1l, i2l, iz )
+subroutine scalario( io, filename, s1, ir, i1, i2, i1l, i2l, iz )
 character(*), intent(in) :: io, filename
 real, intent(in) :: s1(:,:,:)
-integer, intent(in) :: i1(3), i2(3), i1l(3), i2l(3), iz
+integer, intent(in) :: ir, i1(3), i2(3), i1l(3), i2l(3), iz
 integer :: ftype, mtype, fh, nl(3), n(3), i0(3), e
 integer(kind=mpi_offset_kind) :: d = 0
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
@@ -47,10 +47,10 @@ call mpi_type_free( ftype, e )
 end subroutine
 
 ! Vector field component input/output
-subroutine vectorio( io, filename, w1, i, i1, i2, i1l, i2l, iz )
+subroutine vectorio( io, filename, w1, ic, ir, i1, i2, i1l, i2l, iz )
 character(*), intent(in) :: io, filename
 real, intent(in) :: w1(:,:,:,:)
-integer, intent(in) :: i, i1(3), i2(3), i1l(3), i2l(3), iz
+integer, intent(in) :: ic, ir, i1(3), i2(3), i1l(3), i2l(3), iz
 integer :: ftype, mtype, fh, nl(4), n(4), i0(4), e
 integer(kind=mpi_offset_kind) :: d = 0
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
@@ -60,7 +60,7 @@ i0 = (/ i1l - i1,      0 /)
 call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
 n  = (/ size(w1,1), size(w1,2), size(w1,3), size(w1,4) /)
-i0 = (/ i1l - 1,  i - 1 /)
+i0 = (/ i1l - 1,  ic - 1 /)
 call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
 select case( io )
