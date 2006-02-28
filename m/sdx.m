@@ -44,6 +44,7 @@ flim = 0;
 renderer = 'OpenGL';
 renderer = 'painters';
 renderer = 'zbuffer';
+export = 0;
 
 icursor = [ ihypo 0 ];
 ifn = abs( faultnormal );

@@ -14,7 +14,7 @@ if any( dicursor ) && length( hmsg(2) )
   icursor = icursor + way(i) .* dicursor(i);
   rehash
   currentstep
-  icursor = max( icursor, i1viz );
+  icursor = max( icursor, i1viz - [ 0 0 0 1 ] );
   icursor = min( icursor, [ i2viz(1:3) - cellfocus it ] );
 end
 
