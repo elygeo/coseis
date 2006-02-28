@@ -33,6 +33,7 @@ surfcontour( xx, sl, .01 * dc0 );
 
 [ dc, msg ] = read4d( 'dc', i1, i2 );
 if msg
+ msg = '';
 else
   h = surfcontour( xx, dc, 1 ); set( h, 'LineWidth', 2 )
   h = surfcontour( xx, dc, 2 ); set( h, 'LineWidth', 2 )
