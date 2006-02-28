@@ -26,7 +26,7 @@
 % 3b. xy-shear symmetric
   affine = [ 1. 1. 0.; 0. 1. 0.; 0. 0. 1. ] / 1.;
   nn    = [ 486 136 61 ];
-  ihypo = [  0 -1 -1 ];
+  ihypo = [  211 -1 -1 ];
   bc1   = [  0  0  1 ];
   bc2   = [  0  3 -3 ];
   n1expand = [ 50 50 0 ];

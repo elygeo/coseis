@@ -6,6 +6,11 @@ format compact
 meta
 if faultnormal, faultmeta, end
 
+for i = 1 : length( out )
+  field = out{i}{2};
+  if ~strcmp( field, 'x' ), break, end
+end
+
 field = 'v';
 icomp = 0;
 colorscheme = 0;
@@ -33,7 +38,7 @@ renderer = 'OpenGL';
 renderer = 'painters';
 renderer = 'zbuffer';
 
-icursor = [ ihypo 1 ];
+icursor = [ ihypo 0 ];
 ifn = abs( faultnormal );
 cellfocus = 0;
 sensor = 0;
@@ -48,10 +53,6 @@ hhud = [];
 if ifn
   islice = ifn;
   field = 'sv';
-  i1fault = i1viz;
-  i2fault = i2viz;
-  i1fault(ifn) = ihypo(ifn);
-  i2fault(ifn) = ihypo(ifn);
 else
   dofault = 0;
   [ tmp, l ] = max( abs( upvector ) );
