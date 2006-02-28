@@ -6,12 +6,21 @@ format compact
 meta
 if faultnormal, faultmeta, end
 
+i1 = nn;
+i2 = [ 1 1 1 ];
+field = 'x';
 for i = 1 : length( out )
-  field = out{i}{2};
-  if ~strcmp( field, 'x' ), break, end
+  fields{i} = out{i}{2};
+  if strcmp( out{i}{2}, 'x' )
+    i1 = min( i1, [ out{i}{4:6} ] );
+    i2 = max( i2, [ out{i}{7:9} ] );
+  elseif strcmp( field, 'x' )
+    field = out{i}{2};
+  end
 end
-
-field = 'v';
+fields = unique( fields );
+i1viz = [ i1 1 ];
+i2viz = [ i2 nt ];
 icomp = 0;
 colorscheme = 0;
 dit = 1;
@@ -32,8 +41,6 @@ volviz = 0;
 isofrac = .5;
 lim = -1;
 flim = 0;
-i1viz = [ 1 1 1 1 ];
-i2viz = [ nn nt ];
 renderer = 'OpenGL';
 renderer = 'painters';
 renderer = 'zbuffer';

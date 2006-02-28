@@ -14,24 +14,29 @@ case { 'h', 'f1' }
     set( hmsg(5), 'String', '' )
   else
     set( hmsg(5), 'String', ...
-      { 'Acceleration      A   XY-Cursor    Arrows   Zoom            < >'
-        'Velocity          V   Z-Cursor  PgUp PgDn   Zoom Out          /'
-        'Displacement      U   T-Cursor        ; ''   Reset View    Alt-/'
-        'Stress            W   Hypocenter     Home   Perspective       P'
-        'Magnitude         0   Extremum        End   Color Scale     [ ]'
-        'Component       1-6   Render        Enter   Round CS          \\'
-        'Volumes/Slices    Z   Render next   Space   Auto CS       Alt-\\'
-        'Slice         J K L   Save snapshot   Ins   Fold CS           C'
-        'Glyphs            G   Save movie        R   Color scheme  Alt-C'
-        'Isosurfaces       I   Clean     Backspace   Time Series       T'
-        'Surfaces          S   Outline           O   Filtered TS   Alt-T'
-        'Mesh              M   Length Scale      X   Space-Time        Y'
+      { 'Field             F   XY-Cursor    Arrows   Zoom            < >'
+        'Magnitude         0   Z-Cursor  PgUp PgDn   Zoom Out          /'
+        'Component       1-6   T-Cursor        ; ''   Reset View    Alt-/'
+        'Volumes/Slices    V   Hypocenter     Home   Perspective       P'
+        'Slice         J K L   Extremum        End   Color Scale     [ ]'
+        'Glyphs            G   Render        Enter   Round CS          \\'
+        'Isosurfaces       I   Render next   Space   Auto CS       Alt-\\'
+        'Surfaces          S   Save snapshot   Ins   Fold CS           C'
+        'Mesh              M   Save movie        R   Color scheme  Alt-C'
+        'Outline           O   Clean     Backspace   Time Series       T'
+        'Length Scale      A   Restart       Alt-Q   Filtered TS   Alt-T'
       } )
   end
-case 'a', if km, field = 't0'; else, field = 'a'; end, msg = field;
-case 'v', if km, field = 'sv'; else, field = 'v'; end, msg = field;
-case 'u', if km, field = 'sl'; else, field = 'u'; end, msg = field;
-case 'w', if km, field = 't3'; else, field = 'w'; end, msg = field;
+case 'f'
+  list = fields;
+  for i = 1:length( fields )
+    list{i} = [ ' ' list{i} ' ' ];
+  end
+  i = find( strcmp( field, fields ) );
+  i = mod( i, length( fields ) ) + 1;
+  field = fields{i};
+  list{i}([1 end]) = '[]';
+  msg = [ 'Field: ' list{:} ];
 case '0', icomp = 0; colorscale
 case '1', icomp = 1; colorscale
 case '2', icomp = 2; colorscale
@@ -215,9 +220,10 @@ case 'c'
     else       msg = 'Signed color scale';
     end
   case 1
-    list = { 'dark' 'light' 'b/w' };
-    colorscheme = mod( colorscheme + 1, 3 );
-    msg = [ 'Color scheme: ' list{colorscheme+1} ];
+    list = { ' dark ' ' light ' ' b/w ' };
+    colorscheme = mod( colorscheme + 1, length( list ) );
+    list{colorscheme+1}([1 end]) = '[]';
+    msg = [ 'Color scheme: ' list{:} ];
   case 2
     if strcmp( get( hleg(1), 'Visible' ), 'off' )
       set( [hleg htxt], 'Visible', 'on' ),  msg = 'Colorbar on';
@@ -227,7 +233,7 @@ case 'c'
       set( haxes(1), 'Position', [ .02 .02 .96 .96 ] );
     end
   end
-case 'z'
+case 'v'
   volviz = ~volviz;
   if volviz, msg = 'Plotting volumes';
   else       msg = 'Plotting slices';
@@ -257,7 +263,7 @@ case 's'
   if dosurf, msg = 'Surfaces on';
   else       msg = 'Surfaces off';
   end
-case 'x'
+case 'a'
   if strcmp( get( gca, 'Visible' ), 'off' )
     axis on
     msg = 'Axis On';
@@ -274,7 +280,6 @@ case 't'
     zoom
     set( gcf, 'KeyPressFcn', 'delete(gcbf)' )
   end
-case 'y', msg = 'Space-time not implemented yet';
 otherwise, return
 end
 
