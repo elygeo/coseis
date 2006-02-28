@@ -29,15 +29,15 @@
   timeseries = { 'sv' 0. -6000. 0. };
   timeseries = { 'sl' 0. -6000. 0. };
   timeseries = { 'ts' 0. -6000. 0. };
+  bc1      = [   0   0   0 ];
+  n1expand = [  50  50  50 ];
 
 % 2b. xz-shear symmetric
   affine = [ 1. 0. 1.; 0. 1. 0.; 0. 0. 1. ] / 1.;
-  nn    = [ 421 136 101 ];
-  ihypo = [  0 -1 -1 ];
-  bc1   = [  0  0  0 ];
-  bc2   = [  0  3 -3 ];
-  n1expand = [ 50 50 50 ];
-  n2expand = [ 50  0  0 ];
+  nn       = [ 421 136 101 ];
+  ihypo    = [   0  -1  -1 ];
+  bc2      = [   0   3  -3 ];
+  n2expand = [  50   0   0 ];
   timeseries = { 'sv'  7500. 0. 0. };
   timeseries = { 'sl'  7500. 0. 0. };
   timeseries = { 'ts'  7500. 0. 0. };

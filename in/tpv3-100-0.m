@@ -29,14 +29,14 @@
   timeseries = { 'sv' 0. -6000. 0. };
   timeseries = { 'sl' 0. -6000. 0. };
   timeseries = { 'ts' 0. -6000. 0. };
+  bc1      = [   0   0   0 ];
+  n1expand = [  50  50  50 ];
 
 % 0. rectangular
   affine = [ 1. 0. 0.; 0. 1. 0.; 0. 0. 1. ] / 1.;
-  nn    = [ 211 136 101 ];
-  ihypo = [ -1 -1 -1 ];
-  bc1   = [  0  0  0 ];
-  bc2   = [ -3  3 -2 ];
-  n1expand = [ 50 50 50 ];
-  n2expand = [  0  0  0 ];
+  nn       = [ 211 136 101 ];
+  ihypo    = [  -1  -1  -1 ];
+  bc2      = [  -3   3  -2 ];
+  n2expand = [   0   0   0 ];
 
 % np = [ 1 2 2 ];
