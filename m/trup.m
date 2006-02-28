@@ -2,7 +2,7 @@
 figure
 set( gcf, ...
   'Name', 'Rupture Time', ...
-  'DefaultLineLinewidth', .001 );
+  'DefaultLineLinewidth', .4 );
 v = 0:0.5:7;
 
 cwd = pwd;
@@ -70,37 +70,30 @@ if 0
 end
 
 cd( cwd )
-i1 = [  1  1  1 800 ];
-i2 = [ -1 -1 -1 800 ];
 meta
+currentstep
+for i = 1 : length( out ) + 1
+  if strcmp( out{i}{2}, 'trup' ), break, end
+end
+it = it - mod( it, out{i}{3} );
+i1 = [ out{i}{4:6} it ];
+i2 = [ out{i}{7:9} it ];
 l = abs( faultnormal );
 j = max( 1, 3 - l );
 k = 6 - j - l;
 i1(l) = ihypo(l);
 i2(l) = ihypo(l);
 [ t, msg ] = read4d( 'trup', i1, i2 );
-t = squeeze( t ) + dt;
+t = squeeze( t ) + 1.5 * dt;
 i1(4) = 1;
 i2(4) = 1;
 [ x, msg ] = read4d( 'x', i1, i2 );
 x = squeeze( x(:,:,:,[j k]) ) / 1000.;
-bc = abs( bc2([j k]) );
 n = size( t );
-j = 1:n(1);
-k = 1:n(2);
-switch bc(1)
-case 2; j = [ 1:n(1) n(1):-1:1 ];
-case 3; j = [ 1:n(1) n(1)-1:-1:1 ];
-end
-switch bc(2)
-case 2; k = [ 1:n(2) n(2):-1:1 ];
-case 3; k = [ 1:n(2) n(2)-1:-1:1 ];
-end
-bc1
-bc2
-bc
-[ c, h ] = contour( x(j,k,1), x(j,k,2), t(j,k), v );
-set( h, 'Visible', 'off' )
+[ c, h ] = contour( x(:,:,1), x(:,:,2), t, v );
+delete( h );
+%clabel( c, h )
+%set( h, 'Visible', 'off' )
 i  = 1;
 while i < size( c, 2 )
   n  = c(2,i);
@@ -108,14 +101,19 @@ while i < size( c, 2 )
   i  = i + n + 1;
 end
 plot( c(1,:), c(2,:), 'r' )
-clabel( c, h )
-%delete( h );
 
 axis equal;
 axis ij
-axis( [ -15 15 -7.5 7.5 ] )
+lim = [ -15 15 -7.5 7.5 ];
+if ( abs( bc1(j) ) > 1 ), lim(1) = 0; end
+if ( abs( bc2(j) ) > 1 ), lim(2) = 0; end
+if ( abs( bc1(k) ) > 1 ), lim(3) = 0; end
+if ( abs( bc2(k) ) > 1 ), lim(4) = 0; end
+axis( lim )
 plot( 0, 0, 'p', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'MarkerSize', 11 )
 title( 'Rupture Time' )
+xlabel( 'X (km)' )
+ylabel( 'Y (km)' )
 hold on
 
 drawnow

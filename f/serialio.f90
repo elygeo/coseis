@@ -17,15 +17,12 @@ character(*), intent(in) :: io, filename
 real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: ir, i1(3), i2(3), i1l(3), i2l(3), iz
 integer :: j1, k1, l1, j2, k2, l2, reclen
-character(7) :: stat
 if ( any( i1 /= i1l .or. i2 /= i2l ) .or. iz <= 0 ) stop 'scalario error'
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 inquire( iolength=reclen ) s1(j1:j2,k1:k2,l1:l2)
 if ( reclen == 0 ) stop 'zero sized output'
-stat = 'old'
-if ( ir == 1 ) stat = 'replace'
 select case( io )
 case( 'r' )
   open( 9, &
@@ -41,8 +38,7 @@ case( 'w' )
     file=filename, &
     recl=reclen, &
     form='unformatted', &
-    access='direct', &
-    status=stat )
+    access='direct' )
   write( 9, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
   close( 9 )
 end select
@@ -54,15 +50,12 @@ character(*), intent(in) :: io, filename
 real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: ic, ir, i1(3), i2(3), i1l(3), i2l(3), iz
 integer :: j1, k1, l1, j2, k2, l2, reclen
-character(7) :: stat
 if ( any( i1 /= i1l .or. i2 /= i2l ) .or. iz <= 0 ) stop 'vectorio error'
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 inquire( iolength=reclen ) w1(j1:j2,k1:k2,l1:l2,ic)
 if ( reclen == 0 ) stop 'zero sized output'
-stat = 'old'
-if ( ir == 1 ) stat = 'replace'
 select case( io )
 case( 'r' )
   open( 9, &
@@ -78,8 +71,7 @@ case( 'w' )
     file=filename, &
     recl=reclen, &
     form='unformatted', &
-    access='direct', &
-    status=stat )
+    access='direct' )
   write( 9, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
   close( 9 )
 end select

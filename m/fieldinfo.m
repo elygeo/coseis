@@ -52,6 +52,16 @@ case 'sl'
   fmax  = slmax;
   fmaxi = slmaxi;
   labels = { 'Slip Length' 'lslip' };
+case 'tn'
+  isfault = 1;
+  fmax  = tnmax;
+  fmaxi = tnmaxi;
+  labels = { 'Normal Stress' 'Tn' };
+case 'ts'
+  isfault = 1;
+  fmax  = tsmax;
+  fmaxi = tsmaxi;
+  labels = { 'Shear Stress' 'Ts' };
 otherwise, error 'field'
 end
 

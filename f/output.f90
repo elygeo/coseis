@@ -191,8 +191,8 @@ subroutine output( pass )
 character, intent(in) :: pass
 character :: onpass
 real :: dtwall, tarrmax
-real, save :: amax, vmax, umax, wmax, svmax, slmax
-integer, save :: amaxi(3), vmaxi(3), umaxi(3), wmaxi(3), svmaxi(3), slmaxi(3)
+real, save :: amax, vmax, umax, wmax, svmax, slmax, tnmax, tsmax
+integer, save, dimension(3) :: amaxi, vmaxi, umaxi, wmaxi, svmaxi, slmaxi(3), tnmaxi, tsmaxi
 integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, ic, ir, iz
 logical :: fault, test, static
 
@@ -230,13 +230,21 @@ case( 'a' )
   if ( faultnormal /= 0 ) then
     svmaxi = maxloc( sv )
     slmaxi = maxloc( sl )
+    tnmaxi = maxloc( tn )
+    tsmaxi = maxloc( ts )
     svmax = sv(svmaxi(1),svmaxi(2),svmaxi(3))
     slmax = sl(slmaxi(1),slmaxi(2),slmaxi(3))
+    tnmax = tn(tnmaxi(1),tnmaxi(2),tnmaxi(3))
+    tsmax = tv(tsmaxi(1),tsmaxi(2),tsmaxi(3))
     i = abs( faultnormal )
     svmaxi(i) = ihypo(i)
     slmaxi(i) = ihypo(i)
+    tnmaxi(i) = ihypo(i)
+    tsmaxi(i) = ihypo(i)
     call pmaxloc( svmax, svmaxi, nnoff )
     call pmaxloc( slmax, slmaxi, nnoff )
+    call pmaxloc( tnmax, tnmaxi, nnoff )
+    call pmaxloc( tsmax, tsmaxi, nnoff )
   end if
 case default; stop 'output pass'
 end select
@@ -371,12 +379,16 @@ if ( master ) then
   write( 9, * ) 'wmax   =  ', wmax,   ';'
   write( 9, * ) 'svmax  =  ', svmax,  ';'
   write( 9, * ) 'slmax  =  ', slmax,  ';'
-  write( 9, * ) 'amaxi  = [', amaxi - nnoff,  '];'
-  write( 9, * ) 'vmaxi  = [', vmaxi - nnoff,  '];'
-  write( 9, * ) 'umaxi  = [', umaxi - nnoff,  '];'
-  write( 9, * ) 'wmaxi  = [', wmaxi - nnoff,  '];'
+  write( 9, * ) 'tnmax  =  ', tnmax,  ';'
+  write( 9, * ) 'tsmax  =  ', tsmax,  ';'
+  write( 9, * ) 'amaxi  = [', amaxi  - nnoff, '];'
+  write( 9, * ) 'vmaxi  = [', vmaxi  - nnoff, '];'
+  write( 9, * ) 'umaxi  = [', umaxi  - nnoff, '];'
+  write( 9, * ) 'wmaxi  = [', wmaxi  - nnoff, '];'
   write( 9, * ) 'svmaxi = [', svmaxi - nnoff, '];'
   write( 9, * ) 'slmaxi = [', slmaxi - nnoff, '];'
+  write( 9, * ) 'tnmaxi = [', tnmaxi - nnoff, '];'
+  write( 9, * ) 'tsmaxi = [', tsmaxi - nnoff, '];'
   close( 9 )
 end if
 if ( faultnormal /= 0 .and. it == nt - 1 ) then
