@@ -45,6 +45,7 @@ case "$key" in
   nn)  nn3=( $1 $2 $3 ) ;;
   np)  np3=( $1 $2 $3 ) ;;
   out) nout=$(( nout + 1 )) ;;
+  timeseries) nout=$(( nout + 1 )) ;;
   datadir) echo ln -s "$1" "$rundir/data" ;;
   return) break
 esac

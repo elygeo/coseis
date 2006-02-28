@@ -103,6 +103,28 @@ call mpi_allreduce( r, rr, 1, mpi_real, mpi_max, c, e )
 r = rr
 end subroutine
 
+! Real global minimum & location, send to master
+subroutine pminloc( r, i, nnoff )
+real, intent(inout) :: r
+integer, intent(inout) :: i(3)
+integer, intent(in) :: nnoff(3)
+integer :: e, iip
+real :: local(2), global(2)
+local(1) = r
+local(2) = ip
+call mpi_allreduce( local, global, 1, mpi_2real, mpi_minloc, c, e )
+r   = global(1)
+iip = global(2)
+i = i - nnoff
+if ( iip /= ipmaster .and. ip == iip ) then
+  call mpi_send( i, 3, mpi_integer, ipmaster, 0, c, e )
+end if
+if ( iip /= ipmaster .and. ip == ipmaster ) then
+  call mpi_recv( i, 3, mpi_integer, iip, 0, c, mpi_status_ignore, e )
+end if
+i = i + nnoff
+end subroutine
+
 ! Real global maximum & location, send to master
 subroutine pmaxloc( r, i, nnoff )
 real, intent(inout) :: r

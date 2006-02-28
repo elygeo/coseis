@@ -67,6 +67,15 @@ real, intent(inout) :: r
 r = r
 end subroutine
 
+! Real global minimum & location, send to master
+subroutine pminloc( r, i, nnoff )
+real, intent(inout) :: r
+integer, intent(inout) :: i(3)
+integer, intent(in) :: nnoff(3)
+r = r
+i = i - nnoff + nnoff
+end subroutine
+
 ! Real global maximum & location, send to master
 subroutine pmaxloc( r, i, nnoff )
 real, intent(inout) :: r

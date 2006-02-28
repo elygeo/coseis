@@ -93,6 +93,7 @@ real :: &
   gridnoise,     & ! random noise in grid
   x1in(nz,3),    & ! input cube - near corner
   x2in(nz,3),    & ! input cube - far corner 
+  xout(nz,3),    & ! timeseries output location
   xhypo(3),      & ! hypocenter location
   xcenter(3),    & ! mesh center
   rmax(1),       & ! maximum distance from mesh center
@@ -156,7 +157,8 @@ integer :: &
 
 character :: &
   oper(2),       & ! spatial derivative operators, g=general, r=rect, h=const
-  intype(nz)       ! input type: z=zone, c=cube, r=read
+  intype(nz),    & ! input type: z=zone, c=cube, r=read
+  outtype(nz)      ! output type: z=zone, x=location
 
 character(4) :: &
   fieldin(nz),   & ! input variable

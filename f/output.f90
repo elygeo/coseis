@@ -9,8 +9,8 @@ contains
 ! Ouput initialize
 subroutine output_init
 use zone_m
-real :: courant
-integer :: i1(3), i2(3), i, nc, iz
+real :: courant, rout
+integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz
 character :: endian
 character(7) :: field
 logical :: fault, test, cell
@@ -141,25 +141,72 @@ doiz0: do iz = 1, nout
   case( 'tn'   ); fault = .true.
   case( 'ts'   ); fault = .true.
   end select
-  
+
   ! Interval 
   if ( ditout(iz) < 1 ) ditout(iz) = nt + ditout(iz) + 1
  
-  ! Zone
-  i1 = i1out(iz,:)
-  i2 = i2out(iz,:)
-  call zone( i1, i2, nn, nnoff, ihypo, ifn )
-  if ( cell ) i2 = i2 - 1
-  if ( fault ) then
-    if ( faultnormal /= 0 ) then
-      i = abs( faultnormal )
-      i1(i) = ihypo(i)
-      i2(i) = ihypo(i)
-    else
-      ditout(iz) = nt + 1
+  ! Zone or point location
+  select case( outtype(iz) )
+  case( 'z' )
+    rout = 0.
+    i1 = i1out(iz,:)
+    i2 = i2out(iz,:)
+    call zone( i1, i2, nn, nnoff, ihypo, ifn )
+    if ( cell ) i2 = i2 - 1
+    if ( fault ) then
+      if ( faultnormal /= 0 ) then
+        i = abs( faultnormal )
+        i1(i) = ihypo(i)
+        i2(i) = ihypo(i)
+      else
+        ditout(iz) = nt + 1
+      end if
     end if
-  end if
-  if ( any( i2 < i1 ) ) stop 'output indices'
+  case( 'x' )
+    w1 = 2. * rmax(1)
+    if ( cell ) then
+      i1 = i1node
+      i2 = i2node - 1
+      j1 = i1(1); j2 = i2(1)
+      k1 = i1(2); k2 = i2(2)
+      l1 = i1(3); l2 = i2(3)
+      forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+        w1(j,k,l,:) = 0.125 * &
+          ( x(j,k,l,:) + x(j+1,k+1,l+1,:) &
+          + x(j+1,k,l,:) + x(j,k+1,l+1,:) &
+          + x(j,k+1,l,:) + x(j+1,k,l+1,:) &
+          + x(j,k,l+1,:) + x(j+1,k+1,l,:) );
+      end forall
+    else
+      i1 = i1node
+      i2 = i2node
+      if ( fault ) then
+        if ( faultnormal /= 0 ) then
+          i = abs( faultnormal )
+          i1(i) = ihypo(i)
+          i2(i) = ihypo(i)
+        else
+          ditout(iz) = nt + 1
+        end if
+      end if
+      j1 = i1(1); j2 = i2(1)
+      k1 = i1(2); k2 = i2(2)
+      l1 = i1(3); l2 = i2(3)
+      w1(j1:j2,k1:k2,l1:l2,:) = x(j1:j2,k1:k2,l1:l2,:)
+    end if
+    do i = 1, 3
+      w1(:,:,:,i) = w1(:,:,:,i) - xout(iz,i)
+    end do
+    s1 = sum( w1 * w1, 4 )
+    i1 = minloc( s1 )
+    rout = s1(i1(1),i1(2),i1(3))
+    call pminloc( rout, i1, nnoff )
+    i2 = i1
+  end select
+  w1 = 0.
+  s1 = 0.
+
+  if ( any( i2 < i1 ) ) stop 'bad output indices'
   i1out(iz,:) = i1
   i2out(iz,:) = i2
  
@@ -174,6 +221,7 @@ doiz0: do iz = 1, nout
   i1 = max( i1, i1node )
   i2 = min( i2, i2node )
   if ( any( i2 < i1 ) ) ditout(iz) = nt + 1
+  if ( rout > rmax(1) ** rmax(1) ) ditout(iz) = nt + 1
   call iosplit( iz, nout, ditout(iz) )
  
 end do doiz0

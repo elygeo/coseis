@@ -93,9 +93,16 @@ case( 'szz' );         inzone = .true.
 case( 'syz' );         inzone = .true.
 case( 'szx' );         inzone = .true.
 case( 'sxy' );         inzone = .true.
+case( 'timeseries' );
+  nout = nout + 1
+  i = nout
+  outtype(i) = 'x'
+  ditout(i) = 1
+  read( str, * ) fieldout(i), xout(i,:)
 case( 'out' );
   nout = nout + 1
   i = nout
+  outtype(i) = 'z'
   read( str, * ) fieldout(i), ditout(i), i1out(i,:), i2out(i,:)
 case( 'lock' );
   nlock = nlock + 1
