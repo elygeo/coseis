@@ -53,7 +53,7 @@ for iz = 1:nout
     strcmp( fieldin, field )
     all( i1s >= [ i1 1  ] )
     all( i2s <= [ i2 it ] )
-    ( dit == 1 || ( n(4) == 1 && any( i1s(4) == dit:dit:it ) ) )
+    ( dit == 0 || dit == 1 || ( n(4) == 1 && mod( i1s(4), dit ) == 0 ) )
   ]';
   found = all( test );
   if found, break, end
@@ -74,20 +74,31 @@ m = i2 - i1 + 1;
 n = [ n length( ic ) ];
 f = zeros( n );
 i0 = i1s - [ i1 1 ];
-skip = 4 * ( m(1) - n(1) );
-block = sprintf( '%d*float32', n(1) );
-for i  = 1:n(5)
-for it = 1:n(4)
-  file = sprintf( '%s%1d%06d', field, ic(i), it + i0(4) );
-  fid = fopen( file, 'r', endian );
-  for l = 1:n(3)
-    seek = 4 * ( i0(1) + m(1) * ( i0(2) + m(2) * ( i0(3) + l - 1 ) ) );
-    fseek( fid, seek, 'bof' );
-    tmp = fread( fid, n(1)*n(2), block, skip, endian );
-    f(:,:,l,it,i) = reshape( tmp, n(1:2) );
+if all( n(1:3) == 1 )
+  for i = 1:n(5)
+    file = sprintf( '%s%1d', field, ic(i) );
+    fid = fopen( file, 'r', endian );
+    fseek( fid, 4*i0(4), 'bof' );
+    f(1,1,1,:,i) = fread( fid, n(4), 'float32' );
   end
-  fclose( fid );
-end
+else
+  skip = 4 * ( m(1) - n(1) );
+  block = sprintf( '%d*float32', n(1) );
+  for i  = 1:n(5)
+  for it = 1:n(4)
+    if dit, file = sprintf( '%s%1d%06d', field, ic(i), it + i0(4) );
+    else,   file = sprintf( '%s%1d', field, ic(i) );
+    end if
+    fid = fopen( file, 'r', endian );
+    for l = 1:n(3)
+      seek = 4 * ( i0(1) + m(1) * ( i0(2) + m(2) * ( i0(3) + l - 1 ) ) );
+      fseek( fid, seek, 'bof' );
+      tmp = fread( fid, n(1)*n(2), block, skip );
+      f(:,:,l,it,i) = reshape( tmp, n(1:2) );
+    end
+    fclose( fid );
+  end
+  end
 end
 cd '..'
 
