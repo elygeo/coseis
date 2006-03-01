@@ -2,7 +2,7 @@
 figure
 set( gcf, ...
   'Name', 'Rupture Time', ...
-  'DefaultLineLinewidth', .4 );
+  'DefaultLineLinewidth', .2 );
 v = 0:0.5:7;
 
 cwd = pwd;
@@ -25,7 +25,7 @@ if 0
     c(:,i) = NaN;
     i  = i + n + 1;
   end
-  plot( c(1,:), c(2,:), 'b', 'LineWidth', .01 )
+  plot( c(1,:), c(2,:), 'b' )
   hold on
 end
 
@@ -45,7 +45,7 @@ if 1
     c(:,i) = NaN;
     i  = i + n + 1;
   end
-  plot( c(1,:), c(2,:), 'k', 'LineWidth', .01 )
+  plot( c(1,:), c(2,:), 'k' )
   hold on
 end
 
@@ -65,7 +65,7 @@ if 0
     c(:,i) = NaN;
     i  = i + n + 1;
   end
-  plot( c(1,:), c(2,:), 'g', 'LineWidth', .01 )
+  plot( c(1,:), c(2,:), 'g' )
   hold on
 end
 

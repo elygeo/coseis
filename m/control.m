@@ -77,6 +77,7 @@ case 'r'
   rehash
   currentstep
   istep = dit * 10 ^ km;
+  icursorhold = icursor;
   if export && ~exist( 'movie', 'dir' ), mkdir( 'movie' ), end
   while anim && icursor(4) + istep <= it
     icursor(4) = icursor(4) + istep;

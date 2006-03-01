@@ -119,21 +119,23 @@ doiz0: do iz = 1, nout
   fault = .false.
   cell = .false.
   select case( fieldout(iz) )
-  case( 'x'    ); nc = 3
+  case( 'x'    ); nc = 3; ditout(iz) = 0
   case( 'a'    ); nc = 3
   case( 'v'    ); nc = 3
   case( 'u'    ); nc = 3
   case( 'w'    ); nc = 6; cell = .true.
   case( 'wm'   ); cell = .true.
-  case( 'mu'   ); cell = .true.
-  case( 'lam'  ); cell = .true.
-  case( 'y'    ); cell = .true.
-  case( 't0'   ); fault = .true.; nc = 3
+  case( 'mu'   ); cell = .true.; ditout(iz) = 0
+  case( 'lam'  ); cell = .true.; ditout(iz) = 0
+  case( 'y'    ); cell = .true.; ditout(iz) = 0
+  case( 't0'   ); fault = .true.; nc = 3; ditout(iz) = 0
+  case( 't1'   ); fault = .true.; nc = 3
+  case( 't2'   ); fault = .true.; nc = 3
   case( 't3'   ); fault = .true.; nc = 3
-  case( 'mus'  ); fault = .true.
-  case( 'mud'  ); fault = .true.
-  case( 'dc'   ); fault = .true.
-  case( 'co'   ); fault = .true.
+  case( 'mus'  ); fault = .true.; ditout(iz) = 0
+  case( 'mud'  ); fault = .true.; ditout(iz) = 0
+  case( 'dc'   ); fault = .true.; ditout(iz) = 0
+  case( 'co'   ); fault = .true.; ditout(iz) = 0
   case( 'sv'   ); fault = .true.
   case( 'sl'   ); fault = .true.
   case( 'trup' ); fault = .true.
@@ -143,7 +145,7 @@ doiz0: do iz = 1, nout
   end select
 
   ! Interval 
-  if ( ditout(iz) < 1 ) ditout(iz) = nt + ditout(iz) + 1
+  if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
  
   ! Zone or point location
   select case( outtype(iz) )
@@ -242,7 +244,7 @@ real :: dtwall, tarrmax
 real, save :: amax, vmax, umax, wmax, svmax, slmax, tnmax, tsmax
 integer, save, dimension(3) :: amaxi, vmaxi, umaxi, wmaxi, svmaxi, slmaxi(3), tnmaxi, tsmaxi
 integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, ic, ir, iz
-logical :: fault, test, static
+logical :: fault, test
 
 if ( master ) then
   open( 9, file='log', position='append' )
@@ -299,31 +301,36 @@ end select
 
 doiz: do iz = 1, nout !--------------------------------------------------------!
 
-if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
+if ( ditout(iz) == 0 ) then
+  if ( it > 1 ) cycle doiz
+else
+  if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
+end if
 
 ! Properties
 nc = 1
 fault= .false.
-static = .false.
 onpass = 'a'
 select case( fieldout(iz) )
-case( 'x'    ); nc = 3; static = .true.
+case( 'x'    ); nc = 3
 case( 'a'    ); nc = 3
 case( 'v'    ); nc = 3
 case( 'u'    ); nc = 3; onpass = 'w'
 case( 'w'    ); nc = 6; onpass = 'w'
-case( 'mr'   ); static = .true.
-case( 'mu'   ); static = .true.
-case( 'lam'  ); static = .true.
-case( 'y'    ); static = .true.
+case( 'mr'   );
+case( 'mu'   );
+case( 'lam'  );
+case( 'y'    );
 case( 'um'   ); onpass = 'w'
 case( 'wm'   ); onpass = 'w'
 case( 't0'   ); fault = .true.; nc = 3
+case( 't1'   ); fault = .true.; nc = 3
+case( 't2'   ); fault = .true.; nc = 3
 case( 't3'   ); fault = .true.; nc = 3
-case( 'mus'  ); fault = .true.; static = .true.
-case( 'mud'  ); fault = .true.; static = .true.
-case( 'dc'   ); fault = .true.; static = .true.
-case( 'co'   ); fault = .true.; static = .true.
+case( 'mus'  ); fault = .true.
+case( 'mud'  ); fault = .true.
+case( 'dc'   ); fault = .true.
+case( 'co'   ); fault = .true.
 case( 'sv'   ); fault = .true.
 case( 'sl'   ); fault = .true.
 case( 'trup' ); fault = .true.
@@ -347,17 +354,17 @@ if ( fault .and. faultnormal /= 0 ) then
   i1l(i) = 1
   i2l(i) = 1
 end if
-ir = it / ditout(iz)
-
-! X is static, only write once
-if ( static ) ditout(iz) = nt + 1
 
 ! Binary output
 do ic = 1, nc
+  ir = 1
   write( str, '(i2.2,a,a,i1)' ) iz, '/', trim( fieldout(iz) ), ic
-  if ( any( i1 /= i2 ) ) then
-    ir = 1
+  if ( ditout(iz) > 0 ) then
+  if ( all( i1 == i2 ) ) then
+    ir = it / ditout(iz)
+  else
     write( str, '(i2.2,a,a,i1,i6.6)' ) iz, '/', trim( fieldout(iz) ), ic, it
+  end if
   end if
   select case( fieldout(iz) )
   case( 'x'    ); call vectorio( 'w', str, x,  ic,   ir, i1, i2, i1l, i2l, iz )

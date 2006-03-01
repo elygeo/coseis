@@ -7,7 +7,7 @@ switch field
 case 'x'
   fmax  = 2 * rmax;
   fmaxi = nn;
-  labels = { 'Position' '|X|' 'X' 'Y' 'Z' };
+  labels = { 'Position' '|X|' 'x' 'y' 'z' };
 case 'a'
   fmax  = amax;
   fmaxi = amaxi;
