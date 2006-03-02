@@ -24,7 +24,7 @@ case { 'h', 'f1' }
         'Surfaces          S   Save snapshot   Ins   Fold CS           C'
         'Mesh              M   Save movie        R   Color scheme  Alt-C'
         'Outline           O   Clean     Backspace   Time Series       T'
-        'Length Scale      A   Restart       Alt-Q   Filtered TS   Alt-T'
+        'Axes              A   Restart       Alt-Q   Filtered TS   Alt-T'
       } )
   end
 case 'f'
@@ -267,14 +267,14 @@ case 's'
 case 'a'
   if strcmp( get( gca, 'Visible' ), 'off' )
     axis on
-    msg = 'Axis On';
+    msg = 'Axes On';
   else
     axis off
-    msg = 'Axis Off';
+    msg = 'Axes Off';
   end
 case 't'
   sensor = icursor(1:3);
-  [ tt, vt, tta, vta, labels, msg ] = tsread( field, sensor, km );
+  [ msg, tt, vt, tta, vta, labels ] = tsread( field, sensor, km );
   if length( vt )
     tsfigure( colorscheme )
     tsplot

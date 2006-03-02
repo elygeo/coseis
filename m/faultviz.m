@@ -8,7 +8,7 @@ i1(ifn) = ihypo(ifn);
 i2(ifn) = ihypo(ifn);
 i1(4) = 1;
 i2(4) = 1;
-[ xx, msg ] = read4d( 'x', i1, i2 );
+[ msg, xx ] = read4d( 'x', i1, i2 );
 if msg, error( msg ), end
 
 if rcrit > 0. && vrup > .0
@@ -25,13 +25,13 @@ end
 
 i1(4) = icursor(4);
 i2(4) = icursor(4);
-[ sl, msg ] = read4d( 'sl', i1, i2 );
+[ msg, sl ] = read4d( 'sl', i1, i2 );
 if msg, error( msg ), end
 
 surfcontour( xx, sl, dc0 );
 surfcontour( xx, sl, .01 * dc0 );
 
-[ dc, msg ] = read4d( 'dc', i1, i2 );
+[ msg, dc ] = read4d( 'dc', i1, i2 );
 if msg
  msg = '';
 else

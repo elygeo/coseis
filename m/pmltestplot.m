@@ -15,7 +15,7 @@ for i = 1:n
   cd 'pmltest1'
   meta
   sensor = ihypo + loc(i,:);
-  [ t, v, ta, va, labels, msg ] = tsread( 'v', sensor, 1 );
+  [ msg, t, v, ta, va, labels ] = tsread( 'v', sensor, 1 );
   cd '..'
   h1 = axes( 'Position', [ 4/32 23/42 26/32 16/42 ] );
   plot( ta, va, ':' )
@@ -38,7 +38,7 @@ for i = 1:n
   cd 'pmltest2'
   meta
   sensor = ihypo + loc(i,:);
-  [ t, v, ta, va, labels, msg ] = tsread( 'v', sensor, 1 );
+  [ msg, t, v, ta, va, labels ] = tsread( 'v', sensor, 1 );
   cd '..'
   axes( h1 )
   plot( t, v(:,1), 'k--' )

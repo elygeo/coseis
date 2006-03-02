@@ -1,6 +1,5 @@
 % Extract 4D slice from saved data
-%function [ f, msg ] = read4d( fieldin, i1s, i2s, ic )
-function [ f, msg ] = read4d( varargin )
+function [ msg, f ] = read4d( varargin )
 
 % Aguments
 if ~any( nargin == [ 1 3 4 ] ), error, end
@@ -63,6 +62,8 @@ if ~found
   f = [];
   return
 end
+
+if nargout < 2, return, end
 
 % Read data
 file = sprintf( '%02d', iz );

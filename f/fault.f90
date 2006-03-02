@@ -294,8 +294,6 @@ end if
 ! Shear traction bounded by friction
 f2 = 1.
 where ( ts > f1 ) f2 = f1 / ts
-ts = f1
-tn = sum( t3 * nhat, 4 )
 
 ! Update acceleration
 do i = 1, 3
@@ -306,6 +304,10 @@ do i = 1, 3
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f1 * mr(j3:j4,k3:k4,l3:l4)
 end do
 call vectorbc( w1, ibc1, ibc2, nhalo )
+
+! Save for output
+ts = ts * f2
+tn = sum( t3 * nhat, 4 )
 
 end subroutine
 

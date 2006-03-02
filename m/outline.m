@@ -39,7 +39,7 @@ for iz = 1:size( ilines, 1 )
   i2 = ilines(iz,4:6);
   n = i2 - i1 + 1;
   if sum( n > 1 ) ~= 1, continue, end
-  [ x msg ] = read4d( 'x', [ i1 1 ], [ i2 1 ] );
+  [ msg, x ] = read4d( 'x', [ i1 1 ], [ i2 1 ] );
   if msg, continue, end
   x1 = [ x1; shiftdim( x(:,:,:,1,1) ); NaN ];
   x2 = [ x2; shiftdim( x(:,:,:,1,2) ); NaN ];

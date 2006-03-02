@@ -142,6 +142,7 @@ doiz0: do iz = 1, nout
   case( 'tarr' ); fault = .true.
   case( 'tn'   ); fault = .true.
   case( 'ts'   ); fault = .true.
+  case( 'fr'   ); fault = .true.
   end select
 
   ! Interval 
@@ -280,7 +281,7 @@ case( 'a' )
   if ( faultnormal /= 0 ) then
     svmaxi = maxloc( sv )
     slmaxi = maxloc( sl )
-    tnmaxi = maxloc( tn )
+    tnmaxi = maxloc( abs( tn ) )
     tsmaxi = maxloc( ts )
     svmax = sv(svmaxi(1),svmaxi(2),svmaxi(3))
     slmax = sl(slmaxi(1),slmaxi(2),slmaxi(3))
@@ -337,6 +338,7 @@ case( 'trup' ); fault = .true.
 case( 'tarr' ); fault = .true.
 case( 'tn'   ); fault = .true.
 case( 'ts'   ); fault = .true.
+case( 'fr'   ); fault = .true.
 end select
 
 ! Select pass
@@ -396,6 +398,7 @@ do ic = 1, nc
   case( 'tarr' ); call scalario( 'w', str, tarr,     ir, i1, i2, i1l, i2l, iz )
   case( 'tn'   ); call scalario( 'w', str, tn,       ir, i1, i2, i1l, i2l, iz )
   case( 'ts'   ); call scalario( 'w', str, ts,       ir, i1, i2, i1l, i2l, iz )
+  case( 'fr'   ); call scalario( 'w', str, f1,       ir, i1, i2, i1l, i2l, iz )
   case default; stop 'output fieldout'
   end select
 end do
