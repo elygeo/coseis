@@ -89,7 +89,7 @@ else
   for it = 1:n(4)
     if dit, file = sprintf( '%s%1d%06d', field, ic(i), it + i0(4) );
     else,   file = sprintf( '%s%1d', field, ic(i) );
-    end if
+    end
     fid = fopen( file, 'r', endian );
     for l = 1:n(3)
       seek = 4 * ( i0(1) + m(1) * ( i0(2) + m(2) * ( i0(3) + l - 1 ) ) );

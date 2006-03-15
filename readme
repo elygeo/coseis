@@ -357,6 +357,20 @@ Nonuniform strain: 12 = 24 DOF - 6 rigid body - 6 uniform strain
     0----0      '----0      0----'      '----0  
     Z2 Z3       Z3 Z1       Z1 Z2     Z1 Z2 Z3
 
+Sum on a point
+
+  C---------C
+  |\         \
+  | .----B    \     A = -32
+  | |\   |\    \    B = +8
+  | | C----.----C   C = -2
+  | B-|--A |    |
+  C  \|   \|    |
+   \  '----B    |
+    \ |         |
+     \|         |
+      C---------C
+
 Y = mu*(lamda+mu)/6/(lamda+2*mu)
 
 Q = Y*dU*dx^2*dy^2/dv^2

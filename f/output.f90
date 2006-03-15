@@ -385,9 +385,9 @@ do ic = 1, nc
   case( 'lam'  ); call scalario( 'w', str, lam,      ir, i1, i2, i1l, i2l, iz )
   case( 'y'    ); call scalario( 'w', str, y,        ir, i1, i2, i1l, i2l, iz )
   case( 't0'   ); call vectorio( 'w', str, t0, ic,   ir, i1, i2, i1l, i2l, iz )
-  case( 't1'   ); call vectorio( 'w', str, t1, ic,   ir, i1, i2, i1l, i2l, iz )
-  case( 't2'   ); call vectorio( 'w', str, t2, ic,   ir, i1, i2, i1l, i2l, iz )
-  case( 't3'   ); call vectorio( 'w', str, t3, ic,   ir, i1, i2, i1l, i2l, iz )
+  case( 's'    ); call vectorio( 'w', str, t1, ic,   ir, i1, i2, i1l, i2l, iz )
+  case( 'sr'   ); call vectorio( 'w', str, t2, ic,   ir, i1, i2, i1l, i2l, iz )
+  case( 't'    ); call vectorio( 'w', str, t3, ic,   ir, i1, i2, i1l, i2l, iz )
   case( 'mus'  ); call scalario( 'w', str, mus,      ir, i1, i2, i1l, i2l, iz )
   case( 'mud'  ); call scalario( 'w', str, mud,      ir, i1, i2, i1l, i2l, iz )
   case( 'dc'   ); call scalario( 'w', str, dc,       ir, i1, i2, i1l, i2l, iz )
@@ -398,7 +398,7 @@ do ic = 1, nc
   case( 'tarr' ); call scalario( 'w', str, tarr,     ir, i1, i2, i1l, i2l, iz )
   case( 'tn'   ); call scalario( 'w', str, tn,       ir, i1, i2, i1l, i2l, iz )
   case( 'ts'   ); call scalario( 'w', str, ts,       ir, i1, i2, i1l, i2l, iz )
-  case( 'fr'   ); call scalario( 'w', str, f1,       ir, i1, i2, i1l, i2l, iz )
+  case( 'f'    ); call scalario( 'w', str, f1,       ir, i1, i2, i1l, i2l, iz )
   case default; stop 'output fieldout'
   end select
 end do

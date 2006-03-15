@@ -274,7 +274,7 @@ case 'a'
   end
 case 't'
   sensor = icursor(1:3);
-  [ msg, tt, vt, tta, vta, labels ] = tsread( field, sensor, km );
+  [ msg, tt, vt, xsensor, tta, vta, labels ] = tsread( field, sensor, km );
   if length( vt )
     tsfigure( colorscheme )
     tsplot

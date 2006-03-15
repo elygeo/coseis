@@ -8,7 +8,7 @@ tsfigure( 0 )
 dofilter = 1;
 for ir = 10:10:50
   sensor = ihypo + [ ir 0 0 ];
-  [ msg, t, v, ta, va, labels ] = tsread( 'sv', sensor, 1 );
+  [ msg, t, v, x, ta, va, labels ] = tsread( 'sv', sensor, 1 );
   plot( t, v(:,1) )
   hold on
   plot( ta, va, ':' )

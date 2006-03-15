@@ -1,5 +1,5 @@
 % Time series
-function [ msg, tt, vt, tta, vta, labels ] = tsread( field, sensor, dofilter )
+function [ msg, tt, vt, x, tta, vta, labels ] = tsread( field, sensor, dofilter )
 
 tt = [];
 tta = [];
@@ -27,17 +27,15 @@ kostrov = ...
   rcrit > 1e8 && ...
   trelax == 0.;
 
-% Find sensor location if needed
-if pointsource || explosion || kostrov
-  [ msg, xsensor ] = read4d( 'x', [ sensor 1 ], [ sensor 1 ] );
-  if msg
-    pointsource = 0;
-    explosion = 0;
-    kostrov = 0;
-  else
-    xg = squeeze( xsensor )' - xhypo;
-    rg = sqrt( sum( xg .* xg ) );
-  end
+% Find sensor location
+[ msg, x ] = read4d( 'x', [ sensor 1 ], [ sensor 1 ] );
+if msg
+  pointsource = 0;
+  explosion = 0;
+  kostrov = 0;
+else
+  xg = squeeze( x )' - xhypo;
+  rg = sqrt( sum( xg .* xg ) );
 end
 
 % Time

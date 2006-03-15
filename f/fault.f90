@@ -297,8 +297,7 @@ where ( ts > f1 ) f2 = f1 / ts
 
 ! Update acceleration
 do i = 1, 3
-  t2(:,:,:,i) = t2(:,:,:,i) * f2
-  t3(:,:,:,i) = t1(:,:,:,i) + t2(:,:,:,i)
+  t3(:,:,:,i) = t1(:,:,:,i) + f2 * t2(:,:,:,i)
   f1 = area * ( t3(:,:,:,i) - t0(:,:,:,i) )
   w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f1 * mr(j1:j2,k1:k2,l1:l2)
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f1 * mr(j3:j4,k3:k4,l3:l4)
