@@ -29,12 +29,13 @@ kostrov = ...
 
 % Find sensor location
 [ msg, x ] = read4d( 'x', [ sensor 1 ], [ sensor 1 ] );
+x = squeeze( x )';
 if msg
   pointsource = 0;
   explosion = 0;
   kostrov = 0;
 else
-  xg = squeeze( x )' - xhypo;
+  xg = x - xhypo;
   rg = sqrt( sum( xg .* xg ) );
 end
 

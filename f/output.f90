@@ -129,9 +129,9 @@ doiz0: do iz = 1, nout
   case( 'lam'  ); cell = .true.; ditout(iz) = 0
   case( 'y'    ); cell = .true.; ditout(iz) = 0
   case( 't0'   ); fault = .true.; nc = 3; ditout(iz) = 0
-  case( 't1'   ); fault = .true.; nc = 3
-  case( 't2'   ); fault = .true.; nc = 3
-  case( 't3'   ); fault = .true.; nc = 3
+  case( 's'    ); fault = .true.; nc = 3
+  case( 'sr'   ); fault = .true.; nc = 3
+  case( 't'    ); fault = .true.; nc = 3
   case( 'mus'  ); fault = .true.; ditout(iz) = 0
   case( 'mud'  ); fault = .true.; ditout(iz) = 0
   case( 'dc'   ); fault = .true.; ditout(iz) = 0
@@ -166,7 +166,7 @@ doiz0: do iz = 1, nout
       end if
     end if
   case( 'x' )
-    w1 = 2. * rmax(1)
+    w1 = 2. * rmax
     if ( cell ) then
       i1 = i1node
       i2 = i2node - 1
@@ -224,7 +224,7 @@ doiz0: do iz = 1, nout
   i1 = max( i1, i1node )
   i2 = min( i2, i2node )
   if ( any( i2 < i1 ) ) ditout(iz) = nt + 1
-  if ( rout > rmax(1) ** rmax(1) ) ditout(iz) = nt + 1
+  if ( rout > rmax ** rmax ) ditout(iz) = nt + 1
   call iosplit( iz, nout, ditout(iz) )
  
 end do doiz0
@@ -325,9 +325,9 @@ case( 'y'    );
 case( 'um'   ); onpass = 'w'
 case( 'wm'   ); onpass = 'w'
 case( 't0'   ); fault = .true.; nc = 3
-case( 't1'   ); fault = .true.; nc = 3
-case( 't2'   ); fault = .true.; nc = 3
-case( 't3'   ); fault = .true.; nc = 3
+case( 's'    ); fault = .true.; nc = 3
+case( 'sr'   ); fault = .true.; nc = 3
+case( 't'    ); fault = .true.; nc = 3
 case( 'mus'  ); fault = .true.
 case( 'mud'  ); fault = .true.
 case( 'dc'   ); fault = .true.

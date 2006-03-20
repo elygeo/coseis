@@ -308,6 +308,7 @@ do i = 1,3
 end do
 s1 = sum( w1 * w1, 4 );
 rmax = sqrt( maxval( s1 ) )
+call pmax( rmax )
 
 end subroutine
 

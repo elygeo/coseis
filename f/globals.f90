@@ -96,7 +96,7 @@ real :: &
   xout(nz,3),    & ! timeseries output location
   xhypo(3),      & ! hypocenter location
   xcenter(3),    & ! mesh center
-  rmax(1),       & ! maximum distance from mesh center
+  rmax,          & ! maximum distance from mesh center
   viscosity(2),  & ! viscosity for (1) stress & (2) hourglass corrections
   upvector(3),   & ! upward direction
   tsource,       & ! dominant period
