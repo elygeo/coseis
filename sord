@@ -183,6 +183,9 @@ serial="\\
 mpi="\\
   mpi.f90 \\
   mpiio.f90"
+mpi="\\
+  mpi.babieca.f90 \\
+  mpiio.babieca.f90"
 
 case $fflags in
   O) fflags=$oflags ;;
