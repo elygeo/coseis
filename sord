@@ -52,7 +52,8 @@ esac
 done < tmp
 
 # Problem size
-nn=$(( nn3[0] * nn3[1] * nn3[2] ));
+#nn=$(( nn3[0] * nn3[1] * nn3[2] )); # old bash can only handle 32 bits
+nn=$( echo ${nn3[*]} | awk '{ printf "%d", $1 * $2 * $3 }' )
 np=$(( np3[0] * np3[1] * np3[2] ));
 [ $mode = guess ] && [ $np -eq 1 ] && mode=serial
 [ $mode = guess ] && [ $np -gt 1 ] && mode=parallel
