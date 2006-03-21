@@ -1,1 +1,1 @@
-in/faultest.m
+in/benchmark.m

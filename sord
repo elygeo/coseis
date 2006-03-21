@@ -110,11 +110,8 @@ elif [ "${machine:0:2}" = tg ]; then machine=teragrid
 elif [ "$machine" = master ];   then machine=babieca
 fi
 ppn=1
-rate=250000
+rate=30000
 case $machine in
-  phat)     ;;
-  phim)     ;;
-  altai)    rate=177000 ;;
   datastar) ppn=8 ;;
   teragrid) ppn=2 ;;
   babieca)  ppn=2 ;;
@@ -297,7 +294,7 @@ cat << END > batchjob
 #RT_GRQ=ON;\\
 #SPINLOOPTIME=0;\\
 #YIELDLOOPTIME=0;
-#@ class = normal
+#@ class = normalM
 #@ node = $nodes
 #@ tasks_per_node = $ppn
 #@ wall_clock_limit = $wt
