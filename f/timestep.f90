@@ -38,17 +38,18 @@ if ( ifn /= 0 ) then
   f2 = sqrt( sum( t2 * t2, 4 ) )
   if ( svtol > 0. ) then
     where ( f2 >= svtol .and. trup > 1e8 )
-      trup = t - dt * ( .5 + ( svtol - f2 ) / ( sv - f2 ) )
+      trup = t - dt * ( .5 + ( svtol - f2 ) / ( svm - f2 ) )
     end where
     where ( f2 >= svtol )
       tarr = 1e9
     end where
-    where ( f2 < svtol .and. sv >= svtol )
-      tarr = t - dt * ( .5 + ( svtol - f2 ) / ( sv - f2 ) )
+    where ( f2 < svtol .and. svm >= svtol )
+      tarr = t - dt * ( .5 + ( svtol - f2 ) / ( svm - f2 ) )
     end where
   end if
-  sv = f2
-  sl = sl + dt * sv
+  svm = f2
+  f2 = sqrt( sum( t1 * t1, 4 ) )
+  sl = sl + dt * svm
 end if
 
 end subroutine

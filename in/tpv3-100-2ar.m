@@ -20,18 +20,18 @@
   itcheck = -1;
   out = { 'x'      1   1 1 1   -1 -1 -1 };
   out = { 'vm'   100   1 1 1   -1 -1 -1 };
-  out = { 'sv'   100   1 1 0   -1 -1  0 };
+  out = { 'svm'  100   1 1 0   -1 -1  0 };
   out = { 'sl'   100   1 1 0   -1 -1  0 };
   out = { 'trup'  -1   1 1 0   -1 -1  0 };
-  timeseries = { 'sv' -7500.     0. 0. };
-  timeseries = { 'sl' -7500.     0. 0. };
-  timeseries = { 'ts' -7500.     0. 0. };
-  timeseries = { 'sv'     0. -6000. 0. };
-  timeseries = { 'sl'     0. -6000. 0. };
-  timeseries = { 'ts'     0. -6000. 0. };
-  timeseries = { 'sv' -7500. -6000. 0. };
-  timeseries = { 'sl' -7500. -6000. 0. };
-  timeseries = { 'ts' -7500. -6000. 0. };
+  timeseries = { 'svm' -7500.     0. 0. };
+  timeseries = { 'sl'  -7500.     0. 0. };
+  timeseries = { 'ts'  -7500.     0. 0. };
+  timeseries = { 'svm'     0. -6000. 0. };
+  timeseries = { 'sl'      0. -6000. 0. };
+  timeseries = { 'ts'      0. -6000. 0. };
+  timeseries = { 'svm' -7500. -6000. 0. };
+  timeseries = { 'sl'  -7500. -6000. 0. };
+  timeseries = { 'ts'  -7500. -6000. 0. };
   bc1      = [   0   0   0 ];
   n1expand = [  50  50  50 ];
 
@@ -41,12 +41,12 @@
   ihypo    = [   0  -1   0 ];
   bc2      = [   0   3   0 ];
   n2expand = [  50   0  50 ];
-  timeseries = { 'sv'  7500.     0. 0. };
-  timeseries = { 'sl'  7500.     0. 0. };
-  timeseries = { 'ts'  7500.     0. 0. };
-  timeseries = { 'sv'  7500. -6000. 0. };
-  timeseries = { 'sl'  7500. -6000. 0. };
-  timeseries = { 'ts'  7500. -6000. 0. };
+  timeseries = { 'svm'  7500.     0. 0. };
+  timeseries = { 'sl'   7500.     0. 0. };
+  timeseries = { 'ts'   7500.     0. 0. };
+  timeseries = { 'svm'  7500. -6000. 0. };
+  timeseries = { 'sl'   7500. -6000. 0. };
+  timeseries = { 'ts'   7500. -6000. 0. };
   th  =  70e6;
   th  = {  81.6e6 'cube'  -1501. -1501. -1.   1501. 1501. 1. };
 

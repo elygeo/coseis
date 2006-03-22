@@ -124,25 +124,31 @@ doiz0: do iz = 1, nout
   case( 'v'    ); nc = 3
   case( 'u'    ); nc = 3
   case( 'w'    ); nc = 6; cell = .true.
+  case( 'am'   );
+  case( 'vm'   );
+  case( 'um'   );
   case( 'wm'   ); cell = .true.
-  case( 'mu'   ); cell = .true.; ditout(iz) = 0
-  case( 'lam'  ); cell = .true.; ditout(iz) = 0
-  case( 'y'    ); cell = .true.; ditout(iz) = 0
+  case( 'mr'   ); ditout(iz) = 0
+  case( 'mu'   ); ditout(iz) = 0; cell = .true.
+  case( 'lam'  ); ditout(iz) = 0; cell = .true.
+  case( 'y'    ); ditout(iz) = 0; cell = .true.
   case( 't0'   ); fault = .true.; nc = 3; ditout(iz) = 0
-  case( 's'    ); fault = .true.; nc = 3
-  case( 'sr'   ); fault = .true.; nc = 3
+  case( 'sv'   ); fault = .true.; nc = 3
+  case( 'su'   ); fault = .true.; nc = 3
   case( 't'    ); fault = .true.; nc = 3
+  case( 'svm'  ); fault = .true.
+  case( 'sum'  ); fault = .true.
+  case( 'sl'   ); fault = .true.
+  case( 'tn'   ); fault = .true.
+  case( 'ts'   ); fault = .true.
+  case( 'f'    ); fault = .true.
+  case( 'trup' ); fault = .true.
+  case( 'tarr' ); fault = .true.
   case( 'mus'  ); fault = .true.; ditout(iz) = 0
   case( 'mud'  ); fault = .true.; ditout(iz) = 0
   case( 'dc'   ); fault = .true.; ditout(iz) = 0
   case( 'co'   ); fault = .true.; ditout(iz) = 0
-  case( 'sv'   ); fault = .true.
-  case( 'sl'   ); fault = .true.
-  case( 'trup' ); fault = .true.
-  case( 'tarr' ); fault = .true.
-  case( 'tn'   ); fault = .true.
-  case( 'ts'   ); fault = .true.
-  case( 'fr'   ); fault = .true.
+  case default; stop 'output fieldout'
   end select
 
   ! Interval 
@@ -242,8 +248,8 @@ subroutine output( pass )
 character, intent(in) :: pass
 character :: onpass
 real :: dtwall, tarrmax
-real, save :: amax, vmax, umax, wmax, svmax, slmax, tnmax, tsmax
-integer, save, dimension(3) :: amaxi, vmaxi, umaxi, wmaxi, svmaxi, slmaxi(3), tnmaxi, tsmaxi
+real, save :: amax, vmax, umax, wmax, svmax, sumax, slmax, tnmax, tsmax
+integer, save, dimension(3) :: amaxi, vmaxi, umaxi, wmaxi, svmaxi, sumaxi, slmaxi, tnmaxi, tsmaxi
 integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, ic, ir, iz
 logical :: fault, test
 
@@ -279,20 +285,24 @@ case( 'a' )
   call pmaxloc( amax, amaxi, nnoff )
   call pmaxloc( vmax, vmaxi, nnoff )
   if ( faultnormal /= 0 ) then
-    svmaxi = maxloc( sv )
+    svmaxi = maxloc( svm )
+    sumaxi = maxloc( f2 )
     slmaxi = maxloc( sl )
     tnmaxi = maxloc( abs( tn ) )
     tsmaxi = maxloc( ts )
-    svmax = sv(svmaxi(1),svmaxi(2),svmaxi(3))
+    svmax = svm(svmaxi(1),svmaxi(2),svmaxi(3))
+    sumax = f2(sumaxi(1),sumaxi(2),sumaxi(3))
     slmax = sl(slmaxi(1),slmaxi(2),slmaxi(3))
     tnmax = tn(tnmaxi(1),tnmaxi(2),tnmaxi(3))
     tsmax = ts(tsmaxi(1),tsmaxi(2),tsmaxi(3))
     i = abs( faultnormal )
     svmaxi(i) = ihypo(i)
+    sumaxi(i) = ihypo(i)
     slmaxi(i) = ihypo(i)
     tnmaxi(i) = ihypo(i)
     tsmaxi(i) = ihypo(i)
     call pmaxloc( svmax, svmaxi, nnoff )
+    call pmaxloc( sumax, sumaxi, nnoff )
     call pmaxloc( slmax, slmaxi, nnoff )
     call pmaxloc( tnmax, tnmaxi, nnoff )
     call pmaxloc( tsmax, tsmaxi, nnoff )
@@ -318,27 +328,31 @@ case( 'a'    ); nc = 3
 case( 'v'    ); nc = 3
 case( 'u'    ); nc = 3; onpass = 'w'
 case( 'w'    ); nc = 6; onpass = 'w'
+case( 'am'   );
+case( 'vm'   );
+case( 'um'   ); onpass = 'w'
+case( 'wm'   ); onpass = 'w'
 case( 'mr'   );
 case( 'mu'   );
 case( 'lam'  );
 case( 'y'    );
-case( 'um'   ); onpass = 'w'
-case( 'wm'   ); onpass = 'w'
 case( 't0'   ); fault = .true.; nc = 3
-case( 's'    ); fault = .true.; nc = 3
-case( 'sr'   ); fault = .true.; nc = 3
+case( 'sv'   ); fault = .true.; nc = 3
+case( 'su'   ); fault = .true.; nc = 3
 case( 't'    ); fault = .true.; nc = 3
+case( 'svm'  ); fault = .true.
+case( 'sum'  ); fault = .true.
+case( 'sl'   ); fault = .true.
+case( 'tn'   ); fault = .true.
+case( 'ts'   ); fault = .true.
+case( 'f'    ); fault = .true.
+case( 'trup' ); fault = .true.
+case( 'tarr' ); fault = .true.
 case( 'mus'  ); fault = .true.
 case( 'mud'  ); fault = .true.
 case( 'dc'   ); fault = .true.
 case( 'co'   ); fault = .true.
-case( 'sv'   ); fault = .true.
-case( 'sl'   ); fault = .true.
-case( 'trup' ); fault = .true.
-case( 'tarr' ); fault = .true.
-case( 'tn'   ); fault = .true.
-case( 'ts'   ); fault = .true.
-case( 'fr'   ); fault = .true.
+case default; stop 'output fieldout'
 end select
 
 ! Select pass
@@ -385,20 +399,21 @@ do ic = 1, nc
   case( 'lam'  ); call scalario( 'w', str, lam,      ir, i1, i2, i1l, i2l, iz )
   case( 'y'    ); call scalario( 'w', str, y,        ir, i1, i2, i1l, i2l, iz )
   case( 't0'   ); call vectorio( 'w', str, t0, ic,   ir, i1, i2, i1l, i2l, iz )
-  case( 's'    ); call vectorio( 'w', str, t1, ic,   ir, i1, i2, i1l, i2l, iz )
-  case( 'sr'   ); call vectorio( 'w', str, t2, ic,   ir, i1, i2, i1l, i2l, iz )
+  case( 'sv'   ); call vectorio( 'w', str, t2, ic,   ir, i1, i2, i1l, i2l, iz )
+  case( 'su'   ); call vectorio( 'w', str, t1, ic,   ir, i1, i2, i1l, i2l, iz )
   case( 't'    ); call vectorio( 'w', str, t3, ic,   ir, i1, i2, i1l, i2l, iz )
+  case( 'svm'  ); call scalario( 'w', str, svm,      ir, i1, i2, i1l, i2l, iz )
+  case( 'sum'  ); call scalario( 'w', str, f2,       ir, i1, i2, i1l, i2l, iz )
+  case( 'sl'   ); call scalario( 'w', str, sl,       ir, i1, i2, i1l, i2l, iz )
+  case( 'tn'   ); call scalario( 'w', str, tn,       ir, i1, i2, i1l, i2l, iz )
+  case( 'ts'   ); call scalario( 'w', str, ts,       ir, i1, i2, i1l, i2l, iz )
+  case( 'f'    ); call scalario( 'w', str, f1,       ir, i1, i2, i1l, i2l, iz )
+  case( 'trup' ); call scalario( 'w', str, trup,     ir, i1, i2, i1l, i2l, iz )
+  case( 'tarr' ); call scalario( 'w', str, tarr,     ir, i1, i2, i1l, i2l, iz )
   case( 'mus'  ); call scalario( 'w', str, mus,      ir, i1, i2, i1l, i2l, iz )
   case( 'mud'  ); call scalario( 'w', str, mud,      ir, i1, i2, i1l, i2l, iz )
   case( 'dc'   ); call scalario( 'w', str, dc,       ir, i1, i2, i1l, i2l, iz )
   case( 'co'   ); call scalario( 'w', str, co,       ir, i1, i2, i1l, i2l, iz )
-  case( 'sv'   ); call scalario( 'w', str, sv,       ir, i1, i2, i1l, i2l, iz )
-  case( 'sl'   ); call scalario( 'w', str, sl,       ir, i1, i2, i1l, i2l, iz )
-  case( 'trup' ); call scalario( 'w', str, trup,     ir, i1, i2, i1l, i2l, iz )
-  case( 'tarr' ); call scalario( 'w', str, tarr,     ir, i1, i2, i1l, i2l, iz )
-  case( 'tn'   ); call scalario( 'w', str, tn,       ir, i1, i2, i1l, i2l, iz )
-  case( 'ts'   ); call scalario( 'w', str, ts,       ir, i1, i2, i1l, i2l, iz )
-  case( 'f'    ); call scalario( 'w', str, f1,       ir, i1, i2, i1l, i2l, iz )
   case default; stop 'output fieldout'
   end select
 end do
@@ -436,6 +451,7 @@ if ( master ) then
   write( 9, * ) 'umax   =  ', umax,   ';'
   write( 9, * ) 'wmax   =  ', wmax,   ';'
   write( 9, * ) 'svmax  =  ', svmax,  ';'
+  write( 9, * ) 'sumax  =  ', sumax,  ';'
   write( 9, * ) 'slmax  =  ', slmax,  ';'
   write( 9, * ) 'tnmax  =  ', tnmax,  ';'
   write( 9, * ) 'tsmax  =  ', tsmax,  ';'
@@ -444,6 +460,7 @@ if ( master ) then
   write( 9, * ) 'umaxi  = [', umaxi  - nnoff, '];'
   write( 9, * ) 'wmaxi  = [', wmaxi  - nnoff, '];'
   write( 9, * ) 'svmaxi = [', svmaxi - nnoff, '];'
+  write( 9, * ) 'sumaxi = [', sumaxi - nnoff, '];'
   write( 9, * ) 'slmaxi = [', slmaxi - nnoff, '];'
   write( 9, * ) 'tnmaxi = [', tnmaxi - nnoff, '];'
   write( 9, * ) 'tsmaxi = [', tsmaxi - nnoff, '];'

@@ -145,6 +145,7 @@ hh=$(( wt / 3600 ))
 mm=$(( wt % 3600 / 60 ))
 ss=$(( wt % 60 ))
 [ $hh -ge 1 ] && ss=0
+wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
 
 #------------------------------------------------------------------------------#
 # Compile Fortran
@@ -302,7 +303,7 @@ cat << END > batchjob
 #@ node_usage = not_shared
 #@ network.MPI = sn_all, shared, US
 #@ job_type = parallel
-#@ job_name = job.dfm
+#@ job_name = job.sord
 #@ output = out.log
 #@ error = err.log
 #@ notification = always
