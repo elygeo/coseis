@@ -15,7 +15,9 @@ character :: endian
 character(7) :: field
 logical :: fault, test, cell
 
+i = 0
 if ( master ) then
+  i = 1
   open( 9, file='log', position='append' )
   write( 9, * ) 'Output initialize'
   close( 9 )
@@ -27,29 +29,30 @@ end if
 ! Diagnostic
 if ( debug /= 0 ) then
   open(  9, file='diagnostic.m', position='append' )
-  write( 9, * ) 'ifn         =  ', ifn,        ';'
-  write( 9, * ) 'nin         =  ', nin,        ';'
-  write( 9, * ) 'nout        =  ', nout,       ';'
-  write( 9, * ) 'nlock       =  ', nlock,      ';'
-  write( 9, * ) 'noper       =  ', noper,      ';'
-  write( 9, * ) 'twall_rate  =  ', twall_rate, ';'
-  write( 9, * ) 'twall_max   =  ', twall_max,  ';'
-  write( 9, * ) 'ip          =  ', ip,         ';'
-  write( 9, * ) 'ip3         = [', ip3,       '];'
-  write( 9, * ) 'nm          = [', nm,        '];'
-  write( 9, * ) 'nnoff       = [', nnoff,     '];'
+  write( 9, * ) 'ifn         =  ', ifn,         ';'
+  write( 9, * ) 'nin         =  ', nin,         ';'
+  write( 9, * ) 'nout        =  ', nout,        ';'
+  write( 9, * ) 'nlock       =  ', nlock,       ';'
+  write( 9, * ) 'noper       =  ', noper,       ';'
+  write( 9, * ) 'twall_rate  =  ', twall_rate,  ';'
+  write( 9, * ) 'twall_max   =  ', twall_max,   ';'
+  write( 9, * ) 'master      =  ', i,           ';'
+  write( 9, * ) 'ip          =  ', ip,          ';'
+  write( 9, * ) 'ihypo       = [', ihypo,      '];'
+  write( 9, * ) 'ip3         = [', ip3,        '];'
+  write( 9, * ) 'nm          = [', nm,         '];'
+  write( 9, * ) 'nnoff       = [', nnoff,      '];'
   write( 9, * ) 'i1oper      = [', i1oper(1,:), ';', i1oper(2,:), '];'
-  write( 9, * ) 'i1node      = [', i1node,    '];'
-  write( 9, * ) 'i1pml       = [', i1pml,     '];'
-  write( 9, * ) 'i1cell      = [', i1cell,    '];'
+  write( 9, * ) 'i1node      = [', i1node,     '];'
+  write( 9, * ) 'i1cell      = [', i1cell,     '];'
+  write( 9, * ) 'i1pml       = [', i1pml,      '];'
   write( 9, * ) 'i2oper      = [', i2oper(1,:), ';', i2oper(2,:), '];'
-  write( 9, * ) 'i2node      = [', i2node,    '];'
-  write( 9, * ) 'i2pml       = [', i2pml,     '];'
-  write( 9, * ) 'i2cell      = [', i2cell,    '];'
-  write( 9, * ) 'ibc1        = [', ibc1,     '];'
-  write( 9, * ) 'ibc2        = [', ibc2,     '];'
-  write( 9, * ) 'master      =  ', master,     ';'
-  write( 9, * ) 'oper        = ''', oper,    ''';'
+  write( 9, * ) 'i2node      = [', i2node,     '];'
+  write( 9, * ) 'i2cell      = [', i2cell,     '];'
+  write( 9, * ) 'i2pml       = [', i2pml,      '];'
+  write( 9, * ) 'ibc1        = [', ibc1,       '];'
+  write( 9, * ) 'ibc2        = [', ibc2,       '];'
+  write( 9, * ) 'oper        = ''', oper,     ''';'
   do iz = 1, nin
     write( 9,*) fieldin(iz), ' = [', inval(iz), i1in(iz,:), i2in(iz,:), '];'
   end do
@@ -293,7 +296,7 @@ case( 'a' )
     svmax = svm(svmaxi(1),svmaxi(2),svmaxi(3))
     sumax = f2(sumaxi(1),sumaxi(2),sumaxi(3))
     slmax = sl(slmaxi(1),slmaxi(2),slmaxi(3))
-    tnmax = tn(tnmaxi(1),tnmaxi(2),tnmaxi(3))
+    tnmax = abs( tn(tnmaxi(1),tnmaxi(2),tnmaxi(3)) )
     tsmax = ts(tsmaxi(1),tsmaxi(2),tsmaxi(3))
     i = abs( faultnormal )
     svmaxi(i) = ihypo(i)
