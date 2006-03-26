@@ -8,9 +8,11 @@ xi = [  -15 : .1 : 15  ];
 yi = [ -7.5 : .1 : 7.5 ];
 v = 0:0.5:7;
 
+format compact
 figure(1)
 clf
 set( gcf, 'Name', 'Rupture Time' )
+axes( 'Position', [ .1 .2 .8 .7 ] );
 plot( 0, 0, 'p', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'MarkerSize', 11 )
 axis image;
 axis( [ -15 15 -7.5 7.5 ] )
@@ -19,6 +21,7 @@ title( 'Rupture Time' )
 xlabel( 'X (km)' )
 ylabel( 'Y (km)' )
 
+figure(2)
 n = [ length(xi) length(yi) ];
 srcdir
 cd 'out/0'
@@ -30,14 +33,15 @@ cd '..'
 
 for ii = 1:length( dirs )
 
-cd( dirs{ii} )
+model = dirs{ii}
+cd( model )
 [ x, t ] = trupread;
 cd '..'
 i = x(:,:,1) >= -15000 & x(:,:,1) <= 15000 & ...
     x(:,:,2) >= -7500 & x(:,:,2) <= 7500;
 t = reshape( t(i), n );
 
-figure(1)
+set( 0, 'CurrentFigure', 1 );
 [ c, h ] = contour( xi, yi, t', v );
 delete( h );
 i = 1;
@@ -48,25 +52,26 @@ while i < size( c, 2 )
 end
 plot( c(1,:), c(2,:), 'k', 'Linewidth', .2 )
 
-t = ( t0 - t );
+t = ( t - t0 );
 tbar = sum( t(:) ) / prod( n )
 rms = sqrt( sum( t(:).^2 ) / prod( n ) )
-figure
-set( gcf, 'Name', 'Rupture Time Difference' )
+set( 0, 'CurrentFigure', 2 );
+clf
+set( gcf, 'Name', 'Rupture Time Delay' )
 axes( 'Position', [ .1 .2 .8 .7 ] );
 imagesc( [ -15 15 ], [ -7.5 7.5 ], t' )
 axis image;
-title( [ 'Model ' dirs{ii} ' rupture time error (s), RMS = ' num2str(rms) ] )
+title( [ 'Model ' model ' rupture time delay (s), average=' num2str(tbar) ', RMS=' num2str(rms) ] )
 xlabel( 'X (km)' )
 ylabel( 'Y (km)' )
 cmap = [
-  0 0 0 1 1
+  1 1 0 0 0
   1 0 0 0 1
-  1 1 0 0 0 ]';
+  0 0 0 1 1 ]';
 cmap = [
-  0 0 1 1 1
+  1 1 1 0 0
   0 1 1 1 0
-  1 1 1 0 0 ]';
+  0 0 1 1 1 ]';
 h = 2 / ( size( cmap, 1 ) - 1 );
 x1 = -1 : h : 1;
 x2 = -1 : .005 : 1;
@@ -80,7 +85,8 @@ set( gca, ...
   'YTick', [], ...
   'TickLength', [ 0 0 ] )
 
-print( '-depsc2', [ 'trup' dirs{ii} ] )
+print( '-depsc2', [ 'trup' model ] )
+system( [ 'gv trup' model '.eps &' ] );
 
 end
 
@@ -95,6 +101,7 @@ while i < size( c, 2 )
 end
 plot( c(1,:), c(2,:), 'b', 'Linewidth', .2 )
 print( '-depsc2', 'trup' )
+system( 'gv trup.eps &' );
 
 return
 
