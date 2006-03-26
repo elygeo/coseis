@@ -1,6 +1,6 @@
 % Rupture time plot
 
-[ t, x, xylim ] = trupread;
+[ x, t, xylim ] = trupread;
 set( gcf, 'Name', 'Rupture Time' )
 v = 0:0.5:7;
 [ c, h ] = contour( x(:,:,1), x(:,:,2), t, v );
