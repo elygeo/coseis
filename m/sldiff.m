@@ -1,4 +1,4 @@
-% Rupture time plot
+% Final Slip plots
 
 flim = .05;
 colorexp = 1;
@@ -12,13 +12,13 @@ v = 0:0.5:7;
 format compact
 figure(1)
 clf
-set( gcf, 'Name', 'Rupture Time' )
+set( gcf, 'Name', 'Final Slip' )
 axes( 'Position', [ .1 .2 .8 .7 ] );
 plot( 0, 0, 'p', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'MarkerSize', 11 )
 axis image;
 axis( [ -15 15 -7.5 7.5 ] )
 hold on
-title( 'Rupture Time' )
+title( 'Final Slip (m)' )
 xlabel( 'X (km)' )
 ylabel( 'Y (km)' )
 
@@ -26,7 +26,7 @@ figure(2)
 n = [ length(xi) length(yi) ];
 srcdir
 cd 'out/0'
-[ x, t ] = trupread;
+[ x, t ] = sliceread( 'sl' );
 i = x(:,:,1) >= -15000 & x(:,:,1) <= 15000 & ...
     x(:,:,2) >= -7500 & x(:,:,2) <= 7500;
 t0 = reshape( t(i), n );
@@ -36,7 +36,7 @@ for ii = 1:length( dirs )
 
 model = dirs{ii}
 cd( model )
-[ x, t ] = trupread;
+[ x, t ] = sliceread( 'sl' );
 cd '..'
 i = x(:,:,1) >= -15000 & x(:,:,1) <= 15000 & ...
     x(:,:,2) >= -7500 & x(:,:,2) <= 7500;
@@ -58,11 +58,11 @@ tbar = sum( t(:) ) / prod( n )
 rms = sqrt( sum( t(:).^2 ) / prod( n ) )
 set( 0, 'CurrentFigure', 2 );
 clf
-set( gcf, 'Name', 'Rupture Time Delay' )
+set( gcf, 'Name', 'Final slip error' )
 axes( 'Position', [ .1 .2 .8 .7 ] );
 imagesc( [ -15 15 ], [ -7.5 7.5 ], t' )
 axis image;
-title( [ 'Model ' model ' rupture time delay (s), average=' num2str(tbar) ', RMS=' num2str(rms) ] )
+title( [ 'Model ' model ' final slip error (m), average=' num2str(tbar) ', RMS=' num2str(rms) ] )
 xlabel( 'X (km)' )
 ylabel( 'Y (km)' )
 cmap = [
@@ -86,8 +86,8 @@ set( gca, ...
   'YTick', [], ...
   'TickLength', [ 0 0 ] )
 
-print( '-depsc', [ 'trup' model ] )
-system( [ '/usr/bin/ps2pdf -dPDFSETTINGS=/prepress trup' model '.eps &' ] );
+print( '-depsc', [ 'sl' model ] )
+system( [ '/usr/bin/ps2pdf -dPDFSETTINGS=/prepress sl' model '.eps &' ] );
 
 end
 
@@ -101,28 +101,6 @@ while i < size( c, 2 )
   i  = i + n + 1;
 end
 plot( c(1,:), c(2,:), 'b', 'Linewidth', .2 )
-print( '-depsc', 'trup' )
-system( [ '/usr/bin/ps2pdf -dPDFSETTINGS=/prepress trup.eps &' ] );
-
-return
-
-srcdir
-cd 'dalguer'
-n = [ 301 151 ];
-dx = .1;
-dt = .008;
-fid = fopen( 'DFM01paper' );
-t = fscanf( fid,'%g', n )' - 1.5 * dt;
-fclose( fid );
-x1 = dx * ( 0:n(1)-1 );  x1 = x1 - .5 * x1(end);
-x2 = dx * ( 0:n(2)-1 );  x2 = x2 - .5 * x2(end);
-[ c, h ] = contour( x1, x2, t, v );
-delete( h );
-i = 1;
-while i < size( c, 2 )
-  nn = c(2,i);
-  c(:,i) = NaN;
-  i = i + nn + 1;
-end
-plot( c(1,:), c(2,:), 'r', 'Linewidth', .2 )
+print( '-depsc', 'sl' )
+system( '/usr/bin/ps2pdf -dPDFSETTINGS=/prepress sl.eps &' );
 
