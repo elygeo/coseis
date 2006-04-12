@@ -30,6 +30,7 @@ vp2 = 0.
 vs1 = 1e9
 vs2 = 0.
 
+write( 10+ip, * ) ip, 1
 ! Loop over input zones
 
 doiz: do iz = 1, nin
@@ -125,6 +126,7 @@ end select
 
 end do doiz
 
+write( 10+ip, * ) ip, 2
 ! Hypocenter values
 if ( master ) then
   j = ihypo(1)
@@ -135,15 +137,18 @@ if ( master ) then
   vs0  = s2(j,k,l)
 end if
 
+write( 10+ip, * ) ip, 3
 ! Lame parameters
 s2 = mr * s2 * s2
 s1 = mr * ( s1 * s1 ) - 2. * s2
 
+write( 10+ip, * ) ip, 4
 ! Average Lame parameters onto cell centers
 call scalarbc( s1, ibc1, ibc2, nhalo )
 call scalarbc( s2, ibc1, ibc2, nhalo )
 call scalarswaphalo( s1, nhalo )
 call scalarswaphalo( s2, nhalo )
+write( 10+ip, * ) ip, 5
 lam = 0.
 mu = 0.
 i1 = i1cell
@@ -164,6 +169,7 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     + s2(j,k,l+1) + s2(j+1,k+1,l) )
 end forall
 
+write( 10+ip, * ) ip, 6
 ! Cell volume
 s1 = 0.
 call diffnc( s1, 'g', x, x, dx, 1, 1, i1cell, i2cell )
@@ -176,6 +182,7 @@ case( 2 ); s1(:,k,:) = 0.; lam(:,k,:) = 0.; mu(:,k,:) = 0.
 case( 3 ); s1(:,:,l) = 0.; lam(:,:,l) = 0.; mu(:,:,l) = 0.
 end select
 
+write( 10+ip, * ) ip, 7
 ! Node volume
 s2 = 0.
 i1 = i1node
@@ -191,17 +198,20 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     + s1(j,k,l-1) + s1(j-1,k-1,l) )
 end forall
 
+write( 10+ip, * ) ip, 8
 ! Hourglass constant
 y = 12. * ( lam + 2. * mu )
 where ( y /= 0. ) y = dx * mu * ( lam + mu ) / y
 ! y = 12. * dx * dx * ( lam + 2. * mu )
 ! where ( y /= 0. ) y = s1 * mu * ( lam + mu ) / y
 
+write( 10+ip, * ) ip, 9
 ! Divide Lame parameters by cell volume
 where ( s1 /= 0. ) s1 = 1. / s1
 lam = lam * s1
 mu = mu * s1
 
+write( 10+ip, * ) ip, 10
 ! Node mass ratio
 mr = mr * s2
 where ( mr /= 0. ) mr = 1. / mr
@@ -211,6 +221,7 @@ call scalarswaphalo( mr, nhalo )
 s1 = 0.
 s2 = 0.
 
+write( 10+ip, * ) ip, 11
 end subroutine
 
 end module

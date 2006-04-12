@@ -2,13 +2,20 @@
 SORD - Support Operator Rupture Dynamics
 --------------------------------------------------------------------------------
 
-  SORD models spontaneous rupture on a fault within a 3D isotropic
-  viscoelastic solid.  The equations of motion are approximated with second
-  order a Support-Operator method on a logically rectangular mesh.  The fault
-  is modeled with a slip-weakening, frictional, internal boundary condition.
-  There are two versions, one written in Fortran and one in MATLAB.  The
-  MATLAB version is useful for testing small problems.  The Fortran version 
-  is best for large problems and is parallelized with MPI. 
+  The Support Operator Rupture Dynamics code (SORD) models spontaneous rupture 
+  on a fault within a 3D isotropic viscoelastic solid. The equations of motion 
+  are approximated with a second order Support-Operator method on a logically 
+  rectangular mesh. Grid cells are not required to be parallelepipeds, so that 
+  non-rectangular meshes can be supported to model complex regions. However, 
+  for areas in the mesh that are in fact rectangular, the computations are 
+  equivalent to the finite difference method, and computations are streamlined 
+  in that case. The fault itself is modeled using a double node technique, and 
+  the rheology on the fault surface is modeled through a slip-weakening, 
+  frictional, internal boundary condition. Optionally, the fault can be turned 
+  off altogether and replaced by a moment tensor source. Model edge boundaries 
+  can be reflective or absorbing, where absorbing boundaries are handled using 
+  the perfectly matched layers method (PML). SORD is writen in Fortan 95 and 
+  parallelized using MPI for multi-processor execution.
 
 AUTHOR
 
@@ -27,18 +34,17 @@ USAGE
   See 'defaults.m' and 'in/' for examples.
 
   Options:
-    -s  serial Fortran 95 mode (default if np == 1)
-    -p  parallel Fortran/MPI mode (default if np > 1)
-    -m  MATLAB mode
+    -s  serial mode, no MPI (default if np == 1)
+    -p  parallel mode, requires MPI (default if np > 1)
     -i  run interactively (default is to run in the background)
     -c  setup and compile, do not run
     -n  setup only, do not compile or run
     -g  compile with debugging and syntax checking flags
     -G  run in debugger
-    -d  delete output from previous run before starting
+    -d  delete output from previous runs before starting
 
   When porting to a new machine, you may have to modify the sord script for 
-  the proper compiling and batch submission parameters.  For the parallel
+  the proper compiling and batch submission parameters. For the parallel
   version you will need MPI installed.
 
 MACHINE NOTES
@@ -60,7 +66,11 @@ DataStar 8-way p655+ nodes
   Login to dspoe.sdsc.edu to run interactively
   
 SDSC TeraGrid
-  http://www.sdsc.edu/teragrid/guide.html
+  http://www.sdsc.edu/user_services/ia64/
+  http://clumon.sdsc.edu/
+  http://grid.ncsa.uiuc.edu/teragrid/status/
+  compute nodes: 262 dual-processor 1.5Ghz Itanium, 4 GB
+  Intel Fortran
   Useful commands:
     qsub batchjob
     qstat -a
@@ -79,9 +89,8 @@ SDSC TeraGrid
   Login to tg-c127, tg-c128, tg-c129 or  tg-130 to run interactively
 
 Babieca
-  nodes: 2 procs, 1 GB
-  36 batch nodes
-  12 interactive nodes
+  batch nodes: 36 dual-processor, 1 GB
+  interactive nodes: 12 dual-processor, 1 GB
   Useful commands:
     qsub batchjob
     pbsnodes -a
@@ -308,7 +317,7 @@ vrup = 0.9 * vs
 HOURGLASS CORRECTIONS
 
 One of the first works in this direction was presented by Kosloff and Frazier (1978), but in their formulation it is necessary to solve 4 systems of 8 equations for distorted three-dimensional elements, and this is not cost efficient for dynamic analysis.
-Flanagan and Belytschko (1981), Belytschko (1983), and Belytschko, Ong, Liu and Kennedy (1984) presented a systematic and effective way to hourglass control, but in both formulations a parameter, to be defined by the user, is required.  
+Flanagan and Belytschko (1981), Belytschko (1983), and Belytschko, Ong, Liu and Kennedy (1984) presented a systematic and effective way to hourglass control, but in both formulations a parameter, to be defined by the user, is required. 
 Belytschko and Binderman (1993) implemented the hourglass control of the eight-node hexahedral element, where the stabilization parameter is not required, although the stabilization matrix still depends on the Poisson coefficient; the aspect was eliminated by Liu, Hu and Belytschko (1994).
 
 Kosloff, D. and Frazier, G. A.,1978, "Treatment of hourglass patterns in low-order finite element codes", Int. J. Num. Analyt. Meth. Geomech., vol. 2, pp. 57-72.

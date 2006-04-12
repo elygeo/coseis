@@ -79,7 +79,7 @@ xlf95_r)
   oflags='-O -qmaxmem=-1'
   ;;
 ifort)
-  gflags='-g -CB -warn -traceback'
+  gflags='-g -CB -warn -traceback -u'
   oflags='-fast'
   ;;
 pgf90)
@@ -90,6 +90,7 @@ gfortran)
   pfc='mpif90 -O0'
   gflags='-g -W -pedantic -std=f95 -fimplicit-none'
   oflags="-fdefer-pop -fguess-branch-probability -fcprop-registers -floop-optimize -fif-conversion -fif-conversion2 -ftree-ccp -ftree-dce -ftree-dominator-opts -ftree-dse -ftree-ter -ftree-lrs -ftree-sra -ftree-copyrename -ftree-fre -ftree-ch -fmerge-constants -fomit-frame-pointer -fthread-jumps -fcrossjumping -foptimize-sibling-calls -fcse-follow-jumps -fcse-skip-blocks -fgcse -fgcse-lm -fexpensive-optimizations -fstrength-reduce -frerun-cse-after-loop -frerun-loop-opt -fcaller-saves -fforce-mem -fpeephole2 -fschedule-insns -fschedule-insns2 -fsched-interblock -fsched-spec -fregmove -fstrict-aliasing -fdelete-null-pointer-checks -freorder-blocks -freorder-functions -funit-at-a-time -falign-functions -falign-jumps -falign-loops -falign-labels -ftree-pre -finline-functions -funswitch-loops -fgcse-after-reload"
+  oflags="-O3"
   ;;
 f95)
   gflags='-g'
@@ -207,7 +208,7 @@ psord: makefile \$(MPI) \$(COMMON)
 	cd f; \$(PFC) \$(FFLAGS) \$(MPI) \$(COMMON) -o ../psord
 	sh/tarball
 clean:
-	rm -f tmp f/*.o f/*.mod
+	rm -f tmp f/*.o f/*.mod f/*.ipo
 realclean: clean
 	rm -f makefile fsord psord
 .PHONY: clean realclean
@@ -332,6 +333,11 @@ esac
 ;;
 
 teragrid) #--------------------------------------#
+
+if [ $( pwd | grep -v gpfs ) ]; then
+  echo "jobs must be run from /gpfs"
+  exit
+fi
 
 # Batch
 cat << END > batchjob
