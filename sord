@@ -90,6 +90,8 @@ xlf95_r)
 ifort)
   gflags='-g -CB -warn -traceback -u'
   oflags='-fast'
+  oflags='-O3 -static'
+  oflags='-O0'
   ;;
 pgf90)
   gflags='-g'
@@ -364,15 +366,23 @@ END
 chmod u+x batchjob
 
 # Interactive
-[ $run ] || exit
-[ ${HOSTNAME:0:5} = 'tg-c1' ] || exit
+if [ "$run" = serial -a ${HOSTNAME:0:5} != 'tg-c1' ]; then
+  echo "serial interactive jobs must be launched from tg-c127, 128, 129 or 130"
+  exit
+fi
+cat << END > machinefile
+tg-c127:2
+tg-c128:2
+tg-c129:2
+tg-c130:2
+END
 case $mode$run in
   seriali)   ./fsord ;;
   serialg)   gdb ./fsord ;;
   serialb)   nohup ./fsord > errors & ;;
-  paralleli) mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord ;;
+  paralleli) mpirun -v -machinefile machinefile -np $np ./psord ;;
   parallelb)
-    nohup mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord > errors &
+    nohup mpirun -v -machinefile machinefile -np $np ./psord > errors &
     ;;
 esac
 

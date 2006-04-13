@@ -86,7 +86,7 @@ SDSC TeraGrid
     showq
     show_bf
   Always run from a subdirectory of /gpfs/
-  Login to tg-c127, tg-c128, tg-c129 or  tg-130 to run interactively
+  Interactive nodes are tg-c127, 128, 129 and 130
 
 Babieca
   batch nodes: 36 dual-processor, 1 GB
