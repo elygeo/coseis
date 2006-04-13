@@ -33,17 +33,17 @@ mkdir $rundir
 [ -n "$1" ] && ln -sf "$1" 'in.m'
 
 # Ready input file
-sed "
+cat 'defaults.m' 'in.m' | sed "
 s/%.*$//;
-s/;/;\
+s/;/\\
 /g;
-s/[]{}=';/[]//g;
-s/	/ /g;
+" | sed "
+s/[]{}='/	[]/ /g;
 s/  */ /g;
-s/^  //;
-s/  $//;
+s/^ //;
+s/ $//;
 /^$/d
-" 'defaults.m' 'in.m' > "$rundir/in.tmp"
+" > "$rundir/in.tmp"
 
 # Read input
 nout=0
@@ -366,7 +366,7 @@ END
 chmod u+x batchjob
 
 # Interactive
-if [ "$run" = serial -a ${HOSTNAME:0:5} != 'tg-c1' ]; then
+if [ "$run" -a "$mode" = serial -a ${HOSTNAME:0:5} != 'tg-c1' ]; then
   echo "serial interactive jobs must be launched from tg-c127, 128, 129 or 130"
   exit
 fi

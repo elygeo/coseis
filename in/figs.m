@@ -16,21 +16,21 @@
   nn = [ 33 13 14 ];
 
 % shear 3
-  affine = [ 1. 1. 0.; 0. 1. 0.; 0. 0. 1. ] / 1.;
+  affine = [ 1. 1. 0.  0. 1. 0.  0. 0. 1. ] / 1.;
   symmetry = [ 0 1 1 ];
   symmetry = [ 0 0 1 ];
 
 % shear 2
-  affine = [ 1. 0. 1.; 0. 1. 0.; 0. 0. 1. ] / 1.;
+  affine = [ 1. 0. 1.  0. 1. 0.  0. 0. 1. ] / 1.;
   symmetry = [ 0 1 1 ];
   symmetry = [ 0 1 0 ];
 
 % shear 1
-  affine = [ 1. 0. 0.; 0. 1. 1.; 0. 0. 1. ] / 1.;
+  affine = [ 1. 0. 0.  0. 1. 1.  0. 0. 1. ] / 1.;
   symmetry = [ 1 0 1 ];
   symmetry = [ 1 0 0 ];
 
 % no strain
-  affine = [ 1. 0. 0.; 0. 1. 0.; 0. 0. 1. ] / 1.;
+  affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1. ] / 1.;
   symmetry = [ 0 0 0 ];
 
