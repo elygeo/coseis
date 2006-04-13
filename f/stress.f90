@@ -6,7 +6,7 @@ contains
 subroutine stress
 use globals_m
 use diffnc_m
-integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, ic, iid, id, iz
+integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iz
 
 if ( master ) then
   open( 9, file='log', position='append' )

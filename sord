@@ -32,9 +32,18 @@ mkdir $rundir
 # Symlink input file specified on command line
 [ -n "$1" ] && ln -sf "$1" 'in.m'
 
-# Strip MATLAB caracters
-sed "s/%.*$//; s/;/;\
-/g; s/[]={}';[]*//g; /^$/d" 'defaults.m' 'in.m' > tmp
+# Ready input file
+sed "
+s/%.*$//;
+s/;/;\
+/g;
+s/[]{}=';/[]//g;
+s/	/ /g;
+s/  */ /g;
+s/^  //;
+s/  $//;
+/^$/d
+" 'defaults.m' 'in.m' > "$rundir/in.tmp"
 
 # Read input
 nout=0
@@ -49,7 +58,7 @@ case "$key" in
   datadir) echo ln -s "$1" "$rundir/data" ;;
   return) break
 esac
-done < tmp
+done < "$rundir/in.tmp"
 
 # Problem size
 #nn=$(( nn3[0] * nn3[1] * nn3[2] )); # old bash can only handle 32 bits
@@ -237,8 +246,8 @@ END
 chmod u+x viz
 
 #------------------------------------------------------------------------------#
-# Save source, input files & byte order
-cp 'defaults.m' 'in.m' 'sord.tgz' $rundir
+# Save source
+cp 'sord.tgz' $rundir
 cd $rundir
 
 # Write metadata

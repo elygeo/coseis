@@ -11,7 +11,7 @@ subroutine momentsource_init
 use diffnc_m
 use collective_m
 real, allocatable :: cellvol(:)
-integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, ic, nsrc
+integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc
 real :: sumsrcfr
 
 if ( rsource <= 0. ) return

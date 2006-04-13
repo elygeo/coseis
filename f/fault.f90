@@ -234,9 +234,7 @@ end subroutine
 
 !------------------------------------------------------------------------------!
 subroutine fault
-integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, &
-  j3, k3, l3, j4, k4, l4
-logical :: test
+integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
 if ( ifn == 0 ) return
 if ( master ) then

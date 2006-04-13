@@ -3,39 +3,29 @@ module inread_m
 implicit none
 contains
 
-subroutine inread( filename )
+subroutine inread
 use globals_m
-integer :: i, ii, n, err
+integer :: i, err
 logical :: inzone
-character(*), intent(in) :: filename
 character(11) :: key
 character(160) :: line
 
 if ( master ) then
   open( 9, file='log', position='append' )
-  write( 9, * ) 'Reading file: ', filename
+  write( 9, * ) 'Reading input'
   close( 9 )
 end if
 
-open( 9, file=filename, status='old' )
+open( 9, file='in.tmp', status='old' )
 
 doline: do
 
 ! Read line
 read( 9, '(a)', iostat=err ) line
 if ( err /= 0 ) exit doline
+if ( line == '' ) cycle doline
 
-! Strip comments, tabs and MATLAB characters
 str = line
-i = index( str, '%' )
-if ( i > 0 ) str(i:) = ' '
-do
-  i = scan( str, "\t{}=[]/',;" )
-  if ( i == 0 ) exit
-  str(i:i) = ' '
-end do
-if ( str == '' ) cycle doline
-
 ! Read tokens
 call strtok( str, key )
 inzone = .false.
@@ -151,10 +141,10 @@ character(*), intent(inout) :: str
 character(*), intent(out) :: tok
 integer :: i
 tok = ''
-i = verify( str, '\t ' )
+i = verify( str, ' ' )
 if ( i == 0 ) return
 str = str(i:)
-i = scan( str, '\t ' )
+i = scan( str, ' ' )
 if ( i == 0 ) then
   tok = str
   str = ''

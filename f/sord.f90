@@ -17,8 +17,6 @@ use fault_m
 use locknodes_m
 use timestep_m
 
-integer i
-
 ! Initialization
 call initialize( ip, np0, master )
 if ( master ) then
@@ -28,8 +26,7 @@ if ( master ) then
 end if
 
 ! Setup
-call inread( 'defaults.m' )
-call inread( 'in.m' )
+call inread
 call setup
 call arrays
 call readcheckpoint
