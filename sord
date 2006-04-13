@@ -366,11 +366,11 @@ END
 chmod u+x batchjob
 
 # Interactive
-if [ "$run" -a "$mode" = serial -a ${HOSTNAME:0:5} != 'tg-c1' ]; then
-  echo "serial interactive jobs must be launched from tg-c127, 128, 129 or 130"
+if [ "$run" -a ${HOSTNAME:0:5} != 'tg-c1' ]; then
+  echo "interactive jobs must be launched from tg-c127, 128, 129 or 130"
   exit
 fi
-cat << END > machinefile
+[ -f machinefile ] || cat << END > machinefile
 tg-c127:2
 tg-c128:2
 tg-c129:2
@@ -385,6 +385,9 @@ case $mode$run in
     nohup mpirun -v -machinefile machinefile -np $np ./psord > errors &
     ;;
 esac
+tail +$(( nodes + 1 )) machinefile > tmp
+head -$nodes machinefile >> tmp
+mv tmp machinefile
 
 ;;
 

@@ -49,9 +49,15 @@ USAGE
 
 MACHINE NOTES
 
-DataStar 8-way p655+ nodes
-  dspoe.sdsc.edu: 4GB?, 40proc?, 2hr limit
-  dslogin.sdsc.edu: 3672GB, 2176proc, 18hr limit
+SDSC DataStar
+  http://www.sdsc.edu/user_services/datastar/
+  Compute nodes:
+    dslogin.sdsc.edu
+    176 8-way, 1.5GHz, 16GB
+    96  8-way, 1.7GHz, 32GB
+  Interactive nodes:
+    dspoe.sdsc.edu
+    5 8-way, 1.5GHz, 16GB
   Useful commands:
     llsubmit batchjob
     llcancel <jobID>
@@ -65,11 +71,13 @@ DataStar 8-way p655+ nodes
   Login to dslogin.sdsc.edu to submit batch jobs
   Login to dspoe.sdsc.edu to run interactively
   
-SDSC TeraGrid
+SDSC TeraGrid IA-64 Linux Cluster
   http://www.sdsc.edu/user_services/ia64/
   http://clumon.sdsc.edu/
   http://grid.ncsa.uiuc.edu/teragrid/status/
-  compute nodes: 262 dual-processor 1.5Ghz Itanium, 4 GB
+  Compute nodes: 262 dual-processor 1.5Ghz Itanium, 4 GB
+  Interactive nodes: 4 dual-processor 1.5 Ghz Itanium, 4 GB
+    tg-c127, 128, 129 and 130
   Intel Fortran
   Useful commands:
     qsub batchjob
@@ -86,7 +94,6 @@ SDSC TeraGrid
     showq
     show_bf
   Always run from a subdirectory of /gpfs/
-  Interactive nodes are tg-c127, 128, 129 and 130
 
 Babieca
   batch nodes: 36 dual-processor, 1 GB
