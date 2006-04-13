@@ -291,16 +291,13 @@ opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
 cat << END > batchjob
 #!/bin/bash
 #@environment = COPY_ALL;\\
-#AIXTHREAD_COND_DEBUG=OFF;\\
-#AIXTHREAD_MUTEX_DEBUG=OFF;\\
-#AIXTHREAD_RWLOCK_DEBUG=OFF;\\
 #AIXTHREAD_SCOPE=S;\\
 #MP_ADAPTER_USE=dedicated;\\
 #MP_CPU_USE=unique;\\
 #MP_CSS_INTERRUPT=no;\\
 #MP_EAGER_LIMIT=64K;\\
 #MP_EUIDEVELOP=min;\\
-#MP_LABELIO=no;\\
+#MP_LABELIO=yes;\\
 #MP_POLLING_INTERVAL=100000;\\
 #MP_PULSE=0;\\
 #MP_SHARED_MEMORY=yes;\\
@@ -308,14 +305,14 @@ cat << END > batchjob
 #RT_GRQ=ON;\\
 #SPINLOOPTIME=0;\\
 #YIELDLOOPTIME=0;
-#@ class = normalM
+#@ class = normal
 #@ node = $nodes
 #@ tasks_per_node = $ppn
 #@ wall_clock_limit = $wt
 #@ node_usage = not_shared
 #@ network.MPI = sn_all, shared, US
 #@ job_type = parallel
-#@ job_name = job.sord
+#@ job_name = sord_job_$count
 #@ output = out.log
 #@ error = err.log
 #@ notification = always
@@ -334,10 +331,10 @@ if [ "$run" -a $HOSTNAME != ds100 ]; then
 fi
 case $mode$run in
   seriali)   ./fsord ;;
-  serialg)   totalview poe -a ./fsord $opts ;;
+  serialg)   tvpoe ./fsord $opts ;;
   serialb)   nohup ./fsord > errors & ;;
   paralleli) poe ./psord $opts ;;
-  parallelg) totalview poe -a ./psord $opts ;;
+  parallelg) tvpoe ./psord $opts ;;
   parallelb) nohup poe ./psord $opts > errors & ;;
 esac
 
@@ -381,6 +378,7 @@ case $mode$run in
   serialg)   gdb ./fsord ;;
   serialb)   nohup ./fsord > errors & ;;
   paralleli) mpirun -v -machinefile machinefile -np $np ./psord ;;
+  parallelg) mpirun -tv -v -machinefile machinefile -np $np ./psord ;;
   parallelb)
     nohup mpirun -v -machinefile machinefile -np $np ./psord > errors &
     ;;
@@ -397,7 +395,7 @@ babieca) #--------------------------------------#
 cat << END > batchjob
 #!/bin/bash
 #PBS -q workq
-#PBS -N sord_job
+#PBS -N sord_job_$count
 #PBS -l nodes=$nodes:ppn=$ppn:mpi
 #PBS -o out.log
 #PBS -e err.log
