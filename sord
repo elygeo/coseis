@@ -2,15 +2,24 @@
 
 echo -e "\nSORD setup"
 
+cat <<-END
+	asdf
+	asdf
+  END
+exit
+END
+exit
+
 # Get command line options
 mode=guess
 fflags=O
 compile=yes
-run=b
-while getopts spicngGd opt; do
+run=
+while getopts spbicngGd opt; do
 case "$opt" in
   s) mode=serial ;;
   p) mode=parallel ;;
+  b) run=b ;;
   i) run=i ;;
   c) run= ;;
   n) run= ; compile= ;;
@@ -285,57 +294,55 @@ if [ $( pwd | grep -v gpfs ) ]; then
   echo "jobs must be run from /gpfs"
   exit
 fi
-
-# Batch
-opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
-cat << END > batchjob
-#!/bin/bash
-#@environment = COPY_ALL;\\
-#AIXTHREAD_SCOPE=S;\\
-#MP_ADAPTER_USE=dedicated;\\
-#MP_CPU_USE=unique;\\
-#MP_CSS_INTERRUPT=no;\\
-#MP_EAGER_LIMIT=64K;\\
-#MP_EUIDEVELOP=min;\\
-#MP_LABELIO=yes;\\
-#MP_POLLING_INTERVAL=100000;\\
-#MP_PULSE=0;\\
-#MP_SHARED_MEMORY=yes;\\
-#MP_SINGLE_THREAD=no;\\
-#RT_GRQ=ON;\\
-#SPINLOOPTIME=0;\\
-#YIELDLOOPTIME=0;
-#@ class = normal
-#@ node = $nodes
-#@ tasks_per_node = $ppn
-#@ wall_clock_limit = $wt
-#@ node_usage = not_shared
-#@ network.MPI = sn_all, shared, US
-#@ job_type = parallel
-#@ job_name = sord_job_$count
-#@ output = out.log
-#@ error = err.log
-#@ notification = always
-#@ notify_user = $LOGNAME
-#@ initialdir = $rundir
-#@ queue
-cd $rundir
-poe ./psord $opts
-END
-chmod u+x batchjob
-
-# Interactive
 if [ "$run" -a $HOSTNAME != ds100 ]; then
   echo "interactive jobs must be launched from dspoe"
   exit
 fi
+opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
 case $mode$run in
   seriali)   ./fsord ;;
-  serialg)   tvpoe ./fsord $opts ;;
+  serialg)   totalview ./fsord ;;
   serialb)   nohup ./fsord > errors & ;;
   paralleli) poe ./psord $opts ;;
   parallelg) tvpoe ./psord $opts ;;
   parallelb) nohup poe ./psord $opts > errors & ;;
+  parallel)
+	cat <<-END > batchjob
+	#!/bin/bash
+	#@environment = COPY_ALL;\\
+	#AIXTHREAD_SCOPE=S;\\
+	#MP_ADAPTER_USE=dedicated;\\
+	#MP_CPU_USE=unique;\\
+	#MP_CSS_INTERRUPT=no;\\
+	#MP_EAGER_LIMIT=64K;\\
+	#MP_EUIDEVELOP=min;\\
+	#MP_LABELIO=yes;\\
+	#MP_POLLING_INTERVAL=100000;\\
+	#MP_PULSE=0;\\
+	#MP_SHARED_MEMORY=yes;\\
+	#MP_SINGLE_THREAD=no;\\
+	#RT_GRQ=ON;\\
+	#SPINLOOPTIME=0;\\
+	#YIELDLOOPTIME=0;
+	#@ class = normal
+	#@ node = $nodes
+	#@ tasks_per_node = $ppn
+	#@ wall_clock_limit = $wt
+	#@ node_usage = not_shared
+	#@ network.MPI = sn_all, shared, US
+	#@ job_type = parallel
+	#@ job_name = sord_job_$count
+	#@ output = out.log
+	#@ error = err.log
+	#@ notification = always
+	#@ notify_user = $LOGNAME
+	#@ initialdir = $rundir
+	#@ queue
+	cd $rundir
+	poe ./psord $opts
+	END
+	chmod u+x batchjob
+  ;;
 esac
 
 ;;
@@ -346,68 +353,48 @@ if [ $( pwd | grep -v gpfs ) ]; then
   echo "jobs must be run from /gpfs"
   exit
 fi
-
-# Batch
-cat << END > batchjob
-#!/bin/bash
-#PBS -q dque
-#PBS -N sord_job
-#PBS -l nodes=$nodes:ppn=$ppn
-#PBS -l walltime=$wt
-#PBS -o out.log
-#PBS -e err.log
-#PBS -V
-cd $rundir
-mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord
-END
-chmod u+x batchjob
-
-# Interactive
 if [ "$run" -a ${HOSTNAME:0:5} != 'tg-c1' ]; then
   echo "interactive jobs must be launched from tg-c127, 128, 129 or 130"
   exit
 fi
-[ -f machinefile ] || cat << END > machinefile
+[ -f "$srcdir/machinefile" ] || cat << END > "$srcdir/machinefile"
 tg-c127:2
 tg-c128:2
 tg-c129:2
 tg-c130:2
 END
+cp "$srcdir/machinefile" .
+tail +$(( nodes + 1 )) machinefile > "$srcdir/machinefile"
+head -$nodes machinefile >> "$srcdir/machinefile"
 case $mode$run in
   seriali)   ./fsord ;;
-  serialg)   gdb ./fsord ;;
+  serialg)   totalview ./fsord ;;
   serialb)   nohup ./fsord > errors & ;;
-  paralleli) mpirun -v -machinefile machinefile -np $np ./psord ;;
-  parallelg) mpirun -tv -v -machinefile machinefile -np $np ./psord ;;
-  parallelb)
-    nohup mpirun -v -machinefile machinefile -np $np ./psord > errors &
-    ;;
+  paralleli) mpirun -v  -machinefile machinefile -np $np ./psord ;;
+  parallelg) mpirun -tv -machinefile machinefile -np $np ./psord ;;
+  parallelb) nohup mpirun -v -machinefile machinefile -np $np ./psord > errors & ;;
+  parallel)
+	cat <<-END > batchjob
+	#!/bin/bash
+	#PBS -q dque
+	#PBS -N sord_job
+	#PBS -l nodes=$nodes:ppn=$ppn
+	#PBS -l walltime=$wt
+	#PBS -o out.log
+	#PBS -e err.log
+	#PBS -V
+	cd $rundir
+	mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord
+	END
+	chmod u+x batchjob
+  ;;
 esac
-tail +$(( nodes + 1 )) machinefile > tmp
-head -$nodes machinefile >> tmp
-mv tmp machinefile
 
 ;;
 
 babieca) #--------------------------------------#
 
-# Batch
-cat << END > batchjob
-#!/bin/bash
-#PBS -q workq
-#PBS -N sord_job_$count
-#PBS -l nodes=$nodes:ppn=$ppn:mpi
-#PBS -o out.log
-#PBS -e err.log
-#PBS -V
-sleep 2
-cd $rundir
-mpiexec -n $np ./psord
-END
-chmod u+x batchjob
-
-# Interactive
-[ -f machinefile ] || cat << END > machinefile
+[ -f "$srcdir/machinefile" ] || cat << END > "$srcdir/machinefile"
 node37:2
 node38:2
 node39:2
@@ -421,25 +408,38 @@ node46:2
 node47:2
 node48:2
 END
+cp "$srcdir/machinefile" .
+tail +$(( nodes + 1 )) machinefile > "$srcdir/machinefile"
+head -$nodes machinefile >> "$srcdir/machinefile"
 case $mode$run in
   seriali)   mpirun -machinefile machinefile ./fsord ;;
   serialg)   mpirun -machinefile machinefile -dbg=gdb ./fsord ;;
   serialb)   nohup mpirun -machinefile machinefile ./fsord > errors & ;;
   paralleli) mpirun -machinefile machinefile -np $np ./psord ;;
   parallelg) mpirun -machinefile machinefile -np $np -dbg=gdb ./psord ;;
-  parallelb) nohup mpirun -machinefile machinefile -np $np ./psord > errors &;;
+  parallelb) nohup mpirun -machinefile machinefile -np $np ./psord > errors & ;;
+  parallel)
+	cat <<-END > batchjob
+	#!/bin/bash
+	#PBS -q workq
+	#PBS -N sord_job_$count
+	#PBS -l nodes=$nodes:ppn=$ppn:mpi
+	#PBS -o out.log
+	#PBS -e err.log
+	#PBS -V
+	sleep 2
+	cd $rundir
+	mpiexec -n $np ./psord
+	END
+	chmod u+x batchjob
+  ;;
 esac
-tail +$(( nodes + 1 )) machinefile > tmp
-head -$nodes machinefile >> tmp
-mv tmp machinefile
 
 ;;
 
 *) #--------------------------------------#
 
 [ "$mode" = parallel ] && mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon
-
-# Interactive
 case $mode$run in
   seriali)   ./fsord ;;
   serialg)   ddd ./fsord ;;
