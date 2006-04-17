@@ -5,16 +5,13 @@ contains
 
 subroutine inread
 use globals_m
+use tictoc_m
 integer :: i, err
 logical :: inzone
 character(11) :: key
 character(160) :: line
 
-if ( master ) then
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'Reading input'
-  close( 9 )
-end if
+if ( master ) call toc( 'Reading input' )
 
 open( 9, file='in.tmp', status='old' )
 
@@ -99,11 +96,8 @@ case( 'lock' );
   i = nlock
   read( str, * ) ilock(i,:), i1lock(i,:), i2lock(i,:)
 case default
-  if ( master ) then
-    open( 9, file='log', position='append' )
-    write( 9, * ) 'Error: bad input: ', trim( line )
-    close( 9 )
-  end if
+  write( str, * ) 'Error: bad input: ', line
+  if ( master ) call toc( str )
   stop 'bad input'
 end select
 

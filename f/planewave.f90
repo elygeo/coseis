@@ -5,16 +5,13 @@ contains
 
 subroutine bodysource
 use globals_m
+use tictoc_m
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2
 real :: srcft
 
 if ( planenormal == 0. ) return
 
-if ( master )
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'Body source'
-  close( 9 )
-end if
+if ( master ) call toc( 'Body source' )
 
 ! Indices
 i1 = i1plane

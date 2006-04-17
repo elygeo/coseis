@@ -18,27 +18,24 @@ use locknodes_m
 use timestep_m
 
 ! Initialization
+call tic
 call initialize( ip, np0, master )
-if ( master ) then
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'SORD - Support Operator Rupture Dynamics'
-  close( 9 )
-end if
-
-! Setup
+if ( master ) call toc( 'SORD - Support Operator Rupture Dynamics' )
 call inread
 call setup
 call arrays
 call readcheckpoint
 call gridgen
 call material
+call pml
 call momentsource_init
 call fault_init
 call output_init
+if ( master ) call toc( 'Finished initialization' )
 
 ! Main loop
 do while ( it <= nt )
-  call pml
+  call tic
   call stress
   call momentsource
   call output( 'w' ) 
@@ -48,14 +45,11 @@ do while ( it <= nt )
   call output( 'a' )
   call writecheckpoint
   call timestep
+  if ( master ) call toc( 'Finished step', it - 1 )
 end do
 
 ! Finish up
-if ( master ) then
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'Finished'
-  close( 9 )
-end if
+if ( master ) call toc( 'Finished run' )
 call finalize
 
 end program

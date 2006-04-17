@@ -6,13 +6,10 @@ contains
 subroutine stress
 use globals_m
 use diffnc_m
+use tictoc_m
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iz
 
-if ( master ) then
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'Stress calculation'
-  close( 9 )
-end if
+if ( master ) call toc( 'Stress' )
 
 ! Modified displacement
 w1 = u + dt * v * viscosity(1)

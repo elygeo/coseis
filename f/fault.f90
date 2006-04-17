@@ -3,6 +3,7 @@ module fault_m
 use globals_m
 use collectiveio_m
 use bc_m
+use tictoc_m
 implicit none
 contains
 
@@ -14,11 +15,7 @@ real :: mus0, mud0, dc0, lc, tn0, ts0, ess, rctest, x1(3), x2(3), rr
 integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
 
 if ( ifn == 0 ) return
-if ( master ) then
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'Fault initialization'
-  close( 9 )
-end if
+if ( master ) call toc( 'Fault initialization' )
 
 ! Test if fault plane exists on this processor
 i = ihypo(ifn)
@@ -237,11 +234,7 @@ subroutine fault
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
 if ( ifn == 0 ) return
-if ( master ) then
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'Fault'
-  close( 9 )
-end if
+if ( master ) call toc( 'Fault' )
 
 ! Indices
 i1 = 1

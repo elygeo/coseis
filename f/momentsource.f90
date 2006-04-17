@@ -1,6 +1,7 @@
 ! Moment source added to stress
 module momentsource_m
 use globals_m
+use tictoc_m
 implicit none
 real, private, allocatable :: srcfr(:)
 integer, private, allocatable :: jj(:), kk(:), ll(:)
@@ -15,11 +16,7 @@ integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc
 real :: sumsrcfr
 
 if ( rsource <= 0. ) return
-if ( master ) then
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'Moment source initialize'
-  close( 9 )
-end if
+if ( master ) call toc( 'Moment source initialize' )
 
 ! Indices
 i1 = i1cell
@@ -91,11 +88,7 @@ integer :: i, j, k, l, ic, nsrc
 real :: srcft
 
 if ( rsource <= 0. ) return
-if ( master ) then
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'Moment source'
-  close( 9 )
-end if
+if ( master ) call toc( 'Moment source' )
 
 ! Source time function
 select case( tfunc )

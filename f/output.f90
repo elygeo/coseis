@@ -2,13 +2,13 @@
 module output_m
 use globals_m
 use collectiveio_m
-implicit none
-integer, private :: twall_rate, twall_max, twall1, twall2
+use tictoc_m
 contains
 
 ! Ouput initialize
 subroutine output_init
 use zone_m
+implicit none
 real :: courant, rout
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz
 character :: endian
@@ -18,12 +18,9 @@ logical :: fault, test, cell
 i = 0
 if ( master ) then
   i = 1
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'Output initialize'
-  close( 9 )
+  call toc( 'Output initialize' )
   inquire( file='meta.m', exist=test )
   if ( test .and. it == 1 ) stop 'error: previous output found'
-  call system_clock( count_rate=twall_rate, count_max=twall_max )
 end if
 
 ! Diagnostic
@@ -34,8 +31,6 @@ if ( debug /= 0 ) then
   write( 9, * ) 'nout        =  ', nout,        ';'
   write( 9, * ) 'nlock       =  ', nlock,       ';'
   write( 9, * ) 'noper       =  ', noper,       ';'
-  write( 9, * ) 'twall_rate  =  ', twall_rate,  ';'
-  write( 9, * ) 'twall_max   =  ', twall_max,   ';'
   write( 9, * ) 'master      =  ', i,           ';'
   write( 9, * ) 'ip          =  ', ip,          ';'
   write( 9, * ) 'ihypo       = [', ihypo,      '];'
@@ -241,26 +236,22 @@ end do doiz0
 ! Wall time
 if ( master ) then
   close( 9 )
-  call system_clock( twall2 )
 end if
 
 end subroutine
 
 !------------------------------------------------------------------------------!
 subroutine output( pass )
+implicit none
 character, intent(in) :: pass
 character :: onpass
-real :: dtwall, tarrmax
+real :: tarrmax
 real, save :: amax, vmax, umax, wmax, svmax, sumax, slmax, tnmax, tsmax
 integer, save, dimension(3) :: amaxi, vmaxi, umaxi, wmaxi, svmaxi, sumaxi, slmaxi, tnmaxi, tsmaxi
 integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, ic, ir, iz
 logical :: fault, test
 
-if ( master ) then
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'Output pass: ', pass
-  close( 9 )
-end if
+if ( master ) call toc( 'Output' )
 
 ! Magnitudes
 select case( pass )
@@ -273,11 +264,7 @@ case( 'w' )
   wmax = s2(wmaxi(1),wmaxi(2),wmaxi(3))
   call pmaxloc( umax, umaxi, nnoff )
   call pmaxloc( wmax, wmaxi, nnoff )
-  if ( master .and. umax > dx / 10. ) then
-    open( 9, file='log', position='append' )
-    write( 9, * ) 'warning: u !<< dx'
-    close( 9 )
-  end if
+  if ( master .and. umax > dx / 10. ) call toc( 'warning: u !<< dx' )
 case( 'a' )
   s1 = sqrt( sum( w1 * w1, 4 ) )
   s2 = sqrt( sum( v * v, 4 ) )
@@ -435,11 +422,6 @@ end if
 
 ! Metadata
 if ( master ) then
-  twall1 = twall2
-  call system_clock( twall2 )
-  dtwall = real( twall2 - twall1 ) / real( twall_rate )
-  if ( dtwall < 0. ) &
-    dtwall = real( twall2 - twall1 + twall_max ) / real( twall_rate )
   open(  9, file='currentstep.m', status='replace' )
   write( 9, * ) 'it =  ', it, ';'
   close( 9 )
@@ -448,7 +430,6 @@ if ( master ) then
   write( 9, * ) 'it     =  ', it,     ';'
   write( 9, * ) 't      =  ', t,      ';'
   write( 9, * ) 'dt     =  ', dt,     ';'
-  write( 9, * ) 'dtwall =  ', dtwall, ';'
   write( 9, * ) 'amax   =  ', amax,   ';'
   write( 9, * ) 'vmax   =  ', vmax,   ';'
   write( 9, * ) 'umax   =  ', umax,   ';'

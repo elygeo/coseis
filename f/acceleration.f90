@@ -10,13 +10,10 @@ use hourglassnc_m
 use hourglasscn_m
 use collective_m
 use bc_m
+use tictoc_m
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iz, iq
 
-if ( master ) then
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'Acceleration calculation'
-  close( 9 )
-end if
+if ( master ) call toc( 'Acceleration' )
 
 s1 = 0.
 

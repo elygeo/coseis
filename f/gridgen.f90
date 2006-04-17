@@ -8,16 +8,13 @@ use globals_m
 use optimize_m
 use collectiveio_m
 use zone_m
+use tictoc_m
 integer :: i1(3), i2(3), i1l(3), i2l(3), n(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, up(1)
 real :: x1, x2, m(9)
 logical :: expand
 
-if ( master ) then
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'Grid generation'
-  close( 9 )
-end if
+if ( master ) call toc( 'Grid generation' )
 
 ! Single node indexing
 idoublenode = 0

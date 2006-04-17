@@ -2,14 +2,6 @@
 
 echo -e "\nSORD setup"
 
-cat <<-END
-	asdf
-	asdf
-  END
-exit
-END
-exit
-
 # Get command line options
 mode=guess
 fflags=O
@@ -92,25 +84,24 @@ case $fc in
 xlf95_r)
   fc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
   pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
-  gflags='-g -C -qflttrap -qsigtrap -qlanglvl=95pure'
+  gflags='-p -g -C -qflttrap -qsigtrap -qlanglvl=95pure'
   oflags='-O5'
   oflags='-O -qmaxmem=-1'
   ;;
 ifort)
-  gflags='-g -CB -warn -traceback -u'
+  gflags='-O0 -p -g -CB -warn -traceback -u'
   oflags='-fast'
   oflags='-O3 -static'
-  oflags='-O0'
   ;;
 pgf90)
-  gflags='-g'
+  gflags='-p -g'
   oflags='-fastsse -Mipa=fast'
   ;;
 gfortran)
   pfc='mpif90 -O0'
-  gflags='-g -W -pedantic -std=f95 -fimplicit-none'
-  oflags="-fdefer-pop -fguess-branch-probability -fcprop-registers -floop-optimize -fif-conversion -fif-conversion2 -ftree-ccp -ftree-dce -ftree-dominator-opts -ftree-dse -ftree-ter -ftree-lrs -ftree-sra -ftree-copyrename -ftree-fre -ftree-ch -fmerge-constants -fomit-frame-pointer -fthread-jumps -fcrossjumping -foptimize-sibling-calls -fcse-follow-jumps -fcse-skip-blocks -fgcse -fgcse-lm -fexpensive-optimizations -fstrength-reduce -frerun-cse-after-loop -frerun-loop-opt -fcaller-saves -fforce-mem -fpeephole2 -fschedule-insns -fschedule-insns2 -fsched-interblock -fsched-spec -fregmove -fstrict-aliasing -fdelete-null-pointer-checks -freorder-blocks -freorder-functions -funit-at-a-time -falign-functions -falign-jumps -falign-loops -falign-labels -ftree-pre -finline-functions -funswitch-loops -fgcse-after-reload"
-  oflags="-O3"
+  gflags='-p -g -W -pedantic -std=f95 -fimplicit-none'
+  oflags='-fdefer-pop -fguess-branch-probability -fcprop-registers -floop-optimize -fif-conversion -fif-conversion2 -ftree-ccp -ftree-dce -ftree-dominator-opts -ftree-dse -ftree-ter -ftree-lrs -ftree-sra -ftree-copyrename -ftree-fre -ftree-ch -fmerge-constants -fomit-frame-pointer -fthread-jumps -fcrossjumping -foptimize-sibling-calls -fcse-follow-jumps -fcse-skip-blocks -fgcse -fgcse-lm -fexpensive-optimizations -fstrength-reduce -frerun-cse-after-loop -frerun-loop-opt -fcaller-saves -fforce-mem -fpeephole2 -fschedule-insns -fschedule-insns2 -fsched-interblock -fsched-spec -fregmove -fstrict-aliasing -fdelete-null-pointer-checks -freorder-blocks -freorder-functions -funit-at-a-time -falign-functions -falign-jumps -falign-loops -falign-labels -ftree-pre -finline-functions -funswitch-loops -fgcse-after-reload'
+  oflags='-O3'
   ;;
 f95)
   gflags='-g'
@@ -174,6 +165,7 @@ wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
 # Source files
 common="\\
   globals.f90 \\
+  tictoc.f90 \\
   diffcn.f90 \\
   diffnc.f90 \\
   hourglasscn.f90 \\
@@ -363,6 +355,9 @@ tg-c128:2
 tg-c129:2
 tg-c130:2
 END
+#export PAL_LICENSEFILE=/usr/local/apps/vampir/etc/license.dat
+#export PAL_ROOT=/usr/local/apps/vampir
+#export VT_ROOT=/usr/local/apps/vampirtrace
 cp "$srcdir/machinefile" .
 tail +$(( nodes + 1 )) machinefile > "$srcdir/machinefile"
 head -$nodes machinefile >> "$srcdir/machinefile"
@@ -370,21 +365,21 @@ case $mode$run in
   seriali)   ./fsord ;;
   serialg)   totalview ./fsord ;;
   serialb)   nohup ./fsord > errors & ;;
-  paralleli) mpirun -v  -machinefile machinefile -np $np ./psord ;;
+  paralleli) mpirun -machinefile machinefile -np $np ./psord ;;
   parallelg) mpirun -tv -machinefile machinefile -np $np ./psord ;;
-  parallelb) nohup mpirun -v -machinefile machinefile -np $np ./psord > errors & ;;
+  parallelb) nohup mpirun -machinefile machinefile -np $np ./psord > errors & ;;
   parallel)
 	cat <<-END > batchjob
 	#!/bin/bash
 	#PBS -q dque
-	#PBS -N sord_job
+	#PBS -N sord_job_$count
 	#PBS -l nodes=$nodes:ppn=$ppn
 	#PBS -l walltime=$wt
 	#PBS -o out.log
 	#PBS -e err.log
 	#PBS -V
 	cd $rundir
-	mpirun -v -machinefile \$PBS_NODEFILE -np $np ./psord
+	mpirun -machinefile \$PBS_NODEFILE -np $np ./psord
 	END
 	chmod u+x batchjob
   ;;

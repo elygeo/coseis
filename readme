@@ -36,10 +36,11 @@ USAGE
   Options:
     -s  serial mode, no MPI (default if np == 1)
     -p  parallel mode, requires MPI (default if np > 1)
-    -i  run interactively (default is to run in the background)
-    -c  setup and compile, do not run
-    -n  setup only, do not compile or run
+    -c  compile only, do not run (default)
+    -n  check only, do not compile or run
     -g  compile with debugging and syntax checking flags
+    -i  run interactively
+    -b  run in the background
     -G  run in debugger
     -d  delete output from previous runs before starting
 

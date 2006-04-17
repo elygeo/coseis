@@ -9,15 +9,12 @@ use collectiveio_m
 use diffnc_m
 use bc_m
 use zone_m
+use tictoc_m
 real :: x1(3), x2(3)
 integer :: i1(3), i2(3), i1l(3), i2l(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, iz, idoublenode
 
-if ( master ) then
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'Material model'
-  close( 9 )
-end if
+if ( master ) call toc( 'Material model' )
 
 ! Input
 mr = 0.

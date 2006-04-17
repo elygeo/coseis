@@ -5,13 +5,10 @@ contains
 
 subroutine arrays
 use globals_m
+use tictoc_m
 integer :: i1(3), i2(3), j, k, l, j1, k1, l1, j2, k2, l2
 
-if ( master ) then
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'Allocate arrays'
-  close( 9 )
-end if
+if ( master ) call toc( 'Allocate arrays' )
 
 i2 = nm
 j = i2(1)

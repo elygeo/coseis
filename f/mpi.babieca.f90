@@ -33,9 +33,7 @@ integer :: e
 logical :: period(3) = .false.
 call mpi_cart_create( mpi_comm_world, 3, np, period, .true., c, e )
 if ( c == mpi_comm_null ) then
-  open( 9, file='log', position='append' )
-  write( 9, * ) 'Unused processor:', ip
-  close( 9 )
+  call toc( 'Unused processor:', ip )
   call mpi_finalize( e )
   stop
 end if
