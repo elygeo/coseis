@@ -91,13 +91,11 @@ xlf95_r)
 ifort)
   gflags='-O0 -p -g -CB -warn -traceback -u'
   oflags='-fast'
-  oflags='-g -p'
-  oflags='-O3 -static'
+  oflags='-O3'
   ;;
 pgf90)
   gflags='-g -Mprof=func'
   oflags='-fastsse -Mipa=fast'
-  oflags='-g -Mprof=func -fastsse'
   ;;
 gfortran)
   pfc='mpif90 -O0'
@@ -181,9 +179,6 @@ serial="\\
 mpi="\\
   mpi.f90 \\
   mpiio.f90"
-mpi="\\
-  mpi.babieca.f90 \\
-  mpiio.babieca.f90"
 common="\\
   inread.f90 \\
   setup.f90 \\
@@ -303,7 +298,8 @@ case $mode$run in
   parallelg) tvpoe ./psord $opts ;;
   parallelb) nohup poe ./psord $opts > errors & ;;
   parallel)
-	echo "To submit job: llsubmit r$count/batchjob"
+	echo "To submit job:"
+	echo "cd r$count; llsubmit batchjob"
 	cat <<-END > batchjob
 	#!/bin/bash
 	#@environment = COPY_ALL;\\
@@ -374,7 +370,8 @@ case $mode$run in
   parallelg) mpirun -tv -machinefile machinefile -np $np ./psord ;;
   parallelb) nohup mpirun -machinefile machinefile -np $np ./psord > errors & ;;
   parallel)
-	echo "To submit job: qsub r$count/batchjob"
+	echo "To submit job:"
+	echo "cd r$count; qsub batchjob"
 	cat <<-END > batchjob
 	#!/bin/bash
 	#PBS -q dque
@@ -420,7 +417,8 @@ case $mode$run in
   parallelg) mpirun -machinefile machinefile -np $np -dbg=gdb ./psord ;;
   parallelb) nohup mpirun -machinefile machinefile -np $np ./psord > errors & ;;
   parallel)
-	echo "To submit job: qsub r$count/batchjob"
+	echo "To submit job:"
+	echo "cd r$count; qsub batchjob"
 	cat <<-END > batchjob
 	#!/bin/bash
 	#PBS -q workq

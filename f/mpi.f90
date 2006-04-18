@@ -164,7 +164,7 @@ if ( ng(i) > 1 ) then
   call mpi_type_create_subarray( 3, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f, 1, tsend, right, 0, f, 1, trecv, left, 0, c, mpi_status_ignore, e )
+  call mpi_sendrecv( f(1,1,1), 1, tsend, right, 0, f(1,1,1), 1, trecv, left, 0, c, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
   isend(i) = nhalo
@@ -173,7 +173,7 @@ if ( ng(i) > 1 ) then
   call mpi_type_create_subarray( 3, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f, 1, tsend, left, 1, f, 1, trecv, right, 1, c, mpi_status_ignore, e )
+  call mpi_sendrecv( f(1,1,1), 1, tsend, left, 1, f(1,1,1), 1, trecv, right, 1, c, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
 end if
@@ -198,7 +198,7 @@ if ( ng(i) > 1 ) then
   call mpi_type_create_subarray( 4, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f, 1, tsend, right, 0, f, 1, trecv, left, 0, c, mpi_status_ignore, e )
+  call mpi_sendrecv( f(1,1,1,1), 1, tsend, right, 0, f(1,1,1,1), 1, trecv, left, 0, c, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
   isend(i) = nhalo
@@ -207,7 +207,7 @@ if ( ng(i) > 1 ) then
   call mpi_type_create_subarray( 4, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f, 1, tsend, left, 1, f, 1, trecv, right, 1, c, mpi_status_ignore, e )
+  call mpi_sendrecv( f(1,1,1,1), 1, tsend, left, 1, f(1,1,1,1), 1, trecv, right, 1, c, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
 end if
