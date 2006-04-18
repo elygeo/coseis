@@ -27,6 +27,7 @@ end subroutine
 
 ! Processor rank
 subroutine rank( np, ipout, ip3 )
+use tictoc_m
 integer, intent(in) :: np(3)
 integer, intent(out) :: ipout, ip3(3)
 integer :: e

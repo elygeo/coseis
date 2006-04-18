@@ -97,11 +97,13 @@ SDSU CSRC Babieca Cluster
     12, 2 x 2.4GHz Intel Xeon, 1 GB
   batch nodes:
     36, 2 x 2.4GHz Intel Xeon, 1 GB
+  Portland Group compilers http://moocow.sdsu.edu/csrc/pgi/
   Useful commands:
     qsub batchjob
     pbsnodes -a
     qstat
     qdel
+
 
 
 COORDINATE SYSTEM

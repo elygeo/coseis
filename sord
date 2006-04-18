@@ -91,11 +91,13 @@ xlf95_r)
 ifort)
   gflags='-O0 -p -g -CB -warn -traceback -u'
   oflags='-fast'
+  oflags='-g -p'
   oflags='-O3 -static'
   ;;
 pgf90)
-  gflags='-p -g'
+  gflags='-g -Mprof=func'
   oflags='-fastsse -Mipa=fast'
+  oflags='-g -Mprof=func -fastsse'
   ;;
 gfortran)
   pfc='mpif90 -O0'
@@ -163,9 +165,7 @@ wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
 # Compile Fortran
 
 # Source files
-common="\\
-  globals.f90 \\
-  tictoc.f90 \\
+base="\\
   diffcn.f90 \\
   diffnc.f90 \\
   hourglasscn.f90 \\
@@ -173,22 +173,8 @@ common="\\
   surfnormals.f90 \\
   bc.f90 \\
   zone.f90 \\
-  inread.f90 \\
-  setup.f90 \\
-  arrays.f90 \\
-  optimize.f90 \\
-  gridgen.f90 \\
-  material.f90 \\
-  momentsource.f90 \\
-  fault.f90 \\
-  checkpoint.f90 \\
-  output.f90 \\
-  pml.f90 \\
-  stress.f90 \\
-  acceleration.f90 \\
-  locknodes.f90 \\
-  timestep.f90 \\
-  sord.f90"
+  tictoc.f90 \\
+  globals.f90"
 serial="\\
   serial.f90 \\
   serialio.f90"
@@ -198,6 +184,23 @@ mpi="\\
 mpi="\\
   mpi.babieca.f90 \\
   mpiio.babieca.f90"
+common="\\
+  inread.f90 \\
+  setup.f90 \\
+  arrays.f90 \\
+  optimize.f90 \\
+  gridgen.f90 \\
+  material.f90 \\
+  momentsource.f90 \\
+  fault.f90 \\
+  checkpoint.f90 \\
+  pml.f90 \\
+  output.f90 \\
+  stress.f90 \\
+  acceleration.f90 \\
+  locknodes.f90 \\
+  timestep.f90 \\
+  sord.f90"
 
 case $fflags in
   O) fflags=$oflags ;;
@@ -209,15 +212,16 @@ cat << END > tmp
 FC = $fc
 PFC = $pfc
 FFLAGS = $fflags
-COMMON = $common
+BASE = $base
 SERIAL = $serial
 MPI = $mpi
+COMMON = $common
 VPATH = f
-fsord: makefile \$(SERIAL) \$(COMMON)
-	cd f; \$(FC) \$(FFLAGS) \$(SERIAL) \$(COMMON) -o ../fsord
+fsord: makefile \$(BASE) \$(SERIAL) \$(COMMON)
+	cd f; \$(FC) \$(FFLAGS) \$(BASE) \$(SERIAL) \$(COMMON) -o ../fsord
 	sh/tarball
-psord: makefile \$(MPI) \$(COMMON)
-	cd f; \$(PFC) \$(FFLAGS) \$(MPI) \$(COMMON) -o ../psord
+psord: makefile \$(BASE) \$(MPI) \$(COMMON)
+	cd f; \$(PFC) \$(FFLAGS) \$(BASE) \$(MPI) \$(COMMON) -o ../psord
 	sh/tarball
 clean:
 	rm -f tmp f/*.o f/*.mod f/*.ipo
@@ -299,6 +303,7 @@ case $mode$run in
   parallelg) tvpoe ./psord $opts ;;
   parallelb) nohup poe ./psord $opts > errors & ;;
   parallel)
+	echo "To submit job: llsubmit r$count/batchjob"
 	cat <<-END > batchjob
 	#!/bin/bash
 	#@environment = COPY_ALL;\\
@@ -369,6 +374,7 @@ case $mode$run in
   parallelg) mpirun -tv -machinefile machinefile -np $np ./psord ;;
   parallelb) nohup mpirun -machinefile machinefile -np $np ./psord > errors & ;;
   parallel)
+	echo "To submit job: qsub r$count/batchjob"
 	cat <<-END > batchjob
 	#!/bin/bash
 	#PBS -q dque
@@ -414,6 +420,7 @@ case $mode$run in
   parallelg) mpirun -machinefile machinefile -np $np -dbg=gdb ./psord ;;
   parallelb) nohup mpirun -machinefile machinefile -np $np ./psord > errors & ;;
   parallel)
+	echo "To submit job: qsub r$count/batchjob"
 	cat <<-END > batchjob
 	#!/bin/bash
 	#PBS -q workq
@@ -449,6 +456,7 @@ esac
 esac #--------------------------------------#
 
 if [ "$run" = b ]; then
+  echo "Running in background, to cancel: r$count/cancel.sh"
   echo "#!/bin/bash" > cancel.sh
   echo "kill $!" >> cancel.sh
   chmod u+x cancel.sh
