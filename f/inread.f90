@@ -31,9 +31,9 @@ inzone = .false.
 select case( key )
 case( 'datadir' )
 case( 'return' );      exit doline
-case( 'grid' );        grid = key
-case( 'rfunc' );       rfunc = key
-case( 'tfunc' );       tfunc = key
+case( 'grid' );        grid = str
+case( 'rfunc' );       rfunc = str
+case( 'tfunc' );       tfunc = str
 case( 'affine' );      read( str, * ) affine
 case( 'gridnoise' );   read( str, * ) gridnoise
 case( 'symmetry' );    read( str, * ) symmetry

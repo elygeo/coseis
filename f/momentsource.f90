@@ -48,6 +48,7 @@ nsrc = count( s2 <= rsource )
 allocate( srcfr(nsrc), cellvol(nsrc), jj(nsrc), kk(nsrc), ll(nsrc) )
 
 ! Spatial weighting
+print *, rfunc
 select case( rfunc )
 case( 'box'  ); srcfr = 1.
 case( 'tent' ); srcfr = pack( s2, s2 <= rsource )
