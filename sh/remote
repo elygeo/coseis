@@ -13,7 +13,7 @@ echo -e "\n$account"
 ssh-add -L > /dev/null || ssh-add
 
 files="
-  README
+  readme
   sord
   defaults.m
   in.m

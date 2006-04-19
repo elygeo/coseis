@@ -96,9 +96,8 @@ case( 'lock' );
   i = nlock
   read( str, * ) ilock(i,:), i1lock(i,:), i2lock(i,:)
 case default
-  write( str, * ) 'Error: bad input: ', line
-  if ( master ) call toc( str )
-  stop 'bad input'
+  if ( master ) call toc( 'bad input: ' // line )
+  stop
 end select
 
 ! Input zone
@@ -119,7 +118,9 @@ if ( inzone ) then
     case( '' )
     case( 'zone' ); read( str, * ) i1in(i,:), i2in(i,:)
     case( 'cube' ); read( str, * ) x1in(i,:), x2in(i,:); intype(i) = 'c'
-    case default; stop 'bad input'
+    case default
+      if ( master ) call toc( 'bad input: ' // line )
+      stop
     end select
   end if
 end if
@@ -144,6 +145,9 @@ if ( i == 0 ) then
   str = ''
 else
   tok = str(:i-1)
+  str = str(i+1:)
+  i = verify( str, ' ' )
+  if ( i == 0 ) return
   str = str(i:)
 end if
 end subroutine

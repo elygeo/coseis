@@ -1,15 +1,25 @@
 #!/bin/bash -e
 
-version=sord-$( date +%Y-%m-%d-%H-%M-%S )
+version=$( date +%Y-%m-%d-%H-%M-%S )
+date=$( date )
 
 echo $version
-echo $version > VERSION
+
+cat << END > version.m
+version = '$version';
+date    = '$date';
+host    = '$HOSTNAME';
+dir     = '$( /bin/pwd )';
+os      = '$( uname -a )';
+login   = '$LOGNAME';
+name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )';
+END
 
 ln -s . $version
 
 files="
-  $version/VERSION
-  $version/README
+  $version/version.m
+  $version/readme
   $version/sord
   $version/defaults.m
   $version/in.m
@@ -19,13 +29,13 @@ files="
   $version/m
 "
 
-rm -f f/*.o f/*.mod
+rm -f f/*.o f/*.mod f/*.ipo
 
 tar cf - $files | gzip > sord.tgz
 
 rm $version
 
 if [ "x$1" = "x-s" ]; then
-  cp sord.tgz save/$version.tgz
+  cp sord.tgz save/sord-$version.tgz
 fi
 
