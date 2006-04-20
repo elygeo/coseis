@@ -233,7 +233,15 @@ end subroutine
 subroutine fault
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
-if ( ifn == 0 ) return
+if ( ifn == 0 ) then
+  i = abs( faultnormal )
+  if ( i /= 0 ) then
+    if ( ihypo(i) == 0     .and. bc1(i) == 9 ) call vectorrecv1( w1, i )
+    if ( ihypo(i) == nm(i) .and. bc2(i) == 9 ) call vectorrecv2( w1, i )
+  end if
+  return
+end if
+
 if ( master ) call toc( 'Fault' )
 
 ! Indices
@@ -294,6 +302,9 @@ do i = 1, 3
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f1 * mr(j3:j4,k3:k4,l3:l4)
 end do
 call vectorbc( w1, ibc1, ibc2, nhalo )
+i = ifn
+if ( ihypo(i) == i1node(i) .and. bc1(i) == 9 ) call vectorsend1( w1, i, nhalo )
+if ( ihypo(i) == i2node(i) .and. bc2(i) == 9 ) call vectorsend2( w1, i, nhalo )
 
 ! Save for output
 ts = ts * f2

@@ -52,13 +52,13 @@ MACHINE NOTES
 
 SDSC DataStar IBM
   http://www.sdsc.edu/user_services/datastar/
-  Interactive nodes:
+  p655+ interactive nodes:
     dspoe.sdsc.edu
-    5,   8 x 1.5GHz IBM p655, 16GB
-  Batch nodes:
+    5,   8 x 1.5GHz IBM Power4+, 16GB
+  p655+ batch nodes:
     dslogin.sdsc.edu
-    176, 8 x 1.5GHz IBM p655, 16GB
-    96,  8 x 1.7GHz IBM p655, 32GB
+    176, 8 x 1.5GHz IBM Power4+, 16GB
+    96,  8 x 1.7GHz IBM Power4+, 32GB
   Always run from a subdirectory of /gpfs/
   Useful commands:
     reslist
@@ -77,12 +77,19 @@ SDSC TeraGrid IA64 Cluster
   http://grid.ncsa.uiuc.edu/teragrid/status/
   Interactive nodes
     tg-c127, tg-c128, tg-c129 and tg-c130
-    4,   2 x 1.5GHz Intel Itanium 2, 4 GB
+    4, 2 x 1.5GHz Intel Itanium 2, 4 GB
   Batch nodes:
     tg-login1.sdsc.teragrid.org
     tg-login2.sdsc.teragrid.org
-    262, 2 x 1.5GHz Intel Itanium, 4 GB
+    262, 2 x 1.5GHz Intel Itanium 2, 4 GB
   Intel Fortran compiler
+  vi ~/.soft
+    @remove +intel-compilers
+    @remove +intel-c-8.0.066-f-8.0.046-r1
+    @remove +mpich-gm-intel
+    +intel-c-9.0.032-f-9.0.033
+    +mpich-gm-1.2.6-intel9032
+    @teragrid
   Always run from a subdirectory of /gpfs/
   Useful commands:
     myprojects
