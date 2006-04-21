@@ -232,12 +232,23 @@ end subroutine
 subroutine fault
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
-! Test for fault split accross domain boundary
+! If the two sides of the fault are split accross domains, than we must retrieve
+! the correct solution from the processor that contains both sides. Corrisponding
+! sends are below.
 if ( ifn == 0 ) then
   i = abs( faultnormal )
   if ( i /= 0 ) then
-!    if ( ihypo(i) == 0     .and. bc1(i) == 9 ) call vectorrecv1( w1, i )
-!    if ( ihypo(i) == nm(i) .and. bc2(i) == 9 ) call vectorrecv2( w1, i )
+     if ( bc1(i) == 9 .and. ihypo(i) == 0 ) then
+       i1 = 1
+       i2 = nm
+       i2(i) = 1
+       call vectorrecv( w1, i1, i2, -i )
+     elseif ( bc2(i) == 9 .and. ihypo(i) == nm(i) ) then
+       i1 = 1
+       i2 = nm
+       i1(i) = nm(i)
+       call vectorrecv( w1, i1, i2, i )
+     end if
   end if
   return
 end if
@@ -302,9 +313,23 @@ do i = 1, 3
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f1 * mr(j3:j4,k3:k4,l3:l4)
 end do
 call vectorbc( w1, ibc1, ibc2, nhalo )
+
+! If a neighboring processor contains only one side of the fault, then we must
+! send the correct fault wall solution to it.
 i = ifn
-!if ( ihypo(i) == i1node(i) .and. bc1(i) == 9 ) call vectorsend1( w1, i, nhalo )
-!if ( ihypo(i) == i2node(i) .and. bc2(i) == 9 ) call vectorsend2( w1, i, nhalo )
+if ( bc1(i) == 9 .and. ihypo(i) == nhalo ) then
+  i1 = 1
+  i2 = nm
+  i1(i) = nhalo
+  i2(i) = nhalo
+  call vectorsend( w1, i1, i2, -i )
+elseif ( bc2(i) == 9 .and. ihypo(i) == nm(i) - nhalo ) then
+  i1 = 1
+  i2 = nm
+  i1(i) = nm(i) - nhalo + 1
+  i2(i) = nm(i) - nhalo + 1
+  call vectorsend( w1, i1, i2, i )
+end if
 
 ! Save for output
 ts = ts * f2
