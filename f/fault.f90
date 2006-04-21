@@ -17,9 +17,8 @@ integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
 if ( ifn == 0 ) return
 if ( master ) call toc( 'Fault initialization' )
 
-! Test if fault plane exists on this processor
-i = ihypo(ifn)
-if ( i + 1 < i1node(ifn) .or. i > i2node(ifn) ) then
+! Test if both sides of the fault exists on this processor
+if ( ihypo(ifn) < 1 .or. ihypo(ifn) >= nm(ifn) ) then
   ifn = 0
   return
 end if
@@ -233,11 +232,12 @@ end subroutine
 subroutine fault
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
+! Test for fault split accross domain boundary
 if ( ifn == 0 ) then
   i = abs( faultnormal )
   if ( i /= 0 ) then
-    if ( ihypo(i) == 0     .and. bc1(i) == 9 ) call vectorrecv1( w1, i )
-    if ( ihypo(i) == nm(i) .and. bc2(i) == 9 ) call vectorrecv2( w1, i )
+!    if ( ihypo(i) == 0     .and. bc1(i) == 9 ) call vectorrecv1( w1, i )
+!    if ( ihypo(i) == nm(i) .and. bc2(i) == 9 ) call vectorrecv2( w1, i )
   end if
   return
 end if
@@ -303,8 +303,8 @@ do i = 1, 3
 end do
 call vectorbc( w1, ibc1, ibc2, nhalo )
 i = ifn
-if ( ihypo(i) == i1node(i) .and. bc1(i) == 9 ) call vectorsend1( w1, i, nhalo )
-if ( ihypo(i) == i2node(i) .and. bc2(i) == 9 ) call vectorsend2( w1, i, nhalo )
+!if ( ihypo(i) == i1node(i) .and. bc1(i) == 9 ) call vectorsend1( w1, i, nhalo )
+!if ( ihypo(i) == i2node(i) .and. bc2(i) == 9 ) call vectorsend2( w1, i, nhalo )
 
 ! Save for output
 ts = ts * f2

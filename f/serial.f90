@@ -85,6 +85,24 @@ r = r
 i = i - nnoff + nnoff
 end subroutine
 
+! Vector send
+subroutine vectorsend( f, i1, i2, i )
+real, intent(inout) :: f(:,:,:,:)
+integer, intent(in) :: i1(3), i2(3), i
+integer :: ii
+f(1,1,1,1) = f(1,1,1,1)
+ii = i1(1) + i2(1) + i
+end subroutine
+
+! Vector recieve
+subroutine vectorrecv( f, i1, i2, i )
+real, intent(inout) :: f(:,:,:,:)
+integer, intent(in) :: i1(3), i2(3), i
+integer ::  ii
+f(1,1,1,1) = f(1,1,1,1)
+ii = i1(1) + i2(1) + i
+end subroutine
+
 ! Scalar swap halo
 subroutine scalarswaphalo( f, nhalo )
 real, intent(inout) :: f(:,:,:)

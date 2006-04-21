@@ -146,15 +146,45 @@ end if
 i = i + nnoff
 end subroutine
 
+! Vector send
+subroutine vectorsend( f, i1, i2, i )
+real, intent(inout) :: f(:,:,:,:)
+integer, intent(in) :: i1(3), i2(3), i
+integer :: ng(4), nl(4), i0(4), prev, next, datatype, e
+ng = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
+nl = i2 - i1 + 1
+i0 = (/ i1 - 1, 0 /)
+call mpi_cart_shift( c, abs(i)-1, sign(1,i), prev, next, e )
+call mpi_type_create_subarray( 4, ng, nl, i0, mpi_order_fortran, mpi_real, datatype, e )
+call mpi_type_commit( datatype, e )
+call mpi_send( f, 1, datatype, next, 0, c, e )
+call mpi_type_free( datatype, e )
+end subroutine
+
+! Vector recieve
+subroutine vectorrecv( f, i1, i2, i )
+real, intent(inout) :: f(:,:,:,:)
+integer, intent(in) :: i1(3), i2(3), i
+integer :: ng(4), nl(4), i0(4), prev, next, datatype, e
+ng = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
+nl = i2 - i1 + 1
+i0 = (/ i1 - 1, 0 /)
+call mpi_cart_shift( c, abs(i)-1, sign(1,i), prev, next, e )
+call mpi_type_create_subarray( 4, ng, nl, i0, mpi_order_fortran, mpi_real, datatype, e )
+call mpi_type_commit( datatype, e )
+call mpi_recv( f, 1, datatype, next, 0, c, e )
+call mpi_type_free( datatype, e )
+end subroutine
+
 ! Scalar swap halo
 subroutine scalarswaphalo( f, nhalo )
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: nhalo
-integer :: i, e, left, right, ng(3), nl(3), isend(4), irecv(4), tsend, trecv
+integer :: i, e, prev, next, ng(3), nl(3), isend(4), irecv(4), tsend, trecv
 ng = (/ size(f,1), size(f,2), size(f,3) /)
 do i = 1, 3
 if ( ng(i) > 1 ) then
-  call mpi_cart_shift( c, i-1, 1, left, right, e )
+  call mpi_cart_shift( c, i-1, 1, prev, next, e )
   nl = ng
   nl(i) = nhalo
   isend = 0
@@ -164,7 +194,7 @@ if ( ng(i) > 1 ) then
   call mpi_type_create_subarray( 3, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f(1,1,1), 1, tsend, right, 0, f(1,1,1), 1, trecv, left, 0, c, mpi_status_ignore, e )
+  call mpi_sendrecv( f(1,1,1), 1, tsend, next, 0, f(1,1,1), 1, trecv, prev, 0, c, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
   isend(i) = nhalo
@@ -173,7 +203,7 @@ if ( ng(i) > 1 ) then
   call mpi_type_create_subarray( 3, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f(1,1,1), 1, tsend, left, 1, f(1,1,1), 1, trecv, right, 1, c, mpi_status_ignore, e )
+  call mpi_sendrecv( f(1,1,1), 1, tsend, prev, 1, f(1,1,1), 1, trecv, next, 1, c, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
 end if
@@ -184,11 +214,11 @@ end subroutine
 subroutine vectorswaphalo( f, nhalo )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: nhalo
-integer :: i, e, left, right, ng(4), nl(4), isend(4), irecv(4), tsend, trecv
+integer :: i, e, prev, next, ng(4), nl(4), isend(4), irecv(4), tsend, trecv
 ng = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
 do i = 1, 3
 if ( ng(i) > 1 ) then
-  call mpi_cart_shift( c, i-1, 1, left, right, e )
+  call mpi_cart_shift( c, i-1, 1, prev, next, e )
   nl = ng
   nl(i) = nhalo
   isend = 0
@@ -198,7 +228,7 @@ if ( ng(i) > 1 ) then
   call mpi_type_create_subarray( 4, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f(1,1,1,1), 1, tsend, right, 0, f(1,1,1,1), 1, trecv, left, 0, c, mpi_status_ignore, e )
+  call mpi_sendrecv( f(1,1,1,1), 1, tsend, next, 0, f(1,1,1,1), 1, trecv, prev, 0, c, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
   isend(i) = nhalo
@@ -207,7 +237,7 @@ if ( ng(i) > 1 ) then
   call mpi_type_create_subarray( 4, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f(1,1,1,1), 1, tsend, left, 1, f(1,1,1,1), 1, trecv, right, 1, c, mpi_status_ignore, e )
+  call mpi_sendrecv( f(1,1,1,1), 1, tsend, prev, 1, f(1,1,1,1), 1, trecv, next, 1, c, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
 end if
