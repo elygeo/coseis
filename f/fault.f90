@@ -238,15 +238,17 @@ integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 if ( ifn == 0 ) then
   i = abs( faultnormal )
   if ( i /= 0 ) then
-     if ( bc1(i) == 9 .and. ihypo(i) == 0 ) then
+     if ( ibc1(i) == 9 .and. ihypo(i) == 0 ) then
        i1 = 1
        i2 = nm
+       i1(i) = 1
        i2(i) = 1
        call vectorrecv( w1, i1, i2, -i )
-     elseif ( bc2(i) == 9 .and. ihypo(i) == nm(i) ) then
+     elseif ( ibc2(i) == 9 .and. ihypo(i) == nm(i) ) then
        i1 = 1
        i2 = nm
        i1(i) = nm(i)
+       i2(i) = nm(i)
        call vectorrecv( w1, i1, i2, i )
      end if
   end if
@@ -317,17 +319,17 @@ call vectorbc( w1, ibc1, ibc2, nhalo )
 ! If a neighboring processor contains only one side of the fault, then we must
 ! send the correct fault wall solution to it.
 i = ifn
-if ( bc1(i) == 9 .and. ihypo(i) == nhalo ) then
+if ( ibc1(i) == 9 .and. ihypo(i) == 2 * nhalo ) then
   i1 = 1
   i2 = nm
-  i1(i) = nhalo
-  i2(i) = nhalo
+  i1(i) = 2 * nhalo
+  i2(i) = 2 * nhalo
   call vectorsend( w1, i1, i2, -i )
-elseif ( bc2(i) == 9 .and. ihypo(i) == nm(i) - nhalo ) then
+elseif ( ibc2(i) == 9 .and. ihypo(i) == nm(i) - 2 * nhalo ) then
   i1 = 1
   i2 = nm
-  i1(i) = nm(i) - nhalo + 1
-  i2(i) = nm(i) - nhalo + 1
+  i1(i) = nm(i) - 2 * nhalo + 1
+  i2(i) = nm(i) - 2 * nhalo + 1
   call vectorsend( w1, i1, i2, i )
 end if
 

@@ -150,30 +150,31 @@ end subroutine
 subroutine vectorsend( f, i1, i2, i )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i
-integer :: ng(4), nl(4), i0(4), prev, next, datatype, e
+integer :: ng(4), nl(4), i0(4), prev, next, dtype, e
 ng = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
-nl = i2 - i1 + 1
+nl = (/ i2 - i1 + 1, ng(4) /)
 i0 = (/ i1 - 1, 0 /)
 call mpi_cart_shift( c, abs(i)-1, sign(1,i), prev, next, e )
-call mpi_type_create_subarray( 4, ng, nl, i0, mpi_order_fortran, mpi_real, datatype, e )
-call mpi_type_commit( datatype, e )
-call mpi_send( f, 1, datatype, next, 0, c, e )
-call mpi_type_free( datatype, e )
+call mpi_type_create_subarray( 4, ng, nl, i0, mpi_order_fortran, mpi_real, dtype, e )
+call mpi_type_commit( dtype, e )
+call mpi_send( f(1,1,1,1), 1, dtype, next, 0, c, e )
+do e = 1,1; end do ! bug work-around, need slight delay here for MPICH2
+call mpi_type_free( dtype, e )
 end subroutine
 
 ! Vector recieve
 subroutine vectorrecv( f, i1, i2, i )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i
-integer :: ng(4), nl(4), i0(4), prev, next, datatype, e
+integer :: ng(4), nl(4), i0(4), prev, next, dtype, e
 ng = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
-nl = i2 - i1 + 1
+nl = (/ i2 - i1 + 1, ng(4) /)
 i0 = (/ i1 - 1, 0 /)
 call mpi_cart_shift( c, abs(i)-1, sign(1,i), prev, next, e )
-call mpi_type_create_subarray( 4, ng, nl, i0, mpi_order_fortran, mpi_real, datatype, e )
-call mpi_type_commit( datatype, e )
-call mpi_recv( f, 1, datatype, next, 0, c, e )
-call mpi_type_free( datatype, e )
+call mpi_type_create_subarray( 4, ng, nl, i0, mpi_order_fortran, mpi_real, dtype, e )
+call mpi_type_commit( dtype, e )
+call mpi_recv( f(1,1,1,1), 1, dtype, next, 0, c, mpi_status_ignore, e )
+call mpi_type_free( dtype, e )
 end subroutine
 
 ! Scalar swap halo

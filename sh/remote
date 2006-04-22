@@ -3,10 +3,10 @@
 account="moho.sdsu.edu"
 account="ux451302@dslogin.sdsc.edu"
 account="ux451302@tg-login2.sdsc.teragrid.org"
-account="babieca.sdsu.edu"
 account="phim.ucsd.edu"
 account="altai.sdsu.edu"
 account="curl"
+account="babieca.sdsu.edu"
 
 echo -e "\n$account"
 
