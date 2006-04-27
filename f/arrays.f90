@@ -59,14 +59,14 @@ allocate(       &
 allocate( dn1(npml), dn2(npml), dc1(npml), dc2(npml) )
 
 if ( ifn > 0 ) then
-  i2 = nm
-  i2(ifn) = 1
+  i1 = nm
+  i1(ifn) = 1
 else
-  i2 = 0
+  i1 = 0
 end if
-j = i2(1)
-k = i2(2)
-l = i2(3)
+j = i1(1)
+k = i1(2)
+l = i1(3)
 
 ! Fault vectors
 allocate(        &
@@ -84,9 +84,9 @@ allocate(       &
   co(j,k,l),    &
   area(j,k,l),  &
   rhypo(j,k,l), &
+  sl(j,k,l),    &
   svm(j,k,l),   &
   svp(j,k,l),   &
-  sl(j,k,l),    &
   trup(j,k,l),  &
   tarr(j,k,l),  &
   tn(j,k,l),    &
@@ -98,9 +98,9 @@ allocate(       &
 t     =  0.
 v     =  0.
 u     =  0.
+sl    =  0.
 svm   =  0.
 svp   =  0.
-sl    =  0.
 trup  =  1e9
 tarr  =  0.
 p1    =  0.
