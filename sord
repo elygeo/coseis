@@ -252,7 +252,6 @@ cp 'sord.tgz' $rundir
 cd $rundir
 
 # Write metadata
-perl -e 'print pack('V',1) eq pack('L',1) ? "l\n":"b\n"' > endian
 cat << END > runmeta.m
 login   = '$LOGNAME';
 name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )';

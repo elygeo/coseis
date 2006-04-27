@@ -97,7 +97,7 @@ case( 'lock' );
   read( str, * ) ilock(i,:), i1lock(i,:), i2lock(i,:)
 case default
   if ( master ) call toc( 'bad input: ' // line )
-  stop
+  stop 'input error, see log'
 end select
 
 ! Input zone

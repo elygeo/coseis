@@ -14,9 +14,9 @@
   th  = { -81.6e6 'cube'  -1501. -1501. -1.   1501. 1501. 1. };
   viscosity = [ .1 .7 ];
   origin = 0;
-  dx  = 100;
-  dt  = .008;
-  nt  = 2000;
+  dx  = 50;
+  dt  = .004;
+  nt  = 4000;
   itcheck = -1;
   out = { 'x'     1   1 1 1   -1 -1  0 };
   out = { 'su'   -1   1 1 0   -1 -1  0 };
@@ -36,16 +36,10 @@
 
   np = [ 4 4 2 ];
 
-% 1b. yz-shear symmetric
-  affine = [ 1. 0. 0.  0. 1. 1.  0. 0. 1. ] / 1.;
-  nn       = [ 211 271 101 ];
-  ihypo    = [  -1   0  -1 ];
-  bc2      = [  -3   0  -3 ];
-  n2expand = [   0  50   0 ];
-  timeseries = { 'su'     0.  6000. 0. };
-  timeseries = { 'sv'     0.  6000. 0. };
-  timeseries = { 'ts'     0.  6000. 0. };
-  timeseries = { 'su' -7500.  6000. 0. };
-  timeseries = { 'sv' -7500.  6000. 0. };
-  timeseries = { 'ts' -7500.  6000. 0. };
+% 0. rectangular
+  affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1. ] / 1.;
+  nn       = [ 421 271 201 ];
+  ihypo    = [  -1  -1  -1 ];
+  bc2      = [  -3   3  -2 ];
+  n2expand = [   0   0   0 ];
 

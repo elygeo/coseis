@@ -304,17 +304,31 @@ if ( rcrit > 0. .and. vrup > 0. ) then
 end if
 
 ! Shear traction bounded by friction
-f2 = 1.
-where ( ts > f1 ) f2 = f1 / ts
+f2 = f1
+f1 = 1.
+where ( ts > f2 ) f1 = f2 / ts
+do i = 1, 3
+  t2(:,:,:,i) = f1 * t2(:,:,:,i)
+end do
+
+! Total traction
+t3 = t1 + t2
+
+! Save for output
+tn = sum( t3 * nhat, 4 )
+ts = f1 * ts
 
 ! Update acceleration
 do i = 1, 3
-  t3(:,:,:,i) = t1(:,:,:,i) + f2 * t2(:,:,:,i)
   f1 = area * ( t3(:,:,:,i) - t0(:,:,:,i) )
-  w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f1 * mr(j1:j2,k1:k2,l1:l2)
-  w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f1 * mr(j3:j4,k3:k4,l3:l4)
+  w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f2 * mr(j1:j2,k1:k2,l1:l2)
+  w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f2 * mr(j3:j4,k3:k4,l3:l4)
 end do
 call vectorbc( w1, ibc1, ibc2, nhalo )
+
+! Save slip acceleration for output
+t1 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
+f1 = sqrt( sum( t1 * t1, 4 ) )
 
 ! If a neighboring processor contains only one side of the fault, then we must
 ! send the correct fault wall solution to it.
@@ -332,10 +346,6 @@ elseif ( ibc2(i) == 9 .and. ihypo(i) == nm(i) - 2 * nhalo ) then
   i2(i) = nm(i) - 2 * nhalo + 1
   call vectorsend( w1, i1, i2, i )
 end if
-
-! Save for output
-ts = ts * f2
-tn = sum( t3 * nhat, 4 )
 
 end subroutine
 

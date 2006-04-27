@@ -38,11 +38,11 @@ do while ( it <= nt )
   call tic
   call stress
   call momentsource
-  call output( 'w' ) 
+  call output( 1 ) 
   call acceleration
   call fault
   call locknodes
-  call output( 'a' )
+  call output( 2 )
   call writecheckpoint
   call timestep
   if ( master ) call toc( 'Finished step', it - 1 )

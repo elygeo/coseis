@@ -85,6 +85,7 @@ allocate(       &
   area(j,k,l),  &
   rhypo(j,k,l), &
   svm(j,k,l),   &
+  svp(j,k,l),   &
   sl(j,k,l),    &
   trup(j,k,l),  &
   tarr(j,k,l),  &
@@ -98,6 +99,7 @@ t     =  0.
 v     =  0.
 u     =  0.
 svm   =  0.
+svp   =  0.
 sl    =  0.
 trup  =  1e9
 tarr  =  0.

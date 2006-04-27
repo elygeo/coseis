@@ -30,23 +30,24 @@ if ( ifn /= 0 ) then
   j3 = i1(1); j4 = i2(1)
   k3 = i1(2); k4 = i2(2)
   l3 = i1(3); l4 = i2(3)
-  t1 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
-  t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
+  t1 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
+  t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
+  f1 = sqrt( sum( t1 * t1, 4 ) )
   f2 = sqrt( sum( t2 * t2, 4 ) )
+  sl = sl + dt * f1
   if ( svtol > 0. ) then
-    where ( f2 >= svtol .and. trup > 1e8 )
-      trup = t - dt * ( .5 + ( svtol - f2 ) / ( svm - f2 ) )
+    where ( f1 >= svtol .and. trup > 1e8 )
+      trup = t - dt * ( .5 + ( svtol - f1 ) / ( svm - f1 ) )
     end where
-    where ( f2 >= svtol )
+    where ( f1 >= svtol )
       tarr = 1e9
     end where
-    where ( f2 < svtol .and. svm >= svtol )
-      tarr = t - dt * ( .5 + ( svtol - f2 ) / ( svm - f2 ) )
+    where ( f1 < svtol .and. svm >= svtol )
+      tarr = t - dt * ( .5 + ( svtol - f1 ) / ( svm - f1 ) )
     end where
   end if
-  svm = f2
-  f2 = sqrt( sum( t1 * t1, 4 ) )
-  sl = sl + dt * svm
+  svm = f1
+  svp = max( svp, f1 )
 end if
 
 end subroutine
