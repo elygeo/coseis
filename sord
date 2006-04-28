@@ -5,35 +5,28 @@ echo -e "\nSORD setup"
 # Get command line options
 mode=guess
 fflags=O
-compile=yes
+setup=yes
 run=
-while getopts spbicngGd opt; do
+while getopts spibqgGnd opt; do
 case "$opt" in
   s) mode=serial ;;
   p) mode=parallel ;;
-  b) run=b ;;
   i) run=i ;;
-  c) run= ;;
-  n) run= ; compile= ;;
+  b) run=b ;;
+  q) run=q ;;
   g) fflags=g ;;
   G) fflags=g; run=g ;;
+  n) setup= ; run= ;;
   d) rm -rf r[0-9]*/ count;;
   *) exit ;;
 esac
 done
 shift $(( OPTIND - 1 ))
 
-[ -f count ] && count=$( cat count )
-count=$(( count + 1 ))
-echo $count > count
-srcdir=$( /bin/pwd )
-rundir=$( /bin/pwd )/r$count
-mkdir $rundir
-
 # Symlink input file specified on command line
 [ -n "$1" ] && ln -sf "$1" 'in.m'
 
-# Ready input file
+# Prepare input file
 cat 'defaults.m' 'in.m' | sed "
 s/%.*$//;
 s/;/\\
@@ -44,7 +37,7 @@ s/  */ /g;
 s/^ //;
 s/ $//;
 /^$/d
-" > "$rundir/in.tmp"
+" > 'in.tmp'
 
 # Read input
 nout=0
@@ -56,10 +49,10 @@ case "$key" in
   np)  np3=( $1 $2 $3 ) ;;
   out) nout=$(( nout + 1 )) ;;
   timeseries) nout=$(( nout + 1 )) ;;
-  datadir) echo ln -s "$1" "$rundir/data" ;;
-  return) break
+  datadir) datadir="$1" ;;
+  return) break ;;
 esac
-done < "$rundir/in.tmp"
+done < 'in.tmp'
 
 # Problem size
 #nn=$(( nn3[0] * nn3[1] * nn3[2] )); # old bash can only handle 32 bits
@@ -68,7 +61,7 @@ np=$(( np3[0] * np3[1] * np3[2] ));
 [ $mode = guess ] && [ $np -eq 1 ] && mode=serial
 [ $mode = guess ] && [ $np -gt 1 ] && mode=parallel
 
-# Compilter
+# Compiler
 IFS=":$IFS"
 for dir in $PATH; do
 for file in xlf95_r ifort pgf90 gfortran f95; do
@@ -85,13 +78,13 @@ xlf95_r)
   fc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
   pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
   gflags='-p -g -C -qflttrap -qsigtrap -qlanglvl=95pure'
-  oflags='-O5'
   oflags='-O -qmaxmem=-1'
+  oflags='-O5'
   ;;
 ifort)
   gflags='-O0 -p -g -CB -warn -traceback -u'
-  oflags='-fast'
   oflags='-O3'
+  oflags='-fast'
   ;;
 pgf90)
   gflags='-g -Mprof=func'
@@ -129,7 +122,7 @@ case $machine in
   babieca)  ppn=2 ;;
 esac
 
-# Compute nodes
+# Number of compute nodes
 [ $ppn -gt $np ] && ppn=$np
 nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
 
@@ -159,7 +152,7 @@ ss=$(( wt % 60 ))
 wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
 
 #------------------------------------------------------------------------------#
-# Compile Fortran
+# Makefile
 
 # Source files
 base="\\
@@ -227,16 +220,27 @@ END
 [ "$( diff tmp makefile )" != "" ] && mv tmp makefile
 rm -f tmp
 
+#------------------------------------------------------------------------------#
+# Compile & set up
+
+[ "$setup" ] || exit
+
+# Run number
+[ -f count ] && count=$( cat count )
+count=$(( count + 1 ))
+echo $count > count
+srcdir=$( /bin/pwd )
+rundir=$( /bin/pwd )/r$count
+mkdir $rundir
+
 # Compile
-if [ $compile ]; then
 case $mode in
   serial)   gmake fsord; cp fsord $rundir ;;
   parallel) gmake psord; cp psord $rundir ;;
 esac
-fi
 echo ''
 
-# SDX
+# Viz scripts
 echo "cd $srcdir" > m/srcdir.m
 echo "cd $rundir" > m/rundir.m
 echo "addpath $srcdir/m" > m/viz.m
@@ -246,10 +250,19 @@ matlab -nodesktop -nosplash -r "addpath $srcdir/m"
 END
 chmod u+x viz
 
-#------------------------------------------------------------------------------#
-# Save source
-cp 'sord.tgz' $rundir
+# Setup files and folders
+echo "Run directory: r$count"
+cp 'in.tmp' 'sord.tgz' $rundir
 cd $rundir
+mkdir checkpoint
+mkdir stats
+i=0
+while [ $i -lt $nout ]; do
+  i=$(( i + 1 ))
+  dir=$( echo $i | awk '{ printf "%02d", $1 }' )
+  mkdir $dir
+done
+[ "$datadir" ] && ln -s "$srcdir/$datadir" 'data'
 
 # Write metadata
 cat << END > runmeta.m
@@ -262,16 +275,6 @@ host    = '$HOSTNAME';
 os      = '$( uname -a )';
 END
 
-# Create output folders
-[ -e checkpoint ] || mkdir checkpoint
-[ -e stats ]      || mkdir stats
-i=0
-while [ $i -lt $nout ]; do
-  i=$(( i + 1 ))
-  dir=$( echo $i | awk '{ printf "%02d", $1 }' )
-  [ -e $dir ] || mkdir $dir
-done
-
 #------------------------------------------------------------------------------#
 # Run
 
@@ -283,11 +286,50 @@ if [ $( pwd | grep -v gpfs ) ]; then
   echo "jobs must be run from /gpfs"
   exit
 fi
-if [ "$run" -a $HOSTNAME != ds100 ]; then
+if [ "$run" != q -a $HOSTNAME != ds100 ]; then
   echo "interactive jobs must be launched from dspoe"
   exit
 fi
 opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
+
+if [ $mode = parallel ]; then
+cat << END > llscript
+#!/bin/bash
+#@environment = COPY_ALL;\\
+#AIXTHREAD_SCOPE=S;\\
+#MP_ADAPTER_USE=dedicated;\\
+#MP_CPU_USE=unique;\\
+#MP_CSS_INTERRUPT=no;\\
+#MP_EAGER_LIMIT=64K;\\
+#MP_EUIDEVELOP=min;\\
+#MP_LABELIO=yes;\\
+#MP_POLLING_INTERVAL=100000;\\
+#MP_PULSE=0;\\
+#MP_SHARED_MEMORY=yes;\\
+#MP_SINGLE_THREAD=no;\\
+#RT_GRQ=ON;\\
+#SPINLOOPTIME=0;\\
+#YIELDLOOPTIME=0;
+#@ class = normal
+#@ node = $nodes
+#@ tasks_per_node = $ppn
+#@ wall_clock_limit = $wt
+#@ node_usage = not_shared
+#@ network.MPI = sn_all, shared, US
+#@ job_type = parallel
+#@ job_name = sord_job_$count
+#@ output = out.log
+#@ error = err.log
+#@ notification = always
+#@ notify_user = $LOGNAME
+#@ initialdir = $rundir
+#@ queue
+cd $rundir
+poe ./psord $opts
+END
+chmod u+x llscript
+fi
+
 case $mode$run in
   seriali)   ./fsord ;;
   serialg)   totalview ./fsord ;;
@@ -295,71 +337,51 @@ case $mode$run in
   paralleli) poe ./psord $opts ;;
   parallelg) tvpoe ./psord $opts ;;
   parallelb) nohup poe ./psord $opts > errors & ;;
-  parallel)
-	echo "To submit job:"
-	echo "cd r$count; llsubmit batchjob"
-	cat <<-END > batchjob
-	#!/bin/bash
-	#@environment = COPY_ALL;\\
-	#AIXTHREAD_SCOPE=S;\\
-	#MP_ADAPTER_USE=dedicated;\\
-	#MP_CPU_USE=unique;\\
-	#MP_CSS_INTERRUPT=no;\\
-	#MP_EAGER_LIMIT=64K;\\
-	#MP_EUIDEVELOP=min;\\
-	#MP_LABELIO=yes;\\
-	#MP_POLLING_INTERVAL=100000;\\
-	#MP_PULSE=0;\\
-	#MP_SHARED_MEMORY=yes;\\
-	#MP_SINGLE_THREAD=no;\\
-	#RT_GRQ=ON;\\
-	#SPINLOOPTIME=0;\\
-	#YIELDLOOPTIME=0;
-	#@ class = normal
-	#@ node = $nodes
-	#@ tasks_per_node = $ppn
-	#@ wall_clock_limit = $wt
-	#@ node_usage = not_shared
-	#@ network.MPI = sn_all, shared, US
-	#@ job_type = parallel
-	#@ job_name = sord_job_$count
-	#@ output = out.log
-	#@ error = err.log
-	#@ notification = always
-	#@ notify_user = $LOGNAME
-	#@ initialdir = $rundir
-	#@ queue
-	cd $rundir
-	poe ./psord $opts
-	END
-	chmod u+x batchjob
-  ;;
+  parallelq) lljob=$( llsubmit llscript ) ;;
 esac
 
 ;;
 
 teragrid) #--------------------------------------#
 
+#export PAL_LICENSEFILE=/usr/local/apps/vampir/etc/license.dat
+#export PAL_ROOT=/usr/local/apps/vampir
+#export VT_ROOT=/usr/local/apps/vampirtrace
+
 if [ $( pwd | grep -v gpfs ) ]; then
   echo "jobs must be run from /gpfs"
   exit
 fi
-if [ "$run" -a ${HOSTNAME:0:5} != 'tg-c1' ]; then
+if [ "$run" != q  -a ${HOSTNAME:0:5} != 'tg-c1' ]; then
   echo "interactive jobs must be launched from tg-c127, 128, 129 or 130"
   exit
 fi
+
+if [ $mode = parallel ]; then
 [ -f "$srcdir/machinefile" ] || cat << END > "$srcdir/machinefile"
 tg-c127:2
 tg-c128:2
 tg-c129:2
 tg-c130:2
 END
-#export PAL_LICENSEFILE=/usr/local/apps/vampir/etc/license.dat
-#export PAL_ROOT=/usr/local/apps/vampir
-#export VT_ROOT=/usr/local/apps/vampirtrace
 cp "$srcdir/machinefile" .
 tail +$(( nodes + 1 )) machinefile > "$srcdir/machinefile"
 head -$nodes machinefile >> "$srcdir/machinefile"
+cat << END > pbsscript
+#!/bin/bash
+#PBS -q dque
+#PBS -N sord_job_$count
+#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -l walltime=$wt
+#PBS -o out.log
+#PBS -e err.log
+#PBS -V
+cd $rundir
+mpirun -machinefile \$PBS_NODEFILE -np $np ./psord
+END
+chmod u+x pbsscript
+fi
+
 case $mode$run in
   seriali)   ./fsord ;;
   serialg)   totalview ./fsord ;;
@@ -367,23 +389,7 @@ case $mode$run in
   paralleli) mpirun -machinefile machinefile -np $np ./psord ;;
   parallelg) mpirun -tv -machinefile machinefile -np $np ./psord ;;
   parallelb) nohup mpirun -machinefile machinefile -np $np ./psord > errors & ;;
-  parallel)
-	echo "To submit job:"
-	echo "cd r$count; qsub batchjob"
-	cat <<-END > batchjob
-	#!/bin/bash
-	#PBS -q dque
-	#PBS -N sord_job_$count
-	#PBS -l nodes=$nodes:ppn=$ppn
-	#PBS -l walltime=$wt
-	#PBS -o out.log
-	#PBS -e err.log
-	#PBS -V
-	cd $rundir
-	mpirun -machinefile \$PBS_NODEFILE -np $np ./psord
-	END
-	chmod u+x batchjob
-  ;;
+  parallelq) pbsjob=$( qsub pbsscript ) ;;
 esac
 
 ;;
@@ -407,6 +413,23 @@ END
 cp "$srcdir/machinefile" .
 tail +$(( nodes + 1 )) machinefile > "$srcdir/machinefile"
 head -$nodes machinefile >> "$srcdir/machinefile"
+
+if [ $mode = parallel ]; then
+cat << END > pbsscript
+#!/bin/bash
+#PBS -q workq
+#PBS -N sord_job_$count
+#PBS -l nodes=$nodes:ppn=$ppn:mpi
+#PBS -o out.log
+#PBS -e err.log
+#PBS -V
+sleep 2
+cd $rundir
+mpiexec -n $np ./psord
+END
+chmod u+x pbsscript
+fi
+  
 case $mode$run in
   seriali)   mpirun -machinefile machinefile ./fsord ;;
   serialg)   mpirun -machinefile machinefile -dbg=gdb ./fsord ;;
@@ -414,23 +437,7 @@ case $mode$run in
   paralleli) mpirun -machinefile machinefile -np $np ./psord ;;
   parallelg) mpirun -machinefile machinefile -np $np -dbg=gdb ./psord ;;
   parallelb) nohup mpirun -machinefile machinefile -np $np ./psord > errors & ;;
-  parallel)
-	echo "To submit job:"
-	echo "cd r$count; qsub batchjob"
-	cat <<-END > batchjob
-	#!/bin/bash
-	#PBS -q workq
-	#PBS -N sord_job_$count
-	#PBS -l nodes=$nodes:ppn=$ppn:mpi
-	#PBS -o out.log
-	#PBS -e err.log
-	#PBS -V
-	sleep 2
-	cd $rundir
-	mpiexec -n $np ./psord
-	END
-	chmod u+x batchjob
-  ;;
+  parallelq) pbsjob=$( qsub pbsscript ) ;;
 esac
 
 ;;
@@ -452,9 +459,15 @@ esac
 esac #--------------------------------------#
 
 if [ "$run" = b ]; then
-  echo "Running in background, to cancel: r$count/cancel.sh"
-  echo "#!/bin/bash" > cancel.sh
-  echo "kill $!" >> cancel.sh
-  chmod u+x cancel.sh
+  echo "Running in background, to cancel: r$count/kill.sh"
+  echo "#!/bin/bash" > 'kill.sh'
+  echo "kill $!" >> 'kill.sh'
+  chmod u+x 'kill.sh'
+fi
+if [ "$pbsjob" ]; then
+  echo "Job submitted to PBS, to cancel: r$count/qdel.sh"
+  echo "#!/bin/bash" > 'qdel.sh'
+  echo "qdel $pbsjob" >> 'qdel.sh'
+  chmod u+x 'qdel.sh'
 fi
 

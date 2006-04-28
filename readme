@@ -36,12 +36,12 @@ USAGE
   Options:
     -s  serial mode, no MPI (default if np == 1)
     -p  parallel mode, requires MPI (default if np > 1)
-    -c  compile only, do not run (default)
-    -n  check only, do not compile or run
-    -g  compile with debugging and syntax checking flags
     -i  run interactively
     -b  run in the background
+    -q  que job to scheduler
+    -g  compile with debugging and syntax checking flags
     -G  run in debugger
+    -n  check input and exit
     -d  delete output from previous runs before starting
 
   When porting to a new machine, you may have to modify the sord script for 

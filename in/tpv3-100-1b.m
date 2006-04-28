@@ -17,7 +17,6 @@
   dx  = 100;
   dt  = .008;
   nt  = 1500;
-  itcheck = -1;
   out = { 'x'     1   1 1 1   -1 -1  0 };
   out = { 'su'   -1   1 1 0   -1 -1  0 };
   out = { 'svp'  -1   1 1 0   -1 -1  0 };
@@ -34,6 +33,7 @@
   bc1      = [   0   0   0 ];
   n1expand = [  50  50  50 ];
 
+  itcheck = 0;
   np = [ 4 4 2 ];
 
 % 1b. yz-shear symmetric
