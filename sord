@@ -54,12 +54,65 @@ case "$key" in
 esac
 done < 'in.tmp'
 
-# Problem size
-#nn=$(( nn3[0] * nn3[1] * nn3[2] )); # old bash can only handle 32 bits
-nn=$( echo ${nn3[*]} | awk '{ printf "%d", $1 * $2 * $3 }' )
+[ -n "$run" -a "$run" != q ] && interactive=yes
+
+# Host
+machine=$HOSTNAME
+if   [ "${machine:0:2}" = ds ]; then machine=datastar
+elif [ "${machine:0:2}" = tg ]; then machine=teragrid
+elif [ "$machine" = master ];   then machine=babieca
+fi
+
+# Machine attributes
+ppn=1
+rate=200
+case $machine in
+  altai)    rate=90  ;;
+  phat)     rate=180 ;;
+  phim)     rate=200 ;;
+  babieca)  rate=160; ppn=2 ;;
+  teragrid) rate=500; ppn=2 ;;
+  datastar) ppn=8 ;;
+esac
+
+# Number of processors
+[ $mode = serial ] && np3=( 1 1 1 )
 np=$(( np3[0] * np3[1] * np3[2] ));
-[ $mode = guess ] && [ $np -eq 1 ] && mode=serial
-[ $mode = guess ] && [ $np -gt 1 ] && mode=parallel
+[ $mode = guess -a $np -eq 1 ] && mode=serial
+[ $mode = guess -a $np -gt 1 ] && mode=parallel
+[ $ppn -gt $np ] && ppn=$np
+nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
+
+# Domain size
+nn3[0]=$(( nn3[0] / np3[0] + 2 + ( nn3[0] % np3[0] > 0 ? 1 : 0 ) ))
+nn3[1]=$(( nn3[1] / np3[1] + 2 + ( nn3[1] % np3[1] > 0 ? 1 : 0 ) ))
+nn3[2]=$(( nn3[2] / np3[2] + 2 + ( nn3[2] % np3[2] > 0 ? 1 : 0 ) ))
+nn=$(( nn3[0] * nn3[1] * nn3[2] ));
+
+# RAM and Wall time usage
+floatsize=4
+nvars=21
+ram=$(( nn * floatsize * nvars / 1024 / 1024 + 15 ))
+[ $np -gt 1 ] && rate=$(( rate * 4 / 5 ))
+wt=$(( ( ( nt + 2 ) * nn / rate / 100 + np ) / 10 + 1 ))
+hh=$(( wt / 3600 ))
+mm=$(( wt % 3600 / 60 ))
+ss=$(( wt % 60 ))
+[ $hh -ge 1 ] && ss=0
+wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
+echo "Machine: $machine"
+echo "RAM usage: ${ram}Mb"
+echo "Wall time: $wt"
+
+# Wall time limit
+wt=$(( ( ( nt + 2 ) * nn / rate / 100 + np ) / 400 + 1 ))
+hh=$(( wt / 60 ))
+mm=$(( wt % 60 ))
+wt=$( echo $hh $mm | awk '{ printf "%d:%02d:00\n", $1, $2 }' )
+echo "Wall time limit: $wt"
+
+#------------------------------------------------------------------------------#
+# Makefile
 
 # Compiler
 IFS=":$IFS"
@@ -107,52 +160,6 @@ f95)
   echo "Error: no Fortran 95 compiler found"
   exit
 esac
-
-# Host
-machine=$HOSTNAME
-if   [ "${machine:0:2}" = ds ]; then machine=datastar
-elif [ "${machine:0:2}" = tg ]; then machine=teragrid
-elif [ "$machine" = master ];   then machine=babieca
-fi
-ppn=1
-rate=30000
-case $machine in
-  datastar) ppn=8 ;;
-  teragrid) ppn=2 ;;
-  babieca)  ppn=2 ;;
-esac
-
-# Number of compute nodes
-[ $ppn -gt $np ] && ppn=$np
-nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
-
-# RAM and Wall time usage
-floatsize=4
-nvars=21
-ram=$(( nn / np * floatsize * nvars / 1024 / 1024 ))
-#wt=$(( nt * nn / np / rate + 1 )) # old bash can only handle 32 bits
-wt=$( echo $nt $nn $np $rate | awk '{ printf "%d", $1 * $2 / $3 / $4 + 1 }' )
-hh=$(( wt / 3600 ))
-mm=$(( wt % 3600 / 60 ))
-ss=$(( wt % 60 ))
-[ $hh -ge 1 ] && ss=0
-wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
-echo "Machine: $machine"
-echo "RAM usage: at least ${ram}Mb"
-echo "Wall time: $wt"
-
-# Wall time limit
-rate=$(( rate * 2 / 3 ))
-#wt=$(( nt * nn / np / rate + 1 )) # old bash can only handle 32 bits
-wt=$( echo $nt $nn $np $rate | awk '{ printf "%d", $1 * $2 / $3 / $4 + 1 }' )
-hh=$(( wt / 3600 ))
-mm=$(( wt % 3600 / 60 ))
-ss=$(( wt % 60 ))
-[ $hh -ge 1 ] && ss=0
-wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
-
-#------------------------------------------------------------------------------#
-# Makefile
 
 # Source files
 base="\\
@@ -286,13 +293,12 @@ if [ $( pwd | grep -v gpfs ) ]; then
   echo "jobs must be run from /gpfs"
   exit
 fi
-if [ "$run" != q -a $HOSTNAME != ds100 ]; then
+if [ -n "$interactive" -a $HOSTNAME != ds100 ]; then
   echo "interactive jobs must be launched from dspoe"
   exit
 fi
 opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
-
-if [ $mode = parallel ]; then
+if [ -z "$interactive" -a $mode = parallel ]; then
 cat << END > llscript
 #!/bin/bash
 #@environment = COPY_ALL;\\
@@ -344,29 +350,24 @@ esac
 
 teragrid) #--------------------------------------#
 
-#export PAL_LICENSEFILE=/usr/local/apps/vampir/etc/license.dat
-#export PAL_ROOT=/usr/local/apps/vampir
-#export VT_ROOT=/usr/local/apps/vampirtrace
-
 if [ $( pwd | grep -v gpfs ) ]; then
-  echo "jobs must be run from /gpfs"
-  exit
-fi
-if [ "$run" != q  -a ${HOSTNAME:0:5} != 'tg-c1' ]; then
-  echo "interactive jobs must be launched from tg-c127, 128, 129 or 130"
+  echo "Error: jobs must be run from /gpfs"
   exit
 fi
 
-if [ $mode = parallel ]; then
-[ -f "$srcdir/machinefile" ] || cat << END > "$srcdir/machinefile"
-tg-c127:2
-tg-c128:2
-tg-c129:2
-tg-c130:2
-END
-cp "$srcdir/machinefile" .
-tail +$(( nodes + 1 )) machinefile > "$srcdir/machinefile"
-head -$nodes machinefile >> "$srcdir/machinefile"
+if [ "$interactive" ]; then
+  hosts="tg-c127 tg-c128 tg-c129 tg-c130"
+  match=
+  for host in $hosts; do
+    [ $host = $HOSTNAME ] && match=yes
+    echo $node:2 >> mf
+  done
+  if [ -z "$match" ]; then
+    echo "Error: interactive jobs must be launched from the following hosts:"
+    echo "$inodes"
+    exit
+  fi
+elif [ $mode = parallel ]; then
 cat << END > pbsscript
 #!/bin/bash
 #PBS -q dque
@@ -386,9 +387,9 @@ case $mode$run in
   seriali)   ./fsord ;;
   serialg)   totalview ./fsord ;;
   serialb)   nohup ./fsord > errors & ;;
-  paralleli) mpirun -machinefile machinefile -np $np ./psord ;;
-  parallelg) mpirun -tv -machinefile machinefile -np $np ./psord ;;
-  parallelb) nohup mpirun -machinefile machinefile -np $np ./psord > errors & ;;
+  paralleli) mpirun -machinefile mf -np $np ./psord ;;
+  parallelg) mpirun -tv -machinefile mf -np $np ./psord ;;
+  parallelb) nohup mpirun -machinefile mf -np $np ./psord > errors & ;;
   parallelq) pbsjob=$( qsub pbsscript ) ;;
 esac
 
@@ -396,7 +397,8 @@ esac
 
 babieca) #--------------------------------------#
 
-[ -f "$srcdir/machinefile" ] || cat << END > "$srcdir/machinefile"
+if [ -n "$interactive" ]; then
+cat << END > mf
 node37:2
 node38:2
 node39:2
@@ -410,11 +412,7 @@ node46:2
 node47:2
 node48:2
 END
-cp "$srcdir/machinefile" .
-tail +$(( nodes + 1 )) machinefile > "$srcdir/machinefile"
-head -$nodes machinefile >> "$srcdir/machinefile"
-
-if [ $mode = parallel ]; then
+elif [ $mode = parallel ]; then
 cat << END > pbsscript
 #!/bin/bash
 #PBS -q workq
@@ -431,12 +429,12 @@ chmod u+x pbsscript
 fi
   
 case $mode$run in
-  seriali)   mpirun -machinefile machinefile ./fsord ;;
-  serialg)   mpirun -machinefile machinefile -dbg=gdb ./fsord ;;
-  serialb)   nohup mpirun -machinefile machinefile ./fsord > errors & ;;
-  paralleli) mpirun -machinefile machinefile -np $np ./psord ;;
-  parallelg) mpirun -machinefile machinefile -np $np -dbg=gdb ./psord ;;
-  parallelb) nohup mpirun -machinefile machinefile -np $np ./psord > errors & ;;
+  seriali)   mpirun -machinefile mf ./fsord ;;
+  serialg)   mpirun -machinefile mf -dbg=gdb ./fsord ;;
+  serialb)   nohup mpirun -machinefile mf ./fsord > errors & ;;
+  paralleli) mpirun -machinefile mf -np $np ./psord ;;
+  parallelg) mpirun -machinefile mf -np $np -dbg=gdb ./psord ;;
+  parallelb) nohup mpirun -machinefile mf -np $np ./psord > errors & ;;
   parallelq) pbsjob=$( qsub pbsscript ) ;;
 esac
 

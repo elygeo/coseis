@@ -1,1 +1,1 @@
-cd /space/gely/sord/r3
+cd /space/gely/sord/r1

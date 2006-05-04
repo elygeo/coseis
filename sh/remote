@@ -1,12 +1,12 @@
 #!/bin/bash -e
 
 account="ux451302@dslogin.sdsc.edu"
-account="phim.ucsd.edu"
 account="curl"
-account="ux451302@tg-login2.sdsc.teragrid.org"
-account="altai.sdsu.edu"
 account="moho.sdsu.edu"
+account="altai.sdsu.edu"
+account="phim.ucsd.edu"
 account="babieca.sdsu.edu"
+account="ux451302@tg-login2.sdsc.teragrid.org"
 
 echo -e "\n$account"
 
