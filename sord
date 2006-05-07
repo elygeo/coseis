@@ -84,31 +84,21 @@ np=$(( np3[0] * np3[1] * np3[2] ));
 nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
 
 # Domain size
-nn3[0]=$(( nn3[0] / np3[0] + 2 + ( nn3[0] % np3[0] > 0 ? 1 : 0 ) ))
-nn3[1]=$(( nn3[1] / np3[1] + 2 + ( nn3[1] % np3[1] > 0 ? 1 : 0 ) ))
-nn3[2]=$(( nn3[2] / np3[2] + 2 + ( nn3[2] % np3[2] > 0 ? 1 : 0 ) ))
+for (( i=0; i<3; i=i+1 )); do
+  nn3[i]=$(( nn3[i] / np3[i] + 2 + ( nn3[i] % np3[i] > 0 ? 1 : 0 ) ))
+done
 nn=$(( nn3[0] * nn3[1] * nn3[2] ));
 
 # RAM and Wall time usage
 floatsize=4
 nvars=21
 ram=$(( nn * floatsize * nvars / 1024 / 1024 + 15 ))
-[ $np -gt 1 ] && rate=$(( rate * 4 / 5 ))
-wt=$(( ( ( nt + 2 ) * nn / rate / 100 + np ) / 10 + 1 ))
-hh=$(( wt / 3600 ))
-mm=$(( wt % 3600 / 60 ))
-ss=$(( wt % 60 ))
-[ $hh -ge 1 ] && ss=0
-wt=$( echo $hh $mm $ss | awk '{ printf "%d:%02d:%02d\n", $1, $2, $3 }' )
-echo "Machine: $machine"
-echo "RAM usage: ${ram}Mb"
-echo "Wall time: $wt"
-
-# Wall time limit
-wt=$(( ( ( nt + 2 ) * nn / rate / 100 + np ) / 400 + 1 ))
+wt=$(( ( nt + 2 ) * nn / rate / 40000 + 10 ))
 hh=$(( wt / 60 ))
 mm=$(( wt % 60 ))
 wt=$( echo $hh $mm | awk '{ printf "%d:%02d:00\n", $1, $2 }' )
+echo "Machine: $machine"
+echo "RAM usage: ${ram}Mb"
 echo "Wall time limit: $wt"
 
 #------------------------------------------------------------------------------#

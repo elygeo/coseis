@@ -123,7 +123,7 @@ case 'sl'
   isfault = 1;
   fmax  = slmax;
   fmaxi = slmaxi;
-  labels = { 'Slip Path Length' '\el' };
+  labels = { 'Slip Path Length' 'l' };
 case 'f'
   isfault = 1;
   labels = { 'Friction' 'f' };
