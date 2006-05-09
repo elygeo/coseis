@@ -64,18 +64,21 @@ elif [ "$machine" = master ];   then machine=babieca
 fi
 
 # Machine attributes
-ppn=1
 rate=200
+maxn=1
+ppn=1
 case $machine in
-  altai)    rate=90  ;;
-  phat)     rate=180 ;;
-  phim)     rate=200 ;;
-  babieca)  rate=160; ppn=2 ;;
-  teragrid) rate=500; ppn=2 ;;
-  datastar) ppn=8 ;;
+  phat)                      maxram=800;   rate=180 ;;
+  phim)                      maxram=28000; rate=200 ;;
+  altai)    ppn=8;           maxram=30000; rate=90  ;; 
+  babieca)  ppn=2; maxn=36;  maxram=800;   rate=160 ;;
+  teragrid) ppn=2; maxn=262; maxram=3000;  rate=500 ;;
+  datastar) ppn=8; maxn=176; maxram=13500 ;;          
 esac
 
 # Number of processors
+maxp=$(( maxn * ppn ))
+[ $mode = guess -a $maxp -eq 1 ] && mode=serial
 [ $mode = serial ] && np3=( 1 1 1 )
 np=$(( np3[0] * np3[1] * np3[2] ));
 [ $mode = guess -a $np -eq 1 ] && mode=serial
@@ -98,7 +101,8 @@ hh=$(( wt / 60 ))
 mm=$(( wt % 60 ))
 wt=$( echo $hh $mm | awk '{ printf "%d:%02d:00\n", $1, $2 }' )
 echo "Machine: $machine"
-echo "RAM usage: ${ram}Mb"
+echo "Using $np of $maxn processors"
+echo "Using ${ram}Mb of ${maxram}Mb RAM"
 echo "Wall time limit: $wt"
 
 #------------------------------------------------------------------------------#
