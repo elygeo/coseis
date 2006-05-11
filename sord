@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-echo -e "\nSORD setup"
+echo "SORD setup"
 
 # Get command line options
 mode=guess
@@ -17,7 +17,7 @@ case "$opt" in
   g) fflags=g ;;
   G) fflags=g; run=g ;;
   n) setup= ; run= ;;
-  d) rm -rf r[0-9]*/ count;;
+  d) rm -rf [0-9][0-9] count ;;
   *) exit ;;
 esac
 done
@@ -205,17 +205,15 @@ SERIAL = $serial
 MPI = $mpi
 COMMON = $common
 VPATH = f
-fsord: makefile \$(BASE) \$(SERIAL) \$(COMMON)
-	cd f; \$(FC) \$(FFLAGS) \$(BASE) \$(SERIAL) \$(COMMON) -o ../fsord
+bin/sord-bin: makefile \$(BASE) \$(SERIAL) \$(COMMON)
+	cd f; \$(FC) \$(FFLAGS) \$(BASE) \$(SERIAL) \$(COMMON) -o ../bin/sord-bin
 	sh/tarball
-psord: makefile \$(BASE) \$(MPI) \$(COMMON)
-	cd f; \$(PFC) \$(FFLAGS) \$(BASE) \$(MPI) \$(COMMON) -o ../psord
+bin/sord-mpi-bin: makefile \$(BASE) \$(MPI) \$(COMMON)
+	cd f; \$(PFC) \$(FFLAGS) \$(BASE) \$(MPI) \$(COMMON) -o ../bin/sord-mpi-bin
 	sh/tarball
 clean:
-	rm -f tmp f/*.o f/*.mod f/*.ipo
-realclean: clean
-	rm -f makefile fsord psord
-.PHONY: clean realclean
+	rm -f tmp f/*.o f/*.mod f/*.ipo makefile
+.PHONY: clean
 END
 [ ! -f makefile ] && touch makefile
 [ "$( diff tmp makefile )" != "" ] && mv tmp makefile
@@ -227,19 +225,19 @@ rm -f tmp
 [ "$setup" ] || exit
 
 # Run number
-[ -f count ] && count=$( cat count )
-count=$(( count + 1 ))
+count=01
+[ -f count ] && count=$( awk '{ printf "%02d", $1+1 }' count )
 echo $count > count
 srcdir=$( /bin/pwd )
-rundir=$( /bin/pwd )/r$count
+rundir=$( /bin/pwd )/$count
 mkdir $rundir
 
 # Compile
+[ -d bin ] || mkdir bin
 case $mode in
-  serial)   gmake fsord; cp fsord $rundir ;;
-  parallel) gmake psord; cp psord $rundir ;;
+  serial)   gmake bin/sord-bin;     cp bin/sord-bin     $rundir ;;
+  parallel) gmake bin/sord-mpi-bin; cp bin/sord-mpi-bin $rundir ;;
 esac
-echo ''
 
 # Viz scripts
 echo "cd $srcdir" > m/srcdir.m
@@ -252,7 +250,7 @@ END
 chmod u+x viz
 
 # Setup files and folders
-echo "Run directory: r$count"
+echo "Run directory: $count"
 cp 'in.tmp' 'sord.tgz' $rundir
 cd $rundir
 mkdir checkpoint
@@ -325,18 +323,18 @@ cat << END > llscript
 #@ initialdir = $rundir
 #@ queue
 cd $rundir
-poe ./psord $opts
+poe ./sord-mpi-bin $opts
 END
 chmod u+x llscript
 fi
 
 case $mode$run in
-  seriali)   ./fsord ;;
-  serialg)   totalview ./fsord ;;
-  serialb)   nohup ./fsord > errors & ;;
-  paralleli) poe ./psord $opts ;;
-  parallelg) tvpoe ./psord $opts ;;
-  parallelb) nohup poe ./psord $opts > errors & ;;
+  seriali)   ./sord-bin ;;
+  serialg)   totalview ./sord-bin ;;
+  serialb)   nohup ./sord-bin > errors & ;;
+  paralleli) poe ./sord-mpi-bin $opts ;;
+  parallelg) tvpoe ./sord-mpi-bin $opts ;;
+  parallelb) nohup poe ./sord-mpi-bin $opts > errors & ;;
   parallelq) lljob=$( llsubmit llscript ) ;;
 esac
 
@@ -372,18 +370,18 @@ cat << END > pbsscript
 #PBS -e err.log
 #PBS -V
 cd $rundir
-mpirun -machinefile \$PBS_NODEFILE -np $np ./psord
+mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-mpi-bin
 END
 chmod u+x pbsscript
 fi
 
 case $mode$run in
-  seriali)   ./fsord ;;
-  serialg)   totalview ./fsord ;;
-  serialb)   nohup ./fsord > errors & ;;
-  paralleli) mpirun -machinefile mf -np $np ./psord ;;
-  parallelg) mpirun -tv -machinefile mf -np $np ./psord ;;
-  parallelb) nohup mpirun -machinefile mf -np $np ./psord > errors & ;;
+  seriali)   ./sord-bin ;;
+  serialg)   totalview ./sord-bin ;;
+  serialb)   nohup ./sord-bin > errors & ;;
+  paralleli) mpirun -machinefile mf -np $np ./sord-mpi-bin ;;
+  parallelg) mpirun -tv -machinefile mf -np $np ./sord-mpi-bin ;;
+  parallelb) nohup mpirun -machinefile mf -np $np ./sord-mpi-bin > errors & ;;
   parallelq) pbsjob=$( qsub pbsscript ) ;;
 esac
 
@@ -417,18 +415,18 @@ cat << END > pbsscript
 #PBS -V
 sleep 2
 cd $rundir
-mpiexec -n $np ./psord
+mpiexec -n $np ./sord-mpi-bin
 END
 chmod u+x pbsscript
 fi
   
 case $mode$run in
-  seriali)   mpirun -machinefile mf ./fsord ;;
-  serialg)   mpirun -machinefile mf -dbg=gdb ./fsord ;;
-  serialb)   nohup mpirun -machinefile mf ./fsord > errors & ;;
-  paralleli) mpirun -machinefile mf -np $np ./psord ;;
-  parallelg) mpirun -machinefile mf -np $np -dbg=gdb ./psord ;;
-  parallelb) nohup mpirun -machinefile mf -np $np ./psord > errors & ;;
+  seriali)   mpirun -machinefile mf ./sord-bin ;;
+  serialg)   mpirun -machinefile mf -dbg=gdb ./sord-bin ;;
+  serialb)   nohup mpirun -machinefile mf ./sord-bin > errors & ;;
+  paralleli) mpirun -machinefile mf -np $np ./sord-mpi-bin ;;
+  parallelg) mpirun -machinefile mf -np $np -dbg=gdb ./sord-mpi-bin ;;
+  parallelb) nohup mpirun -machinefile mf -np $np ./sord-mpi-bin > errors & ;;
   parallelq) pbsjob=$( qsub pbsscript ) ;;
 esac
 
@@ -438,12 +436,12 @@ esac
 
 [ "$mode" = parallel ] && mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon
 case $mode$run in
-  seriali)   ./fsord ;;
-  serialg)   ddd ./fsord ;;
-  serialb)   nice nohup ./fsord > errors & ;;
-  paralleli) mpiexec -np $np ./psord ;;
-  parallelg) mpiexec -gdb -np $np ./psord ;;
-  parallelb) nice nohup mpiexec -np $np ./psord > errors & ;;
+  seriali)   ./sord-bin ;;
+  serialg)   ddd ./sord-bin ;;
+  serialb)   nice nohup ./sord-bin > errors & ;;
+  paralleli) mpiexec -np $np ./sord-mpi-bin ;;
+  parallelg) mpiexec -gdb -np $np ./sord-mpi-bin ;;
+  parallelb) nice nohup mpiexec -np $np ./sord-mpi-bin > errors & ;;
 esac
 
 ;;
@@ -451,13 +449,13 @@ esac
 esac #--------------------------------------#
 
 if [ "$run" = b ]; then
-  echo "Running in background, to cancel: r$count/kill.sh"
+  echo "Background job started, to cancel: $count/kill.sh"
   echo "#!/bin/bash" > 'kill.sh'
   echo "kill $!" >> 'kill.sh'
   chmod u+x 'kill.sh'
 fi
 if [ "$pbsjob" ]; then
-  echo "Job submitted to PBS, to cancel: r$count/qdel.sh"
+  echo "Job submitted to PBS, to cancel: $count/qdel.sh"
   echo "#!/bin/bash" > 'qdel.sh'
   echo "qdel $pbsjob" >> 'qdel.sh'
   chmod u+x 'qdel.sh'

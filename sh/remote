@@ -1,18 +1,16 @@
 #!/bin/bash -e
 
-account="ux451302@dslogin.sdsc.edu"
-account="curl"
-account="phim.ucsd.edu"
-account="moho.sdsu.edu"
-account="ux451302@tg-login2.sdsc.teragrid.org"
-account="altai.sdsu.edu"
-account="babieca.sdsu.edu"
+list="1 2 3 5"
 
-echo -e "\n$account"
+accounts="\
+  phim.ucsd.edu
+  babieca.sdsu.edu
+  ux451302@tg-login2.sdsc.teragrid.org
+  ux451302@dslogin.sdsc.edu
+  altai.sdsu.edu
+  moho.sdsu.edu"
 
-ssh-add -L > /dev/null || ssh-add
-
-files="
+files="\
   readme
   sord
   defaults.m
@@ -20,13 +18,37 @@ files="
   in
   sh
   f
-  m
-"
+  m"
 
-rfiles=$( echo $files | sed 's|\([^ ]\+\)|sord/\1|g' )
+echo "SORD remote install"
 
-case "$1" in
-get) rsync -avub -e ssh --backup-dir=old $account:"$rfiles" . ;;
-*)   rsync -av   -e ssh --delete $files "$account:sord" ;;
+rfiles=$( echo "$files" | sed '/^$/d; s|^ *|sord/|g' )
+files=$( echo $files )
+rfiles=$( echo $rfiles )
+
+mode=put
+while getopts g opt; do
+case "$opt" in
+  g) mode=get ;;
+  *) exit ;;
 esac
+done
+shift $(( OPTIND - 1 ))
+echo "mode: $mode"
+
+ssh-add -L > /dev/null || ssh-add
+
+echo "$accounts" | cat -b
+echo -n "hosts [$list]: "
+read i
+[ -n "$i" ] && list="$i"
+
+for i in $list; do
+  account=$( echo "$accounts" | sed -n ${i}p )
+  echo $account
+  case $mode in
+  put) rsync -av   -e ssh --delete $files $account:sord ;;
+  get) rsync -avub -e ssh --backup-dir=old $account:"$rfiles" . ;;
+  esac
+done
 
