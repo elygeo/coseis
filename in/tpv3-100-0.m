@@ -16,12 +16,15 @@
   origin = 0;
   dx  = 100;
   dt  = .008;
-  nt  = 2500;
+  nt  = 1500;
   nt  = 1;
   out = { 'x'     1   1 1 0   -1 -1  0 };
   out = { 'su'   -1   1 1 0   -1 -1  0 };
-  out = { 'svp'  -1   1 1 0   -1 -1  0 };
-  out = { 'trup' -1   1 1 0   -1 -1  0 };
+% out = { 'svp'  -1   1 1 0   -1 -1  0 };
+% out = { 'trup' -1   1 1 0   -1 -1  0 };
+  out = { 'svm'  100  1 1 0   -1 -1  0 };
+  out = { 'svp'  100  1 1 0   -1 -1  0 };
+  out = { 'tarr' 100  1 1 0   -1 -1  0 };
   timeseries = { 'su' -7500.     0. 0. };
   timeseries = { 'sv' -7500.     0. 0. };
   timeseries = { 'ts' -7500.     0. 0. };
@@ -35,7 +38,7 @@
   n1expand = [  50  50  50 ];
 
   itcheck = 0;
-  np = [ 4 4 2 ];
+  np = [ 1 1 2 ];
 
 % 0. rectangular
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1. ] / 1.;

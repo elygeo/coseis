@@ -13,7 +13,7 @@ character(160) :: line
 
 if ( master ) call toc( 'Reading input' )
 
-open( 9, file='in.tmp', status='old' )
+open( 9, file='input', status='old' )
 
 doline: do
 
@@ -29,6 +29,7 @@ inzone = .false.
 
 ! Select input key
 select case( key )
+case( '#' )
 case( 'datadir' )
 case( 'return' );      exit doline
 case( 'grid' );        grid = str

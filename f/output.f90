@@ -83,7 +83,7 @@ if ( master ) then
   write( 9, * ) 'svtol       =  ', svtol,   ';'
   write( 9, * ) 'rexpand     =  ', rexpand, ';'
   write( 9, * ) 'courant     =  ', courant, ';'
-  write( 9, * ) 'affine      = [', affine,    '];'
+  write( 9, '(x,a,10g15.7,a)' ) 'affine      = [', affine, '];'
   write( 9, * ) 'viscosity   = [', viscosity, '];'
   write( 9, * ) 'upvector    = [', upvector,  '];'
   write( 9, * ) 'symmetry    = [', symmetry,  '];'
@@ -110,6 +110,7 @@ end if
 
 if ( nout > nz ) stop 'too many output zones, make nz bigger'
 
+write( 10+ip, * ) ip, nout
 doiz0: do iz = 1, nout
 
   ! Properties
@@ -269,7 +270,7 @@ case( 1 )
   wmaxi = maxloc( s2 )
   umax = s1(umaxi(1),umaxi(2),umaxi(3))
   wmax = s2(wmaxi(1),wmaxi(2),wmaxi(3))
-!write( 10+ip, * ) ifn, umax, wmax
+write( 10+ip, * ) ip, ifn, umax, wmax
   call pmaxloc( umax, umaxi, nnoff )
   call pmaxloc( wmax, wmaxi, nnoff )
   if ( master .and. umax > dx / 10. ) call toc( 'warning: u !<< dx' )
