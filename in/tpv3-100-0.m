@@ -38,7 +38,7 @@
   n1expand = [  50  50  50 ];
 
   itcheck = 0;
-  np = [ 1 1 2 ];
+  np = [ 4 4 2 ];
   debug = 1;
 
 % 0. rectangular

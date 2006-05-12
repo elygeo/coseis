@@ -46,7 +46,7 @@ while read key params; do
 set -- $params
 case "$key" in
   nt)  nt=$1 ;;
-  nn)  nn3=( $1 $2 $3 ) ;;
+  nn)  nm3=( $1 $2 $3 ) ;;
   np)  np3=( $1 $2 $3 ) ;;
   out) nout=$(( nout + 1 )) ;;
   timeseries) nout=$(( nout + 1 )) ;;
@@ -65,51 +65,51 @@ elif [ "$machine" = master ];   then machine=babieca
 fi
 
 # Machine attributes
-rate=200
-maxn=1
-ppn=1
+nodes=1; cpus=1; ram=800; rate=200
 case $machine in
-  phat)                      maxram=800;   rate=180 ;;
-  phim)                      maxram=28000; rate=200 ;;
-  altai)    ppn=8;           maxram=30000; rate=90  ;; 
-  babieca)  ppn=2; maxn=36;  maxram=800;   rate=160 ;;
-  teragrid) ppn=2; maxn=262; maxram=3000;  rate=500 ;;
-  datastar) ppn=8; maxn=176; maxram=13500 ;;          
+  phat)                        ram=800;   rate=180 ;;
+  phim)                        ram=2800;  rate=200 ;;
+  altai)    nodes=1;   cpus=8; ram=30000; rate=90  ;; 
+  babieca)  nodes=36;  cpus=2; ram=800;   rate=160 ;;
+  teragrid) nodes=262; cpus=2; ram=3000;  rate=500 ;;
+  datastar) nodes=176; cpus=8; ram=13500 ;;          
 esac
+echo "Machine: $machine"
 
 # Number of processors
-maxp=$(( maxn * ppn ))
-[ $mode = guess -a $maxp -eq 1 ] && mode=s
+[ $mode = guess -a $(( nodes * cpus )) -eq 1 ] && mode=s
 [ $mode = s ] && np3=( 1 1 1 )
 np=$(( np3[0] * np3[1] * np3[2] ));
+nn=$(( np / cpus + ( np % cpus > 0 ? 1 : 0 ) ))
+[ $nn -gt $nodes ] && nn=$nodes
+ppn=$(( np / nodes + ( np % nodes > 0 ? 1 : 0 ) ))
 [ $mode = guess -a $np -eq 1 ] && mode=s
 [ $mode = guess -a $np -gt 1 ] && mode=p
-[ $ppn -gt $np ] && ppn=$np
-nodes=$(( np / ppn + ( np % ppn > 0 ? 1 : 0 ) ))
 
 # Domain size
 for (( i=0; i<3; i=i+1 )); do
-  nn3[i]=$(( nn3[i] / np3[i] + 2 + ( nn3[i] % np3[i] > 0 ? 1 : 0 ) ))
+  nm3[i]=$(( nm3[i] / np3[i] + 2 + ( nm3[i] % np3[i] > 0 ? 1 : 0 ) ))
 done
-nn=$(( nn3[0] * nn3[1] * nn3[2] ));
+nm=$(( nm3[0] * nm3[1] * nm3[2] ));
 
 # RAM and Wall time usage
 floatsize=4
 nvars=21
-ram=$(( nn * floatsize * nvars / 1024 / 1024 + 15 ))
-wt=$(( ( nt + 2 ) * nn / rate / 40000 + 10 ))
-hh=$(( wt / 60 ))
-mm=$(( wt % 60 ))
-wt=$( echo $hh $mm | awk '{ printf "%d:%02d:00\n", $1, $2 }' )
-echo "Machine: $machine"
-echo "Using $np of $maxn processors"
-echo "Using ${ram}Mb of ${maxram}Mb RAM"
-echo "Wall time limit: $wt"
+mem=$(( ppn * ( nm * floatsize * nvars / 1024 / 1024 + 15 ) ))
+mm=$(( ( nt + 2 ) * nm / rate / 40000 + 10 ))
+hh=$(( mm / 60 ))
+mm=$(( mm % 60 ))
+walltime=$( echo $hh $mm | awk '{ printf "%d:%02d:00\n", $1, $2 }' )
+echo "Processes: $np"
+echo "Memory usage ${mem}Mb"
+echo "Wall time limit: $walltime"
+[ $ppn -gt $cpus ] && echo "WARNING! exceding available CPUs ($cpus)"
+[ $mem -gt $ram ]  && echo "WARNING! exceding available RAM (${ram}Mb)"
 
 [ "$setup" ] || exit
 
 #------------------------------------------------------------------------------#
-# Compile code
+# Compile
 
 # Source files
 base="
@@ -216,7 +216,7 @@ cd ..
 [ "$compile" ] && sh/tarball
 
 #------------------------------------------------------------------------------#
-# Set up run
+# Set-up
 
 # Locations
 count=01
@@ -277,7 +277,7 @@ if [ -n "$interactive" -a $HOSTNAME != ds100 ]; then
   echo "interactive jobs must be launched from dspoe"
   exit
 fi
-opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
+opts="-tasks_per_node $ppn -nodes $nn -rmpool 1 -euilib us -euidevice sn_all"
 if [ -z "$interactive" -a $mode = p ]; then
 cat << END > llscript
 #!/bin/bash
@@ -297,9 +297,9 @@ cat << END > llscript
 #SPINLOOPTIME=0;\\
 #YIELDLOOPTIME=0;
 #@ class = normal
-#@ node = $nodes
+#@ node = $nn
 #@ tasks_per_node = $ppn
-#@ wall_clock_limit = $wt
+#@ wall_clock_limit = $walltime
 #@ node_usage = not_shared
 #@ network.MPI = sn_all, shared, US
 #@ job_type = parallel
@@ -352,8 +352,8 @@ cat << END > pbsscript
 #!/bin/bash
 #PBS -q dque
 #PBS -N sord-$count
-#PBS -l nodes=$nodes:ppn=$ppn
-#PBS -l walltime=$wt
+#PBS -l nodes=$nn:ppn=$ppn
+#PBS -l walltime=$walltime
 #PBS -o out.log
 #PBS -e err.log
 #PBS -V
@@ -397,7 +397,7 @@ cat << END > pbsscript
 #!/bin/bash
 #PBS -q workq
 #PBS -N sord-$count
-#PBS -l nodes=$nodes:ppn=$ppn:mpi
+#PBS -l nodes=$nn:ppn=$ppn:mpi
 #PBS -o out.log
 #PBS -e err.log
 #PBS -V
