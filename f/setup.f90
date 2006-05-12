@@ -48,6 +48,9 @@ nl = min( nl, nn + nnoff - nhalo )
 ! Size of arrays
 nm = nl + 2 * nhalo
 
+! Test if both sides of the fault exists on this processor
+if ( ihypo(ifn) < 1 .or. ihypo(ifn) >= nm(ifn) ) ifn = 0
+
 ! PML region
 i1pml = nnoff + npml
 i2pml = nnoff + nn + 1 - npml

@@ -22,14 +22,14 @@ i1 = 1  + nnoff
 i2 = nn + nnoff
 i1l = i1node
 i2l = i2node
-if ( ifn /= 0 ) then
-  i = ihypo(ifn)
-  if ( i < i1l(ifn) ) then
-    if ( i >= i1(ifn) ) i1(ifn) = i1(ifn) + 1
+if ( faultnormal /= 0 ) then
+  i = abs( faultnormal )
+  if ( ihypo(i) < i1l(i) ) then
+    if ( ihypo(i) >= i1(i) ) i1(i) = i1(i) + 1
   else
-    if ( i <  i2(ifn) ) i2(ifn) = i2(ifn) - 1
-    if ( i <= i2l(ifn) ) idoublenode = ifn
-    if ( i <  i2l(ifn) ) i2l(ifn) = i2l(ifn) - 1
+    if ( ihypo(i) <  i2(i) ) i2(i) = i2(i) - 1
+    if ( ihypo(i) <= i2l(i) ) idoublenode = i
+    if ( ihypo(i) <  i2l(i) ) i2l(i) = i2l(i) - 1
   end if
 end if
 j1 = i1l(1); j2 = i2l(1)

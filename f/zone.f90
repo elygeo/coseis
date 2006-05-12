@@ -3,13 +3,14 @@ module zone_m
 implicit none
 contains
 
-subroutine zone( i1, i2, nn, nnoff, ihypo, ifn )
+subroutine zone( i1, i2, nn, nnoff, ihypo, faultnormal )
 integer, intent(inout) :: i1(3), i2(3)
-integer, intent(in) :: nn(3), nnoff(3), ihypo(3), ifn
-integer :: nshift(3)
+integer, intent(in) :: nn(3), nnoff(3), ihypo(3), faultnormal
+integer :: i, nshift(3)
 logical :: m0(3), m1(3), m2(3), m3(3), m4(3)
 nshift = 0
-if ( ifn /= 0 ) nshift(ifn) = 1
+i = abs( faultnormal )
+if ( i /= 0 ) nshift(i) = 1
 m0 = i1 == 0 .and. i2 == 0
 m1 = i1 == 0 .and. i2 /= 0
 m2 = i1 /= 0 .and. i2 == 0

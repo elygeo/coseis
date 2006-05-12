@@ -17,12 +17,6 @@ integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
 if ( ifn == 0 ) return
 if ( master ) call toc( 'Fault initialization' )
 
-! Test if both sides of the fault exists on this processor
-if ( ihypo(ifn) < 1 .or. ihypo(ifn) >= nm(ifn) ) then
-  ifn = 0
-  return
-end if
-
 ! Input
 mus = 0.
 mud = 0.
@@ -62,7 +56,7 @@ case( 'z' )
   rr = inval(iz)
   i1 = i1in(iz,:)
   i2 = i2in(iz,:)
-  call zone( i1, i2, nn, nnoff, ihypo, ifn )
+  call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
   i1 = max( i1, i1node )
   i2 = min( i2, i2node )
   i1(ifn) = 1

@@ -14,7 +14,7 @@ if ( init ) then
   do iz = 1, nlock
     i1 = i1lock(iz,:)
     i2 = i2lock(iz,:)
-    call zone( i1, i2, nn, nnoff, ihypo, ifn )
+    call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
     i1lock(iz,:) = max( i1, i2node )
     i2lock(iz,:) = min( i2, i2node )
   end do

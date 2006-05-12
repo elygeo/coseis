@@ -39,6 +39,7 @@
 
   itcheck = 0;
   np = [ 1 1 2 ];
+  debug = 1;
 
 % 0. rectangular
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1. ] / 1.;

@@ -34,7 +34,7 @@ doiz: do iz = 1, nin
 ! Indices
 i1 = i1in(iz,:)
 i2 = i2in(iz,:)
-call zone( i1, i2, nn, nnoff, ihypo, ifn )
+call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
 i1l = max( i1, i1node )
 i2l = min( i2, i2node )
 
@@ -76,14 +76,14 @@ case( 'c' )
   end select
 case( 'r' )
   idoublenode = 0
-  if ( ifn /= 0 ) then
-    i = ihypo(ifn)
-    if ( i < i1l(ifn) ) then
-      if ( i >= i1(ifn) ) i1(ifn) = i1(ifn) + 1
+  if ( faultnormal /= 0 ) then
+    i = abs( faultnormal )
+    if ( ihypo(i) < i1l(i) ) then
+      if ( ihypo(i) >= i1(i) ) i1(i) = i1(i) + 1
     else
-      if ( i <  i2(ifn) ) i2(ifn) = i2(ifn) - 1
-      if ( i <= i2l(ifn) ) idoublenode = ifn
-      if ( i <  i2l(ifn) ) i2l(ifn) = i2l(ifn) - 1
+      if ( ihypo(i) <  i2(i) ) i2(i) = i2(i) - 1
+      if ( ihypo(i) <= i2l(i) ) idoublenode = i
+      if ( ihypo(i) <  i2l(i) ) i2l(i) = i2l(i) - 1
     end if
   end if
   j1 = i1l(1); j2 = i2l(1)
@@ -167,7 +167,7 @@ call diffnc( s1, 'g', x, x, dx, 1, 1, i1cell, i2cell )
 j = ihypo(1)
 k = ihypo(2)
 l = ihypo(3)
-select case( ifn )
+select case( abs( faultnormal ) )
 case( 1 ); s1(j,:,:) = 0.; lam(j,:,:) = 0.; mu(j,:,:) = 0.
 case( 2 ); s1(:,k,:) = 0.; lam(:,k,:) = 0.; mu(:,k,:) = 0.
 case( 3 ); s1(:,:,l) = 0.; lam(:,:,l) = 0.; mu(:,:,l) = 0.

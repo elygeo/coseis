@@ -6,7 +6,7 @@ contains
 subroutine arrays
 use globals_m
 use tictoc_m
-integer :: i1(3), i2(3), j, k, l, j1, k1, l1, j2, k2, l2
+integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2
 
 if ( master ) call toc( 'Allocate arrays' )
 
@@ -58,9 +58,10 @@ allocate(       &
 ! PML damping
 allocate( dn1(npml), dn2(npml), dc1(npml), dc2(npml) )
 
-if ( ifn > 0 ) then
+if ( faultnormal /= 0 ) then
+  i = abs( faultnormal )
   i1 = nm
-  i1(ifn) = 1
+  i1(i) = 1
 else
   i1 = 0
 end if

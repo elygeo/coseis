@@ -31,12 +31,12 @@ call diffnc( s1, 'g', x, x, dx, 1, 1, i1, i2 )
 
 ! Cell center locations
 w1 = 2. * rsource
-forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-  w1(j,k,l,:) = 0.125 * &
-    ( x(j,k,l,:) + x(j+1,k+1,l+1,:) &
-    + x(j+1,k,l,:) + x(j,k+1,l+1,:) &
-    + x(j,k+1,l,:) + x(j+1,k,l+1,:) &
-    + x(j,k,l+1,:) + x(j+1,k+1,l,:) );
+forall( j=j1:j2, k=k1:k2, l=l1:l2, i=1:3 )
+  w1(j,k,l,i) = 0.125 * &
+    ( x(j,k,l,i) + x(j+1,k+1,l+1,i) &
+    + x(j+1,k,l,i) + x(j,k+1,l+1,i) &
+    + x(j,k+1,l,i) + x(j+1,k,l+1,i) &
+    + x(j,k,l+1,i) + x(j+1,k+1,l,i) );
 end forall
 
 ! Find radius to cell from source location
