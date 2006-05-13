@@ -25,9 +25,10 @@ shift $(( OPTIND - 1 ))
 
 # Symlink input file specified on command line
 [ -n "$1" ] && ln -sf "$1" 'in.m'
+srcdir=$( /bin/pwd )
+mkdir -p tmp
 
 # Prepare input file
-mkdir -p tmp
 cat 'defaults.m' 'in.m' | sed "
 s/%.*$//;
 s/;/\\
@@ -101,7 +102,7 @@ hh=$(( mm / 60 ))
 mm=$(( mm % 60 ))
 walltime=$( echo $hh $mm | awk '{ printf "%d:%02d:00\n", $1, $2 }' )
 echo "Processes: $np"
-echo "Memory usage ${mem}Mb"
+echo "Memory usage: ${mem}Mb per node"
 echo "Wall time limit: $walltime"
 [ $ppn -gt $cpus ] && echo "WARNING! exceding available CPUs ($cpus)"
 [ $mem -gt $ram ]  && echo "WARNING! exceding available RAM (${ram}Mb)"
@@ -109,7 +110,54 @@ echo "Wall time limit: $walltime"
 [ "$setup" ] || exit
 
 #------------------------------------------------------------------------------#
-# Compile
+
+# Compiler
+IFS=":$IFS"
+for dir in $PATH; do
+for file in xlf95_r ifort pgf90 gfortran f95; do
+  if [ -x $dir/$file ]; then
+    sfc=$file
+    break 2
+  fi
+done
+done
+pfc='mpif90'
+case $sfc in
+xlf95_r)
+  sfc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
+  pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
+  gflags='-p -g -C -qflttrap -qsigtrap -qlanglvl=95pure'
+  oflags='-O -qmaxmem=-1'
+  oflags='-O5'
+  ;;
+ifort)
+  gflags='-O0 -p -g -CB -warn -traceback -u'
+  oflags='-fast'
+  ;;
+pgf90)
+  gflags='-g -Mprof=func'
+  oflags='-fastsse'
+  ;;
+gfortran)
+  gflags='-O0 -p -g -W -pedantic -std=f95 -fimplicit-none'
+  oflags='-O3'
+  ;;
+f95)
+  gflags='-g'
+  oflags='-O'
+  if [ $( uname ) = SunOS ]; then
+    gflags='-g -w4 -u -C'
+    oflags='-fast'
+  fi
+  ;;
+*)
+  echo "Error: no Fortran 95 compiler found"
+  exit
+esac
+case $fflags in
+  O) fflags=$oflags ;;
+  g) fflags=$gflags ;;
+esac
 
 # Source files
 base="
@@ -146,74 +194,29 @@ common="
   timestep.f90
   sord.f90"
 
-# Compiler
-IFS=":$IFS"
-for dir in $PATH; do
-for file in xlf95_r ifort pgf90 gfortran f95; do
-  if [ -x $dir/$file ]; then
-    sfc=$file
-    break 2
-  fi
-done
-done
-pfc='mpif90'
-case $sfc in
-xlf95_r)
-  sfc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
-  pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
-  gflags='-p -g -C -qflttrap -qsigtrap -qlanglvl=95pure'
-  oflags='-O -qmaxmem=-1'
-  oflags='-O5'
-  ;;
-ifort)
-  gflags='-O0 -p -g -CB -warn -traceback -u'
-  oflags='-O3'
-  oflags='-fast'
-  ;;
-pgf90)
-  gflags='-g -Mprof=func'
-  oflags='-fastsse'
-  ;;
-gfortran)
-  pfc='mpif90 -O0'
-  gflags='-p -g -W -pedantic -std=f95 -fimplicit-none'
-  oflags='-O3'
-  ;;
-f95)
-  gflags='-g'
-  oflags='-O'
-  if [ $( uname ) = SunOS ]; then
-    gflags='-g -w4 -u -C'
-    oflags='-fast'
-  fi
-  ;;
-*)
-  echo "Error: no Fortran 95 compiler found"
-  exit
-esac
-
-case $fflags in
-  O) fflags=$oflags ;;
-  g) fflags=$gflags ;;
-esac
-
+# Compile
 cd f
-cat $base $serial   $common > ../tmp/sord-s.f90.tmp
-cat $base $parallel $common > ../tmp/sord-p.f90.tmp
-cd ../tmp
-echo "$sfc $fflags sord-s.f90 -o sord-s" > make-s.tmp
-echo "$pfc $fflags sord-p.f90 -o sord-p" > make-p.tmp
-for file in sord-$mode.f90 make-$mode ; do
-  [ ! -f $file ] && touch $file
-  if [ "$( diff $file $file.tmp )" != "" ]; then
-    mv $file.tmp $file
-    compile=yes
-  fi
-done
-rm -f *.tmp
-[ "$compile" ] && sh -v make-$mode
-cd ..
-[ "$compile" ] && sh/tarball
+case $mode in
+  s) fc="$sfc"; collective="$serial" ;;
+  p) fc="$pfc"; collective="$parallel" ;;
+esac
+make="$fc $fflags -o $srcdir/tmp/sord-$mode $base $collective $common"
+echo "$make" > state
+cat $base $collective $common >> state 
+compile=yes
+if [ -f "$srcdir/tmp/state-$mode" ]; then
+  compile=$( cmp state "$srcdir/tmp/state-$mode" || : )
+fi
+if [ "$compile" ]; then
+  mv state "$srcdir/tmp/state-$mode"
+  echo $make
+  $make
+  cd "$srcdir"
+  sh/tarball
+fi
+cd "$srcdir"
+rm -f f/state
+
 
 #------------------------------------------------------------------------------#
 # Set-up
@@ -223,8 +226,7 @@ count=01
 [ -f tmp/count ] && count=$( awk '{ printf "%02d", $1+1 }' tmp/count )
 echo $count > tmp/count
 echo "Run directory: $count"
-srcdir=$( /bin/pwd )
-rundir=$( /bin/pwd )/$count
+rundir="$srcdir/$count"
 
 # Viz scripts
 echo "cd $srcdir" > m/srcdir.m

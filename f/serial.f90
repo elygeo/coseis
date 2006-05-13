@@ -1,13 +1,13 @@
-! Dummy routines providing hooks for parallelizaion
+! Collective routines - Provides hooks for parallelization
 module collective_m
 implicit none
 contains
 
 ! Initialize
-subroutine initialize( ip, np0, master )
+subroutine initialize( ipout, np0, master )
 logical, intent(out) :: master
-integer, intent(out) :: ip, np0
-ip = 0
+integer, intent(out) :: ipout, np0
+ipout = 0
 np0 = 1
 master = .true.
 end subroutine
@@ -17,9 +17,9 @@ subroutine finalize
 end subroutine
 
 ! Processor rank
-subroutine rank( np, ip, ip3 )
+subroutine rank( np, ipout, ip3 )
 integer, intent(in) :: np(3)
-integer, intent(out) :: ip, ip3(3)
+integer, intent(out) :: ipout, ip3(3)
 ip = 0
 ip3 = np - np
 end subroutine
@@ -37,7 +37,7 @@ real, intent(inout) :: r(:)
 r = r
 end subroutine
 
-! Integer Minimum
+! Integer minimum
 subroutine pimin( i )
 integer, intent(inout) :: i
 i = i
@@ -112,7 +112,7 @@ f(1,1,1) = f(1,1,1)
 i = nhalo
 end subroutine
 
-! Vector swap halor
+! Vector swap halo
 subroutine vectorswaphalo( f, nhalo )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: nhalo

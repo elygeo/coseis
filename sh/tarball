@@ -24,6 +24,7 @@ files="
 "
 
 ln -s . $base
+rm -f f/*.o f/*.mod f/*.ipo f/state
 mkdir -p tmp
 tar cf - $files | gzip > tmp/sord.tgz
 rm $base

@@ -1,4 +1,4 @@
-! MPIIO
+! Binary input and output - MPIIO version
 module collectiveio_m
 use collective_m
 implicit none
@@ -16,7 +16,7 @@ end subroutine
 ! Scalar field input/output
 subroutine scalario( io, filename, s1, ir, i1, i2, i1l, i2l, iz )
 character(*), intent(in) :: io, filename
-real, intent(in) :: s1(:,:,:)
+real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: ir, i1(3), i2(3), i1l(3), i2l(3), iz
 integer :: ftype, mtype, fh, nl(4), n(4), i0(4), e
 integer(kind=mpi_offset_kind) :: d = 0
@@ -49,7 +49,7 @@ end subroutine
 ! Vector field component input/output
 subroutine vectorio( io, filename, w1, ic, ir, i1, i2, i1l, i2l, iz )
 character(*), intent(in) :: io, filename
-real, intent(in) :: w1(:,:,:,:)
+real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: ic, ir, i1(3), i2(3), i1l(3), i2l(3), iz
 integer :: ftype, mtype, fh, nl(4), n(4), i0(4), e
 integer(kind=mpi_offset_kind) :: d = 0

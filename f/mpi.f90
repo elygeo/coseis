@@ -1,4 +1,4 @@
-! MPI routines
+! Collective routines - MPI version
 module collective_m
 use mpi
 implicit none

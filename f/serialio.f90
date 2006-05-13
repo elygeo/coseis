@@ -1,10 +1,10 @@
-! Binary input and output
+! Binary input and output - Serial version
 module collectiveio_m
 use collective_m
 implicit none
 contains
 
-! Placeholder for split collective parallel output
+! Split communicator
 subroutine iosplit( iz, nout, ditout )
 integer, intent(in) :: iz, nout, ditout
 integer :: i
@@ -44,7 +44,7 @@ case( 'w' )
 end select
 end subroutine
 
-! Vector component input/output
+! Vector field component input/output
 subroutine vectorio( io, filename, w1, ic, ir, i1, i2, i1l, i2l, iz )
 character(*), intent(in) :: io, filename
 real, intent(inout) :: w1(:,:,:,:)
