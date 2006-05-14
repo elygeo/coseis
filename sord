@@ -66,26 +66,26 @@ elif [ "$machine" = master ];   then machine=babieca
 fi
 
 # Machine attributes
-nodes=1; cpus=1; ram=800; rate=200
+maxnodes=1; cpus=1; maxram=800; rate=200
 case $machine in
-  phat)                        ram=800;   rate=180 ;;
-  phim)                        ram=2800;  rate=200 ;;
-  altai)    nodes=1;   cpus=8; ram=30000; rate=90  ;; 
-  babieca)  nodes=36;  cpus=2; ram=800;   rate=160 ;;
-  teragrid) nodes=262; cpus=2; ram=3000;  rate=500 ;;
-  datastar) nodes=176; cpus=8; ram=13500 ;;          
+  phat)                           maxram=800;   rate=180 ;;
+  phim)                           maxram=2800;  rate=200 ;;
+  altai)    maxnodes=1;   cpus=8; maxram=30000; rate=90  ;; 
+  babieca)  maxnodes=36;  cpus=2; maxram=800;   rate=160 ;;
+  teragrid) maxnodes=262; cpus=2; maxram=3000;  rate=500 ;;
+  datastar) maxnodes=176; cpus=8; maxram=13500 ;;          
 esac
 echo "Machine: $machine"
 
 # Number of processors
-[ $mode = guess -a $(( nodes * cpus )) -eq 1 ] && mode=s
+[ $mode = guess -a $(( maxnodes * cpus )) -eq 1 ] && mode=s
 [ $mode = s ] && np3=( 1 1 1 )
 np=$(( np3[0] * np3[1] * np3[2] ));
-nn=$(( np / cpus + ( np % cpus > 0 ? 1 : 0 ) ))
-[ $nn -gt $nodes ] && nn=$nodes
-ppn=$(( np / nodes + ( np % nodes > 0 ? 1 : 0 ) ))
 [ $mode = guess -a $np -eq 1 ] && mode=s
 [ $mode = guess -a $np -gt 1 ] && mode=p
+nodes=$(( np / cpus + ( np % cpus > 0 ? 1 : 0 ) ))
+[ $nodes -gt $maxnodes ] && nodes=$maxnodes
+ppn=$(( np / nodes + ( np % nodes > 0 ? 1 : 0 ) ))
 
 # Domain size
 for (( i=0; i<3; i=i+1 )); do
@@ -96,16 +96,16 @@ nm=$(( nm3[0] * nm3[1] * nm3[2] ));
 # RAM and Wall time usage
 floatsize=4
 nvars=21
-mem=$(( ppn * ( nm * floatsize * nvars / 1024 / 1024 + 15 ) ))
-mm=$(( ( nt + 2 ) * nm / rate / 40000 + 10 ))
+ram=$(( ppn * ( nm * floatsize * nvars / 1024 / 1024 + 15 ) ))
+mm=$(( ( nt + 2 ) * nm * ppn / cpus / rate / 40000 + 10 ))
 hh=$(( mm / 60 ))
 mm=$(( mm % 60 ))
 walltime=$( echo $hh $mm | awk '{ printf "%d:%02d:00\n", $1, $2 }' )
 echo "Processes: $np"
-echo "Memory usage: ${mem}Mb per node"
+echo "Memory usage: ${ram}Mb per node"
 echo "Wall time limit: $walltime"
-[ $ppn -gt $cpus ] && echo "WARNING! exceding available CPUs ($cpus)"
-[ $mem -gt $ram ]  && echo "WARNING! exceding available RAM (${ram}Mb)"
+[ $ppn -gt $cpus ]    && echo "WARNING! exceding available CPUs ($cpus)"
+[ $ram -gt $maxram ]  && echo "WARNING! exceding available RAM (${maxram}Mb)"
 
 [ "$setup" ] || exit
 
@@ -279,7 +279,7 @@ if [ -n "$interactive" -a $HOSTNAME != ds100 ]; then
   echo "interactive jobs must be launched from dspoe"
   exit
 fi
-opts="-tasks_per_node $ppn -nodes $nn -rmpool 1 -euilib us -euidevice sn_all"
+opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
 if [ -z "$interactive" -a $mode = p ]; then
 cat << END > llscript
 #!/bin/bash
@@ -299,7 +299,7 @@ cat << END > llscript
 #SPINLOOPTIME=0;\\
 #YIELDLOOPTIME=0;
 #@ class = normal
-#@ node = $nn
+#@ node = $nodes
 #@ tasks_per_node = $ppn
 #@ wall_clock_limit = $walltime
 #@ node_usage = not_shared
@@ -354,7 +354,7 @@ cat << END > pbsscript
 #!/bin/bash
 #PBS -q dque
 #PBS -N sord-$count
-#PBS -l nodes=$nn:ppn=$ppn
+#PBS -l nodes=$nodes:ppn=$ppn
 #PBS -l walltime=$walltime
 #PBS -o out.log
 #PBS -e err.log
@@ -399,7 +399,7 @@ cat << END > pbsscript
 #!/bin/bash
 #PBS -q workq
 #PBS -N sord-$count
-#PBS -l nodes=$nn:ppn=$ppn:mpi
+#PBS -l nodes=$nodes:ppn=$ppn:mpi
 #PBS -o out.log
 #PBS -e err.log
 #PBS -V

@@ -20,7 +20,7 @@ end subroutine
 subroutine rank( np, ipout, ip3 )
 integer, intent(in) :: np(3)
 integer, intent(out) :: ipout, ip3(3)
-ip = 0
+ipout = 0
 ip3 = np - np
 end subroutine
 
