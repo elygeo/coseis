@@ -25,7 +25,8 @@ end if
 
 ! Diagnostic
 if ( debug /= 0 ) then
-  open(  9, file='diagnostic.m', position='append' )
+  write( str, '(a,i6.6,a)' ) 'debug/db', ip, '.m'
+  open(  9, file=str, status='replace' )
   write( 9, * ) 'ifn         =  ', ifn,         ';'
   write( 9, * ) 'nin         =  ', nin,         ';'
   write( 9, * ) 'nout        =  ', nout,        ';'
@@ -49,10 +50,16 @@ if ( debug /= 0 ) then
   write( 9, * ) 'ibc2        = [', ibc2,       '];'
   write( 9, * ) 'oper        = ''', oper,     ''';'
   do iz = 1, nin
-    write( 9,*) fieldin(iz), ' = [', inval(iz), i1in(iz,:), i2in(iz,:), '];'
+    select case( intype(iz) )
+    case( 'z' ); write( 9, '(a,a,g15.7,a,6i7,a)' ) &
+      fieldin(iz), ' = {', inval(iz), " 'zone'", i1in(iz,:), i2in(iz,:), ' };'
+    case( 'c' ); write( 9, '(a,a,g15.7,a,6g15.7,a)' ) &
+      fieldin(iz), ' = {', inval(iz), " 'cube'", x1in(iz,:), x2in(iz,:), ' };'
+    end select
   end do
   do iz = 1, nlock
-    write( 9,*) 'lock        = [', ilock(iz,:), i1lock(iz,:), i2lock(iz,:), '];'
+    write( 9, '(a,9i7,a)' ) &
+      'lock        = [', ilock(iz,:), i1lock(iz,:), i2lock(iz,:), '];'
   end do
   close( 9 )
 end if
@@ -231,8 +238,7 @@ doiz0: do iz = 1, nout
   ! Metadata
   if ( master ) then
     write( field, * ) '''', trim( fieldout(iz) ), ''''
-    write( 9, '(a,i3,a,i1,a,7i7,a)' ) ' out{', iz, '}    = { ', nc, field, &
-      ditout(iz), i1 - nnoff, i2 - nnoff, ' };'
+    write( 9, '(a,i3,a,i1,a,7i7,a)' ) ' out{', iz, '}    = { ', nc, field, ditout(iz), i1 - nnoff, i2 - nnoff, ' };'
   end if
  
   if ( any( i2 < i1 ) ) stop 'bad output indices'

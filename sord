@@ -88,9 +88,9 @@ nodes=$(( np / cpus + ( np % cpus > 0 ? 1 : 0 ) ))
 ppn=$(( np / nodes + ( np % nodes > 0 ? 1 : 0 ) ))
 
 # Domain size
-for (( i=0; i<3; i=i+1 )); do
-  nm3[i]=$(( nm3[i] / np3[i] + 2 + ( nm3[i] % np3[i] > 0 ? 1 : 0 ) ))
-done
+nm3[0]=$(( nm3[0] / np3[0] + 2 + ( nm3[0] % np3[0] > 0 ? 1 : 0 ) ))
+nm3[1]=$(( nm3[1] / np3[1] + 2 + ( nm3[1] % np3[1] > 0 ? 1 : 0 ) ))
+nm3[2]=$(( nm3[2] / np3[2] + 2 + ( nm3[2] % np3[2] > 0 ? 1 : 0 ) ))
 nm=$(( nm3[0] * nm3[1] * nm3[2] ));
 
 # RAM and Wall time usage
@@ -244,6 +244,7 @@ cp tmp/sord.tgz tmp/sord-$mode tmp/input $rundir
 cd $rundir
 mkdir stats
 mkdir checkpoint
+mkdir debug
 i=0
 while [ $i -lt $nout ]; do
   i=$(( i + 1 ))
