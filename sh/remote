@@ -26,16 +26,6 @@ rfiles=$( echo "$files" | sed '/^$/d; s|^ *|sord/|g' )
 files=$( echo $files )
 rfiles=$( echo $rfiles )
 
-mode=put
-while getopts g opt; do
-case "$opt" in
-  g) mode=get ;;
-  *) exit ;;
-esac
-done
-shift $(( OPTIND - 1 ))
-echo "mode: $mode"
-
 ssh-add -L > /dev/null || ssh-add
 
 echo "$accounts" | cat -b
@@ -46,9 +36,6 @@ read i
 for i in $list; do
   account=$( echo "$accounts" | sed -n ${i}p )
   echo $account
-  case $mode in
-  put) rsync -av   -e ssh --delete $files $account:sord ;;
-  get) rsync -avub -e ssh --backup-dir=old $account:"$rfiles" . ;;
-  esac
+  rsync -av --delete $files $account:sord
 done
 

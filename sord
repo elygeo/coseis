@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-echo "SORD setup"
+echo " SORD setup"
 
 # Get command line options
 mode=guess
@@ -75,7 +75,7 @@ case $machine in
   teragrid) maxnodes=262; cpus=2; maxram=3000;  rate=500 ;;
   datastar) maxnodes=176; cpus=8; maxram=13500 ;;          
 esac
-echo "Machine: $machine"
+echo " Machine: $machine"
 
 # Number of processors
 [ $mode = guess -a $(( maxnodes * cpus )) -eq 1 ] && mode=s
@@ -91,21 +91,21 @@ ppn=$(( np / nodes + ( np % nodes > 0 ? 1 : 0 ) ))
 nm3[0]=$(( nm3[0] / np3[0] + 2 + ( nm3[0] % np3[0] > 0 ? 1 : 0 ) ))
 nm3[1]=$(( nm3[1] / np3[1] + 2 + ( nm3[1] % np3[1] > 0 ? 1 : 0 ) ))
 nm3[2]=$(( nm3[2] / np3[2] + 2 + ( nm3[2] % np3[2] > 0 ? 1 : 0 ) ))
-nm=$(( nm3[0] * nm3[1] * nm3[2] ));
+nm=$( echo ${nm3[*]} | awk '{ print $1 * $2 * $3 }' )
 
 # RAM and Wall time usage
 floatsize=4
 nvars=21
-ram=$(( ppn * ( nm * floatsize * nvars / 1024 / 1024 + 15 ) ))
-mm=$(( ( nt + 2 ) * nm * ppn / cpus / rate / 40000 + 10 ))
+ram=$( echo $ppn $nm $nvars $floatsize | awk '{ printf "%d", $1 * ( $2 * $3 * $4 / 1024 / 1024 + 15 ) }' )
+mm=$( echo $nt $nm $ppn $cpus $rate | awk '{ printf "%d", ( $1 + 2 ) * $2 * $3 / $4 / $5 / 40000 + 10 }' )
 hh=$(( mm / 60 ))
 mm=$(( mm % 60 ))
-walltime=$( echo $hh $mm | awk '{ printf "%d:%02d:00\n", $1, $2 }' )
-echo "Processes: $np"
-echo "Memory usage: ${ram}Mb per node"
-echo "Wall time limit: $walltime"
-[ $ppn -gt $cpus ]    && echo "WARNING! exceding available CPUs ($cpus)"
-[ $ram -gt $maxram ]  && echo "WARNING! exceding available RAM (${maxram}Mb)"
+walltime=$( echo $hh $mm | awk '{ printf "%d:%02d:00", $1, $2 }' )
+echo " Processes: $np"
+echo " Memory usage: ${ram}Mb per node"
+echo " Wall time limit: $walltime"
+[ $ppn -gt $cpus ]    && echo " Warning: exceding available CPUs ($cpus)"
+[ $ram -gt $maxram ]  && echo " Warning: exceding available RAM (${maxram}Mb)"
 
 [ "$setup" ] || exit
 
@@ -151,7 +151,7 @@ f95)
   fi
   ;;
 *)
-  echo "Error: no Fortran 95 compiler found"
+  echo " Error: no Fortran 95 compiler found"
   exit
 esac
 case $fflags in
@@ -209,7 +209,7 @@ if [ -f "$srcdir/tmp/state-$mode" ]; then
 fi
 if [ "$compile" ]; then
   mv state "$srcdir/tmp/state-$mode"
-  echo $make
+  echo "" $make
   $make
   cd "$srcdir"
   sh/tarball
@@ -225,7 +225,7 @@ rm -f f/state
 count=01
 [ -f tmp/count ] && count=$( awk '{ printf "%02d", $1+1 }' tmp/count )
 echo $count > tmp/count
-echo "Run directory: $count"
+echo " Run directory: $count"
 rundir="$srcdir/$count"
 
 # Viz scripts
@@ -273,11 +273,11 @@ case $machine in
 datastar) #--------------------------------------#
 
 if [ $( pwd | grep -v gpfs ) ]; then
-  echo "jobs must be run from /gpfs"
+  echo " Error: jobs must be run from /gpfs"
   exit
 fi
 if [ -n "$interactive" -a $HOSTNAME != ds100 ]; then
-  echo "interactive jobs must be launched from dspoe"
+  echo " Error: interactive jobs must be launched from dspoe"
   exit
 fi
 opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
@@ -334,22 +334,22 @@ esac
 teragrid) #--------------------------------------#
 
 if [ $( pwd | grep -v gpfs ) ]; then
-  echo "Error: jobs must be run from /gpfs"
+  echo " Error: jobs must be run from /gpfs"
   exit
 fi
 
 if [ "$interactive" ]; then
-  hosts="tg-c127 tg-c128 tg-c129 tg-c130"
-  match=
-  for host in $hosts; do
-    [ $host = $HOSTNAME ] && match=yes
-    echo $node:2 >> mf
-  done
-  if [ -z "$match" ]; then
-    echo "Error: interactive jobs must be launched from the following hosts:"
-    echo "$inodes"
-    exit
-  fi
+cat << END > mf
+tg-c127:2
+tg-c128:2
+tg-c129:2
+tg-c130:2
+END
+if ! grep -q "$HOSTNAME" mf; then
+  echo " Error: interactive jobs must be launched from the following hosts:"
+  sed 's/^/  /; s/:2//' mf
+  exit
+fi
 elif [ $mode = p ]; then
 cat << END > pbsscript
 #!/bin/bash
@@ -395,12 +395,12 @@ node46:2
 node47:2
 node48:2
 END
-elif [ $mode = p ]; then
+else
 cat << END > pbsscript
 #!/bin/bash
 #PBS -q workq
 #PBS -N sord-$count
-#PBS -l nodes=$nodes:ppn=$ppn:mpi
+#PBS -l nodes=$nodes:ppn=$ppn
 #PBS -o out.log
 #PBS -e err.log
 #PBS -V
@@ -437,13 +437,13 @@ esac
 esac #--------------------------------------#
 
 if [ "$run" = b ]; then
-  echo "Background job started, to cancel: $count/kill.sh"
+  echo " Background job started, to cancel: $count/kill.sh"
   echo "#!/bin/bash" > 'kill.sh'
   echo "kill $!" >> 'kill.sh'
   chmod u+x 'kill.sh'
 fi
 if [ "$pbsjob" ]; then
-  echo "Job submitted to PBS, to cancel: $count/qdel.sh"
+  echo " Job submitted to PBS, to cancel: $count/qdel.sh"
   echo "#!/bin/bash" > 'qdel.sh'
   echo "qdel $pbsjob" >> 'qdel.sh'
   chmod u+x 'qdel.sh'
