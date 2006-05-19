@@ -164,13 +164,10 @@ end forall
 ! Cell volume
 s1 = 0.
 call diffnc( s1, 'g', x, x, dx, 1, 1, i1cell, i2cell )
-j = ihypo(1)
-k = ihypo(2)
-l = ihypo(3)
-select case( abs( faultnormal ) )
-case( 1 ); s1(j,:,:) = 0.; lam(j,:,:) = 0.; mu(j,:,:) = 0.
-case( 2 ); s1(:,k,:) = 0.; lam(:,k,:) = 0.; mu(:,k,:) = 0.
-case( 3 ); s1(:,:,l) = 0.; lam(:,:,l) = 0.; mu(:,:,l) = 0.
+select case( ifn )
+case( 1 ); j = ihypo(1); s1(j,:,:) = 0.; lam(j,:,:) = 0.; mu(j,:,:) = 0.
+case( 2 ); k = ihypo(2); s1(:,k,:) = 0.; lam(:,k,:) = 0.; mu(:,k,:) = 0.
+case( 3 ); l = ihypo(3); s1(:,:,l) = 0.; lam(:,:,l) = 0.; mu(:,:,l) = 0.
 end select
 
 ! Node volume

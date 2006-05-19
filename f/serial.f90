@@ -31,6 +31,13 @@ integer :: i
 i = ip3master(1)
 end subroutine
 
+! Split fault
+subroutine splitfault( i )
+integer, intent(in) :: i
+integer :: ii
+ii = i
+end subroutine
+
 ! Broadcast
 subroutine broadcast( r )
 real, intent(inout) :: r(:)
@@ -68,20 +75,22 @@ r = r
 end subroutine
 
 ! Real global minimum & location, send to master
-subroutine pminloc( r, i, nnoff )
+subroutine pminloc( r, i, nnoff, fault )
 real, intent(inout) :: r
 integer, intent(inout) :: i(3)
 integer, intent(in) :: nnoff(3)
-r = r
+logical, intent(in) :: fault
+if ( fault ) r = r
 i = i - nnoff + nnoff
 end subroutine
 
 ! Real global maximum & location, send to master
-subroutine pmaxloc( r, i, nnoff )
+subroutine pmaxloc( r, i, nnoff, fault )
 real, intent(inout) :: r
 integer, intent(inout) :: i(3)
 integer, intent(in) :: nnoff(3)
-r = r
+logical, intent(in) :: fault
+if ( fault ) r = r
 i = i - nnoff + nnoff
 end subroutine
 
@@ -89,36 +98,28 @@ end subroutine
 subroutine vectorsend( f, i1, i2, i )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i
-integer :: ii
-f(1,1,1,1) = f(1,1,1,1)
-ii = i1(1) + i2(1) + i
+f(1,1,1,1) = f(1,1,1,1) - i1(1) + i1(1) - i2(1) + i2(1) - i + i
 end subroutine
 
 ! Vector recieve
 subroutine vectorrecv( f, i1, i2, i )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i
-integer ::  ii
-f(1,1,1,1) = f(1,1,1,1)
-ii = i1(1) + i2(1) + i
+f(1,1,1,1) = f(1,1,1,1) - i1(1) + i1(1) - i2(1) + i2(1) - i + i
 end subroutine
 
 ! Scalar swap halo
 subroutine scalarswaphalo( f, nhalo )
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: nhalo
-integer :: i
-f(1,1,1) = f(1,1,1)
-i = nhalo
+f(1,1,1) = f(1,1,1) - nhalo + nhalo
 end subroutine
 
 ! Vector swap halo
 subroutine vectorswaphalo( f, nhalo )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: nhalo
-integer :: i
-f(1,1,1,1) = f(1,1,1,1)
-i = nhalo
+f(1,1,1,1) = f(1,1,1,1) - nhalo + nhalo
 end subroutine
 
 end module

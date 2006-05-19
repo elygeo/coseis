@@ -58,10 +58,9 @@ allocate(       &
 ! PML damping
 allocate( dn1(npml), dn2(npml), dc1(npml), dc2(npml) )
 
-if ( faultnormal /= 0 ) then
-  i = abs( faultnormal )
+if ( ifn /= 0 ) then
   i1 = nm
-  i1(i) = 1
+  i1(ifn) = 1
 else
   i1 = 0
 end if

@@ -5,7 +5,7 @@ implicit none
 contains
 
 ! Split communicator
-subroutine iosplit( iz, nout, ditout )
+subroutine splitio( iz, nout, ditout )
 integer, intent(in) :: iz, nout, ditout
 integer :: i
 i = iz + nout + ditout ! silence compiler warnings

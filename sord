@@ -1,13 +1,13 @@
 #!/bin/bash -e
 
-echo " SORD setup"
+echo "SORD setup"
 
 # Get command line options
 mode=guess
 fflags=O
 setup=yes
 run=
-while getopts spibqgGnd opt; do
+while getopts spibqgGndf opt; do
 case "$opt" in
   s) mode=s ;;
   p) mode=p ;;
@@ -17,7 +17,8 @@ case "$opt" in
   g) fflags=g ;;
   G) fflags=g; run=g ;;
   n) setup= ; run= ;;
-  d) rm -rf [0-9][0-9] tmp/count ;;
+  d) rm -rf [0-9][0-9] ;;
+  f) rm -rf tmp ;;
   *) exit ;;
 esac
 done
@@ -75,7 +76,7 @@ case $machine in
   teragrid) maxnodes=262; cpus=2; maxram=3000;  rate=500 ;;
   datastar) maxnodes=176; cpus=8; maxram=13500 ;;          
 esac
-echo " Machine: $machine"
+echo "Machine: $machine"
 
 # Number of processors
 [ $mode = guess -a $(( maxnodes * cpus )) -eq 1 ] && mode=s
@@ -101,11 +102,11 @@ mm=$( echo $nt $nm $ppn $cpus $rate | awk '{ printf "%d", ( $1 + 2 ) * $2 * $3 /
 hh=$(( mm / 60 ))
 mm=$(( mm % 60 ))
 walltime=$( echo $hh $mm | awk '{ printf "%d:%02d:00", $1, $2 }' )
-echo " Processes: $np"
-echo " Memory usage: ${ram}Mb per node"
-echo " Wall time limit: $walltime"
-[ $ppn -gt $cpus ]    && echo " Warning: exceding available CPUs ($cpus)"
-[ $ram -gt $maxram ]  && echo " Warning: exceding available RAM (${maxram}Mb)"
+echo "Processes: $np"
+echo "Memory usage: ${ram}Mb per node"
+echo "Wall time limit: $walltime"
+[ $ppn -gt $cpus ]    && echo "Warning: exceding available CPUs ($cpus)"
+[ $ram -gt $maxram ]  && echo "Warning: exceding available RAM (${maxram}Mb)"
 
 [ "$setup" ] || exit
 
@@ -133,6 +134,7 @@ xlf95_r)
 ifort)
   gflags='-O0 -p -g -CB -warn -traceback -u'
   oflags='-fast'
+  [ $machine = teragrid ] && oflags='-O3'
   ;;
 pgf90)
   gflags='-g -Mprof=func'
@@ -151,7 +153,7 @@ f95)
   fi
   ;;
 *)
-  echo " Error: no Fortran 95 compiler found"
+  echo "Error: no Fortran 95 compiler found"
   exit
 esac
 case $fflags in
@@ -201,31 +203,30 @@ case $mode in
   p) fc="$pfc"; collective="$parallel" ;;
 esac
 make="$fc $fflags -o $srcdir/tmp/sord-$mode $base $collective $common"
-echo "$make" > state
-cat $base $collective $common >> state 
+echo "$make" > "$srcdir/tmp/state"
+cat $base $collective $common >> "$srcdir/tmp/state" 
 compile=yes
 if [ -f "$srcdir/tmp/state-$mode" ]; then
-  compile=$( cmp state "$srcdir/tmp/state-$mode" || : )
+  compile=$( cmp "$srcdir/tmp/state" "$srcdir/tmp/state-$mode" || : )
 fi
 if [ "$compile" ]; then
-  mv state "$srcdir/tmp/state-$mode"
-  echo "" $make
+  rm -f "$srcdir/tmp/state-$mode"
+  echo $make
   $make
   cd "$srcdir"
   sh/tarball
+  mv "$srcdir/tmp/state" "$srcdir/tmp/state-$mode"
 fi
 cd "$srcdir"
-rm -f f/state
-
 
 #------------------------------------------------------------------------------#
 # Set-up
 
 # Locations
-count=01
-[ -f tmp/count ] && count=$( awk '{ printf "%02d", $1+1 }' tmp/count )
-echo $count > tmp/count
-echo " Run directory: $count"
+count=$( echo [0-9][0-9] | sed 's/.* //' )
+[ $count = '[0-9][0-9]' ] && count=00
+count=$( echo $count | awk '{ printf "%02d", $1+1 }' )
+echo "Run directory: $count"
 rundir="$srcdir/$count"
 
 # Viz scripts
@@ -264,7 +265,6 @@ host    = '$HOSTNAME';
 os      = '$( uname -a )';
 END
 
-
 #------------------------------------------------------------------------------#
 # Run
 
@@ -273,11 +273,11 @@ case $machine in
 datastar) #--------------------------------------#
 
 if [ $( pwd | grep -v gpfs ) ]; then
-  echo " Error: jobs must be run from /gpfs"
+  echo "Error: jobs must be run from /gpfs"
   exit
 fi
 if [ -n "$interactive" -a $HOSTNAME != ds100 ]; then
-  echo " Error: interactive jobs must be launched from dspoe"
+  echo "Error: interactive jobs must be launched from dspoe"
   exit
 fi
 opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
@@ -334,7 +334,7 @@ esac
 teragrid) #--------------------------------------#
 
 if [ $( pwd | grep -v gpfs ) ]; then
-  echo " Error: jobs must be run from /gpfs"
+  echo "Error: jobs must be run from /gpfs"
   exit
 fi
 
@@ -346,7 +346,7 @@ tg-c129:2
 tg-c130:2
 END
 if ! grep -q "$HOSTNAME" mf; then
-  echo " Error: interactive jobs must be launched from the following hosts:"
+  echo "Error: interactive jobs must be launched from the following hosts:"
   sed 's/^/  /; s/:2//' mf
   exit
 fi
@@ -437,13 +437,13 @@ esac
 esac #--------------------------------------#
 
 if [ "$run" = b ]; then
-  echo " Background job started, to cancel: $count/kill.sh"
+  echo "Background job started, to cancel: $count/kill.sh"
   echo "#!/bin/bash" > 'kill.sh'
   echo "kill $!" >> 'kill.sh'
   chmod u+x 'kill.sh'
 fi
 if [ "$pbsjob" ]; then
-  echo " Job submitted to PBS, to cancel: $count/qdel.sh"
+  echo "Job submitted to PBS, to cancel: $count/qdel.sh"
   echo "#!/bin/bash" > 'qdel.sh'
   echo "qdel $pbsjob" >> 'qdel.sh'
   chmod u+x 'qdel.sh'

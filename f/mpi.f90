@@ -3,7 +3,7 @@ module collective_m
 use mpi
 implicit none
 integer :: c
-integer, private :: ip, ipmaster
+integer, private :: ip, ipmaster, commfault
 contains
 
 ! Initialize
@@ -48,6 +48,13 @@ subroutine setmaster( ip3master )
 integer, intent(in) :: ip3master(3)
 integer :: e
 call mpi_cart_rank( c, ip3master, ipmaster, e )
+end subroutine
+
+! Split fault
+subroutine splitfault( i )
+integer, intent(in) :: i
+integer :: e
+call mpi_comm_split( c, i, 0, commfault, e )
 end subroutine
 
 ! Broadcast
@@ -103,45 +110,51 @@ r = rr
 end subroutine
 
 ! Real global minimum & location, send to master
-subroutine pminloc( r, i, nnoff )
+subroutine pminloc( r, i, nnoff, fault )
 real, intent(inout) :: r
 integer, intent(inout) :: i(3)
 integer, intent(in) :: nnoff(3)
-integer :: e, iip
+logical, intent(in) :: fault
+integer :: comm, e, iip
 real :: local(2), global(2)
 local(1) = r
 local(2) = ip
-call mpi_allreduce( local, global, 1, mpi_2real, mpi_minloc, c, e )
+comm = c
+if ( fault ) comm = commfault
+call mpi_allreduce( local, global, 1, mpi_2real, mpi_minloc, comm, e )
 r   = global(1)
 iip = global(2)
 i = i - nnoff
 if ( iip /= ipmaster .and. ip == iip ) then
-  call mpi_send( i, 3, mpi_integer, ipmaster, 0, c, e )
+  call mpi_send( i, 3, mpi_integer, ipmaster, 0, comm, e )
 end if
 if ( iip /= ipmaster .and. ip == ipmaster ) then
-  call mpi_recv( i, 3, mpi_integer, iip, 0, c, mpi_status_ignore, e )
+  call mpi_recv( i, 3, mpi_integer, iip, 0, comm, mpi_status_ignore, e )
 end if
 i = i + nnoff
 end subroutine
 
 ! Real global maximum & location, send to master
-subroutine pmaxloc( r, i, nnoff )
+subroutine pmaxloc( r, i, nnoff, fault )
 real, intent(inout) :: r
 integer, intent(inout) :: i(3)
 integer, intent(in) :: nnoff(3)
-integer :: e, iip
+logical, intent(in) :: fault
+integer :: comm, e, iip
 real :: local(2), global(2)
 local(1) = r
 local(2) = ip
-call mpi_allreduce( local, global, 1, mpi_2real, mpi_maxloc, c, e )
+comm = c
+if ( fault ) comm = commfault
+call mpi_allreduce( local, global, 1, mpi_2real, mpi_maxloc, comm, e )
 r   = global(1)
 iip = global(2)
 i = i - nnoff
 if ( iip /= ipmaster .and. ip == iip ) then
-  call mpi_send( i, 3, mpi_integer, ipmaster, 0, c, e )
+  call mpi_send( i, 3, mpi_integer, ipmaster, 0, comm, e )
 end if
 if ( iip /= ipmaster .and. ip == ipmaster ) then
-  call mpi_recv( i, 3, mpi_integer, iip, 0, c, mpi_status_ignore, e )
+  call mpi_recv( i, 3, mpi_integer, iip, 0, comm, mpi_status_ignore, e )
 end if
 i = i + nnoff
 end subroutine

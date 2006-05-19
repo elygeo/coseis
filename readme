@@ -446,7 +446,7 @@ V   =  ----------------------------------------
        8 * pi * rho * vp^2 * T^3 * r * vp
 
 
-PML ABSORBING BOUNDARY
+PML ABSORBING BOUNDARY CONDITION
 
 Damping operator
 D     = [ d(x)  0     0
@@ -592,5 +592,8 @@ MPICH2 INSTALL
   ./configure -prefix=/usr/local --with-device=ch3:shm --enable-f90 
   echo "secretword=<secretword>" > $HOME/.mpd.conf
   chmod 600 $HOME/.mpd.conf
-  gforker
+
+Solaris
+  export CC=cc F77=f77 F90=f95
+  ./configure -prefix=/d0/gely/local --with-device=ch3:shm --enable-f90 --disable-cxx
 

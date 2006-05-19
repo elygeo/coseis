@@ -21,8 +21,8 @@
   viscosity = [ .1 .7 ];		% stress (1) & hourglass (2)
 % npml = 0;				% no PML absorbing boundary
   npml = 10;				% 10 PML nodes
-  bc1 = [ 0 0 0 ];			% j1 k1 l1 boundary cond
-  bc2 = [ 0 0 0 ];			% j2 k2 l2 boundary cond
+  bc1 = [ 0 0 0 ];			% j1 k1 l1 boundary cond (see below)
+  bc2 = [ 0 0 0 ];			% j2 k2 l2 boundary cond (see below)
   ihypo	 = [ 0 0 0 ];			% hypocenter node
   xhypo	 = [ -1. -1. -1. ];		% hypocenter location
   rexpand = 1.06;			% grid expansion ratio
@@ -70,6 +70,20 @@
   debug = 0;                            % debugging off
 % out = { 'v'  10   1 1 1  -1 -1 -1 };	% **write v every 10 steps
 % out = { 'sl' -1   1 1 1  -1 -1 -1 };	% **write final slip length
+
+% Boundary conditions:
+%  0: free surface
+%  1: PML absorbing
+%  2: mirror symmetry on exterior cell center
+%     continuous tangential and oposing normal vecotor components
+%  3: mirror symmetry on boundary node
+%     continuous tangential and oposing normal vecotor components
+% -2: mirror symmetry on exterior cell center, 180 phase shift
+%     continuous normal and oposing tangential vecotor components
+% -3: mirror symmetry on boundary node, 180 phase shift
+%     continuous normal and oposing tangential vecotor components
+%  4: continuation
+%  9: domain boundary (for internal use only)
 
 % **optional zone argument, zones accumulate when specified multiple times
 %   'zone' j1 k1 l1   j2 k2 l2

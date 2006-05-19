@@ -221,10 +221,10 @@ if ( master ) then
 end if
 
 ! For output pass 1
-t1 = 0.
-t2 = 0.
-f1 = 0.
-f2 = 0.
+!t1 = 0.
+!t2 = 0.
+!f1 = 0.
+!f2 = 0.
 
 end subroutine
 

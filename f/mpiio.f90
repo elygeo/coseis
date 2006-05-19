@@ -6,7 +6,7 @@ integer, private, allocatable :: commout(:)
 contains
 
 ! Split communicator
-subroutine iosplit( iz, nout, ditout )
+subroutine splitio( iz, nout, ditout )
 integer, intent(in) :: iz, nout, ditout
 integer :: e
 if ( .not. allocated( commout ) ) allocate( commout(nout+1) )
@@ -20,7 +20,7 @@ real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: ir, i1(3), i2(3), i1l(3), i2l(3), iz
 integer :: ftype, mtype, fh, nl(4), n(4), i0(4), e
 integer(kind=mpi_offset_kind) :: d = 0
-call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
+call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 nl = (/ i2l - i1l + 1, 1      /)
 n  = (/ i2  - i1  + 1, ir     /)
 i0 = (/ i1l - i1,      ir - 1 /)
@@ -53,7 +53,7 @@ real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: ic, ir, i1(3), i2(3), i1l(3), i2l(3), iz
 integer :: ftype, mtype, fh, nl(4), n(4), i0(4), e
 integer(kind=mpi_offset_kind) :: d = 0
-call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
+call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 nl = (/ i2l - i1l + 1, 1      /)
 n  = (/ i2  - i1  + 1, ir     /)
 i0 = (/ i1l - i1,      ir - 1 /)
