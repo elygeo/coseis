@@ -13,7 +13,7 @@ real :: courant, rout
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz
 character :: endian
 character(7) :: field
-logical :: fault, test, cell
+logical :: fault, dofault, test, cell
 
 i = 0
 if ( master ) then
@@ -24,8 +24,14 @@ if ( master ) then
 end if
 
 ! Fault communicator
-if ( i /= 0 ) then
-  if ( ihypo(i) < i1node(i) .or. ihypo(i) > i2node(i) ) i = 0
+dofault = .false.
+if ( faultnormal /= 0 ) then
+  i = abs( faultnormal )
+  if ( ihypo(i) >= i1node(i) .and. ihypo(i) <= i2node(i) ) then
+    dofault = .true.
+  else
+    i = 0
+  end if
   call splitfault( i )
 end if
 
@@ -185,27 +191,25 @@ doiz0: do iz = 1, nout
     if ( fault ) then
       i1 = nnoff
       rout = rmax
-      if ( faultnormal /= 0 ) then
+      if ( dofault ) then
         i = abs( faultnormal )
-        if ( ihypo(i) >= i1node(i) .and. ihypo(i) <= i2node(i) ) then
-          i1 = 1
-          i2 = nm
-          i1(i) = ihypo(i)
-          i2(i) = ihypo(i)
-          j1 = i1(1); j2 = i2(1)
-          k1 = i1(2); k2 = i2(2)
-          l1 = i1(3); l2 = i2(3)
-          do i = 1, 3
-            t1(:,:,:,i) = xout(iz,i) - x(j1:j2,k1:k2,l1:l2,i)
-          end do
-          f1 = sum( t1 * t1, 4 )
-          i1 = minloc( f1 )
-          rout = f1(i1(1),i1(2),i1(3))
-          i1(i) = ihypo(i)
-          t1 = 0.
-          f1 = 0.
-          call pminloc( rout, i1, nnoff, fault )
-        end if
+        i1 = 1
+        i2 = nm
+        i1(i) = ihypo(i)
+        i2(i) = ihypo(i)
+        j1 = i1(1); j2 = i2(1)
+        k1 = i1(2); k2 = i2(2)
+        l1 = i1(3); l2 = i2(3)
+        do i = 1, 3
+          t1(:,:,:,i) = xout(iz,i) - x(j1:j2,k1:k2,l1:l2,i)
+        end do
+        f1 = sum( t1 * t1, 4 )
+        i1 = minloc( f1 )
+        rout = f1(i1(1),i1(2),i1(3))
+        i1(i) = ihypo(i)
+        t1 = 0.
+        f1 = 0.
+        call pminloc( rout, i1, nnoff, fault )
       end if
     else
       if ( cell ) then
@@ -230,7 +234,7 @@ doiz0: do iz = 1, nout
       s1 = sum( w1 * w1, 4 )
       i1 = minloc( s1 )
       rout = s1(i1(1),i1(2),i1(3))
-      call pminloc( rout, i1, nnoff )
+      call pminloc( rout, i1, nnoff, fault )
       w1 = 0.
       s1 = 0.
     end if
@@ -282,9 +286,16 @@ real, save :: amax, vmax, umax, wmax, &
 integer, save, dimension(3) :: amaxi, vmaxi, umaxi, wmaxi, &
   samaxi, svmaxi, sumaxi, tnmaxi, tsmaxi, slmaxi, tarrmaxi
 integer :: onpass, i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, ic, ir, iz
-logical :: fault, test
+logical :: fault, dofault, test
 
 if ( master ) call toc( 'Output' )
+
+! Fault
+dofault = .false.
+if ( faultnormal /= 0 ) then
+  i = abs( faultnormal )
+  if ( ihypo(i) >= i1node(i) .and. ihypo(i) <= i2node(i) ) dofault = .true.
+end if
 
 ! Magnitudes
 select case( pass )
@@ -298,13 +309,11 @@ case( 1 )
   call pmaxloc( umax, umaxi, nnoff, fault )
   call pmaxloc( wmax, wmaxi, nnoff, fault )
   if ( master .and. umax > dx / 10. ) call toc( 'warning: u !<< dx' )
-  if ( faultnormal /= 0 ) then
-    i = abs( faultnormal )
+  if ( dofault ) then
     svmaxi = maxloc( f1 )
     sumaxi = maxloc( f2 )
     svmax = f1(svmaxi(1),svmaxi(2),svmaxi(3))
     sumax = f2(sumaxi(1),sumaxi(2),sumaxi(3))
-write( 10+ip, * ) ifn, svmax, size( f1, 1 ), size( f1, 2 ), size( f1, 3 )
     svmaxi(i) = ihypo(i)
     sumaxi(i) = ihypo(i)
     call pmaxloc( svmax, svmaxi, nnoff, fault )
@@ -319,8 +328,7 @@ case( 2 )
   vmax = s2(vmaxi(1),vmaxi(2),vmaxi(3))
   call pmaxloc( amax, amaxi, nnoff, fault )
   call pmaxloc( vmax, vmaxi, nnoff, fault )
-  if ( faultnormal /= 0 ) then
-    i = abs( faultnormal )
+  if ( dofault ) then
     samaxi = maxloc( f1 )
     tnmaxi = maxloc( abs( tn ) )
     tsmaxi = maxloc( ts )
@@ -403,7 +411,7 @@ i1 = i1out(iz,:)
 i2 = i2out(iz,:)
 i1l = max( i1, i1node )
 i2l = min( i2, i2node )
-if ( fault .and. faultnormal /= 0 ) then
+if ( fault ) then
   i = abs( faultnormal )
   i1(i) = 1
   i2(i) = 1
@@ -493,7 +501,7 @@ if ( master ) then
   write( 9, * ) 'vmaxi    = [', vmaxi - nnoff, '];'
   write( 9, * ) 'umaxi    = [', umaxi - nnoff, '];'
   write( 9, * ) 'wmaxi    = [', wmaxi - nnoff, '];'
-  if ( faultnormal /= 0 ) then
+  if ( dofault ) then
     i = abs( faultnormal )
     i1 = ihypo
     i1(i) = 1
