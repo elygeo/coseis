@@ -10,7 +10,7 @@ subroutine splitio( iz, nout, ditout )
 integer, intent(in) :: iz, nout, ditout
 integer :: e
 if ( .not. allocated( commout ) ) allocate( commout(nout+1) )
-call mpi_comm_split( c, ditout, 0, commout(iz), e )
+call mpi_comm_split( comm3d, ditout, 0, commout(iz), e )
 end subroutine
 
 ! Scalar field input/output
@@ -32,7 +32,7 @@ call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype,
 call mpi_type_commit( mtype, e )
 select case( io )
 case( 'r' )
-  call mpi_file_open( c, filename, mpi_mode_rdonly, mpi_info_null, fh, e )
+  call mpi_file_open( comm3d, filename, mpi_mode_rdonly, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
   call mpi_file_close( fh, e )
@@ -65,7 +65,7 @@ call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, mtype,
 call mpi_type_commit( mtype, e )
 select case( io )
 case( 'r' )
-  call mpi_file_open( c, filename, mpi_mode_rdonly, mpi_info_null, fh, e )
+  call mpi_file_open( comm3d, filename, mpi_mode_rdonly, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, w1(1,1,1,1), 1, mtype, mpi_status_ignore, e )
   call mpi_file_close( fh, e )

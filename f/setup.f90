@@ -28,9 +28,9 @@ nnoff = nhalo - nl * ip3
 
 ! Master processor
 ip3master = ( ihypo - 1 ) / nl
-call setmaster( ip3master )
 master = .false.
 if ( all( ip3 == ip3master ) ) master = .true.
+call setmaster( ip3master )
 
 ! Size of arrays
 nl = min( nl, nn + nnoff - nhalo )

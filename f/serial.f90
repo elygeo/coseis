@@ -31,13 +31,6 @@ integer :: i
 i = ip3master(1)
 end subroutine
 
-! Split fault
-subroutine splitfault( i )
-integer, intent(in) :: i
-integer :: ii
-ii = i
-end subroutine
-
 ! Broadcast
 subroutine broadcast( r )
 real, intent(inout) :: r(:)
@@ -75,23 +68,21 @@ r = r
 end subroutine
 
 ! Real global minimum & location, send to master
-subroutine pminloc( r, i, nnoff, fault )
+subroutine pminloc( r, i, nnoff, i2d )
 real, intent(inout) :: r
 integer, intent(inout) :: i(3)
-integer, intent(in) :: nnoff(3)
-logical, intent(in) :: fault
-if ( fault ) r = r
-i = i - nnoff + nnoff
+integer, intent(in) :: nnoff(3), i2d
+r = r
+i = i - nnoff + nnoff - i2d + i2d
 end subroutine
 
 ! Real global maximum & location, send to master
-subroutine pmaxloc( r, i, nnoff, fault )
+subroutine pmaxloc( r, i, nnoff, i2d )
 real, intent(inout) :: r
 integer, intent(inout) :: i(3)
-integer, intent(in) :: nnoff(3)
-logical, intent(in) :: fault
-if ( fault ) r = r
-i = i - nnoff + nnoff
+integer, intent(in) :: nnoff(3), i2d
+r = r
+i = i - nnoff + nnoff - i2d + i2d
 end subroutine
 
 ! Vector send

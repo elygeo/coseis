@@ -23,18 +23,6 @@ if ( master ) then
   if ( test .and. it == 1 ) stop 'error: previous output found'
 end if
 
-! Fault communicator
-dofault = .false.
-if ( faultnormal /= 0 ) then
-  i = abs( faultnormal )
-  if ( ihypo(i) >= i1node(i) .and. ihypo(i) <= i2node(i) ) then
-    dofault = .true.
-  else
-    i = 0
-  end if
-  call splitfault( i )
-end if
-
 ! Diagnostic
 if ( debug /= 0 ) then
   write( str, '(a,i6.6,a)' ) 'debug/db', ip, '.m'
@@ -129,6 +117,13 @@ end if
 
 if ( nout > nz ) stop 'too many output zones, make nz bigger'
 
+! Test for fault
+dofault = .false.
+if ( faultnormal /= 0 ) then
+  i = abs( faultnormal )
+  if ( ihypo(i) >= i1node(i) .and. ihypo(i) <= i2node(i) ) dofault = .true.
+end if
+
 doiz0: do iz = 1, nout
 
   ! Properties
@@ -209,7 +204,7 @@ doiz0: do iz = 1, nout
         i1(i) = ihypo(i)
         t1 = 0.
         f1 = 0.
-        call pminloc( rout, i1, nnoff, fault )
+        call pminloc( rout, i1, nnoff, i )
       end if
     else
       if ( cell ) then
@@ -234,7 +229,7 @@ doiz0: do iz = 1, nout
       s1 = sum( w1 * w1, 4 )
       i1 = minloc( s1 )
       rout = s1(i1(1),i1(2),i1(3))
-      call pminloc( rout, i1, nnoff, fault )
+      call pminloc( rout, i1, nnoff, 0 )
       w1 = 0.
       s1 = 0.
     end if
@@ -290,13 +285,14 @@ logical :: fault, dofault, test
 
 if ( master ) call toc( 'Output' )
 
-! Fault
+! Test for fault
 dofault = .false.
 if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
   if ( ihypo(i) >= i1node(i) .and. ihypo(i) <= i2node(i) ) dofault = .true.
 end if
 
+write( 10+ip, * ) ip, dofault
 ! Magnitudes
 select case( pass )
 case( 1 )
@@ -306,8 +302,8 @@ case( 1 )
   wmaxi = maxloc( s2 )
   umax = s1(umaxi(1),umaxi(2),umaxi(3))
   wmax = s2(wmaxi(1),wmaxi(2),wmaxi(3))
-  call pmaxloc( umax, umaxi, nnoff, fault )
-  call pmaxloc( wmax, wmaxi, nnoff, fault )
+  call pmaxloc( umax, umaxi, nnoff, 0 )
+  call pmaxloc( wmax, wmaxi, nnoff, 0 )
   if ( master .and. umax > dx / 10. ) call toc( 'warning: u !<< dx' )
   if ( dofault ) then
     svmaxi = maxloc( f1 )
@@ -316,8 +312,8 @@ case( 1 )
     sumax = f2(sumaxi(1),sumaxi(2),sumaxi(3))
     svmaxi(i) = ihypo(i)
     sumaxi(i) = ihypo(i)
-    call pmaxloc( svmax, svmaxi, nnoff, fault )
-    call pmaxloc( sumax, sumaxi, nnoff, fault )
+    call pmaxloc( svmax, svmaxi, nnoff, i )
+    call pmaxloc( sumax, sumaxi, nnoff, i )
   end if
 case( 2 )
   s1 = sqrt( sum( w1 * w1, 4 ) )
@@ -326,8 +322,8 @@ case( 2 )
   vmaxi = maxloc( s2 )
   amax = s1(amaxi(1),amaxi(2),amaxi(3))
   vmax = s2(vmaxi(1),vmaxi(2),vmaxi(3))
-  call pmaxloc( amax, amaxi, nnoff, fault )
-  call pmaxloc( vmax, vmaxi, nnoff, fault )
+  call pmaxloc( amax, amaxi, nnoff, 0 )
+  call pmaxloc( vmax, vmaxi, nnoff, 0 )
   if ( dofault ) then
     samaxi = maxloc( f1 )
     tnmaxi = maxloc( abs( tn ) )
@@ -344,15 +340,16 @@ case( 2 )
     tsmaxi(i) = ihypo(i)
     slmaxi(i) = ihypo(i)
     tarrmaxi(i) = ihypo(i)
-    call pmaxloc( samax, samaxi, nnoff, fault )
-    call pmaxloc( tnmax, tnmaxi, nnoff, fault )
-    call pmaxloc( tsmax, tsmaxi, nnoff, fault )
-    call pmaxloc( slmax, slmaxi, nnoff, fault )
-    call pmaxloc( tarrmax, tarrmaxi, nnoff, fault )
+    call pmaxloc( samax, samaxi, nnoff, i )
+    call pmaxloc( tnmax, tnmaxi, nnoff, i )
+    call pmaxloc( tsmax, tsmaxi, nnoff, i )
+    call pmaxloc( slmax, slmaxi, nnoff, i )
+    call pmaxloc( tarrmax, tarrmaxi, nnoff, i )
   end if
 case default; stop 'output pass'
 end select
 
+write( 10+ip, * ) 'yo'
 doiz: do iz = 1, nout !--------------------------------------------------------!
 
 if ( ditout(iz) == 0 ) then

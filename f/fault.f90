@@ -182,7 +182,9 @@ end do
 rhypo = sqrt( sum( t3 * t3, 4 ) )
 
 ! Halos
+write( 10+ip, * ) 'qwer'
 call scalarswaphalo( mus, nhalo )
+write( 10+ip, * ) 'asdf'
 call scalarswaphalo( mud, nhalo )
 call scalarswaphalo( dc, nhalo )
 call scalarswaphalo( co, nhalo )
@@ -219,12 +221,6 @@ if ( master ) then
   write( 9, * ) 'rctest = ', rctest, '; % rcrit for spontaneous rupture'
   close( 9 )
 end if
-
-! For output pass 1
-!t1 = 0.
-!t2 = 0.
-!f1 = 0.
-!f2 = 0.
 
 end subroutine
 
