@@ -4,7 +4,7 @@ echo "SORD setup"
 
 # Get command line options
 mode=guess
-fflags=O
+optimize=O
 setup=yes
 run=
 while getopts spibqgGndf opt; do
@@ -14,8 +14,8 @@ case "$opt" in
   i) run=i ;;
   b) run=b ;;
   q) run=q ;;
-  g) fflags=g ;;
-  G) fflags=g; run=g ;;
+  g) optimize=g ;;
+  G) optimize=g; run=g ;;
   n) setup= ; run= ;;
   d) rm -rf [0-9][0-9] ;;
   f) rm -rf tmp ;;
@@ -162,7 +162,7 @@ f95)
   echo "Error: no Fortran 95 compiler found"
   exit
 esac
-case $fflags in
+case $optimize in
   O) fflags=$oflags ;;
   g) fflags=$gflags ;;
 esac
@@ -229,7 +229,7 @@ fi
 
 echo "Run directory: $count"
 mkdir "$rundir"
-if [ $run = g ]; then
+if [ $optimize = g ]; then
   cp $base $collective $common "$rundir" 
   chmod a-w "$rundir/*f90"
 fi
