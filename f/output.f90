@@ -204,6 +204,7 @@ doiz0: do iz = 1, nout
         i1(i) = ihypo(i)
         t1 = 0.
         f1 = 0.
+        i = abs( faultnormal )
         call pminloc( rout, i1, nnoff, i )
       end if
     else
