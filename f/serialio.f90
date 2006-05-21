@@ -8,7 +8,7 @@ contains
 subroutine splitio( iz, nout, ditout )
 integer, intent(in) :: iz, nout, ditout
 integer :: i
-i = iz + nout + ditout ! silence compiler warnings
+i = iz + nout + ditout
 end subroutine
 
 ! Scalar field input/output

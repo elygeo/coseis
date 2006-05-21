@@ -292,7 +292,6 @@ if ( faultnormal /= 0 ) then
   if ( ihypo(i) >= i1node(i) .and. ihypo(i) <= i2node(i) ) dofault = .true.
 end if
 
-write( 10+ip, * ) ip, dofault
 ! Magnitudes
 select case( pass )
 case( 1 )
@@ -349,7 +348,6 @@ case( 2 )
 case default; stop 'output pass'
 end select
 
-write( 10+ip, * ) 'yo'
 doiz: do iz = 1, nout !--------------------------------------------------------!
 
 if ( ditout(iz) == 0 ) then

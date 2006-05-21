@@ -182,9 +182,7 @@ end do
 rhypo = sqrt( sum( t3 * t3, 4 ) )
 
 ! Halos
-write( 10+ip, * ) 'qwer'
 call scalarswaphalo( mus, nhalo )
-write( 10+ip, * ) 'asdf'
 call scalarswaphalo( mud, nhalo )
 call scalarswaphalo( dc, nhalo )
 call scalarswaphalo( co, nhalo )
