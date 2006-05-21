@@ -26,8 +26,14 @@ shift $(( OPTIND - 1 ))
 
 # Symlink input file specified on command line
 [ -n "$1" ] && ln -sf "$1" 'in.m'
-srcdir=$( /bin/pwd )
 mkdir -p tmp
+
+# Locations
+srcdir=$( /bin/pwd )
+count=$( echo [0-9][0-9] | sed 's/.* //' )
+[ $count = '[0-9][0-9]' ] && count=00
+count=$( echo $count | awk '{ printf "%02d", $1+1 }' )
+rundir="$srcdir/$count"
 
 # Prepare input file
 cat 'defaults.m' 'in.m' | sed "
@@ -137,7 +143,7 @@ ifort)
   [ $machine = teragrid ] && oflags='-O3'
   ;;
 pgf90)
-  gflags='-g -Mprof=func'
+  gflags='-O0 -g -Mprof=lines'
   oflags='-fastsse'
   ;;
 gfortran)
@@ -217,17 +223,17 @@ if [ "$compile" ]; then
   sh/tarball
   mv "$srcdir/tmp/state" "$srcdir/tmp/state-$mode"
 fi
-cd "$srcdir"
 
 #------------------------------------------------------------------------------#
 # Set-up
 
-# Locations
-count=$( echo [0-9][0-9] | sed 's/.* //' )
-[ $count = '[0-9][0-9]' ] && count=00
-count=$( echo $count | awk '{ printf "%02d", $1+1 }' )
 echo "Run directory: $count"
-rundir="$srcdir/$count"
+mkdir "$rundir"
+if [ $run = g ]; then
+  cp $base $collective $common "$rundir" 
+  chmod a-w "$rundir/*f90"
+fi
+cd "$srcdir"
 
 # Viz scripts
 echo "cd $srcdir" > m/srcdir.m
@@ -240,7 +246,6 @@ END
 chmod u+x viz
 
 # Setup run directory
-mkdir $rundir
 cp tmp/sord.tgz tmp/sord-$mode tmp/input $rundir
 cd $rundir
 mkdir stats
