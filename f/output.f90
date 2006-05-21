@@ -198,13 +198,13 @@ doiz0: do iz = 1, nout
         do i = 1, 3
           t1(:,:,:,i) = xout(iz,i) - x(j1:j2,k1:k2,l1:l2,i)
         end do
+        i = abs( faultnormal )
         f1 = sum( t1 * t1, 4 )
         i1 = minloc( f1 )
         rout = f1(i1(1),i1(2),i1(3))
         i1(i) = ihypo(i)
         t1 = 0.
         f1 = 0.
-        i = abs( faultnormal )
         call pminloc( rout, i1, nnoff, i )
       end if
     else

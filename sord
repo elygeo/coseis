@@ -143,11 +143,11 @@ ifort)
   [ $machine = teragrid ] && oflags='-O3'
   ;;
 pgf90)
-  gflags='-O0 -g -Mprof=lines'
+  gflags='-O0 -g -Mbounds -Mdclchk -Mprof=lines'
   oflags='-fastsse'
   ;;
 gfortran)
-  gflags='-O0 -p -g -W -pedantic -std=f95 -fimplicit-none'
+  gflags='-O0 -p -g -W -pedantic -std=f95 -fimplicit-none -fbounds-check'
   oflags='-O3'
   ;;
 f95)
@@ -223,17 +223,10 @@ if [ "$compile" ]; then
   sh/tarball
   mv "$srcdir/tmp/state" "$srcdir/tmp/state-$mode"
 fi
+cd "$srcdir"
 
 #------------------------------------------------------------------------------#
 # Set-up
-
-echo "Run directory: $count"
-mkdir "$rundir"
-if [ $optimize = g ]; then
-  cp $base $collective $common "$rundir" 
-  chmod a-w "$rundir/*f90"
-fi
-cd "$srcdir"
 
 # Viz scripts
 echo "cd $srcdir" > m/srcdir.m
@@ -246,8 +239,16 @@ END
 chmod u+x viz
 
 # Setup run directory
-cp tmp/sord.tgz tmp/sord-$mode tmp/input $rundir
-cd $rundir
+echo "Run directory: $count"
+mkdir "$rundir"
+cp tmp/sord.tgz tmp/sord-$mode tmp/input "$rundir"
+if [ $optimize = g ]; then
+  cd f
+  cp $base $collective $common "$rundir" 
+  cd "$rundir"
+  chmod a-w $base $collective $common
+fi
+cd "$rundir"
 mkdir stats
 mkdir checkpoint
 mkdir debug
