@@ -187,6 +187,7 @@ call scalarswaphalo( mud, nhalo )
 call scalarswaphalo( dc, nhalo )
 call scalarswaphalo( co, nhalo )
 call scalarswaphalo( area, nhalo )
+call scalarswaphalo( rhypo, nhalo )
 call vectorswaphalo( nhat, nhalo )
 call vectorswaphalo( t0, nhalo )
 
