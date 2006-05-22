@@ -143,7 +143,7 @@ ifort)
   [ $machine = teragrid ] && oflags='-O3'
   ;;
 pgf90)
-  gflags='-O0 -g -Mbounds -Mdclchk -Mprof=lines'
+  gflags='-O0 -g -Ktrap=fp -Mbounds -Mdclchk -Mprof=lines'
   oflags='-fastsse'
   ;;
 gfortran)
@@ -243,10 +243,8 @@ echo "Run directory: $count"
 mkdir "$rundir"
 cp tmp/sord.tgz tmp/sord-$mode tmp/input "$rundir"
 if [ $optimize = g ]; then
-  cd f
-  cp $base $collective $common "$rundir" 
-  cd "$rundir"
-  chmod a-w $base $collective $common
+  cp f/*.f90 "$rundir"
+  chmod a-w "$rundir"/*.f90
 fi
 cd "$rundir"
 mkdir stats
