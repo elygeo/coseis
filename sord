@@ -144,7 +144,7 @@ ifort)
   ;;
 pgf90)
   gflags='-O0 -g -Ktrap=fp -Mbounds -Mdclchk -Mprof=lines'
-  oflags='-fast -Mvect -Mcache_align -Mflushz'
+  oflags='-fast'
   ;;
 gfortran)
   gflags='-O0 -p -g -W -pedantic -std=f95 -fimplicit-none -fbounds-check'
