@@ -219,8 +219,6 @@ if [ "$compile" ]; then
   rm -f "$srcdir/tmp/state-$mode"
   echo $make
   $make
-  cd "$srcdir"
-  sh/tarball
   mv "$srcdir/tmp/state" "$srcdir/tmp/state-$mode"
 fi
 cd "$srcdir"
@@ -230,8 +228,6 @@ cd "$srcdir"
 
 # Viz scripts
 echo "cd $srcdir" > m/srcdir.m
-echo "cd $rundir" > m/rundir.m
-echo "addpath $srcdir/m" > m/viz.m
 cat << END > viz
 #!/bin/bash -e
 matlab -nodesktop -nosplash -r "addpath $srcdir/m"
@@ -239,6 +235,7 @@ END
 chmod u+x viz
 
 # Setup run directory
+sh/tarball
 echo "Run directory: $count"
 mkdir "$rundir"
 cp tmp/sord.tgz tmp/sord-$mode tmp/input "$rundir"
