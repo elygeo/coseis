@@ -75,12 +75,13 @@ m = i2 - i1 + 1;
 n = [ n length( ic ) ];
 f = zeros( n );
 i0 = i1s - [ i1 1 ];
-if all( n(1:3) == 1 )
+if all( m(1:3) == 1 )
   for i = 1:n(5)
     file = sprintf( '%s%1d', field, ic(i) );
     fid = fopen( file, 'r', endian );
     fseek( fid, 4*i0(4), 'bof' );
     f(1,1,1,:,i) = fread( fid, n(4), 'float32' );
+    fclose( fid );
   end
 else
   skip = 4 * ( m(1) - n(1) );

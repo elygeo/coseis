@@ -3,8 +3,7 @@
 flim = .05;
 colorexp = 1;
 colorexp = .5;
-dirs = { '1a' '1b' '2a' '2b' '3a' '3b' };
-dirs = { '1a' '2a' '3a' };
+dirs = { '100-1a' '100-2a' '100-3a' };
 xi = [  -15 : .1 : 15  ];
 yi = [ -7.5 : .1 : 7.5 ];
 v = 0:0.5:7;
@@ -25,22 +24,16 @@ ylabel( 'Y (km)' )
 figure(2)
 n = [ length(xi) length(yi) ];
 srcdir
-cd 'out/0'
-[ x, t ] = trupread;
-i = x(:,:,1) >= -15000 & x(:,:,1) <= 15000 & ...
-    x(:,:,2) >= -7500 & x(:,:,2) <= 7500;
-t0 = reshape( t(i), n );
+cd 'out/100-0'
+t0 = faultread( 'trup' );
 cd '..'
 
 for ii = 1:length( dirs )
 
 model = dirs{ii}
 cd( model )
-[ x, t ] = trupread;
+t = faultread( 'trup' );
 cd '..'
-i = x(:,:,1) >= -15000 & x(:,:,1) <= 15000 & ...
-    x(:,:,2) >= -7500 & x(:,:,2) <= 7500;
-t = reshape( t(i), n );
 
 set( 0, 'CurrentFigure', 1 );
 [ c, h ] = contour( xi, yi, t', v );
