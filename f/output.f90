@@ -103,6 +103,8 @@ if ( master ) then
   write( 9, * ) 'itcheck     =  ', itcheck,     ';'
   write( 9, * ) 'npml        =  ', npml,        ';'
   write( 9, * ) 'faultnormal =  ', faultnormal, ';'
+  write( 9, * ) 'origin      =  ', origin,      ';'
+  write( 9, * ) 'fixhypo     =  ', fixhypo,     ';'
   write( 9, * ) 'nn          = [', nn,            '];'
   write( 9, * ) 'ihypo       = [', ihypo - nnoff, '];'
   write( 9, * ) 'n1expand    = [', n1expand,      '];'

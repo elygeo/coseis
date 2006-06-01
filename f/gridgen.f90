@@ -280,8 +280,15 @@ i2oper(1,:) = i2cell + 1
 call optimize
 
 ! Hypocenter location
-if ( all( xhypo < 0. ) ) then
-  if ( master ) xhypo = x(j,k,l,:)
+if ( fixhypo == 1 ) then
+  if ( master ) xhypo = xhypo + x(j,k,l,:)
+  call broadcast( xhypo )
+elseif ( fixhypo == 2 ) then
+  if ( master ) xhypo = xhypo + 0.125 * &
+    ( x(j,k,l,:) + x(j+1,k+1,l+1,:) &
+    + x(j+1,k,l,:) + x(j,k+1,l+1,:) &
+    + x(j,k+1,l,:) + x(j+1,k,l+1,:) &
+    + x(j,k,l+1,:) + x(j+1,k+1,l,:) )
   call broadcast( xhypo )
 end if
 

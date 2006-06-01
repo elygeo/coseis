@@ -39,6 +39,7 @@ case( 'affine' );      read( str, * ) affine
 case( 'gridnoise' );   read( str, * ) gridnoise
 case( 'symmetry' );    read( str, * ) symmetry
 case( 'origin' );      read( str, * ) origin
+case( 'fixhypo' );     read( str, * ) fixhypo
 case( 'nn' );          read( str, * ) nn
 case( 'nt' );          read( str, * ) nt
 case( 'dx' );          read( str, * ) dx
