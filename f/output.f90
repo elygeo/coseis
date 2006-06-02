@@ -237,7 +237,7 @@ doiz0: do iz = 1, nout
       s1 = 0.
     end if
     i2 = i1
-    if ( rout > 2. * dx ) ditout(iz) = nt + 1
+    if ( rout > dx * dx ) ditout(iz) = nt + 1
   end select
 
   ! Interval 

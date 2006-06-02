@@ -6,6 +6,7 @@ dirs = { '50-0' '100-0' };
 dirs = { '100-0' '100-1a' '100-2a' '100-3a' };
 dirs = { '50-0' '100-0' '100-1a' '100-2a' '100-3a' };
 dirs = { '50-0' '100-0' '100-1a' '100-2a' '100-3a' '100-1b' '100-2b' '100-3b' };
+dirs = { 'corner050' 'corner100' };
 fields = { 'su' 'sv' 'ts' };
 srcdir
 cd 'out'
@@ -28,14 +29,14 @@ meta
 for i = 1:length( out )
   field = out{i}{2};
   dit   = out{i}{3};
-  match = strcmp( field, fields );
+  match = strcmp( field, fields )
   if dit == 1 && any( match )
     [ msg, t, v, x ] = tsread( field, [ out{i}{4:6} ], filter );
     s = sqrt( sum( v .* v, 2 ) );
     r = sqrt( sum( x .* x ) );
     ax = find( match );
-    if     abs( r - 7500 ) < 1, count = count + 1;
-    elseif abs( r - 6000 ) < 1, ax = ax + 3;
+    if     abs( r - 7500 ) < dx, count = count + 1;
+    elseif abs( r - 6000 ) < dx, ax = ax + 3;
     else,  ax = 0;
     end
     if ax
