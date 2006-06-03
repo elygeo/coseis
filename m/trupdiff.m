@@ -3,7 +3,8 @@
 flim = .05;
 colorexp = 1;
 colorexp = .5;
-dirs = { '100-1a' '100-2a' '100-3a' };
+dir0 = 'out/100-0'; dirs = { '100-1a' '100-2a' '100-3a' };
+dir0 = 'out/050-0'; dirs = { '100-1a' '100-2a' '100-3a' };
 xi = [  -15 : .1 : 15  ];
 yi = [ -7.5 : .1 : 7.5 ];
 v = 0:0.5:7;
@@ -24,7 +25,7 @@ ylabel( 'Y (km)' )
 figure(2)
 n = [ length(xi) length(yi) ];
 srcdir
-cd 'out/100-0'
+cd( dir0 )
 t0 = faultread( 'trup' );
 cd '..'
 
@@ -98,6 +99,11 @@ print( '-depsc', 'trup' )
 system( [ '/usr/bin/ps2pdf -dPDFSETTINGS=/prepress trup.eps &' ] );
 
 return
+
+
+
+
+
 
 srcdir
 cd 'dalguer'
