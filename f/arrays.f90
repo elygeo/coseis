@@ -29,6 +29,9 @@ allocate(       &
   lam(j,k,l),   &
   mu(j,k,l),    &
   y(j,k,l),     &
+  qp(j,k,l),    &
+  qs(j,k,l),    &
+  z(j,k,l),     &
   s1(j,k,l),    &
   s2(j,k,l)     )
 

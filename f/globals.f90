@@ -23,6 +23,9 @@ real, allocatable, dimension(:,:,:) :: &
   mr,            & ! mass ratio
   lam,           & ! Lame parameter
   mu,            & ! Lame parameter
+  qp,            & ! anelastic coefficient
+  qs,            & ! anelastic coefficient
+  z,             & ! anelastic memory variable
   y,             & ! hourglass constant
   s1,            & ! temporary storage
   s2               ! temporary storage

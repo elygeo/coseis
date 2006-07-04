@@ -102,7 +102,7 @@ nm=$( echo ${nm3[*]} | awk '{ print $1 * $2 * $3 }' )
 
 # RAM and Wall time usage
 floatsize=4
-nvars=21
+nvars=24
 ram=$( echo $ppn $nm $nvars $floatsize | awk '{ printf "%d", $1 * ( $2 * $3 * $4 / 1024 / 1024 + 15 ) }' )
 mm=$( echo $nt $nm $ppn $cpus $rate | awk '{ printf "%d", ( $1 + 2 ) * $2 * $3 / $4 / $5 / 40000 + 10 }' )
 hh=$(( mm / 60 ))
