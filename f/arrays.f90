@@ -20,6 +20,8 @@ allocate(       &
   x(j,k,l,3),   &
   v(j,k,l,3),   &
   u(j,k,l,3),   &
+! z1(j,k,l,3),  &
+! z2(j,k,l,3),  &
   w1(j,k,l,3),  &
   w2(j,k,l,3)   )
 
@@ -29,9 +31,8 @@ allocate(       &
   lam(j,k,l),   &
   mu(j,k,l),    &
   y(j,k,l),     &
-  qp(j,k,l),    &
-  qs(j,k,l),    &
-  z(j,k,l),     &
+! qp(j,k,l),    &
+! qs(j,k,l),    &
   s1(j,k,l),    &
   s2(j,k,l)     )
 

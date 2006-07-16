@@ -1,21 +1,31 @@
 % Contour plots
 
-field = 'svp';
 field = 'trup';
 field = 'su';
+field = 'svp';
 v = 0:0.5:7;
-styles = { 'r-' 'b-' 'r--' 'b--' };
-dirs = { '100' '100-1a' '100-2a' '100-3a' };
+styles = { 'w--' 'c-' 'y-' 'y-' 'y-' };
 dirs = { '050' '100' };
 dirs = { '050-corner' '100-corner' };
 dirs = { '050' '100' '050-corner' '100-corner' };
+dirs = { '050' '100' '100-1a' '100-2a' '100-3a' };
 
 format compact
 clf
+set( gcf, ...
+  'PaperPosition', [ 0.25 0.25 4 4 ], ...
+  'InvertHardCopy', 'off', ...
+  'Color', 'k', ...
+  'DefaultAxesColor', 'none', ...
+  'DefaultTextColor', 'w', ...
+  'DefaultAxesXColor', 'w', ...
+  'DefaultAxesYColor', 'w', ...
+  'DefaultAxesZColor', 'w' )
+
 labels = fieldlabels( field, 0 );
 set( gcf, 'Name', labels{1} )
 axes( 'Position', [ .1 .2 .8 .7 ] );
-plot( 0, 0, 'p', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'MarkerSize', 11 )
+plot( 0, 0, 'p', 'MarkerEdgeColor', 'w', 'MarkerFaceColor', 'k', 'MarkerSize', 11 )
 axis image;
 axis( [ -15 15 -7.5 7.5 ] )
 axis( [ 0 15 0 7.5 ] )
@@ -43,11 +53,10 @@ for ii = 1:length( dirs )
     c(:,i) = nan;
     i  = i + n + 1;
   end
-  h = plot( c(1,:), c(2,:), style, 'linewidth', .2 );
+  h = plot( c(1,:), c(2,:), style );
 end
 
 srcdir
 cd 'out'
 print( '-depsc', 'tpcont' )
-system( [ '/usr/bin/ps2pdf -dPDFSETTINGS=/prepress tpcont.eps &' ] );
 

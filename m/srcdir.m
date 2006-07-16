@@ -1,1 +1,1 @@
-cd /Users/gely/g/sord
+cd /space/gely/files/sord

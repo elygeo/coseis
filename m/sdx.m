@@ -60,7 +60,7 @@ hhud = [];
 
 if ifn
   islice = ifn;
-  field = 'sv';
+  field = 'svm';
 else
   dofault = 0;
   [ tmp, l ] = max( abs( upvector ) );

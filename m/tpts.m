@@ -2,18 +2,22 @@
 
 clear all
 filter = 0;
-dirs = { '050' '100' };
-dirs = { '100' '100-1a' '100-2a' '100-3a' };
 dirs = { '050' '100' '100-1a' '100-2a' '100-3a' };
-dirs = { '050' '100' '100-1a' '100-2a' '100-3a' '100-1b' '100-2b' '100-3b' };
-dirs = { '050-corner' '100-corner' };
-dirs = { '050' '100' '050-corner' '100-corner' };
 fields = { 'su' 'sv' 'ts' };
-styles = { 'r-' 'b-' 'r--' 'b--' };
+styles = { 'w--' 'c-' 'y-' 'y-' 'y-' };
 srcdir
 cd 'out'
 format compact
 clf
+set( gcf, ...
+  'PaperPosition', [ 0.25 0.25 4 4 ], ...
+  'InvertHardCopy', 'off', ...
+  'Color', 'k', ...
+  'DefaultAxesColor', 'none', ...
+  'DefaultTextColor', 'w', ...
+  'DefaultAxesXColor', 'w', ...
+  'DefaultAxesYColor', 'w', ...
+  'DefaultAxesZColor', 'w' )
 count = 0;
 for i = 1:6, h(i) = axes; end
 set( h(1:2), 'Position', [ .08 .54 .4 .4 ] )
@@ -44,7 +48,7 @@ for ii = 1:length( dirs )
       end
       if ax
         axes( h(ax) );
-        plot( t, s, style, 'Linewidth', .2 );
+        plot( t, s, style );
         hold on
       end
     end
@@ -65,5 +69,4 @@ srcdir
 cd 'out'
 orient tall
 print( '-depsc', 'tpts' )
-system( [ '/usr/bin/ps2pdf -dPDFSETTINGS=/prepress tpts.eps &' ] );
 

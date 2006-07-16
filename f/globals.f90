@@ -15,6 +15,8 @@ real, allocatable, dimension(:,:,:,:) :: &
   x,             & ! node locations
   v,             & ! **velocity
   u,             & ! **displacement
+  z1,            & ! **anelastic memory variable
+  z2,            & ! **anelastic memory variable
   w1,            & ! temporary storage
   w2               ! temporary storage
 
@@ -25,7 +27,6 @@ real, allocatable, dimension(:,:,:) :: &
   mu,            & ! Lame parameter
   qp,            & ! anelastic coefficient
   qs,            & ! anelastic coefficient
-  z,             & ! anelastic memory variable
   y,             & ! hourglass constant
   s1,            & ! temporary storage
   s2               ! temporary storage

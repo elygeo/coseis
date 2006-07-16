@@ -25,7 +25,13 @@ done
 shift $(( OPTIND - 1 ))
 
 # Symlink input file specified on command line
-[ -n "$1" ] && ln -sf "$1" 'in.m'
+if [ "$1" ]; then 
+  infile="$1"
+  [ -f "$infile" ] || exit
+  ln -sf "$infile" 'in.m'
+else
+  infile=$( readlink 'in.m' ) || infile='in.m'
+fi
 mkdir -p tmp
 
 # Locations
@@ -36,7 +42,7 @@ count=$( echo $count | awk '{ printf "%02d", $1+1 }' )
 rundir="$srcdir/$count"
 
 # Prepare input file
-cat 'defaults.m' 'in.m' | sed "
+cat 'defaults.m' "$infile" | sed "
 s/%.*$//;
 s/;/\\
 /g;
@@ -63,7 +69,7 @@ case "$key" in
 esac
 done < tmp/input
 
-[ -n "$run" -a "$run" != q ] && interactive=yes
+[ "$run" -a "$run" != q ] && interactive=yes
 
 # Host
 machine=$HOSTNAME
@@ -238,7 +244,7 @@ chmod u+x viz
 sh/tarball
 echo "Run directory: $count"
 mkdir "$rundir"
-cp tmp/sord.tgz tmp/sord-$mode tmp/input "$rundir"
+cp "$infile" tmp/sord.tgz tmp/sord-$mode tmp/input "$rundir"
 if [ $optimize = g ]; then
   cp f/*.f90 "$rundir"
   chmod a-w "$rundir"/*.f90
@@ -261,6 +267,7 @@ login   = '$LOGNAME';
 name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )';
 rundate = '$( date )';
 rundir  = '$rundir';
+infile  = '$infile';
 machine = '$machine';
 host    = '$HOSTNAME';
 os      = '$( uname -a )';
@@ -277,7 +284,7 @@ if [ $( pwd | grep -v gpfs ) ]; then
   echo "Error: jobs must be run from /gpfs"
   exit
 fi
-if [ -n "$interactive" -a $HOSTNAME != ds100 ]; then
+if [ "$interactive" -a $HOSTNAME != ds100 ]; then
   echo "Error: interactive jobs must be launched from dspoe"
   exit
 fi
@@ -381,7 +388,7 @@ esac
 
 babieca) #--------------------------------------#
 
-if [ -n "$interactive" ]; then
+if [ "$interactive" ]; then
 cat << END > mf
 node37:2
 node38:2

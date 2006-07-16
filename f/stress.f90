@@ -143,6 +143,17 @@ end if
 end do doid
 end do doic
 
+! Attenuation
+!do j = 1, 2
+!do k = 1, 2
+!do l = 1, 2
+!  i = j + 2 * ( k - 1 ) + 4 * ( l - 1 )
+!  z1(j::2,k::2,l::2,:) = c1(i) * z1(j::2,k::2,l::2,:) + c2(i) * w1(j::2,k::2,l::2,:)
+!  z2(j::2,k::2,l::2,:) = c1(i) * z2(j::2,k::2,l::2,:) + c2(i) * w2(j::2,k::2,l::2,:)
+!end do
+!end do
+!end do
+
 ! Hook's Law: W = lam*trace(G)*I + mu*(G + G^T)
 s1 = lam * sum( w1, 4 )
 do i = 1, 3
