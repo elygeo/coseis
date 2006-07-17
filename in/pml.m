@@ -1,30 +1,37 @@
 % PML test problem
-
-  debug = 1;
-  np = [ 1 1 1 ];
+  np = [ 4 4 2 ];
   faultnormal = 0;
   rsource = 150.;
-  out = { 'x' 50  1 1 1   -1 -1 -1 };
-  out = { 'v' 50  1 1 1   -1 -1 -1 };
-  nt = 160;
-  nt = 30;
-  nt = 10000;
-  itcheck = -1;
-
+  out = { 'x'  1    1 1   0   -1 -1  -0 };
+  out = { 'vm' 100  1 1   0   -1 -1  -0 };
+  out = { 'x'  1    1 1  20   -1 -1  20 };
+  out = { 'vm' 100  1 1  20   -1 -1  20 };
+  out = { 'x'  1    1 1 -20   -1 -1 -20 };
+  out = { 'vm' 100  1 1 -20   -1 -1 -20 };
+  timeseries = { 'vm'  -6000.      0.     0. }
+  timeseries = { 'vm'  -6000.  -6000.     0. }
+  timeseries = { 'vm'  -6000.  -6000. -6000. }
+  nt = 1000;
+  origin = 0;
   moment1 = [ 0 0 0 ];
   moment2 = [ 3e16 0 0 ];
 
-% Rect
+% Mixed rect
   ihypo = [ 0 0 0 ];
+  nn = [ 161 161 161 ];
+  bc1 = [ 1 1 1 ];
+  bc2 = [ 0 0 0 ];
+return
+
+% Rect
   ihypo = [ -1 -1 -1 ];
   nn = [ 81 81 81 ];
-  nn = [ 11 11 11 ];
-  nn = [ 41 41 41 ];
   bc1 = [ 1 1 1 ];
   bc2 = [ 3 3 3 ];
 return
 
 % Non-rect
+  ihypo = [ 0 0 0 ];
   nn = [ 41 41 41 ];
   affine = [   1. 0. 0.  0.  1. 1.  0. 0.  1. ] /  1.; % shear 1
   affine = [   1. 0. 1.  0.  1. 0.  0. 0.  1. ] /  1.; % shear 2

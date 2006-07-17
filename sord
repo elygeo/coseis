@@ -42,7 +42,7 @@ count=$( echo $count | awk '{ printf "%02d", $1+1 }' )
 rundir="$srcdir/$count"
 
 # Prepare input file
-cat 'defaults.m' "$infile" | sed "
+cat 'defaults.m' 'in.m' | sed "
 s/%.*$//;
 s/;/\\
 /g;
@@ -244,7 +244,7 @@ chmod u+x viz
 sh/tarball
 echo "Run directory: $count"
 mkdir "$rundir"
-cp "$infile" tmp/sord.tgz tmp/sord-$mode tmp/input "$rundir"
+cp 'in.m' tmp/sord.tgz tmp/sord-$mode tmp/input "$rundir"
 if [ $optimize = g ]; then
   cp f/*.f90 "$rundir"
   chmod a-w "$rundir"/*.f90

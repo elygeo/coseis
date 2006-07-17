@@ -2,16 +2,16 @@
 
 clear all
 filter = 0;
-dirs = { '050' '100' '100-1a' '100-2a' '100-3a' };
-fields = { 'su' 'sv' 'ts' };
-styles = { 'w--' 'c-' 'y-' 'y-' 'y-' };
 dirs = { '100' };
+dirs = { '050' '100' '100-1a' '100-2a' '100-3a' };
+fields = { 'su' 'sv' };
+styles = { 'w--' 'c-' 'y-' 'y-' 'y-' };
 srcdir
 cd 'out'
 format compact
 clf
 set( gcf, ...
-  'PaperPosition', [ 0.5 0.5 6 6 ], ...
+  'PaperPosition', [ 0.5 0.5 6 3 ], ...
   'InvertHardCopy', 'off', ...
   'Color', 'k', ...
   'DefaultAxesColor', 'none', ...
@@ -20,16 +20,9 @@ set( gcf, ...
   'DefaultAxesYColor', 'w', ...
   'DefaultAxesZColor', 'w' )
 count = 0;
-for i = 1:6, h(i) = axes; end
-set( h(1:2), 'Position', [ .08 .54 .4 .4 ] )
-set( h(3),   'Position', [ .08 .06 .4 .4 ] )
-set( h(4:5), 'Position', [ .52 .54 .4 .4 ] )
-set( h(6),   'Position', [ .52 .06 .4 .4 ] )
-% Small fig
-%set( h(1:2), 'Position', [ .1 .55 .35 .35 ] )
-%set( h(3),   'Position', [ .1 .1 .35 .35 ] )
-%set( h(4:5), 'Position', [ .55 .55 .35 .35 ] )
-%set( h(6),   'Position', [ .55 .1 .35 .35 ] )
+for i = 1:4, h(i) = axes; end
+set( h(1:2), 'Position', [ .1  .14 .38 .76 ] )
+set( h(3:4), 'Position', [ .52 .14 .38 .76 ] )
 
 for ii = 1:length( dirs )
   model = dirs{ii};
@@ -49,7 +42,7 @@ for ii = 1:length( dirs )
       r = sqrt( sum( x .* x ) );
       ax = find( match );
       if     abs( r - 7500 ) < dx, count = count + 1;
-      elseif abs( r - 6000 ) < dx, ax = ax + 3;
+      elseif abs( r - 6000 ) < dx, ax = ax + 2;
       else,  ax = 0;
       end
       if ax
@@ -62,15 +55,13 @@ for ii = 1:length( dirs )
 end
 
 count
-set( h, 'XLim', [ 2.8 3.3 ] )
 set( h, 'XLim', [ 0 12 ] )
-set( h([1 2 4 5]), 'YLim', [ 0 3.5 ] )
-set( h([1 4]), 'Color', 'none' );
-set( h(4:6), 'YAxisLocation', 'right' );
-axes( h(1) ), title( 'PI' ); ylabel( 'Slip Rate (m/s)' )
-axes( h(4) ), title( 'PA' ); ylabel( 'Slip (m)' )
-axes( h(3) ), title( 'PI' ); xlabel( 'Time (s)' ), ylabel( 'Shear Stress (MPa)')
-axes( h(6) ), title( 'PA' ); xlabel( 'Time (s)' ), ylabel( 'Shear Stress (MPa)')
+set( h, 'XLim', [ 2.8 3.3 ] )
+set( h, 'YLim', [ 0 3.5 ] )
+set( h, 'Color', 'none' );
+set( h(3:4), 'YAxisLocation', 'right' );
+axes( h(1) ), title( 'PI' ); xlabel( 'Time (s)' ); ylabel( 'Slip Rate (m/s)' )
+axes( h(3) ), title( 'PA' ); xlabel( 'Time (s)' ); ylabel( 'Slip (m)' )
 
 srcdir
 cd 'out'
