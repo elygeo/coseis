@@ -409,6 +409,7 @@ cat << END > pbsscript
 #PBS -q workq
 #PBS -N sord-$count
 #PBS -l nodes=$nodes:ppn=$ppn
+#PBS -l walltime=$walltime
 #PBS -o out.log
 #PBS -e err.log
 #PBS -V
