@@ -53,7 +53,14 @@ integer :: e
 call mpi_cart_rank( comm3d, ip3master, ipmaster, e )
 end subroutine
 
-! Broadcast
+! Integer broadcast
+subroutine ibroadcast( i )
+real, intent(inout) :: i
+integer :: e
+call mpi_bcast( i, 1, mpi_real, ipmaster, comm3d, e )
+end subroutine
+
+! Real broadcast
 subroutine broadcast( r )
 real, intent(inout) :: r(:)
 integer :: i, e

@@ -3,8 +3,9 @@
   debug = 1;
   faultnormal = 3;
   nn = [ 3 3 4 ];
-  bc1 = [ 3 3 0 ];
-  bc2 = [ 3 3 0 ];
+  nn = [ 8 8 8 ];
+  bc1 = [ 0 0 0 ];
+  bc2 = [ -3 3 -2 ];
   ihypo = [ -1 -1 0 ];
   nt = 1;
   mus = .5;

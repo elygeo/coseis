@@ -31,7 +31,13 @@ integer :: i
 i = ip3master(1)
 end subroutine
 
-! Broadcast
+! Integer broadcast
+subroutine ibroadcast( i )
+real, intent(inout) :: i
+i = i
+end subroutine
+
+! Real broadcast
 subroutine broadcast( r )
 real, intent(inout) :: r(:)
 r = r

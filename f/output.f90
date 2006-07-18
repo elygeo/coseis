@@ -475,11 +475,15 @@ end do doiz !------------------------------------------------------------------!
 if ( pass == 1 ) return
 
 ! Check for stop file
-inquire( file='stop', exist=test )
-if ( test ) then
-  itcheck = it
-  nt = it
-end if
+!if ( master ) then
+!  inquire( file='stop', exist=test )
+!  if ( test ) then
+!    itcheck = it
+!    nt = it
+!  end if
+!  ibroadcast( itcheck )
+!  ibroadcast( nt )
+!end if
 
 ! Metadata
 if ( master ) then

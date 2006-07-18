@@ -39,6 +39,7 @@ end subroutine
 ! Write checkpoint
 subroutine writecheckpoint
 integer :: i, reclen
+if ( itcheck < 1 ) itcheck = itcheck + nt + 1
 if ( modulo( it, itcheck ) /= 0 ) return
 if ( master ) call toc( 'Write checkpoint' )
 i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
