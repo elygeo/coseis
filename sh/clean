@@ -1,5 +1,9 @@
 #!/bin/bash
 
-rmdir
-rm -f sord-* input qdel.sh pbsscript err.log out.log
+rm sord-* input qdel.sh pbsscript out.log
+
+for file in *; do
+  [ -f "$file" -a ! -s "$file" ] && rm "$file"
+  [ -d "$file" ] && rmdir "$file"
+done
 
