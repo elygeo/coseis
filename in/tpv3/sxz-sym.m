@@ -14,9 +14,9 @@
   th  = { -81.6e6 'cube'  -1501. -1501. -1.   1501. 1501. 1. };
   viscosity = [ .1 .7 ];
   origin = 0;
-  dx  = 50;
-  dt  = .004;
-  nt  = 3000;
+  dx  = 100;
+  dt  = .008;
+  nt  = 1500;
   out = { 'x'     1   1 1 0   -1 -1  0 };
   out = { 'su'   -1   1 1 0   -1 -1  0 };
   out = { 'svp'  -1   1 1 0   -1 -1  0 };
@@ -34,15 +34,15 @@
   timeseries = { 'sv'     0.  6001. 0. };
   timeseries = { 'ts'     0.  6001. 0. };
   bc1      = [   0   0   0 ];
-  n1expand = [  60  60  50 ];
+  n1expand = [  50  50  50 ];
 
   itcheck = 0;
   np = [ 4 4 2 ];
 
-% extend-z
-  affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 2. ] / 1.;
-  nn       = [ 381 231 101 ];
-  ihypo    = [  -1  -1  -1 ];
-  bc2      = [  -3   3  -2 ];
-  n2expand = [   0   0   0 ];
+% xz-shear symmetric grid
+  affine = [ 1. 0. 1.  0. 1. 0.  0. 0. 1. ] / 1.;
+  nn       = [ 421 136 101 ];
+  ihypo    = [   0  -1  -1 ];
+  bc2      = [   0   3  -3 ];
+  n2expand = [  50   0   0 ];
 

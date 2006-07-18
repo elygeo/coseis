@@ -34,14 +34,14 @@
   timeseries = { 'sv'     0.  6001. 0. };
   timeseries = { 'ts'     0.  6001. 0. };
   bc1      = [   0   0   0 ];
-  n1expand = [  50  60  60 ];
+  n1expand = [  50  60  50 ];
 
   itcheck = 0;
   np = [ 4 4 2 ];
 
-% extend-x
-  affine = [ 2. 0. 0.  0. 1. 0.  0. 0. 1. ] / 1.;
-  nn       = [ 211 231 181 ];
+% -yy-strain
+  affine = [ 2. 0. 0.  0. 1. 0.  0. 0. 2. ] / 1.;
+  nn       = [ 211 231 101 ];
   ihypo    = [  -1  -1  -1 ];
   bc2      = [  -3   3  -2 ];
   n2expand = [   0   0   0 ];
