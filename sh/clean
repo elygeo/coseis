@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rmdir
+rm -f sord-* input qdel.sh pbsscript err.log out.log
+

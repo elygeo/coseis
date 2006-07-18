@@ -1,5 +1,5 @@
-version = '20060716-170549';
+version = '20060717-175143';
 login   = 'gely';
 name    = 'Geoffrey Ely';
-host    = 'wide.local';
+host    = 'wide';
 dir     = '/space/gely/files/sord';

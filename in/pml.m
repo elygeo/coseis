@@ -14,20 +14,20 @@
   nt = 1000;
   origin = 0;
   moment1 = [ 0 0 0 ];
-  moment2 = [ 3e16 0 0 ];
-
-% Mixed rect
-  ihypo = [ 0 0 0 ];
-  nn = [ 161 161 161 ];
-  bc1 = [ 1 1 1 ];
-  bc2 = [ 0 0 0 ];
-return
+  moment2 = [ 3e16 3e16 3e16 ];
 
 % Rect
   ihypo = [ -1 -1 -1 ];
   nn = [ 81 81 81 ];
   bc1 = [ 1 1 1 ];
   bc2 = [ 3 3 3 ];
+return
+
+% Mixed rect
+  ihypo = [ 0 0 0 ];
+  nn = [ 161 161 161 ];
+  bc1 = [ 1 1 1 ];
+  bc2 = [ 0 0 0 ];
 return
 
 % Non-rect

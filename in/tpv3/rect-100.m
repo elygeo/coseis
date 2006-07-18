@@ -39,7 +39,7 @@
   itcheck = 0;
   np = [ 4 4 2 ];
 
-% 0. rectangular
+% rectangular
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1. ] / 1.;
   nn       = [ 211 136 101 ];
   ihypo    = [  -1  -1  -1 ];

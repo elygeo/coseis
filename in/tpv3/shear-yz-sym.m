@@ -39,10 +39,10 @@
   itcheck = 0;
   np = [ 4 4 2 ];
 
-% 1a. yz-shear
+% yz-shear symmetric
   affine = [ 1. 0. 0.  0. 1. 1.  0. 0. 1. ] / 1.;
-  nn       = [ 211 271 202 ];
-  ihypo    = [  -1   0   0 ];
-  bc2      = [  -3   0   0 ];
-  n2expand = [   0  50  50 ];
+  nn       = [ 211 271 101 ];
+  ihypo    = [  -1   0  -1 ];
+  bc2      = [  -3   0  -3 ];
+  n2expand = [   0  50   0 ];
 

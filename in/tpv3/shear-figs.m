@@ -15,21 +15,21 @@
   nt  = 2;
   nn = [ 33 13 14 ];
 
-% shear 1
+% yz-shear
   affine = [ 1. 0. 0.  0. 1. 1.  0. 0. 1. ] / 1.;
   symmetry = [ 1 0 1 ];
   symmetry = [ 1 0 0 ];
 
-% no strain
+% rectangular
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1. ] / 1.;
   symmetry = [ 0 0 0 ];
 
-% shear 3
+% xy-shear
   affine = [ 1. 1. 0.  0. 1. 0.  0. 0. 1. ] / 1.;
   symmetry = [ 0 1 1 ];
   symmetry = [ 0 0 1 ];
 
-% shear 2
+% zx-shear
   affine = [ 1. 0. 1.  0. 1. 0.  0. 0. 1. ] / 1.;
   symmetry = [ 0 1 1 ];
   symmetry = [ 0 1 0 ];
