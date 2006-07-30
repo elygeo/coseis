@@ -9,19 +9,58 @@
   bc1 = [ 1 1 1 ];
   bc2 = [ 1 1 0 ];
   faultnormal = 2;
-  grid = 'constant';
   grid = 'read';
+  grid = 'constant';
+  mus = 1e9;
+  mus = [ .6 'cube' 265863. 0. -15000.   459340. 300000. 0. ];
+  xhypo = [ 459340. 230480. -10000. ];
 
+% 200m - DataStar
+  np = [ 16 8 4 ]
   nn = [ 3001 1502 401 ];
   dx = 200.;
-  nt = 6000;
+  nt = 13000;
   dt = .014;
+  itcheck = 1000;
+return
 
-  mus = 1e9;
-  mus = [ .6 'zone' 68 51 16   115 51 21 ];
-  ihypo = [ 115 51 16 ];
+% 4000m - Single processor
+  np = [ 1 1 1 ]
   nn = [ 151 76 21 ];
   dx = 4000.;
-  nt = 300;
+  nt = 650;
   dt = .28;
+return
+
+% 2000m - Single processor
+  np = [ 1 1 1 ]
+  nn = [ 301 152 41 ];
+  dx = 2000.;
+  nt = 1300;
+  dt = .14;
+return
+
+% 1000m - Babieca
+  np = [ 8 4 1 ]
+  nn = [ 601 302 81 ];
+  dx = 1000.;
+  nt = 2600;
+  dt = .07;
+return
+
+% 500m - Babieca
+  np = [ 8 4 1 ]
+  nn = [ 1201 602 161 ];
+  dx = 500.;
+  nt = 5200;
+  dt = .035;
+return
+
+% 400m - DataStar
+  np = [ 16 8 4 ]
+  nn = [ 1501 752 201 ];
+  dx = 400.;
+  nt = 6500;
+  dt = .028;
+return
 

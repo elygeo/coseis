@@ -5,10 +5,10 @@ field = 'su';
 field = 'svp';
 v = 0:0.5:7;
 styles = { 'w--' 'c-' 'y-' 'y-' 'y-' };
-dirs = { '050' '100' };
-dirs = { '050-corner' '100-corner' };
-dirs = { '050' '100' '050-corner' '100-corner' };
-dirs = { '050' '100' '100-1a' '100-2a' '100-3a' };
+dirs = { '50' '100' };
+dirs = { '50' '100' '50-corner' '100-corner' };
+dirs = { '50' '100' 'sxy' 'sxz' 'syz' };
+dirs = { '50' '100' 'uxx' 'uxx-' 'uyy' 'uyy-' 'uzz' 'uzz-' };
 
 format compact
 clf

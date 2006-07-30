@@ -2,10 +2,11 @@
 
 clear all
 filter = 0;
-dirs = { '050' '100' '100-1a' '100-2a' '100-3a' };
-fields = { 'su' 'sv' 'ts' };
-styles = { 'w--' 'c-' 'y-' 'y-' 'y-' };
 dirs = { '100' };
+dirs = { '50' '100' 'sxy' 'sxz' 'syz' };
+dirs = { '50' '100' 'sxy' 'sxz' 'syz' 'uxx' 'uyy' 'uzz' 'uxx-' 'uyy-' 'uzz-' };
+fields = { 'su' 'sv' 'ts' };
+styles = { 'w--' 'c-' 'y-' 'y-' 'y-' 'm-' 'm-' 'm-' 'g-' 'g-' 'g-' };
 srcdir
 cd 'out'
 format compact
@@ -62,8 +63,8 @@ for ii = 1:length( dirs )
 end
 
 count
-set( h, 'XLim', [ 2.8 3.3 ] )
 set( h, 'XLim', [ 0 12 ] )
+set( h, 'XLim', [ 2.8 3.3 ] )
 set( h([1 2 4 5]), 'YLim', [ 0 3.5 ] )
 set( h([1 4]), 'Color', 'none' );
 set( h(4:6), 'YAxisLocation', 'right' );

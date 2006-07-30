@@ -1,1 +1,1 @@
-in/mini-fault.m
+in/terashake.m

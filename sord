@@ -7,7 +7,7 @@ mode=guess
 optimize=O
 setup=yes
 run=
-while getopts spibqgGndf opt; do
+while getopts spibqgGnm:df opt; do
 case "$opt" in
   s) mode=s ;;
   p) mode=p ;;
@@ -17,6 +17,7 @@ case "$opt" in
   g) optimize=g ;;
   G) optimize=g; run=g ;;
   n) setup= ; run= ;;
+  m) machine="$OPTARG" ;;
   d) rm -rf [0-9][0-9] ;;
   f) rm -rf tmp ;;
   *) exit ;;
@@ -72,10 +73,11 @@ done < tmp/input
 [ "$run" -a "$run" != q ] && interactive=yes
 
 # Host
-machine=$HOSTNAME
-if   [ "${machine:0:2}" = ds ]; then machine=datastar
-elif [ "${machine:0:2}" = tg ]; then machine=teragrid
-elif [ "$machine" = master ];   then machine=babieca
+if [ "$machine" ]; then :
+elif [ "${HOSTNAME:0:2}" = ds ]; then machine=datastar
+elif [ "${HOSTNAME:0:2}" = tg ]; then machine=teragrid
+elif [ "$HOSTNAME" = master ];   then machine=babieca
+else machine=$HOSTNAME
 fi
 
 # Machine attributes
