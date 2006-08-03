@@ -154,11 +154,11 @@ open( 4, file='tmp/rdep', recl=reclen, form='unformatted', access='direct' )
 l = n(3)-npml-1
 do i = 1, npml+1
   write( 3, rec=i ) s + (z0 - dx*(n(3)-i))
-  write( 4, rec=i ) x(:,:,:,3) - (z0 - dx*l)
+  write( 4, rec=i ) x(:,:,:,3) - (z0-dx*l)
 end do
 do i = npml+2, n(3)
   write( 3, rec=i )  x(:,:,:,3)*((i-npml-1)/l) + ((z0 - dx*l)*(n(3)-i)/l)
-  write( 4, rec=i ) -x(:,:,:,3)*((n(3)-i)/l)
+  write( 4, rec=i ) (x(:,:,:,3) - (z0-dx*l)) * ((n(3)-i)/l)
 end do
 close( 3 )
 close( 4 )
