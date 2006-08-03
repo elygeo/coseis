@@ -11,17 +11,16 @@
   faultnormal = 2;
   grid = 'constant';
   grid = 'read';
-  datadir = 'ts';
+  datadir = 'ts/tmp';
   mus = 1e9;
   mus = [ .6 'cube' 265863. 0. -15000.   459340. 300000. 4000. ];
-  xhypo = [ 459340. 230480. -10000. ];
 
 % 4000m - Single processor
   np = [ 1 1 2 ]
   np = [ 1 1 1 ]
   nn = [ 151 77 21 ];
-  ihypo = [  68 51 18 ];
-  ihypo = [ 115 51 18 ];
+  ihypo = [  69 52 19 ];
+  ihypo = [ 114 52 19 ];
   dx = 4000.;
   nt = 650;
   nt = 1;

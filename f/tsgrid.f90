@@ -163,21 +163,23 @@ close( 3 )
 close( 4 )
 
 ! Hypocenter
-j1  = int( (xf(3))/dx ) + 1
-j2  = int( (xf(8))/dx )
-j0n = nint( (xf(3)+8000.)/dx )
-j0s = nint( (xf(8)-8000.)/dx )
-l0n = nint( 8000 * l / (dx*l + x(j0n,k0,1,3) - z0) )
-l0s = nint( 8000 * l / (dx*l + x(j0s,k0,1,3) - z0) )
+j1  = int( (xf(3))/dx ) + 2
+j2  = int( (xf(8))/dx ) + 1
+j0n = nint( (xf(3)+8000.)/dx ) + 1
+j0s = nint( (xf(8)-8000.)/dx ) + 1
+l = n(3)-npml-1
+l0n = n(3) - nint( 8000 * l / (dx*l + x(j0n,k0,1,3) - z0) )
+l0s = n(3) - nint( 8000 * l / (dx*l + x(j0s,k0,1,3) - z0) )
 open( 1, file='tmp/griddata.m' )
-write( 1, * ) 'dx    = ', dx, ';'
-write( 1, * ) 'npml  = ', npml, ';'
-write( 1, * ) 'n     = [ ', n, ' ];'
-write( 1, * ) 'nn    = [ ', n + (/ 0, 1, 0 /), ' ];'
-write( 1, * ) 'j1    = ', j1, ';'
-write( 1, * ) 'j2    = ', j2, ';'
-write( 1, * ) 'ihypo = [ ', j0n, k0, l0n, ' ];'
-write( 1, * ) 'ihypo = [ ', j0s, k0, l0s, ' ];'
+write( 1, * ) 'dx     = ', dx, ';'
+write( 1, * ) 'npml   = ', npml, ';'
+write( 1, * ) 'n      = [ ', n, ' ];'
+write( 1, * ) 'nn     = [ ', n + (/ 0, 1, 0 /), ' ];'
+write( 1, * ) 'j1     = ', j1, ';'
+write( 1, * ) 'j2     = ', j2, ';'
+write( 1, * ) 'ihypo1 = [ ', j0n, k0, l0n, ' ];'
+write( 1, * ) 'ihypo2 = [ ', j0s, k0, l0s, ' ];'
+write( 1, * ) 'endian = ''', endian, ''';'
 close( 1 )
 
 end program

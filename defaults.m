@@ -6,7 +6,7 @@
   dx = 100.;				% spatial step length
   dt = .0075;				% time step length
   grid = 'constant';			% regular mesh
-  affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1. ] / 1.; % grid tranformation
+  affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ]; % grid tranformation
   symmetry = [ 0 0 0 ];			% grid symmetry
   origin = 1;				% 0=hypocenter, 1=first node
 % faultnormal = 0;			% no fault
