@@ -4,51 +4,68 @@ use tscoords_m
 use surfnormals_m
 implicit none
 real :: dx, h, o1, o2, z0, h1, h2, h3, h4, ell(3), yf0, xf(10), yf(10)
-integer :: n(3), nn, npml, nt1, nt2, i, j, k, l, jj, kk, i1(3), i2(3), reclen
+integer :: n(3), nn, npml, nt1, nt2, i, j, k, l, jj, kk, i1(3), i2(3), reclen, k0
 real, allocatable :: x(:,:,:,:), w(:,:,:,:), s(:,:,:), topo(:,:)
+character :: endian
 
-npml = 10
-dx = 4000.
+open( 1, file='in-grid', status='old' )
+read( 1, * ) dx, npml
+close( 1 )
 ell = (/ 600, 300, 80 /) * 1000
 yf0 = 200000
+
+! Dimentions
 n = nint( ell / dx ) + 1
+print *, 'n = ' n
 j = n(1)
 k = n(2)
 l = n(3)
 nn = j * k * l
 allocate( x(j,k,1,3), w(j,k,1,3), s(j,k,1) )
-open( 1, file='nn' )
+open( 1, file='tmp/nn' )
 write( 1, * ) nn
 close( 1 )
-xf = (/ 0,dx*npml,265864.,293831.,338482.,364062.,390075.,459348.,ell(1)-dx*npml,ell(1)/)
-yf = (/ yf0, yf0, 183273.,187115.,200421.,212782.,215126.,210481., yf0, yf0 /)
-k = nint( yf0 / dx ) + 1
+
+! 2D mesh
+forall( i=1:n(1) ) x(i,:,:,1) = dx*(i-1)
+forall( i=1:n(2) ) x(:,i,:,2) = dx*(i-1)
+
+! Interpolate fault trace
+xf = (/ -dx,dx*npml,265864.,293831.,338482.,364062.,390075.,459348.,ell(1)-dx*npml,ell(1)+dx /)
+yf = (/ yf0,yf0,    183273.,187115.,200421.,212782.,215126.,210481.,yf0,yf0 /)
 i = 1
+k0 = nint( yf0 / dx ) + 1
 do j = 1, n(1)
-  x(j,:,:) = dx*(j-1)
+  do while( x(j,k0,1,1) > xf(i+1) )
+    i = i + 1
+  end do
+  x(j,k0,1,2) = yf(i) + (yf(i+1)-yf(i)) / (xf(i+1)-xf(i)) * (x(j,k0,1,1)-xf(i))
+end do
+
+! Blend fault to bounaries
+l = k0-npml-1
+do k = npml+2, k0-1
+  x(:,k,:,2) = x(:,k0,:,2)*(k-npml-1)/l + dx*(1+npml)*(k0-k)/l
+end do
+l = n(2)-npml-k0
+do k = k0+1, n(2)-npml-1
+  x(:,k,:,2) = x(:,k0,:,2)*(n(2)-npml-k)/l + dx*(n(2)-npml)*(k-k0)/l
 end do
 
 ! Topo
 nt1 = 960
 nt2 = 780
 allocate( topo(nt1,nt2) )
+endian = 'l'
+if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
 inquire( iolength=reclen ) topo
-open( 1, file='topo.bin', recl=reclen, form='unformatted', access='direct', status='old' )
+open( 1, file='topo.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) topo
 close( 1 )
 
-! 2D x/y
-inquire( iolength=reclen ) x(:,:,:,1)
-open( 1, file='x', recl=reclen, form='unformatted', access='direct', status='old' )
-open( 2, file='y', recl=reclen, form='unformatted', access='direct', status='old' )
-read( 1, rec=1 ) x(:,:,:,1)
-read( 2, rec=1 ) x(:,:,:,2)
-close( 1 )
-close( 2 )
-
 ! 3D x/y
-open( 1, file='x1', recl=reclen, form='unformatted', access='direct' )
-open( 2, file='x2', recl=reclen, form='unformatted', access='direct' )
+open( 1, file='tmp/x1', recl=reclen, form='unformatted', access='direct' )
+open( 2, file='tmp/x2', recl=reclen, form='unformatted', access='direct' )
 do i = 1, n(3)
   write( 1, rec=i ) x(:,:,:,1)
   write( 2, rec=i ) x(:,:,:,2)
@@ -71,8 +88,8 @@ do i = 0, npml-1
 end do
 
 ! 3D lat/lon
-open( 1, file='rlon', recl=reclen, form='unformatted', access='direct' )
-open( 2, file='rlat', recl=reclen, form='unformatted', access='direct' )
+open( 1, file='tmp/rlon', recl=reclen, form='unformatted', access='direct' )
+open( 2, file='tmp/rlat', recl=reclen, form='unformatted', access='direct' )
 do i = 1, n(3)
   write( 1, rec=i ) w(:,:,:,1)
   write( 2, rec=i ) w(:,:,:,2)
@@ -107,7 +124,7 @@ print *, 'Max Elevation: ', maxval( x(:,:,:,3) )
 print *, 'Average Elevation: ', z0
 
 ! 2D elevation
-open( 3, file='z', recl=reclen, form='unformatted', access='direct' )
+open( 3, file='tmp/z', recl=reclen, form='unformatted', access='direct' )
 write( 3, rec=1 ) x(:,:,:,3)
 close( 3 )
 
@@ -126,22 +143,22 @@ where ( s /= 0. ) s = 1. / s
 do i = 1, 3
   w(:,:,:,i) = w(:,:,:,i) * s
 end do
-open( 3, file='shade', recl=reclen, form='unformatted', access='direct' )
+open( 3, file='tmp/shade', recl=reclen, form='unformatted', access='direct' )
 write( 3, rec=1 ) w(:,:,:,1)
 close( 3 )
 
 ! 3D elevation and depth
-s = 0.
-x(:,:,:,3) = (x(:,:,:,3)-z0) / (n(3)-npml)
-open( 3, file='x3', recl=reclen, form='unformatted', access='direct' )
-open( 4, file='rdep', recl=reclen, form='unformatted', access='direct' )
-do i = 1, npml
-  write( 3, rec=i ) z0 - (n(3)-i) * dx + s
-  write( 4, rec=i ) (n(3)-i) * dx + (n(3)-npml) * x(:,:,:,3)
+s = 0
+open( 3, file='tmp/x3', recl=reclen, form='unformatted', access='direct' )
+open( 4, file='tmp/rdep', recl=reclen, form='unformatted', access='direct' )
+l = n(3)-npml-1
+do i = 1, npml+1
+  write( 3, rec=i ) s + (z0 - dx*(n(3)-i))
+  write( 4, rec=i ) x(:,:,:,3) - (z0 - dx*l)
 end do
-do i = npml+1, n(3)
-  write( 3, rec=i ) z0 - (n(3)-i) * dx + (i-npml) * x(:,:,:,3)
-  write( 4, rec=i ) (n(3)-i) * dx + (n(3)-i) * x(:,:,:,3)
+do i = npml+2, n(3)
+  write( 3, rec=i )  x(:,:,:,3)*((i-npml-1)/l) + ((z0 - dx*l)*(n(3)-i)/l)
+  write( 4, rec=i ) -x(:,:,:,3)*((n(3)-i)/l)
 end do
 close( 3 )
 close( 4 )
