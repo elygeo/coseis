@@ -3,58 +3,60 @@ use utm_m
 contains
 
 ! Rotate TeraShake coordinates to UTM
-subroutine ts2ll( x, y )
+subroutine ts2ll( x, i1, i2 )
 implicit none
-real, intent(inout) :: x(:,:,:), y(:,:,:)
+real, intent(inout) :: x(:,:,:,:)
+integer, intent(in) :: i1, i2
 real, parameter ::                                                           &
   h   = 1,                                                                   &
   rot = 40,                                                                  &
-  x0  = 132679.8125,                                                         &
-  y0  = 3824867.,                                                            &
+  o1  = 132679.8125,                                                         &
+  o2  = 3824867.,                                                            &
   pi  = 3.14159265
-real :: c, s, xx, yy
+real :: c, s, x1, x2
 integer :: j, k, l
 c = cos( rot * pi / 180. ) * h
 s = sin( rot * pi / 180. ) * h
 do l = 1, size( x, 3 )
 do k = 1, size( x, 2 )
 do j = 1, size( x, 1 )
-  xx =  c * x(j,k,l) + s * y(j,k,l)
-  yy = -s * x(j,k,l) + c * y(j,k,l)
-  x(j,k,l) = xx
-  y(j,k,l) = yy
+  x1 =  c * x(j,k,l,i1) + s * x(j,k,l,i2)
+  x2 = -s * x(j,k,l,i1) + c * x(j,k,l,i2)
+  x(j,k,l,i1) = x1
+  x(j,k,l,i2) = x2
 end do
 end do
 end do
-x = x + x0
-y = y + y0
-call utm2ll( x, y, 11 )
+x(:,:,:,i1) = x(:,:,:,i1) + o1
+x(:,:,:,i2) = x(:,:,:,i2) + o2
+call utm2ll( x, i1, i2, 11 )
 end subroutine
 
 ! Rotate UTM to TeraShake coordinates
-subroutine ll2ts( x, y )
+subroutine ll2ts( x, i1, i2 )
 implicit none
-real, intent(inout) :: x(:,:,:), y(:,:,:)
+real, intent(inout) :: x(:,:,:,:)
+integer, intent(in) :: i1, i2
 real, parameter ::                                                           &
   h   = 1,                                                                   &
   rot = 40,                                                                  &
-  x0  = 132679.8125,                                                         &
-  y0  = 3824867.,                                                            &
+  o1  = 132679.8125,                                                         &
+  o2  = 3824867.,                                                            &
   pi  = 3.14159265
-real :: c, s, xx, yy
+real :: c, s, x1, x2
 integer :: j, k, l
-call ll2utm( x, y, 11 )
-x = x - x0
-y = y - y0
+call ll2utm( x, i1, i2, 11 )
+x(:,:,:,i1) = x(:,:,:,i1) - o1
+x(:,:,:,i2) = x(:,:,:,i2) - o2
 c = cos( rot * pi / 180. ) / h
 s = sin( rot * pi / 180. ) / h
 do l = 1, size( x, 3 )
 do k = 1, size( x, 2 )
 do j = 1, size( x, 1 )
-  xx = c * x(j,k,l) - s * y(j,k,l)
-  yy = s * x(j,k,l) + c * y(j,k,l)
-  x(j,k,l) = xx
-  y(j,k,l) = yy
+  x1 = c * x(j,k,l,i1) - s * x(j,k,l,i2)
+  x2 = s * x(j,k,l,i1) + c * x(j,k,l,i2)
+  x(j,k,l,i1) = x1
+  x(j,k,l,i2) = x2
 end do
 end do
 end do
