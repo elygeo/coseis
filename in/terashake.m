@@ -26,9 +26,9 @@
   ihypo = [  69 52 19 ];
   ihypo = [ 114 52 19 ];
   dx = 4000.;
-  nt = 650;
   nt = 1;
-  dt = .28;
+  nt = 650;
+  dt = .25;
 return
 
 % 1000m - Babieca

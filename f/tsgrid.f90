@@ -41,7 +41,7 @@ do j = 1, n(1)
   x(j,k0,1,2) = yf(i) + (yf(i+1)-yf(i)) / (xf(i+1)-xf(i)) * (x(j,k0,1,1)-xf(i))
 end do
 
-! Blend fault to bounaries
+! Blend fault to top and bottom bounaries
 l = k0-npml-1
 do k = npml+2, k0-1
   x(:,k,:,2) = x(:,k0,:,2)*(k-npml-1)/l + dx*npml*(k0-k)/l
@@ -63,6 +63,7 @@ read( 1, rec=1 ) topo
 close( 1 )
 
 ! 3D x/y
+inquire( iolength=reclen ) x(:,:,:,1)
 open( 1, file='tmp/x1', recl=reclen, form='unformatted', access='direct' )
 open( 2, file='tmp/x2', recl=reclen, form='unformatted', access='direct' )
 do i = 1, n(3)
@@ -146,18 +147,18 @@ open( 1, file='tmp/shade', recl=reclen, form='unformatted', access='direct' )
 write( 1, rec=1 ) w(:,:,:,1)
 close( 1 )
 
-! 3D elevation and depth
+! 3D elevation and depth. blend topo to flat basement
 s = 0
 open( 3, file='tmp/x3', recl=reclen, form='unformatted', access='direct' )
 open( 4, file='tmp/rdep', recl=reclen, form='unformatted', access='direct' )
 l = n(3)-npml-1
 do i = 1, npml+1
-  write( 3, rec=i ) s + (z0 - dx*(n(3)-i))
-  write( 4, rec=i ) x(:,:,:,3) - (z0-dx*l)
+  write( 3, rec=i ) s + z0 - dx*(n(3)-i)
+  write( 4, rec=i ) x(:,:,:,3) - z0-dx*l
 end do
 do i = npml+2, n(3)
-  write( 3, rec=i )  x(:,:,:,3)*((i-npml-1)/l) + ((z0 - dx*l)*(n(3)-i)/l)
-  write( 4, rec=i ) (x(:,:,:,3) - (z0-dx*l)) * ((n(3)-i)/l)
+  write( 3, rec=i )  x(:,:,:,3)*(i-npml-1)/l + (z0-dx*l)*(n(3)-i)/l
+  write( 4, rec=i ) (x(:,:,:,3)-(z0-dx*l))*(n(3)-i)/l
 end do
 close( 3 )
 close( 4 )
