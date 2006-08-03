@@ -9,9 +9,13 @@
   bc1 = [ 1 1 1 ];
   bc2 = [ 1 1 0 ];
   faultnormal = 2;
-  grid = 'constant';
-  grid = 'read';
   datadir = 'ts/tmp';
+  grid = 'read';
+  rho  = 'read';
+  vp   = 'read';
+  vs   = 'read';
+  vs1 = 500.;
+  vp1 = 1500.;
   mus = 1e9;
   mus = [ .6 'cube' 265863. 0. -15000.   459340. 300000. 4000. ];
 

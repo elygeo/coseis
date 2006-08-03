@@ -20,12 +20,6 @@ if ( master ) call toc( 'Material model' )
 mr = 0.
 s1 = 0.
 s2 = 0.
-rho1 = 1e9
-rho2 = 0.
-vp1 = 1e9
-vp2 = 0.
-vs1 = 1e9
-vs2 = 0.
 
 ! Loop over input zones
 
@@ -44,35 +38,17 @@ case( 'z' )
   k1 = i1l(2); k2 = i2l(2)
   l1 = i1l(3); l2 = i2l(3)
   select case( fieldin(iz) )
-  case( 'rho' )
-    mr(j1:j2,k1:k2,l1:l2) = inval(iz)
-    rho1 = min( rho1, inval(iz) )
-    rho2 = max( rho2, inval(iz) )
-  case( 'vp'  )
-    s1(j1:j2,k1:k2,l1:l2) = inval(iz)
-    vp1 = min( vp1, inval(iz) )
-    vp2 = max( vp2, inval(iz) )
-  case( 'vs'  )
-    s2(j1:j2,k1:k2,l1:l2) = inval(iz)
-    vs1 = min( vs1, inval(iz) )
-    vs2 = max( vs2, inval(iz) )
+  case( 'rho' ); mr(j1:j2,k1:k2,l1:l2) = inval(iz)
+  case( 'vp'  ); s1(j1:j2,k1:k2,l1:l2) = inval(iz)
+  case( 'vs'  ); s2(j1:j2,k1:k2,l1:l2) = inval(iz)
   end select
 case( 'c' )
   x1 = x1in(iz,:)
   x2 = x2in(iz,:)
   select case( fieldin(iz) )
-  case( 'rho' )
-    call cube( mr, x, i1, i2, x1, x2, inval(iz) )
-    rho1 = min( rho1, inval(iz) )
-    rho2 = max( rho2, inval(iz) )
-  case( 'vp'  )
-    call cube( s1, x, i1, i2, x1, x2, inval(iz) )
-    vp1 = min( vp1, inval(iz) )
-    vp2 = max( vp2, inval(iz) )
-  case( 'vs'  )
-    call cube( s2, x, i1, i2, x1, x2, inval(iz) )
-    vs1 = min( vs1, inval(iz) )
-    vs2 = max( vs2, inval(iz) )
+  case( 'rho' ); call cube( mr, x, i1, i2, x1, x2, inval(iz) )
+  case( 'vp'  ); call cube( s1, x, i1, i2, x1, x2, inval(iz) )
+  case( 'vs'  ); call cube( s2, x, i1, i2, x1, x2, inval(iz) )
   end select
 case( 'r' )
   idoublenode = 0
@@ -97,8 +73,6 @@ case( 'r' )
     case( 2 ); k = ihypo(2); mr(:,k+1:k2+1,:) = mr(:,k:k2,:)
     case( 3 ); l = ihypo(3); mr(:,:,l+1:l2+1) = mr(:,:,l:l2)
     end select
-    where ( mr < rho1 ) mr = rho1
-    where ( mr > rho1 ) mr = rho2
   case( 'vp'  )
     call scalario( 'r', 'data/vp', s1, 1, i1, i2, i1l, i2l, 0 )
     select case( idoublenode )
@@ -106,8 +80,6 @@ case( 'r' )
     case( 2 ); k = ihypo(2); s1(:,k+1:k2+1,:) = s1(:,k:k2,:)
     case( 3 ); l = ihypo(3); s1(:,:,l+1:l2+1) = s1(:,:,l:l2)
     end select
-    where ( s1 < vp1 ) s1 = vp1
-    where ( s1 > vp2 ) s1 = vp2
   case( 'vs'  )
     call scalario( 'r', 'data/vs', s2, 1, i1, i2, i1l, i2l, 0 )
     select case( idoublenode )
@@ -115,12 +87,30 @@ case( 'r' )
     case( 2 ); k = ihypo(2); s2(:,k+1:k2+1,:) = s2(:,k:k2,:)
     case( 3 ); l = ihypo(3); s2(:,:,l+1:l2+1) = s2(:,:,l:l2)
     end select
-    where ( s2 < vs1 ) s2 = vs1
-    where ( s2 > vs2 ) s2 = vs2
   end select
 end select
 
 end do doiz
+
+! Extrema
+where ( mr < rho1 ) mr = rho1
+where ( mr > rho2 ) mr = rho2
+where ( s1 < vp1 ) s1 = vp1
+where ( s1 > vp2 ) s1 = vp2
+where ( s2 < vs1 ) s2 = vs1
+where ( s2 > vs2 ) s2 = vs2
+rho1 = minval( mr )
+rho2 = maxval( mr )
+call pmin( rho1 )
+call pmax( rho2 )
+vp1  = minval( s1 )
+vp2  = maxval( s1 )
+call pmin( vp1 )
+call pmax( vp2 )
+vs1  = minval( s2 )
+vs2  = maxval( s2 )
+call pmin( vs1 )
+call pmax( vs2 )
 
 ! Hypocenter values
 if ( master ) then

@@ -46,6 +46,12 @@ case( 'dx' );          read( str, * ) dx
 case( 'dt' );          read( str, * ) dt
 case( 'upvector' );    read( str, * ) upvector
 case( 'viscosity' );   read( str, * ) viscosity
+case( 'rho1' );        read( str, * ) rho1
+case( 'vp1' );         read( str, * ) vp1
+case( 'vs1' );         read( str, * ) vs1
+case( 'rho2' );        read( str, * ) rho2
+case( 'vp2' );         read( str, * ) vp2
+case( 'vs2' );         read( str, * ) vs2
 case( 'npml' );        read( str, * ) npml
 case( 'bc1' );         read( str, * ) bc1
 case( 'bc2' );         read( str, * ) bc2
