@@ -37,8 +37,8 @@ mkdir -p tmp
 
 # Locations
 srcdir=$( /bin/pwd )
-count=$( echo out/[0-9][0-9] | sed 's/.* //' )
-[ $count = 'out/[0-9][0-9]' ] && count=00
+count=$( echo out/[0-9][0-9] | sed 's/.*\///' )
+[ $count = '[0-9][0-9]' ] && count=00
 count=$( echo $count | awk '{ printf "%02d", $1+1 }' )
 rundir="$srcdir/out/$count"
 
@@ -244,7 +244,7 @@ chmod u+x viz
 
 # Setup run directory
 sh/tarball
-echo "Run directory: $count"
+echo "Run directory: out/$count"
 mkdir -p out
 mkdir "$rundir"
 cp 'in.m' tmp/sord.tgz tmp/sord-$mode tmp/input "$rundir"
@@ -449,13 +449,13 @@ esac
 esac #--------------------------------------#
 
 if [ "$run" = b ]; then
-  echo "Background job started, to cancel: $count/kill.sh"
+  echo "Background job started, to cancel: out/$count/kill.sh"
   echo "#!/bin/bash" > 'kill.sh'
   echo "kill $!" >> 'kill.sh'
   chmod u+x 'kill.sh'
 fi
 if [ "$pbsjob" ]; then
-  echo "Job submitted to PBS, to cancel: $count/qdel.sh"
+  echo "Job submitted to PBS, to cancel: out/$count/qdel.sh"
   echo "#!/bin/bash" > 'qdel.sh'
   echo "qdel $pbsjob" >> 'qdel.sh'
   chmod u+x 'qdel.sh'
