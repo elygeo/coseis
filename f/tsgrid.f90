@@ -8,7 +8,7 @@ integer :: n(3), nn, npml, nt1, nt2, i, j, k, l, jj, kk, i1(3), i2(3), reclen, k
 real, allocatable :: x(:,:,:,:), w(:,:,:,:), s(:,:,:), topo(:,:)
 character :: endian
 
-open( 1, file='in-grid', status='old' )
+open( 1, file='tmp/in-grid', status='old' )
 read( 1, * ) dx, npml
 close( 1 )
 ell = (/ 600, 300, 80 /) * 1000
