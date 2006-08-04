@@ -18,13 +18,14 @@
   vs1 = 500.;
   vp1 = 1500.;
   mus = 1e9;
-  mus = [ .6 'cube' 265863. 0. -15000.   459340. 300000. 4000. ];
+% mus = [ .6 'cube' 265863. 0. -16000.   459340. -2000. 4000. ];
 
 % 1000m - Babieca
   np = [ 8 4 1 ]
   nn = [ 601 302 81 ];
-  ihypo = [ 275 203 73 ];
-  ihypo = [ 452 203 73 ];
+  mus = [ .6   'zone'   267 0 -17   460 0 -3 ];
+  ihypo = [ 275 203 -9 ];
+  ihypo = [ 452 203 -9 ];
   dx = 1000.;
   nt = 3000;
   dt = .06;
@@ -34,8 +35,9 @@ return
   np = [ 1 1 2 ]
   np = [ 1 1 1 ]
   nn = [ 151 77 21 ];
-  ihypo = [  69 52 19 ];
-  ihypo = [ 114 52 19 ];
+  mus = FIXME
+  ihypo = [  69 52 -3 ];
+  ihypo = [ 114 52 -3 ];
   dx = 4000.;
   nt = 1;
   nt = 750;
@@ -45,6 +47,8 @@ return
 % 200m - DataStar
   np = [ 16 8 4 ]
   nn = [ 3001 1502 401 ];
+  mus = FIXME
+  ihypo = FIXME
   dx = 200.;
   nt = 13000;
   dt = .014;
@@ -54,6 +58,8 @@ return
 % 2000m - Single processor
   np = [ 1 1 1 ]
   nn = [ 301 152 41 ];
+  mus = FIXME
+  ihypo = FIXME
   dx = 2000.;
   nt = 1300;
   dt = .14;
@@ -62,6 +68,8 @@ return
 % 500m - Babieca
   np = [ 8 4 1 ]
   nn = [ 1201 602 161 ];
+  mus = FIXME
+  ihypo = FIXME
   dx = 500.;
   nt = 5200;
   dt = .035;
@@ -70,6 +78,8 @@ return
 % 400m - DataStar
   np = [ 16 8 4 ]
   nn = [ 1501 752 201 ];
+  mus = FIXME
+  ihypo = FIXME
   dx = 400.;
   nt = 6500;
   dt = .028;
