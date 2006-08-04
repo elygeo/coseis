@@ -9,7 +9,7 @@
   bc1 = [ 1 1 1 ];
   bc2 = [ 1 1 0 ];
   faultnormal = 2;
-  datadir = 'ts/tmp';
+  datadir = 'tstmp';
   grid = 'read';
   rho  = 'read';
   vp   = 'read';
@@ -19,6 +19,16 @@
   mus = 1e9;
   mus = [ .6 'cube' 265863. 0. -15000.   459340. 300000. 4000. ];
 
+% 1000m - Babieca
+  np = [ 8 4 1 ]
+  nn = [ 601 302 81 ];
+  ihypo = [ 275 203 73 ];
+  ihypo = [ 452 203 73 ];
+  dx = 1000.;
+  nt = 3000;
+  dt = .06;
+return
+
 % 4000m - Single processor
   np = [ 1 1 2 ]
   np = [ 1 1 1 ]
@@ -27,16 +37,8 @@
   ihypo = [ 114 52 19 ];
   dx = 4000.;
   nt = 1;
-  nt = 650;
-  dt = .25;
-return
-
-% 1000m - Babieca
-  np = [ 8 4 1 ]
-  nn = [ 601 302 81 ];
-  dx = 1000.;
-  nt = 2600;
-  dt = .07;
+  nt = 750;
+  dt = .24;
 return
 
 % 200m - DataStar
