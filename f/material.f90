@@ -99,16 +99,21 @@ where ( s1 < vp1 ) s1 = vp1
 where ( s1 > vp2 ) s1 = vp2
 where ( s2 < vs1 ) s2 = vs1
 where ( s2 > vs2 ) s2 = vs2
-rho1 = minval( mr )
-rho2 = maxval( mr )
+i1 = i1node
+i2 = i2node
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+rho1 = minval( mr(j1:j2,k1:k2,l1:l2) )
+rho2 = maxval( mr(j1:j2,k1:k2,l1:l2) )
 call pmin( rho1 )
 call pmax( rho2 )
-vp1  = minval( s1 )
-vp2  = maxval( s1 )
+vp1  = minval( s1(j1:j2,k1:k2,l1:l2) )
+vp2  = maxval( s1(j1:j2,k1:k2,l1:l2) )
 call pmin( vp1 )
 call pmax( vp2 )
-vs1  = minval( s2 )
-vs2  = maxval( s2 )
+vs1  = minval( s2(j1:j2,k1:k2,l1:l2) )
+vs2  = maxval( s2(j1:j2,k1:k2,l1:l2) )
 call pmin( vs1 )
 call pmax( vs2 )
 
