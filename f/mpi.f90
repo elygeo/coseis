@@ -2,7 +2,7 @@
 module collective_m
 use mpi
 implicit none
-integer :: comm3d, comm2d(3), comm1d(3)
+integer :: comm3d, comm2d(3)
 integer, private :: ip, ipmaster
 contains
 

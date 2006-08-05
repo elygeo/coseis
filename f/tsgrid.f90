@@ -3,7 +3,7 @@ program grid
 use tscoords_m
 use surfnormals_m
 implicit none
-real :: dx, h, o1, o2, z0, h1, h2, h3, h4, ell(3), yf0, xf(10), yf(10)
+real :: dx, h, o1, o2, z0, h1, h2, h3, h4, ell(3), yf0, xf(10), yf(10), lfault, lfault0
 integer :: n(3), nn, npml, nt1, nt2, i, j, k, l, jj, kk, i1(3), i2(3), reclen, k0, j0n, j0s, l0n, l0s, j1, j2
 real, allocatable :: x(:,:,:,:), w(:,:,:,:), s(:,:,:), topo(:,:)
 character :: endian
@@ -163,24 +163,42 @@ end do
 close( 3 )
 close( 4 )
 
+! Fault
+j1 = int( (xf(3))/dx ) + 2
+j2 = int( (xf(8))/dx ) + 1
+lfault = 0.
+do j = j1, j2
+  h1 = x(j+1,k0,1,1) - x(j,k0,1,1)
+  h2 = x(j+1,k0,1,2) - x(j,k0,1,2)
+  lfault = lfault + sqrt( h1*h1 + h2*h2 )
+end do
+lfault0 = 0.
+do i = 3, 7
+  h1 = xf(i+1)-xf(i)
+  h2 = yf(i+1)-yf(i)
+  lfault0 = lfault0 + sqrt( h1*h1 + h2*h2 )
+end do
+
 ! Hypocenter
-j1  = int( (xf(3))/dx ) + 2
-j2  = int( (xf(8))/dx ) + 1
 j0n = nint( (xf(3)+8000.)/dx ) + 1
 j0s = nint( (xf(8)-8000.)/dx ) + 1
 l = n(3)-npml-1
 l0n = n(3) - nint( 8000 * l / (dx*l + x(j0n,k0,1,3) - z0) )
 l0s = n(3) - nint( 8000 * l / (dx*l + x(j0s,k0,1,3) - z0) )
-open( 1, file='tmp/griddata.m' )
-write( 1, * ) 'dx     = ', dx, ';'
-write( 1, * ) 'npml   = ', npml, ';'
-write( 1, * ) 'n      = [ ', n, ' ];'
-write( 1, * ) 'nn     = [ ', n + (/ 0, 1, 0 /), ' ];'
-write( 1, * ) 'j1     = ', j1, ';'
-write( 1, * ) 'j2     = ', j2, ';'
-write( 1, * ) 'ihypo1 = [ ', j0n, k0, l0n, ' ];'
-write( 1, * ) 'ihypo2 = [ ', j0s, k0, l0s, ' ];'
-write( 1, * ) 'endian = ''', endian, ''';'
+
+! Metadata
+open( 1, file='tmp/gridmeta.m' )
+write( 1, * ) 'dx      = ', dx, ';'
+write( 1, * ) 'npml    = ', npml, ';'
+write( 1, * ) 'n       = [ ', n, ' ];'
+write( 1, * ) 'nn      = [ ', n + (/ 0, 1, 0 /), ' ];'
+write( 1, * ) 'j1      = ', j1, ';'
+write( 1, * ) 'j2      = ', j2, ';'
+write( 1, * ) 'lfault  = ', lfault, ';'
+write( 1, * ) 'lfault0 = ', lfault0, ';'
+write( 1, * ) 'ihypo1  = [ ', j0n, k0, l0n, ' ];'
+write( 1, * ) 'ihypo2  = [ ', j0s, k0, l0s, ' ];'
+write( 1, * ) 'endian  = ''', endian, ''';'
 close( 1 )
 
 end program
