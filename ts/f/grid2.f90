@@ -3,7 +3,7 @@ program grid
 use tscoords_m
 use surfnormals_m
 implicit none
-real :: dx, h, o1, o2, z0, h1, h2, h3, h4, ell(3), x0, y0, xf(10), yf(10), lf
+real :: dx, h, o1, o2, z0, h1, h2, h3, h4, ell(3), x0, y0, xf(6), yf(6), lf(6)
 integer :: n(3), nn, npml, nt1, nt2, i, j, k, l, jj, kk, i1(3), i2(3), reclen, k0, j0n, j0s, l0n, l0s, j1, j2
 real, allocatable :: x(:,:,:,:), w(:,:,:,:), s(:,:,:), topo(:,:)
 character :: endian
@@ -38,11 +38,11 @@ y0 = .5 * ( minval(yf) + maxval(yf) )
 nf = length( xf, 1 )
 
 ! Fault length
-lf = 0.
-do i = 1, nf-1
-  h1 = xf(i+1) - xf(i)
-  h2 = yf(i+1) - yf(i)
-  lf = lf + sqrt( h1*h1 + h2*h2 )
+lf(1) = 0
+do i = 2, nf
+  h1 = xf(i) - xf(i-1)
+  h2 = yf(i) - yf(i-1)
+  lf(i) = sqrt( h1*h1 + h2*h2 )
 end do
 
 ! Fault indices
@@ -53,22 +53,30 @@ j1 = nint( ( x0 - .5*lf ) / dx ) + 1
 j2 = j1 + nf1
 k0 = nint( y0 / dx ) + 1
 
-i = 1
-do j = 1, n(1)
-  do while( x(j,k0,1,1) > xf(i+1) )
+! Interpolate fault
+i = 0
+x(j1,k0,1,1) = xf(1)
+x(j1,k0,1,2) = yf(1)
+do j = j1, j2
+  do while( i < nf-1 .and. x(j,k0,1,1) > xf(i+1) )
     i = i + 1
   end do
-  x(j,k0,1,2) = yf(i) + (yf(i+1)-yf(i)) / (xf(i+1)-xf(i)) * (x(j,k0,1,1)-xf(i))
+  x(j,k0,1,1) = xf(i) + (xf(i+1)-xf(i)) / (lf(i+1)-lf(i)) * (dx*j-lf(i))
+  x(j,k0,1,2) = yf(i) + (yf(i+1)-yf(i)) / (lf(i+1)-lf(i)) * (dx*j-lf(i))
+end do
+i = 1 + npml
+do j = i+1, j2-1
+  x(j,k0,:,:) = x(i,k0,:,:)*(
 end do
 
 ! Blend fault to top and bottom bounaries
-l = k0-npml-1
-do k = npml+2, k0-1
-  x(:,k,:,2) = x(:,k0,:,2)*(k-npml-1)/l + dx*npml*(k0-k)/l
+i = 1 + npml
+do k = i+1, k0-1
+  x(:,k,:,:) = x(:,k0,:,:)*(i-k)/(i-k0) + x(:,i,:,:)*(k-k0)/(i-k0)
 end do
-l = n(2)-npml-k0
-do k = k0+1, n(2)-npml-1
-  x(:,k,:,2) = x(:,k0,:,2)*(n(2)-npml-k)/l + (ell(2)-dx*npml)*(k-k0)/l
+i = n(2) - npml
+do k = k0+1, k1-1
+  x(:,k,:,:) = x(:,k0,:,:)*(i-k)/(i-k0) + x(:,i,:,:)*(k-k0)/(i-k0)
 end do
 
 ! Topo
