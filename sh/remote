@@ -17,8 +17,10 @@ files="\
   in.m
   in
   sh
-  ts
   f
+  ts/f
+  ts/vm
+  ts/data
   m"
 
 echo "SORD remote install"

@@ -21,6 +21,7 @@ files="
   $base/sh
   $base/f
   $base/m
+  $base/ts/f
 "
 
 ln -s . $base
