@@ -7,6 +7,7 @@ subroutine timestep
 use globals_m
 use tictoc_m
 integer :: i1(3), i2(3), j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
+real :: de
 
 if ( master ) call toc( 'Time integration' )
 
@@ -32,6 +33,11 @@ if ( ifn /= 0 ) then
   l3 = i1(3); l4 = i2(3)
   t1 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
   t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
+  work = .5 * sum( sum( ( t0 + t3 ) * t2, 4 ) * area )
+  call psum( work, ifn )
+  de = dt * sum( sum( t1 * t3, 4 ) * area )
+  call psum( de, ifn )
+  efrac = efrac + de
   f1 = sqrt( sum( t1 * t1, 4 ) )
   f2 = sqrt( sum( t2 * t2, 4 ) )
   sl = sl + dt * f1

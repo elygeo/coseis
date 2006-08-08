@@ -50,9 +50,12 @@ i = i
 end subroutine
 
 ! Real sum
-subroutine psum( r )
+subroutine psum( r, i )
 real, intent(inout) :: r
+integer, intent(in) :: i
+integer :: ii
 r = r
+ii = i
 end subroutine
 
 ! Logical or

@@ -77,11 +77,14 @@ i = ii
 end subroutine
 
 ! Real sum
-subroutine psum( r )
+subroutine psum( r, i )
 real, intent(inout) :: r
+integer, intent(in) :: i
 real :: rr
-integer :: e
-call mpi_allreduce( r, rr, 1, mpi_real, mpi_sum, comm3d, e )
+integer :: e, comm
+comm = comm3d
+if ( i /= 0 ) comm = comm2d(i)
+call mpi_allreduce( r, rr, 1, mpi_real, mpi_sum, comm, e )
 r = rr
 end subroutine
 

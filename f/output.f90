@@ -522,6 +522,7 @@ if ( master ) then
     write( 9, * ) 'slmax    =  ', slmax,       ';'
     write( 9, * ) 'tarrmax  =  ', tarrmax,     ';'
     write( 9, * ) 'tarrhypo =  ', tarr(j,k,l), ';'
+    write( 9, * ) 'efrac    =  ', efrac,       ';'
     write( 9, * ) 'samaxi   = [', samaxi   - nnoff, '];'
     write( 9, * ) 'svmaxi   = [', svmaxi   - nnoff, '];'
     write( 9, * ) 'sumaxi   = [', sumaxi   - nnoff, '];'
