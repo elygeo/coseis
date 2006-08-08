@@ -154,110 +154,110 @@ COORDINATE SYSTEM
 
 COMPUTATIONAL CYCLE
  
-U = displacement vector
-V = velocity vector
-A = acceleration vector
-W = stress tensor
+f_i = force vector
+u_i = displacement vector
+v_i = velocity vector
+a_i = acceleration vector
+w_ij = stress tensor
+m_ij = moment tensor
 rho = density
-c lambda mu = elastic moduli
+lam mu = elastic moduli
+gamma = viscosity
+dt = time step
  
 Linearized conservation of momentum, Newton's 2nd law
-  A = divW/rho
+  f_i = w_ij,j
+  a_i = f_i/rho
   (hourglass corrections)
-  (Fault boundary condition)
-  V' = A
-  U' = V
-Modified displacement
-  U~ = U + dt*beta*V
-Strain
-  E = [gradU~ + (gradU~)^T]/2
-Stress-strain constitutive law
-  W = c:E
+  (fault boundary condition)
+  v_i' = a_i
+  u_i' = v_i
+Gradient
+  g_ij = (u_i + gamma*v_i),j
 Viscoelastic solid, Kelvin-Voight model, linear, isotropic,
 spring and dashpot in parallel
-  W = lambda*trace(E)*I + 2*mu*E
+  w_ij = lam*g_ij*delta_ij + mu*(g_ij+G_ji)
 Moment tensor source
-  W = W + M'*dt
-
+  w_ij = w_ij + dt*m_ij'
 
 FAULT BOUNDARY CONDITION
 
 n   = fault normal vector, n points toward the positive side of the fault
-T   = traction exerted by the positive side
-T0  = initial traction
-Wn0 = initial normal component of stress
-R   = restoring force on a node
+t   = traction exerted by the positive side
+t0  = initial traction
+wn0 = initial normal component of stress
+r   = restoring force on a node
 m   = nodal mass
 s   = element area
-F   = friction, |Ts| cannot exceed friction
+f   = friction, |ts| cannot exceed friction
 
 Acceleration and velocity of the double nodes due to restoring forces
 and traction.
 
 with no fault
-A0 = A1 = (R0+R1)/(m0+m1)
+a0 = a1 = (r0+r1)/(m0+m1)
 
-- side acc   A0 = [R0 + s*(T-T0)]/m0	
-+ side acc   A1 = [R1 - s*(T-T0)]/m1
+- side acc   a0 = [r0 + s*(t-t0)]/m0	
++ side acc   a1 = [r1 - s*(t-t0)]/m1
 
-- side vel   V0_ = V0 + dt*[R0 + s*(T-T0)]/m0
-+ side vel   V1_ = V1 + dt*[R1 - s*(T-T0)]/m1
+- side vel   v0_ = v0 + dt*[r0 + s*(t-t0)]/m0
++ side vel   v1_ = v1 + dt*[r1 - s*(t-t0)]/m1
 
-- side disp  U0_ = U0 + dt*{ V0(t0) + dt*[R0 + s*(T-T0)]/m0 }
-+ side disp  U1_ = U1 + dt*{ V1(t0) + dt*[R1 - s*(T-T0)]/m1 }
+- side disp  u0_ = u0 + dt*{ v0(t0) + dt*[r0 + s*(t-t0)]/m0 }
++ side disp  u1_ = u1 + dt*{ v1(t0) + dt*[r1 - s*(t-t0)]/m1 }
 
-dA = A1 - A0
-   = (R1/m1-R0/m0) - s*(1/m1+1/m0)*(T-T0)
+da = a1 - a0
+   = (r1/m1-r0/m0) - s*(1/m1+1/m0)*(t-t0)
 
-dV = V1_ - V0_
-   = V1-V0 + dt*dA
-   = V1-V0 + dt*(R1/m1-R0/m0) - dt*s*(1/m1+1/m0)*(T-T0)
+dv = v1_ - v0_
+   = v1-v0 + dt*da
+   = v1-v0 + dt*(r1/m1-r0/m0) - dt*s*(1/m1+1/m0)*(t-t0)
 
-dU = U1_ - U0_
-   = U1-U0 + dt*dV
-   = U1-U0 + dt*(V1-V0) + dt^2*(R1/m1-R0/m0) - dt^2*s*(1/m1+1/m0)*(T-T0)
+du = u1_ - u0_
+   = u1-u0 + dt*dv
+   = u1-u0 + dt*(v1-v0) + dt^2*(r1/m1-r0/m0) - dt^2*s*(1/m1+1/m0)*(t-t0)
 
 Zero relative acceleration boundary condition
-dA = 0
-Ta = T0 + (R1/m1-R0/m0) / [s*(1/m1+1/m0)]
+da = 0
+ta = t0 + (r1/m1-r0/m0) / [s*(1/m1+1/m0)]
 
 Zero relative velocity boundary condition
-dV = 0
-Tv = T0 + [V1-V0 + dt*(R1/m1-R0/m0)] / [dt*s*(1/m1+1/m0)]
-   = Ta + (V1-V0) / [dt*s*(1/m1+1/m0)]
+dv = 0
+tv = t0 + [v1-v0 + dt*(r1/m1-r0/m0)] / [dt*s*(1/m1+1/m0)]
+   = ta + (v1-v0) / [dt*s*(1/m1+1/m0)]
 
 Zero relative normal displacement boundary condition
-dU = 0
-Tu = T0 + [U1-U0 + dt*(V1-V0) + dt^2*(R1/m1-R0/m0)] / [dt^2*s*(1/m1+1/m0)]
-   = Tv + (U1-U0) / [dt^2*s*(1/m1+1/m0)]
+du = 0
+tu = t0 + [u1-u0 + dt*(v1-v0) + dt^2*(r1/m1-r0/m0)] / [dt^2*s*(1/m1+1/m0)]
+   = tv + (u1-u0) / [dt^2*s*(1/m1+1/m0)]
 
 Shear component of traction is bounded by friction
-Ts = Tv.(I-nn)
-Ts~ = / Ts,         |Ts| <= F
-      \ F*Ts/|Ts|,  |Ts| >  F
+ts = tv.(I-nn)
+ts~ = / ts,         |ts| <= f
+      \ f*ts/|ts|,  |ts| >  f
 
 Fault cannot open
-Tn = Tv.n
+tn = tv.n
 
 Normal component of traction is bounded by cohesion (fault can open)
-Tn = Tu.n
-   = (Tv + U1-U0).n / [dt^2*s*(1/m1+1/m0)]
-Tn~ = / Tn,  Tn <= co
-      \ co,  Tn >  co
+tn = tu.n
+   = (tv + u1-u0).n / [dt^2*s*(1/m1+1/m0)]
+tn~ = / tn,  tn <= co
+      \ co,  tn >  co
 
 Total traction bounded by friction
-T~ = Tn~.n + Ts~
+t~ = tn~.n + ts~
 
 Update accelerations
-A0_ = (R0 + s*(T~-T0))/m0
-A1_ = (R1 - s*(T~-T0))/m1
+a0_ = (r0 + s*(t~-t0))/m0
+a1_ = (r1 - s*(t~-t0))/m1
 
 Update velocities
-V0_ = V0 + dt*(R0 + s*(T~-T0))/m0
-V1_ = V1 + dt*(R1 - s*(T~-T0))/m1
+v0_ = v0 + dt*(r0 + s*(t~-t0))/m0
+v1_ = v1 + dt*(r1 - s*(t~-t0))/m1
 
 DFM fault boundary condition
-T = T0 + [R1*m0-R0*m1 + m1*m0*(v1-v0)/dt] / [s*(m1+m0)]
+t = t0 + [r1*m0-r0*m1 + m1*m0*(v1-v0)/dt] / [s*(m1+m0)]
 
 
 SLIP-WEAKENING FRICTION LAW
@@ -268,14 +268,14 @@ mus   = coefficient of static friction
 mud   = coefficient of dynamic friction
 dc    = slip weakening distance
 
-F = mu(l) * T.n + co
+f = mu(l) * t.n + co
 mu(l) = / mus - (us-ud)*l/dc,  l <= dc
         \ mud,                 l >  dc
 
 
       mus +
           |\
- ^ T0/Wn0 + \
+ ^ t0/wn0 + \
  |        |  \
  u    mud +   +---------
           |
@@ -284,16 +284,16 @@ mu(l) = / mus - (us-ud)*l/dc,  l <= dc
 
 
 Strength parameter
-s = (Tu - T0)/(T0 - Tf)
+s = (tu - t0)/(t0 - tf)
 
 Estimate critical radius needed for spontaneous rupture
-rc =~ mu*dc*(Tu - Tf)/(T0 - Tf)^2
+rc =~ mu*dc*(tu - tf)/(t0 - tf)^2
 
 Breakdown zone width
-lc = dc*mu/(Tu - Tf)
+lc = dc*mu/(tu - tf)
 
 Estimate dc needed to resolve breakdown zone
-dc =~ (3 or 4)*dx*(Tu - Tf)/mu
+dc =~ (3 or 4)*dx*(tu - tf)/mu
 
 
 PRETRACTION
@@ -315,15 +315,15 @@ PRETRACTION
   ------------'
 
   Pre-traction:
-  T0 = Tn*n + Th*h + Td*d
-  Tn < 0 compresive traction
-  Tn > 0 opening traction
-  Th > 0 right-lateral slip
-  Th < 0 left-lateral slip
+  t0 = tn*n + th*h + td*d
+  tn < 0 compresive traction
+  tn > 0 opening traction
+  th > 0 right-lateral slip
+  th < 0 left-lateral slip
 
-  When T0 is applied to the near wall, and -T0 applied to the far wall:
-  Td > 0 far side moves down (is there a name for this?)
-  Td < 0 far side moves up
+  When t0 is applied to the near wall, and -t0 applied to the far wall:
+  td > 0 far side moves down (is there a name for this?)
+  td < 0 far side moves up
 
 KOSTROV SOLUTION
 
@@ -409,13 +409,13 @@ Sum on a point
      \|         |
       C---------C
 
-Y = mu*(lambda+mu)/6/(lambda+2*mu)
+Y = mu*(lam+mu)/6/(lam+2*mu)
 
-Q = Y*dU*dx^2*dy^2/dv^2
-A = dQ/dv/rho
+q = Y*du*dx^2*dy^2/dv^2
+a = dQ/dv/rho
 
-Q = Y*dU*/h^2
-A = dQ/h^3/rho
+q = Y*du*/h^2
+a = dQ/h^3/rho
 
 
 
@@ -423,8 +423,8 @@ MOMENT SOURCE
 
 del^2*phi - phi'' / vp^2  =  -4*pi*delta(r) * f(t)
 phi  =  -f(t-r/vp) / r
-U    =  del*phi   =  f(t-r/vp)  / r^2  +  f'(t-r/vp)  / r/vp
-V    =  del*phi'  =  f'(t-r/vp) / r^2  +  f''(t-r/vp) / r/vp
+u    =  del*phi   =  f(t-r/vp)  / r^2  +  f'(t-r/vp)  / r/vp
+v    =  del*phi'  =  f'(t-r/vp) / r^2  +  f''(t-r/vp) / r/vp
 M    =  -4 * pi * rho * vp^2 * f
 
 Brune Source
@@ -433,7 +433,7 @@ M'  =  H * M0 * e^(-t/T) / T^2 *  t
 M'' = -H * M0 * e^(-t/T) / T^3 * (t - T)
 
        H * M0 * e^(-t/T) * ( t*vp/r - t/T + 1 )
-V   =  ----------------------------------------
+v   =  ----------------------------------------
        4 * pi * rho * vp^2 * T^2 * r * vp
 
 Smooth Brune
@@ -442,61 +442,51 @@ M'  =  H * M0 * e^(-t/t) / T^3 / 2 *  t^2
 M'' = -H * M0 * e^(-t/t) / T^4 / 2 * (t^2 - 2*t*T)
 
        H * M0 * e^(-t/T) * ( t*vp/r - t/T + 2 ) * t
-V   =  ----------------------------------------
+v   =  ----------------------------------------
        8 * pi * rho * vp^2 * T^3 * r * vp
 
 
 PML ABSORBING BOUNDARY CONDITION
 
-Damping operator
-D     = [ d(x)  0     0
-          0     d(y)  0
-          0     0     d(z) ]
-
-Partial derivative operator
-[del] = [ d/dx  0     0
-          0     d/dy  0
-          0     0     d/dz ]
-
 Olsen no PML
-F = divW
-V' = F/rho
-G = gradV
-W' = lambda*trace(G)*I + mu*(G + G^T)
+f_i = w_ij,j
+v_i' = f_i/rho
+g_ij = v_i,j
+w_ij' = lam*g_ij*delta_ij + mu*(g_ij + g_ji)
 
 SORD Hourglass
-F = divW + hourglass
-V' = F/rho
-U' = V
-G = grad(U + gamma*V)
-W = lambda*trace(G)*I + mu*(G + G^T)
+f_i = w_ij,j + hourglass
+v_i' = f_i/rho
+u_i' = v_i
+g_ij = (u_i + gamma*v_i),j
+w_ij = lam*g_ij*delta_ij + mu*(g_ij + g_ji)
 
 SORD PML
-if D == 0
-  F = divW
+if d_j == 0
+  f_i = w_ij,j
 else
-  P' + DP = [del]W
-  F = 1.P'
+  p_ij' + d_j*p_ij = w_ij,j (no summation convetion here)
+  f_j = sum_i( p_ij' )
 end
-V' = F/rho
-U' = V
-if D == 0
-  G = gradU
+v_i' = f_i/rho
+u_i' = v_i
+if d_j == 0
+  g_ij = u_i,j
 else
-  G' + DG = gradV
+  g_ij' = d_j*g_ij = v_i,j
 end
-W = lambda*trace(G)*I + mu*(G + G^T)
+w_ij = lam*g_ij*delta_ij + mu*(g_ij + g_ji)
 
 PML Discretization
-(p2 - p1)/dt   + d*(p2 + p1)/2 = dW/dx
-(p2 - p1)/dt*2 + d*(p2 + p1)   = 2*dW/dx
-(p2 - p1)/dt*(2 + d*dt) + 2*d*p1 = 2*dW/dx
-(p2 - p1)/dt = -2*d/(2 + d*dt)*p1 + 2/(2 + d*dt)*dW/dx
+(p2 - p1)/dt   + d*(p2 + p1)/2 = w_ij,j
+(p2 - p1)/dt*2 + d*(p2 + p1)   = 2*w_ij,j
+(p2 - p1)/dt*(2 + d*dt) + 2*d*p1 = 2*w_ij,j
+(p2 - p1)/dt = -2*d/(2 + d*dt)*p1 + 2/(2 + d*dt)*w_ij,j
 v2 = v1 + (p2 - p1)/dt/rho
 u2 = u1 + v * dt
-(g2 - g1)/dt  + d*(g2 + g1)/2  = dv/dx
-g2 = (2 - d*dt)/(2 + d*dt)*g1 + 2*dt/(2 + d*dt)*dv/dx
-s  = c:g
+(g2 - g1)/dt  + d*(g2 + g1)/2 = v_i,j
+g2 = (2 - d*dt)/(2 + d*dt)*g1 + 2*dt/(2 + d*dt)*v_i,j
+w  = c:g
 
 nb  = PML thickness (in nodes)
 i   = node index counted from the PML interface
@@ -511,7 +501,7 @@ c3  =  1/1500
 
 REYNOLDS GLYPH
 
-r = Wij ni nj
+r = w_ij*n_i*n_j
 
 Vector
 
@@ -527,16 +517,16 @@ n = [ (p+1) * sin(f)^2 * cos(t)
 ELASTIC MODULI
 
   Shear modulus
-  mu    = rho * vs^2
+  mu = rho * vs^2
 
   Lame's 2nd parameter
-  lambda = rho * ( vp^2 - 2*vs^2 )
+  lam = rho * ( vp^2 - 2*vs^2 )
 
   Bulk modulus
-  kappa = lambda + 2/3*mu
+  kappa = lam + 2/3*mu
 
   Poisson's ratio
-  nu = .5 * lambda / ( lambda + mu )
+  nu = .5 * lam / ( lam + mu )
   nu = .5 * (vp^2 - 2*vs^2) / (vp^2 - vs^2)
   nu =  0          fluid
   nu = .25 to .3   crustal rocks
@@ -546,12 +536,6 @@ COURANT STABILITY CONDITION
 
   dt * vp * sqrt(3) / dx   >    1
 
-  A = divW/rho
-  V' = A
-  U' = V
-  U~ = U + dt*beta*V
-  E = [gradU~ + (gradU~)^T]/2
-  W = lambda*trace(E)*I + 2*mu*E
 
 
 DOMAIN DECOMPOSITION DIAGRAM

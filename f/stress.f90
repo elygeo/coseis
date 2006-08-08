@@ -20,14 +20,14 @@ s1 = 0.
 doic: do ic  = 1, 3
 doid: do iid = 1, 3; id = modulo( ic + iid - 1, 3 ) + 1
 
-! Elastic region: G = grad(U + gamma*V)
+! Elastic region: g_ij = (u_i + gamma*v_i),j
 do iz = 1, noper
   i1 = max( max( i1oper(iz,:), i1pml + 1 ),     i1cell )
   i2 = min( min( i2oper(iz,:), i2pml - 1 ) - 1, i2cell )
   call diffnc( s1, oper(iz), w1, x, dx, ic, id, i1, i2 )
 end do
 
-! PML region, non-damped directions: G = gradU
+! PML region, non-damped directions: g_ij = u_i,j
 if ( id /= 1 ) then
   i1 = i1cell
   i2 = i2cell
@@ -59,7 +59,7 @@ if ( id /= 3 ) then
   call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
 end if
 
-! PML region, damped direction: G' + DG = gradV
+! PML region, damped direction: g_ij' = d_j*g_ij = v_i,j
 select case( id )
 case( 1 )
   i1 = i1cell
@@ -132,7 +132,7 @@ case( 3 )
   end do
 end select
 
-! Add contribution to strain
+! Add contribution to gradient
 if ( ic == id ) then
   w1(:,:,:,ic) = s1
 else
@@ -154,7 +154,7 @@ end do doic
 !end do
 !end do
 
-! Hook's Law: W = lam*trace(G)*I + mu*(G + G^T)
+! Hook's Law: w_ij = lam*g_ij*delta_ij + mu*(g_ij + g_ji)
 s1 = lam * sum( w1, 4 )
 do i = 1, 3
   w1(:,:,:,i) = 2. * mu * w1(:,:,:,i) + s1

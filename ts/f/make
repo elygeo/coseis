@@ -1,0 +1,66 @@
+#!/bin/bash -e
+
+if mkdir tmp; then
+  cd tmp
+  echo "1000. 10 10." > in-grid
+  endian=$( perl -e 'print pack('V',1) eq pack('L',1) ? "l":"b"' )
+  ln -s ../f
+  ln -s ../data/topo.$endian
+  ln -s ../data/tn.$endian
+  ln -s ../data/ts.$endian
+  tar zxf ../data/scecvm4.tgz
+else
+  cd tmp
+fi
+
+IFS=":$IFS"
+for dir in $PATH; do
+for file in xlf95_r ifort pgf90 gfortran f95; do
+  if [ -x $dir/$file ]; then
+    sfc=$file
+    break 2
+  fi
+done
+done
+
+pfc='mpif90'
+case $sfc in
+xlf95_r)
+  sfc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
+  pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
+  gflags='-p -g -C -qflttrap -qsigtrap -qlanglvl=95pure'
+  oflags='-O5'
+  ;;
+ifort)
+  gflags='-O0 -p -g -CB -warn -traceback -u'
+  oflags='-O3'
+  ;;
+pgf90)
+  gflags='-O0 -g -Ktrap=fp -Mbounds -Mdclchk -Mprof=lines'
+  oflags='-fast'
+  ;;
+gfortran)
+  gflags="-O0 -p -g -W -pedantic -std=legacy -fbounds-check"
+  gflags="-O0 -g -fbounds-check -ffpe-trap=invalid,zero,overflow,underflow"
+  oflags='-O3'
+  ;;
+f95)  gflags='-g'
+  oflags='-O'
+  if [ $( uname ) = SunOS ]; then
+    gflags='-g -w4 -u -C'
+    oflags='-fast'
+  fi
+  ;;
+*)
+  echo "Error: no Fortran 95 compiler found"
+  exit
+esac
+
+flags=$oflags
+
+$sfc $flags f/utm.f90 f/tscoords.f90 f/grid.f90 -o grid
+rm *.mod
+
+#$sfc $flags f/iobin.f f/scecvm4.f -o scecvm
+#$pfc $flags f/iompi.f f/scecvm4.f -o scecvm
+

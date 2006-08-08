@@ -21,7 +21,8 @@ s1 = 0.
 doic: do ic  = 1, 3
 doid: do iid = 1, 3; id = modulo( ic + iid - 2, 3 ) + 1
 
-! Elastic region: F = divS
+! Elastic region
+! f_i = w_ij,j
 do iz = 1, noper
   i1 = max( i1oper(iz,:), i1node )
   i2 = min( i2oper(iz,:), i2node )
@@ -33,7 +34,9 @@ do iz = 1, noper
   end if
 end do
 
-! PML region: P' + DP = [del]S, F = 1.P'
+! PML region
+! p_ij' + d_j*p_ij = w_ij,j (no summation convetion here)
+! f_j = sum_i( p_ij' )
 i1 = i1node
 i2 = i2node
 select case( id )
@@ -107,7 +110,7 @@ do iq = 1, 4
 end do
 end do
 
-! Newton's Law: A = F / m
+! Newton's Law: a_i = f_i / m
 do i = 1, 3
   w1(:,:,:,i) = w1(:,:,:,i) * mr
 end do
