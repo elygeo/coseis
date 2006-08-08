@@ -61,6 +61,6 @@ flags=$oflags
 $sfc $flags f/utm.f90 f/tscoords.f90 f/grid.f90 -o grid
 rm *.mod
 
-#$sfc $flags f/iobin.f f/scecvm4.f -o scecvm
+$sfc $flags f/iobin.f f/scecvm4.f -o scecvm
 #$pfc $flags f/iompi.f f/scecvm4.f -o scecvm
 

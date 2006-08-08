@@ -43,7 +43,7 @@ rf(1) = 0
 do i = 2, nf
   h1 = xf(i) - xf(i-1)
   h2 = yf(i) - yf(i-1)
-  rf(i) = sqrt( h1*h1 + h2*h2 )
+  rf(i) = rf(i-1) + sqrt( h1*h1 + h2*h2 )
 end do
 
 ! Fault indices
@@ -55,11 +55,11 @@ jf2 = jf1 + nf1
 kf0 = nint( y0 / dx ) + 1
 
 ! Interpolate fault
-j1 = jf1 - 3
-j2 = jf2 + 3
+j1 = 1 + npml
+j2 = n(1) - npml
 k = kf0
 i = 1
-do j = j1, j2
+do j = j1+1, j2-1
   do while( i < nf-1 .and. dx*(j-jf1) > rf(i+1) )
     i = i + 1
   end do
@@ -73,15 +73,20 @@ j2 = jf2 + 1
 k1 = kf0 - 1
 k2 = kf0 + 1
 k = kf0
+h1 = x(jf2,k,1,1) - x(jf1,k,1,1)
+h2 = x(jf2,k,1,2) - x(jf1,k,1,2)
+h = sqrt( h1*h1 + h2*h2 )
 do j = j1, j2
-  h1 = x(j+1,k,1,1) - x(j-1,k,1,1) + x(j+2,k,1,1) - x(j-2,k,1,1)
-  h2 = x(j+1,k,1,2) - x(j-1,k,1,2) + x(j+2,k,1,2) - x(j-2,k,1,2)
-  h1 = dx * h1 / sqrt( h1*h1 + h2*h2 )
-  h2 = dx * h2 / sqrt( h1*h1 + h2*h2 )
-  x(j,k1,1,1) = x(j,k,1,1) + h2
-  x(j,k1,1,2) = x(j,k,1,2) - h1
-  x(j,k2,1,1) = x(j,k,1,1) - h2
-  x(j,k2,1,2) = x(j,k,1,2) + h1
+  h1 = 0
+  do i = 1, 4
+    h1 = x(j+i,k,1,1) - x(j-i,k,1,1)
+    h2 = x(j+i,k,1,2) - x(j-i,k,1,2)
+  end do
+  h = sqrt( h1*h1 + h2*h2 )
+  x(j,k1,1,1) = x(j,k,1,1) + h2 * dx / h
+  x(j,k1,1,2) = x(j,k,1,2) - h1 * dx / h
+  x(j,k2,1,1) = x(j,k,1,1) - h2 * dx / h
+  x(j,k2,1,2) = x(j,k,1,2) + h1 * dx / h
 end do
 
 ! Blend fault to x-bounaries
@@ -213,6 +218,7 @@ write( 1, * ) 'n       = [ ', n, ' ];'
 write( 1, * ) 'nn      = [ ', n + (/ 0, 1, 0 /), ' ];'
 write( 1, * ) 'jf1     = ', jf1, ';'
 write( 1, * ) 'jf2     = ', jf2, ';'
+write( 1, * ) 'kf0     = ', kf0, ';'
 write( 1, * ) 'endian  = ''', endian, ''';'
 close( 1 )
 
