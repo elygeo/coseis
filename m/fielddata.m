@@ -11,7 +11,7 @@ case 'x'
   fmaxi = nn;
   labels = { 'Position' '|X|' 'x' 'y' 'z' };
 case 'mr'
-  labels = { 'Mass Ration' '1/m' };
+  labels = { 'Mass Ratio' '1/m' };
 case 'mu'
   labels = { '\mu' '\mu' };
 case 'lam'
@@ -43,6 +43,8 @@ case 'vm'
   fmax  = vmax;
   fmaxi = vmaxi;
   labels = { 'Velocity' '|V|' };
+case 'pv'
+  labels = { 'Peak Velocity' '|V|_{peak}' };
 case 'um'
   fmax  = umax;
   fmaxi = umaxi;
@@ -98,17 +100,17 @@ case 'sam'
   isfault = 1;
   fmax  = samax;
   fmaxi = samaxi;
-  labels = { 'Slip Acceleration' '|A|' };
+  labels = { 'Slip Acceleration' '|A_s|' };
 case 'svm'
   isfault = 1;
   fmax  = svmax;
   fmaxi = svmaxi;
-  labels = { 'Slip Velocity' '|V|' };
+  labels = { 'Slip Velocity' '|V_s|' };
 case 'sum'
   isfault = 1;
   fmax  = sumax;
   fmaxi = sumaxi;
-  labels = { 'Slip' '|U|' };
+  labels = { 'Slip' '|U_s|' };
 case 'tnm'
   isfault = 1;
   fmax  = tnmax;
@@ -127,7 +129,7 @@ case 'sl'
 case 'f'
   isfault = 1;
   labels = { 'Friction' 'f' };
-case 'svp'
+case 'psv'
   isfault = 1;
   labels = { 'Peak Slip Velocity' '|V|_{peak}' };
 case 'trup'

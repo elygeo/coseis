@@ -28,6 +28,7 @@ real, allocatable, dimension(:,:,:) :: &
   qp,            & ! anelastic coefficient
   qs,            & ! anelastic coefficient
   y,             & ! hourglass constant
+  pv,            & ! peak velocity
   s1,            & ! temporary storage
   s2               ! temporary storage
 
@@ -71,7 +72,7 @@ real, allocatable, dimension(:,:,:) :: &
   rhypo,         & ! radius to hypocenter
   sl,            & ! **slip path length
   svm,           & ! **slip velocity magnitude
-  svp,           & ! **peak slip velocity magnitude
+  psv,           & ! **peak slip velocity magnitude
   trup,          & ! **rupture time
   tarr,          & ! **rise time
   tn,            & ! temporary storage

@@ -47,7 +47,7 @@ if ( ifn /= 0 ) then
     end where
   end if
   svm = f1
-  svp = max( svp, f1 )
+  psv = max( psv, f1 )
 end if
 
 end subroutine

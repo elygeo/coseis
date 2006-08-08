@@ -144,6 +144,7 @@ doiz0: do iz = 1, nout
   case( 'w'    ); nc = 6; cell = .true.
   case( 'am'   );
   case( 'vm'   );
+  case( 'pv'   );
   case( 'um'   );
   case( 'wm'   ); cell = .true.
   case( 'nhat' ); fault = .true.; ditout(iz) = 0; nc = 3
@@ -164,7 +165,7 @@ doiz0: do iz = 1, nout
   case( 'tsm'  ); fault = .true.
   case( 'sl'   ); fault = .true.
   case( 'f'    ); fault = .true.
-  case( 'svp'  ); fault = .true.
+  case( 'psv'  ); fault = .true.
   case( 'trup' ); fault = .true.
   case( 'tarr' ); fault = .true.
   case default
@@ -320,6 +321,7 @@ case( 1 )
 case( 2 )
   s1 = sqrt( sum( w1 * w1, 4 ) )
   s2 = sqrt( sum( v * v, 4 ) )
+  pv = max( pv, s2 )
   amaxi = maxloc( s1 )
   vmaxi = maxloc( s2 )
   amax = s1(amaxi(1),amaxi(2),amaxi(3))
@@ -375,6 +377,7 @@ case( 'u'    ); nc = 3; onpass = 1
 case( 'w'    ); nc = 6; onpass = 1
 case( 'am'   );
 case( 'vm'   );
+case( 'pv'   );
 case( 'um'   ); onpass = 1
 case( 'wm'   ); onpass = 1
 case( 'nhat' ); fault = .true.; nc = 3
@@ -395,7 +398,7 @@ case( 'tnm'  ); fault = .true.
 case( 'tsm'  ); fault = .true.
 case( 'sl'   ); fault = .true.
 case( 'f'    ); fault = .true.
-case( 'svp'  ); fault = .true.
+case( 'psv'  ); fault = .true.
 case( 'trup' ); fault = .true.
 case( 'tarr' ); fault = .true.
 case default; stop 'output fieldout'
@@ -442,6 +445,7 @@ do ic = 1, nc
    if ( ic > 3 )  call vectorio( 'w', str, w2, ic-3, ir, i1, i2, i1l, i2l, iz )
   case( 'am'   ); call scalario( 'w', str, s1,       ir, i1, i2, i1l, i2l, iz )
   case( 'vm'   ); call scalario( 'w', str, s2,       ir, i1, i2, i1l, i2l, iz )
+  case( 'pv'   ); call scalario( 'w', str, pv,       ir, i1, i2, i1l, i2l, iz )
   case( 'um'   ); call scalario( 'w', str, s1,       ir, i1, i2, i1l, i2l, iz )
   case( 'wm'   ); call scalario( 'w', str, s2,       ir, i1, i2, i1l, i2l, iz )
   case( 'nhat' ); call vectorio( 'w', str, nhat, ic, ir, i1, i2, i1l, i2l, iz )
@@ -462,7 +466,7 @@ do ic = 1, nc
   case( 'tsm'  ); call scalario( 'w', str, ts,       ir, i1, i2, i1l, i2l, iz )
   case( 'sl'   ); call scalario( 'w', str, sl,       ir, i1, i2, i1l, i2l, iz )
   case( 'f'    ); call scalario( 'w', str, f2,       ir, i1, i2, i1l, i2l, iz )
-  case( 'svp'  ); call scalario( 'w', str, svp,      ir, i1, i2, i1l, i2l, iz )
+  case( 'psv'  ); call scalario( 'w', str, psv,      ir, i1, i2, i1l, i2l, iz )
   case( 'trup' ); call scalario( 'w', str, trup,     ir, i1, i2, i1l, i2l, iz )
   case( 'tarr' ); call scalario( 'w', str, tarr,     ir, i1, i2, i1l, i2l, iz )
   case default; stop 'output fieldout'
