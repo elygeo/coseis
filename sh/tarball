@@ -21,8 +21,9 @@ files="
   $base/sh
   $base/f
   $base/m
-  $base/ts/f
-  $base/ts/make
+  $base/cvm
+  $base/terashake
+  $base/ts
 "
 
 ln -s . $base

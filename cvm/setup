@@ -1,0 +1,63 @@
+#!/bin/bash -e
+
+# TeraShake grid resolution
+[ -e dx ] || echo "10000." > dx
+
+# Find the Fortran compiler
+IFS=":$IFS"
+for dir in $PATH; do
+for file in xlf95_r ifort pgf90 gfortran f95; do
+  if [ -x $dir/$file ]; then
+    sfc=$file
+    break 2
+  fi
+done
+done
+
+# Fortran flags
+pfc='mpif90'
+case $sfc in
+xlf95_r)
+  sfc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
+  pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
+  gflags='-p -g -C -qflttrap -qsigtrap -qlanglvl=95pure'
+  oflags='-O5'
+  ;;
+ifort)
+  gflags='-O0 -p -g -CB -warn -traceback -u'
+  oflags='-O3'
+  ;;
+pgf90)
+  gflags='-O0 -g -Ktrap=fp -Mbounds -Mdclchk -Mprof=lines'
+  oflags='-fast'
+  ;;
+gfortran)
+  gflags="-O0 -p -g -W -pedantic -std=legacy -fbounds-check"
+  gflags="-O0 -g -fbounds-check -ffpe-trap=invalid,zero,overflow,underflow"
+  oflags='-O3'
+  ;;
+f95)  gflags='-g'
+  oflags='-O'
+  if [ $( uname ) = SunOS ]; then
+    gflags='-g -w4 -u -C'
+    oflags='-fast'
+  fi
+  ;;
+*)
+  echo "Error: no Fortran 95 compiler found"
+  exit
+esac
+
+# Compile and run grid code
+$sfc $oflags utm.f90 tscoords.f90 tsgrid.f90 -o tsgrid
+./tsgrid
+
+# Compile and run serial CVM
+$sfc $oflags iobin.f scecvm4.f -o scecvm4
+./scecvm4
+
+# Comile and run MPI CVM
+#$pfc $oflags iompi.f scecvm4.f -o scecvm4-mpi
+#mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon
+#mpiexec -np 16 ./scecvm4-mpi
+

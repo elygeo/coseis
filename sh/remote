@@ -18,9 +18,9 @@ files="\
   in
   sh
   f
-  ts/f
-  ts/data
-  ts/make
+  terashake
+  ts
+  data
   m"
 
 echo "SORD remote install"

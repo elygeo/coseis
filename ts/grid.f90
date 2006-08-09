@@ -5,7 +5,7 @@ implicit none
 real :: r, dx, h, o1, o2, z0, h1, h2, h3, h4, ell(3), x0, y0, xf(6), yf(6), rf(6), zf, exag
 integer :: n(3), nn, npml, nrect, i, j, k, l, j1, k1, l1, j2, k2, l2, jf1, jf2, kf0, &
   nf, nf1, nf2, nf3, reclen
-real, allocatable :: x(:,:,:,:), w(:,:,:,:), s(:,:,:), topo(:,:)
+real, allocatable :: x(:,:,:,:), w(:,:,:,:), s(:,:,:), t(:,:)
 character :: endian
 
 open( 1, file='in-grid', status='old' )
@@ -114,14 +114,14 @@ forall( k=k1+1:k2-1 )
 end forall
 
 ! Topo
-allocate( topo(960,780) )
+allocate( t(960,780) )
 endian = 'l'
 if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
-inquire( iolength=reclen ) topo
+inquire( iolength=reclen ) t
 open( 1, file='topo.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
-read( 1, rec=1 ) topo
+read( 1, rec=1 ) t
 close( 1 )
-topo = topo * exag
+t = t * exag
 
 ! 3D x/y
 inquire( iolength=reclen ) x(:,:,:,1)
@@ -173,10 +173,10 @@ do j = 1, size(x,1)
   h3 =  w(j,k,1,2) - k1 + 1
   h4 = -w(j,k,1,2) + k1
   x(j,k,1,3) = ( &
-    h2 * h4 * topo(j1,k1)   + &
-    h1 * h4 * topo(j1+1,k1) + &
-    h2 * h3 * topo(j1,k1+1) + &
-    h1 * h3 * topo(j1+1,k1+1) )
+    h2 * h4 * t(j1,k1)   + &
+    h1 * h4 * t(j1+1,k1) + &
+    h2 * h3 * t(j1,k1+1) + &
+    h1 * h3 * t(j1+1,k1+1) )
 end do
 end do
 z0 = sum( x(:,:,:,3) ) / ( n(1) * n(2) )
@@ -209,6 +209,22 @@ do l = l2, n(3)
 end do
 close( 3 )
 close( 4 )
+
+! Fault prestress
+j = n(1)
+k = n(2)
+l = n(3)
+deallocate( t, x, s, w )
+allocate( s(j,1,l), t(1991,161) )
+inquire( iolength=reclen ) t
+open( 1, file='tn.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
+read( 1, rec=1 ) t
+close( 1 )
+i = nint( dx / 100. )
+s = 1e12
+n = 
+s(j1:j2,1,:) = t(
+
 
 ! Metadata
 open( 1, file='gridmeta.m' )

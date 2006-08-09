@@ -3,10 +3,10 @@
 if mkdir tmp > /dev/null; then
   echo "setting up"
   cd tmp
-  echo "1000. 10 1." > in-grid
-  echo "4000. 10 10." > in-grid
+  echo "1000." > dx
+  echo "4000." > dx
   endian=$( perl -e 'print pack('V',1) eq pack('L',1) ? "l":"b"' )
-  for file in ../f/*; do
+  for file in ../ts/*; do
     ln -s "$file"
   done
   for file in ../data/*; do

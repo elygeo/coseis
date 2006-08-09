@@ -1,8 +1,10 @@
+! Routines for converting between lon/lat and TeraShake coordinates
+! Geoffrey Ely, gely@ucsd.edu, 6/8/2006
 module tscoords_m
 use utm_m
 contains
 
-! Rotate TeraShake coordinates to UTM
+! Rotate TeraShake coordinates to UTM and un-project to lon/lat
 subroutine ts2ll( x, i1, i2 )
 implicit none
 real, intent(inout) :: x(:,:,:,:)
@@ -32,7 +34,7 @@ x(:,:,:,i2) = x(:,:,:,i2) + o2
 call utm2ll( x, i1, i2, 11 )
 end subroutine
 
-! Rotate UTM to TeraShake coordinates
+! Project lon/lat to UTM and rotate to TeraShake coordinates
 subroutine ll2ts( x, i1, i2 )
 implicit none
 real, intent(inout) :: x(:,:,:,:)

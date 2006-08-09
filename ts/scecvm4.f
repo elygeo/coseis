@@ -23,6 +23,8 @@ c scum v2j     0-00   various glitch fixes
 c
 c version 3.0  8-01   install upper mantle tomography
 c version 4.0  6-05   new Vp-density, new San Berdo, new Imperial Valley
+c 
+c Bug fixes and modifications for binary and MPI I/O. Geoffrey Ely 6/8/06
 c                   
 c
          include 'in.h'
