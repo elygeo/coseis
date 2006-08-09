@@ -3,16 +3,18 @@ program grid
 use tscoords_m
 implicit none
 real :: r, dx, h, o1, o2, z0, h1, h2, h3, h4, ell(3), x0, y0, xf(6), yf(6), rf(6), zf, exag
-integer :: n(3), nn, npml, nrect, i, j, k, l, j1, k1, l1, j2, k2, l2, jf1, jf2, kf0, &
+integer :: n(3), nn, npml, nrect, i, j, k, l, j1, k1, l1, j2, k2, l2, jf0, kf0, lf0, &
   nf, nf1, nf2, nf3, reclen
 real, allocatable :: x(:,:,:,:), w(:,:,:,:), s(:,:,:), t(:,:)
 character :: endian
 
-open( 1, file='in-grid', status='old' )
-read( 1, * ) dx, npml, exag
+open( 1, file='dx', status='old' )
+read( 1, * ) dx
 close( 1 )
 
 ! Dimentions
+npml = 10
+exag = 1.
 ell = (/ 600, 300, 80 /) * 1000
 n = nint( ell / dx ) + 1
 j = n(1)
@@ -50,9 +52,9 @@ end do
 nf1 = nint( rf(nf) / dx )
 nf2 = 0
 nf3 = nint( zf / dx )
-jf1 = nint( x0 / dx - .5*nf1 ) + 1
-jf2 = jf1 + nf1
+jf0 = nint( x0 / dx - .5*nf1 ) + 1
 kf0 = nint( y0 / dx ) + 1
+lf0 = n(3) - nf3
 
 ! Interpolate fault
 j1 = 1 + npml
@@ -60,42 +62,40 @@ j2 = n(1) - npml
 k = kf0
 i = 1
 do j = j1+1, j2-1
-  do while( i < nf-1 .and. dx*(j-jf1) > rf(i+1) )
+  do while( i < nf-1 .and. dx*(j-jf0) > rf(i+1) )
     i = i + 1
   end do
-  x(j,k,1,1) = xf(i) + (xf(i+1)-xf(i)) / (rf(i+1)-rf(i)) * (dx*(j-jf1)-rf(i))
-  x(j,k,1,2) = yf(i) + (yf(i+1)-yf(i)) / (rf(i+1)-rf(i)) * (dx*(j-jf1)-rf(i))
+  x(j,k,1,1) = xf(i) + (xf(i+1)-xf(i)) / (rf(i+1)-rf(i)) * (dx*(j-jf0)-rf(i))
+  x(j,k,1,2) = yf(i) + (yf(i+1)-yf(i)) / (rf(i+1)-rf(i)) * (dx*(j-jf0)-rf(i))
 end do
 
 ! Orogonal elements next to the fault
-j1 = jf1 - 1
-j2 = jf2 + 1
-k1 = kf0 - 1
-k2 = kf0 + 1
-k = kf0
-h1 = x(jf2,k,1,1) - x(jf1,k,1,1)
-h2 = x(jf2,k,1,2) - x(jf1,k,1,2)
+j1 = jf0
+j2 = jf0 + nf1
+k  = kf0
+h1 = x(j2,k,1,1) - x(j1,k,1,1)
+h2 = x(j2,k,1,2) - x(j1,k,1,2)
 h = sqrt( h1*h1 + h2*h2 )
-do j = j1, j2
+do j = j1-1, j2+1
   h1 = 0
   do i = 1, 4
     h1 = x(j+i,k,1,1) - x(j-i,k,1,1)
     h2 = x(j+i,k,1,2) - x(j-i,k,1,2)
   end do
   h = sqrt( h1*h1 + h2*h2 )
-  x(j,k1,1,1) = x(j,k,1,1) + h2 * dx / h
-  x(j,k1,1,2) = x(j,k,1,2) - h1 * dx / h
-  x(j,k2,1,1) = x(j,k,1,1) - h2 * dx / h
-  x(j,k2,1,2) = x(j,k,1,2) + h1 * dx / h
+  x(j,k-1,1,1) = x(j,k,1,1) + h2 * dx / h
+  x(j,k-1,1,2) = x(j,k,1,2) - h1 * dx / h
+  x(j,k+1,1,1) = x(j,k,1,1) - h2 * dx / h
+  x(j,k+1,1,2) = x(j,k,1,2) + h1 * dx / h
 end do
 
 ! Blend fault to x-bounaries
 j1 = 1 + npml
-j2 = jf1 - 1
+j2 = jf0 - 1
 forall( j=j1+1:j2-1 )
   x(j,:,:,:) = x(j1,:,:,:)*(j2-j)/(j2-j1) + x(j2,:,:,:)*(j-j1)/(j2-j1)
 end forall
-j1 = jf2 + 1
+j1 = jf0 + nf1 + 1
 j2 = n(1) - npml
 forall( j=j1+1:j2-1 )
   x(j,:,:,:) = x(j1,:,:,:)*(j2-j)/(j2-j1) + x(j2,:,:,:)*(j-j1)/(j2-j1)
@@ -211,20 +211,48 @@ close( 3 )
 close( 4 )
 
 ! Fault prestress
-j = n(1)
-k = n(2)
-l = n(3)
 deallocate( t, x, s, w )
-allocate( s(j,1,l), t(1991,161) )
+allocate( s(n(1),1,n(3)), t(1991,161) )
+i = nint( dx / 100. )
+nf1 = min( nf1, (size(t,1)-1)/i )
+nf3 = min( nf3, (size(t,2)-1)/i )
+lf0 = n(3) - nf3
+j1 = jf0
+j2 = jf0 + nf1
+l1 = lf0
+l2 = lf0 + nf3
 inquire( iolength=reclen ) t
 open( 1, file='tn.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
-i = nint( dx / 100. )
 s = 1e12
-n = 
-s(j1:j2,1,:) = t(
-
+do l = l1, l2
+do j = j1, j2
+  k1 = i * (j-j1) + 1
+  k2 = i * (l-l1) + 1
+  s(j,1,l) = t(k1,k2)
+end do
+end do
+inquire( iolength=reclen ) s
+open( 1, file='tn', recl=reclen, form='unformatted', access='direct' )
+write( 1, rec=1 ) s
+close( 1 )
+inquire( iolength=reclen ) t
+open( 1, file='ts.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
+read( 1, rec=1 ) t
+close( 1 )
+s = 0.
+do l = l1, l2
+do j = j1, j2
+  k1 = i * (j-j1) + 1
+  k2 = i * (l-l1) + 1
+  s(j,1,l) = t(k1,k2)
+end do
+end do
+inquire( iolength=reclen ) s
+open( 1, file='ts', recl=reclen, form='unformatted', access='direct' )
+write( 1, rec=1 ) s
+close( 1 )
 
 ! Metadata
 open( 1, file='gridmeta.m' )
@@ -232,9 +260,7 @@ write( 1, * ) 'dx      = ', dx, ';'
 write( 1, * ) 'npml    = ', npml, ';'
 write( 1, * ) 'n       = [ ', n, ' ];'
 write( 1, * ) 'nn      = [ ', n + (/ 0, 1, 0 /), ' ];'
-write( 1, * ) 'jf1     = ', jf1, ';'
-write( 1, * ) 'jf2     = ', jf2, ';'
-write( 1, * ) 'kf0     = ', kf0, ';'
+write( 1, * ) 'ihypo   = [ ', jf0, kf0, lf0, ' ];'
 write( 1, * ) 'endian  = ''', endian, ''';'
 close( 1 )
 

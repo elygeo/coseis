@@ -9,11 +9,11 @@ subroutine ts2ll( x, i1, i2 )
 implicit none
 real, intent(inout) :: x(:,:,:,:)
 integer, intent(in) :: i1, i2
-real, parameter ::                                                           &
-  h   = 1,                                                                   &
-  rot = 40,                                                                  &
-  o1  = 132679.8125,                                                         &
-  o2  = 3824867.,                                                            &
+real, parameter ::    &
+  h   = 1,            &
+  rot = 40,           &
+  o1  = 132679.8125,  &
+  o2  = 3824867.,     &
   pi  = 3.14159265
 real :: c, s, x1, x2
 integer :: j, k, l
@@ -39,11 +39,11 @@ subroutine ll2ts( x, i1, i2 )
 implicit none
 real, intent(inout) :: x(:,:,:,:)
 integer, intent(in) :: i1, i2
-real, parameter ::                                                           &
-  h   = 1,                                                                   &
-  rot = 40,                                                                  &
-  o1  = 132679.8125,                                                         &
-  o2  = 3824867.,                                                            &
+real, parameter ::    &
+  h   = 1,            &
+  rot = 40,           &
+  o1  = 132679.8125,  &
+  o2  = 3824867.,     &
   pi  = 3.14159265
 real :: c, s, x1, x2
 integer :: j, k, l

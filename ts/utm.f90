@@ -8,16 +8,16 @@ subroutine ll2utm( x, i1, i2, zone )
 implicit none
 real, intent(inout) :: x(:,:,:,:)
 integer, intent(in) :: i1, i2, zone
-real(8), parameter ::                                            &
-  a   = 6378137.,                                                &
-  b   = 6356752.3142,                                            &
-  k0  = .9996,                                                   &
-  pi  = 3.14159265,                                              &
-  e2  = 1. - b*b / (a*a),                                        &
-  ep2 = e2 / (1.-e2),                                            &
-  j1  =  a-a*e2/256.*(64.+e2*(e2*5.+12.)),                       &
-  j2  = -a*e2/768.*(288.+e2*(e2*25.+72.)),                       &
-  j3  =  a*e2*e2*15./512.*(e2*3.+4.),                            &
+real(8), parameter ::                       &
+  a   = 6378137.,                           &
+  b   = 6356752.3142,                       &
+  k0  = .9996,                              &
+  pi  = 3.14159265,                         &
+  e2  = 1. - b*b / (a*a),                   &
+  ep2 = e2 / (1.-e2),                       &
+  j1  =  a-a*e2/256.*(64.+e2*(e2*5.+12.)),  &
+  j2  = -a*e2/768.*(288.+e2*(e2*25.+72.)),  &
+  j3  =  a*e2*e2*15./512.*(e2*3.+4.),       &
   j4  = -a*e2*e2*e2*35./768.
 real(8) :: e1, l0, sf, cf, sf2, cf2, s2f, c2f, t, t2, n, c, aa, m
 integer :: j, k, l
@@ -53,13 +53,13 @@ subroutine utm2ll( x, i1, i2, zone )
 implicit none
 real, intent(inout) :: x(:,:,:,:)
 integer, intent(in) :: i1, i2, zone
-real(8), parameter ::                                            &
-  a   = 6378137.,                                                &
-  b   = 6356752.3142,                                            &
-  k0  = .9996,                                                   &
-  pi  = 3.14159265,                                              &
-  e2  = 1. - b*b / (a*a),                                        &
-  ep2 = e2 / (1.-e2),                                            &
+real(8), parameter ::      &
+  a   = 6378137.,          &
+  b   = 6356752.3142,      &
+  k0  = .9996,             &
+  pi  = 3.14159265,        &
+  e2  = 1. - b*b / (a*a),  &
+  ep2 = e2 / (1.-e2),      &
   cmu = 1. / (k0*a*(1.-e2*.25*(1.+e2/16.*(3.+e2*1.25))))
 real(8) :: e1, j1, j2, j3, j4, l0, s2f, c2f, sf, cf, sf2, cf2, t, t2, c, n, r, d, f1
 integer :: j, k, l
