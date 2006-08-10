@@ -1,5 +1,11 @@
 % Terashake
 
+% testing
+  out = { 'tn'   1  1 0  1  -1  0 -1 };
+  out = { 'ts'   1  1 0  1  -1  0 -1 };
+  out = { 't0'   1  1 0  1  -1  0 -1 };
+  out = { 't'    1  1 0  1  -1  0 -1 };
+
   out = { 'x'     1  1 1 -1  -1 -1 -1 };
   out = { 'v'   100  1 1 -1  -1 -1 -1 };
   out = { 'pv'   -1  1 1 -1  -1 -1 -1 };
@@ -7,7 +13,7 @@
   out = { 'svm' 100  1 0  1  -1  0 -1 };
   out = { 'psv'  -1  1 0  1  -1  0 -1 };
   out = { 'trup' -1  1 0  1  -1  0 -1 };
-  timeseries = { 'v' 243000. 127800. 0. };
+  timeseries = { 'v' 243000. 127800. 73. }; % Montebello
 
   upvector = [ 0 0 1 ];
   bc1 = [ 1 1 1 ];
@@ -19,7 +25,7 @@
   vp   = 'read';
   vs   = 'read';
   tn   = 'read';
-  ts   = 'read';
+  th   = 'read';
   vs1 = 500.;
   vp1 = 1500.;
   mus = 1.;
@@ -31,8 +37,8 @@
   nn = [ 151 77 21 ];
   ihypo = [ 67 51 -1 ];
   dx = 4000.;
-  nt = 1;
   nt = 750;
+  nt = 1;
   dt = .24;
 return
 

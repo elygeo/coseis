@@ -155,7 +155,7 @@ pgf90)
   oflags='-fast'
   ;;
 gfortran)
-  gflags='-O0 -p -g -W -pedantic -std=f95 -fimplicit-none -fbounds-check'
+  gflags='-O0 -p -g -W -pedantic -std=f95 -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow,underflow'
   oflags='-O3'
   ;;
 f95)

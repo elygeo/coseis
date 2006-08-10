@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-if mkdir tmp > /dev/null; then
+if mkdir tmp 2> /dev/null; then
   echo "setting up"
   cd tmp
   echo "1000." > dx

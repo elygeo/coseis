@@ -214,11 +214,12 @@ close( 4 )
 deallocate( t, x, s, w )
 allocate( s(n(1),1,n(3)), t(1991,161) )
 i = nint( dx / 100. )
-nf1 = min( nf1, (size(t,1)-1)/i )
-nf3 = min( nf3, (size(t,2)-1)/i )
-lf0 = n(3) - nf3
 j1 = jf0
 j2 = jf0 + nf1
+nf1 = min( nf1, (size(t,1)-1)/i )
+j1 = j2 - nf1
+nf3 = min( nf3, (size(t,2)-1)/i )
+lf0 = n(3) - nf3
 l1 = lf0
 l2 = lf0 + nf3
 inquire( iolength=reclen ) t
@@ -228,8 +229,8 @@ close( 1 )
 s = 1e12
 do l = l1, l2
 do j = j1, j2
-  k1 = i * (j-j1) + 1
-  k2 = i * (l-l1) + 1
+  k1 = i * (j1-j) + 1
+  k2 = i * (l1-l) + 1
   s(j,1,l) = t(k1,k2)
 end do
 end do
@@ -238,19 +239,19 @@ open( 1, file='tn', recl=reclen, form='unformatted', access='direct' )
 write( 1, rec=1 ) s
 close( 1 )
 inquire( iolength=reclen ) t
-open( 1, file='ts.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
+open( 1, file='th.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
 s = 0.
 do l = l1, l2
 do j = j1, j2
-  k1 = i * (j-j1) + 1
-  k2 = i * (l-l1) + 1
+  k1 = i * (j1-j) + 1
+  k2 = i * (l1-l) + 1
   s(j,1,l) = t(k1,k2)
 end do
 end do
 inquire( iolength=reclen ) s
-open( 1, file='ts', recl=reclen, form='unformatted', access='direct' )
+open( 1, file='th', recl=reclen, form='unformatted', access='direct' )
 write( 1, rec=1 ) s
 close( 1 )
 
