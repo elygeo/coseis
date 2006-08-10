@@ -261,7 +261,8 @@ write( 1, * ) 'dx      = ', dx, ';'
 write( 1, * ) 'npml    = ', npml, ';'
 write( 1, * ) 'n       = [ ', n, ' ];'
 write( 1, * ) 'nn      = [ ', n + (/ 0, 1, 0 /), ' ];'
-write( 1, * ) 'ihypo   = [ ', jf0, kf0, lf0, ' ];'
+write( 1, * ) 'ihypo   = [ ', jf0,     kf0, lf0,     ' ];'
+write( 1, * ) 'ihypo   = [ ', jf0+nf1, kf0, lf0+nf3, ' ];'
 write( 1, * ) 'endian  = ''', endian, ''';'
 close( 1 )
 
