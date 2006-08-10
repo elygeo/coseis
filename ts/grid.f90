@@ -14,7 +14,7 @@ close( 1 )
 
 ! Dimentions
 npml = 10
-exag = 1.
+exag = 10.
 ell = (/ 600, 300, 80 /) * 1000
 n = nint( ell / dx ) + 1
 j = n(1)
@@ -229,8 +229,8 @@ close( 1 )
 s = 1e12
 do l = l1, l2
 do j = j1, j2
-  k1 = i * (j1-j) + 1
-  k2 = i * (l1-l) + 1
+  k1 = i * (j2-j) + 1
+  k2 = i * (l2-l) + 1
   s(j,1,l) = t(k1,k2)
 end do
 end do
@@ -245,8 +245,8 @@ close( 1 )
 s = 0.
 do l = l1, l2
 do j = j1, j2
-  k1 = i * (j1-j) + 1
-  k2 = i * (l1-l) + 1
+  k1 = i * (j2-j) + 1
+  k2 = i * (l2-l) + 1
   s(j,1,l) = t(k1,k2)
 end do
 end do

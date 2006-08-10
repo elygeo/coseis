@@ -1,8 +1,8 @@
 % Terashake
 
 % testing
-  out = { 'tn'   1  1 0  1  -1  0 -1 };
-  out = { 'ts'   1  1 0  1  -1  0 -1 };
+  out = { 'tnm'  1  1 0  1  -1  0 -1 };
+  out = { 'tsm'  1  1 0  1  -1  0 -1 };
   out = { 't0'   1  1 0  1  -1  0 -1 };
   out = { 't'    1  1 0  1  -1  0 -1 };
 
@@ -19,7 +19,7 @@
   bc1 = [ 1 1 1 ];
   bc2 = [ 1 1 0 ];
   faultnormal = 2;
-  datadir = 'ts/tmp';
+  datadir = 'tmp';
   grid = 'read';
   rho  = 'read';
   vp   = 'read';
