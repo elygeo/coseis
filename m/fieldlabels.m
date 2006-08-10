@@ -1,7 +1,7 @@
 % Field labels
 function labels = fieldlabels( field, radial )
 
-labels = { field };
+labels = { field field };
 
 switch field
 case 'x',    labels = { 'Position'     '|X|' 'x' 'y' 'z' };

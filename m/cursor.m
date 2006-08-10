@@ -70,7 +70,7 @@ case 1
   str = sprintf( '%s %11.4e', labels{2}, s(j,k,l) );
 case 3
   vv = shiftdim( v(j,k,l,:) )';
-  m = sum( sqrt( vv .* vv ) );
+  m = sqrt( sum( vv .* vv ) );
   str = sprintf( '%s  %11.4e\n%s  %11.4e\n%s  %11.4e\n%s  %11.4e', labels{2}, m, labels{3}, vv(1), labels{4}, vv(2), labels{5}, vv(3) );
 case 6
   vv = shiftdim( v(j,k,l,:) )';
