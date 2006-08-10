@@ -105,6 +105,9 @@ case( 'c' )
 end select
 end do
 
+! Sanity check
+if ( any( t3(:,:,:,1) > 0.) ) stop 'normal traction must be negative'
+
 ! Lock fault in PML region
 i1 = max( i1pml + 1, 1 )
 i2 = min( i2pml - 1, nm )

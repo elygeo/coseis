@@ -20,6 +20,7 @@
       close( 2 )
       close( 3 )
       do i = 1, nn
+        if( rdep(i) .lt. 0 ) stop 'negative depth not allowed'
         rdep(i) = rdep(i) * 3.2808399
         if( rdep(i) .lt. rdepmin ) rdep(i) = rdepmin
       end do

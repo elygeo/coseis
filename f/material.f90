@@ -93,6 +93,9 @@ end select
 end do doiz
 
 ! Extrema
+if ( any( mr /= mr ) .or. any( s1 /= s1 ) .or. any( s2 /= s2 ) ) then
+  stop 'NaNs in velocity model!'
+end if
 where ( mr < rho1 ) mr = rho1
 where ( mr > rho2 ) mr = rho2
 where ( s1 < vp1 ) s1 = vp1

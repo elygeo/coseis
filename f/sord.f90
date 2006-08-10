@@ -20,7 +20,7 @@ use timestep_m
 ! Initialization
 call tic
 call initialize( ip, np0, master )
-if ( master ) print *, 'SORD - Support Operator Rupture Dynamics'
+if ( master ) print '(a)', 'SORD - Support Operator Rupture Dynamics'
 call inread
 call setup
 call arrays
