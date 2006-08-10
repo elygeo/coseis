@@ -183,7 +183,6 @@ end do
 end do
 z0 = sum( x(:,:,:,3) ) / ( n(1) * n(2) )
 print *, 'elevation range: ', minval( x(:,:,:,3) ), maxval( x(:,:,:,3) )
-print *, 'average elevation: ', z0
 
 ! 2D elevation
 open( 3, file='z', recl=reclen, form='unformatted', access='direct' )

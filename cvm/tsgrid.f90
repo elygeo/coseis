@@ -22,8 +22,8 @@ forall( i=1:n(2) ) x(:,i,:,2) = dx*(i-1)
 
 ! Project TeraShake coordinates to lon/lat
 call ts2ll( x, 1, 2 )
-print *, 'lon range: ', minval( x(:,:,:,1) ), maxval( x(:,:,:,1) )
-print *, 'lat range: ', minval( x(:,:,:,2) ), maxval( x(:,:,:,2) )
+print *, 'longitude range: ', minval( x(:,:,:,1) ), maxval( x(:,:,:,1) )
+print *, 'latitude range: ', minval( x(:,:,:,2) ), maxval( x(:,:,:,2) )
 
 ! Output
 open( 1, file='nn' )
