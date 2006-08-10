@@ -1059,6 +1059,8 @@ c temp turned off for historical reason
 c          read(16,11440) rlaup(i),rloup(j),rzupl(i,j) 
 c11440     format(f9.5,1x,f10.5,1x,f10.2)
 c convert thousands of feet to feet---------------
+           rlaup(i) = 0.
+           rloup(i) = 0.
           rzupl(i,j)=rzupl(i,j)*1000. 
 440       continue 
 400      continue  

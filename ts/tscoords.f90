@@ -1,7 +1,7 @@
 ! Routines for converting between lon/lat and TeraShake coordinates
 ! Geoffrey Ely, gely@ucsd.edu, 6/8/2006
-module tscoords_m
-use utm_m
+module m_tscoords
+use m_utm
 contains
 
 ! Rotate TeraShake coordinates to UTM and un-project to lon/lat

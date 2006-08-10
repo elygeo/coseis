@@ -8,8 +8,8 @@
   rho  = 'read';
   vp   = 'read';
   vs   = 'read';
-% tn   = 'read';
-% th   = 'read';
+  tn   = 'read';
+  th   = 'read';
   vs1 = 500.;
   vp1 = 1500.;
   mus = 1.;
@@ -40,11 +40,11 @@
   out = { 'tnm'  1  1 0  1  -1  0 -1 };
   out = { 'tsm'  1  1 0  1  -1  0 -1 };
   out = { 't'    1  1 0  1  -1  0 -1 };
-  rcrit = 10000.;
-  tn = 1e12;
-  th = 0.;
-  tn = [ 10e6 'zone'  67 0 -5   116 0 -1 ];
-  th = [  9e6 'zone'  67 0 -5   116 0 -1 ];
+% rcrit = 10000.;
+% tn = -1e12;
+% th = 0.;
+% tn = [ -10e6 'zone'  67 0 -5   116 0 -1 ];
+% th = [   9e6 'zone'  67 0 -5   116 0 -1 ];
 return
 
 % 1000m - Babieca

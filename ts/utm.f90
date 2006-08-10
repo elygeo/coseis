@@ -1,6 +1,6 @@
 ! UTM projection, reference: John Snyder, 1987, USGS Professional Paper 1395
 ! Geoffrey Ely, gely@ucsd.edu, 6/8/2006
-module utm_m
+module m_utm
 contains
 
 ! UTM projection

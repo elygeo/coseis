@@ -3,7 +3,6 @@
 if mkdir tmp 2> /dev/null; then
   echo "setting up"
   cd tmp
-  echo "1000." > dx
   echo "4000." > dx
   endian=$( perl -e 'print pack('V',1) eq pack('L',1) ? "l":"b"' )
   for file in ../ts/*; do
@@ -17,7 +16,6 @@ else
   cd tmp
 fi
 
-echo "compiling"
 IFS=":$IFS"
 for dir in $PATH; do
 for file in xlf95_r ifort pgf90 gfortran f95; do
@@ -45,9 +43,9 @@ pgf90)
   oflags='-fast'
   ;;
 gfortran)
-  gflags="-O0 -p -g -W -pedantic -std=legacy -fbounds-check"
-  gflags="-O0 -g -fbounds-check -ffpe-trap=invalid,zero,overflow,underflow"
-  oflags='-O3'
+  gflags='-O0 -p -g -W -pedantic -std=legacy -fbounds-check'
+  gflags='-O0 -g -fbounds-check -ffpe-trap=invalid,zero,overflow,underflow'
+  oflags='-O3 -fbounds-check -ffpe-trap=invalid,zero,overflow,underflow'
   ;;
 f95)  gflags='-g'
   oflags='-O'
@@ -62,16 +60,15 @@ f95)  gflags='-g'
 esac
 
 flags=$oflags
-
-$sfc $flags utm.f90 tscoords.f90 grid.f90 -o grid
-rm -f *.mod
-
-$sfc $flags iobin.f scecvm4.f -o scecvm
-#$pfc $flags iompi.f scecvm4.f -o scecvm
+flags='-W -fbounds-check -ffpe-trap=invalid,zero,overflow,underflow'
 
 echo "grid generation"
+$sfc $flags utm.f90 tscoords.f90 grid.f90 -o grid
+rm -f *.mod
 ./grid
 
 echo "velocity model extraction"
+$sfc $flags iobin.f scecvm4.f -o scecvm
+#$pfc $flags iompi.f scecvm4.f -o scecvm
 ./scecvm
 

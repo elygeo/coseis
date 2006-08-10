@@ -1,6 +1,6 @@
 ! Generate TeraShake grid from 2D mesh and topography
 program grid
-use tscoords_m
+use m_tscoords
 implicit none
 real :: r, dx, h, o1, o2, z0, h1, h2, h3, h4, ell(3), x0, y0, xf(6), yf(6), rf(6), zf, exag
 integer :: n(3), nn, npml, nrect, i, j, k, l, j1, k1, l1, j2, k2, l2, jf0, kf0, lf0, &
@@ -14,7 +14,7 @@ close( 1 )
 
 ! Dimentions
 npml = 10
-exag = 10.
+exag = 1.
 ell = (/ 600, 300, 80 /) * 1000
 n = nint( ell / dx ) + 1
 j = n(1)
@@ -137,6 +137,8 @@ close( 2 )
 ! lat/lon
 w = x
 call ts2ll( w, 1, 2 )
+print *, 'longitude range: ', minval( w(:,:,:,1) ), maxval( w(:,:,:,1) )
+print *, 'latgitude range: ', minval( w(:,:,:,2) ), maxval( w(:,:,:,2) )
 
 ! PML regions are orthogonal
 j = n(1)
@@ -180,8 +182,7 @@ do j = 1, size(x,1)
 end do
 end do
 z0 = sum( x(:,:,:,3) ) / ( n(1) * n(2) )
-print *, 'min elevation: ', minval( x(:,:,:,3) )
-print *, 'max elevation: ', maxval( x(:,:,:,3) )
+print *, 'elevation range: ', minval( x(:,:,:,3) ), maxval( x(:,:,:,3) )
 print *, 'average elevation: ', z0
 
 ! 2D elevation
@@ -226,7 +227,7 @@ inquire( iolength=reclen ) t
 open( 1, file='tn.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
-s = 1e12
+s = -1e12
 do l = l1, l2
 do j = j1, j2
   k1 = i * (j2-j) + 1
