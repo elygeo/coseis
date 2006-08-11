@@ -1,3 +1,5 @@
+! Command line input
+
 module m_command_argument
 
 integer function command_argument_count()

@@ -1,4 +1,5 @@
-! binary input
+! MPI I/O for SCEC VM
+
       subroutine readpts( kerr )
       include 'in.h'
       include 'mpif.h'
@@ -40,7 +41,6 @@
       kerr = 0
       end
 
-! binary output
       subroutine writepts( kerr )
       include 'in.h'
       include 'mpif.h'

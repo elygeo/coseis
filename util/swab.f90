@@ -1,3 +1,4 @@
+! Swap endian
 program swab
 implicit none
 integer, parameter :: n = 4

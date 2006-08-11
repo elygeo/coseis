@@ -1,3 +1,4 @@
+! Find extreme values for binary file
 program minmax
 implicit none
 integer :: i, ii, ifile

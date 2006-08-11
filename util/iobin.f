@@ -1,4 +1,5 @@
-! binary input
+! Binary I/O for SCEC VM
+
       subroutine readpts( kerr )
       include 'in.h'
       open( 1,file='nn',status='old' )
@@ -27,7 +28,6 @@
       kerr = 0
       end
 
-! binary output
       subroutine writepts( kerr )
       include 'in.h'
       open( 1,file='vp', recl=4,form='unformatted',access='direct' )

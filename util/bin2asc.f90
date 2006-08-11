@@ -1,3 +1,4 @@
+! Convert binary files to ASCII
 program bin2asc
 implicit none
 integer :: n, i, ii, iii
