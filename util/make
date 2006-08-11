@@ -1,9 +1,5 @@
 #!/bin/bash -e
 
-# TeraShake grid resolution
-[ -e dx ] || echo "10000." > dx
-
-# Find the Fortran compiler
 IFS=":$IFS"
 for dir in $PATH; do
 for file in xlf95_r ifort pgf90 gfortran f95; do
@@ -14,7 +10,6 @@ for file in xlf95_r ifort pgf90 gfortran f95; do
 done
 done
 
-# Fortran flags
 pfc='mpif90'
 case $sfc in
 xlf95_r)
@@ -32,8 +27,8 @@ pgf90)
   oflags='-fast'
   ;;
 gfortran)
-  gflags="-O0 -p -g -W -pedantic -std=legacy -fbounds-check"
-  gflags="-O0 -g -fbounds-check -ffpe-trap=invalid,zero,overflow,underflow"
+  gflags='-O0 -p -g -W -pedantic -std=legacy -fbounds-check'
+  gflags='-O0 -g -fbounds-check -ffpe-trap=invalid,zero,overflow,underflow'
   oflags='-O3'
   ;;
 f95)  gflags='-g'
@@ -48,16 +43,28 @@ f95)  gflags='-g'
   exit
 esac
 
-# Compile and run grid code
-$sfc $oflags utm.f90 tscoords.f90 tsgrid.f90 -o tsgrid
-./tsgrid
+mkdir -p ../tmp/
+cd ../tmp/
+for file in ../util/*; do
+  ln -s "$file"
+done
+for file in ../data/*; do
+  ln -s "$file"
+done
 
-# Compile and run serial CVM
-$sfc $oflags iobin.f scecvm4.f -o scecvm4
-./scecvm4
+flags=$oflags
 
-# Comile and run MPI CVM
-#$pfc $oflags iompi.f scecvm4.f -o scecvm4-mpi
-#mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon
-#mpiexec -np 16 ./scecvm4-mpi
+$sfc $flags swab.f90 -o swab
+$sfc $flags drape.f90 -o drape
+$sfc $flags minmax.f90 -o minmax
+$sfc $flags utm.f90 tscoords.f90 ts2ll.f90 -o ts2ll
+$sfc $flags utm.f90 tscoords.f90 ll2ts.f90 -o ll2ts
+$sfc $flags utm.f90 tscoords.f90 grid.f90 -o grid
+
+tar zxf scecvm4.tgz
+
+$sfc $flags iobin.f scecvm4.f -o scecvm
+#$pfc $flags iompi.f scecvm4.f -o scecvm
+
+rm -f *.mod
 

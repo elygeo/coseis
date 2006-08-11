@@ -11,6 +11,7 @@ accounts="\
   moho.sdsu.edu"
 
 files="\
+  versionmeta.m
   readme
   sord
   defaults.m
@@ -18,10 +19,9 @@ files="\
   in
   sh
   f
-  terashake
-  ts
-  data
-  m"
+  m
+  util
+  data"
 
 echo "SORD remote install"
 
