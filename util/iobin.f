@@ -34,6 +34,8 @@
       open( 2,file='vs', recl=4,form='unformatted',access='direct' )
       open( 3,file='rho',recl=4,form='unformatted',access='direct' )
       do i = 1, nn
+        if(alpha(i)/=alpha(i).or.beta(i)/=beta(i).or.rho(i)/=rho(i))
+     $    print *, 'Error: NaN at', rlon(i), rlat(i), rdep(i)
         write( 1,rec=i ) alpha(i)
         write( 2,rec=i ) beta(i)
         write( 3,rec=i ) rho(i)
