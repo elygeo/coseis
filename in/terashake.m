@@ -20,10 +20,21 @@
   out = { 'v'   100  1 1 -1  -1 -1 -1 };
   out = { 'pv'   -1  1 1 -1  -1 -1 -1 };
   out = { 'x'     1  1 0  1  -1  0 -1 };
+  out = { 'sum' 100  1 0  1  -1  0 -1 };
   out = { 'svm' 100  1 0  1  -1  0 -1 };
   out = { 'psv'  -1  1 0  1  -1  0 -1 };
   out = { 'trup' -1  1 0  1  -1  0 -1 };
-  timeseries = { 'v' 243000. 127800. 73. }; % Montebello
+  timeseries = { 'v'  89667.  58002.   11. }; % UCSB
+  timeseries = { 'v' 214284. 109183.  135. }; % UCLA
+  timeseries = { 'v' 220592. 101610.    3. }; % ISI
+  timeseries = { 'v' 228866. 113967.   54. }; % USC
+  timeseries = { 'v' 231991. 133257.  238. }; % Caltech
+  timeseries = { 'v' 243000. 127800.   73. }; % Montebello
+  timeseries = { 'v' 300417. 166543.  321. }; % UCR
+  timeseries = { 'v' 384166.  76740.   58. }; % SIO
+  timeseries = { 'v' 403893.  80018.  107. }; % SDSU
+  timeseries = { 'v' 366597. 200401.  130. }; % Palm Springs
+  timeseries = { 'v' 387717. 187412. 1296. }; % PFO
 
 % 2000m - Single processor
   np = [ 1 1 1 ]
