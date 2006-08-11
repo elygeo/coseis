@@ -1,7 +1,7 @@
 ! Binary file stats
 program stats
 implicit none
-integer :: i, ii, n
+integer :: i, ii, n, command_argument_count
 character(255) :: filename
 real :: r, rmin, rmax, rmean
 print *, 'file: n min max mean'

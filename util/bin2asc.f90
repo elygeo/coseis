@@ -1,7 +1,7 @@
 ! Convert binary files to ASCII
 program bin2asc
 implicit none
-integer :: n, i, ii, iii
+integer :: n, i, ii, iii, command_argument_count
 real :: r(255)
 character(255) :: filename
 n = command_argument_count()

@@ -2,7 +2,7 @@
 program swab
 implicit none
 integer, parameter :: n = 4
-integer :: i, ii, ifile
+integer :: i, ii, ifile, command_argument_count
 character :: bytes(n)
 character(255) :: filename
 do ifile = 1, command_argument_count()
