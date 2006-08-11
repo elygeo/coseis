@@ -18,7 +18,7 @@ do ifile = 1, command_argument_count()
     rmin = min( r, rmin )
     rmax = max( r, rmax )
   end do
-  print *, trim( filename ), rmin, rmax
+  print *, trim( filename ), i-1, rmin, rmax
 end do
 end program
 
