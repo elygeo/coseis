@@ -23,8 +23,8 @@ ifort)
   oflags='-O3'
   ;;
 pgf90)
-  gflags='-O0 -g -Ktrap=fp -Mbounds -Mdclchk -Mprof=lines'
-  oflags='-fast'
+  gflags='getarg-pgf.f90 -O0 -g -Ktrap=fp -Mbounds -Mdclchk -Mprof=lines'
+  oflags='getarg-pgf.f90 -fast'
   ;;
 gfortran)
   gflags='-O0 -p -g -W -pedantic -std=legacy -fbounds-check'

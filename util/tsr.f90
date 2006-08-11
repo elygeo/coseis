@@ -14,6 +14,7 @@ read( 1, * ) dx
 close( 1 )
 ell = (/ 600, 300, 80 /) * 1000
 n = nint( ell / dx ) + 1
+print *, 'n = ', n
 
 ! 2D mesh
 allocate( x(n(1),n(2),1,3) )

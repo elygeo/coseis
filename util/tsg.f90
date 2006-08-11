@@ -17,6 +17,7 @@ npml = 10
 exag = 1.
 ell = (/ 600, 300, 80 /) * 1000
 n = nint( ell / dx ) + 1
+print *, 'n =', n
 j = n(1)
 k = n(2)
 l = n(3)

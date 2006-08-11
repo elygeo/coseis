@@ -1,10 +1,6 @@
-! Command line input
-
-module m_command_argument
+! Command line arguments
 
 integer function command_argument_count()
-!integer :: iargc
-!external iargc
 command_argument_count = iargc()
 end function
 
@@ -13,6 +9,4 @@ integer, intent(in) :: i
 character(len=*), intent(out) :: val
 call getarg(i,val)
 end subroutine
-
-end module
 

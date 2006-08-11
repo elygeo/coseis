@@ -4,7 +4,7 @@ implicit none
 integer :: i, ii, n
 character(255) :: filename
 real :: r, rmin, rmax, rmean
-logical :: nan
+print *, 'file: n min max mean'
 do ii = 1, command_argument_count()
   call get_command_argument( ii, filename )
   inquire( iolength=i ) r
@@ -20,11 +20,10 @@ do ii = 1, command_argument_count()
     rmin = min( r, rmin )
     rmax = max( r, rmax )
     rmean = rmean + r
-    nan = r /= r
   end do
   n = n - 1
   rmean = rmean / n
-  print *, trim(filename), ' n=',n, ' min=',rmin, ' max=',rmax, ' mean=',rmean, ' nan=',nan
+  print *, trim(filename), n, rmin, rmax, rmean
 end do
 end program
 
