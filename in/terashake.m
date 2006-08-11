@@ -40,8 +40,8 @@
 % 2000m - Single processor
   np = [ 1 1 1 ]
   nn = [ 301 152 41 ];
-% ihypo = [ -1 ];
-% ihypo = [ -1 ];
+  ihypo = [ 133 101 -1 ];
+  ihypo = [ 232 101 -1 ];
   dx = 2000.;
   nt = 1500;
   dt = .12;
@@ -50,8 +50,8 @@ return
 % 1000m - Babieca
   np = [ 8 4 1 ]
   nn = [ 601 302 81 ];
-% ihypo = [ -1 ];
-% ihypo = [ -1 ];
+  ihypo = [ 264 200 -1 ];
+  ihypo = [ 463 200 -1 ];
   dx = 1000.;
   nt = 3000;
   dt = .06;
