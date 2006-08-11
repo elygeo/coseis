@@ -1,0 +1,79 @@
+#!/bash --version
+# SDSC DataStar IBM
+#   http://www.sdsc.edu/user_services/datastar/
+#   p655+ interactive nodes:
+#     dspoe.sdsc.edu
+#     5,   8 x 1.5GHz IBM Power4+, 16GB, 13.5GB usable
+#   p655+ batch nodes:
+#     dslogin.sdsc.edu
+#     176, 8 x 1.5GHz IBM Power4+, 16GB, 13.5GB usable
+#     96,  8 x 1.7GHz IBM Power4+, 32GB
+#   Always run from a subdirectory of /gpfs/
+#   Useful commands:
+#     reslist
+#     showq
+#     llsubmit batchjob
+#     llcancel <jobID>
+#     llq
+#     llq -s <jobID>
+#     show_bf
+#   Login to dslogin.sdsc.edu to submit batch jobs
+#   Login to dspoe.sdsc.edu to run interactively
+
+if [ $( pwd | grep -v gpfs ) ]; then
+  echo "Error: jobs must be run from /gpfs"
+  exit
+fi
+if [ "$interactive" -a $HOSTNAME != ds100 ]; then
+  echo "Error: interactive jobs must be launched from dspoe"
+  exit
+fi
+opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
+if [ -z "$interactive" -a $mode = p ]; then
+cat << END > llscript
+#!/bin/bash
+#@environment = COPY_ALL;\\
+#AIXTHREAD_SCOPE=S;\\
+#MP_ADAPTER_USE=dedicated;\\
+#MP_CPU_USE=unique;\\
+#MP_CSS_INTERRUPT=no;\\
+#MP_EAGER_LIMIT=64K;\\
+#MP_EUIDEVELOP=min;\\
+#MP_LABELIO=yes;\\
+#MP_POLLING_INTERVAL=100000;\\
+#MP_PULSE=0;\\
+#MP_SHARED_MEMORY=yes;\\
+#MP_SINGLE_THREAD=no;\\
+#RT_GRQ=ON;\\
+#SPINLOOPTIME=0;\\
+#YIELDLOOPTIME=0;
+#@ class = normal
+#@ node = $nodes
+#@ tasks_per_node = $ppn
+#@ wall_clock_limit = $walltime
+#@ node_usage = not_shared
+#@ network.MPI = sn_all, shared, US
+#@ job_type = parallel
+#@ job_name = sord-$count
+#@ output = out.log
+#@ error = err.log
+#@ notification = always
+#@ notify_user = $LOGNAME
+#@ initialdir = $rundir
+#@ queue
+cd $rundir
+poe ./sord-p $opts
+END
+chmod u+x llscript
+fi
+
+case $mode$run in
+  si) ./sord-s ;;
+  sg) totalview ./sord-s ;;
+  sb) nohup ./sord-s > errors & ;;
+  pi) poe ./sord-p $opts ;;
+  pg) tvpoe ./sord-p $opts ;;
+  pb) nohup poe ./sord-p $opts > errors & ;;
+  pq) lljob=$( llsubmit llscript ) ;;
+esac
+

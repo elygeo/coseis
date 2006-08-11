@@ -1,0 +1,71 @@
+#!/bin/bash --version
+# SDSC TeraGrid IA64 Cluster
+#   http://www.sdsc.edu/user_services/ia64/
+#   http://clumon.sdsc.edu/
+#   http://grid.ncsa.uiuc.edu/teragrid/status/
+#   Interactive nodes
+#     tg-c127, tg-c128, tg-c129 and tg-c130
+#     4, 2 x 1.5GHz Intel Itanium 2, 4GB, 3GB usable
+#   Batch nodes:
+#     tg-login1.sdsc.teragrid.org
+#     tg-login2.sdsc.teragrid.org
+#     262, 2 x 1.5GHz Intel Itanium 2, 4GB, 3GB usable
+#   Intel Fortran compiler
+#   vi ~/.soft
+#     @remove +intel-compilers
+#     @remove +intel-c-8.0.066-f-8.0.046-r1
+#     @remove +mpich-gm-intel
+#     +intel-c-9.0.032-f-9.0.033
+#     +mpich-gm-1.2.6-intel9032
+#     @teragrid
+#   Always run from a subdirectory of /gpfs/
+#   Useful commands:
+#     myprojects
+#     tgusage
+#     showq
+#     qsub batchjob
+#     qdel
+
+if [ $( pwd | grep -v gpfs ) ]; then
+  echo "Error: jobs must be run from /gpfs"
+  exit
+fi
+
+if [ "$interactive" ]; then
+cat << END > mf
+tg-c127:2
+tg-c128:2
+tg-c129:2
+tg-c130:2
+END
+if ! grep -q "$HOSTNAME" mf; then
+  echo "Error: interactive jobs must be launched from the following hosts:"
+  sed 's/^/  /; s/:2//' mf
+  exit
+fi
+elif [ $mode = p ]; then
+cat << END > pbsscript
+#!/bin/bash
+#PBS -q dque
+#PBS -N sord-$count
+#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -l walltime=$walltime
+#PBS -o out.log
+#PBS -e err.log
+#PBS -V
+cd $rundir
+mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
+END
+chmod u+x pbsscript
+fi
+
+case $mode$run in
+  si) ./sord-s ;;
+  sg) totalview ./sord-s ;;
+  sb) nohup ./sord-s > errors & ;;
+  pi) mpirun -machinefile mf -np $np ./sord-p ;;
+  pg) mpirun -tv -machinefile mf -np $np ./sord-p ;;
+  pb) nohup mpirun -machinefile mf -np $np ./sord-p > errors & ;;
+  pq) pbsjob=$( qsub pbsscript ) ;;
+esac
+

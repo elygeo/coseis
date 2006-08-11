@@ -280,160 +280,10 @@ END
 # Run
 
 case $machine in
-
-datastar) #--------------------------------------#
-
-if [ $( pwd | grep -v gpfs ) ]; then
-  echo "Error: jobs must be run from /gpfs"
-  exit
-fi
-if [ "$interactive" -a $HOSTNAME != ds100 ]; then
-  echo "Error: interactive jobs must be launched from dspoe"
-  exit
-fi
-opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
-if [ -z "$interactive" -a $mode = p ]; then
-cat << END > llscript
-#!/bin/bash
-#@environment = COPY_ALL;\\
-#AIXTHREAD_SCOPE=S;\\
-#MP_ADAPTER_USE=dedicated;\\
-#MP_CPU_USE=unique;\\
-#MP_CSS_INTERRUPT=no;\\
-#MP_EAGER_LIMIT=64K;\\
-#MP_EUIDEVELOP=min;\\
-#MP_LABELIO=yes;\\
-#MP_POLLING_INTERVAL=100000;\\
-#MP_PULSE=0;\\
-#MP_SHARED_MEMORY=yes;\\
-#MP_SINGLE_THREAD=no;\\
-#RT_GRQ=ON;\\
-#SPINLOOPTIME=0;\\
-#YIELDLOOPTIME=0;
-#@ class = normal
-#@ node = $nodes
-#@ tasks_per_node = $ppn
-#@ wall_clock_limit = $walltime
-#@ node_usage = not_shared
-#@ network.MPI = sn_all, shared, US
-#@ job_type = parallel
-#@ job_name = sord-$count
-#@ output = out.log
-#@ error = err.log
-#@ notification = always
-#@ notify_user = $LOGNAME
-#@ initialdir = $rundir
-#@ queue
-cd $rundir
-poe ./sord-p $opts
-END
-chmod u+x llscript
-fi
-
-case $mode$run in
-  si) ./sord-s ;;
-  sg) totalview ./sord-s ;;
-  sb) nohup ./sord-s > errors & ;;
-  pi) poe ./sord-p $opts ;;
-  pg) tvpoe ./sord-p $opts ;;
-  pb) nohup poe ./sord-p $opts > errors & ;;
-  pq) lljob=$( llsubmit llscript ) ;;
-esac
-
-;;
-
-teragrid) #--------------------------------------#
-
-if [ $( pwd | grep -v gpfs ) ]; then
-  echo "Error: jobs must be run from /gpfs"
-  exit
-fi
-
-if [ "$interactive" ]; then
-cat << END > mf
-tg-c127:2
-tg-c128:2
-tg-c129:2
-tg-c130:2
-END
-if ! grep -q "$HOSTNAME" mf; then
-  echo "Error: interactive jobs must be launched from the following hosts:"
-  sed 's/^/  /; s/:2//' mf
-  exit
-fi
-elif [ $mode = p ]; then
-cat << END > pbsscript
-#!/bin/bash
-#PBS -q dque
-#PBS -N sord-$count
-#PBS -l nodes=$nodes:ppn=$ppn
-#PBS -l walltime=$walltime
-#PBS -o out.log
-#PBS -e err.log
-#PBS -V
-cd $rundir
-mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
-END
-chmod u+x pbsscript
-fi
-
-case $mode$run in
-  si) ./sord-s ;;
-  sg) totalview ./sord-s ;;
-  sb) nohup ./sord-s > errors & ;;
-  pi) mpirun -machinefile mf -np $np ./sord-p ;;
-  pg) mpirun -tv -machinefile mf -np $np ./sord-p ;;
-  pb) nohup mpirun -machinefile mf -np $np ./sord-p > errors & ;;
-  pq) pbsjob=$( qsub pbsscript ) ;;
-esac
-
-;;
-
-babieca) #--------------------------------------#
-
-if [ "$interactive" ]; then
-cat << END > mf
-node37:2
-node38:2
-node39:2
-node40:2
-node41:2
-node42:2
-node43:2
-node44:2
-node45:2
-node46:2
-node47:2
-node48:2
-END
-else
-cat << END > pbsscript
-#!/bin/bash
-#PBS -q workq
-#PBS -N sord-$count
-#PBS -l nodes=$nodes:ppn=$ppn
-#PBS -l walltime=$walltime
-#PBS -o out.log
-#PBS -e err.log
-#PBS -V
-sleep 2
-cd $rundir
-mpiexec -n $np ./sord-$mode
-END
-chmod u+x pbsscript
-fi
-  
-case $run in
-  i) mpirun -machinefile mf -np $np ./sord-$mode ;;
-  g) mpirun -machinefile mf -np $np -dbg=gdb ./sord-$mode ;;
-  b) nohup mpirun -machinefile mf -np $np ./sord-$mode > errors & ;;
-  q) pbsjob=$( qsub pbsscript ) ;;
-esac
-
-;;
-
-*) #--------------------------------------#
-
+datastar) . sh/datastar ;;
+teragrid) . sh/teragrid ;;
+babieca) . sh/babieca ;;
+*)
 [ "$mode" = p ] && mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon
 case $mode$run in
   si) ./sord-s ;;
@@ -443,10 +293,8 @@ case $mode$run in
   pg) mpiexec -gdb -np $np ./sord-p ;;
   pb) nice nohup mpiexec -np $np ./sord-p > errors & ;;
 esac
-
 ;;
-
-esac #--------------------------------------#
+esac
 
 if [ "$run" = b ]; then
   echo "Background job started, to cancel: out/$count/kill.sh"

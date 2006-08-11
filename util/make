@@ -65,8 +65,10 @@ $sfc $flags utm.f90 tscoords.f90 tsr.f90 -o tsr
 
 tar zxf scecvm4.tgz
 
-$sfc iobin.f scecvm4.f -o scecvm
-$pfc $flags iompi.f scecvm4.f -o scecvm-mpi
+#$sfc $flags iobin.f scecvm4.f -o scecvm
+#$pfc $flags iompi.f scecvm4.f -o scecvm-mpi
+#$sfc iobin.f scecvm4.f -o scecvm
+$pfc iompi.f scecvm4.f -o scecvm-mpi
 
 rm -f *.mod
 

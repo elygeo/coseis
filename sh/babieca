@@ -1,0 +1,54 @@
+#!/bash --version
+# SDSU CSRC Babieca Cluster
+#   http://babieca.sdsu.edu/
+#   http://www.csrc.sdsu.edu/csrc/about/computing/
+#   interactive nodes:
+#     12, 2 x 2.4GHz Intel Xeon, 1 GB
+#   batch nodes:
+#     36, 2 x 2.4GHz Intel Xeon, 1 GB
+#   Portland Group compilers http://moocow.sdsu.edu/csrc/pgi/
+#   Useful commands:
+#     qsub batchjob
+#     pbsnodes -a
+#     qstat
+#     qdel
+
+if [ "$interactive" ]; then
+cat << END > mf
+node37:2
+node38:2
+node39:2
+node40:2
+node41:2
+node42:2
+node43:2
+node44:2
+node45:2
+node46:2
+node47:2
+node48:2
+END
+else
+cat << END > pbsscript
+#!/bin/bash
+#PBS -q workq
+#PBS -N sord-$count
+#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -l walltime=$walltime
+#PBS -o out.log
+#PBS -e err.log
+#PBS -V
+sleep 2
+cd $rundir
+mpiexec -n $np ./sord-$mode
+END
+chmod u+x pbsscript
+fi
+  
+case $run in
+  i) mpirun -machinefile mf -np $np ./sord-$mode ;;
+  g) mpirun -machinefile mf -np $np -dbg=gdb ./sord-$mode ;;
+  b) nohup mpirun -machinefile mf -np $np ./sord-$mode > errors & ;;
+  q) pbsjob=$( qsub pbsscript ) ;;
+esac
+
