@@ -3,8 +3,8 @@ program drape
 
 implicit none
 real :: t(960,780), x, y, z, h, o1, o2, h1, h2, h3, h4, xx, yy
-integer :: j, k, err, reclen
-character(160) :: line, str
+integer :: i, j, k, reclen
+character(1024) :: line
 character :: endian
 
 endian = 'l'
@@ -21,15 +21,17 @@ o2 = .5 * h  +  30.5 * 3600.
 
 ! interpolate
 doline: do
-  read( 5, '(a)', iostat=err ) line
-  if ( err /= 0 ) exit doline
+  read( 5, '(a)', iostat=i ) line
+  if ( i /= 0 ) exit doline
   if ( line == '' .or. scan( '>#!%cC', line(1:1) ) /= 0 ) then
     print '(a)', trim( line )
     cycle doline
   end if
-  str = ''
-  read( line, *, iostat=err ) x, y, str
-  if ( err == 0 ) read( line, * ) x, y
+  read( line, * ) x, y
+  i = verify( line, ' ' ); line = line(i:)
+  i = scan(   line, ' ' ); line = line(i:)
+  i = verify( line, ' ' ); line = line(i:)
+  i = scan(   line, ' ' ); line = line(i:)
   xx = ( ( x * 3600 ) - o1 ) / h
   yy = ( ( y * 3600 ) - o2 ) / h
   j = int( xx ) + 1
@@ -43,7 +45,7 @@ doline: do
     h1 * h4 * t(j+1,k) + &
     h2 * h3 * t(j,k+1) + &
     h1 * h3 * t(j+1,k+1) )
-  print '(f11.6,x,f9.6,x,f6.1,x,a)', x, y, z, trim( str )
+  print '(f11.6,x,f9.6,x,f6.1,x,a)', x, y, z, trim( line )
 end do doline
 
 end program

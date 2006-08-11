@@ -56,7 +56,7 @@ flags=$oflags
 
 $sfc $flags swab.f90 -o swab
 $sfc $flags drape.f90 -o drape
-$sfc $flags minmax.f90 -o minmax
+$sfc $flags stats.f90 -o stats
 $sfc $flags bin2asc.f90 -o bin2asc
 $sfc $flags utm.f90 tscoords.f90 ts2ll.f90 -o ts2ll
 $sfc $flags utm.f90 tscoords.f90 ll2ts.f90 -o ll2ts
@@ -65,7 +65,7 @@ $sfc $flags utm.f90 tscoords.f90 tsr.f90 -o tsr
 
 tar zxf scecvm4.tgz
 
-$sfc iobin.f scecvm4.f -o scecvm
+$sfc -O3 iobin.f scecvm4.f -o scecvm
 #$pfc iompi.f scecvm4.f -o scecvm
 
 rm -f *.mod
