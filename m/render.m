@@ -1,6 +1,7 @@
 % Render
 
 % Slice
+if icursor(4) < 1, msg = 'No data at t=0'; return, end
 i1s = i1viz;
 i2s = i2viz;
 if ~volviz

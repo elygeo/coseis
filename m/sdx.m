@@ -6,6 +6,7 @@ format compact
 meta
 if faultnormal, faultmeta, end
 
+[ tmp, islice ] = max( abs( upvector ) );
 i1 = nn;
 i2 = [ 1 1 1 ];
 field = 'x';
@@ -16,6 +17,8 @@ for i = 1 : length( out )
     i2 = max( i2, [ out{i}{7:9} ] );
   elseif strcmp( field, 'x' )
     field = out{i}{2};
+    ii = find( out{i}{7:9} - out{i}{4:6} == 0 );
+    if length( ii ), islice = ii(1); end
   end
 end
 fields = unique( fields );
@@ -36,7 +39,6 @@ domesh = 0;
 dosurf = 1;
 doisosurf = 0;
 doglyph = 0;
-dofault = 1;
 volviz = 0;
 isofrac = .5;
 lim = -1;
@@ -45,9 +47,9 @@ renderer = 'OpenGL';
 renderer = 'painters';
 renderer = 'zbuffer';
 export = 0;
+ifn = abs( faultnormal );
 
 icursor = [ ihypo 0 ];
-ifn = abs( faultnormal );
 cellfocus = 0;
 sensor = 0;
 count = 0;
@@ -57,17 +59,6 @@ i1hold = [ 1 1 1 1 ];
 i2hold = [ 0 0 0 0 ];
 houtline = [];
 hhud = [];
-
-if ifn
-  islice = ifn;
-  field = 'svm';
-else
-  dofault = 0;
-  [ tmp, l ] = max( abs( upvector ) );
-  j = 1;
-  if l == 1, j = 2; end
-  islice = 6 - l - j;
-end
 
 hfig = gcf;
 clf reset
