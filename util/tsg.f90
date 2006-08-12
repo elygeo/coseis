@@ -138,6 +138,7 @@ close( 2 )
 ! lat/lon
 w = x
 call ts2ll( w, 1, 2 )
+if ( any( w /= w ) ) stop 'nans in lon/lat'
 print *, 'longitude range: ', minval( w(:,:,:,1) ), maxval( w(:,:,:,1) )
 print *, 'latgitude range: ', minval( w(:,:,:,2) ), maxval( w(:,:,:,2) )
 

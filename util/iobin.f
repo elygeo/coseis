@@ -21,7 +21,10 @@
       close( 2 )
       close( 3 )
       do i = 1, nn
-        if( rdep(i) .lt. 0 ) stop 'negative depth not allowed'
+        if(rdep(i).lt.0)
+     $    print *, 'Error: degative depth', i, rlon(i), rlat(i), rdep(i)
+        if(rlon(i)/=rlon(i).or.rlat(i)/=rlat(i).or.rdep(i)/=rdep(i))
+     $    print *, 'Error: nan', i, rlon(i), rlat(i), rdep(i)
         rdep(i) = rdep(i) * 3.2808399
         if( rdep(i) .lt. rdepmin ) rdep(i) = rdepmin
       end do
@@ -35,7 +38,7 @@
       open( 3,file='rho',recl=4,form='unformatted',access='direct' )
       do i = 1, nn
         if(alpha(i)/=alpha(i).or.beta(i)/=beta(i).or.rho(i)/=rho(i))
-     $    print *, 'Error: NaN at', rlon(i), rlat(i), rdep(i)
+     $    print *, 'Error: nan', i, rlon(i), rlat(i), rdep(i)
         write( 1,rec=i ) alpha(i)
         write( 2,rec=i ) beta(i)
         write( 3,rec=i ) rho(i)
