@@ -124,6 +124,15 @@ read( 1, rec=1 ) t
 close( 1 )
 t = t * exag
 
+! 2D x/y
+inquire( iolength=reclen ) x(:,:,:,1)
+open( 1, file='x', recl=reclen, form='unformatted', access='direct' )
+open( 2, file='y', recl=reclen, form='unformatted', access='direct' )
+write( 1, rec=1 ) x(:,:,:,1)
+write( 2, rec=1 ) x(:,:,:,2)
+close( 1 )
+close( 2 )
+
 ! 3D x/y
 inquire( iolength=reclen ) x(:,:,:,1)
 open( 1, file='x1', recl=reclen, form='unformatted', access='direct' )
@@ -138,7 +147,7 @@ close( 2 )
 ! lat/lon
 w = x
 call ts2ll( w, 1, 2 )
-if ( any( w /= w ) ) stop 'nans in lon/lat'
+if ( any( w /= w ) ) stop 'NaNs in lon/lat'
 print *, 'longitude range: ', minval( w(:,:,:,1) ), maxval( w(:,:,:,1) )
 print *, 'latgitude range: ', minval( w(:,:,:,2) ), maxval( w(:,:,:,2) )
 
