@@ -1,14 +1,14 @@
 ! Grid generation
-module gridgen_m
+module m_gridgen
 implicit none
 contains
 
 subroutine gridgen
-use globals_m
-use optimize_m
-use collectiveio_m
-use zone_m
-use tictoc_m
+use m_globals
+use m_optimize
+use m_collectiveio
+use m_zone
+use m_tictoc
 integer :: i1(3), i2(3), i1l(3), i2l(3), n(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, up(1)
 real :: x1, x2, m(9)

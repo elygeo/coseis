@@ -1,12 +1,12 @@
 ! Stress calculation
-module stress_m
+module m_stress
 implicit none
 contains
 
 subroutine stress
-use globals_m
-use diffnc_m
-use tictoc_m
+use m_globals
+use m_diffnc
+use m_tictoc
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iz
 
 if ( master ) call toc( 'Stress' )

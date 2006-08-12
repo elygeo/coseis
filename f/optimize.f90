@@ -1,11 +1,11 @@
 ! Assign fast operators to rectangular mesh portions
-module optimize_m
+module m_optimize
 implicit none
 contains
 
 subroutine optimize
-use globals_m
-use tictoc_m
+use m_globals
+use m_tictoc
 real :: tol, test
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2
 

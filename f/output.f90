@@ -1,13 +1,13 @@
 ! Write output
-module output_m
-use globals_m
-use collectiveio_m
-use tictoc_m
+module m_output
+use m_globals
+use m_collectiveio
+use m_tictoc
 contains
 
 ! Ouput initialize
 subroutine output_init
-use zone_m
+use m_zone
 implicit none
 real :: courant, rout
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz

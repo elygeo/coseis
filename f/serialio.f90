@@ -1,6 +1,6 @@
 ! Binary input and output - Serial version
-module collectiveio_m
-use collective_m
+module m_collectiveio
+use m_collective
 implicit none
 contains
 

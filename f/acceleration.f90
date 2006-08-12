@@ -1,16 +1,16 @@
 ! Acceleration calculation
-module acceleration_m
+module m_acceleration
 implicit none
 contains
 
 subroutine acceleration
-use globals_m
-use diffcn_m
-use hourglassnc_m
-use hourglasscn_m
-use collective_m
-use bc_m
-use tictoc_m
+use m_globals
+use m_diffcn
+use m_hourglassnc
+use m_hourglasscn
+use m_collective
+use m_bc
+use m_tictoc
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iz, iq
 
 if ( master ) call toc( 'Acceleration' )

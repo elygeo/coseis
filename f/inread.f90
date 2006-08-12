@@ -1,11 +1,11 @@
 ! Read input
-module inread_m
+module m_inread
 implicit none
 contains
 
 subroutine inread
-use globals_m
-use tictoc_m
+use m_globals
+use m_tictoc
 integer :: i, err
 logical :: inzone
 character(11) :: key

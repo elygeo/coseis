@@ -1,5 +1,5 @@
 ! Hourglass corrections, node to cell
-module hourglassnc_m
+module m_hourglassnc
 implicit none
 contains
 

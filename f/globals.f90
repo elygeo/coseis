@@ -1,5 +1,5 @@
 ! Global variables
-module globals_m
+module m_globals
 
 implicit none
 

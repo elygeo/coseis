@@ -1,16 +1,16 @@
 ! Fault boundary condition
-module fault_m
-use globals_m
-use collectiveio_m
-use bc_m
-use tictoc_m
+module m_fault
+use m_globals
+use m_collectiveio
+use m_bc
+use m_tictoc
 implicit none
 contains
 
 ! Fault initialization
 subroutine fault_init
-use surfnormals_m
-use zone_m
+use m_surfnormals
+use m_zone
 real :: mus0, mud0, dc0, lc, tn0, ts0, ess, rctest, x1(3), x2(3), rr
 integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
 

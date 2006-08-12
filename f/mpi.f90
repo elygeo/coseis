@@ -1,5 +1,5 @@
 ! Collective routines - MPI version
-module collective_m
+module m_collective
 use mpi
 implicit none
 integer :: comm3d, comm2d(3)
@@ -27,7 +27,7 @@ end subroutine
 
 ! Processor rank
 subroutine rank( np, ipout, ip3 )
-use tictoc_m
+use m_tictoc
 integer, intent(in) :: np(3)
 integer, intent(out) :: ipout, ip3(3)
 integer :: i, e

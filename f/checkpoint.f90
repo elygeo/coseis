@@ -1,8 +1,8 @@
 ! Checkpointing
-module checkpoint_m
-use globals_m
-use collective_m
-use tictoc_m
+module m_checkpoint
+use m_globals
+use m_collective
+use m_tictoc
 implicit none
 contains
 

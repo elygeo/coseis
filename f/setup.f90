@@ -1,13 +1,13 @@
 ! Setup model dimensions
-module setup_m
+module m_setup
 implicit none
 contains
 
 subroutine setup
-use globals_m
-use collective_m
-use zone_m
-use tictoc_m
+use m_globals
+use m_collective
+use m_zone
+use m_tictoc
 integer :: nl(3), n(3), ip3master(3), i
 
 if ( master ) call toc( 'Setup' )

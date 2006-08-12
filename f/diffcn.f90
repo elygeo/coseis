@@ -1,5 +1,5 @@
 ! Difference operator, cell to node
-module diffcn_m
+module m_diffcn
 implicit none
 contains
 

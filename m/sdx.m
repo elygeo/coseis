@@ -17,7 +17,7 @@ for i = 1 : length( out )
     i2 = max( i2, [ out{i}{7:9} ] );
   elseif strcmp( field, 'x' )
     field = out{i}{2};
-    ii = find( out{i}{7:9} - out{i}{4:6} == 0 );
+    ii = find( [ out{i}{7:9} ] - [ out{i}{4:6} ] == 0 );
     if length( ii ), islice = ii(1); end
   end
 end

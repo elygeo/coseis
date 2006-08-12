@@ -1,5 +1,5 @@
 ! Collective routines - Provides hooks for parallelization
-module collective_m
+module m_collective
 implicit none
 contains
 

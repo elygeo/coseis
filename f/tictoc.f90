@@ -1,5 +1,5 @@
 ! Time stamp log
-module tictoc_m
+module m_tictoc
 implicit none
 integer, private :: clock0, clockrate, clockmax
 contains

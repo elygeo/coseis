@@ -1,5 +1,5 @@
 ! Find surface normals
-module surfnormals_m
+module m_surfnormals
 implicit none
 contains
 

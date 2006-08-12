@@ -2,20 +2,20 @@
 program sord
 
 ! Modules
-use inread_m
-use setup_m
-use arrays_m
-use checkpoint_m
-use gridgen_m
-use material_m
-use output_m
-use pml_m
-use stress_m
-use momentsource_m
-use acceleration_m
-use fault_m
-use locknodes_m
-use timestep_m
+use m_inread
+use m_setup
+use m_arrays
+use m_checkpoint
+use m_gridgen
+use m_material
+use m_output
+use m_pml
+use m_stress
+use m_momentsource
+use m_acceleration
+use m_fault
+use m_locknodes
+use m_timestep
 
 ! Initialization
 call tic

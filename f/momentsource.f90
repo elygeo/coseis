@@ -1,7 +1,7 @@
 ! Moment source added to stress
-module momentsource_m
-use globals_m
-use tictoc_m
+module m_momentsource
+use m_globals
+use m_tictoc
 implicit none
 real, private, allocatable :: srcfr(:)
 integer, private, allocatable :: jj(:), kk(:), ll(:)
@@ -9,8 +9,8 @@ contains
 
 ! Moment source init
 subroutine momentsource_init
-use diffnc_m
-use collective_m
+use m_diffnc
+use m_collective
 real, allocatable :: cellvol(:)
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc
 real :: sumsrcfr

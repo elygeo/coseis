@@ -1,5 +1,5 @@
 ! Boundary conditions
-module bc_m
+module m_bc
 implicit none
 contains
 

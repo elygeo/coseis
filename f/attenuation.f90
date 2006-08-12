@@ -1,10 +1,10 @@
 ! Calculate PML damping parameters
-module attenuation_m
+module m_attenuation
 implicit none
 contains
 
 subroutine attenuation
-use globals_m
+use m_globals
 integer :: i
 real :: tau1, tau2, omega
 

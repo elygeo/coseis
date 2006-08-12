@@ -1,15 +1,15 @@
 ! Material model
-module material_m
+module m_material
 implicit none
 contains
 
 subroutine material
-use globals_m
-use collectiveio_m
-use diffnc_m
-use bc_m
-use zone_m
-use tictoc_m
+use m_globals
+use m_collectiveio
+use m_diffnc
+use m_bc
+use m_zone
+use m_tictoc
 real :: x1(3), x2(3)
 integer :: i1(3), i2(3), i1l(3), i2l(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, iz, idoublenode
