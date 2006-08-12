@@ -8,11 +8,13 @@ use m_arrays
 use m_checkpoint
 use m_gridgen
 use m_material
+use m_output_init
 use m_output
 use m_pml
 use m_stress
 use m_momentsource
 use m_acceleration
+use m_fault_init
 use m_fault
 use m_locknodes
 use m_timestep
