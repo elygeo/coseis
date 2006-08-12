@@ -196,6 +196,7 @@ c---if in Imperial Valley, go there----------------------
          call makevel2(rlat(l0),rlon(l0),rdep(l0),alp,betm,imanfl)
          alpha(l0)=alp
          beta(l0)=betm
+         if ( any( beta /= beta ) ) stop 'nan 1'
          go to 7999
          endif
 c---outside basin or Imperial Valley model area-----------
@@ -786,6 +787,7 @@ c--- assign regional tomo model---------------------
 980       call makereg(rlat(l0),rlon(l0),rdep(l0),alp,bet,iregfl)
           alpha(l0)=alp
           beta(l0)=bet
+       if ( any( beta /= beta ) ) stop 'nan 2'
 c -- find moho depth, rdemoh-- 
           call mohodepth(rlat(l0),rlon(l0),rdemoh)
           if(rdep(l0).ge.rdemoh)then
@@ -794,6 +796,7 @@ c---assign upper mantle velocities
           call makeman(rlat(l0),rlon(l0),rdep(l0),alpm,betm,imanfl)
           alpha(l0)=alpm
           beta(l0)=betm
+       if ( any( beta /= beta ) ) stop 'nan 3'
           endif
 c check if in basement within basin area
           if(inout(l0).eq.1)goto 7998
@@ -850,6 +853,7 @@ c --see lab model for citations----------------------------
          if(rho(l0).ge.2060.)sigma=.40-((rho(l0)-2060.)*.00034091)
          if(rho(l0).gt.2500.)sigma=0.25
          beta(l0)=alpha(l0)/(sqrt((1.-sigma)/(.5-sigma)))
+       if ( any( beta /= beta ) ) stop 'nan 4'
 c--if regional tomo or mantle beta was looked up, replace beta(l0)----
          if(iregfl.ne.0)beta(l0)=bet
          if(imanfl.ne.0)beta(l0)=betm
@@ -858,7 +862,9 @@ c--get geotech S wave----
          if(inout(l0).eq.1)then
          if(rdep(l0).le.1000.)then
          call addtops(rdep(l0),beta(l0),idgens,ifs,beta2,ioldfg,ioff)
+         print *, rdep(l0),beta(l0),idgens,ifs,beta2,ioldfg,ioff
          beta(l0)=beta2
+       if ( any( beta /= beta ) ) stop 'nan 5'
 c    check on Vp/Vs, control from Vs
          bett=beta2*(sqrt(2.))
          if(bett.gt.alpha2)then
@@ -1139,6 +1145,7 @@ c   - KLM -
 c
           alpha1 = alpha(n)
           beta1 = beta(n)
+       if ( any( beta /= beta ) ) stop 'nan 6'
           rho1 = rho(n)
 c look for closest point inside
           rdmin=300.
@@ -1157,6 +1164,7 @@ c
           alpha(n)=alpha(n2)
           rho(n)=rho(n2)
           beta(n)=beta(n2)
+       if ( any( beta /= beta ) ) stop 'nan 7'
           endif
 557       continue
           endif
@@ -1174,6 +1182,7 @@ c
               beta(n) = beta(n) + (beta1-beta(n))*rdmin/rinterp
               rho(n) = rho(n) + (rho1-rho(n))*rdmin/rinterp
           endif
+       if ( any( beta /= beta ) ) stop 'nan 8'
 556      continue
          return
          end
@@ -1826,6 +1835,7 @@ c this gives borehole within 50 m
 7012       continue
 7011      continue
 c--weight for velocity--------------------------
+         print *, 'HEY1', iradcts(j), rtvels
          do 670 j=3,nrad
          if(iradcts(j).ne.0)then
           rtvels(j)=radvs(j)/iradcts(j)
@@ -1846,6 +1856,7 @@ c--get the velocities--------------------------
          rb=0.
          rscfac=1./((nrad-3)+1)
 c better always have generic velo
+         print *, 'HEY', rtvels
          do 1110 n=3,nrad
          rb=rb+(((rtewts(n)*rtvels(n))+((1.-rtewts(n))*rtvelges))
      1   *rscfac)

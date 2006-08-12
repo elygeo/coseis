@@ -61,16 +61,16 @@ $sfc $flags bin2asc.f90 -o bin2asc
 $sfc $flags asc2bin.f90 -o asc2bin
 $sfc $flags utm.f90 tscoords.f90 ts2ll.f90 -o ts2ll
 $sfc $flags utm.f90 tscoords.f90 ll2ts.f90 -o ll2ts
-$sfc $flags utm.f90 tscoords.f90 tsg.f90 -o tsg
-$sfc $flags utm.f90 tscoords.f90 tsr.f90 -o tsr
+$sfc $flags utm.f90 tscoords.f90 tsgrid.f90 -o tsgrid
+$sfc $flags utm.f90 tscoords.f90 tsgridr.f90 -o tsgridr
 
 tar zxf scecvm4.tgz
 cp scecvm4.h 'in.h'
 
 flags=$gflags
 
-$sfc $flags iobin.f scecvm4.f -o scecvm
-#$pfc $flags iompi.f scecvm4.f -o scecvm-mpi
+$sfc $flags iobin.f scecvm4.f -o scecvm4
+#$pfc $flags iompi.f scecvm4.f -o scecvm4-mpi
 #$sfc iobin.f scecvm4.f -o scecvm4
 #$pfc iompi.f scecvm4.f -o scecvm4-mpi
 

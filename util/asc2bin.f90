@@ -10,10 +10,11 @@ do i = 1, n
   call get_command_argument( i, filename )
   open( i+6, file=filename, recl=ii, form='unformatted', access='direct', status='new' )
 end do
+n = 3
 ii = 0
 loop: do
   ii = ii + 1
-  read( 5, '(a)', iostat=i ) r(1:n)
+  read( 5, *, iostat=i ) r(1:n)
   if ( i /= 0 ) exit loop
   do i = 1, n
     write( i+6, rec=ii ) r(i)

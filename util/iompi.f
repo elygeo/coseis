@@ -37,7 +37,7 @@
         if(rdep(i).lt.0) 
      $    print *, 'Error: degative depth', i, rlon(i), rlat(i), rdep(i)
         if(rlon(i)/=rlon(i).or.rlat(i)/=rlat(i).or.rdep(i)/=rdep(i))
-     $    print *, 'Error: nan', i, rlon(i), rlat(i), rdep(i)
+     $    print *, 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
         rdep(i) = rdep(i) * 3.2808399
         if( rdep(i) .lt. rdepmin ) rdep(i) = rdepmin
       end do
@@ -79,7 +79,7 @@
       kerr = 0
       do i = 1, nn
         if(alpha(i)/=alpha(i).or.beta(i)/=beta(i).or.rho(i)/=rho(i))
-     $    print *, 'Error: nan', i, rlon(i), rlat(i), rdep(i)
+     $    print *, 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
       end do
       end
 
