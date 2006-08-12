@@ -37,6 +37,16 @@
   timeseries = { 'v' 366597. 200401.  130. }; % Palm Springs
   timeseries = { 'v' 387717. 187412. 1296. }; % PFO
 
+% 1000m - Babieca
+  np = [ 4 4 1 ]
+  nn = [ 601 302 81 ];
+  ihypo = [ 264 200 -1 ];
+  ihypo = [ 463 200 -1 ];
+  dx = 1000.;
+  nt = 3000;
+  dt = .06;
+return
+
 % 2000m - Single processor
   np = [ 1 1 1 ]
   nn = [ 301 152 41 ];
@@ -45,16 +55,6 @@
   dx = 2000.;
   nt = 1500;
   dt = .12;
-return
-
-% 1000m - Babieca
-  np = [ 8 4 1 ]
-  nn = [ 601 302 81 ];
-  ihypo = [ 264 200 -1 ];
-  ihypo = [ 463 200 -1 ];
-  dx = 1000.;
-  nt = 3000;
-  dt = .06;
 return
 
 % 4000m - Single processor

@@ -280,9 +280,9 @@ END
 # Run
 
 case $machine in
-datastar) . sh/datastar ;;
-teragrid) . sh/teragrid ;;
-babieca) . sh/babieca ;;
+datastar) . "$srcdir/sh/datastar" ;;
+teragrid) . "$srcdir/sh/teragrid" ;;
+babieca) . "$srcdir/sh/babieca" ;;
 *)
 [ "$mode" = p ] && mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon
 case $mode$run in
