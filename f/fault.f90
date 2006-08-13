@@ -81,9 +81,6 @@ if ( rcrit > 0. .and. vrup > 0. ) then
   where ( rhypo < min( rcrit, t * vrup ) .and. f2 < f1 ) f1 = f2
 end if
 
-! TESTING
-print *, sum( t2 * t2 ) - sum( ts * ts )
-
 ! Shear traction bounded by friction
 f2 = f1
 f1 = 1.
@@ -98,9 +95,6 @@ t3 = t1 + t2
 ! Save for output
 tn = sum( t3 * nhat, 4 )
 ts = f1 * ts
-
-! TESTING
-print *, sum( t2 * t2 ) - sum( ts * ts )
 
 ! Update acceleration
 do i = 1, 3

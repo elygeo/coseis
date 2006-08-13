@@ -12,20 +12,21 @@
   th   = 'read';
   vs1 = 500.;
   vp1 = 1500.;
-  mus = 1.;
+  mus = 1e9;
   mud = 0.;
   dc = .64592;
   rcrit = -1.;
 
 % 4000m - Single processor
-  np = [ 1 1 1 ]
-  nn = [ 151 77 21 ];
-  ihypo = [  67 51 -1 ];
-  ihypo = [ 116 51 -1 ];
   dx = 4000.;
   dt = .24;
   nt = 750;
   nt = 2;
+  np = [ 1 1 1 ]
+  nn = [ 151 77 21 ];
+  ihypo = [  67 51 -1 ];
+  ihypo = [ 116 51 -1 ];
+  mus = [  1. 'zone'  67 0 -5   116 0 -1 ];
   out = { 'x'    1  1 0  1  -1 -0 -1 };
   out = { 'nhat' 1  1 0  1  -1 -0 -1 };
   out = { 't0'   1  1 0  1  -1 -0 -1 };
@@ -41,14 +42,6 @@
   out = { 'tsm'  1  1 0  1  -1 -0 -1 };
   out = { 'sl'   1  1 0  1  -1 -0 -1 };
   out = { 'f'    1  1 0  1  -1 -0 -1 };
-% rho = 2670.;
-% vp  = 6000.;
-% vs  = 3464.1016;
-% rcrit = 10000.;
-% tn = -1e12;
-% th = 0.;
-% tn = [ -10e6 'zone'  67 0 -5   116 0 -1 ];
-% th = [   9e6 'zone'  67 0 -5   116 0 -1 ];
 return
 
   out = { 'x'     1  1 1 -1  -1 -1 -1 };
@@ -73,56 +66,58 @@ return
   timeseries = { 'v' 387717. 187412. 1296. }; % PFO
 
 % 1000m - Babieca
+  dx = 1000.;
+  dt = .06;
+  nt = 3000;
   np = [ 4 4 1 ]
   nn = [ 601 302 81 ];
   ihypo = [ 264 200 -1 ];
   ihypo = [ 463 200 -1 ];
-  dx = 1000.;
-  nt = 3000;
-  dt = .06;
+  mus = [  1. 'zone'  264 0 -17   463 0 -1 ];
 return
 
 % 2000m - Single processor
+  dx = 2000.;
+  dt = .12;
+  nt = 1500;
   np = [ 1 1 1 ]
   nn = [ 301 152 41 ];
   ihypo = [ 133 101 -1 ];
   ihypo = [ 232 101 -1 ];
-  dx = 2000.;
-  nt = 1500;
-  dt = .12;
+  mus = [  1. 'zone'  133 0 -9   232 0 -1 ];
 return
 
 % 200m - DataStar
+  dx = 200.;
+  dt = .012;
+  nt = 15000;
   np = [ 16 8 4 ]
   nn = [ 3001 1502 401 ];
-  ihypo = FIXME
-% ihypo = [ -1 ];
-% ihypo = [ -1 ];
-  dx = 200.;
-  nt = 15000;
-  dt = .012;
+  ihypo = [ ? ? -1 ];
+  ihypo = [ ? ? -1 ];
+  mus = [  1. 'zone'  ? 0 -81   ? 0 -1 ];
   itcheck = 1000;
 return
 
 % 500m - Babieca
+  dx = 500.;
+  dt = .03;
+  nt = 6000;
   np = [ 8 4 1 ]
   nn = [ 1201 602 161 ];
-  ihypo = FIXME
-% ihypo = [ -1 ];
-% ihypo = [ -1 ];
-  dx = 500.;
-  nt = 6000;
-  dt = .03;
+  ihypo = [ ? ? -1 ];
+  ihypo = [ ? ? -1 ];
+  mus = [  1. 'zone'  ? 0 -33   ? 0 -1 ];
 return
 
 % 400m - DataStar
+  dx = 400.;
+  dt = .024;
+  nt = 7500;
   np = [ 16 8 4 ]
   nn = [ 1501 752 201 ];
-  ihypo = FIXME
-% ihypo = [ -1 ];
-% ihypo = [ -1 ];
-  dx = 400.;
-  nt = 7500;
-  dt = .024;
+  ihypo = [ ? ? -1 ];
+  ihypo = [ ? ? -1 ];
+  mus = [  1. 'zone'  ? 0 -41   ? 0 -1 ];
 return
 

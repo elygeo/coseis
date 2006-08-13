@@ -240,7 +240,7 @@ cd "$srcdir"
 echo "cd $srcdir" > m/srcdir.m
 cat << END > viz
 #!/bin/bash -e
-matlab -nodesktop -nosplash -r "addpath $srcdir/m"
+matlab -nojvm -nosplash -r "addpath $srcdir/m"
 END
 chmod u+x viz
 

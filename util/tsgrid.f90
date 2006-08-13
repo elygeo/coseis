@@ -237,7 +237,7 @@ inquire( iolength=reclen ) t
 open( 1, file='tn.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
-s = -1e12
+s = -maxval( abs( t ) )
 do l = l1, l2
 do j = j1, j2
   k1 = i * (j2-j) + 1

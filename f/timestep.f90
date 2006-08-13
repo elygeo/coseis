@@ -50,9 +50,18 @@ if ( ifn /= 0 ) then
   end if
   svm = f1
   psv = max( psv, f1 )
-  work = .5 * sum( sum( ( t0 + t3 ) * t2, 4 ) * area )
+  i1 = i1node
+  i2 = i1node
+  i1(ifn) = 1
+  i2(ifn) = 1
+  j1 = i1(1); j2 = i2(1)
+  k1 = i1(2); k2 = i2(2)
+  l1 = i1(3); l2 = i2(3)
+  work = .5 * sum( sum( ( t0(j1:j2,k1:k2,l1:l2,:) + t3(j1:j2,k1:k2,l1:l2,:) ) &
+    * t2(j1:j2,k1:k2,l1:l2,:), 4 ) * area(j1:j2,k1:k2,l1:l2) )
   call psum( work, ifn )
-  de = dt * sum( sum( t1 * t3, 4 ) * area )
+  de = dt * sum( sum( t1(j1:j2,k1:k2,l1:l2,:) * t3(j1:j2,k1:k2,l1:l2,:), 4 ) &
+    * area(j1:j2,k1:k2,l1:l2) )
   call psum( de, ifn )
   efrac = efrac + de
 end if
