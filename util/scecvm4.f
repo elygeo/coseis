@@ -1328,6 +1328,8 @@ c -- define the regional tomo velocities -----------------------
          include 'regionald.h'
          dimension vervep(4),verves(4)
          rd2rad=3.141593/180.
+         alp = 0.
+         bet = 0.
 c -- find which box point is in--
          do 1927 n=1,nregll-ninrow
          rckbox=mod(n,ninrow)

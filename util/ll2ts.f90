@@ -4,7 +4,7 @@ program p_ll2ts
 use m_tscoords
 implicit none
 character(1024) :: line
-real :: x(1,1,1,2), z
+real :: x(1,1,1,2)
 integer :: i
 
 doline: do

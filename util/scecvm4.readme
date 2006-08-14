@@ -1,0 +1,33 @@
+Notes on bug fixes made to the SCEC VM
+
+Any open statements with the syntax type='old', change to standard
+syntax status='old'.
+
+Add the following line to subroutine makevel2:
+
+       rd2rad=3.141593/180.
+
+Do not rely on the compiler to initialize variables to zero.
+Add to the begining of the main program:
+
+       inct = 0
+       incto = 0
+       do i = 1,isurmx
+         iiiold(i) = 0
+         inorold(i) = 0
+         rsuqold(i) = 0.
+       end do
+
+Add to the beginning of subroutine addtops:
+
+       rtvels(n)=0.
+       rtewts(n)=0.
+
+Add to the beginning of subroutine makereg:
+   
+
+
+Geoffrey Ely
+gely@ucsd.edu
+8/8/06
+

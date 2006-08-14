@@ -68,7 +68,7 @@ $sfc $flags utm.f90 tscoords.f90 tsgridr.f90 -o tsgridr
 tar zxf scecvm4.tgz
 cp scecvm4.h 'in.h'
 
-flags=$gflags
+#flags=$gflags
 
 $sfc $flags iobin.f scecvm4.f -o scecvm4
 #$pfc $flags iompi.f scecvm4.f -o scecvm4-mpi

@@ -2,7 +2,7 @@
 program grid
 use m_tscoords
 implicit none
-real :: r, dx, h, o1, o2, r1, r2, h1, h2, h3, h4, ell(3), x0, y0, z0, xf(6), yf(6), rf(6), zf, exag
+real :: r, dx, h, o1, o2, xx, yy, h1, h2, h3, h4, ell(3), x0, y0, z0, xf(6), yf(6), rf(6), zf, exag
 integer :: n(3), nn, npml, nrect, i, j, k, l, j1, k1, l1, j2, k2, l2, jf0, kf0, lf0, &
   nf, nf1, nf2, nf3, reclen
 real, allocatable :: x(:,:,:,:), w(:,:,:,:), s(:,:,:), t(:,:)
@@ -132,25 +132,36 @@ t = t * exag
 o1 = 15. - 121.5 * 3600.
 o2 = 15. +  30.5 * 3600.
 h  = 30.
-do k = 1, size(w,2)
-do j = 1, size(w,1)
-  r1 = ( ( w(:,:,:,1) * 3600 ) - o1 ) / h
-  r2 = ( ( w(:,:,:,2) * 3600 ) - o2 ) / h
-  j1 = int( r1 ) + 1
-  k1 = int( r2 ) + 1
-  h1 =  r1 - j1 + 1
-  h2 = -r1 + j1
-  h3 =  r2 - k1 + 1
-  h4 = -r2 + k1
-  x(j,k,1,3) = ( &
-    h2 * h4 * t(j1,k1)   + &
-    h1 * h4 * t(j1+1,k1) + &
-    h2 * h3 * t(j1,k1+1) + &
-    h1 * h3 * t(j1+1,k1+1) )
+do k1 = 1, size(w,2)
+do j1 = 1, size(w,1)
+  xx = ( ( w(j1,k1,1,1) * 3600 ) - o1 ) / h
+  yy = ( ( w(j1,k1,1,2) * 3600 ) - o2 ) / h
+  j = int( xx ) + 1
+  k = int( yy ) + 1
+  h1 =  xx - j + 1
+  h2 = -xx + j
+  h3 =  yy - k + 1
+  h4 = -yy + k
+  w(j1,k1,1,3) = ( &
+    h2 * h4 * t(j,k)   + &
+    h1 * h4 * t(j+1,k) + &
+    h2 * h3 * t(j,k+1) + &
+    h1 * h3 * t(j+1,k+1) )
 end do
 end do
-z0 = sum( x(:,:,:,3) ) / ( n(1) * n(2) )
-print *, 'elevation range: ', minval( x(:,:,:,3) ), maxval( x(:,:,:,3) )
+x(:,:,:,3) = w(:,:,:,3)
+
+! PML regions are orthogonal
+j = n(1)
+k = n(2)
+do i = npml-1,0,-1
+  w(i+1,:,:,:) = w(i+2,:,:,:)
+  w(j-i,:,:,:) = w(j-i-1,:,:,:)
+  w(:,i+1,:,:) = w(:,i+2,:,:)
+  w(:,k-i,:,:) = w(:,k-i-1,:,:)
+end do
+z0 = sum( w(:,:,:,3) ) / ( n(1) * n(2) )
+print *, 'elevation range: ', minval( w(:,:,:,3) ), maxval( w(:,:,:,3) )
 
 ! 2D files
 inquire( iolength=reclen ) x(:,:,:,1)
@@ -163,20 +174,6 @@ write( 3, rec=1 ) x(:,:,:,3)
 close( 1 )
 close( 2 )
 close( 3 )
-
-! PML regions are orthogonal
-j = n(1)
-k = n(2)
-do i = npml-1,0,-1
-  t(i+1,:,:,3) = t(i+2,:,:,3)
-  t(j-i,:,:,3) = t(j-i-1,:,:,3)
-  t(:,i+1,:,3) = t(:,i+2,:,3)
-  t(:,k-i,:,3) = t(:,k-i-1,:,3)
-  w(i+1,:,:,:) = w(i+2,:,:,:)
-  w(j-i,:,:,:) = w(j-i-1,:,:,:)
-  w(:,i+1,:,:) = w(:,i+2,:,:)
-  w(:,k-i,:,:) = w(:,k-i-1,:,:)
-end do
 
 ! 3D files
 inquire( iolength=reclen ) x(:,:,:,1)
@@ -197,14 +194,14 @@ l1 = npml + 1
 l2 = n(3) - nf3
 do l = 1, l1
   write( 3, rec=l ) -dx*(n(3)-l) + z0 + s
-  write( 9, rec=l )  dx*(n(3)-l1) - z0 + x(:,:,:,3)
+  write( 9, rec=l )  dx*(n(3)-l1) - z0 + w(:,:,:,3)
 end do
 do l = l1+1, l2-1
-  write( 3, rec=l ) -dx*(n(3)-l) + z0*(l2-l)/(l2-l1) + x(:,:,:,3)*(l-l1)/(l2-l1)
-  write( 9, rec=l )  dx*(n(3)-l) + (x(:,:,:,3)-z0)*(l2-l)/(l2-l1)
+  write( 3, rec=l ) -dx*(n(3)-l) + z0*(l2-l)/(l2-l1) + w(:,:,:,3)*(l-l1)/(l2-l1)
+  write( 9, rec=l )  dx*(n(3)-l) + (w(:,:,:,3)-z0)*(l2-l)/(l2-l1)
 end do
 do l = l2, n(3)
-  write( 3, rec=l ) -dx*(n(3)-l) + x(:,:,:,3)
+  write( 3, rec=l ) -dx*(n(3)-l) + w(:,:,:,3)
   write( 9, rec=l )  dx*(n(3)-l) + s
 end do
 close( 1 )
@@ -270,7 +267,7 @@ write( 1, * ) 'n       = [ ', n, ' ];'
 write( 1, * ) 'nn      = [ ', n + (/ 0, 1, 0 /), ' ];'
 write( 1, * ) 'ihypo   = [ ', jf0+i,     kf0, -i, ' ];'
 write( 1, * ) 'ihypo   = [ ', jf0-i+nf1, kf0, -i, ' ];'
-write( 1, * ) 'mus     = [ ', 1. ''zone'' jf0 0 -1-nf3 jf0+nf1, 0, -1, ' ];'
+write( 1, * ) 'mus     = [ 1. ''zone''', jf0, 0, -1-nf3, jf0+nf1, 0, -1, ' ];'
 write( 1, * ) 'endian  = ''', endian, ''';'
 close( 1 )
 
