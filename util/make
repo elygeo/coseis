@@ -44,12 +44,12 @@ f95)  gflags='-g'
   exit
 esac
 
-mkdir -p ../tmp/
-cd ../tmp/
-for file in ../util/*; do
+mkdir -p $HOME/sord/tmp
+cd $HOME/sord/tmp
+for file in $HOME/sord/util/*; do
   [ -e $( basename "$file" ) ] || ln -s "$file"
 done
-for file in ../data/*; do
+for file in $HOME/sord/data/*; do
   [ -e $( basename "$file" ) ] || ln -s "$file"
 done
 
