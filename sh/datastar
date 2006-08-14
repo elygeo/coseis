@@ -20,7 +20,7 @@
 #   Login to dslogin.sdsc.edu to submit batch jobs
 #   Login to dspoe.sdsc.edu to run interactively
 
-if [ $( pwd | grep -v gpfs ) ]; then
+if [ $( /bin/pwd | grep -v gpfs ) ]; then
   echo "Error: jobs must be run from /gpfs"
   exit
 fi

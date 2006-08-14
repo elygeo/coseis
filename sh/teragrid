@@ -26,7 +26,7 @@
 #     qsub batchjob
 #     qdel
 
-if [ $( pwd | grep -v gpfs ) ]; then
+if [ $( /bin/pwd | grep -v gpfs ) ]; then
   echo "Error: jobs must be run from /gpfs"
   exit
 fi

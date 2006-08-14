@@ -13,7 +13,7 @@ real, save :: amax, vmax, umax, wmax, &
 integer, save, dimension(3) :: amaxi, vmaxi, umaxi, wmaxi, &
   samaxi, svmaxi, sumaxi, tnmaxi, tsmaxi, slmaxi, tarrmaxi
 integer :: onpass, i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, ic, ir, iz
-logical :: fault, dofault, test
+logical :: fault, dofault
 
 if ( master ) call toc( 'Output' )
 

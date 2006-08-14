@@ -1,0 +1,11 @@
+#!/bin/bash
+#PBS -q dque
+#PBS -N cvm
+#PBS -l nodes=256:ppn=2
+#PBS -l walltime=00:10:00
+#PBS -o out.log
+#PBS -e err.log
+#PBS -V
+sleep 2
+cd $HOME/sord/tmp
+mpiexec -n 512 ./scecvm4-mpi
