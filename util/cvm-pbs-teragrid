@@ -7,4 +7,6 @@
 #PBS -e err.log
 #PBS -V
 cd $HOME/sord/tmp
-mpirun -machinefile $PBS_NODEFILE -np 504 ./scecvm4-mpi
+date > stamp0
+time mpirun -machinefile $PBS_NODEFILE -np 504 ./scecvm4-mpi
+date > stamp1

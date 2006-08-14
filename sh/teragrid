@@ -54,7 +54,9 @@ cat << END > pbsscript
 #PBS -e err.log
 #PBS -V
 cd $rundir
+date > stamp1
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
+date > stamp2
 END
 chmod u+x pbsscript
 fi

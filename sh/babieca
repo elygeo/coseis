@@ -40,7 +40,9 @@ cat << END > pbsscript
 #PBS -V
 sleep 2
 cd $rundir
+date > stamp1
 mpiexec -n $np ./sord-$mode
+date > stamp2
 END
 chmod u+x pbsscript
 fi

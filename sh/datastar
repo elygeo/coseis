@@ -62,7 +62,9 @@ cat << END > llscript
 #@ initialdir = $rundir
 #@ queue
 cd $rundir
+date > stamp1
 poe ./sord-p $opts
+date > stamp2
 END
 chmod u+x llscript
 fi
