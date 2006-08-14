@@ -8,7 +8,8 @@
   rho  = 'read';
   vp   = 'read';
   vs   = 'read';
-  tn   = 'read';
+  %tn   = 'read';
+  tn   = -9850280.;
   th   = 'read';
   vs1 = 500.;
   vp1 = 1500.;
@@ -21,6 +22,12 @@
   out = { 'pv'   -1   1 1 -1   -1 -1 -1 };
   out = { 'x'     1   1 0  1   -1  0 -1 };
   out = { 'vm'  100   1 0  1   -1  0 -1 };
+  out = { 'svm' 100   1 0 -1   -1  0 -1 };
+  out = { 'sum'  -1   1 0 -1   -1  0 -1 };
+  out = { 'sl'   -1   1 0 -1   -1  0 -1 };
+  out = { 'ts'   -1   1 0 -1   -1  0 -1 };
+  out = { 'psv'  -1   1 0 -1   -1  0 -1 };
+  out = { 'trup' -1   1 0 -1   -1  0 -1 };
   timeseries = { 'v'  89667.  58002.   11. }; % UCSB
   timeseries = { 'v' 214284. 109183.  135. }; % UCLA
   timeseries = { 'v' 220592. 101610.    3. }; % ISI
@@ -32,7 +39,7 @@
   timeseries = { 'v' 403893.  80018.  107. }; % SDSU
   timeseries = { 'v' 366597. 200401.  130. }; % Palm Springs
 
-% 1000m - Babieca
+% 1000m
   dx = 1000.;
   dt = .06;
   nt = 3000;
@@ -40,17 +47,10 @@
   nn = [ 601 302 81 ];
   ihypo = [ 272 200 -9 ];
   ihypo = [ 455 200 -9 ];
-  tn = -9850280.;
   mus = [  1. 'zone'  264 0 -17   463 0 -1 ];
-  out = { 'svm' 100   264 0 -17   463 0 -1 };
-  out = { 'sum'  -1   264 0 -17   463 0 -1 };
-  out = { 'sl'   -1   264 0 -17   463 0 -1 };
-  out = { 'ts'   -1   264 0 -17   463 0 -1 };
-  out = { 'psv'  -1   264 0 -17   463 0 -1 };
-  out = { 'trup' -1   264 0 -17   463 0 -1 };
 return
 
-% 4000m - Single processor
+% 4000m
   dx = 4000.;
   dt = .24;
   nt = 750;
@@ -60,15 +60,9 @@ return
   ihypo = [  69 51 -3 ];
   ihypo = [ 114 51 -3 ];
   mus = [  1. 'zone'  67 0 -5   116 0 -1 ];
-  out = { 'svm' 100   67 0 -5   116 0 -1 };
-  out = { 'sum'  -1   67 0 -5   116 0 -1 };
-  out = { 'sl'   -1   67 0 -5   116 0 -1 };
-  out = { 'tsm'  -1   67 0 -5   116 0 -1 };
-  out = { 'psv'  -1   67 0 -5   116 0 -1 };
-  out = { 'trup' -1   67 0 -5   116 0 -1 };
 return
 
-% 2000m - Single processor
+% 2000m
   dx = 2000.;
   dt = .12;
   nt = 1500;
@@ -79,7 +73,7 @@ return
   mus = [  1. 'zone'  133 0 -9   232 0 -1 ];
 return
 
-% 200m - DataStar
+% 200m
   dx = 200.;
   dt = .012;
   nt = 15000;
@@ -91,7 +85,7 @@ return
   itcheck = 1000;
 return
 
-% 500m - Babieca
+% 500m
   dx = 500.;
   dt = .03;
   nt = 6000;
@@ -102,7 +96,7 @@ return
   mus = [  1. 'zone'  ? 0 -33   ? 0 -1 ];
 return
 
-% 400m - DataStar
+% 400m
   dx = 400.;
   dt = .024;
   nt = 7500;
