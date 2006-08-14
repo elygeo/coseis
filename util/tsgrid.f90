@@ -230,6 +230,7 @@ inquire( iolength=reclen ) t
 open( 1, file='tn.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
+print *, 'normal traction range: ', minval( t ), maxval( t )
 s = -maxval( abs( t ) )
 do l = l1, l2
 do j = j1, j2
@@ -246,6 +247,7 @@ inquire( iolength=reclen ) t
 open( 1, file='th.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
+print *, 'shear traction range: ', minval( t ), maxval( t )
 s = 0.
 do l = l1, l2
 do j = j1, j2
@@ -260,13 +262,15 @@ write( 1, rec=1 ) s
 close( 1 )
 
 ! Metadata
-open( 1, file='gridmeta.m' )
+i = nf3 / 2
+open( 1, file='insord.m' )
 write( 1, * ) 'dx      = ', dx, ';'
 write( 1, * ) 'npml    = ', npml, ';'
 write( 1, * ) 'n       = [ ', n, ' ];'
 write( 1, * ) 'nn      = [ ', n + (/ 0, 1, 0 /), ' ];'
-write( 1, * ) 'ihypo   = [ ', jf0,     kf0, lf0,     ' ];'
-write( 1, * ) 'ihypo   = [ ', jf0+nf1, kf0, lf0+nf3, ' ];'
+write( 1, * ) 'ihypo   = [ ', jf0+i,     kf0, -i, ' ];'
+write( 1, * ) 'ihypo   = [ ', jf0-i+nf1, kf0, -i, ' ];'
+write( 1, * ) 'mus     = [ ', 1. ''zone'' jf0 0 -1-nf3 jf0+nf1, 0, -1, ' ];'
 write( 1, * ) 'endian  = ''', endian, ''';'
 close( 1 )
 
