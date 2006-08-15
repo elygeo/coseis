@@ -5,13 +5,12 @@ contains
 
 subroutine inread
 use m_globals
-use m_tictoc
 integer :: i, err
 logical :: inzone
 character(11) :: key
 character(160) :: line
 
-if ( master ) print *, toc(), 'Reading input'
+if ( master ) print *, 'Reading input'
 
 open( 1, file='input', status='old' )
 

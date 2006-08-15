@@ -43,57 +43,55 @@ real, intent(inout) :: r(:)
 r = r
 end subroutine
 
-! Integer minimum
-subroutine pimin( i )
-integer, intent(inout) :: i
-i = i
-end subroutine
-
 ! Real sum
-subroutine psum( r, i )
-real, intent(inout) :: r
+subroutine psum( rr, r, i )
+real, intent(out) :: rr
+real, intent(in) :: r
 integer, intent(in) :: i
 integer :: ii
-r = r
+rr = r
 ii = i
 end subroutine
 
-! Logical or
-subroutine plor( l )
-logical, intent(inout) :: l
-l = l
+! Integer minimum
+subroutine pimin( ii, i )
+integer, intent(out) :: ii
+integer, intent(in) :: i
+ii = i
 end subroutine
 
 ! Real minimum
-real function pmin( r )
+subroutine pmin( rr, r )
+real, intent(out) :: rr
 real, intent(in) :: r
-pmin = r
-end function
+rr = r
+end subroutine
 
 ! Real maximum
-real function pmax( r )
+subroutine pmax( rr, r )
+real, intent(out) :: rr
 real, intent(in) :: r
-pmax = r
-end function
+rr = r
+end subroutine
 
 !Real global minimum & location
-subroutine pminloc( r, ii, s, nn, nnoff, i2d )
-real, intent(out) :: r
-real, intent(in) :: s(:,:,:)
+subroutine pminloc( rr, ii, r, nn, nnoff, i2d )
+real, intent(out) :: rr
+real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
 integer, intent(in) :: nn(3), nnoff(3), i2d
-ii = minloc( s ) - nn + nn - nnoff + nnoff - i2d + i2d
-r  = s(ii(1),ii(2),ii(3))
+ii = minloc( r ) - nn + nn - nnoff + nnoff - i2d + i2d
+rr = r(ii(1),ii(2),ii(3))
 end subroutine
 
 ! Real global maximum & location
-subroutine pmaxloc( r, ii, s, nn, nnoff, i2d )
-real, intent(out) :: r
-real, intent(in) :: s(:,:,:)
+subroutine pmaxloc( rr, ii, r, nn, nnoff, i2d )
+real, intent(out) :: rr
+real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
 integer, intent(in) :: nn(3), nnoff(3), i2d
-ii = maxloc( s ) - nn + nn - nnoff + nnoff - i2d + i2d
-r  = s(ii(1),ii(2),ii(3))
+ii = maxloc( r ) - nn + nn - nnoff + nnoff - i2d + i2d
+rr = r(ii(1),ii(2),ii(3))
 end subroutine
 
 ! Vector send

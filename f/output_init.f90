@@ -6,7 +6,6 @@ contains
 subroutine output_init
 use m_globals
 use m_collectiveio
-use m_tictoc
 use m_zone
 real :: courant, rout
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz
@@ -17,7 +16,7 @@ logical :: fault, dofault, test, cell
 i = 0
 if ( master ) then
   i = 1
-  print *, toc(), 'Output initialize'
+  print *, 'Output initialize'
   inquire( file='currentstep.m', exist=test )
   if ( test .and. it == 1 ) then
     print *, 'error: previous output found'

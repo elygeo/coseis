@@ -67,69 +67,57 @@ i = size(r)
 call mpi_bcast( r, i, mpi_real, ipmaster, comm3d, e )
 end subroutine
 
-! Integer minimum
-subroutine pimin( i )
-integer, intent(inout) :: i
-integer :: ii, e
-call mpi_allreduce( i, ii, 1, mpi_integer, mpi_min, comm3d, e )
-i = ii
-end subroutine
-
 ! Real sum
-subroutine psum( r, i2d )
-real, intent(inout) :: r
+subroutine psum( rr, r, i2d )
+real, intent(out) :: rr
+real, intent(in) :: r
 integer, intent(in) :: i2d
-real :: rr
 integer :: e, comm
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
 call mpi_allreduce( r, rr, 1, mpi_real, mpi_sum, comm, e )
-r = rr
 end subroutine
 
-! Logical or
-subroutine plor( l )
-logical, intent(inout) :: l
-logical :: ll
+! Integer minimum
+subroutine pimin( ii, i )
+integer, intent(out) :: ii
+integer, intent(in) :: i
 integer :: e
-call mpi_allreduce( l, ll, 1, mpi_logical, mpi_lor, comm3d, e )
-l = ll
+call mpi_allreduce( i, ii, 1, mpi_integer, mpi_min, comm3d, e )
 end subroutine
 
 ! Real minimum
-real function pmin( r )
+subroutine pmin( rr, r )
+real, intent(out) :: rr
 real, intent(in) :: r
-real :: rr
 integer :: e
 call mpi_allreduce( r, rr, 1, mpi_real, mpi_min, comm3d, e )
-pmin = rr
-end function
+end subroutine
 
 ! Real maximum
-real function pmax( r )
+subroutine pmax( rr, r )
+real, intent(out) :: rr
 real, intent(in) :: r
-real :: rr
 integer :: e
 call mpi_allreduce( r, rr, 1, mpi_real, mpi_max, comm3d, e )
-pmax = rr
-end function
+end subroutine
 
 ! Real global minimum & location
-subroutine pminloc( r, ii, i, s, nn, nnoff, i2d )
-real, intent(out) :: r
-real, intent(in) :: s(:,:,:)
+subroutine pminloc( rr, ii, r, nn, nnoff, i2d )
+real, intent(out) :: rr
+real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
 integer, intent(in) :: nn(3), nnoff(3), i2d
 integer :: i, comm, e
 real :: local(2), global(2)
-ii = ii = minloc( s )
-local(1) = s(ii(1),ii(2),ii(3))
+ii = ii = minloc( r )
+local(1) = r(ii(1),ii(2),ii(3))
 ii = ii - nnoff - 1
 local(2) = ii(1) + nn(1) * ( ii(2) + nn(2) * ii(3) )
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
 call mpi_allreduce( local, global, 1, mpi_2real, mpi_minloc, comm, e )
-r = global(1)
+rr = global(1)
 i = global(2)
 ii(1) = modulo( i, nn(1) )
 ii(2) = modulo( i / nn(1), nn(2) )
@@ -138,21 +126,21 @@ ii = ii + 1 + nnoff
 end subroutine
 
 ! Real global maximum & location
-subroutine pmaxloc( r, ii, s, nn, nnoff, i2d )
-real, intent(out) :: r
-real, intent(in) :: s(:,:,:)
+subroutine pmaxloc( rr, ii, r, nn, nnoff, i2d )
+real, intent(out) :: rr
+real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
 integer, intent(in) :: nn(3), nnoff(3), i2d
 integer :: i, comm, e
 real :: local(2), global(2)
-ii = ii = maxloc( s )
-local(1) = s(ii(1),ii(2),ii(3))
+ii = ii = maxloc( r )
+local(1) = r(ii(1),ii(2),ii(3))
 ii = ii - nnoff - 1
 local(2) = ii(1) + nn(1) * ( ii(2) + nn(2) * ii(3) )
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
 call mpi_allreduce( local, global, 1, mpi_2real, mpi_maxloc, comm, e )
-r = global(1)
+rr = global(1)
 i = global(2)
 ii(1) = modulo( i, nn(1) )
 ii(2) = modulo( i / nn(1), nn(2) )

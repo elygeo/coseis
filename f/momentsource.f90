@@ -10,13 +10,12 @@ contains
 subroutine momentsource_init
 use m_diffnc
 use m_collective
-use m_tictoc
 real, allocatable :: cellvol(:)
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc
 real :: sumsrcfr
 
 if ( rsource <= 0. ) return
-if ( master ) print *, toc(), 'Moment source initialize'
+if ( master ) print *, 'Moment source initialize'
 
 ! Indices
 i1 = i1cell
@@ -58,8 +57,7 @@ end select
 
 ! Normalize and divide by cell volume
 cellvol = pack( s1, s2 <= rsource )
-sumsrcfr = sum( srcfr )
-call psum( sumsrcfr, 0 )
+call psum( sumsrcfr, sum( srcfr ), 0 )
 srcfr = srcfr / sumsrcfr / cellvol
 
 ! Index map

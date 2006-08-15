@@ -8,13 +8,12 @@ use m_globals
 use m_optimize
 use m_collectiveio
 use m_zone
-use m_tictoc
 integer :: i1(3), i2(3), i1l(3), i2l(3), n(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, up(1)
 real :: x1, x2, m(9)
 logical :: expand
 
-if ( master ) print *, toc(), 'Grid generation'
+if ( master ) print *, 'Grid generation'
 
 ! Single node indexing
 idoublenode = 0
@@ -305,13 +304,13 @@ end if
 
 ! Grid Dimensions
 do i = 1,3
-  x1 = pmin( minval( x(:,:,:,i) ) )
-  x2 = pmin( maxval( x(:,:,:,i) ) )
+  call pmin( x1, minval( x(:,:,:,i) ) )
+  call pmax( x2, maxval( x(:,:,:,i) ) )
   xcenter(i) = ( x1 + x2 ) / 2.
   w1(:,:,:,i) = x(:,:,:,i) - xcenter(i);
 end do
 s1 = sum( w1 * w1, 4 );
-rmax = sqrt( pmax( maxval( s1 ) ) )
+call pmax( rmax, sqrt( maxval( s1 ) ) )
 
 end subroutine
 

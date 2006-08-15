@@ -18,7 +18,8 @@ if ( err == 0 ) then
 else
   it = 1
 end if
-call pimin( it )
+call pimin( i, it )
+it = i
 if ( it == 1 ) return
 if ( master ) print *, 'Checkpoint found, starting from ', it
 write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', it, '-', i

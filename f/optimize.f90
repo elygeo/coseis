@@ -5,11 +5,10 @@ contains
 
 subroutine optimize
 use m_globals
-use m_tictoc
 real :: tol, test
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2
 
-if ( master ) print *, toc(), 'Operator optimization'
+if ( master ) print *, 'Operator optimization'
 
 ! Grid gradient
 i1 = i1cell

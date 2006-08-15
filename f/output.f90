@@ -34,6 +34,23 @@ write( 1, rec=ir ) r
 close( 1 )
 end subroutine
 
+! Timing
+subroutine tictoc( filename, ir )
+character(*), intent(in), optional :: str
+integer, intent(in), optional :: ir
+integer, save :: clock0, clockrate, clockmax
+integer :: clock1
+real :: t
+if ( .not. present( ir ) ) then
+  call system_clock( clock0, clockrate, clockmax )
+else
+  call system_clock( clock1 )
+  t = real( clock1 - clock0 ) / real( clockrate )
+  if ( t < 0. ) t = real( clock1 - clock0 + clockmax ) / real( clockrate ) 
+  call rwrite( filename, t, ir )
+end if
+end subroutine
+
 ! Main output routine
 subroutine output( pass )
 use m_globals

@@ -7,10 +7,9 @@ subroutine setup
 use m_globals
 use m_collective
 use m_zone
-use m_tictoc
 integer :: nl(3), n(3), ip3master(3), i
 
-if ( master ) print *, toc(), 'Setup'
+if ( master ) print *, 'Setup'
 
 ! Hypocenter
 n = nn

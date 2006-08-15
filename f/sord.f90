@@ -18,36 +18,35 @@ use m_fault_init
 use m_fault
 use m_locknodes
 use m_timestep
-use m_tictoc
 
 ! Initialization
-call tic
+call tictoc
 call initialize( ip, np0, master )
 if ( master ) print *, 'SORD - Support Operator Rupture Dynamics'
-call inread
-call setup
-call arrays
-call readcheckpoint
-call gridgen
-call material
-call pml
-call momentsource_init
-call fault_init
-call output_init
-if ( master ) print *, toc(), 'Finished initialization'
+call inread            ; if ( master ) call tictoc( '00/wt0', 1 )
+call setup             ; if ( master ) call tictoc( '00/wt0', 2 )
+call arrays            ; if ( master ) call tictoc( '00/wt0', 3 )
+call readcheckpoint    ; if ( master ) call tictoc( '00/wt0', 4 )
+call gridgen           ; if ( master ) call tictoc( '00/wt0', 5 )
+call material          ; if ( master ) call tictoc( '00/wt0', 6 )
+call pml               ; if ( master ) call tictoc( '00/wt0', 7 )
+call momentsource_init ; if ( master ) call tictoc( '00/wt0', 8 )
+call fault_init        ; if ( master ) call tictoc( '00/wt0', 9 )
+call output_init       ; if ( master ) call tictop( '00/wt0', 10 )
 
 ! Main loop
+if ( master ) print *, 'Starting main loop'
 do while ( it <= nt )
   call tic
-  call stress          ; if ( master ) call rwrite( '00/wt1', toc(), it )
-  call momentsource    ; if ( master ) call rwrite( '00/wt2', toc(), it )
-  call output( 1 )     ; if ( master ) call rwrite( '00/wt3', toc(), it )
-  call acceleration    ; if ( master ) call rwrite( '00/wt4', toc(), it )
-  call fault           ; if ( master ) call rwrite( '00/wt5', toc(), it )
-  call locknodes       ; if ( master ) call rwrite( '00/wt6', toc(), it )
-  call output( 2 )     ; if ( master ) call rwrite( '00/wt7', toc(), it )
-  call writecheckpoint ; if ( master ) call rwrite( '00/wt8', toc(), it )
-  call timestep        ; if ( master ) call rwrite( '00/wt9', toc(), it-1 )
+  call stress          ; if ( master ) call tictoc( '00/wt1', it )
+  call momentsource    ; if ( master ) call tictoc( '00/wt2', it )
+  call output( 1 )     ; if ( master ) call tictoc( '00/wt3', it )
+  call acceleration    ; if ( master ) call tictoc( '00/wt4', it )
+  call fault           ; if ( master ) call tictoc( '00/wt5', it )
+  call locknodes       ; if ( master ) call tictoc( '00/wt6', it )
+  call output( 2 )     ; if ( master ) call tictoc( '00/wt7', it )
+  call writecheckpoint ; if ( master ) call tictoc( '00/wt8', it )
+  call timestep        ; if ( master ) call tictoc( '00/wt9', it-1 )
 end do
 
 ! Finish up

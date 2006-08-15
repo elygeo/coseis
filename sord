@@ -184,7 +184,6 @@ base="
   surfnormals.f90
   bc.f90
   zone.f90
-  tictoc.f90
   globals.f90"
 serial="
   serial.f90

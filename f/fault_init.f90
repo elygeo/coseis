@@ -7,14 +7,13 @@ subroutine fault_init
 use m_globals
 use m_collectiveio
 use m_bc
-use m_tictoc
 use m_surfnormals
 use m_zone
 real :: mus0, mud0, dc0, lc, tn0, ts0, ess, rctest, x1(3), x2(3), rr
 integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
 
 if ( ifn == 0 ) return
-if ( master ) print *, toc(), 'Fault initialization'
+if ( master ) print *, 'Fault initialization'
 
 ! Input
 mus = 0.

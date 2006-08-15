@@ -7,7 +7,7 @@ subroutine timestep
 use m_globals
 use m_collective
 integer :: i1(3), i2(3), j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
-real :: de
+real :: r, de
 
 ! Time integration
 it = it + 1
@@ -54,12 +54,12 @@ if ( ifn /= 0 ) then
   j1 = i1(1); j2 = i2(1)
   k1 = i1(2); k2 = i2(2)
   l1 = i1(3); l2 = i2(3)
-  work = .5 * sum( sum( ( t0(j1:j2,k1:k2,l1:l2,:) + t3(j1:j2,k1:k2,l1:l2,:) ) &
+  r = .5 * sum( sum( ( t0(j1:j2,k1:k2,l1:l2,:) + t3(j1:j2,k1:k2,l1:l2,:) ) &
     * t2(j1:j2,k1:k2,l1:l2,:), 4 ) * area(j1:j2,k1:k2,l1:l2) )
-  call psum( work, ifn )
-  de = dt * sum( sum( t1(j1:j2,k1:k2,l1:l2,:) * t3(j1:j2,k1:k2,l1:l2,:), 4 ) &
+  call psum( work, r, ifn )
+  r = dt * sum( sum( t1(j1:j2,k1:k2,l1:l2,:) * t3(j1:j2,k1:k2,l1:l2,:), 4 ) &
     * area(j1:j2,k1:k2,l1:l2) )
-  call psum( de, ifn )
+  call psum( de, r, ifn )
   efrac = efrac + de
 end if
 
