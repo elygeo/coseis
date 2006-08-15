@@ -102,10 +102,6 @@ call vectorbc( w1, ibc1, ibc2, nhalo )
 
 ! Save slip acceleration for output
 t1 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
-print *, minval( t1(:,:,:,1) ), maxval( t1(:,:,:,1) )
-print *, minval( t1(:,:,:,2) ), maxval( t1(:,:,:,2) )
-print *, minval( t1(:,:,:,3) ), maxval( t1(:,:,:,3) )
-print *, minval( sum( t1 * t1, 4 ) ), maxval( sum( t1 * t1, 4 ) )
 f1 = sqrt( sum( t1 * t1, 4 ) )
 
 ! If a neighboring processor contains only one side of the fault, then we must

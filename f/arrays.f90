@@ -99,7 +99,7 @@ allocate(       &
   f2(j,k,l)     )
 
 ! Initial state
-t     =  0.
+t     =  dt
 v     =  0.
 u     =  0.
 pv    =  0.

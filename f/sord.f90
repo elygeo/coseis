@@ -38,15 +38,15 @@ call output_init       ; if ( master ) call tictoc( '00/wt0', 10 )
 if ( master ) print *, 'Starting main loop'
 do while ( it <= nt )
   call tictoc
-  call stress          ; if ( master ) call tictoc( '00/wt1', it )
-  call momentsource    ; if ( master ) call tictoc( '00/wt2', it )
-  call output( 1 )     ; if ( master ) call tictoc( '00/wt3', it )
-  call acceleration    ; if ( master ) call tictoc( '00/wt4', it )
-  call fault           ; if ( master ) call tictoc( '00/wt5', it )
-  call locknodes       ; if ( master ) call tictoc( '00/wt6', it )
-  call output( 2 )     ; if ( master ) call tictoc( '00/wt7', it )
-  call writecheckpoint ; if ( master ) call tictoc( '00/wt8', it )
-  call timestep        ; if ( master ) call tictoc( '00/wt9', it-1 )
+  call stress          ; if ( master ) call tictoc( '00/wt1str', it )
+  call momentsource    ; if ( master ) call tictoc( '00/wt2src', it )
+  call output( 1 )     ; if ( master ) call tictoc( '00/wt3out', it )
+  call acceleration    ; if ( master ) call tictoc( '00/wt4acc', it )
+  call fault           ; if ( master ) call tictoc( '00/wt5flt', it )
+  call locknodes       ; if ( master ) call tictoc( '00/wt6lok', it )
+  call output( 2 )     ; if ( master ) call tictoc( '00/wt7out', it )
+  call writecheckpoint ; if ( master ) call tictoc( '00/wt8ckp', it )
+  call timestep        ; if ( master ) call tictoc( '00/wt9tst', it-1 )
 end do
 
 ! Finish up

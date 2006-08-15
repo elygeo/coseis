@@ -11,7 +11,7 @@ real :: r, de
 
 ! Time integration
 it = it + 1
-t  = t  + dt
+t  = it * dt
 v  = v  + dt * w1
 u  = u  + dt * v
 
