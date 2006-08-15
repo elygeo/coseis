@@ -44,9 +44,9 @@ end
 labels = fieldlabels( field, 0 );
 cellfocus = any( strcmp( field, { 'w', 'wm' } ) );
 isfault = any( strcmp( field, { 'nhat' 't0' 'mus' 'mud' 'dc' 'co' 'sa' 'sv' 'su' 'ts' 't' 'sam' 'svm' 'sum' 'tnm' 'tsm' 'sl' 'f' 'svp' 'trup' 'tarr' } ) );
-[ fmax, i ] = max( s(:) );
+[ fmax, i ] = max( abs( s(:) ) );
 [ j, k, l ] = ind2sub( size( s ), i );
-fmaxi = [ j k l ];
+fmaxi = [ j k l ] + i1hold(1:3) - 1;
 flim = lim;
 if flim < 0, flim = fmax; end
 

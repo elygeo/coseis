@@ -67,6 +67,8 @@ $sfc $flags utm.f90 tscoords.f90 ll2ts.f90 -o ll2ts
 $sfc $flags utm.f90 tscoords.f90 tsgrid.f90 -o tsgrid
 $sfc $flags utm.f90 tscoords.f90 tsgridr.f90 -o tsgridr
 
+exit
+
 tar zxf scecvm4.tgz
 cp scecvm4.h 'in.h'
 

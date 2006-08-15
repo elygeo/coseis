@@ -2,16 +2,19 @@
 program grid
 use m_tscoords
 implicit none
-real :: r, dx, h, o1, o2, xx, yy, h1, h2, h3, h4, ell(3), x0, y0, z0, xf(6), yf(6), rf(6), zf, exag
+real :: r, dx, h, o1, o2, xx, yy, h1, h2, h3, h4, ell(3), x0, y0, z0, &
+  xf(6), yf(6), rf(6), zf, exag, mus, mud, tn, ts
 integer :: n(3), nn, npml, nrect, i, j, k, l, j1, k1, l1, j2, k2, l2, jf0, kf0, lf0, &
   nf, nf1, nf2, nf3, reclen
-real, allocatable :: x(:,:,:,:), w(:,:,:,:), s(:,:,:), t(:,:)
+real, allocatable :: x(:,:,:,:), w(:,:,:,:), s1(:,:,:), s2(:,:,:), t(:,:)
 character :: endian
 
 ! Model parameters
 open( 1, file='dx', status='old' )
 read( 1, * ) dx
 close( 1 )
+mus = 1.
+mud = .1
 ell = (/ 600, 300, 80 /) * 1000
 exag = 1.
 npml = 10
@@ -30,7 +33,7 @@ j = n(1)
 k = n(2)
 l = n(3)
 nn = j * k * l
-allocate( x(j,k,1,3), w(j,k,1,3), s(j,k,1) )
+allocate( x(j,k,1,3), w(j,k,1,3), s1(j,k,1) )
 open( 1, file='nn' )
 write( 1, * ) nn
 close( 1 )
@@ -189,11 +192,11 @@ do l = 1, n(3)
   write( 7, rec=l ) w(:,:,:,1)
   write( 8, rec=l ) w(:,:,:,2)
 end do
-s = 0
+s1 = 0
 l1 = npml + 1
 l2 = n(3) - nf3
 do l = 1, l1
-  write( 3, rec=l ) -dx*(n(3)-l) + z0 + s
+  write( 3, rec=l ) -dx*(n(3)-l) + z0 + s1
   write( 9, rec=l )  dx*(n(3)-l1) - z0 + w(:,:,:,3)
 end do
 do l = l1+1, l2-1
@@ -202,7 +205,7 @@ do l = l1+1, l2-1
 end do
 do l = l2, n(3)
   write( 3, rec=l ) -dx*(n(3)-l) + w(:,:,:,3)
-  write( 9, rec=l )  dx*(n(3)-l) + s
+  write( 9, rec=l )  dx*(n(3)-l) + s1
 end do
 close( 1 )
 close( 2 )
@@ -212,8 +215,8 @@ close( 8 )
 close( 9 )
 
 ! Fault prestress
-deallocate( t, x, s, w )
-allocate( s(n(1),1,n(3)), t(1991,161) )
+deallocate( t, x, s1, w )
+allocate( s1(n(1),1,n(3)), s2(n(1),1,n(3)), t(1991,161) )
 i = nint( dx / 100. )
 j1 = jf0
 j2 = jf0 + nf1
@@ -227,47 +230,62 @@ inquire( iolength=reclen ) t
 open( 1, file='tn.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
-print *, 'normal traction range: ', minval( t ), maxval( t )
-s = -maxval( abs( t ) )
+tn = t(91,51)
+print *, 'tn before scaling: ', minval(t), tn, maxval(t)
+s1 = -maxval( abs( t ) )
 do l = l1, l2
 do j = j1, j2
   k1 = i * (j2-j) + 1
   k2 = i * (l2-l) + 1
-  s(j,1,l) = t(k1,k2)
+  s1(j,1,l) = t(k1,k2)
 end do
 end do
-inquire( iolength=reclen ) s
-open( 1, file='tn', recl=reclen, form='unformatted', access='direct' )
-write( 1, rec=1 ) s
-close( 1 )
-inquire( iolength=reclen ) t
 open( 1, file='th.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
-print *, 'shear traction range: ', minval( t ), maxval( t )
-s = 0.
+ts = t(91,51)
+print *, 'ts before scaling: ', minval(t), ts, maxval(t)
+s2 = 0.
 do l = l1, l2
 do j = j1, j2
   k1 = i * (j2-j) + 1
   k2 = i * (l2-l) + 1
-  s(j,1,l) = t(k1,k2)
+  s2(j,1,l) = t(k1,k2)
 end do
 end do
-inquire( iolength=reclen ) s
-open( 1, file='th', recl=reclen, form='unformatted', access='direct' )
-write( 1, rec=1 ) s
+
+! Scale tractions
+! s1 = 1. / ( mus - mud ) * s1
+tn = 1. / ( mus - mud ) * tn
+s1 = tn
+s2 = s2 - mud * s1
+
+! Write tractions
+print *, 'tn range after scaling: ', minval( s1 ), maxval( s1 )
+print *, 'ts range after scaling: ', minval( s2 ), maxval( s2 )
+inquire( iolength=reclen ) s1
+open( 1, file='tn', recl=reclen, form='unformatted', access='direct' )
+open( 2, file='th', recl=reclen, form='unformatted', access='direct' )
+write( 1, rec=1 ) s1
+write( 2, rec=1 ) s2
 close( 1 )
+close( 2 )
+
+! Hypocenter
+j = nint( 9000. / dx )
+l = nint( 5000. / dx )
 
 ! Metadata
-i = nf3 / 2
 open( 1, file='insord.m' )
 write( 1, * ) 'dx      = ', dx, ';'
 write( 1, * ) 'npml    = ', npml, ';'
 write( 1, * ) 'n       = [ ', n, ' ];'
 write( 1, * ) 'nn      = [ ', n + (/ 0, 1, 0 /), ' ];'
-write( 1, * ) 'ihypo   = [ ', jf0+i,     kf0, -1-i, ' ];'
-write( 1, * ) 'ihypo   = [ ', jf0-i+nf1, kf0, -1-i, ' ];'
-write( 1, * ) 'mus     = [ 1. ''zone''', jf0, 0, -1-nf3, jf0+nf1, 0, -1, ' ];'
+write( 1, * ) 'ihypo   = [ ', jf0+j,     kf0, -1-l, ' ];'
+write( 1, * ) 'ihypo   = [ ', jf0-j+nf1, kf0, -1-l, ' ];'
+write( 1, * ) 'tn      = ', tn, ';'
+write( 1, * ) 'mud     = ', mud, ';'
+write( 1, * ) 'mus     = [ ', mus, '''zone''', jf0, 0, -1-nf3, jf0+nf1, 0, -1, ' ];'
 write( 1, * ) 'endian  = ''', endian, ''';'
 close( 1 )
 

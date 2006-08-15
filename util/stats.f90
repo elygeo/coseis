@@ -24,7 +24,7 @@ do ii = 1, command_argument_count()
   end do
   n = n - 1
   rmean = rmean / n
-  print *, filename(1:4), n, rmin, rmax, rmean
+  print *, filename(1:8), n, rmin, rmax, rmean
 end do
 end program
 
