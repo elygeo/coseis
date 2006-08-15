@@ -39,6 +39,11 @@ end subroutine
 ! Write checkpoint
 subroutine writecheckpoint
 integer :: i, reclen
+open( 1, file='itcheck', status='old', iostat=i )
+if ( i == 0 ) then
+  read( 1, * ) itcheck
+  close( 1 )
+end if
 if ( itcheck < 1 ) itcheck = itcheck + nt + 1
 if ( modulo( it, itcheck ) /= 0 ) return
 i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )

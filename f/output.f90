@@ -74,6 +74,8 @@ case( 1 )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
   call pmaxloc( r1, i1, s1, nn, nnoff, 0 )
   call pmaxloc( r2, i2, s2, nn, nnoff, 0 )
+  i1 = i1 - nnoff
+  i2 = i2 - nnoff
   if ( master .and. r1 > dx / 10. ) print *, 'warning: u !<< dx'
   if ( master ) call rwrite( '00/umax',  r1,    it )
   if ( master ) call iwrite( '00/umaxj', i1(1), it )
@@ -84,18 +86,20 @@ case( 1 )
   if ( master ) call iwrite( '00/wmaxk', i2(2), it )
   if ( master ) call iwrite( '00/wmaxl', i2(3), it )
   if ( dofault ) then
-  call pmaxloc( r1, i1, f1, nn, nnoff, i )
-  call pmaxloc( r2, i2, f2, nn, nnoff, i )
-  i1(i) = ihypo(i)
-  i2(i) = ihypo(i)
-  if ( master ) call rwrite( '00/svmax',  r1,    it )
-  if ( master ) call iwrite( '00/svmaxj', i1(1), it )
-  if ( master ) call iwrite( '00/svmaxk', i1(2), it )
-  if ( master ) call iwrite( '00/svmaxl', i1(3), it )
-  if ( master ) call rwrite( '00/sumax',  r2,    it )
-  if ( master ) call iwrite( '00/sumaxj', i2(1), it )
-  if ( master ) call iwrite( '00/sumaxk', i2(2), it )
-  if ( master ) call iwrite( '00/sumaxl', i2(3), it )
+    call pmaxloc( r1, i1, f1, nn, nnoff, i )
+    call pmaxloc( r2, i2, f2, nn, nnoff, i )
+    i1(i) = ihypo(i)
+    i2(i) = ihypo(i)
+    i1 = i1 - nnoff
+    i2 = i2 - nnoff
+    if ( master ) call rwrite( '00/svmax',  r1,    it )
+    if ( master ) call iwrite( '00/svmaxj', i1(1), it )
+    if ( master ) call iwrite( '00/svmaxk', i1(2), it )
+    if ( master ) call iwrite( '00/svmaxl', i1(3), it )
+    if ( master ) call rwrite( '00/sumax',  r2,    it )
+    if ( master ) call iwrite( '00/sumaxj', i2(1), it )
+    if ( master ) call iwrite( '00/sumaxk', i2(2), it )
+    if ( master ) call iwrite( '00/sumaxl', i2(3), it )
   end if
 case( 2 )
   s1 = sqrt( sum( w1 * w1, 4 ) )
@@ -103,6 +107,8 @@ case( 2 )
   pv = max( pv, s2 )
   call pmaxloc( r1, i1, s1, nn, nnoff, 0 )
   call pmaxloc( r2, i2, s2, nn, nnoff, 0 )
+  i1 = i1 - nnoff
+  i2 = i2 - nnoff
   if ( master ) call rwrite( '00/amax',  r1,    it )
   if ( master ) call iwrite( '00/amaxj', i1(1), it )
   if ( master ) call iwrite( '00/amaxk', i1(2), it )
@@ -112,42 +118,48 @@ case( 2 )
   if ( master ) call iwrite( '00/vmaxk', i2(2), it )
   if ( master ) call iwrite( '00/vmaxl', i2(3), it )
   if ( dofault ) then
-  call pmaxloc( r1, i1, f1, nn, nnoff, i )
-  call pmaxloc( r2, i2, sl, nn, nnoff, i )
-  i1(i) = ihypo(i)
-  i2(i) = ihypo(i)
-  if ( master ) call rwrite( '00/samax',  r1,    it )
-  if ( master ) call iwrite( '00/samaxj', i1(1), it )
-  if ( master ) call iwrite( '00/samaxk', i1(2), it )
-  if ( master ) call iwrite( '00/samaxl', i1(3), it )
-  if ( master ) call rwrite( '00/slmax',  r2,    it )
-  if ( master ) call iwrite( '00/slmaxj', i2(1), it )
-  if ( master ) call iwrite( '00/slmaxk', i2(2), it )
-  if ( master ) call iwrite( '00/slmaxl', i2(3), it )
-  call pminloc( r1, i1, tn, nn, nnoff, i )
-  call pmaxloc( r2, i2, tn, nn, nnoff, i )
-  i1(i) = ihypo(i)
-  i2(i) = ihypo(i)
-  if ( master ) call rwrite( '00/tnmin',  r1,    it )
-  if ( master ) call iwrite( '00/tnminj', i1(1), it )
-  if ( master ) call iwrite( '00/tnmink', i1(2), it )
-  if ( master ) call iwrite( '00/tnminl', i1(3), it )
-  if ( master ) call rwrite( '00/tnmax',  r2,    it )
-  if ( master ) call iwrite( '00/tnmaxj', i2(1), it )
-  if ( master ) call iwrite( '00/tnmaxk', i2(2), it )
-  if ( master ) call iwrite( '00/tnmaxl', i2(3), it )
-  call pmaxloc( r1, i1, ts,   nn, nnoff, i )
-  call pmaxloc( r2, i2, tarr, nn, nnoff, i )
-  i1(i) = ihypo(i)
-  i2(i) = ihypo(i)
-  if ( master ) call rwrite( '00/tsmax',  r1,    it )
-  if ( master ) call iwrite( '00/tsmaxj', i1(1), it )
-  if ( master ) call iwrite( '00/tsmaxk', i1(2), it )
-  if ( master ) call iwrite( '00/tsmaxl', i1(3), it )
-  if ( master ) call rwrite( '00/tarrmax',  r2,    it )
-  if ( master ) call iwrite( '00/tarrmaxj', i2(1), it )
-  if ( master ) call iwrite( '00/tarrmaxk', i2(2), it )
-  if ( master ) call iwrite( '00/tarrmaxl', i2(3), it )
+    call pmaxloc( r1, i1, f1, nn, nnoff, i )
+    call pmaxloc( r2, i2, sl, nn, nnoff, i )
+    i1(i) = ihypo(i)
+    i2(i) = ihypo(i)
+    i1 = i1 - nnoff
+    i2 = i2 - nnoff
+    if ( master ) call rwrite( '00/samax',  r1,    it )
+    if ( master ) call iwrite( '00/samaxj', i1(1), it )
+    if ( master ) call iwrite( '00/samaxk', i1(2), it )
+    if ( master ) call iwrite( '00/samaxl', i1(3), it )
+    if ( master ) call rwrite( '00/slmax',  r2,    it )
+    if ( master ) call iwrite( '00/slmaxj', i2(1), it )
+    if ( master ) call iwrite( '00/slmaxk', i2(2), it )
+    if ( master ) call iwrite( '00/slmaxl', i2(3), it )
+    call pminloc( r1, i1, tn, nn, nnoff, i )
+    call pmaxloc( r2, i2, tn, nn, nnoff, i )
+    i1(i) = ihypo(i)
+    i2(i) = ihypo(i)
+    i1 = i1 - nnoff
+    i2 = i2 - nnoff
+    if ( master ) call rwrite( '00/tnmin',  r1,    it )
+    if ( master ) call iwrite( '00/tnminj', i1(1), it )
+    if ( master ) call iwrite( '00/tnmink', i1(2), it )
+    if ( master ) call iwrite( '00/tnminl', i1(3), it )
+    if ( master ) call rwrite( '00/tnmax',  r2,    it )
+    if ( master ) call iwrite( '00/tnmaxj', i2(1), it )
+    if ( master ) call iwrite( '00/tnmaxk', i2(2), it )
+    if ( master ) call iwrite( '00/tnmaxl', i2(3), it )
+    call pmaxloc( r1, i1, ts,   nn, nnoff, i )
+    call pmaxloc( r2, i2, tarr, nn, nnoff, i )
+    i1(i) = ihypo(i)
+    i2(i) = ihypo(i)
+    i1 = i1 - nnoff
+    i2 = i2 - nnoff
+    if ( master ) call rwrite( '00/tsmax',  r1,    it )
+    if ( master ) call iwrite( '00/tsmaxj', i1(1), it )
+    if ( master ) call iwrite( '00/tsmaxk', i1(2), it )
+    if ( master ) call iwrite( '00/tsmaxl', i1(3), it )
+    if ( master ) call rwrite( '00/tarrmax',  r2,    it )
+    if ( master ) call iwrite( '00/tarrmaxj', i2(1), it )
+    if ( master ) call iwrite( '00/tarrmaxk', i2(2), it )
+    if ( master ) call iwrite( '00/tarrmaxl', i2(3), it )
   end if
 end select
 
@@ -279,17 +291,6 @@ end do doiz !------------------------------------------------------------------!
 
 ! Return if not on acceleration pass
 if ( pass == 1 ) return
-
-! Check for stop file
-!if ( master ) then
-!  inquire( file='stop', exist=test )
-!  if ( test ) then
-!    itcheck = it
-!    nt = it
-!  end if
-!  ibroadcast( itcheck )
-!  ibroadcast( nt )
-!end if
 
 ! Metadata
 if ( master ) then
