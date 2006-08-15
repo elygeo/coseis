@@ -128,7 +128,7 @@ end if
 s2 = mr * s2 * s2
 s1 = mr * ( s1 * s1 ) - 2. * s2
 
-! Average Lame parameters onto cell centers
+! Harmonic average Lame parameters onto cell centers
 call scalarbc( s1, ibc1, ibc2, nhalo )
 call scalarbc( s2, ibc1, ibc2, nhalo )
 call scalarswaphalo( s1, nhalo )
@@ -140,6 +140,8 @@ i2 = i2cell
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
+where( s1 > 0. ) s1 = 1. / s1
+where( s2 > 0. ) s2 = 1. / s2
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   lam(j,k,l) = 0.125 * &
     ( s1(j,k,l) + s1(j+1,k+1,l+1) &
@@ -152,6 +154,8 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     + s2(j,k+1,l) + s2(j+1,k,l+1) &
     + s2(j,k,l+1) + s2(j+1,k+1,l) )
 end forall
+where( lam > 0. ) lam = 1. / lam
+where( mu  > 0. ) mu  = 1. / mu
 
 ! Cell volume
 s1 = 0.

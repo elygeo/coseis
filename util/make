@@ -44,12 +44,14 @@ f95)  gflags='-g'
   exit
 esac
 
-mkdir -p $HOME/sord/tmp
-cd $HOME/sord/tmp
-for file in $HOME/sord/util/*; do
+cd ..
+srcdir=$( /bin/pwd )
+mkdir -p "$srcdir/tmp"
+cd tmp
+for file in "$srcdir/util/"*; do
   [ -e $( basename "$file" ) ] || ln -s "$file"
 done
-for file in $HOME/sord/data/*; do
+for file in "$srcdir/data/"*; do
   [ -e $( basename "$file" ) ] || ln -s "$file"
 done
 
@@ -68,9 +70,9 @@ $sfc $flags utm.f90 tscoords.f90 tsgridr.f90 -o tsgridr
 tar zxf scecvm4.tgz
 cp scecvm4.h 'in.h'
 
+flags=$oflags
 flags=$gflags
 flags=
-flags=$oflags
 
 $sfc $flags iobin.f scecvm4.f -o scecvm4
 #$pfc $flags iompi.f scecvm4.f -o scecvm4-mpi

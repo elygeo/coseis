@@ -32,12 +32,12 @@ call material          ; if ( master ) call tictoc( '00/wt0', 6 )
 call pml               ; if ( master ) call tictoc( '00/wt0', 7 )
 call momentsource_init ; if ( master ) call tictoc( '00/wt0', 8 )
 call fault_init        ; if ( master ) call tictoc( '00/wt0', 9 )
-call output_init       ; if ( master ) call tictop( '00/wt0', 10 )
+call output_init       ; if ( master ) call tictoc( '00/wt0', 10 )
 
 ! Main loop
 if ( master ) print *, 'Starting main loop'
 do while ( it <= nt )
-  call tic
+  call tictoc
   call stress          ; if ( master ) call tictoc( '00/wt1', it )
   call momentsource    ; if ( master ) call tictoc( '00/wt2', it )
   call output( 1 )     ; if ( master ) call tictoc( '00/wt3', it )

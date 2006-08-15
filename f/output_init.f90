@@ -17,7 +17,7 @@ i = 0
 if ( master ) then
   i = 1
   print *, 'Output initialize'
-  inquire( file='currentstep.m', exist=test )
+  inquire( file='currentstep', exist=test )
   if ( test .and. it == 1 ) then
     print *, 'error: previous output found'
     stop

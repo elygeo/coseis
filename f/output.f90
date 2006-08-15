@@ -36,7 +36,7 @@ end subroutine
 
 ! Timing
 subroutine tictoc( filename, ir )
-character(*), intent(in), optional :: str
+character(*), intent(in), optional :: filename
 integer, intent(in), optional :: ir
 integer, save :: clock0, clockrate, clockmax
 integer :: clock1
