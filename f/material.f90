@@ -14,7 +14,7 @@ real :: x1(3), x2(3)
 integer :: i1(3), i2(3), i1l(3), i2l(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, iz, idoublenode
 
-if ( master ) call toc( 'Material model' )
+if ( master ) print *, toc(), 'Material model'
 
 ! Input
 mr = 0.
@@ -94,7 +94,8 @@ end do doiz
 
 ! Extrema
 if ( any( mr /= mr ) .or. any( s1 /= s1 ) .or. any( s2 /= s2 ) ) then
-  stop 'NaNs in velocity model!'
+  print *, 'NaNs in velocity model!'
+  stop
 end if
 where ( mr < rho1 ) mr = rho1
 where ( mr > rho2 ) mr = rho2
@@ -107,18 +108,12 @@ i2 = i2node
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-rho1 = minval( mr(j1:j2,k1:k2,l1:l2) )
-rho2 = maxval( mr(j1:j2,k1:k2,l1:l2) )
-call pmin( rho1 )
-call pmax( rho2 )
-vp1  = minval( s1(j1:j2,k1:k2,l1:l2) )
-vp2  = maxval( s1(j1:j2,k1:k2,l1:l2) )
-call pmin( vp1 )
-call pmax( vp2 )
-vs1  = minval( s2(j1:j2,k1:k2,l1:l2) )
-vs2  = maxval( s2(j1:j2,k1:k2,l1:l2) )
-call pmin( vs1 )
-call pmax( vs2 )
+rho1 = pmin( minval( mr(j1:j2,k1:k2,l1:l2) ) )
+rho2 = pmax( maxval( mr(j1:j2,k1:k2,l1:l2) ) )
+vp1  = pmin( minval( s1(j1:j2,k1:k2,l1:l2) ) )
+vp2  = pmax( maxval( s1(j1:j2,k1:k2,l1:l2) ) )
+vs1  = pmin( minval( s2(j1:j2,k1:k2,l1:l2) ) )
+vs2  = pmax( maxval( s2(j1:j2,k1:k2,l1:l2) ) )
 
 ! Hypocenter values
 if ( master ) then

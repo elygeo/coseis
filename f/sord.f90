@@ -22,7 +22,7 @@ use m_timestep
 ! Initialization
 call tic
 call initialize( ip, np0, master )
-if ( master ) print '(a)', 'SORD - Support Operator Rupture Dynamics'
+if ( master ) print *, 'SORD - Support Operator Rupture Dynamics'
 call inread
 call setup
 call arrays
@@ -33,25 +33,24 @@ call pml
 call momentsource_init
 call fault_init
 call output_init
-if ( master ) call toc( 'Finished initialization' )
+if ( master ) print *, toc(), 'Finished initialization'
 
 ! Main loop
 do while ( it <= nt )
-  call tic
-  call stress
-  call momentsource
-  call output( 1 ) 
-  call acceleration
-  call fault
-  call locknodes
-  call output( 2 )
-  call writecheckpoint
-  call timestep
-  if ( master ) call toc( 'Finished step', it - 1 )
+  call tic             ; if ( master ) call write( *, *, advance='no' ) '.'
+  call stress          ; if ( master ) call rwrite( '00/wt1', toc(), it )
+  call momentsource    ; if ( master ) call rwrite( '00/wt2', toc(), it )
+  call output( 1 )     ; if ( master ) call rwrite( '00/wt3', toc(), it )
+  call acceleration    ; if ( master ) call rwrite( '00/wt4', toc(), it )
+  call fault           ; if ( master ) call rwrite( '00/wt5', toc(), it )
+  call locknodes       ; if ( master ) call rwrite( '00/wt6', toc(), it )
+  call output( 2 )     ; if ( master ) call rwrite( '00/wt7', toc(), it )
+  call writecheckpoint ; if ( master ) call rwrite( '00/wt8', toc(), it )
+  call timestep        ; if ( master ) call rwrite( '00/wt9', toc(), it-1 )
 end do
 
 ! Finish up
-if ( master ) call toc( 'Finished run' )
+if ( master ) print *, 'Finished'
 call finalize
 
 end program

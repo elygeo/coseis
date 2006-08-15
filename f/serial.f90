@@ -17,9 +17,9 @@ subroutine finalize
 end subroutine
 
 ! Processor rank
-subroutine rank( np, ipout, ip3 )
-integer, intent(in) :: np(3)
+subroutine rank( ipout, ip3, np )
 integer, intent(out) :: ipout, ip3(3)
+integer, intent(in) :: np(3)
 ipout = 0
 ip3 = np - np
 end subroutine
@@ -65,33 +65,35 @@ l = l
 end subroutine
 
 ! Real minimum
-subroutine pmin( r )
-real, intent(inout) :: r
-r = r
-end subroutine
+real function pmin( r )
+real, intent(in) :: r
+pmin = r
+end function
 
 ! Real maximum
-subroutine pmax( r )
-real, intent(inout) :: r
-r = r
+real function pmax( r )
+real, intent(in) :: r
+pmax = r
+end function
+
+!Real global minimum & location
+subroutine pminloc( r, ii, s, nn, nnoff, i2d )
+real, intent(out) :: r
+integer, intent(out) :: ii(3)
+real, intent(in) :: s(:,:,:)
+integer, intent(in) :: nn(3), nnoff(3), i2d
+ii = minloc( s ) - nn + nn - nnoff + nnoff - i2d + i2d
+r = s(ii(1),ii(2),ii(3))
 end subroutine
 
-! Real global minimum & location, send to master
-subroutine pminloc( r, i, nnoff, i2d )
-real, intent(inout) :: r
-integer, intent(inout) :: i(3)
-integer, intent(in) :: nnoff(3), i2d
-r = r
-i = i - nnoff + nnoff - i2d + i2d
-end subroutine
-
-! Real global maximum & location, send to master
-subroutine pmaxloc( r, i, nnoff, i2d )
-real, intent(inout) :: r
-integer, intent(inout) :: i(3)
-integer, intent(in) :: nnoff(3), i2d
-r = r
-i = i - nnoff + nnoff - i2d + i2d
+! Real global maximum & location
+subroutine pmaxloc( r, ii, s, nn, nnoff, i2d )
+real, intent(out) :: r
+integer, intent(out) :: ii(3)
+real, intent(in) :: s(:,:,:)
+integer, intent(in) :: nn(3), nnoff(3), i2d
+ii = maxloc( s ) - nn + nn - nnoff + nnoff - i2d + i2d
+r = s(ii(1),ii(2),ii(3))
 end subroutine
 
 ! Vector send

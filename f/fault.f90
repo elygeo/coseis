@@ -7,7 +7,6 @@ subroutine fault
 use m_globals
 use m_collectiveio
 use m_bc
-use m_tictoc
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
 ! If the two sides of the fault are split accross domains, than we must retrieve
@@ -32,8 +31,6 @@ if ( ifn == 0 ) then
   end if
   return
 end if
-
-if ( master ) call toc( 'Fault' )
 
 ! Indices
 i1 = 1
@@ -60,7 +57,6 @@ end do
 
 ! Decompose traction to normal and shear components
 tn = sum( t3 * nhat, 4 )
-if ( any( tn > 0. ) ) print *, ip, 'Fault opening!', it
 do i = 1, 3
   t1(:,:,:,i) = tn * nhat(:,:,:,i)
 end do

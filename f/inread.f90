@@ -11,14 +11,14 @@ logical :: inzone
 character(11) :: key
 character(160) :: line
 
-if ( master ) call toc( 'Reading input' )
+if ( master ) print *, toc(), 'Reading input'
 
-open( 9, file='input', status='old' )
+open( 1, file='input', status='old' )
 
 doline: do
 
 ! Read line
-read( 9, '(a)', iostat=err ) line
+read( 1, '(a)', iostat=err ) line
 if ( err /= 0 ) exit doline
 if ( line == '' ) cycle doline
 
@@ -104,8 +104,8 @@ case( 'lock' );
   i = nlock
   read( str, * ) ilock(i,:), i1lock(i,:), i2lock(i,:)
 case default
-  if ( master ) call toc( 'bad input: ' // line )
-  stop 'input error, see log'
+  if ( master ) print *, 'bad input: ', trim( line )
+  stop
 end select
 
 ! Input zone
@@ -127,7 +127,7 @@ if ( inzone ) then
     case( 'zone' ); read( str, * ) i1in(i,:), i2in(i,:)
     case( 'cube' ); read( str, * ) x1in(i,:), x2in(i,:); intype(i) = 'c'
     case default
-      if ( master ) call toc( 'bad input: ' // line )
+      if ( master ) print *, 'bad input: ', trim( line )
       stop
     end select
   end if
@@ -135,7 +135,7 @@ end if
 
 end do doline
 
-close( 9 )
+close( 1 )
 end subroutine
 
 ! Parse string for the first token

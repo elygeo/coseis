@@ -26,15 +26,14 @@ call mpi_finalize( e )
 end subroutine
 
 ! Processor rank
-subroutine rank( np, ipout, ip3 )
-use m_tictoc
-integer, intent(in) :: np(3)
+subroutine rank( ipout, ip3, np )
 integer, intent(out) :: ipout, ip3(3)
+integer, intent(in) :: np(3)
 integer :: i, e
 logical :: period(3) = .false.
 call mpi_cart_create( mpi_comm_world, 3, np, period, .true., comm3d, e )
 if ( comm3d == mpi_comm_null ) then
-  call toc( 'Unused processor:', ip )
+  print *, 'Unused processor:', ip
   call mpi_finalize( e )
   stop
 end if
@@ -77,13 +76,13 @@ i = ii
 end subroutine
 
 ! Real sum
-subroutine psum( r, i )
+subroutine psum( r, i2d )
 real, intent(inout) :: r
-integer, intent(in) :: i
+integer, intent(in) :: i2d
 real :: rr
 integer :: e, comm
 comm = comm3d
-if ( i /= 0 ) comm = comm2d(i)
+if ( i2d /= 0 ) comm = comm2d(i2d)
 call mpi_allreduce( r, rr, 1, mpi_real, mpi_sum, comm, e )
 r = rr
 end subroutine
@@ -98,69 +97,67 @@ l = ll
 end subroutine
 
 ! Real minimum
-subroutine pmin( r )
-real, intent(inout) :: r
-real :: rr
+function pmin( r )
+real :: pmin, rr
+real, intent(in) :: r
 integer :: e
 call mpi_allreduce( r, rr, 1, mpi_real, mpi_min, comm3d, e )
-r = rr
-end subroutine
+pmin = rr
+end function
 
 ! Real maximum
-subroutine pmax( r )
-real, intent(inout) :: r
-real :: rr
+function pmax( r )
+real :: pmax, rr
+real, intent(in) :: r
 integer :: e
 call mpi_allreduce( r, rr, 1, mpi_real, mpi_max, comm3d, e )
-r = rr
-end subroutine
+pmax = rr
+end function
 
-! Real global minimum & location, send to master
-subroutine pminloc( r, i, nnoff, i2d )
-real, intent(inout) :: r
-integer, intent(inout) :: i(3)
-integer, intent(in) :: nnoff(3), i2d
-integer :: comm, e, iip
+! Real global minimum & location
+subroutine pminloc( r, ii, s, nn, nnoff, i2d )
+real, intent(out) :: r
+integer, intent(out) :: ii(3)
+real, intent(in) :: s(:,:,:)
+integer, intent(in) :: nn(3), nnoff(3), i2d
 real :: local(2), global(2)
-local(1) = r
-local(2) = ip
+integer :: i, comm, e
+ii = ii = minloc( s )
+local(1) = s(ii(1),ii(2),ii(3))
+ii = ii - nnoff - 1
+local(2) = ii(1) + nn(1) * ( ii(2) + nn(2) * ii(3) )
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
 call mpi_allreduce( local, global, 1, mpi_2real, mpi_minloc, comm, e )
-r   = global(1)
-iip = global(2)
-i = i - nnoff
-if ( iip /= ipmaster .and. ip == iip ) then
-  call mpi_send( i, 3, mpi_integer, ipmaster, 0, comm3d, e )
-end if
-if ( iip /= ipmaster .and. ip == ipmaster ) then
-  call mpi_recv( i, 3, mpi_integer, iip, 0, comm3d, mpi_status_ignore, e )
-end if
-i = i + nnoff
+r = global(1)
+i = global(2)
+ii(1) = modulo( i, nn(1) )
+ii(2) = modulo( i / nn(1), nn(2) )
+ii(3) = i / ( nn(1) * nn(2) )
+ii = ii + 1 + nnoff
 end subroutine
 
-! Real global maximum & location, send to master
-subroutine pmaxloc( r, i, nnoff, i2d )
-real, intent(inout) :: r
-integer, intent(inout) :: i(3)
-integer, intent(in) :: nnoff(3), i2d
-integer :: comm, e, iip
+! Real global maximum & location
+subroutine pmaxloc( r, ii, s, nn, nnoff, i2d )
+real, intent(out) :: r
+integer, intent(out) :: ii(3)
+real, intent(in) :: s(:,:,:)
+integer, intent(in) :: nn(3), nnoff(3), i2d
 real :: local(2), global(2)
-local(1) = r
-local(2) = ip
+integer :: i, comm, e
+ii = ii = maxloc( s )
+local(1) = s(ii(1),ii(2),ii(3))
+ii = ii - nnoff - 1
+local(2) = ii(1) + nn(1) * ( ii(2) + nn(2) * ii(3) )
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
 call mpi_allreduce( local, global, 1, mpi_2real, mpi_maxloc, comm, e )
-r   = global(1)
-iip = global(2)
-i = i - nnoff
-if ( iip /= ipmaster .and. ip == iip ) then
-  call mpi_send( i, 3, mpi_integer, ipmaster, 0, comm3d, e )
-end if
-if ( iip /= ipmaster .and. ip == ipmaster ) then
-  call mpi_recv( i, 3, mpi_integer, iip, 0, comm3d, mpi_status_ignore, e )
-end if
-i = i + nnoff
+r = global(1)
+i = global(2)
+ii(1) = modulo( i, nn(1) )
+ii(2) = modulo( i / nn(1), nn(2) )
+ii(3) = i / ( nn(1) * nn(2) )
+ii = ii + 1 + nnoff
 end subroutine
 
 ! Vector send

@@ -3,24 +3,33 @@ program p_ll2ts
 
 use m_tscoords
 implicit none
-character(1024) :: line
+character(1024) :: str
 real :: x(1,1,1,2)
-integer :: i
+integer :: i, clip
 
+clip = 0
+do i = 1, command_argument_count()
+  call get_command_argument( i, str )
+  if ( str == '-c' ) then
+    clip = 1
+  else
+    write( 0, * ) 'unknown option: ', trim( str )
+  end if
+end do
 doline: do
-  read( 5, '(a)', iostat=i ) line
+  read( 5, '(a)', iostat=i ) str
   if ( i /= 0 ) exit doline
-  if ( line == '' .or. scan( '>#!%cC', line(1:1) ) /= 0 ) then
-    print '(a)', trim( line )
+  if ( str == '' .or. scan( '>#!%cC', str(1:1) ) /= 0 ) then
+    print '(a)', trim( str )
     cycle doline
   end if
-  read( line, * ) x
-  i = verify( line, ' ' ); line = line(i:)
-  i = scan(   line, ' ' ); line = line(i:)
-  i = verify( line, ' ' ); line = line(i:)
-  i = scan(   line, ' ' ); line = line(i:)
+  read( str, * ) x
+  i = verify( str, ' ' ); str = str(i:)
+  i = scan(   str, ' ' ); str = str(i:)
+  i = verify( str, ' ' ); str = str(i:)
+  i = scan(   str, ' ' ); str = str(i:)
   call ll2ts( x, 1, 2 )
-  print '(2f10.0,a)', x, trim( line )
+  print '(2f10.0,a)', x, trim( str )
 end do doline
 
 end program

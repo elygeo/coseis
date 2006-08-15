@@ -10,7 +10,7 @@ use m_zone
 use m_tictoc
 integer :: nl(3), n(3), ip3master(3), i
 
-if ( master ) call toc( 'Setup' )
+if ( master ) print *, toc(), 'Setup'
 
 ! Hypocenter
 n = nn
@@ -23,7 +23,7 @@ where ( ihypo <  0 ) ihypo = ihypo + nn + 1
 if ( np0 == 1 ) np = 1
 nl = nn / np; where ( modulo( nn, np ) /= 0 ) nl = nl + 1
 np = nn / nl; where ( modulo( nn, nl ) /= 0 ) np = np + 1
-call rank( np, ip, ip3 )
+call rank( ip, ip3, np )
 nnoff = nhalo - nl * ip3
 
 ! Master processor
@@ -60,7 +60,10 @@ i1pml = nnoff + npml
 i2pml = nnoff + nn + 1 - npml
 where ( ibc1 /= 1 ) i1pml = 0
 where ( ibc2 /= 1 ) i2pml = nm + 1
-if ( any( i1pml >= i2pml ) ) stop 'model too small for PML'
+if ( any( i1pml >= i2pml ) ) then
+  print *, 'model too small for PML', npml
+  stop
+end if
 
 ! Map hypocenter to local index, test if fault on this processor
 ihypo = ihypo + nnoff

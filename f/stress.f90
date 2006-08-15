@@ -6,10 +6,7 @@ contains
 subroutine stress
 use m_globals
 use m_diffnc
-use m_tictoc
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iz
-
-if ( master ) call toc( 'Stress' )
 
 ! Modified displacement
 w1 = u + dt * v * viscosity(1)

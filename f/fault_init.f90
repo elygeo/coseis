@@ -14,7 +14,7 @@ real :: mus0, mud0, dc0, lc, tn0, ts0, ess, rctest, x1(3), x2(3), rr
 integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
 
 if ( ifn == 0 ) return
-if ( master ) call toc( 'Fault initialization' )
+if ( master ) print *, toc(), 'Fault initialization'
 
 ! Input
 mus = 0.
@@ -105,7 +105,7 @@ end select
 end do
 
 ! Sanity check
-if ( any( t3(:,:,:,1) > 0.) ) stop 'normal traction must be negative'
+if ( any( t3(:,:,:,1) > 0.) ) print *, 'warning: positive normal traction'
 
 ! Lock fault in PML region
 i1 = max( i1pml + 1, 1 )
@@ -211,16 +211,16 @@ if ( master ) then
   if ( tn0 * ( mus0 - mud0 ) == 0. ) lc = 0.
   rctest = rho0 * vs0 ** 2. * tn0 * ( mus0 - mud0 ) * dc0 &
     / ( ts0 - tn0 * mud0 ) ** 2
-  open(  9, file='faultmeta.m', status='replace' )
-  write( 9, * ) 'mus0   = ', mus0,   '; % static friction at hypocenter'
-  write( 9, * ) 'mud0   = ', mud0,   '; % dynamic friction at hypocenter'
-  write( 9, * ) 'dc0    = ', dc0,    '; % dc at hypocenter'
-  write( 9, * ) 'tn0    = ', tn0,    '; % normal traction at hypocenter'
-  write( 9, * ) 'ts0    = ', ts0,    '; % shear traction at hypocenter'
-  write( 9, * ) 'ess    = ', ess,    '; % strength paramater'
-  write( 9, * ) 'lc     = ', lc,     '; % breakdown width'
-  write( 9, * ) 'rctest = ', rctest, '; % rcrit for spontaneous rupture'
-  close( 9 )
+  open(  1, file='faultmeta.m', status='replace' )
+  write( 1, * ) 'mus0   = ', mus0,   '; % static friction at hypocenter'
+  write( 1, * ) 'mud0   = ', mud0,   '; % dynamic friction at hypocenter'
+  write( 1, * ) 'dc0    = ', dc0,    '; % dc at hypocenter'
+  write( 1, * ) 'tn0    = ', tn0,    '; % normal traction at hypocenter'
+  write( 1, * ) 'ts0    = ', ts0,    '; % shear traction at hypocenter'
+  write( 1, * ) 'ess    = ', ess,    '; % strength paramater'
+  write( 1, * ) 'lc     = ', lc,     '; % breakdown width'
+  write( 1, * ) 'rctest = ', rctest, '; % rcrit for spontaneous rupture'
+  close( 1 )
 end if
 
 end subroutine

@@ -14,7 +14,7 @@ integer :: i1(3), i2(3), i1l(3), i2l(3), n(3), &
 real :: x1, x2, m(9)
 logical :: expand
 
-if ( master ) call toc( 'Grid generation' )
+if ( master ) print *, toc(), 'Grid generation'
 
 ! Single node indexing
 idoublenode = 0
@@ -116,7 +116,10 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 symmetry = max( min( symmetry, 1 ), -1 )
 where( i1 /= i2 ) symmetry = 2 * symmetry
-if( any( symmetry /= 0 .and. np /= 1 ) ) stop 'np(i) must = 1 for symmetry(i)'
+if( any( symmetry /= 0 .and. np /= 1 ) ) then
+  print *, 'np(i) must = 1 for symmetry(i)', np, symmetry
+  stop
+end if
 j = symmetry(1)
 k = symmetry(2)
 l = symmetry(3)
@@ -302,16 +305,13 @@ end if
 
 ! Grid Dimensions
 do i = 1,3
-  x1 = minval( x(:,:,:,i) )
-  x2 = maxval( x(:,:,:,i) )
-  call pmin( x1 )
-  call pmax( x2 )
+  x1 = pmin( minval( x(:,:,:,i) ) )
+  x2 = pmin( maxval( x(:,:,:,i) ) )
   xcenter(i) = ( x1 + x2 ) / 2.
   w1(:,:,:,i) = x(:,:,:,i) - xcenter(i);
 end do
 s1 = sum( w1 * w1, 4 );
-rmax = sqrt( maxval( s1 ) )
-call pmax( rmax )
+rmax = sqrt( pmax( maxval( s1 ) ) )
 
 end subroutine
 

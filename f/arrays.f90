@@ -8,7 +8,7 @@ use m_globals
 use m_tictoc
 integer :: i1(3), i2(3), j, k, l, j1, k1, l1, j2, k2, l2
 
-if ( master ) call toc( 'Allocate arrays' )
+if ( master ) print *, toc(), 'Allocate arrays'
 
 i2 = nm
 j = i2(1)

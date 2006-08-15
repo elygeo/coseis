@@ -1,7 +1,6 @@
 ! Moment source added to stress
 module m_momentsource
 use m_globals
-use m_tictoc
 implicit none
 real, private, allocatable :: srcfr(:)
 integer, private, allocatable :: jj(:), kk(:), ll(:)
@@ -11,12 +10,13 @@ contains
 subroutine momentsource_init
 use m_diffnc
 use m_collective
+use m_tictoc
 real, allocatable :: cellvol(:)
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc
 real :: sumsrcfr
 
 if ( rsource <= 0. ) return
-if ( master ) call toc( 'Moment source initialize' )
+if ( master ) print *, toc(), 'Moment source initialize'
 
 ! Indices
 i1 = i1cell
@@ -51,7 +51,9 @@ allocate( srcfr(nsrc), cellvol(nsrc), jj(nsrc), kk(nsrc), ll(nsrc) )
 select case( rfunc )
 case( 'box'  ); srcfr = 1.
 case( 'tent' ); srcfr = pack( s2, s2 <= rsource )
-case default; call toc( 'Invalid rfunc: ' // rfunc ); stop
+case default
+  print *, 'invalid rfunc: ', trim( rfunc )
+  stop
 end select
 
 ! Normalize and divide by cell volume
@@ -88,7 +90,6 @@ integer :: i, j, k, l, ic, nsrc
 real :: srcft
 
 if ( rsource <= 0. ) return
-if ( master ) call toc( 'Moment source' )
 
 ! Source time function
 select case( tfunc )
@@ -96,7 +97,9 @@ case( 'delta'  ); srcft = 1.
 case( 'brune'  ); srcft = 1. - exp( -t / tsource ) / tsource * ( t + tsource )
 case( 'sbrune' ); srcft = 1. - exp( -t / tsource ) / tsource * &
   ( t + tsource + t * t / tsource / 2. )
-case default; stop 'tfunc'
+case default
+  print *, 'invalid tfunc: ', trim( tfunc )
+  stop
 end select
 
 ! Add to stress variables

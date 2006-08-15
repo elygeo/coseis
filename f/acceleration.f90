@@ -10,10 +10,7 @@ use m_hourglassnc
 use m_hourglasscn
 use m_collective
 use m_bc
-use m_tictoc
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iz, iq
-
-if ( master ) call toc( 'Acceleration' )
 
 s1 = 0.
 

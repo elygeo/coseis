@@ -10,7 +10,10 @@ integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, iz
 logical, save :: init = .true.
 
 if ( init ) then
-  if ( nlock > nz ) stop 'too many lock zones, make nz bigger'
+  if ( nlock > nz ) then
+    print *, 'too many lock zones, make nz bigger ', nlock, nz
+    stop 
+  end if
   do iz = 1, nlock
     i1 = i1lock(iz,:)
     i2 = i2lock(iz,:)

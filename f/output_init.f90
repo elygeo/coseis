@@ -17,51 +17,54 @@ logical :: fault, dofault, test, cell
 i = 0
 if ( master ) then
   i = 1
-  call toc( 'Output initialize' )
+  print *, toc(), 'Output initialize'
   inquire( file='currentstep.m', exist=test )
-  if ( test .and. it == 1 ) stop 'error: previous output found'
+  if ( test .and. it == 1 ) then
+    print *, 'error: previous output found'
+    stop
+  end if
 end if
 
 ! Diagnostic
 if ( debug /= 0 ) then
   write( str, '(a,i6.6,a)' ) 'debug/db', ip, '.m'
-  open(  9, file=str, status='replace' )
-  write( 9, * ) 'ifn         =  ', ifn,         ';'
-  write( 9, * ) 'nin         =  ', nin,         ';'
-  write( 9, * ) 'nout        =  ', nout,        ';'
-  write( 9, * ) 'nlock       =  ', nlock,       ';'
-  write( 9, * ) 'noper       =  ', noper,       ';'
-  write( 9, * ) 'master      =  ', i,           ';'
-  write( 9, * ) 'ip          =  ', ip,          ';'
-  write( 9, * ) 'ip3         = [', ip3,        '];'
-  write( 9, * ) 'np          = [', np,         '];'
-  write( 9, * ) 'ihypo       = [', ihypo,      '];'
-  write( 9, * ) 'nm          = [', nm,         '];'
-  write( 9, * ) 'nnoff       = [', nnoff,      '];'
-  write( 9, * ) 'i1oper      = [', i1oper(1,:), ';', i1oper(2,:), '];'
-  write( 9, * ) 'i1node      = [', i1node,     '];'
-  write( 9, * ) 'i1cell      = [', i1cell,     '];'
-  write( 9, * ) 'i1pml       = [', i1pml,      '];'
-  write( 9, * ) 'i2oper      = [', i2oper(1,:), ';', i2oper(2,:), '];'
-  write( 9, * ) 'i2node      = [', i2node,     '];'
-  write( 9, * ) 'i2cell      = [', i2cell,     '];'
-  write( 9, * ) 'i2pml       = [', i2pml,      '];'
-  write( 9, * ) 'ibc1        = [', ibc1,       '];'
-  write( 9, * ) 'ibc2        = [', ibc2,       '];'
-  write( 9, * ) 'oper        = ''', oper,     ''';'
+  open(  1, file=str, status='replace' )
+  write( 1, * ) 'ifn         =  ', ifn,         ';'
+  write( 1, * ) 'nin         =  ', nin,         ';'
+  write( 1, * ) 'nout        =  ', nout,        ';'
+  write( 1, * ) 'nlock       =  ', nlock,       ';'
+  write( 1, * ) 'noper       =  ', noper,       ';'
+  write( 1, * ) 'master      =  ', i,           ';'
+  write( 1, * ) 'ip          =  ', ip,          ';'
+  write( 1, * ) 'ip3         = [', ip3,        '];'
+  write( 1, * ) 'np          = [', np,         '];'
+  write( 1, * ) 'ihypo       = [', ihypo,      '];'
+  write( 1, * ) 'nm          = [', nm,         '];'
+  write( 1, * ) 'nnoff       = [', nnoff,      '];'
+  write( 1, * ) 'i1oper      = [', i1oper(1,:), ';', i1oper(2,:), '];'
+  write( 1, * ) 'i1node      = [', i1node,     '];'
+  write( 1, * ) 'i1cell      = [', i1cell,     '];'
+  write( 1, * ) 'i1pml       = [', i1pml,      '];'
+  write( 1, * ) 'i2oper      = [', i2oper(1,:), ';', i2oper(2,:), '];'
+  write( 1, * ) 'i2node      = [', i2node,     '];'
+  write( 1, * ) 'i2cell      = [', i2cell,     '];'
+  write( 1, * ) 'i2pml       = [', i2pml,      '];'
+  write( 1, * ) 'ibc1        = [', ibc1,       '];'
+  write( 1, * ) 'ibc2        = [', ibc2,       '];'
+  write( 1, * ) 'oper        = ''', oper,     ''';'
   do iz = 1, nin
     select case( intype(iz) )
-    case( 'z' ); write( 9, '(a,a,g15.7,a,6i7,a)' ) &
+    case( 'z' ); write( 1, '(a,a,g15.7,a,6i7,a)' ) &
       fieldin(iz), ' = {', inval(iz), " 'zone'", i1in(iz,:), i2in(iz,:), ' };'
-    case( 'c' ); write( 9, '(a,a,g15.7,a,6g15.7,a)' ) &
+    case( 'c' ); write( 1, '(a,a,g15.7,a,6g15.7,a)' ) &
       fieldin(iz), ' = {', inval(iz), " 'cube'", x1in(iz,:), x2in(iz,:), ' };'
     end select
   end do
   do iz = 1, nlock
-    write( 9, '(a,9i7,a)' ) &
+    write( 1, '(a,9i7,a)' ) &
       'lock        = [', ilock(iz,:), i1lock(iz,:), i2lock(iz,:), '];'
   end do
-  close( 9 )
+  close( 1 )
 end if
 
 ! Metadata
@@ -69,54 +72,57 @@ if ( master ) then
   endian = 'l'
   if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
   courant = dt * vp2 * sqrt( 3. ) / abs( dx )
-  open(  9, file='meta.m', status='replace' )
-  write( 9, * ) 'dx          =  ', dx,      ';'
-  write( 9, * ) 'rsource     =  ', rsource, ';'
-  write( 9, * ) 'rcrit       =  ', rcrit,   ';'
-  write( 9, * ) 'rmax        =  ', rmax,    ';'
-  write( 9, * ) 'dt          =  ', dt,      ';'
-  write( 9, * ) 'tsource     =  ', tsource, ';'
-  write( 9, * ) 'trelax      =  ', trelax,  ';'
-  write( 9, * ) 'rho0        =  ', rho0,    ';'
-  write( 9, * ) 'rho1        =  ', rho1,    ';'
-  write( 9, * ) 'rho2        =  ', rho2,    ';'
-  write( 9, * ) 'vp0         =  ', vp0,     ';'
-  write( 9, * ) 'vp1         =  ', vp1,     ';'
-  write( 9, * ) 'vp2         =  ', vp2,     ';'
-  write( 9, * ) 'vs0         =  ', vs0,     ';'
-  write( 9, * ) 'vs1         =  ', vs1,     ';'
-  write( 9, * ) 'vs2         =  ', vs2,     ';'
-  write( 9, * ) 'vrup        =  ', vrup,    ';'
-  write( 9, * ) 'svtol       =  ', svtol,   ';'
-  write( 9, * ) 'rexpand     =  ', rexpand, ';'
-  write( 9, * ) 'courant     =  ', courant, ';'
-  write( 9, '(a,10g15.7,a)' ) ' affine      = [', affine, '];'
-  write( 9, * ) 'viscosity   = [', viscosity, '];'
-  write( 9, * ) 'upvector    = [', upvector,  '];'
-  write( 9, * ) 'symmetry    = [', symmetry,  '];'
-  write( 9, * ) 'xcenter     = [', xcenter,   '];'
-  write( 9, * ) 'xhypo       = [', xhypo,     '];'
-  write( 9, * ) 'moment1     = [', moment1,   '];'
-  write( 9, * ) 'moment2     = [', moment2,   '];'
-  write( 9, * ) 'nt          =  ', nt,          ';'
-  write( 9, * ) 'itcheck     =  ', itcheck,     ';'
-  write( 9, * ) 'npml        =  ', npml,        ';'
-  write( 9, * ) 'faultnormal =  ', faultnormal, ';'
-  write( 9, * ) 'origin      =  ', origin,      ';'
-  write( 9, * ) 'fixhypo     =  ', fixhypo,     ';'
-  write( 9, * ) 'nn          = [', nn,            '];'
-  write( 9, * ) 'ihypo       = [', ihypo - nnoff, '];'
-  write( 9, * ) 'n1expand    = [', n1expand,      '];'
-  write( 9, * ) 'n2expand    = [', n2expand,      '];'
-  write( 9, * ) 'bc1         = [', bc1,           '];'
-  write( 9, * ) 'bc2         = [', bc2,           '];'
-  write( 9, * ) 'grid        = ''', trim( grid ),  ''';'
-  write( 9, * ) 'rfunc       = ''', trim( rfunc ), ''';'
-  write( 9, * ) 'tfunc       = ''', trim( tfunc ), ''';'
-  write( 9, * ) 'endian      = ''', endian, ''';'
+  open(  1, file='meta.m', status='replace' )
+  write( 1, * ) 'dx          =  ', dx,      ';'
+  write( 1, * ) 'rsource     =  ', rsource, ';'
+  write( 1, * ) 'rcrit       =  ', rcrit,   ';'
+  write( 1, * ) 'rmax        =  ', rmax,    ';'
+  write( 1, * ) 'dt          =  ', dt,      ';'
+  write( 1, * ) 'tsource     =  ', tsource, ';'
+  write( 1, * ) 'trelax      =  ', trelax,  ';'
+  write( 1, * ) 'rho0        =  ', rho0,    ';'
+  write( 1, * ) 'rho1        =  ', rho1,    ';'
+  write( 1, * ) 'rho2        =  ', rho2,    ';'
+  write( 1, * ) 'vp0         =  ', vp0,     ';'
+  write( 1, * ) 'vp1         =  ', vp1,     ';'
+  write( 1, * ) 'vp2         =  ', vp2,     ';'
+  write( 1, * ) 'vs0         =  ', vs0,     ';'
+  write( 1, * ) 'vs1         =  ', vs1,     ';'
+  write( 1, * ) 'vs2         =  ', vs2,     ';'
+  write( 1, * ) 'vrup        =  ', vrup,    ';'
+  write( 1, * ) 'svtol       =  ', svtol,   ';'
+  write( 1, * ) 'rexpand     =  ', rexpand, ';'
+  write( 1, * ) 'courant     =  ', courant, ';'
+  write( 1, '(a,10g15.7,a)' ) ' affine      = [', affine, '];'
+  write( 1, * ) 'viscosity   = [', viscosity, '];'
+  write( 1, * ) 'upvector    = [', upvector,  '];'
+  write( 1, * ) 'symmetry    = [', symmetry,  '];'
+  write( 1, * ) 'xcenter     = [', xcenter,   '];'
+  write( 1, * ) 'xhypo       = [', xhypo,     '];'
+  write( 1, * ) 'moment1     = [', moment1,   '];'
+  write( 1, * ) 'moment2     = [', moment2,   '];'
+  write( 1, * ) 'nt          =  ', nt,          ';'
+  write( 1, * ) 'itcheck     =  ', itcheck,     ';'
+  write( 1, * ) 'npml        =  ', npml,        ';'
+  write( 1, * ) 'faultnormal =  ', faultnormal, ';'
+  write( 1, * ) 'origin      =  ', origin,      ';'
+  write( 1, * ) 'fixhypo     =  ', fixhypo,     ';'
+  write( 1, * ) 'nn          = [', nn,            '];'
+  write( 1, * ) 'ihypo       = [', ihypo - nnoff, '];'
+  write( 1, * ) 'n1expand    = [', n1expand,      '];'
+  write( 1, * ) 'n2expand    = [', n2expand,      '];'
+  write( 1, * ) 'bc1         = [', bc1,           '];'
+  write( 1, * ) 'bc2         = [', bc2,           '];'
+  write( 1, * ) 'grid        = ''', trim( grid ),  ''';'
+  write( 1, * ) 'rfunc       = ''', trim( rfunc ), ''';'
+  write( 1, * ) 'tfunc       = ''', trim( tfunc ), ''';'
+  write( 1, * ) 'endian      = ''', endian, ''';'
 end if
 
-if ( nout > nz ) stop 'too many output zones, make nz bigger'
+if ( nout > nz ) then
+  print *, 'too many output zones, make nz bigger', nout, nz
+  stop
+end if
 
 ! Test for fault
 dofault = .false.
@@ -168,8 +174,8 @@ doiz0: do iz = 1, nout
   case( 'trup' ); fault = .true.
   case( 'tarr' ); fault = .true.
   case default
-    if ( master ) call toc( 'unknown output field: ' // fieldout(iz) )
-    stop 'output field, see log'
+    print *, 'unknown output field: ' // fieldout(iz)
+    stop
   end select
 
   ! Zone or point location
@@ -198,25 +204,31 @@ doiz0: do iz = 1, nout
         k1 = i1(2); k2 = i2(2)
         l1 = i1(3); l2 = i2(3)
         do i = 1, 3
-          t1(:,:,:,i) = xout(iz,i) - x(j1:j2,k1:k2,l1:l2,i)
+          t2(:,:,:,i) = xout(iz,i) - x(j1:j2,k1:k2,l1:l2,i)
+        end do
+        i1 = i1node
+        i2 = i2node
+        i1(i) = 1
+        i2(i) = 1
+        j1 = i1(1); j2 = i2(1)
+        k1 = i1(2); k2 = i2(2)
+        l1 = i1(3); l2 = i2(3)
+        t1 = rmax
+        do i = 1, 3
+          t1(j1:j2,k1:k2,l1:l2,i) = t2(j1:j2,k1:k2,l1:l2,i)
         end do
         i = abs( faultnormal )
         f1 = sum( t1 * t1, 4 )
-        i1 = minloc( f1 )
-        rout = f1(i1(1),i1(2),i1(3))
-        i1(i) = ihypo(i)
-        t1 = 0.
-        f1 = 0.
-        call pminloc( rout, i1, nnoff, i )
+        call pminloc( rout, i1, f1, nn, nnoff, i )
       end if
     else
+      w1 = rmax
       if ( cell ) then
         i1 = i1node
         i2 = i2node - 1
         j1 = i1(1); j2 = i2(1)
         k1 = i1(2); k2 = i2(2)
         l1 = i1(3); l2 = i2(3)
-        w1 = rmax
         forall( j=j1:j2, k=k1:k2, l=l1:l2, i=1:3 )
           w1(j,k,l,i) = xout(iz,i) - 0.125 * &
             ( x(j,k,l,i) + x(j+1,k+1,l+1,i) &
@@ -225,16 +237,17 @@ doiz0: do iz = 1, nout
             + x(j,k,l+1,i) + x(j+1,k+1,l,i) )
         end forall
       else
+        i1 = i1node
+        i2 = i2node
+        j1 = i1(1); j2 = i2(1)
+        k1 = i1(2); k2 = i2(2)
+        l1 = i1(3); l2 = i2(3)
         do i = 1, 3
-          w1(:,:,:,i) = xout(iz,i) - x(:,:,:,i)
+          w1(j1:j2,k1:k2,l1:l2,i) = xout(iz,i) - x(j1:j2,k1:k2,l1:l2,i)
         end do
       end if
       s1 = sum( w1 * w1, 4 )
-      i1 = minloc( s1 )
-      rout = s1(i1(1),i1(2),i1(3))
-      call pminloc( rout, i1, nnoff, 0 )
-      w1 = 0.
-      s1 = 0.
+      call pminloc( rout, i1, s1, nn, nnoff, i )
     end if
     i2 = i1
     if ( rout > dx * dx ) ditout(iz) = nt + 1
@@ -247,10 +260,13 @@ doiz0: do iz = 1, nout
   ! Metadata
   if ( master ) then
     write( field, * ) '''', trim( fieldout(iz) ), ''''
-    write( 9, '(a,i3,a,i1,a,7i7,a)' ) ' out{', iz, '}    = { ', nc, field, ditout(iz), i1 - nnoff, i2 - nnoff, ' };'
+    write( 1, '(a,i3,a,i1,a,7i7,a)' ) ' out{', iz, '}    = { ', nc, field, ditout(iz), i1 - nnoff, i2 - nnoff, ' };'
   end if
  
-  if ( any( i2 < i1 ) ) stop 'bad output indices'
+  if ( any( i2 < i1 ) ) then
+    print *, 'bad output indices', i1, i2
+    stop
+  end if
   i1out(iz,:) = i1
   i2out(iz,:) = i2
  
@@ -263,6 +279,8 @@ doiz0: do iz = 1, nout
 end do doiz0
 
 ! For step 1, pass 1
+w1 = 0.
+s1 = 0.
 t1 = 0.
 t2 = 0.
 f1 = 0.
@@ -270,7 +288,7 @@ f2 = 0.
  
 ! Wall time
 if ( master ) then
-  close( 9 )
+  close( 1 )
 end if
 
 end subroutine

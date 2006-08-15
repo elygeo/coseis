@@ -3,19 +3,102 @@ module m_output
 implicit none
 contains
 
+subroutine iwrite( filename, i, ir )
+character(*), intent(in) :: filename
+integer, intent(in) :: i, ir
+integer :: reclen
+inquire( iolength=reclen ) i
+open( 1, &
+  file=filename, &
+  recl=reclen, &
+  form='unformatted', &
+  access='direct' )
+write( 1, rec=ir ) i
+close( 1 )
+end subroutine
+
+subroutine rwrite( filename, r, ir )
+character(*), intent(in) :: filename
+real, intent(in) :: r
+integer, intent(in) :: ir
+integer :: reclen
+inquire( iolength=reclen ) r
+open( 1, &
+  file=filename, &
+  recl=reclen, &
+  form='unformatted', &
+  access='direct' )
+write( 1, rec=ir ) r
+close( 1 )
+end subroutine
+
+subroutine minwrite( filename, s, ir, nn, nnoff, i2d, master )
+character(*), intent(in) :: filename
+real, intent(in) :: s(:,:,:)
+integer, intent(in) :: ir, nn(3), nnoff(3), i2d
+logical, intent(in) :: master
+real :: r
+integer :: i, ii(3), reclen
+call pminloc( r, ii, s, nn, nnoff, i2d )
+ii = ii - nnoff - 1
+i = 1 + ii(1) + nn(1) * ( ii(2) + nn(2) * ii(3) )
+if ( master ) then
+  inquire( iolength=reclen ) r
+  open( 1, &
+    file=filename, &
+    recl=reclen, &
+    form='unformatted', &
+    access='direct' )
+  write( 1, rec=ir ) r
+  close( 1 )
+  filename = trim( filename ) // 'i'
+  open( 1, &
+    file=filename, &
+    recl=reclen, &
+    form='unformatted', &
+    access='direct' )
+  write( 1, rec=ir ) i
+  close( 1 )
+end if
+end subroutine
+
+subroutine maxwrite( filename, s, ir, nn, nnoff, i2d, master )
+character(*), intent(in) :: filename
+real, intent(in) :: s(:,:,:)
+integer, intent(in) :: ir, nn(3), nnoff(3), i2d
+logical, intent(in) :: master
+real :: r
+integer :: i, i1(3), reclen
+call pmaxloc( r, ii, s, nn, nnoff, i2d )
+ii = ii - nnoff - 1
+i = 1 + ii(1) + nn(1) * ( ii(2) + nn(2) * ii(3) )
+if ( master ) then
+  inquire( iolength=reclen ) r
+  open( 1, &
+    file=filename, &
+    recl=reclen, &
+    form='unformatted', &
+    access='direct' )
+  write( 1, rec=ir ) r
+  close( 1 )
+  filename = trim( filename ) // 'i'
+  open( 1, &
+    file=filename, &
+    recl=reclen, &
+    form='unformatted', &
+    access='direct' )
+  write( 1, rec=ir ) i
+  close( 1 )
+end if
+end subroutine
+
 subroutine output( pass )
 use m_globals
 use m_collectiveio
-use m_tictoc
 integer, intent(in) :: pass
-real, save :: amax, vmax, umax, wmax, &
-  samax, svmax, sumax, tnmax, tsmax, slmax, tarrmax
-integer, save, dimension(3) :: amaxi, vmaxi, umaxi, wmaxi, &
-  samaxi, svmaxi, sumaxi, tnmaxi, tsmaxi, slmaxi, tarrmaxi
+real :: r1, r2
 integer :: onpass, i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, ic, ir, iz
 logical :: fault, dofault
-
-if ( master ) call toc( 'Output' )
 
 ! Test for fault
 dofault = .false.
@@ -29,56 +112,27 @@ select case( pass )
 case( 1 )
   s1 = sqrt( sum( u * u, 4 ) )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
-  umaxi = maxloc( s1 )
-  wmaxi = maxloc( s2 )
-  umax = s1(umaxi(1),umaxi(2),umaxi(3))
-  wmax = s2(wmaxi(1),wmaxi(2),wmaxi(3))
-  call pmaxloc( umax, umaxi, nnoff, 0 )
-  call pmaxloc( wmax, wmaxi, nnoff, 0 )
-  if ( master .and. umax > dx / 10. ) call toc( 'warning: u !<< dx' )
+  call maxwrite( '00/umax', s1, it, nn, nnoff, 0, master )
+  call maxwrite( '00/wmax', s2, it, nn, nnoff, 0, master )
+  if ( master .and. umax > dx / 10. ) print *, ip, 'warning: u !<< dx'
   if ( dofault ) then
-    svmaxi = maxloc( f1 )
-    sumaxi = maxloc( f2 )
-    svmax = f1(svmaxi(1),svmaxi(2),svmaxi(3))
-    sumax = f2(sumaxi(1),sumaxi(2),sumaxi(3))
-    svmaxi(i) = ihypo(i)
-    sumaxi(i) = ihypo(i)
-    call pmaxloc( svmax, svmaxi, nnoff, i )
-    call pmaxloc( sumax, sumaxi, nnoff, i )
+    call maxwrite( '00/svmax', f1, it, nn, nnoff, i, master )
+    call maxwrite( '00/sumax', f2, it, nn, nnoff, i, master )
   end if
 case( 2 )
   s1 = sqrt( sum( w1 * w1, 4 ) )
   s2 = sqrt( sum( v * v, 4 ) )
   pv = max( pv, s2 )
-  amaxi = maxloc( s1 )
-  vmaxi = maxloc( s2 )
-  amax = s1(amaxi(1),amaxi(2),amaxi(3))
-  vmax = s2(vmaxi(1),vmaxi(2),vmaxi(3))
-  call pmaxloc( amax, amaxi, nnoff, 0 )
-  call pmaxloc( vmax, vmaxi, nnoff, 0 )
+  call maxwrite( '00/amax', s1, it, nn, nnoff, 0, master )
+  call maxwrite( '00/vmax', s2, it, nn, nnoff, 0, master )
   if ( dofault ) then
-    samaxi = maxloc( f1 )
-    tnmaxi = maxloc( abs( tn ) )
-    tsmaxi = maxloc( ts )
-    slmaxi = maxloc( sl )
-    tarrmaxi = maxloc( tarr )
-    samax = f1(samaxi(1),samaxi(2),samaxi(3))
-    tnmax = abs( tn(tnmaxi(1),tnmaxi(2),tnmaxi(3)) )
-    tsmax = ts(tsmaxi(1),tsmaxi(2),tsmaxi(3))
-    slmax = sl(slmaxi(1),slmaxi(2),slmaxi(3))
-    tarrmax = tarr(tarrmaxi(1),tarrmaxi(2),tarrmaxi(3))
-    samaxi(i) = ihypo(i)
-    tnmaxi(i) = ihypo(i)
-    tsmaxi(i) = ihypo(i)
-    slmaxi(i) = ihypo(i)
-    tarrmaxi(i) = ihypo(i)
-    call pmaxloc( samax, samaxi, nnoff, i )
-    call pmaxloc( tnmax, tnmaxi, nnoff, i )
-    call pmaxloc( tsmax, tsmaxi, nnoff, i )
-    call pmaxloc( slmax, slmaxi, nnoff, i )
-    call pmaxloc( tarrmax, tarrmaxi, nnoff, i )
+    call maxwrite( '00/samax',   f1,   it, nn, nnoff, i, master )
+    call maxwrite( '00/slmax',   sl,   it, nn, nnoff, i, master )
+    call minwrite( '00/tnmin',   tn,   it, nn, nnoff, i, master )
+    call maxwrite( '00/tnmax',   tn,   it, nn, nnoff, i, master )
+    call maxwrite( '00/tsmax',   ts,   it, nn, nnoff, i, master )
+    call maxwrite( '00/tarrmax', tarr, it, nn, nnoff, i, master )
   end if
-case default; stop 'output pass'
 end select
 
 doiz: do iz = 1, nout !--------------------------------------------------------!
@@ -129,7 +183,9 @@ case( 'f'    ); fault = .true.
 case( 'psv'  ); fault = .true.
 case( 'trup' ); fault = .true.
 case( 'tarr' ); fault = .true.
-case default; stop 'output fieldout'
+case default
+  print *, 'error: unknown output field: ' fieldout(iz)
+  stop
 end select
 
 ! Select pass
@@ -197,7 +253,9 @@ do ic = 1, nc
   case( 'psv'  ); call scalario( 'w', str, psv,      ir, i1, i2, i1l, i2l, iz )
   case( 'trup' ); call scalario( 'w', str, trup,     ir, i1, i2, i1l, i2l, iz )
   case( 'tarr' ); call scalario( 'w', str, tarr,     ir, i1, i2, i1l, i2l, iz )
-  case default; stop 'output fieldout'
+  case default
+    print *, 'error: unknown output field 2: ' fieldout(iz)
+    stop
   end select
 end do
 
@@ -219,22 +277,11 @@ if ( pass == 1 ) return
 
 ! Metadata
 if ( master ) then
-  open(  9, file='currentstep.m', status='replace' )
-  write( 9, * ) 'it =  ', it, ';'
-  close( 9 )
-  write( str, '(a,i6.6,a)' ) 'stats/st', it, '.m'
-  open(  9, file=str, status='replace' )
-  write( 9, * ) 'it       =  ', it,   ';'
-  write( 9, * ) 't        =  ', t,    ';'
-  write( 9, * ) 'dt       =  ', dt,   ';'
-  write( 9, * ) 'amax     =  ', amax, ';'
-  write( 9, * ) 'vmax     =  ', vmax, ';'
-  write( 9, * ) 'umax     =  ', umax, ';'
-  write( 9, * ) 'wmax     =  ', wmax, ';'
-  write( 9, * ) 'amaxi    = [', amaxi - nnoff, '];'
-  write( 9, * ) 'vmaxi    = [', vmaxi - nnoff, '];'
-  write( 9, * ) 'umaxi    = [', umaxi - nnoff, '];'
-  write( 9, * ) 'wmaxi    = [', wmaxi - nnoff, '];'
+  open(  1, file='currentstep', status='replace' )
+  write( 1, * ) it
+  close( 1 )
+  call iwrite( '00/it', it, it )
+  call rwrite( '00/t',  t,  it )
   if ( dofault ) then
     i = abs( faultnormal )
     i1 = ihypo
@@ -242,23 +289,9 @@ if ( master ) then
     j = i1(1)
     k = i1(2)
     l = i1(3)
-    write( 9, * ) 'samax    =  ', samax,       ';'
-    write( 9, * ) 'svmax    =  ', svmax,       ';'
-    write( 9, * ) 'sumax    =  ', sumax,       ';'
-    write( 9, * ) 'tnmax    =  ', tnmax,       ';'
-    write( 9, * ) 'tsmax    =  ', tsmax,       ';'
-    write( 9, * ) 'slmax    =  ', slmax,       ';'
-    write( 9, * ) 'tarrmax  =  ', tarrmax,     ';'
-    write( 9, * ) 'tarrhypo =  ', tarr(j,k,l), ';'
-    write( 9, * ) 'work     =  ', work,       ';'
-    write( 9, * ) 'efrac    =  ', efrac,       ';'
-    write( 9, * ) 'samaxi   = [', samaxi   - nnoff, '];'
-    write( 9, * ) 'svmaxi   = [', svmaxi   - nnoff, '];'
-    write( 9, * ) 'sumaxi   = [', sumaxi   - nnoff, '];'
-    write( 9, * ) 'tnmaxi   = [', tnmaxi   - nnoff, '];'
-    write( 9, * ) 'tsmaxi   = [', tsmaxi   - nnoff, '];'
-    write( 9, * ) 'slmaxi   = [', slmaxi   - nnoff, '];'
-    write( 9, * ) 'tarrmaxi = [', tarrmaxi - nnoff, '];'
+    call rwrite( '00/tarrhypo', tarr(j,k,l), it )
+    call rwrite( '00/work',     work,        it )
+    call rwrite( '00/efrac',    efrac,       it )
   end if
   close( 9 )              
 end if

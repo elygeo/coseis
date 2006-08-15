@@ -5,12 +5,9 @@ contains
 
 subroutine timestep
 use m_globals
-use m_tictoc
 use m_collective
 integer :: i1(3), i2(3), j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 real :: de
-
-if ( master ) call toc( 'Time integration' )
 
 ! Time integration
 it = it + 1
