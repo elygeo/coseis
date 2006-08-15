@@ -3,6 +3,7 @@ module m_output
 implicit none
 contains
 
+! Write integer binary timeseries
 subroutine iwrite( filename, i, ir )
 character(*), intent(in) :: filename
 integer, intent(in) :: i, ir
@@ -17,6 +18,7 @@ write( 1, rec=ir ) i
 close( 1 )
 end subroutine
 
+! Write real binary timeseries
 subroutine rwrite( filename, r, ir )
 character(*), intent(in) :: filename
 real, intent(in) :: r
@@ -32,66 +34,7 @@ write( 1, rec=ir ) r
 close( 1 )
 end subroutine
 
-subroutine minwrite( filename, s, ir, nn, nnoff, i2d, master )
-character(*), intent(in) :: filename
-real, intent(in) :: s(:,:,:)
-integer, intent(in) :: ir, nn(3), nnoff(3), i2d
-logical, intent(in) :: master
-real :: r
-integer :: i, ii(3), reclen
-call pminloc( r, ii, s, nn, nnoff, i2d )
-ii = ii - nnoff - 1
-i = 1 + ii(1) + nn(1) * ( ii(2) + nn(2) * ii(3) )
-if ( master ) then
-  inquire( iolength=reclen ) r
-  open( 1, &
-    file=filename, &
-    recl=reclen, &
-    form='unformatted', &
-    access='direct' )
-  write( 1, rec=ir ) r
-  close( 1 )
-  filename = trim( filename ) // 'i'
-  open( 1, &
-    file=filename, &
-    recl=reclen, &
-    form='unformatted', &
-    access='direct' )
-  write( 1, rec=ir ) i
-  close( 1 )
-end if
-end subroutine
-
-subroutine maxwrite( filename, s, ir, nn, nnoff, i2d, master )
-character(*), intent(in) :: filename
-real, intent(in) :: s(:,:,:)
-integer, intent(in) :: ir, nn(3), nnoff(3), i2d
-logical, intent(in) :: master
-real :: r
-integer :: i, i1(3), reclen
-call pmaxloc( r, ii, s, nn, nnoff, i2d )
-ii = ii - nnoff - 1
-i = 1 + ii(1) + nn(1) * ( ii(2) + nn(2) * ii(3) )
-if ( master ) then
-  inquire( iolength=reclen ) r
-  open( 1, &
-    file=filename, &
-    recl=reclen, &
-    form='unformatted', &
-    access='direct' )
-  write( 1, rec=ir ) r
-  close( 1 )
-  filename = trim( filename ) // 'i'
-  open( 1, &
-    file=filename, &
-    recl=reclen, &
-    form='unformatted', &
-    access='direct' )
-  write( 1, rec=ir ) i
-  close( 1 )
-end if
-end subroutine
-
+! Main output routine
 subroutine output( pass )
 use m_globals
 use m_collectiveio
@@ -112,26 +55,82 @@ select case( pass )
 case( 1 )
   s1 = sqrt( sum( u * u, 4 ) )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
-  call maxwrite( '00/umax', s1, it, nn, nnoff, 0, master )
-  call maxwrite( '00/wmax', s2, it, nn, nnoff, 0, master )
-  if ( master .and. umax > dx / 10. ) print *, ip, 'warning: u !<< dx'
+  call pmaxloc( r1, i1, s1, nn, nnoff, 0 )
+  call pmaxloc( r2, i2, s2, nn, nnoff, 0 )
+  if ( master .and. r1 > dx / 10. ) print *, 'warning: u !<< dx'
+  if ( master ) call rwrite( '00/umax',  r1,    it )
+  if ( master ) call iwrite( '00/umaxj', i1(1), it )
+  if ( master ) call iwrite( '00/umaxk', i1(2), it )
+  if ( master ) call iwrite( '00/umaxl', i1(3), it )
+  if ( master ) call rwrite( '00/wmax',  r2,    it )
+  if ( master ) call iwrite( '00/wmaxj', i2(1), it )
+  if ( master ) call iwrite( '00/wmaxk', i2(2), it )
+  if ( master ) call iwrite( '00/wmaxl', i2(3), it )
   if ( dofault ) then
-    call maxwrite( '00/svmax', f1, it, nn, nnoff, i, master )
-    call maxwrite( '00/sumax', f2, it, nn, nnoff, i, master )
+  call pmaxloc( r1, i1, f1, nn, nnoff, i )
+  call pmaxloc( r2, i2, f2, nn, nnoff, i )
+  i1(i) = ihypo(i)
+  i2(i) = ihypo(i)
+  if ( master ) call rwrite( '00/svmax',  r1,    it )
+  if ( master ) call iwrite( '00/svmaxj', i1(1), it )
+  if ( master ) call iwrite( '00/svmaxk', i1(2), it )
+  if ( master ) call iwrite( '00/svmaxl', i1(3), it )
+  if ( master ) call rwrite( '00/sumax',  r2,    it )
+  if ( master ) call iwrite( '00/sumaxj', i2(1), it )
+  if ( master ) call iwrite( '00/sumaxk', i2(2), it )
+  if ( master ) call iwrite( '00/sumaxl', i2(3), it )
   end if
 case( 2 )
   s1 = sqrt( sum( w1 * w1, 4 ) )
   s2 = sqrt( sum( v * v, 4 ) )
   pv = max( pv, s2 )
-  call maxwrite( '00/amax', s1, it, nn, nnoff, 0, master )
-  call maxwrite( '00/vmax', s2, it, nn, nnoff, 0, master )
+  call pmaxloc( r1, i1, s1, nn, nnoff, 0 )
+  call pmaxloc( r2, i2, s2, nn, nnoff, 0 )
+  if ( master ) call rwrite( '00/amax',  r1,    it )
+  if ( master ) call iwrite( '00/amaxj', i1(1), it )
+  if ( master ) call iwrite( '00/amaxk', i1(2), it )
+  if ( master ) call iwrite( '00/amaxl', i1(3), it )
+  if ( master ) call rwrite( '00/vmax',  r2,    it )
+  if ( master ) call iwrite( '00/vmaxj', i2(1), it )
+  if ( master ) call iwrite( '00/vmaxk', i2(2), it )
+  if ( master ) call iwrite( '00/vmaxl', i2(3), it )
   if ( dofault ) then
-    call maxwrite( '00/samax',   f1,   it, nn, nnoff, i, master )
-    call maxwrite( '00/slmax',   sl,   it, nn, nnoff, i, master )
-    call minwrite( '00/tnmin',   tn,   it, nn, nnoff, i, master )
-    call maxwrite( '00/tnmax',   tn,   it, nn, nnoff, i, master )
-    call maxwrite( '00/tsmax',   ts,   it, nn, nnoff, i, master )
-    call maxwrite( '00/tarrmax', tarr, it, nn, nnoff, i, master )
+  call pmaxloc( r1, i1, f1, nn, nnoff, i )
+  call pmaxloc( r2, i2, sl, nn, nnoff, i )
+  i1(i) = ihypo(i)
+  i2(i) = ihypo(i)
+  if ( master ) call rwrite( '00/samax',  r1,    it )
+  if ( master ) call iwrite( '00/samaxj', i1(1), it )
+  if ( master ) call iwrite( '00/samaxk', i1(2), it )
+  if ( master ) call iwrite( '00/samaxl', i1(3), it )
+  if ( master ) call rwrite( '00/slmax',  r2,    it )
+  if ( master ) call iwrite( '00/slmaxj', i2(1), it )
+  if ( master ) call iwrite( '00/slmaxk', i2(2), it )
+  if ( master ) call iwrite( '00/slmaxl', i2(3), it )
+  call pminloc( r1, i1, tn, nn, nnoff, i )
+  call pmaxloc( r2, i2, tn, nn, nnoff, i )
+  i1(i) = ihypo(i)
+  i2(i) = ihypo(i)
+  if ( master ) call rwrite( '00/tnmin',  r1,    it )
+  if ( master ) call iwrite( '00/tnminj', i1(1), it )
+  if ( master ) call iwrite( '00/tnmink', i1(2), it )
+  if ( master ) call iwrite( '00/tnminl', i1(3), it )
+  if ( master ) call rwrite( '00/tnmax',  r2,    it )
+  if ( master ) call iwrite( '00/tnmaxj', i2(1), it )
+  if ( master ) call iwrite( '00/tnmaxk', i2(2), it )
+  if ( master ) call iwrite( '00/tnmaxl', i2(3), it )
+  call pmaxloc( r1, i1, ts,   nn, nnoff, i )
+  call pmaxloc( r2, i2, tarr, nn, nnoff, i )
+  i1(i) = ihypo(i)
+  i2(i) = ihypo(i)
+  if ( master ) call rwrite( '00/tsmax',  r1,    it )
+  if ( master ) call iwrite( '00/tsmaxj', i1(1), it )
+  if ( master ) call iwrite( '00/tsmaxk', i1(2), it )
+  if ( master ) call iwrite( '00/tsmaxl', i1(3), it )
+  if ( master ) call rwrite( '00/tarrmax',  r2,    it )
+  if ( master ) call iwrite( '00/tarrmaxj', i2(1), it )
+  if ( master ) call iwrite( '00/tarrmaxk', i2(2), it )
+  if ( master ) call iwrite( '00/tarrmaxl', i2(3), it )
   end if
 end select
 
@@ -184,7 +183,7 @@ case( 'psv'  ); fault = .true.
 case( 'trup' ); fault = .true.
 case( 'tarr' ); fault = .true.
 case default
-  print *, 'error: unknown output field: ' fieldout(iz)
+  print *, 'error: unknown output field: ', fieldout(iz)
   stop
 end select
 
@@ -254,7 +253,7 @@ do ic = 1, nc
   case( 'trup' ); call scalario( 'w', str, trup,     ir, i1, i2, i1l, i2l, iz )
   case( 'tarr' ); call scalario( 'w', str, tarr,     ir, i1, i2, i1l, i2l, iz )
   case default
-    print *, 'error: unknown output field 2: ' fieldout(iz)
+    print *, 'error2: unknown output field: ', fieldout(iz)
     stop
   end select
 end do

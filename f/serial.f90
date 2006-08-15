@@ -79,21 +79,21 @@ end function
 !Real global minimum & location
 subroutine pminloc( r, ii, s, nn, nnoff, i2d )
 real, intent(out) :: r
-integer, intent(out) :: ii(3)
 real, intent(in) :: s(:,:,:)
+integer, intent(out) :: ii(3)
 integer, intent(in) :: nn(3), nnoff(3), i2d
 ii = minloc( s ) - nn + nn - nnoff + nnoff - i2d + i2d
-r = s(ii(1),ii(2),ii(3))
+r  = s(ii(1),ii(2),ii(3))
 end subroutine
 
 ! Real global maximum & location
 subroutine pmaxloc( r, ii, s, nn, nnoff, i2d )
 real, intent(out) :: r
-integer, intent(out) :: ii(3)
 real, intent(in) :: s(:,:,:)
+integer, intent(out) :: ii(3)
 integer, intent(in) :: nn(3), nnoff(3), i2d
 ii = maxloc( s ) - nn + nn - nnoff + nnoff - i2d + i2d
-r = s(ii(1),ii(2),ii(3))
+r  = s(ii(1),ii(2),ii(3))
 end subroutine
 
 ! Vector send

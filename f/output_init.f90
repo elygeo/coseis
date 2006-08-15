@@ -174,7 +174,7 @@ doiz0: do iz = 1, nout
   case( 'trup' ); fault = .true.
   case( 'tarr' ); fault = .true.
   case default
-    print *, 'unknown output field: ' // fieldout(iz)
+    print *, 'unknown output field: ', fieldout(iz)
     stop
   end select
 
@@ -247,7 +247,7 @@ doiz0: do iz = 1, nout
         end do
       end if
       s1 = sum( w1 * w1, 4 )
-      call pminloc( rout, i1, s1, nn, nnoff, i )
+      call pminloc( rout, i1, s1, nn, nnoff, 0 )
     end if
     i2 = i1
     if ( rout > dx * dx ) ditout(iz) = nt + 1

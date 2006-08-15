@@ -97,31 +97,31 @@ l = ll
 end subroutine
 
 ! Real minimum
-function pmin( r )
-real :: pmin, rr
+real function pmin( r )
 real, intent(in) :: r
+real :: rr
 integer :: e
 call mpi_allreduce( r, rr, 1, mpi_real, mpi_min, comm3d, e )
 pmin = rr
 end function
 
 ! Real maximum
-function pmax( r )
-real :: pmax, rr
+real function pmax( r )
 real, intent(in) :: r
+real :: rr
 integer :: e
 call mpi_allreduce( r, rr, 1, mpi_real, mpi_max, comm3d, e )
 pmax = rr
 end function
 
 ! Real global minimum & location
-subroutine pminloc( r, ii, s, nn, nnoff, i2d )
+subroutine pminloc( r, ii, i, s, nn, nnoff, i2d )
 real, intent(out) :: r
-integer, intent(out) :: ii(3)
 real, intent(in) :: s(:,:,:)
+integer, intent(out) :: ii(3)
 integer, intent(in) :: nn(3), nnoff(3), i2d
-real :: local(2), global(2)
 integer :: i, comm, e
+real :: local(2), global(2)
 ii = ii = minloc( s )
 local(1) = s(ii(1),ii(2),ii(3))
 ii = ii - nnoff - 1
@@ -140,11 +140,11 @@ end subroutine
 ! Real global maximum & location
 subroutine pmaxloc( r, ii, s, nn, nnoff, i2d )
 real, intent(out) :: r
-integer, intent(out) :: ii(3)
 real, intent(in) :: s(:,:,:)
+integer, intent(out) :: ii(3)
 integer, intent(in) :: nn(3), nnoff(3), i2d
-real :: local(2), global(2)
 integer :: i, comm, e
+real :: local(2), global(2)
 ii = ii = maxloc( s )
 local(1) = s(ii(1),ii(2),ii(3))
 ii = ii - nnoff - 1
