@@ -18,6 +18,7 @@ use m_fault_init
 use m_fault
 use m_locknodes
 use m_timestep
+use m_tictoc
 
 ! Initialization
 call tic
@@ -37,7 +38,7 @@ if ( master ) print *, toc(), 'Finished initialization'
 
 ! Main loop
 do while ( it <= nt )
-  call tic             ; if ( master ) call write( *, *, advance='no' ) '.'
+  call tic
   call stress          ; if ( master ) call rwrite( '00/wt1', toc(), it )
   call momentsource    ; if ( master ) call rwrite( '00/wt2', toc(), it )
   call output( 1 )     ; if ( master ) call rwrite( '00/wt3', toc(), it )
