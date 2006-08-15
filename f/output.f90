@@ -38,16 +38,20 @@ end subroutine
 subroutine tictoc( filename, ir )
 character(*), intent(in), optional :: filename
 integer, intent(in), optional :: ir
-integer, save :: clock0, clockrate, clockmax
-integer :: clock1
+integer, save :: clock0, clock1, clockrate, clockmax
+integer :: clock2
 real :: t
 if ( .not. present( ir ) ) then
   call system_clock( clock0, clockrate, clockmax )
 else
-  call system_clock( clock1 )
-  t = real( clock1 - clock0 ) / real( clockrate )
-  if ( t < 0. ) t = real( clock1 - clock0 + clockmax ) / real( clockrate ) 
-  call rwrite( filename, t, ir )
+  call system_clock( clock2 )
+  t = real( clock2 - clock0 ) / real( clockrate )
+  if ( t < 0. ) t = real( clock2 - clock0 + clockmax ) / real( clockrate ) 
+  call rwrite( '00/wt_' // filename, t, ir )
+  t = real( clock2 - clock1 ) / real( clockrate )
+  if ( t < 0. ) t = real( clock2 - clock1 + clockmax ) / real( clockrate ) 
+  call rwrite( '00/wdt_' // filename, t, ir )
+  clock1 = clock2
 end if
 end subroutine
 

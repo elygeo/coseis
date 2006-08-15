@@ -231,6 +231,7 @@ open( 1, file='tn.'//endian, recl=reclen, form='unformatted', access='direct', s
 read( 1, rec=1 ) t
 close( 1 )
 tn = t(91,51)
+where( t > tn ) t = tn
 print *, 'tn before scaling: ', minval(t), tn, maxval(t)
 s1 = -maxval( abs( t ) )
 do l = l1, l2
@@ -255,14 +256,14 @@ end do
 end do
 
 ! Scale tractions
-! s1 = 1. / ( mus - mud ) * s1
 tn = 1. / ( mus - mud ) * tn
-s1 = tn
+s1 = 1. / ( mus - mud ) * s1
+ts = ts - mud * tn
 s2 = s2 - mud * s1
 
 ! Write tractions
-print *, 'tn range after scaling: ', minval( s1 ), maxval( s1 )
-print *, 'ts range after scaling: ', minval( s2 ), maxval( s2 )
+print *, 'tn after scaling: ', minval( s1 ), tn, maxval( s1 )
+print *, 'ts after scaling: ', minval( s2 ), ts, maxval( s2 )
 inquire( iolength=reclen ) s1
 open( 1, file='tn', recl=reclen, form='unformatted', access='direct' )
 open( 2, file='th', recl=reclen, form='unformatted', access='direct' )
@@ -283,7 +284,6 @@ write( 1, * ) 'n       = [ ', n, ' ];'
 write( 1, * ) 'nn      = [ ', n + (/ 0, 1, 0 /), ' ];'
 write( 1, * ) 'ihypo   = [ ', jf0+j,     kf0, -1-l, ' ];'
 write( 1, * ) 'ihypo   = [ ', jf0-j+nf1, kf0, -1-l, ' ];'
-write( 1, * ) 'tn      = ', tn, ';'
 write( 1, * ) 'mud     = ', mud, ';'
 write( 1, * ) 'mus     = [ ', mus, '''zone''', jf0, 0, -1-nf3, jf0+nf1, 0, -1, ' ];'
 write( 1, * ) 'endian  = ''', endian, ''';'

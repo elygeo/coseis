@@ -23,30 +23,30 @@ use m_timestep
 call tictoc
 call initialize( ip, np0, master )
 if ( master ) print *, 'SORD - Support Operator Rupture Dynamics'
-call inread            ; if ( master ) call tictoc( '00/wt0', 1 )
-call setup             ; if ( master ) call tictoc( '00/wt0', 2 )
-call arrays            ; if ( master ) call tictoc( '00/wt0', 3 )
-call readcheckpoint    ; if ( master ) call tictoc( '00/wt0', 4 )
-call gridgen           ; if ( master ) call tictoc( '00/wt0', 5 )
-call material          ; if ( master ) call tictoc( '00/wt0', 6 )
-call pml               ; if ( master ) call tictoc( '00/wt0', 7 )
-call momentsource_init ; if ( master ) call tictoc( '00/wt0', 8 )
-call fault_init        ; if ( master ) call tictoc( '00/wt0', 9 )
-call output_init       ; if ( master ) call tictoc( '00/wt0', 10 )
+call inread            ; if ( master ) call tictoc( 'init', 1 )
+call setup             ; if ( master ) call tictoc( 'init', 2 )
+call arrays            ; if ( master ) call tictoc( 'init', 3 )
+call readcheckpoint    ; if ( master ) call tictoc( 'init', 4 )
+call gridgen           ; if ( master ) call tictoc( 'init', 5 )
+call material          ; if ( master ) call tictoc( 'init', 6 )
+call pml               ; if ( master ) call tictoc( 'init', 7 )
+call momentsource_init ; if ( master ) call tictoc( 'init', 8 )
+call fault_init        ; if ( master ) call tictoc( 'init', 9 )
+call output_init       ; if ( master ) call tictoc( 'init', 10 )
 
 ! Main loop
 if ( master ) print *, 'Starting main loop'
 do while ( it <= nt )
   call tictoc
-  call stress          ; if ( master ) call tictoc( '00/wt1str', it )
-  call momentsource    ; if ( master ) call tictoc( '00/wt2src', it )
-  call output( 1 )     ; if ( master ) call tictoc( '00/wt3out', it )
-  call acceleration    ; if ( master ) call tictoc( '00/wt4acc', it )
-  call fault           ; if ( master ) call tictoc( '00/wt5flt', it )
-  call locknodes       ; if ( master ) call tictoc( '00/wt6lok', it )
-  call output( 2 )     ; if ( master ) call tictoc( '00/wt7out', it )
-  call writecheckpoint ; if ( master ) call tictoc( '00/wt8ckp', it )
-  call timestep        ; if ( master ) call tictoc( '00/wt9tst', it-1 )
+  call stress          ; if ( master ) call tictoc( 'm1str', it )
+  call momentsource    ; if ( master ) call tictoc( 'm2src', it )
+  call output( 1 )     ; if ( master ) call tictoc( 'm3out', it )
+  call acceleration    ; if ( master ) call tictoc( 'm4acc', it )
+  call fault           ; if ( master ) call tictoc( 'm5flt', it )
+  call locknodes       ; if ( master ) call tictoc( 'm6lok', it )
+  call output( 2 )     ; if ( master ) call tictoc( 'm7out', it )
+  call writecheckpoint ; if ( master ) call tictoc( 'm8ckp', it )
+  call timestep        ; if ( master ) call tictoc( 'm9tst', it-1 )
 end do
 
 ! Finish up
