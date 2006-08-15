@@ -119,9 +119,9 @@ if ( i2d /= 0 ) comm = comm2d(i2d)
 call mpi_allreduce( local, global, 1, mpi_2real, mpi_minloc, comm, e )
 rr = global(1)
 i = global(2)
-ii(1) = modulo( i, nn(1) )
-ii(2) = modulo( i / nn(1), nn(2) )
 ii(3) = i / ( nn(1) * nn(2) )
+ii(2) = modulo( i / nn(1), nn(2) )
+ii(1) = modulo( i, nn(1) )
 ii = ii + 1 + nnoff
 end subroutine
 
@@ -142,9 +142,9 @@ if ( i2d /= 0 ) comm = comm2d(i2d)
 call mpi_allreduce( local, global, 1, mpi_2real, mpi_maxloc, comm, e )
 rr = global(1)
 i = global(2)
-ii(1) = modulo( i, nn(1) )
-ii(2) = modulo( i / nn(1), nn(2) )
 ii(3) = i / ( nn(1) * nn(2) )
+ii(2) = modulo( i / nn(1), nn(2) )
+ii(1) = modulo( i, nn(1) )
 ii = ii + 1 + nnoff
 end subroutine
 

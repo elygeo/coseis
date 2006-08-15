@@ -12,8 +12,10 @@ if ~volviz
     i2s(i) = i2s(i) + 1;
   end
 end
-i1s(4) = icursor(4);
-i2s(4) = icursor(4);
+it = icursor(4);
+t = it * dt;
+i1s(4) = it;
+i2s(4) = it;
 
 % Read field data
 msg = read4d( field, i1s, i2s );
@@ -38,14 +40,13 @@ case 3, v = s; s = sqrt( sum( v .* v, 4 ) );
 case 6, v = s; s = sqrt( sum( v .* v, 4 ) + 2. * sum( v .* v, 4 ) );
 end
 
-% Read metadata
-it = icursor(4);
-t = it * dt;
+% Metadata
 labels = fieldlabels( field, 0 );
 cellfocus = any( strcmp( field, { 'w', 'wm' } ) );
 isfault = any( strcmp( field, { 'nhat' 't0' 'mus' 'mud' 'dc' 'co' 'sa' 'sv' 'su' 'ts' 't' 'sam' 'svm' 'sum' 'tnm' 'tsm' 'sl' 'f' 'svp' 'trup' 'tarr' } ) );
-fmaxi = [ 0 0 0 ];
-fmax = max(s(:));
+[ fmax, i ] = max( s(:) );
+[ j, k, l ] = ind2sub( size( s ), i );
+fmaxi = [ j k l ];
 flim = lim;
 if flim < 0, flim = fmax; end
 

@@ -14,17 +14,17 @@ case { 'h', 'f1' }
     set( hmsg(5), 'String', '' )
   else
     set( hmsg(5), 'String', ...
-      { 'Field             F   XY-Cursor    Arrows   Zoom            < >'
-        'Magnitude         0   Z-Cursor  PgUp PgDn   Zoom Out          /'
-        'Component       1-6   T-Cursor        ; ''   Reset View    Alt-/'
-        'Volumes/Slices    V   Hypocenter     Home   Perspective       P'
-        'Slice         J K L   Extremum        End   Color Scale     [ ]'
-        'Glyphs            G   Render        Enter   Round CS          \\'
-        'Isosurfaces       I   Render next   Space   Auto CS       Alt-\\'
-        'Surfaces          S   Save snapshot   Ins   Fold CS           C'
-        'Mesh              M   Save movie        R   Color scheme  Alt-C'
-        'Outline           O   Clean     Backspace   Time Series       T'
-        'Axes              A   Restart       Alt-Q   Filtered TS   Alt-T'
+      { 'Field              F   XY-Cursor     Arrows   Zoom             - +'
+        'Magnitude          0   Z-Cursor    Page , .   Zoom Out         Del'
+        'Component        1-6   T-Cursor         ; ''   Reset View   Alt-Del'
+        'Volumes/Slices     V   Hypocenter    Home /   Perspective        P'
+        'Slice          J K L   Extremum       End E   Color Scale      [ ]'
+        'Glyphs             G   Render         Enter   Auto CS            \\'
+        'Isosurfaces        I   Render next    Space   Round CS       Alt-\\'
+        'Surfaces           S   Save snapshot  Ins W   Fold CS            C'
+        'Mesh               M   Save movie         R   Color scheme   Alt-C'
+        'Outline            O   Clean      Backspace   Time Series        T'
+        'Axes               A   Restart        Alt-Q   Filtered TS    Alt-T'
       } )
   end
 case 'f'
@@ -52,14 +52,14 @@ case 'leftarrow',  dicursor = [ -10^km 0 0 0 ]; cursor
 case 'rightarrow', dicursor = [  10^km 0 0 0 ]; cursor
 case 'downarrow',  dicursor = [ 0 -10^km 0 0 ]; cursor
 case 'uparrow',    dicursor = [ 0  10^km 0 0 ]; cursor
-case 'pagedown',   dicursor = [ 0 0 -10^km 0 ]; cursor
-case 'pageup',     dicursor = [ 0 0  10^km 0 ]; cursor
 case 'semicolon',  dicursor = [ 0 0 0 -10^km ]; cursor
 case 'quote',      dicursor = [ 0 0 0  10^km ]; cursor
-case 'home', dicursor = 0; icursor(1:3) = ihypo; cursor; msg = 'Hypocenter';
-case 'end',  dicursor = 0; icursor(1:3) = fmaxi; cursor; msg = 'Extreme value';
-case 'return',     render
-case 'insert',     snap
+case { 'comma',  'pagedown' }, dicursor = [ 0 0 -10^km 0 ]; cursor
+case { 'period', 'pageup'   }, dicursor = [ 0 0  10^km 0 ]; cursor
+case { 'slash', 'home' }, dicursor = 0; icursor(1:3) = ihypo; cursor; msg = 'Hypocenter';
+case { 'e',     'end'  }, dicursor = 0; icursor(1:3) = fmaxi; cursor; msg = 'Extreme value';
+case { 'w',   'insert' }, snap
+case 'return', render
 case 'space'
   rehash
   currentstep
@@ -89,20 +89,20 @@ case 'r'
     rehash
     currentstep
   end
-case 'backspace'
+case 'escape'
   delete( hhud )
   hhud = [];
   set( hmsg, 'String', '' )
-case 'comma'
+case 'hyphen'
   msg = 'Zoom out';
-  if ~km, camva( 1.25 * camva )
-  else    camva( 4 * camva )
+  if ~km, camva( camva * 1.1 )
+  else    camva( camva * 4   )
   end
   panviz = 0;
-case 'period'
+case 'equal'
   msg = 'Zoom In';
-  if ~km, camva( .8 * camva )
-  else    camva( .25 * camva )
+  if ~km, camva( camva / 1.1 )
+  else    camva( camva / 4   )
   end
   if length( hhud )
     campos( campos + xcursor - camtarget )
@@ -129,7 +129,7 @@ case 'p'
     camup( upvec )
     campos( camtarget + pos )
   end
-case 'slash'
+case 'backspace'
   panviz = 0;
   if km
     msg = 'Reset View';
@@ -187,7 +187,7 @@ case 'rightbracket'
   set( htxt(1), 'String', sprintf( '%g', clim(1) ) )
   set( htxt(2), 'String', sprintf( '%g', clim(2) ) )
 case 'backslash'
-  if km
+  if ~km
     msg = 'Auto Color Scale';
     lim = -1;
     clim = fmax * [ -1 1 ];
