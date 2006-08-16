@@ -16,7 +16,7 @@ logical :: fault, dofault, test, cell
 i = 0
 if ( master ) then
   i = 1
-  print *, 'Output initialize'
+  print *, 'Output initialization'
   inquire( file='currentstep', exist=test )
   if ( test .and. it == 1 ) then
     print *, 'error: previous output found'

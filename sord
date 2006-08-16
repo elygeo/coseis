@@ -254,7 +254,8 @@ if [ $optimize = g ]; then
   chmod a-w "$rundir"/*.f90
 fi
 cd "$rundir"
-mkdir 00
+mkdir stats
+mkdir clock
 mkdir checkpoint
 mkdir debug
 i=0
