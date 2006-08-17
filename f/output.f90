@@ -9,11 +9,11 @@ character(*), intent(in) :: filename
 integer, intent(in) :: val, it
 integer :: i
 inquire( iolength=i ) val
-open( 1, &
-  file=filename, &
-  recl=i, &
-  form='unformatted', &
-  access='direct' )
+if ( it == 1 ) then
+  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
+else
+  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+end if
 write( 1, rec=it ) val
 close( 1 )
 end subroutine
@@ -25,11 +25,11 @@ real, intent(in) :: val
 integer, intent(in) :: it
 integer :: i
 inquire( iolength=i ) val
-open( 1, &
-  file=filename, &
-  recl=i, &
-  form='unformatted', &
-  access='direct' )
+if ( it == 1 ) then
+  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
+else
+  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+end if
 write( 1, rec=it ) val
 close( 1 )
 end subroutine
@@ -44,10 +44,11 @@ integer, intent(in) :: it, nn(3), nnoff(3), ihypo(3), i2d
 integer :: ii(3)
 call pminloc( rr, ii, r, nn, nnoff, i2d )
 if ( i2d /= 0 ) ii(i2d) = ihypo(i2d)
+ii = ii - nnoff
 call rwrite( 'stats/' // filename // 'min', rr, it )
-!call iwrite( 'stats/' // filename // 'min1', ii(1), it )
-!call iwrite( 'stats/' // filename // 'min2', ii(2), it )
-!call iwrite( 'stats/' // filename // 'min3', ii(3), it )
+call iwrite( 'stats/' // filename // 'min1', ii(1), it )
+call iwrite( 'stats/' // filename // 'min2', ii(2), it )
+call iwrite( 'stats/' // filename // 'min3', ii(3), it )
 end subroutine
 
 ! Write max value
@@ -60,10 +61,11 @@ integer, intent(in) :: it, nn(3), nnoff(3), ihypo(3), i2d
 integer :: ii(3)
 call pmaxloc( rr, ii, r, nn, nnoff, i2d )
 if ( i2d /= 0 ) ii(i2d) = ihypo(i2d)
+ii = ii - nnoff
 call rwrite( 'stats/' // filename // 'max', rr, it )
-!call iwrite( 'stats/' // filename // 'max1', ii(1), it )
-!call iwrite( 'stats/' // filename // 'max2', ii(2), it )
-!call iwrite( 'stats/' // filename // 'max3', ii(3), it )
+call iwrite( 'stats/' // filename // 'max1', ii(1), it )
+call iwrite( 'stats/' // filename // 'max2', ii(2), it )
+call iwrite( 'stats/' // filename // 'max3', ii(3), it )
 end subroutine
 
 ! Write timing info
@@ -109,7 +111,7 @@ case( 1 )
   s1 = sqrt( sum( u * u, 4 ) )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
   call statmax( rr, s1, 'u', it, nn, nnoff, ihypo, 0 )
-  if ( master .and. rr > dx / 10. ) print *, 'warning: u !<< dx'
+  if ( master .and. rr > dx / 10. ) write( 0, * ) 'warning: u !<< dx'
   call statmax( rr, s2, 'w', it, nn, nnoff, ihypo, 0 )
   if ( dofault ) then
     call statmax( rr, f1, 'sv', it, nn, nnoff, ihypo, i )
@@ -180,7 +182,7 @@ case( 'psv'  ); fault = .true.
 case( 'trup' ); fault = .true.
 case( 'tarr' ); fault = .true.
 case default
-  print *, 'error: unknown output field: ', fieldout(iz)
+  write( 0, * ) 'error: unknown output field: ', fieldout(iz)
   stop
 end select
 
@@ -250,7 +252,7 @@ do ic = 1, nc
   case( 'trup' ); call scalario( 'w', str, trup,     ir, i1, i2, i1l, i2l, iz )
   case( 'tarr' ); call scalario( 'w', str, tarr,     ir, i1, i2, i1l, i2l, iz )
   case default
-    print *, 'error2: unknown output field: ', fieldout(iz)
+    write( 0, * ) 'error2: unknown output field: ', fieldout(iz)
     stop
   end select
 end do
@@ -262,11 +264,10 @@ if ( pass == 1 ) return
 
 ! Metadata
 if ( master ) then
-  open(  1, file='currentstep', status='replace' )
+  open( 1, file='currentstep', status='replace' )
   write( 1, * ) it
   close( 1 )
-  call iwrite( 'stats/it', it, it )
-  call rwrite( 'stats/t',  t,  it )
+  call rwrite( 'stats/t', t, it )
   if ( dofault ) then
     i = abs( faultnormal )
     i1 = ihypo

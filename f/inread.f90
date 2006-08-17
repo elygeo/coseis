@@ -10,7 +10,7 @@ logical :: inzone
 character(11) :: key
 character(160) :: line
 
-if ( master ) print *, 'Reading input'
+if ( master ) write( 0, * ) 'Reading input'
 
 open( 1, file='input', status='old' )
 
@@ -103,7 +103,7 @@ case( 'lock' );
   i = nlock
   read( str, * ) ilock(i,:), i1lock(i,:), i2lock(i,:)
 case default
-  if ( master ) print *, 'bad input: ', trim( line )
+  if ( master ) write( 0, * ) 'bad input: ', trim( line )
   stop
 end select
 
@@ -126,7 +126,7 @@ if ( inzone ) then
     case( 'zone' ); read( str, * ) i1in(i,:), i2in(i,:)
     case( 'cube' ); read( str, * ) x1in(i,:), x2in(i,:); intype(i) = 'c'
     case default
-      if ( master ) print *, 'bad input: ', trim( line )
+      if ( master ) write( 0, * ) 'bad input: ', trim( line )
       stop
     end select
   end if

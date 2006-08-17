@@ -11,7 +11,7 @@ logical, save :: init = .true.
 
 if ( init ) then
   if ( nlock > nz ) then
-    print *, 'too many lock zones, make nz bigger ', nlock, nz
+    write( 0, * ) 'too many lock zones, make nz bigger ', nlock, nz
     stop 
   end if
   do iz = 1, nlock

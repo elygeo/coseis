@@ -15,7 +15,7 @@ integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc
 real :: sumsrcfr
 
 if ( rsource <= 0. ) return
-if ( master ) print *, 'Moment source initialize'
+if ( master ) write( 0, * ) 'Moment source initialize'
 
 ! Indices
 i1 = i1cell
@@ -51,7 +51,7 @@ select case( rfunc )
 case( 'box'  ); srcfr = 1.
 case( 'tent' ); srcfr = pack( s2, s2 <= rsource )
 case default
-  print *, 'invalid rfunc: ', trim( rfunc )
+  write( 0, * ) 'invalid rfunc: ', trim( rfunc )
   stop
 end select
 
@@ -96,7 +96,7 @@ case( 'brune'  ); srcft = 1. - exp( -t / tsource ) / tsource * ( t + tsource )
 case( 'sbrune' ); srcft = 1. - exp( -t / tsource ) / tsource * &
   ( t + tsource + t * t / tsource / 2. )
 case default
-  print *, 'invalid tfunc: ', trim( tfunc )
+  write( 0, * ) 'invalid tfunc: ', trim( tfunc )
   stop
 end select
 

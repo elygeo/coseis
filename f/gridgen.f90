@@ -13,7 +13,7 @@ integer :: i1(3), i2(3), i1l(3), i2l(3), n(3), &
 real :: x1, x2, m(9)
 logical :: expand
 
-if ( master ) print *, 'Grid generation'
+if ( master ) write( 0, * ) 'Grid generation'
 
 ! Single node indexing
 idoublenode = 0
@@ -115,10 +115,7 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 symmetry = max( min( symmetry, 1 ), -1 )
 where( i1 /= i2 ) symmetry = 2 * symmetry
-if( any( symmetry /= 0 .and. np /= 1 ) ) then
-  print *, 'np(i) must = 1 for symmetry(i)', np, symmetry
-  stop
-end if
+if( any( symmetry /= 0 .and. np /= 1 ) ) stop 'np(i) must = 1 for symmetry(i)'
 j = symmetry(1)
 k = symmetry(2)
 l = symmetry(3)

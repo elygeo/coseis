@@ -73,9 +73,7 @@ do a = 1, 3
       + x(j-1,k+1,l,b) * ( x(j-1,k,l,c) - x(j,k+1,l,c) ) &
       + x(j+1,k-1,l,b) * ( x(j+1,k,l,c) - x(j,k-1,l,c) ) )
     end forall
-  case default
-    print *, 'error: surfnormal ', ifn
-    stop
+  case default; stop 'error: surfnormal'
   end select
 end do
 

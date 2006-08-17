@@ -13,7 +13,7 @@ real :: x1(3), x2(3)
 integer :: i1(3), i2(3), i1l(3), i2l(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, iz, idoublenode
 
-if ( master ) print *, 'Material model'
+if ( master ) write( 0, * ) 'Material model'
 
 ! Input
 mr = 0.
@@ -93,8 +93,7 @@ end do doiz
 
 ! Extrema
 if ( any( mr /= mr ) .or. any( s1 /= s1 ) .or. any( s2 /= s2 ) ) then
-  print *, 'NaNs in velocity model!'
-  stop
+  stop 'NaNs in velocity model!'
 end if
 where ( mr < rho1 ) mr = rho1
 where ( mr > rho2 ) mr = rho2

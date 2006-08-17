@@ -8,7 +8,7 @@ use m_globals
 real :: tol, test
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2
 
-if ( master ) print *, 'Operator optimization'
+if ( master ) write( 0, * ) 'Operator optimization'
 
 ! Grid gradient
 i1 = i1cell

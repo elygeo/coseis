@@ -22,7 +22,7 @@ use m_timestep
 ! Initialization
 call clock
 call initialize( ip, np0, master )
-if ( master ) print *, 'SORD - Support Operator Rupture Dynamics'
+if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
 call inread            ; if ( master ) call clock( '0ini', 1 )
 call setup             ; if ( master ) call clock( '0ini', 2 )
 call arrays            ; if ( master ) call clock( '0ini', 3 )
@@ -35,9 +35,9 @@ call fault_init        ; if ( master ) call clock( '0ini', 9 )
 call output_init       ; if ( master ) call clock( '0ini', 10 )
 
 ! Main loop
-if ( master ) print *, 'Main loop'
+if ( master ) write( 0, * ) 'Main loop'
 do while ( it <= nt )
-  call clock           ; if ( master ) write( *, '(a)', advance='no' ) '.'
+  call clock           ; if ( master ) write( 0, '(a)', advance='no' ) '.'
   call stress          ; if ( master ) call clock( '1str', it )
   call momentsource    ; if ( master ) call clock( '2src', it )
   call output( 1 )     ; if ( master ) call clock( '3out', it )
@@ -47,12 +47,12 @@ do while ( it <= nt )
   call output( 2 )     ; if ( master ) call clock( '7out', it )
   call writecheckpoint ; if ( master ) call clock( '8ckp', it )
   call timestep        ; if ( master ) call clock( '9tst', it-1 )
-  if ( master .and. mod( it-1, 50 ) == 0 ) print *, it-1
+  if ( master .and. mod( it-1, 50 ) == 0 ) write( 0, * ) it-1
 end do
 
 ! Finish up
-if ( master .and. mod( nt, 50 ) /= 0 ) print *, ''
-if ( master ) print *, 'Finished!'
+if ( master .and. mod( nt, 50 ) /= 0 ) write( 0, '(a)' ) ''
+if ( master ) write( 0, * ) 'Finished!'
 call finalize
 
 end program

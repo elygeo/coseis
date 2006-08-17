@@ -16,18 +16,15 @@ logical :: fault, dofault, test, cell
 i = 0
 if ( master ) then
   i = 1
-  print *, 'Output initialization'
+  write( 0, * ) 'Output initialization'
   inquire( file='currentstep', exist=test )
-  if ( test .and. it == 1 ) then
-    print *, 'error: previous output found'
-    stop
-  end if
+  if ( test .and. it == 1 ) stop 'error: previous output found'
 end if
 
 ! Diagnostic
 if ( debug /= 0 ) then
   write( str, '(a,i6.6,a)' ) 'debug/db', ip, '.m'
-  open(  1, file=str, status='replace' )
+  open( 1, file=str, status='replace' )
   write( 1, * ) 'ifn         =  ', ifn,         ';'
   write( 1, * ) 'nin         =  ', nin,         ';'
   write( 1, * ) 'nout        =  ', nout,        ';'
@@ -71,7 +68,7 @@ if ( master ) then
   endian = 'l'
   if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
   courant = dt * vp2 * sqrt( 3. ) / abs( dx )
-  open(  1, file='meta.m', status='replace' )
+  open( 1, file='meta.m', status='replace' )
   write( 1, * ) 'dx          =  ', dx,      ';'
   write( 1, * ) 'rsource     =  ', rsource, ';'
   write( 1, * ) 'rcrit       =  ', rcrit,   ';'
@@ -118,10 +115,7 @@ if ( master ) then
   write( 1, * ) 'endian      = ''', endian, ''';'
 end if
 
-if ( nout > nz ) then
-  print *, 'too many output zones, make nz bigger', nout, nz
-  stop
-end if
+if ( nout > nz ) stop 'too many output zones, make nz bigger'
 
 ! Test for fault
 dofault = .false.
@@ -173,7 +167,7 @@ doiz0: do iz = 1, nout
   case( 'trup' ); fault = .true.
   case( 'tarr' ); fault = .true.
   case default
-    print *, 'unknown output field: ', fieldout(iz)
+    write( 0, * ) 'unknown output field: ', fieldout(iz)
     stop
   end select
 
@@ -263,10 +257,7 @@ doiz0: do iz = 1, nout
     write( 1, '(a,i3,a,i1,a,7i7,a)' ) ' out{', iz, '}    = { ', nc, field, ditout(iz), i1 - nnoff, i2 - nnoff, ' };'
   end if
  
-  if ( any( i2 < i1 ) ) then
-    print *, 'bad output indices', i1, i2
-    stop
-  end if
+  if ( any( i2 < i1 ) ) stop 'bad output indices'
   i1out(iz,:) = i1
   i2out(iz,:) = i2
  

@@ -9,7 +9,7 @@ use m_collective
 use m_zone
 integer :: nl(3), n(3), ip3master(3), i
 
-if ( master ) print *, 'Setup'
+if ( master ) write( 0, * ) 'Setup'
 
 ! Hypocenter
 n = nn
@@ -59,10 +59,7 @@ i1pml = nnoff + npml
 i2pml = nnoff + nn + 1 - npml
 where ( ibc1 /= 1 ) i1pml = 0
 where ( ibc2 /= 1 ) i2pml = nm + 1
-if ( any( i1pml >= i2pml ) ) then
-  print *, 'model too small for PML', npml
-  stop
-end if
+if ( any( i1pml >= i2pml ) ) stop 'model too small for PML'
 
 ! Map hypocenter to local index, test if fault on this processor
 ihypo = ihypo + nnoff

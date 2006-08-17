@@ -13,7 +13,7 @@ real :: mus0, mud0, dc0, lc, tn0, ts0, ess, rctest, x1(3), x2(3), rr
 integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
 
 if ( ifn == 0 ) return
-if ( master ) print *, 'Fault initialization'
+if ( master ) write( 0, * ) 'Fault initialization'
 
 ! Input
 mus = 0.
@@ -104,7 +104,7 @@ end select
 end do
 
 ! Sanity check
-if ( any( t3(:,:,:,1) > 0.) ) print *, 'warning: positive normal traction'
+if ( any( t3(:,:,:,1) > 0.) ) write( 0, * ) 'warning: positive normal traction'
 
 ! Lock fault in PML region
 i1 = max( i1pml + 1, 1 )
@@ -210,7 +210,7 @@ if ( master ) then
   if ( tn0 * ( mus0 - mud0 ) == 0. ) lc = 0.
   rctest = rho0 * vs0 ** 2. * tn0 * ( mus0 - mud0 ) * dc0 &
     / ( ts0 - tn0 * mud0 ) ** 2
-  open(  1, file='faultmeta.m', status='replace' )
+  open( 1, file='faultmeta.m', status='replace' )
   write( 1, * ) 'mus0   = ', mus0,   '; % static friction at hypocenter'
   write( 1, * ) 'mud0   = ', mud0,   '; % dynamic friction at hypocenter'
   write( 1, * ) 'dc0    = ', dc0,    '; % dc at hypocenter'

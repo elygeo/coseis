@@ -21,16 +21,11 @@ end if
 call pimin( i, it )
 it = i
 if ( it == 1 ) return
-if ( master ) print *, 'Checkpoint found, starting from ', it
+if ( master ) write( 0, * ) 'Checkpoint found, starting from ', it
 write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', it, '-', ip
 inquire( iolength=i ) &
   t, v, u, pv, z1, z2, sl, svm, psv, trup, tarr, efrac, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
-open( 1, &
-  file=str, &
-  recl=i, &
-  form='unformatted', &
-  access='direct', &
-  status='old' )
+open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) &
   t, v, u, pv, z1, z2, sl, svm, psv, trup, tarr, efrac, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
 close( 1 )
@@ -50,12 +45,7 @@ ip = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
 write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', it, '-', ip
 inquire( iolength=i ) &
   t, v, u, pv, z1, z2, sl, svm, psv, trup, tarr, efrac, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
-open( 1, &
-  file=str, &
-  recl=i, &
-  form='unformatted', &
-  access='direct', &
-  status='replace' )
+open( 1, file=str, recl=i, form='unformatted', access='direct', status='replace' )
 write( 1, rec=1 ) &
   t, v, u, pv, z1, z2, sl, svm, psv, trup, tarr, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
 close( 1 )
