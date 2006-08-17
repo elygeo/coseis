@@ -5,7 +5,7 @@ contains
 
 subroutine inread
 use m_globals
-integer :: i, err
+integer :: i
 logical :: inzone
 character(11) :: key
 character(160) :: line
@@ -17,8 +17,8 @@ open( 1, file='input', status='old' )
 doline: do
 
 ! Read line
-read( 1, '(a)', iostat=err ) line
-if ( err /= 0 ) exit doline
+read( 1, '(a)', iostat=i ) line
+if ( i /= 0 ) exit doline
 if ( line == '' ) cycle doline
 
 str = line

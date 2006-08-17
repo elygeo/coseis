@@ -4,33 +4,33 @@ implicit none
 contains
 
 ! Write integer binary timeseries
-subroutine iwrite( filename, i, it )
+subroutine iwrite( filename, val, it )
 character(*), intent(in) :: filename
-integer, intent(in) :: i, it
-integer :: reclen
-inquire( iolength=reclen ) i
+integer, intent(in) :: val, it
+integer :: i
+inquire( iolength=i ) val
 open( 1, &
   file=filename, &
-  recl=reclen, &
+  recl=i, &
   form='unformatted', &
   access='direct' )
-write( 1, rec=it ) i
+write( 1, rec=it ) val
 close( 1 )
 end subroutine
 
 ! Write real binary timeseries
-subroutine rwrite( filename, r, it )
+subroutine rwrite( filename, val, it )
 character(*), intent(in) :: filename
-real, intent(in) :: r
+real, intent(in) :: val
 integer, intent(in) :: it
-integer :: reclen
-inquire( iolength=reclen ) r
+integer :: i
+inquire( iolength=i ) val
 open( 1, &
   file=filename, &
-  recl=reclen, &
+  recl=i, &
   form='unformatted', &
   access='direct' )
-write( 1, rec=it ) r
+write( 1, rec=it ) val
 close( 1 )
 end subroutine
 
