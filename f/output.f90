@@ -45,9 +45,9 @@ integer :: ii(3)
 call pminloc( rr, ii, r, nn, nnoff, i2d )
 if ( i2d /= 0 ) ii(i2d) = ihypo(i2d)
 call rwrite( 'stats/' // filename // 'min', rr, it )
-call iwrite( 'stats/' // filename // 'min1', ii(1), it )
-call iwrite( 'stats/' // filename // 'min2', ii(2), it )
-call iwrite( 'stats/' // filename // 'min3', ii(3), it )
+!call iwrite( 'stats/' // filename // 'min1', ii(1), it )
+!call iwrite( 'stats/' // filename // 'min2', ii(2), it )
+!call iwrite( 'stats/' // filename // 'min3', ii(3), it )
 end subroutine
 
 ! Write max value
@@ -61,9 +61,9 @@ integer :: ii(3)
 call pmaxloc( rr, ii, r, nn, nnoff, i2d )
 if ( i2d /= 0 ) ii(i2d) = ihypo(i2d)
 call rwrite( 'stats/' // filename // 'max', rr, it )
-call iwrite( 'stats/' // filename // 'max1', ii(1), it )
-call iwrite( 'stats/' // filename // 'max2', ii(2), it )
-call iwrite( 'stats/' // filename // 'max3', ii(3), it )
+!call iwrite( 'stats/' // filename // 'max1', ii(1), it )
+!call iwrite( 'stats/' // filename // 'max2', ii(2), it )
+!call iwrite( 'stats/' // filename // 'max3', ii(3), it )
 end subroutine
 
 ! Write timing info
