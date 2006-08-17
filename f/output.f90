@@ -4,9 +4,9 @@ implicit none
 contains
 
 ! Write integer binary timeseries
-subroutine iwrite( filename, i, ir )
+subroutine iwrite( filename, i, it )
 character(*), intent(in) :: filename
-integer, intent(in) :: i, ir
+integer, intent(in) :: i, it
 integer :: reclen
 inquire( iolength=reclen ) i
 open( 1, &
@@ -14,15 +14,15 @@ open( 1, &
   recl=reclen, &
   form='unformatted', &
   access='direct' )
-write( 1, rec=ir ) i
+write( 1, rec=it ) i
 close( 1 )
 end subroutine
 
 ! Write real binary timeseries
-subroutine rwrite( filename, r, ir )
+subroutine rwrite( filename, r, it )
 character(*), intent(in) :: filename
 real, intent(in) :: r
-integer, intent(in) :: ir
+integer, intent(in) :: it
 integer :: reclen
 inquire( iolength=reclen ) r
 open( 1, &
@@ -30,61 +30,59 @@ open( 1, &
   recl=reclen, &
   form='unformatted', &
   access='direct' )
-write( 1, rec=ir ) r
+write( 1, rec=it ) r
 close( 1 )
 end subroutine
 
-! Write min value and location
-subroutine statmin( rr, filename, r, x, nn, nnoff, ir, i2d )
+! Write min value
+subroutine statmin( rr, r, filename, it, nn, nnoff, ihypo, i2d )
+use m_collective
 real, intent(out) :: rr
-real, intent(in) :: r(:,:,:), x(:,:,:,:)
+real, intent(in) :: r(:,:,:)
 character(*), intent(in) :: filename
-integer, intent(in) :: nn(3), nnoff(3), ir, i2d
-integer :: ii(3), j, k, l
+integer, intent(in) :: it, nn(3), nnoff(3), ihypo(3), i2d
+integer :: ii(3)
 call pminloc( rr, ii, r, nn, nnoff, i2d )
-j = ii(1)
-k = ii(2)
-l = ii(3)
-call rwrite( 'stats/' // filename // 'minv', rr, ir )
-call rwrite( 'stats/' // filename // 'minx', x(j,k,l,1), ir )
-call rwrite( 'stats/' // filename // 'miny', x(j,k,l,2), ir )
-call rwrite( 'stats/' // filename // 'minz', x(j,k,l,3), ir )
+if ( i2d /= 0 ) ii(i2d) = ihypo(i2d)
+call rwrite( 'stats/' // filename // 'min', rr, it )
+call iwrite( 'stats/' // filename // 'min1', ii(1), it )
+call iwrite( 'stats/' // filename // 'min2', ii(2), it )
+call iwrite( 'stats/' // filename // 'min3', ii(3), it )
 end subroutine
 
-! Write max value and location
-subroutine statmax( rr, filename, r, x, nn, nnoff, ir, i2d )
+! Write max value
+subroutine statmax( rr, r, filename, it, nn, nnoff, ihypo, i2d )
+use m_collective
 real, intent(out) :: rr
-real, intent(in) :: r(:,:,:), x(:,:,:,:)
+real, intent(in) :: r(:,:,:)
 character(*), intent(in) :: filename
-integer, intent(in) :: nn(3), nnoff(3), ir, i2d
-integer :: ii(3), j, k, l
+integer, intent(in) :: it, nn(3), nnoff(3), ihypo(3), i2d
+integer :: ii(3)
 call pmaxloc( rr, ii, r, nn, nnoff, i2d )
-j = ii(1)
-k = ii(2)
-l = ii(3)
-call rwrite( 'stats/' // filename // 'maxv', rr, ir )
-call iwrite( 'stats/' // filename // 'maxx', x(j,k,l,1), ir )
-call iwrite( 'stats/' // filename // 'maxy', x(j,k,l,2), ir )
-call iwrite( 'stats/' // filename // 'maxz', x(j,k,l,3), ir )
+if ( i2d /= 0 ) ii(i2d) = ihypo(i2d)
+call rwrite( 'stats/' // filename // 'max', rr, it )
+call iwrite( 'stats/' // filename // 'max1', ii(1), it )
+call iwrite( 'stats/' // filename // 'max2', ii(2), it )
+call iwrite( 'stats/' // filename // 'max3', ii(3), it )
 end subroutine
 
 ! Write timing info
-subroutine clock( filename, ir )
+subroutine clock( filename, it )
 character(*), intent(in), optional :: filename
-integer, intent(in), optional :: ir
+integer, intent(in), optional :: it
 integer, save :: clock0, clock1, clockrate, clockmax
 integer :: clock2
 real :: t
-if ( .not. present( ir ) ) then
+if ( .not. present( it ) ) then
   call system_clock( clock0, clockrate, clockmax )
 else
   call system_clock( clock2 )
   t = real( clock2 - clock0 ) / real( clockrate )
   if ( t < 0. ) t = real( clock2 - clock0 + clockmax ) / real( clockrate ) 
-  call rwrite( 'clock/tt' // filename, t, ir )
+  call rwrite( 'clock/tt' // filename, t, it )
   t = real( clock2 - clock1 ) / real( clockrate )
   if ( t < 0. ) t = real( clock2 - clock1 + clockmax ) / real( clockrate ) 
-  call rwrite( 'clock/dt' // filename, t, ir )
+  call rwrite( 'clock/dt' // filename, t, it )
   clock1 = clock2
 end if
 end subroutine
@@ -110,30 +108,26 @@ select case( pass )
 case( 1 )
   s1 = sqrt( sum( u * u, 4 ) )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
-  call statmax( rr, 'u', s1, x, nn, nnoff, 0 )
+  call statmax( rr, s1, 'u', it, nn, nnoff, ihypo, 0 )
   if ( master .and. rr > dx / 10. ) print *, 'warning: u !<< dx'
-  call statmax( rr, 'w', s2, x, nn, nnoff, 0 )
+  call statmax( rr, s2, 'w', it, nn, nnoff, ihypo, 0 )
   if ( dofault ) then
-    i1 = nnoff
-    i1(i) = ihypo(i)
-    call statmax( rr, 'sv', f1, x, nn, i1, i )
-    call statmax( rr, 'su', f2, x, nn, i1, i )
+    call statmax( rr, f1, 'sv', it, nn, nnoff, ihypo, i )
+    call statmax( rr, f2, 'su', it, nn, nnoff, ihypo, i )
   end if
 case( 2 )
   s1 = sqrt( sum( w1 * w1, 4 ) )
   s2 = sqrt( sum( v * v, 4 ) )
-  call statmax( rr, 'a', s1, x, nn, nnoff, 0 )
-  call statmax( rr, 'v', s2, x, nn, nnoff, 0 )
+  call statmax( rr, s1, 'a', it, nn, nnoff, ihypo, 0 )
+  call statmax( rr, s2, 'v', it, nn, nnoff, ihypo, 0 )
   pv = max( pv, s2 )
   if ( dofault ) then
-    i1 = nnoff
-    i1(i) = ihypo(i)
-    call statmax( rr, 'sa', f1, x, nn, i1, i )
-    call statmax( rr, 'sl', sl, x, nn, i1, i )
-    call statmin( rr, 'tn', tn, x, nn, i1, i )
-    call statmax( rr, 'tn', tn, x, nn, i1, i )
-    call statmax( rr, 'ts', ts, x, nn, i1, i )
-    call statmax( rr, 'tarr', tarr, x, nn, i1, i )
+    call statmax( rr, f1,   'sa',   it, nn, nnoff, ihypo, i )
+    call statmax( rr, sl,   'sl',   it, nn, nnoff, ihypo, i )
+    call statmin( rr, tn,   'tn',   it, nn, nnoff, ihypo, i )
+    call statmax( rr, tn,   'tn',   it, nn, nnoff, ihypo, i )
+    call statmax( rr, ts,   'ts',   it, nn, nnoff, ihypo, i )
+    call statmax( rr, tarr, 'tarr', it, nn, nnoff, ihypo, i )
   end if
 end select
 

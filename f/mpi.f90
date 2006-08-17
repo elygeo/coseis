@@ -110,7 +110,7 @@ integer, intent(out) :: ii(3)
 integer, intent(in) :: nn(3), nnoff(3), i2d
 integer :: i, comm, e
 real :: local(2), global(2)
-ii = ii = minloc( r )
+ii = minloc( r )
 local(1) = r(ii(1),ii(2),ii(3))
 ii = ii - nnoff - 1
 local(2) = ii(1) + nn(1) * ( ii(2) + nn(2) * ii(3) )
@@ -133,7 +133,7 @@ integer, intent(out) :: ii(3)
 integer, intent(in) :: nn(3), nnoff(3), i2d
 integer :: i, comm, e
 real :: local(2), global(2)
-ii = ii = maxloc( r )
+ii = maxloc( r )
 local(1) = r(ii(1),ii(2),ii(3))
 ii = ii - nnoff - 1
 local(2) = ii(1) + nn(1) * ( ii(2) + nn(2) * ii(3) )

@@ -219,6 +219,7 @@ doiz0: do iz = 1, nout
         i = abs( faultnormal )
         f1 = sum( t1 * t1, 4 )
         call pminloc( rout, i1, f1, nn, nnoff, i )
+        i1(i) = ihypo(i)
       end if
     else
       w1 = rmax
@@ -249,6 +250,7 @@ doiz0: do iz = 1, nout
       call pminloc( rout, i1, s1, nn, nnoff, 0 )
     end if
     i2 = i1
+    if ( any( i1 < i1node ) .or. any( i2 > i2node ) ) ditout(iz) = nt + 1
     if ( rout > dx * dx ) ditout(iz) = nt + 1
   end select
 

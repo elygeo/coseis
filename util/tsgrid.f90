@@ -13,8 +13,8 @@ character :: endian
 open( 1, file='dx', status='old' )
 read( 1, * ) dx
 close( 1 )
-mus = 1.
-mud = .1
+mus = .667
+mud = .333
 ell = (/ 600, 300, 80 /) * 1000
 exag = 1.
 npml = 10
@@ -232,7 +232,7 @@ read( 1, rec=1 ) t
 close( 1 )
 tn = t(91,51)
 where( t > tn ) t = tn
-print *, 'tn before scaling: ', minval(t), tn, maxval(t)
+print *, 'tn before scaling: ', minval(t), maxval(t), sum(t)/size(t), tn
 s1 = -maxval( abs( t ) )
 do l = l1, l2
 do j = j1, j2
@@ -245,7 +245,7 @@ open( 1, file='th.'//endian, recl=reclen, form='unformatted', access='direct', s
 read( 1, rec=1 ) t
 close( 1 )
 ts = t(91,51)
-print *, 'ts before scaling: ', minval(t), ts, maxval(t)
+print *, 'ts before scaling: ', minval(t), maxval(t), sum(t)/size(t), ts
 s2 = 0.
 do l = l1, l2
 do j = j1, j2
@@ -256,14 +256,16 @@ end do
 end do
 
 ! Scale tractions
-tn = 1. / ( mus - mud ) * tn
-s1 = 1. / ( mus - mud ) * s1
+print *, 'stress drop: ', ts
+tn = tn / ( mus - mud )
+s1 = s1 / ( mus - mud )
 ts = ts - mud * tn
 s2 = s2 - mud * s1
+print *, 'stress drop: ', abs(ts) - mud*abs(tn)
 
 ! Write tractions
-print *, 'tn after scaling: ', minval( s1 ), tn, maxval( s1 )
-print *, 'ts after scaling: ', minval( s2 ), ts, maxval( s2 )
+print *, 'tn after scaling: ', minval(s1), maxval(s1), sum(s1)/size(s1), tn
+print *, 'ts after scaling: ', minval(s2), maxval(s2), sum(s2)/size(s2), ts
 inquire( iolength=reclen ) s1
 open( 1, file='tn', recl=reclen, form='unformatted', access='direct' )
 open( 2, file='th', recl=reclen, form='unformatted', access='direct' )

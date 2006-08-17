@@ -295,6 +295,14 @@ lc = dc*mu/(tu - tf)
 Estimate dc needed to resolve breakdown zone
 dc =~ (3 or 4)*dx*(tu - tf)/mu
 
+Work
+e_work = int_a su_i * ( t0_i + t_i ) / 2 * da
+
+Fracture energy
+e_frac = int_t int_a sv_i * t_i * da * dt
+
+Ratiated energy
+e_radiate = e_work - e_frac
 
 PRETRACTION
 
