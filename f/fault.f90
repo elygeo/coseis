@@ -100,6 +100,12 @@ do i = 1, 3
 end do
 call vectorbc( w1, ibc1, ibc2, nhalo )
 
+! Work
+t1 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
+r = .5 * sum( sum( ( t0(j1:j2,k1:k2,l1:l2,:) + t3(j1:j2,k1:k2,l1:l2,:) ) &
+  * t1(j1:j2,k1:k2,l1:l2,:), 4 ) * area(j1:j2,k1:k2,l1:l2) )
+call psum( work, r, ifn )
+
 ! Save slip acceleration for output
 t1 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
 f1 = sqrt( sum( t1 * t1, 4 ) )

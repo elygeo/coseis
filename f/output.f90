@@ -252,7 +252,7 @@ do ic = 1, nc
   case( 'trup' ); call scalario( 'w', str, trup,     ir, i1, i2, i1l, i2l, iz )
   case( 'tarr' ); call scalario( 'w', str, tarr,     ir, i1, i2, i1l, i2l, iz )
   case default
-    write( 0, * ) 'error2: unknown output field: ', fieldout(iz)
+    write( 0, * ) 'error: unknown output field: ', fieldout(iz)
     stop
   end select
 end do
