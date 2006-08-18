@@ -147,6 +147,9 @@ doiz0: do iz = 1, nout
   case( 'wm'   ); cell = .true.
   case( 'nhat' ); fault = .true.; ditout(iz) = 0; nc = 3
   case( 't0'   ); fault = .true.; ditout(iz) = 0; nc = 3
+  case( 'ts0'  ); fault = .true.; ditout(iz) = 0; nc = 3
+  case( 'tsm0' ); fault = .true.; ditout(iz) = 0
+  case( 'tn0'  ); fault = .true.; ditout(iz) = 0
   case( 'mus'  ); fault = .true.; ditout(iz) = 0
   case( 'mud'  ); fault = .true.; ditout(iz) = 0
   case( 'dc'   ); fault = .true.; ditout(iz) = 0
@@ -159,7 +162,7 @@ doiz0: do iz = 1, nout
   case( 'sam'  ); fault = .true.
   case( 'svm'  ); fault = .true.
   case( 'sum'  ); fault = .true.
-  case( 'tnm'  ); fault = .true.
+  case( 'tn'   ); fault = .true.
   case( 'tsm'  ); fault = .true.
   case( 'sl'   ); fault = .true.
   case( 'f'    ); fault = .true.
@@ -269,19 +272,22 @@ doiz0: do iz = 1, nout
  
 end do doiz0
 
-! For step 1, pass 1
-w1 = 0.
-s1 = 0.
-t1 = 0.
-t2 = 0.
-f1 = 0.
-f2 = 0.
- 
-! Wall time
+! Close metadata file
 if ( master ) then
   close( 1 )
 end if
 
+! Init arrays
+w1 = 0.
+w2 = 0.
+s1 = 0.
+s2 = 0.
+t1 = 0.
+t2 = 0.
+t3 = 0.
+f1 = 0.
+f2 = 0.
+ 
 end subroutine
 
 end module

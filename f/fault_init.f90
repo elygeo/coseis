@@ -182,6 +182,14 @@ do i = 1, 3
 end do
 rhypo = sqrt( sum( t3 * t3, 4 ) )
 
+! Save for output
+tn = sum( t0 * nhat, 4 )
+do i = 1, 3
+  t2(:,:,:,i) = tn * nhat(:,:,:,i)
+end do
+t3 = t0 - t2
+ts = sqrt( sum( t3 * t3, 4 ) )
+
 ! Halos
 call scalarswaphalo( mus, nhalo )
 call scalarswaphalo( mud, nhalo )

@@ -50,18 +50,18 @@ l3 = i1(3); l4 = i2(3)
 f1 = dt * area * ( mr(j1:j2,k1:k2,l1:l2) + mr(j3:j4,k3:k4,l3:l4) )
 where ( f1 /= 0. ) f1 = 1. / f1
 do i = 1, 3
-  t3(:,:,:,i) = t0(:,:,:,i) + f1 * &
+  t1(:,:,:,i) = t0(:,:,:,i) + f1 * &
     ( v(j3:j4,k3:k4,l3:l4,i) + dt * w1(j3:j4,k3:k4,l3:l4,i) &
     - v(j1:j2,k1:k2,l1:l2,i) - dt * w1(j1:j2,k1:k2,l1:l2,i) )
 end do
 
 ! Decompose traction to normal and shear components
-tn = sum( t3 * nhat, 4 )
+tn = sum( t1 * nhat, 4 )
 do i = 1, 3
-  t1(:,:,:,i) = tn * nhat(:,:,:,i)
+  t2(:,:,:,i) = tn * nhat(:,:,:,i)
 end do
-t2 = t3 - t1
-ts = sqrt( sum( t2 * t2, 4 ) )
+t3 = t1 - t2
+ts = sqrt( sum( t3 * t3, 4 ) )
 
 ! Slip-weakening friction law
 where ( tn > 0. ) tn = 0.
@@ -78,37 +78,26 @@ if ( rcrit > 0. .and. vrup > 0. ) then
 end if
 
 ! Shear traction bounded by friction
-f2 = f1
-f1 = 1.
-where ( ts > f2 ) f1 = f2 / ts
+f2 = 1.
+where ( ts > f1 ) f2 = f1 / ts
 do i = 1, 3
-  t2(:,:,:,i) = f1 * t2(:,:,:,i)
+  t3(:,:,:,i) = f2 * t3(:,:,:,i)
 end do
 
 ! Total traction
-t3 = t1 + t2
+t1 = t2 + t3
 
-! Save for output
-tn = sum( t3 * nhat, 4 )
-ts = f1 * ts
+! Save normal and shear traction for output
+tn = sum( t1 * nhat, 4 )
+ts = f2 * ts
 
 ! Update acceleration
 do i = 1, 3
-  f1 = area * ( t3(:,:,:,i) - t0(:,:,:,i) )
+  f2 = area * ( t1(:,:,:,i) - t0(:,:,:,i) )
   w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f1 * mr(j1:j2,k1:k2,l1:l2)
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f1 * mr(j3:j4,k3:k4,l3:l4)
 end do
 call vectorbc( w1, ibc1, ibc2, nhalo )
-
-! Work
-t1 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
-r = .5 * sum( sum( ( t0(j1:j2,k1:k2,l1:l2,:) + t3(j1:j2,k1:k2,l1:l2,:) ) &
-  * t1(j1:j2,k1:k2,l1:l2,:), 4 ) * area(j1:j2,k1:k2,l1:l2) )
-call psum( work, r, ifn )
-
-! Save slip acceleration for output
-t1 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
-f1 = sqrt( sum( t1 * t1, 4 ) )
 
 ! If a neighboring processor contains only one side of the fault, then we must
 ! send the correct fault wall solution to it.
