@@ -198,16 +198,16 @@ case( 'mu'   );
 case( 'lam'  );
 case( 'y'    );
 case( 'a'    ); nc = 3
-case( 'am'   );
 case( 'v'    ); nc = 3
+case( 'u'    ); nc = 3; onpass = 1
+case( 'w'    ); nc = 6; onpass = 1
+case( 'am'   );
 case( 'vm'   );
-case( 'pv'   );
-case( 'u'    ); onpass = 1; nc = 3
 case( 'um'   ); onpass = 1
-case( 'w'    ); onpass = 1; nc = 6
 case( 'wm'   ); onpass = 1
+case( 'pv'   );
 case( 'nhat' ); fault = .true.; nc = 3
-case( 'ts0'  ); fault = .true.; onpass = 1; nc = 3
+case( 'ts0'  ); fault = .true.; nc = 3; onpass = 1
 case( 'tsm0' ); fault = .true.; onpass = 1
 case( 'tn0'  ); fault = .true.; onpass = 1
 case( 'mus'  ); fault = .true.
@@ -215,16 +215,16 @@ case( 'mud'  ); fault = .true.
 case( 'dc'   ); fault = .true.
 case( 'co'   ); fault = .true.
 case( 'sa'   ); fault = .true.; nc = 3
-case( 'sam'  ); fault = .true.
 case( 'sv'   ); fault = .true.; nc = 3
-case( 'svm'  ); fault = .true.
-case( 'psv'  ); fault = .true.
-case( 'su'   ); fault = .true.; onpass = 1; nc = 3
-case( 'sl'   ); fault = .true.
-case( 'sum'  ); fault = .true.; onpass = 1
+case( 'su'   ); fault = .true.; nc = 3; onpass = 1
 case( 'ts'   ); fault = .true.; nc = 3
+case( 'sam'  ); fault = .true.
+case( 'svm'  ); fault = .true.
+case( 'sum'  ); fault = .true.; onpass = 1
 case( 'tsm'  ); fault = .true.
 case( 'tn'   ); fault = .true.
+case( 'sl'   ); fault = .true.
+case( 'psv'  ); fault = .true.
 case( 'trup' ); fault = .true.
 case( 'tarr' ); fault = .true.
 case default
@@ -266,35 +266,35 @@ do ic = 1, nc
   case( 'lam'  ); call scalario( 'w', str, lam,      ir, i1, i2, i1l, i2l, iz )
   case( 'y'    ); call scalario( 'w', str, y,        ir, i1, i2, i1l, i2l, iz )
   case( 'a'    ); call vectorio( 'w', str, w1,   ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'am'   ); call scalario( 'w', str, s1,       ir, i1, i2, i1l, i2l, iz )
   case( 'v'    ); call vectorio( 'w', str, v,    ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'vm'   ); call scalario( 'w', str, s2,       ir, i1, i2, i1l, i2l, iz )
-  case( 'pv'   ); call scalario( 'w', str, pv,       ir, i1, i2, i1l, i2l, iz )
   case( 'u'    ); call vectorio( 'w', str, u,    ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'um'   ); call scalario( 'w', str, s1,       ir, i1, i2, i1l, i2l, iz )
   case( 'w'    );
    if ( ic < 4 )  call vectorio( 'w', str, w1, ic,   ir, i1, i2, i1l, i2l, iz )
    if ( ic > 3 )  call vectorio( 'w', str, w2, ic-3, ir, i1, i2, i1l, i2l, iz )
+  case( 'am'   ); call scalario( 'w', str, s1,       ir, i1, i2, i1l, i2l, iz )
+  case( 'vm'   ); call scalario( 'w', str, s2,       ir, i1, i2, i1l, i2l, iz )
+  case( 'um'   ); call scalario( 'w', str, s1,       ir, i1, i2, i1l, i2l, iz )
   case( 'wm'   ); call scalario( 'w', str, s2,       ir, i1, i2, i1l, i2l, iz )
+  case( 'pv'   ); call scalario( 'w', str, pv,       ir, i1, i2, i1l, i2l, iz )
   case( 'nhat' ); call vectorio( 'w', str, nhat, ic, ir, i1, i2, i1l, i2l, iz )
   case( 'ts0'  ); call vectorio( 'w', str, t3,   ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'tsm0' ); call vectorio( 'w', str, ts,       ir, i1, i2, i1l, i2l, iz )
-  case( 'tn0'  ); call vectorio( 'w', str, tn,       ir, i1, i2, i1l, i2l, iz )
+  case( 'tsm0' ); call scalario( 'w', str, ts,       ir, i1, i2, i1l, i2l, iz )
+  case( 'tn0'  ); call scalario( 'w', str, tn,       ir, i1, i2, i1l, i2l, iz )
   case( 'mus'  ); call scalario( 'w', str, mus,      ir, i1, i2, i1l, i2l, iz )
   case( 'mud'  ); call scalario( 'w', str, mud,      ir, i1, i2, i1l, i2l, iz )
   case( 'dc'   ); call scalario( 'w', str, dc,       ir, i1, i2, i1l, i2l, iz )
   case( 'co'   ); call scalario( 'w', str, co,       ir, i1, i2, i1l, i2l, iz )
   case( 'sa'   ); call vectorio( 'w', str, t1,   ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'sam'  ); call scalario( 'w', str, f1,       ir, i1, i2, i1l, i2l, iz )
   case( 'sv'   ); call vectorio( 'w', str, t2,   ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'svm'  ); call scalario( 'w', str, f2,       ir, i1, i2, i1l, i2l, iz )
-  case( 'psv'  ); call scalario( 'w', str, psv,      ir, i1, i2, i1l, i2l, iz )
   case( 'su'   ); call vectorio( 'w', str, t1,   ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'sum'  ); call scalario( 'w', str, f1,       ir, i1, i2, i1l, i2l, iz )
-  case( 'sl'   ); call scalario( 'w', str, sl,       ir, i1, i2, i1l, i2l, iz )
   case( 'ts'   ); call vectorio( 'w', str, t3,   ic, ir, i1, i2, i1l, i2l, iz )
+  case( 'sam'  ); call scalario( 'w', str, f1,       ir, i1, i2, i1l, i2l, iz )
+  case( 'svm'  ); call scalario( 'w', str, f2,       ir, i1, i2, i1l, i2l, iz )
+  case( 'sum'  ); call scalario( 'w', str, f1,       ir, i1, i2, i1l, i2l, iz )
   case( 'tsm'  ); call scalario( 'w', str, ts,       ir, i1, i2, i1l, i2l, iz )
   case( 'tn'   ); call scalario( 'w', str, tn,       ir, i1, i2, i1l, i2l, iz )
+  case( 'sl'   ); call scalario( 'w', str, sl,       ir, i1, i2, i1l, i2l, iz )
+  case( 'psv'  ); call scalario( 'w', str, psv,      ir, i1, i2, i1l, i2l, iz )
   case( 'trup' ); call scalario( 'w', str, trup,     ir, i1, i2, i1l, i2l, iz )
   case( 'tarr' ); call scalario( 'w', str, tarr,     ir, i1, i2, i1l, i2l, iz )
   case default
