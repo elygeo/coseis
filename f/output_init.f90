@@ -137,16 +137,15 @@ doiz0: do iz = 1, nout
   case( 'lam'  ); ditout(iz) = 0; cell = .true.
   case( 'y'    ); ditout(iz) = 0; cell = .true.
   case( 'a'    ); nc = 3
-  case( 'v'    ); nc = 3
-  case( 'u'    ); nc = 3
-  case( 'w'    ); nc = 6; cell = .true.
   case( 'am'   );
+  case( 'v'    ); nc = 3
   case( 'vm'   );
   case( 'pv'   );
+  case( 'u'    ); nc = 3
   case( 'um'   );
+  case( 'w'    ); nc = 6; cell = .true.
   case( 'wm'   ); cell = .true.
   case( 'nhat' ); fault = .true.; ditout(iz) = 0; nc = 3
-  case( 't0'   ); fault = .true.; ditout(iz) = 0; nc = 3
   case( 'ts0'  ); fault = .true.; ditout(iz) = 0; nc = 3
   case( 'tsm0' ); fault = .true.; ditout(iz) = 0
   case( 'tn0'  ); fault = .true.; ditout(iz) = 0
@@ -155,18 +154,16 @@ doiz0: do iz = 1, nout
   case( 'dc'   ); fault = .true.; ditout(iz) = 0
   case( 'co'   ); fault = .true.; ditout(iz) = 0
   case( 'sa'   ); fault = .true.; nc = 3
-  case( 'sv'   ); fault = .true.; nc = 3
-  case( 'su'   ); fault = .true.; nc = 3
-  case( 'ts'   ); fault = .true.; nc = 3
-  case( 't'    ); fault = .true.; nc = 3
   case( 'sam'  ); fault = .true.
+  case( 'sv'   ); fault = .true.; nc = 3
   case( 'svm'  ); fault = .true.
-  case( 'sum'  ); fault = .true.
-  case( 'tn'   ); fault = .true.
-  case( 'tsm'  ); fault = .true.
-  case( 'sl'   ); fault = .true.
-  case( 'f'    ); fault = .true.
   case( 'psv'  ); fault = .true.
+  case( 'su'   ); fault = .true.; nc = 3
+  case( 'sum'  ); fault = .true.
+  case( 'sl'   ); fault = .true.
+  case( 'ts'   ); fault = .true.; nc = 3
+  case( 'tsm'  ); fault = .true.
+  case( 'tn'   ); fault = .true.
   case( 'trup' ); fault = .true.
   case( 'tarr' ); fault = .true.
   case default

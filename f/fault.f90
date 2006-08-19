@@ -88,7 +88,7 @@ end do
 ! Total traction
 t1 = t2 + t3
 
-! Save normal and shear traction for output
+! Save for output
 tn = sum( t1 * nhat, 4 )
 ts = f2 * ts
 
@@ -112,6 +112,9 @@ r1 = dt * sum( sum( t1(j1:j2,k1:k2,l1:l2,:) * t2(j1:j2,k1:k2,l1:l2,:), 4 ) &
   * area(j1:j2,k1:k2,l1:l2) )
 call psum( r2, r1, ifn )
 efrac = efrac + r2
+
+! Hold slip velocity for slip path length time integration
+f2 = sqrt( sum( t2 * t2, 4 ) )
 
 ! If a neighboring processor contains only one side of the fault, then we must
 ! send the correct fault wall solution to it.
