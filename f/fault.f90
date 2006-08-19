@@ -8,6 +8,7 @@ use m_globals
 use m_collectiveio
 use m_bc
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
+real :: r1, r2
 
 ! If the two sides of the fault are split accross domains, than we must retrieve
 ! the correct solution from the processor that contains both sides. Corrisponding
@@ -98,6 +99,19 @@ do i = 1, 3
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f1 * mr(j3:j4,k3:k4,l3:l4)
 end do
 call vectorbc( w1, ibc1, ibc2, nhalo )
+
+! Work
+t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
+r1 = .5 * sum( sum( ( t0(j1:j2,k1:k2,l1:l2,:) + t1(j1:j2,k1:k2,l1:l2,:) ) &
+  * t2(j1:j2,k1:k2,l1:l2,:), 4 ) * area(j1:j2,k1:k2,l1:l2) )
+call psum( work, r1, ifn )
+
+! Facture enegry
+t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
+r1 = dt * sum( sum( t1(j1:j2,k1:k2,l1:l2,:) * t2(j1:j2,k1:k2,l1:l2,:), 4 ) &
+  * area(j1:j2,k1:k2,l1:l2) )
+call psum( r2, r1, ifn )
+efrac = efrac + r2
 
 ! If a neighboring processor contains only one side of the fault, then we must
 ! send the correct fault wall solution to it.

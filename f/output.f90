@@ -72,9 +72,9 @@ subroutine output( pass )
 use m_globals
 use m_collectiveio
 integer, intent(in) :: pass
-real :: r1, r2
+real :: r1, r2, r3, r4
 real, save :: efrac = 0.
-integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, &
+integer :: i1(3), i2(3), i3(3), i4(3), i1l(3), i2l(3), i, j, k, l, &
   j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4, onpass, nc, ic, ir, iz
 logical :: fault, dofault
 
@@ -105,89 +105,79 @@ case( 1 )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
   call pmaxloc( r1, i1, s1, nn, nnoff, 0 )
   call pmaxloc( r2, i2, s2, nn, nnoff, 0 )
-  if ( master .and. r1 > dx / 10. ) write( 0, * ) 'warning: u !<< dx'
-  if ( master ) call stats( r1, i1-nnoff, 'umax', it )
-  if ( master ) call stats( r2, i2-nnoff, 'wmax', it )
+  if ( master ) then
+    if ( r1 > dx / 10. ) write( 0, * ) 'warning: u !<< dx'
+    call stats( r1, i1-nnoff, 'umax', it )
+    call stats( r2, i2-nnoff, 'wmax', it )
+  end if
   if ( dofault ) then
     t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
     f2 = sqrt( sum( t2 * t2, 4 ) )
-    psv = max( psv, f2 )
-    sl = sl + dt * f2
-    call pmaxloc( r1, i1, s1, nn, nnoff, 0 )
-    i1(i) = ihypo(i)
-    if ( master ) call stats( r1, i1-nnoff, 'svmax', it )
-    if ( it == 1 ) then
-      tn = sum( t0 * nhat, 4 )
-      do i = 1, 3
-        t2(:,:,:,i) = tn * nhat(:,:,:,i)
-      end do
-      t3 = t0 - t2
-      ts = sqrt( sum( t3 * t3, 4 ) )
-    end if
     if ( svtol > 0. ) then
-      where ( f1 >= svtol .and. trup > 1e8 )
-        trup = t - dt * ( .5 + ( svtol - f1 ) / ( svm - f1 ) )
+      where ( f2 >= svtol .and. trup > 1e8 )
+        trup = t - dt * ( .5 + ( svtol - f2 ) / ( f1 - f2 ) )
       end where
-      where ( f1 >= svtol )
+      where ( f2 >= svtol )
         tarr = 1e9
       end where
-      where ( f1 < svtol .and. svm >= svtol )
-        tarr = t - dt * ( .5 + ( svtol - f1 ) / ( svm - f1 ) )
+      where ( f2 < svtol .and. f1 >= svtol )
+        tarr = t - dt * ( .5 + ( svtol - f2 ) / ( f1 - f2 ) )
       end where
     end if
-    call pmaxloc( r1, i1, f1,   nn, nnoff, i, )
-    call pmaxloc( r2, i2, tarr, nn, nnoff, i, )
+    t1 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
+    f1 = sqrt( sum( t1 * t1, 4 ) )
+    i = abs( faultnormal )
+    call pmaxloc( r1, i1, s1,   nn, nnoff, i )
+    call pmaxloc( r2, i2, f1,   nn, nnoff, i )
+    call pmaxloc( r3, i3, tarr, nn, nnoff, i )
     i1(i) = ihypo(i)
     i2(i) = ihypo(i)
-    if ( master ) call stats( r1, i1-nnoff, 'samax',   it )
-    if ( master ) call stats( r2, i2-nnoff, 'tarrmax', it )
+    i3(i) = ihypo(i)
+    if ( master ) then
+      call stats( r1, i1-nnoff, 'svmax',   it )
+      call stats( r2, i2-nnoff, 'samax',   it )
+      call stats( r3, i3-nnoff, 'tarrmax', it )
+      i = abs( faultnormal )
+      i1 = ihypo
+      i1(i) = 1
+      j = i1(1)
+      k = i1(2)
+      l = i1(3)
+      call rwrite( 'stats/tarrhypo', tarr(j,k,l), it )
+    end if
   end if
 case( 2 )
   if ( dofault ) then
-    i = abs( faultnormal )
-    i1 = ihypo
-    i1(i) = 1
-    j = i1(1)
-    k = i1(2)
-    l = i1(3)
-    call rwrite( 'stats/tarrhypo', tarr(j,k,l), it )
   end if
   close( 9 )              
   s1 = sqrt( sum( w1 * w1, 4 ) )
   s2 = sqrt( sum( v * v, 4 ) )
+  pv = max( pv, s2 )
   call pmaxloc( r1, i1, s1, nn, nnoff 0 )
   call pmaxloc( r2, i2, s2, nn, nnoff 0 )
-  if ( master ) call stats( r1, s1, 'amax', it )
-  if ( master ) call stats( rr, s2, 'vmax', it )
-  pv = max( pv, s2 )
+  if ( master ) then
+    call stats( r1, i1, 'amax', it )
+    call stats( r2, i2, 'vmax', it )
+  end if
   if ( dofault ) then
-    tn = sum( t1 * nhat, 4 )
-    do i = 1, 3
-      t2(:,:,:,i) = tn * nhat(:,:,:,i)
-    end do
-    t3 = t1 - t2
-    ts = sqrt( sum( t3 * t3, 4 ) )
-
-    call pminloc( r1, i1, tn, nn, nnoff 0 ); i1(ifn) = ihypo(ifn)
-    call pmaxloc( r2, i2, tn, nn, nnoff 0 ); i1(ifn) = ihypo(ifn)
-    if ( master ) call stats( r1, i1-nnoff, 'tnmin', it )
-    if ( master ) call stats( r2, i2-nnoff, 'tnmax', it )
-    call pmaxloc( r1, i1, t2, nn, nnoff 0 ); i1(ifn) = ihypo(ifn)
-    if ( master ) call stats( r1, i1-nnoff, 'tnmax', it )
-
-    t1 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
+    t1 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
+    t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
     f1 = sqrt( sum( t1 * t1, 4 ) )
-
-    r1 = .5 * sum( sum( ( t0(j1:j2,k1:k2,l1:l2,:) + t3(j1:j2,k1:k2,l1:l2,:) ) &
-      * t1(j1:j2,k1:k2,l1:l2,:), 4 ) * area(j1:j2,k1:k2,l1:l2) )
-    call psum( r2, r1, ifn )
-    if ( master ) call rwrite( 'stats/work', r2, it )
-
-    r1 = dt * sum( sum( t1(j1:j2,k1:k2,l1:l2,:) * t3(j1:j2,k1:k2,l1:l2,:), 4 ) &
-      * area(j1:j2,k1:k2,l1:l2) )
-    call psum( r2, r1, ifn )
-    efrac = efrac + r2
-    if ( master ) call rwrite( 'stats/efrac', efrac, it )
+    f2 = sqrt( sum( t2 * t2, 4 ) )
+    psv = max( psv, f2 )
+    call pminloc( r1, i1, tn, nn, nnoff 0 )
+    call pmaxloc( r2, i2, tn, nn, nnoff 0 )
+    call pmaxloc( r3, i3, t2, nn, nnoff 0 )
+    i1(ifn) = ihypo(ifn)
+    i2(ifn) = ihypo(ifn)
+    i3(ifn) = ihypo(ifn)
+    if ( master ) then
+      call stats( r1, i1-nnoff, 'tnmin', it )
+      call stats( r2, i2-nnoff, 'tnmax', it )
+      call stats( r3, i3-nnoff, 'tnmax', it )
+      call rwrite( 'stats/work', work, it )
+      call rwrite( 'stats/efrac', efrac, it )
+    end if
   end if
 end select
 
@@ -219,7 +209,9 @@ case( 'pv'   );
 case( 'um'   ); onpass = 1
 case( 'wm'   ); onpass = 1
 case( 'nhat' ); fault = .true.; nc = 3
-case( 't0'   ); fault = .true.; nc = 3
+case( 'ts0'  ); fault = .true.; nc = 3
+case( 'tsm0' ); fault = .true.
+case( 'tn0'  ); fault = .true.
 case( 'mus'  ); fault = .true.
 case( 'mud'  ); fault = .true.
 case( 'dc'   ); fault = .true.
@@ -228,7 +220,6 @@ case( 'sa'   ); fault = .true.; nc = 3
 case( 'sv'   ); fault = .true.; nc = 3; onpass = 1
 case( 'su'   ); fault = .true.; nc = 3; onpass = 1
 case( 'ts'   ); fault = .true.; nc = 3
-case( 't'    ); fault = .true.; nc = 3
 case( 'sam'  ); fault = .true.
 case( 'svm'  ); fault = .true.; onpass = 1
 case( 'sum'  ); fault = .true.; onpass = 1
