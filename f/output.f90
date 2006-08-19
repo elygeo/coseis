@@ -73,7 +73,6 @@ use m_globals
 use m_collectiveio
 integer, intent(in) :: pass
 real :: r1, r2, r3, r4, r5
-real, save :: efrac = 0.
 integer :: i1(3), i2(3), i3(3), i4(3), i5(3), i1l(3), i2l(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4, onpass, nc, ic, ir, iz
 logical :: fault, dofault
@@ -141,9 +140,6 @@ case( 1 )
     end if
   end if
 case( 2 )
-  if ( dofault ) then
-  end if
-  close( 9 )              
   s1 = sqrt( sum( w1 * w1, 4 ) )
   s2 = sqrt( sum( v * v, 4 ) )
   pv = max( pv, s2 )
@@ -306,7 +302,7 @@ end do
 end do doiz !------------------------------------------------------------------!
 
 ! Interation counter
-if ( master .and. pass == 1 ) return
+if ( master .and. pass == 2 ) then
   open( 1, file='currentstep', status='replace' )
   write( 1, * ) it
   close( 1 )
