@@ -71,7 +71,6 @@ real, allocatable, dimension(:,:,:) :: &
   area,          & ! fault element area
   rhypo,         & ! radius to hypocenter
   sl,            & ! **slip path length
-  svm,           & ! **slip velocity magnitude
   psv,           & ! **peak slip velocity magnitude
   trup,          & ! **rupture time
   tarr,          & ! **rise time
@@ -112,8 +111,6 @@ real :: &
   vrup,          & ! nucleation rupture velocity
   rcrit,         & ! nucleation critical radius
   trelax,        & ! nucleation relaxation time
-  efrac,         & ! fracture energy
-  work,          & ! stored energy change
   svtol            ! slip velocity for determining rupture time
 
 integer, dimension(3) :: &

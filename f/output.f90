@@ -73,7 +73,9 @@ use m_globals
 use m_collectiveio
 integer, intent(in) :: pass
 real :: r1, r2
-integer :: onpass, i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, nc, ic, ir, iz
+real, save :: efrac = 0.
+integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, &
+  j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4, onpass, nc, ic, ir, iz
 logical :: fault, dofault
 
 ! Test for fault
@@ -87,11 +89,16 @@ end if
 if ( master ) call rwrite( 'stats/t', t, it )
 i1 = i1node
 i2 = i1node
-i1(ifn) = 1
-i2(ifn) = 1 
+i1(ifn) = ihypo(ifn)
+i2(ifn) = ihypo(ifn)
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
+i1(ifn) = ihypo(ifn) + 1
+i2(ifn) = ihypo(ifn) + 1
+j3 = i1(1); j4 = i2(1)
+k3 = i1(2); k4 = i2(2)
+l3 = i1(3); l4 = i2(3)
 select case( pass )
 case( 1 )
   s1 = sqrt( sum( u * u, 4 ) )
@@ -136,6 +143,16 @@ case( 1 )
     if ( master ) call stats( r2, i2-nnoff, 'tarrmax', it )
   end if
 case( 2 )
+  if ( dofault ) then
+    i = abs( faultnormal )
+    i1 = ihypo
+    i1(i) = 1
+    j = i1(1)
+    k = i1(2)
+    l = i1(3)
+    call rwrite( 'stats/tarrhypo', tarr(j,k,l), it )
+  end if
+  close( 9 )              
   s1 = sqrt( sum( w1 * w1, 4 ) )
   s2 = sqrt( sum( v * v, 4 ) )
   call pmaxloc( r1, i1, s1, nn, nnoff 0 )
@@ -161,15 +178,15 @@ case( 2 )
     t1 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
     f1 = sqrt( sum( t1 * t1, 4 ) )
 
-    r = .5 * sum( sum( ( t0(j1:j2,k1:k2,l1:l2,:) + t3(j1:j2,k1:k2,l1:l2,:) ) &
+    r1 = .5 * sum( sum( ( t0(j1:j2,k1:k2,l1:l2,:) + t3(j1:j2,k1:k2,l1:l2,:) ) &
       * t1(j1:j2,k1:k2,l1:l2,:), 4 ) * area(j1:j2,k1:k2,l1:l2) )
-    call psum( work, r, ifn )
+    call psum( r2, r1, ifn )
+    if ( master ) call rwrite( 'stats/work', r2, it )
 
-    r = dt * sum( sum( t1(j1:j2,k1:k2,l1:l2,:) * t3(j1:j2,k1:k2,l1:l2,:), 4 ) &
+    r1 = dt * sum( sum( t1(j1:j2,k1:k2,l1:l2,:) * t3(j1:j2,k1:k2,l1:l2,:), 4 ) &
       * area(j1:j2,k1:k2,l1:l2) )
-    call psum( de, r, ifn )
-    efrac = efrac + de
-    if ( master ) call rwrite( 'stats/work', work, it )
+    call psum( r2, r1, ifn )
+    efrac = efrac + r2
     if ( master ) call rwrite( 'stats/efrac', efrac, it )
   end if
 end select
@@ -302,24 +319,11 @@ end do
 
 end do doiz !------------------------------------------------------------------!
 
-! Return if not on acceleration pass
-if ( pass == 1 ) return
-
-! Metadata
-if ( master ) then
+! Interation counter
+if ( master .and. pass == 1 ) return
   open( 1, file='currentstep', status='replace' )
   write( 1, * ) it
   close( 1 )
-  if ( dofault ) then
-    i = abs( faultnormal )
-    i1 = ihypo
-    i1(i) = 1
-    j = i1(1)
-    k = i1(2)
-    l = i1(3)
-    call rwrite( 'stats/tarrhypo', tarr(j,k,l), it )
-  end if
-  close( 9 )              
 end if
 
 end subroutine
