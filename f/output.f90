@@ -124,11 +124,10 @@ case( 2 )
       call stats( r1, i1-nnoff, 'samax', it )
       call stats( r2, i2-nnoff, 'svmax', it )
     end if
-    call pminloc( r1, i1, tn, nn, nnoff, i ); i3(ifn) = ihypo(ifn)
-    call pmaxloc( r2, i2, tn, nn, nnoff, i ); i4(ifn) = ihypo(ifn)
-    call pmaxloc( r3, i3, ts, nn, nnoff, i ); i5(ifn) = ihypo(ifn)
+    call pminloc( r1, i1, tn, nn, nnoff, i ); i1(ifn) = ihypo(ifn)
+    call pmaxloc( r2, i2, tn, nn, nnoff, i ); i2(ifn) = ihypo(ifn)
+    call pmaxloc( r3, i3, ts, nn, nnoff, i ); i3(ifn) = ihypo(ifn)
     if ( master ) then
-    end if
       call stats( r1, i1-nnoff, 'tnmin', it )
       call stats( r2, i2-nnoff, 'tnmax', it )
       call stats( r3, i3-nnoff, 'tsmax', it )
