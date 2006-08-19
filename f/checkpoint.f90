@@ -18,7 +18,7 @@ if ( i == 0 ) then
 end if
 call pimin( i, it )
 it = i
-if ( it == 1 ) return
+if ( it == 0 ) return
 if ( master ) write( 0, * ) 'Checkpoint found, starting from ', it
 write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', it, '-', ip
 inquire( iolength=i ) &

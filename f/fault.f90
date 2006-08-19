@@ -113,8 +113,11 @@ r1 = dt * sum( sum( t1(j1:j2,k1:k2,l1:l2,:) * t2(j1:j2,k1:k2,l1:l2,:), 4 ) &
 call psum( r2, r1, ifn )
 efrac = efrac + r2
 
-! Hold slip velocity for slip path length time integration
+! Hold for output and slip path length integration
+t1 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
+f1 = sqrt( sum( t1 * t1, 4 ) )
 f2 = sqrt( sum( t2 * t2, 4 ) )
+psv = max( psv, f2 )
 
 ! If a neighboring processor contains only one side of the fault, then we must
 ! send the correct fault wall solution to it.

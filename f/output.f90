@@ -72,9 +72,8 @@ subroutine output( pass )
 use m_globals
 use m_collectiveio
 integer, intent(in) :: pass
-real :: r1, r2, r3, r4, r5
-integer :: i1(3), i2(3), i3(3), i4(3), i5(3), i1l(3), i2l(3), &
-  i, j, k, l, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4, onpass, nc, ic, ir, iz
+real :: r1, r2, r3
+integer :: i1(3), i2(3), i3(3), i1l(3), i2l(3), i, onpass, nc, ic, ir, iz
 logical :: fault, dofault
 
 ! Test for fault
@@ -86,18 +85,6 @@ end if
 
 ! Prepare output and write stats
 if ( master ) call rwrite( 'stats/t', t, it )
-i1 = i1node
-i2 = i1node
-i1(ifn) = ihypo(ifn)
-i2(ifn) = ihypo(ifn)
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-i1(ifn) = ihypo(ifn) + 1
-i2(ifn) = ihypo(ifn) + 1
-j3 = i1(1); j4 = i2(1)
-k3 = i1(2); k4 = i2(2)
-l3 = i1(3); l4 = i2(3)
 select case( pass )
 case( 1 )
   s1 = sqrt( sum( u * u, 4 ) )
@@ -110,27 +97,8 @@ case( 1 )
     call stats( r2, i2-nnoff, 'wmax', it )
   end if
   if ( dofault ) then
-    f1 = f2
-    t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
-    f2 = sqrt( sum( t2 * t2, 4 ) )
-    if ( svtol > 0. ) then
-      where ( f2 >= svtol .and. trup > 1e8 )
-        trup = t - dt * ( .5 + ( svtol - f2 ) / ( f1 - f2 ) )
-      end where
-      where ( f2 >= svtol )
-        tarr = 1e9
-      end where
-      where ( f2 < svtol .and. f1 >= svtol )
-        tarr = t - dt * ( .5 + ( svtol - f2 ) / ( f1 - f2 ) )
-      end where
-    end if
-    t1 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
-    f1 = sqrt( sum( t1 * t1, 4 ) )
-    call pmaxloc( r1, i1, f1,   nn, nnoff, i )
-    call pmaxloc( r2, i2, tarr, nn, nnoff, i )
-    i1(i) = ihypo(i)
-    i2(i) = ihypo(i)
-    i3(i) = ihypo(i)
+    call pmaxloc( r1, i1, f1,   nn, nnoff, i ); i1(i) = ihypo(i)
+    call pmaxloc( r2, i2, tarr, nn, nnoff, i ); i2(i) = ihypo(i)
     if ( master ) then
       call stats( r1, i1-nnoff, 'sumax',   it )
       call stats( r2, i2-nnoff, 'tarrmax', it )
@@ -150,25 +118,20 @@ case( 2 )
     call stats( r2, i2-nnoff, 'vmax', it )
   end if
   if ( dofault ) then
-    psv = max( psv, f2 )
-    t1 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
-    f1 = sqrt( sum( t1 * t1, 4 ) )
-    call pmaxloc( r1, i1, f1, nn, nnoff, i )
-    call pmaxloc( r2, i2, f2, nn, nnoff, i )
-    call pminloc( r3, i3, tn, nn, nnoff, i )
-    call pmaxloc( r4, i4, tn, nn, nnoff, i )
-    call pmaxloc( r5, i5, ts, nn, nnoff, i )
-    i1(ifn) = ihypo(ifn)
-    i2(ifn) = ihypo(ifn)
-    i3(ifn) = ihypo(ifn)
-    i4(ifn) = ihypo(ifn)
-    i5(ifn) = ihypo(ifn)
+    call pmaxloc( r1, i1, f1, nn, nnoff, i ); i1(ifn) = ihypo(ifn)
+    call pmaxloc( r2, i2, f2, nn, nnoff, i ); i2(ifn) = ihypo(ifn)
     if ( master ) then
       call stats( r1, i1-nnoff, 'samax', it )
       call stats( r2, i2-nnoff, 'svmax', it )
-      call stats( r3, i3-nnoff, 'tnmin', it )
-      call stats( r4, i4-nnoff, 'tnmax', it )
-      call stats( r5, i5-nnoff, 'tsmax', it )
+    end if
+    call pminloc( r1, i1, tn, nn, nnoff, i ); i3(ifn) = ihypo(ifn)
+    call pmaxloc( r2, i2, tn, nn, nnoff, i ); i4(ifn) = ihypo(ifn)
+    call pmaxloc( r3, i3, ts, nn, nnoff, i ); i5(ifn) = ihypo(ifn)
+    if ( master ) then
+    end if
+      call stats( r1, i1-nnoff, 'tnmin', it )
+      call stats( r2, i2-nnoff, 'tnmax', it )
+      call stats( r3, i3-nnoff, 'tsmax', it )
       call rwrite( 'stats/work', work, it )
       call rwrite( 'stats/efrac', efrac, it )
     end if
