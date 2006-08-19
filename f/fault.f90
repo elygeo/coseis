@@ -8,7 +8,7 @@ use m_globals
 use m_collectiveio
 use m_bc
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
-real :: r1, r2
+real :: r1
 
 ! If the two sides of the fault are split accross domains, than we must retrieve
 ! the correct solution from the processor that contains both sides. Corrisponding
@@ -100,18 +100,17 @@ do i = 1, 3
 end do
 call vectorbc( w1, ibc1, ibc2, nhalo )
 
-! Work
+! Work & Facture enegry
 t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
-r1 = .5 * sum( sum( ( t0(j1:j2,k1:k2,l1:l2,:) + t1(j1:j2,k1:k2,l1:l2,:) ) &
-  * t2(j1:j2,k1:k2,l1:l2,:), 4 ) * area(j1:j2,k1:k2,l1:l2) )
-call psum( work, r1, ifn )
-
-! Facture enegry
+f1 = sum( ( t0 + t1 ) * t2, 4 ) * area
 t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
-r1 = dt * sum( sum( t1(j1:j2,k1:k2,l1:l2,:) * t2(j1:j2,k1:k2,l1:l2,:), 4 ) &
-  * area(j1:j2,k1:k2,l1:l2) )
-call psum( r2, r1, ifn )
-efrac = efrac + r2
+f2 = sum( t1 * t2, 4 ) * area
+do i = 1, nhalo
+  FIXME
+end do
+call psum( work, .5 * sum( f1 ), ifn )
+call psum( r1, dt * sum( f2 ), ifn )
+efrac = efrac + r1
 
 ! Hold for output and slip path length integration
 t1 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
