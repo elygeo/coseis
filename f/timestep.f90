@@ -6,7 +6,7 @@ subroutine timestep
 use m_globals
 integer :: i1(3), i2(3), j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
-! Save slip velocity
+! Save previous slip velocity
 if ( ifn /= 0 ) then
   i1 = 1
   i2 = nm

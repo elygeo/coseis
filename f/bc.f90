@@ -16,12 +16,12 @@ if ( j > 1 ) then
   forall( i=0:nhalo-1 ) f(j-i,:,:) = r
 end if
 if ( k > 1 ) then
-  forall( i=0:nhalo-1 ) f(:,1+i:,:) = r
-  forall( i=0:nhalo-1 ) f(:,k-i:,:) = r
+  forall( i=0:nhalo-1 ) f(:,1+i,:) = r
+  forall( i=0:nhalo-1 ) f(:,k-i,:) = r
 end if
 if ( l > 1 ) then
-  forall( i=0:nhalo-1 ) f(:,:,1+i:) = r
-  forall( i=0:nhalo-1 ) f(:,:,l-i:) = r
+  forall( i=0:nhalo-1 ) f(:,:,1+i) = r
+  forall( i=0:nhalo-1 ) f(:,:,l-i) = r
 end if
 end subroutine
 

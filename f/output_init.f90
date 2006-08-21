@@ -202,7 +202,7 @@ doiz0: do iz = 1, nout
         end do
         i = abs( faultnormal )
         f2 = sum( t2 * t2, 4 )
-        call sethalo( f2, rmax, nhalo )
+        call sethalo( f2, maxval( f2 ) + 1., nhalo )
         call pminloc( rout, i1, f2, nn, nnoff, i )
         i1(i) = ihypo(i)
       end if
