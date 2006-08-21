@@ -7,6 +7,7 @@ subroutine output_init
 use m_globals
 use m_collectiveio
 use m_zone
+use m_bc
 real :: courant, rout
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz
 character :: endian
@@ -199,20 +200,10 @@ doiz0: do iz = 1, nout
         do i = 1, 3
           t2(:,:,:,i) = xout(iz,i) - x(j1:j2,k1:k2,l1:l2,i)
         end do
-        i1 = i1node
-        i2 = i2node
-        i1(i) = 1
-        i2(i) = 1
-        j1 = i1(1); j2 = i2(1)
-        k1 = i1(2); k2 = i2(2)
-        l1 = i1(3); l2 = i2(3)
-        t1 = rmax
-        do i = 1, 3
-          t1(j1:j2,k1:k2,l1:l2,i) = t2(j1:j2,k1:k2,l1:l2,i)
-        end do
         i = abs( faultnormal )
-        f1 = sum( t1 * t1, 4 )
-        call pminloc( rout, i1, f1, nn, nnoff, i )
+        f2 = sum( t2 * t2, 4 )
+        call sethalo( f2, rmax, nhalo )
+        call pminloc( rout, i1, f2, nn, nnoff, i )
         i1(i) = ihypo(i)
       end if
     else
@@ -276,12 +267,8 @@ end if
 
 ! Init arrays
 w1 = 0.
-w2 = 0.
 s1 = 0.
-s2 = 0.
-t1 = 0.
 t2 = 0.
-f1 = 0.
 f2 = 0.
  
 end subroutine

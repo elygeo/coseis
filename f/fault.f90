@@ -117,24 +117,21 @@ elseif ( ibc2(i) == 9 .and. ihypo(i) == nm(i) - 2 * nhalo ) then
   call vectorsend( w1, i1, i2, i )
 end if
 
-! work, facture enegry, slip acceleration
+! fracture energy
 t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
-f1 = sum( t1 * t2, 4 ) * area
+f2 = sum( t1 * t2, 4 ) * area
+call sethalo( f2, 0., nhalo )
+call psum( r1, dt * sum( f2 ), ifn )
+efrac = efrac + r1
+
+! work
 t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( ( t0 + t1 ) * t2, 4 ) * area
-t2 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
+call sethalo( f2, 0., nhalo )
+call psum( work, .5 * sum( f2 ), ifn )
 
-! Don't include halo in energy calculation
-i1 = i1node
-i2 = i2node
-i1(ifn) = 1
-i2(ifn) = 1
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-call psum( r1,   dt * sum( f1(j1:j2,k1:k2,l1:l2) ), ifn )
-call psum( work, .5 * sum( f2(j1:j2,k1:k2,l1:l2) ), ifn )
-efrac = efrac + r1
+! slip acceleration
+t2 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
 f2 = sqrt( sum( t2 * t2, 4 ) )
 
 end subroutine

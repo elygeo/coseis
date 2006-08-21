@@ -3,6 +3,28 @@ module m_bc
 implicit none
 contains
 
+subroutine sethalo( f, r, nhalo )
+real, intent(inout) :: f(:,:,:)
+real, intent(in) :: r
+integer, intent(in) :: nhalo
+integer :: i, j, k, l
+j = size( f, 1 )
+k = size( f, 2 )
+l = size( f, 3 )
+if ( j > 1 ) then
+  forall( i=0:nhalo-1 ) f(1+i,:,:) = r
+  forall( i=0:nhalo-1 ) f(j-i,:,:) = r
+end if
+if ( k > 1 ) then
+  forall( i=0:nhalo-1 ) f(:,1+i:,:) = r
+  forall( i=0:nhalo-1 ) f(:,k-i:,:) = r
+end if
+if ( l > 1 ) then
+  forall( i=0:nhalo-1 ) f(:,:,1+i:) = r
+  forall( i=0:nhalo-1 ) f(:,:,l-i:) = r
+end if
+end subroutine
+
 subroutine scalarbc( f, ibc1, ibc2, nhalo )
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: ibc1(3), ibc2(3), nhalo

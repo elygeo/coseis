@@ -178,9 +178,9 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 do i = 1, 3
-  t3(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i)
+  t2(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i)
 end do
-rhypo = sqrt( sum( t3 * t3, 4 ) )
+rhypo = sqrt( sum( t2 * t2, 4 ) )
 
 ! Save for output
 tn = sum( t0 * nhat, 4 )

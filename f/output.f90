@@ -72,8 +72,8 @@ subroutine output( pass )
 use m_globals
 use m_collectiveio
 integer, intent(in) :: pass
-real :: r1, r2, r3
-integer :: i1(3), i2(3), i3(3), i1l(3), i2l(3), i, onpass, nc, ic, ir, iz
+real :: r1, r2, r3, r4
+integer :: i1(3), i2(3), i3(3), i4(3), i, onpass, nc, ic, ir, iz
 logical :: fault, dofault
 
 ! Test for fault
@@ -194,14 +194,14 @@ if ( pass /= onpass ) cycle doiz
 ! Indices
 i1 = i1out(iz,:)
 i2 = i2out(iz,:)
-i1l = max( i1, i1node )
-i2l = min( i2, i2node )
+i3 = max( i1, i1node )
+i4 = min( i2, i2node )
 if ( fault ) then
   i = abs( faultnormal )
   i1(i) = 1
   i2(i) = 1
-  i1l(i) = 1
-  i2l(i) = 1
+  i3(i) = 1
+  i4(i) = 1
 end if
 
 ! Binary output
@@ -216,43 +216,43 @@ do ic = 1, nc
   end if
   end if
   select case( fieldout(iz) )
-  case( 'x'    ); call vectorio( 'w', str, x,    ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'mr'   ); call scalario( 'w', str, mr,       ir, i1, i2, i1l, i2l, iz )
-  case( 'mu'   ); call scalario( 'w', str, mu,       ir, i1, i2, i1l, i2l, iz )
-  case( 'lam'  ); call scalario( 'w', str, lam,      ir, i1, i2, i1l, i2l, iz )
-  case( 'y'    ); call scalario( 'w', str, y,        ir, i1, i2, i1l, i2l, iz )
-  case( 'a'    ); call vectorio( 'w', str, w1,   ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'v'    ); call vectorio( 'w', str, v,    ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'u'    ); call vectorio( 'w', str, u,    ic, ir, i1, i2, i1l, i2l, iz )
+  case( 'x'    ); call vectorio( 'w', str, x,    ic, ir, i1, i2, i3, i4, iz )
+  case( 'mr'   ); call scalario( 'w', str, mr,       ir, i1, i2, i3, i4, iz )
+  case( 'mu'   ); call scalario( 'w', str, mu,       ir, i1, i2, i3, i4, iz )
+  case( 'lam'  ); call scalario( 'w', str, lam,      ir, i1, i2, i3, i4, iz )
+  case( 'y'    ); call scalario( 'w', str, y,        ir, i1, i2, i3, i4, iz )
+  case( 'a'    ); call vectorio( 'w', str, w1,   ic, ir, i1, i2, i3, i4, iz )
+  case( 'v'    ); call vectorio( 'w', str, v,    ic, ir, i1, i2, i3, i4, iz )
+  case( 'u'    ); call vectorio( 'w', str, u,    ic, ir, i1, i2, i3, i4, iz )
   case( 'w'    );
-   if ( ic < 4 )  call vectorio( 'w', str, w1, ic,   ir, i1, i2, i1l, i2l, iz )
-   if ( ic > 3 )  call vectorio( 'w', str, w2, ic-3, ir, i1, i2, i1l, i2l, iz )
-  case( 'am'   ); call scalario( 'w', str, s2,       ir, i1, i2, i1l, i2l, iz )
-  case( 'vm'   ); call scalario( 'w', str, s1,       ir, i1, i2, i1l, i2l, iz )
-  case( 'um'   ); call scalario( 'w', str, s1,       ir, i1, i2, i1l, i2l, iz )
-  case( 'wm'   ); call scalario( 'w', str, s2,       ir, i1, i2, i1l, i2l, iz )
-  case( 'pv'   ); call scalario( 'w', str, pv,       ir, i1, i2, i1l, i2l, iz )
-  case( 'nhat' ); call vectorio( 'w', str, nhat, ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'ts0'  ); call vectorio( 'w', str, t3,   ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'tsm0' ); call scalario( 'w', str, ts,       ir, i1, i2, i1l, i2l, iz )
-  case( 'tn0'  ); call scalario( 'w', str, tn,       ir, i1, i2, i1l, i2l, iz )
-  case( 'mus'  ); call scalario( 'w', str, mus,      ir, i1, i2, i1l, i2l, iz )
-  case( 'mud'  ); call scalario( 'w', str, mud,      ir, i1, i2, i1l, i2l, iz )
-  case( 'dc'   ); call scalario( 'w', str, dc,       ir, i1, i2, i1l, i2l, iz )
-  case( 'co'   ); call scalario( 'w', str, co,       ir, i1, i2, i1l, i2l, iz )
-  case( 'sa'   ); call vectorio( 'w', str, t2,   ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'sv'   ); call vectorio( 'w', str, t1,   ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'su'   ); call vectorio( 'w', str, t2,   ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'ts'   ); call vectorio( 'w', str, t3,   ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'sam'  ); call scalario( 'w', str, f2,       ir, i1, i2, i1l, i2l, iz )
-  case( 'svm'  ); call scalario( 'w', str, f1,       ir, i1, i2, i1l, i2l, iz )
-  case( 'sum'  ); call scalario( 'w', str, f2,       ir, i1, i2, i1l, i2l, iz )
-  case( 'tsm'  ); call scalario( 'w', str, ts,       ir, i1, i2, i1l, i2l, iz )
-  case( 'tn'   ); call scalario( 'w', str, tn,       ir, i1, i2, i1l, i2l, iz )
-  case( 'sl'   ); call scalario( 'w', str, sl,       ir, i1, i2, i1l, i2l, iz )
-  case( 'psv'  ); call scalario( 'w', str, psv,      ir, i1, i2, i1l, i2l, iz )
-  case( 'trup' ); call scalario( 'w', str, trup,     ir, i1, i2, i1l, i2l, iz )
-  case( 'tarr' ); call scalario( 'w', str, tarr,     ir, i1, i2, i1l, i2l, iz )
+   if ( ic < 4 )  call vectorio( 'w', str, w1, ic,   ir, i1, i2, i3, i4, iz )
+   if ( ic > 3 )  call vectorio( 'w', str, w2, ic-3, ir, i1, i2, i3, i4, iz )
+  case( 'am'   ); call scalario( 'w', str, s2,       ir, i1, i2, i3, i4, iz )
+  case( 'vm'   ); call scalario( 'w', str, s1,       ir, i1, i2, i3, i4, iz )
+  case( 'um'   ); call scalario( 'w', str, s1,       ir, i1, i2, i3, i4, iz )
+  case( 'wm'   ); call scalario( 'w', str, s2,       ir, i1, i2, i3, i4, iz )
+  case( 'pv'   ); call scalario( 'w', str, pv,       ir, i1, i2, i3, i4, iz )
+  case( 'nhat' ); call vectorio( 'w', str, nhat, ic, ir, i1, i2, i3, i4, iz )
+  case( 'ts0'  ); call vectorio( 'w', str, t3,   ic, ir, i1, i2, i3, i4, iz )
+  case( 'tsm0' ); call scalario( 'w', str, ts,       ir, i1, i2, i3, i4, iz )
+  case( 'tn0'  ); call scalario( 'w', str, tn,       ir, i1, i2, i3, i4, iz )
+  case( 'mus'  ); call scalario( 'w', str, mus,      ir, i1, i2, i3, i4, iz )
+  case( 'mud'  ); call scalario( 'w', str, mud,      ir, i1, i2, i3, i4, iz )
+  case( 'dc'   ); call scalario( 'w', str, dc,       ir, i1, i2, i3, i4, iz )
+  case( 'co'   ); call scalario( 'w', str, co,       ir, i1, i2, i3, i4, iz )
+  case( 'sa'   ); call vectorio( 'w', str, t2,   ic, ir, i1, i2, i3, i4, iz )
+  case( 'sv'   ); call vectorio( 'w', str, t1,   ic, ir, i1, i2, i3, i4, iz )
+  case( 'su'   ); call vectorio( 'w', str, t2,   ic, ir, i1, i2, i3, i4, iz )
+  case( 'ts'   ); call vectorio( 'w', str, t3,   ic, ir, i1, i2, i3, i4, iz )
+  case( 'sam'  ); call scalario( 'w', str, f2,       ir, i1, i2, i3, i4, iz )
+  case( 'svm'  ); call scalario( 'w', str, f1,       ir, i1, i2, i3, i4, iz )
+  case( 'sum'  ); call scalario( 'w', str, f2,       ir, i1, i2, i3, i4, iz )
+  case( 'tsm'  ); call scalario( 'w', str, ts,       ir, i1, i2, i3, i4, iz )
+  case( 'tn'   ); call scalario( 'w', str, tn,       ir, i1, i2, i3, i4, iz )
+  case( 'sl'   ); call scalario( 'w', str, sl,       ir, i1, i2, i3, i4, iz )
+  case( 'psv'  ); call scalario( 'w', str, psv,      ir, i1, i2, i3, i4, iz )
+  case( 'trup' ); call scalario( 'w', str, trup,     ir, i1, i2, i3, i4, iz )
+  case( 'tarr' ); call scalario( 'w', str, tarr,     ir, i1, i2, i3, i4, iz )
   case default
     write( 0, * ) 'error: unknown output field: ', fieldout(iz)
     stop
