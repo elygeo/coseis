@@ -21,7 +21,7 @@ if ( ifn /= 0 ) then
   k3 = i1(2); k4 = i2(2)
   l3 = i1(3); l4 = i2(3)
   t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
-  f1 = sqrt( sum( t2 * t2, 4 ) )
+  f2 = sqrt( sum( t2 * t2, 4 ) )
 end if
 
 ! Time integration
@@ -32,23 +32,23 @@ u  = u  + dt * v
 
 ! Fault time integration
 if ( ifn /= 0 ) then
-  t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
-  f2 = sqrt( sum( t2 * t2, 4 ) )
-  sl = sl + dt * f2
-  psv = max( psv, f2 )
+  t1 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
+  f1 = sqrt( sum( t1 * t1, 4 ) )
+  sl = sl + dt * f1
+  psv = max( psv, f1 )
   if ( svtol > 0. ) then
-    where ( f2 >= svtol .and. trup > 1e8 )
-      trup = t - dt * ( .5 + ( svtol - f2 ) / ( f1 - f2 ) )
+    where ( f1 >= svtol .and. trup > 1e8 )
+      trup = t - dt * ( .5 + ( svtol - f1 ) / ( f2 - f1 ) )
     end where
-    where ( f2 >= svtol )
+    where ( f1 >= svtol )
       tarr = 1e9
     end where
-    where ( f2 < svtol .and. f1 >= svtol )
-      tarr = t - dt * ( .5 + ( svtol - f2 ) / ( f1 - f2 ) )
+    where ( f1 < svtol .and. f2 >= svtol )
+      tarr = t - dt * ( .5 + ( svtol - f1 ) / ( f2 - f1 ) )
     end where
   end if
-  t1 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
-  f1 = sqrt( sum( t1 * t1, 4 ) )
+  t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
+  f2 = sqrt( sum( t2 * t2, 4 ) )
 end if
 
 end subroutine
