@@ -188,30 +188,30 @@ doiz0: do iz = 1, nout
       i1 = nnoff
       rout = rmax
       if ( dofault ) then
-        t2 = rmax + rmax
         i = abs( faultnormal )
         i1 = i1node
         i2 = i2node
-        i1(i) = ihypo(i)
-        i2(i) = ihypo(i)
+        i1(i) = 1
+        i2(i) = 1
         j1 = i1(1); j2 = i2(1)
         k1 = i1(2); k2 = i2(2)
         l1 = i1(3); l2 = i2(3)
-        i1(i) = 1
-        i2(i) = 1
+        i1(i) = ihypo(i)
+        i2(i) = ihypo(i)
         j3 = i1(1); j4 = i2(1)
         k3 = i1(2); k4 = i2(2)
         l3 = i1(3); l4 = i2(3)
         do i = 1, 3
-          t2(j3:j4,k3:k4,l3:l4,i) = xout(iz,i) - x(j1:j2,k1:k2,l1:l2,i)
+          t1(j1:j2,k1:k2,l1:l2,i) = xout(iz,i) - x(j3:j4,k3:k4,l3:l4,i)
         end do
+        f1 = sum( t1 * t1, 4 )
+        f2 = 2. * maxval( f1 )
+        f2(j1:j2,k1:k2,l1:l2) = f1(j1:j2,k1:k2,l1:l2)
         i = abs( faultnormal )
-        f2 = sum( t2 * t2, 4 )
         call pminloc( rout, i1, f2, nn, nnoff, i )
         i1(i) = ihypo(i)
       end if
     else
-      w1 = rmax + rmax
       if ( cell ) then
         i1 = i1node
         i2 = i2cell
@@ -236,7 +236,9 @@ doiz0: do iz = 1, nout
         end do
       end if
       s1 = sum( w1 * w1, 4 )
-      call pminloc( rout, i1, s1, nn, nnoff, 0 )
+      s2 = 2. * maxval( s1 )
+      s2(j1:j2,k1:k2,l1:l2) = s1(j1:j2,k1:k2,l1:l2)
+      call pminloc( rout, i1, s2, nn, nnoff, 0 )
     end if
     i2 = i1
     if ( rout > dx * dx ) ditout(iz) = nt + 1
