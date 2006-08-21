@@ -3,25 +3,25 @@ module m_bc
 implicit none
 contains
 
-subroutine sethalo( f, r, nhalo )
+subroutine sethalo( f, r, i )
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
-integer, intent(in) :: nhalo
-integer :: i, j, k, l
-j = size( f, 1 )
-k = size( f, 2 )
-l = size( f, 3 )
+integer, intent(in) :: i
+integer :: j, k, l
+j = size( f, 1 ) - i + 1
+k = size( f, 2 ) - i + 1
+l = size( f, 3 ) - i + 1
 if ( j > 1 ) then
-  forall( i=0:nhalo-1 ) f(1+i,:,:) = r
-  forall( i=0:nhalo-1 ) f(j-i,:,:) = r
+  f(:i,:,:) = r
+  f(j:,:,:) = r
 end if
 if ( k > 1 ) then
-  forall( i=0:nhalo-1 ) f(:,1+i,:) = r
-  forall( i=0:nhalo-1 ) f(:,k-i,:) = r
+  f(:,:i,:) = r
+  f(:,k:,:) = r
 end if
 if ( l > 1 ) then
-  forall( i=0:nhalo-1 ) f(:,:,1+i) = r
-  forall( i=0:nhalo-1 ) f(:,:,l-i) = r
+  f(:,:,:i) = r
+  f(:,:,l:) = r
 end if
 end subroutine
 

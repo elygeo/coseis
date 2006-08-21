@@ -9,7 +9,7 @@ use m_collectiveio
 use m_zone
 use m_bc
 real :: courant, rout
-integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz
+integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4, nc, iz
 character :: endian
 character(7) :: field
 logical :: fault, dofault, test, cell
@@ -190,15 +190,20 @@ doiz0: do iz = 1, nout
       rout = rmax
       if ( dofault ) then
         i = abs( faultnormal )
-        i1 = 1
-        i2 = nm
+        i1 = i1node
+        i2 = i2node
         i1(i) = ihypo(i)
         i2(i) = ihypo(i)
         j1 = i1(1); j2 = i2(1)
         k1 = i1(2); k2 = i2(2)
         l1 = i1(3); l2 = i2(3)
+        i1(i) = 1
+        i2(i) = 1
+        j3 = i1(1); j4 = i2(1)
+        k3 = i1(2); k4 = i2(2)
+        l3 = i1(3); l4 = i2(3)
         do i = 1, 3
-          t2(:,:,:,i) = xout(iz,i) - x(j1:j2,k1:k2,l1:l2,i)
+          t2(j3:j4,k3:k4,l3:l4,i) = xout(iz,i) - x(j1:j2,k1:k2,l1:l2,i)
         end do
         i = abs( faultnormal )
         f2 = sum( t2 * t2, 4 )
@@ -210,7 +215,7 @@ doiz0: do iz = 1, nout
       w1 = rmax
       if ( cell ) then
         i1 = i1node
-        i2 = i2node - 1
+        i2 = i2cell
         j1 = i1(1); j2 = i2(1)
         k1 = i1(2); k2 = i2(2)
         l1 = i1(3); l2 = i2(3)
