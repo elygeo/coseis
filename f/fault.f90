@@ -100,24 +100,6 @@ do i = 1, 3
 end do
 call vectorbc( w1, ibc1, ibc2, nhalo )
 
-! Work & Facture enegry
-t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
-f1 = sum( ( t0 + t1 ) * t2, 4 ) * area
-t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
-f2 = sum( t1 * t2, 4 ) * area
-do i = 1, nhalo
-  FIXME
-end do
-call psum( work, .5 * sum( f1 ), ifn )
-call psum( r1, dt * sum( f2 ), ifn )
-efrac = efrac + r1
-
-! Hold for output and slip path length integration
-t1 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
-f1 = sqrt( sum( t1 * t1, 4 ) )
-f2 = sqrt( sum( t2 * t2, 4 ) )
-psv = max( psv, f2 )
-
 ! If a neighboring processor contains only one side of the fault, then we must
 ! send the correct fault wall solution to it.
 i = ifn
@@ -134,6 +116,26 @@ elseif ( ibc2(i) == 9 .and. ihypo(i) == nm(i) - 2 * nhalo ) then
   i2(i) = nm(i) - 2 * nhalo + 1
   call vectorsend( w1, i1, i2, i )
 end if
+
+! work, facture enegry, slip acceleration
+t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
+f1 = sum( t1 * t2, 4 ) * area
+t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
+f2 = sum( ( t0 + t1 ) * t2, 4 ) * area
+t2 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
+
+! Don't include halo in energy calculation
+i1 = i1node
+i2 = i2node
+i1(ifn) = 1
+i2(ifn) = 1
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+call psum( r1,   dt * sum( f1(j1:j2,k1:k2,l1:l2) ), ifn )
+call psum( work, .5 * sum( f2(j1:j2,k1:k2,l1:l2) ), ifn )
+efrac = efrac + r1
+f2 = sqrt( sum( t2 * t2, 4 ) )
 
 end subroutine
 

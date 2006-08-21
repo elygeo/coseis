@@ -87,50 +87,48 @@ end if
 if ( master ) call rwrite( 'stats/t', t, it )
 select case( pass )
 case( 1 )
-  s1 = sqrt( sum( u * u, 4 ) )
+  s1 = sqrt( sum( v * v, 4 ) )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
   call pmaxloc( r1, i1, s1, nn, nnoff, 0 )
   call pmaxloc( r2, i2, s2, nn, nnoff, 0 )
   if ( master ) then
-    if ( r1 > dx / 10. ) write( 0, * ) 'warning: u !<< dx'
-    call stats( r1, i1-nnoff, 'umax', it )
+    call stats( r1, i1-nnoff, 'vmax', it )
     call stats( r2, i2-nnoff, 'wmax', it )
+    if ( r1 > dx / 10. ) write( 0, * ) 'warning: u !<< dx'
   end if
   if ( dofault ) then
     call pmaxloc( r1, i1, f1,   nn, nnoff, i ); i1(i) = ihypo(i)
-    call pmaxloc( r2, i2, tarr, nn, nnoff, i ); i2(i) = ihypo(i)
+    call pmaxloc( r2, i2, f2,   nn, nnoff, i ); i2(i) = ihypo(i)
+    call pmaxloc( r3, i3, tarr, nn, nnoff, i ); i3(i) = ihypo(i)
     if ( master ) then
-      call stats( r1, i1-nnoff, 'sumax',   it )
-      call stats( r2, i2-nnoff, 'tarrmax', it )
+      call stats( r1, i1-nnoff, 'svmax',   it )
+      call stats( r2, i2-nnoff, 'sumax',   it )
+      call stats( r3, i3-nnoff, 'tarrmax', it )
       i1 = ihypo
       i1(i) = 1
       call rwrite( 'stats/tarrhypo', tarr(i1(1),i1(2),i1(3)), it )
     end if
   end if
 case( 2 )
-  s1 = sqrt( sum( w1 * w1, 4 ) )
-  s2 = sqrt( sum( v * v, 4 ) )
+  s1 = sqrt( sum( u * u, 4 ) )
+  s2 = sqrt( sum( w1 * w1, 4 ) )
   pv = max( pv, s2 )
   call pmaxloc( r1, i1, s1, nn, nnoff, 0 )
   call pmaxloc( r2, i2, s2, nn, nnoff, 0 )
   if ( master ) then
-    call stats( r1, i1-nnoff, 'amax', it )
-    call stats( r2, i2-nnoff, 'vmax', it )
+    call stats( r1, i1-nnoff, 'umax', it )
+    call stats( r2, i2-nnoff, 'amax', it )
   end if
   if ( dofault ) then
-    call pmaxloc( r1, i1, f1, nn, nnoff, i ); i1(ifn) = ihypo(ifn)
-    call pmaxloc( r2, i2, f2, nn, nnoff, i ); i2(ifn) = ihypo(ifn)
-    if ( master ) then
-      call stats( r1, i1-nnoff, 'samax', it )
-      call stats( r2, i2-nnoff, 'svmax', it )
-    end if
     call pminloc( r1, i1, tn, nn, nnoff, i ); i1(ifn) = ihypo(ifn)
     call pmaxloc( r2, i2, tn, nn, nnoff, i ); i2(ifn) = ihypo(ifn)
     call pmaxloc( r3, i3, ts, nn, nnoff, i ); i3(ifn) = ihypo(ifn)
+    call pmaxloc( r4, i4, f2, nn, nnoff, i ); i4(ifn) = ihypo(ifn)
     if ( master ) then
       call stats( r1, i1-nnoff, 'tnmin', it )
       call stats( r2, i2-nnoff, 'tnmax', it )
       call stats( r3, i3-nnoff, 'tsmax', it )
+      call stats( r4, i4-nnoff, 'samax', it )
       call rwrite( 'stats/work', work, it )
       call rwrite( 'stats/efrac', efrac, it )
     end if
@@ -156,12 +154,12 @@ case( 'mu'   );
 case( 'lam'  );
 case( 'y'    );
 case( 'a'    ); nc = 3
-case( 'v'    ); nc = 3
-case( 'u'    ); nc = 3; onpass = 1
+case( 'v'    ); nc = 3; onpass = 1
+case( 'u'    ); nc = 3
 case( 'w'    ); nc = 6; onpass = 1
 case( 'am'   );
-case( 'vm'   );
-case( 'um'   ); onpass = 1
+case( 'vm'   ); onpass = 1
+case( 'um'   )
 case( 'wm'   ); onpass = 1
 case( 'pv'   );
 case( 'nhat' ); fault = .true.; nc = 3
@@ -173,11 +171,11 @@ case( 'mud'  ); fault = .true.
 case( 'dc'   ); fault = .true.
 case( 'co'   ); fault = .true.
 case( 'sa'   ); fault = .true.; nc = 3
-case( 'sv'   ); fault = .true.; nc = 3
+case( 'sv'   ); fault = .true.; nc = 3; onpass = 1
 case( 'su'   ); fault = .true.; nc = 3; onpass = 1
 case( 'ts'   ); fault = .true.; nc = 3
 case( 'sam'  ); fault = .true.
-case( 'svm'  ); fault = .true.
+case( 'svm'  ); fault = .true.; onpass = 1
 case( 'sum'  ); fault = .true.; onpass = 1
 case( 'tsm'  ); fault = .true.
 case( 'tn'   ); fault = .true.
@@ -229,8 +227,8 @@ do ic = 1, nc
   case( 'w'    );
    if ( ic < 4 )  call vectorio( 'w', str, w1, ic,   ir, i1, i2, i1l, i2l, iz )
    if ( ic > 3 )  call vectorio( 'w', str, w2, ic-3, ir, i1, i2, i1l, i2l, iz )
-  case( 'am'   ); call scalario( 'w', str, s1,       ir, i1, i2, i1l, i2l, iz )
-  case( 'vm'   ); call scalario( 'w', str, s2,       ir, i1, i2, i1l, i2l, iz )
+  case( 'am'   ); call scalario( 'w', str, s2,       ir, i1, i2, i1l, i2l, iz )
+  case( 'vm'   ); call scalario( 'w', str, s1,       ir, i1, i2, i1l, i2l, iz )
   case( 'um'   ); call scalario( 'w', str, s1,       ir, i1, i2, i1l, i2l, iz )
   case( 'wm'   ); call scalario( 'w', str, s2,       ir, i1, i2, i1l, i2l, iz )
   case( 'pv'   ); call scalario( 'w', str, pv,       ir, i1, i2, i1l, i2l, iz )
@@ -242,13 +240,13 @@ do ic = 1, nc
   case( 'mud'  ); call scalario( 'w', str, mud,      ir, i1, i2, i1l, i2l, iz )
   case( 'dc'   ); call scalario( 'w', str, dc,       ir, i1, i2, i1l, i2l, iz )
   case( 'co'   ); call scalario( 'w', str, co,       ir, i1, i2, i1l, i2l, iz )
-  case( 'sa'   ); call vectorio( 'w', str, t1,   ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'sv'   ); call vectorio( 'w', str, t2,   ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'su'   ); call vectorio( 'w', str, t1,   ic, ir, i1, i2, i1l, i2l, iz )
+  case( 'sa'   ); call vectorio( 'w', str, t2,   ic, ir, i1, i2, i1l, i2l, iz )
+  case( 'sv'   ); call vectorio( 'w', str, t1,   ic, ir, i1, i2, i1l, i2l, iz )
+  case( 'su'   ); call vectorio( 'w', str, t2,   ic, ir, i1, i2, i1l, i2l, iz )
   case( 'ts'   ); call vectorio( 'w', str, t3,   ic, ir, i1, i2, i1l, i2l, iz )
-  case( 'sam'  ); call scalario( 'w', str, f1,       ir, i1, i2, i1l, i2l, iz )
-  case( 'svm'  ); call scalario( 'w', str, f2,       ir, i1, i2, i1l, i2l, iz )
-  case( 'sum'  ); call scalario( 'w', str, f1,       ir, i1, i2, i1l, i2l, iz )
+  case( 'sam'  ); call scalario( 'w', str, f2,       ir, i1, i2, i1l, i2l, iz )
+  case( 'svm'  ); call scalario( 'w', str, f1,       ir, i1, i2, i1l, i2l, iz )
+  case( 'sum'  ); call scalario( 'w', str, f2,       ir, i1, i2, i1l, i2l, iz )
   case( 'tsm'  ); call scalario( 'w', str, ts,       ir, i1, i2, i1l, i2l, iz )
   case( 'tn'   ); call scalario( 'w', str, tn,       ir, i1, i2, i1l, i2l, iz )
   case( 'sl'   ); call scalario( 'w', str, sl,       ir, i1, i2, i1l, i2l, iz )
