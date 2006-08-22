@@ -111,8 +111,8 @@ real :: &
   vrup,          & ! nucleation rupture velocity
   rcrit,         & ! nucleation critical radius
   trelax,        & ! nucleation relaxation time
-  work,          & ! change in stored energy
-  efrac,         & ! fracure energy
+  estrain,       & ! change in stored strain energy
+  efric,         & ! friction + fracure energy
   svtol            ! slip velocity for determining rupture time
 
 integer, dimension(3) :: &

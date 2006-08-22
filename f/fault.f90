@@ -95,8 +95,8 @@ ts = f2 * ts
 ! Update acceleration
 do i = 1, 3
   f2 = area * ( t1(:,:,:,i) - t0(:,:,:,i) )
-  w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f1 * mr(j1:j2,k1:k2,l1:l2)
-  w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f1 * mr(j3:j4,k3:k4,l3:l4)
+  w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f2 * mr(j1:j2,k1:k2,l1:l2)
+  w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f2 * mr(j3:j4,k3:k4,l3:l4)
 end do
 call vectorbc( w1, ibc1, ibc2, nhalo )
 
@@ -117,20 +117,20 @@ elseif ( ibc2(i) == 9 .and. ihypo(i) == nm(i) - 2 * nhalo ) then
   call vectorsend( w1, i1, i2, i )
 end if
 
-! fracture energy
+! Friction + fracture energy
 t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( t1 * t2, 4 ) * area
-call sethalo( f2, 0., nhalo )
+call sethalo( f2, 0., i1node, i2node )
 call psum( r1, dt * sum( f2 ), ifn )
-efrac = efrac + r1
+efric = efric + r1
 
-! work
+! Strain enegry
 t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( ( t0 + t1 ) * t2, 4 ) * area
-call sethalo( f2, 0., nhalo )
-call psum( work, .5 * sum( f2 ), ifn )
+call sethalo( f2, 0., i1node, i2node )
+call psum( estrain, .5 * sum( f2 ), ifn )
 
-! slip acceleration
+! Slip acceleration
 t2 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
 f2 = sqrt( sum( t2 * t2, 4 ) )
 

@@ -162,6 +162,7 @@ doiz0: do iz = 1, nout
   case( 'sum'  ); fault = .true.
   case( 'tsm'  ); fault = .true.
   case( 'tn'   ); fault = .true.
+  case( 'fr'   ); fault = .true.
   case( 'sl'   ); fault = .true.
   case( 'psv'  ); fault = .true.
   case( 'trup' ); fault = .true.

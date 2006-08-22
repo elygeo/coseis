@@ -49,7 +49,7 @@ do while ( it < nt )
   call writecheckpoint ; if ( master ) call clock( '9ckp', it )
   if ( master ) then
     write( 0, '(a)', advance='no' ) '.'
-    if ( it == nt .or. mod( it, 50 ) == 0 ) write( 0, * ) it
+    if ( it == nt .or. mod( it, 50 ) == 0 ) write( 0, '(i6)' ) it
   end if
 end do
 

@@ -129,8 +129,8 @@ case( 2 )
       call stats( r2, i2-nnoff, 'tnmax', it )
       call stats( r3, i3-nnoff, 'tsmax', it )
       call stats( r4, i4-nnoff, 'samax', it )
-      call rwrite( 'stats/work', work, it )
-      call rwrite( 'stats/efrac', efrac, it )
+      call rwrite( 'stats/estrain', estrain, it )
+      call rwrite( 'stats/efric', efric, it )
     end if
   end if
 end select
@@ -179,6 +179,7 @@ case( 'sum'  ); fault = .true.; onpass = 1
 case( 'tsm'  ); fault = .true.
 case( 'sam'  ); fault = .true.
 case( 'tn'   ); fault = .true.
+case( 'fr'   ); fault = .true.
 case( 'sl'   ); fault = .true.
 case( 'psv'  ); fault = .true.
 case( 'trup' ); fault = .true.
@@ -249,6 +250,7 @@ do ic = 1, nc
   case( 'tsm'  ); call scalario( 'w', str, ts,       ir, i1, i2, i3, i4, iz )
   case( 'sam'  ); call scalario( 'w', str, f2,       ir, i1, i2, i3, i4, iz )
   case( 'tn'   ); call scalario( 'w', str, tn,       ir, i1, i2, i3, i4, iz )
+  case( 'fr'   ); call scalario( 'w', str, f1,       ir, i1, i2, i3, i4, iz )
   case( 'sl'   ); call scalario( 'w', str, sl,       ir, i1, i2, i3, i4, iz )
   case( 'psv'  ); call scalario( 'w', str, psv,      ir, i1, i2, i3, i4, iz )
   case( 'trup' ); call scalario( 'w', str, trup,     ir, i1, i2, i3, i4, iz )

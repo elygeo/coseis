@@ -59,7 +59,7 @@ for iz = 1:nout
 end
 if ~found
   msg = 'No saved data found for this region';
-  msg = sprintf( 'No saved data for %s %d %d %d %d   %d %d %d %d', fieldin, i1s, i2s );
+  msg = sprintf( 'No saved data for:   %s   %d %d %d %d   %d %d %d %d', fieldin, i1s, i2s );
   f = [];
   return
 end
