@@ -5,6 +5,9 @@ labels = { field field };
 
 switch field
 case 'x',    labels = { 'Position'      '|X|' 'x' 'y' 'z' };
+case 'rho',  labels = { 'Density'       '\rho' };
+case 'vp',   labels = { 'V_p'           'V_p' };
+case 'vs',   labels = { 'V_s'           'V_s' };
 case 'mr',   labels = { 'Mass Ration'   '1/m' };
 case 'mu',   labels = { '\mu'           '\mu' };
 case 'lam',  labels = { '\lambda'       '\lambda' };

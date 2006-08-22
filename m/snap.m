@@ -6,11 +6,13 @@ case 1, file = varargin{1};
 otherwise, error
 end
 
-%print -dtiff -r480 'tmp'
+res = sprintf( '-r%d', 3 * get( 0, 'ScreenPixelsPerInch' ) );
+set( gcf, 'PaperPositionMode', 'auto' )
+print( '-dtiff', res, 'tmp' )
 
-print -dtiff -r240 'tmp'
 img = imread( 'tmp.tif' );
-n = [ 480 640 ];
+n = size( img );
+n = round( n(1:2) / 3 );
 img = imresize( img, n, 'bilinear' );
 img([1 end],:,:) = 64;
 img(:,[1 end],:) = 64;
