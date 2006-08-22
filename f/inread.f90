@@ -45,6 +45,7 @@ case( 'dx' );          read( str, * ) dx
 case( 'dt' );          read( str, * ) dt
 case( 'upvector' );    read( str, * ) upvector
 case( 'viscosity' );   read( str, * ) viscosity
+case( 'vdamp' );       read( str, * ) vdamp
 case( 'rho1' );        read( str, * ) rho1
 case( 'vp1' );         read( str, * ) vp1
 case( 'vs1' );         read( str, * ) vs1

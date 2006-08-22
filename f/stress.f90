@@ -9,7 +9,7 @@ use m_diffnc
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iz
 
 ! Modified displacement
-w1 = u + dt * v * viscosity(1)
+w1 = u + gam * v
 w2 = 0.
 s1 = 0.
 

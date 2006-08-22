@@ -29,10 +29,11 @@ allocate(       &
   mr(j,k,l),    &
   lam(j,k,l),   &
   mu(j,k,l),    &
-  y(j,k,l),     &
-  pv(j,k,l),    &
+  gam(j,k,l),   &
 ! qp(j,k,l),    &
 ! qs(j,k,l),    &
+  y(j,k,l),     &
+  pv(j,k,l),    &
   s1(j,k,l),    &
   s2(j,k,l)     )
 

@@ -8,11 +8,12 @@
   rho  = 'read';
   vp   = 'read';
   vs   = 'read';
+  vs1 = 500.;
+  vp1 = 1500.;
+  vdamp = 400.;
   th   = 'read';
   tn   = 'read';
   mud = .1;
-  vs1 = 500.;
-  vp1 = 1500.;
   mus = 1000.;
   dc = .64592;
   rcrit = 6000.;

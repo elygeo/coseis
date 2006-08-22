@@ -25,6 +25,7 @@ real, allocatable, dimension(:,:,:) :: &
   mr,            & ! mass ratio
   lam,           & ! Lame parameter
   mu,            & ! Lame parameter
+  gam,           & ! viscosity
   qp,            & ! anelastic coefficient
   qs,            & ! anelastic coefficient
   y,             & ! hourglass constant
@@ -103,6 +104,7 @@ real :: &
   xcenter(3),    & ! mesh center
   rmax,          & ! maximum distance from mesh center
   viscosity(2),  & ! viscosity for (1) stress & (2) hourglass corrections
+  vdamp,         & ! shear wave velocity dependent damping
   upvector(3),   & ! upward direction
   tsource,       & ! dominant period
   rsource,       & ! source radius

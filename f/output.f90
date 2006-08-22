@@ -99,11 +99,13 @@ case( 1 )
   if ( dofault ) then
     call pmaxloc( r1, i1, f1,   nn, nnoff, i ); i1(i) = ihypo(i)
     call pmaxloc( r2, i2, f2,   nn, nnoff, i ); i2(i) = ihypo(i)
-    call pmaxloc( r3, i3, tarr, nn, nnoff, i ); i3(i) = ihypo(i)
+    call pmaxloc( r3, i3, sl,   nn, nnoff, i ); i3(i) = ihypo(i)
+    call pmaxloc( r4, i4, tarr, nn, nnoff, i ); i4(i) = ihypo(i)
     if ( master ) then
       call stats( r1, i1-nnoff, 'svmax',   it )
       call stats( r2, i2-nnoff, 'sumax',   it )
-      call stats( r3, i3-nnoff, 'tarrmax', it )
+      call stats( r3, i3-nnoff, 'slmax',   it )
+      call stats( r4, i4-nnoff, 'tarrmax', it )
       i1 = ihypo
       i1(i) = 1
       call rwrite( 'stats/tarrhypo', tarr(i1(1),i1(2),i1(3)), it )

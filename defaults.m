@@ -26,6 +26,7 @@
 % lock = [ 1 1 0   1 1 1  -1 -1 -1 ];	% **lock v1 & v2, v3 is free
   viscosity = [ .0 .3 ];		% stress (1) & hourglass (2)
   viscosity = [ .1 .7 ];		% stress (1) & hourglass (2)
+  vdamp = -1.;				% Vs dependent damping
 % npml = 0;				% no PML absorbing boundary
   npml = 10;				% 10 PML nodes
   bc1 = [ 0 0 0 ];			% j1 k1 l1 boundary cond (see below)

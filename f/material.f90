@@ -123,6 +123,15 @@ if ( master ) then
   vs0  = s2(j,k,l)
 end if
 
+! Viscosity
+if ( vdamp > 0. ) then
+  where( s2 > 0. ) gam = vdamp / s2
+  where( gam > .8 ) gam = .8
+  gam = dt * gam
+else
+  gam = dt * viscosity(1)
+end if
+
 ! Lame parameters
 s2 = mr * s2 * s2
 s1 = mr * ( s1 * s1 ) - 2. * s2
