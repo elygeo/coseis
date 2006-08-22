@@ -35,7 +35,7 @@ j = icursor(1) - i1hold(1) + 1;
 k = icursor(2) - i1hold(2) + 1;
 l = icursor(3) - i1hold(3) + 1;
 
-if strcmp( grid, 'contant' )
+if strcmp( grid, 'constant' )
   xx = ( icursor(1:3) - 1 ) * dx;
 elseif ~cellfocus
   xx = x(j,k,l,:);

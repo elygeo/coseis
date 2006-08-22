@@ -9,7 +9,9 @@ use m_diffnc
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iz
 
 ! Modified displacement
-w1 = u + gam * v
+do i = 1, 3
+  w1(:,:,:,i) = u(:,:,:,i) + gam * v(:,:,:,i)
+end do
 w2 = 0.
 s1 = 0.
 

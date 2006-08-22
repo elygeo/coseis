@@ -104,7 +104,7 @@ set( hmsg(1), 'String', 'Press F1 for help' )
 set( hfig, 'CurrentAxes', haxes(1) )
 
 if dooutline
-  houtline = outline( i1viz, i2viz, ifn, ihypo, rmax, grid, dx );
+  houtline = outline( i1viz, i2viz, ifn, ihypo, rmax );
   set( houtline, 'HandleVisibility', 'off' )
 end
 

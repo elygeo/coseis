@@ -13,8 +13,8 @@ character :: endian
 open( 1, file='dx', status='old' )
 read( 1, * ) dx
 close( 1 )
-mus = .667
-mud = .333
+mus = .6
+mud = .3
 ell = (/ 600, 300, 80 /) * 1000
 exag = 1.
 npml = 10
@@ -215,6 +215,9 @@ close( 8 )
 close( 9 )
 
 ! Fault prestress
+print *, 'mus: ', mus
+print *, 'mud: ', mud
+print *, 'before scaling:'
 deallocate( t, x, s1, w )
 allocate( s1(n(1),1,n(3)), s2(n(1),1,n(3)), t(1991,161) )
 i = nint( dx / 100. )
@@ -232,7 +235,7 @@ read( 1, rec=1 ) t
 close( 1 )
 tn = t(91,51)
 where( t > tn ) t = tn
-print *, 'tn before scaling: ', minval(t), maxval(t), sum(t)/size(t), tn
+print *, 'tn: ', tn, maxval(t), minval(t), sum(t)/size(t)
 s1 = -maxval( abs( t ) )
 do l = l1, l2
 do j = j1, j2
@@ -245,7 +248,7 @@ open( 1, file='th.'//endian, recl=reclen, form='unformatted', access='direct', s
 read( 1, rec=1 ) t
 close( 1 )
 ts = t(91,51)
-print *, 'ts before scaling: ', minval(t), maxval(t), sum(t)/size(t), ts
+print *, 'ts: ', ts, minval(t), maxval(t), sum(t)/size(t)
 s2 = 0.
 do l = l1, l2
 do j = j1, j2
@@ -256,16 +259,17 @@ end do
 end do
 
 ! Scale tractions
-print *, 'stress drop: ', ts
+print *, 'dt: ', ts
 tn = tn / ( mus - mud )
 s1 = s1 / ( mus - mud )
 ts = ts - mud * tn
 s2 = s2 - mud * s1
-print *, 'stress drop: ', abs(ts) - mud*abs(tn)
+print *, 'after scaling:'
+print *, 'tn: ', tn, maxval(s1), minval(s1), sum(s1)/size(s1)
+print *, 'ts: ', ts, minval(s2), maxval(s2), sum(s2)/size(s2)
+print *, 'dt: ', abs(ts) - mud*abs(tn)
 
 ! Write tractions
-print *, 'tn after scaling: ', minval(s1), maxval(s1), sum(s1)/size(s1), tn
-print *, 'ts after scaling: ', minval(s2), maxval(s2), sum(s2)/size(s2), ts
 inquire( iolength=reclen ) s1
 open( 1, file='tn', recl=reclen, form='unformatted', access='direct' )
 open( 2, file='th', recl=reclen, form='unformatted', access='direct' )
@@ -278,17 +282,35 @@ close( 2 )
 j = nint( 9000. / dx )
 l = nint( 5000. / dx )
 
-! Metadata
+! SORD input parameters
 open( 1, file='insord.m' )
-write( 1, * ) 'dx      = ', dx, ';'
-write( 1, * ) 'npml    = ', npml, ';'
-write( 1, * ) 'n       = [ ', n, ' ];'
-write( 1, * ) 'nn      = [ ', n + (/ 0, 1, 0 /), ' ];'
-write( 1, * ) 'ihypo   = [ ', jf0+j,     kf0, -1-l, ' ];'
-write( 1, * ) 'ihypo   = [ ', jf0-j+nf1, kf0, -1-l, ' ];'
-write( 1, * ) 'mud     = ', mud, ';'
-write( 1, * ) 'mus     = [ ', mus, '''zone''', jf0, 0, -1-nf3, jf0+nf1, 0, -1, ' ];'
-write( 1, * ) 'endian  = ''', endian, ''';'
+write( 1, * ) 'dx    = ', dx, ';'
+write( 1, * ) 'npml  = ', npml, ';'
+write( 1, * ) 'nn    = [ ', n + (/ 0, 1, 0 /), ' ];'
+write( 1, * ) 'ihypo = [ ', jf0+j,     kf0, -1-l, ' ];'
+write( 1, * ) 'ihypo = [ ', jf0-j+nf1, kf0, -1-l, ' ];'
+write( 1, * ) 'mud   = ', mud, ';'
+write( 1, * ) 'mus   = [ ', mus, '''zone''', jf0, 0, -1-nf3, jf0+nf1, 0, -1, ' ];'
+close( 1 )
+
+! Metadata for plotting with SDX
+open( 1, file='meta.m' )
+write( 1, * ) 'dt       = 1.;'
+write( 1, * ) 'dx       = ', dx, ';'
+write( 1, * ) 'nt       = 0;'
+write( 1, * ) 'nn       = [ ', n, ' ];'
+write( 1, * ) 'ihypo    = [ ', jf0+j,     kf0, n(3)-l, ' ];'
+write( 1, * ) 'ihypo    = [ ', jf0-j+nf1, kf0, n(3)-l, ' ];'
+write( 1, * ) 'upvector = [ 0. 0. 1. ];'
+write( 1, * ) 'xcenter  = [', .5 * ell(1:2), -.5 * ell(3), '];'
+write( 1, * ) 'rmax     = ', .5 * sqrt( sum( ell * ell ) ), ';'
+write( 1, * ) 'grid     = ''read'';'
+write( 1, * ) 'endian   = ''', endian, ''';'
+write( 1, * ) 'faultnormal = 0;'
+write( 1, * ) 'out{1}   = { 3 ''x''   0   1 1 1 ', n, '};'
+write( 1, * ) 'out{2}   = { 1 ''rho'' 0   1 1 1 ', n, '};'
+write( 1, * ) 'out{3}   = { 1 ''vp''  0   1 1 1 ', n, '};'
+write( 1, * ) 'out{4}   = { 1 ''vs''  0   1 1 1 ', n, '};'
 close( 1 )
 
 end program

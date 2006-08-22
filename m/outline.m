@@ -1,6 +1,6 @@
 % Outline viz
 
-function h = outline( i1, i2, ifn, ihypo, rmax, grid, dx )
+function h = outline( i1, i2, ifn, ihypo, rmax )
 
 izones = [ i1(1:3) i2(1:3) ];
 if ifn

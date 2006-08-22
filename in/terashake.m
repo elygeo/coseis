@@ -5,15 +5,15 @@
   faultnormal = 2;
   datadir = 'tmp';
   grid = 'read';
-  rho  = 'read';
-  vp   = 'read';
-  vs   = 'read';
+  rho = 'read';
+  vp = 'read';
+  vs = 'read';
   vs1 = 500.;
   vp1 = 1500.;
   vdamp = 400.;
-  th   = 'read';
-  tn   = 'read';
-  mud = .1;
+  th = 'read';
+  tn = 'read';
+  mud = .3;
   mus = 1000.;
   dc = .64592;
   rcrit = 6000.;
@@ -41,22 +41,20 @@
   timeseries = { 'v' 366597. 200401. 130. }; % Palm Springs
 
 % 4000m
-  rcrit = 10000.;
-  vrup = 1000.;
-  tn  = -10944756.;
-  tn  = -11000000.;
-  tn  = -11500000.;
+% rcrit = 10000.;
+% vrup = 1000.;
+% tn  = -11500000.;
   dx = 4000.;
   dt = .24;
   nt = 750;
-  nt = 60;
-  itcheck = 50;
+  nt = 100;
+  itcheck = 80;
   np = [ 1 1 1 ]
   np = [ 2 3 1 ]
   nn = [ 151 77 21 ];
   ihypo = [  69 51 -2 ];
   ihypo = [ 114 51 -2 ];
-  mus = [  1. 'zone'  67 0 -5   116 0 -1 ];
+  mus = [ .6 'zone'  67 0 -5   116 0 -1 ];
   out = { 'v'   10   1 1 -1   -1 -1 -1 };
   out = { 'su'  10   1 0  1   -1  0 -1 };
   out = { 'sv'  10   1 0  1   -1  0 -1 };
@@ -70,7 +68,7 @@ return
   nn = [ 1501 752 201 ];
   ihypo = [  679 499 -21 ];
   ihypo = [ 1136 499 -21 ];
-  mus  = [ 1. 'zone' 659 0 -41   1156 0 -1 ];
+  mus  = [ .6 'zone' 659 0 -41   1156 0 -1 ];
 return
 
 % 1000m
@@ -81,7 +79,7 @@ return
   nn = [ 601 302 81 ];
   ihypo = [ 272 200 -9 ];
   ihypo = [ 455 200 -9 ];
-  mus = [  1. 'zone'  264 0 -17   463 0 -1 ];
+  mus = [ .6 'zone'  264 0 -17   463 0 -1 ];
 return
 
 % 2000m
@@ -92,7 +90,7 @@ return
   nn = [ 301 152 41 ];
   ihypo = [ 137 101 -5 ];
   ihypo = [ 228 101 -5 ];
-  mus = [  1. 'zone'  133 0 -9   232 0 -1 ];
+  mus = [ .6 'zone'  133 0 -9   232 0 -1 ];
 return
 
 % 200m
@@ -103,7 +101,7 @@ return
   nn = [ 3001 1502 401 ];
   ihypo = [ ? ? -1 ];
   ihypo = [ ? ? -1 ];
-  mus = [  1. 'zone'  ? 0 -81   ? 0 -1 ];
+  mus = [ .6 'zone'  ? 0 -81   ? 0 -1 ];
   itcheck = 1000;
 return
 
@@ -115,6 +113,6 @@ return
   nn = [ 1201 602 161 ];
   ihypo = [ ? ? -1 ];
   ihypo = [ ? ? -1 ];
-  mus = [  1. 'zone'  ? 0 -33   ? 0 -1 ];
+  mus = [ .6 'zone'  ? 0 -33   ? 0 -1 ];
 return
 
