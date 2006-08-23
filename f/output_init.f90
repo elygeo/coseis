@@ -7,6 +7,7 @@ subroutine output_init
 use m_globals
 use m_collectiveio
 use m_zone
+use m_bc
 real :: courant, rout
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz
 character :: endian
