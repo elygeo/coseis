@@ -28,21 +28,19 @@ l1 = i1(3); l2 = i2(3)
 s1 = 0.
 call diffnc( s1, 'g', x, x, dx, 1, 1, i1, i2 )
 
-! Cell center locations
-w1 = 2. * rsource
+! Cell center distance
+w2 = 2. * rsource
 forall( j=j1:j2, k=k1:k2, l=l1:l2, i=1:3 )
-  w1(j,k,l,i) = 0.125 * &
+  w2(j,k,l,i) = 0.125 * &
     ( x(j,k,l,i) + x(j+1,k+1,l+1,i) &
     + x(j+1,k,l,i) + x(j,k+1,l+1,i) &
     + x(j,k+1,l,i) + x(j+1,k,l+1,i) &
     + x(j,k,l+1,i) + x(j+1,k+1,l,i) );
 end forall
-
-! Find radius to cell from source location
 do i = 1, 3
-  w1(:,:,:,i) = w1(:,:,:,i) - xhypo(i)
+  w2(:,:,:,i) = w2(:,:,:,i) - xhypo(i)
 end do
-s2 = sqrt( sum( w1 * w1, 4 ) )
+s2 = sqrt( sum( w2 * w2, 4 ) )
 nsrc = count( s2 <= rsource )
 allocate( srcfr(nsrc), cellvol(nsrc), jj(nsrc), kk(nsrc), ll(nsrc) )
 
@@ -74,10 +72,6 @@ end if
 end do
 end do
 end do
-
-w1 = 0.
-s1 = 0.
-s2 = 0.
 
 end subroutine
 

@@ -93,10 +93,10 @@ end if
 
 ! Affine grid transformation
 m = sign( 1., affine(1:9) ) * sqrt( abs( affine(1:9) / affine(10) ) )
-w1(:,:,:,1) = m(1) * x(:,:,:,1) + m(2) * x(:,:,:,2) + m(3) * x(:,:,:,3)
-w1(:,:,:,2) = m(4) * x(:,:,:,1) + m(5) * x(:,:,:,2) + m(6) * x(:,:,:,3)
-w1(:,:,:,3) = m(7) * x(:,:,:,1) + m(8) * x(:,:,:,2) + m(9) * x(:,:,:,3)
-x = w1
+w2(:,:,:,1) = m(1) * x(:,:,:,1) + m(2) * x(:,:,:,2) + m(3) * x(:,:,:,3)
+w2(:,:,:,2) = m(4) * x(:,:,:,1) + m(5) * x(:,:,:,2) + m(6) * x(:,:,:,3)
+w2(:,:,:,3) = m(7) * x(:,:,:,1) + m(8) * x(:,:,:,2) + m(9) * x(:,:,:,3)
+x = w2
 
 ! Mesh type
 select case( grid )
@@ -144,20 +144,20 @@ l1 = i1l(3); l2 = i2l(3)
 
 ! Random noise added to mesh
 if ( gridnoise > 0. ) then
-  call random_number( w1 )
-  w1 = gridnoise * ( w1 - .5 )
-  if ( i1(1) <= 1 ) w1(j1,:,:,1) = 0.
-  if ( i2(1) <= 1 ) w1(j2,:,:,1) = 0.
-  if ( i1(2) <= 1 ) w1(:,k1,:,2) = 0.
-  if ( i2(2) <= 1 ) w1(:,k2,:,2) = 0.
-  if ( i1(3) <= 1 ) w1(:,:,l1,3) = 0.
-  if ( i2(3) <= 1 ) w1(:,:,l2,3) = 0.
+  call random_number( w2 )
+  w2 = gridnoise * ( w2 - .5 )
+  if ( i1(1) <= 1 ) w2(j1,:,:,1) = 0.
+  if ( i2(1) <= 1 ) w2(j2,:,:,1) = 0.
+  if ( i1(2) <= 1 ) w2(:,k1,:,2) = 0.
+  if ( i2(2) <= 1 ) w2(:,k2,:,2) = 0.
+  if ( i1(3) <= 1 ) w2(:,:,l1,3) = 0.
+  if ( i2(3) <= 1 ) w2(:,:,l2,3) = 0.
   select case( idoublenode )
-  case( 1 ); w1(j,:,:,1) = 0.
-  case( 2 ); w1(:,k,:,2) = 0.
-  case( 3 ); w1(:,:,l,3) = 0.
+  case( 1 ); w2(j,:,:,1) = 0.
+  case( 2 ); w2(:,k,:,2) = 0.
+  case( 3 ); w2(:,:,l,3) = 0.
   end select
-  x = x + w1
+  x = x + w2
 end if
 
 ! Free surface BC
@@ -304,10 +304,10 @@ do i = 1,3
   call pmin( x1, minval( x(:,:,:,i) ) )
   call pmax( x2, maxval( x(:,:,:,i) ) )
   xcenter(i) = ( x1 + x2 ) / 2.
-  w1(:,:,:,i) = x(:,:,:,i) - xcenter(i);
+  w2(:,:,:,i) = x(:,:,:,i) - xcenter(i);
 end do
-s1 = sum( w1 * w1, 4 );
-call pmax( rmax, sqrt( maxval( s1 ) ) )
+s2 = sum( w2 * w2, 4 );
+call pmax( rmax, sqrt( maxval( s2 ) ) )
 
 end subroutine
 

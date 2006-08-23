@@ -206,9 +206,6 @@ where ( mr /= 0. ) mr = 1. / mr
 call scalarbc( mr, ibc1, ibc2, nhalo )
 call scalarswaphalo( mr, nhalo )
 
-s1 = 0.
-s2 = 0.
-
 end subroutine
 
 end module
