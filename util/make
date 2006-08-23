@@ -89,10 +89,8 @@ flags=$oflags
 flags=$gflags
 flags=
 
-$sfc $flags iobin.f scecvm4.f -o scecvm4
-#$pfc $flags iompi.f scecvm4.f -o scecvm4-mpi
-#$sfc iobin.f scecvm4.f -o scecvm4
-#$pfc iompi.f scecvm4.f -o scecvm4-mpi
+$sfc $flags iobin.f scecvm4.f -o scecvm4-s
+#$pfc $flags iompi.f scecvm4.f -o scecvm4-p
 
 rm -f *.mod
 

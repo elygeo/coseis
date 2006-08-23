@@ -39,6 +39,9 @@ cat << END > pbsscript
 #PBS -e err.log
 #PBS -V
 sleep 2
+#cd $rundir/data
+#date > stamp0
+#mpiexec -n $np ./scecvm4-$mode
 cd $rundir
 date > stamp1
 mpiexec -n $np ./sord-$mode

@@ -9,5 +9,5 @@
 sleep 2
 cd /usr/localb/home/gely/sord/tmp
 date > stamp0
-time mpiexec -n 16 ./scecvm4-mpi
+mpiexec -n 16 ./scecvm4-p
 date > stamp1

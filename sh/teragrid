@@ -55,7 +55,7 @@ cat << END > pbsscript
 #PBS -V
 #cd $rundir/data
 #date > stamp0
-#time mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-mpi
+#time mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-$mode
 cd $rundir
 date > stamp1
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode

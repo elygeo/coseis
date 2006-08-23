@@ -8,5 +8,5 @@
 #PBS -V
 cd $HOME/sord/tmp
 date > stamp0
-time mpirun -machinefile $PBS_NODEFILE -np 504 ./scecvm4-mpi
+mpirun -machinefile $PBS_NODEFILE -np 504 ./scecvm4-p
 date > stamp1
