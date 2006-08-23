@@ -53,6 +53,9 @@ cat << END > pbsscript
 #PBS -o out.log
 #PBS -e err.log
 #PBS -V
+#cd $rundir/data
+#date > stamp0
+#time mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-mpi
 cd $rundir
 date > stamp1
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode

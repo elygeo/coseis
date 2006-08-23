@@ -10,6 +10,7 @@ for file in xlf95_r ifort pgf90 gfortran f95; do
 done
 done
 
+getarg=''
 pfc='mpif90'
 case $sfc in
 xlf95_r)
@@ -23,9 +24,10 @@ ifort)
   oflags='-O3'
   ;;
 pgf90)
-  gflags='getarg-pgf.f90 -O0 -g -Ktrap=fp -Mbounds -Mdclchk -Mprof=lines'
-  gflags='getarg-pgf.f90 -O0 -g -Ktrap=fp -Mbounds'
-  oflags='getarg-pgf.f90 -fast'
+  getarg='getarg-pgf.f90'
+  gflags='-O0 -g -Ktrap=fp -Mbounds -Mdclchk -Mprof=lines'
+  gflags='-O0 -g -Ktrap=fp -Mbounds'
+  oflags='-fast'
   ;;
 gfortran)
   gflags='-O0 -p -g -W -pedantic -std=legacy -fbounds-check'
@@ -71,14 +73,14 @@ flags=$oflags
 $sfc $flags utm.f90 tscoords.f90 tsgrid.f90 -o tsgrid
 $sfc $flags utm.f90 tscoords.f90 tsgridr.f90 -o tsgridr
 $sfc $flags utm.f90 tscoords.f90 ts2ll.f90 -o ts2ll
-$sfc $flags utm.f90 tscoords.f90 ll2ts.f90 -o ll2ts
-$sfc $flags flt2asc.f90 -o flt2asc
-$sfc $flags int2asc.f90 -o int2asc
-$sfc $flags asc2flt.f90 -o asc2flt
-$sfc $flags asc2int.f90 -o asc2int
+$sfc $flags $getarg utm.f90 tscoords.f90 ll2ts.f90 -o ll2ts
+$sfc $flags $getarg flt2asc.f90 -o flt2asc
+$sfc $flags $getarg int2asc.f90 -o int2asc
+$sfc $flags $getarg asc2flt.f90 -o asc2flt
+$sfc $flags $getarg asc2int.f90 -o asc2int
+$sfc $flags $getarg stats.f90 -o stats
+$sfc $flags $getarg swab.f90 -o swab
 $sfc $flags drape.f90 -o drape
-$sfc $flags stats.f90 -o stats
-$sfc $flags swab.f90 -o swab
 
 tar zxf scecvm4.tgz
 cp scecvm4.h 'in.h'

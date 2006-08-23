@@ -5,7 +5,7 @@ use m_tscoords
 implicit none
 character(1024) :: str
 real :: x(1,1,1,2)
-integer :: i, clip
+integer :: i, clip, command_argument_count
 
 clip = 0
 do i = 1, command_argument_count()
