@@ -10,8 +10,6 @@ logical :: inzone
 character(11) :: key
 character(160) :: line
 
-if ( master ) write( 0, * ) 'Reading input'
-
 open( 1, file='input', status='old' )
 
 doline: do

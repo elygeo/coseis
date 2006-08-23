@@ -103,49 +103,53 @@ call mpi_allreduce( r, rr, 1, mpi_real, mpi_max, comm3d, e )
 end subroutine
 
 ! Real global minimum & location
-subroutine pminloc( rr, ii, r, nn, nnoff, i2d )
+subroutine pminloc( rr, ii, r, n, noff, i2d )
 real, intent(out) :: rr
 real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
-integer, intent(in) :: nn(3), nnoff(3), i2d
+integer, intent(in) :: n(3), noff(3), i2d
 integer :: i, comm, e
 real :: local(2), global(2)
 ii = minloc( r )
-local(1) = r(ii(1),ii(2),ii(3))
-ii = ii - nnoff - 1
-local(2) = ii(1) + nn(1) * ( ii(2) + nn(2) * ii(3) )
+rr = r(ii(1),ii(2),ii(3))
+ii = ii - noff - 1
+i = ii(1) + n(1) * ( ii(2) + n(2) * ii(3) )
+local(1) = rr
+local(2) = i
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
 call mpi_allreduce( local, global, 1, mpi_2real, mpi_minloc, comm, e )
 rr = global(1)
 i = global(2)
-ii(3) = i / ( nn(1) * nn(2) )
-ii(2) = modulo( i / nn(1), nn(2) )
-ii(1) = modulo( i, nn(1) )
-ii = ii + 1 + nnoff
+ii(3) = i / ( n(1) * n(2) )
+ii(2) = modulo( i / n(1), n(2) )
+ii(1) = modulo( i, n(1) )
+ii = ii + 1 + noff
 end subroutine
 
 ! Real global maximum & location
-subroutine pmaxloc( rr, ii, r, nn, nnoff, i2d )
+subroutine pmaxloc( rr, ii, r, n, noff, i2d )
 real, intent(out) :: rr
 real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
-integer, intent(in) :: nn(3), nnoff(3), i2d
+integer, intent(in) :: n(3), noff(3), i2d
 integer :: i, comm, e
 real :: local(2), global(2)
 ii = maxloc( r )
-local(1) = r(ii(1),ii(2),ii(3))
-ii = ii - nnoff - 1
-local(2) = ii(1) + nn(1) * ( ii(2) + nn(2) * ii(3) )
+rr = r(ii(1),ii(2),ii(3))
+ii = ii - noff - 1
+i = ii(1) + n(1) * ( ii(2) + n(2) * ii(3) )
+local(1) = rr
+local(2) = i
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
 call mpi_allreduce( local, global, 1, mpi_2real, mpi_maxloc, comm, e )
 rr = global(1)
 i = global(2)
-ii(3) = i / ( nn(1) * nn(2) )
-ii(2) = modulo( i / nn(1), nn(2) )
-ii(1) = modulo( i, nn(1) )
-ii = ii + 1 + nnoff
+ii(3) = i / ( n(1) * n(2) )
+ii(2) = modulo( i / n(1), n(2) )
+ii(1) = modulo( i, n(1) )
+ii = ii + 1 + noff
 end subroutine
 
 ! Vector send

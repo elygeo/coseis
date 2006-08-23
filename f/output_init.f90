@@ -8,7 +8,7 @@ use m_globals
 use m_collectiveio
 use m_zone
 real :: courant, rout
-integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4, nc, iz
+integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz
 character :: endian
 character(7) :: field
 logical :: fault, dofault, test, cell
@@ -190,25 +190,19 @@ doiz0: do iz = 1, nout
       rout = rmax
       if ( dofault ) then
         i = abs( faultnormal )
-        i1 = i1node
-        i2 = i2node
-        i1(i) = 1
-        i2(i) = 1
+        i1 = 1
+        i2 = nm
+        i1(i) = ihypo(i)
+        i2(i) = ihypo(i)
         j1 = i1(1); j2 = i2(1)
         k1 = i1(2); k2 = i2(2)
         l1 = i1(3); l2 = i2(3)
-        i1(i) = ihypo(i)
-        i2(i) = ihypo(i)
-        j3 = i1(1); j4 = i2(1)
-        k3 = i1(2); k4 = i2(2)
-        l3 = i1(3); l4 = i2(3)
         do i = 1, 3
-          t1(j1:j2,k1:k2,l1:l2,i) = xout(iz,i) - x(j3:j4,k3:k4,l3:l4,i)
+          t2(:,:,:,i) = xout(iz,i) - x(j1:j2,k1:k2,l1:l2,i)
         end do
-        f1 = sum( t1 * t1, 4 )
-        f2 = 2. * maxval( f1 )
-        f2(j1:j2,k1:k2,l1:l2) = f1(j1:j2,k1:k2,l1:l2)
+        f2 = sum( t2 * t2, 4 )
         i = abs( faultnormal )
+        call sethalo( f2, 2. * maxval( f2 ), i1node, i2node )
         call pminloc( rout, i1, f2, nn, nnoff, i )
         i1(i) = ihypo(i)
       end if
@@ -220,25 +214,21 @@ doiz0: do iz = 1, nout
         k1 = i1(2); k2 = i2(2)
         l1 = i1(3); l2 = i2(3)
         forall( j=j1:j2, k=k1:k2, l=l1:l2, i=1:3 )
-          w1(j,k,l,i) = xout(iz,i) - 0.125 * &
+          w2(j,k,l,i) = xout(iz,i) - 0.125 * &
             ( x(j,k,l,i) + x(j+1,k+1,l+1,i) &
             + x(j+1,k,l,i) + x(j,k+1,l+1,i) &
             + x(j,k+1,l,i) + x(j+1,k,l+1,i) &
             + x(j,k,l+1,i) + x(j+1,k+1,l,i) )
         end forall
+        s2 = sum( w2 * w2, 4 )
+        call sethalo( s2, 2. * maxval( s2 ), i1node, i2cell )
       else
-        i1 = i1node
-        i2 = i2node
-        j1 = i1(1); j2 = i2(1)
-        k1 = i1(2); k2 = i2(2)
-        l1 = i1(3); l2 = i2(3)
         do i = 1, 3
-          w1(j1:j2,k1:k2,l1:l2,i) = xout(iz,i) - x(j1:j2,k1:k2,l1:l2,i)
+          w2(:,:,:,i) = xout(iz,i) - x(:,:,:,i)
         end do
+        s2 = sum( w2 * w2, 4 )
+        call sethalo( s2, 2. * maxval( s2 ), i1node, i2node )
       end if
-      s1 = sum( w1 * w1, 4 )
-      s2 = 2. * maxval( s1 )
-      s2(j1:j2,k1:k2,l1:l2) = s1(j1:j2,k1:k2,l1:l2)
       call pminloc( rout, i1, s2, nn, nnoff, 0 )
     end if
     i2 = i1
@@ -273,8 +263,8 @@ if ( master ) then
 end if
 
 ! Init arrays
-w1 = 0.
-s1 = 0.
+w2 = 0.
+s2 = 0.
 t2 = 0.
 f2 = 0.
  

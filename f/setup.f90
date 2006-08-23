@@ -9,8 +9,6 @@ use m_collective
 use m_zone
 integer :: nl(3), n(3), ip3master(3), i
 
-if ( master ) write( 0, * ) 'Setup'
-
 ! Hypocenter
 n = nn
 i = abs( faultnormal )

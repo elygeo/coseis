@@ -22,9 +22,9 @@ use m_timestep
 ! Initialization
 call clock
 call initialize( ip, np0, master )
-if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
 call inread            ; if ( master ) call clock( '0ini', 1 )
 call setup             ; if ( master ) call clock( '0ini', 2 )
+if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
 call arrays            ; if ( master ) call clock( '0ini', 3 )
 call gridgen           ; if ( master ) call clock( '0ini', 4 )
 call material          ; if ( master ) call clock( '0ini', 5 )

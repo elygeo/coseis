@@ -7,8 +7,6 @@ subroutine arrays
 use m_globals
 integer :: i1(3), i2(3), j, k, l, j1, k1, l1, j2, k2, l2
 
-if ( master ) write( 0, * ) 'Allocate arrays'
-
 i2 = nm
 j = i2(1)
 k = i2(2)
