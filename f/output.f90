@@ -55,6 +55,7 @@ integer :: clock2
 real :: tt, dt
 if ( .not. present( it ) ) then
   call system_clock( clock0, clockrate, clockmax )
+  clock1 = clock0
 else
   call system_clock( clock2 )
   tt = real( clock2 - clock0 ) / real( clockrate )
@@ -92,7 +93,7 @@ select case( pass )
 case( 1 )
   s1 = sqrt( sum( v * v, 4 ) )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
-  pv = max( pv, s2 )
+  pv = max( pv, s1 )
   call sethalo( s1, -1., i1node, i2node )
   call sethalo( s2, -1., i1cell, i2cell )
   call pmaxloc( r1, i1, s1, n, noff, 0 )
@@ -134,11 +135,13 @@ case( 2 )
   if ( dofault ) then
     call sethalo( ts, -1., i1node, i2node )
     call sethalo( f2, -1., i1node, i2node )
-    call sethalo( tn, 2. * minval( tn ) - 1., i1node, i2node )
     call pmaxloc( r1, i1, ts, n, noff, i ); i1(ifn) = ihypo(ifn)
     call pmaxloc( r2, i2, f2, n, noff, i ); i2(ifn) = ihypo(ifn)
+    r3 = 2. * minval( tn ) - 1.
+    call sethalo( tn, r3, i1node, i2node )
     call pmaxloc( r3, i3, tn, n, noff, i ); i3(ifn) = ihypo(ifn)
-    call sethalo( tn, 2. * r3 + 1, i1node, i2node )
+    r4 = 2. * r3 + 1.
+    call sethalo( tn, r4, i1node, i2node )
     call pminloc( r4, i4, tn, n, noff, i ); i4(ifn) = ihypo(ifn)
     if ( master ) then
       call stats( r1, i1-nnoff, 'tsmax', it )

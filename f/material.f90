@@ -131,6 +131,8 @@ if ( vdamp > 0. ) then
 else
   gam = dt * viscosity(1)
 end if
+call scalarbc( gam, ibc1, ibc2, nhalo )
+call scalarswaphalo( gam, nhalo )
 
 ! Lame parameters
 s2 = mr * s2 * s2
