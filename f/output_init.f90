@@ -13,26 +13,24 @@ real :: courant, rout
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz
 character :: endian
 character(7) :: field
-logical :: fault, dofault, test, cell
+logical :: dofault, fault, static, cell
 
 i = 0
 if ( master ) then
   i = 1
   write( 0, * ) 'Output initialization'
-  inquire( file='currentstep', exist=test )
-  if ( test .and. it == 1 ) stop 'error: previous output found'
 end if
 
 ! Diagnostic
 if ( debug /= 0 ) then
   write( str, '(a,i6.6,a)' ) 'debug/db', ip, '.m'
   open( 1, file=str, status='replace' )
+  write( 1, * ) 'master      =  ', i,           ';'
   write( 1, * ) 'ifn         =  ', ifn,         ';'
   write( 1, * ) 'nin         =  ', nin,         ';'
   write( 1, * ) 'nout        =  ', nout,        ';'
   write( 1, * ) 'nlock       =  ', nlock,       ';'
   write( 1, * ) 'noper       =  ', noper,       ';'
-  write( 1, * ) 'master      =  ', i,           ';'
   write( 1, * ) 'ip          =  ', ip,          ';'
   write( 1, * ) 'ip3         = [', ip3,        '];'
   write( 1, * ) 'np          = [', np,         '];'

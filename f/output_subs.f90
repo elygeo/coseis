@@ -70,12 +70,12 @@ end subroutine
 
 ! Output properties
 subroutine outprops( field, nc, fault, static, cell )
-logical, intent(in) :: field
+character(*), intent(in) :: field
 integer, intent(out) :: nc
 logical, intent(out) :: fault, static, cell
 nc = 1
 fault = .false.
-static = .false..
+static = .false.
 cell = .false.
 select case( field )
 case( 'x'    ); static = .true.; nc = 3
