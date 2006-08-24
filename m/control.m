@@ -61,7 +61,6 @@ case { 'e',     'end'  }, dicursor = 0; icursor(1:3) = fmaxi; cursor; msg = 'Ext
 case { 'w',   'insert' }, snap
 case 'return', render
 case 'space'
-  rehash
   currentstep
   istep = dit * 10 ^ km;
   if icursor(4) + istep <= it
@@ -74,7 +73,6 @@ case 'space'
   end
 case 'r'
   anim = 1;
-  rehash
   currentstep
   istep = dit * 10 ^ km;
   icursorhold = icursor;
@@ -86,7 +84,6 @@ case 'r'
     if export && ~length( msg )
       snap( sprintf( 'movie/frame%06d.png', icursor(4) ) )
     end
-    rehash
     currentstep
   end
 case 'escape'

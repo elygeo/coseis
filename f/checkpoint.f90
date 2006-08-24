@@ -48,7 +48,8 @@ if ( it == 0 ) then
   return
 end if
 if ( master ) write( 0, * ) 'Checkpoint found, starting from ', it
-write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', it, '-', ip
+i = modulo( it / itcheck, 2 )
+write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', i, '-', ip
 inquire( iolength=i ) &
   t, v, u, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, pv, psv, trup, tarr, efric
 open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
@@ -68,7 +69,8 @@ end if
 if ( itcheck < 1 ) itcheck = itcheck + nt + 1
 if ( modulo( it, itcheck ) /= 0 ) return
 ip = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
-write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', it, '-', ip
+i = modulo( it / itcheck, 2 )
+write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', i, '-', ip
 inquire( iolength=i ) &
   t, v, u, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, pv, psv, trup, tarr, efric
 open( 1, file=str, recl=i, form='unformatted', access='direct', status='replace' )

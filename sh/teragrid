@@ -54,12 +54,12 @@ cat << END > pbsscript
 #PBS -e err.log
 #PBS -V
 #cd $rundir/data
-#date > stamp0
+#date > $rundir/clock0
 #time mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-$mode
 cd $rundir
-date > stamp1
+date > clock1
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
-date > stamp2
+date > clock2
 END
 chmod u+x pbsscript
 fi
@@ -67,10 +67,10 @@ fi
 case $mode$run in
   si) ./sord-s ;;
   sg) totalview ./sord-s ;;
-  sb) nohup ./sord-s > errors & ;;
+  sb) nohup ./sord-s > out.log & ;;
   pi) mpirun -machinefile mf -np $np ./sord-p ;;
   pg) mpirun -tv -machinefile mf -np $np ./sord-p ;;
-  pb) nohup mpirun -machinefile mf -np $np ./sord-p > errors & ;;
+  pb) nohup mpirun -machinefile mf -np $np ./sord-p > out.log & ;;
   pq) pbsjob=$( qsub pbsscript ) ;;
 esac
 

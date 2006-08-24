@@ -40,12 +40,12 @@ cat << END > pbsscript
 #PBS -V
 sleep 2
 #cd $rundir/data
-#date > stamp0
+#date > $rundir/clock0
 #mpiexec -n $np ./scecvm4-$mode
 cd $rundir
-date > stamp1
+date > clock1
 mpiexec -n $np ./sord-$mode
-date > stamp2
+date > clock2
 END
 chmod u+x pbsscript
 fi
@@ -53,7 +53,7 @@ fi
 case $run in
   i) mpirun -machinefile mf -np $np ./sord-$mode ;;
   g) mpirun -machinefile mf -np $np -dbg=gdb ./sord-$mode ;;
-  b) nohup mpirun -machinefile mf -np $np ./sord-$mode > errors & ;;
+  b) nohup mpirun -machinefile mf -np $np ./sord-$mode > out.log & ;;
   q) pbsjob=$( qsub pbsscript ) ;;
 esac
 

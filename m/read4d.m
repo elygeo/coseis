@@ -16,7 +16,6 @@ if nargin > 3
 end
 
 % Metadata
-rehash
 meta
 currentstep
 

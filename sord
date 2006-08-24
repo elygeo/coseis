@@ -203,6 +203,7 @@ common="
   fault.f90
   checkpoint.f90
   pml.f90
+  output_subs.f90
   output_init.f90
   output.f90
   stress.f90
@@ -290,10 +291,10 @@ babieca) . "$srcdir/sh/babieca" ;;
 case $mode$run in
   si) ./sord-s ;;
   sg) ddd ./sord-s ;;
-  sb) nice nohup ./sord-s > errors & ;;
+  sb) nice nohup ./sord-s > out.log & ;;
   pi) mpiexec -np $np ./sord-p ;;
   pg) mpiexec -gdb -np $np ./sord-p ;;
-  pb) nice nohup mpiexec -np $np ./sord-p > errors & ;;
+  pb) nice nohup mpiexec -np $np ./sord-p > out.log & ;;
 esac
 ;;
 esac

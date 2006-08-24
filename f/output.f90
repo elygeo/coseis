@@ -3,80 +3,15 @@ module m_output
 implicit none
 contains
 
-! Write integer binary timeseries
-subroutine iwrite( filename, val, it )
-character(*), intent(in) :: filename
-integer, intent(in) :: val, it
-integer :: i
-inquire( iolength=i ) val
-if ( it == 1 ) then
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
-else
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
-end if
-write( 1, rec=it ) val
-close( 1 )
-end subroutine
-
-! Write real binary timeseries
-subroutine rwrite( filename, val, it )
-character(*), intent(in) :: filename
-real, intent(in) :: val
-integer, intent(in) :: it
-integer :: i
-inquire( iolength=i ) val
-if ( it == 1 ) then
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
-else
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
-end if
-write( 1, rec=it ) val
-close( 1 )
-end subroutine
-
-! Write stats
-subroutine stats( rr, ii, filename, it )
-use m_collective
-real, intent(in) :: rr
-character(*), intent(in) :: filename
-integer, intent(in) :: ii(3), it
-call rwrite( 'stats/' // filename, rr, it )
-call iwrite( 'stats/' // filename // '1', ii(1), it )
-call iwrite( 'stats/' // filename // '2', ii(2), it )
-call iwrite( 'stats/' // filename // '3', ii(3), it )
-end subroutine
-
-! Write timing info
-subroutine clock( filename, it )
-character(*), intent(in), optional :: filename
-integer, intent(in), optional :: it
-integer, save :: clock0, clock1, clockrate, clockmax
-integer :: clock2
-real :: tt, dt
-if ( .not. present( it ) ) then
-  call system_clock( clock0, clockrate, clockmax )
-  clock1 = clock0
-else
-  call system_clock( clock2 )
-  tt = real( clock2 - clock0 ) / real( clockrate )
-  dt = real( clock2 - clock1 ) / real( clockrate )
-  if ( tt < 0. ) tt = real( clock2 - clock0 + clockmax ) / real( clockrate ) 
-  if ( dt < 0. ) dt = real( clock2 - clock1 + clockmax ) / real( clockrate ) 
-  call rwrite( 'clock/tt' // filename, tt, it )
-  call rwrite( 'clock/dt' // filename, dt, it )
-  clock1 = clock2
-end if
-end subroutine
-
-! Main output routine
 subroutine output( pass )
 use m_globals
+use m_output_subs
 use m_collectiveio
 use m_bc
 integer, intent(in) :: pass
 real :: r1, r2, r3, r4
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), noff(3), i, onpass, nc, ic, ir, iz
-logical :: fault, dofault
+logical :: dofault, fault, static, cell
 
 ! Test for fault
 dofault = .false.
@@ -163,52 +98,24 @@ else
 end if
 
 ! Properties
-nc = 1
-fault= .false.
-onpass = 2
-select case( fieldout(iz) )
-case( 'x'    ); nc = 3
-case( 'mr'   );
-case( 'mu'   );
-case( 'lam'  );
-case( 'y'    );
-case( 'v'    ); nc = 3; onpass = 1
-case( 'u'    ); nc = 3
-case( 'w'    ); nc = 6; onpass = 1
-case( 'a'    ); nc = 3
-case( 'vm'   ); onpass = 1
-case( 'um'   )
-case( 'wm'   ); onpass = 1
-case( 'am'   );
-case( 'pv'   );
-case( 'nhat' ); fault = .true.; nc = 3
-case( 'ts0'  ); fault = .true.; nc = 3; onpass = 1
-case( 'tsm0' ); fault = .true.; onpass = 1
-case( 'tn0'  ); fault = .true.; onpass = 1
-case( 'mus'  ); fault = .true.
-case( 'mud'  ); fault = .true.
-case( 'dc'   ); fault = .true.
-case( 'co'   ); fault = .true.
-case( 'sv'   ); fault = .true.; nc = 3; onpass = 1
-case( 'su'   ); fault = .true.; nc = 3; onpass = 1
-case( 'ts'   ); fault = .true.; nc = 3
-case( 'sa'   ); fault = .true.; nc = 3
-case( 'svm'  ); fault = .true.; onpass = 1
-case( 'sum'  ); fault = .true.; onpass = 1
-case( 'tsm'  ); fault = .true.
-case( 'sam'  ); fault = .true.
-case( 'tn'   ); fault = .true.
-case( 'fr'   ); fault = .true.
-case( 'sl'   ); fault = .true.
-case( 'psv'  ); fault = .true.
-case( 'trup' ); fault = .true.
-case( 'tarr' ); fault = .true.
-case default
-  write( 0, * ) 'error: unknown output field: ', fieldout(iz)
-  stop
-end select
+call outprops( fieldout(iz), nc, fault, static, cell )
+if ( static ) ditout(iz) = 0
 
 ! Select pass
+onpass = 2
+select case( fieldout(iz) )
+case( 'v'    ); onpass = 1
+case( 'w'    ); onpass = 1
+case( 'vm'   ); onpass = 1
+case( 'wm'   ); onpass = 1
+case( 'ts0'  ); onpass = 1
+case( 'tsm0' ); onpass = 1
+case( 'tn0'  ); onpass = 1
+case( 'sv'   ); onpass = 1
+case( 'su'   ); onpass = 1
+case( 'svm'  ); onpass = 1
+case( 'sum'  ); onpass = 1
+end select
 if ( pass /= onpass ) cycle doiz
 
 ! Indices
@@ -216,6 +123,7 @@ i1 = i1out(iz,:)
 i2 = i2out(iz,:)
 i3 = max( i1, i1node )
 i4 = min( i2, i2node )
+if ( cell ) i4 = min( i2, i2cell )
 if ( fault ) then
   i = abs( faultnormal )
   i1(i) = 1

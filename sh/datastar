@@ -61,10 +61,13 @@ cat << END > llscript
 #@ notify_user = $LOGNAME
 #@ initialdir = $rundir
 #@ queue
+#date > $rundir/clock0
+#cd $rundir/data
+#poe $opts ./scecvm4-$mode
 cd $rundir
-date > stamp1
+date > clock1
 poe ./sord-p $opts
-date > stamp2
+date > clock2
 END
 chmod u+x llscript
 fi
@@ -72,10 +75,10 @@ fi
 case $mode$run in
   si) ./sord-s ;;
   sg) totalview ./sord-s ;;
-  sb) nohup ./sord-s > errors & ;;
+  sb) nohup ./sord-s > out.log & ;;
   pi) poe ./sord-p $opts ;;
   pg) tvpoe ./sord-p $opts ;;
-  pb) nohup poe ./sord-p $opts > errors & ;;
+  pb) nohup poe ./sord-p $opts > out.log & ;;
   pq) lljob=$( llsubmit llscript ) ;;
 esac
 

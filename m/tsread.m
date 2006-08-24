@@ -7,7 +7,6 @@ vta = [];
 labels = {};
 
 % Read metadata
-rehash
 meta
 if faultnormal, faultmeta, end
 currentstep

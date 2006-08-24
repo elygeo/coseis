@@ -22,17 +22,17 @@ use m_timestep
 ! Initialization
 call clock
 call initialize( ip, np0, master )
-call inread            ; if ( master ) call clock( '0ini', 1 )
-call setup             ; if ( master ) call clock( '0ini', 2 )
+call inread
+call setup
 if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
-call arrays            ; if ( master ) call clock( '0ini', 3 )
-call gridgen           ; if ( master ) call clock( '0ini', 4 )
-call material          ; if ( master ) call clock( '0ini', 5 )
-call pml               ; if ( master ) call clock( '0ini', 6 )
-call momentsource_init ; if ( master ) call clock( '0ini', 7 )
-call fault_init        ; if ( master ) call clock( '0ini', 8 )
-call output_init       ; if ( master ) call clock( '0ini', 9 )
-call readcheckpoint    ; if ( master ) call clock( '0ini', 10 )
+call arrays            ; if ( master ) call clock( '0ini', 1 )
+call gridgen           ; if ( master ) call clock( '0ini', 2 )
+call material          ; if ( master ) call clock( '0ini', 3 )
+call pml
+call momentsource_init
+call fault_init        ; if ( master ) call clock( '0ini', 4 )
+call output_init       ; if ( master ) call clock( '0ini', 5 )
+call readcheckpoint    ; if ( master ) call clock( '0ini', 6 )
 
 ! Main loop
 if ( master ) write( 0, * ) 'Main loop'
@@ -40,13 +40,13 @@ do while ( it < nt )
   call clock
   call timestep        ; if ( master ) call clock( '1tst', it )
   call stress          ; if ( master ) call clock( '2str', it )
-  call momentsource    ; if ( master ) call clock( '3src', it )
-  call output( 1 )     ; if ( master ) call clock( '4out', it )
-  call acceleration    ; if ( master ) call clock( '5acc', it )
-  call fault           ; if ( master ) call clock( '6flt', it )
-  call locknodes       ; if ( master ) call clock( '7lok', it )
-  call output( 2 )     ; if ( master ) call clock( '8out', it )
-  call writecheckpoint ; if ( master ) call clock( '9ckp', it )
+  call momentsource
+  call output( 1 )     ; if ( master ) call clock( '3out', it )
+  call acceleration    ; if ( master ) call clock( '4acc', it )
+  call fault           ; if ( master ) call clock( '5flt', it )
+  call locknodes
+  call output( 2 )     ; if ( master ) call clock( '6out', it )
+  call writecheckpoint ; if ( master ) call clock( '7ckp', it )
   if ( master ) then
     write( 0, '(a)', advance='no' ) '.'
     if ( it == nt .or. mod( it, 50 ) == 0 ) write( 0, '(i6)' ) it

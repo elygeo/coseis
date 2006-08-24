@@ -5,6 +5,7 @@ contains
 
 subroutine output_init
 use m_globals
+use m_output_subs
 use m_collectiveio
 use m_zone
 use m_bc
@@ -127,51 +128,9 @@ end if
 
 doiz0: do iz = 1, nout
 
-  ! Properties
-  nc = 1
-  fault = .false.
-  cell = .false.
-  select case( fieldout(iz) )
-  case( 'x'    ); ditout(iz) = 0; nc = 3
-  case( 'mr'   ); ditout(iz) = 0
-  case( 'mu'   ); ditout(iz) = 0; cell = .true.
-  case( 'lam'  ); ditout(iz) = 0; cell = .true.
-  case( 'y'    ); ditout(iz) = 0; cell = .true.
-  case( 'a'    ); nc = 3
-  case( 'v'    ); nc = 3
-  case( 'u'    ); nc = 3
-  case( 'w'    ); nc = 6; cell = .true.
-  case( 'am'   );
-  case( 'vm'   );
-  case( 'um'   );
-  case( 'wm'   ); cell = .true.
-  case( 'pv'   );
-  case( 'nhat' ); fault = .true.; ditout(iz) = 0; nc = 3
-  case( 'ts0'  ); fault = .true.; ditout(iz) = 0; nc = 3
-  case( 'tsm0' ); fault = .true.; ditout(iz) = 0
-  case( 'tn0'  ); fault = .true.; ditout(iz) = 0
-  case( 'mus'  ); fault = .true.; ditout(iz) = 0
-  case( 'mud'  ); fault = .true.; ditout(iz) = 0
-  case( 'dc'   ); fault = .true.; ditout(iz) = 0
-  case( 'co'   ); fault = .true.; ditout(iz) = 0
-  case( 'sa'   ); fault = .true.; nc = 3
-  case( 'sv'   ); fault = .true.; nc = 3
-  case( 'su'   ); fault = .true.; nc = 3
-  case( 'ts'   ); fault = .true.; nc = 3
-  case( 'sam'  ); fault = .true.
-  case( 'svm'  ); fault = .true.
-  case( 'sum'  ); fault = .true.
-  case( 'tsm'  ); fault = .true.
-  case( 'tn'   ); fault = .true.
-  case( 'fr'   ); fault = .true.
-  case( 'sl'   ); fault = .true.
-  case( 'psv'  ); fault = .true.
-  case( 'trup' ); fault = .true.
-  case( 'tarr' ); fault = .true.
-  case default
-    write( 0, * ) 'unknown output field: ', fieldout(iz)
-    stop
-  end select
+  ! Output field properties
+  call outprops( fieldout(iz), nc, fault, static, cell )
+  if ( static ) ditout(iz) = 0
 
   ! Zone or point location
   select case( outtype(iz) )
@@ -201,9 +160,9 @@ doiz0: do iz = 1, nout
         do i = 1, 3
           t2(:,:,:,i) = xout(iz,i) - x(j1:j2,k1:k2,l1:l2,i)
         end do
-        f2 = sum( t2 * t2, 4 )
         i = abs( faultnormal )
-        call sethalo( f2, 2. * maxval( f2 ), i1node, i2node )
+        f2 = sum( t2 * t2, 4 )
+        call sethalo( f2, rmax * rmax, i1node, i2node )
         call pminloc( rout, i1, f2, nn, nnoff, i )
         i1(i) = ihypo(i)
       end if
@@ -222,13 +181,13 @@ doiz0: do iz = 1, nout
             + x(j,k,l+1,i) + x(j+1,k+1,l,i) )
         end forall
         s2 = sum( w2 * w2, 4 )
-        call sethalo( s2, 2. * maxval( s2 ), i1node, i2cell )
+        call sethalo( s2, rmax * rmax, i1node, i2cell )
       else
         do i = 1, 3
           w2(:,:,:,i) = xout(iz,i) - x(:,:,:,i)
         end do
         s2 = sum( w2 * w2, 4 )
-        call sethalo( s2, 2. * maxval( s2 ), i1node, i2node )
+        call sethalo( s2, rmax * rmax, i1node, i2node )
       end if
       call pminloc( rout, i1, s2, nn, nnoff, 0 )
     end if
@@ -253,6 +212,7 @@ doiz0: do iz = 1, nout
   ! Split collective i/o
   i1 = max( i1, i1node )
   i2 = min( i2, i2node )
+  if ( cell ) i2 = min( i2, i2cell )
   if ( any( i2 < i1 ) ) ditout(iz) = nt + 1
   call splitio( iz, nout, ditout(iz) )
  
@@ -263,12 +223,6 @@ if ( master ) then
   close( 1 )
 end if
 
-! Init arrays
-w2 = 0.
-s2 = 0.
-t2 = 0.
-f2 = 0.
- 
 end subroutine
 
 end module
