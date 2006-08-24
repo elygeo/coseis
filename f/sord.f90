@@ -8,6 +8,7 @@ use m_arrays
 use m_checkpoint
 use m_gridgen
 use m_material
+use m_output_subs
 use m_output_init
 use m_output
 use m_pml
