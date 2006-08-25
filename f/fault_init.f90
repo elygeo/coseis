@@ -10,7 +10,7 @@ use m_bc
 use m_surfnormals
 use m_zone
 real :: mus0, mud0, dc0, lc, tn0, ts0, ess, rctest, x1(3), x2(3), rr
-integer :: i1(3), i2(3), i1l(3), i2l(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
+integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
 
 if ( ifn == 0 ) return
 if ( master ) write( 0, * ) 'Fault initialization'
@@ -29,26 +29,26 @@ select case( intype(iz) )
 case( 'r' )
   i1 = 1  + nnoff
   i2 = nn + nnoff
-  i1l = i1node
-  i2l = i2node
+  i3 = i1node
+  i4 = i2node
   i1(ifn) = 1
   i2(ifn) = 1
-  i1l(ifn) = 1
-  i2l(ifn) = 1
+  i3(ifn) = 1
+  i4(ifn) = 1
   select case( fieldin(iz) )
-  case( 'mus' ); call scalario( 'r', 'data/mus', mus,   1, i1, i2, i1l, i2l, ifn )
-  case( 'mud' ); call scalario( 'r', 'data/mud', mud,   1, i1, i2, i1l, i2l, ifn )
-  case( 'dc'  ); call scalario( 'r', 'data/dc',  dc,    1, i1, i2, i1l, i2l, ifn )
-  case( 'co'  ); call scalario( 'r', 'data/co',  co,    1, i1, i2, i1l, i2l, ifn )
-  case( 'sxx' ); call vectorio( 'r', 'data/sxx', t1, 1, 1, i1, i2, i1l, i2l, ifn )
-  case( 'syy' ); call vectorio( 'r', 'data/syy', t1, 2, 1, i1, i2, i1l, i2l, ifn )
-  case( 'szz' ); call vectorio( 'r', 'data/szz', t1, 3, 1, i1, i2, i1l, i2l, ifn )
-  case( 'syz' ); call vectorio( 'r', 'data/syz', t2, 1, 1, i1, i2, i1l, i2l, ifn )
-  case( 'szx' ); call vectorio( 'r', 'data/szx', t2, 2, 1, i1, i2, i1l, i2l, ifn )
-  case( 'sxy' ); call vectorio( 'r', 'data/szy', t2, 3, 1, i1, i2, i1l, i2l, ifn )
-  case( 'tn'  ); call vectorio( 'r', 'data/tn',  t3, 1, 1, i1, i2, i1l, i2l, ifn )
-  case( 'th'  ); call vectorio( 'r', 'data/th',  t3, 2, 1, i1, i2, i1l, i2l, ifn )
-  case( 'td'  ); call vectorio( 'r', 'data/td',  t3, 3, 1, i1, i2, i1l, i2l, ifn )
+  case( 'mus' ); call scalario( 'r', 'data/mus', mus,   1, i1, i2, i3, i4, ifn )
+  case( 'mud' ); call scalario( 'r', 'data/mud', mud,   1, i1, i2, i3, i4, ifn )
+  case( 'dc'  ); call scalario( 'r', 'data/dc',  dc,    1, i1, i2, i3, i4, ifn )
+  case( 'co'  ); call scalario( 'r', 'data/co',  co,    1, i1, i2, i3, i4, ifn )
+  case( 'sxx' ); call vectorio( 'r', 'data/sxx', t1, 1, 1, i1, i2, i3, i4, ifn )
+  case( 'syy' ); call vectorio( 'r', 'data/syy', t1, 2, 1, i1, i2, i3, i4, ifn )
+  case( 'szz' ); call vectorio( 'r', 'data/szz', t1, 3, 1, i1, i2, i3, i4, ifn )
+  case( 'syz' ); call vectorio( 'r', 'data/syz', t2, 1, 1, i1, i2, i3, i4, ifn )
+  case( 'szx' ); call vectorio( 'r', 'data/szx', t2, 2, 1, i1, i2, i3, i4, ifn )
+  case( 'sxy' ); call vectorio( 'r', 'data/szy', t2, 3, 1, i1, i2, i3, i4, ifn )
+  case( 'tn'  ); call vectorio( 'r', 'data/tn',  t3, 1, 1, i1, i2, i3, i4, ifn )
+  case( 'th'  ); call vectorio( 'r', 'data/th',  t3, 2, 1, i1, i2, i3, i4, ifn )
+  case( 'td'  ); call vectorio( 'r', 'data/td',  t3, 3, 1, i1, i2, i3, i4, ifn )
   end select
 case( 'z' )
   rr = inval(iz)

@@ -21,11 +21,9 @@ if ( faultnormal /= 0 ) then
 end if
 
 ! Prepare output and write stats
-if ( master ) call rwrite( 'stats/t', t, it )
 n = nn + 2 * nhalo
 noff = nnoff - nhalo
 select case( pass )
-case( 0 )
 case( 1 )
   s1 = sqrt( sum( v * v, 4 ) )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
@@ -37,6 +35,7 @@ case( 1 )
   if ( master ) then
     call stats( r1, i1-nnoff, 'vmax', it )
     call stats( r2, i2-nnoff, 'wmax', it )
+    call rwrite( 'stats/t', t, it )
   end if
   if ( dofault ) then
     call sethalo( f1, -1., i1node, i2node )
@@ -87,7 +86,9 @@ case( 2 )
       call rwrite( 'stats/efric', efric, it )
       call rwrite( 'stats/estrain', estrain, it )
       call rwrite( 'stats/m0', m0, it )
-      call rwrite( 'stats/mw', 2. / 3. * log10( m0 ) - 10.7, it )
+      r1 = -0.
+      if ( m0 > 0. ) r1 = 2. / 3. * log10( m0 ) - 10.7
+      call rwrite( 'stats/mw', r1, it )
     end if
   end if
 end select
@@ -95,7 +96,7 @@ end select
 doiz: do iz = 1, nout !--------------------------------------------------------!
 
 ! Pass
-if ( pass /= 0 ) then
+if ( ditout(iz) /= 0 ) then
   if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 end if
 call outprops( fieldout(iz), nc, onpass, fault, cell )

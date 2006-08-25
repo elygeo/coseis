@@ -8,8 +8,8 @@ use m_globals
 use m_optimize
 use m_collectiveio
 use m_zone
-integer :: i1(3), i2(3), i1l(3), i2l(3), n(3), &
-  i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, up(1)
+integer :: i1(3), i2(3), i3(3), i4(3), n(3), i, j, k, l, &
+  j1, k1, l1, j2, k2, l2, idoublenode, up(1)
 real :: x1, x2, m(9)
 logical :: expand
 
@@ -19,21 +19,21 @@ if ( master ) write( 0, * ) 'Grid generation'
 idoublenode = 0
 i1 = 1  + nnoff
 i2 = nn + nnoff
-i1l = i1node
-i2l = i2node
+i3 = i1node
+i4 = i2node
 if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
-  if ( ihypo(i) < i1l(i) ) then
+  if ( ihypo(i) < i3(i) ) then
     if ( ihypo(i) >= i1(i) ) i1(i) = i1(i) + 1
   else
     if ( ihypo(i) <  i2(i) ) i2(i) = i2(i) - 1
-    if ( ihypo(i) <= i2l(i) ) idoublenode = i
-    if ( ihypo(i) <  i2l(i) ) i2l(i) = i2l(i) - 1
+    if ( ihypo(i) <= i4(i) ) idoublenode = i
+    if ( ihypo(i) <  i4(i) ) i4(i) = i4(i) - 1
   end if
 end if
-j1 = i1l(1); j2 = i2l(1)
-k1 = i1l(2); k2 = i2l(2)
-l1 = i1l(3); l2 = i2l(3)
+j1 = i3(1); j2 = i4(1)
+k1 = i3(2); k2 = i4(2)
+l1 = i3(3); l2 = i4(3)
 
 ! Read grid files or create basic rectangular mesh
 x = 0.
@@ -42,9 +42,9 @@ if ( grid /= 'read' ) then
   forall( i=k1:k2 ) x(:,i,:,2) = dx * ( i - i1(2) )
   forall( i=l1:l2 ) x(:,:,i,3) = dx * ( i - i1(3) )
 else
-  call vectorio( 'r', 'data/x1', x, 1, 1, i1, i2, i1l, i2l, 0 )
-  call vectorio( 'r', 'data/x2', x, 2, 1, i1, i2, i1l, i2l, 0 )
-  call vectorio( 'r', 'data/x3', x, 3, 1, i1, i2, i1l, i2l, 0 )
+  call vectorio( 'r', 'data/x1', x, 1, 1, i1, i2, i3, i4, 0 )
+  call vectorio( 'r', 'data/x2', x, 2, 1, i1, i2, i3, i4, 0 )
+  call vectorio( 'r', 'data/x3', x, 3, 1, i1, i2, i3, i4, 0 )
 end if
 
 ! Coordinate system
@@ -58,33 +58,33 @@ expand = .false.
 if ( rexpand > 1. ) then
   i1 = i1 + n1expand
   i2 = i2 - n2expand
-  if ( any( i1l < i1 ) .or. any( i2 < i2l ) ) expand = .true.
-  do j = i1l(1), min( i2l(1), i1(1) - 1 )
+  if ( any( i3 < i1 ) .or. any( i2 < i4 ) ) expand = .true.
+  do j = i3(1), min( i4(1), i1(1) - 1 )
     i = i1(1) - j
     x(j,:,:,1) = x(j,1,1,1) + &
       dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
-  do j = max( i1l(1), i2(1) + 1 ), i2l(1)
+  do j = max( i3(1), i2(1) + 1 ), i4(1)
     i = j - i2(1)
     x(j,:,:,1) = x(j,1,1,1) - &
       dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
-  do k = i1l(2), min( i2l(2), i1(2) - 1 )
+  do k = i3(2), min( i4(2), i1(2) - 1 )
     i = i1(2) - k
     x(:,k,:,2) = x(1,k,1,2) + &
       dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
-  do k = max( i1l(2), i2(2) + 1 ), i2l(2)
+  do k = max( i3(2), i2(2) + 1 ), i4(2)
     i = k - i2(2)
     x(:,k,:,2) = x(1,k,1,2) - &
       dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
-  do l = i1l(3), min( i2l(3), i1(3) - 1 )
+  do l = i3(3), min( i4(3), i1(3) - 1 )
     i = i1(3) - l
     x(:,:,l,3) = x(1,1,l,3) + &
       dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
-  do l = max( i1l(3), i2(3) + 1 ), i2l(3)
+  do l = max( i3(3), i2(3) + 1 ), i4(3)
     i = l - i2(3)
     x(:,:,l,3) = x(1,1,l,3) - &
       dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
@@ -107,9 +107,9 @@ case( 'spherical' )
 end select
 
 ! Symmetry
-i1 = ( i1l + i2l ) / 2
-i2 = ( i1l + i2l + 1 ) / 2
-n  = ( i2l - i1l + 1 ) / 2
+i1 = ( i3 + i4 ) / 2
+i2 = ( i3 + i4 + 1 ) / 2
+n  = ( i4 - i3 + 1 ) / 2
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
@@ -138,9 +138,9 @@ k = ihypo(2)
 l = ihypo(3)
 i1 = abs( ibc1 )
 i2 = abs( ibc2 )
-j1 = i1l(1); j2 = i2l(1)
-k1 = i1l(2); k2 = i2l(2)
-l1 = i1l(3); l2 = i2l(3)
+j1 = i3(1); j2 = i4(1)
+k1 = i3(2); k2 = i4(2)
+l1 = i3(3); l2 = i4(3)
 
 ! Random noise added to mesh
 if ( gridnoise > 0. ) then

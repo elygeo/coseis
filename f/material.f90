@@ -7,9 +7,10 @@ subroutine material
 use m_globals
 use m_collectiveio
 use m_zone
+use m_bc
 real :: x1(3), x2(3)
-integer :: i1(3), i2(3), i1l(3), i2l(3), &
-  i, j, k, l, j1, k1, l1, j2, k2, l2, iz, idoublenode
+integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, &
+  j1, k1, l1, j2, k2, l2, iz, idoublenode
 
 if ( master ) write( 0, * ) 'Material model'
 
@@ -26,14 +27,14 @@ doiz: do iz = 1, nin
 i1 = i1in(iz,:)
 i2 = i2in(iz,:)
 call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
-i1l = max( i1, i1node )
-i2l = min( i2, i2node )
+i3 = max( i1, i1node )
+i4 = min( i2, i2node )
 
 select case( intype(iz) )
 case( 'z' )
-  j1 = i1l(1); j2 = i2l(1)
-  k1 = i1l(2); k2 = i2l(2)
-  l1 = i1l(3); l2 = i2l(3)
+  j1 = i3(1); j2 = i4(1)
+  k1 = i3(2); k2 = i4(2)
+  l1 = i3(3); l2 = i4(3)
   select case( fieldin(iz) )
   case( 'rho' ); mr(j1:j2,k1:k2,l1:l2) = inval(iz)
   case( 'vp'  ); s1(j1:j2,k1:k2,l1:l2) = inval(iz)
@@ -51,34 +52,34 @@ case( 'r' )
   idoublenode = 0
   if ( faultnormal /= 0 ) then
     i = abs( faultnormal )
-    if ( ihypo(i) < i1l(i) ) then
+    if ( ihypo(i) < i3(i) ) then
       if ( ihypo(i) >= i1(i) ) i1(i) = i1(i) + 1
     else
       if ( ihypo(i) <  i2(i) ) i2(i) = i2(i) - 1
-      if ( ihypo(i) <= i2l(i) ) idoublenode = i
-      if ( ihypo(i) <  i2l(i) ) i2l(i) = i2l(i) - 1
+      if ( ihypo(i) <= i4(i) ) idoublenode = i
+      if ( ihypo(i) <  i4(i) ) i4(i) = i4(i) - 1
     end if
   end if
-  j1 = i1l(1); j2 = i2l(1)
-  k1 = i1l(2); k2 = i2l(2)
-  l1 = i1l(3); l2 = i2l(3)
+  j1 = i3(1); j2 = i4(1)
+  k1 = i3(2); k2 = i4(2)
+  l1 = i3(3); l2 = i4(3)
   select case( fieldin(iz) )
   case( 'rho' )
-    call scalario( 'r', 'data/rho', mr, 1, i1, i2, i1l, i2l, 0 )
+    call scalario( 'r', 'data/rho', mr, 1, i1, i2, i3, i4, 0 )
     select case( idoublenode )
     case( 1 ); j = ihypo(1); mr(j+1:j2+1,:,:) = mr(j:j2,:,:)
     case( 2 ); k = ihypo(2); mr(:,k+1:k2+1,:) = mr(:,k:k2,:)
     case( 3 ); l = ihypo(3); mr(:,:,l+1:l2+1) = mr(:,:,l:l2)
     end select
   case( 'vp'  )
-    call scalario( 'r', 'data/vp', s1, 1, i1, i2, i1l, i2l, 0 )
+    call scalario( 'r', 'data/vp', s1, 1, i1, i2, i3, i4, 0 )
     select case( idoublenode )
     case( 1 ); j = ihypo(1); s1(j+1:j2+1,:,:) = s1(j:j2,:,:)
     case( 2 ); k = ihypo(2); s1(:,k+1:k2+1,:) = s1(:,k:k2,:)
     case( 3 ); l = ihypo(3); s1(:,:,l+1:l2+1) = s1(:,:,l:l2)
     end select
   case( 'vs'  )
-    call scalario( 'r', 'data/vs', s2, 1, i1, i2, i1l, i2l, 0 )
+    call scalario( 'r', 'data/vs', s2, 1, i1, i2, i3, i4, 0 )
     select case( idoublenode )
     case( 1 ); j = ihypo(1); s2(j+1:j2+1,:,:) = s2(j:j2,:,:)
     case( 2 ); k = ihypo(2); s2(:,k+1:k2+1,:) = s2(:,k:k2,:)

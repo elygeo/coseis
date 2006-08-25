@@ -197,6 +197,7 @@ common="
   optimize.f90
   gridgen.f90
   material.f90
+  resample.f90
   momentsource.f90
   fault_init.f90
   fault.f90
