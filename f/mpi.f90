@@ -266,6 +266,7 @@ real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: ir, i1(3), i2(3), i3(3), i4(3), iz
 integer :: ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
 integer(kind=mpi_offset_kind) :: d = 0
+
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 nl = (/ i4 - i3 + 1, 1      /)
 n  = (/ i2 - i1 + 1, ir     /)
@@ -301,6 +302,10 @@ real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: ic, ir, i1(3), i2(3), i3(3), i4(3), iz
 integer :: ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
 integer(kind=mpi_offset_kind) :: d = 0
+
+write( 10+ip, * ) ip, iz, ic, ir, trim( filename )
+write( 10+ip, * ) i1, i2
+write( 10+ip, * ) i3, i4
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 nl = (/ i4 - i3 + 1, 1      /)
 n  = (/ i2 - i1 + 1, ir     /)

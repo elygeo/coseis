@@ -106,8 +106,9 @@ i2out(iz,:) = i2
 i1 = max( i1, i1node )
 i2 = min( i2, i2node )
 if ( cell ) i2 = min( i2, i2cell )
-if ( any( i2 < i1 ) ) ditout(iz) = nt + 1
-call splitio( iz, nout, ditout(iz) )
+i = 1
+if ( any( i2 < i1 ) ) i = 0
+call splitio( iz, nout, i )
  
 end do
 
@@ -207,11 +208,10 @@ end select
 doiz: do iz = 1, nout
 
 ! Pass
-if ( ditout(iz) /= 0 ) then
-  if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
-end if
+if ( ditout(iz) /= 0 ) if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 call outprops( fieldout(iz), nc, onpass, fault, cell )
 if ( pass /= onpass ) cycle doiz
+if ( ditout(iz) == 0 ) ditout(iz) = nt + 1
 
 ! Indices
 i1 = i1out(iz,:)
@@ -219,6 +219,7 @@ i2 = i2out(iz,:)
 i3 = max( i1, i1node )
 i4 = min( i2, i2node )
 if ( cell ) i4 = min( i2, i2cell )
+if ( any i1 > i2 ) cycle doiz
 if ( fault ) then
   i = abs( faultnormal )
   i1(i) = 1
@@ -466,75 +467,6 @@ if ( master ) then
   close( 1 )
 end if
 
-end subroutine
-
-!------------------------------------------------------------------------------!
-! Write integer binary timeseries
-subroutine iwrite( filename, val, it )
-character(*), intent(in) :: filename
-integer, intent(in) :: val, it
-integer :: i
-inquire( iolength=i ) val
-if ( it == 1 ) then
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
-else
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
-end if
-write( 1, rec=it ) val
-close( 1 )
-end subroutine
-
-!------------------------------------------------------------------------------!
-! Write real binary timeseries
-subroutine rwrite( filename, val, it )
-character(*), intent(in) :: filename
-real, intent(in) :: val
-integer, intent(in) :: it
-integer :: i
-inquire( iolength=i ) val
-if ( it == 1 ) then
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
-else
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
-end if
-write( 1, rec=it ) val
-close( 1 )
-end subroutine
-
-!------------------------------------------------------------------------------!
-! Write stats
-subroutine stats( rr, ii, filename, it )
-use m_collective
-real, intent(in) :: rr
-character(*), intent(in) :: filename
-integer, intent(in) :: ii(3), it
-call rwrite( 'stats/' // filename, rr, it )
-call iwrite( 'stats/' // filename // '1', ii(1), it )
-call iwrite( 'stats/' // filename // '2', ii(2), it )
-call iwrite( 'stats/' // filename // '3', ii(3), it )
-end subroutine
-
-!------------------------------------------------------------------------------!
-! Timer
-subroutine timer( i, filename, it )
-character(*), intent(in), optional :: filename
-integer, intent(in), optional :: i, it
-integer, save :: clock0, clockrate, clockmax
-integer(8), save :: timers(4)
-integer :: clock1
-if ( .not. present( i ) ) then
-  call system_clock( clock0, clockrate, clockmax )
-  timers = 0
-else
-  call system_clock( clock1 )
-  timers = timers - clock0 + clock1
-  if ( clock0 > clock1 ) timers = timers + clockmax
-  clock0 = clock1
-  if ( present( it ) ) then
-    call rwrite( 'timer/' // filename, real( timers(i) ) / real( clockrate ), it )
-  end if
-  timers(:i) = 0
-end if
 end subroutine
 
 end module

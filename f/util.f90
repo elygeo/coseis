@@ -1,8 +1,9 @@
-! Zone selection
+! Misc utilities
 module m_util
 implicit none
 contains
 
+!------------------------------------------------------------------------------!
 subroutine zone( i1, i2, nn, nnoff, ihypo, faultnormal )
 integer, intent(inout) :: i1(3), i2(3)
 integer, intent(in) :: nn(3), nnoff(3), ihypo(3), faultnormal
@@ -28,6 +29,7 @@ i1 = i1 + nnoff
 i2 = i2 + nnoff
 end subroutine
 
+!------------------------------------------------------------------------------!
 subroutine cube( s, x, i1, i2, x1, x2, r )
 real, intent(inout) :: s(:,:,:)
 real, intent(in) :: x(:,:,:,:), x1(3), x2(3), r
@@ -44,6 +46,7 @@ where( x(j1:j2,k1:k2,l1:l2,1) >= x1(1) &
  .and. x(j1:j2,k1:k2,l1:l2,3) <= x2(3) ) s = r
 end subroutine
 
+!------------------------------------------------------------------------------!
 subroutine sethalo( f, r, i1, i2 )
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
@@ -62,5 +65,74 @@ if ( size( f, 3 ) > 1 ) then
 end if
 end subroutine
 
+!------------------------------------------------------------------------------!
+! Timer
+subroutine timer( i, filename, it )
+character(*), intent(in), optional :: filename
+integer, intent(in), optional :: i, it
+integer, save :: clock0, clockrate, clockmax
+integer(8), save :: timers(4)
+integer :: clock1
+if ( .not. present( i ) ) then
+  call system_clock( clock0, clockrate, clockmax )
+  timers = 0
+else
+  call system_clock( clock1 )
+  timers = timers - clock0 + clock1
+  if ( clock0 > clock1 ) timers = timers + clockmax
+  clock0 = clock1
+  if ( present( it ) ) then
+    call rwrite( 'timer/' // filename, real( timers(i) ) / real( clockrate ), it )
+  end if
+  timers(:i) = 0
+end if
+end subroutine
+
+!------------------------------------------------------------------------------!
+! Write stats 
+subroutine stats( rr, ii, filename, it )
+use m_collective
+real, intent(in) :: rr
+character(*), intent(in) :: filename
+integer, intent(in) :: ii(3), it
+call rwrite( 'stats/' // filename, rr, it )
+call iwrite( 'stats/' // filename // '1', ii(1), it )
+call iwrite( 'stats/' // filename // '2', ii(2), it )
+call iwrite( 'stats/' // filename // '3', ii(3), it )
+end subroutine
+
+!------------------------------------------------------------------------------!
+! Write integer binary timeseries
+subroutine iwrite( filename, val, it )
+character(*), intent(in) :: filename
+integer, intent(in) :: val, it
+integer :: i
+inquire( iolength=i ) val
+if ( it == 1 ) then
+  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
+else
+  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+end if
+write( 1, rec=it ) val
+close( 1 )
+end subroutine
+
+!------------------------------------------------------------------------------!
+! Write real binary timeseries
+subroutine rwrite( filename, val, it )
+character(*), intent(in) :: filename
+real, intent(in) :: val
+integer, intent(in) :: it
+integer :: i
+inquire( iolength=i ) val
+if ( it == 1 ) then
+  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
+else
+  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+end if
+write( 1, rec=it ) val
+close( 1 )
+end subroutine
+  
 end module
 
