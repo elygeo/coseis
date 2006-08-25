@@ -527,6 +527,9 @@ n = [ (p+1) * sin(f)^2 * cos(t)
 
 ELASTIC MODULI
 
+  Vs = sqrt( mu / rho )
+  Vp = sqrt( ( lam + 2 * mu ) / rho )
+
   Shear modulus
   mu = rho * vs^2
 

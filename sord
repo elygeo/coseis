@@ -196,20 +196,16 @@ common="
   arrays.f90
   optimize.f90
   gridgen.f90
-  material.f90
-  resample.f90
-  momentsource.f90
-  fault_init.f90
-  fault.f90
-  checkpoint.f90
-  pml.f90
-  output_subs.f90
-  output_init.f90
   output.f90
+  momentsource.f90
+  material.f90
+  fault_init.f90
+  checkpoint.f90
+  timestep.f90
   stress.f90
   acceleration.f90
+  fault.f90
   locknodes.f90
-  timestep.f90
   sord.f90"
 
 # Compile

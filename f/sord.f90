@@ -7,12 +7,8 @@ use m_setup
 use m_arrays
 use m_checkpoint
 use m_gridgen
-use m_material
-use m_resample
-use m_output_subs
-use m_output_init
 use m_output
-use m_pml
+use m_material
 use m_stress
 use m_momentsource
 use m_acceleration
@@ -29,11 +25,12 @@ call setup
 if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
 call arrays            ; if ( master ) call clock( '0ini', 1 )
 call gridgen           ; if ( master ) call clock( '0ini', 2 )
-call material          ; if ( master ) call clock( '0ini', 3 )
-call pml
+call output_init       ; if ( master ) call clock( '0ini', 3 )
 call momentsource_init
-call fault_init        ; if ( master ) call clock( '0ini', 4 )
-call output_init       ; if ( master ) call clock( '0ini', 5 )
+call material          ; if ( master ) call clock( '0ini', 4 )
+call pml
+call fault_init        ; if ( master ) call clock( '0ini', 5 )
+call metadata
 call output( 0 )       ; if ( master ) call clock( '0ini', 6 )
 call resample          ; if ( master ) call clock( '0ini', 7 )
 call readcheckpoint    ; if ( master ) call clock( '0ini', 8 )
