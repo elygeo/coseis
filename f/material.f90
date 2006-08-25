@@ -5,8 +5,8 @@ contains
 
 subroutine material
 use m_globals
-use m_collectiveio
-use m_zone
+use m_collective
+use m_util
 use m_bc
 real :: x1(3), x2(3)
 integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, &
@@ -147,7 +147,7 @@ end subroutine
 ! Resample material model
 subroutine resample
 use m_globals
-use m_collectiveio
+use m_collective
 use m_diffnc
 use m_bc
 integer :: i1(3), i2(3), j, k, l, j1, k1, l1, j2, k2, l2

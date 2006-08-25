@@ -82,9 +82,9 @@ fi
 # Machine attributes
 maxnodes=1; cpus=1; maxram=800; rate=200
 case $machine in
-  phat)                           maxram=800;   rate=180 ;;
+  wide)                   cpus=2; maxram=1800 ;;
   phim)                           maxram=2800;  rate=200 ;;
-  altai)    maxnodes=1;   cpus=8; maxram=30000; rate=90  ;; 
+  altai)                  cpus=8; maxram=30000; rate=90  ;; 
   babieca)  maxnodes=36;  cpus=2; maxram=800;   rate=160 ;;
   teragrid) maxnodes=262; cpus=2; maxram=3000;  rate=500 ;;
   datastar) maxnodes=176; cpus=8; maxram=13500 ;;          
@@ -178,18 +178,15 @@ esac
 base="
   diffcn.f90
   diffnc.f90
-  hourglasscn.f90
-  hourglassnc.f90
+  hourglass.f90
   surfnormals.f90
   bc.f90
-  zone.f90
+  util.f90
   globals.f90"
 serial="
-  serial.f90
-  serialio.f90"
+  serial.f90"
 parallel="
-  mpi.f90
-  mpiio.f90"
+  mpi.f90"
 common="
   inread.f90
   setup.f90
@@ -199,12 +196,11 @@ common="
   output.f90
   momentsource.f90
   material.f90
-  fault_init.f90
+  fault.f90
   checkpoint.f90
   timestep.f90
   stress.f90
   acceleration.f90
-  fault.f90
   locknodes.f90
   sord.f90"
 
@@ -254,7 +250,7 @@ fi
 cd "$rundir"
 rundir=$( /bin/pwd )
 mkdir stats
-mkdir clock
+mkdir timer
 mkdir checkpoint
 mkdir debug
 i=0

@@ -6,8 +6,7 @@ contains
 subroutine acceleration
 use m_globals
 use m_diffcn
-use m_hourglassnc
-use m_hourglasscn
+use m_hourglass
 use m_collective
 use m_bc
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iz, iq

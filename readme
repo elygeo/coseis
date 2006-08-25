@@ -116,15 +116,15 @@ Phim: 3GHz Intel Xeon
 Phat: 1.6GHz Intel Pentium M
 Curl: 1.5Ghz AMD Athlon XP 1800+
 
-SunOS MPICH2
-  export CC=cc
-  export CFLAGS=-fast
-  export F77=f77
-  export FFLAGS=-fast
-  export F90=f95
-  export F90FLAGS=-fast
-  export CXX=CC
-  export CXXFLAGS=-fast
+MPICH2
+  ./configure -prefix=/usr/local --with-device=ch3:shm --enable-f90 --disable-cxx
+  echo "secretword=<secretword>" > $HOME/.mpd.conf
+  chmod 600 $HOME/.mpd.conf
+
+MPICH2 SunOS
+  export CC=cc F77=f77 F90=f95 CXX=CC
+  export CFLAGS=-fast FFLAGS=-fast F90FLAGS=-fast CXXFLAGS=-fast
+  ./configure -prefix=/d0/gely/local --with-device=ch3:shm --enable-f90 --disable-cxx
 
 
 
@@ -587,16 +587,4 @@ DOMAIN DECOMPOSITION DIAGRAM
   ------- o---o nn=16     '---' nm=5     o---o i1node i2node
   Surface       n=15                     |   |
                                          '---' nm=3
-
-MPICH INSTALL - does not work w/ gfortran
-  ./configure -prefix=/usr/local --with-device=ch_shmem --with-romio
-
-MPICH2 INSTALL
-  ./configure -prefix=/usr/local --with-device=ch3:shm --enable-f90 
-  echo "secretword=<secretword>" > $HOME/.mpd.conf
-  chmod 600 $HOME/.mpd.conf
-
-Solaris
-  export CC=cc F77=f77 F90=f95
-  ./configure -prefix=/d0/gely/local --with-device=ch3:shm --enable-f90 --disable-cxx
 

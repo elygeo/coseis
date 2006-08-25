@@ -1,5 +1,5 @@
 ! Zone selection
-module m_zone
+module m_util
 implicit none
 contains
 
@@ -42,6 +42,24 @@ where( x(j1:j2,k1:k2,l1:l2,1) >= x1(1) &
  .and. x(j1:j2,k1:k2,l1:l2,1) <= x2(1) &
  .and. x(j1:j2,k1:k2,l1:l2,2) <= x2(2) &
  .and. x(j1:j2,k1:k2,l1:l2,3) <= x2(3) ) s = r
+end subroutine
+
+subroutine sethalo( f, r, i1, i2 )
+real, intent(inout) :: f(:,:,:)
+real, intent(in) :: r
+integer, intent(in) :: i1(3), i2(3)
+if ( size( f, 1 ) > 1 ) then
+  f(:i1(1)-1,:,:) = r
+  f(i2(1)+1:,:,:) = r
+end if
+if ( size( f, 2 ) > 1 ) then
+  f(:,:i1(2)-1,:) = r
+  f(:,i2(2)+1:,:) = r
+end if
+if ( size( f, 3 ) > 1 ) then
+  f(:,:,:i1(3)-1) = r
+  f(:,:,i2(3)+1:) = r
+end if
 end subroutine
 
 end module

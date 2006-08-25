@@ -39,13 +39,13 @@ cat << END > pbsscript
 #PBS -e err.log
 #PBS -V
 sleep 2
-#date > "$rundir/clock0"
+#date > "$rundir/stamp0"
 #cd "$datadir"
 #mpiexec -n $np ./scecvm4-$mode
 cd "$rundir"
-date > clock1
+date > stamp1
 mpiexec -n $np ./sord-$mode
-date > clock2
+date > stamp2
 END
 chmod u+x pbsscript
 fi

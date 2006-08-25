@@ -5,11 +5,12 @@ contains
 
 subroutine locknodes
 use m_globals
-use m_zone
+use m_util
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, iz
 logical, save :: init = .true.
 
 if ( init ) then
+  init = .false.
   if ( nlock > nz ) then
     write( 0, * ) 'too many lock zones, make nz bigger ', nlock, nz
     stop 

@@ -7,9 +7,8 @@ contains
 ! Initialize output
 subroutine output_init
 use m_globals
-use m_collectiveio
-use m_zone
-use m_bc
+use m_collective
+use m_util
 real :: rout
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz, onpass
 character(7) :: field
@@ -118,8 +117,8 @@ end subroutine
 ! Write output
 subroutine output( pass )
 use m_globals
-use m_collectiveio
-use m_bc
+use m_collective
+use m_util
 integer, intent(in) :: pass
 real :: r1, r2, r3, r4
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), noff(3), i, onpass, nc, ic, ir, iz
@@ -360,6 +359,8 @@ character :: endian
 character(7) :: field
 logical :: fault, cell
 
+if ( master ) write( 0, * ) 'Write metadata'
+
 ! Diagnostic
 if ( debug /= 0 ) then
   write( str, '(a,i6.6,a)' ) 'debug/db', ip, '.m'
@@ -514,25 +515,25 @@ call iwrite( 'stats/' // filename // '3', ii(3), it )
 end subroutine
 
 !------------------------------------------------------------------------------!
-! Write timing info
-subroutine clock( filename, it )
+! Timer
+subroutine timer( i, filename, it )
 character(*), intent(in), optional :: filename
-integer, intent(in), optional :: it
-integer, save :: clock0, clock1, clockrate, clockmax
-integer :: clock2
-real :: tt, dt
-if ( .not. present( it ) ) then
+integer, intent(in), optional :: i, it
+integer, save :: clock0, clockrate, clockmax
+integer(8), save :: timers(4)
+integer :: clock1
+if ( .not. present( i ) ) then
   call system_clock( clock0, clockrate, clockmax )
-  clock1 = clock0
+  timers = 0
 else
-  call system_clock( clock2 )
-  tt = real( clock2 - clock0 ) / real( clockrate )
-  dt = real( clock2 - clock1 ) / real( clockrate )
-  if ( tt < 0. ) tt = real( clock2 - clock0 + clockmax ) / real( clockrate ) 
-  if ( dt < 0. ) dt = real( clock2 - clock1 + clockmax ) / real( clockrate ) 
-  call rwrite( 'clock/tt' // filename, tt, it )
-  call rwrite( 'clock/dt' // filename, dt, it )
-  clock1 = clock2
+  call system_clock( clock1 )
+  timers = timers - clock0 + clock1
+  if ( clock0 > clock1 ) timers = timers + clockmax
+  clock0 = clock1
+  if ( present( it ) ) then
+    call rwrite( 'timer/' // filename, real( timers(i) ) / real( clockrate ), it )
+  end if
+  timers(:i) = 0
 end if
 end subroutine
 

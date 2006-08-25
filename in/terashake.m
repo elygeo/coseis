@@ -52,10 +52,7 @@
   ihypo = [  69 51 -2 ];
   ihypo = [ 114 51 -2 ];
   mus = [ 1.1 'zone'  67 0 -5   116 0 -1 ];
-nt = 300;
-itcheck = 300;
-out = { 'sv'  10   1 0  1   -1  0 -1 };
-rcrit = 20000.;
+nt = 1;
 return
 
 % 1000m

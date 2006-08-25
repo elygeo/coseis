@@ -6,8 +6,7 @@ contains
 subroutine gridgen
 use m_globals
 use m_optimize
-use m_collectiveio
-use m_zone
+use m_collective
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), i, j, k, l, &
   j1, k1, l1, j2, k2, l2, idoublenode, up(1)
 real :: x1, x2, m(9)
