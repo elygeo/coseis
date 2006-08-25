@@ -40,7 +40,6 @@ srcdir=$( /bin/pwd )
 count=$( echo out/[0-9][0-9] | sed 's/.*\///' )
 [ $count = '[0-9][0-9]' ] && count=00
 count=$( echo $count | awk '{ printf "%02d", $1+1 }' )
-rundir="$srcdir/out/$count"
 
 # Prepare input file
 cat 'defaults.m' 'in.m' | sed "
@@ -246,7 +245,8 @@ chmod u+x viz
 
 # Setup run directory
 sh/tarball
-echo "Run directory: out/$count"
+rundir="out/$count"
+echo "Run directory: $rundir"
 mkdir -p out
 mkdir "$rundir"
 cp 'in.m' tmp/sord.tgz tmp/sord-$mode tmp/input "$rundir"
@@ -255,6 +255,7 @@ if [ $optimize = g ]; then
   chmod a-w "$rundir"/*.f90
 fi
 cd "$rundir"
+rundir=$( /bin/pwd )
 mkdir stats
 mkdir clock
 mkdir checkpoint
@@ -265,7 +266,12 @@ while [ $i -lt $nout ]; do
   dir=$( echo $i | awk '{ printf "%02d", $1 }' )
   mkdir $dir
 done
-[ "$datadir" ] && ln -s "$srcdir/$datadir" 'data'
+if [ "$datadir" ]; then
+  cd "$srcdir/$datadir"
+  datadir=$( /bin/pwd )
+  cd "$rundir"
+  ln -s "$datadir" 'data'
+fi
 
 # Write run metadata
 cat << END > runmeta.m
@@ -273,6 +279,7 @@ login   = '$LOGNAME';
 name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )';
 rundate = '$( date )';
 rundir  = '$rundir';
+datadir = '$datadir';
 infile  = '$infile';
 machine = '$machine';
 host    = '$HOSTNAME';

@@ -130,6 +130,11 @@ f2 = sum( ( t0 + t1 ) * t2, 4 ) * area
 call sethalo( f2, 0., i1node, i2node )
 call psum( estrain, -.5 * sum( f2 ), ifn )
 
+! Moment
+f2 = muf * area * sqrt( sum( t2 * t2, 4 ) )
+call sethalo( f2, 0., i1node, i2node )
+call psum( m0, sum( f2 ), ifn )
+
 ! Slip acceleration
 t2 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
 f2 = sqrt( sum( t2 * t2, 4 ) )

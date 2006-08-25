@@ -8,6 +8,7 @@ use m_arrays
 use m_checkpoint
 use m_gridgen
 use m_material
+use m_resample
 use m_output_subs
 use m_output_init
 use m_output
@@ -33,7 +34,9 @@ call pml
 call momentsource_init
 call fault_init        ; if ( master ) call clock( '0ini', 4 )
 call output_init       ; if ( master ) call clock( '0ini', 5 )
-call readcheckpoint    ; if ( master ) call clock( '0ini', 6 )
+call output( 0 )       ; if ( master ) call clock( '0ini', 6 )
+call resample          ; if ( master ) call clock( '0ini', 7 )
+call readcheckpoint    ; if ( master ) call clock( '0ini', 8 )
 
 ! Main loop
 if ( master ) write( 0, * ) 'Main loop'

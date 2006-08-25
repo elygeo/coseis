@@ -10,10 +10,10 @@ use m_collectiveio
 use m_zone
 use m_bc
 real :: courant, rout
-integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz
+integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz, onpass
 character :: endian
 character(7) :: field
-logical :: dofault, fault, static, cell
+logical :: dofault, fault, cell
 
 i = 0
 if ( master ) then
@@ -127,8 +127,8 @@ end if
 doiz0: do iz = 1, nout
 
   ! Output field properties
-  call outprops( fieldout(iz), nc, fault, static, cell )
-  if ( static ) ditout(iz) = 0
+  call outprops( fieldout(iz), nc, onpass, fault, cell )
+  if ( onpass == 0 ) ditout(iz) = 0
 
   ! Zone or point location
   select case( outtype(iz) )

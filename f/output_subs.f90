@@ -69,43 +69,42 @@ end if
 end subroutine
 
 ! Output properties
-subroutine outprops( field, nc, fault, static, cell )
+subroutine outprops( field, nc, onpass, fault, cell )
 character(*), intent(in) :: field
-integer, intent(out) :: nc
-logical, intent(out) :: fault, static, cell
+integer, intent(out) :: nc, onpass
+logical, intent(out) :: fault, cell
 nc = 1
 fault = .false.
-static = .false.
+onpass = 2
 cell = .false.
 select case( field )
-case( 'x'    ); static = .true.; nc = 3
-case( 'mr'   ); static = .true.
-case( 'mu'   ); static = .true.; cell = .true.
-case( 'lam'  ); static = .true.; cell = .true.
-case( 'y'    ); static = .true.; cell = .true.
-case( 'v'    ); nc = 3
+case( 'x'    ); onpass = 0; nc = 3
+case( 'rho'  ); onpass = 0
+case( 'mu'   ); onpass = 0; cell = .true.
+case( 'lam'  ); onpass = 0; cell = .true.
+case( 'v'    ); onpass = 1; nc = 3
 case( 'u'    ); nc = 3
-case( 'w'    ); nc = 6; cell = .true.
+case( 'w'    ); onpass = 1; nc = 6; cell = .true.
 case( 'a'    ); nc = 3
-case( 'vm'   )
+case( 'vm'   ); onpass = 1
 case( 'um'   )
-case( 'wm'   ); cell = .true.
+case( 'wm'   ); onpass = 1; cell = .true.
 case( 'am'   )
 case( 'pv'   )
-case( 'nhat' ); fault = .true.; static = .true.; nc = 3
-case( 'ts0'  ); fault = .true.; static = .true.; nc = 3
-case( 'tsm0' ); fault = .true.; static = .true.
-case( 'tn0'  ); fault = .true.; static = .true.
-case( 'mus'  ); fault = .true.; static = .true.
-case( 'mud'  ); fault = .true.; static = .true.
-case( 'dc'   ); fault = .true.; static = .true.
-case( 'co'   ); fault = .true.; static = .true.
-case( 'sv'   ); fault = .true.; nc = 3
-case( 'su'   ); fault = .true.; nc = 3
+case( 'nhat' ); fault = .true.; onpass = 0; nc = 3
+case( 'ts0'  ); fault = .true.; onpass = 0; nc = 3
+case( 'tsm0' ); fault = .true.; onpass = 0
+case( 'tn0'  ); fault = .true.; onpass = 0
+case( 'mus'  ); fault = .true.; onpass = 0
+case( 'mud'  ); fault = .true.; onpass = 0
+case( 'dc'   ); fault = .true.; onpass = 0
+case( 'co'   ); fault = .true.; onpass = 0
+case( 'sv'   ); fault = .true.; onpass = 1; nc = 3
+case( 'su'   ); fault = .true.; onpass = 1; nc = 3
 case( 'ts'   ); fault = .true.; nc = 3
 case( 'sa'   ); fault = .true.; nc = 3
-case( 'svm'  ); fault = .true.
-case( 'sum'  ); fault = .true.
+case( 'svm'  ); fault = .true.; onpass = 1
+case( 'sum'  ); fault = .true.; onpass = 1
 case( 'tsm'  ); fault = .true.
 case( 'sam'  ); fault = .true.
 case( 'tn'   ); fault = .true.

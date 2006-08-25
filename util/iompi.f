@@ -13,6 +13,7 @@
       call mpi_file_set_errhandler( mpi_file_null,
      $  MPI_ERRORS_ARE_FATAL, ierr )
       nnl = nn / impisize
+      if( impirank == 0 ) write( 0, * ) 'SCEC Velocity Model version 4'
       if( nnl > ibig ) stop 'ibig too small'
       if( modulo(nnl,impisize) /= 0 ) nnl = nnl+1
       nn = min( nnl, nn-impirank*nnl )
@@ -34,10 +35,10 @@
      $  mpi_status_ignore, ierr )
       call mpi_file_close( ifh, ierr )
       do i = 1, nn
-        if(rdep(i).lt.0) 
-     $    print *, 'Error: degative depth', i, rlon(i), rlat(i), rdep(i)
+        if(rdep(i).lt.0) write( 0, * ) 
+     $    'Error: degative depth', i, rlon(i), rlat(i), rdep(i)
         if(rlon(i)/=rlon(i).or.rlat(i)/=rlat(i).or.rdep(i)/=rdep(i))
-     $    print *, 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
+     $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
         rdep(i) = rdep(i) * 3.2808399
         if( rdep(i) .lt. rdepmin ) rdep(i) = rdepmin
       end do
@@ -79,7 +80,7 @@
       kerr = 0
       do i = 1, nn
         if(alpha(i)/=alpha(i).or.beta(i)/=beta(i).or.rho(i)/=rho(i))
-     $    print *, 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
+     $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
       end do
       end
 

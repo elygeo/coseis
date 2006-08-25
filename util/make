@@ -60,12 +60,16 @@ mkdir -p 01
 mkdir -p 02
 mkdir -p 03
 mkdir -p 04
+mkdir -p 05
+mkdir -p 06
 ln -sf '../x1'  '01/x1'
 ln -sf '../x2'  '01/x2'
 ln -sf '../x3'  '01/x3'
 ln -sf '../rho' '02/rho1'
 ln -sf '../vp'  '03/vp1'
 ln -sf '../vs'  '04/vs1'
+ln -sf '../th'  '05/tsm01'
+ln -sf '../tn'  '06/tn01'
 echo 1 > currentstep
 
 flags=$oflags

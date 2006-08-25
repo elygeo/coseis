@@ -1,7 +1,6 @@
 % Render
 
 % Slice
-if icursor(4) < 1, msg = 'No data at t=0'; return, end
 i1s = i1viz;
 i2s = i2viz;
 if ~volviz
@@ -12,16 +11,15 @@ if ~volviz
     i2s(i) = i2s(i) + 1;
   end
 end
-it = icursor(4);
-t = it * dt;
-i1s(4) = it;
-i2s(4) = it;
+i1s(4) = icursor(4);
+i2s(4) = icursor(4);
+t = dt * icursor(4);
 
 % Read field data
 msg = read4d( field, i1s, i2s );
 if msg, return, end
 [ msg, s ] = read4d( field, i1s, i2s );
-[ msg, x ] = read4d( 'x', [ i1s(1:3) 1 ], [ i2s(1:3) 1 ] );
+[ msg, x ] = read4d( 'x', [ i1s(1:3) 0 ], [ i2s(1:3) 0 ] );
 if msg, error 'no mesh data found', end
 i1hold = i1s;
 i2hold = i2s;

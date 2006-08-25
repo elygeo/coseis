@@ -53,10 +53,10 @@ cat << END > pbsscript
 #PBS -o out.log
 #PBS -e err.log
 #PBS -V
-#cd $rundir/data
-#date > $rundir/clock0
+#date > "$rundir/clock0"
+#cd "$datadir"
 #time mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-$mode
-cd $rundir
+cd "$rundir"
 date > clock1
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
 date > clock2

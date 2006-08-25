@@ -20,25 +20,24 @@ meta
 currentstep
 
 % Slice
-i = [ ihypo 1 ];
 n = [ nn it ];
 shift = [ 0 0 0 0 ];
 if faultnormal, shift( abs( faultnormal) ) = 1; end
-m0 = i1s == 0 & i2s == 0;
-m1 = i1s == 0 & i2s ~= 0;
-m2 = i1s ~= 0 & i2s == 0;
+m0 = i1s(1:3) == 0 & i2s(1:3) == 0;
+m1 = i1s(1:3) == 0 & i2s(1:3) ~= 0;
+m2 = i1s(1:3) ~= 0 & i2s(1:3) == 0;
 m3 = i1s < 0;
 m4 = i2s < 0;
-i1s(m0) = i(m0);
-i2s(m0) = i(m0) + shift(m0);
-i1s(m1) = i(m1) + shift(m1);
-i2s(m2) = i(m2);
+i1s(m0) = ihypo(m0);
+i2s(m0) = ihypo(m0) + shift(m0);
+i1s(m1) = ihypo(m1) + shift(m1);
+i2s(m2) = ihypo(m2);
 i1s(m3) = i1s(m3) + n(m3) + 1;
 i2s(m4) = i2s(m4) + n(m4) + 1;
 
 % Look for file with desired data
 n = i2s - i1s + 1;
-found = 0;
+found = 1;
 msg = '';
 nout = length( out );
 for iz = 1:nout
@@ -49,9 +48,12 @@ for iz = 1:nout
   i2    = [ out{iz}{7:9} ];
   test  = [ 
     strcmp( fieldin, field )
-    all( i1s >= [ i1 1  ] )
-    all( i2s <= [ i2 it ] )
-    ( dit == 0 || dit == 1 || ( n(4) == 1 && mod( i1s(4), dit ) == 0 ) )
+    all( i1s(1:3) >= i1 )
+    all( i2s(1:3) <= i2 )
+    dit == 0 || ( ...
+      i1s(4) >= 1  && ...
+      i2s(4) <= it && ...
+      ( dit == 1 || n(4) == 1 && mod( i1s(4), dit ) == 0 ) )
   ]';
   found = all( test );
   if found, break, end

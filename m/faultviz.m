@@ -6,8 +6,8 @@ i1 = i1viz;
 i2 = i2viz;
 i1(ifn) = ihypo(ifn);
 i2(ifn) = ihypo(ifn);
-i1(4) = 1;
-i2(4) = 1;
+i1(4) = icursor(4);
+i2(4) = icursor(4);
 [ msg, xx ] = read4d( 'x', i1, i2 );
 if msg, error( msg ), end
 
@@ -23,8 +23,6 @@ if rcrit > 0. && vrup > .0
   end
 end
 
-i1(4) = icursor(4);
-i2(4) = icursor(4);
 [ msg, sl ] = read4d( 'sl', i1, i2 );
 if msg
   msg = '';

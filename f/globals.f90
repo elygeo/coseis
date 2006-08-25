@@ -71,6 +71,7 @@ real, allocatable, dimension(:,:,:) :: &
   co,            & ! cohesion
   area,          & ! fault element area
   rhypo,         & ! radius to hypocenter
+  muf,           & ! shear modulus at the fault nodes
   sl,            & ! **slip path length
   psv,           & ! **peak slip velocity magnitude
   trup,          & ! **rupture time
@@ -115,6 +116,7 @@ real :: &
   trelax,        & ! nucleation relaxation time
   estrain,       & ! change in stored strain energy
   efric,         & ! friction + fracure energy
+  m0,            & ! moment calculated from slip*area*mu
   svtol            ! slip velocity for determining rupture time
 
 integer, dimension(3) :: &

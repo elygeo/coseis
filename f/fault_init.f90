@@ -183,6 +183,7 @@ end do
 rhypo = sqrt( sum( t2 * t2, 4 ) )
 
 ! Save for output
+muf = mu(j1:j2,k1:k2,l1:l2)
 tn = sum( t0 * nhat, 4 )
 do i = 1, 3
   t2(:,:,:,i) = tn * nhat(:,:,:,i)

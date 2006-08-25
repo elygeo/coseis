@@ -168,9 +168,9 @@ print *, 'elevation range: ', minval( w(:,:,:,3) ), maxval( w(:,:,:,3) )
 
 ! 2D files
 inquire( iolength=reclen ) x(:,:,:,1)
-open( 1, file='x', recl=reclen, form='unformatted', access='direct' )
-open( 2, file='y', recl=reclen, form='unformatted', access='direct' )
-open( 3, file='z', recl=reclen, form='unformatted', access='direct' )
+open( 1, file='x', recl=reclen, form='unformatted', access='direct', status='replace' )
+open( 2, file='y', recl=reclen, form='unformatted', access='direct', status='replace' )
+open( 3, file='z', recl=reclen, form='unformatted', access='direct', status='replace' )
 write( 1, rec=1 ) x(:,:,:,1)
 write( 2, rec=1 ) x(:,:,:,2)
 write( 3, rec=1 ) x(:,:,:,3)
@@ -180,12 +180,12 @@ close( 3 )
 
 ! 3D files
 inquire( iolength=reclen ) x(:,:,:,1)
-open( 1, file='x1', recl=reclen, form='unformatted', access='direct' )
-open( 2, file='x2', recl=reclen, form='unformatted', access='direct' )
-open( 3, file='x3', recl=reclen, form='unformatted', access='direct' )
-open( 7, file='rlon', recl=reclen, form='unformatted', access='direct' )
-open( 8, file='rlat', recl=reclen, form='unformatted', access='direct' )
-open( 9, file='rdep', recl=reclen, form='unformatted', access='direct' )
+open( 1, file='x1', recl=reclen, form='unformatted', access='direct', status='replace' )
+open( 2, file='x2', recl=reclen, form='unformatted', access='direct', status='replace' )
+open( 3, file='x3', recl=reclen, form='unformatted', access='direct', status='replace' )
+open( 7, file='rlon', recl=reclen, form='unformatted', access='direct', status='replace' )
+open( 8, file='rlat', recl=reclen, form='unformatted', access='direct', status='replace' )
+open( 9, file='rdep', recl=reclen, form='unformatted', access='direct', status='replace' )
 do l = 1, n(3)
   write( 1, rec=l ) x(:,:,:,1)
   write( 2, rec=l ) x(:,:,:,2)
@@ -260,10 +260,14 @@ end do
 
 ! Scale tractions
 print *, 'dt: ', ts
-tn = tn / ( mus - mud )
-s1 = s1 / ( mus - mud )
-ts = ts - mud * tn
-s2 = s2 - mud * s1
+tn = tn - 10e6
+s1 = s1 - 10e6
+ts = ts + 10e6
+s2 = s2 + 10e6
+!tn = tn / ( mus - mud )
+!s1 = s1 / ( mus - mud )
+!ts = ts - mud * tn
+!s2 = s2 - mud * s1
 print *, 'after scaling:'
 print *, 'tn: ', tn, maxval(s1), minval(s1), sum(s1)/size(s1)
 print *, 'ts: ', ts, minval(s2), maxval(s2), sum(s2)/size(s2)
@@ -271,8 +275,8 @@ print *, 'dt: ', abs(ts) - mud*abs(tn)
 
 ! Write tractions
 inquire( iolength=reclen ) s1
-open( 1, file='tn', recl=reclen, form='unformatted', access='direct' )
-open( 2, file='th', recl=reclen, form='unformatted', access='direct' )
+open( 1, file='tn', recl=reclen, form='unformatted', access='direct', status='replace' )
+open( 2, file='th', recl=reclen, form='unformatted', access='direct', status='replace' )
 write( 1, rec=1 ) s1
 write( 2, rec=1 ) s2
 close( 1 )
@@ -283,7 +287,7 @@ j = nint( 9000. / dx )
 l = nint( 5000. / dx )
 
 ! SORD input parameters
-open( 1, file='insord.m' )
+open( 1, file='insord.m', status='replace' )
 write( 1, * ) 'dx    = ', dx, ';'
 write( 1, * ) 'npml  = ', npml, ';'
 write( 1, * ) 'nn    = [ ', n + (/ 0, 1, 0 /), ' ];'
@@ -294,7 +298,7 @@ write( 1, * ) 'mus   = [ ', mus, '''zone''', jf0, 0, -1-nf3, jf0+nf1, 0, -1, ' ]
 close( 1 )
 
 ! Metadata for plotting with SDX
-open( 1, file='meta.m' )
+open( 1, file='meta.m', status='replace' )
 write( 1, * ) 'dt       = 1.;'
 write( 1, * ) 'dx       = ', dx, ';'
 write( 1, * ) 'nt       = 0;'
@@ -307,10 +311,13 @@ write( 1, * ) 'rmax     = ', .5 * sqrt( sum( ell * ell ) ), ';'
 write( 1, * ) 'grid     = ''read'';'
 write( 1, * ) 'endian   = ''', endian, ''';'
 write( 1, * ) 'faultnormal = 0;'
-write( 1, * ) 'out{1}   = { 3 ''x''   0   1 1 1 ', n, '};'
-write( 1, * ) 'out{2}   = { 1 ''rho'' 0   1 1 1 ', n, '};'
-write( 1, * ) 'out{3}   = { 1 ''vp''  0   1 1 1 ', n, '};'
-write( 1, * ) 'out{4}   = { 1 ''vs''  0   1 1 1 ', n, '};'
+write( 1, * ) 'out{1}   = { 3 ''x''    0   1 1 1 ', n, '};'
+write( 1, * ) 'out{2}   = { 1 ''rho''  0   1 1 1 ', n, '};'
+write( 1, * ) 'out{3}   = { 1 ''vp''   0   1 1 1 ', n, '};'
+write( 1, * ) 'out{4}   = { 1 ''vs''   0   1 1 1 ', n, '};'
+n(2) = kf0
+write( 1, * ) 'out{5}   = { 1 ''tsm0'' 0   1 ', kf0, ' 1 ', n, '};'
+write( 1, * ) 'out{6}   = { 1 ''tn0''  0   1 ', kf0, ' 1 ', n, '};'
 close( 1 )
 
 end program

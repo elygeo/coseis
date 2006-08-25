@@ -87,6 +87,7 @@ allocate(       &
   co(j,k,l),    &
   area(j,k,l),  &
   rhypo(j,k,l), &
+  muf(j,k,l),   &
   sl(j,k,l),    &
   psv(j,k,l),   &
   trup(j,k,l),  &

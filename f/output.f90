@@ -11,7 +11,7 @@ use m_bc
 integer, intent(in) :: pass
 real :: r1, r2, r3, r4
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), noff(3), i, onpass, nc, ic, ir, iz
-logical :: dofault, fault, static, cell
+logical :: dofault, fault, cell
 
 ! Test for fault
 dofault = .false.
@@ -25,6 +25,7 @@ if ( master ) call rwrite( 'stats/t', t, it )
 n = nn + 2 * nhalo
 noff = nnoff - nhalo
 select case( pass )
+case( 0 )
 case( 1 )
   s1 = sqrt( sum( v * v, 4 ) )
   s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
@@ -83,39 +84,21 @@ case( 2 )
       call stats( r2, i2-nnoff, 'samax', it )
       call stats( r3, i3-nnoff, 'tnmax', it )
       call stats( r4, i4-nnoff, 'tnmin', it )
-      call rwrite( 'stats/estrain', estrain, it )
       call rwrite( 'stats/efric', efric, it )
+      call rwrite( 'stats/estrain', estrain, it )
+      call rwrite( 'stats/m0', m0, it )
+      call rwrite( 'stats/mw', 2. / 3. * log10( m0 ) - 10.7, it )
     end if
   end if
 end select
 
 doiz: do iz = 1, nout !--------------------------------------------------------!
 
-if ( ditout(iz) == 0 ) then
-  if ( it > 1 ) cycle doiz
-else
+! Pass
+if ( pass /= 0 ) then
   if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 end if
-
-! Properties
-call outprops( fieldout(iz), nc, fault, static, cell )
-if ( static ) ditout(iz) = 0
-
-! Select pass
-onpass = 2
-select case( fieldout(iz) )
-case( 'v'    ); onpass = 1
-case( 'w'    ); onpass = 1
-case( 'vm'   ); onpass = 1
-case( 'wm'   ); onpass = 1
-case( 'ts0'  ); onpass = 1
-case( 'tsm0' ); onpass = 1
-case( 'tn0'  ); onpass = 1
-case( 'sv'   ); onpass = 1
-case( 'su'   ); onpass = 1
-case( 'svm'  ); onpass = 1
-case( 'sum'  ); onpass = 1
-end select
+call outprops( fieldout(iz), nc, onpass, fault, cell )
 if ( pass /= onpass ) cycle doiz
 
 ! Indices
@@ -136,7 +119,7 @@ end if
 do ic = 1, nc
   ir = 1
   write( str, '(i2.2,a,a,i1)' ) iz, '/', trim( fieldout(iz) ), ic
-  if ( ditout(iz) > 0 ) then
+  if ( pass /= 0 ) then
   if ( all( i1 == i2 ) ) then
     ir = it / ditout(iz)
   else
@@ -145,10 +128,9 @@ do ic = 1, nc
   end if
   select case( fieldout(iz) )
   case( 'x'    ); call vectorio( 'w', str, x,    ic, ir, i1, i2, i3, i4, iz )
-  case( 'mr'   ); call scalario( 'w', str, mr,       ir, i1, i2, i3, i4, iz )
+  case( 'rho'  ); call scalario( 'w', str, mr,       ir, i1, i2, i3, i4, iz )
   case( 'mu'   ); call scalario( 'w', str, mu,       ir, i1, i2, i3, i4, iz )
   case( 'lam'  ); call scalario( 'w', str, lam,      ir, i1, i2, i3, i4, iz )
-  case( 'y'    ); call scalario( 'w', str, y,        ir, i1, i2, i3, i4, iz )
   case( 'v'    ); call vectorio( 'w', str, v,    ic, ir, i1, i2, i3, i4, iz )
   case( 'u'    ); call vectorio( 'w', str, u,    ic, ir, i1, i2, i3, i4, iz )
   case( 'w'    );

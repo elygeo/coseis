@@ -27,7 +27,7 @@ kostrov = ...
   trelax == 0.;
 
 % Find sensor location
-[ msg, x ] = read4d( 'x', [ sensor 1 ], [ sensor 1 ] );
+[ msg, x ] = read4d( 'x', [ sensor 0 ], [ sensor 0 ] );
 x = squeeze( x )';
 if msg
   pointsource = 0;

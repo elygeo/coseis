@@ -61,10 +61,10 @@ cat << END > llscript
 #@ notify_user = $LOGNAME
 #@ initialdir = $rundir
 #@ queue
-#date > $rundir/clock0
-#cd $rundir/data
+#date > "$rundir/clock0"
+#cd "$datadir"
 #poe $opts ./scecvm4-$mode
-cd $rundir
+cd "$rundir"
 date > clock1
 poe ./sord-p $opts
 date > clock2
