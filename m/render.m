@@ -41,7 +41,7 @@ end
 % Metadata
 labels = fieldlabels( field, 0 );
 cellfocus = any( strcmp( field, { 'w', 'wm', 'lam', 'mu' } ) );
-isfault = any( strcmp( field, { 'nhat' 'ts0' 'tsm0' 'tn0' 'mus' 'mud' 'dc' 'co' 'sv' 'su' 'ts' 'sa' 'svm' 'sum' 'tsm' 'sam' 'tn' 'fr' 'sl' 'psv' 'trup' 'tarr' } ) );
+isfault = any( strcmp( field, { 'nhat' 'mus' 'mud' 'dc' 'co' 'sv' 'su' 'ts' 'sa' 'svm' 'sum' 'tsm' 'sam' 'tn' 'fr' 'sl' 'psv' 'trup' 'tarr' } ) );
 [ fmax, i ] = max( abs( s(:) ) );
 [ j, k, l ] = ind2sub( size( s ), i );
 fmaxi = [ j k l ] + i1hold(1:3) - 1;

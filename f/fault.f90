@@ -325,6 +325,10 @@ t1 = t2 + t3
 ! Save for output
 tn = sum( t1 * nhat, 4 )
 ts = f2 * ts
+t1 = 0.
+t2 = 0.
+f1 = 0.
+f2 = 0.
 
 ! Update acceleration
 do i = 1, 3

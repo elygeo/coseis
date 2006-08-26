@@ -197,6 +197,7 @@ common="
   momentsource.f90
   material.f90
   fault.f90
+  initial.f90
   checkpoint.f90
   timestep.f90
   stress.f90

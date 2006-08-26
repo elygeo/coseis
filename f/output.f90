@@ -133,85 +133,86 @@ if ( faultnormal /= 0 ) then
 end if
 
 ! Prepare output and write stats
-n = nn + 2 * nhalo
-noff = nnoff - nhalo
-select case( pass )
-case( 1 )
-  s1 = sqrt( sum( v * v, 4 ) )
-  s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
-  pv = max( pv, s1 )
-  call sethalo( s1, -1., i1node, i2node )
-  call sethalo( s2, -1., i1cell, i2cell )
-  call pmaxloc( r1, i1, s1, n, noff, 0 )
-  call pmaxloc( r2, i2, s2, n, noff, 0 )
-  if ( master ) then
-    call stats( r1, i1-nnoff, 'vmax', it )
-    call stats( r2, i2-nnoff, 'wmax', it )
-    call rwrite( 'stats/t', t, it )
-  end if
-  if ( dofault ) then
-    call sethalo( f1, -1., i1node, i2node )
-    call sethalo( f2, -1., i1node, i2node )
-    call sethalo( tarr, -1., i1node, i2node )
-    call pmaxloc( r1, i1, f1,   n, noff, i ); i1(i) = ihypo(i)
-    call pmaxloc( r2, i2, f2,   n, noff, i ); i2(i) = ihypo(i)
-    call pmaxloc( r3, i3, sl,   n, noff, i ); i3(i) = ihypo(i)
-    call pmaxloc( r4, i4, tarr, n, noff, i ); i4(i) = ihypo(i)
+if ( it > 0 ) then
+  n = nn + 2 * nhalo
+  noff = nnoff - nhalo
+  select case( pass )
+  case( 1 )
+    s1 = sqrt( sum( v * v, 4 ) )
+    s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
+    pv = max( pv, s1 )
+    call sethalo( s1, -1., i1node, i2node )
+    call sethalo( s2, -1., i1cell, i2cell )
+    call pmaxloc( r1, i1, s1, n, noff, 0 )
+    call pmaxloc( r2, i2, s2, n, noff, 0 )
     if ( master ) then
-      call stats( r1, i1-nnoff, 'svmax',   it )
-      call stats( r2, i2-nnoff, 'sumax',   it )
-      call stats( r3, i3-nnoff, 'slmax',   it )
-      call stats( r4, i4-nnoff, 'tarrmax', it )
-      i1 = ihypo
-      i1(i) = 1
-      call rwrite( 'stats/tarrhypo', tarr(i1(1),i1(2),i1(3)), it )
+      call stats( r1, i1-nnoff, 'vmax', it )
+      call stats( r2, i2-nnoff, 'wmax', it )
+      call rwrite( 'stats/t', t, it )
     end if
-  end if
-case( 2 )
-  s1 = sqrt( sum( u * u, 4 ) )
-  s2 = sqrt( sum( w1 * w1, 4 ) )
-  call sethalo( s1, -1., i1node, i2node )
-  call sethalo( s2, -1., i1node, i2node )
-  call pmaxloc( r1, i1, s1, n, noff, 0 )
-  call pmaxloc( r2, i2, s2, n, noff, 0 )
-  if ( master ) then
-    call stats( r1, i1-nnoff, 'umax', it )
-    call stats( r2, i2-nnoff, 'amax', it )
-    if ( r1 > dx / 10. ) write( 0, * ) 'warning: u !<< dx', r1, dx
-  end if
-  if ( dofault ) then
-    call sethalo( ts, -1., i1node, i2node )
-    call sethalo( f2, -1., i1node, i2node )
-    call pmaxloc( r1, i1, ts, n, noff, i ); i1(ifn) = ihypo(ifn)
-    call pmaxloc( r2, i2, f2, n, noff, i ); i2(ifn) = ihypo(ifn)
-    r3 = 2. * minval( tn ) - 1.
-    call sethalo( tn, r3, i1node, i2node )
-    call pmaxloc( r3, i3, tn, n, noff, i ); i3(ifn) = ihypo(ifn)
-    r4 = 2. * r3 + 1.
-    call sethalo( tn, r4, i1node, i2node )
-    call pminloc( r4, i4, tn, n, noff, i ); i4(ifn) = ihypo(ifn)
+    if ( dofault ) then
+      call sethalo( f1, -1., i1node, i2node )
+      call sethalo( f2, -1., i1node, i2node )
+      call sethalo( tarr, -1., i1node, i2node )
+      call pmaxloc( r1, i1, f1,   n, noff, i ); i1(i) = ihypo(i)
+      call pmaxloc( r2, i2, f2,   n, noff, i ); i2(i) = ihypo(i)
+      call pmaxloc( r3, i3, sl,   n, noff, i ); i3(i) = ihypo(i)
+      call pmaxloc( r4, i4, tarr, n, noff, i ); i4(i) = ihypo(i)
+      if ( master ) then
+        call stats( r1, i1-nnoff, 'svmax',   it )
+        call stats( r2, i2-nnoff, 'sumax',   it )
+        call stats( r3, i3-nnoff, 'slmax',   it )
+        call stats( r4, i4-nnoff, 'tarrmax', it )
+        i1 = ihypo
+        i1(i) = 1
+        call rwrite( 'stats/tarrhypo', tarr(i1(1),i1(2),i1(3)), it )
+      end if
+    end if
+  case( 2 )
+    s1 = sqrt( sum( u * u, 4 ) )
+    s2 = sqrt( sum( w1 * w1, 4 ) )
+    call sethalo( s1, -1., i1node, i2node )
+    call sethalo( s2, -1., i1node, i2node )
+    call pmaxloc( r1, i1, s1, n, noff, 0 )
+    call pmaxloc( r2, i2, s2, n, noff, 0 )
     if ( master ) then
-      call stats( r1, i1-nnoff, 'tsmax', it )
-      call stats( r2, i2-nnoff, 'samax', it )
-      call stats( r3, i3-nnoff, 'tnmax', it )
-      call stats( r4, i4-nnoff, 'tnmin', it )
-      call rwrite( 'stats/efric', efric, it )
-      call rwrite( 'stats/estrain', estrain, it )
-      call rwrite( 'stats/m0', m0, it )
-      r1 = -0.
-      if ( m0 > 0. ) r1 = 2. / 3. * log10( m0 ) - 10.7
-      call rwrite( 'stats/mw', r1, it )
+      call stats( r1, i1-nnoff, 'umax', it )
+      call stats( r2, i2-nnoff, 'amax', it )
+      if ( r1 > dx / 10. ) write( 0, * ) 'warning: u !<< dx', r1, dx
     end if
-  end if
-end select
+    if ( dofault ) then
+      call sethalo( ts, -1., i1node, i2node )
+      call sethalo( f2, -1., i1node, i2node )
+      call pmaxloc( r1, i1, ts, n, noff, i ); i1(ifn) = ihypo(ifn)
+      call pmaxloc( r2, i2, f2, n, noff, i ); i2(ifn) = ihypo(ifn)
+      r3 = 2. * minval( tn ) - 1.
+      call sethalo( tn, r3, i1node, i2node )
+      call pmaxloc( r3, i3, tn, n, noff, i ); i3(ifn) = ihypo(ifn)
+      r4 = 2. * r3 + 1.
+      call sethalo( tn, r4, i1node, i2node )
+      call pminloc( r4, i4, tn, n, noff, i ); i4(ifn) = ihypo(ifn)
+      if ( master ) then
+        call stats( r1, i1-nnoff, 'tsmax', it )
+        call stats( r2, i2-nnoff, 'samax', it )
+        call stats( r3, i3-nnoff, 'tnmax', it )
+        call stats( r4, i4-nnoff, 'tnmin', it )
+        call rwrite( 'stats/efric', efric, it )
+        call rwrite( 'stats/estrain', estrain, it )
+        call rwrite( 'stats/m0', m0, it )
+        r1 = -0.
+        if ( m0 > 0. ) r1 = 2. / 3. * log10( m0 ) - 10.7
+        call rwrite( 'stats/mw', r1, it )
+      end if
+    end if
+  end select
+end if
 
 doiz: do iz = 1, nout
 
-! Pass
-if ( ditout(iz) /= 0 ) if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
-call outprops( fieldout(iz), nc, onpass, fault, cell )
-if ( pass /= onpass ) cycle doiz
-if ( ditout(iz) == 0 ) ditout(iz) = nt + 1
+! Interval
+if ( ditout(iz) /= 0 ) then
+  if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
+end if
 
 ! Indices
 i1 = i1out(iz,:)
@@ -219,7 +220,15 @@ i2 = i2out(iz,:)
 i3 = max( i1, i1node )
 i4 = min( i2, i2node )
 if ( cell ) i4 = min( i2, i2cell )
-if ( any i1 > i2 ) cycle doiz
+if ( any( i3 > i4 ) ) then
+  ditout(iz) = nt + 1
+  cycle doiz
+end if
+
+! Properies
+call outprops( fieldout(iz), nc, onpass, fault, cell )
+if ( pass /= onpass ) cycle doiz
+if ( ditout(iz) == 0 ) ditout(iz) = nt + 1
 if ( fault ) then
   i = abs( faultnormal )
   i1(i) = 1
@@ -233,7 +242,7 @@ do ic = 1, nc
   ir = 1
   write( str, '(i2.2,a,a,i1)' ) iz, '/', trim( fieldout(iz) ), ic
   if ( pass /= 0 ) then
-  if ( all( i1 == i2 ) ) then
+  if ( all( i1 == i2 ) .and. it > 0 ) then
     ir = it / ditout(iz)
   else
     write( str, '(i2.2,a,a,i1,i6.6)' ) iz, '/', trim( fieldout(iz) ), ic, it
@@ -258,9 +267,6 @@ do ic = 1, nc
   case( 'am'   ); call scalario( 'w', str, s2,       ir, i1, i2, i3, i4, iz )
   case( 'pv'   ); call scalario( 'w', str, pv,       ir, i1, i2, i3, i4, iz )
   case( 'nhat' ); call vectorio( 'w', str, nhat, ic, ir, i1, i2, i3, i4, iz )
-  case( 'ts0'  ); call vectorio( 'w', str, t3,   ic, ir, i1, i2, i3, i4, iz )
-  case( 'tsm0' ); call scalario( 'w', str, ts,       ir, i1, i2, i3, i4, iz )
-  case( 'tn0'  ); call scalario( 'w', str, tn,       ir, i1, i2, i3, i4, iz )
   case( 'mus'  ); call scalario( 'w', str, mus,      ir, i1, i2, i3, i4, iz )
   case( 'mud'  ); call scalario( 'w', str, mud,      ir, i1, i2, i3, i4, iz )
   case( 'dc'   ); call scalario( 'w', str, dc,       ir, i1, i2, i3, i4, iz )
@@ -323,9 +329,6 @@ case( 'wm'   ); onpass = 1; cell = .true.
 case( 'am'   )
 case( 'pv'   )
 case( 'nhat' ); fault = .true.; onpass = 0; nc = 3
-case( 'ts0'  ); fault = .true.; onpass = 0; nc = 3
-case( 'tsm0' ); fault = .true.; onpass = 0
-case( 'tn0'  ); fault = .true.; onpass = 0
 case( 'mus'  ); fault = .true.; onpass = 0
 case( 'mud'  ); fault = .true.; onpass = 0
 case( 'dc'   ); fault = .true.; onpass = 0

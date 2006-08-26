@@ -20,33 +20,7 @@ else
 end if
 call pimin( i, it )
 it = i
-if ( it == 0 ) then
-  t     =  0.
-  v     =  0.
-  u     =  0.
-  w1    =  0.
-! z1    =  0.
-! z2    =  0.
-  sl    =  0.
-  p1    =  0.
-  p2    =  0.
-  p3    =  0.
-  p4    =  0. 
-  p5    =  0.
-  p6    =  0. 
-  g1    =  0.
-  g2    =  0.
-  g3    =  0.
-  g4    =  0.
-  g5    =  0.
-  g6    =  0.
-  pv    =  0.
-  psv   =  0.
-  trup  =  1e9
-  tarr  =  0.
-  efric =  0.
-  return
-end if
+if ( it == 0 ) return
 if ( master ) write( 0, * ) 'Checkpoint found, starting from ', it
 i = modulo( it / itcheck, 2 )
 write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', i, '-', ip

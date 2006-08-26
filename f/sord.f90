@@ -10,6 +10,8 @@ use m_output
 use m_momentsource
 use m_material
 use m_fault
+use m_metadata
+use m_initial
 use m_checkpoint
 use m_timestep
 use m_stress
@@ -31,8 +33,10 @@ call pml               ; if ( master ) call timer( 1, 'init', 6 )
 call fault_init        ; if ( master ) call timer( 1, 'init', 7 )
 call metadata          ; if ( master ) call timer( 1, 'init', 8 )
 call output( 0 )       ; if ( master ) call timer( 1, 'init', 9 )
-call resample          ; if ( master ) call timer( 1, 'init', 10 )
-call readcheckpoint    ; if ( master ) call timer( 1, 'init', 11 )
+call initial           ; if ( master ) call timer( 1, 'init', 10 )
+call output( 1 )       ; if ( master ) call timer( 1, 'init', 11 )
+call output( 2 )       ; if ( master ) call timer( 1, 'init', 12 )
+call readcheckpoint    ; if ( master ) call timer( 1, 'init', 13 )
 
 ! Main loop
 if ( master ) write( 0, * ) 'Main loop'

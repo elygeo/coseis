@@ -91,7 +91,6 @@ end subroutine
 !------------------------------------------------------------------------------!
 ! Write stats 
 subroutine stats( rr, ii, filename, it )
-use m_collective
 real, intent(in) :: rr
 character(*), intent(in) :: filename
 integer, intent(in) :: ii(3), it
