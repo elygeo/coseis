@@ -117,6 +117,13 @@ real :: &
   estrain,       & ! change in stored strain energy
   efric,         & ! friction + fracure energy
   m0,            & ! moment calculated from slip*area*mu
+  mus0,          & ! static friction at hypocenter
+  mud0,          & ! dynamic friction at hypocenter
+  dc0,           & ! dc at hypocenter
+  tn0,           & ! normal traction at hypocenter
+  ts0,           & ! shear traction at hypocenter
+  ess,           & ! strength paramater
+  lc,            & ! breakdown width
   svtol            ! slip velocity for determining rupture time
 
 integer, dimension(3) :: &

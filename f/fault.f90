@@ -10,7 +10,7 @@ use m_globals
 use m_collective
 use m_surfnormals
 use m_util
-real :: mus0, mud0, dc0, lc, tn0, ts0, ess, rctest, x1(3), x2(3), rr
+real :: x1(3), x2(3), rr
 integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
 
 if ( ifn == 0 ) return
@@ -220,16 +220,6 @@ if ( master ) then
   if ( tn0 * ( mus0 - mud0 ) == 0. ) lc = 0.
   rctest = rho0 * vs0 ** 2. * tn0 * ( mus0 - mud0 ) * dc0 &
     / ( ts0 - tn0 * mud0 ) ** 2
-  open( 1, file='faultmeta.m', status='replace' )
-  write( 1, * ) 'mus0   = ', mus0,   '; % static friction at hypocenter'
-  write( 1, * ) 'mud0   = ', mud0,   '; % dynamic friction at hypocenter'
-  write( 1, * ) 'dc0    = ', dc0,    '; % dc at hypocenter'
-  write( 1, * ) 'tn0    = ', tn0,    '; % normal traction at hypocenter'
-  write( 1, * ) 'ts0    = ', ts0,    '; % shear traction at hypocenter'
-  write( 1, * ) 'ess    = ', ess,    '; % strength paramater'
-  write( 1, * ) 'lc     = ', lc,     '; % breakdown width'
-  write( 1, * ) 'rctest = ', rctest, '; % rcrit for spontaneous rupture'
-  close( 1 )
 end if
 
 end subroutine

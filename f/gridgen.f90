@@ -275,7 +275,8 @@ call vectorswaphalo( x, nhalo )
 noper = 1
 i1oper(1,:) = i1cell
 i2oper(1,:) = i2cell + 1
-call optimize
+call optimize( noper, oper, i1oper, i2oper, x, dx, w2, s2, i1cell, i2cell )
+
 
 ! Hypocenter location
 if ( fixhypo == 1 ) then

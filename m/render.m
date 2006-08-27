@@ -40,7 +40,7 @@ end
 
 % Metadata
 labels = fieldlabels( field, 0 );
-cellfocus = any( strcmp( field, { 'w', 'wm', 'lam', 'mu' } ) );
+cellfocus = any( strcmp( field, { 'w', 'wm' } ) );
 isfault = any( strcmp( field, { 'nhat' 'mus' 'mud' 'dc' 'co' 'sv' 'su' 'ts' 'sa' 'svm' 'sum' 'tsm' 'sam' 'tn' 'fr' 'sl' 'psv' 'trup' 'tarr' } ) );
 [ fmax, i ] = max( abs( s(:) ) );
 [ j, k, l ] = ind2sub( size( s ), i );
