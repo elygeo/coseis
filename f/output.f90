@@ -107,6 +107,11 @@ i2out(iz,:) = i2
 i1 = max( i1, i1node )
 i2 = min( i2, i2node )
 if ( cell ) i2 = min( i2, i2cell )
+if ( fault ) then
+  i = abs( faultnormal )
+  i1(i) = 1
+  i2(i) = 1
+end if
 i = 1
 if ( any( i2 < i1 ) ) i = 0
 call splitio( iz, nout, i )
@@ -216,21 +221,19 @@ if ( ditout(iz) /= 0 ) then
   if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 end if
 
+! Properies
+call outprops( fieldout(iz), nc, onpass, fault, cell )
+
 ! Indices
 i1 = i1out(iz,:)
 i2 = i2out(iz,:)
 i3 = max( i1, i1node )
 i4 = min( i2, i2node )
-if ( cell ) i4 = min( i2, i2cell )
-if ( any( i3 > i4 ) ) then
+if ( cell ) i4 = min( i4, i2cell )
+if ( any( i3 > i4 ) ) then 
   ditout(iz) = nt + 1
   cycle doiz
 end if
-
-! Properies
-call outprops( fieldout(iz), nc, onpass, fault, cell )
-if ( pass /= onpass ) cycle doiz
-if ( ditout(iz) == 0 ) ditout(iz) = nt + 1
 if ( fault ) then
   i = abs( faultnormal )
   i1(i) = 1
@@ -238,6 +241,10 @@ if ( fault ) then
   i3(i) = 1
   i4(i) = 1
 end if
+
+! Pass
+if ( pass /= onpass ) cycle doiz
+if ( ditout(iz) == 0 ) ditout(iz) = nt + 1
 
 ! Binary output
 do ic = 1, nc

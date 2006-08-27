@@ -13,10 +13,10 @@ integer, parameter :: &
 ! 3D vectors
 real, allocatable, dimension(:,:,:,:) :: &
   x,             & ! node locations
-  v,             & ! **velocity
-  u,             & ! **displacement
-  z1,            & ! **anelastic memory variable
-  z2,            & ! **anelastic memory variable
+  v,             & ! velocity
+  u,             & ! displacement
+  z1,            & ! anelastic memory variable
+  z2,            & ! anelastic memory variable
   w1,            & ! temporary storage
   w2               ! temporary storage
 
@@ -35,18 +35,18 @@ real, allocatable, dimension(:,:,:) :: &
 
 ! PML state
 real, allocatable, dimension(:,:,:,:) :: &
-  p1,            & ! **j1 pml momentum
-  p2,            & ! **k1 pml momentum
-  p3,            & ! **l1 pml momentum
-  p4,            & ! **j2 pml momentum
-  p5,            & ! **k2 pml momentum
-  p6,            & ! **l2 pml momentum
-  g1,            & ! **j1 pml gradient
-  g2,            & ! **k1 pml gradient
-  g3,            & ! **l1 pml gradient
-  g4,            & ! **j2 pml gradient
-  g5,            & ! **k2 pml gradient
-  g6               ! **l2 pml gradient
+  p1,            & ! j1 pml momentum
+  p2,            & ! k1 pml momentum
+  p3,            & ! l1 pml momentum
+  p4,            & ! j2 pml momentum
+  p5,            & ! k2 pml momentum
+  p6,            & ! l2 pml momentum
+  g1,            & ! j1 pml gradient
+  g2,            & ! k1 pml gradient
+  g3,            & ! l1 pml gradient
+  g4,            & ! j2 pml gradient
+  g5,            & ! k2 pml gradient
+  g6               ! l2 pml gradient
 
 ! PML damping
 real, allocatable, dimension(:) :: &
@@ -72,17 +72,17 @@ real, allocatable, dimension(:,:,:) :: &
   area,          & ! fault element area
   rhypo,         & ! radius to hypocenter
   muf,           & ! shear modulus at the fault nodes
-  sl,            & ! **slip path length
-  psv,           & ! **peak slip velocity magnitude
-  trup,          & ! **rupture time
-  tarr,          & ! **rise time
+  sl,            & ! slip path length
+  psv,           & ! peak slip velocity magnitude
+  trup,          & ! rupture time
+  tarr,          & ! rise time
   tn,            & ! temporary storage
   ts,            & ! temporary storage
   f1,            & ! temporary storage
   f2               ! temporary storage
 
 real :: &
-  t,             & ! **time
+  t,             & ! time
   dt,            & ! time step
   dx,            & ! spatial step
   inval(nz),     & ! input value
@@ -172,8 +172,10 @@ integer :: &
   i2lock(nz,3),  & ! j2 k2 l2 lock zone end index
   nout = 0,      & ! number of zones for output
   ditout(nz),    & ! interval for writing output
-  i1out(nz,3),   & ! j1 k1 l1 input zone start index
-  i2out(nz,3)      ! j2 k2 l2 input zone end index
+  i1out(nz,3),   & ! j1 k1 l1 output zone start index
+  i2out(nz,3),   & ! j2 k2 l2 output zone end index
+  i3out(nz,3),   & ! j1 k1 l1 local output zone start index
+  i4out(nz,3)      ! j2 k2 l2 local output zone end index
 
 character :: &
   oper(2),       & ! spatial derivative operators, g=general, r=rect, h=const
