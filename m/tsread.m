@@ -8,7 +8,6 @@ labels = {};
 
 % Read metadata
 meta
-if faultnormal, faultmeta, end
 currentstep
 
 % Test for special cases

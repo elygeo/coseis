@@ -124,6 +124,7 @@ real :: &
   ts0,           & ! shear traction at hypocenter
   ess,           & ! strength paramater
   lc,            & ! breakdown width
+  rctest,        & ! rcrit needed for spontaneous rupture
   svtol            ! slip velocity for determining rupture time
 
 integer, dimension(3) :: &

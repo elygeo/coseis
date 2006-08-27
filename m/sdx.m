@@ -4,7 +4,6 @@ clear all
 format compact
 
 meta
-if faultnormal, faultmeta, end
 
 [ tmp, islice ] = max( abs( upvector ) );
 i1 = nn;

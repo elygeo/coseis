@@ -17,6 +17,7 @@ use m_timestep
 use m_stress
 use m_acceleration
 use m_locknodes
+use m_util
 
 ! Initialization
 call timer

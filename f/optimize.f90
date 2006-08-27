@@ -5,14 +5,12 @@ contains
 
 subroutine optimize( oper, noper, i1oper, i2oper, w2, s2, x, dx, i1cell, i2cell )
 character, intent(out) :: oper(2)
-integer, intent(out) :: noper, i1oper(3), i2oper(3)
+integer, intent(out) :: noper, i1oper(2,3), i2oper(2,3)
 real, intent(out) :: w2(:,:,:,:), s2(:,:,:)
 real, intent(in) :: x(:,:,:,:), dx
 integer, intent(in) :: i1cell(3), i2cell(3)
 real :: tol, test
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2
-
-if ( master ) write( 0, * ) 'Operator optimization'
 
 ! Grid gradient
 i1 = i1cell

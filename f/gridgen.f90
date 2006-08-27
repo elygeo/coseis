@@ -271,13 +271,6 @@ case( 3 ); x(:,:,l+1:nm(3),:) = x(:,:,l:nm(3)-1,:)
 end select
 call vectorswaphalo( x, nhalo )
 
-! Assign fast operators to rectangular mesh portions
-noper = 1
-i1oper(1,:) = i1cell
-i2oper(1,:) = i2cell + 1
-call optimize( noper, oper, i1oper, i2oper, x, dx, w2, s2, i1cell, i2cell )
-
-
 ! Hypocenter location
 if ( fixhypo == 1 ) then
   if ( master ) xhypo = xhypo + x(j,k,l,:)
@@ -308,6 +301,12 @@ do i = 1,3
 end do
 s2 = sum( w2 * w2, 4 );
 call pmax( rmax, sqrt( maxval( s2 ) ) )
+
+! Assign fast operators to rectangular mesh portions
+noper = 1
+i1oper(1,:) = i1cell
+i2oper(1,:) = i2cell + 1
+call optimize( oper, noper, i1oper, i2oper, w2, s2, x, dx, i1cell, i2cell )
 
 end subroutine
 
