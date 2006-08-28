@@ -3,7 +3,6 @@ module m_output
 implicit none
 contains
 
-!------------------------------------------------------------------------------!
 ! Initialize output
 subroutine output_init
 use m_globals
@@ -121,6 +120,7 @@ end do
 end subroutine
 
 !------------------------------------------------------------------------------!
+
 ! Write output
 subroutine output( pass )
 use m_globals

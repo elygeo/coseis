@@ -10,7 +10,13 @@ use m_diffnc
 use m_bc
 integer :: i1(3), i2(3), j, k, l, j1, k1, l1, j2, k2, l2
 
-if ( master ) write( 0, * ) 'Initial state'
+if ( master ) write( 0, * ) 'Resample material model'
+
+! Fill halo
+call scalarbc( lam, ibc1, ibc2, nhalo )
+call scalarbc( mu,  ibc1, ibc2, nhalo )
+call scalarswaphalo( lam, nhalo )
+call scalarswaphalo( mu,  nhalo )
 
 ! Harmonic average Lame parameters onto cell centers
 s1 = 0.

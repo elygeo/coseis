@@ -3,7 +3,6 @@ module m_util
 implicit none
 contains
 
-!------------------------------------------------------------------------------!
 subroutine zone( i1, i2, nn, nnoff, ihypo, faultnormal )
 integer, intent(inout) :: i1(3), i2(3)
 integer, intent(in) :: nn(3), nnoff(3), ihypo(3), faultnormal
@@ -29,7 +28,6 @@ i1 = i1 + nnoff
 i2 = i2 + nnoff
 end subroutine
 
-!------------------------------------------------------------------------------!
 subroutine cube( s, x, i1, i2, x1, x2, r )
 real, intent(inout) :: s(:,:,:)
 real, intent(in) :: x(:,:,:,:), x1(3), x2(3), r
@@ -46,7 +44,6 @@ where( x(j1:j2,k1:k2,l1:l2,1) >= x1(1) &
  .and. x(j1:j2,k1:k2,l1:l2,3) <= x2(3) ) s = r
 end subroutine
 
-!------------------------------------------------------------------------------!
 subroutine sethalo( f, r, i1, i2 )
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
@@ -65,7 +62,6 @@ if ( size( f, 3 ) > 1 ) then
 end if
 end subroutine
 
-!------------------------------------------------------------------------------!
 ! Timer
 subroutine timer( i, filename, it )
 character(*), intent(in), optional :: filename
@@ -88,7 +84,6 @@ else
 end if
 end subroutine
 
-!------------------------------------------------------------------------------!
 ! Write stats 
 subroutine stats( rr, ii, filename, it )
 real, intent(in) :: rr
@@ -100,7 +95,6 @@ call iwrite( 'stats/' // filename // '2', ii(2), it )
 call iwrite( 'stats/' // filename // '3', ii(3), it )
 end subroutine
 
-!------------------------------------------------------------------------------!
 ! Write integer binary timeseries
 subroutine iwrite( filename, val, it )
 character(*), intent(in) :: filename
@@ -116,7 +110,6 @@ write( 1, rec=it ) val
 close( 1 )
 end subroutine
 
-!------------------------------------------------------------------------------!
 ! Write real binary timeseries
 subroutine rwrite( filename, val, it )
 character(*), intent(in) :: filename

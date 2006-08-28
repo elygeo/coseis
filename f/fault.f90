@@ -3,7 +3,6 @@ module m_fault
 implicit none
 contains
 
-!------------------------------------------------------------------------------!
 ! Fault initialization
 subroutine fault_init
 use m_globals
@@ -225,6 +224,7 @@ end if
 end subroutine
 
 !------------------------------------------------------------------------------!
+
 ! Fault boundary condition
 subroutine fault
 use m_globals

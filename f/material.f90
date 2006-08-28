@@ -112,12 +112,6 @@ call pmax( vp2,  maxval( s1(j1:j2,k1:k2,l1:l2) ) )
 call pmin( vs1,  minval( s2(j1:j2,k1:k2,l1:l2) ) )
 call pmax( vs2,  maxval( s2(j1:j2,k1:k2,l1:l2) ) )
 
-! Fill halo
-call scalarbc( s1, ibc1, ibc2, nhalo )
-call scalarbc( s2, ibc1, ibc2, nhalo )
-call scalarswaphalo( s1, nhalo )
-call scalarswaphalo( s2, nhalo )
-
 ! Hypocenter values
 if ( master ) then
   j = ihypo(1)
@@ -144,6 +138,7 @@ lam = mr * ( s1 * s1 ) - 2. * mu
 end subroutine
 
 !------------------------------------------------------------------------------!
+
 ! Calculate PML damping parameters
 subroutine pml
 use m_globals

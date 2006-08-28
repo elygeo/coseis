@@ -3,7 +3,6 @@ module m_hourglass
 implicit none
 contains
 
-!------------------------------------------------------------------------------!
 ! Node to cell
 subroutine hourglassnc( hg, f, i, iq, i1, i2 )
 real, intent(out) :: hg(:,:,:)
@@ -55,6 +54,7 @@ end select
 end subroutine
 
 !------------------------------------------------------------------------------!
+
 ! Cell to node
 subroutine hourglasscn( hg, f, iq, i1, i2 )
 real, intent(out) :: hg(:,:,:)
