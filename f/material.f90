@@ -90,27 +90,36 @@ end select
 
 end do doiz
 
-! Extrema
 if ( any( mr /= mr ) .or. any( s1 /= s1 ) .or. any( s2 /= s2 ) ) then
   stop 'NaNs in velocity model!'
 end if
+
+! Limits
 where ( mr < rho1 ) mr = rho1
 where ( mr > rho2 ) mr = rho2
 where ( s1 < vp1 ) s1 = vp1
 where ( s1 > vp2 ) s1 = vp2
 where ( s2 < vs1 ) s2 = vs1
 where ( s2 > vs2 ) s2 = vs2
-i1 = i1node
-i2 = i2node
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-call pmin( rho1, minval( mr(j1:j2,k1:k2,l1:l2) ) )
-call pmax( rho2, maxval( mr(j1:j2,k1:k2,l1:l2) ) )
-call pmin( vp1,  minval( s1(j1:j2,k1:k2,l1:l2) ) )
-call pmax( vp2,  maxval( s1(j1:j2,k1:k2,l1:l2) ) )
-call pmin( vs1,  minval( s2(j1:j2,k1:k2,l1:l2) ) )
-call pmax( vs2,  maxval( s2(j1:j2,k1:k2,l1:l2) ) )
+
+! Extrema
+call pmax( rho2, maxval( mr ) )
+call pmax( vp2, maxval( s1 ) )
+call pmax( vs2, maxval( s2 ) )
+call sethalo( mr, rho2, i1node, i2node )
+call sethalo( s1, vp2, i1node, i2node )
+call sethalo( s2, vs2, i1node, i2node )
+call pmin( rho1, minval( mr ) )
+call pmin( vp1, minval( s1 ) )
+call pmin( vs1, minval( s2 ) )
+
+! Fill halo
+call scalarbc( mr, ibc1, ibc2, nhalo )
+call scalarbc( s1, ibc1, ibc2, nhalo )
+call scalarbc( s2, ibc1, ibc2, nhalo )
+call scalarswaphalo( mr, nhalo )
+call scalarswaphalo( s1, nhalo )
+call scalarswaphalo( s2, nhalo )
 
 ! Hypocenter values
 if ( master ) then
@@ -122,6 +131,10 @@ if ( master ) then
   vs0  = s2(j,k,l)
 end if
 
+! Lame' parameters
+mu  = mr * s2 * s2
+lam = mr * ( s1 * s1 ) - 2. * mu
+
 ! Viscosity
 if ( vdamp > 0. ) then
   where( s2 > 0. ) gam = vdamp / s2
@@ -130,10 +143,6 @@ if ( vdamp > 0. ) then
 else
   gam = dt * viscosity(1)
 end if
-
-! Lame parameters
-mu  = mr * s2 * s2
-lam = mr * ( s1 * s1 ) - 2. * mu
 
 end subroutine
 

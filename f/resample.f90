@@ -12,12 +12,6 @@ integer :: i1(3), i2(3), j, k, l, j1, k1, l1, j2, k2, l2
 
 if ( master ) write( 0, * ) 'Resample material model'
 
-! Fill halo
-call scalarbc( lam, ibc1, ibc2, nhalo )
-call scalarbc( mu,  ibc1, ibc2, nhalo )
-call scalarswaphalo( lam, nhalo )
-call scalarswaphalo( mu,  nhalo )
-
 ! Harmonic average Lame parameters onto cell centers
 s1 = 0.
 s2 = 0.
@@ -53,9 +47,9 @@ where ( y /= 0. ) y = dx * mu * ( lam + mu ) / y
 s1 = 0.
 call diffnc( s1, 'g', x, x, dx, 1, 1, i1cell, i2cell )
 select case( ifn )
-case( 1 ); j = ihypo(1); s1(j,:,:) = 0.; lam(j,:,:) = 0.; mu(j,:,:) = 0.
-case( 2 ); k = ihypo(2); s1(:,k,:) = 0.; lam(:,k,:) = 0.; mu(:,k,:) = 0.
-case( 3 ); l = ihypo(3); s1(:,:,l) = 0.; lam(:,:,l) = 0.; mu(:,:,l) = 0.
+case( 1 ); j = ihypo(1); s1(j,:,:) = 0.
+case( 2 ); k = ihypo(2); s1(:,k,:) = 0.
+case( 3 ); l = ihypo(3); s1(:,:,l) = 0.
 end select
 
 ! Node volume

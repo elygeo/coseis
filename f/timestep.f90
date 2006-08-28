@@ -49,7 +49,7 @@ if ( ifn /= 0 ) then
       tarr = t - dt * ( .5 + ( svtol - f1 ) / ( f2 - f1 ) )
     end where
   end if
-  if ( master )
+  if ( master ) then
     i1 = ihypo
     i1(ifn) = 1 
     call rwrite( 'stats/tarrhypo', tarr(i1(1),i1(2),i1(3)), it )

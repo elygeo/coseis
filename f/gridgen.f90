@@ -294,8 +294,9 @@ end if
 
 ! Grid Dimensions
 do i = 1,3
-  call pmin( x1, minval( x(:,:,:,i) ) )
-  call pmax( x2, maxval( x(:,:,:,i) ) )
+  s2 = x(:,:,:,i)
+  call pmin( x1, minval( s2 ) )
+  call pmax( x2, maxval( s2 ) )
   xcenter(i) = ( x1 + x2 ) / 2.
   w2(:,:,:,i) = x(:,:,:,i) - xcenter(i);
 end do
