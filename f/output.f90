@@ -157,7 +157,6 @@ if ( it > 0 ) then
     if ( master ) then
       call stats( r1, i1-nnoff, 'vmax', it )
       call stats( r2, i2-nnoff, 'wmax', it )
-      call rwrite( 'stats/t', t, it )
     end if
     if ( dofault ) then
       call sethalo( f1, -1., i1node, i2node )
@@ -172,9 +171,6 @@ if ( it > 0 ) then
         call stats( r2, i2-nnoff, 'sumax',   it )
         call stats( r3, i3-nnoff, 'slmax',   it )
         call stats( r4, i4-nnoff, 'tarrmax', it )
-        i1 = ihypo
-        i1(i) = 1
-        call rwrite( 'stats/tarrhypo', tarr(i1(1),i1(2),i1(3)), it )
       end if
     end if
   case( 2 )
@@ -205,12 +201,6 @@ if ( it > 0 ) then
         call stats( r2, i2-nnoff, 'samax', it )
         call stats( r3, i3-nnoff, 'tnmax', it )
         call stats( r4, i4-nnoff, 'tnmin', it )
-        call rwrite( 'stats/efric', efric, it )
-        call rwrite( 'stats/estrain', estrain, it )
-        call rwrite( 'stats/m0', m0, it )
-        r1 = -0.
-        if ( m0 > 0. ) r1 = 2. / 3. * log10( m0 ) - 10.7
-        call rwrite( 'stats/mw', r1, it )
       end if
     end if
   end select
@@ -219,21 +209,21 @@ end if
 doiz: do iz = 1, nout
 
 ! Interval
-if ( ditout(iz) /= 0 ) then
+if ( ditout(iz) == 0 ) then
+  if ( it > 0 ) cycle doiz
+else
   if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 end if
 
-! Properies
+! Pass
 call outprops( fieldout(iz), nc, onpass, fault, cell )
-
-! Indices
 i1 = i1out(iz,:)
 i2 = i2out(iz,:)
 i3 = max( i1, i1node )
 i4 = min( i2, i2node )
 if ( cell ) i4 = min( i4, i2cell )
 if ( any( i3 > i4 ) ) then 
-  ditout(iz) = nt + 1
+  ditout(iz) = 0
   cycle doiz
 end if
 if ( fault ) then
@@ -243,17 +233,14 @@ if ( fault ) then
   i3(i) = 1
   i4(i) = 1
 end if
-
-! Pass
 if ( pass /= onpass ) cycle doiz
-if ( ditout(iz) == 0 ) ditout(iz) = nt + 1
 
 ! Binary output
 do ic = 1, nc
   ir = 1
   write( str, '(i2.2,a,a,i1)' ) iz, '/', trim( fieldout(iz) ), ic
-  if ( pass /= 0 ) then
-  if ( all( i1 == i2 ) .and. it > 0 ) then
+  if ( it > 0 ) then
+  if ( all( i1 == i2 ) ) then
     ir = it / ditout(iz)
   else
     write( str, '(i2.2,a,a,i1,i6.6)' ) iz, '/', trim( fieldout(iz) ), ic, it

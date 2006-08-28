@@ -114,9 +114,7 @@ real :: &
   vrup,          & ! nucleation rupture velocity
   rcrit,         & ! nucleation critical radius
   trelax,        & ! nucleation relaxation time
-  estrain,       & ! change in stored strain energy
   efric,         & ! friction + fracure energy
-  m0,            & ! moment calculated from slip*area*mu
   mus0,          & ! static friction at hypocenter
   mud0,          & ! dynamic friction at hypocenter
   dc0,           & ! dc at hypocenter

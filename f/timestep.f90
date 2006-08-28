@@ -4,6 +4,7 @@ implicit none
 contains
 subroutine timestep
 use m_globals
+use m_util
 integer :: i1(3), i2(3), j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
 ! Save previous slip velocity
@@ -29,6 +30,7 @@ it = it + 1
 t  = it * dt
 v  = v  + dt * w1
 u  = u  + dt * v
+if ( master ) call rwrite( 'stats/t', t, it )
 
 ! Fault time integration
 if ( ifn /= 0 ) then
@@ -46,6 +48,11 @@ if ( ifn /= 0 ) then
     where ( f1 < svtol .and. f2 >= svtol )
       tarr = t - dt * ( .5 + ( svtol - f1 ) / ( f2 - f1 ) )
     end where
+  end if
+  if ( master )
+    i1 = ihypo
+    i1(ifn) = 1 
+    call rwrite( 'stats/tarrhypo', tarr(i1(1),i1(2),i1(3)), it )
   end if
   t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
   f2 = sqrt( sum( t2 * t2, 4 ) )
