@@ -280,6 +280,8 @@ infile  = '$infile';
 machine = '$machine';
 host    = '$HOSTNAME';
 os      = '$( uname -a )';
+mode    = '$mode';
+np      = $np;
 END
 
 #------------------------------------------------------------------------------#

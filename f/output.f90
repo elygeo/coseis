@@ -10,7 +10,7 @@ use m_collective
 use m_outprops
 use m_util
 real :: rout
-integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz, onpass
+integer :: i1(3), i2(3), n(3), noff(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz, onpass
 character(7) :: field
 logical :: dofault, fault, cell
 
@@ -31,6 +31,8 @@ call outprops( fieldout(iz), nc, onpass, fault, cell )
 if ( onpass == 0 ) ditout(iz) = 0
 
 ! Zone or point location
+n = nn + 2 * nhalo
+noff = nnoff - nhalo
 select case( outtype(iz) )
 case( 'z' )
   i1 = i1out(iz,:)
@@ -61,7 +63,7 @@ case( 'x' )
       i = abs( faultnormal )
       f2 = sum( t2 * t2, 4 )
       call sethalo( f2, rmax * rmax, i1node, i2node )
-      call pminloc( rout, i1, f2, nn, nnoff, i )
+      call pminloc( rout, i1, f2, n, noff, i )
       i1(i) = ihypo(i)
     end if
   else
@@ -87,7 +89,7 @@ case( 'x' )
       s2 = sum( w2 * w2, 4 )
       call sethalo( s2, rmax * rmax, i1node, i2node )
     end if
-    call pminloc( rout, i1, s2, nn, nnoff, 0 )
+    call pminloc( rout, i1, s2, n, noff, 0 )
   end if
   i2 = i1
   if ( rout > dx * dx ) ditout(iz) = nt + 1

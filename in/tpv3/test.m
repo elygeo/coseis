@@ -16,12 +16,12 @@
   origin = 0;
   dx  = 100;
   dt  = .008;
-  nt  = 2;
+  nt  = 10;
   bc1   = [  0  0  0 ];
   bc2   = [ -3  3 -2 ];
   ihypo = [ -1 -1 -1 ];
   nn    = [  8  8  8 ];
-  np    = [  2  1  1 ];
+  np    = [  2  3  1 ];
   debug = 0;
 
   out = { 'x'    0      1 1 1   -1 -1 -1 };
@@ -62,4 +62,7 @@
   out = { 'tarr' 1      1 1 1   -1 -1 -1 };
   timeseries = { 'v'  -200. 0. 0. };
   timeseries = { 'sv' -200. 0. 0. };
+  timeseries = { 'v'  0. 0. 0. };
+  timeseries = { 'v'  -801. -700. -700. };
+  timeseries = { 'v'  101. 000. 000. };
 

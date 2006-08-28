@@ -75,22 +75,22 @@ rr = r
 end subroutine
 
 !Real global minimum & location
-subroutine pminloc( rr, ii, r, nn, nnoff, i2d )
+subroutine pminloc( rr, ii, r, n, noff, i2d )
 real, intent(out) :: rr
 real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
-integer, intent(in) :: nn(3), nnoff(3), i2d
-ii = minloc( r ) - nn + nn - nnoff + nnoff - i2d + i2d
+integer, intent(in) :: n(3), noff(3), i2d
+ii = minloc( r ) - n + n - noff + noff - i2d + i2d
 rr = r(ii(1),ii(2),ii(3))
 end subroutine
 
 ! Real global maximum & location
-subroutine pmaxloc( rr, ii, r, nn, nnoff, i2d )
+subroutine pmaxloc( rr, ii, r, n, noff, i2d )
 real, intent(out) :: rr
 real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
-integer, intent(in) :: nn(3), nnoff(3), i2d
-ii = maxloc( r ) - nn + nn - nnoff + nnoff - i2d + i2d
+integer, intent(in) :: n(3), noff(3), i2d
+ii = maxloc( r ) - n + n - noff + noff - i2d + i2d
 rr = r(ii(1),ii(2),ii(3))
 end subroutine
 

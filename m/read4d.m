@@ -29,7 +29,7 @@ m2 = i1s(1:3) ~= 0 & i2s(1:3) == 0;
 m3 = i1s < 0;
 m4 = i2s < 0;
 i1s(m0) = ihypo(m0);
-i2s(m0) = ihypo(m0) + shift(m0);
+i2s(m0) = ihypo(m0);
 i1s(m1) = ihypo(m1) + shift(m1);
 i2s(m2) = ihypo(m2);
 i1s(m3) = i1s(m3) + n(m3) + 1;
