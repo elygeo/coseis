@@ -47,7 +47,7 @@ doline: do
       h1 * h4 * t(j+1,k) + &
       h2 * h3 * t(j,k+1) + &
       h1 * h3 * t(j+1,k+1) )
-    print '(f11.6,x,f9.6,x,f7.1,x,a)', x, y, z, trim( line )
+    print '(f11.6,x,f9.6,x,f6.0,x,a)', x, y, z, trim( line )
   end if
 end do doline
 
