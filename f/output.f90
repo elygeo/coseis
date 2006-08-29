@@ -108,11 +108,6 @@ i2out(iz,:) = i2
 i1 = max( i1, i1node )
 i2 = min( i2, i2node )
 if ( cell ) i2 = min( i2, i2cell )
-if ( fault ) then
-  i = abs( faultnormal )
-  i1(i) = 1
-  i2(i) = 1
-end if
 i = 1
 if ( any( i2 < i1 ) ) i = 0
 call splitio( iz, nout, i )

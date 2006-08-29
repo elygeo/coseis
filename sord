@@ -150,11 +150,12 @@ ifort)
   [ $machine = teragrid ] && oflags='-O3'
   ;;
 pgf90)
-  gflags='-O0 -g -Ktrap=fp -Mbounds -Mdclchk -Mprof=lines'
+  gflags='-O0 -g -Ktrap=fp -Mbounds -Mdclchk'
+  gflags='-g -Mprof=lines'
   oflags='-fast'
   ;;
 gfortran)
-  gflags='-O0 -p -g -W -pedantic -std=f95 -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
+  gflags='-O0 -pg -g -W -pedantic -std=f95 -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
   oflags='-O3'
   ;;
 f95)

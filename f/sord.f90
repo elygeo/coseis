@@ -25,33 +25,33 @@ call initialize( ip, np0, master )
 call inread
 call setup
 if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
-call arrays            ; if ( master ) call timer( 1, 'init', 1 )
-call gridgen           ; if ( master ) call timer( 1, 'init', 2 )
-call output_init       ; if ( master ) call timer( 1, 'init', 3 )
-call momentsource_init ; if ( master ) call timer( 1, 'init', 4 )
-call material          ; if ( master ) call timer( 1, 'init', 5 )
-call pml               ; if ( master ) call timer( 1, 'init', 6 )
-call fault_init        ; if ( master ) call timer( 1, 'init', 7 )
-call metadata          ; if ( master ) call timer( 1, 'init', 8 )
-call output( 0 )       ; if ( master ) call timer( 1, 'init', 9 )
-call resample          ; if ( master ) call timer( 1, 'init', 10 )
-call output( 1 )       ; if ( master ) call timer( 1, 'init', 11 )
-call output( 2 )       ; if ( master ) call timer( 1, 'init', 12 )
-call readcheckpoint    ; if ( master ) call timer( 1, 'init', 13 )
+call arrays            ; if ( master ) call timer( 1, 'main', 1 )
+call gridgen           ; if ( master ) call timer( 1, 'main', 2 )
+call output_init       ; if ( master ) call timer( 1, 'main', 3 )
+call momentsource_init ; if ( master ) call timer( 1, 'main', 4 )
+call material          ; if ( master ) call timer( 1, 'main', 5 )
+call pml               ; if ( master ) call timer( 1, 'main', 6 )
+call fault_init        ; if ( master ) call timer( 1, 'main', 7 )
+call metadata          ; if ( master ) call timer( 1, 'main', 8 )
+call output( 0 )       ; if ( master ) call timer( 1, 'main', 9 )
+call resample          ; if ( master ) call timer( 1, 'main', 10 )
+call output( 1 )       ; if ( master ) call timer( 1, 'main', 11 )
+call output( 2 )       ; if ( master ) call timer( 1, 'main', 12 )
+call readcheckpoint    ; if ( master ) call timer( 1, 'main', 13 )
 
 ! Main loop
 if ( master ) write( 0, * ) 'Main loop'
-if ( master ) call timer( 3, 'main', 1 )
+if ( master ) call timer( 3, 'main', 14 )
 do while ( it < nt )
-  call timestep        ; if ( master ) call timer( 1, 'step', it )
-  call stress          ; if ( master ) call timer( 1, 'stre', it )
-  call momentsource    ; if ( master ) call timer( 1, 'msrc', it )
-  call output( 1 )     ; if ( master ) call timer( 1, 'out1', it )
-  call acceleration    ; if ( master ) call timer( 1, 'accl', it )
-  call fault           ; if ( master ) call timer( 1, 'falt', it )
-  call locknodes       ; if ( master ) call timer( 1, 'lock', it )
-  call output( 2 )     ; if ( master ) call timer( 1, 'out2', it )
-  call writecheckpoint ; if ( master ) call timer( 1, 'ckpt', it )
+  call timestep        ; if ( master ) call timer( 1, '1tst', it )
+  call stress          ; if ( master ) call timer( 1, '2str', it )
+  call momentsource    ; if ( master ) call timer( 1, '3mom', it )
+  call output( 1 )     ; if ( master ) call timer( 1, '4out', it )
+  call acceleration    ; if ( master ) call timer( 1, '5acc', it )
+  call fault           ; if ( master ) call timer( 1, '6flt', it )
+  call locknodes       ; if ( master ) call timer( 1, '7loc', it )
+  call output( 2 )     ; if ( master ) call timer( 1, '8out', it )
+  call writecheckpoint ; if ( master ) call timer( 1, '9ckp', it )
   if ( master ) then
     write( 0, '(a)', advance='no' ) '.'
     if ( it == nt .or. mod( it, 50 ) == 0 ) write( 0, '(i6)' ) it
@@ -61,8 +61,8 @@ end do
 
 ! Finish up
 if ( master ) write( 0, * ) 'Finished!'
-if ( master ) call timer( 3, 'main', 2 )
-if ( master ) call timer( 4, 'main', 3 )
+if ( master ) call timer( 3, 'main', 15 )
+if ( master ) call timer( 4, 'main', 16 )
 call finalize
 
 end program
