@@ -304,6 +304,9 @@ e_fric = int_t int_a sv_i * t_i * da * dt
 Moment
 m0 = int_a * su_i * mu * da
 
+Moment magnitude
+mw = ( log10( m0 ) - 9.05 ) / 1.5
+
 Ratiated energy
 e_radiate = e_strain - e_fric
 

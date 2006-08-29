@@ -293,7 +293,7 @@ t3 = t1 - t2
 ts = sqrt( sum( t3 * t3, 4 ) )
 
 ! Slip-weakening friction law
-where ( tn > 0. ) tn = 0.
+tn = min( tn, 0. )
 f1 = mud
 where ( sl < dc ) f1 = f1 + ( 1. - sl / dc ) * ( mus - mud )
 f1 = -tn * f1 + co
@@ -316,17 +316,9 @@ end do
 ! Total traction
 t1 = t2 + t3
 
-! Total traction
-!do i = 1, 3
-!  tn = t1(:,:,:,i)
-!  f2 = t2(:,:,:,i) + t3(:,:,:,i)
-!  where ( ts > f1 ) tn = f2
-!  t1(:,:,:,i) = tn
-!end do
-
 ! Save for output
 tn = sum( t1 * nhat, 4 )
-ts = f2 * ts
+ts = min( ts, f1 )
 
 ! Update acceleration
 do i = 1, 3
@@ -373,7 +365,7 @@ f2 = muf * area * sqrt( sum( t2 * t2, 4 ) )
 call sethalo( f2, 0., i1node, i2node )
 call psum( r1, sum( f2 ), ifn )
 if ( master ) call rwrite( 'stats/m0', r1, it )
-if ( r1 > 0. ) r1 = 2. / 3. * log10( r1 ) - 10.7
+if ( r1 > 0. ) r1 = ( log10( r1 ) - 9.05 ) / 1.5
 if ( master ) call rwrite( 'stats/mw', r1, it )
 
 ! Slip acceleration

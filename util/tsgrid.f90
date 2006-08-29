@@ -13,8 +13,8 @@ character :: endian
 open( 1, file='dx', status='old' )
 read( 1, * ) dx
 close( 1 )
-mus = .6
-mud = .3
+mus = 1.05
+mud = .5
 ell = (/ 600, 300, 80 /) * 1000
 exag = 1.
 npml = 10
@@ -50,6 +50,7 @@ do i = 2, nf
   h2 = yf(i) - yf(i-1)
   rf(i) = rf(i-1) + sqrt( h1*h1 + h2*h2 )
 end do
+print *, 'Fault length: ', rf(nf)
 
 ! Fault indices
 nf1 = nint( rf(nf) / dx )
