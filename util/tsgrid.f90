@@ -13,7 +13,7 @@ character :: endian
 open( 1, file='dx', status='old' )
 read( 1, * ) dx
 close( 1 )
-mus = 1.05
+mus = 1.
 mud = .5
 ell = (/ 600, 300, 80 /) * 1000
 exag = 1.
