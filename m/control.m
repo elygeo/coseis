@@ -33,6 +33,7 @@ case 'f'
     list{i} = [ ' ' list{i} ' ' ];
   end
   i = find( strcmp( field, fields ) );
+  if km, i = i - 2; end
   i = mod( i, length( fields ) ) + 1;
   field = fields{i};
   list{i}([1 end]) = '[]';

@@ -212,7 +212,7 @@ doiz: do iz = 1, nout
 if ( ditout(iz) == 0 ) then
   if ( it > 0 ) cycle doiz
 else
-  if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
+  if ( it == 0 .or. modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 end if
 
 ! Pass

@@ -6,8 +6,8 @@ i1 = i1viz;
 i2 = i2viz;
 i1(ifn) = ihypo(ifn);
 i2(ifn) = ihypo(ifn);
-i1(4) = icursor(4);
-i2(4) = icursor(4);
+i1(4) = 0;
+i2(4) = 0;
 [ msg, xx ] = read4d( 'x', i1, i2 );
 if msg, error( msg ), end
 
@@ -23,19 +23,21 @@ if rcrit > 0. && vrup > .0
   end
 end
 
-[ msg, sl ] = read4d( 'sl', i1, i2 );
-if msg
-  msg = '';
-else
-  surfcontour( xx, sl, dc0 );
-  surfcontour( xx, sl, .01 * dc0 );
-end
-
 [ msg, dc ] = read4d( 'dc', i1, i2 );
 if msg
   msg = '';
 else
   h = surfcontour( xx, dc, 1 ); set( h, 'LineWidth', 2 )
   h = surfcontour( xx, dc, 2 ); set( h, 'LineWidth', 2 )
+end
+
+i1(4) = icursor(4);
+i2(4) = icursor(4);
+[ msg, sl ] = read4d( 'sl', i1, i2 );
+if msg
+  msg = '';
+else
+  surfcontour( xx, sl, dc0 );
+  surfcontour( xx, sl, .01 * dc0 );
 end
 

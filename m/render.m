@@ -14,6 +14,8 @@ end
 i1s(4) = icursor(4);
 i2s(4) = icursor(4);
 t = dt * icursor(4);
+static = any( strcmp( field, { 'x', 'rho', 'vp', 'vs', 'lam', 'mu', 'nhat', 'mus', 'mud', 'dc', 'co' } ) );
+if static, i1s(4) = 0; i2s(4) = 0; end
 
 % Read field data
 msg = read4d( field, i1s, i2s );

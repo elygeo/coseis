@@ -190,6 +190,10 @@ do i = 1, 3
 end do
 t3 = t0 - t2
 ts = sqrt( sum( t3 * t3, 4 ) )
+f1 = 0.
+f2 = 0.
+t1 = 0.
+t2 = 0.
 
 ! Halos
 call scalarswaphalo( mus, nhalo )
@@ -312,13 +316,17 @@ end do
 ! Total traction
 t1 = t2 + t3
 
+! Total traction
+!do i = 1, 3
+!  tn = t1(:,:,:,i)
+!  f2 = t2(:,:,:,i) + t3(:,:,:,i)
+!  where ( ts > f1 ) tn = f2
+!  t1(:,:,:,i) = tn
+!end do
+
 ! Save for output
 tn = sum( t1 * nhat, 4 )
 ts = f2 * ts
-t1 = 0.
-t2 = 0.
-f1 = 0.
-f2 = 0.
 
 ! Update acceleration
 do i = 1, 3

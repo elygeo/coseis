@@ -16,8 +16,8 @@ case( 'x'    ); onpass = 0; nc = 3
 case( 'rho'  ); onpass = 0
 case( 'vp'   ); onpass = 0
 case( 'vs'   ); onpass = 0
-case( 'mu'   ); onpass = 0
 case( 'lam'  ); onpass = 0
+case( 'mu'   ); onpass = 0
 case( 'v'    ); onpass = 1; nc = 3
 case( 'vm'   ); onpass = 1
 case( 'pv'   ); onpass = 1

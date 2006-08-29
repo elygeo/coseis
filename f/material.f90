@@ -136,6 +136,7 @@ mu  = mr * s2 * s2
 lam = mr * ( s1 * s1 ) - 2. * mu
 
 ! Viscosity
+gam = 0.
 if ( vdamp > 0. ) then
   where( s2 > 0. ) gam = vdamp / s2
   where( gam > .8 ) gam = .8
