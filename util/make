@@ -64,10 +64,6 @@ $tar zxf scecvm4.tgz
 for file in "$srcdir/scecvm4/"*; do
   ln -sf "$file"
 done
-$sfc $vmflags blockdata.f iobin.f scecvm4.f -o scecvm4-s
-$pfc $vmflags blockdata.f iompi.f scecvm4.f -o scecvm4-p
-exit
-
 mkdir -p 01
 mkdir -p 02
 mkdir -p 03
@@ -97,9 +93,8 @@ $sfc $flags $getarg asc2int.f90 -o asc2int
 $sfc $flags $getarg stats.f90 -o stats
 $sfc $flags $getarg swab.f90 -o swab
 $sfc $flags drape.f90 -o drape
-
-$sfc $vmflags blockdata.f iobin.f scecvm4.f -o scecvm4-s
-$pfc $vmflags blockdata.f iompi.f scecvm4.f -o scecvm4-p
+$sfc $vmflags iobin.f scecvm4.f -o scecvm4-s
+$pfc $vmflags iompi.f scecvm4.f -o scecvm4-p
 
 rm -f *.mod
 
