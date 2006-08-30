@@ -12,12 +12,14 @@ done
 
 getarg=''
 pfc='mpif90'
+vmflags=''
 case $sfc in
 xlf95_r)
   sfc='xlf95_r -q64 -qsuppress=cmpmsg'
   pfc='mpxlf95_r -q64 -qsuppress=cmpmsg'
   gflags='-qsuffix=f=f90 -p -g -C -qflttrap -qsigtrap -qlanglvl=95pure'
   oflags='-qsuffix=f=f90 -O4'
+  vmflags='-qfixed'
   ;;
 ifort)
   gflags='-O0 -p -g -CB -warn -traceback -u'
@@ -70,7 +72,7 @@ ln -sf '../vp'  '03/vp1'
 ln -sf '../vs'  '04/vs1'
 ln -sf '../th'  '05/tsm01'
 ln -sf '../tn'  '06/tn01'
-echo 1 > currentstep
+echo 0 > currentstep
 
 flags=$oflags
 
@@ -86,17 +88,12 @@ $sfc $flags $getarg stats.f90 -o stats
 $sfc $flags $getarg swab.f90 -o swab
 $sfc $flags drape.f90 -o drape
 
-if which gtar > /dev/null; then
-  gtar zxf scecvm4.tgz
-else
-  tar zxf scecvm4.tgz
-fi
+tar=tar
+for dir in $PATH; do [ -x $dir/gtar ] && tar=gtar; done
+$tar zxf scecvm4.tgz
 cp scecvm4.h 'in.h'
-
-flags=
-
-$sfc $flags iobin.f scecvm4.f -o scecvm4-s
-#$pfc $flags iompi.f scecvm4.f -o scecvm4-p
+$sfc $vmflags iobin.f scecvm4.f -o scecvm4-s
+#$pfc $vmflags iompi.f scecvm4.f -o scecvm4-p
 
 rm -f *.mod
 
