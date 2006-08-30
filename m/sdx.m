@@ -86,6 +86,9 @@ hleg(1) = surf( [ 0 1 ], [ 0 .08 ], [ 0 0; 0 0 ], ...
   'EdgeLighting', 'none' );
 hleg(2) = plot( [ 0 1 ], [ .08 .08 ], 'Color', .25 * [ 1 1 1 ] );
 hleg(3) = imagesc( [ .1 .9 ], [ .058 .06 ], 0:.001:1 );
+igpp
+hleg(4) = fill( .5 + .04 * logo(:,1), .1 + .04 * logo(:,2), .25 * [ 1 1 1 ] );
+set( hleg(4), 'EdgeColor', 'none', 'FaceAlpha', 1. )
 htxt(1) = text( .10, .05, '', 'Ver', 'top',    'Hor', 'center' );
 htxt(2) = text( .90, .05, '', 'Ver', 'top',    'Hor', 'center' );
 htxt(3) = text( .50, .05, '', 'Ver', 'top',    'Hor', 'center' );
