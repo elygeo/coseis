@@ -22,6 +22,7 @@ files="
   $base/f
   $base/m
   $base/util
+  $base/scecvm4
 "
 
 ln -s . $base

@@ -1,6 +1,8 @@
 #!/bin/bash -e
 
 IFS=":$IFS"
+tar=tar
+for dir in $PATH; do [ -x $dir/gtar ] && tar=gtar; done
 for dir in $PATH; do
 for file in xlf95_r ifort pgf90 gfortran f95; do
   if [ -x $dir/$file ]; then
@@ -53,11 +55,19 @@ srcdir=$( /bin/pwd )
 mkdir -p "$srcdir/tmp"
 cd tmp
 for file in "$srcdir/util/"*; do
-  [ -e $( basename "$file" ) ] || ln -s "$file"
+  ln -s "$file" &> /dev/null || :
 done
 for file in "$srcdir/data/"*; do
-  [ -e $( basename "$file" ) ] || ln -s "$file"
+  ln -s "$file" &> /dev/null || :
 done
+$tar zxf scecvm4.tgz
+for file in "$srcdir/scecvm4/"*; do
+  ln -sf "$file"
+done
+$sfc $vmflags blockdata.f iobin.f scecvm4.f -o scecvm4-s
+$pfc $vmflags blockdata.f iompi.f scecvm4.f -o scecvm4-p
+exit
+
 mkdir -p 01
 mkdir -p 02
 mkdir -p 03
@@ -88,12 +98,8 @@ $sfc $flags $getarg stats.f90 -o stats
 $sfc $flags $getarg swab.f90 -o swab
 $sfc $flags drape.f90 -o drape
 
-tar=tar
-for dir in $PATH; do [ -x $dir/gtar ] && tar=gtar; done
-$tar zxf scecvm4.tgz
-cp scecvm4.h 'in.h'
-$sfc $vmflags iobin.f scecvm4.f -o scecvm4-s
-#$pfc $vmflags iompi.f scecvm4.f -o scecvm4-p
+$sfc $vmflags blockdata.f iobin.f scecvm4.f -o scecvm4-s
+$pfc $vmflags blockdata.f iompi.f scecvm4.f -o scecvm4-p
 
 rm -f *.mod
 

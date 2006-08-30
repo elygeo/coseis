@@ -22,6 +22,7 @@ files="\
   f
   m
   util
+  scecvm4
   data"
 
 echo "SORD remote install"
