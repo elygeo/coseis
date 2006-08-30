@@ -43,19 +43,19 @@ call readcheckpoint    ; if ( master ) call timer( 1, 'main', 13 )
 if ( master ) write( 0, * ) 'Main loop'
 if ( master ) call timer( 3, 'main', 14 )
 do while ( it < nt )
-  call timestep        ; if ( master ) call timer( 1, '1tst', it )
-  call stress          ; if ( master ) call timer( 1, '2str', it )
-  call momentsource    ; if ( master ) call timer( 1, '3mom', it )
-  call output( 1 )     ; if ( master ) call timer( 1, '4out', it )
-  call acceleration    ; if ( master ) call timer( 1, '5acc', it )
-  call fault           ; if ( master ) call timer( 1, '6flt', it )
-  call locknodes       ; if ( master ) call timer( 1, '7loc', it )
-  call output( 2 )     ; if ( master ) call timer( 1, '8out', it )
-  call writecheckpoint ; if ( master ) call timer( 1, '9ckp', it )
+  call timestep        ; if ( master ) call timer( 1, '0tst', it )
+  call stress          ; if ( master ) call timer( 1, '1str', it )
+  call momentsource    ; if ( master ) call timer( 1, '2mom', it )
+  call output( 1 )     ; if ( master ) call timer( 1, '3out', it )
+  call acceleration    ; if ( master ) call timer( 1, '4acc', it )
+  call fault           ; if ( master ) call timer( 1, '5flt', it )
+  call locknodes       ; if ( master ) call timer( 1, '6loc', it )
+  call output( 2 )     ; if ( master ) call timer( 1, '7out', it )
+  call writecheckpoint ; if ( master ) call timer( 1, '8ckp', it )
   if ( master ) then
     write( 0, '(a)', advance='no' ) '.'
     if ( it == nt .or. mod( it, 50 ) == 0 ) write( 0, '(i6)' ) it
-    call timer( 2, 'loop', it )
+    call timer( 2, '9tot', it )
   end if
 end do
 

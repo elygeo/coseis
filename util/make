@@ -14,10 +14,10 @@ getarg=''
 pfc='mpif90'
 case $sfc in
 xlf95_r)
-  sfc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
-  pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
-  gflags='-p -g -C -qflttrap -qsigtrap -qlanglvl=95pure'
-  oflags='-O5'
+  sfc='xlf95_r -q64 -qsuppress=cmpmsg'
+  pfc='mpxlf95_r -q64 -qsuppress=cmpmsg'
+  gflags='-qsuffix=f=f90 -p -g -C -qflttrap -qsigtrap -qlanglvl=95pure'
+  oflags='-qsuffix=f=f90 -O4'
   ;;
 ifort)
   gflags='-O0 -p -g -CB -warn -traceback -u'
@@ -86,11 +86,13 @@ $sfc $flags $getarg stats.f90 -o stats
 $sfc $flags $getarg swab.f90 -o swab
 $sfc $flags drape.f90 -o drape
 
-tar zxf scecvm4.tgz
+if which gtar > /dev/null; then
+  gtar zxf scecvm4.tgz
+else
+  tar zxf scecvm4.tgz
+fi
 cp scecvm4.h 'in.h'
 
-flags=$oflags
-flags=$gflags
 flags=
 
 $sfc $flags iobin.f scecvm4.f -o scecvm4-s
