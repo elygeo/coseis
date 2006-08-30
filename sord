@@ -38,7 +38,7 @@ mkdir -p tmp
 # Locations
 srcdir=$( /bin/pwd )
 count=$( echo out/[0-9][0-9] | sed 's/.*\///' )
-[ $count = '[0-9][0-9]' ] && count=00
+[ "$count" = '[0-9][0-9]' ] && count=00
 count=$( echo $count | awk '{ printf "%02d", $1+1 }' )
 
 # Prepare input file
@@ -86,8 +86,8 @@ case $machine in
   phim)                           maxram=2800;  rate=200 ;;
   altai)                  cpus=8; maxram=30000; rate=90  ;; 
   babieca)  maxnodes=36;  cpus=2; maxram=800;   rate=160 ;;
-  teragrid) maxnodes=262; cpus=2; maxram=3000;  rate=500 ;;
-  datastar) maxnodes=176; cpus=8; maxram=13500 ;;          
+  teragrid) maxnodes=252; cpus=2; maxram=3000;  rate=500 ;;
+  datastar) maxnodes=265; cpus=8; maxram=13500 ;;          
 esac
 echo "Machine: $machine"
 

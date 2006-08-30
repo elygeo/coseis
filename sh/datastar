@@ -63,7 +63,7 @@ cat << END > llscript
 #@ queue
 #date > "$rundir/stamp0"
 #cd "$datadir"
-#poe $opts ./scecvm4-$mode
+#poe ./scecvm4-$mode $opts
 cd "$rundir"
 date > stamp1
 poe ./sord-p $opts
