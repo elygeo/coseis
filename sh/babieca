@@ -40,7 +40,7 @@ cat << END > pbsscript
 #PBS -V
 sleep 2
 #date > "$rundir/stamp0"
-#cd "$datadir"
+#cd "$rundir/data"
 #mpiexec -n $np ./scecvm4-$mode
 cd "$rundir"
 date > stamp1

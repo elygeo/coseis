@@ -3,7 +3,6 @@
   bc1 = [ 1 1 1 ];
   bc2 = [ 1 1 0 ];
   faultnormal = 2;
-  datadir = 'tmp';
   grid = 'read';
   rho = 'read';
   vp = 'read';
@@ -46,6 +45,20 @@
   timeseries = { 'v' 581530. 224874.  40. }; % Yuma
   itcheck = 1000;
 
+% 4000m
+  dx = 4000.;
+  dt = .24;
+  trelax = 2.4;
+  nt = 200;
+  np = [ 2 1 1 ] % Wide
+  nn = [ 151 77 21 ];
+  ihypo = [  69 51 -2 ];
+  ihypo = [ 114 51 -2 ];
+  mus = [ 1. 'zone'  67 0 -5   116 0 -1 ];
+  rcrit = 10000.;
+  datadir = 'tmp/data';
+return
+
 % 200m
   dx = 200.;
   dt = .012;
@@ -82,19 +95,6 @@ return
   ihypo = [ 273 200 -6 ];
   ihypo = [ 454 200 -6 ];
   mus = [ 1. 'zone'  264 0 -17   463 0 -1 ];
-return
-
-% 4000m
-  dx = 4000.;
-  dt = .24;
-  trelax = 2.4;
-  nt = 200;
-  np = [ 2 1 1 ] % Wide
-  nn = [ 151 77 21 ];
-  ihypo = [  69 51 -2 ];
-  ihypo = [ 114 51 -2 ];
-  mus = [ 1. 'zone'  67 0 -5   116 0 -1 ];
-  rcrit = 10000.;
 return
 
 % 500m

@@ -62,6 +62,7 @@ case "$key" in
   nt)  nt=$1 ;;
   nn)  nm3=( $1 $2 $3 ) ;;
   np)  np3=( $1 $2 $3 ) ;;
+  dx)  echo "$1" > tmp/dx ;;
   out) nout=$(( nout + 1 )) ;;
   timeseries) nout=$(( nout + 1 )) ;;
   datadir) datadir="$1" ;;
