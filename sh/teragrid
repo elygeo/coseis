@@ -17,7 +17,7 @@ if ! grep -q "$HOSTNAME" mf; then
   sed 's/^/  /; s/:2//' mf
   exit
 fi
-elif [ "$mode" = p ]]; then
+elif [ "$mode" = p ]; then
 cat << END > pbsscript
 #!/bin/bash
 #PBS -q dque
