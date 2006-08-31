@@ -89,24 +89,12 @@ return
   dt = .24;
   trelax = 2.4;
   nt = 200;
-  np = [ 2 1 1 ]
+  np = [ 2 1 1 ] % Wide
   nn = [ 151 77 21 ];
   ihypo = [  69 51 -2 ];
   ihypo = [ 114 51 -2 ];
   mus = [ 1. 'zone'  67 0 -5   116 0 -1 ];
   rcrit = 10000.;
-return
-
-% 2000m
-  dx = 2000.;
-  dt = .12;
-  trelax = 1.2;
-  nt = 1500;
-  np = [ 2 1 1 ]
-  nn = [ 301 152 41 ];
-  ihypo = [ 137 101 -5 ];
-  ihypo = [ 228 101 -5 ];
-  mus = [ 1. 'zone'  133 0 -9   232 0 -1 ];
 return
 
 % 500m
@@ -116,8 +104,20 @@ return
   nt = 6000;
   np = [ 8 4 1 ] % Babiaca
   nn = [ 1201 602 161 ];
-  ihypo = [ ? ? -1 ];
-  ihypo = [ ? ? -1 ];
-  mus = [ 1. 'zone'  ? 0 -33   ? 0 -1 ];
+  ihypo = [ 545 399 -11 ];
+  ihypo = [ 907 399 -11 ];
+  mus = [ 1. 'zone' 527 0 -33   925 0 -1 ];
+return
+
+% 2000m
+  dx = 2000.;
+  dt = .12;
+  trelax = 1.2;
+  nt = 1500;
+  np = [ 2 1 1 ] % Wide
+  nn = [ 301 152 41 ];
+  ihypo = [ 137 101 -5 ];
+  ihypo = [ 228 101 -5 ];
+  mus = [ 1. 'zone'  133 0 -9   232 0 -1 ];
 return
 
