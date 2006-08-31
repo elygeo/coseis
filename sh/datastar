@@ -1,35 +1,14 @@
-#!/bash --version
-# SDSC DataStar IBM
-#   http://www.sdsc.edu/user_services/datastar/
-#   p655+ interactive nodes:
-#     dspoe.sdsc.edu
-#     5,   8 x 1.5GHz IBM Power4+, 16GB, 13.5GB usable
-#   p655+ batch nodes:
-#     dslogin.sdsc.edu
-#     176, 8 x 1.5GHz IBM Power4+, 16GB, 13.5GB usable
-#     96,  8 x 1.7GHz IBM Power4+, 32GB
-#   Always run from a subdirectory of /gpfs/
-#   Useful commands:
-#     reslist
-#     showq
-#     llsubmit batchjob
-#     llcancel <jobID>
-#     llq
-#     llq -s <jobID>
-#     show_bf
-#   Login to dslogin.sdsc.edu to submit batch jobs
-#   Login to dspoe.sdsc.edu to run interactively
+#!/bash -e
 
 if [ $( /bin/pwd | grep -v gpfs ) ]; then
   echo "Error: jobs must be run from /gpfs"
   exit
 fi
-if [ "$interactive" -a $HOSTNAME != ds100 ]; then
+if [ "$interactive" -a "$HOSTNAME" != ds100 ]; then
   echo "Error: interactive jobs must be launched from dspoe"
   exit
 fi
-opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
-if [ -z "$interactive" -a $mode = p ]; then
+if [ -z "$interactive" -a "$mode" = p ]; then
 cat << END > llscript
 #!/bin/bash
 #@environment = COPY_ALL;\\
@@ -62,17 +41,18 @@ cat << END > llscript
 #@ initialdir = $rundir
 #@ queue
 #date > "$rundir/stamp0"
-#cd "$datadir"
-#poe ./scecvm4-$mode $opts
+#cd "$rundir/data"
+#poe ./scecvm4-$mode
 cd "$rundir"
 date > stamp1
-poe ./sord-p $opts
+poe ./sord-$mode
 date > stamp2
 END
 chmod u+x llscript
 fi
 
-case $mode$run in
+opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
+case "$mode$run" in
   si) ./sord-s ;;
   sg) totalview ./sord-s ;;
   sb) nohup ./sord-s > out.log & ;;

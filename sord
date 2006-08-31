@@ -281,7 +281,6 @@ login   = '$LOGNAME';
 name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )';
 rundate = '$( date )';
 rundir  = '$rundir';
-datadir = '$datadir';
 infile  = '$infile';
 machine = '$machine';
 host    = '$HOSTNAME';

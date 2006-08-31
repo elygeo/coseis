@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+mkdir -p tmp/data
+echo -n "dx = "
+read dx
+cd util
+./make
+cd ../tmp
+echo "$dx" > dx
+./tsgrid
+mv x1 x2 x3 th nn rlon rlat rdep scecvm4-* data/

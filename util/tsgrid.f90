@@ -13,6 +13,7 @@ character :: endian
 open( 1, file='dx', status='old' )
 read( 1, * ) dx
 close( 1 )
+print *, 'dx =', dx
 mus = 1.
 mud = .5
 ell = (/ 600, 300, 80 /) * 1000
@@ -29,6 +30,7 @@ y0 = .5 * ( minval(yf) + maxval(yf) )
 ! Byte order
 endian = 'l'
 if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
+print *, 'endian = ', endian
 
 ! Dimentions
 n = nint( ell / dx ) + 1
@@ -259,9 +261,8 @@ close( 9 )
 ! Fault prestress
 print *, 'mus: ', mus
 print *, 'mud: ', mud
-print *, 'before scaling:'
 deallocate( t, x, s1, w )
-allocate( s1(n(1),1,n(3)), s2(n(1),1,n(3)), t(1991,161) )
+allocate( t(1991,161), s1(n(1),1,n(3)), s2(n(1),1,n(3)) )
 i = nint( dx / 100. )
 j1 = jf0
 j2 = jf0 + nf1
@@ -271,14 +272,16 @@ nf3 = min( nf3, (size(t,2)-1)/i )
 lf0 = n(3) - nf3
 l1 = lf0
 l2 = lf0 + nf3
+
+print *, 'before scaling:'
 inquire( iolength=reclen ) t
-open( 1, file='tn.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
+
+open( 1, file='th.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
-tn = t(91,51)
-where( t > tn ) t = tn
-print *, 'tn: ', tn, maxval(t), minval(t), sum(t)/size(t)
-s1 = -maxval( abs( t ) )
+ts = t(91,51)
+print *, 'ts: ', ts, minval(t), maxval(t), sum(t)/size(t)
+s1 = 0.
 do l = l1, l2
 do j = j1, j2
   k1 = i * (j2-j) + 1
@@ -286,12 +289,14 @@ do j = j1, j2
   s1(j,1,l) = t(k1,k2)
 end do
 end do
-open( 1, file='th.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
+
+open( 1, file='tn.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
-ts = t(91,51)
-print *, 'ts: ', ts, minval(t), maxval(t), sum(t)/size(t)
-s2 = 0.
+tn = t(91,51)
+where( t > tn ) t = tn
+print *, 'tn: ', tn, maxval(t), minval(t), sum(t)/size(t)
+s2 = -maxval( abs( t ) )
 do l = l1, l2
 do j = j1, j2
   k1 = i * (j2-j) + 1
@@ -302,23 +307,23 @@ end do
 
 ! Scale tractions
 print *, 'dt: ', ts
-tn = tn - 10e6
-s1 = s1 - 10e6
 ts = ts + 10e6
-s2 = s2 + 10e6
-!tn = tn / ( mus - mud )
-!s1 = s1 / ( mus - mud )
+s1 = s1 + 10e6
+tn = tn - 10e6
+s2 = s2 - 10e6
 !ts = ts - mud * tn
-!s2 = s2 - mud * s1
+!s1 = s1 - mud * s2
+!tn = tn / ( mus - mud )
+!s2 = s2 / ( mus - mud )
 print *, 'after scaling:'
-print *, 'tn: ', tn, maxval(s1), minval(s1), sum(s1)/size(s1)
-print *, 'ts: ', ts, minval(s2), maxval(s2), sum(s2)/size(s2)
+print *, 'ts: ', ts, minval(s1), maxval(s1), sum(s1)/size(s1)
+print *, 'tn: ', tn, maxval(s2), minval(s2), sum(s2)/size(s2)
 print *, 'dt: ', abs(ts) - mud*abs(tn)
 
 ! Write tractions
 inquire( iolength=reclen ) s1
-open( 1, file='tn', recl=reclen, form='unformatted', access='direct', status='replace' )
-open( 2, file='th', recl=reclen, form='unformatted', access='direct', status='replace' )
+open( 1, file='th', recl=reclen, form='unformatted', access='direct', status='replace' )
+open( 2, file='tn', recl=reclen, form='unformatted', access='direct', status='replace' )
 write( 1, rec=1 ) s1
 write( 2, rec=1 ) s2
 close( 1 )
