@@ -80,26 +80,29 @@ else machine=$HOSTNAME
 fi
 
 # Machine attributes
-maxnodes=1; cpus=1; maxram=800; rate=200
+maxnodes=1; maxcpus=1; maxram=800; rate=200
 case $machine in
-  wide)                   cpus=2; maxram=1800 ;;
-  phim)                           maxram=2800;  rate=200 ;;
-  altai)                  cpus=8; maxram=30000; rate=90  ;; 
-  babieca)  maxnodes=36;  cpus=2; maxram=800;   rate=160 ;;
-  teragrid) maxnodes=252; cpus=2; maxram=3000;  rate=500 ;;
-  datastar) maxnodes=265; cpus=8; maxram=13500 ;;          
+  wide)                   maxcpus=2; maxram=1800 ;;
+  phim)                              maxram=2800;  rate=200 ;;
+  altai)                  maxcpus=8; maxram=30000; rate=90  ;; 
+  babieca)  maxnodes=36;  maxcpus=2; maxram=800;   rate=160 ;;
+  teragrid) maxnodes=252; maxcpus=2; maxram=3000;  rate=500 ;;
+  datastar) maxnodes=265; maxcpus=8; maxram=13500 ;;          
 esac
 echo "Machine: $machine"
+echo "CPUs: $(( maxnodes * maxcpus ))"
 
 # Number of processors
-[ $mode = guess -a $(( maxnodes * cpus )) -eq 1 ] && mode=s
+[ $mode = guess -a $(( maxnodes * maxcpus )) -eq 1 ] && mode=s
 [ $mode = s ] && np3=( 1 1 1 )
 np=$(( np3[0] * np3[1] * np3[2] ));
 [ $mode = guess -a $np -eq 1 ] && mode=s
 [ $mode = guess -a $np -gt 1 ] && mode=p
-nodes=$(( np / cpus + ( np % cpus > 0 ? 1 : 0 ) ))
+nodes=$(( np / maxcpus + ( np % maxcpus > 0 ? 1 : 0 ) ))
 [ $nodes -gt $maxnodes ] && nodes=$maxnodes
 ppn=$(( np / nodes + ( np % nodes > 0 ? 1 : 0 ) ))
+cpus=$ppn
+[ $cpus -gt $maxcpus ] && cpus=$maxcpus
 
 # Domain size
 nm3[0]=$(( nm3[0] / np3[0] + 2 + ( nm3[0] % np3[0] > 0 ? 1 : 0 ) ))
@@ -110,16 +113,18 @@ nm=$( echo ${nm3[*]} | awk '{ print $1 * $2 * $3 }' )
 # RAM and Wall time usage
 floatsize=4
 nvars=24
-ram=$( echo $ppn $nm $nvars $floatsize | awk '{ printf "%d", $1 * ( $2 * $3 * $4 / 1024 / 1024 + 15 ) }' )
-mm=$( echo $nt $nm $ppn $cpus $rate | awk '{ printf "%d", ( $1 + 2 ) * $2 * $3 / $4 / $5 / 40000 + 10 }' )
+ram=$( echo $ppn $nm $nvars $floatsize | awk '{ printf "%.0f", $1 * ( $2 * $3 * $4 / 1024 / 1024 + 15 ) }' )
+mm=$(  echo $nt $ppn $nm $cpus $rate | awk '{ printf "%.0f", ( $1 + 2 ) * $2 * $3 / $4 / $5 / 40000 + 10 }' )
+sus=$( echo $nt $ppn $nm $cpus $rate $nodes $maxcpus | awk '{ printf "%.0f", ( $1 + 2 ) * $2 * $3 / $4 / $5 / 3600000 * $6 * $7 }' )
 hh=$(( mm / 60 ))
 mm=$(( mm % 60 ))
 walltime=$( echo $hh $mm | awk '{ printf "%d:%02d:00", $1, $2 }' )
 echo "Processes: $np"
 echo "Memory usage: ${ram}Mb per node"
 echo "Wall time limit: $walltime"
-[ $ppn -gt $cpus ]    && echo "Warning: exceding available CPUs ($cpus)"
-[ $ram -gt $maxram ]  && echo "Warning: exceding available RAM (${maxram}Mb)"
+echo "SUs: $sus"
+[ $ppn -gt $maxcpus ] && echo "Warning: exceding available CPUs per node ($maxcpus)"
+[ $ram -gt $maxram ]  && echo "Warning: exceding available RAM per node (${maxram}Mb)"
 
 [ "$setup" ] || exit
 
