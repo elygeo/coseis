@@ -28,8 +28,10 @@ cat << END > pbsscript0
 #PBS -e err0.log
 #PBS -V
 date > "$rundir/stamp0"
-cd "$rundir/data"
+cd "$srcdir/tmp/vm"
 time mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-$mode
+mkdir -p "$rundir/data"
+mv th x1 x2 x3 rho vp vs "$rundir/data"
 cd "$rundir"
 date > stamp1
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode

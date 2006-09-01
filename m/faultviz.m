@@ -9,7 +9,7 @@ i2(ifn) = ihypo(ifn);
 i1(4) = 0;
 i2(4) = 0;
 [ msg, xx ] = read4d( 'x', i1, i2 );
-if msg, error( msg ), end
+if msg, return, end
 
 if rcrit > 0. && vrup > .0
   r = 0;

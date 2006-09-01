@@ -52,7 +52,7 @@ esac
 
 cd ..
 srcdir=$( /bin/pwd )
-mkdir -p "$srcdir/tmp/data"
+mkdir -p "$srcdir/tmp/vm"
 cd tmp
 for file in "$srcdir/util/"*; do
   ln -s "$file" &> /dev/null || :
@@ -89,7 +89,7 @@ $sfc $flags $getarg int2asc.f90 -o int2asc
 $sfc $flags $getarg asc2flt.f90 -o asc2flt
 $sfc $flags $getarg asc2int.f90 -o asc2int
 
-cd data
+cd vm
 $tar zxf "$srcdir/data/scecvm4.tgz"
 for file in "$srcdir/scecvm4/"*; do
   ln -sf "$file"
