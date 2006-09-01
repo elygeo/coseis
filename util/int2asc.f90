@@ -1,23 +1,25 @@
 ! Convert integer binary files to ASCII
 program int2asc
 implicit none
-integer :: n, i, ii, iii, command_argument_count
-integer :: vals(255)
+integer :: nfiles, i, io, command_argument_count
+integer(8) :: n
+integer :: val
 character(255) :: filename
-n = command_argument_count()
-inquire( iolength=ii ) vals(1)
-do i = 1, n
+nfiles = command_argument_count()
+inquire( iolength=io ) val
+do i = 1, nfiles
   call get_command_argument( i, filename )
-  open( i+6, file=filename, recl=ii, form='unformatted', access='direct', status='old' )
+  open( i+6, file=filename, recl=io, form='unformatted', access='direct', status='old' )
 end do
-ii = 0
+n = 0
 loop: do
-  ii = ii + 1
-  do i = 1, n
-    read( i+6, rec=ii, iostat=iii ) vals(i)
-    if ( iii /= 0 ) exit loop
+  n = n + 1
+  do i = 1, nfiles
+    read( i+6, rec=n, iostat=io ) val
+    if ( io /= 0 ) exit loop
+    write( *, '(i15)', advance='no' )
   end do
-  print *, ii, vals(1:n)
+  print *, n, vals(:nfiles)
 end do loop
 end program
 

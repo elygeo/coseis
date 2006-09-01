@@ -1,7 +1,8 @@
 ! Binary file stats
 program stats
 implicit none
-integer :: i, ii, n, command_argument_count
+integer :: i, ii, command_argument_count
+integer(8) :: n
 character(255) :: filename
 real :: r, rmin, rmax
 real(8) :: rmean
@@ -25,7 +26,7 @@ do ii = 1, command_argument_count()
   end do
   n = n - 1
   rmean = rmean / n
-  print *, filename(1:8), rmin, rmax, rmean, n
+  print '(3e15.6,i15,x,a)', rmin, rmax, rmean, n, trim( filename )
 end do
 end program
 
