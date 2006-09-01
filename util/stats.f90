@@ -3,7 +3,8 @@ program stats
 implicit none
 integer :: i, ii, n, command_argument_count
 character(255) :: filename
-real :: r, rmin, rmax, rmean
+real :: r, rmin, rmax
+real(8) :: rmean
 do ii = 1, command_argument_count()
   call get_command_argument( ii, filename )
   inquire( iolength=i ) r

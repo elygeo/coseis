@@ -3,7 +3,7 @@
       subroutine readpts( kerr )
       include 'in.h'
       include 'mpif.h'
-      integer(kind=mpi_offset_kind) mpioffset
+      integer(kind=mpi_offset_kind) mpioffset, nnl
       call mpi_init( ierr )
       open( 1, file='nn', status='old' )
       read( 1, * ) nn
@@ -48,7 +48,7 @@
       subroutine writepts( kerr )
       include 'in.h'
       include 'mpif.h'
-      integer(kind=mpi_offset_kind) mpioffset
+      integer(kind=mpi_offset_kind) mpioffset, nnl
       open( 1, file='nn', status='old' )
       read( 1, * ) nn
       close( 1 )

@@ -20,7 +20,7 @@ xlf95_r)
   sfc='xlf95_r -q64 -qsuppress=cmpmsg'
   pfc='mpxlf95_r -q64 -qsuppress=cmpmsg'
   gflags='-qsuffix=f=f90 -p -g -C -qflttrap -qsigtrap -qlanglvl=95pure'
-  oflags='-qsuffix=f=f90 -O4'
+  oflags='-qsuffix=f=f90 -O3'
   vmflags='-qfixed'
   ;;
 ifort)

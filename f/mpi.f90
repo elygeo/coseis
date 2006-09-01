@@ -108,8 +108,9 @@ real, intent(out) :: rr
 real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
 integer, intent(in) :: n(3), noff(3), i2d
-integer :: i, comm, e
-real :: local(2), global(2)
+integer(8) :: i
+integer :: comm, e
+double precision :: local(2), global(2)
 ii = minloc( r )
 rr = r(ii(1),ii(2),ii(3))
 ii = ii - noff - 1
@@ -118,7 +119,7 @@ local(1) = rr
 local(2) = i
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
-call mpi_allreduce( local, global, 1, mpi_2real, mpi_minloc, comm, e )
+call mpi_allreduce( local, global, 1, mpi_2double_precision, mpi_minloc, comm, e )
 rr = global(1)
 i = global(2)
 ii(3) = i / ( n(1) * n(2) )
@@ -133,8 +134,9 @@ real, intent(out) :: rr
 real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
 integer, intent(in) :: n(3), noff(3), i2d
-integer :: i, comm, e
-real :: local(2), global(2)
+integer(8) :: i
+integer :: comm, e
+double precision :: local(2), global(2)
 ii = maxloc( r )
 rr = r(ii(1),ii(2),ii(3))
 ii = ii - noff - 1
@@ -143,7 +145,7 @@ local(1) = rr
 local(2) = i
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
-call mpi_allreduce( local, global, 1, mpi_2real, mpi_maxloc, comm, e )
+call mpi_allreduce( local, global, 1, mpi_2double_precision, mpi_maxloc, comm, e )
 rr = global(1)
 i = global(2)
 ii(3) = i / ( n(1) * n(2) )

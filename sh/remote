@@ -41,6 +41,6 @@ read i
 for i in $list; do
   account=$( echo "$accounts" | sed -n ${i}p )
   echo $account
-  rsync -av --delete --exclude='srcdir.m' --exclude='dx' $files $account:sord
+  rsync -av --delete --exclude='srcdir.m' --exclude='versionmeta.m' $files $account:sord
 done
 
