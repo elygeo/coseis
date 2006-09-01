@@ -18,22 +18,36 @@ if ! grep -q "$HOSTNAME" mf; then
   exit
 fi
 elif [ "$mode" = p ]; then
-cat << END > pbsscript
+cat << END > pbsscript0
 #!/bin/bash
 #PBS -q dque
 #PBS -N sord-$count
 #PBS -l nodes=$nodes:ppn=$ppn
 #PBS -l walltime=$walltime
-#PBS -o out.log
-#PBS -e err.log
+#PBS -o out0.log
+#PBS -e err0.log
 #PBS -V
-#date > "$rundir/stamp0"
-#cd "$rundir/data"
-#time mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-$mode
+date > "$rundir/stamp0"
+cd "$rundir/data"
+time mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-$mode
 cd "$rundir"
 date > stamp1
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
 date > stamp2
+END
+cat << END > pbsscript1
+#!/bin/bash
+#PBS -q dque
+#PBS -N sord-$count
+#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -l walltime=$walltime
+#PBS -o out1.log
+#PBS -e err1.log
+#PBS -V
+cd "$rundir"
+date > stamp3
+mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
+date > stamp4
 END
 chmod u+x pbsscript
 fi

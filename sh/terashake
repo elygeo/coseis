@@ -1,0 +1,12 @@
+#!/bin/bash -e
+
+[ -x sord ]
+srcdir=$( /bin/pwd )
+mkdir -p tmp/data
+./sord
+cd util
+./make
+cd "$srcdir/tmp"
+./tsgrid
+mv x1 x2 x3 th nn rlon rlat rdep data/
+
