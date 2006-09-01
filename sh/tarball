@@ -15,7 +15,6 @@ files="
   $base/versionmeta.m
   $base/readme
   $base/sord
-  $base/terashake
   $base/defaults.m
   $base/in.m
   $base/in
