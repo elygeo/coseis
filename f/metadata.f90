@@ -121,6 +121,7 @@ if ( faultnormal /= 0 ) then
   write( 1, * ) 'lc          =  ', lc,     ';'
   write( 1, * ) 'rctest      =  ', rctest, ';'
 end if
+write( 1, * ) 'dirfmt      =  ''%02d/'';'
 do iz = 1, nout
   i = ditout(iz)
   i1 = i1out(iz,:) - nnoff
