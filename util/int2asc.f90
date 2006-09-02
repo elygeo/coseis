@@ -1,5 +1,5 @@
 ! Convert integer binary files to ASCII
-program int2asc
+program main
 implicit none
 integer :: nfiles, i, io, command_argument_count
 integer(8) :: n
@@ -17,9 +17,9 @@ loop: do
   do i = 1, nfiles
     read( i+6, rec=n, iostat=io ) val
     if ( io /= 0 ) exit loop
-    write( *, '(i15)', advance='no' )
+    write( *, '(i15)', advance='no' ) val
   end do
-  print *, n, vals(:nfiles)
+  write( *, '(a)' ) ''
 end do loop
 end program
 

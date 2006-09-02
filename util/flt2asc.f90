@@ -1,5 +1,5 @@
 ! Convert floating point binary files to ASCII
-program flt2asc
+program main
 implicit none
 integer :: nfiles, i, io, command_argument_count
 integer(8) :: n

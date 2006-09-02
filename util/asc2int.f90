@@ -1,5 +1,5 @@
 ! Convert ASCII to integer binary files
-program asc2int
+program main
 implicit none
 integer :: nfiles, i, io, command_argument_count
 integer(8) :: n
