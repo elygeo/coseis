@@ -1,5 +1,5 @@
 ! Convert TeraShake coordinates in meters to lat/lon
-program p_ts2ll
+program main
 
 use m_tscoords
 implicit none

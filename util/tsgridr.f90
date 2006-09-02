@@ -1,6 +1,6 @@
 ! Generate TeraShake mesh for input to the SCEC VM
 ! Geoffrey Ely, gely@ucsd.edu, 6/8/2006
-program grid
+program main
 use m_tscoords
 implicit none
 real :: ell(3), dx

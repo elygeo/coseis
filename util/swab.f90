@@ -1,5 +1,5 @@
 ! Swap endian
-program swab
+program main
 implicit none
 integer, parameter :: n = 4
 integer :: i, ii, ifile, command_argument_count

@@ -1,5 +1,5 @@
 ! Binary file stats
-program stats
+program main
 implicit none
 integer :: i, ii, command_argument_count
 integer(8) :: n

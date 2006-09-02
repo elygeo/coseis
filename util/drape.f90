@@ -1,5 +1,5 @@
 ! Drape points over topography
-program drape
+program main
 
 implicit none
 integer, parameter :: n1=960, n2=780

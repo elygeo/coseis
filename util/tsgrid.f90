@@ -1,5 +1,5 @@
 ! Generate TeraShake grid from 2D mesh and topography
-program grid
+program main
 use m_tscoords
 implicit none
 real :: r, dx, h, o1, o2, xx, yy, h1, h2, h3, h4, ell(3), x0, y0, z0, &
