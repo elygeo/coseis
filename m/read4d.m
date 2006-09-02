@@ -16,6 +16,7 @@ if nargin > 3
 end
 
 % Metadata
+dirfmt = '%02d/';
 meta
 currentstep
 
@@ -69,8 +70,6 @@ end
 if nargout < 2, return, end
 
 % Read data
-file = sprintf( '%02d', iz );
-cd( file )
 if ic == 0
   ic = 1:nc;
 end
@@ -80,7 +79,9 @@ f = zeros( n );
 i0 = i1s - [ i1 1 ];
 if all( m(1:3) == 1 )
   for i = 1:n(5)
-    file = sprintf( '%s%1d', field, ic(i) );
+    file = field;
+    if dirfmt, file = sprintf( [ dirfmt file ], iz ); end
+    if nc > 1, file = sprintf( [ file '%1d'  ], ic(i) ); end
     fid = fopen( file, 'r', endian );
     fseek( fid, 4*i0(4), 'bof' );
     f(1,1,1,:,i) = fread( fid, n(4), 'float32' );
@@ -91,9 +92,10 @@ else
   block = sprintf( '%d*float32', n(1) );
   for i  = 1:n(5)
   for it = 1:n(4)
-    if dit, file = sprintf( '%s%1d%06d', field, ic(i), it + i0(4) );
-    else,   file = sprintf( '%s%1d', field, ic(i) );
-    end
+    file = field;
+    if dirfmt, file = sprintf( [ dirfmt file ], iz ); end
+    if nc > 1, file = sprintf( [ file '%1d'  ], ic(i) ); end
+    if dit,    file = sprintf( [ file '%06d' ], it + i0(4) ); end
     fid = fopen( file, 'r', endian );
     for l = 1:n(3)
       seek = 4 * ( i0(1) + m(1) * ( i0(2) + m(2) * ( i0(3) + l - 1 ) ) );
@@ -105,5 +107,4 @@ else
   end
   end
 end
-cd '..'
 

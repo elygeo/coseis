@@ -233,12 +233,13 @@ if ( pass /= onpass ) cycle doiz
 ! Binary output
 do ic = 1, nc
   ir = 1
-  write( str, '(i2.2,a,a,i1)' ) iz, '/', trim( fieldout(iz) ), ic
+  write( str, '(i2.2,a,a)' ) iz, '/', fieldout(iz)
+  if ( nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic
   if ( it > 0 ) then
   if ( all( i1 == i2 ) ) then
     ir = it / ditout(iz)
   else
-    write( str, '(i2.2,a,a,i1,i6.6)' ) iz, '/', trim( fieldout(iz) ), ic, it
+    write( str, '(a,i6.6)' ) trim( str ), it
   end if
   end if
   select case( fieldout(iz) )
