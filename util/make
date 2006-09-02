@@ -52,7 +52,7 @@ esac
 
 cd ..
 srcdir=$( /bin/pwd )
-mkdir -p "$srcdir/tmp/vm"
+mkdir -p tmp/vm
 cd tmp
 for file in "$srcdir/util/"*; do
   ln -s "$file" &> /dev/null || :

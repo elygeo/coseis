@@ -81,14 +81,14 @@ else machine=$HOSTNAME
 fi
 
 # Machine attributes
-maxnodes=1; maxcpus=1; maxram=800; rate=200
+maxnodes=1; maxcpus=1; maxram=800; maxmm=0; rate=200
 case $machine in
   wide)                   maxcpus=2; maxram=1800 ;;
   phim)                              maxram=2800;  rate=200 ;;
   altai)                  maxcpus=8; maxram=30000; rate=90  ;; 
   babieca)  maxnodes=36;  maxcpus=2; maxram=800;   rate=160 ;;
-  teragrid) maxnodes=252; maxcpus=2; maxram=3000;  rate=500 ;;
-  datastar) maxnodes=265; maxcpus=8; maxram=13500 ;;          
+  teragrid) maxnodes=252; maxcpus=2; maxram=3000;  rate=500; maxmm=1080 ;;
+  datastar) maxnodes=265; maxcpus=8; maxram=13500; maxmm=1080 ;;          
 esac
 echo "Machine: $machine"
 echo "CPUs: $(( maxnodes * maxcpus ))"
@@ -115,8 +115,9 @@ nm=$( echo ${nm3[*]} | awk '{ print $1 * $2 * $3 }' )
 floatsize=4
 nvars=24
 ram=$( echo $ppn $nm $nvars $floatsize | awk '{ printf "%.0f", $1 * ( $2 * $3 * $4 / 1024 / 1024 + 15 ) }' )
-mm=$(  echo $nt $ppn $nm $cpus $rate | awk '{ printf "%.0f", ( $1 + 2 ) * $2 * $3 / $4 / $5 / 40000 + 10 }' )
 sus=$( echo $nt $ppn $nm $cpus $rate $nodes $maxcpus | awk '{ printf "%.0f", ( $1 + 2 ) * $2 * $3 / $4 / $5 / 3600000 * $6 * $7 }' )
+mm=$(  echo $nt $ppn $nm $cpus $rate | awk '{ printf "%.0f", ( $1 + 2 ) * $2 * $3 / $4 / $5 / 40000 + 10 }' )
+[ $maxmm -gt 0 -a $mm -gt $maxmm ] && mm=$maxmm
 hh=$(( mm / 60 ))
 mm=$(( mm % 60 ))
 walltime=$( echo $hh $mm | awk '{ printf "%d:%02d:00", $1, $2 }' )
