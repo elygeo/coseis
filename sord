@@ -252,6 +252,7 @@ rundir="out/$count"
 echo "Run directory: $rundir"
 mkdir -p out
 mkdir "$rundir"
+ln -sf "$count" out/current
 cp 'in.m' tmp/sord.tgz tmp/sord-$mode tmp/input "$rundir"
 if [ $optimize = g ]; then
   cp f/*.f90 "$rundir"

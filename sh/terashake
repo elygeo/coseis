@@ -9,4 +9,10 @@ cd util
 cd "$srcdir/tmp"
 ./tsgrid
 mv th x1 x2 x3 nn rlon rlat rdep meta.m vm/
+if [ nn=$( cat vm/nn ) -gt 4000000 ]; then
+  echo "Deferring velocity model generation"
+else
+  cd vm
+  ./scecvm4-s
+fi
 
