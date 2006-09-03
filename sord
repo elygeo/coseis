@@ -19,7 +19,7 @@ case "$opt" in
   n) setup= ; run= ;;
   m) machine="$OPTARG" ;;
   d) rm -rf out/* ;;
-  f) rm -rf tmp ;;
+  f) rm -rf tmp/* ;;
   *) exit ;;
 esac
 done

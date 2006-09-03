@@ -60,16 +60,17 @@
   datadir = 'tmp/data';
 return
 
-% 1000m
-  dx = 1000.;
-  dt = .06;
-  trelax = .6;
-  nt = 3000;
-  np = [ 8 4 1 ] % Babiaca
-  nn = [ 601 302 81 ];
-  ihypo = [ 273 200 -6 ];
-  ihypo = [ 454 200 -6 ];
-  mus = [ 1. 'zone'  264 0 -17   463 0 -1 ];
+% 200m
+  dx = 200.;
+  dt = .012;
+  trelax = .12;
+  nt = 15000;
+  np = [ 32 16 4 ] % DataStar
+  np = [ 21  8 3 ] % TeraGrid
+  nn = [ 3001 1502 401 ];
+  ihypo = [  1362 997 -26  ];
+  ihypo = [  2266 997 -26  ];
+  mus = [ 1. 'zone' 1317 0 -81   2311 0 -1  ];
 return
 
 % 500m
@@ -84,17 +85,16 @@ return
   mus = [ 1. 'zone' 527 0 -33   925 0 -1 ];
 return
 
-% 200m
-  dx = 200.;
-  dt = .012;
-  trelax = .12;
-  nt = 15000;
-  np = [ 21  8 3 ] % TeraGrid
-  np = [ 32 16 4 ] % DataStar
-  nn = [ 3001 1502 401 ];
-  ihypo = [  1362 997 -26  ];
-  ihypo = [  2266 997 -26  ];
-  mus = [ 1. 'zone' 1317 0 -81   2311 0 -1  ];
+% 1000m
+  dx = 1000.;
+  dt = .06;
+  trelax = .6;
+  nt = 3000;
+  np = [ 8 4 1 ] % Babiaca
+  nn = [ 601 302 81 ];
+  ihypo = [ 273 200 -6 ];
+  ihypo = [ 454 200 -6 ];
+  mus = [ 1. 'zone'  264 0 -17   463 0 -1 ];
 return
 
 % 2000m
