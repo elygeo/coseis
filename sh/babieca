@@ -42,8 +42,7 @@ sleep 2
 #date > "$rundir/stamp0"
 #cd "$srcdir/tmp/vm"
 #mpiexec -n $np ./scecvm4-$mode
-#mkdir -p "$rundir/data"
-#mv th x1 x2 x3 rho vp vs "$rundir/data"
+#mv rho vp vs "$rundir/data"
 cd "$rundir"
 date > stamp1
 mpiexec -n $np ./sord-$mode

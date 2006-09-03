@@ -12,6 +12,7 @@ mv th x1 x2 x3 meta.m data/
 mv nn rlon rlat rdep vm/
 if [ $( cat vm/nn ) -gt 4000000 ]; then
   echo "Deferring velocity model generation"
+  mv data "$srcdir/out/current"
 else
   cd vm
   ./scecvm4-s

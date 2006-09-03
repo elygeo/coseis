@@ -30,29 +30,28 @@ cat << END > pbsscript0
 date > "$rundir/stamp0"
 cd "$srcdir/tmp/vm"
 time mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-$mode
-mkdir -p "$rundir/data"
-mv th x1 x2 x3 rho vp vs "$rundir/data"
+mv rho vp vs "$rundir/data"
 cd "$rundir"
 date > stamp1
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
 date > stamp2
 END
 chmod u+x pbsscript0
-cat << END > pbsscript1
+cat << END > pbsscript
 #!/bin/bash
 #PBS -q dque
 #PBS -N sord-$count
 #PBS -l nodes=$nodes:ppn=$ppn
 #PBS -l walltime=$walltime
-#PBS -o out1.log
-#PBS -e err1.log
+#PBS -o out.log
+#PBS -e err.log
 #PBS -V
 cd "$rundir"
 date > stamp3
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
 date > stamp4
 END
-chmod u+x pbsscript1
+chmod u+x pbsscript
 fi
 
 case "$mode$run" in
