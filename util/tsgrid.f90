@@ -84,26 +84,24 @@ close( 1 )
 
 ! Metadata for plotting with SDX
 open( 1, file='meta.m', status='replace' )
-write( 1, * ) 'dx       = ', dx, ';'
-write( 1, * ) 'dt       = ', dx * .00006, ';'
-write( 1, * ) 'nt       = 0;'
-write( 1, * ) 'nn       = [ ', n, ' ];'
-write( 1, * ) 'ihypo    = [ ', jf0+j,     kf0, n(3)-l, ' ];'
-write( 1, * ) 'ihypo    = [ ', jf0-j+nf1, kf0, n(3)-l, ' ];'
-write( 1, * ) 'upvector = [ 0. 0. 1. ];'
-write( 1, * ) 'xcenter  = [', .5 * ell(1:2), -.5 * ell(3), '];'
-write( 1, * ) 'rmax     = ', .5 * sqrt( sum( ell * ell ) ), ';'
-write( 1, * ) 'grid     = ''read'';'
-write( 1, * ) 'endian   = ''', endian, ''';'
+write( 1, * ) 'dx          = ', dx, ';'
+write( 1, * ) 'dt          = ', dx * .00006, ';'
+write( 1, * ) 'nt          = 0;'
+write( 1, * ) 'nn          = [ ', n, ' ];'
+write( 1, * ) 'ihypo       = [ ', jf0+j,     kf0, n(3)-l, ' ];'
+write( 1, * ) 'ihypo       = [ ', jf0-j+nf1, kf0, n(3)-l, ' ];'
+write( 1, * ) 'upvector    = [ 0. 0. 1. ];'
+write( 1, * ) 'xcenter     = [', .5 * ell(1:2), -.5 * ell(3), '];'
+write( 1, * ) 'rmax        = ', .5 * sqrt( sum( ell * ell ) ), ';'
+write( 1, * ) 'grid        = ''read'';'
+write( 1, * ) 'endian      = ''', endian, ''';'
 write( 1, * ) 'faultnormal = 0;'
-write( 1, * ) 'dirfmt   = '';'
-write( 1, * ) 'out{1}   = { 3 ''x''    0   1 1 1 ', n, '};'
-write( 1, * ) 'out{2}   = { 1 ''rho''  0   1 1 1 ', n, '};'
-write( 1, * ) 'out{3}   = { 1 ''vp''   0   1 1 1 ', n, '};'
-write( 1, * ) 'out{4}   = { 1 ''vs''   0   1 1 1 ', n, '};'
-n(2) = kf0
-write( 1, * ) 'out{5}   = { 1 ''tsm0'' 0   1 ', kf0, ' 1 ', n, '};'
-write( 1, * ) 'out{6}   = { 1 ''tn0''  0   1 ', kf0, ' 1 ', n, '};'
+write( 1, * ) 'dirfmt      = '''';'
+write( 1, * ) 'out{1}      = { 3 ''x''   0   1 1 1 ', n, '};'
+write( 1, * ) 'out{2}      = { 1 ''rho'' 0   1 1 1 ', n, '};'
+write( 1, * ) 'out{3}      = { 1 ''vp''  0   1 1 1 ', n, '};'
+write( 1, * ) 'out{4}      = { 1 ''vs''  0   1 1 1 ', n, '};'
+write( 1, * ) 'out{5}      = { 1 ''th''  0   1 1 1 ', n, '};'
 close( 1 )
 
 ! Interpolate fault
