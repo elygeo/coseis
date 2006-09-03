@@ -39,8 +39,9 @@ cat << END > pbsscript
 #PBS -e err.log
 #PBS -V
 sleep 2
-#date > "$rundir/stamp0"
-#cd "$srcdir/tmp/vm"
+#cd "$rundir"
+#date > stamp0
+#cd vm
 #mpiexec -n $np ./scecvm4-$mode
 #mv rho vp vs "$rundir/data"
 cd "$rundir"

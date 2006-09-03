@@ -40,8 +40,9 @@ cat << END > llscript
 #@ notify_user = $LOGNAME
 #@ initialdir = $rundir
 #@ queue
-#date > "$rundir/stamp0"
-#cd "$rundir/tmp/vm"
+#cd "$rundir"
+#date > stamp0
+#cd vm
 #poe ./scecvm4-$mode
 #mv rho vp vs "$rundir/data"
 cd "$rundir"

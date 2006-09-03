@@ -52,7 +52,7 @@ esac
 
 cd ..
 srcdir=$( /bin/pwd )
-mkdir -p tmp/vm
+mkdir -p tmp/scecvm
 cd tmp
 for file in "$srcdir/util/"*; do
   ln -s "$file" &> /dev/null || :
@@ -74,13 +74,12 @@ $sfc $flags $getarg int2asc.f90 -o int2asc
 $sfc $flags $getarg asc2flt.f90 -o asc2flt
 $sfc $flags $getarg asc2int.f90 -o asc2int
 
-cd vm
+cd scecvm
 $tar zxf "$srcdir/data/scecvm4.tgz"
 for file in "$srcdir/scecvm4/"*; do
   ln -sf "$file"
 done
 $sfc $vmflags iobin.f scecvm4.f -o scecvm4-s
 $pfc $vmflags iompi.f scecvm4.f -o scecvm4-p
-
-rm -f *.mod
+rm -f *.mod *.f *.h
 

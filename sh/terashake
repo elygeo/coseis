@@ -1,21 +1,25 @@
 #!/bin/bash -e
 
-[ -x sord ]
-mkdir -p tmp/data
 ./sord
 srcdir=$( /bin/pwd )
 cd util
-./make
+[ tsgrid.f90 -nt tsgrid ] && ./make
 cd "$srcdir/tmp"
+rm -rf data vm
+mkdir data
+cp -r scecvm vm
 ./tsgrid
 mv th x1 x2 x3 meta.m data/
 mv nn rlon rlat rdep vm/
-if [ $( cat vm/nn ) -gt 4000000 ]; then
+nn=$( cat nn )
+if [ "$nn" -gt 4000000 ]; then
   echo "Deferring velocity model generation"
-  mv data "$srcdir/out/current"
+  count=$( cat count )
+  mv data "$srcdir/out/$count/"
+  mv vm "$srcdir/out/$count/"
 else
   cd vm
   ./scecvm4-s
-  mv rho vp vs "$srcdir/tmp/data"
+  mv rho vp vs "$srcdir/tmp/data/"
 fi
 
