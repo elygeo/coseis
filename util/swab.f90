@@ -1,26 +1,31 @@
 ! Swap endian
 program main
 implicit none
-integer, parameter :: n = 4
-integer :: i, ii, ifile, command_argument_count
-character :: bytes(n)
+integer, parameter :: nb = 4
+integer :: i, ifile, command_argument_count
+integer(8) :: n
+character :: bytes(nb)
 character(255) :: filename
 do ifile = 1, command_argument_count()
   call get_command_argument( ifile, filename )
-  open( 1, file=filename, recl=1, form='unformatted', access='direct', status='old' )
+  open( 1, file=filename, recl=1, iostat=i, form='unformatted', access='direct', status='old' )
+  if ( i /= 0 ) then
+    write( *, * ) 'Error opening file: ', trim( filename )
+    stop
+  end if
   filename = trim( filename ) // '.swab'
-  open( 2, file=filename, recl=n, form='unformatted', access='direct' )
-  i = 0
+  open( 2, file=filename, recl=nb, form='unformatted', access='direct', status='replace' )
+  n = 0
   do
-    read( 1, rec=n*i+1, iostat=ii ) bytes(4)
-    if ( ii /= 0 ) exit
-    do ii = 2, n
-      read( 1, rec=n*i+ii ) bytes(n-ii+1)
+    read( 1, rec=nb*n+1, iostat=i ) bytes(4)
+    if ( i /= 0 ) exit
+    do i = 2, nb
+      read( 1, rec=nb*n+i ) bytes(nb-i+1)
     end do
-    i = i + 1
-    write( 2, rec=i ) bytes
+    n = n + 1
+    write( 2, rec=n ) bytes
   end do
-  write( 0, * ) trim( filename ), i
+  write( 0, * ) trim( filename ), n
 end do
 end program
 

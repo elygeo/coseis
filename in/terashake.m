@@ -45,6 +45,32 @@
   timeseries = { 'v' 581530. 224874.  40. }; % Yuma
   itcheck = 1000;
 
+% 2000m
+  dx = 2000.;
+  dt = .12;
+  trelax = 1.2;
+  nt = 1500;
+  np = [ 2 1 1 ] % Wide
+  nn = [ 301 152 41 ];
+  ihypo = [ 137 101 -5 ];
+  ihypo = [ 228 101 -5 ];
+  mus = [ 1. 'zone'  133 0 -9   232 0 -1 ];
+  datadir = 'tmp/2000';
+return
+
+% 1000m
+  dx = 1000.;
+  dt = .06;
+  trelax = .6;
+  nt = 3000;
+  np = [ 8 4 1 ] % Babiaca
+  np = [ 2 1 1 ] % Wide
+  nn = [ 601 302 81 ];
+  ihypo = [ 273 200 -6 ];
+  ihypo = [ 454 200 -6 ];
+  mus = [ 1. 'zone'  264 0 -17   463 0 -1 ];
+return
+
 % 4000m
   dx = 4000.;
   dt = .24;
@@ -83,30 +109,6 @@ return
   ihypo = [ 545 399 -11 ];
   ihypo = [ 907 399 -11 ];
   mus = [ 1. 'zone' 527 0 -33   925 0 -1 ];
-return
-
-% 1000m
-  dx = 1000.;
-  dt = .06;
-  trelax = .6;
-  nt = 3000;
-  np = [ 8 4 1 ] % Babiaca
-  nn = [ 601 302 81 ];
-  ihypo = [ 273 200 -6 ];
-  ihypo = [ 454 200 -6 ];
-  mus = [ 1. 'zone'  264 0 -17   463 0 -1 ];
-return
-
-% 2000m
-  dx = 2000.;
-  dt = .12;
-  trelax = 1.2;
-  nt = 1500;
-  np = [ 2 1 1 ] % Wide
-  nn = [ 301 152 41 ];
-  ihypo = [ 137 101 -5 ];
-  ihypo = [ 228 101 -5 ];
-  mus = [ 1. 'zone'  133 0 -9   232 0 -1 ];
 return
 
 % 400m

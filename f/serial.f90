@@ -134,23 +134,31 @@ subroutine scalario( io, filename, s1, ir, i1, i2, i3, i4, iz )
 character(*), intent(in) :: io, filename
 real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: ir, i1(3), i2(3), i3(3), i4(3), iz
-integer :: i, j1, k1, l1, j2, k2, l2
+integer :: nb, i, j1, k1, l1, j2, k2, l2
 if ( any( i1 /= i3 .or. i2 /= i4 ) .or. iz < 0 ) stop 'scalario index error'
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-inquire( iolength=i ) s1(j1:j2,k1:k2,l1:l2)
-if ( i == 0 ) stop 'scalario zero size'
+inquire( iolength=nb ) s1(j1:j2,k1:k2,l1:l2)
+if ( nb == 0 ) stop 'scalario zero size'
 select case( io )
 case( 'r' )
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+  open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='old' )
+  if ( i /= 0 ) then
+    write( *, * ) 'Error opening file: ', trim( filename )
+    stop
+  end if
   read( 1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
   close( 1 )
 case( 'w' )
   if ( ir == 1 ) then
-    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
+    open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='replace' )
   else
-    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+    open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='old' )
+  end if
+  if ( i /= 0 ) then
+    write( *, * ) 'Error opening file: ', trim( filename )
+    stop
   end if
   write( 1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
   close( 1 )
@@ -162,23 +170,31 @@ subroutine vectorio( io, filename, w1, ic, ir, i1, i2, i3, i4, iz )
 character(*), intent(in) :: io, filename
 real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: ic, ir, i1(3), i2(3), i3(3), i4(3), iz
-integer :: i, j1, k1, l1, j2, k2, l2
+integer :: nb, i, j1, k1, l1, j2, k2, l2
 if ( any( i1 /= i3 .or. i2 /= i4 ) .or. iz < 0 ) stop 'vectorio index error'
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-inquire( iolength=i ) w1(j1:j2,k1:k2,l1:l2,ic)
-if ( i == 0 ) stop 'vectorio zero size'
+inquire( iolength=nb ) w1(j1:j2,k1:k2,l1:l2,ic)
+if ( nb == 0 ) stop 'vectorio zero size'
 select case( io )
 case( 'r' )
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+  open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='old' )
+  if ( i /= 0 ) then
+    write( *, * ) 'Error opening file: ', trim( filename )
+    stop
+  end if
   read( 1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
   close( 1 )
 case( 'w' )
   if ( ir == 1 ) then
-    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
+    open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='replace' )
   else
-    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+    open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='old' )
+  end if
+  if ( i /= 0 ) then
+    write( *, * ) 'Error opening file: ', trim( filename )
+    stop
   end if
   write( 1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
   close( 1 )
