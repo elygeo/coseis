@@ -128,7 +128,7 @@ do iz = 1, nout
   i2 = i2out(iz,:) - nnoff
   call outprops( fieldout(iz), nc, onpass, fault, cell )
   write( field, * ) '''', trim( fieldout(iz) ), ''''
-  write( 1, '(a,i3,a,i1,a,7i7,a)' ) ' out{', iz, '}    = { ', nc, field, i, i1, i2, ' };'
+  write( 1, '(a,i3.3,a,i1,a,7i7,a)' ) ' out{', iz, '}    = { ', nc, field, i, i1, i2, ' };'
 end do
 close( 1 )
 

@@ -88,18 +88,18 @@ hleg(4) = fill( logo(:,1), logo(:,2), 'w', 'EdgeColor', 'none' );
 axis image
 
 set( hfig, 'CurrentAxes', haxes(3) )
-axis( [ 0 1 0 1 ] );
+axis( [ 0 1 0 6 ] );
 hold on
-hleg(1) = surf( [ 0 1 ], [ 0 1 ], [ 0 0; 0 0 ], ...
+hleg(1) = surf( [ 0 1 ], [ 0 6 ], [ 0 0; 0 0 ], ...
   'EdgeColor', 'none', ...
   'FaceLighting', 'none', ...
   'EdgeLighting', 'none' );
-hleg(2) = plot( [ 0 1 ], [ 1 1 ], 'Color', .25 * [ 1 1 1 ] );
-hleg(3) = imagesc( [ .2 .8 ], [ .7 .72 ], 0:.001:1 );
-htxt(1) = text( .20, .5, '', 'Ver', 'top', 'Hor', 'center' );
-htxt(2) = text( .80, .5, '', 'Ver', 'top', 'Hor', 'center' );
-htxt(3) = text( .50, .5, '', 'Ver', 'top', 'Hor', 'center' );
-htxt(5) = text( .90, .5, 'SORD', 'Ver', 'top', 'Hor', 'center' );
+hleg(2) = plot( [ 0 1 ], [ 6 6 ], 'Color', .25 * [ 1 1 1 ] );
+hleg(3) = imagesc( [ .2 .8 ], [ 4 5 ], 0:.001:1 );
+htxt(1) = text( .20, 3, '', 'Ver', 'top', 'Hor', 'center' );
+htxt(2) = text( .80, 3, '', 'Ver', 'top', 'Hor', 'center' );
+htxt(3) = text( .50, 3, '', 'Ver', 'top', 'Hor', 'center' );
+htxt(5) = text( .90, 3, 'SORD', 'Ver', 'top', 'Hor', 'center' );
 
 set( hfig, 'CurrentAxes', haxes(2) )
 axis( [ 0 1 0 1 ] );
