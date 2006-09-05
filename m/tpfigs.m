@@ -5,7 +5,7 @@ dosurf = 0;
 render
 campos( -[ 75000 75000 150000 ] )
 camva( 18 )
-delete( haxes(2) )
+delete( haxes(2:4) )
 set( 1, 'renderer', 'painters' )
 print -dps tpv
 

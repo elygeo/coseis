@@ -226,10 +226,10 @@ case 'c'
   case 2
     if strcmp( get( hleg(1), 'Visible' ), 'off' )
       set( [hleg htxt], 'Visible', 'on' ),  msg = 'Colorbar on';
-      set( haxes(1), 'Position', [ .02 .1 .96 .88 ] );
+      set( haxes(1), 'Position', [ 0 .1 1 .9 ] );
     else
       set( [hleg htxt], 'Visible', 'off' ), msg = 'Colorbar off';
-      set( haxes(1), 'Position', [ .02 .02 .96 .96 ] );
+      set( haxes(1), 'Position', [ 0 0 1 1 ] );
     end
   end
 case 'v'

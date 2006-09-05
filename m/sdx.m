@@ -59,14 +59,17 @@ i2hold = [ 0 0 0 0 ];
 houtline = [];
 hhud = [];
 
+igpp
+i = find( isnan( logo(:,1) ) );
+logo(i,:) = [];
+
 hfig = gcf;
 clf reset
 
-% 'DefaultTextFontUnits', 'normalized', ...
-% 'DefaultTextFontName', 'FixedWidth', ...
 set( hfig, ...
   'Renderer', renderer, ...
   'KeyPressFcn', 'control', ...
+  'Resizefcn', 'resizefcn', ...
   'Name', 'SDX', ...
   'NumberTitle', 'off', ...
   'InvertHardcopy', 'off', ...
@@ -75,33 +78,38 @@ set( hfig, ...
   'DefaultTextFontSize', 12, ...
   'DefaultTextFontWeight', 'bold' )
 
-haxes(1) = axes( 'Position', [ .02 .1 .96 .88 ] );
-haxes(2) = axes( 'Position', [ 0 0 1 1 ], 'HitTest', 'off' );
-haxes(3) = axes( 'Position', [ .02 .02 .16 .04 ], 'HitTest', 'off' );
-igpp
-i = find( isnan( logo(:,1) ) );
-logo(i,:) = [];
+haxes(1) = axes;
+haxes(2) = axes;
+haxes(3) = axes;
+haxes(4) = axes;
+resizefcn
+
 hleg(4) = fill( logo(:,1), logo(:,2), 'w', 'EdgeColor', 'none' );
 axis image
-set( hfig, 'CurrentAxes', haxes(2) )
+
+set( hfig, 'CurrentAxes', haxes(3) )
 axis( [ 0 1 0 1 ] );
 hold on
-hleg(1) = surf( [ 0 1 ], [ 0 .08 ], [ 0 0; 0 0 ], ...
+hleg(1) = surf( [ 0 1 ], [ 0 1 ], [ 0 0; 0 0 ], ...
   'EdgeColor', 'none', ...
   'FaceLighting', 'none', ...
   'EdgeLighting', 'none' );
-hleg(2) = plot( [ 0 1 ], [ .08 .08 ], 'Color', .25 * [ 1 1 1 ] );
-hleg(3) = imagesc( [ .2 .8 ], [ .058 .06 ], 0:.001:1 );
-htxt(1) = text( .20, .05, '', 'Ver', 'top',    'Hor', 'center' );
-htxt(2) = text( .80, .05, '', 'Ver', 'top',    'Hor', 'center' );
-htxt(3) = text( .50, .05, '', 'Ver', 'top',    'Hor', 'center' );
-htxt(4) = text( .98, .98, '', 'Ver', 'top',    'Hor', 'right'  );
-htxt(5) = text( .90, .05, 'SORD', 'Ver', 'top', 'Hor', 'center' );
-hmsg(1) = text( .02, .10, '', 'Ver', 'bottom', 'Hor', 'left'   );
-hmsg(2) = text( .98, .10, '', 'Ver', 'bottom', 'Hor', 'right'  );
-hmsg(3) = text( .02, .98, '', 'Ver', 'top',    'Hor', 'left', 'Interpreter', 'none' );
-hmsg(4) = text( .98, .98, '', 'Ver', 'top',    'Hor', 'right'  );
-hmsg(5) = text( .50, .54, '', 'Ver', 'middle', 'Hor', 'center', ...
+hleg(2) = plot( [ 0 1 ], [ 1 1 ], 'Color', .25 * [ 1 1 1 ] );
+hleg(3) = imagesc( [ .2 .8 ], [ .7 .72 ], 0:.001:1 );
+htxt(1) = text( .20, .5, '', 'Ver', 'top', 'Hor', 'center' );
+htxt(2) = text( .80, .5, '', 'Ver', 'top', 'Hor', 'center' );
+htxt(3) = text( .50, .5, '', 'Ver', 'top', 'Hor', 'center' );
+htxt(5) = text( .90, .5, 'SORD', 'Ver', 'top', 'Hor', 'center' );
+
+set( hfig, 'CurrentAxes', haxes(2) )
+axis( [ 0 1 0 1 ] );
+hold on
+htxt(4) = text(  1,  1, '', 'Ver', 'top',    'Hor', 'right'  );
+hmsg(1) = text(  0,  0, '', 'Ver', 'bottom', 'Hor', 'left'   );
+hmsg(2) = text(  1,  0, '', 'Ver', 'bottom', 'Hor', 'right'  );
+hmsg(3) = text(  0,  1, '', 'Ver', 'top',    'Hor', 'left', 'Interpreter', 'none' );
+hmsg(4) = text(  1,  1, '', 'Ver', 'top',    'Hor', 'right'  );
+hmsg(5) = text( .5, .5, '', 'Ver', 'middle', 'Hor', 'center', ...
   'FontWeight', 'normal', ...
   'Margin', 10, ...
   'EdgeColor', 0.25 * [ 1 1 1 ] );
@@ -117,7 +125,7 @@ if dooutline
 end
 
 set( haxes, 'Visible', 'off' );
-%set( haxes(3), 'Visible', 'on' );
+set( haxes(2:4), 'HitTest', 'off' );
 colorscale
 
 panviz = 0;
