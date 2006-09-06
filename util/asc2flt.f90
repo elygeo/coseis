@@ -9,7 +9,7 @@ nfiles = command_argument_count()
 inquire( iolength=nb ) vals(1)
 do i = 1, nfiles
   call get_command_argument( i, filename )
-  open( i+6, file=filename, recl=nb, iostat=io, form='unformatted', access='direct', status='old' )
+  open( i+6, file=filename, recl=nb, iostat=io, form='unformatted', access='direct', status='replace' )
   if ( io /= 0 ) then
     write( *, * ) 'Error opening file: ', trim( filename )
     stop

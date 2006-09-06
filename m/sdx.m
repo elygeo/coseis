@@ -82,24 +82,25 @@ haxes(1) = axes;
 haxes(2) = axes;
 haxes(3) = axes;
 haxes(4) = axes;
+haxes(5) = axes;
 resizefcn
 
+set( hfig, 'CurrentAxes', haxes(4) )
 hleg(4) = fill( logo(:,1), logo(:,2), 'w', 'EdgeColor', 'none' );
 axis image
 
 set( hfig, 'CurrentAxes', haxes(3) )
-axis( [ 0 1 0 6 ] );
+axis( [ 0 1 0 30 ] );
 hold on
-hleg(1) = surf( [ 0 1 ], [ 0 6 ], [ 0 0; 0 0 ], ...
+hleg(1) = surf( [ 0 1 ], [ 0 30 ], [ 0 0; 0 0 ], ...
   'EdgeColor', 'none', ...
   'FaceLighting', 'none', ...
   'EdgeLighting', 'none' );
-hleg(2) = plot( [ 0 1 ], [ 6 6 ], 'Color', .25 * [ 1 1 1 ] );
-hleg(3) = imagesc( [ .2 .8 ], [ 4 5 ], 0:.001:1 );
-htxt(1) = text( .20, 3, '', 'Ver', 'top', 'Hor', 'center' );
-htxt(2) = text( .80, 3, '', 'Ver', 'top', 'Hor', 'center' );
-htxt(3) = text( .50, 3, '', 'Ver', 'top', 'Hor', 'center' );
-htxt(5) = text( .90, 3, 'SORD', 'Ver', 'top', 'Hor', 'center' );
+hleg(2) = plot( [ 0 1 ], [ 30 30 ], 'Color', .25 * [ 1 1 1 ] );
+hleg(3) = imagesc( [ .2 .8 ], [ 22 23 ], 0:.001:1 );
+htxt(1) = text( .20, 18, '', 'Ver', 'top', 'Hor', 'center' );
+htxt(2) = text( .80, 18, '', 'Ver', 'top', 'Hor', 'center' );
+htxt(3) = text( .50, 18, '', 'Ver', 'top', 'Hor', 'center' );
 
 set( hfig, 'CurrentAxes', haxes(2) )
 axis( [ 0 1 0 1 ] );
@@ -125,7 +126,7 @@ if dooutline
 end
 
 set( haxes, 'Visible', 'off' );
-set( haxes(2:4), 'HitTest', 'off' );
+set( haxes(2:5), 'HitTest', 'off' );
 colorscale
 
 panviz = 0;

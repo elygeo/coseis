@@ -18,16 +18,23 @@ Add to the begining of the main program:
          rsuqold(i) = 0.
        end do
 
-Add to the beginning of subroutine addtops:
+Add inside the first do loop of subroutine addtops:
 
        rtvels(n)=0.
        rtewts(n)=0.
 
 Add to the beginning of subroutine makereg:
-   
+
+       alp = 0.
+       bet = 0.
+
+Add inside of do loops in subroutine readup
+
+       rlaup(i) = 0.
+       rloup(i) = 0.
 
 
 Geoffrey Ely
 gely@ucsd.edu
-8/8/06
+9/6/06
 
