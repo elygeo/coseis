@@ -59,10 +59,6 @@ i2hold = [ 0 0 0 0 ];
 houtline = [];
 hhud = [];
 
-igpp
-i = find( isnan( logo(:,1) ) );
-logo(i,:) = [];
-
 hfig = gcf;
 clf reset
 
@@ -86,8 +82,9 @@ haxes(5) = axes;
 resizefcn
 
 set( hfig, 'CurrentAxes', haxes(4) )
-hleg(4) = fill( logo(:,1), logo(:,2), 'w', 'EdgeColor', 'none' );
-axis image
+imshow( 'sio.png' )
+set( hfig, 'CurrentAxes', haxes(5) )
+imshow( 'igpp.png' )
 
 set( hfig, 'CurrentAxes', haxes(3) )
 axis( [ 0 1 0 30 ] );

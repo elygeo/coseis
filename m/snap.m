@@ -11,6 +11,7 @@ set( gcf, 'PaperPositionMode', 'auto' )
 print( '-dtiff', res, 'tmp' )
 
 img = imread( 'tmp.tif' );
+delete tmp.tif
 n = size( img );
 n = round( n(1:2) / 3 );
 img = imresize( img, n, 'bilinear' );
