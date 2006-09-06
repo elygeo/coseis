@@ -75,11 +75,12 @@ open( 1, file='insord.m', status='replace' )
 write( 1, * ) ' npml = ', npml, ';'
 write( 1, * ) ' dx = ', dx, ';'
 write( 1, * ) ' dt = ', dx * .00006, ';'
+write( 1, * ) ' n = [ ', n, ' ];'
 write( 1, * ) ' nn = [ ', n + (/ 0, 1, 0 /), ' ];'
 write( 1, * ) ' ihypo = [ ', jf0+j,     kf0, -1-l, ' ];'
 write( 1, * ) ' ihypo = [ ', jf0-j+nf1, kf0, -1-l, ' ];'
 write( 1, * ) ' mud = ', mud, ';'
-write( 1, * ) ' mus = [ ', mus, '''zone''', jf0, 0, -1-nf3, jf0+nf1, 0, -1, ' ];'
+write( 1, * ) ' mus = { ', mus, '''zone''', jf0, 0, -1-nf3, jf0+nf1, 0, -1, ' };'
 close( 1 )
 
 ! Metadata for plotting with SDX
