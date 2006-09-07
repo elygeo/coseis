@@ -8,7 +8,7 @@ field = 'svm'; t = 100:100:5000;
 field = 'svm'; t = 2500;
 foldcs = 1;
 colorexp = .5;
-colorexp = 2;
+colorexp = 1;
 i1 = [ 1317 0 -81 ];
 i2 = [ 2311 0  -1 ];
 
@@ -67,8 +67,7 @@ for i = 1:n(1)
   x1(i,:) = (i-1) * dx;
 end
 
-aspect = ( max(x1(:)) - min(x1(:)) ) / ( max(x2(:)) - min(x2(:)) );
-1240 / aspect;
+lf = max(x1(:));
 rf = [ 0 28.230 74.821 103.231 129.350 198.778 ];
 jf = round( rf / dx ) + 1;
 
@@ -77,7 +76,7 @@ set( gcf, 'Position', [ 0 442 1280 360 ] )
 for it = t
   clf
   flim = 4;
-  axes( 'Units', 'pixels', 'Position', [ 0 210 1280 112 ] )
+  axes( 'Units', 'pixels', 'Position', [ 30 180 1240 170 ] );
   [ msg, s ] = read4d( 'svm', [ i1 it ], [ i2 it ] );
   if msg, error( msg ), end
   s = squeeze( s );
@@ -87,51 +86,75 @@ for it = t
     s(1:j-1,2:k)   + s(2:j,2:k) );
   pcolor( x1, x2, s )
   shading flat
-  axis image
-  axis off
   hold on
-  caxis( flim * [-1 1] )
-  plot( x1(:,k), x2(:,k) )
-  plot( x1(:,1), x2(:,1), '--' )
-  for i = jf
-    plot( x1(i,:), x2(i,:), '--' )
-  end
-  text( x1(1,k), x2(1,k)+1, 'NW', 'Hor', 'left', 'Ver', 'bottom' )
-  text( x1(j,k), x2(j,k)+1, 'SE', 'Hor', 'right', 'Ver', 'bottom' )
-  text( x1(134,k), x2(134,k)+1, { 'San' 'Bernardino' }, 'Hor', 'center', 'Ver', 'bottom' )
-  text( x1(521,k), x2(521,k)+1, { 'Palm' 'Springs' }, 'Hor', 'center', 'Ver', 'bottom' )
-  text( x1(900,k), x2(900,k)+1, { 'Salton' 'Sea' }, 'Hor', 'center', 'Ver', 'bottom' )
-% [ msg, s ] = read4d( 'sl', [ i1 it ], [ i2 it ] );
-  [ msg, s ] = read4d( 'tsm', [ i1 0 ], [ i2 0 ] );
+  [ msg, s ] = read4d( 'sl', [ i1 it ], [ i2 it ] );
   if msg, error( msg ), end
   s = squeeze( s );
-  contour( x1, x2, s, [ dc0 dc0 ] );
-  contour( x1, x2, s, .01 * [ dc0 dc0 ] );
-  hleg(3) = imagesc( [ 100 150 ], [ -18.2 -18 ], 0:.001*flim:flim );
-  htxt(1) = text( .20, 18, '0' );
-  htxt(2) = text( .80, 18, 'Slip Rate' );
-  htxt(3) = text( .50, 18, [ num2str(flim) 'm/s' ] );
-  set( htxt, 'Ver', 'top', 'Hor', 'center' );
-
-  axes( 'Units', 'pixels', 'Position', [ 0 40 1280 112 ] )
-  flim = 6;
-  ss = s;
-  ss(1:end-1,1:end-1) = .25 * ( ...
-    s(1:end-1,1:end-1) + s(2:end,1:end-1) + ...
-    s(1:end-1,2:end)   + s(2:end,2:end) );
-  pcolor( x1, x2, ss )
-  shading flat
-  axis image
-  axis off
-  hold on
-% caxis( flim * [-1 1] )
+  [ c1, h ] = contour( x1', x2', s', [ dc0 dc0 ] );
+  delete( h );
+  i = 1;
+  while i < size( c1, 2 )
+    n = c1(2,i);
+    c1(:,i) = nan;
+    i = i + n + 1;
+  end 
+  [ c2, h ] = contour( x1', x2', s', .01 * [ dc0 dc0 ] );
+  delete( h );
+  i = 1;
+  while i < size( c2, 2 )
+    n = c2(2,i);
+    c2(:,i) = nan;
+    i = i + n + 1;
+  end 
+  plot( c1(1,:), c1(2,:) );
+  plot( c2(1,:), c2(2,:) );
   plot( x1(:,k), x2(:,k) )
   plot( x1(:,1), x2(:,1), '--' )
   for i = jf
     plot( x1(i,:), x2(i,:), '--' )
   end
-  contour( x1, x2, s, [ dc0 dc0 ] );
-  contour( x1, x2, s, .01 * [ dc0 dc0 ] );
+  plot( -3 + .3 * [ -1 1 nan 0 0 nan -1 1 ], ...
+    [ x2(1,1) x2(1,1) nan x2(1,1) x2(1,k) nan x2(1,k) x2(1,k) ], 'LineWidth', 1 )
+  imagesc( 142 + [ -25 25 ], -19 + .1 * [ -1 1 ], 0:.001*flim:flim )
+  h    = text( 142 - 25, -20, '0' );
+  h(2) = text( 142,      -20, 'Slip Rate' );
+  h(3) = text( 142 + 25, -20, [ num2str(flim) 'm/s' ] );
+  set( h, 'Ver', 'top', 'Hor', 'center' );
+  text( 10, -20, sprintf( 'Time = %.1fs', it*dt ), 'Ver', 'top', 'Hor', 'left' )
+  h    = text( x1(1,k), x2(1,k)+1, 'NW', 'Hor', 'left' );
+  h(2) = text( x1(j,k), x2(j,k)+1, 'SE', 'Hor', 'right' );
+  h(3) = text( x1(134,k), x2(134,k)+1, { 'San' 'Bernardino' }, 'Hor', 'center' );
+  h(4) = text( x1(521,k), x2(521,k)+1, { 'Palm' 'Springs' }, 'Hor', 'center' );
+  h(5) = text( x1(900,k), x2(900,k)+1, { 'Salton' 'Sea' }, 'Hor', 'center' );
+  set( h, 'Ver', 'bottom' )
+  text( -3, x2(1,41), '16km', 'Ver', 'middle', 'Hor', 'center', 'Rotation', 90, 'Back', 'k' );
+  axis equal
+  axis off
+  caxis( flim * [-1 1] )
+
+  haxes(2) = axes( 'Units', 'pixels', 'Position', [ 30 10 1240 170 ] );
+  flim = 6;
+  s(1:end-1,1:end-1) = .25 * ( ...
+    s(1:end-1,1:end-1) + s(2:end,1:end-1) + ...
+    s(1:end-1,2:end)   + s(2:end,2:end) );
+  pcolor( x1, x2, s )
+  shading flat
+  hold on
+  plot( c1(1,:), c1(2,:) );
+  plot( c2(1,:), c2(2,:) );
+  plot( x1(:,k), x2(:,k) )
+  plot( x1(:,1), x2(:,1), '--' )
+  for i = jf
+    plot( x1(i,:), x2(i,:), '--' )
+  end
+  imagesc( .71 * lf + [ -25 25 ], -19 + .1 * [ -1 1 ], 0:.001*flim:flim )
+  h    = text( .71 * lf - 25, -20, '0' );
+  h(2) = text( .71 * lf,      -20, 'Slip' );
+  h(3) = text( .71 * lf + 25, -20, [ num2str(flim) 'm/s' ] );
+  set( h, 'Ver', 'top', 'Hor', 'center' );
+  axis equal
+  axis off
+  caxis( flim * [-1 1] )
   drawnow
 end
 
