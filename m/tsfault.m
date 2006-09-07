@@ -4,8 +4,8 @@ clear all
 srcdir
 cd 'runs/ts200'
 field = 'tsm'; t = 0;
-field = 'svm'; t = 100:100:5000;
 field = 'svm'; t = 2500;
+field = 'svm'; t = 100:100:5000;
 foldcs = 1;
 colorexp = 1;
 i1 = [ 1317 0 -81 ];
@@ -78,7 +78,9 @@ sio = imread( 'sio.png' );
 igpp = imread( 'igpp.png' );
 sdsu = imread( 'sdsu.png' );
 
+iframe = 0;
 for it = t
+  iframe = iframe + 1;
   clf
   flim = 4;
   axes( 'Units', 'pixels', 'Position', [ 30 170 1240 180 ] );
@@ -158,7 +160,7 @@ for it = t
   text( .71*lf - 25, -20, '0' );
   text( .71*lf,      -20, 'Slip' );
   text( .71*lf + 25, -20, [ num2str(flim) 'm' ] );
-  text( 0, -22, sprintf( 'Time = %.1fs', it*dt ), 'Hor', 'left' )
+  text( 0, -22, sprintf( 'Time = %5.1fs', it*dt ), 'Hor', 'left' )
   image( 53 + [ -4   -1 ], [ -19 -22 ], sio )
   image( 66 + [ -5.5 -1 ], [ -19 -22 ], igpp )
   image( 78 + [ -2.88 -1 ], [ -19 -22 ], sdsu )
@@ -169,5 +171,6 @@ for it = t
   axis off
   caxis( flim * [-1 1] )
   drawnow
+  snap( sprintf( 'frame%04d.png', iframe ) )
 end
 
