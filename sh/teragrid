@@ -28,14 +28,14 @@ cat << END > pbsscript0
 #PBS -e err0.log
 #PBS -V
 cd "$rundir"
-date > stamp0
+echo "$(date): Start SCECVM run" >> run.log
 cd vm
 time mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-$mode
 mv rho vp vs "$rundir/data"
 cd "$rundir"
-date > stamp1
+echo "$(date): Start SORD run" >> run.log
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
-date > stamp2
+echo "$(date): Finish SORD run" >> run.log
 END
 chmod u+x pbsscript0
 cat << END > pbsscript
@@ -48,9 +48,9 @@ cat << END > pbsscript
 #PBS -e err.log
 #PBS -V
 cd "$rundir"
-date > stamp3
+echo "$(date): Start SORD run" >> run.log
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
-date > stamp4
+echo "$(date): Finish SORD run" >> run.log
 END
 chmod u+x pbsscript
 fi

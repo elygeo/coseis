@@ -40,14 +40,14 @@ cat << END > pbsscript
 #PBS -V
 sleep 2
 #cd "$rundir"
-#date > stamp0
+#echo "$(date): Start VM run" >> run.log
 #cd vm
 #mpiexec -n $np ./scecvm4-$mode
 #mv rho vp vs "$rundir/data"
 cd "$rundir"
-date > stamp1
+echo "$(date): Start SORD run" >> run.log
 mpiexec -n $np ./sord-$mode
-date > stamp2
+echo "$(date): Finish SORD run" >> run.log
 END
 chmod u+x pbsscript
 fi

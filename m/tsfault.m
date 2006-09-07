@@ -4,8 +4,8 @@ clear all
 srcdir
 cd 'runs/ts200'
 field = 'tsm'; t = 0;
-field = 'svm'; t = 2500;
-field = 'svm'; t = 100:100:5000;
+field = 'svm'; t = 100:100:4000;
+field = 'svm'; t = 2800:100:4000;
 foldcs = 1;
 colorexp = 1;
 i1 = [ 1317 0 -81 ];
@@ -79,6 +79,7 @@ igpp = imread( 'igpp.png' );
 sdsu = imread( 'sdsu.png' );
 
 iframe = 0;
+iframe = 27;
 for it = t
   iframe = iframe + 1;
   clf
@@ -171,6 +172,6 @@ for it = t
   axis off
   caxis( flim * [-1 1] )
   drawnow
-  snap( sprintf( 'frame%04d.png', iframe ) )
+  snap( sprintf( 'tmp/frame%04d.png', iframe ) )
 end
 

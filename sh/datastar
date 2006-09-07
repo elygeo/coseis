@@ -41,14 +41,14 @@ cat << END > llscript
 #@ initialdir = $rundir
 #@ queue
 #cd "$rundir"
-#date > stamp0
+#echo "$(date): Start SCECVM run" >> run.log
 #cd vm
 #poe ./scecvm4-$mode
 #mv rho vp vs "$rundir/data"
 cd "$rundir"
-date > stamp1
+echo "$(date): Start SORD run" >> run.log
 poe ./sord-$mode
-date > stamp2
+echo "$(date): Finish SORD run" >> run.log
 END
 chmod u+x llscript
 fi
