@@ -4,10 +4,9 @@ clear all
 srcdir
 cd 'runs/ts200'
 field = 'tsm'; t = 0;
-field = 'svm'; t = 100:100:5000;
 field = 'svm'; t = 2500;
+field = 'svm'; t = 100:100:5000;
 foldcs = 1;
-colorexp = .5;
 colorexp = 1;
 i1 = [ 1317 0 -81 ];
 i2 = [ 2311 0  -1 ];
@@ -88,6 +87,7 @@ for it = t
   shading flat
   hold on
   [ msg, s ] = read4d( 'sl', [ i1 it ], [ i2 it ] );
+% [ msg, s ] = read4d( 'tsm', [ i1 0 ], [ i2 0 ] );
   if msg, error( msg ), end
   s = squeeze( s );
   [ c1, h ] = contour( x1', x2', s', [ dc0 dc0 ] );
@@ -113,7 +113,7 @@ for it = t
   for i = jf
     plot( x1(i,:), x2(i,:), '--' )
   end
-  plot( -3 + .3 * [ -1 1 nan 0 0 nan -1 1 ], ...
+  plot( -2 + .3 * [ -1 1 nan 0 0 nan -1 1 ], ...
     [ x2(1,1) x2(1,1) nan x2(1,1) x2(1,k) nan x2(1,k) x2(1,k) ], 'LineWidth', 1 )
   imagesc( 142 + [ -25 25 ], -19 + .1 * [ -1 1 ], 0:.001*flim:flim )
   h    = text( 142 - 25, -20, '0' );
@@ -127,12 +127,13 @@ for it = t
   h(4) = text( x1(521,k), x2(521,k)+1, { 'Palm' 'Springs' }, 'Hor', 'center' );
   h(5) = text( x1(900,k), x2(900,k)+1, { 'Salton' 'Sea' }, 'Hor', 'center' );
   set( h, 'Ver', 'bottom' )
-  text( -3, x2(1,41), '16km', 'Ver', 'middle', 'Hor', 'center', 'Rotation', 90, 'Back', 'k' );
+  text( -2, x2(1,41), '16km', 'Ver', 'middle', 'Hor', 'center', 'Rotation', 90, 'Back', 'k' );
   axis equal
   axis off
   caxis( flim * [-1 1] )
 
   haxes(2) = axes( 'Units', 'pixels', 'Position', [ 30 10 1240 170 ] );
+  flim = 20e6;
   flim = 6;
   s(1:end-1,1:end-1) = .25 * ( ...
     s(1:end-1,1:end-1) + s(2:end,1:end-1) + ...
