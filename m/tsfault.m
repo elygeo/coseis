@@ -4,8 +4,8 @@ clear all
 srcdir
 cd 'runs/ts200'
 field = 'tsm'; t = 0;
-field = 'svm'; t = 2500;
 field = 'svm'; t = 100:100:5000;
+field = 'svm'; t = 2500;
 foldcs = 1;
 colorexp = 1;
 i1 = [ 1317 0 -81 ];
@@ -49,7 +49,9 @@ set( gcf, ...
   'DefaultLineClipping', 'off', ...
   'DefaultTextClipping', 'off', ...
   'DefaultTextFontName', 'Helvetica', ...
-  'DefaultTextFontSize', 12, ...
+  'DefaultTextFontSize', 14, ...
+  'DefaultTextHorizontalAlignment', 'center', ...
+  'DefaultTextVerticalAlignment', 'bottom', ...
   'DefaultTextColor', 'w' )
 
 meta
@@ -68,14 +70,18 @@ end
 
 lf = max(x1(:));
 rf = [ 0 28.230 74.821 103.231 129.350 198.778 ];
-jf = round( rf / dx ) + 1;
+jf = round( rf(2:end-1) / dx ) + 1;
 
 set( gcf, 'Position', [ 0 442 1280 360 ] )
+
+sio = imread( 'sio.png' );
+igpp = imread( 'igpp.png' );
+sdsu = imread( 'sdsu.png' );
 
 for it = t
   clf
   flim = 4;
-  axes( 'Units', 'pixels', 'Position', [ 30 180 1240 170 ] );
+  axes( 'Units', 'pixels', 'Position', [ 30 170 1240 180 ] );
   [ msg, s ] = read4d( 'svm', [ i1 it ], [ i2 it ] );
   if msg, error( msg ), end
   s = squeeze( s );
@@ -87,7 +93,6 @@ for it = t
   shading flat
   hold on
   [ msg, s ] = read4d( 'sl', [ i1 it ], [ i2 it ] );
-% [ msg, s ] = read4d( 'tsm', [ i1 0 ], [ i2 0 ] );
   if msg, error( msg ), end
   s = squeeze( s );
   [ c1, h ] = contour( x1', x2', s', [ dc0 dc0 ] );
@@ -106,53 +111,60 @@ for it = t
     c2(:,i) = nan;
     i = i + n + 1;
   end 
-  plot( c1(1,:), c1(2,:) );
-  plot( c2(1,:), c2(2,:) );
+  plot( c1(1,:), c1(2,:) )
+  plot( c2(1,:), c2(2,:) )
   plot( x1(:,k), x2(:,k) )
-  plot( x1(:,1), x2(:,1), '--' )
+  plot( x1(:,1), x2(:,1) )
+  plot( x1(1,:), x2(1,:) )
+  plot( x1(j,:), x2(j,:) )
   for i = jf
-    plot( x1(i,:), x2(i,:), '--' )
+    plot( x1(i,:), x2(i,:), ':' )
   end
   plot( -2 + .3 * [ -1 1 nan 0 0 nan -1 1 ], ...
     [ x2(1,1) x2(1,1) nan x2(1,1) x2(1,k) nan x2(1,k) x2(1,k) ], 'LineWidth', 1 )
-  imagesc( 142 + [ -25 25 ], -19 + .1 * [ -1 1 ], 0:.001*flim:flim )
-  h    = text( 142 - 25, -20, '0' );
-  h(2) = text( 142,      -20, 'Slip Rate' );
-  h(3) = text( 142 + 25, -20, [ num2str(flim) 'm/s' ] );
-  set( h, 'Ver', 'top', 'Hor', 'center' );
-  text( 10, -20, sprintf( 'Time = %.1fs', it*dt ), 'Ver', 'top', 'Hor', 'left' )
-  h    = text( x1(1,k), x2(1,k)+1, 'NW', 'Hor', 'left' );
-  h(2) = text( x1(j,k), x2(j,k)+1, 'SE', 'Hor', 'right' );
-  h(3) = text( x1(134,k), x2(134,k)+1, { 'San' 'Bernardino' }, 'Hor', 'center' );
-  h(4) = text( x1(521,k), x2(521,k)+1, { 'Palm' 'Springs' }, 'Hor', 'center' );
-  h(5) = text( x1(900,k), x2(900,k)+1, { 'Salton' 'Sea' }, 'Hor', 'center' );
-  set( h, 'Ver', 'bottom' )
-  text( -2, x2(1,41), '16km', 'Ver', 'middle', 'Hor', 'center', 'Rotation', 90, 'Back', 'k' );
+  imagesc( .71*lf + [ -25 25 ], 3 + .1 * [ -1 1 ], 0:.001*flim:flim )
+  text( .71*lf - 25, 4, '0' )
+  text( .71*lf,      4, 'Slip Rate' )
+  text( .71*lf + 25, 4, [ num2str(flim) 'm/s' ] )
+  text( x1(1,k), x2(1,k)+1, 'NW', 'Hor', 'left' )
+  text( x1(j,k), x2(j,k)+1, 'SE', 'Hor', 'right' )
+  text( x1(134,k), x2(134,k)+1, { 'San' 'Bernardino' } )
+  text( x1(521,k), x2(521,k)+1, { 'Palm' 'Springs'   } )
+  text( x1(900,k), x2(900,k)+1, { 'Salton' 'Sea'     } )
+  text( -2, x2(1,41), '16km', 'Ver', 'middle', 'Rotation', 90, 'Back', 'k' )
   axis equal
   axis off
   caxis( flim * [-1 1] )
 
-  haxes(2) = axes( 'Units', 'pixels', 'Position', [ 30 10 1240 170 ] );
+  haxes(2) = axes( 'Units', 'pixels', 'Position', [ 30 10 1240 160 ] );
   flim = 20e6;
   flim = 6;
-  s(1:end-1,1:end-1) = .25 * ( ...
-    s(1:end-1,1:end-1) + s(2:end,1:end-1) + ...
-    s(1:end-1,2:end)   + s(2:end,2:end) );
+  s(1:j-1,1:k-1) = .25 * ( ...
+    s(1:j-1,1:k-1) + s(2:j,1:k-1) + ...
+    s(1:j-1,2:k)   + s(2:j,2:k) );
   pcolor( x1, x2, s )
   shading flat
   hold on
   plot( c1(1,:), c1(2,:) );
   plot( c2(1,:), c2(2,:) );
   plot( x1(:,k), x2(:,k) )
-  plot( x1(:,1), x2(:,1), '--' )
+  plot( x1(:,1), x2(:,1) )
+  plot( x1(1,:), x2(1,:) )
+  plot( x1(j,:), x2(j,:) )
   for i = jf
-    plot( x1(i,:), x2(i,:), '--' )
+    plot( x1(i,:), x2(i,:), ':' )
   end
-  imagesc( .71 * lf + [ -25 25 ], -19 + .1 * [ -1 1 ], 0:.001*flim:flim )
-  h    = text( .71 * lf - 25, -20, '0' );
-  h(2) = text( .71 * lf,      -20, 'Slip' );
-  h(3) = text( .71 * lf + 25, -20, [ num2str(flim) 'm/s' ] );
-  set( h, 'Ver', 'top', 'Hor', 'center' );
+  imagesc( .71*lf + [ -25 25 ], -21 + .1 * [ -1 1 ], 0:.001*flim:flim )
+  text( .71*lf - 25, -20, '0' );
+  text( .71*lf,      -20, 'Slip' );
+  text( .71*lf + 25, -20, [ num2str(flim) 'm' ] );
+  text( 0, -22, sprintf( 'Time = %.1fs', it*dt ), 'Hor', 'left' )
+  image( 53 + [ -4   -1 ], [ -19 -22 ], sio )
+  image( 66 + [ -5.5 -1 ], [ -19 -22 ], igpp )
+  image( 78 + [ -2.88 -1 ], [ -19 -22 ], sdsu )
+  text( 53, -22, 'SIO',  'Hor', 'left' )
+  text( 66, -22, 'IGPP', 'Hor', 'left' )
+  text( 78, -22, 'SDSU', 'Hor', 'left' )
   axis equal
   axis off
   caxis( flim * [-1 1] )
