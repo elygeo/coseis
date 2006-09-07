@@ -56,6 +56,7 @@ do i = 2, nf
   h2 = yf(i) - yf(i-1)
   rf(i) = rf(i-1) + sqrt( h1*h1 + h2*h2 )
 end do
+print *, 'Fault corners: ', rf
 print *, 'Fault length: ', rf(nf)
 
 ! Fault indices

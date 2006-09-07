@@ -82,9 +82,9 @@ haxes(5) = axes;
 resizefcn
 
 set( hfig, 'CurrentAxes', haxes(4) )
-imshow( 'sio.png' )
+hleg(4) = imshow( 'sio.png' );
 set( hfig, 'CurrentAxes', haxes(5) )
-imshow( 'igpp.png' )
+hleg(5) = imshow( 'igpp.png' );
 
 set( hfig, 'CurrentAxes', haxes(3) )
 axis( [ 0 1 0 30 ] );
@@ -95,9 +95,9 @@ hleg(1) = surf( [ 0 1 ], [ 0 30 ], [ 0 0; 0 0 ], ...
   'EdgeLighting', 'none' );
 hleg(2) = plot( [ 0 1 ], [ 30 30 ], 'Color', .25 * [ 1 1 1 ] );
 hleg(3) = imagesc( [ .2 .8 ], [ 22 23 ], 0:.001:1 );
-htxt(1) = text( .20, 18, '', 'Ver', 'top', 'Hor', 'center' );
-htxt(2) = text( .80, 18, '', 'Ver', 'top', 'Hor', 'center' );
-htxt(3) = text( .50, 18, '', 'Ver', 'top', 'Hor', 'center' );
+htxt(1) = text( .2, 18, '', 'Ver', 'top', 'Hor', 'center' );
+htxt(2) = text( .8, 18, '', 'Ver', 'top', 'Hor', 'center' );
+htxt(3) = text( .5, 18, '', 'Ver', 'top', 'Hor', 'center' );
 
 set( hfig, 'CurrentAxes', haxes(2) )
 axis( [ 0 1 0 1 ] );
