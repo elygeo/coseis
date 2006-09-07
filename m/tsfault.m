@@ -32,19 +32,25 @@ else
   x2 = abs( x2 ) .^ colorexp;
 end
 colormap( interp1( x1, cmap, x2 ) );
-% 'DefaultAxesColor', 'k', ...
-% 'DefaultAxesColorOrder', 'w', ...
-% 'DefaultAxesXColor', 'w', ...
-% 'DefaultAxesYColor', 'w', ...
-% 'DefaultAxesZColor', 'w', ...
 set( gcf, ...
-  'InvertHardcopy', 'on', ...
-  'Color', 'k', ...
+  'Renderer', 'painters', ...
+  'KeyPressFcn', '', ...
   'ResizeFcn', '', ...
+  'Name', 'TS Fault', ...
+  'NumberTitle', 'off', ...
+  'InvertHardcopy', 'off', ...
+  'Color', 'k', ...
+  'DefaultAxesColor', 'k', ...
+  'DefaultAxesColorOrder', [1 1 1], ...
+  'DefaultAxesXColor', 'w', ...
+  'DefaultAxesYColor', 'w', ...
+  'DefaultAxesZColor', 'w', ...
   'DefaultLineColor', 'w', ...
   'DefaultLineLinewidth', 1, ...
-  'DefaultTextFontSize', 12, ...
   'DefaultLineClipping', 'off', ...
+  'DefaultTextClipping', 'off', ...
+  'DefaultTextFontName', 'Helvetica', ...
+  'DefaultTextFontSize', 12, ...
   'DefaultTextColor', 'w' )
 
 meta
@@ -66,7 +72,7 @@ aspect = ( max(x1(:)) - min(x1(:)) ) / ( max(x2(:)) - min(x2(:)) );
 rf = [ 0 28.230 74.821 103.231 129.350 198.778 ];
 jf = round( rf / dx ) + 1;
 
-set( gcf, 'Position', [ 0 442 1280 360 ], 'Clipping', 'off' )
+set( gcf, 'Position', [ 0 442 1280 360 ] )
 
 for it = t
   clf
@@ -85,10 +91,10 @@ for it = t
   axis off
   hold on
   caxis( flim * [-1 1] )
-  plot( x1(:,k), x2(:,k), 'w' )
-  plot( x1(:,1), x2(:,1), 'w--' )
+  plot( x1(:,k), x2(:,k) )
+  plot( x1(:,1), x2(:,1), '--' )
   for i = jf
-    plot( x1(i,:), x2(i,:), 'w--' )
+    plot( x1(i,:), x2(i,:), '--' )
   end
   text( x1(1,k), x2(1,k)+1, 'NW', 'Hor', 'left', 'Ver', 'bottom' )
   text( x1(j,k), x2(j,k)+1, 'SE', 'Hor', 'right', 'Ver', 'bottom' )
@@ -99,15 +105,15 @@ for it = t
   [ msg, s ] = read4d( 'tsm', [ i1 0 ], [ i2 0 ] );
   if msg, error( msg ), end
   s = squeeze( s );
-  contour( x1, x2, s, [ dc0 dc0 ], '-w' );
-  contour( x1, x2, s, .01 * [ dc0 dc0 ], '-w' );
+  contour( x1, x2, s, [ dc0 dc0 ] );
+  contour( x1, x2, s, .01 * [ dc0 dc0 ] );
   hleg(3) = imagesc( [ 100 150 ], [ -18.2 -18 ], 0:.001*flim:flim );
   htxt(1) = text( .20, 18, '0' );
   htxt(2) = text( .80, 18, 'Slip Rate' );
   htxt(3) = text( .50, 18, [ num2str(flim) 'm/s' ] );
-  set( htxt, 'Ver', 'top', 'Hor', 'center', 'Clipping', 'off' );
+  set( htxt, 'Ver', 'top', 'Hor', 'center' );
 
-  axes( 'Units', 'pixels', 'Position', [ 0 40 1280 112 ], 'Clipping', 'off' )
+  axes( 'Units', 'pixels', 'Position', [ 0 40 1280 112 ] )
   flim = 6;
   ss = s;
   ss(1:end-1,1:end-1) = .25 * ( ...
@@ -119,13 +125,13 @@ for it = t
   axis off
   hold on
 % caxis( flim * [-1 1] )
-  plot( x1(:,k), x2(:,k), 'w' )
-  plot( x1(:,1), x2(:,1), 'w--' )
+  plot( x1(:,k), x2(:,k) )
+  plot( x1(:,1), x2(:,1), '--' )
   for i = jf
-    plot( x1(i,:), x2(i,:), 'w--' )
+    plot( x1(i,:), x2(i,:), '--' )
   end
-  contour( x1, x2, s, [ dc0 dc0 ], '-w' );
-  contour( x1, x2, s, .01 * [ dc0 dc0 ], '-w' );
+  contour( x1, x2, s, [ dc0 dc0 ] );
+  contour( x1, x2, s, .01 * [ dc0 dc0 ] );
   drawnow
 end
 

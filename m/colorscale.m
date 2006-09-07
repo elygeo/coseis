@@ -8,8 +8,10 @@ poscolor = [ 1 .5 0 ];
 negcolor = [ 0 .5 1 ];
 if colorscheme
   set( hfig, 'InvertHardcopy', 'on' )
+  set( hleg(4:5), 'Visible', 'off' )
 else
   set( hfig, 'InvertHardcopy', 'off' )
+  set( hleg(4:5), 'Visible', 'on' )
 end
 
 if ~foldcs
@@ -21,13 +23,9 @@ if ~foldcs
       1 1 0 0 0 ]';
   case 1
     cmap = [
-      1 1 2 2 2
-      2 1 2 1 2
-      2 2 2 1 1 ]' / 2;
-    cmap = [
-      0 0 1 1 1
-      0 1 1 1 0
-      1 1 1 0 0 ]';
+      1 0 4 4 4
+      1 4 4 4 1
+      4 4 4 0 1 ]' / 4;
   case 2
     cmap = [
       0 1 0
@@ -46,14 +44,14 @@ else
   switch colorscheme
   case 0
     cmap = [
-      0 0 0 1 1 1
-      0 0 1 1 0 0
-      0 1 1 0 0 1 ]';
+      0 0 0 0 1 1 1
+      0 0 1 1 1 0 0
+      0 1 1 0 0 0 1 ]';
   case 1
     cmap = [
-      4 1 1 4 4 1
-      4 1 4 4 1 0
-      4 4 4 1 1 0 ]' / 4;
+      4 2 0 1 4 4 4
+      4 2 4 4 4 1 0
+      4 4 4 1 0 1 4 ]' / 4;
   case 2
     cmap = [
       1 0

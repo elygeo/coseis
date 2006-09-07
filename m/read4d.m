@@ -16,9 +16,10 @@ if nargin > 3
 end
 
 % Metadata
-dirfmt = '%02d/';
 meta
 currentstep
+oldway = ~exist( 'dirfmt', 'var' );
+if oldway, dirfmt = '%02d/'; end
 
 % Slice
 n = [ nn it ];
@@ -81,7 +82,7 @@ if all( m(1:3) == 1 )
   for i = 1:n(5)
     file = field;
     if dirfmt, file = sprintf( [ dirfmt file ], iz ); end
-    if nc > 1, file = sprintf( [ file '%1d'  ], ic(i) ); end
+    if nc > 1 || oldway, file = sprintf( [ file '%1d'  ], ic(i) ); end
     fid = fopen( file, 'r', endian );
     fseek( fid, 4*i0(4), 'bof' );
     f(1,1,1,:,i) = fread( fid, n(4), 'float32' );
@@ -94,7 +95,7 @@ else
   for it = 1:n(4)
     file = field;
     if dirfmt, file = sprintf( [ dirfmt file ], iz ); end
-    if nc > 1, file = sprintf( [ file '%1d'  ], ic(i) ); end
+    if nc > 1 || oldway, file = sprintf( [ file '%1d'  ], ic(i) ); end
     if dit,    file = sprintf( [ file '%06d' ], it + i0(4) ); end
     fid = fopen( file, 'r', endian );
     for l = 1:n(3)
