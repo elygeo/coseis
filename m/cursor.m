@@ -57,7 +57,7 @@ hhud(1) = plot3( x1, x2, x3 );
 x1 = xx(1) + [ dx 0 0 ];
 x2 = xx(2) + [ 0 dx 0 ];
 x3 = xx(3) + [ 0 0 dx ];
-hhud(2:4) = text( x1, x2, x3, ['xyz']', 'Ver', 'middle', 'Color', foreground );
+hhud(2:4) = text( x1, x2, x3, ['xyz']', 'Ver', 'middle', 'Color' );
 
 if panviz
   campos( campos + xx - camtarget )
