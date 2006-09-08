@@ -13,7 +13,7 @@ accounts="\
 
 files="\
   versionmeta.m
-  notes
+  doc
   sord
   defaults.m
   in.m
