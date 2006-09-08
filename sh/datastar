@@ -34,21 +34,23 @@ cat << END > llscript
 #@ network.MPI = sn_all, shared, US
 #@ job_type = parallel
 #@ job_name = sord-$count
-#@ output = out.log
-#@ error = err.log
+#@ output = out.$(jobid)
+#@ error = err.$(jobid) 
 #@ notification = always
 #@ notify_user = $LOGNAME
 #@ initialdir = $rundir
 #@ queue
-#cd "$rundir"
-#echo "$(date): Start SCECVM run" >> run.log
+cd "$rundir"
+
+#echo "$(date): Start SCECVM run" >> log
 #cd vm
 #poe ./scecvm4-$mode
 #mv rho vp vs "$rundir/data"
-cd "$rundir"
-echo "$(date): Start SORD run" >> run.log
+#cd "$rundir"
+
+echo "$(date): Start SORD run" >> log
 poe ./sord-$mode
-echo "$(date): Finish SORD run" >> run.log
+echo "$(date): Finished!" >> log
 END
 chmod u+x llscript
 fi

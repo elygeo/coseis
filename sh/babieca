@@ -29,27 +29,44 @@ node47:2
 node48:2
 END
 else
+cat << END > pbsscript-vm
+#!/bin/bash
+#PBS -q workq
+#PBS -N sord-$count
+#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -l walltime=$walltime
+#PBS -o out.$PBS_JOBID
+#PBS -e err.$PBS_JOBID
+#PBS -V
+sleep 2
+cd "$rundir"
+echo "$PBS_JOBID" >> log
+echo "$(date): Start SCECVM run" >> log
+cd vm
+mpiexec -n $np ./scecvm4-$mode
+mv rho vp vs "$rundir/data"
+cd "$rundir"
+echo "$(date): Start SORD run" >> log
+mpiexec -n $np ./sord-$mode
+echo "$(date): Finished!" >> log
+END
 cat << END > pbsscript
 #!/bin/bash
 #PBS -q workq
 #PBS -N sord-$count
 #PBS -l nodes=$nodes:ppn=$ppn
 #PBS -l walltime=$walltime
-#PBS -o out.log
-#PBS -e err.log
+#PBS -o out.$PBS_JOBID
+#PBS -e err.$PBS_JOBID
 #PBS -V
 sleep 2
-#cd "$rundir"
-#echo "$(date): Start VM run" >> run.log
-#cd vm
-#mpiexec -n $np ./scecvm4-$mode
-#mv rho vp vs "$rundir/data"
 cd "$rundir"
-echo "$(date): Start SORD run" >> run.log
+echo "$PBS_JOBID" >> log
+echo "$(date): Start SORD run" >> log
 mpiexec -n $np ./sord-$mode
-echo "$(date): Finish SORD run" >> run.log
+echo "$(date): Finished!" >> log
 END
-chmod u+x pbsscript
+chmod u+x pbsscript-vm pbsscript
 fi
   
 case $run in

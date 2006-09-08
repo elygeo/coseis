@@ -13,7 +13,7 @@ END
 
 files="
   $base/versionmeta.m
-  $base/readme
+  $base/notes
   $base/sord
   $base/defaults.m
   $base/in.m

@@ -13,7 +13,7 @@ accounts="\
 
 files="\
   versionmeta.m
-  readme
+  notes
   sord
   defaults.m
   in.m
