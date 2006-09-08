@@ -19,7 +19,7 @@ end do
 doline: do
   read( 5, '(a)', iostat=i ) str
   if ( i /= 0 ) exit doline
-  if ( str == '' .or. scan( '>#!%cC', str(1:1) ) /= 0 ) then
+  if ( str == '' .or. scan( '>#!%cCnN', str(1:1) ) /= 0 ) then
     print '(a)', trim( str )
     cycle doline
   end if

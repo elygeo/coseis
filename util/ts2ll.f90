@@ -10,7 +10,7 @@ integer :: i
 doline: do
   read( 5, '(a)', iostat=i ) line
   if ( i /= 0 ) exit doline
-  if ( line == '' .or. scan( '>#!%cC', line(1:1) ) /= 0 ) then
+  if ( line == '' .or. scan( '>#!%cCnN', line(1:1) ) /= 0 ) then
     print '(a)', trim( line )
     cycle doline
   end if

@@ -476,6 +476,7 @@ DOMAIN DECOMPOSITION DIAGRAM
   Surface       n=15                     |   |
                                          '---' nm=3
 
+
 REYNOLDS GLYPH
 
 r = w_ij*n_i*n_j
