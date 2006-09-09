@@ -58,7 +58,7 @@ colormap( interp1( x1, cmap, x2 ) );
 % Legend
 cwd = pwd;
 srcdir
-cd prep
+cd data
 axes( 'Units', 'Pixels', 'Position', [ 0 0 1280 80 ] )
 plot( [ 0 600 ], [ 37.5 37.5 ], 'Clipping', 'off' )
 axis( [ 0 600 0 37.5 ] )
