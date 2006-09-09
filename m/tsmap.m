@@ -3,8 +3,8 @@
 clear all
 format compact
 field = 'vm';
-t = 100:100:3000;
 t = 5000;
+t = 100:100:5000;
 foldcs = 1;
 colorexp = 1;
 flim = 1;
@@ -74,9 +74,9 @@ caxis( [ -1 1 ] )
 sio = imread( 'sio.png' );
 igpp = imread( 'igpp.png' );
 sdsu = imread( 'sdsu.png' );
-image( 460 - [ 14   4 ], [ 26 16 ], sio )
-image( 512 - [ 19   4 ], [ 26 16 ], igpp )
-image( 560 - [ 10.2 4 ], [ 26 16 ], sdsu )
+image( 460 - [ 14   4 ], [ 25 15 ], sio )
+image( 512 - [ 19   4 ], [ 25 15 ], igpp )
+image( 560 - [ 10.2 4 ], [ 25 15 ], sdsu )
 text( 460, 22, 'SIO',  'Hor', 'left' )
 text( 512, 22, 'IGPP', 'Hor', 'left' )
 text( 560, 22, 'SDSU', 'Hor', 'left' )
@@ -154,6 +154,7 @@ for it = t
   end
   set( hsurf, 'CData', s )
   set( htime, 'String', sprintf( 'Time = %.1fs', it * dt ) )
-  drawnow
+  snap( sprintf( 'tmp/frame%04d.png', it ) )
+  %drawnow
 end
 
