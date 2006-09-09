@@ -4,10 +4,10 @@ clear all
 format compact
 field = 'vm';
 t = 100:100:3000;
+t = 5000;
 foldcs = 1;
 colorexp = 1;
-flim = 2;
-flim = 1000;
+flim = 1;
 cellfocus = 0;
 
 clf
@@ -74,9 +74,9 @@ caxis( [ -1 1 ] )
 sio = imread( 'sio.png' );
 igpp = imread( 'igpp.png' );
 sdsu = imread( 'sdsu.png' );
-image( 460 - [ 14   4 ], [ 24 14 ], sio )
-image( 512 - [ 19   4 ], [ 24 14 ], igpp )
-image( 560 - [ 10.2 4 ], [ 24 14 ], sdsu )
+image( 460 - [ 14   4 ], [ 26 16 ], sio )
+image( 512 - [ 19   4 ], [ 26 16 ], igpp )
+image( 560 - [ 10.2 4 ], [ 26 16 ], sdsu )
 text( 460, 22, 'SIO',  'Hor', 'left' )
 text( 512, 22, 'IGPP', 'Hor', 'left' )
 text( 560, 22, 'SDSU', 'Hor', 'left' )
@@ -128,13 +128,7 @@ i1 = [  1  1 -1 ];
 i2 = [ -1 -1 -1 ];
 [ msg, x ] = read4d( 'x', [ i1 0 ], [ i2 0 ] );
 if msg, error( msg ), end
-z = x(:,:,:,3);
-if ~cellfocus
-  z(1:end-1,1:end-1) = .25 * ( ...
-    z(1:end-1,1:end-1) + z(2:end,1:end-1) + ...
-    z(1:end-1,2:end)   + z(2:end,2:end) );
-end
-hsurf = surf( x(:,:,:,1), x(:,:,:,2), x(:,:,:,3)-1000, z );
+hsurf = surf( x(:,:,:,1), x(:,:,:,2), x(:,:,:,3)-1000 );
 set( hsurf, ...
   'EdgeColor', 'none', ...
   'AmbientStrength',  1, ...
@@ -146,7 +140,6 @@ set( hsurf, ...
   'FaceLighting', 'phong' );
 caxis( 4000 * [ -1 1 ] )
 hlit = light( 'Position', [ -300000 150000 0000 ] );
-drawnow
 
 % Data
 caxis( flim * [ -1 1 ] )
@@ -154,7 +147,13 @@ for it = t
   [ msg, s ] = read4d( field, [ i1 it ], [ i2 it ] );
   if msg, error( msg ), end
   if size( s, 5 ) > 1, s = sqrt( sum( s .* s, 5 ) ); end
+  if ~cellfocus
+    s(1:end-1,1:end-1) = .25 * ( ...
+      s(1:end-1,1:end-1) + s(2:end,1:end-1) + ...
+      s(1:end-1,2:end)   + s(2:end,2:end) );
+  end
   set( hsurf, 'CData', s )
+  set( htime, 'String', sprintf( 'Time = %.1fs', it * dt ) )
   drawnow
 end
 
