@@ -222,6 +222,7 @@ write( 3, rec=1 ) x(:,:,:,3)
 close( 1 )
 close( 2 )
 close( 3 )
+stop
 
 ! 3D files
 inquire( iolength=reclen ) x(:,:,:,1)

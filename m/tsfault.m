@@ -161,9 +161,9 @@ for it = t
   text( .71*lf,      -20, 'Slip' );
   text( .71*lf + 25, -20, [ num2str(flim) 'm' ] );
   text( 0, -22, sprintf( 'Time = %5.1fs', it*dt ), 'Hor', 'left' )
-  image( 53 + [ -4   -1 ], [ -19 -22 ], sio )
-  image( 66 + [ -5.5 -1 ], [ -19 -22 ], igpp )
-  image( 78 + [ -2.88 -1 ], [ -19 -22 ], sdsu )
+  image( 53 - [ 1 4    ], [ -22 -19 ], sio )
+  image( 66 - [ 1 5.5  ], [ -22 -19 ], igpp )
+  image( 78 - [ 1 2.88 ], [ -22 -19 ], sdsu )
   text( 53, -22, 'SIO',  'Hor', 'left' )
   text( 66, -22, 'IGPP', 'Hor', 'left' )
   text( 78, -22, 'SDSU', 'Hor', 'left' )
