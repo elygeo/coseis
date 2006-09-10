@@ -14,11 +14,14 @@ open( 1, file='dx', status='old' )
 read( 1, * ) dx
 close( 1 )
 print *, 'dx =', dx
+open( 1, file='npml', status='old' )
+read( 1, * ) npml
+close( 1 )
+print *, 'npml =', npml
 mus = 1.
 mud = .5
 ell = (/ 600, 300, 80 /) * 1000
-exag = 1.
-npml = 10
+exag = 10.
 xf = (/ 265864.,293831.,338482.,364062.,390075.,459348. /)
 yf = (/ 183273.,187115.,200421.,212782.,215126.,210481. /)
 zf = 16000.
@@ -222,7 +225,6 @@ write( 3, rec=1 ) x(:,:,:,3)
 close( 1 )
 close( 2 )
 close( 3 )
-stop
 
 ! 3D files
 inquire( iolength=reclen ) x(:,:,:,1)

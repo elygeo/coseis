@@ -7,14 +7,14 @@ otherwise, error
 end
 
 res = sprintf( '-r%d', 3 * get( 0, 'ScreenPixelsPerInch' ) );
-set( gcf, 'PaperPositionMode', 'auto' )
+set( gcf, 'PaperPositionMode', 'auto', 'Units', 'pixels' )
+pos = get( gcf, 'Position' );
 print( '-dtiff', res, 'tmp' )
 
 img = imread( 'tmp.tif' );
 delete tmp.tif
 n = size( img );
-n = round( n(1:2) / 3 );
-img = imresize( img, n, 'bilinear' );
+img = imresize( img, pos([4 3]), 'bilinear' );
 img([1 end],:,:) = 64;
 img(:,[1 end],:) = 64;
 imwrite( img, file );

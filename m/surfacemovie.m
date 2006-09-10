@@ -3,31 +3,89 @@
 clear all
 format compact
 field = 'vm';
-t = 1000:1000:5000;
+t = 100:100:5000;
+t = 3000:100:5000;
+t = 5000;
+foldcs = 1;
 colorexp = 1;
 flim = 1;
 cellfocus = 0;
+colorscheme = 1;
 
 clf
 pos = get( gcf, 'Position' );
+fg = [ .5 .5 .5 ];
 set( gcf, ...
-  'Color', 'w', ...
+  'Name', 'TS Map', ...
+  'NumberTitle', 'off', ...
+  'Color', 'k', ...
   'Position', [ pos(1:2) 1280 720 ], ...
-  'DefaultAxesColorOrder', [ 0 0 0 ], ...
+  'DefaultAxesColor', 'k', ...
+  'DefaultAxesColorOrder', fg, ...
+  'DefaultAxesXColor', fg, ...
+  'DefaultAxesYColor', fg, ...
+  'DefaultAxesZColor', fg, ...
+  'DefaultLineColor', fg, ...
   'DefaultLineLineWidth', 1, ...
+  'DefaultLineClipping', 'on', ...
+  'DefaultTextClipping', 'on', ...
   'DefaultTextFontName', 'Helvetica', ...
   'DefaultTextFontSize', 16, ...
   'DefaultTextHorizontalAlignment', 'center', ...
-  'DefaultTextVerticalAlignment', 'top' )
+  'DefaultTextVerticalAlignment', 'top', ...
+  'DefaultTextColor', 'w' )
 
-cmap = [
-  4 2 0 2 4 4 4
-  4 2 4 4 4 1 0
-  4 4 4 2 0 1 4 ]' / 4;
-h = 1 / ( size( cmap, 1 ) - 1 );
-x1 = 0 : h : 1;
-x2 = -1 : .0005 : 1;
-x2 = abs( x2 ) .^ colorexp;
+% Colormap
+if colorscheme
+  set( gcf, 'InvertHardcopy', 'on' )
+else
+  set( gcf, 'InvertHardcopy', 'off' )
+end
+if ~foldcs
+  switch colorscheme
+  case 0
+    cmap = [
+      0 0 0 1 1
+      1 0 0 0 1
+      1 1 0 0 0 ]';
+  case 1
+    cmap = [
+      1 0 4 4 4
+      1 4 4 4 1
+      4 4 4 0 1 ]' / 4;
+  case 2
+    cmap = [
+      0 1 0
+      0 1 0
+      0 1 0 ]';
+  end
+  h = 2 / ( size( cmap, 1 ) - 1 );
+  x1 = -1 : h : 1;
+  x2 = -1 : .0005 : 1;
+  x2 = sign( x2 ) .* abs( x2 ) .^ colorexp;
+else
+  switch colorscheme
+  case 0
+    cmap = [
+      0 0 0 1 4 4 4
+      0 0 4 4 4 0 0
+      0 4 4 1 0 0 4 ]' / 4;
+  case 1
+    cmap = [
+      4 2 0 1 4 4 4
+      4 2 4 4 4 1 0
+      4 4 4 1 0 1 4 ]' / 4;
+  case 2
+    cmap = [
+      1 0
+      1 0
+      1 0 ]';
+  end
+  h = 1 / ( size( cmap, 1 ) - 1 );
+  x1 = 0 : h : 1;
+  x2 = -1 : .0005 : 1;
+  x2 = abs( x2 ) .^ colorexp;
+end
 colormap( interp1( x1, cmap, x2 ) );
 
 % Legend
@@ -39,14 +97,23 @@ plot( [ 0 600 ], [ 37.5 37.5 ], 'Clipping', 'off' )
 axis( [ 0 600 0 37.5 ] )
 axis off
 hold on
-plot( 200 + [ -50 -50 nan -50 50 nan 50 50 ], 26 + [ -1 1 nan 0 0 nan -1 1 ], 'k', 'LineWidth', 2 )
-text( 200, 22, '100km' );
-text( 320, 22, '0' );
-text( 420, 22, '|V|' );
-text( 520, 22, [ num2str( flim ) 'm/s' ] );
-imagesc( 420 + [ -100 100 ] , 26 + [ -.33 .33 ], 0:.001:1 )
+plot( 140 + [ -50 -50 nan -50 50 nan 50 50 ], 26 + [ -1 1 nan 0 0 nan -1 1 ], 'w', 'LineWidth', 2 )
+text( 140, 22, '100km' );
+text( 240, 22, '0' );
+text( 320, 22, '|V|' );
+text( 400, 22, [ num2str( flim ) 'm/s' ] );
+imagesc( 320 + [ -80 80 ] , 26 + [ -.33 .33 ], 0:.001:1 )
 caxis( [ -1 1 ] )
-htime = text( 50, 22, 'Time = 0s', 'Hor', 'left' );
+sio = imread( 'sio.png' );
+igpp = imread( 'igpp.png' );
+sdsu = imread( 'sdsu.png' );
+image( 460 - [ 14   4 ], [ 25 15 ], sio )
+image( 512 - [ 19   4 ], [ 25 15 ], igpp )
+image( 560 - [ 10.2 4 ], [ 25 15 ], sdsu )
+text( 460, 22, 'SIO',  'Hor', 'left' )
+text( 512, 22, 'IGPP', 'Hor', 'left' )
+text( 560, 22, 'SDSU', 'Hor', 'left' )
+htime = text( 15, 22, 'Time = 0s', 'Hor', 'left' );
 
 % Map
 axes( 'Units', 'Pixels', 'Position', [ 0 80 1280 640 ] )
@@ -72,12 +139,12 @@ z = [ sites{:,3} ];
 ver = sites(:,4);
 hor = sites(:,5);
 txt = sites(:,6);
-plot3( x, y, z+1000, 'o', 'MarkerSize', 8, 'MarkerFaceColor', 'k', 'MarkerEdgeColor', [.9 .9 .9], 'LineWidth', 2 );
+plot3( x, y, z+1000, 'ow', 'MarkerSize', 8, 'MarkerFaceColor', fg, 'MarkerEdgeColor', 'k', 'LineWidth', 2 );
 hold on
 for i = 1:length(x)
   dy = 2000;
   if strcmp( ver{i}, 'top' ), dy = -3000; end
-  text( x(i), y(i)+dy, z(i)+1000, txt{i}, 'Ver', ver{i}, 'Hor', hor{i}, 'Color', 'k' );
+  text( x(i), y(i)+dy, z(i)+1000, txt{i}, 'Ver', ver{i}, 'Hor', hor{i}, 'Color', fg );
 end
 [ x, y, z ] = textread( 'fault.xyz',   '%n%n%n%*[^\n]' ); plot3( x, y, z, '--', 'LineW', 3 )
 [ x, y, z ] = textread( 'coast.xyz',   '%n%n%n%*[^\n]' ); plot3( x, y, z )
@@ -97,15 +164,15 @@ if msg, error( msg ), end
 hsurf = surf( x(:,:,:,1), x(:,:,:,2), x(:,:,:,3)-1000 );
 set( hsurf, ...
   'EdgeColor', 'none', ...
-  'AmbientStrength',  .8, ...
-  'DiffuseStrength',  .5, ...
-  'SpecularStrength', .5, ...
-  'SpecularColorReflectance', 0, ...
-  'SpecularExponent', 1, ...
+  'AmbientStrength',  1, ...
+  'DiffuseStrength',  1, ...
+  'SpecularColorReflectance', 1, ...
+  'SpecularStrength', .3, ...
+  'SpecularExponent', .5, ...
   'EdgeLighting', 'none', ...
   'FaceLighting', 'phong' );
-lighting phong
-hlit = light( 'Position', 1000 * [ -300 150 50 ] );
+caxis( 4000 * [ -1 1 ] )
+hlit = light( 'Position', [ -300000 150000 0000 ] );
 
 % Data
 caxis( flim * [ -1 1 ] )
@@ -121,6 +188,7 @@ for it = t
   end
   set( hsurf, 'CData', s )
   set( htime, 'String', sprintf( 'Time = %.1fs', it * dt ) )
-  snap( sprintf( 'map%04d.png', it ) )
+  %drawnow
+  %snap( sprintf( 'tmp/frame%04d.png', it ) )
 end
 

@@ -44,9 +44,9 @@ else
   switch colorscheme
   case 0
     cmap = [
-      0 0 0 0 1 1 1
-      0 0 1 1 1 0 0
-      0 1 1 0 0 0 1 ]';
+      0 0 0 1 4 4 4
+      0 0 4 4 4 0 0
+      0 4 4 1 0 0 4 ]' / 4;
   case 1
     cmap = [
       4 2 0 1 4 4 4
