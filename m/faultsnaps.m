@@ -3,21 +3,10 @@
 clear all
 flim = 4;
 field = 'svm';
-t = 100:100:4000;
+t = 200:200:3400;
 colorexp = 1;
 i1 = [ 1317 0 -81 ];
 i2 = [ 2311 0  -1 ];
-
-cmap = [
-  4 2 0 2 4 4 4
-  4 2 4 4 4 1 0
-  4 4 4 2 0 1 4 ]' / 4;
-h = 2 / ( size( cmap, 1 ) - 1 );
-x1 = -1 : h : 1;
-x2 = -1 : .0005 : 1;
-x2 = sign( x2 ) .* abs( x2 ) .^ colorexp;
-colormap( interp1( x1, cmap, x2 ) );
-
 pos = get( gcf, 'Position' );
 set( gcf, ...
   'Renderer', 'painters', ...
@@ -32,6 +21,16 @@ set( gcf, ...
   'DefaultTextHorizontalAlignment', 'center', ...
   'DefaultTextVerticalAlignment', 'bottom', ...
   'DefaultTextColor', 'k' )
+
+cmap = [
+  4 2 0 2 4 4 4
+  4 2 4 4 4 1 0
+  4 4 4 2 0 1 4 ]' / 4;
+h = 2 / ( size( cmap, 1 ) - 1 );
+x1 = -1 : h : 1;
+x2 = -1 : .0005 : 1;
+x2 = sign( x2 ) .* abs( x2 ) .^ colorexp;
+colormap( interp1( x1, cmap, x2 ) );
 
 meta
 [ msg, x2 ] = read4d( 'x', [ i1 0 ], [ i2 0 ], 3 );

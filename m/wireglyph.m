@@ -1,6 +1,8 @@
 % Wire glyph
 
 FIXME
+poscolor = [ 1 .5 0 ];
+negcolor = [ 0 .5 1 ];
 
 hglyph = [];
 if ~length( mga ) || ~flim, return, end

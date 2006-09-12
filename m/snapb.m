@@ -1,8 +1,9 @@
-function snap( varargin )
+function snapb( varargin )
 
+border = 256 * varargin{1};
 switch nargin
-case 0, file = 'snap.png';
-case 1, file = varargin{1};
+case 1, file = 'snap.png';
+case 2, file = varargin{2};
 otherwise, error
 end
 
@@ -15,5 +16,7 @@ img = imread( 'tmp.tif' );
 delete tmp.tif
 n = size( img );
 img = imresize( img, pos([4 3]), 'bilinear' );
+img([1 end],:,:) = border;
+img(:,[1 end],:) = border;
 imwrite( img, file );
 
