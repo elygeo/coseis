@@ -28,7 +28,11 @@ do iz = 1, nout
 
 ! Output field properties
 call outprops( fieldout(iz), nc, onpass, fault, cell )
-if ( onpass == 0 ) ditout(iz) = 0
+if ( onpass == 0 ) then
+  ditout(iz) = 0
+  i1out(iz,4) = 0
+  i2out(iz,4) = 0
+end if
 
 ! Zone or point location
 n = nn + 2 * nhalo
@@ -95,12 +99,14 @@ case( 'x' )
   if ( rout > dx * dx ) ditout(iz) = nt + 1
 end select
 
-! Time index 
+! Time indices 
 if ( i1out(iz,4) < 0 ) i1out(iz,4) = nt + i1out(iz,4) + 1
 if ( i2out(iz,4) < 0 ) i2out(iz,4) = nt + i2out(iz,4) + 1
-
-! Interval
-if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
+if ( ditout(iz)  < 0 ) ditout(iz)  = nt + ditout(iz)  + 1
+if ( ditout(iz) == 0 ) then
+  ditout(iz) = 1
+  i2out(iz,4) = i1out(iz,4)
+end if
 if ( fault .and. faultnormal == 0 ) ditout(iz) = nt + 1
 
 ! Save indices
