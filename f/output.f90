@@ -28,15 +28,24 @@ do iz = 1, nout
 
 ! Output field properties
 call outprops( fieldout(iz), nc, onpass, fault, cell )
-if ( onpass == 0 ) ditout(iz) = 0
 
-! Zone or point location
+! Time indices 
+if ( fault .and. faultnormal == 0 ) ditout(iz) = 0
+if ( i1out(iz,4) < 0 ) i1out(iz,4) = nt + i1out(iz,4) + 1
+if ( i2out(iz,4) < 0 ) i2out(iz,4) = nt + i2out(iz,4) + 1
+if ( ditout(iz)  < 0 ) ditout(iz)  = nt + ditout(iz)  + 1
+if ( onpass == 0 ) then
+  i1out(iz,4) = 0
+  i2out(iz,4) = 0
+end if
+
+! Spacial indices
 n = nn + 2 * nhalo
 noff = nnoff - nhalo
 select case( outtype(iz) )
 case( 'z' )
-  i1 = i1out(iz,:)
-  i2 = i2out(iz,:)
+  i1 = i1out(iz,1:3)
+  i2 = i2out(iz,1:3)
   call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
   if ( cell ) i2 = i2 - 1
   if ( fault .and. faultnormal /= 0 ) then
@@ -92,23 +101,19 @@ case( 'x' )
     call pminloc( rout, i1, s2, n, noff, 0 )
   end if
   i2 = i1
-  if ( rout > dx * dx ) ditout(iz) = nt + 1
+  if ( rout > dx * dx ) ditout(iz) = 0
 end select
-
-! Interval 
-if ( ditout(iz) < 0 ) ditout(iz) = nt + ditout(iz) + 1
-if ( fault .and. faultnormal == 0 ) ditout(iz) = nt + 1
 
 ! Save indices
 if ( any( i2 < i1 ) ) stop 'bad output indices'
-i1out(iz,:) = i1
-i2out(iz,:) = i2
+i1out(iz,1:3) = i1
+i2out(iz,1:3) = i2
 
 ! Split collective i/o
 i1 = max( i1, i1node )
 i2 = min( i2, i2node )
 if ( cell ) i2 = min( i2, i2cell )
-i = 1
+i = ditout(iz)
 if ( any( i2 < i1 ) ) i = 0
 call splitio( iz, nout, i )
  
@@ -204,16 +209,14 @@ end if
 doiz: do iz = 1, nout
 
 ! Interval
-if ( ditout(iz) == 0 ) then
-  if ( it > 0 ) cycle doiz
-else
-  if ( it == 0 .or. modulo( it, ditout(iz) ) /= 0 ) cycle doiz
-end if
+if ( ditout(iz) == 0 ) cycle doiz
+if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
+if ( it < i1out(iz,4) .or it > i2out(iz,4) ) cycle doiz
 
 ! Pass
 call outprops( fieldout(iz), nc, onpass, fault, cell )
-i1 = i1out(iz,:)
-i2 = i2out(iz,:)
+i1 = i1out(iz,1:3)
+i2 = i2out(iz,1:3)
 i3 = max( i1, i1node )
 i4 = min( i2, i2node )
 if ( cell ) i4 = min( i4, i2cell )
@@ -235,7 +238,7 @@ do ic = 1, nc
   ir = 1
   write( str, '(i2.2,a,a)' ) iz, '/', fieldout(iz)
   if ( nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic
-  if ( it > 0 ) then
+  if ( onpass /= 0 ) then
   if ( all( i1 == i2 ) ) then
     ir = it / ditout(iz)
   else

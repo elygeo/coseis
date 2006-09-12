@@ -77,8 +77,8 @@
 % itcheck = -1;				% checkpoint just before finishing
   itcheck = 0;				% checkpointing off
   debug = 0;                            % debugging off
-% out = { 'v'  10   1 1 1  -1 -1 -1 };	% **write v every 10 steps
-% out = { 'sl' -1   1 1 1  -1 -1 -1 };	% **write final slip length
+% out = { 'v'  10   1 1 1 1  -1 -1 -1 -1 };	% write v every 10 steps, 4D zone
+% out = { 'sl' -1   1 1 1 1  -1 -1 -1 -1 };	% write final slip length, 4D zone
 
 % Boundary conditions:
 %  0: free surface
@@ -94,7 +94,7 @@
 %  4: continuation
 %  9: domain boundary (for internal use only)
 
-% **optional zone argument, zones accumulate when specified multiple times
+% **optional 3D zone argument, zones accumulate when specified multiple times
 %   'zone' j1 k1 l1   j2 k2 l2
 %   negative indices count inward from nn
 %   an index of zero is replaced by the hypocenter index
