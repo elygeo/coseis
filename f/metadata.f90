@@ -7,7 +7,7 @@ subroutine metadata
 use m_globals
 use m_outprops
 real :: courant
-integer :: i1(3), i2(3), i, nc, iz, onpass
+integer :: i1(4), i2(4), i, nc, iz, onpass
 character :: endian
 character(7) :: field
 logical :: fault, cell
@@ -124,11 +124,11 @@ end if
 write( 1, * ) 'dirfmt      =  ''%02d/'';'
 do iz = 1, nout
   i = ditout(iz)
-  i1 = i1out(iz,1:3) - nnoff
-  i2 = i2out(iz,1:3) - nnoff
+  i1 = i1out(iz,:) - (/ nnoff, 0 /)
+  i2 = i2out(iz,:) - (/ nnoff, 0 /)
   call outprops( fieldout(iz), nc, onpass, fault, cell )
   write( field, * ) '''', trim( fieldout(iz) ), ''''
-  write( 1, '(a,i3.3,a,i1,a,9i7,a)' ) ' out{', iz, '}    = { ', nc, field, i, i1, i2, ' };'
+  write( 1, '(a,i3.3,a,i1,a,9i7,a)' ) ' out{', iz, '} = { ', nc, field, i, i1, i2, ' };'
 end do
 close( 1 )
 
