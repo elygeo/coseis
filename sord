@@ -43,7 +43,7 @@ count=$( echo $count | awk '{ printf "%02d", $1+1 }' )
 echo $count > tmp/count
 
 # Prepare input file
-cat 'defaults.m' 'in.m' | sed "
+cat 'in/defaults.m' 'in.m' | sed "
 s/%.*$//;
 s/;/\\
 /g;

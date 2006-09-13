@@ -15,7 +15,6 @@ files="\
   versionmeta.m
   doc
   sord
-  defaults.m
   in.m
   in
   sh
