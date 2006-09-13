@@ -124,8 +124,8 @@ end if
 write( 1, * ) 'dirfmt      =  ''%02d/'';'
 do iz = 1, nout
   i = ditout(iz)
-  i1 = i1out(iz,:) - nnoff
-  i2 = i2out(iz,:) - nnoff
+  i1 = i1out(iz,1:3) - nnoff
+  i2 = i2out(iz,1:3) - nnoff
   call outprops( fieldout(iz), nc, onpass, fault, cell )
   write( field, * ) '''', trim( fieldout(iz) ), ''''
   write( 1, '(a,i3.3,a,i1,a,9i7,a)' ) ' out{', iz, '}    = { ', nc, field, i, i1, i2, ' };'

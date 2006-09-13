@@ -10,6 +10,9 @@ real, allocatable :: x(:,:,:,:), w(:,:,:,:), s1(:,:,:), s2(:,:,:), t(:,:)
 character :: endian
 
 ! Model parameters
+exag = 1.
+mus = 1.
+mud = .5
 open( 1, file='dx', status='old' )
 read( 1, * ) dx
 close( 1 )
@@ -18,10 +21,7 @@ open( 1, file='npml', status='old' )
 read( 1, * ) npml
 close( 1 )
 print *, 'npml =', npml
-mus = 1.
-mud = .5
 ell = (/ 600, 300, 80 /) * 1000
-exag = 10.
 xf = (/ 265864.,293831.,338482.,364062.,390075.,459348. /)
 yf = (/ 183273.,187115.,200421.,212782.,215126.,210481. /)
 zf = 16000.

@@ -212,7 +212,7 @@ end if
 doiz: do iz = 1, nout
 
 ! Interval
-if ( it < i1out(iz,4) .or it > i2out(iz,4) ) cycle doiz
+if ( it < i1out(iz,4) .or. it > i2out(iz,4) ) cycle doiz
 if ( modulo( it - i1out(iz,4), ditout(iz) ) /= 0 ) cycle doiz
 
 ! Pass
@@ -240,7 +240,7 @@ do ic = 1, nc
   ir = 1
   write( str, '(i2.2,a,a)' ) iz, '/', fieldout(iz)
   if ( nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic
-  if ( i2out(4) > 0 ) then
+  if ( i2out(iz,4) > 0 ) then
   if ( all( i1 == i2 ) ) then
     ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
   else

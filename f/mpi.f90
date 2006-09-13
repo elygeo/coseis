@@ -108,7 +108,7 @@ real, intent(out) :: rr
 real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
 integer, intent(in) :: n(3), noff(3), i2d
-integer(8) :: i
+integer(8) :: i, nn(3)
 integer :: comm, e
 double precision :: local(2), global(2)
 ii = minloc( r )
@@ -122,9 +122,10 @@ if ( i2d /= 0 ) comm = comm2d(i2d)
 call mpi_allreduce( local, global, 1, mpi_2double_precision, mpi_minloc, comm, e )
 rr = global(1)
 i = global(2)
+nn = n
 ii(3) = i / ( n(1) * n(2) )
-ii(2) = modulo( i / n(1), n(2) )
-ii(1) = modulo( i, n(1) )
+ii(2) = modulo( i / nn(1), nn(2) )
+ii(1) = modulo( i, nn(1) )
 ii = ii + 1 + noff
 end subroutine
 
@@ -134,7 +135,7 @@ real, intent(out) :: rr
 real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
 integer, intent(in) :: n(3), noff(3), i2d
-integer(8) :: i
+integer(8) :: i, nn(3)
 integer :: comm, e
 double precision :: local(2), global(2)
 ii = maxloc( r )
@@ -148,9 +149,10 @@ if ( i2d /= 0 ) comm = comm2d(i2d)
 call mpi_allreduce( local, global, 1, mpi_2double_precision, mpi_maxloc, comm, e )
 rr = global(1)
 i = global(2)
+nn = n
 ii(3) = i / ( n(1) * n(2) )
-ii(2) = modulo( i / n(1), n(2) )
-ii(1) = modulo( i, n(1) )
+ii(2) = modulo( i / nn(1), nn(2) )
+ii(1) = modulo( i, nn(1) )
 ii = ii + 1 + noff
 end subroutine
 
