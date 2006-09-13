@@ -12,7 +12,7 @@ accounts="\
   moho.sdsu.edu"
 
 files="\
-  versionmeta.m
+  version.m
   doc
   sord
   in.m

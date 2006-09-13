@@ -213,7 +213,7 @@ doiz: do iz = 1, nout
 
 ! Interval
 if ( it < i1out(iz,4) .or it > i2out(iz,4) ) cycle doiz
-if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
+if ( modulo( it - i1out(iz,4), ditout(iz) ) /= 0 ) cycle doiz
 
 ! Pass
 call outprops( fieldout(iz), nc, onpass, fault, cell )
@@ -242,7 +242,7 @@ do ic = 1, nc
   if ( nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic
   if ( i2out(4) > 0 ) then
   if ( all( i1 == i2 ) ) then
-    ir = it / ditout(iz)
+    ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
   else
     write( str, '(a,i6.6)' ) trim( str ), it
   end if

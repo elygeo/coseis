@@ -50,8 +50,8 @@ for iz = 1:nout
     i1  = out{iz}{4:7};
     i2  = out{iz}{8:11};
   else
-    i1  = [ out{iz}{4:6}  1 ];
-    i2  = [ out{iz}{7:9} nt ];
+    i1  = [ out{iz}{4:6} dit ];
+    i2  = [ out{iz}{7:9} nt  ];
   end
   if dit == 0
     dit = 1;
@@ -62,7 +62,7 @@ for iz = 1:nout
     strcmp( fieldin, field )
     all( i1s >= i1 )
     all( i2s <= i2 )
-    ( dit == 1 || ( n(4) == 1 && mod( i1s(4), dit ) == 0 ) )
+    ( dit == 1 || ( i1s(4) == i2s(4) && mod( i1s(4) - i1(4), dit ) == 0 ) )
   ]';
   found = all( test );
   if found, break, end
@@ -88,7 +88,7 @@ if all( m(1:3) == 1 )
   for i = 1:n(5)
     file = field;
     if dirfmt, file = sprintf( [ dirfmt file ], iz ); end
-    if nc > 1 || oldway, file = sprintf( [ file '%1d'  ], ic(i) ); end
+    if nc > 1 || oldway, file = sprintf( [ file '%1d' ], ic(i) ); end
     fid = fopen( file, 'r', endian );
     fseek( fid, 4*i0(4), 'bof' );
     f(1,1,1,:,i) = fread( fid, n(4), 'float32' );
@@ -101,7 +101,7 @@ else
   for it = 1:n(4)
     file = field;
     if dirfmt, file = sprintf( [ dirfmt file ], iz ); end
-    if nc > 1 || oldway, file = sprintf( [ file '%1d'  ], ic(i) ); end
+    if nc > 1 || oldway, file = sprintf( [ file '%1d' ], ic(i) ); end
     if i2(4) > 0, file = sprintf( [ file '%06d' ], it + i0(4) ); end
     fid = fopen( file, 'r', endian );
     for l = 1:n(3)
