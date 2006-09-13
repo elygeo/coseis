@@ -12,7 +12,7 @@ dir     = '$( /bin/pwd )';
 END
 
 files="
-  $base/versionmeta.m
+  $base/version.m
   $base/doc
   $base/sord
   $base/in.m
