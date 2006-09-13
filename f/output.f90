@@ -30,14 +30,15 @@ do iz = 1, nout
 call outprops( fieldout(iz), nc, onpass, fault, cell )
 
 ! Time indices 
-if ( fault .and. faultnormal == 0 ) ditout(iz) = 0
 if ( i1out(iz,4) < 0 ) i1out(iz,4) = nt + i1out(iz,4) + 1
 if ( i2out(iz,4) < 0 ) i2out(iz,4) = nt + i2out(iz,4) + 1
 if ( ditout(iz)  < 0 ) ditout(iz)  = nt + ditout(iz)  + 1
 if ( onpass == 0 ) then
+  ditout(iz) = 1
   i1out(iz,4) = 0
   i2out(iz,4) = 0
 end if
+if ( fault .and. faultnormal == 0 ) ditout(iz) = nt + 1
 
 ! Spacial indices
 n = nn + 2 * nhalo
@@ -54,6 +55,8 @@ case( 'z' )
     i2(i) = ihypo(i)
   end if
 case( 'x' )
+  i1out(iz,4) = 0
+  i2out(iz,4) = nt
   if ( fault ) then
     i1 = nnoff
     rout = rmax
@@ -101,7 +104,7 @@ case( 'x' )
     call pminloc( rout, i1, s2, n, noff, 0 )
   end if
   i2 = i1
-  if ( rout > dx * dx ) ditout(iz) = 0
+  if ( rout > dx * dx ) ditout(iz) = nt + 1
 end select
 
 ! Save indices
@@ -114,7 +117,7 @@ i1 = max( i1, i1node )
 i2 = min( i2, i2node )
 if ( cell ) i2 = min( i2, i2cell )
 i = ditout(iz)
-if ( any( i2 < i1 ) ) i = 0
+if ( any( i2 < i1 ) ) i = nt + 1
 call splitio( iz, nout, i )
  
 end do
@@ -209,9 +212,8 @@ end if
 doiz: do iz = 1, nout
 
 ! Interval
-if ( ditout(iz) == 0 ) cycle doiz
-if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 if ( it < i1out(iz,4) .or it > i2out(iz,4) ) cycle doiz
+if ( modulo( it, ditout(iz) ) /= 0 ) cycle doiz
 
 ! Pass
 call outprops( fieldout(iz), nc, onpass, fault, cell )
@@ -221,7 +223,7 @@ i3 = max( i1, i1node )
 i4 = min( i2, i2node )
 if ( cell ) i4 = min( i4, i2cell )
 if ( any( i3 > i4 ) ) then 
-  ditout(iz) = 0
+  ditout(iz) = nt + 1
   cycle doiz
 end if
 if ( fault ) then
@@ -238,7 +240,7 @@ do ic = 1, nc
   ir = 1
   write( str, '(i2.2,a,a)' ) iz, '/', fieldout(iz)
   if ( nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic
-  if ( onpass /= 0 ) then
+  if ( i2out(4) > 0 ) then
   if ( all( i1 == i2 ) ) then
     ir = it / ditout(iz)
   else

@@ -38,31 +38,25 @@ i1s(m3) = i1s(m3) + n(m3) + 1;
 i2s(m4) = i2s(m4) + n(m4) + 1;
 
 % Look for file with desired data
-msg = '';
-found = 0;
 n = i2s - i1s + 1;
+found = 1;
+msg = '';
 nout = length( out );
 for iz = 1:nout
   nc    = out{iz}{1};
   field = out{iz}{2};
   dit   = out{iz}{3};
-  if length( out{iz} ) == 11
-    i1  = out{iz}{4:7};
-    i2  = out{iz}{8:11};
-  else
-    i1  = [ out{iz}{4:6}  1 ];
-    i2  = [ out{iz}{7:9} nt ];
-  end
-  if dit == 0
-    dit = 1;
-    i1(4) = 0;
-    i2(4) = 0;
-  end
+  i1    = [ out{iz}{4:6} ];
+  i2    = [ out{iz}{7:9} ];
   test  = [ 
     strcmp( fieldin, field )
-    all( i1s >= i1 )
-    all( i2s <= i2 )
-    ( dit == 1 || ( n(4) == 1 && mod( i1s(4), dit ) == 0 ) )
+    all( i1s(1:3) >= i1 )
+    all( i2s(1:3) <= i2 )
+    ( dit == 0 && i2s(4) == 0 ) || ...
+    ( dit ~= 0 && ...
+      i1s(4) >= 1  && ...
+      i2s(4) <= it && ...
+      ( dit == 1 || ( n(4) == 1 && mod( i1s(4), dit ) == 0 ) ) )
   ]';
   found = all( test );
   if found, break, end
@@ -83,7 +77,7 @@ end
 m = i2 - i1 + 1;
 n = [ n length( ic ) ];
 f = zeros( n );
-i0 = i1s - i1;
+i0 = i1s - [ i1 1 ];
 if all( m(1:3) == 1 )
   for i = 1:n(5)
     file = field;
@@ -102,7 +96,7 @@ else
     file = field;
     if dirfmt, file = sprintf( [ dirfmt file ], iz ); end
     if nc > 1 || oldway, file = sprintf( [ file '%1d'  ], ic(i) ); end
-    if i2(4) > 0, file = sprintf( [ file '%06d' ], it + i0(4) ); end
+    if dit,    file = sprintf( [ file '%06d' ], it + i0(4) ); end
     fid = fopen( file, 'r', endian );
     for l = 1:n(3)
       seek = 4 * ( i0(1) + m(1) * ( i0(2) + m(2) * ( i0(3) + l - 1 ) ) );
