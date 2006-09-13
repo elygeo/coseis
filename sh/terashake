@@ -1,5 +1,11 @@
 #!/bin/bash -e
 
+if [ -d /gpfs ]; then
+  mkdir -p /gpfs/$LOGNAME/sord/tmp
+  mkdir -p /gpfs/$LOGNAME/sord/out
+  ln -sf /gpfs/$LOGNAME/sord/tmp
+  ln -sf /gpfs/$LOGNAME/sord/out
+fi
 ./sord
 srcdir=$( /bin/pwd )
 cd util
