@@ -4,7 +4,6 @@ clear all
 format compact
 field = 'vm';
 t = 1000:1000:5000;
-colorexp = 1;
 flim = 1;
 cellfocus = 0;
 
@@ -19,16 +18,7 @@ set( gcf, ...
   'DefaultTextFontSize', 16, ...
   'DefaultTextHorizontalAlignment', 'center', ...
   'DefaultTextVerticalAlignment', 'top' )
-
-cmap = [
-  4 2 0 2 4 4 4
-  4 2 4 4 4 1 0
-  4 4 4 2 0 1 4 ]' / 4;
-h = 1 / ( size( cmap, 1 ) - 1 );
-x1 = 0 : h : 1;
-x2 = -1 : .0005 : 1;
-x2 = abs( x2 ) .^ colorexp;
-colormap( interp1( x1, cmap, x2 ) );
+setcolormap( 'folded', 'light' )
 
 % Legend
 cwd = pwd;

@@ -59,19 +59,7 @@ axis image;
 title( [ 'Model ' model ' rupture time delay (s), average=' num2str(tbar) ', RMS=' num2str(rms) ] )
 xlabel( 'X (km)' )
 ylabel( 'Y (km)' )
-cmap = [
-  1 1 0 0 0
-  1 0 0 0 1
-  0 0 0 1 1 ]';
-cmap = [
-  1 1 1 0 0
-  0 1 1 1 0
-  0 0 1 1 1 ]';
-h = 2 / ( size( cmap, 1 ) - 1 );
-x1 = -1 : h : 1;
-x2 = -1 : .005 : 1;
-x2 = sign( x2 ) .* abs( x2 ) .^ colorexp;
-colormap( interp1( x1, cmap, x2 ) );
+setcolormap
 caxis( flim * [ -1 1 ] )
 axes( 'Position', [ .1 .16 .8 .02 ] );
 imagesc( flim * [ -1 1 ], [ -1 1 ], 0:.001:1 );

@@ -20,6 +20,7 @@ set( gcf, ...
   'NumberTitle', 'off', ...
   'Color', 'k', ...
   'Position', [ pos(1:2) 1280 720 ], ...
+  'InvertHardcopy', 'off', ...
   'DefaultAxesColor', 'k', ...
   'DefaultAxesColorOrder', fg, ...
   'DefaultAxesXColor', fg, ...
@@ -36,57 +37,8 @@ set( gcf, ...
   'DefaultTextColor', 'w' )
 
 % Colormap
+setcolormap( 'folded' )
 if colorscheme
-  set( gcf, 'InvertHardcopy', 'on' )
-else
-  set( gcf, 'InvertHardcopy', 'off' )
-end
-if ~foldcs
-  switch colorscheme
-  case 0
-    cmap = [
-      0 0 0 1 1
-      1 0 0 0 1
-      1 1 0 0 0 ]';
-  case 1
-    cmap = [
-      1 0 4 4 4
-      1 4 4 4 1
-      4 4 4 0 1 ]' / 4;
-  case 2
-    cmap = [
-      0 1 0
-      0 1 0
-      0 1 0 ]';
-  end
-  h = 2 / ( size( cmap, 1 ) - 1 );
-  x1 = -1 : h : 1;
-  x2 = -1 : .0005 : 1;
-  x2 = sign( x2 ) .* abs( x2 ) .^ colorexp;
-else
-  switch colorscheme
-  case 0
-    cmap = [
-      0 0 0 1 4 4 4
-      0 0 4 4 4 0 0
-      0 4 4 1 0 0 4 ]' / 4;
-  case 1
-    cmap = [
-      4 2 0 1 4 4 4
-      4 2 4 4 4 1 0
-      4 4 4 1 0 1 4 ]' / 4;
-  case 2
-    cmap = [
-      1 0
-      1 0
-      1 0 ]';
-  end
-  h = 1 / ( size( cmap, 1 ) - 1 );
-  x1 = 0 : h : 1;
-  x2 = -1 : .0005 : 1;
-  x2 = abs( x2 ) .^ colorexp;
-end
-colormap( interp1( x1, cmap, x2 ) );
 
 % Legend
 cwd = pwd;
