@@ -11,8 +11,7 @@
   dc = 1e9;
   co = 0.;
   tn = -100e6;
-  th = -90e6;
-  td = 0.;
+  ts1 = -90e6;
   vrup = 3117.6914;
   rcrit = 1e9;
   trelax = 0.;

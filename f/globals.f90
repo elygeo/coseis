@@ -107,6 +107,7 @@ real :: &
   viscosity(2),  & ! viscosity for (1) stress & (2) hourglass corrections
   vdamp,         & ! shear wave velocity dependent damping
   upvector(3),   & ! upward direction
+  slipvector(3), & ! slip direction for finding traction vectors
   tsource,       & ! dominant period
   rsource,       & ! source radius
   moment1(3),    & ! moment source normal components

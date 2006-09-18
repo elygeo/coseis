@@ -10,8 +10,8 @@
   vs1 = 500.;
   vp1 = 1500.;
   vdamp = 400.;
-  th = 'read';
   tn = -20e6;
+  ts1 = 'read';
   mud = .5;
   mus = 1000.;
   dc = .5;

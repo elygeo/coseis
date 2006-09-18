@@ -46,9 +46,9 @@ case( 'r' )
   case( 'syz' ); call vectorio( 'r', 'data/syz', t2, 1, 1, i1, i2, i3, i4, ifn )
   case( 'szx' ); call vectorio( 'r', 'data/szx', t2, 2, 1, i1, i2, i3, i4, ifn )
   case( 'sxy' ); call vectorio( 'r', 'data/szy', t2, 3, 1, i1, i2, i3, i4, ifn )
-  case( 'tn'  ); call vectorio( 'r', 'data/tn',  t3, 1, 1, i1, i2, i3, i4, ifn )
-  case( 'th'  ); call vectorio( 'r', 'data/th',  t3, 2, 1, i1, i2, i3, i4, ifn )
-  case( 'td'  ); call vectorio( 'r', 'data/td',  t3, 3, 1, i1, i2, i3, i4, ifn )
+  case( 'ts1' ); call vectorio( 'r', 'data/ts1', t3, 1, 1, i1, i2, i3, i4, ifn )
+  case( 'ts2' ); call vectorio( 'r', 'data/ts2', t3, 2, 1, i1, i2, i3, i4, ifn )
+  case( 'tn'  ); call vectorio( 'r', 'data/tn',  t3, 3, 1, i1, i2, i3, i4, ifn )
   end select
 case( 'z' )
   rr = inval(iz)
@@ -73,9 +73,9 @@ case( 'z' )
   case( 'syz' ); t2(j1:j2,k1:k2,l1:l2,1) = rr
   case( 'szx' ); t2(j1:j2,k1:k2,l1:l2,2) = rr
   case( 'sxy' ); t2(j1:j2,k1:k2,l1:l2,3) = rr
-  case( 'tn'  ); t3(j1:j2,k1:k2,l1:l2,1) = rr
-  case( 'th'  ); t3(j1:j2,k1:k2,l1:l2,2) = rr
-  case( 'td'  ); t3(j1:j2,k1:k2,l1:l2,3) = rr
+  case( 'ts1' ); t3(j1:j2,k1:k2,l1:l2,1) = rr
+  case( 'ts2' ); t3(j1:j2,k1:k2,l1:l2,2) = rr
+  case( 'tn'  ); t3(j1:j2,k1:k2,l1:l2,3) = rr
   end select
 case( 'c' )
   rr = inval(iz)
@@ -96,9 +96,9 @@ case( 'c' )
   case( 'syz' ); f1 = t2(:,:,:,1); call cube( f1, x, i1, i2, x1, x2, rr ); t2(:,:,:,1) = f1
   case( 'szx' ); f1 = t2(:,:,:,2); call cube( f1, x, i1, i2, x1, x2, rr ); t2(:,:,:,2) = f1
   case( 'sxy' ); f1 = t2(:,:,:,3); call cube( f1, x, i1, i2, x1, x2, rr ); t2(:,:,:,3) = f1
-  case( 'tn'  ); f1 = t3(:,:,:,1); call cube( f1, x, i1, i2, x1, x2, rr ); t3(:,:,:,1) = f1
-  case( 'th'  ); f1 = t3(:,:,:,2); call cube( f1, x, i1, i2, x1, x2, rr ); t3(:,:,:,2) = f1
-  case( 'td'  ); f1 = t3(:,:,:,3); call cube( f1, x, i1, i2, x1, x2, rr ); t3(:,:,:,3) = f1
+  case( 'ts1' ); f1 = t3(:,:,:,1); call cube( f1, x, i1, i2, x1, x2, rr ); t3(:,:,:,1) = f1
+  case( 'ts2' ); f1 = t3(:,:,:,2); call cube( f1, x, i1, i2, x1, x2, rr ); t3(:,:,:,2) = f1
+  case( 'tn'  ); f1 = t3(:,:,:,3); call cube( f1, x, i1, i2, x1, x2, rr ); t3(:,:,:,3) = f1
   end select
 end select
 end do
@@ -141,32 +141,32 @@ do i = 1, 3
     t2(:,:,:,k) * nhat(:,:,:,j)
 end do
 
-! Strike vectors
-t1(:,:,:,1) = nhat(:,:,:,2) * upvector(3) - nhat(:,:,:,3) * upvector(2)
-t1(:,:,:,2) = nhat(:,:,:,3) * upvector(1) - nhat(:,:,:,1) * upvector(3)
-t1(:,:,:,3) = nhat(:,:,:,1) * upvector(2) - nhat(:,:,:,2) * upvector(1)
-f1 = sqrt( sum( t1 * t1, 4 ) )
-where ( f1 /= 0. ) f1 = 1. / f1
-do i = 1, 3
-  t1(:,:,:,i) = t1(:,:,:,i) * f1
-end do
-
-! Dip vectors
-t2(:,:,:,1) = nhat(:,:,:,2) * t1(:,:,:,3) - nhat(:,:,:,3) * t1(:,:,:,2)
-t2(:,:,:,2) = nhat(:,:,:,3) * t1(:,:,:,1) - nhat(:,:,:,1) * t1(:,:,:,3)
-t2(:,:,:,3) = nhat(:,:,:,1) * t1(:,:,:,2) - nhat(:,:,:,2) * t1(:,:,:,1)
+! Ts2 vector
+t2(:,:,:,1) = nhat(:,:,:,2) * slipvector(3) - nhat(:,:,:,3) * slipvector(2)
+t2(:,:,:,2) = nhat(:,:,:,3) * slipvector(1) - nhat(:,:,:,1) * slipvector(3)
+t2(:,:,:,3) = nhat(:,:,:,1) * slipvector(2) - nhat(:,:,:,2) * slipvector(1)
 f1 = sqrt( sum( t2 * t2, 4 ) )
 where ( f1 /= 0. ) f1 = 1. / f1
 do i = 1, 3
   t2(:,:,:,i) = t2(:,:,:,i) * f1
 end do
 
+! Ts1 vector
+t1(:,:,:,1) = t2(:,:,:,2) * nhat(:,:,:,3) - t2(:,:,:,3) * nhat(:,:,:,2)
+t1(:,:,:,2) = t2(:,:,:,3) * nhat(:,:,:,1) - t2(:,:,:,1) * nhat(:,:,:,3)
+t1(:,:,:,3) = t2(:,:,:,1) * nhat(:,:,:,2) - t2(:,:,:,2) * nhat(:,:,:,1)
+f1 = sqrt( sum( t1 * t1, 4 ) )
+where ( f1 /= 0. ) f1 = 1. / f1
+do i = 1, 3
+  t1(:,:,:,i) = t1(:,:,:,i) * f1
+end do
+
 ! Total pretraction
 do i = 1, 3
   t0(:,:,:,i) = t0(:,:,:,i) + &
-    t3(:,:,:,1) * nhat(:,:,:,i) + &
-    t3(:,:,:,2) * t1(:,:,:,i) + &
-    t3(:,:,:,3) * t2(:,:,:,i)
+    t3(:,:,:,1) * t1(:,:,:,i) + &
+    t3(:,:,:,2) * t2(:,:,:,i) + &
+    t3(:,:,:,3) * nhat(:,:,:,i)
 end do
 
 ! Hypocentral radius

@@ -3,7 +3,7 @@
 version=$( date +%Y%m%d-%H%M%S )
 base=sord-$version
 
-cat << END > version.m
+cat << END > versionmeta.m
 version = '$version';
 login   = '$LOGNAME';
 name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )';
@@ -12,7 +12,7 @@ dir     = '$( /bin/pwd )';
 END
 
 files="
-  $base/version.m
+  $base/versionmeta.m
   $base/doc
   $base/sord
   $base/in.m

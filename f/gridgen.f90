@@ -8,7 +8,7 @@ use m_globals
 use m_optimize
 use m_collective
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), i, j, k, l, &
-  j1, k1, l1, j2, k2, l2, idoublenode, up(1)
+  j1, k1, l1, j2, k2, l2, idoublenode
 real :: x1, x2, m(9)
 logical :: expand
 
@@ -47,10 +47,10 @@ else
 end if
 
 ! Coordinate system
-l = sum( maxloc( abs( upvector ) ) )
-up = sign( 1., upvector(l) )
-k = modulo( l + 1, 3 ) + 1
-j = 6 - k - l
+!l = sum( maxloc( abs( upvector ) ) )
+!up = sign( 1., upvector(l) )
+!k = modulo( l + 1, 3 ) + 1
+!j = 6 - k - l
 
 ! Grid expansion
 expand = .false.

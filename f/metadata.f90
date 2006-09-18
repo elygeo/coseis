@@ -108,6 +108,7 @@ if ( rsource > 0. ) then
 end if
 write( 1, * ) 'faultnormal =  ', faultnormal, ';'
 if ( faultnormal /= 0 ) then
+  write( 1, * ) 'slipvector  = [', slipvector,'];'
   write( 1, * ) 'vrup        =  ', vrup,   ';'
   write( 1, * ) 'rcrit       =  ', rcrit,  ';'
   write( 1, * ) 'trelax      =  ', trelax, ';'

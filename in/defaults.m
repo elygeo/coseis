@@ -52,14 +52,15 @@
 
 % Fault parameters;
 % faultnormal = 0;			% no fault
+  slipvector = [ 1. 0. 0. ];		% Shear traction direction
   faultnormal = 3;			% constant l fault plane
   mus = .6;				% **coef of static friction
   mud = .5;				% **coef of dynamic friction
   dc  = .25;				% **slip-weakening distance
   co  = 0.;				% **cohesion
-  tn  = -120e6;				% **normal pretraction
-  th  = -70e6;				% **horizontal (strike) pretraction
-  td  = 0.;				% **dip pretraction
+  ts1 = -70e6;				% **shear traction component 1
+  ts2 = 0.;				% **shear traction component 2
+  tn  = -120e6;				% **normal traction
   sxx = 0.;				% **prestress Sxx
   syy = 0.;				% **prestress Syy
   szz = 0.;				% **prestress Szz

@@ -280,7 +280,7 @@ l2 = lf0 + nf3
 print *, 'before scaling:'
 inquire( iolength=reclen ) t
 
-open( 1, file='th.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
+open( 1, file='ts1.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
 ts = t(91,51)
@@ -326,8 +326,8 @@ print *, 'dt: ', abs(ts) - mud*abs(tn)
 
 ! Write tractions
 inquire( iolength=reclen ) s1
-open( 1, file='th', recl=reclen, form='unformatted', access='direct', status='replace' )
-open( 2, file='tn', recl=reclen, form='unformatted', access='direct', status='replace' )
+open( 1, file='ts1', recl=reclen, form='unformatted', access='direct', status='replace' )
+open( 2, file='tn',  recl=reclen, form='unformatted', access='direct', status='replace' )
 write( 1, rec=1 ) s1
 write( 2, rec=1 ) s2
 close( 1 )
