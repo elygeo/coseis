@@ -219,11 +219,6 @@ case 'c'
     else       msg = 'Signed color scale';
     end
   case 1
-    list = { ' dark ' ' light ' ' b/w ' };
-    colorscheme = mod( colorscheme + 1, length( list ) );
-    list{colorscheme+1}([1 end]) = '[]';
-    msg = [ 'Color scheme: ' list{:} ];
-  case 2
     if strcmp( get( hleg(1), 'Visible' ), 'off' )
       set( [hleg htxt], 'Visible', 'on' ),  msg = 'Colorbar on';
       set( haxes(1), 'Position', [ 0 .1 1 .9 ] );
@@ -274,7 +269,7 @@ case 't'
   sensor = icursor(1:3);
   [ msg, tt, vt, xsensor, tta, vta, labels ] = tsread( field, sensor, km );
   if length( vt )
-    tsfigure( colorscheme )
+    tsfigure
     tsplot
     zoom
     set( gcf, 'KeyPressFcn', 'delete(gcbf)' )
