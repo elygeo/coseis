@@ -17,6 +17,7 @@ set( gcf, ...
   'InvertHardcopy', 'off', ...
   'DefaultLineLinewidth', 1, ...
   'DefaultLineClipping', 'off', ...
+  'DefaultImageClipping', 'off', ...
   'DefaultSurfaceClipping', 'off', ...
   'DefaultTextClipping', 'off', ...
   'DefaultTextHorizontalAlignment', 'center', ...
@@ -66,15 +67,15 @@ axis( xlim )
 axis off
 
 % top annotations
-plot( -2 + .3 * [ -1 1 nan 0 0 nan -1 1 ], ...
-  [ x2(1,1) x2(1,1) nan x2(1,1) x2(1,k) nan x2(1,k) x2(1,k) ], 'LineWidth', 1 )
-hold on
-text(  -2, -7, '16km', 'Rotation', 90, 'Back', 'k' )
-text(   0,  3, 'NW', 'Hor', 'left' )
-text(  lf,  3, 'SE', 'Hor', 'right' )
-text(  26,  3, 'San Bernardino' )
-text( 103,  3, 'Palm Springs' )
-text( 177,  3, 'Salton Sea' )
+plot(  [ 0 0 nan 0 50 nan 50 50 ], -18 + .3 * [ -1 1 nan 0 0 nan -1 1 ], 'LineWidth', 1 )
+plot(  -2 + .3 * [ -1 1 nan 0 0 nan -1 1 ], -15 + [ 0 0 nan 0 16 nan 16 16 ], 'LineWidth', 1 )
+text(  -2,  -7, '16km', 'Back', 'k', 'Rotation', 90 )
+text(  25, -18, '50km', 'Back', 'k' )
+text(   0,   3, 'NW', 'Hor', 'left' )
+text(  lf,   3, 'SE', 'Hor', 'right' )
+text(  26,   3, 'San Bernardino' )
+text( 103,   3, 'Palm Springs' )
+text( 177,   3, 'Salton Sea' )
 
 % normal traction pane
 flim = 200;
@@ -118,6 +119,7 @@ shading flat
 axis equal
 axis( xlim )
 axis off
+
 
 % slip rate pane
 flim = 4;
