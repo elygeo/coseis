@@ -281,16 +281,17 @@ fi
 
 # Write run metadata
 cat << END > runmeta.m
-login   = '$LOGNAME';
-name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )';
-rundate = '$( date )';
-rundir  = '$rundir';
-infile  = '$infile';
-machine = '$machine';
-host    = '$HOSTNAME';
-os      = '$( uname -a )';
-mode    = '$mode';
-np      = $np;
+% SORD run metadata
+  login   = '$LOGNAME';
+  name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )';
+  rundate = '$( date )';
+  rundir  = '$rundir';
+  infile  = '$infile';
+  machine = '$machine';
+  host    = '$HOSTNAME';
+  os      = '$( uname -a )';
+  mode    = '$mode';
+  np      = $np;
 END
 
 #------------------------------------------------------------------------------#

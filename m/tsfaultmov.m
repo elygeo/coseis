@@ -16,6 +16,7 @@ set( gcf, ...
   'Renderer', 'painters', ...
   'InvertHardcopy', 'off', ...
   'DefaultLineLinewidth', 1, ...
+  'DefaultLineMarkerSize', 15, ...
   'DefaultLineClipping', 'off', ...
   'DefaultImageClipping', 'off', ...
   'DefaultSurfaceClipping', 'off', ...
@@ -32,21 +33,22 @@ x2 = squeeze( x2 );
 x2 = .001 * x2;
 dx = .001 * dx;
 n = size( x2 );
-j = n(1);
-k = n(2);
 x1 = zeros( n );
 for i = 1:n(1)
   x1(i,:) = (i-1) * dx;
 end
+xlim = [ min(x1(:)) max(x1(:)) min(x2(:)) max(x2(:)) ];
 lf = max(x1(:));
+ihypo = ihypo - i1(1:3) + 1;
+j = ihypo(1);
+k = ihypo(3);
 rf = [ 0 28.230 74.821 103.231 129.350 198.778 ];
 jf = round( rf(2:end-1) / dx ) + 1;
-xlim = [ min(x1(:)) max(x1(:)) min(x2(:)) max(x2(:)) ];
 
 panes = [ 140 140 140 140 160 ];
 
 % shear traction pane
-flim = 200;
+flim = 30e6;
 axes( 'Units', 'pixels', 'Position', [ 30 565 1240 135 ] );
 hsurf = pcolor( x1, x2, x1 );
 hold on
@@ -54,13 +56,14 @@ text( .8*lf - 21, -18, 'Shear Traction: 0', 'Hor', 'right' )
 text( .8*lf + 21, -18, [ num2str(flim) 'MPa' ], 'Hor', 'left' )
 imagesc( .8*lf + [ -20 20 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
 caxis( flim * [ -1 1 ] )
-plot( x1(:,k), x2(:,k) )
 plot( x1(:,1), x2(:,1) )
 plot( x1(1,:), x2(1,:) )
-plot( x1(j,:), x2(j,:) )
+plot( x1(:,end), x2(:,end) )
+plot( x1(end,:), x2(end,:) )
 for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
+plot( x1(j,k), x2(j,k), 'p' )
 shading flat
 axis equal
 axis( xlim )
@@ -78,7 +81,7 @@ text( 103,   3, 'Palm Springs' )
 text( 177,   3, 'Salton Sea' )
 
 % normal traction pane
-flim = 200;
+flim = 30e6;
 axes( 'Units', 'pixels', 'Position', [ 30 430 1240 135 ] );
 hsurf(2) = pcolor( x1, x2, x1 );
 hold on
@@ -86,13 +89,14 @@ text( .8*lf - 21, -18, 'Normal Traction: 0', 'Hor', 'right' )
 text( .8*lf + 21, -18, [ num2str(flim) 'MPa' ], 'Hor', 'left' )
 imagesc( .8*lf + [ -20 20 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
 caxis( flim * [ -1 1 ] )
-plot( x1(:,k), x2(:,k) )
 plot( x1(:,1), x2(:,1) )
 plot( x1(1,:), x2(1,:) )
-plot( x1(j,:), x2(j,:) )
+plot( x1(:,end), x2(:,end) )
+plot( x1(end,:), x2(end,:) )
 for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
+plot( x1(j,k), x2(j,k), 'p' )
 shading flat
 axis equal
 axis( xlim )
@@ -108,13 +112,14 @@ text( .8*lf - 21, -18, 'Slip: 0', 'Hor', 'right' )
 text( .8*lf + 21, -18, [ num2str(flim) 'm' ], 'Hor', 'left' )
 imagesc( .8*lf + [ -20 20 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
 caxis( flim * [ -1 1 ] )
-plot( x1(:,k), x2(:,k) )
 plot( x1(:,1), x2(:,1) )
 plot( x1(1,:), x2(1,:) )
-plot( x1(j,:), x2(j,:) )
+plot( x1(:,end), x2(:,end) )
+plot( x1(end,:), x2(end,:) )
 for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
+plot( x1(j,k), x2(j,k), 'p' )
 shading flat
 axis equal
 axis( xlim )
@@ -131,13 +136,14 @@ text( .8*lf - 21, -18, 'Slip Rate: 0', 'Hor', 'right' )
 text( .8*lf + 21, -18, [ num2str(flim) 'm/s' ], 'Hor', 'left' )
 imagesc( .8*lf + [ -20 20 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
 caxis( flim * [ -1 1 ] )
-plot( x1(:,k), x2(:,k) )
 plot( x1(:,1), x2(:,1) )
 plot( x1(1,:), x2(1,:) )
-plot( x1(j,:), x2(j,:) )
+plot( x1(:,end), x2(:,end) )
+plot( x1(end,:), x2(end,:) )
 for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
+plot( x1(j,k), x2(j,k), 'p' )
 shading flat
 axis equal
 axis( xlim )
@@ -152,13 +158,14 @@ text( .8*lf - 21, -18, 'Peak Slip Rate: 0', 'Hor', 'right' )
 text( .8*lf + 21, -18, [ num2str(flim) 'm/s' ], 'Hor', 'left' )
 imagesc( .8*lf + [ -20 20 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
 caxis( flim * [ -1 1 ] )
-plot( x1(:,k), x2(:,k) )
 plot( x1(:,1), x2(:,1) )
 plot( x1(1,:), x2(1,:) )
-plot( x1(j,:), x2(j,:) )
+plot( x1(:,end), x2(:,end) )
+plot( x1(end,:), x2(end,:) )
 for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
+plot( x1(j,k), x2(j,k), 'p' )
 shading flat
 axis equal
 axis( xlim )
@@ -177,7 +184,7 @@ text( 66, -18, 'IGPP', 'Hor', 'left' )
 text( 78, -18, 'SDSU', 'Hor', 'left' )
 
 % time loop
-for it = 100
+for it = i1(4) : dit : i2(4)
   [ msg, s ] = read4d( 'sl', [ i1(1:3) it ], [ i2(1:3) it ] );
   if msg, error( msg ), end
   s = squeeze( s );
