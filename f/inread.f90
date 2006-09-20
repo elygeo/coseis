@@ -41,6 +41,7 @@ case( 'nn' );          read( str, * ) nn
 case( 'nt' );          read( str, * ) nt
 case( 'dx' );          read( str, * ) dx
 case( 'dt' );          read( str, * ) dt
+case( 'upvector' );    read( str, * ) upvector
 case( 'slipvector' );  read( str, * ) slipvector
 case( 'viscosity' );   read( str, * ) viscosity
 case( 'vdamp' );       read( str, * ) vdamp
@@ -78,8 +79,8 @@ case( 'mud' );         inzone = .true.
 case( 'dc' );          inzone = .true.
 case( 'co' );          inzone = .true.
 case( 'tn' );          inzone = .true.
-case( 'th' );          inzone = .true.
-case( 'td' );          inzone = .true.
+case( 'ts1' );         inzone = .true.
+case( 'ts2' );         inzone = .true.
 case( 'sxx' );         inzone = .true.
 case( 'syy' );         inzone = .true.
 case( 'szz' );         inzone = .true.

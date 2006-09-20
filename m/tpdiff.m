@@ -13,6 +13,7 @@ format compact
 figure(1)
 clf
 set( gcf, 'Name', 'Rupture Time' )
+colorscheme
 axes( 'Position', [ .1 .2 .8 .7 ] );
 plot( 0, 0, 'p', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'MarkerSize', 11 )
 axis image;
@@ -53,13 +54,13 @@ rms = sqrt( sum( t(:).^2 ) / prod( n ) )
 set( 0, 'CurrentFigure', 2 );
 clf
 set( gcf, 'Name', 'Rupture Time Delay' )
+colorscheme
 axes( 'Position', [ .1 .2 .8 .7 ] );
 imagesc( [ -15 15 ], [ -7.5 7.5 ], t' )
 axis image;
 title( [ 'Model ' model ' rupture time delay (s), average=' num2str(tbar) ', RMS=' num2str(rms) ] )
 xlabel( 'X (km)' )
 ylabel( 'Y (km)' )
-setcolormap
 caxis( flim * [ -1 1 ] )
 axes( 'Position', [ .1 .16 .8 .02 ] );
 imagesc( flim * [ -1 1 ], [ -1 1 ], 0:.001:1 );

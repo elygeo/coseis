@@ -8,17 +8,16 @@ flim = 1;
 cellfocus = 0;
 
 clf
+colorscheme
 pos = get( gcf, 'Position' );
 set( gcf, ...
-  'Color', 'w', ...
   'Position', [ pos(1:2) 1280 720 ], ...
-  'DefaultAxesColorOrder', [ 0 0 0 ], ...
   'DefaultLineLineWidth', 1, ...
   'DefaultTextFontName', 'Helvetica', ...
   'DefaultTextFontSize', 16, ...
   'DefaultTextHorizontalAlignment', 'center', ...
   'DefaultTextVerticalAlignment', 'top' )
-setcolormap( 'folded', 'light' )
+colorscheme( 1 )
 
 % Legend
 cwd = pwd;
@@ -62,7 +61,7 @@ z = [ sites{:,3} ];
 ver = sites(:,4);
 hor = sites(:,5);
 txt = sites(:,6);
-plot3( x, y, z+1000, 'o', 'MarkerSize', 8, 'MarkerFaceColor', 'k', 'MarkerEdgeColor', [.9 .9 .9], 'LineWidth', 2 );
+plot3( x, y, z+1000, 'o', 'MarkerSize', 8, 'LineWidth', 2 );
 hold on
 for i = 1:length(x)
   dy = 2000;

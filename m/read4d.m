@@ -47,8 +47,8 @@ for iz = 1:nout
   field = out{iz}{2};
   dit   = out{iz}{3};
   if length( out{iz} ) == 11
-    i1  = out{iz}{4:7};
-    i2  = out{iz}{8:11};
+    i1  = [ out{iz}{4:7}  ];
+    i2  = [ out{iz}{8:11} ];
   else
     i1  = [ out{iz}{4:6} dit ];
     i2  = [ out{iz}{7:9} nt  ];
@@ -58,6 +58,10 @@ for iz = 1:nout
     i1(4) = 0;
     i2(4) = 0;
   end
+i1
+i2
+i1s
+i2s
   test  = [ 
     strcmp( fieldin, field )
     all( i1s >= i1 )

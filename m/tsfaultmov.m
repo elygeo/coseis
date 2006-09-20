@@ -5,23 +5,24 @@ flim = 4;
 iz = 21;
 meta
 dit = out{iz}{3};
-i1 = out{iz}{4:7};
-i2 = out{iz}{8:11};
-pos = get( gcf, 'Position' );
+i1 = [ out{iz}{4:7}  ];
+i2 = [ out{iz}{8:11} ];
+format compact
 clf
+colorscheme
+pos = get( gcf, 'Position' );
 set( gcf, ...
   'Position', [ pos(1:2) 1280 720 ], ...
   'Renderer', 'painters', ...
   'InvertHardcopy', 'off', ...
   'DefaultLineLinewidth', 1, ...
   'DefaultLineClipping', 'off', ...
+  'DefaultSurfaceClipping', 'off', ...
   'DefaultTextClipping', 'off', ...
   'DefaultTextHorizontalAlignment', 'center', ...
-  'DefaultTextVerticalAlignment', 'bottom', ...
+  'DefaultTextVerticalAlignment', 'middle', ...
   'DefaultTextFontName', 'Helvetica', ...
   'DefaultTextFontSize', 14 )
-setcolormap( 'folded' )
-darkfig
 
 % position data
 [ msg, x2 ] = read4d( 'x', [ i1(1:3) 0 ], [ i2(1:3) 0 ], 3 );
@@ -39,17 +40,19 @@ end
 lf = max(x1(:));
 rf = [ 0 28.230 74.821 103.231 129.350 198.778 ];
 jf = round( rf(2:end-1) / dx ) + 1;
+xlim = [ min(x1(:)) max(x1(:)) min(x2(:)) max(x2(:)) ];
+
+panes = [ 140 140 140 140 160 ];
 
 % shear traction pane
-flim = 999;
-axes( 'Units', 'pixels', 'Position', [ 30 540 1240 180 ] );
+flim = 200;
+axes( 'Units', 'pixels', 'Position', [ 30 565 1240 135 ] );
 hsurf = pcolor( x1, x2, x1 );
 hold on
-text( .71*lf - 25, 4, '0' )
-text( .71*lf,      4, 'Shear Traction' )
-text( .71*lf + 25, 4, [ num2str(flim) 'MPa' ] )
-imagesc( .71*lf + [ -25 25 ], 3 + .1 * [ -1 1 ], 0:.001*flim:flim )
-%caxis( flim * [ -1 1 ] )
+text( .8*lf - 26, -18, 'Shear Traction  0', 'Hor', 'right' )
+text( .8*lf + 26, -18, [ num2str(flim) 'MPa' ], 'Hor', 'left' )
+imagesc( .8*lf + [ -25 25 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
+caxis( flim * [ -1 1 ] )
 plot( x1(:,k), x2(:,k) )
 plot( x1(:,1), x2(:,1) )
 plot( x1(1,:), x2(1,:) )
@@ -59,29 +62,29 @@ for i = jf
 end
 shading flat
 axis equal
+axis( xlim )
 axis off
 
 % top annotations
 plot( -2 + .3 * [ -1 1 nan 0 0 nan -1 1 ], ...
   [ x2(1,1) x2(1,1) nan x2(1,1) x2(1,k) nan x2(1,k) x2(1,k) ], 'LineWidth', 1 )
 hold on
-text( x1(1,k), x2(1,k)+1, 'NW', 'Hor', 'left' )
-text( x1(j,k), x2(j,k)+1, 'SE', 'Hor', 'right' )
-text( x1(134,k), x2(134,k)+1, { 'San' 'Bernardino' } )
-text( x1(521,k), x2(521,k)+1, { 'Palm' 'Springs'   } )
-text( x1(900,k), x2(900,k)+1, { 'Salton' 'Sea'     } )
-text( -2, x2(1,41), '16km', 'Ver', 'middle', 'Rotation', 90, 'Back', bg )
+text(  -2, -7, '16km', 'Rotation', 90, 'Back', 'k' )
+text(   0,  3, 'NW', 'Hor', 'left' )
+text(  lf,  3, 'SE', 'Hor', 'right' )
+text(  26,  3, 'San Bernardino' )
+text( 103,  3, 'Palm Springs' )
+text( 177,  3, 'Salton Sea' )
 
 % normal traction pane
-flim = 999;
-axes( 'Units', 'pixels', 'Position', [ 30 420 1240 120 ] );
+flim = 200;
+axes( 'Units', 'pixels', 'Position', [ 30 430 1240 135 ] );
 hsurf(2) = pcolor( x1, x2, x1 );
 hold on
-text( .71*lf - 25, 4, '0' )
-text( .71*lf,      4, 'Normal Traction' )
-text( .71*lf + 25, 4, [ num2str(flim) 'MPa' ] )
-imagesc( .71*lf + [ -25 25 ], 3 + .1 * [ -1 1 ], 0:.001*flim:flim )
-%caxis( flim * [ -1 1 ] )
+text( .8*lf - 26, -18, 'Normal Traction: 0', 'Hor', 'right' )
+text( .8*lf + 26, -18, [ num2str(flim) 'MPa' ], 'Hor', 'left' )
+imagesc( .8*lf + [ -25 25 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
+caxis( flim * [ -1 1 ] )
 plot( x1(:,k), x2(:,k) )
 plot( x1(:,1), x2(:,1) )
 plot( x1(1,:), x2(1,:) )
@@ -91,18 +94,18 @@ for i = jf
 end
 shading flat
 axis equal
+axis( xlim )
 axis off
 
 % slip pane
 flim = 4;
-axes( 'Units', 'pixels', 'Position', [ 30 300 1240 120 ] );
+axes( 'Units', 'pixels', 'Position', [ 30 295 1240 135 ] );
 hsurf(3) = pcolor( x1, x2, x1 );
 hold on
 hcont = plot( [ 0 1 ], [ 0 1 ] );
-text( .71*lf - 25, -20, '0' );
-text( .71*lf,      -20, 'Slip' );
-text( .71*lf + 25, -20, [ num2str(flim) 'm' ] );
-imagesc( .71*lf + [ -25 25 ], -21 + .1 * [ -1 1 ], 0:.001*flim:flim )
+text( .8*lf - 26, -18, 'Slip: 0', 'Hor', 'right' )
+text( .8*lf + 26, -18, [ num2str(flim) 'm' ], 'Hor', 'left' )
+imagesc( .8*lf + [ -25 25 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
 caxis( flim * [ -1 1 ] )
 plot( x1(:,k), x2(:,k) )
 plot( x1(:,1), x2(:,1) )
@@ -113,18 +116,18 @@ for i = jf
 end
 shading flat
 axis equal
+axis( xlim )
 axis off
 
 % slip rate pane
 flim = 4;
-axes( 'Units', 'pixels', 'Position', [ 30 180 1240 120 ] );
+axes( 'Units', 'pixels', 'Position', [ 30 160 1240 135 ] );
 hsurf(4) = pcolor( x1, x2, x1 );
 hold on
 hcont(2) = plot( [ 0 1 ], [ 0 1 ] );
-text( .71*lf - 25, 4, '0' )
-text( .71*lf,      4, 'Slip Rate' )
-text( .71*lf + 25, 4, [ num2str(flim) 'm/s' ] )
-imagesc( .71*lf + [ -25 25 ], 3 + .1 * [ -1 1 ], 0:.001*flim:flim )
+text( .8*lf - 26, -18, 'Slip Rate: 0', 'Hor', 'right' )
+text( .8*lf + 26, -18, [ num2str(flim) 'm/s' ], 'Hor', 'left' )
+imagesc( .8*lf + [ -25 25 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
 caxis( flim * [ -1 1 ] )
 plot( x1(:,k), x2(:,k) )
 plot( x1(:,1), x2(:,1) )
@@ -135,17 +138,17 @@ for i = jf
 end
 shading flat
 axis equal
+axis( xlim )
 axis off
 
 % peak slip rate pane
 flim = 4;
-axes( 'Units', 'pixels', 'Position', [ 30 0 1240 180 ] );
+axes( 'Units', 'pixels', 'Position', [ 30 25 1240 135 ] );
 hsurf(5) = pcolor( x1, x2, x1 );
 hold on
-text( .71*lf - 25, 4, '0' )
-text( .71*lf,      4, 'Peak Slip Rate' )
-text( .71*lf + 25, 4, [ num2str(flim) 'm/s' ] )
-imagesc( .71*lf + [ -25 25 ], 3 + .1 * [ -1 1 ], 0:.001*flim:flim )
+text( .8*lf - 26, -18, 'Peak Slip Rate: 0', 'Hor', 'right' )
+text( .8*lf + 26, -18, [ num2str(flim) 'm/s' ], 'Hor', 'left' )
+imagesc( .8*lf + [ -25 25 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
 caxis( flim * [ -1 1 ] )
 plot( x1(:,k), x2(:,k) )
 plot( x1(:,1), x2(:,1) )
@@ -156,19 +159,20 @@ for i = jf
 end
 shading flat
 axis equal
+axis( xlim )
 axis off
 
 % bottom annotations
-htime = text( 0, -22, '0s', 'Hor', 'left' );
+htime = text( 0, -18, 'Time: 0s', 'Hor', 'left' );
 sio = imread( 'sio.png' );
 igpp = imread( 'igpp.png' );
 sdsu = imread( 'sdsu.png' );
-image( 53 - [ 1 4    ], [ -22 -19 ], sio )
-image( 66 - [ 1 5.5  ], [ -22 -19 ], igpp )
-image( 78 - [ 1 2.88 ], [ -22 -19 ], sdsu )
-text( 53, -22, 'SIO',  'Hor', 'left' )
-text( 66, -22, 'IGPP', 'Hor', 'left' )
-text( 78, -22, 'SDSU', 'Hor', 'left' )
+image( 53 - [ 1 3    ], [ -17 -19 ], sio )
+image( 66 - [ 1 4    ], [ -17 -19 ], igpp )
+image( 78 - [ 1 2.25 ], [ -17 -19 ], sdsu )
+text( 53, -18, 'SIO',  'Hor', 'left' )
+text( 66, -18, 'IGPP', 'Hor', 'left' )
+text( 78, -18, 'SDSU', 'Hor', 'left' )
 
 % time loop
 for it = 200

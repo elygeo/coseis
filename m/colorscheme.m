@@ -1,9 +1,10 @@
 % Colorscheme
-function colorscheme( varargin )
+function clim = colorscheme( varargin )
 
 scheme   = 0;
 type     = 'folded';
 colorexp = .5;
+
 if nargin >= 1, scheme   = varargin{1}; end
 if nargin >= 2, type     = varargin{2}; end
 if nargin >= 3, colorexp = varargin{3}; end
@@ -15,19 +16,22 @@ else
   bg = 'w';
   fg = [ 0 0 0 ];
 end
+
 set( gcf, ...
-  'InvertHardCopy', 'off', ...
   'Color', bg, ...
-  'DefaultAxesColor', bg, ...
+  'DefaultAxesColor', 'none', ...
   'DefaultAxesColorOrder', fg, ...
   'DefaultAxesXColor', fg, ...
-  'DefaultAxesYColor', fg ...
+  'DefaultAxesYColor', fg, ...
   'DefaultAxesZColor', fg, ...
   'DefaultLineColor', fg, ...
+  'DefaultLineMarkerEdgeColor', bg, ...
+  'DefaultLineMarkerFaceColor', fg, ...
   'DefaultTextColor', fg )
 
 switch type
 case 'signed'
+  clim = [ 0 1 ];
   switch abs( scheme )
   case 0
     cmap = [
@@ -51,6 +55,7 @@ case 'signed'
   x2 = -1 : .0005 : 1;
   x2 = sign( x2 ) .* abs( x2 ) .^ colorexp;
 case 'folded'
+  clim = [ -1 1 ];
   switch abs( scheme )
   case 0
     cmap = [
@@ -75,6 +80,10 @@ case 'folded'
   x2 = abs( x2 ) .^ colorexp;
 otherwise, error( 'colormap type' )
 end
+
 if scheme < 0, cmap = 1 - cmap; end
+
 colormap( interp1( x1, cmap, x2 ) );
+
+if nargout == 0, clear clim, end
 

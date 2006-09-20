@@ -1,8 +1,6 @@
 % Final Slip plots
 
 flim = .05;
-colorexp = 1;
-colorexp = .5;
 dirs = { '1a' '1b' '2a' '2b' '3a' '3b' };
 dirs = { '1a' '2a' '3a' };
 xi = [  -15 : .1 : 15  ];
@@ -43,6 +41,7 @@ i = x(:,:,1) >= -15000 & x(:,:,1) <= 15000 & ...
 t = reshape( t(i), n );
 
 set( 0, 'CurrentFigure', 1 );
+colorscheme
 [ c, h ] = contour( xi, yi, t', v );
 delete( h );
 i = 1;
@@ -59,13 +58,13 @@ rms = sqrt( sum( t(:).^2 ) / prod( n ) )
 set( 0, 'CurrentFigure', 2 );
 clf
 set( gcf, 'Name', 'Final slip error' )
+colorscheme
 axes( 'Position', [ .1 .2 .8 .7 ] );
 imagesc( [ -15 15 ], [ -7.5 7.5 ], t' )
 axis image;
 title( [ 'Model ' model ' final slip error (m), average=' num2str(tbar) ', RMS=' num2str(rms) ] )
 xlabel( 'X (km)' )
 ylabel( 'Y (km)' )
-setcolormap
 caxis( flim * [ -1 1 ] )
 axes( 'Position', [ .1 .16 .8 .02 ] );
 imagesc( flim * [ -1 1 ], [ -1 1 ], 0:.001:1 );

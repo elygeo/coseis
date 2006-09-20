@@ -3,8 +3,9 @@
 clear all
 format compact
 clf
+colorscheme( 1 )
 pos = get( gcf, 'Position' );
-set( gcf, 'Position', [ pos(1:2) 1280 720 ], 'Color', 'w' )
+set( gcf, 'Position', [ pos(1:2) 1280 720 ] )
 
 meta
 isurf = [
