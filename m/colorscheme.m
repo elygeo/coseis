@@ -3,7 +3,7 @@ function clim = colorscheme( varargin )
 
 scheme   = 0;
 type     = 'folded';
-colorexp = .5;
+colorexp = 1;
 
 if nargin >= 1, scheme   = varargin{1}; end
 if nargin >= 2, type     = varargin{2}; end
@@ -59,9 +59,9 @@ case 'folded'
   switch abs( scheme )
   case 0
     cmap = [
-      0 0 0 1 4 4 4
+      0 0 0 0 4 4 4
       0 0 4 4 4 0 0
-      0 4 4 1 0 0 4 ]' / 4;
+      0 4 4 0 0 0 4 ]' / 4;
   case 1
     cmap = [
       4 2 0 2 4 4 4
