@@ -103,7 +103,7 @@ else
     file = field;
     if dirfmt, file = sprintf( [ dirfmt file ], iz ); end
     if nc > 1 || oldway, file = sprintf( [ file '%1d' ], ic(i) ); end
-    if i2(4) > 0, file = sprintf( [ file '%06d' ], it + i0(4) ); end
+    if i2(4) > 0, file = sprintf( [ file '%06d' ], it - 1 + i0(4) ); end
     fid = fopen( file, 'r', endian );
     if ( fid == -1 ), error( [ 'Error opening file: ' file ] ), end
     for l = 1:n(3)
