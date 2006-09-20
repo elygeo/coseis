@@ -50,9 +50,9 @@ flim = 200;
 axes( 'Units', 'pixels', 'Position', [ 30 565 1240 135 ] );
 hsurf = pcolor( x1, x2, x1 );
 hold on
-text( .8*lf - 26, -18, 'Shear Traction  0', 'Hor', 'right' )
-text( .8*lf + 26, -18, [ num2str(flim) 'MPa' ], 'Hor', 'left' )
-imagesc( .8*lf + [ -25 25 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
+text( .8*lf - 21, -18, 'Shear Traction: 0', 'Hor', 'right' )
+text( .8*lf + 21, -18, [ num2str(flim) 'MPa' ], 'Hor', 'left' )
+imagesc( .8*lf + [ -20 20 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
 caxis( flim * [ -1 1 ] )
 plot( x1(:,k), x2(:,k) )
 plot( x1(:,1), x2(:,1) )
@@ -67,10 +67,10 @@ axis( xlim )
 axis off
 
 % top annotations
-plot(  [ 0 0 nan 0 50 nan 50 50 ], -18 + .3 * [ -1 1 nan 0 0 nan -1 1 ], 'LineWidth', 1 )
+plot( [ 0 0 nan 0 100 nan 100 100 ], -18 + .3 * [ -1 1 nan 0 0 nan -1 1 ], 'LineWidth', 1 )
 plot(  -2 + .3 * [ -1 1 nan 0 0 nan -1 1 ], -15 + [ 0 0 nan 0 16 nan 16 16 ], 'LineWidth', 1 )
 text(  -2,  -7, '16km', 'Back', 'k', 'Rotation', 90 )
-text(  25, -18, '50km', 'Back', 'k' )
+text(  50, -18, '100km', 'Back', 'k' )
 text(   0,   3, 'NW', 'Hor', 'left' )
 text(  lf,   3, 'SE', 'Hor', 'right' )
 text(  26,   3, 'San Bernardino' )
@@ -82,9 +82,9 @@ flim = 200;
 axes( 'Units', 'pixels', 'Position', [ 30 430 1240 135 ] );
 hsurf(2) = pcolor( x1, x2, x1 );
 hold on
-text( .8*lf - 26, -18, 'Normal Traction: 0', 'Hor', 'right' )
-text( .8*lf + 26, -18, [ num2str(flim) 'MPa' ], 'Hor', 'left' )
-imagesc( .8*lf + [ -25 25 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
+text( .8*lf - 21, -18, 'Normal Traction: 0', 'Hor', 'right' )
+text( .8*lf + 21, -18, [ num2str(flim) 'MPa' ], 'Hor', 'left' )
+imagesc( .8*lf + [ -20 20 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
 caxis( flim * [ -1 1 ] )
 plot( x1(:,k), x2(:,k) )
 plot( x1(:,1), x2(:,1) )
@@ -104,9 +104,9 @@ axes( 'Units', 'pixels', 'Position', [ 30 295 1240 135 ] );
 hsurf(3) = pcolor( x1, x2, x1 );
 hold on
 hcont = plot( [ 0 1 ], [ 0 1 ] );
-text( .8*lf - 26, -18, 'Slip: 0', 'Hor', 'right' )
-text( .8*lf + 26, -18, [ num2str(flim) 'm' ], 'Hor', 'left' )
-imagesc( .8*lf + [ -25 25 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
+text( .8*lf - 21, -18, 'Slip: 0', 'Hor', 'right' )
+text( .8*lf + 21, -18, [ num2str(flim) 'm' ], 'Hor', 'left' )
+imagesc( .8*lf + [ -20 20 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
 caxis( flim * [ -1 1 ] )
 plot( x1(:,k), x2(:,k) )
 plot( x1(:,1), x2(:,1) )
@@ -127,9 +127,9 @@ axes( 'Units', 'pixels', 'Position', [ 30 160 1240 135 ] );
 hsurf(4) = pcolor( x1, x2, x1 );
 hold on
 hcont(2) = plot( [ 0 1 ], [ 0 1 ] );
-text( .8*lf - 26, -18, 'Slip Rate: 0', 'Hor', 'right' )
-text( .8*lf + 26, -18, [ num2str(flim) 'm/s' ], 'Hor', 'left' )
-imagesc( .8*lf + [ -25 25 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
+text( .8*lf - 21, -18, 'Slip Rate: 0', 'Hor', 'right' )
+text( .8*lf + 21, -18, [ num2str(flim) 'm/s' ], 'Hor', 'left' )
+imagesc( .8*lf + [ -20 20 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
 caxis( flim * [ -1 1 ] )
 plot( x1(:,k), x2(:,k) )
 plot( x1(:,1), x2(:,1) )
@@ -148,9 +148,9 @@ flim = 4;
 axes( 'Units', 'pixels', 'Position', [ 30 25 1240 135 ] );
 hsurf(5) = pcolor( x1, x2, x1 );
 hold on
-text( .8*lf - 26, -18, 'Peak Slip Rate: 0', 'Hor', 'right' )
-text( .8*lf + 26, -18, [ num2str(flim) 'm/s' ], 'Hor', 'left' )
-imagesc( .8*lf + [ -25 25 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
+text( .8*lf - 21, -18, 'Peak Slip Rate: 0', 'Hor', 'right' )
+text( .8*lf + 21, -18, [ num2str(flim) 'm/s' ], 'Hor', 'left' )
+imagesc( .8*lf + [ -20 20 ], -18 + .1 * [ -1 1 ], 0:.001*flim:flim )
 caxis( flim * [ -1 1 ] )
 plot( x1(:,k), x2(:,k) )
 plot( x1(:,1), x2(:,1) )
@@ -177,8 +177,8 @@ text( 66, -18, 'IGPP', 'Hor', 'left' )
 text( 78, -18, 'SDSU', 'Hor', 'left' )
 
 % time loop
-for it = 200
-  [ msg, s ] = read4d( 'sl', [ i1 it ], [ i2 it ] );
+for it = 100
+  [ msg, s ] = read4d( 'sl', [ i1(1:3) it ], [ i2(1:3) it ] );
   if msg, error( msg ), end
   s = squeeze( s );
   [ c1, h ] = contour( x1', x2', s', [ dc0 dc0 ] );
@@ -205,7 +205,7 @@ for it = 200
     s(1:j-1,2:k)   + s(2:j,2:k) );
   set( hsurf(3), 'CData', s )
 
-  [ msg, s ] = read4d( 'svm', [ i1 it ], [ i2 it ] );
+  [ msg, s ] = read4d( 'svm', [ i1(1:3) it ], [ i2(1:3) it ] );
   if msg, error( msg ), end
   s = squeeze( s );
   s(1:j-1,1:k-1) = .25 * ( ...
@@ -213,7 +213,7 @@ for it = 200
     s(1:j-1,2:k)   + s(2:j,2:k) );
   set( hsurf(4), 'CData', s )
 
-  [ msg, s ] = read4d( 'psv', [ i1 it ], [ i2 it ] );
+  [ msg, s ] = read4d( 'psv', [ i1(1:3) it ], [ i2(1:3) it ] );
   if msg, error( msg ), end
   s = squeeze( s );
   s(1:j-1,1:k-1) = .25 * ( ...
@@ -221,7 +221,7 @@ for it = 200
     s(1:j-1,2:k)   + s(2:j,2:k) );
   set( hsurf(5), 'CData', s )
 
-  [ msg, s ] = read4d( 'tn', [ i1 it ], [ i2 it ] );
+  [ msg, s ] = read4d( 'tn', [ i1(1:3) it ], [ i2(1:3) it ] );
   if msg, error( msg ), end
   s = squeeze( s );
   s(1:j-1,1:k-1) = .25 * ( ...
@@ -229,7 +229,7 @@ for it = 200
     s(1:j-1,2:k)   + s(2:j,2:k) );
   set( hsurf(1), 'CData', s )
 
-  [ msg, s ] = read4d( 'tsm', [ i1 it ], [ i2 it ] );
+  [ msg, s ] = read4d( 'tsm', [ i1(1:3) it ], [ i2(1:3) it ] );
   if msg, error( msg ), end
   s = squeeze( s );
   s(1:j-1,1:k-1) = .25 * ( ...

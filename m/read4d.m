@@ -58,10 +58,6 @@ for iz = 1:nout
     i1(4) = 0;
     i2(4) = 0;
   end
-i1
-i2
-i1s
-i2s
   test  = [ 
     strcmp( fieldin, field )
     all( i1s >= i1 )
@@ -94,6 +90,7 @@ if all( m(1:3) == 1 )
     if dirfmt, file = sprintf( [ dirfmt file ], iz ); end
     if nc > 1 || oldway, file = sprintf( [ file '%1d' ], ic(i) ); end
     fid = fopen( file, 'r', endian );
+    if ( fid == -1 ), error( [ 'Error opening file: ' file ] ), end
     fseek( fid, 4*i0(4), 'bof' );
     f(1,1,1,:,i) = fread( fid, n(4), 'float32' );
     fclose( fid );
@@ -108,6 +105,7 @@ else
     if nc > 1 || oldway, file = sprintf( [ file '%1d' ], ic(i) ); end
     if i2(4) > 0, file = sprintf( [ file '%06d' ], it + i0(4) ); end
     fid = fopen( file, 'r', endian );
+    if ( fid == -1 ), error( [ 'Error opening file: ' file ] ), end
     for l = 1:n(3)
       seek = 4 * ( i0(1) + m(1) * ( i0(2) + m(2) * ( i0(3) + l - 1 ) ) );
       fseek( fid, seek, 'bof' );
