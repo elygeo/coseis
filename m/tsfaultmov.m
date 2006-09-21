@@ -55,11 +55,12 @@ axes( 'Units', 'pixels', 'Position', [ 30 565 1220 135 ] );
 hsurf = pcolor( x1, x2, x1 );
 hold on
 text( 2, -1, 'Normal Traction', 'Ver', 'top', 'Hor', 'left', 'FontWeight', 'bold' )
-text( .1*lf - 16, -18, '0', 'Hor', 'right' )
-text( .1*lf + 16, -18, [ num2str(flim) 'MPa' ], 'Hor', 'left' )
 h = flim / ( length( colormap ) - 1 );
-imagesc( .1*lf + [ -15 15 ], -18 + .2 * [ -1 1 ], 0:h:flim )
-caxis( flim * [ -1 1 ] )
+imagesc( 17 + 15 * [ -1 1 ], -18 + .2 * [ -1 1 ], 0:h:flim )
+plot( 17 + 15 * [ 1 1 -1 -1 1 ], -18 + .6 * [ 1 -1 -1 1 1 ] ) 
+text( 17 - 16, -18, '0', 'Hor', 'right' )
+text( 17 + 16, -18, [ num2str(flim) 'MPa' ], 'Hor', 'left' )
+plot( x1(j,k), x2(j,k), 'p' )
 plot( x1(:,1), x2(:,1) )
 plot( x1(1,:), x2(1,:) )
 plot( x1(:,end), x2(:,end) )
@@ -67,18 +68,18 @@ plot( x1(end,:), x2(end,:) )
 for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
-plot( x1(j,k), x2(j,k), 'p' )
 shading flat
+caxis( flim * [ -1 1 ] )
 axis equal
 axis( xlim )
 axis off
 
 % top annotations
-plot( lf - [ 0 0 nan 0 100 nan 100 100 ], -18 + .6 * [ -1 1 nan 0 0 nan -1 1 ], 'LineWidth', 1 )
-plot( lf+2 + .6 * [ -1 1 nan 0 0 nan -1 1 ], -16 + [ 0 0 nan 0 16 nan 16 16 ], 'LineWidth', 1 )
+plot( lf - [ 0 0 nan 0 100 nan 100 100 ], -18 + .75 * [ -1 1 nan 0 0 nan -1 1 ], 'LineWidth', 1 )
+plot( lf+2 + .75 * [ -1 1 nan 0 0 nan -1 1 ], -16 + [ 0 0 nan 0 16 nan 16 16 ], 'LineWidth', 1 )
 text( lf+2,  -7, '16km', 'Back', 'k', 'Rotation', -90 )
 text( lf-50, -18, '100km', 'Back', 'k' )
-text(   0,   3, 'NW', 'Hor', 'left' )
+text(   0,   3.5, 'NW', 'Hor', 'left' )
 text(  26,   3, 'San Bernardino' )
 text( 103,   2.5, 'Palm Springs' )
 text( 177,   2.5, 'Salton Sea' )
@@ -92,10 +93,11 @@ hold on
 text( 2, -1, 'Shear Traction', 'Ver', 'top', 'Hor', 'left', 'FontWeight', 'bold' )
 hcont = plot( [ 0 1 ], [ 0 1 ] );
 h = flim / ( length( colormap ) - 1 );
-imagesc( .1*lf + [ -15 15 ], -18 + .2 * [ -1 1 ], 0:h:flim )
-text( .1*lf - 16, -18, '0', 'Hor', 'right' )
-text( .1*lf + 16, -18, [ num2str(flim) 'MPa' ], 'Hor', 'left' )
-caxis( flim * [ -1 1 ] )
+imagesc( 17 + 15 * [ -1 1 ], -18 + .2 * [ -1 1 ], 0:h:flim )
+plot( 17 + 15 * [ 1 1 -1 -1 1 ], -18 + .6 * [ 1 -1 -1 1 1 ] ) 
+text( 17 - 16, -18, '0', 'Hor', 'right' )
+text( 17 + 16, -18, [ num2str(flim) 'MPa' ], 'Hor', 'left' )
+plot( x1(j,k), x2(j,k), 'p' )
 plot( x1(:,1), x2(:,1) )
 plot( x1(1,:), x2(1,:) )
 plot( x1(:,end), x2(:,end) )
@@ -103,8 +105,8 @@ plot( x1(end,:), x2(end,:) )
 for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
-plot( x1(j,k), x2(j,k), 'p' )
 shading flat
+caxis( flim * [ -1 1 ] )
 axis equal
 axis( xlim )
 axis off
@@ -116,11 +118,12 @@ hsurf(3) = pcolor( x1, x2, x1 );
 hold on
 text( 2, -1, 'Slip', 'Ver', 'top', 'Hor', 'left', 'FontWeight', 'bold' )
 hcont(2) = plot( [ 0 1 ], [ 0 1 ] );
-text( .1*lf - 16, -18, '0', 'Hor', 'right' )
-text( .1*lf + 16, -18, [ num2str(flim) 'm' ], 'Hor', 'left' )
 h = flim / ( length( colormap ) - 1 );
-imagesc( .1*lf + [ -15 15 ], -18 + .2 * [ -1 1 ], 0:h:flim )
-caxis( flim * [ -1 1 ] )
+imagesc( 17 + [ -15 15 ], -18 + .2 * [ -1 1 ], 0:h:flim )
+plot( 17 + [ 15 15 -15 -15 15 ], -18 + .6 * [ 1 -1 -1 1 1 ] ) 
+text( 17 - 16, -18, '0', 'Hor', 'right' )
+text( 17 + 16, -18, [ num2str(flim) 'm' ], 'Hor', 'left' )
+plot( x1(j,k), x2(j,k), 'p' )
 plot( x1(:,1), x2(:,1) )
 plot( x1(1,:), x2(1,:) )
 plot( x1(:,end), x2(:,end) )
@@ -128,8 +131,8 @@ plot( x1(end,:), x2(end,:) )
 for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
-plot( x1(j,k), x2(j,k), 'p' )
 shading flat
+caxis( flim * [ -1 1 ] )
 axis equal
 axis( xlim )
 axis off
@@ -141,11 +144,12 @@ hsurf(4) = pcolor( x1, x2, x1 );
 hold on
 text( 2, -1, 'Peak Slip Rate', 'Ver', 'top', 'Hor', 'left', 'FontWeight', 'bold' )
 hcont(3) = plot( [ 0 1 ], [ 0 1 ] );
-text( .1*lf - 16, -18, '0', 'Hor', 'right' )
-text( .1*lf + 16, -18, [ num2str(flim) 'm/s' ], 'Hor', 'left' )
 h = flim / ( length( colormap ) - 1 );
-imagesc( .1*lf + [ -15 15 ], -18 + .2 * [ -1 1 ], 0:h:flim )
-caxis( flim * [ -1 1 ] )
+imagesc( 17 + [ -15 15 ], -18 + .2 * [ -1 1 ], 0:h:flim )
+plot( 17 + [ 15 15 -15 -15 15 ], -18 + .6 * [ 1 -1 -1 1 1 ] ) 
+text( 17 - 16, -18, '0', 'Hor', 'right' )
+text( 17 + 16, -18, [ num2str(flim) 'm/s' ], 'Hor', 'left' )
+plot( x1(j,k), x2(j,k), 'p' )
 plot( x1(:,1), x2(:,1) )
 plot( x1(1,:), x2(1,:) )
 plot( x1(:,end), x2(:,end) )
@@ -153,8 +157,8 @@ plot( x1(end,:), x2(end,:) )
 for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
-plot( x1(j,k), x2(j,k), 'p' )
 shading flat
+caxis( flim * [ -1 1 ] )
 axis equal
 axis( xlim )
 axis off
@@ -166,11 +170,12 @@ hsurf(5) = pcolor( x1, x2, x1 );
 hold on
 text( 2, -1, 'Slip Rate', 'Ver', 'top', 'Hor', 'left', 'FontWeight', 'bold' )
 hcont(4) = plot( [ 0 1 ], [ 0 1 ] );
-text( .1*lf - 16, -18, '0', 'Hor', 'right' )
-text( .1*lf + 16, -18, [ num2str(flim) 'm/s' ], 'Hor', 'left' )
 h = flim / ( length( colormap ) - 1 );
-imagesc( .1*lf + [ -15 15 ], -18 + .2 * [ -1 1 ], 0:h:flim )
-caxis( flim * [ -1 1 ] )
+imagesc( 17 + [ -15 15 ], -18 + .2 * [ -1 1 ], 0:h:flim )
+plot( 17 + [ 15 15 -15 -15 15 ], -18 + .6 * [ 1 -1 -1 1 1 ] ) 
+text( 17 - 16, -18, '0', 'Hor', 'right' )
+text( 17 + 16, -18, [ num2str(flim) 'm/s' ], 'Hor', 'left' )
+plot( x1(j,k), x2(j,k), 'p' )
 plot( x1(:,1), x2(:,1) )
 plot( x1(1,:), x2(1,:) )
 plot( x1(:,end), x2(:,end) )
@@ -178,8 +183,8 @@ plot( x1(end,:), x2(end,:) )
 for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
-plot( x1(j,k), x2(j,k), 'p' )
 shading flat
+caxis( flim * [ -1 1 ] )
 axis equal
 axis( xlim )
 axis off
