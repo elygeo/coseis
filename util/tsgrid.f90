@@ -3,7 +3,7 @@ program main
 use m_tscoords
 implicit none
 real :: r, dx, h, o1, o2, xx, yy, h1, h2, h3, h4, ell(3), x0, y0, z0, &
-  xf(6), yf(6), rf(6), zf, exag, mus, mud, tn, ts
+  xf(6), yf(6), rf(6), zf, exag, mus, mud, tn, ts, rho, vp, vs, dc
 integer :: n(3), nn, npml, nrect, i, j, k, l, j1, k1, l1, j2, k2, l2, jf0, kf0, lf0, &
   nf, nf1, nf2, nf3, reclen
 real, allocatable :: x(:,:,:,:), w(:,:,:,:), s1(:,:,:), s2(:,:,:), t(:,:)
@@ -13,6 +13,10 @@ character :: endian
 exag = 1.
 mus = 1.
 mud = .5
+rho = 3000.
+vp = 7250.
+vs = 4200.
+dc = .5
 open( 1, file='dx', status='old' )
 read( 1, * ) dx
 close( 1 )
@@ -76,10 +80,14 @@ l = nint( 5000. / dx )
 
 ! SORD input parameters
 open( 1, file='insord.m', status='replace' )
+write( 1, '(a)' ) '% SORD input'
 write( 1, * ) ' npml = ', npml, ';'
 write( 1, * ) ' dx = ', dx, ';'
 write( 1, * ) ' dt = ', dx * .00006, ';'
-write( 1, * ) ' n = [ ', n, ' ];'
+write( 1, * ) ' dc = ', dc, ';'
+write( 1, * ) ' rho = ', rho, ';'
+write( 1, * ) ' vs = ', vs, ';'
+write( 1, * ) ' %n = [ ', n, ' ];'
 write( 1, * ) ' nn = [ ', n + (/ 0, 1, 0 /), ' ];'
 write( 1, * ) ' ihypo = [ ', jf0+j,     kf0, -1-l, ' ];'
 write( 1, * ) ' ihypo = [ ', jf0-j+nf1, kf0, -1-l, ' ];'
@@ -89,24 +97,25 @@ close( 1 )
 
 ! Metadata for plotting with SDX
 open( 1, file='meta.m', status='replace' )
-write( 1, * ) 'dx          = ', dx, ';'
-write( 1, * ) 'dt          = ', dx * .00006, ';'
-write( 1, * ) 'nt          = 0;'
-write( 1, * ) 'nn          = [ ', n, ' ];'
-write( 1, * ) 'ihypo       = [ ', jf0+j,     kf0, n(3)-l, ' ];'
-write( 1, * ) 'ihypo       = [ ', jf0-j+nf1, kf0, n(3)-l, ' ];'
-write( 1, * ) 'upvector    = [ 0. 0. 1. ];'
-write( 1, * ) 'xcenter     = [', .5 * ell(1:2), -.5 * ell(3), '];'
-write( 1, * ) 'rmax        = ', .5 * sqrt( sum( ell * ell ) ), ';'
-write( 1, * ) 'grid        = ''read'';'
-write( 1, * ) 'endian      = ''', endian, ''';'
-write( 1, * ) 'faultnormal = 0;'
-write( 1, * ) 'dirfmt      = '''';'
-write( 1, * ) 'out{1}      = { 3 ''x''   0   1 1 1 ', n, '};'
-write( 1, * ) 'out{2}      = { 1 ''rho'' 0   1 1 1 ', n, '};'
-write( 1, * ) 'out{3}      = { 1 ''vp''  0   1 1 1 ', n, '};'
-write( 1, * ) 'out{4}      = { 1 ''vs''  0   1 1 1 ', n, '};'
-write( 1, * ) 'out{5}      = { 1 ''th''  0   1 1 1 ', n, '};'
+write( 1, '(a)' ) '% SORD metadata'
+write( 1, * ) ' dx          = ', dx, ';'
+write( 1, * ) ' dt          = ', dx * .00006, ';'
+write( 1, * ) ' nt          = 0;'
+write( 1, * ) ' nn          = [ ', n, ' ];'
+write( 1, * ) ' ihypo       = [ ', jf0+j,     kf0, n(3)-l, ' ];'
+write( 1, * ) ' ihypo       = [ ', jf0-j+nf1, kf0, n(3)-l, ' ];'
+write( 1, * ) ' upvector    = [ 0. 0. 1. ];'
+write( 1, * ) ' xcenter     = [', .5 * ell(1:2), -.5 * ell(3), '];'
+write( 1, * ) ' rmax        = ', .5 * sqrt( sum( ell * ell ) ), ';'
+write( 1, * ) ' grid        = ''read'';'
+write( 1, * ) ' endian      = ''', endian, ''';'
+write( 1, * ) ' faultnormal = 0;'
+write( 1, * ) ' dirfmt      = '''';'
+write( 1, * ) ' out{1}      = { 3 ''x''    0   1 1 1 0 ', n, ' 0 };'
+write( 1, * ) ' out{2}      = { 1 ''rho''  0   1 1 1 0 ', n, ' 0 };'
+write( 1, * ) ' out{3}      = { 1 ''vp''   0   1 1 1 0 ', n, ' 0 };'
+write( 1, * ) ' out{4}      = { 1 ''vs''   0   1 1 1 0 ', n, ' 0 };'
+write( 1, * ) ' out{5}      = { 1 ''ts1''  0   1 1 1 0 ', n, ' 0 };'
 close( 1 )
 
 ! Interpolate fault
@@ -323,6 +332,8 @@ print *, 'after scaling:'
 print *, 'ts: ', ts, minval(s1), maxval(s1), sum(s1)/size(s1)
 print *, 'tn: ', tn, maxval(s2), minval(s2), sum(s2)/size(s2)
 print *, 'dt: ', abs(ts) - mud*abs(tn)
+print *, 'S:  ', ( tn * mus - ts ) / ( ts - tn * mud )
+print *, 'rcrit: ', rho * vs ** 2. * tn * ( mus - mud ) * dc / ( ts - tn * mud ) ** 2
 
 ! Write tractions
 inquire( iolength=reclen ) s1
