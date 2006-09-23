@@ -26,31 +26,31 @@ cat << END > llscript
 #RT_GRQ=ON;\\
 #SPINLOOPTIME=0;\\
 #YIELDLOOPTIME=0;
-#@ class = normal
+#@ job_name = sord-$count
+#@ initialdir = $rundir
 #@ node = $nodes
 #@ tasks_per_node = $ppn
 #@ wall_clock_limit = $walltime
-#@ node_usage = not_shared
-#@ network.MPI = sn_all, shared, US
-#@ job_type = parallel
-#@ job_name = sord-$count
-#@ output = out.$(jobid)
-#@ error = err.$(jobid) 
 #@ notification = always
 #@ notify_user = $LOGNAME
-#@ initialdir = $rundir
+#@ job_type = parallel
+#@ class = normal
+#@ node_usage = not_shared
+#@ network.MPI = sn_all, shared, US
+#@ output = out.\$(jobid)
+#@ error = err.\$(jobid) 
 #@ queue
 cd "$rundir"
 
-#echo "$(date): Start SCECVM run" >> log
+#echo "\$(date): Start SCECVM run" >> log
 #cd vm
 #poe ./scecvm4-$mode
 #mv rho vp vs "$rundir/data"
 #cd "$rundir"
 
-echo "$(date): Start SORD run" >> log
+echo "\$(date): Start SORD run" >> log
 poe ./sord-$mode
-echo "$(date): Finished!" >> log
+echo "\$(date): Finished!" >> log
 END
 chmod u+x llscript
 fi

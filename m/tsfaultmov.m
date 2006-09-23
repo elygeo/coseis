@@ -8,7 +8,7 @@ dit = out{iz}{3};
 i1 = [ out{iz}{4:7}  ];
 i2 = [ out{iz}{8:11} ];
 i1 = [ out{iz}{4:6}  0 ];
-i2 = [ out{iz}{8:10} 0 ];
+i2 = [ out{iz}{8:10} 200 ];
 format compact
 clf
 colorscheme

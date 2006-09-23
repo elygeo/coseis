@@ -15,7 +15,7 @@
   mud = .5;
   mus = 1000.;
   dc = .5;
-  rcrit = 6000.;
+  rcrit = 3000.;
   vrup = 2300.;
   timeseries = { 'v'  82188. 188340. 129. }; % Bakersfield
   timeseries = { 'v'  99691.  67008.  21. }; % Santa Barbara
@@ -34,16 +34,20 @@
   timeseries = { 'v' 581530. 224874.  40. }; % Yuma
   itcheck = 100;
 
-  tn = -25e6;
-  mud = .4;
+  rcrit = 6000;
+  tn = -22.22222e6;
+  mud = .45;
+
+  tn = -20.83333e6;
+  mud = .48;
 
 % 1000m
   dx = 1000.;
   dt = .06;
   trelax = .6;
   nt = 3000;
-  np = [ 8 4 1 ] % Babiaca
   np = [ 2 1 1 ] % Wide
+  np = [ 8 4 1 ] % Babiaca
   nn = [ 601 302 81 ];
   ihypo = [ 273 200 -6 ];
   ihypo = [ 454 200 -6 ];
@@ -57,8 +61,11 @@
   out = { 'psv'  10   264 0 -17    0   463 0 -1 1500 };
   out = { 'trup'  1   264 0 -17 1500   463 0 -1 1500 };
   out = { 'x'     1    1  1  -1    0   -1 -1 -1    0 };
-  out = { 'vm'   10    1  1  -1    0   -1 -1 -1   -1 };
+% out = { 'vm'   10    1  1  -1    0   -1 -1 -1   -1 };
   out = { 'pv'    1    1  1  -1   -1   -1 -1 -1   -1 };
+
+nt = 1000;
+
 return
 
 % 2000m
@@ -67,7 +74,7 @@ return
   dt = .12;
   trelax = 1.2;
   nt = 1500;
-  nt = 500;
+  nt = 200;
   np = [ 2 1 1 ] % Wide
   nn = [ 301 152 41 ];
   ihypo = [ 138 101 -4 ];

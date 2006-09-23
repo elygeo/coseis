@@ -20,38 +20,34 @@ fi
 elif [ "$mode" = p ]; then
 cat << END > pbsscript-vm
 #!/bin/bash
-#PBS -q dque
-#PBS -N sord-$count
-#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -N sord-vm-$count
 #PBS -l walltime=$walltime
-#PBS -o out.$PBS_JOBID
-#PBS -e err.$PBS_JOBID
+#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -q dque
 #PBS -V
 cd "$rundir"
-echo "$PBS_JOBID" >> log
-echo "$(date): Start SCECVM run" >> log
+echo "\$PBS_JOBID" >> log
+echo "\$(date): Start SCECVM run" >> log
 cd vm
 time mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-$mode
 mv rho vp vs "$rundir/data"
 cd "$rundir"
-echo "$(date): Start SORD run" >> log
+echo "\$(date): Start SORD run" >> log
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
-echo "$(date): Finished!" >> log
+echo "\$(date): Finished!" >> log
 END
 cat << END > pbsscript
 #!/bin/bash
-#PBS -q dque
 #PBS -N sord-$count
-#PBS -l nodes=$nodes:ppn=$ppn
 #PBS -l walltime=$walltime
-#PBS -o out.$PBS_JOBID
-#PBS -e err.$PBS_JOBID
+#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -q dque
 #PBS -V
 cd "$rundir"
-echo "$PBS_JOBID" >> log
-echo "$(date): Start SORD run" >> log
+echo "\$PBS_JOBID" >> log
+echo "\$(date): Start SORD run" >> log
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
-echo "$(date): Finished!" >> log
+echo "\$(date): Finished!" >> log
 END
 chmod u+x pbsscript-vm pbsscript
 fi

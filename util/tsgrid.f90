@@ -12,7 +12,8 @@ character :: endian
 ! Model parameters
 exag = 1.
 mus = 1.
-mud = .5
+mud = .5;  tn = -20e6
+mud = .45; tn = -22.22222e6
 rho = 3000.
 vp = 7250.
 vs = 4200.
@@ -274,6 +275,8 @@ close( 9 )
 ! Fault prestress
 print *, 'mus: ', mus
 print *, 'mud: ', mud
+print *, 'tn: ', tn
+print *, 'dc: ', dc
 deallocate( t, x, s1, w )
 allocate( t(1991,161), s1(n(1),1,n(3)), s2(n(1),1,n(3)) )
 i = nint( dx / 100. )
@@ -286,14 +289,13 @@ lf0 = n(3) - nf3
 l1 = lf0
 l2 = lf0 + nf3
 
-print *, 'before scaling:'
 inquire( iolength=reclen ) t
-
 open( 1, file='ts1.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
-ts = t(91,51)
-print *, 'ts: ', ts, minval(t), maxval(t), sum(t)/size(t)
+
+t = t + 10e6
+
 s1 = 0.
 do l = l1, l2
 do j = j1, j2
@@ -303,46 +305,34 @@ do j = j1, j2
 end do
 end do
 
-open( 1, file='tn.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
-read( 1, rec=1 ) t
-close( 1 )
-tn = t(91,51)
-where( t > tn ) t = tn
-print *, 'tn: ', tn, maxval(t), minval(t), sum(t)/size(t)
-s2 = -maxval( abs( t ) )
-do l = l1, l2
-do j = j1, j2
-  k1 = i * (j2-j) + 1
-  k2 = i * (l2-l) + 1
-  s2(j,1,l) = t(k1,k2)
-end do
-end do
-
-! Scale tractions
-print *, 'dt: ', ts
-ts = ts + 10e6
-s1 = s1 + 10e6
-tn = tn - 10e6
-s2 = s2 - 10e6
-!ts = ts - mud * tn
-!s1 = s1 - mud * s2
-!tn = tn / ( mus - mud )
-!s2 = s2 / ( mus - mud )
-print *, 'after scaling:'
-print *, 'ts: ', ts, minval(s1), maxval(s1), sum(s1)/size(s1)
-print *, 'tn: ', tn, maxval(s2), minval(s2), sum(s2)/size(s2)
-print *, 'dt: ', abs(ts) - mud*abs(tn)
-print *, 'S:  ', ( tn * mus - ts ) / ( ts - tn * mud )
-print *, 'rcrit: ', rho * vs ** 2. * tn * ( mus - mud ) * dc / ( ts - tn * mud ) ** 2
-
 ! Write tractions
 inquire( iolength=reclen ) s1
 open( 1, file='ts1', recl=reclen, form='unformatted', access='direct', status='replace' )
-open( 2, file='tn',  recl=reclen, form='unformatted', access='direct', status='replace' )
 write( 1, rec=1 ) s1
-write( 2, rec=1 ) s2
 close( 1 )
-close( 2 )
+
+tn = abs( tn )
+ts = sum( t ) / size( t )
+print *, 'Average'
+print *, 'ts: ', ts
+print *, 'dt: ', abs( ts ) - mud * abs( tn )
+print *, 'S:  ', ( tn * mus - ts ) / ( ts - tn * mud )
+print *, 'rcrit: ', rho * vs ** 2. * tn * ( mus - mud ) * dc / ( ts - tn * mud ) ** 2
+
+!ts = t(91,51)
+ts = sum( t(21:1971,21:141) ) / size( t(21:1971,21:141) )
+print *, 'Interior average'
+print *, 'ts: ', ts
+print *, 'dt: ', abs( ts ) - mud * abs( tn )
+print *, 'S:  ', ( tn * mus - ts ) / ( ts - tn * mud )
+print *, 'rcrit: ', rho * vs ** 2. * tn * ( mus - mud ) * dc / ( ts - tn * mud ) ** 2
+
+ts = maxval( t )
+print *, 'Max'
+print *, 'ts: ', ts
+print *, 'dt: ', abs( ts ) - mud * abs( tn )
+print *, 'S:  ', ( tn * mus - ts ) / ( ts - tn * mud )
+print *, 'rcrit: ', rho * vs ** 2. * tn * ( mus - mud ) * dc / ( ts - tn * mud ) ** 2
 
 end program
 
