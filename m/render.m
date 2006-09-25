@@ -55,7 +55,7 @@ set( 0, 'CurrentFigure', hfig );
 kids = get( haxes, 'Children' );
 delete( [ kids{1}; kids{2}; hhud' ] );
 hhud = [];
-colorscale
+setcolor
 set( hmsg,    'String', '' )
 set( htxt(3), 'String', labels( icomp + 2 ) )
 set( htxt(4), 'String', sprintf( '%.3fs', t ) )

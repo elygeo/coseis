@@ -31,12 +31,10 @@ END
 else
 cat << END > pbsscript-vm
 #!/bin/bash
-#PBS -q workq
-#PBS -N sord-$count
-#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -N sord-vm-$count
 #PBS -l walltime=$walltime
-#PBS -o out.\$PBS_JOBID
-#PBS -e err.\$PBS_JOBID
+#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -q workq
 #PBS -V
 sleep 2
 cd "$rundir"
@@ -52,12 +50,10 @@ echo "\$(date): Finished!" >> log
 END
 cat << END > pbsscript
 #!/bin/bash
-#PBS -q workq
 #PBS -N sord-$count
 #PBS -l nodes=$nodes:ppn=$ppn
 #PBS -l walltime=$walltime
-#PBS -o out.\$PBS_JOBID
-#PBS -e err.\$PBS_JOBID
+#PBS -q workq
 #PBS -V
 sleep 2
 cd "$rundir"

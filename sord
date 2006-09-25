@@ -88,7 +88,7 @@ case $machine in
   wide)                   maxcpus=2; maxram=1800 ;;
   phim)                              maxram=2800;  rate=200 ;;
   altai)                  maxcpus=8; maxram=30000; rate=90  ;; 
-  babieca)  maxnodes=36;  maxcpus=2; maxram=800;   rate=120 ;;
+  babieca)  maxnodes=36;  maxcpus=2; maxram=800;   rate=80 ;;
   teragrid) maxnodes=252; maxcpus=2; maxram=3000;  rate=500; maxmm=1080 ;;
   datastar) maxnodes=265; maxcpus=8; maxram=13500; maxmm=1080 ;;          
 esac

@@ -18,6 +18,7 @@ else
 end
 
 set( gcf, ...
+  'InvertHardcopy', 'off', ...
   'Color', bg, ...
   'DefaultAxesColor', 'none', ...
   'DefaultAxesColorOrder', fg, ...
@@ -52,7 +53,7 @@ case 'signed'
   end
   h = 2 / ( size( cmap, 1 ) - 1 );
   x1 = -1 : h : 1;
-  x2 = -1 : .0005 : 1;
+  x2 = -1 : .001 : 1;
   x2 = sign( x2 ) .* abs( x2 ) .^ colorexp;
 case 'folded'
   clim = [ -1 1 ];

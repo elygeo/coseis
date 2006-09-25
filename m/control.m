@@ -38,13 +38,13 @@ case 'f'
   field = fields{i};
   list{i}([1 end]) = '[]';
   msg = [ 'Field: ' list{:} ];
-case '0', icomp = 0; colorscale
-case '1', icomp = 1; colorscale
-case '2', icomp = 2; colorscale
-case '3', icomp = 3; colorscale
-case '4', icomp = 4; colorscale
-case '5', icomp = 5; colorscale
-case '6', icomp = 6; colorscale
+case '0', icomp = 0; setcolor
+case '1', icomp = 1; setcolor
+case '2', icomp = 2; setcolor
+case '3', icomp = 3; setcolor
+case '4', icomp = 4; setcolor
+case '5', icomp = 5; setcolor
+case '6', icomp = 6; setcolor
 case 'j', islice = 1; msg = 'j slice';
 case 'k', islice = 2; msg = 'k slice';
 case 'l', islice = 3; msg = 'l slice';
