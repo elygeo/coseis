@@ -42,8 +42,8 @@ isofrac = .5;
 lim = -1;
 flim = 0;
 renderer = 'OpenGL';
-renderer = 'painters';
 renderer = 'zbuffer';
+renderer = 'painters';
 export = 0;
 ifn = abs( faultnormal );
 
@@ -73,7 +73,6 @@ set( hfig, ...
   'DefaultLineClipping', 'off', ...
   'DefaultTextFontName', 'Helvetica', ...
   'DefaultTextFontSize', 12 )
-darkfig
 
 haxes(1) = axes;
 haxes(2) = axes;
@@ -83,9 +82,9 @@ haxes(5) = axes;
 resizefcn
 
 set( hfig, 'CurrentAxes', haxes(4) )
-hleg(4) = imshow( 'sio.png' );
+hleg(5) = imshow( 'sio.png' );
 set( hfig, 'CurrentAxes', haxes(5) )
-hleg(5) = imshow( 'igpp.png' );
+hleg(6) = imshow( 'igpp.png' );
 
 set( hfig, 'CurrentAxes', haxes(3) )
 axis( [ 0 1 0 30 ] );
@@ -96,11 +95,9 @@ hleg(1) = surf( [ 0 1 ], [ 0 30 ], [ 0 0; 0 0 ], ...
   'FaceLighting', 'none', ...
   'EdgeLighting', 'none' );
 hleg(2) = plot( [ 0 1 ], [ 30 30 ], 'Color', .25 * [ 1 1 1 ] );
-h = 1 / ( length( colormap ) - 1 );
-hleg(3) = imagesc( [ .2 .8 ], [ 21 23 ], 0:h:1 );
-htxt(1) = text( .3, 22, '', 'Ver', 'middle', 'Hor', 'right' );
-htxt(2) = text( .7, 22, '', 'Ver', 'middle', 'Hor', 'left' );
-htxt(3) = text( .1, 22, '', 'Ver', 'middle', 'Hor', 'left' );
+[ h, htxt ] = colorscale( '', [ .3 .7 ], [ 12 18 ] );
+hleg(3:4) = h;
+htxt(3) = text( .04, 15, '', 'Ver', 'middle', 'Hor', 'left' );
 
 set( hfig, 'CurrentAxes', haxes(2) )
 axis( [ 0 1 0 1 ] );

@@ -12,22 +12,23 @@ img1 = imread( 'tmp.tif' );
 delete tmp.tif
 
 pos = get( gcf, 'Position' );
-r1 * pos([4 3])
-size( img1 )
-
-n1 = min( [ r1 * pos([4 3]) 3 ], size( img1 ) );
-n2 = [ r1 / r2 * pos([4 3]) 3 ];
+n1 = r1 * pos([4 3]);
+n2 = r1 / r2 * pos([4 3]);
+o1 = round( .5 * ( size( img1, 1 ) - n1(1) ) );
+o2 = round( .5 * ( size( img1, 2 ) - n1(2) ) );
+if o1 < 0 || o2 < 0, error, end
 
 if r2 ~= 1
-  %img1 = imresize( img1, n2(1:2), 'bilinear' );
-  img2 = repmat( single(1), n2 );
-  for j = 1:r2
-  for k = 1:r2
-    img2 = img2 + single( img1(j:r2:n1(1),k:r2:n1(2),:) );
-  end
-  end
-  img1 = uint8( 1 / r2 / r2 * img2 );
-  clear img2
+  img1 = img1(o1+1:o1+n1(1),o2+1:o2+n1(2),:);
+  img1 = imresize( img1, n2(1:2), 'bicubic' );
+  %img2 = repmat( single(1), n2 );
+  %for j = 1:r2
+  %for k = 1:r2
+  %  img2 = img2 + single( img1(o1+j:r2:o1+n1(1),o2+k:r2:o2+n1(2),:) );
+  %end
+  %end
+  %img1 = uint8( 1 / r2 / r2 * img2 );
+  %clear img2
 end
 
 if nargout == 0

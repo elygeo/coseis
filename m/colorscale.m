@@ -1,5 +1,5 @@
 % Scale bar
-function h = colorscale( varargin )
+function [ h1, h2 ] = colorscale( varargin )
 
 % arguments
 units = '';
@@ -21,17 +21,16 @@ if folded, clim(1) = 0; end
 hold on
 dx = .5 * ( x(2) - x(1) ) / ( length( cmap ) - 1 );
 dy = ( y(2) - y(1) ) / 3;
-h(1) = imagesc( x + dx * [ 1 -1 ], y(1) + dy * [ 1 2 ], clim(1):dc:clim(2) );
-h(2) = plot( x([1 1 2 2 1]), y([1 2 2 1 1]), 'Color', fg );
-set( h, 'Clipping', 'off' )
+h1(1) = imagesc( x + dx * [ 1 -1 ], y(1) + dy * [ 1 2 ], clim(1):dc:clim(2) );
+h1(2) = plot( x([1 1 2 2 1]), y([1 2 2 1 1]), 'Color', fg );
+set( h1, 'Clipping', 'off', 'HitTest', 'off' )
+if nargout < 1, clear h1, end
 
 % text
 dx = x(2) - x(1);
 dy = y(2) - y(1);
-h(1) = text( x(1) - .02 * dx, y(1) + .5 * dy, num2str(clim(1)), 'Hor', 'right' );
-h(2) = text( x(2) + .02 * dx, y(1) + .5 * dy, [ num2str(clim(2)) units ], 'Hor', 'left' );
-set( h, 'Ver', 'middle', 'Clipping', 'off' )
-if nargout == 0, clear h, end
-
-
+h2(1) = text( x(1) - .02 * dx, y(1) + .5 * dy, num2str(clim(1)), 'Hor', 'right' );
+h2(2) = text( x(2) + .02 * dx, y(1) + .5 * dy, [ num2str(clim(2)) units ], 'Hor', 'left' );
+set( h2, 'Ver', 'middle', 'Clipping', 'off', 'HitTest', 'off' )
+if nargout < 2, clear h2, end
 

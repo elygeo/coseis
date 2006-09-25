@@ -18,6 +18,6 @@ imagesc( fliplr( ts' ), [ -20 20 ] )
 hold on
 plot( [ xf; xf ], zf, ':' )
 axis image
-colorbar( 'SouthOutside' )
+colorscale
 drawnow
 
