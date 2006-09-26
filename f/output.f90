@@ -38,6 +38,7 @@ if ( onpass == 0 ) then
   i1out(iz,4) = 0
   i2out(iz,4) = 0
 end if
+i2out(iz,4) = min( i2out(iz,4), nt )
 if ( fault .and. faultnormal == 0 ) ditout(iz) = nt + 1
 
 ! Spacial indices

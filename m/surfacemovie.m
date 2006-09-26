@@ -136,6 +136,22 @@ for it = t
   set( hsurf, 'CData', s )
   set( htime, 'String', sprintf( 'Time = %.1fs', it * dt ) )
   %drawnow
-  %snap( sprintf( 'tmp/frame%04d.png', it ) )
+  %img = snap( sprintf( 'tmp/frame%04d.png', it ) )
 end
+
+return
+
+img = single( img );
+w = rgb2gray( img ) ./ 255;
+w = .5 * ( 1 - w ) .^ 2;
+for i = 1:3
+  img(:,:,i) = img(:,:,i) + w .* basemap(:,:,i);
+end 
+img = uint8( img );
+img = [ img; leg ];
+img([1 end],:,:) = 32;
+img(:,[1 end],:) = 32;
+clf
+imshow( img );
+imwrite( img, sprintf( 'tmp/frame%04d.png', it ) )
 
