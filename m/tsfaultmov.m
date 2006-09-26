@@ -2,7 +2,7 @@
 
 clear all
 flim = 4;
-iz = 21;
+iz = 3;
 meta
 dit = out{iz}{3};
 i1 = [ out{iz}{4:6}  0 ];

@@ -56,14 +56,18 @@ axes( 'Position', [ 0 0 1 1 ] )
 sites = {
    82188 188340 129 'bottom' 'right' 'Bakersfield'
    99691  67008  21 'bottom' 'right' 'Santa Barbara'
+  152641  77599  16 'bottom' 'right' 'Oxnard'
   191871 180946 714 'bottom' 'right' 'Lancaster'
   229657 119310 107 'bottom' 'right' 'Los Angeles'
+  253599  98027   7 'bottom' 'left'  'Long Beach'
   256108 263112 648 'bottom' 'right' 'Barstow'
   263052 216515 831 'bottom' 'right' 'Victorville'
-  286666 111230  15 'bottom' 'left'  'Irvine'
+  278097 115102  36 'top'    'left'  'Santa Ana'
   293537 180173 327 'top'    'left'  'San Bernardino'
   296996 160683 261 'top'    'left'  'Riverside'
+  351928  97135  18 'bottom' 'left'  'Oceanside'
   366020 200821 140 'top'    'left'  'Palm Springs'
+  403002 210421 -18 'top'    'left'  'Coachella'
   402013  69548  23 'bottom' 'left'  'San Diego'
   501570  31135  24 'bottom' 'left'  'Ensenada'
   526989 167029   1 'top'    'left'  'Mexicali'
@@ -85,6 +89,7 @@ end
 [ x, y, z ] = textread( 'fault.xyz',   '%n%n%n%*[^\n]' ); plot3( x, y, z, '--', 'LineW', 3 )
 [ x, y, z ] = textread( 'coast.xyz',   '%n%n%n%*[^\n]' ); plot3( x, y, z )
 [ x, y, z ] = textread( 'borders.xyz', '%n%n%n%*[^\n]' ); plot3( x, y, z )
+text( 595000, 5000, 1000, 'GPE', 'Hor', 'right', 'Ver', 'bottom', 'FontSize', 8 )
 view( 0, 90 )
 axis equal
 axis( 1000 * [ 0 600 0 300 -80 10 ] )
