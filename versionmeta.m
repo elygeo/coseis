@@ -1,4 +1,4 @@
-version = '20060925-001859';
+version = '20060925-203818';
 login   = 'gely';
 name    = 'Geoffrey Ely';
 host    = 'wide';

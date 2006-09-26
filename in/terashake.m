@@ -35,7 +35,7 @@
   itcheck = 100;
 
 % 2000m
-  datadir = 'ts/2000';
+  datadir = 'ts/2000/data';
   dx = 2000.;
   dt = .12;
   trelax = 1.2;
@@ -56,6 +56,7 @@
   out = { 'x'     1     1 1 -1    0   -1 -1 -1    0 };
   out = { 'vm'   10     1 1 -1    0   -1 -1 -1   -1 };
   out = { 'pv'    1     1 1 -1   -1   -1 -1 -1   -1 };
+nt = 0;
 return
 
 % 500m
@@ -107,7 +108,7 @@ return
 return
 
 % 4000m
-  datadir = 'ts/4000';
+  datadir = 'ts/4000/data';
   dx = 4000.;
   dt = .24;
   trelax = 2.4;

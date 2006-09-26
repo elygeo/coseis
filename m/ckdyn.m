@@ -21,7 +21,7 @@ for i = 2:5
   plot( xf(i) * [ 1 1 ], [ 0 16 ] )
 end
 
-colorscale( 'MPa', [ 80 120 ], [ 20 22 ] )
+colorscale( '\Tau_s: ', 'MPa', [ 80 120 ], [ 20 22 ] )
 axis image
 axis off
 drawnow

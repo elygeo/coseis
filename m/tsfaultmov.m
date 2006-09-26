@@ -50,11 +50,10 @@ jf = round( rf(2:end-1) / dx ) + 1;
 panes = [ 140 140 140 140 160 ];
 
 % normal traction pane
-flim = 50;
+flim = 46;
 axes( 'Units', 'pixels', 'Position', [ 30 565 1220 135 ] );
 hsurf = pcolor( x1, x2, x1 );
 hold on
-text( 2, -1, 'Normal Traction', 'Ver', 'top', 'Hor', 'left', 'FontWeight', 'bold' )
 plot( x1(j,k), x2(j,k), 'p' )
 plot( x1(:,1), x2(:,1) )
 plot( x1(1,:), x2(1,:) )
@@ -64,7 +63,7 @@ for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
 caxis( flim * [ -1 1 ] )
-colorscale( 'MPa', 17 + 15 * [ -1 1 ], -18 + .6 * [ -1 1 ] )
+colorscale( '\Tau_n: ', 'MPa', 17 + 15 * [ -1 1 ], -18 + .6 * [ -1 1 ] )
 shading flat
 axis equal
 axis( xlim )
@@ -82,11 +81,10 @@ text( 177,   2.5, 'Salton Sea' )
 text(  lf,   2.5, 'SE', 'Hor', 'right' )
 
 % shear traction pane
-flim = 25;
+flim = 23;
 axes( 'Units', 'pixels', 'Position', [ 30 430 1220 135 ] );
 hsurf(2) = pcolor( x1, x2, x1 );
 hold on
-text( 2, -1, 'Shear Traction', 'Ver', 'top', 'Hor', 'left', 'FontWeight', 'bold' )
 hcont = plot( [ 0 1 ], [ 0 1 ] );
 plot( x1(j,k), x2(j,k), 'p' )
 plot( x1(:,1), x2(:,1) )
@@ -97,7 +95,7 @@ for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
 caxis( flim * [ -1 1 ] )
-colorscale( 'MPa', 17 + 15 * [ -1 1 ], -18 + .6 * [ -1 1 ] )
+colorscale( '\Tau_s: ', 'MPa', 17 + 15 * [ -1 1 ], -18 + .6 * [ -1 1 ] )
 shading flat
 axis equal
 axis( xlim )
@@ -130,7 +128,6 @@ flim = 6;
 axes( 'Units', 'pixels', 'Position', [ 30 160 1220 135 ] );
 hsurf(4) = pcolor( x1, x2, x1 );
 hold on
-text( 2, -1, 'Peak Slip Rate', 'Ver', 'top', 'Hor', 'left', 'FontWeight', 'bold' )
 hcont(3) = plot( [ 0 1 ], [ 0 1 ] );
 plot( x1(j,k), x2(j,k), 'p' )
 plot( x1(:,1), x2(:,1) )
@@ -141,13 +138,13 @@ for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
 caxis( flim * [ -1 1 ] )
-colorscale( 'm/s', 17 + 15 * [ -1 1 ], -18 + .6 * [ -1 1 ] )
+colorscale( 'Peak \dot s: ', 'm/s', 17 + 15 * [ -1 1 ], -18 + .6 * [ -1 1 ] )
 shading flat
 axis equal
 axis( xlim )
 axis off
 
-% peak slip rate pane
+% slip rate pane
 flim = 6;
 axes( 'Units', 'pixels', 'Position', [ 30 25 1220 135 ] );
 hsurf(5) = pcolor( x1, x2, x1 );
@@ -163,7 +160,7 @@ for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
 caxis( flim * [ -1 1 ] )
-colorscale( 'm/s', 17 + 15 * [ -1 1 ], -18 + .6 * [ -1 1 ] )
+colorscale( '\dot s: ', 'm/s', 17 + 15 * [ -1 1 ], -18 + .6 * [ -1 1 ] )
 shading flat
 axis equal
 axis( xlim )

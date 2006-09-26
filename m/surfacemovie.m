@@ -6,8 +6,7 @@ field = 'vm';
 t = 100:100:5000;
 t = 3000:100:5000;
 t = 5000;
-foldcs = 1;
-colorexp = 1;
+t = 0;
 flim = 1;
 cellfocus = 0;
 hardcopy = 1;
@@ -16,49 +15,44 @@ clf
 colorscheme
 pos = get( gcf, 'Position' );
 set( gcf, ...
-  'Name', 'TS Map', ...
-  'NumberTitle', 'off', ...
-  'Position', [ pos(1:2) 1280 720 ], ...
-  'DefaultLineLineWidth', 1, ...
+  'DefaultLineMarkerFaceColor', 'w', ...
+  'DefaultLineMarkerEdgeColor', [ .2 .2 .2 ], ...
   'DefaultLineClipping', 'on', ...
   'DefaultTextClipping', 'on', ...
-  'DefaultTextFontName', 'Helvetica', ...
-  'DefaultTextFontSize', 16, ...
-  'DefaultTextHorizontalAlignment', 'center', ...
-  'DefaultTextVerticalAlignment', 'top' )
-colorscheme
-
-if hardcopy
+  'DefaultTextFontSize', 14, ...
+  'DefaultTextHorizontalAlignment', 'left', ...
+  'DefaultTextVerticalAlignment', 'middle' )
 
 % Legend
 cwd = pwd;
 srcdir
 cd data
-axes( 'Units', 'Pixels', 'Position', [ 0 0 1280 80 ] )
-plot( [ 0 600 ], [ 37.5 37.5 ], 'Clipping', 'off' )
+%set( gcf, 'Position', [ pos(1:2) 1280 80 ] )
+axes( 'Position', [ 0 0 1 1 ] )
+htime = text( 15, 20, 'Time = 0s' );
+hold on
+plot( 150 + [ -50 -50 nan -50 50 nan 50 50 ], 20 + [ -2 2 nan 0 0 nan -2 2 ] )
+text( 150, 20, '100km', 'Hor', 'center', 'Background', 'k' );
+caxis( flim * [ -1 1 ] )
+colorscale( '|V|: ', 'm/s', 325 + [ -50 50 ], [ 18 22 ] )
+igpp = imread( 'igpp.png' );
+sio  = imread( 'sio.png'  );
+sdsu = imread( 'sdsu.png' );
+image( 460 - [ 19   4 ], [ 25 15 ], igpp )
+image( 513 - [ 14   4 ], [ 25 15 ], sio  )
+image( 560 - [ 10.2 4 ], [ 25 15 ], sdsu )
+text( 460, 20, 'IGPP' )
+text( 513, 20, 'SIO'  )
+text( 560, 20, 'SDSU' )
 axis( [ 0 600 0 37.5 ] )
 axis off
-hold on
-plot( 140 + [ -50 -50 nan -50 50 nan 50 50 ], 26 + [ -1 1 nan 0 0 nan -1 1 ], 'w', 'LineWidth', 2 )
-text( 140, 22, '100km' );
-text( 240, 22, '0' );
-text( 320, 22, '|V|' );
-text( 400, 22, [ num2str( flim ) 'm/s' ] );
-imagesc( 320 + [ -80 80 ] , 26 + [ -.33 .33 ], 0:.001:1 )
-caxis( [ -1 1 ] )
-sio = imread( 'sio.png' );
-igpp = imread( 'igpp.png' );
-sdsu = imread( 'sdsu.png' );
-image( 460 - [ 14   4 ], [ 25 15 ], sio )
-image( 512 - [ 19   4 ], [ 25 15 ], igpp )
-image( 560 - [ 10.2 4 ], [ 25 15 ], sdsu )
-text( 460, 22, 'SIO',  'Hor', 'left' )
-text( 512, 22, 'IGPP', 'Hor', 'left' )
-text( 560, 22, 'SDSU', 'Hor', 'left' )
-htime = text( 15, 22, 'Time = 0s', 'Hor', 'left' );
+%leg = snap;
+%imshow( leg )
+delete( gca )
 
 % Map
-axes( 'Units', 'Pixels', 'Position', [ 0 80 1280 640 ] )
+set( gcf, 'Position', [ pos(1:2) 1280 640 ] )
+axes( 'Position', [ 0 0 1 1 ] )
 sites = {
    82188 188340 129 'bottom' 'right' 'Bakersfield'
    99691  67008  21 'bottom' 'right' 'Santa Barbara'
@@ -86,7 +80,7 @@ hold on
 for i = 1:length(x)
   dy = 2000;
   if strcmp( ver{i}, 'top' ), dy = -3000; end
-  text( x(i), y(i)+dy, z(i)+1000, txt{i}, 'Ver', ver{i}, 'Hor', hor{i}, 'Color', fg );
+  text( x(i), y(i)+dy, z(i)+1000, txt{i}, 'Ver', ver{i}, 'Hor', hor{i} );
 end
 [ x, y, z ] = textread( 'fault.xyz',   '%n%n%n%*[^\n]' ); plot3( x, y, z, '--', 'LineW', 3 )
 [ x, y, z ] = textread( 'coast.xyz',   '%n%n%n%*[^\n]' ); plot3( x, y, z )
@@ -103,20 +97,31 @@ i1 = [  1  1 -1 ];
 i2 = [ -1 -1 -1 ];
 [ msg, x ] = read4d( 'x', [ i1 0 ], [ i2 0 ] );
 if msg, error( msg ), end
-hsurf = surf( x(:,:,:,1), x(:,:,:,2), x(:,:,:,3)-1000 );
-set( hsurf, ...
+h = surf( x(:,:,:,1), x(:,:,:,2), x(:,:,:,3)-1000 );
+set( h, ...
+  'FaceColor', [ .2 .2 .2 ], ...
   'EdgeColor', 'none', ...
-  'AmbientStrength',  1, ...
-  'DiffuseStrength',  1, ...
+  'AmbientStrength',  .1, ...
+  'DiffuseStrength',  .1, ...
   'SpecularColorReflectance', 1, ...
-  'SpecularStrength', .3, ...
-  'SpecularExponent', .5, ...
+  'SpecularStrength', .25, ...
+  'SpecularExponent', 1, ...
   'EdgeLighting', 'none', ...
   'FaceLighting', 'phong' );
-caxis( 4000 * [ -1 1 ] )
-hlit = light( 'Position', [ -300000 150000 0000 ] );
+light( 'Position', [ -300000 150000 100000 ] );
+%map = snap;
+drawnow
+clf
+
+return
 
 % Data
+axes( 'Position', [ 0 0 1 1 ] )
+hsurf = surf( x(:,:,:,1), x(:,:,:,2), x(:,:,:,3) );
+view( 0, 90 )
+axis equal
+axis( 1000 * [ 0 600 0 300 -80 10 ] )
+axis off
 caxis( flim * [ -1 1 ] )
 for it = t
   it

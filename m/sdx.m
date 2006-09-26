@@ -95,7 +95,7 @@ hleg(1) = surf( [ 0 1 ], [ 0 30 ], [ 0 0; 0 0 ], ...
   'FaceLighting', 'none', ...
   'EdgeLighting', 'none' );
 hleg(2) = plot( [ 0 1 ], [ 30 30 ], 'Color', .25 * [ 1 1 1 ] );
-[ h, htxt ] = colorscale( '', [ .3 .7 ], [ 12 18 ] );
+[ h, htxt ] = colorscale( '', '', [ .3 .7 ], [ 12 18 ] );
 hleg(3:4) = h;
 htxt(3) = text( .04, 15, '', 'Ver', 'middle', 'Hor', 'left' );
 

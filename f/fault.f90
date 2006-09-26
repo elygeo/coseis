@@ -103,8 +103,12 @@ case( 'c' )
 end select
 end do
 
-! Sanity check
-if ( any( t3(:,:,:,1) > 0.) ) write( 0, * ) 'warning: positive normal traction'
+! Normal traction check
+i1 = maxloc( t3(:,:,:,3) )
+rr = t3(i1(1),i1(2),i1(3),3)
+i1(ifn) = ihypo(ifn)
+i1 = i1 - nnoff
+if ( rr > 0. ) write( 0, * ) 'warning: positive normal traction: ', rr, i1
 
 ! Lock fault in PML region
 i1 = max( i1pml + 1, 1 )
