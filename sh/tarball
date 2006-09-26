@@ -6,7 +6,7 @@ base=sord-$version
 cat << END > versionmeta.m
 version = '$version';
 login   = '$LOGNAME';
-name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )';
+name    = '$( finger $LOGNAME | sed -n 's/^Login.*:.*e: //p' )';
 host    = '$HOSTNAME';
 dir     = '$( /bin/pwd )';
 END
