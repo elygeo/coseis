@@ -16,7 +16,7 @@ colorscheme
 pos = get( gcf, 'Position' );
 set( gcf, ...
   'DefaultLineMarkerFaceColor', 'w', ...
-  'DefaultLineMarkerEdgeColor', [ .2 .2 .2 ], ...
+  'DefaultLineMarkerEdgeColor', [ .1 .1 .1 ], ...
   'DefaultLineClipping', 'on', ...
   'DefaultTextClipping', 'on', ...
   'DefaultTextFontSize', 14, ...
@@ -27,25 +27,39 @@ set( gcf, ...
 cwd = pwd;
 srcdir
 cd data
-%set( gcf, 'Position', [ pos(1:2) 1280 80 ] )
+set( gcf, 'Position', [ pos(1:2) 1280 80 ] )
 axes( 'Position', [ 0 0 1 1 ] )
-htime = text( 15, 20, 'Time = 0s' );
+text( 300, 24, 'M7.6 Southern San Andreas Senario', 'Hor', 'center' );
+text( 300, 14, 'SORD Rupture Dynamics Simulation', 'Hor', 'center' );
 hold on
-plot( 150 + [ -50 -50 nan -50 50 nan 50 50 ], 20 + [ -2 2 nan 0 0 nan -2 2 ] )
-text( 150, 20, '100km', 'Hor', 'center', 'Background', 'k' );
+plot( 100 + 50 * [ -1 1 nan -1 -1 nan 0 0 nan 1 1 ], 24 + [ 0 0 nan -2 2 nan -2 2 nan -2 2 ] )
+text(  48, 24, '0',     'Hor', 'right' );
+text( 152, 24, '100km', 'Hor', 'left'  );
 caxis( flim * [ -1 1 ] )
-colorscale( '|V|: ', 'm/s', 325 + [ -50 50 ], [ 18 22 ] )
+colorscale( '', 'm/s', 100 + [ -50 50 ], [ 12 16 ] )
 igpp = imread( 'igpp.png' );
 sio  = imread( 'sio.png'  );
 sdsu = imread( 'sdsu.png' );
-image( 460 - [ 19   4 ], [ 25 15 ], igpp )
-image( 513 - [ 14   4 ], [ 25 15 ], sio  )
-image( 560 - [ 10.2 4 ], [ 25 15 ], sdsu )
-text( 460, 20, 'IGPP' )
-text( 513, 20, 'SIO'  )
-text( 560, 20, 'SDSU' )
+image( 520 - 8 * [ -1 1 ], 19 + 8 * [ -1 1 ], igpp )
+image( 543 - 8 * [ -1 1 ], 19 + 8 * [ -1 1 ], sio  )
+image( 560 - 8 * [ -1 1 ], 19 + 8 * [ -1 1 ], sdsu )
+a = 40;
+c = cos( a / 180 * pi );
+s = sin( a / 180 * pi );
+x = 419 + 6 * [ c -c; s -s ]';
+y =  19 + 6 * [ s -s; -c c ]';
+z =  [ 0 0; 0 0 ];
+plot3( x, y, z )
+x = 419 + 10 * [ c -c; s -s ]';
+y =  19 + 10 * [ s -s; -c c ]';
+h    = text( x(1), y(1), 0, 'E' );
+h(2) = text( x(2), y(2), 0, 'W' );
+h(3) = text( x(3), y(3), 0, 'S' );
+h(4) = text( x(4), y(4), 0, 'N' );
+set( h, 'Rotation', a, 'Hor', 'center', 'FontSize', 12 )
 axis( [ 0 600 0 37.5 ] )
 axis off
+return
 %leg = snap;
 %imshow( leg )
 delete( gca )
@@ -54,22 +68,22 @@ delete( gca )
 set( gcf, 'Position', [ pos(1:2) 1280 640 ] )
 axes( 'Position', [ 0 0 1 1 ] )
 sites = {
-   82188 188340 129 'bottom' 'right' 'Bakersfield'
+   82188 188340 129 'bottom' 'center' 'Bakersfield'
    99691  67008  21 'bottom' 'right' 'Santa Barbara'
-  152641  77599  16 'bottom' 'right' 'Oxnard'
-  191871 180946 714 'bottom' 'right' 'Lancaster'
-  229657 119310 107 'bottom' 'right' 'Los Angeles'
-  253599  98027   7 'bottom' 'left'  'Long Beach'
-  256108 263112 648 'bottom' 'right' 'Barstow'
-  263052 216515 831 'bottom' 'right' 'Victorville'
-  278097 115102  36 'top'    'left'  'Santa Ana'
-  293537 180173 327 'top'    'left'  'San Bernardino'
-  296996 160683 261 'top'    'left'  'Riverside'
+  152641  77599  16 'bottom' 'center' 'Oxnard'
+  191871 180946 714 'bottom' 'center' 'Lancaster'
+  229657 119310 107 'bottom' 'center' 'Los Angeles'
+  253599  98027   7 'bottom' 'center'  'Long Beach'
+  256108 263112 648 'bottom' 'center' 'Barstow'
+  263052 216515 831 'bottom' 'center' 'Victorville'
+  278097 115102  36 'bottom'    'center'  'Santa Ana'
+  293537 180173 327 'top'    'center'  'San Bernardino'
+  296996 160683 261 'top'    'center'  'Riverside'
   351928  97135  18 'bottom' 'left'  'Oceanside'
-  366020 200821 140 'top'    'left'  'Palm Springs'
-  403002 210421 -18 'top'    'left'  'Coachella'
-  402013  69548  23 'bottom' 'left'  'San Diego'
-  501570  31135  24 'bottom' 'left'  'Ensenada'
+  366020 200821 140 'top'    'center'  'Palm Springs'
+  403002 210421 -18 'top'    'center'  'Coachella'
+  402013  69548  23 'bottom' 'center'  'San Diego'
+  501570  31135  24 'bottom' 'center'  'Ensenada'
   526989 167029   1 'top'    'left'  'Mexicali'
   581530 224874  40 'bottom' 'right' 'Yuma'
 };
@@ -82,14 +96,15 @@ txt = sites(:,6);
 plot3( x, y, z+1000, 'ow', 'MarkerSize', 8, 'LineWidth', 2 );
 hold on
 for i = 1:length(x)
-  dy = 2000;
+  dy = 3000;
   if strcmp( ver{i}, 'top' ), dy = -3000; end
   text( x(i), y(i)+dy, z(i)+1000, txt{i}, 'Ver', ver{i}, 'Hor', hor{i} );
 end
 [ x, y, z ] = textread( 'fault.xyz',   '%n%n%n%*[^\n]' ); plot3( x, y, z, '--', 'LineW', 3 )
 [ x, y, z ] = textread( 'coast.xyz',   '%n%n%n%*[^\n]' ); plot3( x, y, z )
 [ x, y, z ] = textread( 'borders.xyz', '%n%n%n%*[^\n]' ); plot3( x, y, z )
-text( 595000, 5000, 1000, 'GPE', 'Hor', 'right', 'Ver', 'bottom', 'FontSize', 8 )
+[ x, y, z ] = textread( 'borders.xyz', '%n%n%n%*[^\n]' ); plot3( x, y, z )
+text( 3000, 3000, 0, 'GPE', 'Hor', 'left', 'Ver', 'bottom', 'FontSize', 8 )
 view( 0, 90 )
 axis equal
 axis( 1000 * [ 0 600 0 300 -80 10 ] )
@@ -100,8 +115,11 @@ cd( cwd )
 meta
 i1 = [  1  1 -1 ];
 i2 = [ -1 -1 -1 ];
+
 [ msg, x ] = read4d( 'x', [ i1 0 ], [ i2 0 ] );
 if msg, error( msg ), end
+ihypo = ihypo - i1(1:3) + 1;
+x(:,ihypo(2),:,:) = [];
 h = surf( x(:,:,:,1), x(:,:,:,2), x(:,:,:,3)-1000 );
 set( h, ...
   'FaceColor', [ .2 .2 .2 ], ...
@@ -115,14 +133,16 @@ set( h, ...
   'FaceLighting', 'phong' );
 light( 'Position', [ -300000 150000 100000 ] );
 %map = snap;
-drawnow
-clf
 
 return
+drawnow
+clf
 
 % Data
 axes( 'Position', [ 0 0 1 1 ] )
 hsurf = surf( x(:,:,:,1), x(:,:,:,2), x(:,:,:,3) );
+hold on
+htime = text( 15, 20, 'Time = 0s' );
 view( 0, 90 )
 axis equal
 axis( 1000 * [ 0 600 0 300 -80 10 ] )
