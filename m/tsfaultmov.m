@@ -181,6 +181,10 @@ text( 163, -19, 'SIO',  'Hor', 'left' )
 text( 176, -19, 'IGPP', 'Hor', 'left' )
 text( 188, -19, 'SDSU', 'Hor', 'left' )
 
+[ msg, vs ] = read4d( 'vs', [ i1(1:3) it ], [ i2(1:3) it ] );
+if msg, error( msg ), end
+vs = sum( vs(:) ) / length( vs(:) );
+
 % time loop
 for it = i1(4) : dit : i2(4)
   [ msg, s ] = read4d( 'sl', [ i1(1:3) it ], [ i2(1:3) it ] );
@@ -203,6 +207,7 @@ for it = i1(4) : dit : i2(4)
     i = i + n + 1;
   end 
   c1 = [ c1 c2 ];
+  vr = min( c1(1,~isnan(c1(1,:))) )
   if size( c1 ), set( hcont, 'XData', c1(1,:), 'YData', c1(2,:) )
   else, set( hcont, 'XData', [], 'YData', [] )
   end

@@ -19,16 +19,18 @@ o2 = round( .5 * ( size( img1, 2 ) - n1(2) ) );
 if o1 < 0 || o2 < 0, error, end
 
 if r2 ~= 1
-  img1 = img1(o1+1:o1+n1(1),o2+1:o2+n1(2),:);
-  img1 = imresize( img1, n2(1:2), 'bicubic' );
-  %img2 = repmat( single(1), n2 );
-  %for j = 1:r2
-  %for k = 1:r2
-  %  img2 = img2 + single( img1(o1+j:r2:o1+n1(1),o2+k:r2:o2+n1(2),:) );
-  %end
-  %end
-  %img1 = uint8( 1 / r2 / r2 * img2 );
-  %clear img2
+  %img1 = img1(o1+1:o1+n1(1),o2+1:o2+n1(2),:);
+  %img1 = imresize( img1, n2(1:2), 'bicubic' );
+  img2 = repmat( single(1), [ n2 3 ] );
+  size( img2 )
+  for j = 1:r2
+  for k = 1:r2
+    size( img1(o1+j:r2:o1+n1(1),o2+k:r2:o2+n1(2),:) )
+    img2 = img2 + single( img1(o1+j:r2:o1+n1(1),o2+k:r2:o2+n1(2),:) );
+  end
+  end
+  img1 = uint8( 1 / r2 / r2 * img2 );
+  clear img2
 end
 
 if nargout == 0

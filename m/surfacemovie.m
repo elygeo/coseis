@@ -22,45 +22,53 @@ set( gcf, ...
   'DefaultTextHorizontalAlignment', 'left', ...
   'DefaultTextVerticalAlignment', 'middle' )
 
-if 0
-
+%if 1
 % Legend
 cwd = pwd;
 srcdir
 cd data
 set( gcf, 'Position', [ pos(1:2) 1280 80 ] )
 axes( 'Position', [ 0 0 1 1 ] )
-text( 15, 24, 'M7.6 Southern San Andreas Senario' );
+text( 20, 29, 'Surface Velocity Magnitude' );
 hold on
-text( 15, 14, 'SORD Rupture Dynamics Simulation' );
+text( 20, 19, 'M7.6 Southern San Andreas Senario' );
+text( 20,  9, 'SORD Rupture Dynamics Simulation' );
 a = 40;
 c = cos( a / 180 * pi );
 s = sin( a / 180 * pi );
-x = 200 + 5 * [ c -c; s -s ]';
-y =  19 + 5 * [ s -s; -c c ]';
-z =  [ 0 0; 0 0 ];
-plot3( x, y, z )
 x = 200 + 9 * [ c -c; s -s ]';
 y =  19 + 9 * [ s -s; -c c ]';
+z =  [ 0 0; 0 0 ];
+plot3( x, y, z )
+x = 200 + 13 * [ c -c; s -s ]';
+y =  19 + 13 * [ s -s; -c c ]';
 h    = text( x(1), y(1), 0, 'E' );
 h(2) = text( x(2), y(2), 0, 'W' );
 h(3) = text( x(3), y(3), 0, 'S' );
 h(4) = text( x(4), y(4), 0, 'N' );
 set( h, 'Rotation', a, 'Hor', 'center', 'FontSize', 12 )
 caxis( flim * [ -1 1 ] )
-colorscale( '', 'm/s', 330 + [ -50 50 ], [ 12 16 ] )
-lengthscale( '', 'km', 330 + [ -50 50 ], [ 22 26 ] )
-igpp = imread( 'igpp.png' );
-sio  = imread( 'sio.png'  );
-sdsu = imread( 'sdsu.png' );
+lengthscale( 320 + [ -50 50 ], 29 + [ -1.2 1.2 ], 'km' )
+colorscale(  320 + [ -50 50 ], 18 + [ -2.4 2.4 ], 'm/s' )
 scec = imread( 'scec.png'  );
-image( 470 + 8 * [ 0 3    ], 19 - 8 * [ -1 1 ], igpp )
-image( 503 + 8 * [ 0 2    ], 19 - 8 * [ -1 1 ], sio  )
-image( 530 + 8 * [ 0 1.23 ], 19 - 8 * [ -1 1 ], sdsu )
-image( 552 + 8 * [ 0 2.69 ], 19 - 8 * [ -1 1 ], scec )
+sdsu = imread( 'sdsu.png' );
+sio  = imread( 'sio.png'  );
+igpp = imread( 'igpp.png' );
+y =  19 - 12 * [ -1 1 ];
+x = 600 - 24 * flipud( cumsum( [ 0
+  size(scec,2) / size(scec,1)
+  size(sdsu,2) / size(sdsu,1)
+  size(sio,2)  / size(sio,1)
+  size(igpp,2) / size(igpp,1) ] ) );
+image( x(1:2) - 50, y, igpp )
+image( x(2:3) - 40, y, sio  )
+image( x(3:4) - 30, y, sdsu )
+image( x(4:5) - 20, y, scec )
 axis( [ 0 600 0 37.5 ] )
 axis off
-%leg = snap;
+leg = snap;
+img(1,:,:) = 255;
+img(:,[1 end],:) = 255;
 clf
 
 % Map
@@ -126,12 +134,12 @@ set( hsurf, ...
   'EdgeLighting', 'none', ...
   'FaceLighting', 'phong' );
 light( 'Position', [ -300000 150000 100000 ] );
-%map = snap;
+map = snap;
 clf
 cd( cwd )
 
-end
-set( gcf, 'Position', [ pos(1:2) 1280 640 ] )
+%end
+%set( gcf, 'Position', [ pos(1:2) 1280 640 ] )
 
 % Data
 meta
@@ -172,23 +180,18 @@ for it = t
   end
   set( hsurf, 'CData', s )
   set( htime, 'String', sprintf( 'Time = %.1fs', it * dt ) )
-  %img = snap
-  drawnow
+  img = single( snap );
+  w = rgb2gray( img ) ./ 255;
+  w = .5 * ( 1 - w ) .^ 2;
+  for i = 1:3
+    img(:,:,i) = img(:,:,i) + w .* map(:,:,i);
+  end 
+  img = uint8( img );
+  img([1 end],:,:) = 255;
+  img(:,[1 end],:) = 255;
+  img = [ img; leg ];
+  clf
+  imshow( img );
+  %imwrite( img, sprintf( 'tmp/frame%04d.png', it ) )
 end
-
-return
-
-img = single( img );
-w = rgb2gray( img ) ./ 255;
-w = .5 * ( 1 - w ) .^ 2;
-for i = 1:3
-  img(:,:,i) = img(:,:,i) + w .* basemap(:,:,i);
-end 
-img = uint8( img );
-img = [ img; leg ];
-img([1 end],:,:) = 32;
-img(:,[1 end],:) = 32;
-clf
-imshow( img );
-imwrite( img, sprintf( 'tmp/frame%04d.png', it ) )
 
