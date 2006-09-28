@@ -66,6 +66,7 @@ done
 flags=$oflags
 $sfc $flags utm.f90 tscoords.f90 tsgrid.f90 -o tsgrid
 $sfc $flags utm.f90 tscoords.f90 tsgridr.f90 -o tsgridr
+$sfc $flags utm.f90 tscoords.f90 tstopomesh.f90 -o tstopomesh
 $sfc $flags utm.f90 tscoords.f90 ts2ll.f90 -o ts2ll
 $sfc $flags $getarg utm.f90 tscoords.f90 ll2ts.f90 -o ll2ts
 $sfc $flags drape.f90 -o drape

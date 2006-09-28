@@ -29,37 +29,36 @@ srcdir
 cd data
 set( gcf, 'Position', [ pos(1:2) 1280 80 ] )
 axes( 'Position', [ 0 0 1 1 ] )
-text( 300, 24, 'M7.6 Southern San Andreas Senario', 'Hor', 'center' );
-text( 300, 14, 'SORD Rupture Dynamics Simulation', 'Hor', 'center' );
+text( 15, 24, 'M7.6 Southern San Andreas Senario' );
 hold on
-plot( 100 + 50 * [ -1 1 nan -1 -1 nan 0 0 nan 1 1 ], 24 + [ 0 0 nan -2 2 nan -2 2 nan -2 2 ] )
-text(  48, 24, '0',     'Hor', 'right' );
-text( 152, 24, '100km', 'Hor', 'left'  );
-caxis( flim * [ -1 1 ] )
-colorscale( '', 'm/s', 100 + [ -50 50 ], [ 12 16 ] )
-igpp = imread( 'igpp.png' );
-sio  = imread( 'sio.png'  );
-sdsu = imread( 'sdsu.png' );
-image( 520 - 8 * [ -1 1 ], 19 + 8 * [ -1 1 ], igpp )
-image( 543 - 8 * [ -1 1 ], 19 + 8 * [ -1 1 ], sio  )
-image( 560 - 8 * [ -1 1 ], 19 + 8 * [ -1 1 ], sdsu )
+text( 15, 14, 'SORD Rupture Dynamics Simulation' );
 a = 40;
 c = cos( a / 180 * pi );
 s = sin( a / 180 * pi );
-x = 419 + 6 * [ c -c; s -s ]';
-y =  19 + 6 * [ s -s; -c c ]';
+x = 200 + 5 * [ c -c; s -s ]';
+y =  19 + 5 * [ s -s; -c c ]';
 z =  [ 0 0; 0 0 ];
 plot3( x, y, z )
-x = 419 + 10 * [ c -c; s -s ]';
-y =  19 + 10 * [ s -s; -c c ]';
+x = 200 + 9 * [ c -c; s -s ]';
+y =  19 + 9 * [ s -s; -c c ]';
 h    = text( x(1), y(1), 0, 'E' );
 h(2) = text( x(2), y(2), 0, 'W' );
 h(3) = text( x(3), y(3), 0, 'S' );
 h(4) = text( x(4), y(4), 0, 'N' );
 set( h, 'Rotation', a, 'Hor', 'center', 'FontSize', 12 )
+caxis( flim * [ -1 1 ] )
+colorscale( '', 'm/s', 300 + [ -50 50 ], [ 12 16 ] )
+lengthscale( '', 'km', 300 + [ -50 50 ], [ 22 26 ] )
+igpp = imread( 'igpp.png' );
+sio  = imread( 'sio.png'  );
+sdsu = imread( 'sdsu.png' );
+scec = imread( 'scec.png'  );
+image( 460 + 8 * [ 0 3    ], 19 - 8 * [ -1 1 ], scec )
+image( 500 + 8 * [ 0 3    ], 19 - 8 * [ -1 1 ], igpp )
+image( 533 + 8 * [ 0 2    ], 19 - 8 * [ -1 1 ], sio  )
+image( 560 + 8 * [ 0 1.23 ], 19 - 8 * [ -1 1 ], sdsu )
 axis( [ 0 600 0 37.5 ] )
 axis off
-return
 %leg = snap;
 %imshow( leg )
 delete( gca )
@@ -120,8 +119,8 @@ i2 = [ -1 -1 -1 ];
 if msg, error( msg ), end
 ihypo = ihypo - i1(1:3) + 1;
 x(:,ihypo(2),:,:) = [];
-h = surf( x(:,:,:,1), x(:,:,:,2), x(:,:,:,3)-1000 );
-set( h, ...
+hsurf = surf( x(:,:,:,1), x(:,:,:,2), x(:,:,:,3)-1000 );
+set( hsurf, ...
   'FaceColor', [ .2 .2 .2 ], ...
   'EdgeColor', 'none', ...
   'AmbientStrength',  .1, ...
@@ -133,10 +132,6 @@ set( h, ...
   'FaceLighting', 'phong' );
 light( 'Position', [ -300000 150000 100000 ] );
 %map = snap;
-
-return
-drawnow
-clf
 
 % Data
 axes( 'Position', [ 0 0 1 1 ] )

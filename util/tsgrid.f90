@@ -186,13 +186,13 @@ print *, 'latgitude range: ', minval( w(:,:,:,2) ), maxval( w(:,:,:,2) )
 ! Topo
 allocate( t(960,780) )
 inquire( iolength=reclen ) t
-open( 1, file='topo.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
+open( 1, file='topo3.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
 t = t * exag
-o1 = 15. - 121.5 * 3600.
-o2 = 15. +  30.5 * 3600.
-h  = 30.
+h = 30.
+o1 = .5 * h - 121.5 * 3600.
+o2 = .5 * h +  30.5 * 3600.
 do k1 = 1, size(w,2)
 do j1 = 1, size(w,1)
   xx = ( ( w(j1,k1,1,1) * 3600 ) - o1 ) / h

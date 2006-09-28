@@ -11,7 +11,7 @@ character :: endian
 endian = 'l'
 if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
 inquire( iolength=reclen ) t
-open( 1, file='topo.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
+open( 1, file='topo3.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 ) 
 

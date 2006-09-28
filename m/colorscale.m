@@ -6,8 +6,8 @@ str1 = '';
 str2 = '';
 x = get( gca, 'XLim' );
 y = get( gca, 'YLim' );
-x = x(1) + [ .3 .7 ] * ( x(2) - x(1) );
-y = y(1) - [ .1 .08 ] * ( y(2) - y(1) );
+x = x(1) + [ .25 .75 ] * ( x(2) - x(1) );
+y = y(1) - [ .1  .08 ] * ( y(2) - y(1) );
 if nargin >= 1, str1 = varargin{1}; end
 if nargin >= 2, str2 = varargin{2}; end
 if nargin >= 3, x = varargin{3}; end
