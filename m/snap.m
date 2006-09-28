@@ -20,9 +20,8 @@ if o1 < 0 || o2 < 0, error, end
 
 if r2 ~= 1
   %img1 = img1(o1+1:o1+n1(1),o2+1:o2+n1(2),:);
-  %img1 = imresize( img1, n2(1:2), 'bicubic' );
+  %img1 = imresize( img1, n2(1:2), 'bilinear' );
   img2 = repmat( single(1), [ n2 3 ] );
-  size( img2 )
   for j = 1:r2
   for k = 1:r2
     size( img1(o1+j:r2:o1+n1(1),o2+k:r2:o2+n1(2),:) )
