@@ -11,6 +11,7 @@ flim = 1;
 cwd = pwd;
 srcdir
 cd data
+basemap = imread( 'basemap.png' );
 
 clf
 colorscheme
@@ -115,7 +116,7 @@ for it = t
   w = rgb2gray( img ) ./ 255;
   w = .5 * ( 1 - w ) .^ 2;
   for i = 1:3
-    img(:,:,i) = img(:,:,i) + w .* map(:,:,i);
+    img(:,:,i) = img(:,:,i) + w .* basemap(:,:,i);
   end 
   img = uint8( img );
   img([1 end],:,:) = 255;
