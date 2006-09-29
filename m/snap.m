@@ -24,7 +24,6 @@ if r2 ~= 1
   img2 = repmat( single(1), [ n2 3 ] );
   for j = 1:r2
   for k = 1:r2
-    size( img1(o1+j:r2:o1+n1(1),o2+k:r2:o2+n1(2),:) )
     img2 = img2 + single( img1(o1+j:r2:o1+n1(1),o2+k:r2:o2+n1(2),:) );
   end
   end
