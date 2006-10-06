@@ -5,15 +5,15 @@ r2 = 3;
 if nargin > 0, r1 = varargin{1}; r2 = r1; end
 if nargin > 1, r2 = varargin{2}; end
 
+r1 = 1;
+r2 = 1;
 set( gcf, 'PaperPositionMode', 'auto', 'Units', 'pixels' )
-pos = get( gcf, 'Position' );
 res = sprintf( '-r%d', r1 * get( 0, 'ScreenPixelsPerInch' ) )
 print( '-dtiff', res, 'tmp' )
-%set( gcf, 'Position', pos * r1 )
-%print -dtiff tmp
-%set( gcf, 'Position', pos )
 img1 = imread( 'tmp.tif' );
 delete tmp.tif
+
+pos = get( gcf, 'Position' );
 n1 = r1 * pos([4 3])
 n2 = r1 / r2 * pos([4 3])
 sz = size( img1 )

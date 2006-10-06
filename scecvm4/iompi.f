@@ -1,7 +1,7 @@
 ! MPI I/O for SCEC VM
 
       subroutine readpts( kerr )
-      include 'in.h'
+      include 'newin.h'
       include 'mpif.h'
       integer(kind=mpi_offset_kind) mpioffset, nnl
       call mpi_init( ierr )
@@ -46,7 +46,7 @@
       end
 
       subroutine writepts( kerr )
-      include 'in.h'
+      include 'newin.h'
       include 'mpif.h'
       integer(kind=mpi_offset_kind) mpioffset, nnl
       open( 1, file='nn', status='old' )

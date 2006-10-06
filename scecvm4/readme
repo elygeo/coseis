@@ -1,4 +1,38 @@
-Notes on bug fixes made to the SCEC VM
+SCECVM bug fixes and parallel binary I/O
+
+Geoffrey Ely
+gely@ucsd.edu
+2006 Sep 6
+
+These files must be combined with the SCECVM 4.0 distribution.
+
+Input files:
+  nn: acsii file containing the number mesh nodes
+  rlon: binary file containing nn longitude values
+  rlat: binary file containing nn latitude values
+  rdep: binary file containing nn depth values
+
+Output files:
+  rho: binary file containing nn density values
+  vp:  binary file containing nn V_p values
+  vp:  binary file containing nn V_s values
+
+EXAMPLE USAGE
+
+Compile and run a TeraShake mesh generator:
+  f90 utm.f90 tscoords.f90 tsgrid.f90 -o tsgrid
+  ./tsgrid
+
+Compile and run the CVM serial version
+  f90 iobin.f scecvm4.f -o scecvm4
+  ./scecvm4
+
+Compile and run the CVM MPI version
+  mpif90 iompi.f scecvm4.f -o scecvm4-mpi
+  mpiexec -np 16 ./scecvm4-mpi
+
+
+NOTES ON BUG FIXES
 
 Any open statements with the syntax type='old', change to standard
 syntax status='old'.
@@ -32,9 +66,4 @@ Add inside of do loops in subroutine readup
 
        rlaup(i) = 0.
        rloup(i) = 0.
-
-
-Geoffrey Ely
-gely@ucsd.edu
-9/6/06
 

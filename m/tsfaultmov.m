@@ -5,8 +5,10 @@ flim = 4;
 iz = 3;
 meta
 dit = out{iz}{3};
-i1 = [ out{iz}{4:7}  ];
+i1 = [ out{iz}{4:7} ];
 i2 = [ out{iz}{8:11} ];
+i1 = [ out{iz}{4:6} 0 ];
+i2 = [ out{iz}{8:10} 850 ];
 format compact
 clf
 colorscheme
@@ -172,6 +174,8 @@ if msg, error( msg ), end
 vs = sum( vs(:) ) / length( vs(:) );
 
 % time loop
+tr = [ 0 0 0 0 0 ];
+xr = [ 0 0 0 0 0 ];
 for it = i1(4) : dit : i2(4)
   [ msg, s ] = read4d( 'sl', [ i1(1:3) it ], [ i2(1:3) it ] );
   if msg, error( msg ), end
@@ -193,9 +197,20 @@ for it = i1(4) : dit : i2(4)
     i = i + n + 1;
   end 
   c1 = [ c1 c2 ];
-  vr = min( c1(1,~isnan(c1(1,:))) )
-  if size( c1 ), set( hcont, 'XData', c1(1,:), 'YData', c1(2,:) )
-  else, set( hcont, 'XData', [], 'YData', [] )
+  if size( c1 )
+    set( hcont, 'XData', c1(1,:), 'YData', c1(2,:) )
+    j = ihypo(1);
+    k = ihypo(3);
+    c1(1,:) = c1(1,:) - x1(j,k);
+    c1(2,:) = c1(2,:) - x2(j,k);
+    tr1 = it * dt;
+    xr1 = sqrt( max( sum( c1 .* c1, 1 ) ) );
+    vr = ( xr1 - xr ) ./ ( tr1 - tr );
+    disp( [ num2str(it) ' vrup = ' num2str( vr ) ] )
+    tr(2:end) = [ tr(3:end) tr1 ];
+    xr(2:end) = [ xr(3:end) xr1 ];
+  else
+    set( hcont, 'XData', [], 'YData', [] )
   end
   s(1:j-1,1:k-1) = .25 * ( ...
     s(1:j-1,1:k-1) + s(2:j,1:k-1) + ...

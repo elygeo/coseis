@@ -1,5 +1,5 @@
-version = '20060928-230138';
+version = '20061006-160014';
 login   = 'gely';
 name    = 'Geoffrey Ely';
 host    = 'wide';
-dir     = '/space/gely/files/sord';
+dir     = '/space/gely/Files/sord';

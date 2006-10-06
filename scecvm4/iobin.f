@@ -1,7 +1,7 @@
 ! Binary I/O for SCEC VM
 
       subroutine readpts( kerr )
-      include 'in.h'
+      include 'newin.h'
       write( 0, * ) 'SCEC Velocity Model version 4'
       open( 1, file='nn', status='old' )
       read( 1, * ) nn
@@ -33,7 +33,7 @@
       end
 
       subroutine writepts( kerr )
-      include 'in.h'
+      include 'newin.h'
       open( 1, file='vp', recl=4, form='unformatted', access='direct',
      $  status='replace' )
       open( 2, file='vs', recl=4, form='unformatted', access='direct',

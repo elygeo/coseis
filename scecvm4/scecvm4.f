@@ -27,7 +27,7 @@ c
 c Bug fixes and modifications for binary and MPI I/O. Geoffrey Ely 6/8/06
 c                   
 c
-         include 'in.h'
+         include 'newin.h'
          include 'surface.h'
          include 'innum.h'
          include 'labup.h'
@@ -1124,7 +1124,7 @@ c
 c POST PROcessing for LAB model
 c continues velocities out from realm of
 c credibility to beyond
-         include 'in.h'
+         include 'newin.h'
 c
 c linear interpolation distance rinterp
 c    - KLM -
@@ -1180,7 +1180,7 @@ c
 
          subroutine readivsurf(kerr)
 c-----read Imperial Valley surfaces--------------
-         include 'in.h'
+         include 'newin.h'
          include 'ivsurface.h'
          kerr=0
 c---loop to read-------------------
@@ -1203,7 +1203,7 @@ cc convert km depths to feet
          subroutine readivedge(kerr)
 c-----read Imp valley- Salton Trough edge file,-----------------
 c  and iv model edge file
-         include 'in.h'
+         include 'newin.h'
          include 'ivsurface.h'
          kerr=0
 c----ivi2=number of xy pairs-------
@@ -1229,7 +1229,7 @@ c  nregv  = total number P or S velocities in regional model
 c  nregly = number layers in regional model
 c Using Egill Hauksson's so cal model at 15 km horizontal
 c  spacing, variable vertical spacing
-         include 'in.h'
+         include 'newin.h'
          include 'regional.h'
           kerr=0
          open(19,file='eh.modPS',status='old',err=2999)
@@ -1254,7 +1254,7 @@ c -- convert to m/s
           subroutine makevel2(rla,rlo,rde,alp,betm,imanfl)
 c--Calculates the Imperial Valley model velocities--
 c note betm returned is temporary dummy valus unless it is from mantle
-         include 'in.h'
+         include 'newin.h'
          include 'ivsurface.h'
          include 'dim2.h'
          dimension rsuqiv(numsiv)
