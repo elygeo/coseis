@@ -4,14 +4,14 @@ program main
 implicit none
 integer, parameter :: n1=960, n2=780
 real :: t(n1,n2), x, y, z, h, o1, o2, h1, h2, h3, h4, xx, yy
-integer :: i, j, k, reclen
+integer :: i, j, k
 character(1024) :: line
 character :: endian
 
 endian = 'l'
 if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
-inquire( iolength=reclen ) t
-open( 1, file='topo3.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
+inquire( iolength=i ) t
+open( 1, file='topo3.'//endian, recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 ) 
 

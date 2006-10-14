@@ -5,7 +5,7 @@ implicit none
 real :: r, dx, h, o1, o2, xx, yy, h1, h2, h3, h4, ell(3), x0, y0, z0, &
   xf(6), yf(6), rf(6), zf, exag, mus, mud, tn, ts, rho, vp, vs, dc
 integer :: n(3), nn, npml, nrect, i, j, k, l, j1, k1, l1, j2, k2, l2, jf0, kf0, lf0, &
-  nf, nf1, nf2, nf3, reclen
+  nf, nf1, nf2, nf3
 real, allocatable :: x(:,:,:,:), w(:,:,:,:), s1(:,:,:), s2(:,:,:), t(:,:)
 character :: endian
 
@@ -185,8 +185,8 @@ print *, 'latgitude range: ', minval( w(:,:,:,2) ), maxval( w(:,:,:,2) )
 
 ! Topo
 allocate( t(960,780) )
-inquire( iolength=reclen ) t
-open( 1, file='topo3.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
+inquire( iolength=i ) t
+open( 1, file='topo3.'//endian, recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
 t = t * exag
@@ -225,10 +225,10 @@ z0 = sum( w(:,:,:,3) ) / ( n(1) * n(2) )
 print *, 'elevation range: ', minval( w(:,:,:,3) ), maxval( w(:,:,:,3) )
 
 ! 2D files
-inquire( iolength=reclen ) x(:,:,:,1)
-open( 1, file='x', recl=reclen, form='unformatted', access='direct', status='replace' )
-open( 2, file='y', recl=reclen, form='unformatted', access='direct', status='replace' )
-open( 3, file='z', recl=reclen, form='unformatted', access='direct', status='replace' )
+inquire( iolength=i ) x(:,:,:,1)
+open( 1, file='x', recl=i, form='unformatted', access='direct', status='replace' )
+open( 2, file='y', recl=i, form='unformatted', access='direct', status='replace' )
+open( 3, file='z', recl=i, form='unformatted', access='direct', status='replace' )
 write( 1, rec=1 ) x(:,:,:,1)
 write( 2, rec=1 ) x(:,:,:,2)
 write( 3, rec=1 ) x(:,:,:,3)
@@ -237,13 +237,13 @@ close( 2 )
 close( 3 )
 
 ! 3D files
-inquire( iolength=reclen ) x(:,:,:,1)
-open( 1, file='x1', recl=reclen, form='unformatted', access='direct', status='replace' )
-open( 2, file='x2', recl=reclen, form='unformatted', access='direct', status='replace' )
-open( 3, file='x3', recl=reclen, form='unformatted', access='direct', status='replace' )
-open( 7, file='rlon', recl=reclen, form='unformatted', access='direct', status='replace' )
-open( 8, file='rlat', recl=reclen, form='unformatted', access='direct', status='replace' )
-open( 9, file='rdep', recl=reclen, form='unformatted', access='direct', status='replace' )
+inquire( iolength=i ) x(:,:,:,1)
+open( 1, file='x1', recl=i, form='unformatted', access='direct', status='replace' )
+open( 2, file='x2', recl=i, form='unformatted', access='direct', status='replace' )
+open( 3, file='x3', recl=i, form='unformatted', access='direct', status='replace' )
+open( 7, file='rlon', recl=i, form='unformatted', access='direct', status='replace' )
+open( 8, file='rlat', recl=i, form='unformatted', access='direct', status='replace' )
+open( 9, file='rdep', recl=i, form='unformatted', access='direct', status='replace' )
 do l = 1, n(3)
   write( 1, rec=l ) x(:,:,:,1)
   write( 2, rec=l ) x(:,:,:,2)
@@ -289,8 +289,8 @@ lf0 = n(3) - nf3
 l1 = lf0
 l2 = lf0 + nf3
 
-inquire( iolength=reclen ) t
-open( 1, file='ts1.'//endian, recl=reclen, form='unformatted', access='direct', status='old' )
+inquire( iolength=i ) t
+open( 1, file='ts1.'//endian, recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
 
@@ -306,8 +306,8 @@ end do
 end do
 
 ! Write tractions
-inquire( iolength=reclen ) s1
-open( 1, file='ts1', recl=reclen, form='unformatted', access='direct', status='replace' )
+inquire( iolength=i ) s1
+open( 1, file='ts1', recl=i, form='unformatted', access='direct', status='replace' )
 write( 1, rec=1 ) s1
 close( 1 )
 

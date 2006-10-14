@@ -67,3 +67,16 @@ Add inside of do loops in subroutine readup
        rlaup(i) = 0.
        rloup(i) = 0.
 
+
+SDSC IA-64 CLUSTER
+
+I found it necessary modify my .soft file as follows to get MPI
+working correctly.
+
+  @remove +intel-compilers
+  @remove +intel-c-8.0.066-f-8.0.046-r1
+  @remove +mpich-gm-intel
+  +intel-c-9.0.032-f-9.0.033
+  +mpich-gm-1.2.6-intel9032
+  @teragrid
+
