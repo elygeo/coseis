@@ -4,6 +4,7 @@ clear all
 field = 'vm';
 meta
 t = 0:10:nt;
+t = 100:100:5000;
 flim = 1;
 cellfocus = 0;
 
@@ -116,7 +117,7 @@ for it = t
   img = [ img; leg ];
   img([1 end],:,:) = 255;
   img(:,[1 end],:) = 255;
-  file = sprintf( 'tmp/surf/%04d.png', it );
+  file = sprintf( 'tmp/surface%04d.png', it );
   imwrite( img, file )
 end
 

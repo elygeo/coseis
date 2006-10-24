@@ -251,7 +251,7 @@ for it = i1(4) : dit : i2(4)
   set( hsurf(2), 'CData', s )
 
   set( htime, 'String', sprintf( 'Time = %5.1fs', it*dt ) )
-  imwrite( snap, sprintf( 'tmp/rup/%04d.png', it ) )
+  imwrite( snap, sprintf( 'tmp/rupture%04d.png', it ) )
   drawnow
 end
 
