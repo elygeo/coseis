@@ -2,9 +2,8 @@
 
 clear all
 field = 'vm';
-t = 100:100:5000;
-t = 3000:100:5000;
-t = 1000;
+meta
+t = 0:10:nt;
 flim = 1;
 cellfocus = 0;
 
@@ -21,7 +20,10 @@ set( gcf, ...
   'DefaultTextHorizontalAlignment', 'left', ...
   'DefaultTextVerticalAlignment', 'middle' )
 
-% Legend
+% Legend & Basemap
+cwd = pwd;
+srcdir
+cd data
 set( gcf, 'Position', [ pos(1:2) 1280 80 ] )
 axes( 'Position', [ 0 0 1 1 ] )
 text( 20, 29, 'Surface Velocity Magnitude' );
@@ -63,11 +65,6 @@ axis( [ 0 600 0 37.5 ] )
 axis off
 leg = snap;
 clf
-
-% Basemap
-cwd = pwd;
-srcdir
-cd data
 basemap = imread( 'basemap.png' );
 basemap = single( basemap );
 n = size( basemap );
@@ -84,7 +81,7 @@ if msg, error( msg ), end
 axes( 'Position', [ 0 0 1 1 ] )
 hsurf = surf( x(:,:,:,1), x(:,:,:,2), x(:,:,:,3) );
 hold on
-htime = text( 15, 285, 5000, 'Time = 0s', 'Ver', 'top' );
+htime = text( 8000, 294000, 10000, 'Time = 0s', 'Ver', 'top' );
 view( 0, 90 )
 axis equal
 axis( 1000 * [ 0 600 0 300 -80 10 ] )
@@ -107,7 +104,7 @@ for it = t
   img = single( snap );
   img = reshape( img, prod( n(1:2) ), 3 );
   w = img * [ .3 .59 .11 ]' / 255;
-  w = .4 * ( 1 - w ) .^ 2;
+  w = .5 * ( 1 - w ) .^ 2;
   w = reshape( w, n(1:2) );
   img = reshape( img, n );
   for i = 1:3
