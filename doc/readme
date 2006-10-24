@@ -379,7 +379,7 @@ SORD PML
 if d_j == 0
   f_i = w_ij,j
 else
-  p_ij' + d_j*p_ij = w_ij,j (no summation convetion here)
+  p_ij' + d_j*p_ij = w_ij,j (no summation convetion)
   f_j = sum_i( p_ij' )
 end
 v_i' = f_i/rho

@@ -7,6 +7,7 @@ meta
 dit = out{iz}{3};
 i1 = [ out{iz}{4:7} ];
 i2 = [ out{iz}{8:11} ];
+i1 = [ out{iz}{4:6} 850 ];
 i1 = [ out{iz}{4:6} 0 ];
 i2 = [ out{iz}{8:10} 850 ];
 format compact
@@ -64,7 +65,7 @@ for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
 caxis( flim * [ -1 1 ] )
-colorscale( [ -3.3 -2 ], [ -15 1 ], 'MPa', 'l' )
+colorscale( [ -3.3 -2 ], [ -14 0 ], 'MPa', 'l' )
 shading flat
 axis equal
 axis( xlim )
@@ -93,7 +94,7 @@ for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
 caxis( flim * [ -1 1 ] )
-colorscale( [ -3.3 -2 ], [ -15 1 ], 'MPa', 'l' )
+colorscale( [ -3.3 -2 ], [ -14 0 ], 'MPa', 'l' )
 shading flat
 axis equal
 axis( xlim )
@@ -115,7 +116,7 @@ for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
 caxis( flim * [ -1 1 ] )
-colorscale( [ -3.3 -2 ], [ -15 1 ], 'm', 'l' )
+colorscale( [ -3.3 -2 ], [ -14 0 ], 'm', 'l' )
 shading flat
 axis equal
 axis( xlim )
@@ -137,7 +138,7 @@ for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
 caxis( flim * [ -1 1 ] )
-colorscale( [ -3.3 -2 ], [ -15 1 ], 'm/s', 'l' )
+colorscale( [ -3.3 -2 ], [ -14 0 ], 'm/s', 'l' )
 shading flat
 axis equal
 axis( xlim )
@@ -159,7 +160,7 @@ for i = jf
   plot( x1(i,:), x2(i,:), ':' )
 end
 caxis( flim * [ -1 1 ] )
-colorscale( [ -3.3 -2 ], [ -15 1 ], 'm/s', 'l' )
+colorscale( [ -3.3 -2 ], [ -14 0 ], 'm/s', 'l' )
 shading flat
 axis equal
 axis( xlim )
@@ -167,7 +168,7 @@ axis off
 
 % bottom annotations
 htime = text( 2, -18, 'Time: 0s', 'Hor', 'left' );
-lengthscale( [ 149 199 ], [ -19 -18 ], 'km' )
+lengthscale( x1(j,k) - [ 50 0 ], [ -19 -18 ], 'km' )
 
 [ msg, vs ] = read4d( 'vs', [ i1(1:3) 0 ], [ i2(1:3) 0 ] );
 if msg, error( msg ), end
@@ -250,7 +251,7 @@ for it = i1(4) : dit : i2(4)
   set( hsurf(2), 'CData', s )
 
   set( htime, 'String', sprintf( 'Time = %5.1fs', it*dt ) )
+  imwrite( snap, sprintf( 'tmp/rup/%04d.png', it ) )
   drawnow
-  %snap( sprintf( 'tmp/frame%04d.png', iframe ) )
 end
 

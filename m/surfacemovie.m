@@ -1,18 +1,14 @@
 % Terashake map plot
 
 clear all
-format compact
 field = 'vm';
 t = 100:100:5000;
 t = 3000:100:5000;
 t = 1000;
 flim = 1;
+cellfocus = 0;
 
-cwd = pwd;
-srcdir
-cd data
-basemap = imread( 'basemap.png' );
-
+format compact
 clf
 colorscheme
 pos = get( gcf, 'Position' );
@@ -66,9 +62,15 @@ image( x(4:5) - 20, y, scec )
 axis( [ 0 600 0 37.5 ] )
 axis off
 leg = snap;
-leg(end,:,:) = 255;
-leg(:,[1 end],:) = 255;
 clf
+
+% Basemap
+cwd = pwd;
+srcdir
+cd data
+basemap = imread( 'basemap.png' );
+basemap = single( basemap );
+n = size( basemap );
 cd( cwd )
 
 % Data
@@ -81,30 +83,20 @@ i2 = [ -1 -1 -1 ];
 if msg, error( msg ), end
 axes( 'Position', [ 0 0 1 1 ] )
 hsurf = surf( x(:,:,:,1), x(:,:,:,2), x(:,:,:,3) );
-set( hsurf, ...
-  'FaceColor', 'flat', ...
-  'EdgeColor', 'none', ...
-  'AmbientStrength',  .6, ...
-  'DiffuseStrength',  1, ...
-  'SpecularColorReflectance', 1, ...
-  'SpecularStrength', .4, ...
-  'SpecularExponent', 1, ...
-  'EdgeLighting', 'none', ...
-  'FaceLighting', 'phong' );
-light( 'Position', [ -300000 150000 0 ] );
 hold on
-htime = text( 15, 285, 'Time = 0s', 'Ver', 'top' );
+htime = text( 15, 285, 5000, 'Time = 0s', 'Ver', 'top' );
 view( 0, 90 )
 axis equal
 axis( 1000 * [ 0 600 0 300 -80 10 ] )
 axis off
 caxis( flim * [ -1 1 ] )
+shading flat
 for it = t
   it
+  set( htime, 'String', sprintf( 'Time = %5.1fs', it * dt ) )
   [ msg, s ] = read4d( field, [ i1 it ], [ i2 it ] );
   if msg, error( msg ), end
   if size( s, 5 ) > 1, s = sqrt( sum( s .* s, 5 ) ); end
-  set( hsurf, 'ZData', s * flim * 4000 )
   if ~cellfocus
     s(1:end-1,1:end-1) = .25 * ( ...
       s(1:end-1,1:end-1) + s(2:end,1:end-1) + ...
@@ -113,8 +105,11 @@ for it = t
   set( hsurf, 'CData', s )
   set( htime, 'String', sprintf( 'Time = %.1fs', it * dt ) )
   img = single( snap );
-  w = rgb2gray( img ) ./ 255;
-  w = .5 * ( 1 - w ) .^ 2;
+  img = reshape( img, prod( n(1:2) ), 3 );
+  w = img * [ .3 .59 .11 ]' / 255;
+  w = .4 * ( 1 - w ) .^ 2;
+  w = reshape( w, n(1:2) );
+  img = reshape( img, n );
   for i = 1:3
     img(:,:,i) = img(:,:,i) + w .* basemap(:,:,i);
   end 
@@ -122,8 +117,9 @@ for it = t
   img([1 end],:,:) = 255;
   img(:,[1 end],:) = 255;
   img = [ img; leg ];
-  clf
-  imshow( img );
-  %imwrite( img, sprintf( 'tmp/frame%04d.png', it ) )
+  img([1 end],:,:) = 255;
+  img(:,[1 end],:) = 255;
+  file = sprintf( 'tmp/surf/%04d.png', it );
+  imwrite( img, file )
 end
 

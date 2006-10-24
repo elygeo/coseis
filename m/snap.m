@@ -7,16 +7,12 @@ if nargin > 1, r2 = varargin{2}; end
 
 set( gcf, 'PaperPositionMode', 'auto', 'Units', 'pixels' )
 pos = get( gcf, 'Position' );
-res = sprintf( '-r%d', r1 * get( 0, 'ScreenPixelsPerInch' ) )
+res = sprintf( '-r%d', r1 * get( 0, 'ScreenPixelsPerInch' ) );
 print( '-dtiff', res, 'tmp' )
-%set( gcf, 'Position', pos * r1 )
-%print -dtiff tmp
-%set( gcf, 'Position', pos )
 img1 = imread( 'tmp.tif' );
 delete tmp.tif
-n1 = r1 * pos([4 3])
-n2 = r1 / r2 * pos([4 3])
-sz = size( img1 )
+n1 = r1 * pos([4 3]);
+n2 = r1 / r2 * pos([4 3]);
 o1 = round( .5 * ( size( img1, 1 ) - n1(1) ) );
 o2 = round( .5 * ( size( img1, 2 ) - n1(2) ) );
 if o1 < 0 || o2 < 0, error 'bad image size', end
