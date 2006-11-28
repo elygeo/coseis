@@ -14,7 +14,7 @@ SORD - Support Operator Rupture Dynamics
   frictional, internal boundary condition. Optionally, the fault can be turned 
   off altogether and replaced by a moment tensor source. Model edge boundaries 
   can be reflective or absorbing, where absorbing boundaries are handled using 
-  the perfectly matched layers method (PML). SORD is writen in Fortan 95 and 
+  the perfectly matched layers method (PML). SORD is written in Fortran 95 and 
   parallelized using MPI for multi-processor execution.
 
 AUTHOR
@@ -491,4 +491,6 @@ n = [ (p+1) * sin(f)^2 * cos(t)
       (p+1) * sin(f)^2 * sin(t)
       sin(f) / |cos(f)| * ( cos(f)^2 - p*sin(f)^2 ) ]
 
+
+SOM
 

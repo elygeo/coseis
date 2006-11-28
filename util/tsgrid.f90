@@ -11,9 +11,8 @@ character :: endian
 
 ! Model parameters
 exag = 1.
-mus = 1.
+mus = 1.05
 mud = .5;  tn = -20e6
-mud = .45; tn = -22.22222e6
 rho = 3000.
 vp = 7250.
 vs = 4200.
@@ -40,7 +39,7 @@ endian = 'l'
 if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
 print *, 'endian = ', endian
 
-! Dimentions
+! Dimensions
 n = nint( ell / dx ) + 1
 print *, 'n =', n
 j = n(1)
@@ -132,7 +131,7 @@ do j = j1+1, j2-1
   x(j,k,1,2) = yf(i) + (yf(i+1)-yf(i)) / (rf(i+1)-rf(i)) * (dx*(j-jf0)-rf(i))
 end do
 
-! Orogonal elements next to the fault
+! Orthogonal elements next to the fault
 j1 = jf0
 j2 = jf0 + nf1
 k  = kf0
@@ -152,7 +151,7 @@ do j = j1-1, j2+1
   x(j,k+1,1,2) = x(j,k,1,2) + h1 * dx / h
 end do
 
-! Blend fault to x-bounaries
+! Blend fault to x-boundaries
 j1 = 1 + npml
 j2 = jf0 - 1
 forall( j=j1+1:j2-1 )
@@ -164,7 +163,7 @@ forall( j=j1+1:j2-1 )
   x(j,:,:,:) = x(j1,:,:,:)*(j2-j)/(j2-j1) + x(j2,:,:,:)*(j-j1)/(j2-j1)
 end forall
 
-! Blend fault to y-bounaries
+! Blend fault to y-boundaries
 k1 = 1 + npml
 k2 = kf0 - 1
 forall( k=k1+1:k2-1 )
@@ -294,9 +293,15 @@ open( 1, file='ts1.'//endian, recl=i, form='unformatted', access='direct', statu
 read( 1, rec=1 ) t
 close( 1 )
 
+! Taper shear stress
 t = t + 10e6
+do j = 1, 1991
+  t(j,:) = t(j,:) * ( 1. + .05 * ( 996. - j ) / 1990. )
+end do
 
+! Sample shear stress onto mesh
 s1 = 0.
+i = nint( dx / 100. )
 do l = l1, l2
 do j = j1, j2
   k1 = i * (j2-j) + 1

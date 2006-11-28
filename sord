@@ -241,14 +241,6 @@ cd "$srcdir"
 #------------------------------------------------------------------------------#
 # Set-up
 
-# Viz scripts
-echo "cd $srcdir" > m/srcdir.m
-cat << END > viz
-#!/bin/bash -e
-matlab -nojvm -nosplash -r "addpath $srcdir/m"
-END
-chmod u+x viz
-
 # Setup run directory
 sh/tarball
 rundir="out/$count"

@@ -46,7 +46,7 @@ case 'l', y = y * w; x = x(1) - x * h; ver = 'bottom'; rot = 90;
 case 'r', y = y * w; x = x(2) + x * h; ver = 'top';    rot = 90;
 otherwise, error
 end
-h2 = text( x, y, { num2str(clim(1)) str num2str(clim(2)) } );
+h2 = text( x, y, { num2str(clim(1)) str num2str(clim(2)) } )';
 set( h2, 'Hor', 'center', 'Ver', ver, 'Rot', rot, 'Clipping', 'off', 'HitTest', 'off' )
 if nargout < 2, clear h2, end
 

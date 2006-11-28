@@ -16,15 +16,17 @@ else
   bg = 'w';
   fg = [ 0 0 0 ];
 end
+if abs( scheme ) > 2, type = 'signed'; end
 
 set( gcf, ...
-  'Render', 'zbuffer', ...
   'InvertHardcopy', 'off', ...
   'DefaultTextFontName', 'Helvetica', ...
   'DefaultTextFontSize', 14, ...
   'DefaultTextInterpreter', 'tex', ...
   'DefaultLineLinewidth', 1, ...
   'Color', bg, ...
+  'DefaultAxesFontName', 'Helvetica', ...
+  'DefaultAxesFontSize', 14, ...
   'DefaultAxesColor', 'none', ...
   'DefaultAxesColorOrder', fg, ...
   'DefaultAxesXColor', fg, ...
@@ -55,6 +57,18 @@ case 'signed'
       0 1 0
       0 1 0
       0 1 0 ]';
+  case 3
+    cmap = 1 - [
+      8 8 8 2 0 0
+      0 0 8 8 8 0
+      8 0 0 2 8 8 ]' / 8;
+    cmap = repmat( cmap, 3, 1 );
+  case 4
+    cmap = [
+      8 8 8 2 2 2
+      2 2 8 8 8 2 
+      8 2 2 2 8 8 ]' / 8;
+    cmap = repmat( cmap, 3, 1 );
   otherwise, error( 'colormap scheme' )
   end
   h = 2 / ( size( cmap, 1 ) - 1 );
@@ -90,7 +104,7 @@ end
 
 if scheme < 0, cmap = 1 - cmap; end
 
-colormap( interp1( x1, cmap, x2 ) );
+colormap( max( 0, min( 1, interp1( x1, cmap, x2 ) ) ) );
 
 if nargout == 0, clear clim, end
 
