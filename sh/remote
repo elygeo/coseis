@@ -30,8 +30,6 @@ rfiles=$( echo "$files" | sed '/^$/d; s|^ *|sord/|g' )
 files=$( echo $files )
 rfiles=$( echo $rfiles )
 
-ssh-add -L > /dev/null || ssh-add
-
 echo "$accounts" | cat -b
 echo -n "hosts [$list]: "
 read i
