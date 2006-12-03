@@ -28,8 +28,8 @@ cat << END > pbsscript-vm
 cd "$rundir"
 echo "\$PBS_JOBID" >> log
 echo "\$(date): Start SCECVM run" >> log
-cd vm
-time mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-$mode
+cd "$rundir/vm"
+mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-$mode
 mv rho vp vs "$rundir/data"
 cd "$rundir"
 echo "\$(date): Start SORD run" >> log

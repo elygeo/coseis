@@ -21,6 +21,7 @@
 
   np = [ 21  8 3 ] % TeraGrid
   np = [ 16 16 4 ] % DataStar
+  np = [ 8 8 1 ] % Babiaca
   dx = 400.;
   dt = .024;
   trelax = .24;

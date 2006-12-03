@@ -43,7 +43,7 @@ cat << END > llscript
 cd "$rundir"
 
 #echo "\$(date): Start SCECVM run" >> log
-#cd vm
+#cd "$rundir/vm"
 #poe ./scecvm4-$mode
 #mv rho vp vs "$rundir/data"
 #cd "$rundir"

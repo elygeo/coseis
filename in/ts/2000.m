@@ -19,6 +19,7 @@
   vrup = 2300.;
   itcheck = 100;
 
+
   datadir = 'ts/2000/data';
   np = [ 2 1 1 ] % Wide
   dx = 2000.;

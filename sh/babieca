@@ -40,7 +40,7 @@ sleep 2
 cd "$rundir"
 echo "\$PBS_JOBID" >> log
 echo "\$(date): Start SCECVM run" >> log
-cd vm
+cd "$rundir/vm"
 mpiexec -n $np ./scecvm4-$mode
 mv rho vp vs "$rundir/data"
 cd "$rundir"

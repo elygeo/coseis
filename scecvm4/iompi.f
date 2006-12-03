@@ -3,7 +3,8 @@
       subroutine readpts( kerr )
       include 'newin.h'
       include 'mpif.h'
-      integer(kind=mpi_offset_kind) mpioffset, nnl
+      integer(kind=mpi_offset_kind) mpioffset
+      integer(8) nnl, i64bit
       call mpi_init( ierr )
       open( 1, file='nn', status='old' )
       read( 1, * ) nn
@@ -15,7 +16,8 @@
       nnl = nn / impisize
       if( impirank == 0 ) write( 0, * ) 'SCEC Velocity Model version 4'
       if( nnl > ibig ) stop 'ibig too small'
-      if( modulo(nnl,impisize) /= 0 ) nnl = nnl+1
+      i64bit = impisize
+      if( modulo(nnl,i64bit) /= 0 ) nnl = nnl+1
       nn = min( nnl, nn-impirank*nnl )
       irealsize = 4
       mpioffset = impirank * nnl * irealsize
@@ -48,7 +50,8 @@
       subroutine writepts( kerr )
       include 'newin.h'
       include 'mpif.h'
-      integer(kind=mpi_offset_kind) mpioffset, nnl
+      integer(kind=mpi_offset_kind) mpioffset
+      integer(8) nnl, i64bit
       open( 1, file='nn', status='old' )
       read( 1, * ) nn
       close( 1 )
@@ -57,7 +60,8 @@
       call mpi_file_set_errhandler( mpi_file_null,
      $  MPI_ERRORS_ARE_FATAL, ierr )
       nnl = nn / impisize
-      if( modulo(nnl,impisize) /= 0 ) nnl = nnl+1
+      i64bit = impisize
+      if( modulo(nnl,i64bit) /= 0 ) nnl = nnl+1
       nn = min( nnl, nn-impirank*nnl )
       irealsize = 4
       mpioffset = impirank * nnl * irealsize

@@ -19,6 +19,7 @@
   vrup = 2300.;
   itcheck = 100;
 
+
   np = [ 2 1 1 ] % Wide
   np = [ 8 4 1 ] % Babiaca
   dx = 1000.;

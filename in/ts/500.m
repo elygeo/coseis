@@ -20,6 +20,7 @@
   itcheck = 100;
 
 
+
   np = [ 8 4 1 ] % Babiaca
   dx = 500.;
   dt = .03;
