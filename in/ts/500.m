@@ -22,6 +22,7 @@
 
 
   np = [ 8 4 1 ] % Babiaca
+  itstats = 100;
   dx = 500.;
   dt = .03;
   trelax = .3;

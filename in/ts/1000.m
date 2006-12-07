@@ -22,6 +22,7 @@
 
   np = [ 2 1 1 ] % Wide
   np = [ 8 4 1 ] % Babiaca
+  dostat = 10;
   dx = 1000.;
   dt = .06;
   trelax = .6;

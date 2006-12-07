@@ -22,6 +22,7 @@
 
   datadir = 'ts/4000/data';
   np = [ 2 1 1 ] % Wide
+  itstats = 10;
   dx = 4000.;
   dt = .24;
   trelax = 2.4;

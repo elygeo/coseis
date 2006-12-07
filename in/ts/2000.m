@@ -20,9 +20,9 @@
   itcheck = 100;
 
 
-  itstats = 3;
   datadir = 'ts/2000/data';
   np = [ 2 1 1 ] % Wide
+  itstats = 10;
   dx = 2000.;
   dt = .12;
   trelax = 1.2;
