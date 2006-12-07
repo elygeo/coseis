@@ -87,6 +87,7 @@ case( 'szz' );         inzone = .true.
 case( 'syz' );         inzone = .true.
 case( 'szx' );         inzone = .true.
 case( 'sxy' );         inzone = .true.
+case( 'itstats' );     read( str, * ) itstats
 case( 'timeseries' );
   nout = nout + 1
   i = nout

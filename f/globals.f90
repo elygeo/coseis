@@ -116,6 +116,8 @@ real :: &
   rcrit,         & ! nucleation critical radius
   trelax,        & ! nucleation relaxation time
   efric,         & ! friction + fracure energy
+  estrain,       & ! strain energy
+  moment,        & ! strain energy
   mus0,          & ! static friction at hypocenter
   mud0,          & ! dynamic friction at hypocenter
   dc0,           & ! dc at hypocenter
@@ -154,6 +156,7 @@ integer :: &
   it,            & ! current time step
   itcheck,       & ! interval for checkpointing
   debug,         & ! debugging flag
+  itstats,       & ! interval for statistics output
   npml,          & ! number of PML damping nodes
   origin,        & ! 0=hypocenter, 1=firstnode
   fixhypo,       & ! fix hypocenter to 0=none, 1=ihypo node, 2=ihypo cell

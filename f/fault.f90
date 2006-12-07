@@ -353,24 +353,18 @@ end if
 t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( t1 * t2, 4 ) * area
 call sethalo( f2, 0., i1node, i2node )
-call psum( r1, dt * sum( f2 ), ifn )
-efric = efric + r1
-if ( master ) call rwrite( 'stats/efric', efric, it )
+efric = efric + dt * sum( f2 )
 
 ! Strain enegry
 t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( ( t0 + t1 ) * t2, 4 ) * area
 call sethalo( f2, 0., i1node, i2node )
-call psum( r1, -.5 * sum( f2 ), ifn )
-if ( master ) call rwrite( 'stats/estrain', r1, it )
+estrain = -.5 * sum( f2 )
 
 ! Moment
 f2 = muf * area * sqrt( sum( t2 * t2, 4 ) )
 call sethalo( f2, 0., i1node, i2node )
-call psum( r1, sum( f2 ), ifn )
-if ( master ) call rwrite( 'stats/m0', r1, it )
-if ( r1 > 0. ) r1 = ( log10( r1 ) - 9.05 ) / 1.5
-if ( master ) call rwrite( 'stats/mw', r1, it )
+moment = sum( f2 )
 
 ! Slip acceleration
 t2 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)

@@ -70,6 +70,11 @@ case 'signed'
       2 2 8 8 8 2 
       8 2 2 2 8 8 ]' / 8;
     cmap = repmat( cmap, 3, 1 );
+  case 5
+    cmap = [
+      0 0 0 8 8 8
+      0 8 8 8 0 0
+      8 8 0 0 0 8 ]' / 8;
   otherwise, error( 'colormap scheme' )
   end
   h = 2 / ( size( cmap, 1 ) - 1 );

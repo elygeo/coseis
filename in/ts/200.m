@@ -19,6 +19,7 @@
   vrup = 2300.;
   itcheck = 100;
 
+  itstats = 100;
   np = [ 32 16 4 ] % DataStar
   np = [ 21  8 3 ] % TeraGrid
   np = [  8  8 1 ] % Babieca
