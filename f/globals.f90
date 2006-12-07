@@ -154,9 +154,9 @@ integer :: &
   np0,           & ! number of processors available
   nt,            & ! number of time steps
   it,            & ! current time step
+  itstats,       & ! interval for statistics output
   itcheck,       & ! interval for checkpointing
   debug,         & ! debugging flag
-  itstats,       & ! interval for statistics output
   npml,          & ! number of PML damping nodes
   origin,        & ! 0=hypocenter, 1=firstnode
   fixhypo,       & ! fix hypocenter to 0=none, 1=ihypo node, 2=ihypo cell

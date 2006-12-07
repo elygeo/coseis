@@ -69,6 +69,7 @@ case( 'rcrit' );       read( str, * ) rcrit
 case( 'trelax' );      read( str, * ) trelax
 case( 'svtol' );       read( str, * ) svtol
 case( 'np' );          read( str, * ) np
+case( 'itstats' );     read( str, * ) itstats
 case( 'itcheck' );     read( str, * ) itcheck
 case( 'debug' );       read( str, * ) debug
 case( 'rho' );         inzone = .true.
@@ -87,7 +88,6 @@ case( 'szz' );         inzone = .true.
 case( 'syz' );         inzone = .true.
 case( 'szx' );         inzone = .true.
 case( 'sxy' );         inzone = .true.
-case( 'itstats' );     read( str, * ) itstats
 case( 'timeseries' );
   nout = nout + 1
   i = nout
