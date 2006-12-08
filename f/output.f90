@@ -198,7 +198,7 @@ if ( it > 0 ) then
         call psum( r2, estrain, ifn )
         call psum( r3, moment,  ifn )
         r4 = -999.
-        if ( r3 > 0. ) r4 = ( log10( r4 ) - 9.05 ) / 1.5
+        if ( r3 > 0. ) r4 = ( log10( r3 ) - 9.05 ) / 1.5
         if ( master ) then
           call rwrite( 'stats/efric',   r1, it / itstats )
           call rwrite( 'stats/estrain', r2, it / itstats )
