@@ -296,7 +296,7 @@ close( 1 )
 ! Taper shear stress
 t = t + 10e6
 do j = 1, 1991
-  t(j,:) = t(j,:) * ( 1. + .05 * ( 996. - j ) / 1990. )
+  t(j,:) = t(j,:) * ( 1. + .1 * ( 996. - j ) / 1990. )
 end do
 
 ! Sample shear stress onto mesh

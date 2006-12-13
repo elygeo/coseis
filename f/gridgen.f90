@@ -9,7 +9,7 @@ use m_optimize
 use m_collective
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), i, j, k, l, &
   j1, k1, l1, j2, k2, l2, idoublenode
-real :: x1, x2, m(9)
+real :: x0(3), x1(3), x2(3), m(9)
 logical :: expand
 
 if ( master ) write( 0, * ) 'Grid generation'
@@ -274,14 +274,14 @@ call vectorswaphalo( x, nhalo )
 ! Hypocenter location
 if ( fixhypo == 1 ) then
   if ( master ) xhypo = xhypo + x(j,k,l,:)
-  call broadcast( xhypo )
+  call broadcastr1( xhypo )
 elseif ( fixhypo == 2 ) then
   if ( master ) xhypo = xhypo + 0.125 * &
     ( x(j,k,l,:) + x(j+1,k+1,l+1,:) &
     + x(j+1,k,l,:) + x(j,k+1,l+1,:) &
     + x(j,k+1,l,:) + x(j+1,k,l+1,:) &
     + x(j,k,l+1,:) + x(j+1,k+1,l,:) )
-  call broadcast( xhypo )
+  call broadcastr1( xhypo )
 end if
 
 ! Origin
@@ -295,13 +295,17 @@ end if
 ! Grid Dimensions
 do i = 1,3
   s2 = x(:,:,:,i)
-  call pmin( x1, minval( s2 ) )
-  call pmax( x2, maxval( s2 ) )
-  xcenter(i) = ( x1 + x2 ) / 2.
+  x1(i) = minval( s2 )
+  x2(i) = maxval( s2 )
+end do
+x0 = x1; call reducer1( x1, x0, 'min', 0 )
+x0 = x2; call reducer1( x2, x0, 'max', 0 )
+xcenter = .5 * ( x1 + x2 )
+do i = 1,3
   w2(:,:,:,i) = x(:,:,:,i) - xcenter(i);
 end do
 s2 = sum( w2 * w2, 4 );
-call pmax( rmax, sqrt( maxval( s2 ) ) )
+call reducer0( rmax, sqrt( maxval( s2 ) ), 'max', 0 )
 
 ! Assign fast operators to rectangular mesh portions
 noper = 1

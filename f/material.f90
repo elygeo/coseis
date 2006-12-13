@@ -103,15 +103,23 @@ where ( s2 < vs1 ) s2 = vs1
 where ( s2 > vs2 ) s2 = vs2
 
 ! Extrema
-call pmax( rho2, maxval( mr ) )
-call pmax( vp2, maxval( s1 ) )
-call pmax( vs2, maxval( s2 ) )
+x1(1) = maxval( mr )
+x1(2) = maxval( s1 )
+x1(3) = maxval( s2 )
+call allreducer1( x2, x1, 'max', 0 )
+rho2 = x2(1)
+vp2  = x2(2)
+vs2  = x2(3)
 call sethalo( mr, rho2, i1node, i2node )
 call sethalo( s1, vp2, i1node, i2node )
 call sethalo( s2, vs2, i1node, i2node )
-call pmin( rho1, minval( mr ) )
-call pmin( vp1, minval( s1 ) )
-call pmin( vs1, minval( s2 ) )
+x1(1) = minval( mr )
+x1(2) = minval( s1 )
+x1(3) = minval( s2 )
+call allreducer1( x2, x1, 'min', 0 )
+rho1 = x2(1)
+vp1  = x2(2)
+vs1  = x2(3)
 
 ! Fill halo
 call scalarbc( mr, ibc1, ibc2, nhalo )

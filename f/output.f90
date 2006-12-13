@@ -61,7 +61,7 @@ case( 'x' )
   i2out(iz,4) = nt
   if ( fault ) then
     i1 = nnoff
-    rout = rmax
+    rout = 2 * dx * dx
     if ( dofault ) then
       i = abs( faultnormal )
       i1 = 1
@@ -76,8 +76,9 @@ case( 'x' )
       end do
       i = abs( faultnormal )
       f2 = sum( t2 * t2, 4 )
-      call sethalo( f2, rmax * rmax, i1node, i2node )
-      call pminloc( rout, i1, f2, n, noff, i )
+      rout = 2 * dx * dx + maxval( f2 )
+      call sethalo( f2, rout, i1node, i2node )
+      call allreduceloc( rout, i1, f2, 'min', n, noff, i )
       i1(i) = ihypo(i)
     end if
   else
@@ -95,15 +96,17 @@ case( 'x' )
           + x(j,k,l+1,i) + x(j+1,k+1,l,i) )
       end forall
       s2 = sum( w2 * w2, 4 )
-      call sethalo( s2, rmax * rmax, i1node, i2cell )
+      rout = 2 * dx * dx + maxval( s2 )
+      call sethalo( s2, rout, i1node, i2cell )
     else
       do i = 1, 3
         w2(:,:,:,i) = xout(iz,i) - x(:,:,:,i)
       end do
       s2 = sum( w2 * w2, 4 )
-      call sethalo( s2, rmax * rmax, i1node, i2node )
+      rout = 2 * dx * dx + maxval( s2 )
+      call sethalo( s2, rout, i1node, i2node )
     end if
-    call pminloc( rout, i1, s2, n, noff, 0 )
+    call allreduceloc( rout, i1, s2, 'min', n, noff, 0 )
   end if
   i2 = i1
   if ( rout > dx * dx ) ditout(iz) = nt + 1
@@ -158,8 +161,8 @@ if ( it > 0 ) then
     if ( modulo( it, itstats ) == 0 ) then
       call sethalo( s1, -1., i1node, i2node )
       call sethalo( s2, -1., i1cell, i2cell )
-      call pmaxloc( r1, i1, s1, n, noff, 0 )
-      call pmaxloc( r2, i2, s2, n, noff, 0 )
+      call reduceloc( r1, i1, s1, 'max', n, noff, 0 )
+      call reduceloc( r2, i2, s2, 'max', n, noff, 0 )
       if ( master ) then
         call stats( r1, i1-nnoff, 'vmax', it / itstats )
         call stats( r2, i2-nnoff, 'wmax', it / itstats )
@@ -168,10 +171,10 @@ if ( it > 0 ) then
         call sethalo( f1, -1., i1node, i2node )
         call sethalo( f2, -1., i1node, i2node )
         call sethalo( tarr, -1., i1node, i2node )
-        call pmaxloc( r1, i1, f1,   n, noff, i ); i1(i) = ihypo(i)
-        call pmaxloc( r2, i2, f2,   n, noff, i ); i2(i) = ihypo(i)
-        call pmaxloc( r3, i3, sl,   n, noff, i ); i3(i) = ihypo(i)
-        call pmaxloc( r4, i4, tarr, n, noff, i ); i4(i) = ihypo(i)
+        call reduceloc( r1, i1, f1,   'max', n, noff, i ); i1(i) = ihypo(i)
+        call reduceloc( r2, i2, f2,   'max', n, noff, i ); i2(i) = ihypo(i)
+        call reduceloc( r3, i3, sl,   'max', n, noff, i ); i3(i) = ihypo(i)
+        call reduceloc( r4, i4, tarr, 'max', n, noff, i ); i4(i) = ihypo(i)
         if ( master ) then
           call stats( r1, i1-nnoff, 'svmax',   it / itstats )
           call stats( r2, i2-nnoff, 'sumax',   it / itstats )
@@ -186,17 +189,17 @@ if ( it > 0 ) then
     if ( modulo( it, itstats ) == 0 ) then
       call sethalo( s1, -1., i1node, i2node )
       call sethalo( s2, -1., i1node, i2node )
-      call pmaxloc( r1, i1, s1, n, noff, 0 )
-      call pmaxloc( r2, i2, s2, n, noff, 0 )
+      call reduceloc( r1, i1, s1, 'max', n, noff, 0 )
+      call reduceloc( r2, i2, s2, 'max', n, noff, 0 )
       if ( master ) then
         call stats( r1, i1-nnoff, 'umax', it / itstats )
         call stats( r2, i2-nnoff, 'amax', it / itstats )
         if ( r1 > dx / 10. ) write( 0, * ) 'warning: u !<< dx', r1, dx
       end if
       if ( dofault ) then
-        call psum( r1, efric,   ifn )
-        call psum( r2, estrain, ifn )
-        call psum( r3, moment,  ifn )
+        call reducer0( r1, efric,   'sum', ifn )
+        call reducer0( r2, estrain, 'sum', ifn )
+        call reducer0( r3, moment,  'sum', ifn )
         r4 = -999.
         if ( r3 > 0. ) r4 = ( log10( r3 ) - 9.05 ) / 1.5
         if ( master ) then
@@ -207,14 +210,14 @@ if ( it > 0 ) then
         end if
         call sethalo( ts, -1., i1node, i2node )
         call sethalo( f2, -1., i1node, i2node )
-        call pmaxloc( r1, i1, ts, n, noff, i ); i1(ifn) = ihypo(ifn)
-        call pmaxloc( r2, i2, f2, n, noff, i ); i2(ifn) = ihypo(ifn)
+        call reduceloc( r1, i1, ts, 'max', n, noff, i ); i1(ifn) = ihypo(ifn)
+        call reduceloc( r2, i2, f2, 'max', n, noff, i ); i2(ifn) = ihypo(ifn)
         r3 = 2. * minval( tn ) - 1.
         call sethalo( tn, r3, i1node, i2node )
-        call pmaxloc( r3, i3, tn, n, noff, i ); i3(ifn) = ihypo(ifn)
+        call reduceloc( r3, i3, tn, 'max', n, noff, i ); i3(ifn) = ihypo(ifn)
         r4 = 2. * r3 + 1.
         call sethalo( tn, r4, i1node, i2node )
-        call pminloc( r4, i4, tn, n, noff, i ); i4(ifn) = ihypo(ifn)
+        call reduceloc( r4, i4, tn, 'min', n, noff, i ); i4(ifn) = ihypo(ifn)
         if ( master ) then
           call stats( r1, i1-nnoff, 'tsmax', it / itstats )
           call stats( r2, i2-nnoff, 'samax', it / itstats )

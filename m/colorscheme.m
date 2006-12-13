@@ -16,7 +16,10 @@ else
   bg = 'w';
   fg = [ 0 0 0 ];
 end
-if abs( scheme ) > 2, type = 'signed'; end
+i = abs( scheme );
+if i == 3, type = 'signed'; end
+if i == 4, type = 'signed'; end
+if i == 5, type = 'folded'; end
 
 set( gcf, ...
   'InvertHardcopy', 'off', ...
@@ -52,7 +55,7 @@ case 'signed'
     cmap = [
       0 2 8 8 8
       8 2 8 2 8
-      8 8 8 2 0 ]' / 8;
+      8 8 8 2 2 ]' / 8;
   case 2
     cmap = [
       0 1 0
@@ -66,15 +69,10 @@ case 'signed'
     cmap = repmat( cmap, 3, 1 );
   case 4
     cmap = [
-      8 8 8 2 2 2
-      2 2 8 8 8 2 
-      8 2 2 2 8 8 ]' / 8;
+      8 8 2 2 2 8
+      2 8 8 8 2 2 
+      2 2 2 8 8 8 ]' / 8;
     cmap = repmat( cmap, 3, 1 );
-  case 5
-    cmap = [
-      0 0 0 8 8 8
-      0 8 8 8 0 0
-      8 8 0 0 0 8 ]' / 8;
   otherwise, error( 'colormap scheme' )
   end
   h = 2 / ( size( cmap, 1 ) - 1 );
@@ -99,6 +97,11 @@ case 'folded'
       1 0
       1 0
       1 0 ]';
+  case 5
+    cmap = [
+      8 8 8 2 2 2 8
+      8 2 8 8 8 2 2
+      8 2 2 2 8 8 8 ]' / 8;
   otherwise, error( 'colormap scheme' )
   end
   h = 1 / ( size( cmap, 1 ) - 1 );
