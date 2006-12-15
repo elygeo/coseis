@@ -138,7 +138,8 @@ use m_collective
 use m_outprops
 use m_util
 integer, intent(in) :: pass
-real :: r1, r2, r3, r4
+real, save :: r1(4), r3(8)
+real :: r2(4), r4(8), rr
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), noff(3), i, onpass, nc, ic, ir, iz
 logical :: dofault, fault, cell
 
@@ -149,82 +150,95 @@ if ( faultnormal /= 0 ) then
   if ( ihypo(i) >= i1node(i) .and. ihypo(i) <= i2node(i) ) dofault = .true.
 end if
 
-! Prepare output and write stats
+! Prepare output
 if ( it > 0 ) then
-  n = nn + 2 * nhalo
-  noff = nnoff - nhalo
   select case( pass )
   case( 1 )
     s1 = sqrt( sum( v * v, 4 ) )
     s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
     pv = max( pv, s1 )
-    if ( modulo( it, itstats ) == 0 ) then
-      call sethalo( s1, -1., i1node, i2node )
-      call sethalo( s2, -1., i1cell, i2cell )
-      call reduceloc( r1, i1, s1, 'max', n, noff, 0 )
-      call reduceloc( r2, i2, s2, 'max', n, noff, 0 )
-      if ( master ) then
-        call stats( r1, i1-nnoff, 'vmax', it / itstats )
-        call stats( r2, i2-nnoff, 'wmax', it / itstats )
-      end if
-      if ( dofault ) then
-        call sethalo( f1, -1., i1node, i2node )
-        call sethalo( f2, -1., i1node, i2node )
-        call sethalo( tarr, -1., i1node, i2node )
-        call reduceloc( r1, i1, f1,   'max', n, noff, i ); i1(i) = ihypo(i)
-        call reduceloc( r2, i2, f2,   'max', n, noff, i ); i2(i) = ihypo(i)
-        call reduceloc( r3, i3, sl,   'max', n, noff, i ); i3(i) = ihypo(i)
-        call reduceloc( r4, i4, tarr, 'max', n, noff, i ); i4(i) = ihypo(i)
-        if ( master ) then
-          call stats( r1, i1-nnoff, 'svmax',   it / itstats )
-          call stats( r2, i2-nnoff, 'sumax',   it / itstats )
-          call stats( r3, i3-nnoff, 'slmax',   it / itstats )
-          call stats( r4, i4-nnoff, 'tarrmax', it / itstats )
-        end if
-      end if
-    end if
   case( 2 )
     s1 = sqrt( sum( u * u, 4 ) )
     s2 = sqrt( sum( w1 * w1, 4 ) )
-    if ( modulo( it, itstats ) == 0 ) then
-      call sethalo( s1, -1., i1node, i2node )
-      call sethalo( s2, -1., i1node, i2node )
-      call reduceloc( r1, i1, s1, 'max', n, noff, 0 )
-      call reduceloc( r2, i2, s2, 'max', n, noff, 0 )
-      if ( master ) then
-        call stats( r1, i1-nnoff, 'umax', it / itstats )
-        call stats( r2, i2-nnoff, 'amax', it / itstats )
-        if ( r1 > dx / 10. ) write( 0, * ) 'warning: u !<< dx', r1, dx
-      end if
-      if ( dofault ) then
-        call reducer0( r1, efric,   'sum', ifn )
-        call reducer0( r2, estrain, 'sum', ifn )
-        call reducer0( r3, moment,  'sum', ifn )
-        r4 = -999.
-        if ( r3 > 0. ) r4 = ( log10( r3 ) - 9.05 ) / 1.5
-        if ( master ) then
-          call rwrite( 'stats/efric',   r1, it / itstats )
-          call rwrite( 'stats/estrain', r2, it / itstats )
-          call rwrite( 'stats/moment',  r3, it / itstats )
-          call rwrite( 'stats/mw',      r4, it / itstats ) 
-        end if
-        call sethalo( ts, -1., i1node, i2node )
-        call sethalo( f2, -1., i1node, i2node )
-        call reduceloc( r1, i1, ts, 'max', n, noff, i ); i1(ifn) = ihypo(ifn)
-        call reduceloc( r2, i2, f2, 'max', n, noff, i ); i2(ifn) = ihypo(ifn)
-        r3 = 2. * minval( tn ) - 1.
-        call sethalo( tn, r3, i1node, i2node )
-        call reduceloc( r3, i3, tn, 'max', n, noff, i ); i3(ifn) = ihypo(ifn)
-        r4 = 2. * r3 + 1.
-        call sethalo( tn, r4, i1node, i2node )
-        call reduceloc( r4, i4, tn, 'min', n, noff, i ); i4(ifn) = ihypo(ifn)
-        if ( master ) then
-          call stats( r1, i1-nnoff, 'tsmax', it / itstats )
-          call stats( r2, i2-nnoff, 'samax', it / itstats )
-          call stats( r3, i3-nnoff, 'tnmax', it / itstats )
-          call stats( r4, i4-nnoff, 'tnmin', it / itstats )
-        end if
-      end if
+  end select
+end if
+
+! Write volume stats
+if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
+  select case( pass )
+  case( 1 )
+    call sethalo( s1, -1., i1node, i2node )
+    call sethalo( s2, -1., i1cell, i2cell )
+    r1(1) = max( s1 )
+    r1(2) = max( s2 )
+    n = nn + 2 * nhalo
+    noff = nnoff - nhalo
+    call reduceloc( rr, i1, s1, 'max', n, noff, 0 )
+    if ( master ) then
+      call iwrite( 'stats/vmax1', i1(1), it / itstats )
+      call iwrite( 'stats/vmax2', i1(2), it / itstats )
+      call iwrite( 'stats/vmax3', i1(3), it / itstats )
+    end if
+  case( 2 )
+    call sethalo( s1, -1., i1node, i2node )
+    call sethalo( s2, -1., i1node, i2node )
+    r1(3) = max( s1 )
+    r1(4) = max( s2 )
+    call reducer1( r2, r1, 'max', 0 )
+    if ( master ) then
+      call rwrite( 'stats/vmax', r2(1), it / itstats )
+      call rwrite( 'stats/wmax', r2(2), it / itstats )
+      call rwrite( 'stats/umax', r2(3), it / itstats )
+      call rwrite( 'stats/amax', r2(4), it / itstats )
+      if ( r2(3) > dx / 10. ) write( 0, * ) 'warning: u !<< dx', r2(3), dx
+    end if
+  end select
+end if
+
+! Write fault stats
+if ( it > 0 .and. modulo( it, itstats ) == 0 .and. dofault ) then
+  select case( pass )
+  case( 1 )
+    call sethalo( f1, -1., i1node, i2node )
+    call sethalo( f2, -1., i1node, i2node )
+    call sethalo( tarr, -1., i1node, i2node )
+    r3(1) = max( f1 )
+    r3(2) = max( f2 )
+    r3(3) = max( sl )
+    r3(4) = max( tarr )
+  case( 2 )
+    call sethalo( ts, -1., i1node, i2node )
+    call sethalo( f2, -1., i1node, i2node )
+    r3(5) = max( ts )
+    r3(6) = max( f2 )
+    rr = 2. * minval( tn ) - 1.
+    call sethalo( tn, rr, i1node, i2node )
+    r3(7) = max( tn )
+    rr = 2. * r3(7) + 1.
+    call sethalo( tn, rr, i1node, i2node )
+    r3(8) = -min( tn )
+    call reducer1( r4, r3, 'max', ifn )
+    if ( master ) then
+      call rwrite( 'stats/svmax',   r4(1), it / itstats )
+      call rwrite( 'stats/sumax',   r4(2), it / itstats )
+      call rwrite( 'stats/slmax',   r4(3), it / itstats )
+      call rwrite( 'stats/tarrmax', r4(4), it / itstats )
+      call rwrite( 'stats/tsmax',   r4(5), it / itstats )
+      call rwrite( 'stats/samax',   r4(6), it / itstats )
+      call rwrite( 'stats/tnmax',   r4(7), it / itstats )
+      call rwrite( 'stats/tnmin',  -r4(8), it / itstats )
+    end if
+    r3(1) = efric
+    r3(2) = estrain
+    r3(3) = moment
+    call reducer1( r4, r3, 'sum', ifn )
+    if ( master ) then
+      r4(4) = -999.
+      if ( r4(3) > 0. ) r4(4) = ( log10( r4(3) ) - 9.05 ) / 1.5
+      call rwrite( 'stats/efric',   r4(1), it / itstats )
+      call rwrite( 'stats/estrain', r4(2), it / itstats )
+      call rwrite( 'stats/moment',  r4(3), it / itstats )
+      call rwrite( 'stats/mw',      r4(4), it / itstats ) 
     end if
   end select
 end if

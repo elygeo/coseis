@@ -84,17 +84,6 @@ else
 end if
 end subroutine
 
-! Write stats 
-subroutine stats( rr, ii, filename, it )
-real, intent(in) :: rr
-character(*), intent(in) :: filename
-integer, intent(in) :: ii(3), it
-call rwrite( 'stats/' // filename, rr, it )
-call iwrite( 'stats/' // filename // '1', ii(1), it )
-call iwrite( 'stats/' // filename // '2', ii(2), it )
-call iwrite( 'stats/' // filename // '3', ii(3), it )
-end subroutine
-
 ! Write integer binary timeseries
 subroutine iwrite( filename, val, it )
 character(*), intent(in) :: filename

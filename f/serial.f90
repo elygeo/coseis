@@ -32,17 +32,11 @@ integer :: i
 i = ip3master(1)
 end subroutine
 
-! broadcast real 1d
-subroutine broadcastr1( r )
-real, intent(inout) :: r(:)
-r = r
-end subroutine
-
 ! all reduce integer
 subroutine allreducei0( ii, i, op, i2d )
 integer, intent(out) :: ii
 integer, intent(in) :: i, i2d
-character(3), intent(in) :: op(3)
+character(3), intent(in) :: op
 ii = i2d
 ii = i
 end subroutine
@@ -52,7 +46,17 @@ subroutine reducer0( rr, r, op, i2d )
 real, intent(out) :: rr
 real, intent(in) :: r
 integer, intent(in) :: i2d
-character(3), intent(in) :: op(3)
+character(3), intent(in) :: op
+rr = i2d
+rr = r
+end subroutine
+
+! all reduce real
+subroutine allreducer0( rr, r, op, i2d )
+real, intent(out) :: rr
+real, intent(in) :: r
+integer, intent(in) :: i2d
+character(3), intent(in) :: op
 rr = i2d
 rr = r
 end subroutine
@@ -62,7 +66,7 @@ subroutine reducer1( rr, r, op, i2d )
 real, intent(out) :: rr(:)
 real, intent(in) :: r(:)
 integer, intent(in) :: i2d
-character(3), intent(in) :: op(3)
+character(3), intent(in) :: op
 rr = i2d
 rr = r
 end subroutine
@@ -72,7 +76,7 @@ subroutine allreducer1( rr, r, op, i2d )
 real, intent(out) :: rr(:)
 real, intent(in) :: r(:)
 integer, intent(in) :: i2d
-character(3), intent(in) :: op(3)
+character(3), intent(in) :: op
 rr = i2d
 rr = r
 end subroutine

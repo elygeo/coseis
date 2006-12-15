@@ -55,7 +55,7 @@ end select
 
 ! Normalize and divide by cell volume
 cellvol = pack( s1, s2 <= rsource )
-call allreducer0( sumsrcfr, sum( srcfr ), 'sum', 0 )
+call reducer0( sumsrcfr, sum( srcfr ), 'allsum', 0 )
 srcfr = srcfr / sumsrcfr / cellvol
 
 ! Index map

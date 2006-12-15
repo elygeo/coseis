@@ -18,7 +18,7 @@ if ( i == 0 ) then
 else
   it = 0
 end if
-call allreducei0( i, it, 'min', 0 )
+call reducei0( i, it, 'allmin', 0 )
 it = i
 if ( it == 0 ) return
 if ( master ) write( 0, * ) 'Checkpoint found, starting from ', it

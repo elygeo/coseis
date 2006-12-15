@@ -60,17 +60,22 @@ i = size(r)
 call mpi_bcast( r, i, mpi_real, ipmaster, comm3d, e )
 end subroutine
 
-! all reduce integer
-subroutine allreducei0( ii, i, op, i2d )
+! reduce integer
+subroutine reducei0( ii, i, op, i2d )
 integer, intent(out) :: ii
 integer, intent(in) :: i, i2d
-character(3), intent(in) :: op(3)
+character(6), intent(in) :: op
 integer :: e, comm
+comm = comm3d
+if ( i2d /= 0 ) comm = comm2d(i2d)
 call mpi_allreduce( i, ii, 1, mpi_integer, mpi_min, comm3d, e )
 select case( op )
-case( 'min' ); call mpi_allreduce( r, rr, i, mpi_integer, mpi_min, comm, e )
-case( 'max' ); call mpi_allreduce( r, rr, i, mpi_integer, mpi_max, comm, e )
-case( 'sum' ); call mpi_allreduce( r, rr, i, mpi_integer, mpi_sum, comm, e )
+case( 'min' ); call mpi_allreduce( i, ii, 1, mpi_integer, mpi_min, ipmaster, comm, e )
+case( 'max' ); call mpi_allreduce( i, ii, 1, mpi_integer, mpi_max, ipmaster, comm, e )
+case( 'sum' ); call mpi_allreduce( i, ii, 1, mpi_integer, mpi_sum, ipmaster, comm, e )
+case( 'allmin' ); call mpi_allreduce( i, ii, 1, mpi_integer, mpi_min, comm, e )
+case( 'allmax' ); call mpi_allreduce( i, ii, 1, mpi_integer, mpi_max, comm, e )
+case( 'allsum' ); call mpi_allreduce( i, ii, 1, mpi_integer, mpi_sum, comm, e )
 end select
 end subroutine
 
@@ -79,7 +84,7 @@ subroutine reducer0( rr, r, op, i2d )
 real, intent(out) :: rr
 real, intent(in) :: r
 integer, intent(in) :: i2d
-character(3), intent(in) :: op(3)
+character(6), intent(in) :: op
 integer :: e, comm
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
@@ -87,6 +92,9 @@ select case( op )
 case( 'min' ); call mpi_reduce( r, rr, 1, mpi_real, mpi_min, ipmaster, comm, e )
 case( 'max' ); call mpi_reduce( r, rr, 1, mpi_real, mpi_max, ipmaster, comm, e )
 case( 'sum' ); call mpi_reduce( r, rr, 1, mpi_real, mpi_sum, ipmaster, comm, e )
+case( 'allmin' ); call mpi_allreduce( r, rr, 1, mpi_real, mpi_min, comm, e )
+case( 'allmax' ); call mpi_allreduce( r, rr, 1, mpi_real, mpi_max, comm, e )
+case( 'allsum' ); call mpi_allreduce( r, rr, 1, mpi_real, mpi_sum, comm, e )
 end select
 end subroutine
 
@@ -95,7 +103,7 @@ subroutine reducer1( rr, r, op, i2d )
 real, intent(out) :: rr(:)
 real, intent(in) :: r(:)
 integer, intent(in) :: i2d
-character(3), intent(in) :: op(3)
+character(6), intent(in) :: op
 integer :: i, e, comm
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
@@ -104,23 +112,9 @@ select case( op )
 case( 'min' ); call mpi_reduce( r, rr, i, mpi_real, mpi_min, ipmaster, comm, e )
 case( 'max' ); call mpi_reduce( r, rr, i, mpi_real, mpi_max, ipmaster, comm, e )
 case( 'sum' ); call mpi_reduce( r, rr, i, mpi_real, mpi_sum, ipmaster, comm, e )
-end select
-end subroutine
-
-! all reduce real 1d
-subroutine allreducer1( rr, r, op, i2d )
-real, intent(out) :: rr(:)
-real, intent(in) :: r(:)
-integer, intent(in) :: i2d
-character(3), intent(in) :: op(3)
-integer :: i, e, comm
-comm = comm3d
-if ( i2d /= 0 ) comm = comm2d(i2d)
-i = size(r)
-select case( op )
-case( 'min' ); call mpi_allreduce( r, rr, i, mpi_real, mpi_min, comm, e )
-case( 'max' ); call mpi_allreduce( r, rr, i, mpi_real, mpi_max, comm, e )
-case( 'sum' ); call mpi_allreduce( r, rr, i, mpi_real, mpi_sum, comm, e )
+case( 'allmin' ); call mpi_allreduce( r, rr, i, mpi_real, mpi_min, comm, e )
+case( 'allmax' ); call mpi_allreduce( r, rr, i, mpi_real, mpi_max, comm, e )
+case( 'allsum' ); call mpi_allreduce( r, rr, i, mpi_real, mpi_sum, comm, e )
 end select
 end subroutine
 
