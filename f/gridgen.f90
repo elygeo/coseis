@@ -281,7 +281,7 @@ elseif ( fixhypo == 2 ) then
     + x(j+1,k,l,:) + x(j,k+1,l+1,:) &
     + x(j,k+1,l,:) + x(j+1,k,l+1,:) &
     + x(j,k,l+1,:) + x(j+1,k+1,l,:) )
-  call broadcastr1( xhypo )
+  call rbroadcast1( xhypo )
 end if
 
 ! Origin
@@ -298,14 +298,14 @@ do i = 1,3
   x1(i) = minval( s2 )
   x2(i) = maxval( s2 )
 end do
-x0 = x1; call reducer1( x1, x0, 'min', 0 )
-x0 = x2; call reducer1( x2, x0, 'max', 0 )
+x0 = x1; call rreduce1( x1, x0, 'min', 0 )
+x0 = x2; call rreduce1( x2, x0, 'max', 0 )
 xcenter = .5 * ( x1 + x2 )
 do i = 1,3
   w2(:,:,:,i) = x(:,:,:,i) - xcenter(i);
 end do
 s2 = sum( w2 * w2, 4 );
-call reducer0( rmax, sqrt( maxval( s2 ) ), 'max', 0 )
+call rreduce( rmax, sqrt( maxval( s2 ) ), 'max', 0 )
 
 ! Assign fast operators to rectangular mesh portions
 noper = 1

@@ -33,46 +33,26 @@ i = ip3master(1)
 end subroutine
 
 ! all reduce integer
-subroutine allreducei0( ii, i, op, i2d )
+subroutine ireduce( ii, i, op, i2d )
 integer, intent(out) :: ii
 integer, intent(in) :: i, i2d
-character(3), intent(in) :: op
+character(*), intent(in) :: op
 ii = i2d
 ii = i
 end subroutine
 
 ! reduce real
-subroutine reducer0( rr, r, op, i2d )
+subroutine rreduce( rr, r, op, i2d )
 real, intent(out) :: rr
 real, intent(in) :: r
 integer, intent(in) :: i2d
-character(3), intent(in) :: op
-rr = i2d
-rr = r
-end subroutine
-
-! all reduce real
-subroutine allreducer0( rr, r, op, i2d )
-real, intent(out) :: rr
-real, intent(in) :: r
-integer, intent(in) :: i2d
-character(3), intent(in) :: op
+character(*), intent(in) :: op
 rr = i2d
 rr = r
 end subroutine
 
 ! reduce real 1d
-subroutine reducer1( rr, r, op, i2d )
-real, intent(out) :: rr(:)
-real, intent(in) :: r(:)
-integer, intent(in) :: i2d
-character(3), intent(in) :: op
-rr = i2d
-rr = r
-end subroutine
-
-! all reduce real 1d
-subroutine allreducer1( rr, r, op, i2d )
+subroutine rreduce1( rr, r, op, i2d )
 real, intent(out) :: rr(:)
 real, intent(in) :: r(:)
 integer, intent(in) :: i2d
@@ -87,24 +67,9 @@ real, intent(out) :: rr
 real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
 integer, intent(in) :: n(3), noff(3), i2d
-character(3), intent(in) :: op
+character(*), intent(in) :: op
 ii = n + noff + i2d
-select case( op )
-case( 'min' ); ii = minloc( r );
-case( 'max' ); ii = maxloc( r );
-end select
-rr = r(ii(1),ii(2),ii(3))
-end subroutine
-
-! all reduce extrema location, real 3d
-subroutine allreduceloc( rr, ii, r, op, n, noff, i2d )
-real, intent(out) :: rr
-real, intent(in) :: r(:,:,:)
-integer, intent(out) :: ii(3)
-integer, intent(in) :: n(3), noff(3), i2d
-character(3), intent(in) :: op
-ii = n + noff + i2d
-select case( op )
+select case( op(1:3) )
 case( 'min' ); ii = minloc( r );
 case( 'max' ); ii = maxloc( r );
 end select

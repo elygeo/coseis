@@ -53,7 +53,7 @@ call mpi_cart_rank( comm3d, ip3master, ipmaster, e )
 end subroutine
 
 ! broadcast real 1d
-subroutine broadcastr1( r )
+subroutine rbroadcast1( r )
 real, intent(inout) :: r(:)
 integer :: i, e
 i = size(r)
@@ -61,10 +61,10 @@ call mpi_bcast( r, i, mpi_real, ipmaster, comm3d, e )
 end subroutine
 
 ! reduce integer
-subroutine reducei0( ii, i, op, i2d )
+subroutine ireduce( ii, i, op, i2d )
 integer, intent(out) :: ii
 integer, intent(in) :: i, i2d
-character(6), intent(in) :: op
+character(*), intent(in) :: op
 integer :: e, comm
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
@@ -80,11 +80,11 @@ end select
 end subroutine
 
 ! reduce real
-subroutine reducer0( rr, r, op, i2d )
+subroutine rreduce( rr, r, op, i2d )
 real, intent(out) :: rr
 real, intent(in) :: r
 integer, intent(in) :: i2d
-character(6), intent(in) :: op
+character(*), intent(in) :: op
 integer :: e, comm
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
@@ -99,11 +99,11 @@ end select
 end subroutine
 
 ! reduce real 1d
-subroutine reducer1( rr, r, op, i2d )
+subroutine rreduce1( rr, r, op, i2d )
 real, intent(out) :: rr(:)
 real, intent(in) :: r(:)
 integer, intent(in) :: i2d
-character(6), intent(in) :: op
+character(*), intent(in) :: op
 integer :: i, e, comm
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
@@ -125,12 +125,14 @@ real, intent(out) :: rr
 real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
 integer, intent(in) :: n(3), noff(3), i2d
-character(3), intent(in) :: op
+character(*), intent(in) :: op
 integer(8) :: i, nn(3)
 integer :: iop, comm, e
 select case( op )
-case( 'min' ); ii = minloc( r ); iop = mpi_minloc
-case( 'max' ); ii = maxloc( r ); iop = mpi_maxloc
+case( 'min' );    ii = minloc( r ); iop = mpi_minloc
+case( 'max' );    ii = maxloc( r ); iop = mpi_maxloc
+case( 'allmin' ); ii = minloc( r ); iop = mpi_minloc
+case( 'allmax' ); ii = maxloc( r ); iop = mpi_maxloc
 end select
 rr = r(ii(1),ii(2),ii(3))
 ii = ii - noff - 1
@@ -139,38 +141,12 @@ local(1) = rr
 local(2) = i
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
-call mpi_reduce( local, global, 1, mpi_2double_precision, iop, ipmaster, comm, e )
-rr = global(1)
-i = global(2)
-nn = n
-ii(3) = i / ( n(1) * n(2) )
-ii(2) = modulo( i / nn(1), nn(2) )
-ii(1) = modulo( i, nn(1) )
-ii = ii + 1 + noff
-end subroutine
-
-! all reduce extrema location, real 3d
-subroutine allreduceloc( rr, ii, r, op, n, noff, i2d )
-real, intent(out) :: rr
-real, intent(in) :: r(:,:,:)
-integer, intent(out) :: ii(3)
-integer, intent(in) :: n(3), noff(3), i2d
-character(3), intent(in) :: op
-double precision :: local(2), global(2)
-integer(8) :: i, nn(3)
-integer :: iop, comm, e
 select case( op )
-case( 'min' ); ii = minloc( r ); iop = mpi_minloc
-case( 'max' ); ii = maxloc( r ); iop = mpi_maxloc
+case( 'min' ); case( call mpi_reduce( local, global, 1, mpi_2double_precision, iop, ipmaster, comm, e )
+case( 'max' ); case( call mpi_reduce( local, global, 1, mpi_2double_precision, iop, ipmaster, comm, e )
+case( 'allmin' ); case( call mpi_allreduce( local, global, 1, mpi_2double_precision, iop, comm, e )
+case( 'allmax' ); case( call mpi_allreduce( local, global, 1, mpi_2double_precision, iop, comm, e )
 end select
-rr = r(ii(1),ii(2),ii(3))
-ii = ii - noff - 1
-i = ii(1) + n(1) * ( ii(2) + n(2) * ii(3) )
-local(1) = rr
-local(2) = i
-comm = comm3d
-if ( i2d /= 0 ) comm = comm2d(i2d)
-call mpi_allreduce( local, global, 1, mpi_2double_precision, iop, comm, e )
 rr = global(1)
 i = global(2)
 nn = n
