@@ -1,4 +1,4 @@
-! collective routines - MPI version
+! Collective routines - MPI version
 module m_collective
 use mpi
 implicit none
@@ -6,7 +6,7 @@ integer, private :: ip, ipmaster, comm3d, comm2d(3)
 integer, private, allocatable :: commout(:)
 contains
 
-! initialize
+! Initialize
 subroutine initialize( ipout, np0, master )
 integer, intent(out) :: ipout, np0
 logical, intent(out) :: master
@@ -19,13 +19,13 @@ master = .false.
 if ( ip == 0 ) master = .true.
 end subroutine
 
-! finalize
+! Finalize
 subroutine finalize
 integer :: e
 call mpi_finalize( e )
 end subroutine
 
-! processor rank
+! Processor rank
 subroutine rank( ipout, ip3, np )
 integer, intent(out) :: ipout, ip3(3)
 integer, intent(in) :: np(3)
@@ -45,14 +45,14 @@ do i = 1, 3
 end do
 end subroutine
 
-! set master processor
+! Set master processor
 subroutine setmaster( ip3master )
 integer, intent(in) :: ip3master(3)
 integer :: e
 call mpi_cart_rank( comm3d, ip3master, ipmaster, e )
 end subroutine
 
-! broadcast real 1d
+! Broadcast real 1d
 subroutine rbroadcast1( r )
 real, intent(inout) :: r(:)
 integer :: i, e
@@ -60,7 +60,7 @@ i = size(r)
 call mpi_bcast( r, i, mpi_real, ipmaster, comm3d, e )
 end subroutine
 
-! reduce integer
+! Reduce integer
 subroutine ireduce( ii, i, op, i2d )
 integer, intent(out) :: ii
 integer, intent(in) :: i, i2d
@@ -80,7 +80,7 @@ case default; stop
 end select
 end subroutine
 
-! reduce real
+! Reduce real
 subroutine rreduce( rr, r, op, i2d )
 real, intent(out) :: rr
 real, intent(in) :: r
@@ -100,7 +100,7 @@ case default; stop
 end select
 end subroutine
 
-! reduce real 1d
+! Reduce real 1d
 subroutine rreduce1( rr, r, op, i2d )
 real, intent(out) :: rr(:)
 real, intent(in) :: r(:)
@@ -121,7 +121,7 @@ case default; stop
 end select
 end subroutine
 
-! reduce extrema location, real 3d
+! Reduce extrema location, real 3d
 subroutine reduceloc( rr, ii, r, op, n, noff, i2d )
 double precision :: local(2), global(2)
 real, intent(out) :: rr
@@ -159,7 +159,7 @@ ii(1) = modulo( i, nn(1) )
 ii = ii + 1 + noff
 end subroutine
 
-! vector send
+! Vector send
 subroutine vectorsend( f, i1, i2, i )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i
@@ -175,7 +175,7 @@ do e = 1,1; end do ! bug work-around, need slight delay here for MPICH2
 call mpi_type_free( dtype, e )
 end subroutine
 
-! vector recieve
+! Vector recieve
 subroutine vectorrecv( f, i1, i2, i )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i
@@ -190,7 +190,7 @@ call mpi_recv( f(1,1,1,1), 1, dtype, next, 0, comm3d, mpi_status_ignore, e )
 call mpi_type_free( dtype, e )
 end subroutine
 
-! scalar swap halo
+! Scalar swap halo
 subroutine scalarswaphalo( f, nhalo )
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: nhalo
@@ -224,7 +224,7 @@ end if
 end do
 end subroutine
 
-! vector swap halo
+! Vector swap halo
 subroutine vectorswaphalo( f, nhalo )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: nhalo
@@ -258,7 +258,7 @@ end if
 end do
 end subroutine
 
-! split communicator
+! Split communicator
 subroutine splitio( iz, nout, ditout )
 integer, intent(in) :: iz, nout, ditout
 integer :: e
@@ -266,7 +266,7 @@ if ( .not. allocated( commout ) ) allocate( commout(nout) )
 call mpi_comm_split( comm3d, ditout, 0, commout(iz), e )
 end subroutine
 
-! scalar field input/output
+! Scalar field input/output
 subroutine scalario( io, filename, s1, ir, i1, i2, i3, i4, iz )
 real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: ir, i1(3), i2(3), i3(3), i4(3), iz
@@ -301,7 +301,7 @@ call mpi_type_free( mtype, e )
 call mpi_type_free( ftype, e )
 end subroutine
 
-! vector field component input/output
+! Vector field component input/output
 subroutine vectorio( io, filename, w1, ic, ir, i1, i2, i3, i4, iz )
 real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: ic, ir, i1(3), i2(3), i3(3), i4(3), iz

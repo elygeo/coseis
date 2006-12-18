@@ -1,9 +1,9 @@
-! collective routines - hooks for parallelization
+! Collective routines - hooks for parallelization
 module m_collective
 implicit none
 contains
 
-! initialize
+! Initialize
 subroutine initialize( ipout, np0, master )
 integer, intent(out) :: ipout, np0
 logical, intent(out) :: master
@@ -12,11 +12,11 @@ np0 = 1
 master = .true.
 end subroutine
 
-! finalize
+! Finalize
 subroutine finalize
 end subroutine
 
-! processor rank
+! Processor rank
 subroutine rank( ipout, ip3, np )
 integer, intent(out) :: ipout, ip3(3)
 integer, intent(in) :: np(3)
@@ -25,20 +25,20 @@ ip3 = 0
 ipout = 0
 end subroutine
 
-! set master processor
+! Set master processor
 subroutine setmaster( ip3master )
 integer, intent(in) :: ip3master(3)
 integer :: i
 i = ip3master(1)
 end subroutine
 
-! broadcast real 1d
+! Broadcast real 1d
 subroutine rbroadcast1( r )
 real, intent(inout) :: r(:)
 r = r
 end subroutine
 
-! reduce integer
+! Reduce integer
 subroutine ireduce( ii, i, op, i2d )
 integer, intent(out) :: ii
 integer, intent(in) :: i, i2d
@@ -49,7 +49,7 @@ ii = i2d
 ii = i
 end subroutine
 
-! reduce real
+! Reduce real
 subroutine rreduce( rr, r, op, i2d )
 real, intent(out) :: rr
 real, intent(in) :: r
@@ -61,7 +61,7 @@ rr = i2d
 rr = r
 end subroutine
 
-! reduce real 1d
+! Reduce real 1d
 subroutine rreduce1( rr, r, op, i2d )
 real, intent(out) :: rr(:)
 real, intent(in) :: r(:)
@@ -73,7 +73,7 @@ rr = i2d
 rr = r
 end subroutine
 
-! reduce extrema location, real 3d
+! Reduce extrema location, real 3d
 subroutine reduceloc( rr, ii, r, op, n, noff, i2d )
 real, intent(out) :: rr
 real, intent(in) :: r(:,:,:)
@@ -91,42 +91,42 @@ end select
 rr = r(ii(1),ii(2),ii(3))
 end subroutine
 
-! vector send
+! Vector send
 subroutine vectorsend( f, i1, i2, i )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i
 f(1,1,1,1) = f(1,1,1,1) - i1(1) + i1(1) - i2(1) + i2(1) - i + i
 end subroutine
 
-! vector recieve
+! Vector recieve
 subroutine vectorrecv( f, i1, i2, i )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i
 f(1,1,1,1) = f(1,1,1,1) - i1(1) + i1(1) - i2(1) + i2(1) - i + i
 end subroutine
 
-! scalar swap halo
+! Scalar swap halo
 subroutine scalarswaphalo( f, nhalo )
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: nhalo
 f(1,1,1) = f(1,1,1) - nhalo + nhalo
 end subroutine
 
-! vector swap halo
+! Vector swap halo
 subroutine vectorswaphalo( f, nhalo )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: nhalo
 f(1,1,1,1) = f(1,1,1,1) - nhalo + nhalo
 end subroutine
 
-! split communicator
+! Split communicator
 subroutine splitio( iz, nout, ditout )
 integer, intent(in) :: iz, nout, ditout
 integer :: i
 i = iz + nout + ditout
 end subroutine
 
-! scalar field input/output
+! Scalar field input/output
 subroutine scalario( io, filename, s1, ir, i1, i2, i3, i4, iz )
 real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: ir, i1(3), i2(3), i3(3), i4(3), iz
@@ -162,7 +162,7 @@ case( 'w' )
 end select
 end subroutine
 
-! vector field component input/output
+! Vector field component input/output
 subroutine vectorio( io, filename, w1, ic, ir, i1, i2, i3, i4, iz )
 real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: ic, ir, i1(3), i2(3), i3(3), i4(3), iz

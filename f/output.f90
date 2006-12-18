@@ -1,4 +1,4 @@
-! OUTPUT ROUTINES
+! Output routines
 module m_output
 implicit none
 contains
@@ -17,7 +17,7 @@ logical :: dofault, fault, cell
 if ( master ) write( 0, * ) 'Output initialization'
 if ( nout > nz ) stop 'too many output zones, make nz bigger'
 
-! test for fault
+! Test for fault
 dofault = .false.
 if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
@@ -26,10 +26,10 @@ end if
 
 do iz = 1, nout
 
-! output field properties
+! Output field properties
 call outprops( fieldout(iz), nc, onpass, fault, cell )
 
-! time indices 
+! Time indices 
 if ( itstats < 1 ) itstats = itstats + nt + 1
 if ( i1out(iz,4) < 0 ) i1out(iz,4) = nt + i1out(iz,4) + 1
 if ( i2out(iz,4) < 0 ) i2out(iz,4) = nt + i2out(iz,4) + 1
@@ -42,7 +42,7 @@ end if
 i2out(iz,4) = min( i2out(iz,4), nt )
 if ( fault .and. faultnormal == 0 ) ditout(iz) = nt + 1
 
-! spacial indices
+! Spacial indices
 n = nn + 2 * nhalo
 noff = nnoff - nhalo
 select case( outtype(iz) )
@@ -112,12 +112,12 @@ case( 'x' )
   if ( rout > dx * dx ) ditout(iz) = nt + 1
 end select
 
-! save indices
+! Save indices
 if ( any( i2 < i1 ) ) stop 'bad output indices'
 i1out(iz,1:3) = i1
 i2out(iz,1:3) = i2
 
-! split collective i/o
+! Split collective i/o
 i1 = max( i1, i1node )
 i2 = min( i2, i2node )
 if ( cell ) i2 = min( i2, i2cell )
@@ -131,7 +131,7 @@ end subroutine
 
 !------------------------------------------------------------------------------!
 
-! write output
+! Write output
 subroutine output( pass )
 use m_globals
 use m_collective
@@ -143,14 +143,14 @@ real :: gvstats(4), gfstats(8), rr
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), noff(3), i, onpass, nc, ic, ir, iz
 logical :: dofault, fault, cell
 
-! test for fault
+! Test for fault
 dofault = .false.
 if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
   if ( ihypo(i) >= i1node(i) .and. ihypo(i) <= i2node(i) ) dofault = .true.
 end if
 
-! prepare output
+! Prepare output
 if ( it > 0 ) then
   select case( pass )
   case( 1 )
@@ -163,7 +163,7 @@ if ( it > 0 ) then
   end select
 end if
 
-! volume stats
+! Volume stats
 if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
   select case( pass )
   case( 1 )
@@ -196,7 +196,7 @@ if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
   end select
 end if
 
-! write fault stats
+! Write fault stats
 if ( it > 0 .and. modulo( it, itstats ) == 0 .and. dofault ) then
   select case( pass )
   case( 1 )
@@ -246,11 +246,11 @@ end if
 
 doiz: do iz = 1, nout
 
-! interval
+! Interval
 if ( it < i1out(iz,4) .or. it > i2out(iz,4) ) cycle doiz
 if ( modulo( it - i1out(iz,4), ditout(iz) ) /= 0 ) cycle doiz
 
-! pass
+! Pass
 call outprops( fieldout(iz), nc, onpass, fault, cell )
 i1 = i1out(iz,1:3)
 i2 = i2out(iz,1:3)
@@ -270,7 +270,7 @@ if ( fault ) then
 end if
 if ( pass /= onpass ) cycle doiz
 
-! binary output
+! Binary output
 do ic = 1, nc
   ir = 1
   write( str, '(i2.2,a,a)' ) iz, '/', fieldout(iz)
@@ -327,7 +327,7 @@ end do
 
 end do doiz
 
-! interation counter
+! Interation counter
 if ( master .and. pass == 2 ) then
   open( 1, file='currentstep', status='replace' )
   write( 1, * ) it
