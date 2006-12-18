@@ -12,7 +12,7 @@ j = i2(1)
 k = i2(2)
 l = i2(3)
 
-! 3D vectors
+! 3d vectors
 allocate(       &
   x(j,k,l,3),   &
   v(j,k,l,3),   &
@@ -22,7 +22,7 @@ allocate(       &
   w1(j,k,l,3),  &
   w2(j,k,l,3)   )
 
-! 3D scalars
+! 3d scalars
 allocate(       &
   mr(j,k,l),    &
   lam(j,k,l),   &

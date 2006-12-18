@@ -1,4 +1,4 @@
-! Acceleration calculation
+! Acceleration Calculation
 module m_acceleration
 implicit none
 contains
@@ -106,7 +106,7 @@ do iq = 1, 4
 end do
 end do
 
-! Newton's Law: a_i = f_i / m
+! Newton's law: a_i = f_i / m
 do i = 1, 3
   w1(:,:,:,i) = w1(:,:,:,i) * mr
 end do

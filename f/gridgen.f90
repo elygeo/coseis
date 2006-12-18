@@ -274,7 +274,7 @@ call vectorswaphalo( x, nhalo )
 ! Hypocenter location
 if ( fixhypo == 1 ) then
   if ( master ) xhypo = xhypo + x(j,k,l,:)
-  call broadcastr1( xhypo )
+  call rbroadcast1( xhypo )
 elseif ( fixhypo == 2 ) then
   if ( master ) xhypo = xhypo + 0.125 * &
     ( x(j,k,l,:) + x(j+1,k+1,l+1,:) &

@@ -10,7 +10,7 @@ integer, parameter :: &
   nz = 80,       & ! max number of input and output zones
   nhalo = 1        ! number of ghost nodes
 
-! 3D vectors
+! 3d vectors
 real, allocatable, dimension(:,:,:,:) :: &
   x,             & ! node locations
   v,             & ! velocity
@@ -20,7 +20,7 @@ real, allocatable, dimension(:,:,:,:) :: &
   w1,            & ! temporary storage
   w2               ! temporary storage
 
-! 3D scalars
+! 3d scalars
 real, allocatable, dimension(:,:,:) :: &
   mr,            & ! mass ratio
   lam,           & ! Lame parameter

@@ -1,9 +1,9 @@
-! Output routines
+! OUTPUT ROUTINES
 module m_output
 implicit none
 contains
 
-! Initialize output
+! initialize output
 subroutine output_init
 use m_globals
 use m_collective
@@ -17,7 +17,7 @@ logical :: dofault, fault, cell
 if ( master ) write( 0, * ) 'Output initialization'
 if ( nout > nz ) stop 'too many output zones, make nz bigger'
 
-! Test for fault
+! test for fault
 dofault = .false.
 if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
@@ -26,10 +26,10 @@ end if
 
 do iz = 1, nout
 
-! Output field properties
+! output field properties
 call outprops( fieldout(iz), nc, onpass, fault, cell )
 
-! Time indices 
+! time indices 
 if ( itstats < 1 ) itstats = itstats + nt + 1
 if ( i1out(iz,4) < 0 ) i1out(iz,4) = nt + i1out(iz,4) + 1
 if ( i2out(iz,4) < 0 ) i2out(iz,4) = nt + i2out(iz,4) + 1
@@ -42,7 +42,7 @@ end if
 i2out(iz,4) = min( i2out(iz,4), nt )
 if ( fault .and. faultnormal == 0 ) ditout(iz) = nt + 1
 
-! Spacial indices
+! spacial indices
 n = nn + 2 * nhalo
 noff = nnoff - nhalo
 select case( outtype(iz) )
@@ -112,12 +112,12 @@ case( 'x' )
   if ( rout > dx * dx ) ditout(iz) = nt + 1
 end select
 
-! Save indices
+! save indices
 if ( any( i2 < i1 ) ) stop 'bad output indices'
 i1out(iz,1:3) = i1
 i2out(iz,1:3) = i2
 
-! Split collective i/o
+! split collective i/o
 i1 = max( i1, i1node )
 i2 = min( i2, i2node )
 if ( cell ) i2 = min( i2, i2cell )
@@ -131,26 +131,26 @@ end subroutine
 
 !------------------------------------------------------------------------------!
 
-! Write output
+! write output
 subroutine output( pass )
 use m_globals
 use m_collective
 use m_outprops
 use m_util
 integer, intent(in) :: pass
-real, save :: stats(4), fstats(8)
-real :: stats(4), allfaultstats(8), rr
+real, save :: vstats(4), fstats(8)
+real :: gvstats(4), gfstats(8), rr
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), noff(3), i, onpass, nc, ic, ir, iz
 logical :: dofault, fault, cell
 
-! Test for fault
+! test for fault
 dofault = .false.
 if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
   if ( ihypo(i) >= i1node(i) .and. ihypo(i) <= i2node(i) ) dofault = .true.
 end if
 
-! Prepare output
+! prepare output
 if ( it > 0 ) then
   select case( pass )
   case( 1 )
@@ -163,14 +163,14 @@ if ( it > 0 ) then
   end select
 end if
 
-! Volume stats
+! volume stats
 if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
   select case( pass )
   case( 1 )
     call sethalo( s1, -1., i1node, i2node )
     call sethalo( s2, -1., i1cell, i2cell )
-    vstats(1) = max( s1 )
-    vstats(2) = max( s2 )
+    vstats(1) = maxval( s1 )
+    vstats(2) = maxval( s2 )
     n = nn + 2 * nhalo
     noff = nnoff - nhalo
     call reduceloc( rr, i1, s1, 'max', n, noff, 0 )
@@ -182,8 +182,8 @@ if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
   case( 2 )
     call sethalo( s1, -1., i1node, i2node )
     call sethalo( s2, -1., i1node, i2node )
-    vstats(3) = max( s1 )
-    vstats(4) = max( s2 )
+    vstats(3) = maxval( s1 )
+    vstats(4) = maxval( s2 )
     call rreduce1( gvstats, vstats, 'max', 0 )
     if ( master ) then
       call rwrite( 'stats/vmax', gvstats(1), it / itstats )
@@ -196,28 +196,28 @@ if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
   end select
 end if
 
-! Write fault stats
+! write fault stats
 if ( it > 0 .and. modulo( it, itstats ) == 0 .and. dofault ) then
   select case( pass )
   case( 1 )
     call sethalo( f1,   -1., i1node, i2node )
     call sethalo( f2,   -1., i1node, i2node )
     call sethalo( tarr, -1., i1node, i2node )
-    fstats(1) = max( f1 )
-    fstats(2) = max( f2 )
-    fstats(3) = max( sl )
-    fstats(4) = max( tarr )
+    fstats(1) = maxval( f1 )
+    fstats(2) = maxval( f2 )
+    fstats(3) = maxval( sl )
+    fstats(4) = maxval( tarr )
   case( 2 )
     call sethalo( ts, -1., i1node, i2node )
     call sethalo( f2, -1., i1node, i2node )
-    fstats(5) = max( ts )
-    fstats(6) = max( f2 )
+    fstats(5) = maxval( ts )
+    fstats(6) = maxval( f2 )
     rr = 2. * minval( tn ) - 1.
     call sethalo( tn, rr, i1node, i2node )
-    fstats(7) = max( tn )
-    rr = 2. * r3(7) + 1.
+    fstats(7) = maxval( tn )
+    rr = 2. * fstats(7) + 1.
     call sethalo( tn, rr, i1node, i2node )
-    fstats(8) = -min( tn )
+    fstats(8) = -minval( tn )
     call rreduce1( gfstats, fstats, 'max', ifn )
     if ( master ) then
       call rwrite( 'stats/svmax',   gfstats(1), it / itstats )
@@ -235,7 +235,7 @@ if ( it > 0 .and. modulo( it, itstats ) == 0 .and. dofault ) then
     call rreduce1( gfstats, fstats, 'sum', ifn )
     if ( master ) then
       rr = -999.
-      if ( r4(3) > 0. ) rr = ( log10( r4(3) ) - 9.05 ) / 1.5
+      if ( gfstats(3) > 0. ) rr = ( log10( gfstats(3) ) - 9.05 ) / 1.5
       call rwrite( 'stats/efric',   gfstats(1), it / itstats )
       call rwrite( 'stats/estrain', gfstats(2), it / itstats )
       call rwrite( 'stats/moment',  gfstats(3), it / itstats )
@@ -246,11 +246,11 @@ end if
 
 doiz: do iz = 1, nout
 
-! Interval
+! interval
 if ( it < i1out(iz,4) .or. it > i2out(iz,4) ) cycle doiz
 if ( modulo( it - i1out(iz,4), ditout(iz) ) /= 0 ) cycle doiz
 
-! Pass
+! pass
 call outprops( fieldout(iz), nc, onpass, fault, cell )
 i1 = i1out(iz,1:3)
 i2 = i2out(iz,1:3)
@@ -270,7 +270,7 @@ if ( fault ) then
 end if
 if ( pass /= onpass ) cycle doiz
 
-! Binary output
+! binary output
 do ic = 1, nc
   ir = 1
   write( str, '(i2.2,a,a)' ) iz, '/', fieldout(iz)
@@ -327,7 +327,7 @@ end do
 
 end do doiz
 
-! Interation counter
+! interation counter
 if ( master .and. pass == 2 ) then
   open( 1, file='currentstep', status='replace' )
   write( 1, * ) it

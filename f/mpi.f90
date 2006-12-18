@@ -76,6 +76,7 @@ case( 'sum' ); call mpi_allreduce( i, ii, 1, mpi_integer, mpi_sum, ipmaster, com
 case( 'allmin' ); call mpi_allreduce( i, ii, 1, mpi_integer, mpi_min, comm, e )
 case( 'allmax' ); call mpi_allreduce( i, ii, 1, mpi_integer, mpi_max, comm, e )
 case( 'allsum' ); call mpi_allreduce( i, ii, 1, mpi_integer, mpi_sum, comm, e )
+case default; stop
 end select
 end subroutine
 
@@ -95,6 +96,7 @@ case( 'sum' ); call mpi_reduce( r, rr, 1, mpi_real, mpi_sum, ipmaster, comm, e )
 case( 'allmin' ); call mpi_allreduce( r, rr, 1, mpi_real, mpi_min, comm, e )
 case( 'allmax' ); call mpi_allreduce( r, rr, 1, mpi_real, mpi_max, comm, e )
 case( 'allsum' ); call mpi_allreduce( r, rr, 1, mpi_real, mpi_sum, comm, e )
+case default; stop
 end select
 end subroutine
 
@@ -115,6 +117,7 @@ case( 'sum' ); call mpi_reduce( r, rr, i, mpi_real, mpi_sum, ipmaster, comm, e )
 case( 'allmin' ); call mpi_allreduce( r, rr, i, mpi_real, mpi_min, comm, e )
 case( 'allmax' ); call mpi_allreduce( r, rr, i, mpi_real, mpi_max, comm, e )
 case( 'allsum' ); call mpi_allreduce( r, rr, i, mpi_real, mpi_sum, comm, e )
+case default; stop
 end select
 end subroutine
 
@@ -126,13 +129,12 @@ real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
 integer, intent(in) :: n(3), noff(3), i2d
 character(*), intent(in) :: op
-integer(8) :: i, nn(3)
-integer :: iop, comm, e
+integer(8) :: nn(3), i, iop
+integer :: comm, e
 select case( op )
-case( 'min' );    ii = minloc( r ); iop = mpi_minloc
-case( 'max' );    ii = maxloc( r ); iop = mpi_maxloc
-case( 'allmin' ); ii = minloc( r ); iop = mpi_minloc
-case( 'allmax' ); ii = maxloc( r ); iop = mpi_maxloc
+case( 'min', 'allmin' ); ii = minloc( r ); iop = mpi_minloc
+case( 'max', 'allmax' ); ii = maxloc( r ); iop = mpi_maxloc
+case default; stop
 end select
 rr = r(ii(1),ii(2),ii(3))
 ii = ii - noff - 1
@@ -142,10 +144,11 @@ local(2) = i
 comm = comm3d
 if ( i2d /= 0 ) comm = comm2d(i2d)
 select case( op )
-case( 'min' ); case( call mpi_reduce( local, global, 1, mpi_2double_precision, iop, ipmaster, comm, e )
-case( 'max' ); case( call mpi_reduce( local, global, 1, mpi_2double_precision, iop, ipmaster, comm, e )
-case( 'allmin' ); case( call mpi_allreduce( local, global, 1, mpi_2double_precision, iop, comm, e )
-case( 'allmax' ); case( call mpi_allreduce( local, global, 1, mpi_2double_precision, iop, comm, e )
+case( 'min', 'max' )
+  call mpi_reduce( local, global, 1, mpi_2double_precision, iop, ipmaster, comm, e )
+case( 'allmin', 'allmax' )
+  call mpi_allreduce( local, global, 1, mpi_2double_precision, iop, comm, e )
+case default; stop
 end select
 rr = global(1)
 i = global(2)

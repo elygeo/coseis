@@ -32,11 +32,19 @@ integer :: i
 i = ip3master(1)
 end subroutine
 
-! all reduce integer
+! broadcast real 1d
+subroutine rbroadcast1( r )
+real, intent(inout) :: r(:)
+r = r
+end subroutine
+
+! reduce integer
 subroutine ireduce( ii, i, op, i2d )
 integer, intent(out) :: ii
 integer, intent(in) :: i, i2d
 character(*), intent(in) :: op
+character :: a
+a = op(1:1)
 ii = i2d
 ii = i
 end subroutine
@@ -47,6 +55,8 @@ real, intent(out) :: rr
 real, intent(in) :: r
 integer, intent(in) :: i2d
 character(*), intent(in) :: op
+character :: a
+a = op(1:1)
 rr = i2d
 rr = r
 end subroutine
@@ -56,7 +66,9 @@ subroutine rreduce1( rr, r, op, i2d )
 real, intent(out) :: rr(:)
 real, intent(in) :: r(:)
 integer, intent(in) :: i2d
-character(3), intent(in) :: op
+character(*), intent(in) :: op
+character :: a
+a = op(1:1)
 rr = i2d
 rr = r
 end subroutine
@@ -68,10 +80,13 @@ real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
 integer, intent(in) :: n(3), noff(3), i2d
 character(*), intent(in) :: op
+character :: a
+a = op(1:1)
 ii = n + noff + i2d
-select case( op(1:3) )
-case( 'min' ); ii = minloc( r );
-case( 'max' ); ii = maxloc( r );
+select case( op )
+case( 'min', 'allmin' ); ii = minloc( r );
+case( 'max', 'allmax' ); ii = maxloc( r );
+case default; stop
 end select
 rr = r(ii(1),ii(2),ii(3))
 end subroutine
