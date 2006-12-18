@@ -14,11 +14,11 @@ do ifile = 1, command_argument_count()
     write( *, * ) 'Error opening file: ', trim( filename )
     stop
   end if
-  n = 0
-  read( 1, rec=n+1 ) r
+  read( 1, rec=1 ) r
   rmin = r
   rmax = r
   rmean = r
+  n = 1
   do
     read( 1, rec=n+1, iostat=i ) r
     if ( i /= 0 ) exit
