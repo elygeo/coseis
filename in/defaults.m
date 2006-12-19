@@ -77,7 +77,7 @@
 % itcheck = 100;			% checkpoint every 100 time steps
 % itcheck = -1;				% checkpoint just before finishing
   itcheck = 0;				% checkpointing off
-  itstats = 1;				% write statistic every step
+  itstats = 10;				% write statistic every 10 time steps
   debug = 0;                            % debugging off
 % out = { 'v'  10   1 1 1 1  -1 -1 -1 -1 };	% write v every 10 steps, 4D zone
 % out = { 'sl' -1   1 1 1 1  -1 -1 -1 -1 };	% write final slip length, 4D zone

@@ -18,11 +18,10 @@
   rcrit = 3000.;
   vrup = 2300.;
   itcheck = 100;
+  itstats = 10;
 
-  np = [ 21  8 3 ] % TeraGrid
-  np = [ 16 16 4 ] % DataStar
-  np = [ 8 8 1 ] % Babiaca
-  itstats = 100;
+  np = [ 1 40 20 ] % TeraGrid
+  np = [ 1 20 20 ] % DataStar
   dx = 400.;
   dt = .024;
   trelax = .24;
@@ -30,7 +29,7 @@
   nn = [ 1501 752 201 ];
   ihypo = [  682 499 -14 ];
   ihypo = [ 1133 499 -14 ];
-  mus = [ 1.04 'zone'  659 0 -41        1156  0 -1      ];
+  mus = [ 1.06 'zone'  659 0 -41        1156  0 -1      ];
   out = { 'x'     1    659 0 -41    0   1156  0 -1    0 };
   out = { 'rho'   1    659 0 -41    0   1156  0 -1    0 };
   out = { 'vp'    1    659 0 -41    0   1156  0 -1    0 };
