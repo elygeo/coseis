@@ -1,6 +1,5 @@
 ! Moment source added to stress
 module m_momentsource
-use m_globals
 implicit none
 real, private, allocatable :: srcfr(:)
 integer, private, allocatable :: jj(:), kk(:), ll(:)
@@ -8,6 +7,7 @@ contains
 
 ! Moment source init
 subroutine momentsource_init
+use m_globals
 use m_diffnc
 use m_collective
 real, allocatable :: cellvol(:)
@@ -79,6 +79,7 @@ end subroutine
 
 ! Add moment source
 subroutine momentsource
+use m_globals
 integer :: i, j, k, l, ic, nsrc
 real :: srcft
 

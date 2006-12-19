@@ -1,6 +1,5 @@
 ! Global variables
 module m_globals
-
 implicit none
 
 real, parameter :: &

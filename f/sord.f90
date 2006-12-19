@@ -2,6 +2,8 @@
 program sord
 
 ! Modules
+use m_collective
+use m_globals
 use m_inread
 use m_setup
 use m_arrays
@@ -18,6 +20,7 @@ use m_stress
 use m_acceleration
 use m_locknodes
 use m_util
+implicit none
 
 ! Initialization
 call timer
