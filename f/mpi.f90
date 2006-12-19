@@ -137,8 +137,8 @@ real, intent(in) :: r(:,:,:)
 integer, intent(out) :: ii(3)
 integer, intent(in) :: n(3), noff(3), i2d
 character(*), intent(in) :: op
-integer(8) :: nn(3), i, iop
-integer :: comm, e
+integer(8) :: nn(3), i
+integer :: iop, comm, e
 select case( op )
 case( 'min', 'allmin' ); ii = minloc( r ); iop = mpi_minloc
 case( 'max', 'allmax' ); ii = maxloc( r ); iop = mpi_maxloc
