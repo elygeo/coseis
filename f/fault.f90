@@ -240,7 +240,6 @@ use m_collective
 use m_bc
 use m_util
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
-real :: r1
 
 ! If the two sides of the fault are split accross domains, than we must retrieve
 ! the correct solution from the processor that contains both sides. Corrisponding

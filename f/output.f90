@@ -11,7 +11,6 @@ use m_outprops
 use m_util
 real :: rout
 integer :: i1(3), i2(3), n(3), noff(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz, onpass
-character(7) :: field
 logical :: dofault, fault, cell
 
 if ( master ) write( 0, * ) 'Output initialization'
