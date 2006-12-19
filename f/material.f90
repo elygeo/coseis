@@ -8,7 +8,7 @@ use m_globals
 use m_collective
 use m_util
 use m_bc
-real :: x1(3), x2(3)
+real :: x1(3), x2(3), stats(6), gstats(6)
 integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, &
   j1, k1, l1, j2, k2, l2, iz, idoublenode
 
@@ -103,23 +103,22 @@ where ( s2 < vs1 ) s2 = vs1
 where ( s2 > vs2 ) s2 = vs2
 
 ! Extrema
-x1(1) = maxval( mr )
-x1(2) = maxval( s1 )
-x1(3) = maxval( s2 )
-call rreduce1( x2, x1, 'allmax', 0 )
-rho2 = x2(1)
-vp2  = x2(2)
-vs2  = x2(3)
-call sethalo( mr, rho2, i1node, i2node )
-call sethalo( s1, vp2, i1node, i2node )
-call sethalo( s2, vs2, i1node, i2node )
-x1(1) = minval( mr )
-x1(2) = minval( s1 )
-x1(3) = minval( s2 )
-call rreduce1( x2, x1, 'allmin', 0 )
-rho1 = x2(1)
-vp1  = x2(2)
-vs1  = x2(3)
+stats(1) = maxval( mr )
+stats(2) = maxval( s1 )
+stats(3) = maxval( s2 )
+call sethalo( mr, stats(1), i1node, i2node )
+call sethalo( s1, stats(2), i1node, i2node )
+call sethalo( s2, stats(3), i1node, i2node )
+stats(4) = -minval( mr )
+stats(5) = -minval( s1 )
+stats(6) = -minval( s2 )
+call rreduce1( gstats, stats, 'allmax', 0 )
+rho2 = gstats(1)
+vp2  = gstats(2)
+vs2  = gstats(3)
+rho1 = -gstats(4)
+vp1  = -gstats(5)
+vs1  = -gstats(6)
 
 ! Fill halo
 call scalarbc( mr, ibc1, ibc2, nhalo )

@@ -21,7 +21,7 @@
   itstats = 10;
 
   np = [ 1 4 8 ] % Babiaca
-  np = [ 1 4 16 ] % Babiaca
+  np = [ 1 3 16 ] % Babiaca
   dx = 500.;
   dt = .03;
   trelax = .3;

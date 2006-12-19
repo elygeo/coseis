@@ -84,7 +84,6 @@ real :: &
   t,             & ! time
   dt,            & ! time step
   dx,            & ! spatial step
-  inval(nz),     & ! input value
   rho0,          & ! hypocenter density
   rho1,          & ! min density
   rho2,          & ! max density
@@ -94,19 +93,22 @@ real :: &
   vs0,           & ! hypocenter S-wave speed
   vs1,           & ! min S-wave speed
   vs2,           & ! max S-wave speed
+  viscosity(2),  & ! viscosity for (1) stress & (2) hourglass corrections
+  vdamp,         & ! shear wave velocity dependent damping
   rexpand,       & ! grid expantion ratio
   affine(10),    & ! grid transformation
   gridnoise,     & ! random noise in grid
+  inval(nz),     & ! input value
   x1in(nz,3),    & ! input cube - near corner
   x2in(nz,3),    & ! input cube - far corner 
   xout(nz,3),    & ! timeseries output location
   xhypo(3),      & ! hypocenter location
   xcenter(3),    & ! mesh center
   rmax,          & ! maximum distance from mesh center
-  viscosity(2),  & ! viscosity for (1) stress & (2) hourglass corrections
-  vdamp,         & ! shear wave velocity dependent damping
   upvector(3),   & ! upward direction
-  slipvector(3), & ! slip direction for finding traction vectors
+  slipvector(3)    ! slip direction for finding traction vectors
+
+real :: &
   tsource,       & ! dominant period
   rsource,       & ! source radius
   moment1(3),    & ! moment source normal components
@@ -160,7 +162,9 @@ integer :: &
   origin,        & ! 0=hypocenter, 1=firstnode
   fixhypo,       & ! fix hypocenter to 0=none, 1=ihypo node, 2=ihypo cell
   faultnormal,   & ! fault normal direction
-  ifn,           & ! fault normal component=abs(faultnormal)
+  ifn              ! fault normal component=abs(faultnormal)
+
+integer :: &
   noper,         & ! number of zones for spatial derivative operators
   i1oper(2,3),   & ! j1 k1 l1 operator zone start index
   i2oper(2,3),   & ! j2 k2 l2 operator zone end index
