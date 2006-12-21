@@ -20,8 +20,8 @@
   itcheck = 100;
   itstats = 10;
 
+  datadir = 'ts/1000/data';
   np = [ 1 1 2 ] % Wide
-  np = [ 1 4 8 ] % Babiaca
   dx = 1000.;
   dt = .06;
   trelax = .6;

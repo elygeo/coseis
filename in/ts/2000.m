@@ -18,10 +18,11 @@
   rcrit = 3000.;
   vrup = 2300.;
   itcheck = 100;
-  itstats = 10;
+  itstats = 2;
 
+  debug = 1;
   datadir = 'ts/2000/data';
-  np = [ 1 1 2 ] % Wide
+  np = [ 1 2 2 ] % Wide
   dx = 2000.;
   dt = .12;
   trelax = 1.2;

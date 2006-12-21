@@ -70,19 +70,21 @@ use mpi
 integer, intent(out) :: ii
 integer, intent(in) :: i, i2d
 character(*), intent(in) :: op
-integer :: e, comm
-comm = comm3d
-if ( i2d /= 0 ) comm = comm2d(i2d)
-call mpi_allreduce( i, ii, 1, mpi_integer, mpi_min, comm3d, e )
+integer :: iop, e, comm
 select case( op )
-case( 'min' ); call mpi_reduce( i, ii, 1, mpi_integer, mpi_min, ipmaster, comm, e )
-case( 'max' ); call mpi_reduce( i, ii, 1, mpi_integer, mpi_max, ipmaster, comm, e )
-case( 'sum' ); call mpi_reduce( i, ii, 1, mpi_integer, mpi_sum, ipmaster, comm, e )
-case( 'allmin' ); call mpi_allreduce( i, ii, 1, mpi_integer, mpi_min, comm, e )
-case( 'allmax' ); call mpi_allreduce( i, ii, 1, mpi_integer, mpi_max, comm, e )
-case( 'allsum' ); call mpi_allreduce( i, ii, 1, mpi_integer, mpi_sum, comm, e )
+case( 'min', 'allmin' ); iop = mpi_min
+case( 'max', 'allmax' ); iop = mpi_max
+case( 'sum', 'allsum' ); iop = mpi_sum
 case default; stop
 end select
+if ( op(1:3) == 'all' ) then
+  comm = comm3d
+  if ( i2d /= 0 ) comm = comm2d(i2d)
+  call mpi_allreduce( i, ii, 1, mpi_integer, iop, comm, e )
+else
+  if ( i2d /= 0 ) error 'must allreduce for comm2d'
+  call mpi_reduce( i, ii, 1, mpi_integer, iop, ipmaster, comm3d, e )
+end if
 end subroutine
 
 ! Reduce real
@@ -92,18 +94,21 @@ real, intent(out) :: rr
 real, intent(in) :: r
 integer, intent(in) :: i2d
 character(*), intent(in) :: op
-integer :: e, comm
-comm = comm3d
-if ( i2d /= 0 ) comm = comm2d(i2d)
+integer :: iop, e, comm
 select case( op )
-case( 'min' ); call mpi_reduce( r, rr, 1, mpi_real, mpi_min, ipmaster, comm, e )
-case( 'max' ); call mpi_reduce( r, rr, 1, mpi_real, mpi_max, ipmaster, comm, e )
-case( 'sum' ); call mpi_reduce( r, rr, 1, mpi_real, mpi_sum, ipmaster, comm, e )
-case( 'allmin' ); call mpi_allreduce( r, rr, 1, mpi_real, mpi_min, comm, e )
-case( 'allmax' ); call mpi_allreduce( r, rr, 1, mpi_real, mpi_max, comm, e )
-case( 'allsum' ); call mpi_allreduce( r, rr, 1, mpi_real, mpi_sum, comm, e )
+case( 'min', 'allmin' ); iop = mpi_min
+case( 'max', 'allmax' ); iop = mpi_max
+case( 'sum', 'allsum' ); iop = mpi_sum
 case default; stop
 end select
+if ( op(1:3) == 'all' ) then
+  comm = comm3d
+  if ( i2d /= 0 ) comm = comm2d(i2d)
+  call mpi_allreduce( r, rr, 1, mpi_real, iop, comm, e )
+else
+  if ( i2d /= 0 ) error 'must allreduce for comm2d'
+  call mpi_reduce( r, rr, 1, mpi_real, iop, ipmaster, comm3d, e )
+end if
 end subroutine
 
 ! Reduce real 1d
@@ -113,19 +118,22 @@ real, intent(out) :: rr(:)
 real, intent(in) :: r(:)
 integer, intent(in) :: i2d
 character(*), intent(in) :: op
-integer :: i, e, comm
-comm = comm3d
-if ( i2d /= 0 ) comm = comm2d(i2d)
-i = size(r)
+integer :: iop, i, e, comm
 select case( op )
-case( 'min' ); call mpi_reduce( r, rr, i, mpi_real, mpi_min, ipmaster, comm, e )
-case( 'max' ); call mpi_reduce( r, rr, i, mpi_real, mpi_max, ipmaster, comm, e )
-case( 'sum' ); call mpi_reduce( r, rr, i, mpi_real, mpi_sum, ipmaster, comm, e )
-case( 'allmin' ); call mpi_allreduce( r, rr, i, mpi_real, mpi_min, comm, e )
-case( 'allmax' ); call mpi_allreduce( r, rr, i, mpi_real, mpi_max, comm, e )
-case( 'allsum' ); call mpi_allreduce( r, rr, i, mpi_real, mpi_sum, comm, e )
+case( 'min', 'allmin' ); iop = mpi_min
+case( 'max', 'allmax' ); iop = mpi_max
+case( 'sum', 'allsum' ); iop = mpi_sum
 case default; stop
 end select
+i = size(r)
+if ( op(1:3) == 'all' ) then
+  comm = comm3d
+  if ( i2d /= 0 ) comm = comm2d(i2d)
+  call mpi_allreduce( r, rr, i, mpi_real, iop, comm, e )
+else
+  if ( i2d /= 0 ) error 'must allreduce for comm2d'
+  call mpi_reduce( r, rr, i, mpi_real, iop, ipmaster, comm3d, e )
+end if
 end subroutine
 
 ! Reduce extrema location, real 3d
@@ -149,15 +157,14 @@ ii = ii - noff - 1
 i = ii(1) + n(1) * ( ii(2) + n(2) * ii(3) )
 local(1) = rr
 local(2) = i
-comm = comm3d
-if ( i2d /= 0 ) comm = comm2d(i2d)
-select case( op )
-case( 'min', 'max' )
-  call mpi_reduce( local, global, 1, mpi_2double_precision, iop, ipmaster, comm, e )
-case( 'allmin', 'allmax' )
+if ( op(1:3) == 'all' ) then
+  comm = comm3d
+  if ( i2d /= 0 ) comm = comm2d(i2d)
   call mpi_allreduce( local, global, 1, mpi_2double_precision, iop, comm, e )
-case default; stop
-end select
+else
+  if ( i2d /= 0 ) error 'must allreduce for comm2d'
+  call mpi_reduce( local, global, 1, mpi_2double_precision, iop, ipmaster, comm3d, e )
+end if
 rr = global(1)
 i = global(2)
 nn = n

@@ -19,7 +19,7 @@ y = y(:)';
 fg = get( gcf, 'DefaultTextColor' );
 cmap = colormap;
 clim = caxis;
-folded = -clim(1) == clim(2) && all( cmap(1,:) == cmap(end,:) );
+folded = -clim(1) == clim(2) && all( all( cmap == cmap(end:-1:1,:) ) );
 dc = ( clim(2) - clim(1) ) / ( length( cmap ) - 1 );
 if folded, clim(1) = 0; end
 hold on
