@@ -292,12 +292,22 @@ use mpi
 real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: ir, i1(3), i2(3), i3(3), i4(3), iz
 character(*), intent(in) :: io, filename
-integer :: ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
+integer :: ftype, mtype, fh, nl(4), n(4), i0(4), i, comm, e
 integer(kind=mpi_offset_kind) :: d = 0
-call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 nl = (/ i4 - i3 + 1, 1      /)
 n  = (/ i2 - i1 + 1, ir     /)
 i0 = (/ i3 - i1,     ir - 1 /)
+if ( all( n(1:3) == 1 ) .and. io == 'w' ) then
+  inquire( iolength=i ) s1(i1(1),i1(2),i1(3))
+  if ( ir == 1 ) then
+    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
+  else
+    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+  end if
+  write( 1, rec=ir ) s1(i1(1),i1(2),i1(3))
+  return
+end if
+call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
 n  = (/ size(s1,1), size(s1,2), size(s1,3), 1 /)
@@ -328,12 +338,22 @@ use mpi
 real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: ic, ir, i1(3), i2(3), i3(3), i4(3), iz
 character(*), intent(in) :: io, filename
-integer :: ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
+integer :: ftype, mtype, fh, nl(4), n(4), i0(4), i, comm, e
 integer(kind=mpi_offset_kind) :: d = 0
-call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 nl = (/ i4 - i3 + 1, 1      /)
 n  = (/ i2 - i1 + 1, ir     /)
 i0 = (/ i3 - i1,     ir - 1 /)
+if ( all( n(1:3) == 1 ) .and. io == 'w' ) then
+  inquire( iolength=i ) w1(i1(1),i1(2),i1(3),ic)
+  if ( ir == 1 ) then
+    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
+  else
+    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+  end if
+  write( 1, rec=ir ) w1(i1(1),i1(2),i1(3),ic)
+  return
+end if
+call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
 n  = (/ size(w1,1), size(w1,2), size(w1,3), size(w1,4) /)
