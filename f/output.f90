@@ -217,7 +217,7 @@ if ( it > 0 .and. modulo( it, itstats ) == 0 .and. dofault ) then
     rr = 2. * fstats(7) + 1.
     call sethalo( tn, rr, i1node, i2node )
     fstats(8) = -minval( tn )
-    call rreduce1( gfstats, fstats, 'max', ifn )
+    call rreduce1( gfstats, fstats, 'allmax', ifn )
     if ( master ) then
       call rwrite( 'stats/svmax',   gfstats(1), it / itstats )
       call rwrite( 'stats/sumax',   gfstats(2), it / itstats )
@@ -231,7 +231,7 @@ if ( it > 0 .and. modulo( it, itstats ) == 0 .and. dofault ) then
     fstats(1) = efric
     fstats(2) = estrain
     fstats(3) = moment
-    call rreduce1( gfstats, fstats, 'sum', ifn )
+    call rreduce1( gfstats, fstats, 'allsum', ifn )
     if ( master ) then
       rr = -999.
       if ( gfstats(3) > 0. ) rr = ( log10( gfstats(3) ) - 9.05 ) / 1.5

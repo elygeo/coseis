@@ -82,7 +82,7 @@ if ( op(1:3) == 'all' ) then
   if ( i2d /= 0 ) comm = comm2d(i2d)
   call mpi_allreduce( i, ii, 1, mpi_integer, iop, comm, e )
 else
-  if ( i2d /= 0 ) error 'must allreduce for comm2d'
+  if ( i2d /= 0 ) stop 'must allreduce for comm2d'
   call mpi_reduce( i, ii, 1, mpi_integer, iop, ipmaster, comm3d, e )
 end if
 end subroutine
@@ -106,7 +106,7 @@ if ( op(1:3) == 'all' ) then
   if ( i2d /= 0 ) comm = comm2d(i2d)
   call mpi_allreduce( r, rr, 1, mpi_real, iop, comm, e )
 else
-  if ( i2d /= 0 ) error 'must allreduce for comm2d'
+  if ( i2d /= 0 ) stop 'must allreduce for comm2d'
   call mpi_reduce( r, rr, 1, mpi_real, iop, ipmaster, comm3d, e )
 end if
 end subroutine
@@ -131,7 +131,7 @@ if ( op(1:3) == 'all' ) then
   if ( i2d /= 0 ) comm = comm2d(i2d)
   call mpi_allreduce( r, rr, i, mpi_real, iop, comm, e )
 else
-  if ( i2d /= 0 ) error 'must allreduce for comm2d'
+  if ( i2d /= 0 ) stop 'must allreduce for comm2d'
   call mpi_reduce( r, rr, i, mpi_real, iop, ipmaster, comm3d, e )
 end if
 end subroutine
@@ -162,7 +162,7 @@ if ( op(1:3) == 'all' ) then
   if ( i2d /= 0 ) comm = comm2d(i2d)
   call mpi_allreduce( local, global, 1, mpi_2double_precision, iop, comm, e )
 else
-  if ( i2d /= 0 ) error 'must allreduce for comm2d'
+  if ( i2d /= 0 ) stop 'must allreduce for comm2d'
   call mpi_reduce( local, global, 1, mpi_2double_precision, iop, ipmaster, comm3d, e )
 end if
 rr = global(1)
