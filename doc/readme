@@ -259,6 +259,8 @@ vrup = 0.9 * vs
 
 HOURGLASS CORRECTIONS
 
+Kosloff, Frazier, Belytschko
+
 One of the first works in this direction was presented by Kosloff and Frazier (1978), but in their formulation it is necessary to solve 4 systems of 8 equations for distorted three-dimensional elements, and this is not cost efficient for dynamic analysis.
 Flanagan and Belytschko (1981), Belytschko (1983), and Belytschko, Ong, Liu and Kennedy (1984) presented a systematic and effective way to hourglass control, but in both formulations a parameter, to be defined by the user, is required. 
 Belytschko and Binderman (1993) implemented the hourglass control of the eight-node hexahedral element, where the stabilization parameter is not required, although the stabilization matrix still depends on the Poisson coefficient; the aspect was eliminated by Liu, Hu and Belytschko (1994).
