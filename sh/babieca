@@ -68,7 +68,22 @@ fi
 case $run in
   i) mpirun -machinefile mf -np $np ./sord-$mode ;;
   g) mpirun -machinefile mf -np $np -dbg=gdb ./sord-$mode ;;
-  b) nohup mpirun -machinefile mf -np $np ./sord-$mode > out.log & ;;
+  b) nohup mpirun -machinefile mf -np $np ./sord-$mode > out.log & :; pid=$! ;;
   q) pbsjob=$( qsub pbsscript ) ;;
 esac
+
+if [ "$pid" ]; then
+  echo "$pid" >> log
+  echo "Background job started, to cancel: out/$count/cancel.sh"
+  echo "#!/bin/bash" > 'cancel.sh'
+  echo "kill $pid" >> 'cancel.sh'
+  chmod u+x 'cancel.sh'
+fi
+if [ "$pbsjob" ]; then
+  echo "$pbsjob" >> log 
+  echo "PBS job submitted, to cancel: out/$count/cancel.sh"
+  echo "#!/bin/bash" > 'cancel.sh'
+  echo "qdel $pbsjob" >> 'cancel.sh'
+  chmod u+x 'cancel.sh'
+fi
 

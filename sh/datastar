@@ -59,10 +59,26 @@ opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
 case "$mode$run" in
   si) ./sord-s ;;
   sg) totalview ./sord-s ;;
-  sb) nohup ./sord-s > out.log & ;;
+  sb) nohup ./sord-s > out.log & :; pid=$! ;;
   pi) poe ./sord-p $opts ;;
   pg) tvpoe ./sord-p $opts ;;
-  pb) nohup poe ./sord-p $opts > out.log & ;;
+  pb) nohup poe ./sord-p $opts > out.log & :; pid=$! ;;
   pq) lljob=$( llsubmit llscript ) ;;
 esac
+
+if [ "$pid" ]; then
+  echo "$pid" >> log
+  echo "Background job started, to cancel: out/$count/cancel.sh"
+  echo "#!/bin/bash" > 'cancel.sh'
+  echo "kill $pid" >> 'cancel.sh'
+  chmod u+x 'cancel.sh'
+fi
+if [ "$lljob" ]; then
+  echo "$lljob" >> log 
+  echo "LoadLeveler job submitted, to cancel: out/$count/cancel.sh"
+  echo "#!/bin/bash" > 'cancel.sh'
+  echo "llcancel $lljob" >> 'cancel.sh'
+  chmod u+x 'cancel.sh'
+fi
+
 

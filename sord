@@ -298,24 +298,19 @@ babieca) . "$srcdir/sh/babieca" ;;
 case $mode$run in
   si) ./sord-s ;;
   sg) ddd ./sord-s ;;
-  sb) nice nohup ./sord-s > out.log & ;;
+  sb) nice nohup ./sord-s > out.log & :; pid=$! ;;
   pi) mpiexec -np $np ./sord-p ;;
   pg) mpiexec -gdb -np $np ./sord-p ;;
-  pb) nice nohup mpiexec -np $np ./sord-p > out.log & ;;
+  pb) nice nohup mpiexec -np $np ./sord-p > out.log & :; pid=$! ;;
 esac
 ;;
 esac
 
-if [ "$run" = b ]; then
-  echo "Background job started, to cancel: out/$count/kill.sh"
-  echo "#!/bin/bash" > 'kill.sh'
-  echo "kill $!" >> 'kill.sh'
-  chmod u+x 'kill.sh'
-fi
-if [ "$pbsjob" ]; then
-  echo "Job submitted to PBS, to cancel: out/$count/qdel.sh"
-  echo "#!/bin/bash" > 'qdel.sh'
-  echo "qdel $pbsjob" >> 'qdel.sh'
-  chmod u+x 'qdel.sh'
+if [ "$pid" ]; then
+  echo "$pid" >> log
+  echo "Background job started, to cancel: out/$count/cancel.sh"
+  echo "#!/bin/bash" > 'cancel.sh'
+  echo "kill $pid" >> 'cancel.sh'
+  chmod u+x 'cancel.sh'
 fi
 
