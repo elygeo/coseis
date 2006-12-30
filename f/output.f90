@@ -174,6 +174,7 @@ if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
     noff = nnoff - nhalo
     call reduceloc( rr, i1, s1, 'max', n, noff, 0 )
     if ( master ) then
+      i1 = i1 - nnoff
       call iwrite( 'stats/vmax1', i1(1), it / itstats )
       call iwrite( 'stats/vmax2', i1(2), it / itstats )
       call iwrite( 'stats/vmax3', i1(3), it / itstats )

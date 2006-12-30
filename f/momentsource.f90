@@ -42,23 +42,9 @@ do i = 1, 3
 end do
 s2 = sqrt( sum( w2 * w2, 4 ) )
 nsrc = count( s2 <= rsource )
-allocate( srcfr(nsrc), cellvol(nsrc), jj(nsrc), kk(nsrc), ll(nsrc) )
+allocate( jj(nsrc), kk(nsrc), ll(nsrc), cellvol(nsrc), srcfr(nsrc) )
 
-! Spatial weighting
-select case( rfunc )
-case( 'box'  ); srcfr = 1.
-case( 'tent' ); srcfr = pack( s2, s2 <= rsource )
-case default
-  write( 0, * ) 'invalid rfunc: ', trim( rfunc )
-  stop
-end select
-
-! Normalize and divide by cell volume
-cellvol = pack( s1, s2 <= rsource )
-call rreduce( sumsrcfr, sum( srcfr ), 'allsum', 0 )
-srcfr = srcfr / sumsrcfr / cellvol
-
-! Index map
+! Use points inside radius
 i = 0
 do l = l1, l2
 do k = k1, k2
@@ -68,10 +54,22 @@ if ( s2(j,k,l) <= rsource ) then
   jj(i) = j
   kk(i) = k
   ll(i) = l
+  cellvol(i) = s1(j,k,l)
+  select case( rfunc )
+  case( 'box'  ); srcfr(i) = 1.
+  case( 'tent' ); srcfr(i) = s2(j,k,l)
+  case default
+    write( 0, * ) 'invalid rfunc: ', trim( rfunc )
+    stop
+  end select
 end if
 end do
 end do
 end do
+
+! Normalize and divide by cell volume
+call rreduce( sumsrcfr, sum( srcfr ), 'allsum', 0 )
+srcfr = srcfr / sumsrcfr / cellvol
 
 end subroutine
 
