@@ -33,8 +33,9 @@ if msg
   explosion = 0;
   kostrov = 0;
 else
-  xg = x - xhypo;
-  rg = sqrt( sum( xg .* xg ) );
+  nr = x - xhypo;
+  rg = sqrt( sum( nr .* nr ) );
+  if rg, nr = nr / rg; end
 end
 
 % Time
@@ -58,14 +59,12 @@ vt = reshape( vt, nt, nc );
 
 % For point source, rotate to r,h,v coords
 if pointsource
-  if ( xg(2) || xg(3) )
-    rot = [ xg(1)     0 -xg(2)*xg(2)-xg(3)*xg(3)
-            xg(2) -xg(3) xg(1)*xg(2)
-            xg(3)  xg(2) xg(1)*xg(3) ];
-    tmp = sqrt( sum( rot .* rot, 1 ) );
-    for i = 1:3
-      rot(i,:) = rot(i,:) ./ tmp;
-    end
+  nh = cross( upvector, nr );
+  if any( nh )
+    nh = nh / sqrt( sum( nh .* nh ) );
+    nv = cross( nr, nh );
+    nv = nv / sqrt( sum( nv .* nv ) );
+    rot = [ nr(:) nh(:) nv(:) ];
     switch nc
     case 3
       vt = vt * rot;
@@ -78,6 +77,8 @@ if pointsource
          vt([1 6 5]) * rot(:,3) ...
          vt([6 2 4]) * rot(:,1) ]';
     end
+  else
+    vt = vt * nr(1);
   end
 end
 

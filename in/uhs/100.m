@@ -1,6 +1,6 @@
 % PEER UHS.1, UHS.2, LOH.1, 
 
-  timeseries = { 'v' 600.   800. -2000. };
+  timeseries = { 'v'  600.  800. -2000. };
   timeseries = { 'v' 1200. 1600. -2000. };
   timeseries = { 'v' 1800. 2400. -2000. };
   timeseries = { 'v' 2400. 3200. -2000. };
@@ -10,6 +10,9 @@
   timeseries = { 'v' 4800. 6400. -2000. };
   timeseries = { 'v' 5400. 7200. -2000. };
   timeseries = { 'v' 6000. 8000. -2000. };
+  out = { 'v' 20   0 0 1 1   -1 -1 1 -1 };
+  out = { 'v' 20   0 0 0 1   -1 -1 0 -1 };
+  out = { 'v' 20   0 0 0 1   -1 0 -1 -1 };
 
   faultnormal = 0;
   moment1 = [ 0. 0. 0. ];
@@ -31,7 +34,7 @@
   n2expand = [   0   0   0 ];
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ];
   itcheck = 0;
-  np = [ 1 1 2 ];
+  np  = [ 1 1 2 ];
 
   nt  = 1125;
   nt  = 625;

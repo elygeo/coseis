@@ -259,33 +259,25 @@ vrup = 0.9 * vs
 
 HOURGLASS CORRECTIONS
 
-Kosloff, Frazier, Belytschko
+One of the first works in this direction was presented by Kosloff and Frazier
+(1978), but in their formulation it is necessary to solve 4 systems of 8
+equations for distorted three-dimensional elements, and this is not cost
+efficient for dynamic analysis.  Flanagan and Belytschko (1981), Belytschko
+(1983), and Belytschko, Ong, Liu and Kennedy (1984) presented a systematic and
+effective way to hourglass control, but in both formulations a parameter, to be
+defined by the user, is required.  Belytschko and Binderman (1993) implemented
+the hourglass control of the eight-node hexahedral element, where the
+stabilization parameter is not required, although the stabilization matrix
+still depends on the Poisson coefficient; the aspect was eliminated by Liu, Hu
+and Belytschko (1994).
 
-One of the first works in this direction was presented by Kosloff and Frazier (1978), but in their formulation it is necessary to solve 4 systems of 8 equations for distorted three-dimensional elements, and this is not cost efficient for dynamic analysis.
-Flanagan and Belytschko (1981), Belytschko (1983), and Belytschko, Ong, Liu and Kennedy (1984) presented a systematic and effective way to hourglass control, but in both formulations a parameter, to be defined by the user, is required. 
-Belytschko and Binderman (1993) implemented the hourglass control of the eight-node hexahedral element, where the stabilization parameter is not required, although the stabilization matrix still depends on the Poisson coefficient; the aspect was eliminated by Liu, Hu and Belytschko (1994).
+Kosloff, Frazier, 1978
+Flanagan, and Belytschko, 1981 ***
+Belytschko, 1983
+Belytschko, Ong, Liu, Keneddy, 1984
+Belytschko, Binderman, 1993 ***
+Liu, Hu, Belytschko, 1994
 
-Kosloff, D. and Frazier, G. A.,1978, "Treatment of hourglass patterns in low-order finite element codes", Int. J. Num. Analyt. Meth. Geomech., vol. 2, pp. 57-72.
-
-
-***Flanagan, D. P. and Belytschko, T.,1981, "A uniform strain hexahedron and quadrilateral with orthogonal hourglass control", Int. J. Num. Meth. Engng., vol. 17, pp. 679-706.
-
-Belytschko, T.,1983, "Correction of article by D. P. Flanagan and T. Belytschko", Int. J. Num. Meth. Engng., vol. 19, pp. 467-468.
-
-Belytschko, T., Ong, J. S-J., Liu, W. K. and Keneddy, J. M., 1984, "Hourglass control in linear and nonlinear problems", Comp. Meth. Appl. Mech. Engng., vol. 43, pp. 251-276.
-
-
-
-***Belytschko, T. and Binderman, L. P., 1993, "Assumed strain stabilization of the eight-node hexahedral element", Comp. Meth. Appl. Mech. Engng., vol. 105, pp. 225-260.
-
-Liu, W. K., Hu,Y. K. and Belytschko, T.,1994, "Multiple quadrature underintegrated finite elements", Int. J. Num. Meth. Engng., vol. 37, pp. 3263-3289.
-
-
-From LS_DYNA theoretica manual:
-
-Belytschko, T., Wong, B. L. and Chiang, H. Y., 1992, "Advances in one-point quadrature", Int. J. Num. Meth. Engng., vol. 96, pp. 93-107.
-
-Wilkins et al, "A Method for Computer Simulation of Problems in Solid Mechanics and Gas Dynamics in Three Dimensions and Time", UC, LLNL, Rept. UCRL-51574 (1974)
 
 Deformation Modes for hexahedron: 8 * 3 = 24 degrees of freedom
 

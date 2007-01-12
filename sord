@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
 echo "SORD setup"
+starttime=$(date)
 
 # Get command line options
 mode=guess
@@ -289,12 +290,15 @@ END
 #------------------------------------------------------------------------------#
 # Run
 
+echo "$starttime: Start SORD setup" >> log
+echo "$(date): Finished setup" >> log
 case $machine in
 datastar) . "$srcdir/sh/datastar" ;;
 teragrid) . "$srcdir/sh/teragrid" ;;
 babieca) . "$srcdir/sh/babieca" ;;
 *)
 [ "$mode" = p ] && mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon
+[ $run ] && echo "$(date): Start SORD run" >> log
 case $mode$run in
   si) ./sord-s ;;
   sg) ddd ./sord-s ;;

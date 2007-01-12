@@ -1,20 +1,23 @@
 % PML test problem
-  np = [ 4 4 2 ];
+  tfunc = 'brune';
+  tfunc = 'sbrune';
   faultnormal = 0;
   rsource = 150.;
-  out = { 'x'    1   1 1   0   0   -1 -1   0  0 };
-  out = { 'vm' 100   1 1   0 100   -1 -1   0 -1 };
-  out = { 'x'    1   1 1  20   0   -1 -1  20  0 };
-  out = { 'vm' 100   1 1  20 100   -1 -1  20 -1 };
-  out = { 'x'    1   1 1 -20   0   -1 -1 -20  0 };
-  out = { 'vm' 100   1 1 -20 100   -1 -1 -20 -1 };
-  timeseries = { 'vm'  -6000.      0.     0. }
-  timeseries = { 'vm'  -6000.  -6000.     0. }
-  timeseries = { 'vm'  -6000.  -6000. -6000. }
+  viscosity = [ .0 .0 ];
+  timeseries = { 'v'  -6000.      0.     0. }
+  timeseries = { 'v'  -6000.  -6000.     0. }
+  timeseries = { 'v'  -6000.  -6000. -6000. }
+  timeseries = { 'x'  -6000.      0.     0. }
+  timeseries = { 'x'  -6000.  -6000.     0. }
+  timeseries = { 'x'  -6000.  -6000. -6000. }
   nt = 1000;
+  nt = 500;
   origin = 0;
-  moment1 = [ 0 0 0 ];
-  moment2 = [ 3e16 3e16 3e16 ];
+  moment1 = [ 1e18 1e18 1e18 ];
+  moment2 = [ 0 0 0 ];
+  np = [ 4 4 2 ];
+  np = [ 1 1 2 ];
+  debug = 1;
 
 % Rect
   ihypo = [ -1 -1 -1 ];
