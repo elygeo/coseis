@@ -69,7 +69,7 @@ end do
 
 ! Normalize and divide by cell volume
 call rreduce( sumsrcfr, sum( srcfr ), 'allsum', 0 )
-if ( nsrc == 0 .or. sumsrcfr <= 0. ) stop 'bad source space function'
+if ( sumsrcfr <= 0. ) stop 'bad source space function'
 srcfr = srcfr / sumsrcfr / cellvol
 
 end subroutine
