@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-version=$( date +%Y%m%d-%H%M%S )
+version=$( date +%Y%m%d%H%M%S )
 base=sord-$version
 
 cat << END > versionmeta.m
