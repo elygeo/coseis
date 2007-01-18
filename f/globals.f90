@@ -93,7 +93,7 @@ real :: &
   vs0,           & ! hypocenter S-wave speed
   vs1,           & ! min S-wave speed
   vs2,           & ! max S-wave speed
-  viscosity(2),  & ! viscosity for (1) stress & (2) hourglass corrections
+  hourglass(2),  & ! hourglass stiffness (1) and viscosity (2)
   vdamp,         & ! shear wave velocity dependent damping
   rexpand,       & ! grid expantion ratio
   affine(10),    & ! grid transformation

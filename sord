@@ -298,7 +298,8 @@ teragrid) . "$srcdir/sh/teragrid" ;;
 babieca) . "$srcdir/sh/babieca" ;;
 *)
 [ "$mode" = p ] && mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon
-[ $run ] && echo "$(date): Start SORD run" >> log
+[ $run ]
+echo "$(date): Start SORD run" >> log
 case $mode$run in
   si) ./sord-s ;;
   sg) ddd ./sord-s ;;

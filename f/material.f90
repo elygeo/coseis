@@ -18,6 +18,7 @@ if ( master ) write( 0, * ) 'Material model'
 mr = 0.
 s1 = 0.
 s2 = 0.
+gam = 0.
 
 ! Loop over input zones
 
@@ -36,9 +37,10 @@ case( 'z' )
   k1 = i3(2); k2 = i4(2)
   l1 = i3(3); l2 = i4(3)
   select case( fieldin(iz) )
-  case( 'rho' ); mr(j1:j2,k1:k2,l1:l2) = inval(iz)
-  case( 'vp'  ); s1(j1:j2,k1:k2,l1:l2) = inval(iz)
-  case( 'vs'  ); s2(j1:j2,k1:k2,l1:l2) = inval(iz)
+  case( 'rho' ); mr(j1:j2,k1:k2,l1:l2)  = inval(iz)
+  case( 'vp'  ); s1(j1:j2,k1:k2,l1:l2)  = inval(iz)
+  case( 'vs'  ); s2(j1:j2,k1:k2,l1:l2)  = inval(iz)
+  case( 'gam' ); gam(j1:j2,k1:k2,l1:l2) = inval(iz)
   end select
 case( 'c' )
   x1 = x1in(iz,:)
@@ -47,6 +49,7 @@ case( 'c' )
   case( 'rho' ); call cube( mr, x, i1, i2, x1, x2, inval(iz) )
   case( 'vp'  ); call cube( s1, x, i1, i2, x1, x2, inval(iz) )
   case( 'vs'  ); call cube( s2, x, i1, i2, x1, x2, inval(iz) )
+  case( 'gam' ); call cube( s2, x, i1, i2, x1, x2, inval(iz) )
   end select
 case( 'r' )
   idoublenode = 0
@@ -84,6 +87,13 @@ case( 'r' )
     case( 1 ); j = ihypo(1); s2(j+1:j2+1,:,:) = s2(j:j2,:,:)
     case( 2 ); k = ihypo(2); s2(:,k+1:k2+1,:) = s2(:,k:k2,:)
     case( 3 ); l = ihypo(3); s2(:,:,l+1:l2+1) = s2(:,:,l:l2)
+    end select
+  case( 'gam'  )
+    call scalario( 'r', 'data/vs', s2, 1, i1, i2, i3, i4, 0 )
+    select case( idoublenode )
+    case( 1 ); j = ihypo(1); gam(j+1:j2+1,:,:) = gam(j:j2,:,:)
+    case( 2 ); k = ihypo(2); gam(:,k+1:k2+1,:) = gam(:,k:k2,:)
+    case( 3 ); l = ihypo(3); gam(:,:,l+1:l2+1) = gam(:,:,l:l2)
     end select
   end select
 end select
@@ -124,9 +134,11 @@ vs1  = -gstats(6)
 call scalarbc( mr, ibc1, ibc2, nhalo )
 call scalarbc( s1, ibc1, ibc2, nhalo )
 call scalarbc( s2, ibc1, ibc2, nhalo )
+call scalarbc( gam, ibc1, ibc2, nhalo )
 call scalarswaphalo( mr, nhalo )
 call scalarswaphalo( s1, nhalo )
 call scalarswaphalo( s2, nhalo )
+call scalarswaphalo( gam, nhalo )
 
 ! Hypocenter values
 if ( master ) then
@@ -143,14 +155,11 @@ mu  = mr * s2 * s2
 lam = mr * ( s1 * s1 ) - 2. * mu
 
 ! Viscosity
-gam = 0.
 if ( vdamp > 0. ) then
   where( s2 > 0. ) gam = vdamp / s2
   where( gam > .8 ) gam = .8
-  gam = dt * gam
-else
-  gam = dt * viscosity(1)
 end if
+gam = dt * gam
 
 end subroutine
 

@@ -38,9 +38,9 @@ where( lam > 0. ) lam = 1. / lam
 where( mu  > 0. ) mu  = 1. / mu
 
 ! Hourglass constant
-y = 3. * ( lam + 2. * mu )
-where ( y /= 0. ) y = 2. * dx * mu * ( lam + mu ) / y
-!y = .3 / 2. * ( lam + 2. * mu ) * dx ! like Ma & Liu, 2006
+y = 12. * ( lam + 2. * mu )
+where ( y /= 0. ) y = dx * mu * ( lam + mu ) / y
+!y = .3 / 16. * ( lam + 2. * mu ) * dx ! like Ma & Liu, 2006
 
 ! Cell volume
 s1 = 0.

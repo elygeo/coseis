@@ -3,7 +3,6 @@
   tfunc = 'sbrune';
   faultnormal = 0;
   rsource = 150.;
-  viscosity = [ .0 .0 ];
   timeseries = { 'v'  -6000.      0.     0. }
   timeseries = { 'v'  -6000.  -6000.     0. }
   timeseries = { 'v'  -6000.  -6000. -6000. }
@@ -18,6 +17,10 @@
   np = [ 4 4 2 ];
   np = [ 1 1 2 ];
   debug = 1;
+  gam = .0;
+  hourglass = [ 1. .0 ];
+  hourglass = [ .125 .0 ];
+  hourglass = [ .0 .0 ];
 
 % Rect
   ihypo = [ -1 -1 -1 ];

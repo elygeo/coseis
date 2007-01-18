@@ -94,7 +94,7 @@ end do doid
 end do doic
 
 ! Hourglass correction
-w2 = u + dt * viscosity(2) * v
+w2 = hourglass(1) * u + dt * hourglass(2) * v
 s1 = 0.
 s2 = 0.
 do ic = 1, 3

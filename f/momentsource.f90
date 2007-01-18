@@ -57,7 +57,7 @@ if ( s2(j,k,l) <= rsource ) then
   cellvol(i) = s1(j,k,l)
   select case( rfunc )
   case( 'box'  ); srcfr(i) = 1.
-  case( 'tent' ); srcfr(i) = s2(j,k,l)
+  case( 'tent' ); srcfr(i) = rsource - s2(j,k,l)
   case default
     write( 0, * ) 'invalid rfunc: ', trim( rfunc )
     stop
@@ -69,6 +69,7 @@ end do
 
 ! Normalize and divide by cell volume
 call rreduce( sumsrcfr, sum( srcfr ), 'allsum', 0 )
+if ( nsrc == 0 .or. sumsrcfr <= 0. ) stop 'bad source space function'
 srcfr = srcfr / sumsrcfr / cellvol
 
 end subroutine

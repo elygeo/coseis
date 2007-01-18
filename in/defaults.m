@@ -24,9 +24,9 @@
   vs2  = 1e9;				% max S-wave speed
 
 % lock = [ 1 1 0   1 1 1  -1 -1 -1 ];	% **lock v1 & v2, v3 is free
-  viscosity = [ .0 .3 ];		% stress (1) & hourglass (2)
-  viscosity = [ .1 .7 ];		% stress (1) & hourglass (2)
+  gam = .0;				% viscosity
   vdamp = -1.;				% Vs dependent damping
+  hourglass = [ 1. .5 ];		% hourglass stiffness (1) and viscosity (2)
 % npml = 0;				% no PML absorbing boundary
   npml = 10;				% 10 PML nodes
   bc1 = [ 0 0 0 ];			% j1 k1 l1 boundary cond (see below)
