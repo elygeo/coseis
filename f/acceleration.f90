@@ -9,7 +9,7 @@ use m_diffcn
 use m_hourglass
 use m_collective
 use m_bc
-integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iz, iq
+integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, ic, iid, id, iz, iq
 
 s1 = 0.
 
@@ -94,7 +94,13 @@ end do doid
 end do doic
 
 ! Hourglass correction
-w2 = hourglass(1) * u + dt * hourglass(2) * v
+i1 = max( i1pml + 1,  1 )
+i2 = min( i2pml - 1, nm )
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+w2 = hourglass(2) * dt * v
+w2(j1:j2,k1:k2,l1:l2,:) = w2(j1:j2,k1:k2,l1:l2,:) + hourglass(1) * u(j1:j2,k1:k2,l1:l2,:)
 s1 = 0.
 s2 = 0.
 do ic = 1, 3

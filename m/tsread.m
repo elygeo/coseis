@@ -40,8 +40,8 @@ end
 
 % Time
 if any( strcmp( field, { 'v' 'vm' 'sv' } ) )
-  it0 = 2;
-  tt = ( it0 : it ) * dt - 1.5 * dt;
+  it0 = 1;
+  tt = ( it0 : it ) * dt - .5 * dt;
 else
   it0 = 1;
   tt = ( it0 : it ) * dt - dt;
@@ -60,31 +60,29 @@ vt = reshape( vt, nt, nc );
 % For point source, rotate to r,h,v coords
 if pointsource
   nh = cross( upvector, nr );
-  if any( nh )
-    nh = nh / sqrt( sum( nh .* nh ) );
-    nv = cross( nr, nh );
-    nv = nv / sqrt( sum( nv .* nv ) );
-    rot = [ nr(:) nh(:) nv(:) ];
-    switch nc
-    case 3
-      vt = vt * rot;
-    case 6
-      vt = [ ...
-         vt([1 6 5]) * rot(:,1) ...
-         vt([6 2 4]) * rot(:,2) ...
-         vt([5 4 3]) * rot(:,3) ...
-         vt([5 4 3]) * rot(:,2) ...
-         vt([1 6 5]) * rot(:,3) ...
-         vt([6 2 4]) * rot(:,1) ]';
-    end
-  else
-    vt = vt * nr(1);
+  if all( ~nh ), nh = cross( [ 1 0 0 ], nr ); end
+  if all( ~nh ), nh = cross( [ 0 1 0 ], nr ); end
+  nh = nh / sqrt( sum( nh .* nh ) );
+  nv = cross( nr, nh );
+  nv = nv / sqrt( sum( nv .* nv ) );
+  rot = [ nr(:) nh(:) nv(:) ];
+  switch nc
+  case 3
+    vt = vt * rot;
+  case 6
+    vt = [ ...
+       vt([1 6 5]) * rot(:,1) ...
+       vt([6 2 4]) * rot(:,2) ...
+       vt([5 4 3]) * rot(:,3) ...
+       vt([5 4 3]) * rot(:,2) ...
+       vt([1 6 5]) * rot(:,3) ...
+       vt([6 2 4]) * rot(:,1) ]';
   end
 end
 
 % Filter
 if dofilter
-  fcorner = vp0 / ( 8 * dx )
+  fcorner = vp0 / ( dofilter * 8 * dx )
   n = 2 * round( 1 / ( fcorner * dt ) );
   b = .5 * ( 1 - cos( 2 * pi * ( 1 : n - 1 ) / n ) );  % hanning
   a  = sum( b );

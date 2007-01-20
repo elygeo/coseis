@@ -1,8 +1,5 @@
 % PML test problem
-  tfunc = 'brune';
-  tfunc = 'sbrune';
   faultnormal = 0;
-  rsource = 150.;
   timeseries = { 'v'  -6000.      0.     0. }
   timeseries = { 'v'  -6000.  -6000.     0. }
   timeseries = { 'v'  -6000.  -6000. -6000. }
@@ -12,15 +9,15 @@
   nt = 1000;
   nt = 500;
   origin = 0;
+  tfunc = 'brune';
+  tfunc = 'sbrune';
+  rsource = 100.;
   moment1 = [ 1e18 1e18 1e18 ];
   moment2 = [ 0 0 0 ];
-  np = [ 4 4 2 ];
   np = [ 1 1 2 ];
   debug = 1;
-  gam = .0;
-  hourglass = [ 1. .0 ];
-  hourglass = [ .125 .0 ];
-  hourglass = [ .0 .0 ];
+  gam = .3;
+  hourglass = [ 1. 3. ];
 
 % Rect
   ihypo = [ -1 -1 -1 ];
