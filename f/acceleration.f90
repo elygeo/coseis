@@ -93,23 +93,28 @@ end if
 end do doid
 end do doic
 
-! Hourglass correction
-i1 = max( i1pml + 1,  1 )
-i2 = min( i2pml - 1, nm )
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-w2 = hourglass(2) * dt * v
-w2(j1:j2,k1:k2,l1:l2,:) = w2(j1:j2,k1:k2,l1:l2,:) + hourglass(1) * u(j1:j2,k1:k2,l1:l2,:)
-s1 = 0.
+! Stiffness hourglass control
+w2 = 0.
 s2 = 0.
-do ic = 1, 3
+i1 = max( i1pml + 1, inode1 )
+i2 = min( i2pml - 1, inode2 )
 do iq = 1, 4
-  call hourglassnc( s1, w2, ic, iq, i1cell, i2cell )
-  s1 = y * s1
-  call hourglasscn( s2, s1, iq, i1node, i2node )
-  w1(:,:,:,ic) = w1(:,:,:,ic) - s2
+  call hourglassnc( w2, u, iq, i1cell, i2cell )
+  do i = 1, 3
+    s1 = hourglass(1) * y * w2(:,:,:,i)
+    call hourglasscn( s2, s1, iq, i1, i2 )
+    w1(:,:,:,i) = w1(:,:,:,i) - s2
+  end do
 end do
+
+! Viscous hourglass control
+do iq = 1, 4
+  call hourglassnc( w2, v, iq, i1cell, i2cell )
+  do i = 1, 3
+    s1 = dt * hourglass(2) * y * w2(:,:,:,i)
+    call hourglasscn( s2, s1, iq, i1node, i2node )
+    w1(:,:,:,i) = w1(:,:,:,i) - s2
+  end do
 end do
 
 ! Newton's law: a_i = f_i / m
