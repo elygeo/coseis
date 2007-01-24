@@ -19,15 +19,12 @@
   bc2 = [  1  1  1 ];
   dx  = 100;
   dt  = .008;
-  nt  = 565;
-  nt  = 1;
+  nt  = 625;
   rsource = 50.;
   nn    = [  91  111 61 ];
   ihypo = [ -92 -112 21 ];
   timeseries = { 'v' 5950. 7950. -2050. };
   timeseries = { 'v' 6050. 8050. -2050. };
-  timeseries = { 'x' 5950. 7950. -2050. };
-  timeseries = { 'x' 6050. 8050. -2050. };
 
 return
 
