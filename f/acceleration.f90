@@ -96,8 +96,8 @@ end do doic
 ! Stiffness hourglass control
 w2 = 0.
 s2 = 0.
-i1 = max( i1pml + 1, inode1 )
-i2 = min( i2pml - 1, inode2 )
+i1 = max( i1pml + 1, i1node )
+i2 = min( i2pml - 1, i2node )
 do iq = 1, 4
   call hourglassnc( w2, u, iq, i1cell, i2cell )
   do i = 1, 3
