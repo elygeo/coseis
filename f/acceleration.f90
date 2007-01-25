@@ -124,7 +124,7 @@ end do
 
 ! Boundary conditions
 call vectorbc( w1, ibc1, ibc2, nhalo )
-call vectorswaphalo( w1, 0, nhalo )
+call vectorswaphalo( w1, nhalo )
 
 end subroutine
 

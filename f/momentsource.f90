@@ -10,6 +10,7 @@ subroutine momentsource_init
 use m_globals
 use m_diffnc
 use m_collective
+use m_util
 real, allocatable :: cellvol(:)
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nsrc
 real :: sumsrcfr
@@ -17,35 +18,26 @@ real :: sumsrcfr
 if ( rsource <= 0. ) return
 if ( master ) write( 0, * ) 'Moment source initialize'
 
-! Indices
-i1 = i1cell
-i2 = i2cell
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-
 ! Cell volumes
-s1 = 0.
-call diffnc( s1, 'g', x, x, dx, 1, 1, i1, i2 )
+call diffnc( s1, 'g', x, x, dx, 1, 1, i1cell, i2cell )
 
 ! Cell center distance
-w2 = 2. * rsource
-forall( j=j1:j2, k=k1:k2, l=l1:l2, i=1:3 )
-  w2(j,k,l,i) = 0.125 * &
-    ( x(j,k,l,i) + x(j+1,k+1,l+1,i) &
-    + x(j+1,k,l,i) + x(j,k+1,l+1,i) &
-    + x(j,k+1,l,i) + x(j+1,k,l+1,i) &
-    + x(j,k,l+1,i) + x(j+1,k+1,l,i) );
-end forall
+call vectoraverage( w2, x, i1cell, i2cell, 1 )
 do i = 1, 3
   w2(:,:,:,i) = w2(:,:,:,i) - xhypo(i)
 end do
 s2 = sqrt( sum( w2 * w2, 4 ) )
+call sethalo( s2, 2.*rsource, i1cell, i2cell )
 nsrc = count( s2 <= rsource )
 allocate( jj(nsrc), kk(nsrc), ll(nsrc), cellvol(nsrc), srcfr(nsrc) )
 
 ! Use points inside radius
 i = 0
+i1 = i1cell
+i2 = i2cell
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
 do l = l1, l2
 do k = k1, k2
 do j = j1, j2

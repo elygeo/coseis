@@ -11,31 +11,33 @@ use m_bc
 integer :: i1(3), i2(3), j, k, l, j1, k1, l1, j2, k2, l2
 
 if ( master ) write( 0, * ) 'Resample material model'
+s1 = 0.
 
 ! Harmonic average Lame parameters onto cell centers
-s1 = 0.
-s2 = 0.
-i1 = i1cell
-i2 = i2cell
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-where( lam > 0. ) s1 = 1. / lam
-where( mu  > 0. ) s2 = 1. / mu
-forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-  lam(j,k,l) = 0.125 * &
-    ( s1(j,k,l) + s1(j+1,k+1,l+1) &
-    + s1(j+1,k,l) + s1(j,k+1,l+1) &
-    + s1(j,k+1,l) + s1(j+1,k,l+1) &
-    + s1(j,k,l+1) + s1(j+1,k+1,l) )
-  mu(j,k,l) = 0.125 * &
-    ( s2(j,k,l) + s2(j+1,k+1,l+1) &
-    + s2(j+1,k,l) + s2(j,k+1,l+1) &
-    + s2(j,k+1,l) + s2(j+1,k,l+1) &
-    + s2(j,k,l+1) + s2(j+1,k+1,l) )
-end forall
-where( lam > 0. ) lam = 1. / lam
-where( mu  > 0. ) mu  = 1. / mu
+if ( cellreg == 0 ) then
+  s2 = 0.
+  i1 = i1cell
+  i2 = i2cell
+  j1 = i1(1); j2 = i2(1)
+  k1 = i1(2); k2 = i2(2)
+  l1 = i1(3); l2 = i2(3)
+  where( lam > 0. ) s1 = 1. / lam
+  where( mu  > 0. ) s2 = 1. / mu
+  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+    lam(j,k,l) = 0.125 * &
+      ( s1(j,k,l) + s1(j+1,k+1,l+1) &
+      + s1(j+1,k,l) + s1(j,k+1,l+1) &
+      + s1(j,k+1,l) + s1(j+1,k,l+1) &
+      + s1(j,k,l+1) + s1(j+1,k+1,l) )
+    mu(j,k,l) = 0.125 * &
+      ( s2(j,k,l) + s2(j+1,k+1,l+1) &
+      + s2(j+1,k,l) + s2(j,k+1,l+1) &
+      + s2(j,k+1,l) + s2(j+1,k,l+1) &
+      + s2(j,k,l+1) + s2(j+1,k+1,l) )
+  end forall
+  where( lam > 0. ) lam = 1. / lam
+  where( mu  > 0. ) mu  = 1. / mu
+end if
 
 ! Hourglass constant
 y = 12. * ( lam + 2. * mu )
@@ -43,7 +45,6 @@ where ( y /= 0. ) y = dx * mu * ( lam + mu ) / y
 !y = .3 / 16. * ( lam + 2. * mu ) * dx ! like Ma & Liu, 2006
 
 ! Cell volume
-s1 = 0.
 call diffnc( s1, 'g', x, x, dx, 1, 1, i1cell, i2cell )
 select case( ifn )
 case( 1 ); j = ihypo(1); s1(j,:,:) = 0.
@@ -51,7 +52,16 @@ case( 2 ); k = ihypo(2); s1(:,k,:) = 0.
 case( 3 ); l = ihypo(3); s1(:,:,l) = 0.
 end select
 
-! Node volume
+! Divide moduli by cell volume
+where ( s1 /= 0. ) s1 = 1. / s1
+mu = mu * s1
+lam = lam * s1
+where ( s1 /= 0. ) mu = mu. / s1
+call sethalo( lam, 0., i1cell, i2cell )
+call sethalo( mu,  0., i1cell, i2cell )
+
+! Node volume/mass
+if ( cellreg = 1 ) s1 = s1 * mr
 s2 = 0.
 i1 = i1node
 i2 = i2node
@@ -65,17 +75,13 @@ forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     + s1(j,k-1,l) + s1(j-1,k,l-1) &
     + s1(j,k,l-1) + s1(j-1,k-1,l) )
 end forall
-
-! Divide Lame parameters by cell volume
-where ( s1 /= 0. ) s1 = 1. / s1
-lam = lam * s1
-mu = mu * s1
+if ( cellreg = 0 ) s2 = s2
 
 ! Node mass ratio
 mr = mr * s2
 where ( mr /= 0. ) mr = 1. / mr
 call scalarbc( mr, ibc1, ibc2, nhalo )
-call scalarswaphalo( mr, 0, nhalo )
+call scalarswaphalo( mr, nhalo )
 
 ! Initial state
   t     =  0.

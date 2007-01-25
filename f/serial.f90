@@ -106,17 +106,17 @@ f(1,1,1,1) = f(1,1,1,1) - i1(1) + i1(1) - i2(1) + i2(1) - i + i
 end subroutine
 
 ! Scalar swap halo
-subroutine scalarswaphalo( f, ntrim, nhalo )
+subroutine scalarswaphalo( f, nhalo )
 real, intent(inout) :: f(:,:,:)
-integer, intent(in) :: ntrim, nhalo
-f(1,1,1) = f(1,1,1) - ntrim + ntrim - nhalo + nhalo
+integer, intent(in) :: nhalo
+f(1,1,1) = f(1,1,1) - nhalo + nhalo
 end subroutine
 
 ! Vector swap halo
-subroutine vectorswaphalo( f, ntrim, nhalo )
+subroutine vectorswaphalo( f, nhalo )
 real, intent(inout) :: f(:,:,:,:)
-integer, intent(in) :: ntrim nhalo
-f(1,1,1,1) = f(1,1,1,1) - ntrim + ntrim - nhalo + nhalo
+integer, intent(in) :: nhalo
+f(1,1,1,1) = f(1,1,1,1) - nhalo + nhalo
 end subroutine
 
 ! Split communicator

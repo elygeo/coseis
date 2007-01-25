@@ -269,7 +269,7 @@ case( 1 ); x(j+1:nm(1),:,:,:) = x(j:nm(1)-1,:,:,:)
 case( 2 ); x(:,k+1:nm(2),:,:) = x(:,k:nm(2)-1,:,:)
 case( 3 ); x(:,:,l+1:nm(3),:) = x(:,:,l:nm(3)-1,:)
 end select
-call vectorswaphalo( x, 0, nhalo )
+call vectorswaphalo( x, nhalo )
 
 ! Hypocenter location
 select case( fixhypo )

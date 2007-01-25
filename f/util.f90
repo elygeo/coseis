@@ -44,6 +44,32 @@ where( x(j1:j2,k1:k2,l1:l2,1) >= x1(1) &
  .and. x(j1:j2,k1:k2,l1:l2,3) <= x2(3) ) s = r
 end subroutine
 
+subroutine scalaraverage( fa, f, i1, i2, d )
+real, intent(out) :: fa(:,:,:)
+real, intent(in) :: f(:,:,:), i1(3), i2(3), d
+integer :: j, k, l
+forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+  fa(j,k,l) = 0.125 * &
+  ( f(j,k,l) + f(j+d,k+d,l+d) &
+  + f(j+d,k,l) + f(j,k+d,l+d) &
+  + f(j,k+d,l) + f(j+d,k,l+d) &
+  + f(j,k,l+d) + f(j+d,k+d,l) )
+end forall
+end subroutine
+
+subroutine vectoraverage( fa, f, i1, i2, d )
+real, intent(out) :: fa(:,:,:,:)
+real, intent(in) :: f(:,:,:,:), i1(3), i2(3), d
+integer :: i, j, k, l
+forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3), i=1:3 )
+  fa(j,k,l,i) = 0.125 * &
+  ( f(j,k,l,i) + f(j+d,k+d,l+d,i) &
+  + f(j+d,k,l,i) + f(j,k+d,l+d,i) &
+  + f(j,k+d,l,i) + f(j+d,k,l+d,i) &
+  + f(j,k,l+d,i) + f(j+d,k+d,l,i) )
+end forall
+end subroutine
+
 subroutine sethalo( f, r, i1, i2 )
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r

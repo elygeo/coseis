@@ -28,18 +28,22 @@ doiz: do iz = 1, nin
 i1 = i1in(iz,:)
 i2 = i2in(iz,:)
 call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
-select case( cellreg )
-case( 0 )
-  i3 = max( i1, i1node )
-  i4 = min( i2, i2node )
-case( 1 )
-  i2 = i1 - 1
-  i3 = max( i1, i1cell )
-  i4 = min( i2, i2cell )
-end select
+
+! Locations
+if ( cellreg == 0 ) then
+  w1 = x
+else
+  cellreg = 1
+  i2 = i2 - 1
+  i3 = 1
+  i4 = nm - 1
+  call vectoraverage( w1, x, i3, i4, 1 )
+end if
 
 select case( intype(iz) )
 case( 'z' )
+  i3 = max( i1, 1 )
+  i4 = min( i2, nm )
   j1 = i3(1); j2 = i4(1)
   k1 = i3(2); k2 = i4(2)
   l1 = i3(3); l2 = i4(3)
@@ -50,15 +54,19 @@ case( 'z' )
   case( 'gam' ); gam(j1:j2,k1:k2,l1:l2) = inval(iz)
   end select
 case( 'c' )
+  i3 = 1
+  i4 = nm
   x1 = x1in(iz,:)
   x2 = x2in(iz,:)
   select case( fieldin(iz) )
-  case( 'rho' ); call cube( mr, x, i1, i2, x1, x2, inval(iz) )
-  case( 'vp'  ); call cube( s1, x, i1, i2, x1, x2, inval(iz) )
-  case( 'vs'  ); call cube( s2, x, i1, i2, x1, x2, inval(iz) )
-  case( 'gam' ); call cube( s2, x, i1, i2, x1, x2, inval(iz) )
+  case( 'rho' ); call cube( mr, w1, i3, i4, x1, x2, inval(iz) )
+  case( 'vp'  ); call cube( s1, w1, i3, i4, x1, x2, inval(iz) )
+  case( 'vs'  ); call cube( s2, w1, i3, i4, x1, x2, inval(iz) )
+  case( 'gam' ); call cube( s2, w1, i3, i4, x1, x2, inval(iz) )
   end select
 case( 'r' )
+  i3 = max( i1, i1node )
+  i4 = min( i2, i1node )
   idoublenode = 0
   if ( faultnormal /= 0 ) then
     i = abs( faultnormal )
@@ -123,9 +131,15 @@ where ( s2 > vs2 ) s2 = vs2
 stats(1) = maxval( mr )
 stats(2) = maxval( s1 )
 stats(3) = maxval( s2 )
-call sethalo( mr, stats(1), i1node, i2node )
-call sethalo( s1, stats(2), i1node, i2node )
-call sethalo( s2, stats(3), i1node, i2node )
+if ( cellreg == 0 ) then
+  call sethalo( mr, stats(1), i1node, i2node )
+  call sethalo( s1, stats(2), i1node, i2node )
+  call sethalo( s2, stats(3), i1node, i2node )
+else
+  call sethalo( mr, stats(1), i1node, i2cell )
+  call sethalo( s1, stats(2), i1node, i2cell )
+  call sethalo( s2, stats(3), i1node, i2cell )
+end if
 stats(4) = -minval( mr )
 stats(5) = -minval( s1 )
 stats(6) = -minval( s2 )
@@ -138,14 +152,14 @@ vp1  = -gstats(5)
 vs1  = -gstats(6)
 
 ! Fill halo
-call scalarbc( mr, ibc1, ibc2, nhalo )
-call scalarbc( s1, ibc1, ibc2, nhalo )
-call scalarbc( s2, ibc1, ibc2, nhalo )
-call scalarbc( gam, ibc1, ibc2, nhalo )
-call scalarswaphalo( mr, 0, nhalo )
-call scalarswaphalo( s1, 0, nhalo )
-call scalarswaphalo( s2, 0, nhalo )
-call scalarswaphalo( gam, 0, nhalo )
+call scalarbc( mr,  ibc1, ibc2, nhalo, cellreg )
+call scalarbc( s1,  ibc1, ibc2, nhalo, cellreg )
+call scalarbc( s2,  ibc1, ibc2, nhalo, cellreg )
+call scalarbc( gam, ibc1, ibc2, nhalo, cellreg )
+call scalarswaphalo( mr, nhalo )
+call scalarswaphalo( s1, nhalo )
+call scalarswaphalo( s2, nhalo )
+call scalarswaphalo( gam, nhalo )
 
 ! Hypocenter values
 if ( master ) then

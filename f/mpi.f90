@@ -208,20 +208,20 @@ call mpi_type_free( dtype, e )
 end subroutine
 
 ! Scalar swap halo
-subroutine scalarswaphalo( f, ntrim, nhalo )
+subroutine scalarswaphalo( f, nhalo )
 use mpi
 real, intent(inout) :: f(:,:,:)
-integer, intent(in) :: ntrim, nhalo
+integer, intent(in) :: nhalo
 integer :: i, e, prev, next, nm(3), n(3), isend(3), irecv(3), tsend, trecv
 nm = (/ size(f,1), size(f,2), size(f,3) /)
 do i = 1, 3
 if ( nm(i) > 1 ) then
   call mpi_cart_shift( comm3d, i-1, 1, prev, next, e )
-  n = nm - ntrim
+  n = nm
   n(i) = nhalo
   isend = 0
   irecv = 0
-  isend(i) = nm(i) - 2 * nhalo - ntrim
+  isend(i) = nm(i) - 2 * nhalo
   call mpi_type_create_subarray( 3, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
   call mpi_type_create_subarray( 3, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
@@ -230,7 +230,7 @@ if ( nm(i) > 1 ) then
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
   isend(i) = nhalo
-  irecv(i) = nm(i) - nhalo - ntrim
+  irecv(i) = nm(i) - nhalo
   call mpi_type_create_subarray( 3, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
   call mpi_type_create_subarray( 3, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
@@ -243,20 +243,20 @@ end do
 end subroutine
 
 ! Vector swap halo
-subroutine vectorswaphalo( f, ntrim, nhalo )
+subroutine vectorswaphalo( f, nhalo )
 use mpi
 real, intent(inout) :: f(:,:,:,:)
-integer, intent(in) :: ntrim, nhalo
+integer, intent(in) :: nhalo
 integer :: i, e, prev, next, nm(4), n(4), isend(4), irecv(4), tsend, trecv
 nm = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
 do i = 1, 3
 if ( nm(i) > 1 ) then
   call mpi_cart_shift( comm3d, i-1, 1, prev, next, e )
-  n = nm - ntrim
+  n = nm
   n(i) = nhalo
   isend = 0
   irecv = 0
-  isend(i) = nm(i) - 2 * nhalo - ntrim
+  isend(i) = nm(i) - 2 * nhalo
   call mpi_type_create_subarray( 4, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
   call mpi_type_create_subarray( 4, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
@@ -265,7 +265,7 @@ if ( nm(i) > 1 ) then
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
   isend(i) = nhalo
-  irecv(i) = nm(i) - nhalo - ntrim
+  irecv(i) = nm(i) - nhalo
   call mpi_type_create_subarray( 4, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
   call mpi_type_create_subarray( 4, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )

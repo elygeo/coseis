@@ -82,21 +82,15 @@ case( 'x' )
     end if
   else
     if ( cell ) then
-      i1 = i1node
-      i2 = i2cell
-      j1 = i1(1); j2 = i2(1)
-      k1 = i1(2); k2 = i2(2)
-      l1 = i1(3); l2 = i2(3)
-      forall( j=j1:j2, k=k1:k2, l=l1:l2, i=1:3 )
-        w2(j,k,l,i) = xout(iz,i) - 0.125 * &
-          ( x(j,k,l,i) + x(j+1,k+1,l+1,i) &
-          + x(j+1,k,l,i) + x(j,k+1,l+1,i) &
-          + x(j,k+1,l,i) + x(j+1,k,l+1,i) &
-          + x(j,k,l+1,i) + x(j+1,k+1,l,i) )
-      end forall
+      call vectoraverage( w2, x, i1node, i2cell, 1 )
+      do i = 1, 3
+        w2(:,:,:,i) = xout(iz,i) - w2(:,:,:,i)
+      end do
       s2 = sum( w2 * w2, 4 )
       rout = 2 * dx * dx + maxval( s2 )
       call sethalo( s2, rout, i1node, i2cell )
+      i1 = i1node
+      i2 = i2cell
     else
       do i = 1, 3
         w2(:,:,:,i) = xout(iz,i) - x(:,:,:,i)
@@ -256,7 +250,6 @@ i1 = i1out(iz,1:3)
 i2 = i2out(iz,1:3)
 i3 = max( i1, i1node )
 i4 = min( i2, i2node )
-if ( cell ) i4 = min( i4, i2cell )
 if ( any( i3 > i4 ) ) then 
   ditout(iz) = nt + 1
   cycle doiz
