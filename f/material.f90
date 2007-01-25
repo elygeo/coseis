@@ -28,8 +28,15 @@ doiz: do iz = 1, nin
 i1 = i1in(iz,:)
 i2 = i2in(iz,:)
 call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
-i3 = max( i1, i1node )
-i4 = min( i2, i2node )
+select case( cellreg )
+case( 0 )
+  i3 = max( i1, i1node )
+  i4 = min( i2, i2node )
+case( 1 )
+  i2 = i1 - 1
+  i3 = max( i1, i1cell )
+  i4 = min( i2, i2cell )
+end select
 
 select case( intype(iz) )
 case( 'z' )
@@ -135,10 +142,10 @@ call scalarbc( mr, ibc1, ibc2, nhalo )
 call scalarbc( s1, ibc1, ibc2, nhalo )
 call scalarbc( s2, ibc1, ibc2, nhalo )
 call scalarbc( gam, ibc1, ibc2, nhalo )
-call scalarswaphalo( mr, nhalo )
-call scalarswaphalo( s1, nhalo )
-call scalarswaphalo( s2, nhalo )
-call scalarswaphalo( gam, nhalo )
+call scalarswaphalo( mr, 0, nhalo )
+call scalarswaphalo( s1, 0, nhalo )
+call scalarswaphalo( s2, 0, nhalo )
+call scalarswaphalo( gam, 0, nhalo )
 
 ! Hypocenter values
 if ( master ) then

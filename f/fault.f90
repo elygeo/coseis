@@ -200,14 +200,14 @@ t1 = 0.
 t2 = 0.
 
 ! Halos
-call scalarswaphalo( mus, nhalo )
-call scalarswaphalo( mud, nhalo )
-call scalarswaphalo( dc, nhalo )
-call scalarswaphalo( co, nhalo )
-call scalarswaphalo( area, nhalo )
-call scalarswaphalo( rhypo, nhalo )
-call vectorswaphalo( nhat, nhalo )
-call vectorswaphalo( t0, nhalo )
+call scalarswaphalo( mus, 0, nhalo )
+call scalarswaphalo( mud, 0, nhalo )
+call scalarswaphalo( dc, 0, nhalo )
+call scalarswaphalo( co, 0, nhalo )
+call scalarswaphalo( area, 0, nhalo )
+call scalarswaphalo( rhypo, 0, nhalo )
+call vectorswaphalo( nhat, 0, nhalo )
+call vectorswaphalo( t0, 0, nhalo )
 
 ! Metadata
 if ( master ) then

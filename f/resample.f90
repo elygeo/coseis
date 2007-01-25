@@ -75,7 +75,7 @@ mu = mu * s1
 mr = mr * s2
 where ( mr /= 0. ) mr = 1. / mr
 call scalarbc( mr, ibc1, ibc2, nhalo )
-call scalarswaphalo( mr, nhalo )
+call scalarswaphalo( mr, 0, nhalo )
 
 ! Initial state
   t     =  0.

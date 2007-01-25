@@ -195,14 +195,14 @@ if ( i1(3) == 2 ) then
     x(:,:,l1-i,3) = 3 * x(:,:,l1,3) - x(:,:,l1+1,3) - x(:,:,l1+i-1,3)
     x(:,:,l1-i,1) = x(:,:,l1+i-1,1)
     x(:,:,l1-i,2) = x(:,:,l1+i-1,2)
-  end forall
-end if
+  end forall 
+end if 
 if ( i2(1) == 2 ) then
   forall( i=1:nhalo )
     x(j2+i,:,:,1) = 3 * x(j2,:,:,1) - x(j2-1,:,:,1) - x(j2-i+1,:,:,1)
     x(j2+i,:,:,2) = x(j2-i+1,:,:,2)
     x(j2+i,:,:,3) = x(j2-i+1,:,:,3)
-  end forall
+  end forall 
 end if
 if ( i2(2) == 2 ) then
   forall( i=1:nhalo )
@@ -214,8 +214,8 @@ end if
 if ( i2(3) == 2 ) then
   forall( i=1:nhalo )
     x(:,:,l2+i,3) = 3 * x(:,:,l2,3) - x(:,:,l2-1,3) - x(:,:,l2-i+1,3)
-    x(:,:,l2+i,1) = x(:,:,l2-i+1,1)
-    x(:,:,l2+i,2) = x(:,:,l2-i+1,2)
+    x(:,:,l2+i,1) = x(:,:,l2-i+1,1) 
+    x(:,:,l2+i,2) = x(:,:,l2-i+1,2) 
   end forall
 end if
 
@@ -269,20 +269,21 @@ case( 1 ); x(j+1:nm(1),:,:,:) = x(j:nm(1)-1,:,:,:)
 case( 2 ); x(:,k+1:nm(2),:,:) = x(:,k:nm(2)-1,:,:)
 case( 3 ); x(:,:,l+1:nm(3),:) = x(:,:,l:nm(3)-1,:)
 end select
-call vectorswaphalo( x, nhalo )
+call vectorswaphalo( x, 0, nhalo )
 
 ! Hypocenter location
-if ( fixhypo == 1 ) then
+select case( fixhypo )
+case( 1 )
   if ( master ) xhypo = xhypo + x(j,k,l,:)
   call rbroadcast1( xhypo )
-elseif ( fixhypo == 2 ) then
+case( 2 )
   if ( master ) xhypo = xhypo + 0.125 * &
     ( x(j,k,l,:) + x(j+1,k+1,l+1,:) &
     + x(j+1,k,l,:) + x(j,k+1,l+1,:) &
     + x(j,k+1,l,:) + x(j+1,k,l+1,:) &
     + x(j,k,l+1,:) + x(j+1,k+1,l,:) )
   call rbroadcast1( xhypo )
-end if
+end select
 
 ! Origin
 if ( origin == 0 ) then

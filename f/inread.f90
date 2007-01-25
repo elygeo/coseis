@@ -37,6 +37,7 @@ case( 'gridnoise' );   read( str, *, iostat=io ) gridnoise
 case( 'symmetry' );    read( str, *, iostat=io ) symmetry
 case( 'origin' );      read( str, *, iostat=io ) origin
 case( 'fixhypo' );     read( str, *, iostat=io ) fixhypo
+case( 'cellreg' );     read( str, *, iostat=io ) cellreg
 case( 'nn' );          read( str, *, iostat=io ) nn
 case( 'nt' );          read( str, *, iostat=io ) nt
 case( 'dx' );          read( str, *, iostat=io ) dx

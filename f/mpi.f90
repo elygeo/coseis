@@ -179,12 +179,12 @@ subroutine vectorsend( f, i1, i2, i )
 use mpi
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i
-integer :: ng(4), nl(4), i0(4), prev, next, dtype, e
-ng = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
-nl = (/ i2 - i1 + 1, ng(4) /)
+integer :: nm(4), nl(4), i0(4), prev, next, dtype, e
+nm = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
+nl = (/ i2 - i1 + 1, nm(4) /)
 i0 = (/ i1 - 1, 0 /)
 call mpi_cart_shift( comm3d, abs(i)-1, sign(1,i), prev, next, e )
-call mpi_type_create_subarray( 4, ng, nl, i0, mpi_order_fortran, mpi_real, dtype, e )
+call mpi_type_create_subarray( 4, nm, nl, i0, mpi_order_fortran, mpi_real, dtype, e )
 call mpi_type_commit( dtype, e )
 call mpi_send( f(1,1,1,1), 1, dtype, next, 0, comm3d, e )
 do e = 1,1; end do ! bug work-around, need slight delay here for MPICH2
@@ -196,43 +196,43 @@ subroutine vectorrecv( f, i1, i2, i )
 use mpi
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i
-integer :: ng(4), nl(4), i0(4), prev, next, dtype, e
-ng = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
-nl = (/ i2 - i1 + 1, ng(4) /)
+integer :: nm(4), nl(4), i0(4), prev, next, dtype, e
+nm = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
+nl = (/ i2 - i1 + 1, nm(4) /)
 i0 = (/ i1 - 1, 0 /)
 call mpi_cart_shift( comm3d, abs(i)-1, sign(1,i), prev, next, e )
-call mpi_type_create_subarray( 4, ng, nl, i0, mpi_order_fortran, mpi_real, dtype, e )
+call mpi_type_create_subarray( 4, nm, nl, i0, mpi_order_fortran, mpi_real, dtype, e )
 call mpi_type_commit( dtype, e )
 call mpi_recv( f(1,1,1,1), 1, dtype, next, 0, comm3d, mpi_status_ignore, e )
 call mpi_type_free( dtype, e )
 end subroutine
 
 ! Scalar swap halo
-subroutine scalarswaphalo( f, nhalo )
+subroutine scalarswaphalo( f, ntrim, nhalo )
 use mpi
 real, intent(inout) :: f(:,:,:)
-integer, intent(in) :: nhalo
-integer :: i, e, prev, next, ng(3), nl(3), isend(4), irecv(4), tsend, trecv
-ng = (/ size(f,1), size(f,2), size(f,3) /)
+integer, intent(in) :: ntrim, nhalo
+integer :: i, e, prev, next, nm(3), n(3), isend(3), irecv(3), tsend, trecv
+nm = (/ size(f,1), size(f,2), size(f,3) /)
 do i = 1, 3
-if ( ng(i) > 1 ) then
+if ( nm(i) > 1 ) then
   call mpi_cart_shift( comm3d, i-1, 1, prev, next, e )
-  nl = ng
-  nl(i) = nhalo
+  n = nm - ntrim
+  n(i) = nhalo
   isend = 0
   irecv = 0
-  isend(i) = ng(i) - 2 * nhalo
-  call mpi_type_create_subarray( 3, ng, nl, isend, mpi_order_fortran, mpi_real, tsend, e )
-  call mpi_type_create_subarray( 3, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
+  isend(i) = nm(i) - 2 * nhalo - ntrim
+  call mpi_type_create_subarray( 3, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
+  call mpi_type_create_subarray( 3, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
   call mpi_sendrecv( f(1,1,1), 1, tsend, next, 0, f(1,1,1), 1, trecv, prev, 0, comm3d, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
   isend(i) = nhalo
-  irecv(i) = ng(i) - nhalo
-  call mpi_type_create_subarray( 3, ng, nl, isend, mpi_order_fortran, mpi_real, tsend, e )
-  call mpi_type_create_subarray( 3, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
+  irecv(i) = nm(i) - nhalo - ntrim
+  call mpi_type_create_subarray( 3, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
+  call mpi_type_create_subarray( 3, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
   call mpi_sendrecv( f(1,1,1), 1, tsend, prev, 1, f(1,1,1), 1, trecv, next, 1, comm3d, mpi_status_ignore, e )
@@ -243,31 +243,31 @@ end do
 end subroutine
 
 ! Vector swap halo
-subroutine vectorswaphalo( f, nhalo )
+subroutine vectorswaphalo( f, ntrim, nhalo )
 use mpi
 real, intent(inout) :: f(:,:,:,:)
-integer, intent(in) :: nhalo
-integer :: i, e, prev, next, ng(4), nl(4), isend(4), irecv(4), tsend, trecv
-ng = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
+integer, intent(in) :: ntrim, nhalo
+integer :: i, e, prev, next, nm(4), n(4), isend(4), irecv(4), tsend, trecv
+nm = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
 do i = 1, 3
-if ( ng(i) > 1 ) then
+if ( nm(i) > 1 ) then
   call mpi_cart_shift( comm3d, i-1, 1, prev, next, e )
-  nl = ng
-  nl(i) = nhalo
+  n = nm - ntrim
+  n(i) = nhalo
   isend = 0
   irecv = 0
-  isend(i) = ng(i) - 2 * nhalo
-  call mpi_type_create_subarray( 4, ng, nl, isend, mpi_order_fortran, mpi_real, tsend, e )
-  call mpi_type_create_subarray( 4, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
+  isend(i) = nm(i) - 2 * nhalo - ntrim
+  call mpi_type_create_subarray( 4, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
+  call mpi_type_create_subarray( 4, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
   call mpi_sendrecv( f(1,1,1,1), 1, tsend, next, 0, f(1,1,1,1), 1, trecv, prev, 0, comm3d, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
   isend(i) = nhalo
-  irecv(i) = ng(i) - nhalo
-  call mpi_type_create_subarray( 4, ng, nl, isend, mpi_order_fortran, mpi_real, tsend, e )
-  call mpi_type_create_subarray( 4, ng, nl, irecv, mpi_order_fortran, mpi_real, trecv, e )
+  irecv(i) = nm(i) - nhalo - ntrim
+  call mpi_type_create_subarray( 4, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
+  call mpi_type_create_subarray( 4, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
   call mpi_sendrecv( f(1,1,1,1), 1, tsend, prev, 1, f(1,1,1,1), 1, trecv, next, 1, comm3d, mpi_status_ignore, e )
