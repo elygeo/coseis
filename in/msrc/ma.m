@@ -1,4 +1,4 @@
-% PEER UHS.1, UHS.2, LOH.1, 
+% PEER LOH Shuo Ma
 
   np  = [ 1 1 2 ];
   vp  = 6000.;
