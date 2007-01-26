@@ -145,19 +145,18 @@ if ( vdamp > 0. ) then
   where( s2 > 0. ) gam = vdamp / s2
   where( gam > .8 ) gam = .8
 end if
-gam = dt * gam
 
 ! Extrema
-stats(1) = maxval( mr )
-stats(2) = maxval( s1 )
-stats(3) = maxval( s2 )
+stats(1) =  maxval( mr )
+stats(2) =  maxval( s1 )
+stats(3) =  maxval( s2 )
 stats(4) = -minval( mr )
 stats(5) = -minval( s1 )
 stats(6) = -minval( s2 )
 call rreduce1( gstats, stats, 'allmax', 0 )
-rho2 = gstats(1)
-vp2  = gstats(2)
-vs2  = gstats(3)
+rho2 =  gstats(1)
+vp2  =  gstats(2)
+vs2  =  gstats(3)
 rho1 = -gstats(4)
 vp1  = -gstats(5)
 vs1  = -gstats(6)

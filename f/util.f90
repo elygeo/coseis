@@ -46,7 +46,8 @@ end subroutine
 
 subroutine scalaraverage( fa, f, i1, i2, d )
 real, intent(out) :: fa(:,:,:)
-real, intent(in) :: f(:,:,:), i1(3), i2(3), d
+real, intent(in) :: f(:,:,:)
+integer, intent(in) :: i1(3), i2(3), d
 integer :: j, k, l
 forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
   fa(j,k,l) = 0.125 * &
@@ -59,7 +60,8 @@ end subroutine
 
 subroutine vectoraverage( fa, f, i1, i2, d )
 real, intent(out) :: fa(:,:,:,:)
-real, intent(in) :: f(:,:,:,:), i1(3), i2(3), d
+real, intent(in) :: f(:,:,:,:)
+integer, intent(in) :: i1(3), i2(3), d
 integer :: i, j, k, l
 forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3), i=1:3 )
   fa(j,k,l,i) = 0.125 * &
@@ -88,7 +90,7 @@ subroutine fillhalo( f, r, i1, i2 )
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
 integer, intent(in) :: i1(3), i2(3)
-integer :: n(3)
+integer :: n(3), i
 n = (/ size(f,1), size(f,2), size(f,3) /)
 if ( n(1) > 1 ) forall( i=1:i1(1)-1 ) f(i,:,:) = f(i1(1),:,:) + r
 if ( n(2) > 1 ) forall( i=1:i1(1)-1 ) f(:,i,:) = f(:,i1(2),:) + r

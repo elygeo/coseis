@@ -8,6 +8,7 @@ use m_globals
 use m_collective
 use m_diffnc
 use m_bc
+use m_util
 integer :: i1(3), i2(3), j, k, l, j1, k1, l1, j2, k2, l2
 
 if ( master ) write( 0, * ) 'Resample material model'
