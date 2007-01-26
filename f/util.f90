@@ -56,6 +56,12 @@ forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
   + f(j,k+d,l) + f(j+d,k,l+d) &
   + f(j,k,l+d) + f(j+d,k+d,l) )
 end forall
+fa(:i1(1)-1,:,:) = 0.
+fa(:,:i1(2)-1,:) = 0.
+fa(:,:,:i1(3)-1) = 0.
+fa(i2(1)+1:,:,:) = 0.
+fa(:,i2(2)+1:,:) = 0.
+fa(:,:,i2(3)+1:) = 0.
 end subroutine
 
 subroutine vectoraverage( fa, f, i1, i2, d )
@@ -70,6 +76,12 @@ forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3), i=1:3 )
   + f(j,k+d,l,i) + f(j+d,k,l+d,i) &
   + f(j,k,l+d,i) + f(j+d,k+d,l,i) )
 end forall
+fa(:i1(1)-1,:,:,:) = 0.
+fa(:,:i1(2)-1,:,:) = 0.
+fa(:,:,:i1(3)-1,:) = 0.
+fa(i2(1)+1:,:,:,:) = 0.
+fa(:,i2(2)+1:,:,:) = 0.
+fa(:,:,i2(3)+1:,:) = 0.
 end subroutine
 
 subroutine sethalo( f, r, i1, i2 )

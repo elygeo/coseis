@@ -23,17 +23,24 @@ end select
 call sethalo( s1, 0., i1cell, i2cell )
 
 ! Mass ratio
-s2 = mr * s1
-call scalaraverage( mr, s2, i1node, i2node, -1 )
+call scalaraverage( s2, mr, i1node, i2node, -1 )
+mr = s2
+call scalaraverage( s2, s1, i1node, i2node, -1 )
+mr = mr * s2
 where ( mr /= 0. ) mr = 1. / mr
-call sethalo( mr, 0., i1node, i2node )
 call scalarbc( mr, ibc1, ibc2, nhalo, 0 )
 call scalarswaphalo( mr, nhalo )
+
+! Mass ratio
+!s2 = mr * s1
+!call scalaraverage( mr, s2, i1node, i2node, -1 )
+!where ( mr /= 0. ) mr = 1. / mr
+!call scalarbc( mr, ibc1, ibc2, nhalo, 0 )
+!call scalarswaphalo( mr, nhalo )
 
 ! Viscosity
 s2 = gam * dt
 call scalaraverage( gam, s2, i1node, i2node, -1 )
-call sethalo( gam, 0., i1node, i2node )
 call scalarbc( gam, ibc1, ibc2, nhalo, 0 )
 call scalarswaphalo( gam, nhalo )
 
