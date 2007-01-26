@@ -6,7 +6,7 @@ real :: r, dx, h, o1, o2, xx, yy, h1, h2, h3, h4, ell(3), x0, y0, z0, &
   xf(6), yf(6), rf(6), zf, exag, mus, mud, tn, ts, rho, vp, vs, dc
 integer :: n(3), nn, npml, nrect, i, j, k, l, j1, k1, l1, j2, k2, l2, jf0, kf0, lf0, &
   nf, nf1, nf2, nf3
-real, allocatable :: x(:,:,:,:), w(:,:,:,:), s1(:,:,:), s2(:,:,:), t(:,:)
+real, allocatable :: x(:,:,:,:), w1(:,:,:,:), w2(:,:,:,:), s1(:,:,:), s2(:,:,:), t(:,:)
 character :: endian
 
 ! Model parameters
@@ -46,7 +46,7 @@ j = n(1)
 k = n(2)
 l = n(3)
 nn = j * k * l
-allocate( x(j,k,1,3), w(j,k,1,3), s1(j,k,1) )
+allocate( x(j,k,1,3) )
 open( 1, file='nn' )
 write( 1, * ) nn
 close( 1 )
@@ -112,9 +112,9 @@ write( 1, * ) ' endian      = ''', endian, ''';'
 write( 1, * ) ' faultnormal = 0;'
 write( 1, * ) ' dirfmt      = '''';'
 write( 1, * ) ' out{1}      = { 3 ''x''    0   1 1 1 0 ', n, ' 0 };'
-write( 1, * ) ' out{2}      = { 1 ''rho''  0   1 1 1 0 ', n, ' 0 };'
-write( 1, * ) ' out{3}      = { 1 ''vp''   0   1 1 1 0 ', n, ' 0 };'
-write( 1, * ) ' out{4}      = { 1 ''vs''   0   1 1 1 0 ', n, ' 0 };'
+write( 1, * ) ' out{2}      = { 1 ''rho''  0   1 1 1 0 ', n-1, ' 0 };'
+write( 1, * ) ' out{3}      = { 1 ''vp''   0   1 1 1 0 ', n-1, ' 0 };'
+write( 1, * ) ' out{4}      = { 1 ''vs''   0   1 1 1 0 ', n-1, ' 0 };'
 write( 1, * ) ' out{5}      = { 1 ''ts1''  0   1 1 1 0 ', n, ' 0 };'
 close( 1 )
 
@@ -176,14 +176,14 @@ forall( k=k1+1:k2-1 )
 end forall
 
 ! lon/lat
-w = x
-call ts2ll( w, 1, 2 )
-if ( any( w /= w ) ) stop 'NaNs in lon/lat'
-print *, 'longitude range: ', minval( w(:,:,:,1) ), maxval( w(:,:,:,1) )
-print *, 'latgitude range: ', minval( w(:,:,:,2) ), maxval( w(:,:,:,2) )
+allocate( w1(j,k,1,3), s1(j,k,1), t(960,780) )
+w1 = x
+call ts2ll( w1, 1, 2 )
+if ( any( w1 /= w1 ) ) stop 'NaNs in lon/lat'
+print *, 'longitude range: ', minval( w1(:,:,:,1) ), maxval( w1(:,:,:,1) )
+print *, 'latgitude range: ', minval( w1(:,:,:,2) ), maxval( w1(:,:,:,2) )
 
 ! Topo
-allocate( t(960,780) )
 inquire( iolength=i ) t
 open( 1, file='topo3.'//endian, recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
@@ -194,36 +194,25 @@ o1 = .5 * h - 121.5 * 3600.
 o2 = .5 * h +  30.5 * 3600.
 do k1 = 1, size(w,2)
 do j1 = 1, size(w,1)
-  xx = ( ( w(j1,k1,1,1) * 3600 ) - o1 ) / h
-  yy = ( ( w(j1,k1,1,2) * 3600 ) - o2 ) / h
+  xx = ( ( w1(j1,k1,1,1) * 3600 ) - o1 ) / h
+  yy = ( ( w1(j1,k1,1,2) * 3600 ) - o2 ) / h
   j = int( xx ) + 1
   k = int( yy ) + 1
   h1 =  xx - j + 1
   h2 = -xx + j
   h3 =  yy - k + 1
   h4 = -yy + k
-  w(j1,k1,1,3) = ( &
+  x(j1,k1,1,3) = ( &
     h2 * h4 * t(j,k)   + &
     h1 * h4 * t(j+1,k) + &
     h2 * h3 * t(j,k+1) + &
     h1 * h3 * t(j+1,k+1) )
 end do
 end do
-x(:,:,:,3) = w(:,:,:,3)
+z0 = sum( x(:,:,:,3) ) / ( n(1) * n(2) )
+print *, 'elevation range: ', minval( x(:,:,:,3) ), maxval( x(:,:,:,3) )
 
-! PML regions are orthogonal
-j = n(1)
-k = n(2)
-do i = npml-1,0,-1
-  w(i+1,:,:,:) = w(i+2,:,:,:)
-  w(j-i,:,:,:) = w(j-i-1,:,:,:)
-  w(:,i+1,:,:) = w(:,i+2,:,:)
-  w(:,k-i,:,:) = w(:,k-i-1,:,:)
-end do
-z0 = sum( w(:,:,:,3) ) / ( n(1) * n(2) )
-print *, 'elevation range: ', minval( w(:,:,:,3) ), maxval( w(:,:,:,3) )
-
-! 2D files
+! 2D grid
 inquire( iolength=i ) x(:,:,:,1)
 open( 1, file='x', recl=i, form='unformatted', access='direct', status='replace' )
 open( 2, file='y', recl=i, form='unformatted', access='direct', status='replace' )
@@ -235,38 +224,71 @@ close( 1 )
 close( 2 )
 close( 3 )
 
-! 3D files
+! PML regions are orthogonal
+j = n(1)
+k = n(2)
+do i = npml-1,0,-1
+  x(i+1,:,:,3) = x(i+2,:,:,3)
+  x(j-i,:,:,3) = x(j-i-1,:,:,3)
+  x(:,i+1,:,3) = x(:,i+2,:,3)
+  x(:,k-i,:,3) = x(:,k-i-1,:,3)
+end do
+
+! 3D grid
 inquire( iolength=i ) x(:,:,:,1)
 open( 1, file='x1', recl=i, form='unformatted', access='direct', status='replace' )
 open( 2, file='x2', recl=i, form='unformatted', access='direct', status='replace' )
 open( 3, file='x3', recl=i, form='unformatted', access='direct', status='replace' )
-open( 7, file='rlon', recl=i, form='unformatted', access='direct', status='replace' )
-open( 8, file='rlat', recl=i, form='unformatted', access='direct', status='replace' )
-open( 9, file='rdep', recl=i, form='unformatted', access='direct', status='replace' )
 do l = 1, n(3)
   write( 1, rec=l ) x(:,:,:,1)
   write( 2, rec=l ) x(:,:,:,2)
-  write( 7, rec=l ) w(:,:,:,1)
-  write( 8, rec=l ) w(:,:,:,2)
 end do
 s1 = 0
 l1 = npml + 1
 l2 = n(3) - nf3
 do l = 1, l1
   write( 3, rec=l ) -dx*(n(3)-l) + z0 + s1
-  write( 9, rec=l )  dx*(n(3)-l1) - z0 + w(:,:,:,3)
 end do
 do l = l1+1, l2-1
-  write( 3, rec=l ) -dx*(n(3)-l) + z0*(l2-l)/(l2-l1) + w(:,:,:,3)*(l-l1)/(l2-l1)
-  write( 9, rec=l )  dx*(n(3)-l) + (w(:,:,:,3)-z0)*(l2-l)/(l2-l1)
+  write( 3, rec=l ) -dx*(n(3)-l) + z0*(l2-l)/(l2-l1) + x(:,:,:,3)*(l-l1)/(l2-l1)
 end do
 do l = l2, n(3)
-  write( 3, rec=l ) -dx*(n(3)-l) + w(:,:,:,3)
-  write( 9, rec=l )  dx*(n(3)-l) + s1
+  write( 3, rec=l ) -dx*(n(3)-l) + x(:,:,:,3)
 end do
 close( 1 )
 close( 2 )
 close( 3 )
+
+! 3D element centers
+deallocate( w1, s1, t )
+allocate( w1(j-1,k-1,1,3), s1(j-1,k-1,1) )
+forall( j=1:n(1)-1, k=1:n(2)-1, i=1:3 )
+  w1(j,k,1,i) = .25 * ( x(j,k,1,i) + x(j,k,1,i) + x(j,k,1,i) + x(j,k,1,i) )
+end forall
+call ts2ll( w1, 1, 2 )
+
+! 3D lon/lat/depth
+inquire( iolength=i ) w1(:,:,:,1)
+open( 7, file='rlon', recl=i, form='unformatted', access='direct', status='replace' )
+open( 8, file='rlat', recl=i, form='unformatted', access='direct', status='replace' )
+open( 9, file='rdep', recl=i, form='unformatted', access='direct', status='replace' )
+do l = 1, n(3)
+  write( 7, rec=l ) w1(:,:,:,1)
+  write( 8, rec=l ) w1(:,:,:,2)
+end do
+s1 = 0
+l1 = npml + 1
+l2 = n(3) - nf3
+FIXME this is not right
+do l = 1, l1-1
+  write( 9, rec=l ) dx*(.5+n(3)-l1) - z0 + w1(:,:,:,3)
+end do
+do l = l1, l2-1
+  write( 9, rec=l ) dx*(.5+n(3)-l) + (w1(:,:,:,3)-z0)*(l2-l)/(l2-l1)
+end do
+do l = l2, n(3)-1
+  write( 9, rec=l ) dx*(.5+n(3)-l) + s1
+end do
 close( 7 )
 close( 8 )
 close( 9 )
@@ -276,7 +298,7 @@ print *, 'mus: ', mus
 print *, 'mud: ', mud
 print *, 'tn: ', tn
 print *, 'dc: ', dc
-deallocate( t, x, s1, w )
+deallocate( x, s1, w1 )
 allocate( t(1991,161), s1(n(1),1,n(3)), s2(n(1),1,n(3)) )
 i = nint( dx / 100. )
 j1 = jf0

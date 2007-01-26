@@ -159,7 +159,6 @@ integer :: &
   itcheck,       & ! interval for checkpointing
   debug,         & ! debugging flag
   npml,          & ! number of PML damping nodes
-  cellreg,       & ! material model registered to 0=nodes, 1=cells
   fixhypo,       & ! fix hypocenter to 0=none, 1=node, 2=cell
   origin,        & ! 0=hypocenter, 1=firstnode
   faultnormal,   & ! fault normal direction

@@ -14,36 +14,26 @@ integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, &
 
 if ( master ) write( 0, * ) 'Material model'
 
-! Input
+! Init
+call vectoraverage( w1, x, i1node, i2cell, 1 )
 mr = 0.
 s1 = 0.
 s2 = 0.
 gam = 0.
 
 ! Loop over input zones
-
 doiz: do iz = 1, nin
 
 ! Indices
 i1 = i1in(iz,:)
 i2 = i2in(iz,:)
 call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
-
-! Locations
-if ( cellreg == 0 ) then
-  w1 = x
-else
-  cellreg = 1
-  i2 = i2 - 1
-  i3 = 1
-  i4 = nm - 1
-  call vectoraverage( w1, x, i3, i4, 1 )
-end if
+i2 = i2 - 1
 
 select case( intype(iz) )
 case( 'z' )
-  i3 = max( i1, 1 )
-  i4 = min( i2, nm )
+  i3 = max( i1, i1node )
+  i4 = min( i2, i2cell )
   j1 = i3(1); j2 = i4(1)
   k1 = i3(2); k2 = i4(2)
   l1 = i3(3); l2 = i4(3)
@@ -66,7 +56,7 @@ case( 'c' )
   end select
 case( 'r' )
   i3 = max( i1, i1node )
-  i4 = min( i2, i1node )
+  i4 = min( i2, i1cell )
   idoublenode = 0
   if ( faultnormal /= 0 ) then
     i = abs( faultnormal )
@@ -119,6 +109,20 @@ if ( any( mr /= mr ) .or. any( s1 /= s1 ) .or. any( s2 /= s2 ) ) then
   stop 'NaNs in velocity model!'
 end if
 
+! Fill halo
+call fillhalo( mr,  0., i1node, i2cell )
+call fillhalo( s1,  0., i1node, i2cell )
+call fillhalo( s2,  0., i1node, i2cell )
+call fillhalo( gam, 0., i1node, i2cell )
+call scalarbc( mr,  ibc1, ibc2, nhalo, 1 )
+call scalarbc( s1,  ibc1, ibc2, nhalo, 1 )
+call scalarbc( s2,  ibc1, ibc2, nhalo, 1 )
+call scalarbc( gam, ibc1, ibc2, nhalo, 1 )
+call scalarswaphalo( mr, nhalo )
+call scalarswaphalo( s1, nhalo )
+call scalarswaphalo( s2, nhalo )
+call scalarswaphalo( gam, nhalo )
+
 ! Limits
 where ( mr < rho1 ) mr = rho1
 where ( mr > rho2 ) mr = rho2
@@ -127,19 +131,26 @@ where ( s1 > vp2 ) s1 = vp2
 where ( s2 < vs1 ) s2 = vs1
 where ( s2 > vs2 ) s2 = vs2
 
+! Lame' parameters
+mu  = mr * s2 * s2
+lam = mr * ( s1 * s1 ) - 2. * mu
+
+! Hourglass constant
+y = 12. * ( lam + 2. * mu )
+where ( y /= 0. ) y = dx * mu * ( lam + mu ) / y
+!y = .3 / 16. * ( lam + 2. * mu ) * dx ! like Ma & Liu, 2006
+
+! Viscosity
+if ( vdamp > 0. ) then
+  where( s2 > 0. ) gam = vdamp / s2
+  where( gam > .8 ) gam = .8
+end if
+gam = dt * gam
+
 ! Extrema
 stats(1) = maxval( mr )
 stats(2) = maxval( s1 )
 stats(3) = maxval( s2 )
-if ( cellreg == 0 ) then
-  call sethalo( mr, stats(1), i1node, i2node )
-  call sethalo( s1, stats(2), i1node, i2node )
-  call sethalo( s2, stats(3), i1node, i2node )
-else
-  call sethalo( mr, stats(1), i1node, i2cell )
-  call sethalo( s1, stats(2), i1node, i2cell )
-  call sethalo( s2, stats(3), i1node, i2cell )
-end if
 stats(4) = -minval( mr )
 stats(5) = -minval( s1 )
 stats(6) = -minval( s2 )
@@ -151,16 +162,6 @@ rho1 = -gstats(4)
 vp1  = -gstats(5)
 vs1  = -gstats(6)
 
-! Fill halo
-call scalarbc( mr,  ibc1, ibc2, nhalo, cellreg )
-call scalarbc( s1,  ibc1, ibc2, nhalo, cellreg )
-call scalarbc( s2,  ibc1, ibc2, nhalo, cellreg )
-call scalarbc( gam, ibc1, ibc2, nhalo, cellreg )
-call scalarswaphalo( mr, nhalo )
-call scalarswaphalo( s1, nhalo )
-call scalarswaphalo( s2, nhalo )
-call scalarswaphalo( gam, nhalo )
-
 ! Hypocenter values
 if ( master ) then
   j = ihypo(1)
@@ -170,17 +171,6 @@ if ( master ) then
   vp0  = s1(j,k,l)
   vs0  = s2(j,k,l)
 end if
-
-! Lame' parameters
-mu  = mr * s2 * s2
-lam = mr * ( s1 * s1 ) - 2. * mu
-
-! Viscosity
-if ( vdamp > 0. ) then
-  where( s2 > 0. ) gam = vdamp / s2
-  where( gam > .8 ) gam = .8
-end if
-gam = dt * gam
 
 end subroutine
 

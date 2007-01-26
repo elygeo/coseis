@@ -13,11 +13,12 @@ onpass = 2
 cell = .false.
 select case( field )
 case( 'x'    ); onpass = 0; nc = 3
-case( 'rho'  ); onpass = 0
-case( 'vp'   ); onpass = 0
-case( 'vs'   ); onpass = 0
-case( 'lam'  ); onpass = 0
-case( 'mu'   ); onpass = 0
+case( 'rho'  ); onpass = 0; cell = .true.
+case( 'vp'   ); onpass = 0; cell = .true.
+case( 'vs'   ); onpass = 0; cell = .true.
+case( 'lam'  ); onpass = 0; cell = .true.
+case( 'mu'   ); onpass = 0; cell = .true.
+case( 'gam'  ); onpass = 0; cell = .true.
 case( 'v'    ); onpass = 1; nc = 3
 case( 'vm'   ); onpass = 1
 case( 'pv'   ); onpass = 1
