@@ -23,8 +23,8 @@
   rsource = 25.;
   nn    = [  161  201 101 ];
   ihypo = [ -162 -202  41 ];
-  timeseries = { 'v' 5975. 7975. -2025. };
-  timeseries = { 'v' 6025. 8025. -2025. };
+  timeseries = { 'v' 5999. 7999. -2001. };
+  timeseries = { 'v' 6001. 8001. -2001. };
 
 return
 
