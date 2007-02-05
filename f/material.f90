@@ -110,10 +110,6 @@ if ( any( mr /= mr ) .or. any( s1 /= s1 ) .or. any( s2 /= s2 ) ) then
 end if
 
 ! Fill halo
-call fillhalo( mr,  0., i1node, i2cell )
-call fillhalo( s1,  0., i1node, i2cell )
-call fillhalo( s2,  0., i1node, i2cell )
-call fillhalo( gam, 0., i1node, i2cell )
 call scalarbc( mr,  ibc1, ibc2, nhalo, 1 )
 call scalarbc( s1,  ibc1, ibc2, nhalo, 1 )
 call scalarbc( s2,  ibc1, ibc2, nhalo, 1 )

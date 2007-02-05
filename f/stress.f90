@@ -12,6 +12,9 @@ integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iz
 do i = 1, 3
   w1(:,:,:,i) = u(:,:,:,i) + gam * v(:,:,:,i)
 end do
+!print *, 'asdf-g', sum( abs( w1 ) )
+!print *, gam(1,1,1), gam(2,2,2), gam(3,3,3)
+!print *, gam(nm(1),nm(2),nm(3)), gam(nm(1)-1,nm(2)-1,nm(3)-1), gam(nm(1)-2,nm(2)-2,nm(3)-2)
 w2 = 0.
 s1 = 0.
 

@@ -15,10 +15,20 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 i1 = abs( ibc1 )
 i2 = abs( ibc2 )
-where ( nm == 1 ) i1 = 0
-where ( nm == 1 ) i2 = 0
+where ( i1 == 0 ) i1 = 4
+where ( i2 == 0 ) i2 = 4
+where ( nm == 1 ) i1 = -1
+where ( nm == 1 ) i2 = -1
 
 ! Mirror on cell BC
+if ( cell /= 0 ) then
+  if ( i1(1) == 2 ) f(j1-1,:,:) = f(j1,:,:)
+  if ( i1(2) == 2 ) f(:,k1-1,:) = f(:,k1,:)
+  if ( i1(3) == 2 ) f(:,:,l1-1) = f(:,:,l1)
+  if ( i2(1) == 2 ) f(j2+1,:,:) = f(j2,:,:)
+  if ( i2(2) == 2 ) f(:,k2+1,:) = f(:,k2,:)
+  if ( i2(3) == 2 ) f(:,:,l2+1) = f(:,:,l2)
+end if
 if ( i1(1) == 2 ) forall( i=1:nhalo-cell ) f(j1-i-cell,:,:) = f(j1+i-1,:,:)
 if ( i1(2) == 2 ) forall( i=1:nhalo-cell ) f(:,k1-i-cell,:) = f(:,k1+i-1,:)
 if ( i1(3) == 2 ) forall( i=1:nhalo-cell ) f(:,:,l1-i-cell) = f(:,:,l1+i-1)

@@ -4,7 +4,7 @@
   vp  = 6000.;
   vs  = 3464.;
   rho = 2700.;
-  gam = .1;
+  gam = .0;
   hourglass = [ 1. 4. ];
   upvector = [ 0 0 -1 ];
   itcheck = 0;
@@ -30,7 +30,14 @@
   vs  = { 2000. 'zone'   1 1 1   -1 -1 21 };
   rho = { 2600. 'zone'   1 1 1   -1 -1 21 };
 
+  ihypo = [ -162 -202  40 ];
+
 return
+
+  bc1 = [ -3 -3  0 ];
+  ihypo = [ 1 1 41 ];
+  fixhypo = 1;
+  rsource = 100;
 
   out = { 'x'  0   1 1 1 0  -1  1 -1  0 };
   out = { 'v' 40   1 1 1 0  -1  1 -1 -1 };

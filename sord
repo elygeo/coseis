@@ -319,3 +319,5 @@ if [ "$pid" ]; then
   chmod u+x 'cancel.sh'
 fi
 
+echo "$(date): SORD script finished" >> log
+
