@@ -16,9 +16,9 @@ if ( master ) write( 0, * ) 'Resample material model'
 ! Cell volume
 call diffnc( s1, 'g', x, x, dx, 1, 1, i1cell, i2cell )
 select case( ifn )
-case( 1 ); j = ihypo(1); s1(j,:,:) = 0.
-case( 2 ); k = ihypo(2); s1(:,k,:) = 0.
-case( 3 ); l = ihypo(3); s1(:,:,l) = 0.
+case( 1 ); j = ihypo(1); s1(j,:,:) = 0.; y(k,:,:) = 0.
+case( 2 ); k = ihypo(2); s1(:,k,:) = 0.; y(:,k,:) = 0.
+case( 3 ); l = ihypo(3); s1(:,:,l) = 0.; y(:,:,l) = 0.
 end select
 call sethalo( s1, 0., i1cell, i2cell )
 

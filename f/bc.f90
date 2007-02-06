@@ -15,8 +15,6 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 i1 = abs( ibc1 )
 i2 = abs( ibc2 )
-where ( i1 == 0 ) i1 = 4
-where ( i2 == 0 ) i2 = 4
 where ( nm == 1 ) i1 = -1
 where ( nm == 1 ) i2 = -1
 

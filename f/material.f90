@@ -109,16 +109,6 @@ if ( any( mr /= mr ) .or. any( s1 /= s1 ) .or. any( s2 /= s2 ) ) then
   stop 'NaNs in velocity model!'
 end if
 
-! Fill halo
-call scalarbc( mr,  ibc1, ibc2, nhalo, 1 )
-call scalarbc( s1,  ibc1, ibc2, nhalo, 1 )
-call scalarbc( s2,  ibc1, ibc2, nhalo, 1 )
-call scalarbc( gam, ibc1, ibc2, nhalo, 1 )
-call scalarswaphalo( mr, nhalo )
-call scalarswaphalo( s1, nhalo )
-call scalarswaphalo( s2, nhalo )
-call scalarswaphalo( gam, nhalo )
-
 ! Limits
 where ( mr < rho1 ) mr = rho1
 where ( mr > rho2 ) mr = rho2
@@ -126,6 +116,20 @@ where ( s1 < vp1 ) s1 = vp1
 where ( s1 > vp2 ) s1 = vp2
 where ( s2 < vs1 ) s2 = vs1
 where ( s2 > vs2 ) s2 = vs2
+
+! Fill halo
+i1 = ibc1
+i2 = ibc2
+where( i1 == 0 ) i1 = 4
+where( i2 == 0 ) i2 = 4
+call scalarbc( mr,  i1,   i2,   nhalo, 1 )
+call scalarbc( gam, i1,   i2,   nhalo, 1 )
+call scalarbc( s1,  ibc1, ibc2, nhalo, 1 )
+call scalarbc( s2,  ibc1, ibc2, nhalo, 1 )
+call scalarswaphalo( mr, nhalo )
+call scalarswaphalo( gam, nhalo )
+call scalarswaphalo( s1, nhalo )
+call scalarswaphalo( s2, nhalo )
 
 ! Lame' parameters
 mu  = mr * s2 * s2
