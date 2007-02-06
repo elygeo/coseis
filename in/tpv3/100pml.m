@@ -37,7 +37,6 @@
   n1expand = [   0   0   0 ];
 
   itcheck = 0;
-  np = [ 4 4 2 ];
   np = [ 1 1 2 ];
 
 % rectangular
@@ -47,4 +46,5 @@
   ihypo    = [  -1  -1  -1 ];
   bc2      = [  -3   3  -2 ];
   n2expand = [   0   0   0 ];
+nt  = 750;
 
