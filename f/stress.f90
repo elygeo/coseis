@@ -31,31 +31,31 @@ if ( id /= 1 ) then
   i1 = i1cell
   i2 = i2cell
   i2(1) = min( i2(1), i1pml(1) )
-  call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(2), u, x, dx, ic, id, i1, i2 )
   i1 = i1cell
   i2 = i2cell
   i1(1) = max( i1(1), i2pml(1) - 1 )
-  call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(2), u, x, dx, ic, id, i1, i2 )
 end if
 if ( id /= 2 ) then
   i1 = i1cell
   i2 = i2cell
   i2(2) = min( i2(2), i1pml(2) )
-  call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(2), u, x, dx, ic, id, i1, i2 )
   i1 = i1cell
   i2 = i2cell
   i1(2) = max( i1(2), i2pml(2) - 1 )
-  call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(2), u, x, dx, ic, id, i1, i2 )
 end if
 if ( id /= 3 ) then
   i1 = i1cell
   i2 = i2cell
   i2(3) = min( i2(3), i1pml(3) )
-  call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(2), u, x, dx, ic, id, i1, i2 )
   i1 = i1cell
   i2 = i2cell
   i1(3) = max( i1(3), i2pml(3) - 1 )
-  call diffnc( s1, oper(1), u, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(2), u, x, dx, ic, id, i1, i2 )
 end if
 
 ! PML region, damped direction: g_ij' = d_j*g_ij = v_i,j
@@ -64,7 +64,7 @@ case( 1 )
   i1 = i1cell
   i2 = i2cell
   i2(1) = min( i2(1), i1pml(1) )
-  call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(2), v, x, dx, ic, id, i1, i2 )
   do j = i1(1), i2(1)
   i = j - nnoff(1)
   forall( k=i1(2):i2(2), l=i1(3):i2(3) )
@@ -75,7 +75,7 @@ case( 1 )
   i1 = i1cell
   i2 = i2cell
   i1(1) = max( i1(1), i2pml(1) - 1 )
-  call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(2), v, x, dx, ic, id, i1, i2 )
   do j = i1(1), i2(1)
   i = nn(1) - j + nnoff(1)
   forall( k=i1(2):i2(2), l=i1(3):i2(3) )
@@ -87,7 +87,7 @@ case( 2 )
   i1 = i1cell
   i2 = i2cell
   i2(2) = min( i2(2), i1pml(2) )
-  call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(2), v, x, dx, ic, id, i1, i2 )
   do k = i1(2), i2(2)
   i = k - nnoff(2)
   forall( j=i1(1):i2(1), l=i1(3):i2(3) )
@@ -98,7 +98,7 @@ case( 2 )
   i1 = i1cell
   i2 = i2cell
   i1(2) = max( i1(2), i2pml(2) - 1 )
-  call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(2), v, x, dx, ic, id, i1, i2 )
   do k = i1(2), i2(2)
   i = nn(2) - k + nnoff(2)
   forall( j=i1(1):i2(1), l=i1(3):i2(3) )
@@ -110,7 +110,7 @@ case( 3 )
   i1 = i1cell
   i2 = i2cell
   i2(3) = min( i2(3), i1pml(3) )
-  call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(2), v, x, dx, ic, id, i1, i2 )
   do l = i1(3), i2(3)
   i = l - nnoff(3)
   forall( j=i1(1):i2(1), k=i1(2):i2(2) )
@@ -121,7 +121,7 @@ case( 3 )
   i1 = i1cell
   i2 = i2cell
   i1(3) = max( i1(3), i2pml(3) - 1 )
-  call diffnc( s1, oper(1), v, x, dx, ic, id, i1, i2 )
+  call diffnc( s1, oper(2), v, x, dx, ic, id, i1, i2 )
   do l = i1(3), i2(3)
   i = nn(3) - l + nnoff(3)
   forall( j=i1(1):i2(1), k=i1(2):i2(2) )

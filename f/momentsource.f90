@@ -19,7 +19,7 @@ if ( rsource <= 0. ) return
 if ( master ) write( 0, * ) 'Moment source initialize'
 
 ! Cell volumes
-call diffnc( s1, 4, x, x, dx, 1, 1, i1cell, i2cell )
+call diffnc( s1, maxval( oper ), x, x, dx, 1, 1, i1cell, i2cell )
 
 ! Cell center distance
 call vectoraverage( w2, x, i1cell, i2cell, 1 )

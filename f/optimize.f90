@@ -77,7 +77,7 @@ if ( all( i2 > i1 ) .and. test > .8 ) then
 else if ( all( i2 <= i1 ) ) then
   oper = 2
 else
-  oper(1) = 2
+  oper = 2
   oper(2) = 4
 end if
 
