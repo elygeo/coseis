@@ -310,8 +310,13 @@ call rreduce( rmax, sqrt( maxval( s2 ) ), 'max', 0 )
 noper = 1
 i1oper(1,:) = i1cell
 i2oper(1,:) = i2cell + 1
-call optimize( oper, noper, i1oper, i2oper, w2, s2, x, dx, i1cell, i2cell )
-where( oper > oplevel ) oper = oplevel
+if oplevel <= 1 then
+  oper = 1
+else
+  call optimize( oper, i1oper, i2oper, w2, s2, x, dx, i1cell, i2cell )
+  where( oper > oplevel ) oper = oplevel
+  if ( oper(1) /= oper(2) ) noper = 2
+end if
 
 end subroutine
 

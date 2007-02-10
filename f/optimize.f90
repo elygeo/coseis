@@ -3,8 +3,8 @@ module m_optimize
 implicit none
 contains
 
-subroutine optimize( oper, noper, i1oper, i2oper, w2, s2, x, dx, i1cell, i2cell )
-integer, intent(out) :: oper(2), noper, i1oper(2,3), i2oper(2,3)
+subroutine optimize( oper, i1oper, i2oper, w2, s2, x, dx, i1cell, i2cell )
+integer, intent(out) :: oper(2), i1oper(2,3), i2oper(2,3)
 real, intent(out) :: w2(:,:,:,:), s2(:,:,:)
 real, intent(in) :: x(:,:,:,:), dx
 integer, intent(in) :: i1cell(3), i2cell(3)
@@ -79,7 +79,6 @@ else if ( all( i2 <= i1 ) ) then
 else
   oper(1) = 2
   oper(2) = 4
-  noper = 2
 end if
 
 end subroutine
