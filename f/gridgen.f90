@@ -284,13 +284,13 @@ case( 2 )
     + x(j,k,l+1,:) + x(j+1,k+1,l,:) )
   call rbroadcast1( x0 )
 end select
-if ( fixhyp > 0 ) then
+if ( fixhypo > 0 ) then
   xhypo = x0
 elseif ( fixhyp < 0 ) then
   x(:,:,:,1) = x(:,:,:,1) - x0(1) + xhypo(1)
   x(:,:,:,2) = x(:,:,:,2) - x0(2) + xhypo(2)
   x(:,:,:,3) = x(:,:,:,3) - x0(3) + xhypo(3)
-end select
+end if
 
 ! Grid Dimensions
 do i = 1,3
@@ -310,7 +310,7 @@ call rreduce( rmax, sqrt( maxval( s2 ) ), 'max', 0 )
 noper = 1
 i1oper(1,:) = i1cell
 i2oper(1,:) = i2cell + 1
-if oplevel <= 1 then
+if ( oplevel <= 1 ) then
   oper = 1
 else
   call optimize( oper, i1oper, i2oper, w2, s2, x, dx, i1cell, i2cell )
