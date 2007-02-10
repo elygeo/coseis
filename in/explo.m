@@ -17,7 +17,6 @@
   tfunc = 'brune';
   tsource = .1;
   bc2 = [ 0 0 0 ];
-  origin = 0;
 
   bc1 = [ 3 3 3 ];
   fixhypo = 1;

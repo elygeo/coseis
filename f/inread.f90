@@ -32,10 +32,10 @@ case( 'return' );      exit doline
 case( 'grid' );        grid = str
 case( 'rfunc' );       rfunc = str
 case( 'tfunc' );       tfunc = str
+case( 'oplevel' );     read( str, *, iostat=io ) oplevel
 case( 'affine' );      read( str, *, iostat=io ) affine
 case( 'gridnoise' );   read( str, *, iostat=io ) gridnoise
 case( 'symmetry' );    read( str, *, iostat=io ) symmetry
-case( 'origin' );      read( str, *, iostat=io ) origin
 case( 'fixhypo' );     read( str, *, iostat=io ) fixhypo
 case( 'nn' );          read( str, *, iostat=io ) nn
 case( 'nt' );          read( str, *, iostat=io ) nt

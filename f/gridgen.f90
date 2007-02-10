@@ -9,7 +9,7 @@ use m_optimize
 use m_collective
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), i, j, k, l, &
   j1, k1, l1, j2, k2, l2, idoublenode
-real :: xlim(6), gxlim(6), m(9)
+real :: x0(3), xlim(6), gxlim(6), m(9)
 logical :: expand
 
 if ( master ) write( 0, * ) 'Grid generation'
@@ -272,26 +272,25 @@ end select
 call vectorswaphalo( x, nhalo )
 
 ! Hypocenter location
-select case( fixhypo )
+select case( abs( fixhypo ) )
 case( 1 )
-  if ( master ) xhypo = xhypo + x(j,k,l,:)
-  call rbroadcast1( xhypo )
+  if ( master ) x0 = x(j,k,l,:)
+  call rbroadcast1( x0 )
 case( 2 )
-  if ( master ) xhypo = xhypo + 0.125 * &
+  if ( master ) x0 = 0.125 * &
     ( x(j,k,l,:) + x(j+1,k+1,l+1,:) &
     + x(j+1,k,l,:) + x(j,k+1,l+1,:) &
     + x(j,k+1,l,:) + x(j+1,k,l+1,:) &
     + x(j,k,l+1,:) + x(j+1,k+1,l,:) )
-  call rbroadcast1( xhypo )
+  call rbroadcast1( x0 )
 end select
-
-! Origin
-if ( origin == 0 ) then
-  x(:,:,:,1) = x(:,:,:,1) - xhypo(1)
-  x(:,:,:,2) = x(:,:,:,2) - xhypo(2)
-  x(:,:,:,3) = x(:,:,:,3) - xhypo(3)
-  xhypo = 0.
-end if
+if ( fixhyp > 0 ) then
+  xhypo = x0
+elseif ( fixhyp < 0 ) then
+  x(:,:,:,1) = x(:,:,:,1) - x0(1) + xhypo(1)
+  x(:,:,:,2) = x(:,:,:,2) - x0(2) + xhypo(2)
+  x(:,:,:,3) = x(:,:,:,3) - x0(3) + xhypo(3)
+end select
 
 ! Grid Dimensions
 do i = 1,3
@@ -312,6 +311,7 @@ noper = 1
 i1oper(1,:) = i1cell
 i2oper(1,:) = i2cell + 1
 call optimize( oper, noper, i1oper, i2oper, w2, s2, x, dx, i1cell, i2cell )
+where( oper > oplevel ) oper = oplevel
 
 end subroutine
 

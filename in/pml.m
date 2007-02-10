@@ -8,7 +8,7 @@
   timeseries = { 'x'  -6000.  -6000. -6000. }
   nt = 1000;
   nt = 500;
-  origin = 0;
+  fixhypo = 2;
   tfunc = 'brune';
   tfunc = 'sbrune';
   rsource = 100.;

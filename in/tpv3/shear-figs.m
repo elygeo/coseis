@@ -2,7 +2,7 @@
   debug = 1;
   faultnormal = 3;
   vrup = -1.;
-  origin = 0;
+  fixhypo = 1;
   ihypo = [ 0 0 0 ];
   out = { 'x'   1   1 1 1 0   -1 -1 -1  0 };
   out = { 'svm' 1   1 1 1 1   -1 -1 -1 -1 };

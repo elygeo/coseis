@@ -16,7 +16,7 @@
   bc2 = [ 0 0 0 ];
   faultnormal = 0;
   ihypo = [ 31 31 31 ];
-  origin = 0;
+  xhypo = [ 0. 0. 0. ];
   fixhypo = 1; rsource = 100.;
   fixhypo = 2; rsource = 50.;
   moment1 = [ 1e18 1e18 1e18 ];

@@ -4,8 +4,7 @@ implicit none
 contains
 
 subroutine optimize( oper, noper, i1oper, i2oper, w2, s2, x, dx, i1cell, i2cell )
-character, intent(out) :: oper(2)
-integer, intent(out) :: noper, i1oper(2,3), i2oper(2,3)
+integer, intent(out) :: oper(2), noper, i1oper(2,3), i2oper(2,3)
 real, intent(out) :: w2(:,:,:,:), s2(:,:,:)
 real, intent(in) :: x(:,:,:,:), dx
 integer, intent(in) :: i1cell(3), i2cell(3)
@@ -56,7 +55,7 @@ tol = 10. * epsilon( dx )
 ! For constant grid:
 ! dx/dy = dx/dz = dy/dz = dy/dx = dz/dx = dz/dy = 0
 ! dx/dx = dy/dy = dz/dz
-oper = 'h'
+oper = 1
 
 if ( test < tol ) return
 
@@ -74,12 +73,12 @@ i2oper(2,:) = i2 + 1
 test = product( i2 - i1 + 2 ) / product( i2cell - i1cell + 2 )
 
 if ( all( i2 > i1 ) .and. test > .8 ) then
-  oper = 'g'
+  oper = 4
 else if ( all( i2 <= i1 ) ) then
-  oper = 'r'
+  oper = 2
 else
-  oper(1) = 'r'
-  oper(2) = 'g'
+  oper(1) = 2
+  oper(2) = 4
   noper = 2
 end if
 

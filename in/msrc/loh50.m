@@ -10,7 +10,6 @@
   itcheck = 0;
   faultnormal = 0;
   fixhypo = 2;
-  origin = 0;
   tfunc = 'brune';
   tsource = .1;
   moment1 = [ 0. 0. 0. ];

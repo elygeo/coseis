@@ -159,12 +159,13 @@ integer :: &
   itcheck,       & ! interval for checkpointing
   debug,         & ! debugging flag
   npml,          & ! number of PML damping nodes
-  fixhypo,       & ! fix hypocenter to 0=none, 1=node, 2=cell
-  origin,        & ! 0=hypocenter, 1=firstnode
+  fixhypo,       & ! fix hypocenter to 0=none, 1,2=ihypo node, cell, -1,-2=xhypo node, cell
   faultnormal,   & ! fault normal direction
   ifn              ! fault normal component=abs(faultnormal)
 
 integer :: &
+  oper(2),       & ! 1=constant, 2=rectangular, 3=one-point quadrature, 4=mean stress
+  oplevel,       & ! max operator number, higher is more expensive, and more accurate
   noper,         & ! number of zones for spatial derivative operators
   i1oper(2,3),   & ! j1 k1 l1 operator zone start index
   i2oper(2,3),   & ! j2 k2 l2 operator zone end index
@@ -183,7 +184,6 @@ integer :: &
   i4out(nz,3)      ! j2 k2 l2 local output zone end index
 
 character :: &
-  oper(2),       & ! spatial derivative operators, g=general, r=rect, h=const
   intype(nz),    & ! input type: z=zone, c=cube, r=read
   outtype(nz)      ! output type: z=zone, x=location
 

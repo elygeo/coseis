@@ -6,9 +6,9 @@
   dx = 100.;				% spatial step length
   dt = .0075;				% time step length
   grid = 'constant';			% regular mesh
+  oplevel = 4;				% 1=const, 2=rect, 3=one-point quadrature, 4=mean stress
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ]; % grid tranformation
   symmetry = [ 0 0 0 ];			% grid symmetry
-  origin = 1;				% 0=hypocenter, 1=first node
 % faultnormal = 0;			% no fault
   gridnoise = 0.			% Random noise added to mesh
 % upvector = [ 0 0 1 ];			% positive z up
@@ -33,7 +33,7 @@
   bc2 = [ 0 0 0 ];			% j2 k2 l2 boundary cond (see below)
   ihypo	 = [ 0 0 0 ];			% hypocenter node
   xhypo	 = [ 0. 0. 0. ];		% hypocenter location
-  fixhypo = 1;				% 0=none, 1=node, 2=cell
+  fixhypo = 1;				% 0=none 1=xnode, 2=xcell, -1=inode, -2=icell
   rexpand = 1.06;			% grid expansion ratio
   n1expand = [ 0 0 0 ];			% n grid expansion nodes for j1 k1 l1
   n2expand = [ 0 0 0 ];			% n grid expansion nodes for j2 k2 l2

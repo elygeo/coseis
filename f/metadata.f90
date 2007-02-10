@@ -22,12 +22,13 @@ if ( debug /= 0 ) then
   open( 1, file=str, status='replace' )
   write( 1, '(a)' ) '% SORD debug info'
   write( 1, * ) ' master      =  ', i,           ';'
+  write( 1, * ) ' ip          =  ', ip,          ';'
   write( 1, * ) ' ifn         =  ', ifn,         ';'
   write( 1, * ) ' nin         =  ', nin,         ';'
   write( 1, * ) ' nout        =  ', nout,        ';'
   write( 1, * ) ' nlock       =  ', nlock,       ';'
   write( 1, * ) ' noper       =  ', noper,       ';'
-  write( 1, * ) ' ip          =  ', ip,          ';'
+  write( 1, * ) ' oper        = [', oper,       '];'
   write( 1, * ) ' ip3         = [', ip3,        '];'
   write( 1, * ) ' np          = [', np,         '];'
   write( 1, * ) ' ihypo       = [', ihypo,      '];'
@@ -43,7 +44,6 @@ if ( debug /= 0 ) then
   write( 1, * ) ' i2pml       = [', i2pml,      '];'
   write( 1, * ) ' ibc1        = [', ibc1,       '];'
   write( 1, * ) ' ibc2        = [', ibc2,       '];'
-  write( 1, * ) ' oper        = ''', oper,     ''';'
   do iz = 1, nin
     select case( intype(iz) )
     case( 'z' ); write( 1, '(2x,a,a,g15.7,a,6i7,a)' ) &
@@ -91,9 +91,9 @@ write( 1, * ) ' xhypo       = [', xhypo,     '];'
 write( 1, * ) ' nt          =  ', nt,         ';'
 write( 1, * ) ' itstats     =  ', itstats,    ';'
 write( 1, * ) ' itcheck     =  ', itcheck,    ';'
-write( 1, * ) ' origin      =  ', origin,     ';'
 write( 1, * ) ' fixhypo     =  ', fixhypo,    ';'
 write( 1, * ) ' npml        =  ', npml,       ';'
+write( 1, * ) ' oplevel     =  ', oplevel,    ';'
 write( 1, * ) ' nn          = [', nn,            '];'
 write( 1, * ) ' ihypo       = [', ihypo - nnoff, '];'
 write( 1, * ) ' n1expand    = [', n1expand,      '];'
