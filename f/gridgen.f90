@@ -286,7 +286,7 @@ case( 2 )
 end select
 if ( fixhypo > 0 ) then
   xhypo = x0
-elseif ( fixhyp < 0 ) then
+elseif ( fixhypo < 0 ) then
   x(:,:,:,1) = x(:,:,:,1) - x0(1) + xhypo(1)
   x(:,:,:,2) = x(:,:,:,2) - x0(2) + xhypo(2)
   x(:,:,:,3) = x(:,:,:,3) - x0(3) + xhypo(3)
