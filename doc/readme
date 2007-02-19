@@ -356,34 +356,41 @@ v   =  ----------------------------------------
 
 PML ABSORBING BOUNDARY CONDITION
 
-Olsen no PML
+Stress-Velocity
+g_ij = v_i,j
+w_ij' = lam*delta_ij*g_kk + mu*(g_ij + g_ji)
 f_i = w_ij,j
 v_i' = f_i/rho
-g_ij = v_i,j
-w_ij' = lam*g_ij*delta_ij + mu*(g_ij + g_ji)
 
-SORD Hourglass
+Stress-Velocity with PML
+g_ij = v_i,j
+w_ij' = lam*delta_ij*g_kk + mu*(g_ij + g_ji)
+f_i = w_ij,j
+v_i' = f_i/rho
+
+SORD
+g_ij = (u_i + gamma*v_i),j
+w_ij = lam*delta_ij*g_kk + mu*(g_ij + g_ji)
 f_i = w_ij,j + hourglass
 v_i' = f_i/rho
 u_i' = v_i
-g_ij = (u_i + gamma*v_i),j
-w_ij = lam*g_ij*delta_ij + mu*(g_ij + g_ji)
 
-SORD PML
+SORD with PML
+if d_j == 0
+  g_ij = u_i,j
+else
+  g_ij' + d_j*g_ij = v_i,j
+end
+w_ij = lam*delta_ij*g_kk + mu*(g_ij + g_ji)
 if d_j == 0
   f_i = w_ij,j
 else
   p_ij' + d_j*p_ij = w_ij,j (no summation convetion)
-  f_j = sum_i( p_ij' )
+  f_j = sum_i(p_ij')
 end
+f_i = f_i + hourglass
 v_i' = f_i/rho
 u_i' = v_i
-if d_j == 0
-  g_ij = u_i,j
-else
-  g_ij' = d_j*g_ij = v_i,j
-end
-w_ij = lam*g_ij*delta_ij + mu*(g_ij + g_ji)
 
 PML Discretization
 (p2 - p1)/dt   + d*(p2 + p1)/2 = w_ij,j

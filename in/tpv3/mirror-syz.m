@@ -46,3 +46,8 @@
   bc2      = [  -3   0  -3 ];
   n2expand = [   0  50   0 ];
 
+np = [ 1 1 1 ];
+debug = 1;
+oplevel = 4;
+nt = 10;
+

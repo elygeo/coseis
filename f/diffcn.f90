@@ -89,74 +89,78 @@ b = mod( a, 3 ) + 1
 c = mod( a + 1, 3 ) + 1
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
 df(j,k,l) = 1. / 16. * &
-(f(j,k,l,i)*((x(j,k+1,l+1,b)-x(j+1,k,l,b))*(x(j+1,k,l+1,c)-x(j,k+1,l,c)-x(j+1,k+1,l,c)+x(j,k,l+1,c)) &
-      +(x(j+1,k,l+1,b)-x(j,k+1,l,b))*(x(j+1,k+1,l,c)-x(j,k,l+1,c)-x(j,k+1,l+1,c)+x(j+1,k,l,c)) &
-      +(x(j+1,k+1,l,b)-x(j,k,l+1,b))*(x(j,k+1,l+1,c)-x(j+1,k,l,c)-x(j+1,k,l+1,c)+x(j,k+1,l,c))) &
--f(j-1,k-1,l-1,i)*((x(j-1,k,l,b)-x(j,k-1,l-1,b))*(x(j,k-1,l,c)-x(j-1,k,l-1,c)-x(j,k,l-1,c)+x(j-1,k-1,l,c)) &
-      +(x(j,k-1,l,b)-x(j-1,k,l-1,b))*(x(j,k,l-1,c)-x(j-1,k-1,l,c)-x(j-1,k,l,c)+x(j,k-1,l-1,c)) &
-      +(x(j,k,l-1,b)-x(j-1,k-1,l,b))*(x(j-1,k,l,c)-x(j,k-1,l-1,c)-x(j,k-1,l,c)+x(j-1,k,l-1,c))) &
-+f(j-1,k,l,i)*((x(j,k+1,l+1,b)-x(j-1,k,l,b))*(x(j,k+1,l,c)-x(j-1,k,l+1,c)-x(j,k,l+1,c)+x(j-1,k+1,l,c)) &
-      +(x(j,k,l+1,b)-x(j-1,k+1,l,b))*(x(j,k+1,l+1,c)-x(j-1,k,l,c)+x(j,k+1,l,c)-x(j-1,k,l+1,c)) &
-      -(x(j,k+1,l,b)-x(j-1,k,l+1,b))*(x(j,k,l+1,c)-x(j-1,k+1,l,c)+x(j,k+1,l+1,c)-x(j-1,k,l,c))) &
--f(j,k-1,l-1,i)*((x(j+1,k,l,b)-x(j,k-1,l-1,b))*(x(j+1,k,l-1,c)-x(j,k-1,l,c)-x(j+1,k-1,l,c)+x(j,k,l-1,c)) &
-      +(x(j+1,k-1,l,b)-x(j,k,l-1,b))*(x(j+1,k,l,c)-x(j,k-1,l-1,c)+x(j+1,k,l-1,c)-x(j,k-1,l,c)) &
-      -(x(j+1,k,l-1,b)-x(j,k-1,l,b))*(x(j+1,k-1,l,c)-x(j,k,l-1,c)+x(j+1,k,l,c)-x(j,k-1,l-1,c))) &
-+f(j,k-1,l,i)*((x(j+1,k,l+1,b)-x(j,k-1,l,b))*(x(j,k,l+1,c)-x(j+1,k-1,l,c)-x(j+1,k,l,c)+x(j,k-1,l+1,c)) &
-      +(x(j+1,k,l,b)-x(j,k-1,l+1,b))*(x(j+1,k,l+1,c)-x(j,k-1,l,c)+x(j,k,l+1,c)-x(j+1,k-1,l,c)) &
-      -(x(j,k,l+1,b)-x(j+1,k-1,l,b))*(x(j+1,k,l,c)-x(j,k-1,l+1,c)+x(j+1,k,l+1,c)-x(j,k-1,l,c))) &
--f(j-1,k,l-1,i)*((x(j,k+1,l,b)-x(j-1,k,l-1,b))*(x(j-1,k+1,l,c)-x(j,k,l-1,c)-x(j,k+1,l-1,c)+x(j-1,k,l,c)) &
-      +(x(j,k+1,l-1,b)-x(j-1,k,l,b))*(x(j,k+1,l,c)-x(j-1,k,l-1,c)+x(j-1,k+1,l,c)-x(j,k,l-1,c)) &
-      -(x(j-1,k+1,l,b)-x(j,k,l-1,b))*(x(j,k+1,l-1,c)-x(j-1,k,l,c)+x(j,k+1,l,c)-x(j-1,k,l-1,c))) &
-+f(j,k,l-1,i)*((x(j+1,k+1,l,b)-x(j,k,l-1,b))*(x(j+1,k,l,c)-x(j,k+1,l-1,c)-x(j,k+1,l,c)+x(j+1,k,l-1,c)) &
-      +(x(j,k+1,l,b)-x(j+1,k,l-1,b))*(x(j+1,k+1,l,c)-x(j,k,l-1,c)+x(j+1,k,l,c)-x(j,k+1,l-1,c)) &
-      -(x(j+1,k,l,b)-x(j,k+1,l-1,b))*(x(j,k+1,l,c)-x(j+1,k,l-1,c)+x(j+1,k+1,l,c)-x(j,k,l-1,c))) &
--f(j-1,k-1,l,i)*((x(j,k,l+1,b)-x(j-1,k-1,l,b))*(x(j,k-1,l+1,c)-x(j-1,k,l,c)-x(j-1,k,l+1,c)+x(j,k-1,l,c)) &
-      +(x(j-1,k,l+1,b)-x(j,k-1,l,b))*(x(j,k,l+1,c)-x(j-1,k-1,l,c)+x(j,k-1,l+1,c)-x(j-1,k,l,c)) &
-      -(x(j,k-1,l+1,b)-x(j-1,k,l,b))*(x(j-1,k,l+1,c)-x(j,k-1,l,c)+x(j,k,l+1,c)-x(j-1,k-1,l,c)))) 
+(f(j,k,l,i)* &
+  ((x(j+1,k,l,b)-x(j,k+1,l+1,b))*(x(j,k+1,l,c)-x(j+1,k,l+1,c)-x(j,k,l+1,c)+x(j+1,k+1,l,c)) &
+  +(x(j,k+1,l,b)-x(j+1,k,l+1,b))*(x(j,k,l+1,c)-x(j+1,k+1,l,c)-x(j+1,k,l,c)+x(j,k+1,l+1,c)) &
+  +(x(j,k,l+1,b)-x(j+1,k+1,l,b))*(x(j+1,k,l,c)-x(j,k+1,l+1,c)-x(j,k+1,l,c)+x(j+1,k,l+1,c))) &
++f(j,k-1,l-1,i)* &
+  ((x(j+1,k,l,b)-x(j,k-1,l-1,b))*(x(j,k-1,l,c)-x(j+1,k,l-1,c)-x(j,k,l-1,c)+x(j+1,k-1,l,c)) &
+  +(x(j,k-1,l,b)-x(j+1,k,l-1,b))*(x(j,k,l-1,c)-x(j+1,k-1,l,c)-x(j+1,k,l,c)+x(j,k-1,l-1,c)) &
+  +(x(j,k,l-1,b)-x(j+1,k-1,l,b))*(x(j+1,k,l,c)-x(j,k-1,l-1,c)-x(j,k-1,l,c)+x(j+1,k,l-1,c))) &
++f(j-1,k,l-1,i)* &
+  ((x(j,k+1,l,b)-x(j-1,k,l-1,b))*(x(j,k,l-1,c)-x(j-1,k+1,l,c)-x(j-1,k,l,c)+x(j,k+1,l-1,c)) &
+  +(x(j,k,l-1,b)-x(j-1,k+1,l,b))*(x(j-1,k,l,c)-x(j,k+1,l-1,c)-x(j,k+1,l,c)+x(j-1,k,l-1,c)) &
+  +(x(j-1,k,l,b)-x(j,k+1,l-1,b))*(x(j,k+1,l,c)-x(j-1,k,l-1,c)-x(j,k,l-1,c)+x(j-1,k+1,l,c))) &
++f(j-1,k-1,l,i)* &
+  ((x(j,k,l+1,b)-x(j-1,k-1,l,b))*(x(j-1,k,l,c)-x(j,k-1,l+1,c)-x(j,k-1,l,c)+x(j-1,k,l+1,c)) &
+  +(x(j-1,k,l,b)-x(j,k-1,l+1,b))*(x(j,k-1,l,c)-x(j-1,k,l+1,c)-x(j,k,l+1,c)+x(j-1,k-1,l,c)) &
+  +(x(j,k-1,l,b)-x(j-1,k,l+1,b))*(x(j,k,l+1,c)-x(j-1,k-1,l,c)-x(j-1,k,l,c)+x(j,k-1,l+1,c))) &
++f(j-1,k-1,l-1,i)* &
+  ((x(j-1,k,l,b)-x(j,k-1,l-1,b))*(x(j-1,k,l-1,c)-x(j,k-1,l,c)-x(j-1,k-1,l,c)+x(j,k,l-1,c)) &
+  +(x(j,k-1,l,b)-x(j-1,k,l-1,b))*(x(j-1,k-1,l,c)-x(j,k,l-1,c)-x(j,k-1,l-1,c)+x(j-1,k,l,c)) &
+  +(x(j,k,l-1,b)-x(j-1,k-1,l,b))*(x(j,k-1,l-1,c)-x(j-1,k,l,c)-x(j-1,k,l-1,c)+x(j,k-1,l,c))) &
++f(j-1,k,l,i)* &
+  ((x(j-1,k,l,b)-x(j,k+1,l+1,b))*(x(j-1,k,l+1,c)-x(j,k+1,l,c)-x(j-1,k+1,l,c)+x(j,k,l+1,c)) &
+  +(x(j,k+1,l,b)-x(j-1,k,l+1,b))*(x(j-1,k+1,l,c)-x(j,k,l+1,c)-x(j,k+1,l+1,c)+x(j-1,k,l,c)) &
+  +(x(j,k,l+1,b)-x(j-1,k+1,l,b))*(x(j,k+1,l+1,c)-x(j-1,k,l,c)-x(j-1,k,l+1,c)+x(j,k+1,l,c))) &
++f(j,k-1,l,i)* &
+  ((x(j,k-1,l,b)-x(j+1,k,l+1,b))*(x(j+1,k-1,l,c)-x(j,k,l+1,c)-x(j,k-1,l+1,c)+x(j+1,k,l,c)) &
+  +(x(j,k,l+1,b)-x(j+1,k-1,l,b))*(x(j,k-1,l+1,c)-x(j+1,k,l,c)-x(j+1,k,l+1,c)+x(j,k-1,l,c)) &
+  +(x(j+1,k,l,b)-x(j,k-1,l+1,b))*(x(j+1,k,l+1,c)-x(j,k-1,l,c)-x(j+1,k-1,l,c)+x(j,k,l+1,c))) &
++f(j,k,l-1,i)* &
+  ((x(j,k,l-1,b)-x(j+1,k+1,l,b))*(x(j,k+1,l-1,c)-x(j+1,k,l,c)-x(j+1,k,l-1,c)+x(j,k+1,l,c)) &
+  +(x(j+1,k,l,b)-x(j,k+1,l-1,b))*(x(j+1,k,l-1,c)-x(j,k+1,l,c)-x(j+1,k+1,l,c)+x(j,k,l-1,c)) &
+  +(x(j,k+1,l,b)-x(j+1,k,l-1,b))*(x(j+1,k+1,l,c)-x(j,k,l-1,c)-x(j,k+1,l-1,c)+x(j+1,k,l,c))))
 end forall
 
-! Mean stress, flops: 55* 107+
+! Mean stress, flops: 57* 119+
 case( 4 )
 b = modulo( a, 3 ) + 1
 c = modulo( a + 1, 3 ) + 1
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
 df(j,k,l) = 1. / 12. * &
-(x(j+1,k,l,c)*((x(j,k+1,l,b)+x(j+1,k+1,l,b))*(f(j,k,l-1,i)-f(j,k,l,i)) &
-              +(x(j,k-1,l,b)+x(j+1,k-1,l,b))*(f(j,k-1,l,i)-f(j,k-1,l-1,i)) &
-              +(x(j,k,l+1,b)+x(j+1,k,l+1,b))*(f(j,k,l,i)-f(j,k-1,l,i)) &
-              +(x(j,k,l-1,b)+x(j+1,k,l-1,b))*(f(j,k-1,l-1,i)-f(j,k,l-1,i))) &
-+x(j-1,k,l,c)*((x(j,k+1,l,b)+x(j-1,k+1,l,b))*(f(j-1,k,l,i)-f(j-1,k,l-1,i)) &
-              +(x(j,k-1,l,b)+x(j-1,k-1,l,b))*(f(j-1,k-1,l-1,i)-f(j-1,k-1,l,i)) &
-              +(x(j,k,l+1,b)+x(j-1,k,l+1,b))*(f(j-1,k-1,l,i)-f(j-1,k,l,i)) &
-              +(x(j,k,l-1,b)+x(j-1,k,l-1,b))*(f(j-1,k,l-1,i)-f(j-1,k-1,l-1,i))) &
-+x(j,k+1,l,c)*((x(j+1,k,l,b)+x(j+1,k+1,l,b))*(f(j,k,l,i)-f(j,k,l-1,i)) &
-              +(x(j-1,k,l,b)+x(j-1,k+1,l,b))*(f(j-1,k,l-1,i)-f(j-1,k,l,i)) &
-              +(x(j,k,l+1,b)+x(j,k+1,l+1,b))*(f(j-1,k,l,i)-f(j,k,l,i)) &
-              +(x(j,k,l-1,b)+x(j,k+1,l-1,b))*(f(j,k,l-1,i)-f(j-1,k,l-1,i))) &
-+x(j,k-1,l,c)*((x(j+1,k,l,b)+x(j+1,k-1,l,b))*(f(j,k-1,l-1,i)-f(j,k-1,l,i)) &
-              +(x(j-1,k,l,b)+x(j-1,k-1,l,b))*(f(j-1,k-1,l,i)-f(j-1,k-1,l-1,i)) &
-              +(x(j,k,l+1,b)+x(j,k-1,l+1,b))*(f(j,k-1,l,i)-f(j-1,k-1,l,i)) &
-              +(x(j,k,l-1,b)+x(j,k-1,l-1,b))*(f(j-1,k-1,l-1,i)-f(j,k-1,l-1,i))) &
-+x(j,k,l+1,c)*((x(j+1,k,l,b)+x(j+1,k,l+1,b))*(f(j,k-1,l,i)-f(j,k,l,i)) &
-              +(x(j-1,k,l,b)+x(j-1,k,l+1,b))*(f(j-1,k,l,i)-f(j-1,k-1,l,i)) &
-              +(x(j,k+1,l,b)+x(j,k+1,l+1,b))*(f(j,k,l,i)-f(j-1,k,l,i)) &
-              +(x(j,k-1,l,b)+x(j,k-1,l+1,b))*(f(j-1,k-1,l,i)-f(j,k-1,l,i))) &
-+x(j,k,l-1,c)*((x(j+1,k,l,b)+x(j+1,k,l-1,b))*(f(j,k,l-1,i)-f(j,k-1,l-1,i)) &
-              +(x(j-1,k,l,b)+x(j-1,k,l-1,b))*(f(j-1,k-1,l-1,i)-f(j-1,k,l-1,i)) &
-              +(x(j,k+1,l,b)+x(j,k+1,l-1,b))*(f(j-1,k,l-1,i)-f(j,k,l-1,i)) &
-              +(x(j,k-1,l,b)+x(j,k-1,l-1,b))*(f(j,k-1,l-1,i)-f(j-1,k-1,l-1,i))) &
- +x(j,k+1,l+1,c)*(x(j,k+1,l,b)-x(j,k,l+1,b))*(f(j,k,l,i)-f(j-1,k,l,i)) &
- +x(j,k-1,l-1,c)*(x(j,k-1,l,b)-x(j,k,l-1,b))*(f(j,k-1,l-1,i)-f(j-1,k-1,l-1,i)) &
- +x(j+1,k,l+1,c)*(x(j+1,k,l,b)-x(j,k,l+1,b))*(f(j,k-1,l,i)-f(j,k,l,i)) &
- +x(j-1,k,l-1,c)*(x(j-1,k,l,b)-x(j,k,l-1,b))*(f(j-1,k-1,l-1,i)-f(j-1,k,l-1,i)) &
- +x(j+1,k+1,l,c)*(x(j+1,k,l,b)-x(j,k+1,l,b))*(f(j,k,l,i)-f(j,k,l-1,i)) &
- +x(j-1,k-1,l,c)*(x(j-1,k,l,b)-x(j,k-1,l,b))*(f(j-1,k-1,l,i)-f(j-1,k-1,l-1,i)) &
- +x(j+1,k,l-1,c)*(x(j+1,k,l,b)-x(j,k,l-1,b))*(f(j,k,l-1,i)-f(j,k-1,l-1,i)) &
- +x(j-1,k,l+1,c)*(x(j-1,k,l,b)-x(j,k,l+1,b))*(f(j-1,k,l,i)-f(j-1,k-1,l,i)) &
- +x(j-1,k+1,l,c)*(x(j-1,k,l,b)-x(j,k+1,l,b))*(f(j-1,k,l-1,i)-f(j-1,k,l,i)) &
- +x(j+1,k-1,l,c)*(x(j+1,k,l,b)-x(j,k-1,l,b))*(f(j,k-1,l-1,i)-f(j,k-1,l,i)) &
- +x(j,k-1,l+1,c)*(x(j,k-1,l,b)-x(j,k,l+1,b))*(f(j-1,k-1,l,i)-f(j,k-1,l,i)) &
- +x(j,k+1,l-1,c)*(x(j,k+1,l,b)-x(j,k,l-1,b))*(f(j-1,k,l-1,i)-f(j,k,l-1,i)))
+(f(j,k,l,i)* &
+  ((x(j+1,k,l,b)-x(j,k+1,l+1,b))*(x(j,k+1,l,c)-x(j,k,l+1,c))+x(j+1,k,l,b)*(x(j+1,k+1,l,c)-x(j+1,k,l+1,c)) &
+  +(x(j,k+1,l,b)-x(j+1,k,l+1,b))*(x(j,k,l+1,c)-x(j+1,k,l,c))+x(j,k+1,l,b)*(x(j,k+1,l+1,c)-x(j+1,k+1,l,c)) &
+  +(x(j,k,l+1,b)-x(j+1,k+1,l,b))*(x(j+1,k,l,c)-x(j,k+1,l,c))+x(j,k,l+1,b)*(x(j+1,k,l+1,c)-x(j,k+1,l+1,c))) &
++f(j,k-1,l-1,i)* &
+  ((x(j+1,k,l,b)-x(j,k-1,l-1,b))*(x(j,k-1,l,c)-x(j,k,l-1,c))+x(j+1,k,l,b)*(x(j+1,k-1,l,c)-x(j+1,k,l-1,c)) &
+  +(x(j,k-1,l,b)-x(j+1,k,l-1,b))*(x(j,k,l-1,c)-x(j+1,k,l,c))+x(j,k-1,l,b)*(x(j,k-1,l-1,c)-x(j+1,k-1,l,c)) &
+  +(x(j,k,l-1,b)-x(j+1,k-1,l,b))*(x(j+1,k,l,c)-x(j,k-1,l,c))+x(j,k,l-1,b)*(x(j+1,k,l-1,c)-x(j,k-1,l-1,c))) &
++f(j-1,k,l-1,i)* &
+  ((x(j,k+1,l,b)-x(j-1,k,l-1,b))*(x(j,k,l-1,c)-x(j-1,k,l,c))+x(j,k+1,l,b)*(x(j,k+1,l-1,c)-x(j-1,k+1,l,c)) &
+  +(x(j,k,l-1,b)-x(j-1,k+1,l,b))*(x(j-1,k,l,c)-x(j,k+1,l,c))+x(j,k,l-1,b)*(x(j-1,k,l-1,c)-x(j,k+1,l-1,c)) &
+  +(x(j-1,k,l,b)-x(j,k+1,l-1,b))*(x(j,k+1,l,c)-x(j,k,l-1,c))+x(j-1,k,l,b)*(x(j-1,k+1,l,c)-x(j-1,k,l-1,c))) &
++f(j-1,k-1,l,i)* &
+  ((x(j,k,l+1,b)-x(j-1,k-1,l,b))*(x(j-1,k,l,c)-x(j,k-1,l,c))+x(j,k,l+1,b)*(x(j-1,k,l+1,c)-x(j,k-1,l+1,c)) &
+  +(x(j-1,k,l,b)-x(j,k-1,l+1,b))*(x(j,k-1,l,c)-x(j,k,l+1,c))+x(j-1,k,l,b)*(x(j-1,k-1,l,c)-x(j-1,k,l+1,c)) &
+  +(x(j,k-1,l,b)-x(j-1,k,l+1,b))*(x(j,k,l+1,c)-x(j-1,k,l,c))+x(j,k-1,l,b)*(x(j,k-1,l+1,c)-x(j-1,k-1,l,c))) &
++f(j-1,k-1,l-1,i)* &
+  ((x(j-1,k,l,b)-x(j,k-1,l-1,b))*(x(j,k,l-1,c)-x(j,k-1,l,c))+x(j-1,k,l,b)*(x(j-1,k,l-1,c)-x(j-1,k-1,l,c)) &
+  +(x(j,k-1,l,b)-x(j-1,k,l-1,b))*(x(j-1,k,l,c)-x(j,k,l-1,c))+x(j,k-1,l,b)*(x(j-1,k-1,l,c)-x(j,k-1,l-1,c)) &
+  +(x(j,k,l-1,b)-x(j-1,k-1,l,b))*(x(j,k-1,l,c)-x(j-1,k,l,c))+x(j,k,l-1,b)*(x(j,k-1,l-1,c)-x(j-1,k,l-1,c))) &
++f(j-1,k,l,i)* &
+  ((x(j-1,k,l,b)-x(j,k+1,l+1,b))*(x(j,k,l+1,c)-x(j,k+1,l,c))+x(j-1,k,l,b)*(x(j-1,k,l+1,c)-x(j-1,k+1,l,c)) &
+  +(x(j,k+1,l,b)-x(j-1,k,l+1,b))*(x(j-1,k,l,c)-x(j,k,l+1,c))+x(j,k+1,l,b)*(x(j-1,k+1,l,c)-x(j,k+1,l+1,c)) &
+  +(x(j,k,l+1,b)-x(j-1,k+1,l,b))*(x(j,k+1,l,c)-x(j-1,k,l,c))+x(j,k,l+1,b)*(x(j,k+1,l+1,c)-x(j-1,k,l+1,c))) &
++f(j,k-1,l,i)* &
+  ((x(j,k-1,l,b)-x(j+1,k,l+1,b))*(x(j+1,k,l,c)-x(j,k,l+1,c))+x(j,k-1,l,b)*(x(j+1,k-1,l,c)-x(j,k-1,l+1,c)) &
+  +(x(j,k,l+1,b)-x(j+1,k-1,l,b))*(x(j,k-1,l,c)-x(j+1,k,l,c))+x(j,k,l+1,b)*(x(j,k-1,l+1,c)-x(j+1,k,l+1,c)) &
+  +(x(j+1,k,l,b)-x(j,k-1,l+1,b))*(x(j,k,l+1,c)-x(j,k-1,l,c))+x(j+1,k,l,b)*(x(j+1,k,l+1,c)-x(j+1,k-1,l,c))) &
++f(j,k,l-1,i)* &
+  ((x(j,k,l-1,b)-x(j+1,k+1,l,b))*(x(j,k+1,l,c)-x(j+1,k,l,c))+x(j,k,l-1,b)*(x(j,k+1,l-1,c)-x(j+1,k,l-1,c)) &
+  +(x(j+1,k,l,b)-x(j,k+1,l-1,b))*(x(j,k,l-1,c)-x(j,k+1,l,c))+x(j+1,k,l,b)*(x(j+1,k,l-1,c)-x(j+1,k+1,l,c)) &
+  +(x(j,k+1,l,b)-x(j+1,k,l-1,b))*(x(j+1,k,l,c)-x(j,k,l-1,c))+x(j,k+1,l,b)*(x(j+1,k+1,l,c)-x(j,k+1,l-1,c))))
 end forall
 
 end select
