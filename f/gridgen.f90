@@ -46,12 +46,6 @@ else
   call vectorio( 'r', 'data/x3', x, 3, 1, i1, i2, i3, i4, 0 )
 end if
 
-! Coordinate system
-!l = sum( maxloc( abs( upvector ) ) )
-!up = sign( 1., upvector(l) )
-!k = modulo( l + 1, 3 ) + 1
-!j = 6 - k - l
-
 ! Grid expansion
 expand = .false.
 if ( rexpand > 1. ) then

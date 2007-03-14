@@ -41,7 +41,6 @@ case( 'nn' );          read( str, *, iostat=io ) nn
 case( 'nt' );          read( str, *, iostat=io ) nt
 case( 'dx' );          read( str, *, iostat=io ) dx
 case( 'dt' );          read( str, *, iostat=io ) dt
-case( 'upvector' );    read( str, *, iostat=io ) upvector
 case( 'slipvector' );  read( str, *, iostat=io ) slipvector
 case( 'hourglass' );   read( str, *, iostat=io ) hourglass
 case( 'vdamp' );       read( str, *, iostat=io ) vdamp

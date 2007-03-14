@@ -6,13 +6,11 @@
   dx = 100.;				% spatial step length
   dt = .0075;				% time step length
   grid = 'constant';			% regular mesh
-  oplevel = 5;				% 1=const, 2=rect, 3=parallelepiped, 3=one-point, 5=exact
+  oplevel = 5;				% 1=const, 2=rect, 3=parallel, 3=one-point, 5=exact
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ]; % grid tranformation
   symmetry = [ 0 0 0 ];			% grid symmetry
 % faultnormal = 0;			% no fault
   gridnoise = 0.			% Random noise added to mesh
-% upvector = [ 0 0 1 ];			% positive z up
-  upvector = [ 0 -1 0 ];		% negative y up
   rho = 2670.;				% **density
   vp  = 6000.;				% **P-wave speed
   vs  = 3464.1016;			% **S-wave speed

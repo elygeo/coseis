@@ -105,7 +105,6 @@ real :: &
   xhypo(3),      & ! hypocenter location
   xcenter(3),    & ! mesh center
   rmax,          & ! maximum distance from mesh center
-  upvector(3),   & ! upward direction
   slipvector(3)    ! slip direction for finding traction vectors
 
 real :: &
