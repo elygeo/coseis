@@ -164,7 +164,7 @@ integer :: &
   ifn              ! fault normal component=abs(faultnormal)
 
 integer :: &
-  oper(2),       & ! 1=constant, 2=rectangular, 3=one-point quadrature, 4=mean stress
+  oper(2),       & ! 1=constant, 2=rectangular, 3=parallelepiped, 4=one-point quadrature, 5=exact
   oplevel,       & ! max operator number, higher is more expensive, and more accurate
   noper,         & ! number of zones for spatial derivative operators
   i1oper(2,3),   & ! j1 k1 l1 operator zone start index

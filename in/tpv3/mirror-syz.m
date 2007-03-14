@@ -41,6 +41,7 @@
   np = [ 1 1 2 ];
 
 % yz-shear symmetric
+  oplevel = 3;
   affine = [ 1. 0. 0.  0. 1. 1.  0. 0. 1.  1. ];
   nn       = [ 211 271 101 ];
   ihypo    = [  -1   0  -1 ];

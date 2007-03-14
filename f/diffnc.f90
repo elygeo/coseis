@@ -24,27 +24,27 @@ h = 0.25 * dx * dx
 select case( a )
 case( 1 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-    df(j,k,l) = h * &
-    ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
-    + f(j+1,k,l,i) - f(j,k+1,l+1,i) &
-    - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
-    - f(j,k,l+1,i) + f(j+1,k+1,l,i) )
+  df(j,k,l) = h * &
+  ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
+  + f(j+1,k,l,i) - f(j,k+1,l+1,i) &
+  - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
+  - f(j,k,l+1,i) + f(j+1,k+1,l,i) )
   end forall
 case( 2 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-    df(j,k,l) = h * &
-    ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
-    - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
-    + f(j,k+1,l,i) - f(j+1,k,l+1,i) &
-    - f(j,k,l+1,i) + f(j+1,k+1,l,i) )
+  df(j,k,l) = h * &
+  ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
+  - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
+  + f(j,k+1,l,i) - f(j+1,k,l+1,i) &
+  - f(j,k,l+1,i) + f(j+1,k+1,l,i) )
   end forall
 case( 3 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-    df(j,k,l) = h * &
-    ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
-    - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
-    - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
-    + f(j,k,l+1,i) - f(j+1,k+1,l,i) )
+  df(j,k,l) = h * &
+  ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
+  - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
+  - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
+  + f(j,k,l+1,i) - f(j+1,k+1,l,i) )
   end forall
 end select
  
@@ -53,42 +53,66 @@ case( 2 )
 select case( a )
 case( 1 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-    df(j,k,l) = 0.25 * &
-    ( ( x(j,k+1,l,2) - x(j,k,l,2) ) &
-    * ( x(j,k,l+1,3) - x(j,k,l,3) ) &
-    * ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
-      + f(j+1,k,l,i) - f(j,k+1,l+1,i) &
-      - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
-      - f(j,k,l+1,i) + f(j+1,k+1,l,i) ) )
+  df(j,k,l) = 0.25 * &
+  ( ( x(j,k+1,l,2) - x(j,k,l,2) ) &
+  * ( x(j,k,l+1,3) - x(j,k,l,3) ) &
+  * ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
+    + f(j+1,k,l,i) - f(j,k+1,l+1,i) &
+    - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
+    - f(j,k,l+1,i) + f(j+1,k+1,l,i) ) )
   end forall
 case( 2 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-    df(j,k,l) = 0.25 * &
-    ( ( x(j,k,l+1,3) - x(j,k,l,3) ) &
-    * ( x(j+1,k,l,1) - x(j,k,l,1) ) &
-    * ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
-      - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
-      + f(j,k+1,l,i) - f(j+1,k,l+1,i) &
-      - f(j,k,l+1,i) + f(j+1,k+1,l,i) ) )
+  df(j,k,l) = 0.25 * &
+  ( ( x(j,k,l+1,3) - x(j,k,l,3) ) &
+  * ( x(j+1,k,l,1) - x(j,k,l,1) ) &
+  * ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
+    - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
+    + f(j,k+1,l,i) - f(j+1,k,l+1,i) &
+    - f(j,k,l+1,i) + f(j+1,k+1,l,i) ) )
   end forall
 case( 3 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-    df(j,k,l) = 0.25 * &
-    ( ( x(j+1,k,l,1) - x(j,k,l,1) ) &
-    * ( x(j,k+1,l,2) - x(j,k,l,2) ) &
-    * ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
-      - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
-      - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
-      + f(j,k,l+1,i) - f(j+1,k+1,l,i) ) )
+  df(j,k,l) = 0.25 * &
+  ( ( x(j+1,k,l,1) - x(j,k,l,1) ) &
+  * ( x(j,k+1,l,2) - x(j,k,l,2) ) &
+  * ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
+    - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
+    - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
+    + f(j,k,l+1,i) - f(j+1,k+1,l,i) ) )
   end forall
 end select
 
-! One-point quadrature, flops: 17* 63+
+! Parallelepiped grid, flops: 17* 27+
 case( 3 )
 b = mod( a, 3 ) + 1
 c = mod( a + 1, 3 ) + 1
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-df(j,k,l) = 1./ 16. * &
+df(j,k,l) = 0.25 * &
+((f(j+1,k+1,l+1,i)-f(j,k,l,i))* &
+  (x(j,k+1,l+1,b)*(x(j+1,k,l+1,c)-x(j+1,k+1,l,c)) &
+  +x(j+1,k,l+1,b)*(x(j+1,k+1,l,c)-x(j,k+1,l+1,c)) &
+  +x(j+1,k+1,l,b)*(x(j,k+1,l+1,c)-x(j+1,k,l+1,c))) &
++(f(j+1,k,l,i)-f(j,k+1,l+1,i))* &
+  (x(j,k,l,b)*(x(j+1,k+1,l,c)-x(j+1,k,l+1,c)) &
+  +x(j+1,k,l+1,b)*(x(j,k,l,c)-x(j+1,k+1,l,c)) &
+  +x(j+1,k+1,l,b)*(x(j+1,k,l+1,c)-x(j,k,l,c))) &
++(f(j,k+1,l,i)-f(j+1,k,l+1,i))* &
+  (x(j,k,l,b)*(x(j,k+1,l+1,c)-x(j+1,k+1,l,c)) &
+  +x(j+1,k+1,l,b)*(x(j,k,l,c)-x(j,k+1,l+1,c)) &
+  +x(j,k+1,l+1,b)*(x(j+1,k+1,l,c)-x(j,k,l,c))) &
++(f(j,k,l+1,i)-f(j+1,k+1,l,i))* &
+  (x(j,k,l,b)*(x(j+1,k,l+1,c)-x(j,k+1,l+1,c)) &
+  +x(j,k+1,l+1,b)*(x(j,k,l,c)-x(j+1,k,l+1,c)) &
+  +x(j+1,k,l+1,b)*(x(j,k+1,l+1,c)-x(j,k,l,c))))
+end forall
+
+! General grid one-point quadrature, flops: 17* 63+
+case( 4 )
+b = mod( a, 3 ) + 1
+c = mod( a + 1, 3 ) + 1
+forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+df(j,k,l) = 0.0625 * &
 ((f(j+1,k+1,l+1,i)-f(j,k,l,i))* &
   ((x(j+1,k,l,b)-x(j,k+1,l+1,b))*(x(j,k+1,l,c)-x(j+1,k,l+1,c)-x(j,k,l+1,c)+x(j+1,k+1,l,c)) &
   +(x(j,k+1,l,b)-x(j+1,k,l+1,b))*(x(j,k,l+1,c)-x(j+1,k+1,l,c)-x(j+1,k,l,c)+x(j,k+1,l+1,c)) &
@@ -107,8 +131,8 @@ df(j,k,l) = 1./ 16. * &
   +(x(j,k+1,l,b)-x(j+1,k,l+1,b))*(x(j+1,k,l,c)-x(j,k+1,l+1,c)-x(j+1,k+1,l+1,c)+x(j,k,l,c))))
 end forall
 
-!  Mean stress, flops: 57* 119+
-case( 4 )
+! General grid exact, flops: 57* 119+
+case( 5 )
 b = modulo( a, 3 ) + 1
 c = modulo( a + 1, 3 ) + 1
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )

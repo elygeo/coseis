@@ -3,17 +3,16 @@ module m_optimize
 implicit none
 contains
 
-subroutine optimize( oper, i1oper, i2oper, w2, s2, x, dx, i1cell, i2cell )
-integer, intent(out) :: oper(2), i1oper(2,3), i2oper(2,3)
+subroutine optimize( oper, i1oper, i2oper, w2, s2, x, dx )
+integer, intent(inout) :: oper(2), i1oper(2,3), i2oper(2,3)
 real, intent(out) :: w2(:,:,:,:), s2(:,:,:)
 real, intent(in) :: x(:,:,:,:), dx
-integer, intent(in) :: i1cell(3), i2cell(3)
 real :: tol, test
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2
 
 ! Grid gradient
-i1 = i1cell
-i2 = i2cell
+i1 = i1oper(1,:)
+i2 = i2oper(1,:) - 1
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
@@ -55,9 +54,10 @@ tol = 10. * epsilon( dx )
 ! For constant grid:
 ! dx/dy = dx/dz = dy/dz = dy/dx = dz/dx = dz/dy = 0
 ! dx/dx = dy/dy = dz/dz
-oper = 1
-
-if ( test < tol ) return
+if ( test < tol ) then
+  oper = 1
+  return
+end if
 
 ! For rectangular grid:
 ! dx/dy = dx/dz = dy/dz = dy/dx = dz/dx = dz/dy = 0
@@ -70,15 +70,17 @@ do i = l1, l2;     i1(3) = i; if ( any( s2(:,:,i) > tol ) ) exit; end do
 do i = l2, l1, -1; i2(3) = i; if ( any( s2(:,:,i) > tol ) ) exit; end do
 i1oper(2,:) = i1
 i2oper(2,:) = i2 + 1
-test = product( i2 - i1 + 2 ) / product( i2cell - i1cell + 2 )
 
-if ( all( i2 > i1 ) .and. test > .8 ) then
-  oper = 4
-else if ( all( i2 <= i1 ) ) then
+! Retangular everywhere
+if ( any( i2 < i1 ) ) then
   oper = 2
-else
-  oper = 2
-  oper(2) = 4
+  return
+end if
+
+! Non-rectangular subregion
+test = product( i2 - i1 + 2 ) / product( i2oper(1,:) - i1oper(1,:) + 1 )
+if ( test < .8 ) then
+  oper(1) = 2
 end if
 
 end subroutine

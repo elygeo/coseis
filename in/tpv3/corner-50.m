@@ -40,6 +40,7 @@
   np = [ 4 4 2 ];
 
 % rectangular
+  oplevel = 2;
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ];
   nn       = [ 421 271 201 ];
   ihypo    = [  -1  -1  -1 ];

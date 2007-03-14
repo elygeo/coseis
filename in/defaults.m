@@ -6,7 +6,7 @@
   dx = 100.;				% spatial step length
   dt = .0075;				% time step length
   grid = 'constant';			% regular mesh
-  oplevel = 4;				% 1=const, 2=rect, 3=one-point quadrature, 4=mean stress
+  oplevel = 5;				% 1=const, 2=rect, 3=parallelepiped, 3=one-point, 5=exact
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ]; % grid tranformation
   symmetry = [ 0 0 0 ];			% grid symmetry
 % faultnormal = 0;			% no fault

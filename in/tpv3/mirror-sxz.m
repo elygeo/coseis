@@ -40,6 +40,7 @@
   np = [ 4 4 2 ];
 
 % xz-shear symmetric grid
+  oplevel = 3;
   affine = [ 1. 0. 1.  0. 1. 0.  0. 0. 1.  1. ];
   nn       = [ 421 136 101 ];
   ihypo    = [   0  -1  -1 ];
