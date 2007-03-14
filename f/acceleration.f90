@@ -31,8 +31,8 @@ do iz = 1, noper
 end do
 
 ! PML region
-! p_ij' + d_j*p_ij = w_ij,j (no summation convetion here)
-! f_j = sum_i( p_ij' )
+! p'_ij + d_j*p_ij = w_ij,j (no summation convetion)
+! f_i = sum_j( p_ij' )
 i1 = i1node
 i2 = i2node
 select case( id )

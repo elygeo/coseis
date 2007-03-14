@@ -4,8 +4,8 @@
   vp  = 6000.;
   vs  = 3464.;
   rho = 2700.;
-  gam = .0;
-  hourglass = [ 1. 4. ];
+  gam = .1;
+  hourglass = [ 1. 2. ];
   upvector = [ 0 0 -1 ];
   itcheck = 0;
   faultnormal = 0;

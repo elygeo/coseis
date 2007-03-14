@@ -26,25 +26,25 @@ case( 1 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     df(j,k,l) = h * &
     ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
-    - f(j,k+1,l+1,i) + f(j+1,k,l,i) &
-    + f(j+1,k,l+1,i) - f(j,k+1,l,i) &
-    + f(j+1,k+1,l,i) - f(j,k,l+1,i) )
+    + f(j+1,k,l,i) - f(j,k+1,l+1,i) &
+    - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
+    - f(j,k,l+1,i) + f(j+1,k+1,l,i) )
   end forall
 case( 2 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     df(j,k,l) = h * &
     ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
-    + f(j,k+1,l+1,i) - f(j+1,k,l,i) &
-    - f(j+1,k,l+1,i) + f(j,k+1,l,i) &
-    + f(j+1,k+1,l,i) - f(j,k,l+1,i))
+    - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
+    + f(j,k+1,l,i) - f(j+1,k,l+1,i) &
+    - f(j,k,l+1,i) + f(j+1,k+1,l,i) )
   end forall
 case( 3 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     df(j,k,l) = h * &
     ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
-    + f(j,k+1,l+1,i) - f(j+1,k,l,i) &
-    + f(j+1,k,l+1,i) - f(j,k+1,l,i) &
-    - f(j+1,k+1,l,i) + f(j,k,l+1,i) )
+    - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
+    - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
+    + f(j,k,l+1,i) - f(j+1,k+1,l,i) )
   end forall
 end select
  
@@ -57,9 +57,9 @@ case( 1 )
     ( ( x(j,k+1,l,2) - x(j,k,l,2) ) &
     * ( x(j,k,l+1,3) - x(j,k,l,3) ) &
     * ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
-      - f(j,k+1,l+1,i) + f(j+1,k,l,i) &
-      + f(j+1,k,l+1,i) - f(j,k+1,l,i) &
-      + f(j+1,k+1,l  ,i) - f(j,k,l+1,i) ) )
+      + f(j+1,k,l,i) - f(j,k+1,l+1,i) &
+      - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
+      - f(j,k,l+1,i) + f(j+1,k+1,l,i) ) )
   end forall
 case( 2 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
@@ -67,9 +67,9 @@ case( 2 )
     ( ( x(j,k,l+1,3) - x(j,k,l,3) ) &
     * ( x(j+1,k,l,1) - x(j,k,l,1) ) &
     * ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
-      + f(j,k+1,l+1,i) - f(j+1,k,l,i) &
-      - f(j+1,k,l+1,i) + f(j,k+1,l,i) &
-      + f(j+1,k+1,l,i) - f(j,k,l+1,i) ) )
+      - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
+      + f(j,k+1,l,i) - f(j+1,k,l+1,i) &
+      - f(j,k,l+1,i) + f(j+1,k+1,l,i) ) )
   end forall
 case( 3 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
@@ -77,9 +77,9 @@ case( 3 )
     ( ( x(j+1,k,l,1) - x(j,k,l,1) ) &
     * ( x(j,k+1,l,2) - x(j,k,l,2) ) &
     * ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
-      + f(j,k+1,l+1,i) - f(j+1,k,l,i) &
-      + f(j+1,k,l+1,i) - f(j,k+1,l,i) &
-      - f(j+1,k+1,l,i) + f(j,k,l+1,i) ) )
+      - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
+      - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
+      + f(j,k,l+1,i) - f(j+1,k+1,l,i) ) )
   end forall
 end select
 

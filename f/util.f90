@@ -52,9 +52,9 @@ integer :: j, k, l
 forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
   fa(j,k,l) = 0.125 * &
   ( f(j,k,l) + f(j+d,k+d,l+d) &
-  + f(j+d,k,l) + f(j,k+d,l+d) &
-  + f(j,k+d,l) + f(j+d,k,l+d) &
-  + f(j,k,l+d) + f(j+d,k+d,l) )
+  + f(j,k+d,l+d) + f(j+d,k,l) &
+  + f(j+d,k,l+d) + f(j,k+d,l) &
+  + f(j+d,k+d,l) + f(j,k,l+d) )
 end forall
 fa(:i1(1)-1,:,:) = 0.
 fa(:,:i1(2)-1,:) = 0.
@@ -72,9 +72,9 @@ integer :: i, j, k, l
 forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3), i=1:3 )
   fa(j,k,l,i) = 0.125 * &
   ( f(j,k,l,i) + f(j+d,k+d,l+d,i) &
-  + f(j+d,k,l,i) + f(j,k+d,l+d,i) &
-  + f(j,k+d,l,i) + f(j+d,k,l+d,i) &
-  + f(j,k,l+d,i) + f(j+d,k+d,l,i) )
+  + f(j,k+d,l+d,i) + f(j+d,k,l,i) &
+  + f(j+d,k,l+d,i) + f(j,k+d,l,i) &
+  + f(j+d,k+d,l,i) + f(j,k,l+d,i) )
 end forall
 fa(:i1(1)-1,:,:,:) = 0.
 fa(:,:i1(2)-1,:,:) = 0.

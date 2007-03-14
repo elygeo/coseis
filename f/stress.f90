@@ -58,7 +58,7 @@ if ( id /= 3 ) then
   call diffnc( s1, oper(2), u, x, dx, ic, id, i1, i2 )
 end if
 
-! PML region, damped direction: g_ij' = d_j*g_ij = v_i,j
+! PML region, damped direction: g'_ij = d_j*g_ij = v_i,j
 select case( id )
 case( 1 )
   i1 = i1cell

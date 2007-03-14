@@ -23,14 +23,11 @@ files="
   $base/util
   $base/scecvm4
 "
-
 ln -s . $base
 rm -f f/*.o f/*.mod f/*.ipo f/*.il f/*.stb
 mkdir -p tmp
 tar cf - $files | gzip > tmp/sord.tgz
 rm $base
 
-if [ "x$1" = "x-s" ]; then
-  cp tmp/sord.tgz save/$base.tgz
-fi
+[ "x$1" = "x-s" ] && cp tmp/sord.tgz save/$base.tgz
 

@@ -20,34 +20,34 @@ select case( iq )
 case( 1 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2, i=1:3 )
     df(j,k,l,i) = &
-    - f(j,k,l,i) - f(j+1,k+1,l+1,i) &
-    - f(j+1,k,l,i) - f(j,k+1,l+1,i) &
-    + f(j,k+1,l,i) + f(j+1,k,l+1,i) &
-    + f(j,k,l+1,i) + f(j+1,k+1,l,i)
+      f(j,k,l,i) + f(j+1,k+1,l+1,i) &
+    + f(j,k+1,l+1,i) + f(j+1,k,l,i) &
+    - f(j+1,k,l+1,i) - f(j,k+1,l,i) &
+    - f(j+1,k+1,l,i) - f(j,k,l+1,i)
   end forall
 case( 2 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2, i=1:3 )
     df(j,k,l,i) = &
-    - f(j,k,l,i) - f(j+1,k+1,l+1,i) &
-    + f(j+1,k,l,i) + f(j,k+1,l+1,i) &
-    - f(j,k+1,l,i) - f(j+1,k,l+1,i) &
-    + f(j,k,l+1,i) + f(j+1,k+1,l,i)
+      f(j,k,l,i) + f(j+1,k+1,l+1,i) &
+    - f(j,k+1,l+1,i) - f(j+1,k,l,i) &
+    + f(j+1,k,l+1,i) + f(j,k+1,l,i) &
+    - f(j+1,k+1,l,i) - f(j,k,l+1,i)
   end forall
 case( 3 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2, i=1:3 )
     df(j,k,l,i) = &
-    - f(j,k,l,i) - f(j+1,k+1,l+1,i) &
-    + f(j+1,k,l,i) + f(j,k+1,l+1,i) &
-    + f(j,k+1,l,i) + f(j+1,k,l+1,i) &
-    - f(j,k,l+1,i) - f(j+1,k+1,l,i)
+      f(j,k,l,i) + f(j+1,k+1,l+1,i) &
+    - f(j,k+1,l+1,i) - f(j+1,k,l,i) &
+    - f(j+1,k,l+1,i) - f(j,k+1,l,i) &
+    + f(j+1,k+1,l,i) + f(j,k,l+1,i)
   end forall
 case( 4 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2, i=1:3 )
     df(j,k,l,i) = &
-    - f(j,k,l,i) + f(j+1,k+1,l+1,i) &
-    + f(j+1,k,l,i) - f(j,k+1,l+1,i) &
-    + f(j,k+1,l,i) - f(j+1,k,l+1,i) &
-    + f(j,k,l+1,i) - f(j+1,k+1,l,i)
+      f(j,k,l,i) - f(j+1,k+1,l+1,i) &
+    + f(j,k+1,l+1,i) - f(j+1,k,l,i) &
+    + f(j+1,k,l+1,i) - f(j,k+1,l,i) &
+    + f(j+1,k+1,l,i) - f(j,k,l+1,i) 
   end forall
 end select
 
@@ -72,34 +72,34 @@ select case( iq )
 case( 1 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     df(j,k,l) = &
-    - f(j,k,l) - f(j-1,k-1,l-1) &
-    - f(j-1,k,l) - f(j,k-1,l-1) &
-    + f(j,k-1,l) + f(j-1,k,l-1) &
-    + f(j,k,l-1) + f(j-1,k-1,l)
+      f(j,k,l) + f(j-1,k-1,l-1) &
+    + f(j,k-1,l-1) + f(j-1,k,l) &
+    - f(j-1,k,l-1) - f(j,k-1,l) &
+    - f(j-1,k-1,l) - f(j,k,l-1)
   end forall
 case( 2 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     df(j,k,l) = &
-    - f(j,k,l) - f(j-1,k-1,l-1) &
-    + f(j-1,k,l) + f(j,k-1,l-1) &
-    - f(j,k-1,l) - f(j-1,k,l-1) &
-    + f(j,k,l-1) + f(j-1,k-1,l)
+      f(j,k,l) + f(j-1,k-1,l-1) &
+    - f(j,k-1,l-1) - f(j-1,k,l) &
+    + f(j-1,k,l-1) + f(j,k-1,l) &
+    - f(j-1,k-1,l) - f(j,k,l-1)
   end forall
 case( 3 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     df(j,k,l) = &
-    - f(j,k,l) - f(j-1,k-1,l-1) &
-    + f(j-1,k,l) + f(j,k-1,l-1) &
-    + f(j,k-1,l) + f(j-1,k,l-1) &
-    - f(j,k,l-1) - f(j-1,k-1,l)
+      f(j,k,l) + f(j-1,k-1,l-1) &
+    - f(j,k-1,l-1) - f(j-1,k,l) &
+    - f(j-1,k,l-1) - f(j,k-1,l) &
+    + f(j-1,k-1,l) + f(j,k,l-1)
   end forall
 case( 4 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
     df(j,k,l) = &
-    - f(j,k,l) + f(j-1,k-1,l-1) &
-    + f(j-1,k,l) - f(j,k-1,l-1) &
-    + f(j,k-1,l) - f(j-1,k,l-1) &
-    + f(j,k,l-1) - f(j-1,k-1,l)
+      f(j,k,l) - f(j-1,k-1,l-1) &
+    + f(j,k-1,l-1) - f(j-1,k,l) &
+    + f(j-1,k,l-1) - f(j,k-1,l) &
+    + f(j-1,k-1,l) - f(j,k,l-1)
   end forall
 end select
 
