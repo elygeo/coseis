@@ -1,14 +1,15 @@
 #!/bin/bash -e
 
+dir=$( /bin/pwd )
+base=$( basename "$dir" )
 version=$( date +%Y%m%d%H%M%S )
-base=sord-$version
 
 cat << END > versionmeta.m
 version = '$version';
 login   = '$LOGNAME';
 name    = '$( finger $LOGNAME | sed -n 's/^Login.*:.*e: //p' )';
 host    = '$HOSTNAME';
-dir     = '$( /bin/pwd )';
+dir     = '$dir';
 END
 
 files="
@@ -23,13 +24,13 @@ files="
   $base/util
   $base/scecvm4
 "
-ln -s . $base
 rm -f f/*.o f/*.mod f/*.ipo f/*.il f/*.stb
 mkdir -p tmp
-tar cf - $files | gzip > tmp/sord.tgz
-rm $base
+cd $( dirname "$dir" )
+tar cf - $files | gzip > "$dir/tmp/$base.tgz"
+cd "$dir"
 
-[ "x$1" = "x-s" ] && cp tmp/sord.tgz save/$base.tgz
+[ "x$1" = "x-s" ] && cp "tmp/$base.tgz" "save/$base-$version.tgz"
 
 exit 0
 
