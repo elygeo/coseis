@@ -31,3 +31,5 @@ rm $base
 
 [ "x$1" = "x-s" ] && cp tmp/sord.tgz save/$base.tgz
 
+exit 0
+
