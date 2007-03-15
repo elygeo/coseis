@@ -19,6 +19,15 @@ USAGE
   the proper compiling and batch submission parameters. For the parallel
   version you will need MPI installed.
 
+MPICH2 install
+  ./configure -prefix=/usr/local --with-device=ch3:shm --enable-f90 --disable-cxx
+  echo "secretword=<secretword>" > $HOME/.mpd.conf
+  chmod 600 $HOME/.mpd.conf
+
+MPICH2 SunOS install
+  export CC=cc F77=f77 F90=f95 CXX=CC
+  export CFLAGS=-fast FFLAGS=-fast F90FLAGS=-fast CXXFLAGS=-fast
+  ./configure -prefix=/d0/gely/local --with-device=ch3:shm --enable-f90 --disable-cxx
 
 MACHINE NOTES
 
@@ -83,18 +92,4 @@ SDSU CSRC Babieca Cluster
     pbsnodes -a
     qstat
     qdel
-
-Phim: 3GHz Intel Xeon
-Phat: 1.6GHz Intel Pentium M
-Curl: 1.5Ghz AMD Athlon XP 1800+
-
-MPICH2
-  ./configure -prefix=/usr/local --with-device=ch3:shm --enable-f90 --disable-cxx
-  echo "secretword=<secretword>" > $HOME/.mpd.conf
-  chmod 600 $HOME/.mpd.conf
-
-MPICH2 SunOS
-  export CC=cc F77=f77 F90=f95 CXX=CC
-  export CFLAGS=-fast FFLAGS=-fast F90FLAGS=-fast CXXFLAGS=-fast
-  ./configure -prefix=/d0/gely/local --with-device=ch3:shm --enable-f90 --disable-cxx
 

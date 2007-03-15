@@ -6,22 +6,20 @@
   dx = 100.;				% spatial step length
   dt = .0075;				% time step length
   grid = 'constant';			% regular mesh
-  oplevel = 5;				% 1=const, 2=rect, 3=parallel, 3=one-point, 5=exact
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ]; % grid tranformation
   symmetry = [ 0 0 0 ];			% grid symmetry
 % faultnormal = 0;			% no fault
   gridnoise = 0.			% Random noise added to mesh
+  oplevel = 5;				% 1=const, 2=rect, 3=parallel, 3=one-point, 5=exact
   rho = 2670.;				% **density
-  vp  = 6000.;				% **P-wave speed
-  vs  = 3464.1016;			% **S-wave speed
+  vp = 6000.;				% **P-wave speed
+  vs = 3464.1016;			% **S-wave speed
   rho1 = 0.;				% min density
   rho2 = 1e9;				% max density
-  vp1  = 0.;				% min P-wave speed
-  vp2  = 1e9;				% max P-wave speed
-  vs1  = 0.;				% min S-wave speed
-  vs2  = 1e9;				% max S-wave speed
-
-% lock = [ 1 1 0   1 1 1  -1 -1 -1 ];	% **lock v1 & v2, v3 is free
+  vp1 = 0.;				% min P-wave speed
+  vp2 = 1e9;				% max P-wave speed
+  vs1 = 0.;				% min S-wave speed
+  vs2 = 1e9;				% max S-wave speed
   gam = .0;				% viscosity
   vdamp = -1.;				% Vs dependent damping
   hourglass = [ 1. .5 ];		% hourglass stiffness (1) and viscosity (2)
@@ -35,6 +33,7 @@
   rexpand = 1.06;			% grid expansion ratio
   n1expand = [ 0 0 0 ];			% n grid expansion nodes for j1 k1 l1
   n2expand = [ 0 0 0 ];			% n grid expansion nodes for j2 k2 l2
+% lock = [ 1 1 0   1 1 1  -1 -1 -1 ];	% **lock v1 & v2, v3 is free
 
 % Moment source parameters
 % rfunc = 'box';			% spatial weighting: uniform
@@ -50,8 +49,8 @@
 
 % Fault parameters;
 % faultnormal = 0;			% no fault
-  slipvector = [ 1. 0. 0. ];		% Shear traction direction
   faultnormal = 3;			% constant l fault plane
+  slipvector = [ 1. 0. 0. ];		% shear traction direction for ts1
   mus = .6;				% **coef of static friction
   mud = .5;				% **coef of dynamic friction
   dc  = .25;				% **slip-weakening distance
