@@ -8,7 +8,6 @@
   grid = 'constant';			% regular mesh
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ]; % grid tranformation
   symmetry = [ 0 0 0 ];			% grid symmetry
-% faultnormal = 0;			% no fault
   gridnoise = 0.			% Random noise added to mesh
   oplevel = 5;				% 1=const, 2=rect, 3=parallel, 3=one-point, 5=exact
   rho = 2670.;				% **density
@@ -22,7 +21,7 @@
   vs2 = 1e9;				% max S-wave speed
   gam = .0;				% viscosity
   vdamp = -1.;				% Vs dependent damping
-  hourglass = [ 1. .5 ];		% hourglass stiffness (1) and viscosity (2)
+  hourglass = [ 1. 1. ];		% hourglass stiffness (1) and viscosity (2)
 % npml = 0;				% no PML absorbing boundary
   npml = 10;				% 10 PML nodes
   bc1 = [ 0 0 0 ];			% j1 k1 l1 boundary cond (see below)
