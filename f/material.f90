@@ -15,7 +15,6 @@ integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, &
 if ( master ) write( 0, * ) 'Material model'
 
 ! Init
-call vectoraverage( w1, x, i1node, i2cell, 1 )
 mr = 0.
 s1 = 0.
 s2 = 0.
@@ -49,10 +48,10 @@ case( 'c' )
   x1 = x1in(iz,:)
   x2 = x2in(iz,:)
   select case( fieldin(iz) )
-  case( 'rho' ); call cube( mr, w1, i3, i4, x1, x2, inval(iz) )
-  case( 'vp'  ); call cube( s1, w1, i3, i4, x1, x2, inval(iz) )
-  case( 'vs'  ); call cube( s2, w1, i3, i4, x1, x2, inval(iz) )
-  case( 'gam' ); call cube( s2, w1, i3, i4, x1, x2, inval(iz) )
+  case( 'rho' ); call cube( mr, w2, i3, i4, x1, x2, inval(iz) )
+  case( 'vp'  ); call cube( s1, w2, i3, i4, x1, x2, inval(iz) )
+  case( 'vs'  ); call cube( s2, w2, i3, i4, x1, x2, inval(iz) )
+  case( 'gam' ); call cube( s2, w2, i3, i4, x1, x2, inval(iz) )
   end select
 case( 'r' )
   i3 = max( i1, i1node )

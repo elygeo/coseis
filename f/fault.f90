@@ -86,19 +86,19 @@ case( 'c' )
   i1(ifn) = ihypo(ifn)
   i2(ifn) = ihypo(ifn)
   select case ( fieldin(iz) )
-  case( 'mus' ); call cube( mus, x, i1, i2, x1, x2, rr )
-  case( 'mud' ); call cube( mud, x, i1, i2, x1, x2, rr )
-  case( 'dc'  ); call cube( dc,  x, i1, i2, x1, x2, rr )
-  case( 'co'  ); call cube( co,  x, i1, i2, x1, x2, rr )
-  case( 'sxx' ); f1 = t1(:,:,:,1); call cube( f1, x, i1, i2, x1, x2, rr ); t1(:,:,:,1) = f1
-  case( 'syy' ); f1 = t1(:,:,:,2); call cube( f1, x, i1, i2, x1, x2, rr ); t1(:,:,:,2) = f1
-  case( 'szz' ); f1 = t1(:,:,:,3); call cube( f1, x, i1, i2, x1, x2, rr ); t1(:,:,:,3) = f1
-  case( 'syz' ); f1 = t2(:,:,:,1); call cube( f1, x, i1, i2, x1, x2, rr ); t2(:,:,:,1) = f1
-  case( 'szx' ); f1 = t2(:,:,:,2); call cube( f1, x, i1, i2, x1, x2, rr ); t2(:,:,:,2) = f1
-  case( 'sxy' ); f1 = t2(:,:,:,3); call cube( f1, x, i1, i2, x1, x2, rr ); t2(:,:,:,3) = f1
-  case( 'ts1' ); f1 = t3(:,:,:,1); call cube( f1, x, i1, i2, x1, x2, rr ); t3(:,:,:,1) = f1
-  case( 'ts2' ); f1 = t3(:,:,:,2); call cube( f1, x, i1, i2, x1, x2, rr ); t3(:,:,:,2) = f1
-  case( 'tn'  ); f1 = t3(:,:,:,3); call cube( f1, x, i1, i2, x1, x2, rr ); t3(:,:,:,3) = f1
+  case( 'mus' ); call cube( mus, w1, i1, i2, x1, x2, rr )
+  case( 'mud' ); call cube( mud, w1, i1, i2, x1, x2, rr )
+  case( 'dc'  ); call cube( dc,  w1, i1, i2, x1, x2, rr )
+  case( 'co'  ); call cube( co,  w1, i1, i2, x1, x2, rr )
+  case( 'sxx' ); f1 = t1(:,:,:,1); call cube( f1, w1, i1, i2, x1, x2, rr ); t1(:,:,:,1) = f1
+  case( 'syy' ); f1 = t1(:,:,:,2); call cube( f1, w1, i1, i2, x1, x2, rr ); t1(:,:,:,2) = f1
+  case( 'szz' ); f1 = t1(:,:,:,3); call cube( f1, w1, i1, i2, x1, x2, rr ); t1(:,:,:,3) = f1
+  case( 'syz' ); f1 = t2(:,:,:,1); call cube( f1, w1, i1, i2, x1, x2, rr ); t2(:,:,:,1) = f1
+  case( 'szx' ); f1 = t2(:,:,:,2); call cube( f1, w1, i1, i2, x1, x2, rr ); t2(:,:,:,2) = f1
+  case( 'sxy' ); f1 = t2(:,:,:,3); call cube( f1, w1, i1, i2, x1, x2, rr ); t2(:,:,:,3) = f1
+  case( 'ts1' ); f1 = t3(:,:,:,1); call cube( f1, w1, i1, i2, x1, x2, rr ); t3(:,:,:,1) = f1
+  case( 'ts2' ); f1 = t3(:,:,:,2); call cube( f1, w1, i1, i2, x1, x2, rr ); t3(:,:,:,2) = f1
+  case( 'tn'  ); f1 = t3(:,:,:,3); call cube( f1, w1, i1, i2, x1, x2, rr ); t3(:,:,:,3) = f1
   end select
 end select
 end do
@@ -127,7 +127,7 @@ i1 = i1node
 i2 = i2node
 i1(ifn) = ihypo(ifn)
 i2(ifn) = ihypo(ifn)
-call surfnormals( nhat, x, i1, i2 )
+call surfnormals( nhat, w1, i1, i2 )
 area = sign( 1, faultnormal ) * sqrt( sum( nhat * nhat, 4 ) )
 f1 = area
 where ( f1 /= 0. ) f1 = 1. / f1
@@ -182,7 +182,7 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 do i = 1, 3
-  t2(:,:,:,i) = x(j1:j2,k1:k2,l1:l2,i) - xhypo(i)
+  t2(:,:,:,i) = w1(j1:j2,k1:k2,l1:l2,i) - xhypo(i)
 end do
 rhypo = sqrt( sum( t2 * t2, 4 ) )
 

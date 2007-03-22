@@ -19,14 +19,13 @@ if ( rsource <= 0. ) return
 if ( master ) write( 0, * ) 'Moment source initialize'
 
 ! Cell volumes
-call diffnc( s1, maxval( oper ), x, x, dx, 1, 1, i1cell, i2cell )
+call diffnc( s1, oplevel, w1, w1, dx, 1, 1, i1cell, i2cell )
 
 ! Cell center distance
-call vectoraverage( w2, x, i1cell, i2cell, 1 )
-do i = 1, 3
-  w2(:,:,:,i) = w2(:,:,:,i) - xhypo(i)
-end do
-s2 = sqrt( sum( w2 * w2, 4 ) )
+s2 = sqrt( &
+  ( w2(:,:,:,1) - xhypo(1) ) * ( w2(:,:,:,1) - xhypo(1) ) + &
+  ( w2(:,:,:,2) - xhypo(2) ) * ( w2(:,:,:,2) - xhypo(2) ) + &
+  ( w2(:,:,:,3) - xhypo(3) ) * ( w2(:,:,:,3) - xhypo(3) ) )
 call sethalo( s2, 2.*rsource, i1cell, i2cell )
 nsrc = count( s2 <= rsource )
 allocate( jj(nsrc), kk(nsrc), ll(nsrc), cellvol(nsrc), srcfr(nsrc) )

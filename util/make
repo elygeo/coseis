@@ -68,8 +68,8 @@ $sfc $flags utm.f90 tscoords.f90 tsgrid.f90 -o tsgrid
 $sfc $flags utm.f90 tscoords.f90 tsgridr.f90 -o tsgridr
 $sfc $flags utm.f90 tscoords.f90 ts2ll.f90 -o ts2ll
 $sfc $flags utm.f90 pscoords.f90 ps2ll.f90 -o ps2ll
-$sfc $flags $getarg utm.f90 tscoords.f90 ll2ts.f90 -o ll2ts
-$sfc $flags $getarg utm.f90 pscoords.f90 ll2ps.f90 -o ll2ps
+$sfc $flags utm.f90 tscoords.f90 ll2ts.f90 -o ll2ts
+$sfc $flags utm.f90 pscoords.f90 ll2ps.f90 -o ll2ps
 $sfc $flags $getarg utm.f90 ll2utm.f90 -o ll2utm
 $sfc $flags drape.f90 -o drape
 $sfc $flags $getarg swab.f90 -o swab

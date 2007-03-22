@@ -9,6 +9,10 @@ integer, parameter :: &
   nz = 80,       & ! max number of input and output zones
   nhalo = 1        ! number of ghost nodes
 
+! 4d vectors
+real, allocatable, dimension(:,:,:,:,:) :: &
+  bb             & ! B matrix
+
 ! 3d vectors
 real, allocatable, dimension(:,:,:,:) :: &
   x,             & ! node locations
@@ -163,11 +167,7 @@ integer :: &
   ifn              ! fault normal component=abs(faultnormal)
 
 integer :: &
-  oper(2),       & ! 1=constant, 2=rectangular, 3=parallelepiped, 4=one-point quadrature, 5=exact
-  oplevel,       & ! max operator number, higher is more expensive, and more accurate
-  noper,         & ! number of zones for spatial derivative operators
-  i1oper(2,3),   & ! j1 k1 l1 operator zone start index
-  i2oper(2,3),   & ! j2 k2 l2 operator zone end index
+  oplevel,       & ! 1=constant, 2=rectangular, 3=parallelepiped, 4=one-point quadrature, 5=exact
   nin = 0,       & ! number of zones for input
   i1in(nz,3),    & ! j1 k1 l1 input start index
   i2in(nz,3),    & ! j1 k1 l1 input end index

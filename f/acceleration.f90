@@ -19,16 +19,12 @@ doid: do iid = 1, 3; id = modulo( ic + iid - 2, 3 ) + 1
 
 ! Elastic region
 ! f_i = w_ij,j
-do iz = 1, noper
-  i1 = max( i1oper(iz,:), i1node )
-  i2 = min( i2oper(iz,:), i2node )
-  if ( ic == id ) then
-    call diffcn( s1, oper(iz), w1, x, dx, ic, id, i1, i2 )
-  else
-    i = 6 - ic - id
-    call diffcn( s1, oper(iz), w2, x, dx, i, id, i1, i2 )
-  end if
-end do
+if ( ic == id ) then
+  call diffcn( s1, oplevel, w1, x, dx, ic, id, i1node, i2node )
+else
+  i = 6 - ic - id
+  call diffcn( s1, oplevel, w2, x, dx, i, id, i1node, i2node )
+end if
 
 ! PML region
 ! p'_ij + d_j*p_ij = w_ij,j (no summation convetion)

@@ -5,17 +5,8 @@ use m_pscoords
 implicit none
 character(1024) :: str
 real :: x(1,1,1,2)
-integer :: i, clip, command_argument_count
+integer :: i
 
-clip = 0
-do i = 1, command_argument_count()
-  call get_command_argument( i, str )
-  if ( str == '-c' ) then
-    clip = 1
-  else
-    write( 0, * ) 'unknown option: ', trim( str )
-  end if
-end do
 doline: do
   read( 5, '(a)', iostat=i ) str
   if ( i /= 0 ) exit doline

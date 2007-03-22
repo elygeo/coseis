@@ -70,11 +70,11 @@ case( 'x' )
       j1 = i1(1); j2 = i2(1)
       k1 = i1(2); k2 = i2(2)
       l1 = i1(3); l2 = i2(3)
-      do i = 1, 3
-        t2(:,:,:,i) = xout(iz,i) - x(j1:j2,k1:k2,l1:l2,i)
-      end do
-      i = abs( faultnormal )
-      f2 = sum( t2 * t2, 4 )
+      t2 = w2(j1:j2,k1:k2,l1:l2,:)
+      f2 = ( &
+        ( t2(:,:,:,1) - xout(iz,1) ) * ( t2(:,:,:,1) - xout(iz,1) ) + &
+        ( t2(:,:,:,2) - xout(iz,2) ) * ( t2(:,:,:,2) - xout(iz,2) ) + &
+        ( t2(:,:,:,3) - xout(iz,3) ) * ( t2(:,:,:,3) - xout(iz,3) ) )
       rout = 2 * dx * dx + maxval( f2 )
       call sethalo( f2, rout, i1node, i2node )
       call reduceloc( rout, i1, f2, 'allmin', n, noff, i )
@@ -82,20 +82,19 @@ case( 'x' )
     end if
   else
     if ( cell ) then
-      call vectoraverage( w2, x, i1node, i2cell, 1 )
-      do i = 1, 3
-        w2(:,:,:,i) = xout(iz,i) - w2(:,:,:,i)
-      end do
-      s2 = sum( w2 * w2, 4 )
+      s2 = ( &
+        ( w2(:,:,:,1) - xout(iz,1) ) * ( w2(:,:,:,1) - xout(iz,1) ) + &
+        ( w2(:,:,:,2) - xout(iz,2) ) * ( w2(:,:,:,2) - xout(iz,2) ) + &
+        ( w2(:,:,:,3) - xout(iz,3) ) * ( w2(:,:,:,3) - xout(iz,3) ) )
       rout = 2 * dx * dx + maxval( s2 )
       call sethalo( s2, rout, i1node, i2cell )
       i1 = i1node
       i2 = i2cell
     else
-      do i = 1, 3
-        w2(:,:,:,i) = xout(iz,i) - x(:,:,:,i)
-      end do
-      s2 = sum( w2 * w2, 4 )
+      s2 = ( &
+        ( w1(:,:,:,1) - xout(iz,1) ) * ( w1(:,:,:,1) - xout(iz,1) ) + &
+        ( w1(:,:,:,2) - xout(iz,2) ) * ( w1(:,:,:,2) - xout(iz,2) ) + &
+        ( w1(:,:,:,3) - xout(iz,3) ) * ( w1(:,:,:,3) - xout(iz,3) ) )
       rout = 2 * dx * dx + maxval( s2 )
       call sethalo( s2, rout, i1node, i2node )
     end if
@@ -276,7 +275,7 @@ do ic = 1, nc
   end if
   end if
   select case( fieldout(iz) )
-  case( 'x'    ); call vectorio( 'w', str, x,    ic, ir, i1, i2, i3, i4, iz )
+  case( 'x'    ); call vectorio( 'w', str, w1,   ic, ir, i1, i2, i3, i4, iz )
   case( 'rho'  ); call scalario( 'w', str, mr,       ir, i1, i2, i3, i4, iz )
   case( 'vp'   ); call scalario( 'w', str, s1,       ir, i1, i2, i3, i4, iz )
   case( 'vs'   ); call scalario( 'w', str, s2,       ir, i1, i2, i3, i4, iz )
