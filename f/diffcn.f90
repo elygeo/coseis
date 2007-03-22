@@ -3,10 +3,10 @@ module m_diffcn
 implicit none
 contains
 
-subroutine diffcn( df, oper, f, x, dx, i, a, i1, i2 )
+subroutine diffcn( df, f, i, a, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
 real, intent(out) :: df(:,:,:)
-real, intent(in) :: f(:,:,:,:), x(:,:,:,:), dx
-integer, intent(in) :: oper, i, a, i1(3), i2(3)
+real, intent(in) :: f(:,:,:,:), bb(:,:,:,:,:), x(:,:,:,:), dx1(:), dx2(:), dx3(:), dx
+integer, intent(in) :: i, a, i1(3), i2(3), oplevel
 real :: h
 integer :: j, k, l, j1, k1, l1, j2, k2, l2, b, c
 
@@ -16,7 +16,7 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
-select case( oper )
+select case( oplevel )
 
 ! Constant grid, flops: 1* 7+
 case( 1 )

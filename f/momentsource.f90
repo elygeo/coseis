@@ -19,21 +19,21 @@ if ( rsource <= 0. ) return
 if ( master ) write( 0, * ) 'Moment source initialize'
 
 ! Cell volumes
-call diffnc( s1, oplevel, w1, w1, dx, 1, 1, i1cell, i2cell )
+i1 = i1cell
+i2 = i2cell
+call diffnc( s1, w1, 1, 1, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
 
 ! Cell center distance
 s2 = sqrt( &
   ( w2(:,:,:,1) - xhypo(1) ) * ( w2(:,:,:,1) - xhypo(1) ) + &
   ( w2(:,:,:,2) - xhypo(2) ) * ( w2(:,:,:,2) - xhypo(2) ) + &
   ( w2(:,:,:,3) - xhypo(3) ) * ( w2(:,:,:,3) - xhypo(3) ) )
-call sethalo( s2, 2.*rsource, i1cell, i2cell )
+call sethalo( s2, 2.*rsource, i1, i2 )
 nsrc = count( s2 <= rsource )
 allocate( jj(nsrc), kk(nsrc), ll(nsrc), cellvol(nsrc), srcfr(nsrc) )
 
 ! Use points inside radius
 i = 0
-i1 = i1cell
-i2 = i2cell
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)

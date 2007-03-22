@@ -19,18 +19,18 @@ doid: do iid = 1, 3; id = modulo( ic + iid - 2, 3 ) + 1
 
 ! Elastic region
 ! f_i = w_ij,j
+i1 = i1node
+i2 = i2node
 if ( ic == id ) then
-  call diffcn( s1, oplevel, w1, x, dx, ic, id, i1node, i2node )
+  call diffcn( s1, w1, ic, id, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
 else
   i = 6 - ic - id
-  call diffcn( s1, oplevel, w2, x, dx, i, id, i1node, i2node )
+  call diffcn( s1, w2, i, id, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
 end if
 
 ! PML region
 ! p'_ij + d_j*p_ij = w_ij,j (no summation convetion)
 ! f_i = sum_j( p_ij' )
-i1 = i1node
-i2 = i2node
 select case( id )
 case( 1 )
   do j = i1(1), min( i2(1), i1pml(1) )

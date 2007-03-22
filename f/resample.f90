@@ -14,7 +14,7 @@ integer :: i1(3), i2(3), j, k, l, j1, k1, l1, j2, k2, l2
 if ( master ) write( 0, * ) 'Resample material model'
 
 ! Cell volume
-call diffnc( s1, oplevel, w1, w1, dx, 1, 1, i1cell, i2cell )
+call diffnc( s1, w1, 1, 1, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
 select case( ifn )
 case( 1 ); j = ihypo(1); s1(j,:,:) = 0.; y(k,:,:) = 0.
 case( 2 ); k = ihypo(2); s1(:,k,:) = 0.; y(:,k,:) = 0.
