@@ -14,7 +14,6 @@ l = i2(3)
 
 ! 3d vectors
 allocate(       &
-  x(j,k,l,3),   &
   v(j,k,l,3),   &
   u(j,k,l,3),   &
 ! z1(j,k,l,3),  &

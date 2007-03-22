@@ -48,40 +48,44 @@ case( 3 )
   end forall
 end select
  
-! Rectangular grid, flops: 3* 9+
+! Rectangular grid, flops: 2* 7+
 case( 2 )
 select case( a )
 case( 1 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-  df(j,k,l) = 0.25 * &
-  ( ( x(j,k+1,l,2) - x(j,k,l,2) ) &
-  * ( x(j,k,l+1,3) - x(j,k,l,3) ) &
-  * ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
-    + f(j+1,k,l,i) - f(j,k+1,l+1,i) &
-    - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
-    - f(j,k,l+1,i) + f(j+1,k+1,l,i) ) )
+  df(j,k,l) = dx2(k) * dx3(l) * &
+  ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
+  + f(j+1,k,l,i) - f(j,k+1,l+1,i) &
+  - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
+  - f(j,k,l+1,i) + f(j+1,k+1,l,i) )
   end forall
 case( 2 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-  df(j,k,l) = 0.25 * &
-  ( ( x(j,k,l+1,3) - x(j,k,l,3) ) &
-  * ( x(j+1,k,l,1) - x(j,k,l,1) ) &
-  * ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
-    - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
-    + f(j,k+1,l,i) - f(j+1,k,l+1,i) &
-    - f(j,k,l+1,i) + f(j+1,k+1,l,i) ) )
+  df(j,k,l) = dx3(l) * dx1(j) * &
+  ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
+  - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
+  + f(j,k+1,l,i) - f(j+1,k,l+1,i) &
+  - f(j,k,l+1,i) + f(j+1,k+1,l,i) )
   end forall
 case( 3 )
   forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-  df(j,k,l) = 0.25 * &
-  ( ( x(j+1,k,l,1) - x(j,k,l,1) ) &
-  * ( x(j,k+1,l,2) - x(j,k,l,2) ) &
-  * ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
-    - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
-    - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
-    + f(j,k,l+1,i) - f(j+1,k+1,l,i) ) )
+  df(j,k,l) = dx1(j) * dx2(k) * &
+  ( f(j+1,k+1,l+1,i) - f(j,k,l,i) &
+  - f(j+1,k,l,i) + f(j,k+1,l+1,i) &
+  - f(j,k+1,l,i) + f(j+1,k,l+1,i) &
+  + f(j,k,l+1,i) - f(j+1,k+1,l,i) )
   end forall
 end select
+
+! Saved B matrix, flops: 8* 7+
+case( 9 )
+forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  df(j,k,l) = &
+  bb(j,k,l,1,i) * f(j+1,k+1,l+1,i) + f(j,k,l,i) * bb(j,k,l,5,i) + &
+  bb(j,k,l,2,i) * f(j+1,k,l,i) + f(j,k+1,l+1,i) * bb(j,k,l,6,i) + &
+  bb(j,k,l,3,i) * f(j,k+1,l,i) + f(j+1,k,l+1,i) * bb(j,k,l,7,i) + &
+  bb(j,k,l,4,i) * f(j,k,l+1,i) + f(j+1,k+1,l,i) * bb(j,k,l,8,i)
+end forall
 
 ! Parallelepiped grid, flops: 17* 27+
 case( 3 )

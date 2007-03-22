@@ -303,8 +303,58 @@ call rreduce( rmax, sqrt( maxval( s2 ) ), 'max', 0 )
 ! Cell center locations
 call vectoraverage( w2, w1, i1node, i2cell, 1 )
 
-! Use fast operators is mesh permits it
+! Operators
 if ( oplevel > 1 ) call optimize( oplevel, i1cell, i2cell+1, w1, dx )
+select case( oplevel )
+case( 2 )
+  allocate( dx1(nm(1)), dx2(nm(2)), dx3(nm(3)) )
+  forall( i=1:nm(1)-1 ) dx1(i) = .5 * ( w1(i+1,2,2,1) - w1(i,2,2,1) )
+  forall( i=1:nm(2)-1 ) dx2(i) = .5 * ( w1(2,i+1,2,2) - w1(2,i,2,2) )
+  forall( i=1:nm(3)-1 ) dx3(i) = .5 * ( w1(2,2,i+1,3) - w1(2,2,i,3) )
+case( 3-5 )
+  allocate( x(nm(1),nm(2),nm(3),3) )
+  x = w1
+case( 9 )
+  allocate( bb(nm(1),nm(2),nm(3),8,3) )
+  do i = 1, 3
+    b = modulo( a, 3 ) + 1
+    c = modulo( a + 1, 3 ) + 1
+    forall( j=1:nm(1)-1, k=1:nm(2)-1, l=1:nm(3)-1 )
+      bb(j,k,l,1,i) = 1. / 12. * &
+        ((x(j+1,k,l,b)-x(j,k+1,l+1,b))*(x(j+1,k+1,l,c)-x(j+1,k,l+1,c))+x(j,k+1,l+1,b)*(x(j,k,l+1,c)-x(j,k+1,l,c)) &
+        +(x(j,k+1,l,b)-x(j+1,k,l+1,b))*(x(j,k+1,l+1,c)-x(j+1,k+1,l,c))+x(j+1,k,l+1,b)*(x(j+1,k,l,c)-x(j,k,l+1,c)) &
+        +(x(j,k,l+1,b)-x(j+1,k+1,l,b))*(x(j+1,k,l+1,c)-x(j,k+1,l+1,c))+x(j+1,k+1,l,b)*(x(j,k+1,l,c)-x(j+1,k,l,c)))
+      bb(j,k,l,2,i) = 1. / 12. * &
+        ((x(j+1,k+1,l+1,b)-x(j,k,l,b))*(x(j+1,k,l+1,c)-x(j+1,k+1,l,c))+x(j,k,l,b)*(x(j,k+1,l,c)-x(j,k,l+1,c)) &
+        +(x(j,k+1,l,b)-x(j+1,k,l+1,b))*(x(j+1,k+1,l,c)-x(j,k,l,c))+x(j+1,k,l+1,b)*(x(j,k,l+1,c)-x(j+1,k+1,l+1,c)) &
+        +(x(j,k,l+1,b)-x(j+1,k+1,l,b))*(x(j,k,l,c)-x(j+1,k,l+1,c))+x(j+1,k+1,l,b)*(x(j+1,k+1,l+1,c)-x(j,k+1,l,c)))
+      bb(j,k,l,3,i) = 1. / 12. * &
+        ((x(j+1,k+1,l+1,b)-x(j,k,l,b))*(x(j+1,k+1,l,c)-x(j,k+1,l+1,c))+x(j,k,l,b)*(x(j,k,l+1,c)-x(j+1,k,l,c)) &
+        +(x(j+1,k,l,b)-x(j,k+1,l+1,b))*(x(j,k,l,c)-x(j+1,k+1,l,c))+x(j,k+1,l+1,b)*(x(j+1,k+1,l+1,c)-x(j,k,l+1,c)) &
+        +(x(j,k,l+1,b)-x(j+1,k+1,l,b))*(x(j,k+1,l+1,c)-x(j,k,l,c))+x(j+1,k+1,l,b)*(x(j+1,k,l,c)-x(j+1,k+1,l+1,c)))
+      bb(j,k,l,4,i) = 1. / 12. * &
+        ((x(j+1,k+1,l+1,b)-x(j,k,l,b))*(x(j,k+1,l+1,c)-x(j+1,k,l+1,c))+x(j,k,l,b)*(x(j+1,k,l,c)-x(j,k+1,l,c)) &
+        +(x(j+1,k,l,b)-x(j,k+1,l+1,b))*(x(j+1,k,l+1,c)-x(j,k,l,c))+x(j,k+1,l+1,b)*(x(j,k+1,l,c)-x(j+1,k+1,l+1,c)) &
+        +(x(j,k+1,l,b)-x(j+1,k,l+1,b))*(x(j,k,l,c)-x(j,k+1,l+1,c))+x(j+1,k,l+1,b)*(x(j+1,k+1,l+1,c)-x(j+1,k,l,c)))
+      bb(j,k,l,5,i) = 1. / 12. * &
+        ((x(j,k+1,l+1,b)-x(j+1,k,l,b))*(x(j,k+1,l,c)-x(j,k,l+1,c))+x(j+1,k,l,b)*(x(j+1,k,l+1,c)-x(j+1,k+1,l,c)) &
+        +(x(j+1,k,l+1,b)-x(j,k+1,l,b))*(x(j,k,l+1,c)-x(j+1,k,l,c))+x(j,k+1,l,b)*(x(j+1,k+1,l,c)-x(j,k+1,l+1,c)) &
+        +(x(j+1,k+1,l,b)-x(j,k,l+1,b))*(x(j+1,k,l,c)-x(j,k+1,l,c))+x(j,k,l+1,b)*(x(j,k+1,l+1,c)-x(j+1,k,l+1,c)))
+      bb(j,k,l,6,i) = 1. / 12. * &
+        ((x(j,k,l,b)-x(j+1,k+1,l+1,b))*(x(j,k,l+1,c)-x(j,k+1,l,c))+x(j+1,k+1,l+1,b)*(x(j+1,k+1,l,c)-x(j+1,k,l+1,c)) &
+        +(x(j+1,k,l+1,b)-x(j,k+1,l,b))*(x(j+1,k+1,l+1,c)-x(j,k,l+1,c))+x(j,k+1,l,b)*(x(j,k,l,c)-x(j+1,k+1,l,c)) &
+        +(x(j+1,k+1,l,b)-x(j,k,l+1,b))*(x(j,k+1,l,c)-x(j+1,k+1,l+1,c))+x(j,k,l+1,b)*(x(j+1,k,l+1,c)-x(j,k,l,c)))
+      bb(j,k,l,7,i) = 1. / 12. * &
+        ((x(j,k,l,b)-x(j+1,k+1,l+1,b))*(x(j+1,k,l,c)-x(j,k,l+1,c))+x(j+1,k+1,l+1,b)*(x(j,k+1,l+1,c)-x(j+1,k+1,l,c)) &
+        +(x(j,k+1,l+1,b)-x(j+1,k,l,b))*(x(j,k,l+1,c)-x(j+1,k+1,l+1,c))+x(j+1,k,l,b)*(x(j+1,k+1,l,c)-x(j,k,l,c)) &
+        +(x(j+1,k+1,l,b)-x(j,k,l+1,b))*(x(j+1,k+1,l+1,c)-x(j+1,k,l,c))+x(j,k,l+1,b)*(x(j,k,l,c)-x(j,k+1,l+1,c)))
+      bb(j,k,l,8,i) = 1. / 12. * &
+        ((x(j,k,l,b)-x(j+1,k+1,l+1,b))*(x(j,k+1,l,c)-x(j+1,k,l,c))+x(j+1,k+1,l+1,b)*(x(j+1,k,l+1,c)-x(j,k+1,l+1,c)) &
+        +(x(j,k+1,l+1,b)-x(j+1,k,l,b))*(x(j+1,k+1,l+1,c)-x(j,k+1,l,c))+x(j+1,k,l,b)*(x(j,k,l,c)-x(j+1,k,l+1,c)) &
+        +(x(j+1,k,l+1,b)-x(j,k+1,l,b))*(x(j+1,k,l,c)-x(j+1,k+1,l+1,c))+x(j,k+1,l,b)*(x(j,k+1,l+1,c)-x(j,k,l,c)))
+    end forall
+  end do
+end select
 
 end subroutine
 
