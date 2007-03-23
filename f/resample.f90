@@ -9,29 +9,20 @@ use m_collective
 use m_diffnc
 use m_bc
 use m_util
-integer :: i1(3), i2(3), j, k, l, j1, k1, l1, j2, k2, l2
+integer :: i
 
 if ( master ) write( 0, * ) 'Resample material model'
 
 ! Cell volume
-call diffnc( s1, w1, 1, 1, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
-select case( ifn )
-case( 1 ); j = ihypo(1); s1(j,:,:) = 0.; y(k,:,:) = 0.
-case( 2 ); k = ihypo(2); s1(:,k,:) = 0.; y(:,k,:) = 0.
-case( 3 ); l = ihypo(3); s1(:,:,l) = 0.; y(:,:,l) = 0.
-end select
+call diffnc( s1, w1, 1, 1, i1cell, i2cell, oplevel, bb, x, dx1, dx2, dx3, dx )
 call sethalo( s1, 0., i1cell, i2cell )
+select case( ifn )
+case( 1 ); i = ihypo(1); s1(i,:,:) = 0.; y(i,:,:) = 0.
+case( 2 ); i = ihypo(2); s1(:,i,:) = 0.; y(:,i,:) = 0.
+case( 3 ); i = ihypo(3); s1(:,:,i) = 0.; y(:,:,i) = 0.
+end select
 
-! Mass ratio, SOM style
-!call scalaraverage( s2, mr, i1node, i2node, -1 )
-!mr = s2
-!call scalaraverage( s2, s1, i1node, i2node, -1 )
-!mr = mr * s2
-!where ( mr /= 0. ) mr = 1. / mr
-!call scalarbc( mr, ibc1, ibc2, nhalo, 0 )
-!call scalarswaphalo( mr, nhalo )
-
-! Mass ratio, FEM style
+! Mass ratio
 s2 = mr * s1
 call scalaraverage( mr, s2, i1node, i2node, -1 )
 where ( mr /= 0. ) mr = 1. / mr

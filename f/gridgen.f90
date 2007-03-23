@@ -7,8 +7,9 @@ subroutine gridgen
 use m_globals
 use m_optimize
 use m_collective
+use m_util
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), i, j, k, l, &
-  j1, k1, l1, j2, k2, l2, idoublenode
+  j1, k1, l1, j2, k2, l2, idoublenode, b, c
 real :: x0(3), xlim(6), gxlim(6), m(9)
 logical :: expand
 
@@ -263,7 +264,13 @@ case( 1 ); w1(j+1:nm(1),:,:,:) = w1(j:nm(1)-1,:,:,:)
 case( 2 ); w1(:,k+1:nm(2),:,:) = w1(:,k:nm(2)-1,:,:)
 case( 3 ); w1(:,:,l+1:nm(3),:) = w1(:,:,l:nm(3)-1,:)
 end select
+
+! Fill halo
 call vectorswaphalo( w1, nhalo )
+
+! Cell center locations
+w2 = 0.
+call vectoraverage( w2, w1, i1cell, i2cell, 1 )
 
 ! Hypocenter location
 select case( abs( fixhypo ) )
@@ -271,11 +278,7 @@ case( 1 )
   if ( master ) x0 = w1(j,k,l,:)
   call rbroadcast1( x0 )
 case( 2 )
-  if ( master ) x0 = 0.125 * &
-    ( w1(j,k,l,:) + w1(j+1,k+1,l+1,:) &
-    + w1(j+1,k,l,:) + w1(j,k+1,l+1,:) &
-    + w1(j,k+1,l,:) + w1(j+1,k,l+1,:) &
-    + w1(j,k,l+1,:) + w1(j+1,k+1,l,:) )
+  if ( master ) x0 = w2(j,k,l,:)
   call rbroadcast1( x0 )
 end select
 if ( fixhypo > 0 ) then
@@ -284,6 +287,9 @@ elseif ( fixhypo < 0 ) then
   w1(:,:,:,1) = w1(:,:,:,1) - x0(1) + xhypo(1)
   w1(:,:,:,2) = w1(:,:,:,2) - x0(2) + xhypo(2)
   w1(:,:,:,3) = w1(:,:,:,3) - x0(3) + xhypo(3)
+  w2(:,:,:,1) = w2(:,:,:,1) - x0(1) + xhypo(1)
+  w2(:,:,:,2) = w2(:,:,:,2) - x0(2) + xhypo(2)
+  w2(:,:,:,3) = w2(:,:,:,3) - x0(3) + xhypo(3)
 end if
 
 ! Grid Dimensions
@@ -294,14 +300,10 @@ do i = 1,3
 end do
 call rreduce1( gxlim, xlim, 'min', 0 )
 xcenter = .5 * ( gxlim(1:3) - gxlim(4:6) )
-s2 = ( &
-  ( w1(:,:,:,1) - xcenter(1) ) * ( w1(:,:,:,1) - xcenter(1) ) + &
-  ( w1(:,:,:,2) - xcenter(2) ) * ( w1(:,:,:,2) - xcenter(2) ) + &
-  ( w1(:,:,:,3) - xcenter(3) ) * ( w1(:,:,:,3) - xcenter(3) ) )
+s2 = ( w1(:,:,:,1) - xcenter(1) ) * ( w1(:,:,:,1) - xcenter(1) ) &
+   + ( w1(:,:,:,2) - xcenter(2) ) * ( w1(:,:,:,2) - xcenter(2) ) &
+   + ( w1(:,:,:,3) - xcenter(3) ) * ( w1(:,:,:,3) - xcenter(3) )
 call rreduce( rmax, sqrt( maxval( s2 ) ), 'max', 0 )
-
-! Cell center locations
-call vectoraverage( w2, w1, i1node, i2cell, 1 )
 
 ! Operators
 if ( oplevel > 1 ) call optimize( oplevel, i1cell, i2cell+1, w1, dx )
@@ -317,41 +319,41 @@ case( 3-5 )
 case( 9 )
   allocate( bb(nm(1),nm(2),nm(3),8,3) )
   do i = 1, 3
-    b = modulo( a, 3 ) + 1
-    c = modulo( a + 1, 3 ) + 1
+    b = modulo( i, 3 ) + 1
+    c = modulo( i + 1, 3 ) + 1
     forall( j=1:nm(1)-1, k=1:nm(2)-1, l=1:nm(3)-1 )
       bb(j,k,l,1,i) = 1. / 12. * &
-        ((x(j+1,k,l,b)-x(j,k+1,l+1,b))*(x(j+1,k+1,l,c)-x(j+1,k,l+1,c))+x(j,k+1,l+1,b)*(x(j,k,l+1,c)-x(j,k+1,l,c)) &
-        +(x(j,k+1,l,b)-x(j+1,k,l+1,b))*(x(j,k+1,l+1,c)-x(j+1,k+1,l,c))+x(j+1,k,l+1,b)*(x(j+1,k,l,c)-x(j,k,l+1,c)) &
-        +(x(j,k,l+1,b)-x(j+1,k+1,l,b))*(x(j+1,k,l+1,c)-x(j,k+1,l+1,c))+x(j+1,k+1,l,b)*(x(j,k+1,l,c)-x(j+1,k,l,c)))
+        ((w1(j+1,k,l,b)-w1(j,k+1,l+1,b))*(w1(j+1,k+1,l,c)-w1(j+1,k,l+1,c))+w1(j,k+1,l+1,b)*(w1(j,k,l+1,c)-w1(j,k+1,l,c)) &
+        +(w1(j,k+1,l,b)-w1(j+1,k,l+1,b))*(w1(j,k+1,l+1,c)-w1(j+1,k+1,l,c))+w1(j+1,k,l+1,b)*(w1(j+1,k,l,c)-w1(j,k,l+1,c)) &
+        +(w1(j,k,l+1,b)-w1(j+1,k+1,l,b))*(w1(j+1,k,l+1,c)-w1(j,k+1,l+1,c))+w1(j+1,k+1,l,b)*(w1(j,k+1,l,c)-w1(j+1,k,l,c)))
       bb(j,k,l,2,i) = 1. / 12. * &
-        ((x(j+1,k+1,l+1,b)-x(j,k,l,b))*(x(j+1,k,l+1,c)-x(j+1,k+1,l,c))+x(j,k,l,b)*(x(j,k+1,l,c)-x(j,k,l+1,c)) &
-        +(x(j,k+1,l,b)-x(j+1,k,l+1,b))*(x(j+1,k+1,l,c)-x(j,k,l,c))+x(j+1,k,l+1,b)*(x(j,k,l+1,c)-x(j+1,k+1,l+1,c)) &
-        +(x(j,k,l+1,b)-x(j+1,k+1,l,b))*(x(j,k,l,c)-x(j+1,k,l+1,c))+x(j+1,k+1,l,b)*(x(j+1,k+1,l+1,c)-x(j,k+1,l,c)))
+        ((w1(j+1,k+1,l+1,b)-w1(j,k,l,b))*(w1(j+1,k,l+1,c)-w1(j+1,k+1,l,c))+w1(j,k,l,b)*(w1(j,k+1,l,c)-w1(j,k,l+1,c)) &
+        +(w1(j,k+1,l,b)-w1(j+1,k,l+1,b))*(w1(j+1,k+1,l,c)-w1(j,k,l,c))+w1(j+1,k,l+1,b)*(w1(j,k,l+1,c)-w1(j+1,k+1,l+1,c)) &
+        +(w1(j,k,l+1,b)-w1(j+1,k+1,l,b))*(w1(j,k,l,c)-w1(j+1,k,l+1,c))+w1(j+1,k+1,l,b)*(w1(j+1,k+1,l+1,c)-w1(j,k+1,l,c)))
       bb(j,k,l,3,i) = 1. / 12. * &
-        ((x(j+1,k+1,l+1,b)-x(j,k,l,b))*(x(j+1,k+1,l,c)-x(j,k+1,l+1,c))+x(j,k,l,b)*(x(j,k,l+1,c)-x(j+1,k,l,c)) &
-        +(x(j+1,k,l,b)-x(j,k+1,l+1,b))*(x(j,k,l,c)-x(j+1,k+1,l,c))+x(j,k+1,l+1,b)*(x(j+1,k+1,l+1,c)-x(j,k,l+1,c)) &
-        +(x(j,k,l+1,b)-x(j+1,k+1,l,b))*(x(j,k+1,l+1,c)-x(j,k,l,c))+x(j+1,k+1,l,b)*(x(j+1,k,l,c)-x(j+1,k+1,l+1,c)))
+        ((w1(j+1,k+1,l+1,b)-w1(j,k,l,b))*(w1(j+1,k+1,l,c)-w1(j,k+1,l+1,c))+w1(j,k,l,b)*(w1(j,k,l+1,c)-w1(j+1,k,l,c)) &
+        +(w1(j+1,k,l,b)-w1(j,k+1,l+1,b))*(w1(j,k,l,c)-w1(j+1,k+1,l,c))+w1(j,k+1,l+1,b)*(w1(j+1,k+1,l+1,c)-w1(j,k,l+1,c)) &
+        +(w1(j,k,l+1,b)-w1(j+1,k+1,l,b))*(w1(j,k+1,l+1,c)-w1(j,k,l,c))+w1(j+1,k+1,l,b)*(w1(j+1,k,l,c)-w1(j+1,k+1,l+1,c)))
       bb(j,k,l,4,i) = 1. / 12. * &
-        ((x(j+1,k+1,l+1,b)-x(j,k,l,b))*(x(j,k+1,l+1,c)-x(j+1,k,l+1,c))+x(j,k,l,b)*(x(j+1,k,l,c)-x(j,k+1,l,c)) &
-        +(x(j+1,k,l,b)-x(j,k+1,l+1,b))*(x(j+1,k,l+1,c)-x(j,k,l,c))+x(j,k+1,l+1,b)*(x(j,k+1,l,c)-x(j+1,k+1,l+1,c)) &
-        +(x(j,k+1,l,b)-x(j+1,k,l+1,b))*(x(j,k,l,c)-x(j,k+1,l+1,c))+x(j+1,k,l+1,b)*(x(j+1,k+1,l+1,c)-x(j+1,k,l,c)))
+        ((w1(j+1,k+1,l+1,b)-w1(j,k,l,b))*(w1(j,k+1,l+1,c)-w1(j+1,k,l+1,c))+w1(j,k,l,b)*(w1(j+1,k,l,c)-w1(j,k+1,l,c)) &
+        +(w1(j+1,k,l,b)-w1(j,k+1,l+1,b))*(w1(j+1,k,l+1,c)-w1(j,k,l,c))+w1(j,k+1,l+1,b)*(w1(j,k+1,l,c)-w1(j+1,k+1,l+1,c)) &
+        +(w1(j,k+1,l,b)-w1(j+1,k,l+1,b))*(w1(j,k,l,c)-w1(j,k+1,l+1,c))+w1(j+1,k,l+1,b)*(w1(j+1,k+1,l+1,c)-w1(j+1,k,l,c)))
       bb(j,k,l,5,i) = 1. / 12. * &
-        ((x(j,k+1,l+1,b)-x(j+1,k,l,b))*(x(j,k+1,l,c)-x(j,k,l+1,c))+x(j+1,k,l,b)*(x(j+1,k,l+1,c)-x(j+1,k+1,l,c)) &
-        +(x(j+1,k,l+1,b)-x(j,k+1,l,b))*(x(j,k,l+1,c)-x(j+1,k,l,c))+x(j,k+1,l,b)*(x(j+1,k+1,l,c)-x(j,k+1,l+1,c)) &
-        +(x(j+1,k+1,l,b)-x(j,k,l+1,b))*(x(j+1,k,l,c)-x(j,k+1,l,c))+x(j,k,l+1,b)*(x(j,k+1,l+1,c)-x(j+1,k,l+1,c)))
+        ((w1(j,k+1,l+1,b)-w1(j+1,k,l,b))*(w1(j,k+1,l,c)-w1(j,k,l+1,c))+w1(j+1,k,l,b)*(w1(j+1,k,l+1,c)-w1(j+1,k+1,l,c)) &
+        +(w1(j+1,k,l+1,b)-w1(j,k+1,l,b))*(w1(j,k,l+1,c)-w1(j+1,k,l,c))+w1(j,k+1,l,b)*(w1(j+1,k+1,l,c)-w1(j,k+1,l+1,c)) &
+        +(w1(j+1,k+1,l,b)-w1(j,k,l+1,b))*(w1(j+1,k,l,c)-w1(j,k+1,l,c))+w1(j,k,l+1,b)*(w1(j,k+1,l+1,c)-w1(j+1,k,l+1,c)))
       bb(j,k,l,6,i) = 1. / 12. * &
-        ((x(j,k,l,b)-x(j+1,k+1,l+1,b))*(x(j,k,l+1,c)-x(j,k+1,l,c))+x(j+1,k+1,l+1,b)*(x(j+1,k+1,l,c)-x(j+1,k,l+1,c)) &
-        +(x(j+1,k,l+1,b)-x(j,k+1,l,b))*(x(j+1,k+1,l+1,c)-x(j,k,l+1,c))+x(j,k+1,l,b)*(x(j,k,l,c)-x(j+1,k+1,l,c)) &
-        +(x(j+1,k+1,l,b)-x(j,k,l+1,b))*(x(j,k+1,l,c)-x(j+1,k+1,l+1,c))+x(j,k,l+1,b)*(x(j+1,k,l+1,c)-x(j,k,l,c)))
+        ((w1(j,k,l,b)-w1(j+1,k+1,l+1,b))*(w1(j,k,l+1,c)-w1(j,k+1,l,c))+w1(j+1,k+1,l+1,b)*(w1(j+1,k+1,l,c)-w1(j+1,k,l+1,c)) &
+        +(w1(j+1,k,l+1,b)-w1(j,k+1,l,b))*(w1(j+1,k+1,l+1,c)-w1(j,k,l+1,c))+w1(j,k+1,l,b)*(w1(j,k,l,c)-w1(j+1,k+1,l,c)) &
+        +(w1(j+1,k+1,l,b)-w1(j,k,l+1,b))*(w1(j,k+1,l,c)-w1(j+1,k+1,l+1,c))+w1(j,k,l+1,b)*(w1(j+1,k,l+1,c)-w1(j,k,l,c)))
       bb(j,k,l,7,i) = 1. / 12. * &
-        ((x(j,k,l,b)-x(j+1,k+1,l+1,b))*(x(j+1,k,l,c)-x(j,k,l+1,c))+x(j+1,k+1,l+1,b)*(x(j,k+1,l+1,c)-x(j+1,k+1,l,c)) &
-        +(x(j,k+1,l+1,b)-x(j+1,k,l,b))*(x(j,k,l+1,c)-x(j+1,k+1,l+1,c))+x(j+1,k,l,b)*(x(j+1,k+1,l,c)-x(j,k,l,c)) &
-        +(x(j+1,k+1,l,b)-x(j,k,l+1,b))*(x(j+1,k+1,l+1,c)-x(j+1,k,l,c))+x(j,k,l+1,b)*(x(j,k,l,c)-x(j,k+1,l+1,c)))
+        ((w1(j,k,l,b)-w1(j+1,k+1,l+1,b))*(w1(j+1,k,l,c)-w1(j,k,l+1,c))+w1(j+1,k+1,l+1,b)*(w1(j,k+1,l+1,c)-w1(j+1,k+1,l,c)) &
+        +(w1(j,k+1,l+1,b)-w1(j+1,k,l,b))*(w1(j,k,l+1,c)-w1(j+1,k+1,l+1,c))+w1(j+1,k,l,b)*(w1(j+1,k+1,l,c)-w1(j,k,l,c)) &
+        +(w1(j+1,k+1,l,b)-w1(j,k,l+1,b))*(w1(j+1,k+1,l+1,c)-w1(j+1,k,l,c))+w1(j,k,l+1,b)*(w1(j,k,l,c)-w1(j,k+1,l+1,c)))
       bb(j,k,l,8,i) = 1. / 12. * &
-        ((x(j,k,l,b)-x(j+1,k+1,l+1,b))*(x(j,k+1,l,c)-x(j+1,k,l,c))+x(j+1,k+1,l+1,b)*(x(j+1,k,l+1,c)-x(j,k+1,l+1,c)) &
-        +(x(j,k+1,l+1,b)-x(j+1,k,l,b))*(x(j+1,k+1,l+1,c)-x(j,k+1,l,c))+x(j+1,k,l,b)*(x(j,k,l,c)-x(j+1,k,l+1,c)) &
-        +(x(j+1,k,l+1,b)-x(j,k+1,l,b))*(x(j+1,k,l,c)-x(j+1,k+1,l+1,c))+x(j,k+1,l,b)*(x(j,k+1,l+1,c)-x(j,k,l,c)))
+        ((w1(j,k,l,b)-w1(j+1,k+1,l+1,b))*(w1(j,k+1,l,c)-w1(j+1,k,l,c))+w1(j+1,k+1,l+1,b)*(w1(j+1,k,l+1,c)-w1(j,k+1,l+1,c)) &
+        +(w1(j,k+1,l+1,b)-w1(j+1,k,l,b))*(w1(j+1,k+1,l+1,c)-w1(j,k+1,l,c))+w1(j+1,k,l,b)*(w1(j,k,l,c)-w1(j+1,k,l+1,c)) &
+        +(w1(j+1,k,l+1,b)-w1(j,k+1,l,b))*(w1(j+1,k,l,c)-w1(j+1,k+1,l+1,c))+w1(j,k+1,l,b)*(w1(j,k+1,l+1,c)-w1(j,k,l,c)))
     end forall
   end do
 end select

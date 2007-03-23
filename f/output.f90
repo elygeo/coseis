@@ -71,10 +71,9 @@ case( 'x' )
       k1 = i1(2); k2 = i2(2)
       l1 = i1(3); l2 = i2(3)
       t2 = w2(j1:j2,k1:k2,l1:l2,:)
-      f2 = ( &
-        ( t2(:,:,:,1) - xout(iz,1) ) * ( t2(:,:,:,1) - xout(iz,1) ) + &
-        ( t2(:,:,:,2) - xout(iz,2) ) * ( t2(:,:,:,2) - xout(iz,2) ) + &
-        ( t2(:,:,:,3) - xout(iz,3) ) * ( t2(:,:,:,3) - xout(iz,3) ) )
+      f2 = ( t2(:,:,:,1) - xout(iz,1) ) * ( t2(:,:,:,1) - xout(iz,1) ) &
+         + ( t2(:,:,:,2) - xout(iz,2) ) * ( t2(:,:,:,2) - xout(iz,2) ) &
+         + ( t2(:,:,:,3) - xout(iz,3) ) * ( t2(:,:,:,3) - xout(iz,3) )
       rout = 2 * dx * dx + maxval( f2 )
       call sethalo( f2, rout, i1node, i2node )
       call reduceloc( rout, i1, f2, 'allmin', n, noff, i )
@@ -82,19 +81,17 @@ case( 'x' )
     end if
   else
     if ( cell ) then
-      s2 = ( &
-        ( w2(:,:,:,1) - xout(iz,1) ) * ( w2(:,:,:,1) - xout(iz,1) ) + &
-        ( w2(:,:,:,2) - xout(iz,2) ) * ( w2(:,:,:,2) - xout(iz,2) ) + &
-        ( w2(:,:,:,3) - xout(iz,3) ) * ( w2(:,:,:,3) - xout(iz,3) ) )
+      s2 = ( w2(:,:,:,1) - xout(iz,1) ) * ( w2(:,:,:,1) - xout(iz,1) ) &
+         + ( w2(:,:,:,2) - xout(iz,2) ) * ( w2(:,:,:,2) - xout(iz,2) ) &
+         + ( w2(:,:,:,3) - xout(iz,3) ) * ( w2(:,:,:,3) - xout(iz,3) )
       rout = 2 * dx * dx + maxval( s2 )
       call sethalo( s2, rout, i1node, i2cell )
       i1 = i1node
       i2 = i2cell
     else
-      s2 = ( &
-        ( w1(:,:,:,1) - xout(iz,1) ) * ( w1(:,:,:,1) - xout(iz,1) ) + &
-        ( w1(:,:,:,2) - xout(iz,2) ) * ( w1(:,:,:,2) - xout(iz,2) ) + &
-        ( w1(:,:,:,3) - xout(iz,3) ) * ( w1(:,:,:,3) - xout(iz,3) ) )
+      s2 = ( w1(:,:,:,1) - xout(iz,1) ) * ( w1(:,:,:,1) - xout(iz,1) ) &
+         + ( w1(:,:,:,2) - xout(iz,2) ) * ( w1(:,:,:,2) - xout(iz,2) ) &
+         + ( w1(:,:,:,3) - xout(iz,3) ) * ( w1(:,:,:,3) - xout(iz,3) )
       rout = 2 * dx * dx + maxval( s2 )
       call sethalo( s2, rout, i1node, i2node )
     end if

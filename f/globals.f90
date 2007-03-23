@@ -11,7 +11,7 @@ integer, parameter :: &
 
 ! 4d vectors
 real, allocatable, dimension(:,:,:,:,:) :: &
-  bb             & ! B matrix
+  bb               ! B matrix
 
 ! 3d vectors
 real, allocatable, dimension(:,:,:,:) :: &
@@ -56,13 +56,6 @@ real, allocatable, dimension(:) :: &
   dx1,           & ! x rectangular element size
   dx2,           & ! y rectangular element size
   dx3,           & ! z rectangular element size
-  dn1,           & ! pml node damping -2*d     / (2+d*dt)
-  dn2,           & ! pml node damping  2       / (2+d*dt)
-  dc1,           & ! pml cell damping (2-d*dt) / (2+d*dt)
-  dc2              ! pml cell damping  2*dt    / (2+d*dt)
-
-! Rectangular cell space damping 
-real, allocatable, dimension(:) :: &
   dn1,           & ! pml node damping -2*d     / (2+d*dt)
   dn2,           & ! pml node damping  2       / (2+d*dt)
   dc1,           & ! pml cell damping (2-d*dt) / (2+d*dt)
