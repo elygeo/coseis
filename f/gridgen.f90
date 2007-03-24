@@ -5,12 +5,11 @@ contains
 
 subroutine gridgen
 use m_globals
-use m_optimize
 use m_collective
 use m_util
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), i, j, k, l, &
   j1, k1, l1, j2, k2, l2, idoublenode, b, c
-real :: x0(3), xlim(6), gxlim(6), m(9)
+real :: x0(3), xlim(6), gxlim(6), m(9), tol
 logical :: expand
 
 if ( master ) write( 0, * ) 'Grid generation'
@@ -306,17 +305,30 @@ s2 = ( w1(:,:,:,1) - xcenter(1) ) * ( w1(:,:,:,1) - xcenter(1) ) &
 call rreduce( rmax, sqrt( maxval( s2 ) ), 'max', 0 )
 
 ! Operators
-if ( oplevel > 1 ) call optimize( oplevel, i1cell, i2cell+1, w1, dx )
+if ( oplevel == 0 ) then
+  oplevel = 6
+  tol = 10. * epsilon( dx )
+  j = nm(1)
+  k = nm(2)
+  l = nm(3)
+  if ( &
+  sum( abs( w1(2:j,:,:,2) - w1(1:j-1,:,:,2) ) ) < tol .and. &
+  sum( abs( w1(2:j,:,:,3) - w1(1:j-1,:,:,3) ) ) < tol .and. &
+  sum( abs( w1(:,2:k,:,3) - w1(:,1:k-1,:,3) ) ) < tol .and. &
+  sum( abs( w1(:,2:k,:,1) - w1(:,1:k-1,:,1) ) ) < tol .and. &
+  sum( abs( w1(:,:,2:l,1) - w1(:,:,1:l-1,1) ) ) < tol .and. &
+  sum( abs( w1(:,:,2:l,2) - w1(:,:,1:l-1,2) ) ) < tol ) oplevel = 2
+end if
 select case( oplevel )
 case( 2 )
   allocate( dx1(nm(1)), dx2(nm(2)), dx3(nm(3)) )
   forall( i=1:nm(1)-1 ) dx1(i) = .5 * ( w1(i+1,2,2,1) - w1(i,2,2,1) )
   forall( i=1:nm(2)-1 ) dx2(i) = .5 * ( w1(2,i+1,2,2) - w1(2,i,2,2) )
   forall( i=1:nm(3)-1 ) dx3(i) = .5 * ( w1(2,2,i+1,3) - w1(2,2,i,3) )
-case( 3-5 )
+case( 3:5 )
   allocate( x(nm(1),nm(2),nm(3),3) )
   x = w1
-case( 9 )
+case( 6 )
   allocate( bb(nm(1),nm(2),nm(3),8,3) )
   do i = 1, 3
     b = modulo( i, 3 ) + 1
@@ -356,6 +368,7 @@ case( 9 )
         +(w1(j+1,k,l+1,b)-w1(j,k+1,l,b))*(w1(j+1,k,l,c)-w1(j+1,k+1,l+1,c))+w1(j,k+1,l,b)*(w1(j,k+1,l+1,c)-w1(j,k,l,c)))
     end forall
   end do
+case default; stop 'illegal operator'
 end select
 
 end subroutine

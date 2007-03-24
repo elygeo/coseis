@@ -191,7 +191,6 @@ base="
   diffcn.f90
   diffnc.f90
   hourglass.f90
-  optimize.f90
   bc.f90
   surfnormals.f90
   outprops.f90

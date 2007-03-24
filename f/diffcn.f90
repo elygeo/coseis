@@ -18,6 +18,16 @@ l1 = i1(3); l2 = i2(3)
 
 select case( oplevel )
 
+! Saved B matrix, flops: 8* 7+
+case( 6 )
+forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  df(j,k,l) = &
+  - bb(j,k,l,5,i) * f(j,k,l,i) - f(j-1,k-1,l-1,i) * bb(j-1,k-1,l-1,1,i) &
+  - bb(j,k-1,l-1,6,i) * f(j,k-1,l-1,i) - f(j-1,k,l,i) * bb(j-1,k,l,2,i) &
+  - bb(j-1,k,l-1,7,i) * f(j-1,k,l-1,i) - f(j,k-1,l,i) * bb(j,k-1,l,3,i) &
+  - bb(j-1,k-1,l,8,i) * f(j-1,k-1,l,i) - f(j,k,l-1,i) * bb(j,k,l-1,4,i)
+end forall
+
 ! Constant grid, flops: 1* 7+
 case( 1 )
 h = 0.25 * dx * dx
@@ -70,16 +80,6 @@ case( 3 )
   dx2(k-1) * ( dx1(j) * ( f(j,k-1,l,i) - f(j,k-1,l-1,i) ) + dx1(j-1) * ( f(j-1,k-1,l,i) - f(j-1,k-1,l-1,i) ) )
   end forall
 end select
-
-! Saved B matrix, flops: 8* 7+
-case( 9 )
-forall( j=j1:j2, k=k1:k2, l=l1:l2 )
-  df(j,k,l) = &
-  - bb(j,k,l,5,i) * f(j,k,l,i) - f(j-1,k-1,l-1,i) * bb(j-1,k-1,l-1,1,i) &
-  - bb(j,k-1,l-1,6,i) * f(j,k-1,l-1,i) - f(j-1,k,l,i) * bb(j-1,k,l,2,i) &
-  - bb(j-1,k,l-1,7,i) * f(j-1,k,l-1,i) - f(j,k-1,l,i) * bb(j,k-1,l,3,i) &
-  - bb(j-1,k-1,l,8,i) * f(j-1,k-1,l,i) - f(j,k,l-1,i) * bb(j,k,l-1,4,i)
-end forall
 
 ! Parallelepiped grid, flops: 33* 47+
 case( 3 )
@@ -200,6 +200,8 @@ df(j,k,l) = 1. / 12. * &
   +(x(j+1,k,l,b)-x(j,k+1,l-1,b))*(x(j,k,l-1,c)-x(j,k+1,l,c))+x(j+1,k,l,b)*(x(j+1,k,l-1,c)-x(j+1,k+1,l,c)) &
   +(x(j,k+1,l,b)-x(j+1,k,l-1,b))*(x(j+1,k,l,c)-x(j,k,l-1,c))+x(j,k+1,l,b)*(x(j+1,k+1,l,c)-x(j,k+1,l-1,c))))
 end forall
+
+case default; stop 'illegal operator'
 
 end select
 

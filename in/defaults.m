@@ -9,7 +9,7 @@
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ]; % grid tranformation
   symmetry = [ 0 0 0 ];			% grid symmetry
   gridnoise = 0.			% Random noise added to mesh
-  oplevel = 5;				% 1=const, 2=rect, 3=parallel, 3=one-point, 5=exact
+  oplevel = 0;				% 1=const, 2=rect, 3=parallel, 3=one-point, 5=exact, 6=save B-matrix, 0=auto pick 2 or 6
   rho = 2670.;				% **density
   vp = 6000.;				% **P-wave speed
   vs = 3464.1016;			% **S-wave speed

@@ -1,6 +1,6 @@
 % PEER LOH.1
 
-  np  = [ 1 1 2 ];
+  np  = [ 1 1 1 ];
   vp  = 6000.;
   vs  = 3464.;
   rho = 2700.;
@@ -8,7 +8,6 @@
   hourglass = [ 1. 4. ];
   itcheck = 0;
   faultnormal = 0;
-  fixhypo = 2;
   tfunc = 'brune';
   tsource = .1;
   moment1 = [ 0. 0. 0. ];
@@ -21,8 +20,13 @@
   rsource = 50.;
   nn    = [  91  111 61 ];
   ihypo = [ -92 -112 21 ];
-  timeseries = { 'v' 5999. 7999. -2001. };
-  timeseries = { 'v' 6001. 8001. -2001. };
+  xhypo = [ 0. 0. 2000. ];
+  fixhypo = -2;
+  timeseries = { 'v' 5999. 7999. -1. };
+  timeseries = { 'v' 6001. 8001. -1. };
+
+oplevel = 3;
+nt = 10;
 
   vp  = { 4000. 'zone'   1 1 1   -1 -1 11 };
   vs  = { 2000. 'zone'   1 1 1   -1 -1 11 };
