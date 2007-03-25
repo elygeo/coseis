@@ -30,6 +30,8 @@
   rho = { 2600. 'zone'   1 1 1   -1 -1 21 };
 
   ihypo = [ -162 -202  40 ];
+nt = 10;
+oplevel = 5;
 
 return
 

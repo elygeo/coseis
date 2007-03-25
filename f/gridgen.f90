@@ -320,6 +320,7 @@ if ( oplevel == 0 ) then
   sum( abs( w1(:,:,2:l,2) - w1(:,:,1:l-1,2) ) ) < tol ) oplevel = 2
 end if
 select case( oplevel )
+case( 1 )
 case( 2 )
   allocate( dx1(nm(1)), dx2(nm(2)), dx3(nm(3)) )
   forall( i=1:nm(1)-1 ) dx1(i) = .5 * ( w1(i+1,2,2,1) - w1(i,2,2,1) )

@@ -25,7 +25,7 @@
   timeseries = { 'v' 5999. 7999. -1. };
   timeseries = { 'v' 6001. 8001. -1. };
 
-oplevel = 3;
+oplevel = 6;
 nt = 10;
 
   vp  = { 4000. 'zone'   1 1 1   -1 -1 11 };
