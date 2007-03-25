@@ -1,11 +1,11 @@
 % PEER LOH.1
 
-  np  = [ 1 1 1 ];
+  np  = [ 1 1 2 ];
   vp  = 6000.;
   vs  = 3464.;
   rho = 2700.;
-  gam = .1;
-  hourglass = [ 1. 4. ];
+  gam = .0;
+  hourglass = [ 1. 2. ];
   itcheck = 0;
   faultnormal = 0;
   tfunc = 'brune';
@@ -25,12 +25,12 @@
   timeseries = { 'v' 5999. 7999. -1. };
   timeseries = { 'v' 6001. 8001. -1. };
 
-oplevel = 6;
-nt = 10;
-
   vp  = { 4000. 'zone'   1 1 1   -1 -1 11 };
   vs  = { 2000. 'zone'   1 1 1   -1 -1 11 };
   rho = { 2600. 'zone'   1 1 1   -1 -1 11 };
+
+oplevel = 6;
+nt = 10;
 
 return
 

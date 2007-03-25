@@ -116,7 +116,9 @@ nm=$( echo ${nm3[*]} | awk '{ print $1 * $2 * $3 }' )
 
 # RAM and Wall time usage
 floatsize=4
-nvars=24
+nvars=20 # oplevel 1-2
+nvars=23 # oplevel 3-5
+nvars=44 # oplevel 6
 ram=$( echo $ppn $nm $nvars $floatsize | awk '{ printf "%.0f", $1 * ( $2 * $3 * $4 / 1024 / 1024 + 15 ) }' )
 sus=$( echo $nt $ppn $nm $cpus $rate $nodes $maxcpus | awk '{ printf "%.0f", ( $1 + 2 ) * $2 * $3 / $4 / $5 / 3600000 * $6 * $7 }' )
 mm=$(  echo $nt $ppn $nm $cpus $rate | awk '{ printf "%.0f", ( $1 + 2 ) * $2 * $3 / $4 / $5 / 40000 + 10 }' )
