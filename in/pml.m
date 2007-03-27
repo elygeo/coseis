@@ -22,7 +22,8 @@
 % Junk
   out = [ 'x' 1   1 0 1 0   -1  0 -1  0 ];
   out = [ 'v' 1   1 0 1 1   -1  0 -1 -1 ];
-  tfunc = 'brune';
+  tfunc = 'sbrune';
+  tsource = .016;                       % dominant period of 8*dt
   ihypo = [ 0 0 0 ];
   nn = [ 51 51 51 ];
   bc1 = [ 1 1 1 ];

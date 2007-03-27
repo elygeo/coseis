@@ -116,35 +116,13 @@ where ( s1 > vp2 ) s1 = vp2
 where ( s2 < vs1 ) s2 = vs1
 where ( s2 > vs2 ) s2 = vs2
 
-! Hypocenter values
-if ( master ) then
-  j = ihypo(1)
-  k = ihypo(2)
-  l = ihypo(3)
-  rho0 = mr(j,k,l)
-  vp0  = s1(j,k,l)
-  vs0  = s2(j,k,l)
-end if
-
-! Extrema
+! Fill halo and find extrema
 stats(1) =  maxval( mr )
 stats(2) =  maxval( s1 )
 stats(3) =  maxval( s2 )
 call sethalo( mr, stats(1), i1cell, i2cell )
 call sethalo( s1, stats(2), i1cell, i2cell )
 call sethalo( s2, stats(3), i1cell, i2cell )
-stats(4) = -minval( mr )
-stats(5) = -minval( s1 )
-stats(6) = -minval( s2 )
-call rreduce1( gstats, stats, 'allmax', 0 )
-rho2 =  gstats(1)
-vp2  =  gstats(2)
-vs2  =  gstats(3)
-rho1 = -gstats(4)
-vp1  = -gstats(5)
-vs1  = -gstats(6)
-
-! Fill halo
 i1 = ibc1
 i2 = ibc2
 where( i1 <= 1 ) i1 = 4
@@ -157,6 +135,26 @@ call scalarswaphalo( mr, nhalo )
 call scalarswaphalo( gam, nhalo )
 call scalarswaphalo( s1, nhalo )
 call scalarswaphalo( s2, nhalo )
+stats(4) = -minval( mr )
+stats(5) = -minval( s1 )
+stats(6) = -minval( s2 )
+call rreduce1( gstats, stats, 'allmax', 0 )
+rho2 =  gstats(1)
+vp2  =  gstats(2)
+vs2  =  gstats(3)
+rho1 = -gstats(4)
+vp1  = -gstats(5)
+vs1  = -gstats(6)
+
+! Hypocenter values
+if ( master ) then
+  j = ihypo(1)
+  k = ihypo(2)
+  l = ihypo(3)
+  rho0 = mr(j,k,l)
+  vp0  = s1(j,k,l)
+  vs0  = s2(j,k,l)
+end if
 
 ! Lame' parameters
 mu  = mr * s2 * s2
