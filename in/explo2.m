@@ -17,8 +17,8 @@
   faultnormal = 0;
   ihypo = [ 31 31 31 ];
   xhypo = [ 0. 0. 0. ];
-  fixhypo = 1; rsource = 100.;
-  fixhypo = 2; rsource = 50.;
+  fixhypo = -1; rsource = 100.;
+  fixhypo = -2; rsource = 50.;
   moment1 = [ 1e18 1e18 1e18 ];
   moment2 = [ 0 0 0 ];
   tfunc = 'brune';

@@ -27,7 +27,7 @@
   trelax = .6;
   nt = 3000;
   nn = [ 601 302 81 ];
-  fixhypo = -1;
+  fixhypo = 1;
   ihypo = [ 273 200 -6 ];
   ihypo = [ 454 200 -6 ];
   mus = [ 1.05 'zone'  264 0 -17         463  0 -1      ];

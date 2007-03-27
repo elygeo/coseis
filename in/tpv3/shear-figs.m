@@ -2,7 +2,7 @@
   debug = 1;
   faultnormal = 3;
   vrup = -1.;
-  fixhypo = 1;
+  fixhypo = -1;
   ihypo = [ 0 0 0 ];
   out = { 'x'   1   1 1 1 0   -1 -1 -1  0 };
   out = { 'svm' 1   1 1 1 1   -1 -1 -1 -1 };
@@ -16,24 +16,20 @@
   nn = [ 33 13 14 ];
 
 % yz-shear
-  oplevel = 3;
   affine = [ 1. 0. 0.  0. 1. 1.  0. 0. 1.  1. ];
   symmetry = [ 1 0 1 ];
   symmetry = [ 1 0 0 ];
 
 % rectangular
-  oplevel = 2;
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ];
   symmetry = [ 0 0 0 ];
 
 % xy-shear
-  oplevel = 3;
   affine = [ 1. 1. 0.  0. 1. 0.  0. 0. 1.  1. ];
   symmetry = [ 0 1 1 ];
   symmetry = [ 0 0 1 ];
 
 % zx-shear
-  oplevel = 3;
   affine = [ 1. 0. 1.  0. 1. 0.  0. 0. 1.  1. ];
   symmetry = [ 0 1 1 ];
   symmetry = [ 0 1 0 ];

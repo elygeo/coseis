@@ -28,7 +28,7 @@
   bc2 = [ 0 0 0 ];			% j2 k2 l2 boundary cond (see below)
   ihypo	 = [ 0 0 0 ];			% hypocenter node
   xhypo	 = [ 0. 0. 0. ];		% hypocenter location
-  fixhypo = 1;				% 0=none 1=xnode, 2=xcell, -1=inode, -2=icell
+  fixhypo = 1;				% 0=none 1=inode, 2=icell, -1=xnode, -2=xcell
   rexpand = 1.06;			% grid expansion ratio
   n1expand = [ 0 0 0 ];			% n grid expansion nodes for j1 k1 l1
   n2expand = [ 0 0 0 ];			% n grid expansion nodes for j2 k2 l2

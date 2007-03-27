@@ -17,7 +17,7 @@
   gam = .1
   hourglass = [ 1. .7 ];
   xhypo = [ 0. 7500. 0. ];
-  fixhypo = 1;
+  fixhypo = -1;
   dx  = 100;
   dt  = .008;
   nt  = 1500;

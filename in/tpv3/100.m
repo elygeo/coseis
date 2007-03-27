@@ -12,8 +12,8 @@
   ts1 = -70e6;
   ts1 = { -81.6e6 'cube'  -1501. -1501. -1.   1501. 1501. 1. };
   gam = .1
-  hourglass = [ 1. .7 ];
-  fixhypo = 1;
+  hourglass = [ 1. 2. ];
+  fixhypo = -1;
   dx  = 100;
   dt  = .008;
   nt  = 1500;
@@ -40,7 +40,6 @@
   np = [ 1 1 2 ];
 
 % rectangular
-  oplevel = 2;
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ];
   nn       = [ 211 136 101 ];
   ihypo    = [  -1  -1  -1 ];

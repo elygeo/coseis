@@ -13,7 +13,7 @@
   ts1 = { -81.6e6 'cube'  -1501. -1501. -1.   1501. 1501. 1. };
   gam = .1;
   hourglass = [ 1. .7 ];
-  fixhypo = 1;
+  fixhypo = -1;
   dx  = 100;
   dt  = .008;
   nt  = 1500;
@@ -40,7 +40,6 @@
   np = [ 4 4 2 ];
 
 % xz-shear reverse slip
-  oplevel = 3;
   affine = [ 1. 0. 1.  0. 1. 0.  0. 0. 1.  1. ];
   nn       = [ 421 136 202 ];
   ihypo    = [   0  -1   0 ];

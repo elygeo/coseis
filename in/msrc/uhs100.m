@@ -4,8 +4,8 @@
   vp  = 6000.;
   vs  = 3464.;
   rho = 2700.;
-  gam = .0;
-  hourglass = [ 1. 2. ];
+  gam = .1;
+  hourglass = [ 1. 4. ];
   itcheck = 0;
   faultnormal = 0;
   tfunc = 'brune';

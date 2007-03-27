@@ -17,7 +17,8 @@
 % Moment source
   faultnormal = 0;
   ihypo = [ -92 -112 21 ];
-  fixhypo = 2;
+  xhypo = [ 0. 0. 2000. ];
+  fixhypo = -2;
   moment1 = [ 0. 0. 0. ];
   moment2 = [ 0. 0. 1e18 ];
   tfunc = 'brune';
@@ -33,8 +34,8 @@
 % Code execution and output
   np  = [ 1 1 2 ];
   itcheck = 0;
-  timeseries = { 'v' 5999. 7999. -2001. };
-  timeseries = { 'v' 6001. 8001. -2001. };
+  timeseries = { 'v' 5999. 7999. -1. };
+  timeseries = { 'v' 6001. 8001. -1. };
 
 return
 
