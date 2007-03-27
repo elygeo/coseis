@@ -15,8 +15,6 @@
 
 if [ "$interactive" ]; then
 cat << END > mf
-node37:2
-node38:2
 node39:2
 node40:2
 node41:2
@@ -27,6 +25,7 @@ node45:2
 node46:2
 node47:2
 node48:2
+node49:2
 END
 else
 cat << END > pbsscript-vm

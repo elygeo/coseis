@@ -1,11 +1,11 @@
 % PML test problem
   faultnormal = 0;
-  timeseries = { 'v'  -6000.      0.     0. }
-  timeseries = { 'v'  -6000.  -6000.     0. }
-  timeseries = { 'v'  -6000.  -6000. -6000. }
-  timeseries = { 'x'  -6000.      0.     0. }
-  timeseries = { 'x'  -6000.  -6000.     0. }
-  timeseries = { 'x'  -6000.  -6000. -6000. }
+% timeseries = { 'v'  -6000.      0.     0. }
+% timeseries = { 'v'  -6000.  -6000.     0. }
+% timeseries = { 'v'  -6000.  -6000. -6000. }
+% timeseries = { 'x'  -6000.      0.     0. }
+% timeseries = { 'x'  -6000.  -6000.     0. }
+% timeseries = { 'x'  -6000.  -6000. -6000. }
   nt = 1000;
   nt = 500;
   fixhypo = 2;
@@ -18,6 +18,16 @@
   debug = 1;
   gam = .3;
   hourglass = [ 1. 3. ];
+
+% Junk
+  out = [ 'x' 1   1 0 1 0   -1  0 -1  0 ];
+  out = [ 'v' 1   1 0 1 1   -1  0 -1 -1 ];
+  tfunc = 'brune';
+  ihypo = [ 0 0 0 ];
+  nn = [ 51 51 51 ];
+  bc1 = [ 1 1 1 ];
+  bc2 = [ 1 1 1 ];
+return
 
 % Rect
   ihypo = [ -1 -1 -1 ];

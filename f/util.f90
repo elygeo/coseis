@@ -98,20 +98,6 @@ if ( n(2) > 1 ) f(:,i2(2)+1:,:) = r
 if ( n(3) > 1 ) f(:,:,i2(3)+1:) = r
 end subroutine
 
-subroutine fillhalo( f, r, i1, i2 )
-real, intent(inout) :: f(:,:,:)
-real, intent(in) :: r
-integer, intent(in) :: i1(3), i2(3)
-integer :: n(3), i
-n = (/ size(f,1), size(f,2), size(f,3) /)
-if ( n(1) > 1 ) forall( i=1:i1(1)-1 ) f(i,:,:) = f(i1(1),:,:) + r
-if ( n(2) > 1 ) forall( i=1:i1(2)-1 ) f(:,i,:) = f(:,i1(2),:) + r
-if ( n(3) > 1 ) forall( i=1:i1(3)-1 ) f(:,:,i) = f(:,:,i1(3)) + r
-if ( n(1) > 1 ) forall( i=i2(1)+1:n(1) ) f(i,:,:) = f(i2(1),:,:) + r
-if ( n(2) > 1 ) forall( i=i2(2)+1:n(2) ) f(:,i,:) = f(:,i2(2),:) + r
-if ( n(3) > 1 ) forall( i=i2(3)+1:n(3) ) f(:,:,i) = f(:,:,i2(3)) + r
-end subroutine
-
 ! Timer
 subroutine timer( i, filename, it )
 character(*), intent(in), optional :: filename
