@@ -11,8 +11,8 @@
   tn  = -120e6;
   ts1 = -70e6;
   ts1 = { -81.6e6 'cube'  -1501. -1501. -1.   1501. 1501. 1. };
-  gam = .1
-  hourglass = [ 1. 2. ];
+  gam = .0
+  hourglass = [ 1. 4. ];
   fixhypo = -1;
   dx  = 100;
   dt  = .008;
