@@ -182,6 +182,7 @@ if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
       call rwrite( 'stats/amax', gvstats(4), it / itstats )
       rr = gvstats(3)
       if ( rr > dx / 10. ) write( 0, * ) 'warning: u !<< dx', rr, dx
+      if ( any( gvstats > huge( 0. ) ) ) stop 'unstable solution'
     end if
   end select
 end if

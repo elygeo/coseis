@@ -62,7 +62,7 @@ mu = mu * s1
   g6    =  0.
   pv    =  0.
   psv   =  0.
-  trup  =  1e9
+  trup  =  huge( 0. )
   tarr  =  0.
   efric =  0.
 

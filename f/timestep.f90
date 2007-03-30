@@ -44,7 +44,7 @@ if ( ifn /= 0 ) then
       trup = t - dt * ( .5 + ( svtol - f1 ) / ( f2 - f1 ) )
     end where
     where ( f1 >= svtol )
-      tarr = 1e9
+      tarr = huge( 0. )
     end where
     where ( f1 < svtol .and. f2 >= svtol )
       tarr = t - dt * ( .5 + ( svtol - f1 ) / ( f2 - f1 ) )

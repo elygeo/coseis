@@ -22,10 +22,10 @@ select case( oplevel )
 case( 6 )
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
   df(j,k,l) = &
-    bb(j,k,l,1,i) * f(j+1,k+1,l+1,i) + f(j,k,l,i) * bb(j,k,l,5,i) &
-  + bb(j,k,l,2,i) * f(j+1,k,l,i) + f(j,k+1,l+1,i) * bb(j,k,l,6,i) &
-  + bb(j,k,l,3,i) * f(j,k+1,l,i) + f(j+1,k,l+1,i) * bb(j,k,l,7,i) &
-  + bb(j,k,l,4,i) * f(j,k,l+1,i) + f(j+1,k+1,l,i) * bb(j,k,l,8,i)
+    bb(j,k,l,1,a) * f(j+1,k+1,l+1,i) + f(j,k,l,i) * bb(j,k,l,5,a) &
+  + bb(j,k,l,2,a) * f(j+1,k,l,i) + f(j,k+1,l+1,i) * bb(j,k,l,6,a) &
+  + bb(j,k,l,3,a) * f(j,k+1,l,i) + f(j+1,k,l+1,i) * bb(j,k,l,7,a) &
+  + bb(j,k,l,4,a) * f(j,k,l+1,i) + f(j+1,k+1,l,i) * bb(j,k,l,8,a)
 end forall
 
 ! Constant grid, flops: 1* 7+

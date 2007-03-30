@@ -1,29 +1,49 @@
 % PML test problem
+
+  nt = 500;
+  dx = 100.;
+  dt = .0075;
+  gam = .3;
+  hourglass = [ 1. 3. ];
+  oplevel = 6;
+
   faultnormal = 0;
+  fixhypo = -2;
+  tfunc = 'sbrune';
+  tfunc = 'brune';
+  rsource = 100.;
+  tsource = .056;
+  moment1 = [ 1e18 1e18 1e18 ];
+  moment2 = [ 0 0 0 ];
+
+  np = [ 1 1 2 ];
+  debug = 1;
 % timeseries = { 'v'  -6000.      0.     0. }
 % timeseries = { 'v'  -6000.  -6000.     0. }
 % timeseries = { 'v'  -6000.  -6000. -6000. }
 % timeseries = { 'x'  -6000.      0.     0. }
 % timeseries = { 'x'  -6000.  -6000.     0. }
 % timeseries = { 'x'  -6000.  -6000. -6000. }
-  nt = 1000;
-  nt = 500;
-  fixhypo = -2;
-  tfunc = 'brune';
-  tfunc = 'sbrune';
-  rsource = 100.;
-  moment1 = [ 1e18 1e18 1e18 ];
-  moment2 = [ 0 0 0 ];
-  np = [ 1 1 2 ];
-  debug = 1;
-  gam = .3;
-  hourglass = [ 1. 3. ];
-
-% Junk
   out = [ 'x' 1   1 0 1 0   -1  0 -1  0 ];
   out = [ 'v' 1   1 0 1 1   -1  0 -1 -1 ];
+
+% Non-rect
+  ihypo = [ 0 0 0 ];
+  nn = [ 41 41 41 ];
+  affine = [   1. 0. 0.  0.  1. 1.  0. 0.  1.   1. ]; % shear 1
+  affine = [   1. 0. 1.  0.  1. 0.  0. 0.  1.   1. ]; % shear 2
+  affine = [   1. 1. 0.  0.  1. 0.  0. 0.  1.   1. ]; % shear 3
+  affine = [  25. 0. 9.  0. 10. 0.  0. 0. 16.  10. ]; % 2D strain
+  affine = [   4. 0. 0.  0.  1. 0.  0. 0.  1.   1. ]; % 1D strain
+  affine = [  12. 3. 3.  0.  9. 1.  0. 0.  8.   6. ]; % 3D strain
+  bc1 = [ 1 1 1 ];
+  bc2 = [ 1 1 1 ];
+  bc1 = [ 0 0 0 ];
+  bc2 = [ 0 0 0 ];
+return
+
+% Junk
   tfunc = 'sbrune';
-  tsource = .016;                       % dominant period of 8*dt
   ihypo = [ 0 0 0 ];
   nn = [ 51 51 51 ];
   bc1 = [ 1 1 1 ];
@@ -42,20 +62,5 @@ return
   nn = [ 161 161 161 ];
   bc1 = [ 1 1 1 ];
   bc2 = [ 0 0 0 ];
-return
-
-% Non-rect
-  ihypo = [ 0 0 0 ];
-  nn = [ 41 41 41 ];
-  affine = [   1. 0. 0.  0.  1. 1.  0. 0.  1.   1. ]; % shear 1
-  affine = [   1. 0. 1.  0.  1. 0.  0. 0.  1.   1. ]; % shear 2
-  affine = [   1. 1. 0.  0.  1. 0.  0. 0.  1.   1. ]; % shear 3
-  affine = [  25. 0. 9.  0. 10. 0.  0. 0. 16.  10. ]; % 2D strain
-  affine = [   4. 0. 0.  0.  1. 0.  0. 0.  1.   1. ]; % 1D strain
-  affine = [  12. 3. 3.  0.  9. 1.  0. 0.  8.   6. ]; % 3D strain
-  bc1 = [ 0 0 0 ];
-  bc2 = [ 0 0 0 ];
-  bc1 = [ 1 1 1 ];
-  bc2 = [ 1 1 1 ];
 return
 
