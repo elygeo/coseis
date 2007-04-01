@@ -12,13 +12,13 @@
   vs  = { 2000. 'zone'   1 1 1   -1 -1 21 };
   rho = { 2600. 'zone'   1 1 1   -1 -1 21 };
   hourglass = [ 1. 4. ];
-  bc1 = [  1  0  0 ];
+  bc1 = [ -2  0  0 ];
   bc2 = [  1  0  1 ];
   n1expand = [ 0 60 0 ];
   n2expand = [ 0 60 0 ];
 
-  nn    = [ 201 502 101 ];
-  ihypo = [  41 331  41 ];
+  nn    = [  161  502 101 ];
+  ihypo = [ -162  331  41 ];
   xhypo = [ 0. 0. 2000. ];
   fixhypo = -2;
   rsource = 25.;
@@ -29,7 +29,7 @@
   faultnormal = 0;
 
   itcheck = 0;
-  np = [ 2 2 4 ];
+  np = [ 1 1 2 ];
 
   timeseries = { 'v' 5999.  7999. -1. };
   timeseries = { 'v' 6001.  8001. -1. };
