@@ -1,0 +1,16 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <kml xmlns="http://earth.google.com/kml/2.1">
+ <GroundOverlay>
+   <name>TeraShake</name>
+   <Icon>
+     <href>data.jpg</href>
+   </Icon>
+   <LatLonBox>
+     <north>   35.43596     </north>
+     <south>   32.18565     </south>
+     <east>  -114.2815     </east>
+     <west>  -120.6776     </west>
+     <rotation>  -38.01511     </rotation>
+   </LatLonBox>
+ </GroundOverlay>
+ </kml>

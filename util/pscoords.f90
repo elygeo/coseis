@@ -22,15 +22,13 @@ s = sin( rot * pi / 180. ) * h
 do l = 1, size( x, 3 )
 do k = 1, size( x, 2 )
 do j = 1, size( x, 1 )
-  x1 =  c * x(j,k,l,i1) + s * x(j,k,l,i2)
-  x2 = -s * x(j,k,l,i1) + c * x(j,k,l,i2)
-  x(j,k,l,i1) = x1
-  x(j,k,l,i2) = x2
+  x1 = x(j,k,l,i1)
+  x2 = x(j,k,l,i2)
+  x(j,k,l,i1) =  c * x1 + s * x2 + o1
+  x(j,k,l,i2) = -s * x1 + c * x2 + o2
 end do
 end do
 end do
-x(:,:,:,i1) = x(:,:,:,i1) + o1
-x(:,:,:,i2) = x(:,:,:,i2) + o2
 call utm2ll( x, i1, i2, 11 )
 end subroutine
 
@@ -48,17 +46,15 @@ real, parameter ::    &
 real :: c, s, x1, x2
 integer :: j, k, l
 call ll2utm( x, i1, i2, 11 )
-x(:,:,:,i1) = x(:,:,:,i1) - o1
-x(:,:,:,i2) = x(:,:,:,i2) - o2
 c = cos( rot * pi / 180. ) / h
 s = sin( rot * pi / 180. ) / h
 do l = 1, size( x, 3 )
 do k = 1, size( x, 2 )
 do j = 1, size( x, 1 )
-  x1 = c * x(j,k,l,i1) - s * x(j,k,l,i2)
-  x2 = s * x(j,k,l,i1) + c * x(j,k,l,i2)
-  x(j,k,l,i1) = x1
-  x(j,k,l,i2) = x2
+  x1 = x(j,k,l,i1) - o1
+  x2 = x(j,k,l,i2) - o2
+  x(j,k,l,i1) = c * x1 - s * x2
+  x(j,k,l,i2) = s * x1 + c * x2
 end do
 end do
 end do
