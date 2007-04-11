@@ -2,18 +2,30 @@
 program main
 use m_utm
 implicit none
-integer, parameter :: n1 = 601, n2 = 302, i1 = 1, i2 = 1, di = 1
-real, parameter :: dx = 1000., pi  = 3.14159265, emptyval = -1.
-real :: x(n1,n2,1,2), v1(n1,n2), v2(n1,n2), x0(1,1,1,2), x1, x2, x3, x4, h1, h2, h3, h4, &
-  o1, o2, d1, d2, rot, s, c, r, north, south, east, west, rotation
-integer :: i, j, k, j1, k1, ifile
+real, parameter :: pi = 3.14159265
+real :: dx, l1, l2, x1, x2, x3, x4, h1, h2, h3, h4, &
+  o1, o2, d1, d2, rot, s, c, r, emptyval, &
+  north, south, east, west, rotation
+real, allocatable :: x(:,:,:,:), v1(:,:), v2(:,:)
+integer :: n1, n2, i, j, k, j1, k1, ifile
 character(160) :: filename
+logical :: cell
 
-filename = 'template'
+! parameters
+n1 = 601
+n2 = 301
+dx = 1000.
+l1 = -117.478
+l2 =   33.852
+emptyval = -1.
+cell = .false.
+
+allocate( x(n1,n2,1,2), v1(n1,n2), v2(n1,n2) )
 
 ! local meters
 forall( i=1:n1 ) x(i,:,1,1) = dx * ( i - 1 )
 forall( i=1:n2 ) x(:,i,1,2) = dx * ( i - 1 )
+if ( cell ) x = x + .5 * dx
 
 ! UTM zone 11
 o1 = 132679.8125
@@ -21,10 +33,6 @@ o2 = 3824867.
 rot = -40. * pi / 180.
 c = cos( rot )
 s = sin( rot )
-x1 = .5 * x(n1,n2,1,1)
-x2 = .5 * x(n1,n2,1,2)
-x0(1,1,1,1) = c * x1 - s * x2 + o1
-x0(1,1,1,2) = s * x1 + c * x2 + o2
 do k = 1, n2
 do j = 1, n1
   x1 = x(j,k,1,1)
@@ -36,8 +44,7 @@ end do
 
 ! lon/lat
 call utm2ll( x,  1, 2, 11 )
-call utm2ll( x0, 1, 2, 11 )
-r = cos( x0(1,1,1,2) * pi / 180. )
+r = cos( l2 * pi / 180. )
 
 ! rotate
 rot = 39.65 / 180. * pi
@@ -45,8 +52,8 @@ c = cos( rot )
 s = sin( rot )
 do k = 1, n2
 do j = 1, n1
-  x1 = x(j,k,1,1) - x0(1,1,1,1)
-  x2 = x(j,k,1,2) - x0(1,1,1,2)
+  x1 = x(j,k,1,1) - l1
+  x2 = x(j,k,1,2) - l2
   x(j,k,1,1) = c * x1 * r - s * x2
   x(j,k,1,2) = s * x1 + c / r * x2
 end do
@@ -57,10 +64,10 @@ d1 = 2. * maxval( abs( x(:,:,1,1) ) ) / ( n1 - 1 )
 d2 = 2. * maxval( abs( x(:,:,1,2) ) ) / ( n2 - 1 )
 
 ! KML parameters
-north = x0(1,1,1,2) + .5 * ( d2 * n2 - d2 )
-south = x0(1,1,1,2) - .5 * ( d2 * n2 - d2 )
-east  = x0(1,1,1,1) + .5 * ( d1 * n1 - d1 )
-west  = x0(1,1,1,1) - .5 * ( d1 * n1 - d1 )
+north = l2 + .5 * ( d2 * n2 - d2 )
+south = l2 - .5 * ( d2 * n2 - d2 )
+east  = l1 + .5 * ( d1 * n1 - d1 )
+west  = l1 - .5 * ( d1 * n1 - d1 )
 rotation = -rot * 180. / pi
 
 ! lon/lat
@@ -70,8 +77,8 @@ do k = 1, n2
 do j = 1, n1
   x1 = x(j,k,1,1)
   x2 = x(j,k,1,2)
-  x(j,k,1,1) =  c * x1 / r + s * x2 + x0(1,1,1,1)
-  x(j,k,1,2) = -s * x1 + c * r * x2 + x0(1,1,1,2)
+  x(j,k,1,1) =  c * x1 / r + s * x2 + l1
+  x(j,k,1,2) = -s * x1 + c * r * x2 + l2
 end do
 end do
 
