@@ -6,9 +6,8 @@ implicit none
 real, parameter :: pi = 3.14159265
 real :: dx, l1, l2, rotation, emptyval, x1, x2, h1, h2, h3, h4, o1, o2, d1, d2, r
 real, allocatable :: x(:,:,:,:), v1(:,:), v2(:,:)
-integer :: n1, n2, i, j, k, j1, k1, ifile
+integer :: n1, n2, registration, i, j, k, j1, k1, ifile
 character(160) :: filename
-logical :: cell
 
 ! parameters
 n1 = 3000           ! number of x grid points
@@ -18,13 +17,13 @@ l1 = -117.478       ! center longitude
 l2 =   33.852       ! center latitude
 rotation = -39.65   ! rotation angle
 emptyval = -1.      ! value for points outside the data region
-cell = .true.       ! true=cell registration, false=node registration
+registration = 0    ! 0=cell, 1=node
 
 ! local meters
 allocate( x(n1,n2,1,2), v1(n1,n2), v2(n1,n2) )
 forall( i=1:n1 ) x(i,:,1,1) = dx * ( i - 1 )
 forall( i=1:n2 ) x(:,i,1,2) = dx * ( i - 1 )
-if ( cell ) x = x + .5 * dx
+if ( registration == 0 ) x = x + .5 * dx
 
 ! UTM zone 11
 r = -40. * pi / 180.
@@ -142,10 +141,11 @@ x2 = .5 * ( d2 * n2 - d2 ) * cos( l2 * pi / 180. )
 open( 1, file=trim(filename)//'.kml', status='replace' )
 write( 1, '(a)' ) '<?xml version="1.0" encoding="UTF-8"?>'
 write( 1, '(a)' ) '<kml xmlns="http://earth.google.com/kml/2.1">'
+write( 1, '(a)' ) '<Folder>'
 write( 1, '(a)' ) '<GroundOverlay>'
-write( 1, * )    ' <name>TeraShake</name>'
+write( 1, * )    ' <name>Image</name>'
 write( 1, * )    ' <Icon>'
-write( 1, * )    '   <href>'//trim(filename)//'.jpg</href>'
+write( 1, * )    '   <href>'//trim(filename)//'.png</href>'
 write( 1, * )    ' </Icon>'
 write( 1, * )    ' <LatLonBox>'
 write( 1, * )    '   <north>', l2 + x2, '</north>'
@@ -155,6 +155,15 @@ write( 1, * )    '   <west>',  l1 - x1, '</west>'
 write( 1, * )    '   <rotation>', rotation, '</rotation>'
 write( 1, * )    ' </LatLonBox>'
 write( 1, '(a)' ) '</GroundOverlay>'
+write( 1, '(a)' ) '<ScreenOverlay>'
+write( 1, '(a)' ) '  <name>Legend</name>'
+write( 1, '(a)' ) '  <Icon>'
+write( 1, '(a)' ) '    <href>legend.png</href>'
+write( 1, '(a)' ) '  </Icon>'
+write( 1, '(a)' ) '  <overlayXY x=".5" y="0"  xunits="fraction" yunits="pixels" />'
+write( 1, '(a)' ) '  <screenXY  x=".5" y="80" xunits="fraction" yunits="pixels" />'
+write( 1, '(a)' ) '</ScreenOverlay>'
+write( 1, '(a)' ) '</Folder>'
 write( 1, '(a)' ) '</kml>'
 close(1)
 
