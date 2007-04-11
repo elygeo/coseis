@@ -1,24 +1,24 @@
-! Generate TeraShake grid from 2D mesh and topography
+! Drape TeraShake surface snapshots for draping in Google Earth
+! Geoffrey Ely, 2007-04-10
 program main
 use m_utm
 implicit none
 real, parameter :: pi = 3.14159265
-real :: dx, l1, l2, rotation, emptyval, &
-  x1, x2, h1, h2, h3, h4, o1, o2, d1, d2, r
+real :: dx, l1, l2, rotation, emptyval, x1, x2, h1, h2, h3, h4, o1, o2, d1, d2, r
 real, allocatable :: x(:,:,:,:), v1(:,:), v2(:,:)
 integer :: n1, n2, i, j, k, j1, k1, ifile
 character(160) :: filename
 logical :: cell
 
 ! parameters
-n1 = 601
-n2 = 301
-dx = 1000.
-l1 = -117.478
-l2 =   33.852
-rotation = -39.65
-emptyval = -1.
-cell = .false.
+n1 = 3000           ! number of x grid points
+n2 = 1500           ! number of y gridpoints
+dx = 200.           ! cell size in meters
+l1 = -117.478       ! center longitude
+l2 =   33.852       ! center latitude
+rotation = -39.65   ! rotation angle
+emptyval = -1.      ! value for points outside the data region
+cell = .true.       ! true=cell registration, false=node registration
 
 ! local meters
 allocate( x(n1,n2,1,2), v1(n1,n2), v2(n1,n2) )
