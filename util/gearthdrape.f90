@@ -4,20 +4,25 @@ program main
 use m_utm
 implicit none
 real, parameter :: pi = 3.14159265
-real :: dx, l1, l2, rotation, emptyval, x1, x2, h1, h2, h3, h4, o1, o2, d1, d2, r
+real :: dx, dt, lon0, lat0, phi, emptyval, theta, o1, o2
+real :: x1, x2, h1, h2, h3, h4, dlon, dlat, r
 real, allocatable :: x(:,:,:,:), v1(:,:), v2(:,:)
 integer :: n1, n2, registration, i, j, k, j1, k1, ifile
 character(160) :: filename
 
 ! parameters
-n1 = 3000           ! number of x grid points
-n2 = 1500           ! number of y gridpoints
-dx = 200.           ! cell size in meters
-l1 = -117.478       ! center longitude
-l2 =   33.852       ! center latitude
-rotation = -39.65   ! rotation angle
-emptyval = -1.      ! value for points outside the data region
-registration = 0    ! 0=cell, 1=node
+registration = 0 ! 0=cell, 1=node
+emptyval = 0.    ! value for points outside the data region
+n1 = 3000        ! number of x grid points
+n2 = 1500        ! number of y gridpoints
+dx = 200.        ! cell size in meters
+dt = .008        ! time step
+lon0 = -117.478  ! center longitude
+lat0 =   33.852  ! center latitude
+phi   = -39.65   ! lon/lat rotation
+theta = -40.     ! UTM rotation
+o1 = 132679.8125 ! UTM x offset
+o2 = 3824867.    ! UTM y offset
 
 ! local meters
 allocate( x(n1,n2,1,2), v1(n1,n2), v2(n1,n2) )
@@ -26,13 +31,10 @@ forall( i=1:n2 ) x(:,i,1,2) = dx * ( i - 1 )
 if ( registration == 0 ) x = x + .5 * dx
 
 ! UTM zone 11
-r = -40. * pi / 180.
-o1 = 132679.8125
-o2 = 3824867.
-h1 =  cos( r )
-h2 =  sin( r )
-h3 = -sin( r )
-h4 =  cos( r )
+h1 =  cos( -theta / 180. * pi )
+h2 =  sin( -theta / 180. * pi )
+h3 = -sin( -theta / 180. * pi )
+h4 =  cos( -theta / 180. * pi )
 do k = 1, n2
 do j = 1, n1
   x1 = x(j,k,1,1)
@@ -46,33 +48,33 @@ end do
 call utm2ll( x, 1, 2, 11 )
 
 ! rotate
-r = rotation / 180. * pi
-h1 =  cos( r ) / cos( l2 * pi / 180. )
+r = phi / 180. * pi
+h1 =  cos( r ) / cos( lat0 * pi / 180. )
 h2 =  sin( r )
 h3 = -sin( r )
-h4 =  cos( r ) * cos( l2 * pi / 180. )
+h4 =  cos( r ) * cos( lat0 * pi / 180. )
 do k = 1, n2
 do j = 1, n1
-  x1 = x(j,k,1,1) - l1
-  x2 = x(j,k,1,2) - l2
+  x1 = x(j,k,1,1) - lon0
+  x2 = x(j,k,1,2) - lat0
   x(j,k,1,1) = h4 * x1 + h2 * x2
   x(j,k,1,2) = h3 * x1 + h1 * x2
 end do
 end do
 
 ! origin and step size
-d1 = 2. * maxval( abs( x(:,:,1,1) ) ) / ( n1 - 1 )
-d2 = 2. * maxval( abs( x(:,:,1,2) ) ) / ( n2 - 1 )
+dlon = 2. * maxval( abs( x(:,:,1,1) ) ) / ( n1 - 1 )
+dlat = 2. * maxval( abs( x(:,:,1,2) ) ) / ( n2 - 1 )
 
 ! lon/lat
-forall( i=1:n1 ) x(i,:,1,1) = -d1 * ( .5 + .5 * n1 - i )
-forall( i=1:n2 ) x(:,i,1,2) = -d2 * ( .5 + .5 * n2 - i )
+forall( i=1:n1 ) x(i,:,1,1) = -dlon * ( .5 + .5 * n1 - i )
+forall( i=1:n2 ) x(:,i,1,2) = -dlat * ( .5 + .5 * n2 - i )
 do k = 1, n2
 do j = 1, n1
   x1 = x(j,k,1,1)
   x2 = x(j,k,1,2)
-  x(j,k,1,1) = h1 * x1 + h3 * x2 + l1
-  x(j,k,1,2) = h2 * x1 + h4 * x2 + l2
+  x(j,k,1,1) = h1 * x1 + h3 * x2 + lon0
+  x(j,k,1,2) = h2 * x1 + h4 * x2 + lat0
 end do
 end do
 
@@ -80,13 +82,10 @@ end do
 call ll2utm( x, 1, 2, 11 )
 
 ! local meters
-r = -40. * pi / 180.
-o1 = 132679.8125
-o2 = 3824867.
-h1 =  cos( r )
-h2 =  sin( r )
-h3 = -sin( r )
-h4 =  cos( r )
+h1 =  cos( theta / 180. * pi )
+h2 =  sin( theta / 180. * pi )
+h3 = -sin( theta / 180. * pi )
+h4 =  cos( theta / 180. * pi )
 do k = 1, n2
 do j = 1, n1
   x1 = x(j,k,1,1) - o1
@@ -136,8 +135,8 @@ write( 1, rec=1 ) v2
 close( 1 )
 
 ! KML file
-x1 = .5 * ( d1 * n1 - d1 ) / cos( l2 * pi / 180. )
-x2 = .5 * ( d2 * n2 - d2 ) * cos( l2 * pi / 180. )
+x1 = .5 * ( dlon * n1 - dlon ) / cos( lat0 * pi / 180. )
+x2 = .5 * ( dlat * n2 - dlat ) * cos( lat0 * pi / 180. )
 open( 1, file=trim(filename)//'.kml', status='replace' )
 write( 1, '(a)' ) '<?xml version="1.0" encoding="UTF-8"?>'
 write( 1, '(a)' ) '<kml xmlns="http://earth.google.com/kml/2.1">'
@@ -148,11 +147,11 @@ write( 1, * )    ' <Icon>'
 write( 1, * )    '   <href>'//trim(filename)//'.png</href>'
 write( 1, * )    ' </Icon>'
 write( 1, * )    ' <LatLonBox>'
-write( 1, * )    '   <north>', l2 + x2, '</north>'
-write( 1, * )    '   <south>', l2 - x2, '</south>'
-write( 1, * )    '   <east>',  l1 + x1, '</east>'
-write( 1, * )    '   <west>',  l1 - x1, '</west>'
-write( 1, * )    '   <rotation>', rotation, '</rotation>'
+write( 1, * )    '   <north>', lat0 + x2, '</north>'
+write( 1, * )    '   <south>', lat0 - x2, '</south>'
+write( 1, * )    '   <east>',  lon0 + x1, '</east>'
+write( 1, * )    '   <west>',  lon0 - x1, '</west>'
+write( 1, * )    '   <rotation>', phi, '</rotation>'
 write( 1, * )    ' </LatLonBox>'
 write( 1, '(a)' ) '</GroundOverlay>'
 write( 1, '(a)' ) '<ScreenOverlay>'
