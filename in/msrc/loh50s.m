@@ -17,7 +17,7 @@
   n1expand = [ 60 60 0 ];
   n2expand = [ 60 60 0 ];
 
-  nn    = [ 520 720 101 ];
+  nn    = [ 520 720 161 ];
   ihypo = [ 241 389  40 ];
   ihypo = [ 240 390  41 ];
   xhypo = [ 0. 0. 2000. ];
@@ -30,7 +30,7 @@
   faultnormal = 0;
 
   itcheck = 0;
-  np = [ 2 4 4 ];
+  np = [ 4 4 2 ];
 
   timeseries = { 'v'  6000.  8000. -1. };
   timeseries = { 'v'  6000. -8000. -1. };

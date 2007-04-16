@@ -1,11 +1,16 @@
-! Drape TeraShake surface snapshots for draping in Google Earth
+! Project TeraShake surface snapshot data to lon/lat for viewing in Google Earth.
+! Also generates a Google Earth KML file with time animation called 'tmp.kml'.
+! You must create the images using a separate plotting program of your choice.
 ! Geoffrey Ely, 2007-04-10
+! compile: f95 -O utm.f90 gearthdrape.f90 -o gearthdrape
+! usage: ./gearthdrape <file1> <file2> <file3> ...
+
 program main
 use m_utm
 implicit none
 real, parameter :: pi = 3.14159265
-real :: dx, dt, lon0, lat0, phi, emptyval, theta, o1, o2
-real :: x1, x2, h1, h2, h3, h4, dlon, dlat, r
+real :: dx, lon0, lat0, phi, emptyval, theta, o1, o2
+real :: x1, x2, h1, h2, h3, h4, dlon, dlat
 real, allocatable :: x(:,:,:,:), v1(:,:), v2(:,:)
 integer :: n1, n2, registration, i, j, k, j1, k1, ifile
 character(160) :: filename
@@ -16,7 +21,6 @@ emptyval = 0.    ! value for points outside the data region
 n1 = 3000        ! number of x grid points
 n2 = 1500        ! number of y gridpoints
 dx = 200.        ! cell size in meters
-dt = .008        ! time step
 lon0 = -117.478  ! center longitude
 lat0 =   33.852  ! center latitude
 phi   = -39.65   ! lon/lat rotation
@@ -31,10 +35,10 @@ forall( i=1:n2 ) x(:,i,1,2) = dx * ( i - 1 )
 if ( registration == 0 ) x = x + .5 * dx
 
 ! UTM zone 11
-h1 =  cos( -theta / 180. * pi )
-h2 =  sin( -theta / 180. * pi )
-h3 = -sin( -theta / 180. * pi )
-h4 =  cos( -theta / 180. * pi )
+h1 =  cos( theta / 180. * pi )
+h2 =  sin( theta / 180. * pi )
+h3 = -sin( theta / 180. * pi )
+h4 =  cos( theta / 180. * pi )
 do k = 1, n2
 do j = 1, n1
   x1 = x(j,k,1,1)
@@ -48,11 +52,10 @@ end do
 call utm2ll( x, 1, 2, 11 )
 
 ! rotate
-r = phi / 180. * pi
-h1 =  cos( r ) / cos( lat0 * pi / 180. )
-h2 =  sin( r )
-h3 = -sin( r )
-h4 =  cos( r ) * cos( lat0 * pi / 180. )
+h1 =  cos( phi / 180. * pi ) / cos( lat0 * pi / 180. )
+h2 =  sin( phi / 180. * pi )
+h3 = -sin( phi / 180. * pi )
+h4 =  cos( phi / 180. * pi ) * cos( lat0 * pi / 180. )
 do k = 1, n2
 do j = 1, n1
   x1 = x(j,k,1,1) - lon0
@@ -62,9 +65,18 @@ do j = 1, n1
 end do
 end do
 
-! origin and step size
+! lon/lat resolution
 dlon = 2. * maxval( abs( x(:,:,1,1) ) ) / ( n1 - 1 )
 dlat = 2. * maxval( abs( x(:,:,1,2) ) ) / ( n2 - 1 )
+
+! KML snippet
+x1 = .5 * ( dlon * n1 - dlon ) / cos( lat0 * pi / 180. )
+x2 = .5 * ( dlat * n2 - dlat ) * cos( lat0 * pi / 180. )
+print *, '   <north>', lat0 + x2, '</north>'
+print *, '   <south>', lat0 - x2, '</south>'
+print *, '   <east>',  lon0 + x1, '</east>'
+print *, '   <west>',  lon0 - x1, '</west>'
+print *, '   <rotation>', phi, '</rotation>'
 
 ! lon/lat
 forall( i=1:n1 ) x(i,:,1,1) = -dlon * ( .5 + .5 * n1 - i )
@@ -94,6 +106,20 @@ do j = 1, n1
   x(j,k,1,2) = h3 * x1 + h1 * x2
 end do
 end do
+
+! KML initialize
+open( 2, file='tmp.kml', status='replace' )
+write( 2, '(a)' ) '<?xml version="1.0" encoding="UTF-8"?>'
+write( 2, '(a)' ) '<kml xmlns="http://earth.google.com/kml/2.1">'
+write( 2, '(a)' ) '<Folder>'
+write( 2, '(a)' ) '<ScreenOverlay>'
+write( 2, '(a)' ) '  <name>Legend</name>'
+write( 2, '(a)' ) '  <Icon>'
+write( 2, '(a)' ) '    <href>legend.png</href>'
+write( 2, '(a)' ) '  </Icon>'
+write( 2, '(a)' ) '  <overlayXY x=".5" y="0"  xunits="fraction" yunits="pixels" />'
+write( 2, '(a)' ) '  <screenXY  x=".5" y="80" xunits="fraction" yunits="pixels" />'
+write( 2, '(a)' ) '</ScreenOverlay>'
 
 ! loop over arguments
 do ifile = 1, command_argument_count()
@@ -134,39 +160,33 @@ open( 1, file=filename, recl=i, form='unformatted', access='direct', status='rep
 write( 1, rec=1 ) v2
 close( 1 )
 
-! KML file
+! KML
 x1 = .5 * ( dlon * n1 - dlon ) / cos( lat0 * pi / 180. )
 x2 = .5 * ( dlat * n2 - dlat ) * cos( lat0 * pi / 180. )
-open( 1, file=trim(filename)//'.kml', status='replace' )
-write( 1, '(a)' ) '<?xml version="1.0" encoding="UTF-8"?>'
-write( 1, '(a)' ) '<kml xmlns="http://earth.google.com/kml/2.1">'
-write( 1, '(a)' ) '<Folder>'
-write( 1, '(a)' ) '<GroundOverlay>'
-write( 1, * )    ' <name>Image</name>'
-write( 1, * )    ' <Icon>'
-write( 1, * )    '   <href>'//trim(filename)//'.png</href>'
-write( 1, * )    ' </Icon>'
-write( 1, * )    ' <LatLonBox>'
-write( 1, * )    '   <north>', lat0 + x2, '</north>'
-write( 1, * )    '   <south>', lat0 - x2, '</south>'
-write( 1, * )    '   <east>',  lon0 + x1, '</east>'
-write( 1, * )    '   <west>',  lon0 - x1, '</west>'
-write( 1, * )    '   <rotation>', phi, '</rotation>'
-write( 1, * )    ' </LatLonBox>'
-write( 1, '(a)' ) '</GroundOverlay>'
-write( 1, '(a)' ) '<ScreenOverlay>'
-write( 1, '(a)' ) '  <name>Legend</name>'
-write( 1, '(a)' ) '  <Icon>'
-write( 1, '(a)' ) '    <href>legend.png</href>'
-write( 1, '(a)' ) '  </Icon>'
-write( 1, '(a)' ) '  <overlayXY x=".5" y="0"  xunits="fraction" yunits="pixels" />'
-write( 1, '(a)' ) '  <screenXY  x=".5" y="80" xunits="fraction" yunits="pixels" />'
-write( 1, '(a)' ) '</ScreenOverlay>'
-write( 1, '(a)' ) '</Folder>'
-write( 1, '(a)' ) '</kml>'
-close(1)
+write( 2, '(a)' ) '<GroundOverlay>'
+write( 2, * )    ' <name>Image</name>'
+write( 2, * )    ' <Icon>'
+write( 2, * )    '   <href>'//trim(filename)//'.png</href>'
+write( 2, * )    ' </Icon>'
+write( 2, * )    ' <TimeSpan>'
+write( 2, * )    '   <begin>', ifile, '</begin>'
+write( 2, * )    ' </TimeSpan>'
+write( 2, * )    ' <drawOrder>', ifile, '</drawOrder>'
+write( 2, * )    ' <LatLonBox>'
+write( 2, * )    '   <north>', lat0 + x2, '</north>'
+write( 2, * )    '   <south>', lat0 - x2, '</south>'
+write( 2, * )    '   <east>',  lon0 + x1, '</east>'
+write( 2, * )    '   <west>',  lon0 - x1, '</west>'
+write( 2, * )    '   <rotation>', phi, '</rotation>'
+write( 2, * )    ' </LatLonBox>'
+write( 2, '(a)' ) '</GroundOverlay>'
 
 end do
+
+! KML finalize
+write( 2, '(a)' ) '</Folder>'
+write( 2, '(a)' ) '</kml>'
+close(2)
 
 end program
 
