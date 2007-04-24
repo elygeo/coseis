@@ -35,7 +35,7 @@ k1 = i3(2); k2 = i4(2)
 l1 = i3(3); l2 = i4(3)
 
 ! Read grid files or create basic rectangular mesh
-w1 = 0.
+call vectorsethalo( w1, 0., i3, i4 )
 if ( grid /= 'read' ) then
   forall( i=j1:j2 ) w1(i,:,:,1) = dx * ( i - i1(1) )
   forall( i=k1:k2 ) w1(:,i,:,2) = dx * ( i - i1(2) )
@@ -268,7 +268,7 @@ end select
 call vectorswaphalo( w1, nhalo )
 
 ! Cell center locations
-w2 = 0.
+call vectorsethalo( w2, 0., i1cell, i2cell )
 call vectoraverage( w2, w1, i1cell, i2cell, 1 )
 
 ! Hypocenter location

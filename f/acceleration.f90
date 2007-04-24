@@ -12,7 +12,7 @@ use m_bc
 use m_util
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, ic, iid, id, iz, iq
 
-call sethalo( s1, 0., i1node, i2node )
+call scalarsethalo( s1, 0., i1node, i2node )
 
 ! Loop over component and derivative direction
 doic: do ic  = 1, 3
@@ -94,8 +94,8 @@ end do doic
 if ( any( hourglass > 0. ) .and. ( npml == 0 .or. all( ibc1 /= 1 .and. ibc2 /= 1 ) ) ) then
 
 ! Optimize for no PML: combined stiffness and viscous hourglass controll
-call sethalo( s1, 0., i1cell, i2cell )
-call sethalo( s2, 0., i1node, i2node )
+call scalarsethalo( s1, 0., i1cell, i2cell )
+call scalarsethalo( s2, 0., i1node, i2node )
 w2 = hourglass(1) * u + dt * hourglass(2) * v
 do iq = 1, 4
 do i = 1, 3
@@ -108,13 +108,13 @@ end do
 
 ! PML present
 else
-call sethalo( s1, 0., i1cell, i2cell )
+call scalarsethalo( s1, 0., i1cell, i2cell )
 
 ! Stiffness hourglass control, exclude PML
 if ( hourglass(1) > 0. ) then
 i1 = max( i1pml + 1, i1node )
 i2 = min( i2pml - 1, i2node )
-call sethalo( s2, 0., i1, i2 )
+call scalarsethalo( s2, 0., i1, i2 )
 do iq = 1, 4
 do i = 1, 3
   call hourglassnc( s1, u, iq, i, i1cell, i2cell )
@@ -127,7 +127,7 @@ end if
 
 ! Viscous hourglass control
 if ( hourglass(2) > 0. ) then
-call sethalo( s2, 0., i1node, i2node )
+call scalarsethalo( s2, 0., i1node, i2node )
 do iq = 1, 4
 do i = 1, 3
   call hourglassnc( s1, v, iq, i, i1cell, i2cell )

@@ -75,7 +75,7 @@ case( 'x' )
          + ( t2(:,:,:,2) - xout(iz,2) ) * ( t2(:,:,:,2) - xout(iz,2) ) &
          + ( t2(:,:,:,3) - xout(iz,3) ) * ( t2(:,:,:,3) - xout(iz,3) )
       rout = 2 * dx * dx + maxval( f2 )
-      call sethalo( f2, rout, i1node, i2node )
+      call scalarsethalo( f2, rout, i1node, i2node )
       call reduceloc( rout, i1, f2, 'allmin', n, noff, i )
       i1(i) = ihypo(i)
     end if
@@ -85,7 +85,7 @@ case( 'x' )
          + ( w2(:,:,:,2) - xout(iz,2) ) * ( w2(:,:,:,2) - xout(iz,2) ) &
          + ( w2(:,:,:,3) - xout(iz,3) ) * ( w2(:,:,:,3) - xout(iz,3) )
       rout = 2 * dx * dx + maxval( s2 )
-      call sethalo( s2, rout, i1node, i2cell )
+      call scalarsethalo( s2, rout, i1node, i2cell )
       i1 = i1node
       i2 = i2cell
     else
@@ -93,7 +93,7 @@ case( 'x' )
          + ( w1(:,:,:,2) - xout(iz,2) ) * ( w1(:,:,:,2) - xout(iz,2) ) &
          + ( w1(:,:,:,3) - xout(iz,3) ) * ( w1(:,:,:,3) - xout(iz,3) )
       rout = 2 * dx * dx + maxval( s2 )
-      call sethalo( s2, rout, i1node, i2node )
+      call scalarsethalo( s2, rout, i1node, i2node )
     end if
     call reduceloc( rout, i1, s2, 'allmin', n, noff, 0 )
   end if
@@ -156,8 +156,8 @@ end if
 if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
   select case( pass )
   case( 1 )
-    call sethalo( s1, -1., i1node, i2node )
-    call sethalo( s2, -1., i1cell, i2cell )
+    call scalarsethalo( s1, -1., i1node, i2node )
+    call scalarsethalo( s2, -1., i1cell, i2cell )
     vstats(1) = maxval( s1 )
     vstats(2) = maxval( s2 )
     n = nn + 2 * nhalo
@@ -170,8 +170,8 @@ if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
       call iwrite( 'stats/vmax3', i1(3), it / itstats )
     end if
   case( 2 )
-    call sethalo( s1, -1., i1node, i2node )
-    call sethalo( s2, -1., i1node, i2node )
+    call scalarsethalo( s1, -1., i1node, i2node )
+    call scalarsethalo( s2, -1., i1node, i2node )
     vstats(3) = maxval( s1 )
     vstats(4) = maxval( s2 )
     call rreduce1( gvstats, vstats, 'max', 0 )
@@ -191,23 +191,23 @@ end if
 if ( it > 0 .and. modulo( it, itstats ) == 0 .and. dofault ) then
   select case( pass )
   case( 1 )
-    call sethalo( f1,   -1., i1node, i2node )
-    call sethalo( f2,   -1., i1node, i2node )
-    call sethalo( tarr, -1., i1node, i2node )
+    call scalarsethalo( f1,   -1., i1node, i2node )
+    call scalarsethalo( f2,   -1., i1node, i2node )
+    call scalarsethalo( tarr, -1., i1node, i2node )
     fstats(1) = maxval( f1 )
     fstats(2) = maxval( f2 )
     fstats(3) = maxval( sl )
     fstats(4) = maxval( tarr )
   case( 2 )
-    call sethalo( ts, -1., i1node, i2node )
-    call sethalo( f2, -1., i1node, i2node )
+    call scalarsethalo( ts, -1., i1node, i2node )
+    call scalarsethalo( f2, -1., i1node, i2node )
     fstats(5) = maxval( ts )
     fstats(6) = maxval( f2 )
     rr = 2. * minval( tn ) - 1.
-    call sethalo( tn, rr, i1node, i2node )
+    call scalarsethalo( tn, rr, i1node, i2node )
     fstats(7) = maxval( tn )
     rr = 2. * fstats(7) + 1.
-    call sethalo( tn, rr, i1node, i2node )
+    call scalarsethalo( tn, rr, i1node, i2node )
     fstats(8) = -minval( tn )
     call rreduce1( gfstats, fstats, 'allmax', ifn )
     if ( master ) then

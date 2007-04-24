@@ -120,9 +120,9 @@ where ( s2 > vs2 ) s2 = vs2
 stats(1) =  maxval( mr )
 stats(2) =  maxval( s1 )
 stats(3) =  maxval( s2 )
-call sethalo( mr, stats(1), i1cell, i2cell )
-call sethalo( s1, stats(2), i1cell, i2cell )
-call sethalo( s2, stats(3), i1cell, i2cell )
+call scalarsethalo( mr, stats(1), i1cell, i2cell )
+call scalarsethalo( s1, stats(2), i1cell, i2cell )
+call scalarsethalo( s2, stats(3), i1cell, i2cell )
 i1 = ibc1
 i2 = ibc2
 where( i1 <= 1 ) i1 = 4
