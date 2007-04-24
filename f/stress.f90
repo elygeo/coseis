@@ -6,14 +6,14 @@ contains
 subroutine stress
 use m_globals
 use m_diffnc
+use m_util
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iz
 
 ! Modified displacement
 do i = 1, 3
   w1(:,:,:,i) = u(:,:,:,i) + gam * v(:,:,:,i)
 end do
-w2 = 0.
-s1 = 0.
+call sethalo( s1, 0., i1cell, i2cell )
 
 ! Loop over component and derivative direction
 doic: do ic  = 1, 3
@@ -130,11 +130,14 @@ case( 3 )
 end select
 
 ! Add contribution to gradient
-if ( ic == id ) then
-  w1(:,:,:,ic) = s1
-else
+if ( ic < id ) then
+  i = 6 - ic - id
+  w2(:,:,:,i) = s1
+elseif ( ic > id ) then
   i = 6 - ic - id
   w2(:,:,:,i) = w2(:,:,:,i) + s1
+else
+  w1(:,:,:,ic) = s1
 end if
 
 end do doid

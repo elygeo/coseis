@@ -8,7 +8,7 @@ subroutine hourglassnc( df, f, iq, i, i1, i2 )
 real, intent(out) :: df(:,:,:)
 real, intent(in) :: f(:,:,:,:)
 integer, intent(in) :: iq, i, i1(3), i2(3)
-integer :: i, j, k, l, j1, k1, l1, j2, k2, l2
+integer :: j, k, l, j1, k1, l1, j2, k2, l2
 
 if ( any( i2 < i1 ) ) return
 
