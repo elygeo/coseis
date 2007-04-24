@@ -31,6 +31,7 @@ allocate( jj(nsrc), kk(nsrc), ll(nsrc), cellvol(nsrc), srcfr(nsrc) )
 
 ! Use points inside radius
 i = 0
+sumsrcfr = 0.
 do l = i1cell(3), i2cell(3)
 do k = i1cell(2), i2cell(2)
 do j = i1cell(1), i2cell(1)
@@ -57,6 +58,7 @@ end do
 
 ! Normalize and divide by cell volume
 call rreduce( allsumsrcfr, sumsrcfr, 'allsum', 0 )
+print *, sumsrcfr, allsumsrcfr
 if ( allsumsrcfr <= 0. ) stop 'bad source space function'
 srcfr = srcfr / allsumsrcfr / cellvol
 
