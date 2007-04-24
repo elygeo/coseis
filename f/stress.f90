@@ -13,7 +13,7 @@ integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iz
 do i = 1, 3
   w1(:,:,:,i) = u(:,:,:,i) + gam * v(:,:,:,i)
 end do
-call sethalo( s1, 0., i1cell, i2cell )
+call scalarsethalo( s1, 0., i1cell, i2cell )
 
 ! Loop over component and derivative direction
 doic: do ic  = 1, 3
