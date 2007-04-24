@@ -9,9 +9,10 @@ use m_diffcn
 use m_hourglass
 use m_collective
 use m_bc
+use m_util
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, ic, iid, id, iz, iq
 
-s1 = 0.
+call sethalo( s1, 0., i1node, i2node )
 
 ! Loop over component and derivative direction
 doic: do ic  = 1, 3
@@ -89,29 +90,55 @@ end if
 end do doid
 end do doic
 
-! Stiffness hourglass control
-w2 = 0.
-s2 = 0.
-i1 = max( i1pml + 1, i1node )
-i2 = min( i2pml - 1, i2node )
+! Hourglass controll. First check for PML
+if ( any( hourglass > 0. ) .and. ( npml == 0 .or. all( ibc1 /= 1 .and. ibc2 /= 1 ) ) ) then
+
+! Optimize for no PML: combined stiffness and viscous hourglass controll
+call sethalo( s1, 0., i1cell, i2cell )
+call sethalo( s2, 0., i1node, i2node )
+w2 = hourglass(1) * u + dt * hourglass(2) * v
 do iq = 1, 4
-  call hourglassnc( w2, u, iq, i1cell, i2cell )
-  do i = 1, 3
-    s1 = hourglass(1) * y * w2(:,:,:,i)
-    call hourglasscn( s2, s1, iq, i1, i2 )
-    w1(:,:,:,i) = w1(:,:,:,i) - s2
-  end do
+do i = 1, 3
+  call hourglassnc( s1, w2, iq, i, i1cell, i2cell )
+  s1 = y * s1
+  call hourglasscn( s2, s1, iq, i1node, i2node )
+  w1(:,:,:,i) = w1(:,:,:,i) - s2
+end do
 end do
 
-! Viscous hourglass control
+! PML present
+else
+call sethalo( s1, 0., i1cell, i2cell )
+
+! Stiffness hourglass control, exclude PML
+if ( hourglass(1) > 0. ) then
+i1 = max( i1pml + 1, i1node )
+i2 = min( i2pml - 1, i2node )
+call sethalo( s2, 0., i1, i2 )
 do iq = 1, 4
-  call hourglassnc( w2, v, iq, i1cell, i2cell )
-  do i = 1, 3
-    s1 = dt * hourglass(2) * y * w2(:,:,:,i)
-    call hourglasscn( s2, s1, iq, i1node, i2node )
-    w1(:,:,:,i) = w1(:,:,:,i) - s2
-  end do
+do i = 1, 3
+  call hourglassnc( s1, u, iq, i, i1cell, i2cell )
+  s1 = hourglass(1) * y * s1
+  call hourglasscn( s2, s1, iq, i1, i2 )
+  w1(:,:,:,i) = w1(:,:,:,i) - s2
 end do
+end do
+end if
+
+! Viscous hourglass control
+if ( hourglass(2) > 0. ) then
+call sethalo( s2, 0., i1node, i2node )
+do iq = 1, 4
+do i = 1, 3
+  call hourglassnc( s1, v, iq, i, i1cell, i2cell )
+  s1 = dt * hourglass(2) * y * s1
+  call hourglasscn( s2, s1, iq, i1node, i2node )
+  w1(:,:,:,i) = w1(:,:,:,i) - s2
+end do
+end do
+end if
+
+end if
 
 ! Newton's law: a_i = f_i / m
 do i = 1, 3

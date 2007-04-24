@@ -4,10 +4,10 @@ implicit none
 contains
 
 ! Node to cell
-subroutine hourglassnc( df, f, iq, i1, i2 )
-real, intent(out) :: df(:,:,:,:)
+subroutine hourglassnc( df, f, iq, i, i1, i2 )
+real, intent(out) :: df(:,:,:)
 real, intent(in) :: f(:,:,:,:)
-integer, intent(in) :: iq, i1(3), i2(3)
+integer, intent(in) :: iq, i, i1(3), i2(3)
 integer :: i, j, k, l, j1, k1, l1, j2, k2, l2
 
 if ( any( i2 < i1 ) ) return
@@ -18,32 +18,32 @@ l1 = i1(3); l2 = i2(3)
 
 select case( iq )
 case( 1 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2, i=1:3 )
-    df(j,k,l,i) = &
+  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+    df(j,k,l) = &
       f(j,k,l,i) + f(j+1,k+1,l+1,i) &
     + f(j,k+1,l+1,i) + f(j+1,k,l,i) &
     - f(j+1,k,l+1,i) - f(j,k+1,l,i) &
     - f(j+1,k+1,l,i) - f(j,k,l+1,i)
   end forall
 case( 2 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2, i=1:3 )
-    df(j,k,l,i) = &
+  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+    df(j,k,l) = &
       f(j,k,l,i) + f(j+1,k+1,l+1,i) &
     - f(j,k+1,l+1,i) - f(j+1,k,l,i) &
     + f(j+1,k,l+1,i) + f(j,k+1,l,i) &
     - f(j+1,k+1,l,i) - f(j,k,l+1,i)
   end forall
 case( 3 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2, i=1:3 )
-    df(j,k,l,i) = &
+  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+    df(j,k,l) = &
       f(j,k,l,i) + f(j+1,k+1,l+1,i) &
     - f(j,k+1,l+1,i) - f(j+1,k,l,i) &
     - f(j+1,k,l+1,i) - f(j,k+1,l,i) &
     + f(j+1,k+1,l,i) + f(j,k,l+1,i)
   end forall
 case( 4 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2, i=1:3 )
-    df(j,k,l,i) = &
+  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+    df(j,k,l) = &
       f(j,k,l,i) - f(j+1,k+1,l+1,i) &
     + f(j,k+1,l+1,i) - f(j+1,k,l,i) &
     + f(j+1,k,l+1,i) - f(j,k+1,l,i) &
@@ -60,7 +60,7 @@ subroutine hourglasscn( df, f, iq, i1, i2 )
 real, intent(out) :: df(:,:,:)
 real, intent(in) :: f(:,:,:)
 integer, intent(in) :: iq, i1(3), i2(3)
-integer :: i, j, k, l, j1, k1, l1, j2, k2, l2
+integer :: j, k, l, j1, k1, l1, j2, k2, l2
 
 if ( any( i2 < i1 ) ) return
 

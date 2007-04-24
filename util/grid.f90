@@ -26,10 +26,10 @@ forall( i=1:n2 ) x(:,i,1,2) = dx * ( i - 1 )
 if ( registration == 0 ) x = x + .5 * dx
 
 ! UTM zone 11
-h1 =  cos( -theta / 180. * pi )
-h2 =  sin( -theta / 180. * pi )
-h3 = -sin( -theta / 180. * pi )
-h4 =  cos( -theta / 180. * pi )
+h1 =  cos( theta / 180. * pi )
+h2 =  sin( theta / 180. * pi )
+h3 = -sin( theta / 180. * pi )
+h4 =  cos( theta / 180. * pi )
 do k = 1, n2
 do j = 1, n1
   x1 = x(j,k,1,1)
