@@ -58,7 +58,6 @@ end do
 
 ! Normalize and divide by cell volume
 call rreduce( allsumsrcfr, sumsrcfr, 'allsum', 0 )
-print *, sumsrcfr, allsumsrcfr
 if ( allsumsrcfr <= 0. ) stop 'bad source space function'
 srcfr = srcfr / allsumsrcfr / cellvol
 
