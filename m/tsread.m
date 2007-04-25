@@ -1,5 +1,12 @@
 % Time series
-function [ msg, tt, vt, x, tta, vta, labels ] = tsread( field, sensor, dofilter )
+function [ msg, tt, vt, x, tta, vta, labels ] = tsread( varargin )
+
+field  = varargin{1};
+sensor = varargin{2};
+dofilter = 0;
+upvector = [ 0 0 1 ];
+if nargin >= 3, dofilter = varargin{3}; end
+if nargin >= 4, upvector = varargin{4}; end
 
 tt = [];
 tta = [];

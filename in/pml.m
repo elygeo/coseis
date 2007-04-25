@@ -3,29 +3,34 @@
   nt = 500;
   dx = 100.;
   dt = .0075;
-  gam = .3;
-  hourglass = [ 1. 3. ];
-  oplevel = 6;
+  gam = .0;
+  hourglass = [ 1. 2. ];
 
   faultnormal = 0;
-  fixhypo = -2;
-  tfunc = 'sbrune';
   tfunc = 'brune';
+  tfunc = 'sbrune';
   rsource = 100.;
   tsource = .056;
   moment1 = [ 1e18 1e18 1e18 ];
   moment2 = [ 0 0 0 ];
+  fixhypo = -2;
 
   np = [ 1 1 2 ];
-  debug = 1;
-% timeseries = { 'v'  -6000.      0.     0. }
-% timeseries = { 'v'  -6000.  -6000.     0. }
-% timeseries = { 'v'  -6000.  -6000. -6000. }
-% timeseries = { 'x'  -6000.      0.     0. }
-% timeseries = { 'x'  -6000.  -6000.     0. }
-% timeseries = { 'x'  -6000.  -6000. -6000. }
-  out = [ 'x' 1   1 0 1 0   -1  0 -1  0 ];
-  out = [ 'v' 1   1 0 1 1   -1  0 -1 -1 ];
+  timeseries = { 'x'  -6001.     -1.    -1. }
+  timeseries = { 'v'  -6001.     -1.    -1. }
+  timeseries = { 'x'  -6001.  -6001.    -1. }
+  timeseries = { 'v'  -6001.  -6001.    -1. }
+  timeseries = { 'x'  -6001.  -6001. -6001. }
+  timeseries = { 'v'  -6001.  -6001. -6001. }
+  out = [ 'x' 1   1 1 0 0   -1 -1 0  0 ];
+  out = [ 'v' 1   1 1 0 1   -1 -1 0 -1 ];
+
+% Rect
+  ihypo = [ -1 -1 -1 ];
+  nn = [ 81 81 81 ];
+  bc1 = [ 1 1 1 ];
+  bc2 = [ 2 2 2 ];
+return
 
 % Non-rect
   ihypo = [ 0 0 0 ];
@@ -48,13 +53,6 @@ return
   nn = [ 51 51 51 ];
   bc1 = [ 1 1 1 ];
   bc2 = [ 1 1 1 ];
-return
-
-% Rect
-  ihypo = [ -1 -1 -1 ];
-  nn = [ 81 81 81 ];
-  bc1 = [ 1 1 1 ];
-  bc2 = [ 3 3 3 ];
 return
 
 % Mixed rect

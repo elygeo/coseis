@@ -5,9 +5,9 @@
   nt = 1500;
 
 % Mesh
-  affine = [ 2. 0. 0.  0. 1. 0.  0. 0. 1.  1. ]; oplevel = 2; % xx
-  affine = [ 1. 1. 0.  0. 1. 0.  0. 0. 1.  1. ]; oplevel = 3; % xy
-  affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ]; oplevel = 2; % rectangular
+  affine = [ 2. 0. 0.  0. 1. 0.  0. 0. 1.  1. ]; % xx
+  affine = [ 1. 1. 0.  0. 1. 0.  0. 0. 1.  1. ]; % xy
+  affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ]; % rectangular
 
 % Material model
   vp  = 6000.;

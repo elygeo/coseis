@@ -1,7 +1,5 @@
 % Test
 
-  oplevel = 5;
-  oplevel = 6;
 % affine = [ 1 0 0   1 1 0   0 0 1   1 ];
 
   nn = [ 2 2 2 ];

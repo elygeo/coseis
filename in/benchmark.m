@@ -6,15 +6,10 @@
   fixhypo = 2;
   rsource = 50.;
   debug = 0;
-  oplevel = 6;
-  oplevel = 5;
-  oplevel = 4;
-  oplevel = 3;
-  oplevel = 2;
-  oplevel = 1;
+  bc1 = [ 0 0 0 ];
+  npml = 0;
   hourglass = [ 1. 1. ];
-  bc1 = [ 1 0 0 ];
-  npml = 1;
+  oplevel = 2;
 
   % 4^3
   nt = 4;

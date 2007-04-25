@@ -11,8 +11,8 @@
   vp  = { 4000. 'zone'   1 1 1   -1 -1 21 };
   vs  = { 2000. 'zone'   1 1 1   -1 -1 21 };
   rho = { 2600. 'zone'   1 1 1   -1 -1 21 };
-  hourglass = [ 1. 4. ];
-  hourglass = [ 0. 0. ];
+  hourglass = [ 1. 1. ];
+  hourglass = [ 1. 0. ];
   bc1 = [  0  0  0 ]; n1expand = [ 60 60 0 ];
   bc2 = [  0  0  0 ]; n2expand = [ 60 60 60 ];
   bc2 = [  0  0  1 ]; n2expand = [ 60 60 0 ];
