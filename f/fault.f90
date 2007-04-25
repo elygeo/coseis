@@ -241,8 +241,8 @@ use m_bc
 use m_util
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
-! If the two sides of the fault are split accross domains, than we must retrieve
-! the correct solution from the processor that contains both sides. Corrisponding
+! If the two sides of the fault are split across domains, than we must retrieve
+! the correct solution from the processor that contains both sides. Corresponding
 ! sends are below.
 if ( ifn == 0 ) then
   i = abs( faultnormal )
@@ -354,7 +354,7 @@ f2 = sum( t1 * t2, 4 ) * area
 call scalarsethalo( f2, 0., i1node, i2node )
 efric = efric + dt * sum( f2 )
 
-! Strain enegry
+! Strain energy
 t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( ( t0 + t1 ) * t2, 4 ) * area
 call scalarsethalo( f2, 0., i1node, i2node )

@@ -102,7 +102,7 @@ real :: &
   vs2,           & ! max S-wave speed
   hourglass(2),  & ! hourglass stiffness (1) and viscosity (2)
   vdamp,         & ! shear wave velocity dependent damping
-  rexpand,       & ! grid expantion ratio
+  rexpand,       & ! grid expansion ratio
   affine(10),    & ! grid transformation
   gridnoise,     & ! random noise in grid
   inval(nz),     & ! input value
@@ -122,7 +122,7 @@ real :: &
   vrup,          & ! nucleation rupture velocity
   rcrit,         & ! nucleation critical radius
   trelax,        & ! nucleation relaxation time
-  efric,         & ! friction + fracure energy
+  efric,         & ! friction + fracture energy
   estrain,       & ! strain energy
   moment,        & ! strain energy
   mus0,          & ! static friction at hypocenter
@@ -130,7 +130,7 @@ real :: &
   dc0,           & ! dc at hypocenter
   tn0,           & ! normal traction at hypocenter
   ts0,           & ! shear traction at hypocenter
-  ess,           & ! strength paramater
+  ess,           & ! strength parameter
   lc,            & ! breakdown width
   rctest,        & ! rcrit needed for spontaneous rupture
   svtol            ! slip velocity for determining rupture time
@@ -147,8 +147,8 @@ integer, dimension(3) :: &
   nnoff,         & ! offset between local and global indices
   ihypo,         & ! hypocenter node
   symmetry,      & ! grid symmetry in j k l
-  n1expand,      & ! # grid expantion nodes - near side
-  n2expand,      & ! # grid expantion nodes - far side
+  n1expand,      & ! # grid expansion nodes - near side
+  n2expand,      & ! # grid expansion nodes - far side
   i1node,        & ! node calculations start index
   i2node,        & ! node calculations end index
   i1cell,        & ! cell calculations start index

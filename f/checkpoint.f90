@@ -1,4 +1,4 @@
-! Checkpointing
+! Checkpoint
 module m_checkpoint
 implicit none
 contains

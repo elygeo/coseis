@@ -3,7 +3,7 @@ module m_output
 implicit none
 contains
 
-! initialize output
+! Initialize output
 subroutine output_init
 use m_globals
 use m_collective
@@ -317,7 +317,7 @@ end do
 
 end do doiz
 
-! Interation counter
+! Iteration counter
 if ( master .and. pass == 2 ) then
   open( 1, file='currentstep', status='replace' )
   write( 1, * ) it

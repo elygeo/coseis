@@ -191,7 +191,7 @@ do e = 1,1; end do ! bug work-around, need slight delay here for MPICH2
 call mpi_type_free( dtype, e )
 end subroutine
 
-! Vector recieve
+! Vector receive
 subroutine vectorrecv( f, i1, i2, i )
 use mpi
 real, intent(inout) :: f(:,:,:,:)

@@ -30,7 +30,7 @@ else
 end if
 
 ! PML region
-! p'_ij + d_j*p_ij = w_ij,j (no summation convetion)
+! p'_ij + d_j*p_ij = w_ij,j (no summation convention)
 ! f_i = sum_j( p_ij' )
 select case( id )
 case( 1 )
@@ -90,7 +90,7 @@ end if
 end do doid
 end do doic
 
-! Hourglass control.
+! Hourglass control. Only viscous in PML
 if ( any( hourglass > 0. ) ) then
 call scalarsethalo( s1, 0., i1cell, i2cell )
 call scalarsethalo( s2, 0., i1node, i2node )
@@ -110,12 +110,17 @@ do ic = 1, 3
       i2 = i2cell
       i2(i) = min( i2(i), i1pml(i) )
       call hourglassnc( s1, v, iq, ic, i1, i2 )
+      forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+        s1(j,k,l) = dt * hourglass(2) * y(j,k,l) * s1(j,k,l)
+      end forall
       i1 = i1cell
       i2 = i2cell
       i1(i) = max( i1(i), i2pml(i) - 1 )
       call hourglassnc( s1, v, iq, ic, i1, i2 )
+      forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+        s1(j,k,l) = dt * hourglass(2) * y(j,k,l) * s1(j,k,l)
+      end forall
     end do
-    s1 = dt * hourglass(2) * y * s1
     do i = 1, 3
       i1 = i1node
       i2 = i2node

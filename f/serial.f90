@@ -98,7 +98,7 @@ integer, intent(in) :: i1(3), i2(3), i
 f(1,1,1,1) = f(1,1,1,1) - i1(1) + i1(1) - i2(1) + i2(1) - i + i
 end subroutine
 
-! Vector recieve
+! Vector receive
 subroutine vectorrecv( f, i1, i2, i )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i
