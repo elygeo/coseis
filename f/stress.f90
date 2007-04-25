@@ -25,36 +25,18 @@ i2 = min( i2pml - 2, i2cell )
 call diffnc( s1, w1, ic, id, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
 
 ! PML region, non-damped directions: g_ij = u_i,j
-if ( id /= 1 ) then
+do i = 1, 3
+if ( id /= i ) then
   i1 = i1cell
   i2 = i2cell
-  i2(1) = min( i2(1), i1pml(1) )
+  i2(i) = min( i2(i), i1pml(i) )
   call diffnc( s1, u, ic, id, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
   i1 = i1cell
   i2 = i2cell
-  i1(1) = max( i1(1), i2pml(1) - 1 )
-  call diffnc( s1, u, ic, id, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
-end if
-if ( id /= 2 ) then
-  i1 = i1cell
-  i2 = i2cell
-  i2(2) = min( i2(2), i1pml(2) )
-  call diffnc( s1, u, ic, id, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
-  i1 = i1cell
-  i2 = i2cell
-  i1(2) = max( i1(2), i2pml(2) - 1 )
+  i1(i) = max( i1(i), i2pml(i) - 1 )
   call diffnc( s1, u, ic, id, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
 end if
-if ( id /= 3 ) then
-  i1 = i1cell
-  i2 = i2cell
-  i2(3) = min( i2(3), i1pml(3) )
-  call diffnc( s1, u, ic, id, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
-  i1 = i1cell
-  i2 = i2cell
-  i1(3) = max( i1(3), i2pml(3) - 1 )
-  call diffnc( s1, u, ic, id, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
-end if
+end do
 
 ! PML region, damped direction: g'_ij = d_j*g_ij = v_i,j
 select case( id )
