@@ -6,8 +6,8 @@
   vp  = 6000.;
   vs  = 3464.;
   rho = 2700.;
-  gam = .0;
-  hourglass = [ 1. 4. ];
+  gam = .3;
+  hourglass = [ 1. .3 ];
   bc1 = [ -2 -2  0 ];
   bc2 = [  1  1  1 ];
 

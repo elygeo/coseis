@@ -4,12 +4,12 @@
   dx = 100.;
   dt = .0075;
   gam = .0;
-  hourglass = [ 1. 2. ];
+  hourglass = [ 1. .7 ];
 
   faultnormal = 0;
-  tfunc = 'brune';
   tfunc = 'sbrune';
-  rsource = 100.;
+  tfunc = 'brune';
+  rsource = 50.;
   tsource = .056;
   moment1 = [ 1e18 1e18 1e18 ];
   moment2 = [ 0 0 0 ];
@@ -30,6 +30,8 @@
   nn = [ 81 81 81 ];
   bc1 = [ 1 1 1 ];
   bc2 = [ 2 2 2 ];
+bc2 = [ 1 1 1 ];
+ihypo = [ 0 0 0 ];
 return
 
 % Non-rect

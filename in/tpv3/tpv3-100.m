@@ -11,8 +11,9 @@
   tn  = -120e6;
   ts1 = -70e6;
   ts1 = { -81.6e6 'cube'  -1501. -1501. -1.   1501. 1501. 1. };
-  gam = .0
+  gam = .1
   hourglass = [ 1. 4. ];
+  hourglass = [ 1. .7 ];
   fixhypo = -1;
   dx  = 100;
   dt  = .008;
@@ -36,8 +37,11 @@
   bc1      = [   0   0   0 ];
   n1expand = [  50  50  50 ];
 
+  itstats = 1;
   itcheck = 0;
   np = [ 1 1 2 ];
+np = [ 1 1 1 ];
+nt = 2;
 
 % rectangular
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ];

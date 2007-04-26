@@ -50,8 +50,8 @@ if any( strcmp( field, { 'v' 'vm' 'sv' } ) )
   it0 = 1;
   tt = ( it0 : it ) * dt - .5 * dt;
 else
-  it0 = 1;
-  tt = ( it0 : it ) * dt - dt;
+  it0 = 0;
+  tt = ( it0 : it ) * dt;
 end
 
 % Extract data

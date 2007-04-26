@@ -94,7 +94,6 @@ case( 'timeseries' );
   nout = nout + 1
   i = nout
   outtype(i) = 'x'
-  ditout(i) = 1
   read( str, *, iostat=io ) fieldout(i), xout(i,:)
 case( 'out' );
   nout = nout + 1

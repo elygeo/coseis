@@ -10,7 +10,7 @@ use m_hourglass
 use m_collective
 use m_bc
 use m_util
-integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2, ic, iid, id, iz, iq
+integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq
 
 call scalarsethalo( s1, 0., i1node, i2node )
 
@@ -79,7 +79,7 @@ case( 3 )
   end forall
   end do
 end select
-
+ 
 ! Add contribution to force vector
 if ( ic == id ) then
   w1(:,:,:,ic) = s1

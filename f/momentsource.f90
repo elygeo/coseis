@@ -26,7 +26,7 @@ s2 = ( w2(:,:,:,1) - xhypo(1) ) * ( w2(:,:,:,1) - xhypo(1) ) &
    + ( w2(:,:,:,2) - xhypo(2) ) * ( w2(:,:,:,2) - xhypo(2) ) &
    + ( w2(:,:,:,3) - xhypo(3) ) * ( w2(:,:,:,3) - xhypo(3) )
 call scalarsethalo( s2, 2.*rsource*rsource, i1cell, i2cell )
-nsrc = count( s2 <= rsource*rsource )
+nsrc = count( s2 < rsource*rsource )
 allocate( jj(nsrc), kk(nsrc), ll(nsrc), cellvol(nsrc), srcfr(nsrc) )
 
 ! Use points inside radius
@@ -35,7 +35,7 @@ sumsrcfr = 0.
 do l = i1cell(3), i2cell(3)
 do k = i1cell(2), i2cell(2)
 do j = i1cell(1), i2cell(1)
-if ( s2(j,k,l) <= rsource*rsource ) then
+if ( s2(j,k,l) < rsource*rsource ) then
   i = i + 1
   jj(i) = j
   kk(i) = k

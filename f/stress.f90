@@ -7,7 +7,7 @@ subroutine stress
 use m_globals
 use m_diffnc
 use m_util
-integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iz
+integer :: i1(3), i2(3), i, j, k, l, ic, iid, id
 
 ! Modified displacement
 do i = 1, 3

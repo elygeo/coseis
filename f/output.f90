@@ -10,7 +10,7 @@ use m_collective
 use m_outprops
 use m_util
 real :: rout
-integer :: i1(3), i2(3), n(3), noff(3), i, j, k, l, j1, k1, l1, j2, k2, l2, nc, iz, onpass
+integer :: i1(3), i2(3), n(3), noff(3), i, j1, k1, l1, j2, k2, l2, nc, iz, onpass
 logical :: dofault, fault, cell
 
 if ( master ) write( 0, * ) 'Output initialization'
@@ -39,7 +39,7 @@ if ( onpass == 0 ) then
   i2out(iz,4) = 0
 end if
 i2out(iz,4) = min( i2out(iz,4), nt )
-if ( fault .and. faultnormal == 0 ) ditout(iz) = nt + 1
+if ( fault .and. faultnormal == 0 ) i1out(iz,4) = nt + 1
 
 ! Spacial indices
 n = nn + 2 * nhalo
@@ -56,8 +56,10 @@ case( 'z' )
     i2(i) = ihypo(i)
   end if
 case( 'x' )
+  ditout(iz) = 1
   i1out(iz,4) = 0
   i2out(iz,4) = nt
+  if ( onpass == 0 ) i2out(iz,4) = 0
   if ( fault ) then
     i1 = nnoff
     rout = 2 * dx * dx
@@ -98,7 +100,7 @@ case( 'x' )
     call reduceloc( rout, i1, s2, 'allmin', n, noff, 0 )
   end if
   i2 = i1
-  if ( rout > dx * dx ) ditout(iz) = nt + 1
+  if ( rout > dx * dx ) i1out(iz,4) = nt + 1
 end select
 
 ! Save indices
@@ -110,7 +112,7 @@ i2out(iz,1:3) = i2
 i1 = max( i1, i1node )
 i2 = min( i2, i2node )
 if ( cell ) i2 = min( i2, i2cell )
-i = ditout(iz)
+i = i1out(iz,4)
 if ( any( i2 < i1 ) ) i = nt + 1
 call splitio( iz, nout, i )
  
@@ -248,7 +250,7 @@ i2 = i2out(iz,1:3)
 i3 = max( i1, i1node )
 i4 = min( i2, i2node )
 if ( any( i3 > i4 ) ) then 
-  ditout(iz) = nt + 1
+  i1out(iz,4) = nt + 1
   cycle doiz
 end if
 if ( fault ) then
