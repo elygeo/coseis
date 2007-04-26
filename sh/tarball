@@ -4,6 +4,9 @@ dir=$( /bin/pwd )
 base=$( basename "$dir" )
 version=$( date +%Y%m%d%H%M%S )
 
+unset s g
+while getopts sg opt; do eval "$opt=y"; done
+
 cat << END > versionmeta.m
 version = '$version';
 login   = '$LOGNAME';
@@ -30,7 +33,9 @@ cd $( dirname "$dir" )
 tar cf - $files | gzip > "$dir/tmp/$base.tgz"
 cd "$dir"
 
-[ "x$1" = "x-s" ] && cp "tmp/$base.tgz" "save/$base-$version.tgz"
+mkdir -p save/good
+[ "$g" -o "$s" ] && cp "tmp/$base.tgz" "save/$base-$version.tgz"
+[ "$g" ]         && cp "tmp/$base.tgz" "save/good/$base-$version.tgz"
 
 exit 0
 
