@@ -20,14 +20,14 @@ case( 'lam'  ); onpass = 0; cell = .true.
 case( 'mu'   ); onpass = 0; cell = .true.
 case( 'gam'  ); onpass = 0; cell = .true.
 case( 'v'    ); onpass = 1; nc = 3
-case( 'vm'   ); onpass = 1
-case( 'pv'   ); onpass = 1
+case( 'vm2'  ); onpass = 1
+case( 'pv2'  ); onpass = 1
 case( 'w'    ); onpass = 1; cell = .true.; nc = 6
-case( 'wm'   ); onpass = 1; cell = .true.
+case( 'wm2'  ); onpass = 1; cell = .true.
 case( 'u'    ); nc = 3
-case( 'um'   )
+case( 'um2'  )
 case( 'a'    ); nc = 3
-case( 'am'   )
+case( 'am2'  )
 case( 'nhat' ); fault = .true.; onpass = 0; nc = 3
 case( 'mus'  ); fault = .true.; onpass = 0
 case( 'mud'  ); fault = .true.; onpass = 0

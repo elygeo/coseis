@@ -145,12 +145,12 @@ end if
 if ( it > 0 ) then
   select case( pass )
   case( 1 )
-    s1 = sqrt( sum( v * v, 4 ) )
-    s2 = sqrt( sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 ) )
+    s1 = sum( v * v, 4 )
+    s2 = sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 )
     pv = max( pv, s1 )
   case( 2 )
-    s1 = sqrt( sum( u * u, 4 ) )
-    s2 = sqrt( sum( w1 * w1, 4 ) )
+    s1 = sum( u * u, 4 )
+    s2 = sum( w1 * w1, 4 )
   end select
 end if
 
@@ -160,8 +160,6 @@ if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
   case( 1 )
     call scalarsethalo( s1, -1., i1node, i2node )
     call scalarsethalo( s2, -1., i1cell, i2cell )
-    vstats(1) = maxval( s1 )
-    vstats(2) = maxval( s2 )
     n = nn + 2 * nhalo
     noff = nnoff - nhalo
     call reduceloc( rr, i1, s1, 'max', n, noff, 0 )
@@ -171,11 +169,13 @@ if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
       call iwrite( 'stats/vmax2', i1(2), it / itstats )
       call iwrite( 'stats/vmax3', i1(3), it / itstats )
     end if
+    vstats(1) = sqrt( rr )
+    vstats(2) = sqrt( maxval( s2 ) )
   case( 2 )
     call scalarsethalo( s1, -1., i1node, i2node )
     call scalarsethalo( s2, -1., i1node, i2node )
-    vstats(3) = maxval( s1 )
-    vstats(4) = maxval( s2 )
+    vstats(3) = sqrt( maxval( s1 ) )
+    vstats(4) = sqrt( maxval( s2 ) )
     call rreduce1( gvstats, vstats, 'max', 0 )
     if ( master ) then
       call rwrite( 'stats/vmax', gvstats(1), it / itstats )
@@ -287,11 +287,11 @@ do ic = 1, nc
    if ( ic < 4 )  call vectorio( 'w', str, w1, ic,   ir, i1, i2, i3, i4, iz )
    if ( ic > 3 )  call vectorio( 'w', str, w2, ic-3, ir, i1, i2, i3, i4, iz )
   case( 'a'    ); call vectorio( 'w', str, w1,   ic, ir, i1, i2, i3, i4, iz )
-  case( 'vm'   ); call scalario( 'w', str, s1,       ir, i1, i2, i3, i4, iz )
-  case( 'um'   ); call scalario( 'w', str, s1,       ir, i1, i2, i3, i4, iz )
-  case( 'wm'   ); call scalario( 'w', str, s2,       ir, i1, i2, i3, i4, iz )
-  case( 'am'   ); call scalario( 'w', str, s2,       ir, i1, i2, i3, i4, iz )
-  case( 'pv'   ); call scalario( 'w', str, pv,       ir, i1, i2, i3, i4, iz )
+  case( 'vm2'  ); call scalario( 'w', str, s1,       ir, i1, i2, i3, i4, iz )
+  case( 'um2'  ); call scalario( 'w', str, s1,       ir, i1, i2, i3, i4, iz )
+  case( 'wm2'  ); call scalario( 'w', str, s2,       ir, i1, i2, i3, i4, iz )
+  case( 'am2'  ); call scalario( 'w', str, s2,       ir, i1, i2, i3, i4, iz )
+  case( 'pv2'  ); call scalario( 'w', str, pv,       ir, i1, i2, i3, i4, iz )
   case( 'nhat' ); call vectorio( 'w', str, nhat, ic, ir, i1, i2, i3, i4, iz )
   case( 'mus'  ); call scalario( 'w', str, mus,      ir, i1, i2, i3, i4, iz )
   case( 'mud'  ); call scalario( 'w', str, mud,      ir, i1, i2, i3, i4, iz )
