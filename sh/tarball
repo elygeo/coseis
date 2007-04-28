@@ -4,7 +4,8 @@ dir=$( /bin/pwd )
 base=$( basename "$dir" )
 version=$( date +%Y%m%d%H%M%S )
 
-unset s g
+s=""
+g=""
 while getopts sg opt; do eval "$opt=y"; done
 
 cat << END > versionmeta.m

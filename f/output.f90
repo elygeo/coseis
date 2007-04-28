@@ -156,6 +156,7 @@ end if
 
 ! Volume stats
 if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
+print *, 12341234
   select case( pass )
   case( 1 )
     call scalarsethalo( s1, -1., i1node, i2node )

@@ -38,7 +38,8 @@ gfortran)
   gflags='-O0 -g -W -fbounds-check -ffpe-trap=invalid,zero,overflow,underflow'
   oflags='-O3'
   ;;
-f95)  gflags='-g'
+f95)
+  gflags='-g'
   oflags='-O'
   if [ $( uname ) = SunOS ]; then
     gflags='-g -w4 -u -C'

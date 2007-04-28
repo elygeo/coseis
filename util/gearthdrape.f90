@@ -1,9 +1,10 @@
 ! Project TeraShake surface snapshot data to lon/lat for viewing in Google Earth.
-! Also generates a Google Earth KML file with time animation called 'tmp.kml'.
+! Also generates a Google Earth KML file with time animation called 'doc.kml'.
 ! You must create the images using a separate plotting program of your choice.
-! Geoffrey Ely, 2007-04-10
+! Geoffrey Ely, 2007-04-27
 ! compile: f95 -O utm.f90 gearthdrape.f90 -o gearthdrape
-! usage: ./gearthdrape <file1> <file2> <file3> ...
+! usage: ./gearthdrape [-s] <file1> <file2> <file3> ...
+!   -s   swap bytes
 
 program main
 use m_utm
@@ -31,6 +32,7 @@ theta = -40.     ! UTM rotation
 o1 = 132679.8125 ! UTM x offset
 o2 = 3824867.    ! UTM y offset
 
+swab = .false.
 do iarg = 1, command_argument_count()
   call get_command_argument( iarg, str )
   if ( str(1:1) /= '-' ) exit
@@ -120,10 +122,23 @@ end do
 end do
 
 ! KML initialize
-open( 2, file='tmp.kml', status='replace' )
+open( 2, file='doc.kml', status='replace' )
 write( 2, '(a)' ) '<?xml version="1.0" encoding="UTF-8"?>'
 write( 2, '(a)' ) '<kml xmlns="http://earth.google.com/kml/2.1">'
-write( 2, '(a)' ) '<Folder>'
+write( 2, '(a)' ) '<Document>'
+write( 2, '(a)' ) '<name>TeraShake</name>'
+write( 2, '(a)' ) '<description><![CDATA['
+write( 2, '(a)' ) '  Simulation:<br>'
+write( 2, '(a)' ) '  Kim Olsen, et al.<br>'
+write( 2, '(a)' ) '  Southern California Earthquake Center<br>'
+write( 2, '(a)' ) '  http://epicenter.usc.edu/cmeportal/TeraShake.html<br>'
+write( 2, '(a)' ) '  <br>'
+write( 2, '(a)' ) '  Visualization:<br>'
+write( 2, '(a)' ) '  Geoffrey Ely<br>'
+write( 2, '(a)' ) '  Scripps Institution of Oceanography<br>'
+write( 2, '(a)' ) '  http://igpphome.ucsd.edu/~gely/'
+write( 2, '(a)' ) ']]></description>'
+write( 2, '(a)' ) '<Snippet maxLines="0"></Snippet>'
 write( 2, '(a)' ) '<ScreenOverlay>'
 write( 2, '(a)' ) '  <name>Legend</name>'
 write( 2, '(a)' ) '  <Icon>'
@@ -210,7 +225,7 @@ write( 2, '(a)' ) '</GroundOverlay>'
 end do
 
 ! KML finalize
-write( 2, '(a)' ) '</Folder>'
+write( 2, '(a)' ) '</Document>'
 write( 2, '(a)' ) '</kml>'
 close(2)
 
