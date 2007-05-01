@@ -66,7 +66,6 @@ for file in "$srcdir/data/"*; do
 done
 flags=$oflags
 #$sfc $flags utm.f90 tscoords.f90 tsgrid.f90 -o tsgrid
-$sfc $flags utm.f90 tscoords.f90 tsgridr.f90 -o tsgridr
 $sfc $flags utm.f90 tscoords.f90 ts2ll.f90 -o ts2ll
 $sfc $flags utm.f90 pscoords.f90 ps2ll.f90 -o ps2ll
 $sfc $flags utm.f90 tscoords.f90 ll2ts.f90 -o ll2ts

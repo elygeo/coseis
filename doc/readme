@@ -344,6 +344,16 @@ M'' = -H * M0 * e^(-t/T) / T^3 * (t - T)
 v   =  ----------------------------------------
        4 * pi * rho * vp^2 * T^2 * r * vp
 
+Analytical Inverse
+Divide 1 by the Laplace transform of the Brune pulse, then in this result,
+interpret the Laplace variable as a differentiation operator. The result is
+(d/dt + 1/T)^2. 
+
+So to simultaneously deconvolve the Brune pulse  from a series, and then
+convolve with a newly desired source function S, you just apply the operator
+(d/dt + 1/T)^2 to S, which just gives you d/dt(dS/dt) + 2(dS/dt)/T + S/T^2,
+and then convolve this result with the original series.
+
 Smooth Brune
 M   = -H * M0 * e^(-t/t) / T^2 / 2 * (t^2 + 2*t*T + 2*T^2) + M0
 M'  =  H * M0 * e^(-t/t) / T^3 / 2 *  t^2

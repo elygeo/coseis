@@ -1,7 +1,7 @@
 ! Project TeraShake surface snapshot data to lon/lat for viewing in Google Earth.
 ! Also generates a Google Earth KML file with time animation called 'doc.kml'.
 ! You must create the images using a separate plotting program of your choice.
-! Geoffrey Ely, 2007-04-27
+! Geoffrey Ely, 2007-04-28
 ! compile: f95 -O utm.f90 gearthdrape.f90 -o gearthdrape
 ! usage: ./gearthdrape [-s] <file1> <file2> <file3> ...
 !   -s   swap bytes
@@ -15,7 +15,7 @@ real :: x1, x2, h1, h2, h3, h4, dlon, dlat
 real, allocatable :: x(:,:,:,:), v1(:,:), v2(:,:)
 integer :: n1, n2, registration, i, j, k, j1, k1, iarg, ifile
 character(160) :: str
-logical :: swab
+logical :: swab, timeseries
 character :: c1(4), c2(4)
 equivalence (x1,c1), (x2,c2)
 
@@ -41,6 +41,8 @@ do iarg = 1, command_argument_count()
   case default; stop 'Usage: gearthdrape [-s] <file1> <file2> ...'
   end select
 end do
+timeseries = .false.
+if ( iarg < command_argument_count() ) timeseries = .true.
 
 ! local meters
 allocate( x(n1,n2,1,2), v1(n1,n2), v2(n1,n2) )
@@ -194,25 +196,12 @@ do j1 = 1, n1
 end do
 end do
 
-! write
-str = trim( str ) // '.ll'
-inquire( iolength=i ) v2
-open( 1, file=str, recl=i, form='unformatted', access='direct', status='replace' )
-write( 1, rec=1 ) v2
-close( 1 )
-
 ! KML
 x1 = .5 * ( dlon * n1 - dlon ) / cos( lat0 * pi / 180. )
 x2 = .5 * ( dlat * n2 - dlat ) * cos( lat0 * pi / 180. )
 write( 2, '(a)' ) '<GroundOverlay>'
-write( 2, * )    ' <name>Image</name>'
-write( 2, * )    ' <Icon>'
-write( 2, * )    '   <href>'//trim(str)//'.png</href>'
-write( 2, * )    ' </Icon>'
-write( 2, * )    ' <TimeSpan>'
-write( 2, * )    '   <begin>', ifile, '</begin>'
-write( 2, * )    ' </TimeSpan>'
-write( 2, * )    ' <drawOrder>', ifile, '</drawOrder>'
+write( 2, * )    ' <name>'//trim(str)//'</name>'
+write( 2, * )    ' <Icon><href>'//trim(str)//'.png</href></Icon>'
 write( 2, * )    ' <LatLonBox>'
 write( 2, * )    '   <north>', lat0 + x2, '</north>'
 write( 2, * )    '   <south>', lat0 - x2, '</south>'
@@ -220,7 +209,18 @@ write( 2, * )    '   <east>',  lon0 + x1, '</east>'
 write( 2, * )    '   <west>',  lon0 - x1, '</west>'
 write( 2, * )    '   <rotation>', phi, '</rotation>'
 write( 2, * )    ' </LatLonBox>'
+if ( timeseries ) then
+  write( 2, * )  ' <TimeSpan><begin>', ifile, '</begin></TimeSpan>'
+  write( 2, * )  ' <drawOrder>', ifile, '</drawOrder>'
+end if
 write( 2, '(a)' ) '</GroundOverlay>'
+
+! write
+str = trim( str ) // '.ll'
+inquire( iolength=i ) v2
+open( 1, file=str, recl=i, form='unformatted', access='direct', status='replace' )
+write( 1, rec=1 ) v2
+close( 1 )
 
 end do
 
