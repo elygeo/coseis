@@ -95,7 +95,7 @@ write( 1, * ) ' mud = ', mud, ';'
 write( 1, * ) ' mus = { ', mus, '''zone''', jf0, 0, -1-nf3, jf0+nf1, 0, -1, ' };'
 close( 1 )
 
-! Metadata for plotting with SDX
+! Metadata for plotting
 open( 1, file='meta.m', status='replace' )
 write( 1, '(a)' ) '% SORD metadata'
 write( 1, * ) ' dx          = ', dx, ';'
@@ -279,15 +279,15 @@ end do
 s1 = 0
 l1 = npml + 1
 l2 = n(3) - nf3
-FIXME this is not right
 do l = 1, l1-1
-  write( 9, rec=l ) dx*(.5+n(3)-l1) - z0 + w1(:,:,:,3)
+  write( 9, rec=l ) dx*(n(3)-.5-l) - z0 + w1(:,:,:,3)
 end do
 do l = l1, l2-1
-  write( 9, rec=l ) dx*(.5+n(3)-l) + (w1(:,:,:,3)-z0)*(l2-l)/(l2-l1)
+  FIXME
+  write( 9, rec=l ) dx*(n(3)-.5-l) + (w1(:,:,:,3)-z0)*(l2-.5-l)/(l2-l1)
 end do
 do l = l2, n(3)-1
-  write( 9, rec=l ) dx*(.5+n(3)-l) + s1
+  write( 9, rec=l ) dx*(n(3)-.5-l) + s1
 end do
 close( 7 )
 close( 8 )
