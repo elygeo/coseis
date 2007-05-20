@@ -44,7 +44,7 @@ cd "$rundir"
 
 #echo "\$(date): Start SCECVM run" >> log
 #cd "$rundir/vm"
-#poe ./scecvm4-$mode
+#poe ./scecvm4-$mode $nn rlon rlat rdep rho vp vs
 #mv rho vp vs "$rundir/data"
 #cd "$rundir"
 

@@ -17,7 +17,7 @@ cp -r scecvm vm
 ./tsgrid
 nn=$( cat nn )
 mv ts1 x1 x2 x3 meta.m data/
-mv nn rlon rlat rdep vm/
+mv rlon rlat rdep vm/
 if [ "$nn" -gt 4000000 ]; then
   echo "Deferring velocity model generation"
   count=$( cat count )
@@ -25,7 +25,7 @@ if [ "$nn" -gt 4000000 ]; then
   mv vm "$srcdir/out/$count/"
 else
   cd vm
-  ./scecvm4-s
+  ./scecvm4-s $nn rlon rlat rdep rho vp vs
   mv rho vp vs "$srcdir/tmp/data/"
 fi
 

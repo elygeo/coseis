@@ -5,10 +5,10 @@
       include 'mpif.h'
       integer(kind=mpi_offset_kind) mpioffset
       integer(8) nnl, i64bit
+      character(160) str
       call mpi_init( ierr )
-      open( 1, file='nn', status='old' )
-      read( 1, * ) nn
-      close( 1 )
+      call get_command_argument( 1, str )
+      read( str, * ) nn
       call mpi_comm_rank( mpi_comm_world, impirank, ierr )
       call mpi_comm_size( mpi_comm_world, impisize, ierr )
       call mpi_file_set_errhandler( mpi_file_null,
@@ -21,17 +21,20 @@
       nn = min( nnl, nn-impirank*nnl )
       irealsize = 4
       mpioffset = impirank * nnl * irealsize
-      call mpi_file_open( mpi_comm_world, 'rlon', mpi_mode_rdonly,
+      call get_command_argument( 2, str )
+      call mpi_file_open( mpi_comm_world, str, mpi_mode_rdonly,
      $  mpi_info_null, ifh, ierr )
       call mpi_file_read_at( ifh, mpioffset, rlon, nn, mpi_real,
      $  mpi_status_ignore, ierr )
       call mpi_file_close( ifh, ierr )
-      call mpi_file_open( mpi_comm_world, 'rlat', mpi_mode_rdonly,
+      call get_command_argument( 3, str )
+      call mpi_file_open( mpi_comm_world, str, mpi_mode_rdonly,
      $  mpi_info_null, ifh, ierr )
       call mpi_file_read_at( ifh, mpioffset, rlat, nn, mpi_real,
      $  mpi_status_ignore, ierr )
       call mpi_file_close( ifh, ierr )
-      call mpi_file_open( mpi_comm_world, 'rdep', mpi_mode_rdonly,
+      call get_command_argument( 4, str )
+      call mpi_file_open( mpi_comm_world, str, mpi_mode_rdonly,
      $  mpi_info_null, ifh, ierr )
       call mpi_file_read_at( ifh, mpioffset, rdep, nn, mpi_real,
      $  mpi_status_ignore, ierr )
@@ -52,9 +55,9 @@
       include 'mpif.h'
       integer(kind=mpi_offset_kind) mpioffset
       integer(8) nnl, i64bit
-      open( 1, file='nn', status='old' )
-      read( 1, * ) nn
-      close( 1 )
+      character(160) str
+      call get_command_argument( 1, str )
+      read( str, * ) nn
       call mpi_comm_rank( mpi_comm_world, impirank, ierr )
       call mpi_comm_size( mpi_comm_world, impisize, ierr )
       call mpi_file_set_errhandler( mpi_file_null,
@@ -65,25 +68,28 @@
       nn = min( nnl, nn-impirank*nnl )
       irealsize = 4
       mpioffset = impirank * nnl * irealsize
-      call mpi_file_open( mpi_comm_world, 'vp',
+      call get_command_argument( 5, str )
+      call mpi_file_open( mpi_comm_world, str,
+     $  mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr )
+      call mpi_file_write_at( ifh, mpioffset, rho, nn, mpi_real,
+     $  mpi_status_ignore, ierr )
+      call mpi_file_close( ifh, ierr )
+      call get_command_argument( 6, str )
+      call mpi_file_open( mpi_comm_world, str,
      $  mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr )
       call mpi_file_write_at( ifh, mpioffset, alpha, nn, mpi_real,
      $  mpi_status_ignore, ierr )
       call mpi_file_close( ifh, ierr )
-      call mpi_file_open( mpi_comm_world, 'vs',
+      call get_command_argument( 7, str )
+      call mpi_file_open( mpi_comm_world, str,
      $  mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr )
       call mpi_file_write_at( ifh, mpioffset, beta, nn, mpi_real,
-     $  mpi_status_ignore, ierr )
-      call mpi_file_close( ifh, ierr )
-      call mpi_file_open( mpi_comm_world, 'rho',
-     $  mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr )
-      call mpi_file_write_at( ifh, mpioffset, rho, nn, mpi_real,
      $  mpi_status_ignore, ierr )
       call mpi_file_close( ifh, ierr )
       call mpi_finalize( ierr )
       kerr = 0
       do i = 1, nn
-        if(alpha(i)/=alpha(i).or.beta(i)/=beta(i).or.rho(i)/=rho(i))
+        if(rho(i)/=rho(i).or.alpha(i)/=alpha(i).or.beta(i)/=beta(i))
      $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
       end do
       end

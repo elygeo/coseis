@@ -40,7 +40,7 @@ cd "$rundir"
 echo "\$PBS_JOBID" >> log
 echo "\$(date): Start SCECVM run" >> log
 cd "$rundir/vm"
-mpiexec -n $np ./scecvm4-$mode
+mpiexec -n $np ./scecvm4-$mode $nn rlon rlat rdep rho vp vs
 mv rho vp vs "$rundir/data"
 cd "$rundir"
 echo "\$(date): Start SORD run" >> log
