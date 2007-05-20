@@ -4,7 +4,6 @@
       character(160) :: str
       include 'newin.h'
       write( 0, * ) 'SCEC Velocity Model version 4'
-      swab = .false.
       call get_command_argument( 1, str )
       read( str, * ) nn
       if( nn > ibig ) stop 'ibig too small'
@@ -35,6 +34,7 @@
       end
 
       subroutine writepts( kerr )
+      character(160) :: str
       include 'newin.h'
       call get_command_argument( 5, str )
       open( 1, file=str, recl=4*nn, form='unformatted', access='direct',
