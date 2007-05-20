@@ -192,8 +192,8 @@ t = t * exag
 h = 30.
 o1 = .5 * h - 121.5 * 3600.
 o2 = .5 * h +  30.5 * 3600.
-do k1 = 1, size(w,2)
-do j1 = 1, size(w,1)
+do k1 = 1, size(w1,2)
+do j1 = 1, size(w1,1)
   xx = ( ( w1(j1,k1,1,1) * 3600 ) - o1 ) / h
   yy = ( ( w1(j1,k1,1,2) * 3600 ) - o2 ) / h
   j = int( xx ) + 1
@@ -283,7 +283,6 @@ do l = 1, l1-1
   write( 9, rec=l ) dx*(n(3)-.5-l) - z0 + w1(:,:,:,3)
 end do
 do l = l1, l2-1
-  FIXME
   write( 9, rec=l ) dx*(n(3)-.5-l) + (w1(:,:,:,3)-z0)*(l2-.5-l)/(l2-l1)
 end do
 do l = l2, n(3)-1

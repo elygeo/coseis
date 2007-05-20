@@ -2,8 +2,8 @@
 program main
 implicit none
 integer, parameter :: nb = 4, nr = 4096
-integer :: i, j, ifile, command_argument_count
 integer(8) :: n
+integer :: i, j, ifile, command_argument_count
 character :: b0(nb,nr), b1(nb), b2(nb)
 character(255) :: filename
 do ifile = 1, command_argument_count()
