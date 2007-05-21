@@ -1,4 +1,5 @@
 #!/bin/bash -e
+trap 'echo ERROR' ERR
 
 echo "SORD setup"
 starttime=$(date)
@@ -72,6 +73,7 @@ case "$key" in
   return) break ;;
 esac
 done < tmp/input
+echo "$nn" > tmp/nn
 
 [ "$run" -a "$run" != q ] && interactive=yes
 

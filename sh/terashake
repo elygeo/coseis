@@ -1,4 +1,5 @@
 #!/bin/bash -e
+trap 'echo ERROR' ERR
 
 if [ -d /gpfs ]; then
   mkdir -p /gpfs/$LOGNAME/sord/tmp
@@ -6,23 +7,24 @@ if [ -d /gpfs ]; then
   ln -sf /gpfs/$LOGNAME/sord/tmp
   ln -sf /gpfs/$LOGNAME/sord/out
 fi
-./sord
+./sord -n
 srcdir=$( /bin/pwd )
 cd util
 [ tsgrid.f90 -nt "$srcdir/tmp/tsgrid" ] && ./make
 cd "$srcdir/tmp"
+./tsgrid
 rm -rf data vm
 mkdir data
-cp -r scecvm vm
-./tsgrid
-nn=$( cat nn )
 mv ts1 x1 x2 x3 meta.m data/
+cp -r scecvm vm
 mv rlon rlat rdep vm/
+nn=$( cat nn )
 if [ "$nn" -gt 4000000 ]; then
   echo "Deferring velocity model generation"
-  count=$( cat count )
-  mv data "$srcdir/out/$count/"
-  mv vm "$srcdir/out/$count/"
+  cd "$srcdir"
+  ./sord
+  count=$( cat tmp/count )
+  mv tmp/data tmp/vm "out/$count/"
 else
   cd vm
   ./scecvm4-s $nn rlon rlat rdep rho vp vs

@@ -1,4 +1,5 @@
 #!/bin/bash
+trap 'echo ERROR' ERR
 
 rm sord-[sp] input pbsscript* llscript cancel.sh currentstep kill.sh qdel.sh
 

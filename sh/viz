@@ -1,2 +1,0 @@
-#!/bin/bash -e
-matlab -nosplash -nodesktop -r "addpath /space/gely/files/sord/m"
