@@ -32,17 +32,22 @@ theta = -40.     ! UTM rotation
 o1 = 132679.8125 ! UTM x offset
 o2 = 3824867.    ! UTM y offset
 
+j = 0
 swab = .false.
-do iarg = 1, command_argument_count()
-  call get_command_argument( iarg, str )
-  if ( str(1:1) /= '-' ) exit
-  select case( str )
-  case( '-s' ); swab = .true.
-  case default; stop 'Usage: gearthdrape [-s] <file1> <file2> ...'
-  end select
+do i = 1, command_argument_count()
+  call get_command_argument( i, str )
+  if ( str(1:1) == '-' ) then
+    select case( str )
+    case( '-s' ); swab = .true.
+    case default; stop 'Usage: gearthdrape [-s] <file1> <file2> ...'
+    end select
+  else
+    j = j + 1
+  end if
 end do
 timeseries = .false.
-if ( iarg < command_argument_count() ) timeseries = .true.
+if ( j == 0 ) stop 'Usage: gearthdrape [-s] <file1> <file2> ...'
+if ( j >= 2 ) timeseries = .true.
 
 ! local meters
 allocate( x(n1,n2,1,2), v1(n1,n2), v2(n1,n2) )
@@ -151,8 +156,10 @@ write( 2, '(a)' ) '  <screenXY  x=".5" y="80" xunits="fraction" yunits="pixels" 
 write( 2, '(a)' ) '</ScreenOverlay>'
 
 ! loop over arguments
-do ifile = iarg, command_argument_count()
+do ifile = 1, command_argument_count()
+
 call get_command_argument( ifile, str )
+if ( str(1:1) == '-' ) exit
 
 ! read
 inquire( iolength=i ) v1

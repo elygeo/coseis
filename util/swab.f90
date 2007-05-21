@@ -1,14 +1,29 @@
-! Swap endian of a file in place
+! Swap endian of files in place
 program main
 implicit none
 integer, parameter :: nb = 4, nr = 4096
 integer(8) :: n
 integer :: i, j, ifile, command_argument_count
 character :: b0(nb,nr), b1(nb), b2(nb)
-character(255) :: filename
+character(255) :: str
+character :: endian
+
+! Print native endian
+endian = 'l'
+if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
+print *, endian
+
+! Check that all files can be opened
 do ifile = 1, command_argument_count()
-  call get_command_argument( ifile, filename )
-  open( 1, file=filename, recl=nb*nr, form='unformatted', access='direct', status='old' )
+  call get_command_argument( ifile, str )
+  open( 1, file=str, recl=nb*nr, form='unformatted', access='direct', status='old' )
+  close( 1 )
+end do
+
+! Swap bytes
+do ifile = 1, command_argument_count()
+  call get_command_argument( ifile, str )
+  open( 1, file=str, recl=nb*nr, form='unformatted', access='direct', status='old' )
   n = 0
   do
     read( 1, rec=n+1, iostat=i ) b0
@@ -21,7 +36,7 @@ do ifile = 1, command_argument_count()
     n = n + 1
   end do
   close(1)
-  open( 1, file=filename, recl=nb, form='unformatted', access='direct', status='old' )
+  open( 1, file=str, recl=nb, form='unformatted', access='direct', status='old' )
   n = n * nr
   do
     read( 1, rec=n+1, iostat=i ) b1
@@ -30,8 +45,8 @@ do ifile = 1, command_argument_count()
     write( 1, rec=n+1 ) b2
     n = n + 1
   end do
-  close(1)
-  write( 0, * ) trim( filename ), n
+  close( 1 )
+  write( 0, * ) trim( str ), n
 end do
 end program
 

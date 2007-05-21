@@ -37,7 +37,6 @@ y0 = .5 * ( minval(yf) + maxval(yf) )
 ! Byte order
 endian = 'l'
 if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
-print *, 'endian = ', endian
 
 ! Dimensions
 n = nint( ell / dx ) + 1
@@ -185,7 +184,7 @@ print *, 'latgitude range: ', minval( w1(:,:,:,2) ), maxval( w1(:,:,:,2) )
 
 ! Topo
 inquire( iolength=i ) t
-open( 1, file='topo3.'//endian, recl=i, form='unformatted', access='direct', status='old' )
+open( 1, file='topo3.f32', recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
 t = t * exag
@@ -209,7 +208,6 @@ do j1 = 1, size(w1,1)
     h1 * h3 * t(j+1,k+1) )
 end do
 end do
-print *, 'elevation range: ', minval( x(:,:,:,3) ), maxval( x(:,:,:,3) )
 
 ! 2D grid
 inquire( iolength=i ) x(:,:,:,1)
@@ -233,6 +231,7 @@ do i = npml-1,0,-1
   x(:,k-i,:,3) = x(:,k-i-1,:,3)
 end do
 z0 = sum( x(:,:,:,3) ) / ( n(1) * n(2) )
+print *, 'elevation range: ', minval( x(:,:,:,3) ), maxval( x(:,:,:,3) ), z0
 
 ! 3D grid
 inquire( iolength=i ) x(:,:,:,1)
@@ -312,7 +311,7 @@ l1 = lf0
 l2 = lf0 + nf3
 
 inquire( iolength=i ) t
-open( 1, file='ts1.'//endian, recl=i, form='unformatted', access='direct', status='old' )
+open( 1, file='ts-ts1.f32', recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
 
