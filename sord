@@ -42,7 +42,7 @@ srcdir=$( /bin/pwd )
 count=$( echo out/[0-9][0-9] | sed 's/.*\///' )
 [ "$count" = '[0-9][0-9]' ] && count=00
 count=$( echo $count | awk '{ printf "%02d", $1+1 }' )
-echo $count > tmp/count
+echo "$count" > tmp/count
 
 # Prepare input file
 cat 'in/defaults.m' 'in.m' | sed "
@@ -73,7 +73,6 @@ case "$key" in
   return) break ;;
 esac
 done < tmp/input
-echo "$nn" > tmp/nn
 
 [ "$run" -a "$run" != q ] && interactive=yes
 
@@ -135,7 +134,7 @@ echo "SUs: $sus"
 [ $ppn -gt $maxcpus ] && echo "Warning: exceding available CPUs per node ($maxcpus)"
 [ $ram -gt $maxram ]  && echo "Warning: exceding available RAM per node (${maxram}Mb)"
 
-[ "$setup" ] || exit
+[ "$setup" ] || exit 0
 
 #------------------------------------------------------------------------------#
 

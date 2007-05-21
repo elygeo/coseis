@@ -44,11 +44,9 @@ n = nint( ell / dx ) + 1
 print *, 'n =', n
 j = n(1)
 k = n(2)
-l = n(3)
-nn = j * k * l
 allocate( x(j,k,1,3) )
-open( 1, file='nn' )
-write( 1, * ) nn
+open( 1, file='nc' )
+write( 1, * ) product( n - 1 )
 close( 1 )
 
 ! 2D mesh
@@ -176,6 +174,8 @@ forall( k=k1+1:k2-1 )
 end forall
 
 ! lon/lat
+j = n(1)
+k = n(2)
 allocate( w1(j,k,1,3), s1(j,k,1), t(960,780) )
 w1 = x
 call ts2ll( w1, 1, 2 )
@@ -209,7 +209,6 @@ do j1 = 1, size(w1,1)
     h1 * h3 * t(j+1,k+1) )
 end do
 end do
-z0 = sum( x(:,:,:,3) ) / ( n(1) * n(2) )
 print *, 'elevation range: ', minval( x(:,:,:,3) ), maxval( x(:,:,:,3) )
 
 ! 2D grid
@@ -233,6 +232,7 @@ do i = npml-1,0,-1
   x(:,i+1,:,3) = x(:,i+2,:,3)
   x(:,k-i,:,3) = x(:,k-i-1,:,3)
 end do
+z0 = sum( x(:,:,:,3) ) / ( n(1) * n(2) )
 
 ! 3D grid
 inquire( iolength=i ) x(:,:,:,1)
@@ -261,7 +261,9 @@ close( 3 )
 
 ! 3D element centers
 deallocate( w1, s1, t )
-allocate( w1(j-1,k-1,1,3), s1(j-1,k-1,1) )
+j = n(1) - 1
+k = n(2) - 1
+allocate( w1(j,k,1,3), s1(j,k,1) )
 forall( j=1:n(1)-1, k=1:n(2)-1, i=1:3 )
   w1(j,k,1,i) = .25 * ( x(j,k,1,i) + x(j,k,1,i) + x(j,k,1,i) + x(j,k,1,i) )
 end forall
@@ -272,7 +274,7 @@ inquire( iolength=i ) w1(:,:,:,1)
 open( 7, file='rlon', recl=i, form='unformatted', access='direct', status='replace' )
 open( 8, file='rlat', recl=i, form='unformatted', access='direct', status='replace' )
 open( 9, file='rdep', recl=i, form='unformatted', access='direct', status='replace' )
-do l = 1, n(3)
+do l = 1, n(3)-1
   write( 7, rec=l ) w1(:,:,:,1)
   write( 8, rec=l ) w1(:,:,:,2)
 end do

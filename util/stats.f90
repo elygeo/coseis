@@ -18,6 +18,7 @@ do ifile = 1, command_argument_count()
     if ( n == 0 ) then
       xmin = xx(1)
       xmax = xx(1)
+      xmean = 0
     end if
     xmin = min( xmin, minval(xx) )
     xmax = max( xmax, maxval(xx) )
@@ -34,6 +35,7 @@ do ifile = 1, command_argument_count()
     if ( n == 0 ) then
       xmin = x
       xmax = x
+      xmean = 0
     end if
     xmin = min( xmin, x )
     xmax = max( xmax, x )

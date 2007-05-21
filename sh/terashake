@@ -1,5 +1,5 @@
 #!/bin/bash -e
-trap 'echo ERROR' ERR
+trap 'echo ERROR in terashake script $_' ERR
 
 if [ -d /gpfs ]; then
   mkdir -p /gpfs/$LOGNAME/sord/tmp
@@ -18,8 +18,8 @@ mkdir data
 mv ts1 x1 x2 x3 meta.m data/
 cp -r scecvm vm
 mv rlon rlat rdep vm/
-nn=$( cat nn )
-if [ "$nn" -gt 4000000 ]; then
+nc=$( cat nc )
+if [ "$nc" -gt 4000000 ]; then
   echo "Deferring velocity model generation"
   cd "$srcdir"
   ./sord
@@ -27,7 +27,7 @@ if [ "$nn" -gt 4000000 ]; then
   mv tmp/data tmp/vm "out/$count/"
 else
   cd vm
-  ./scecvm4-s $nn rlon rlat rdep rho vp vs
+  ./scecvm4-s $nc rlon rlat rdep rho vp vs
   mv rho vp vs "$srcdir/tmp/data/"
 fi
 
