@@ -41,7 +41,7 @@ end if
 i2out(iz,4) = min( i2out(iz,4), nt )
 if ( fault .and. faultnormal == 0 ) i1out(iz,4) = nt + 1
 
-! Spacial indices
+! Spatial indices
 n = nn + 2 * nhalo
 noff = nnoff - nhalo
 select case( outtype(iz) )
@@ -104,7 +104,10 @@ case( 'x' )
 end select
 
 ! Save indices
-if ( any( i2 < i1 ) ) stop 'bad output indices'
+if ( any( i2 < i1 ) ) then
+  print '(i3.3,x,a,6i7)', iz, fieldout(iz), i1, i2
+  stop 'bad output indices'
+end if
 i1out(iz,1:3) = i1
 i2out(iz,1:3) = i2
 
@@ -156,7 +159,6 @@ end if
 
 ! Volume stats
 if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
-print *, 12341234
   select case( pass )
   case( 1 )
     call scalarsethalo( s1, -1., i1node, i2node )
