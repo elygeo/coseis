@@ -1,5 +1,5 @@
 #!/bin/bash -e
-trap 'echo ERROR in terashake script $_' ERR
+trap 'echo Error in terashake script $_' ERR
 
 if [ -d /gpfs ]; then
   mkdir -p /gpfs/$LOGNAME/sord/tmp

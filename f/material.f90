@@ -55,7 +55,7 @@ case( 'c' )
   end select
 case( 'r' )
   i3 = max( i1, i1node )
-  i4 = min( i2, i1cell )
+  i4 = min( i2, i2cell )
   idoublenode = 0
   if ( faultnormal /= 0 ) then
     i = abs( faultnormal )

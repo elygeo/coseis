@@ -86,7 +86,7 @@ ii = n + noff + i2d
 select case( op )
 case( 'min', 'allmin' ); ii = minloc( r );
 case( 'max', 'allmax' ); ii = maxloc( r );
-case default; stop
+case default; stop 'unknown op in reduceloc'
 end select
 rr = r(ii(1),ii(2),ii(3))
 end subroutine
@@ -132,7 +132,12 @@ real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: ir, i1(3), i2(3), i3(3), i4(3), iz
 character(*), intent(in) :: io, filename
 integer :: nb, i, j1, k1, l1, j2, k2, l2
-if ( any( i1 /= i3 .or. i2 /= i4 ) .or. iz < 0 ) stop 'scalario index error'
+if ( any( i1 /= i3 .or. i2 /= i4 ) .or. iz < 0 ) then
+  write( 0, * ) 'Error in scalario: ', filename, io, ir
+  write( 0, * ) i1, i2
+  write( 0, * ) i3, i4
+  stop
+end if
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
@@ -142,7 +147,7 @@ select case( io )
 case( 'r' )
   open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='old' )
   if ( i /= 0 ) then
-    write( *, * ) 'Error opening file: ', trim( filename )
+    write( 0, * ) 'Error opening file: ', trim( filename )
     stop
   end if
   read( 1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
@@ -154,7 +159,7 @@ case( 'w' )
     open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='old' )
   end if
   if ( i /= 0 ) then
-    write( *, * ) 'Error opening file: ', trim( filename )
+    write( 0, * ) 'Error opening file: ', trim( filename )
     stop
   end if
   write( 1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
@@ -168,7 +173,12 @@ real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: ic, ir, i1(3), i2(3), i3(3), i4(3), iz
 character(*), intent(in) :: io, filename
 integer :: nb, i, j1, k1, l1, j2, k2, l2
-if ( any( i1 /= i3 .or. i2 /= i4 ) .or. iz < 0 ) stop 'vectorio index error'
+if ( any( i1 /= i3 .or. i2 /= i4 ) .or. iz < 0 ) then
+  write( 0, * ) 'Error in vectorio: ', filename, io, ir
+  write( 0, * ) i1, i2
+  write( 0, * ) i3, i4
+  stop
+end if
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
@@ -178,7 +188,7 @@ select case( io )
 case( 'r' )
   open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='old' )
   if ( i /= 0 ) then
-    write( *, * ) 'Error opening file: ', trim( filename )
+    write( 0, * ) 'Error opening file: ', trim( filename )
     stop
   end if
   read( 1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
@@ -190,7 +200,7 @@ case( 'w' )
     open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='old' )
   end if
   if ( i /= 0 ) then
-    write( *, * ) 'Error opening file: ', trim( filename )
+    write( 0, * ) 'Error opening file: ', trim( filename )
     stop
   end if
   write( 1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)

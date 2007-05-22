@@ -105,8 +105,8 @@ end select
 
 ! Save indices
 if ( any( i2 < i1 ) ) then
-  print '(i3.3,x,a,6i7)', iz, fieldout(iz), i1, i2
-  stop 'bad output indices'
+  write( 0, '(a,i3.3,x,a,6i7)' ) 'Error in output indices: ', iz, fieldout(iz), i1, i2
+  stop
 end if
 i1out(iz,1:3) = i1
 i2out(iz,1:3) = i2
