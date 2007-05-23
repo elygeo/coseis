@@ -1,5 +1,5 @@
 #!/bin/bash -e
-trap "Error in sord script $_" ERR
+trap "Error in sord script" ERR
 
 echo "SORD setup"
 starttime=$(date)

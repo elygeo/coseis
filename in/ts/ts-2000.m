@@ -2,7 +2,7 @@
   bc1 = [ 1 1 1 ];
   bc2 = [ 1 1 0 ];
   faultnormal = 2;
-  slipvecor = [ 1. 0. 0. ];
+  slipvector = [ 1. 0. 0. ];
   grid = 'read';
   rho = 'read';
   vp = 'read';
@@ -17,11 +17,11 @@
   dc = .5;
   rcrit = 3000.;
   vrup = 2300.;
-  itcheck = 100;
+  itcheck = 0;
   itstats = 10;
 
   datadir = 'ts/2000/data';
-  np = [ 1 2 2 ] % Wide
+  np = [ 1 1 2 ] % Wide
   dx = 2000.;
   dt = .12;
   trelax = 1.2;

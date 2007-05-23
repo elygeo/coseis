@@ -38,9 +38,11 @@ call fault_init        ; if ( master ) call timer( 1, 'main', 7 )
 call metadata          ; if ( master ) call timer( 1, 'main', 8 )
 call output( 0 )       ; if ( master ) call timer( 1, 'main', 9 )
 call resample          ; if ( master ) call timer( 1, 'main', 10 )
-call output( 1 )       ; if ( master ) call timer( 1, 'main', 11 )
-call output( 2 )       ; if ( master ) call timer( 1, 'main', 12 )
-call readcheckpoint    ; if ( master ) call timer( 1, 'main', 13 )
+call readcheckpoint    ; if ( master ) call timer( 1, 'main', 11 )
+if ( it == 0 ) then
+  call output( 1 )     ; if ( master ) call timer( 1, 'main', 12 )
+  call output( 2 )     ; if ( master ) call timer( 1, 'main', 13 )
+end if
 
 ! Main loop
 if ( master ) write( 0, * ) 'Main loop'

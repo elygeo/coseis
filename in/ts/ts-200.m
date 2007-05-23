@@ -2,7 +2,7 @@
   bc1 = [ 1 1 1 ];
   bc2 = [ 1 1 0 ];
   faultnormal = 2;
-  slipvecor = [ 1. 0. 0. ];
+  slipvector = [ 1. 0. 0. ];
   grid = 'read';
   rho = 'read';
   vp = 'read';
