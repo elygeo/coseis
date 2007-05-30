@@ -1,0 +1,4 @@
+#!/bin/bash -e
+cd gpfs/sord
+hsi g - : tmp.tar | tar xf -
+

@@ -120,10 +120,12 @@ du = u1_ - u0_
 Zero relative acceleration boundary condition
 da = 0
 ta = t0 + (r1/m1-r0/m0) / [s*(1/m1+1/m0)]
+   = t0 + (r1*m0-r0*m1) / [s*(m0+m1)]
 
 Zero relative velocity boundary condition
 dv = 0
 tv = t0 + [v1-v0 + dt*(r1/m1-r0/m0)] / [dt*s*(1/m1+1/m0)]
+   = t0 + [(v1-v0)*m0*m1/dt + r1*m0-r0*m1] / [s*(m0+m1)]   (DFM)
    = ta + (v1-v0) / [dt*s*(1/m1+1/m0)]
 
 Zero relative normal displacement boundary condition
@@ -155,9 +157,6 @@ a1_ = (r1 - s*(t~-t0))/m1
 Update velocities
 v0_ = v0 + dt*(r0 + s*(t~-t0))/m0
 v1_ = v1 + dt*(r1 - s*(t~-t0))/m1
-
-DFM fault boundary condition
-t = t0 + [r1*m0-r0*m1 + m1*m0*(v1-v0)/dt] / [s*(m1+m0)]
 
 
 SLIP-WEAKENING FRICTION LAW
@@ -207,37 +206,31 @@ m0 = int_a * su_i * mu * da
 Moment magnitude
 mw = ( log10( m0 ) - 9.05 ) / 1.5
 
-Ratiated energy
+Radiated energy
 e_radiate = e_strain - e_fric
 
 PRETRACTION
 
-  u = upward pointing unit normal
+  t0 = tn*n + ts1*s1 + ts2*s2
+  n = fault surface normal, points towards the opposing fault wall
+  s1 = fault surface, component 1
+  s2 = fault surface, component 2
+  tn < 0 compressive traction
+  tn > 0 opening traction
 
-  Consider either of the two fault walls:
-  n = local surface normal, points towards the oposing fault wall
-  h = n x u, horizontal unit normal (strike), points to the right on
-             the near wall, left on the far wall.
-  d = n x h, dip unit normal, for a vertical fault d = -u
+  Component normals
+  h = slip vector
+  s2 =  n x h
+  s1 = s2 x n
 
-       .------------ 
-      /  n u       /
-     /    \|      /
-    /   h--+     /
-   /      /     /
-  /      d     /
+       .------------
+      /  n         /
+     /    \       /
+    /      +--s2 /
+   /      /|    /
+  /     s1 h   /
   ------------'
 
-  Pre-traction:
-  t0 = tn*n + th*h + td*d
-  tn < 0 compresive traction
-  tn > 0 opening traction
-  th > 0 right-lateral slip
-  th < 0 left-lateral slip
-
-  When t0 is applied to the near wall, and -t0 applied to the far wall:
-  td > 0 far side moves down (is there a name for this?)
-  td < 0 far side moves up
 
 KOSTROV SOLUTION
 

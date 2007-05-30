@@ -21,7 +21,7 @@
   itstats = 10;
 
   np = [ 1 40 20 ] % DataStar
-  np = [ 1 20 20 ] % TeraGrid
+  np = [ 1 25 20 ] % TeraGrid
   dx = 200.;
   dt = .012;
   trelax = .12;

@@ -1,0 +1,21 @@
+HPSS Quick Start
+
+http://www.sdsc.edu/us/resources/hpss/
+
+Create file ~/.hsirc:
+  authmethod = keytab
+  principal = ux451302
+  keytab = %H/.private/.ktb_ux451302
+
+Single-Line:
+  hsi p <local-file> : <hpss-file>
+  hsi g <hpss-file> : <local-file>
+
+Interactive:
+  hsi
+  help
+  p -r <local-file>
+  g -r <hpss-file>
+  rm -R <hpss-file>
+  quit
+

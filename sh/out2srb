@@ -1,0 +1,17 @@
+#!/bin/bash -e
+
+localdir="${1:?Filename required}"
+srbdir=${2:-$localdir}
+
+echo "sending $localdir to srb:$srbdir"
+
+perl -ne 'if( /\s*([^%]\S*)\s*=\s*(\S[^;]*)/ ) { print "$1|$2\n" }' "$localdir/meta.m" > Sufmeta.tmp
+
+Sinit
+Sput -rV "$localdir" "$srbdir"
+Chmod -r r public npaci "$srbdir"
+Sufmeta -c -f Sufmeta.tmp '|' "$srbdir"
+Sufmeta -f Sufmeta.tmp '|' "$srbdir/metedata"
+Sexit
+
+#rm Sufmeta.tmp
