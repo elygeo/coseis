@@ -1,17 +1,4 @@
-#!/bash --version
-# SDSU CSRC Babieca Cluster
-#   http://babieca.sdsu.edu/
-#   http://www.csrc.sdsu.edu/csrc/about/computing/
-#   interactive nodes:
-#     12, 2 x 2.4GHz Intel Xeon, 1 GB
-#   batch nodes:
-#     36, 2 x 2.4GHz Intel Xeon, 1 GB
-#   Portland Group compilers http://moocow.sdsu.edu/csrc/pgi/
-#   Useful commands:
-#     qsub batchjob
-#     pbsnodes -a
-#     qstat
-#     qdel
+#!/bin/bash -e
 
 if [ "$interactive" ]; then
 cat << END > mf
@@ -35,6 +22,7 @@ cat << END > pbsscript-vm
 #PBS -l nodes=$nodes:ppn=$ppn
 #PBS -q workq
 #PBS -V
+mail $email -s "Started on Babieca" < /dev/null
 sleep 2
 cd "$rundir"
 echo "\$PBS_JOBID" >> log
@@ -46,6 +34,7 @@ cd "$rundir"
 echo "\$(date): Start SORD run" >> log
 mpiexec -n $np ./sord-$mode
 echo "\$(date): Finished!" >> log
+mail $email -s "Finished on Babieca" < /dev/null
 END
 cat << END > pbsscript
 #!/bin/bash
@@ -54,12 +43,14 @@ cat << END > pbsscript
 #PBS -l walltime=$walltime
 #PBS -q workq
 #PBS -V
+mail $email -s "Started on Babieca" < /dev/null
 sleep 2
 cd "$rundir"
 echo "\$PBS_JOBID" >> log
 echo "\$(date): Start SORD run" >> log
 mpiexec -n $np ./sord-$mode
 echo "\$(date): Finished!" >> log
+mail $email -s "Finished on Babieca" < /dev/null
 END
 chmod u+x pbsscript-vm pbsscript
 fi

@@ -18,24 +18,6 @@ if ! grep -q "$HOSTNAME" mf; then
   exit
 fi
 elif [ "$mode" = p ]; then
-cat << END > pbsscript-vm
-#!/bin/bash
-#PBS -N sord-vm-$count
-#PBS -l walltime=$walltime
-#PBS -l nodes=$nodes:ppn=$ppn
-#PBS -q dque
-#PBS -V
-cd "$rundir"
-echo "\$PBS_JOBID" >> log
-echo "\$(date): Start SCECVM run" >> log
-cd "$rundir/vm"
-mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-$mode $nn rlon rlat rdep rho vp vs
-mv rho vp vs "$rundir/data"
-cd "$rundir"
-echo "\$(date): Start SORD run" >> log
-mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
-echo "\$(date): Finished!" >> log
-END
 cat << END > pbsscript
 #!/bin/bash
 #PBS -N sord-$count
@@ -43,13 +25,38 @@ cat << END > pbsscript
 #PBS -l nodes=$nodes:ppn=$ppn
 #PBS -q dque
 #PBS -V
+mail $email -s "Started on TeraGrid" < /dev/null
 cd "$rundir"
 echo "\$PBS_JOBID" >> log
 echo "\$(date): Start SORD run" >> log
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
-echo "\$(date): Finished!" >> log
+echo "\$(date): Finished" >> log
+mail $email -s "Finished on TeraGrid" < /dev/null
 END
-chmod u+x pbsscript-vm pbsscript
+chmod u+x pbsscript
+if [ "$nc" ]; then
+cat << END > pbsscript-vm
+#!/bin/bash
+#PBS -N sord-vm-$count
+#PBS -l walltime=$walltime
+#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -q dque
+#PBS -V
+mail $email -s "Started on TeraGrid" < /dev/null
+cd "$rundir"
+echo "\$PBS_JOBID" >> log
+echo "\$(date): Start VM run" >> log
+cd "$rundir/vm"
+mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-$mode $nc rlon rlat rdep rho vp vs
+mv rho vp vs "$rundir/data"
+cd "$rundir"
+echo "\$(date): Start SORD run" >> log
+mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
+echo "\$(date): Finished" >> log
+mail $email -s "Finished on TeraGrid" < /dev/null
+END
+chmod u+x pbsscript-vm
+fi
 fi
 
 case "$mode$run" in

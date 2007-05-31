@@ -292,6 +292,8 @@ END
 #------------------------------------------------------------------------------#
 # Run
 
+email=$LOGNAME
+[ -f email ] && email=$( cat email )
 echo "$starttime: Start SORD setup" >> log
 echo "$(date): Finished setup" >> log
 case $machine in

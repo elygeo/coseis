@@ -1,4 +1,4 @@
-#!/bash -e
+#!/bin/bash -e
 
 if [ $( /bin/pwd | grep -v gpfs ) ]; then
   echo "Error: jobs must be run from /gpfs"
@@ -40,17 +40,31 @@ cat << END > llscript
 #@ output = out.\$(jobid)
 #@ error = err.\$(jobid) 
 #@ queue
+mail $email -s "Started on DataStar" < /dev/null
 cd "$rundir"
+END
 
-#echo "\$(date): Start SCECVM run" >> log
-#cd "$rundir/vm"
-#poe ./scecvm4-$mode $nn rlon rlat rdep rho vp vs
-#mv rho vp vs "$rundir/data"
-#cd "$rundir"
-
+if [ "$nc" ]; then
+cp llscript llscript-vm
+cat << END >> llscript-vm
+echo "\$(date): Start VM run" >> log
+cd "$rundir/vm"
+poe ./scecvm4-$mode $nc rlon rlat rdep rho vp vs
+mv rho vp vs "$rundir/data"
+cd "$rundir"
 echo "\$(date): Start SORD run" >> log
 poe ./sord-$mode
-echo "\$(date): Finished!" >> log
+echo "\$(date): Finished" >> log
+mail $email -s "Finished on DataStar" < /dev/null
+END
+chmod u+x llscript-vm
+fi
+
+cat << END >> llscript
+echo "\$(date): Start SORD run" >> log
+poe ./sord-$mode
+echo "\$(date): Finished" >> log
+mail $email -s "Finished on DataStar" < /dev/null
 END
 chmod u+x llscript
 fi
@@ -80,5 +94,4 @@ if [ "$lljob" ]; then
   echo "llcancel $lljob" >> 'cancel.sh'
   chmod u+x 'cancel.sh'
 fi
-
 

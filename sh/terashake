@@ -22,8 +22,8 @@ rm -rf data vm
 mkdir data
 mv ts1 x1 x2 x3 meta.m data/
 cp -r scecvm vm
-mv rlon rlat rdep vm/
 nc=$( cat nc )
+mv nc rlon rlat rdep vm/
 if [ "$nc" -gt 4000000 ]; then
   echo "Deferring velocity model generation"
   cd "$srcdir"

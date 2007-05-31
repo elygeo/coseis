@@ -13,6 +13,7 @@ accounts="\
 
 files="\
   versionmeta.m
+  email
   doc
   sord
   in.m
