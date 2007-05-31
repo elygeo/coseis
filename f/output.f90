@@ -110,7 +110,7 @@ end if
 i1out(iz,1:3) = i1
 i2out(iz,1:3) = i2
 
-! Buffer 
+! Bufferq 
 
 ! Split collective i/o
 i1 = max( i1, i1node )
