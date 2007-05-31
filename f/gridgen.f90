@@ -9,7 +9,7 @@ use m_collective
 use m_util
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), i, j, k, l, &
   j1, k1, l1, j2, k2, l2, idoublenode, b, c
-real :: x0(3), xlim(6), gxlim(6), m(9), tol
+real :: x0(3), xlim(6), gxlim(6), m(9), tol, r
 logical :: expand
 
 if ( master ) write( 0, * ) 'Grid generation'
@@ -41,9 +41,10 @@ if ( grid /= 'read' ) then
   forall( i=k1:k2 ) w1(:,i,:,2) = dx * ( i - i1(2) )
   forall( i=l1:l2 ) w1(:,:,i,3) = dx * ( i - i1(3) )
 else
-  call vectorio( 'r', 'data/x1', w1, 1, 1, i1, i2, i3, i4, 0 )
-  call vectorio( 'r', 'data/x2', w1, 2, 1, i1, i2, i3, i4, 0 )
-  call vectorio( 'r', 'data/x3', w1, 3, 1, i1, i2, i3, i4, 0 )
+  r = 0.
+  call vectorio( 'r', 'data/x1', r, w1, 1, i1, i2, i3, i4, 0 )
+  call vectorio( 'r', 'data/x2', r, w1, 2, i1, i2, i3, i4, 0 )
+  call vectorio( 'r', 'data/x3', r, w1, 3, i1, i2, i3, i4, 0 )
 end if
 
 ! Grid expansion

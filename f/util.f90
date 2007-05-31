@@ -113,9 +113,9 @@ if ( n(3) > 1 ) f(:,:,i2(3)+1:,:) = r
 end subroutine
 
 ! Timer
-subroutine timer( i, filename, it )
-character(*), intent(in), optional :: filename
-integer, intent(in), optional :: i, it
+subroutine timer( time, i )
+real, intent(out), optional :: time
+integer, intent(in), optional :: i
 integer, save :: clock0, clockrate, clockmax
 integer(8), save :: timers(4)
 integer :: clock1
@@ -127,11 +127,18 @@ else
   timers = timers - clock0 + clock1
   if ( clock0 > clock1 ) timers = timers + clockmax
   clock0 = clock1
-  if ( present( it ) ) then
-    call rwrite( 'timer/' // filename, real( timers(i) ) / real( clockrate ), it )
-  end if
+  time = real( timers(i) ) / real( clockrate )
   timers(:i) = 0
 end if
+end subroutine
+
+! Write timing info
+subroutine writetimer( i, filename, it )
+character(*), intent(in) :: filename
+integer, intent(in) :: i, it
+real :: r
+call timer( r, i )
+call rwrite( filename, r, it )
 end subroutine
 
 ! Write integer binary timeseries
@@ -163,6 +170,38 @@ else
 end if
 write( 1, rec=it ) val
 close( 1 )
+end subroutine
+  
+! Write real binary timeseries, buffered
+subroutine rwrite1( filename, val, it )
+character(*), intent(in) :: filename
+real, intent(in) :: val(:)
+integer, intent(in) :: it
+integer :: i, n
+n = size( val, 1 )
+if ( it < n ) stop 'error in rwrite1'
+if ( modulo( it, n ) == 0 ) then
+  inquire( iolength=i ) val
+  if ( it == n ) then
+    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
+  else
+    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+  end if
+  i = it / n
+  write( 1, rec=i ) val
+  close( 1 )
+else
+  inquire( iolength=i ) val(1)
+  if ( it == n ) then
+    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
+  else
+    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+  end if
+  do i = 1, n
+    write( 1, rec=i ) val(i)
+  end do
+  close( 1 )
+end if
 end subroutine
   
 end module

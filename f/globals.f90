@@ -6,7 +6,8 @@ real, parameter :: &
   pi = 3.14159
 
 integer, parameter :: &
-  nz = 80,       & ! max number of input and output zones
+  nz = 100,      & ! max number of input and output zones
+  itio = 50,     & ! buffersize for i/o
   nhalo = 1        ! number of ghost nodes
 
 ! 4d vectors
@@ -161,7 +162,6 @@ integer :: &
   np0,           & ! number of processors available
   nt,            & ! number of time steps
   it,            & ! current time step
-  itstats,       & ! interval for statistics output
   itcheck,       & ! interval for checkpointing
   debug,         & ! debugging flag
   npml,          & ! number of PML damping nodes
@@ -198,7 +198,7 @@ character(16) :: &
   rfunc,         & ! moment source space function
   tfunc            ! moment source time function
 
-character(160) :: &
+character(255) :: &
   str              ! string for storing file names
 
 logical :: &

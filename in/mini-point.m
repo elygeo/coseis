@@ -16,6 +16,5 @@
   fixhypo = 2;
   rsource = 50.;
 
-  itstats = 1;
   debug = 1;
 

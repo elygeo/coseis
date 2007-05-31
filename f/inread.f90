@@ -68,7 +68,6 @@ case( 'rcrit' );       read( str, *, iostat=io ) rcrit
 case( 'trelax' );      read( str, *, iostat=io ) trelax
 case( 'svtol' );       read( str, *, iostat=io ) svtol
 case( 'np' );          read( str, *, iostat=io ) np
-case( 'itstats' );     read( str, *, iostat=io ) itstats
 case( 'itcheck' );     read( str, *, iostat=io ) itcheck
 case( 'debug' );       read( str, *, iostat=io ) debug
 case( 'rho' );         inzone = .true.

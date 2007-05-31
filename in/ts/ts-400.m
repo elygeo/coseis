@@ -18,7 +18,6 @@
   rcrit = 3000.;
   vrup = 2300.;
   itcheck = 100;
-  itstats = 10;
 
   np = [ 1 40 20 ] % TeraGrid
   np = [ 1 20 20 ] % DataStar

@@ -136,6 +136,31 @@ else
 end if
 end subroutine
 
+! Reduce real 2d
+subroutine rreduce2( rr, r, op, i2d )
+use mpi
+real, intent(out) :: rr(:,:)
+real, intent(in) :: r(:,:)
+integer, intent(in) :: i2d
+character(*), intent(in) :: op
+integer :: iop, i, e, comm
+select case( op )
+case( 'min', 'allmin' ); iop = mpi_min
+case( 'max', 'allmax' ); iop = mpi_max
+case( 'sum', 'allsum' ); iop = mpi_sum
+case default; stop
+end select
+i = size(r)
+if ( op(1:3) == 'all' ) then
+  comm = comm3d
+  if ( i2d /= 0 ) comm = comm2d(i2d)
+  call mpi_allreduce( r, rr, i, mpi_real, iop, comm, e )
+else
+  if ( i2d /= 0 ) stop 'must allreduce for comm2d'
+  call mpi_reduce( r, rr, i, mpi_real, iop, ipmaster, comm3d, e )
+end if
+end subroutine
+
 ! Reduce extrema location, real 3d
 subroutine reduceloc( rr, ii, r, op, n, noff, i2d )
 use mpi
@@ -287,24 +312,19 @@ call mpi_comm_split( comm3d, ditout, 0, commout(iz), e )
 end subroutine
 
 ! Scalar field input/output
-subroutine scalario( io, filename, s1, ir, i1, i2, i3, i4, iz )
+subroutine scalario( io, filename, r, s1, i1, i2, i3, i4, iz )
 use mpi
-real, intent(inout) :: s1(:,:,:)
-integer, intent(in) :: ir, i1(3), i2(3), i3(3), i4(3), iz
+real, intent(inout) :: r, s1(:,:,:)
+integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), iz
 character(*), intent(in) :: io, filename
 integer :: ftype, mtype, fh, nl(4), n(4), i0(4), i, comm, e
 integer(kind=mpi_offset_kind) :: d = 0
-nl = (/ i4 - i3 + 1, 1      /)
-n  = (/ i2 - i1 + 1, ir     /)
-i0 = (/ i3 - i1,     ir - 1 /)
-if ( all( n(1:3) == 1 ) .and. io == 'w' ) then
-  inquire( iolength=i ) s1(i1(1),i1(2),i1(3))
-  if ( ir == 1 ) then
-    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
-  else
-    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
-  end if
-  write( 1, rec=ir ) s1(i1(1),i1(2),i1(3))
+nl = (/ i4 - i3 + 1, 1 /)
+n  = (/ i2 - i1 + 1, 1 /)
+i0 = (/ i3 - i1,     0 /)
+if ( all( n == 1 ) ) then
+  if ( io == 'r' ) stop 'error in scalario'
+  if ( io == 'w' ) r = s1(i1(1),i1(2),i1(3))
   return
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
@@ -333,24 +353,19 @@ call mpi_type_free( ftype, e )
 end subroutine
 
 ! Vector field component input/output
-subroutine vectorio( io, filename, w1, ic, ir, i1, i2, i3, i4, iz )
+subroutine vectorio( io, filename, r, w1, ic, i1, i2, i3, i4, iz )
 use mpi
-real, intent(inout) :: w1(:,:,:,:)
-integer, intent(in) :: ic, ir, i1(3), i2(3), i3(3), i4(3), iz
+real, intent(inout) :: r, w1(:,:,:,:)
+integer, intent(in) :: ic, i1(3), i2(3), i3(3), i4(3), iz
 character(*), intent(in) :: io, filename
 integer :: ftype, mtype, fh, nl(4), n(4), i0(4), i, comm, e
 integer(kind=mpi_offset_kind) :: d = 0
-nl = (/ i4 - i3 + 1, 1      /)
-n  = (/ i2 - i1 + 1, ir     /)
-i0 = (/ i3 - i1,     ir - 1 /)
-if ( all( n(1:3) == 1 ) .and. io == 'w' ) then
-  inquire( iolength=i ) w1(i1(1),i1(2),i1(3),ic)
-  if ( ir == 1 ) then
-    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
-  else
-    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
-  end if
-  write( 1, rec=ir ) w1(i1(1),i1(2),i1(3),ic)
+nl = (/ i4 - i3 + 1, 1 /)
+n  = (/ i2 - i1 + 1, 1 /)
+i0 = (/ i3 - i1,     0 /)
+if ( all( n == 1 ) ) then
+  if ( io == 'r' ) stop 'error in vectorio'
+  if ( io == 'w' ) r = w1(i1(1),i1(2),i1(3),ic)
   return
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )

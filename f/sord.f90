@@ -21,6 +21,8 @@ use m_acceleration
 use m_locknodes
 use m_util
 implicit none
+real :: r, prof(8*itio)
+integer :: i
 
 ! Initialization
 call timer
@@ -28,46 +30,52 @@ call initialize( ip, np0, master )
 call inread
 call setup
 if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
-call arrays            ; if ( master ) call timer( 1, 'main', 1 )
-call gridgen           ; if ( master ) call timer( 1, 'main', 2 )
-call output_init       ; if ( master ) call timer( 1, 'main', 3 )
-call momentsource_init ; if ( master ) call timer( 1, 'main', 4 )
-call material          ; if ( master ) call timer( 1, 'main', 5 )
-call pml               ; if ( master ) call timer( 1, 'main', 6 )
-call fault_init        ; if ( master ) call timer( 1, 'main', 7 )
-call metadata          ; if ( master ) call timer( 1, 'main', 8 )
-call output( 0 )       ; if ( master ) call timer( 1, 'main', 9 )
-call resample          ; if ( master ) call timer( 1, 'main', 10 )
-call readcheckpoint    ; if ( master ) call timer( 1, 'main', 11 )
+call arrays            ; if ( master ) call writetimer( 1, 'prof0', 1 )
+call gridgen           ; if ( master ) call writetimer( 1, 'prof0', 2 )
+call output_init       ; if ( master ) call writetimer( 1, 'prof0', 3 )
+call momentsource_init ; if ( master ) call writetimer( 1, 'prof0', 4 )
+call material          ; if ( master ) call writetimer( 1, 'prof0', 5 )
+call pml               ; if ( master ) call writetimer( 1, 'prof0', 6 )
+call fault_init        ; if ( master ) call writetimer( 1, 'prof0', 7 )
+call metadata          ; if ( master ) call writetimer( 1, 'prof0', 8 )
+call output( 0 )       ; if ( master ) call writetimer( 1, 'prof0', 9 )
+call resample          ; if ( master ) call writetimer( 1, 'prof0', 10 )
+call readcheckpoint    ; if ( master ) call writetimer( 1, 'prof0', 11 )
 if ( it == 0 ) then
-  call output( 1 )     ; if ( master ) call timer( 1, 'main', 12 )
-  call output( 2 )     ; if ( master ) call timer( 1, 'main', 13 )
+  call output( 1 )     ; if ( master ) call writetimer( 1, 'prof0', 12 )
+  call output( 2 )     ; if ( master ) call writetimer( 1, 'prof0', 13 )
 end if
 
 ! Main loop
 if ( master ) write( 0, * ) 'Main loop'
-if ( master ) call timer( 3, 'main', 14 )
+if ( master ) call writetimer( 3, 'prof0', 14 )
 do while ( it < nt )
-  call timestep        ; if ( master ) call timer( 1, '0tst', it )
+  i = modulo( it-1, itio ) + 1
+  call timestep        ; call timer( r, 1 ); prof(i*8-7) = r
   if ( master ) then
     write( 0, '(a)', advance='no' ) '.'
     if ( it == nt .or. mod( it, 50 ) == 0 ) write( 0, '(i6)' ) it
   end if
-  call stress          ; if ( master ) call timer( 1, '1str', it )
-  call momentsource    ; if ( master ) call timer( 1, '2mom', it )
-  call output( 1 )     ; if ( master ) call timer( 1, '3out', it )
-  call acceleration    ; if ( master ) call timer( 1, '4acc', it )
-  call fault           ; if ( master ) call timer( 1, '5flt', it )
-  call locknodes       ; if ( master ) call timer( 1, '6loc', it )
-  call output( 2 )     ; if ( master ) call timer( 1, '7out', it )
-  call writecheckpoint ; if ( master ) call timer( 1, '8ckp', it )
-  if ( master ) call timer( 2, '9tot', it )
+  call stress          ; call timer( r, 1 ); prof(i*8-6) = r
+  call momentsource
+  call output( 1 )     ; call timer( r, 1 ); prof(i*8-5) = r
+  call acceleration    ; call timer( r, 1 ); prof(i*8-4) = r
+  call fault           ; call timer( r, 1 ); prof(i*8-3) = r
+  call locknodes
+  call output( 2 )     ; call timer( r, 1 ); prof(i*8-2) = r
+  call writecheckpoint ; call timer( r, 1 ); prof(i*8-1) = r
+  call timer( r, 2 ); prof(i*8) = r
+  if ( master ) then
+  if ( i == itio .or. it == nt .or. modulo( it, itcheck ) == 0 ) then
+    call rwrite1( 'prof1', prof(:i*8), it*8 )
+  end if
+  end if
 end do
 
 ! Finish up
 if ( master ) write( 0, * ) 'Finished!'
-if ( master ) call timer( 3, 'main', 15 )
-if ( master ) call timer( 4, 'main', 16 )
+if ( master ) call writetimer( 3, 'prof0', 15 )
+if ( master ) call writetimer( 4, 'prof0', 16 )
 call finalize
 
 end program

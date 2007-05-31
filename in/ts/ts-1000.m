@@ -18,7 +18,6 @@
   rcrit = 3000.;
   vrup = 2300.;
   itcheck = 100;
-  itstats = 10;
 
   datadir = 'ts/1000/data';
   np = [ 1 1 2 ] % Wide

@@ -18,7 +18,6 @@
   rcrit = 3000.;
   vrup = 2300.;
   itcheck = 100;
-  itstats = 10;
 
   np = [ 1 4 8 ] % Babiaca
   np = [ 1 3 16 ] % Babiaca
