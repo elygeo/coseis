@@ -66,7 +66,7 @@ do while ( it < nt )
   call writecheckpoint ; call timer( r, 1 ); prof(i*8-1) = r
   call timer( r, 2 ); prof(i*8) = r
   if ( master ) then
-  if ( i == itio .or. it == nt .or. modulo( it, itcheck ) == 0 ) then
+  if ( modulo( it, itio ) == 0 .or. it == nt ) then
     call rwrite1( 'prof1', prof(:i*8), it*8 )
   end if
   end if

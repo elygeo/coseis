@@ -182,7 +182,7 @@ if ( it > 0 ) then
     vstats(i,3) = sqrt( maxval( s1 ) )
     vstats(i,4) = sqrt( maxval( s2 ) )
     if ( any( vstats > huge( 0. ) ) ) stop 'unstable solution'
-    if ( i == itio .or. it == nt .or. modulo( it, itcheck ) == 0 ) then
+    if ( modulo( it, itio ) == 0 .or. it == nt ) then
       call rreduce2( gvstats, vstats, 'max', 0 )
       if ( master ) then
         call rwrite1( 'stats/vmax', gvstats(:i,1), it )
@@ -225,7 +225,7 @@ if ( it > 0 .and. dofault ) then
     estats(i,1) = efric
     estats(i,2) = estrain
     estats(i,3) = moment
-    if ( i == itio .or. it == nt .or. modulo( it, itcheck ) == 0 ) then
+    if ( modulo( it, itio ) == 0 .or. it == nt ) then
       call rreduce2( gfstats, fstats, 'allmax', ifn )
       call rreduce2( gestats, estats, 'allsum', ifn )
       gfstats(:,8) = -gfstats(:,8)
@@ -331,7 +331,7 @@ do ic = 1, nc
       i = ibuff(iz) + ic - 1
       jbuff(i) = jbuff(i) + 1
       iobuffer(jbuff(i),i) = rr
-      if ( jbuff(i) == itio .or. it == nt .or. modulo( it, itcheck ) == 0 ) then
+      if ( modulo( it, itio ) == 0 .or. it == nt ) then
         call rwrite1( str, iobuffer(:jbuff(i),i), ir )
         jbuff(i) = 0
       end if
@@ -342,7 +342,7 @@ end do
 end do doiz
 
 ! Iteration counter
-if ( master .and. pass == 2 ) then
+if ( master .and. pass == 2 .and. ( modulo( it, itio ) == 0 .or. it == nt ) ) then
   open( 1, file='currentstep', status='replace' )
   write( 1, * ) it
   close( 1 )
