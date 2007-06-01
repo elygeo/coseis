@@ -198,7 +198,7 @@ else
     open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
   end if
   do i = 1, n
-    write( 1, rec=i+it-n+1 ) val(i)
+    write( 1, rec=i+it-n ) val(i)
   end do
   close( 1 )
 end if
