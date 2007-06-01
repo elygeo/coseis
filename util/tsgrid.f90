@@ -10,7 +10,6 @@ real, allocatable :: x(:,:,:,:), w1(:,:,:,:), w2(:,:,:,:), s1(:,:,:), s2(:,:,:),
 character :: endian
 
 ! Model parameters
-exag = 1.
 mus = 1.05
 mud = .5;  tn = -20e6
 rho = 3000.
@@ -23,6 +22,9 @@ close( 1 )
 print *, 'dx =', dx
 open( 1, file='npml', status='old' )
 read( 1, * ) npml
+close( 1 )
+open( 1, file='exag', status='old' )
+read( 1, * ) exag
 close( 1 )
 print *, 'npml =', npml
 ell = (/ 600, 300, 80 /) * 1000
@@ -187,7 +189,6 @@ inquire( iolength=i ) t
 open( 1, file='topo3.f32', recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
-t = t * exag
 h = 30.
 o1 = .5 * h - 121.5 * 3600.
 o2 = .5 * h +  30.5 * 3600.
@@ -208,6 +209,7 @@ do j1 = 1, size(w1,1)
     h1 * h3 * t(j+1,k+1) )
 end do
 end do
+x(:,:,:,3) = x(:,:,:,3) * exag
 
 ! 2D grid
 inquire( iolength=i ) x(:,:,:,1)
