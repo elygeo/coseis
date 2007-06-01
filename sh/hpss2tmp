@@ -1,4 +1,0 @@
-#!/bin/bash -e
-cd gpfs/sord
-hsi g - : $HOSTTYPE/tmp.tar | tar xf -
-

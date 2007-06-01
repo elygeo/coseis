@@ -23,7 +23,8 @@ end do
 ! Swap bytes
 do ifile = 1, command_argument_count()
   call get_command_argument( ifile, str )
-  open( 1, file=str, recl=nb*nr, form='unformatted', access='direct', status='old' )
+  inquire( iolength=i ) b0
+  open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
   n = 0
   do
     read( 1, rec=n+1, iostat=i ) b0
@@ -36,7 +37,8 @@ do ifile = 1, command_argument_count()
     n = n + 1
   end do
   close(1)
-  open( 1, file=str, recl=nb, form='unformatted', access='direct', status='old' )
+  inquire( iolength=i ) b2
+  open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
   n = n * nr
   do
     read( 1, rec=n+1, iostat=i ) b1
