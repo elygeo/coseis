@@ -3,8 +3,8 @@ program main
 implicit none
 integer, parameter :: nb = 4, nr = 4096
 integer(8) :: n
-integer :: i, j, ifile, command_argument_count
-character :: b0(nb,nr), b1(nb), b2(nb)
+integer :: i, j, nj, ifile, command_argument_count
+character :: b0(nb,nr), b1(nb)
 character(255) :: str
 character :: endian
 
@@ -30,22 +30,25 @@ do ifile = 1, command_argument_count()
     read( 1, rec=n+1, iostat=i ) b0
     if ( i /= 0 ) exit
     do j = 1, nr
-      forall( i=1:nb ) b1(i) = b0(nb-i+1,j)
-      b0(:,j) = b1
+      b1 = b0(:,j)
+      forall( i=1:nb ) b0(i,j) = b1(nb-i+1)
     end do
     write( 1, rec=n+1 ) b0
     n = n + 1
   end do
   close(1)
-  inquire( iolength=i ) b2
+  inquire( iolength=i ) b1
   open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
   n = n * nr
+  j = 1
   do
-    read( 1, rec=n+1, iostat=i ) b1
+    read( 1, rec=n+j, iostat=i ) b1
     if ( i /= 0 ) exit
-    forall( i=1:nb ) b2(i) = b1(nb-i+1)
-    write( 1, rec=n+1 ) b2
-    n = n + 1
+    forall( i=1:nb ) b0(i,j) = b1(nb-i+1)
+    j = j + 1
+  end do
+  do i = 1, j
+    write( 1, rec=n+i ) b0(:,i)
   end do
   close( 1 )
   write( 0, * ) trim( str ), n

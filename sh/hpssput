@@ -1,4 +1,4 @@
 #!/bin/bash -e
 file="${1:?}"
-tar cf - "$file" | hsi p - : "$HOSTTYPE/$file.tar"
+tar cf - "$file" | hsi p - : "$HOSTTYPE/$2$( basename $file ).tar"
 

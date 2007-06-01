@@ -1,7 +1,7 @@
 ! Floating point stats
 program main
 implicit none
-integer, parameter :: nr = 4096
+integer, parameter :: nr = 8192
 integer(8) :: n
 integer :: i, ifile, command_argument_count
 real(8) :: xmean
