@@ -1,5 +1,4 @@
 #!/bin/bash -e
-trap "Error in sord script" ERR
 
 echo "SORD setup"
 starttime=$(date)
@@ -28,15 +27,17 @@ done
 shift $(( OPTIND - 1 ))
 
 # Email address
-email=$LOGNAME
-[ -f email ] && email=$( cat email )
+email="$LOGNAME"
+[ -f email ] && email="$( cat email )"
 
 # Symlink input file specified on command line
 if [ "$1" ]; then 
   infile="$1"
-  [ -f "$infile" ]
+  if [ ! -f "$infile" ]; then
+    echo "Error: $infile not found"
+    exit 1
+  fi
   ln -sf "$infile" 'in.m'
-else
   infile=$( readlink 'in.m' 2> /dev/null ) || infile='in.m'
 fi
 mkdir -p tmp

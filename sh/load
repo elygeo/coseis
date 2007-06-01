@@ -1,5 +1,4 @@
 #!/bin/bash -e
-trap 'echo ERROR' ERR
 
 if [ "${HOSTNAME:0:2}" = tg ]; then machine=teragrid
 elif [ "$HOSTNAME" = master ]; then machine=babieca

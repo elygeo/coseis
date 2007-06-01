@@ -1,5 +1,4 @@
 #!/bin/bash -e
-trap 'echo ERROR' ERR
 
 list="1"
 

@@ -1,5 +1,4 @@
 #!/bin/bash -e
-trap 'echo ERROR' ERR
 
 dir=$( /bin/pwd )
 base=$( basename "$dir" )

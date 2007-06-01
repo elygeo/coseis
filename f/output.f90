@@ -181,7 +181,7 @@ if ( it > 0 ) then
     call scalarsethalo( s2, -1., i1node, i2node )
     vstats(i,3) = sqrt( maxval( s1 ) )
     vstats(i,4) = sqrt( maxval( s2 ) )
-    if ( any( vstats > huge( 0. ) ) ) stop 'unstable solution'
+    !if ( any( vstats > huge( rr ) ) ) stop 'unstable solution'
     if ( modulo( it, itio ) == 0 .or. it == nt ) then
       call rreduce2( gvstats, vstats, 'max', 0 )
       if ( master ) then
