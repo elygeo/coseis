@@ -113,33 +113,44 @@ if ( n(3) > 1 ) f(:,:,i2(3)+1:,:) = r
 end subroutine
 
 ! Timer
-subroutine timer( time, i )
-real, intent(out), optional :: time
-integer, intent(in), optional :: i
+real function timer( i )
+integer, intent(in) :: i
 integer, save :: clock0, clockrate, clockmax
 integer(8), save :: timers(4)
 integer :: clock1
-if ( .not. present( i ) ) then
+if ( i == 0 ) then
   call system_clock( clock0, clockrate, clockmax )
+  timer = 0
   timers = 0
 else
   call system_clock( clock1 )
   timers = timers - clock0 + clock1
   if ( clock0 > clock1 ) timers = timers + clockmax
   clock0 = clock1
-  time = real( timers(i) ) / real( clockrate )
+  timer = real( timers(i) ) / real( clockrate )
   timers(:i) = 0
 end if
-end subroutine
+end function
 
-! Write timing info
-subroutine writetimer( i, filename, it )
-character(*), intent(in) :: filename
-integer, intent(in) :: i, it
-real :: r
-call timer( r, i )
-call rwrite( filename, r, it )
-end subroutine
+! Timer (old way, not used anymore )
+!subroutine oldtimer( time, i )
+!real, intent(out), optional :: time
+!integer, intent(in), optional :: i
+!integer, save :: clock0, clockrate, clockmax
+!integer(8), save :: timers(4)
+!integer :: clock1
+!if ( .not. present( i ) ) then
+!  call system_clock( clock0, clockrate, clockmax )
+!  timers = 0
+!else
+!  call system_clock( clock1 )
+!  timers = timers - clock0 + clock1
+!  if ( clock0 > clock1 ) timers = timers + clockmax
+!  clock0 = clock1
+!  time = real( timers(i) ) / real( clockrate )
+!  timers(:i) = 0
+!end if
+!end subroutine
 
 ! Write integer binary timeseries
 subroutine iwrite( filename, val, it )

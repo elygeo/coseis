@@ -21,61 +21,62 @@ use m_acceleration
 use m_locknodes
 use m_util
 implicit none
-real :: r, prof(8*itio)
+real :: prof(8*itio)
 integer :: i
 
 ! Initialization
-call timer
-call initialize( ip, np0, master )
-call inread
-call setup
+prof(1) = timer( 0 )
+call initialize( ip, np0, master ) ; prof(1) = timer( 1 )
+call inread                        ; prof(2) = timer( 1 )
+call setup                         ; prof(3) = timer( 1 )
 if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
-call arrays            ; if ( master ) call writetimer( 1, 'prof0', 1 )
-call gridgen           ; if ( master ) call writetimer( 1, 'prof0', 2 )
-call output_init       ; if ( master ) call writetimer( 1, 'prof0', 3 )
-call momentsource_init ; if ( master ) call writetimer( 1, 'prof0', 4 )
-call material          ; if ( master ) call writetimer( 1, 'prof0', 5 )
-call pml               ; if ( master ) call writetimer( 1, 'prof0', 6 )
-call fault_init        ; if ( master ) call writetimer( 1, 'prof0', 7 )
-call metadata          ; if ( master ) call writetimer( 1, 'prof0', 8 )
-call output( 0 )       ; if ( master ) call writetimer( 1, 'prof0', 9 )
-call resample          ; if ( master ) call writetimer( 1, 'prof0', 10 )
-call readcheckpoint    ; if ( master ) call writetimer( 1, 'prof0', 11 )
+call arrays                        ; prof(4) = timer( 1 )
+call gridgen                       ; prof(6) = timer( 1 )
+call output_init                   ; prof(7) = timer( 1 )
+call momentsource_init             ; prof(8) = timer( 1 )
+if ( master ) call rwrite1( 'prof0', prof(:8), 8 )
+call material                      ; prof(1) = timer( 1 )
+call pml
+call fault_init                    ; prof(2) = timer( 1 )
+call metadata
+call output( 0 )                   ; prof(3) = timer( 1 )
+call resample                      ; prof(4) = timer( 1 )
+call readcheckpoint                ; prof(5) = timer( 1 )
 if ( it == 0 ) then
-  call output( 1 )     ; if ( master ) call writetimer( 1, 'prof0', 12 )
-  call output( 2 )     ; if ( master ) call writetimer( 1, 'prof0', 13 )
+  call output( 1 )                 ; prof(6) = timer( 1 )
+  call output( 2 )                 ; prof(7) = timer( 1 )
 end if
 
 ! Main loop
 if ( master ) write( 0, * ) 'Main loop'
-if ( master ) call writetimer( 3, 'prof0', 14 )
+prof(8) = timer( 3 )
+if ( master ) call rwrite1( 'prof0', prof(:8), 16 )
 do while ( it < nt )
   i = modulo( it, itio ) + 1
-  call timestep        ; call timer( r, 1 ); prof(i*8-7) = r
+  call timestep                    ; prof(i*8-7) = timer( 1 )
   if ( master ) then
     write( 0, '(a)', advance='no' ) '.'
     if ( it == nt .or. modulo( it, 50 ) == 0 ) write( 0, '(i6)' ) it
   end if
-  call stress          ; call timer( r, 1 ); prof(i*8-6) = r
+  call stress                      ; prof(i*8-6) = timer( 1 )
   call momentsource
-  call output( 1 )     ; call timer( r, 1 ); prof(i*8-5) = r
-  call acceleration    ; call timer( r, 1 ); prof(i*8-4) = r
-  call fault           ; call timer( r, 1 ); prof(i*8-3) = r
+  call output( 1 )                 ; prof(i*8-5) = timer( 1 )
+  call acceleration                ; prof(i*8-4) = timer( 1 )
+  call fault                       ; prof(i*8-3) = timer( 1 )
   call locknodes
-  call output( 2 )     ; call timer( r, 1 ); prof(i*8-2) = r
-  call writecheckpoint ; call timer( r, 1 ); prof(i*8-1) = r
-  call timer( r, 2 ); prof(i*8) = r
-  if ( master ) then
+  call output( 2 )                 ; prof(i*8-2) = timer( 1 )
+  call writecheckpoint             ; prof(i*8-1) = timer( 1 )
+  prof(i*8) = timer( 2 )
   if ( modulo( it, itio ) == 0 .or. it == nt ) then
-    call rwrite1( 'prof1', prof(:i*8), it*8 )
-  end if
+    if ( master ) call rwrite1( 'prof1', prof(:i*8), it*8 )
   end if
 end do
 
 ! Finish up
+prof(1) = timer( 3 )
+prof(2) = timer( 4 )
+if ( master ) call rwrite1( 'prof0', prof(:2), 18 )
 if ( master ) write( 0, * ) 'Finished!'
-if ( master ) call writetimer( 3, 'prof0', 15 )
-if ( master ) call writetimer( 4, 'prof0', 16 )
 call finalize
 
 end program
