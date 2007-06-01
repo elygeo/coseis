@@ -110,7 +110,7 @@ end select
 
 ! Save indices
 if ( any( i2 < i1 ) ) then
-  write( 0, '(a,i3.3,x,a,6i7)' ) 'Error in output indices: ', iz, fieldout(iz), i1, i2
+  write( 0, '(a,i3.3,a,a,6i7)' ) 'Error in output indices: ', iz, ' ', fieldout(iz), i1, i2
   stop
 end if
 i1out(iz,1:3) = i1
@@ -152,7 +152,7 @@ use m_util
 integer, intent(in) :: pass
 real, save :: vstats(itio,4), fstats(itio,8), estats(itio,4)
 real :: gvstats(itio,4), gfstats(itio,8), gestats(itio,4), rr
-integer :: i1(3), i2(3), i3(3), i4(3), n(3), noff(3), i, onpass, nc, ic, ir, iz
+integer :: i1(3), i2(3), i3(3), i4(3), i, onpass, nc, ic, ir, iz
 logical :: dofault, fault, cell
 
 ! Test for fault
@@ -228,6 +228,7 @@ if ( it > 0 .and. dofault ) then
     if ( i == itio .or. it == nt .or. modulo( it, itcheck ) == 0 ) then
       call rreduce2( gfstats, fstats, 'allmax', ifn )
       call rreduce2( gestats, estats, 'allsum', ifn )
+      gfstats(:,8) = -gfstats(:,8)
       gestats(:,4) = -999
       do i = 1, itio
         if ( gestats(i,3) > 0. ) gestats(i,4) = ( log10( gestats(i,3) ) - 9.05 ) / 1.5
@@ -241,7 +242,7 @@ if ( it > 0 .and. dofault ) then
         call rwrite1( 'stats/tsmax',   gfstats(:i,5), it )
         call rwrite1( 'stats/samax',   gfstats(:i,6), it )
         call rwrite1( 'stats/tnmax',   gfstats(:i,7), it )
-        call rwrite1( 'stats/tnmin',  -gfstats(:i,8), it )
+        call rwrite1( 'stats/tnmin',   gfstats(:i,8), it )
         call rwrite1( 'stats/efric',   gestats(:i,1), it )
         call rwrite1( 'stats/estrain', gestats(:i,2), it )
         call rwrite1( 'stats/moment',  gestats(:i,3), it )
