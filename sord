@@ -27,6 +27,10 @@ esac
 done
 shift $(( OPTIND - 1 ))
 
+# Email address
+email=$LOGNAME
+[ -f email ] && email=$( cat email )
+
 # Symlink input file specified on command line
 if [ "$1" ]; then 
   infile="$1"
@@ -291,8 +295,6 @@ END
 #------------------------------------------------------------------------------#
 # Run
 
-email=$LOGNAME
-[ -f email ] && email=$( cat email )
 echo "$starttime: Start SORD setup" >> log
 echo "$(date): Finished setup" >> log
 case $machine in
