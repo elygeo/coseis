@@ -317,7 +317,7 @@ use mpi
 real, intent(inout) :: r, s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), iz
 character(*), intent(in) :: io, filename
-integer :: ftype, mtype, fh, nl(4), n(4), i0(4), i, comm, e
+integer :: ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
 integer(kind=mpi_offset_kind) :: d = 0
 nl = (/ i4 - i3 + 1, 1 /)
 n  = (/ i2 - i1 + 1, 1 /)
@@ -358,7 +358,7 @@ use mpi
 real, intent(inout) :: r, w1(:,:,:,:)
 integer, intent(in) :: ic, i1(3), i2(3), i3(3), i4(3), iz
 character(*), intent(in) :: io, filename
-integer :: ftype, mtype, fh, nl(4), n(4), i0(4), i, comm, e
+integer :: ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
 integer(kind=mpi_offset_kind) :: d = 0
 nl = (/ i4 - i3 + 1, 1 /)
 n  = (/ i2 - i1 + 1, 1 /)
