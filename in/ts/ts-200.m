@@ -19,8 +19,8 @@
   vrup = 2300.;
   itcheck = 100;
 
-  np = [ 1 40 20 ] % DataStar
   np = [ 1 25 20 ] % TeraGrid
+  np = [ 2 32 16 ] % DataStar
   dx = 200.;
   dt = .012;
   trelax = .12;
