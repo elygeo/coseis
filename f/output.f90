@@ -10,11 +10,14 @@ use m_collective
 use m_outprops
 use m_util
 real :: rout
-integer :: i1(3), i2(3), n(3), noff(3), i, j1, k1, l1, j2, k2, l2, nc, iz, onpass
+integer :: i1(3), i2(3), n(3), noff(3), i, j1, k1, l1, j2, k2, l2, nc, iz, onpass, ibuff
 logical :: dofault, fault, cell
 
 if ( master ) write( 0, * ) 'Output initialization'
 if ( nout > nz ) stop 'too many output zones, make nz bigger'
+if ( itcheck < 1 ) itcheck = itcheck + nt + 1
+if ( modulo( itcheck, itio ) /= 0 ) itcheck = ( itcheck / itio + 1 ) * itio
+ibuff = 0
 
 ! Test for fault
 dofault = .false.
@@ -109,8 +112,7 @@ if ( any( i2 < i1 ) ) then
 end if
 i1out(iz,1:3) = i1
 i2out(iz,1:3) = i2
-
-! Bufferq 
+if ( all( i1 == i2 ) ) ibuff = ibuff + 1
 
 ! Split collective i/o
 i1 = max( i1, i1node )
@@ -121,6 +123,11 @@ if ( any( i2 < i1 ) ) i = nt + 1
 call splitio( iz, nout, i )
  
 end do
+
+! Buffer single node output
+if ( ibuff > 0 ) then
+  !allocate( iobuff(itio) )
+end if
 
 end subroutine
 
@@ -133,8 +140,8 @@ use m_collective
 use m_outprops
 use m_util
 integer, intent(in) :: pass
-real, save :: vstats(4,itio), fstats(8,itio), estats(4,itio)
-real :: gvstats(4,itio), gfstats(8,itio), gestats(4,itio), rr
+real, save :: vstats(itio,4), fstats(itio,8), estats(itio,4)
+real :: gvstats(itio,4), gfstats(itio,8), gestats(itio,4), rr
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), noff(3), i, onpass, nc, ic, ir, iz
 logical :: dofault, fault, cell, ioflush
 
@@ -156,24 +163,24 @@ if ( it > 0 ) then
     pv = max( pv, s1 )
     call scalarsethalo( s1, -1., i1node, i2node )
     call scalarsethalo( s2, -1., i1cell, i2cell )
-    vstats(1,i) = sqrt( maxval( s1 ) )
-    vstats(2,i) = sqrt( maxval( s2 ) )
+    vstats(i,1) = sqrt( maxval( s1 ) )
+    vstats(i,2) = sqrt( maxval( s2 ) )
   case( 2 )
     ioflush = ( i == itio .or. it == nt .or. modulo( it, itcheck ) == 0 )
     s1 = sum( u * u, 4 )
     s2 = sum( w1 * w1, 4 )
     call scalarsethalo( s1, -1., i1node, i2node )
     call scalarsethalo( s2, -1., i1node, i2node )
-    vstats(3,i) = sqrt( maxval( s1 ) )
-    vstats(4,i) = sqrt( maxval( s2 ) )
+    vstats(i,3) = sqrt( maxval( s1 ) )
+    vstats(i,4) = sqrt( maxval( s2 ) )
     if ( any( vstats > huge( 0. ) ) ) stop 'unstable solution'
     if ( ioflush ) then
       call rreduce2( gvstats, vstats, 'max', 0 )
       if ( master ) then
-        call rwrite1( 'stats/vmax', gvstats(1,:i), it )
-        call rwrite1( 'stats/wmax', gvstats(2,:i), it )
-        call rwrite1( 'stats/umax', gvstats(3,:i), it )
-        call rwrite1( 'stats/amax', gvstats(4,:i), it )
+        call rwrite1( 'stats/vmax', gvstats(:i,1), it )
+        call rwrite1( 'stats/wmax', gvstats(:i,2), it )
+        call rwrite1( 'stats/umax', gvstats(:i,3), it )
+        call rwrite1( 'stats/amax', gvstats(:i,4), it )
         rr = maxval( gvstats(3,:) )
         if ( rr > dx / 10. ) write( 0, * ) 'warning: u !<< dx', rr, dx
       end if
@@ -189,45 +196,45 @@ if ( it > 0 .and. dofault ) then
     call scalarsethalo( f1,   -1., i1node, i2node )
     call scalarsethalo( f2,   -1., i1node, i2node )
     call scalarsethalo( tarr, -1., i1node, i2node )
-    fstats(1,i) = maxval( f1 )
-    fstats(2,i) = maxval( f2 )
-    fstats(3,i) = maxval( sl )
-    fstats(4,i) = maxval( tarr )
+    fstats(i,1) = maxval( f1 )
+    fstats(i,2) = maxval( f2 )
+    fstats(i,3) = maxval( sl )
+    fstats(i,4) = maxval( tarr )
   case( 2 )
     call scalarsethalo( ts, -1., i1node, i2node )
     call scalarsethalo( f2, -1., i1node, i2node )
-    fstats(5,i) = maxval( ts )
-    fstats(6,i) = maxval( f2 )
-    rr = 2. * minval( tn ) - 1.
+    fstats(i,5) = maxval( ts )
+    fstats(i,6) = maxval( f2 )
+    rr = -2. * abs( minval( tn ) ) - 1.
     call scalarsethalo( tn, rr, i1node, i2node )
-    fstats(7,i) = maxval( tn )
+    fstats(i,7) = maxval( tn )
     rr = 2. * fstats(7,i) + 1.
     call scalarsethalo( tn, rr, i1node, i2node )
-    fstats(8,i) = -minval( tn )
-    estats(1,i) = efric
-    estats(2,i) = estrain
-    estats(3,i) = moment
+    fstats(i,8) = -minval( tn )
+    estats(i,1) = efric
+    estats(i,2) = estrain
+    estats(i,3) = moment
     if ( ioflush ) then
       call rreduce2( gfstats, fstats, 'allmax', ifn )
       call rreduce2( gestats, estats, 'allsum', ifn )
-      gestats(4,:) = -999
+      gestats(:,4) = -999
       do i = 1, itio
-        if ( gestats(3,i) > 0. ) gestats(4,i) = ( log10( gestats(3,i) ) - 9.05 ) / 1.5
+        if ( gestats(i,3) > 0. ) gestats(i,4) = ( log10( gestats(i,3) ) - 9.05 ) / 1.5
       end do
       if ( master ) then
         i = modulo( it-1, itio ) + 1
-        call rwrite1( 'stats/svmax',   gfstats(1,:i), it )
-        call rwrite1( 'stats/sumax',   gfstats(2,:i), it )
-        call rwrite1( 'stats/slmax',   gfstats(3,:i), it )
-        call rwrite1( 'stats/tarrmax', gfstats(4,:i), it )
-        call rwrite1( 'stats/tsmax',   gfstats(5,:i), it )
-        call rwrite1( 'stats/samax',   gfstats(6,:i), it )
-        call rwrite1( 'stats/tnmax',   gfstats(7,:i), it )
-        call rwrite1( 'stats/tnmin',  -gfstats(8,:i), it )
-        call rwrite1( 'stats/efric',   gestats(1,:i), it )
-        call rwrite1( 'stats/estrain', gestats(2,:i), it )
-        call rwrite1( 'stats/moment',  gestats(3,:i), it )
-        call rwrite1( 'stats/mw',      gestats(4,:i), it ) 
+        call rwrite1( 'stats/svmax',   gfstats(:i,1), it )
+        call rwrite1( 'stats/sumax',   gfstats(:i,2), it )
+        call rwrite1( 'stats/slmax',   gfstats(:i,3), it )
+        call rwrite1( 'stats/tarrmax', gfstats(:i,4), it )
+        call rwrite1( 'stats/tsmax',   gfstats(:i,5), it )
+        call rwrite1( 'stats/samax',   gfstats(:i,6), it )
+        call rwrite1( 'stats/tnmax',   gfstats(:i,7), it )
+        call rwrite1( 'stats/tnmin',  -gfstats(:i,8), it )
+        call rwrite1( 'stats/efric',   gestats(:i,1), it )
+        call rwrite1( 'stats/estrain', gestats(:i,2), it )
+        call rwrite1( 'stats/moment',  gestats(:i,3), it )
+        call rwrite1( 'stats/mw',      gestats(:i,4), it ) 
       end if
     end if
   end select
@@ -300,12 +307,12 @@ do ic = 1, nc
   case( 'psv'  ); call scalario( 'w', str, rr, psv,      i1, i2, i3, i4, iz )
   case( 'trup' ); call scalario( 'w', str, rr, trup,     i1, i2, i3, i4, iz )
   case( 'tarr' ); call scalario( 'w', str, rr, tarr,     i1, i2, i3, i4, iz )
-  ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
-  if ( all( i1 == i2 ) ) call rwrite( str, rr, ir )
   case default
     write( 0, * ) 'error: unknown output field: ', fieldout(iz)
     stop
   end select
+  ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
+  if ( all( i1 == i2 ) ) call rwrite( str, rr, ir )
 end do
 
 end do doiz

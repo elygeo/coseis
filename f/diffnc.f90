@@ -89,8 +89,8 @@ end select
 
 ! Parallelepiped grid, flops: 17* 27+
 case( 3 )
-b = mod( a, 3 ) + 1
-c = mod( a + 1, 3 ) + 1
+b = modulo( a, 3 ) + 1
+c = modulo( a + 1, 3 ) + 1
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
 df(j,k,l) = 0.25 * &
 ((f(j+1,k+1,l+1,i)-f(j,k,l,i))* &
@@ -113,8 +113,8 @@ end forall
 
 ! General grid one-point quadrature, flops: 17* 63+
 case( 4 )
-b = mod( a, 3 ) + 1
-c = mod( a + 1, 3 ) + 1
+b = modulo( a, 3 ) + 1
+c = modulo( a + 1, 3 ) + 1
 forall( j=j1:j2, k=k1:k2, l=l1:l2 )
 df(j,k,l) = 0.0625 * &
 ((f(j+1,k+1,l+1,i)-f(j,k,l,i))* &

@@ -258,7 +258,6 @@ fi
 cd "$rundir"
 rundir=$( /bin/pwd )
 mkdir stats
-mkdir timer
 mkdir checkpoint
 mkdir debug
 i=0

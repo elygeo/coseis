@@ -50,11 +50,11 @@ end if
 if ( master ) write( 0, * ) 'Main loop'
 if ( master ) call writetimer( 3, 'prof0', 14 )
 do while ( it < nt )
-  i = modulo( it-1, itio ) + 1
+  i = modulo( it, itio ) + 1
   call timestep        ; call timer( r, 1 ); prof(i*8-7) = r
   if ( master ) then
     write( 0, '(a)', advance='no' ) '.'
-    if ( it == nt .or. mod( it, 50 ) == 0 ) write( 0, '(i6)' ) it
+    if ( it == nt .or. modulo( it, 50 ) == 0 ) write( 0, '(i6)' ) it
   end if
   call stress          ; call timer( r, 1 ); prof(i*8-6) = r
   call momentsource
