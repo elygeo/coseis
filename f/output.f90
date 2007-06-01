@@ -1,6 +1,8 @@
 ! Output routines
 module m_output
 implicit none
+real, private, allocatable :: iobuffer(:,:)
+integer, private, allocatable :: jbuff(:)
 contains
 
 ! Initialize output
@@ -10,13 +12,14 @@ use m_collective
 use m_outprops
 use m_util
 real :: rout
-integer :: i1(3), i2(3), n(3), noff(3), i, j1, k1, l1, j2, k2, l2, nc, iz, onpass, ibuff
+integer :: i1(3), i2(3), n(3), noff(3), i, j1, k1, l1, j2, k2, l2, nc, iz, onpass, nbuff
 logical :: dofault, fault, cell
 
 if ( master ) write( 0, * ) 'Output initialization'
 if ( nout > nz ) stop 'too many output zones, make nz bigger'
 if ( itcheck < 1 ) itcheck = itcheck + nt + 1
 if ( modulo( itcheck, itio ) /= 0 ) itcheck = ( itcheck / itio + 1 ) * itio
+nbuff = 0
 ibuff = 0
 
 ! Test for fault
@@ -112,7 +115,12 @@ if ( any( i2 < i1 ) ) then
 end if
 i1out(iz,1:3) = i1
 i2out(iz,1:3) = i2
-if ( all( i1 == i2 ) ) ibuff = ibuff + 1
+
+! Buffer timer series
+if ( all( i1 == i2 ) .and. i2out(iz,4) - i1out(iz,4) > 0 ) then
+  ibuff(iz) = nbuff + 1
+  nbuff = nbuff + nc
+end if
 
 ! Split collective i/o
 i1 = max( i1, i1node )
@@ -124,9 +132,11 @@ call splitio( iz, nout, i )
  
 end do
 
-! Buffer single node output
-if ( ibuff > 0 ) then
-  !allocate( iobuff(itio) )
+! Allocate buffer
+if ( nbuff > 0 ) then
+  allocate( iobuffer(itio,nbuff), jbuff(nbuff) )
+  iobuffer = 0.
+  jbuff = 0
 end if
 
 end subroutine
@@ -143,7 +153,7 @@ integer, intent(in) :: pass
 real, save :: vstats(itio,4), fstats(itio,8), estats(itio,4)
 real :: gvstats(itio,4), gfstats(itio,8), gestats(itio,4), rr
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), noff(3), i, onpass, nc, ic, ir, iz
-logical :: dofault, fault, cell, ioflush
+logical :: dofault, fault, cell
 
 ! Test for fault
 dofault = .false.
@@ -153,7 +163,6 @@ if ( faultnormal /= 0 ) then
 end if
 
 ! Prepare output
-ioflush = .false.
 if ( it > 0 ) then
   i = modulo( it-1, itio ) + 1
   select case( pass )
@@ -166,7 +175,6 @@ if ( it > 0 ) then
     vstats(i,1) = sqrt( maxval( s1 ) )
     vstats(i,2) = sqrt( maxval( s2 ) )
   case( 2 )
-    ioflush = ( i == itio .or. it == nt .or. modulo( it, itcheck ) == 0 )
     s1 = sum( u * u, 4 )
     s2 = sum( w1 * w1, 4 )
     call scalarsethalo( s1, -1., i1node, i2node )
@@ -174,15 +182,18 @@ if ( it > 0 ) then
     vstats(i,3) = sqrt( maxval( s1 ) )
     vstats(i,4) = sqrt( maxval( s2 ) )
     if ( any( vstats > huge( 0. ) ) ) stop 'unstable solution'
-    if ( ioflush ) then
+    if ( i == itio .or. it == nt .or. modulo( it, itcheck ) == 0 ) then
       call rreduce2( gvstats, vstats, 'max', 0 )
       if ( master ) then
         call rwrite1( 'stats/vmax', gvstats(:i,1), it )
         call rwrite1( 'stats/wmax', gvstats(:i,2), it )
         call rwrite1( 'stats/umax', gvstats(:i,3), it )
         call rwrite1( 'stats/amax', gvstats(:i,4), it )
-        rr = maxval( gvstats(3,:) )
+        rr = maxval( gvstats(:,3) )
         if ( rr > dx / 10. ) write( 0, * ) 'warning: u !<< dx', rr, dx
+        i1 = ihypo
+        i1(ifn) = 1  
+        call rwrite( 'stats/tarrhypo', tarr(i1(1),i1(2),i1(3)), 1 )
       end if
     end if
   end select
@@ -214,7 +225,7 @@ if ( it > 0 .and. dofault ) then
     estats(i,1) = efric
     estats(i,2) = estrain
     estats(i,3) = moment
-    if ( ioflush ) then
+    if ( i == itio .or. it == nt .or. modulo( it, itcheck ) == 0 ) then
       call rreduce2( gfstats, fstats, 'allmax', ifn )
       call rreduce2( gestats, estats, 'allsum', ifn )
       gestats(:,4) = -999
@@ -311,8 +322,20 @@ do ic = 1, nc
     write( 0, * ) 'error: unknown output field: ', fieldout(iz)
     stop
   end select
-  ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
-  if ( all( i1 == i2 ) ) call rwrite( str, rr, ir )
+  if ( all( i1 == i2 ) ) then
+    ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
+    if ( it == 0 .or. ibuff(iz) == 0 ) then
+      call rwrite( str, rr, ir )
+    else
+      i = ibuff(iz) + ic - 1
+      jbuff(i) = jbuff(i) + 1
+      iobuffer(jbuff(i),i) = rr
+      if ( jbuff(i) == itio .or. it == nt .or. modulo( it, itcheck ) == 0 ) then
+        call rwrite1( str, iobuffer(:jbuff(i),i), ir )
+        jbuff(i) = 0
+      end if
+    end if
+  end if
 end do
 
 end do doiz

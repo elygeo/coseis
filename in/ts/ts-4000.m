@@ -47,6 +47,7 @@
   timeseries = { 'v'  99691.  67008.  21. }; % Santa Barbara
   timeseries = { 'v' 152641.  77599.  16. }; % Oxnard
   timeseries = { 'v' 191871. 180946. 714. }; % Lancaster
+return
   timeseries = { 'v' 216802. 109919.  92. }; % Westwood
   timeseries = { 'v' 229657. 119310. 107. }; % Los Angeles
   timeseries = { 'v' 242543. 123738.  63. }; % Montebello

@@ -172,7 +172,7 @@ write( 1, rec=it ) val
 close( 1 )
 end subroutine
   
-! Write real binary timeseries, buffered
+! Write buffered real binary timeseries
 subroutine rwrite1( filename, val, it )
 character(*), intent(in) :: filename
 real, intent(in) :: val(:)
@@ -198,7 +198,7 @@ else
     open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
   end if
   do i = 1, n
-    write( 1, rec=i ) val(i)
+    write( 1, rec=i+it-n+1 ) val(i)
   end do
   close( 1 )
 end if

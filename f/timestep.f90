@@ -31,7 +31,6 @@ it = it + 1
 t  = it * dt
 v  = v  + dt * w1
 u  = u  + dt * v
-if ( master ) call rwrite( 'stats/t', t, it )
 
 ! Fault time integration
 if ( ifn /= 0 ) then
@@ -49,11 +48,6 @@ if ( ifn /= 0 ) then
     where ( f1 < svtol .and. f2 >= svtol )
       tarr = t - dt * ( .5 + ( svtol - f1 ) / ( f2 - f1 ) )
     end where
-  end if
-  if ( master ) then
-    i1 = ihypo
-    i1(ifn) = 1 
-    call rwrite( 'stats/tarrhypo', tarr(i1(1),i1(2),i1(3)), it )
   end if
   t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
   f2 = sqrt( sum( t2 * t2, 4 ) )
