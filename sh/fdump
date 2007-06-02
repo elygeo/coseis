@@ -1,0 +1,4 @@
+#!/bin/bash -e
+file="${1:?}"
+od -A d -f "$file"
+

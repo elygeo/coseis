@@ -54,7 +54,7 @@ mv rho vp vs "$rundir/data"
 cd "$rundir"
 echo "\$(date): Start SORD run" >> log
 poe ./sord-$mode
-echo "\$(date): Finished" >> log
+echo "\$(date): Finished!" >> log
 mail $email -s "Finished on DataStar" < /dev/null
 END
 chmod u+x llscript-vm
@@ -63,7 +63,7 @@ fi
 cat << END >> llscript
 echo "\$(date): Start SORD run" >> log
 poe ./sord-$mode
-echo "\$(date): Finished" >> log
+echo "\$(date): Finished!" >> log
 mail $email -s "Finished on DataStar" < /dev/null
 END
 chmod u+x llscript

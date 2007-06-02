@@ -219,7 +219,7 @@ if ( it > 0 .and. dofault ) then
     rr = -2. * abs( minval( tn ) ) - 1.
     call scalarsethalo( tn, rr, i1node, i2node )
     fstats(i,7) = maxval( tn )
-    rr = 2. * fstats(7,i) + 1.
+    rr = 2. * abs( fstats(7,i) ) + 1.
     call scalarsethalo( tn, rr, i1node, i2node )
     fstats(i,8) = -minval( tn )
     estats(i,1) = efric

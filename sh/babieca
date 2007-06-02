@@ -15,27 +15,6 @@ node48:2
 node49:2
 END
 else
-cat << END > pbsscript-vm
-#!/bin/bash
-#PBS -N sord-vm-$count
-#PBS -l walltime=$walltime
-#PBS -l nodes=$nodes:ppn=$ppn
-#PBS -q workq
-#PBS -V
-mail $email -s "Started on Babieca" < /dev/null
-sleep 2
-cd "$rundir"
-echo "\$PBS_JOBID" >> log
-echo "\$(date): Start SCECVM run" >> log
-cd "$rundir/vm"
-mpiexec -n $np ./scecvm4-$mode $nn rlon rlat rdep rho vp vs
-mv rho vp vs "$rundir/data"
-cd "$rundir"
-echo "\$(date): Start SORD run" >> log
-mpiexec -n $np ./sord-$mode
-echo "\$(date): Finished!" >> log
-mail $email -s "Finished on Babieca" < /dev/null
-END
 cat << END > pbsscript
 #!/bin/bash
 #PBS -N sord-$count
@@ -52,7 +31,31 @@ mpiexec -n $np ./sord-$mode
 echo "\$(date): Finished!" >> log
 mail $email -s "Finished on Babieca" < /dev/null
 END
-chmod u+x pbsscript-vm pbsscript
+chmod u+x pbsscript-vm
+if [ "$nc" ]; then
+cat << END > pbsscript-vm
+#!/bin/bash
+#PBS -N sord-vm-$count
+#PBS -l walltime=$walltime
+#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -q workq
+#PBS -V
+mail $email -s "Started on Babieca" < /dev/null
+sleep 2
+cd "$rundir"
+echo "\$PBS_JOBID" >> log
+echo "\$(date): Start VM run" >> log
+cd "$rundir/vm"
+mpiexec -n $np ./scecvm4-$mode $nc rlon rlat rdep rho vp vs
+mv rho vp vs "$rundir/data"
+cd "$rundir"
+echo "\$(date): Start SORD run" >> log
+mpiexec -n $np ./sord-$mode
+echo "\$(date): Finished!" >> log
+mail $email -s "Finished on Babieca" < /dev/null
+END
+chmod u+x pbsscript-vm
+fi
 fi
   
 case $run in

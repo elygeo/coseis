@@ -175,6 +175,8 @@ pgf90)
 gfortran)
   gflags='-O0 -pg -g -W -pedantic -std=f95 -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
   oflags='-O3'
+#sfc='gfortran-mp-4.2'
+#echo AAAAAAAAAAAAAAAAA
   ;;
 f95)
   gflags='-g'

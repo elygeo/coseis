@@ -20,7 +20,7 @@
   itcheck = 100;
 
   np = [ 1 25 20 ] % TeraGrid
-  np = [ 2 32 16 ] % DataStar
+  np = [ 1 64 16 ] % DataStar
   dx = 200.;
   dt = .012;
   trelax = .12;

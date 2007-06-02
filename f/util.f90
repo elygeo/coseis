@@ -187,29 +187,31 @@ end subroutine
 subroutine rwrite1( filename, val, it )
 character(*), intent(in) :: filename
 real, intent(in) :: val(:)
-integer, intent(in) :: it
-integer :: i, n
+integer, intent(in), optional :: it
+integer :: i, n, i0
 n = size( val, 1 )
-if ( it < n ) stop 'error in rwrite1'
-if ( modulo( it, n ) == 0 ) then
+i0 = 0
+if ( present( it ) ) i0 = it - n
+if ( i0 < 0 ) stop 'error in rwrite1'
+if ( modulo( i0, n ) == 0 ) then
   inquire( iolength=i ) val
-  if ( it == n ) then
+  if ( i0 == 0 ) then
     open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
   else
     open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
   end if
-  i = it / n
+  i = i0 / n + 1
   write( 1, rec=i ) val
   close( 1 )
 else
   inquire( iolength=i ) val(1)
-  if ( it == n ) then
+  if ( i0 == 0 ) then
     open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
   else
     open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
   end if
   do i = 1, n
-    write( 1, rec=i+it-n ) val(i)
+    write( 1, rec=i0+i ) val(i)
   end do
   close( 1 )
 end if
