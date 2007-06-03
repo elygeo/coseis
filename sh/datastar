@@ -16,7 +16,7 @@ cat << END > llscript
 #MP_ADAPTER_USE=dedicated;\\
 #MP_CPU_USE=unique;\\
 #MP_CSS_INTERRUPT=no;\\
-#MP_EAGER_LIMIT=64K;\\
+#MP_EAGER_LIMIT=32768;\\
 #MP_EUIDEVELOP=min;\\
 #MP_LABELIO=yes;\\
 #MP_POLLING_INTERVAL=100000;\\
@@ -32,7 +32,7 @@ cat << END > llscript
 #@ tasks_per_node = $ppn
 #@ wall_clock_limit = $walltime
 #@ notification = always
-#@ notify_user = $LOGNAME
+#@ notify_user = $email
 #@ job_type = parallel
 #@ class = normal
 #@ node_usage = not_shared
@@ -40,7 +40,6 @@ cat << END > llscript
 #@ output = out.\$(jobid)
 #@ error = err.\$(jobid) 
 #@ queue
-mail $email -s "Started on DataStar" < /dev/null
 cd "$rundir"
 END
 
@@ -55,7 +54,6 @@ cd "$rundir"
 echo "\$(date): Start SORD run" >> log
 poe ./sord-$mode
 echo "\$(date): Finished!" >> log
-mail $email -s "Finished on DataStar" < /dev/null
 END
 chmod u+x llscript-vm
 fi
@@ -64,7 +62,6 @@ cat << END >> llscript
 echo "\$(date): Start SORD run" >> log
 poe ./sord-$mode
 echo "\$(date): Finished!" >> log
-mail $email -s "Finished on DataStar" < /dev/null
 END
 chmod u+x llscript
 fi

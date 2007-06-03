@@ -21,15 +21,15 @@ cat << END > pbsscript
 #PBS -l nodes=$nodes:ppn=$ppn
 #PBS -l walltime=$walltime
 #PBS -q workq
+#PBS -M $email
+#PBS -m abe
 #PBS -V
-mail $email -s "Started on Babieca" < /dev/null
 sleep 2
 cd "$rundir"
 echo "\$PBS_JOBID" >> log
 echo "\$(date): Start SORD run" >> log
 mpiexec -n $np ./sord-$mode
 echo "\$(date): Finished!" >> log
-mail $email -s "Finished on Babieca" < /dev/null
 END
 chmod u+x pbsscript-vm
 if [ "$nc" ]; then
@@ -39,8 +39,9 @@ cat << END > pbsscript-vm
 #PBS -l walltime=$walltime
 #PBS -l nodes=$nodes:ppn=$ppn
 #PBS -q workq
+#PBS -M $email
+#PBS -m abe
 #PBS -V
-mail $email -s "Started on Babieca" < /dev/null
 sleep 2
 cd "$rundir"
 echo "\$PBS_JOBID" >> log
@@ -52,7 +53,6 @@ cd "$rundir"
 echo "\$(date): Start SORD run" >> log
 mpiexec -n $np ./sord-$mode
 echo "\$(date): Finished!" >> log
-mail $email -s "Finished on Babieca" < /dev/null
 END
 chmod u+x pbsscript-vm
 fi

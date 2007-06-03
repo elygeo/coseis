@@ -24,14 +24,14 @@ cat << END > pbsscript
 #PBS -l walltime=$walltime
 #PBS -l nodes=$nodes:ppn=$ppn
 #PBS -q dque
+#PBS -M $email
+#PBS -m abe
 #PBS -V
-mail $email -s "Started on TeraGrid" < /dev/null
 cd "$rundir"
 echo "\$PBS_JOBID" >> log
 echo "\$(date): Start SORD run" >> log
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
 echo "\$(date): Finished!" >> log
-mail $email -s "Finished on TeraGrid" < /dev/null
 END
 chmod u+x pbsscript
 if [ "$nc" ]; then
@@ -41,8 +41,9 @@ cat << END > pbsscript-vm
 #PBS -l walltime=$walltime
 #PBS -l nodes=$nodes:ppn=$ppn
 #PBS -q dque
+#PBS -M $email
+#PBS -m abe
 #PBS -V
-mail $email -s "Started on TeraGrid" < /dev/null
 cd "$rundir"
 echo "\$PBS_JOBID" >> log
 echo "\$(date): Start VM run" >> log
@@ -53,7 +54,6 @@ cd "$rundir"
 echo "\$(date): Start SORD run" >> log
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
 echo "\$(date): Finished!" >> log
-mail $email -s "Finished on TeraGrid" < /dev/null
 END
 chmod u+x pbsscript-vm
 fi
