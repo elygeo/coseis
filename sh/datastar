@@ -20,7 +20,8 @@ case "\${1:?}" in
   -i) ./sord-s ;;
   -g) totalview ./sord-s ;;
   -b) nohup ./sord-s > out.log & :; pid=\$!
-      echo "\$pid" >> log; echo "Background job started with PID: \$pid" ;;
+      echo "Background job started with PID \$pid" >> log
+      echo "Background job started with PID \$pid" ;;
 esac
 echo "\$(date): Finished!" >> log
 END
@@ -31,7 +32,8 @@ case "\${1:?}" in
   -i) poe ./sord-p $opts ;;
   -g) tvpoe ./sord-p $opts ;;
   -b) nohup poe ./sord-p $opts > out.log & :; pid=\$!
-      echo "\$pid" >> log; echo "Background job started with PID: \$pid" ;;
+      echo "Background job started with PID \$pid" >> log
+      echo "Background job started with PID \$pid" ;;
 esac
 echo "\$(date): Finished!" >> log
 END
