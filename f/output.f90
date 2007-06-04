@@ -127,7 +127,7 @@ i1 = max( i1, i1node )
 i2 = min( i2, i2node )
 if ( cell ) i2 = min( i2, i2cell )
 i = i1out(iz,4)
-if ( any( i2 < i1 ) ) i = nt + 1
+if ( any( i2 < i1 ) ) i = -1
 call splitio( iz, nout, i )
  
 end do

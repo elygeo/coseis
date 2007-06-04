@@ -153,9 +153,8 @@ end if
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-if ( all( i1 == i2 ) ) then
-  if ( io == 'r' ) stop 'error in scalario'
-  if ( io == 'w' ) r = s1(j1,k1,l1)
+if ( all( i1 == i2 ) .and. io == 'w' ) then
+  r = s1(j1,k1,l1)
   return
 end if
 inquire( iolength=nb ) s1(j1:j2,k1:k2,l1:l2)
@@ -195,9 +194,8 @@ end if
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-if ( all( i1 == i2 ) ) then
-  if ( io == 'r' ) stop 'error in vectorio'
-  if ( io == 'w' ) r = w1(j1,k1,l1,ic)
+if ( all( i1 == i2 ) .and. io == 'w' ) then
+  r = w1(j1,k1,l1,ic)
   return
 end if
 inquire( iolength=nb ) w1(j1:j2,k1:k2,l1:l2,ic)

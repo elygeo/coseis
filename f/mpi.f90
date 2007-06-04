@@ -306,9 +306,11 @@ end subroutine
 subroutine splitio( iz, nout, ditout )
 use mpi
 integer, intent(in) :: iz, nout, ditout
-integer :: e
+integer :: i, e
 if ( .not. allocated( commout ) ) allocate( commout(nout) )
-call mpi_comm_split( comm3d, ditout, 0, commout(iz), e )
+i = ditout
+if ( i < 0 ) i = mpi_undefined
+call mpi_comm_split( comm3d, i, 0, commout(iz), e )
 end subroutine
 
 ! Scalar field input/output
@@ -322,9 +324,8 @@ integer(kind=mpi_offset_kind) :: d = 0
 nl = (/ i4 - i3 + 1, 1 /)
 n  = (/ i2 - i1 + 1, 1 /)
 i0 = (/ i3 - i1,     0 /)
-if ( all( n == 1 ) ) then
-  if ( io == 'r' ) stop 'error in scalario'
-  if ( io == 'w' ) r = s1(i1(1),i1(2),i1(3))
+if ( all( n == 1 ) .and. io =='w' ) then
+  r = s1(i1(1),i1(2),i1(3))
   return
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
@@ -363,9 +364,8 @@ integer(kind=mpi_offset_kind) :: d = 0
 nl = (/ i4 - i3 + 1, 1 /)
 n  = (/ i2 - i1 + 1, 1 /)
 i0 = (/ i3 - i1,     0 /)
-if ( all( n == 1 ) ) then
-  if ( io == 'r' ) stop 'error in vectorio'
-  if ( io == 'w' ) r = w1(i1(1),i1(2),i1(3),ic)
+if ( all( n == 1 ) .and. io =='w' ) then
+   r = w1(i1(1),i1(2),i1(3),ic)
   return
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
