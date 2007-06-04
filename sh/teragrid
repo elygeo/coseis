@@ -5,19 +5,51 @@ if [ $( /bin/pwd | grep -v gpfs ) ]; then
   exit
 fi
 
-if [ "$interactive" ]; then
+cat << END > run
+#!/bin/bash -e
+if ! grep -q "\$HOSTNAME" mf; then
+  echo "Error: interactive jobs must be launched from the following hosts:"
+  sed 's/^/  /; s/:2//' mf
+  exit
+fi
+echo "\$(date): Start SORD run" >> log
+END
+
+case "$mode" in
+s) cat << END >> run
+case \${1:?} in
+  -i) ./sord-s ;;
+  -g) totalview ./sord-s ;;
+  -b) nohup ./sord-s > out.log & :; pid=\$!
+      echo "\$pid" >> log; echo "Background job started with PID: \$pid" ;;
+esac
+echo "\$(date): Finished!" >> log
+END
+;;
+p) cat << END >> run
+case \${1:?} in
+  -i) mpirun -machinefile mf -np $np ./sord-p ;;
+  -g) mpirun -tv -machinefile mf -np $np ./sord-p ;;
+  -b) nohup mpirun -machinefile mf -np $np ./sord-p > out.log & :; pid=\$!
+      echo "\$pid" >> log; echo "Background job started with PID: \$pid" ;;
+esac
+echo "\$(date): Finished!" >> log
+END
+;;
+esac
+
 cat << END > mf
 tg-c127:2
 tg-c128:2
 tg-c129:2
 tg-c130:2
 END
-if ! grep -q "$HOSTNAME" mf; then
-  echo "Error: interactive jobs must be launched from the following hosts:"
-  sed 's/^/  /; s/:2//' mf
-  exit
-fi
-elif [ "$mode" = p ]; then
+
+cat << END > que
+#!/bin/bash
+qsub pbsscript >> log
+END
+
 cat << END > pbsscript
 #!/bin/bash
 #PBS -N sord-$count
@@ -33,8 +65,16 @@ echo "\$(date): Start SORD run" >> log
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
 echo "\$(date): Finished!" >> log
 END
-chmod u+x pbsscript
-if [ "$nc" ]; then
+
+chmod u+x run que pbsscript
+
+[ "$nc" ]
+
+cat << END > que-vm
+#!/bin/bash
+qsub pbsscript-vm >> log
+END
+
 cat << END > pbsscript-vm
 #!/bin/bash
 #PBS -N sord-vm-$count
@@ -55,32 +95,6 @@ echo "\$(date): Start SORD run" >> log
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
 echo "\$(date): Finished!" >> log
 END
-chmod u+x pbsscript-vm
-fi
-fi
 
-case "$mode$run" in
-  si) ./sord-s ;;
-  sg) totalview ./sord-s ;;
-  sb) nohup ./sord-s > out.log & :; pid=$! ;;
-  pi) mpirun -machinefile mf -np $np ./sord-p ;;
-  pg) mpirun -tv -machinefile mf -np $np ./sord-p ;;
-  pb) nohup mpirun -machinefile mf -np $np ./sord-p > out.log & :; pid=$! ;;
-  pq) pbsjob=$( qsub pbsscript ) ;;
-esac
-
-if [ "$pid" ]; then
-  echo "$pid" >> log
-  echo "Background job started, to cancel: out/$count/cancel.sh"
-  echo "#!/bin/bash" > 'cancel.sh'
-  echo "kill $pid" >> 'cancel.sh'
-  chmod u+x 'cancel.sh'
-fi
-if [ "$pbsjob" ]; then
-  echo "$pbsjob" >> log
-  echo "PBS job submitted, to cancel: out/$count/cancel.sh"
-  echo "#!/bin/bash" > 'cancel.sh'
-  echo "qdel $pbsjob" >> 'cancel.sh'
-  chmod u+x 'cancel.sh'
-fi
+chmod u+x pbsscript-vm que-vm
 

@@ -8,13 +8,12 @@ mode=guess
 optimize=O
 setup=yes
 run=
-while getopts spibqgGnm:df opt; do
+while getopts spibgGnm:df opt; do
 case "$opt" in
   s) mode=s ;;
   p) mode=p ;;
   i) run=i ;;
   b) run=b ;;
-  q) run=q ;;
   g) optimize=g ;;
   G) optimize=g; run=g ;;
   n) setup= ; run= ;;
@@ -175,8 +174,6 @@ pgf90)
 gfortran)
   gflags='-O0 -pg -g -W -pedantic -std=f95 -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
   oflags='-O3'
-#sfc='gfortran-mp-4.2'
-#echo AAAAAAAAAAAAAAAAA
   ;;
 f95)
   gflags='-g'
@@ -249,7 +246,7 @@ fi
 cd "$srcdir"
 
 #------------------------------------------------------------------------------#
-# Set-up
+# Set-up and run
 
 # Setup run directory
 sh/tarball
@@ -257,6 +254,7 @@ rundir="out/$count"
 echo "Run directory: $rundir"
 mkdir -p out
 mkdir "$rundir"
+echo "$starttime: Start SORD setup" >> "$rundir/log"
 cp 'in.m' tmp/sord.tgz tmp/sord-$mode tmp/input "$rundir"
 if [ $optimize = g ]; then
   cp f/*.f90 "$rundir"
@@ -295,37 +293,45 @@ cat << END > runmeta.m
   np      = $np;
 END
 
-#------------------------------------------------------------------------------#
-# Run
+# Run script
+case "$mode" in
+s) cat << END > run
+#!/bin/bash -e
+echo "\$(date): Start SORD run" >> log
+case \${1:?} in
+  -i) ./sord-s ;;
+  -g) ddd ./sord-s ;;
+  -b) nice nohup ./sord-s > out.log & :; pid=\$!
+      echo "\$pid" >> log; echo "Background job started with PID: \$pid" ;;
+esac
+echo "\$(date): Finished!" >> log
+END
+;;
+p) cat << END > run
+#!/bin/bash -e
+mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon
+echo "\$(date): Start SORD run" >> log
+case \${1:?} in
+  -i) mpiexec -np $np ./sord-p ;;
+  -g) mpiexec -gdb -np $np ./sord-p ;;
+  -b) nice nohup mpiexec -np $np ./sord-p > out.log & :; pid=\$!
+      echo "\$pid" >> log; echo "Background job started with PID: \$pid" ;;
+esac
+echo "\$(date): Finished!" >> log
+END
+;;
+esac
+chmod u+x run
 
-echo "$starttime: Start SORD setup" >> log
-echo "$(date): Finished setup" >> log
+# Machine dependent run scripts
 case $machine in
 datastar) . "$srcdir/sh/datastar" ;;
 teragrid) . "$srcdir/sh/teragrid" ;;
-babieca) . "$srcdir/sh/babieca" ;;
-*)
-[ "$mode" = p ] && mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon
-[ $run ]
-echo "$(date): Start SORD run" >> log
-case $mode$run in
-  si) ./sord-s ;;
-  sg) ddd ./sord-s ;;
-  sb) nice nohup ./sord-s > out.log & :; pid=$! ;;
-  pi) mpiexec -np $np ./sord-p ;;
-  pg) mpiexec -gdb -np $np ./sord-p ;;
-  pb) nice nohup mpiexec -np $np ./sord-p > out.log & :; pid=$! ;;
-esac
-;;
+babieca)  . "$srcdir/sh/babieca"  ;;
 esac
 
-if [ "$pid" ]; then
-  echo "$pid" >> log
-  echo "Background job started, to cancel: out/$count/cancel.sh"
-  echo "#!/bin/bash" > 'cancel.sh'
-  echo "kill $pid" >> 'cancel.sh'
-  chmod u+x 'cancel.sh'
-fi
+echo "$(date): Finished setup" >> log
 
-echo "$(date): SORD script finished" >> log
+# Launch job
+[ "$run" ] && ./run "-$run"
 

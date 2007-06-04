@@ -1,6 +1,17 @@
 #!/bin/bash -e
 
-if [ "$interactive" ]; then
+cat << END > run
+#!/bin/bash
+echo "$(date): Start SORD run" >> log
+case \${1:?} in
+  -i) mpirun -machinefile mf -np $np ./sord-$mode ;;
+  -g) mpirun -machinefile mf -np $np -dbg=gdb ./sord-$mode ;;
+  -b) nohup mpirun -machinefile mf -np $np ./sord-$mode > out.log & :; pid=\$!
+      echo "\$pid" >> log; echo "Background job started with PID: \$pid" ;;
+esac
+echo "$(date): Finished!" >> log
+END
+
 cat << END > mf
 node39:2
 node40:2
@@ -14,7 +25,12 @@ node47:2
 node48:2
 node49:2
 END
-else
+
+cat << END > que
+#!/bin/bash
+qsub pbsscript >> log
+END
+
 cat << END > pbsscript
 #!/bin/bash
 #PBS -N sord-$count
@@ -31,8 +47,16 @@ echo "\$(date): Start SORD run" >> log
 mpiexec -n $np ./sord-$mode
 echo "\$(date): Finished!" >> log
 END
-chmod u+x pbsscript-vm
-if [ "$nc" ]; then
+
+chmod u+x run que pbsscript
+
+[ "$nc" ]
+
+cat << END > que-vm
+#!/bin/bash
+qsub pbsscript-vm >> log
+END
+
 cat << END > pbsscript-vm
 #!/bin/bash
 #PBS -N sord-vm-$count
@@ -54,29 +78,6 @@ echo "\$(date): Start SORD run" >> log
 mpiexec -n $np ./sord-$mode
 echo "\$(date): Finished!" >> log
 END
-chmod u+x pbsscript-vm
-fi
-fi
-  
-case $run in
-  i) mpirun -machinefile mf -np $np ./sord-$mode ;;
-  g) mpirun -machinefile mf -np $np -dbg=gdb ./sord-$mode ;;
-  b) nohup mpirun -machinefile mf -np $np ./sord-$mode > out.log & :; pid=$! ;;
-  q) pbsjob=$( qsub pbsscript ) ;;
-esac
 
-if [ "$pid" ]; then
-  echo "$pid" >> log
-  echo "Background job started, to cancel: out/$count/cancel.sh"
-  echo "#!/bin/bash" > 'cancel.sh'
-  echo "kill $pid" >> 'cancel.sh'
-  chmod u+x 'cancel.sh'
-fi
-if [ "$pbsjob" ]; then
-  echo "$pbsjob" >> log 
-  echo "PBS job submitted, to cancel: out/$count/cancel.sh"
-  echo "#!/bin/bash" > 'cancel.sh'
-  echo "qdel $pbsjob" >> 'cancel.sh'
-  chmod u+x 'cancel.sh'
-fi
+chmod u+x que-vm pbsscript-vm
 
