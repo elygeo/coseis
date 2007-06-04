@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm sord-[sp] input pbsscript* llscript cancel.sh currentstep kill.sh qdel.sh
+rm sord-[sp] input currentstep run mf que* pbsscript* llscript*
 
 for file in *; do
   [ -f "$file" -a ! -s "$file" ] && rm "$file"
