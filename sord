@@ -302,7 +302,8 @@ case \${1:?} in
   -i) ./sord-s ;;
   -g) ddd ./sord-s ;;
   -b) nice nohup ./sord-s > out.log & :; pid=\$!
-      echo "\$pid" >> log; echo "Background job started with PID: \$pid" ;;
+      echo "Background job started with PID \$pid" >> log
+      echo "Background job started with PID \$pid" ;;
 esac
 echo "\$(date): Finished!" >> log
 END
@@ -315,7 +316,8 @@ case \${1:?} in
   -i) mpiexec -np $np ./sord-p ;;
   -g) mpiexec -gdb -np $np ./sord-p ;;
   -b) nice nohup mpiexec -np $np ./sord-p > out.log & :; pid=\$!
-      echo "\$pid" >> log; echo "Background job started with PID: \$pid" ;;
+      echo "Background job started with PID \$pid" >> log
+      echo "Background job started with PID \$pid" ;;
 esac
 echo "\$(date): Finished!" >> log
 END
