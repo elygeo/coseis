@@ -7,9 +7,9 @@ real :: r, dx, h, o1, o2, xx, yy, h1, h2, h3, h4, ell(3), x0, y0, z0, &
 integer :: n(3), nn, npml, nrect, i, j, k, l, j1, k1, l1, j2, k2, l2, jf0, kf0, lf0, &
   nf, nf1, nf2, nf3
 real, allocatable :: x(:,:,:,:), w1(:,:,:,:), w2(:,:,:,:), s1(:,:,:), s2(:,:,:), t(:,:)
-character :: endian, dataendian, c1(4), c2(4)
+character :: endian, dataendian, b1(4), b2(4)
 logical :: swab
-equivalence (h1,c1), (h2,c2)
+equivalence (h1,b1), (h2,b2)
 
 ! Model parameters
 mus = 1.05
@@ -196,13 +196,13 @@ open( 1, file='topo3.f32', recl=i, form='unformatted', access='direct', status='
 read( 1, rec=1 ) t
 close( 1 )
 if ( swab ) then
-do k = 1, n2
-do j = 1, n1
+do k = 1, size( t, 2 )
+do j = 1, size( t, 1 )
   h1 = t(j,k)
-  c2(4) = c1(1)
-  c2(3) = c1(2)
-  c2(2) = c1(3)
-  c2(1) = c1(4)
+  b2(4) = b1(1)
+  b2(3) = b1(2)
+  b2(2) = b1(3)
+  b2(1) = b1(4)
   t(j,k) = h2
 end do
 end do
@@ -335,14 +335,14 @@ open( 1, file='ts-ts1.f32', recl=i, form='unformatted', access='direct', status=
 read( 1, rec=1 ) t
 close( 1 )
 if ( swab ) then
-do k = 1, n2
-do j = 1, n1
-  x1 = v1(j,k)
-  c2(4) = c1(1)
-  c2(3) = c1(2)
-  c2(2) = c1(3)
-  c2(1) = c1(4)
-  v1(j,k) = x2
+do k = 1, size( t, 2 )
+do j = 1, size( t, 1 )
+  h1 = t(j,k)
+  b2(4) = b1(1)
+  b2(3) = b1(2)
+  b2(2) = b1(3)
+  b2(1) = b1(4)
+  t(j,k) = h2
 end do
 end do
 end if

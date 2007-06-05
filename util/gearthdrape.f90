@@ -16,8 +16,8 @@ real, allocatable :: x(:,:,:,:), v1(:,:), v2(:,:)
 integer :: n1, n2, registration, i, j, k, j1, k1, iarg, ifile
 character(160) :: str
 logical :: swab, timeseries
-character :: c1(4), c2(4)
-equivalence (x1,c1), (x2,c2)
+character :: b1(4), b2(4)
+equivalence (x1,b1), (x2,b2)
 
 ! parameters
 registration = 0 ! 0=cell, 1=node
@@ -172,10 +172,10 @@ if ( swab ) then
 do k = 1, n2
 do j = 1, n1
   x1 = v1(j,k)
-  c2(4) = c1(1)
-  c2(3) = c1(2)
-  c2(2) = c1(3)
-  c2(1) = c1(4)
+  b2(4) = b1(1)
+  b2(3) = b1(2)
+  b2(2) = b1(3)
+  b2(1) = b1(4)
   v1(j,k) = x2
 end do
 end do

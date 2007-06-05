@@ -11,11 +11,6 @@ srcdir=$( /bin/pwd )
 cd util
 [ tsgrid.f90 -nt "$srcdir/tmp/tsgrid" ] && ./make
 cd "$srcdir/tmp"
-endian=$( ./swab )
-if [ "$( cat endian )" != "$endian" ]; then
-  ./swab topo*.f32 ts-t*.f32
-  echo "$endian" > endian
-fi
 echo 1 > exag
 ./tsgrid
 rm -rf data vm
