@@ -13,7 +13,7 @@ real, parameter :: pi = 3.14159265
 real :: dx, lon0, lat0, phi, emptyval, theta, o1, o2
 real :: x1, x2, h1, h2, h3, h4, dlon, dlat
 real, allocatable :: x(:,:,:,:), v1(:,:), v2(:,:)
-integer :: n1, n2, registration, i, j, k, j1, k1, iarg, ifile
+integer :: n1, n2, registration, i, j, k, j1, k1, iarg, ifile, command_argument_count
 character(160) :: str
 logical :: swab, timeseries
 character :: b1(4), b2(4)
