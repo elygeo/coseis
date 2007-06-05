@@ -12,7 +12,7 @@ character :: endian
 endian = 'l'
 if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
 print *, endian
-if ( command_argument_count() < 3 ) return
+if ( command_argument_count() < 3 ) stop
 
 ! Block sizes
 call get_command_argument( 1, str )
