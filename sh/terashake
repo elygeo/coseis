@@ -15,8 +15,7 @@ echo 1 > exag
 ./tsgrid
 rm -rf data vm
 mkdir data
-mv ts1 x1 x2 x3 meta.m data/
-perl -le 'print pack('V',1) eq pack('L',1) ? "l" : "b"' > data/endian
+mv ts1 x1 x2 x3 meta.m endian data/
 cp -r scecvm vm
 nc=$( cat nc )
 mv nc rlon rlat rdep vm/

@@ -7,12 +7,11 @@ real :: r, dx, h, o1, o2, xx, yy, h1, h2, h3, h4, ell(3), x0, y0, z0, &
 integer :: n(3), nn, npml, nrect, i, j, k, l, j1, k1, l1, j2, k2, l2, jf0, kf0, lf0, &
   nf, nf1, nf2, nf3
 real, allocatable :: x(:,:,:,:), w1(:,:,:,:), w2(:,:,:,:), s1(:,:,:), s2(:,:,:), t(:,:)
-character :: endian, dataendian, b1(4), b2(4)
-logical :: swab
+character :: endian0, endian, b1(4), b2(4)
 equivalence (h1,b1), (h2,b2)
 
 ! Model parameters
-mus = 1.05
+mus = 1.06
 mud = .5;  tn = -20e6
 rho = 3000.
 vp = 7250.
@@ -28,8 +27,8 @@ close( 1 )
 open( 1, file='exag', status='old' )
 read( 1, * ) exag
 close( 1 )
-open( 1, file='endian', status='old' )
-read( 1, * ) dataendian
+open( 1, file='endian0', status='old' )
+read( 1, * ) endian0
 close( 1 )
 print *, 'npml =', npml
 ell = (/ 600, 300, 80 /) * 1000
@@ -44,7 +43,9 @@ y0 = .5 * ( minval(yf) + maxval(yf) )
 ! Byte order
 endian = 'l'
 if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
-swab = endian /= dataendian
+open( 1, file='endian', status='replace' )
+write( 1, '(a)' ) endian
+close( 1 )
 
 ! Dimensions
 n = nint( ell / dx ) + 1
@@ -195,7 +196,7 @@ inquire( iolength=i ) t
 open( 1, file='topo3.f32', recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
-if ( swab ) then
+if ( endian /= endian0 ) then
 do k = 1, size( t, 2 )
 do j = 1, size( t, 1 )
   h1 = t(j,k)
@@ -334,7 +335,7 @@ inquire( iolength=i ) t
 open( 1, file='ts-ts1.f32', recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
-if ( swab ) then
+if ( endian /= endian0 ) then
 do k = 1, size( t, 2 )
 do j = 1, size( t, 1 )
   h1 = t(j,k)
