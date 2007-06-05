@@ -20,7 +20,7 @@ case "$opt" in
   m) machine="$OPTARG" ;;
   d) rm -rf out/* ;;
   f) rm -rf tmp/* ;;
-  *) exit ;;
+  *) exit 1 ;;
 esac
 done
 shift $(( OPTIND - 1 ))
@@ -185,7 +185,7 @@ f95)
   ;;
 *)
   echo "Error: no Fortran 95 compiler found"
-  exit
+  exit 1
 esac
 case $optimize in
   O) fflags=$oflags ;;
@@ -341,4 +341,6 @@ echo "$(date): Finished setup" >> log
 
 # Launch job
 [ "$run" ] && ./run "-$run"
+
+exit 0
 

@@ -1,5 +1,6 @@
 #!/bin/bash -e
 
+srcdir=$( /bin/pwd )
 if [ -d /gpfs ]; then
   mkdir -p /gpfs/$LOGNAME/sord/tmp
   mkdir -p /gpfs/$LOGNAME/sord/out
@@ -7,7 +8,6 @@ if [ -d /gpfs ]; then
   ln -sf /gpfs/$LOGNAME/sord/out
 fi
 ./sord -n
-srcdir=$( /bin/pwd )
 cd util
 [ tsgrid.f90 -nt "$srcdir/tmp/tsgrid" ] && ./make
 cd "$srcdir/tmp"
@@ -15,14 +15,15 @@ echo 1 > exag
 ./tsgrid
 rm -rf data vm
 mkdir data
-mv ts1 x1 x2 x3 meta.m endian data/
+mv ts1 x1 x2 x3 meta.m data/
+cp endian data/
 cp -r scecvm vm
-nc=$( cat nc )
-mv nc rlon rlat rdep vm/
+export nc=$( cat nc )
+mv rlon rlat rdep vm/
 if [ "$nc" -gt 4000000 ]; then
   echo "Deferring velocity model generation"
   cd "$srcdir"
-  . sord
+  ./sord
   count=$( cat tmp/count )
   mv tmp/data tmp/vm "out/$count/"
 else
