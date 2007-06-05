@@ -80,10 +80,10 @@ echo "Compiling SCECVM"
 
 cd scecvm
 $tar zxf "$srcdir/data/scecvm4.tgz"
-for file in "$srcdir/scecvm4/"*; do
+for file in "$srcdir"/scecvm4/* "$srcdir"/util/getarg*; do
   ln -sf "$file"
 done
-$sfc $vmflags iobin.f scecvm4.f -o scecvm4-s
-$pfc $vmflags iompi.f scecvm4.f -o scecvm4-p
+$sfc $vmflags $getarg iobin.f scecvm4.f -o scecvm4-s
+$pfc $vmflags $getarg iompi.f scecvm4.f -o scecvm4-p
 rm -f *.mod *.f *.h
 

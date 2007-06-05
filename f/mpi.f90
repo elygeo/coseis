@@ -129,10 +129,10 @@ i = size(r)
 if ( op(1:3) == 'all' ) then
   comm = comm3d
   if ( i2d /= 0 ) comm = comm2d(i2d)
-  call mpi_allreduce( r, rr, i, mpi_real, iop, comm, e )
+  call mpi_allreduce( r(1), rr(1), i, mpi_real, iop, comm, e )
 else
   if ( i2d /= 0 ) stop 'must allreduce for comm2d'
-  call mpi_reduce( r, rr, i, mpi_real, iop, ipmaster, comm3d, e )
+  call mpi_reduce( r(1), rr(1), i, mpi_real, iop, ipmaster, comm3d, e )
 end if
 end subroutine
 
@@ -154,10 +154,10 @@ i = size(r)
 if ( op(1:3) == 'all' ) then
   comm = comm3d
   if ( i2d /= 0 ) comm = comm2d(i2d)
-  call mpi_allreduce( r, rr, i, mpi_real, iop, comm, e )
+  call mpi_allreduce( r(1,1), rr(1,1), i, mpi_real, iop, comm, e )
 else
   if ( i2d /= 0 ) stop 'must allreduce for comm2d'
-  call mpi_reduce( r, rr, i, mpi_real, iop, ipmaster, comm3d, e )
+  call mpi_reduce( r(1,1), rr(1,1), i, mpi_real, iop, ipmaster, comm3d, e )
 end if
 end subroutine
 
