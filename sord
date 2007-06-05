@@ -172,7 +172,7 @@ pgf90)
   oflags='-fast'
   ;;
 gfortran)
-  gflags='-O0 -pg -g -Wall -pedantic -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
+  gflags='-O0 -pg -g -Wall -std=f95 -pedantic -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
   oflags='-O3'
   ;;
 f95)
@@ -272,10 +272,10 @@ while [ $i -lt $nout ]; do
   mkdir $dir
 done
 if [ "$datadir" ]; then
-  endian="$( perl -e 'print pack('V',1) eq pack('L',1) ? "l" : "b"' )"
+  endian="$( perl -le 'print pack('V',1) eq pack('L',1) ? "l" : "b"' )"
   cd "$srcdir/$datadir"
   if [ "$endian" != "$( cat endian )" ]; then
-    echo "Error: endian missmatch in data dir"
+    echo "Error: endian file not found or endian missmatch"
     exit 1
   fi
   datadir=$( /bin/pwd )
