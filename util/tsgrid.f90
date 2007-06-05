@@ -192,6 +192,9 @@ print *, 'longitude range: ', minval( w1(:,:,:,1) ), maxval( w1(:,:,:,1) )
 print *, 'latgitude range: ', minval( w1(:,:,:,2) ), maxval( w1(:,:,:,2) )
 
 ! Topo
+if ( exag < .00001 ) then
+x(:,:,:,3) = 0.
+else
 inquire( iolength=i ) t
 open( 1, file='topo3.f32', recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
@@ -229,6 +232,7 @@ do j1 = 1, size(w1,1)
 end do
 end do
 x(:,:,:,3) = x(:,:,:,3) * exag
+end if
 
 ! 2D grid
 inquire( iolength=i ) x(:,:,:,1)

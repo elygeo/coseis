@@ -32,7 +32,7 @@ cd "$rundir"
 echo "\$PBS_JOBID" >> log
 echo "\$(date): Start SORD run" >> log
 mpiexec -n $np ./sord-$mode
-#mpirun -machinefile mfb -np $np ./sord-$mode ;;
+#mpirun -machinefile mfb -np $np ./sord-$mode
 echo "\$(date): Finished!" >> log
 END
 
@@ -60,12 +60,12 @@ echo "\$PBS_JOBID" >> log
 echo "\$(date): Start VM run" >> log
 cd "$rundir/vm"
 mpiexec -n $np ./scecvm4-$mode $nc rlon rlat rdep rho vp vs
-#mpirun machinefile mfb -np $np ./scecvm4-$mode $nc rlon rlat rdep rho vp vs
+#mpirun -machinefile "$rundir/mfb" -np $np ./scecvm4-$mode $nc rlon rlat rdep rho vp vs
 mv rho vp vs "$rundir/data"
 cd "$rundir"
 echo "\$(date): Start SORD run" >> log
 mpiexec -n $np ./sord-$mode
-#mpirun -machinefile mfb -np $np ./sord-$mode ;;
+#mpirun -machinefile mfb -np $np ./sord-$mode
 echo "\$(date): Finished!" >> log
 END
 
