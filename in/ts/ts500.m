@@ -19,8 +19,8 @@
   vrup = 2300.;
   itcheck = 100;
 
-  np = [ 1 4 8 ] % Babiaca
-  np = [ 1 3 16 ] % Babiaca
+  np = [ 1 4 14 ] % Babiaca
+  np = [ 1 4 11 ] % Babiaca
   dx = 500.;
   dt = .03;
   trelax = .3;
