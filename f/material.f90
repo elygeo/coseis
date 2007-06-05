@@ -11,7 +11,6 @@ use m_bc
 real :: x1(3), x2(3), stats(6), gstats(6), r
 integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, &
   j1, k1, l1, j2, k2, l2, iz, idoublenode
-character :; endian
 
 if ( master ) write( 0, * ) 'Material model'
 
@@ -82,7 +81,6 @@ case( 'r' )
     end select
   case( 'vp'  )
     call scalario( 'r', 'data/vp', r, s1, i1, i2, i3, i4, 0, endian )
-    call swab3( s1, i3, i4, endian )
     select case( idoublenode )
     case( 1 ); j = ihypo(1); s1(j+1:j2+1,:,:) = s1(j:j2,:,:)
     case( 2 ); k = ihypo(2); s1(:,k+1:k2+1,:) = s1(:,k:k2,:)
@@ -90,7 +88,6 @@ case( 'r' )
     end select
   case( 'vs'  )
     call scalario( 'r', 'data/vs', r, s2, i1, i2, i3, i4, 0, endian )
-    call swab3( s2, i3, i4, endian )
     select case( idoublenode )
     case( 1 ); j = ihypo(1); s2(j+1:j2+1,:,:) = s2(j:j2,:,:)
     case( 2 ); k = ihypo(2); s2(:,k+1:k2+1,:) = s2(:,k:k2,:)
@@ -98,7 +95,6 @@ case( 'r' )
     end select
   case( 'gam'  )
     call scalario( 'r', 'data/gam', r, gam, i1, i2, i3, i4, 0, endian )
-    call swab3( gam, i3, i4, endian )
     select case( idoublenode )
     case( 1 ); j = ihypo(1); gam(j+1:j2+1,:,:) = gam(j:j2,:,:)
     case( 2 ); k = ihypo(2); gam(:,k+1:k2+1,:) = gam(:,k:k2,:)
