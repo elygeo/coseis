@@ -319,10 +319,10 @@ use mpi
 real, intent(inout) :: r, s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), iz
 character(*), intent(in) :: io, filename, endian
-integer :: ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
+integer :: ftype, mtype, fh, nl(4), n(4), i0(4), j, k, l, comm, e
 integer(kind=mpi_offset_kind) :: d = 0
 real :: r1, r2
-character :: c1(4), c2(4)
+byte :: c1(4), c2(4)
 equivalence (r1,c1), (r2,c2)
 nl = (/ i4 - i3 + 1, 1 /)
 n  = (/ i2 - i1 + 1, 1 /)
@@ -378,10 +378,10 @@ use mpi
 real, intent(inout) :: r, w1(:,:,:,:)
 integer, intent(in) :: ic, i1(3), i2(3), i3(3), i4(3), iz
 character(*), intent(in) :: io, filename, endian
-integer :: ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
+integer :: ftype, mtype, fh, nl(4), n(4), i0(4), j, k, l, comm, e
 integer(kind=mpi_offset_kind) :: d = 0
 real :: r1, r2
-character :: c1(4), c2(4)
+byte :: c1(4), c2(4)
 equivalence (r1,c1), (r2,c2)
 nl = (/ i4 - i3 + 1, 1 /)
 n  = (/ i2 - i1 + 1, 1 /)

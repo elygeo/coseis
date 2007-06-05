@@ -8,7 +8,7 @@ use m_globals
 use m_outprops
 real :: courant
 integer :: i1(4), i2(4), i, nc, iz, onpass
-character :: endian
+character :: nendian
 character(7) :: field
 logical :: fault, cell
 
@@ -57,8 +57,8 @@ end if
 
 ! Metadata
 if ( .not. master ) return
-endian = 'l'
-if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
+nendian = 'l'
+if ( iachar( transfer( 1, 'a' ) ) == 0 ) nendian = 'b'
 courant = dt * vp2 * sqrt( 3. ) / abs( dx )
 open( 1, file='meta.m', status='replace' )
 write( 1, '(a)' ) '% SORD metadata'
@@ -94,7 +94,7 @@ write( 1, * ) ' n2expand    = [', n2expand,      '];'
 write( 1, * ) ' bc1         = [', bc1,           '];'
 write( 1, * ) ' bc2         = [', bc2,           '];'
 write( 1, * ) ' grid        = ''', trim( grid ),  ''';'
-write( 1, * ) ' endian      = ''', endian, ''';'
+write( 1, * ) ' endian      = ''', nendian, ''';'
 write( 1, * ) ' rsource     =  ', rsource, ';'
 if ( rsource > 0. ) then
   write( 1, * ) ' tsource     =  ', tsource, ';'
