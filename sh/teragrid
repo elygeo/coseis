@@ -70,7 +70,7 @@ END
 
 chmod u+x run que pbsscript
 
-[ "$nc" ]
+if [ "$nc" ]; then
 
 cat << END > que-vm
 #!/bin/bash
@@ -98,5 +98,7 @@ mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
 echo "\$(date): Finished!" >> log
 END
 
-chmod u+x pbsscript-vm que-vm
+chmod u+x que-vm pbsscript-vm
+
+fi
 

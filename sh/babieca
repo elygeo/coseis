@@ -51,7 +51,7 @@ END
 
 chmod u+x run que pbsscript
 
-[ "$nc" ]
+if [ "$nc" ]; then
 
 cat << END > que-vm
 #!/bin/bash
@@ -81,4 +81,6 @@ echo "\$(date): Finished!" >> log
 END
 
 chmod u+x que-vm pbsscript-vm
+
+fi
 

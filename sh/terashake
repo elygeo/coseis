@@ -22,7 +22,7 @@ mv nc rlon rlat rdep vm/
 if [ "$nc" -gt 4000000 ]; then
   echo "Deferring velocity model generation"
   cd "$srcdir"
-  ./sord
+  . sord
   count=$( cat tmp/count )
   mv tmp/data tmp/vm "out/$count/"
 else
