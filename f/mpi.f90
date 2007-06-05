@@ -314,13 +314,16 @@ call mpi_comm_split( comm3d, i, 0, commout(iz), e )
 end subroutine
 
 ! Scalar field input/output
-subroutine scalario( io, filename, r, s1, i1, i2, i3, i4, iz )
+subroutine scalario( io, filename, r, s1, i1, i2, i3, i4, iz, endian )
 use mpi
 real, intent(inout) :: r, s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), iz
-character(*), intent(in) :: io, filename
+character(*), intent(in) :: io, filename, endian
 integer :: ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
 integer(kind=mpi_offset_kind) :: d = 0
+real :: r1, r2
+character :: c1(4), c2(4)
+equivalence (r1,c1), (r2,c2)
 nl = (/ i4 - i3 + 1, 1 /)
 n  = (/ i2 - i1 + 1, 1 /)
 i0 = (/ i3 - i1,     0 /)
@@ -342,6 +345,22 @@ case( 'r' )
   call mpi_file_open( comm, filename, mpi_mode_rdonly, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
+  if ( endian /= '' ) then
+  if ( endian == 'l' .eqv. iachar( transfer( 1, 'a' ) ) == 0 ) then
+    do l = i3(3), i4(3)
+    do k = i3(2), i4(2)
+    do j = i3(1), i4(1)
+      r1 = s1(j,k,l)
+      c2(4) = c1(1)
+      c2(3) = c1(2)
+      c2(2) = c1(3)
+      c2(1) = c1(4)
+      s1(j,k,l) = r2
+    end do
+    end do
+    end do
+  end if
+  end if
 case( 'w' )
   if ( iz /= 0 ) comm = commout(iz)
   call mpi_file_open( comm, filename, mpi_mode_create + mpi_mode_wronly, mpi_info_null, fh, e )
@@ -354,13 +373,16 @@ call mpi_type_free( ftype, e )
 end subroutine
 
 ! Vector field component input/output
-subroutine vectorio( io, filename, r, w1, ic, i1, i2, i3, i4, iz )
+subroutine vectorio( io, filename, r, w1, ic, i1, i2, i3, i4, iz, endian )
 use mpi
 real, intent(inout) :: r, w1(:,:,:,:)
 integer, intent(in) :: ic, i1(3), i2(3), i3(3), i4(3), iz
-character(*), intent(in) :: io, filename
+character(*), intent(in) :: io, filename, endian
 integer :: ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
 integer(kind=mpi_offset_kind) :: d = 0
+real :: r1, r2
+character :: c1(4), c2(4)
+equivalence (r1,c1), (r2,c2)
 nl = (/ i4 - i3 + 1, 1 /)
 n  = (/ i2 - i1 + 1, 1 /)
 i0 = (/ i3 - i1,     0 /)
@@ -382,6 +404,22 @@ case( 'r' )
   call mpi_file_open( comm, filename, mpi_mode_rdonly, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, w1(1,1,1,1), 1, mtype, mpi_status_ignore, e )
+  if ( endian /= '' ) then
+  if ( endian == 'l' .eqv. iachar( transfer( 1, 'a' ) ) == 0 ) then
+    do l = i3(3), i4(3)
+    do k = i3(2), i4(2)
+    do j = i3(1), i4(1)
+      r1 = w1(j,k,l,ic)
+      c2(4) = c1(1)
+      c2(3) = c1(2)
+      c2(2) = c1(3)
+      c2(1) = c1(4)
+      w1(j,k,l,ic) = r2
+    end do
+    end do
+    end do
+  end if
+  end if
 case( 'w' )
   if ( iz /= 0 ) comm = commout(iz)
   call mpi_file_open( comm, filename, mpi_mode_create + mpi_mode_wronly, mpi_info_null, fh, e )

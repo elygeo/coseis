@@ -138,6 +138,13 @@ end if
 end do doline
 
 close( 1 )
+
+! Data byte order
+endian = ''
+open( 1, file='data/endian', status='old', iostat=io ) 
+if ( io == 0 ) read( 1, * ) endian 
+close( 1 ) 
+
 end subroutine
 
 ! Parse string for the first token

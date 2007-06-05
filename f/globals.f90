@@ -187,6 +187,7 @@ integer :: &
   ibuff(nz)        ! buffered i/o flag
 
 character :: &
+  endian,        & ! byte order, 'l'=little, 'b'=big, ''=native
   intype(nz),    & ! input type: z=zone, c=cube, r=read
   outtype(nz)      ! output type: z=zone, x=location
 
