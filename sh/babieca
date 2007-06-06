@@ -2,7 +2,7 @@
 
 cat << END > run
 #!/bin/bash
-echo "$(date): Start SORD run" >> log
+echo "\$( date ): Start SORD run" >> log
 case \${1:?} in
   -i) mpirun -machinefile mfi -np $np ./sord-$mode ;;
   -g) mpirun -machinefile mfi -np $np -dbg=gdb ./sord-$mode ;;
@@ -10,12 +10,12 @@ case \${1:?} in
       echo "Background job started with PID: \$pid" >> log
       echo "Background job started with PID: \$pid" ;;
 esac
-echo "$(date): Finished!" >> log
+echo "\$( date ): Finished!" >> log
 END
 
 cat << END > que
 #!/bin/bash
-qsub pbsscript >> log
+echo "\$( date ): Job qued with ID: \$( qsub pbsscript )" >> log
 END
 
 cat << END > pbsscript
@@ -30,10 +30,10 @@ cat << END > pbsscript
 sleep 2
 cd "$rundir"
 echo "\$PBS_JOBID" >> log
-echo "\$(date): Start SORD run" >> log
+echo "\$( date ): Start SORD run" >> log
 mpiexec -n $np ./sord-$mode
 #mpirun -machinefile mfb -np $np ./sord-$mode
-echo "\$(date): Finished!" >> log
+echo "\$( date ): Finished!" >> log
 END
 
 chmod u+x run que pbsscript
@@ -42,7 +42,7 @@ if [ "$nc" ]; then
 
 cat << END > que-vm
 #!/bin/bash
-qsub pbsscript-vm >> log
+echo "\$( date ): Job qued with ID: \$( qsub pbsscript-vm )" >> log
 END
 
 cat << END > pbsscript-vm
@@ -57,16 +57,16 @@ cat << END > pbsscript-vm
 sleep 2
 cd "$rundir"
 echo "\$PBS_JOBID" >> log
-echo "\$(date): Start VM run" >> log
+echo "\$( date ): Start VM run" >> log
 cd "$rundir/vm"
 mpiexec -n $np ./scecvm4-$mode $nc rlon rlat rdep rho vp vs
 #mpirun -machinefile "$rundir/mfb" -np $np ./scecvm4-$mode $nc rlon rlat rdep rho vp vs
 mv rho vp vs "$rundir/data"
 cd "$rundir"
-echo "\$(date): Start SORD run" >> log
+echo "\$( date ): Start SORD run" >> log
 mpiexec -n $np ./sord-$mode
 #mpirun -machinefile mfb -np $np ./sord-$mode
-echo "\$(date): Finished!" >> log
+echo "\$( date ): Finished!" >> log
 END
 
 chmod u+x que-vm pbsscript-vm

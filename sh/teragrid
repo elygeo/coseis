@@ -12,7 +12,7 @@ if ! grep -q "\$HOSTNAME" mf; then
   sed 's/^/  /; s/:2//' mf
   exit
 fi
-echo "\$(date): Start SORD run" >> log
+echo "\$( date ): Start SORD run" >> log
 END
 
 case "$mode" in
@@ -24,7 +24,7 @@ case \${1:?} in
       echo "Background job started with PID \$pid" >> log
       echo "Background job started with PID \$pid" ;;
 esac
-echo "\$(date): Finished!" >> log
+echo "\$( date ): Finished!" >> log
 END
 ;;
 p) cat << END >> run
@@ -35,7 +35,7 @@ case \${1:?} in
       echo "Background job started with PID \$pid" >> log
       echo "Background job started with PID \$pid" ;;
 esac
-echo "\$(date): Finished!" >> log
+echo "\$( date ): Finished!" >> log
 END
 ;;
 esac
@@ -49,7 +49,7 @@ END
 
 cat << END > que
 #!/bin/bash
-qsub pbsscript >> log
+echo "\$( date ): Job qued with ID: \$( qsub pbsscript )" >> log
 END
 
 cat << END > pbsscript
@@ -63,9 +63,9 @@ cat << END > pbsscript
 #PBS -V
 cd "$rundir"
 echo "\$PBS_JOBID" >> log
-echo "\$(date): Start SORD run" >> log
+echo "\$( date ): Start SORD run" >> log
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
-echo "\$(date): Finished!" >> log
+echo "\$( date ): Finished!" >> log
 END
 
 chmod u+x run que pbsscript
@@ -74,7 +74,7 @@ if [ "$nc" ]; then
 
 cat << END > que-vm
 #!/bin/bash
-qsub pbsscript-vm >> log
+echo "\$( date ): Job qued with ID: \$( qsub pbsscript )" >> log
 END
 
 cat << END > pbsscript-vm
@@ -88,14 +88,14 @@ cat << END > pbsscript-vm
 #PBS -V
 cd "$rundir"
 echo "\$PBS_JOBID" >> log
-echo "\$(date): Start VM run" >> log
+echo "\$( date ): Start VM run" >> log
 cd "$rundir/vm"
 mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-$mode $nc rlon rlat rdep rho vp vs
 mv rho vp vs "$rundir/data"
 cd "$rundir"
-echo "\$(date): Start SORD run" >> log
+echo "\$( date ): Start SORD run" >> log
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
-echo "\$(date): Finished!" >> log
+echo "\$( date ): Finished!" >> log
 END
 
 chmod u+x que-vm pbsscript-vm
