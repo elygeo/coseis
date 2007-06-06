@@ -307,7 +307,7 @@ do ic = 1, nc
   case( 'co'   ); call scalario( 'w', str, rr, co,       i1, i2, i3, i4, iz )
   case( 'sv'   ); call vectorio( 'w', str, rr, t1,   ic, i1, i2, i3, i4, iz )
   case( 'su'   ); call vectorio( 'w', str, rr, t2,   ic, i1, i2, i3, i4, iz )
-  case( 'ts'   ); call vectorio( 'w', str, rr, t3,   ic, i1, i2, i3, i4, iz )
+  case( 'ts'   ); call vectorio( 'w', str, rr, t1,   ic, i1, i2, i3, i4, iz )
   case( 'sa'   ); call vectorio( 'w', str, rr, t2,   ic, i1, i2, i3, i4, iz )
   case( 'svm'  ); call scalario( 'w', str, rr, f1,       i1, i2, i3, i4, iz )
   case( 'sum'  ); call scalario( 'w', str, rr, f2,       i1, i2, i3, i4, iz )

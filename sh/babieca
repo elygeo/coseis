@@ -4,13 +4,27 @@ cat << END > run
 #!/bin/bash
 echo "\$( date ): Start SORD run" >> log
 case \${1:?} in
-  -i) mpirun -machinefile mfi -np $np ./sord-$mode ;;
-  -g) mpirun -machinefile mfi -np $np -dbg=gdb ./sord-$mode ;;
-  -b) nohup mpirun -machinefile mfi -np $np ./sord-$mode > out.log & :; pid=\$!
+  -i) mpirun -machinefile mf -np $np ./sord-$mode ;;
+  -g) mpirun -machinefile mf -np $np -dbg=gdb ./sord-$mode ;;
+  -b) nohup mpirun -machinefile mf -np $np ./sord-$mode > out.log & :; pid=\$!
       echo "Background job started with PID: \$pid" >> log
       echo "Background job started with PID: \$pid" ;;
 esac
 echo "\$( date ): Finished!" >> log
+END
+
+cat << END > mf
+node39:4
+node40:4
+node41:4
+node42:4
+node43:2
+node44:2
+node45:4
+node46:2
+node47:2
+node48:2
+node49:2
 END
 
 cat << END > que
@@ -32,7 +46,6 @@ cd "$rundir"
 echo "\$PBS_JOBID" >> log
 echo "\$( date ): Start SORD run" >> log
 mpiexec -n $np ./sord-$mode
-#mpirun -machinefile mfb -np $np ./sord-$mode
 echo "\$( date ): Finished!" >> log
 END
 
@@ -60,62 +73,14 @@ echo "\$PBS_JOBID" >> log
 echo "\$( date ): Start VM run" >> log
 cd "$rundir/vm"
 mpiexec -n $np ./scecvm4-$mode $nc rlon rlat rdep rho vp vs
-#mpirun -machinefile "$rundir/mfb" -np $np ./scecvm4-$mode $nc rlon rlat rdep rho vp vs
 mv rho vp vs "$rundir/data"
 cd "$rundir"
 echo "\$( date ): Start SORD run" >> log
 mpiexec -n $np ./sord-$mode
-#mpirun -machinefile mfb -np $np ./sord-$mode
 echo "\$( date ): Finished!" >> log
 END
 
 chmod u+x que-vm pbsscript-vm
 
 fi
-
-cat << END > mfi
-node39:4
-node40:4
-node41:4
-node42:4
-node43:2
-node44:2
-node45:4
-node46:2
-node47:2
-node48:2
-node49:2
-END
-
-cat << END > mfb
-node1:2
-node2:2
-node3:2
-node4:2
-node5:2
-node6:2
-node7:2
-node9:2
-node10:2
-node11:2
-node12:2
-node13:2
-node14:2
-node15:2
-node16:2
-node17:2
-node18:2
-node19:2
-node20:2
-node21:2
-node22:2
-node23:2
-node24:2
-node25:2
-node26:2
-node27:2
-node28:2
-node29:2
-node30:2
-END
 

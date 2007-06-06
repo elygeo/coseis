@@ -279,25 +279,26 @@ j3 = i1(1); j4 = i2(1)
 k3 = i1(2); k4 = i2(2)
 l3 = i1(3); l4 = i2(3)
 
-! Zero slip velocity condition
-f1 = dt * area * ( mr(j1:j2,k1:k2,l1:l2) + mr(j3:j4,k3:k4,l3:l4) )
+! Trial traction for zero velocity and zero displacement
+f1 = dt * dt * area * ( mr(j1:j2,k1:k2,l1:l2) + mr(j3:j4,k3:k4,l3:l4) )
 where ( f1 /= 0. ) f1 = 1. / f1
 do i = 1, 3
-  t1(:,:,:,i) = t0(:,:,:,i) + f1 * &
-    ( v(j3:j4,k3:k4,l3:l4,i) + dt * w1(j3:j4,k3:k4,l3:l4,i) &
-    - v(j1:j2,k1:k2,l1:l2,i) - dt * w1(j1:j2,k1:k2,l1:l2,i) )
+  t1(:,:,:,i) = t0(:,:,:,i) + f1 * dt * &
+    ( (  v(j3:j4,k3:k4,l3:l4,i) -  v(j1:j2,k1:k2,l1:l2,i) ) &
+    + ( w1(j3:j4,k3:k4,l3:l4,i) - w1(j1:j2,k1:k2,l1:l2,i) ) * dt )
+  t2(:,:,:,i) = t1(:,:,:,i) + f1 * &
+      (  u(j3:j4,k3:k4,l3:l4,i) -  u(j1:j2,k1:k2,l1:l2,i) )
 end do
 
-! Decompose traction to normal and shear components
+! Shear and normal traction
 tn = sum( t1 * nhat, 4 )
 do i = 1, 3
-  t2(:,:,:,i) = tn * nhat(:,:,:,i)
+  t1(:,:,:,i) = t1(:,:,:,i) - tn * nhat(:,:,:,i)
 end do
-t3 = t1 - t2
-ts = sqrt( sum( t3 * t3, 4 ) )
+ts = sqrt( sum( t1 * t1, 4 ) )
+tn = min( 0., sum( t2 * nhat, 4 ) )
 
 ! Slip-weakening friction law
-tn = min( tn, 0. )
 f1 = mud
 where ( sl < dc ) f1 = f1 + ( 1. - sl / dc ) * ( mus - mud )
 f1 = -tn * f1 + co
@@ -314,19 +315,18 @@ end if
 f2 = 1.
 where ( ts > f1 ) f2 = f1 / ts
 do i = 1, 3
-  t3(:,:,:,i) = f2 * t3(:,:,:,i)
+  t1(:,:,:,i) = f2 * t1(:,:,:,i)
 end do
+ts = min( ts, f1 )
 
 ! Total traction
-t1 = t2 + t3
-
-! Save for output
-tn = sum( t1 * nhat, 4 )
-ts = min( ts, f1 )
+do i = 1, 3
+  t3(:,:,:,i) = t1(:,:,:,i) + tn * nhat(:,:,:,i)
+end do
 
 ! Update acceleration
 do i = 1, 3
-  f2 = area * ( t1(:,:,:,i) - t0(:,:,:,i) )
+  f2 = area * ( t3(:,:,:,i) - t0(:,:,:,i) )
   w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f2 * mr(j1:j2,k1:k2,l1:l2)
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f2 * mr(j3:j4,k3:k4,l3:l4)
 end do
@@ -351,13 +351,13 @@ end if
 
 ! Friction + fracture energy
 t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
-f2 = sum( t1 * t2, 4 ) * area
+f2 = sum( t3 * t2, 4 ) * area
 call scalarsethalo( f2, 0., i1node, i2node )
 efric = efric + dt * sum( f2 )
 
 ! Strain energy
 t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
-f2 = sum( ( t0 + t1 ) * t2, 4 ) * area
+f2 = sum( ( t0 + t3 ) * t2, 4 ) * area
 call scalarsethalo( f2, 0., i1node, i2node )
 estrain = -.5 * sum( f2 )
 

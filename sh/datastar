@@ -11,7 +11,7 @@ if [ "\$HOSTNAME" != ds100 ]; then
   echo "Error: interactive jobs must be launched from dspoe"
   exit
 fi
-echo "\$(date): Start SORD run" >> log
+echo "\$( date ): Start SORD run" >> log
 END
 
 case "$mode" in
@@ -23,7 +23,7 @@ case "\${1:?}" in
       echo "Background job started with PID \$pid" >> log
       echo "Background job started with PID \$pid" ;;
 esac
-echo "\$(date): Finished!" >> log
+echo "\$( date ): Finished!" >> log
 END
 ;;
 p) cat << END >> run
@@ -35,7 +35,7 @@ case "\${1:?}" in
       echo "Background job started with PID \$pid" >> log
       echo "Background job started with PID \$pid" ;;
 esac
-echo "\$(date): Finished!" >> log
+echo "\$( date ): Finished!" >> log
 END
 ;;
 esac
@@ -88,23 +88,23 @@ END
 
 cp llscript llscript-vm
 cat << END >> llscript-vm
-echo "\$(date): Start VM run" >> log
+echo "\$( date ): Start VM run" >> log
 cd "$rundir/vm"
 poe ./scecvm4-$mode $nc rlon rlat rdep rho vp vs
 mv rho vp vs "$rundir/data"
 cd "$rundir"
-echo "\$(date): Start SORD run" >> log
+echo "\$( date ): Start SORD run" >> log
 poe ./sord-$mode
-echo "\$(date): Finished!" >> log
+echo "\$( date ): Finished!" >> log
 END
 chmod u+x que-vm llscript-vm
 
 fi
 
 cat << END >> llscript
-echo "\$(date): Start SORD run" >> log
+echo "\$( date ): Start SORD run" >> log
 poe ./sord-$mode
-echo "\$(date): Finished!" >> log
+echo "\$( date ): Finished!" >> log
 END
 
 chmod u+x run que llscript
