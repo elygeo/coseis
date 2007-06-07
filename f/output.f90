@@ -185,15 +185,15 @@ if ( it > 0 ) then
     if ( modulo( it, itio ) == 0 .or. it == nt ) then
       call rreduce2( gvstats, vstats, 'max', 0 )
       if ( master ) then
-        call rwrite1( 'vmax', gvstats(:i,1), it )
-        call rwrite1( 'wmax', gvstats(:i,2), it )
-        call rwrite1( 'umax', gvstats(:i,3), it )
-        call rwrite1( 'amax', gvstats(:i,4), it )
+        call rwrite1( 'stats/vmax', gvstats(:i,1), it )
+        call rwrite1( 'stats/wmax', gvstats(:i,2), it )
+        call rwrite1( 'stats/umax', gvstats(:i,3), it )
+        call rwrite1( 'stats/amax', gvstats(:i,4), it )
         rr = maxval( gvstats(:,3) )
         if ( rr > dx / 10. ) write( 0, * ) 'warning: u !<< dx', rr, dx
         i1 = ihypo
         i1(ifn) = 1  
-        call rwrite( 'tarrhypo', tarr(i1(1),i1(2),i1(3)), 1 )
+        call rwrite( 'stats/tarrhypo', tarr(i1(1),i1(2),i1(3)), 1 )
       end if
     end if
   end select
@@ -235,18 +235,18 @@ if ( it > 0 .and. dofault ) then
       end do
       if ( master ) then
         i = modulo( it-1, itio ) + 1
-        call rwrite1( 'svmax',   gfstats(:i,1), it )
-        call rwrite1( 'sumax',   gfstats(:i,2), it )
-        call rwrite1( 'slmax',   gfstats(:i,3), it )
-        call rwrite1( 'tarrmax', gfstats(:i,4), it )
-        call rwrite1( 'tsmax',   gfstats(:i,5), it )
-        call rwrite1( 'samax',   gfstats(:i,6), it )
-        call rwrite1( 'tnmax',   gfstats(:i,7), it )
-        call rwrite1( 'tnmin',   gfstats(:i,8), it )
-        call rwrite1( 'efric',   gestats(:i,1), it )
-        call rwrite1( 'estrain', gestats(:i,2), it )
-        call rwrite1( 'moment',  gestats(:i,3), it )
-        call rwrite1( 'mw',      gestats(:i,4), it ) 
+        call rwrite1( 'stats/svmax',   gfstats(:i,1), it )
+        call rwrite1( 'stats/sumax',   gfstats(:i,2), it )
+        call rwrite1( 'stats/slmax',   gfstats(:i,3), it )
+        call rwrite1( 'stats/tarrmax', gfstats(:i,4), it )
+        call rwrite1( 'stats/tsmax',   gfstats(:i,5), it )
+        call rwrite1( 'stats/samax',   gfstats(:i,6), it )
+        call rwrite1( 'stats/tnmax',   gfstats(:i,7), it )
+        call rwrite1( 'stats/tnmin',   gfstats(:i,8), it )
+        call rwrite1( 'stats/efric',   gestats(:i,1), it )
+        call rwrite1( 'stats/estrain', gestats(:i,2), it )
+        call rwrite1( 'stats/moment',  gestats(:i,3), it )
+        call rwrite1( 'stats/mw',      gestats(:i,4), it ) 
       end if
     end if
   end select
@@ -280,7 +280,7 @@ if ( pass /= onpass ) cycle doiz
 ! Binary output
 ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
 do ic = 1, nc
-  write( str, '(i2.2,a)' ) iz, fieldout(iz)
+  write( str, '(a,i2.2,a)' ) 'out/', iz, fieldout(iz)
   if ( nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic
   !if ( i2out(iz,4) > 0 .and. any( i1 /= i2 ) ) write( str, '(a,i6.6)' ) trim( str ), it
   select case( fieldout(iz) )

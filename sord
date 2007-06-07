@@ -259,6 +259,8 @@ if [ $optimize = g ]; then
 fi
 cd "$rundir"
 rundir=$( /bin/pwd )
+mkdir out
+mkdir stats
 mkdir checkpoint
 mkdir debug
 if [ "$datadir" ]; then
