@@ -55,7 +55,7 @@ do while ( it < nt )
   call timestep
   if ( master ) then
     write( 0, '(a)', advance='no' ) '.'
-    if ( it == nt .or. modulo( it, 50 ) == 0 ) write( 0, '(i6)' ) it
+    if ( modulo( it, 50 ) == 0 .or. it == nt ) write( 0, '(i6)' ) it
   end if
   call stress      
   call momentsource                ; prof(i*4-3) = timer( 1 )
@@ -66,16 +66,18 @@ do while ( it < nt )
   call output( 2 )
   call writecheckpoint             ; prof(i*4-1) = prof(i*4-1) + timer( 1 )
   prof(i*4) = timer( 2 )
-  if ( modulo( it, itio ) == 0 .or. it == nt ) then
-    if ( master ) call rwrite1( 'prof', prof(1:i*4), it*4 )
+  if ( master .and. modulo( it, itio ) ) call rwrite1( 'prof', prof, it*4 )
   end if
 end do
 
 ! Finish up
-prof0(17) = timer( 3 )
-prof0(18) = timer( 4 )
-if ( master ) call rwrite1( 'prof0', prof0 )
-if ( master ) write( 0, * ) 'Finished!'
+if ( master ) then
+  call rwrite1( 'prof', prof(1:i*4), it*4 )
+  prof0(17) = timer( 3 )
+  prof0(18) = timer( 4 )
+  call rwrite1( 'prof0', prof0 )
+  write( 0, * ) 'Finished!'
+end if
 call finalize
 
 end program

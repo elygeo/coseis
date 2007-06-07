@@ -314,16 +314,16 @@ call mpi_comm_split( comm3d, i, 0, commout(iz), e )
 end subroutine
 
 ! Scalar field input/output
-subroutine scalario( io, filename, r, s1, i1, i2, i3, i4, iz )
+subroutine scalario( io, filename, r, s1, i1, i2, i3, i4, ir, iz )
 use mpi
 real, intent(inout) :: r, s1(:,:,:)
-integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), iz
+integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, iz
 character(*), intent(in) :: io, filename
 integer :: ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
 integer(kind=mpi_offset_kind) :: d = 0
 nl = (/ i4 - i3 + 1, 1 /)
 n  = (/ i2 - i1 + 1, 1 /)
-i0 = (/ i3 - i1,     0 /)
+i0 = (/ i3 - i1, ir - 1 /)
 if ( all( n == 1 ) .and. io =='w' ) then
   r = s1(i1(1),i1(2),i1(3))
   return
@@ -343,8 +343,10 @@ case( 'r' )
   call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
 case( 'w' )
+  i = 0
+  if ( ir == 1 ) i = mpi_mode_create
   if ( iz /= 0 ) comm = commout(iz)
-  call mpi_file_open( comm, filename, mpi_mode_create + mpi_mode_wronly, mpi_info_null, fh, e )
+  call mpi_file_open( comm, filename, mpi_mode_wronly + i, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_write_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
 end select
@@ -354,16 +356,16 @@ call mpi_type_free( ftype, e )
 end subroutine
 
 ! Vector field component input/output
-subroutine vectorio( io, filename, r, w1, ic, i1, i2, i3, i4, iz )
+subroutine vectorio( io, filename, r, w1, ic, i1, i2, i3, i4, ir, iz )
 use mpi
 real, intent(inout) :: r, w1(:,:,:,:)
-integer, intent(in) :: ic, i1(3), i2(3), i3(3), i4(3), iz
+integer, intent(in) :: ic, i1(3), i2(3), i3(3), i4(3), ir, iz
 character(*), intent(in) :: io, filename
-integer :: ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
+integer :: i, ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
 integer(kind=mpi_offset_kind) :: d = 0
 nl = (/ i4 - i3 + 1, 1 /)
 n  = (/ i2 - i1 + 1, 1 /)
-i0 = (/ i3 - i1,     0 /)
+i0 = (/ i3 - i1, ir - 1 /)
 if ( all( n == 1 ) .and. io =='w' ) then
    r = w1(i1(1),i1(2),i1(3),ic)
   return
@@ -383,8 +385,10 @@ case( 'r' )
   call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, w1(1,1,1,1), 1, mtype, mpi_status_ignore, e )
 case( 'w' )
+  i = 0
+  if ( ir == 1 ) i = mpi_mode_create
   if ( iz /= 0 ) comm = commout(iz)
-  call mpi_file_open( comm, filename, mpi_mode_create + mpi_mode_wronly, mpi_info_null, fh, e )
+  call mpi_file_open( comm, filename, mpi_mode_wronly + i, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_write_all( fh, w1(1,1,1,1), 1, mtype, mpi_status_ignore, e )
 end select

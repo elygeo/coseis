@@ -185,15 +185,15 @@ if ( it > 0 ) then
     if ( modulo( it, itio ) == 0 .or. it == nt ) then
       call rreduce2( gvstats, vstats, 'max', 0 )
       if ( master ) then
-        call rwrite1( 'stats/vmax', gvstats(:i,1), it )
-        call rwrite1( 'stats/wmax', gvstats(:i,2), it )
-        call rwrite1( 'stats/umax', gvstats(:i,3), it )
-        call rwrite1( 'stats/amax', gvstats(:i,4), it )
+        call rwrite1( 'vmax', gvstats(:i,1), it )
+        call rwrite1( 'wmax', gvstats(:i,2), it )
+        call rwrite1( 'umax', gvstats(:i,3), it )
+        call rwrite1( 'amax', gvstats(:i,4), it )
         rr = maxval( gvstats(:,3) )
         if ( rr > dx / 10. ) write( 0, * ) 'warning: u !<< dx', rr, dx
         i1 = ihypo
         i1(ifn) = 1  
-        call rwrite( 'stats/tarrhypo', tarr(i1(1),i1(2),i1(3)), 1 )
+        call rwrite( 'tarrhypo', tarr(i1(1),i1(2),i1(3)), 1 )
       end if
     end if
   end select
@@ -235,18 +235,18 @@ if ( it > 0 .and. dofault ) then
       end do
       if ( master ) then
         i = modulo( it-1, itio ) + 1
-        call rwrite1( 'stats/svmax',   gfstats(:i,1), it )
-        call rwrite1( 'stats/sumax',   gfstats(:i,2), it )
-        call rwrite1( 'stats/slmax',   gfstats(:i,3), it )
-        call rwrite1( 'stats/tarrmax', gfstats(:i,4), it )
-        call rwrite1( 'stats/tsmax',   gfstats(:i,5), it )
-        call rwrite1( 'stats/samax',   gfstats(:i,6), it )
-        call rwrite1( 'stats/tnmax',   gfstats(:i,7), it )
-        call rwrite1( 'stats/tnmin',   gfstats(:i,8), it )
-        call rwrite1( 'stats/efric',   gestats(:i,1), it )
-        call rwrite1( 'stats/estrain', gestats(:i,2), it )
-        call rwrite1( 'stats/moment',  gestats(:i,3), it )
-        call rwrite1( 'stats/mw',      gestats(:i,4), it ) 
+        call rwrite1( 'svmax',   gfstats(:i,1), it )
+        call rwrite1( 'sumax',   gfstats(:i,2), it )
+        call rwrite1( 'slmax',   gfstats(:i,3), it )
+        call rwrite1( 'tarrmax', gfstats(:i,4), it )
+        call rwrite1( 'tsmax',   gfstats(:i,5), it )
+        call rwrite1( 'samax',   gfstats(:i,6), it )
+        call rwrite1( 'tnmax',   gfstats(:i,7), it )
+        call rwrite1( 'tnmin',   gfstats(:i,8), it )
+        call rwrite1( 'efric',   gestats(:i,1), it )
+        call rwrite1( 'estrain', gestats(:i,2), it )
+        call rwrite1( 'moment',  gestats(:i,3), it )
+        call rwrite1( 'mw',      gestats(:i,4), it ) 
       end if
     end if
   end select
@@ -278,53 +278,53 @@ end if
 if ( pass /= onpass ) cycle doiz
 
 ! Binary output
+ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
 do ic = 1, nc
-  write( str, '(i2.2,a,a)' ) iz, '/', fieldout(iz)
+  write( str, '(i2.2,a)' ) iz, fieldout(iz)
   if ( nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic
-  if ( i2out(iz,4) > 0 .and. any( i1 /= i2 ) ) write( str, '(a,i6.6)' ) trim( str ), it
+  !if ( i2out(iz,4) > 0 .and. any( i1 /= i2 ) ) write( str, '(a,i6.6)' ) trim( str ), it
   select case( fieldout(iz) )
-  case( 'x'    ); call vectorio( 'w', str, rr, w1,   ic, i1, i2, i3, i4, iz )
-  case( 'rho'  ); call scalario( 'w', str, rr, mr,       i1, i2, i3, i4, iz )
-  case( 'vp'   ); call scalario( 'w', str, rr, s1,       i1, i2, i3, i4, iz )
-  case( 'vs'   ); call scalario( 'w', str, rr, s2,       i1, i2, i3, i4, iz )
-  case( 'mu'   ); call scalario( 'w', str, rr, mu,       i1, i2, i3, i4, iz )
-  case( 'lam'  ); call scalario( 'w', str, rr, lam,      i1, i2, i3, i4, iz )
-  case( 'v'    ); call vectorio( 'w', str, rr, v,    ic, i1, i2, i3, i4, iz )
-  case( 'u'    ); call vectorio( 'w', str, rr, u,    ic, i1, i2, i3, i4, iz )
-  case( 'w'    );
-   if ( ic < 4 )  call vectorio( 'w', str, rr, w1, ic,   i1, i2, i3, i4, iz )
-   if ( ic > 3 )  call vectorio( 'w', str, rr, w2, ic-3, i1, i2, i3, i4, iz )
-  case( 'a'    ); call vectorio( 'w', str, rr, w1,   ic, i1, i2, i3, i4, iz )
-  case( 'vm2'  ); call scalario( 'w', str, rr, s1,       i1, i2, i3, i4, iz )
-  case( 'um2'  ); call scalario( 'w', str, rr, s1,       i1, i2, i3, i4, iz )
-  case( 'wm2'  ); call scalario( 'w', str, rr, s2,       i1, i2, i3, i4, iz )
-  case( 'am2'  ); call scalario( 'w', str, rr, s2,       i1, i2, i3, i4, iz )
-  case( 'pv2'  ); call scalario( 'w', str, rr, pv,       i1, i2, i3, i4, iz )
-  case( 'nhat' ); call vectorio( 'w', str, rr, nhat, ic, i1, i2, i3, i4, iz )
-  case( 'mus'  ); call scalario( 'w', str, rr, mus,      i1, i2, i3, i4, iz )
-  case( 'mud'  ); call scalario( 'w', str, rr, mud,      i1, i2, i3, i4, iz )
-  case( 'dc'   ); call scalario( 'w', str, rr, dc,       i1, i2, i3, i4, iz )
-  case( 'co'   ); call scalario( 'w', str, rr, co,       i1, i2, i3, i4, iz )
-  case( 'sv'   ); call vectorio( 'w', str, rr, t1,   ic, i1, i2, i3, i4, iz )
-  case( 'su'   ); call vectorio( 'w', str, rr, t2,   ic, i1, i2, i3, i4, iz )
-  case( 'ts'   ); call vectorio( 'w', str, rr, t1,   ic, i1, i2, i3, i4, iz )
-  case( 'sa'   ); call vectorio( 'w', str, rr, t2,   ic, i1, i2, i3, i4, iz )
-  case( 'svm'  ); call scalario( 'w', str, rr, f1,       i1, i2, i3, i4, iz )
-  case( 'sum'  ); call scalario( 'w', str, rr, f2,       i1, i2, i3, i4, iz )
-  case( 'tsm'  ); call scalario( 'w', str, rr, ts,       i1, i2, i3, i4, iz )
-  case( 'sam'  ); call scalario( 'w', str, rr, f2,       i1, i2, i3, i4, iz )
-  case( 'tn'   ); call scalario( 'w', str, rr, tn,       i1, i2, i3, i4, iz )
-  case( 'fr'   ); call scalario( 'w', str, rr, f1,       i1, i2, i3, i4, iz )
-  case( 'sl'   ); call scalario( 'w', str, rr, sl,       i1, i2, i3, i4, iz )
-  case( 'psv'  ); call scalario( 'w', str, rr, psv,      i1, i2, i3, i4, iz )
-  case( 'trup' ); call scalario( 'w', str, rr, trup,     i1, i2, i3, i4, iz )
-  case( 'tarr' ); call scalario( 'w', str, rr, tarr,     i1, i2, i3, i4, iz )
+  case( 'x'    ); call vectorio( 'w', str, rr, w1,   ic, i1, i2, i3, i4, ir, iz )
+  case( 'rho'  ); call scalario( 'w', str, rr, mr,       i1, i2, i3, i4, ir, iz )
+  case( 'vp'   ); call scalario( 'w', str, rr, s1,       i1, i2, i3, i4, ir, iz )
+  case( 'vs'   ); call scalario( 'w', str, rr, s2,       i1, i2, i3, i4, ir, iz )
+  case( 'mu'   ); call scalario( 'w', str, rr, mu,       i1, i2, i3, i4, ir, iz )
+  case( 'lam'  ); call scalario( 'w', str, rr, lam,      i1, i2, i3, i4, ir, iz )
+  case( 'v'    ); call vectorio( 'w', str, rr, v,    ic, i1, i2, i3, i4, ir, iz )
+  case( 'u'    ); call vectorio( 'w', str, rr, u,    ic, i1, i2, i3, i4, ir, iz )
+  case( 'w'    );                                                              
+   if ( ic < 4 )  call vectorio( 'w', str, rr, w1, ic,   i1, i2, i3, i4, ir, iz )
+   if ( ic > 3 )  call vectorio( 'w', str, rr, w2, ic-3, i1, i2, i3, i4, ir, iz )
+  case( 'a'    ); call vectorio( 'w', str, rr, w1,   ic, i1, i2, i3, i4, ir, iz )
+  case( 'vm2'  ); call scalario( 'w', str, rr, s1,       i1, i2, i3, i4, ir, iz )
+  case( 'um2'  ); call scalario( 'w', str, rr, s1,       i1, i2, i3, i4, ir, iz )
+  case( 'wm2'  ); call scalario( 'w', str, rr, s2,       i1, i2, i3, i4, ir, iz )
+  case( 'am2'  ); call scalario( 'w', str, rr, s2,       i1, i2, i3, i4, ir, iz )
+  case( 'pv2'  ); call scalario( 'w', str, rr, pv,       i1, i2, i3, i4, ir, iz )
+  case( 'nhat' ); call vectorio( 'w', str, rr, nhat, ic, i1, i2, i3, i4, ir, iz )
+  case( 'mus'  ); call scalario( 'w', str, rr, mus,      i1, i2, i3, i4, ir, iz )
+  case( 'mud'  ); call scalario( 'w', str, rr, mud,      i1, i2, i3, i4, ir, iz )
+  case( 'dc'   ); call scalario( 'w', str, rr, dc,       i1, i2, i3, i4, ir, iz )
+  case( 'co'   ); call scalario( 'w', str, rr, co,       i1, i2, i3, i4, ir, iz )
+  case( 'sv'   ); call vectorio( 'w', str, rr, t1,   ic, i1, i2, i3, i4, ir, iz )
+  case( 'su'   ); call vectorio( 'w', str, rr, t2,   ic, i1, i2, i3, i4, ir, iz )
+  case( 'ts'   ); call vectorio( 'w', str, rr, t1,   ic, i1, i2, i3, i4, ir, iz )
+  case( 'sa'   ); call vectorio( 'w', str, rr, t2,   ic, i1, i2, i3, i4, ir, iz )
+  case( 'svm'  ); call scalario( 'w', str, rr, f1,       i1, i2, i3, i4, ir, iz )
+  case( 'sum'  ); call scalario( 'w', str, rr, f2,       i1, i2, i3, i4, ir, iz )
+  case( 'tsm'  ); call scalario( 'w', str, rr, ts,       i1, i2, i3, i4, ir, iz )
+  case( 'sam'  ); call scalario( 'w', str, rr, f2,       i1, i2, i3, i4, ir, iz )
+  case( 'tn'   ); call scalario( 'w', str, rr, tn,       i1, i2, i3, i4, ir, iz )
+  case( 'fr'   ); call scalario( 'w', str, rr, f1,       i1, i2, i3, i4, ir, iz )
+  case( 'sl'   ); call scalario( 'w', str, rr, sl,       i1, i2, i3, i4, ir, iz )
+  case( 'psv'  ); call scalario( 'w', str, rr, psv,      i1, i2, i3, i4, ir, iz )
+  case( 'trup' ); call scalario( 'w', str, rr, trup,     i1, i2, i3, i4, ir, iz )
+  case( 'tarr' ); call scalario( 'w', str, rr, tarr,     i1, i2, i3, i4, ir, iz )
   case default
     write( 0, * ) 'error: unknown output field: ', fieldout(iz)
     stop
   end select
   if ( all( i1 == i2 ) ) then
-    ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
     if ( it == 0 .or. ibuff(iz) == 0 ) then
       call rwrite( str, rr, ir )
     else

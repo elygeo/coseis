@@ -1,9 +1,0 @@
-#!/bin/bash
-
-rm sord-[sp] input currentstep run mf que* pbsscript* llscript*
-
-for file in *; do
-  [ -f "$file" -a ! -s "$file" ] && rm "$file"
-  [ -d "$file" ] && rmdir "$file"
-done
-

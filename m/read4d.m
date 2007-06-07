@@ -99,21 +99,20 @@ else
   skip = 4 * ( m(1) - n(1) );
   block = sprintf( '%d*float32', n(1) );
   for i  = 1:n(5)
-  for it = 1:n(4)
     file = field;
     if dirfmt, file = sprintf( [ dirfmt file ], iz ); end
     if nc > 1 || oldway, file = sprintf( [ file '%1d' ], ic(i) ); end
-    if i2(4) > 0, file = sprintf( [ file '%06d' ], i1s(4) + it - 1 ); end
     fid = fopen( file, 'r', endian );
     if ( fid == -1 ), error( [ 'Error opening file: ' file ] ), end
-    for l = 1:n(3)
-      seek = 4 * ( i0(1) + m(1) * ( i0(2) + m(2) * ( i0(3) + l - 1 ) ) );
+    for it = 1:n(4)
+    for l  = 1:n(3)
+      seek = 4 * ( i0(1) + m(1) * ( i0(2) + m(2) * ( i0(3) + l - 1 + m(3) * ( i0(4) + it - 1 ) ) ) );
       fseek( fid, seek, 'bof' );
       tmp = fread( fid, n(1)*n(2), block, skip );
       f(:,:,l,it,i) = reshape( tmp, n(1:2) );
     end
+    end
     fclose( fid );
-  end
   end
 end
 

@@ -62,17 +62,14 @@ s/ $//;
 " > tmp/input
 
 # Read input
-nout=0
 while read key params; do
 set -- $params
 case "$key" in
   nt) nt=$1 ;;
   nn) nm3=( $1 $2 $3 ) ;;
   np) np3=( $1 $2 $3 ) ;;
-  out) nout=$(( nout + 1 )) ;;
   dx)   echo "$1" > tmp/dx ;;
   npml) echo "$1" > tmp/npml ;;
-  timeseries) nout=$(( nout + 1 )) ;;
   datadir) datadir="$1" ;;
   return) break ;;
 esac
@@ -262,15 +259,8 @@ if [ $optimize = g ]; then
 fi
 cd "$rundir"
 rundir=$( /bin/pwd )
-mkdir stats
 mkdir checkpoint
 mkdir debug
-i=0
-while [ $i -lt $nout ]; do
-  i=$(( i + 1 ))
-  dir=$( echo $i | awk '{ printf "%02d", $1 }' )
-  mkdir $dir
-done
 if [ "$datadir" ]; then
   endian="$( perl -le 'print pack('V',1) eq pack('L',1) ? "l" : "b"' )"
   cd "$srcdir/$datadir"

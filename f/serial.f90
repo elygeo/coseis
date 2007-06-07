@@ -139,9 +139,9 @@ i = iz + nout + ditout
 end subroutine
 
 ! Scalar field input/output
-subroutine scalario( io, filename, r, s1, i1, i2, i3, i4, iz )
+subroutine scalario( io, filename, r, s1, i1, i2, i3, i4, ir, iz )
 real, intent(inout) :: r, s1(:,:,:)
-integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), iz
+integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, iz
 character(*), intent(in) :: io, filename
 integer :: nb, i, j1, k1, l1, j2, k2, l2
 if ( any( i1 /= i3 .or. i2 /= i4 ) .or. iz < 0 ) then
@@ -166,23 +166,27 @@ case( 'r' )
     write( 0, * ) 'Error opening file: ', trim( filename )
     stop
   end if
-  read( 1, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
+  read( 1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
   close( 1 )
 case( 'w' )
-  open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='replace' )
+  if ( ir == 1 ) the
+    open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='replace' )
+  else
+    open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='old' )
+  end if
   if ( i /= 0 ) then
     write( 0, * ) 'Error opening file: ', trim( filename )
     stop
   end if
-  write( 1, rec=1 ) s1(j1:j2,k1:k2,l1:l2)
+  write( 1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
   close( 1 )
 end select
 end subroutine
 
 ! Vector field component input/output
-subroutine vectorio( io, filename, r, w1, ic, i1, i2, i3, i4, iz )
+subroutine vectorio( io, filename, r, w1, ic, i1, i2, i3, i4, ir, iz )
 real, intent(inout) :: r, w1(:,:,:,:)
-integer, intent(in) :: ic, i1(3), i2(3), i3(3), i4(3), iz
+integer, intent(in) :: ic, i1(3), i2(3), i3(3), i4(3), ir, iz
 character(*), intent(in) :: io, filename
 integer :: nb, i, j1, k1, l1, j2, k2, l2
 if ( any( i1 /= i3 .or. i2 /= i4 ) .or. iz < 0 ) then
@@ -207,15 +211,19 @@ case( 'r' )
     write( 0, * ) 'Error opening file: ', trim( filename )
     stop
   end if
-  read( 1, rec=1 ) w1(j1:j2,k1:k2,l1:l2,ic)
+  read( 1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
   close( 1 )
 case( 'w' )
-  open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='replace' )
+  if ( ir == 1 ) the
+    open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='replace' )
+  else
+    open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='old' )
+  end if
   if ( i /= 0 ) then
     write( 0, * ) 'Error opening file: ', trim( filename )
     stop
   end if
-  write( 1, rec=1 ) w1(j1:j2,k1:k2,l1:l2,ic)
+  write( 1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
   close( 1 )
 end select
 end subroutine
