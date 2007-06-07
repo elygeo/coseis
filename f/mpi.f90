@@ -319,7 +319,7 @@ use mpi
 real, intent(inout) :: r, s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, iz
 character(*), intent(in) :: io, filename
-integer :: ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
+integer :: i, ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
 integer(kind=mpi_offset_kind) :: d = 0
 nl = (/ i4 - i3 + 1, 1 /)
 n  = (/ i2 - i1 + 1, 1 /)

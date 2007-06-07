@@ -21,6 +21,7 @@
 
   datadir = 'ts/1000/data';
   np = [ 1 1 2 ] % Wide
+  np = [ 1 8 4 ] % Babieca
   dx = 1000.;
   dt = .06;
   trelax = .6;
