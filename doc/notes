@@ -119,18 +119,17 @@ du = u1_ - u0_
 
 Zero relative acceleration boundary condition
 da = 0
-ta = t0 + (r1/m1-r0/m0) / [s*(1/m1+1/m0)]
-   = t0 + (r1*m0-r0*m1) / [s*(m0+m1)]
+ta = t0 + (a1-a0) / [s*(1/m1+1/m0)]
 
 Zero relative velocity boundary condition
 dv = 0
-tv = t0 + [v1-v0 + dt*(r1/m1-r0/m0)] / [dt*s*(1/m1+1/m0)]
-   = t0 + [(v1-v0)*m0*m1/dt + r1*m0-r0*m1] / [s*(m0+m1)]   (DFM)
+tv = t0 + [v1-v0 + dt*(a1-a0)] / [dt*s*(1/m1+1/m0)]
    = ta + (v1-v0) / [dt*s*(1/m1+1/m0)]
+   = t0 + [(v1-v0)*m0*m1/dt + r1*m0-r0*m1] / [s*(m0+m1)]   (DFM)
 
 Zero relative normal displacement boundary condition
 du = 0
-tu = t0 + [u1-u0 + dt*(v1-v0) + dt^2*(r1/m1-r0/m0)] / [dt^2*s*(1/m1+1/m0)]
+tu = t0 + [u1-u0 + dt*(v1-v0) + dt^2*(a1-a0)] / [dt^2*s*(1/m1+1/m0)]
    = tv + (u1-u0) / [dt^2*s*(1/m1+1/m0)]
 
 Shear component of traction is bounded by friction

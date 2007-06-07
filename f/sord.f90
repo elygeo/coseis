@@ -66,7 +66,7 @@ do while ( it < nt )
   call output( 2 )
   call writecheckpoint             ; prof(i*4-1) = prof(i*4-1) + timer( 1 )
   prof(i*4) = timer( 2 )
-  if ( master .and. modulo( it, itio ) ) call rwrite1( 'prof', prof, it*4 )
+  if ( master .and. modulo( it, itio ) == 0 ) call rwrite1( 'prof', prof, it*4 )
 end do
 
 ! Finish up
