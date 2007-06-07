@@ -18,7 +18,7 @@ case "$opt" in
   G) optimize=g; run=g ;;
   n) setup= ; run= ;;
   m) machine="$OPTARG" ;;
-  d) rm -rf out/* ;;
+  d) rm -rf run/* ;;
   f) rm -rf tmp/* ;;
   *) exit 1 ;;
 esac
@@ -43,7 +43,7 @@ mkdir -p tmp
 
 # Locations
 srcdir=$( /bin/pwd )
-count=$( echo out/[0-9][0-9] | sed 's/.*\///' )
+count=$( echo run/[0-9][0-9] | sed 's/.*\///' )
 [ "$count" = '[0-9][0-9]' ] && count=00
 count=$( echo $count | awk '{ printf "%02d", $1+1 }' )
 echo "$count" > tmp/count
@@ -247,9 +247,9 @@ cd "$srcdir"
 
 # Setup run directory
 sh/tarball
-rundir="out/$count"
+rundir="run/$count"
 echo "Run directory: $rundir"
-mkdir -p out
+mkdir -p run
 mkdir "$rundir"
 echo "$starttime: Start SORD setup" >> "$rundir/log"
 cp 'in.m' tmp/sord.tgz tmp/sord-$mode tmp/input "$rundir"

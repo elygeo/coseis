@@ -3,9 +3,9 @@
 srcdir=$( /bin/pwd )
 if [ -d /gpfs ]; then
   mkdir -p /gpfs/$LOGNAME/sord/tmp
-  mkdir -p /gpfs/$LOGNAME/sord/out
+  mkdir -p /gpfs/$LOGNAME/sord/run
   ln -sf /gpfs/$LOGNAME/sord/tmp
-  ln -sf /gpfs/$LOGNAME/sord/out
+  ln -sf /gpfs/$LOGNAME/sord/run
 fi
 ./sord -n
 cd util
@@ -25,7 +25,7 @@ if [ "$nc" -gt 4000000 ]; then
   cd "$srcdir"
   ./sord
   count=$( cat tmp/count )
-  mv tmp/data tmp/vm "out/$count/"
+  mv tmp/data tmp/vm "run/$count/"
 else
   cd vm
   ./scecvm4-s $nc rlon rlat rdep rho vp vs
