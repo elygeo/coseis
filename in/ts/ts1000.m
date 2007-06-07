@@ -18,7 +18,6 @@
   rcrit = 3000.;
   vrup = 2300.;
   itcheck = 100;
-
   datadir = 'ts/1000/data';
   np = [ 1 1 2 ] % Wide
   np = [ 1 8 4 ] % Babieca

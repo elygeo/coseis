@@ -62,7 +62,6 @@ cat << END > pbsscript
 #PBS -m abe
 #PBS -V
 cd "$rundir"
-echo "\$PBS_JOBID" >> log
 echo "\$( date ): Start SORD run" >> log
 mpirun -machinefile \$PBS_NODEFILE -np $np ./sord-$mode
 echo "\$( date ): Finished!" >> log
@@ -87,7 +86,6 @@ cat << END > pbsscript-vm
 #PBS -m abe
 #PBS -V
 cd "$rundir"
-echo "\$PBS_JOBID" >> log
 echo "\$( date ): Start VM run" >> log
 cd "$rundir/vm"
 mpirun -machinefile \$PBS_NODEFILE -np $np ./scecvm4-$mode $nc rlon rlat rdep rho vp vs
