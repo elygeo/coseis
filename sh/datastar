@@ -5,47 +5,54 @@ if [ $( /bin/pwd | grep -v gpfs ) ]; then
   exit
 fi
 
-cat << END > run
+cat << END > run-$name
 #!/bin/bash -e
 if [ "\$HOSTNAME" != ds100 ]; then
   echo "Error: interactive jobs must be launched from dspoe"
   exit
 fi
-echo "\$( date ): Start SORD run" >> log
+cd "$rundir"
+echo "\$( date ): Start $name" >> log
+$pre
 END
 
 case "$mode" in
-s) cat << END >> run
+
+s) cat << END >> run-$name
 case "\${1:?}" in
-  -i) ./sord-s ;;
-  -g) totalview ./sord-s ;;
-  -b) nohup ./sord-s > out.log & :; pid=\$!
+  -i) $bin ;;
+  -g) totalview $bin ;;
+  -b) nohup $bin > out.log & :; pid=\$!
       echo "Background job started with PID \$pid" >> log
       echo "Background job started with PID \$pid" ;;
 esac
-echo "\$( date ): Finished!" >> log
+cd "$rundir"
+echo "\$( date ): Finish $name" >> log
 END
 ;;
-p) cat << END >> run
+
+p) cat << END >> run-$name
 opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
 case "\${1:?}" in
-  -i) poe ./sord-p $opts ;;
-  -g) tvpoe ./sord-p $opts ;;
-  -b) nohup poe ./sord-p $opts > out.log & :; pid=\$!
+  -i) poe $bin \$opts ;;
+  -g) tvpoe $bin \$opts ;;
+  -b) nohup poe $bin \$opts > out.log & :; pid=\$!
       echo "Background job started with PID \$pid" >> log
       echo "Background job started with PID \$pid" ;;
 esac
-echo "\$( date ): Finished!" >> log
+cd "$rundir"
+echo "\$( date ): Finish $name" >> log
 END
 ;;
+
 esac
 
-cat << END > que
+cat << END > que-$name
 #!/bin/bash
-llsubmit llscript >> log
+llsubmit script-$name >> log
 END
 
-cat << END > llscript
+cat << END > script-$name
 #!/bin/bash
 #@environment = COPY_ALL;\\
 #AIXTHREAD_SCOPE=S;\\
@@ -62,7 +69,7 @@ cat << END > llscript
 #RT_GRQ=ON;\\
 #SPINLOOPTIME=0;\\
 #YIELDLOOPTIME=0;
-#@ job_name = sord-$count
+#@ job_name = $name-$count
 #@ initialdir = $rundir
 #@ node = $nodes
 #@ tasks_per_node = $ppn
@@ -77,35 +84,12 @@ cat << END > llscript
 #@ error = err.\$(jobid) 
 #@ queue
 cd "$rundir"
-END
-
-if [ "$nc" ]; then
-
-cat << END > que-vm
-#!/bin/bash
-llsubmit llscript-vm >> log
-END
-
-cp llscript llscript-vm
-cat << END >> llscript-vm
-echo "\$( date ): Start VM run" >> log
-cd "$rundir/vm"
-poe ./scecvm4-$mode $nc rlon rlat rdep rho vp vs
-mv rho vp vs "$rundir/data"
+echo "\$( date ): Start $name" >> log
+$pre
+poe $bin
 cd "$rundir"
-echo "\$( date ): Start SORD run" >> log
-poe ./sord-$mode
-echo "\$( date ): Finished!" >> log
-END
-chmod u+x que-vm llscript-vm
-
-fi
-
-cat << END >> llscript
-echo "\$( date ): Start SORD run" >> log
-poe ./sord-$mode
-echo "\$( date ): Finished!" >> log
+echo "\$( date ): Finish $name" >> log
 END
 
-chmod u+x run que llscript
+chmod u+x run-$name que-$name script-$name
 

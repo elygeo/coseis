@@ -8,7 +8,7 @@ mode=guess
 optimize=O
 setup=yes
 run=
-while getopts spibgGnm:df opt; do
+while getopts spibgGnvm:df opt; do
 case "$opt" in
   s) mode=s ;;
   p) mode=p ;;
@@ -17,6 +17,7 @@ case "$opt" in
   g) optimize=g ;;
   G) optimize=g; run=g ;;
   n) setup= ; run= ;;
+  v) velmodel=y ;;
   m) machine="$OPTARG" ;;
   d) rm -rf run/* ;;
   f) rm -rf tmp/* ;;
@@ -39,7 +40,17 @@ if [ "$1" ]; then
   ln -sf "$infile" 'in.m'
   infile=$( readlink 'in.m' 2> /dev/null ) || infile='in.m'
 fi
-mkdir -p tmp
+
+# Make diretories
+if [ -d /gpfs ]; then
+  mkdir -p /gpfs/$LOGNAME/sord/tmp
+  mkdir -p /gpfs/$LOGNAME/sord/run
+  ln -sf /gpfs/$LOGNAME/sord/tmp
+  ln -sf /gpfs/$LOGNAME/sord/run
+else
+  mkdir -p tmp
+  mkdir -p run
+fi
 
 # Locations
 srcdir=$( /bin/pwd )
@@ -249,7 +260,6 @@ cd "$srcdir"
 sh/tarball
 rundir="run/$count"
 echo "Run directory: $rundir"
-mkdir -p run
 mkdir "$rundir"
 echo "$starttime: Start SORD setup" >> "$rundir/log"
 cp 'in.m' tmp/sord.tgz tmp/sord-$mode tmp/input "$rundir"
@@ -290,49 +300,51 @@ cat << END > runmeta.m
   np      = $np;
 END
 
-# Run script
-case "$mode" in
-s) cat << END > run
-#!/bin/bash -e
-echo "\$(date): Start SORD run" >> log
-case \${1:?} in
-  -i) ./sord-s ;;
-  -g) ddd ./sord-s ;;
-  -b) nice nohup ./sord-s > out.log & :; pid=\$!
-      echo "Background job started with PID \$pid" >> log
-      echo "Background job started with PID \$pid" ;;
-esac
-echo "\$(date): Finished!" >> log
-END
-;;
-p) cat << END > run
-#!/bin/bash -e
-mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon
-echo "\$(date): Start SORD run" >> log
-case \${1:?} in
-  -i) mpiexec -np $np ./sord-p ;;
-  -g) mpiexec -gdb -np $np ./sord-p ;;
-  -b) nice nohup mpiexec -np $np ./sord-p > out.log & :; pid=\$!
-      echo "Background job started with PID \$pid" >> log
-      echo "Background job started with PID \$pid" ;;
-esac
-echo "\$(date): Finished!" >> log
-END
-;;
-esac
-chmod u+x run
+echo "$(date): Finish setup" >> log
 
-# Machine dependent run scripts
+# run scripts
+name="sord"
+bin="./sord-$mode"
 case $machine in
 datastar) . "$srcdir/sh/datastar" ;;
 teragrid) . "$srcdir/sh/teragrid" ;;
 babieca)  . "$srcdir/sh/babieca"  ;;
+*)        . "$srcdir/sh/default"  ;;
 esac
 
-echo "$(date): Finished setup" >> log
+# SCECVM
+if [ "$velmodel" ]; then
+  cd "$srcdir/util"
+  [ tsgrid.f90 -nt "$srcdir/tmp/tsgrid" ] && ./make
+  cd "$srcdir/tmp"
+  echo 1 > exag
+  ./tsgrid
+  nc=$( cat nc )
+  rm -rf data vm
+  mkdir data
+  cp endian data/
+  mv ts1 x1 x2 x3 meta.m data/
+  cp -r scecvm vm
+  mv rlon rlat rdep vm/
+  mv tmp/data tmp/vm "$rundir"
+  cd "$rundir"
+  name="scecvm"
+  pre="cd vm"
+  bin="./scecvm4-$mode $nc rlon rlat rdep rho vp vs"
+  walltime="00:30:00"
+  case $machine in
+  datastar) . "$srcdir/sh/datastar" ;;
+  teragrid) . "$srcdir/sh/teragrid" ;;
+  babieca)  . "$srcdir/sh/babieca"  ;;
+  *)        . "$srcdir/sh/default"  ;;
+  esac
+  echo "mv rho vp vs $rundir/data" >> "run-scecvm"
+  echo "mv rho vp vs $rundir/data" >> "script-scecvm"
+  [ "$run" ] && ./run-scecvm "-$run"
+fi
 
-# Launch job
-[ "$run" ] && ./run "-$run"
+# Run SORD
+[ "$run" ] && ./run-sord "-$run"
 
 exit 0
 

@@ -1,16 +1,19 @@
 #!/bin/bash -e
 
-cat << END > run
+cat << END > run-$name
 #!/bin/bash
-echo "\$( date ): Start SORD run" >> log
+cd "$rundir"
+echo "\$( date ): Start $name" >> log
+$pre
 case \${1:?} in
-  -i) mpirun -machinefile mf -np $np ./sord-$mode ;;
-  -g) mpirun -machinefile mf -np $np -dbg=gdb ./sord-$mode ;;
-  -b) nohup mpirun -machinefile mf -np $np ./sord-$mode > out.log & :; pid=\$!
+  -i) mpirun -machinefile mf -np $np $bin ;;
+  -g) mpirun -machinefile mf -np $np -dbg=gdb $bin ;;
+  -b) nohup mpirun -machinefile mf -np $np $bin > out.log & :; pid=\$!
       echo "Background job started with PID: \$pid" >> log
       echo "Background job started with PID: \$pid" ;;
 esac
-echo "\$( date ): Finished!" >> log
+cd "$rundir"
+echo "\$( date ): Finish $name" >> log
 END
 
 cat << END > mf
@@ -27,14 +30,14 @@ node48:2
 node49:2
 END
 
-cat << END > que
+cat << END > que-$name
 #!/bin/bash
-echo "\$( date ): Job qued with ID: \$( qsub pbsscript )" >> log
+echo "\$( date ): Job qued with ID: \$( qsub script-$name )" >> log
 END
 
-cat << END > pbsscript
+cat << END > script-$name
 #!/bin/bash
-#PBS -N sord-$count
+#PBS -N $name-$count
 #PBS -l nodes=$nodes:ppn=$ppn
 #PBS -l walltime=$walltime
 #PBS -q workq
@@ -43,42 +46,12 @@ cat << END > pbsscript
 #PBS -V
 sleep 2
 cd "$rundir"
-echo "\$( date ): Start SORD run" >> log
-mpiexec -n $np ./sord-$mode
-echo "\$( date ): Finished!" >> log
-END
-
-chmod u+x run que pbsscript
-
-if [ "$nc" ]; then
-
-cat << END > que-vm
-#!/bin/bash
-echo "\$( date ): Job qued with ID: \$( qsub pbsscript-vm )" >> log
-END
-
-cat << END > pbsscript-vm
-#!/bin/bash
-#PBS -N sord-vm-$count
-#PBS -l walltime=$walltime
-#PBS -l nodes=$nodes:ppn=$ppn
-#PBS -q workq
-#PBS -M $email
-#PBS -m abe
-#PBS -V
-sleep 2
+echo "\$( date ): Start $name" >> log
+$pre
+mpiexec -n $np $bin
 cd "$rundir"
-echo "\$( date ): Start VM run" >> log
-cd "$rundir/vm"
-mpiexec -n $np ./scecvm4-$mode $nc rlon rlat rdep rho vp vs
-mv rho vp vs "$rundir/data"
-cd "$rundir"
-echo "\$( date ): Start SORD run" >> log
-mpiexec -n $np ./sord-$mode
-echo "\$( date ): Finished!" >> log
+echo "\$( date ): Finish $name" >> log
 END
 
-chmod u+x que-vm pbsscript-vm
-
-fi
+chmod u+x run-$name que-$name script-$name
 
