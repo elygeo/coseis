@@ -5,36 +5,36 @@ case "$mode" in
 s) cat << END > run-$name
 
 #!/bin/bash -e
-cd "$rundir"
-echo "\$(date): Start $name" >> log
+log="$rundir/log"
+echo "\$(date): Start $name" >> "\$log"
 $pre
 case \${1:?} in
   -i) $bin ;;
   -g) ddd $bin ;;
   -b) nice nohup $bin > out.log & :; pid=\$!
-      echo "Background job started with PID \$pid" >> log
+      echo "Background job started with PID \$pid" >> "\$log"
       echo "Background job started with PID \$pid" ;;
 esac
-cd "$rundir"
-echo "\$(date): Finish $name" >> log
+$post
+echo "\$(date): Finish $name" >> "\$log"
 END
 ;;
 
 p) cat << END > run-$name
 #!/bin/bash -e
-cd "$rundir"
-echo "\$(date): Start $name" >> log
+log="$rundir/log"
+echo "\$(date): Start $name" >> "\$log"
 $pre
 mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon
 case \${1:?} in
   -i) mpiexec -np $np $bin ;;
   -g) mpiexec -gdb -np $np $bin ;;
   -b) nice nohup mpiexec -np $np $bin > out.log & :; pid=\$!
-      echo "Background job started with PID \$pid" >> log
+      echo "Background job started with PID \$pid" >> "\$log"
       echo "Background job started with PID \$pid" ;;
 esac
-cd "$rundir"
-echo "\$(date): Finish $name" >> log
+$post
+echo "\$(date): Finish $name" >> "\$log"
 END
 ;;
 

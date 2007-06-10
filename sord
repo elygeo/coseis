@@ -273,7 +273,7 @@ mkdir out
 mkdir stats
 mkdir checkpoint
 mkdir debug
-if [ "$datadir" ]; then
+if [ "$datadir" -a ! "$velmodel" ]; then
   endian="$( perl -le 'print pack('V',1) eq pack('L',1) ? "l" : "b"' )"
   cd "$srcdir/$datadir"
   if [ "$endian" != "$( cat endian )" ]; then
@@ -304,6 +304,7 @@ echo "$(date): Finish setup" >> log
 
 # run scripts
 name="sord"
+pre="cd $rundir"
 bin="./sord-$mode"
 case $machine in
 datastar) . "$srcdir/sh/datastar" ;;
@@ -319,27 +320,23 @@ if [ "$velmodel" ]; then
   cd "$srcdir/tmp"
   echo 1 > exag
   ./tsgrid
-  nc=$( cat nc )
-  rm -rf data vm
-  mkdir data
-  cp endian data/
-  mv ts1 x1 x2 x3 meta.m data/
-  cp -r scecvm vm
-  mv rlon rlat rdep vm/
-  mv tmp/data tmp/vm "$rundir"
-  cd "$rundir"
+  mkdir "$rundir/data"
+  cp endian "$rundir/data/"
+  cp -r scecvm "$rundir/vm"
+  mv rlon rlat rdep "$rundir/vm/"
+  mv ts1 x1 x2 x3 meta.m "$rundir/data/"
   name="scecvm"
-  pre="cd vm"
-  bin="./scecvm4-$mode $nc rlon rlat rdep rho vp vs"
+  pre="cd $rundir/vm"
+  bin="./scecvm4-$mode $( cat nc ) rlon rlat rdep rho vp vs"
+  post="mv rho vp vs $rundir/data"
   walltime="00:30:00"
+  cd "$rundir"
   case $machine in
   datastar) . "$srcdir/sh/datastar" ;;
   teragrid) . "$srcdir/sh/teragrid" ;;
   babieca)  . "$srcdir/sh/babieca"  ;;
   *)        . "$srcdir/sh/default"  ;;
   esac
-  echo "mv rho vp vs $rundir/data" >> "run-scecvm"
-  echo "mv rho vp vs $rundir/data" >> "script-scecvm"
   [ "$run" ] && ./run-scecvm "-$run"
 fi
 

@@ -11,8 +11,8 @@ if [ "\$HOSTNAME" != ds100 ]; then
   echo "Error: interactive jobs must be launched from dspoe"
   exit
 fi
-cd "$rundir"
-echo "\$( date ): Start $name" >> log
+log="$rundir/log"
+echo "\$( date ): Start $name" >> "\$log"
 $pre
 END
 
@@ -23,11 +23,11 @@ case "\${1:?}" in
   -i) $bin ;;
   -g) totalview $bin ;;
   -b) nohup $bin > out.log & :; pid=\$!
-      echo "Background job started with PID \$pid" >> log
+      echo "Background job started with PID \$pid" >> "\$log"
       echo "Background job started with PID \$pid" ;;
 esac
-cd "$rundir"
-echo "\$( date ): Finish $name" >> log
+$post
+echo "\$( date ): Finish $name" >> "\$log"
 END
 ;;
 
@@ -37,11 +37,11 @@ case "\${1:?}" in
   -i) poe $bin \$opts ;;
   -g) tvpoe $bin \$opts ;;
   -b) nohup poe $bin \$opts > out.log & :; pid=\$!
-      echo "Background job started with PID \$pid" >> log
+      echo "Background job started with PID \$pid" >> "\$log"
       echo "Background job started with PID \$pid" ;;
 esac
-cd "$rundir"
-echo "\$( date ): Finish $name" >> log
+$post
+echo "\$( date ): Finish $name" >> "\$log"
 END
 ;;
 
@@ -83,12 +83,12 @@ cat << END > script-$name
 #@ output = out.\$(jobid)
 #@ error = err.\$(jobid) 
 #@ queue
-cd "$rundir"
-echo "\$( date ): Start $name" >> log
+log="$rundir/log"
+echo "\$( date ): Start $name" >> "\$log"
 $pre
 poe $bin
-cd "$rundir"
-echo "\$( date ): Finish $name" >> log
+$post
+echo "\$( date ): Finish $name" >> "\$log"
 END
 
 chmod u+x run-$name que-$name script-$name

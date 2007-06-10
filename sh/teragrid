@@ -12,8 +12,8 @@ if ! grep -q "\$HOSTNAME" mf; then
   sed 's/^/  /; s/:2//' mf
   exit
 fi
-cd "$rundir"
-echo "\$( date ): Start $name" >> log
+log="$rundir/log"
+echo "\$( date ): Start $name" >> "\$log"
 $pre
 END
 
@@ -24,11 +24,11 @@ case \${1:?} in
   -i) $bin ;;
   -g) totalview $bin ;;
   -b) nohup $bin > out.log & :; pid=\$!
-      echo "Background job started with PID \$pid" >> log
+      echo "Background job started with PID \$pid" >> "\$log"
       echo "Background job started with PID \$pid" ;;
 esac
-cd "$rundir"
-echo "\$( date ): Finish $name" >> log
+$post
+echo "\$( date ): Finish $name" >> "\$log"
 END
 ;;
 
@@ -37,11 +37,11 @@ case \${1:?} in
   -i) mpirun -machinefile mf -np $np $bin ;;
   -g) mpirun -tv -machinefile mf -np $np $bin ;;
   -b) nohup mpirun -machinefile mf -np $np $bin > out.log & :; pid=\$!
-      echo "Background job started with PID \$pid" >> log
+      echo "Background job started with PID \$pid" >> "\$log"
       echo "Background job started with PID \$pid" ;;
 esac
-cd "$rundir"
-echo "\$( date ): Finish $name" >> log
+$post
+echo "\$( date ): Finish $name" >> "\$log"
 END
 ;;
 
@@ -68,12 +68,12 @@ cat << END > script-$name
 #PBS -M $email
 #PBS -m abe
 #PBS -V
-cd "$rundir"
-echo "\$( date ): Start $name" >> log
+log="$rundir/log"
+echo "\$( date ): Start $name" >> "\$log"
 $pre
 mpirun -machinefile \$PBS_NODEFILE -np $np $bin
-cd "$rundir"
-echo "\$( date ): Finish $name" >> log
+$post
+echo "\$( date ): Finish $name" >> "\$log"
 END
 
 chmod u+x run-$name que-$name script-$name
