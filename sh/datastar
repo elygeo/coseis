@@ -5,43 +5,56 @@ if [ $( /bin/pwd | grep -v gpfs ) ]; then
   exit
 fi
 
-cat << END > run-$name
+case "$mode" in
+
+s) cat << END > run-$name
 #!/bin/bash -e
 if [ "\$HOSTNAME" != ds100 ]; then
   echo "Error: interactive jobs must be launched from dspoe"
   exit
 fi
-log="$rundir/log"
-echo "\$( date ): Start $name" >> "\$log"
+cd "$rundir"
+echo "\$( date ): Start $name" >> log
 $pre
-END
-
-case "$mode" in
-
-s) cat << END >> run-$name
 case "\${1:?}" in
   -i) $bin ;;
   -g) totalview $bin ;;
   -b) nohup $bin > out.log & :; pid=\$!
-      echo "Background job started with PID \$pid" >> "\$log"
-      echo "Background job started with PID \$pid" ;;
 esac
-$post
-echo "\$( date ): Finish $name" >> "\$log"
+cd "$rundir"
+if [ "\$pid" ]; then
+  echo "Background job started with PID \$pid" >> log
+  echo "Background job started with PID \$pid" ;;
+else
+  $post
+fi
+echo "\$( date ): Finish $name" >> log
 END
 ;;
 
-p) cat << END >> run-$name
+p) cat << END > run-$name
+#!/bin/bash -e
+if [ "\$HOSTNAME" != ds100 ]; then
+  echo "Error: interactive jobs must be launched from dspoe"
+  exit
+fi
+cd "$rundir"
+echo "\$( date ): Start $name" >> log
+$pre
 opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
 case "\${1:?}" in
   -i) poe $bin \$opts ;;
   -g) tvpoe $bin \$opts ;;
   -b) nohup poe $bin \$opts > out.log & :; pid=\$!
-      echo "Background job started with PID \$pid" >> "\$log"
-      echo "Background job started with PID \$pid" ;;
 esac
-$post
-echo "\$( date ): Finish $name" >> "\$log"
+cd "$rundir"
+if [ "\$pid" ]; then
+  echo "Background job started with PID \$pid" >> log
+  echo "Background job started with PID \$pid" ;;
+else
+  $post
+fi
+echo "\$( date ): Finish $name" >> log
 END
 ;;
 
@@ -83,12 +96,13 @@ cat << END > script-$name
 #@ output = out.\$(jobid)
 #@ error = err.\$(jobid) 
 #@ queue
-log="$rundir/log"
-echo "\$( date ): Start $name" >> "\$log"
+cd "$rundir"
+echo "\$( date ): Start $name" >> log
 $pre
 poe $bin
+cd "$rundir"
 $post
-echo "\$( date ): Finish $name" >> "\$log"
+echo "\$( date ): Finish $name" >> log
 END
 
 chmod u+x run-$name que-$name script-$name

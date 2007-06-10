@@ -2,18 +2,22 @@
 
 cat << END > run-$name
 #!/bin/bash
-log="$rundir/log"
-echo "\$( date ): Start $name" >> "\$log"
+cd "$rundir"
+echo "\$( date ): Start $name" >> log
 $pre
 case \${1:?} in
   -i) mpirun -machinefile mf -np $np $bin ;;
   -g) mpirun -machinefile mf -np $np -dbg=gdb $bin ;;
   -b) nohup mpirun -machinefile mf -np $np $bin > out.log & :; pid=\$!
-      echo "Background job started with PID: \$pid" >> "\$log"
-      echo "Background job started with PID: \$pid" ;;
 esac
-$post
-echo "\$( date ): Finish $name" >> "\$log"
+cd "$rundir"
+if [ "\$pid" ]; then
+  echo "Background job started with PID \$pid" >> log
+  echo "Background job started with PID \$pid" ;;
+else
+  $post
+fi
+echo "\$( date ): Finish $name" >> log
 END
 
 cat << END > mf
@@ -45,12 +49,13 @@ cat << END > script-$name
 #PBS -m abe
 #PBS -V
 sleep 2
-log="$rundir/log"
-echo "\$( date ): Start $name" >> "\$log"
+cd "$rundir"
+echo "\$( date ): Start $name" >> log
 $pre
 mpiexec -n $np $bin
+cd "$rundir"
 $post
-echo "\$( date ): Finish $name" >> "\$log"
+echo "\$( date ): Finish $name" >> log
 END
 
 chmod u+x run-$name que-$name script-$name
