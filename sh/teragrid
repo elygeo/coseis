@@ -5,8 +5,7 @@ if [ $( /bin/pwd | grep -v gpfs ) ]; then
   exit
 fi
 
-case "$mode" in
-s) cat << END > run-$name
+cat << END > run-$code
 #!/bin/bash -e
 if ! grep -q "\$HOSTNAME" mf; then
   echo "Error: interactive jobs must be launched from the following hosts:"
@@ -14,12 +13,15 @@ if ! grep -q "\$HOSTNAME" mf; then
   exit
 fi
 cd "$rundir"
-echo "\$( date ): Start $name" >> log
+echo "\$( date ): Start $code" >> log
 $pre
-case \${1:?} in
-  -i) $bin ;;
-  -g) totalview $bin ;;
-  -b) nohup $bin > out.log & :; pid=\$!
+case "\${1:--i}$mode" in
+  -is) $bin ;;
+  -gs) totalview $bin ;;
+  -bs) nohup $bin > out.log & :; pid=\$!
+  -ip) mpirun -machinefile mf -np $np $bin ;;
+  -gp) mpirun -tv -machinefile mf -np $np $bin ;;
+  -bp) nohup mpirun -machinefile mf -np $np $bin > out.log & :; pid=\$!
 esac
 cd "$rundir"
 if [ "\$pid" ]; then
@@ -28,37 +30,8 @@ if [ "\$pid" ]; then
 else
   $post
 fi
-echo "\$( date ): Finish $name" >> log
+echo "\$( date ): Finish $code" >> log
 END
-;;
-
-p) cat << END > run-$name
-#!/bin/bash -e
-if ! grep -q "\$HOSTNAME" mf; then
-  echo "Error: interactive jobs must be launched from the following hosts:"
-  sed 's/^/  /; s/:2//' mf
-  exit
-fi
-cd "$rundir"
-echo "\$( date ): Start $name" >> log
-$pre
-case \${1:?} in
-  -i) mpirun -machinefile mf -np $np $bin ;;
-  -g) mpirun -tv -machinefile mf -np $np $bin ;;
-  -b) nohup mpirun -machinefile mf -np $np $bin > out.log & :; pid=\$!
-esac
-cd "$rundir"
-if [ "\$pid" ]; then
-  echo "Background job started with PID \$pid" >> log
-  echo "Background job started with PID \$pid" ;;
-else
-  $post
-fi
-echo "\$( date ): Finish $name" >> log
-END
-;;
-
-esac
 
 cat << END > mf
 tg-c127:2
@@ -67,14 +40,14 @@ tg-c129:2
 tg-c130:2
 END
 
-cat << END > que-$name
+cat << END > que-$code
 #!/bin/bash
-echo "\$( date ): Job qued with ID: \$( qsub script-$name )" >> log
+echo "\$( date ): Job qued with ID: \$( qsub script-$code )" >> log
 END
 
-cat << END > script-$name
+cat << END > script-$code
 #!/bin/bash
-#PBS -N $name-$count
+#PBS -N $code-$count
 #PBS -l walltime=$walltime
 #PBS -l nodes=$nodes:ppn=$ppn
 #PBS -q dque
@@ -82,13 +55,13 @@ cat << END > script-$name
 #PBS -m abe
 #PBS -V
 cd "$rundir"
-echo "\$( date ): Start $name" >> log
+echo "\$( date ): Start $code" >> log
 $pre
 mpirun -machinefile \$PBS_NODEFILE -np $np $bin
 cd "$rundir"
 $post
-echo "\$( date ): Finish $name" >> log
+echo "\$( date ): Finish $code" >> log
 END
 
-chmod u+x run-$name que-$name script-$name
+chmod u+x run-$code que-$code script-$code
 

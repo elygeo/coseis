@@ -5,47 +5,23 @@ if [ $( /bin/pwd | grep -v gpfs ) ]; then
   exit
 fi
 
-case "$mode" in
-
-s) cat << END > run-$name
+cat << END > run-$code
 #!/bin/bash -e
 if [ "\$HOSTNAME" != ds100 ]; then
   echo "Error: interactive jobs must be launched from dspoe"
   exit
 fi
 cd "$rundir"
-echo "\$( date ): Start $name" >> log
-$pre
-case "\${1:?}" in
-  -i) $bin ;;
-  -g) totalview $bin ;;
-  -b) nohup $bin > out.log & :; pid=\$!
-esac
-cd "$rundir"
-if [ "\$pid" ]; then
-  echo "Background job started with PID \$pid" >> log
-  echo "Background job started with PID \$pid" ;;
-else
-  $post
-fi
-echo "\$( date ): Finish $name" >> log
-END
-;;
-
-p) cat << END > run-$name
-#!/bin/bash -e
-if [ "\$HOSTNAME" != ds100 ]; then
-  echo "Error: interactive jobs must be launched from dspoe"
-  exit
-fi
-cd "$rundir"
-echo "\$( date ): Start $name" >> log
+echo "\$( date ): Start $code" >> log
 $pre
 opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
-case "\${1:?}" in
-  -i) poe $bin \$opts ;;
-  -g) tvpoe $bin \$opts ;;
-  -b) nohup poe $bin \$opts > out.log & :; pid=\$!
+case "\${1:--i}$mode" in
+  -is) $bin ;;
+  -gs) totalview $bin ;;
+  -bs) nohup $bin > out.log & :; pid=\$!
+  -ip) poe $bin \$opts ;;
+  -gp) tvpoe $bin \$opts ;;
+  -bp) nohup poe $bin \$opts > out.log & :; pid=\$!
 esac
 cd "$rundir"
 if [ "\$pid" ]; then
@@ -54,18 +30,15 @@ if [ "\$pid" ]; then
 else
   $post
 fi
-echo "\$( date ): Finish $name" >> log
+echo "\$( date ): Finish $code" >> log
 END
-;;
 
-esac
-
-cat << END > que-$name
+cat << END > que-$code
 #!/bin/bash
-llsubmit script-$name >> log
+llsubmit script-$code >> log
 END
 
-cat << END > script-$name
+cat << END > script-$code
 #!/bin/bash
 #@environment = COPY_ALL;\\
 #AIXTHREAD_SCOPE=S;\\
@@ -82,7 +55,7 @@ cat << END > script-$name
 #RT_GRQ=ON;\\
 #SPINLOOPTIME=0;\\
 #YIELDLOOPTIME=0;
-#@ job_name = $name-$count
+#@ job_name = $code-$count
 #@ initialdir = $rundir
 #@ node = $nodes
 #@ tasks_per_node = $ppn
@@ -97,13 +70,13 @@ cat << END > script-$name
 #@ error = err.\$(jobid) 
 #@ queue
 cd "$rundir"
-echo "\$( date ): Start $name" >> log
+echo "\$( date ): Start $code" >> log
 $pre
 poe $bin
 cd "$rundir"
 $post
-echo "\$( date ): Finish $name" >> log
+echo "\$( date ): Finish $code" >> log
 END
 
-chmod u+x run-$name que-$name script-$name
+chmod u+x run-$code que-$code script-$code
 

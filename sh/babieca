@@ -1,11 +1,11 @@
 #!/bin/bash -e
 
-cat << END > run-$name
+cat << END > run-$code
 #!/bin/bash
 cd "$rundir"
-echo "\$( date ): Start $name" >> log
+echo "\$( date ): Start $code" >> log
 $pre
-case \${1:?} in
+case "\${1:--i}" in
   -i) mpirun -machinefile mf -np $np $bin ;;
   -g) mpirun -machinefile mf -np $np -dbg=gdb $bin ;;
   -b) nohup mpirun -machinefile mf -np $np $bin > out.log & :; pid=\$!
@@ -17,7 +17,7 @@ if [ "\$pid" ]; then
 else
   $post
 fi
-echo "\$( date ): Finish $name" >> log
+echo "\$( date ): Finish $code" >> log
 END
 
 cat << END > mf
@@ -34,14 +34,14 @@ node48:2
 node49:2
 END
 
-cat << END > que-$name
+cat << END > que-$code
 #!/bin/bash
-echo "\$( date ): Job qued with ID: \$( qsub script-$name )" >> log
+echo "\$( date ): Job qued with ID: \$( qsub script-$code )" >> log
 END
 
-cat << END > script-$name
+cat << END > script-$code
 #!/bin/bash
-#PBS -N $name-$count
+#PBS -N $code-$count
 #PBS -l nodes=$nodes:ppn=$ppn
 #PBS -l walltime=$walltime
 #PBS -q workq
@@ -50,13 +50,13 @@ cat << END > script-$name
 #PBS -V
 sleep 2
 cd "$rundir"
-echo "\$( date ): Start $name" >> log
+echo "\$( date ): Start $code" >> log
 $pre
 mpiexec -n $np $bin
 cd "$rundir"
 $post
-echo "\$( date ): Finish $name" >> log
+echo "\$( date ): Finish $code" >> log
 END
 
-chmod u+x run-$name que-$name script-$name
+chmod u+x run-$code que-$code script-$code
 
