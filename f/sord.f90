@@ -21,7 +21,7 @@ use m_acceleration
 use m_locknodes
 use m_util
 implicit none
-real :: prof0(18), prof(4*itio)
+real :: prof0(16), prof(4*itio)
 integer :: i
 
 ! Initialization
@@ -49,7 +49,7 @@ end if
 ! Main loop
 if ( master ) write( 0, * ) 'Main loop'
 prof0(16) = timer( 3 )
-if ( master ) call rwrite1( 'prof0', prof0(1:16) )
+if ( master ) call rwrite1( 'prof0', prof0 )
 do while ( it < nt )
   i = modulo( it, itio ) + 1
   call timestep
@@ -72,9 +72,9 @@ end do
 ! Finish up
 if ( master ) then
   call rwrite1( 'prof', prof(1:i*4), it*4 )
-  prof0(17) = timer( 3 )
-  prof0(18) = timer( 4 )
-  call rwrite1( 'prof0', prof0 )
+  prof0(1) = timer( 3 )
+  prof0(2) = timer( 4 )
+  call rwrite1( 'prof0', prof0(1:2), 18 )
   write( 0, * ) 'Finished!'
 end if
 call finalize

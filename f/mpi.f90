@@ -315,8 +315,58 @@ end subroutine
 
 ! Scalar field input/output
 subroutine scalario( io, filename, r, s1, i1, i2, i3, i4, ir, iz )
+use m_util
 use mpi
 real, intent(inout) :: r, s1(:,:,:)
+integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, iz
+character(*), intent(inout) :: io, filename
+integer :: i, np(3), ip3(3)
+if ( all( i1 == i2 ) .and. io == 'w' ) then
+  r = s1(i1(1),i1(2),i1(3))
+  return
+end if
+if ( iz < 0 ) then
+  if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
+    call mpi_comm_size( comm3d, np, e  )
+    call mpi_cart_coords( comm3d, ip, 3, ip3, e )
+    i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
+    write( filename, '(a,i5.5)' ) trim( filename ), i 
+  else
+  call rio3( io, filename, i1, i2, ir )
+else
+  call prio3( io, filename, s1, i1, i2, i3, i4, ir, iz )
+end if
+end subroutine
+
+! Vector field component input/output
+subroutine vectorio( io, filename, r, w1, ic, i1, i2, i3, i4, ir, iz )
+use m_util
+use mpi
+real, intent(inout) :: r, w1(:,:,:,:)
+integer, intent(in) :: ic, i1(3), i2(3), i3(3), i4(3), ir, iz
+character(*), intent(inout) :: io, filename
+integer :: i, np(3), ip3(3)
+if ( all( i1 == i2 ) .and. io =='w' ) then
+  r = w1(i1(1),i1(2),i1(3),ic)
+  return
+end if
+if ( iz < 0 ) then
+  if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
+    call mpi_comm_size( comm3d, np, e  )
+    call mpi_cart_coords( comm3d, ip, 3, ip3, e )
+    i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
+    write( filename, '(a,i5.5)' ) trim( filename ), i 
+  else
+  call rio4( io, filename, i1, i2, ic, ir )
+else
+  call prio4( io, filename, w1, i1, i2, i3, i4, ic, ir, iz )
+end if
+end subroutine
+
+! Scalar field input/output
+subroutine prio3( io, filename, s1, i1, i2, i3, i4, ir, iz )
+use mpi
+real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, iz
 character(*), intent(in) :: io, filename
 integer :: i, ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
@@ -324,10 +374,6 @@ integer(kind=mpi_offset_kind) :: d = 0
 nl = (/ i4 - i3 + 1, 1 /)
 n  = (/ i2 - i1 + 1, 1 /)
 i0 = (/ i3 - i1, ir - 1 /)
-if ( all( n == 1 ) .and. io =='w' ) then
-  r = s1(i1(1),i1(2),i1(3))
-  return
-end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
@@ -356,9 +402,9 @@ call mpi_type_free( ftype, e )
 end subroutine
 
 ! Vector field component input/output
-subroutine vectorio( io, filename, r, w1, ic, i1, i2, i3, i4, ir, iz )
+subroutine vectorio( io, filename, w1, ic, i1, i2, i3, i4, ir, iz )
 use mpi
-real, intent(inout) :: r, w1(:,:,:,:)
+real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: ic, i1(3), i2(3), i3(3), i4(3), ir, iz
 character(*), intent(in) :: io, filename
 integer :: i, ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
@@ -366,10 +412,6 @@ integer(kind=mpi_offset_kind) :: d = 0
 nl = (/ i4 - i3 + 1, 1 /)
 n  = (/ i2 - i1 + 1, 1 /)
 i0 = (/ i3 - i1, ir - 1 /)
-if ( all( n == 1 ) .and. io =='w' ) then
-   r = w1(i1(1),i1(2),i1(3),ic)
-  return
-end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )

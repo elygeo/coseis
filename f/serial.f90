@@ -140,92 +140,44 @@ end subroutine
 
 ! Scalar field input/output
 subroutine scalario( io, filename, r, s1, i1, i2, i3, i4, ir, iz )
+use m_util
 real, intent(inout) :: r, s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, iz
 character(*), intent(in) :: io, filename
-integer :: nb, i, j1, k1, l1, j2, k2, l2
+integer :: i
 if ( any( i1 /= i3 .or. i2 /= i4 ) .or. iz < 0 ) then
   write( 0, * ) 'Error in scalario: ', filename, io
   write( 0, * ) i1, i2
   write( 0, * ) i3, i4
   stop
 end if
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
 if ( all( i1 == i2 ) .and. io == 'w' ) then
-  r = s1(j1,k1,l1)
+  r = s1(i1(1),i1(2),i1(3))
   return
 end if
-inquire( iolength=nb ) s1(j1:j2,k1:k2,l1:l2)
-if ( nb == 0 ) stop 'scalario zero size'
-select case( io )
-case( 'r' )
-  open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='old' )
-  if ( i /= 0 ) then
-    write( 0, * ) 'Error opening file: ', trim( filename )
-    stop
-  end if
-  read( 1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
-  close( 1 )
-case( 'w' )
-  if ( ir == 1 ) the
-    open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='replace' )
-  else
-    open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='old' )
-  end if
-  if ( i /= 0 ) then
-    write( 0, * ) 'Error opening file: ', trim( filename )
-    stop
-  end if
-  write( 1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
-  close( 1 )
-end select
+call rio3( io, filename, i1, i2, ir )
+i = i3(1) + i4(1) + iz
 end subroutine
 
 ! Vector field component input/output
 subroutine vectorio( io, filename, r, w1, ic, i1, i2, i3, i4, ir, iz )
+use m_util
 real, intent(inout) :: r, w1(:,:,:,:)
 integer, intent(in) :: ic, i1(3), i2(3), i3(3), i4(3), ir, iz
 character(*), intent(in) :: io, filename
-integer :: nb, i, j1, k1, l1, j2, k2, l2
 if ( any( i1 /= i3 .or. i2 /= i4 ) .or. iz < 0 ) then
   write( 0, * ) 'Error in vectorio: ', filename, io
   write( 0, * ) i1, i2
   write( 0, * ) i3, i4
   stop
 end if
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
+integer :: i
 if ( all( i1 == i2 ) .and. io == 'w' ) then
-  r = w1(j1,k1,l1,ic)
+  r = w1(i1(1),i1(2),i1(3),ic)
   return
 end if
-inquire( iolength=nb ) w1(j1:j2,k1:k2,l1:l2,ic)
-if ( nb == 0 ) stop 'vectorio zero size'
-select case( io )
-case( 'r' )
-  open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='old' )
-  if ( i /= 0 ) then
-    write( 0, * ) 'Error opening file: ', trim( filename )
-    stop
-  end if
-  read( 1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
-  close( 1 )
-case( 'w' )
-  if ( ir == 1 ) the
-    open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='replace' )
-  else
-    open( 1, file=filename, recl=nb, iostat=i, form='unformatted', access='direct', status='old' )
-  end if
-  if ( i /= 0 ) then
-    write( 0, * ) 'Error opening file: ', trim( filename )
-    stop
-  end if
-  write( 1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
-  close( 1 )
-end select
+call rio4( io, filename, i1, i2, ic, ir )
+i = i3(1) + i4(1) + iz
 end subroutine
 
 end module

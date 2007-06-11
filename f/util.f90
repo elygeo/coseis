@@ -132,41 +132,6 @@ else
 end if
 end function
 
-! Timer (old way, not used anymore )
-!subroutine oldtimer( time, i )
-!real, intent(out), optional :: time
-!integer, intent(in), optional :: i
-!integer, save :: clock0, clockrate, clockmax
-!integer(8), save :: timers(4)
-!integer :: clock1
-!if ( .not. present( i ) ) then
-!  call system_clock( clock0, clockrate, clockmax )
-!  timers = 0
-!else
-!  call system_clock( clock1 )
-!  timers = timers - clock0 + clock1
-!  if ( clock0 > clock1 ) timers = timers + clockmax
-!  clock0 = clock1
-!  time = real( timers(i) ) / real( clockrate )
-!  timers(:i) = 0
-!end if
-!end subroutine
-
-! Write integer binary timeseries
-subroutine iwrite( filename, val, it )
-character(*), intent(in) :: filename
-integer, intent(in) :: val, it
-integer :: i
-inquire( iolength=i ) val
-if ( it == 1 ) then
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
-else
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
-end if
-write( 1, rec=it ) val
-close( 1 )
-end subroutine
-
 ! Write real binary timeseries
 subroutine rwrite( filename, val, it )
 character(*), intent(in) :: filename
@@ -175,7 +140,7 @@ integer, intent(in) :: it
 integer :: i
 inquire( iolength=i ) val
 if ( it == 1 ) then
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
+  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='new' )
 else
   open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
 end if
@@ -196,7 +161,7 @@ if ( i0 < 0 ) stop 'error in rwrite1'
 if ( modulo( i0, n ) == 0 ) then
   inquire( iolength=i ) val
   if ( i0 == 0 ) then
-    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
+    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='new' )
   else
     open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
   end if
@@ -206,7 +171,7 @@ if ( modulo( i0, n ) == 0 ) then
 else
   inquire( iolength=i ) val(1)
   if ( i0 == 0 ) then
-    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='replace' )
+    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='new' )
   else
     open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
   end if
@@ -215,6 +180,60 @@ else
   end do
   close( 1 )
 end if
+end subroutine
+
+! Scalar I/O
+subroutine rio3( io, filename, s1, i1, i2, ir )
+real, intent(inout) :: s1(:,:,:)
+integer, intent(in) :: i1(3), i2(3), ir
+character(*), intent(in) :: str
+integer :: nb, i, j1, k1, l1, j2, k2, l2
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+inquire( iolength=nb ) s1(j1:j2,k1:k2,l1:l2)
+if ( nb == 0 ) stop 'rio3 zero size'
+if ( io == 'w' .and. ir == 1 ) the
+  open( 1, file=str, recl=nb, iostat=i, form='unformatted', access='direct', status='new' )
+else
+  open( 1, file=str, recl=nb, iostat=i, form='unformatted', access='direct', status='old' ) 
+end if
+if ( i /= 0 ) then
+  write( 0, * ) 'Error opening file: ', trim( filename )
+  stop 
+end if
+select case( io )
+case( 'r' ); read(  1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
+case( 'w' ); write( 1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
+end select
+close( 1 )
+end subroutine
+
+! Vector I/O
+subroutine rio4( io, filename, f, i1, i2, ic, ir )
+real, intent(inout) :: f(:,:,:,:)
+integer, intent(in) :: i1(3), i2(3), ic, ir
+character(*), intent(in) :: str
+integer :: nb, i, j1, k1, l1, j2, k2, l2
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+inquire( iolength=nb ) f(j1:j2,k1:k2,l1:l2,ic)
+if ( nb == 0 ) stop 'rio4 zero size'
+if ( io == 'w' .and. ir == 1 ) the
+  open( 1, file=str, recl=nb, iostat=i, form='unformatted', access='direct', status='new' )
+else
+  open( 1, file=str, recl=nb, iostat=i, form='unformatted', access='direct', status='old' ) 
+end if
+if ( i /= 0 ) then
+  write( 0, * ) 'Error opening file: ', trim( filename )
+  stop 
+end if
+select case( io )
+case( 'r' ); read(  1, rec=ir ) f(j1:j2,k1:k2,l1:l2,ic)
+case( 'w' ); write( 1, rec=ir ) f(j1:j2,k1:k2,l1:l2,ic)
+end select
+close( 1 )
 end subroutine
   
 end module

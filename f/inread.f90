@@ -70,6 +70,7 @@ case( 'svtol' );       read( str, *, iostat=io ) svtol
 case( 'np' );          read( str, *, iostat=io ) np
 case( 'itcheck' );     read( str, *, iostat=io ) itcheck
 case( 'debug' );       read( str, *, iostat=io ) debug
+case( 'mpiio' );       read( str, *, iostat=io ) mpiio
 case( 'rho' );         inzone = .true.
 case( 'vp' );          inzone = .true.
 case( 'vs' );          inzone = .true.
