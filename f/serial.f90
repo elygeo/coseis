@@ -139,14 +139,14 @@ i = iz + nout + ditout
 end subroutine
 
 ! Scalar field input/output
-subroutine scalario( io, filename, r, s1, i1, i2, i3, i4, ir, iz )
+subroutine scalario( io, str, r, s1, i1, i2, i3, i4, ir, iz )
 use m_util
 real, intent(inout) :: r, s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, iz
-character(*), intent(in) :: io, filename
+character(*), intent(in) :: io, str
 integer :: i
 if ( any( i1 /= i3 .or. i2 /= i4 ) .or. iz < 0 ) then
-  write( 0, * ) 'Error in scalario: ', filename, io
+  write( 0, * ) 'Error in scalario: ', str, io
   write( 0, * ) i1, i2
   write( 0, * ) i3, i4
   stop
@@ -155,28 +155,28 @@ if ( all( i1 == i2 ) .and. io == 'w' ) then
   r = s1(i1(1),i1(2),i1(3))
   return
 end if
-call rio3( io, filename, i1, i2, ir )
+call rio3( io, str, s1, i1, i2, ir )
 i = i3(1) + i4(1) + iz
 end subroutine
 
 ! Vector field component input/output
-subroutine vectorio( io, filename, r, w1, ic, i1, i2, i3, i4, ir, iz )
+subroutine vectorio( io, str, r, w1, ic, i1, i2, i3, i4, ir, iz )
 use m_util
 real, intent(inout) :: r, w1(:,:,:,:)
 integer, intent(in) :: ic, i1(3), i2(3), i3(3), i4(3), ir, iz
-character(*), intent(in) :: io, filename
+character(*), intent(in) :: io, str
+integer :: i
 if ( any( i1 /= i3 .or. i2 /= i4 ) .or. iz < 0 ) then
-  write( 0, * ) 'Error in vectorio: ', filename, io
+  write( 0, * ) 'Error in vectorio: ', str, io
   write( 0, * ) i1, i2
   write( 0, * ) i3, i4
   stop
 end if
-integer :: i
 if ( all( i1 == i2 ) .and. io == 'w' ) then
   r = w1(i1(1),i1(2),i1(3),ic)
   return
 end if
-call rio4( io, filename, i1, i2, ic, ir )
+call rio4( io, str, w1, i1, i2, ic, ir )
 i = i3(1) + i4(1) + iz
 end subroutine
 

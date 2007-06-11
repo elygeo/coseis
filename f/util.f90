@@ -133,24 +133,24 @@ end if
 end function
 
 ! Write real binary timeseries
-subroutine rwrite( filename, val, it )
-character(*), intent(in) :: filename
+subroutine rwrite( str, val, it )
+character(*), intent(in) :: str
 real, intent(in) :: val
 integer, intent(in) :: it
 integer :: i
 inquire( iolength=i ) val
 if ( it == 1 ) then
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='new' )
+  open( 1, file=str, recl=i, form='unformatted', access='direct', status='new' )
 else
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+  open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
 end if
 write( 1, rec=it ) val
 close( 1 )
 end subroutine
   
 ! Write buffered real binary timeseries
-subroutine rwrite1( filename, val, it )
-character(*), intent(in) :: filename
+subroutine rwrite1( str, val, it )
+character(*), intent(in) :: str
 real, intent(in) :: val(:)
 integer, intent(in), optional :: it
 integer :: i, n, i0
@@ -161,9 +161,9 @@ if ( i0 < 0 ) stop 'error in rwrite1'
 if ( modulo( i0, n ) == 0 ) then
   inquire( iolength=i ) val
   if ( i0 == 0 ) then
-    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='new' )
+    open( 1, file=str, recl=i, form='unformatted', access='direct', status='new' )
   else
-    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+    open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
   end if
   i = i0 / n + 1
   write( 1, rec=i ) val
@@ -171,9 +171,9 @@ if ( modulo( i0, n ) == 0 ) then
 else
   inquire( iolength=i ) val(1)
   if ( i0 == 0 ) then
-    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='new' )
+    open( 1, file=str, recl=i, form='unformatted', access='direct', status='new' )
   else
-    open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+    open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
   end if
   do i = 1, n
     write( 1, rec=i0+i ) val(i)
@@ -183,23 +183,23 @@ end if
 end subroutine
 
 ! Scalar I/O
-subroutine rio3( io, filename, s1, i1, i2, ir )
+subroutine rio3( io, str, s1, i1, i2, ir )
 real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), ir
-character(*), intent(in) :: str
+character(*), intent(in) :: io, str
 integer :: nb, i, j1, k1, l1, j2, k2, l2
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 inquire( iolength=nb ) s1(j1:j2,k1:k2,l1:l2)
 if ( nb == 0 ) stop 'rio3 zero size'
-if ( io == 'w' .and. ir == 1 ) the
+if ( io == 'w' .and. ir == 1 ) then
   open( 1, file=str, recl=nb, iostat=i, form='unformatted', access='direct', status='new' )
 else
   open( 1, file=str, recl=nb, iostat=i, form='unformatted', access='direct', status='old' ) 
 end if
 if ( i /= 0 ) then
-  write( 0, * ) 'Error opening file: ', trim( filename )
+  write( 0, * ) 'Error opening file: ', trim( str )
   stop 
 end if
 select case( io )
@@ -210,23 +210,23 @@ close( 1 )
 end subroutine
 
 ! Vector I/O
-subroutine rio4( io, filename, f, i1, i2, ic, ir )
+subroutine rio4( io, str, f, i1, i2, ic, ir )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), ic, ir
-character(*), intent(in) :: str
+character(*), intent(in) :: io, str
 integer :: nb, i, j1, k1, l1, j2, k2, l2
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 inquire( iolength=nb ) f(j1:j2,k1:k2,l1:l2,ic)
 if ( nb == 0 ) stop 'rio4 zero size'
-if ( io == 'w' .and. ir == 1 ) the
+if ( io == 'w' .and. ir == 1 ) then
   open( 1, file=str, recl=nb, iostat=i, form='unformatted', access='direct', status='new' )
 else
   open( 1, file=str, recl=nb, iostat=i, form='unformatted', access='direct', status='old' ) 
 end if
 if ( i /= 0 ) then
-  write( 0, * ) 'Error opening file: ', trim( filename )
+  write( 0, * ) 'Error opening file: ', trim( str )
   stop 
 end if
 select case( io )
