@@ -5,7 +5,7 @@ if [ $( /bin/pwd | grep -v gpfs ) ]; then
   exit
 fi
 
-cat << END > run-$code
+cat << END > $code-run
 #!/bin/bash -e
 if [ "\$HOSTNAME" != ds100 ]; then
   echo "Error: interactive jobs must be launched from dspoe"
@@ -18,27 +18,27 @@ opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
 case "\${1:--i}$mode" in
   -is) $bin ;;
   -gs) totalview $bin ;;
-  -bs) nohup $bin > out.log & :; pid=\$!
+  -bs) nohup $bin > out.log & :; pid=\$! ;;
   -ip) poe $bin \$opts ;;
   -gp) tvpoe $bin \$opts ;;
-  -bp) nohup poe $bin \$opts > out.log & :; pid=\$!
+  -bp) nohup poe $bin \$opts > out.log & :; pid=\$! ;;
 esac
 cd "$rundir"
 if [ "\$pid" ]; then
   echo "Background job started with PID \$pid" >> log
-  echo "Background job started with PID \$pid" ;;
+  echo "Background job started with PID \$pid"
 else
   $post
 fi
 echo "\$( date ): Finish $code" >> log
 END
 
-cat << END > que-$code
+cat << END > $code-que
 #!/bin/bash
-llsubmit script-$code >> log
+llsubmit $code-script >> log
 END
 
-cat << END > script-$code
+cat << END > $code-script
 #!/bin/bash
 #@environment = COPY_ALL;\\
 #AIXTHREAD_SCOPE=S;\\
@@ -78,5 +78,5 @@ $post
 echo "\$( date ): Finish $code" >> log
 END
 
-chmod u+x run-$code que-$code script-$code
+chmod u+x $code-*
 

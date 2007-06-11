@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-cat << END > run-$code
+cat << END > $code-run
 #!/bin/bash
 cd "$rundir"
 echo "\$( date ): Start $code" >> log
@@ -8,12 +8,12 @@ $pre
 case "\${1:--i}" in
   -i) mpirun -machinefile mf -np $np $bin ;;
   -g) mpirun -machinefile mf -np $np -dbg=gdb $bin ;;
-  -b) nohup mpirun -machinefile mf -np $np $bin > out.log & :; pid=\$!
+  -b) nohup mpirun -machinefile mf -np $np $bin > out.log & :; pid=\$! ;;
 esac
 cd "$rundir"
 if [ "\$pid" ]; then
   echo "Background job started with PID \$pid" >> log
-  echo "Background job started with PID \$pid" ;;
+  echo "Background job started with PID \$pid"
 else
   $post
 fi
@@ -34,12 +34,12 @@ node48:2
 node49:2
 END
 
-cat << END > que-$code
+cat << END > $code-que
 #!/bin/bash
-echo "\$( date ): Job qued with ID: \$( qsub script-$code )" >> log
+echo "\$( date ): Job qued with ID: \$( qsub $code-script )" >> log
 END
 
-cat << END > script-$code
+cat << END > $code-script
 #!/bin/bash
 #PBS -N $code-$count
 #PBS -l nodes=$nodes:ppn=$ppn
@@ -58,5 +58,5 @@ $post
 echo "\$( date ): Finish $code" >> log
 END
 
-chmod u+x run-$code que-$code script-$code
+chmod u+x $code-*
 

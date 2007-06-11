@@ -5,7 +5,7 @@ if [ $( /bin/pwd | grep -v gpfs ) ]; then
   exit
 fi
 
-cat << END > run-$code
+cat << END > $code-run
 #!/bin/bash -e
 if ! grep -q "\$HOSTNAME" mf; then
   echo "Error: interactive jobs must be launched from the following hosts:"
@@ -18,15 +18,15 @@ $pre
 case "\${1:--i}$mode" in
   -is) $bin ;;
   -gs) totalview $bin ;;
-  -bs) nohup $bin > out.log & :; pid=\$!
+  -bs) nohup $bin > out.log & :; pid=\$! ;;
   -ip) mpirun -machinefile mf -np $np $bin ;;
   -gp) mpirun -tv -machinefile mf -np $np $bin ;;
-  -bp) nohup mpirun -machinefile mf -np $np $bin > out.log & :; pid=\$!
+  -bp) nohup mpirun -machinefile mf -np $np $bin > out.log & :; pid=\$! ;;
 esac
 cd "$rundir"
 if [ "\$pid" ]; then
   echo "Background job started with PID \$pid" >> log
-  echo "Background job started with PID \$pid" ;;
+  echo "Background job started with PID \$pid"
 else
   $post
 fi
@@ -40,12 +40,12 @@ tg-c129:2
 tg-c130:2
 END
 
-cat << END > que-$code
+cat << END > $code-que
 #!/bin/bash
-echo "\$( date ): Job qued with ID: \$( qsub script-$code )" >> log
+echo "\$( date ): Job qued with ID: \$( qsub $code-script )" >> log
 END
 
-cat << END > script-$code
+cat << END > $code-script
 #!/bin/bash
 #PBS -N $code-$count
 #PBS -l walltime=$walltime
@@ -63,5 +63,5 @@ $post
 echo "\$( date ): Finish $code" >> log
 END
 
-chmod u+x run-$code que-$code script-$code
+chmod u+x $code-*
 

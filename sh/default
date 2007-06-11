@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-cat << END > run-$code
+cat << END > $code-run
 #!/bin/bash -e
 cd "$rundir"
 echo "\$(date): Start $code" >> log
@@ -8,20 +8,20 @@ $pre
 case "\${1:--i}$mode" in
   -is) $bin ;;
   -gs) ddd $bin ;;
-  -bs) nice nohup $bin > out.log & :; pid=\$!
+  -bs) nice nohup $bin > out.log & :; pid=\$! ;;
   -ip) mpiexec -np $np $bin ;;
   -gp) mpiexec -gdb -np $np $bin ;;
-  -bp) nice nohup mpiexec -np $np $bin > out.log & :; pid=\$!
+  -bp) nice nohup mpiexec -np $np $bin > out.log & :; pid=\$! ;;
 esac
 cd "$rundir"
 if [ "\$pid" ]; then
   echo "Background job started with PID \$pid" >> log
-  echo "Background job started with PID \$pid" ;;
+  echo "Background job started with PID \$pid"
 else
   $post
 fi
 echo "\$(date): Finish $code" >> log
 END
 
-chmod u+x run-$code
+chmod u+x $code-run
 
