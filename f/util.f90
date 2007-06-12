@@ -210,15 +210,15 @@ close( 1 )
 end subroutine
 
 ! Vector I/O
-subroutine rio4( io, str, f, i1, i2, ic, ir )
-real, intent(inout) :: f(:,:,:,:)
+subroutine rio4( io, str, w1, i1, i2, ic, ir )
+real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), ic, ir
 character(*), intent(in) :: io, str
 integer :: nb, i, j1, k1, l1, j2, k2, l2
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-inquire( iolength=nb ) f(j1:j2,k1:k2,l1:l2,ic)
+inquire( iolength=nb ) w1(j1:j2,k1:k2,l1:l2,ic)
 if ( nb == 0 ) stop 'rio4 zero size'
 if ( io == 'w' .and. ir == 1 ) then
   open( 1, file=str, recl=nb, iostat=i, form='unformatted', access='direct', status='new' )
@@ -230,8 +230,8 @@ if ( i /= 0 ) then
   stop 
 end if
 select case( io )
-case( 'r' ); read(  1, rec=ir ) f(j1:j2,k1:k2,l1:l2,ic)
-case( 'w' ); write( 1, rec=ir ) f(j1:j2,k1:k2,l1:l2,ic)
+case( 'r' ); read(  1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
+case( 'w' ); write( 1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
 end select
 close( 1 )
 end subroutine

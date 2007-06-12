@@ -42,9 +42,9 @@ if ( grid /= 'read' ) then
   forall( i=l1:l2 ) w1(:,:,i,3) = dx * ( i - i1(3) )
 else
   r = 0.
-  call vectorio( 'r', 'data/x1', r, w1, 1, i1, i2, i3, i4, 1, 0 )
-  call vectorio( 'r', 'data/x2', r, w1, 2, i1, i2, i3, i4, 1, 0 )
-  call vectorio( 'r', 'data/x3', r, w1, 3, i1, i2, i3, i4, 1, 0 )
+  call vectorio( 'r', 'data/x1', r, w1, i1, i2, i3, i4, 1, 1, -9 )
+  call vectorio( 'r', 'data/x2', r, w1, i1, i2, i3, i4, 2, 1, -9 )
+  call vectorio( 'r', 'data/x3', r, w1, i1, i2, i3, i4, 3, 1, -9 )
 end if
 
 ! Grid expansion

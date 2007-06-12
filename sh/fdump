@@ -1,4 +1,6 @@
 #!/bin/bash -e
-file="${1:?}"
-od -A d -f "$file"
+for file in "$@"; do
+  echo "$file"
+  od -A d -vf "$file"
+done
 

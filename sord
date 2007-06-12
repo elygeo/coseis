@@ -336,11 +336,11 @@ if [ "$velmodel" ]; then
   babieca)  . "$srcdir/sh/babieca"  ;;
   *)        . "$srcdir/sh/default"  ;;
   esac
-  [ "$run" ] && ./run-scecvm "-$run"
+  [ "$run" ] && ./scecvm-run "-$run"
 fi
 
 # Run SORD
-[ "$run" ] && ./run-sord "-$run"
+[ "$run" ] && ./sord-run "-$run"
 
 exit 0
 

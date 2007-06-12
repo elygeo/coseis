@@ -19,14 +19,15 @@
   vrup = 2300.;
   itcheck = 100;
 
-mpiio = 0;
-nt = 10;
   datadir = 'ts/4000/data';
-  np = [ 2 1 1 ] % Wide
+  np = [ 1 1 2 ] % Wide
   dx = 4000.;
   dt = .24;
   trelax = 2.4;
   nt = 375;
+nt = 20;
+mpiio = 1;
+debug = 0;
   nn = [  151   77  21 ];
   fixhypo = 1;
   ihypo = [   69   51  -2 ];

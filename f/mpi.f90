@@ -303,99 +303,60 @@ end do
 end subroutine
 
 ! Split communicator
-subroutine splitio( iz, nout, ditout )
+subroutine splitio( iz, n, color )
 use mpi
-integer, intent(in) :: iz, nout, ditout
+integer, intent(in) :: iz, n, color
 integer :: i, e
-if ( .not. allocated( commout ) ) allocate( commout(nout) )
-i = ditout
+if ( .not. allocated( commout ) ) allocate( commout(n) )
+i = color
 if ( i < 0 ) i = mpi_undefined
 call mpi_comm_split( comm3d, i, 0, commout(iz), e )
 end subroutine
 
 ! Scalar field input/output
-subroutine scalario( io, filename, r, s1, i1, i2, i3, i4, ir, iz )
+subroutine scalario( io, str, r, s1, i1, i2, i3, i4, ir, iz )
 use m_util
 use mpi
 real, intent(inout) :: r, s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, iz
-character(*), intent(in) :: io, filename
-integer :: i, np(3), ip3(3), e
-character(255) :: str
+character(*), intent(in) :: io, str
+integer :: i, ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
+integer(kind=mpi_offset_kind) :: d = 0
 if ( all( i1 == i2 ) .and. io == 'w' ) then
   r = s1(i1(1),i1(2),i1(3))
   return
 end if
-str = filename
-if ( iz < 0 ) then
-  if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
-    call mpi_comm_size( comm3d, np, e  )
-    call mpi_cart_coords( comm3d, ip, 3, ip3, e )
-    i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
-    write( str, '(a,i5.5)' ) trim( str ), i 
-  end if
-  call rio3( io, str, s1, i1, i2, ir )
-else
-  call prio3( io, str, s1, i1, i2, i3, i4, ir, iz )
-end if
-end subroutine
-
-! Vector field component input/output
-subroutine vectorio( io, filename, r, w1, ic, i1, i2, i3, i4, ir, iz )
-use m_util
-use mpi
-real, intent(inout) :: r, w1(:,:,:,:)
-integer, intent(in) :: ic, i1(3), i2(3), i3(3), i4(3), ir, iz
-character(*), intent(in) :: io, filename
-integer :: i, np(3), ip3(3), e
-character(255) :: str
-if ( all( i1 == i2 ) .and. io =='w' ) then
-  r = w1(i1(1),i1(2),i1(3),ic)
+if ( iz == -1 ) then
+  call rio3( io, str, s1, i3, i4, ir )
   return
 end if
-str = filename
-if ( iz < 0 ) then
-  if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
-    call mpi_comm_size( comm3d, np, e  )
-    call mpi_cart_coords( comm3d, ip, 3, ip3, e )
-    i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
-    write( str, '(a,i5.5)' ) trim( str ), i 
-  end if
-  call rio4( io, str, w1, i1, i2, ic, ir )
-else
-  call prio4( io, str, w1, i1, i2, i3, i4, ic, ir, iz )
-end if
-end subroutine
-
-! Scalar field input/output
-subroutine prio3( io, str, s1, i1, i2, i3, i4, ir, iz )
-use mpi
-real, intent(inout) :: s1(:,:,:)
-integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, iz
-character(*), intent(in) :: io, str
-integer :: i, ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
-integer(kind=mpi_offset_kind) :: d = 0
 nl = (/ i4 - i3 + 1, 1 /)
-n  = (/ i2 - i1 + 1, 1 /)
-i0 = (/ i3 - i1, ir - 1 /)
+if ( iz == 0 ) then
+  n  = (/ i4 - i3 + 1, ir /)
+  i0 = (/ i3 - i3, ir - 1 /)
+else
+  n  = (/ i2 - i1 + 1, ir /)
+  i0 = (/ i3 - i1, ir - 1 /)
+end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
 n  = (/ size(s1,1), size(s1,2), size(s1,3), 1 /)
-i0 = (/ i3 - 1, 1 /)
+i0 = (/ i3 - 1, 0 /)
 call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
 comm = comm3d
+if ( iz == 0 ) comm = mpi_comm_self
 select case( io )
 case( 'r' )
-  if ( iz /= 0 ) comm = comm2d(iz)
+  if ( iz > 0 ) comm = comm2d(iz)
   call mpi_file_open( comm, str, mpi_mode_rdonly, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
 case( 'w' )
+  if ( iz > 0 ) comm = commout(iz)
   i = 0
   if ( ir == 1 ) i = mpi_mode_create
-  if ( iz /= 0 ) comm = commout(iz)
   call mpi_file_open( comm, str, mpi_mode_wronly + i, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_write_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
@@ -406,34 +367,49 @@ call mpi_type_free( ftype, e )
 end subroutine
 
 ! Vector field component input/output
-subroutine prio4( io, str, w1, i1, i2, i3, i4, ic, ir, iz )
+subroutine vectorio( io, str, r, w1, i1, i2, i3, i4, ic, ir, iz )
+use m_util
 use mpi
-real, intent(inout) :: w1(:,:,:,:)
+real, intent(inout) :: r, w1(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ic, ir, iz
 character(*), intent(in) :: io, str
 integer :: i, ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
 integer(kind=mpi_offset_kind) :: d = 0
+if ( all( i1 == i2 ) .and. io =='w' ) then
+  r = w1(i1(1),i1(2),i1(3),ic)
+  return
+end if
+if ( iz == -1 ) then
+  call rio4( io, str, w1, i3, i4, ic, ir )
+  return
+end if
 nl = (/ i4 - i3 + 1, 1 /)
-n  = (/ i2 - i1 + 1, 1 /)
-i0 = (/ i3 - i1, ir - 1 /)
+if ( iz == 0 ) then
+  n  = (/ i4 - i3 + 1, ir /)
+  i0 = (/ i3 - i3, ir - 1 /)
+else
+  n  = (/ i2 - i1 + 1, ir /)
+  i0 = (/ i3 - i1, ir - 1 /)
+end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
 n  = (/ size(w1,1), size(w1,2), size(w1,3), size(w1,4) /)
-i0 = (/ i3 - 1,  ic - 1 /)
+i0 = (/ i3 - 1, ic - 1 /)
 call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
 comm = comm3d
+if ( iz == 0 ) comm = mpi_comm_self
 select case( io )
 case( 'r' )
-  if ( iz /= 0 ) comm = comm2d(iz)
+  if ( iz > 0 ) comm = comm2d(iz)
   call mpi_file_open( comm, str, mpi_mode_rdonly, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, w1(1,1,1,1), 1, mtype, mpi_status_ignore, e )
 case( 'w' )
+  if ( iz > 0 ) comm = commout(iz)
   i = 0
   if ( ir == 1 ) i = mpi_mode_create
-  if ( iz /= 0 ) comm = commout(iz)
   call mpi_file_open( comm, str, mpi_mode_wronly + i, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, d, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_write_all( fh, w1(1,1,1,1), 1, mtype, mpi_status_ignore, e )

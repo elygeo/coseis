@@ -1,1 +1,1 @@
-in/ts/ts4000.m
+in/mini-fault.m

@@ -73,28 +73,28 @@ case( 'r' )
   r = 0.
   select case( fieldin(iz) )
   case( 'rho' )
-    call scalario( 'r', 'data/rho', r, mr, i1, i2, i3, i4, 1, 0 )
+    call scalario( 'r', 'data/rho', r, mr, i1, i2, i3, i4, 1, -9 )
     select case( idoublenode )
     case( 1 ); j = ihypo(1); mr(j+1:j2+1,:,:) = mr(j:j2,:,:)
     case( 2 ); k = ihypo(2); mr(:,k+1:k2+1,:) = mr(:,k:k2,:)
     case( 3 ); l = ihypo(3); mr(:,:,l+1:l2+1) = mr(:,:,l:l2)
     end select
   case( 'vp'  )
-    call scalario( 'r', 'data/vp', r, s1, i1, i2, i3, i4, 1, 0 )
+    call scalario( 'r', 'data/vp', r, s1, i1, i2, i3, i4, 1, -9 )
     select case( idoublenode )
     case( 1 ); j = ihypo(1); s1(j+1:j2+1,:,:) = s1(j:j2,:,:)
     case( 2 ); k = ihypo(2); s1(:,k+1:k2+1,:) = s1(:,k:k2,:)
     case( 3 ); l = ihypo(3); s1(:,:,l+1:l2+1) = s1(:,:,l:l2)
     end select
   case( 'vs'  )
-    call scalario( 'r', 'data/vs', r, s2, i1, i2, i3, i4, 1, 0 )
+    call scalario( 'r', 'data/vs', r, s2, i1, i2, i3, i4, 1, -9 )
     select case( idoublenode )
     case( 1 ); j = ihypo(1); s2(j+1:j2+1,:,:) = s2(j:j2,:,:)
     case( 2 ); k = ihypo(2); s2(:,k+1:k2+1,:) = s2(:,k:k2,:)
     case( 3 ); l = ihypo(3); s2(:,:,l+1:l2+1) = s2(:,:,l:l2)
     end select
   case( 'gam'  )
-    call scalario( 'r', 'data/vs', r, s2, i1, i2, i3, i4, 1, 0 )
+    call scalario( 'r', 'data/vs', r, s2, i1, i2, i3, i4, 1, -9 )
     select case( idoublenode )
     case( 1 ); j = ihypo(1); gam(j+1:j2+1,:,:) = gam(j:j2,:,:)
     case( 2 ); k = ihypo(2); gam(:,k+1:k2+1,:) = gam(:,k:k2,:)
@@ -118,14 +118,8 @@ where ( s2 < vs1 ) s2 = vs1
 where ( s2 > vs2 ) s2 = vs2
 
 ! Fill halo and find extrema
-stats(1) =  maxval( mr )
-stats(2) =  maxval( s1 )
-stats(3) =  maxval( s2 )
-call scalarsethalo( mr, stats(1), i1cell, i2cell )
-call scalarsethalo( s1, stats(2), i1cell, i2cell )
-call scalarsethalo( s2, stats(3), i1cell, i2cell )
-i1 = ibc1
-i2 = ibc2
+i1 = abs( ibc1 )
+i2 = abs( ibc2 )
 where( i1 <= 1 ) i1 = 4
 where( i2 <= 1 ) i2 = 4
 call scalarbc( mr,  i1,   i2,   nhalo, 1 )
@@ -136,6 +130,9 @@ call scalarswaphalo( mr, nhalo )
 call scalarswaphalo( gam, nhalo )
 call scalarswaphalo( s1, nhalo )
 call scalarswaphalo( s2, nhalo )
+stats(1) =  maxval( mr )
+stats(2) =  maxval( s1 )
+stats(3) =  maxval( s2 )
 stats(4) = -minval( mr )
 stats(5) = -minval( s1 )
 stats(6) = -minval( s2 )

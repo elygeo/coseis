@@ -74,7 +74,7 @@
 % itcheck = -1;				% checkpoint just before finishing
   itcheck = 0;				% checkpointing off
   debug = 0;                            % debugging off
-  mpiio = 1;				% use MPIIO for output
+  mpiio = 1;				% -1=Fortran IO, 0=MPIIO separate, 1=MPIIO merged
 % out = { 'v'  10   1 1 1 1  -1 -1 -1 -1 };	% write v every 10 steps, 4D zone
 % out = { 'sl' -1   1 1 1 1  -1 -1 -1 -1 };	% write final slip length, 4D zone
 
