@@ -27,7 +27,6 @@
   nt = 375;
 nt = 20;
 mpiio = 1;
-debug = 0;
   nn = [  151   77  21 ];
   fixhypo = 1;
   ihypo = [   69   51  -2 ];
