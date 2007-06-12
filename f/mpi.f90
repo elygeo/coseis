@@ -320,7 +320,7 @@ use mpi
 real, intent(inout) :: r, s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, mpio
 character(*), intent(in) :: io, str
-integer :: i, ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
+integer :: i, ndims, ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
 integer(kind=mpi_offset_kind) :: d1 = 0
 if ( all( i1 == i2 ) .and. io == 'w' ) then
   r = s1(i1(1),i1(2),i1(3))
@@ -332,17 +332,36 @@ if ( mpio == 0 ) then
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 i0 = (/ i3-i1,   ir-1 /)
-n  = (/ i2-i1+1, ir   /)
-nl = (/ i4-i3+1, 1    /)
+n  = (/ i2-i1+1, ir /)
+nl = (/ i4-i3+1, 1 /)
+i = 4
 if ( mpio < 0 ) then
   i0 = (/ i0(1)+n(1)*i0(2), i0(3), ir-1, 0 /)
   n  = (/ n(1)*n(2),        n(3),  ir,   1 /)
   nl = (/ nl(1)*nl(2),      nl(3), 1,    1 /)
+  i = 3
 end if
-call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
+ndims = 4
+do i = 4, 1, -1
+if ( n(i) == 1 ) then
+  ndims = ndims - 1
+  i0(i:) = (/ i0(i+1:), 0 /)
+  n(i:)  = (/ n(i+1:),  1 /)
+  nl(i:) = (/ nl(i+1:), 1 /)
+end if
+end do
+if ( mpio < 0 ) then
+  ndims = ndims - 1
+  i0 = (/ i0(1)+n(1)*i0(2), i0(3:4), 0 /)
+  n  = (/ n(1)*n(2),        n(3:4),  1 /)
+  nl = (/ nl(1)*nl(2),      nl(3:4), 1 /)
+end if
+if ( ndims < 1 ) ndims = 1
+call mpi_type_create_subarray( ndims, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
-n  = (/ size(s1,1), size(s1,2), size(s1,3), 1 /)
 i0 = (/ i3-1, 0 /)
+n  = (/ size(s1,1), size(s1,2), size(s1,3), 1 /)
+nl = (/ i4-i3+1, 1 /)
 call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
 i = abs( mpio )
@@ -373,7 +392,7 @@ use mpi
 real, intent(inout) :: r, w1(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ic, ir, mpio
 character(*), intent(in) :: io, str
-integer :: i, ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
+integer :: i, ndims, ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
 integer(kind=mpi_offset_kind) :: d1 = 0
 if ( all( i1 == i2 ) .and. io =='w' ) then
   r = w1(i1(1),i1(2),i1(3),ic)
@@ -385,17 +404,29 @@ if ( mpio == 0 ) then
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 i0 = (/ i3-i1,   ir-1 /)
-n  = (/ i2-i1+1, ir   /)
-nl = (/ i4-i3+1, 1    /)
-if ( mpio < 0 ) then
-  i0 = (/ i0(1)+n(1)*i0(2), i0(3), ir-1, 0 /)
-  n  = (/ n(1)*n(2),        n(3),  ir,   1 /)
-  nl = (/ nl(1)*nl(2),      nl(3), 1,    1 /)
+n  = (/ i2-i1+1, ir /)
+nl = (/ i4-i3+1, 1 /)
+ndims = 4
+do i = 4, 1, -1
+if ( n(i) == 1 ) then
+  ndims = ndims - 1
+  i0(i:) = (/ i0(i+1:), 0 /)
+  n(i:)  = (/ n(i+1:),  1 /)
+  nl(i:) = (/ nl(i+1:), 1 /)
 end if
-call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
+end do
+if ( mpio < 0 ) then
+  ndims = ndims - 1
+  i0 = (/ i0(1)+n(1)*i0(2), i0(3:4), 0 /)
+  n  = (/ n(1)*n(2),        n(3:4),  1 /)
+  nl = (/ nl(1)*nl(2),      nl(3:4), 1 /)
+end if
+if ( ndims < 1 ) ndims = 1
+call mpi_type_create_subarray( ndims, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
 i0 = (/ i3-1, ic-1 /)
 n  = (/ size(w1,1), size(w1,2), size(w1,3), size(w1,4) /)
+nl = (/ i4-i3+1, 1 /)
 call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
 i = abs( mpio )
