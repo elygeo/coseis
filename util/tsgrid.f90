@@ -4,7 +4,7 @@ use m_tscoords
 implicit none
 real :: r, dx, h, o1, o2, xx, yy, h1, h2, h3, h4, ell(3), x0, y0, z0, &
   xf(6), yf(6), rf(6), zf, exag, mus, mud, tn, ts, rho, vp, vs, dc
-integer :: n(3), nn, npml, nrect, i, j, k, l, j1, k1, l1, j2, k2, l2, jf0, kf0, lf0, &
+integer :: np(3), n(3), npml, nrect, i, j, k, l, j1, k1, l1, j2, k2, l2, jf0, kf0, lf0, &
   nf, nf1, nf2, nf3
 real, allocatable :: x(:,:,:,:), w1(:,:,:,:), w2(:,:,:,:), s1(:,:,:), s2(:,:,:), t(:,:)
 character :: endian0, endian, b1(4), b2(4)
@@ -17,6 +17,9 @@ rho = 3000.
 vp = 7250.
 vs = 4200.
 dc = .5
+open( 1, file='np', status='old' )
+read( 1, * ) np
+close( 1 )
 open( 1, file='dx', status='old' )
 read( 1, * ) dx
 close( 1 )
@@ -49,7 +52,8 @@ close( 1 )
 
 ! Dimensions
 n = nint( ell / dx ) + 1
-print *, 'n =', n
+n(2) = n(2) + 1
+print *, 'nn =', n
 j = n(1)
 k = n(2)
 allocate( x(j,k,1,3) )
@@ -93,8 +97,7 @@ write( 1, * ) ' dt = ', dx * .00006, ';'
 write( 1, * ) ' dc = ', dc, ';'
 write( 1, * ) ' rho = ', rho, ';'
 write( 1, * ) ' vs = ', vs, ';'
-write( 1, * ) ' %n = [ ', n, ' ];'
-write( 1, * ) ' nn = [ ', n + (/ 0, 1, 0 /), ' ];'
+write( 1, * ) ' nn = [ ', n, ' ];'
 write( 1, * ) ' ihypo = [ ', jf0+j,     kf0, -1-l, ' ];'
 write( 1, * ) ' ihypo = [ ', jf0-j+nf1, kf0, -1-l, ' ];'
 write( 1, * ) ' mud = ', mud, ';'
@@ -137,6 +140,9 @@ do j = j1+1, j2-1
   x(j,k,1,2) = yf(i) + (yf(i+1)-yf(i)) / (rf(i+1)-rf(i)) * (dx*(j-jf0)-rf(i))
 end do
 
+! Fault double nodes
+x(:,kf0+1,1,:) = x(:,kf0,1,:)
+
 ! Orthogonal elements next to the fault
 j1 = jf0
 j2 = jf0 + nf1
@@ -153,8 +159,8 @@ do j = j1-1, j2+1
   h = sqrt( h1*h1 + h2*h2 )
   x(j,k-1,1,1) = x(j,k,1,1) + h2 * dx / h
   x(j,k-1,1,2) = x(j,k,1,2) - h1 * dx / h
-  x(j,k+1,1,1) = x(j,k,1,1) - h2 * dx / h
-  x(j,k+1,1,2) = x(j,k,1,2) + h1 * dx / h
+  x(j,k+2,1,1) = x(j,k,1,1) - h2 * dx / h
+  x(j,k+2,1,2) = x(j,k,1,2) + h1 * dx / h
 end do
 
 ! Blend fault to x-boundaries
@@ -175,7 +181,7 @@ k2 = kf0 - 1
 forall( k=k1+1:k2-1 )
   x(:,k,:,:) = x(:,k1,:,:)*(k2-k)/(k2-k1) + x(:,k2,:,:)*(k-k1)/(k2-k1)
 end forall
-k1 = kf0 + 1
+k1 = kf0 + 2
 k2 = n(2) - npml
 forall( k=k1+1:k2-1 )
   x(:,k,:,:) = x(:,k1,:,:)*(k2-k)/(k2-k1) + x(:,k2,:,:)*(k-k1)/(k2-k1)
@@ -258,6 +264,8 @@ end do
 z0 = sum( x(:,:,:,3) ) / ( n(1) * n(2) )
 print *, 'elevation range: ', minval( x(:,:,:,3) ), maxval( x(:,:,:,3) ), z0
 
+! Chunk here x -> w1
+
 ! 3D grid
 inquire( iolength=i ) x(:,:,:,1)
 open( 1, file='x1', recl=i, form='unformatted', access='direct', status='replace' )
@@ -292,6 +300,8 @@ forall( j=1:n(1)-1, k=1:n(2)-1, i=1:3 )
   w1(j,k,1,i) = .25 * ( x(j,k,1,i) + x(j,k,1,i) + x(j,k,1,i) + x(j,k,1,i) )
 end forall
 call ts2ll( w1, 1, 2 )
+
+! Chunk here w1 -> ?
 
 ! 3D lon/lat/depth
 inquire( iolength=i ) w1(:,:,:,1)

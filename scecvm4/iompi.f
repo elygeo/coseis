@@ -3,8 +3,7 @@
       subroutine readpts( kerr )
       include 'newin.h'
       include 'mpif.h'
-      integer(kind=mpi_offset_kind) mpioffset
-      integer(8) nnl, i64bit
+      integer(kind=mpi_offset_kind) mpioffset, nnl, i64bit
       character(160) str
       call mpi_init( ierr )
       call get_command_argument( 1, str )
@@ -53,8 +52,7 @@
       subroutine writepts( kerr )
       include 'newin.h'
       include 'mpif.h'
-      integer(kind=mpi_offset_kind) mpioffset
-      integer(8) nnl, i64bit
+      integer(kind=mpi_offset_kind) mpioffset, nnl, i64bit
       character(160) str
       call get_command_argument( 1, str )
       read( str, * ) nn

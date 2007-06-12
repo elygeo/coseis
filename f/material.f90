@@ -9,8 +9,8 @@ use m_collective
 use m_util
 use m_bc
 real :: x1(3), x2(3), stats(6), gstats(6), r
-integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, &
-  j1, k1, l1, j2, k2, l2, iz, idoublenode
+integer :: i1(3), i2(3), i3(3), i4(3), j, k, l, &
+  j1, k1, l1, j2, k2, l2, iz
 
 if ( master ) write( 0, * ) 'Material model'
 
@@ -43,8 +43,8 @@ case( 'z' )
   case( 'gam' ); gam(j1:j2,k1:k2,l1:l2) = inval(iz)
   end select
 case( 'c' )
-  i3 = 1
-  i4 = nm
+  i3 = i1node
+  i4 = i2cell
   x1 = x1in(iz,:)
   x2 = x2in(iz,:)
   select case( fieldin(iz) )
@@ -56,50 +56,15 @@ case( 'c' )
 case( 'r' )
   i3 = max( i1, i1node )
   i4 = min( i2, i2cell )
-  idoublenode = 0
-  if ( faultnormal /= 0 ) then
-    i = abs( faultnormal )
-    if ( ihypo(i) < i3(i) ) then
-      if ( ihypo(i) >= i1(i) ) i1(i) = i1(i) + 1
-    else
-      if ( ihypo(i) <  i2(i) ) i2(i) = i2(i) - 1
-      if ( ihypo(i) <= i4(i) ) idoublenode = i
-      if ( ihypo(i) <  i4(i) ) i4(i) = i4(i) - 1
-    end if
-  end if
   j1 = i3(1); j2 = i4(1)
   k1 = i3(2); k2 = i4(2)
   l1 = i3(3); l2 = i4(3)
   r = 0.
   select case( fieldin(iz) )
-  case( 'rho' )
-    call scalario( 'r', 'data/rho', r, mr, i1, i2, i3, i4, 1, -9 )
-    select case( idoublenode )
-    case( 1 ); j = ihypo(1); mr(j+1:j2+1,:,:) = mr(j:j2,:,:)
-    case( 2 ); k = ihypo(2); mr(:,k+1:k2+1,:) = mr(:,k:k2,:)
-    case( 3 ); l = ihypo(3); mr(:,:,l+1:l2+1) = mr(:,:,l:l2)
-    end select
-  case( 'vp'  )
-    call scalario( 'r', 'data/vp', r, s1, i1, i2, i3, i4, 1, -9 )
-    select case( idoublenode )
-    case( 1 ); j = ihypo(1); s1(j+1:j2+1,:,:) = s1(j:j2,:,:)
-    case( 2 ); k = ihypo(2); s1(:,k+1:k2+1,:) = s1(:,k:k2,:)
-    case( 3 ); l = ihypo(3); s1(:,:,l+1:l2+1) = s1(:,:,l:l2)
-    end select
-  case( 'vs'  )
-    call scalario( 'r', 'data/vs', r, s2, i1, i2, i3, i4, 1, -9 )
-    select case( idoublenode )
-    case( 1 ); j = ihypo(1); s2(j+1:j2+1,:,:) = s2(j:j2,:,:)
-    case( 2 ); k = ihypo(2); s2(:,k+1:k2+1,:) = s2(:,k:k2,:)
-    case( 3 ); l = ihypo(3); s2(:,:,l+1:l2+1) = s2(:,:,l:l2)
-    end select
-  case( 'gam'  )
-    call scalario( 'r', 'data/vs', r, s2, i1, i2, i3, i4, 1, -9 )
-    select case( idoublenode )
-    case( 1 ); j = ihypo(1); gam(j+1:j2+1,:,:) = gam(j:j2,:,:)
-    case( 2 ); k = ihypo(2); gam(:,k+1:k2+1,:) = gam(:,k:k2,:)
-    case( 3 ); l = ihypo(3); gam(:,:,l+1:l2+1) = gam(:,:,l:l2)
-    end select
+  case( 'rho' ); call scalario( 'r', 'data/rho', r, mr, i1, i2, i3, i4, 1, 0, chunk0 )
+  case( 'vp'  ); call scalario( 'r', 'data/vp',  r, s1, i1, i2, i3, i4, 1, 0, chunk0 )
+  case( 'vs'  ); call scalario( 'r', 'data/vs',  r, s2, i1, i2, i3, i4, 1, 0, chunk0 )
+  case( 'gam' ); call scalario( 'r', 'data/gam', r, s2, i1, i2, i3, i4, 1, 0, chunk0 )
   end select
 end select
 
@@ -122,10 +87,10 @@ i1 = abs( ibc1 )
 i2 = abs( ibc2 )
 where( i1 <= 1 ) i1 = 4
 where( i2 <= 1 ) i2 = 4
-call scalarbc( mr,  i1,   i2,   nhalo, 1 )
-call scalarbc( gam, i1,   i2,   nhalo, 1 )
-call scalarbc( s1,  ibc1, ibc2, nhalo, 1 )
-call scalarbc( s2,  ibc1, ibc2, nhalo, 1 )
+call scalarbc( mr,  i1, i2, nhalo, 1 )
+call scalarbc( gam, i1, i2, nhalo, 1 )
+call scalarbc( s1,  i1, i2, nhalo, 1 )
+call scalarbc( s2,  i1, i2, nhalo, 1 )
 call scalarswaphalo( mr, nhalo )
 call scalarswaphalo( gam, nhalo )
 call scalarswaphalo( s1, nhalo )

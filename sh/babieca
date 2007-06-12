@@ -14,7 +14,7 @@ cd "$rundir"
 if [ "\$pid" ]; then
   echo "Background job started with PID \$pid" >> log
   echo "Background job started with PID \$pid"
-else
+else :
   $post
 fi
 echo "\$( date ): Finish $code" >> log

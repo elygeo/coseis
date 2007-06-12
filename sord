@@ -78,7 +78,7 @@ set -- $params
 case "$key" in
   nt) nt=$1 ;;
   nn) nm3=( $1 $2 $3 ) ;;
-  np) np3=( $1 $2 $3 ) ;;
+  np) np3=( $1 $2 $3 ); echo "${np3[*]}" > np ;;
   dx)   echo "$1" > tmp/dx ;;
   npml) echo "$1" > tmp/npml ;;
   datadir) datadir="$1" ;;

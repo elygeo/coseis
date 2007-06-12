@@ -184,7 +184,8 @@ integer :: &
   i2out(nz,4),   & ! j2 k2 l2 output zone end index
   i3out(nz,3),   & ! j1 k1 l1 local output zone start index
   i4out(nz,3),   & ! j2 k2 l2 local output zone end index
-  mpiio,         & ! -1=Fortran IO, 0=MPIIO separate, 1=MPIIO merged
+  chunk0,        &
+  chunk1,        &
   ifile(nz),     & ! file output flag
   ibuff(nz)        ! buffered i/o flag
 

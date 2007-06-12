@@ -14,12 +14,20 @@ logical :: expand
 
 if ( master ) write( 0, * ) 'Grid generation'
 
-! Single node indexing
-idoublenode = 0
+! Read grid
 i1 = 1  + nnoff
 i2 = nn + nnoff
 i3 = i1node
 i4 = i2node
+if ( grid == 'read' ) then
+  r = 0.
+  call vectorio( 'r', 'data/x1', r, w1, i1, i2, i3, i4, 1, 1, 0, chunk0 )
+  call vectorio( 'r', 'data/x2', r, w1, i1, i2, i3, i4, 2, 1, 0, chunk0 )
+  call vectorio( 'r', 'data/x3', r, w1, i1, i2, i3, i4, 3, 1, 0, chunk0 )
+end if
+
+! Single node indexing
+idoublenode = 0
 if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
   if ( ihypo(i) < i3(i) ) then
@@ -34,18 +42,22 @@ j1 = i3(1); j2 = i4(1)
 k1 = i3(2); k2 = i4(2)
 l1 = i3(3); l2 = i4(3)
 
-! Read grid files or create basic rectangular mesh
-call vectorsethalo( w1, 0., i3, i4 )
-if ( grid /= 'read' ) then
+! Remove double nodes for now, or create basic rectangular mesh
+if ( grid == 'read' ) then
+  j = ihypo(1)
+  k = ihypo(2)
+  l = ihypo(3)
+  select case( idoublenode )
+  case( 1 ); w1(j:nm(1)-1,:,:,:) = w1(j+1:nm(1),:,:,:)
+  case( 2 ); w1(:,k:nm(2)-1,:,:) = w1(:,k+1:nm(2),:,:)
+  case( 3 ); w1(:,:,l:nm(3)-1,:) = w1(:,:,l+1:nm(3),:)
+  end select
+else
   forall( i=j1:j2 ) w1(i,:,:,1) = dx * ( i - i1(1) )
   forall( i=k1:k2 ) w1(:,i,:,2) = dx * ( i - i1(2) )
   forall( i=l1:l2 ) w1(:,:,i,3) = dx * ( i - i1(3) )
-else
-  r = 0.
-  call vectorio( 'r', 'data/x1', r, w1, i1, i2, i3, i4, 1, 1, -9 )
-  call vectorio( 'r', 'data/x2', r, w1, i1, i2, i3, i4, 2, 1, -9 )
-  call vectorio( 'r', 'data/x3', r, w1, i1, i2, i3, i4, 3, 1, -9 )
 end if
+call vectorsethalo( w1, 0., i3, i4 )
 
 ! Grid expansion
 expand = .false.

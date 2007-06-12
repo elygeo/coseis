@@ -37,11 +37,8 @@
   bc1      = [   0   0   0 ];
   n1expand = [  50  50  50 ];
 
-  itstats = 1;
   itcheck = 0;
   np = [ 1 1 2 ];
-np = [ 1 1 1 ];
-nt = 2;
 
 % rectangular
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ];
