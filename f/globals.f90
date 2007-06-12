@@ -184,8 +184,8 @@ integer :: &
   i2out(nz,4),   & ! j2 k2 l2 output zone end index
   i3out(nz,3),   & ! j1 k1 l1 local output zone start index
   i4out(nz,3),   & ! j2 k2 l2 local output zone end index
-  chunk0,        &
-  chunk1,        &
+  mpin,          & ! input, 0=separate files, 1=MPIIO
+  mpout,         & ! output, 0=separate files, 1=MPIIO
   ifile(nz),     & ! file output flag
   ibuff(nz)        ! buffered i/o flag
 

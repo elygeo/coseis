@@ -139,10 +139,10 @@ i = iz + nout + ditout
 end subroutine
 
 ! Scalar field input/output
-subroutine scalario( io, str, r, s1, i1, i2, i3, i4, ir, iz )
+subroutine scalario( io, str, r, s1, i1, i2, i3, i4, ir, mpio )
 use m_util
 real, intent(inout) :: r, s1(:,:,:)
-integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, iz
+integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, mpio
 character(*), intent(in) :: io, str
 integer :: i
 if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
@@ -156,14 +156,14 @@ if ( all( i1 == i2 ) .and. io == 'w' ) then
   return
 end if
 call rio3( io, str, s1, i1, i2, ir )
-i = i3(1) + i4(1) + iz
+i = i3(1) + i4(1) + mpio
 end subroutine
 
 ! Vector field component input/output
-subroutine vectorio( io, str, r, w1, i1, i2, i3, i4, ic, ir, iz )
+subroutine vectorio( io, str, r, w1, i1, i2, i3, i4, ic, ir, mpio )
 use m_util
 real, intent(inout) :: r, w1(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ic, ir, iz
+integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ic, ir, mpio
 character(*), intent(in) :: io, str
 integer :: i
 if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
@@ -177,7 +177,7 @@ if ( all( i1 == i2 ) .and. io == 'w' ) then
   return
 end if
 call rio4( io, str, w1, i1, i2, ic, ir )
-i = i3(1) + i4(1) + iz
+i = i3(1) + i4(1) + mpio
 end subroutine
 
 end module

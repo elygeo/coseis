@@ -60,11 +60,12 @@ case( 'r' )
   k1 = i3(2); k2 = i4(2)
   l1 = i3(3); l2 = i4(3)
   r = 0.
+  i = 4 * mpin
   select case( fieldin(iz) )
-  case( 'rho' ); call scalario( 'r', 'data/rho', r, mr, i1, i2, i3, i4, 1, 0, chunk0 )
-  case( 'vp'  ); call scalario( 'r', 'data/vp',  r, s1, i1, i2, i3, i4, 1, 0, chunk0 )
-  case( 'vs'  ); call scalario( 'r', 'data/vs',  r, s2, i1, i2, i3, i4, 1, 0, chunk0 )
-  case( 'gam' ); call scalario( 'r', 'data/gam', r, s2, i1, i2, i3, i4, 1, 0, chunk0 )
+  case( 'rho' ); call scalario( 'r', 'data/rho', r, mr, i1, i2, i3, i4, 1, i )
+  case( 'vp'  ); call scalario( 'r', 'data/vp',  r, s1, i1, i2, i3, i4, 1, i )
+  case( 'vs'  ); call scalario( 'r', 'data/vs',  r, s2, i1, i2, i3, i4, 1, i )
+  case( 'gam' ); call scalario( 'r', 'data/gam', r, s2, i1, i2, i3, i4, 1, i )
   end select
 end select
 

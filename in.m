@@ -40,10 +40,6 @@
   n1expand = [  50  50  50 ];
 
   itcheck = 0;
-mpiio = 0;
-mpiio = -1;
-np = [ 1 8 4 ];
-nt = 10;
 
 % rectangular
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ];
@@ -52,3 +48,8 @@ nt = 10;
   bc2      = [  -3   3  -2 ];
   n2expand = [   0   0   0 ];
 
+nn = [ 300 300 300 ];
+mpin  = 0;
+mpout = 0;
+np = [ 2 4 4 ];
+nt = 10;

@@ -314,62 +314,49 @@ call mpi_comm_split( comm3d, i, 0, commout(iz), e )
 end subroutine
 
 ! Scalar field input/output
-subroutine scalario( io, str, r, s1, i1, i2, i3, i4, ir, iz, chunk )
+subroutine scalario( io, str, r, s1, i1, i2, i3, i4, ir, mpio )
 use m_util
 use mpi
 real, intent(inout) :: r, s1(:,:,:)
-integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, iz, chunk
+integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, mpio
 character(*), intent(in) :: io, str
 integer :: i, ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
-integer(kind=mpi_offset_kind) :: d1, dn(4), dnl(4), di0(4)
+integer(kind=mpi_offset_kind) :: d1 = 0
 if ( all( i1 == i2 ) .and. io == 'w' ) then
   r = s1(i1(1),i1(2),i1(3))
   return
 end if
-if ( chunk == 0 .or. all( i1 == i3 .and. i2 == i4 ) ) then
+if ( mpio == 0 ) then
   call rio3( io, str, s1, i3, i4, ir )
   return
 end if
-n  = (/ i2 - i1 + 1, ir /)
-nl = (/ i4 - i3 + 1, 1 /)
-i0 = (/ i3 - i1, ir - 1 /)
-select case( chunk )
-case( 1 )
-  dn(1)  = n(1) * n(2) * n(3) * n(4)
-  dnl(1) = nl(1) * nl(2) * nl(3) * nl(4)
-  di0(1) = i0(1) + n(1) * ( i0(2) + n(2) * ( i0(3) + n(3) * i0(4) ) )
-case( 2 )
-  dn(1:2)  = (/ n(1) * n(2) * n(3), n(4) /)
-  dnl(1:2) = (/ nl(1) * nl(2) * nl(3), nl(4) /)
-  di0(1:2) = (/ i0(1) + n(1) * ( i0(2) + n(2) * i0(3) ), i0(4) /)
-case( 3 )
-  dn(1:3)  = (/ n(1) * n(2), n(3), n(4) /)
-  dnl(1:3) = (/ nl(1) * nl(2), nl(3), nl(4) /)
-  di0(1:3) = (/ i0(1) + n(1) * i0(2), i0(3), i0(4) /)
-case( 4 )
-  dn = n
-  dnl = nl
-  di0 = i0
-end select
-call mpi_type_create_subarray( chunk, dn, dnl, di0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
+i0 = (/ i3-i1,   ir-1 /)
+n  = (/ i2-i1+1, ir   /)
+nl = (/ i4-i3+1, 1    /)
+if ( mpio < 0 ) then
+  i0 = (/ i0(1)+n(1)*i0(2), i0(3), ir-1, 0 /)
+  n  = (/ n(1)*n(2),        n(3),  ir,   1 /)
+  nl = (/ nl(1)*nl(2),      nl(3), 1,    1 /)
+end if
+call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
 n  = (/ size(s1,1), size(s1,2), size(s1,3), 1 /)
-i0 = (/ i3 - 1, 0 /)
+i0 = (/ i3-1, 0 /)
 call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
-d1 = 0
-comm = comm3d
+i = abs( mpio )
 select case( io )
 case( 'r' )
-  if ( iz /= 0 ) comm = comm2d(abs(iz))
+  comm = comm3d
+  if ( i <= 3 ) comm = comm2d(i)
   call mpi_file_open( comm, str, mpi_mode_rdonly, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, d1, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
 case( 'w' )
+  comm = commout(i)
   i = 0
   if ( ir == 1 ) i = mpi_mode_create
-  if ( iz /= 0 ) comm = commout(abs(iz))
   call mpi_file_open( comm, str, mpi_mode_wronly + i, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, d1, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_write_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
@@ -380,61 +367,49 @@ call mpi_type_free( ftype, e )
 end subroutine
 
 ! Vector field component input/output
-subroutine vectorio( io, str, r, w1, i1, i2, i3, i4, ic, ir, iz, chunk )
+subroutine vectorio( io, str, r, w1, i1, i2, i3, i4, ic, ir, mpio )
 use m_util
 use mpi
 real, intent(inout) :: r, w1(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ic, ir, iz, chunk
+integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ic, ir, mpio
 character(*), intent(in) :: io, str
 integer :: i, ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
-integer(kind=mpi_offset_kind) :: d1, dn(4), dnl(4), di0(4)
+integer(kind=mpi_offset_kind) :: d1 = 0
 if ( all( i1 == i2 ) .and. io =='w' ) then
   r = w1(i1(1),i1(2),i1(3),ic)
   return
 end if
-if ( all( i1 == i3 .and. i2 == i4 ) ) then
+if ( mpio == 0 ) then
   call rio4( io, str, w1, i3, i4, ic, ir )
   return
 end if
-n  = (/ i2 - i1 + 1, ir /)
-nl = (/ i4 - i3 + 1, 1 /)
-i0 = (/ i3 - i1, ir - 1 /)
-select case( chunk )
-case( 1 )
-  dn(1)  = n(1) * n(2) * n(3) * n(4)
-  dnl(1) = nl(1) * nl(2) * nl(3) * nl(4)
-  di0(1) = i0(1) + n(1) * ( i0(2) + n(2) * ( i0(3) + n(3) * i0(4) ) )
-case( 2 )
-  dn(1:2)  = (/ n(1) * n(2) * n(3), n(4) /)
-  dnl(1:2) = (/ nl(1) * nl(2) * nl(3), nl(4) /)
-  di0(1:2) = (/ i0(1) + n(1) * ( i0(2) + n(2) * i0(3) ), i0(4) /)
-case( 3 )
-  dn(1:3)  = (/ n(1) * n(2), n(3), n(4) /)
-  dnl(1:3) = (/ nl(1) * nl(2), nl(3), nl(4) /)
-  di0(1:3) = (/ i0(1) + n(1) * i0(2), i0(3), i0(4) /)
-case( 4 )
-  dn = n
-  dnl = nl
-  di0 = i0
-end select
-call mpi_type_create_subarray( chunk, dn, dnl, di0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
+i0 = (/ i3-i1,   ir-1 /)
+n  = (/ i2-i1+1, ir   /)
+nl = (/ i4-i3+1, 1    /)
+if ( mpio < 0 ) then
+  i0 = (/ i0(1)+n(1)*i0(2), i0(3), ir-1, 0 /)
+  n  = (/ n(1)*n(2),        n(3),  ir,   1 /)
+  nl = (/ nl(1)*nl(2),      nl(3), 1,    1 /)
+end if
+call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
+i0 = (/ i3-1, ic-1 /)
 n  = (/ size(w1,1), size(w1,2), size(w1,3), size(w1,4) /)
-i0 = (/ i3 - 1, ic - 1 /)
 call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
-comm = comm3d
+i = abs( mpio )
 select case( io )
 case( 'r' )
-  if ( iz /= 0 ) comm = comm2d(abs(iz))
+  comm = comm3d
+  if ( i <= 3 ) comm = comm2d(i)
   call mpi_file_open( comm, str, mpi_mode_rdonly, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, d1, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, w1(1,1,1,1), 1, mtype, mpi_status_ignore, e )
 case( 'w' )
+  comm = commout(i)
   i = 0
   if ( ir == 1 ) i = mpi_mode_create
-  if ( iz /= 0 ) comm = commout(abs(iz))
   call mpi_file_open( comm, str, mpi_mode_wronly + i, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, d1, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_write_all( fh, w1(1,1,1,1), 1, mtype, mpi_status_ignore, e )
