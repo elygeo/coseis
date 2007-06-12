@@ -3,7 +3,6 @@
   nt = 100;
 debug = 1;
   np = [ 2 3 4 ];
-  np = [ 1 1 4 ];
   nn = [ 8 9 10 ];
   ihypo = [ 3 3 3 ];
   faultnormal = 3;
