@@ -76,9 +76,9 @@ s/ $//;
 while read key params; do
 set -- $params
 case "$key" in
-  nt) nt=$1; echo "$nt" > tmp/nt ;;
-  nn) nm3=( $1 $2 $3 ); echo "${nm3[*]}" > tmp/nn ;;
-  np) np3=( $1 $2 $3 ); echo "${np3[*]}" > tmp/np ;;
+  nt) nt=$1 ;;
+  nn) nm3=( $1 $2 $3 ); echo "$1 $2 $3" > tmp/nn ;;
+  np) np3=( $1 $2 $3 ); echo "$1 $2 $3" > tmp/np ;;
   dx)   echo "$1" > tmp/dx ;;
   npml) echo "$1" > tmp/npml ;;
   datadir) datadir="$1" ;;
@@ -327,7 +327,7 @@ if [ "$velmodel" ]; then
   mv ts1 x1 x2 x3 meta.m "$rundir/data/"
   code="scecvm"
   pre="cd vm"
-  bin="./scecvm4-$mode $( cat nc ) rlon rlat rdep rho vp vs"
+  bin="./scecvm4-$mode nc rlon rlat rdep rho vp vs"
   post="mv vm/rho vm/vp vm/vs data"
   walltime="00:30:00"
   cd "$rundir"

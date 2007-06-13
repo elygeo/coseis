@@ -7,7 +7,9 @@
       character(160) str
       call mpi_init( ierr )
       call get_command_argument( 1, str )
-      read( str, * ) nn
+      open( 1, file=str, status='old' )
+      read( 1, * ) nn
+      close( 1 )
       call mpi_comm_rank( mpi_comm_world, impirank, ierr )
       call mpi_comm_size( mpi_comm_world, impisize, ierr )
       call mpi_file_set_errhandler( mpi_file_null,
@@ -54,8 +56,6 @@
       include 'mpif.h'
       integer(kind=mpi_offset_kind) mpioffset, nnl, i64bit
       character(160) str
-      call get_command_argument( 1, str )
-      read( str, * ) nn
       call mpi_comm_rank( mpi_comm_world, impirank, ierr )
       call mpi_comm_size( mpi_comm_world, impisize, ierr )
       call mpi_file_set_errhandler( mpi_file_null,

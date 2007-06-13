@@ -5,7 +5,9 @@
       include 'newin.h'
       write( 0, * ) 'SCEC Velocity Model version 4'
       call get_command_argument( 1, str )
-      read( str, * ) nn
+      open( 1, file=str, status='old' )
+      read( 1, * ) nn
+      close( 1 )
       if( nn > ibig ) stop 'ibig too small'
       call get_command_argument( 2, str )
       open( 1, file=str, recl=4*nn, form='unformatted', access='direct',

@@ -26,7 +26,7 @@
   trelax = 2.4;
   nt = 375;
 nt = 20;
-mpiio = 1;
+mpout = 1;
   nn = [  151   77  21 ];
   fixhypo = 1;
   ihypo = [   69   51  -2 ];

@@ -11,6 +11,7 @@ character :: endian0, endian, b1(4), b2(4)
 equivalence (h1,b1), (h2,b2)
 
 ! Model parameters
+print '(a)', 'TeraShake grid generation'
 mus = 1.06
 mud = .5;  tn = -20e6
 rho = 3000.
