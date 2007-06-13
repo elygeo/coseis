@@ -19,7 +19,7 @@ if ( master ) write( 0, * ) 'Fault initialization'
 mus = 0.
 mud = 0.
 dc = 0.
-co = huge( 0. )
+co = 0.
 t1 = 0.
 t2 = 0.
 t3 = 0.
@@ -115,14 +115,7 @@ if ( rr > 0. ) write( 0, * ) 'warning: positive normal traction: ', rr, i1
 ! Lock fault in PML region
 i1 = max( i1pml + 1, 1 )
 i2 = min( i2pml - 1, nm )
-i1(ifn) = 1
-i2(ifn) = 1
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-f1 = co
-co = huge( 0. )
-co(j1:j2,k1:k2,l1:l2) = f1(j1:j2,k1:k2,l1:l2)
+call scalarsethalo( co, 1e20, i1, i2 )
 
 ! Normal vectors
 i1 = i1node
