@@ -15,8 +15,8 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 i1 = abs( ibc1 )
 i2 = abs( ibc2 )
-where ( nm == 1 ) i1 = -9
-where ( nm == 1 ) i2 = -9
+where ( nm == 1 ) i1 = 99
+where ( nm == 1 ) i2 = 99
 
 ! Zero BC
 if ( i1(1) <= 1 ) forall( i=1:nhalo ) f(j1-i,:,:) = 0.
@@ -73,8 +73,8 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 i1 = abs( ibc1 )
 i2 = abs( ibc2 )
-where ( nm == 1 ) i1 = -9
-where ( nm == 1 ) i2 = -9
+where ( nm == 1 ) i1 = 99
+where ( nm == 1 ) i2 = 99
 
 ! Zero BC
 if ( i1(1) <= 1 ) forall( i=1:nhalo ) f(j1-i,:,:,:) = 0.
