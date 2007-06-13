@@ -311,7 +311,7 @@ do i = 1,3
   xlim(i) = minval( s2 )
   xlim(i+3) = -maxval( s2 )
 end do
-call rreduce1( gxlim, xlim, 'min', 0 )
+call rreduce1( gxlim, xlim, 'allmin', 0 )
 xcenter = .5 * ( gxlim(1:3) - gxlim(4:6) )
 s2 = ( w1(:,:,:,1) - xcenter(1) ) * ( w1(:,:,:,1) - xcenter(1) ) &
    + ( w1(:,:,:,2) - xcenter(2) ) * ( w1(:,:,:,2) - xcenter(2) ) &

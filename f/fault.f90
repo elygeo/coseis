@@ -8,6 +8,7 @@ subroutine fault_init
 use m_globals
 use m_collective
 use m_surfnormals
+use m_bc
 use m_util
 real :: x1(3), x2(3), rr
 integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
