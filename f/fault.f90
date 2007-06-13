@@ -57,8 +57,8 @@ case( 'z' )
   i1 = i1in(iz,:)
   i2 = i2in(iz,:)
   call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
-  i1 = max( i1, i1node )
-  i2 = min( i2, i2node )
+  i1 = max( i1, 1 )
+  i2 = min( i2, nm )
   i1(ifn) = 1
   i2(ifn) = 1
   j1 = i1(1); j2 = i2(1)
@@ -181,7 +181,7 @@ do i = 1, 3
 end do
 rhypo = sqrt( sum( t2 * t2, 4 ) )
 
-! Save for output
+! Save for output FIXME
 muf = mu(j1:j2,k1:k2,l1:l2)
 tn = sum( t0 * nhat, 4 )
 do i = 1, 3
@@ -195,6 +195,14 @@ t1 = 0.
 t2 = 0.
 
 ! Halos
+call scalarbc( mus,   ibc1, ibc2, nhalo, 0 )
+call scalarbc( mud,   ibc1, ibc2, nhalo, 0 )
+call scalarbc( dc,    ibc1, ibc2, nhalo, 0 )
+call scalarbc( co,    ibc1, ibc2, nhalo, 0 )
+call scalarbc( area,  ibc1, ibc2, nhalo, 0 )
+call scalarbc( rhypo, ibc1, ibc2, nhalo, 0 )
+call vectorbc( nhat,  ibc1, ibc2, nhalo )
+call vectorbc( t0,    ibc1, ibc2, nhalo )
 call scalarswaphalo( mus, nhalo )
 call scalarswaphalo( mud, nhalo )
 call scalarswaphalo( dc, nhalo )
