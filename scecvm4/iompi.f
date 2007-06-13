@@ -15,7 +15,7 @@
       call mpi_file_set_errhandler( mpi_file_null,
      $  MPI_ERRORS_ARE_FATAL, ierr )
       nnl = nn / impisize
-      if( impirank == 0 ) write( 0, * ) 'SCEC Velocity Model version 4'
+      if( impirank == 0 ) write(0,'(a)') 'SCEC Velocity Model version 4'
       if( nnl > ibig ) stop 'ibig too small'
       i64bit = impisize
       if( modulo(nnl,i64bit) /= 0 ) nnl = nnl+1

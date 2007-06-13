@@ -3,7 +3,7 @@
       subroutine readpts( kerr )
       character(160) :: str
       include 'newin.h'
-      write( 0, * ) 'SCEC Velocity Model version 4'
+      write( 0, '(a)' ) 'SCEC Velocity Model version 4'
       call get_command_argument( 1, str )
       open( 1, file=str, status='old' )
       read( 1, * ) nn

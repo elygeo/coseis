@@ -11,7 +11,7 @@ character :: endian0, endian, b1(4), b2(4)
 equivalence (h1,b1), (h2,b2)
 
 ! Model parameters
-print '(a)', 'TeraShake grid generation'
+print '(a)', 'TeraShake Grid Generation'
 mus = 1.06
 mud = .5;  tn = -20e6
 rho = 3000.
@@ -185,7 +185,6 @@ k2 = n(2) - npml
 forall( k=k1+1:k2-1 )
   x(:,k,:,:) = x(:,k1,:,:)*(k2-k)/(k2-k1) + x(:,k2,:,:)*(k-k1)/(k2-k1)
 end forall
-print *, x(1,:,1,2)
 
 ! lon/lat
 j = n(1)
