@@ -49,9 +49,9 @@ if ( grid == 'read' ) then
   k = ihypo(2)
   l = ihypo(3)
   select case( idoublenode )
-  case( 1 ); w1(j:nm(1)-1,:,:,:) = w1(j+1:nm(1),:,:,:)
-  case( 2 ); w1(:,k:nm(2)-1,:,:) = w1(:,k+1:nm(2),:,:)
-  case( 3 ); w1(:,:,l:nm(3)-1,:) = w1(:,:,l+1:nm(3),:)
+  case( 1 ); w1(j+1:nm(1)-1,:,:,:) = w1(j+2:nm(1),:,:,:)
+  case( 2 ); w1(:,k+1:nm(2)-1,:,:) = w1(:,k+2:nm(2),:,:)
+  case( 3 ); w1(:,:,l+1:nm(3)-1,:) = w1(:,:,l+2:nm(3),:)
   end select
 else
   forall( i=j1:j2 ) w1(i,:,:,1) = dx * ( i - i1(1) )

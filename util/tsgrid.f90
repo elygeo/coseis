@@ -24,7 +24,6 @@ close( 1 )
 open( 1, file='dx', status='old' )
 read( 1, * ) dx
 close( 1 )
-print *, 'dx =', dx
 open( 1, file='npml', status='old' )
 read( 1, * ) npml
 close( 1 )
@@ -34,6 +33,7 @@ close( 1 )
 open( 1, file='endian0', status='old' )
 read( 1, * ) endian0
 close( 1 )
+print *, 'dx =', dx
 print *, 'npml =', npml
 ell = (/ 600, 300, 80 /) * 1000
 xf = (/ 265864.,293831.,338482.,364062.,390075.,459348. /)
@@ -55,16 +55,9 @@ close( 1 )
 n = nint( ell / dx ) + 1
 n(2) = n(2) + 1
 print *, 'nn =', n
-j = n(1)
-k = n(2)
-allocate( x(j,k,1,3) )
 open( 1, file='nc' )
 write( 1, * ) product( n - 1 )
 close( 1 )
-
-! 2D mesh
-forall( i=1:n(1) ) x(i,:,:,1) = dx*(i-1)
-forall( i=1:n(2) ) x(:,i,:,2) = dx*(i-1)
 
 ! Fault length
 nf = size( xf, 1 )
@@ -128,6 +121,11 @@ write( 1, * ) ' out{4}      = { 1 ''vs''   0   1 1 1 0 ', n-1, ' 0 };'
 write( 1, * ) ' out{5}      = { 1 ''ts1''  0   1 1 1 0 ', n, ' 0 };'
 close( 1 )
 
+! 2D mesh
+allocate( x(n(1),n(2),1,3) )
+forall( i=1:n(1) ) x(i,:,:,1) = dx*(i-1)
+forall( i=1:n(2) ) x(:,i,:,2) = dx*(i-1)
+
 ! Interpolate fault
 j1 = 1 + npml
 j2 = n(1) - npml
@@ -142,7 +140,7 @@ do j = j1+1, j2-1
 end do
 
 ! Fault double nodes
-x(:,kf0+1,1,:) = x(:,kf0,1,:)
+x(:,kf0+1:n(2),1,:) = x(:,kf0:n(2)-1,1,:)
 
 ! Orthogonal elements next to the fault
 j1 = jf0
@@ -187,6 +185,7 @@ k2 = n(2) - npml
 forall( k=k1+1:k2-1 )
   x(:,k,:,:) = x(:,k1,:,:)*(k2-k)/(k2-k1) + x(:,k2,:,:)*(k-k1)/(k2-k1)
 end forall
+print *, x(1,:,1,2)
 
 ! lon/lat
 j = n(1)
