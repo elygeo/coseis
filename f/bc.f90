@@ -15,8 +15,24 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 i1 = abs( ibc1 )
 i2 = abs( ibc2 )
-where ( nm == 1 ) i1 = -1
-where ( nm == 1 ) i2 = -1
+where ( nm == 1 ) i1 = -9
+where ( nm == 1 ) i2 = -9
+
+! Zero BC
+if ( i1(1) <= 1 ) forall( i=1:nhalo ) f(j1-i,:,:) = 0.
+if ( i1(2) <= 1 ) forall( i=1:nhalo ) f(:,k1-i,:) = 0.
+if ( i1(3) <= 1 ) forall( i=1:nhalo ) f(:,:,l1-i) = 0.
+if ( i2(1) <= 1 ) forall( i=1:nhalo ) f(j2+i,:,:) = 0.
+if ( i2(2) <= 1 ) forall( i=1:nhalo ) f(:,k2+i,:) = 0.
+if ( i2(3) <= 1 ) forall( i=1:nhalo ) f(:,:,l2+i) = 0.
+
+! Continuing BC
+if ( i1(1) == 4 ) forall( i=1:nhalo ) f(j1-i,:,:) = f(j1,:,:)
+if ( i1(2) == 4 ) forall( i=1:nhalo ) f(:,k1-i,:) = f(:,k1,:)
+if ( i1(3) == 4 ) forall( i=1:nhalo ) f(:,:,l1-i) = f(:,:,l1)
+if ( i2(1) == 4 ) forall( i=1:nhalo ) f(j2+i,:,:) = f(j2,:,:)
+if ( i2(2) == 4 ) forall( i=1:nhalo ) f(:,k2+i,:) = f(:,k2,:)
+if ( i2(3) == 4 ) forall( i=1:nhalo ) f(:,:,l2+i) = f(:,:,l2)
 
 ! Mirror on cell BC
 if ( cell /= 0 ) then
@@ -42,14 +58,6 @@ if ( i2(1) == 3 ) forall( i=1:nhalo ) f(j2+i,:,:) = f(j2-i+cell,:,:)
 if ( i2(2) == 3 ) forall( i=1:nhalo ) f(:,k2+i,:) = f(:,k2-i+cell,:)
 if ( i2(3) == 3 ) forall( i=1:nhalo ) f(:,:,l2+i) = f(:,:,l2-i+cell)
 
-! Continuing BC
-if ( i1(1) == 4 ) forall( i=1:nhalo ) f(j1-i,:,:) = f(j1,:,:)
-if ( i1(2) == 4 ) forall( i=1:nhalo ) f(:,k1-i,:) = f(:,k1,:)
-if ( i1(3) == 4 ) forall( i=1:nhalo ) f(:,:,l1-i) = f(:,:,l1)
-if ( i2(1) == 4 ) forall( i=1:nhalo ) f(j2+i,:,:) = f(j2,:,:)
-if ( i2(2) == 4 ) forall( i=1:nhalo ) f(:,k2+i,:) = f(:,k2,:)
-if ( i2(3) == 4 ) forall( i=1:nhalo ) f(:,:,l2+i) = f(:,:,l2)
-
 end subroutine
 
 subroutine vectorbc( f, ibc1, ibc2, nhalo )
@@ -65,8 +73,16 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 i1 = abs( ibc1 )
 i2 = abs( ibc2 )
-where ( nm == 1 ) i1 = 0
-where ( nm == 1 ) i2 = 0
+where ( nm == 1 ) i1 = -9
+where ( nm == 1 ) i2 = -9
+
+! Zero BC
+if ( i1(1) <= 1 ) forall( i=1:nhalo ) f(j1-i,:,:,:) = 0.
+if ( i1(2) <= 1 ) forall( i=1:nhalo ) f(:,k1-i,:,:) = 0.
+if ( i1(3) <= 1 ) forall( i=1:nhalo ) f(:,:,l1-i,:) = 0.
+if ( i2(1) <= 1 ) forall( i=1:nhalo ) f(j2+i,:,:,:) = 0.
+if ( i2(2) <= 1 ) forall( i=1:nhalo ) f(:,k2+i,:,:) = 0.
+if ( i2(3) <= 1 ) forall( i=1:nhalo ) f(:,:,l2+i,:) = 0.
 
 ! Continuing BC
 if ( i1(1) == 4 ) forall( i=1:nhalo ) f(j1-i,:,:,:) = f(j1,:,:,:)

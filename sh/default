@@ -16,7 +16,7 @@ case "\${1:--i}$mode" in
 esac
 cd "$rundir"
 if [ "\$pid" ]; then
-  echo "Background job started with PID \$pid" >> log
+  echo "\$(date): Start $code in background: \$pid" >> log
   echo "Background job started with PID \$pid"
 else :
   $post

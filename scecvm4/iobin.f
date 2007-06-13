@@ -8,7 +8,10 @@
       open( 1, file=str, status='old' )
       read( 1, * ) nn
       close( 1 )
-      if( nn > ibig ) stop 'ibig too small'
+      if ( nn > ibig ) then
+         print *, 'Error: nn greater than ibig', nn , big
+         stop
+      end if
       call get_command_argument( 2, str )
       open( 1, file=str, recl=4*nn, form='unformatted', access='direct',
      $  status='old' )
