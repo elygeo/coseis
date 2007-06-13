@@ -71,7 +71,7 @@ end do
 
 ! Finish up
 if ( master ) then
-  call rwrite1( 'prof', prof(1:i*4), it*4 )
+  if ( i /= itio ) call rwrite1( 'prof', prof(1:i*4), it*4 )
   prof0(1) = timer( 3 )
   prof0(2) = timer( 4 )
   call rwrite1( 'prof0', prof0(1:2), 18 )
