@@ -223,7 +223,7 @@ if ( it > 0 .and. dofault ) then
     rr = -2. * abs( minval( tn ) ) - 1.
     call scalarsethalo( tn, rr, i1node, i2node )
     fstats(i,7) = maxval( tn )
-    rr = 2. * abs( fstats(7,i) ) + 1.
+    rr = 2. * abs( fstats(i,7) ) + 1.
     call scalarsethalo( tn, rr, i1node, i2node )
     fstats(i,8) = -minval( tn )
     estats(i,1) = efric
@@ -288,7 +288,7 @@ do ic = 1, nc
   if ( nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic
   if ( mpout == 0 ) then
     i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
-    if ( any( i1 /= i3 .or. i2 /= i4 ) ) write( str, '(a,i5.5)' ) trim( str ), i
+    if ( any( i1 /= i3 .or. i2 /= i4 ) ) write( str, '(a,i6.6)' ) trim( str ), i
   end if
   i = mpout * iz
   select case( fieldout(iz) )

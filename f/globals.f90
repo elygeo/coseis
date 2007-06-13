@@ -7,7 +7,7 @@ real, parameter :: &
 
 integer, parameter :: &
   nz = 100,      & ! max number of input and output zones
-  itio = 50,     & ! buffersize for i/o, must be at least 4
+  itio = 50,     & ! buffersize for i/o
   nhalo = 1        ! number of ghost nodes
 
 ! 4d vectors
