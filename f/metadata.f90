@@ -132,6 +132,17 @@ do iz = 1, nout
 end do
 close( 1 )
 
+open( 1, file='out/hdr', status='replace' )
+write( 1, * ) nn
+write( 1, * ) np
+do iz = 1, nout
+  i1 = i1out(iz,:) - (/ nnoff, 0 /)
+  i2 = i2out(iz,:) - (/ nnoff, 0 /)
+  call outprops( fieldout(iz), nc, onpass, fault, cell )
+  do i = 1, nc
+    write( 1, '(i2.2,a,i1,9i7)' ) iz, trim(fieldout(iz)), i, ditout(iz), i1, i2
+  end do
+end do
 end subroutine
 
 end module

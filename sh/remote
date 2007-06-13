@@ -8,7 +8,8 @@ accounts="\
   ux451302@tg-login2.sdsc.teragrid.org
   ux451302@dslogin.sdsc.edu
   altai.sdsu.edu
-  moho.sdsu.edu"
+  moho.sdsu.edu
+  kim"
 
 files="\
   versionmeta.m
