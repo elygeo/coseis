@@ -208,6 +208,7 @@ x1 = .5 * ( dlon * n1 - dlon ) / cos( lat0 * pi / 180. )
 x2 = .5 * ( dlat * n2 - dlat ) * cos( lat0 * pi / 180. )
 write( 2, '(a)' ) '<GroundOverlay>'
 write( 2, * )    ' <name>'//trim(str)//'</name>'
+write( 2, * )    ' <color>bbffffff</color>'
 write( 2, * )    ' <Icon><href>'//trim(str)//'.png</href></Icon>'
 write( 2, * )    ' <LatLonBox>'
 write( 2, * )    '   <north>', lat0 + x2, '</north>'

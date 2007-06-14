@@ -21,12 +21,12 @@
 
   datadir = 'ts/4000/data';
   np = [ 1 1 2 ] % Wide
+  mpin = 1;
+  mpout = 1;
   dx = 4000.;
   dt = .24;
   trelax = 2.4;
   nt = 375;
-np = [ 2 3 4 ]
-nt = 50;
   nn = [  151   77  21 ];
   fixhypo = 1;
   ihypo = [   69   51  -2 ];
