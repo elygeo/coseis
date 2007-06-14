@@ -334,13 +334,6 @@ call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 i0 = (/ i3-i1,   ir-1 /)
 n  = (/ i2-i1+1, ir /)
 nl = (/ i4-i3+1, 1 /)
-i = 4
-if ( mpio < 0 ) then
-  i0 = (/ i0(1)+n(1)*i0(2), i0(3), ir-1, 0 /)
-  n  = (/ n(1)*n(2),        n(3),  ir,   1 /)
-  nl = (/ nl(1)*nl(2),      nl(3), 1,    1 /)
-  i = 3
-end if
 ndims = 4
 do i = 4, 1, -1
 if ( n(i) == 1 ) then
@@ -351,10 +344,15 @@ if ( n(i) == 1 ) then
 end if
 end do
 if ( mpio < 0 ) then
-  ndims = ndims - 1
-  i0 = (/ i0(1)+n(1)*i0(2), i0(3:4), 0 /)
-  n  = (/ n(1)*n(2),        n(3:4),  1 /)
-  nl = (/ nl(1)*nl(2),      nl(3:4), 1 /)
+  do i = 1, 3
+  if ( n(i) == nl(i) ) then
+    i0(i:) = (/ i0(i)+n(i)*i0(i+1), i0(i+2:), 0 /)
+    n(i:)  = (/ n(i)*n(i+1),        n(i+2:),  1 /)
+    nl(i:) = (/ nl(i)*nl(i+1),      nl(i+2:), 1 /)
+    ndims = ndims - 1
+    exit ! only do this once to prevent 32 bit overrun
+  end if
+  end do
 end if
 if ( ndims < 1 ) ndims = 1
 call mpi_type_create_subarray( ndims, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
@@ -416,10 +414,15 @@ if ( n(i) == 1 ) then
 end if
 end do
 if ( mpio < 0 ) then
-  ndims = ndims - 1
-  i0 = (/ i0(1)+n(1)*i0(2), i0(3:4), 0 /)
-  n  = (/ n(1)*n(2),        n(3:4),  1 /)
-  nl = (/ nl(1)*nl(2),      nl(3:4), 1 /)
+  do i = 1, 3
+  if ( n(i) == nl(i) ) then
+    i0(i:) = (/ i0(i)+n(i)*i0(i+1), i0(i+2:), 0 /)
+    n(i:)  = (/ n(i)*n(i+1),        n(i+2:),  1 /)
+    nl(i:) = (/ nl(i)*nl(i+1),      nl(i+2:), 1 /)
+    ndims = ndims - 1
+    exit ! only do this once to prevent 32 bit overrun
+  end if
+  end do
 end if
 if ( ndims < 1 ) ndims = 1
 call mpi_type_create_subarray( ndims, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )

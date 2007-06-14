@@ -85,5 +85,5 @@ for file in "$srcdir"/scecvm4/* "$srcdir"/util/getarg*; do
 done
 $sfc $vmflags $getarg iobin.f scecvm4.f -o scecvm4-s
 $pfc $vmflags $getarg iompi.f scecvm4.f -o scecvm4-p
-rm -f *.mod *.f *.h
+rm -f *.mod *.f *.f90
 

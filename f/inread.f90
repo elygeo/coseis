@@ -7,7 +7,7 @@ subroutine inread
 use m_globals
 integer :: i, io
 logical :: inzone
-character(11) :: key
+character(12) :: key
 character(255) :: line
 
 open( 1, file='input', status='old' )
@@ -28,70 +28,70 @@ inzone = .false.
 select case( key )
 case( '' )
 case( 'datadir' )
-case( 'return' );      exit doline
-case( 'grid' );        grid = str
-case( 'rfunc' );       rfunc = str
-case( 'tfunc' );       tfunc = str
-case( 'oplevel' );     read( str, *, iostat=io ) oplevel
-case( 'affine' );      read( str, *, iostat=io ) affine
-case( 'gridnoise' );   read( str, *, iostat=io ) gridnoise
-case( 'symmetry' );    read( str, *, iostat=io ) symmetry
-case( 'fixhypo' );     read( str, *, iostat=io ) fixhypo
-case( 'nn' );          read( str, *, iostat=io ) nn
-case( 'nt' );          read( str, *, iostat=io ) nt
-case( 'dx' );          read( str, *, iostat=io ) dx
-case( 'dt' );          read( str, *, iostat=io ) dt
-case( 'slipvector' );  read( str, *, iostat=io ) slipvector
-case( 'hourglass' );   read( str, *, iostat=io ) hourglass
-case( 'vdamp' );       read( str, *, iostat=io ) vdamp
-case( 'rho1' );        read( str, *, iostat=io ) rho1
-case( 'vp1' );         read( str, *, iostat=io ) vp1
-case( 'vs1' );         read( str, *, iostat=io ) vs1
-case( 'rho2' );        read( str, *, iostat=io ) rho2
-case( 'vp2' );         read( str, *, iostat=io ) vp2
-case( 'vs2' );         read( str, *, iostat=io ) vs2
-case( 'npml' );        read( str, *, iostat=io ) npml
-case( 'bc1' );         read( str, *, iostat=io ) bc1
-case( 'bc2' );         read( str, *, iostat=io ) bc2
-case( 'xhypo' );       read( str, *, iostat=io ) xhypo
-case( 'rsource' );     read( str, *, iostat=io ) rsource
-case( 'tsource' );     read( str, *, iostat=io ) tsource
-case( 'moment1' );     read( str, *, iostat=io ) moment1
-case( 'moment2' );     read( str, *, iostat=io ) moment2
-case( 'faultnormal' ); read( str, *, iostat=io ) faultnormal
+case( 'return' );       exit doline
+case( 'grid' );         grid = str
+case( 'rfunc' );        rfunc = str
+case( 'tfunc' );        tfunc = str
+case( 'oplevel' );      read( str, *, iostat=io ) oplevel
+case( 'affine' );       read( str, *, iostat=io ) affine
+case( 'gridnoise' );    read( str, *, iostat=io ) gridnoise
+case( 'symmetry' );     read( str, *, iostat=io ) symmetry
+case( 'fixhypo' );      read( str, *, iostat=io ) fixhypo
+case( 'nn' );           read( str, *, iostat=io ) nn
+case( 'nt' );           read( str, *, iostat=io ) nt
+case( 'dx' );           read( str, *, iostat=io ) dx
+case( 'dt' );           read( str, *, iostat=io ) dt
+case( 'slipvector' );   read( str, *, iostat=io ) slipvector
+case( 'hourglass' );    read( str, *, iostat=io ) hourglass
+case( 'vdamp' );        read( str, *, iostat=io ) vdamp
+case( 'rho1' );         read( str, *, iostat=io ) rho1
+case( 'vp1' );          read( str, *, iostat=io ) vp1
+case( 'vs1' );          read( str, *, iostat=io ) vs1
+case( 'rho2' );         read( str, *, iostat=io ) rho2
+case( 'vp2' );          read( str, *, iostat=io ) vp2
+case( 'vs2' );          read( str, *, iostat=io ) vs2
+case( 'npml' );         read( str, *, iostat=io ) npml
+case( 'bc1' );          read( str, *, iostat=io ) bc1
+case( 'bc2' );          read( str, *, iostat=io ) bc2
+case( 'xhypo' );        read( str, *, iostat=io ) xhypo
+case( 'rsource' );      read( str, *, iostat=io ) rsource
+case( 'tsource' );      read( str, *, iostat=io ) tsource
+case( 'moment1' );      read( str, *, iostat=io ) moment1
+case( 'moment2' );      read( str, *, iostat=io ) moment2
+case( 'faultnormal' );  read( str, *, iostat=io ) faultnormal
 case( 'faultopening' ); read( str, *, iostat=io ) faultopening
-case( 'rexpand' );     read( str, *, iostat=io ) rexpand
-case( 'n1expand' );    read( str, *, iostat=io ) n1expand
-case( 'n2expand' );    read( str, *, iostat=io ) n2expand
-case( 'ihypo' );       read( str, *, iostat=io ) ihypo
-case( 'vrup' );        read( str, *, iostat=io ) vrup
-case( 'rcrit' );       read( str, *, iostat=io ) rcrit
-case( 'trelax' );      read( str, *, iostat=io ) trelax
-case( 'svtol' );       read( str, *, iostat=io ) svtol
-case( 'np' );          read( str, *, iostat=io ) np
-case( 'itcheck' );     read( str, *, iostat=io ) itcheck
-case( 'debug' );       read( str, *, iostat=io ) debug
-case( 'mpin' );        read( str, *, iostat=io ) mpin
-case( 'mpout' );       read( str, *, iostat=io ) mpout
-case( 'rho' );         inzone = .true.
-case( 'vp' );          inzone = .true.
-case( 'vs' );          inzone = .true.
-!case( 'qp' );          inzone = .true.
-!case( 'qs' );          inzone = .true.
-case( 'gam' );         inzone = .true.
-case( 'mus' );         inzone = .true.
-case( 'mud' );         inzone = .true.
-case( 'dc' );          inzone = .true.
-case( 'co' );          inzone = .true.
-case( 'tn' );          inzone = .true.
-case( 'ts1' );         inzone = .true.
-case( 'ts2' );         inzone = .true.
-case( 'sxx' );         inzone = .true.
-case( 'syy' );         inzone = .true.
-case( 'szz' );         inzone = .true.
-case( 'syz' );         inzone = .true.
-case( 'szx' );         inzone = .true.
-case( 'sxy' );         inzone = .true.
+case( 'rexpand' );      read( str, *, iostat=io ) rexpand
+case( 'n1expand' );     read( str, *, iostat=io ) n1expand
+case( 'n2expand' );     read( str, *, iostat=io ) n2expand
+case( 'ihypo' );        read( str, *, iostat=io ) ihypo
+case( 'vrup' );         read( str, *, iostat=io ) vrup
+case( 'rcrit' );        read( str, *, iostat=io ) rcrit
+case( 'trelax' );       read( str, *, iostat=io ) trelax
+case( 'svtol' );        read( str, *, iostat=io ) svtol
+case( 'np' );           read( str, *, iostat=io ) np
+case( 'itcheck' );      read( str, *, iostat=io ) itcheck
+case( 'debug' );        read( str, *, iostat=io ) debug
+case( 'mpin' );         read( str, *, iostat=io ) mpin
+case( 'mpout' );        read( str, *, iostat=io ) mpout
+case( 'rho' );          inzone = .true.
+case( 'vp' );           inzone = .true.
+case( 'vs' );           inzone = .true.
+!case( 'qp' );           inzone = .true.
+!case( 'qs' );           inzone = .true.
+case( 'gam' );          inzone = .true.
+case( 'mus' );          inzone = .true.
+case( 'mud' );          inzone = .true.
+case( 'dc' );           inzone = .true.
+case( 'co' );           inzone = .true.
+case( 'tn' );           inzone = .true.
+case( 'ts1' );          inzone = .true.
+case( 'ts2' );          inzone = .true.
+case( 'sxx' );          inzone = .true.
+case( 'syy' );          inzone = .true.
+case( 'szz' );          inzone = .true.
+case( 'syz' );          inzone = .true.
+case( 'szx' );          inzone = .true.
+case( 'sxy' );          inzone = .true.
 case( 'timeseries' );
   nout = nout + 1
   i = nout

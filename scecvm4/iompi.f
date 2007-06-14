@@ -16,13 +16,13 @@
      $  MPI_ERRORS_ARE_FATAL, ierr )
       nnl = nn / impisize
       if( impirank == 0 ) write(0,'(a)') 'SCEC Velocity Model version 4'
-      if ( nnl > ibig ) then
-         print *, 'Error: nnl greater than ibig', nnl , big
-         stop
-      end if
       i64bit = impisize
       if( modulo(nnl,i64bit) /= 0 ) nnl = nnl+1
       nn = min( nnl, nn-impirank*nnl )
+      if ( nnl > ibig ) then
+         print *, 'Error: nnl greater than ibig', nnl, ibig
+         stop
+      end if
       irealsize = 4
       mpioffset = impirank * nnl * irealsize
       call get_command_argument( 2, str )
