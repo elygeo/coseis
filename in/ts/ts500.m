@@ -21,8 +21,6 @@
 
   np = [ 1  8 4 ] % Babiaca
   np = [ 1 12 4 ] % Babiaca
-  mpin = 1;
-  mpout = -1;
   dx = 500.;
   dt = .03;
   trelax = .3;

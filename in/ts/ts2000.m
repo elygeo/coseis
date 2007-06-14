@@ -21,8 +21,6 @@
 
   datadir = 'ts/2000/data';
   np = [ 1 1 2 ] % Wide
-  mpin = 1;
-  mpout = 1;
   dx = 2000.;
   dt = .12;
   trelax = 1.2;
