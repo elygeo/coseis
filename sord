@@ -103,8 +103,8 @@ case $machine in
   kim.home)               maxcpus=2; maxram=800  ;;
   phim)                              maxram=2800;  rate=200 ;;
   altai)                  maxcpus=8; maxram=30000; rate=90  ;; 
-  babieca)  maxnodes=29;  maxcpus=2; maxram=1800;  rate=80 ;;
-  teragrid) maxnodes=252; maxcpus=2; maxram=3000;  rate=500; maxmm=1080 ;;
+  babieca)  maxnodes=30;  maxcpus=2; maxram=1800;  rate=80 ;;
+  teragrid) maxnodes=256; maxcpus=2; maxram=3000;  rate=500; maxmm=1080 ;;
   datastar) maxnodes=265; maxcpus=8; maxram=13500; maxmm=1080 ;;          
 esac
 echo "Machine: $machine"
