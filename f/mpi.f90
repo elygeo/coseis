@@ -320,8 +320,8 @@ use mpi
 real, intent(inout) :: r, s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, mpio
 character(*), intent(in) :: io, str
-integer :: i, ndims, ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
-integer(kind=mpi_offset_kind) :: d1 = 0
+integer :: i, ndims, ftype, mtype, fh, nl(3), n(3), i0(3), comm, e
+integer(kind=mpi_offset_kind) :: dr
 if ( all( i1 == i2 ) .and. io == 'w' ) then
   r = s1(i1(1),i1(2),i1(3))
   return
@@ -331,11 +331,13 @@ if ( mpio == 0 ) then
   return
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
-i0 = (/ i3-i1,   ir-1 /) ! offsets
-n  = (/ i2-i1+1, ir /)   ! global size
-nl = (/ i4-i3+1, 1 /)    ! local size
-ndims = 4
-do i = ndims, 1, -1      ! squeeze singleton dimentions
+i0 = i3 - i1           ! offsets
+n  = i2 - i1 + 1       ! global size
+nl = i4 - i3 + 1       ! local size
+inquire( iolength=i ) r
+dr = i * (ir-1) * n(1) * n(2) * n(3)
+ndims = 3
+do i = ndims, 1, -1    ! squeeze singleton dimentions
 if ( n(i) == 1 ) then
   ndims = ndims - 1
   i0(i:) = (/ i0(i+1:), 0 /)
@@ -343,23 +345,23 @@ if ( n(i) == 1 ) then
   nl(i:) = (/ nl(i+1:), 1 /)
 end if
 end do
-if ( mpio > 0 ) then     ! collapes dimension if all on one proc
+if ( mpio > 0 ) then   ! collapes dimension if all on one proc
   do i = 1, ndims-1
   if ( n(i) == nl(i) ) then
     ndims = ndims - 1
     i0(i:) = (/ i0(i)+n(i)*i0(i+1), i0(i+2:), 0 /)
     n(i:)  = (/ n(i)*n(i+1),        n(i+2:),  1 /)
     nl(i:) = (/ nl(i)*nl(i+1),      nl(i+2:), 1 /)
-    exit                 ! only do this once to prevent 32 bit overrun
+    exit               ! only do this once to prevent 32 bit overrun
   end if
   end do
 end if
 if ( ndims < 1 ) ndims = 1
 call mpi_type_create_subarray( ndims, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
-i0 = (/ i3-1, 0 /)
-n  = (/ size(s1,1), size(s1,2), size(s1,3), 1 /)
-nl = (/ i4-i3+1, 1 /)
+i0 = i3 - 1
+n  = (/ size(s1,1), size(s1,2), size(s1,3) /)
+nl = i4 - i3 + 1
 call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
 i = abs( mpio )
@@ -368,14 +370,14 @@ case( 'r' )
   comm = comm3d
   if ( i <= 3 ) comm = comm2d(i)
   call mpi_file_open( comm, str, mpi_mode_rdonly, mpi_info_null, fh, e )
-  call mpi_file_set_view( fh, d1, mpi_real, ftype, 'native', mpi_info_null, e )
+  call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
 case( 'w' )
   comm = commout(i)
   i = 0
   if ( ir == 1 ) i = mpi_mode_create
   call mpi_file_open( comm, str, mpi_mode_wronly + i, mpi_info_null, fh, e )
-  call mpi_file_set_view( fh, d1, mpi_real, ftype, 'native', mpi_info_null, e )
+  call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_write_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
 end select
 call mpi_file_close( fh, e )
@@ -390,8 +392,8 @@ use mpi
 real, intent(inout) :: r, w1(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ic, ir, mpio
 character(*), intent(in) :: io, str
-integer :: i, ndims, ftype, mtype, fh, nl(4), n(4), i0(4), comm, e
-integer(kind=mpi_offset_kind) :: d1 = 0
+integer :: i, ndims, ftype, mtype, fh, nl(3), n(3), i0(3), comm, e
+integer(kind=mpi_offset_kind) :: dr
 if ( all( i1 == i2 ) .and. io =='w' ) then
   r = w1(i1(1),i1(2),i1(3),ic)
   return
@@ -401,11 +403,13 @@ if ( mpio == 0 ) then
   return
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
-i0 = (/ i3-i1,   ir-1 /) ! offsets
-n  = (/ i2-i1+1, ir /)   ! global size
-nl = (/ i4-i3+1, 1 /)    ! local size
-ndims = 4
-do i = ndims, 1, -1      ! squeeze singleton dimentions
+i0 = i3 - i1           ! offsets
+n  = i2 - i1 + 1       ! global size
+nl = i4 - i3 + 1       ! local size
+inquire( iolength=i ) r
+dr = i * (ir-1) * n(1) * n(2) * n(3)
+ndims = 3
+do i = ndims, 1, -1    ! squeeze singleton dimentions
 if ( n(i) == 1 ) then
   ndims = ndims - 1
   i0(i:) = (/ i0(i+1:), 0 /)
@@ -413,24 +417,24 @@ if ( n(i) == 1 ) then
   nl(i:) = (/ nl(i+1:), 1 /)
 end if
 end do
-if ( mpio > 0 ) then     ! collapes dimension if all on one proc
+if ( mpio > 0 ) then   ! collapes dimension if all on one proc
   do i = 1, ndims-1
   if ( n(i) == nl(i) ) then
     ndims = ndims - 1
     i0(i:) = (/ i0(i)+n(i)*i0(i+1), i0(i+2:), 0 /)
     n(i:)  = (/ n(i)*n(i+1),        n(i+2:),  1 /)
     nl(i:) = (/ nl(i)*nl(i+1),      nl(i+2:), 1 /)
-    exit                 ! only do this once to prevent 32 bit overrun
+    exit               ! only do this once to prevent 32 bit overrun
   end if
   end do
 end if
 if ( ndims < 1 ) ndims = 1
 call mpi_type_create_subarray( ndims, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
-i0 = (/ i3-1, ic-1 /)
-n  = (/ size(w1,1), size(w1,2), size(w1,3), size(w1,4) /)
-nl = (/ i4-i3+1, 1 /)
-call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
+i0 = i3 - 1
+n  = (/ size(w1,1), size(w1,2), size(w1,3) /)
+nl = i4 - i3 + 1
+call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
 i = abs( mpio )
 select case( io )
@@ -438,15 +442,15 @@ case( 'r' )
   comm = comm3d
   if ( i <= 3 ) comm = comm2d(i)
   call mpi_file_open( comm, str, mpi_mode_rdonly, mpi_info_null, fh, e )
-  call mpi_file_set_view( fh, d1, mpi_real, ftype, 'native', mpi_info_null, e )
-  call mpi_file_read_all( fh, w1(1,1,1,1), 1, mtype, mpi_status_ignore, e )
+  call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
+  call mpi_file_read_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
 case( 'w' )
   comm = commout(i)
   i = 0
   if ( ir == 1 ) i = mpi_mode_create
   call mpi_file_open( comm, str, mpi_mode_wronly + i, mpi_info_null, fh, e )
-  call mpi_file_set_view( fh, d1, mpi_real, ftype, 'native', mpi_info_null, e )
-  call mpi_file_write_all( fh, w1(1,1,1,1), 1, mtype, mpi_status_ignore, e )
+  call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
+  call mpi_file_write_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
 end select
 call mpi_file_close( fh, e )
 call mpi_type_free( mtype, e )
