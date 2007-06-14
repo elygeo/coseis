@@ -102,10 +102,10 @@ case $machine in
   wide)                   maxcpus=2; maxram=1800 ;;
   kim.home)               maxcpus=2; maxram=800  ;;
   phim)                              maxram=2800;  rate=200 ;;
-  altai)                  maxcpus=8; maxram=30000; rate=90  ;; 
-  babieca)  maxnodes=30;  maxcpus=2; maxram=1800;  rate=80 ;;
+  altai)                  maxcpus=8; maxram=30000; rate=100  ;; 
+  babieca)  maxnodes=30;  maxcpus=2; maxram=1800;  rate=100 ;;
   teragrid) maxnodes=256; maxcpus=2; maxram=3000;  rate=500; maxmm=1080 ;;
-  datastar) maxnodes=265; maxcpus=8; maxram=13500; maxmm=1080 ;;          
+  datastar) maxnodes=265; maxcpus=8; maxram=13500; rate=200; maxmm=1080 ;;          
 esac
 echo "Machine: $machine"
 echo "CPUs: $(( maxnodes * maxcpus ))"
@@ -334,10 +334,10 @@ if [ "$velmodel" ]; then
   mv nc rlon rlat rdep "$rundir/vm/"
   mv ts1 x1 x2 x3 meta.m "$rundir/data/"
   code="scecvm"
-  pre="cd vm"
   bin="./scecvm4-$mode nc rlon rlat rdep rho vp vs"
-  post="mv vm/rho vm/vp vm/vs data"
   walltime="00:30:00"
+  post="mv rho vp vs $rundir/data"
+  rundir="$rundir/vm"
   cd "$rundir"
   case $machine in
   datastar) . "$srcdir/sh/datastar" ;;

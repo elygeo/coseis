@@ -5,7 +5,7 @@ if [ $( /bin/pwd | grep -v gpfs ) ]; then
   exit
 fi
 
-cat << END > $code-run
+cat << END > run
 #!/bin/bash -e
 if [ "\$HOSTNAME" != ds100 ]; then
   echo "Error: interactive jobs must be launched from dspoe"
@@ -23,7 +23,6 @@ case "\${1:--i}$mode" in
   -gp) tvpoe $bin \$opts ;;
   -bp) nohup poe $bin \$opts > out.log & :; pid=\$! ;;
 esac
-cd "$rundir"
 if [ "\$pid" ]; then
   echo "Background job started with PID \$pid" >> log
   echo "Background job started with PID \$pid"
@@ -33,12 +32,13 @@ fi
 echo "\$( date ): Finish $code" >> log
 END
 
-cat << END > $code-que
+cat << END > que
 #!/bin/bash
-llsubmit $code-script >> log
+cd "$rundir"
+llsubmit script >> log
 END
 
-cat << END > $code-script
+cat << END > script
 #!/bin/bash
 #@environment = COPY_ALL;\\
 #AIXTHREAD_SCOPE=S;\\
@@ -73,10 +73,9 @@ cd "$rundir"
 echo "\$( date ): Start $code" >> log
 $pre
 poe $bin
-cd "$rundir"
 $post
 echo "\$( date ): Finish $code" >> log
 END
 
-chmod u+x $code-*
+chmod u+x run que script
 

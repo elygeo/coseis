@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-cat << END > $code-run
+cat << END > run
 #!/bin/bash -e
 cd "$rundir"
 echo "\$(date): Start $code" >> log
@@ -14,7 +14,6 @@ case "\${1:--i}$mode" in
   -gp) mpiexec -gdb -np $np $bin ;;
   -bp) nice nohup mpiexec -np $np $bin > out.log & :; pid=\$! ;;
 esac
-cd "$rundir"
 if [ "\$pid" ]; then
   echo "\$(date): Start $code in background: \$pid" >> log
   echo "Background job started with PID \$pid"
@@ -24,5 +23,5 @@ fi
 echo "\$(date): Finish $code" >> log
 END
 
-chmod u+x $code-run
+chmod u+x run
 
