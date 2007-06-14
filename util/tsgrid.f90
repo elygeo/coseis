@@ -296,9 +296,8 @@ j = n(1) - 1
 k = n(2) - 1
 allocate( w1(j,k,1,3), s1(j,k,1) )
 forall( j=1:n(1)-1, k=1:n(2)-1, i=1:3 )
-  w1(j,k,1,i) = .25 * ( x(j,k,1,i) + x(j,k,1,i) + x(j,k,1,i) + x(j,k,1,i) )
+  w1(j,k,1,i) = .25 * ( x(j,k,1,i) + x(j+1,k,1,i) + x(j,k+1,1,i) + x(j+1,k+1,1,i) )
 end forall
-call ts2ll( w1, 1, 2 )
 
 ! PML regions are extruded
 j = n(1) - 1
@@ -309,6 +308,21 @@ do i = npml-2,0,-1
   w1(:,i+1,:,:) = w1(:,i+2,:,:)
   w1(:,k-i,:,:) = w1(:,k-i-1,:,:)
 end do
+
+! lon/lat
+call ts2ll( w1, 1, 2 )
+
+! 2D lon/lat check
+inquire( iolength=i ) w1(:,:,:,1)
+open( 1, file='xc1', recl=i, form='unformatted', access='direct', status='replace' )
+open( 2, file='xc2', recl=i, form='unformatted', access='direct', status='replace' )
+open( 3, file='xc3', recl=i, form='unformatted', access='direct', status='replace' )
+write( 1, rec=1 ) w1(:,:,:,1)
+write( 2, rec=1 ) w1(:,:,:,2)
+write( 3, rec=1 ) w1(:,:,:,3)
+close( 1 )
+close( 2 )
+close( 3 )
 
 ! Chunk here w1 -> ?
 

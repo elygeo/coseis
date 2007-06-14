@@ -324,11 +324,10 @@ if [ "$velmodel" ]; then
   nc=$( cat nc )
   nnl=$(( nc / np + ( nc % np > 0 ? 1 : 0 ) ))
   ibig=$( sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' < scecvm/newin.h )
-  if [ "$ibig" < "$nnl" ]; then
+  if [ "$ibig" -lt "$nnl" ]; then
     echo "Error: ibig=$ibig in newin.h must be greater than $nnl"
     exit 1
   fi
-  grep ibig "scecvm/newin.h"
   mkdir "$rundir/data"
   cp endian "$rundir/data/"
   cp -r scecvm "$rundir/vm"
