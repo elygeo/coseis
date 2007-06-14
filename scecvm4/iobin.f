@@ -9,7 +9,7 @@
       read( 1, * ) nn
       close( 1 )
       if ( nn > ibig ) then
-         print *, 'Error: nn greater than ibig', nn , big
+         print *, 'Error: nn greater than ibig', nn , ibig
          stop
       end if
       call get_command_argument( 2, str )
