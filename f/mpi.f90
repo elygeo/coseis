@@ -331,11 +331,11 @@ if ( mpio == 0 ) then
   return
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
-i0 = (/ i3-i1,   ir-1 /)
-n  = (/ i2-i1+1, ir /)
-nl = (/ i4-i3+1, 1 /)
+i0 = (/ i3-i1,   ir-1 /) ! offsets
+n  = (/ i2-i1+1, ir /)   ! global size
+nl = (/ i4-i3+1, 1 /)    ! local size
 ndims = 4
-do i = 4, 1, -1
+do i = ndims, 1, -1      ! squeeze singleton dimentions
 if ( n(i) == 1 ) then
   ndims = ndims - 1
   i0(i:) = (/ i0(i+1:), 0 /)
@@ -343,14 +343,14 @@ if ( n(i) == 1 ) then
   nl(i:) = (/ nl(i+1:), 1 /)
 end if
 end do
-if ( mpio < 0 ) then
-  do i = 1, 3
+if ( mpio < 0 ) then     ! collapes dimension if all on one proc
+  do i = 1, ndims-1
   if ( n(i) == nl(i) ) then
+    ndims = ndims - 1
     i0(i:) = (/ i0(i)+n(i)*i0(i+1), i0(i+2:), 0 /)
     n(i:)  = (/ n(i)*n(i+1),        n(i+2:),  1 /)
     nl(i:) = (/ nl(i)*nl(i+1),      nl(i+2:), 1 /)
-    ndims = ndims - 1
-    exit ! only do this once to prevent 32 bit overrun
+    exit                 ! only do this once to prevent 32 bit overrun
   end if
   end do
 end if
@@ -401,11 +401,11 @@ if ( mpio == 0 ) then
   return
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
-i0 = (/ i3-i1,   ir-1 /)
-n  = (/ i2-i1+1, ir /)
-nl = (/ i4-i3+1, 1 /)
+i0 = (/ i3-i1,   ir-1 /) ! offsets
+n  = (/ i2-i1+1, ir /)   ! global size
+nl = (/ i4-i3+1, 1 /)    ! local size
 ndims = 4
-do i = 4, 1, -1
+do i = ndims, 1, -1      ! squeeze singleton dimentions
 if ( n(i) == 1 ) then
   ndims = ndims - 1
   i0(i:) = (/ i0(i+1:), 0 /)
@@ -413,14 +413,14 @@ if ( n(i) == 1 ) then
   nl(i:) = (/ nl(i+1:), 1 /)
 end if
 end do
-if ( mpio < 0 ) then
-  do i = 1, 3
+if ( mpio < 0 ) then     ! collapes dimension if all on one proc
+  do i = 1, ndims-1
   if ( n(i) == nl(i) ) then
+    ndims = ndims - 1
     i0(i:) = (/ i0(i)+n(i)*i0(i+1), i0(i+2:), 0 /)
     n(i:)  = (/ n(i)*n(i+1),        n(i+2:),  1 /)
     nl(i:) = (/ nl(i)*nl(i+1),      nl(i+2:), 1 /)
-    ndims = ndims - 1
-    exit ! only do this once to prevent 32 bit overrun
+    exit                 ! only do this once to prevent 32 bit overrun
   end if
   end do
 end if
