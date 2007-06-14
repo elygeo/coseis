@@ -20,7 +20,6 @@
   itcheck = 100;
 
   np = [ 1 36 12 ] % TeraGrid
-  np = [ 1 32 16 ] % TeraGrid
   np = [ 1 80 24 ] % DataStar
   mpin = 1;
   mpout = -1;

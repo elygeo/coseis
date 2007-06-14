@@ -300,6 +300,16 @@ forall( j=1:n(1)-1, k=1:n(2)-1, i=1:3 )
 end forall
 call ts2ll( w1, 1, 2 )
 
+! PML regions are extruded
+j = n(1) - 1
+k = n(2) - 1
+do i = npml-2,0,-1
+  w1(i+1,:,:,:) = w1(i+2,:,:,:)
+  w1(j-i,:,:,:) = w1(j-i-1,:,:,:)
+  w1(:,i+1,:,:) = w1(:,i+2,:,:)
+  w1(:,k-i,:,:) = w1(:,k-i-1,:,:)
+end do
+
 ! Chunk here w1 -> ?
 
 ! 3D lon/lat/depth
@@ -312,13 +322,13 @@ do l = 1, n(3)-1
   write( 8, rec=l ) w1(:,:,:,2)
 end do
 s1 = 0
-l1 = npml + 1
+l1 = npml
 l2 = n(3) - nf3
-do l = 1, l1-1
-  write( 9, rec=l ) dx*(n(3)-.5-l) - z0 + w1(:,:,:,3)
+do l = 1, l1
+  write( 9, rec=l ) dx*(n(3)-.5-l1) - z0 + w1(:,:,:,3)
 end do
-do l = l1, l2-1
-  write( 9, rec=l ) dx*(n(3)-.5-l) + (w1(:,:,:,3)-z0)*(l2-.5-l)/(l2-l1)
+do l = l1+1, l2-1
+  write( 9, rec=l ) dx*(n(3)-.5-l) + (w1(:,:,:,3)-z0)*(l2-.5-l)/(l2-l1-1)
 end do
 do l = l2, n(3)-1
   write( 9, rec=l ) dx*(n(3)-.5-l) + s1
