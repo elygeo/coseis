@@ -4,12 +4,12 @@ function [ msg, f ] = read4d( varargin )
 % Aguments
 if ~any( nargin == [ 1 3 4 ] ), error, end
 fieldin = varargin{1};
-i1s =  [ 1 1 1 1 ];
-i2s = -[ 1 1 1 1 ];
+i3 =  [ 1 1 1 1 ];
+i4 = -[ 1 1 1 1 ];
 ic = 0;
 if nargin > 1
-  i1s = varargin{2};
-  i2s = varargin{3};
+  i3 = varargin{2};
+  i4 = varargin{3};
 end
 if nargin > 3
   ic = varargin{4};
@@ -25,22 +25,22 @@ if oldway, dirfmt = '%02d/'; end
 n = [ nn it ];
 shift = [ 0 0 0 0 ];
 if faultnormal, shift( abs( faultnormal) ) = 1; end
-m0 = i1s(1:3) == 0 & i2s(1:3) == 0;
-m1 = i1s(1:3) == 0 & i2s(1:3) ~= 0;
-m2 = i1s(1:3) ~= 0 & i2s(1:3) == 0;
-m3 = i1s < 0;
-m4 = i2s < 0;
-i1s(m0) = ihypo(m0);
-i2s(m0) = ihypo(m0);
-i1s(m1) = ihypo(m1) + shift(m1);
-i2s(m2) = ihypo(m2);
-i1s(m3) = i1s(m3) + n(m3) + 1;
-i2s(m4) = i2s(m4) + n(m4) + 1;
+m0 = i3(1:3) == 0 & i4(1:3) == 0;
+m1 = i3(1:3) == 0 & i4(1:3) ~= 0;
+m2 = i3(1:3) ~= 0 & i4(1:3) == 0;
+m3 = i3 < 0;
+m4 = i4 < 0;
+i3(m0) = ihypo(m0);
+i4(m0) = ihypo(m0);
+i3(m1) = ihypo(m1) + shift(m1);
+i4(m2) = ihypo(m2);
+i3(m3) = i3(m3) + n(m3) + 1;
+i4(m4) = i4(m4) + n(m4) + 1;
 
 % Look for file with desired data
 msg = '';
 found = 0;
-n = i2s - i1s + 1;
+n = i4 - i3 + 1;
 nout = length( out );
 for iz = 1:nout
   nc    = out{iz}{1};
@@ -60,16 +60,16 @@ for iz = 1:nout
   end
   test  = [ 
     strcmp( fieldin, field )
-    all( i1s >= i1 )
-    all( i2s <= i2 )
-    ( dit == 1 || ( i1s(4) == i2s(4) && mod( i1s(4) - i1(4), dit ) == 0 ) )
+    all( i3 >= i1 )
+    all( i4 <= i2 )
+    ( dit == 1 || ( i3(4) == i4(4) && mod( i3(4) - i1(4), dit ) == 0 ) )
   ]';
   found = all( test );
   if found, break, end
 end
 if ~found
   msg = 'No saved data found for this region';
-  msg = sprintf( 'No saved data for:   %s   %d %d %d %d   %d %d %d %d', fieldin, i1s, i2s );
+  msg = sprintf( 'No saved data for:   %s   %d %d %d %d   %d %d %d %d', fieldin, i3, i4 );
   f = [];
   return
 end
@@ -83,7 +83,7 @@ end
 m = i2 - i1 + 1;
 n = [ n length( ic ) ];
 f = zeros( n );
-i0 = i1s - i1;
+i0 = ( i3 - i1 ) ./ [ 1 1 1 dit ];
 if all( m(1:3) == 1 )
   for i = 1:n(5)
     file = field;

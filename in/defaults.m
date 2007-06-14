@@ -49,6 +49,7 @@
 % Fault parameters;
 % faultnormal = 0;			% no fault
   faultnormal = 3;			% constant l fault plane
+  faultopening = 0;			% 0=not allowed, 1=allowed
   slipvector = [ 1. 0. 0. ];		% shear traction direction for ts1
   mus = .6;				% **coef of static friction
   mud = .5;				% **coef of dynamic friction

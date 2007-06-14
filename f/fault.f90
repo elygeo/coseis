@@ -299,12 +299,13 @@ do i = 1, 3
   t1(:,:,:,i) = t1(:,:,:,i) - tn * nhat(:,:,:,i)
 end do
 ts = sqrt( sum( t1 * t1, 4 ) )
-tn = min( 0., sum( t2 * nhat, 4 ) )
+tn = sum( t2 * nhat, 4 )
+if ( faultopening == 1 ) tn = min( 0., tn )
 
 ! Slip-weakening friction law
 f1 = mud
 where ( sl < dc ) f1 = f1 + ( 1. - sl / dc ) * ( mus - mud )
-f1 = -tn * f1 + co
+f1 = -min( 0., tn ) * f1 + co
 
 ! Nucleation
 if ( rcrit > 0. .and. vrup > 0. ) then

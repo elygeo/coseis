@@ -59,6 +59,7 @@ case( 'tsource' );     read( str, *, iostat=io ) tsource
 case( 'moment1' );     read( str, *, iostat=io ) moment1
 case( 'moment2' );     read( str, *, iostat=io ) moment2
 case( 'faultnormal' ); read( str, *, iostat=io ) faultnormal
+case( 'faultopening' ); read( str, *, iostat=io ) faultopening
 case( 'rexpand' );     read( str, *, iostat=io ) rexpand
 case( 'n1expand' );    read( str, *, iostat=io ) n1expand
 case( 'n2expand' );    read( str, *, iostat=io ) n2expand

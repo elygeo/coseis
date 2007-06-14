@@ -1,1 +1,1 @@
-in/ts/ts500.m
+in/ts/ts2000.m
