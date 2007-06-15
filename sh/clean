@@ -1,4 +1,5 @@
 #!/bin/bash -e
 
-/bin/rm -rf vm checkpoint input sord-s sord-p
+/bin/rm -rf vm checkpoint input sord-s sord-p currentstep
+rmdir debug
 
