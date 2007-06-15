@@ -13,7 +13,7 @@ if ! grep -q "\$HOSTNAME" mf; then
   exit
 fi
 cd "$rundir"
-echo "\$( date ): Start $code" >> log
+echo "\$( date ): $code started" >> log
 $pre
 case "\${1:--i}$mode" in
   -is) $bin ;;
@@ -24,12 +24,12 @@ case "\${1:--i}$mode" in
   -bp) nohup mpirun -machinefile mf -np $np $bin > out.log & :; pid=\$! ;;
 esac
 if [ "\$pid" ]; then
-  echo "Background job started with PID \$pid" >> log
-  echo "Background job started with PID \$pid"
+  echo "\$( date ): $code started with PID: \$pid" >> log
+  echo "$code started with PID: \$pid"
 else :
   $post
+  echo "\$( date ): $code finished" >> log
 fi
-echo "\$( date ): Finish $code" >> log
 END
 
 cat << END > mf
@@ -42,7 +42,7 @@ END
 cat << END > que
 #!/bin/bash
 cd "$rundir"
-echo "\$( date ): Job qued with ID: \$( qsub script )" >> log
+echo "\$( date ): $code qued with ID: \$( qsub script )" >> log
 END
 
 cat << END > script
@@ -55,11 +55,11 @@ cat << END > script
 #PBS -m abe
 #PBS -V
 cd "$rundir"
-echo "\$( date ): Start $code" >> log
+echo "\$( date ): $code started" >> log
 $pre
 mpirun -machinefile \$PBS_NODEFILE -np $np $bin
 $post
-echo "\$( date ): Finish $code" >> log
+echo "\$( date ): $code finished" >> log
 END
 
 chmod u+x run que script

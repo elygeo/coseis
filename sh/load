@@ -6,7 +6,7 @@ fi
 
 case "$machine$1" in
 babieca)   hosts="node%d"; i1=1;   i2=30  ;;
-babieca-i) hosts="node%d"; i1=37;  i2=48  ;;
+babieca-i) hosts="node%d"; i1=39;  i2=49  ;;
 teragrid)  hosts="tg-c%d"; i1=127; i2=130 ;;
 *) exit ;;
 esac
