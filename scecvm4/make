@@ -68,7 +68,7 @@ if [ "$compile" ]; then
   $sfc iobin.f scecvm4.f -o scecvm4-s
   $pfc iompi.f scecvm4.f -o scecvm4-p
   sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
-  rm *.f *.f90 *.mod *.h
+  rm *.f *.f90 *.h
   mv state state-vm
 fi
 
