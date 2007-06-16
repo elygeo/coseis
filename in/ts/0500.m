@@ -18,6 +18,7 @@
   rcrit = 3000.;
   vrup = 2300.;
   itcheck = 100;
+  datadir = 'ts/0500/data';
 
   np = [ 1 76 18 ] % DataStar 171 nodes
   np = [ 1  8  4 ] % Babiaca 16 nodes

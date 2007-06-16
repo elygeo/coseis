@@ -20,6 +20,7 @@
   itcheck = 100;
   datadir = 'ts/2000/data';
 
+
   np = [ 1 8 4 ] % Babieca 16 nodes
   np = [ 1 1 2 ] % Wide
   dx = 2000.;
