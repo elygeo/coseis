@@ -1,7 +1,5 @@
 #!/bin/bash -e
 
-echo "Compiling SORD utilities"
-
 . ../sh/findfortran
 flags=$oflags
 
@@ -35,6 +33,7 @@ if [ -f state-util ]; then
 fi
 
 if [ "$compile" ]; then
+  echo "Compiling SORD utilities"
   rm -f state-util
   $sfc $flags asc2flt.f90 -o asc2flt
   $sfc $flags swab.f90 -o swab
@@ -47,5 +46,6 @@ if [ "$compile" ]; then
   $sfc $flags utm.f90 pscoords.f90 ll2ps.f90 -o ll2ps
   $sfc $flags utm.f90 gearthdrape.f90 -o gearthdrape
   mv state state-util
+  rm -f $files *.o *.mod *.ipo *.il *.stb
 fi
 

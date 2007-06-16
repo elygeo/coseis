@@ -190,16 +190,16 @@ case $optimize in
   g) fflags=$gflags ;;
 esac
 case $mode in
-  s) fc="$sfc"; collective="$serial" ;;
-  p) fc="$pfc"; collective="$parallel" ;;
+  s) fc="$sfc"; files="$base $serial $common" ;;
+  p) fc="$pfc"; files="$base $parallel $common" ;;
 esac
-make="$fc $fflags -o sord-$mode $base $collective $common"
+make="$fc $fflags -o sord-$mode $files"
 cd tmp
-for file in "$srcdir/f/"*; do
-  ln -s "$file" &> /dev/null || :
+for file in $files; do
+  ln -s "$srcdir/f/$file" &> /dev/null || :
 done
 echo "$make" > state
-cat $base $collective $common >> state
+cat $files >> state
 compile=yes
 if [ -f state-$mode ]; then
   compile=$( cmp state state-$mode || : )
@@ -209,6 +209,7 @@ if [ "$compile" ]; then
   echo $make
   $make
   mv state state-$mode
+  rm -f $files *.o *.mod *.ipo *.il *.stb
 fi
 cd "$srcdir"
 

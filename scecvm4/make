@@ -1,7 +1,5 @@
 #!/bin/bash -e
 
-echo "Compiling SCECVM"
-
 IFS=":$IFS"
 tar=tar
 for dir in $PATH; do [ -x $dir/gtar ] && tar=gtar; done
@@ -63,10 +61,11 @@ if [ -f state-vm ]; then
 fi
 
 if [ "$compile" ]; then
+  echo "Compiling SCECVM"
   rm -f state-vm
   $tar xzf "$srcdir/../data/scecvm4.tgz"
-  $sfc iobin.f scecvm4.f -o scecvm4-s
-  $pfc iompi.f scecvm4.f -o scecvm4-p
+  make="$sfc iobin.f scecvm4.f -o scecvm4-s"; echo "$make"; $make
+  make="$pfc iompi.f scecvm4.f -o scecvm4-p"; echo "$make"; $make
   sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
   rm *.f *.f90 *.h
   mv state state-vm
