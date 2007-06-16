@@ -212,6 +212,9 @@ if [ "$compile" ]; then
   rm -f *.o *.mod *.ipo *.il *.stb
 fi
 rm $files
+
+# Compile utilities
+cd "$srcdir/util"; ./make
 cd "$srcdir"
 
 #------------------------------------------------------------------------------#
@@ -264,7 +267,10 @@ esac
 
 # SCECVM
 if [ "$velmodel" ]; then
-  cd "$srcdir/util"; ./make
+  if [ "${infile/ts/}" = "$infile" ]; then 
+    echo "Error: TeraShake input file required for VM"
+    exit 1
+  fi
   cd "$srcdir/scecvm4"; ./make
   cd "$rundir"
   mkdir "$rundir/data"

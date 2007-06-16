@@ -1,1 +1,1 @@
-in/ts/ts1000.m
+in/mini-fault.m
