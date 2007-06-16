@@ -11,7 +11,7 @@ character :: endian0, endian, b1(4), b2(4)
 equivalence (h1,b1), (h2,b2)
 
 ! Model parameters
-print '(a)', 'TeraShake Grid Generation'
+write( 0, '(a)' ) 'TeraShake Grid Generation'
 mus = 1.06
 mud = .5;  tn = -20e6
 rho = 3000.
@@ -30,8 +30,8 @@ close( 1 )
 open( 1, file='endian0', status='old' )
 read( 1, * ) endian0
 close( 1 )
-print *, 'dx =', dx
-print *, 'npml =', npml
+write( 0, * ) 'dx =', dx
+write( 0, * ) 'npml =', npml
 ell = (/ 600, 300, 80 /) * 1000
 xf = (/ 265864.,293831.,338482.,364062.,390075.,459348. /)
 yf = (/ 183273.,187115.,200421.,212782.,215126.,210481. /)
@@ -51,7 +51,7 @@ close( 1 )
 ! Dimensions
 n = nint( ell / dx ) + 1
 n(2) = n(2) + 1
-print *, 'nn =', n
+write( 0, * ) 'nn =', n
 open( 1, file='nc' )
 write( 1, * ) product( n - 1 )
 close( 1 )
@@ -64,8 +64,8 @@ do i = 2, nf
   h2 = yf(i) - yf(i-1)
   rf(i) = rf(i-1) + sqrt( h1*h1 + h2*h2 )
 end do
-print *, 'Fault corners: ', rf
-print *, 'Fault length: ', rf(nf)
+write( 0, * ) 'Fault corners: ', rf
+write( 0, * ) 'Fault length: ', rf(nf)
 
 ! Fault indices
 nf1 = nint( rf(nf) / dx )
@@ -190,8 +190,8 @@ allocate( w1(j,k,1,3), s1(j,k,1), t(960,780) )
 w1 = x
 call ts2ll( w1, 1, 2 )
 if ( any( w1 /= w1 ) ) stop 'NaNs in lon/lat'
-print *, 'longitude range: ', minval( w1(:,:,:,1) ), maxval( w1(:,:,:,1) )
-print *, 'latgitude range: ', minval( w1(:,:,:,2) ), maxval( w1(:,:,:,2) )
+write( 0, * ) 'longitude range: ', minval( w1(:,:,:,1) ), maxval( w1(:,:,:,1) )
+write( 0, * ) 'latgitude range: ', minval( w1(:,:,:,2) ), maxval( w1(:,:,:,2) )
 
 ! Topo
 if ( exag < .00001 ) then
@@ -258,7 +258,7 @@ do i = npml-1,0,-1
   x(:,k-i,:,3) = x(:,k-i-1,:,3)
 end do
 z0 = sum( x(:,:,:,3) ) / ( n(1) * n(2) )
-print *, 'elevation range: ', minval( x(:,:,:,3) ), maxval( x(:,:,:,3) ), z0
+write( 0, * ) 'elevation range: ', minval( x(:,:,:,3) ), maxval( x(:,:,:,3) ), z0
 
 ! Chunk here x -> w1
 
@@ -349,10 +349,10 @@ close( 8 )
 close( 9 )
 
 ! Fault prestress
-print *, 'mus: ', mus
-print *, 'mud: ', mud
-print *, 'tn: ', tn
-print *, 'dc: ', dc
+write( 0, * ) 'mus: ', mus
+write( 0, * ) 'mud: ', mud
+write( 0, * ) 'tn: ', tn
+write( 0, * ) 'dc: ', dc
 deallocate( x, s1, w1 )
 allocate( t(1991,161), s1(n(1),1,n(3)), s2(n(1),1,n(3)) )
 i = nint( dx / 100. )
@@ -407,26 +407,26 @@ close( 1 )
 
 tn = abs( tn )
 ts = sum( t ) / size( t )
-print *, 'Average'
-print *, 'ts: ', ts
-print *, 'dt: ', abs( ts ) - mud * abs( tn )
-print *, 'S:  ', ( tn * mus - ts ) / ( ts - tn * mud )
-print *, 'rcrit: ', rho * vs ** 2. * tn * ( mus - mud ) * dc / ( ts - tn * mud ) ** 2
+write( 0, * ) 'Average'
+write( 0, * ) 'ts: ', ts
+write( 0, * ) 'dt: ', abs( ts ) - mud * abs( tn )
+write( 0, * ) 'S:  ', ( tn * mus - ts ) / ( ts - tn * mud )
+write( 0, * ) 'rcrit: ', rho * vs ** 2. * tn * ( mus - mud ) * dc / ( ts - tn * mud ) ** 2
 
 !ts = t(91,51)
 ts = sum( t(21:1971,21:141) ) / size( t(21:1971,21:141) )
-print *, 'Interior average'
-print *, 'ts: ', ts
-print *, 'dt: ', abs( ts ) - mud * abs( tn )
-print *, 'S:  ', ( tn * mus - ts ) / ( ts - tn * mud )
-print *, 'rcrit: ', rho * vs ** 2. * tn * ( mus - mud ) * dc / ( ts - tn * mud ) ** 2
+write( 0, * ) 'Interior average'
+write( 0, * ) 'ts: ', ts
+write( 0, * ) 'dt: ', abs( ts ) - mud * abs( tn )
+write( 0, * ) 'S:  ', ( tn * mus - ts ) / ( ts - tn * mud )
+write( 0, * ) 'rcrit: ', rho * vs ** 2. * tn * ( mus - mud ) * dc / ( ts - tn * mud ) ** 2
 
 ts = maxval( t )
-print *, 'Max'
-print *, 'ts: ', ts
-print *, 'dt: ', abs( ts ) - mud * abs( tn )
-print *, 'S:  ', ( tn * mus - ts ) / ( ts - tn * mud )
-print *, 'rcrit: ', rho * vs ** 2. * tn * ( mus - mud ) * dc / ( ts - tn * mud ) ** 2
+write( 0, * ) 'Max'
+write( 0, * ) 'ts: ', ts
+write( 0, * ) 'dt: ', abs( ts ) - mud * abs( tn )
+write( 0, * ) 'S:  ', ( tn * mus - ts ) / ( ts - tn * mud )
+write( 0, * ) 'rcrit: ', rho * vs ** 2. * tn * ( mus - mud ) * dc / ( ts - tn * mud ) ** 2
 
 end program
 
