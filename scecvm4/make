@@ -48,9 +48,12 @@ files="
   iobin.f
   iompi.f"
 
+cd "$( dirname $0 )"
 srcdir=$( /bin/pwd )
-mkdir -p ../tmp/scecvm
-cd ../tmp/scecvm
+cd ..
+
+mkdir -p tmp/scecvm
+cd tmp/scecvm
 for file in $files; do
   ln -s "$srcdir/$file" &> /dev/null || :
 done

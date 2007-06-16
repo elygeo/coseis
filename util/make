@@ -1,6 +1,10 @@
 #!/bin/bash -e
 
-. ../sh/findfortran
+cd "$( dirname $0 )"
+srcdir=$( /bin/pwd )
+cd ..
+
+. sh/findfortran
 flags=$oflags
 
 files="
@@ -19,9 +23,8 @@ files="
   ll2ps.f90
   gearthdrape.f90"
 
-srcdir=$( /bin/pwd )
-mkdir -p ../tmp
-cd ../tmp
+mkdir -p tmp
+cd tmp
 for file in $files; do
   ln -s "$srcdir/$file" &> /dev/null || :
 done

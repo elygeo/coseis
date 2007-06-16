@@ -12,6 +12,7 @@ accounts="\
   kim"
 
 files="\
+gilead
   versionmeta.m
   email
   doc

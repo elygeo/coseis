@@ -79,7 +79,7 @@ case "$key" in
   np) np3=( $1 $2 $3 ) ;;
   dx) dx=$1 ;;
   npml) npml=$1 ;;
-  datadir) datair="$1" ;;
+  datadir) datadir="$1" ;;
   return) break ;;
 esac
 done < tmp/input
@@ -212,8 +212,8 @@ fi
 rm $files
 
 # Compile utilities
-cd "$srcdir/util"; ./make
 cd "$srcdir"
+util/make
 
 #------------------------------------------------------------------------------#
 # Set-up and run
@@ -267,9 +267,8 @@ if [ "$velmodel" ]; then
     echo "Error: TeraShake input file required for VM"
     exit 1
   fi
-  cd "$srcdir/scecvm4"; ./make
-  cd "$rundir"
-  mkdir "$rundir/data"
+  mkdir data
+  "$srcdir"/scecvm4/make
   cp -r "$srcdir/tmp/scecvm" .
   cd scecvm
   echo 1 > exag
@@ -304,22 +303,15 @@ if [ "$velmodel" ]; then
 elif [ "$datadir" ]; then
   mkdir data
   cd data
-  files="endian meta.m ts1 x1 x2 x3 rho vp vs"
-  for file in $files; do
-    fullfile="$srcdir/$datadir/$file"
-    if [ -f "$fullfile" ]; then
-      ln "$fullfile" .
-    else
-      echo "$fullfile not found, can't run yet"
-      exit 1
-    fi
-    endian=$( cat endian )
-    native="$( perl -le 'print pack('V',1) eq pack('L',1) ? "l" : "b"' )"
-    if [ "$endian" != "$native" ]; then
-      echo "Error: data endian=$endian, native endian=$native"
-      exit 1
-    fi
+  for file in "$srcdir/$datadir/"*; do
+    [ -f "$file" ] && ln "$file" . || ln -s "$file" .
   done
+  endian=$( cat endian ) || endian="(not found)"
+  native="$( perl -le 'print pack('V',1) eq pack('L',1) ? "l" : "b"' )"
+  if [ "$endian" != "$native" ]; then
+    echo "Error: data endian=$endian, native endian=$native"
+    exit 1
+  fi
   cd "$rundir"
 fi
 

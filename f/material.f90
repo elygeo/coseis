@@ -87,6 +87,8 @@ i1 = abs( ibc1 )
 i2 = abs( ibc2 )
 where( i1 <= 1 ) i1 = 4
 where( i2 <= 1 ) i2 = 4
+where( i1 == 9 ) i1 = 4
+where( i2 == 9 ) i2 = 4
 call scalarbc( mr,  ibc1, ibc2, nhalo, 1 )
 call scalarbc( gam, ibc1, ibc2, nhalo, 1 )
 call scalarbc( s1,  ibc1, ibc2, nhalo, 1 )
