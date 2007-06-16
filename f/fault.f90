@@ -11,7 +11,8 @@ use m_surfnormals
 use m_bc
 use m_util
 real :: x1(3), x2(3), rr
-integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
+integer :: iz, i1(3), i2(3), i3(3), i4(3), i, j, k, l, &
+  j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
 if ( ifn == 0 ) return
 if ( master ) write( 0, * ) 'Fault initialization'
@@ -182,8 +183,47 @@ do i = 1, 3
 end do
 rhypo = sqrt( sum( t2 * t2, 4 ) )
 
-! Save for output FIXME
-muf = mu(j1:j2,k1:k2,l1:l2)
+! Resample mu on to fault plane nodes for moment calculatioin
+i1 = 1
+i2 = nm
+i1(ifn) = ihypo(ifn) - 1
+i2(ifn) = ihypo(ifn) - 1
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+i1(ifn) = ihypo(ifn) + 1
+i2(ifn) = ihypo(ifn) + 1
+j3 = i1(1); j4 = i2(1)
+k3 = i1(2); k4 = i2(2)
+l3 = i1(3); l4 = i2(3)
+f1 = mu(j1:j2,k1:k2,l1:l2)
+f2 = mu(j3:j4,k3:k4,l3:l4)
+where ( f1 /= 0. ) f1 = 1. / f1
+where ( f2 /= 0. ) f2 = 1. / f2
+muf = f1 + f2
+j = nm(1)
+k = nm(2)
+l = nm(3)
+select case( ifn )
+case ( 1 )
+  muf(:,k,:) = muf(:,k-1,:)
+  muf(:,:,l) = muf(:,:,l-1)
+  muf(:,2:k-1,:) = .5 * ( muf(:,1:k-2,:) + muf(:,2:k-1,:) )
+  muf(:,:,2:l-1) = .5 * ( muf(:,:,1:l-2) + muf(:,:,2:l-1) )
+case ( 2 )
+  muf(j,:,:) = muf(j-1,:,:)
+  muf(:,:,l) = muf(:,:,l-1)
+  muf(2:j-1,:,:) = .5 * ( muf(1:j-2,:,:) + muf(2:j-1,:,:) )
+  muf(:,:,2:l-1) = .5 * ( muf(:,:,1:l-2) + muf(:,:,2:l-1) )
+case ( 3 )
+  muf(j,:,:) = muf(j-1,:,:)
+  muf(:,k,:) = muf(:,k-1,:)
+  muf(2:j-1,:,:) = .5 * ( muf(1:j-2,:,:) + muf(2:j-1,:,:) )
+  muf(:,2:k-1,:) = .5 * ( muf(:,1:k-2,:) + muf(:,2:k-1,:) )
+end select
+where ( muf /= 0. ) muf = 1. / muf
+
+! Save for output
 tn = sum( t0 * nhat, 4 )
 do i = 1, 3
   t2(:,:,:,i) = tn * nhat(:,:,:,i)

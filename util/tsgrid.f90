@@ -4,7 +4,7 @@ use m_tscoords
 implicit none
 real :: r, dx, h, o1, o2, xx, yy, h1, h2, h3, h4, ell(3), x0, y0, z0, &
   xf(6), yf(6), rf(6), zf, exag, mus, mud, tn, ts, rho, vp, vs, dc
-integer :: np(3), n(3), npml, nrect, i, j, k, l, j1, k1, l1, j2, k2, l2, jf0, kf0, lf0, &
+integer :: n(3), npml, nrect, i, j, k, l, j1, k1, l1, j2, k2, l2, jf0, kf0, lf0, &
   nf, nf1, nf2, nf3
 real, allocatable :: x(:,:,:,:), w1(:,:,:,:), w2(:,:,:,:), s1(:,:,:), s2(:,:,:), t(:,:)
 character :: endian0, endian, b1(4), b2(4)
@@ -18,9 +18,6 @@ rho = 3000.
 vp = 7250.
 vs = 4200.
 dc = .5
-open( 1, file='np', status='old' )
-read( 1, * ) np
-close( 1 )
 open( 1, file='dx', status='old' )
 read( 1, * ) dx
 close( 1 )

@@ -64,7 +64,7 @@ fi
 
 if [ "$compile" ]; then
   rm -f state-vm
-  $tar xzvf "$srcdir/../data/scecvm4.tgz"
+  $tar xzf "$srcdir/../data/scecvm4.tgz"
   $sfc iobin.f scecvm4.f -o scecvm4-s
   $pfc iompi.f scecvm4.f -o scecvm4-p
   sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig

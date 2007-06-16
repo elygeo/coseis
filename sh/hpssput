@@ -1,4 +1,0 @@
-#!/bin/bash -e
-file="${1:?}"
-tar cf - "$file" | hsi p - : "${file%/}.tar"
-
