@@ -4,6 +4,7 @@
 flags=$oflags
 
 files="
+  $getarg
   asc2flt.f90
   swab.f90
   drape.f90

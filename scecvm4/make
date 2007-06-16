@@ -14,6 +14,7 @@ done
 IFS="${IFS:1}"
 
 pfc='mpif90'
+getarg=''
 case $sfc in
 xlf95_r)
   sfc='xlf95_r -q64 -qsuppress=cmpmsg -qfixed'
@@ -24,8 +25,9 @@ ifort)
   gflags='-O0 -p -g -CB -warn -traceback -u'
   ;;
 pgf90)
-  sfc='pgf90 getarg-pgf.f90'
-  gflags='-O0 -g -Ktrap=fp -Mbounds getarg-pgf.f90'
+  sfc='pgf90'
+  gflags='-O0 -g -Ktrap=fp -Mbounds'
+  getarg='getarg-pgf.f90'
   ;;
 gfortran)
   gflags='-O0 -p -g -W -pedantic -std=legacy -fbounds-check'
@@ -40,7 +42,7 @@ f95)
 esac
 
 files="
-  getarg-pgf.f90
+  $getarg
   newin.h
   scecvm4.f
   iobin.f
@@ -64,8 +66,8 @@ if [ "$compile" ]; then
   echo "Compiling SCECVM"
   rm -f state-vm
   $tar xzf "$srcdir/../data/scecvm4.tgz"
-  make="$sfc iobin.f scecvm4.f -o scecvm4-s"; echo "$make"; $make
-  make="$pfc iompi.f scecvm4.f -o scecvm4-p"; echo "$make"; $make
+  make="$sfc $getarg iobin.f scecvm4.f -o scecvm4-s"; echo "$make"; $make
+  make="$pfc $getarg iompi.f scecvm4.f -o scecvm4-p"; echo "$make"; $make
   sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
   rm -f *.o *.f *.h
   mv state state-vm
