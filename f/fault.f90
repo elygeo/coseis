@@ -11,8 +11,7 @@ use m_surfnormals
 use m_bc
 use m_util
 real :: x1(3), x2(3), rr
-integer :: iz, i1(3), i2(3), i3(3), i4(3), i, j, k, l, &
-  j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
+integer :: iz, i1(3), i2(3), i3(3), i4(3), i, j, k, l, j1, k1, l1, j2, k2, l2
 
 if ( ifn == 0 ) return
 if ( master ) write( 0, * ) 'Fault initialization'
@@ -137,9 +136,9 @@ do i = 1, 3
   j = modulo( i , 3 ) + 1
   k = modulo( i + 1, 3 ) + 1
   t0(:,:,:,i) = &
-    t1(:,:,:,i) * nhat(:,:,:,i) + &
-    t2(:,:,:,j) * nhat(:,:,:,k) + &
-    t2(:,:,:,k) * nhat(:,:,:,j)
+  t1(:,:,:,i) * nhat(:,:,:,i) + &
+  t2(:,:,:,j) * nhat(:,:,:,k) + &
+  t2(:,:,:,k) * nhat(:,:,:,j)
 end do
 
 ! Ts2 vector
@@ -165,9 +164,9 @@ end do
 ! Total pretraction
 do i = 1, 3
   t0(:,:,:,i) = t0(:,:,:,i) + &
-    t3(:,:,:,1) * t1(:,:,:,i) + &
-    t3(:,:,:,2) * t2(:,:,:,i) + &
-    t3(:,:,:,3) * nhat(:,:,:,i)
+  t3(:,:,:,1) * t1(:,:,:,i) + &
+  t3(:,:,:,2) * t2(:,:,:,i) + &
+  t3(:,:,:,3) * nhat(:,:,:,i)
 end do
 
 ! Hypocentral radius
@@ -184,32 +183,20 @@ end do
 rhypo = sqrt( sum( t2 * t2, 4 ) )
 
 ! Resample mu on to fault plane nodes for moment calculatioin
-j = nm(1)
-k = nm(2)
-l = nm(3)
 select case( ifn )
-case ( 1 )
-  j = ihypo(1)
-  muf = .5 * ( mu(j-1,:,:) + mu(j+1,:,:) )
-  muf(:,k,:) = muf(:,k-1,:)
-  muf(:,:,l) = muf(:,:,l-1)
-  muf(:,2:k-1,:) = .5 * ( muf(:,1:k-2,:) + muf(:,2:k-1,:) )
-  muf(:,:,2:l-1) = .5 * ( muf(:,:,1:l-2) + muf(:,:,2:l-1) )
-case ( 2 )
-  k = ihypo(2)
-  muf = .5 * ( mu(:,k-1,:) + mu(:,k+1,:) )
-  muf(j,:,:) = muf(j-1,:,:)
-  muf(:,:,l) = muf(:,:,l-1)
-  muf(2:j-1,:,:) = .5 * ( muf(1:j-2,:,:) + muf(2:j-1,:,:) )
-  muf(:,:,2:l-1) = .5 * ( muf(:,:,1:l-2) + muf(:,:,2:l-1) )
-case ( 3 )
-  l = ihypo(3)
-  muf = .5 * ( mu(:,:,l-1) + mu(:,:,l+1) )
-  muf(j,:,:) = muf(j-1,:,:)
-  muf(:,k,:) = muf(:,k-1,:)
-  muf(2:j-1,:,:) = .5 * ( muf(1:j-2,:,:) + muf(2:j-1,:,:) )
-  muf(:,2:k-1,:) = .5 * ( muf(:,1:k-2,:) + muf(:,2:k-1,:) )
+case ( 1 ); f1(1,:,:) = mu(ihypo(1)-1,:,:); f2(1,:,:) = mu(ihypo(1)+1,:,:)
+case ( 2 ); f1(:,1,:) = mu(:,ihypo(2)-1,:); f2(:,1,:) = mu(:,ihypo(2)+1,:)
+case ( 3 ); f1(:,:,1) = mu(:,:,ihypo(3)-1); f2(:,:,1) = mu(:,:,ihypo(3)+1)
 end select
+where( f1 /= 0. ) f1 = 1. / f1
+where( f2 /= 0. ) f2 = 1. / f2
+muf = f1 + f2
+j = nm(1) - 1
+k = nm(2) - 1
+l = nm(3) - 1
+if ( ifn /= 1 ) muf(2:j,:,:) = .5 * ( muf(2:j,:,:) + muf(1:j-1,:,:) )
+if ( ifn /= 2 ) muf(:,2:k,:) = .5 * ( muf(:,2:k,:) + muf(:,1:k-1,:) )
+if ( ifn /= 3 ) muf(:,:,2:l) = .5 * ( muf(:,:,2:l) + muf(:,:,1:l-1) )
 where ( muf /= 0. ) muf = 1. / muf
 
 ! Save for output

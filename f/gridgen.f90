@@ -282,7 +282,6 @@ end select
 call vectorswaphalo( w1, nhalo )
 
 ! Cell center locations
-call vectorsethalo( w2, 0., i1cell, i2cell )
 call vectoraverage( w2, w1, i1cell, i2cell, 1 )
 
 ! Hypocenter location

@@ -15,8 +15,6 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 i1 = abs( ibc1 )
 i2 = abs( ibc2 )
-if ( n1 /= n2 ) then
-end if
 where ( nm == 1 ) i1 = 99
 where ( nm == 1 ) i2 = 99
 
@@ -29,7 +27,7 @@ if ( i2(2) <= 1 ) forall( i=1:n+c ) f(:,k2+i,:) = 0.
 if ( i2(3) <= 1 ) forall( i=1:n+c ) f(:,:,l2+i) = 0.
 
 ! Mirror on cell BC
-if ( cell /= 0 ) then
+if ( c /= 0 ) then
   if ( i1(1) == 2 ) f(j1-1,:,:) = f(j1,:,:)
   if ( i1(2) == 2 ) f(:,k1-1,:) = f(:,k1,:)
   if ( i1(3) == 2 ) f(:,:,l1-1) = f(:,:,l1)
