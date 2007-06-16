@@ -1,4 +1,4 @@
-% Terashake 200m
+% TeraShake 200m
   bc1 = [ 1 1 1 ];
   bc2 = [ 1 1 0 ];
   faultnormal = 2;

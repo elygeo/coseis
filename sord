@@ -263,7 +263,7 @@ esac
 
 # SCECVM
 if [ "$velmodel" ]; then
-  if [ "${infile/ts/}" = "$infile" ]; then 
+  if grep TeraShake "$srcdir/$infile" > /dev/null; then :; else
     echo "Error: TeraShake input file required for VM"
     exit 1
   fi
