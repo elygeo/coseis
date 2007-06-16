@@ -12,6 +12,7 @@ done
 IFS="${IFS:1}"
 
 pfc='mpif90'
+getarg=''
 case $sfc in
 xlf95_r)
   sfc='xlf95_r -q64 -qsuppress=cmpmsg'
@@ -24,9 +25,10 @@ ifort)
   oflags='-O3'
   ;;
 pgf90)
-  gflags='-O0 -g -Ktrap=fp -Mbounds getarg-pgf.f90'
-  gflags='-O0 -g -Ktrap=fp -Mbounds -Mdclchk getarg-pgf.f90'
-  oflags='-fast getarg-pgf.f90'
+  gflags='-O0 -g -Ktrap=fp -Mbounds'
+  gflags='-O0 -g -Ktrap=fp -Mbounds -Mdclchk'
+  oflags='-fast'
+  getarg='getarg-pgf.f90'
   ;;
 gfortran)
   gflags='-O0 -pg -g -Wall -std=f95 -pedantic -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
