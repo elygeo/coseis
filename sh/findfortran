@@ -1,0 +1,47 @@
+#!/bin/bash -e
+
+IFS=":$IFS"
+for dir in $PATH; do
+for file in xlf95_r ifort pgf90 gfortran f95; do
+  if [ -x $dir/$file ]; then
+    sfc=$file
+    break 2
+  fi
+done
+done
+IFS="${IFS:1}"
+
+pfc='mpif90'
+case $sfc in
+xlf95_r)
+  sfc='xlf95_r -q64 -qsuppress=cmpmsg'
+  pfc='mpxlf95_r -q64 -qsuppress=cmpmsg'
+  gflags='-qsuffix=f=f90 -p -g -C -qflttrap -qsigtrap -qlanglvl=95pure'
+  oflags='-qsuffix=f=f90 -O5'
+  ;;
+ifort)
+  gflags='-O0 -p -g -CB -warn -traceback -u'
+  oflags='-O3'
+  ;;
+pgf90)
+  gflags='-O0 -g -Ktrap=fp -Mbounds getarg-pgf.f90'
+  gflags='-O0 -g -Ktrap=fp -Mbounds -Mdclchk getarg-pgf.f90'
+  oflags='-fast getarg-pgf.f90'
+  ;;
+gfortran)
+  gflags='-O0 -pg -g -Wall -std=f95 -pedantic -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
+  oflags='-O3'
+  ;;
+f95)
+  gflags='-g'
+  oflags='-O'
+  if [ $( uname ) = SunOS ]; then
+    gflags='-g -w4 -u -C'
+    oflags='-fast'
+  fi
+  ;;
+*)
+  echo "Error: no Fortran 95 compiler found"
+  exit 1
+esac
+

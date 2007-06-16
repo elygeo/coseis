@@ -1,89 +1,51 @@
 #!/bin/bash -e
 
-IFS=":$IFS"
-tar=tar
-for dir in $PATH; do [ -x $dir/gtar ] && tar=gtar; done
-for dir in $PATH; do
-for file in xlf95_r ifort pgf90 gfortran f95; do
-  if [ -x $dir/$file ]; then
-    sfc=$file
-    break 2
-  fi
-done
-done
-
-getarg=''
-pfc='mpif90'
-vmflags=''
-case $sfc in
-xlf95_r)
-  sfc='xlf95_r -q64 -qsuppress=cmpmsg'
-  pfc='mpxlf95_r -q64 -qsuppress=cmpmsg'
-  gflags='-qsuffix=f=f90 -p -g -C -qflttrap -qsigtrap -qlanglvl=95pure'
-  oflags='-qsuffix=f=f90 -O3'
-  vmflags='-qfixed'
-  ;;
-ifort)
-  gflags='-O0 -p -g -CB -warn -traceback -u'
-  oflags='-O3'
-  ;;
-pgf90)
-  getarg='getarg-pgf.f90'
-  gflags='-O0 -g -Ktrap=fp -Mbounds -Mdclchk -Mprof=lines'
-  gflags='-O0 -g -Ktrap=fp -Mbounds'
-  oflags='-fast'
-  ;;
-gfortran)
-  gflags='-O0 -p -g -W -pedantic -std=legacy -fbounds-check'
-  gflags='-O0 -g -W -fbounds-check -ffpe-trap=invalid,zero,overflow,underflow'
-  oflags='-O3'
-  ;;
-f95)
-  gflags='-g'
-  oflags='-O'
-  if [ $( uname ) = SunOS ]; then
-    gflags='-g -w4 -u -C'
-    oflags='-fast'
-  fi
-  ;;
-*)
-  echo "Error: no Fortran 95 compiler found"
-  exit
-esac
-
-cd ..
-srcdir=$( /bin/pwd )
-mkdir -p tmp/scecvm
-cd tmp
-
 echo "Compiling SORD utilities"
 
-for file in "$srcdir/util/"*; do
-  ln -s "$file" &> /dev/null || :
-done
-for file in "$srcdir/data/"*; do
-  ln -s "$file" &> /dev/null || :
-done
+. ../sh/findfortran
 flags=$oflags
-$sfc $flags utm.f90 tscoords.f90 tsgrid.f90 -o tsgrid
-$sfc $flags utm.f90 tscoords.f90 ts2ll.f90 -o ts2ll
-$sfc $flags utm.f90 tscoords.f90 ll2ts.f90 -o ll2ts
-$sfc $flags utm.f90 pscoords.f90 ps2ll.f90 -o ps2ll
-$sfc $flags utm.f90 pscoords.f90 ll2ps.f90 -o ll2ps
-$sfc $flags $getarg utm.f90 ll2utm.f90 -o ll2utm
-$sfc $flags $getarg utm.f90 gearthdrape.f90 -o gearthdrape
-$sfc $flags drape.f90 -o drape
-$sfc $flags $getarg swab.f90 -o swab
-$sfc $flags $getarg asc2flt.f90 -o asc2flt
 
-echo "Compiling SCECVM"
+files="
+  asc2flt.f90
+  swab.f90
+  drape.f90
+  utm.f90
+  ll2utm.f90
+  tscoords.f90
+  tsgrid.f90
+  ts2ll.f90
+  ll2ts.f90
+  pscoords.f90
+  ps2ll.f90
+  ll2ps.f90
+  gearthdrape.f90"
 
-cd scecvm
-$tar zxf "$srcdir/data/scecvm4.tgz"
-for file in "$srcdir"/scecvm4/* "$srcdir"/util/getarg*; do
-  ln -sf "$file"
+srcdir=$( /bin/pwd )
+mkdir -p ../tmp
+cd ../tmp
+for file in $files; do
+  ln -s "$srcdir/$file" &> /dev/null || :
 done
-$sfc $vmflags $getarg iobin.f scecvm4.f -o scecvm4-s
-$pfc $vmflags $getarg iompi.f scecvm4.f -o scecvm4-p
-rm -f *.mod *.f *.f90
+cat $files > state
+echo "$sfc $flags" >> state
+
+compile=yes
+if [ -f state-util ]; then
+  compile=$( cmp state state-util || : )
+fi
+
+if [ "$compile" ]; then
+  rm -f state-util
+  $sfc $flags asc2flt.f90 -o asc2flt
+  $sfc $flags swab.f90 -o swab
+  $sfc $flags drape.f90 -o drape
+  $sfc $flags utm.f90 ll2utm.f90 -o ll2utm
+  $sfc $flags utm.f90 tscoords.f90 tsgrid.f90 -o tsgrid
+  $sfc $flags utm.f90 tscoords.f90 ts2ll.f90 -o ts2ll
+  $sfc $flags utm.f90 tscoords.f90 ll2ts.f90 -o ll2ts
+  $sfc $flags utm.f90 pscoords.f90 ps2ll.f90 -o ps2ll
+  $sfc $flags utm.f90 pscoords.f90 ll2ps.f90 -o ll2ps
+  $sfc $flags utm.f90 gearthdrape.f90 -o gearthdrape
+  mv state state-util
+fi
 

@@ -28,7 +28,6 @@ files="
   $base/util
   $base/scecvm4
 "
-rm -f f/*.o f/*.mod f/*.ipo f/*.il f/*.stb
 mkdir -p tmp
 cd $( dirname "$dir" )
 tar cf - $files | gzip > "$dir/tmp/$base.tgz"

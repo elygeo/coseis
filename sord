@@ -77,10 +77,10 @@ while read key params; do
 set -- $params
 case "$key" in
   nt) nt=$1 ;;
-  nn) nm3=( $1 $2 $3 ); echo "$1 $2 $3" > tmp/nn ;;
-  np) np3=( $1 $2 $3 ); echo "$1 $2 $3" > tmp/np ;;
-  dx)   echo "$1" > tmp/dx ;;
-  npml) echo "$1" > tmp/npml ;;
+  nn) nm3=( $1 $2 $3 ) ;;
+  np) np3=( $1 $2 $3 ) ;;
+  dx) dx=$1 ;;
+  npml) npml=$1 ;;
   datadir) datadir="$1" ;;
   return) break ;;
 esac
@@ -151,57 +151,6 @@ echo "SUs: $sus"
 
 #------------------------------------------------------------------------------#
 
-# Compiler
-IFS=":$IFS"
-for dir in $PATH; do
-for file in xlf95_r ifort pgf90 gfortran f95; do
-  if [ -x $dir/$file ]; then
-    sfc=$file
-    break 2
-  fi
-done
-done
-IFS="${IFS:1}"
-pfc='mpif90'
-case $sfc in
-xlf95_r)
-  sfc='xlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
-  pfc='mpxlf95_r -qsuffix=f=f90 -q64 -qsuppress=cmpmsg'
-  gflags='-p -g -C -qflttrap -qsigtrap -qlanglvl=95pure'
-  oflags='-O -qmaxmem=-1'
-  oflags='-O5'
-  ;;
-ifort)
-  gflags='-O0 -p -g -CB -warn -traceback -u'
-  oflags='-fast'
-  [ $machine = teragrid ] && oflags='-O3'
-  ;;
-pgf90)
-  gflags='-g -Mprof=lines'
-  gflags='-O0 -g -Ktrap=fp -Mbounds -Mdclchk'
-  oflags='-fast'
-  ;;
-gfortran)
-  gflags='-O0 -pg -g -Wall -std=f95 -pedantic -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
-  oflags='-O3'
-  ;;
-f95)
-  gflags='-g'
-  oflags='-O'
-  if [ $( uname ) = SunOS ]; then
-    gflags='-g -w4 -u -C'
-    oflags='-fast'
-  fi
-  ;;
-*)
-  echo "Error: no Fortran 95 compiler found"
-  exit 1
-esac
-case $optimize in
-  O) fflags=$oflags ;;
-  g) fflags=$gflags ;;
-esac
-
 # Source files
 base="
   globals.f90
@@ -235,23 +184,31 @@ common="
   sord.f90"
 
 # Compile
-cd f
+. sh/findfortran
+case $optimize in
+  O) fflags=$oflags ;;
+  g) fflags=$gflags ;;
+esac
 case $mode in
   s) fc="$sfc"; collective="$serial" ;;
   p) fc="$pfc"; collective="$parallel" ;;
 esac
-make="$fc $fflags -o $srcdir/tmp/sord-$mode $base $collective $common"
-echo "$make" > "$srcdir/tmp/state"
-cat $base $collective $common >> "$srcdir/tmp/state" 
+make="$fc $fflags -o sord-$mode $base $collective $common"
+cd tmp
+for file in "$srcdir/f/"*; do
+  ln -s "$file" &> /dev/null || :
+done
+echo "$make" > state
+cat $base $collective $common >> state
 compile=yes
-if [ -f "$srcdir/tmp/state-$mode" ]; then
-  compile=$( cmp "$srcdir/tmp/state" "$srcdir/tmp/state-$mode" || : )
+if [ -f state-$mode ]; then
+  compile=$( cmp state state-$mode || : )
 fi
 if [ "$compile" ]; then
-  rm -f "$srcdir/tmp/state-$mode"
+  rm -f state-$mode
   echo $make
   $make
-  mv "$srcdir/tmp/state" "$srcdir/tmp/state-$mode"
+  mv state state-$mode
 fi
 cd "$srcdir"
 
@@ -275,17 +232,6 @@ mkdir out
 mkdir stats
 mkdir checkpoint
 mkdir debug
-if [ "$datadir" -a ! "$velmodel" ]; then
-  endian="$( perl -le 'print pack('V',1) eq pack('L',1) ? "l" : "b"' )"
-  cd "$srcdir/$datadir"
-  if [ "$endian" != "$( cat endian )" ]; then
-    echo "Error: endian file not found or endian missmatch"
-    exit 1
-  fi
-  datadir=$( /bin/pwd )
-  cd "$rundir"
-  ln -s "$datadir" 'data'
-fi
 
 # Write run metadata
 cat << END > runmeta.m
@@ -316,30 +262,33 @@ esac
 
 # SCECVM
 if [ "$velmodel" ]; then
-  cd "$srcdir/util"
-  [ tsgrid.f90 -nt "$srcdir/tmp/tsgrid" ] && ./make
-  cd "$srcdir/tmp"
+  cd "$srcdir/util"; ./make
+  cd "$srcdir/scecvm4"; ./make
+  cd "$rundir"
+  mkdir "$rundir/data"
+  cp -r "$srcdir/tmp/scecvm" .
+  cd scecvm
   echo 1 > exag
+  echo "$dx" > dx
+  echo "$npml" > npml
+  cp "$srcdir/tmp/tsgrid" .
+  cp "$srcdir/data/topo3.f32" .
+  cp "$srcdir/data/ts-ts1.f32" .
+  cp "$srcdir/data/endian0" .
   ./tsgrid
+  ibig=$( cat ibig )
   nc=$( cat nc )
   nnl=$(( nc / np + ( nc % np > 0 ? 1 : 0 ) ))
-  ibig=$( sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' < scecvm/newin.h )
   if [ "$ibig" -lt "$nnl" ]; then
     echo "Error: ibig=$ibig in newin.h must be greater than $nnl"
     exit 1
   fi
-  mkdir "$rundir/data"
-  cp endian "$rundir/data/"
-  cp -r scecvm "$rundir/vm/"
-  mv nc rlon rlat rdep "$rundir/vm/"
-  mv ts1 x1 x2 x3 meta.m "$rundir/data/"
   code="scecvm"
   bin="./scecvm4-$mode nc rlon rlat rdep rho vp vs"
-  post="mv rho vp vs $rundir/data"
+  post="mv meta.m endian x1 x2 x3 rho vp vs $rundir/data"
   walltime="00:30:00"
   topdir="$rundir"
-  rundir="$topdir/vm"
-  cd "$rundir"
+  rundir="$topdir/scecvm"
   case $machine in
   datastar) . "$srcdir/sh/datastar" ;;
   teragrid) . "$srcdir/sh/teragrid" ;;
@@ -348,6 +297,16 @@ if [ "$velmodel" ]; then
   esac
   [ "$run" ] && ./run "-$run"
   cd "$topdir"
+elif [ "$datadir" ]; then
+  endian="$( perl -le 'print pack('V',1) eq pack('L',1) ? "l" : "b"' )"
+  cd "$srcdir/$datadir"
+  if [ "$endian" != "$( cat endian )" ]; then
+    echo "Error: endian file not found or endian missmatch"
+    exit 1
+  fi
+  datadir=$( /bin/pwd )
+  cd "$rundir"
+  ln -s "$datadir" 'data'
 fi
 
 # Run SORD

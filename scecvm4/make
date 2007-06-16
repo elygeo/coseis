@@ -1,0 +1,74 @@
+#!/bin/bash -e
+
+echo "Compiling SCECVM"
+
+IFS=":$IFS"
+tar=tar
+for dir in $PATH; do [ -x $dir/gtar ] && tar=gtar; done
+for dir in $PATH; do
+for file in xlf95_r ifort pgf90 gfortran f95; do
+  if [ -x $dir/$file ]; then
+    sfc=$file
+    break 2
+  fi
+done
+done
+IFS="${IFS:1}"
+
+pfc='mpif90'
+case $sfc in
+xlf95_r)
+  sfc='xlf95_r -q64 -qsuppress=cmpmsg -qfixed'
+  pfc='mpxlf95_r -q64 -qsuppress=cmpmsg -qfixed'
+  gflags='-p -g -C -qflttrap -qsigtrap'
+  ;;
+ifort)
+  gflags='-O0 -p -g -CB -warn -traceback -u'
+  ;;
+pgf90)
+  sfc='pgf90 getarg-pgf.f90'
+  gflags='-O0 -g -Ktrap=fp -Mbounds getarg-pgf.f90'
+  ;;
+gfortran)
+  gflags='-O0 -p -g -W -pedantic -std=legacy -fbounds-check'
+  ;;
+f95)
+  gflags='-g'
+  [ $( uname ) = SunOS ] && gflags='-g -w4 -u -C'
+  ;;
+*)
+  echo "Error: no Fortran 95 compiler found"
+  exit
+esac
+
+files="
+  getarg-pgf.f90
+  newin.h
+  scecvm4.f
+  iobin.f
+  iompi.f"
+
+srcdir=$( /bin/pwd )
+mkdir -p ../tmp/scecvm
+cd ../tmp/scecvm
+for file in $files; do
+  ln -s "$srcdir/$file" &> /dev/null || :
+done
+cat $files > state
+echo "$sfc $pfc" >> state
+
+compile=yes
+if [ -f state-vm ]; then
+  compile=$( cmp state state-vm || : )
+fi
+
+if [ "$compile" ]; then
+  rm -f state-vm
+  $tar xzvf "$srcdir/../data/scecvm4.tgz"
+  $sfc iobin.f scecvm4.f -o scecvm4-s
+  $pfc iompi.f scecvm4.f -o scecvm4-p
+  sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
+  rm *.f *.f90 *.mod *.h
+  mv state state-vm
+fi
+

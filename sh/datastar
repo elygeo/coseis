@@ -45,7 +45,7 @@ cat << END > script
 #MP_ADAPTER_USE=dedicated;\\
 #MP_CPU_USE=unique;\\
 #MP_CSS_INTERRUPT=no;\\
-#MP_EAGER_LIMIT=32768;\\
+#MP_EAGER_LIMIT=16384;\\
 #MP_EUIDEVELOP=min;\\
 #MP_LABELIO=yes;\\
 #MP_POLLING_INTERVAL=100000;\\
