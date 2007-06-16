@@ -209,8 +209,9 @@ if [ "$compile" ]; then
   echo $make
   $make
   mv state state-$mode
-  rm -f $files *.o *.mod *.ipo *.il *.stb
+  rm -f *.o *.mod *.ipo *.il *.stb
 fi
+rm $files
 cd "$srcdir"
 
 #------------------------------------------------------------------------------#

@@ -82,17 +82,24 @@ where ( s1 > vp2 ) s1 = vp2
 where ( s2 < vs1 ) s2 = vs1
 where ( s2 > vs2 ) s2 = vs2
 
-! Extrema
-stats(1) =  maxval( mr )
-stats(2) =  maxval( s1 )
-stats(3) =  maxval( s2 )
-call scalarsethalo( mr, stats(1), i1cell, i2cell )
-call scalarsethalo( s1, stats(2), i1cell, i2cell )
-call scalarsethalo( s2, stats(3), i1cell, i2cell )
+! Fill halo
+i1 = abs( ibc1 )
+i2 = abs( ibc2 )
+where( i1 <= 1 ) i1 = 4
+where( i2 <= 1 ) i2 = 4
+call scalarbc( mr,  ibc1, ibc2, nhalo, 1 )
+call scalarbc( gam, ibc1, ibc2, nhalo, 1 )
+call scalarbc( s1,  ibc1, ibc2, nhalo, 1 )
+call scalarbc( s2,  ibc1, ibc2, nhalo, 1 )
 call scalarswaphalo( mr, nhalo )
 call scalarswaphalo( gam, nhalo )
 call scalarswaphalo( s1, nhalo )
 call scalarswaphalo( s2, nhalo )
+
+! Extrema
+stats(1) =  maxval( mr )
+stats(2) =  maxval( s1 )
+stats(3) =  maxval( s2 )
 stats(4) = -minval( mr )
 stats(5) = -minval( s1 )
 stats(6) = -minval( s2 )
@@ -103,12 +110,6 @@ vs2  =  gstats(3)
 rho1 = -gstats(4)
 vp1  = -gstats(5)
 vs1  = -gstats(6)
-
-! BCs
-call scalarbc( mr,  ibc1, ibc2, nhalo, 1 )
-call scalarbc( gam, ibc1, ibc2, nhalo, 1 )
-call scalarbc( s1,  ibc1, ibc2, nhalo, 1 )
-call scalarbc( s2,  ibc1, ibc2, nhalo, 1 )
 
 ! Hypocenter values
 if ( master ) then

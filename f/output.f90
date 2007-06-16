@@ -210,6 +210,7 @@ if ( it > 0 .and. dofault ) then
   case( 1 )
     call scalarsethalo( f1,   -1., i1node, i2node )
     call scalarsethalo( f2,   -1., i1node, i2node )
+    call scalarsethalo( sl,   -1., i1node, i2node )
     call scalarsethalo( tarr, -1., i1node, i2node )
     fstats(i,1) = maxval( f1 )
     fstats(i,2) = maxval( f2 )

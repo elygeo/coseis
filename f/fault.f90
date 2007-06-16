@@ -184,38 +184,27 @@ end do
 rhypo = sqrt( sum( t2 * t2, 4 ) )
 
 ! Resample mu on to fault plane nodes for moment calculatioin
-i1 = 1
-i2 = nm
-i1(ifn) = ihypo(ifn) - 1
-i2(ifn) = ihypo(ifn) - 1
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-i1(ifn) = ihypo(ifn) + 1
-i2(ifn) = ihypo(ifn) + 1
-j3 = i1(1); j4 = i2(1)
-k3 = i1(2); k4 = i2(2)
-l3 = i1(3); l4 = i2(3)
-f1 = mu(j1:j2,k1:k2,l1:l2)
-f2 = mu(j3:j4,k3:k4,l3:l4)
-where ( f1 /= 0. ) f1 = 1. / f1
-where ( f2 /= 0. ) f2 = 1. / f2
-muf = f1 + f2
 j = nm(1)
 k = nm(2)
 l = nm(3)
 select case( ifn )
 case ( 1 )
+  j = ihypo(1)
+  muf = .5 * ( mu(j-1,:,:) + mu(j+1,:,:) )
   muf(:,k,:) = muf(:,k-1,:)
   muf(:,:,l) = muf(:,:,l-1)
   muf(:,2:k-1,:) = .5 * ( muf(:,1:k-2,:) + muf(:,2:k-1,:) )
   muf(:,:,2:l-1) = .5 * ( muf(:,:,1:l-2) + muf(:,:,2:l-1) )
 case ( 2 )
+  k = ihypo(2)
+  muf = .5 * ( mu(:,k-1,:) + mu(:,k+1,:) )
   muf(j,:,:) = muf(j-1,:,:)
   muf(:,:,l) = muf(:,:,l-1)
   muf(2:j-1,:,:) = .5 * ( muf(1:j-2,:,:) + muf(2:j-1,:,:) )
   muf(:,:,2:l-1) = .5 * ( muf(:,:,1:l-2) + muf(:,:,2:l-1) )
 case ( 3 )
+  l = ihypo(3)
+  muf = .5 * ( mu(:,:,l-1) + mu(:,:,l+1) )
   muf(j,:,:) = muf(j-1,:,:)
   muf(:,k,:) = muf(:,k-1,:)
   muf(2:j-1,:,:) = .5 * ( muf(1:j-2,:,:) + muf(2:j-1,:,:) )
