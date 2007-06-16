@@ -67,7 +67,8 @@ if [ "$compile" ]; then
   make="$sfc iobin.f scecvm4.f -o scecvm4-s"; echo "$make"; $make
   make="$pfc iompi.f scecvm4.f -o scecvm4-p"; echo "$make"; $make
   sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
-  rm *.f *.f90 *.h
+  rm -f *.o *.f *.h
   mv state state-vm
 fi
+rm -f $files
 

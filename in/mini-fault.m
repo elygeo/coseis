@@ -2,9 +2,6 @@
 
 nt = 2;
 debug = 1;
-mpout = 0;
-mpout = 1;
-mpout = -1;
   np = [ 2 1 1 ];
   nn = [ 45 46 47 ];
   ihypo = [ 3 3 3 ];
