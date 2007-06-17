@@ -1,25 +1,36 @@
 % Extract 4D slice from saved data
-function [ msg, f ] = read4d( varargin )
+% [ f, i3, i4 ] = read4d( iout )
+% [ f, i3, i4 ] = read4d( iout, i1, i2 )
+% [ f, i3, i4 ] = read4d( 'field', i1, i2 )
+% iout is the output index
+% i1 and i2 are the optional desired min and max indices
+% i3 and i4 are the min and max indices returned
 
-% Aguments
-if ~any( nargin == [ 1 3 4 ] ), error, end
-fieldin = varargin{1};
-i3 =  [ 1 1 1 1 ];
-i4 = -[ 1 1 1 1 ];
-ic = 0;
-if nargin > 1
-  i3 = varargin{2};
-  i4 = varargin{3};
-end
-if nargin > 3
-  ic = varargin{4};
-end
+function [ f, i3, i4 ] = read4d( varargin )
 
 % Metadata
 meta
-currentstep
-oldway = ~exist( 'dirfmt', 'var' );
-if oldway, dirfmt = '%02d/'; end
+
+% Aguments
+if ~any( nargin == [ 1 3 4 ] ), error, end
+if ( isnumeric( varargin{1} ) )
+  iz = varargin{1};
+  fieldin = out{izs}{2};
+  i3 = [ out{izs}{4:7}  ];
+  i4 = [ out{izs}{8:11} ];
+  if nargin > 1
+    i3 = varargin{2};
+    i4 = varargin{3};
+  end
+else
+  fieldin = varargin{1};
+  i3 = varargin{2};
+  i4 = varargin{3};
+end
+ic = 0;
+if nargin > 3
+  ic = varargin{4};
+end
 
 % Slice
 n = [ nn it ];
@@ -37,8 +48,7 @@ i4(m2) = ihypo(m2);
 i3(m3) = i3(m3) + n(m3) + 1;
 i4(m4) = i4(m4) + n(m4) + 1;
 
-% Look for file with desired data
-msg = '';
+% Look for data
 found = 0;
 n = i4 - i3 + 1;
 nout = length( out );
@@ -46,13 +56,8 @@ for iz = 1:nout
   nc    = out{iz}{1};
   field = out{iz}{2};
   dit   = out{iz}{3};
-  if length( out{iz} ) == 11
-    i1  = [ out{iz}{4:7}  ];
-    i2  = [ out{iz}{8:11} ];
-  else
-    i1  = [ out{iz}{4:6} dit ];
-    i2  = [ out{iz}{7:9} nt  ];
-  end
+  i1 = [ out{iz}{4:7}  ];
+  i2 = [ out{iz}{8:11} ];
   if dit == 0
     dit = 1;
     i1(4) = 0;
@@ -68,51 +73,38 @@ for iz = 1:nout
   if found, break, end
 end
 if ~found
-  msg = 'No saved data found for this region';
-  msg = sprintf( 'No saved data for:   %s   %d %d %d %d   %d %d %d %d', fieldin, i3, i4 );
   f = [];
+  i3 = [];
+  i4 = [];
   return
 end
 
-if nargout < 2, return, end
-
 % Read data
-if ic == 0
-  ic = 1:nc;
-end
+i0 = ( i3 - i1 ) ./ [ 1 1 1 dit ];
 m = i2 - i1 + 1;
+i = [ find( m~=1 ) find( m==1 ) ];
+i0 = i0(i);
+m = m(i);
+n = n(i);
+if ic == 0, ic = 1:nc; end
 n = [ n length( ic ) ];
 f = zeros( n );
-i0 = ( i3 - i1 ) ./ [ 1 1 1 dit ];
-if all( m(1:3) == 1 )
-  for i = 1:n(5)
-    file = field;
-    if dirfmt, file = sprintf( [ dirfmt file ], iz ); end
-    if nc > 1 || oldway, file = sprintf( [ file '%1d' ], ic(i) ); end
-    fid = fopen( file, 'r', endian );
-    if ( fid == -1 ), error( [ 'Error opening file: ' file ] ), end
-    fseek( fid, 4*i0(4), 'bof' );
-    f(1,1,1,:,i) = fread( fid, n(4), 'float32' );
-    fclose( fid );
+skip = 4 * ( m(1) - n(1) );
+block = sprintf( '%d*float32', n(1) );
+for l = 1:n(5)
+  if dirfmt, file = sprintf( [ dirfmt field ], iz ); end
+  if nc > 1, file = sprintf( [ file '%1d' ], ic(l) ); end
+  fid = fopen( file, 'r', endian );
+  if ( fid == -1 ), error( [ 'Error opening file: ' file ] ), end
+  for k = 1:n(4)
+  for j = 1:n(3)
+    seek = 4 * ( i0(1) + m(1) * ( i0(2) + m(2) * ( i0(3) + j-1 + m(3) * ( i0(4) + k-1 ) ) ) );
+    fseek( fid, seek, 'bof' );
+    tmp = fread( fid, n(1)*n(2), block, skip );
+    f(:,:,j,k,l) = reshape( tmp, n(1:2) );
   end
-else
-  skip = 4 * ( m(1) - n(1) );
-  block = sprintf( '%d*float32', n(1) );
-  for i  = 1:n(5)
-    file = field;
-    if dirfmt, file = sprintf( [ dirfmt file ], iz ); end
-    if nc > 1 || oldway, file = sprintf( [ file '%1d' ], ic(i) ); end
-    fid = fopen( file, 'r', endian );
-    if ( fid == -1 ), error( [ 'Error opening file: ' file ] ), end
-    for it = 1:n(4)
-    for l  = 1:n(3)
-      seek = 4 * ( i0(1) + m(1) * ( i0(2) + m(2) * ( i0(3) + l - 1 + m(3) * ( i0(4) + it - 1 ) ) ) );
-      fseek( fid, seek, 'bof' );
-      tmp = fread( fid, n(1)*n(2), block, skip );
-      f(:,:,l,it,i) = reshape( tmp, n(1:2) );
-    end
-    end
-    fclose( fid );
   end
+  fclose( fid );
 end
+f = squeeze( f );
 

@@ -98,7 +98,7 @@ fi
 maxnodes=1; maxcpus=1; maxram=800; maxmm=0; rate=200
 case $machine in
   wide)                   maxcpus=2; maxram=1800 ;;
-  kim.home)               maxcpus=2; maxram=800  ;;
+  kim)                    maxcpus=2; maxram=800  ;;
   phim)                              maxram=2800;  rate=400 ;;
   altai)                  maxcpus=8; maxram=30000; rate=100  ;; 
   babieca)  maxnodes=30;  maxcpus=2; maxram=1800;  rate=100 ;;

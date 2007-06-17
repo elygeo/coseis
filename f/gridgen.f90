@@ -14,8 +14,8 @@ real :: x0(3), xlim(6), gxlim(6), m(9), tol, r
 if ( master ) write( 0, * ) 'Grid generation'
 
 ! Read grid
-i1 = 1  + nnoff
-i2 = nn + nnoff
+i1 = 1  - nnoff
+i2 = nn - nnoff
 i3 = i1node
 i4 = i2node
 if ( grid == 'read' ) then

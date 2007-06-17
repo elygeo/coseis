@@ -21,8 +21,8 @@
   datadir = 'ts/4000/data';
 
 
-
-  np = [ 1 1 2 ] % Wide
+  np = [ 1 1 4 ]
+  np = [ 1 1 2 ]
   dx = 4000.;
   dt = .24;
   trelax = 2.4;

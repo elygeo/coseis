@@ -1,5 +1,5 @@
 % Time series
-function [ msg, tt, vt, x, tta, vta, labels ] = tsread( varargin )
+function [ tt, vt, x, tta, vta, labels ] = tsread( varargin )
 
 field  = varargin{1};
 sensor = varargin{2};
@@ -33,16 +33,15 @@ kostrov = ...
   trelax == 0.;
 
 % Find sensor location
-[ msg, x ] = read4d( 'x', [ sensor 0 ], [ sensor 0 ] );
-x = squeeze( x )';
-if msg
-  pointsource = 0;
-  explosion = 0;
-  kostrov = 0;
-else
+x = read4d( 'x', [ sensor 0 ], [ sensor 0 ] );
+if x
   nr = x - xhypo;
   rg = sqrt( sum( nr .* nr ) );
   if rg, nr = nr / rg; end
+else
+  pointsource = 0;
+  explosion = 0;
+  kostrov = 0;
 end
 
 % Time
@@ -55,10 +54,9 @@ else
 end
 
 % Extract data
-[ msg, vt ] = read4d( field, [ sensor it0 ], [ sensor it ] );
-if msg, return, end
+vt = read4d( field, [ sensor it0 ], [ sensor it ] );
+if vt, else, return, end
 if nargout < 2, return, end
-msg = 'Time Series';
 
 nt = it - it0 + 1;
 nc = size( vt, 5 );

@@ -21,7 +21,7 @@ if ( np0 == 1 ) np = 1
 nl = nn / np; where ( modulo( nn, np ) /= 0 ) nl = nl + 1
 np = nn / nl; where ( modulo( nn, nl ) /= 0 ) np = np + 1
 call rank( ip, ip3, np )
-nnoff = nhalo - nl * ip3
+nnoff = nl * ip3 - nhalo
 
 ! Master processor
 ip3master = ( ihypo - 1 ) / nl
@@ -30,7 +30,7 @@ if ( all( ip3 == ip3master ) ) master = .true.
 call setmaster( ip3master )
 
 ! Size of arrays
-nl = min( nl, nn + nnoff - nhalo )
+nl = min( nl, nn - nnoff - nhalo )
 nm = nl + 2 * nhalo
 
 ! Boundary conditions
@@ -53,14 +53,18 @@ where ( abs( ibc1 ) <= 1 ) i1cell = i1cell + 1
 where ( abs( ibc2 ) <= 1 ) i2cell = i2cell - 1
 
 ! PML region
-i1pml = nnoff + npml
-i2pml = nnoff + nn + 1 - npml
-where ( ibc1 /= 1 ) i1pml = 0
-where ( ibc2 /= 1 ) i2pml = nm + 1
+i1pml = 0 - nhalo
+i2pml = nn + 1 + nhalo
+if ( npml > 0 ) then
+  where ( bc1 == 1 ) i1pml = npml
+  where ( bc2 == 1 ) i2pml = nn + 1 - npml
+end if
+i1pml = i1pml - nnoff
+i2pml = i2pml - nnoff
 if ( any( i1pml >= i2pml ) ) stop 'model too small for PML'
 
 ! Map hypocenter to local index, test if fault on this processor
-ihypo = ihypo + nnoff
+ihypo = ihypo - nnoff
 ifn = 0
 if ( faultnormal /= 0 ) then
   if ( ihypo(i) >= 1 .and. ihypo(i) <= nm(i) ) ifn = abs( faultnormal )

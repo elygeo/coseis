@@ -3,16 +3,15 @@
 list="1"
 
 accounts="\
+  kim
   phim.ucsd.edu
-  babieca.sdsu.edu
-  ux451302@tg-login2.sdsc.teragrid.org
-  ux451302@dslogin.sdsc.edu
-  altai.sdsu.edu
   moho.sdsu.edu
-  kim"
+  altai.sdsu.edu
+  ux451302@dslogin.sdsc.edu
+  ux451302@tg-login2.sdsc.teragrid.org
+  babieca.sdsu.edu"
 
 files="\
-gilead
   versionmeta.m
   email
   doc

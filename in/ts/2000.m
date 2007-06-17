@@ -22,7 +22,7 @@
 
 
   np = [ 1 8 4 ] % Babieca 16 nodes
-  np = [ 1 1 2 ] % Wide
+  np = [ 1 1 2 ]
   dx = 2000.;
   dt = .12;
   trelax = 1.2;

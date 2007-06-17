@@ -90,7 +90,7 @@ write( 1, * ) ' oplevel     =  ', oplevel,    ';'
 write( 1, * ) ' mpin        =  ', mpin,       ';'
 write( 1, * ) ' mpout       =  ', mpout,      ';'
 write( 1, * ) ' nn          = [', nn,            '];'
-write( 1, * ) ' ihypo       = [', ihypo - nnoff, '];'
+write( 1, * ) ' ihypo       = [', ihypo + nnoff, '];'
 write( 1, * ) ' n1expand    = [', n1expand,      '];'
 write( 1, * ) ' n2expand    = [', n2expand,      '];'
 write( 1, * ) ' bc1         = [', bc1,           '];'
@@ -126,8 +126,8 @@ do iz = 1, nout
   i = ditout(iz)
   i1 = i1out(iz,:)
   i2 = i2out(iz,:)
-  i1(1:3) = i1(1:3) - nnoff
-  i2(1:3) = i2(1:3) - nnoff
+  i1(1:3) = i1(1:3) + nnoff
+  i2(1:3) = i2(1:3) + nnoff
   call outprops( fieldout(iz), nc, onpass, fault, cell )
   write( field, * ) '''', trim( fieldout(iz) ), ''''
   write( 1, '(a,i3.3,a,i1,a,9i7,a)' ) '  out{', iz, '} = { ', nc, field, i, i1, i2, ' };'
@@ -140,8 +140,8 @@ write( 1, '(3i8)' ) np
 do iz = 1, nout
   i1 = i1out(iz,:)
   i2 = i2out(iz,:)
-  i1(1:3) = i1(1:3) - nnoff
-  i2(1:3) = i2(1:3) - nnoff
+  i1(1:3) = i1(1:3) + nnoff
+  i2(1:3) = i2(1:3) + nnoff
   call outprops( fieldout(iz), nc, onpass, fault, cell )
   do i = 1, nc
     write( 1, '(9i7,a,i2.2,a,i1)' ) ditout(iz), i1, i2, '  ', iz, trim(fieldout(iz)), i

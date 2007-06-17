@@ -48,7 +48,7 @@ if ( fault .and. faultnormal == 0 ) i1out(iz,4) = nt + 1
 
 ! Spatial indices
 n = nn + 2 * nhalo
-noff = nnoff - nhalo
+noff = nnoff + nhalo
 select case( outtype(iz) )
 case( 'z' )
   i1 = i1out(iz,1:3)
@@ -298,6 +298,7 @@ do ic = 1, nc
   case( 'vs'   ); call scalario( 'w', str, rr, s2,   i1, i2, i3, i4,       ir, i )
   case( 'mu'   ); call scalario( 'w', str, rr, mu,   i1, i2, i3, i4,       ir, i )
   case( 'lam'  ); call scalario( 'w', str, rr, lam,  i1, i2, i3, i4,       ir, i )
+  case( 'gam'  ); call scalario( 'w', str, rr, gam,  i1, i2, i3, i4,       ir, i )
   case( 'v'    ); call vectorio( 'w', str, rr, v,    i1, i2, i3, i4, ic,   ir, i )
   case( 'u'    ); call vectorio( 'w', str, rr, u,    i1, i2, i3, i4, ic,   ir, i )
   case( 'w'    );

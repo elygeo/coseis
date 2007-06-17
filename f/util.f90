@@ -16,16 +16,16 @@ m1 = i1 == 0 .and. i2 /= 0
 m2 = i1 /= 0 .and. i2 == 0
 m3 = i1 < 0
 m4 = i2 < 0
-where ( m0 ) i1 = ihypo - nnoff
-where ( m0 ) i2 = ihypo - nnoff
-where ( m1 ) i1 = ihypo - nnoff + nshift
-where ( m2 ) i2 = ihypo - nnoff
+where ( m0 ) i1 = ihypo + nnoff
+where ( m0 ) i2 = ihypo + nnoff
+where ( m1 ) i1 = ihypo + nnoff + nshift
+where ( m2 ) i2 = ihypo + nnoff
 where ( m3 ) i1 = i1 + nn + 1
 where ( m4 ) i2 = i2 + nn + 1
 i1 = max( i1, 1 )
 i2 = min( i2, nn )
-i1 = i1 + nnoff
-i2 = i2 + nnoff
+i1 = i1 - nnoff
+i2 = i2 - nnoff
 end subroutine
 
 subroutine cube( s, x, i1, i2, x1, x2, r )

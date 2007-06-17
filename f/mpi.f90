@@ -178,7 +178,7 @@ case( 'max', 'allmax' ); ii = maxloc( r ); iop = mpi_maxloc
 case default; stop
 end select
 rr = r(ii(1),ii(2),ii(3))
-ii = ii - noff - 1
+ii = ii - 1 + noff
 i = ii(1) + n(1) * ( ii(2) + n(2) * ii(3) )
 local(1) = rr
 local(2) = i
@@ -196,7 +196,7 @@ nn = n
 ii(3) = i / ( n(1) * n(2) )
 ii(2) = modulo( i / nn(1), nn(2) )
 ii(1) = modulo( i, nn(1) )
-ii = ii + 1 + noff
+ii = ii + 1 - noff
 end subroutine
 
 ! Vector send
@@ -345,7 +345,7 @@ if ( n(i) == 1 ) then
   nl(i:) = (/ nl(i+1:), 1 /)
 end if
 end do
-if ( mpio > 0 ) then   ! collapes dimension if all on one proc
+if ( mpio < 0 ) then   ! collapes dimension if all on one proc
   do i = 1, ndims-1
   if ( n(i) == nl(i) ) then
     ndims = ndims - 1
@@ -417,7 +417,7 @@ if ( n(i) == 1 ) then
   nl(i:) = (/ nl(i+1:), 1 /)
 end if
 end do
-if ( mpio > 0 ) then   ! collapes dimension if all on one proc
+if ( mpio < 0 ) then   ! collapes dimension if all on one proc
   do i = 1, ndims-1
   if ( n(i) == nl(i) ) then
     ndims = ndims - 1

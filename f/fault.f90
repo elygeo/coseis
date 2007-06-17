@@ -28,8 +28,8 @@ t3 = 0.
 do iz = 1, nin
 select case( intype(iz) )
 case( 'r' )
-  i1 = 1  + nnoff
-  i2 = nn + nnoff
+  i1 = 1  - nnoff
+  i2 = nn - nnoff
   i3 = i1node
   i4 = i2node
   i1(ifn) = 1
@@ -110,7 +110,7 @@ end do
 i1 = maxloc( t3(:,:,:,3) )
 rr = t3(i1(1),i1(2),i1(3),3)
 i1(ifn) = ihypo(ifn)
-i1 = i1 - nnoff
+i1 = i1 + nnoff
 if ( rr > 0. ) write( 0, * ) 'warning: positive normal traction: ', rr, i1
 
 ! Lock fault in PML region

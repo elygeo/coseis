@@ -1,1 +1,1 @@
-in/ts/0500.m
+in/mini-fault.m
