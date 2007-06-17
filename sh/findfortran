@@ -17,28 +17,28 @@ case $sfc in
 xlf95_r)
   sfc='xlf95_r -q64 -qsuppress=cmpmsg'
   pfc='mpxlf95_r -q64 -qsuppress=cmpmsg'
-  gflags='-qsuffix=f=f90 -p -g -C -qflttrap -qsigtrap -qlanglvl=95pure'
+  gflags='-qsuffix=f=f90 -O -p -g -C -qflttrap -qsigtrap -qlanglvl=95pure'
   oflags='-qsuffix=f=f90 -O5'
   ;;
 ifort)
-  gflags='-O0 -p -g -CB -warn -traceback -u'
+  gflags='-O -p -g -CB -warn -traceback -u'
   oflags='-O3'
   ;;
 pgf90)
-  gflags='-O0 -g -Ktrap=fp -Mbounds'
-  gflags='-O0 -g -Ktrap=fp -Mbounds -Mdclchk'
+  gflags='-O -g -Ktrap=fp -Mbounds'
+  gflags='-O -g -Ktrap=fp -Mbounds -Mdclchk'
   oflags='-fast'
   getarg='getarg-pgf.f90'
   ;;
 gfortran)
-  gflags='-O0 -pg -g -Wall -std=f95 -pedantic -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
+  gflags='-O -pg -g -Wall -std=f95 -pedantic -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
   oflags='-O3'
   ;;
 f95)
-  gflags='-g'
+  gflags='-O -g'
   oflags='-O'
   if [ $( uname ) = SunOS ]; then
-    gflags='-g -w4 -u -C'
+    gflags='-O -g -w4 -u -C'
     oflags='-fast'
   fi
   ;;

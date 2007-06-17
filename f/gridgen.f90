@@ -10,7 +10,6 @@ use m_util
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), i, j, k, l, &
   j1, k1, l1, j2, k2, l2, idoublenode, b, c
 real :: x0(3), xlim(6), gxlim(6), m(9), tol, r
-logical :: expand
 
 if ( master ) write( 0, * ) 'Grid generation'
 
@@ -61,39 +60,37 @@ end if
 call vectorsethalo( w1, 0., i3, i4 )
 
 ! Grid expansion
-expand = .false.
 if ( rexpand > 1. ) then
   i1 = i1 + n1expand
   i2 = i2 - n2expand
-  if ( any( i3 < i1 ) .or. any( i2 < i4 ) ) expand = .true.
   do j = i3(1), min( i4(1), i1(1) - 1 )
     i = i1(1) - j
-    w1(j,:,:,1) = w1(j,1,1,1) + &
+    w1(j,:,:,1) = w1(j,:,:,1) + &
       dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
   do j = max( i3(1), i2(1) + 1 ), i4(1)
     i = j - i2(1)
-    w1(j,:,:,1) = w1(j,1,1,1) - &
+    w1(j,:,:,1) = w1(j,:,:,1) - &
       dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
   do k = i3(2), min( i4(2), i1(2) - 1 )
     i = i1(2) - k
-    w1(:,k,:,2) = w1(1,k,1,2) + &
+    w1(:,k,:,2) = w1(:,k,:,2) + &
       dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
   do k = max( i3(2), i2(2) + 1 ), i4(2)
     i = k - i2(2)
-    w1(:,k,:,2) = w1(1,k,1,2) - &
+    w1(:,k,:,2) = w1(:,k,:,2) - &
       dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
   do l = i3(3), min( i4(3), i1(3) - 1 )
     i = i1(3) - l
-    w1(:,:,l,3) = w1(1,1,l,3) + &
+    w1(:,:,l,3) = w1(:,:,l,3) + &
       dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
   do l = max( i3(3), i2(3) + 1 ), i4(3)
     i = l - i2(3)
-    w1(:,:,l,3) = w1(1,1,l,3) - &
+    w1(:,:,l,3) = w1(:,:,l,3) - &
       dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
 end if

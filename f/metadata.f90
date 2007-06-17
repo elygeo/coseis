@@ -124,8 +124,10 @@ end if
 write( 1, * ) ' dirfmt      =  ''out/%02d'';'
 do iz = 1, nout
   i = ditout(iz)
-  i1 = i1out(iz,:) - (/ nnoff, 0 /)
-  i2 = i2out(iz,:) - (/ nnoff, 0 /)
+  i1 = i1out(iz,:)
+  i2 = i2out(iz,:)
+  i1(1:3) = i1(1:3) - nnoff
+  i2(1:3) = i2(1:3) - nnoff
   call outprops( fieldout(iz), nc, onpass, fault, cell )
   write( field, * ) '''', trim( fieldout(iz) ), ''''
   write( 1, '(a,i3.3,a,i1,a,9i7,a)' ) '  out{', iz, '} = { ', nc, field, i, i1, i2, ' };'
@@ -136,8 +138,10 @@ open( 1, file='out/hdr', status='replace' )
 write( 1, '(3i8)' ) nn
 write( 1, '(3i8)' ) np
 do iz = 1, nout
-  i1 = i1out(iz,:) - (/ nnoff, 0 /)
-  i2 = i2out(iz,:) - (/ nnoff, 0 /)
+  i1 = i1out(iz,:)
+  i2 = i2out(iz,:)
+  i1(1:3) = i1(1:3) - nnoff
+  i2(1:3) = i2(1:3) - nnoff
   call outprops( fieldout(iz), nc, onpass, fault, cell )
   do i = 1, nc
     write( 1, '(9i7,a,i2.2,a,i1)' ) ditout(iz), i1, i2, '  ', iz, trim(fieldout(iz)), i

@@ -50,6 +50,7 @@ end if
 if ( master ) write( 0, * ) 'Main loop'
 prof0(16) = timer( 3 )
 if ( master ) call rwrite1( 'prof0', prof0 )
+i = itio
 do while ( it < nt )
   i = modulo( it, itio ) + 1
   call timestep
