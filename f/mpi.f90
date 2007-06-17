@@ -35,7 +35,7 @@ integer :: i, e
 logical :: period(3) = .false.
 call mpi_cart_create( mpi_comm_world, 3, np, period, .true., comm3d, e )
 if ( comm3d == mpi_comm_null ) then
-  write( 0, * ) 'Unused processor:', ip
+  write( 0, * ) 'Unused process:', ip
   call mpi_finalize( e )
   stop
 end if
