@@ -120,7 +120,12 @@ if ( inzone ) then
   i2in(i,:) = -1
   call strtok( str, key )
   if ( key == 'read' ) then
-    intype(i) = 'r'
+    call strtok( str, key )
+    select case( key )
+    case( '' )
+    case( 'zone' ); read( str, *, iostat=io ) i1in(i,:), i2in(i,:)
+    case default; io = 1
+    end select
   else
     read( key, * ) inval(i)
     call strtok( str, key )

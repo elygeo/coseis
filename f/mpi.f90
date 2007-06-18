@@ -331,7 +331,10 @@ if ( mpio == 0 ) then
   return
 end if
 if ( any( i3 > i4 ) ) then
-  if ( io == 'r' ) call mpi_comm_split( comm, 0, 0, commin, e )
+  i = abs( mpio )
+  comm = comm3d
+  if ( i <= 3 ) comm = comm2d(i)
+  if ( io == 'r' ) call mpi_comm_split( comm, mpi_undefined, 0, commin, e )
   return
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
@@ -408,7 +411,10 @@ if ( mpio == 0 ) then
   return
 end if
 if ( any( i3 > i4 ) ) then
-  if ( io == 'r' ) call mpi_comm_split( comm, 0, 0, commin, e )
+  i = abs( mpio )
+  comm = comm3d
+  if ( i <= 3 ) comm = comm2d(i)
+  if ( io == 'r' ) call mpi_comm_split( comm, mpi_undefined, 0, commin, e )
   return
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
