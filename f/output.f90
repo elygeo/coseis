@@ -115,22 +115,22 @@ if ( any( i2 < i1 ) ) then
 end if
 i1out(iz,1:3) = i1
 i2out(iz,1:3) = i2
+i1 = max( i1, i1core )
+i2 = min( i2, i2core )
 
 ! Buffer timer series
-if ( all( i1 == i2 ) .and. i2out(iz,4) - i1out(iz,4) > 0 ) then
+if ( all( i1 == i2 ) .and. i1out(iz,4) <= i2out(iz,4) ) then
   ibuff(iz) = nbuff + 1
   nbuff = nbuff + nc
 end if
 
 ! Split collective i/o
 if ( mpout /= 0 ) then
-  i1 = max( i1, i1core )
-  i2 = min( i2, i2core )
-  i = 1
-  if ( any( i2 < i1 ) .or. i1out(iz,4) > nt ) i = -1
+  i = -1
+  if ( all( i1 <= i2 ) .and. i1out(iz,4) <= i2out(iz,4) ) i = 1
   call splitio( iz, nout, i )
 end if
- 
+
 end do
 
 ! Allocate buffer
@@ -333,17 +333,17 @@ do ic = 1, nc
     stop
   end select
   if ( all( i1 == i2 ) ) then
-    if ( it == 0 .or. ibuff(iz) == 0 ) then
-      call rwrite( str, rr, ir )
-    else
-      i = ibuff(iz) + ic - 1
-      jbuff(i) = jbuff(i) + 1
-      iobuffer(jbuff(i),i) = rr
-      if ( modulo( it, itio ) == 0 .or. it == nt ) then
-        call rwrite1( str, iobuffer(:jbuff(i),i), ir )
-        jbuff(i) = 0
-      end if
+  if ( it == 0 .or. ibuff(iz) == 0 ) then
+    call rwrite( str, rr, ir )
+  else
+    i = ibuff(iz) + ic - 1
+    jbuff(i) = jbuff(i) + 1
+    iobuffer(jbuff(i),i) = rr
+    if ( modulo( it, itio ) == 0 .or. it == nt ) then
+      call rwrite1( str, iobuffer(:jbuff(i),i), ir )
+      jbuff(i) = 0
     end if
+  end if
   end if
 end do
 

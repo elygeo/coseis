@@ -188,6 +188,7 @@ real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), ir
 character(*), intent(in) :: io, str
 integer :: nb, i, j1, k1, l1, j2, k2, l2
+if ( any( i1 > i2 ) ) return
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
@@ -215,6 +216,7 @@ real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), ic, ir
 character(*), intent(in) :: io, str
 integer :: nb, i, j1, k1, l1, j2, k2, l2
+if ( any( i1 > i2 ) ) return
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)

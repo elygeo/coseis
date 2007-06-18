@@ -26,16 +26,20 @@ t2 = 0.
 t3 = 0.
 
 do iz = 1, nin
+i1 = i1in(iz,:)
+i2 = i2in(iz,:)
+call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
+i3 = max( i1, i1core )
+i4 = min( i2, i2core )
+i1(ifn) = 1
+i2(ifn) = 1
+i3(ifn) = 1
+i4(ifn) = 1
+j1 = i3(1); j2 = i4(1)
+k1 = i3(2); k2 = i4(2)
+l1 = i3(3); l2 = i4(3)
 select case( intype(iz) )
 case( 'r' )
-  i1 = 1  - nnoff
-  i2 = nn - nnoff
-  i3 = i1node
-  i4 = i2node
-  i1(ifn) = 1
-  i2(ifn) = 1
-  i3(ifn) = 1
-  i4(ifn) = 1
   rr = 0.
   i = ifn * mpin
   select case( fieldin(iz) )
@@ -55,16 +59,6 @@ case( 'r' )
   end select
 case( 'z' )
   rr = inval(iz)
-  i1 = i1in(iz,:)
-  i2 = i2in(iz,:)
-  call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
-  i1 = max( i1, 1 )
-  i2 = min( i2, nm )
-  i1(ifn) = 1
-  i2(ifn) = 1
-  j1 = i1(1); j2 = i2(1)
-  k1 = i1(2); k2 = i2(2)
-  l1 = i1(3); l2 = i2(3)
   select case ( fieldin(iz) )
   case( 'mus' ); mus(j1:j2,k1:k2,l1:l2)  = rr
   case( 'mud' ); mud(j1:j2,k1:k2,l1:l2)  = rr
