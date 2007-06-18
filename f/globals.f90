@@ -205,7 +205,7 @@ character(16) :: &
   rfunc,         & ! moment source space function
   tfunc            ! moment source time function
 
-character(255) :: &
+character(256) :: &
   str              ! string for storing file names
 
 logical :: &

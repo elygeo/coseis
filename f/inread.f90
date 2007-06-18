@@ -8,7 +8,7 @@ use m_globals
 integer :: i, io
 logical :: inzone
 character(12) :: key
-character(255) :: line
+character(256) :: line
 
 open( 1, file='input', status='old' )
 
