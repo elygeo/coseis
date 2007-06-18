@@ -263,6 +263,7 @@ i1 = i1out(iz,1:3)
 i2 = i2out(iz,1:3)
 i3 = max( i1, i1core )
 i4 = min( i2, i2core )
+ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
 if ( any( i3 > i4 ) ) i1out(iz,4) = nt + 1
 if ( fault ) then
   i = abs( faultnormal )
@@ -273,7 +274,6 @@ if ( fault ) then
 end if
 
 ! Binary output
-ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
 do ic = 1, nc
   write( str, '(a,i2.2,a)' ) 'out/', iz, fieldout(iz)
   if ( nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic

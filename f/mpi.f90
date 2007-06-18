@@ -1,8 +1,8 @@
 ! Collective routines - MPI version
 module m_collective
 implicit none
-integer, private :: ip, ipmaster, comm3d, comm2d(3)
-integer, private, allocatable :: commout(:)
+integer, private :: ip, ipmaster, &
+  comm3d, comm2d(3), commout(nz) = mpi_comm_null
 contains
 
 ! Initialize
@@ -370,10 +370,6 @@ case( 'r' )
   call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
 case( 'w' )
-  if ( .not. allocated( commout ) ) then
-    allocate( commout(i) )
-    commout = mpi_comm_null
-  end if
   comm = commout(i)
   if ( comm == mpi_comm_null ) then
     call mpi_comm_split( comm3d, 1, 0, comm, e )
@@ -458,10 +454,6 @@ case( 'r' )
   call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
 case( 'w' )
-  if ( .not. allocated( commout ) ) then
-    allocate( commout(i) )
-    commout = mpi_comm_null
-  end if
   comm = commout(i)
   if ( comm == mpi_comm_null ) then
     call mpi_comm_split( comm3d, 1, 0, comm, e )
