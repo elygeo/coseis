@@ -26,7 +26,7 @@ ibuff = 0
 dofault = .false.
 if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
-  if ( ihypo(i) >= i1node(i) .and. ihypo(i) <= i2node(i) ) dofault = .true.
+  if ( ihypo(i) >= i1core(i) .and. ihypo(i) <= i2core(i) ) dofault = .true.
 end if
 
 do iz = 1, nout
@@ -266,14 +266,11 @@ i4 = min( i2, i2core )
 if ( any( i3 > i4 ) ) i1out(iz,4) = nt + 1
 ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
 if ( fault ) then
-  i = ifn
-  if ( i == 0 ) cycle doiz
-  if ( ihypo(i) < i1core(i) &
-  .or. ihypo(i) > i2core(i) ) cycle doiz
-  i1(i) = 1
-  i2(i) = 1
-  i3(i) = 1
-  i4(i) = 1
+  if ( .not. dofault ) cycle doiz
+  i1(ifn) = 1
+  i2(ifn) = 1
+  i3(ifn) = 1
+  i4(ifn) = 1
 end if
 
 ! Binary output
