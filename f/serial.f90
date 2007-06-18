@@ -140,7 +140,7 @@ character(*), intent(in) :: str
 integer :: i
 if ( iz == 0 ) return
 if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
-  write( 0, * ) 'Error in scalario: ', str, io
+  write( 0, * ) 'Error in scalario: ', iz, str
   write( 0, * ) i1, i2
   write( 0, * ) i3, i4
   stop
@@ -162,7 +162,7 @@ character(*), intent(in) :: str
 integer :: i
 if ( iz == 0 ) return
 if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
-  write( 0, * ) 'Error in vectorio: ', str, io
+  write( 0, * ) 'Error in vectorio: ', iz, str
   write( 0, * ) i1, i2
   write( 0, * ) i3, i4
   stop

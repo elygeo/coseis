@@ -153,7 +153,7 @@ logical :: dofault, fault, cell
 dofault = .false.
 if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
-  if ( ihypo(i) >= i1node(i) .and. ihypo(i) <= i2node(i) ) dofault = .true.
+  if ( ihypo(i) >= i1core(i) .and. ihypo(i) <= i2core(i) ) dofault = .true.
 end if
 
 ! Prepare output
