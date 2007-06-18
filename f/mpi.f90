@@ -1,8 +1,7 @@
 ! Collective routines - MPI version
 module m_collective
 implicit none
-integer, private :: ip, ipmaster, &
-  comm3d, comm2d(3), commout(nz) = mpi_comm_null
+integer, private :: ip, ipmaster, comm3d, comm2d(3), commout(nz)
 contains
 
 ! Initialize
@@ -45,6 +44,7 @@ ipout = ip
 do i = 1, 3
   call mpi_comm_split( comm3d, ip3(i), 0, comm2d(i), e )
 end do
+commout = mpi_comm_null
 end subroutine
 
 ! Set master processor
