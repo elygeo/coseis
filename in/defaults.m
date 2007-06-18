@@ -71,6 +71,7 @@
 
 % Code execution and output parameters
   np = [ 1 1 1 ];			% number of processors in j k l
+  nhalo = 1;				% number of ghost nodes
 % itcheck = 100;			% checkpoint every 100 time steps
 % itcheck = -1;				% checkpoint just before finishing
   itcheck = 0;				% checkpointing off

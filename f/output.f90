@@ -92,7 +92,7 @@ case( 'x' )
          + ( w2(:,:,:,2) - xout(iz,2) ) * ( w2(:,:,:,2) - xout(iz,2) ) &
          + ( w2(:,:,:,3) - xout(iz,3) ) * ( w2(:,:,:,3) - xout(iz,3) )
       rout = 2 * dx * dx + maxval( s2 )
-      call scalarsethalo( s2, rout, i1node, i2cell )
+      call scalarsethalo( s2, rout, i1cell, i2cell )
       i1 = i1node
       i2 = i2cell
     else
@@ -124,9 +124,8 @@ end if
 
 ! Split collective i/o
 if ( mpout /= 0 ) then
-  i1 = max( i1, i1node )
-  i2 = min( i2, i2node )
-  if ( cell ) i2 = min( i2, i2cell )
+  i1 = max( i1, i1core )
+  i2 = min( i2, i2core )
   i = 1
   if ( any( i2 < i1 ) .or. i1out(iz,4) > nt ) i = -1
   call splitio( iz, nout, i )
@@ -266,8 +265,8 @@ if ( modulo( it - i1out(iz,4), ditout(iz) ) /= 0 ) cycle doiz
 call outprops( fieldout(iz), nc, onpass, fault, cell )
 i1 = i1out(iz,1:3)
 i2 = i2out(iz,1:3)
-i3 = max( i1, i1node )
-i4 = min( i2, i2node )
+i3 = max( i1, i1core )
+i4 = min( i2, i2core )
 if ( any( i3 > i4 ) ) then 
   i1out(iz,4) = nt + 1
   cycle doiz

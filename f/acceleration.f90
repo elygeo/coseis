@@ -144,7 +144,7 @@ end do
 
 ! Boundary conditions
 call vectorbc( w1, ibc1, ibc2, nhalo )
-call vectorswaphalo( w1, nhalo )
+if ( modulo( it, nhalo ) == 0 ) call vectorswaphalo( w1, nhalo )
 
 end subroutine
 

@@ -27,14 +27,14 @@ i1 = i1in(iz,:)
 i2 = i2in(iz,:)
 call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
 i2 = i2 - 1
+i3 = max( i1, i1core )
+i4 = min( i2, i2core )
+j1 = i3(1); j2 = i4(1)
+k1 = i3(2); k2 = i4(2)
+l1 = i3(3); l2 = i4(3)
 
 select case( intype(iz) )
 case( 'z' )
-  i3 = max( i1, i1node )
-  i4 = min( i2, i2cell )
-  j1 = i3(1); j2 = i4(1)
-  k1 = i3(2); k2 = i4(2)
-  l1 = i3(3); l2 = i4(3)
   select case( fieldin(iz) )
   case( 'rho' ); mr(j1:j2,k1:k2,l1:l2)  = inval(iz)
   case( 'vp'  ); s1(j1:j2,k1:k2,l1:l2)  = inval(iz)
@@ -42,8 +42,6 @@ case( 'z' )
   case( 'gam' ); gam(j1:j2,k1:k2,l1:l2) = inval(iz)
   end select
 case( 'c' )
-  i3 = i1node
-  i4 = i2cell
   x1 = x1in(iz,:)
   x2 = x2in(iz,:)
   select case( fieldin(iz) )
@@ -53,11 +51,6 @@ case( 'c' )
   case( 'gam' ); call cube( gam, w2, i3, i4, x1, x2, inval(iz) )
   end select
 case( 'r' )
-  i3 = max( i1, i1node )
-  i4 = min( i2, i2cell )
-  j1 = i3(1); j2 = i4(1)
-  k1 = i3(2); k2 = i4(2)
-  l1 = i3(3); l2 = i4(3)
   r = 0.
   i = 4 * mpin
   select case( fieldin(iz) )
@@ -82,13 +75,25 @@ where ( s1 > vp2 ) s1 = vp2
 where ( s2 < vs1 ) s2 = vs1
 where ( s2 > vs2 ) s2 = vs2
 
-! Extrema
+! Fill halo and find extrema
+call scalarswaphalo( mr, nhalo )
+call scalarswaphalo( gam, nhalo )
+call scalarswaphalo( s1, nhalo )
+call scalarswaphalo( s2, nhalo )
 stats(1) = maxval( mr )
 stats(2) = maxval( s1 )
 stats(3) = maxval( s2 )
-call scalarsethalo( mr, stats(1), i1node, i2cell )
-call scalarsethalo( s1, stats(2), i1node, i2cell )
-call scalarsethalo( s2, stats(3), i1node, i2cell )
+call scalarsethalo( mr, stats(1), i1cell, i2cell )
+call scalarsethalo( s1, stats(2), i1cell, i2cell )
+call scalarsethalo( s2, stats(3), i1cell, i2cell )
+i1 = abs( ibc1 )
+i2 = abs( ibc2 )
+where( i1 <= 1 ) i1 = 4
+where( i2 <= 1 ) i2 = 4
+call scalarbc( mr,  i1, i2, nhalo, 1 )
+call scalarbc( gam, i1, i2, nhalo, 1 )
+call scalarbc( s1,  i1, i2, nhalo, 1 )
+call scalarbc( s2,  i1, i2, nhalo, 1 )
 stats(4) = -minval( mr )
 stats(5) = -minval( s1 )
 stats(6) = -minval( s2 )
@@ -99,20 +104,6 @@ vs2  =  gstats(3)
 rho1 = -gstats(4)
 vp1  = -gstats(5)
 vs1  = -gstats(6)
-
-! Fill halo
-i1 = abs( ibc1 )
-i2 = abs( ibc2 )
-where( i1 <= 1 ) i1 = 4
-where( i2 <= 1 ) i2 = 4
-call scalarbc( mr,  i1, i2, nhalo, 1 )
-call scalarbc( gam, i1, i2, nhalo, 1 )
-call scalarbc( s1,  i1, i2, nhalo, 1 )
-call scalarbc( s2,  i1, i2, nhalo, 1 )
-call scalarswaphalo( mr, nhalo )
-call scalarswaphalo( gam, nhalo )
-call scalarswaphalo( s1, nhalo )
-call scalarswaphalo( s2, nhalo )
 
 ! Hypocenter values
 if ( master ) then

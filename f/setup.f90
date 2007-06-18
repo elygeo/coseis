@@ -19,6 +19,7 @@ where ( ihypo <  0 ) ihypo = ihypo + nn + 1
 ! Partition for parallelization
 if ( np0 == 1 ) np = 1
 nl = nn / np; where ( modulo( nn, np ) /= 0 ) nl = nl + 1
+nl = max( nl, nhalo )
 np = nn / nl; where ( modulo( nn, nl ) /= 0 ) np = np + 1
 call rank( ip, ip3, np )
 nnoff = nl * ip3 - nhalo
@@ -42,15 +43,13 @@ ibc2 = bc2
 where ( ip3 /= 0      ) ibc1 = 9
 where ( ip3 /= np - 1 ) ibc2 = 9
 
-! Node region
-i1node = nhalo + 1
-i2node = nhalo + nl
-
-! Cell region
-i1cell = nhalo  
-i2cell = nhalo + nl
-where ( abs( ibc1 ) <= 1 ) i1cell = i1cell + 1
-where ( abs( ibc2 ) <= 1 ) i2cell = i2cell - 1
+! Regions
+i1core = 1  + nhalo
+i2core = nm - nhalo
+i1node = max(  1-nnoff, 2    )
+i2node = min( nn-nnoff, nm-1 )
+i1cell = max(  1-nnoff,   1    )
+i2cell = min( nn-nnoff-1, nm-1 )
 
 ! PML region
 i1pml = 0 - nhalo

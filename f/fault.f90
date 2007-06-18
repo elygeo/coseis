@@ -264,6 +264,7 @@ integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 ! If the two sides of the fault are split across domains, than we must retrieve
 ! the correct solution from the processor that contains both sides. Corresponding
 ! sends are below.
+if ( modulo( it, nhalo ) == 0 ) then
 if ( ifn == 0 ) then
   i = abs( faultnormal )
   if ( i /= 0 ) then
@@ -282,6 +283,7 @@ if ( ifn == 0 ) then
      end if
   end if
   return
+end if
 end if
 
 ! Indices
@@ -355,6 +357,7 @@ call vectorbc( w1, ibc1, ibc2, nhalo )
 ! If a neighboring processor contains only one side of the fault, then we must
 ! send the correct fault wall solution to it.
 i = ifn
+if ( modulo( it, nhalo ) == 0 ) then
 if ( ibc1(i) == 9 .and. ihypo(i) == 2 * nhalo ) then
   i1 = 1
   i2 = nm
@@ -367,6 +370,7 @@ elseif ( ibc2(i) == 9 .and. ihypo(i) == nm(i) - 2 * nhalo ) then
   i1(i) = nm(i) - 2 * nhalo + 1
   i2(i) = nm(i) - 2 * nhalo + 1
   call vectorsend( w1, i1, i2, i )
+end if
 end if
 
 ! Friction + fracture energy

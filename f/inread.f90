@@ -32,6 +32,7 @@ case( 'return' );       exit doline
 case( 'grid' );         grid = str
 case( 'rfunc' );        rfunc = str
 case( 'tfunc' );        tfunc = str
+case( 'nhalo' );        read( str, *, iostat=io ) nhalo
 case( 'oplevel' );      read( str, *, iostat=io ) oplevel
 case( 'affine' );       read( str, *, iostat=io ) affine
 case( 'gridnoise' );    read( str, *, iostat=io ) gridnoise

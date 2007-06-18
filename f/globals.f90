@@ -7,8 +7,7 @@ real, parameter :: &
 
 integer, parameter :: &
   nz = 100,      & ! max number of input and output zones
-  itio = 50,     & ! buffersize for i/o
-  nhalo = 1        ! number of ghost nodes
+  itio = 50        ! buffersize for i/o
 
 ! 4d vectors
 real, allocatable, dimension(:,:,:,:,:) :: &
@@ -150,6 +149,8 @@ integer, dimension(3) :: &
   symmetry,      & ! grid symmetry in j k l
   n1expand,      & ! # grid expansion nodes - near side
   n2expand,      & ! # grid expansion nodes - far side
+  i1core,        & ! core region start index
+  i2core,        & ! core region end index
   i1node,        & ! node calculations start index
   i2node,        & ! node calculations end index
   i1cell,        & ! cell calculations start index
@@ -158,6 +159,7 @@ integer, dimension(3) :: &
   i2pml            ! PML boundary
 
 integer :: &
+  nhalo,         & ! number of ghost nodes
   ip,            & ! processor rank
   np0,           & ! number of processors available
   nt,            & ! number of time steps
