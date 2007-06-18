@@ -322,12 +322,20 @@ if ( mpio == 0 ) then
   call rio3( iz, str, s1, i3, i4, ir )
   return
 end if
-if ( any( i3 > i4 ) ) then
+if ( iz < 0 ) comm = commin(-iz)
+if ( iz > 0 ) comm = commout(iz)
+if ( comm == mpi_comm_null ) then
   comm0 = comm3d
   i = abs( mpio )
-  if ( <= 3 ) comm0 = comm2d(i)
-  call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
-  return
+  if ( i <= 3 ) comm0 = comm2d(i)
+  if ( all( i3 <= i4 ) .and. ir > 0 ) then
+    call mpi_comm_split( comm0, iz, 0, comm, e )
+  else
+    call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
+    return
+  end if
+  if ( iz < 0 ) commin(-iz) = comm
+  if ( iz > 0 ) commout(iz) = comm
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 i0 = i3 - i1           ! offsets
@@ -363,25 +371,11 @@ n  = (/ size(s1,1), size(s1,2), size(s1,3) /)
 nl = i4 - i3 + 1
 call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
-comm = comm3d
-i = abs( mpio )
-if ( i <= 3 ) comm0 = comm2d(i)
 if ( iz < 0 ) then
-  comm = commin(-iz)
-  if ( comm == mpi_comm_null ) then
-    call mpi_comm_split( comm0, 1, 0, comm, e )
-    commin(-iz) = comm
-  end if
-  call mpi_comm_split( comm0, iz, 0, comm, e )
   call mpi_file_open( comm, str, mpi_mode_rdonly, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
 else
-  comm = commout(iz)
-  if ( comm == mpi_comm_null ) then
-    call mpi_comm_split( comm3d, iz, 0, comm, e )
-    commout(iz) = comm
-  end if
   i = 0
   if ( ir == 1 ) i = mpi_mode_create
   call mpi_file_open( comm, str, mpi_mode_wronly + i, mpi_info_null, fh, e )
@@ -411,12 +405,20 @@ if ( mpio == 0 ) then
   call rio4( iz, str, w1, i3, i4, ic, ir )
   return
 end if
-if ( any( i3 > i4 ) ) then
+if ( iz < 0 ) comm = commin(-iz)
+if ( iz > 0 ) comm = commout(iz)
+if ( comm == mpi_comm_null ) then
   comm0 = comm3d
   i = abs( mpio )
   if ( i <= 3 ) comm0 = comm2d(i)
-  call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
-  return
+  if ( all( i3 <= i4 ) .and. ir > 0 ) then
+    call mpi_comm_split( comm0, iz, 0, comm, e )
+  else
+    call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
+    return
+  end if
+  if ( iz < 0 ) commin(-iz) = comm
+  if ( iz > 0 ) commout(iz) = comm
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 i0 = i3 - i1           ! offsets
@@ -452,24 +454,11 @@ n  = (/ size(w1,1), size(w1,2), size(w1,3) /)
 nl = i4 - i3 + 1
 call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
-comm0 = comm3d
-i = abs( mpio )
-if ( i <= 3 ) comm0 = comm2d(i)
 if ( iz < 0 ) then
-  comm = commin(-iz)
-  if ( comm == mpi_comm_null ) then
-    call mpi_comm_split( comm0, iz, 0, comm, e )
-    commin(-iz) = comm
-  end if
   call mpi_file_open( comm, str, mpi_mode_rdonly, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
 else
-  comm = commout(iz)
-  if ( comm == mpi_comm_null ) then
-    call mpi_comm_split( comm0, iz, 0, comm, e )
-    commin(iz) = comm
-  end if
   i = 0
   if ( ir == 1 ) i = mpi_mode_create
   call mpi_file_open( comm, str, mpi_mode_wronly + i, mpi_info_null, fh, e )

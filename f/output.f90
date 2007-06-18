@@ -257,25 +257,24 @@ if ( modulo( it - i1out(iz,4), ditout(iz) ) /= 0 ) cycle doiz
 ! Pass
 call outprops( fieldout(iz), nc, onpass, fault, cell )
 if ( pass /= onpass ) cycle doiz
-if ( fault .and. ifn == 0 ) then
-  i1out(iz,4) = nt + 1
-  cycle doiz
-end if
 
 ! Indices
 i1 = i1out(iz,1:3)
 i2 = i2out(iz,1:3)
 i3 = max( i1, i1core )
 i4 = min( i2, i2core )
-if ( any( i3 > i4 ) ) then
-  i1out(iz,4) = nt + 1
-elseif ( fault ) then
-  i1(ifn) = 1
-  i2(ifn) = 1
-  i3(ifn) = 1
-  i4(ifn) = 1
-end if
+if ( any( i3 > i4 ) ) i1out(iz,4) = nt + 1
 ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
+if ( fault ) then
+  i = ifn
+  if ( i == 0 ) cycle doiz
+  if ( ihypo(i) < i1core(i) &
+  .or. ihypo(i) > i2core(i) ) cycle doiz
+  i1(i) = 1
+  i2(i) = 1
+  i3(i) = 1
+  i4(i) = 1
+end if
 
 ! Binary output
 do ic = 1, nc

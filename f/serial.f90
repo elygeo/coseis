@@ -138,13 +138,14 @@ real, intent(inout) :: r, s1(:,:,:)
 integer, intent(in) :: iz, i1(3), i2(3), i3(3), i4(3), ir, mpio
 character(*), intent(in) :: str
 integer :: i
+if ( iz == 0 ) return
 if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
   write( 0, * ) 'Error in scalario: ', str, io
   write( 0, * ) i1, i2
   write( 0, * ) i3, i4
   stop
 end if
-if ( all( i1 == i2 ) .and. iz /= 0 ) then
+if ( all( i1 == i2 ) .and. iz > 0 ) then
   r = s1(i1(1),i1(2),i1(3))
   return
 end if
@@ -159,13 +160,14 @@ real, intent(inout) :: r, w1(:,:,:,:)
 integer, intent(in) :: iz, i1(3), i2(3), i3(3), i4(3), ic, ir, mpio
 character(*), intent(in) :: str
 integer :: i
+if ( iz == 0 ) return
 if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
   write( 0, * ) 'Error in vectorio: ', str, io
   write( 0, * ) i1, i2
   write( 0, * ) i3, i4
   stop
 end if
-if ( all( i1 == i2 ) .and. iz /= 0 ) then
+if ( all( i1 == i2 ) .and. iz > 0 ) then
   r = w1(i1(1),i1(2),i1(3),ic)
   return
 end if
