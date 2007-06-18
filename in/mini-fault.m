@@ -1,11 +1,11 @@
 % Test
 
-nt = 2;
-debug = 1;
-  np = [ 1 1 2 ];
+  nt = 2;
+  debug = 1;
+  faultnormal = 2;
+  np = [ 1 1 5 ];
   nn = [ 4 4 4 ];
   ihypo = [ 2 2 2 ];
-  faultnormal = 3;
 
   affine = [ 1. 0. 1.   1. 1. 0.   0. 0. 1.   1. ];
   n1expand = [ 2 2 2 ];

@@ -117,7 +117,7 @@ i1 = i1node
 i2 = i2node
 i1(ifn) = ihypo(ifn)
 i2(ifn) = ihypo(ifn)
-call surfnormals( nhat, w1, i1, i2 )
+call surfnormals( nhat, w1, i1, i2, ifn )
 area = sign( 1, faultnormal ) * sqrt( sum( nhat * nhat, 4 ) )
 f1 = area
 where ( f1 /= 0. ) f1 = 1. / f1
