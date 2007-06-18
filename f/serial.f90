@@ -131,13 +131,6 @@ integer, intent(in) :: nhalo
 f(1,1,1,1) = f(1,1,1,1) - nhalo + nhalo
 end subroutine
 
-! Split communicator
-subroutine splitio( iz, nout, ditout )
-integer, intent(in) :: iz, nout, ditout
-integer :: i
-i = iz + nout + ditout
-end subroutine
-
 ! Scalar field input/output
 subroutine scalario( io, str, r, s1, i1, i2, i3, i4, ir, mpio )
 use m_util

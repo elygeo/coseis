@@ -115,20 +115,13 @@ if ( any( i2 < i1 ) ) then
 end if
 i1out(iz,1:3) = i1
 i2out(iz,1:3) = i2
-i1 = max( i1, i1core )
-i2 = min( i2, i2core )
 
 ! Buffer timer series
+i1 = max( i1, i1core )
+i2 = min( i2, i2core )
 if ( all( i1 == i2 ) .and. i1out(iz,4) <= i2out(iz,4) ) then
   ibuff(iz) = nbuff + 1
   nbuff = nbuff + nc
-end if
-
-! Split collective i/o
-if ( mpout /= 0 ) then
-  i = -1
-  if ( all( i1 <= i2 ) .and. i1out(iz,4) <= i2out(iz,4) ) i = 1
-  call splitio( iz, nout, i )
 end if
 
 end do
@@ -255,7 +248,7 @@ if ( it > 0 .and. dofault ) then
   end select
 end if
 
-doiz: do iz = 1, nout
+doiz: do iz = nout, 1, -1
 
 ! Interval
 if ( it < i1out(iz,4) .or. it > i2out(iz,4) ) cycle doiz
@@ -263,14 +256,14 @@ if ( modulo( it - i1out(iz,4), ditout(iz) ) /= 0 ) cycle doiz
 
 ! Pass
 call outprops( fieldout(iz), nc, onpass, fault, cell )
+if ( pass /= onpass ) cycle doiz
+
+! Indices
 i1 = i1out(iz,1:3)
 i2 = i2out(iz,1:3)
 i3 = max( i1, i1core )
 i4 = min( i2, i2core )
-if ( any( i3 > i4 ) ) then 
-  i1out(iz,4) = nt + 1
-  cycle doiz
-end if
+if ( any( i3 > i4 ) ) i1out(iz,4) = nt + 1
 if ( fault ) then
   i = abs( faultnormal )
   i1(i) = 1
@@ -278,7 +271,6 @@ if ( fault ) then
   i3(i) = 1
   i4(i) = 1
 end if
-if ( pass /= onpass ) cycle doiz
 
 ! Binary output
 ir = ( it - i1out(iz,4) ) / ditout(iz) + 1

@@ -302,17 +302,6 @@ end if
 end do
 end subroutine
 
-! Split communicator
-subroutine splitio( iz, n, color )
-use mpi
-integer, intent(in) :: iz, n, color
-integer :: i, e
-if ( .not. allocated( commout ) ) allocate( commout(n) )
-i = color
-if ( i < 0 ) i = mpi_undefined
-call mpi_comm_split( comm3d, i, 0, commout(iz), e )
-end subroutine
-
 ! Scalar field input/output
 subroutine scalario( io, str, r, s1, i1, i2, i3, i4, ir, mpio )
 use m_util
@@ -320,7 +309,7 @@ use mpi
 real, intent(inout) :: r, s1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, mpio
 character(*), intent(in) :: io, str
-integer :: i, ndims, ftype, mtype, fh, nl(3), n(3), i0(3), comm, commin, e
+integer :: i, ndims, ftype, mtype, fh, nl(3), n(3), i0(3), comm0, comm, e
 integer(kind=mpi_offset_kind) :: dr
 if ( all( i1 == i2 ) .and. io == 'w' ) then
   r = s1(i1(1),i1(2),i1(3))
@@ -331,10 +320,10 @@ if ( mpio == 0 ) then
   return
 end if
 if ( any( i3 > i4 ) ) then
+  comm0 = comm3d
   i = abs( mpio )
-  comm = comm3d
-  if ( i <= 3 ) comm = comm2d(i)
-  if ( io == 'r' ) call mpi_comm_split( comm, mpi_undefined, 0, commin, e )
+  if ( io == 'r' .and. i <= 3 ) comm0 = comm2d(i)
+  call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
   return
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
@@ -374,14 +363,22 @@ call mpi_type_commit( mtype, e )
 i = abs( mpio )
 select case( io )
 case( 'r' )
-  comm = comm3d
-  if ( i <= 3 ) comm = comm2d(i)
-  call mpi_comm_split( comm, 1, 0, commin, e )
-  call mpi_file_open( commin, str, mpi_mode_rdonly, mpi_info_null, fh, e )
+  comm0 = comm3d
+  if ( i <= 3 ) comm0 = comm2d(i)
+  call mpi_comm_split( comm0, 1, 0, comm, e )
+  call mpi_file_open( comm, str, mpi_mode_rdonly, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
 case( 'w' )
+  if ( .not. allocated( commout ) ) then
+    allocate( commout(i) )
+    commout = mpi_comm_null
+  end if
   comm = commout(i)
+  if ( comm == mpi_comm_null ) then
+    call mpi_comm_split( comm3d, 1, 0, comm, e )
+    commout(i) = comm
+  end if
   i = 0
   if ( ir == 1 ) i = mpi_mode_create
   call mpi_file_open( comm, str, mpi_mode_wronly + i, mpi_info_null, fh, e )
@@ -400,7 +397,7 @@ use mpi
 real, intent(inout) :: r, w1(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ic, ir, mpio
 character(*), intent(in) :: io, str
-integer :: i, ndims, ftype, mtype, fh, nl(3), n(3), i0(3), comm, commin, e
+integer :: i, ndims, ftype, mtype, fh, nl(3), n(3), i0(3), comm0, comm, e
 integer(kind=mpi_offset_kind) :: dr
 if ( all( i1 == i2 ) .and. io =='w' ) then
   r = w1(i1(1),i1(2),i1(3),ic)
@@ -412,9 +409,9 @@ if ( mpio == 0 ) then
 end if
 if ( any( i3 > i4 ) ) then
   i = abs( mpio )
-  comm = comm3d
-  if ( i <= 3 ) comm = comm2d(i)
-  if ( io == 'r' ) call mpi_comm_split( comm, mpi_undefined, 0, commin, e )
+  comm0 = comm3d
+  if ( io == 'r' .and. i <= 3 ) comm0 = comm2d(i)
+  call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
   return
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
@@ -454,14 +451,22 @@ call mpi_type_commit( mtype, e )
 i = abs( mpio )
 select case( io )
 case( 'r' )
-  comm = comm3d
-  if ( i <= 3 ) comm = comm2d(i)
-  call mpi_comm_split( comm, 1, 0, commin, e )
-  call mpi_file_open( commin, str, mpi_mode_rdonly, mpi_info_null, fh, e )
+  comm0 = comm3d
+  if ( i <= 3 ) comm0 = comm2d(i)
+  call mpi_comm_split( comm0, 1, 0, comm, e )
+  call mpi_file_open( comm, str, mpi_mode_rdonly, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
 case( 'w' )
+  if ( .not. allocated( commout ) ) then
+    allocate( commout(i) )
+    commout = mpi_comm_null
+  end if
   comm = commout(i)
+  if ( comm == mpi_comm_null ) then
+    call mpi_comm_split( comm3d, 1, 0, comm, e )
+    commout(i) = comm
+  end if
   i = 0
   if ( ir == 1 ) i = mpi_mode_create
   call mpi_file_open( comm, str, mpi_mode_wronly + i, mpi_info_null, fh, e )
