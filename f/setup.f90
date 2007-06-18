@@ -66,7 +66,7 @@ if ( any( i1pml >= i2pml ) ) stop 'model too small for PML'
 ihypo = ihypo - nnoff
 ifn = 0
 if ( faultnormal /= 0 ) then
-  if ( ihypo(i) >= 1 .and. ihypo(i) <= nm(i) ) ifn = abs( faultnormal )
+  if ( ihypo(i) >= 1 .and. ihypo(i) < nm(i) ) ifn = abs( faultnormal )
 end if
 
 end subroutine

@@ -268,19 +268,20 @@ if ( modulo( it, nhalo ) == 0 ) then
 if ( ifn == 0 ) then
   i = abs( faultnormal )
   if ( i /= 0 ) then
-     if ( ibc1(i) == 9 .and. ihypo(i) == 0 ) then
-       i1 = 1
-       i2 = nm
-       i1(i) = 1
-       i2(i) = 1
-       call vectorrecv( w1, i1, i2, -i )
-     elseif ( ibc2(i) == 9 .and. ihypo(i) == nm(i) ) then
-       i1 = 1
-       i2 = nm
-       i1(i) = nm(i)
-       i2(i) = nm(i)
-       call vectorrecv( w1, i1, i2, i )
-     end if
+  if ( ibc1(i) == 9 .and. ihypo(i) == 0 ) then
+    i1 = 1
+    i2 = nm
+    i1(i) = 1
+    i2(i) = 1
+    call vectorrecv( w1, i1, i2, -i )
+  end if
+  if ( ibc2(i) == 9 .and. ihypo(i) == nm(i) ) then
+    i1 = 1
+    i2 = nm
+    i1(i) = nm(i)
+    i2(i) = nm(i)
+    call vectorrecv( w1, i1, i2, i )
+  end if
   end if
   return
 end if
@@ -358,18 +359,19 @@ call vectorbc( w1, ibc1, ibc2, nhalo )
 ! send the correct fault wall solution to it.
 i = ifn
 if ( modulo( it, nhalo ) == 0 ) then
+if ( ibc2(i) == 9 .and. ihypo(i) == nm(i) - 2 * nhalo ) then
+  i1 = 1
+  i2 = nm
+  i1(i) = nm(i) - 2 * nhalo + 1
+  i2(i) = nm(i) - 2 * nhalo + 1
+  call vectorsend( w1, i1, i2, i )
+end if
 if ( ibc1(i) == 9 .and. ihypo(i) == 2 * nhalo ) then
   i1 = 1
   i2 = nm
   i1(i) = 2 * nhalo
   i2(i) = 2 * nhalo
   call vectorsend( w1, i1, i2, -i )
-elseif ( ibc2(i) == 9 .and. ihypo(i) == nm(i) - 2 * nhalo ) then
-  i1 = 1
-  i2 = nm
-  i1(i) = nm(i) - 2 * nhalo + 1
-  i2(i) = nm(i) - 2 * nhalo + 1
-  call vectorsend( w1, i1, i2, i )
 end if
 end if
 
