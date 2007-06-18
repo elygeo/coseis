@@ -1,8 +1,8 @@
 ! Collective routines - MPI version
 module m_collective
 implicit none
-integer, private, parameter :: nz = 500
-integer, private :: ip, ipmaster, comm3d, comm2d(3), commout(nz)
+integer, private, parameter :: nz = 100
+integer, private :: ip, ipmaster, comm3d, comm2d(3), commin(nz), commout(nz)
 contains
 
 ! Initialize
@@ -45,6 +45,7 @@ ipout = ip
 do i = 1, 3
   call mpi_comm_split( comm3d, ip3(i), 0, comm2d(i), e )
 end do
+commin = mpi_comm_null
 commout = mpi_comm_null
 end subroutine
 
@@ -304,26 +305,27 @@ end do
 end subroutine
 
 ! Scalar field input/output
-subroutine scalario( io, str, r, s1, i1, i2, i3, i4, ir, mpio )
+subroutine scalario( iz, str, r, s1, i1, i2, i3, i4, ir, mpio )
 use m_util
 use mpi
 real, intent(inout) :: r, s1(:,:,:)
-integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, mpio
-character(*), intent(in) :: io, str
+integer, intent(in) :: iz, i1(3), i2(3), i3(3), i4(3), ir, mpio
+character(*), intent(in) :: str
 integer :: i, ndims, ftype, mtype, fh, nl(3), n(3), i0(3), comm0, comm, e
 integer(kind=mpi_offset_kind) :: dr
-if ( all( i1 == i2 ) .and. io == 'w' ) then
+if ( iz == 0 ) return
+if ( all( i1 == i2 ) .and. iz /= 0 ) then
   r = s1(i1(1),i1(2),i1(3))
   return
 end if
 if ( mpio == 0 ) then
-  call rio3( io, str, s1, i3, i4, ir )
+  call rio3( iz, str, s1, i3, i4, ir )
   return
 end if
 if ( any( i3 > i4 ) ) then
   comm0 = comm3d
   i = abs( mpio )
-  if ( io == 'r' .and. i <= 3 ) comm0 = comm2d(i)
+  if ( <= 3 ) comm0 = comm2d(i)
   call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
   return
 end if
@@ -361,53 +363,58 @@ n  = (/ size(s1,1), size(s1,2), size(s1,3) /)
 nl = i4 - i3 + 1
 call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
+comm = comm3d
 i = abs( mpio )
-select case( io )
-case( 'r' )
-  comm0 = comm3d
-  if ( i <= 3 ) comm0 = comm2d(i)
-  call mpi_comm_split( comm0, 1, 0, comm, e )
+if ( i <= 3 ) comm0 = comm2d(i)
+if ( iz < 0 ) then
+  comm = commin(-iz)
+  if ( comm == mpi_comm_null ) then
+    call mpi_comm_split( comm0, 1, 0, comm, e )
+    commin(-iz) = comm
+  end if
+  call mpi_comm_split( comm0, iz, 0, comm, e )
   call mpi_file_open( comm, str, mpi_mode_rdonly, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
-case( 'w' )
-  comm = commout(i)
+else
+  comm = commout(iz)
   if ( comm == mpi_comm_null ) then
-    call mpi_comm_split( comm3d, 1, 0, comm, e )
-    commout(i) = comm
+    call mpi_comm_split( comm3d, iz, 0, comm, e )
+    commout(iz) = comm
   end if
   i = 0
   if ( ir == 1 ) i = mpi_mode_create
   call mpi_file_open( comm, str, mpi_mode_wronly + i, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_write_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
-end select
+end if
 call mpi_file_close( fh, e )
 call mpi_type_free( mtype, e )
 call mpi_type_free( ftype, e )
 end subroutine
 
 ! Vector field component input/output
-subroutine vectorio( io, str, r, w1, i1, i2, i3, i4, ic, ir, mpio )
+subroutine vectorio( iz, str, r, w1, i1, i2, i3, i4, ic, ir, mpio )
 use m_util
 use mpi
 real, intent(inout) :: r, w1(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ic, ir, mpio
-character(*), intent(in) :: io, str
+integer, intent(in) :: iz, i1(3), i2(3), i3(3), i4(3), ic, ir, mpio
+character(*), intent(in) :: str
 integer :: i, ndims, ftype, mtype, fh, nl(3), n(3), i0(3), comm0, comm, e
 integer(kind=mpi_offset_kind) :: dr
-if ( all( i1 == i2 ) .and. io =='w' ) then
+if ( iz == 0 ) return
+if ( all( i1 == i2 ) .and. iz /= 0 ) then
   r = w1(i1(1),i1(2),i1(3),ic)
   return
 end if
 if ( mpio == 0 ) then
-  call rio4( io, str, w1, i3, i4, ic, ir )
+  call rio4( iz, str, w1, i3, i4, ic, ir )
   return
 end if
 if ( any( i3 > i4 ) ) then
-  i = abs( mpio )
   comm0 = comm3d
-  if ( io == 'r' .and. i <= 3 ) comm0 = comm2d(i)
+  i = abs( mpio )
+  if ( i <= 3 ) comm0 = comm2d(i)
   call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
   return
 end if
@@ -445,27 +452,30 @@ n  = (/ size(w1,1), size(w1,2), size(w1,3) /)
 nl = i4 - i3 + 1
 call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
+comm0 = comm3d
 i = abs( mpio )
-select case( io )
-case( 'r' )
-  comm0 = comm3d
-  if ( i <= 3 ) comm0 = comm2d(i)
-  call mpi_comm_split( comm0, 1, 0, comm, e )
+if ( i <= 3 ) comm0 = comm2d(i)
+if ( iz < 0 ) then
+  comm = commin(-iz)
+  if ( comm == mpi_comm_null ) then
+    call mpi_comm_split( comm0, iz, 0, comm, e )
+    commin(-iz) = comm
+  end if
   call mpi_file_open( comm, str, mpi_mode_rdonly, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_read_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
-case( 'w' )
-  comm = commout(i)
+else
+  comm = commout(iz)
   if ( comm == mpi_comm_null ) then
-    call mpi_comm_split( comm3d, 1, 0, comm, e )
-    commout(i) = comm
+    call mpi_comm_split( comm0, iz, 0, comm, e )
+    commin(iz) = comm
   end if
   i = 0
   if ( ir == 1 ) i = mpi_mode_create
   call mpi_file_open( comm, str, mpi_mode_wronly + i, mpi_info_null, fh, e )
   call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_write_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
-end select
+end if
 call mpi_file_close( fh, e )
 call mpi_type_free( mtype, e )
 call mpi_type_free( ftype, e )

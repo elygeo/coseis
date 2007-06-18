@@ -54,10 +54,10 @@ case( 'r' )
   r = 0.
   i = 4 * mpin
   select case( fieldin(iz) )
-  case( 'rho' ); call scalario( 'r', 'data/rho', r, mr,  i1, i2, i3, i4, 1, i )
-  case( 'vp'  ); call scalario( 'r', 'data/vp',  r, s1,  i1, i2, i3, i4, 1, i )
-  case( 'vs'  ); call scalario( 'r', 'data/vs',  r, s2,  i1, i2, i3, i4, 1, i )
-  case( 'gam' ); call scalario( 'r', 'data/gam', r, gam, i1, i2, i3, i4, 1, i )
+  case( 'rho' ); call scalario( -iz, 'data/rho', r, mr,  i1, i2, i3, i4, 1, i )
+  case( 'vp'  ); call scalario( -iz, 'data/vp',  r, s1,  i1, i2, i3, i4, 1, i )
+  case( 'vs'  ); call scalario( -iz, 'data/vs',  r, s2,  i1, i2, i3, i4, 1, i )
+  case( 'gam' ); call scalario( -iz, 'data/gam', r, gam, i1, i2, i3, i4, 1, i )
   end select
 end select
 

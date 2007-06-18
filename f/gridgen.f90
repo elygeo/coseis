@@ -21,9 +21,9 @@ i4 = i2node
 if ( grid == 'read' ) then
   r = 0.
   i = 4 * mpin
-  call vectorio( 'r', 'data/x1', r, w1, i1, i2, i3, i4, 1, 1, i )
-  call vectorio( 'r', 'data/x2', r, w1, i1, i2, i3, i4, 2, 1, i )
-  call vectorio( 'r', 'data/x3', r, w1, i1, i2, i3, i4, 3, 1, i )
+  call vectorio( -1, 'data/x1', r, w1, i1, i2, i3, i4, 1, 1, i )
+  call vectorio( -1, 'data/x2', r, w1, i1, i2, i3, i4, 2, 1, i )
+  call vectorio( -1, 'data/x3', r, w1, i1, i2, i3, i4, 3, 1, i )
 end if
 
 ! Single node indexing

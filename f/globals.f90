@@ -174,7 +174,7 @@ integer :: &
 
 integer :: &
   oplevel,       & ! 1=constant, 2=rectangular, 3=parallelepiped, 4=one-point quadrature, 5=exact
-  nin = 0,       & ! number of zones for input
+  nin = 1,       & ! number of zones for input, hold one spot for the mesh
   i1in(nz,3),    & ! j1 k1 l1 input start index
   i2in(nz,3),    & ! j1 k1 l1 input end index
   nlock = 0,     & ! number of zones for locking velocity

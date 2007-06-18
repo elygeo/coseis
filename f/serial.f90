@@ -132,11 +132,11 @@ f(1,1,1,1) = f(1,1,1,1) - nhalo + nhalo
 end subroutine
 
 ! Scalar field input/output
-subroutine scalario( io, str, r, s1, i1, i2, i3, i4, ir, mpio )
+subroutine scalario( iz, str, r, s1, i1, i2, i3, i4, ir, mpio )
 use m_util
 real, intent(inout) :: r, s1(:,:,:)
-integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ir, mpio
-character(*), intent(in) :: io, str
+integer, intent(in) :: iz, i1(3), i2(3), i3(3), i4(3), ir, mpio
+character(*), intent(in) :: str
 integer :: i
 if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
   write( 0, * ) 'Error in scalario: ', str, io
@@ -144,20 +144,20 @@ if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
   write( 0, * ) i3, i4
   stop
 end if
-if ( all( i1 == i2 ) .and. io == 'w' ) then
+if ( all( i1 == i2 ) .and. iz /= 0 ) then
   r = s1(i1(1),i1(2),i1(3))
   return
 end if
-call rio3( io, str, s1, i1, i2, ir )
+call rio3( iz, str, s1, i1, i2, ir )
 i = i3(1) + i4(1) + mpio
 end subroutine
 
 ! Vector field component input/output
-subroutine vectorio( io, str, r, w1, i1, i2, i3, i4, ic, ir, mpio )
+subroutine vectorio( iz, str, r, w1, i1, i2, i3, i4, ic, ir, mpio )
 use m_util
 real, intent(inout) :: r, w1(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3), i3(3), i4(3), ic, ir, mpio
-character(*), intent(in) :: io, str
+integer, intent(in) :: iz, i1(3), i2(3), i3(3), i4(3), ic, ir, mpio
+character(*), intent(in) :: str
 integer :: i
 if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
   write( 0, * ) 'Error in vectorio: ', str, io
@@ -165,11 +165,11 @@ if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
   write( 0, * ) i3, i4
   stop
 end if
-if ( all( i1 == i2 ) .and. io == 'w' ) then
+if ( all( i1 == i2 ) .and. iz /= 0 ) then
   r = w1(i1(1),i1(2),i1(3),ic)
   return
 end if
-call rio4( io, str, w1, i1, i2, ic, ir )
+call rio4( iz, str, w1, i1, i2, ic, ir )
 i = i3(1) + i4(1) + mpio
 end subroutine
 
