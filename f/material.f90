@@ -8,7 +8,7 @@ use m_globals
 use m_collective
 use m_util
 use m_bc
-real :: x1(3), x2(3), stats(6), gstats(6), r
+real :: x1(3), x2(3), stats(8), gstats(8), r
 integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
 
 if ( master ) write( 0, * ) 'Material model'
@@ -63,29 +63,40 @@ end select
 
 end do doiz
 
-if ( any( mr /= mr ) .or. any( s1 /= s1 ) .or. any( s2 /= s2 ) ) then
+! Limits
+where ( s1  < vp1  ) s1  = vp1
+where ( s1  > vp2  ) s1  = vp2
+where ( s2  < vs1  ) s2  = vs1
+where ( s2  > vs2  ) s2  = vs2
+
+! Viscosity
+if ( vdamp > 0. ) where( s2 > 0. ) gam = vdamp / s2
+
+! Limits
+where ( mr  < rho1 ) mr  = rho1
+where ( mr  > rho2 ) mr  = rho2
+where ( gam < gam1 ) gam = gam1
+where ( gam > gam2 ) gam = gam2
+
+! Test for Nans
+if ( any( mr  /= mr  ) .or. any( s1 /= s1 ) &
+.or. any( gam /= gam ) .or. any( s2 /= s2 ) ) then
   stop 'NaNs in velocity model!'
 end if
 
-! Limits
-where ( mr < rho1 ) mr = rho1
-where ( mr > rho2 ) mr = rho2
-where ( s1 < vp1 ) s1 = vp1
-where ( s1 > vp2 ) s1 = vp2
-where ( s2 < vs1 ) s2 = vs1
-where ( s2 > vs2 ) s2 = vs2
-
 ! Fill halo and find extrema
-call scalarswaphalo( mr, nhalo )
+call scalarswaphalo( mr,  nhalo )
 call scalarswaphalo( gam, nhalo )
-call scalarswaphalo( s1, nhalo )
-call scalarswaphalo( s2, nhalo )
-stats(1) = maxval( mr )
-stats(2) = maxval( s1 )
-stats(3) = maxval( s2 )
-call scalarsethalo( mr, stats(1), i1cell, i2cell )
-call scalarsethalo( s1, stats(2), i1cell, i2cell )
-call scalarsethalo( s2, stats(3), i1cell, i2cell )
+call scalarswaphalo( s1,  nhalo )
+call scalarswaphalo( s2,  nhalo )
+stats(1) = maxval( mr  )
+stats(2) = maxval( gam )
+stats(3) = maxval( s1  )
+stats(4) = maxval( s2  )
+call scalarsethalo( mr,  stats(1), i1cell, i2cell )
+call scalarsethalo( gam, stats(2), i1cell, i2cell )
+call scalarsethalo( s1,  stats(3), i1cell, i2cell )
+call scalarsethalo( s2,  stats(4), i1cell, i2cell )
 i1 = abs( ibc1 )
 i2 = abs( ibc2 )
 where( i1 <= 1 ) i1 = 4
@@ -94,16 +105,19 @@ call scalarbc( mr,  i1, i2, nhalo, 1 )
 call scalarbc( gam, i1, i2, nhalo, 1 )
 call scalarbc( s1,  i1, i2, nhalo, 1 )
 call scalarbc( s2,  i1, i2, nhalo, 1 )
-stats(4) = -minval( mr )
-stats(5) = -minval( s1 )
-stats(6) = -minval( s2 )
+stats(5) = -minval( mr  )
+stats(6) = -minval( gam )
+stats(7) = -minval( s1  )
+stats(8) = -minval( s2  )
 call rreduce1( gstats, stats, 'allmax', 0 )
 rho2 =  gstats(1)
-vp2  =  gstats(2)
-vs2  =  gstats(3)
-rho1 = -gstats(4)
-vp1  = -gstats(5)
-vs1  = -gstats(6)
+gam2 =  gstats(2)
+vp2  =  gstats(3)
+vs2  =  gstats(4)
+rho1 = -gstats(5)
+gam1 = -gstats(6)
+vp1  = -gstats(7)
+vs1  = -gstats(8)
 
 ! Hypocenter values
 if ( master ) then
@@ -123,12 +137,6 @@ lam = mr * ( s1 * s1 ) - 2. * mu
 y = 12. * ( lam + 2. * mu )
 where ( y /= 0. ) y = dx * mu * ( lam + mu ) / y
 !y = .3 / 16. * ( lam + 2. * mu ) * dx ! like Ma & Liu, 2006
-
-! Viscosity
-if ( vdamp > 0. ) then
-  where( s2 > 0. ) gam = vdamp / s2
-  where( gam > .8 ) gam = .8
-end if
 
 end subroutine
 

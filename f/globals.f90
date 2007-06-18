@@ -100,6 +100,8 @@ real :: &
   vs0,           & ! hypocenter S-wave speed
   vs1,           & ! min S-wave speed
   vs2,           & ! max S-wave speed
+  gam1,          & ! min viscosity
+  gam2,          & ! max viscosity
   hourglass(2),  & ! hourglass stiffness (1) and viscosity (2)
   vdamp,         & ! shear wave velocity dependent damping
   rexpand,       & ! grid expansion ratio

@@ -56,12 +56,7 @@ forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
   + f(j+d,k,l+d) + f(j,k+d,l) &
   + f(j+d,k+d,l) + f(j,k,l+d) )
 end forall
-fa(:i1(1)-1,:,:) = 0.
-fa(:,:i1(2)-1,:) = 0.
-fa(:,:,:i1(3)-1) = 0.
-fa(i2(1)+1:,:,:) = 0.
-fa(:,i2(2)+1:,:) = 0.
-fa(:,:,i2(3)+1:) = 0.
+call scalarsethalo( fa, 0., i1, i2 )
 end subroutine
 
 subroutine vectoraverage( fa, f, i1, i2, d )
@@ -76,12 +71,7 @@ forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3), i=1:3 )
   + f(j+d,k,l+d,i) + f(j,k+d,l,i) &
   + f(j+d,k+d,l,i) + f(j,k,l+d,i) )
 end forall
-fa(:i1(1)-1,:,:,:) = 0.
-fa(:,:i1(2)-1,:,:) = 0.
-fa(:,:,:i1(3)-1,:) = 0.
-fa(i2(1)+1:,:,:,:) = 0.
-fa(:,i2(2)+1:,:,:) = 0.
-fa(:,:,i2(3)+1:,:) = 0.
+call vectorsethalo( fa, 0., i1, i2 )
 end subroutine
 
 subroutine scalarsethalo( f, r, i1, i2 )
@@ -90,12 +80,12 @@ real, intent(in) :: r
 integer, intent(in) :: i1(3), i2(3)
 integer :: n(3)
 n = (/ size(f,1), size(f,2), size(f,3) /)
-if ( n(1) > 1 ) f(:i1(1)-1,:,:) = r
-if ( n(2) > 1 ) f(:,:i1(2)-1,:) = r
-if ( n(3) > 1 ) f(:,:,:i1(3)-1) = r
-if ( n(1) > 1 ) f(i2(1)+1:,:,:) = r
-if ( n(2) > 1 ) f(:,i2(2)+1:,:) = r
-if ( n(3) > 1 ) f(:,:,i2(3)+1:) = r
+if ( n(1) > 1 ) f(1:i1(1)-1,:,:) = r
+if ( n(2) > 1 ) f(:,1:i1(2)-1,:) = r
+if ( n(3) > 1 ) f(:,:,1:i1(3)-1) = r
+if ( n(1) > 1 ) f(i2(1)+1:n(1),:,:) = r
+if ( n(2) > 1 ) f(:,i2(2)+1:n(2),:) = r
+if ( n(3) > 1 ) f(:,:,i2(3)+1:n(3)) = r
 end subroutine
 
 subroutine vectorsethalo( f, r, i1, i2 )
@@ -104,12 +94,12 @@ real, intent(in) :: r
 integer, intent(in) :: i1(3), i2(3)
 integer :: n(3)
 n = (/ size(f,1), size(f,2), size(f,3) /)
-if ( n(1) > 1 ) f(:i1(1)-1,:,:,:) = r
-if ( n(2) > 1 ) f(:,:i1(2)-1,:,:) = r
-if ( n(3) > 1 ) f(:,:,:i1(3)-1,:) = r
-if ( n(1) > 1 ) f(i2(1)+1:,:,:,:) = r
-if ( n(2) > 1 ) f(:,i2(2)+1:,:,:) = r
-if ( n(3) > 1 ) f(:,:,i2(3)+1:,:) = r
+if ( n(1) > 1 ) f(1:i1(1)-1,:,:,:) = r
+if ( n(2) > 1 ) f(:,1:i1(2)-1,:,:) = r
+if ( n(3) > 1 ) f(:,:,1:i1(3)-1,:) = r
+if ( n(1) > 1 ) f(i2(1)+1:n(1),:,:,:) = r
+if ( n(2) > 1 ) f(:,i2(2)+1:n(2),:,:) = r
+if ( n(3) > 1 ) f(:,:,i2(3)+1:n(3),:) = r
 end subroutine
 
 ! Timer

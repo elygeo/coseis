@@ -113,8 +113,8 @@ i2 = min( i2pml - 1, nm )
 call scalarsethalo( co, 1e20, i1, i2 )
 
 ! Normal vectors
-i1 = i1node
-i2 = i2node
+i1 = i1core
+i2 = i2core
 i1(ifn) = ihypo(ifn)
 i2(ifn) = ihypo(ifn)
 call surfnormals( nhat, w1, i1, i2, ifn )
@@ -209,14 +209,14 @@ call scalarbc( area,  ibc1, ibc2, nhalo, 0 )
 call scalarbc( rhypo, ibc1, ibc2, nhalo, 0 )
 call vectorbc( nhat,  ibc1, ibc2, nhalo )
 call vectorbc( t0,    ibc1, ibc2, nhalo )
-call scalarswaphalo( mus, nhalo )
-call scalarswaphalo( mud, nhalo )
-call scalarswaphalo( dc, nhalo )
-call scalarswaphalo( co, nhalo )
-call scalarswaphalo( area, nhalo )
+call scalarswaphalo( mus,   nhalo )
+call scalarswaphalo( mud,   nhalo )
+call scalarswaphalo( dc,    nhalo )
+call scalarswaphalo( co,    nhalo )
+call scalarswaphalo( area,  nhalo )
 call scalarswaphalo( rhypo, nhalo )
-call vectorswaphalo( nhat, nhalo )
-call vectorswaphalo( t0, nhalo )
+call vectorswaphalo( nhat,  nhalo )
+call vectorswaphalo( t0,    nhalo )
 
 ! Metadata
 if ( master ) then
@@ -367,18 +367,18 @@ end if
 ! Friction + fracture energy
 t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( t3 * t2, 4 ) * area
-call scalarsethalo( f2, 0., i1node, i2node )
+call scalarsethalo( f2, 0., i1core, i2core )
 efric = efric + dt * sum( f2 )
 
 ! Strain energy
 t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( ( t0 + t3 ) * t2, 4 ) * area
-call scalarsethalo( f2, 0., i1node, i2node )
+call scalarsethalo( f2, 0., i1core, i2core )
 estrain = -.5 * sum( f2 )
 
 ! Moment
 f2 = muf * area * sqrt( sum( t2 * t2, 4 ) )
-call scalarsethalo( f2, 0., i1node, i2node )
+call scalarsethalo( f2, 0., i1core, i2core )
 moment = sum( f2 )
 
 ! Slip acceleration
