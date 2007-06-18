@@ -248,7 +248,7 @@ if ( it > 0 .and. dofault ) then
   end select
 end if
 
-doiz: do iz = nout, 1, -1
+doiz: do iz = 1, nout
 
 ! Interval
 if ( it < i1out(iz,4) .or. it > i2out(iz,4) ) cycle doiz
@@ -263,15 +263,16 @@ i1 = i1out(iz,1:3)
 i2 = i2out(iz,1:3)
 i3 = max( i1, i1core )
 i4 = min( i2, i2core )
-ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
-if ( any( i3 > i4 ) ) i1out(iz,4) = nt + 1
-if ( fault ) then
+if ( any( i3 > i4 ) ) then
+  i1out(iz,4) = nt + 1
+elseif ( fault ) then
   i = abs( faultnormal )
   i1(i) = 1
   i2(i) = 1
   i3(i) = 1
   i4(i) = 1
 end if
+ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
 
 ! Binary output
 do ic = 1, nc
@@ -324,7 +325,7 @@ do ic = 1, nc
     write( 0, * ) 'error: unknown output field: ', fieldout(iz)
     stop
   end select
-  if ( all( i1 == i2 ) ) then
+  if ( all( i1 == i2 .and. i3 == i4 ) ) then
   if ( it == 0 .or. ibuff(iz) == 0 ) then
     call rwrite( str, rr, ir )
   else

@@ -2,7 +2,7 @@
 
 nt = 2;
 debug = 1;
-  np = [ 1 1 5 ];
+  np = [ 1 1 2 ];
   nn = [ 4 4 4 ];
   ihypo = [ 2 2 2 ];
   faultnormal = 3;
