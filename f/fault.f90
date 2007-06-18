@@ -164,27 +164,22 @@ do i = 1, 3
 end do
 
 ! Hypocentral radius
-i1 = 1
-i2 = nm
-i1(ifn) = ihypo(ifn)
-i2(ifn) = ihypo(ifn)
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
 do i = 1, 3
-  t2(:,:,:,i) = w1(j1:j2,k1:k2,l1:l2,i) - xhypo(i)
+  select case( ifn )
+  case ( 1 ); t2(1,:,:,i) = w1(ihypo(1),:,:,i) - xhypo(i)
+  case ( 2 ); t2(:,1,:,i) = w1(:,ihypo(2),:,i) - xhypo(i)
+  case ( 3 ); t2(:,:,1,i) = w1(:,:,ihypo(3),i) - xhypo(i)
+  end select
 end do
 rhypo = sqrt( sum( t2 * t2, 4 ) )
 
 ! Resample mu on to fault plane nodes for moment calculatioin
 select case( ifn )
-case ( 1 ); f1(1,:,:) = mu(ihypo(1)-1,:,:); f2(1,:,:) = mu(ihypo(1)+1,:,:)
-case ( 2 ); f1(:,1,:) = mu(:,ihypo(2)-1,:); f2(:,1,:) = mu(:,ihypo(2)+1,:)
-case ( 3 ); f1(:,:,1) = mu(:,:,ihypo(3)-1); f2(:,:,1) = mu(:,:,ihypo(3)+1)
+case ( 1 ); muf(1,:,:) = mu(ihypo(1),:,:)
+case ( 2 ); muf(:,1,:) = mu(:,ihypo(2),:)
+case ( 3 ); muf(:,:,1) = mu(:,:,ihypo(3))
 end select
-where( f1 /= 0. ) f1 = 1. / f1
-where( f2 /= 0. ) f2 = 1. / f2
-muf = f1 + f2
+where ( muf /= 0. ) muf = 1. / muf
 j = nm(1) - 1
 k = nm(2) - 1
 l = nm(3) - 1

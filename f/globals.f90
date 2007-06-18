@@ -6,7 +6,7 @@ real, parameter :: &
   pi = 3.14159
 
 integer, parameter :: &
-  nz = 100,      & ! max number of input and output zones
+  nz = 100,      & ! max number of input and output zones, also see mpi.f90
   itio = 50        ! buffersize for i/o
 
 ! 4d vectors

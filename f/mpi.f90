@@ -1,7 +1,8 @@
 ! Collective routines - MPI version
 module m_collective
 implicit none
-integer, private :: ip, ipmaster, comm3d, comm2d(3), commout(256)
+integer, private, parameter :: nz = 500
+integer, private :: ip, ipmaster, comm3d, comm2d(3), commout(nz)
 contains
 
 ! Initialize
