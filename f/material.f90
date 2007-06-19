@@ -125,6 +125,7 @@ if ( master ) then
   k = ihypo(2)
   l = ihypo(3)
   rho0 = mr(j,k,l)
+  gam0 = gam(j,k,l)
   vp0  = s1(j,k,l)
   vs0  = s2(j,k,l)
 end if

@@ -100,12 +100,13 @@ real :: &
   vs0,           & ! hypocenter S-wave speed
   vs1,           & ! min S-wave speed
   vs2,           & ! max S-wave speed
+  gam0,          & ! hypocenter viscosity
   gam1,          & ! min viscosity
   gam2,          & ! max viscosity
   hourglass(2),  & ! hourglass stiffness (1) and viscosity (2)
   vdamp,         & ! shear wave velocity dependent damping
   rexpand,       & ! grid expansion ratio
-  affine(10),    & ! grid transformation
+  affine(9),     & ! grid transformation
   gridnoise,     & ! random noise in grid
   inval(nz),     & ! input value
   x1in(nz,3),    & ! input cube - near corner

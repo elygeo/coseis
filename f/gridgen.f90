@@ -96,7 +96,7 @@ if ( rexpand > 1. ) then
 end if
 
 ! Affine grid transformation
-m = sign( 1., affine(1:9) ) * sqrt( abs( affine(1:9) / affine(10) ) )
+m = affine
 w2(:,:,:,1) = m(1) * w1(:,:,:,1) + m(2) * w1(:,:,:,2) + m(3) * w1(:,:,:,3)
 w2(:,:,:,2) = m(4) * w1(:,:,:,1) + m(5) * w1(:,:,:,2) + m(6) * w1(:,:,:,3)
 w2(:,:,:,3) = m(7) * w1(:,:,:,1) + m(8) * w1(:,:,:,2) + m(9) * w1(:,:,:,3)
