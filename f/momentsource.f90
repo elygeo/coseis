@@ -48,7 +48,7 @@ if ( s2(j,k,l) < rsource*rsource ) then
     write( 0, * ) 'invalid rfunc: ', trim( rfunc )
     stop
   end select
-  if ( all( ibc1 /= 9 .or. (/ j, k, l /) >= i1node ) ) then
+  if ( all( ibc1 /= 9 .or. (/ j, k, l /) >= i1core ) ) then
     sumsrcfr = sumsrcfr + srcfr(i)
   end if
 end if

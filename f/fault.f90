@@ -201,7 +201,6 @@ t1 = 0.
 t2 = 0.
 
 ! Halos
-stop
 call scalarbc( mus,   ibc1, ibc2, nhalo, 0 )
 call scalarbc( mud,   ibc1, ibc2, nhalo, 0 )
 call scalarbc( dc,    ibc1, ibc2, nhalo, 0 )

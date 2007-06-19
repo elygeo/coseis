@@ -1,6 +1,4 @@
 ! Boundary conditions
-! Must do the far boundary condition first for cells because
-! we might have i2cell < i2core on last process 
 module m_bc
 implicit none
 contains
@@ -21,44 +19,44 @@ where ( nm == 1 ) i1 = 99
 where ( nm == 1 ) i2 = 99
 
 ! Zero BC
-if ( i2(1) <= 1 ) forall( i=1:n+c ) f(j2+i,:,:) = 0.
-if ( i2(2) <= 1 ) forall( i=1:n+c ) f(:,k2+i,:) = 0.
-if ( i2(3) <= 1 ) forall( i=1:n+c ) f(:,:,l2+i) = 0.
 if ( i1(1) <= 1 ) forall( i=1:n   ) f(j1-i,:,:) = 0.
 if ( i1(2) <= 1 ) forall( i=1:n   ) f(:,k1-i,:) = 0.
 if ( i1(3) <= 1 ) forall( i=1:n   ) f(:,:,l1-i) = 0.
+if ( i2(1) <= 1 ) forall( i=1:n+c ) f(j2+i,:,:) = 0.
+if ( i2(2) <= 1 ) forall( i=1:n+c ) f(:,k2+i,:) = 0.
+if ( i2(3) <= 1 ) forall( i=1:n+c ) f(:,:,l2+i) = 0.
 
 ! Mirror on cell BC
 if ( c /= 0 ) then
-  if ( i2(1) == 2 ) f(j2+1,:,:) = f(j2,:,:)
-  if ( i2(2) == 2 ) f(:,k2+1,:) = f(:,k2,:)
-  if ( i2(3) == 2 ) f(:,:,l2+1) = f(:,:,l2)
   if ( i1(1) == 2 ) f(j1-1,:,:) = f(j1,:,:)
   if ( i1(2) == 2 ) f(:,k1-1,:) = f(:,k1,:)
   if ( i1(3) == 2 ) f(:,:,l1-1) = f(:,:,l1)
+  if ( i2(1) == 2 ) f(j2+1,:,:) = f(j2,:,:)
+  if ( i2(2) == 2 ) f(:,k2+1,:) = f(:,k2,:)
+  if ( i2(3) == 2 ) f(:,:,l2+1) = f(:,:,l2)
 end if
-if ( i2(1) == 2 ) forall( i=1:n   ) f(j2+i+c,:,:) = f(j2-i+1,:,:)
-if ( i2(2) == 2 ) forall( i=1:n   ) f(:,k2+i+c,:) = f(:,k2-i+1,:)
-if ( i2(3) == 2 ) forall( i=1:n   ) f(:,:,l2+i+c) = f(:,:,l2-i+1)
 if ( i1(1) == 2 ) forall( i=1:n-c ) f(j1-i-c,:,:) = f(j1+i-1,:,:)
 if ( i1(2) == 2 ) forall( i=1:n-c ) f(:,k1-i-c,:) = f(:,k1+i-1,:)
 if ( i1(3) == 2 ) forall( i=1:n-c ) f(:,:,l1-i-c) = f(:,:,l1+i-1)
+if ( i2(1) == 2 ) forall( i=1:n   ) f(j2+i+c,:,:) = f(j2-i+1,:,:)
+if ( i2(2) == 2 ) forall( i=1:n   ) f(:,k2+i+c,:) = f(:,k2-i+1,:)
+if ( i2(3) == 2 ) forall( i=1:n   ) f(:,:,l2+i+c) = f(:,:,l2-i+1)
 
 ! Mirror on node BC
-if ( i2(1) == 3 ) forall( i=1:n+c ) f(j2+i,:,:) = f(j2-i+c,:,:)
-if ( i2(2) == 3 ) forall( i=1:n+c ) f(:,k2+i,:) = f(:,k2-i+c,:)
-if ( i2(3) == 3 ) forall( i=1:n+c ) f(:,:,l2+i) = f(:,:,l2-i+c)
 if ( i1(1) == 3 ) forall( i=1:n   ) f(j1-i,:,:) = f(j1+i-c,:,:)
 if ( i1(2) == 3 ) forall( i=1:n   ) f(:,k1-i,:) = f(:,k1+i-c,:)
 if ( i1(3) == 3 ) forall( i=1:n   ) f(:,:,l1-i) = f(:,:,l1+i-c)
+if ( i2(1) == 3 ) forall( i=1:n+c ) f(j2+i,:,:) = f(j2-i+c,:,:)
+if ( i2(2) == 3 ) forall( i=1:n+c ) f(:,k2+i,:) = f(:,k2-i+c,:)
+if ( i2(3) == 3 ) forall( i=1:n+c ) f(:,:,l2+i) = f(:,:,l2-i+c)
 
 ! Continuing BC
-if ( i2(1) == 4 ) forall( i=1:n+c ) f(j2+i,:,:) = f(j2,:,:)
-if ( i2(2) == 4 ) forall( i=1:n+c ) f(:,k2+i,:) = f(:,k2,:)
-if ( i2(3) == 4 ) forall( i=1:n+c ) f(:,:,l2+i) = f(:,:,l2)
 if ( i1(1) == 4 ) forall( i=1:n   ) f(j1-i,:,:) = f(j1,:,:)
 if ( i1(2) == 4 ) forall( i=1:n   ) f(:,k1-i,:) = f(:,k1,:)
 if ( i1(3) == 4 ) forall( i=1:n   ) f(:,:,l1-i) = f(:,:,l1)
+if ( i2(1) == 4 ) forall( i=1:n+c ) f(j2+i,:,:) = f(j2,:,:)
+if ( i2(2) == 4 ) forall( i=1:n+c ) f(:,k2+i,:) = f(:,k2,:)
+if ( i2(3) == 4 ) forall( i=1:n+c ) f(:,:,l2+i) = f(:,:,l2)
 
 end subroutine
 
@@ -79,46 +77,22 @@ where ( nm == 1 ) i1 = 99
 where ( nm == 1 ) i2 = 99
 
 ! Zero BC
-if ( i2(1) <= 1 ) forall( i=1:n ) f(j2+i,:,:,:) = 0.
-if ( i2(2) <= 1 ) forall( i=1:n ) f(:,k2+i,:,:) = 0.
-if ( i2(3) <= 1 ) forall( i=1:n ) f(:,:,l2+i,:) = 0.
 if ( i1(1) <= 1 ) forall( i=1:n ) f(j1-i,:,:,:) = 0.
 if ( i1(2) <= 1 ) forall( i=1:n ) f(:,k1-i,:,:) = 0.
 if ( i1(3) <= 1 ) forall( i=1:n ) f(:,:,l1-i,:) = 0.
+if ( i2(1) <= 1 ) forall( i=1:n ) f(j2+i,:,:,:) = 0.
+if ( i2(2) <= 1 ) forall( i=1:n ) f(:,k2+i,:,:) = 0.
+if ( i2(3) <= 1 ) forall( i=1:n ) f(:,:,l2+i,:) = 0.
 
 ! Continuing BC
-if ( i2(1) == 4 ) forall( i=1:n ) f(j2+i,:,:,:) = f(j2,:,:,:)
-if ( i2(2) == 4 ) forall( i=1:n ) f(:,k2+i,:,:) = f(:,k2,:,:)
-if ( i2(3) == 4 ) forall( i=1:n ) f(:,:,l2+i,:) = f(:,:,l2,:)
 if ( i1(1) == 4 ) forall( i=1:n ) f(j1-i,:,:,:) = f(j1,:,:,:)
 if ( i1(2) == 4 ) forall( i=1:n ) f(:,k1-i,:,:) = f(:,k1,:,:)
 if ( i1(3) == 4 ) forall( i=1:n ) f(:,:,l1-i,:) = f(:,:,l1,:)
+if ( i2(1) == 4 ) forall( i=1:n ) f(j2+i,:,:,:) = f(j2,:,:,:)
+if ( i2(2) == 4 ) forall( i=1:n ) f(:,k2+i,:,:) = f(:,k2,:,:)
+if ( i2(3) == 4 ) forall( i=1:n ) f(:,:,l2+i,:) = f(:,:,l2,:)
 
 ! Mirror on cell BC
-if ( i2(1) == 2 ) then
-  s = sign( 1, ibc2(1) )
-  forall( i=1:n )
-    f(j2+i,:,:,1) = -s * f(j2-i+1,:,:,1)
-    f(j2+i,:,:,2) =  s * f(j2-i+1,:,:,2)
-    f(j2+i,:,:,3) =  s * f(j2-i+1,:,:,3)
-  end forall
-end if
-if ( i2(2) == 2 ) then
-  s = sign( 1, ibc2(2) )
-  forall( i=1:n )
-    f(:,k2+i,:,1) =  s * f(:,k2-i+1,:,1)
-    f(:,k2+i,:,2) = -s * f(:,k2-i+1,:,2)
-    f(:,k2+i,:,3) =  s * f(:,k2-i+1,:,3)
-  end forall
-end if
-if ( i2(3) == 2 ) then
-  s = sign( 1, ibc2(3) )
-  forall( i=1:n )
-    f(:,:,l2+i,1) =  s * f(:,:,l2-i+1,1)
-    f(:,:,l2+i,2) =  s * f(:,:,l2-i+1,2)
-    f(:,:,l2+i,3) = -s * f(:,:,l2-i+1,3)
-  end forall
-end if
 if ( i1(1) == 2 ) then
   s = sign( 1, ibc1(1) )
   forall( i=1:n )
@@ -143,32 +117,32 @@ if ( i1(3) == 2 ) then
     f(:,:,l1-i,3) = -s * f(:,:,l1+i-1,3)
   end forall
 end if
-
-! Mirror on node BC
-if ( i2(1) == 3 ) then
+if ( i2(1) == 2 ) then
   s = sign( 1, ibc2(1) )
   forall( i=1:n )
-    f(j2+i,:,:,1) = -s * f(j2-i,:,:,1)
-    f(j2+i,:,:,2) =  s * f(j2-i,:,:,2)
-    f(j2+i,:,:,3) =  s * f(j2-i,:,:,3)
+    f(j2+i,:,:,1) = -s * f(j2-i+1,:,:,1)
+    f(j2+i,:,:,2) =  s * f(j2-i+1,:,:,2)
+    f(j2+i,:,:,3) =  s * f(j2-i+1,:,:,3)
   end forall
 end if
-if ( i2(2) == 3 ) then
+if ( i2(2) == 2 ) then
   s = sign( 1, ibc2(2) )
   forall( i=1:n )
-    f(:,k2+i,:,1) =  s * f(:,k2-i,:,1)
-    f(:,k2+i,:,2) = -s * f(:,k2-i,:,2)
-    f(:,k2+i,:,3) =  s * f(:,k2-i,:,3)
+    f(:,k2+i,:,1) =  s * f(:,k2-i+1,:,1)
+    f(:,k2+i,:,2) = -s * f(:,k2-i+1,:,2)
+    f(:,k2+i,:,3) =  s * f(:,k2-i+1,:,3)
   end forall
 end if
-if ( i2(3) == 3 ) then
+if ( i2(3) == 2 ) then
   s = sign( 1, ibc2(3) )
   forall( i=1:n )
-    f(:,:,l2+i,1) =  s * f(:,:,l2-i,1)
-    f(:,:,l2+i,2) =  s * f(:,:,l2-i,2)
-    f(:,:,l2+i,3) = -s * f(:,:,l2-i,3)
+    f(:,:,l2+i,1) =  s * f(:,:,l2-i+1,1)
+    f(:,:,l2+i,2) =  s * f(:,:,l2-i+1,2)
+    f(:,:,l2+i,3) = -s * f(:,:,l2-i+1,3)
   end forall
 end if
+
+! Mirror on node BC
 if ( i1(1) == 3 ) then
   s = sign( 1, ibc1(1) )
   forall( i=1:n )
@@ -191,6 +165,30 @@ if ( i1(3) == 3 ) then
     f(:,:,l1-i,1) =  s * f(:,:,l1+i,1)
     f(:,:,l1-i,2) =  s * f(:,:,l1+i,2)
     f(:,:,l1-i,3) = -s * f(:,:,l1+i,3)
+  end forall
+end if
+if ( i2(1) == 3 ) then
+  s = sign( 1, ibc2(1) )
+  forall( i=1:n )
+    f(j2+i,:,:,1) = -s * f(j2-i,:,:,1)
+    f(j2+i,:,:,2) =  s * f(j2-i,:,:,2)
+    f(j2+i,:,:,3) =  s * f(j2-i,:,:,3)
+  end forall
+end if
+if ( i2(2) == 3 ) then
+  s = sign( 1, ibc2(2) )
+  forall( i=1:n )
+    f(:,k2+i,:,1) =  s * f(:,k2-i,:,1)
+    f(:,k2+i,:,2) = -s * f(:,k2-i,:,2)
+    f(:,k2+i,:,3) =  s * f(:,k2-i,:,3)
+  end forall
+end if
+if ( i2(3) == 3 ) then
+  s = sign( 1, ibc2(3) )
+  forall( i=1:n )
+    f(:,:,l2+i,1) =  s * f(:,:,l2-i,1)
+    f(:,:,l2+i,2) =  s * f(:,:,l2-i,2)
+    f(:,:,l2+i,3) = -s * f(:,:,l2-i,3)
   end forall
 end if
 

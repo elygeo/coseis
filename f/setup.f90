@@ -43,24 +43,30 @@ ibc2 = bc2
 where ( ip3 /= 0      ) ibc1 = 9
 where ( ip3 /= np - 1 ) ibc2 = 9
 
-! Regions
+! Non-overlapping core region
 i1core = 1  + nhalo
 i2core = nm - nhalo
-i1node = max(  1-nnoff, 2    )
-i2node = min( nn-nnoff, nm-1 )
-i1cell = max(  1-nnoff,   1    )
-i2cell = min( nn-nnoff-1, nm-1 )
+
+! Node region
+i1node = 1  + nhalo
+i2node = nm - nhalo
+where ( abs( ibc1 ) > 1 ) i1node = 2
+where ( abs( ibc2 ) > 1 ) i2node = nm - 1
+
+! Cell region
+i1cell = 1  + nhalo
+i2cell = nm - nhalo - 1
+where ( abs( ibc1 ) > 1 ) i1cell = 1
+where ( abs( ibc2 ) > 1 ) i2cell = nm - 1
 
 ! PML region
-i1pml = 0 - nhalo
-i2pml = nn + 1 + nhalo
+i1pml = min( nm, max( 0, npml - nnoff ) )
+i2pml = max( 1,  min( nm + 1, nn + 1 - npml - nnoff ) )
 if ( npml > 0 ) then
-  where ( bc1 == 1 ) i1pml = npml
-  where ( bc2 == 1 ) i2pml = nn + 1 - npml
+  where ( bc1 /= 1 ) i1pml = 0
+  where ( bc2 /= 1 ) i2pml = nm + 1
 end if
-i1pml = i1pml - nnoff
-i2pml = i2pml - nnoff
-if ( any( i1pml >= i2pml ) ) stop 'model too small for PML'
+if ( any( i1pml > i2pml ) ) stop 'model too small for PML'
 
 ! Map hypocenter to local index, test if fault on this processor
 ihypo = ihypo - nnoff
