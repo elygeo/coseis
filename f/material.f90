@@ -89,12 +89,12 @@ call scalarbc( s2,  i1, i2, nhalo, 1 )
 call scalarbc( gam, i1, i2, nhalo, 1 )
 
 ! Limits
-if ( mr1 > 0. ) where ( mr < rho1 ) mr = rho1
-if ( mr2 > 0. ) where ( mr > rho2 ) mr = rho2
-if ( vp1 > 0. ) where ( s1 < vp1  ) s1 = vp1
-if ( vp2 > 0. ) where ( s1 > vp2  ) s1 = vp2
-if ( vs1 > 0. ) where ( s2 < vs1  ) s2 = vs1
-if ( vs2 > 0. ) where ( s2 > vs2  ) s2 = vs2
+if ( rho1 > 0. ) where ( mr < rho1 ) mr = rho1
+if ( rho2 > 0. ) where ( mr > rho2 ) mr = rho2
+if ( vp1  > 0. ) where ( s1 < vp1  ) s1 = vp1
+if ( vp2  > 0. ) where ( s1 > vp2  ) s1 = vp2
+if ( vs1  > 0. ) where ( s2 < vs1  ) s2 = vs1
+if ( vs2  > 0. ) where ( s2 > vs2  ) s2 = vs2
 
 ! Velocity dependent viscosity
 if ( vdamp > 0. ) where( s2 > 0. ) gam = vdamp / s2

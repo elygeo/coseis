@@ -110,7 +110,7 @@ if ( rr > 0. ) write( 0, * ) 'warning: positive normal traction: ', rr, i1
 ! Lock fault in PML region
 i1 = min( i1pml, nm + 1 )
 i2 = max( i2pml, 0 )
-call scalarsethalo( co, 1e20, i1pml, i2pml )
+call scalarsethalo( co, 1e20, i1, i2 )
 
 ! Normal vectors
 i1 = i1core
@@ -201,6 +201,7 @@ t1 = 0.
 t2 = 0.
 
 ! Halos
+stop
 call scalarbc( mus,   ibc1, ibc2, nhalo, 0 )
 call scalarbc( mud,   ibc1, ibc2, nhalo, 0 )
 call scalarbc( dc,    ibc1, ibc2, nhalo, 0 )

@@ -67,6 +67,13 @@ i = size(r)
 call mpi_bcast( r, i, mpi_real, ipmaster, comm3d, e )
 end subroutine
 
+! Barrier
+subroutine barrier
+use mpi
+integer :: e
+call mpi_barrier( comm3d, e )
+end subroutine
+
 ! Reduce integer
 subroutine ireduce( ii, i, op, i2d )
 use mpi

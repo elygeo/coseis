@@ -38,6 +38,10 @@ real, intent(inout) :: r(:)
 r = r
 end subroutine
 
+! Barrier
+subroutine barrier
+end subroutine
+
 ! Reduce integer
 subroutine ireduce( ii, i, op, i2d )
 integer, intent(out) :: ii

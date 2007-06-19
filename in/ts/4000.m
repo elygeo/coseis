@@ -22,7 +22,7 @@
   datadir = 'ts/4000/data';
 
   debug = 1;
-  np = [ 1 2 1 ]
+  np = [ 1 1 21 ]
   dx = 4000.;
   dt = .24;
   trelax = 2.4;
