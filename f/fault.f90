@@ -108,9 +108,9 @@ i1 = i1 + nnoff
 if ( rr > 0. ) write( 0, * ) 'warning: positive normal traction: ', rr, i1
 
 ! Lock fault in PML region
-i1 = max( i1pml + 1, 1 )
-i2 = min( i2pml - 1, nm )
-call scalarsethalo( co, 1e20, i1, i2 )
+i1 = min( i1pml, nm + 1 )
+i2 = max( i2pml, 0 )
+call scalarsethalo( co, 1e20, i1pml, i2pml )
 
 ! Normal vectors
 i1 = i1core

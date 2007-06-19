@@ -329,7 +329,7 @@ if ( comm == mpi_comm_null ) then
   i = abs( mpio )
   if ( i <= 3 ) comm0 = comm2d(i)
   if ( all( i3 <= i4 ) .and. ir > 0 ) then
-    call mpi_comm_split( comm0, iz, 0, comm, e )
+    call mpi_comm_split( comm0, abs( iz ), 0, comm, e )
   else
     call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
     return
@@ -412,7 +412,7 @@ if ( comm == mpi_comm_null ) then
   i = abs( mpio )
   if ( i <= 3 ) comm0 = comm2d(i)
   if ( all( i3 <= i4 ) .and. ir > 0 ) then
-    call mpi_comm_split( comm0, iz, 0, comm, e )
+    call mpi_comm_split( comm0, abs( iz ), 0, comm, e )
   else
     call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
     return

@@ -80,12 +80,12 @@ real, intent(in) :: r
 integer, intent(in) :: i1(3), i2(3)
 integer :: n(3)
 n = (/ size(f,1), size(f,2), size(f,3) /)
-if ( n(1) > 1 ) f(1:i1(1)-1,:,:) = r
-if ( n(2) > 1 ) f(:,1:i1(2)-1,:) = r
-if ( n(3) > 1 ) f(:,:,1:i1(3)-1) = r
-if ( n(1) > 1 ) f(i2(1)+1:n(1),:,:) = r
-if ( n(2) > 1 ) f(:,i2(2)+1:n(2),:) = r
-if ( n(3) > 1 ) f(:,:,i2(3)+1:n(3)) = r
+if ( n(1) > 1 ) f(:i1(1)-1,:,:) = r
+if ( n(2) > 1 ) f(:,:i1(2)-1,:) = r
+if ( n(3) > 1 ) f(:,:,:i1(3)-1) = r
+if ( n(1) > 1 ) f(i2(1)+1:,:,:) = r
+if ( n(2) > 1 ) f(:,i2(2)+1:,:) = r
+if ( n(3) > 1 ) f(:,:,i2(3)+1:) = r
 end subroutine
 
 subroutine vectorsethalo( f, r, i1, i2 )
@@ -94,12 +94,12 @@ real, intent(in) :: r
 integer, intent(in) :: i1(3), i2(3)
 integer :: n(3)
 n = (/ size(f,1), size(f,2), size(f,3) /)
-if ( n(1) > 1 ) f(1:i1(1)-1,:,:,:) = r
-if ( n(2) > 1 ) f(:,1:i1(2)-1,:,:) = r
-if ( n(3) > 1 ) f(:,:,1:i1(3)-1,:) = r
-if ( n(1) > 1 ) f(i2(1)+1:n(1),:,:,:) = r
-if ( n(2) > 1 ) f(:,i2(2)+1:n(2),:,:) = r
-if ( n(3) > 1 ) f(:,:,i2(3)+1:n(3),:) = r
+if ( n(1) > 1 ) f(:i1(1)-1,:,:,:) = r
+if ( n(2) > 1 ) f(:,:i1(2)-1,:,:) = r
+if ( n(3) > 1 ) f(:,:,:i1(3)-1,:) = r
+if ( n(1) > 1 ) f(i2(1)+1:,:,:,:) = r
+if ( n(2) > 1 ) f(:,i2(2)+1:,:,:) = r
+if ( n(3) > 1 ) f(:,:,i2(3)+1:,:) = r
 end subroutine
 
 ! Timer

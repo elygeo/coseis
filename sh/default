@@ -12,6 +12,7 @@ case "\${1:--i}$mode" in
   -bs) nice nohup $bin > out.log & :; pid=\$! ;;
   -ip) mpiexec -np $np $bin ;;
   -gp) mpiexec -gdb -np $np $bin ;;
+  -gpX) mpiexec -np $np ddd $bin ;;
   -bp) nice nohup mpiexec -np $np $bin > out.log & :; pid=\$! ;;
 esac
 if [ "\$pid" ]; then

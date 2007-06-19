@@ -10,7 +10,7 @@ real, intent(in) :: f(:,:,:,:)
 integer, intent(in) :: iq, i, i1(3), i2(3)
 integer :: j, k, l, j1, k1, l1, j2, k2, l2
 
-if ( any( i2 < i1 ) ) return
+if ( any( i1 > i2 ) ) return
 
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
@@ -62,7 +62,7 @@ real, intent(in) :: f(:,:,:)
 integer, intent(in) :: iq, i1(3), i2(3)
 integer :: j, k, l, j1, k1, l1, j2, k2, l2
 
-if ( any( i2 < i1 ) ) return
+if ( any( i1 > i2 ) ) return
 
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)

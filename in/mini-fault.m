@@ -1,9 +1,9 @@
 % Test
 
-  nt = 2;
+  nt = 10;
   debug = 1;
   faultnormal = 2;
-  np = [ 1 1 4 ];
+  np = [ 1 5 5 ];
   nn = [ 4 4 4 ];
   ihypo = [ 2 2 2 ];
 
