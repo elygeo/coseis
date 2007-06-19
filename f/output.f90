@@ -267,8 +267,9 @@ i4 = min( i2, i2core )
 if ( any( i3 > i4 ) ) i1out(iz,4) = nt + 1
 mpio = mpout * 4
 if ( fault ) then
-  if ( .not. dofault ) cycle doiz
-  mpio = mpout * ifn
+  if ( .not. dofault ) ir = -1
+  !if ( .not. dofault ) cycle doiz
+  !mpio = mpout * ifn
   i = abs( faultnormal )
   i1(i) = 1
   i2(i) = 1
@@ -289,9 +290,9 @@ do ic = 1, nc
   case( 'rho'  ); call scalario( iz, str, rr, mr,   i1, i2, i3, i4,       ir, mpio )
   case( 'vp'   ); call scalario( iz, str, rr, s1,   i1, i2, i3, i4,       ir, mpio )
   case( 'vs'   ); call scalario( iz, str, rr, s2,   i1, i2, i3, i4,       ir, mpio )
-  case( 'mu'   ); call scalario( iz, str, rr, mu,   i1, i2, i3, i4,       ir, mpio )
-  case( 'lam'  ); call scalario( iz, str, rr, lam,  i1, i2, i3, i4,       ir, mpio )
   case( 'gam'  ); call scalario( iz, str, rr, gam,  i1, i2, i3, i4,       ir, mpio )
+  case( 'lam'  ); call scalario( iz, str, rr, lam,  i1, i2, i3, i4,       ir, mpio )
+  case( 'mu'   ); call scalario( iz, str, rr, mu,   i1, i2, i3, i4,       ir, mpio )
   case( 'v'    ); call vectorio( iz, str, rr, v,    i1, i2, i3, i4, ic,   ir, mpio )
   case( 'u'    ); call vectorio( iz, str, rr, u,    i1, i2, i3, i4, ic,   ir, mpio )
   case( 'w'    );
@@ -326,7 +327,7 @@ do ic = 1, nc
     write( 0, * ) 'error: unknown output field: ', fieldout(iz)
     stop
   end select
-  if ( all( i1 == i2 .and. i3 == i4 ) ) then
+  if ( all( i1 == i2 .and. ir > 0 ) ) then
   if ( it == 0 .or. ibuff(iz) == 0 ) then
     call rwrite( str, rr, ir )
   else

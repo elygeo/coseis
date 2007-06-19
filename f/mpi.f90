@@ -1,7 +1,8 @@
 ! Collective routines - MPI version
 module m_collective
+use m_globals, only: nz
 implicit none
-integer, private, parameter :: nz = 100
+!integer, private, parameter :: nz = 100
 integer, private :: ip, ipmaster, comm3d, comm2d(3), commin(nz), commout(nz)
 contains
 
@@ -412,8 +413,10 @@ if ( comm == mpi_comm_null ) then
   i = abs( mpio )
   if ( i <= 3 ) comm0 = comm2d(i)
   if ( all( i3 <= i4 ) .and. ir > 0 ) then
+!print *, ip, 'on ', comm3d, comm0, ' ', trim( str ), ' ', mpio
     call mpi_comm_split( comm0, abs( iz ), 0, comm, e )
   else
+!print *, ip, 'off', comm3d, comm0, ' ', trim( str ), ' ', mpio
     call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
     return
   end if

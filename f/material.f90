@@ -63,61 +63,64 @@ end select
 
 end do doiz
 
-! Limits
-where ( s1  < vp1  ) s1  = vp1
-where ( s1  > vp2  ) s1  = vp2
-where ( s2  < vs1  ) s2  = vs1
-where ( s2  > vs2  ) s2  = vs2
-
-! Viscosity
-if ( vdamp > 0. ) where( s2 > 0. ) gam = vdamp / s2
-
-! Limits
-where ( mr  < rho1 ) mr  = rho1
-where ( mr  > rho2 ) mr  = rho2
-where ( gam < gam1 ) gam = gam1
-where ( gam > gam2 ) gam = gam2
-
 ! Test for Nans
 if ( any( mr  /= mr  ) .or. any( s1 /= s1 ) &
 .or. any( gam /= gam ) .or. any( s2 /= s2 ) ) then
   stop 'NaNs in velocity model!'
 end if
 
-! Fill halo and find extrema
+! Fill halo and find extrema. Be very careful here!
+! Last processor may not initially hold any cell values, i.e. i2cell<i2core.
+!   -must call BCs after halo swap.
+!   -make sure to do far BC first.
+! Make sure BCs fill out extra cells for min/max calc.
+! Must use continuing BC at surfaces for resampling mr & gam.
 call scalarswaphalo( mr,  nhalo )
-call scalarswaphalo( gam, nhalo )
 call scalarswaphalo( s1,  nhalo )
 call scalarswaphalo( s2,  nhalo )
-stats(1) = maxval( mr  )
-stats(2) = maxval( gam )
-stats(3) = maxval( s1  )
-stats(4) = maxval( s2  )
-call scalarsethalo( mr,  stats(1), i1cell, i2cell )
-call scalarsethalo( gam, stats(2), i1cell, i2cell )
-call scalarsethalo( s1,  stats(3), i1cell, i2cell )
-call scalarsethalo( s2,  stats(4), i1cell, i2cell )
+call scalarswaphalo( gam, nhalo )
 i1 = abs( ibc1 )
 i2 = abs( ibc2 )
 where( i1 <= 1 ) i1 = 4
 where( i2 <= 1 ) i2 = 4
 call scalarbc( mr,  i1, i2, nhalo, 1 )
-call scalarbc( gam, i1, i2, nhalo, 1 )
 call scalarbc( s1,  i1, i2, nhalo, 1 )
 call scalarbc( s2,  i1, i2, nhalo, 1 )
+call scalarbc( gam, i1, i2, nhalo, 1 )
+
+! Limits
+if ( mr1 > 0. ) where ( mr < rho1 ) mr = rho1
+if ( mr2 > 0. ) where ( mr > rho2 ) mr = rho2
+if ( vp1 > 0. ) where ( s1 < vp1  ) s1 = vp1
+if ( vp2 > 0. ) where ( s1 > vp2  ) s1 = vp2
+if ( vs1 > 0. ) where ( s2 < vs1  ) s2 = vs1
+if ( vs2 > 0. ) where ( s2 > vs2  ) s2 = vs2
+
+! Velocity dependent viscosity
+if ( vdamp > 0. ) where( s2 > 0. ) gam = vdamp / s2
+
+! Limits
+if ( gam1 > 0. ) where ( gam < gam1 ) gam = gam1
+if ( gam2 > 0. ) where ( gam > gam2 ) gam = gam2
+
+! Stats
+stats(1) =  maxval( mr  )
+stats(2) =  maxval( s1  )
+stats(3) =  maxval( s2  )
+stats(4) =  maxval( gam )
 stats(5) = -minval( mr  )
-stats(6) = -minval( gam )
-stats(7) = -minval( s1  )
-stats(8) = -minval( s2  )
+stats(6) = -minval( s1  )
+stats(7) = -minval( s2  )
+stats(8) = -minval( gam )
 call rreduce1( gstats, stats, 'allmax', 0 )
 rho2 =  gstats(1)
-gam2 =  gstats(2)
-vp2  =  gstats(3)
-vs2  =  gstats(4)
+vp2  =  gstats(2)
+vs2  =  gstats(3)
+gam2 =  gstats(4)
 rho1 = -gstats(5)
-gam1 = -gstats(6)
-vp1  = -gstats(7)
-vs1  = -gstats(8)
+vp1  = -gstats(6)
+vs1  = -gstats(7)
+gam1 = -gstats(8)
 
 ! Hypocenter values
 if ( master ) then
