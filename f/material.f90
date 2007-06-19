@@ -52,7 +52,7 @@ case( 'c' )
   end select
 case( 'r' )
   r = 0.
-  i = 4 * mpin
+  i = mpin * 4
   select case( fieldin(iz) )
   case( 'rho' ); call scalario( -iz, 'data/rho', r, mr,  i1, i2, i3, i4, 1, i )
   case( 'vp'  ); call scalario( -iz, 'data/vp',  r, s1,  i1, i2, i3, i4, 1, i )

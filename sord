@@ -222,6 +222,7 @@ echo "Run directory: $rundir"
 mkdir "$rundir"
 echo "$starttime: SORD setup started" >> "$rundir/log"
 cp 'in.m' tmp/sord.tgz tmp/sord-$mode tmp/input "$rundir"
+chmod a-w 'in.m'
 if [ $optimize = g ]; then
   cp f/*.f90 "$rundir"
   chmod a-w "$rundir"/*.f90

@@ -41,7 +41,7 @@ l1 = i3(3); l2 = i4(3)
 select case( intype(iz) )
 case( 'r' )
   rr = 0.
-  i = ifn * mpin
+  i = mpin * ifn
   select case( fieldin(iz) )
   case( 'mus' ); call scalario( -iz, 'data/mus', rr, mus, i1, i2, i3, i4,    1, i )
   case( 'mud' ); call scalario( -iz, 'data/mud', rr, mud, i1, i2, i3, i4,    1, i )
