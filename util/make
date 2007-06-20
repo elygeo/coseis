@@ -11,6 +11,7 @@ files="
   $getarg
   asc2flt.f90
   swab.f90
+  stats.f90
   drape.f90
   utm.f90
   ll2utm.f90
@@ -41,6 +42,7 @@ if [ "$compile" ]; then
   rm -f state-util
   $sfc $flags $getarg asc2flt.f90 -o asc2flt
   $sfc $flags $getarg swab.f90 -o swab
+  $sfc $flags $getarg stats.f90 -o stats
   $sfc $flags drape.f90 -o drape
   $sfc $flags $getarg utm.f90 ll2utm.f90 -o ll2utm
   $sfc $flags utm.f90 tscoords.f90 tsgrid.f90 -o tsgrid

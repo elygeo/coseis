@@ -21,7 +21,7 @@
   itcheck = 100;
   datadir = 'ts/2000/data';
 
-
+  itswap = 2;
   np = [ 1 8 4 ] % Babieca 16 nodes
   np = [ 1 1 2 ]
   dx = 2000.;
@@ -44,9 +44,9 @@
   out = { 'psv'   10    133   0  -9    0    232  0 -1  750 };
   out = { 'trup'   1    133   0  -9  750    232  0 -1  750 };
   out = { 'x'      1      1   1  -1    0     -1 -1 -1    0 };
-  out = { 'vs'     1      1   1  -2    0     -1 -1 -1    0 };
   out = { 'pv2'  750      1   1  -1  750     -1 -1 -1 1500 };
   out = { 'vm2'   10      1   1  -1    0     -1 -1 -1 1500 };
+  out = { 'vs'     1      1   1  -2    0     -1 -1 -1    0 };
   timeseries = { 'v'  82188. 188340. 129. }; % Bakersfield
   timeseries = { 'v'  99691.  67008.  21. }; % Santa Barbara
   timeseries = { 'v' 152641.  77599.  16. }; % Oxnard

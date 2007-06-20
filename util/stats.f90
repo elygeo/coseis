@@ -3,18 +3,19 @@ program main
 implicit none
 integer, parameter :: nr = 8192
 integer(8) :: n
-integer :: i, ifile, command_argument_count
+integer :: io, ifile, command_argument_count
 real(8) :: xmean
 real :: xx(nr), x, xmin, xmax
 character(255) :: filename
 do ifile = 1, command_argument_count()
   call get_command_argument( ifile, filename )
-  inquire( iolength=i ) xx
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+  inquire( iolength=io ) xx
+  open( 1, file=filename, recl=io, form='unformatted', access='direct', status='old' )
   n = 0
   do
-    read( 1, rec=n+1, iostat=i ) xx
-    if ( i /= 0 ) exit
+    read( 1, rec=n+2, iostat=io ) xx ! work around gfortran bug
+    if ( io /= 0 ) exit
+    read( 1, rec=n+1 ) xx
     if ( n == 0 ) then
       xmin = xx(1)
       xmax = xx(1)
@@ -26,12 +27,13 @@ do ifile = 1, command_argument_count()
     n = n + 1
   end do
   close(1)
-  inquire( iolength=i ) x
-  open( 1, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+  inquire( iolength=io ) x
+  open( 1, file=filename, recl=io, form='unformatted', access='direct', status='old' )
   n = n * nr
+  print '(3e15.6,i15,x,a)', xmin, xmax, xmean, n, trim( filename )
   do
-    read( 1, rec=n+1, iostat=i ) x
-    if ( i /= 0 ) exit
+    read( 1, rec=n+1, iostat=io ) x
+    if ( io /= 0 ) exit
     if ( n == 0 ) then
       xmin = x
       xmax = x
