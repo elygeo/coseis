@@ -264,12 +264,15 @@ i1 = i1out(iz,1:3)
 i2 = i2out(iz,1:3)
 i3 = max( i1, i1core )
 i4 = min( i2, i2core )
-if ( any( i3 > i4 ) ) i1out(iz,4) = nt + 1
+if ( any( i3 > i4 ) ) then
+  i1out(iz,4) = nt + 1
+  ir = -1
+end if
 mpio = mpout * 4
 if ( fault ) then
-  if ( .not. dofault ) ir = -1
-  !if ( .not. dofault ) cycle doiz
-  !mpio = mpout * ifn
+  !if ( .not. dofault ) ir = -1
+  if ( .not. dofault ) cycle doiz
+  mpio = mpout * ifn
   i = abs( faultnormal )
   i1(i) = 1
   i2(i) = 1

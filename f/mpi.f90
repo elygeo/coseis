@@ -338,12 +338,14 @@ if ( comm == mpi_comm_null ) then
   if ( i <= 3 ) comm0 = comm2d(i)
   if ( all( i3 <= i4 ) .and. ir > 0 ) then
     call mpi_comm_split( comm0, abs( iz ), 0, comm, e )
+    if ( iz < 0 ) commin(-iz) = comm
+    if ( iz > 0 ) commout(iz) = comm
   else
     call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
+    if ( iz < 0 ) commin(-iz) = comm
+    if ( iz > 0 ) commout(iz) = comm
     return
   end if
-  if ( iz < 0 ) commin(-iz) = comm
-  if ( iz > 0 ) commout(iz) = comm
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 i0 = i3 - i1           ! offsets
@@ -420,15 +422,15 @@ if ( comm == mpi_comm_null ) then
   i = abs( mpio )
   if ( i <= 3 ) comm0 = comm2d(i)
   if ( all( i3 <= i4 ) .and. ir > 0 ) then
-!print *, ip, 'on ', comm3d, comm0, ' ', trim( str ), ' ', mpio
     call mpi_comm_split( comm0, abs( iz ), 0, comm, e )
+    if ( iz < 0 ) commin(-iz) = comm
+    if ( iz > 0 ) commout(iz) = comm
   else
-!print *, ip, 'off', comm3d, comm0, ' ', trim( str ), ' ', mpio
     call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
+    if ( iz < 0 ) commin(-iz) = comm
+    if ( iz > 0 ) commout(iz) = comm
     return
   end if
-  if ( iz < 0 ) commin(-iz) = comm
-  if ( iz > 0 ) commout(iz) = comm
 end if
 call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 i0 = i3 - i1           ! offsets
