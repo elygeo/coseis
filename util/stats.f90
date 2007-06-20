@@ -7,6 +7,7 @@ integer :: io, ifile, command_argument_count
 real(8) :: xmean
 real :: xx(nr), x, xmin, xmax
 character(255) :: filename
+print '(a)', '        Min            Max           Mean                  N'
 do ifile = 1, command_argument_count()
   call get_command_argument( ifile, filename )
   inquire( iolength=io ) xx
@@ -30,7 +31,6 @@ do ifile = 1, command_argument_count()
   inquire( iolength=io ) x
   open( 1, file=filename, recl=io, form='unformatted', access='direct', status='old' )
   n = n * nr
-  print '(3e15.6,i15,x,a)', xmin, xmax, xmean, n, trim( filename )
   do
     read( 1, rec=n+1, iostat=io ) x
     if ( io /= 0 ) exit
@@ -45,7 +45,7 @@ do ifile = 1, command_argument_count()
     n = n + 1
   end do
   xmean = xmean / n
-  print '(3e15.6,i15,x,a)', xmin, xmax, xmean, n, trim( filename )
+  print '(3g15.7,i15,x,a)', xmin, xmax, xmean, n, trim( filename )
 end do
 end program
 
