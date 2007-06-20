@@ -35,12 +35,6 @@ end subroutine
 subroutine writecheckpoint
 use m_globals
 integer :: i, irank
-open( 1, file='itcheck', status='old', iostat=i )
-if ( i == 0 ) then
-  read( 1, * ) itcheck
-  close( 1 )
-end if
-if ( modulo( it, itcheck ) /= 0 ) return
 irank = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
 i = modulo( it / itcheck, 2 )
 write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', i, '-', irank

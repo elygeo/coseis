@@ -61,14 +61,21 @@ do while ( it < nt )
   end if
   call stress      
   call momentsource                ; prof(i*4-3) = timer( 1 )
-  call output( 1 )                 ; prof(i*4-1) = timer( 1 )
-  call acceleration
+  call output( 1 )                 ; prof(i*4-2) = timer( 1 )
+  call acceleration                ; prof(i*4-3) = prof(i*4-3) + timer( 1 )
+  if ( modulo( it, itswap ) == 0 ) then
+    call vectorswaphalo( w1, nhalo )
+  end if                           ; prof(i*4-1) = timer( 1 )
   call fault
-  call locknodes                   ; prof(i*4-2) = timer( 1 )
+  call locknodes                   ; prof(i*4-3) = prof(i*4-3) + timer( 1 )
   call output( 2 )
-  call writecheckpoint             ; prof(i*4-1) = prof(i*4-1) + timer( 1 )
+  if ( modulo( it, itcheck ) == 0 ) then
+    call writecheckpoint
+  end if                           ; prof(i*4-2) = prof(i*4-2) + timer( 1 )
   prof(i*4) = timer( 2 )
-  if ( master .and. modulo( it, itio ) == 0 ) call rwrite1( 'prof', prof, it*4 )
+  if ( modulo( it, itio ) == 0 .and. master ) then
+    call rwrite1( 'prof', prof, it*4 )
+  end if
 end do
 
 ! Finish up
