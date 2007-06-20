@@ -107,32 +107,18 @@ end select
 rr = r(ii(1),ii(2),ii(3))
 end subroutine
 
-! Vector send
-subroutine vectorsend( f, i1, i2, i )
-real, intent(inout) :: f(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3), i
-f(1,1,1,1) = f(1,1,1,1) - i1(1) + i1(1) - i2(1) + i2(1) - i + i
-end subroutine
-
-! Vector receive
-subroutine vectorrecv( f, i1, i2, i )
-real, intent(inout) :: f(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3), i
-f(1,1,1,1) = f(1,1,1,1) - i1(1) + i1(1) - i2(1) + i2(1) - i + i
-end subroutine
-
 ! Scalar swap halo
-subroutine scalarswaphalo( f, nhalo )
+subroutine scalarswaphalo( f, nh )
 real, intent(inout) :: f(:,:,:)
-integer, intent(in) :: nhalo
-f(1,1,1) = f(1,1,1) - nhalo + nhalo
+integer, intent(in) :: nh
+f(1,1,1) = f(1,1,1) - nh + nh
 end subroutine
 
 ! Vector swap halo
-subroutine vectorswaphalo( f, nhalo )
+subroutine vectorswaphalo( f, nh )
 real, intent(inout) :: f(:,:,:,:)
-integer, intent(in) :: nhalo
-f(1,1,1,1) = f(1,1,1,1) - nhalo + nhalo
+integer, intent(in) :: nh
+f(1,1,1,1) = f(1,1,1,1) - nh + nh
 end subroutine
 
 ! Scalar field input/output

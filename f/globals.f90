@@ -139,6 +139,7 @@ real :: &
   svtol            ! slip velocity for determining rupture time
 
 integer, dimension(3) :: &
+  nhalo3,        & ! number of ghost nodes, including extra node in fault dimention
   nn,            & ! number of global nodes, count double nodes twice
   nm,            & ! size of local 3D arrays
   np,            & ! number of processors

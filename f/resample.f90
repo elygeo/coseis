@@ -26,14 +26,14 @@ end select
 s2 = mr * s1
 call scalaraverage( mr, s2, i1node, i2node, -1 )
 where ( mr /= 0. ) mr = 1. / mr
-call scalarbc( mr, ibc1, ibc2, nhalo, 0 )
-call scalarswaphalo( mr, nhalo )
+call scalarbc( mr, ibc1, ibc2, nhalo3, 0 )
+call scalarswaphalo( mr, nhalo3 )
 
 ! Viscosity
 s2 = gam * dt
 call scalaraverage( gam, s2, i1node, i2node, -1 )
-call scalarbc( gam, ibc1, ibc2, nhalo, 0 )
-call scalarswaphalo( gam, nhalo )
+call scalarbc( gam, ibc1, ibc2, nhalo3, 0 )
+call scalarswaphalo( gam, nhalo3 )
 
 ! Moduli
 where ( s1 /= 0. ) s1 = 1. / s1

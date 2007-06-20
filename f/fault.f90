@@ -201,22 +201,22 @@ t1 = 0.
 t2 = 0.
 
 ! Halos
-call scalarbc( mus,   ibc1, ibc2, nhalo, 0 )
-call scalarbc( mud,   ibc1, ibc2, nhalo, 0 )
-call scalarbc( dc,    ibc1, ibc2, nhalo, 0 )
-call scalarbc( co,    ibc1, ibc2, nhalo, 0 )
-call scalarbc( area,  ibc1, ibc2, nhalo, 0 )
-call scalarbc( rhypo, ibc1, ibc2, nhalo, 0 )
-call vectorbc( nhat,  ibc1, ibc2, nhalo )
-call vectorbc( t0,    ibc1, ibc2, nhalo )
-call scalarswaphalo( mus,   nhalo )
-call scalarswaphalo( mud,   nhalo )
-call scalarswaphalo( dc,    nhalo )
-call scalarswaphalo( co,    nhalo )
-call scalarswaphalo( area,  nhalo )
-call scalarswaphalo( rhypo, nhalo )
-call vectorswaphalo( nhat,  nhalo )
-call vectorswaphalo( t0,    nhalo )
+call scalarbc( mus,   ibc1, ibc2, nhalo3, 0 )
+call scalarbc( mud,   ibc1, ibc2, nhalo3, 0 )
+call scalarbc( dc,    ibc1, ibc2, nhalo3, 0 )
+call scalarbc( co,    ibc1, ibc2, nhalo3, 0 )
+call scalarbc( area,  ibc1, ibc2, nhalo3, 0 )
+call scalarbc( rhypo, ibc1, ibc2, nhalo3, 0 )
+call vectorbc( nhat,  ibc1, ibc2, nhalo3 )
+call vectorbc( t0,    ibc1, ibc2, nhalo3 )
+call scalarswaphalo( mus,   nhalo3 )
+call scalarswaphalo( mud,   nhalo3 )
+call scalarswaphalo( dc,    nhalo3 )
+call scalarswaphalo( co,    nhalo3 )
+call scalarswaphalo( area,  nhalo3 )
+call scalarswaphalo( rhypo, nhalo3 )
+call vectorswaphalo( nhat,  nhalo3 )
+call vectorswaphalo( t0,    nhalo3 )
 
 ! Metadata
 if ( master ) then
@@ -249,32 +249,6 @@ use m_collective
 use m_bc
 use m_util
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
-
-! If the two sides of the fault are split across domains, than we must retrieve
-! the correct solution from the processor that contains both sides. Corresponding
-! sends are below.
-if ( ifn == 0 ) then
-if ( modulo( it, nhalo ) == 0 ) then
-  i = abs( faultnormal )
-  if ( i /= 0 ) then
-  if ( ibc1(i) == 9 .and. ihypo(i) == 0 ) then
-    i1 = 1
-    i2 = nm
-    i1(i) = 1
-    i2(i) = 1
-    call vectorrecv( w1, i1, i2, -i )
-  end if
-  if ( ibc2(i) == 9 .and. ihypo(i) == nm(i) ) then
-    i1 = 1
-    i2 = nm
-    i1(i) = nm(i)
-    i2(i) = nm(i)
-    call vectorrecv( w1, i1, i2, i )
-  end if
-  end if
-end if
-return
-end if
 
 ! Indices
 i1 = 1
@@ -342,27 +316,7 @@ do i = 1, 3
   w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f2 * mr(j1:j2,k1:k2,l1:l2)
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f2 * mr(j3:j4,k3:k4,l3:l4)
 end do
-call vectorbc( w1, ibc1, ibc2, nhalo )
-
-! If a neighboring processor contains only one side of the fault, then we must
-! send the correct fault wall solution to it.
-i = ifn
-if ( modulo( it, nhalo ) == 0 ) then
-if ( ibc2(i) == 9 .and. ihypo(i) == nm(i) - 2 * nhalo ) then
-  i1 = 1
-  i2 = nm
-  i1(i) = nm(i) - 2 * nhalo + 1
-  i2(i) = nm(i) - 2 * nhalo + 1
-  call vectorsend( w1, i1, i2, i )
-end if
-if ( ibc1(i) == 9 .and. ihypo(i) == 2 * nhalo ) then
-  i1 = 1
-  i2 = nm
-  i1(i) = 2 * nhalo
-  i2(i) = 2 * nhalo
-  call vectorsend( w1, i1, i2, -i )
-end if
-end if
+call vectorbc( w1, ibc1, ibc2, nhalo3 )
 
 ! Friction + fracture energy
 t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)

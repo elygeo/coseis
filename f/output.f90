@@ -53,8 +53,8 @@ end if
 i2out(iz,4) = min( i2out(iz,4), nt )
 
 ! Spatial indices
-n = nn + 2 * nhalo
-noff = nnoff + nhalo
+n = nn + 2 * nhalo3
+noff = nnoff + nhalo3
 select case( outtype(iz) )
 case( 'z' )
   i1 = i1out(iz,1:3)
@@ -88,7 +88,7 @@ case( 'x' )
          + ( t2(:,:,:,2) - xout(iz,2) ) * ( t2(:,:,:,2) - xout(iz,2) ) &
          + ( t2(:,:,:,3) - xout(iz,3) ) * ( t2(:,:,:,3) - xout(iz,3) )
       rout = 2 * dx * dx + maxval( f2 )
-      call scalarsethalo( f2, rout, i1node, i2node )
+      call scalarsethalo( f2, rout, i1core, i2core )
       call reduceloc( rout, i1, f2, 'allmin', n, noff, i )
       i1(i) = ihypo(i)
     end if
@@ -98,15 +98,15 @@ case( 'x' )
          + ( w2(:,:,:,2) - xout(iz,2) ) * ( w2(:,:,:,2) - xout(iz,2) ) &
          + ( w2(:,:,:,3) - xout(iz,3) ) * ( w2(:,:,:,3) - xout(iz,3) )
       rout = 2 * dx * dx + maxval( s2 )
-      call scalarsethalo( s2, rout, i1cell, i2cell )
-      i1 = i1node
-      i2 = i2cell
+      i1 = max( i1core, i1cell )
+      i2 = min( i2core, i2cell )
+      call scalarsethalo( s2, rout, i1, i2 )
     else
       s2 = ( w1(:,:,:,1) - xout(iz,1) ) * ( w1(:,:,:,1) - xout(iz,1) ) &
          + ( w1(:,:,:,2) - xout(iz,2) ) * ( w1(:,:,:,2) - xout(iz,2) ) &
          + ( w1(:,:,:,3) - xout(iz,3) ) * ( w1(:,:,:,3) - xout(iz,3) )
       rout = 2 * dx * dx + maxval( s2 )
-      call scalarsethalo( s2, rout, i1node, i2node )
+      call scalarsethalo( s2, rout, i1core, i2core )
     end if
     call reduceloc( rout, i1, s2, 'allmin', n, noff, 0 )
   end if
@@ -170,15 +170,17 @@ if ( it > 0 ) then
     s1 = sum( v * v, 4 )
     s2 = sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 )
     pv = max( pv, s1 )
-    call scalarsethalo( s1, -1., i1node, i2node )
-    call scalarsethalo( s2, -1., i1cell, i2cell )
+    call scalarsethalo( s1, -1., i1core, i2core )
+    i1 = max( i1core, i1cell )
+    i2 = min( i2core, i2cell )
+    call scalarsethalo( s2, -1., i1, i2 )
     vstats(i,1) = sqrt( maxval( s1 ) )
     vstats(i,2) = sqrt( maxval( s2 ) )
   case( 2 )
     s1 = sum( u * u, 4 )
     s2 = sum( w1 * w1, 4 )
-    call scalarsethalo( s1, -1., i1node, i2node )
-    call scalarsethalo( s2, -1., i1node, i2node )
+    call scalarsethalo( s1, -1., i1core, i2core )
+    call scalarsethalo( s2, -1., i1core, i2core )
     vstats(i,3) = sqrt( maxval( s1 ) )
     vstats(i,4) = sqrt( maxval( s2 ) )
     !if ( any( vstats > huge( rr ) ) ) stop 'unstable solution'
@@ -206,23 +208,23 @@ if ( it > 0 .and. dofault ) then
   i = modulo( it-1, itio ) + 1
   select case( pass )
   case( 1 )
-    call scalarsethalo( f1,   -1., i1node, i2node )
-    call scalarsethalo( f2,   -1., i1node, i2node )
-    call scalarsethalo( tarr, -1., i1node, i2node )
+    call scalarsethalo( f1,   -1., i1core, i2core )
+    call scalarsethalo( f2,   -1., i1core, i2core )
+    call scalarsethalo( tarr, -1., i1core, i2core )
     fstats(i,1) = maxval( f1 )
     fstats(i,2) = maxval( f2 )
     fstats(i,3) = maxval( sl )
     fstats(i,4) = maxval( tarr )
   case( 2 )
-    call scalarsethalo( ts, -1., i1node, i2node )
-    call scalarsethalo( f2, -1., i1node, i2node )
+    call scalarsethalo( ts, -1., i1core, i2core )
+    call scalarsethalo( f2, -1., i1core, i2core )
     fstats(i,5) = maxval( ts )
     fstats(i,6) = maxval( f2 )
     rr = -2. * abs( minval( tn ) ) - 1.
-    call scalarsethalo( tn, rr, i1node, i2node )
+    call scalarsethalo( tn, rr, i1core, i2core )
     fstats(i,7) = maxval( tn )
     rr = 2. * abs( fstats(i,7) ) + 1.
-    call scalarsethalo( tn, rr, i1node, i2node )
+    call scalarsethalo( tn, rr, i1core, i2core )
     fstats(i,8) = -minval( tn )
     estats(i,1) = efric
     estats(i,2) = estrain
