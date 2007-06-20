@@ -340,6 +340,7 @@ if ( ir < 1 .or. any( i3 > i4 ) ) then
     call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
     if ( iz < 0 ) commin(-iz) = comm
     if ( iz > 0 ) commout(iz) = comm
+  end if
   return
 end if
 if ( comm == mpi_undefined ) then
@@ -425,6 +426,7 @@ if ( ir < 1 .or. any( i3 > i4 ) ) then
     call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
     if ( iz < 0 ) commin(-iz) = comm
     if ( iz > 0 ) commout(iz) = comm
+  end if
   return
 end if
 if ( comm == mpi_undefined ) then

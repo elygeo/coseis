@@ -21,12 +21,13 @@
   itcheck = 100;
   datadir = 'ts/4000/data';
 
+  nhalo = 1;
   debug = 1;
-  np = [ 1 1 2 ]
+  np = [ 1 3 2 ]
   dx = 4000.;
   dt = .24;
   trelax = 2.4;
-  nt = 1;
+  nt = 5;
   nn = [  151   77  21 ];
   fixhypo = 1;
   ihypo = [   69   51  -2 ];
