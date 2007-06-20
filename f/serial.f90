@@ -108,17 +108,17 @@ rr = r(ii(1),ii(2),ii(3))
 end subroutine
 
 ! Scalar swap halo
-subroutine scalarswaphalo( f, nh )
+subroutine scalarswaphalo( f, n )
 real, intent(inout) :: f(:,:,:)
-integer, intent(in) :: nh
-f(1,1,1) = f(1,1,1) - nh + nh
+integer, intent(in) :: n(3)
+!f(1,1,1) = f(1,1,1) - n(1) + n(1)
 end subroutine
 
 ! Vector swap halo
-subroutine vectorswaphalo( f, nh )
+subroutine vectorswaphalo( f, n )
 real, intent(inout) :: f(:,:,:,:)
-integer, intent(in) :: nh
-f(1,1,1,1) = f(1,1,1,1) - nh + nh
+integer, intent(in) :: n(3)
+!f(1,1,1,1) = f(1,1,1,1) - n(1) + n(1)
 end subroutine
 
 ! Scalar field input/output

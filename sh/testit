@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+./sord -dip && ./sord -is && diff -qr run/*
+
