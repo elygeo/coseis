@@ -7,7 +7,7 @@ subroutine setup
 use m_globals
 use m_collective
 use m_util
-integer :: nl(3), n(3), ip3master(3), i
+integer :: nl(3), n(3), i
 
 ! Hypocenter
 n = nn

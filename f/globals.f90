@@ -143,6 +143,7 @@ integer, dimension(3) :: &
   nm,            & ! size of local 3D arrays
   np,            & ! number of processors
   ip3,           & ! 3D processor rank
+  ip3master,     & ! 3D master processor rank
   bc1,           & ! boundary conditions - near side
   bc2,           & ! boundary conditions - far side
   ibc1,          & ! internal boundary conditions - near side

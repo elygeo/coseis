@@ -26,13 +26,20 @@ ibuff = 0
 dofault = .false.
 if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
-  if ( ihypo(i) >= i1core(i) .and. ihypo(i) <= i2core(i) ) dofault = .true.
+  if ( ip3(i) == ip3master(i) ) dofault = .true.
 end if
 
-do iz = 1, nout
+doiz: do iz = 1, nout
 
 ! Output field properties
 call outprops( fieldout(iz), nc, onpass, fault, cell )
+if ( fault .and. faultnormal == 0 ) then
+  write( 0, * ) 'No fault to output for ', trim( fieldout(iz) )
+  stop
+elseif ( fault .and. .not. dofault ) then
+  i1out(iz,4) = nt + 1
+  cycle doiz
+end if
 
 ! Time indices 
 if ( i1out(iz,4) < 0 ) i1out(iz,4) = nt + i1out(iz,4) + 1
@@ -44,7 +51,6 @@ if ( onpass == 0 ) then
   i2out(iz,4) = 0
 end if
 i2out(iz,4) = min( i2out(iz,4), nt )
-if ( fault .and. faultnormal == 0 ) i1out(iz,4) = nt + 1
 
 ! Spatial indices
 n = nn + 2 * nhalo
@@ -55,7 +61,7 @@ case( 'z' )
   i2 = i2out(iz,1:3)
   call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
   if ( cell ) i2 = i2 - 1
-  if ( fault .and. faultnormal /= 0 ) then
+  if ( fault ) then
     i = abs( faultnormal )
     i1(i) = ihypo(i)
     i2(i) = ihypo(i)
@@ -124,7 +130,7 @@ if ( all( i1 == i2 ) .and. i1out(iz,4) <= i2out(iz,4) ) then
   nbuff = nbuff + nc
 end if
 
-end do
+end do doiz
 
 ! Allocate buffer
 if ( nbuff > 0 ) then
@@ -153,7 +159,7 @@ logical :: dofault, fault, cell
 dofault = .false.
 if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
-  if ( ihypo(i) >= i1core(i) .and. ihypo(i) <= i2core(i) ) dofault = .true.
+  if ( ip3(i) == ip3master(i) ) dofault = .true.
 end if
 
 ! Prepare output
@@ -266,14 +272,14 @@ i3 = max( i1, i1core )
 i4 = min( i2, i2core )
 if ( any( i3 > i4 ) ) then
   i1out(iz,4) = nt + 1
-  ir = -1
+  if ( all( i1 == i2 ) ) cycle doiz
+  nc = 1
 end if
 mpio = mpout * 4
 if ( fault ) then
-  !if ( .not. dofault ) ir = -1
   if ( .not. dofault ) cycle doiz
-  mpio = mpout * ifn
   i = abs( faultnormal )
+  mpio = mpout * i
   i1(i) = 1
   i2(i) = 1
   i3(i) = 1
@@ -330,7 +336,7 @@ do ic = 1, nc
     write( 0, * ) 'error: unknown output field: ', fieldout(iz)
     stop
   end select
-  if ( all( i1 == i2 .and. ir > 0 ) ) then
+  if ( all( i1 == i2 ) ) then
   if ( it == 0 .or. ibuff(iz) == 0 ) then
     call rwrite( str, rr, ir )
   else

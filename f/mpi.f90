@@ -322,7 +322,7 @@ character(*), intent(in) :: str
 integer :: i, ndims, ftype, mtype, fh, nl(3), n(3), i0(3), comm0, comm, e
 integer(kind=mpi_offset_kind) :: dr
 if ( iz == 0 ) return
-if ( all( i1 == i2 ) .and. iz /= 0 ) then
+if ( iz > 0 .and. all( i1 == i2 ) ) then
   r = s1(i1(1),i1(2),i1(3))
   return
 end if
@@ -335,14 +335,11 @@ comm0 = comm3d
 if ( i < 4 ) comm0 = comm2d(i)
 if ( iz < 0 ) comm = commin(-iz)
 if ( iz > 0 ) comm = commout(iz)
-if ( any( i3 > i4 ) .or. ir < 1 ) then
+if ( ir < 1 .or. any( i3 > i4 ) ) then
   if ( comm == mpi_undefined ) then
     call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
     if ( iz < 0 ) commin(-iz) = comm
     if ( iz > 0 ) commout(iz) = comm
-  else
-    write( 0, * ) 'Warning: no output from scalario'
-  end if
   return
 end if
 if ( comm == mpi_undefined ) then
@@ -351,13 +348,13 @@ if ( comm == mpi_undefined ) then
   if ( iz > 0 ) commout(iz) = comm
 end if
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
-i0 = i3 - i1           ! offsets
-n  = i2 - i1 + 1       ! global size
-nl = i4 - i3 + 1       ! local size
+i0 = i3 - i1
+n  = i2 - i1 + 1
+nl = i4 - i3 + 1
 inquire( iolength=i ) r
 dr = i * (ir-1) * n(1) * n(2) * n(3)
 ndims = 3
-do i = ndims, 1, -1    ! squeeze singleton dimentions
+do i = ndims, 1, -1 ! squeeze singleton dimentions
 if ( n(i) == 1 ) then
   ndims = ndims - 1
   i0(i:) = (/ i0(i+1:), 0 /)
@@ -365,14 +362,14 @@ if ( n(i) == 1 ) then
   nl(i:) = (/ nl(i+1:), 1 /)
 end if
 end do
-if ( mpio < 0 ) then   ! collapes dimension if all on one proc
+if ( mpio < 0 ) then ! collapes dimension if all on one proc
   do i = 1, ndims-1
   if ( n(i) == nl(i) ) then
     ndims = ndims - 1
     i0(i:) = (/ i0(i)+n(i)*i0(i+1), i0(i+2:), 0 /)
     n(i:)  = (/ n(i)*n(i+1),        n(i+2:),  1 /)
     nl(i:) = (/ nl(i)*nl(i+1),      nl(i+2:), 1 /)
-    exit               ! only do this once to prevent 32 bit overrun
+    exit ! only do this once to prevent 32 bit overrun
   end if
   end do
 end if
@@ -410,7 +407,7 @@ character(*), intent(in) :: str
 integer :: i, ndims, ftype, mtype, fh, nl(3), n(3), i0(3), comm0, comm, e
 integer(kind=mpi_offset_kind) :: dr
 if ( iz == 0 ) return
-if ( all( i1 == i2 ) .and. iz /= 0 ) then
+if ( iz > 0 .and. all( i1 == i2 ) ) then
   r = w1(i1(1),i1(2),i1(3),ic)
   return
 end if
@@ -423,14 +420,11 @@ comm0 = comm3d
 if ( i < 4 ) comm0 = comm2d(i)
 if ( iz < 0 ) comm = commin(-iz)
 if ( iz > 0 ) comm = commout(iz)
-if ( any( i3 > i4 ) .or. ir < 1 ) then
+if ( ir < 1 .or. any( i3 > i4 ) ) then
   if ( comm == mpi_undefined ) then
     call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
     if ( iz < 0 ) commin(-iz) = comm
     if ( iz > 0 ) commout(iz) = comm
-  else
-    write( 0, * ) 'Warning: no output from vectorio'
-  end if
   return
 end if
 if ( comm == mpi_undefined ) then
@@ -438,15 +432,14 @@ if ( comm == mpi_undefined ) then
   if ( iz < 0 ) commin(-iz) = comm
   if ( iz > 0 ) commout(iz) = comm
 end if
-!call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
-i0 = i3 - i1           ! offsets
-n  = i2 - i1 + 1       ! global size
-nl = i4 - i3 + 1       ! local size
+i0 = i3 - i1
+n  = i2 - i1 + 1
+nl = i4 - i3 + 1
 inquire( iolength=i ) r
 dr = i * (ir-1) * n(1) * n(2) * n(3)
 ndims = 3
-do i = ndims, 1, -1    ! squeeze singleton dimentions
+do i = ndims, 1, -1 ! squeeze singleton dimentions
 if ( n(i) == 1 ) then
   ndims = ndims - 1
   i0(i:) = (/ i0(i+1:), 0 /)
@@ -454,14 +447,14 @@ if ( n(i) == 1 ) then
   nl(i:) = (/ nl(i+1:), 1 /)
 end if
 end do
-if ( mpio < 0 ) then   ! collapes dimension if all on one proc
+if ( mpio < 0 ) then ! collapes dimension if all on one proc
   do i = 1, ndims-1
   if ( n(i) == nl(i) ) then
     ndims = ndims - 1
     i0(i:) = (/ i0(i)+n(i)*i0(i+1), i0(i+2:), 0 /)
     n(i:)  = (/ n(i)*n(i+1),        n(i+2:),  1 /)
     nl(i:) = (/ nl(i)*nl(i+1),      nl(i+2:), 1 /)
-    exit               ! only do this once to prevent 32 bit overrun
+    exit ! only do this once to prevent 32 bit overrun
   end if
   end do
 end if

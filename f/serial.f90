@@ -149,7 +149,7 @@ if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
   write( 0, * ) i3, i4
   stop
 end if
-if ( all( i1 == i2 ) .and. iz > 0 ) then
+if ( iz > 0 .and. all( i1 == i2 ) ) then
   r = s1(i1(1),i1(2),i1(3))
   return
 end if
@@ -171,7 +171,7 @@ if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
   write( 0, * ) i3, i4
   stop
 end if
-if ( all( i1 == i2 ) .and. iz > 0 ) then
+if ( iz > 0 .and. all( i1 == i2 ) ) then
   r = w1(i1(1),i1(2),i1(3),ic)
   return
 end if
