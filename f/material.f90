@@ -71,8 +71,7 @@ end if
 
 ! Fill halo and find extrema. Be very careful here!
 ! Last processor may not initially hold any cell values, i.e. i2cell<i2core.
-!   -must call BCs after halo swap.
-!   -adjust ibc2
+!   -must call BCs after halo swap, and adjust ibc2
 ! Make sure BCs fill out extra cells for min/max calc.
 ! Must use continuing BC at surfaces for resampling mr & gam.
 i1 = abs( ibc1 )
