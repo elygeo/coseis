@@ -21,7 +21,6 @@
   itcheck = 100;
   datadir = 'ts/4000/data';
 
-  nhalo = 1;
   debug = 1;
   np = [ 1 3 2 ]
   dx = 4000.;

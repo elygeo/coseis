@@ -139,9 +139,9 @@ real :: &
   svtol            ! slip velocity for determining rupture time
 
 integer, dimension(3) :: &
-  nhalo3,        & ! number of ghost nodes, including extra node in fault dimention
   nn,            & ! number of global nodes, count double nodes twice
   nm,            & ! size of local 3D arrays
+  nhalo,         & ! number of ghost nodes
   np,            & ! number of processors
   ip3,           & ! 3D processor rank
   ip3master,     & ! 3D master processor rank
@@ -164,12 +164,12 @@ integer, dimension(3) :: &
   i2pml            ! PML boundary
 
 integer :: &
-  nhalo,         & ! number of ghost nodes
   ip,            & ! processor rank
   np0,           & ! number of processors available
   nt,            & ! number of time steps
   it,            & ! current time step
   itcheck,       & ! interval for checkpointing, must be a multiple of itio
+  itswap,        & ! interval for parallel communications
   debug,         & ! debugging flag
   npml,          & ! number of PML damping nodes
   fixhypo,       & ! fix hypocenter to 0=none, 1,2=ihypo node, cell, -1,-2=xhypo node, cell

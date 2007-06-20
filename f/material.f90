@@ -80,14 +80,14 @@ i2 = abs( ibc2 )
 where( i2cell == nn - 1 - nnoff ) i2 = abs( bc2 )
 where( i1 <= 1 ) i1 = 4
 where( i2 <= 1 ) i2 = 4
-call scalarswaphalo( mr,  nhalo3 )
-call scalarswaphalo( s1,  nhalo3 )
-call scalarswaphalo( s2,  nhalo3 )
-call scalarswaphalo( gam, nhalo3 )
-call scalarbc( mr,  i1, i2, nhalo3, 1 )
-call scalarbc( s1,  i1, i2, nhalo3, 1 )
-call scalarbc( s2,  i1, i2, nhalo3, 1 )
-call scalarbc( gam, i1, i2, nhalo3, 1 )
+call scalarswaphalo( mr,  nhalo )
+call scalarswaphalo( s1,  nhalo )
+call scalarswaphalo( s2,  nhalo )
+call scalarswaphalo( gam, nhalo )
+call scalarbc( mr,  i1, i2, nhalo, 1 )
+call scalarbc( s1,  i1, i2, nhalo, 1 )
+call scalarbc( s2,  i1, i2, nhalo, 1 )
+call scalarbc( gam, i1, i2, nhalo, 1 )
 
 ! Limits
 if ( rho1 > 0. ) where ( mr < rho1 ) mr = rho1

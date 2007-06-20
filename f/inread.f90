@@ -32,7 +32,6 @@ case( 'return' );       exit doline
 case( 'grid' );         grid = str
 case( 'rfunc' );        rfunc = str
 case( 'tfunc' );        tfunc = str
-case( 'nhalo' );        read( str, *, iostat=io ) nhalo
 case( 'oplevel' );      read( str, *, iostat=io ) oplevel
 case( 'affine' );       read( str, *, iostat=io ) affine
 case( 'gridnoise' );    read( str, *, iostat=io ) gridnoise
@@ -73,6 +72,7 @@ case( 'trelax' );       read( str, *, iostat=io ) trelax
 case( 'svtol' );        read( str, *, iostat=io ) svtol
 case( 'np' );           read( str, *, iostat=io ) np
 case( 'itcheck' );      read( str, *, iostat=io ) itcheck
+case( 'itswap' );       read( str, *, iostat=io ) itswap
 case( 'debug' );        read( str, *, iostat=io ) debug
 case( 'mpin' );         read( str, *, iostat=io ) mpin
 case( 'mpout' );        read( str, *, iostat=io ) mpout

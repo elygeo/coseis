@@ -53,8 +53,8 @@ end if
 i2out(iz,4) = min( i2out(iz,4), nt )
 
 ! Spatial indices
-n = nn + 2 * nhalo3
-noff = nnoff + nhalo3
+n = nn + 2 * nhalo
+noff = nnoff + nhalo
 select case( outtype(iz) )
 case( 'z' )
   i1 = i1out(iz,1:3)

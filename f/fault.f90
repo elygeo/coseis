@@ -201,22 +201,22 @@ t1 = 0.
 t2 = 0.
 
 ! Halos
-call scalarbc( mus,   ibc1, ibc2, nhalo3, 0 )
-call scalarbc( mud,   ibc1, ibc2, nhalo3, 0 )
-call scalarbc( dc,    ibc1, ibc2, nhalo3, 0 )
-call scalarbc( co,    ibc1, ibc2, nhalo3, 0 )
-call scalarbc( area,  ibc1, ibc2, nhalo3, 0 )
-call scalarbc( rhypo, ibc1, ibc2, nhalo3, 0 )
-call vectorbc( nhat,  ibc1, ibc2, nhalo3 )
-call vectorbc( t0,    ibc1, ibc2, nhalo3 )
-call scalarswaphalo( mus,   nhalo3 )
-call scalarswaphalo( mud,   nhalo3 )
-call scalarswaphalo( dc,    nhalo3 )
-call scalarswaphalo( co,    nhalo3 )
-call scalarswaphalo( area,  nhalo3 )
-call scalarswaphalo( rhypo, nhalo3 )
-call vectorswaphalo( nhat,  nhalo3 )
-call vectorswaphalo( t0,    nhalo3 )
+call scalarbc( mus,   ibc1, ibc2, nhalo, 0 )
+call scalarbc( mud,   ibc1, ibc2, nhalo, 0 )
+call scalarbc( dc,    ibc1, ibc2, nhalo, 0 )
+call scalarbc( co,    ibc1, ibc2, nhalo, 0 )
+call scalarbc( area,  ibc1, ibc2, nhalo, 0 )
+call scalarbc( rhypo, ibc1, ibc2, nhalo, 0 )
+call vectorbc( nhat,  ibc1, ibc2, nhalo )
+call vectorbc( t0,    ibc1, ibc2, nhalo )
+call scalarswaphalo( mus,   nhalo )
+call scalarswaphalo( mud,   nhalo )
+call scalarswaphalo( dc,    nhalo )
+call scalarswaphalo( co,    nhalo )
+call scalarswaphalo( area,  nhalo )
+call scalarswaphalo( rhypo, nhalo )
+call vectorswaphalo( nhat,  nhalo )
+call vectorswaphalo( t0,    nhalo )
 
 ! Metadata
 if ( master ) then
@@ -316,7 +316,7 @@ do i = 1, 3
   w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f2 * mr(j1:j2,k1:k2,l1:l2)
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f2 * mr(j3:j4,k3:k4,l3:l4)
 end do
-call vectorbc( w1, ibc1, ibc2, nhalo3 )
+call vectorbc( w1, ibc1, ibc2, nhalo )
 
 ! Friction + fracture energy
 t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
