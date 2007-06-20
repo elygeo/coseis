@@ -1,1 +1,1 @@
-in/ts/4000.m
+in/mini-point.m

@@ -1,4 +1,3 @@
 #!/bin/bash -v
-
-./sord -dip && ./sord -is && diff -qr run/*
+./sord -dipg && ./sord -isg && diff -qr run/*
 

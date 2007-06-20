@@ -19,6 +19,7 @@ if ( i /= 0 ) then
 end if
 where ( ihypo == 0 ) ihypo = ( n + 1 ) / 2
 where ( ihypo <  0 ) ihypo = ihypo + nn + 1
+if ( any( ihypo < 0 .or. ihypo > nn ) ) stop 'ihypo out of bounds'
 
 ! Partition for parallelization
 if ( np0 == 1 ) np = 1
@@ -28,7 +29,7 @@ np = nn / nl; where ( modulo( nn, nl ) /= 0 ) np = np + 1
 call rank( ip, ip3, np )
 nnoff = nl * ip3 - nhalo
 
-! Master processor
+! Master process
 ip3master = ( ihypo - 1 ) / nl
 master = .false.
 if ( all( ip3 == ip3master ) ) master = .true.
@@ -72,7 +73,7 @@ if ( npml > 0 ) then
 end if
 if ( any( i1pml > i2pml ) ) stop 'model too small for PML'
 
-! Map hypocenter to local index, test if fault on this processor
+! Map hypocenter to local index, test if fault on this process
 ihypo = ihypo - nnoff
 ifn = 0
 if ( faultnormal /= 0 ) then

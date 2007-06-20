@@ -23,10 +23,10 @@ doid: do iid = 1, 3; id = modulo( ic + iid - 2, 3 ) + 1
 i1 = i1node
 i2 = i2node
 if ( ic == id ) then
-  call diffcn( s1, w1, ic, id, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
+  call diffcn( s1, w1, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
 else
   i = 6 - ic - id
-  call diffcn( s1, w2, i, id, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
+  call diffcn( s1, w2, i, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
 end if
 
 ! PML region
@@ -94,13 +94,13 @@ end do doic
 if ( any( hourglass > 0. ) ) then
 call scalarsethalo( s1, 0., i1cell, i2cell )
 call scalarsethalo( s2, 0., i1node, i2node )
-w2 = hourglass(1) * u + dt * hourglass(2) * v
+w2 = hourglass(1) * uu + dt * hourglass(2) * vv
 do iq = 1, 4
 do ic = 1, 3
   i1 = max( i1pml    , i1cell )
   i2 = min( i2pml - 1, i2cell )
   call hourglassnc( s1, w2, iq, ic, i1, i2 )
-  s1 = y * s1
+  s1 = yy * s1
   i1 = max( i1pml + 1, i1node )
   i2 = min( i2pml - 1, i2node )
   call hourglasscn( s2, s1, iq, i1, i2 )
@@ -109,16 +109,16 @@ do ic = 1, 3
       i1 = i1cell
       i2 = i2cell
       i2(i) = min( i2(i), i1pml(i) )
-      call hourglassnc( s1, v, iq, ic, i1, i2 )
+      call hourglassnc( s1, vv, iq, ic, i1, i2 )
       forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
-        s1(j,k,l) = dt * hourglass(2) * y(j,k,l) * s1(j,k,l)
+        s1(j,k,l) = dt * hourglass(2) * yy(j,k,l) * s1(j,k,l)
       end forall
       i1 = i1cell
       i2 = i2cell
       i1(i) = max( i1(i), i2pml(i) - 1 )
-      call hourglassnc( s1, v, iq, ic, i1, i2 )
+      call hourglassnc( s1, vv, iq, ic, i1, i2 )
       forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
-        s1(j,k,l) = dt * hourglass(2) * y(j,k,l) * s1(j,k,l)
+        s1(j,k,l) = dt * hourglass(2) * yy(j,k,l) * s1(j,k,l)
       end forall
     end do
     do i = 1, 3

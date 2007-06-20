@@ -15,9 +15,9 @@ real, allocatable, dimension(:,:,:,:,:) :: &
 
 ! 3d vectors
 real, allocatable, dimension(:,:,:,:) :: &
-  x,             & ! node locations
-  v,             & ! velocity
-  u,             & ! displacement
+  xx,            & ! node locations
+  vv,            & ! velocity
+  uu,            & ! displacement
   z1,            & ! anelastic memory variable
   z2,            & ! anelastic memory variable
   w1,            & ! temporary storage
@@ -31,7 +31,7 @@ real, allocatable, dimension(:,:,:) :: &
   gam,           & ! viscosity
   qp,            & ! anelastic coefficient
   qs,            & ! anelastic coefficient
-  y,             & ! hourglass constant
+  yy,            & ! hourglass constant
   pv,            & ! peak velocity
   s1,            & ! temporary storage
   s2               ! temporary storage
@@ -88,7 +88,7 @@ real, allocatable, dimension(:,:,:) :: &
   f2               ! temporary storage
 
 real :: &
-  t,             & ! time
+  tm,            & ! time
   dt,            & ! time step
   dx,            & ! spatial step
   rho0,          & ! hypocenter density
@@ -142,9 +142,9 @@ integer, dimension(3) :: &
   nn,            & ! number of global nodes, count double nodes twice
   nm,            & ! size of local 3D arrays
   nhalo,         & ! number of ghost nodes
-  np,            & ! number of processors
-  ip3,           & ! 3D processor rank
-  ip3master,     & ! 3D master processor rank
+  np,            & ! number of processes
+  ip3,           & ! 3D process rank
+  ip3master,     & ! 3D master process rank
   bc1,           & ! boundary conditions - near side
   bc2,           & ! boundary conditions - far side
   ibc1,          & ! internal boundary conditions - near side
@@ -164,8 +164,8 @@ integer, dimension(3) :: &
   i2pml            ! PML boundary
 
 integer :: &
-  ip,            & ! processor rank
-  np0,           & ! number of processors available
+  ip,            & ! process rank
+  np0,           & ! number of processes available
   nt,            & ! number of time steps
   it,            & ! current time step
   itcheck,       & ! interval for checkpointing, must be a multiple of itio
@@ -214,7 +214,7 @@ character(256) :: &
   str              ! string for storing file names
 
 logical :: &
-  master           ! master processor flag
+  master           ! master process flag
 
 end module
 

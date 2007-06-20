@@ -16,7 +16,7 @@ end subroutine
 subroutine finalize
 end subroutine
 
-! Processor rank
+! Process rank
 subroutine rank( ipout, ip3, np )
 integer, intent(out) :: ipout, ip3(3)
 integer, intent(in) :: np(3)
@@ -25,7 +25,7 @@ ip3 = 0
 ipout = 0
 end subroutine
 
-! Set master processor
+! Set master process
 subroutine setmaster( ip3master )
 integer, intent(in) :: ip3master(3)
 integer :: i

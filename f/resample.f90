@@ -15,11 +15,11 @@ if ( master ) write( 0, * ) 'Resample material model'
 
 ! Cell volume
 call scalarsethalo( s1, 0., i1cell, i2cell )
-call diffnc( s1, w1, 1, 1, i1cell, i2cell, oplevel, bb, x, dx1, dx2, dx3, dx )
+call diffnc( s1, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
 select case( ifn )
-case( 1 ); i = ihypo(1); s1(i,:,:) = 0.; y(i,:,:) = 0.
-case( 2 ); i = ihypo(2); s1(:,i,:) = 0.; y(:,i,:) = 0.
-case( 3 ); i = ihypo(3); s1(:,:,i) = 0.; y(:,:,i) = 0.
+case( 1 ); i = ihypo(1); s1(i,:,:) = 0.; yy(i,:,:) = 0.
+case( 2 ); i = ihypo(2); s1(:,i,:) = 0.; yy(:,i,:) = 0.
+case( 3 ); i = ihypo(3); s1(:,:,i) = 0.; yy(:,:,i) = 0.
 end select
 
 ! Mass ratio
@@ -41,9 +41,9 @@ lam = lam * s1
 mu = mu * s1
 
 ! Initial state
-  t     =  0.
-  v     =  0.
-  u     =  0.
+  tm    =  0.
+  vv    =  0.
+  uu    =  0.
   w1    =  0.
 ! z1    =  0.
 ! z2    =  0.

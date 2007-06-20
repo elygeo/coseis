@@ -341,8 +341,8 @@ case( 2 )
   forall( i=1:nm(2)-1 ) dx2(i) = .5 * ( w1(2,i+1,2,2) - w1(2,i,2,2) )
   forall( i=1:nm(3)-1 ) dx3(i) = .5 * ( w1(2,2,i+1,3) - w1(2,2,i,3) )
 case( 3:5 )
-  allocate( x(nm(1),nm(2),nm(3),3) )
-  x = w1
+  allocate( xx(nm(1),nm(2),nm(3),3) )
+  xx = w1
 case( 6 )
   allocate( bb(nm(1),nm(2),nm(3),8,3) )
   do i = 1, 3

@@ -2,8 +2,11 @@
 
 % affine = [ 1 0 0   1 1 0   0 0 1   1 ];
 
-  nn = [ 8 8 8 ];
-np = [ 2 1 1 ];
+  debug = 1;
+  itswap = 1;
+  np = [ 1 5 1 ];
+  nn = [ 8 4 8 ];
+
   nt = 10;
   dx = 100;
   dt = .0075;
@@ -17,5 +20,4 @@ np = [ 2 1 1 ];
   fixhypo = 2;
   rsource = 50.;
 
-  debug = 1;
 

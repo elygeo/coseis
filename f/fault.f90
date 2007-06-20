@@ -271,10 +271,10 @@ f1 = dt * dt * area * ( mr(j1:j2,k1:k2,l1:l2) + mr(j3:j4,k3:k4,l3:l4) )
 where ( f1 /= 0. ) f1 = 1. / f1
 do i = 1, 3
   t1(:,:,:,i) = t0(:,:,:,i) + f1 * dt * &
-    ( (  v(j3:j4,k3:k4,l3:l4,i) -  v(j1:j2,k1:k2,l1:l2,i) ) &
+    ( ( vv(j3:j4,k3:k4,l3:l4,i) - vv(j1:j2,k1:k2,l1:l2,i) ) &
     + ( w1(j3:j4,k3:k4,l3:l4,i) - w1(j1:j2,k1:k2,l1:l2,i) ) * dt )
   t2(:,:,:,i) = t1(:,:,:,i) + f1 * &
-      (  u(j3:j4,k3:k4,l3:l4,i) -  u(j1:j2,k1:k2,l1:l2,i) )
+      ( uu(j3:j4,k3:k4,l3:l4,i) - uu(j1:j2,k1:k2,l1:l2,i) )
 end do
 
 ! Shear and normal traction
@@ -294,9 +294,9 @@ f1 = -min( 0., tn ) * f1 + co
 ! Nucleation
 if ( rcrit > 0. .and. vrup > 0. ) then
   f2 = 1.
-  if ( trelax > 0. ) f2 = min( ( t - rhypo / vrup ) / trelax, 1. )
+  if ( trelax > 0. ) f2 = min( ( tm - rhypo / vrup ) / trelax, 1. )
   f2 = ( 1. - f2 ) * ts + f2 * ( -tn * mud + co )
-  where ( rhypo < min( rcrit, t * vrup ) .and. f2 < f1 ) f1 = f2
+  where ( rhypo < min( rcrit, tm * vrup ) .and. f2 < f1 ) f1 = f2
 end if
 
 ! Shear traction bounded by friction
@@ -321,13 +321,13 @@ end do
 call vectorbc( w1, ibc1, ibc2, nhalo )
 
 ! Friction + fracture energy
-t2 = v(j3:j4,k3:k4,l3:l4,:) - v(j1:j2,k1:k2,l1:l2,:)
+t2 = vv(j3:j4,k3:k4,l3:l4,:) - vv(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( t3 * t2, 4 ) * area
 call scalarsethalo( f2, 0., i1core, i2core )
 efric = efric + dt * sum( f2 )
 
 ! Strain energy
-t2 = u(j3:j4,k3:k4,l3:l4,:) - u(j1:j2,k1:k2,l1:l2,:)
+t2 = uu(j3:j4,k3:k4,l3:l4,:) - uu(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( ( t0 + t3 ) * t2, 4 ) * area
 call scalarsethalo( f2, 0., i1core, i2core )
 estrain = -.5 * sum( f2 )

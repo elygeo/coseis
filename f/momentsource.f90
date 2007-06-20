@@ -19,7 +19,7 @@ if ( rsource <= 0. ) return
 if ( master ) write( 0, * ) 'Moment source initialize'
 
 ! Cell volumes
-call diffnc( s1, w1, 1, 1, i1cell, i2cell, oplevel, bb, x, dx1, dx2, dx3, dx )
+call diffnc( s1, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
 
 ! Hypocenter/cell radius (squared)
 s2 = ( w2(:,:,:,1) - xhypo(1) ) * ( w2(:,:,:,1) - xhypo(1) ) &
@@ -76,9 +76,9 @@ if ( rsource <= 0. ) return
 ! Source time function
 select case( tfunc )
 case( 'delta'  ); srcft = 1.
-case( 'brune'  ); srcft = 1. - exp( -t / tsource ) / tsource * ( t + tsource )
-case( 'sbrune' ); srcft = 1. - exp( -t / tsource ) / tsource * &
-  ( t + tsource + t * t / tsource / 2. )
+case( 'brune'  ); srcft = 1. - exp( -tm / tsource ) / tsource * ( tm + tsource )
+case( 'sbrune' ); srcft = 1. - exp( -tm / tsource ) / tsource * &
+  ( tm + tsource + tm * tm / tsource / 2. )
 case default
   write( 0, * ) 'invalid tfunc: ', trim( tfunc )
   stop

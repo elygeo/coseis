@@ -70,7 +70,7 @@ if ( any( mr  /= mr  ) .or. any( s1 /= s1 ) &
 end if
 
 ! Fill halo and find extrema. Be very careful here!
-! Last processor may not initially hold any cell values, i.e. i2cell<i2core.
+! Last process may not initially hold any cell values, i.e. i2cell<i2core.
 !   -must call BCs after halo swap, and adjust ibc2
 ! Make sure BCs fill out extra cells for min/max calc.
 ! Must use continuing BC at surfaces for resampling mr & gam.
@@ -138,9 +138,9 @@ mu  = mr * s2 * s2
 lam = mr * ( s1 * s1 ) - 2. * mu
 
 ! Hourglass constant
-y = 12. * ( lam + 2. * mu )
-where ( y /= 0. ) y = dx * mu * ( lam + mu ) / y
-!y = .3 / 16. * ( lam + 2. * mu ) * dx ! like Ma & Liu, 2006
+yy = 12. * ( lam + 2. * mu )
+where ( yy /= 0. ) yy = dx * mu * ( lam + mu ) / yy
+!yy = .3 / 16. * ( lam + 2. * mu ) * dx ! like Ma & Liu, 2006
 
 end subroutine
 

@@ -167,17 +167,17 @@ if ( it > 0 ) then
   i = modulo( it-1, itio ) + 1
   select case( pass )
   case( 1 )
-    s1 = sum( v * v, 4 )
+    s1 = sum( vv * vv, 4 )
     s2 = sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 )
-    pv = max( pv, s1 )
-    call scalarsethalo( s1, -1., i1core, i2core )
     i1 = max( i1core, i1cell )
     i2 = min( i2core, i2cell )
+    call scalarsethalo( s1, -1., i1core, i2core )
     call scalarsethalo( s2, -1., i1, i2 )
+    pv = max( pv, s1 )
     vstats(i,1) = sqrt( maxval( s1 ) )
     vstats(i,2) = sqrt( maxval( s2 ) )
   case( 2 )
-    s1 = sum( u * u, 4 )
+    s1 = sum( uu * uu, 4 )
     s2 = sum( w1 * w1, 4 )
     call scalarsethalo( s1, -1., i1core, i2core )
     call scalarsethalo( s2, -1., i1core, i2core )
@@ -193,11 +193,6 @@ if ( it > 0 ) then
         call rwrite1( 'stats/amax', gvstats(:i,4), it )
         rr = maxval( gvstats(:,3) )
         if ( rr > dx / 10. ) write( 0, * ) 'warning: u !<< dx', rr, dx
-        i1 = ihypo
-        i1(ifn) = 1  
-        open( 1, file='stats/tarrhypo', status='replace' )
-        write( 1, * ) tarr(i1(1),i1(2),i1(3))
-        close( 1 )
       end if
     end if
   end select
@@ -251,6 +246,11 @@ if ( it > 0 .and. dofault ) then
         call rwrite1( 'stats/estrain', gestats(:i,2), it )
         call rwrite1( 'stats/moment',  gestats(:i,3), it )
         call rwrite1( 'stats/mw',      gestats(:i,4), it ) 
+        i1 = ihypo
+        i1(ifn) = 1  
+        open( 1, file='stats/tarrhypo', status='replace' )
+        write( 1, * ) tarr(i1(1),i1(2),i1(3))
+        close( 1 )
       end if
     end if
   end select
@@ -304,8 +304,8 @@ do ic = 1, nc
   case( 'gam'  ); call scalario( iz, str, rr, gam,  i1, i2, i3, i4,       ir, mpio )
   case( 'lam'  ); call scalario( iz, str, rr, lam,  i1, i2, i3, i4,       ir, mpio )
   case( 'mu'   ); call scalario( iz, str, rr, mu,   i1, i2, i3, i4,       ir, mpio )
-  case( 'v'    ); call vectorio( iz, str, rr, v,    i1, i2, i3, i4, ic,   ir, mpio )
-  case( 'u'    ); call vectorio( iz, str, rr, u,    i1, i2, i3, i4, ic,   ir, mpio )
+  case( 'v'    ); call vectorio( iz, str, rr, vv,   i1, i2, i3, i4, ic,   ir, mpio )
+  case( 'u'    ); call vectorio( iz, str, rr, uu,   i1, i2, i3, i4, ic,   ir, mpio )
   case( 'w'    );
    if ( ic < 4 )  call vectorio( iz, str, rr, w1,   i1, i2, i3, i4, ic,   ir, mpio )
    if ( ic > 3 )  call vectorio( iz, str, rr, w2,   i1, i2, i3, i4, ic-3, ir, mpio )

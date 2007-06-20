@@ -27,7 +27,7 @@ integer :: e
 call mpi_finalize( e )
 end subroutine
 
-! Processor rank
+! Process rank
 subroutine rank( ipout, ip3, np )
 use mpi
 integer, intent(out) :: ipout, ip3(3)
@@ -50,7 +50,7 @@ commin = mpi_undefined
 commout = mpi_undefined
 end subroutine
 
-! Set master processor
+! Set master process
 subroutine setmaster( ip3master )
 use mpi
 integer, intent(in) :: ip3master(3)
