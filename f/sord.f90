@@ -31,7 +31,6 @@ call inread                        ; prof0(2) = timer( 1 )
 call setup                         ; prof0(3) = timer( 1 )
 if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
 call arrays                        ; prof0(4) = timer( 1 )
-return
 call gridgen                       ; prof0(5) = timer( 1 )
 call output_init                   ; prof0(6) = timer( 1 )
 call momentsource_init             ; prof0(7) = timer( 1 )
