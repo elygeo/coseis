@@ -83,6 +83,7 @@ case "$key" in
   nn) nm3=( $1 $2 $3 ) ;;
   np) np3=( $1 $2 $3 ) ;;
   dx) dx=$1 ;;
+  itswap) nh=$1 ;;
   npml) npml=$1 ;;
   datadir) datadir="$1" ;;
   return) break ;;
@@ -125,10 +126,10 @@ ppn=$(( np / nodes + ( np % nodes > 0 ? 1 : 0 ) ))
 cpus=$ppn
 [ $cpus -gt $maxcpus ] && cpus=$maxcpus
 
-# Domain size
-nm3[0]=$(( nm3[0] / np3[0] + 2 + ( nm3[0] % np3[0] > 0 ? 1 : 0 ) ))
-nm3[1]=$(( nm3[1] / np3[1] + 2 + ( nm3[1] % np3[1] > 0 ? 1 : 0 ) ))
-nm3[2]=$(( nm3[2] / np3[2] + 2 + ( nm3[2] % np3[2] > 0 ? 1 : 0 ) ))
+# Local domain size
+nm3[0]=$(( nm3[0] / np3[0] + 2 * nh + ( nm3[0] % np3[0] > 0 ? 1 : 0 ) ))
+nm3[1]=$(( nm3[1] / np3[1] + 2 * nh + ( nm3[1] % np3[1] > 0 ? 1 : 0 ) ))
+nm3[2]=$(( nm3[2] / np3[2] + 2 * nh + ( nm3[2] % np3[2] > 0 ? 1 : 0 ) ))
 nm=$( echo ${nm3[*]} | awk '{ print $1 * $2 * $3 }' )
 
 # RAM and Wall time usage

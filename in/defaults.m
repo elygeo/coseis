@@ -6,7 +6,7 @@
   dx = 100.;				% spatial step length
   dt = .0075;				% time step length
   grid = 'constant';			% regular mesh
-  affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ]; % grid tranformation
+  affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ]; % grid transformation
   symmetry = [ 0 0 0 ];			% grid symmetry
   gridnoise = 0.			% Random noise added to mesh
   oplevel = 0;				% 1=const, 2=rect, 3=parallel, 3=onepoint, 5=exact, 6=saved, 0=auto pick 2 or 6
@@ -73,13 +73,13 @@
 
 % Code execution and output parameters
   np = [ 1 1 1 ];			% number of processors in j k l
-  itswap = 2;				% commicate every 2 time steps
+  itswap = 2;				% communication interval
 % itcheck = 100;			% checkpoint every 100 time steps
 % itcheck = -1;				% checkpoint just before finishing
   itcheck = 0;				% checkpointing off
   debug = 0;                            % debugging off
-  mpin  = 1;				% 0=sparate files, 1=MPIIO
-  mpout = 1;				% 0=sparate files, 1=MPIIO
+  mpin  = 1;				% 0=separate files, 1=MPIIO
+  mpout = 1;				% 0=separate files, 1=MPIIO
 % out = { 'v'  10   1 1 1 1  -1 -1 -1 -1 };	% write v every 10 steps, 4D zone
 % out = { 'sl' -1   1 1 1 1  -1 -1 -1 -1 };	% write final slip length, 4D zone
 
@@ -87,13 +87,13 @@
 %  0: free surface
 %  1: PML absorbing
 %  2: mirror symmetry on exterior cell center
-%     continuous tangential and oposing normal vecotor components
+%     continuous tangential and opposing normal vector components
 %  3: mirror symmetry on boundary node
-%     continuous tangential and oposing normal vecotor components
+%     continuous tangential and opposing normal vector components
 % -2: mirror symmetry on exterior cell center, 180 phase shift
-%     continuous normal and oposing tangential vecotor components
+%     continuous normal and opposing tangential vector components
 % -3: mirror symmetry on boundary node, 180 phase shift
-%     continuous normal and oposing tangential vecotor components
+%     continuous normal and opposing tangential vector components
 %  4: continuation
 %  9: domain boundary (for internal use only)
 
