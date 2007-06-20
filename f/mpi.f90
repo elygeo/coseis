@@ -46,8 +46,8 @@ ipout = ip
 do i = 1, 3
   call mpi_comm_split( comm3d, ip3(i), 0, comm2d(i), e )
 end do
-commin = mpi_comm_null
-commout = mpi_comm_null
+commin = mpi_undefined
+commout = mpi_undefined
 end subroutine
 
 ! Set master processor
@@ -330,24 +330,27 @@ if ( mpio == 0 ) then
   call rio3( iz, str, s1, i3, i4, ir )
   return
 end if
+i = abs( mpio )
+comm0 = comm3d
+if ( i < 4 ) comm0 = comm2d(i)
 if ( iz < 0 ) comm = commin(-iz)
 if ( iz > 0 ) comm = commout(iz)
-if ( comm == mpi_comm_null ) then
-  comm0 = comm3d
-  i = abs( mpio )
-  if ( i <= 3 ) comm0 = comm2d(i)
-  if ( all( i3 <= i4 ) .and. ir > 0 ) then
-    call mpi_comm_split( comm0, abs( iz ), 0, comm, e )
-    if ( iz < 0 ) commin(-iz) = comm
-    if ( iz > 0 ) commout(iz) = comm
-  else
+if ( any( i3 > i4 ) .or. ir < 1 ) then
+  if ( comm == mpi_undefined ) then
     call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
     if ( iz < 0 ) commin(-iz) = comm
     if ( iz > 0 ) commout(iz) = comm
-    return
+  else
+    write( 0, * ) 'Warning: no output from scalario'
   end if
+  return
 end if
-call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
+if ( comm == mpi_undefined ) then
+  call mpi_comm_split( comm0, abs( iz ), 0, comm, e )
+  if ( iz < 0 ) commin(-iz) = comm
+  if ( iz > 0 ) commout(iz) = comm
+end if
+call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
 i0 = i3 - i1           ! offsets
 n  = i2 - i1 + 1       ! global size
 nl = i4 - i3 + 1       ! local size
@@ -415,24 +418,28 @@ if ( mpio == 0 ) then
   call rio4( iz, str, w1, i3, i4, ic, ir )
   return
 end if
+i = abs( mpio )
+comm0 = comm3d
+if ( i < 4 ) comm0 = comm2d(i)
 if ( iz < 0 ) comm = commin(-iz)
 if ( iz > 0 ) comm = commout(iz)
-if ( comm == mpi_comm_null ) then
-  comm0 = comm3d
-  i = abs( mpio )
-  if ( i <= 3 ) comm0 = comm2d(i)
-  if ( all( i3 <= i4 ) .and. ir > 0 ) then
-    call mpi_comm_split( comm0, abs( iz ), 0, comm, e )
-    if ( iz < 0 ) commin(-iz) = comm
-    if ( iz > 0 ) commout(iz) = comm
-  else
+if ( any( i3 > i4 ) .or. ir < 1 ) then
+  if ( comm == mpi_undefined ) then
     call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
     if ( iz < 0 ) commin(-iz) = comm
     if ( iz > 0 ) commout(iz) = comm
-    return
+  else
+    write( 0, * ) 'Warning: no output from vectorio'
   end if
+  return
 end if
-call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
+if ( comm == mpi_undefined ) then
+  call mpi_comm_split( comm0, abs( iz ), 0, comm, e )
+  if ( iz < 0 ) commin(-iz) = comm
+  if ( iz > 0 ) commout(iz) = comm
+end if
+!call mpi_file_set_errhandler( mpi_file_null, MPI_ERRORS_ARE_FATAL, e )
+call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
 i0 = i3 - i1           ! offsets
 n  = i2 - i1 + 1       ! global size
 nl = i4 - i3 + 1       ! local size

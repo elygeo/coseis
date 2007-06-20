@@ -14,7 +14,7 @@ fi
 cd "$rundir"
 echo "\$( date ): $code started" >> log
 $pre
-opts="-tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
+opts="-labelio yes -tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
 case "\${1:--i}$mode" in
   -is) $bin ;;
   -gs) totalview $bin ;;
