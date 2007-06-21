@@ -156,7 +156,7 @@ integer :: i1(3), i2(3), i3(3), i4(3), i, onpass, nc, ic, ir, iz, mpio
 logical :: dofault, fault, cell
 
 ! Debug
-if ( master .and. debug > 1 ) write( 0, * ) 'Output pass ', pass
+if ( master .and. ( it == 0 .or. debug > 1 ) ) write( 0, * ) 'Output pass', it, pass
 
 ! Test for fault
 dofault = .false.
@@ -172,10 +172,8 @@ if ( it > 0 ) then
   case( 1 )
     s1 = sum( vv * vv, 4 )
     s2 = sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 )
-    i1 = max( i1core, i1cell )
-    i2 = min( i2core, i2cell )
-    call scalarsethalo( s1, 0., i1core, i2core )
-    call scalarsethalo( s2, 0., i1, i2 )
+    call scalarsethalo( s1, -1., i1core, i2core )
+    call scalarsethalo( s2, -1., i1core, i2core )
     pv = max( pv, s1 )
     vstats(i,1) = maxval( s1 )
     vstats(i,2) = maxval( s2 )
@@ -186,6 +184,7 @@ if ( it > 0 ) then
     call scalarsethalo( s2, -1., i1core, i2core )
     vstats(i,3) = maxval( s1 )
     vstats(i,4) = maxval( s2 )
+print *, it, ip, maxval( s2 ), maxloc( s2 )
     !if ( any( vstats > huge( rr ) ) ) stop 'unstable solution'
     if ( modulo( it, itio ) == 0 .or. it == nt ) then
       call rreduce2( gvstats, vstats, 'max', 0 )

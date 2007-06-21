@@ -48,7 +48,8 @@ if ( s2(j,k,l) < rsource*rsource ) then
     write( 0, * ) 'invalid rfunc: ', trim( rfunc )
     stop
   end select
-  if ( all( ibc1 /= 9 .or. (/ j, k, l /) >= i1core ) ) then
+  if (  all( ibc1 /= 9 .or. (/ j, k, l /) >= i1core ) &
+  .and. all( ibc2 /= 9 .or. (/ j, k, l /) <= i2core ) ) then
     sumsrcfr = sumsrcfr + srcfr(i)
   end if
 end if
@@ -56,8 +57,10 @@ end do
 end do
 end do
 
+
 ! Normalize and divide by cell volume
 call rreduce( allsumsrcfr, sumsrcfr, 'allsum', 0 )
+print *, ip, allsumsrcfr
 if ( allsumsrcfr <= 0. ) stop 'bad source space function'
 srcfr = srcfr / allsumsrcfr / cellvol
 

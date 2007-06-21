@@ -1,82 +1,56 @@
 % Extract 4D slice from saved data
-% [ f, i3, i4 ] = read4d( iout )
-% [ f, i3, i4 ] = read4d( iout, i1, i2 )
-% [ f, i3, i4 ] = read4d( 'field', i1, i2 )
-% iout is the output index
-% i1 and i2 are the optional desired min and max indices
-% i3 and i4 are the min and max indices returned
 
 function [ f, i3, i4 ] = read4d( varargin )
-
-% Metadata
 meta
 
-% Aguments
-if ~any( nargin == [ 1 3 4 ] ), error, end
-if ( isnumeric( varargin{1} ) )
-  iz = varargin{1};
-  fieldin = out{izs}{2};
-  i3 = [ out{izs}{4:7}  ];
-  i4 = [ out{izs}{8:11} ];
-  if nargin > 1
-    i3 = varargin{2};
-    i4 = varargin{3};
+iz = varargin{1};
+if ( ischar( iz ) )
+  field = iz;
+  found = 1;
+  for iz = 1:nout
+  if strcmp( field, out{iz}{2} ), break, end
+    found = 0;
   end
-else
-  fieldin = varargin{1};
+  end
+  if ~found, return, end
+end
+
+nc    = out{iz}{1};
+field = out{iz}{2};
+dit   = out{iz}{3};
+i1 = [ out{iz}{4:7}  ];
+i2 = [ out{iz}{8:11} ];
+
+switch nargin
+case 1
+  i3 = i1;
+  i4 = i2;
+  if any( i3(1:3) ~= i4(1:3) ), i3(4) = i4(4); end
+case 2
+  i3 = varagin{2};
+  i4 = varagin{2};
+  i = i3 == 0;
+  i3(i) = i1(i);
+  i4(i) = i2(i);
+case 3
   i3 = varargin{2};
   i4 = varargin{3};
-end
-ic = 0;
-if nargin > 3
-  ic = varargin{4};
-end
-
-% Slice
-n = [ nn it ];
-shift = [ 0 0 0 0 ];
-if faultnormal, shift( abs( faultnormal) ) = 1; end
-m0 = i3(1:3) == 0 & i4(1:3) == 0;
-m1 = i3(1:3) == 0 & i4(1:3) ~= 0;
-m2 = i3(1:3) ~= 0 & i4(1:3) == 0;
-m3 = i3 < 0;
-m4 = i4 < 0;
-i3(m0) = ihypo(m0);
-i4(m0) = ihypo(m0);
-i3(m1) = ihypo(m1) + shift(m1);
-i4(m2) = ihypo(m2);
-i3(m3) = i3(m3) + n(m3) + 1;
-i4(m4) = i4(m4) + n(m4) + 1;
-
-% Look for data
-found = 0;
-n = i4 - i3 + 1;
-nout = length( out );
-for iz = 1:nout
-  nc    = out{iz}{1};
-  field = out{iz}{2};
-  dit   = out{iz}{3};
-  i1 = [ out{iz}{4:7}  ];
-  i2 = [ out{iz}{8:11} ];
-  if dit == 0
-    dit = 1;
-    i1(4) = 0;
-    i2(4) = 0;
-  end
-  test  = [ 
-    strcmp( fieldin, field )
-    all( i3 >= i1 )
-    all( i4 <= i2 )
-    ( dit == 1 || ( i3(4) == i4(4) && mod( i3(4) - i1(4), dit ) == 0 ) )
-  ]';
-  found = all( test );
-  if found, break, end
-end
-if ~found
-  f = [];
-  i3 = [];
-  i4 = [];
-  return
+  n = [ nn nt ];
+  shift = [ 0 0 0 0 ];
+  if faultnormal, shift( abs( faultnormal) ) = 1; end
+  m0 = i3(1:3) == 0 & i4(1:3) == 0;
+  m1 = i3(1:3) == 0 & i4(1:3) ~= 0;
+  m2 = i3(1:3) ~= 0 & i4(1:3) == 0;
+  m3 = i3 < 0;
+  m4 = i4 < 0;
+  i3(m0) = ihypo(m0);
+  i4(m0) = ihypo(m0);
+  i3(m1) = ihypo(m1) + shift(m1);
+  i4(m2) = ihypo(m2);
+  i3(m3) = i3(m3) + n(m3) + 1;
+  i4(m4) = i4(m4) + n(m4) + 1;
+  if any( i3 < i1 || i4 > i2 ), error, end
+otherwise, error
 end
 
 % Read data

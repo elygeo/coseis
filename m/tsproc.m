@@ -1,21 +1,19 @@
-% Time series
-function [ tt, vt, x, tta, vta, labels ] = tsread( varargin )
+% Process time series
+function [ tt, vt, tta, vta ] = tsproc( varargin )
 
-field  = varargin{1};
-sensor = varargin{2};
-dofilter = 0;
-upvector = [ 0 0 1 ];
-if nargin >= 3, dofilter = varargin{3}; end
-if nargin >= 4, upvector = varargin{4}; end
-
+meta
+x = [];
 tt = [];
 tta = [];
 vta = [];
-labels = {};
-
-% Read metadata
-meta
-currentstep
+field = [];
+dofilter = 0;
+upvector = [ 0 0 1 ];
+vt = varargin{1};
+if nargin >= 2, x        = varargin{2}; end
+if nargin >= 3, field    = varargin{3}; end
+if nargin >= 4, dofilter = varargin{4}; end
+if nargin >= 5, upvector = varargin{5}; end
 
 % Test for special cases
 pointsource = ... 
@@ -32,8 +30,7 @@ kostrov = ...
   rcrit > 1e8 && ...
   trelax == 0.;
 
-% Find sensor location
-x = read4d( 'x', [ sensor 0 ], [ sensor 0 ] );
+% Sensor radius
 if x
   nr = x - xhypo;
   rg = sqrt( sum( nr .* nr ) );
@@ -52,12 +49,6 @@ else
   it0 = 0;
   tt = ( it0 : it ) * dt;
 end
-
-% Extract data
-vt = read4d( field, [ sensor it0 ], [ sensor it ] );
-if vt, else, return, end
-if nargout < 2, return, end
-
 nt = it - it0 + 1;
 nc = size( vt, 5 );
 vt = reshape( vt, nt, nc );
@@ -123,7 +114,4 @@ elseif kostrov
   tta = tta(i);
   vta = vta(i);
 end
-
-% Labels
-labels = fieldlabels( field, pointsource );
 
