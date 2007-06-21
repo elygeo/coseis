@@ -3,7 +3,6 @@
 cat << END > run
 #!/bin/bash -e
 cd "$rundir"
-echo "$0"
 echo "\$(date): $code started" >> log
 $pre
 [ "$mode" = p ] && mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon

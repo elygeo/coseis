@@ -69,20 +69,23 @@ if ( any( mr  /= mr  ) .or. any( s1 /= s1 ) &
   stop 'NaNs in velocity model!'
 end if
 
-! Fill halo and find extrema. Be very careful here!
-! Last process may not initially hold any cell values, i.e. i2cell<i2core.
-!   -must call BCs after halo swap, and adjust ibc2
-! Make sure BCs fill out extra cells for min/max calc.
-! Must use continuing BC at surfaces for resampling mr & gam.
-i1 = abs( ibc1 )
-i2 = abs( ibc2 )
-where( i2cell == nn - 1 - nnoff ) i2 = abs( bc2 )
-where( i1 <= 1 ) i1 = 4
-where( i2 <= 1 ) i2 = 4
+! Fill halo. Be very careful here!
+! Last process may not initially hold any cell values, i.e. i2cell < i2core.
+! Call BCs after halo swap
+! Fill out extra cells for min/max calc.
+! Use continuing BC at surfaces for resampling mr & gam.
 call scalarswaphalo( mr,  nhalo )
 call scalarswaphalo( s1,  nhalo )
 call scalarswaphalo( s2,  nhalo )
 call scalarswaphalo( gam, nhalo )
+call scalarsethalo( mr,  maxval( mr  ), i1cell, i2cell )
+call scalarsethalo( s1,  maxval( s1  ), i1cell, i2cell )
+call scalarsethalo( s2,  maxval( s2  ), i1cell, i2cell )
+call scalarsethalo( gam, maxval( gam ), i1cell, i2cell )
+i1 = abs( ibc1 )
+i2 = abs( ibc2 )
+where( i1 <= 1 ) i1 = 4
+where( i2 <= 1 ) i2 = 4
 call scalarbc( mr,  i1, i2, nhalo, 1 )
 call scalarbc( s1,  i1, i2, nhalo, 1 )
 call scalarbc( s2,  i1, i2, nhalo, 1 )

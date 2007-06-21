@@ -49,8 +49,12 @@ case 3
   i4(m2) = ihypo(m2);
   i3(m3) = i3(m3) + n(m3) + 1;
   i4(m4) = i4(m4) + n(m4) + 1;
-  if any( i3 < i1 || i4 > i2 ), error, end
 otherwise, error
+end
+
+if any( i3 < i1 | i4 > i2 | i3 > n | i4 > n | i1 > i2 | i3 > i4 )
+  disp( [ 'no data found for ' field ] )
+  return
 end
 
 % Read data

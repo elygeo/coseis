@@ -23,11 +23,11 @@
 
 
   debug = 2;
-  np = [ 3 3 1 ]
+  np = [ 3 3 2 ]
   dx = 4000.;
   dt = .24;
   trelax = 2.4;
-  nt = 10;
+  nt = 0;
   nn = [  151   77  21 ];
   fixhypo = 1;
   ihypo = [   69   51  -2 ];
