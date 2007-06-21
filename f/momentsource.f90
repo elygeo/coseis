@@ -72,6 +72,7 @@ integer :: i, j, k, l, ic, nsrc
 real :: srcft
 
 if ( rsource <= 0. ) return
+if ( master .and. debug > 1 ) write( 0, * ) 'Moment source'
 
 ! Source time function
 select case( tfunc )

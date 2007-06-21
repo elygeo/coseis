@@ -7,7 +7,7 @@ subroutine surfnormals( nhat, x, i1, i2, ihat )
 real, intent(out) :: nhat(:,:,:,:)
 real, intent(in) :: x(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), ihat
-integer :: i, j, k, l, j1, k1, l1, j2, k2, l2, a, b, c
+integer :: j, k, l, j1, k1, l1, j2, k2, l2, a, b, c
 
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)

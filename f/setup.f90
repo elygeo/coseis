@@ -80,6 +80,9 @@ if ( faultnormal /= 0 ) then
   if ( ihypo(i) >= 1 .and. ihypo(i) < nm(i) ) ifn = abs( faultnormal )
 end if
 
+! Synchronize processes if debugging
+sync = debug > 1
+
 end subroutine
 
 end module

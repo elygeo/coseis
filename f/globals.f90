@@ -214,6 +214,7 @@ character(256) :: &
   str              ! string for storing file names
 
 logical :: &
+  sync,          & ! synchronize processes
   master           ! master process flag
 
 end module

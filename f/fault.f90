@@ -251,6 +251,7 @@ use m_util
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
 if ( ifn == 0 ) return
+if ( master .and. debug > 1 ) write( 0, * ) 'Fault'
 
 ! Indices
 i1 = 1

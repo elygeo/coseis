@@ -26,25 +26,24 @@ integer :: i
 
 ! Initialization
 prof0(1) = timer( 0 )
-call initialize( ip, np0, master ) ; prof0(1) = timer( 1 )
-call inread                        ; prof0(2) = timer( 1 )
-call setup                         ; prof0(3) = timer( 1 )
+call initialize( ip, np0, master )                ; prof0(1) = timer( 1 )
+call inread                                       ; prof0(2) = timer( 1 )
+call setup             ; if ( sync ) call barrier ; prof0(3) = timer( 1 )
 if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
-call arrays                        ; prof0(4) = timer( 1 )
-call gridgen                       ; prof0(5) = timer( 1 )
-call output_init                   ; prof0(6) = timer( 1 )
-call momentsource_init             ; prof0(7) = timer( 1 )
-call material                      ; prof0(8) = timer( 1 )
-call pml
-call fault_init                    ; prof0(9) = timer( 1 )
-call metadata                      ; prof0(10) = timer( 1 )
-call output( 0 )                   ; prof0(11) = timer( 1 )
-call barrier
-call resample                      ; prof0(12) = timer( 1 )
-call readcheckpoint                ; prof0(13) = timer( 1 )
-if ( it == 0 ) then
-  call output( 1 )                 ; prof0(14) = timer( 1 )
-  call output( 2 )                 ; prof0(15) = timer( 1 )
+call arrays            ; if ( sync ) call barrier ; prof0(4) = timer( 1 )
+call gridgen           ; if ( sync ) call barrier ; prof0(5) = timer( 1 )
+call output_init       ; if ( sync ) call barrier ; prof0(6) = timer( 1 )
+call momentsource_init ; if ( sync ) call barrier ; prof0(7) = timer( 1 )
+call material          ; if ( sync ) call barrier ; prof0(8) = timer( 1 )
+call pml               ; if ( sync ) call barrier 
+call fault_init        ; if ( sync ) call barrier ; prof0(9) = timer( 1 )
+call metadata          ; if ( sync ) call barrier ; prof0(10) = timer( 1 )
+call output( 0 )       ; if ( sync ) call barrier ; prof0(11) = timer( 1 )
+call resample          ; if ( sync ) call barrier ; prof0(12) = timer( 1 )
+call readcheckpoint    ; if ( sync ) call barrier ; prof0(13) = timer( 1 )
+if ( it == 0 ) then                               
+  call output( 1 )     ; if ( sync ) call barrier ; prof0(14) = timer( 1 )
+  call output( 2 )     ; if ( sync ) call barrier ; prof0(15) = timer( 1 )
 end if
 
 ! Main loop
@@ -54,24 +53,24 @@ if ( master ) call rwrite1( 'prof0', prof0 )
 i = itio
 do while ( it < nt )
   i = modulo( it, itio ) + 1
-  call timestep
+  call timestep        ; if ( sync ) call barrier
   if ( master ) then
     write( 0, '(a)', advance='no' ) '.'
     if ( modulo( it, 50 ) == 0 .or. it == nt ) write( 0, '(i6)' ) it
   end if
-  call stress      
-  call momentsource                ; prof(i*4-3) = timer( 1 )
-  call output( 1 )                 ; prof(i*4-2) = timer( 1 )
-  call acceleration                ; prof(i*4-3) = prof(i*4-3) + timer( 1 )
+  call stress          ; if ( sync ) call barrier
+  call momentsource    ; if ( sync ) call barrier ; prof(i*4-3) = timer( 1 )
+  call output( 1 )     ; if ( sync ) call barrier ; prof(i*4-2) = timer( 1 )
+  call acceleration    ; if ( sync ) call barrier ; prof(i*4-3) = prof(i*4-3) + timer( 1 )
   if ( modulo( it, itswap ) == 0 ) then
     call vectorswaphalo( w1, nhalo )
-  end if                           ; prof(i*4-1) = timer( 1 )
-  call fault
-  call locknodes                   ; prof(i*4-3) = prof(i*4-3) + timer( 1 )
-  call output( 2 )
+  end if               ; if ( sync ) call barrier ; prof(i*4-1) = timer( 1 )
+  call fault           ; if ( sync ) call barrier
+  call locknodes       ; if ( sync ) call barrier ; prof(i*4-3) = prof(i*4-3) + timer( 1 )
+  call output( 2 )     ; if ( sync ) call barrier
   if ( modulo( it, itcheck ) == 0 ) then
     call writecheckpoint
-  end if                           ; prof(i*4-2) = prof(i*4-2) + timer( 1 )
+  end if               ; if ( sync ) call barrier ; prof(i*4-2) = prof(i*4-2) + timer( 1 )
   prof(i*4) = timer( 2 )
   if ( modulo( it, itio ) == 0 .and. master ) then
     call rwrite1( 'prof', prof, it*4 )
@@ -79,6 +78,7 @@ do while ( it < nt )
 end do
 
 ! Finish up
+if ( sync ) call barrier
 if ( master ) then
   if ( i /= itio ) call rwrite1( 'prof', prof(1:i*4), it*4 )
   prof0(1) = timer( 3 )

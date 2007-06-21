@@ -22,19 +22,18 @@ xlf95_r)
   oflags='-qsuffix=f=f90 -O'
   ;;
 ifort)
-  gflags='-O -p -g -CB -warn -traceback -u'
+  gflags='-p -g -CB -warn -traceback -u'
   oflags='-O3'
   oflags='-O'
   ;;
 pgf90)
-  gflags='-O -g -Ktrap=fp -Mbounds'
   gflags='-O -g -Ktrap=fp -Mbounds -Mdclchk'
+  gflags='-g -Ktrap=fp -Mbounds -Mdclchk'
   oflags='-fast'
   getarg='getarg-pgf.f90'
   ;;
 gfortran)
-  gflags='-O -pg -g -Wall -std=f95 -pedantic -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
-  gflags='-O -g -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
+  gflags='-pg -g -Wall -std=f95 -pedantic -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
   gflags='-g -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
   oflags='-O3'
   oflags='-O'

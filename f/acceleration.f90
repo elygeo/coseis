@@ -7,11 +7,11 @@ subroutine acceleration
 use m_globals
 use m_diffcn
 use m_hourglass
-use m_collective
 use m_bc
 use m_util
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq
 
+if ( master .and. debug > 1 ) write( 0, * ) 'Acceleration'
 call scalarsethalo( s1, 0., i1node, i2node )
 
 ! Loop over component and derivative direction

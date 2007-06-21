@@ -9,6 +9,8 @@ use m_diffnc
 use m_util
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id
 
+if ( master .and. debug > 1 ) write( 0, * ) 'Stress'
+
 ! Modified displacement
 do i = 1, 3
   w1(:,:,:,i) = uu(:,:,:,i) + gam * vv(:,:,:,i)
