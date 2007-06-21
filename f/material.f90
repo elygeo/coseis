@@ -152,6 +152,7 @@ use m_globals
 integer :: i
 real :: hmean, tune, c1, c2, c3, damp, dampn, dampc, pmlp
 
+if ( npml < 1 ) return
 c1 =  8. / 15.
 c2 = -3. / 100.
 c3 =  1. / 1500.

@@ -7,11 +7,6 @@ fi
 
 cat << END > run
 #!/bin/bash -e
-if ! grep -q "\$HOSTNAME" mf; then
-  echo "Error: interactive jobs must be launched from the following hosts:"
-  sed 's/^/  /; s/:2//' mf
-  exit
-fi
 cd "$rundir"
 echo "\$( date ): $code started" >> log
 $pre

@@ -156,7 +156,7 @@ integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, onpass, nc, ic, ir, iz, mpio
 logical :: dofault, fault, cell
 
 ! Debug
-if ( master .and. ( it == 0 .or. debug == 2 ) ) write( 0, '(a,i2)' ) 'Output pass', pass
+if ( master .and. ( it == 0 .or. debug == 2 ) ) write( 0, '(a,i2)' ) ' Output pass', pass
 if ( debug == 10 .and. ip < 10 .and. nt < 10 ) then
 i = 1000 * ( it + 1 ) + ip
 select case( pass )

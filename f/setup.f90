@@ -25,9 +25,9 @@ nl = nn / np
 where ( modulo( nn, np ) /= 0 ) nl = nl + 1
 nhalo = 1
 if ( i /= 0 ) then
+  nl(i) = max( 2, nl(i) )
   if ( modulo( ihypo(i), nl(i) ) == 0 ) nhalo(i) = 2
 end if
-nl = max( nl, nhalo )
 np = nn / nl
 where ( modulo( nn, nl ) /= 0 ) np = np + 1
 call rank( ip, ip3, np )

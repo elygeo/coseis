@@ -9,7 +9,7 @@ use m_collective
 use m_diffnc
 use m_bc
 use m_util
-integer :: i, k, l
+integer :: i
 
 if ( master ) write( 0, * ) 'Resample material model'
 

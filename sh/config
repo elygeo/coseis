@@ -27,23 +27,22 @@ ifort)
   oflags='-O'
   ;;
 pgf90)
-  gflags='-O -g -Ktrap=fp -Mbounds -Mdclchk'
+  getarg='getarg-pgf.f90'
   gflags='-g -Ktrap=fp -Mbounds -Mdclchk'
   oflags='-fast'
-  getarg='getarg-pgf.f90'
   ;;
 gfortran)
   gflags='-pg -g -Wall -std=f95 -pedantic -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
   gflags='-g -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
-  gflags='-O0 -g -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
   oflags='-O3'
   oflags='-O'
   ;;
 f95)
-  gflags='-O -g'
+  gflags='-g'
   oflags='-O'
   if [ $( uname ) = SunOS ]; then
-    gflags='-O -g -w4 -u -C'
+    getarg='getarg.f90'
+    gflags='-g -w4 -u -C'
     oflags='-fast'
   fi
   ;;
