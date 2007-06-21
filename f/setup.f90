@@ -10,12 +10,10 @@ use m_util
 integer :: nl(3), n(3), i
 
 ! Hypocenter & halo
-nhalo = itswap
 n = nn
 i = abs( faultnormal )
 if ( i /= 0 ) then
-  n(i) = n(i) - 1
-  nhalo(i) = nhalo(i) + 1
+  nhalo(i) = 2
 end if
 where ( ihypo == 0 ) ihypo = ( n + 1 ) / 2
 where ( ihypo <  0 ) ihypo = ihypo + nn + 1
@@ -23,9 +21,15 @@ if ( any( ihypo < 0 .or. ihypo > nn ) ) stop 'ihypo out of bounds'
 
 ! Partition for parallelization
 if ( np0 == 1 ) np = 1
-nl = nn / np; where ( modulo( nn, np ) /= 0 ) nl = nl + 1
+nl = nn / np
+where ( modulo( nn, np ) /= 0 ) nl = nl + 1
+nhalo = 1
+if ( i /= 0 ) then
+  if ( modulo( ihypo(i), nl(i) ) == 0 ) nhalo(i) = 2
+end if
 nl = max( nl, nhalo )
-np = nn / nl; where ( modulo( nn, nl ) /= 0 ) np = np + 1
+np = nn / nl
+where ( modulo( nn, nl ) /= 0 ) np = np + 1
 call rank( ip, ip3, np )
 nnoff = nl * ip3 - nhalo
 

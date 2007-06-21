@@ -21,6 +21,7 @@ if ( debug /= 0 ) then
   write( str, '(a,i6.6,a)' ) 'debug/db', ip, '.m'
   open( 1, file=str, status='replace' )
   write( 1, '(a)'             ) '% SORD debug info'
+  write( 1, '(a,i8,a)'        ) '  debug  =  ', debug,  ' ;'
   write( 1, '(a,i8,a)'        ) '  master =  ', i,      ' ;'
   write( 1, '(a,i8,a)'        ) '  ip     =  ', ip,     ' ;'
   write( 1, '(a,i8,a)'        ) '  ifn    =  ', ifn,    ' ;'
@@ -85,7 +86,6 @@ write( 1, '(a,3g15.7)'   ) '                 ', affine(4:6)
 write( 1, '(a,3g15.7,a)' ) '                 ', affine(7:9),    ' ];'
 write( 1, '(a,i8,a)'     ) '  nt          =  ', nt,             ' ;'
 write( 1, '(a,i8,a)'     ) '  itcheck     =  ', itcheck,        ' ;'
-write( 1, '(a,i8,a)'     ) '  itswap      =  ', itswap,         ' ;'
 write( 1, '(a,i8,a)'     ) '  fixhypo     =  ', fixhypo,        ' ;'
 write( 1, '(a,i8,a)'     ) '  npml        =  ', npml,           ' ;'
 write( 1, '(a,i8,a)'     ) '  oplevel     =  ', oplevel,        ' ;'

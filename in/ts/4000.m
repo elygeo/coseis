@@ -21,8 +21,8 @@
   itcheck = 100;
   datadir = 'ts/4000/data';
 
+
   debug = 1;
-  itswap = 2;
   np = [ 1 1 2 ]
   dx = 4000.;
   dt = .24;

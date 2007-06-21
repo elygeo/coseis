@@ -46,12 +46,6 @@ if ( it == 0 ) then
   if ( sync ) call barrier ; call output( 2 )     ; prof0(15) = timer( 1 )
 end if
 
-! Debug parallel
-if ( debug == 10 .and. ip == 0 ) then
-  i = i1core(1)
-  w1(i,:,:,1) = 1.
-end if
-
 ! Main loop
 if ( sync ) call barrier ; prof0(16) = timer( 3 )
 if ( master ) write( 0, * ) 'Main loop'
@@ -65,15 +59,12 @@ do while ( it < nt )
     if ( modulo( it, 50 ) == 0 .or. it == nt ) write( 0, '(i6)' ) it
   end if
   if ( sync ) call barrier ; call stress
-  if ( sync ) call barrier ; call momentsource ; prof1(i) = timer( 1 )
-  if ( sync ) call barrier ; call output( 1 )  ; prof2(i) = timer( 1 )
-  if ( sync ) call barrier ; call acceleration ; prof1(i) = prof1(i) + timer( 1 )
-  if ( modulo( it, itswap ) == 0 ) then
-    if ( sync ) call barrier ; call vectorswaphalo( w1, nhalo )
-  end if
-  prof3(i) = timer( 1 )
+  if ( sync ) call barrier ; call momentsource     ; prof1(i) = timer( 1 )
+  if ( sync ) call barrier ; call output( 1 )      ; prof2(i) = timer( 1 )
+  if ( sync ) call barrier ; call acceleration     ; prof1(i) = prof1(i) + timer( 1 )
+  if ( sync ) call barrier ; call vectorswaphalo( w1, nhalo ) ; prof3(i) = timer( 1 )
   if ( sync ) call barrier ; call fault
-  if ( sync ) call barrier ; call locknodes ; prof1(i) = prof1(i) + timer( 1 )
+  if ( sync ) call barrier ; call locknodes        ; prof1(i) = prof1(i) + timer( 1 )
   if ( sync ) call barrier ; call output( 2 )
   if ( modulo( it, itcheck ) == 0 ) then
     if ( sync ) call barrier ; call writecheckpoint

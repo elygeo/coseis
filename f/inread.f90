@@ -72,7 +72,6 @@ case( 'trelax' );       read( str, *, iostat=io ) trelax
 case( 'svtol' );        read( str, *, iostat=io ) svtol
 case( 'np' );           read( str, *, iostat=io ) np
 case( 'itcheck' );      read( str, *, iostat=io ) itcheck
-case( 'itswap' );       read( str, *, iostat=io ) itswap
 case( 'debug' );        read( str, *, iostat=io ) debug
 case( 'mpin' );         read( str, *, iostat=io ) mpin
 case( 'mpout' );        read( str, *, iostat=io ) mpout

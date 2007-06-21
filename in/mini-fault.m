@@ -2,7 +2,6 @@
 
   nt = 5;
   debug = 1;
-  itswap = 2;
   faultnormal = 2;
   np = [ 1 2 1 ];
   nn = [ 6 10 6 ];

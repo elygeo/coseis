@@ -1,15 +1,13 @@
 % Test
 
-% affine = [ 1 0 0   1 1 0   0 0 1   1 ];
 
-  debug = 10;
-  itswap = 2;
-  np = [ 2 1 1 ];
-  nn = [ 4 2 2 ];
+  debug = 1;
+  np = [ 2 3 1 ];
+  nn = [ 5 2 2 ];
 
   hourglass = [ 0. 0. ];
 
-  nt = 2;
+  nt = 10;
   dx = 100;
   dt = .0075;
   bc1 = [ 0 0 0 ];
@@ -20,7 +18,8 @@
   moment2 = [ 0. 0. 0. ];
   ihypo = [ 1 1 1 ];
   fixhypo = 2;
-% rsource = 50.;
+  affine = [ 1 0 0   1 1 0   0 0 1   1 ];
+  rsource = 50.;
   out = { 'x' 1  1 1 1 0   -1 -1 -1 -1 };
   out = { 'rho' 1  1 1 1 0   -1 -1 -1 -1 };
   out = { 'vp' 1  1 1 1 0   -1 -1 -1 -1 };
