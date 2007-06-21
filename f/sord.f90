@@ -53,7 +53,7 @@ if ( master ) call rwrite1( 'prof/main', prof0 )
 i = itio
 do while ( it < nt )
   it = it + 1
-  i = modulo( it, itio ) + 1
+  i = modulo( it - 1, itio ) + 1
   if ( sync ) call barrier ; call timestep
   if ( sync ) call barrier ; call stress
   if ( sync ) call barrier ; call momentsource ; prof1(i) = timer( 1 )

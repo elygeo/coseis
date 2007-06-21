@@ -306,7 +306,7 @@ if [ "$velmodel" ]; then
   *)        . "$srcdir/sh/default"  ;;
   esac
   if [ "$run" ]; then
-    echo "SCECVM"
+    echo ./run "-$run"
     ./run "-$run"
   fi
   cd "$topdir"
@@ -330,7 +330,7 @@ echo "$(date): setup finished" >> log
 
 # Run SORD
 if [ "$run" ]; then
-  echo "SORD"
+  echo ./run "-$run"
   ./run "-$run"
 fi
 
