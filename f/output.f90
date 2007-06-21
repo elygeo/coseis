@@ -189,8 +189,8 @@ if ( it > 0 ) then
     !if ( any( vstats > huge( rr ) ) ) stop 'unstable solution'
     if ( modulo( it, itio ) == 0 .or. it == nt ) then
       call rreduce2( gvstats, vstats, 'max', 0 )
-      gvstats = sqrt( gvstats )
       if ( master ) then
+        gvstats = sqrt( gvstats )
         call rwrite1( 'stats/vmax', gvstats(:i,1), it )
         call rwrite1( 'stats/wmax', gvstats(:i,2), it )
         call rwrite1( 'stats/umax', gvstats(:i,3), it )
