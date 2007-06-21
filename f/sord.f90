@@ -52,20 +52,17 @@ if ( master ) write( 0, * ) 'Main loop'
 if ( master ) call rwrite1( 'prof/main', prof0 )
 i = itio
 do while ( it < nt )
+  it = it + 1
   i = modulo( it, itio ) + 1
   if ( sync ) call barrier ; call timestep
-  if ( master ) then
-    write( 0, '(a)', advance='no' ) '.'
-    if ( modulo( it, 50 ) == 0 .or. it == nt ) write( 0, '(i6)' ) it
-  end if
   if ( sync ) call barrier ; call stress
-  if ( sync ) call barrier ; call momentsource     ; prof1(i) = timer( 1 )
-  if ( sync ) call barrier ; call output( 1 )      ; prof2(i) = timer( 1 )
-  if ( sync ) call barrier ; call acceleration     ; prof1(i) = prof1(i) + timer( 1 )
-  if ( sync ) call barrier ; call vectorswaphalo( w1, nhalo ) ; prof3(i) = timer( 1 )
+  if ( sync ) call barrier ; call momentsource ; prof1(i) = timer( 1 )
+  if ( sync ) call barrier ; call output( 1 )  ; prof2(i) = timer( 1 )
+  if ( sync ) call barrier ; call acceleration
   if ( sync ) call barrier ; call fault
-  if ( sync ) call barrier ; call locknodes        ; prof1(i) = prof1(i) + timer( 1 )
-  if ( sync ) call barrier ; call output( 2 )
+  if ( sync ) call barrier ; call locknodes    ; prof1(i) = prof1(i) + timer( 1 )
+  if ( sync ) call barrier ; call output( 2 )  ; prof2(i) = prof2(i) + timer( 1 )
+  if ( sync ) call barrier ; call vectorswaphalo( w1, nhalo ) ; prof3(i) = timer( 1 )
   if ( modulo( it, itcheck ) == 0 ) then
     if ( sync ) call barrier ; call writecheckpoint
   end if

@@ -11,9 +11,9 @@ integer :: nl(3), n(3), i
 
 ! Hypocenter & halo
 n = nn
-i = abs( faultnormal )
-if ( i /= 0 ) then
-  nhalo(i) = 2
+ifn = abs( faultnormal )
+if ( ifn /= 0 ) then
+  nhalo(ifn) = 2
 end if
 where ( ihypo == 0 ) ihypo = ( n + 1 ) / 2
 where ( ihypo <  0 ) ihypo = ihypo + nn + 1
@@ -24,9 +24,9 @@ if ( np0 == 1 ) np = 1
 nl = nn / np
 where ( modulo( nn, np ) /= 0 ) nl = nl + 1
 nhalo = 1
-if ( i /= 0 ) then
-  nl(i) = max( 2, nl(i) )
-  if ( modulo( ihypo(i), nl(i) ) == 0 ) nhalo(i) = 2
+if ( ifn /= 0 ) then
+  nl(ifn) = max( 2, nl(ifn) )
+  if ( modulo( ihypo(ifn), nl(ifn) ) == 0 ) nhalo(ifn) = 2
 end if
 np = nn / nl
 where ( modulo( nn, nl ) /= 0 ) np = np + 1
@@ -44,8 +44,8 @@ nl = min( nl, nn - nnoff - nhalo )
 nm = nl + 2 * nhalo
 
 ! Boundary conditions
-if ( faultnormal /= 0 ) then
-  if ( ihypo(i) == nn(i) ) bc2(i) = -2
+if ( ifn /= 0 ) then
+  if ( ihypo(ifn) == nn(ifn) ) bc2(ifn) = -2
 end if
 ibc1 = bc1
 ibc2 = bc2
@@ -79,9 +79,8 @@ if ( any( i1pml > i2pml ) ) stop 'model too small for PML'
 
 ! Map hypocenter to local index, test if fault on this process
 ihypo = ihypo - nnoff
-ifn = 0
-if ( faultnormal /= 0 ) then
-  if ( ihypo(i) >= 1 .and. ihypo(i) < nm(i) ) ifn = abs( faultnormal )
+if ( ifn /= 0 ) then
+  if ( ihypo(ifn) < 2 .or. ihypo(ifn) > nm(ifn) - 2 ) ifn = 0
 end if
 
 ! Synchronize processes if debugging

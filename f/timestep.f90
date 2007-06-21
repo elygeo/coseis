@@ -8,7 +8,15 @@ use m_globals
 use m_util
 integer :: j, k, l
 
-if ( master .and. debug == 2 ) write( 0, * ) 'Time step', it + 1
+! Status
+if ( master ) then
+  if ( debug == 2 ) then
+    write( 0, * ) 'Time step', it
+  else
+    write( 0, '(a)', advance='no' ) '.'
+    if ( modulo( it, 50 ) == 0 .or. it == nt ) write( 0, '(i6)' ) it
+  end if
+end if
 
 ! Save previous slip velocity
 if ( ifn /= 0 ) then
@@ -24,7 +32,6 @@ if ( ifn /= 0 ) then
 end if
 
 ! Time integration
-it = it + 1
 tm = it * dt
 vv = vv + dt * w1
 uu = uu + dt * vv
