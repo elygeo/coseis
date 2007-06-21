@@ -22,12 +22,12 @@
   datadir = 'ts/4000/data';
 
 
-  debug = 2;
-  np = [ 3 3 2 ]
+  debug = 1;
+  np = [ 1 1 2 ]
   dx = 4000.;
   dt = .24;
   trelax = 2.4;
-  nt = 0;
+  nt = 10;
   nn = [  151   77  21 ];
   fixhypo = 1;
   ihypo = [   69   51  -2 ];
