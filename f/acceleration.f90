@@ -11,7 +11,7 @@ use m_bc
 use m_util
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq
 
-if ( master .and. debug > 1 ) write( 0, * ) 'Acceleration'
+if ( master .and. debug == 2 ) write( 0, * ) 'Acceleration'
 call scalarsethalo( s1, 0., i1node, i2node )
 
 ! Loop over component and derivative direction
@@ -144,6 +144,17 @@ end do
 
 ! Boundary conditions
 call vectorbc( w1, ibc1, ibc2, nhalo )
+
+! Debug parallel
+if ( debug == 10 .and. ip < 10 .and. nt < 10 ) then
+do l = 1, nm(3)
+do k = 1, nm(2)
+  write( 310+1000*it+ip, * ) w1(:,k,l,1)
+  write( 320+1000*it+ip, * ) w1(:,k,l,2)
+  write( 330+1000*it+ip, * ) w1(:,k,l,3)
+end do
+end do
+end if
 
 end subroutine
 

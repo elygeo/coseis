@@ -1,20 +1,21 @@
 % Extract 4D slice from saved data
 
 function [ f, i3, i4 ] = read4d( varargin )
-meta
 
+meta
+f = [];
+i3 = [];
+i4 = [];
 iz = varargin{1};
 if ( ischar( iz ) )
   field = iz;
-  found = 1;
-  for iz = 1:nout
-  if strcmp( field, out{iz}{2} ), break, end
-    found = 0;
-  end
+  for iz = 1:length( out )
+    found = strcmp( field, out{iz}{2} );
+    if found, break, end
   end
   if ~found, return, end
 end
-
+n = [ nn nt ];
 nc    = out{iz}{1};
 field = out{iz}{2};
 dit   = out{iz}{3};
@@ -27,15 +28,14 @@ case 1
   i4 = i2;
   if any( i3(1:3) ~= i4(1:3) ), i3(4) = i4(4); end
 case 2
-  i3 = varagin{2};
-  i4 = varagin{2};
+  i3 = varargin{2};
+  i4 = varargin{2};
   i = i3 == 0;
   i3(i) = i1(i);
   i4(i) = i2(i);
 case 3
   i3 = varargin{2};
   i4 = varargin{3};
-  n = [ nn nt ];
   shift = [ 0 0 0 0 ];
   if faultnormal, shift( abs( faultnormal) ) = 1; end
   m0 = i3(1:3) == 0 & i4(1:3) == 0;
@@ -56,18 +56,18 @@ end
 % Read data
 i0 = ( i3 - i1 ) ./ [ 1 1 1 dit ];
 m = i2 - i1 + 1;
+n = i4 - i3 + 1;
 i = [ find( m~=1 ) find( m==1 ) ];
 i0 = i0(i);
 m = m(i);
 n = n(i);
-if ic == 0, ic = 1:nc; end
-n = [ n length( ic ) ];
+n = [ n nc ];
 f = zeros( n );
 skip = 4 * ( m(1) - n(1) );
 block = sprintf( '%d*float32', n(1) );
-for l = 1:n(5)
+for l = 1:nc
   if dirfmt, file = sprintf( [ dirfmt field ], iz ); end
-  if nc > 1, file = sprintf( [ file '%1d' ], ic(l) ); end
+  if nc > 1, file = sprintf( [ file '%1d' ], l ); end
   fid = fopen( file, 'r', endian );
   if ( fid == -1 ), error( [ 'Error opening file: ' file ] ), end
   for k = 1:n(4)

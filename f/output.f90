@@ -156,7 +156,7 @@ integer :: i1(3), i2(3), i3(3), i4(3), i, onpass, nc, ic, ir, iz, mpio
 logical :: dofault, fault, cell
 
 ! Debug
-if ( master .and. ( it == 0 .or. debug > 1 ) ) write( 0, * ) 'Output pass', it, pass
+if ( master .and. ( it == 0 .or. debug == 2 ) ) write( 0, * ) 'Output pass', it, pass
 
 ! Test for fault
 dofault = .false.
@@ -184,7 +184,6 @@ if ( it > 0 ) then
     call scalarsethalo( s2, -1., i1core, i2core )
     vstats(i,3) = maxval( s1 )
     vstats(i,4) = maxval( s2 )
-print *, it, ip, maxval( s2 ), maxloc( s2 )
     !if ( any( vstats > huge( rr ) ) ) stop 'unstable solution'
     if ( modulo( it, itio ) == 0 .or. it == nt ) then
       call rreduce2( gvstats, vstats, 'max', 0 )
@@ -299,7 +298,7 @@ do ic = 1, nc
     i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
     if ( any( i1 /= i3 .or. i2 /= i4 ) ) write( str, '(a,i6.6)' ) trim( str ), i
   end if
-  if ( debug > 2 ) write( 0, * ) ip, 'Writing: ', trim( str ), ir
+  if ( debug == 3 ) write( 0, * ) ip, 'Writing: ', trim( str ), ir
   select case( fieldout(iz) )
   case( 'x'    ); call vectorio( iz, str, rr, w1,   i1, i2, i3, i4, ic,   ir, mpio )
   case( 'rho'  ); call scalario( iz, str, rr, mr,   i1, i2, i3, i4,       ir, mpio )

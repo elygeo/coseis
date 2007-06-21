@@ -35,6 +35,7 @@ pgf90)
 gfortran)
   gflags='-pg -g -Wall -std=f95 -pedantic -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
   gflags='-g -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
+  gflags='-O0 -g -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
   oflags='-O3'
   oflags='-O'
   ;;

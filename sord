@@ -19,7 +19,7 @@ case "$opt" in
   n) setup= ; run= ;;
   v) velmodel=y ;;
   m) machine="$OPTARG" ;;
-  d) rm -rf run/* ;;
+  d) rm -rf run/[0-9][0-9] ;;
   f) rm -rf tmp/* ;;
   *) exit 1 ;;
 esac
@@ -236,9 +236,10 @@ cd "$rundir"
 chmod a-w 'in.m'
 rundir=$( /bin/pwd )
 mkdir out
+mkdir prof
 mkdir stats
-mkdir checkpoint
 mkdir debug
+mkdir checkpoint
 
 # Write run metadata
 cat << END > runmeta.m

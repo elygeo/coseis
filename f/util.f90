@@ -147,7 +147,10 @@ integer :: i, n, i0
 n = size( val, 1 )
 i0 = 0
 if ( present( it ) ) i0 = it - n
-if ( i0 < 0 ) stop 'error in rwrite1'
+if ( i0 < 0 ) then
+  write ( 0, * )  'Error writing ', trim( str ), it, n
+  stop
+end if
 if ( modulo( i0, n ) == 0 ) then
   inquire( iolength=i ) val
   if ( i0 == 0 ) then

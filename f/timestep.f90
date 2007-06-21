@@ -8,7 +8,7 @@ use m_globals
 use m_util
 integer :: j, k, l
 
-if ( master .and. debug > 1 ) write( 0, * ) 'Time step', it + 1
+if ( master .and. debug == 2 ) write( 0, * ) 'Time step', it + 1
 
 ! Save previous slip velocity
 if ( ifn /= 0 ) then

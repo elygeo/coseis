@@ -60,7 +60,6 @@ end do
 
 ! Normalize and divide by cell volume
 call rreduce( allsumsrcfr, sumsrcfr, 'allsum', 0 )
-print *, ip, allsumsrcfr
 if ( allsumsrcfr <= 0. ) stop 'bad source space function'
 srcfr = srcfr / allsumsrcfr / cellvol
 
@@ -75,7 +74,7 @@ integer :: i, j, k, l, ic, nsrc
 real :: srcft
 
 if ( rsource <= 0. ) return
-if ( master .and. debug > 1 ) write( 0, * ) 'Moment source'
+if ( master .and. debug == 2 ) write( 0, * ) 'Moment source'
 
 ! Source time function
 select case( tfunc )
