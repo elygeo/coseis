@@ -296,7 +296,7 @@ if [ "$velmodel" ]; then
   code="scecvm"
   bin="./scecvm4-$mode nc rlon rlat rdep rho vp vs"
   post="mv endian meta.m ts1 x1 x2 x3 rho vp vs $rundir/data"
-  walltime="00:30:00"
+  walltime="01:00:00"
   topdir="$rundir"
   rundir="$topdir/scecvm"
   case $machine in
