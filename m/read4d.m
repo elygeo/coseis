@@ -39,15 +39,13 @@ case 2
     i3(4) = varargin{2};
     i4(4) = varargin{2};
   else
-    m0 = 0 == varargin{2};
-    m0 = 0 >  varargin{2};
-    i3(m0) = i1(m0);
-    i4(m0) = i2(m0);
-    i3(m1) = i3(m1) + n(m1) + 1;
-    i4(m1) = i4(m1) + n(m1) + 1;
-  end
-  if any( i3(1:3) ~= i4(1:3) )
-    i3(4) = i4(4);
+    ii = varargin{2};
+    m1 = ii > 0;
+    m2 = ii < 0;
+    i3(m1) = ii(m1);
+    i4(m1) = ii(m1);
+    i3(m2) = ii(m2) + n(m2) + 1;
+    i4(m2) = ii(m2) + n(m2) + 1;
   end
 case 3
   i3 = varargin{2};
@@ -68,6 +66,9 @@ case 3
   i3(m3) = i3(m3) + n(m3) + 1;
   i4(m4) = i4(m4) + n(m4) + 1;
 otherwise, error
+end
+if any( i3(1:3) ~= i4(1:3) )
+  i3(4) = i4(4);
 end
 
 if any( i3 > i4 | i3 < i1 | i4 > i2 ) || mod( i3(4) - i1(4), dit ) ~= 0 
