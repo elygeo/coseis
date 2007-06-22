@@ -1,6 +1,6 @@
 % Extract 4D slice from saved data
 
-function [ f, i3, i4 ] = read4d( varargin )
+function [ f, iz ] = read4d( varargin )
 
 format compact
 meta
@@ -23,7 +23,7 @@ dit   = out{iz}{3};
 i1 = [ out{iz}{4:7}  ];
 i2 = [ out{iz}{8:11} ];
 if dit == 0
-  dit = 1
+  dit = 1;
   i1(4) = 0;
   i2(4) = 0;
 end
@@ -59,15 +59,14 @@ case 3
   i4(m4) = i4(m4) + n(m4) + 1;
 otherwise, error
 end
-test = any( i3 < i1 | i4 > i2 | i3 > n | i4 > n | i1 > i2 | i3 > i4 );
-if test
+
+if any( i3 < i1 | i4 > i2 | i3 > n | i4 > n | i1 > i2 | i3 > i4 );
   disp( [ 'no data found for ' field ] )
   return
 end
 
 % Read data
-dit
-i0 = ( i3 - i1 ) ./ [ 1 1 1 dit ]
+i0 = ( i3 - i1 ) ./ [ 1 1 1 dit ];
 m = i2 - i1 + 1;
 n = i4 - i3 + 1;
 i = [ find( m~=1 ) find( m==1 ) ];
