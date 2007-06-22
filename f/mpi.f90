@@ -330,7 +330,7 @@ if ( n(i) == 1 ) then
   nl(i:) = (/ nl(i+1:), 1 /)
 end if
 end do
-if ( mpio < 0 ) then ! collapes dimension if all on one proc
+if ( mpio > 0 ) then ! collapes dimension if all on one proc
   do i = 1, ndims-1
   if ( n(i) == nl(i) ) then
     ndims = ndims - 1
@@ -416,7 +416,7 @@ if ( n(i) == 1 ) then
   nl(i:) = (/ nl(i+1:), 1 /)
 end if
 end do
-if ( mpio < 0 ) then ! collapes dimension if all on one proc
+if ( mpio > 0 ) then ! collapes dimension if all on one proc
   do i = 1, ndims-1
   if ( n(i) == nl(i) ) then
     ndims = ndims - 1
