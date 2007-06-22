@@ -1,27 +1,31 @@
-% Extract 4D slice from saved data
+% Extract 4D slice from SORD output
 
-function [ f, iz ] = read4d( varargin )
+function [ f, izone ] = read4d( varargin )
 
 format compact
 meta
 f = [];
-i3 = [];
-i4 = [];
-iz = varargin{1};
-if ( ischar( iz ) )
-  field = iz;
-  for iz = 1:length( out )
-    found = strcmp( field, out{iz}{2} );
-    if found, break, end
+izone = 0;
+if ( isnumeric( varargin{1} ) )
+  izone = varargin{1};
+  field = out{izone}{2};
+else
+  field = varargin{1};
+  for i = 1:length( out )
+  if strcmp( field, out{i}{2} )
+    izone = i;
+    break
   end
-  if ~found, return, end
+  end
 end
+if ~izone, return, end
 n = [ nn nt ];
-nc    = out{iz}{1};
-field = out{iz}{2};
-dit   = out{iz}{3};
-i1 = [ out{iz}{4:7}  ];
-i2 = [ out{iz}{8:11} ];
+nc  = out{izone}{1};
+dit = out{izone}{3};
+i1 = [ out{izone}{4:7} ];
+i2 = [ out{izone}{8:11} ];
+i3 = i1;
+i4 = i2;
 if dit == 0
   dit = 1;
   i1(4) = 0;
@@ -30,22 +34,28 @@ end
 
 switch nargin
 case 1
-  i3 = i1;
-  i4 = i2;
-  if any( i3(1:3) ~= i4(1:3) ), i3(4) = i4(4); end
 case 2
-  i3 = varargin{2};
-  i = i3 < 0;
-  i3(i) = i3(i) + n(i) + 1;
-  i4 = i3;
-  i = i3 == 0;
-  i3(i) = i1(i);
-  i4(i) = i2(i);
+  if ( length( varargin{2} ) == 1 )
+    i3(4) = varargin{2};
+    i4(4) = varargin{2};
+  else
+    m0 = 0 == varargin{2};
+    m0 = 0 >  varargin{2};
+    i3(m0) = i1(m0);
+    i4(m0) = i2(m0);
+    i3(m1) = i3(m1) + n(m1) + 1;
+    i4(m1) = i4(m1) + n(m1) + 1;
+  end
+  if any( i3(1:3) ~= i4(1:3) )
+    i3(4) = i4(4);
+  end
 case 3
   i3 = varargin{2};
   i4 = varargin{3};
   shift = [ 0 0 0 0 ];
-  if faultnormal, shift( abs( faultnormal) ) = 1; end
+  if faultnormal
+    shift( abs( faultnormal) ) = 1;
+  end
   m0 = i3(1:3) == 0 & i4(1:3) == 0;
   m1 = i3(1:3) == 0 & i4(1:3) ~= 0;
   m2 = i3(1:3) ~= 0 & i4(1:3) == 0;
@@ -60,15 +70,16 @@ case 3
 otherwise, error
 end
 
-if any( i3 < i1 | i4 > i2 | i3 > n | i4 > n | i1 > i2 | i3 > i4 );
+if any( i3 > i4 | i3 < i1 | i4 > i2 ) || mod( i3(4) - i1(4), dit ) ~= 0 
   disp( [ 'no data found for ' field ] )
   return
 end
 
 % Read data
-i0 = ( i3 - i1 ) ./ [ 1 1 1 dit ];
-m = i2 - i1 + 1;
-n = i4 - i3 + 1;
+di = [ 1 1 1 dit ];
+i0 = ( i3 - i1 ) ./ di;
+m = ( i2 - i1 ) ./ di + 1;
+n = ( i4 - i3 ) ./ di + 1;
 i = [ find( m~=1 ) find( m==1 ) ];
 i0 = i0(i);
 m = m(i);
@@ -79,7 +90,7 @@ skip = 4 * ( m(1) - n(1) );
 block = sprintf( '%d*float32', n(1) );
 for l = 1:nc
   file = field;
-  if dirfmt, file = sprintf( [ dirfmt field ], iz ); end
+  if dirfmt, file = sprintf( [ dirfmt field ], izone ); end
   if nc > 1, file = sprintf( [ file '%1d' ], l ); end
   fid = fopen( file, 'r', endian );
   if ( fid == -1 ), error( [ 'Error opening file: ' file ] ), end
