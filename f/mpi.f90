@@ -46,7 +46,7 @@ ipout = ip
 do i = 1, 3
   call mpi_comm_split( comm3d, ip3(i), 0, comm2d(i), e )
 end do
-fh = mpi_undefined
+filehandles = mpi_undefined
 end subroutine
 
 ! Set master process
@@ -300,7 +300,9 @@ fh = filehandles(i)
 if ( fh == mpi_undefined ) then
   call mpopen( fh, id, mpio, str, i1, i2, i3, i4, nr, ir )
   filehandles(i) = fh
+  if ( any( i3 > i4 ) ) return
 end if
+if ( any( i3 > i4 ) ) stop 'error in scalario'
 i0 = i3 - 1
 nl = i4 - i3 + 1
 n = (/ size(s1,1), size(s1,2), size(s1,3) /)
@@ -326,7 +328,7 @@ use mpi
 real, intent(inout) :: r, w1(:,:,:,:)
 integer, intent(in) :: id, mpio, ic, i1(3), i2(3), i3(3), i4(3), nr, ir
 character(*), intent(in) :: str
-integer :: i, id, mtype, nl(3), n(3), i0(3), e
+integer :: i, fh, mtype, nl(3), n(3), i0(3), e
 if ( id == 0 ) return
 if ( id > 0 .and. all( i1 == i2 ) ) then
   r = w1(i1(1),i1(2),i1(3),ic)
@@ -341,7 +343,9 @@ fh = filehandles(i)
 if ( fh == mpi_undefined ) then
   call mpopen( fh, id, mpio, str, i1, i2, i3, i4, nr, ir )
   filehandles(i) = fh
+  if ( any( i3 > i4 ) ) return
 end if
+if ( any( i3 > i4 ) ) stop 'error in vectorio'
 i0 = i3 - 1
 nl = i4 - i3 + 1
 n = (/ size(w1,1), size(w1,2), size(w1,3) /)
@@ -361,7 +365,7 @@ call mpi_type_free( mtype, e )
 end subroutine
 
 ! Open file with MPIIO
-subroutine mpopen( id, mpio, str, i1, i2, i3, i4, nr, ir, fh )
+subroutine mpopen( fh, id, mpio, str, i1, i2, i3, i4, nr, ir )
 use mpi
 integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), nr, ir
 integer, intent(out) :: fh
@@ -376,7 +380,8 @@ if ( any( i3 > i4 ) ) then
   fh = mpi_file_null
   return
 end if
-call mpi_comm_split( comm0, id, 0, comm, e )
+i = abs( id )
+call mpi_comm_split( comm0, i, 0, comm, e )
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
 if ( id < 0 ) then
   i = mpi_mode_rdonly

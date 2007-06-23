@@ -208,7 +208,7 @@ subroutine rio4( id, str, w1, ic, i1, i2, ir )
 real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: id, ic, i1(3), i2(3), ir
 character(*), intent(in) :: str
-integer :: id, nb, io, j1, k1, l1, j2, k2, l2
+integer :: nb, io, j1, k1, l1, j2, k2, l2
 if ( id == 0 .or. ir < 1 .or. any( i1 > i2 ) ) return
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
