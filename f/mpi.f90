@@ -3,7 +3,7 @@ module m_collective
 use m_globals, only: nz
 implicit none
 !integer, private, parameter :: nz = 100
-integer, private :: ip, ipmaster, comm3d, comm2d(3), commin(nz), commout(nz)
+integer, private :: ip, ipmaster, comm3d, comm2d(3), filehandles(6*nz)
 contains
 
 ! Initialize
@@ -46,8 +46,7 @@ ipout = ip
 do i = 1, 3
   call mpi_comm_split( comm3d, ip3(i), 0, comm2d(i), e )
 end do
-commin = mpi_undefined
-commout = mpi_undefined
+fh = mpi_undefined
 end subroutine
 
 ! Set master process
@@ -279,135 +278,118 @@ end if
 end do
 end subroutine
 
-! Scalar field input/output
-subroutine scalario( iz, str, r, s1, i1, i2, i3, i4, ir, mpio )
+! Scalar field component input/output
+subroutine scalario( id, mpio, r, str, s1, i1, i2, i3, i4, nr, ir )
 use m_util
 use mpi
 real, intent(inout) :: r, s1(:,:,:)
-integer, intent(in) :: iz, i1(3), i2(3), i3(3), i4(3), ir, mpio
+integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), nr, ir
 character(*), intent(in) :: str
-integer :: i, ndims, ftype, mtype, fh, nl(3), n(3), i0(3), comm0, comm, e
-integer(kind=mpi_offset_kind) :: dr
-if ( iz == 0 ) return
-if ( iz > 0 .and. all( i1 == i2 ) ) then
+integer :: i, fh, mtype, nl(3), n(3), i0(3), e
+if ( id == 0 ) return
+if ( id > 0 .and. all( i1 == i2 ) ) then
   r = s1(i1(1),i1(2),i1(3))
   return
 end if
 if ( mpio == 0 ) then
-  call rio3( iz, str, s1, i3, i4, ir )
+  call rio3( id, str, s1, i3, i4, ir )
   return
 end if
-i = abs( mpio )
-comm0 = comm3d
-if ( i < 4 ) comm0 = comm2d(i)
-if ( iz < 0 ) comm = commin(-iz)
-if ( iz > 0 ) comm = commout(iz)
-if ( ir < 1 .or. any( i3 > i4 ) ) then
-  if ( comm == mpi_undefined ) then
-    call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
-    if ( iz < 0 ) commin(-iz) = comm
-    if ( iz > 0 ) commout(iz) = comm
-  end if
-  return
+i = abs( id )
+fh = filehandles(i)
+if ( fh == mpi_undefined ) then
+  call mpopen( fh, id, mpio, str, i1, i2, i3, i4, nr, ir )
+  filehandles(i) = fh
 end if
-if ( comm == mpi_undefined ) then
-  call mpi_comm_split( comm0, abs( iz ), 0, comm, e )
-  if ( iz < 0 ) commin(-iz) = comm
-  if ( iz > 0 ) commout(iz) = comm
-end if
-call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
-i0 = i3 - i1
-n  = i2 - i1 + 1
-nl = i4 - i3 + 1
-inquire( iolength=i ) r
-dr = i * (ir-1) * n(1) * n(2) * n(3)
-ndims = 3
-do i = ndims, 1, -1 ! squeeze singleton dimentions
-if ( n(i) == 1 ) then
-  ndims = ndims - 1
-  i0(i:) = (/ i0(i+1:), 0 /)
-  n(i:)  = (/ n(i+1:),  1 /)
-  nl(i:) = (/ nl(i+1:), 1 /)
-end if
-end do
-if ( mpio > 0 ) then ! collapes dimension if all on one proc
-  do i = 1, ndims-1
-  if ( n(i) == nl(i) ) then
-    ndims = ndims - 1
-    i0(i:) = (/ i0(i)+n(i)*i0(i+1), i0(i+2:), 0 /)
-    n(i:)  = (/ n(i)*n(i+1),        n(i+2:),  1 /)
-    nl(i:) = (/ nl(i)*nl(i+1),      nl(i+2:), 1 /)
-    exit ! only do this once to prevent 32 bit overrun
-  end if
-  end do
-end if
-if ( ndims < 1 ) ndims = 1
-call mpi_type_create_subarray( ndims, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
-call mpi_type_commit( ftype, e )
 i0 = i3 - 1
-n  = (/ size(s1,1), size(s1,2), size(s1,3) /)
 nl = i4 - i3 + 1
+n = (/ size(s1,1), size(s1,2), size(s1,3) /)
 call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
-if ( iz < 0 ) then
-  call mpi_file_open( comm, str, mpi_mode_rdonly, mpi_info_null, fh, e )
-  call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
+if ( id < 0 ) then
   call mpi_file_read_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
 else
-  i = 0
-  if ( ir == 1 ) i = mpi_mode_create
-  call mpi_file_open( comm, str, mpi_mode_wronly + i, mpi_info_null, fh, e )
-  call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
   call mpi_file_write_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
 end if
-call mpi_file_close( fh, e )
+if ( ir == nr ) then
+  i = abs( id )
+  filehandles(i) = mpi_undefined
+  call mpi_file_close( fh, e )
+end if
 call mpi_type_free( mtype, e )
-call mpi_type_free( ftype, e )
 end subroutine
 
 ! Vector field component input/output
-subroutine vectorio( iz, str, r, w1, i1, i2, i3, i4, ic, ir, mpio )
+subroutine vectorio( id, mpio, r, str, w1, ic, i1, i2, i3, i4, nr, ir )
 use m_util
 use mpi
 real, intent(inout) :: r, w1(:,:,:,:)
-integer, intent(in) :: iz, i1(3), i2(3), i3(3), i4(3), ic, ir, mpio
+integer, intent(in) :: id, mpio, ic, i1(3), i2(3), i3(3), i4(3), nr, ir
 character(*), intent(in) :: str
-integer :: i, ndims, ftype, mtype, fh, nl(3), n(3), i0(3), comm0, comm, e
-integer(kind=mpi_offset_kind) :: dr
-if ( iz == 0 ) return
-if ( iz > 0 .and. all( i1 == i2 ) ) then
+integer :: i, id, mtype, nl(3), n(3), i0(3), e
+if ( id == 0 ) return
+if ( id > 0 .and. all( i1 == i2 ) ) then
   r = w1(i1(1),i1(2),i1(3),ic)
   return
 end if
 if ( mpio == 0 ) then
-  call rio4( iz, str, w1, i3, i4, ic, ir )
+  call rio4( id, str, w1, ic, i3, i4, ir )
   return
 end if
+i = abs( id )
+fh = filehandles(i)
+if ( fh == mpi_undefined ) then
+  call mpopen( fh, id, mpio, str, i1, i2, i3, i4, nr, ir )
+  filehandles(i) = fh
+end if
+i0 = i3 - 1
+nl = i4 - i3 + 1
+n = (/ size(w1,1), size(w1,2), size(w1,3) /)
+call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
+call mpi_type_commit( mtype, e )
+if ( id < 0 ) then
+  call mpi_file_read_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
+else
+  call mpi_file_write_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
+end if
+if ( ir == nr ) then
+  i = abs( id )
+  filehandles(i) = mpi_undefined
+  call mpi_file_close( fh, e )
+end if
+call mpi_type_free( mtype, e )
+end subroutine
+
+! Open file with MPIIO
+subroutine mpopen( id, mpio, str, i1, i2, i3, i4, nr, ir, fh )
+use mpi
+integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), nr, ir
+integer, intent(out) :: fh
+character(*), intent(in) :: str
+integer :: i, ndims, ftype, nl(4), n(4), i0(4), comm0, comm, e
+integer(kind=mpi_offset_kind) :: ir0 = 0
 i = abs( mpio )
 comm0 = comm3d
 if ( i < 4 ) comm0 = comm2d(i)
-if ( iz < 0 ) comm = commin(-iz)
-if ( iz > 0 ) comm = commout(iz)
-if ( ir < 1 .or. any( i3 > i4 ) ) then
-  if ( comm == mpi_undefined ) then
-    call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
-    if ( iz < 0 ) commin(-iz) = comm
-    if ( iz > 0 ) commout(iz) = comm
-  end if
+if ( any( i3 > i4 ) ) then
+  call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
+  fh = mpi_file_null
   return
 end if
-if ( comm == mpi_undefined ) then
-  call mpi_comm_split( comm0, abs( iz ), 0, comm, e )
-  if ( iz < 0 ) commin(-iz) = comm
-  if ( iz > 0 ) commout(iz) = comm
-end if
+call mpi_comm_split( comm0, id, 0, comm, e )
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
-i0 = i3 - i1
-n  = i2 - i1 + 1
-nl = i4 - i3 + 1
-inquire( iolength=i ) r
-dr = i * (ir-1) * n(1) * n(2) * n(3)
-ndims = 3
+if ( id < 0 ) then
+  i = mpi_mode_rdonly
+elseif ( ir == 1 ) then
+  i = mpi_mode_wronly + mpi_mode_create
+else
+  i = mpi_mode_wronly
+end if
+call mpi_file_open( comm, str, i, mpi_info_null, fh, e )
+i0 = (/ i3 - i1    , 0  /)
+n  = (/ i2 - i1 + 1, nr /)
+nl = (/ i4 - i3 + 1, nr /)
+ndims = 4
 do i = ndims, 1, -1 ! squeeze singleton dimentions
 if ( n(i) == 1 ) then
   ndims = ndims - 1
@@ -430,25 +412,7 @@ end if
 if ( ndims < 1 ) ndims = 1
 call mpi_type_create_subarray( ndims, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
-i0 = i3 - 1
-n  = (/ size(w1,1), size(w1,2), size(w1,3) /)
-nl = i4 - i3 + 1
-call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
-call mpi_type_commit( mtype, e )
-if ( iz < 0 ) then
-  call mpi_file_open( comm, str, mpi_mode_rdonly, mpi_info_null, fh, e )
-  call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
-  call mpi_file_read_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
-else
-  i = 0
-  if ( ir == 1 ) i = mpi_mode_create
-  call mpi_file_open( comm, str, mpi_mode_wronly + i, mpi_info_null, fh, e )
-  call mpi_file_set_view( fh, dr, mpi_real, ftype, 'native', mpi_info_null, e )
-  call mpi_file_write_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
-end if
-call mpi_file_close( fh, e )
-call mpi_type_free( mtype, e )
-call mpi_type_free( ftype, e )
+call mpi_file_set_view( fh, ir0, mpi_real, ftype, 'native', mpi_info_null, e )
 end subroutine
 
 end module

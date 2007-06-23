@@ -19,11 +19,10 @@ i2 = nn - nnoff
 i3 = i1node
 i4 = i2node
 if ( grid == 'read' ) then
-  r = 0.
   i = mpin * 4
-  call vectorio( -1, 'data/x1', r, w1, i1, i2, i3, i4, 1, 1, i )
-  call vectorio( -1, 'data/x2', r, w1, i1, i2, i3, i4, 2, 1, i )
-  call vectorio( -1, 'data/x3', r, w1, i1, i2, i3, i4, 3, 1, i )
+  call vectorio( -1, i, r, 'data/x1', w1, 1, i1, i2, i3, i4, 1, 1 )
+  call vectorio( -1, i, r, 'data/x2', w1, 2, i1, i2, i3, i4, 1, 1 )
+  call vectorio( -1, i, r, 'data/x3', w1, 3, i1, i2, i3, i4, 1, 1 )
 end if
 
 ! Single node indexing

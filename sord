@@ -284,7 +284,7 @@ if [ "$velmodel" ]; then
   cp "$srcdir/data/topo3.f32" .
   cp "$srcdir/data/ts-ts1.f32" .
   cp "$srcdir/data/endian0" .
-  echo "Grid"
+  echo "./tsgrid"
   ./tsgrid
   ibig=$( cat ibig )
   nc=$( cat nc )
@@ -296,7 +296,7 @@ if [ "$velmodel" ]; then
   code="scecvm"
   bin="./scecvm4-$mode nc rlon rlat rdep rho vp vs"
   post="mv endian meta.m ts1 x1 x2 x3 rho vp vs $rundir/data"
-  walltime="01:00:00"
+  walltime="02:00:00"
   topdir="$rundir"
   rundir="$topdir/scecvm"
   case $machine in

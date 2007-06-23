@@ -24,7 +24,7 @@ xlf95_r)
 ifort)
   gflags='-p -g -CB -warn -traceback -u'
   oflags='-O'
-  oflags='-O3'
+  oflags='-O3 -override_limits'
   ;;
 pgf90)
   getarg='getarg-pgf.f90'

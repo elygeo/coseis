@@ -152,7 +152,7 @@ use m_util
 integer, intent(in) :: pass
 real, save :: vstats(itio,4), fstats(itio,8), estats(itio,4)
 real :: gvstats(itio,4), gfstats(itio,8), gestats(itio,4), rr
-integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, onpass, nc, ic, ir, iz, mpio
+integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, onpass, nc, ic, nr, ir, iz, id, mpio
 logical :: dofault, fault, cell
 
 ! Debug
@@ -320,7 +320,8 @@ call outprops( fieldout(iz), nc, onpass, fault, cell )
 if ( pass /= onpass ) cycle doiz
 
 ! Indices
-ir = ( it - i1out(iz,4) ) / ditout(iz) + 1
+nr = ( i2out(iz,4) - i1out(iz,4) ) / ditout(iz) + 1
+ir = ( it          - i1out(iz,4) ) / ditout(iz) + 1
 i1 = i1out(iz,1:3)
 i2 = i2out(iz,1:3)
 i3 = max( i1, i1core )
@@ -328,7 +329,6 @@ i4 = min( i2, i2core )
 if ( any( i3 > i4 ) ) then
   i1out(iz,4) = nt + 1
   if ( all( i1 == i2 ) ) cycle doiz
-  nc = 1
 end if
 mpio = mpout * 4
 if ( fault ) then
@@ -343,6 +343,7 @@ end if
 
 ! Binary output
 do ic = 1, nc
+  id = 6 * ( iz - 1 ) + ic
   write( str, '(a,i2.2,a)' ) 'out/', iz, fieldout(iz)
   if ( nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic
   if ( mpout == 0 ) then
@@ -351,43 +352,43 @@ do ic = 1, nc
   end if
   if ( debug == 3 ) write( 0, * ) ip, 'Writing: ', trim( str ), ir
   select case( fieldout(iz) )
-  case( 'x'    ); call vectorio( iz, str, rr, w1,   i1, i2, i3, i4, ic,   ir, mpio )
-  case( 'rho'  ); call scalario( iz, str, rr, mr,   i1, i2, i3, i4,       ir, mpio )
-  case( 'vp'   ); call scalario( iz, str, rr, s1,   i1, i2, i3, i4,       ir, mpio )
-  case( 'vs'   ); call scalario( iz, str, rr, s2,   i1, i2, i3, i4,       ir, mpio )
-  case( 'gam'  ); call scalario( iz, str, rr, gam,  i1, i2, i3, i4,       ir, mpio )
-  case( 'lam'  ); call scalario( iz, str, rr, lam,  i1, i2, i3, i4,       ir, mpio )
-  case( 'mu'   ); call scalario( iz, str, rr, mu,   i1, i2, i3, i4,       ir, mpio )
-  case( 'v'    ); call vectorio( iz, str, rr, vv,   i1, i2, i3, i4, ic,   ir, mpio )
-  case( 'u'    ); call vectorio( iz, str, rr, uu,   i1, i2, i3, i4, ic,   ir, mpio )
-  case( 'w'    );
-   if ( ic < 4 )  call vectorio( iz, str, rr, w1,   i1, i2, i3, i4, ic,   ir, mpio )
-   if ( ic > 3 )  call vectorio( iz, str, rr, w2,   i1, i2, i3, i4, ic-3, ir, mpio )
-  case( 'a'    ); call vectorio( iz, str, rr, w1,   i1, i2, i3, i4, ic,   ir, mpio )
-  case( 'vm2'  ); call scalario( iz, str, rr, s1,   i1, i2, i3, i4,       ir, mpio )
-  case( 'um2'  ); call scalario( iz, str, rr, s1,   i1, i2, i3, i4,       ir, mpio )
-  case( 'wm2'  ); call scalario( iz, str, rr, s2,   i1, i2, i3, i4,       ir, mpio )
-  case( 'am2'  ); call scalario( iz, str, rr, s2,   i1, i2, i3, i4,       ir, mpio )
-  case( 'pv2'  ); call scalario( iz, str, rr, pv,   i1, i2, i3, i4,       ir, mpio )
-  case( 'nhat' ); call vectorio( iz, str, rr, nhat, i1, i2, i3, i4, ic,   ir, mpio )
-  case( 'mus'  ); call scalario( iz, str, rr, mus,  i1, i2, i3, i4,       ir, mpio )
-  case( 'mud'  ); call scalario( iz, str, rr, mud,  i1, i2, i3, i4,       ir, mpio )
-  case( 'dc'   ); call scalario( iz, str, rr, dc,   i1, i2, i3, i4,       ir, mpio )
-  case( 'co'   ); call scalario( iz, str, rr, co,   i1, i2, i3, i4,       ir, mpio )
-  case( 'sv'   ); call vectorio( iz, str, rr, t1,   i1, i2, i3, i4, ic,   ir, mpio )
-  case( 'su'   ); call vectorio( iz, str, rr, t2,   i1, i2, i3, i4, ic,   ir, mpio )
-  case( 'ts'   ); call vectorio( iz, str, rr, t1,   i1, i2, i3, i4, ic,   ir, mpio )
-  case( 'sa'   ); call vectorio( iz, str, rr, t2,   i1, i2, i3, i4, ic,   ir, mpio )
-  case( 'svm'  ); call scalario( iz, str, rr, f1,   i1, i2, i3, i4,       ir, mpio )
-  case( 'sum'  ); call scalario( iz, str, rr, f2,   i1, i2, i3, i4,       ir, mpio )
-  case( 'tsm'  ); call scalario( iz, str, rr, ts,   i1, i2, i3, i4,       ir, mpio )
-  case( 'sam'  ); call scalario( iz, str, rr, f2,   i1, i2, i3, i4,       ir, mpio )
-  case( 'tn'   ); call scalario( iz, str, rr, tn,   i1, i2, i3, i4,       ir, mpio )
-  case( 'fr'   ); call scalario( iz, str, rr, f1,   i1, i2, i3, i4,       ir, mpio )
-  case( 'sl'   ); call scalario( iz, str, rr, sl,   i1, i2, i3, i4,       ir, mpio )
-  case( 'psv'  ); call scalario( iz, str, rr, psv,  i1, i2, i3, i4,       ir, mpio )
-  case( 'trup' ); call scalario( iz, str, rr, trup, i1, i2, i3, i4,       ir, mpio )
-  case( 'tarr' ); call scalario( iz, str, rr, tarr, i1, i2, i3, i4,       ir, mpio )
+  case( 'x'    ); call vectorio( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'rho'  ); call scalario( id, mpio, rr, str, mr,       i1, i2, i3, i4, nr, ir )
+  case( 'vp'   ); call scalario( id, mpio, rr, str, s1,       i1, i2, i3, i4, nr, ir )
+  case( 'vs'   ); call scalario( id, mpio, rr, str, s2,       i1, i2, i3, i4, nr, ir )
+  case( 'gam'  ); call scalario( id, mpio, rr, str, gam,      i1, i2, i3, i4, nr, ir )
+  case( 'lam'  ); call scalario( id, mpio, rr, str, lam,      i1, i2, i3, i4, nr, ir )
+  case( 'mu'   ); call scalario( id, mpio, rr, str, mu,       i1, i2, i3, i4, nr, ir )
+  case( 'v'    ); call vectorio( id, mpio, rr, str, vv, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'u'    ); call vectorio( id, mpio, rr, str, uu, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'w'    );                                                                   
+   if ( ic < 4 )  call vectorio( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, nr, ir )
+   if ( ic > 3 )  call vectorio( id, mpio, rr, str, w2, ic-3, i1, i2, i3, i4, nr, ir )
+  case( 'a'    ); call vectorio( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'vm2'  ); call scalario( id, mpio, rr, str, s1,       i1, i2, i3, i4, nr, ir )
+  case( 'um2'  ); call scalario( id, mpio, rr, str, s1,       i1, i2, i3, i4, nr, ir )
+  case( 'wm2'  ); call scalario( id, mpio, rr, str, s2,       i1, i2, i3, i4, nr, ir )
+  case( 'am2'  ); call scalario( id, mpio, rr, str, s2,       i1, i2, i3, i4, nr, ir )
+  case( 'pv2'  ); call scalario( id, mpio, rr, str, pv,       i1, i2, i3, i4, nr, ir )
+  case( 'nhat' ); call vectorio( id, mpio, rr, str, nhat, ic, i1, i2, i3, i4, nr, ir )
+  case( 'mus'  ); call scalario( id, mpio, rr, str, mus,      i1, i2, i3, i4, nr, ir )
+  case( 'mud'  ); call scalario( id, mpio, rr, str, mud,      i1, i2, i3, i4, nr, ir )
+  case( 'dc'   ); call scalario( id, mpio, rr, str, dc,       i1, i2, i3, i4, nr, ir )
+  case( 'co'   ); call scalario( id, mpio, rr, str, co,       i1, i2, i3, i4, nr, ir )
+  case( 'sv'   ); call vectorio( id, mpio, rr, str, t1, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'su'   ); call vectorio( id, mpio, rr, str, t2, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'ts'   ); call vectorio( id, mpio, rr, str, t1, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'sa'   ); call vectorio( id, mpio, rr, str, t2, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'svm'  ); call scalario( id, mpio, rr, str, f1,       i1, i2, i3, i4, nr, ir )
+  case( 'sum'  ); call scalario( id, mpio, rr, str, f2,       i1, i2, i3, i4, nr, ir )
+  case( 'tsm'  ); call scalario( id, mpio, rr, str, ts,       i1, i2, i3, i4, nr, ir )
+  case( 'sam'  ); call scalario( id, mpio, rr, str, f2,       i1, i2, i3, i4, nr, ir )
+  case( 'tn'   ); call scalario( id, mpio, rr, str, tn,       i1, i2, i3, i4, nr, ir )
+  case( 'fr'   ); call scalario( id, mpio, rr, str, f1,       i1, i2, i3, i4, nr, ir )
+  case( 'sl'   ); call scalario( id, mpio, rr, str, sl,       i1, i2, i3, i4, nr, ir )
+  case( 'psv'  ); call scalario( id, mpio, rr, str, psv,      i1, i2, i3, i4, nr, ir )
+  case( 'trup' ); call scalario( id, mpio, rr, str, trup,     i1, i2, i3, i4, nr, ir )
+  case( 'tarr' ); call scalario( id, mpio, rr, str, tarr,     i1, i2, i3, i4, nr, ir )
   case default
     write( 0, * ) 'error: unknown output field: ', fieldout(iz)
     stop

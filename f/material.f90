@@ -51,13 +51,12 @@ case( 'c' )
   case( 'gam' ); call cube( gam, w2, i3, i4, x1, x2, inval(iz) )
   end select
 case( 'r' )
-  r = 0.
   i = mpin * 4
   select case( fieldin(iz) )
-  case( 'rho' ); call scalario( -iz, 'data/rho', r, mr,  i1, i2, i3, i4, 1, i )
-  case( 'vp'  ); call scalario( -iz, 'data/vp',  r, s1,  i1, i2, i3, i4, 1, i )
-  case( 'vs'  ); call scalario( -iz, 'data/vs',  r, s2,  i1, i2, i3, i4, 1, i )
-  case( 'gam' ); call scalario( -iz, 'data/gam', r, gam, i1, i2, i3, i4, 1, i )
+  case( 'rho' ); call scalario( -1, i, r, 'data/rho', mr,  i1, i2, i3, i4, 1, 1 )
+  case( 'vp'  ); call scalario( -1, i, r, 'data/vp',  s1,  i1, i2, i3, i4, 1, 1 )
+  case( 'vs'  ); call scalario( -1, i, r, 'data/vs',  s2,  i1, i2, i3, i4, 1, 1 )
+  case( 'gam' ); call scalario( -1, i, r, 'data/gam', gam, i1, i2, i3, i4, 1, 1 )
   end select
 end select
 

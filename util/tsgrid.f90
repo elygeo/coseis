@@ -94,7 +94,7 @@ write( 1, * ) ' mud = ', mud, ';'
 write( 1, * ) ' mus = { ', mus, '''zone''', jf0, 0, -1-nf3, jf0+nf1, 0, -1, ' };'
 close( 1 )
 
-! Metadata for plotting
+! Mesh metadata
 open( 1, file='meta.m', status='replace' )
 write( 1, '(a)' ) '% SORD metadata'
 write( 1, * ) ' dx          = ', dx, ';'
@@ -103,6 +103,7 @@ write( 1, * ) ' nt          = 0;'
 write( 1, * ) ' nn          = [ ', n, ' ];'
 write( 1, * ) ' ihypo       = [ ', jf0+j,     kf0, n(3)-l, ' ];'
 write( 1, * ) ' ihypo       = [ ', jf0-j+nf1, kf0, n(3)-l, ' ];'
+write( 1, * ) ' npml        = ', npml, ';'
 write( 1, * ) ' faultnormal = 2;'
 write( 1, * ) ' endian      = ''', endian, ''';'
 write( 1, * ) ' out{1}      = { 3 ''x''    0   1 1 1 0 ', n, ' 0 };'
