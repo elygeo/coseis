@@ -19,6 +19,7 @@ logical :: dofault, fault, cell
 if ( master ) write( 0, * ) 'Output initialization'
 if ( nout > nz ) stop 'too many output zones, make nz bigger'
 if ( itcheck < 1 ) itcheck = itcheck + nt + 1
+if ( itstats < 1 ) itstats = itstats + nt + 1
 if ( modulo( itcheck, itio ) /= 0 ) itcheck = ( itcheck / itio + 1 ) * itio
 nbuff = 0
 ibuff = 0
@@ -276,7 +277,7 @@ i4 = min( i2, i2core )
 j1 = i3(1); j2 = i4(1)
 k1 = i3(2); k2 = i4(2)
 l1 = i3(3); l2 = i4(3)
-if ( fieldout(iz) == 'pv2' ) then
+if ( fieldout(iz) == 'pv2' .and. all( i3 >= i4 ) ) then
   if ( modulo( it, itstats ) /= 0 ) then
     s1(j1:j2,k1:k2,l1:l2) = sum( vv(j1:j2,k1:k2,l1:l2,:) * vv(j1:j2,k1:k2,l1:l2,:), 4 )
   end if
@@ -311,7 +312,7 @@ if ( fault ) then
 end if
 
 ! Magnitudes
-if ( modulo( it, itstats ) /= 0 ) then
+if ( modulo( it, itstats ) /= 0 .and. all( i3 >= i4 ) ) then
   select case( fieldout(iz) )
   case( 'vm2'  )
     s1(j1:j2,k1:k2,l1:l2) = sum( vv(j1:j2,k1:k2,l1:l2,:) * vv(j1:j2,k1:k2,l1:l2,:), 4 )
