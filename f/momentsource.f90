@@ -22,9 +22,7 @@ if ( master ) write( 0, * ) 'Moment source initialize'
 call diffnc( s1, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
 
 ! Hypocenter/cell radius (squared)
-s2 = ( w2(:,:,:,1) - xhypo(1) ) * ( w2(:,:,:,1) - xhypo(1) ) &
-   + ( w2(:,:,:,2) - xhypo(2) ) * ( w2(:,:,:,2) - xhypo(2) ) &
-   + ( w2(:,:,:,3) - xhypo(3) ) * ( w2(:,:,:,3) - xhypo(3) )
+call radius( s2, w2, xhypo, i1cell, i2cell )
 call scalarsethalo( s2, 2.*rsource*rsource, i1cell, i2cell )
 nsrc = count( s2 < rsource*rsource )
 allocate( jj(nsrc), kk(nsrc), ll(nsrc), cellvol(nsrc), srcfr(nsrc) )

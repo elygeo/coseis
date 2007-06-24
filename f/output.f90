@@ -86,9 +86,7 @@ case( 'x' )
       k1 = i1(2); k2 = i2(2)
       l1 = i1(3); l2 = i2(3)
       t2 = w2(j1:j2,k1:k2,l1:l2,:)
-      f2 = ( t2(:,:,:,1) - xout(iz,1) ) * ( t2(:,:,:,1) - xout(iz,1) ) &
-         + ( t2(:,:,:,2) - xout(iz,2) ) * ( t2(:,:,:,2) - xout(iz,2) ) &
-         + ( t2(:,:,:,3) - xout(iz,3) ) * ( t2(:,:,:,3) - xout(iz,3) )
+      call radius( f2, t2, xout(iz,:), i1, i2 )
       rout = 2 * dx * dx + maxval( f2 )
       call scalarsethalo( f2, rout, i1core, i2core )
       call reduceloc( rout, i1, f2, 'allmin', n, noff, i )
@@ -96,17 +94,13 @@ case( 'x' )
     end if
   else
     if ( cell ) then
-      s2 = ( w2(:,:,:,1) - xout(iz,1) ) * ( w2(:,:,:,1) - xout(iz,1) ) &
-         + ( w2(:,:,:,2) - xout(iz,2) ) * ( w2(:,:,:,2) - xout(iz,2) ) &
-         + ( w2(:,:,:,3) - xout(iz,3) ) * ( w2(:,:,:,3) - xout(iz,3) )
-      rout = 2 * dx * dx + maxval( s2 )
       i1 = max( i1core, i1cell )
       i2 = min( i2core, i2cell )
+      call radius( s2, w2, xout(iz,:), i1, i2 )
+      rout = 2 * dx * dx + maxval( s2 )
       call scalarsethalo( s2, rout, i1, i2 )
     else
-      s2 = ( w1(:,:,:,1) - xout(iz,1) ) * ( w1(:,:,:,1) - xout(iz,1) ) &
-         + ( w1(:,:,:,2) - xout(iz,2) ) * ( w1(:,:,:,2) - xout(iz,2) ) &
-         + ( w1(:,:,:,3) - xout(iz,3) ) * ( w1(:,:,:,3) - xout(iz,3) )
+      call radius( s2, w1, xout(iz,:), i1core, i2core )
       rout = 2 * dx * dx + maxval( s2 )
       call scalarsethalo( s2, rout, i1core, i2core )
     end if
@@ -307,16 +301,6 @@ if ( fault ) then
   i4(i) = 1
 end if
 
-! Magnitudes
-if ( modulo( it, itstats ) /= 0 .and. all( i3 >= i4 ) ) then
-  select case( fieldout(iz) )
-  case( 'vm2' ); call vectornorm( s1, vv, i3, i4 )
-  case( 'um2' ); call vectornorm( s1, uu, i3, i4 )
-  case( 'wm2' ); call tensornorm( s2, w1, w2, i3, i4 )
-  case( 'am2' ); call vectornorm( s2, w1, i3, i4 )
-  end select
-end if
-
 ! Binary output
 do ic = 1, nc
   id = 6 * ( iz - 1 ) + ic
@@ -361,10 +345,18 @@ do ic = 1, nc
   case( 'trup' ); call scalario( id, mpio, rr, str, trup,     i1, i2, i3, i4, nr, ir )
   case( 'tarr' ); call scalario( id, mpio, rr, str, tarr,     i1, i2, i3, i4, nr, ir )
   case( 'pv2'  ); call scalario( id, mpio, rr, str, pv,       i1, i2, i3, i4, nr, ir )
-  case( 'vm2'  ); call scalario( id, mpio, rr, str, s1,       i1, i2, i3, i4, nr, ir )
-  case( 'um2'  ); call scalario( id, mpio, rr, str, s1,       i1, i2, i3, i4, nr, ir )
-  case( 'wm2'  ); call scalario( id, mpio, rr, str, s2,       i1, i2, i3, i4, nr, ir )
-  case( 'am2'  ); call scalario( id, mpio, rr, str, s2,       i1, i2, i3, i4, nr, ir )
+  case( 'vm2'  )
+    if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, vv, i3, i4 )
+    call scalario( id, mpio, rr, str, s1, i1, i2, i3, i4, nr, ir )
+  case( 'um2'  )
+    if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, uu, i3, i4 )
+    call scalario( id, mpio, rr, str, s1, i1, i2, i3, i4, nr, ir )
+  case( 'wm2'  )
+    if ( modulo( it, itstats ) /= 0 ) call tensornorm( s2, w1, w2, i3, i4 )
+    call scalario( id, mpio, rr, str, s2, i1, i2, i3, i4, nr, ir )
+  case( 'am2'  )
+    if ( modulo( it, itstats ) /= 0 ) call vectornorm( s2, w1, i3, i4 )
+    call scalario( id, mpio, rr, str, s2, i1, i2, i3, i4, nr, ir )
   case default
     write( 0, * ) 'error: unknown output field: ', fieldout(iz)
     stop

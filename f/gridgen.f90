@@ -96,9 +96,11 @@ end if
 
 ! Affine grid transformation
 m = affine
-w2(:,:,:,1) = m(1) * w1(:,:,:,1) + m(2) * w1(:,:,:,2) + m(3) * w1(:,:,:,3)
-w2(:,:,:,2) = m(4) * w1(:,:,:,1) + m(5) * w1(:,:,:,2) + m(6) * w1(:,:,:,3)
-w2(:,:,:,3) = m(7) * w1(:,:,:,1) + m(8) * w1(:,:,:,2) + m(9) * w1(:,:,:,3)
+forall( j=1:nm(1), k=1:nm(2), l=1:nm(3) )
+  w2(j,k,l,1) = m(1) * w1(j,k,l,1) + m(2) * w1(j,k,l,2) + m(3) * w1(j,k,l,3)
+  w2(j,k,l,2) = m(4) * w1(j,k,l,1) + m(5) * w1(j,k,l,2) + m(6) * w1(j,k,l,3)
+  w2(j,k,l,3) = m(7) * w1(j,k,l,1) + m(8) * w1(j,k,l,2) + m(9) * w1(j,k,l,3)
+end forall
 w1 = w2
 
 ! Mesh type
@@ -296,12 +298,14 @@ end select
 if ( fixhypo > 0 ) then
   xhypo = x0
 elseif ( fixhypo < 0 ) then
-  w1(:,:,:,1) = w1(:,:,:,1) - x0(1) + xhypo(1)
-  w1(:,:,:,2) = w1(:,:,:,2) - x0(2) + xhypo(2)
-  w1(:,:,:,3) = w1(:,:,:,3) - x0(3) + xhypo(3)
-  w2(:,:,:,1) = w2(:,:,:,1) - x0(1) + xhypo(1)
-  w2(:,:,:,2) = w2(:,:,:,2) - x0(2) + xhypo(2)
-  w2(:,:,:,3) = w2(:,:,:,3) - x0(3) + xhypo(3)
+  forall( j=1:nm(1), k=1:nm(2), l=1:nm(3) )
+    w1(j,k,l,1) = w1(j,k,l,1) - x0(1) + xhypo(1)
+    w1(j,k,l,2) = w1(j,k,l,2) - x0(2) + xhypo(2)
+    w1(j,k,l,3) = w1(j,k,l,3) - x0(3) + xhypo(3)
+    w2(j,k,l,1) = w2(j,k,l,1) - x0(1) + xhypo(1)
+    w2(j,k,l,2) = w2(j,k,l,2) - x0(2) + xhypo(2)
+    w2(j,k,l,3) = w2(j,k,l,3) - x0(3) + xhypo(3)
+  end forall
 end if
 
 ! Grid Dimensions
@@ -312,9 +316,9 @@ do i = 1,3
 end do
 call rreduce1( gxlim, xlim, 'allmin', 0 )
 xcenter = .5 * ( gxlim(1:3) - gxlim(4:6) )
-s2 = ( w1(:,:,:,1) - xcenter(1) ) * ( w1(:,:,:,1) - xcenter(1) ) &
-   + ( w1(:,:,:,2) - xcenter(2) ) * ( w1(:,:,:,2) - xcenter(2) ) &
-   + ( w1(:,:,:,3) - xcenter(3) ) * ( w1(:,:,:,3) - xcenter(3) )
+i1 = 1
+i2 = nm
+call radius( s2, w1, xcenter, i1, i2 )
 call rreduce( rmax, sqrt( maxval( s2 ) ), 'max', 0 )
 
 ! Operators

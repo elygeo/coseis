@@ -299,8 +299,8 @@ i = abs( id )
 fh = filehandles(i)
 if ( fh == mpi_undefined ) then
   call mpopen( fh, id, mpio, str, i1, i2, i3, i4, nr, ir )
-  filehandles(i) = fh
   if ( any( i3 > i4 ) ) return
+  filehandles(i) = fh
 end if
 if ( any( i3 > i4 ) ) stop 'error in scalario'
 i0 = i3 - 1
@@ -342,8 +342,8 @@ i = abs( id )
 fh = filehandles(i)
 if ( fh == mpi_undefined ) then
   call mpopen( fh, id, mpio, str, i1, i2, i3, i4, nr, ir )
-  filehandles(i) = fh
   if ( any( i3 > i4 ) ) return
+  filehandles(i) = fh
 end if
 if ( any( i3 > i4 ) ) stop 'error in vectorio'
 i0 = i3 - 1
