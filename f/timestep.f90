@@ -6,7 +6,7 @@ contains
 subroutine timestep
 use m_globals
 use m_util
-integer :: i, j, k, l
+integer :: j, k, l
 
 ! Status
 if ( master ) then
@@ -33,10 +33,8 @@ end if
 
 ! Time integration
 tm = it * dt
-forall( j=1:nm(1), k=1:nm(2), l=1:nm(3), i=1:3 )
-  vv(j,k,l,i) = vv(j,k,l,i) + dt * w1(j,k,l,i)
-  uu(j,k,l,i) = uu(j,k,l,i) + dt * vv(j,k,l,i)
-end forall
+vv = vv + dt * w1
+uu = uu + dt * vv
 
 ! Fault time integration
 if ( ifn /= 0 ) then

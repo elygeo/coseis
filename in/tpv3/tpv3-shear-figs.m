@@ -16,21 +16,21 @@
   nn = [ 33 13 14 ];
 
 % yz-shear
-  affine = [ 1. 0. 0.  0. 1. 1.  0. 0. 1.  1. ];
+  affine = [ 1. 0. 0.   0. 1. 1.   0. 0. 1. ];
   symmetry = [ 1 0 1 ];
   symmetry = [ 1 0 0 ];
 
 % rectangular
-  affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ];
+  affine = [ 1. 0. 0.   0. 1. 0.   0. 0. 1. ];
   symmetry = [ 0 0 0 ];
 
 % xy-shear
-  affine = [ 1. 1. 0.  0. 1. 0.  0. 0. 1.  1. ];
+  affine = [ 1. 1. 0.   0. 1. 0.   0. 0. 1. ];
   symmetry = [ 0 1 1 ];
   symmetry = [ 0 0 1 ];
 
 % zx-shear
-  affine = [ 1. 0. 1.  0. 1. 0.  0. 0. 1.  1. ];
+  affine = [ 1. 0. 1.   0. 1. 0.   0. 0. 1. ];
   symmetry = [ 0 1 1 ];
   symmetry = [ 0 1 0 ];
 

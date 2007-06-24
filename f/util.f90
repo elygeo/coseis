@@ -74,6 +74,19 @@ end forall
 call vectorsethalo( fa, 0., i1, i2 )
 end subroutine
 
+subroutine radius( r, x, x0, i1, i2 )
+real, intent(out) :: r(:,:,:)
+real, intent(in) :: x(:,:,:,:), x0(3)
+integer, intent(in) :: i1(3), i2(3)
+integer :: j, k, l
+forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+  r(j,k,l) = &
+  ( x(j,k,l,1) - x0(1) ) * ( x(j,k,l,1) - x0(1) ) + &
+  ( x(j,k,l,2) - x0(2) ) * ( x(j,k,l,2) - x0(2) ) + &
+  ( x(j,k,l,3) - x0(3) ) * ( x(j,k,l,3) - x0(3) )
+end forall
+end subroutine
+
 subroutine vectornorm( s, f, i1, i2 )
 real, intent(out) :: s(:,:,:)
 real, intent(in) :: f(:,:,:,:)
@@ -97,22 +110,9 @@ forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
   w1(j,k,l,1) * w1(j,k,l,1) + &
   w1(j,k,l,2) * w1(j,k,l,2) + &
   w1(j,k,l,3) * w1(j,k,l,3) + &
-  ( w2(j,k,l,1) * w2(j,k,l,1) + &
-  + w2(j,k,l,2) * w2(j,k,l,2) + &
+  ( w2(j,k,l,1) * w2(j,k,l,1) &
+  + w2(j,k,l,2) * w2(j,k,l,2) &
   + w2(j,k,l,3) * w2(j,k,l,3) ) * 2.
-end forall
-end subroutine
-
-subroutine radius( r, x, x0, i1, i2 )
-real, intent(out) :: r(:,:,:)
-real, intent(in) :: x(:,:,:,:), x0(3)
-integer, intent(in) :: i1(3), i2(3)
-integer :: j, k, l
-forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
-  r(j,k,l) = &
-  ( x(j,k,l,1) - x0(1) ) * ( x(j,k,l,1) - x0(1) ) + &
-  ( x(j,k,l,2) - x0(2) ) * ( x(j,k,l,2) - x0(2) ) + &
-  ( x(j,k,l,3) - x0(3) ) * ( x(j,k,l,3) - x0(3) )
 end forall
 end subroutine
 

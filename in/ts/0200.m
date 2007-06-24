@@ -22,8 +22,8 @@
   datadir = 'ts/0200/data';
   np = [ 1 76 26 ] % DataStar 247 nodes
   np = [ 1 32 14 ] % TeraGrid 224 nodes
+  np = [ 1 40 24 ] % DataStar 120 nodes
   np = [ 1 80 24 ] % DataStar 240 nodes
-  np = [ 1 20 24 ] % DataStar 120 nodes
   dx = 200.;
   dt = .012;
   trelax = .12;

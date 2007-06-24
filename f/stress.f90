@@ -12,9 +12,9 @@ integer :: i1(3), i2(3), i, j, k, l, ic, iid, id
 if ( master .and. debug == 2 ) write( 0, * ) 'Stress'
 
 ! Modified displacement
-forall( j=1:nm(1), k=1:nm(2), l=1:nm(3), i=1:3 )
-  w1(j,k,l,i) = uu(j,k,l,i) + gam(j,k,l) * vv(j,k,l,i)
-end forall
+do i = 1, 3
+  w1(:,:,:,i) = uu(:,:,:,i) + gam * vv(:,:,:,i)
+end do
 call scalarsethalo( s1, 0., i1cell, i2cell )
 
 ! Loop over component and derivative direction
@@ -139,13 +139,11 @@ end do doic
 !end do
 
 ! Hook's Law: w_ij = lam*g_ij*delta_ij + mu*(g_ij + g_ji)
-forall( j=1:nm(1), k=1:nm(2), l=1:nm(3) )
-  s1(j,k,l) = lam(j,k,l) * ( w1(j,k,l,1) + w1(j,k,l,2) + w1(j,k,l,3) )
-end forall
-forall( j=1:nm(1), k=1:nm(2), l=1:nm(3), i=1:3 )
-  w1(j,k,l,i) = 2. * mu(j,k,l) * w1(j,k,l,i) + s1(j,k,l)
-  w2(j,k,l,i) =      mu(j,k,l) * w2(j,k,l,i)
-end forall
+s1 = lam * sum( w1, 4 )
+do i = 1, 3
+  w1(:,:,:,i) = 2. * mu * w1(:,:,:,i) + s1
+  w2(:,:,:,i) =      mu * w2(:,:,:,i)
+end do
 
 end subroutine
 

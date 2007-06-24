@@ -132,17 +132,15 @@ do ic = 1, 3
       call hourglasscn( s2, s1, iq, i1, i2 )
     end do
   end if
-  forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
-    w1(j,k,l,ic) = w1(j,k,l,ic) - s2(j,k,l)
-  end forall
+  w1(:,:,:,ic) = w1(:,:,:,ic) - s2
 end do
 end do
 end if
 
 ! Newton's law: a_i = f_i / m
-forall( j=1:nm(1), k=1:nm(2), l=1:nm(3), i=1:3 )
-  w1(j,k,l,i) = w1(j,k,l,i) * mr(j,k,l)
-end forall
+do i = 1, 3
+  w1(:,:,:,i) = w1(:,:,:,i) * mr
+end do
 
 ! Boundary conditions
 call vectorbc( w1, ibc1, ibc2, nhalo )
