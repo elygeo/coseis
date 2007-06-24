@@ -153,7 +153,8 @@ use m_util
 integer, intent(in) :: pass
 real, save :: vstats(itio,4), fstats(itio,8), estats(itio,4)
 real :: gvstats(itio,4), gfstats(itio,8), gestats(itio,4), rr
-integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, onpass, nc, ic, nr, ir, iz, id, mpio
+integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, j1, k1, l1, j2, k2, l2, &
+  onpass, nc, ic, nr, ir, iz, id, mpio
 logical :: dofault, fault, cell
 
 ! Debug
@@ -217,16 +218,15 @@ if ( faultnormal /= 0 ) then
   if ( ip3(i) == ip3master(i) ) dofault = .true.
 end if
 
-! Prepare output
-if ( it > 0 ) then
-  i = modulo( it-1, itio ) + 1
+! Volume stats
+if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
+  i = modulo( it/itstats-1, itio ) + 1
   select case( pass )
   case( 1 )
     s1 = sum( vv * vv, 4 )
     s2 = sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 )
     call scalarsethalo( s1, -1., i1core, i2core )
     call scalarsethalo( s2, -1., i1core, i2core )
-    pv = max( pv, s1 )
     vstats(i,1) = maxval( s1 )
     vstats(i,2) = maxval( s2 )
   case( 2 )
@@ -236,15 +236,14 @@ if ( it > 0 ) then
     call scalarsethalo( s2, -1., i1core, i2core )
     vstats(i,3) = maxval( s1 )
     vstats(i,4) = maxval( s2 )
-    !if ( any( vstats > huge( rr ) ) ) stop 'unstable solution'
     if ( modulo( it, itio ) == 0 .or. it == nt ) then
       call rreduce2( gvstats, vstats, 'max', 0 )
       if ( master ) then
         gvstats = sqrt( gvstats )
-        call rwrite1( 'stats/vmax', gvstats(:i,1), it )
-        call rwrite1( 'stats/wmax', gvstats(:i,2), it )
-        call rwrite1( 'stats/umax', gvstats(:i,3), it )
-        call rwrite1( 'stats/amax', gvstats(:i,4), it )
+        call rwrite1( 'stats/vmax', gvstats(:i,1), it / itstats )
+        call rwrite1( 'stats/wmax', gvstats(:i,2), it / itstats )
+        call rwrite1( 'stats/umax', gvstats(:i,3), it / itstats )
+        call rwrite1( 'stats/amax', gvstats(:i,4), it / itstats )
         rr = maxval( gvstats(:,3) )
         if ( rr > dx / 10. ) write( 0, * ) 'warning: u !<< dx', rr, dx
       end if
@@ -252,9 +251,9 @@ if ( it > 0 ) then
   end select
 end if
 
-! Write fault stats
-if ( it > 0 .and. dofault ) then
-  i = modulo( it-1, itio ) + 1
+! Fault stats
+if ( it > 0 .and. dofault .and. modulo( it, itstats ) == 0 ) then
+  i = modulo( it/itstats-1, itio ) + 1
   select case( pass )
   case( 1 )
     call scalarsethalo( f1,   -1., i1core, i2core )
@@ -288,18 +287,18 @@ if ( it > 0 .and. dofault ) then
       end do
       if ( master ) then
         i = modulo( it-1, itio ) + 1
-        call rwrite1( 'stats/svmax',   gfstats(:i,1), it )
-        call rwrite1( 'stats/sumax',   gfstats(:i,2), it )
-        call rwrite1( 'stats/slmax',   gfstats(:i,3), it )
-        call rwrite1( 'stats/tarrmax', gfstats(:i,4), it )
-        call rwrite1( 'stats/tsmax',   gfstats(:i,5), it )
-        call rwrite1( 'stats/samax',   gfstats(:i,6), it )
-        call rwrite1( 'stats/tnmax',   gfstats(:i,7), it )
-        call rwrite1( 'stats/tnmin',   gfstats(:i,8), it )
-        call rwrite1( 'stats/efric',   gestats(:i,1), it )
-        call rwrite1( 'stats/estrain', gestats(:i,2), it )
-        call rwrite1( 'stats/moment',  gestats(:i,3), it )
-        call rwrite1( 'stats/mw',      gestats(:i,4), it ) 
+        call rwrite1( 'stats/svmax',   gfstats(:i,1), it / itstats )
+        call rwrite1( 'stats/sumax',   gfstats(:i,2), it / itstats )
+        call rwrite1( 'stats/slmax',   gfstats(:i,3), it / itstats )
+        call rwrite1( 'stats/tarrmax', gfstats(:i,4), it / itstats )
+        call rwrite1( 'stats/tsmax',   gfstats(:i,5), it / itstats )
+        call rwrite1( 'stats/samax',   gfstats(:i,6), it / itstats )
+        call rwrite1( 'stats/tnmax',   gfstats(:i,7), it / itstats )
+        call rwrite1( 'stats/tnmin',   gfstats(:i,8), it / itstats )
+        call rwrite1( 'stats/efric',   gestats(:i,1), it / itstats )
+        call rwrite1( 'stats/estrain', gestats(:i,2), it / itstats )
+        call rwrite1( 'stats/moment',  gestats(:i,3), it / itstats )
+        call rwrite1( 'stats/mw',      gestats(:i,4), it / itstats ) 
         i1 = ihypo
         i1(ifn) = 1  
         open( 1, file='stats/tarrhypo', status='replace' )
@@ -312,26 +311,43 @@ end if
 
 doiz: do iz = 1, nout
 
-! Interval
-if ( it < i1out(iz,4) .or. it > i2out(iz,4) ) cycle doiz
-if ( modulo( it - i1out(iz,4), ditout(iz) ) /= 0 ) cycle doiz
-
 ! Pass
 call outprops( fieldout(iz), nc, onpass, fault, cell )
 if ( pass /= onpass ) cycle doiz
 
 ! Indices
-nr = ( i2out(iz,4) - i1out(iz,4) ) / ditout(iz) + 1
-ir = ( it          - i1out(iz,4) ) / ditout(iz) + 1
 i1 = i1out(iz,1:3)
 i2 = i2out(iz,1:3)
 i3 = max( i1, i1core )
 i4 = min( i2, i2core )
+
+! Peak velocity calculation
+j1 = i3(1); j2 = i4(1)
+k1 = i3(2); k2 = i4(2)
+l1 = i3(3); l2 = i4(3)
+if ( fieldout(iz) == 'pv2' ) then
+  if ( modulo( it, itstats ) /= 0 ) then
+    s1(j1:j2,k1:k2,l1:l2) = sum( vv(j1:j2,k1:k2,l1:l2,:) * vv(j1:j2,k1:k2,l1:l2,:), 4 )
+  end if
+  pv(j1:j2,k1:k2,l1:l2) = max( pv(j1:j2,k1:k2,l1:l2), s1(j1:j2,k1:k2,l1:l2) )
+end if
+
+! Time indices
+if ( it < i1out(iz,4) .or. it > i2out(iz,4) ) cycle doiz
+if ( modulo( it - i1out(iz,4), ditout(iz) ) /= 0 ) cycle doiz
+
+! Test if any thing to do on this processor, can't cycle yet though
+! because all processors have to call mpi_split
 if ( any( i3 > i4 ) ) then
   i1out(iz,4) = nt + 1
   if ( all( i1 == i2 ) ) cycle doiz
 end if
-mpio = mpout * 4
+
+! Record number and number of records
+ir = ( it          - i1out(iz,4) ) / ditout(iz) + 1
+nr = ( i2out(iz,4) - i1out(iz,4) ) / ditout(iz) + 1
+
+! Fault plane
 if ( fault ) then
   if ( .not. dofault ) cycle doiz
   i = abs( faultnormal )
@@ -342,7 +358,23 @@ if ( fault ) then
   i4(i) = 1
 end if
 
+! Magnitudes
+if ( modulo( it, itstats ) /= 0 ) then
+  select case( fieldout(iz) )
+  case( 'vm2'  )
+    s1(j1:j2,k1:k2,l1:l2) = sum( vv(j1:j2,k1:k2,l1:l2,:) * vv(j1:j2,k1:k2,l1:l2,:), 4 )
+  case( 'um2'  )
+    s1(j1:j2,k1:k2,l1:l2) = sum( uu(j1:j2,k1:k2,l1:l2,:) * uu(j1:j2,k1:k2,l1:l2,:), 4 )
+  case( 'wm2'  )
+    s2(j1:j2,k1:k2,l1:l2) = sum( w1(j1:j2,k1:k2,l1:l2,:) * w1(j1:j2,k1:k2,l1:l2,:), 4 ) &
+                     + 2. * sum( w2(j1:j2,k1:k2,l1:l2,:) * w2(j1:j2,k1:k2,l1:l2,:), 4 )
+  case( 'am2'  )
+    s2(j1:j2,k1:k2,l1:l2) = sum( w1(j1:j2,k1:k2,l1:l2,:) * w1(j1:j2,k1:k2,l1:l2,:), 4 )
+  end select
+end if
+
 ! Binary output
+mpio = mpout * 4
 do ic = 1, nc
   id = 6 * ( iz - 1 ) + ic
   write( str, '(a,i2.2,a)' ) 'out/', iz, fieldout(iz)
@@ -366,11 +398,6 @@ do ic = 1, nc
    if ( ic < 4 )  call vectorio( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, nr, ir )
    if ( ic > 3 )  call vectorio( id, mpio, rr, str, w2, ic-3, i1, i2, i3, i4, nr, ir )
   case( 'a'    ); call vectorio( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, nr, ir )
-  case( 'vm2'  ); call scalario( id, mpio, rr, str, s1,       i1, i2, i3, i4, nr, ir )
-  case( 'um2'  ); call scalario( id, mpio, rr, str, s1,       i1, i2, i3, i4, nr, ir )
-  case( 'wm2'  ); call scalario( id, mpio, rr, str, s2,       i1, i2, i3, i4, nr, ir )
-  case( 'am2'  ); call scalario( id, mpio, rr, str, s2,       i1, i2, i3, i4, nr, ir )
-  case( 'pv2'  ); call scalario( id, mpio, rr, str, pv,       i1, i2, i3, i4, nr, ir )
   case( 'nhat' ); call vectorio( id, mpio, rr, str, nhat, ic, i1, i2, i3, i4, nr, ir )
   case( 'mus'  ); call scalario( id, mpio, rr, str, mus,      i1, i2, i3, i4, nr, ir )
   case( 'mud'  ); call scalario( id, mpio, rr, str, mud,      i1, i2, i3, i4, nr, ir )
@@ -390,11 +417,16 @@ do ic = 1, nc
   case( 'psv'  ); call scalario( id, mpio, rr, str, psv,      i1, i2, i3, i4, nr, ir )
   case( 'trup' ); call scalario( id, mpio, rr, str, trup,     i1, i2, i3, i4, nr, ir )
   case( 'tarr' ); call scalario( id, mpio, rr, str, tarr,     i1, i2, i3, i4, nr, ir )
+  case( 'pv2'  ); call scalario( id, mpio, rr, str, pv,       i1, i2, i3, i4, nr, ir )
+  case( 'vm2'  ); call scalario( id, mpio, rr, str, s1,       i1, i2, i3, i4, nr, ir )
+  case( 'um2'  ); call scalario( id, mpio, rr, str, s1,       i1, i2, i3, i4, nr, ir )
+  case( 'wm2'  ); call scalario( id, mpio, rr, str, s2,       i1, i2, i3, i4, nr, ir )
+  case( 'am2'  ); call scalario( id, mpio, rr, str, s2,       i1, i2, i3, i4, nr, ir )
   case default
     write( 0, * ) 'error: unknown output field: ', fieldout(iz)
     stop
   end select
-  if ( all( i1 == i2 ) ) then
+  if ( all( i1 == i2 .and. i3 == i4 ) ) then
   if ( it == 0 .or. ibuff(iz) == 0 ) then
     call rwrite( str, rr, ir )
   else

@@ -169,6 +169,7 @@ integer :: &
   nt,            & ! number of time steps
   it,            & ! current time step
   itcheck,       & ! interval for checkpointing, must be a multiple of itio
+  itstats,       & ! interval for calculating statistics
   debug,         & ! debugging flag
   npml,          & ! number of PML damping nodes
   fixhypo,       & ! fix hypocenter to 0=none, 1,2=ihypo node, cell, -1,-2=xhypo node, cell

@@ -21,13 +21,13 @@
   itcheck = 100;
   datadir = 'ts/2000/data';
 
-
   np = [ 1 8 4 ] % Babieca 16 nodes
   np = [ 1 1 2 ]
   dx = 2000.;
   dt = .12;
   trelax = 1.2;
   nt = 1500;
+  nt = 750;
   nn = [  301  152  41 ];
   fixhypo = 1;
   ihypo = [  138  101  -4 ];
@@ -44,7 +44,7 @@
   out = { 'x'      1      1   1  -1    0     -1 -1 -1    0 };
   out = { 'vs'     1      1   1  -2    0     -1 -1 -1    0 };
   out = { 'pv2'  750      1   1  -1  750     -1 -1 -1 1500 };
-  out = { 'vm2'   10      1   1  -1    0     -1 -1 -1 1500 };
+% out = { 'vm2'   10      1   1  -1    0     -1 -1 -1 1500 };
   timeseries = { 'v'  82188. 188340. 129. }; % Bakersfield
   timeseries = { 'v'  99691.  67008.  21. }; % Santa Barbara
   timeseries = { 'v' 152641.  77599.  16. }; % Oxnard

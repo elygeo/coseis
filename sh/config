@@ -28,7 +28,7 @@ ifort)
   ;;
 pgf90)
   getarg='getarg-pgf.f90'
-  gflags='-g -Ktrap=fp -Mbounds -Mdclchk'
+  gflags='-g -Ktrap=fp -Mbounds -Mdclchk -Mprof=func -Mprof=lines'
   oflags='-fast'
   ;;
 gfortran)

@@ -76,6 +76,7 @@
 % itcheck = 100;			% checkpoint every 100 time steps
 % itcheck = -1;				% checkpoint just before finishing
   itcheck = 0;				% checkpointing off
+  itstats = 10;				% calculate statistics every 10
   debug = 0;                            % debugging off
   mpin  = 1;				% 0=separate files, 1=MPIIO
   mpout = 1;				% 0=separate files, 1=MPIIO
