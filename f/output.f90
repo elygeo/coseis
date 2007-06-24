@@ -86,21 +86,23 @@ case( 'x' )
       k1 = i1(2); k2 = i2(2)
       l1 = i1(3); l2 = i2(3)
       t2 = w2(j1:j2,k1:k2,l1:l2,:)
-      call radius( f2, t2, xout(iz,:), i1, i2 )
+      rout = xout(iz,:)
+      call radius( f2, t2, rout, i1, i2 )
       rout = 2 * dx * dx + maxval( f2 )
       call scalarsethalo( f2, rout, i1core, i2core )
       call reduceloc( rout, i1, f2, 'allmin', n, noff, i )
       i1(i) = ihypo(i)
     end if
   else
+    rout = xout(iz,:)
     if ( cell ) then
       i1 = max( i1core, i1cell )
       i2 = min( i2core, i2cell )
-      call radius( s2, w2, xout(iz,:), i1, i2 )
+      call radius( s2, w2, rout, i1, i2 )
       rout = 2 * dx * dx + maxval( s2 )
       call scalarsethalo( s2, rout, i1, i2 )
     else
-      call radius( s2, w1, xout(iz,:), i1core, i2core )
+      call radius( s2, w1, rout, i1core, i2core )
       rout = 2 * dx * dx + maxval( s2 )
       call scalarsethalo( s2, rout, i1core, i2core )
     end if

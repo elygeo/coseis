@@ -104,7 +104,7 @@ subroutine tensornorm( s, w1, w2, i1, i2 )
 real, intent(out) :: s(:,:,:)
 real, intent(in) :: w1(:,:,:,:), w2(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3)
-integer :: i, j, k, l
+integer :: j, k, l
 forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
   s(j,k,l) = &
   w1(j,k,l,1) * w1(j,k,l,1) + &
