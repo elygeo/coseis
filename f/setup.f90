@@ -69,6 +69,7 @@ where ( abs( ibc1 ) > 1 ) i1cell = 1
 where ( abs( ibc2 ) > 1 ) i2cell = nm - 1
 
 ! PML region
+npml = max( 0, npml )
 i1pml = min( nm, max( 0, npml - nnoff ) )
 i2pml = max( 1,  min( nm + 1, nn + 1 - npml - nnoff ) )
 if ( npml > 0 ) then

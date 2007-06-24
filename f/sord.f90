@@ -22,7 +22,7 @@ use m_locknodes
 use m_util
 implicit none
 real :: prof0(16), prof1(itio), prof2(itio), prof3(itio), prof4(itio)
-integer :: i
+integer :: jp
 
 ! Initialization
 prof0(1) = timer( 0 )
@@ -50,44 +50,41 @@ end if
 if ( sync ) call barrier ; prof0(16) = timer( 3 )
 if ( master ) write( 0, * ) 'Main loop'
 if ( master ) call rwrite1( 'prof/main', prof0 )
-i = itio
+jp = 0
 do while ( it < nt )
   it = it + 1
-  i = modulo( it - 1, itio ) + 1
+  jp = jp + 1
   if ( sync ) call barrier ; call timestep
   if ( sync ) call barrier ; call stress
-  if ( sync ) call barrier ; call momentsource ; prof1(i) = timer( 1 )
-  if ( sync ) call barrier ; call output( 1 )  ; prof2(i) = timer( 1 )
+  if ( sync ) call barrier ; call momentsource ; prof1(jp) = timer( 1 )
+  if ( sync ) call barrier ; call output( 1 )  ; prof2(jp) = timer( 1 )
   if ( sync ) call barrier ; call acceleration
   if ( sync ) call barrier ; call fault
-  if ( sync ) call barrier ; call locknodes    ; prof1(i) = prof1(i) + timer( 1 )
-  if ( sync ) call barrier ; call output( 2 )  ; prof2(i) = prof2(i) + timer( 1 )
-  if ( sync ) call barrier ; call vectorswaphalo( w1, nhalo ) ; prof3(i) = timer( 1 )
+  if ( sync ) call barrier ; call locknodes    ; prof1(jp) = prof1(jp) + timer( 1 )
+  if ( sync ) call barrier ; call output( 2 )  ; prof2(jp) = prof2(jp) + timer( 1 )
+  if ( sync ) call barrier ; call vectorswaphalo( w1, nhalo ) ; prof3(jp) = timer( 1 )
   if ( modulo( it, itcheck ) == 0 ) then
     if ( sync ) call barrier ; call writecheckpoint
   end if
-  prof2(i) = prof2(i) + timer( 1 )
-  prof4(i) = timer( 2 )
-  if ( modulo( it, itio ) == 0 .and. master ) then
-    call rwrite1( 'prof/comp', prof1, it )
-    call rwrite1( 'prof/out' , prof2, it )
-    call rwrite1( 'prof/comm', prof3, it )
-    call rwrite1( 'prof/step', prof4, it )
+  prof2(jp) = prof2(jp) + timer( 1 )
+  prof4(jp) = timer( 2 )
+  if ( master ) then
+  if ( modulo( it, itio ) == 0 .or. it = nt ) then
+    call rwrite1( 'prof/comp', prof1(:jp), it )
+    call rwrite1( 'prof/out' , prof2(:jp), it )
+    call rwrite1( 'prof/comm', prof3(:jp), it )
+    call rwrite1( 'prof/step', prof4(:jp), it )
+    jp = 0
+  end if
   end if
 end do
 
 ! Finish up
 if ( sync ) call barrier
 if ( master ) then
-  if ( i /= itio ) then
-    call rwrite1( 'prof/comp', prof1(1:i), it )
-    call rwrite1( 'prof/out',  prof2(1:i), it )
-    call rwrite1( 'prof/comm', prof3(1:i), it )
-    call rwrite1( 'prof/step', prof4(1:i), it )
-  end if
   prof0(1) = timer( 3 )
   prof0(2) = timer( 4 )
-  call rwrite1( 'prof/main', prof0(1:2), 18 )
+  call rwrite1( 'prof/main', prof0(:2), 18 )
   write( 0, * ) 'Finished!'
 end if
 call finalize

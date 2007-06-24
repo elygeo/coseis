@@ -123,10 +123,10 @@ end if
 end function
 
 ! Write real binary timeseries
-subroutine rwrite( str, val, it )
+subroutine rwrite( str, val, ir )
 character(*), intent(in) :: str
 real, intent(in) :: val
-integer, intent(in) :: it
+integer, intent(in) :: ir
 integer :: i
 inquire( iolength=i ) val
 if ( it == 1 ) then
@@ -134,21 +134,21 @@ if ( it == 1 ) then
 else
   open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
 end if
-write( 1, rec=it ) val
+write( 1, rec=ir ) val
 close( 1 )
 end subroutine
   
 ! Write buffered real binary timeseries
-subroutine rwrite1( str, val, it )
+subroutine rwrite1( str, val, ir )
 character(*), intent(in) :: str
 real, intent(in) :: val(:)
-integer, intent(in), optional :: it
+integer, intent(in), optional :: ir
 integer :: i, n, i0
 n = size( val, 1 )
 i0 = 0
-if ( present( it ) ) i0 = it - n
+if ( present( ir ) ) i0 = ir - n
 if ( i0 < 0 ) then
-  write ( 0, * )  'Error writing ', trim( str ), it, n
+  write ( 0, * )  'Error in rwrite1 ', trim( str ), ir, n
   stop
 end if
 if ( modulo( i0, n ) == 0 ) then
