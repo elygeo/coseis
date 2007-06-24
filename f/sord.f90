@@ -67,14 +67,14 @@ do while ( it < nt )
   end if
   prof2(jp) = prof2(jp) + timer( 1 )
   prof4(jp) = timer( 2 )
-  if ( master ) then
   if ( it == nt .or. modulo( it, itio ) == 0 ) then
-    call rwrite1( 'prof/comp', prof1(:jp), it )
-    call rwrite1( 'prof/out' , prof2(:jp), it )
-    call rwrite1( 'prof/comm', prof3(:jp), it )
-    call rwrite1( 'prof/step', prof4(:jp), it )
+    if ( master ) then
+      call rwrite1( 'prof/comp', prof1(:jp), it )
+      call rwrite1( 'prof/out' , prof2(:jp), it )
+      call rwrite1( 'prof/comm', prof3(:jp), it )
+      call rwrite1( 'prof/step', prof4(:jp), it )
+    end if
     jp = 0
-  end if
   end if
 end do
 

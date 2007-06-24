@@ -30,12 +30,14 @@ pgf90)
   getarg='getarg-pgf.f90'
   gflags='-g -Ktrap=fp -Mbounds -Mdclchk -Mprof=func -Mprof=lines'
   oflags='-fast'
+  oflags='-fast -Ktrap=fp -Mbounds -Mdclchk -Mprof=func'
   ;;
 gfortran)
   gflags='-pg -g -Wall -std=f95 -pedantic -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
   gflags='-g -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
   oflags='-O -fimplicit-none'
   oflags='-O3 -fimplicit-none'
+  oflags='-O3 -fimplicit-none -fbounds-check -ffpe-trap=invalid,zero,overflow'
   ;;
 f95)
   gflags='-g'

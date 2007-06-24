@@ -243,13 +243,13 @@ if ( it > 0 .and. dofault .and. modulo( it, itstats ) == 0 ) then
         call rwrite1( 'stats/estrain', gestats(:jf,2), it / itstats )
         call rwrite1( 'stats/moment',  gestats(:jf,3), it / itstats )
         call rwrite1( 'stats/mw',      gestats(:jf,4), it / itstats ) 
-        jf = 0
         i1 = ihypo
         i1(ifn) = 1  
         open( 1, file='stats/tarrhypo', status='replace' )
         write( 1, * ) tarr(i1(1),i1(2),i1(3))
         close( 1 )
       end if
+      jf = 0
     end if
   end select
 end if
@@ -310,7 +310,6 @@ do ic = 1, nc
     i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
     if ( any( i1 /= i3 .or. i2 /= i4 ) ) write( str, '(a,i6.6)' ) trim( str ), i
   end if
-  if ( debug == 3 ) write( 0, * ) ip, 'Writing: ', trim( str ), ir
   select case( fieldout(iz) )
   case( 'x'    ); call vectorio( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, nr, ir )
   case( 'rho'  ); call scalario( id, mpio, rr, str, mr,       i1, i2, i3, i4, nr, ir )
