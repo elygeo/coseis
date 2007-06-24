@@ -154,8 +154,7 @@ use m_util
 integer, intent(in) :: pass
 real, save :: vstats(itio,4), fstats(itio,8), estats(itio,4)
 real :: gvstats(itio,4), gfstats(itio,8), gestats(itio,4), rr
-integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, j1, k1, l1, j2, k2, l2, &
-  onpass, nc, ic, nr, ir, iz, id, mpio
+integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, onpass, nc, ic, nr, ir, iz, id, mpio
 integer, save :: jv = 0, jf = 0
 logical :: dofault, fault, cell
 
@@ -174,15 +173,15 @@ if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
   select case( pass )
   case( 1 )
     jv = jv + 1
-    s1 = sum( vv * vv, 4 )
-    s2 = sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 )
+    call vectornorm( s1, vv, i1core, i2core )
+    call tensornorm( s2, w1, w2, i1core, i2core )
     call scalarsethalo( s1, -1., i1core, i2core )
     call scalarsethalo( s2, -1., i1core, i2core )
     vstats(jv,1) = maxval( s1 )
     vstats(jv,2) = maxval( s2 )
   case( 2 )
-    s1 = sum( uu * uu, 4 )
-    s2 = sum( w1 * w1, 4 )
+    call vectornorm( s1, uu, i1core, i2core )
+    call vectornorm( s2, w1, i1core, i2core )
     call scalarsethalo( s1, -1., i1core, i2core )
     call scalarsethalo( s2, -1., i1core, i2core )
     vstats(jv,3) = maxval( s1 )
@@ -274,14 +273,11 @@ i3 = max( i1, i1core )
 i4 = min( i2, i2core )
 
 ! Peak velocity calculation
-j1 = i3(1); j2 = i4(1)
-k1 = i3(2); k2 = i4(2)
-l1 = i3(3); l2 = i4(3)
 if ( fieldout(iz) == 'pv2' .and. all( i3 >= i4 ) ) then
-  if ( modulo( it, itstats ) /= 0 ) then
-    s1(j1:j2,k1:k2,l1:l2) = sum( vv(j1:j2,k1:k2,l1:l2,:) * vv(j1:j2,k1:k2,l1:l2,:), 4 )
-  end if
-  pv(j1:j2,k1:k2,l1:l2) = max( pv(j1:j2,k1:k2,l1:l2), s1(j1:j2,k1:k2,l1:l2) )
+  if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, vv, i3, i4 )
+  forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+    pv(j,k,l) = max( pv(j,k,l), s1(j,k,l) )
+  end forall
 end if
 
 ! Time indices
@@ -314,15 +310,10 @@ end if
 ! Magnitudes
 if ( modulo( it, itstats ) /= 0 .and. all( i3 >= i4 ) ) then
   select case( fieldout(iz) )
-  case( 'vm2'  )
-    s1(j1:j2,k1:k2,l1:l2) = sum( vv(j1:j2,k1:k2,l1:l2,:) * vv(j1:j2,k1:k2,l1:l2,:), 4 )
-  case( 'um2'  )
-    s1(j1:j2,k1:k2,l1:l2) = sum( uu(j1:j2,k1:k2,l1:l2,:) * uu(j1:j2,k1:k2,l1:l2,:), 4 )
-  case( 'wm2'  )
-    s2(j1:j2,k1:k2,l1:l2) = sum( w1(j1:j2,k1:k2,l1:l2,:) * w1(j1:j2,k1:k2,l1:l2,:), 4 ) &
-                     + 2. * sum( w2(j1:j2,k1:k2,l1:l2,:) * w2(j1:j2,k1:k2,l1:l2,:), 4 )
-  case( 'am2'  )
-    s2(j1:j2,k1:k2,l1:l2) = sum( w1(j1:j2,k1:k2,l1:l2,:) * w1(j1:j2,k1:k2,l1:l2,:), 4 )
+  case( 'vm2' ); call vectornorm( s1, vv, i3, i4 )
+  case( 'um2' ); call vectornorm( s1, uu, i3, i4 )
+  case( 'wm2' ); call tensornorm( s2, w1, w2, i3, i4 )
+  case( 'am2' ); call vectornorm( s2, w1, i3, i4 )
   end select
 end if
 

@@ -74,6 +74,35 @@ end forall
 call vectorsethalo( fa, 0., i1, i2 )
 end subroutine
 
+subroutine vectornorm( s, f, i1, i2 )
+real, intent(out) :: s(:,:,:)
+real, intent(in) :: f(:,:,:,:)
+integer, intent(in) :: i1(3), i2(3)
+integer :: i, j, k, l
+forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+  s(j,k,l) = &
+  f(j,k,l,1) * f(j,k,l,1) + &
+  f(j,k,l,2) * f(j,k,l,2) + &
+  f(j,k,l,3) * f(j,k,l,3)
+end forall
+end subroutine
+
+subroutine tensornorm( s, w1, w2, i1, i2 )
+real, intent(out) :: s(:,:,:)
+real, intent(in) :: w1(:,:,:,:), w2(:,:,:,:)
+integer, intent(in) :: i1(3), i2(3)
+integer :: i, j, k, l
+forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+  s(j,k,l) = &
+  w1(j,k,l,1) * w1(j,k,l,1) + &
+  w1(j,k,l,2) * w1(j,k,l,2) + &
+  w1(j,k,l,3) * w1(j,k,l,3) + &
+  ( w2(j,k,l,1) * w2(j,k,l,1) + &
+  + w2(j,k,l,2) * w2(j,k,l,2) + &
+  + w2(j,k,l,3) * w2(j,k,l,3) ) * 2.
+end forall
+end subroutine
+
 subroutine scalarsethalo( f, r, i1, i2 )
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
