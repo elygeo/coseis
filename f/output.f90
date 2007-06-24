@@ -2,7 +2,7 @@
 module m_output
 implicit none
 real, private, allocatable :: iobuffer(:,:)
-integer, private, allocatable :: jbuff(:)
+integer, private, allocatable :: jb(:)
 contains
 
 ! Initialize output
@@ -135,9 +135,9 @@ end do doiz
 
 ! Allocate buffer
 if ( nbuff > 0 ) then
-  allocate( iobuffer(itio,nbuff), jbuff(nbuff) )
+  allocate( iobuffer(itio,nbuff), jb(nbuff) )
   iobuffer = 0.
-  jbuff = 0
+  jb = 0
 end if
 
 end subroutine
@@ -155,62 +155,11 @@ real, save :: vstats(itio,4), fstats(itio,8), estats(itio,4)
 real :: gvstats(itio,4), gfstats(itio,8), gestats(itio,4), rr
 integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, j1, k1, l1, j2, k2, l2, &
   onpass, nc, ic, nr, ir, iz, id, mpio
-integer, save :: jvstats = 0, jfstats = 0
+integer, save :: jv = 0, jf = 0
 logical :: dofault, fault, cell
 
-! Debug
+! Staus
 if ( master .and. ( it == 0 .or. debug == 2 ) ) write( 0, '(a,i2)' ) ' Output pass', pass
-if ( debug == 10 .and. ip < 10 .and. nt < 10 ) then
-i = 1000 * ( it + 1 ) + ip
-select case( pass )
-case( 1 )
-  if ( it == 0 ) then
-    j = i1core(1) 
-    if ( ip == 0 ) uu(j,:,:,1) = 1.
-    do l = i1node(3), i2node(3)
-    do k = 1, nm(2)
-      write( 010+i, * ) mr(:,k,l)
-      write( 020+i, * ) gam(:,k,l)
-    end do
-    end do
-    do l = i1cell(3), i2cell(3)
-    do k = 1, nm(2)-1
-      write( 030+i, * ) lam(:,k,l)
-      write( 040+i, * ) mu(:,k,l)
-      write( 050+i, * ) yy(:,k,l)
-    end do
-    end do
-  end if
-  do l = i1node(3), i2node(3)
-  do k = 1, nm(2)
-    write( 110+i, * ) vv(:,k,l,1)
-    write( 120+i, * ) vv(:,k,l,2)
-    write( 130+i, * ) vv(:,k,l,3)
-    write( 210+i, * ) uu(:,k,l,1)
-    write( 220+i, * ) uu(:,k,l,2)
-    write( 230+i, * ) uu(:,k,l,3)
-  end do
-  end do
-  do l = i1cell(3), i2cell(3)
-  do k = 1, nm(2)-1
-    write( 310+i, * ) w1(:,k,l,1)
-    write( 320+i, * ) w1(:,k,l,2)
-    write( 330+i, * ) w1(:,k,l,3)
-    write( 340+i, * ) w2(:,k,l,1)
-    write( 350+i, * ) w2(:,k,l,2)
-    write( 360+i, * ) w2(:,k,l,3)
-  end do
-  end do
-case( 2 )
-  do l = i1node(3), i2node(3)
-  do k = 1, nm(2)
-    write( 410+i, * ) w1(:,k,l,1)
-    write( 420+i, * ) w1(:,k,l,2)
-    write( 430+i, * ) w1(:,k,l,3)
-  end do
-  end do
-end select
-end if
 
 ! Test for fault
 dofault = .false.
@@ -223,32 +172,32 @@ end if
 if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
   select case( pass )
   case( 1 )
-    jvstats = jvstats + 1
+    jv = jv + 1
     s1 = sum( vv * vv, 4 )
     s2 = sum( w1 * w1, 4 ) + 2. * sum( w2 * w2, 4 )
     call scalarsethalo( s1, -1., i1core, i2core )
     call scalarsethalo( s2, -1., i1core, i2core )
-    vstats(jvstats,1) = maxval( s1 )
-    vstats(jvstats,2) = maxval( s2 )
+    vstats(jv,1) = maxval( s1 )
+    vstats(jv,2) = maxval( s2 )
   case( 2 )
     s1 = sum( uu * uu, 4 )
     s2 = sum( w1 * w1, 4 )
     call scalarsethalo( s1, -1., i1core, i2core )
     call scalarsethalo( s2, -1., i1core, i2core )
-    vstats(jvstats,3) = maxval( s1 )
-    vstats(jvstats,4) = maxval( s2 )
+    vstats(jv,3) = maxval( s1 )
+    vstats(jv,4) = maxval( s2 )
     if ( modulo( it, itio ) == 0 .or. it == nt ) then
       call rreduce2( gvstats, vstats, 'max', 0 )
       if ( master ) then
         gvstats = sqrt( gvstats )
-        call rwrite1( 'stats/vmax', gvstats(:jvstats,1), it / itstats )
-        call rwrite1( 'stats/wmax', gvstats(:jvstats,2), it / itstats )
-        call rwrite1( 'stats/umax', gvstats(:jvstats,3), it / itstats )
-        call rwrite1( 'stats/amax', gvstats(:jvstats,4), it / itstats )
-        rr = maxval( gvstats(:jvstats,3) )
+        call rwrite1( 'stats/vmax', gvstats(:jv,1), it / itstats )
+        call rwrite1( 'stats/wmax', gvstats(:jv,2), it / itstats )
+        call rwrite1( 'stats/umax', gvstats(:jv,3), it / itstats )
+        call rwrite1( 'stats/amax', gvstats(:jv,4), it / itstats )
+        rr = maxval( gvstats(:jv,3) )
         if ( rr > dx / 10. ) write( 0, * ) 'warning: u !<< dx', rr, dx
       end if
-      jvstats = 0
+      jv = 0
     end if
   end select
 end if
@@ -257,50 +206,50 @@ end if
 if ( it > 0 .and. dofault .and. modulo( it, itstats ) == 0 ) then
   select case( pass )
   case( 1 )
-    jfstats = jfstats + 1
+    jf = jf + 1
     call scalarsethalo( f1,   -1., i1core, i2core )
     call scalarsethalo( f2,   -1., i1core, i2core )
     call scalarsethalo( tarr, -1., i1core, i2core )
-    fstats(jfstats,1) = maxval( f1 )
-    fstats(jfstats,2) = maxval( f2 )
-    fstats(jfstats,3) = maxval( sl )
-    fstats(jfstats,4) = maxval( tarr )
+    fstats(jf,1) = maxval( f1 )
+    fstats(jf,2) = maxval( f2 )
+    fstats(jf,3) = maxval( sl )
+    fstats(jf,4) = maxval( tarr )
   case( 2 )
     call scalarsethalo( ts, -1., i1core, i2core )
     call scalarsethalo( f2, -1., i1core, i2core )
-    fstats(jfstats,5) = maxval( ts )
-    fstats(jfstats,6) = maxval( f2 )
+    fstats(jf,5) = maxval( ts )
+    fstats(jf,6) = maxval( f2 )
     rr = -2. * abs( minval( tn ) ) - 1.
     call scalarsethalo( tn, rr, i1core, i2core )
-    fstats(jfstats,7) = maxval( tn )
-    rr = 2. * abs( fstats(jfstats,7) ) + 1.
+    fstats(jf,7) = maxval( tn )
+    rr = 2. * abs( fstats(jf,7) ) + 1.
     call scalarsethalo( tn, rr, i1core, i2core )
-    fstats(jfstats,8) = -minval( tn )
-    estats(jfstats,1) = efric
-    estats(jfstats,2) = estrain
-    estats(jfstats,3) = moment
+    fstats(jf,8) = -minval( tn )
+    estats(jf,1) = efric
+    estats(jf,2) = estrain
+    estats(jf,3) = moment
     if ( modulo( it, itio ) == 0 .or. it == nt ) then
       call rreduce2( gfstats, fstats, 'allmax', ifn )
       call rreduce2( gestats, estats, 'allsum', ifn )
       if ( master ) then
-        gfstats(:jfstats,8) = -gfstats(:jfstats,8)
-        gestats(:jfstats,4) = -999
-        do i = 1, jfstats
+        gfstats(:jf,8) = -gfstats(:jf,8)
+        gestats(:jf,4) = -999
+        do i = 1, jf
           if ( gestats(i,3) > 0. ) gestats(i,4) = ( log10( gestats(i,3) ) - 9.05 ) / 1.5
         end do
-        call rwrite1( 'stats/svmax',   gfstats(:jfstats,1), it / itstats )
-        call rwrite1( 'stats/sumax',   gfstats(:jfstats,2), it / itstats )
-        call rwrite1( 'stats/slmax',   gfstats(:jfstats,3), it / itstats )
-        call rwrite1( 'stats/tarrmax', gfstats(:jfstats,4), it / itstats )
-        call rwrite1( 'stats/tsmax',   gfstats(:jfstats,5), it / itstats )
-        call rwrite1( 'stats/samax',   gfstats(:jfstats,6), it / itstats )
-        call rwrite1( 'stats/tnmax',   gfstats(:jfstats,7), it / itstats )
-        call rwrite1( 'stats/tnmin',   gfstats(:jfstats,8), it / itstats )
-        call rwrite1( 'stats/efric',   gestats(:jfstats,1), it / itstats )
-        call rwrite1( 'stats/estrain', gestats(:jfstats,2), it / itstats )
-        call rwrite1( 'stats/moment',  gestats(:jfstats,3), it / itstats )
-        call rwrite1( 'stats/mw',      gestats(:jfstats,4), it / itstats ) 
-        jfstats = 0
+        call rwrite1( 'stats/svmax',   gfstats(:jf,1), it / itstats )
+        call rwrite1( 'stats/sumax',   gfstats(:jf,2), it / itstats )
+        call rwrite1( 'stats/slmax',   gfstats(:jf,3), it / itstats )
+        call rwrite1( 'stats/tarrmax', gfstats(:jf,4), it / itstats )
+        call rwrite1( 'stats/tsmax',   gfstats(:jf,5), it / itstats )
+        call rwrite1( 'stats/samax',   gfstats(:jf,6), it / itstats )
+        call rwrite1( 'stats/tnmax',   gfstats(:jf,7), it / itstats )
+        call rwrite1( 'stats/tnmin',   gfstats(:jf,8), it / itstats )
+        call rwrite1( 'stats/efric',   gestats(:jf,1), it / itstats )
+        call rwrite1( 'stats/estrain', gestats(:jf,2), it / itstats )
+        call rwrite1( 'stats/moment',  gestats(:jf,3), it / itstats )
+        call rwrite1( 'stats/mw',      gestats(:jf,4), it / itstats ) 
+        jf = 0
         i1 = ihypo
         i1(ifn) = 1  
         open( 1, file='stats/tarrhypo', status='replace' )
@@ -350,6 +299,7 @@ ir = ( it          - i1out(iz,4) ) / ditout(iz) + 1
 nr = ( i2out(iz,4) - i1out(iz,4) ) / ditout(iz) + 1
 
 ! Fault plane
+mpio = mpout * 4
 if ( fault ) then
   if ( .not. dofault ) cycle doiz
   i = abs( faultnormal )
@@ -376,7 +326,6 @@ if ( modulo( it, itstats ) /= 0 ) then
 end if
 
 ! Binary output
-mpio = mpout * 4
 do ic = 1, nc
   id = 6 * ( iz - 1 ) + ic
   write( str, '(a,i2.2,a)' ) 'out/', iz, fieldout(iz)
@@ -433,11 +382,11 @@ do ic = 1, nc
     call rwrite( str, rr, ir )
   else
     i = ibuff(iz) + ic - 1
-    jbuff(i) = jbuff(i) + 1
-    iobuffer(jbuff(i),i) = rr
+    jb(i) = jb(i) + 1
+    iobuffer(jb(i),i) = rr
     if ( modulo( it, itio ) == 0 .or. it == nt ) then
-      call rwrite1( str, iobuffer(:jbuff(i),i), ir )
-      jbuff(i) = 0
+      call rwrite1( str, iobuffer(:jb(i),i), ir )
+      jb(i) = 0
     end if
   end if
   end if

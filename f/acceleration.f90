@@ -145,17 +145,6 @@ end do
 ! Boundary conditions
 call vectorbc( w1, ibc1, ibc2, nhalo )
 
-! Debug parallel
-if ( debug == 10 .and. ip < 10 .and. nt < 10 ) then
-do l = 1, nm(3)
-do k = 1, nm(2)
-  write( 310+1000*it+ip, * ) w1(:,k,l,1)
-  write( 320+1000*it+ip, * ) w1(:,k,l,2)
-  write( 330+1000*it+ip, * ) w1(:,k,l,3)
-end do
-end do
-end if
-
 end subroutine
 
 end module

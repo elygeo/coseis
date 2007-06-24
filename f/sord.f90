@@ -22,7 +22,7 @@ use m_locknodes
 use m_util
 implicit none
 real :: prof0(16), prof1(itio), prof2(itio), prof3(itio), prof4(itio)
-integer :: jp
+integer :: jp = 0
 
 ! Initialization
 prof0(1) = timer( 0 )
@@ -50,7 +50,6 @@ end if
 if ( sync ) call barrier ; prof0(16) = timer( 3 )
 if ( master ) write( 0, * ) 'Main loop'
 if ( master ) call rwrite1( 'prof/main', prof0 )
-jp = 0
 do while ( it < nt )
   it = it + 1
   jp = jp + 1
@@ -69,7 +68,7 @@ do while ( it < nt )
   prof2(jp) = prof2(jp) + timer( 1 )
   prof4(jp) = timer( 2 )
   if ( master ) then
-  if ( modulo( it, itio ) == 0 .or. it = nt ) then
+  if ( it == nt .or. modulo( it, itio ) == 0 ) then
     call rwrite1( 'prof/comp', prof1(:jp), it )
     call rwrite1( 'prof/out' , prof2(:jp), it )
     call rwrite1( 'prof/comm', prof3(:jp), it )

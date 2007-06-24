@@ -129,7 +129,7 @@ real, intent(in) :: val
 integer, intent(in) :: ir
 integer :: i
 inquire( iolength=i ) val
-if ( it == 1 ) then
+if ( ir == 1 ) then
   open( 1, file=str, recl=i, form='unformatted', access='direct', status='new' )
 else
   open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
