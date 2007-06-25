@@ -24,10 +24,8 @@ if ( np0 == 1 ) np = 1
 nl = nn / np
 where ( modulo( nn, np ) /= 0 ) nl = nl + 1
 nhalo = 1
-if ( ifn /= 0 ) then
-  nl(ifn) = max( 2, nl(ifn) )
-  if ( modulo( ihypo(ifn), nl(ifn) ) == 0 ) nhalo(ifn) = 2
-end if
+if ( ifn /= 0 ) nhalo(ifn) = 2
+nl = max( nl, nhalo )
 np = nn / nl
 where ( modulo( nn, nl ) /= 0 ) np = np + 1
 call rank( ip, ip3, np )
@@ -35,6 +33,7 @@ nnoff = nl * ip3 - nhalo
 
 ! Master process
 ip3master = ( ihypo - 1 ) / nl
+where ( ip3master < 0 ) ip3master = 0
 master = .false.
 if ( all( ip3 == ip3master ) ) master = .true.
 call setmaster( ip3master )
@@ -81,7 +80,7 @@ if ( any( i1pml > i2pml ) ) stop 'model too small for PML'
 ! Map hypocenter to local index, test if fault on this process
 ihypo = ihypo - nnoff
 if ( ifn /= 0 ) then
-  if ( ihypo(ifn) < 1 .or. ihypo(ifn) > nm(ifn) - 1 ) ifn = 0
+  if ( ihypo(ifn) + 1 < i1core(ifn) .or. ihypo(ifn) > i2core(ifn) ) ifn = 0
 end if
 
 ! Synchronize processes if debugging

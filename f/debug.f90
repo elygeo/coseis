@@ -1,7 +1,8 @@
+! include in output.f90 for debugging
 
-if ( debug == 10 .and. ip < 10 .and. nt < 10 ) then
 i = 1000 * ( it + 1 ) + ip
-
+select case( pass )
+case( 1 )
   if ( it == 0 ) then
     j = i1core(1) 
     if ( ip == 0 ) uu(j,:,:,1) = 1.
@@ -39,8 +40,7 @@ i = 1000 * ( it + 1 ) + ip
     write( 360+i, * ) w2(:,k,l,3)
   end do
   end do
-
-
+case( 2 )
   do l = i1node(3), i2node(3)
   do k = 1, nm(2)
     write( 410+i, * ) w1(:,k,l,1)
@@ -48,3 +48,5 @@ i = 1000 * ( it + 1 ) + ip
     write( 430+i, * ) w1(:,k,l,3)
   end do
   end do
+end select
+

@@ -28,6 +28,7 @@
   dt = .24;
   trelax = 2.4;
   nt = 375;
+  nt = 10;
   nn = [  151   77  21 ];
   fixhypo = 1;
   ihypo = [   69   51  -2 ];
