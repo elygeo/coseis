@@ -265,7 +265,7 @@ i3 = max( i1, i1core )
 i4 = min( i2, i2core )
 
 ! Peak velocity calculation
-if ( fieldout(iz) == 'pv2' .and. all( i3 >= i4 ) ) then
+if ( fieldout(iz) == 'pv2' .and. all( i3 <= i4 ) ) then
   if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, vv, i3, i4 )
   forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
     pv(j,k,l) = max( pv(j,k,l), s1(j,k,l) )

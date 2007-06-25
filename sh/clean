@@ -1,5 +1,6 @@
 #!/bin/bash -ev
 
 /bin/rm -rf vm checkpoint input sord-s sord-p currentstep
-rmdir debug
+for file in *; do [ -s "$file" ] || rm "$file"; done
+rmdir * 1> /dev/null
 
