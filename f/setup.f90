@@ -81,7 +81,7 @@ if ( any( i1pml > i2pml ) ) stop 'model too small for PML'
 ! Map hypocenter to local index, test if fault on this process
 ihypo = ihypo - nnoff
 if ( ifn /= 0 ) then
-  if ( ihypo(ifn) < 2 .or. ihypo(ifn) > nm(ifn) - 2 ) ifn = 0
+  if ( ihypo(ifn) < 1 .or. ihypo(ifn) > nm(ifn) - 1 ) ifn = 0
 end if
 
 ! Synchronize processes if debugging

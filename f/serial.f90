@@ -111,14 +111,16 @@ end subroutine
 subroutine scalarswaphalo( f, n )
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: n(3)
-!f(1,1,1) = f(1,1,1) - n(1) + n(1)
+return
+f(1,1,1) = f(1,1,1) - n(1) + n(1)
 end subroutine
 
 ! Vector swap halo
 subroutine vectorswaphalo( f, n )
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: n(3)
-!f(1,1,1,1) = f(1,1,1,1) - n(1) + n(1)
+return
+f(1,1,1,1) = f(1,1,1,1) - n(1) + n(1)
 end subroutine
 
 ! Scalar field input/output

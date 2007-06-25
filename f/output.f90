@@ -11,7 +11,7 @@ use m_globals
 use m_collective
 use m_outprops
 use m_util
-real :: rout
+real :: rout, x0(3)
 integer :: i1(3), i2(3), n(3), noff(3), &
   i, j1, k1, l1, j2, k2, l2, nc, iz, onpass, nbuff
 logical :: dofault, fault, cell
@@ -69,6 +69,7 @@ case( 'z' )
     i2(i) = ihypo(i)
   end if
 case( 'x' )
+  x0 = xout(iz,:)
   ditout(iz) = 1
   i1out(iz,4) = 0
   i2out(iz,4) = nt
@@ -82,27 +83,22 @@ case( 'x' )
       i2 = nm
       i1(i) = ihypo(i)
       i2(i) = ihypo(i)
-      j1 = i1(1); j2 = i2(1)
-      k1 = i1(2); k2 = i2(2)
-      l1 = i1(3); l2 = i2(3)
-      t2 = w2(j1:j2,k1:k2,l1:l2,:)
-      rout = xout(iz,:)
-      call radius( f2, t2, rout, i1, i2 )
+      call radius( s2, w1, x0, i1, i2 )
+      f2 = s2(i1(1):i2(1),i1(2):i2(2),i1(3):i2(3))
       rout = 2 * dx * dx + maxval( f2 )
       call scalarsethalo( f2, rout, i1core, i2core )
       call reduceloc( rout, i1, f2, 'allmin', n, noff, i )
       i1(i) = ihypo(i)
     end if
   else
-    rout = xout(iz,:)
     if ( cell ) then
       i1 = max( i1core, i1cell )
       i2 = min( i2core, i2cell )
-      call radius( s2, w2, rout, i1, i2 )
+      call radius( s2, w2, x0, i1, i2 )
       rout = 2 * dx * dx + maxval( s2 )
       call scalarsethalo( s2, rout, i1, i2 )
     else
-      call radius( s2, w1, rout, i1core, i2core )
+      call radius( s2, w1, x0, i1core, i2core )
       rout = 2 * dx * dx + maxval( s2 )
       call scalarsethalo( s2, rout, i1core, i2core )
     end if

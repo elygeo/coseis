@@ -48,7 +48,9 @@ subroutine scalaraverage( fa, f, i1, i2, d )
 real, intent(out) :: fa(:,:,:)
 real, intent(in) :: f(:,:,:)
 integer, intent(in) :: i1(3), i2(3), d
-integer :: j, k, l
+integer :: j, k, l, n(3)
+n = (/ size(f,1), size(f,2), size(f,3) /)
+if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in scalaraverage'
 forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
   fa(j,k,l) = 0.125 * &
   ( f(j,k,l) + f(j+d,k+d,l+d) &
@@ -63,7 +65,9 @@ subroutine vectoraverage( fa, f, i1, i2, d )
 real, intent(out) :: fa(:,:,:,:)
 real, intent(in) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), d
-integer :: i, j, k, l
+integer :: i, j, k, l, n(3)
+n = (/ size(f,1), size(f,2), size(f,3) /)
+if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vectoraverage'
 forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3), i=1:3 )
   fa(j,k,l,i) = 0.125 * &
   ( f(j,k,l,i) + f(j+d,k+d,l+d,i) &
@@ -78,7 +82,9 @@ subroutine radius( r, x, x0, i1, i2 )
 real, intent(out) :: r(:,:,:)
 real, intent(in) :: x(:,:,:,:), x0(3)
 integer, intent(in) :: i1(3), i2(3)
-integer :: j, k, l
+integer :: j, k, l, n(3)
+n = (/ size(r,1), size(r,2), size(r,3) /)
+if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in radius'
 forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
   r(j,k,l) = &
   ( x(j,k,l,1) - x0(1) ) * ( x(j,k,l,1) - x0(1) ) + &
@@ -91,7 +97,9 @@ subroutine vectornorm( s, f, i1, i2 )
 real, intent(out) :: s(:,:,:)
 real, intent(in) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3)
-integer :: j, k, l
+integer :: j, k, l, n(3)
+n = (/ size(s,1), size(s,2), size(s,3) /)
+if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vectornorm'
 forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
   s(j,k,l) = &
   f(j,k,l,1) * f(j,k,l,1) + &
@@ -104,7 +112,9 @@ subroutine tensornorm( s, w1, w2, i1, i2 )
 real, intent(out) :: s(:,:,:)
 real, intent(in) :: w1(:,:,:,:), w2(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3)
-integer :: j, k, l
+integer :: j, k, l, n(3)
+n = (/ size(s,1), size(s,2), size(s,3) /)
+if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in tensornorm'
 forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
   s(j,k,l) = &
   w1(j,k,l,1) * w1(j,k,l,1) + &

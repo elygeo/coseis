@@ -39,10 +39,10 @@
   itcheck = 0;
   np = [ 4 4 2 ];
 
-% xy-shear symmetric
-  affine = [ 1. 1. 0.   0. 1. 0.   0. 0. 1. ];
-  nn       = [ 486 136 101 ];
-  ihypo    = [ 211  -1  -1 ];
-  bc2      = [   0   3  -2 ];
-  n2expand = [  50   0   0 ];
+% xy-shear
+  affine = [ 1. 1. 1.   0. 1. 0.   0. 0. 1. ];
+  nn       = [ 551 271 101 ];
+  ihypo    = [   0   0  -1 ];
+  bc2      = [   0   0  -2 ];
+  n2expand = [  50  50   0 ];
 
