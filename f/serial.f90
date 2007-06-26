@@ -123,7 +123,19 @@ return
 f(1,1,1,1) = f(1,1,1,1) - n(1) + n(1)
 end subroutine
 
-! Scalar field input/output
+! Time series I/O
+subroutine tseriesio( id, mpio, str, ft, ir )
+use m_util
+real, intent(inout) :: ft(:)
+integer, intent(in) :: id, mpio, ir
+character(*), intent(in) :: str
+integer :: i
+if ( id == 0 ) return
+call rio1( id, str, s1, ir )
+i = mpio
+end function
+
+! Scalar field I/O
 subroutine scalario( id, mpio, r, str, s1, i1, i2, i3, i4, nr, ir )
 use m_util
 real, intent(inout) :: r, s1(:,:,:)
@@ -145,7 +157,7 @@ call rio3( id, str, s1, i1, i2, ir )
 i = i3(1) + i4(1) + mpio
 end subroutine
 
-! Vector field component input/output
+! Vector field component I/O
 subroutine vectorio( id, mpio, r, str, w1, ic, i1, i2, i3, i4, nr, ir )
 use m_util
 real, intent(inout) :: r, w1(:,:,:,:)

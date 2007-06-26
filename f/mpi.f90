@@ -278,6 +278,40 @@ end if
 end do
 end subroutine
 
+! Timer series input/output
+subroutine tseriesio( id, mpio, str, ft, ir )
+use m_util
+use mpi
+real, intent(inout) :: ft(:)
+integer, intent(in) :: id, mpio, ir
+character(*), intent(in) :: str
+integer :: i, n, fh, comm, e
+integer(kind=mpi_offset_kind) i0
+if ( id == 0 ) return
+if ( mpio == 0 ) then
+  call rio1( id, str, s1, ir )
+  return
+end if
+inquire( iolength=i ) ft(1)
+n = size( ft )
+i0 = i * ( ir - n )
+if ( id < 0 ) then
+  i = mpi_mode_rdonly
+elseif ( ir == 1 ) then
+  i = mpi_mode_wronly + mpi_mode_create
+else
+  i = mpi_mode_wronly
+end if
+call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
+call mpi_file_open( comm, str, i, mpi_info_null, fh, e )
+if ( id < 0 ) then
+  call mpi_file_read_at( fh, i0, ft(1), n, mpi_real, mpi_status_ignore, e )
+else
+  call mpi_file_write_at( fh, i0, ft(1), n, mpi_real, mpi_status_ignore, e )
+end if
+call mpi_file_close( fh, e )
+end function
+
 ! Scalar field component input/output
 subroutine scalario( id, mpio, r, str, s1, i1, i2, i3, i4, nr, ir )
 use m_util
@@ -391,9 +425,9 @@ else
   i = mpi_mode_wronly
 end if
 call mpi_file_open( comm, str, i, mpi_info_null, fh, e )
-i0 = (/ i3 - i1    , 0  /)
-n  = (/ i2 - i1 + 1, nr /)
-nl = (/ i4 - i3 + 1, nr /)
+i0 = (/ i3 - i1    , ir - 1  /)
+n  = (/ i2 - i1 + 1, nr - ir + 1 /)
+nl = (/ i4 - i3 + 1, nr - ir + 1 /)
 ndims = 4
 do i = ndims, 1, -1 ! squeeze singleton dimentions
 if ( n(i) == 1 ) then

@@ -174,55 +174,44 @@ else
 end if
 end function
 
-! Write real binary timeseries
-subroutine rwrite( str, val, ir )
+! Timeseries I/O
+subroutine rio1( id, str, ft, ir )
+real, intent(inout) :: ft(:)
+integer, intent(in) :: id, ir
 character(*), intent(in) :: str
-real, intent(in) :: val
-integer, intent(in) :: ir
-integer :: i
-inquire( iolength=i ) val
-if ( ir == 1 ) then
-  open( 1, file=str, recl=i, form='unformatted', access='direct', status='new' )
-else
-  open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
-end if
-write( 1, rec=ir ) val
-close( 1 )
-end subroutine
-  
-! Write buffered real binary timeseries
-subroutine rwrite1( str, val, ir )
-character(*), intent(in) :: str
-real, intent(in) :: val(:)
-integer, intent(in), optional :: ir
 integer :: i, n, i0
-n = size( val, 1 )
-i0 = 0
-if ( present( ir ) ) i0 = ir - n
+n = size( ft )
+i0 = ir - n
 if ( i0 < 0 ) then
-  write ( 0, * )  'Error in rwrite1 ', trim( str ), ir, n
+  write ( 0, * )  'Error in rio1 ', trim( str ), ir, n
   stop
 end if
 if ( modulo( i0, n ) == 0 ) then
-  inquire( iolength=i ) val
-  if ( i0 == 0 ) then
+  inquire( iolength=i ) ft
+  if ( id > 0 .and. i0 == 0 ) then
     open( 1, file=str, recl=i, form='unformatted', access='direct', status='new' )
   else
     open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
   end if
   i = i0 / n + 1
-  write( 1, rec=i ) val
+  if ( id > 0 ) then
+    write( 1, rec=i ) ft
+  else
+    read( 1, rec=i ) ft
+  end if
   close( 1 )
 else
-  inquire( iolength=i ) val(1)
-  if ( i0 == 0 ) then
+  inquire( iolength=i ) ft(1)
+  if ( id > 0 .and. i0 == 0 ) then
     open( 1, file=str, recl=i, form='unformatted', access='direct', status='new' )
   else
     open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
   end if
-  do i = 1, n
-    write( 1, rec=i0+i ) val(i)
-  end do
+  if ( id > 0 ) then
+    do i = 1, n; write( 1, rec=i0+i ) ft(i); end do
+  else
+    do i = 1, n; read( 1, rec=i0+i ) ft(i); end do
+  end if
   close( 1 )
 end if
 end subroutine
@@ -247,10 +236,10 @@ if ( io /= 0 ) then
   write( 0, * ) 'Error opening file: ', trim( str )
   stop 
 end if
-if ( id < 0 ) then
-  read(  1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
-else
+if ( id > 0 ) then
   write( 1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
+else
+  read(  1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
 end if
 close( 1 )
 end subroutine
@@ -275,10 +264,10 @@ if ( io /= 0 ) then
   write( 0, * ) 'Error opening file: ', trim( str )
   stop 
 end if
-if ( id < 0 ) then
-  read(  1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
-else
+if ( id > 0 ) then
   write( 1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
+else
+  read(  1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
 end if
 close( 1 )
 end subroutine

@@ -38,7 +38,7 @@
 
   itcheck = 0;
   np = [ 1 1 2 ];
-  np = [ 4 4 1 ];
+  np = [ 4 2 1 ];
 
 % rectangular
   affine = [ 1. 0. 0.   0. 1. 0.   0. 0. 1. ];
