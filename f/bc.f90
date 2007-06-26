@@ -56,7 +56,7 @@ subroutine vectorbc( f, ibc1, ibc2, n, tensor )
 implicit none
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: ibc1(3), ibc2(3), n(3), tensor
-integer :: i1(3), i2(3), nm(3), s(3), a, b, c, i, j, k, l, j1, k1, l1, j2, k2, l2
+integer :: i1(3), i2(3), nm(3), s(3), a, b, c, i, j1, k1, l1, j2, k2, l2
 nm = (/ size(f,1), size(f,2), size(f,3) /)
 a = -1 ! sign of normal component
 b = 1  ! sign of tangential components

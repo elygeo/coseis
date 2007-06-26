@@ -8,8 +8,7 @@ use m_globals
 use m_collective
 use m_bc
 use m_util
-integer :: i1(3), i2(3), i3(3), i4(3), n(3), i, j, k, l, &
-  j1, k1, l1, j2, k2, l2, idoublenode, b, c
+integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, b, c
 real :: x0(3), xlim(6), gxlim(6), m(9), tol, r
 
 if ( master ) write( 0, * ) 'Grid generation'

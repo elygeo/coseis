@@ -7,7 +7,6 @@
   dt = .0075;				% time step length
   grid = 'constant';			% regular mesh
   affine = [ 1. 0. 0.  0. 1. 0.  0. 0. 1.  1. ]; % grid transformation
-  symmetry = [ 0 0 0 ];			% grid symmetry
   gridnoise = 0.			% Random noise added to mesh
   oplevel = 0;				% 1=const, 2=rect, 3=parallel, 3=onepoint, 5=exact, 6=saved, 0=auto pick 2 or 6
   rho = 2670.;				% **density
