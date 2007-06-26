@@ -43,7 +43,7 @@ gfortran)
   sfc='gfortran -fimplicit-none -Wall'
   pfc='mpif90 -fimplicit-none -Wall'
   gflags='-g -pg -fbounds-check -ffpe-trap=invalid,zero,overflow'
-  gflags='-g -O0 -fbounds-check -ffpe-trap=invalid,zero,overflow'
+  gflags='-g -fbounds-check -ffpe-trap=invalid,zero,overflow'
   oflags='-O -fbounds-check -ffpe-trap=invalid,zero,overflow'
   oflags='-O3 -fbounds-check -ffpe-trap=invalid,zero,overflow'
   oflags='-O3'

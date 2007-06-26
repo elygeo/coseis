@@ -34,11 +34,11 @@ if ( debug /= 0 ) then
   write( 1, '(a,3i8,a)'       ) '  ihypo  = [', ihypo,  ' ];'
   write( 1, '(a,3i8,a)'       ) '  nm     = [', nm,     ' ];'
   write( 1, '(a,3i8,a)'       ) '  nnoff  = [', nnoff,  ' ];'
+  write( 1, '(a,3i8,a,3i8,a)' ) '  i1bc   = [', i1bc  , ' ]; i2bc   = [', i2bc  , ' ];'
   write( 1, '(a,3i8,a,3i8,a)' ) '  i1pml  = [', i1pml,  ' ]; i2pml  = [', i2pml,  ' ];'
   write( 1, '(a,3i8,a,3i8,a)' ) '  i1core = [', i1core, ' ]; i2core = [', i2core, ' ];'
   write( 1, '(a,3i8,a,3i8,a)' ) '  i1node = [', i1node, ' ]; i2node = [', i2node, ' ];'
   write( 1, '(a,3i8,a,3i8,a)' ) '  i1cell = [', i1cell, ' ]; i2cell = [', i2cell, ' ];'
-  write( 1, '(a,3i8,a,3i8,a)' ) '  i1bc   = [', i1bc,   ' ]; i2bc   = [', i2bc ,  ' ];'
   do iz = 1, nin
     select case( intype(iz) )
     case( 'z' ); write( 1, '(2x,a,a,g15.7,a,6i8,a)' ) &
@@ -98,6 +98,8 @@ write( 1, '(a,3i8,a)'    ) '  n1expand    = [', n1expand,       ' ];'
 write( 1, '(a,3i8,a)'    ) '  n2expand    = [', n2expand,       ' ];'
 write( 1, '(a,3i8,a)'    ) '  bc1         = [', bc1,            ' ];'
 write( 1, '(a,3i8,a)'    ) '  bc2         = [', bc2,            ' ];'
+write( 1, '(a,3i8,a)'    ) '  i1bc        = [', i1bc + nnoff,   ' ];'
+write( 1, '(a,3i8,a)'    ) '  i2bc        = [', i2bc + nnoff,   ' ];'
 write( 1, '(3a)'         ) '  grid        = ''', trim( grid ),  ''' ;'
 write( 1, '(3a)'         ) '  endian      = ''', endian,        ''' ;'
 write( 1, '(a,g15.7,a)'  ) '  rsource     =  ', rsource,        ' ;'

@@ -70,7 +70,7 @@ i2node = min( i2bc, nm - 1 )
 
 ! Cell region
 i1cell = max( i1bc, 1 )
-i2cell = min( i2bc, nm - 1 )
+i2cell = min( i2bc - 1, nm - 1 )
 
 ! PML region
 npml = max( 0, npml )
