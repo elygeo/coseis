@@ -151,7 +151,6 @@ integer, dimension(3) :: &
   ibc2,          & ! internal boundary conditions - far side
   nnoff,         & ! offset between local and global indices
   ihypo,         & ! hypocenter node
-  symmetry,      & ! grid symmetry in j k l
   n1expand,      & ! # grid expansion nodes - near side
   n2expand,      & ! # grid expansion nodes - far side
   i1core,        & ! core region start index
