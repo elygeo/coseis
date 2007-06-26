@@ -30,9 +30,9 @@ select case( key )
 case( '' )
 case( 'datadir' )
 case( 'return' );       exit doline
-case( 'grid' );         grid = str
-case( 'rfunc' );        rfunc = str
-case( 'tfunc' );        tfunc = str
+case( 'grid' );         grid = str(1:16)
+case( 'rfunc' );        rfunc = str(1:16)
+case( 'tfunc' );        tfunc = str(1:16)
 case( 'oplevel' );      read( str, *, iostat=io ) oplevel
 case( 'affine' );       read( str, *, iostat=io ) affine
 case( 'gridnoise' );    read( str, *, iostat=io ) gridnoise
@@ -55,6 +55,8 @@ case( 'vs2' );          read( str, *, iostat=io ) vs2
 case( 'npml' );         read( str, *, iostat=io ) npml
 case( 'bc1' );          read( str, *, iostat=io ) bc1
 case( 'bc2' );          read( str, *, iostat=io ) bc2
+case( 'i1bc' );         read( str, *, iostat=io ) i1bc
+case( 'i2bc' );         read( str, *, iostat=io ) i2bc
 case( 'xhypo' );        read( str, *, iostat=io ) xhypo
 case( 'rsource' );      read( str, *, iostat=io ) rsource
 case( 'tsource' );      read( str, *, iostat=io ) tsource
@@ -116,7 +118,7 @@ end select
 if ( inzone ) then
   nin = nin + 1
   i = nin
-  fieldin(i) = key
+  fieldin(i) = key(1:4)
   intype(i) = 'z'
   i1in(i,:) = 1
   i2in(i,:) = -1

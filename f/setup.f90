@@ -43,30 +43,34 @@ nl = min( nl, nn - nnoff - nhalo )
 nm = nl + 2 * nhalo
 
 ! Boundary conditions
+where ( i1bc < 1 ) i1bc = i1bc + nn + 1
+where ( i2bc < 1 ) i2bc = i2bc + nn + 1
+where ( abs( bc2 ) == 2 ) i2bc = i2bc - 1
 if ( ifn /= 0 ) then
-  if ( ihypo(ifn) == 0       ) bc1(ifn) = -2
-  if ( ihypo(ifn) == nn(ifn) ) bc2(ifn) = -2
+  if ( ihypo(ifn) < 2 ) then
+    bc1(ifn) = -2
+    i1bc(ifn) = ihypo(ifn) + 1
+  end if
+  if ( ihypo(ifn) > nn(ifn) - 2 ) then
+    bc2(ifn) = -2
+    i2bc(ifn) = ihypo(ifn)
+  end if
 end if
-ibc1 = bc1
-ibc2 = bc2
-where ( ip3 /= 0      ) ibc1 = 9
-where ( ip3 /= np - 1 ) ibc2 = 9
+i1bc = max( 0,      i1bc - nnoff )
+i2bc = min( nm + 1, i2bc - nnoff )
+if ( any( i1bc > i2bc ) ) stop 'model too small for BC'
 
 ! Non-overlapping core region
 i1core = 1  + nhalo
 i2core = nm - nhalo
 
 ! Node region
-i1node = 1  + nhalo
-i2node = nm - nhalo
-where ( ibc1 == 9 ) i1node = 2
-where ( ibc2 == 9 ) i2node = nm - 1
+i1node = max( i1bc, 2 )
+i2node = min( i2bc, nm - 1 )
 
 ! Cell region
-i1cell = 1  + nhalo
-i2cell = nm - nhalo - 1
-where ( ibc1 == 9 ) i1cell = 1
-where ( ibc2 == 9 ) i2cell = nm - 1
+i1cell = max( i1bc, 1 )
+i2cell = min( i2bc, nm - 1 )
 
 ! PML region
 npml = max( 0, npml )

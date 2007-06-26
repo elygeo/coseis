@@ -15,8 +15,7 @@ if ( master ) write( 0, * ) 'Resample material model'
 
 ! Cell volume
 call diffnc( s1, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
-call scalarsethalo( s1, 0., i1cell, i2cell )
-call scalarbc( s1, ibc1, ibc2, nhalo, 1 )
+call scalarbc( s1, bc1, bc2, i1bc, i2bc, 1 )
 select case( ifn )
 case( 1 ); i = ihypo(1); s1(i,:,:) = 0.; yy(i,:,:) = 0.
 case( 2 ); i = ihypo(2); s1(:,i,:) = 0.; yy(:,i,:) = 0.
@@ -27,14 +26,14 @@ end select
 s2 = mr * s1
 call scalaraverage( mr, s2, i1node, i2node, -1 )
 where ( mr /= 0. ) mr = 1. / mr
-call scalarbc( mr, ibc1, ibc2, nhalo, 0 )
 call scalarswaphalo( mr, nhalo )
+call scalarbc( mr, bc1, bc2, i1bc, i2bc, 0 )
 
 ! Viscosity
 s2 = gam * dt
 call scalaraverage( gam, s2, i1node, i2node, -1 )
-call scalarbc( gam, ibc1, ibc2, nhalo, 0 )
 call scalarswaphalo( gam, nhalo )
+call scalarbc( s1, bc1, bc2, i1bc, i2bc, 0 )
 
 ! Moduli
 where ( s1 /= 0. ) s1 = 1. / s1

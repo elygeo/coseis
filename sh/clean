@@ -2,5 +2,5 @@
 
 /bin/rm -rf vm checkpoint input sord-s sord-p currentstep
 for file in *; do [ -s "$file" ] || rm "$file"; done
-rmdir * 1> /dev/null
+rmdir * 2> /dev/null
 

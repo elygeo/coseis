@@ -27,6 +27,8 @@
   npml = 10;				% 10 PML nodes
   bc1 = [ 0 0 0 ];			% j1 k1 l1 boundary cond (see below)
   bc2 = [ 0 0 0 ];			% j2 k2 l2 boundary cond (see below)
+  i1bc = [  1  1  1 ];			% boundary condition location - near side
+  i2bc = [ -1 -1 -1 ];			% boundary condition location - far side
   ihypo	 = [ 0 0 0 ];			% hypocenter node
   xhypo	 = [ 0. 0. 0. ];		% hypocenter location
   fixhypo = 1;				% 0=none 1=inode, 2=icell, -1=xnode, -2=xcell
@@ -85,9 +87,7 @@
 % Boundary conditions:
 %  0: free surface
 %  1: PML absorbing
-%  2: mirror symmetry on exterior cell center
-%     continuous tangential and opposing normal vector components
-% -2: mirror symmetry on exterior cell center, 180 phase shift
+% -2: mirror symmetry on exterior node pairs, 180 phase shift
 %     continuous normal and opposing tangential vector components
 %     useful for fault planes
 %  3: mirror symmetry on boundary node

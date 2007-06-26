@@ -20,6 +20,7 @@ use m_stress
 use m_acceleration
 use m_locknodes
 use m_util
+use m_bc
 implicit none
 real :: prof0(16), prof1(itio), prof2(itio), prof3(itio), prof4(itio)
 integer :: jp = 0
@@ -62,6 +63,7 @@ do while ( it < nt )
   if ( sync ) call barrier ; call locknodes    ; prof1(jp) = prof1(jp) + timer( 1 )
   if ( sync ) call barrier ; call output( 2 )  ; prof2(jp) = prof2(jp) + timer( 1 )
   if ( sync ) call barrier ; call vectorswaphalo( w1, nhalo ) ; prof3(jp) = timer( 1 )
+  if ( sync ) call barrier ; call vectorbc( w1, bc1, bc2, i1bc, i2bc, 0 )
   if ( modulo( it, itcheck ) == 0 ) then
     if ( sync ) call barrier ; call writecheckpoint
   end if

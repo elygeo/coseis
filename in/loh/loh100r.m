@@ -11,11 +11,11 @@
   vs  = { 2000. 'zone'   1 1 1   -1 -1 11 };
   rho = { 2600. 'zone'   1 1 1   -1 -1 11 };
   hourglass = [ 1. 1. ];
-  bc1 = [ -2 -2  0 ]; % This won't work anymore!
+  bc1 = [ -2 -2  0 ];
   bc2 = [  1  1  1 ];
 
-  nn    = [  91  111 61 ];
-  ihypo = [ -92 -112 21 ];
+  nn    = [ 91 111 61 ];
+  ihypo = [  1   1 21 ];
   xhypo = [ 0. 0. 2000. ];
   fixhypo = -2;
   rsource = 50.;

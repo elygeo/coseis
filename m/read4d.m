@@ -105,5 +105,6 @@ for l = 1:nc
   end
   fclose( fid );
 end
-f = squeeze( f );
+n = ( i4 - i3 ) ./ di + 1;
+if any( i3 ~= i4 ), f = reshape( f, [ n nc ] ); end
 

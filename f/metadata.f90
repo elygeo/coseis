@@ -38,7 +38,7 @@ if ( debug /= 0 ) then
   write( 1, '(a,3i8,a,3i8,a)' ) '  i1core = [', i1core, ' ]; i2core = [', i2core, ' ];'
   write( 1, '(a,3i8,a,3i8,a)' ) '  i1node = [', i1node, ' ]; i2node = [', i2node, ' ];'
   write( 1, '(a,3i8,a,3i8,a)' ) '  i1cell = [', i1cell, ' ]; i2cell = [', i2cell, ' ];'
-  write( 1, '(a,3i8,a,3i8,a)' ) '  ibc1   = [', ibc1,   ' ]; ibc2   = [', ibc2,   ' ];'
+  write( 1, '(a,3i8,a,3i8,a)' ) '  i1bc   = [', i1bc,   ' ]; i2bc   = [', i2bc ,  ' ];'
   do iz = 1, nin
     select case( intype(iz) )
     case( 'z' ); write( 1, '(2x,a,a,g15.7,a,6i8,a)' ) &

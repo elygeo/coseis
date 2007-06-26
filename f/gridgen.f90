@@ -112,8 +112,8 @@ if ( gridnoise > 0. ) then
   j1 = i3(1); j2 = i4(1)
   k1 = i3(2); k2 = i4(2)
   l1 = i3(3); l2 = i4(3)
-  i1 = abs( ibc1 )
-  i2 = abs( ibc2 )
+  i1 = abs( bc1 )
+  i2 = abs( bc2 )
   if ( i1(1) <= 1 ) w2(j1,:,:,1) = 0.
   if ( i2(1) <= 1 ) w2(j2,:,:,1) = 0.
   if ( i1(2) <= 1 ) w2(:,k1,:,2) = 0.
@@ -138,8 +138,8 @@ end select
 ! Fill halo and find cell centers
 i1 = 4
 i2 = 4
-call vectorbc( w1, i1, i2, nhalo, 0 )
 call vectorswaphalo( w1, nhalo )
+call vectorbc( w1, i1, i2, i1bc, i2bc, 0 )
 call vectoraverage( w2, w1, i1cell, i2cell, 1 )
 
 ! Hypocenter location

@@ -68,27 +68,20 @@ if ( any( mr  /= mr  ) .or. any( s1 /= s1 ) &
   stop 'NaNs in velocity model!'
 end if
 
-! Fill halo. Be very careful here!
-! Last process may not initially hold any cell values, i.e. i2cell < i2core.
-! Call BCs after halo swap
-! Fill out extra cells for min/max calc.
-! Use continuing BC at surfaces for resampling rho & gam.
+! Fill halo. Be very careful here! Boundary may extend into next to last processor.
+! Use continuing BC at surface for re-sampling gam
+i1 = bc1
+i2 = bc2
+where( bc1 == 0 .or. bc1 == 1 ) i1 = 4
+where( bc2 == 0 .or. bc1 == 1 ) i2 = 4
 call scalarswaphalo( mr,  nhalo )
 call scalarswaphalo( s1,  nhalo )
 call scalarswaphalo( s2,  nhalo )
 call scalarswaphalo( gam, nhalo )
-call scalarsethalo( mr,  maxval( mr  ), i1cell, i2cell )
-call scalarsethalo( s1,  maxval( s1  ), i1cell, i2cell )
-call scalarsethalo( s2,  maxval( s2  ), i1cell, i2cell )
-call scalarsethalo( gam, maxval( gam ), i1cell, i2cell )
-i1 = abs( ibc1 )
-i2 = abs( ibc2 )
-where( i1 <= 1 ) i1 = 4
-where( i2 <= 1 ) i2 = 4
-call scalarbc( mr,  i1, i2, nhalo, 1 )
-call scalarbc( s1,  i1, i2, nhalo, 1 )
-call scalarbc( s2,  i1, i2, nhalo, 1 )
-call scalarbc( gam, i1, i2, nhalo, 1 )
+call scalarbc( mr,  i1, i2, i1bc, i2bc, 1 )
+call scalarbc( s1,  i1, i2, i1bc, i2bc, 1 )
+call scalarbc( s2,  i1, i2, i1bc, i2bc, 1 )
+call scalarbc( gam, i1, i2, i1bc, i2bc, 1 )
 
 ! Limits
 if ( rho1 > 0. ) where ( mr < rho1 ) mr = rho1
@@ -110,6 +103,12 @@ stats(1) =  maxval( mr  )
 stats(2) =  maxval( s1  )
 stats(3) =  maxval( s2  )
 stats(4) =  maxval( gam )
+i1 = 1
+i2 = nm - 1
+call scalarsethalo( mr,  stats(1), i1, i2 )
+call scalarsethalo( s1,  stats(2), i1, i2 )
+call scalarsethalo( s2,  stats(3), i1, i2 )
+call scalarsethalo( gam, stats(4), i1, i2 )
 stats(5) = -minval( mr  )
 stats(6) = -minval( s1  )
 stats(7) = -minval( s2  )

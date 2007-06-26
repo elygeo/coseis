@@ -147,8 +147,8 @@ do i = 1, 3
 end do
 
 ! Boundary conditions
-call vectorbc( w1, ibc1, ibc2, nhalo, 1 )
-call vectorbc( w2, ibc1, ibc2, nhalo, -1 )
+call vectorbc( w1, bc1, bc2, i1bc, i2bc, 1 )
+call vectorbc( w2, bc1, bc2, i1bc, i2bc, -1 )
 
 end subroutine
 

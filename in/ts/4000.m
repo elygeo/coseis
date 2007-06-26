@@ -18,9 +18,8 @@
   dc = .5;
   rcrit = 3000.;
   vrup = 2300.;
-  itcheck = 100;
+  itcheck = 0;
   datadir = 'ts/4000/data';
-
 
   debug = 0;
   np = [ 1 3 3 ]

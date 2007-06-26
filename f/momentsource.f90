@@ -46,10 +46,16 @@ if ( s2(j,k,l) < rsource*rsource ) then
     write( 0, * ) 'invalid rfunc: ', trim( rfunc )
     stop
   end select
-  if (  all( ibc1 /= 9 .or. (/ j, k, l /) >= i1core ) &
-  .and. all( ibc2 /= 9 .or. (/ j, k, l /) <= i2core ) ) then
+  if (  all( (/ j, k, l /) >= i1core .and. (/ j, k, l /) <= i2core ) ) then
     sumsrcfr = sumsrcfr + srcfr(i)
   end if
+  !if ( &
+  !( j >= i1core(1) .or. j < i1bc(1) ) .and. &
+  !( k >= i1core(2) .or. k < i1bc(2) ) .and. &
+  !( l >= i1core(3) .or. l < i1bc(3) ) .and. &
+  !( j <= i2core(1) .or. j >= i2bc(1) ) .and. &
+  !( k <= i2core(2) .or. k >= i2bc(2) ) .and. &
+  !( l <= i2core(3) .or. l >= i2bc(3) ) ) sumsrcfr = sumsrcfr + srcfr(i)
 end if
 end do
 end do
@@ -98,8 +104,8 @@ end do
 end do
 
 ! Boundary conditions
-call vectorbc( w1, ibc1, ibc2, nhalo, 1 )
-call vectorbc( w2, ibc1, ibc2, nhalo, -1 )
+call vectorbc( w1, bc1, bc2, i1bc, i2bc, 1 )
+call vectorbc( w2, bc1, bc2, i1bc, i2bc, -1 )
 
 end subroutine
 

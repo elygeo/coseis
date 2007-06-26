@@ -1,4 +1,4 @@
-! Calculate PML damping parameters
+! 
 module m_attenuation
 implicit none
 contains

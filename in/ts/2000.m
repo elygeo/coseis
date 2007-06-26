@@ -18,7 +18,7 @@
   dc = .5;
   rcrit = 3000.;
   vrup = 2300.;
-  itcheck = 100;
+  itcheck = 0;
   datadir = 'ts/2000/data';
 
   np = [ 1 1 2 ]

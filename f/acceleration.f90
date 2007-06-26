@@ -104,7 +104,7 @@ do ic = 1, 3
   i1 = max( i1pml + 1, i1node )
   i2 = min( i2pml - 1, i2node )
   call hourglasscn( s2, s1, iq, i1, i2 )
-  if ( hourglass(2) > 0. .and. npml > 0 .and. any( ibc1 == 1 .or. ibc2 == 1 ) ) then
+  if ( hourglass(2) > 0. .and. npml > 0 ) then
     do i = 1, 3
       i1 = i1cell
       i2 = i2cell
@@ -143,7 +143,7 @@ do i = 1, 3
 end do
 
 ! Boundary conditions
-call vectorbc( w1, ibc1, ibc2, nhalo, 0 )
+call vectorbc( w1, bc1, bc2, i1bc, i2bc, 0 )
 
 end subroutine
 
