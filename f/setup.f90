@@ -44,6 +44,7 @@ nm = nl + 2 * nhalo
 
 ! Boundary conditions
 if ( ifn /= 0 ) then
+  if ( ihypo(ifn) == 0       ) bc1(ifn) = -2
   if ( ihypo(ifn) == nn(ifn) ) bc2(ifn) = -2
 end if
 ibc1 = bc1

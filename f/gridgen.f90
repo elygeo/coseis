@@ -101,40 +101,6 @@ forall( j=1:nm(1), k=1:nm(2), l=1:nm(3) )
 end forall
 w1 = w2
 
-! Mesh type
-select case( grid )
-case( 'read' )
-case( 'constant' )
-case( 'hill' )
-case( 'spherical' )
-end select
-
-! Symmetry
-i1 = ( i3 + i4 ) / 2
-i2 = ( i3 + i4 + 1 ) / 2
-n  = ( i4 - i3 + 1 ) / 2
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-symmetry = max( min( symmetry, 1 ), -1 )
-where( i1 /= i2 ) symmetry = 2 * symmetry
-if( any( symmetry /= 0 .and. np /= 1 ) ) stop 'np(i) must = 1 for symmetry(i)'
-j = symmetry(1)
-k = symmetry(2)
-l = symmetry(3)
-if ( j > 0 ) forall( i=1:n(1) ) w1(j1+i,:,:,:) = w1(j2-i,:,:,:)
-if ( k > 0 ) forall( i=1:n(2) ) w1(:,k1+i,:,:) = w1(:,k2-i,:,:)
-if ( l > 0 ) forall( i=1:n(3) ) w1(:,:,l1+i,:) = w1(:,:,l2-i,:)
-if ( j < 0 ) forall( i=1:n(1) ) w1(j1+i,:,:,:) = w1(j1,:,:,:)
-if ( k < 0 ) forall( i=1:n(2) ) w1(:,k1+i,:,:) = w1(:,k1,:,:)
-if ( l < 0 ) forall( i=1:n(3) ) w1(:,:,l1+i,:) = w1(:,:,l1,:)
-if ( abs( j ) == 1 ) forall( i=1:n(1) ) w1(j1+i,:,:,1) = -w1(j2-i,:,:,1) + 2 * w1(j1,:,:,1)
-if ( abs( k ) == 1 ) forall( i=1:n(2) ) w1(:,k1+i,:,2) = -w1(:,k2-i,:,2) + 2 * w1(:,k1,:,2)
-if ( abs( l ) == 1 ) forall( i=1:n(3) ) w1(:,:,l1+i,3) = -w1(:,:,l2-i,3) + 2 * w1(:,:,l1,3)
-if ( abs( j ) == 2 ) forall( i=1:n(1) ) w1(j1+i,:,:,1) = -w1(j2-i,:,:,1) + 3 * w1(j1,:,:,1) - w1(j1-1,:,:,1)
-if ( abs( k ) == 2 ) forall( i=1:n(2) ) w1(:,k1+i,:,2) = -w1(:,k2-i,:,2) + 3 * w1(:,k1,:,2) - w1(:,k1-1,:,2)
-if ( abs( l ) == 2 ) forall( i=1:n(3) ) w1(:,:,l1+i,3) = -w1(:,:,l2-i,3) + 3 * w1(:,:,l1,3) - w1(:,:,l1-1,3)
-
 ! Hypocenter
 j = ihypo(1)
 k = ihypo(2)
