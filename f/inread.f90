@@ -23,6 +23,7 @@ str = line
 ! Read tokens
 call strtok( str, key )
 inzone = .false.
+i = 0
 
 ! Select input key
 select case( key )

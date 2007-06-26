@@ -55,7 +55,6 @@ end do
 end do
 end do
 
-
 ! Normalize and divide by cell volume
 call rreduce( allsumsrcfr, sumsrcfr, 'allsum', 0 )
 if ( allsumsrcfr <= 0. ) stop 'bad source space function'
@@ -68,8 +67,9 @@ end subroutine
 ! Add moment source
 subroutine momentsource
 use m_globals
+use m_bc
 integer :: i, j, k, l, ic, nsrc
-real :: srcft
+real :: srcft = 0.
 
 if ( rsource <= 0. ) return
 if ( master .and. debug == 2 ) write( 0, * ) 'Moment source'
@@ -96,6 +96,10 @@ do i = 1, nsrc
   w2(j,k,l,ic) = w2(j,k,l,ic) - srcft * srcfr(i) * moment2(ic)
 end do
 end do
+
+! Boundary conditions
+call vectorbc( w1, ibc1, ibc2, nhalo, 1 )
+call vectorbc( w2, ibc1, ibc2, nhalo, -1 )
 
 end subroutine
 

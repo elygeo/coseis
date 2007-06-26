@@ -206,8 +206,8 @@ call scalarbc( dc,    ibc1, ibc2, nhalo, 0 )
 call scalarbc( co,    ibc1, ibc2, nhalo, 0 )
 call scalarbc( area,  ibc1, ibc2, nhalo, 0 )
 call scalarbc( rhypo, ibc1, ibc2, nhalo, 0 )
-call vectorbc( nhat,  ibc1, ibc2, nhalo )
-call vectorbc( t0,    ibc1, ibc2, nhalo )
+call vectorbc( nhat,  ibc1, ibc2, nhalo, 0 )
+call vectorbc( t0,    ibc1, ibc2, nhalo, 0 )
 call scalarswaphalo( mus,   nhalo )
 call scalarswaphalo( mud,   nhalo )
 call scalarswaphalo( dc,    nhalo )
@@ -318,7 +318,7 @@ do i = 1, 3
   w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f2 * mr(j1:j2,k1:k2,l1:l2)
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f2 * mr(j3:j4,k3:k4,l3:l4)
 end do
-call vectorbc( w1, ibc1, ibc2, nhalo )
+call vectorbc( w1, ibc1, ibc2, nhalo, 0 )
 
 ! Friction + fracture energy
 t2 = vv(j3:j4,k3:k4,l3:l4,:) - vv(j1:j2,k1:k2,l1:l2,:)

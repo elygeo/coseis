@@ -12,8 +12,7 @@ use m_collective
 use m_outprops
 use m_util
 real :: rout, x0(3)
-integer :: i1(3), i2(3), n(3), noff(3), &
-  i, j1, k1, l1, j2, k2, l2, nc, iz, onpass, nbuff
+integer :: i1(3), i2(3), n(3), noff(3), i, nc, iz, onpass, nbuff
 logical :: dofault, fault, cell
 
 if ( master ) write( 0, * ) 'Output initialization'
@@ -267,7 +266,7 @@ i4 = min( i2, i2core )
 ! Peak velocity calculation
 if ( fieldout(iz) == 'pv2' .and. all( i3 <= i4 ) ) then
   if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, vv, i3, i4 )
-  forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+  forall( j=i3(1):i4(1), k=i3(2):i4(2), l=i3(3):i4(3) )
     pv(j,k,l) = max( pv(j,k,l), s1(j,k,l) )
   end forall
 end if

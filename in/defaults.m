@@ -88,10 +88,11 @@
 %  1: PML absorbing
 %  2: mirror symmetry on exterior cell center
 %     continuous tangential and opposing normal vector components
-%  3: mirror symmetry on boundary node
-%     continuous tangential and opposing normal vector components
 % -2: mirror symmetry on exterior cell center, 180 phase shift
 %     continuous normal and opposing tangential vector components
+%     useful for fault planes
+%  3: mirror symmetry on boundary node
+%     continuous tangential and opposing normal vector components
 % -3: mirror symmetry on boundary node, 180 phase shift
 %     continuous normal and opposing tangential vector components
 %  4: continuation

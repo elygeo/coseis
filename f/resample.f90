@@ -14,8 +14,9 @@ integer :: i
 if ( master ) write( 0, * ) 'Resample material model'
 
 ! Cell volume
-call scalarsethalo( s1, 0., i1cell, i2cell )
 call diffnc( s1, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
+call scalarsethalo( s1, 0., i1cell, i2cell )
+call scalarbc( s1, ibc1, ibc2, nhalo, 1 )
 select case( ifn )
 case( 1 ); i = ihypo(1); s1(i,:,:) = 0.; yy(i,:,:) = 0.
 case( 2 ); i = ihypo(2); s1(:,i,:) = 0.; yy(:,i,:) = 0.

@@ -6,6 +6,7 @@ contains
 subroutine gridgen
 use m_globals
 use m_collective
+use m_bc
 use m_util
 integer :: i1(3), i2(3), i3(3), i4(3), n(3), i, j, k, l, &
   j1, k1, l1, j2, k2, l2, idoublenode, b, c
@@ -16,8 +17,8 @@ if ( master ) write( 0, * ) 'Grid generation'
 ! Read grid
 i1 = 1  - nnoff
 i2 = nn - nnoff
-i3 = i1node
-i4 = i2node
+i3 = i1core
+i4 = i2core
 if ( grid == 'read' ) then
   i = mpin * 4
   call vectorio( -1, i, r, 'data/x1', w1, 1, i1, i2, i3, i4, 1, 1 )
@@ -37,9 +38,6 @@ if ( faultnormal /= 0 ) then
     if ( ihypo(i) <  i4(i) ) i4(i) = i4(i) - 1
   end if
 end if
-j1 = i3(1); j2 = i4(1)
-k1 = i3(2); k2 = i4(2)
-l1 = i3(3); l2 = i4(3)
 
 ! Remove double nodes for now, or create basic rectangular mesh
 if ( grid == 'read' ) then
@@ -52,9 +50,9 @@ if ( grid == 'read' ) then
   case( 3 ); w1(:,:,l+1:nm(3)-1,:) = w1(:,:,l+2:nm(3),:)
   end select
 else
-  forall( i=j1:j2 ) w1(i,:,:,1) = dx * ( i - i1(1) )
-  forall( i=k1:k2 ) w1(:,i,:,2) = dx * ( i - i1(2) )
-  forall( i=l1:l2 ) w1(:,:,i,3) = dx * ( i - i1(3) )
+  do i = i3(1), i4(1); w1(i,:,:,1) = dx * ( i - i1(1) ); end do
+  do i = i3(2), i4(2); w1(:,i,:,2) = dx * ( i - i1(2) ); end do
+  do i = i3(3), i4(3); w1(:,:,i,3) = dx * ( i - i1(3) ); end do
 end if
 call vectorsethalo( w1, 0., i3, i4 )
 
@@ -137,20 +135,20 @@ if ( abs( j ) == 2 ) forall( i=1:n(1) ) w1(j1+i,:,:,1) = -w1(j2-i,:,:,1) + 3 * w
 if ( abs( k ) == 2 ) forall( i=1:n(2) ) w1(:,k1+i,:,2) = -w1(:,k2-i,:,2) + 3 * w1(:,k1,:,2) - w1(:,k1-1,:,2)
 if ( abs( l ) == 2 ) forall( i=1:n(3) ) w1(:,:,l1+i,3) = -w1(:,:,l2-i,3) + 3 * w1(:,:,l1,3) - w1(:,:,l1-1,3)
 
-! Boundary conditions
+! Hypocenter
 j = ihypo(1)
 k = ihypo(2)
 l = ihypo(3)
-i1 = abs( ibc1 )
-i2 = abs( ibc2 )
-j1 = i3(1); j2 = i4(1)
-k1 = i3(2); k2 = i4(2)
-l1 = i3(3); l2 = i4(3)
 
 ! Random noise added to mesh
 if ( gridnoise > 0. ) then
   call random_number( w2 )
   w2 = gridnoise * ( w2 - .5 )
+  j1 = i3(1); j2 = i4(1)
+  k1 = i3(2); k2 = i4(2)
+  l1 = i3(3); l2 = i4(3)
+  i1 = abs( ibc1 )
+  i2 = abs( ibc2 )
   if ( i1(1) <= 1 ) w2(j1,:,:,1) = 0.
   if ( i2(1) <= 1 ) w2(j2,:,:,1) = 0.
   if ( i1(2) <= 1 ) w2(:,k1,:,2) = 0.
@@ -165,114 +163,6 @@ if ( gridnoise > 0. ) then
   w1 = w1 + w2
 end if
 
-! Free surface BC
-n = nhalo
-if ( i1(1) <= 1 ) forall( i=1:n(1) ) w1(j1-i,:,:,:) = w1(j1,:,:,:)
-if ( i1(2) <= 1 ) forall( i=1:n(2) ) w1(:,k1-i,:,:) = w1(:,k1,:,:)
-if ( i1(3) <= 1 ) forall( i=1:n(3) ) w1(:,:,l1-i,:) = w1(:,:,l1,:)
-if ( i2(1) <= 1 ) forall( i=1:n(1) ) w1(j2+i,:,:,:) = w1(j2,:,:,:)
-if ( i2(2) <= 1 ) forall( i=1:n(2) ) w1(:,k2+i,:,:) = w1(:,k2,:,:)
-if ( i2(3) <= 1 ) forall( i=1:n(3) ) w1(:,:,l2+i,:) = w1(:,:,l2,:)
-
-! Continuing BC
-n = nhalo
-if ( i1(1) == 4 ) forall( i=1:n(1) ) w1(j1-i,:,:,:) = (i+1) * w1(j1,:,:,:) - i * w1(j1+1,:,:,:)
-if ( i1(2) == 4 ) forall( i=1:n(2) ) w1(:,k1-i,:,:) = (i+1) * w1(:,k1,:,:) - i * w1(:,k1+1,:,:)
-if ( i1(3) == 4 ) forall( i=1:n(3) ) w1(:,:,l1-i,:) = (i+1) * w1(:,:,l1,:) - i * w1(:,:,l1+1,:)
-if ( i2(1) == 4 ) forall( i=1:n(1) ) w1(j2+i,:,:,:) = (i+1) * w1(j2,:,:,:) - i * w1(j2-1,:,:,:)
-if ( i2(2) == 4 ) forall( i=1:n(2) ) w1(:,k2+i,:,:) = (i+1) * w1(:,k2,:,:) - i * w1(:,k2-1,:,:)
-if ( i2(3) == 4 ) forall( i=1:n(3) ) w1(:,:,l2+i,:) = (i+1) * w1(:,:,l2,:) - i * w1(:,:,l2-1,:)
-
-! Mirror on cell center BC
-n = nhalo
-if ( i1(1) == 2 ) then
-  forall( i=1:n(1) )
-    w1(j1-i,:,:,1) = 3 * w1(j1,:,:,1) - w1(j1+1,:,:,1) - w1(j1+i-1,:,:,1)
-    w1(j1-i,:,:,2) = w1(j1+i-1,:,:,2)
-    w1(j1-i,:,:,3) = w1(j1+i-1,:,:,3)
-  end forall
-end if
-if ( i1(2) == 2 ) then
-  forall( i=1:n(2) )
-    w1(:,k1-i,:,2) = 3 * w1(:,k1,:,2) - w1(:,k1+1,:,2) - w1(:,k1+i-1,:,2)
-    w1(:,k1-i,:,3) = w1(:,k1+i-1,:,3)
-    w1(:,k1-i,:,1) = w1(:,k1+i-1,:,1)
-  end forall
-end if
-if ( i1(3) == 2 ) then
-  forall( i=1:n(3) )
-    w1(:,:,l1-i,3) = 3 * w1(:,:,l1,3) - w1(:,:,l1+1,3) - w1(:,:,l1+i-1,3)
-    w1(:,:,l1-i,1) = w1(:,:,l1+i-1,1)
-    w1(:,:,l1-i,2) = w1(:,:,l1+i-1,2)
-  end forall 
-end if 
-if ( i2(1) == 2 ) then
-  forall( i=1:n(1) )
-    w1(j2+i,:,:,1) = 3 * w1(j2,:,:,1) - w1(j2-1,:,:,1) - w1(j2-i+1,:,:,1)
-    w1(j2+i,:,:,2) = w1(j2-i+1,:,:,2)
-    w1(j2+i,:,:,3) = w1(j2-i+1,:,:,3)
-  end forall 
-end if
-if ( i2(2) == 2 ) then
-  forall( i=1:n(2) )
-    w1(:,k2+i,:,2) = 3 * w1(:,k2,:,2) - w1(:,k2-1,:,2) - w1(:,k2-i+1,:,2)
-    w1(:,k2+i,:,3) = w1(:,k2-i+1,:,3)
-    w1(:,k2+i,:,1) = w1(:,k2-i+1,:,1)
-  end forall
-end if
-if ( i2(3) == 2 ) then
-  forall( i=1:n(3) )
-    w1(:,:,l2+i,3) = 3 * w1(:,:,l2,3) - w1(:,:,l2-1,3) - w1(:,:,l2-i+1,3)
-    w1(:,:,l2+i,1) = w1(:,:,l2-i+1,1) 
-    w1(:,:,l2+i,2) = w1(:,:,l2-i+1,2) 
-  end forall
-end if
-
-! Mirror on node BC
-n = nhalo
-if ( i1(1) == 3 ) then
-  forall( i=1:n(1) )
-    w1(j1-i,:,:,1) = 2 * w1(j1,:,:,1) - w1(j1+i,:,:,1)
-    w1(j1-i,:,:,2) = w1(j1+i,:,:,2)
-    w1(j1-i,:,:,3) = w1(j1+i,:,:,3)
-  end forall
-end if
-if ( i1(2) == 3 ) then
-  forall( i=1:n(2) )
-    w1(:,k1-i,:,2) = 2 * w1(:,k1,:,2) - w1(:,k1+i,:,2)
-    w1(:,k1-i,:,3) = w1(:,k1+i,:,3)
-    w1(:,k1-i,:,1) = w1(:,k1+i,:,1)
-  end forall
-end if
-if ( i1(3) == 3 ) then
-  forall( i=1:n(3) )
-    w1(:,:,l1-i,3) = 2 * w1(:,:,l1,3) - w1(:,:,l1+i,3)
-    w1(:,:,l1-i,1) = w1(:,:,l1+i,1)
-    w1(:,:,l1-i,2) = w1(:,:,l1+i,2)
-  end forall
-end if
-if ( i2(1) == 3 ) then
-  forall( i=1:n(1) )
-    w1(j2+i,:,:,1) = 2 * w1(j2,:,:,1) - w1(j2-i,:,:,1)
-    w1(j2+i,:,:,2) = w1(j2-i,:,:,2)
-    w1(j2+i,:,:,3) = w1(j2-i,:,:,3)
-  end forall
-end if
-if ( i2(2) == 3 ) then
-  forall( i=1:n(2) )
-    w1(:,k2+i,:,2) = 2 * w1(:,k2,:,2) - w1(:,k2-i,:,2)
-    w1(:,k2+i,:,3) = w1(:,k2-i,:,3)
-    w1(:,k2+i,:,1) = w1(:,k2-i,:,1)
-  end forall
-end if
-if ( i2(3) == 3 ) then
-  forall( i=1:n(3) )
-    w1(:,:,l2+i,3) = 2 * w1(:,:,l2,3) - w1(:,:,l2-i,3)
-    w1(:,:,l2+i,1) = w1(:,:,l2-i,1)
-    w1(:,:,l2+i,2) = w1(:,:,l2-i,2)
-  end forall
-end if
-
 ! Create fault double nodes
 select case( idoublenode )
 case( 1 ); w1(j+1:nm(1),:,:,:) = w1(j:nm(1)-1,:,:,:)
@@ -280,10 +170,11 @@ case( 2 ); w1(:,k+1:nm(2),:,:) = w1(:,k:nm(2)-1,:,:)
 case( 3 ); w1(:,:,l+1:nm(3),:) = w1(:,:,l:nm(3)-1,:)
 end select
 
-! Fill halo
+! Fill halo and find cell centers
+i1 = 4
+i2 = 4
+call vectorbc( w1, i1, i2, nhalo, 0 )
 call vectorswaphalo( w1, nhalo )
-
-! Cell center locations
 call vectoraverage( w2, w1, i1cell, i2cell, 1 )
 
 ! Hypocenter location
@@ -340,9 +231,9 @@ select case( oplevel )
 case( 1 )
 case( 2 )
   allocate( dx1(nm(1)), dx2(nm(2)), dx3(nm(3)) )
-  forall( i=1:nm(1)-1 ) dx1(i) = .5 * ( w1(i+1,2,2,1) - w1(i,2,2,1) )
-  forall( i=1:nm(2)-1 ) dx2(i) = .5 * ( w1(2,i+1,2,2) - w1(2,i,2,2) )
-  forall( i=1:nm(3)-1 ) dx3(i) = .5 * ( w1(2,2,i+1,3) - w1(2,2,i,3) )
+  do i =1, nm(1)-1; dx1(i) = .5 * ( w1(i+1,2,2,1) - w1(i,2,2,1) ); end do
+  do i =1, nm(2)-1; dx2(i) = .5 * ( w1(2,i+1,2,2) - w1(2,i,2,2) ); end do
+  do i =1, nm(3)-1; dx3(i) = .5 * ( w1(2,2,i+1,3) - w1(2,2,i,3) ); end do
 case( 3:5 )
   allocate( xx(nm(1),nm(2),nm(3),3) )
   xx = w1

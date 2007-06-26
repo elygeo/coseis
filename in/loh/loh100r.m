@@ -11,7 +11,7 @@
   vs  = { 2000. 'zone'   1 1 1   -1 -1 11 };
   rho = { 2600. 'zone'   1 1 1   -1 -1 11 };
   hourglass = [ 1. 1. ];
-  bc1 = [ -2 -2  0 ];
+  bc1 = [ -2 -2  0 ]; % This won't work anymore!
   bc2 = [  1  1  1 ];
 
   nn    = [  91  111 61 ];

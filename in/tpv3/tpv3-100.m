@@ -38,6 +38,8 @@
 
   itcheck = 0;
   np = [ 1 1 2 ];
+  np = [ 4 4 1 ];
+nt = 10;
 
 % rectangular
   affine = [ 1. 0. 0.   0. 1. 0.   0. 0. 1. ];

@@ -6,6 +6,7 @@ contains
 subroutine stress
 use m_globals
 use m_diffnc
+use m_bc
 use m_util
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id
 
@@ -144,6 +145,10 @@ do i = 1, 3
   w1(:,:,:,i) = 2. * mu * w1(:,:,:,i) + s1
   w2(:,:,:,i) =      mu * w2(:,:,:,i)
 end do
+
+! Boundary conditions
+call vectorbc( w1, ibc1, ibc2, nhalo, 1 )
+call vectorbc( w2, ibc1, ibc2, nhalo, -1 )
 
 end subroutine
 

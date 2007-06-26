@@ -19,10 +19,10 @@ if ( master ) then
 end if
 
 ! Save previous slip velocity
+j = ihypo(1)
+k = ihypo(2)
+l = ihypo(3)
 if ( ifn /= 0 ) then
-  j = ihypo(1)
-  k = ihypo(2)
-  l = ihypo(3)
   select case( ifn )
   case( 1 ); t2(1,:,:,:) = vv(j+1,:,:,:) - vv(j,:,:,:)
   case( 2 ); t2(:,1,:,:) = vv(:,k+1,:,:) - vv(:,k,:,:)

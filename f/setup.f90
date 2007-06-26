@@ -58,14 +58,14 @@ i2core = nm - nhalo
 ! Node region
 i1node = 1  + nhalo
 i2node = nm - nhalo
-where ( abs( ibc1 ) > 1 ) i1node = 2
-where ( abs( ibc2 ) > 1 ) i2node = nm - 1
+where ( ibc1 == 9 ) i1node = 2
+where ( ibc2 == 9 ) i2node = nm - 1
 
 ! Cell region
 i1cell = 1  + nhalo
 i2cell = nm - nhalo - 1
-where ( abs( ibc1 ) > 1 ) i1cell = 1
-where ( abs( ibc2 ) > 1 ) i2cell = nm - 1
+where ( ibc1 == 9 ) i1cell = 1
+where ( ibc2 == 9 ) i2cell = nm - 1
 
 ! PML region
 npml = max( 0, npml )

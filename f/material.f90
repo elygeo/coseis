@@ -72,7 +72,7 @@ end if
 ! Last process may not initially hold any cell values, i.e. i2cell < i2core.
 ! Call BCs after halo swap
 ! Fill out extra cells for min/max calc.
-! Use continuing BC at surfaces for resampling mr & gam.
+! Use continuing BC at surfaces for resampling rho & gam.
 call scalarswaphalo( mr,  nhalo )
 call scalarswaphalo( s1,  nhalo )
 call scalarswaphalo( s2,  nhalo )
