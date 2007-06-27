@@ -279,7 +279,7 @@ end do
 end subroutine
 
 ! Timer series input/output
-subroutine tseriesio( id, mpio, str, ft, ir )
+subroutine rio1( id, mpio, str, ft, ir )
 use m_util
 use mpi
 real, intent(inout) :: ft(:)
@@ -289,11 +289,12 @@ integer :: i, n, fh, comm, e
 integer(kind=mpi_offset_kind) i0
 if ( id == 0 ) return
 if ( mpio == 0 ) then
-  call rio1( id, str, ft, ir )
+  call frio1( id, str, ft, ir )
   return
 end if
 inquire( iolength=i ) ft(1)
 n = size( ft )
+if ( n == 0 ) return
 i0 = i * ( ir - n )
 if ( id < 0 ) then
   i = mpi_mode_rdonly
@@ -314,7 +315,7 @@ call mpi_file_close( fh, e )
 end subroutine
 
 ! Scalar field component input/output
-subroutine scalario( id, mpio, r, str, s1, i1, i2, i3, i4, nr, ir )
+subroutine rio3( id, mpio, r, str, s1, i1, i2, i3, i4, nr, ir )
 use m_util
 use mpi
 real, intent(inout) :: r, s1(:,:,:)
@@ -327,7 +328,7 @@ if ( id > 0 .and. all( i1 == i2 ) ) then
   return
 end if
 if ( mpio == 0 ) then
-  call rio3( id, str, s1, i3, i4, ir )
+  call frio3( id, str, s1, i3, i4, ir )
   return
 end if
 i = abs( id )
@@ -337,7 +338,7 @@ if ( fh == mpi_undefined ) then
   if ( any( i3 > i4 ) ) return
   filehandles(i) = fh
 end if
-if ( any( i3 > i4 ) ) stop 'error in scalario'
+if ( any( i3 > i4 ) ) stop 'error in rio3'
 i0 = i3 - 1
 nl = i4 - i3 + 1
 n = (/ size(s1,1), size(s1,2), size(s1,3) /)
@@ -357,7 +358,7 @@ call mpi_type_free( mtype, e )
 end subroutine
 
 ! Vector field component input/output
-subroutine vectorio( id, mpio, r, str, w1, ic, i1, i2, i3, i4, nr, ir )
+subroutine rio4( id, mpio, r, str, w1, ic, i1, i2, i3, i4, nr, ir )
 use m_util
 use mpi
 real, intent(inout) :: r, w1(:,:,:,:)
@@ -370,7 +371,7 @@ if ( id > 0 .and. all( i1 == i2 ) ) then
   return
 end if
 if ( mpio == 0 ) then
-  call rio4( id, str, w1, ic, i3, i4, ir )
+  call frio4( id, str, w1, ic, i3, i4, ir )
   return
 end if
 i = abs( id )
@@ -380,7 +381,7 @@ if ( fh == mpi_undefined ) then
   if ( any( i3 > i4 ) ) return
   filehandles(i) = fh
 end if
-if ( any( i3 > i4 ) ) stop 'error in vectorio'
+if ( any( i3 > i4 ) ) stop 'error in rio4'
 i0 = i3 - 1
 nl = i4 - i3 + 1
 n = (/ size(w1,1), size(w1,2), size(w1,3) /)

@@ -2,6 +2,7 @@
 function [ tt, vt, tta, vta ] = tsproc( varargin )
 
 meta
+currentstep
 x = [];
 tt = [];
 tta = [];
@@ -42,16 +43,12 @@ else
 end
 
 % Time
-if any( strcmp( field, { 'v' 'vm' 'sv' } ) )
-  it0 = 1;
-  tt = ( it0 : it ) * dt - .5 * dt;
-else
-  it0 = 0;
-  tt = ( it0 : it ) * dt;
+nt = size( vt, 1 );
+nc = size( vt, 2 );
+tt = ( 0 : it )' * dt;
+if any( strcmp( field, { 'v' 'vm2' 'sv' 'svm' } ) )
+  tt = tt - .5 * dt;
 end
-nt = it - it0 + 1;
-nc = size( vt, 5 );
-vt = reshape( vt, nt, nc );
 
 % For point source, rotate to r,h,v coords
 if pointsource

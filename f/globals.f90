@@ -6,8 +6,7 @@ real, parameter :: &
   pi = 3.14159
 
 integer, parameter :: &
-  nz = 100,      & ! max number of input and output zones, also see mpi.f90
-  itio = 50        ! buffersize for i/o
+  nz = 100         ! max number of input and output zones, also see mpi.f90
 
 ! 4d vectors
 real, allocatable, dimension(:,:,:,:,:) :: &
@@ -167,8 +166,9 @@ integer :: &
   np0,           & ! number of processes available
   nt,            & ! number of time steps
   it,            & ! current time step
-  itcheck,       & ! interval for checkpointing, must be a multiple of itio
   itstats,       & ! interval for calculating statistics
+  itio,          & ! interval for writing i/o buffers, must be a multiple of itstats
+  itcheck,       & ! interval for checkpointing, must be a multiple of itio
   debug,         & ! debugging flag
   npml,          & ! number of PML damping nodes
   fixhypo,       & ! fix hypocenter to 0=none, 1,2=ihypo node, cell, -1,-2=xhypo node, cell

@@ -74,10 +74,11 @@
 
 % Code execution and output parameters
   np = [ 1 1 1 ];			% number of processors in j k l
-% itcheck = 100;			% checkpoint every 100 time steps
-% itcheck = -1;				% checkpoint just before finishing
+  itstats = 4;				% calculate statistics every 4
+  itio =   32;				% empty buffers every 32
   itcheck = 0;				% checkpointing off
-  itstats = 10;				% calculate statistics every 10
+% itcheck = 1000;			% checkpoint every 1000 time steps
+% itcheck = -1;				% checkpoint just before finishing
   debug = 0;                            % debugging off
   mpin  = 1;				% 0=separate files, 1=MPIIO
   mpout = 1;				% 0=separate files, 1=MPIIO

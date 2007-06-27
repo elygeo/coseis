@@ -1,8 +1,10 @@
 ! Output routines
 module m_output
 implicit none
-real, private, allocatable :: iobuffer(:,:)
+integer, private :: jv, jf
 integer, private, allocatable :: jb(:)
+real, private, allocatable, dimension(:,:) :: &
+  vstats, fstats, estats, gvstats, gfstats, gestats, iobuffer
 contains
 
 ! Initialize output
@@ -17,11 +19,13 @@ logical :: dofault, fault, cell
 
 if ( master ) write( 0, * ) 'Output initialization'
 if ( nout > nz ) stop 'too many output zones, make nz bigger'
-if ( itcheck < 1 ) itcheck = itcheck + nt + 1
+
+! I/O intervals
 if ( itstats < 1 ) itstats = itstats + nt + 1
+if ( itio    < 1 ) itio    = itio    + nt + 1
+if ( itcheck < 1 ) itcheck = itcheck + nt + 1
+if ( modulo( itio, itstats ) /= 0 ) itio = ( itio / itstats + 1 ) * itstats
 if ( modulo( itcheck, itio ) /= 0 ) itcheck = ( itcheck / itio + 1 ) * itio
-nbuff = 0
-ibuff = 0
 
 ! Test for fault
 dofault = .false.
@@ -29,6 +33,10 @@ if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
   if ( ip3(i) == ip3master(i) ) dofault = .true.
 end if
+
+! Buffer counters
+nbuff = 0
+ibuff = 0
 
 doiz: do iz = 1, nout
 
@@ -125,12 +133,20 @@ end if
 
 end do doiz
 
-! Allocate buffer
-if ( nbuff > 0 ) then
-  allocate( iobuffer(itio,nbuff), jb(nbuff) )
-  iobuffer = 0.
-  jb = 0
-end if
+! Allocate buffers
+allocate( jb(nbuff), iobuffer(itio,nbuff), &
+  vstats(itio,4), fstats(itio,8), estats(itio,4), &
+  gvstats(itio,4), gfstats(itio,8), gestats(itio,4) )
+jb = 0
+jv = 0
+jf = 0
+iobuffer = 0.
+vstats = 0.
+fstats = 0.
+estats = 0.
+gvstats = 0.
+gfstats = 0.
+gestats = 0.
 
 end subroutine
 
@@ -143,13 +159,11 @@ use m_collective
 use m_outprops
 use m_util
 integer, intent(in) :: pass
-real, save :: vstats(itio,4), fstats(itio,8), estats(itio,4)
-real :: gvstats(itio,4), gfstats(itio,8), gestats(itio,4), rr
 integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, onpass, nc, ic, nr, ir, iz, id, mpio
-integer, save :: jv = 0, jf = 0
+real :: rr
 logical :: dofault, fault, cell
 
-! Staus
+! Stats
 if ( master .and. ( it == 0 .or. debug == 2 ) ) write( 0, '(a,i2)' ) ' Output pass', pass
 
 ! Test for fault
@@ -161,94 +175,95 @@ end if
 
 ! Volume stats
 if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
-  select case( pass )
-  case( 1 )
-    jv = jv + 1
-    call vectornorm( s1, vv, i1core, i2core )
-    call tensornorm( s2, w1, w2, i1core, i2core )
-    call scalarsethalo( s1, -1., i1core, i2core )
-    call scalarsethalo( s2, -1., i1core, i2core )
-    vstats(jv,1) = maxval( s1 )
-    vstats(jv,2) = maxval( s2 )
-  case( 2 )
-    call vectornorm( s1, uu, i1core, i2core )
-    call vectornorm( s2, w1, i1core, i2core )
-    call scalarsethalo( s1, -1., i1core, i2core )
-    call scalarsethalo( s2, -1., i1core, i2core )
-    vstats(jv,3) = maxval( s1 )
-    vstats(jv,4) = maxval( s2 )
-    if ( modulo( it, itio ) == 0 .or. it == nt ) then
-      call rreduce2( gvstats, vstats, 'max', 0 )
-      if ( master ) then
-        gvstats = sqrt( gvstats )
-        call tseriesio( 1, mpout, 'stats/vmax', gvstats(:jv,1), it / itstats )
-        call tseriesio( 1, mpout, 'stats/wmax', gvstats(:jv,2), it / itstats )
-        call tseriesio( 1, mpout, 'stats/umax', gvstats(:jv,3), it / itstats )
-        call tseriesio( 1, mpout, 'stats/amax', gvstats(:jv,4), it / itstats )
-        rr = maxval( gvstats(:jv,3) )
-        if ( rr > dx / 10. ) write( 0, * ) 'warning: u !<< dx', rr, dx
-      end if
-      jv = 0
+select case( pass )
+case( 1 )
+  jv = jv + 1
+  call vectornorm( s1, vv, i1core, i2core )
+  call tensornorm( s2, w1, w2, i1core, i2core )
+  call scalarsethalo( s1, -1., i1core, i2core )
+  call scalarsethalo( s2, -1., i1core, i2core )
+  vstats(jv,1) = maxval( s1 )
+  vstats(jv,2) = maxval( s2 )
+case( 2 )
+  call vectornorm( s1, uu, i1core, i2core )
+  call vectornorm( s2, w1, i1core, i2core )
+  call scalarsethalo( s1, -1., i1core, i2core )
+  call scalarsethalo( s2, -1., i1core, i2core )
+  vstats(jv,3) = maxval( s1 )
+  vstats(jv,4) = maxval( s2 )
+  if ( modulo( it, itio ) == 0 ) then
+    call rreduce2( gvstats, vstats, 'max', 0 )
+    if ( master ) then
+      gvstats = sqrt( gvstats )
+      call rio1( 1, mpout, 'stats/vmax', gvstats(:jv,1), it / itstats )
+      call rio1( 1, mpout, 'stats/wmax', gvstats(:jv,2), it / itstats )
+      call rio1( 1, mpout, 'stats/umax', gvstats(:jv,3), it / itstats )
+      call rio1( 1, mpout, 'stats/amax', gvstats(:jv,4), it / itstats )
+      rr = maxval( gvstats(:jv,3) )
+      if ( rr > dx / 10. ) write( 0, * ) 'warning: u !<< dx', rr, dx
     end if
-  end select
+    jv = 0
+  end if
+end select
 end if
 
 ! Fault stats
-if ( it > 0 .and. dofault .and. modulo( it, itstats ) == 0 ) then
-  select case( pass )
-  case( 1 )
-    jf = jf + 1
-    call scalarsethalo( f1,   -1., i1core, i2core )
-    call scalarsethalo( f2,   -1., i1core, i2core )
-    call scalarsethalo( tarr, -1., i1core, i2core )
-    fstats(jf,1) = maxval( f1 )
-    fstats(jf,2) = maxval( f2 )
-    fstats(jf,3) = maxval( sl )
-    fstats(jf,4) = maxval( tarr )
-  case( 2 )
-    call scalarsethalo( ts, -1., i1core, i2core )
-    call scalarsethalo( f2, -1., i1core, i2core )
-    fstats(jf,5) = maxval( ts )
-    fstats(jf,6) = maxval( f2 )
-    rr = -2. * abs( minval( tn ) ) - 1.
-    call scalarsethalo( tn, rr, i1core, i2core )
-    fstats(jf,7) = maxval( tn )
-    rr = 2. * abs( fstats(jf,7) ) + 1.
-    call scalarsethalo( tn, rr, i1core, i2core )
-    fstats(jf,8) = -minval( tn )
-    estats(jf,1) = efric
-    estats(jf,2) = estrain
-    estats(jf,3) = moment
-    if ( modulo( it, itio ) == 0 .or. it == nt ) then
-      call rreduce2( gfstats, fstats, 'allmax', ifn )
-      call rreduce2( gestats, estats, 'allsum', ifn )
-      if ( master ) then
-        gfstats(:jf,8) = -gfstats(:jf,8)
-        gestats(:jf,4) = -999
-        do i = 1, jf
-          if ( gestats(i,3) > 0. ) gestats(i,4) = ( log10( gestats(i,3) ) - 9.05 ) / 1.5
-        end do
-        call tseriesio( 1, mpout, 'stats/svmax',   gfstats(:jf,1), it / itstats )
-        call tseriesio( 1, mpout, 'stats/sumax',   gfstats(:jf,2), it / itstats )
-        call tseriesio( 1, mpout, 'stats/slmax',   gfstats(:jf,3), it / itstats )
-        call tseriesio( 1, mpout, 'stats/tarrmax', gfstats(:jf,4), it / itstats )
-        call tseriesio( 1, mpout, 'stats/tsmax',   gfstats(:jf,5), it / itstats )
-        call tseriesio( 1, mpout, 'stats/samax',   gfstats(:jf,6), it / itstats )
-        call tseriesio( 1, mpout, 'stats/tnmax',   gfstats(:jf,7), it / itstats )
-        call tseriesio( 1, mpout, 'stats/tnmin',   gfstats(:jf,8), it / itstats )
-        call tseriesio( 1, mpout, 'stats/efric',   gestats(:jf,1), it / itstats )
-        call tseriesio( 1, mpout, 'stats/estrain', gestats(:jf,2), it / itstats )
-        call tseriesio( 1, mpout, 'stats/moment',  gestats(:jf,3), it / itstats )
-        call tseriesio( 1, mpout, 'stats/mw',      gestats(:jf,4), it / itstats ) 
-        i1 = ihypo
-        i1(ifn) = 1  
-        open( 1, file='stats/tarrhypo', status='replace' )
-        write( 1, * ) tarr(i1(1),i1(2),i1(3))
-        close( 1 )
-      end if
-      jf = 0
+if ( dofault .and. it > 0 .and. modulo( it, itstats ) == 0 ) then
+select case( pass )
+case( 1 )
+  jf = jf + 1
+  call scalarsethalo( f1,   -1., i1core, i2core )
+  call scalarsethalo( f2,   -1., i1core, i2core )
+  call scalarsethalo( tarr, -1., i1core, i2core )
+  fstats(jf,1) = maxval( f1 )
+  fstats(jf,2) = maxval( f2 )
+  fstats(jf,3) = maxval( sl )
+  fstats(jf,4) = maxval( tarr )
+case( 2 )
+  call scalarsethalo( ts, -1., i1core, i2core )
+  call scalarsethalo( f2, -1., i1core, i2core )
+  fstats(jf,5) = maxval( ts )
+  fstats(jf,6) = maxval( f2 )
+  rr = -2. * abs( minval( tn ) ) - 1.
+  call scalarsethalo( tn, rr, i1core, i2core )
+  fstats(jf,7) = maxval( tn )
+  rr = 2. * abs( fstats(jf,7) ) + 1.
+  call scalarsethalo( tn, rr, i1core, i2core )
+  fstats(jf,8) = -minval( tn )
+  estats(jf,1) = efric
+  estats(jf,2) = estrain
+  estats(jf,3) = moment
+  if ( any( fstats /= fstats .or. fstats > huge(rr) ) ) stop 'NaNs/Inf!'
+  if ( modulo( it, itio ) == 0 ) then
+    call rreduce2( gfstats, fstats, 'allmax', ifn )
+    call rreduce2( gestats, estats, 'allsum', ifn )
+    if ( master ) then
+      gfstats(:jf,8) = -gfstats(:jf,8)
+      gestats(:jf,4) = -999
+      do i = 1, jf
+        if ( gestats(i,3) > 0. ) gestats(i,4) = ( log10( gestats(i,3) ) - 9.05 ) / 1.5
+      end do
+      call rio1( 1, mpout, 'stats/svmax',   gfstats(:jf,1), it / itstats )
+      call rio1( 1, mpout, 'stats/sumax',   gfstats(:jf,2), it / itstats )
+      call rio1( 1, mpout, 'stats/slmax',   gfstats(:jf,3), it / itstats )
+      call rio1( 1, mpout, 'stats/tarrmax', gfstats(:jf,4), it / itstats )
+      call rio1( 1, mpout, 'stats/tsmax',   gfstats(:jf,5), it / itstats )
+      call rio1( 1, mpout, 'stats/samax',   gfstats(:jf,6), it / itstats )
+      call rio1( 1, mpout, 'stats/tnmax',   gfstats(:jf,7), it / itstats )
+      call rio1( 1, mpout, 'stats/tnmin',   gfstats(:jf,8), it / itstats )
+      call rio1( 1, mpout, 'stats/efric',   gestats(:jf,1), it / itstats )
+      call rio1( 1, mpout, 'stats/estrain', gestats(:jf,2), it / itstats )
+      call rio1( 1, mpout, 'stats/moment',  gestats(:jf,3), it / itstats )
+      call rio1( 1, mpout, 'stats/mw',      gestats(:jf,4), it / itstats )
+      i1 = ihypo
+      i1(ifn) = 1
+      open( 1, file='stats/tarrhypo', status='replace' )
+      write( 1, * ) tarr(i1(1),i1(2),i1(3))
+      close( 1 )
     end if
-  end select
+    jf = 0
+  end if
+end select
 end if
 
 doiz: do iz = 1, nout
@@ -308,51 +323,51 @@ do ic = 1, nc
     if ( any( i1 /= i3 .or. i2 /= i4 ) ) write( str, '(a,i6.6)' ) trim( str ), i
   end if
   select case( fieldout(iz) )
-  case( 'x'    ); call vectorio( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, nr, ir )
-  case( 'rho'  ); call scalario( id, mpio, rr, str, mr,       i1, i2, i3, i4, nr, ir )
-  case( 'vp'   ); call scalario( id, mpio, rr, str, s1,       i1, i2, i3, i4, nr, ir )
-  case( 'vs'   ); call scalario( id, mpio, rr, str, s2,       i1, i2, i3, i4, nr, ir )
-  case( 'gam'  ); call scalario( id, mpio, rr, str, gam,      i1, i2, i3, i4, nr, ir )
-  case( 'lam'  ); call scalario( id, mpio, rr, str, lam,      i1, i2, i3, i4, nr, ir )
-  case( 'mu'   ); call scalario( id, mpio, rr, str, mu,       i1, i2, i3, i4, nr, ir )
-  case( 'v'    ); call vectorio( id, mpio, rr, str, vv, ic,   i1, i2, i3, i4, nr, ir )
-  case( 'u'    ); call vectorio( id, mpio, rr, str, uu, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'x'    ); call rio4( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'rho'  ); call rio3( id, mpio, rr, str, mr,       i1, i2, i3, i4, nr, ir )
+  case( 'vp'   ); call rio3( id, mpio, rr, str, s1,       i1, i2, i3, i4, nr, ir )
+  case( 'vs'   ); call rio3( id, mpio, rr, str, s2,       i1, i2, i3, i4, nr, ir )
+  case( 'gam'  ); call rio3( id, mpio, rr, str, gam,      i1, i2, i3, i4, nr, ir )
+  case( 'lam'  ); call rio3( id, mpio, rr, str, lam,      i1, i2, i3, i4, nr, ir )
+  case( 'mu'   ); call rio3( id, mpio, rr, str, mu,       i1, i2, i3, i4, nr, ir )
+  case( 'v'    ); call rio4( id, mpio, rr, str, vv, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'u'    ); call rio4( id, mpio, rr, str, uu, ic,   i1, i2, i3, i4, nr, ir )
   case( 'w'    );                                                                   
-   if ( ic < 4 )  call vectorio( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, nr, ir )
-   if ( ic > 3 )  call vectorio( id, mpio, rr, str, w2, ic-3, i1, i2, i3, i4, nr, ir )
-  case( 'a'    ); call vectorio( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, nr, ir )
-  case( 'nhat' ); call vectorio( id, mpio, rr, str, nhat, ic, i1, i2, i3, i4, nr, ir )
-  case( 'mus'  ); call scalario( id, mpio, rr, str, mus,      i1, i2, i3, i4, nr, ir )
-  case( 'mud'  ); call scalario( id, mpio, rr, str, mud,      i1, i2, i3, i4, nr, ir )
-  case( 'dc'   ); call scalario( id, mpio, rr, str, dc,       i1, i2, i3, i4, nr, ir )
-  case( 'co'   ); call scalario( id, mpio, rr, str, co,       i1, i2, i3, i4, nr, ir )
-  case( 'sv'   ); call vectorio( id, mpio, rr, str, t1, ic,   i1, i2, i3, i4, nr, ir )
-  case( 'su'   ); call vectorio( id, mpio, rr, str, t2, ic,   i1, i2, i3, i4, nr, ir )
-  case( 'ts'   ); call vectorio( id, mpio, rr, str, t1, ic,   i1, i2, i3, i4, nr, ir )
-  case( 'sa'   ); call vectorio( id, mpio, rr, str, t2, ic,   i1, i2, i3, i4, nr, ir )
-  case( 'svm'  ); call scalario( id, mpio, rr, str, f1,       i1, i2, i3, i4, nr, ir )
-  case( 'sum'  ); call scalario( id, mpio, rr, str, f2,       i1, i2, i3, i4, nr, ir )
-  case( 'tsm'  ); call scalario( id, mpio, rr, str, ts,       i1, i2, i3, i4, nr, ir )
-  case( 'sam'  ); call scalario( id, mpio, rr, str, f2,       i1, i2, i3, i4, nr, ir )
-  case( 'tn'   ); call scalario( id, mpio, rr, str, tn,       i1, i2, i3, i4, nr, ir )
-  case( 'fr'   ); call scalario( id, mpio, rr, str, f1,       i1, i2, i3, i4, nr, ir )
-  case( 'sl'   ); call scalario( id, mpio, rr, str, sl,       i1, i2, i3, i4, nr, ir )
-  case( 'psv'  ); call scalario( id, mpio, rr, str, psv,      i1, i2, i3, i4, nr, ir )
-  case( 'trup' ); call scalario( id, mpio, rr, str, trup,     i1, i2, i3, i4, nr, ir )
-  case( 'tarr' ); call scalario( id, mpio, rr, str, tarr,     i1, i2, i3, i4, nr, ir )
-  case( 'pv2'  ); call scalario( id, mpio, rr, str, pv,       i1, i2, i3, i4, nr, ir )
+   if ( ic < 4 )  call rio4( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, nr, ir )
+   if ( ic > 3 )  call rio4( id, mpio, rr, str, w2, ic-3, i1, i2, i3, i4, nr, ir )
+  case( 'a'    ); call rio4( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'nhat' ); call rio4( id, mpio, rr, str, nhat, ic, i1, i2, i3, i4, nr, ir )
+  case( 'mus'  ); call rio3( id, mpio, rr, str, mus,      i1, i2, i3, i4, nr, ir )
+  case( 'mud'  ); call rio3( id, mpio, rr, str, mud,      i1, i2, i3, i4, nr, ir )
+  case( 'dc'   ); call rio3( id, mpio, rr, str, dc,       i1, i2, i3, i4, nr, ir )
+  case( 'co'   ); call rio3( id, mpio, rr, str, co,       i1, i2, i3, i4, nr, ir )
+  case( 'sv'   ); call rio4( id, mpio, rr, str, t1, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'su'   ); call rio4( id, mpio, rr, str, t2, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'ts'   ); call rio4( id, mpio, rr, str, t1, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'sa'   ); call rio4( id, mpio, rr, str, t2, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'svm'  ); call rio3( id, mpio, rr, str, f1,       i1, i2, i3, i4, nr, ir )
+  case( 'sum'  ); call rio3( id, mpio, rr, str, f2,       i1, i2, i3, i4, nr, ir )
+  case( 'tsm'  ); call rio3( id, mpio, rr, str, ts,       i1, i2, i3, i4, nr, ir )
+  case( 'sam'  ); call rio3( id, mpio, rr, str, f2,       i1, i2, i3, i4, nr, ir )
+  case( 'tn'   ); call rio3( id, mpio, rr, str, tn,       i1, i2, i3, i4, nr, ir )
+  case( 'fr'   ); call rio3( id, mpio, rr, str, f1,       i1, i2, i3, i4, nr, ir )
+  case( 'sl'   ); call rio3( id, mpio, rr, str, sl,       i1, i2, i3, i4, nr, ir )
+  case( 'psv'  ); call rio3( id, mpio, rr, str, psv,      i1, i2, i3, i4, nr, ir )
+  case( 'trup' ); call rio3( id, mpio, rr, str, trup,     i1, i2, i3, i4, nr, ir )
+  case( 'tarr' ); call rio3( id, mpio, rr, str, tarr,     i1, i2, i3, i4, nr, ir )
+  case( 'pv2'  ); call rio3( id, mpio, rr, str, pv,       i1, i2, i3, i4, nr, ir )
   case( 'vm2'  )
     if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, vv, i3, i4 )
-    call scalario( id, mpio, rr, str, s1, i1, i2, i3, i4, nr, ir )
+    call rio3( id, mpio, rr, str, s1, i1, i2, i3, i4, nr, ir )
   case( 'um2'  )
     if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, uu, i3, i4 )
-    call scalario( id, mpio, rr, str, s1, i1, i2, i3, i4, nr, ir )
+    call rio3( id, mpio, rr, str, s1, i1, i2, i3, i4, nr, ir )
   case( 'wm2'  )
     if ( modulo( it, itstats ) /= 0 ) call tensornorm( s2, w1, w2, i3, i4 )
-    call scalario( id, mpio, rr, str, s2, i1, i2, i3, i4, nr, ir )
+    call rio3( id, mpio, rr, str, s2, i1, i2, i3, i4, nr, ir )
   case( 'am2'  )
     if ( modulo( it, itstats ) /= 0 ) call vectornorm( s2, w1, i3, i4 )
-    call scalario( id, mpio, rr, str, s2, i1, i2, i3, i4, nr, ir )
+    call rio3( id, mpio, rr, str, s2, i1, i2, i3, i4, nr, ir )
   case default
     write( 0, * ) 'error: unknown output field: ', fieldout(iz)
     stop
@@ -362,8 +377,8 @@ do ic = 1, nc
     if ( i == 0 ) stop 'unknown buffer'
     jb(i) = jb(i) + 1
     iobuffer(jb(i),i) = rr
-    if ( modulo( it, itio ) == 0 .or. it == nt .or. it == 0 ) then
-      call tseriesio( 1, mpout, str, iobuffer(:jb(i),i), ir )
+    if ( it == nt .or. modulo( it, itio ) == 0 ) then
+      call rio1( 1, mpout, str, iobuffer(:jb(i),i), ir )
       jb(i) = 0
     end if
   end if

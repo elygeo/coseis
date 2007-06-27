@@ -106,5 +106,6 @@ for l = 1:nc
   fclose( fid );
 end
 n = ( i4 - i3 ) ./ di + 1;
-if any( i3 ~= i4 ), f = reshape( f, [ n nc ] ); end
+if all( n(1:3) == 1 ), n = n(4); end
+f = reshape( f, [ n nc ] );
 

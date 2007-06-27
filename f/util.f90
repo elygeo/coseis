@@ -175,12 +175,13 @@ end if
 end function
 
 ! Timeseries I/O
-subroutine rio1( id, str, ft, ir )
+subroutine frio1( id, str, ft, ir )
 real, intent(inout) :: ft(:)
 integer, intent(in) :: id, ir
 character(*), intent(in) :: str
 integer :: i, n, i0
 n = size( ft )
+if ( n == 0 ) return
 i0 = ir - n
 if ( i0 < 0 ) then
   write ( 0, * )  'Error in rio1 ', trim( str ), ir, n
@@ -217,7 +218,7 @@ end if
 end subroutine
 
 ! Scalar I/O
-subroutine rio3( id, str, s1, i1, i2, ir )
+subroutine frio3( id, str, s1, i1, i2, ir )
 real, intent(inout) :: s1(:,:,:)
 integer, intent(in) :: id, i1(3), i2(3), ir
 character(*), intent(in) :: str
@@ -245,7 +246,7 @@ close( 1 )
 end subroutine
 
 ! Vector I/O
-subroutine rio4( id, str, w1, ic, i1, i2, ir )
+subroutine frio4( id, str, w1, ic, i1, i2, ir )
 real, intent(inout) :: w1(:,:,:,:)
 integer, intent(in) :: id, ic, i1(3), i2(3), ir
 character(*), intent(in) :: str

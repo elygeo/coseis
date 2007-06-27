@@ -1,0 +1,44 @@
+Support Operator Rupture Dynamics (SORD)
+
+Solver
+
+SORD solves the isotropic viscoelastic wave equation, and includes dynamic
+rupture and PML absorbing boundaries.  The mesh is logically rectangular.  The
+method of Support Operators for constructin the spatial difference operators is
+similar to finite elements.
+
+MPI Communications
+
+The topology is rectangular domain decomposition.  Sub-divisions may be in one,
+two, or three dimensions.  Communications are synchronous and blocking between
+neighboring processes in the topology.
+
+I/O
+
+MPII/O is used for all input and output aside from reading the inital parameter
+file and checkpointing.
+Time series output is buffered and written out periodically.  
+MPII/O is used but may be optionally switched off.  In that case Volume input for
+the mesh and material models, as well as volume snapshot output is
+performed with MPII/O.  Optionally MPII/O may be switched off, and separate
+files used per process.  Check-pointing always uses separate files for
+efficiency.  Intervals for writing buffers, snapshots, and checkpoints are
+configurable.  Parallel HDF5 was considered for output, but was rejected due to
+the added level or library dependence on top of MPII/O.  Plain MPII/O is widely
+used and stable.
+
+Optimization
+
+
+
+Fault detection
+
+Periodically a single global reduction is preformed to compile global
+statistics.  The statics are checked for overflows and invalid numbers, and the
+run halted if found.  The statistics are also written to disk for monitoring
+the run.
+
+Tools used
+
+pgdbg Totalview pgprof gprof
+

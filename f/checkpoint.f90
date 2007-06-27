@@ -8,6 +8,7 @@ subroutine readcheckpoint
 use m_globals
 use m_collective
 integer :: i, irank
+if ( itcheck == 0 ) return
 irank = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
 write( str, '(a,i6.6)' ) 'checkpoint/it', irank
 open( 1, file=str, status='old', iostat=i )
@@ -40,6 +41,7 @@ if ( i == 0 ) then
   read( 1, * ) itcheck
   close( 1 )
 end if
+if ( itcheck == 0 ) return
 irank = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
 i = modulo( it / itcheck, 2 )
 write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', i, '-', irank
