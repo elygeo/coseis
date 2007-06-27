@@ -18,7 +18,7 @@
   dc = .5;
   rcrit = 3000.;
   vrup = 2300.;
-  itcheck = 500;
+  itcheck = 3000;
   datadir = 'ts/0500/data';
 
   np = [ 1  8  4 ] % Babiaca 16 nodes

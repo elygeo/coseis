@@ -37,12 +37,13 @@
   n1expand = [  50  50  50 ];
 
   itcheck = 0;
-  np = [ 4 4 1 ];
+  np = [ 1 4 2 ];
 
-% xy-shear symmetric
-  affine = [ 1. 1. 1.   0. 1. 0.   0. 0. 1. ];
-  nn       = [ 486 136 101 ];
-  ihypo    = [ 276  -1  -1 ];
-  bc2      = [   0   3   0 ];
-  n2expand = [  50   0   0 ];
+% rectangular
+  affine = [ 1. 0. 0.   0. 1. 0.   0. 0. 1. ];
+  nn       = [ 211 136 101 ];
+  ihypo    = [  -1  -1  -1 ];
+  bc2      = [  -2   2   0 ];
+  n2expand = [   0   0   0 ];
+  fixhypo = -2;
 

@@ -289,7 +289,7 @@ integer :: i, n, fh, comm, e
 integer(kind=mpi_offset_kind) i0
 if ( id == 0 ) return
 if ( mpio == 0 ) then
-  call rio1( id, str, s1, ir )
+  call rio1( id, str, ft, ir )
   return
 end if
 inquire( iolength=i ) ft(1)
@@ -297,11 +297,12 @@ n = size( ft )
 i0 = i * ( ir - n )
 if ( id < 0 ) then
   i = mpi_mode_rdonly
-elseif ( ir == 1 ) then
+elseif ( ir - n == 0 ) then
   i = mpi_mode_wronly + mpi_mode_create
 else
   i = mpi_mode_wronly
 end if
+comm = mpi_comm_self
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
 call mpi_file_open( comm, str, i, mpi_info_null, fh, e )
 if ( id < 0 ) then
@@ -310,7 +311,7 @@ else
   call mpi_file_write_at( fh, i0, ft(1), n, mpi_real, mpi_status_ignore, e )
 end if
 call mpi_file_close( fh, e )
-end function
+end subroutine
 
 ! Scalar field component input/output
 subroutine scalario( id, mpio, r, str, s1, i1, i2, i3, i4, nr, ir )

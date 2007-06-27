@@ -37,7 +37,7 @@
   n1expand = [  50  50  50 ];
 
   itcheck = 0;
-  np = [ 4 4 2 ];
+  np = [ 1 4 4 ];
 
 % xy-shear
   affine = [ 1. 1. 1.   0. 1. 0.   0. 0. 1. ];

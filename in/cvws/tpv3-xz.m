@@ -37,13 +37,12 @@
   n1expand = [  50  50  50 ];
 
   itcheck = 0;
-  np = [ 4 4 2 ];
+  np = [ 1 4 2 ];
 
-% rectangular
-  affine = [ 1. 0. 0.   0. 1. 0.   0. 0. 1. ];
-  nn       = [ 211 136 101 ];
-  ihypo    = [  -1  -1  -1 ];
-  bc2      = [  -2   2   0 ];
-  n2expand = [   0   0   0 ];
-  fixhypo = -2;
+% xz-shear symmetric grid
+  affine = [ 1. 0. 1.   0. 1. 0.   0. 0. 1. ];
+  nn       = [ 421 136 101 ];
+  ihypo    = [   0  -1  -1 ];
+  bc2      = [   0   3   0 ];
+  n2expand = [  50   0   0 ];
 

@@ -50,7 +50,7 @@ end if
 ! Main loop
 if ( sync ) call barrier ; prof0(16) = timer( 3 )
 if ( master ) write( 0, * ) 'Main loop'
-if ( master ) call tseriesio( 1, mpio, 'prof/main', prof0, 16 )
+if ( master ) call tseriesio( 1, mpout, 'prof/main', prof0, 16 )
 do while ( it < nt )
   it = it + 1
   jp = jp + 1
@@ -71,10 +71,10 @@ do while ( it < nt )
   prof4(jp) = timer( 2 )
   if ( it == nt .or. modulo( it, itio ) == 0 ) then
     if ( master ) then
-      call tseriesio( 1, mpio, 'prof/comp', prof1(:jp), it )
-      call tseriesio( 1, mpio, 'prof/out' , prof2(:jp), it )
-      call tseriesio( 1, mpio, 'prof/comm', prof3(:jp), it )
-      call tseriesio( 1, mpio, 'prof/step', prof4(:jp), it )
+      call tseriesio( 1, mpout, 'prof/comp', prof1(:jp), it )
+      call tseriesio( 1, mpout, 'prof/out' , prof2(:jp), it )
+      call tseriesio( 1, mpout, 'prof/comm', prof3(:jp), it )
+      call tseriesio( 1, mpout, 'prof/step', prof4(:jp), it )
     end if
     jp = 0
   end if
@@ -85,7 +85,7 @@ if ( sync ) call barrier
 if ( master ) then
   prof0(1) = timer( 3 )
   prof0(2) = timer( 4 )
-  call tseriesio( 1, mpio, 'prof/main', prof0(:2), 18 )
+  call tseriesio( 1, mpout, 'prof/main', prof0(:2), 18 )
   write( 0, * ) 'Finished!'
 end if
 call finalize

@@ -14,9 +14,9 @@
   gam = .1;
   hourglass = [ 1. .7 ];
   fixhypo = -1;
-  dx  = 50;
-  dt  = .004;
-  nt  = 3000;
+  dx  = 100;
+  dt  = .008;
+  nt  = 1500;
   out = { 'x'    1   1 1 0  0   -1 -1  0  0 };
   out = { 'su'   1   1 1 0 -1   -1 -1  0 -1 };
   out = { 'psv'  1   1 1 0 -1   -1 -1  0 -1 };
@@ -37,13 +37,12 @@
   n1expand = [  50  50  50 ];
 
   itcheck = 0;
-  np = [ 4 4 2 ];
+  np = [ 1 4 2 ];
 
-% rectangular
-  affine = [ 1. 0. 0.   0. 1. 0.   0. 0. 1. ];
-  nn       = [ 421 271 201 ];
-  ihypo    = [  -1  -1  -1 ];
-  bc2      = [  -2   2   0 ];
-  n2expand = [   0   0   0 ];
-  fixhypo = -2;
+% xy-shear symmetric
+  affine = [ 1. 1. 1.   0. 1. 0.   0. 0. 1. ];
+  nn       = [ 486 136 101 ];
+  ihypo    = [ 276  -1  -1 ];
+  bc2      = [   0   3   0 ];
+  n2expand = [  50   0   0 ];
 

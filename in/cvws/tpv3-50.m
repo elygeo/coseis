@@ -14,9 +14,9 @@
   gam = .1;
   hourglass = [ 1. .7 ];
   fixhypo = -1;
-  dx  = 100;
-  dt  = .008;
-  nt  = 1500;
+  dx  = 50;
+  dt  = .004;
+  nt  = 3000;
   out = { 'x'    1   1 1 0  0   -1 -1  0  0 };
   out = { 'su'   1   1 1 0 -1   -1 -1  0 -1 };
   out = { 'psv'  1   1 1 0 -1   -1 -1  0 -1 };
@@ -34,15 +34,15 @@
   timeseries = { 'sv'     0.  6001. 0. };
   timeseries = { 'ts'     0.  6001. 0. };
   bc1      = [   0   0   0 ];
-  n1expand = [  50  50  50 ];
+  n1expand = [  60  60  60 ];
 
   itcheck = 0;
-  np = [ 4 4 2 ];
+  np = [ 1 4 4 ];
 
-% xy-shear
-  affine = [ 1. 1. 0.   0. 1. 0.   0. 0. 1. ];
-  nn       = [ 551 271 101 ];
-  ihypo    = [   0   0  -1 ];
-  bc2      = [   0   0   0 ];
-  n2expand = [  50  50   0 ];
+% rectangular
+  affine = [ 1. 0. 0.   0. 1. 0.   0. 0. 1. ];
+  nn       = [ 381 231 181 ];
+  ihypo    = [  -1  -1  -1 ];
+  bc2      = [  -3   3   0 ];
+  n2expand = [   0   0   0 ];
 

@@ -33,18 +33,16 @@
   timeseries = { 'su'     0.  6001. 0. };
   timeseries = { 'sv'     0.  6001. 0. };
   timeseries = { 'ts'     0.  6001. 0. };
-  bc1      = [   1   1   1 ];
-  n1expand = [   0   0   0 ];
+  bc1      = [   0   0   0 ];
+  n1expand = [  50  50  50 ];
 
   itcheck = 0;
-  np = [ 1 1 2 ];
+  np = [ 1 4 2 ];
 
-% rectangular
-  affine = [ 1. 0. 0.   0. 1. 0.   0. 0. 1. ];
-  nn       = [ 171  96  61 ];
-  nn       = [ 171  96  91 ];
-  ihypo    = [  -1  -1  -1 ];
-  bc2      = [  -3   3   0 ];
-  n2expand = [   0   0   0 ];
-  nt  = 750;
+% xy-shear symmetric
+  affine = [ 1. 1. 0.   0. 1. 0.   0. 0. 1. ];
+  nn       = [ 486 136 101 ];
+  ihypo    = [ 211  -1  -1 ];
+  bc2      = [   0   3   0 ];
+  n2expand = [  50   0   0 ];
 

@@ -131,9 +131,9 @@ integer, intent(in) :: id, mpio, ir
 character(*), intent(in) :: str
 integer :: i
 if ( id == 0 ) return
-call rio1( id, str, s1, ir )
+call rio1( id, str, ft, ir )
 i = mpio
-end function
+end subroutine
 
 ! Scalar field I/O
 subroutine scalario( id, mpio, r, str, s1, i1, i2, i3, i4, nr, ir )

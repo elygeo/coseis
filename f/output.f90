@@ -181,10 +181,10 @@ if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
       call rreduce2( gvstats, vstats, 'max', 0 )
       if ( master ) then
         gvstats = sqrt( gvstats )
-        call tseriesio( 1, mpio, 'stats/vmax', gvstats(:jv,1), it / itstats )
-        call tseriesio( 1, mpio, 'stats/wmax', gvstats(:jv,2), it / itstats )
-        call tseriesio( 1, mpio, 'stats/umax', gvstats(:jv,3), it / itstats )
-        call tseriesio( 1, mpio, 'stats/amax', gvstats(:jv,4), it / itstats )
+        call tseriesio( 1, mpout, 'stats/vmax', gvstats(:jv,1), it / itstats )
+        call tseriesio( 1, mpout, 'stats/wmax', gvstats(:jv,2), it / itstats )
+        call tseriesio( 1, mpout, 'stats/umax', gvstats(:jv,3), it / itstats )
+        call tseriesio( 1, mpout, 'stats/amax', gvstats(:jv,4), it / itstats )
         rr = maxval( gvstats(:jv,3) )
         if ( rr > dx / 10. ) write( 0, * ) 'warning: u !<< dx', rr, dx
       end if
@@ -228,18 +228,18 @@ if ( it > 0 .and. dofault .and. modulo( it, itstats ) == 0 ) then
         do i = 1, jf
           if ( gestats(i,3) > 0. ) gestats(i,4) = ( log10( gestats(i,3) ) - 9.05 ) / 1.5
         end do
-        call tseriesio( 1, mpio, 'stats/svmax',   gfstats(:jf,1), it / itstats )
-        call tseriesio( 1, mpio, 'stats/sumax',   gfstats(:jf,2), it / itstats )
-        call tseriesio( 1, mpio, 'stats/slmax',   gfstats(:jf,3), it / itstats )
-        call tseriesio( 1, mpio, 'stats/tarrmax', gfstats(:jf,4), it / itstats )
-        call tseriesio( 1, mpio, 'stats/tsmax',   gfstats(:jf,5), it / itstats )
-        call tseriesio( 1, mpio, 'stats/samax',   gfstats(:jf,6), it / itstats )
-        call tseriesio( 1, mpio, 'stats/tnmax',   gfstats(:jf,7), it / itstats )
-        call tseriesio( 1, mpio, 'stats/tnmin',   gfstats(:jf,8), it / itstats )
-        call tseriesio( 1, mpio, 'stats/efric',   gestats(:jf,1), it / itstats )
-        call tseriesio( 1, mpio, 'stats/estrain', gestats(:jf,2), it / itstats )
-        call tseriesio( 1, mpio, 'stats/moment',  gestats(:jf,3), it / itstats )
-        call tseriesio( 1, mpio, 'stats/mw',      gestats(:jf,4), it / itstats ) 
+        call tseriesio( 1, mpout, 'stats/svmax',   gfstats(:jf,1), it / itstats )
+        call tseriesio( 1, mpout, 'stats/sumax',   gfstats(:jf,2), it / itstats )
+        call tseriesio( 1, mpout, 'stats/slmax',   gfstats(:jf,3), it / itstats )
+        call tseriesio( 1, mpout, 'stats/tarrmax', gfstats(:jf,4), it / itstats )
+        call tseriesio( 1, mpout, 'stats/tsmax',   gfstats(:jf,5), it / itstats )
+        call tseriesio( 1, mpout, 'stats/samax',   gfstats(:jf,6), it / itstats )
+        call tseriesio( 1, mpout, 'stats/tnmax',   gfstats(:jf,7), it / itstats )
+        call tseriesio( 1, mpout, 'stats/tnmin',   gfstats(:jf,8), it / itstats )
+        call tseriesio( 1, mpout, 'stats/efric',   gestats(:jf,1), it / itstats )
+        call tseriesio( 1, mpout, 'stats/estrain', gestats(:jf,2), it / itstats )
+        call tseriesio( 1, mpout, 'stats/moment',  gestats(:jf,3), it / itstats )
+        call tseriesio( 1, mpout, 'stats/mw',      gestats(:jf,4), it / itstats ) 
         i1 = ihypo
         i1(ifn) = 1  
         open( 1, file='stats/tarrhypo', status='replace' )
@@ -363,7 +363,7 @@ do ic = 1, nc
     jb(i) = jb(i) + 1
     iobuffer(jb(i),i) = rr
     if ( modulo( it, itio ) == 0 .or. it == nt .or. it == 0 ) then
-      call tseriesio( 1, mpio, str, iobuffer(:jb(i),i), ir )
+      call tseriesio( 1, mpout, str, iobuffer(:jb(i),i), ir )
       jb(i) = 0
     end if
   end if
