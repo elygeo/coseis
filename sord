@@ -111,8 +111,7 @@ case $machine in
   teragrid) maxnodes=256; maxcpus=2; maxram=3000;  rate=500; maxmm=1080 ;;
   datastar) maxnodes=265; maxcpus=8; maxram=13500; rate=200; maxmm=1080 ;;          
 esac
-echo "Machine: $machine"
-echo "CPUs: $(( maxnodes * maxcpus ))"
+echo "Machine: $machine ($(( maxnodes * maxcpus )),$maxram)"
 
 # Number of processors
 [ $mode = guess -a $(( maxnodes * maxcpus )) -eq 1 ] && mode=s
@@ -145,6 +144,7 @@ hh=$(( mm / 60 ))
 mm=$(( mm % 60 ))
 walltime=$( echo $hh $mm | awk '{ printf "%d:%02d:00", $1, $2 }' )
 echo "Processes: $np"
+echo "Nodes: $nodes"
 echo "Memory usage: ${ram}Mb per node"
 echo "Wall time limit: $walltime"
 echo "SUs: $sus"

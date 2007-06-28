@@ -19,13 +19,13 @@
   rcrit = 3000.;
   vrup = 2300.;
   itstats = 10;
-  itio = 100;
+  itio = 400;
   itcheck = 800;
   datadir = 'ts/0500/data';
-
-  np = [ 1 32 14 ] % TeraGrid 224 nodes
-  np = [ 1 76 18 ] % DataStar 171 nodes
-  np = [ 1  8  4 ] % Babiaca 16 nodes
+  np = [ 1 36 4 ]; % DS 18, TG 72
+  np = [ 1 38 4 ]; % DS 19, TG 76
+  np = [ 1 76 4 ]; % DS 38, TG 152
+  np = [ 1  8 4 ];
   dx = 500.;
   dt = .03;
   trelax = .3;

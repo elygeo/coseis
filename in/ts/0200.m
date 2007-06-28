@@ -22,10 +22,10 @@
   itio = 400;
   itcheck = 800;
   datadir = 'ts/0200/data';
-  np = [ 1 32 14 ] % DataStar  28 nodes TeraGrid 224 nodes
-  np = [ 1 40 12 ] % DataStar  60 nodes
-  np = [ 1 40 24 ] % DataStar 120 nodes
-  np = [ 1 80 24 ] % DataStar 240 nodes
+  np = [ 1 188 4 ] % DS 94
+  np = [ 1 116 4 ] % DS 58, TG 232
+  np = [ 1 108 4 ] % DS 54, TG 216
+  np = [ 1  80 4 ] % DS 40, TG 160
   dx = 200.;
   dt = .012;
   trelax = .12;

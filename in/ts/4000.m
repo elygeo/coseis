@@ -23,7 +23,7 @@
   itcheck = 0;
   datadir = 'ts/4000/data';
 
-  np = [ 1 3 3 ]
+  np = [ 1 3 4 ];
   dx = 4000.;
   dt = .24;
   trelax = 2.4;

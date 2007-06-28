@@ -24,8 +24,8 @@
   datadir = 'ts/1000/data';
 
 
-  np = [ 1 1 2 ]
-  np = [ 1 8 4 ] % Babieca 16 nodes
+  np = [ 1 1 2 ];
+  np = [ 1 8 4 ];
   dx = 1000.;
   dt = .06;
   trelax = .6;
