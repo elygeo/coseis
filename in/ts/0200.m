@@ -19,8 +19,8 @@
   rcrit = 3000.;
   vrup = 2300.;
   itstats = 10;
-  itio = 500;
-  itcheck = 5000;
+  itio = 400;
+  itcheck = 800;
   datadir = 'ts/0200/data';
   np = [ 1 32 14 ] % DataStar  28 nodes TeraGrid 224 nodes
   np = [ 1 40 12 ] % DataStar  60 nodes

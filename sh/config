@@ -15,6 +15,7 @@ pfc='mpif90'
 getarg=''
 case $sfc in
 xlf95_r)
+  getarg='getarg.f90'
   sfc='xlf95_r -q64 -qsuppress=cmpmsg -qlanglvl=95pure -qsuffix=f=f90'
   pfc='mpxlf95_r -q64 -qsuppress=cmpmsg -qlanglvl=95pure -qsuffix=f=f90'
   gflags='-g -p -C -qflttrap -qsigtrap'

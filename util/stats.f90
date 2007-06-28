@@ -45,7 +45,7 @@ do ifile = 1, command_argument_count()
     n = n + 1
   end do
   xmean = xmean / n
-  print '(3g15.7,i15,x,a)', xmin, xmax, xmean, n, trim( filename )
+  print '(3g15.7,i15,1x,a)', xmin, xmax, xmean, n, trim( filename )
 end do
 end program
 

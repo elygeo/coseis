@@ -130,28 +130,32 @@ subroutine scalarsethalo( f, r, i1, i2 )
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
 integer, intent(in) :: i1(3), i2(3)
-integer :: n(3)
+integer :: n(3), i3(3), i4(3)
 n = (/ size(f,1), size(f,2), size(f,3) /)
-if ( n(1) > 1 ) f(:i1(1)-1,:,:) = r
-if ( n(2) > 1 ) f(:,:i1(2)-1,:) = r
-if ( n(3) > 1 ) f(:,:,:i1(3)-1) = r
-if ( n(1) > 1 ) f(i2(1)+1:,:,:) = r
-if ( n(2) > 1 ) f(:,i2(2)+1:,:) = r
-if ( n(3) > 1 ) f(:,:,i2(3)+1:) = r
+i3 = min( i1, n + 1 )
+i4 = max( i2, 0 )
+if ( n(1) > 1 ) f(:i3(1)-1,:,:) = r
+if ( n(2) > 1 ) f(:,:i3(2)-1,:) = r
+if ( n(3) > 1 ) f(:,:,:i3(3)-1) = r
+if ( n(1) > 1 ) f(i4(1)+1:,:,:) = r
+if ( n(2) > 1 ) f(:,i4(2)+1:,:) = r
+if ( n(3) > 1 ) f(:,:,i4(3)+1:) = r
 end subroutine
 
 subroutine vectorsethalo( f, r, i1, i2 )
 real, intent(inout) :: f(:,:,:,:)
 real, intent(in) :: r
 integer, intent(in) :: i1(3), i2(3)
-integer :: n(3)
+integer :: n(3), i3(3), i4(3)
 n = (/ size(f,1), size(f,2), size(f,3) /)
-if ( n(1) > 1 ) f(:i1(1)-1,:,:,:) = r
-if ( n(2) > 1 ) f(:,:i1(2)-1,:,:) = r
-if ( n(3) > 1 ) f(:,:,:i1(3)-1,:) = r
-if ( n(1) > 1 ) f(i2(1)+1:,:,:,:) = r
-if ( n(2) > 1 ) f(:,i2(2)+1:,:,:) = r
-if ( n(3) > 1 ) f(:,:,i2(3)+1:,:) = r
+i3 = min( i1, n + 1 )
+i4 = max( i2, 0 )
+if ( n(1) > 1 ) f(:i3(1)-1,:,:,:) = r
+if ( n(2) > 1 ) f(:,:i3(2)-1,:,:) = r
+if ( n(3) > 1 ) f(:,:,:i3(3)-1,:) = r
+if ( n(1) > 1 ) f(i4(1)+1:,:,:,:) = r
+if ( n(2) > 1 ) f(:,i4(2)+1:,:,:) = r
+if ( n(3) > 1 ) f(:,:,i4(3)+1:,:) = r
 end subroutine
 
 ! Timer
@@ -179,7 +183,7 @@ subroutine frio1( id, str, ft, ir )
 real, intent(inout) :: ft(:)
 integer, intent(in) :: id, ir
 character(*), intent(in) :: str
-integer :: i, n, i0
+integer :: i, n, i0, io
 n = size( ft )
 if ( n == 0 ) return
 i0 = ir - n
@@ -190,10 +194,13 @@ end if
 if ( modulo( i0, n ) == 0 ) then
   inquire( iolength=i ) ft
   if ( id > 0 .and. i0 == 0 ) then
-    open( 1, file=str, recl=i, form='unformatted', access='direct', status='new' )
+    open( 1, file=str, recl=i, iostat=io, form='unformatted', access='direct', status='new' )
+    if ( io /= 0 ) write( 0, * ) 'Error: file exists: ', trim( str )
   else
-    open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
+    open( 1, file=str, recl=i, iostat=io, form='unformatted', access='direct', status='old' )
+    if ( io /= 0 ) write( 0, * ) 'Error: file not found: ', trim( str )
   end if
+  if ( io /= 0 ) stop
   i = i0 / n + 1
   if ( id > 0 ) then
     write( 1, rec=i ) ft
@@ -204,10 +211,13 @@ if ( modulo( i0, n ) == 0 ) then
 else
   inquire( iolength=i ) ft(1)
   if ( id > 0 .and. i0 == 0 ) then
-    open( 1, file=str, recl=i, form='unformatted', access='direct', status='new' )
+    open( 1, file=str, recl=i, iostat=io, form='unformatted', access='direct', status='new' )
+    if ( io /= 0 ) write( 0, * ) 'Error: file exists: ', trim( str )
   else
-    open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
+    open( 1, file=str, recl=i, iostat=io, form='unformatted', access='direct', status='old' )
+    if ( io /= 0 ) write( 0, * ) 'Error: file not found: ', trim( str )
   end if
+  if ( io /= 0 ) stop
   if ( id > 0 ) then
     do i = 1, n; write( 1, rec=i0+i ) ft(i); end do
   else
@@ -230,13 +240,12 @@ l1 = i1(3); l2 = i2(3)
 inquire( iolength=nb ) s1(j1:j2,k1:k2,l1:l2)
 if ( id > 0 .and. ir == 1 ) then
   open( 1, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='new' )
+  if ( io /= 0 ) write( 0, * ) 'Error: file exists: ', trim( str )
 else
   open( 1, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='old' ) 
+  if ( io /= 0 ) write( 0, * ) 'Error: file not found: ', trim( str )
 end if
-if ( io /= 0 ) then
-  write( 0, * ) 'Error opening file: ', trim( str )
-  stop 
-end if
+if ( io /= 0 ) stop
 if ( id > 0 ) then
   write( 1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
 else
@@ -258,13 +267,12 @@ l1 = i1(3); l2 = i2(3)
 inquire( iolength=nb ) w1(j1:j2,k1:k2,l1:l2,ic)
 if ( id > 0 .and. ir == 1 ) then
   open( 1, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='new' )
+  if ( io /= 0 ) write( 0, * ) 'Error: file exists: ', trim( str )
 else
   open( 1, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='old' ) 
+  if ( io /= 0 ) write( 0, * ) 'Error: file not found: ', trim( str )
 end if
-if ( io /= 0 ) then
-  write( 0, * ) 'Error opening file: ', trim( str )
-  stop 
-end if
+if ( io /= 0 ) stop
 if ( id > 0 ) then
   write( 1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
 else

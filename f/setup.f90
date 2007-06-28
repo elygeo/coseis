@@ -56,8 +56,8 @@ if ( ifn /= 0 ) then
     i2bc(ifn) = ihypo(ifn)
   end if
 end if
-i1bc = max( 0,      i1bc - nnoff )
-i2bc = min( nm + 1, i2bc - nnoff )
+i1bc = i1bc - nnoff
+i2bc = i2bc - nnoff
 if ( any( i1bc > i2bc ) ) stop 'model too small for BC'
 
 ! Non-overlapping core region
@@ -73,16 +73,17 @@ i1cell = max( i1bc, 1 )
 i2cell = min( i2bc - 1, nm - 1 )
 
 ! PML region
-npml = max( 0, npml )
-i1pml = min( nm, max( 0, npml - nnoff ) )
-i2pml = max( 1,  min( nm + 1, nn + 1 - npml - nnoff ) )
+i1pml = 0
+i2pml = nn + 1
 if ( npml > 0 ) then
-  where ( bc1 /= 1 ) i1pml = 0
-  where ( bc2 /= 1 ) i2pml = nm + 1
+  where ( bc1 == 1 ) i1pml = npml
+  where ( bc2 == 1 ) i2pml = nn - npml + 1
 end if
 if ( any( i1pml > i2pml ) ) stop 'model too small for PML'
+i1pml = i1pml - nnoff
+i2pml = i2pml - nnoff
 
-! Map hypocenter to local index, test if fault on this process
+! Map hypocenter to local indices, and if fault on this process
 ihypo = ihypo - nnoff
 if ( ifn /= 0 ) then
   if ( ihypo(ifn) + 1 < i1core(ifn) .or. ihypo(ifn) > i2core(ifn) ) ifn = 0

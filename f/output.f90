@@ -135,8 +135,8 @@ end do doiz
 
 ! Allocate buffers
 allocate( jb(nbuff), iobuffer(itio,nbuff), &
-  vstats(itio,4), fstats(itio,8), estats(itio,4), &
-  gvstats(itio,4), gfstats(itio,8), gestats(itio,4) )
+  vstats(itio,4), fstats(itio,8), estats(itio,3), &
+  gvstats(itio,4), gfstats(itio,8), gestats(itio,3) )
 jb = 0
 jv = 0
 jf = 0
@@ -239,10 +239,6 @@ case( 2 )
     call rreduce2( gestats, estats, 'allsum', ifn )
     if ( master ) then
       gfstats(:jf,8) = -gfstats(:jf,8)
-      gestats(:jf,4) = -999
-      do i = 1, jf
-        if ( gestats(i,3) > 0. ) gestats(i,4) = ( log10( gestats(i,3) ) - 9.05 ) / 1.5
-      end do
       call rio1( 1, mpout, 'stats/svmax',   gfstats(:jf,1), it / itstats )
       call rio1( 1, mpout, 'stats/sumax',   gfstats(:jf,2), it / itstats )
       call rio1( 1, mpout, 'stats/slmax',   gfstats(:jf,3), it / itstats )
@@ -254,7 +250,14 @@ case( 2 )
       call rio1( 1, mpout, 'stats/efric',   gestats(:jf,1), it / itstats )
       call rio1( 1, mpout, 'stats/estrain', gestats(:jf,2), it / itstats )
       call rio1( 1, mpout, 'stats/moment',  gestats(:jf,3), it / itstats )
-      call rio1( 1, mpout, 'stats/mw',      gestats(:jf,4), it / itstats )
+      do i = 1, jf
+      if ( gestats(i,3) > 0. ) then 
+        gestats(i,3) = ( log10( gestats(i,3) ) - 9.05 ) / 1.5
+      else
+        gestats(i,3) = -999
+      end if
+      end do
+      call rio1( 1, mpout, 'stats/mw',      gestats(:jf,3), it / itstats )
       i1 = ihypo
       i1(ifn) = 1
       open( 1, file='stats/tarrhypo', status='replace' )

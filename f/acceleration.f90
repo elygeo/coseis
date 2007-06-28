@@ -97,7 +97,7 @@ call scalarsethalo( s2, 0., i1node, i2node )
 w2 = hourglass(1) * uu + dt * hourglass(2) * vv
 do iq = 1, 4
 do ic = 1, 3
-  i1 = max( i1pml    , i1cell )
+  i1 = max( i1pml,     i1cell )
   i2 = min( i2pml - 1, i2cell )
   call hourglassnc( s1, w2, iq, ic, i1, i2 )
   s1 = yy * s1

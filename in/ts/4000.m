@@ -19,18 +19,18 @@
   rcrit = 3000.;
   vrup = 2300.;
   itstats = 4;
-  itio = 32;
+  itio = 8;
   itcheck = 0;
   datadir = 'ts/4000/data';
 
-  debug = 0;
   np = [ 1 3 3 ]
   dx = 4000.;
   dt = .24;
   trelax = 2.4;
   nt = 375;
-nt = 100; itcheck = 20;
-  nt = 10;
+debug = 1;
+nt = 10; itcheck = 0;
+nt = 64; itcheck = 16;
   nn = [  151   77  21 ];
   fixhypo = 1;
   ihypo = [   69   51  -2 ];

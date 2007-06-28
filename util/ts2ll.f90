@@ -20,7 +20,7 @@ doline: do
   i = verify( line, ' ' ); line = line(i:)
   i = scan(   line, ' ' ); line = line(i:)
   call ts2ll( x, 1, 2 )
-  print '(2f10.5,x,a)', x, trim( line )
+  print '(2f10.5,1x,a)', x, trim( line )
 end do doline
 
 end program

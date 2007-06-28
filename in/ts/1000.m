@@ -18,8 +18,8 @@
   dc = .5;
   rcrit = 3000.;
   vrup = 2300.;
-  itstats = 4;
-  itio = 32;
+  itstats = 10;
+  itio = 100;
   itcheck = 0;
   datadir = 'ts/1000/data';
 

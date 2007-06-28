@@ -19,8 +19,8 @@
   rcrit = 3000.;
   vrup = 2300.;
   itstats = 10;
-  itio = 500;
-  itcheck = 2500;
+  itio = 400;
+  itcheck = 800;
   datadir = 'ts/0400/data';
 
   np = [ 1 40 26 ] % DataStar 130 nodes

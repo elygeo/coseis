@@ -428,7 +428,7 @@ else
 end if
 call mpi_file_open( comm, str, i, mpi_info_null, fh, e )
 i0 = (/ i3 - i1    , ir - 1  /)
-n  = (/ i2 - i1 + 1, nr - ir + 1 /)
+n  = (/ i2 - i1 + 1, nr /)
 nl = (/ i4 - i3 + 1, nr - ir + 1 /)
 ndims = 4
 do i = ndims, 1, -1 ! squeeze singleton dimentions
