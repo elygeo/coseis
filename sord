@@ -184,7 +184,6 @@ common="
   timestep.f90
   stress.f90
   acceleration.f90
-  locknodes.f90
   sord.f90"
 
 # Compile

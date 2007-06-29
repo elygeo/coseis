@@ -7,17 +7,16 @@ contains
 subroutine scalarbc( f, bc1, bc2, i1bc, i2bc, cell )
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: bc1(3), bc2(3), i1bc(3), i2bc(3), cell
-integer :: i1(3), i2(3), n1(3), n2(3), nm(3), i, j1, k1, l1, j2, k2, l2, c
+integer :: i1(3), i2(3), nm(3), j1, k1, l1, j2, k2, l2, c
 nm = (/ size(f,1), size(f,2), size(f,3) /)
-i1 = i1bc - 1
-i2 = i2bc + 1
-n1 = i1 - 1
-n2 = nm - i2
 if ( cell == 0 ) then
+  i1 = i1bc - 1
+  i2 = i2bc + 1
   c = 0
 else
+  i1 = i1bc - 1
+  i2 = i2bc
   c = 1
-  i2 = i2 - 1
 end if
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
@@ -54,21 +53,20 @@ subroutine vectorbc( f, bc1, bc2, i1bc, i2bc, tensor )
 implicit none
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: bc1(3), bc2(3), i1bc(3), i2bc(3), tensor
-integer :: i1(3), i2(3), s1(3), s2(3), nm(3), i, j1, k1, l1, j2, k2, l2, a, b, c
+integer :: i1(3), i2(3), s1(3), s2(3), nm(3), j1, k1, l1, j2, k2, l2, a, b, c
 nm = (/ size(f,1), size(f,2), size(f,3) /)
-i1 = i1bc - 1
-i2 = i2bc + 1
-n1 = i1 - 1
-n2 = nm - i2
 if ( tensor == 0 ) then
+  i1 = i1bc - 1
+  i2 = i2bc + 1
   a = -1
   b = 1
   c = 0
 else
+  i1 = i1bc - 1
+  i2 = i2bc
   a = 1
   b = sign( 1, tensor )
   c = 1
-  i2 = i2 - 1
 end if
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)

@@ -76,8 +76,8 @@ i2cell = min( i2bc - 1, nm - 1 )
 i1pml = 0
 i2pml = nn + 1
 if ( npml > 0 ) then
-  where ( bc1 = 10 ) i1pml = npml
-  where ( bc2 = 10 ) i2pml = nn - npml + 1
+  where ( bc1 == 10 ) i1pml = npml
+  where ( bc2 == 10 ) i2pml = nn - npml + 1
 end if
 if ( any( i1pml > i2pml ) ) stop 'model too small for PML'
 i1pml = i1pml - nnoff
