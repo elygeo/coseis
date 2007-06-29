@@ -62,25 +62,6 @@ end select
 
 end do doiz
 
-! Test for Nans
-if ( any( mr  /= mr  ) .or. any( s1 /= s1 ) &
-.or. any( gam /= gam ) .or. any( s2 /= s2 ) ) then
-  stop 'NaNs in velocity model!'
-end if
-
-! Fill halo. Be very careful here! Boundary may extend into next to last processor.
-! Use mirror BC at surface for re-sampling gam
-i1 = 2
-i2 = 2
-call scalarswaphalo( mr,  nhalo )
-call scalarswaphalo( s1,  nhalo )
-call scalarswaphalo( s2,  nhalo )
-call scalarswaphalo( gam, nhalo )
-call scalarbc( mr,  i1, i2, i1bc, i2bc, 1 )
-call scalarbc( s1,  i1, i2, i1bc, i2bc, 1 )
-call scalarbc( s2,  i1, i2, i1bc, i2bc, 1 )
-call scalarbc( gam, i1, i2, i1bc, i2bc, 1 )
-
 ! Limits
 if ( rho1 > 0. ) where ( mr < rho1 ) mr = rho1
 if ( rho2 > 0. ) where ( mr > rho2 ) mr = rho2
@@ -96,17 +77,33 @@ if ( vdamp > 0. ) where( s2 > 0. ) gam = vdamp / s2
 if ( gam1 > 0. ) where ( gam < gam1 ) gam = gam1
 if ( gam2 > 0. ) where ( gam > gam2 ) gam = gam2
 
+! Test for NaN
+if ( any( mr  /= mr  ) .or. any( s1 /= s1 ) &
+.or. any( gam /= gam ) .or. any( s2 /= s2 ) ) then
+  stop 'NaN in velocity model!'
+end if
+
+! Test for Inf
+if ( any( mr  > huge(r) ) .or. any( s1 > huge(r) ) &
+.or. any( gam > huge(r) ) .or. any( s2 > huge(r) ) ) then
+  stop 'Inf in velocity model!'
+end if
+
+! Fill halo
+call scalarswaphalo( mr,  nhalo )
+call scalarswaphalo( s1,  nhalo )
+call scalarswaphalo( s2,  nhalo )
+call scalarswaphalo( gam, nhalo )
+
 ! Stats
-stats(1) =  maxval( mr  )
-stats(2) =  maxval( s1  )
-stats(3) =  maxval( s2  )
-stats(4) =  maxval( gam )
-i1 = 1
-i2 = nm - 1
-call scalarsethalo( mr,  stats(1), i1, i2 )
-call scalarsethalo( s1,  stats(2), i1, i2 )
-call scalarsethalo( s2,  stats(3), i1, i2 )
-call scalarsethalo( gam, stats(4), i1, i2 )
+stats(1) = maxval( mr  )
+stats(2) = maxval( s1  )
+stats(3) = maxval( s2  )
+stats(4) = maxval( gam )
+call scalarsethalo( mr,  stats(1), i1cell, i2cell )
+call scalarsethalo( s1,  stats(2), i1cell, i2cell )
+call scalarsethalo( s2,  stats(3), i1cell, i2cell )
+call scalarsethalo( gam, stats(4), i1cell, i2cell )
 stats(5) = -minval( mr  )
 stats(6) = -minval( s1  )
 stats(7) = -minval( s2  )

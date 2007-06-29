@@ -8,12 +8,11 @@ mode=guess
 optimize=O
 setup=yes
 run=
-while getopts spibgGnvm:df opt; do
+while getopts spigGnvm:df opt; do
 case "$opt" in
   s) mode=s ;;
   p) mode=p ;;
   i) run=i ;;
-  b) run=b ;;
   g) optimize=g ;;
   G) optimize=g; run=g ;;
   n) setup= ; run= ;;

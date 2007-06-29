@@ -86,16 +86,11 @@
 % out = { 'sl' -1   1 1 1 1  -1 -1 -1 -1 };	% write final slip length, 4D zone
 
 % Boundary conditions:
-%  0: free surface
-%  1: mirror symmetry on boundary nodes
-%     continuous tangential and opposing normal vector components
-% -1: mirror symmetry on boundary nodes, 180 phase shift
-%     continuous normal and opposing tangential vector components
-%  2: mirror symmetry on the boundary cells
-%     continuous tangential and opposing normal vector components
-% -2: mirror symmetry on the boundary cells, 180 phase shift
-%     continuous normal and opposing tangential vector components
-%     useful for fault planes
+%  0: Vacuum free surface
+%  1: Mirror symmetry at the node: shear stress=0
+% -1: At the node: normal stress=0
+%  2: Mirror symmetry at the cell: shear stress=0
+% -2: At the cell: normal stress=0
 % 10: PML absorbing
 
 % **optional 3D zone argument, zones accumulate when specified multiple times
