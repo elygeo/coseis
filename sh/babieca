@@ -8,14 +8,9 @@ $pre
 case "\${1:--i}" in
   -i) mpirun -machinefile mf -np $np $bin ;;
   -g) mpirun -machinefile mf -np $np -dbg=gdb $bin ;;
-  -b) nohup mpirun -machinefile mf -np $np $bin > out.log & :; pid=\$! ;;
 esac
-if [ "\$pid" ]; then
-  echo "$( date ): $code started with PID: \$pid" >> log
-  echo "$code started with PID: \$pid"
-else :
-  $post
-  echo "\$( date ): $code finished" >> log
+$post
+echo "\$( date ): $code finished" >> log
 fi
 END
 

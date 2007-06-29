@@ -406,7 +406,7 @@ use mpi
 integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), nr, ir
 integer, intent(out) :: fh
 character(*), intent(in) :: str
-integer :: i, ndims, ftype, nl(4), n(4), i0(4), comm0, comm, e
+integer :: i, iio, nio, ndims, ftype, nl(4), n(4), i0(4), comm0, comm, e
 integer(kind=mpi_offset_kind) :: ir0 = 0
 i = abs( mpio )
 comm0 = comm3d
@@ -418,6 +418,9 @@ if ( any( i3 > i4 ) ) then
 end if
 i = abs( id )
 call mpi_comm_split( comm0, i, 0, comm, e )
+call mpi_comm_rank( comm, iio, e  )
+call mpi_comm_size( comm, nio, e  )
+if ( iio == 0 ) write( 0, * ) 'Opening file ', trim(str), ' on ', nio, 'processes'
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
 if ( id < 0 ) then
   i = mpi_mode_rdonly

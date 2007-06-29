@@ -69,11 +69,11 @@ if ( any( mr  /= mr  ) .or. any( s1 /= s1 ) &
 end if
 
 ! Fill halo. Be very careful here! Boundary may extend into next to last processor.
-! Use continuing BC at surface for re-sampling gam
+! Use mirror BC at surface for re-sampling gam
 i1 = bc1
 i2 = bc2
-where( bc1 == 0 .or. bc1 == 1 ) i1 = 4
-where( bc2 == 0 .or. bc1 == 1 ) i2 = 4
+where( bc1 == 0 .or. bc1 == 10 ) i1 = 2
+where( bc2 == 0 .or. bc1 == 10 ) i2 = 2
 call scalarswaphalo( mr,  nhalo )
 call scalarswaphalo( s1,  nhalo )
 call scalarswaphalo( s2,  nhalo )

@@ -1,7 +1,5 @@
 #!/bin/bash -e
 
-list="1"
-
 accounts="\
   phim.ucsd.edu
   kim
@@ -27,17 +25,23 @@ files="\
 
 echo "SORD remote install"
 
+list="1"
+if [ -n "$1" ]; then
+  list="$*"
+else
+  echo "$accounts" | cat -b
+  echo -n "hosts [$list]: "
+  read i
+  [ -n "$i" ] && list="$i"
+fi
+
 rfiles=$( echo "$files" | sed '/^$/d; s|^ *|sord/|g' )
 files=$( echo $files )
 rfiles=$( echo $rfiles )
-
-echo "$accounts" | cat -b
-echo -n "hosts [$list]: "
-read i
-[ -n "$i" ] && list="$i"
+accounts=( $accounts )
 
 for i in $list; do
-  account=$( echo "$accounts" | sed -n ${i}p )
+  account=${accounts[i-1]}
   echo $account
   rsync -av --delete --exclude='srcdir.m' --exclude='versionmeta.m' $files $account:sord
 done

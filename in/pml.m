@@ -28,7 +28,7 @@
 % Rect
   ihypo = [ -1 -1 -1 ];
   nn = [ 81 81 81 ];
-  bc1 = [ 1 1 1 ];
+  bc1 = [ 10 10 10 ];
   bc2 = [ 2 2 2 ];
 bc2 = [ 1 1 1 ];
 ihypo = [ 0 0 0 ];
@@ -43,8 +43,8 @@ return
 % affine = [  25. 0. 9.  0. 10. 0.  0. 0. 16.  10. ]; % 2D strain FIXME
 % affine = [   4. 0. 0.  0.  1. 0.  0. 0.  1.   1. ]; % 1D strain FIXME
 % affine = [  12. 3. 3.  0.  9. 1.  0. 0.  8.   6. ]; % 3D strain FIXME
-  bc1 = [ 1 1 1 ];
-  bc2 = [ 1 1 1 ];
+  bc1 = [ 10 10 10 ];
+  bc2 = [ 10 10 10 ];
   bc1 = [ 0 0 0 ];
   bc2 = [ 0 0 0 ];
 return
@@ -53,14 +53,14 @@ return
   tfunc = 'sbrune';
   ihypo = [ 0 0 0 ];
   nn = [ 51 51 51 ];
-  bc1 = [ 1 1 1 ];
-  bc2 = [ 1 1 1 ];
+  bc1 = [ 10 10 10 ];
+  bc2 = [ 10 10 10 ];
 return
 
 % Mixed rect
   ihypo = [ 0 0 0 ];
   nn = [ 161 161 161 ];
-  bc1 = [ 1 1 1 ];
+  bc1 = [ 10 10 10 ];
   bc2 = [ 0 0 0 ];
 return
 

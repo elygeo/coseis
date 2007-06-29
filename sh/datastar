@@ -7,28 +7,23 @@ fi
 
 cat << END > run
 #!/bin/bash -e
+mode=$mode
 if [ "\$HOSTNAME" != ds100 ]; then
   echo "Error: interactive jobs must be launched from dspoe"
   exit
 fi
 cd "$rundir"
 echo "\$( date ): $code started" >> log
-$pre
 opts="-labelio yes -tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
-case "\${1:--i}$mode" in
+$pre
+case "\${1:--i}\$mode" in
   -is) $bin ;;
   -gs) totalview $bin ;;
-  -bs) nohup $bin > out.log & :; pid=\$! ;;
   -ip) poe $bin \$opts ;;
   -gp) tvpoe $bin \$opts ;;
-  -bp) nohup poe $bin \$opts > out.log & :; pid=\$! ;;
 esac
-if [ "\$pid" ]; then
-  echo "\$( date ): $code started with PID: \$pid" >> log
-  echo "$code started with PID: \$pid"
-else :
-  $post
-  echo "\$( date ): $code finished" >> log
+$post
+echo "\$( date ): $code finished" >> log
 fi
 END
 
@@ -60,6 +55,7 @@ cat << END > script
 #@ node = $nodes
 #@ tasks_per_node = $ppn
 #@ wall_clock_limit = $walltime
+#@ resources = ConsumableCpus(1) ConsumableMemory(1600mb)
 #@ notification = always
 #@ notify_user = $email
 #@ job_type = parallel

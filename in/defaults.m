@@ -79,6 +79,7 @@
   itcheck = 0;				% checkpointing off
 % itcheck = 1000;			% checkpoint every 1000 time steps
 % itcheck = -1;				% checkpoint just before finishing
+  itstop = 0;				% for testing, leave at 0
   debug = 0;                            % debugging off
   mpin  = 1;				% 0=separate files, 1=MPIIO
   mpout = 1;				% 0=separate files, 1=MPIIO
@@ -87,16 +88,16 @@
 
 % Boundary conditions:
 %  0: free surface
-%  1: PML absorbing
-% -2: mirror symmetry on exterior node pairs, 180 phase shift
+%  1: mirror symmetry on boundary nodes
+%     continuous tangential and opposing normal vector components
+% -1: mirror symmetry on boundary nodes, 180 phase shift
+%     continuous normal and opposing tangential vector components
+%  2: mirror symmetry on the boundary cells
+%     continuous tangential and opposing normal vector components
+% -2: mirror symmetry on the boundary cells, 180 phase shift
 %     continuous normal and opposing tangential vector components
 %     useful for fault planes
-%  3: mirror symmetry on boundary node
-%     continuous tangential and opposing normal vector components
-% -3: mirror symmetry on boundary node, 180 phase shift
-%     continuous normal and opposing tangential vector components
-%  4: continuation
-%  9: domain boundary (for internal use only)
+% 10: PML absorbing
 
 % **optional 3D zone argument, zones accumulate when specified multiple times
 %   'zone' j1 k1 l1   j2 k2 l2

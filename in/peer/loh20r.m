@@ -13,7 +13,7 @@
   hourglass = [ 1. 1. ];
   bc1 = [ -2 -2  0 ]; n1expand = [ 0 0 0 ];
   bc2 = [  0  0  0 ]; n2expand = [ 50 50 50 ];
-  bc2 = [  1  1  1 ]; n2expand = [ 0 0 0 ];
+  bc2 = [ 10 10 10 ]; n2expand = [ 0 0 0 ];
 
   nn    = [ 402 502 301 ];
   ihypo = [   1   1 101 ];

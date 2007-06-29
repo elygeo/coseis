@@ -76,6 +76,7 @@ case( 'np' );           read( str, *, iostat=io ) np
 case( 'itstats' );      read( str, *, iostat=io ) itstats
 case( 'itio' );         read( str, *, iostat=io ) itio
 case( 'itcheck' );      read( str, *, iostat=io ) itcheck
+case( 'itstop' );       read( str, *, iostat=io ) itstop
 case( 'debug' );        read( str, *, iostat=io ) debug
 case( 'mpin' );         read( str, *, iostat=io ) mpin
 case( 'mpout' );        read( str, *, iostat=io ) mpout

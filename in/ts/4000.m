@@ -1,6 +1,6 @@
 % TeraShake 4000m
-  bc1 = [ 1 1 1 ];
-  bc2 = [ 1 1 0 ];
+  bc1 = [ 10 10 10 ];
+  bc2 = [ 10 10  0 ];
   faultnormal = 2;
   slipvector = [ 1. 0. 0. ];
   grid = 'read';
@@ -22,21 +22,21 @@
   itio = 8;
   itcheck = 0;
   datadir = 'ts/4000/data';
-
-  np = [ 1 3 4 ];
+  np = [ 1 1 21 ];
+  np = [ 1 3 5 ];
   dx = 4000.;
   dt = .24;
   trelax = 2.4;
   nt = 375;
 debug = 1;
-nt = 10; itcheck = 0;
 nt = 64; itcheck = 16;
+nt = 10; itcheck = 0;
   nn = [  151   77  21 ];
   fixhypo = 1;
   ihypo = [   69   51  -2 ];
   ihypo = [  114   51  -2 ];
   mus = [ 1.01 'zone'    67   0  -5         116  0 -1      ];
-  out = { 'sl'     1     67   0  -5    0    116  0 -1  375 };
+  out = { 'sl'     4     67   0  -5    0    116  0 -1  375 };
   out = { 'x'      1     67   0  -5    0    116  0 -1    0 };
   out = { 'vs'     1     67  50  -5    0    116  0 -1    0 };
   out = { 'tn'     1     67   0  -5    0    116  0 -1  375 };

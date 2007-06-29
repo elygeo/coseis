@@ -1,6 +1,6 @@
 % TeraShake 2000m
-  bc1 = [ 1 1 1 ];
-  bc2 = [ 1 1 0 ];
+  bc1 = [ 10 10 10 ];
+  bc2 = [ 10 10  0 ];
   faultnormal = 2;
   slipvector = [ 1. 0. 0. ];
   grid = 'read';

@@ -1,6 +1,6 @@
 % TeraShake 500m
-  bc1 = [ 1 1 1 ];
-  bc2 = [ 1 1 0 ];
+  bc1 = [ 10 10 10 ];
+  bc2 = [ 10 10  0 ];
   faultnormal = 2;
   slipvector = [ 1. 0. 0. ];
   grid = 'read';
@@ -20,7 +20,7 @@
   vrup = 2300.;
   itstats = 10;
   itio = 400;
-  itcheck = 800;
+  itcheck = 0;
   datadir = 'ts/0500/data';
   np = [ 1 36 4 ]; % DS 18, TG 72
   np = [ 1 38 4 ]; % DS 19, TG 76
@@ -35,7 +35,7 @@
   ihypo = [  545  399 -11 ];
   ihypo = [  907  399 -11 ];
 % mus = [ 1.06 'zone'   527   0 -33         925  0 -1      ]; % node reg
-  mus = [ 1.07 'zone'   527   0 -33         925  0 -1      ];
+  mus = [ 1.08 'zone'   527   0 -33         925  0 -1      ];
   out = { 'x'      1    527   0 -33    0    925  0 -1    0 };
   out = { 'vs'     1    527 398 -33    0    925  0 -1    0 };
   out = { 'tn'    10    527   0 -33    0    925  0 -1 3000 };

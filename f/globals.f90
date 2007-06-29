@@ -169,6 +169,7 @@ integer :: &
   itstats,       & ! interval for calculating statistics
   itio,          & ! interval for writing i/o buffers, must be a multiple of itstats
   itcheck,       & ! interval for checkpointing, must be a multiple of itio
+  itstop,        & ! stop time, for simulating a killed job
   debug,         & ! debugging flag
   npml,          & ! number of PML damping nodes
   fixhypo,       & ! fix hypocenter to 0=none, 1,2=ihypo node, cell, -1,-2=xhypo node, cell

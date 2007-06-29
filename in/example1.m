@@ -29,7 +29,7 @@
 % Boundary conditions
   npml = 10;
   bc1 = [ -2 -2  0 ];
-  bc2 = [  1  1  1 ];
+  bc2 = [ 10 10 10 ];
 
 % Code execution and output
   np  = [ 1 1 2 ];

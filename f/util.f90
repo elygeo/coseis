@@ -162,7 +162,7 @@ end subroutine
 real function timer( i )
 integer, intent(in) :: i
 integer, save :: clock0, clockrate, clockmax
-integer(8), save :: timers(4)
+integer(8), save :: timers(8)
 integer :: clock1
 if ( i == 0 ) then
   call system_clock( clock0, clockrate, clockmax )
@@ -193,35 +193,37 @@ if ( i0 < 0 ) then
 end if
 if ( modulo( i0, n ) == 0 ) then
   inquire( iolength=i ) ft
-  if ( id > 0 .and. i0 == 0 ) then
-    open( 1, file=str, recl=i, iostat=io, form='unformatted', access='direct', status='new' )
-    if ( io /= 0 ) write( 0, * ) 'Error: file exists: ', trim( str )
-  else
+  if ( id < 0 .or. i0 > 0 ) then
     open( 1, file=str, recl=i, iostat=io, form='unformatted', access='direct', status='old' )
-    if ( io /= 0 ) write( 0, * ) 'Error: file not found: ', trim( str )
-  end if
-  if ( io /= 0 ) stop
-  i = i0 / n + 1
-  if ( id > 0 ) then
-    write( 1, rec=i ) ft
   else
+    open( 1, file=str, recl=i, iostat=io, form='unformatted', access='direct', status='replace' )
+  end if
+  if ( io /= 0 ) then
+    if ( io /= 0 ) write( 0, * ) 'Error: opening file: ', trim( str )
+    stop
+  end if
+  i = i0 / n + 1
+  if ( id < 0 ) then
     read( 1, rec=i ) ft
+  else
+    write( 1, rec=i ) ft
   end if
   close( 1 )
 else
   inquire( iolength=i ) ft(1)
-  if ( id > 0 .and. i0 == 0 ) then
-    open( 1, file=str, recl=i, iostat=io, form='unformatted', access='direct', status='new' )
-    if ( io /= 0 ) write( 0, * ) 'Error: file exists: ', trim( str )
-  else
+  if ( id < 0 .or. i0 > 0 ) then
     open( 1, file=str, recl=i, iostat=io, form='unformatted', access='direct', status='old' )
-    if ( io /= 0 ) write( 0, * ) 'Error: file not found: ', trim( str )
-  end if
-  if ( io /= 0 ) stop
-  if ( id > 0 ) then
-    do i = 1, n; write( 1, rec=i0+i ) ft(i); end do
   else
+    open( 1, file=str, recl=i, iostat=io, form='unformatted', access='direct', status='replace' )
+  end if
+  if ( io /= 0 ) then
+    if ( io /= 0 ) write( 0, * ) 'Error: opening file: ', trim( str )
+    stop
+  end if
+  if ( id < 0 ) then
     do i = 1, n; read( 1, rec=i0+i ) ft(i); end do
+  else
+    do i = 1, n; write( 1, rec=i0+i ) ft(i); end do
   end if
   close( 1 )
 end if
@@ -238,18 +240,19 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 inquire( iolength=nb ) s1(j1:j2,k1:k2,l1:l2)
-if ( id > 0 .and. ir == 1 ) then
-  open( 1, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='new' )
-  if ( io /= 0 ) write( 0, * ) 'Error: file exists: ', trim( str )
-else
+if ( id < 0 .or. ir > 1 ) then
   open( 1, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='old' ) 
-  if ( io /= 0 ) write( 0, * ) 'Error: file not found: ', trim( str )
-end if
-if ( io /= 0 ) stop
-if ( id > 0 ) then
-  write( 1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
 else
+  open( 1, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='replace' )
+end if
+if ( io /= 0 ) then
+  if ( io /= 0 ) write( 0, * ) 'Error: opening file: ', trim( str )
+  stop
+end if
+if ( id < 0 ) then
   read(  1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
+else
+  write( 1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
 end if
 close( 1 )
 end subroutine
@@ -265,18 +268,19 @@ j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 inquire( iolength=nb ) w1(j1:j2,k1:k2,l1:l2,ic)
-if ( id > 0 .and. ir == 1 ) then
-  open( 1, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='new' )
-  if ( io /= 0 ) write( 0, * ) 'Error: file exists: ', trim( str )
-else
+if ( id < 0 .or. ir > 1 ) then
   open( 1, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='old' ) 
-  if ( io /= 0 ) write( 0, * ) 'Error: file not found: ', trim( str )
-end if
-if ( io /= 0 ) stop
-if ( id > 0 ) then
-  write( 1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
 else
+  open( 1, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='replace' )
+end if
+if ( io /= 0 ) then
+  if ( io /= 0 ) write( 0, * ) 'Error: opening file: ', trim( str )
+  stop
+end if
+if ( id < 0 ) then
   read(  1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
+else
+  write( 1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
 end if
 close( 1 )
 end subroutine

@@ -7,24 +7,18 @@ fi
 
 cat << END > run
 #!/bin/bash -e
+mode=$mode
 cd "$rundir"
 echo "\$( date ): $code started" >> log
 $pre
-case "\${1:--i}$mode" in
+case "\${1:--i}\$mode" in
   -is) $bin ;;
   -gs) totalview $bin ;;
-  -bs) nohup $bin > out.log & :; pid=\$! ;;
   -ip) mpirun -machinefile mf -np $np $bin ;;
   -gp) mpirun -tv -machinefile mf -np $np $bin ;;
-  -bp) nohup mpirun -machinefile mf -np $np $bin > out.log & :; pid=\$! ;;
 esac
-if [ "\$pid" ]; then
-  echo "\$( date ): $code started with PID: \$pid" >> log
-  echo "$code started with PID: \$pid"
-else :
-  $post
-  echo "\$( date ): $code finished" >> log
-fi
+$post
+echo "\$( date ): $code finished" >> log
 END
 
 cat << END > mf
@@ -36,6 +30,7 @@ END
 
 cat << END > que
 #!/bin/bash
+# qsub -W depend=afterok:$1
 cd "$rundir"
 echo "\$( date ): $code qued with ID: \$( qsub script )" >> log
 END
