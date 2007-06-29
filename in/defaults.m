@@ -35,7 +35,6 @@
   rexpand = 1.06;			% grid expansion ratio
   n1expand = [ 0 0 0 ];			% n grid expansion nodes for j1 k1 l1
   n2expand = [ 0 0 0 ];			% n grid expansion nodes for j2 k2 l2
-% lock = [ 1 1 0   1 1 1  -1 -1 -1 ];	% **lock v1 & v2, v3 is free
 
 % Moment source parameters
 % rfunc = 'box';			% spatial weighting: uniform

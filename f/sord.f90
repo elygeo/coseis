@@ -18,7 +18,6 @@ use m_checkpoint
 use m_timestep
 use m_stress
 use m_acceleration
-use m_locknodes
 use m_util
 use m_bc
 implicit none
@@ -60,8 +59,7 @@ do while ( it < nt )
   if ( sync ) call barrier ; call momentsource    ; prof1(jp) = timer( 5 )
   if ( sync ) call barrier ; call output( 1 )     ; prof2(jp) = timer( 5 )
   if ( sync ) call barrier ; call acceleration   
-  if ( sync ) call barrier ; call fault           
-  if ( sync ) call barrier ; call locknodes       ; prof1(jp) = prof1(jp) + timer( 5 )
+  if ( sync ) call barrier ; call fault           ; prof1(jp) = prof1(jp) + timer( 5 )
   if ( sync ) call barrier ; call output( 2 )     ; prof2(jp) = prof2(jp) + timer( 5 )
   if ( sync ) call barrier ; call vectorswaphalo( w1, nhalo ) ; prof3(jp) = timer( 5 )
   if ( sync ) call barrier ; call vectorbc( w1, bc1, bc2, i1bc, i2bc, 0 )

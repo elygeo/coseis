@@ -27,7 +27,6 @@ if ( debug /= 0 ) then
   write( 1, '(a,i8,a)'        ) '  ifn    =  ', ifn,    ' ;'
   write( 1, '(a,i8,a)'        ) '  nin    =  ', nin,    ' ;'
   write( 1, '(a,i8,a)'        ) '  nout   =  ', nout,   ' ;'
-  write( 1, '(a,i8,a)'        ) '  nlock  =  ', nlock,  ' ;'
   write( 1, '(a,3i8,a)'       ) '  ip3    = [', ip3,    ' ];'
   write( 1, '(a,3i8,a)'       ) '  np     = [', np,     ' ];'
   write( 1, '(a,3i8,a)'       ) '  nhalo  = [', nhalo,  ' ];'
@@ -46,10 +45,6 @@ if ( debug /= 0 ) then
     case( 'c' ); write( 1, '(2x,a,a,g15.7,a,6g15.7,a)' ) &
       fieldin(iz), ' = {', inval(iz), " 'cube'", x1in(iz,:), x2in(iz,:), ' };'
     end select
-  end do
-  do iz = 1, nlock
-    write( 1, '(a,9i7,a)' ) &
-      '  lock        = [', ilock(iz,:), i1lock(iz,:), i2lock(iz,:), ' ];'
   end do
   close( 1 )
 end if

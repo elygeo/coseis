@@ -109,10 +109,6 @@ case( 'out' );
   i = nout
   outtype(i) = 'z'
   read( str, *, iostat=io ) fieldout(i), ditout(i), i1out(i,:), i2out(i,:)
-case( 'lock' );
-  nlock = nlock + 1
-  i = nlock
-  read( str, *, iostat=io ) ilock(i,:), i1lock(i,:), i2lock(i,:)
 case default; io = 1
 end select
 
