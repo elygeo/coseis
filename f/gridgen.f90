@@ -27,6 +27,10 @@ end if
 
 ! Single node indexing
 idoublenode = 0
+print *, i1
+print *, i2
+print *, i3
+print *, i4
 if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
   if ( ihypo(i) < i3(i) ) then
@@ -37,6 +41,10 @@ if ( faultnormal /= 0 ) then
     if ( ihypo(i) <  i4(i) ) i4(i) = i4(i) - 1
   end if
 end if
+print *, i1
+print *, i2
+print *, i3
+print *, i4
 
 ! Remove double nodes for now, or create basic rectangular mesh
 if ( grid == 'read' ) then
@@ -136,10 +144,7 @@ case( 3 ); w1(:,:,l+1:nm(3),:) = w1(:,:,l:nm(3)-1,:)
 end select
 
 ! Fill halo and find cell centers
-i1 = 4
-i2 = 4
 call vectorswaphalo( w1, nhalo )
-call vectorbc( w1, i1, i2, i1bc, i2bc, 0 )
 call vectoraverage( w2, w1, i1cell, i2cell, 1 )
 
 ! Hypocenter location
@@ -164,19 +169,6 @@ elseif ( fixhypo < 0 ) then
   end forall
 end if
 
-! Grid Dimensions
-do i = 1,3
-  s2 = w1(:,:,:,i)
-  xlim(i) = minval( s2 )
-  xlim(i+3) = -maxval( s2 )
-end do
-call rreduce1( gxlim, xlim, 'allmin', 0 )
-xcenter = .5 * ( gxlim(1:3) - gxlim(4:6) )
-i1 = 1
-i2 = nm
-call radius( s2, w1, xcenter, i1, i2 )
-call rreduce( rmax, sqrt( maxval( s2 ) ), 'max', 0 )
-
 ! Operators
 if ( oplevel == 0 ) then
   oplevel = 6
@@ -196,9 +188,9 @@ select case( oplevel )
 case( 1 )
 case( 2 )
   allocate( dx1(nm(1)), dx2(nm(2)), dx3(nm(3)) )
-  do i =1, nm(1)-1; dx1(i) = .5 * ( w1(i+1,2,2,1) - w1(i,2,2,1) ); end do
-  do i =1, nm(2)-1; dx2(i) = .5 * ( w1(2,i+1,2,2) - w1(2,i,2,2) ); end do
-  do i =1, nm(3)-1; dx3(i) = .5 * ( w1(2,2,i+1,3) - w1(2,2,i,3) ); end do
+  do i =1, nm(1)-1; dx1(i) = .5 * ( w1(i+1,3,3,1) - w1(i,3,3,1) ); end do
+  do i =1, nm(2)-1; dx2(i) = .5 * ( w1(3,i+1,3,2) - w1(3,i,3,2) ); end do
+  do i =1, nm(3)-1; dx3(i) = .5 * ( w1(3,3,i+1,3) - w1(3,3,i,3) ); end do
 case( 3:5 )
   allocate( xx(nm(1),nm(2),nm(3),3) )
   xx = w1

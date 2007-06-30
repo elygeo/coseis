@@ -6,7 +6,7 @@
   fixhypo = 2;
   rsource = 50.;
   debug = 0;
-  bc1 = [ 0 0 0 ];
+  bc1 = [ 1 1 1 ];
   npml = 0;
   hourglass = [ 1. 1. ];
   oplevel = 2;

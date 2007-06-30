@@ -18,8 +18,8 @@
   tfunc = 'brune';
   tsource = .1;
   xhypo = [ 0. 0. 0. ];
-  bc1 = [ 0 0 0 ];
-  bc2 = [ 0 0 0 ];
+  bc1 = [ 1 1 1 ];
+  bc2 = [ 1 1 1 ];
   ihypo = [ 31 31 31 ];
 
   timeseries = { 'x'    0. 3999. 0. };

@@ -112,8 +112,6 @@ real :: &
   x2in(nz,3),    & ! input cube - far corner 
   xout(nz,3),    & ! timeseries output location
   xhypo(3),      & ! hypocenter location
-  xcenter(3),    & ! mesh center
-  rmax,          & ! maximum distance from mesh center
   slipvector(3)    ! slip direction for finding traction vectors
 
 real :: &

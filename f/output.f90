@@ -42,10 +42,7 @@ doiz: do iz = 1, nout
 
 ! Output field properties
 call outprops( fieldout(iz), nc, onpass, fault, cell )
-if ( fault .and. faultnormal == 0 ) then
-  write( 0, * ) 'No fault to output for ', trim( fieldout(iz) )
-  stop
-elseif ( fault .and. .not. dofault ) then
+if ( fault .and. .not. dofault ) then
   i1out(iz,4) = nt + 1
   cycle doiz
 end if
@@ -83,7 +80,7 @@ case( 'x' )
   if ( onpass == 0 ) i2out(iz,4) = 0
   if ( fault ) then
     i1 = nnoff
-    rout = 2 * dx * dx
+    rout = huge( rout )
     if ( dofault ) then
       i = abs( faultnormal )
       i1 = 1
@@ -92,8 +89,7 @@ case( 'x' )
       i2(i) = ihypo(i)
       call radius( s2, w1, x0, i1, i2 )
       f2 = s2(i1(1):i2(1),i1(2):i2(2),i1(3):i2(3))
-      rout = 2 * dx * dx + maxval( f2 )
-      call scalarsethalo( f2, rout, i1core, i2core )
+      call scalarsethalo( f2, rout, i1, i2 )
       call reduceloc( rout, i1, f2, 'allmin', n, noff, i )
       i1(i) = ihypo(i)
     end if
@@ -102,11 +98,9 @@ case( 'x' )
       i1 = max( i1core, i1cell )
       i2 = min( i2core, i2cell )
       call radius( s2, w2, x0, i1, i2 )
-      rout = 2 * dx * dx + maxval( s2 )
       call scalarsethalo( s2, rout, i1, i2 )
     else
       call radius( s2, w1, x0, i1core, i2core )
-      rout = 2 * dx * dx + maxval( s2 )
       call scalarsethalo( s2, rout, i1core, i2core )
     end if
     call reduceloc( rout, i1, s2, 'allmin', n, noff, 0 )
@@ -212,23 +206,21 @@ if ( dofault .and. it > 0 .and. modulo( it, itstats ) == 0 ) then
 select case( pass )
 case( 1 )
   jf = jf + 1
-  call scalarsethalo( f1,   -1., i1core, i2core )
-  call scalarsethalo( f2,   -1., i1core, i2core )
-  call scalarsethalo( tarr, -1., i1core, i2core )
+  call scalarsethalo( f1,   -huge(rr), i1core, i2core )
+  call scalarsethalo( f2,   -huge(rr), i1core, i2core )
+  call scalarsethalo( tarr, -huge(rr), i1core, i2core )
   fstats(jf,1) = maxval( f1 )
   fstats(jf,2) = maxval( f2 )
   fstats(jf,3) = maxval( sl )
   fstats(jf,4) = maxval( tarr )
 case( 2 )
-  call scalarsethalo( ts, -1., i1core, i2core )
-  call scalarsethalo( f2, -1., i1core, i2core )
+  call scalarsethalo( ts, -huge(rr), i1core, i2core )
+  call scalarsethalo( f2, -huge(rr), i1core, i2core )
+  call scalarsethalo( tn, -huge(rr), i1core, i2core )
   fstats(jf,5) = maxval( ts )
   fstats(jf,6) = maxval( f2 )
-  rr = -2. * abs( minval( tn ) ) - 1.
-  call scalarsethalo( tn, rr, i1core, i2core )
   fstats(jf,7) = maxval( tn )
-  rr = 2. * abs( fstats(jf,7) ) + 1.
-  call scalarsethalo( tn, rr, i1core, i2core )
+  call scalarsethalo( tn, huge(rr), i1core, i2core )
   fstats(jf,8) = -minval( tn )
   estats(jf,1) = efric
   estats(jf,2) = estrain
@@ -307,7 +299,6 @@ nr = ( i2out(iz,4) - i1out(iz,4) ) / ditout(iz) + 1
 ! Fault plane
 mpio = mpout * 4
 if ( fault ) then
-  if ( .not. dofault ) cycle doiz
   i = abs( faultnormal )
   mpio = mpout * i
   i1(i) = 1

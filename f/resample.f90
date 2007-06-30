@@ -24,14 +24,16 @@ case( 3 ); i = ihypo(3); s1(:,:,i) = 0.; yy(:,:,i) = 0.
 end select
 
 ! BCs, use mirror for gamma
-i1 = 1
-i2 = 1
-call scalarbc( gam, i1, i2, i1, i2, 1 )
 call scalarbc( s1,  bc1, bc2, i1bc, i2bc, 1 )
 call scalarbc( mr,  bc1, bc2, i1bc, i2bc, 1 )
 call scalarbc( lam, bc1, bc2, i1bc, i2bc, 1 )
 call scalarbc( mu,  bc1, bc2, i1bc, i2bc, 1 )
 call scalarbc( yy,  bc1, bc2, i1bc, i2bc, 1 )
+
+! Use mirror for gamma
+i1 = 1
+i2 = 1
+call scalarbc( gam, i1, i2, i1bc, i2bc, 1 )
 
 ! Mass ratio
 s2 = mr * s1

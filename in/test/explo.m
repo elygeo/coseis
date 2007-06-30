@@ -18,7 +18,7 @@
   tfunc = 'brune';
   tsource = .1;
   xhypo = [ 0. 0. 0. ];
-  bc2 = [ 0 0 0 ];
+  bc2 = [ 1 1 1 ];
 
   timeseries = { 'x'    0. 3999. 0. };
   timeseries = { 'v'    0. 3999. 0. };
@@ -29,13 +29,14 @@
 
   fixhypo = -2;
   rsource = 50.;
-  ihypo = [ -72 -72 -62 ];
-  bc1 = [ 2 2 2 ];
+  ihypo = [ 1 1 1 ];
+  bc1   = [ 2 2 2 ];
   return
 
   fixhypo = -1;
   rsource = 100.;
-  ihypo = [ 1 1 1 ];
-  bc1 = [ 1 1 1 ];
+  ihypo = [ 2 2 2 ];
+  bc1   = [ 3 3 3 ];
+  i1bc  = [ 2 2 2 ];
   return
 

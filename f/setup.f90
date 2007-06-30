@@ -11,13 +11,14 @@ integer :: nl(3), n(3)
 
 ! Hypocenter & halo
 n = nn
-ifn = abs( faultnormal )
-if ( ifn /= 0 ) then
-  nhalo(ifn) = 2
-end if
 where ( ihypo == 0 ) ihypo = ( n + 1 ) / 2
 where ( ihypo <  0 ) ihypo = ihypo + nn + 1
-if ( any( ihypo < 0 .or. ihypo > nn ) ) stop 'ihypo out of bounds'
+if ( any( ihypo < 1 .or. ihypo > nn ) ) stop 'ihypo out of bounds'
+ifn = abs( faultnormal )
+if ( ifn /= 0 ) then
+  if ( ihypo(ifn) == nn(ifn) ) stop 'ihypo out of bounds'
+  nhalo(ifn) = 2
+end if
 
 ! Partition for parallelization
 if ( np0 == 1 ) np = 1
@@ -45,16 +46,9 @@ nm = nl + 2 * nhalo
 ! Boundary conditions
 where ( i1bc < 1 ) i1bc = i1bc + nn + 1
 where ( i2bc < 1 ) i2bc = i2bc + nn + 1
-where ( abs( bc2 ) == 2 ) i2bc = i2bc - 1
 if ( ifn /= 0 ) then
-  if ( ihypo(ifn) < 2 ) then
-    bc1(ifn) = -2
-    i1bc(ifn) = ihypo(ifn) + 1
-  end if
-  if ( ihypo(ifn) > nn(ifn) - 2 ) then
-    bc2(ifn) = -2
-    i2bc(ifn) = ihypo(ifn)
-  end if
+  if ( ihypo(ifn) == 1           ) bc1(ifn) = -2
+  if ( ihypo(ifn) == nn(ifn) - 1 ) bc2(ifn) = -2
 end if
 i1bc = i1bc - nnoff
 i2bc = i2bc - nnoff

@@ -33,16 +33,15 @@
   timeseries = { 'su'     0.  6001. 0. };
   timeseries = { 'sv'     0.  6001. 0. };
   timeseries = { 'ts'     0.  6001. 0. };
-  bc1      = [   0   0   0 ];
+  bc1      = [   1   1   1 ];
   n1expand = [  50  50  50 ];
 
   itcheck = 0;
   np = [ 1 4 4 ];
 
-% xy-shear
   affine = [ 1. 1. 0.   0. 1. 1.   0. 0. 1. ];
-  nn       = [ 551 271 101 ];
-  ihypo    = [   0   0  -1 ];
-  bc2      = [   0   0   0 ];
+  nn       = [ 551 271 102 ];
+  ihypo    = [   0   0  -2 ];
+  bc2      = [   1   1  -2 ];
   n2expand = [  50  50   0 ];
 

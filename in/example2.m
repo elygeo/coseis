@@ -35,8 +35,8 @@
   vrup = -1.;
 
 % Boundary conditions
-  bc1 = [ 0 0 0 ];
-  bc2 = [ 0 0 0 ];
+  bc1 = [ 1 1 1 ];
+  bc2 = [ 1 1 1 ];
   n1expand = [ 50  0 50 ];
   n2expand = [ 50 50 50 ];
 

@@ -62,6 +62,12 @@ end select
 
 end do doiz
 
+! Fill halo
+call scalarswaphalo( mr,  nhalo )
+call scalarswaphalo( s1,  nhalo )
+call scalarswaphalo( s2,  nhalo )
+call scalarswaphalo( gam, nhalo )
+
 ! Limits
 if ( rho1 > 0. ) where ( mr < rho1 ) mr = rho1
 if ( rho2 > 0. ) where ( mr > rho2 ) mr = rho2
@@ -89,21 +95,15 @@ if ( any( mr  > huge(r) ) .or. any( s1 > huge(r) ) &
   stop 'Inf in velocity model!'
 end if
 
-! Fill halo
-call scalarswaphalo( mr,  nhalo )
-call scalarswaphalo( s1,  nhalo )
-call scalarswaphalo( s2,  nhalo )
-call scalarswaphalo( gam, nhalo )
-
 ! Stats
 stats(1) = maxval( mr  )
 stats(2) = maxval( s1  )
 stats(3) = maxval( s2  )
 stats(4) = maxval( gam )
-call scalarsethalo( mr,  stats(1), i1cell, i2cell )
-call scalarsethalo( s1,  stats(2), i1cell, i2cell )
-call scalarsethalo( s2,  stats(3), i1cell, i2cell )
-call scalarsethalo( gam, stats(4), i1cell, i2cell )
+call scalarsethalo( mr,  huge(r), i1cell, i2cell )
+call scalarsethalo( s1,  huge(r), i1cell, i2cell )
+call scalarsethalo( s2,  huge(r), i1cell, i2cell )
+call scalarsethalo( gam, huge(r), i1cell, i2cell )
 stats(5) = -minval( mr  )
 stats(6) = -minval( s1  )
 stats(7) = -minval( s2  )

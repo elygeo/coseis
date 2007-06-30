@@ -33,7 +33,7 @@
   timeseries = { 'su'     0.  6001. 0. };
   timeseries = { 'sv'     0.  6001. 0. };
   timeseries = { 'ts'     0.  6001. 0. };
-  bc1      = [   0   0   0 ];
+  bc1      = [   1   1   1 ];
   n1expand = [  50  50  50 ];
 
   itcheck = 0;
@@ -41,9 +41,9 @@
 
 % rectangular
   affine = [ 1. 0. 0.   0. 1. 0.   0. 0. 1. ];
-  nn       = [ 421 271 201 ];
-  ihypo    = [  -1  -1  -1 ];
-  bc2      = [  -2   2   0 ];
+  nn       = [ 421 271 202 ];
+  ihypo    = [  -1  -1  -2 ];
+  bc2      = [  -2   2  -2 ];
   n2expand = [   0   0   0 ];
   fixhypo = -2;
 

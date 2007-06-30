@@ -57,7 +57,6 @@ courant = dt * vp2 * sqrt( 3. ) / abs( dx )
 open( 1, file='meta.m', status='replace' )
 write( 1, '(a)' ) '% SORD metadata'
 write( 1, '(a,g15.7,a)'  ) '  dx          =  ', dx,             ' ;'
-write( 1, '(a,g15.7,a)'  ) '  rmax        =  ', rmax,           ' ;'
 write( 1, '(a,g15.7,a)'  ) '  dt          =  ', dt,             ' ;'
 write( 1, '(a,g15.7,a)'  ) '  rho0        =  ', rho0,           ' ;'
 write( 1, '(a,g15.7,a)'  ) '  rho1        =  ', rho1,           ' ;'
@@ -75,7 +74,6 @@ write( 1, '(a,g15.7,a)'  ) '  vdamp       =  ', vdamp,          ' ;'
 write( 1, '(a,g15.7,a)'  ) '  rexpand     =  ', rexpand,        ' ;'
 write( 1, '(a,g15.7,a)'  ) '  courant     =  ', courant,        ' ;'
 write( 1, '(a,2g15.7,a)' ) '  hourglass   = [', hourglass,      ' ];'
-write( 1, '(a,3g15.7,a)' ) '  xcenter     = [', xcenter,        ' ];'
 write( 1, '(a,3g15.7,a)' ) '  xhypo       = [', xhypo,          ' ];'
 write( 1, '(a,3g15.7)'   ) '  affine      = [', affine(1:3)
 write( 1, '(a,3g15.7)'   ) '                 ', affine(4:6)

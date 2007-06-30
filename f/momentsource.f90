@@ -23,7 +23,6 @@ call diffnc( s1, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
 
 ! Hypocenter/cell radius (squared)
 call radius( s2, w2, xhypo, i1cell, i2cell )
-call scalarsethalo( s2, 2.*rsource*rsource, i1cell, i2cell )
 nsrc = count( s2 < rsource*rsource )
 allocate( jj(nsrc), kk(nsrc), ll(nsrc), cellvol(nsrc), srcfr(nsrc) )
 
@@ -49,13 +48,6 @@ if ( s2(j,k,l) < rsource*rsource ) then
   if (  all( (/ j, k, l /) >= i1core .and. (/ j, k, l /) <= i2core ) ) then
     sumsrcfr = sumsrcfr + srcfr(i)
   end if
-  !if ( &
-  !( j >= i1core(1) .or. j < i1bc(1) ) .and. &
-  !( k >= i1core(2) .or. k < i1bc(2) ) .and. &
-  !( l >= i1core(3) .or. l < i1bc(3) ) .and. &
-  !( j <= i2core(1) .or. j >= i2bc(1) ) .and. &
-  !( k <= i2core(2) .or. k >= i2bc(2) ) .and. &
-  !( l <= i2core(3) .or. l >= i2bc(3) ) ) sumsrcfr = sumsrcfr + srcfr(i)
 end if
 end do
 end do

@@ -10,21 +10,23 @@ integer, intent(in) :: bc1(3), bc2(3), i1bc(3), i2bc(3), cell
 integer, dimension(3) :: i1, i2, b1, b2, nm
 integer :: j1, k1, l1, j2, k2, l2
 nm = (/ size(f,1), size(f,2), size(f,3) /) - cell
-i1 = i1bc - 1
-i2 = i2bc + 1 - cell
+i1 = i1bc - cell
+i2 = i2bc
 b1 = abs( bc1 )
 b2 = abs( bc2 )
-where ( bc1 == 0 .or. bc1 == 10 ) b1 = -1
-where ( bc2 == 0 .or. bc2 == 10 ) b2 = -1
-b1 = b1 + cell
-b2 = b2 + cell
-where ( nm <= 1 .or. i1 < 1 .or. i1 > nm ) b1 = 99
-where ( nm <= 1 .or. i2 < 1 .or. i2 > nm ) b2 = 99
+where ( bc1 == 10 ) b1 = 0
+where ( bc2 == 10 ) b2 = 0
+where ( bc1 == 11 ) b1 = 1
+where ( bc2 == 11 ) b2 = 1
+b1 = b1 - cell
+b2 = b2 - cell
+where ( nm <= 1 .or. i1 < 1 .or. i1 > nm - 1 ) b1 = 99
+where ( nm <= 1 .or. i2 < 2 .or. i2 > nm     ) b2 = 99
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
-! Vacuum
+! Zero
 if ( b1(1) == 0 ) f(j1,:,:) = 0.
 if ( b1(2) == 0 ) f(:,k1,:) = 0.
 if ( b1(3) == 0 ) f(:,:,l1) = 0.
@@ -32,7 +34,7 @@ if ( b2(1) == 0 ) f(j2,:,:) = 0.
 if ( b2(2) == 0 ) f(:,k2,:) = 0.
 if ( b2(3) == 0 ) f(:,:,l2) = 0.
 
-! Mirror
+! Symmetry
 if ( b1(1) == 2 ) f(j1,:,:) = f(j1+1,:,:)
 if ( b1(2) == 2 ) f(:,k1,:) = f(:,k1+1,:)
 if ( b1(3) == 2 ) f(:,:,l1) = f(:,:,l1+1)
@@ -51,21 +53,23 @@ integer, dimension(3) :: i1, i2, b1, b2, s1, s2, nm
 integer :: j1, k1, l1, j2, k2, l2, cell, normal, tangent
 cell = abs( tensor )
 nm = (/ size(f,1), size(f,2), size(f,3) /) - cell
-i1 = i1bc - 1
-i2 = i2bc + 1 - cell
+i1 = i1bc - cell
+i2 = i2bc
 b1 = abs( bc1 )
 b2 = abs( bc2 )
-where ( bc1 == 0 .or. bc1 == 10 ) b1 = -1
-where ( bc2 == 0 .or. bc2 == 10 ) b2 = -1
-b1 = b1 + cell
-b2 = b2 + cell
-where ( nm <= 1 .or. i1 < 1 .or. i1 > nm ) b1 = 99
-where ( nm <= 1 .or. i2 < 1 .or. i2 > nm ) b2 = 99
+where ( bc1 == 10 ) b1 = 0
+where ( bc2 == 10 ) b2 = 0
+where ( bc1 == 11 ) b1 = 1
+where ( bc2 == 11 ) b2 = 1
+b1 = b1 - cell
+b2 = b2 - cell
+where ( nm <= 1 .or. i1 < 1 .or. i1 > nm - 1 ) b1 = 99
+where ( nm <= 1 .or. i2 < 2 .or. i2 > nm     ) b2 = 99
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
-! Vacuum
+! Zero
 if ( b1(1) == 0 ) f(j1,:,:,:) = 0.
 if ( b1(2) == 0 ) f(:,k1,:,:) = 0.
 if ( b1(3) == 0 ) f(:,:,l1,:) = 0.
@@ -73,7 +77,7 @@ if ( b2(1) == 0 ) f(j2,:,:,:) = 0.
 if ( b2(2) == 0 ) f(:,k2,:,:) = 0.
 if ( b2(3) == 0 ) f(:,:,l2,:) = 0.
 
-! Mirror
+! Symmetry
 s1 = sign( 1, bc1 )
 s2 = sign( 1, bc2 )
 if ( tensor == 0 ) then
