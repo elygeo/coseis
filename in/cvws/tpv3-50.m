@@ -33,7 +33,7 @@
   timeseries = { 'su'     0.  6001. 0. };
   timeseries = { 'sv'     0.  6001. 0. };
   timeseries = { 'ts'     0.  6001. 0. };
-  bc1      = [   1   1   1 ];
+  bc1      = [   0   0   0 ];
   n1expand = [  60  60  60 ];
 
   itcheck = 0;

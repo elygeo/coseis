@@ -56,7 +56,7 @@
   slipvector = [ 1. 0. 0. ];	% shear traction direction for ts1
   mus = .6;			% **coef of static friction
   mud = .5;			% **coef of dynamic friction
-  dc  = .25;			% **slip-weakening distance
+  dc  = .4;			% **slip-weakening distance
 % co  = 0.;			% **cohesion
   ts1 = -70e6;			% **shear traction component 1
 % ts2 = 0.;			% **shear traction component 2
@@ -87,14 +87,15 @@
 % out = { 'sl' -1   1 1 1 1   -1 -1 -1 -1 };	% write final slip length, 4D zone
 
 % Boundary conditions:
-%  0: Rigid boundary: zero node displacement
-%  1: Vacuum free surface: zero cell stress
-%  2: Mirror symmetry between nodes
-%  3: Mirror symmetry between cells
-% -2: Anti-mirror symmetry between nodes, useful for faults
-% -3: Anti-mirror symmetry between cells
-% 10: Rigid + PML absorbing
-% 11: Vacumm + PML absorbing
+%  0: Vacuum free surface: zero cell stress
+%  1: Rigid boundary: zero node displacement
+%  2: Mirror symmetry between nodes, at the cell, use will fixhypo=2,-2
+%  3: Mirror symmetry between cells, at the node, use will fixhypo=1,-1
+% -2: Anti-mirror symmetry between nodes, at the cell, use with fixhypo=2,-2
+%     Useful for fault planes and nodal planes
+% -3: Anti-mirror symmetry between cells, at the node, use with fixhypo=1,-1
+%     Useful for nodal planes
+% 10: PML absorbing
 
 % **optional 3D region argument: 'zone', 'cube', or 'read'
 %   when not specified, defaults to the entire volume

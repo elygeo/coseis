@@ -12,22 +12,27 @@ use m_diffnc
 use m_collective
 use m_util
 real, allocatable :: cellvol(:)
-integer :: i, j, k, l, nsrc
+integer :: i1(3), i2(3), i, j, k, l, nsrc
 real :: sumsrcfr, allsumsrcfr
 
 if ( rsource <= 0. ) return
 if ( master ) write( 0, * ) 'Moment source initialize'
 
 ! Cell volumes
+i1 = i1bc
+i2 = i2bc - 1
 call diffnc( s1, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
+call scalarsethalo( s1, 0., i1, i2 )
 
 ! Hypocenter/cell radius (squared)
 call radius( s2, w2, xhypo, i1cell, i2cell )
+call scalarsethalo( s2, huge(sumsrcfr), i1cell, i2cell )
 nsrc = count( s2 < rsource*rsource )
 allocate( jj(nsrc), kk(nsrc), ll(nsrc), cellvol(nsrc), srcfr(nsrc) )
 
 ! Use points inside radius
 i = 0
+srcfr = 0.
 sumsrcfr = 0.
 do l = i1cell(3), i2cell(3)
 do k = i1cell(2), i2cell(2)
@@ -52,11 +57,12 @@ end if
 end do
 end do
 end do
+call scalarsethalo( s2, 0., i1cell, i2cell )
 
 ! Normalize and divide by cell volume
 call rreduce( allsumsrcfr, sumsrcfr, 'allsum', 0 )
 if ( allsumsrcfr <= 0. ) stop 'bad source space function'
-srcfr = srcfr / allsumsrcfr / cellvol
+where ( cellvol > 0. ) srcfr = srcfr / allsumsrcfr / cellvol
 
 end subroutine
 
@@ -94,10 +100,6 @@ do i = 1, nsrc
   w2(j,k,l,ic) = w2(j,k,l,ic) - srcft * srcfr(i) * moment2(ic)
 end do
 end do
-
-! Boundary conditions
-call vectorbc( w1, bc1, bc2, i1bc, i2bc, 1 )
-call vectorbc( w2, bc1, bc2, i1bc, i2bc, -1 )
 
 end subroutine
 

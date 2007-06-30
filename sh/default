@@ -9,7 +9,8 @@ echo "\$(date): $code started" >> log
 $pre
 case "\${1:--i}\$mode" in
   -is) $bin ;;
-  -gs) ddd $bin ;;
+  -gs) gdb $bin ;;
+  -ddds) ddd $bin ;;
   -ip) mpiexec -np $np $bin ;;
   -gp) mpiexec -gdb -np $np $bin ;;
   -dddp) mpiexec -np $np ddd $bin ;;

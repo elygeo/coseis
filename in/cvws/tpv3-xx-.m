@@ -33,14 +33,14 @@
   timeseries = { 'su'     0.  6001. 0. };
   timeseries = { 'sv'     0.  6001. 0. };
   timeseries = { 'ts'     0.  6001. 0. };
-  bc1      = [   1   1   1 ];
-  n1expand = [  50  50  60 ];
+  bc1      = [   0   0   0 ];
+  n1expand = [  60  50  50 ];
 
   itcheck = 0;
   np = [ 4 4 2 ];
 
-  affine = [ 2. 0. 0.   0. 2. 0.   0. 0. 1. ];
-  nn       = [ 211 136 182 ];
+  affine = [ 1. 0. 0.   0. 2. 0.   0. 0. 2. ];
+  nn       = [ 381 136 102 ];
   ihypo    = [  -1  -1  -2 ];
   bc2      = [  -3   3  -2 ];
   n2expand = [   0   0   0 ];

@@ -146,10 +146,6 @@ do i = 1, 3
   w2(:,:,:,i) =      mu * w2(:,:,:,i)
 end do
 
-! Boundary conditions
-call vectorbc( w1, bc1, bc2, i1bc, i2bc, 1 )
-call vectorbc( w2, bc1, bc2, i1bc, i2bc, -1 )
-
 end subroutine
 
 end module

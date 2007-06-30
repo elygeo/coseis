@@ -164,15 +164,12 @@ base="
   surfnormals.f90
   outprops.f90
   util.f90"
-serial="
-  serial.f90"
-parallel="
-  mpi.f90"
 common="
   inread.f90
   setup.f90
   arrays.f90
   gridgen.f90
+  debug.f90
   output.f90
   momentsource.f90
   material.f90
@@ -188,12 +185,12 @@ common="
 # Compile
 . sh/config
 case $optimize in
-  O) fflags=$oflags ;;
-  g) fflags=$gflags ;;
+  O) fflags=$oflags; ;;
+  g) fflags=$gflags; ;;
 esac
 case $mode in
-  s) fc="$sfc"; files="$base $serial $common" ;;
-  p) fc="$pfc"; files="$base $parallel $common" ;;
+  s) fc="$sfc"; files="$base serial.f90 $common" ;;
+  p) fc="$pfc"; files="$base mpi.f90    $common" ;;
 esac
 make="$fc $fflags -o sord-$mode $files"
 cd tmp

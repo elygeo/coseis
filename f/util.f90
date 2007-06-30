@@ -106,7 +106,6 @@ forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
   f(j,k,l,2) * f(j,k,l,2) + &
   f(j,k,l,3) * f(j,k,l,3)
 end forall
-call scalarsethalo( fa, 0., i1, i2 )
 end subroutine
 
 subroutine tensornorm( s, w1, w2, i1, i2 )
@@ -125,7 +124,6 @@ forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
   + w2(j,k,l,2) * w2(j,k,l,2) &
   + w2(j,k,l,3) * w2(j,k,l,3) ) * 2.
 end forall
-call vectorsethalo( fa, 0., i1, i2 )
 end subroutine
 
 subroutine scalarsethalo( f, r, i1, i2 )

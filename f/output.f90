@@ -152,6 +152,7 @@ use m_globals
 use m_collective
 use m_outprops
 use m_util
+use m_debug_out
 integer, intent(in) :: pass
 integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, onpass, nc, ic, nr, ir, iz, id, mpio
 real :: rr
@@ -159,6 +160,7 @@ logical :: dofault, fault, cell
 
 ! Stats
 if ( master .and. ( it == 0 .or. debug == 2 ) ) write( 0, '(a,i2)' ) ' Output pass', pass
+if ( debug > 2 ) call debug_out( pass )
 
 ! Test for fault
 dofault = .false.
@@ -206,22 +208,21 @@ if ( dofault .and. it > 0 .and. modulo( it, itstats ) == 0 ) then
 select case( pass )
 case( 1 )
   jf = jf + 1
-  call scalarsethalo( f1,   -huge(rr), i1core, i2core )
-  call scalarsethalo( f2,   -huge(rr), i1core, i2core )
-  call scalarsethalo( tarr, -huge(rr), i1core, i2core )
+  call scalarsethalo( f1,   -1., i1core, i2core )
+  call scalarsethalo( f2,   -1., i1core, i2core )
+  call scalarsethalo( tarr, -1., i1core, i2core )
   fstats(jf,1) = maxval( f1 )
   fstats(jf,2) = maxval( f2 )
   fstats(jf,3) = maxval( sl )
   fstats(jf,4) = maxval( tarr )
 case( 2 )
-  call scalarsethalo( ts, -huge(rr), i1core, i2core )
-  call scalarsethalo( f2, -huge(rr), i1core, i2core )
-  call scalarsethalo( tn, -huge(rr), i1core, i2core )
+  call scalarsethalo( ts, -1., i1core, i2core )
+  call scalarsethalo( f2, -1., i1core, i2core )
   fstats(jf,5) = maxval( ts )
   fstats(jf,6) = maxval( f2 )
-  fstats(jf,7) = maxval( tn )
-  call scalarsethalo( tn, huge(rr), i1core, i2core )
-  fstats(jf,8) = -minval( tn )
+  call scalarsethalo( tn, -huge(rr), i1core, i2core ); fstats(jf,7) =  maxval( tn )
+  call scalarsethalo( tn,  huge(rr), i1core, i2core ); fstats(jf,8) = -minval( tn )
+  call scalarsethalo( tn, 0., i1core, i2core )
   estats(jf,1) = efric
   estats(jf,2) = estrain
   estats(jf,3) = moment

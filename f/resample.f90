@@ -9,44 +9,41 @@ use m_collective
 use m_diffnc
 use m_bc
 use m_util
-integer :: i, i1(3), i2(3)
+integer :: i, i1(3), i2(3), bc(3)
 
 if ( master ) write( 0, * ) 'Resample material model'
 
 ! Cell volume
 call diffnc( s1, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
 
-! Zero volume and hourglass viscosity at fault cell
+! Zero volume and hourglass viscosity outside boundary, and at fault cell
+i1 = i1bc
+i2 = i2bc - 1
+call scalarsethalo( s1, 0., i1, i2 )
+call scalarsethalo( yy, 0., i1, i2 )
 select case( ifn )
 case( 1 ); i = ihypo(1); s1(i,:,:) = 0.; yy(i,:,:) = 0.
 case( 2 ); i = ihypo(2); s1(:,i,:) = 0.; yy(:,i,:) = 0.
 case( 3 ); i = ihypo(3); s1(:,:,i) = 0.; yy(:,:,i) = 0.
 end select
 
-! BCs, use mirror for gamma
-call scalarbc( s1,  bc1, bc2, i1bc, i2bc, 1 )
-call scalarbc( mr,  bc1, bc2, i1bc, i2bc, 1 )
-call scalarbc( lam, bc1, bc2, i1bc, i2bc, 1 )
-call scalarbc( mu,  bc1, bc2, i1bc, i2bc, 1 )
-call scalarbc( yy,  bc1, bc2, i1bc, i2bc, 1 )
-
-! Use mirror for gamma
-i1 = 1
-i2 = 1
-call scalarbc( gam, i1, i2, i1bc, i2bc, 1 )
-
 ! Mass ratio
 s2 = mr * s1
 call scalaraverage( mr, s2, i1node, i2node, -1 )
 where ( mr /= 0. ) mr = 1. / mr
 call scalarswaphalo( mr, nhalo )
-call scalarbc( mr, bc1, bc2, i1bc, i2bc, 0 )
+call scalarbc( mr, bc1, bc2, i1bc, i2bc )
 
-! Viscosity, use mirror BC initially
+! Viscosity, bc=4 means copy into halo for resampling at the node
+bc = 4
+i1 = i1bc - 1
+i2 = i2bc
+call scalarbc( gam, bc, bc, i1, i2 )
 s2 = gam * dt
 call scalaraverage( gam, s2, i1node, i2node, -1 )
+call scalarsethalo( gam, 0., i1bc, i2bc )
 call scalarswaphalo( gam, nhalo )
-call scalarbc( gam, bc1, bc2, i1bc, i2bc, 0 )
+call scalarbc( gam, bc1, bc2, i1bc, i2bc )
 
 ! Moduli
 where ( s1 /= 0. ) s1 = 1. / s1

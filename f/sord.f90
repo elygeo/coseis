@@ -56,13 +56,17 @@ do while ( it < nt )
   jp = jp + 1
   if ( sync ) call barrier ; call timestep
   if ( sync ) call barrier ; call stress
-  if ( sync ) call barrier ; call momentsource    ; prof1(jp) = timer( 5 )
-  if ( sync ) call barrier ; call output( 1 )     ; prof2(jp) = timer( 5 )
+  if ( sync ) call barrier ; call momentsource
+  if ( sync ) call barrier ; prof1(jp) = timer( 5 )
+  if ( sync ) call barrier ; call output( 1 )
+  if ( sync ) call barrier ; prof2(jp) = timer( 5 )
   if ( sync ) call barrier ; call acceleration   
-  if ( sync ) call barrier ; call fault           ; prof1(jp) = prof1(jp) + timer( 5 )
-  if ( sync ) call barrier ; call output( 2 )     ; prof2(jp) = prof2(jp) + timer( 5 )
-  if ( sync ) call barrier ; call vectorswaphalo( w1, nhalo ) ; prof3(jp) = timer( 5 )
-  if ( sync ) call barrier ; call vectorbc( w1, bc1, bc2, i1bc, i2bc, 0 )
+  if ( sync ) call barrier ; call fault
+  if ( sync ) call barrier ; prof1(jp) = prof1(jp) + timer( 5 )
+  if ( sync ) call barrier ; call vectorswaphalo( w1, nhalo )
+  if ( sync ) call barrier ; prof3(jp) = timer( 5 )
+  if ( sync ) call barrier ; call output( 2 )
+  if ( sync ) call barrier ; prof2(jp) = prof2(jp) + timer( 5 )
   if ( modulo( it, itcheck ) == 0 ) then
     if ( sync ) call barrier ; call writecheckpoint
   end if

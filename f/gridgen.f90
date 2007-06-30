@@ -8,8 +8,9 @@ use m_globals
 use m_collective
 use m_bc
 use m_util
-integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, b, c
-real :: x0(3), xlim(6), gxlim(6), m(9), tol, r
+integer :: i1(3), i2(3), i3(3), i4(3), bc(3), &
+  i, j, k, l, j1, k1, l1, j2, k2, l2, idoublenode, b, c
+real :: x0(3), m(9), tol, r
 
 if ( master ) write( 0, * ) 'Grid generation'
 
@@ -27,10 +28,6 @@ end if
 
 ! Single node indexing
 idoublenode = 0
-print *, i1
-print *, i2
-print *, i3
-print *, i4
 if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
   if ( ihypo(i) < i3(i) ) then
@@ -41,10 +38,6 @@ if ( faultnormal /= 0 ) then
     if ( ihypo(i) <  i4(i) ) i4(i) = i4(i) - 1
   end if
 end if
-print *, i1
-print *, i2
-print *, i3
-print *, i4
 
 ! Remove double nodes for now, or create basic rectangular mesh
 if ( grid == 'read' ) then
@@ -61,7 +54,6 @@ else
   do i = i3(2), i4(2); w1(:,i,:,2) = dx * ( i - i1(2) ); end do
   do i = i3(3), i4(3); w1(:,:,i,3) = dx * ( i - i1(3) ); end do
 end if
-call vectorsethalo( w1, 0., i3, i4 )
 
 ! Grid expansion
 if ( rexpand > 1. ) then
@@ -113,21 +105,12 @@ j = ihypo(1)
 k = ihypo(2)
 l = ihypo(3)
 
-! Random noise added to mesh
+! Random noise added to mesh, leave boundaries flat, bc=3 means zero normal component
 if ( gridnoise > 0. ) then
   call random_number( w2 )
   w2 = gridnoise * ( w2 - .5 )
-  j1 = i3(1); j2 = i4(1)
-  k1 = i3(2); k2 = i4(2)
-  l1 = i3(3); l2 = i4(3)
-  i1 = abs( bc1 )
-  i2 = abs( bc2 )
-  if ( i1(1) <= 1 ) w2(j1,:,:,1) = 0.
-  if ( i2(1) <= 1 ) w2(j2,:,:,1) = 0.
-  if ( i1(2) <= 1 ) w2(:,k1,:,2) = 0.
-  if ( i2(2) <= 1 ) w2(:,k2,:,2) = 0.
-  if ( i1(3) <= 1 ) w2(:,:,l1,3) = 0.
-  if ( i2(3) <= 1 ) w2(:,:,l2,3) = 0.
+  bc = 3
+  call vectorbc( w2, bc, bc, i1bc, i2bc )
   select case( idoublenode )
   case( 1 ); w2(j,:,:,1) = 0.
   case( 2 ); w2(:,k,:,2) = 0.
@@ -143,9 +126,16 @@ case( 2 ); w1(:,k+1:nm(2),:,:) = w1(:,k:nm(2)-1,:,:)
 case( 3 ); w1(:,:,l+1:nm(3),:) = w1(:,:,l:nm(3)-1,:)
 end select
 
-! Fill halo and find cell centers
+! Fill halo, bc=4 means copy into halo, need this for nhat
+bc = 4
+i1 = i1bc - 1
+i2 = i2bc + 1
 call vectorswaphalo( w1, nhalo )
+call vectorbc( w1, bc, bc, i1, i2 )
+
+! Find cell centers
 call vectoraverage( w2, w1, i1cell, i2cell, 1 )
+call vectorsethalo( w2, huge(r), i1cell, i2cell )
 
 ! Hypocenter location
 select case( abs( fixhypo ) )
@@ -169,28 +159,30 @@ elseif ( fixhypo < 0 ) then
   end forall
 end if
 
-! Operators
+! Orthogonality test
 if ( oplevel == 0 ) then
   oplevel = 6
   tol = 10. * epsilon( dx )
-  j = nm(1)
-  k = nm(2)
-  l = nm(3)
+  j1 = i1cell(1); j2 = i2cell(1)
+  k1 = i1cell(2); k2 = i2cell(2)
+  l1 = i1cell(3); l2 = i2cell(3)
   if ( &
-  sum( abs( w1(2:j,:,:,2) - w1(1:j-1,:,:,2) ) ) < tol .and. &
-  sum( abs( w1(2:j,:,:,3) - w1(1:j-1,:,:,3) ) ) < tol .and. &
-  sum( abs( w1(:,2:k,:,3) - w1(:,1:k-1,:,3) ) ) < tol .and. &
-  sum( abs( w1(:,2:k,:,1) - w1(:,1:k-1,:,1) ) ) < tol .and. &
-  sum( abs( w1(:,:,2:l,1) - w1(:,:,1:l-1,1) ) ) < tol .and. &
-  sum( abs( w1(:,:,2:l,2) - w1(:,:,1:l-1,2) ) ) < tol ) oplevel = 2
+  sum( abs( w1(j1+1:j2+1,:,:,2) - w1(j1:j2,:,:,2) ) ) < tol .and. &
+  sum( abs( w1(j1+1:j2+1,:,:,3) - w1(j1:j2,:,:,3) ) ) < tol .and. &
+  sum( abs( w1(:,k1+1:k2+1,:,3) - w1(:,k1:k2,:,3) ) ) < tol .and. &
+  sum( abs( w1(:,k1+1:k2+1,:,1) - w1(:,k1:k2,:,1) ) ) < tol .and. &
+  sum( abs( w1(:,:,l1+1:l2+1,1) - w1(:,:,l1:l2,1) ) ) < tol .and. &
+  sum( abs( w1(:,:,l1+1:l2+1,2) - w1(:,:,l1:l2,2) ) ) < tol ) oplevel = 2
 end if
+
+! Operators
 select case( oplevel )
 case( 1 )
 case( 2 )
   allocate( dx1(nm(1)), dx2(nm(2)), dx3(nm(3)) )
-  do i =1, nm(1)-1; dx1(i) = .5 * ( w1(i+1,3,3,1) - w1(i,3,3,1) ); end do
-  do i =1, nm(2)-1; dx2(i) = .5 * ( w1(3,i+1,3,2) - w1(3,i,3,2) ); end do
-  do i =1, nm(3)-1; dx3(i) = .5 * ( w1(3,3,i+1,3) - w1(3,3,i,3) ); end do
+  do i = 1, nm(1)-1; dx1(i) = .5 * ( w1(i+1,3,3,1) - w1(i,3,3,1) ); end do
+  do i = 1, nm(2)-1; dx2(i) = .5 * ( w1(3,i+1,3,2) - w1(3,i,3,2) ); end do
+  do i = 1, nm(3)-1; dx3(i) = .5 * ( w1(3,3,i+1,3) - w1(3,3,i,3) ); end do
 case( 3:5 )
   allocate( xx(nm(1),nm(2),nm(3),3) )
   xx = w1
