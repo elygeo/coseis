@@ -44,8 +44,6 @@ nl = min( nl, nn - nnoff - nhalo )
 nm = nl + 2 * nhalo
 
 ! Boundary conditions
-bc1 = sign( 1, bc1 ) * abs( fixhypo )
-bc2 = sign( 1, bc2 ) * abs( fixhypo )
 if ( ifn /= 0 ) then
   if ( ihypo(ifn) == 1           ) bc1(ifn) = -2
   if ( ihypo(ifn) == nn(ifn) - 1 ) bc2(ifn) = -2

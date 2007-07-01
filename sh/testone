@@ -1,3 +1,0 @@
-#!/bin/bash -v
-vim in.m && ./sord -igd && vim in.m && ./sord -ig && diff -qr run/01 run/02
-
