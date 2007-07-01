@@ -36,7 +36,7 @@
   bc1      = [   0   0   0 ];
   n1expand = [  50  50  50 ];
 
-  np = [ 1 4 2 ];
+  np = [ 1 1 16 ];
 
 % xy-shear symmetric
   affine = [ 1. 1. 1.   0. 1. 0.   0. 0. 1. ];

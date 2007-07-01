@@ -25,7 +25,7 @@
   moment2 = [ 0. 0. 1e18 ];
   faultnormal = 0;
 
-  np = [ 1 4 4 ];
+  np = [ 1 16 1 ];
 
   timeseries = { 'v'  5999.  7999. -1. };
   timeseries = { 'v'  6001.  8001. -1. };

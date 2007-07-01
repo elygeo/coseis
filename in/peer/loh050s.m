@@ -27,7 +27,7 @@
   faultnormal = 0;
   affine = [ 1. 0. 1.   1. 1. 0.   0. 0. 1.   1. ];
 
-  np = [ 1 8 4 ];
+  np = [ 1 32 1 ];
 
   timeseries = { 'v'  5999.  7999. -1. };
   timeseries = { 'v'  5999. -7999. -1. };
