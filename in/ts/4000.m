@@ -18,8 +18,7 @@
   dc = .5;
   rcrit = 3000.;
   vrup = 2300.;
-  itstats = 4;
-  itio = 8;
+  itio = 16;
   itcheck = 0;
   datadir = 'ts/4000/data';
   np = [ 1 1 21 ];
@@ -29,7 +28,7 @@
   trelax = 2.4;
   nt = 375;
 debug = 1;
-nt = 64; itcheck = 16;
+nt = 50; itcheck = 10;
 nt = 10; itcheck = 0;
   nn = [  151   77  21 ];
   fixhypo = 1;

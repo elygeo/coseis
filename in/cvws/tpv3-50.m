@@ -36,7 +36,6 @@
   bc1      = [   0   0   0 ];
   n1expand = [  60  60  60 ];
 
-  itcheck = 0;
   np = [ 1 4 4 ];
 
 % rectangular

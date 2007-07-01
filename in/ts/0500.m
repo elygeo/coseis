@@ -18,7 +18,6 @@
   dc = .5;
   rcrit = 3000.;
   vrup = 2300.;
-  itstats = 10;
   itio = 400;
   itcheck = 0;
   datadir = 'ts/0500/data';

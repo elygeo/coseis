@@ -4,7 +4,6 @@
   debug = 3;
   np = [ 1 1 1 ];
   nt = 8;
-  itstats = 1;
   tsource = .1;
   tfunc = 'brune';
   slipvector = [ 1. 0. 0. ];

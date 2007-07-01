@@ -36,7 +36,6 @@
   bc1      = [   0   0   0 ];
   n1expand = [  50  50  50 ];
 
-  itcheck = 0;
   np = [ 1 4 2 ];
 
 % xz-shear symmetric grid
