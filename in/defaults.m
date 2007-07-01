@@ -74,7 +74,7 @@
 % Code execution and output parameters
   np = [ 1 1 1 ];		% number of processors in j k l
   itstats = 4;			% calculate statistics every 4
-  itio =   32;			% empty buffers every 32
+  itio =   50;			% empty buffers every 50
   itcheck = 0;			% checkpointing off
 % itcheck = 1000;		% checkpoint every 1000 time steps
 % itcheck = -1;			% checkpoint just before finishing

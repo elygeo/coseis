@@ -165,7 +165,7 @@ integer :: &
   nt,            & ! number of time steps
   it,            & ! current time step
   itstats,       & ! interval for calculating statistics
-  itio,          & ! interval for writing i/o buffers, must be a multiple of itstats
+  itio,          & ! interval for writing i/o buffers
   itcheck,       & ! interval for checkpointing, must be a multiple of itio
   itstop,        & ! stop time, for simulating a killed job
   debug,         & ! debugging flag

@@ -24,7 +24,6 @@ if ( nout > nz ) stop 'too many output zones, make nz bigger'
 if ( itstats < 1 ) itstats = itstats + nt + 1
 if ( itio    < 1 ) itio    = itio    + nt + 1
 if ( itcheck < 1 ) itcheck = itcheck + nt + 1
-if ( modulo( itio, itstats ) /= 0 ) itio = ( itio / itstats + 1 ) * itstats
 if ( modulo( itcheck, itio ) /= 0 ) itcheck = ( itcheck / itio + 1 ) * itio
 
 ! Test for fault
@@ -170,24 +169,29 @@ if ( faultnormal /= 0 ) then
 end if
 
 ! Volume stats
-if ( it > 0 .and. modulo( it, itstats ) == 0 ) then
+if ( it > 0 ) then
 select case( pass )
 case( 1 )
-  jv = jv + 1
-  call vectornorm( s1, vv, i1core, i2core )
-  call tensornorm( s2, w1, w2, i1core, i2core )
-  call scalarsethalo( s1, -1., i1core, i2core )
-  call scalarsethalo( s2, -1., i1core, i2core )
-  vstats(jv,1) = maxval( s1 )
-  vstats(jv,2) = maxval( s2 )
+  if ( modulo( it, itstats ) == 0 ) then
+    jv = jv + 1
+    call vectornorm( s1, vv, i1core, i2core )
+    call tensornorm( s2, w1, w2, i1core, i2core )
+    call scalarsethalo( s1, -1., i1core, i2core )
+    call scalarsethalo( s2, -1., i1core, i2core )
+    vstats(jv,1) = maxval( s1 )
+    vstats(jv,2) = maxval( s2 )
+  end if
 case( 2 )
-  call vectornorm( s1, uu, i1core, i2core )
-  call vectornorm( s2, w1, i1core, i2core )
-  call scalarsethalo( s1, -1., i1core, i2core )
-  call scalarsethalo( s2, -1., i1core, i2core )
-  vstats(jv,3) = maxval( s1 )
-  vstats(jv,4) = maxval( s2 )
-  if ( modulo( it, itio ) == 0 .or. it + itstats > nt ) then
+  if ( modulo( it, itstats ) == 0 ) then
+    call vectornorm( s1, uu, i1core, i2core )
+    call vectornorm( s2, w1, i1core, i2core )
+    call scalarsethalo( s1, -1., i1core, i2core )
+    call scalarsethalo( s2, -1., i1core, i2core )
+    vstats(jv,3) = maxval( s1 )
+    vstats(jv,4) = maxval( s2 )
+    if ( any( vstats /= vstats .or. vstats > huge(rr) ) ) stop 'NaN/Inf!'
+  end if
+  if ( modulo( it, itio ) == 0 .or. it == nt ) then
     call rreduce2( gvstats, vstats, 'max', 0 )
     if ( master ) then
       gvstats = sqrt( gvstats )
@@ -204,30 +208,34 @@ end select
 end if
 
 ! Fault stats
-if ( dofault .and. it > 0 .and. modulo( it, itstats ) == 0 ) then
+if ( it > 0 .and. dofault ) then
 select case( pass )
 case( 1 )
-  jf = jf + 1
-  call scalarsethalo( f1,   -1., i1core, i2core )
-  call scalarsethalo( f2,   -1., i1core, i2core )
-  call scalarsethalo( tarr, -1., i1core, i2core )
-  fstats(jf,1) = maxval( f1 )
-  fstats(jf,2) = maxval( f2 )
-  fstats(jf,3) = maxval( sl )
-  fstats(jf,4) = maxval( tarr )
+  if ( modulo( it, itstats ) == 0 ) then
+    jf = jf + 1
+    call scalarsethalo( f1,   -1., i1core, i2core )
+    call scalarsethalo( f2,   -1., i1core, i2core )
+    call scalarsethalo( tarr, -1., i1core, i2core )
+    fstats(jf,1) = maxval( f1 )
+    fstats(jf,2) = maxval( f2 )
+    fstats(jf,3) = maxval( sl )
+    fstats(jf,4) = maxval( tarr )
+  end if
 case( 2 )
-  call scalarsethalo( ts, -1., i1core, i2core )
-  call scalarsethalo( f2, -1., i1core, i2core )
-  fstats(jf,5) = maxval( ts )
-  fstats(jf,6) = maxval( f2 )
-  call scalarsethalo( tn, -huge(rr), i1core, i2core ); fstats(jf,7) =  maxval( tn )
-  call scalarsethalo( tn,  huge(rr), i1core, i2core ); fstats(jf,8) = -minval( tn )
-  call scalarsethalo( tn, 0., i1core, i2core )
-  estats(jf,1) = efric
-  estats(jf,2) = estrain
-  estats(jf,3) = moment
-  if ( any( fstats /= fstats .or. fstats > huge(rr) ) ) stop 'NaNs/Inf!'
-  if ( modulo( it, itio ) == 0 .or. it + itstats > nt ) then
+  if ( modulo( it, itstats ) == 0 ) then
+    call scalarsethalo( ts, -1., i1core, i2core )
+    call scalarsethalo( f2, -1., i1core, i2core )
+    fstats(jf,5) = maxval( ts )
+    fstats(jf,6) = maxval( f2 )
+    call scalarsethalo( tn, -huge(rr), i1core, i2core ); fstats(jf,7) =  maxval( tn )
+    call scalarsethalo( tn,  huge(rr), i1core, i2core ); fstats(jf,8) = -minval( tn )
+    call scalarsethalo( tn, 0., i1core, i2core )
+    estats(jf,1) = efric
+    estats(jf,2) = estrain
+    estats(jf,3) = moment
+    if ( any( fstats /= fstats .or. fstats > huge(rr) ) ) stop 'NaN/Inf!'
+  end if
+  if ( modulo( it, itio ) == 0 .or. it == nt ) then
     call rreduce2( gfstats, fstats, 'allmax', ifn )
     call rreduce2( gestats, estats, 'allsum', ifn )
     if ( master ) then
