@@ -25,13 +25,13 @@
   tn  = -120e6;
   bc1 = [ 0 0 0 ];
 
-% Test 3 and -3 with fault
+% Test 1 and -1 with fault
   faultnormal = 3;
   rsource = -1.;
   ihypo = [ 3 3 2 ];
   fixhypo = -1;
   nn = [ 5 5 4 ]; bc2 = [  0 0  0 ];
-  nn = [ 3 3 3 ]; bc2 = [ -3 3 -2 ];
+  nn = [ 3 3 3 ]; bc2 = [ -1 1 -2 ];
 return
 
 % Test 2 and -2 with fault
@@ -44,24 +44,24 @@ return
   nn = [ 3 3 3 ]; bc2 = [ -2 2 -2 ];
 return
 
-% Test 3 and -3
+% Test 1 and -1
   ihypo = [ 3 3 3 ];
   fixhypo = -1;
   faultnormal = 0;
   rsource = 100.;
   moment1 = [ 0. 0. 0. ];
   nn = [ 5 5 5 ]; bc2 = [  0  0 0 ]; moment2 = [ 0. 0. 8e18 ];
-  nn = [ 3 3 3 ]; bc2 = [ -3 -3 3 ]; moment2 = [ 0. 0. 1e18 ];
+  nn = [ 3 3 3 ]; bc2 = [ -1 -1 1 ]; moment2 = [ 0. 0. 1e18 ];
 return
 
-% Test 3
+% Test 1
   ihypo = [ 3 3 3 ];
   fixhypo = -1;
   faultnormal = 0;
   rsource = 100.;
   moment2 = [ 0. 0. 0. ];
   nn = [ 5 5 5 ]; bc2 = [ 0 0 0 ]; moment1 = [ 8e18 8e18 8e18 ];
-  nn = [ 3 3 3 ]; bc2 = [ 3 3 3 ]; moment1 = [ 1e18 1e18 1e18 ];
+  nn = [ 3 3 3 ]; bc2 = [ 1 1 1 ]; moment1 = [ 1e18 1e18 1e18 ];
 return
 
 % Test 2

@@ -36,6 +36,6 @@
   fixhypo = -1;
   rsource = 100.;
   ihypo = [ 2 2 2 ];
-  bc1   = [ 3 3 3 ];
+  bc1   = [ 1 1 1 ];
   return
 

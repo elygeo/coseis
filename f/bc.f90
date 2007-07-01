@@ -12,8 +12,8 @@ nm = (/ size(f,1), size(f,2), size(f,3) /)
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-b1 = abs( bc1 )
-b2 = abs( bc2 )
+b1 = abs( mod( bc1, 10 ) )
+b2 = abs( mod( bc2, 10 ) )
 where ( b1 == 4 ) b1 = 2
 where ( b2 == 4 ) b2 = 2
 where ( nm == 1 .or. i1 <  1 .or. i1 >= nm ) b1 = 99
@@ -36,34 +36,34 @@ nm = (/ size(f,1), size(f,2), size(f,3) /)
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-b1 = bc1
-b2 = bc2
+b1 = mod( bc1, 10 )
+b2 = mod( bc2, 10 )
 where ( nm == 1 .or. i1 < 1 .or. i1 > nm ) b1 = 99
 where ( nm == 1 .or. i2 < 1 .or. i2 > nm ) b2 = 99
 
-! Zero
-if ( b1(1) == 1 ) f(j1,:,:,:) = 0.
-if ( b1(2) == 1 ) f(:,k1,:,:) = 0.
-if ( b1(3) == 1 ) f(:,:,l1,:) = 0.
-if ( b2(1) == 1 ) f(j2,:,:,:) = 0.
-if ( b2(2) == 1 ) f(:,k2,:,:) = 0.
-if ( b2(3) == 1 ) f(:,:,l2,:) = 0.
+! Anti-mirror symmetry at the node
+if ( b1(1) == -1 ) then; f(j1,:,:,2) = 0.; f(j1,:,:,3) = 0.; end if
+if ( b1(2) == -1 ) then; f(:,k1,:,3) = 0.; f(:,k1,:,1) = 0.; end if
+if ( b1(3) == -1 ) then; f(:,:,l1,1) = 0.; f(:,:,l1,2) = 0.; end if
+if ( b2(1) == -1 ) then; f(j2,:,:,2) = 0.; f(j2,:,:,3) = 0.; end if
+if ( b2(2) == -1 ) then; f(:,k2,:,3) = 0.; f(:,k2,:,1) = 0.; end if
+if ( b2(3) == -1 ) then; f(:,:,l2,1) = 0.; f(:,:,l2,2) = 0.; end if
 
-! Mirror symmetry at the node has zero normal component
-if ( b1(1) == 3 ) f(j1,:,:,1) = 0.
-if ( b1(2) == 3 ) f(:,k1,:,2) = 0.
-if ( b1(3) == 3 ) f(:,:,l1,3) = 0.
-if ( b2(1) == 3 ) f(j2,:,:,1) = 0.
-if ( b2(2) == 3 ) f(:,k2,:,2) = 0.
-if ( b2(3) == 3 ) f(:,:,l2,3) = 0.
+! Mirror symmetry at the node
+if ( b1(1) == 1 ) f(j1,:,:,1) = 0.
+if ( b1(2) == 1 ) f(:,k1,:,2) = 0.
+if ( b1(3) == 1 ) f(:,:,l1,3) = 0.
+if ( b2(1) == 1 ) f(j2,:,:,1) = 0.
+if ( b2(2) == 1 ) f(:,k2,:,2) = 0.
+if ( b2(3) == 1 ) f(:,:,l2,3) = 0.
 
-! Anti-mirror symmetry at the node has zero tangential component
-if ( b1(1) == -3 ) then; f(j1,:,:,2) = 0.; f(j1,:,:,3) = 0.; end if
-if ( b1(2) == -3 ) then; f(:,k1,:,3) = 0.; f(:,k1,:,1) = 0.; end if
-if ( b1(3) == -3 ) then; f(:,:,l1,1) = 0.; f(:,:,l1,2) = 0.; end if
-if ( b2(1) == -3 ) then; f(j2,:,:,2) = 0.; f(j2,:,:,3) = 0.; end if
-if ( b2(2) == -3 ) then; f(:,k2,:,3) = 0.; f(:,k2,:,1) = 0.; end if
-if ( b2(3) == -3 ) then; f(:,:,l2,1) = 0.; f(:,:,l2,2) = 0.; end if
+! Rigid
+if ( b1(1) == 3 ) f(j1,:,:,:) = 0.
+if ( b1(2) == 3 ) f(:,k1,:,:) = 0.
+if ( b1(3) == 3 ) f(:,:,l1,:) = 0.
+if ( b2(1) == 3 ) f(j2,:,:,:) = 0.
+if ( b2(2) == 3 ) f(:,k2,:,:) = 0.
+if ( b2(3) == 3 ) f(:,:,l2,:) = 0.
 
 where ( i1 >= nm ) b1 = 99
 where ( i2 <= 1  ) b2 = 99

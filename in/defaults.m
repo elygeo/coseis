@@ -87,13 +87,12 @@
 
 % Boundary conditions:
 %  0: Vacuum free surface: zero cell stress
-%  1: Rigid boundary: zero node displacement
-%  2: Mirror symmetry between nodes, at the cell, use will fixhypo=2,-2
-%  3: Mirror symmetry between cells, at the node, use will fixhypo=1,-1
-% -2: Anti-mirror symmetry between nodes, at the cell, use with fixhypo=2,-2
-%     Useful for fault planes and nodal planes
-% -3: Anti-mirror symmetry between cells, at the node, use with fixhypo=1,-1
-%     Useful for nodal planes
+%  1: Mirror symmetry at the node
+%  2: Mirror symmetry at the cell
+% -1: Anti-mirror symmetry at the node, useful for nodal planes
+% -2: Anti-mirror symmetry at the cell, useful for nodal planes and fault planes
+%  3: Rigid boundary: zero node displacement
+%  4: Continue
 % 10: PML absorbing
 
 % **optional 3D region argument: 'zone', 'cube', or 'read'
