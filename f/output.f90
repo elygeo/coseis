@@ -78,9 +78,9 @@ case( 'x' )
   i1out(iz,4) = 0
   i2out(iz,4) = nt
   if ( onpass == 0 ) i2out(iz,4) = 0
+  rout = huge( rout )
   if ( fault ) then
     i1 = nnoff
-    rout = huge( rout )
     if ( dofault ) then
       i = abs( faultnormal )
       i1 = 1
@@ -89,7 +89,7 @@ case( 'x' )
       i2(i) = ihypo(i)
       call radius( s2, w1, x0, i1, i2 )
       f2 = s2(i1(1):i2(1),i1(2):i2(2),i1(3):i2(3))
-      call scalarsethalo( f2, rout, i1, i2 )
+      call scalarsethalo( f2, rout, i1node, i2node )
       call reduceloc( rout, i1, f2, 'allmin', n, noff, i )
       i1(i) = ihypo(i)
     end if

@@ -19,7 +19,6 @@ use m_timestep
 use m_stress
 use m_acceleration
 use m_util
-use m_bc
 implicit none
 integer :: jp = 0
 real :: prof0(17) = 0.

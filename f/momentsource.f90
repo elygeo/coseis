@@ -78,7 +78,6 @@ end subroutine
 ! Add moment source
 subroutine momentsource
 use m_globals
-use m_bc
 integer :: i, j, k, l, ic, nsrc
 real :: srcft = 0.
 

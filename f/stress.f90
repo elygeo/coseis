@@ -6,7 +6,6 @@ contains
 subroutine stress
 use m_globals
 use m_diffnc
-use m_bc
 use m_util
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id
 
