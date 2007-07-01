@@ -187,7 +187,7 @@ case( 2 )
   call scalarsethalo( s2, -1., i1core, i2core )
   vstats(jv,3) = maxval( s1 )
   vstats(jv,4) = maxval( s2 )
-  if ( modulo( it, itio ) == 0 ) then
+  if ( modulo( it, itio ) == 0 .or. it + itstats > nt ) then
     call rreduce2( gvstats, vstats, 'max', 0 )
     if ( master ) then
       gvstats = sqrt( gvstats )
@@ -227,7 +227,7 @@ case( 2 )
   estats(jf,2) = estrain
   estats(jf,3) = moment
   if ( any( fstats /= fstats .or. fstats > huge(rr) ) ) stop 'NaNs/Inf!'
-  if ( modulo( it, itio ) == 0 ) then
+  if ( modulo( it, itio ) == 0 .or. it + itstats > nt ) then
     call rreduce2( gfstats, fstats, 'allmax', ifn )
     call rreduce2( gestats, estats, 'allsum', ifn )
     if ( master ) then

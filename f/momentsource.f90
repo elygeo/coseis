@@ -44,13 +44,14 @@ if ( s2(j,k,l) < rsource*rsource ) then
   ll(i) = l
   cellvol(i) = s1(j,k,l)
   select case( rfunc )
+  case( 'point' )
   case( 'box'  ); srcfr(i) = 1.
   case( 'tent' ); srcfr(i) = rsource - sqrt( s2(j,k,l) )
   case default
     write( 0, * ) 'invalid rfunc: ', trim( rfunc )
     stop
   end select
-  if (  all( (/ j, k, l /) >= i1core .and. (/ j, k, l /) <= i2core ) ) then
+  if ( all( (/ j, k, l /) >= i1core .and. (/ j, k, l /) <= i2core ) ) then
     sumsrcfr = sumsrcfr + srcfr(i)
   end if
 end if
@@ -60,9 +61,15 @@ end do
 call scalarsethalo( s2, 0., i1cell, i2cell )
 
 ! Normalize and divide by cell volume
-call rreduce( allsumsrcfr, sumsrcfr, 'allsum', 0 )
-if ( allsumsrcfr <= 0. ) stop 'bad source space function'
-where ( cellvol > 0. ) srcfr = srcfr / allsumsrcfr / cellvol
+if ( rfunc == 'point' ) then
+  if ( nsrc > 8 ) stop 'rsource too large for point source'
+  srcfr = ( .5 * dx / rsource ) ** 3
+else
+  call rreduce( allsumsrcfr, sumsrcfr, 'allsum', 0 )
+  if ( allsumsrcfr <= 0. ) stop 'bad source space function'
+  srcfr = srcfr / allsumsrcfr
+end if
+where ( cellvol > 0. ) srcfr = srcfr / cellvol
 
 end subroutine
 

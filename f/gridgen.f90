@@ -93,6 +93,8 @@ end if
 
 ! Affine grid transformation
 m = affine
+!tol = 10. * epsilon( dx )
+!if ( m - (/ 1., 0., 0., 0., 1., 0., 0., 0., 1. /)
 forall( j=1:nm(1), k=1:nm(2), l=1:nm(3) )
   w2(j,k,l,1) = m(1) * w1(j,k,l,1) + m(2) * w1(j,k,l,2) + m(3) * w1(j,k,l,3)
   w2(j,k,l,2) = m(4) * w1(j,k,l,1) + m(5) * w1(j,k,l,2) + m(6) * w1(j,k,l,3)

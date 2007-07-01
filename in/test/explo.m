@@ -37,6 +37,5 @@
   rsource = 100.;
   ihypo = [ 2 2 2 ];
   bc1   = [ 3 3 3 ];
-  i1bc  = [ 2 2 2 ];
   return
 

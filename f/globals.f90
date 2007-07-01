@@ -144,8 +144,8 @@ integer, dimension(3) :: &
   ip3master,     & ! 3D master process rank
   bc1,           & ! boundary conditions - near side
   bc2,           & ! boundary conditions - far side
-  i1bc,          & ! boundary conditions region
-  i2bc,          & ! boundary conditions region 
+  i1bc,          & ! model boundary
+  i2bc,          & ! model boundary
   nnoff,         & ! offset between local and global indices
   ihypo,         & ! hypocenter node
   n1expand,      & ! # grid expansion nodes - near side

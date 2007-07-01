@@ -28,8 +28,6 @@
   npml = 10;			% 10 PML nodes
   bc1 = [ 0 0 0 ];		% j1 k1 l1 boundary cond (see below)
   bc2 = [ 0 0 0 ];		% j2 k2 l2 boundary cond (see below)
-  i1bc = [  1  1  1 ];		% boundary condition location - near side
-  i2bc = [ -1 -1 -1 ];		% boundary condition location - far side
   ihypo	 = [ 0 0 0 ];		% hypocenter node
   xhypo	 = [ 0. 0. 0. ];	% hypocenter location
   fixhypo = 1;			% 0=none 1=inode, 2=icell, -1=xnode, -2=xcell
@@ -39,7 +37,8 @@
 
 % Moment source parameters
 % rfunc = 'box';		% spatial weighting: uniform
-  rfunc = 'tent';		% spatial weighting: tapered
+% rfunc = 'tent';		% spatial weighting: tapered
+  rfunc = 'point';		% point source
 % tfunc = 'delta';		% source time function: delta
 % tfunc = 'brune';		% source time function: Brune
   tfunc = 'sbrune';		% source time function: smooth Brune

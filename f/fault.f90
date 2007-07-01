@@ -208,14 +208,6 @@ call scalarswaphalo( area,  nhalo )
 call scalarswaphalo( rhypo, nhalo )
 call vectorswaphalo( nhat,  nhalo )
 call vectorswaphalo( t0,    nhalo )
-call scalarbc( mus,   bc1, bc2, i1bc, i2bc )
-call scalarbc( mud,   bc1, bc2, i1bc, i2bc )
-call scalarbc( dc,    bc1, bc2, i1bc, i2bc )
-call scalarbc( co,    bc1, bc2, i1bc, i2bc )
-call scalarbc( area,  bc1, bc2, i1bc, i2bc )
-call scalarbc( rhypo, bc1, bc2, i1bc, i2bc )
-call vectorbc( nhat,  bc1, bc2, i1bc, i2bc )
-call vectorbc( t0,    bc1, bc2, i1bc, i2bc )
 
 ! Metadata
 if ( master ) then
@@ -227,6 +219,18 @@ if ( master ) then
   mus0 = mus(j,k,l)
   mud0 = mud(j,k,l)
   dc0 = dc(j,k,l)
+print *, 't1'
+print *, t0(:,:,:,1)
+print *, 't2'
+print *, t0(:,:,:,2)
+print *, 't3'
+print *, t0(:,:,:,3)
+print *, 'n1'
+print *, nhat(:,:,:,1)
+print *, 'n2'
+print *, nhat(:,:,:,2)
+print *, 'n3'
+print *, nhat(:,:,:,3)
   tn0 = sum( t0(j,k,l,:) * nhat(j,k,l,:) )
   ts0 = sqrt( sum( ( t0(j,k,l,:) - tn0 * nhat(j,k,l,:) ) ** 2. ) )
   tn0 = max( -tn0, 0. )

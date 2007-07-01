@@ -44,15 +44,12 @@ nl = min( nl, nn - nnoff - nhalo )
 nm = nl + 2 * nhalo
 
 ! Boundary conditions
-where ( i1bc < 1 ) i1bc = i1bc + nn + 1
-where ( i2bc < 1 ) i2bc = i2bc + nn + 1
 if ( ifn /= 0 ) then
   if ( ihypo(ifn) == 1           ) bc1(ifn) = -2
   if ( ihypo(ifn) == nn(ifn) - 1 ) bc2(ifn) = -2
 end if
-i1bc = i1bc - nnoff
-i2bc = i2bc - nnoff
-if ( any( i1bc > i2bc ) ) stop 'model too small for BC'
+i1bc = 1  - nnoff
+i2bc = nn - nnoff
 
 ! Non-overlapping core region
 i1core = 1  + nhalo

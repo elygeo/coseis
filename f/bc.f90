@@ -79,8 +79,8 @@ if ( b2(3) == 4 ) f(:,:,l2,:) = f(:,:,l2-1,:)
 ! Symmetry at the cell
 b1 = abs( b1 )
 b2 = abs( b2 )
-s1 = sign( 1, b1 )
-s2 = sign( 1, b2 )
+s1 = sign( 1, bc1 )
+s2 = sign( 1, bc2 )
 if ( b1(1) == 2 ) then
   f(j1,:,:,1) = -s1(1) * f(j1+1,:,:,1)
   f(j1,:,:,2) =  s1(1) * f(j1+1,:,:,2)
