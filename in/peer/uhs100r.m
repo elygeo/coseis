@@ -1,21 +1,21 @@
 % PEER UHS.1
 
-  dx  = 50.;
-  dt  = .004;
-  nt  = 1250;
+  dx  = 100;
+  dt  = .008;
+  nt  = 625;
   vp  = 6000.;
   vs  = 3464.;
   rho = 2700.;
-  gam = .0;
-  hourglass = [ 1. 4. ];
+  gam = .1;
+  hourglass = [ 1. 1. ];
   bc1 = [ -2 -2  0 ];
   bc2 = [ 10 10 10 ];
 
-  nn    = [ 161 201 101 ];
-  ihypo = [ 1 1 41 ];
+  nn    = [ 91 111 61 ];
+  ihypo = [  1   1 21 ];
   xhypo = [ 0. 0. 2000. ];
   fixhypo = -2;
-  rsource = 25.;
+  rsource = 50.;
   tsource = .1;
   tfunc = 'brune';
   moment1 = [ 0. 0. 0. ];
@@ -23,7 +23,7 @@
   faultnormal = 0;
 
   itcheck = 0;
-  np = [ 1 1 2 ];
+  np = [ 1 2 4 ];
 
   timeseries = { 'v' 5999.  7999. -1. };
   timeseries = { 'v' 6001.  8001. -1. };

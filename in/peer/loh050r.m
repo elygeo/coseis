@@ -26,7 +26,7 @@
   faultnormal = 0;
 
   itcheck = 0;
-  np = [ 4 4 2 ];
+  np = [ 1 4 4 ];
 
   timeseries = { 'v'  5999.  7999. -1. };
   timeseries = { 'v'  6001.  8001. -1. };
