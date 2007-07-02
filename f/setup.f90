@@ -33,11 +33,11 @@ call rank( ip, ip3, np )
 nnoff = nl * ip3 - nhalo
 
 ! Master process
-ip3master = ( ihypo - 1 ) / nl
-where ( ip3master < 0 ) ip3master = 0
+ip3root = ( ihypo - 1 ) / nl
+where ( ip3root < 0 ) ip3root = 0
 master = .false.
-if ( all( ip3 == ip3master ) ) master = .true.
-call setmaster( ip3master )
+if ( all( ip3 == ip3root ) ) master = .true.
+call setroot( ip3root )
 
 ! Size of arrays
 nl = min( nl, nn - nnoff - nhalo )

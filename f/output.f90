@@ -30,7 +30,7 @@ if ( modulo( itcheck, itio ) /= 0 ) itcheck = ( itcheck / itio + 1 ) * itio
 dofault = .false.
 if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
-  if ( ip3(i) == ip3master(i) ) dofault = .true.
+  if ( ip3(i) == ip3root(i) ) dofault = .true.
 end if
 
 ! Buffer counters
@@ -165,7 +165,7 @@ if ( debug > 2 ) call debug_out( pass )
 dofault = .false.
 if ( faultnormal /= 0 ) then
   i = abs( faultnormal )
-  if ( ip3(i) == ip3master(i) ) dofault = .true.
+  if ( ip3(i) == ip3root(i) ) dofault = .true.
 end if
 
 ! Volume stats
@@ -189,7 +189,8 @@ case( 2 )
     call scalarsethalo( s2, -1., i1core, i2core )
     vstats(jv,3) = maxval( s1 )
     vstats(jv,4) = maxval( s2 )
-    if ( any( vstats /= vstats .or. vstats > huge(rr) ) ) stop 'NaN/Inf!'
+    rr = maxval( vstats )
+    if ( rr /= rr .or. rr > huge( rr ) ) stop 'NaN/Inf!'
   end if
   if ( modulo( it, itio ) == 0 .or. it == nt ) then
     call rreduce2( gvstats, vstats, 'max', 0 )
@@ -233,11 +234,12 @@ case( 2 )
     estats(jf,1) = efric
     estats(jf,2) = estrain
     estats(jf,3) = moment
-    if ( any( fstats /= fstats .or. fstats > huge(rr) ) ) stop 'NaN/Inf!'
+    rr = maxval( fstats )
+    if ( rr /= rr .or. rr > huge( rr ) ) stop 'NaN/Inf!'
   end if
   if ( modulo( it, itio ) == 0 .or. it == nt ) then
-    call rreduce2( gfstats, fstats, 'allmax', ifn )
-    call rreduce2( gestats, estats, 'allsum', ifn )
+    call rreduce2( gfstats, fstats, 'max', ifn )
+    call rreduce2( gestats, estats, 'sum', ifn )
     if ( master ) then
       gfstats(:jf,8) = -gfstats(:jf,8)
       call rio1( 1, mpout, 'stats/svmax',   gfstats(:jf,1), it / itstats )

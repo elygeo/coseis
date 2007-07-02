@@ -438,6 +438,9 @@ COURANT STABILITY CONDITION
   dt * vp * sqrt(3) / dx   >    1
 
 
+PARALLELISM
+  Do swap between output passes so they can happen concurrently
+  
 
 DOMAIN DECOMPOSITION DIAGRAM
 
@@ -490,6 +493,4 @@ n = [ (p+1) * sin(f)^2 * cos(t)
       (p+1) * sin(f)^2 * sin(t)
       sin(f) / |cos(f)| * ( cos(f)^2 - p*sin(f)^2 ) ]
 
-
-SOM
 

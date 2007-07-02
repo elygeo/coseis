@@ -3,7 +3,7 @@ module m_collective
 use m_globals, only: nz
 implicit none
 !integer, private, parameter :: nz = 100
-integer, private :: ip, ipmaster, comm3d, comm2d(3), filehandles(6*nz)
+integer, private :: ip, root3d, root2d(3), comm3d, comm2d(3), comm1d(3), filehandles(6*nz)
 contains
 
 ! Initialize
@@ -33,8 +33,9 @@ use mpi
 integer, intent(out) :: ipout, ip3(3)
 integer, intent(in) :: np(3)
 integer :: i, e
-logical :: period(3) = .false.
-call mpi_cart_create( mpi_comm_world, 3, np, period, .true., comm3d, e )
+logical :: hat(3)
+hat = .false.
+call mpi_cart_create( mpi_comm_world, 3, np, hat, .true., comm3d, e )
 if ( comm3d == mpi_comm_null ) then
   write( 0, * ) 'Unused process:', ip
   call mpi_finalize( e )
@@ -44,17 +45,28 @@ call mpi_comm_rank( comm3d, ip, e  )
 call mpi_cart_coords( comm3d, ip, 3, ip3, e )
 ipout = ip
 do i = 1, 3
-  call mpi_comm_split( comm3d, ip3(i), 0, comm2d(i), e )
+  hat = .true.
+  hat(i) = .false.
+  call mpi_cart_sub( comm3d, hat, comm2d(i), e )
+end do
+do i = 1, 3
+  hat = .false.
+  hat(i) = .true.
+  call mpi_cart_sub( comm3d, hat, comm1d(i), e )
 end do
 filehandles = mpi_undefined
 end subroutine
 
-! Set master process
-subroutine setmaster( ip3master )
+! Set root process
+subroutine setroot( ip3root )
 use mpi
-integer, intent(in) :: ip3master(3)
-integer :: e
-call mpi_cart_rank( comm3d, ip3master, ipmaster, e )
+integer, intent(in) :: ip3root(3)
+integer :: ip2root(2), e, i
+call mpi_cart_rank( comm3d, ip3root, root3d, e )
+do i = 1, 3
+  ip2root = (/ ip3root(:i-1), ip3root(i+1:) /)
+  call mpi_cart_rank( comm3d, ip2root, root2d(i), e )
+end do
 end subroutine
 
 ! Broadcast real 1d
@@ -63,7 +75,7 @@ use mpi
 real, intent(inout) :: r(:)
 integer :: i, e
 i = size(r)
-call mpi_bcast( r, i, mpi_real, ipmaster, comm3d, e )
+call mpi_bcast( r, i, mpi_real, root3d, comm3d, e )
 end subroutine
 
 ! Barrier
@@ -79,20 +91,23 @@ use mpi
 integer, intent(out) :: ii
 integer, intent(in) :: i, i2d
 character(*), intent(in) :: op
-integer :: iop, e, comm
+integer :: iop, comm, root, e
 select case( op )
 case( 'min', 'allmin' ); iop = mpi_min
 case( 'max', 'allmax' ); iop = mpi_max
 case( 'sum', 'allsum' ); iop = mpi_sum
 case default; stop
 end select
+comm = comm3d
+root = root3d
+if ( i2d /= 0 ) then
+  comm = comm2d(i2d)
+  root = root2d(i2d)
+end if
 if ( op(1:3) == 'all' ) then
-  comm = comm3d
-  if ( i2d /= 0 ) comm = comm2d(i2d)
   call mpi_allreduce( i, ii, 1, mpi_integer, iop, comm, e )
 else
-  if ( i2d /= 0 ) stop 'must allreduce for comm2d'
-  call mpi_reduce( i, ii, 1, mpi_integer, iop, ipmaster, comm3d, e )
+  call mpi_reduce( i, ii, 1, mpi_integer, iop, root, comm, e )
 end if
 end subroutine
 
@@ -103,20 +118,23 @@ real, intent(out) :: rr
 real, intent(in) :: r
 integer, intent(in) :: i2d
 character(*), intent(in) :: op
-integer :: iop, e, comm
+integer :: iop, comm, root, e
 select case( op )
 case( 'min', 'allmin' ); iop = mpi_min
 case( 'max', 'allmax' ); iop = mpi_max
 case( 'sum', 'allsum' ); iop = mpi_sum
 case default; stop
 end select
+comm = comm3d
+root = root3d
+if ( i2d /= 0 ) then
+  comm = comm2d(i2d)
+  root = root2d(i2d)
+end if
 if ( op(1:3) == 'all' ) then
-  comm = comm3d
-  if ( i2d /= 0 ) comm = comm2d(i2d)
   call mpi_allreduce( r, rr, 1, mpi_real, iop, comm, e )
 else
-  if ( i2d /= 0 ) stop 'must allreduce for comm2d'
-  call mpi_reduce( r, rr, 1, mpi_real, iop, ipmaster, comm3d, e )
+  call mpi_reduce( r, rr, 1, mpi_real, iop, root, comm, e )
 end if
 end subroutine
 
@@ -127,21 +145,24 @@ real, intent(out) :: rr(:)
 real, intent(in) :: r(:)
 integer, intent(in) :: i2d
 character(*), intent(in) :: op
-integer :: iop, i, e, comm
+integer :: iop, root, comm, e, i
 select case( op )
 case( 'min', 'allmin' ); iop = mpi_min
 case( 'max', 'allmax' ); iop = mpi_max
 case( 'sum', 'allsum' ); iop = mpi_sum
 case default; stop
 end select
+comm = comm3d
+root = root3d
+if ( i2d /= 0 ) then
+  comm = comm2d(i2d)
+  root = root2d(i2d)
+end if
 i = size(r)
 if ( op(1:3) == 'all' ) then
-  comm = comm3d
-  if ( i2d /= 0 ) comm = comm2d(i2d)
   call mpi_allreduce( r(1), rr(1), i, mpi_real, iop, comm, e )
 else
-  if ( i2d /= 0 ) stop 'must allreduce for comm2d'
-  call mpi_reduce( r(1), rr(1), i, mpi_real, iop, ipmaster, comm3d, e )
+  call mpi_reduce( r(1), rr(1), i, mpi_real, iop, root, comm, e )
 end if
 end subroutine
 
@@ -152,21 +173,24 @@ real, intent(out) :: rr(:,:)
 real, intent(in) :: r(:,:)
 integer, intent(in) :: i2d
 character(*), intent(in) :: op
-integer :: iop, i, e, comm
+integer :: iop, comm, root, e, i
 select case( op )
 case( 'min', 'allmin' ); iop = mpi_min
 case( 'max', 'allmax' ); iop = mpi_max
 case( 'sum', 'allsum' ); iop = mpi_sum
 case default; stop
 end select
+comm = comm3d
+root = root3d
+if ( i2d /= 0 ) then
+  comm = comm2d(i2d)
+  root = root2d(i2d)
+end if
 i = size(r)
 if ( op(1:3) == 'all' ) then
-  comm = comm3d
-  if ( i2d /= 0 ) comm = comm2d(i2d)
   call mpi_allreduce( r(1,1), rr(1,1), i, mpi_real, iop, comm, e )
 else
-  if ( i2d /= 0 ) stop 'must allreduce for comm2d'
-  call mpi_reduce( r(1,1), rr(1,1), i, mpi_real, iop, ipmaster, comm3d, e )
+  call mpi_reduce( r(1,1), rr(1,1), i, mpi_real, iop, root, comm, e )
 end if
 end subroutine
 
@@ -180,24 +204,27 @@ integer, intent(out) :: ii(3)
 integer, intent(in) :: n(3), noff(3), i2d
 character(*), intent(in) :: op
 integer(8) :: nn(3), i
-integer :: iop, comm, e
+integer :: iop, comm, root, e
 select case( op )
 case( 'min', 'allmin' ); ii = minloc( r ); iop = mpi_minloc
 case( 'max', 'allmax' ); ii = maxloc( r ); iop = mpi_maxloc
 case default; stop
 end select
+comm = comm3d
+root = root3d
+if ( i2d /= 0 ) then
+  comm = comm2d(i2d)
+  root = root2d(i2d)
+end if
 rr = r(ii(1),ii(2),ii(3))
 ii = ii - 1 + noff
 i = ii(1) + n(1) * ( ii(2) + n(2) * ii(3) )
 local(1) = rr
 local(2) = i
 if ( op(1:3) == 'all' ) then
-  comm = comm3d
-  if ( i2d /= 0 ) comm = comm2d(i2d)
   call mpi_allreduce( local, global, 1, mpi_2double_precision, iop, comm, e )
 else
-  if ( i2d /= 0 ) stop 'must allreduce for comm2d'
-  call mpi_reduce( local, global, 1, mpi_2double_precision, iop, ipmaster, comm3d, e )
+  call mpi_reduce( local, global, 1, mpi_2double_precision, iop, root, comm, e )
 end if
 rr = global(1)
 i = global(2)
@@ -227,7 +254,7 @@ if ( nm(i) > 1 ) then
   call mpi_type_create_subarray( 3, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f(1,1,1), 1, tsend, next, 0, f(1,1,1), 1, trecv, prev, 0, comm3d, mpi_status_ignore, e )
+  call mpi_sendrecv( f(1,1,1), 1, tsend, next, 0, f(1,1,1), 1, trecv, prev, 0, comm1d(i), mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
   isend(i) = nh(i)
@@ -236,7 +263,7 @@ if ( nm(i) > 1 ) then
   call mpi_type_create_subarray( 3, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f(1,1,1), 1, tsend, prev, 1, f(1,1,1), 1, trecv, next, 1, comm3d, mpi_status_ignore, e )
+  call mpi_sendrecv( f(1,1,1), 1, tsend, prev, 1, f(1,1,1), 1, trecv, next, 1, comm1d(i), mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
 end if
@@ -285,7 +312,7 @@ use mpi
 real, intent(inout) :: ft(:)
 integer, intent(in) :: id, mpio, ir
 character(*), intent(in) :: str
-integer :: i, n, fh, comm, e
+integer :: i, n, fh, e
 integer(kind=mpi_offset_kind) i0
 if ( id == 0 ) return
 if ( mpio == 0 ) then
@@ -303,9 +330,8 @@ elseif ( ir - n == 0 ) then
 else
   i = mpi_mode_wronly
 end if
-comm = mpi_comm_self
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
-call mpi_file_open( comm, str, i, mpi_info_null, fh, e )
+call mpi_file_open( mpi_comm_self, str, i, mpi_info_null, fh, e )
 if ( id < 0 ) then
   call mpi_file_read_at( fh, i0, ft(1), n, mpi_real, mpi_status_ignore, e )
 else
@@ -420,7 +446,7 @@ i = abs( id )
 call mpi_comm_split( comm0, i, 0, comm, e )
 call mpi_comm_rank( comm, iio, e  )
 call mpi_comm_size( comm, nio, e  )
-if ( iio == 0 ) write( 0, * ) 'Opening file ', trim(str), ' on ', nio, 'processes'
+if ( iio == 0 ) write( 0, * ) 'Opening file:', nio, trim(str)
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
 if ( id < 0 ) then
   i = mpi_mode_rdonly

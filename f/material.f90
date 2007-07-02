@@ -61,6 +61,12 @@ end select
 
 end do doiz
 
+! Test for endian problems
+if ( any( mr  /= mr  ) .or. maxval( mr  ) > huge( r ) ) stop 'NaN/Inf in rho'
+if ( any( s1  /= s1  ) .or. maxval( s1  ) > huge( r ) ) stop 'NaN/Inf in vp'
+if ( any( s2  /= s2  ) .or. maxval( s2  ) > huge( r ) ) stop 'NaN/Inf in vs'
+if ( any( gam /= gam ) .or. maxval( gam ) > huge( r ) ) stop 'NaN/Inf in gam'
+
 ! Fill halo
 call scalarswaphalo( mr,  nhalo )
 call scalarswaphalo( s1,  nhalo )
@@ -81,18 +87,6 @@ if ( vdamp > 0. ) where( s2 > 0. ) gam = vdamp / s2
 ! Limits
 if ( gam1 > 0. ) where ( gam < gam1 ) gam = gam1
 if ( gam2 > 0. ) where ( gam > gam2 ) gam = gam2
-
-! Test for NaN
-if ( any( mr  /= mr  ) .or. any( s1 /= s1 ) &
-.or. any( gam /= gam ) .or. any( s2 /= s2 ) ) then
-  stop 'NaN in velocity model!'
-end if
-
-! Test for Inf
-if ( any( mr  > huge(r) ) .or. any( s1 > huge(r) ) &
-.or. any( gam > huge(r) ) .or. any( s2 > huge(r) ) ) then
-  stop 'Inf in velocity model!'
-end if
 
 ! Stats
 stats(1) = maxval( mr  )

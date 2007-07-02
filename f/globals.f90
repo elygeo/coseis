@@ -141,7 +141,7 @@ integer, dimension(3) :: &
   nhalo,         & ! number of ghost nodes
   np,            & ! number of processes
   ip3,           & ! 3D process rank
-  ip3master,     & ! 3D master process rank
+  ip3root,       & ! 3D master process rank
   bc1,           & ! boundary conditions - near side
   bc2,           & ! boundary conditions - far side
   i1bc,          & ! model boundary

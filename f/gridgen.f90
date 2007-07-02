@@ -24,6 +24,7 @@ if ( grid == 'read' ) then
   call rio4( -1, i, r, 'data/x1', w1, 1, i1, i2, i3, i4, 1, 1 )
   call rio4( -1, i, r, 'data/x2', w1, 2, i1, i2, i3, i4, 1, 1 )
   call rio4( -1, i, r, 'data/x3', w1, 3, i1, i2, i3, i4, 1, 1 )
+  if ( any( w1 /= w1 ) .or. maxval( w1 ) > huge( r ) ) stop 'NaN/Inf in mesh'
 end if
 
 ! Single node indexing

@@ -25,11 +25,11 @@ ip3 = 0
 ipout = 0
 end subroutine
 
-! Set master process
-subroutine setmaster( ip3master )
-integer, intent(in) :: ip3master(3)
+! Set root process
+subroutine setroot( ip3root )
+integer, intent(in) :: ip3root(3)
 integer :: i
-i = ip3master(1)
+i = ip3root(1)
 end subroutine
 
 ! Broadcast real 1d
