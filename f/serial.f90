@@ -4,10 +4,9 @@ implicit none
 contains
 
 ! Initialize
-subroutine initialize( ipout, np0, master )
-integer, intent(out) :: ipout, np0
+subroutine initialize( np0, master )
+integer, intent(out) :: np0
 logical, intent(out) :: master
-ipout = 0
 np0 = 1
 master = .true.
 end subroutine
@@ -17,12 +16,12 @@ subroutine finalize
 end subroutine
 
 ! Process rank
-subroutine rank( ipout, ip3, np )
-integer, intent(out) :: ipout, ip3(3)
+subroutine rank( ipout, ip3out, np )
+integer, intent(out) :: ipout, ip3out(3)
 integer, intent(in) :: np(3)
-ip3 = np
-ip3 = 0
 ipout = 0
+ip3out = np
+ip3out = 0
 end subroutine
 
 ! Set root process

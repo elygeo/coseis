@@ -38,7 +38,6 @@
 
   np = [ 1 1 16 ];
   np = [ 1 1 2 ];
-  np = [ 1 4 1 ];
 
 % rectangular
   affine = [ 1. 0. 0.   0. 1. 0.   0. 0. 1. ];
@@ -47,6 +46,7 @@
   bc2      = [  -3   3  -2 ];
   n2expand = [   0   0   0 ];
 
-itio = 4;
-itstats = 2;
-nt = 6
+itio = 2;
+itstats = 1;
+nt = 4;
+mpout = 1;

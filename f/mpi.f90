@@ -3,21 +3,20 @@ module m_collective
 use m_globals, only: nz
 implicit none
 !integer, private, parameter :: nz = 100
-integer, private :: ip, root3d, root2d(3), comm3d, comm2d(3), comm1d(3), filehandles(6*nz)
+integer, private :: ip, ip3(3), np(3), root3d, root2d(3), comm3d, comm2d(3), comm1d(3), filehandles(6*nz)
 contains
 
 ! Initialize
-subroutine initialize( ipout, np0, master )
+subroutine initialize( np0, master )
 use mpi
-integer, intent(out) :: ipout, np0
+integer, intent(out) :: np0
 logical, intent(out) :: master
-integer :: e
+integer :: ip0, e
 call mpi_init( e )
-call mpi_comm_rank( mpi_comm_world, ip, e  )
 call mpi_comm_size( mpi_comm_world, np0, e  )
-ipout = ip
+call mpi_comm_rank( mpi_comm_world, ip0, e  )
 master = .false.
-if ( ip == 0 ) master = .true.
+if ( ip0 == 0 ) master = .true.
 end subroutine
 
 ! Finalize
@@ -28,14 +27,14 @@ call mpi_finalize( e )
 end subroutine
 
 ! Process rank
-subroutine rank( ipout, ip3, np )
+subroutine rank( ipout, ip3out, npin )
 use mpi
-integer, intent(out) :: ipout, ip3(3)
-integer, intent(in) :: np(3)
-integer :: i, e
-logical :: hat(3)
-hat = .false.
-call mpi_cart_create( mpi_comm_world, 3, np, hat, .true., comm3d, e )
+integer, intent(out) :: ipout, ip3out(3)
+integer, intent(in) :: npin(3)
+integer :: e
+logical :: period(3) = .false.
+np = npin
+call mpi_cart_create( mpi_comm_world, 3, np, period, .true., comm3d, e )
 if ( comm3d == mpi_comm_null ) then
   write( 0, * ) 'Unused process:', ip
   call mpi_finalize( e )
@@ -44,28 +43,33 @@ end if
 call mpi_comm_rank( comm3d, ip, e  )
 call mpi_cart_coords( comm3d, ip, 3, ip3, e )
 ipout = ip
-do i = 1, 3
-  hat = .true.
-  hat(i) = .false.
-  call mpi_cart_sub( comm3d, hat, comm2d(i), e )
-end do
-do i = 1, 3
-  hat = .false.
-  hat(i) = .true.
-  call mpi_cart_sub( comm3d, hat, comm1d(i), e )
-end do
+ip3out = ip3
 filehandles = mpi_undefined
 end subroutine
 
-! Set root process
+! Set root process and creat 2D and 1D communicators
 subroutine setroot( ip3root )
 use mpi
 integer, intent(in) :: ip3root(3)
 integer :: ip2root(2), e, i
+logical :: hat(3)
 call mpi_cart_rank( comm3d, ip3root, root3d, e )
+root2d = 0
+comm2d = mpi_comm_self
+comm1d = mpi_comm_self
 do i = 1, 3
+if ( product( (/ np(:i-1), np(i+1:) /) ) > 1 ) then
+  hat = .true.
+  hat(i) = .false.
+  call mpi_cart_sub( comm3d, hat, comm2d(i), e )
   ip2root = (/ ip3root(:i-1), ip3root(i+1:) /)
-  call mpi_cart_rank( comm3d, ip2root, root2d(i), e )
+  call mpi_cart_rank( comm2d(i), ip2root, root2d(i), e )
+end if
+if ( np(i) > 1 ) then
+  hat = .false.
+  hat(i) = .true.
+  call mpi_cart_sub( comm3d, hat, comm1d(i), e )
+end if
 end do
 end subroutine
 
@@ -240,11 +244,14 @@ subroutine scalarswaphalo( f, nh )
 use mpi
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: nh(3)
-integer :: i, e, prev, next, nm(3), n(3), isend(3), irecv(3), tsend, trecv
+integer :: i, e, prev, next, nm(3), n(3), isend(3), irecv(3), tsend, trecv, comm
 nm = (/ size(f,1), size(f,2), size(f,3) /)
 do i = 1, 3
-if ( nm(i) > 1 ) then
-  call mpi_cart_shift( comm3d, i-1, 1, prev, next, e )
+if ( np(i) > 1 .and. nm(i) > 1 ) then
+  !comm = comm3
+  !call mpi_cart_shift( comm, i-1, 1, prev, next, e )
+  comm = comm1d(i)
+  call mpi_cart_shift( comm, 0, 1, prev, next, e )
   n = nm
   n(i) = nh(i)
   isend = 0
@@ -254,7 +261,7 @@ if ( nm(i) > 1 ) then
   call mpi_type_create_subarray( 3, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f(1,1,1), 1, tsend, next, 0, f(1,1,1), 1, trecv, prev, 0, comm1d(i), mpi_status_ignore, e )
+  call mpi_sendrecv( f(1,1,1), 1, tsend, next, 0, f(1,1,1), 1, trecv, prev, 0, comm, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
   isend(i) = nh(i)
@@ -263,7 +270,7 @@ if ( nm(i) > 1 ) then
   call mpi_type_create_subarray( 3, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f(1,1,1), 1, tsend, prev, 1, f(1,1,1), 1, trecv, next, 1, comm1d(i), mpi_status_ignore, e )
+  call mpi_sendrecv( f(1,1,1), 1, tsend, prev, 1, f(1,1,1), 1, trecv, next, 1, comm, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
 end if
@@ -275,11 +282,14 @@ subroutine vectorswaphalo( f, nh )
 use mpi
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: nh(3)
-integer :: i, e, prev, next, nm(4), n(4), isend(4), irecv(4), tsend, trecv
+integer :: i, e, prev, next, nm(4), n(4), isend(4), irecv(4), tsend, trecv, comm
 nm = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
 do i = 1, 3
-if ( nm(i) > 1 ) then
-  call mpi_cart_shift( comm3d, i-1, 1, prev, next, e )
+if ( np(i) > 1 .and. nm(i) > 1 ) then
+  !comm = comm3
+  !call mpi_cart_shift( comm, i-1, 1, prev, next, e )
+  comm = comm1d(i)
+  call mpi_cart_shift( comm, 0, 1, prev, next, e )
   n = nm
   n(i) = nh(i)
   isend = 0
@@ -289,7 +299,7 @@ if ( nm(i) > 1 ) then
   call mpi_type_create_subarray( 4, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f(1,1,1,1), 1, tsend, next, 0, f(1,1,1,1), 1, trecv, prev, 0, comm3d, mpi_status_ignore, e )
+  call mpi_sendrecv( f(1,1,1,1), 1, tsend, next, 0, f(1,1,1,1), 1, trecv, prev, 0, comm, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
   isend(i) = nh(i)
@@ -298,7 +308,7 @@ if ( nm(i) > 1 ) then
   call mpi_type_create_subarray( 4, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
   call mpi_type_commit( tsend, e )
   call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f(1,1,1,1), 1, tsend, prev, 1, f(1,1,1,1), 1, trecv, next, 1, comm3d, mpi_status_ignore, e )
+  call mpi_sendrecv( f(1,1,1,1), 1, tsend, prev, 1, f(1,1,1,1), 1, trecv, next, 1, comm, mpi_status_ignore, e )
   call mpi_type_free( tsend, e )
   call mpi_type_free( trecv, e )
 end if

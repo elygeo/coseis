@@ -26,7 +26,7 @@ real, allocatable :: prof(:,:)
 
 ! Initialization
 prof0(1) = timer( 0 )
-call initialize( ip, np0, master )                         ; prof0(1) = timer( 6 )
+call initialize( np0, master )                             ; prof0(1) = timer( 6 )
 call inread                                                ; prof0(2) = timer( 6 )
 call setup                                                 ; prof0(3) = timer( 6 )
 if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
