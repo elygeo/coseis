@@ -63,7 +63,7 @@ do while ( it < nt )
   if ( sync ) call barrier ; call fault
   if ( sync ) call barrier ; prof(1,jp) = prof(1,jp) + timer( 5 )
   if ( sync ) call barrier ; call vectorswaphalo( w1, nhalo )
-  if ( sync ) call barrier ; prof(2,jp) = timer( 5 )
+  if ( sync ) call barrier ; prof(3,jp) = timer( 5 )
   if ( sync ) call barrier ; call output( 2 )
   if ( sync ) call barrier ; prof(2,jp) = prof(2,jp) + timer( 5 )
   if ( modulo( it, itcheck ) == 0 ) then
