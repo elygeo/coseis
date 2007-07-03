@@ -1,10 +1,9 @@
 % TeraShake 2000m
   datadir = 'ts/2000/data';
   itcheck = 0;
-  itio = 32;
+  itio = 100;
   nt = 1500;
   np = [ 1 1 2 ];
-
 
 
 

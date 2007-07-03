@@ -3,11 +3,10 @@
   itcheck = 0;
   itio = 400;
   nt = 6000;
-  np = [ 1 36 4 ]; % DS 18, TG 72
   np = [ 1 38 4 ]; % DS 19, TG 76
   np = [ 1 76 4 ]; % DS 38, TG 152
   np = [ 1  8 4 ];
-
+  np = [ 1  6 4 ];
 
   grid  = 'read';
   rho   = 'read';

@@ -1,12 +1,11 @@
 % TeraShake 4000m
   datadir = 'ts/4000/data';
   itcheck = 0;
-  itio = 16;
+  itio = 100;
   nt = 375;
   np = [ 1 1 21 ];
   np = [ 1 3 5 ];
   debug = 1;
-
 
 
   grid  = 'read';

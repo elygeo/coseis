@@ -1,11 +1,10 @@
 % TeraShake 1000m
   datadir = 'ts/1000/data';
   itcheck = 0;
-  itio = 64;
+  itio = 100;
   nt = 3000;
   np = [ 1 1 2 ];
   np = [ 1 8 4 ];
-
 
 
 

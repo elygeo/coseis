@@ -1,1 +1,1 @@
-in/test/bc-test.m
+in/ts/0500.m

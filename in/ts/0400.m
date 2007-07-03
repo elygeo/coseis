@@ -8,7 +8,6 @@
   np = [ 1 32 4 ];
   np = [ 1 40 4 ];
 
-
   grid  = 'read';
   rho   = 'read';
   vp    = 'read';
