@@ -1,36 +1,40 @@
 % TeraShake 400m
-  bc1 = [ 10 10 10 ];
-  bc2 = [ 10 10  0 ];
-  faultnormal = 2;
-  slipvector = [ 1. 0. 0. ];
-  grid = 'read';
-  rho = 'read';
-  vp = 'read';
-  vs = 'read';
-  vs1 = 500.;
-  vp1 = 1500.;
-  vdamp = 400.;
-  gam2 = .8;
-  tn = -20e6;
-  ts1 = 'read';
-  mus = 1000.;
-  mud = .5;
-  dc = .5;
-  rcrit = 3000.;
-  vrup = 2300.;
-  itio = 400;
-  itcheck = 800;
   datadir = 'ts/0400/data';
+  itcheck = 800;
+  itio = 400;
+  nt = 7500;
   np = [ 1 58 4 ];
   np = [ 1 76 4 ];
   np = [ 1 32 4 ];
   np = [ 1 40 4 ];
-  dx = 400.;
-  dt = .024;
-  trelax = .24;
-  nt = 7500;
-  nn = [ 1501  752 201 ];
+
+
+  grid  = 'read';
+  rho   = 'read';
+  vp    = 'read';
+  vs    = 'read';
+  vs1   = 500.;
+  vp1   = 1500.;
+  vdamp = 400.;
+  gam2  = .8;
+  bc1   = [ 10 10 10 ];
+  bc2   = [ 10 10  0 ];
+
   fixhypo = 1;
+  faultnormal = 2;
+  slipvector = [ 1. 0. 0. ];
+  mus = 1000.;
+  mud = .5;
+  dc  = .5;
+  tn  = -20e6;
+  ts1 = 'read';
+  vrup = 2300.;
+  rcrit = 3000.;
+
+  trelax = .24;
+  dt = .024;
+  dx = 400.;
+  nn    = [ 1501  752 201 ];
   ihypo = [  682  499 -14 ];
   ihypo = [ 1133  499 -14 ];
   mus = [ 1.07 'zone'   659   0 -41        1156  0 -1      ];

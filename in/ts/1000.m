@@ -1,36 +1,40 @@
 % TeraShake 1000m
-  bc1 = [ 10 10 10 ];
-  bc2 = [ 10 10  0 ];
-  faultnormal = 2;
-  slipvector = [ 1. 0. 0. ];
-  grid = 'read';
-  rho = 'read';
-  vp = 'read';
-  vs = 'read';
-  vs1 = 500.;
-  vp1 = 1500.;
-  vdamp = 400.;
-  gam2 = .8;
-  tn = -20e6;
-  ts1 = 'read';
-  mus = 1000.;
-  mud = .5;
-  dc = .5;
-  rcrit = 3000.;
-  vrup = 2300.;
-  itio = 64;
-  itcheck = 0;
   datadir = 'ts/1000/data';
-
-
+  itcheck = 0;
+  itio = 64;
+  nt = 3000;
   np = [ 1 1 2 ];
   np = [ 1 8 4 ];
-  dx = 1000.;
-  dt = .06;
-  trelax = .6;
-  nt = 3000;
-  nn = [  601  302  81 ];
+
+
+
+
+  grid  = 'read';
+  rho   = 'read';
+  vp    = 'read';
+  vs    = 'read';
+  vs1   = 500.;
+  vp1   = 1500.;
+  vdamp = 400.;
+  gam2  = .8;
+  bc1   = [ 10 10 10 ];
+  bc2   = [ 10 10  0 ];
+
   fixhypo = 1;
+  faultnormal = 2;
+  slipvector = [ 1. 0. 0. ];
+  mus = 1000.;
+  mud = .5;
+  dc  = .5;
+  tn  = -20e6;
+  ts1 = 'read';
+  vrup = 2300.;
+  rcrit = 3000.;
+
+  trelax = .6;
+  dt = .06;
+  dx = 1000.;
+  nn    = [  601  302  81 ];
   ihypo = [  273  200  -6 ];
   ihypo = [  454  200  -6 ];
   mus = [ 1.055 'zone'  264   0 -17         463  0 -1      ];
