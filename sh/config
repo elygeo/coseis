@@ -37,19 +37,20 @@ pgf90)
   gflags='-g -Ktrap=fp -Mbounds -Mdclchk -Mprof=func'
   gflags='-g -O0 -Ktrap=fp -Mbounds -Mdclchk'
   oflags='-fast -Ktrap=fp -Mbounds -Mdclchk'
-  oflags='-fast'
   oflags='-fast -Mprof=func'
+  oflags='-fast'
   ;;
 gfortran)
   sfc='gfortran -fimplicit-none -Wall -std=f95 -pedantic'
+  sfc='gfortran -fimplicit-none -Wall -pg'
   sfc='gfortran -fimplicit-none -Wall'
-  pfc='mpif90 -fimplicit-none -Wall'
+  pfc='mpif90 -fimplicit-none -Wall -std=f95 -pedantic'
   pfc='mpif90 -fimplicit-none -Wall -mpe=mpilog'
+  pfc='mpif90 -fimplicit-none -Wall'
   gflags='-g -pg -fbounds-check -ffpe-trap=invalid,zero,overflow'
   gflags='-g -fbounds-check -ffpe-trap=invalid,zero,overflow'
   oflags='-O -fbounds-check -ffpe-trap=invalid,zero,overflow'
   oflags='-O3 -fbounds-check -ffpe-trap=invalid,zero,overflow'
-  oflags='-O3 -pg'
   oflags='-O3'
   ;;
 f95)

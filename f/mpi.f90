@@ -56,7 +56,6 @@ logical :: hat(3)
 call mpi_cart_rank( comm3d, ip3root, root3d, e )
 root2d = 0
 comm2d = mpi_comm_self
-comm1d = mpi_comm_self
 do i = 1, 3
 if ( product( (/ np(:i-1), np(i+1:) /) ) > 1 ) then
   hat = .true.

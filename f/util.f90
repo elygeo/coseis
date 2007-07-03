@@ -170,7 +170,7 @@ if ( i == 0 ) then
   timers = 0
 else
   call system_clock( clock1 )
-  timers = timers - clock0 + clock1
+  timers = timers + clock1 - clock0
   if ( clock0 > clock1 ) timers = timers + clockmax
   clock0 = clock1
   timer = real( timers(i) ) / real( clockrate )

@@ -33,8 +33,8 @@ end if
 
 ! Time integration
 tm = it * dt
-vv = vv + dt * w1
-uu = uu + dt * vv
+vv = vv + w1 * dt
+uu = uu + vv * dt
 
 ! Fault time integration
 if ( ifn /= 0 ) then
