@@ -100,6 +100,10 @@ for l = 1:nc
     seek = 4 * ( i0(1) + m(1) * ( i0(2) + m(2) * ( i0(3) + j-1 + m(3) * ( i0(4) + k-1 ) ) ) );
     fseek( fid, seek, 'bof' );
     tmp = fread( fid, n(1)*n(2), block, skip );
+block
+skip
+size( tmp )
+n(1:2)
     f(:,:,j,k,l) = reshape( tmp, n(1:2) );
   end
   end

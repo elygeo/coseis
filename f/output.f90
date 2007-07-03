@@ -192,14 +192,14 @@ case( 2 )
     rr = maxval( vstats )
     if ( rr /= rr .or. rr > huge( rr ) ) stop 'NaN/Inf!'
   end if
-  if ( modulo( it, itio ) == 0 .or. it == nt ) then
+  if ( modulo( it, itio ) == 0 .or. ( it == nt .and. jv > 0 ) ) then
     call rreduce2( gvstats, vstats, 'max', 0 )
     if ( master ) then
       gvstats = sqrt( gvstats )
-      call rio1( 1, mpout, 'stats/vmax', gvstats(:jv,1), it / itstats )
-      call rio1( 1, mpout, 'stats/wmax', gvstats(:jv,2), it / itstats )
-      call rio1( 1, mpout, 'stats/umax', gvstats(:jv,3), it / itstats )
-      call rio1( 1, mpout, 'stats/amax', gvstats(:jv,4), it / itstats )
+      call rio1( 21, mpout, 'stats/vmax', gvstats(:jv,1), it/itstats, nt/itstats )
+      call rio1( 22, mpout, 'stats/wmax', gvstats(:jv,2), it/itstats, nt/itstats )
+      call rio1( 23, mpout, 'stats/umax', gvstats(:jv,3), it/itstats, nt/itstats )
+      call rio1( 24, mpout, 'stats/amax', gvstats(:jv,4), it/itstats, nt/itstats )
       rr = maxval( gvstats(:jv,3) )
       if ( rr > dx / 10. ) write( 0, * ) 'warning: u !<< dx', rr, dx
     end if
@@ -237,22 +237,22 @@ case( 2 )
     rr = maxval( fstats )
     if ( rr /= rr .or. rr > huge( rr ) ) stop 'NaN/Inf!'
   end if
-  if ( modulo( it, itio ) == 0 .or. it == nt ) then
+  if ( modulo( it, itio ) == 0 .or. ( it == nt .and. jf > 0 ) ) then
     call rreduce2( gfstats, fstats, 'max', ifn )
     call rreduce2( gestats, estats, 'sum', ifn )
     if ( master ) then
       gfstats(:jf,8) = -gfstats(:jf,8)
-      call rio1( 1, mpout, 'stats/svmax',   gfstats(:jf,1), it / itstats )
-      call rio1( 1, mpout, 'stats/sumax',   gfstats(:jf,2), it / itstats )
-      call rio1( 1, mpout, 'stats/slmax',   gfstats(:jf,3), it / itstats )
-      call rio1( 1, mpout, 'stats/tarrmax', gfstats(:jf,4), it / itstats )
-      call rio1( 1, mpout, 'stats/tsmax',   gfstats(:jf,5), it / itstats )
-      call rio1( 1, mpout, 'stats/samax',   gfstats(:jf,6), it / itstats )
-      call rio1( 1, mpout, 'stats/tnmax',   gfstats(:jf,7), it / itstats )
-      call rio1( 1, mpout, 'stats/tnmin',   gfstats(:jf,8), it / itstats )
-      call rio1( 1, mpout, 'stats/efric',   gestats(:jf,1), it / itstats )
-      call rio1( 1, mpout, 'stats/estrain', gestats(:jf,2), it / itstats )
-      call rio1( 1, mpout, 'stats/moment',  gestats(:jf,3), it / itstats )
+      call rio1( 25, mpout, 'stats/svmax',   gfstats(:jf,1), it/itstats, nt/itstats )
+      call rio1( 26, mpout, 'stats/sumax',   gfstats(:jf,2), it/itstats, nt/itstats )
+      call rio1( 27, mpout, 'stats/slmax',   gfstats(:jf,3), it/itstats, nt/itstats )
+      call rio1( 28, mpout, 'stats/tarrmax', gfstats(:jf,4), it/itstats, nt/itstats )
+      call rio1( 29, mpout, 'stats/tsmax',   gfstats(:jf,5), it/itstats, nt/itstats )
+      call rio1( 30, mpout, 'stats/samax',   gfstats(:jf,6), it/itstats, nt/itstats )
+      call rio1( 31, mpout, 'stats/tnmax',   gfstats(:jf,7), it/itstats, nt/itstats )
+      call rio1( 32, mpout, 'stats/tnmin',   gfstats(:jf,8), it/itstats, nt/itstats )
+      call rio1( 33, mpout, 'stats/efric',   gestats(:jf,1), it/itstats, nt/itstats )
+      call rio1( 34, mpout, 'stats/estrain', gestats(:jf,2), it/itstats, nt/itstats )
+      call rio1( 35, mpout, 'stats/moment',  gestats(:jf,3), it/itstats, nt/itstats )
       do i = 1, jf
       if ( gestats(i,3) > 0. ) then 
         gestats(i,3) = ( log10( gestats(i,3) ) - 9.05 ) / 1.5
@@ -260,7 +260,7 @@ case( 2 )
         gestats(i,3) = -999
       end if
       end do
-      call rio1( 1, mpout, 'stats/mw',      gestats(:jf,3), it / itstats )
+      call rio1( 36, mpout, 'stats/mw',      gestats(:jf,3), it/itstats, nt/itstats )
       i1 = ihypo
       i1(ifn) = 1
       open( 1, file='stats/tarrhypo', status='replace' )
@@ -320,7 +320,7 @@ end if
 
 ! Binary output
 do ic = 1, nc
-  id = 6 * ( iz - 1 ) + ic
+  id = 64 + 6 * ( iz - 1 ) + ic
   write( str, '(a,i2.2,a)' ) 'out/', iz, fieldout(iz)
   if ( nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic
   if ( mpout == 0 ) then
@@ -328,51 +328,52 @@ do ic = 1, nc
     if ( any( i1 /= i3 .or. i2 /= i4 ) ) write( str, '(a,i6.6)' ) trim( str ), i
   end if
   select case( fieldout(iz) )
-  case( 'x'    ); call rio4( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, nr, ir )
-  case( 'rho'  ); call rio3( id, mpio, rr, str, mr,       i1, i2, i3, i4, nr, ir )
-  case( 'vp'   ); call rio3( id, mpio, rr, str, s1,       i1, i2, i3, i4, nr, ir )
-  case( 'vs'   ); call rio3( id, mpio, rr, str, s2,       i1, i2, i3, i4, nr, ir )
-  case( 'gam'  ); call rio3( id, mpio, rr, str, gam,      i1, i2, i3, i4, nr, ir )
-  case( 'lam'  ); call rio3( id, mpio, rr, str, lam,      i1, i2, i3, i4, nr, ir )
-  case( 'mu'   ); call rio3( id, mpio, rr, str, mu,       i1, i2, i3, i4, nr, ir )
-  case( 'v'    ); call rio4( id, mpio, rr, str, vv, ic,   i1, i2, i3, i4, nr, ir )
-  case( 'u'    ); call rio4( id, mpio, rr, str, uu, ic,   i1, i2, i3, i4, nr, ir )
+  case( 'x'    ); call rio4( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, ir, nr )
+  case( 'rho'  ); call rio3( id, mpio, rr, str, mr,       i1, i2, i3, i4, ir, nr )
+  case( 'vp'   ); call rio3( id, mpio, rr, str, s1,       i1, i2, i3, i4, ir, nr )
+  case( 'vs'   ); call rio3( id, mpio, rr, str, s2,       i1, i2, i3, i4, ir, nr )
+  case( 'lam'  ); call rio3( id, mpio, rr, str, lam,      i1, i2, i3, i4, ir, nr )
+  case( 'mu'   ); call rio3( id, mpio, rr, str, mu,       i1, i2, i3, i4, ir, nr )
+  case( 'mr'   ); call rio3( id, mpio, rr, str, mr,       i1, i2, i3, i4, ir, nr )
+  case( 'gam'  ); call rio3( id, mpio, rr, str, gam,      i1, i2, i3, i4, ir, nr )
+  case( 'v'    ); call rio4( id, mpio, rr, str, vv, ic,   i1, i2, i3, i4, ir, nr )
+  case( 'u'    ); call rio4( id, mpio, rr, str, uu, ic,   i1, i2, i3, i4, ir, nr )
   case( 'w'    );                                                                   
-   if ( ic < 4 )  call rio4( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, nr, ir )
-   if ( ic > 3 )  call rio4( id, mpio, rr, str, w2, ic-3, i1, i2, i3, i4, nr, ir )
-  case( 'a'    ); call rio4( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, nr, ir )
-  case( 'nhat' ); call rio4( id, mpio, rr, str, nhat, ic, i1, i2, i3, i4, nr, ir )
-  case( 'mus'  ); call rio3( id, mpio, rr, str, mus,      i1, i2, i3, i4, nr, ir )
-  case( 'mud'  ); call rio3( id, mpio, rr, str, mud,      i1, i2, i3, i4, nr, ir )
-  case( 'dc'   ); call rio3( id, mpio, rr, str, dc,       i1, i2, i3, i4, nr, ir )
-  case( 'co'   ); call rio3( id, mpio, rr, str, co,       i1, i2, i3, i4, nr, ir )
-  case( 'sv'   ); call rio4( id, mpio, rr, str, t1, ic,   i1, i2, i3, i4, nr, ir )
-  case( 'su'   ); call rio4( id, mpio, rr, str, t2, ic,   i1, i2, i3, i4, nr, ir )
-  case( 'ts'   ); call rio4( id, mpio, rr, str, t1, ic,   i1, i2, i3, i4, nr, ir )
-  case( 'sa'   ); call rio4( id, mpio, rr, str, t2, ic,   i1, i2, i3, i4, nr, ir )
-  case( 'svm'  ); call rio3( id, mpio, rr, str, f1,       i1, i2, i3, i4, nr, ir )
-  case( 'sum'  ); call rio3( id, mpio, rr, str, f2,       i1, i2, i3, i4, nr, ir )
-  case( 'tsm'  ); call rio3( id, mpio, rr, str, ts,       i1, i2, i3, i4, nr, ir )
-  case( 'sam'  ); call rio3( id, mpio, rr, str, f2,       i1, i2, i3, i4, nr, ir )
-  case( 'tn'   ); call rio3( id, mpio, rr, str, tn,       i1, i2, i3, i4, nr, ir )
-  case( 'fr'   ); call rio3( id, mpio, rr, str, f1,       i1, i2, i3, i4, nr, ir )
-  case( 'sl'   ); call rio3( id, mpio, rr, str, sl,       i1, i2, i3, i4, nr, ir )
-  case( 'psv'  ); call rio3( id, mpio, rr, str, psv,      i1, i2, i3, i4, nr, ir )
-  case( 'trup' ); call rio3( id, mpio, rr, str, trup,     i1, i2, i3, i4, nr, ir )
-  case( 'tarr' ); call rio3( id, mpio, rr, str, tarr,     i1, i2, i3, i4, nr, ir )
-  case( 'pv2'  ); call rio3( id, mpio, rr, str, pv,       i1, i2, i3, i4, nr, ir )
+   if ( ic < 4 )  call rio4( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, ir, nr )
+   if ( ic > 3 )  call rio4( id, mpio, rr, str, w2, ic-3, i1, i2, i3, i4, ir, nr )
+  case( 'a'    ); call rio4( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, ir, nr )
+  case( 'nhat' ); call rio4( id, mpio, rr, str, nhat, ic, i1, i2, i3, i4, ir, nr )
+  case( 'mus'  ); call rio3( id, mpio, rr, str, mus,      i1, i2, i3, i4, ir, nr )
+  case( 'mud'  ); call rio3( id, mpio, rr, str, mud,      i1, i2, i3, i4, ir, nr )
+  case( 'dc'   ); call rio3( id, mpio, rr, str, dc,       i1, i2, i3, i4, ir, nr )
+  case( 'co'   ); call rio3( id, mpio, rr, str, co,       i1, i2, i3, i4, ir, nr )
+  case( 'sv'   ); call rio4( id, mpio, rr, str, t1, ic,   i1, i2, i3, i4, ir, nr )
+  case( 'su'   ); call rio4( id, mpio, rr, str, t2, ic,   i1, i2, i3, i4, ir, nr )
+  case( 'ts'   ); call rio4( id, mpio, rr, str, t1, ic,   i1, i2, i3, i4, ir, nr )
+  case( 'sa'   ); call rio4( id, mpio, rr, str, t2, ic,   i1, i2, i3, i4, ir, nr )
+  case( 'svm'  ); call rio3( id, mpio, rr, str, f1,       i1, i2, i3, i4, ir, nr )
+  case( 'sum'  ); call rio3( id, mpio, rr, str, f2,       i1, i2, i3, i4, ir, nr )
+  case( 'tsm'  ); call rio3( id, mpio, rr, str, ts,       i1, i2, i3, i4, ir, nr )
+  case( 'sam'  ); call rio3( id, mpio, rr, str, f2,       i1, i2, i3, i4, ir, nr )
+  case( 'tn'   ); call rio3( id, mpio, rr, str, tn,       i1, i2, i3, i4, ir, nr )
+  case( 'fr'   ); call rio3( id, mpio, rr, str, f1,       i1, i2, i3, i4, ir, nr )
+  case( 'sl'   ); call rio3( id, mpio, rr, str, sl,       i1, i2, i3, i4, ir, nr )
+  case( 'psv'  ); call rio3( id, mpio, rr, str, psv,      i1, i2, i3, i4, ir, nr )
+  case( 'trup' ); call rio3( id, mpio, rr, str, trup,     i1, i2, i3, i4, ir, nr )
+  case( 'tarr' ); call rio3( id, mpio, rr, str, tarr,     i1, i2, i3, i4, ir, nr )
+  case( 'pv2'  ); call rio3( id, mpio, rr, str, pv,       i1, i2, i3, i4, ir, nr )
   case( 'vm2'  )
     if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, vv, i3, i4 )
-    call rio3( id, mpio, rr, str, s1, i1, i2, i3, i4, nr, ir )
+    call rio3( id, mpio, rr, str, s1, i1, i2, i3, i4, ir, nr )
   case( 'um2'  )
     if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, uu, i3, i4 )
-    call rio3( id, mpio, rr, str, s1, i1, i2, i3, i4, nr, ir )
+    call rio3( id, mpio, rr, str, s1, i1, i2, i3, i4, ir, nr )
   case( 'wm2'  )
     if ( modulo( it, itstats ) /= 0 ) call tensornorm( s2, w1, w2, i3, i4 )
-    call rio3( id, mpio, rr, str, s2, i1, i2, i3, i4, nr, ir )
+    call rio3( id, mpio, rr, str, s2, i1, i2, i3, i4, ir, nr )
   case( 'am2'  )
     if ( modulo( it, itstats ) /= 0 ) call vectornorm( s2, w1, i3, i4 )
-    call rio3( id, mpio, rr, str, s2, i1, i2, i3, i4, nr, ir )
+    call rio3( id, mpio, rr, str, s2, i1, i2, i3, i4, ir, nr )
   case default
     write( 0, * ) 'error: unknown output field: ', fieldout(iz)
     stop
@@ -383,7 +384,7 @@ do ic = 1, nc
     jb(i) = jb(i) + 1
     iobuffer(jb(i),i) = rr
     if ( it == nt .or. modulo( it, itio ) == 0 ) then
-      call rio1( 1, mpout, str, iobuffer(:jb(i),i), ir )
+      call rio1( id, mpout, str, iobuffer(:jb(i),i), ir, nr )
       jb(i) = 0
     end if
   end if

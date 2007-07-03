@@ -18,8 +18,9 @@ case( 'vp'   ); onpass = 0; cell = .true.
 case( 'vs'   ); onpass = 0; cell = .true.
 case( 'lam'  ); onpass = 0; cell = .true.
 case( 'mu'   ); onpass = 0; cell = .true.
-case( 'gam'  ); onpass = 0; cell = .true.
-case( 'v'    ); onpass = 1; nc = 3
+case( 'mr'   );
+case( 'gam'  );
+case( 'v'    ); nc = 3
 case( 'vm2'  ); onpass = 1
 case( 'pv2'  ); onpass = 1
 case( 'w'    ); onpass = 1; cell = .true.; nc = 6

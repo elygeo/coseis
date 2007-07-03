@@ -123,22 +123,23 @@ f(1,1,1,1) = f(1,1,1,1) - n(1) + n(1)
 end subroutine
 
 ! Time series I/O
-subroutine rio1( id, mpio, str, ft, ir )
+subroutine rio1( id, mpio, str, ft, ir, nr )
 use m_util
 real, intent(inout) :: ft(:)
-integer, intent(in) :: id, mpio, ir
+integer, intent(in) :: id, mpio, ir, nr
 character(*), intent(in) :: str
 integer :: i
-if ( id == 0 ) return
+if ( id == 0 .or. size( ft ) == 0 ) return
+if ( size( ft ) > ir .or. ir > nr ) stop 'error in rio1'
 call frio1( id, str, ft, ir )
-i = mpio
+i = mpio + nr
 end subroutine
 
 ! Scalar field I/O
-subroutine rio3( id, mpio, r, str, s1, i1, i2, i3, i4, nr, ir )
+subroutine rio3( id, mpio, r, str, s1, i1, i2, i3, i4, ir, nr )
 use m_util
 real, intent(inout) :: r, s1(:,:,:)
-integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), nr, ir
+integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), ir, nr
 character(*), intent(in) :: str
 integer :: i
 if ( id == 0 ) return
@@ -157,10 +158,10 @@ i = i3(1) + i4(1) + mpio
 end subroutine
 
 ! Vector field component I/O
-subroutine rio4( id, mpio, r, str, w1, ic, i1, i2, i3, i4, nr, ir )
+subroutine rio4( id, mpio, r, str, w1, ic, i1, i2, i3, i4, ir, nr )
 use m_util
 real, intent(inout) :: r, w1(:,:,:,:)
-integer, intent(in) :: id, mpio, ic, i1(3), i2(3), i3(3), i4(3), nr, ir
+integer, intent(in) :: id, mpio, ic, i1(3), i2(3), i3(3), i4(3), ir, nr
 character(*), intent(in) :: str
 integer :: i
 if ( id == 0 ) return

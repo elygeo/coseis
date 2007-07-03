@@ -45,7 +45,7 @@ if ( sync ) call barrier ; call readcheckpoint             ; prof0(14) = timer( 
 if ( sync ) call barrier ; if ( it == 0 ) call output( 1 ) ; prof0(15) = timer( 6 )
 if ( sync ) call barrier ; if ( it == 0 ) call output( 2 ) ; prof0(16) = timer( 6 )
 if ( sync ) call barrier ; prof0(17) = timer( 7 )
-if ( master .and. it == 0 ) call rio1( 1, mpout, 'prof/main', prof0, 17 )
+if ( master .and. it == 0 ) call rio1( 10, mpout, 'prof/main', prof0, 17, 19 )
 allocate( prof(4,itio) )
 
 ! Main loop
@@ -65,18 +65,17 @@ do while ( it < nt )
   if ( sync ) call barrier ; call vectorswaphalo( w1, nhalo )
   if ( sync ) call barrier ; prof(3,jp) = timer( 5 )
   if ( sync ) call barrier ; call output( 2 )
-  if ( sync ) call barrier ; prof(2,jp) = prof(2,jp) + timer( 5 )
   if ( modulo( it, itcheck ) == 0 ) then
     if ( sync ) call barrier ; call writecheckpoint
   end if
-  prof(2,jp) = prof(2,jp) + timer( 5 )
+  if ( sync ) call barrier ; prof(2,jp) = prof(2,jp) + timer( 5 )
   prof(4,jp) = timer( 6 )
   if ( it == nt .or. modulo( it, itio ) == 0 ) then
     if ( master ) then
-      call rio1( 1, mpout, 'prof/comp', prof(1,:jp), it )
-      call rio1( 1, mpout, 'prof/out' , prof(2,:jp), it )
-      call rio1( 1, mpout, 'prof/comm', prof(3,:jp), it )
-      call rio1( 1, mpout, 'prof/step', prof(4,:jp), it )
+      call rio1( 11, mpout, 'prof/comp', prof(1,:jp), it, nt )
+      call rio1( 12, mpout, 'prof/out' , prof(2,:jp), it, nt )
+      call rio1( 13, mpout, 'prof/comm', prof(3,:jp), it, nt )
+      call rio1( 14, mpout, 'prof/step', prof(4,:jp), it, nt )
     end if
     jp = 0
   end if
@@ -91,7 +90,7 @@ if ( sync ) call barrier
 if ( master ) then
   prof0(1) = timer( 7 )
   prof0(2) = timer( 8 )
-  call rio1( 1, mpout, 'prof/main', prof0(:2), 19 )
+  call rio1( 10, mpout, 'prof/main', prof0(:2), 19, 19 )
   write( 0, * ) 'Finished!'
 end if
 call finalize

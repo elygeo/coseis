@@ -4,8 +4,10 @@
   itio = 100;
   nt = 375;
   np = [ 1 1 21 ];
-  np = [ 1 3 5 ];
+  np = [ 1 1 2 ];
   debug = 1;
+itio = 32;
+nt = 100
 
 
   grid  = 'read';
@@ -48,7 +50,8 @@
   out = { 'x'      1      1   1  -1    0     -1 -1 -1    0 };
   out = { 'vs'     1      1   1  -2    0     -1 -1 -1    0 };
   out = { 'pv2'  375      1   1  -1  375     -1 -1 -1  750 };
-  out = { 'vm2'    1      1   1  -1    0     -1 -1 -1  750 };
+% out = { 'vm2'    1      1   1  -1    0     -1 -1 -1  750 };
+  out = { 'gam'    1     67  50  -5    0    116  0 -1    0 };
   timeseries = { 'v'  82188. 188340. 129. }; % Bakersfield
   timeseries = { 'v'  99691.  67008.  21. }; % Santa Barbara
   timeseries = { 'v' 152641.  77599.  16. }; % Oxnard
