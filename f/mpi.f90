@@ -3,7 +3,7 @@ module m_collective
 use m_globals, only: nz
 implicit none
 !integer, private, parameter :: nz = 100
-integer, private :: ip, ip3(3), np(3), root3d, root2d(3), comm3d, comm2d(3), comm1d(3), filehandles(6*nz)
+integer, private :: ip, ip3(3), np(3), root3d, root2d(3), comm3d, comm2d(3), filehandles(6*nz)
 contains
 
 ! Initialize
@@ -47,7 +47,7 @@ ip3out = ip3
 filehandles = mpi_undefined
 end subroutine
 
-! Set root process and creat 2D and 1D communicators
+! Set root process and creat 2D communicators
 subroutine setroot( ip3root )
 use mpi
 integer, intent(in) :: ip3root(3)
@@ -64,11 +64,6 @@ if ( product( (/ np(:i-1), np(i+1:) /) ) > 1 ) then
   call mpi_cart_sub( comm3d, hat, comm2d(i), e )
   ip2root = (/ ip3root(:i-1), ip3root(i+1:) /)
   call mpi_cart_rank( comm2d(i), ip2root, root2d(i), e )
-end if
-if ( np(i) > 1 ) then
-  hat = .false.
-  hat(i) = .true.
-  call mpi_cart_sub( comm3d, hat, comm1d(i), e )
 end if
 end do
 end subroutine
@@ -248,10 +243,8 @@ integer :: i, e, prev, next, nm(3), n(3), isend(3), irecv(3), tsend, trecv, comm
 nm = (/ size(f,1), size(f,2), size(f,3) /)
 do i = 1, 3
 if ( np(i) > 1 .and. nm(i) > 1 ) then
-  !comm = comm3
-  !call mpi_cart_shift( comm, i-1, 1, prev, next, e )
-  comm = comm1d(i)
-  call mpi_cart_shift( comm, 0, 1, prev, next, e )
+  comm = comm3d
+  call mpi_cart_shift( comm, i-1, 1, prev, next, e )
   n = nm
   n(i) = nh(i)
   isend = 0
@@ -286,10 +279,8 @@ integer :: i, e, prev, next, nm(4), n(4), isend(4), irecv(4), tsend, trecv, comm
 nm = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
 do i = 1, 3
 if ( np(i) > 1 .and. nm(i) > 1 ) then
-  !comm = comm3
-  !call mpi_cart_shift( comm, i-1, 1, prev, next, e )
-  comm = comm1d(i)
-  call mpi_cart_shift( comm, 0, 1, prev, next, e )
+  comm = comm3d
+  call mpi_cart_shift( comm, i-1, 1, prev, next, e )
   n = nm
   n(i) = nh(i)
   isend = 0
