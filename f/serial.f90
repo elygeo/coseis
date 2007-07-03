@@ -130,7 +130,7 @@ integer, intent(in) :: id, mpio, ir, nr
 character(*), intent(in) :: str
 integer :: i
 if ( id == 0 .or. size( ft ) == 0 ) return
-if ( size( ft ) > ir .or. ir > nr ) stop 'error in rio1'
+if ( ir < size( ft ) .or. ir > nr ) stop 'error in rio1'
 call frio1( id, str, ft, ir )
 i = mpio + nr
 end subroutine

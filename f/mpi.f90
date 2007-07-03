@@ -316,7 +316,7 @@ integer :: i, nl(1), n(1), i0(1), ftype, fh, e
 integer(kind=mpi_offset_kind) :: ir0 = 0
 nl = size( ft )
 if ( id == 0 .or. nl(1) == 0 ) return
-if ( nl(1) > ir .or. ir > nr ) stop 'error in rio1'
+if ( ir < nl(1) .or. ir > nr ) stop 'error in rio1'
 if ( mpio == 0 ) then
   call frio1( id, str, ft, ir )
   return

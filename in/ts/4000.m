@@ -6,8 +6,8 @@
   np = [ 1 1 21 ];
   np = [ 1 1 2 ];
   debug = 1;
-itio = 32;
-nt = 100
+itio = 2;
+nt = 4
 
 
   grid  = 'read';
