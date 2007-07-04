@@ -11,6 +11,9 @@ use m_bc
 use m_util
 integer :: i, i1(3), i2(3), bc(3)
 
+
+integer :: j, k, l
+
 if ( master ) write( 0, * ) 'Resample material model'
 
 ! Cell volume
@@ -27,6 +30,17 @@ case( 2 ); i = ihypo(2); s1(:,i,:) = 0.; yy(:,i,:) = 0.
 case( 3 ); i = ihypo(3); s1(:,:,i) = 0.; yy(:,:,i) = 0.
 end select
 
+j = ihypo(1)
+k = ihypo(2)
+l = ihypo(3)
+
+print *, ihypo + nnoff
+print *, 'vs'; print *, s2(j-8,k-1,:)
+print *, 'gam'; print *, gam(j-7,k-1,:)
+print *, 'gam'; print *, gam(j-8,k-1,:)
+print *, 'gam'; print *, gam(j-7,k,:)
+print *, 'gam'; print *, gam(j-8,k,:)
+
 ! Mass ratio
 s2 = mr * s1
 call scalaraverage( mr, s2, i1node, i2node, -1 )
@@ -39,11 +53,16 @@ bc = 4
 i1 = i1bc - 1
 i2 = i2bc
 call scalarbc( gam, bc, bc, i1, i2 )
+print *, 'bc'; print *, gam(j-8,k-1,:)
 s2 = gam * dt
+print *, 'dt'; print *, s2(j-8,k-1,:) / dt
 call scalaraverage( gam, s2, i1node, i2node, -1 )
+print *, 'av'; print *, gam(j-8,k,:) / dt
 call scalarsethalo( gam, 0., i1bc, i2bc )
 call scalarswaphalo( gam, nhalo )
 call scalarbc( gam, bc1, bc2, i1bc, i2bc )
+print *, 'final'; print *, gam(j-8,k,:) / dt
+!stop
 
 ! Moduli
 where ( s1 /= 0. ) s1 = 1. / s1

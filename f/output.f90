@@ -334,8 +334,9 @@ do ic = 1, nc
   case( 'vs'   ); call rio3( id, mpio, rr, str, s2,       i1, i2, i3, i4, ir, nr )
   case( 'lam'  ); call rio3( id, mpio, rr, str, lam,      i1, i2, i3, i4, ir, nr )
   case( 'mu'   ); call rio3( id, mpio, rr, str, mu,       i1, i2, i3, i4, ir, nr )
-  case( 'mr'   ); call rio3( id, mpio, rr, str, mr,       i1, i2, i3, i4, ir, nr )
   case( 'gam'  ); call rio3( id, mpio, rr, str, gam,      i1, i2, i3, i4, ir, nr )
+  case( 'gamt' ); call rio3( id, mpio, rr, str, gam,      i1, i2, i3, i4, ir, nr )
+  case( 'mr'   ); call rio3( id, mpio, rr, str, mr,       i1, i2, i3, i4, ir, nr )
   case( 'v'    ); call rio4( id, mpio, rr, str, vv, ic,   i1, i2, i3, i4, ir, nr )
   case( 'u'    ); call rio4( id, mpio, rr, str, uu, ic,   i1, i2, i3, i4, ir, nr )
   case( 'w'    );                                                                   

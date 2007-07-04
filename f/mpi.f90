@@ -333,7 +333,7 @@ if ( fh == mpi_undefined ) then
   end if
   i0 = ir - nl
   n  = nr
-  write( 0, '(a,i7,2a)' ) ' Opening 1D file on proc', ip, ': ', trim(str)
+  write( 0, '(a,i8,1x,a)' ) ' Opening 1D buffered file:', ip, trim(str)
   call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
   call mpi_file_open( mpi_comm_self, str, i, mpi_info_null, fh, e )
   call mpi_type_create_subarray( 1, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
@@ -481,8 +481,8 @@ if ( n(i) == 1 ) then
   nl(i:) = (/ nl(i+1:), 1 /)
 end if
 end do
-if ( iio == 0 ) write( 0, '(a,i2,a,i6,2a)' ) &
-  ' Opening', ndims, 'D file on', nio, ' procs: ', trim(str)
+if ( iio == 0 ) write( 0, '(a,i2,a,i8,a,i8,1x,a)' ) &
+  ' Opening', ndims, 'D', nio, 'P file:', ip, trim(str)
 if ( mpio > 0 ) then ! collapes dimension if all on one proc
   do i = 1, ndims-1
   if ( n(i) == nl(i) ) then

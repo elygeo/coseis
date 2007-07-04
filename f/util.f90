@@ -17,7 +17,7 @@ m2 = i1 /= 0 .and. i2 == 0
 m3 = i1 < 0
 m4 = i2 < 0
 where ( m0 ) i1 = ihypo + nnoff
-where ( m0 ) i2 = ihypo + nnoff
+where ( m0 ) i2 = ihypo + nnoff + nshift
 where ( m1 ) i1 = ihypo + nnoff + nshift
 where ( m2 ) i2 = ihypo + nnoff
 where ( m3 ) i1 = i1 + nn + 1
