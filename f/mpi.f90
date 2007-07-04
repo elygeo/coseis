@@ -312,13 +312,13 @@ use mpi
 real, intent(inout) :: ft(:)
 integer, intent(in) :: id, mpio, ir, nr
 character(*), intent(in) :: str
-integer :: i, nl(1), n(1), i0(1), ftype, fh, e
+integer :: i, n, nl(1), ng(1), i0(1), ftype, fh, e
 integer(kind=mpi_offset_kind) :: ir0 = 0
-nl = size( ft )
-if ( id == 0 .or. nl(1) == 0 ) return
-if ( ir < nl(1) .or. ir > nr ) stop 'error in rio1'
+n = size( ft )
+if ( n == 0 .or. id == 0 ) return
+if ( n > ir .or. ir > nr ) stop 'error in rio1'
 if ( mpio == 0 ) then
-  call frio1( id, str, ft, ir )
+  call frio1( id, str, ft, ir, nr )
   return
 end if
 i = abs( id )
@@ -326,26 +326,27 @@ fh = filehandles(i)
 if ( fh == mpi_undefined ) then
   if ( id < 0 ) then
     i = mpi_mode_rdonly
-  elseif ( ir == nl(1) ) then
+  elseif ( ir == n ) then
     i = mpi_mode_wronly + mpi_mode_create
   else
     i = mpi_mode_wronly
   end if
-  i0 = ir - nl
-  n  = nr
+  i0 = ir - n
+  ng = nr
+  nl = nr - ir + n
   write( 0, '(a,i8,1x,a)' ) ' Opening 1D buffered file:', ip, trim(str)
   call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
   call mpi_file_open( mpi_comm_self, str, i, mpi_info_null, fh, e )
-  call mpi_type_create_subarray( 1, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
+  call mpi_type_create_subarray( 1, ng, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
   call mpi_type_commit( ftype, e )
   call mpi_file_set_view( fh, ir0, mpi_real, ftype, 'native', mpi_info_null, e )
   i = abs( id )
   filehandles(i) = fh
 end if
 if ( id < 0 ) then
-  call mpi_file_read( fh, ft(1), nl(1), mpi_real, mpi_status_ignore, e )
+  call mpi_file_read( fh, ft(1), n, mpi_real, mpi_status_ignore, e )
 else
-  call mpi_file_write( fh, ft(1), nl(1), mpi_real, mpi_status_ignore, e )
+  call mpi_file_write( fh, ft(1), n, mpi_real, mpi_status_ignore, e )
 end if
 if ( ir == nr ) then
   i = abs( id )
@@ -368,7 +369,7 @@ if ( id > 0 .and. all( i1 == i2 ) ) then
   return
 end if
 if ( mpio == 0 ) then
-  call frio3( id, str, s1, i3, i4, ir )
+  call frio3( id, str, s1, i3, i4, ir, nr )
   return
 end if
 i = abs( id )
@@ -411,7 +412,7 @@ if ( id > 0 .and. all( i1 == i2 ) ) then
   return
 end if
 if ( mpio == 0 ) then
-  call frio4( id, str, w1, ic, i3, i4, ir )
+  call frio4( id, str, w1, ic, i3, i4, ir, nr )
   return
 end if
 i = abs( id )

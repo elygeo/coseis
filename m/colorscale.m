@@ -7,10 +7,10 @@ orientation = 'b';
 x = get( gca, 'XLim' );
 y = get( gca, 'YLim' );
 x = x(1) + [ .25 .75 ] * ( x(2) - x(1) );
-y = y(1) - [ .1  .08 ] * ( y(2) - y(1) );
-if nargin >= 1, x = varargin{1}; end
-if nargin >= 2, y = varargin{2}; end
-if nargin >= 3, str = varargin{3}; end
+y = y(1) - [ .1  .05 ] * ( y(2) - y(1) );
+if nargin >= 1, str = varargin{1}; end
+if nargin >= 2, x = varargin{2}; end
+if nargin >= 3, y = varargin{3}; end
 if nargin >= 4, orientation = varargin{4}; end
 x = x(:)';
 y = y(:)';
@@ -24,13 +24,13 @@ dc = ( clim(2) - clim(1) ) / ( length( cmap ) - 1 );
 if folded, clim(1) = 0; end
 hold on
 if any( strcmp( orientation, { 'l' 'r' } ) )
-  dx = ( x(2) - x(1) ) / 3;
-  dy = .5 * ( y(2) - y(1) ) / ( length( cmap ) - 1 );
-  h1(1) = imagesc( x + dx * [ 1 -1 ], y + dy * [ 1 -1 ], [ clim(1):dc:clim(2) ]' );
+  xx = x + [ 1 -1 ] * ( x(2) - x(1) ) / 3;
+  yy = y + [ 1 -1 ] * .5 * ( y(2) - y(1) ) / ( length( cmap ) - 1 );
+  h1(1) = imagesc( xx, yy, [ clim(1):dc:clim(2) ]' );
 else
-  dx = .5 * ( x(2) - x(1) ) / ( length( cmap ) - 1 );
-  dy = ( y(2) - y(1) ) / 3;
-  h1(1) = imagesc( x + dx * [ 1 -1 ], y + dy * [ 1 -1 ], clim(1):dc:clim(2) );
+  yy = y + [ 1 -1 ] * ( y(2) - y(1) ) / 3;
+  xx = x + [ 1 -1 ] * .5 * ( x(2) - x(1) ) / ( length( cmap ) - 1 );
+  h1(1) = imagesc( xx, yy, clim(1):dc:clim(2) );
 end
 h1(2) = plot( x([1 1 2 2 1]), y([1 2 2 1 1]), 'Color', fg );
 set( h1, 'Clipping', 'off', 'HitTest', 'off' )

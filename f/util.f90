@@ -179,11 +179,11 @@ end if
 end function
 
 ! Timeseries I/O
-subroutine frio1( id, str, ft, ir )
+subroutine frio1( id, str, ft, ir, nr )
 real, intent(inout) :: ft(:)
-integer, intent(in) :: id, ir
+integer, intent(in) :: id, ir, nr
 character(*), intent(in) :: str
-integer :: i, n, i0, io
+integer :: fh, n, i0, nb, io, i
 n = size( ft )
 if ( n == 0 ) return
 i0 = ir - n
@@ -191,12 +191,13 @@ if ( i0 < 0 ) then
   write ( 0, * )  'Error in rio1 ', trim( str ), ir, n
   stop
 end if
+fh = id + 65536
 if ( modulo( i0, n ) == 0 ) then
-  inquire( iolength=i ) ft
+  inquire( iolength=nb ) ft
   if ( id < 0 .or. i0 > 0 ) then
-    open( 1, file=str, recl=i, iostat=io, form='unformatted', access='direct', status='old' )
+    open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='old' )
   else
-    open( 1, file=str, recl=i, iostat=io, form='unformatted', access='direct', status='replace' )
+    open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='replace' )
   end if
   if ( io /= 0 ) then
     if ( io /= 0 ) write( 0, * ) 'Error: opening file: ', trim( str )
@@ -204,85 +205,86 @@ if ( modulo( i0, n ) == 0 ) then
   end if
   i = i0 / n + 1
   if ( id < 0 ) then
-    read( 1, rec=i ) ft
+    read( fh, rec=i ) ft
   else
-    write( 1, rec=i ) ft
+    write( fh, rec=i ) ft
   end if
-  close( 1 )
 else
-  inquire( iolength=i ) ft(1)
+  inquire( iolength=nb ) ft(1)
   if ( id < 0 .or. i0 > 0 ) then
-    open( 1, file=str, recl=i, iostat=io, form='unformatted', access='direct', status='old' )
+    open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='old' )
   else
-    open( 1, file=str, recl=i, iostat=io, form='unformatted', access='direct', status='replace' )
+    open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='replace' )
   end if
   if ( io /= 0 ) then
     if ( io /= 0 ) write( 0, * ) 'Error: opening file: ', trim( str )
     stop
   end if
   if ( id < 0 ) then
-    do i = 1, n; read( 1, rec=i0+i ) ft(i); end do
+    do i = 1, n; read( fh, rec=i0+i ) ft(i); end do
   else
-    do i = 1, n; write( 1, rec=i0+i ) ft(i); end do
+    do i = 1, n; write( fh, rec=i0+i ) ft(i); end do
   end if
-  close( 1 )
 end if
+if ( ir == nr ) close( fh )
 end subroutine
 
 ! Scalar I/O
-subroutine frio3( id, str, s1, i1, i2, ir )
+subroutine frio3( id, str, s1, i1, i2, ir, nr )
 real, intent(inout) :: s1(:,:,:)
-integer, intent(in) :: id, i1(3), i2(3), ir
+integer, intent(in) :: id, i1(3), i2(3), ir, nr
 character(*), intent(in) :: str
-integer :: nb, io, j1, k1, l1, j2, k2, l2
+integer :: fh, nb, io, j1, k1, l1, j2, k2, l2
 if ( id == 0 .or. ir < 1 .or. any( i1 > i2 ) ) return
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
+fh = id + 65536
 inquire( iolength=nb ) s1(j1:j2,k1:k2,l1:l2)
 if ( id < 0 .or. ir > 1 ) then
-  open( 1, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='old' ) 
+  open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='old' ) 
 else
-  open( 1, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='replace' )
+  open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='replace' )
 end if
 if ( io /= 0 ) then
   if ( io /= 0 ) write( 0, * ) 'Error: opening file: ', trim( str )
   stop
 end if
 if ( id < 0 ) then
-  read(  1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
+  read(  fh, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
 else
-  write( 1, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
+  write( fh, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
 end if
-close( 1 )
+if ( ir == nr ) close( fh )
 end subroutine
 
 ! Vector I/O
-subroutine frio4( id, str, w1, ic, i1, i2, ir )
+subroutine frio4( id, str, w1, ic, i1, i2, ir, nr )
 real, intent(inout) :: w1(:,:,:,:)
-integer, intent(in) :: id, ic, i1(3), i2(3), ir
+integer, intent(in) :: id, ic, i1(3), i2(3), ir, nr
 character(*), intent(in) :: str
-integer :: nb, io, j1, k1, l1, j2, k2, l2
+integer :: fh, nb, io, j1, k1, l1, j2, k2, l2
 if ( id == 0 .or. ir < 1 .or. any( i1 > i2 ) ) return
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
+fh = id + 65536
 inquire( iolength=nb ) w1(j1:j2,k1:k2,l1:l2,ic)
 if ( id < 0 .or. ir > 1 ) then
-  open( 1, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='old' ) 
+  open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='old' ) 
 else
-  open( 1, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='replace' )
+  open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='replace' )
 end if
 if ( io /= 0 ) then
   if ( io /= 0 ) write( 0, * ) 'Error: opening file: ', trim( str )
   stop
 end if
 if ( id < 0 ) then
-  read(  1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
+  read(  fh, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
 else
-  write( 1, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
+  write( fh, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
 end if
-close( 1 )
+if ( ir == nr ) close( fh )
 end subroutine
   
 end module
