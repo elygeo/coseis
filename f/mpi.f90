@@ -386,9 +386,17 @@ n = (/ size(s1,1), size(s1,2), size(s1,3) /)
 call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
 if ( id < 0 ) then
-  call mpi_file_read_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
+  if ( mpio < 0 ) then
+    call mpi_file_read( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
+  else
+    call mpi_file_read_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
+  end if
 else
-  call mpi_file_write_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
+  if ( mpio < 0 ) then
+    call mpi_file_write( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
+  else
+    call mpi_file_write_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
+  end if
 end if
 if ( ir == nr ) then
   i = abs( id )
@@ -429,9 +437,17 @@ n = (/ size(w1,1), size(w1,2), size(w1,3) /)
 call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
 if ( id < 0 ) then
-  call mpi_file_read_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
+  if ( mpio < 0 ) then
+    call mpi_file_read( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
+  else
+    call mpi_file_read_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
+  end if
 else
-  call mpi_file_write_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
+  if ( mpio < 0 ) then
+    call mpi_file_write( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
+  else
+    call mpi_file_write_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
+  end if
 end if
 if ( ir == nr ) then
   i = abs( id )
@@ -474,7 +490,7 @@ i0 = (/ i3 - i1    , ir - 1  /)
 n  = (/ i2 - i1 + 1, nr /)
 nl = (/ i4 - i3 + 1, nr - ir + 1 /)
 ndims = 4
-do i = ndims, 1, -1 ! squeeze singleton dimentions
+do i = ndims, 1, -1
 if ( n(i) == 1 ) then
   ndims = ndims - 1
   i0(i:) = (/ i0(i+1:), 0 /)
@@ -484,17 +500,6 @@ end if
 end do
 if ( iio == 0 ) write( 0, '(a,i2,a,i8,a,i8,1x,a)' ) &
   ' Opening', ndims, 'D', nio, 'P file:', ip, trim(str)
-if ( mpio > 0 ) then ! collapes dimension if all on one proc
-  do i = 1, ndims-1
-  if ( n(i) == nl(i) ) then
-    ndims = ndims - 1
-    i0(i:) = (/ i0(i)+n(i)*i0(i+1), i0(i+2:), 0 /)
-    n(i:)  = (/ n(i)*n(i+1),        n(i+2:),  1 /)
-    nl(i:) = (/ nl(i)*nl(i+1),      nl(i+2:), 1 /)
-    exit ! only do this once to prevent 32 bit overrun
-  end if
-  end do
-end if
 if ( ndims < 1 ) ndims = 1
 call mpi_type_create_subarray( ndims, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )

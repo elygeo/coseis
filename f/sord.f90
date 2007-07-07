@@ -46,7 +46,7 @@ if ( sync ) call barrier ; if ( it == 0 ) call output( 1 ) ; prof0(15) = timer( 
 if ( sync ) call barrier ; if ( it == 0 ) call output( 2 ) ; prof0(16) = timer( 6 )
 if ( sync ) call barrier ; prof0(17) = timer( 7 )
 if ( master .and. it == 0 ) call rio1( 10, mpout, 'prof/main', prof0, 17, 19 )
-allocate( prof(4,itio) )
+allocate( prof(itio,4) )
 
 ! Main loop
 if ( master ) write( 0, * ) 'Main loop'
@@ -56,26 +56,26 @@ do while ( it < nt )
   if ( sync ) call barrier ; call timestep
   if ( sync ) call barrier ; call stress
   if ( sync ) call barrier ; call momentsource
-  if ( sync ) call barrier ; prof(1,jp) = timer( 5 )
+  if ( sync ) call barrier ; prof(jp,1) = timer( 5 )
   if ( sync ) call barrier ; call output( 1 )
-  if ( sync ) call barrier ; prof(2,jp) = timer( 5 )
+  if ( sync ) call barrier ; prof(jp,2) = timer( 5 )
   if ( sync ) call barrier ; call acceleration   
   if ( sync ) call barrier ; call fault
-  if ( sync ) call barrier ; prof(1,jp) = prof(1,jp) + timer( 5 )
+  if ( sync ) call barrier ; prof(jp,1) = prof(jp,1) + timer( 5 )
   if ( sync ) call barrier ; call vectorswaphalo( w1, nhalo )
-  if ( sync ) call barrier ; prof(3,jp) = timer( 5 )
+  if ( sync ) call barrier ; prof(jp,3) = timer( 5 )
   if ( sync ) call barrier ; call output( 2 )
   if ( modulo( it, itcheck ) == 0 ) then
     if ( sync ) call barrier ; call writecheckpoint
   end if
-  if ( sync ) call barrier ; prof(2,jp) = prof(2,jp) + timer( 5 )
-  prof(4,jp) = timer( 6 )
+  if ( sync ) call barrier ; prof(jp,2) = prof(jp,2) + timer( 5 )
+  prof(jp,4) = timer( 6 )
   if ( it == nt .or. modulo( it, itio ) == 0 ) then
     if ( master ) then
-      call rio1( 11, mpout, 'prof/comp', prof(1,:jp), it, nt )
-      call rio1( 12, mpout, 'prof/out' , prof(2,:jp), it, nt )
-      call rio1( 13, mpout, 'prof/comm', prof(3,:jp), it, nt )
-      call rio1( 14, mpout, 'prof/step', prof(4,:jp), it, nt )
+      call rio1( 11, mpout, 'prof/comp', prof(:jp,1), it, nt )
+      call rio1( 12, mpout, 'prof/out' , prof(:jp,2), it, nt )
+      call rio1( 13, mpout, 'prof/comm', prof(:jp,3), it, nt )
+      call rio1( 14, mpout, 'prof/step', prof(:jp,4), it, nt )
     end if
     jp = 0
   end if

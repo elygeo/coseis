@@ -330,7 +330,7 @@ efric = efric + dt * sum( f2 )
 t2 = uu(j3:j4,k3:k4,l3:l4,:) - uu(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( ( t0 + t3 ) * t2, 4 ) * area
 call scalarsethalo( f2, 0., i1core, i2core )
-estrain = -.5 * sum( f2 )
+estrain = .5 * sum( f2 )
 
 ! Moment
 f2 = muf * area * sqrt( sum( t2 * t2, 4 ) )

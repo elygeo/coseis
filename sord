@@ -205,8 +205,8 @@ if [ -f state-$mode ]; then
 fi
 if [ "$compile" ]; then
   rm -f state-$mode
-  echo $make
-  $make
+  echo time $make
+  time $make
   mv state state-$mode
   rm -f *.o *.mod *.ipo *.il *.stb
 fi

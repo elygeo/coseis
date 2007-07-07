@@ -7,9 +7,9 @@ x = get( gca, 'XLim' );
 y = get( gca, 'YLim' );
 x = x(1) + [ .25 .75 ] * ( x(2) - x(1) );
 y = y(1) - [ .1  .08 ] * ( y(2) - y(1) );
-if nargin >= 1, x = varargin{1}; end
-if nargin >= 2, y = varargin{2}; end
-if nargin >= 3, str = varargin{3}; end
+if nargin >= 1, str = varargin{1}; end
+if nargin >= 2, x = varargin{2}; end
+if nargin >= 3, y = varargin{3}; end
 
 % lines
 hold on

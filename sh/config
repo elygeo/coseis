@@ -22,6 +22,7 @@ xlf95_r)
   gflags='-g -O0 -C -qflttrap -qsigtrap'
   oflags='-O -C -qflttrap -qsigtrap'
   oflags='-O5'
+  oflags='-O4'
   ;;
 ifort)
   sfc='ifort -implicitnone -std95 -warn'

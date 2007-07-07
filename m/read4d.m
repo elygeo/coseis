@@ -2,7 +2,6 @@
 
 function [ f, izone ] = read4d( varargin )
 
-format compact
 meta
 f = [];
 izone = 0;

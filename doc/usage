@@ -52,11 +52,11 @@ SDSC DataStar IBM
   Useful commands:
     reslist
     showq
+    show_bf
     llsubmit batchjob
     llcancel <jobID>
     llq
     llq -s <jobID>
-    show_bf
   Login to dslogin.sdsc.edu to submit batch jobs
   Login to dspoe.sdsc.edu to run interactively
 
@@ -82,8 +82,10 @@ SDSC TeraGrid IA64 Cluster
   Always run from a subdirectory of /gpfs/
   Useful commands:
     myprojects
-    tgusage
+    reslist
     showq
+    show_bf
+    show_bf-all
     qsub batchjob
     qdel
 

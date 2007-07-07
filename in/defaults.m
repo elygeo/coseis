@@ -73,7 +73,7 @@
   np = [ 1 1 1 ];		% number of processors in j k l
   mpin = 1;			% parallel input, 0=separate files, 1=MPI-IO
   mpout = 1;			% parallel output, 0=separate files, 1=MPI-IO
-  itstats = 8;			% interval for calculating statistics
+  itstats = 10;			% interval for calculating statistics
   itio = 50;			% interval for writing i/o buffers
   itcheck = 0;			% interval for check-pointing (0=off)
   itstop = 0;			% for testing check-pointing, simulates code crash
