@@ -1,106 +1,148 @@
-% SORD stats
+% Plot SORD statistics
 
-clear all
-tlim = [ 0 60 ];
-
-format compact
+function stats( varargin )
 meta
 currentstep
-set( 0, 'ScreenPixelsPerInch', 100 )
+tlim = [ 0 it*dt ];
+if nargin > 0, tlim = varargin{1}; end
 
-figure(5)
-clf
-subplot(2,1,1)
-f = diff( readf32( 'stats/moment' ) ) / dt;
-t = ( 1:length(f) ) * dt * itstats;
-plot( tlim, [ 0 0 ], 'k--', 'HandleVisibility', 'off' )
-hold on
-plot( t, 1e-18 * f, 'k' )
-xlim( tlim )
-ylim( [ -20 120 ] )
-set( gca, 'XTickLabel', [] )
-ylabel( 'Moment Rate (EN m/s)' )
-legend( { 'Moment Rate' } )
-subplot(2,1,2)
-f      = -diff( readf32( 'stats/estrain' ) ) / dt;
-f(:,2) =  diff( readf32( 'stats/efric' ) ) / dt; 
-f(:,3) = 2 * ( f(:,1) - f(:,2) );
-plot( tlim, [ 0 0 ], 'k--', 'HandleVisibility', 'off' )
-hold on
-plot( t, 1e-15 * f )
-xlim( tlim )
-ylim( [ -10 60 ] )
-xlabel( 'Time (s)' )
-ylabel( 'Power (PW)' )
-legend( { 'Strain Power' 'Frictional Power' 'Radiated Power (x2)' } )
-print -depsc energy
-!sed 's|/DA { \[6|/DA { \[1|' energy.eps > tmp.eps
-!ps2pdf14 -dPDFSETTINGS=/prepress -dEPSCrop tmp.eps energy.pdf
-return
-
-figure(1); clf
-f(:,1) = readf32( 'prof/step' );
-f(:,2) = readf32( 'prof/comp' );
-f(:,3) = readf32( 'prof/comm' );
-f(:,4) = readf32( 'prof/out' );
-plot( f, '.' )
-xlabel( 'Step' )
-ylabel( 'Run Time (s)' )
-legend( { 'Total' 'Computation' 'Communication' 'Output' } )
-
-t = ( 1:floor(it/itstats) ) * dt * itstats;
+f = readf32( 'prof/step' );
+if ~isempty( f )
+  figure(1); clf
+  pos = get( gcf, 'Pos' );
+  set( gcf, ...
+    'InvertHardcopy', 'off', ...
+    'Color', 'w', ...
+    'PaperPositionMode', 'auto', ...
+    'Pos', [ pos(1:2) 640 640 ] )
+  axes( 'Pos', [ .1 .1 .84 .84 ] )
+  plot( f, '.k' );
+  hold on
+  f = readf32( 'prof/comp' ); plot( f, '.b' )
+  f = readf32( 'prof/comm' ); plot( f, '.g' )
+  f = readf32( 'prof/out'  ); plot( f, '.r' )
+  xlim( [ 0 length(f) ] )
+  title( 'Timing Profile' )
+  xlabel( 'Step' )
+  ylabel( 'Run Time (s)' )
+  legend( { 'Total' 'Computation' 'Communication' 'Output' }, 'Location', 'NorthWest' )
+  legend boxoff
+  printpdf( 'prof' )
+end
 
 figure(2); clf
-subplot(3,1,1)
+pos = get( gcf, 'Pos' );
+set( gcf, ...
+  'InvertHardcopy', 'off', ...
+  'Color', 'w', ...
+  'PaperPositionMode', 'auto', ...
+  'Pos', [ pos(1:2) 640 640 ] )
+axes( 'Pos', [ .1 .68 .84 .26 ] )
 f = readf32( 'stats/umax' );
-plot( t, f )
+t = ( 1:length(f) ) * dt * itstats;
+plot( t, f, 'k' )
 xlim( tlim )
-set( gca, 'XTickLabel', [] )
+ptitle( 'Max Displacement' )
 ylabel( 'u (m)' )
-subplot(3,1,2)
-f = readf32( 'stats/vmax' );
-plot( t, f )
-xlim( tlim )
 set( gca, 'XTickLabel', [] )
-ylabel( 'u'' (m/s)' )
-subplot(3,1,3)
-f = readf32( 'stats/amax' );
-plot( t, f )
+axes( 'Pos', [ .1 .39 .84 .26 ] )
+f = readf32( 'stats/vmax' );
+plot( t, f, 'k' )
 xlim( tlim )
+ptitle( 'Max Velocity', 'r' )
+ylabel( 'u'' (m/s)' )
+set( gca, 'XTickLabel', [] )
+axes( 'Pos', [ .1 .1 .84 .26 ] )
+f = readf32( 'stats/amax' );
+plot( t, f, 'k' )
+xlim( tlim )
+ptitle( 'Max Acceleration', 'r' )
 xlabel( 'Time (s)' )
 ylabel( 'u'''' (m/s^2)' )
+printpdf( 'disp' )
 
 if faultnormal
 
 figure(3); clf
-f      = readf32( 'stats/tnmin' );
-f(:,2) = readf32( 'stats/tnmax' );
-f(:,3) = readf32( 'stats/tsmax' );
-plot( t, 1e-6 * f )
+pos = get( gcf, 'Pos' );
+set( gcf, ...
+  'InvertHardcopy', 'off', ...
+  'Color', 'w', ...
+  'PaperPositionMode', 'auto', ...
+  'Pos', [ pos(1:2) 640 640 ] )
+axes( 'Pos', [ .1 .68 .84 .26 ] )
+f = readf32( 'stats/sumax' );
+t = ( 1:length(f) ) * dt * itstats;
+plot( t, f, 'k' )
+xlim( tlim )
+ptitle( 'Max Slip' )
+ylabel( 's (m)' )
+set( gca, 'XTickLabel', [] )
+axes( 'Pos', [ .1 .39 .84 .26 ] )
+f = readf32( 'stats/svmax' );
+plot( t, f, 'k' )
+xlim( tlim )
+ptitle( 'Max Slip Rate', 'r' )
+ylabel( 's'' (m/s)' )
+set( gca, 'XTickLabel', [] )
+axes( 'Pos', [ .1 .1 .84 .26 ] )
+f = readf32( 'stats/samax' );
+plot( t, f, 'k' )
+xlim( tlim )
+ptitle( 'Max Slip Acceleration', 'r' )
+xlabel( 'Time (s)' )
+ylabel( 's'''' (m/s^2)' )
+printpdf( 'slip' )
+
+figure(4); clf
+pos = get( gcf, 'Pos' );
+set( gcf, ...
+  'InvertHardcopy', 'off', ...
+  'Color', 'w', ...
+  'PaperPositionMode', 'auto', ...
+  'Pos', [ pos(1:2) 640 640 ] )
+axes( 'Pos', [ .1 .1 .84 .84 ] )
+plot( tlim, [ 0 0 ], 'k--', 'HandleVisibility', 'off' ), hold on
+f = readf32( 'stats/tsmax' ); plot( t, 1e-6 * f, 'k' )
+f = readf32( 'stats/tnmax' ); plot( t, 1e-6 * f, 'r' )
+f = readf32( 'stats/tnmin' ); plot( t, 1e-6 * f, 'b' )
 xlim( tlim )
 xlabel( 'Time (s)' )
 ylabel( 'Stress (MPa)' )
-legend( { 'Min \sigma_n' 'Max \sigma_n' 'Max \tau_s' } )
+legend( { 'Max |\tau_s|' 'Max \sigma_n' 'Min \sigma_n' }, 'Location', 'NorthWest' )
+legend boxoff
+printpdf( 'stress' )
 
-figure(4); clf
-subplot(3,1,1)
-f = readf32( 'stats/sumax' );
-plot( t, f )
+figure(5); clf
+pos = get( gcf, 'Pos' );
+set( gcf, ...
+  'InvertHardcopy', 'off', ...
+  'Color', 'w', ...
+  'PaperPositionMode', 'auto', ...
+  'Pos', [ pos(1:2) 640 320 ] )
+axes( 'Pos', [ .1 .2 .84 .68 ] )
+f = diff( readf32( 'stats/moment' ) ) / dt;
+t = ( 1:length(f) ) * dt * itstats;
+plot( t, 1e-18 * f, 'k' ); hold on
+plot( t(1), 1e-18 * f(1), 'k--' )
 xlim( tlim )
-set( gca, 'XTickLabel', [] )
-ylabel( 's (m)' )
-subplot(3,1,2)
-f = readf32( 'stats/svmax' );
-plot( t, f )
-xlim( tlim )
-set( gca, 'XTickLabel', [] )
-ylabel( 's'' (m/s)' )
-subplot(3,1,3)
-f = readf32( 'stats/samax' );
-plot( t, f )
-xlim( tlim )
+y = ylim;
+ylim( [ 0 y(2) ] )
 xlabel( 'Time (s)' )
-ylabel( 's'''' (m/s^2)' )
+ylabel( 'Moment Rate (EN m/s)' )
+legend( { 'Moment Rate' 'Dissipated Power' } )
+legend boxoff
+box off
+axes( 'Pos', [ .1 .2 .84 .68 ] )
+f = diff( readf32( 'stats/efric' ) ) / dt;
+plot( t, 1e-15 * f, 'k--' )
+xlim( tlim )
+y = ylim;
+ylim( [ 0 y(2) ] )
+ylabel( 'Power (PW)' )
+set( gca, 'XAxisLoc', 'top', 'YAxisLoc', 'right', 'XTickLabel', [], 'Color', 'none' )
+box off
+printpdf( 'energy' )
 
 end
 

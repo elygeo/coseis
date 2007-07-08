@@ -1,4 +1,0 @@
-#!/bin/bash -ev
-
-ssh phim.ucsd.edu ssh babieca.sdsu.edu 'bin/stats sord/run/01/stats/*'
-ssh phim.ucsd.edu ssh babieca.sdsu.edu 'bin/stats sord/run/01/prof/*'

@@ -1,4 +1,0 @@
-#!/bin/bash -ev
-file="${1:?}"
-hsi g - : "${file%/}.tar" | tar xf -
-

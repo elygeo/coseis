@@ -1,6 +1,0 @@
-#!/bin/bash -e
-
-/bin/rm -rf vm checkpoint input sord-s sord-p
-for file in *; do [ -s "$file" ] || rm "$file"; done
-rmdir * 2> /dev/null
-

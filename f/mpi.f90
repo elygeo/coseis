@@ -15,6 +15,7 @@ integer :: ip0, e
 call mpi_init( e )
 call mpi_comm_size( mpi_comm_world, np0, e  )
 call mpi_comm_rank( mpi_comm_world, ip0, e  )
+ip = ip0
 master = .false.
 if ( ip0 == 0 ) master = .true.
 end subroutine
@@ -327,7 +328,7 @@ if ( fh == mpi_undefined ) then
   if ( id < 0 ) then
     i = mpi_mode_rdonly
   elseif ( ir == n ) then
-    i = mpi_mode_wronly + mpi_mode_create
+    i = mpi_mode_wronly + mpi_mode_create + mpi_mode_excl
   else
     i = mpi_mode_wronly
   end if
@@ -480,7 +481,7 @@ call mpi_comm_size( comm, nio, e  )
 if ( id < 0 ) then
   i = mpi_mode_rdonly
 elseif ( ir == 1 ) then
-  i = mpi_mode_wronly + mpi_mode_create
+  i = mpi_mode_wronly + mpi_mode_create + mpi_mode_excl
 else
   i = mpi_mode_wronly
 end if

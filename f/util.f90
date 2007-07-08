@@ -197,7 +197,7 @@ if ( modulo( i0, n ) == 0 ) then
   if ( id < 0 .or. i0 > 0 ) then
     open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='old' )
   else
-    open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='replace' )
+    open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='new' )
   end if
   if ( io /= 0 ) then
     if ( io /= 0 ) write( 0, * ) 'Error: opening file: ', trim( str )
@@ -214,7 +214,7 @@ else
   if ( id < 0 .or. i0 > 0 ) then
     open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='old' )
   else
-    open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='replace' )
+    open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='new' )
   end if
   if ( io /= 0 ) then
     if ( io /= 0 ) write( 0, * ) 'Error: opening file: ', trim( str )
@@ -244,7 +244,7 @@ inquire( iolength=nb ) s1(j1:j2,k1:k2,l1:l2)
 if ( id < 0 .or. ir > 1 ) then
   open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='old' ) 
 else
-  open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='replace' )
+  open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='new' )
 end if
 if ( io /= 0 ) then
   if ( io /= 0 ) write( 0, * ) 'Error: opening file: ', trim( str )
@@ -273,7 +273,7 @@ inquire( iolength=nb ) w1(j1:j2,k1:k2,l1:l2,ic)
 if ( id < 0 .or. ir > 1 ) then
   open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='old' ) 
 else
-  open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='replace' )
+  open( fh, file=str, recl=nb, iostat=io, form='unformatted', access='direct', status='new' )
 end if
 if ( io /= 0 ) then
   if ( io /= 0 ) write( 0, * ) 'Error: opening file: ', trim( str )

@@ -1,3 +1,0 @@
-#!/bin/bash -v
-./sord -n in/test/bc-test.m && vim in.m && ./sord -igd && vim in.m && ./sord -ig && vim run/02/fort.*
-

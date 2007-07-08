@@ -1,5 +1,0 @@
-#!/bin/bash -e
-
-sh/remote 1
-ssh phim.ucsd.edu 'cd sord; sh/remote'
-
