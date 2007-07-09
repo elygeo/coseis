@@ -2,59 +2,75 @@
 
 function stats( varargin )
 meta
+runmeta
 currentstep
 tlim = [ 0 it*dt ];
-if nargin > 0, tlim = varargin{1}; end
+cs = 'w0';
+for i = 1:nargin
+  arg = varargin{i};
+  if ischar( arg )
+    cs = arg;
+  else
+    tlim = arg;
+  end
+end
+set( 0, 'ScreenPixelsPerInch', 150 )
 
-f = readf32( 'prof/step' );
+f = readf32( 'prof/comp' );
 if ~isempty( f )
+  g = -f + readf32( 'prof/step' );
   figure(1); clf
+  colorscheme( cs )
   pos = get( gcf, 'Pos' );
-  set( gcf, ...
-    'InvertHardcopy', 'off', ...
-    'Color', 'w', ...
-    'PaperPositionMode', 'auto', ...
-    'Pos', [ pos(1:2) 640 640 ] )
-  axes( 'Pos', [ .1 .1 .84 .84 ] )
-  plot( f, '.k' );
-  hold on
-  f = readf32( 'prof/comp' ); plot( f, '.b' )
-  f = readf32( 'prof/comm' ); plot( f, '.g' )
-  f = readf32( 'prof/out'  ); plot( f, '.r' )
-  xlim( [ 0 length(f) ] )
-  title( 'Timing Profile' )
-  xlabel( 'Step' )
-  ylabel( 'Run Time (s)' )
-  legend( { 'Total' 'Computation' 'Communication' 'Output' }, 'Location', 'NorthWest' )
+  set( gcf, 'PaperPositionMode', 'auto', 'Pos', [ pos(1:2) 640 640 ] )
+  axes( 'Pos', [ .13 .57 .84 .4 ] )
+  %plot( sqrt( f ), '.', 'MarkerE', [ 0 0 .5 ] ), hold on
+  %plot( sqrt( g ), '.', 'MarkerE', [ .5 0 0 ] )
+  plot( f, '.', 'MarkerE', [ 0 0 .5 ] ), hold on
+  plot( g, '.', 'MarkerE', [ .5 0 0 ] )
+  xlim( tlim ./ dt )
+  ptitle( [ 'NP=' num2str( prod( np ) ) ] )
+  ylabel( 'Step Time (s)' )
+  set( gca, 'XTickLabel', [] )
+  legend( { 'Computation' 'Overhead' }, 'Location', 'North' )
   legend boxoff
+  f = cumsum( f ) / 3600;
+  g = cumsum( g ) / 3600;
+  axes( 'Pos', [ .13 .13 .84 .4 ] )
+  area( [ f g ] )
+  xlim( tlim ./ dt )
+  ptitle( [ 'NP=' num2str( prod( np ) ) ] )
+  xlabel( 'Step' )
+  ylabel( 'Cumulative Run Time (hr)' )
+  legend( { 'Computation' 'Overhead' }, 'Location', 'North' )
+  legend boxoff
+  colormap jet
   printpdf( 'prof' )
 end
 
 figure(2); clf
+colorscheme( cs )
 pos = get( gcf, 'Pos' );
-set( gcf, ...
-  'InvertHardcopy', 'off', ...
-  'Color', 'w', ...
-  'PaperPositionMode', 'auto', ...
-  'Pos', [ pos(1:2) 640 640 ] )
-axes( 'Pos', [ .1 .68 .84 .26 ] )
+set( gcf, 'PaperPositionMode', 'auto', 'Pos', [ pos(1:2) 640 640 ] )
+set( gcf, 'DefaultLineLinewidth', 1 )
+axes( 'Pos', [ .13 .71 .84 .26 ] )
 f = readf32( 'stats/umax' );
 t = ( 1:length(f) ) * dt * itstats;
-plot( t, f, 'k' )
+plot( t, f )
 xlim( tlim )
 ptitle( 'Max Displacement' )
 ylabel( 'u (m)' )
 set( gca, 'XTickLabel', [] )
-axes( 'Pos', [ .1 .39 .84 .26 ] )
+axes( 'Pos', [ .13 .42 .84 .26 ] )
 f = readf32( 'stats/vmax' );
-plot( t, f, 'k' )
+plot( t, f )
 xlim( tlim )
 ptitle( 'Max Velocity', 'r' )
 ylabel( 'u'' (m/s)' )
 set( gca, 'XTickLabel', [] )
-axes( 'Pos', [ .1 .1 .84 .26 ] )
+axes( 'Pos', [ .13 .13 .84 .26 ] )
 f = readf32( 'stats/amax' );
-plot( t, f, 'k' )
+plot( t, f )
 xlim( tlim )
 ptitle( 'Max Acceleration', 'r' )
 xlabel( 'Time (s)' )
@@ -64,30 +80,28 @@ printpdf( 'disp' )
 if faultnormal
 
 figure(3); clf
+colorscheme( cs )
 pos = get( gcf, 'Pos' );
-set( gcf, ...
-  'InvertHardcopy', 'off', ...
-  'Color', 'w', ...
-  'PaperPositionMode', 'auto', ...
-  'Pos', [ pos(1:2) 640 640 ] )
-axes( 'Pos', [ .1 .68 .84 .26 ] )
+set( gcf, 'PaperPositionMode', 'auto', 'Pos', [ pos(1:2) 640 640 ] )
+set( gcf, 'DefaultLineLinewidth', 1 )
+axes( 'Pos', [ .13 .71 .84 .26 ] )
 f = readf32( 'stats/sumax' );
 t = ( 1:length(f) ) * dt * itstats;
-plot( t, f, 'k' )
+plot( t, f )
 xlim( tlim )
 ptitle( 'Max Slip' )
 ylabel( 's (m)' )
 set( gca, 'XTickLabel', [] )
-axes( 'Pos', [ .1 .39 .84 .26 ] )
+axes( 'Pos', [ .13 .42 .84 .26 ] )
 f = readf32( 'stats/svmax' );
-plot( t, f, 'k' )
+plot( t, f )
 xlim( tlim )
 ptitle( 'Max Slip Rate', 'r' )
 ylabel( 's'' (m/s)' )
 set( gca, 'XTickLabel', [] )
-axes( 'Pos', [ .1 .1 .84 .26 ] )
+axes( 'Pos', [ .13 .13 .84 .26 ] )
 f = readf32( 'stats/samax' );
-plot( t, f, 'k' )
+plot( t, f )
 xlim( tlim )
 ptitle( 'Max Slip Acceleration', 'r' )
 xlabel( 'Time (s)' )
@@ -95,15 +109,13 @@ ylabel( 's'''' (m/s^2)' )
 printpdf( 'slip' )
 
 figure(4); clf
+colorscheme( cs )
 pos = get( gcf, 'Pos' );
-set( gcf, ...
-  'InvertHardcopy', 'off', ...
-  'Color', 'w', ...
-  'PaperPositionMode', 'auto', ...
-  'Pos', [ pos(1:2) 640 640 ] )
-axes( 'Pos', [ .1 .1 .84 .84 ] )
-plot( tlim, [ 0 0 ], 'k--', 'HandleVisibility', 'off' ), hold on
-f = readf32( 'stats/tsmax' ); plot( t, 1e-6 * f, 'k' )
+set( gcf, 'PaperPositionMode', 'auto', 'Pos', [ pos(1:2) 640 640 ] )
+set( gcf, 'DefaultLineLinewidth', 1 )
+axes( 'Pos', [ .13 .13 .84 .84 ] )
+plot( tlim, [ 0 0 ], '--', 'HandleVisibility', 'off' ), hold on
+f = readf32( 'stats/tsmax' ); plot( t, 1e-6 * f )
 f = readf32( 'stats/tnmax' ); plot( t, 1e-6 * f, 'r' )
 f = readf32( 'stats/tnmin' ); plot( t, 1e-6 * f, 'b' )
 xlim( tlim )
@@ -114,34 +126,27 @@ legend boxoff
 printpdf( 'stress' )
 
 figure(5); clf
+colorscheme( cs )
 pos = get( gcf, 'Pos' );
-set( gcf, ...
-  'InvertHardcopy', 'off', ...
-  'Color', 'w', ...
-  'PaperPositionMode', 'auto', ...
-  'Pos', [ pos(1:2) 640 320 ] )
-axes( 'Pos', [ .1 .2 .84 .68 ] )
+set( gcf, 'PaperPositionMode', 'auto', 'Pos', [ pos(1:2) 640 640 ] )
+set( gcf, 'DefaultLineLinewidth', 1 )
+axes( 'Pos', [ .13 .57 .84 .4 ] )
 f = diff( readf32( 'stats/moment' ) ) / dt;
 t = ( 1:length(f) ) * dt * itstats;
-plot( t, 1e-18 * f, 'k' ); hold on
-plot( t(1), 1e-18 * f(1), 'k--' )
+plot( t, 1e-18 * f )
 xlim( tlim )
-y = ylim;
-ylim( [ 0 y(2) ] )
-xlabel( 'Time (s)' )
-ylabel( 'Moment Rate (EN m/s)' )
-legend( { 'Moment Rate' 'Dissipated Power' } )
-legend boxoff
-box off
-axes( 'Pos', [ .1 .2 .84 .68 ] )
+y = ylim; ylim( [ 0 y(2) ] )
+ptitle( 'Moment Rate', 'r' )
+ylabel( 'EN-m/s' )
+set( gca, 'XTickLabel', [] )
+axes( 'Pos', [ .13 .13 .84 .4 ] )
 f = diff( readf32( 'stats/efric' ) ) / dt;
-plot( t, 1e-15 * f, 'k--' )
+plot( t, 1e-15 * f )
 xlim( tlim )
-y = ylim;
-ylim( [ 0 y(2) ] )
+y = ylim; ylim( [ 0 y(2) ] )
+ptitle( 'Dissipated Power', 'r' )
+xlabel( 'Time (s)' )
 ylabel( 'Power (PW)' )
-set( gca, 'XAxisLoc', 'top', 'YAxisLoc', 'right', 'XTickLabel', [], 'Color', 'none' )
-box off
 printpdf( 'energy' )
 
 end

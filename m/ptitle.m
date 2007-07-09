@@ -16,4 +16,5 @@ case 'r', h = text( x(2) - dx, y(2) - dy, str, 'Hor', 'right' );
 end
 set( h, 'Ver', 'top', 'Clipping', 'off', 'HitTest', 'off' )
 if nargout == 0, clear h, end
+axis manual
 

@@ -335,7 +335,7 @@ if ( fh == mpi_undefined ) then
   i0 = ir - n
   ng = nr
   nl = nr - ir + n
-  write( 0, '(a,i8,1x,a)' ) ' Opening 1D buffered file:', ip, trim(str)
+  write( 0, '(i8,2a)' ) ip, ' Opening 1D buffered file: ', trim(str)
   call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
   call mpi_file_open( mpi_comm_self, str, i, mpi_info_null, fh, e )
   call mpi_type_create_subarray( 1, ng, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
@@ -499,8 +499,8 @@ if ( n(i) == 1 ) then
   nl(i:) = (/ nl(i+1:), 1 /)
 end if
 end do
-if ( iio == 0 ) write( 0, '(a,i2,a,i8,a,i8,1x,a)' ) &
-  ' Opening', ndims, 'D', nio, 'P file:', ip, trim(str)
+if ( iio == 0 ) write( 0, '(i8,a,i2,a,i8,2a)' ) &
+  ip, ' Opening', ndims, 'D', nio, 'P file: ', trim(str)
 if ( ndims < 1 ) ndims = 1
 call mpi_type_create_subarray( ndims, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
