@@ -24,16 +24,16 @@ if ~isempty( f )
   pos = get( gcf, 'Pos' );
   set( gcf, 'PaperPositionMode', 'auto', 'Pos', [ pos(1:2) 640 640 ] )
   axes( 'Pos', [ .13 .57 .84 .4 ] )
-  %plot( sqrt( f ), '.', 'MarkerE', [ 0 0 .5 ] ), hold on
-  %plot( sqrt( g ), '.', 'MarkerE', [ .5 0 0 ] )
-  plot( f, '.', 'MarkerE', [ 0 0 .5 ] ), hold on
-  plot( g, '.', 'MarkerE', [ .5 0 0 ] )
+  plot( sqrt( f ), '.', 'MarkerE', [ 0 0 .5 ] ), hold on
+  plot( sqrt( g ), '.', 'MarkerE', [ .5 0 0 ] )
+  y = get( gca, 'YTick' );
+  set( gca, 'YTickLabel', y .* y, 'YTickMode', 'manual' )
   xlim( tlim ./ dt )
   ptitle( [ 'NP=' num2str( prod( np ) ) ] )
   ylabel( 'Step Time (s)' )
   set( gca, 'XTickLabel', [] )
   legend( { 'Computation' 'Overhead' }, 'Location', 'North' )
-  legend boxoff
+% legend boxoff
   f = cumsum( f ) / 3600;
   g = cumsum( g ) / 3600;
   axes( 'Pos', [ .13 .13 .84 .4 ] )
@@ -43,7 +43,7 @@ if ~isempty( f )
   xlabel( 'Step' )
   ylabel( 'Cumulative Run Time (hr)' )
   legend( { 'Computation' 'Overhead' }, 'Location', 'North' )
-  legend boxoff
+% legend boxoff
   colormap jet
   printpdf( 'prof' )
 end

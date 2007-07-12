@@ -17,24 +17,34 @@ pfc='mpif90'
 getarg=''
 case $sfc in
 xlf95_r)
+  getarg='getarg.f'
   sfc='xlf95_r -q64 -qsuppress=cmpmsg -qfixed'
   pfc='mpxlf95_r -q64 -qsuppress=cmpmsg -qfixed'
-  gflags='-p -g -C -qflttrap -qsigtrap'
+  flags='-g -C -qflttrap -qsigtrap'
+  flags='-O -C'
   ;;
 ifort)
-  gflags='-O0 -p -g -CB -warn -traceback -u'
+  flags='-warn -u -O0 -CB -traceback'
+  flags='-warn -O -CB -traceback'
   ;;
 pgf90)
+  getarg='getarg-pgf.f'
   sfc='pgf90'
-  gflags='-O0 -g -Ktrap=fp -Mbounds'
-  getarg='getarg-pgf.f90'
+  flags='-O -Ktrap=fp -Mbounds'
   ;;
 gfortran)
-  gflags='-O0 -p -g -W -pedantic -std=legacy -fbounds-check'
+  flags='-Wall -O -g -pg'
+  flags='-Wall -O -g -pedantic -std=legacy -fbounds-check'
+  flags='-Wall -O -fbounds-check'
   ;;
 f95)
-  gflags='-g'
-  [ $( uname ) = SunOS ] && gflags='-g -w4 -u -C'
+  flags='-g'
+  flags=''
+  if [ $( uname ) = SunOS ]; then
+    getarg='getarg.f'
+    flags='-g -w4 -u -C'
+    flags='-w4 -O -C'
+  fi
   ;;
 *)
   echo "Error: no Fortran 95 compiler found"
@@ -43,6 +53,7 @@ esac
 
 files="
   $getarg
+  xsec.f
   newin.h
   scecvm4.f
   iobin.f
@@ -58,7 +69,7 @@ for file in $files; do
   ln -s "$srcdir/$file" &> /dev/null || :
 done
 cat $files > state
-echo "$sfc $pfc" >> state
+echo "$sfc $pfc $flags" >> state
 
 compile=yes
 if [ -f state-vm ]; then
@@ -69,8 +80,9 @@ if [ "$compile" ]; then
   echo "Compiling SCECVM"
   rm -f state-vm
   $tar xzf "$srcdir/../data/scecvm4.tgz"
-  make="$sfc $getarg iobin.f scecvm4.f -o scecvm4-s"; echo "$make"; $make
-  make="$pfc $getarg iompi.f scecvm4.f -o scecvm4-p"; echo "$make"; $make
+  make="$sfc -O xsec.f -o xsec"; echo $make; $make
+  make="$sfc $flags $getarg iobin.f scecvm4.f -o scecvm4-s"; echo $make; $make
+  make="$pfc $flags $getarg iompi.f scecvm4.f -o scecvm4-p"; echo $make; $make
   sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
   rm -f *.o *.f *.h
   mv state state-vm

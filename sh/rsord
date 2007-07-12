@@ -1,0 +1,34 @@
+#!/bin/bash -e
+# SORD remote install & execution
+
+account="${1:?}"
+shift 1
+
+# Install files
+files="\
+  email
+  doc
+  sord
+  in.m
+  in
+  sh
+  g
+  f
+  m
+  util
+  scecvm4
+  data"
+rfiles=$( echo "$files" | sed '/^$/d; s|^ *|sord/|g' )
+files=$( echo $files )
+rfiles=$( echo $rfiles )
+op="rsync -av --delete $files $account:sord"
+echo $op
+$op
+
+# Execute command
+if [ -n "$1" ]; then
+   op="ssh -t $account cd sord; $*"
+   echo $op
+   $op
+fi
+

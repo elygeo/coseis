@@ -3,8 +3,8 @@
   datadir = 'ts/1000/data'; itio = 100; itcheck = 0;
   nt = 3000;
   nt = 1500;
-  np = [ 1 1 2 ];
   np = [ 1 8 4 ];
+  np = [ 1 1 2 ];
 
 
   grid  = 'read';

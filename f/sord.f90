@@ -79,10 +79,7 @@ do while ( it < nt )
     end if
     jp = 0
   end if
-  if ( it == itstop ) then
-    if ( master ) write( 0, * ) 'Killing job'
-    stop
-  end if
+  if ( master .and. it == itstop ) stop
 end do
 
 ! Finish up

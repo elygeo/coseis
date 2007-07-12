@@ -10,6 +10,7 @@ flags=$oflags
 files="
   $getarg
   asc2flt.f90
+  flt2asc.f90
   swab.f90
   stats.f90
   drape.f90
@@ -41,6 +42,7 @@ if [ "$compile" ]; then
   echo "Compiling SORD utilities"
   rm -f state-util
   $sfc $flags $getarg asc2flt.f90 -o asc2flt
+  $sfc $flags $getarg flt2asc.f90 -o flt2asc
   $sfc $flags $getarg swab.f90 -o swab
   $sfc $flags $getarg stats.f90 -o stats
   $sfc $flags drape.f90 -o drape

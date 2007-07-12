@@ -39,13 +39,37 @@ c
          include 'surfaced.h'
          include 'genpro.h'
          include 'genprod.h'
-         inct = 0
-         incto = 0
-         do i = 1,isurmx
-           iiiold(i) = 0
-           inorold(i) = 0
-           rsuqold(i) = 0.
-         end do
+
+c initialize to zero, add by Ely
+      inct = 0
+      incto = 0
+      do i = 1,isurmx
+        iiiold(i) = 0
+        inorold(i) = 0
+        rsuqold(i) = 0.
+      end do
+      iupm = 0
+      idnm = 0
+      rshcor = 0.
+      rtemp01 = 0.
+      rtemp05 = 0.
+      rtemp07 = 0.
+      rtemp22 = 0.
+      rtemp36 = 0.
+      rtemp47 = 0.
+      rtemp50 = 0.
+      rtemp55 = 0.
+      rtemp56 = 0.
+      rtemp57 = 0.
+      rtemp62 = 0.
+      rtemp63 = 0.
+      rtemp64 = 0.
+      rtemp65 = 0.
+      rtemp68 = 0.
+      rtemp69 = 0.
+      rtemp70 = 0.
+      rtemp73 = 0.
+
 c some constants
          rd2rad=3.141593/180.
          rckval=5000000.
@@ -549,7 +573,7 @@ c check for LAB and SMM and SAN BERDO ---99 is a flag---
 c diag      write(*,*)l0,iup,idn
             go to 1177
             endif
-1188       iup=idn
+           iup=idn
            iupm=idnm
            ishal=idn
            goto 1177
@@ -1074,7 +1098,7 @@ c convert thousands of feet to feet---------------
 c--gets uplift for LAB---------------
 c find uplift amount at current lat long
         include 'labup.h'
-877        do 817 l7=1,nlaup-1
+           do 817 l7=1,nlaup-1
            if(rlatl0.le.rlaup(l7).and.rlatl0.gt.rlaup(l7+1))then
             do 828 l8=1,nloup-1 
             if(rlonl0.gt.rloup(l8).and.rlonl0.le.rloup(l8+1))then
@@ -1267,6 +1291,11 @@ c        do 6009 i9=1,numsiv
 c---find valid surfaces-------------------
          rd2rad=3.141593/180.
          i9=1
+      do i = 1, numsiv
+        rsuqiv(i) = 0.
+      end do
+
+         
          do 8139 l3=1,nlasiv(i9)-1
       if(rla.le.rlasiv(i9,l3).and.rla.gt.rlasiv(i9,l3+1))then
          do 8249 l4=1,nlosiv(i9)-1
@@ -1319,7 +1348,7 @@ c over metaseds
 c
 1181      betm=alp/(sqrt(2.))
 c -- all done
-1182      return
+          return
           end
 
           subroutine makereg(rla,rlo,rde,alp,bet,iregfl)
@@ -1327,6 +1356,8 @@ c -- define the regional tomo velocities -----------------------
          include 'regional.h'
          include 'regionald.h'
          dimension vervep(4),verves(4)
+         rscal = 0.
+         iinum = 0
          rd2rad=3.141593/180.
          alp = 0.
          bet = 0.
@@ -1506,7 +1537,7 @@ c Do the interpolation
       return
       end
 
-         subroutine readbore(kerr) 
+         subroutine readbore(k2err) 
 c--read geotech borehole data-------------- 
          include 'borehole.h'
          character*9 fileib
@@ -1545,7 +1576,7 @@ c read file
 2915      return
            end
 
-         subroutine readgene(kerr)
+         subroutine readgene(k2err)
 c--read generic borehole profiles--------------
          include 'genpro.h'
          character*12 fileig,ag1*50
@@ -1628,6 +1659,7 @@ c--looks up soil type---------------------------
         dimension inindex(inct)
         dimension rdelz(nx,ny)
         rdmi2=40.
+        iteisb = 0
 c
         icolnm=abs(int((rlonmax-rlonl0)/rdelx))
         irownm=int((rlatmax-rlatl0)/rdely)
@@ -1742,12 +1774,13 @@ c chino - berdo need to split this!
          return
         end
 
-        subroutine readsoil(kerr)
+        subroutine readsoil(k2err)
 c--reads soil type info---------------------------------
 c Reads a modified .pgm ascii file
         include 'soil1.h'
         character*50 filesb
 c here's input file name-----------------------------------
+        k2err=0
         filesb='soil.pgm'
         open(16,file=filesb,status='old',err=5977)
         read(16,*)rlonmax,rlonmin,rlatmax,rlatmin
@@ -1779,6 +1812,9 @@ c iradcts=number of nearby boreholes with data
          include 'genpro.h'
          include 'wtbh1.h'
          include 'wtbh2.h'
+         roff = 0.
+         rvte3 = 0.
+         rvte8 = 0.
          ihtfg=0
          rtvelges=0.
          rdep=rdep2

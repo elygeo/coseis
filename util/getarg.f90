@@ -1,6 +1,7 @@
 ! Command line arguments
 
 integer function command_argument_count()
+integer :: iargc
 command_argument_count = iargc()
 end function
 

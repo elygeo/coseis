@@ -3,6 +3,7 @@
 function [ f, izone ] = read4d( varargin )
 
 meta
+currentstep
 f = [];
 izone = 0;
 if ( isnumeric( varargin{1} ) )
@@ -18,11 +19,12 @@ else
   end
 end
 if ~izone, return, end
-n = [ nn nt ];
 nc  = out{izone}{1};
 dit = out{izone}{3};
 i1 = [ out{izone}{4:7} ];
 i2 = [ out{izone}{8:11} ];
+n = [ nn i1(4) + dit * floor( ( it - i1(4) ) / dit ) ];
+i2(4) = min( i2(4), n(4) );
 i3 = i1;
 i4 = i2;
 if dit == 0

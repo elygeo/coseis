@@ -12,14 +12,15 @@
          print *, 'Error: nn greater than ibig', nn , ibig
          stop
       end if
+      inquire( iolength=nio ) rlon(1:nn)
       call get_command_argument( 2, str )
-      open( 1, file=str, recl=4*nn, form='unformatted', access='direct',
+      open( 1, file=str, recl=nio, form='unformatted', access='direct',
      $  status='old' )
       call get_command_argument( 3, str )
-      open( 2, file=str, recl=4*nn, form='unformatted', access='direct',
+      open( 2, file=str, recl=nio, form='unformatted', access='direct',
      $  status='old' )
       call get_command_argument( 4, str )
-      open( 3, file=str, recl=4*nn, form='unformatted', access='direct',
+      open( 3, file=str, recl=nio, form='unformatted', access='direct',
      $  status='old' )
       read( 1, rec=1 ) rlon(1:nn)
       read( 2, rec=1 ) rlat(1:nn)
@@ -41,14 +42,15 @@
       subroutine writepts( kerr )
       character(160) :: str
       include 'newin.h'
+      inquire( iolength=nio ) rho(1:nn)
       call get_command_argument( 5, str )
-      open( 1, file=str, recl=4*nn, form='unformatted', access='direct',
+      open( 1, file=str, recl=nio, form='unformatted', access='direct',
      $  status='replace' )
       call get_command_argument( 6, str )
-      open( 2, file=str, recl=4*nn, form='unformatted', access='direct',
+      open( 2, file=str, recl=nio, form='unformatted', access='direct',
      $  status='replace' )
       call get_command_argument( 7, str )
-      open( 3, file=str,recl=4*nn, form='unformatted', access='direct',
+      open( 3, file=str,recl=nio, form='unformatted', access='direct',
      $  status='replace' )
       do i = 1, nn
         if(rho(i)/=rho(i).or.alpha(i)/=alpha(i).or.beta(i)/=beta(i))
