@@ -21,7 +21,7 @@ xlf95_r)
   gflags='-g -p -C -qflttrap -qsigtrap'
   gflags='-g -O0 -C -qflttrap -qsigtrap'
   oflags='-O -C -qflttrap -qsigtrap'
-  oflags='-O3 -qarch=pwr4 -qtune=pwr4'
+  oflags='-O4' # -O3 is MUCH slower
   ;;
 ifort)
   sfc='ifort -implicitnone -std95 -warn'
@@ -45,8 +45,8 @@ gfortran)
   sfc='gfortran -fimplicit-none -Wall -pg'
   sfc='gfortran -fimplicit-none -Wall'
   pfc='mpif90 -fimplicit-none -Wall -std=f95 -pedantic'
-  pfc='mpif90 -fimplicit-none -Wall'
   pfc='mpif90 -fimplicit-none -Wall -mpe=mpilog'
+  pfc='mpif90 -fimplicit-none -Wall'
   gflags='-g -pg -fbounds-check -ffpe-trap=invalid,zero,overflow'
   gflags='-g -fbounds-check -ffpe-trap=invalid,zero,overflow'
   oflags='-O -fbounds-check -ffpe-trap=invalid,zero,overflow'

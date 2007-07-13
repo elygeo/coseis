@@ -1,5 +1,8 @@
 SCECVM FIXES
 
+For PG Fortran, any optimization will break it.
+For SUN Fortran, optimization greater than -O2 breaks it.
+
 Do not rely on the compiler to initialize variables to zero.
 
 Any open statements with the syntax type='old', change to standard syntax
@@ -43,7 +46,7 @@ Add inside of do loops in subroutine readup:
 Add to the beginning of subroutine getsoil:
       iteisb = 0
 
-Add to the begining of the main program:
+Add to the beginning of the main program:
       inct = 0
       incto = 0
       iupm = 0

@@ -24,7 +24,6 @@ case "\${1:--i}\$mode" in
 esac
 $post
 echo "\$( date ): $code finished" >> log
-fi
 END
 
 cat << END > que

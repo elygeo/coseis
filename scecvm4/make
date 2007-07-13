@@ -33,7 +33,7 @@ pgf90)
   getarg='getarg-pgf.f'
   sfc='pgf90'
   flags='-O -Ktrap=fp -Mbounds'
-  flags='-O2'
+  flags='-O0' # optimization breaks it
   ;;
 gfortran)
   flags='-Wall -O -g -pg'
@@ -47,7 +47,7 @@ f95)
     getarg='getarg.f'
     flags='-g -w4 -u -C'
     flags='-w4 -O -C'
-    flags='-w1 -O'
+    flags='-w1 -O2' # anything higher than -O2 breaks it
   fi
   ;;
 *)
