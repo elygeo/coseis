@@ -22,20 +22,23 @@ xlf95_r)
   pfc='mpxlf95_r -q64 -qsuppress=cmpmsg -qfixed'
   flags='-g -C -qflttrap -qsigtrap'
   flags='-O -C'
+  flags='-O4'
   ;;
 ifort)
-  flags='-warn -u -O0 -CB -traceback'
-  flags='-warn -O -CB -traceback'
+  flags='-warn -CB -traceback'
+  flags='-O -CB -traceback'
+  flags='-O3'
   ;;
 pgf90)
   getarg='getarg-pgf.f'
   sfc='pgf90'
   flags='-O -Ktrap=fp -Mbounds'
+  flags='-O2'
   ;;
 gfortran)
   flags='-Wall -O -g -pg'
-  flags='-Wall -O -g -pedantic -std=legacy -fbounds-check'
-  flags='-Wall -O -fbounds-check'
+  flags='-Wall -O -g -fbounds-check'
+  flags='-Wall -O3'
   ;;
 f95)
   flags='-g'
@@ -69,8 +72,8 @@ cd tmp/scecvm
 for file in $files; do
   ln -s "$srcdir/$file" &> /dev/null || :
 done
-cat $files > state
-echo "$sfc $pfc $flags" >> state
+echo "$sfc $pfc $flags" > state
+cat $files >> state
 
 compile=yes
 if [ -f state-vm ]; then
@@ -81,7 +84,7 @@ if [ "$compile" ]; then
   echo "Compiling SCECVM"
   rm -f state-vm
   $tar xzf "$srcdir/../data/scecvm4.tgz"
-  make="$sfc -O xsec.f -o xsec"; echo $make; $make
+  make="$sfc $flags xsec.f -o xsec"; echo $make; $make
   make="$sfc $flags $getarg iobin.f scecvm4.f -o scecvm4-s"; echo $make; $make
   make="$pfc $flags $getarg iompi.f scecvm4.f -o scecvm4-p"; echo $make; $make || :
   sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
