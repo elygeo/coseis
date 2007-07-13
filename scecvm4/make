@@ -44,6 +44,7 @@ f95)
     getarg='getarg.f'
     flags='-g -w4 -u -C'
     flags='-w4 -O -C'
+    flags='-w1 -O'
   fi
   ;;
 *)
@@ -82,7 +83,7 @@ if [ "$compile" ]; then
   $tar xzf "$srcdir/../data/scecvm4.tgz"
   make="$sfc -O xsec.f -o xsec"; echo $make; $make
   make="$sfc $flags $getarg iobin.f scecvm4.f -o scecvm4-s"; echo $make; $make
-  make="$pfc $flags $getarg iompi.f scecvm4.f -o scecvm4-p"; echo $make; $make
+  make="$pfc $flags $getarg iompi.f scecvm4.f -o scecvm4-p"; echo $make; $make || :
   sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
   rm -f *.o *.f *.h
   mv state state-vm

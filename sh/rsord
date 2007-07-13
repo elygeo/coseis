@@ -27,7 +27,7 @@ $op
 
 # Execute command
 if [ -n "$1" ]; then
-   op="ssh -t $account cd sord; $*"
+   op="ssh -tX $account bash --login -c 'cd sord; $*; exit'"
    echo $op
    $op
 fi
