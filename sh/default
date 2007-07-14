@@ -4,16 +4,16 @@ cat << END > run
 #!/bin/bash -e
 mode=$mode
 cd "$rundir"
-echo "\$(date): $code started" >> log
 [ "\$mode" = p ] && mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon
+echo "\$(date): $code started" >> log
 $pre
-case "\${1:--i}\$mode" in
-  -is) $bin ;;
-  -gs) gdb $bin ;;
-  -ddds) ddd $bin ;;
-  -ip) mpiexec -np $np $bin ;;
-  -gp) mpiexec -gdb -np $np $bin ;;
-  -dddp) mpiexec -np $np ddd $bin ;;
+case "\$mode\${1:--i}" in
+  s-i)   $bin ;;
+  s-g)   gdb $bin ;;
+  s-ddd) ddd $bin ;;
+  p-i)   mpiexec -np $np $bin ;;
+  p-g)   mpiexec -gdb -np $np $bin ;;
+  p-ddd) mpiexec -np $np ddd $bin ;;
 esac
 $post
 echo "\$(date): $code finished" >> log
@@ -22,6 +22,7 @@ END
 cat << END > que
 #!/bin/bash -e
 cd "$rundir"
+[ "\$mode" = p ] && mpich2version &> /dev/null && ! mpdtrace &> /dev/null && mpd --daemon
 nice nohup ./run > out.log &
 pid=\$!
 echo "\$(date): PID: \$pid" >> log

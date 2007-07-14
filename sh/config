@@ -15,24 +15,23 @@ pfc='mpif90'
 getarg=''
 case $sfc in
 xlf95_r)
-  getarg='getarg.f90'
-  sfc='xlf95_r -q64 -qsuppress=cmpmsg -qlanglvl=95pure -qsuffix=f=f90'
-  pfc='mpxlf95_r -q64 -qsuppress=cmpmsg -qlanglvl=95pure -qsuffix=f=f90'
+  sfc='xlf95_r -u -q64 -qsuppress=cmpmsg -qlanglvl=2003pure -qsuffix=f=f90'
+  pfc='mpxlf95_r -u -q64 -qsuppress=cmpmsg -qlanglvl=2003pure -qsuffix=f=f90'
   gflags='-g -p -C -qflttrap -qsigtrap'
   gflags='-g -O0 -C -qflttrap -qsigtrap'
   oflags='-O -C -qflttrap -qsigtrap'
   oflags='-O4' # -O3 is MUCH slower
   ;;
 ifort)
-  sfc='ifort -implicitnone -std95 -warn'
-  pfc='mpif90 -implicitnone -std95 -warn'
+  sfc='ifort -u -std95 -warn'
+  pfc='mpif90 -u -std95 -warn'
   gflags='-g -p -CB -traceback'
   gflags='-g -O0 -CB -traceback'
   oflags='-O -override_limits -CB -traceback'
   oflags='-O3 -override_limits'
   ;;
 pgf90)
-  getarg='getarg-pgf.f90'
+  getarg='getarg-pgf.f'
   gflags='-g -Ktrap=fp -Mbounds -Mdclchk -Mprof=func -Mprof=lines'
   gflags='-g -Ktrap=fp -Mbounds -Mdclchk -Mprof=func'
   gflags='-g -O0 -Ktrap=fp -Mbounds -Mdclchk'
@@ -58,7 +57,7 @@ f95)
   gflags='-g'
   oflags='-O'
   if [ $( uname ) = SunOS ]; then
-    getarg='getarg.f90'
+    getarg='getarg.f'
     gflags='-w4 -u -C -g'
     oflags='-w4 -u -fast -C'
     oflags='-w4 -u -fast'

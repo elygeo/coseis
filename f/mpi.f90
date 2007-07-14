@@ -308,7 +308,7 @@ end subroutine
 
 ! Timer series input/output
 subroutine rio1( id, mpio, str, ft, ir, nr )
-use m_util
+use m_frio
 use mpi
 real, intent(inout) :: ft(:)
 integer, intent(in) :: id, mpio, ir, nr
@@ -358,7 +358,7 @@ end subroutine
 
 ! Scalar field component input/output
 subroutine rio3( id, mpio, r, str, s1, i1, i2, i3, i4, ir, nr )
-use m_util
+use m_frio
 use mpi
 real, intent(inout) :: r, s1(:,:,:)
 integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), ir, nr
@@ -381,6 +381,7 @@ if ( fh == mpi_undefined ) then
   filehandles(i) = fh
 end if
 if ( any( i3 > i4 ) ) stop 'error in rio3'
+if ( ir < 1 ) return
 i0 = i3 - 1
 nl = i4 - i3 + 1
 n = (/ size(s1,1), size(s1,2), size(s1,3) /)
@@ -409,7 +410,7 @@ end subroutine
 
 ! Vector field component input/output
 subroutine rio4( id, mpio, r, str, w1, ic, i1, i2, i3, i4, ir, nr )
-use m_util
+use m_frio
 use mpi
 real, intent(inout) :: r, w1(:,:,:,:)
 integer, intent(in) :: id, mpio, ic, i1(3), i2(3), i3(3), i4(3), ir, nr
@@ -432,6 +433,7 @@ if ( fh == mpi_undefined ) then
   filehandles(i) = fh
 end if
 if ( any( i3 > i4 ) ) stop 'error in rio4'
+if ( ir < 1 ) return
 i0 = i3 - 1
 nl = i4 - i3 + 1
 n = (/ size(w1,1), size(w1,2), size(w1,3) /)

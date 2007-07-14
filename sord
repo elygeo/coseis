@@ -8,11 +8,12 @@ mode=guess
 optimize=O
 setup=yes
 run=
-while getopts spigGnvm:df opt; do
+while getopts spiqgGnvm:df opt; do
 case "$opt" in
   s) mode=s ;;
   p) mode=p ;;
   i) run=i ;;
+  q) run=q ;;
   g) optimize=g ;;
   G) optimize=g; run=g ;;
   n) setup= ; run= ;;
@@ -163,7 +164,8 @@ base="
   bc.f90
   surfnormals.f90
   outprops.f90
-  util.f90"
+  util.f90
+  frio.f90"
 common="
   inread.f90
   setup.f90
@@ -300,7 +302,11 @@ if [ "$velmodel" ]; then
   babieca)  . "$srcdir/sh/babieca"  ;;
   *)        . "$srcdir/sh/default"  ;;
   esac
-  if [ "$run" ]; then
+  if [ "$run" = q ]; then
+    echo ./que
+    ./que
+    run=""
+  elif [ "$run" ]; then
     echo ./run "-$run"
     ./run "-$run"
   fi
@@ -324,7 +330,10 @@ fi
 echo "$(date): setup finished" >> log
 
 # Run SORD
-if [ "$run" ]; then
+if [ "$run" = q ]; then
+  echo ./que
+  ./que
+elif [ "$run" ]; then
   echo ./run "-$run"
   ./run "-$run"
 fi

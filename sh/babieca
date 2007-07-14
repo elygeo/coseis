@@ -1,17 +1,21 @@
 #!/bin/bash -e
 
 cat << END > run
-#!/bin/bash
+#!/bin/bash -e
+mode=$mode
 cd "$rundir"
 echo "\$( date ): $code started" >> log
 $pre
-case "\${1:--i}" in
-  -i) mpirun -machinefile mf -np $np $bin ;;
-  -g) mpirun -machinefile mf -np $np -dbg=gdb $bin ;;
+case "\$mode\${1:--i}" in
+  s-i)   $bin ;;
+  s-g)   gdb $bin ;;
+  s-pg)  pgdbg $bin ;;
+  s-ddd) ddd $bin ;;
+  p-i)   mpirun -machinefile mf -np $np $bin ;;
+  p-g)   mpirun -machinefile mf -np $np -dbg=gdb $bin ;;
 esac
 $post
 echo "\$( date ): $code finished" >> log
-fi
 END
 
 cat << END > mf

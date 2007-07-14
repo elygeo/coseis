@@ -5,6 +5,7 @@ contains
 
 subroutine inread
 use m_globals
+use m_util
 integer :: i, io
 logical :: inzone
 character(12) :: key
@@ -148,35 +149,7 @@ end if
 end do doline
 
 close( 1 )
-end subroutine
 
-! Erase comments and MATLAB characters, parse string for the first token 
-subroutine strtok( str, tok )
-character(*), intent(inout) :: str
-character(*), intent(out) :: tok
-integer :: i
-i = index( str, '%' )         ! find start of comment
-if ( i > 0 ) str(i:) = ' '    ! erase comment if present
-do
-  i = scan( str, "{}=[]',;" ) ! find next MATLAB character
-  if ( i == 0 ) exit          ! move on if none found
-  str(i:i) = ' '              ! erase character
-end do
-tok = ''
-i = verify( str, ' ' )        ! find first non space
-if ( i == 0 ) return          ! return if all blank
-str = str(i:)                 ! strip leading spaces
-i = scan( str, ' ' )          ! find space delimiter
-if ( i == 0 ) then            ! only one word
-  tok = str                   ! tok get word
-  str = ''                    ! empty str
-else                          ! more than one word
-  tok = str(:i-1)             ! tok gets fist word
-  str = str(i+1:)             ! str gets remainder
-  i = verify( str, ' ' )      ! find first non space
-  if ( i == 0 ) return        ! return if all blank
-  str = str(i:)               ! strip leading spaces
-end if
 end subroutine
 
 end module

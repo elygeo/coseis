@@ -11,11 +11,12 @@ mode=$mode
 cd "$rundir"
 echo "\$( date ): $code started" >> log
 $pre
-case "\${1:--i}\$mode" in
-  -is) $bin ;;
-  -gs) totalview $bin ;;
-  -ip) mpirun -machinefile mf -np $np $bin ;;
-  -gp) mpirun -tv -machinefile mf -np $np $bin ;;
+case "\$mode\${1:--i}" in
+  s-i)  $bin ;;
+  s-g)  gdb $bin ;;
+  s-tv) totalview $bin ;;
+  p-i)  mpirun -machinefile mf -np $np $bin ;;
+  p-tv) mpirun -tv -machinefile mf -np $np $bin ;;
 esac
 $post
 echo "\$( date ): $code finished" >> log

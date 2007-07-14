@@ -8,19 +8,16 @@ fi
 cat << END > run
 #!/bin/bash -e
 mode=$mode
-if [ "\$HOSTNAME" != ds100 ]; then
-  echo "Error: interactive jobs must be launched from dspoe"
-  exit
-fi
 cd "$rundir"
 echo "\$( date ): $code started" >> log
 opts="-labelio yes -tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
 $pre
-case "\${1:--i}\$mode" in
-  -is) $bin ;;
-  -gs) totalview $bin ;;
-  -ip) poe $bin \$opts ;;
-  -gp) tvpoe $bin \$opts ;;
+case "\$mode\${1:--i}" in
+  s-i)  $bin ;;
+  s-g)  pdx $bin ;;
+  s-tv) totalview $bin ;;
+  p-i)  poe $bin \$opts ;;
+  p-tv) tvpoe $bin \$opts ;;
 esac
 $post
 echo "\$( date ): $code finished" >> log

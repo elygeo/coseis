@@ -124,7 +124,7 @@ end subroutine
 
 ! Time series I/O
 subroutine rio1( id, mpio, str, ft, ir, nr )
-use m_util
+use m_frio
 real, intent(inout) :: ft(:)
 integer, intent(in) :: id, mpio, ir, nr
 character(*), intent(in) :: str
@@ -137,7 +137,7 @@ end subroutine
 
 ! Scalar field I/O
 subroutine rio3( id, mpio, r, str, s1, i1, i2, i3, i4, ir, nr )
-use m_util
+use m_frio
 real, intent(inout) :: r, s1(:,:,:)
 integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), ir, nr
 character(*), intent(in) :: str
@@ -159,7 +159,7 @@ end subroutine
 
 ! Vector field component I/O
 subroutine rio4( id, mpio, r, str, w1, ic, i1, i2, i3, i4, ir, nr )
-use m_util
+use m_frio
 real, intent(inout) :: r, w1(:,:,:,:)
 integer, intent(in) :: id, mpio, ic, i1(3), i2(3), i3(3), i4(3), ir, nr
 character(*), intent(in) :: str

@@ -3,8 +3,8 @@
   datadir = 'ts/4000/data'; itio = 100; itcheck = 0; itstats = 1;
   debug = 0;
   mpout = -1;
-  np = [ 1 2  1 ]; nt = 750;
   np = [ 1 77 1 ]; nt = 4;
+  np = [ 1 16  1 ]; nt = 750;
   np = [ 1 1 1 ]; nt = 10;
 
   grid  = 'read';
@@ -27,7 +27,6 @@
   ihypo = [   69   51  -2 ];
   ihypo = [  114   51  -2 ];
   mus = [ 1.00 'zone'    67   0  -5         116   0 -1      ];
-return
   out = { 'x'      1     67  51  -5    0    116  51 -1    0 };
   out = { 'rho'    1     67   0  -5    0    116   0 -1    0 };
   out = { 'vp'     1     67   0  -5    0    116   0 -1    0 };

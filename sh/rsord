@@ -1,8 +1,7 @@
 #!/bin/bash -e
 # SORD remote install & execution
 
-account="${1:?}"
-shift 1
+acct="${1:?}"
 
 # Install files
 files="\
@@ -18,17 +17,18 @@ files="\
   util
   scecvm4
   data"
-rfiles=$( echo "$files" | sed '/^$/d; s|^ *|sord/|g' )
 files=$( echo $files )
-rfiles=$( echo $rfiles )
-op="rsync -av --delete $files $account:sord"
-echo $op
-$op
+ssh="ssh ${acct//,/ ssh }"
+target="${ssh##* }"
+ssh="${ssh% *}"
+echo "rsync -av --delete -e \"$ssh\" $files $target:sord"
+rsync -av --delete -e "$ssh" $files $target:sord 
 
 # Execute command
-if [ -n "$1" ]; then
-   op="ssh -tX $account bash --login -c 'cd sord; $*; exit'"
-   echo $op
-   $op
-fi
+[ -z "$2" ] && exit 0
+shift 1
+cmd="cd sord; $*"
+ssh="ssh -tX ${acct//,/ ssh -tX }"
+echo "$ssh bash --login -c \"$cmd\""
+$ssh "bash --login -c \"$cmd\""
 
