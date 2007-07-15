@@ -17,8 +17,8 @@ pfc='mpif90'
 getarg=''
 case $sfc in
 xlf95_r)
-  sfc='xlf95_r -q64 -qsuppress=cmpmsg -qfixed'
-  pfc='mpxlf95_r -q64 -qsuppress=cmpmsg -qfixed'
+  sfc='xlf95_r -q64 -qlanglvl=2003std -qsuppress=cmpmsg -qfixed'
+  pfc='mpxlf95_r -q64 -qlanglvl=2003std -qsuppress=cmpmsg -qfixed'
   flags='-g -C -qflttrap -qsigtrap'
   flags='-O -C'
   flags='-O4'
@@ -63,7 +63,7 @@ cd tmp/scecvm
 ln -s "$srcdir/newin.h" &> /dev/null || :
 sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
 
-makes="
+makes="\
   $sfc $flags xsec.f -o xsec
   $sfc $flags $getarg iobin.f scecvm4.f -o scecvm4-s
   $pfc $flags $getarg iompi.f scecvm4.f -o scecvm4-p"
@@ -80,7 +80,7 @@ for make in "${makes[@]}"; do
   files=""
   cat newin.h >> state
   for arg in $*; do
-  if [ "${arg#*.}" = f ]; then
+  if [ "${arg#*\.}" = f ]; then
     ln -s "$srcdir/$arg" &> /dev/null || :
     files="$files $arg"
     cat "$arg" >> state

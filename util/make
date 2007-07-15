@@ -9,7 +9,7 @@ cd tmp
 
 flags=$oflags
 
-makes="
+makes="\
   $sfc $flags $getarg asc2flt.f90 -o asc2flt
   $sfc $flags $getarg flt2asc.f90 -o flt2asc
   $sfc $flags $getarg swab.f90 -o swab
@@ -21,7 +21,7 @@ makes="
   $sfc $flags utm.f90 tscoords.f90 ll2ts.f90 -o ll2ts
   $sfc $flags utm.f90 pscoords.f90 ps2ll.f90 -o ps2ll
   $sfc $flags utm.f90 pscoords.f90 ll2ps.f90 -o ll2ps
-  $sfc $flags$getarg utm.f90 gearthdrape.f90 -o gearthdrape"
+  $sfc $flags $getarg utm.f90 gearthdrape.f90 -o gearthdrape"
 
 IFS_save=$IFS
 IFS=${IFS// /}

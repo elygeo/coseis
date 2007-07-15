@@ -31,7 +31,7 @@ ifort)
   oflags='-O3 -override_limits'
   ;;
 pgf90)
-  getarg='getarg-pgf.f'
+  getarg='getarg-pgf.f90'
   gflags='-g -Ktrap=fp -Mbounds -Mdclchk -Mprof=func -Mprof=lines'
   gflags='-g -Ktrap=fp -Mbounds -Mdclchk -Mprof=func'
   gflags='-g -O0 -Ktrap=fp -Mbounds -Mdclchk'
@@ -57,7 +57,7 @@ f95)
   gflags='-g'
   oflags='-O'
   if [ $( uname ) = SunOS ]; then
-    getarg='getarg.f'
+    getarg='getarg.f90'
     gflags='-w4 -u -C -g'
     oflags='-w4 -u -fast -C'
     oflags='-w4 -u -fast'
