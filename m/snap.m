@@ -1,20 +1,26 @@
 % Window snapshot
+
 function img1 = snap( varargin )
 r1 = 3;
-r2 = 3;
-if nargin > 0, r1 = varargin{1}; r2 = 1; end
+if nargin > 0, r1 = varargin{1}; end
+r2 = r1;
 if nargin > 1, r2 = varargin{2}; end
 
-set( gcf, 'PaperPositionMode', 'auto', 'Units', 'pixels' )
+ppi = get( 0, 'ScreenPixelsPerInch' );
 pos = get( gcf, 'Position' );
-res = sprintf( '-r%d', r1 * get( 0, 'ScreenPixelsPerInch' ) );
+set( gcf, 'PaperPositionMode', 'auto', 'Units', 'pixels' )
+res = sprintf( '-r%d', r1 * ppi );
 print( '-dtiff', res, 'tmp' )
 img1 = imread( 'tmp.tif' );
 delete tmp.tif
 n0 = [ size( img1, 1 ) size( img1, 2 ) ];
 n2 = floor( r1 / r2 * pos([4 3]) );
 n1 = r2 * n2;
-if any( n0 < n1 ), error 'bad image size', end
+if any( n0 < n1 )
+  n0
+  n1
+  error 'bad image size'
+end
 
 if any( n2 ~= n0 )
   img2 = repmat( single(0), [ n2 3 ] );

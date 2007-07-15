@@ -5,9 +5,10 @@ implicit none
 real :: dx, h, o1, o2, xx, yy, h1, h2, h3, h4, ell(3), x0, y0, z0, &
   xf(6), yf(6), rf(6), zf, exag, mus, mud, tn, ts, rho, vp, vs, dc
 integer :: n(3), npml, i, j, k, l, j1, k1, l1, j2, k2, l2, jf0, kf0, lf0, &
-  nf, nf1, nf2, nf3
+  nf, nf1, nf2, nf3, ii(3)
 real, allocatable :: x(:,:,:,:), w1(:,:,:,:), s1(:,:,:), s2(:,:,:), t(:,:)
 character :: endian0, endian, b1(4), b2(4)
+character(256) :: str
 equivalence (h1,b1), (h2,b2)
 
 ! Model parameters
@@ -79,21 +80,6 @@ lf0 = n(3) - nf3
 j = nint( 9000. / dx )
 l = nint( 5000. / dx )
 
-! SORD input parameters
-open( 1, file='insord.m', status='replace' )
-write( 1, '(a)' ) '% SORD input'
-write( 1, * ) ' dx = ', dx, ';'
-write( 1, * ) ' dt = ', dx * .00006, ';'
-write( 1, * ) ' nt = ', 180. / dx / .00006, ';'
-write( 1, * ) ' nn = [ ', n, ' ];'
-write( 1, * ) ' ihypo = [ ', jf0+j,     kf0, -1-l, ' ];'
-write( 1, * ) ' ihypo = [ ', jf0-j+nf1, kf0, -1-l, ' ];'
-write( 1, * ) ' npml = ', npml, ';'
-write( 1, * ) ' dc = ', dc, ';'
-write( 1, * ) ' mud = ', mud, ';'
-write( 1, * ) ' mus = { ', mus, '''zone''', jf0, 0, -1-nf3, jf0+nf1, 0, -1, ' };'
-close( 1 )
-
 ! Mesh metadata
 open( 1, file='meta.m', status='replace' )
 write( 1, '(a)' ) '% SORD metadata'
@@ -111,6 +97,21 @@ write( 1, * ) ' out{2}      = { 1 ''rho''  0   1 1 1 0 ', n-1, ' 0 };'
 write( 1, * ) ' out{3}      = { 1 ''vp''   0   1 1 1 0 ', n-1, ' 0 };'
 write( 1, * ) ' out{4}      = { 1 ''vs''   0   1 1 1 0 ', n-1, ' 0 };'
 write( 1, * ) ' out{5}      = { 1 ''ts1''  0   1 1 1 0 ', n, ' 0 };'
+close( 1 )
+
+! SORD input parameters
+open( 1, file='insord.m', status='replace' )
+write( 1, '(a)' ) '% SORD input'
+write( 1, * ) ' dx = ', dx, ';'
+write( 1, * ) ' dt = ', dx * .00006, ';'
+write( 1, * ) ' nt = ', 180. / dx / .00006, ';'
+write( 1, * ) ' nn = [ ', n, ' ];'
+write( 1, * ) ' ihypo = [ ', jf0+j,     kf0, -1-l, ' ];'
+write( 1, * ) ' ihypo = [ ', jf0-j+nf1, kf0, -1-l, ' ];'
+write( 1, * ) ' npml = ', npml, ';'
+write( 1, * ) ' dc = ', dc, ';'
+write( 1, * ) ' mud = ', mud, ';'
+write( 1, * ) ' mus = { ', mus, '''zone''', jf0, 0, -1-nf3, jf0+nf1, 0, -1, ' };'
 close( 1 )
 
 ! 2D mesh
@@ -187,6 +188,20 @@ call ts2ll( w1, 1, 2 )
 if ( any( w1 /= w1 ) ) stop 'NaNs in lon/lat'
 write( 0, * ) 'longitude range: ', minval( w1(:,:,:,1) ), maxval( w1(:,:,:,1) )
 write( 0, * ) 'latgitude range: ', minval( w1(:,:,:,2) ), maxval( w1(:,:,:,2) )
+
+! Sites
+doline: do
+open( 1, file='tssites.ll', status='old' )
+open( 2, file='insord.m', status='old', position='append' )
+read( 1, *, iostat=i ) xx, yy, str
+if ( i /= 0 ) exit doline
+s1 = ( w1(:,:,:,1) - xx ) * ( w1(:,:,:,1) - xx ) &
+   + ( w1(:,:,:,2) - yy ) * ( w1(:,:,:,2) - yy )
+ii = minloc( s1 )
+write( 2, * ) 'out = { ''v'' 1   ', ii(1:2), ' -1 0   ', ii(1:2), ' -1 -1 }; % ', trim(str)
+end do doline
+close( 1 )
+close( 2 )
 
 ! Topo
 if ( exag < .00001 ) then

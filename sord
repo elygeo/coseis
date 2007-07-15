@@ -278,6 +278,7 @@ if [ "$velmodel" ]; then
   echo "$dx" > dx
   echo "$npml" > npml
   cp "$srcdir/tmp/tsgrid" .
+  cp "$srcdir/data/tssites.ll" .
   cp "$srcdir/data/topo3.f32" .
   cp "$srcdir/data/ts-ts1.f32" .
   cp "$srcdir/data/endian0" .
