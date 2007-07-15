@@ -1,0 +1,27 @@
+#!/bin/bash -e
+
+make="$*"
+
+while getopts o: opt; do
+case "$opt" in
+  o) object="$OPTARG" ;;
+esac
+done
+shift $(( OPTIND - 1 ))
+
+echo $make > state
+cat $* >> state
+
+compile=yes
+if [ -f state-$object ]; then
+  compile=$( cmp state state-$object || : )
+fi
+
+if [ "$compile" ]; then
+  rm -f state-$object
+  echo $make
+  $make
+  mv state state-$object
+  rm -f *.o *.mod *.ipo *.il *.stb
+fi 
+

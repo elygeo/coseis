@@ -54,41 +54,49 @@ f95)
   exit
 esac
 
-files="
-  $getarg
-  xsec.f
-  newin.h
-  scecvm4.f
-  iobin.f
-  iompi.f"
-
 cd "$( dirname $0 )"
 srcdir=$( /bin/pwd )
 cd ..
 
 mkdir -p tmp/scecvm
 cd tmp/scecvm
-for file in $files; do
-  ln -s "$srcdir/$file" &> /dev/null || :
+ln -s "$srcdir/newin.h" &> /dev/null || :
+sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
+
+makes="
+  $sfc $flags xsec.f -o xsec
+  $sfc $flags $getarg iobin.f scecvm4.f -o scecvm4-s
+  $pfc $flags $getarg iompi.f scecvm4.f -o scecvm4-p"
+
+IFS_save=$IFS
+IFS=${IFS// /}
+makes=( $makes )
+IFS=$IFS_save
+
+for make in "${makes[@]}"; do
+  set $make
+  echo $make > state
+  obj=${!#}
+  files=""
+  cat newin.h >> state
+  for arg in $*; do
+  if [ "${arg#*.}" = f ]; then
+    ln -s "$srcdir/$arg" &> /dev/null || :
+    files="$files $arg"
+    cat "$arg" >> state
+  fi
+  done
+  compile=yes
+  if [ -f $obj-state ]; then
+    compile=$( cmp state $obj-state || : )
+  fi
+  if [ "$compile" ]; then
+    [ -f "in.h" ] || $tar xzf "$srcdir/../data/scecvm4.tgz"
+    echo $make
+    $make || :
+    mv state $obj-state
+  fi 
+  rm -f $files *.o *.mod *.ipo *.il *.stb
 done
-echo "$sfc $pfc $flags" > state
-cat $files >> state
-
-compile=yes
-if [ -f state-vm ]; then
-  compile=$( cmp state state-vm || : )
-fi
-
-if [ "$compile" ]; then
-  echo "Compiling SCECVM"
-  rm -f state-vm
-  $tar xzf "$srcdir/../data/scecvm4.tgz"
-  make="$sfc $flags xsec.f -o xsec"; echo $make; $make
-  make="$sfc $flags $getarg iobin.f scecvm4.f -o scecvm4-s"; echo $make; $make
-  make="$pfc $flags $getarg iompi.f scecvm4.f -o scecvm4-p"; echo $make; $make || :
-  sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
-  rm -f *.o *.f *.h
-  mv state state-vm
-fi
-rm -f $files
+rm -f *.h
 

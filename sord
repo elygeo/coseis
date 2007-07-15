@@ -202,14 +202,14 @@ done
 echo "$make" > state
 cat $files >> state
 compile=yes
-if [ -f state-$mode ]; then
-  compile=$( cmp state state-$mode || : )
+if [ -f sord-$mode-state ]; then
+  compile=$( cmp state sord-$mode-state || : )
 fi
 if [ "$compile" ]; then
-  rm -f state-$mode
+  rm -f sord-$mode-state
   echo time $make
   time $make
-  mv state state-$mode
+  mv state sord-$mode-state
   rm -f *.o *.mod *.ipo *.il *.stb
 fi
 rm $files
