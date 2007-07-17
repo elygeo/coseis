@@ -202,7 +202,7 @@ done
 echo $make > state
 cat $files >> state
 compile=yes
-if [ -f sord-$mode-state ]; then
+if [ -f sord-$mode.state ]; then
   compile=$( cmp state sord-$mode.state || : )
 fi
 if [ "$compile" ]; then
