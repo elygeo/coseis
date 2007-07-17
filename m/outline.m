@@ -36,4 +36,5 @@ for i = 1:size( ii, 1 )
 end
 
 h = plot3( x1, x2, x3 );
+if nargout == 0, clear h, end
 

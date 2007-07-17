@@ -3,21 +3,20 @@ module m_collective
 use m_globals, only: nz
 implicit none
 !integer, private, parameter :: nz = 100
-integer, private :: ip, ip3(3), np(3), root3d, root2d(3), comm3d, comm2d(3), filehandles(64+6*nz)
+integer, private :: np(3), root3d, root2d(3), comm3d, comm2d(3), filehandles(64+6*nz)
 contains
 
 ! Initialize
-subroutine initialize( np0, master )
+subroutine initialize( np0, ip, master )
 use mpi
-integer, intent(out) :: np0
+integer, intent(out) :: np0, ip
 logical, intent(out) :: master
-integer :: ip0, e
+integer :: e
 call mpi_init( e )
 call mpi_comm_size( mpi_comm_world, np0, e  )
-call mpi_comm_rank( mpi_comm_world, ip0, e  )
-ip = ip0
+call mpi_comm_rank( mpi_comm_world, ip, e  )
 master = .false.
-if ( ip0 == 0 ) master = .true.
+if ( ip == 0 ) master = .true.
 end subroutine
 
 ! Finalize
@@ -28,23 +27,22 @@ call mpi_finalize( e )
 end subroutine
 
 ! Process rank
-subroutine rank( ipout, ip3out, npin )
+subroutine rank( ip3, npin )
 use mpi
-integer, intent(out) :: ipout, ip3out(3)
+integer, intent(out) :: ip3(3)
 integer, intent(in) :: npin(3)
-integer :: e
+integer :: ip, e
 logical :: period(3) = .false.
 np = npin
 call mpi_cart_create( mpi_comm_world, 3, np, period, .true., comm3d, e )
 if ( comm3d == mpi_comm_null ) then
+  call mpi_comm_rank( mpi_comm_world, ip, e  )
   write( 0, * ) 'Unused process:', ip
   call mpi_finalize( e )
   stop
 end if
 call mpi_comm_rank( comm3d, ip, e  )
 call mpi_cart_coords( comm3d, ip, 3, ip3, e )
-ipout = ip
-ip3out = ip3
 filehandles = mpi_undefined
 end subroutine
 
@@ -313,7 +311,7 @@ use mpi
 real, intent(inout) :: ft(:)
 integer, intent(in) :: id, mpio, ir, nr
 character(*), intent(in) :: str
-integer :: i, n, nl(1), ng(1), i0(1), ftype, fh, e
+integer :: i, ip, n, nl(1), ng(1), i0(1), ftype, fh, e
 integer(kind=mpi_offset_kind) :: ir0 = 0
 n = size( ft )
 if ( n == 0 .or. id == 0 ) return
@@ -335,6 +333,7 @@ if ( fh == mpi_undefined ) then
   i0 = ir - n
   ng = nr
   nl = nr - ir + n
+  call mpi_comm_rank( mpi_comm_world, ip, e  )
   write( 0, '(i8,2a)' ) ip, ' Opening 1D buffered file: ', trim(str)
   call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
   call mpi_file_open( mpi_comm_self, str, i, mpi_info_null, fh, e )
@@ -466,7 +465,7 @@ use mpi
 integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), ir, nr
 integer, intent(out) :: fh
 character(*), intent(in) :: str
-integer :: i, iio, nio, ndims, ftype, nl(4), n(4), i0(4), comm0, comm, e
+integer :: i, ip, iio, nio, ndims, ftype, nl(4), n(4), i0(4), comm0, comm, e
 integer(kind=mpi_offset_kind) :: ir0 = 0
 i = abs( mpio )
 comm0 = comm3d
@@ -478,8 +477,6 @@ if ( any( i3 > i4 ) ) then
 end if
 i = abs( id )
 call mpi_comm_split( comm0, i, 0, comm, e )
-call mpi_comm_rank( comm, iio, e  )
-call mpi_comm_size( comm, nio, e  )
 if ( id < 0 ) then
   i = mpi_mode_rdonly
 elseif ( ir == 1 ) then
@@ -501,6 +498,9 @@ if ( n(i) == 1 ) then
   nl(i:) = (/ nl(i+1:), 1 /)
 end if
 end do
+call mpi_comm_rank( comm, iio, e  )
+call mpi_comm_size( comm, nio, e  )
+call mpi_comm_rank( mpi_comm_world, ip, e  )
 if ( iio == 0 ) write( 0, '(i8,a,i2,a,i8,2a)' ) &
   ip, ' Opening', ndims, 'D', nio, 'P file: ', trim(str)
 if ( ndims < 1 ) ndims = 1

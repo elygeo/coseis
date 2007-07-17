@@ -5,7 +5,7 @@
   mpout = -1;
   np = [ 1 77 1 ]; nt = 4;
   np = [ 1 16  1 ]; nt = 750;
-  np = [ 1 1 1 ]; nt = 10;
+  np = [ 1 1 2 ]; nt = 10;
 
   grid  = 'read';
   rho   = 'read';

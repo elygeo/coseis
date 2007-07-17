@@ -1,14 +1,14 @@
 % TPV3
   np       = [   1   1   2 ];
   np       = [   1   1  16 ];
-  nn       = [ 421 136 102 ];
-  ihypo    = [   0  -1  -2 ];
+  nn       = [ 486 136 102 ];
+  ihypo    = [ 211  -1  -2 ];
   n1expand = [  50  50  50 ];
   n2expand = [  50   0   0 ];
   bc1      = [   0   0   0 ];
   bc2      = [   0   1  -2 ];
   fixhypo  =    -1;
-  affine   = [ 1. 0. 1.   0. 1. 0.   0. 0. 1. ];
+  affine   = [ 1. 1. 0.   0. 1. 0.   0. 0. 1. ];
   nt  = 1500;
   dx  = 100;
   dt  = .008;
@@ -17,7 +17,7 @@
   vs  = 3464.;
   rho = 2670.;
   gam = .1;
-  hourglass = [ 1. .7 ];
+  hourglass = [ 1. 2. ];
 
   faultnormal = 3;
   vrup = -1.;

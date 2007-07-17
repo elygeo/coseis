@@ -29,7 +29,7 @@ if ( ifn /= 0 ) nhalo(ifn) = 2
 nl = max( nl, nhalo )
 np = nn / nl
 where ( modulo( nn, nl ) /= 0 ) np = np + 1
-call rank( ip, ip3, np )
+call rank( ip3, np )
 nnoff = nl * ip3 - nhalo
 
 ! Master process
