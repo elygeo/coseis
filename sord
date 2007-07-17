@@ -192,24 +192,24 @@ case $optimize in
 esac
 case $mode in
   s) fc="$sfc"; files="$base serial.f90 $common" ;;
-  p) fc="$pfc"; files="$base mpi.f90    $common" ;;
+  p) fc="$pfc"; files="$base mpi.f90 $common" ;;
 esac
 make="$fc $fflags -o sord-$mode $files"
 cd tmp
 for file in $files; do
   ln -s "$srcdir/f/$file" &> /dev/null || :
 done
-echo "$make" > state
+echo $make > state
 cat $files >> state
 compile=yes
 if [ -f sord-$mode-state ]; then
-  compile=$( cmp state sord-$mode-state || : )
+  compile=$( cmp state sord-$mode.state || : )
 fi
 if [ "$compile" ]; then
-  rm -f sord-$mode-state
+  rm -f sord-$mode.state
   echo time $make
   time $make
-  mv state sord-$mode-state
+  mv state sord-$mode.state
   rm -f *.o *.mod *.ipo *.il *.stb
 fi
 rm $files

@@ -46,7 +46,7 @@ cat << END > script
 #RT_GRQ=ON;\\
 #SPINLOOPTIME=0;\\
 #YIELDLOOPTIME=0;
-#@ job_name = $code-$count
+#@ job_name = $code$count
 #@ initialdir = $rundir
 #@ node = $nodes
 #@ tasks_per_node = $ppn

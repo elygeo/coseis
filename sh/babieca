@@ -40,7 +40,7 @@ END
 
 cat << END > script
 #!/bin/bash
-#PBS -N $code-$count
+#PBS -N $code$count
 #PBS -l nodes=$nodes:ppn=$ppn
 #PBS -l walltime=$walltime
 #PBS -q workq

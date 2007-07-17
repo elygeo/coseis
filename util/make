@@ -41,13 +41,13 @@ for make in "${makes[@]}"; do
   fi
   done
   compile=yes
-  if [ -f $obj-state ]; then
-    compile=$( cmp state $obj-state || : )
+  if [ -f $obj.state ]; then
+    compile=$( cmp state $obj.state || : )
   fi
   if [ "$compile" ]; then
     echo $make
     $make
-    mv state $obj-state
+    mv state $obj.state
   fi
   rm -f $files *.o *.mod *.ipo *.il *.stb
 done
