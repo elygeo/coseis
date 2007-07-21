@@ -31,7 +31,6 @@ select case( key )
 case( '' )
 case( 'datadir' )
 case( 'return' );       exit doline
-case( 'grid' );         grid = str(1:16)
 case( 'rfunc' );        rfunc = str(1:16)
 case( 'tfunc' );        tfunc = str(1:16)
 case( 'oplevel' );      read( str, *, iostat=io ) oplevel
@@ -79,6 +78,9 @@ case( 'itstop' );       read( str, *, iostat=io ) itstop
 case( 'debug' );        read( str, *, iostat=io ) debug
 case( 'mpin' );         read( str, *, iostat=io ) mpin
 case( 'mpout' );        read( str, *, iostat=io ) mpout
+case( 'x1' );           inzone = .true.
+case( 'x2' );           inzone = .true.
+case( 'x3' );           inzone = .true.
 case( 'rho' );          inzone = .true.
 case( 'vp' );           inzone = .true.
 case( 'vs' );           inzone = .true.

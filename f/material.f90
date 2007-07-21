@@ -7,8 +7,8 @@ subroutine material
 use m_globals
 use m_collective
 use m_util
-real :: x1(3), x2(3), stats(8), gstats(8), r
-integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, j1, k1, l1, j2, k2, l2, iz
+real :: x1(3), x2(3), stats(8), gstats(8), r, rr(3)
+integer :: i1(3), i2(3), i3(3), i4(3), i, j1, k1, l1, j2, k2, l2, iz
 
 if ( master ) write( 0, * ) 'Material model'
 
@@ -67,12 +67,6 @@ if ( any( s1  /= s1  ) .or. maxval( s1  ) > huge( r ) ) stop 'NaN/Inf in vp'
 if ( any( s2  /= s2  ) .or. maxval( s2  ) > huge( r ) ) stop 'NaN/Inf in vs'
 if ( any( gam /= gam ) .or. maxval( gam ) > huge( r ) ) stop 'NaN/Inf in gam'
 
-! Fill halo
-call scalarswaphalo( mr,  nhalo )
-call scalarswaphalo( s1,  nhalo )
-call scalarswaphalo( s2,  nhalo )
-call scalarswaphalo( gam, nhalo )
-
 ! Limits
 if ( rho1 > 0. ) where ( mr < rho1 ) mr = rho1
 if ( rho2 > 0. ) where ( mr > rho2 ) mr = rho2
@@ -88,7 +82,33 @@ if ( vdamp > 0. ) where( s2 > 0. ) gam = vdamp / s2
 if ( gam1 > 0. ) where ( gam < gam1 ) gam = gam1
 if ( gam2 > 0. ) where ( gam > gam2 ) gam = gam2
 
-! Stats
+! Averages
+stats = 0.
+i1 = max( i1core, i1bc )
+i2 = min( i2core, i2bc - 1 )
+call scalarsethalo( mr,  0., i1, i2 )
+call scalarsethalo( s1,  0., i1, i2 )
+call scalarsethalo( s2,  0., i1, i2 )
+call scalarsethalo( gam, 0., i1, i2 )
+stats(1) = sum( mr  )
+stats(2) = sum( s1  )
+stats(3) = sum( s2  )
+stats(4) = sum( gam )
+call rreduce1( gstats, stats, 'sum', 0 )
+rr = nn - 1
+r = 1. / product( rr ) 
+rho_ = r * gstats(1)
+vp_  = r * gstats(2)
+vs_  = r * gstats(3)
+gam_ = r * gstats(4)
+
+! Fill halo
+call scalarswaphalo( mr,  nhalo )
+call scalarswaphalo( s1,  nhalo )
+call scalarswaphalo( s2,  nhalo )
+call scalarswaphalo( gam, nhalo )
+
+! Extrema
 call scalarsethalo( mr,  huge(r), i1cell, i2cell )
 call scalarsethalo( s1,  huge(r), i1cell, i2cell )
 call scalarsethalo( s2,  huge(r), i1cell, i2cell )
@@ -114,17 +134,6 @@ rho2 =  gstats(5)
 vp2  =  gstats(6)
 vs2  =  gstats(7)
 gam2 =  gstats(8)
-
-! Hypocenter values
-if ( master ) then
-  j = ihypo(1)
-  k = ihypo(2)
-  l = ihypo(3)
-  rho0 = mr(j,k,l)
-  gam0 = gam(j,k,l)
-  vp0  = s1(j,k,l)
-  vs0  = s2(j,k,l)
-end if
 
 ! Lame' parameters
 mu  = mr * s2 * s2

@@ -131,7 +131,7 @@ character(*), intent(in) :: str
 integer :: i
 if ( size( ft ) == 0 .or. id == 0 ) return
 if ( size( ft ) > ir .or. ir > nr ) stop 'error in rio1'
-call frio1( id, str, ft, ir, nr )
+call frio1( id, str, ft, ir, ir )
 i = mpio
 end subroutine
 
@@ -153,7 +153,7 @@ if ( id > 0 .and. all( i1 == i2 ) ) then
   r = s1(i1(1),i1(2),i1(3))
   return
 end if
-call frio3( id, str, s1, i1, i2, ir, nr )
+call frio3( id, str, s1, i1, i2, ir, ir )
 i = i3(1) + i4(1) + mpio
 end subroutine
 
@@ -175,7 +175,7 @@ if ( id > 0 .and. all( i1 == i2 ) ) then
   r = w1(i1(1),i1(2),i1(3),ic)
   return
 end if
-call frio4( id, str, w1, ic, i1, i2, ir, nr )
+call frio4( id, str, w1, ic, i1, i2, ir, ir )
 i = i3(1) + i4(1) + mpio
 end subroutine
 

@@ -2,7 +2,7 @@
   np       = [   1   1   2 ];
   np       = [   1   1  16 ];
   nn       = [ 211 136 102 ];
-  ihypo    = [  -1  -1  -2 ];
+  ihypo    = [  -2  -2  -2 ];
   n1expand = [  50  50  50 ];
   n2expand = [   0   0   0 ];
   bc1      = [   0   0   0 ];
@@ -16,8 +16,8 @@
   vp  = 6000.;
   vs  = 3464.;
   rho = 2670.;
-  gam = .1;
-  hourglass = [ 1. 2. ];
+  gam = .0;
+  hourglass = [ 1. .0 ];
 
   faultnormal = 3;
   vrup = -1.;
@@ -33,16 +33,15 @@
   out = { 'su'   1   1 1  0 -1   -1 -1  0 -1 };
   out = { 'psv'  1   1 1  0 -1   -1 -1  0 -1 };
   out = { 'trup' 1   1 1  0 -1   -1 -1  0 -1 };
-  timeseries = { 'su' -7501.     0. 0. };
-  timeseries = { 'sv' -7501.     0. 0. };
-  timeseries = { 'ts' -7501.     0. 0. };
-  timeseries = { 'su'  7501.     0. 0. };
-  timeseries = { 'sv'  7501.     0. 0. };
-  timeseries = { 'ts'  7501.     0. 0. };
-  timeseries = { 'su'     0. -6001. 0. };
-  timeseries = { 'sv'     0. -6001. 0. };
-  timeseries = { 'ts'     0. -6001. 0. };
-  timeseries = { 'su'     0.  6001. 0. };
-  timeseries = { 'sv'     0.  6001. 0. };
-  timeseries = { 'ts'     0.  6001. 0. };
-
+  timeseries = { 'su' -7499.    -1. 0. };
+  timeseries = { 'sv' -7499.    -1. 0. };
+  timeseries = { 'ts' -7499.    -1. 0. };
+  timeseries = { 'su'  7499.    -1. 0. };
+  timeseries = { 'sv'  7499.    -1. 0. };
+  timeseries = { 'ts'  7499.    -1. 0. };
+  timeseries = { 'su'    -1. -5999. 0. };
+  timeseries = { 'sv'    -1. -5999. 0. };
+  timeseries = { 'ts'    -1. -5999. 0. };
+  timeseries = { 'su'    -1.  5999. 0. };
+  timeseries = { 'sv'    -1.  5999. 0. };
+  timeseries = { 'ts'    -1.  5999. 0. };

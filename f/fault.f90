@@ -224,6 +224,7 @@ if ( master ) then
   j = i1(1)
   k = i1(2)
   l = i1(3)
+  mu0 = muf(j,k,l)
   mus0 = mus(j,k,l)
   mud0 = mud(j,k,l)
   dc0 = dc(j,k,l)
@@ -231,10 +232,9 @@ if ( master ) then
   ts0 = sqrt( sum( ( t0(j,k,l,:) - tn0 * nhat(j,k,l,:) ) ** 2. ) )
   tn0 = max( -tn0, 0. )
   ess = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 )
-  lc =  dc0 * ( rho0 * vs0 ** 2. ) / tn0 / ( mus0 - mud0 )
+  lc =  dc0 * mu0 / tn0 / ( mus0 - mud0 )
   if ( tn0 * ( mus0 - mud0 ) == 0. ) lc = 0.
-  rctest = rho0 * vs0 ** 2. * tn0 * ( mus0 - mud0 ) * dc0 &
-    / ( ts0 - tn0 * mud0 ) ** 2
+  rctest = mu0 * tn0 * ( mus0 - mud0 ) * dc0 / ( ts0 - tn0 * mud0 ) ** 2
 end if
 
 end subroutine

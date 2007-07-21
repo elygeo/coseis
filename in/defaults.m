@@ -3,12 +3,13 @@
 % Wave model parameters
   nn = [ 41 41 42 ];		% nx ny nz (double nodes counted)
   nt = 40;			% number of time steps
-  dx = 100.;			% spatial step length
   dt = .0075;			% time step length
-  grid = 'rect';		% rectangular mesh
-% grid = 'read';		% read mesh from files 'data/x1', 'data/x2', and 'data/x3'
+  dx = 100.;			% spatial step length
+% x1 = 'read';			% read mesh x coord from file 'data/x1'
+% x2 = 'read';			% read mesh y coord from file 'data/x2'
+% x3 = 'read';			% read mesh z coord from file 'data/x3'
   affine = [ 1. 0. 0.   0. 1. 0.   0. 0. 1. ]; % grid transformation
-  gridnoise = 0.		% random noise added to mesh
+  gridnoise = 0.		% random noise added to mesh, assumes planar fault
   oplevel = 0;			% spatial difference operator level (see below)
   rho = 2670.;			% **density
   vp = 6000.;			% **P-wave speed

@@ -90,16 +90,16 @@ real :: &
   tm,            & ! time
   dt,            & ! time step
   dx,            & ! spatial step
-  rho0,          & ! hypocenter density
+  rho_,          & ! ave density
   rho1,          & ! min density
   rho2,          & ! max density
-  vp0,           & ! hypocenter P-wave speed
+  vp_,           & ! ave P-wave speed
   vp1,           & ! min P-wave speed
   vp2,           & ! max P-wave speed
-  vs0,           & ! hypocenter S-wave speed
+  vs_,           & ! ave S-wave speed
   vs1,           & ! min S-wave speed
   vs2,           & ! max S-wave speed
-  gam0,          & ! hypocenter viscosity
+  gam_,          & ! ave viscosity
   gam1,          & ! min viscosity
   gam2,          & ! max viscosity
   hourglass(2),  & ! hourglass stiffness (1) and viscosity (2)
@@ -125,6 +125,7 @@ real :: &
   efric,         & ! friction + fracture energy
   estrain,       & ! strain energy
   moment,        & ! strain energy
+  mu0,           & ! shear modulus at hypocenter
   mus0,          & ! static friction at hypocenter
   mud0,          & ! dynamic friction at hypocenter
   dc0,           & ! dc at hypocenter
@@ -200,7 +201,6 @@ character(4) :: &
   fieldout(nz)     ! output variable
 
 character(16) :: &
-  grid,          & ! grid generation scheme
   rfunc,         & ! moment source space function
   tfunc            ! moment source time function
 

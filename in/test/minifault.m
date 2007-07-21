@@ -1,15 +1,18 @@
 % Test
 
-  nt = 4;
-  debug = 1;
+  nt = 0;
+  debug = 3;
   faultnormal = 2;
   np = [ 2 2 3 ];
-  nn = [ 4 5 4 ];
+  np = [ 1 3 4 ];
+  nn = [ 3 4 3 ];
   ihypo = [ 2 2 2 ];
 
-  affine = [ 1. 0. 1.   1. 1. 0.   0. 0. 1.   1. ];
-  n1expand = [ 2 2 2 ];
-  n2expand = [ 2 2 2 ];
+return
+
+% affine = [ 1. 0. 1.   1. 1. 0.   0. 0. 1.   1. ];
+% n1expand = [ 2 2 2 ];
+% n2expand = [ 2 2 2 ];
 
   out = { 'x'   1  1 1 1 1   -1 -1 -1 -1 };
 
