@@ -1,9 +1,9 @@
 % TeraShake 200 m
 % np(2) = 1:43, 56, 76, 80, np(3) = 1:4, 10, 15, 20, 24, 29, 34, 37, 45
-  datadir = 'ts/0200/data'; itio = 500; itcheck = 2000;
+  datadir = 'ts/0200/data'; itio = 500; itcheck = 0;
   nt = 15000;
-  np = [ 1 40 45 ] % DS 225/265
   np = [ 1 24 20 ] % TG 240/256
+  np = [ 1 40 45 ] % DS 225/265
 
 
 

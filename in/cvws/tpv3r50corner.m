@@ -16,8 +16,8 @@
   vp  = 6000.;
   vs  = 3464.;
   rho = 2670.;
-  gam = .0;
-  hourglass = [ 1. 0. ];
+  gam = .05;
+  hourglass = [ 1. .5 ];
 
   faultnormal = 3;
   vrup = -1.;
