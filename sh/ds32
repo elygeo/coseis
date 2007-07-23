@@ -16,8 +16,8 @@ case "\$mode\${1:--i}" in
   s-i)  $bin ;;
   s-g)  pdx $bin ;;
   s-tv) totalview $bin ;;
-  p-i)  poe $bin \$opts ;;
-  p-tv) tvpoe $bin \$opts ;;
+  p-i)  poe32 $bin \$opts ;;
+  p-tv) tvpoe32 $bin \$opts ;;
 esac
 $post
 echo "\$( date ): $code finished" >> log
@@ -48,22 +48,24 @@ cat << END > script
 #MP_SHARED_MEMORY=yes;\\
 #MP_SINGLE_THREAD=no;\\
 #RT_GRQ=ON;\\
-#SPINLOOPTIME=0;\\
-#YIELDLOOPTIME=0;
+#XLSMPOPTS="stack=67108864"
 #@ job_name = $code$count
 #@ initialdir = $rundir
 #@ node = $nodes
 #@ tasks_per_node = $ppn
 #@ wall_clock_limit = $walltime
+#@ resources = ConsumableCpus(1) ConsumableMemory(${ramproc}mb)
 #@ notification = always
 #@ notify_user = $email
 #@ job_type = parallel
-#@ class = normal
-#@ node_usage = not_shared
+#@ class = normal32
+#@ node_usage = shared
 #@ network.MPI = sn_all, shared, US
 #@ output = out.\$(jobid)
 #@ error = err.\$(jobid) 
 #@ queue
+export MEMORY_AFFINITY=MCM
+export MP_TASK_AFFINITY=MCM
 cd "$rundir"
 echo "\$( date ): $code started" >> log
 $pre

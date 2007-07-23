@@ -51,26 +51,28 @@ case( 'r' )
 end select
 end do doiz
 
-! Add random noise, leave boundaries flat, bc=3 means zero normal component
+! Add random noise except at boundaries and in PML
 if ( gridnoise > 0. ) then
   call random_seed( size=i )
   allocate( seed(i) )
   seed = ip
   call random_seed( put=seed )
   call random_number( w2 )
+  w2 = dx * gridnoise * ( w2 - .5 )
   i1 = i1pml + 1
   i2 = i2pml - 1
   call vectorsethalo( w2, 0., i1, i2 )
-  bc = 1
-  call vectorbc( w2, bc, bc, i1bc, i2bc )
+  i1 = i1bc + 1
+  i2 = i2bc - 1
+  call vectorsethalo( w2, 0., i1, i2 )
   i1 = max( i1core, ihypo )
   i2 = min( i2core, ihypo + 1 )
   select case( abs( faultnormal ) )
-  case( 1 ); w2(i1(1):i2(1),:,:,1) = 0.
-  case( 2 ); w2(:,i1(2):i2(2),:,2) = 0.
-  case( 3 ); w2(:,:,i1(3):i2(3),3) = 0.
+  case( 1 ); w2(i1(1):i2(1),:,:,:) = 0.
+  case( 2 ); w2(:,i1(2):i2(2),:,:) = 0.
+  case( 3 ); w2(:,:,i1(3):i2(3),:) = 0.
   end select
-  w1 = w1 + dx * gridnoise * ( w2 - .5 )
+  w1 = w1 + w2
 end if
 
 ! Grid expansion

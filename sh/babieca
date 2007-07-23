@@ -39,13 +39,10 @@ END
 cat << END > script
 #!/bin/bash
 #PBS -N $code$count
-#PBS -l nodes=$nodes:ppn=$ppn
+#PBS -l nodes=$nodes:ppn=$ppn:mpi
 #PBS -l walltime=$walltime
 #PBS -q workq
-#PBS -M $email
-#PBS -m abe
 #PBS -V
-sleep 2
 cd "$rundir"
 echo "\$( date ): $code started" >> log
 $pre

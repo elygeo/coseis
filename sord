@@ -94,24 +94,26 @@ done < tmp/input
 
 # Host
 if [ "$machine" ]; then :
+elif [ "$HOSTNAME" = master ];   then machine=babieca
+elif [ "$HOSTNAME" = ds011 ];    then machine=ds32
 elif [ "${HOSTNAME:0:2}" = ds ]; then machine=datastar
 elif [ "${HOSTNAME:0:2}" = tg ]; then machine=teragrid
-elif [ "$HOSTNAME" = master ];   then machine=babieca
 else machine=${HOSTNAME%%.*}
 fi
 
 # Machine attributes
 maxnodes=1; maxcpus=1; maxram=800; maxmm=0; rate=500
 case $machine in
-  wide)                   maxcpus=2; maxram=1800 ;;
-  kim)                    maxcpus=2; maxram=800  ;;
-  phim)                              maxram=2800;  rate=400 ;;
-  altai)                  maxcpus=8; maxram=30000; rate=100  ;; 
-  babieca)  maxnodes=30;  maxcpus=2; maxram=1800;  rate=100 ;;
-  teragrid) maxnodes=256; maxcpus=2; maxram=3000;  rate=500; maxmm=1080 ;;
-  datastar) maxnodes=265; maxcpus=8; maxram=13500; rate=200; maxmm=1080 ;;
+  wide)                   maxcpus=2;  maxram=1800 ;;
+  kim)                    maxcpus=2;  maxram=800  ;;
+  phim)                               maxram=2800;   rate=400 ;;
+  altai)                  maxcpus=8;  maxram=30000;  rate=100  ;; 
+  babieca)  maxnodes=30;  maxcpus=2;  maxram=1800;   rate=100 ;;
+  teragrid) maxnodes=256; maxcpus=2;  maxram=3000;   rate=800; maxmm=1080 ;;
+  datastar) maxnodes=265; maxcpus=8;  maxram=13500;  rate=200; maxmm=1080 ;;
+  ds32)     maxnodes=5;   maxcpus=32; maxram=124000; rate=200; maxmm=1080 ;;
 esac
-echo "Machine: $machine ($(( maxnodes * maxcpus )),$maxram)"
+echo "Machine: $machine"
 
 # Number of processors
 [ $mode = guess -a $(( maxnodes * maxcpus )) -eq 1 ] && mode=s
@@ -136,20 +138,27 @@ floatsize=4
 nvars=20 # oplevel 1-2
 nvars=23 # oplevel 3-5
 nvars=44 # oplevel 6
-ram=$( echo $ppn $nm $nvars $floatsize | awk '{ printf "%.0f", $1 * ( $2 * $3 * $4 / 1024 / 1024 + 15 ) }' )
-sus=$( echo $nt $ppn $nm $cpus $rate $nodes $maxcpus | awk '{ printf "%.0f", ( $1 + 2 ) * $2 * $3 / $4 / $5 / 3600000 * $6 * $7 }' )
-mm=$(  echo $nt $ppn $nm $cpus $rate | awk '{ printf "%.0f", ( $1 + 2 ) * $2 * $3 / $4 / $5 / 40000 + 10 }' )
+ramproc=$( echo $nm $nvars $floatsize 1.5 | \
+  awk '{ printf "%.0f", ( $1 * $2 * $3 / 1024 / 1024 + 15 ) * $4 } ' )
+ramnode=$( echo $nm $nvars $floatsize $ppn | \
+  awk '{ printf "%.0f", ( $1 * $2 * $3 / 1024 / 1024 + 15 ) * $4 }' )
+sus=$( echo $nt $ppn $nm $cpus $rate $nodes $maxcpus | \
+  awk '{ printf "%.0f", ( $1 + 10 ) * $2 * $3 / $4 / $5 / 3600000 * $6 * $7 }' )
+mm=$(  echo $nt $ppn $nm $cpus $rate 1.5 | \
+  awk '{ printf "%.0f", ( $1 + 10 ) * $2 * $3 / $4 / $5 / 60000 * $6 + 10 }' )
 [ $maxmm -gt 0 -a $mm -gt $maxmm ] && mm=$maxmm
 hh=$(( mm / 60 ))
 mm=$(( mm % 60 ))
 walltime=$( echo $hh $mm | awk '{ printf "%d:%02d:00", $1, $2 }' )
-echo "Processes: $np"
-echo "Nodes: $nodes"
-echo "Memory usage: ${ram}Mb per node"
-echo "Wall time limit: $walltime"
+echo "Procs: $np of $(( maxnodes * maxcpus ))"
+echo "Nodes: $nodes of $maxnodes"
+echo "RAM: ${ramnode}Mb of ${maxram}Mb per node"
+echo "Time limit: $walltime"
 echo "SUs: $sus"
-[ $ppn -gt $maxcpus ] && echo "Warning: exceding available CPUs per node ($maxcpus)"
-[ $ram -gt $maxram ]  && echo "Warning: exceding available RAM per node (${maxram}Mb)"
+[ $ppn -gt $maxcpus ] && \
+  echo "Warning: exceding available CPUs per node ($maxcpus)"
+[ $ramnode -gt $maxram ] && \
+  echo "Warning: exceding available RAM per node (${maxram}Mb)"
 
 [ "$setup" ] || exit 0
 
@@ -224,7 +233,7 @@ rundir="run/$count"
 echo "Run directory: $rundir"
 mkdir "$rundir"
 echo "$starttime: SORD setup started" >> "$rundir/log"
-cp 'in.m' tmp/sord.tgz tmp/sord-$mode tmp/input "$rundir"
+cp 'in.m' tmp/sord.tgz tmp/sord-$mode tmp/input sh/clean "$rundir"
 if [ $optimize = g ]; then
   cp f/*.f90 "$rundir"
   chmod a-w "$rundir"/*.f90
@@ -256,12 +265,8 @@ END
 # Run scripts
 code="sord"
 bin="./sord-$mode"
-case $machine in
-datastar) . "$srcdir/sh/datastar" ;;
-teragrid) . "$srcdir/sh/teragrid" ;;
-babieca)  . "$srcdir/sh/babieca"  ;;
-*)        . "$srcdir/sh/default"  ;;
-esac
+[ -x "$srcdir/sh/$machine" ] && . "$srcdir/sh/$machine"
+[ -x "$srcdir/sh/$machine" ] || . "$srcdir/sh/default"
 
 # SCECVM
 if [ "$velmodel" ]; then
@@ -297,12 +302,8 @@ if [ "$velmodel" ]; then
   walltime="02:00:00"
   topdir="$rundir"
   rundir="$topdir/scecvm"
-  case $machine in
-  datastar) . "$srcdir/sh/datastar" ;;
-  teragrid) . "$srcdir/sh/teragrid" ;;
-  babieca)  . "$srcdir/sh/babieca"  ;;
-  *)        . "$srcdir/sh/default"  ;;
-  esac
+  [ -x "$srcdir/sh/$machine" ] && . "$srcdir/sh/$machine"
+  [ -x "$srcdir/sh/$machine" ] || . "$srcdir/sh/default"
   if [ "$run" = q ]; then
     echo ./que
     ./que

@@ -4,7 +4,6 @@ crop = 1;
 file = 'fig';
 if nargin > 0, file = varargin{1}; end
 if nargin > 1, crop = 0; end
-set( gcf, 'InvertHardCopy', 'off' )
 print( '-depsc', file )
 movefile( [ file '.eps' ], 'tmp.eps' )
 if crop

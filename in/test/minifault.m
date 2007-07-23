@@ -5,8 +5,10 @@
   faultnormal = 2;
   np = [ 2 2 3 ];
   np = [ 1 3 4 ];
-  nn = [ 3 4 3 ];
+  nn = [ 3 6 3 ];
   ihypo = [ 2 2 2 ];
+gridnoise = -.1;
+gridnoise = .1;
 
 return
 

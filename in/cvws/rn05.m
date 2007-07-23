@@ -3,7 +3,7 @@
   np       = [   1   1  16 ];
   nn       = [ 401 251 182 ];
   ihypo    = [  -1  -1  -2 ];
-  n1expand = [  70  70  70 ];
+  n1expand = [  60  60  60 ];
   n2expand = [   0   0   0 ];
   bc1      = [   0   0   0 ];
   bc2      = [  -1   1  -2 ];
@@ -16,7 +16,7 @@
   vp  = 6000.;
   vs  = 3464.;
   rho = 2670.;
-  gam = .1;
+  gam = .02;
   hourglass = [ 1. 2. ];
 
   faultnormal = 3;
