@@ -1,8 +1,10 @@
 ! Binary I/O for SCEC VM
 
       subroutine readpts( kerr )
-      character(160) :: str
+      implicit none
       include 'newin.h'
+      integer :: kerr, nio, i
+      character(160) :: str
       write( 0, '(a)' ) 'SCEC Velocity Model version 4'
       call get_command_argument( 1, str )
       open( 1, file=str, status='old' )
@@ -40,8 +42,10 @@
       end
 
       subroutine writepts( kerr )
-      character(160) :: str
+      implicit none
       include 'newin.h'
+      integer :: kerr, nio, i
+      character(160) :: str
       inquire( iolength=nio ) rho(1:nn)
       call get_command_argument( 5, str )
       open( 1, file=str, recl=nio, form='unformatted', access='direct',

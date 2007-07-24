@@ -83,6 +83,7 @@ case "$key" in
   nn) nm3=( $1 $2 $3 ) ;;
   np) np3=( $1 $2 $3 ) ;;
   dx) dx=$1 ;;
+  affine) affine=$* ;;
   itswap) nh=$1 ;;
   npml) npml=$1 ;;
   datadir) datadir="$1" ;;
@@ -135,9 +136,9 @@ nm=$( echo ${nm3[*]} | awk '{ print $1 * $2 * $3 }' )
 
 # RAM and Wall time usage
 floatsize=4
-nvars=20 # oplevel 1-2
 nvars=23 # oplevel 3-5
 nvars=44 # oplevel 6
+[ "$affine" = "1. 0. 0. 0. 1. 0. 0. 0. 1." ] && nvars=20 # oplevel 1-2
 ramproc=$( echo $nm $nvars $floatsize 1.5 | \
   awk '{ printf "%.0f", ( $1 * $2 * $3 / 1024 / 1024 + 15 ) * $4 } ' )
 ramnode=$( echo $nm $nvars $floatsize $ppn | \

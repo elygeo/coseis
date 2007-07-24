@@ -16,7 +16,7 @@ case "\$mode\${1:--i}" in
   s-i)  $bin ;;
   s-g)  pdx $bin ;;
   s-tv) totalview $bin ;;
-  p-i)  poe32 $bin \$opts ;;
+  p-i)  poe32 hpmcount $bin \$opts ;;
   p-tv) tvpoe32 $bin \$opts ;;
 esac
 $post

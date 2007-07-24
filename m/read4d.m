@@ -35,6 +35,9 @@ end
 
 switch nargin
 case 1
+  if any( i3(1:3) ~= i4(1:3) )
+    i3(4) = i4(4);
+  end
 case 2
   if ( length( varargin{2} ) == 1 )
     i3(4) = varargin{2};
@@ -67,9 +70,6 @@ case 3
   i3(m3) = i3(m3) + n(m3) + 1;
   i4(m4) = i4(m4) + n(m4) + 1;
 otherwise, error
-end
-if any( i3(1:3) ~= i4(1:3) )
-  i3(4) = i4(4);
 end
 
 if any( i3 > i4 | i3 < i1 | i4 > i2 ) || mod( i3(4) - i1(4), dit ) ~= 0 

@@ -1,30 +1,32 @@
 ! MPI I/O for SCEC VM
 
       subroutine readpts( kerr )
+      implicit none
       include 'newin.h'
       include 'mpif.h'
-      integer(kind=mpi_offset_kind) mpioffset, nnl, i64bit
-      character(160) str
+      integer(kind=mpi_offset_kind) :: nnd, npd, mpioffset
+      integer :: kerr, ip, np, ifh, ierr, i
+      character(160) :: str
       call mpi_init( ierr )
       call get_command_argument( 1, str )
       open( 1, file=str, status='old' )
-      read( 1, * ) nn
+      read( 1, * ) nnd
       close( 1 )
-      call mpi_comm_rank( mpi_comm_world, impirank, ierr )
-      call mpi_comm_size( mpi_comm_world, impisize, ierr )
+      call mpi_comm_rank( mpi_comm_world, ip, ierr )
+      call mpi_comm_size( mpi_comm_world, np, ierr )
       call mpi_file_set_errhandler( mpi_file_null,
      $  MPI_ERRORS_ARE_FATAL, ierr )
-      nnl = nn / impisize
-      if( impirank == 0 ) write(0,'(a)') 'SCEC Velocity Model version 4'
-      i64bit = impisize
-      if( modulo(nnl,i64bit) /= 0 ) nnl = nnl+1
-      nn = min( nnl, nn-impirank*nnl )
-      if ( nnl > ibig ) then
-         print *, 'Error: nnl greater than ibig', nnl, ibig
+      if ( ip == 0 ) write( 0, '(a)' ) 'SCEC Velocity Model version 4'
+      npd = np
+      nnl = nnd / npd
+      if ( modulo( nnd, npd ) /= 0 ) nnl = nnl + 1
+      nn = nnd - ip * nnl
+      nn = min( nn, nnl )
+      if ( nn > ibig ) then
+         print *, 'Error: nn greater than ibig', nn, ibig
          stop
       end if
-      irealsize = 4
-      mpioffset = impirank * nnl * irealsize
+      mpioffset = ip * nnl * irealsize
       call get_command_argument( 2, str )
       call mpi_file_open( mpi_comm_world, str, mpi_mode_rdonly,
      $  mpi_info_null, ifh, ierr )
@@ -55,24 +57,14 @@
       end
 
       subroutine writepts( kerr )
+      implicit none
       include 'newin.h'
       include 'mpif.h'
-      integer(kind=mpi_offset_kind) mpioffset, nnl, i64bit
-      character(160) str
-      call get_command_argument( 1, str )
-      open( 1, file=str, status='old' )
-      read( 1, * ) nn
-      close( 1 )
-      call mpi_comm_rank( mpi_comm_world, impirank, ierr )
-      call mpi_comm_size( mpi_comm_world, impisize, ierr )
-      call mpi_file_set_errhandler( mpi_file_null,
-     $  MPI_ERRORS_ARE_FATAL, ierr )
-      nnl = nn / impisize
-      i64bit = impisize
-      if( modulo(nnl,i64bit) /= 0 ) nnl = nnl+1
-      nn = min( nnl, nn-impirank*nnl )
-      irealsize = 4
-      mpioffset = impirank * nnl * irealsize
+      integer(kind=mpi_offset_kind) :: mpioffset
+      integer :: kerr, ip, ifh, ierr, i
+      character(160) :: str
+      call mpi_comm_rank( mpi_comm_world, ip, ierr )
+      mpioffset = ip * nnl * irealsize
       call get_command_argument( 5, str )
       call mpi_file_open( mpi_comm_world, str,
      $  mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr )

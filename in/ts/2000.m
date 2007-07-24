@@ -4,12 +4,12 @@
   nt = 1500;
   nt =  750;
   np = [ 1 1 2 ];
-
+nt = 10;
 
 
   x1    = 'read';
   x2    = 'read';
-  x3    = 'read';
+% x3    = 'read';
   rho   = 'read';
   vp    = 'read'; vp1  = 1500.;
   vs    = 'read'; vs1  = 500.;

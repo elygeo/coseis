@@ -65,7 +65,7 @@
 % syz = 0.;			% **prestress Syz
 % szx = 0.;			% **prestress Szx
 % sxy = 0.;			% **prestress Sxy
-  vrup = 3117.6914;		% nucleation rupture velocity
+  vrup = 3184.9;		% nucleation rupture velocity (using Rayleigh speed here)
   rcrit = 1000.;		% nucleation critical radius
   trelax = .07;			% nucleation relaxation time
   svtol = .001;			% slip velocity considered rupturing

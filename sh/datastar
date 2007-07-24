@@ -13,10 +13,10 @@ echo "\$( date ): $code started" >> log
 opts="-labelio yes -tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
 $pre
 case "\$mode\${1:--i}" in
-  s-i)  $bin ;;
+  s-i)  hpmcount -o hpm_out $bin ;;
   s-g)  pdx $bin ;;
   s-tv) totalview $bin ;;
-  p-i)  poe $bin \$opts ;;
+  p-i)  poe hpmcount -o hpm_out $bin \$opts ;;
   p-tv) tvpoe $bin \$opts ;;
 esac
 $post
