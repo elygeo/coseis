@@ -34,6 +34,7 @@ real, intent(in) :: x(:,:,:,:), x1(3), x2(3), r
 integer, intent(in) :: i1(3), i2(3)
 integer :: n(3), o(3), j, k, l
 n = (/ size(f,1), size(f,2), size(f,3) /)
+o = 0
 where ( n == 1 ) o = 1 - i1
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
