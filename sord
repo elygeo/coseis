@@ -83,10 +83,10 @@ case "$key" in
   nn) nm3=( $1 $2 $3 ) ;;
   np) np3=( $1 $2 $3 ) ;;
   dx) dx=$1 ;;
-  oplevel) oplevel=$1 ;;
-  itswap) nh=$1 ;;
   npml) npml=$1 ;;
+  oplevel) oplevel=$1 ;;
   datadir) datadir="$1" ;;
+  faultnormal) faultnormal=$1 ;;
   return) break ;;
 esac
 done < tmp/input
@@ -129,9 +129,11 @@ cpus=$ppn
 [ $cpus -gt $maxcpus ] && cpus=$maxcpus
 
 # Local domain size
-nm3[0]=$(( nm3[0] / np3[0] + 2 * nh + ( nm3[0] % np3[0] > 0 ? 1 : 0 ) ))
-nm3[1]=$(( nm3[1] / np3[1] + 2 * nh + ( nm3[1] % np3[1] > 0 ? 1 : 0 ) ))
-nm3[2]=$(( nm3[2] / np3[2] + 2 * nh + ( nm3[2] % np3[2] > 0 ? 1 : 0 ) ))
+nm3[0]=$(( nm3[0] / np3[0] + 2 + ( nm3[0] % np3[0] > 0 ? 1 : 0 ) ))
+nm3[1]=$(( nm3[1] / np3[1] + 2 + ( nm3[1] % np3[1] > 0 ? 1 : 0 ) ))
+nm3[2]=$(( nm3[2] / np3[2] + 2 + ( nm3[2] % np3[2] > 0 ? 1 : 0 ) ))
+i=$(( faultnormal - 1 ))
+[ $i -ge 0 ] && nm3[i]=$(( nm3[i] + 2 ))
 nm=$( echo ${nm3[*]} | awk '{ print $1 * $2 * $3 }' )
 
 # RAM and Wall time usage

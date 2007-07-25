@@ -7,10 +7,10 @@ subroutine arrays
 use m_globals
 integer :: i1(3), i2(3), j, k, l, j1, k1, l1, j2, k2, l2
 
-i2 = nm
-j = i2(1)
-k = i2(2)
-l = i2(3)
+! 3d
+j = nm(1)
+k = nm(2)
+l = nm(3)
 
 ! 3d vectors
 allocate(       &
@@ -34,6 +34,7 @@ allocate(       &
   s1(j,k,l),    &
   s2(j,k,l)     )
 
+! PML
 i1 = 0
 i2 = 0
 where ( bc1 > 2 ) i1 = npml
@@ -60,6 +61,7 @@ allocate(       &
 ! PML damping
 allocate( dn1(npml), dn2(npml), dc1(npml), dc2(npml) )
 
+! Fault
 if ( ifn /= 0 ) then
   i1 = nm
   i1(ifn) = 1
