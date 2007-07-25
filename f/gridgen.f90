@@ -115,11 +115,15 @@ end if
 
 ! Affine grid transformation
 m = affine
-forall( j=1:nm(1), k=1:nm(2), l=1:nm(3) )
+do l = 1, nm(3)
+do k = 1, nm(2)
+do j = 1, nm(1)
   w2(j,k,l,1) = m(1) * w1(j,k,l,1) + m(2) * w1(j,k,l,2) + m(3) * w1(j,k,l,3)
   w2(j,k,l,2) = m(4) * w1(j,k,l,1) + m(5) * w1(j,k,l,2) + m(6) * w1(j,k,l,3)
   w2(j,k,l,3) = m(7) * w1(j,k,l,1) + m(8) * w1(j,k,l,2) + m(9) * w1(j,k,l,3)
-end forall
+end do
+end do
+end do
 w1 = w2
 
 ! Fill halo, bc=4 means copy into halo, need this for nhat
@@ -148,14 +152,18 @@ end select
 if ( fixhypo > 0 ) then
   xhypo = x0
 elseif ( fixhypo < 0 ) then
-  forall( j=1:nm(1), k=1:nm(2), l=1:nm(3) )
+  do l = 1, nm(3)
+  do k = 1, nm(2)
+  do j = 1, nm(1)
     w1(j,k,l,1) = w1(j,k,l,1) - x0(1) + xhypo(1)
     w1(j,k,l,2) = w1(j,k,l,2) - x0(2) + xhypo(2)
     w1(j,k,l,3) = w1(j,k,l,3) - x0(3) + xhypo(3)
     w2(j,k,l,1) = w2(j,k,l,1) - x0(1) + xhypo(1)
     w2(j,k,l,2) = w2(j,k,l,2) - x0(2) + xhypo(2)
     w2(j,k,l,3) = w2(j,k,l,3) - x0(3) + xhypo(3)
-  end forall
+  end do
+  end do
+  end do
 end if
 
 ! Orthogonality test
@@ -190,7 +198,9 @@ case( 6 )
   do i = 1, 3
     b = modulo( i, 3 ) + 1
     c = modulo( i + 1, 3 ) + 1
-    forall( j=1:nm(1)-1, k=1:nm(2)-1, l=1:nm(3)-1 )
+    do l = 1, nm(3)-1
+    do k = 1, nm(2)-1
+    do j = 1, nm(1)-1
       bb(j,k,l,1,i) = 1. / 12. * &
         ((w1(j+1,k,l,b)-w1(j,k+1,l+1,b))*(w1(j+1,k+1,l,c)-w1(j+1,k,l+1,c))+w1(j,k+1,l+1,b)*(w1(j,k,l+1,c)-w1(j,k+1,l,c)) &
         +(w1(j,k+1,l,b)-w1(j+1,k,l+1,b))*(w1(j,k+1,l+1,c)-w1(j+1,k+1,l,c))+w1(j+1,k,l+1,b)*(w1(j+1,k,l,c)-w1(j,k,l+1,c)) &
@@ -223,7 +233,9 @@ case( 6 )
         ((w1(j,k,l,b)-w1(j+1,k+1,l+1,b))*(w1(j,k+1,l,c)-w1(j+1,k,l,c))+w1(j+1,k+1,l+1,b)*(w1(j+1,k,l+1,c)-w1(j,k+1,l+1,c)) &
         +(w1(j,k+1,l+1,b)-w1(j+1,k,l,b))*(w1(j+1,k+1,l+1,c)-w1(j,k+1,l,c))+w1(j+1,k,l,b)*(w1(j,k,l,c)-w1(j+1,k,l+1,c)) &
         +(w1(j+1,k,l+1,b)-w1(j,k+1,l,b))*(w1(j+1,k,l,c)-w1(j+1,k+1,l+1,c))+w1(j,k+1,l,b)*(w1(j,k+1,l+1,c)-w1(j,k,l,c)))
-    end forall
+    end do
+    end do
+    end do
   end do
 case default; stop 'illegal operator'
 end select

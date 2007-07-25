@@ -16,7 +16,7 @@ case "\$mode\${1:--i}" in
   s-i)  hpmcount -o hpm_out $bin ;;
   s-g)  pdx $bin ;;
   s-tv) totalview $bin ;;
-  p-i)  poe hpmcount -o hpm_out $bin \$opts ;;
+  p-i)  poe hpmcount -a -o hpm_out $bin \$opts ;;
   p-tv) tvpoe $bin \$opts ;;
 esac
 $post

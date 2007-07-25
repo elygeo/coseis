@@ -8,47 +8,59 @@ subroutine hourglassnc( df, f, iq, i, i1, i2 )
 real, intent(out) :: df(:,:,:)
 real, intent(in) :: f(:,:,:,:)
 integer, intent(in) :: iq, i, i1(3), i2(3)
-integer :: j, k, l, j1, k1, l1, j2, k2, l2
+integer :: j, k, l
 
 if ( any( i1 > i2 ) ) return
 
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-
 select case( iq )
 case( 1 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
     df(j,k,l) = &
       f(j,k,l,i) + f(j+1,k+1,l+1,i) &
     + f(j,k+1,l+1,i) + f(j+1,k,l,i) &
     - f(j+1,k,l+1,i) - f(j,k+1,l,i) &
     - f(j+1,k+1,l,i) - f(j,k,l+1,i)
-  end forall
+  end do
+  end do
+  end do
 case( 2 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
     df(j,k,l) = &
       f(j,k,l,i) + f(j+1,k+1,l+1,i) &
     - f(j,k+1,l+1,i) - f(j+1,k,l,i) &
     + f(j+1,k,l+1,i) + f(j,k+1,l,i) &
     - f(j+1,k+1,l,i) - f(j,k,l+1,i)
-  end forall
+  end do
+  end do
+  end do
 case( 3 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
     df(j,k,l) = &
       f(j,k,l,i) + f(j+1,k+1,l+1,i) &
     - f(j,k+1,l+1,i) - f(j+1,k,l,i) &
     - f(j+1,k,l+1,i) - f(j,k+1,l,i) &
     + f(j+1,k+1,l,i) + f(j,k,l+1,i)
-  end forall
+  end do
+  end do
+  end do
 case( 4 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
     df(j,k,l) = &
       f(j,k,l,i) - f(j+1,k+1,l+1,i) &
     + f(j,k+1,l+1,i) - f(j+1,k,l,i) &
     + f(j+1,k,l+1,i) - f(j,k+1,l,i) &
     + f(j+1,k+1,l,i) - f(j,k,l+1,i) 
-  end forall
+  end do
+  end do
+  end do
 end select
 
 end subroutine
@@ -60,47 +72,59 @@ subroutine hourglasscn( df, f, iq, i1, i2 )
 real, intent(out) :: df(:,:,:)
 real, intent(in) :: f(:,:,:)
 integer, intent(in) :: iq, i1(3), i2(3)
-integer :: j, k, l, j1, k1, l1, j2, k2, l2
+integer :: j, k, l
 
 if ( any( i1 > i2 ) ) return
 
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-
 select case( iq )
 case( 1 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
     df(j,k,l) = &
       f(j,k,l) + f(j-1,k-1,l-1) &
     + f(j,k-1,l-1) + f(j-1,k,l) &
     - f(j-1,k,l-1) - f(j,k-1,l) &
     - f(j-1,k-1,l) - f(j,k,l-1)
-  end forall
+  end do
+  end do
+  end do
 case( 2 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
     df(j,k,l) = &
       f(j,k,l) + f(j-1,k-1,l-1) &
     - f(j,k-1,l-1) - f(j-1,k,l) &
     + f(j-1,k,l-1) + f(j,k-1,l) &
     - f(j-1,k-1,l) - f(j,k,l-1)
-  end forall
+  end do
+  end do
+  end do
 case( 3 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
     df(j,k,l) = &
       f(j,k,l) + f(j-1,k-1,l-1) &
     - f(j,k-1,l-1) - f(j-1,k,l) &
     - f(j-1,k,l-1) - f(j,k-1,l) &
     + f(j-1,k-1,l) + f(j,k,l-1)
-  end forall
+  end do
+  end do
+  end do
 case( 4 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
     df(j,k,l) = &
       f(j,k,l) - f(j-1,k-1,l-1) &
     + f(j,k-1,l-1) - f(j-1,k,l) &
     + f(j-1,k,l-1) - f(j,k-1,l) &
     + f(j-1,k-1,l) - f(j,k,l-1)
-  end forall
+  end do
+  end do
+  end do
 end select
 
 end subroutine

@@ -8,84 +8,110 @@ real, intent(out) :: df(:,:,:)
 real, intent(in) :: f(:,:,:,:), bb(:,:,:,:,:), x(:,:,:,:), dx1(:), dx2(:), dx3(:), dx
 integer, intent(in) :: i, a, i1(3), i2(3), oplevel
 real :: h
-integer :: j, k, l, j1, k1, l1, j2, k2, l2, b, c
+integer :: j, k, l, b, c
 
 if ( any( i1 > i2 ) ) return
-
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
 
 select case( oplevel )
 
 ! Saved B matrix, flops: 8* 7+
 case( 6 )
-forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+do l = i1(3), i2(3)
+do k = i1(2), i2(2)
+do j = i1(1), i2(1)
   df(j,k,l) = &
   - bb(j,k,l,5,a) * f(j,k,l,i) - f(j-1,k-1,l-1,i) * bb(j-1,k-1,l-1,1,a) &
   - bb(j,k-1,l-1,6,a) * f(j,k-1,l-1,i) - f(j-1,k,l,i) * bb(j-1,k,l,2,a) &
   - bb(j-1,k,l-1,7,a) * f(j-1,k,l-1,i) - f(j,k-1,l,i) * bb(j,k-1,l,3,a) &
   - bb(j-1,k-1,l,8,a) * f(j-1,k-1,l,i) - f(j,k,l-1,i) * bb(j,k,l-1,4,a)
-end forall
+end do
+end do
+end do
 
 ! Constant grid, flops: 1* 7+
 case( 1 )
 h = 0.25 * dx * dx
 select case( a )
 case( 1 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
   df(j,k,l) = h * &
   ( f(j,k,l,i) - f(j-1,k-1,l-1,i) &
   + f(j,k-1,l-1,i) - f(j-1,k,l,i) &
   - f(j-1,k,l-1,i) + f(j,k-1,l,i) &
   - f(j-1,k-1,l,i) + f(j,k,l-1,i) )
-  end forall
+  end do
+  end do
+  end do
 case( 2 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
   df(j,k,l) = h * &
   ( f(j,k,l,i) - f(j-1,k-1,l-1,i) &
   - f(j,k-1,l-1,i) + f(j-1,k,l,i) &
   + f(j-1,k,l-1,i) - f(j,k-1,l,i) &
   - f(j-1,k-1,l,i) + f(j,k,l-1,i) )
-  end forall
+  end do
+  end do
+  end do
 case( 3 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
   df(j,k,l) = h * &
   ( f(j,k,l,i) - f(j-1,k-1,l-1,i) &
   - f(j,k-1,l-1,i) + f(j-1,k,l,i) &
   - f(j-1,k,l-1,i) + f(j,k-1,l,i) &
   + f(j-1,k-1,l,i) - f(j,k,l-1,i) )
-  end forall
+  end do
+  end do
+  end do
 end select
 
 ! Rectangular grid, flops: 6* 7+
 case( 2 )
 select case( a )
 case( 1 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
   df(j,k,l) = &
   dx3(l)   * ( dx2(k) * ( f(j,k,l,i)   - f(j-1,k,l,i) )   + dx2(k-1) * ( f(j,k-1,l,i)   - f(j-1,k-1,l,i)   ) ) + &
   dx3(l-1) * ( dx2(k) * ( f(j,k,l-1,i) - f(j-1,k,l-1,i) ) + dx2(k-1) * ( f(j,k-1,l-1,i) - f(j-1,k-1,l-1,i) ) )
-  end forall
+  end do
+  end do
+  end do
 case( 2 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
   df(j,k,l) = &
   dx1(j)   * ( dx3(l) * ( f(j,k,l,i)   - f(j,k-1,l,i) )   + dx3(l-1) * ( f(j,k,l-1,i)   - f(j,k-1,l-1,i)   ) ) + &
   dx1(j-1) * ( dx3(l) * ( f(j-1,k,l,i) - f(j-1,k-1,l,i) ) + dx3(l-1) * ( f(j-1,k,l-1,i) - f(j-1,k-1,l-1,i) ) )
-  end forall
+  end do
+  end do
+  end do
 case( 3 )
-  forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
   df(j,k,l) = &
   dx2(k)   * ( dx1(j) * ( f(j,k,l,i)   - f(j,k,l-1,i) )   + dx1(j-1) * ( f(j-1,k,l,i)   - f(j-1,k,l-1,i)   ) ) + &
   dx2(k-1) * ( dx1(j) * ( f(j,k-1,l,i) - f(j,k-1,l-1,i) ) + dx1(j-1) * ( f(j-1,k-1,l,i) - f(j-1,k-1,l-1,i) ) )
-  end forall
+  end do
+  end do
+  end do
 end select
 
 ! Parallelepiped grid, flops: 33* 47+
 case( 3 )
 b = modulo( a, 3 ) + 1
 c = modulo( a + 1, 3 ) + 1
-forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+do l = i1(3), i2(3)
+do k = i1(2), i2(2)
+do j = i1(1), i2(1)
 df(j,k,l) = 0.25 * &
 (f(j,k,l,i)* &
   (x(j+1,k,l,b)*(x(j,k+1,l,c)-x(j,k,l+1,c)) &
@@ -119,13 +145,17 @@ df(j,k,l) = 0.25 * &
   (x(j,k,l-1,b)*(x(j,k+1,l,c)-x(j+1,k,l,c)) &
   +x(j+1,k,l,b)*(x(j,k,l-1,c)-x(j,k+1,l,c)) &
   +x(j,k+1,l,b)*(x(j+1,k,l,c)-x(j,k,l-1,c))))
-end forall
+end do
+end do
+end do
 
 ! General grid one-point quadrature, flops: 33* 119+
 case( 4 )
 b = modulo( a, 3 ) + 1
 c = modulo( a + 1, 3 ) + 1
-forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+do l = i1(3), i2(3)
+do k = i1(2), i2(2)
+do j = i1(1), i2(1)
 df(j,k,l) = 0.0625 * &
 (f(j,k,l,i)* &
   ((x(j+1,k,l,b)-x(j,k+1,l+1,b))*(x(j,k+1,l,c)-x(j+1,k,l+1,c)-x(j,k,l+1,c)+x(j+1,k+1,l,c)) &
@@ -159,13 +189,17 @@ df(j,k,l) = 0.0625 * &
   ((x(j,k,l-1,b)-x(j+1,k+1,l,b))*(x(j,k+1,l-1,c)-x(j+1,k,l,c)-x(j+1,k,l-1,c)+x(j,k+1,l,c)) &
   +(x(j+1,k,l,b)-x(j,k+1,l-1,b))*(x(j+1,k,l-1,c)-x(j,k+1,l,c)-x(j+1,k+1,l,c)+x(j,k,l-1,c)) &
   +(x(j,k+1,l,b)-x(j+1,k,l-1,b))*(x(j+1,k+1,l,c)-x(j,k,l-1,c)-x(j,k+1,l-1,c)+x(j+1,k,l,c))))
-end forall
+end do
+end do
+end do
 
 ! General grid exact, flops: 57* 119+
 case( 5 )
 b = modulo( a, 3 ) + 1
 c = modulo( a + 1, 3 ) + 1
-forall( j=j1:j2, k=k1:k2, l=l1:l2 )
+do l = i1(3), i2(3)
+do k = i1(2), i2(2)
+do j = i1(1), i2(1)
 df(j,k,l) = 1. / 12. * &
 (f(j,k,l,i)* &
   ((x(j+1,k,l,b)-x(j,k+1,l+1,b))*(x(j,k+1,l,c)-x(j,k,l+1,c))+x(j+1,k,l,b)*(x(j+1,k+1,l,c)-x(j+1,k,l+1,c)) &
@@ -199,7 +233,9 @@ df(j,k,l) = 1. / 12. * &
   ((x(j,k,l-1,b)-x(j+1,k+1,l,b))*(x(j,k+1,l,c)-x(j+1,k,l,c))+x(j,k,l-1,b)*(x(j,k+1,l-1,c)-x(j+1,k,l-1,c)) &
   +(x(j+1,k,l,b)-x(j,k+1,l-1,b))*(x(j,k,l-1,c)-x(j,k+1,l,c))+x(j+1,k,l,b)*(x(j+1,k,l-1,c)-x(j+1,k+1,l,c)) &
   +(x(j,k+1,l,b)-x(j+1,k,l-1,b))*(x(j+1,k,l,c)-x(j,k,l-1,c))+x(j,k+1,l,b)*(x(j+1,k+1,l,c)-x(j,k+1,l-1,c))))
-end forall
+end do
+end do
+end do
 
 case default; stop 'illegal operator'
 

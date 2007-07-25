@@ -33,15 +33,15 @@ real, intent(inout) :: s(:,:,:)
 real, intent(in) :: x(:,:,:,:), x1(3), x2(3), r
 integer, intent(in) :: i1(3), i2(3)
 integer :: j1, k1, l1, j2, k2, l2
-j1 = i1(1); j2 = i2(1)
-k1 = i1(2); k2 = i2(2)
-l1 = i1(3); l2 = i2(3)
-where( x(j1:j2,k1:k2,l1:l2,1) >= x1(1) &
- .and. x(j1:j2,k1:k2,l1:l2,2) >= x1(2) &
- .and. x(j1:j2,k1:k2,l1:l2,3) >= x1(3) &
- .and. x(j1:j2,k1:k2,l1:l2,1) <= x2(1) &
- .and. x(j1:j2,k1:k2,l1:l2,2) <= x2(2) &
- .and. x(j1:j2,k1:k2,l1:l2,3) <= x2(3) ) s = r
+do l = i1(3), i2(3)
+do k = i1(2), i2(2)
+do j = i1(1), i2(1)
+if( x(j,k,l,1) >= x1(1) .and. x(j,k,l,1) <= x2(1) .and. &
+    x(j,k,l,2) >= x1(2) .and. x(j,k,l,2) <= x2(2) .and. &
+    x(j,k,l,3) >= x1(3) .and. x(j,k,l,3) <= x2(3) ) s(j,k,l) = r
+end do
+end do
+end do
 end subroutine
 
 subroutine scalaraverage( fa, f, i1, i2, d )
@@ -51,13 +51,17 @@ integer, intent(in) :: i1(3), i2(3), d
 integer :: j, k, l, n(3)
 n = (/ size(f,1), size(f,2), size(f,3) /)
 if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in scalaraverage'
-forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+do l = i1(3), i2(3)
+do k = i1(2), i2(2)
+do j = i1(1), i2(1)
   fa(j,k,l) = 0.125 * &
   ( f(j,k,l) + f(j+d,k+d,l+d) &
   + f(j,k+d,l+d) + f(j+d,k,l) &
   + f(j+d,k,l+d) + f(j,k+d,l) &
   + f(j+d,k+d,l) + f(j,k,l+d) )
-end forall
+end do
+end do
+end do
 call scalarsethalo( fa, 0., i1, i2 )
 end subroutine
 
@@ -68,13 +72,19 @@ integer, intent(in) :: i1(3), i2(3), d
 integer :: i, j, k, l, n(3)
 n = (/ size(f,1), size(f,2), size(f,3) /)
 if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vectoraverage'
-forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3), i=1:3 )
+do i = 1, 3
+do l = i1(3), i2(3)
+do k = i1(2), i2(2)
+do j = i1(1), i2(1)
   fa(j,k,l,i) = 0.125 * &
   ( f(j,k,l,i) + f(j+d,k+d,l+d,i) &
   + f(j,k+d,l+d,i) + f(j+d,k,l,i) &
   + f(j+d,k,l+d,i) + f(j,k+d,l,i) &
   + f(j+d,k+d,l,i) + f(j,k,l+d,i) )
-end forall
+end do
+end do
+end do
+end do
 call vectorsethalo( fa, 0., i1, i2 )
 end subroutine
 
@@ -85,12 +95,16 @@ integer, intent(in) :: i1(3), i2(3)
 integer :: j, k, l, n(3)
 n = (/ size(r,1), size(r,2), size(r,3) /)
 if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in radius'
-forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+do l = i1(3), i2(3)
+do k = i1(2), i2(2)
+do j = i1(1), i2(1)
   r(j,k,l) = &
   ( x(j,k,l,1) - x0(1) ) * ( x(j,k,l,1) - x0(1) ) + &
   ( x(j,k,l,2) - x0(2) ) * ( x(j,k,l,2) - x0(2) ) + &
   ( x(j,k,l,3) - x0(3) ) * ( x(j,k,l,3) - x0(3) )
-end forall
+end do
+end do
+end do
 end subroutine
 
 subroutine vectornorm( s, f, i1, i2 )
@@ -100,12 +114,16 @@ integer, intent(in) :: i1(3), i2(3)
 integer :: j, k, l, n(3)
 n = (/ size(s,1), size(s,2), size(s,3) /)
 if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vectornorm'
-forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+do l = i1(3), i2(3)
+do k = i1(2), i2(2)
+do j = i1(1), i2(1)
   s(j,k,l) = &
   f(j,k,l,1) * f(j,k,l,1) + &
   f(j,k,l,2) * f(j,k,l,2) + &
   f(j,k,l,3) * f(j,k,l,3)
-end forall
+end do
+end do
+end do
 end subroutine
 
 subroutine tensornorm( s, w1, w2, i1, i2 )
@@ -115,7 +133,9 @@ integer, intent(in) :: i1(3), i2(3)
 integer :: j, k, l, n(3)
 n = (/ size(s,1), size(s,2), size(s,3) /)
 if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in tensornorm'
-forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
+do l = i1(3), i2(3)
+do k = i1(2), i2(2)
+do j = i1(1), i2(1)
   s(j,k,l) = &
   w1(j,k,l,1) * w1(j,k,l,1) + &
   w1(j,k,l,2) * w1(j,k,l,2) + &
@@ -123,7 +143,9 @@ forall( j=i1(1):i2(1), k=i1(2):i2(2), l=i1(3):i2(3) )
   ( w2(j,k,l,1) * w2(j,k,l,1) &
   + w2(j,k,l,2) * w2(j,k,l,2) &
   + w2(j,k,l,3) * w2(j,k,l,3) ) * 2.
-end forall
+end do
+end do
+end do
 end subroutine
 
 subroutine scalarsethalo( f, r, i1, i2 )

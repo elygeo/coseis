@@ -68,19 +68,19 @@ if ( any( s2  /= s2  ) .or. maxval( s2  ) > huge( r ) ) stop 'NaN/Inf in vs'
 if ( any( gam /= gam ) .or. maxval( gam ) > huge( r ) ) stop 'NaN/Inf in gam'
 
 ! Limits
-if ( rho1 > 0. ) where ( mr < rho1 ) mr = rho1
-if ( rho2 > 0. ) where ( mr > rho2 ) mr = rho2
-if ( vp1  > 0. ) where ( s1 < vp1  ) s1 = vp1
-if ( vp2  > 0. ) where ( s1 > vp2  ) s1 = vp2
-if ( vs1  > 0. ) where ( s2 < vs1  ) s2 = vs1
-if ( vs2  > 0. ) where ( s2 > vs2  ) s2 = vs2
+if ( rho1 > 0. ) mr = max( mr, rho1 )
+if ( rho2 > 0. ) mr = min( mr, rho2 )
+if ( vp1  > 0. ) s1 = max( s1, vp1 )
+if ( vp2  > 0. ) s1 = min( s1, vp2 )
+if ( vs1  > 0. ) s2 = max( s2, vs1 )
+if ( vs2  > 0. ) s2 = min( s2, vs2 )
 
 ! Velocity dependent viscosity
 if ( vdamp > 0. ) where( s2 > 0. ) gam = vdamp / s2
 
 ! Limits
-if ( gam1 > 0. ) where ( gam < gam1 ) gam = gam1
-if ( gam2 > 0. ) where ( gam > gam2 ) gam = gam2
+if ( gam1 > 0. ) gam = max( gam, gam1 )
+if ( gam2 > 0. ) gam = min( gam, gam2 )
 
 ! Averages
 stats = 0.
