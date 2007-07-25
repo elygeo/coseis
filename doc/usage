@@ -60,7 +60,7 @@ SDSC DataStar IBM
   Login to dslogin.sdsc.edu to submit batch jobs
   Login to dspoe.sdsc.edu to run interactively
 
-SDSC TeraGrid IA64 Cluster
+SDSC TeraGrid IA64 cluster
   http://www.sdsc.edu/user_services/ia64/
   http://clumon.sdsc.edu/
   http://grid.ncsa.uiuc.edu/teragrid/status/
@@ -89,7 +89,7 @@ SDSC TeraGrid IA64 Cluster
     qsub batchjob
     qdel
 
-SDSU CSRC Babieca Cluster
+SDSU CSRC Babieca cluster
   http://babieca.sdsu.edu/
   http://www.csrc.sdsu.edu/csrc/about/computing/
   interactive nodes:

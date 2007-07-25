@@ -1,4 +1,5 @@
 #!/bin/bash -e
+# SDSU CSRC Babieca cluster
 
 cat << END > run
 #!/bin/bash -e

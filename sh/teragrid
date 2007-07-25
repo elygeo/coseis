@@ -1,5 +1,5 @@
 #!/bin/bash -e
-
+# SDSC TeraGrid IA64 cluster
 
 cat << END > run
 #!/bin/bash -e

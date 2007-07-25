@@ -18,10 +18,11 @@ s1 = 0.
 s2 = 0.
 gam = 0.
 
-! Loop over input zones
+! Inputs
 doiz: do iz = 1, nin
-
-! Indices
+r = inval(iz)
+x1 = x1in(iz,:)
+x2 = x2in(iz,:)
 i1 = i1in(iz,:)
 i2 = i2in(iz,:)
 call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
@@ -31,24 +32,7 @@ i4 = min( i2, i2core )
 j1 = i3(1); j2 = i4(1)
 k1 = i3(2); k2 = i4(2)
 l1 = i3(3); l2 = i4(3)
-
 select case( intype(iz) )
-case( 'z' )
-  select case( fieldin(iz) )
-  case( 'rho' ); mr(j1:j2,k1:k2,l1:l2)  = inval(iz)
-  case( 'vp'  ); s1(j1:j2,k1:k2,l1:l2)  = inval(iz)
-  case( 'vs'  ); s2(j1:j2,k1:k2,l1:l2)  = inval(iz)
-  case( 'gam' ); gam(j1:j2,k1:k2,l1:l2) = inval(iz)
-  end select
-case( 'c' )
-  x1 = x1in(iz,:)
-  x2 = x2in(iz,:)
-  select case( fieldin(iz) )
-  case( 'rho' ); call cube( mr,  w2, i3, i4, x1, x2, inval(iz) )
-  case( 'vp'  ); call cube( s1,  w2, i3, i4, x1, x2, inval(iz) )
-  case( 'vs'  ); call cube( s2,  w2, i3, i4, x1, x2, inval(iz) )
-  case( 'gam' ); call cube( gam, w2, i3, i4, x1, x2, inval(iz) )
-  end select
 case( 'r' )
   i = mpin * 4
   select case( fieldin(iz) )
@@ -57,8 +41,21 @@ case( 'r' )
   case( 'vs'  ); call rio3( -1, i, r, 'data/vs',  s2,  i1, i2, i3, i4, 1, 1 )
   case( 'gam' ); call rio3( -1, i, r, 'data/gam', gam, i1, i2, i3, i4, 1, 1 )
   end select
+case( 'z' )
+  select case( fieldin(iz) )
+  case( 'rho' ); mr(j1:j2,k1:k2,l1:l2)  = r
+  case( 'vp'  ); s1(j1:j2,k1:k2,l1:l2)  = r
+  case( 'vs'  ); s2(j1:j2,k1:k2,l1:l2)  = r
+  case( 'gam' ); gam(j1:j2,k1:k2,l1:l2) = r
+  end select
+case( 'c' )
+  select case( fieldin(iz) )
+  case( 'rho' ); call cube( mr,  w2, i3, i4, x1, x2, r )
+  case( 'vp'  ); call cube( s1,  w2, i3, i4, x1, x2, r )
+  case( 'vs'  ); call cube( s2,  w2, i3, i4, x1, x2, r )
+  case( 'gam' ); call cube( gam, w2, i3, i4, x1, x2, r )
+  end select
 end select
-
 end do doiz
 
 ! Test for endian problems

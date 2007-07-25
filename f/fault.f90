@@ -26,6 +26,9 @@ t3 = 0.
 
 ! Inputs
 do iz = 1, nin
+rr = inval(iz)
+x1 = x1in(iz,:)
+x2 = x2in(iz,:)
 i1 = i1in(iz,:)
 i2 = i2in(iz,:)
 call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
@@ -35,6 +38,9 @@ i1(ifn) = 1
 i2(ifn) = 1
 i3(ifn) = 1
 i4(ifn) = 1
+j1 = i3(1); j2 = i4(1)
+k1 = i3(2); k2 = i4(2)
+l1 = i3(3); l2 = i4(3)
 select case( intype(iz) )
 case( 'r' )
   i = mpin * ifn
@@ -54,10 +60,6 @@ case( 'r' )
   case( 'tn'  ); call rio4( -1, i, rr, 'data/tn',  t3, 3, i1, i2, i3, i4, 1, 1 )
   end select
 case( 'z' )
-  rr = inval(iz)
-  j1 = i3(1); j2 = i4(1)
-  k1 = i3(2); k2 = i4(2)
-  l1 = i3(3); l2 = i4(3)
   select case ( fieldin(iz) )
   case( 'mus' ); mus(j1:j2,k1:k2,l1:l2)  = rr
   case( 'mud' ); mud(j1:j2,k1:k2,l1:l2)  = rr
@@ -74,9 +76,6 @@ case( 'z' )
   case( 'tn'  ); t3(j1:j2,k1:k2,l1:l2,3) = rr
   end select
 case( 'c' )
-  rr = inval(iz)
-  x1 = x1in(iz,:)
-  x2 = x2in(iz,:)
   i3(ifn) = ihypo(ifn)
   i4(ifn) = ihypo(ifn)
   select case ( fieldin(iz) )
