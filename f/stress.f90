@@ -49,10 +49,12 @@ case( 1 )
   call diffnc( s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
   do j = i1(1), i2(1)
   i = j + nnoff(1)
-  forall( k=i1(2):i2(2), l=i1(3):i2(3) )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
     s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g1(i,k,l,ic)
     g1(i,k,l,ic) = s1(j,k,l)
-  end forall
+  end do
+  end do
   end do
   i1 = i1cell
   i2 = i2cell
@@ -60,10 +62,12 @@ case( 1 )
   call diffnc( s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
   do j = i1(1), i2(1)
   i = nn(1) - j - nnoff(1)
-  forall( k=i1(2):i2(2), l=i1(3):i2(3) )
+  do l = i1(3), i2(3)
+  do k = i1(2), i2(2)
     s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g4(i,k,l,ic)
     g4(i,k,l,ic) = s1(j,k,l)
-  end forall
+  end do
+  end do
   end do
 case( 2 )
   i1 = i1cell
@@ -72,10 +76,12 @@ case( 2 )
   call diffnc( s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
   do k = i1(2), i2(2)
   i = k + nnoff(2)
-  forall( j=i1(1):i2(1), l=i1(3):i2(3) )
+  do l = i1(3), i2(3)
+  do j = i1(1), i2(1)
     s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g2(j,i,l,ic)
     g2(j,i,l,ic) = s1(j,k,l)
-  end forall
+  end do
+  end do
   end do
   i1 = i1cell
   i2 = i2cell
@@ -83,10 +89,12 @@ case( 2 )
   call diffnc( s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
   do k = i1(2), i2(2)
   i = nn(2) - k - nnoff(2)
-  forall( j=i1(1):i2(1), l=i1(3):i2(3) )
+  do l = i1(3), i2(3)
+  do j = i1(1), i2(1)
     s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g5(j,i,l,ic)
     g5(j,i,l,ic) = s1(j,k,l)
-  end forall
+  end do
+  end do
   end do
 case( 3 )
   i1 = i1cell
@@ -95,10 +103,12 @@ case( 3 )
   call diffnc( s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
   do l = i1(3), i2(3)
   i = l + nnoff(3)
-  forall( j=i1(1):i2(1), k=i1(2):i2(2) )
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
     s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g3(j,k,i,ic)
     g3(j,k,i,ic) = s1(j,k,l)
-  end forall
+  end do
+  end do
   end do
   i1 = i1cell
   i2 = i2cell
@@ -106,10 +116,12 @@ case( 3 )
   call diffnc( s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
   do l = i1(3), i2(3)
   i = nn(3) - l - nnoff(3)
-  forall( j=i1(1):i2(1), k=i1(2):i2(2) )
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
     s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g6(j,k,i,ic)
     g6(j,k,i,ic) = s1(j,k,l)
-  end forall
+  end do
+  end do
   end do
 end select
 

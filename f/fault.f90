@@ -127,7 +127,7 @@ i2(ifn) = ihypo(ifn)
 call surfnormals( nhat, w1, i1, i2, ifn )
 area = sign( 1, faultnormal ) * sqrt( sum( nhat * nhat, 4 ) )
 f1 = area
-where ( f1 /= 0. ) f1 = 1. / f1
+call invert( f1 )
 do i = 1, 3
   nhat(:,:,:,i) = nhat(:,:,:,i) * f1
 end do
@@ -147,7 +147,7 @@ t2(:,:,:,1) = nhat(:,:,:,2) * slipvector(3) - nhat(:,:,:,3) * slipvector(2)
 t2(:,:,:,2) = nhat(:,:,:,3) * slipvector(1) - nhat(:,:,:,1) * slipvector(3)
 t2(:,:,:,3) = nhat(:,:,:,1) * slipvector(2) - nhat(:,:,:,2) * slipvector(1)
 f1 = sqrt( sum( t2 * t2, 4 ) )
-where ( f1 /= 0. ) f1 = 1. / f1
+call invert( f1 )
 do i = 1, 3
   t2(:,:,:,i) = t2(:,:,:,i) * f1
 end do
@@ -157,7 +157,7 @@ t1(:,:,:,1) = t2(:,:,:,2) * nhat(:,:,:,3) - t2(:,:,:,3) * nhat(:,:,:,2)
 t1(:,:,:,2) = t2(:,:,:,3) * nhat(:,:,:,1) - t2(:,:,:,1) * nhat(:,:,:,3)
 t1(:,:,:,3) = t2(:,:,:,1) * nhat(:,:,:,2) - t2(:,:,:,2) * nhat(:,:,:,1)
 f1 = sqrt( sum( t1 * t1, 4 ) )
-where ( f1 /= 0. ) f1 = 1. / f1
+call invert( f1 )
 do i = 1, 3
   t1(:,:,:,i) = t1(:,:,:,i) * f1
 end do
@@ -186,14 +186,14 @@ case ( 1 ); muf(1,:,:) = mu(ihypo(1),:,:)
 case ( 2 ); muf(:,1,:) = mu(:,ihypo(2),:)
 case ( 3 ); muf(:,:,1) = mu(:,:,ihypo(3))
 end select
-where ( muf /= 0. ) muf = 1. / muf
+call invert( muf )
 j = nm(1) - 1
 k = nm(2) - 1
 l = nm(3) - 1
 if ( ifn /= 1 ) muf(2:j,:,:) = .5 * ( muf(2:j,:,:) + muf(1:j-1,:,:) )
 if ( ifn /= 2 ) muf(:,2:k,:) = .5 * ( muf(:,2:k,:) + muf(:,1:k-1,:) )
 if ( ifn /= 3 ) muf(:,:,2:l) = .5 * ( muf(:,:,2:l) + muf(:,:,1:l-1) )
-where ( muf /= 0. ) muf = 1. / muf
+call invert( muf )
 
 ! Save for output
 tn = sum( t0 * nhat, 4 )
@@ -268,7 +268,7 @@ l3 = i1(3); l4 = i2(3)
 
 ! Trial traction for zero velocity and zero displacement
 f1 = dt * dt * area * ( mr(j1:j2,k1:k2,l1:l2) + mr(j3:j4,k3:k4,l3:l4) )
-where ( f1 /= 0. ) f1 = 1. / f1
+call invert( f1 )
 do i = 1, 3
   t1(:,:,:,i) = t0(:,:,:,i) + f1 * dt * &
     ( ( vv(j3:j4,k3:k4,l3:l4,i) - vv(j1:j2,k1:k2,l1:l2,i) ) &

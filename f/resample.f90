@@ -30,7 +30,7 @@ end select
 ! Mass ratio
 s2 = mr * s1
 call scalaraverage( mr, s2, i1node, i2node, -1 )
-where ( mr /= 0. ) mr = 1. / mr
+call invert( mr )
 call scalarswaphalo( mr, nhalo )
 call scalarbc( mr, bc1, bc2, i1bc, i2bc )
 
@@ -46,7 +46,7 @@ call scalarswaphalo( gam, nhalo )
 call scalarbc( gam, bc1, bc2, i1bc, i2bc )
 
 ! Moduli
-where ( s1 /= 0. ) s1 = 1. / s1
+call invert( s1 )
 lam = lam * s1
 mu = mu * s1
 

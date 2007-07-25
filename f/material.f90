@@ -76,7 +76,11 @@ if ( vs1  > 0. ) s2 = max( s2, vs1 )
 if ( vs2  > 0. ) s2 = min( s2, vs2 )
 
 ! Velocity dependent viscosity
-if ( vdamp > 0. ) where( s2 > 0. ) gam = vdamp / s2
+if ( vdamp > 0. ) then
+  gam = s2
+  call invert( gam )
+  gam = gam * vdamp
+end if
 
 ! Limits
 if ( gam1 > 0. ) gam = max( gam, gam1 )
@@ -141,7 +145,8 @@ lam = mr * ( s1 * s1 ) - 2. * mu
 
 ! Hourglass constant
 yy = 12. * ( lam + 2. * mu )
-where ( yy /= 0. ) yy = dx * mu * ( lam + mu ) / yy
+call invert( yy )
+yy = yy * dx * mu * ( lam + mu )
 !yy = .3 / 16. * ( lam + 2. * mu ) * dx ! like Ma & Liu, 2006
 
 end subroutine

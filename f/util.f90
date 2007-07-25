@@ -32,7 +32,7 @@ subroutine cube( s, x, i1, i2, x1, x2, r )
 real, intent(inout) :: s(:,:,:)
 real, intent(in) :: x(:,:,:,:), x1(3), x2(3), r
 integer, intent(in) :: i1(3), i2(3)
-integer :: j1, k1, l1, j2, k2, l2
+integer :: j, k, l
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
@@ -44,11 +44,24 @@ end do
 end do
 end subroutine
 
+subroutine invert( f )
+real, intent(inout) :: f(:,:,:)
+integer :: n(3), j, k, l
+n = (/ size(f,1), size(f,2), size(f,3) /)
+do l = 1, n(3)
+do k = 1, n(2)
+do j = 1, n(1)
+  if ( f(j,k,l) /= 0. ) f(j,k,l) = 1. / f(j,k,l)
+end do
+end do
+end do
+end subroutine
+
 subroutine scalaraverage( fa, f, i1, i2, d )
 real, intent(out) :: fa(:,:,:)
 real, intent(in) :: f(:,:,:)
 integer, intent(in) :: i1(3), i2(3), d
-integer :: j, k, l, n(3)
+integer :: n(3), j, k, l
 n = (/ size(f,1), size(f,2), size(f,3) /)
 if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in scalaraverage'
 do l = i1(3), i2(3)
@@ -69,7 +82,7 @@ subroutine vectoraverage( fa, f, i1, i2, d )
 real, intent(out) :: fa(:,:,:,:)
 real, intent(in) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), d
-integer :: i, j, k, l, n(3)
+integer :: n(3), i, j, k, l
 n = (/ size(f,1), size(f,2), size(f,3) /)
 if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vectoraverage'
 do i = 1, 3
@@ -92,7 +105,7 @@ subroutine radius( r, x, x0, i1, i2 )
 real, intent(out) :: r(:,:,:)
 real, intent(in) :: x(:,:,:,:), x0(3)
 integer, intent(in) :: i1(3), i2(3)
-integer :: j, k, l, n(3)
+integer :: n(3), j, k, l
 n = (/ size(r,1), size(r,2), size(r,3) /)
 if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in radius'
 do l = i1(3), i2(3)
@@ -111,7 +124,7 @@ subroutine vectornorm( s, f, i1, i2 )
 real, intent(out) :: s(:,:,:)
 real, intent(in) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3)
-integer :: j, k, l, n(3)
+integer :: n(3), j, k, l
 n = (/ size(s,1), size(s,2), size(s,3) /)
 if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vectornorm'
 do l = i1(3), i2(3)
@@ -130,7 +143,7 @@ subroutine tensornorm( s, w1, w2, i1, i2 )
 real, intent(out) :: s(:,:,:)
 real, intent(in) :: w1(:,:,:,:), w2(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3)
-integer :: j, k, l, n(3)
+integer :: n(3), j, k, l
 n = (/ size(s,1), size(s,2), size(s,3) /)
 if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in tensornorm'
 do l = i1(3), i2(3)

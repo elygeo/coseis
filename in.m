@@ -1,1 +1,1 @@
-in/ts/2000.m
+in/test/minifault.m
