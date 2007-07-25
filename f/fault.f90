@@ -24,6 +24,7 @@ t1 = 0.
 t2 = 0.
 t3 = 0.
 
+! Inputs
 do iz = 1, nin
 i1 = i1in(iz,:)
 i2 = i2in(iz,:)
@@ -76,24 +77,20 @@ case( 'c' )
   rr = inval(iz)
   x1 = x1in(iz,:)
   x2 = x2in(iz,:)
-  i1 = 1
-  i2 = nm
-  i1(ifn) = ihypo(ifn)
-  i2(ifn) = ihypo(ifn)
   select case ( fieldin(iz) )
-  case( 'mus' ); call cube( mus, w1, i1, i2, x1, x2, rr )
-  case( 'mud' ); call cube( mud, w1, i1, i2, x1, x2, rr )
-  case( 'dc'  ); call cube( dc,  w1, i1, i2, x1, x2, rr )
-  case( 'co'  ); call cube( co,  w1, i1, i2, x1, x2, rr )
-  case( 'sxx' ); f1 = t1(:,:,:,1); call cube( f1, w1, i1, i2, x1, x2, rr ); t1(:,:,:,1) = f1
-  case( 'syy' ); f1 = t1(:,:,:,2); call cube( f1, w1, i1, i2, x1, x2, rr ); t1(:,:,:,2) = f1
-  case( 'szz' ); f1 = t1(:,:,:,3); call cube( f1, w1, i1, i2, x1, x2, rr ); t1(:,:,:,3) = f1
-  case( 'syz' ); f1 = t2(:,:,:,1); call cube( f1, w1, i1, i2, x1, x2, rr ); t2(:,:,:,1) = f1
-  case( 'szx' ); f1 = t2(:,:,:,2); call cube( f1, w1, i1, i2, x1, x2, rr ); t2(:,:,:,2) = f1
-  case( 'sxy' ); f1 = t2(:,:,:,3); call cube( f1, w1, i1, i2, x1, x2, rr ); t2(:,:,:,3) = f1
-  case( 'ts1' ); f1 = t3(:,:,:,1); call cube( f1, w1, i1, i2, x1, x2, rr ); t3(:,:,:,1) = f1
-  case( 'ts2' ); f1 = t3(:,:,:,2); call cube( f1, w1, i1, i2, x1, x2, rr ); t3(:,:,:,2) = f1
-  case( 'tn'  ); f1 = t3(:,:,:,3); call cube( f1, w1, i1, i2, x1, x2, rr ); t3(:,:,:,3) = f1
+  case( 'mus' ); call cube( mus, w1, i3, i4, x1, x2, rr )
+  case( 'mud' ); call cube( mud, w1, i3, i4, x1, x2, rr )
+  case( 'dc'  ); call cube( dc,  w1, i3, i4, x1, x2, rr )
+  case( 'co'  ); call cube( co,  w1, i3, i4, x1, x2, rr )
+  case( 'sxx' ); f1 = t1(:,:,:,1); call cube( f1, w1, i3, i4, x1, x2, rr ); t1(:,:,:,1) = f1
+  case( 'syy' ); f1 = t1(:,:,:,2); call cube( f1, w1, i3, i4, x1, x2, rr ); t1(:,:,:,2) = f1
+  case( 'szz' ); f1 = t1(:,:,:,3); call cube( f1, w1, i3, i4, x1, x2, rr ); t1(:,:,:,3) = f1
+  case( 'syz' ); f1 = t2(:,:,:,1); call cube( f1, w1, i3, i4, x1, x2, rr ); t2(:,:,:,1) = f1
+  case( 'szx' ); f1 = t2(:,:,:,2); call cube( f1, w1, i3, i4, x1, x2, rr ); t2(:,:,:,2) = f1
+  case( 'sxy' ); f1 = t2(:,:,:,3); call cube( f1, w1, i3, i4, x1, x2, rr ); t2(:,:,:,3) = f1
+  case( 'ts1' ); f1 = t3(:,:,:,1); call cube( f1, w1, i3, i4, x1, x2, rr ); t3(:,:,:,1) = f1
+  case( 'ts2' ); f1 = t3(:,:,:,2); call cube( f1, w1, i3, i4, x1, x2, rr ); t3(:,:,:,2) = f1
+  case( 'tn'  ); f1 = t3(:,:,:,3); call cube( f1, w1, i3, i4, x1, x2, rr ); t3(:,:,:,3) = f1
   end select
 end select
 end do

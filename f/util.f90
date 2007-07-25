@@ -28,17 +28,20 @@ i1 = i1 - nnoff
 i2 = i2 - nnoff
 end subroutine
 
-subroutine cube( s, x, i1, i2, x1, x2, r )
-real, intent(inout) :: s(:,:,:)
+subroutine cube( f, x, i1, i2, x1, x2, r )
+real, intent(inout) :: f(:,:,:)
 real, intent(in) :: x(:,:,:,:), x1(3), x2(3), r
 integer, intent(in) :: i1(3), i2(3)
-integer :: j, k, l
+integer :: n(3), o(3), j, k, l
+n = (/ size(f,1), size(f,2), size(f,3) /)
+where ( n == 1 ) o = 1 - i1
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
 if( x(j,k,l,1) >= x1(1) .and. x(j,k,l,1) <= x2(1) .and. &
     x(j,k,l,2) >= x1(2) .and. x(j,k,l,2) <= x2(2) .and. &
-    x(j,k,l,3) >= x1(3) .and. x(j,k,l,3) <= x2(3) ) s(j,k,l) = r
+    x(j,k,l,3) >= x1(3) .and. x(j,k,l,3) <= x2(3) ) &
+    f(j+o(1),k+o(2),l+o(3)) = r
 end do
 end do
 end do
