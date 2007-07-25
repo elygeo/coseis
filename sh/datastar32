@@ -13,10 +13,10 @@ echo "\$( date ): $code started" >> log
 opts="-labelio yes -tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
 $pre
 case "\$mode\${1:--i}" in
-  s-i)  $bin ;;
+  s-i)  hpmcount -nao prof/hpm $bin ;;
   s-g)  pdx $bin ;;
   s-tv) totalview $bin ;;
-  p-i)  poe32 hpmcount $bin \$opts ;;
+  p-i)  poe32 hpmcount -nao prof/hpm $bin \$opts ;;
   p-tv) tvpoe32 $bin \$opts ;;
 esac
 $post
@@ -69,7 +69,7 @@ export MP_TASK_AFFINITY=MCM
 cd "$rundir"
 echo "\$( date ): $code started" >> log
 $pre
-poe $bin
+poe hpmcount -nao prof/hpm $bin
 $post
 echo "\$( date ): $code finished" >> log
 END

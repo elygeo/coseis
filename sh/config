@@ -19,6 +19,7 @@ xlf95_r)
   pfc='mpxlf95_r -u -q64 -qsuppress=cmpmsg -qlanglvl=2003pure -qsuffix=f=f90'
   gflags='-g -p -C -qflttrap -qsigtrap'
   gflags='-g -O0 -C -qflttrap -qsigtrap'
+  oflags='-O4 -g -L/usr/local/apps/mpitrace -lmpiprof'
   oflags='-O -C -qflttrap -qsigtrap'
   oflags='-O4' # -O3 is MUCH slower
   ;;
