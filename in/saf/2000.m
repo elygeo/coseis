@@ -1,6 +1,6 @@
-% TeraShake 2000 m
+% SAF 2000 m
 
-  datadir = 'ts/2000/data'; itio = 100; itcheck = 0;
+  datadir = 'saf/2000/data'; itio = 100; itcheck = 0;
   nt = 1500;
   nt =  750;
   np = [ 1 1 4 ];

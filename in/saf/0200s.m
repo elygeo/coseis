@@ -1,6 +1,6 @@
-% TeraShake 200 m - suface output
+% SAF 200 m - suface output
 % np(3) = 1:24, 16, 27, 29, 31, 34, 37, 41, 45, 51, 58, 67, 81, 101, 134, 201, 401
-  datadir = 'ts/0200/data'; itio = 500; itcheck = 2000;
+  datadir = 'saf/0200/data'; itio = 500; itcheck = 2000;
   nt = 15000;
   np = [ 1 1 401 ] % TG 201/256
   np = [ 1 4 401 ] % DS 201/265

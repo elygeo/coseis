@@ -1,1 +1,1 @@
-in/cvws/s23p.m
+in/scec/s2310.m

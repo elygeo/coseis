@@ -17,7 +17,7 @@
   vs  = { 2165. 'zone' 1 1 0   -1 -1 -1 };
   rho = { 2225. 'zone' 1 1 0   -1 -1 -1 };
   gam = .1
-  hourglass = [ 1. .7 ];
+  hourglass = [ 1. 2. ];
 
 % Fault model
   faultnormal = 3;

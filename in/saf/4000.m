@@ -1,6 +1,6 @@
-% TeraShake 4000 m
+% SAF 4000 m
 
-  datadir = 'ts/4000/data'; itio = 100; itcheck = 0; itstats = 1;
+  datadir = 'saf/4000/data'; itio = 100; itcheck = 0; itstats = 1;
   debug = 0;
   mpout = -1;
   np = [ 1 77 1 ]; nt = 4;
