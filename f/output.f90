@@ -71,6 +71,7 @@ case( 'z' )
     i1(i) = ihypo(i)
     i2(i) = ihypo(i)
   end if
+  if ( any( i2 < i1 ) ) i1out(iz,4) = nt + 1
 case( 'x' )
   x0 = xout(iz,:)
   ditout(iz) = 1
@@ -109,10 +110,6 @@ case( 'x' )
 end select
 
 ! Save indices
-if ( any( i2 < i1 ) ) then
-  write( 0, '(a,i3.3,a,a,6i7)' ) 'Error in output indices: ', iz, ' ', fieldout(iz), i1, i2
-  stop
-end if
 i1out(iz,1:3) = i1
 i2out(iz,1:3) = i2
 

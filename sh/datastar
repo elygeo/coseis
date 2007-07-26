@@ -55,6 +55,7 @@ cat << END > script
 #@ node = $nodes
 #@ tasks_per_node = $ppn
 #@ wall_clock_limit = $walltime
+#@ resources = ConsumableCpus(1) ConsumableMemory(${ramproc}mb)
 #@ notification = always
 #@ notify_user = $email
 #@ job_type = parallel
