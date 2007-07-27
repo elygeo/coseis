@@ -1,18 +1,18 @@
 % TPV3
-  np       = [    1   1  16 ];
-  np       = [    1   2  16 ];
-  nn       = [  601 200  64 ];
-  n1expand = [   40   0   0 ];
-  n2expand = [   40   0   0 ];
-  bc1      = [    0  10  10 ];
-  bc2      = [    0  10  -2 ];
-  ihypo    = [  276 100  -2 ];
+  np       = [    1   1  32 ];
+  np       = [    1   2  32 ];
+  nn       = [  701 401 256 ];
+  n1expand = [    0   0   0 ];
+  n2expand = [    0   0   0 ];
+  bc1      = [   10  10  10 ];
+  bc2      = [   -2   2  -2 ];
+  ihypo    = [   -2  -2  -2 ];
   fixhypo  =     -2;
-  xhypo    = [  50.  0.  0. ];
-  nt  = 1500;
-  dx  = 100.;
-  dt  = .008;
-  affine   = [ 1. 1. 1.   0. 1. 0.   0. 0. 1. ];
+  xhypo    = [   0.  0.  0. ];
+  nt  = 6000;
+  dx  =  25.;
+  dt  = .002;
+  affine   = [ 1. 0. 0.   0. 1. 0.   0. 0. 1. ];
 
   rho = 2670.;
   vp  = 6000.;
@@ -46,10 +46,4 @@
   timeseries = { 'su'    -1. -5999. 0. };
   timeseries = { 'sv'    -1. -5999. 0. };
   timeseries = { 'ts'    -1. -5999. 0. };
-  timeseries = { 'su'  7499.     1. 0. };
-  timeseries = { 'sv'  7499.     1. 0. };
-  timeseries = { 'ts'  7499.     1. 0. };
-  timeseries = { 'su'     1.  5999. 0. };
-  timeseries = { 'sv'     1.  5999. 0. };
-  timeseries = { 'ts'     1.  5999. 0. };
 

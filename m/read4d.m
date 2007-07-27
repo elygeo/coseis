@@ -8,6 +8,7 @@ f = [];
 izone = 0;
 if ( isnumeric( varargin{1} ) )
   izone = varargin{1};
+  if izone > length(out), return, end
   field = out{izone}{2};
 else
   field = varargin{1};
@@ -72,10 +73,7 @@ case 3
 otherwise, error
 end
 
-if any( i3 > i4 | i3 < i1 | i4 > i2 ) || mod( i3(4) - i1(4), dit ) ~= 0 
-  disp( [ 'no data found for ' field ] )
-  return
-end
+if any( i3 > i4 | i3 < i1 | i4 > i2 ) || mod( i3(4) - i1(4), dit ) ~= 0, return, end
 
 % Read data
 di = [ 1 1 1 dit ];
