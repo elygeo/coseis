@@ -10,7 +10,7 @@ use m_collective
 use m_surfnormals
 use m_util
 real :: x1(3), x2(3), rr
-integer :: iz, i1(3), i2(3), i3(3), i4(3), i, j, k, l, j1, k1, l1, j2, k2, l2
+integer :: iz, i1(3), i2(3), i3(3), i4(3), ifill(3), i, j, k, l, j1, k1, l1, j2, k2, l2
 
 if ( ifn == 0 ) return
 if ( master ) write( 0, * ) 'Fault initialization'
@@ -43,21 +43,29 @@ k1 = i3(2); k2 = i4(2)
 l1 = i3(3); l2 = i4(3)
 select case( intype(iz) )
 case( 'r' )
+  ifill = 0
+  where ( i1 == i2 .and. ifn /= (/ 1, 2, 3 /) )
+    i1 = i1core
+    i2 = i1core
+    i3 = i1core
+    i4 = i1core
+    ifill = i2core
+  end where
   i = mpin * ifn
   select case( fieldin(iz) )
-  case( 'mus' ); call rio3( -1, i, rr, 'data/mus', mus,   i1, i2, i3, i4, 1, 1 )
-  case( 'mud' ); call rio3( -1, i, rr, 'data/mud', mud,   i1, i2, i3, i4, 1, 1 )
-  case( 'dc'  ); call rio3( -1, i, rr, 'data/dc',  dc,    i1, i2, i3, i4, 1, 1 )
-  case( 'co'  ); call rio3( -1, i, rr, 'data/co',  co,    i1, i2, i3, i4, 1, 1 )
-  case( 'sxx' ); call rio4( -1, i, rr, 'data/sxx', t1, 1, i1, i2, i3, i4, 1, 1 )
-  case( 'syy' ); call rio4( -1, i, rr, 'data/syy', t1, 2, i1, i2, i3, i4, 1, 1 )
-  case( 'szz' ); call rio4( -1, i, rr, 'data/szz', t1, 3, i1, i2, i3, i4, 1, 1 )
-  case( 'syz' ); call rio4( -1, i, rr, 'data/syz', t2, 1, i1, i2, i3, i4, 1, 1 )
-  case( 'szx' ); call rio4( -1, i, rr, 'data/szx', t2, 2, i1, i2, i3, i4, 1, 1 )
-  case( 'sxy' ); call rio4( -1, i, rr, 'data/sxy', t2, 3, i1, i2, i3, i4, 1, 1 )
-  case( 'ts1' ); call rio4( -1, i, rr, 'data/ts1', t3, 1, i1, i2, i3, i4, 1, 1 )
-  case( 'ts2' ); call rio4( -1, i, rr, 'data/ts2', t3, 2, i1, i2, i3, i4, 1, 1 )
-  case( 'tn'  ); call rio4( -1, i, rr, 'data/tn',  t3, 3, i1, i2, i3, i4, 1, 1 )
+  case( 'mus' ); call rio3( -1, i, rr, 'data/mus', mus,   i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'mud' ); call rio3( -1, i, rr, 'data/mud', mud,   i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'dc'  ); call rio3( -1, i, rr, 'data/dc',  dc,    i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'co'  ); call rio3( -1, i, rr, 'data/co',  co,    i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'sxx' ); call rio4( -1, i, rr, 'data/sxx', t1, 1, i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'syy' ); call rio4( -1, i, rr, 'data/syy', t1, 2, i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'szz' ); call rio4( -1, i, rr, 'data/szz', t1, 3, i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'syz' ); call rio4( -1, i, rr, 'data/syz', t2, 1, i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'szx' ); call rio4( -1, i, rr, 'data/szx', t2, 2, i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'sxy' ); call rio4( -1, i, rr, 'data/sxy', t2, 3, i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'ts1' ); call rio4( -1, i, rr, 'data/ts1', t3, 1, i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'ts2' ); call rio4( -1, i, rr, 'data/ts2', t3, 2, i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'tn'  ); call rio4( -1, i, rr, 'data/tn',  t3, 3, i1, i2, i3, i4, ifill, 1, 1 )
   end select
 case( 'z' )
   select case ( fieldin(iz) )

@@ -277,7 +277,8 @@ inquire( iolength=i ) x(:,:,:,1)
 open( 1, file='x1', recl=i, form='unformatted', access='direct', status='replace' )
 open( 2, file='x2', recl=i, form='unformatted', access='direct', status='replace' )
 open( 3, file='x3', recl=i, form='unformatted', access='direct', status='replace' )
-do l = 1, n(3)
+!do l = 1, n(3)
+do l = 1, 1
   write( 1, rec=l ) x(:,:,:,1)
   write( 2, rec=l ) x(:,:,:,2)
 end do

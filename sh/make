@@ -1,13 +1,17 @@
 #!/bin/bash -e
 
 make="$*"
+files="${make//* -o/}"
 
 while getopts o: opt; do
 case "$opt" in
-  o) object="$OPTARG" ;;
+  o) obj="$OPTARG" ;;
 esac
 done
-shift $(( OPTIND - 1 ))
+echo $obj
+
+echo "$files"
+exit
 
 echo $make > state
 cat $* >> state

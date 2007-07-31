@@ -8,7 +8,7 @@ use m_globals
 use m_collective
 use m_bc
 use m_util
-integer :: i1(3), i2(3), i3(3), i4(3), bc(3), &
+integer :: i1(3), i2(3), i3(3), i4(3), ifill(3), bc(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, iz, b, c
 real :: x0(3), m(9), tol, r
 integer, allocatable :: seed(:)
@@ -39,14 +39,19 @@ case( 'r' )
   call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
   i3 = max( i1, i1core )
   i4 = min( i2, i2core )
-  j1 = i3(1); j2 = i4(1)
-  k1 = i3(2); k2 = i4(2)
-  l1 = i3(3); l2 = i4(3)
+  ifill = 0
+  where ( i1 == i2 )
+    i1 = i1core
+    i2 = i1core
+    i3 = i1core
+    i4 = i1core
+    ifill = i2core
+  end where
   i = mpin * 4
   select case( fieldin(iz) )
-  case( 'x1' ); call rio4( -1, i, r, 'data/x1', w1, 1, i1, i2, i3, i4, 1, 1 )
-  case( 'x2' ); call rio4( -1, i, r, 'data/x2', w1, 2, i1, i2, i3, i4, 1, 1 )
-  case( 'x3' ); call rio4( -1, i, r, 'data/x3', w1, 3, i1, i2, i3, i4, 1, 1 )
+  case( 'x1' ); call rio4( -1, i, r, 'data/x1', w1, 1, i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'x2' ); call rio4( -1, i, r, 'data/x2', w1, 2, i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'x3' ); call rio4( -1, i, r, 'data/x3', w1, 3, i1, i2, i3, i4, ifill, 1, 1 )
   end select
 end select
 end do doiz

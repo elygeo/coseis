@@ -1,14 +1,14 @@
-% SAF 2000 m
+% SAF 2000 m - fault and surface movies
 
-  datadir = 'saf/2000/data'; itio = 100; itcheck = 0;
+  datadir = 'saf/2000/data'; itio = 100; itcheck = 0; itstats = 10;
   nt = 1500;
   nt =  750;
   np = [ 1 1 4 ];
-nt = 1;
 
 
-  x1    = 'read';
-  x2    = 'read';
+
+  x1    = { 'read' 'zone' 1 1 1   -1 -1 1 };
+  x2    = { 'read' 'zone' 1 1 1   -1 -1 1 };
 % x3    = 'read';
   rho   = 'read';
   vp    = 'read'; vp1  = 1500.;

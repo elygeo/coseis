@@ -131,15 +131,15 @@ character(*), intent(in) :: str
 integer :: i
 if ( size( ft ) == 0 .or. id == 0 ) return
 if ( size( ft ) > ir .or. ir > nr ) stop 'error in rio1'
-call frio1( id, str, ft, ir, ir )
+call frio1( id, str, ft, ir, nr )
 i = mpio
 end subroutine
 
 ! Scalar field I/O
-subroutine rio3( id, mpio, r, str, s1, i1, i2, i3, i4, ir, nr )
+subroutine rio3( id, mpio, r, str, f, i1, i2, i3, i4, ifill, ir, nr )
 use m_frio
-real, intent(inout) :: r, s1(:,:,:)
-integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), ir, nr
+real, intent(inout) :: r, f(:,:,:)
+integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), ifill(3), ir, nr
 character(*), intent(in) :: str
 integer :: i
 if ( id == 0 ) return
@@ -150,18 +150,18 @@ if ( any( i1 /= i3 .or. i2 /= i4 .or. ir > nr ) ) then
   stop
 end if
 if ( id > 0 .and. all( i1 == i2 ) ) then
-  r = s1(i1(1),i1(2),i1(3))
+  r = f(i1(1),i1(2),i1(3))
   return
 end if
-call frio3( id, str, s1, i1, i2, ir, ir )
+call frio3( id, str, f, i1, i2, ifill, ir, nr )
 i = i3(1) + i4(1) + mpio
 end subroutine
 
 ! Vector field component I/O
-subroutine rio4( id, mpio, r, str, w1, ic, i1, i2, i3, i4, ir, nr )
+subroutine rio4( id, mpio, r, str, f, ic, i1, i2, i3, i4, ifill, ir, nr )
 use m_frio
-real, intent(inout) :: r, w1(:,:,:,:)
-integer, intent(in) :: id, mpio, ic, i1(3), i2(3), i3(3), i4(3), ir, nr
+real, intent(inout) :: r, f(:,:,:,:)
+integer, intent(in) :: id, mpio, ic, i1(3), i2(3), i3(3), i4(3), ifill(3), ir, nr
 character(*), intent(in) :: str
 integer :: i
 if ( id == 0 ) return
@@ -172,10 +172,10 @@ if ( any( i1 /= i3 .or. i2 /= i4 .or. ir > nr ) ) then
   stop
 end if
 if ( id > 0 .and. all( i1 == i2 ) ) then
-  r = w1(i1(1),i1(2),i1(3),ic)
+  r = f(i1(1),i1(2),i1(3),ic)
   return
 end if
-call frio4( id, str, w1, ic, i1, i2, ir, ir )
+call frio4( id, str, f, ic, i1, i2, ifill, ir, nr )
 i = i3(1) + i4(1) + mpio
 end subroutine
 

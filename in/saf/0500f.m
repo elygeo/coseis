@@ -1,14 +1,14 @@
-% SAF 500 m - fault output
+% SAF 500 m - fault movie
 % np(2) = 1:29, 32, 34, 36, 38, 76, 86, 101, 121, 151, 201, 301, 602
-  datadir = 'saf/0500/data'; itio = 500; itcheck = 0;
+  datadir = 'saf/0500/data'; itio = 500; itcheck = 0; itstats = 10;
   nt = 3000;
   np = [ 1 38 4 ];
   np = [ 1 76 4 ];
   np = [ 1  8 4 ];
   np = [ 1 22 1 ];
 
-  x1    = 'read';
-  x2    = 'read';
+  x1    = { 'read' 'zone' 1 1 1   -1 -1 1 };
+  x2    = { 'read' 'zone' 1 1 1   -1 -1 1 };
   x3    = 'read';
   rho   = 'read';
   vp    = 'read'; vp1  = 1500.;
@@ -46,7 +46,7 @@
   out = { 'vp'     1      1   1  -2    0     -1  -1 -1    0 };
   out = { 'vs'     1      1   1  -2    0     -1  -1 -1    0 };
   out = { 'pv2' 1000      1   1  -1 3000     -1  -1 -1   -1 };
-% out = { 'vm2'   20      1   1  -1    0     -1  -1 -1   -1 };
+  out = { 'vm2'    1      1   1  -1 3000     -1  -1 -1 3000 };
   out = { 'v' 1    164  387 -1 0    164  387 -1 -1 }; % Bakersfield
   out = { 'v' 1    200  139 -1 0    200  139 -1 -1 }; % Santa Barbara
   out = { 'v' 1    305  163 -1 0    305  163 -1 -1 }; % Oxnard

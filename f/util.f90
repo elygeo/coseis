@@ -61,48 +61,48 @@ end do
 end do
 end subroutine
 
-subroutine scalaraverage( fa, f, i1, i2, d )
-real, intent(out) :: fa(:,:,:)
-real, intent(in) :: f(:,:,:)
+subroutine scalaraverage( f2, f1, i1, i2, d )
+real, intent(out) :: f2(:,:,:)
+real, intent(in) :: f1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), d
 integer :: n(3), j, k, l
-n = (/ size(f,1), size(f,2), size(f,3) /)
+n = (/ size(f1,1), size(f1,2), size(f1,3) /)
 if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in scalaraverage'
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
-  fa(j,k,l) = 0.125 * &
-  ( f(j,k,l) + f(j+d,k+d,l+d) &
-  + f(j,k+d,l+d) + f(j+d,k,l) &
-  + f(j+d,k,l+d) + f(j,k+d,l) &
-  + f(j+d,k+d,l) + f(j,k,l+d) )
+  f2(j,k,l) = 0.125 * &
+  ( f1(j,k,l) + f1(j+d,k+d,l+d) &
+  + f1(j,k+d,l+d) + f1(j+d,k,l) &
+  + f1(j+d,k,l+d) + f1(j,k+d,l) &
+  + f1(j+d,k+d,l) + f1(j,k,l+d) )
 end do
 end do
 end do
-call scalarsethalo( fa, 0., i1, i2 )
+call scalarsethalo( f2, 0., i1, i2 )
 end subroutine
 
-subroutine vectoraverage( fa, f, i1, i2, d )
-real, intent(out) :: fa(:,:,:,:)
-real, intent(in) :: f(:,:,:,:)
+subroutine vectoraverage( f2, f1, i1, i2, d )
+real, intent(out) :: f2(:,:,:,:)
+real, intent(in) :: f1(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), d
 integer :: n(3), i, j, k, l
-n = (/ size(f,1), size(f,2), size(f,3) /)
+n = (/ size(f1,1), size(f1,2), size(f1,3) /)
 if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vectoraverage'
 do i = 1, 3
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
-  fa(j,k,l,i) = 0.125 * &
-  ( f(j,k,l,i) + f(j+d,k+d,l+d,i) &
-  + f(j,k+d,l+d,i) + f(j+d,k,l,i) &
-  + f(j+d,k,l+d,i) + f(j,k+d,l,i) &
-  + f(j+d,k+d,l,i) + f(j,k,l+d,i) )
+  f2(j,k,l,i) = 0.125 * &
+  ( f1(j,k,l,i) + f1(j+d,k+d,l+d,i) &
+  + f1(j,k+d,l+d,i) + f1(j+d,k,l,i) &
+  + f1(j+d,k,l+d,i) + f1(j,k+d,l,i) &
+  + f1(j+d,k+d,l,i) + f1(j,k,l+d,i) )
 end do
 end do
 end do
 end do
-call vectorsethalo( fa, 0., i1, i2 )
+call vectorsethalo( f2, 0., i1, i2 )
 end subroutine
 
 subroutine radius( r, x, x0, i1, i2 )
@@ -143,9 +143,9 @@ end do
 end do
 end subroutine
 
-subroutine tensornorm( s, w1, w2, i1, i2 )
+subroutine tensornorm( s, f1, f2, i1, i2 )
 real, intent(out) :: s(:,:,:)
-real, intent(in) :: w1(:,:,:,:), w2(:,:,:,:)
+real, intent(in) :: f1(:,:,:,:), f2(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3)
 integer :: n(3), j, k, l
 n = (/ size(s,1), size(s,2), size(s,3) /)
@@ -154,12 +154,12 @@ do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
   s(j,k,l) = &
-  w1(j,k,l,1) * w1(j,k,l,1) + &
-  w1(j,k,l,2) * w1(j,k,l,2) + &
-  w1(j,k,l,3) * w1(j,k,l,3) + &
-  ( w2(j,k,l,1) * w2(j,k,l,1) &
-  + w2(j,k,l,2) * w2(j,k,l,2) &
-  + w2(j,k,l,3) * w2(j,k,l,3) ) * 2.
+  f1(j,k,l,1) * f1(j,k,l,1) + &
+  f1(j,k,l,2) * f1(j,k,l,2) + &
+  f1(j,k,l,3) * f1(j,k,l,3) + &
+  ( f2(j,k,l,1) * f2(j,k,l,1) &
+  + f2(j,k,l,2) * f2(j,k,l,2) &
+  + f2(j,k,l,3) * f2(j,k,l,3) ) * 2.
 end do
 end do
 end do

@@ -12,7 +12,7 @@ fi
 echo "\$( date ): $code started" >> log
 $pre
 case "\$mode\${1:--i}" in
-  s-i)  $bin ;;
+  s-i)  time $bin ;;
   s-g)  gdb $bin ;;
   s-tv) totalview $bin ;;
   p-i)  mpirun -machinefile mf -np $np $bin ;;

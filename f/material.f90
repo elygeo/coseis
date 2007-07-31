@@ -8,7 +8,7 @@ use m_globals
 use m_collective
 use m_util
 real :: x1(3), x2(3), stats(8), gstats(8), r, rr(3)
-integer :: i1(3), i2(3), i3(3), i4(3), i, j1, k1, l1, j2, k2, l2, iz
+integer :: i1(3), i2(3), i3(3), i4(3), ifill(3), i, j1, k1, l1, j2, k2, l2, iz
 
 if ( master ) write( 0, * ) 'Material model'
 
@@ -34,12 +34,20 @@ k1 = i3(2); k2 = i4(2)
 l1 = i3(3); l2 = i4(3)
 select case( intype(iz) )
 case( 'r' )
+  ifill = 0
+  where ( i1 == i2 )
+    i1 = i1core
+    i2 = i1core
+    i3 = i1core
+    i4 = i1core
+    ifill = 0
+  end where
   i = mpin * 4
   select case( fieldin(iz) )
-  case( 'rho' ); call rio3( -1, i, r, 'data/rho', mr,  i1, i2, i3, i4, 1, 1 )
-  case( 'vp'  ); call rio3( -1, i, r, 'data/vp',  s1,  i1, i2, i3, i4, 1, 1 )
-  case( 'vs'  ); call rio3( -1, i, r, 'data/vs',  s2,  i1, i2, i3, i4, 1, 1 )
-  case( 'gam' ); call rio3( -1, i, r, 'data/gam', gam, i1, i2, i3, i4, 1, 1 )
+  case( 'rho' ); call rio3( -1, i, r, 'data/rho', mr,  i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'vp'  ); call rio3( -1, i, r, 'data/vp',  s1,  i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'vs'  ); call rio3( -1, i, r, 'data/vs',  s2,  i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'gam' ); call rio3( -1, i, r, 'data/gam', gam, i1, i2, i3, i4, ifill, 1, 1 )
   end select
 case( 'z' )
   select case( fieldin(iz) )

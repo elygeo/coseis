@@ -44,9 +44,9 @@ end if
 end subroutine
 
 ! Scalar I/O
-subroutine frio3( id, str, s1, i1, i2, ir, nr )
-real, intent(inout) :: s1(:,:,:)
-integer, intent(in) :: id, i1(3), i2(3), ir, nr
+subroutine frio3( id, str, f, i1, i2, ifill, ir, nr )
+real, intent(inout) :: f(:,:,:)
+integer, intent(in) :: id, i1(3), i2(3), ifill(3), ir, nr
 character(*), intent(in) :: str
 integer :: i, fh, nb, j1, k1, l1, j2, k2, l2
 if ( id == 0 .or. any( i1 > i2 ) ) return
@@ -59,7 +59,7 @@ if ( fh == 0 ) then
   fh = id + 65536
   filehandles(i) = fh
   write( 0, * ) 'Opening file: ', trim( str )
-  inquire( iolength=nb ) s1(j1:j2,k1:k2,l1:l2)
+  inquire( iolength=nb ) f(j1:j2,k1:k2,l1:l2)
   if ( id < 0 .or. ir > 1 ) then
     open( fh, file=str, recl=nb, form='unformatted', access='direct', status='old' ) 
   else
@@ -68,9 +68,12 @@ if ( fh == 0 ) then
 end if
 if ( ir < 1 ) return
 if ( id < 0 ) then
-  read(  fh, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
+  read(  fh, rec=ir ) f(j1:j2,k1:k2,l1:l2)
+  do i = i2(1)+1, ifill(1); f(i,:,:) = f(i2(1),:,:); end do
+  do i = i2(2)+1, ifill(2); f(:,i,:) = f(:,i2(2),:); end do
+  do i = i2(3)+1, ifill(3); f(:,:,i) = f(:,:,i2(3)); end do
 else
-  write( fh, rec=ir ) s1(j1:j2,k1:k2,l1:l2)
+  write( fh, rec=ir ) f(j1:j2,k1:k2,l1:l2)
 end if
 if ( ir == nr ) then
   close( fh )
@@ -80,9 +83,9 @@ end if
 end subroutine
 
 ! Vector I/O
-subroutine frio4( id, str, w1, ic, i1, i2, ir, nr )
-real, intent(inout) :: w1(:,:,:,:)
-integer, intent(in) :: id, ic, i1(3), i2(3), ir, nr
+subroutine frio4( id, str, f, ic, i1, i2, ifill, ir, nr )
+real, intent(inout) :: f(:,:,:,:)
+integer, intent(in) :: id, ic, i1(3), i2(3), ifill(3), ir, nr
 character(*), intent(in) :: str
 integer :: i, fh, nb, j1, k1, l1, j2, k2, l2
 if ( id == 0 .or. any( i1 > i2 ) ) return
@@ -95,7 +98,7 @@ if ( fh == 0 ) then
   fh = id + 65536
   filehandles(i) = fh
   write( 0, * ) 'Opening file: ', trim( str )
-  inquire( iolength=nb ) w1(j1:j2,k1:k2,l1:l2,ic)
+  inquire( iolength=nb ) f(j1:j2,k1:k2,l1:l2,ic)
   if ( id < 0 .or. ir > 1 ) then
     open( fh, file=str, recl=nb, form='unformatted', access='direct', status='old' ) 
   else
@@ -104,9 +107,12 @@ if ( fh == 0 ) then
 end if
 if ( ir < 1 ) return
 if ( id < 0 ) then
-  read(  fh, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
+  read(  fh, rec=ir ) f(j1:j2,k1:k2,l1:l2,ic)
+  do i = i2(1)+1, ifill(1); f(i,:,:,ic) = f(i2(1),:,:,ic); end do
+  do i = i2(2)+1, ifill(2); f(:,i,:,ic) = f(:,i2(2),:,ic); end do
+  do i = i2(3)+1, ifill(3); f(:,:,i,ic) = f(:,:,i2(3),ic); end do
 else
-  write( fh, rec=ir ) w1(j1:j2,k1:k2,l1:l2,ic)
+  write( fh, rec=ir ) f(j1:j2,k1:k2,l1:l2,ic)
 end if
 if ( ir == nr ) then
   close( fh )

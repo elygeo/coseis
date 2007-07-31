@@ -356,20 +356,20 @@ end if
 end subroutine
 
 ! Scalar field component input/output
-subroutine rio3( id, mpio, r, str, s1, i1, i2, i3, i4, ir, nr )
+subroutine rio3( id, mpio, r, str, f, i1, i2, i3, i4, ifill, ir, nr )
 use m_frio
 use mpi
-real, intent(inout) :: r, s1(:,:,:)
-integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), ir, nr
+real, intent(inout) :: r, f(:,:,:)
+integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), ifill(3), ir, nr
 character(*), intent(in) :: str
 integer :: i, fh, mtype, nl(3), n(3), i0(3), e
 if ( id == 0 ) return
 if ( id > 0 .and. all( i1 == i2 ) ) then
-  r = s1(i1(1),i1(2),i1(3))
+  r = f(i1(1),i1(2),i1(3))
   return
 end if
 if ( mpio == 0 ) then
-  call frio3( id, str, s1, i3, i4, ir, nr )
+  call frio3( id, str, f, i3, i4, ifill, ir, nr )
   return
 end if
 i = abs( id )
@@ -383,20 +383,23 @@ if ( any( i3 > i4 ) ) stop 'error in rio3'
 if ( ir < 1 ) return
 i0 = i3 - 1
 nl = i4 - i3 + 1
-n = (/ size(s1,1), size(s1,2), size(s1,3) /)
+n = (/ size(f,1), size(f,2), size(f,3) /)
 call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
 if ( id < 0 ) then
   if ( mpio < 0 ) then
-    call mpi_file_read( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
+    call mpi_file_read( fh, f(1,1,1), 1, mtype, mpi_status_ignore, e )
   else
-    call mpi_file_read_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
+    call mpi_file_read_all( fh, f(1,1,1), 1, mtype, mpi_status_ignore, e )
   end if
+  do i = i4(1)+1, ifill(1); f(i,:,:) = f(i4(1),:,:); end do
+  do i = i4(2)+1, ifill(2); f(:,i,:) = f(:,i4(2),:); end do
+  do i = i4(3)+1, ifill(3); f(:,:,i) = f(:,:,i4(3)); end do
 else
   if ( mpio < 0 ) then
-    call mpi_file_write( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
+    call mpi_file_write( fh, f(1,1,1), 1, mtype, mpi_status_ignore, e )
   else
-    call mpi_file_write_all( fh, s1(1,1,1), 1, mtype, mpi_status_ignore, e )
+    call mpi_file_write_all( fh, f(1,1,1), 1, mtype, mpi_status_ignore, e )
   end if
 end if
 if ( ir == nr ) then
@@ -408,20 +411,20 @@ call mpi_type_free( mtype, e )
 end subroutine
 
 ! Vector field component input/output
-subroutine rio4( id, mpio, r, str, w1, ic, i1, i2, i3, i4, ir, nr )
+subroutine rio4( id, mpio, r, str, f, ic, i1, i2, i3, i4, ifill, ir, nr )
 use m_frio
 use mpi
-real, intent(inout) :: r, w1(:,:,:,:)
-integer, intent(in) :: id, mpio, ic, i1(3), i2(3), i3(3), i4(3), ir, nr
+real, intent(inout) :: r, f(:,:,:,:)
+integer, intent(in) :: id, mpio, ic, i1(3), i2(3), i3(3), i4(3), ifill(3), ir, nr
 character(*), intent(in) :: str
 integer :: i, fh, mtype, nl(3), n(3), i0(3), e
 if ( id == 0 ) return
 if ( id > 0 .and. all( i1 == i2 ) ) then
-  r = w1(i1(1),i1(2),i1(3),ic)
+  r = f(i1(1),i1(2),i1(3),ic)
   return
 end if
 if ( mpio == 0 ) then
-  call frio4( id, str, w1, ic, i3, i4, ir, nr )
+  call frio4( id, str, f, ic, i3, i4, ifill, ir, nr )
   return
 end if
 i = abs( id )
@@ -435,20 +438,23 @@ if ( any( i3 > i4 ) ) stop 'error in rio4'
 if ( ir < 1 ) return
 i0 = i3 - 1
 nl = i4 - i3 + 1
-n = (/ size(w1,1), size(w1,2), size(w1,3) /)
+n = (/ size(f,1), size(f,2), size(f,3) /)
 call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
 call mpi_type_commit( mtype, e )
 if ( id < 0 ) then
   if ( mpio < 0 ) then
-    call mpi_file_read( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
+    call mpi_file_read( fh, f(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
   else
-    call mpi_file_read_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
+    call mpi_file_read_all( fh, f(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
   end if
+  do i = i4(1)+1, ifill(1); f(i,:,:,ic) = f(i4(1),:,:,ic); end do
+  do i = i4(2)+1, ifill(2); f(:,i,:,ic) = f(:,i4(2),:,ic); end do
+  do i = i4(3)+1, ifill(3); f(:,:,i,ic) = f(:,:,i4(3),ic); end do
 else
   if ( mpio < 0 ) then
-    call mpi_file_write( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
+    call mpi_file_write( fh, f(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
   else
-    call mpi_file_write_all( fh, w1(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
+    call mpi_file_write_all( fh, f(1,1,1,ic), 1, mtype, mpi_status_ignore, e )
   end if
 end if
 if ( ir == nr ) then

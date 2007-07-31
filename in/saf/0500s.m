@@ -1,14 +1,14 @@
-% SAF 500 m - surface output
+% SAF 500 m - surface movie
 % np(3) = 1:15, 17, 18, 21, 23, 27, 33, 41, 54, 81, 161
-  datadir = 'saf/0500/data'; itio = 500; itcheck = 0;
+  datadir = 'saf/0500/data'; itio = 500; itcheck = 0; itstats = 10;
   nt = 6000;
   np = [ 1 1 82 ];
   np = [ 1 1 54 ];
   np = [ 1 1 18 ];
 
 
-  x1    = 'read';
-  x2    = 'read';
+  x1    = { 'read' 'zone' 1 1 1   -1 -1 1 };
+  x2    = { 'read' 'zone' 1 1 1   -1 -1 1 };
   x3    = 'read';
   rho   = 'read';
   vp    = 'read'; vp1  = 1500.;
@@ -38,7 +38,7 @@
   out = { 'tn'     1    527   0 -33 3000    925   0 -1 3000 };
   out = { 'tsm' 3000    527   0 -33    0    925   0 -1 3000 };
   out = { 'sl'     1    527   0 -33 3000    925   0 -1 3000 };
-% out = { 'svm'   10    527   0 -33    0    925   0 -1 3000 };
+  out = { 'svm'    1    527   0 -33 1500    925   0 -1 1500 };
   out = { 'psv'    1    527   0 -33 3000    925   0 -1 3000 };
   out = { 'trup'   1    527   0 -33 3000    925   0 -1 3000 };
   out = { 'x'      1      1   1  -1    0     -1  -1 -1    0 };
