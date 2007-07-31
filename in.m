@@ -1,1 +1,1 @@
-in/saf/1000.m
+in/scec/curve.m

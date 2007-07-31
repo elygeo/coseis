@@ -16,6 +16,7 @@ makes="\
   $sfc $flags $getarg stats.f90 -o stats
   $sfc $flags drape.f90 -o drape
   $sfc $flags $getarg utm.f90 ll2utm.f90 -o ll2utm
+  $sfc $flags curve.f90 -o curve
   $sfc $flags utm.f90 tscoords.f90 tsgrid.f90 -o tsgrid
   $sfc $flags utm.f90 tscoords.f90 ts2ll.f90 -o ts2ll
   $sfc $flags utm.f90 tscoords.f90 ll2ts.f90 -o ll2ts

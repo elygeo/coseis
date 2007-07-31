@@ -1,1 +1,0 @@
-colormap( flipud( colormap ) )
