@@ -7,6 +7,7 @@ real :: ell, dx, r, phi, phi1, dphi
 integer :: i, j, l, j1, j2, l0, n, m1, m3, cell
 
 cell = 1
+dx = 50.
 dx = 100.
 phi = 60. * pi / 180.
 ell = 30000.
@@ -20,7 +21,8 @@ j2 = ( m1 - n ) / 2 + n
 phi1 = -.5 * phi
 dphi = -phi1 / ( n - 1 + cell )
 
-print *, ' r = ', r
+print *, ' dx = ', dx
+print *, ' r  = ', r
 print *, ' nn = [ ', m1, ' ? ', m3, ' ];'
 print *, ' ihypo = [ ', m1/2, ' ? ', l0, ' ];'
 
