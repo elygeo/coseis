@@ -1,9 +1,12 @@
 % Window snapshot
 
 function img1 = snap( varargin )
-file = 'snap.png'; if nargin > 0, file = varargin{1}; end
-dpi = 100;         if nargin > 1, dpi  = varargin{2}; end
-aa = 3;            if nargin > 2, aa   = varargin{3}; end
+file = 'snap.png';
+dpi = get( 0, 'ScreenPixelsPerInch' );
+aa = 3;           
+if nargin > 0, file = varargin{1}; end
+if nargin > 1, dpi  = varargin{2}; end
+if nargin > 2, aa   = varargin{3}; end
 
 if dpi < 10, error( 'snap is changed' ), end
 
@@ -14,7 +17,7 @@ delete tmp.tif
 n1 = size( img1 );
 n2 = floor( n1 ./ aa );
 
-if any( aa > 1 )
+if aa > 1
   img2 = repmat( single(0), [ n2(1:2) 3 ] );
   o = round( .5 * ( n1 - aa * n2 ) );
   for j = 1:aa

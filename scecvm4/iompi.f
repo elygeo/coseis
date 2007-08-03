@@ -26,7 +26,9 @@
          print *, 'Error: nn greater than ibig', nn, ibig
          stop
       end if
-      mpioffset = ip * nnl * irealsize
+      call mpi_type_size( mpi_real, i, ierr )
+      mpioffset = i
+      mpioffset = mpioffset * ip * nnl
       call get_command_argument( 2, str )
       call mpi_file_open( mpi_comm_world, str, mpi_mode_rdonly,
      $  mpi_info_null, ifh, ierr )
@@ -64,7 +66,9 @@
       integer :: kerr, ip, ifh, ierr, i
       character(160) :: str
       call mpi_comm_rank( mpi_comm_world, ip, ierr )
-      mpioffset = ip * nnl * irealsize
+      call mpi_type_size( mpi_real, i, ierr )
+      mpioffset = i
+      mpioffset = mpioffset * ip * nnl
       call get_command_argument( 5, str )
       call mpi_file_open( mpi_comm_world, str,
      $  mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr )
