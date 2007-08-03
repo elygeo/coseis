@@ -1,6 +1,6 @@
 % SAF 200 m
 % np(2) = 1:43, 56, 76, 80, np(3) = 1:4, 10, 15, 20, 24, 29, 34, 37, 45
-  datadir = 'saf/0200/data'; itio = 500; itcheck = 0; itstats = 10;
+  datadir = 'saf/data/0200'; itio = 500; itcheck = 0; itstats = 10;
   nt = 15000;
   np = [ 1 40 45 ] % DS 225/265
   np = [ 1 56 37 ] % DS 259/265

@@ -269,7 +269,7 @@ elif [ "$datadir" ]; then
   mkdir data
   cd data
   for file in "$srcdir/$datadir/"*; do
-    [ -f "$file" ] && ln "$file" . || ln -s "$file" .
+    [ -f "$file" ] && ln "$file" . 2> /dev/null || cp "$file" .
   done
   endian="(not found)"
   [ -f endian ] && endian=$( cat endian )

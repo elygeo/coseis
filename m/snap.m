@@ -2,25 +2,27 @@
 
 function img1 = snap( varargin )
 file = 'snap.png'; if nargin > 0, file = varargin{1}; end
-r1 = 3;            if nargin > 1, r1   = varargin{2}; end
-r2 = r1;           if nargin > 2, r2   = varargin{3}; end
+dpi = 100;         if nargin > 1, dpi  = varargin{2}; end
+aa = 3;            if nargin > 2, aa   = varargin{3}; end
 
-res = sprintf( '-r%d', r1 * 72 );
+if dpi < 10, error( 'snap is changed' ), end
+
+res = sprintf( '-r%d', dpi * aa );
 print( '-dtiff', res, 'tmp' )
 img1 = single( imread( 'tmp.tif' ) );
 delete tmp.tif
 n1 = size( img1 );
-n2 = floor( n1 ./ r2 );
+n2 = floor( n1 ./ aa );
 
-if any( n2 ~= n1 )
+if any( aa > 1 )
   img2 = repmat( single(0), [ n2(1:2) 3 ] );
-  o = round( .5 * ( n1 - r2 * n2 ) );
-  for j = 1:r2
-  for k = 1:r2
-    img2 = img2 + img1(o(1)+j:r2:n1(1),k:o(2)+r2:n1(2),:);
+  o = round( .5 * ( n1 - aa * n2 ) );
+  for j = 1:aa
+  for k = 1:aa
+    img2 = img2 + img1(o(1)+j:aa:n1(1),o(2)+k:aa:n1(2),:);
   end
   end
-  img1 = img2 ./ ( r2 * r2 );
+  img1 = img2 ./ ( aa * aa );
   clear img2
 end
 

@@ -1,10 +1,10 @@
 % SAF 500 m - surface movie
 % np(3) = 1:15, 17, 18, 21, 23, 27, 33, 41, 54, 81, 161
-  datadir = 'saf/0500/data'; itio = 500; itcheck = 0; itstats = 10;
+  datadir = 'saf/data/0500'; itio = 500; itcheck = 0; itstats = 10;
   nt = 6000;
   np = [ 1 1 82 ];
-  np = [ 1 1 54 ];
   np = [ 1 1 18 ];
+  np = [ 1 1 54 ];
 
 
   x1    = { 'read' 'zone' 1 1 1   -1 -1 1 };

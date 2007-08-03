@@ -90,7 +90,7 @@ case $machine in
   kim)                      maxcpus=2;  maxram=800  ;;
   phim)                                 maxram=2800;   rate=400 ;;
   altai)                    maxcpus=8;  maxram=30000;  rate=100 ;;
-  babieca)    maxnodes=32;  maxcpus=1;  maxram=1800;   rate=100 ;;
+  babieca)    maxnodes=32;  maxcpus=2;  maxram=1800;   rate=100 ;;
   teragrid)   maxnodes=256; maxcpus=2;  maxram=3000;   rate=1000; maxmm=1080 ;;
   datastar)   maxnodes=265; maxcpus=8;  maxram=13500;  rate=500;  maxmm=1080 ;;
   datastar32) maxnodes=5;   maxcpus=32; maxram=124000; rate=500;  maxmm=1080 ;;

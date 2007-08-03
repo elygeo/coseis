@@ -1,1 +1,1 @@
-in/scec/curve.m
+in/scec/curve-100.m

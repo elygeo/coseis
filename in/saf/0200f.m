@@ -1,6 +1,6 @@
 % SAF 200 m - fault movie
 % np(2) = 1:43, 56, 76, 80, 94, 108, 116, 126, 188, 301, 376, 501, 751, 1502
-  datadir = 'saf/0200/data'; itio = 500; itcheck = 0; itstats = 10;
+  datadir = 'saf/data/0200'; itio = 500; itcheck = 0; itstats = 10;
   nt =  7500;
   np = [ 1 501 4 ] % DS 251/265
   np = [ 1 376 4 ] % DS 188/265

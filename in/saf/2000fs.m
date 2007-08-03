@@ -1,6 +1,6 @@
 % SAF 2000 m - fault and surface movies
 
-  datadir = 'saf/2000/data'; itio = 100; itcheck = 0; itstats = 10;
+  datadir = 'saf/data/2000'; itio = 100; itcheck = 0; itstats = 10;
   nt = 1500;
   nt =  750;
   np = [ 1 1 4 ];

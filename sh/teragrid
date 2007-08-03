@@ -48,6 +48,8 @@ cat << END > script
 #PBS -q dque
 #PBS -M $email
 #PBS -m abe
+#PBS -e stderr
+#PBS -o stdout
 #PBS -V
 cd "$rundir"
 echo "\$( date ): $code started" >> log
