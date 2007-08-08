@@ -1,5 +1,9 @@
 % Field labels
-function labels = fieldlabels( field, radial )
+function labels = fieldlabels( varargin )
+
+field = varargin{1};
+radial = 0;
+if nargin > 1, radial = varargin{2}; end
 
 labels = { field field };
 

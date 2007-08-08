@@ -1,15 +1,15 @@
-% SAF 2000 m - fault and surface movies
+% SAF 2000 m - fault
 
   datadir = 'saf/data/2000'; itio = 100; itcheck = 0; itstats = 10;
   nt = 1500;
-  nt =  750;
-  np = [ 1 1 4 ];
+  np = [ 1 2 4 ];
+
 
 
 
   x1    = { 'read' 'zone' 1 1 1   -1 -1 1 };
   x2    = { 'read' 'zone' 1 1 1   -1 -1 1 };
-% x3    = 'read';
+  x3    = 'read';
   rho   = 'read';
   vp    = 'read'; vp1  = 1500.;
   vs    = 'read'; vs1  = 500.;
@@ -45,8 +45,8 @@
   out = { 'rho'    1      1   1  -2    0     -1  -1 -1    0 };
   out = { 'vp'     1      1   1  -2    0     -1  -1 -1    0 };
   out = { 'vs'     1      1   1  -2    0     -1  -1 -1    0 };
-  out = { 'pv2'   20      1   1  -1    0     -1  -1 -1   -1 };
-  out = { 'vm2'   20      1   1  -1    0     -1  -1 -1   -1 };
+  out = { 'pv2'  750      1   1  -1  750     -1  -1 -1   -1 };
+  out = { 'vm2'    1      1   1  -1  750     -1  -1 -1  750 };
   out = { 'v' 1     42   97 -1 0     42   97 -1 -1 }; % Bakersfield
   out = { 'v' 1     51   35 -1 0     51   35 -1 -1 }; % Santa
   out = { 'v' 1     77   41 -1 0     77   41 -1 -1 }; % Oxnard

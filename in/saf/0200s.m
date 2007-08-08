@@ -1,4 +1,4 @@
-% SAF 200 m - suface movie
+% SAF 200 m - suface
 % np(3) = 1:24, 16, 27, 29, 31, 34, 37, 41, 45, 51, 58, 67, 81, 101, 134, 201, 401
   datadir = 'saf/data/0200'; itio = 500; itcheck = 2000; itstats = 10;
   nt = 15000;

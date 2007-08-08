@@ -76,7 +76,8 @@ ppn=$(( np / nodes + ( np % nodes > 0 ? 1 : 0 ) ))
 cpus=$ppn
 [ $cpus -gt $maxcpus ] && cpus=$maxcpus
 
-# Local domain size
+# Domain size
+nc=$( echo ${nm3[*]} | awk '{ print ( $1 - 1 ) * ( $2 - 1 ) * ( $3 - 1 ) }' )
 nm3[0]=$(( nm3[0] / np3[0] + 2 + ( nm3[0] % np3[0] > 0 ? 1 : 0 ) ))
 nm3[1]=$(( nm3[1] / np3[1] + 2 + ( nm3[1] % np3[1] > 0 ? 1 : 0 ) ))
 nm3[2]=$(( nm3[2] / np3[2] + 2 + ( nm3[2] % np3[2] > 0 ? 1 : 0 ) ))
@@ -231,23 +232,22 @@ if [ "$velmodel" ]; then
   "$srcdir/scecvm4/make"
   cp -r "$srcdir/tmp/scecvm" .
   cd scecvm
+  ibig=$( cat ibig )
+  nnl=$(( nc / np + ( nc % np > 0 ? 1 : 0 ) ))
+  if [ "$ibig" -lt "$nnl" ]; then
+    echo "Error: ibig=$ibig in newin.h must be >= $nnl"
+    exit 1
+  fi
   echo 1 > exag
   echo "$dx" > dx
   echo "$npml" > npml
-  cp "$srcdir/tmp/tsgrid" .
-  cp "$srcdir/data/tssites.ll" .
+  cp "$srcdir/tmp/safgrid" .
+  cp "$srcdir/data/safsites.ll" .
   cp "$srcdir/data/topo3.f32" .
   cp "$srcdir/data/ts-ts1.f32" .
   cp "$srcdir/data/endian0" .
-  echo "./tsgrid"
-  ./tsgrid
-  ibig=$( cat ibig )
-  nc=$( cat nc )
-  nnl=$(( nc / np + ( nc % np > 0 ? 1 : 0 ) ))
-  if [ "$ibig" -lt "$nnl" ]; then
-    echo "Error: ibig=$ibig in newin.h must be greater than $nnl"
-    exit 1
-  fi
+  echo "./safgrid"
+  ./safgrid
   code="scecvm"
   bin="./scecvm4-$mode nc rlon rlat rdep rho vp vs"
   post="mv endian meta.m ts1 x1 x2 x3 rho vp vs $rundir/data"

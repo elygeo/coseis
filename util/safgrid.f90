@@ -1,4 +1,4 @@
-! Generate TeraShake grid from 2D mesh and topography
+! Generate SAF grid from 2D mesh and topography
 program main
 use m_tscoords
 implicit none
@@ -12,7 +12,7 @@ character(256) :: str
 equivalence (h1,b1), (h2,b2)
 
 ! Model parameters
-write( 0, '(a)' ) 'TeraShake Grid Generation'
+write( 0, '(a)' ) 'SAF Grid Generation'
 mus = 1.06
 mud = .5;  tn = -20e6
 rho = 3000.
@@ -191,7 +191,7 @@ write( 0, * ) 'latgitude range: ', minval( w1(:,:,:,2) ), maxval( w1(:,:,:,2) )
 
 ! Sites
 doline: do
-open( 1, file='tssites.ll', status='old' )
+open( 1, file='safsites.ll', status='old' )
 open( 2, file='insord.m', status='old', position='append' )
 read( 1, *, iostat=i ) xx, yy, str
 if ( i /= 0 ) exit doline

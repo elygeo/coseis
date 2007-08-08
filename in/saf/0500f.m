@@ -1,11 +1,11 @@
-% SAF 500 m - fault movie
+% SAF 500 m - fault
 % np(2) = 1:29, 32, 34, 36, 38, 76, 86, 101, 121, 151, 201, 301, 602
   datadir = 'saf/data/0500'; itio = 500; itcheck = 0; itstats = 10;
-  nt = 3000;
-  np = [ 1 38 4 ];
-  np = [ 1 76 4 ];
+  nt = 6000;
   np = [ 1  8 4 ];
   np = [ 1 16 4 ];
+
+
 
   x1    = { 'read' 'zone' 1 1 1   -1 -1 1 };
   x2    = { 'read' 'zone' 1 1 1   -1 -1 1 };
