@@ -46,9 +46,9 @@ for make in "${makes[@]}"; do
   compile=yes
   if [ -f $obj.state ]; then
     compile=$( diff state $obj.state || : )
+    [ "$compile" ] && echo "$compile"
   fi
   if [ "$compile" ]; then
-    echo "$compile"
     echo $make
     $make
     mv state $obj.state
