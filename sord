@@ -165,7 +165,8 @@ echo $make > state
 cat $files >> state
 compile=yes
 if [ -f sord-$mode.state ]; then
-  compile=$( cmp state sord-$mode.state || : )
+  compile=$( diff sord-$mode.state state || : )
+  echo "$compile"
 fi
 if [ "$compile" ]; then
   rm -f sord-$mode.state
