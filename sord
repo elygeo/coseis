@@ -166,9 +166,9 @@ cat $files >> state
 compile=yes
 if [ -f sord-$mode.state ]; then
   compile=$( diff sord-$mode.state state || : )
-  echo "$compile"
 fi
 if [ "$compile" ]; then
+  echo "$compile"
   rm -f sord-$mode.state
   echo time $make
   time $make
