@@ -35,7 +35,8 @@
   n1expand = [ 0 0 0 ];		% n grid expansion nodes for j1 k1 l1
   n2expand = [ 0 0 0 ];		% n grid expansion nodes for j2 k2 l2
 
-% Moment source parameters
+% Point source and plane wave parameters
+  wavenormal = 0;		% plane wave normal
 % rfunc = 'box';		% spatial weighting: uniform
 % rfunc = 'tent';		% spatial weighting: tapered
   rfunc = 'point';		% point source

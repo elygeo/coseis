@@ -61,8 +61,8 @@ cat << END > script
 #@ class = normal32
 #@ node_usage = shared
 #@ network.MPI = sn_all, shared, US
-#@ output = out.\$(jobid)
-#@ error = err.\$(jobid) 
+#@ output = stdout
+#@ error = stderr
 #@ queue
 export MEMORY_AFFINITY=MCM
 export MP_TASK_AFFINITY=MCM

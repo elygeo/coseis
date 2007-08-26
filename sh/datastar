@@ -62,8 +62,8 @@ cat << END > script
 #@ class = normal
 #@ node_usage = not_shared
 #@ network.MPI = sn_all, shared, US
-#@ output = out.\$(jobid)
-#@ error = err.\$(jobid) 
+#@ output = stdout
+#@ error = stderr
 #@ queue
 cd "$rundir"
 echo "\$( date ): $code started" >> log

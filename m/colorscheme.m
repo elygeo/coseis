@@ -12,7 +12,7 @@ centered = 0;
 
 %Y = 0.3R + 0.6G + 0.1B
 switch scheme
-case { 'earth' 'keath' }
+case { 'earth' 'kearth' }
   fg = [ 1 1 1 ];
   cmap = [
     00 00 00 10 10 15 15 25 25 25
@@ -50,6 +50,11 @@ case 'w0'
     8 1 0 3 4 8 8
     8 3 5 8 8 8 3
     8 8 8 8 4 3 3 ]' / 8;
+case 'lg0'
+  cmap = [
+    7 3 0 2 8 8
+    7 4 8 8 8 2
+    7 8 8 2 0 2 ]' / 8;
 case 'w1'
   cmap = [
     1 0 3 4 8 8
@@ -61,6 +66,12 @@ case 'w2'
     4 3 8 8 8
     8 3 8 2 8
     8 8 8 2 3 ]' / 8;
+case 'lg2'
+  centered = 1;
+  cmap = [
+    0 0 7.5 8 6
+    0 6 7.5 6 0
+    6 6 7.5 0 0 ]' / 8;
 case 'w3'
   cmap = [
     8 8 8 8 7 6 4 2

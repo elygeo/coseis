@@ -1,5 +1,5 @@
-! Moment source added to stress
-module m_momentsource
+! Moment source and plane wave source
+module m_source
 implicit none
 real, private, allocatable :: srcfr(:)
 integer, private, allocatable :: jj(:), kk(:), ll(:)
@@ -87,6 +87,8 @@ if ( master .and. debug == 2 ) write( 0, * ) 'Moment source'
 ! Source time function
 select case( tfunc )
 case( 'delta'  ); srcft = 1.
+case( 'ricker' ); srcft = ( 1 - 2. * ( pi * tm / tsource ) ** 2. ) * &
+  exp( -( pi * tm / tsource ) ** 2. )
 case( 'brune'  ); srcft = 1. - exp( -tm / tsource ) / tsource * ( tm + tsource )
 case( 'sbrune' ); srcft = 1. - exp( -tm / tsource ) / tsource * &
   ( tm + tsource + tm * tm / tsource / 2. )
@@ -105,6 +107,44 @@ do i = 1, nsrc
   w1(j,k,l,ic) = w1(j,k,l,ic) - srcft * srcfr(i) * moment1(ic)
   w2(j,k,l,ic) = w2(j,k,l,ic) - srcft * srcfr(i) * moment2(ic)
 end do
+end do
+
+end subroutine
+
+!------------------------------------------------------------------------------!
+
+! Add planewave
+subroutine planewave
+use m_globals
+integer :: ic
+real :: srcft = 0.
+
+if ( wavenormal <= 0 ) return
+if ( master .and. debug == 2 ) write( 0, * ) 'Plane wave source'
+
+! Source time function
+select case( tfunc )
+case( 'delta'  ); srcft = 1.
+case( 'ricker' ); srcft = ( 1 - 2. * ( pi * tm / tsource ) ** 2. ) * &
+  exp( -( pi * tm / tsource ) ** 2. )
+case( 'brune'  ); srcft = 1. - exp( -tm / tsource ) / tsource * ( tm + tsource )
+case( 'sbrune' ); srcft = 1. - exp( -tm / tsource ) / tsource * &
+  ( tm + tsource + tm * tm / tsource / 2. )
+case default
+  write( 0, * ) 'invalid tfunc: ', trim( tfunc )
+  stop
+end select
+
+! Set displacement
+do ic = 1, 3
+select case( wavenormal )
+case( 1 ); uu(ihypo(1),:,:,ic) = uu(ihypo(1),:,:,ic) + srcft * moment1(ic)
+case( 2 ); uu(:,ihypo(2),:,ic) = uu(:,ihypo(2),:,ic) + srcft * moment1(ic)
+case( 3 ); uu(:,:,ihypo(3),ic) = uu(:,:,ihypo(3),ic) + srcft * moment1(ic)
+case default
+  write( 0, * ) 'invalid wavenormal: ', wavenormal
+  stop
+end select
 end do
 
 end subroutine

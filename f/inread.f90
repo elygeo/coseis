@@ -60,6 +60,7 @@ case( 'rsource' );      read( str, *, iostat=io ) rsource
 case( 'tsource' );      read( str, *, iostat=io ) tsource
 case( 'moment1' );      read( str, *, iostat=io ) moment1
 case( 'moment2' );      read( str, *, iostat=io ) moment2
+case( 'wavenormal' );   read( str, *, iostat=io ) wavenormal
 case( 'faultnormal' );  read( str, *, iostat=io ) faultnormal
 case( 'faultopening' ); read( str, *, iostat=io ) faultopening
 case( 'rexpand' );      read( str, *, iostat=io ) rexpand

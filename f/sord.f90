@@ -9,7 +9,7 @@ use m_setup
 use m_arrays
 use m_gridgen
 use m_output
-use m_momentsource
+use m_source
 use m_material
 use m_fault
 use m_metadata
@@ -54,6 +54,7 @@ do while ( it < nt )
   it = it + 1
   jp = jp + 1
   if ( sync ) call barrier ; call timestep
+  if ( sync ) call barrier ; call planewave
   if ( sync ) call barrier ; call stress
   if ( sync ) call barrier ; call momentsource
   if ( sync ) call barrier ; prof(jp,1) = timer( 5 )
