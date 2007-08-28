@@ -1,12 +1,12 @@
-! Moment source and plane wave source
+! Moment source and finite source
 module m_source
 implicit none
 real, private, allocatable :: srcfr(:)
 integer, private, allocatable :: jj(:), kk(:), ll(:)
 contains
 
-! Moment source init
-subroutine momentsource_init
+! Initialize source
+subroutine source_init
 use m_globals
 use m_diffnc
 use m_collective
@@ -15,6 +15,12 @@ real, allocatable :: cellvol(:)
 integer :: i1(3), i2(3), i, j, k, l, nsrc
 real :: sumsrcfr, allsumsrcfr
 
+! Finite source indices
+call zone( i1source, i2source, nn, nnoff, ihypo, faultnormal )
+i1source = max( i1source, 1  )
+i2source = min( i2source, nm )
+
+! Moment source
 if ( rsource <= 0. ) return
 if ( master ) write( 0, * ) 'Moment source initialize'
 
@@ -113,38 +119,36 @@ end subroutine
 
 !------------------------------------------------------------------------------!
 
-! Add planewave
-subroutine planewave
+! Add finite source
+subroutine finitesource
 use m_globals
-integer :: ic
+integer :: j, k, l
 real :: srcft = 0.
 
-if ( wavenormal <= 0 ) return
-if ( master .and. debug == 2 ) write( 0, * ) 'Plane wave source'
+if ( any( i1source > i2source ) ) return
+if ( master .and. debug == 2 ) write( 0, * ) 'Finite source'
 
 ! Source time function
 select case( tfunc )
-case( 'delta'  ); srcft = 1.
+case( 'delta'  ); if ( it == 0 ) srcft = 1.
 case( 'ricker' ); srcft = ( 1 - 2. * ( pi * tm / tsource ) ** 2. ) * &
   exp( -( pi * tm / tsource ) ** 2. )
-case( 'brune'  ); srcft = 1. - exp( -tm / tsource ) / tsource * ( tm + tsource )
-case( 'sbrune' ); srcft = 1. - exp( -tm / tsource ) / tsource * &
-  ( tm + tsource + tm * tm / tsource / 2. )
+case( 'brune'  ); srcft = exp( -tm / tsource ) * tm / tsource
+case( 'sbrune' ); srcft = exp( -tm / tsource ) * ( tm / tsource ) ** 2.
 case default
   write( 0, * ) 'invalid tfunc: ', trim( tfunc )
   stop
 end select
 
 ! Set displacement
-do ic = 1, 3
-select case( wavenormal )
-case( 1 ); uu(ihypo(1),:,:,ic) = uu(ihypo(1),:,:,ic) + srcft * moment1(ic)
-case( 2 ); uu(:,ihypo(2),:,ic) = uu(:,ihypo(2),:,ic) + srcft * moment1(ic)
-case( 3 ); uu(:,:,ihypo(3),ic) = uu(:,:,ihypo(3),ic) + srcft * moment1(ic)
-case default
-  write( 0, * ) 'invalid wavenormal: ', wavenormal
-  stop
-end select
+do l = i1source(3), i2source(3)
+do k = i1source(2), i2source(2)
+do j = i1source(1), i2source(1)
+  uu(j,k,l,1) = srcft * moment1(1)
+  uu(j,k,l,2) = srcft * moment1(2)
+  uu(j,k,l,3) = srcft * moment1(3)
+end do
+end do
 end do
 
 end subroutine

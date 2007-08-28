@@ -33,7 +33,7 @@ if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
 if ( sync ) call barrier ; call arrays                     ; prof0(4) = timer( 6 )
 if ( sync ) call barrier ; call gridgen                    ; prof0(5) = timer( 6 )
 if ( sync ) call barrier ; call output_init                ; prof0(6) = timer( 6 )
-if ( sync ) call barrier ; call momentsource_init          ; prof0(7) = timer( 6 )
+if ( sync ) call barrier ; call source_init                ; prof0(7) = timer( 6 )
 if ( sync ) call barrier ; call material                   ; prof0(8) = timer( 6 )
 if ( sync ) call barrier ; call pml
 if ( sync ) call barrier ; call fault_init                 ; prof0(9) = timer( 6 )
@@ -54,7 +54,7 @@ do while ( it < nt )
   it = it + 1
   jp = jp + 1
   if ( sync ) call barrier ; call timestep
-  if ( sync ) call barrier ; call planewave
+  if ( sync ) call barrier ; call finitesource
   if ( sync ) call barrier ; call stress
   if ( sync ) call barrier ; call momentsource
   if ( sync ) call barrier ; prof(jp,1) = timer( 5 )

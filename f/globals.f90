@@ -151,6 +151,8 @@ integer, dimension(3) :: &
   ihypo,         & ! hypocenter node
   n1expand,      & ! # grid expansion nodes - near side
   n2expand,      & ! # grid expansion nodes - far side
+  i1source,      & ! finite source start index
+  i2source,      & ! finite source end index
   i1core,        & ! core region start index
   i2core,        & ! core region end index
   i1node,        & ! node calculations start index
@@ -172,7 +174,6 @@ integer :: &
   debug,         & ! debugging flag
   npml,          & ! number of PML damping nodes
   fixhypo,       & ! fix hypocenter to 0=none, 1,2=ihypo node, cell, -1,-2=xhypo node, cell
-  wavenormal,    & ! normal direction to plane wave
   faultopening,  & ! flag to allow fault opening
   faultnormal,   & ! fault normal direction
   ifn              ! fault normal component=abs(faultnormal)

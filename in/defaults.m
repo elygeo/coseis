@@ -36,13 +36,14 @@
   n2expand = [ 0 0 0 ];		% n grid expansion nodes for j2 k2 l2
 
 % Point source and plane wave parameters
-  wavenormal = 0;		% plane wave normal
+  i1source = [ 2 2 2 ];         % finite source start index
+  i2source = [ 1 1 1 ];         % finite source end index
 % rfunc = 'box';		% spatial weighting: uniform
 % rfunc = 'tent';		% spatial weighting: tapered
   rfunc = 'point';		% point source
 % tfunc = 'delta';		% source time function: delta
-% tfunc = 'brune';		% source time function: Brune
-  tfunc = 'sbrune';		% source time function: smooth Brune
+  tfunc = 'brune';		% source time function: Brune
+% tfunc = 'sbrune';		% source time function: smooth Brune
 % rsource = 150.;		% source radius: 1.5*dx = 8 nodes
   rsource = -1.;		% no moment source
   tsource = .056;		% dominant period of 8*dt

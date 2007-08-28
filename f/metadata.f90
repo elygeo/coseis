@@ -93,6 +93,8 @@ write( 1, '(a,3i8,a)'    ) '  n1expand    = [', n1expand,       ' ];'
 write( 1, '(a,3i8,a)'    ) '  n2expand    = [', n2expand,       ' ];'
 write( 1, '(a,3i8,a)'    ) '  bc1         = [', bc1,            ' ];'
 write( 1, '(a,3i8,a)'    ) '  bc2         = [', bc2,            ' ];'
+write( 1, '(a,3i8,a)'    ) '  i1source    = [', i1source,       ' ];'
+write( 1, '(a,3i8,a)'    ) '  i2source    = [', i2source,       ' ];'
 write( 1, '(3a)'         ) '  endian      = ''', endian,        ''' ;'
 write( 1, '(a,g15.7,a)'  ) '  rsource     =  ', rsource,        ' ;'
 if ( rsource > 0. ) then
