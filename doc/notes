@@ -355,8 +355,13 @@ M'' = -H * M0 * e^(-t/t) / T^4 / 2 * (t^2 - 2*t*T)
 v   =  ----------------------------------------
        8 * pi * rho * vp^2 * T^3 * r * vp
 
-Ricker
-M' = ( 1 - 2 * pi^2 * f^2 * t^2 ) * exp( -pi * f^2 * t^2 )
+Ricker Wavelet - displacement form - gaussion 1st derivative
+  t' = t - T
+  u = t' * exp( -2 * ( pi * t' / T ) ^ 2 )
+
+Ricker Wavelet - velocity form - gaussion 2nd derivative
+  t' = ( pi * ( t - T ) / T ) ^ 2
+  u = ( 1 - 2 * t' ) * exp( -t' )
 
 PML ABSORBING BOUNDARY CONDITION
 

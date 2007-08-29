@@ -205,7 +205,7 @@ mkdir checkpoint
 cat << END > runmeta.m
 % SORD run metadata
   login   = '$LOGNAME';
-  name    = '$( finger $LOGNAME | sed -n 's/^.*e: //p' )';
+  name    = '$( finger $LOGNAME | sed -n '1s/^.*e: //p' )';
   rundate = '$( date )';
   rundir  = '$rundir';
   infile  = '$infile';

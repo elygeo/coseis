@@ -92,12 +92,8 @@ if ( master .and. debug == 2 ) write( 0, * ) 'Moment source'
 
 ! Source time function
 select case( tfunc )
-case( 'delta'  ); srcft = 1.
-case( 'ricker' ); srcft = ( 1 - 2. * ( pi * tm / tsource ) ** 2. ) * &
-  exp( -( pi * tm / tsource ) ** 2. )
-case( 'brune'  ); srcft = 1. - exp( -tm / tsource ) / tsource * ( tm + tsource )
-case( 'sbrune' ); srcft = 1. - exp( -tm / tsource ) / tsource * &
-  ( tm + tsource + tm * tm / tsource / 2. )
+case( 'delta' ); srcft = 1.
+case( 'brune' ); srcft = 1. - exp( -tm / tsource ) / tsource * ( tm + tsource )
 case default
   write( 0, * ) 'invalid tfunc: ', trim( tfunc )
   stop
@@ -123,18 +119,23 @@ end subroutine
 subroutine finitesource
 use m_globals
 integer :: j, k, l
-real :: srcft = 0.
+real :: t, srcft = 0.
 
 if ( any( i1source > i2source ) ) return
 if ( master .and. debug == 2 ) write( 0, * ) 'Finite source'
 
 ! Source time function
 select case( tfunc )
-case( 'delta'  ); if ( it == 0 ) srcft = 1.
-case( 'ricker' ); srcft = ( 1 - 2. * ( pi * tm / tsource ) ** 2. ) * &
-  exp( -( pi * tm / tsource ) ** 2. )
-case( 'brune'  ); srcft = exp( -tm / tsource ) * tm / tsource
-case( 'sbrune' ); srcft = exp( -tm / tsource ) * ( tm / tsource ) ** 2.
+case( 'delta'  )
+  if ( it == 0 ) srcft = 1.
+case( 'brune' )
+  srcft = exp( -tm / tsource ) * tm / tsource
+case( 'ricker1' )
+  t = tm - tsource
+  srcft = t * exp( -2. * ( pi * t / tsource ) ** 2. )
+case( 'ricker2' )
+  t = ( pi * ( tm - tsource ) / tsource ) ** 2.
+  srcft = ( 1. - 2. * t ) * exp( -t )
 case default
   write( 0, * ) 'invalid tfunc: ', trim( tfunc )
   stop

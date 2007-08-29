@@ -97,13 +97,11 @@ write( 1, '(a,3i8,a)'    ) '  i1source    = [', i1source,       ' ];'
 write( 1, '(a,3i8,a)'    ) '  i2source    = [', i2source,       ' ];'
 write( 1, '(3a)'         ) '  endian      = ''', endian,        ''' ;'
 write( 1, '(a,g15.7,a)'  ) '  rsource     =  ', rsource,        ' ;'
-if ( rsource > 0. ) then
 write( 1, '(a,g15.7,a)'  ) '  tsource     =  ', tsource,        ' ;'
 write( 1, '(a,3g15.7,a)' ) '  moment1     = [', moment1,        ' ];'
 write( 1, '(a,3g15.7,a)' ) '  moment2     = [', moment2,        ' ];'
 write( 1, '(3a)'         ) '  rfunc       = ''', trim( rfunc ), ''' ;'
 write( 1, '(3a)'         ) '  tfunc       = ''', trim( tfunc ), ''' ;'
-end if
 write( 1, '(a,i8,a)'     ) '  faultnormal =  ', faultnormal,    ' ;'
 if ( faultnormal /= 0 ) then
 write( 1, '(a,3g15.7,a)' ) '  slipvector  = [', slipvector,     ' ];'
