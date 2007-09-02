@@ -153,29 +153,12 @@ case $optimize in
   g) fflags=$gflags; ;;
 esac
 case $mode in
-  s) fc="$sfc"; files="$base serial.f90 $common" ;;
-  p) fc="$pfc"; files="$base mpi.f90 $common" ;;
+  s) fc="$sfc"; src="$base serial.f90 $common" ;;
+  p) fc="$pfc"; src="$base mpi.f90 $common" ;;
 esac
-make="$fc $fflags -o sord-$mode $files"
+make="time $fc $fflags -o sord-$mode $src"
 cd tmp
-for file in $files; do
-  ln -s "$srcdir/f/$file" &> /dev/null || :
-done
-echo $make > state
-cat $files >> state
-compile=yes
-if [ -f sord-$mode.state ]; then
-  compile=$( diff sord-$mode.state state || : )
-  [ "$compile" ] && echo "$compile"
-fi
-if [ "$compile" ]; then
-  rm -f sord-$mode.state
-  echo time $make
-  time $make
-  mv state sord-$mode.state
-  rm -f *.o *.mod *.ipo *.il *.stb
-fi
-rm $files
+../sh/make "$make" "$srcdir/f"
 cd "$srcdir"
 
 #------------------------------------------------------------------------------#

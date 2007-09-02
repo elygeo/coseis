@@ -1,31 +1,33 @@
 #!/bin/bash -e
 
-make="$*"
-files="${make//* -o/}"
+make="$1"
+srcdir="${2:-.}"
+src="${make##* -o }"
+obj="${src%% *}"
+src="${src#* }"
 
-while getopts o: opt; do
-case "$opt" in
-  o) obj="$OPTARG" ;;
-esac
+if [ "$src" = "$make" -o "$obj" = "$src" -o -z "$obj" -o -z "$src" -o -z "$srcdir" ]; then
+  echo Error
+  exit 1
+fi 
+
+echo "$make" > state
+for file in $src do
+  ln -s "$srcdir/$file" &> /dev/null || :
+  cat "$file" >> state
 done
-echo $obj
-
-echo "$files"
-exit
-
-echo $make > state
-cat $* >> state
 
 compile=yes
-if [ -f state-$object ]; then
-  compile=$( cmp state state-$object || : )
+if [ -f $obj.state ]; then
+  compile=$( diff state $obj.state || : )
+  [ "$compile" ] && echo "$compile"
 fi
 
 if [ "$compile" ]; then
-  rm -f state-$object
+  rm -f $obj.state
   echo $make
   $make
-  mv state state-$object
-  rm -f *.o *.mod *.ipo *.il *.stb
+  mv state $obj.state
+  rm -f $src *.o *.mod *.ipo *.il *.stb
 fi 
 
