@@ -36,8 +36,8 @@ pgf90)
   ;;
 gfortran)
   flags='-Wall -O -g -pg'
-  flags='-Wall -O3'
   flags='-Wall -O -g -fbounds-check'
+  flags='-Wall -O3'
   ;;
 f95)
   flags='-g'

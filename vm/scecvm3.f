@@ -22,9 +22,10 @@ c scum v2i     8-00   new tomo interpolator, vent glitch fixes HM
 c scum v2j     0-00   various glitch fixes
 c
 c version 3.0  8-01   install upper mantle tomography
+c Bug fixes and modifications for binary and MPI I/O. Geoffrey Ely 2007/9/1
 c                   
 c
-         include 'in.h'
+         include 'newin.h'
          include 'surface.h'
          include 'innum.h'
          include 'labup.h'
@@ -36,6 +37,37 @@ c
          include 'surfaced.h'
          include 'genpro.h'
          include 'genprod.h'
+
+c initialize to zero, add by Ely
+      inct = 0
+      incto = 0
+      iupm = 0
+      idnm = 0
+      rshcor = 0.
+      do i = 1,isurmx
+        iiiold(i) = 0
+        inorold(i) = 0
+        rsuqold(i) = 0.
+      end do
+      rtemp01 = 0.
+      rtemp05 = 0.
+      rtemp07 = 0.
+      rtemp22 = 0.
+      rtemp36 = 0.
+      rtemp47 = 0.
+      rtemp50 = 0.
+      rtemp55 = 0.
+      rtemp56 = 0.
+      rtemp57 = 0.
+      rtemp62 = 0.
+      rtemp63 = 0.
+      rtemp64 = 0.
+      rtemp65 = 0.
+      rtemp68 = 0.
+      rtemp69 = 0.
+      rtemp70 = 0.
+      rtemp73 = 0.
+
 c some constants
          rd2rad=3.141593/180.
          rckval=5000000.
@@ -538,7 +570,7 @@ c check for LAB and SMM and SAN BERDO ---99 is a flag---
 c diag      write(*,*)l0,iup,idn
             go to 1177
             endif
-1188       iup=idn
+           iup=idn
            iupm=idnm
            ishal=idn
            goto 1177
@@ -927,7 +959,7 @@ c---file name assignment-------
          fileii='lab_geo2_geology'
          k2err=0
 c read file
-           open(12,file=fileii,type='old',err=977)
+           open(12,file=fileii,status='old',err=977)
            do 300 k=1,ngeo
            read(12,*)np(k)
             do 310 k1=1,np(k)
@@ -1040,6 +1072,8 @@ c
 c
          do 400 i=1,nlaup 
           do 440 j=1,nloup
+      rlaup(i) = 0.
+      rloup(i) = 0.
 c temp turned off for historical reason
 c          read(16,11440) rlaup(i),rloup(j),rzupl(i,j) 
 c11440     format(f9.5,1x,f10.5,1x,f10.2)
@@ -1057,7 +1091,7 @@ c convert thousands of feet to feet---------------
 c--gets uplift for LAB---------------
 c find uplift amount at current lat long
         include 'labup.h'
-877        do 817 l7=1,nlaup-1
+           do 817 l7=1,nlaup-1
            if(rlatl0.le.rlaup(l7).and.rlatl0.gt.rlaup(l7+1))then
             do 828 l8=1,nloup-1 
             if(rlonl0.gt.rloup(l8).and.rlonl0.le.rloup(l8+1))then
@@ -1107,7 +1141,7 @@ c
 c POST PROcessing for LAB model
 c continues velocities out from realm of
 c credibility to beyond
-         include 'in.h'
+         include 'newin.h'
 c
 c linear interpolation distance rinterp
 c    - KLM -
@@ -1161,43 +1195,9 @@ c
          return
          end
 
-         subroutine readpts(kerr)
-c-----read points of interest-----------------
-         include 'in.h'
-         kerr=0
-         open(15,file='btestin',status='old',err=1099) 
-c        nn=51456
-         read(15,*)nn 
-         do 150 i=1,nn 
-         read(15,*)rlat(i),rlon(i),rdep(i) 
-c now read in meters
-         rdep(i)=rdep(i)*3.2808399
-         if(rdep(i).lt.rdepmin)rdep(i)=rdepmin 
-150      continue 
-         close(15)
-         go to 1088
-1099     kerr=1
-1088     return
-         end
- 
-         subroutine writepts(kerr)
-c----write points of interest-----------------
-         include 'in.h'
-         kerr=0
-         open(17,file='btestout',status='new')
-         do 155 i=1,nn
-          rdep(i)=rdep(i)/3.2808399
-          write(17,77)rlat(i),rlon(i),rdep(i),alpha(i)
-     1    ,beta(i),rho(i)
-77       format(f8.5,1x,f10.5,1x,f9.2,1x,f8.1,1x,f8.1,1x,f8.1)
-155      continue
-         close(17)
-         return
-         end
-
          subroutine readivsurf(kerr)
 c-----read Imperial Valley surfaces--------------
-         include 'in.h'
+         include 'newin.h'
          include 'ivsurface.h'
          character*8 aname4, asuf4*6,asrnam(numsiv)*2
          character*9 aname42, a418*1
@@ -1228,7 +1228,7 @@ cc convert km depths to feet
          subroutine readivedge(kerr)
 c-----read Imp valley- Salton Trough edge file,-----------------
 c  and iv model edge file
-         include 'in.h'
+         include 'newin.h'
          include 'ivsurface.h'
          kerr=0
 c----ivi2=number of xy pairs-------
@@ -1254,7 +1254,7 @@ c  nregv  = total number P or S velocities in regional model
 c  nregly = number layers in regional model
 c Using Egill Hauksson's so cal model at 15 km horizontal
 c  spacing, variable vertical spacing
-         include 'in.h'
+         include 'newin.h'
          include 'regional.h'
           kerr=0
          open(19,file='eh.modPS',status='old',err=2999)
@@ -1279,13 +1279,17 @@ c -- convert to m/s
           subroutine makevel2(rla2,rlo2,rde,alp,betm,imanfl)
 c--Calculates the Imperial Valley model velocities--
 c note betm returned is temporary dummy valus unless it is from mantle
-         include 'in.h'
+         include 'newin.h'
          include 'ivsurface.h'
          include 'dim2.h'
          dimension rsuqiv(numsiv)
          include 'ivsurfaced.h'
          include 'generic_loc.h'
 c---see if in constrained or generic Imperial Valley
+      rd2rad=3.141593/180.
+      do i = 1, numsiv
+        rsuqiv(i) = 0.
+      end do
          xref=rmoivx(ivi3)
          yref=rmoivy(ivi3)
          reflat=yref*rd2rad
@@ -1386,6 +1390,10 @@ c -- define the regional tomo velocities -----------------------
          include 'regional.h'
          include 'regionald.h'
          dimension vervep(4),verves(4)
+      alp = 0.
+      bet = 0.
+      rscal = 0.
+      iinum = 0
          rd2rad=3.141593/180.
 c -- find which box point is in--
          do 1927 n=1,nregll-ninrow
@@ -1563,7 +1571,7 @@ c Do the interpolation
       return
       end
 
-         subroutine readbore(kerr) 
+         subroutine readbore(k2err) 
 c--read geotech borehole data-------------- 
          include 'borehole.h'
          character*9 fileib
@@ -1571,7 +1579,7 @@ c---file name assignment-------
          fileib='boreholes'
          k2err=0
 c read file
-         open(15,file=fileib,type='old',err=2978)
+         open(15,file=fileib,status='old',err=2978)
          iprono=0
          ibhct=0
          ieach=0
@@ -1602,7 +1610,7 @@ c read file
 2915      return
            end
 
-         subroutine readgene(kerr)
+         subroutine readgene(k2err)
 c--read generic borehole profiles--------------
          include 'genpro.h'
          character*12 fileig,ag1*50
@@ -1610,7 +1618,7 @@ c---file name assignment-------
          fileig='soil_generic'
          k2err=0
 c read file
-         open(12,file=fileig,type='old',err=2977)
+         open(12,file=fileig,status='old',err=2977)
          do 2300 k=1,numgen
           read(12,*)irt2
           numptge2(k)=irt2
@@ -1685,6 +1693,7 @@ c--looks up soil type---------------------------
         dimension inindex(inct)
         dimension rdelz(nx,ny)
         rdmi2=40.
+      iteisb = 0
 c
         icolnm=abs(int((rlonmax-rlonl0)/rdelx))
         irownm=int((rlatmax-rlatl0)/rdely)
@@ -1799,12 +1808,13 @@ c chino - berdo need to split this!
          return
         end
 
-        subroutine readsoil(kerr)
+        subroutine readsoil(k2err)
 c--reads soil type info---------------------------------
 c Reads a modified .pgm ascii file
         include 'soil1.h'
         character*50 filesb
 c here's input file name-----------------------------------
+        k2err = 0
         filesb='soil.pgm'
         open(16,file=filesb,status='old',err=5977)
         read(16,*)rlonmax,rlonmin,rlatmax,rlatmin
@@ -1836,12 +1846,17 @@ c iradcts=number of nearby boreholes with data
          include 'genpro.h'
          include 'wtbh1.h'
          include 'wtbh2.h'
+      roff = 0.
+      rvte3 = 0.
+      rvte8 = 0.
          ihtfg=0
          rtvelges=0.
          rdep=rdep2
          do 7013 n=1,nrad
          iradcts(n)=0
          radvs(n)=0.
+      rtvels(n) = 0.
+      rtewts(n) = 0.
 7013     continue
 c--check ifs flag--
          if(ifs.eq.0)then

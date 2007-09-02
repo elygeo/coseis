@@ -8,7 +8,8 @@ mode=guess
 optimize=O
 setup=yes
 run=
-while getopts spiqgGnvm:df opt; do
+velmodel=
+while getopts spiqgGnv:m:df opt; do
 case "$opt" in
   s) mode=s ;;
   p) mode=p ;;
@@ -17,7 +18,7 @@ case "$opt" in
   g) optimize=g ;;
   G) optimize=g; run=g ;;
   n) setup= ; run= ;;
-  v) velmodel=y ;;
+  v) vm="scecvm$OPTARG" ;;
   m) machine="$OPTARG" ;;
   d) rm -rf run/[0-9][0-9] ;;
   f) rm -rf tmp/* ;;
@@ -205,7 +206,7 @@ bin="./sord-$mode"
 [ -x "$srcdir/sh/$machine" ] && . "$srcdir/sh/$machine"
 
 # SCECVM
-if [ "$velmodel" ]; then
+if [ "$vm" ]; then
   if grep SAF "$srcdir/$infile" > /dev/null; then :; else
     echo "Error: SAF input file required for SCECVM"
     exit 1
@@ -213,8 +214,8 @@ if [ "$velmodel" ]; then
   mkdir data
   "$srcdir/util/make"
   "$srcdir/vm/make"
-  cp -r "$srcdir/tmp/scecvm4" .
-  cd scecvm4
+  cp -r "$srcdir/tmp/$vm" vm
+  cd vm
   ibig=$( cat ibig )
   nnl=$(( nc / np + ( nc % np > 0 ? 1 : 0 ) ))
   if [ "$ibig" -lt "$nnl" ]; then
@@ -231,8 +232,8 @@ if [ "$velmodel" ]; then
   cp "$srcdir/data/endian0" .
   echo "./safgrid"
   ./safgrid
-  code="scecvm4"
-  bin="./scecvm4-$mode nc rlon rlat rdep rho vp vs"
+  code="$vm"
+  bin="./$vm-$mode nc rlon rlat rdep rho vp vs"
   post="mv endian meta.m ts1 x1 x2 x3 rho vp vs $rundir/data"
   walltime="02:00:00"
   topdir="$rundir"

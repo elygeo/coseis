@@ -4,6 +4,7 @@ cd "$( dirname $0 )"
 mkdir -p ../tmp
 ../sh/config
 ../sh/compile "$sfc $oflags -o" ../tmp/swab        $getarg swab.f90
+exit
 ../sh/compile "$sfc $oflags -o" ../tmp/swab-safe   $getarg swab-safe.f90
 ../sh/compile "$sfc $oflags -o" ../tmp/asc2flt     $getarg asc2flt.f90
 ../sh/compile "$sfc $oflags -o" ../tmp/flt2asc     $getarg flt2asc.f90
