@@ -15,7 +15,7 @@ files="\
   f
   m
   util
-  scecvm4
+  vm
   data"
 files=$( echo $files )
 ssh="ssh ${acct//,/ ssh }"
