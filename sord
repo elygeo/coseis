@@ -148,18 +148,17 @@ common="
   sord.f90"
 
 # Compile
+cd f
 case $optimize in
   O) fflags=$oflags; ;;
   g) fflags=$gflags; ;;
 esac
 case $mode in
-  s) fc="$sfc"; src="$base serial.f90 $common" ;;
-  p) fc="$pfc"; src="$base mpi.f90 $common" ;;
+  s) ../sh/compile "$sfc $fflags -o" ../tmp/sord-s $base serial.f90 $common ;;
+  p) ../sh/compile "$pfc $fflags -o" ../tmp/sord-p $base mpi.f90 $common ;;
 esac
-make="time $fc $fflags -o sord-$mode $src"
-cd tmp
-../sh/make "$make" "$srcdir/f"
 cd "$srcdir"
+exit
 
 #------------------------------------------------------------------------------#
 # Set-up and run
@@ -213,9 +212,9 @@ if [ "$velmodel" ]; then
   fi
   mkdir data
   "$srcdir/util/make"
-  "$srcdir/scecvm4/make"
-  cp -r "$srcdir/tmp/scecvm" .
-  cd scecvm
+  "$srcdir/vm/make"
+  cp -r "$srcdir/tmp/scecvm4" .
+  cd scecvm4
   ibig=$( cat ibig )
   nnl=$(( nc / np + ( nc % np > 0 ? 1 : 0 ) ))
   if [ "$ibig" -lt "$nnl" ]; then
@@ -232,12 +231,12 @@ if [ "$velmodel" ]; then
   cp "$srcdir/data/endian0" .
   echo "./safgrid"
   ./safgrid
-  code="scecvm"
+  code="scecvm4"
   bin="./scecvm4-$mode nc rlon rlat rdep rho vp vs"
   post="mv endian meta.m ts1 x1 x2 x3 rho vp vs $rundir/data"
   walltime="02:00:00"
   topdir="$rundir"
-  rundir="$topdir/scecvm"
+  rundir="$topdir/vm"
   [ -x "$srcdir/sh/$machine" ] || . "$srcdir/sh/default"
   [ -x "$srcdir/sh/$machine" ] && . "$srcdir/sh/$machine"
   if [ "$run" = q ]; then

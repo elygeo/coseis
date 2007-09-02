@@ -1,26 +1,19 @@
 #!/bin/bash -e
 
 cd "$( dirname $0 )"
-srcdir=$( /bin/pwd )
-cd ..
-. sh/config
-mkdir -p tmp
-cd tmp
-make="../sh/make $sfc $oflags -o"
-
-$make "swab $getarg swab.f90"                       "$srcdir"
-$make "swab-safe $getarg swab-safe.f90"             "$srcdir"
-exit
-
-$make "asc2flt $getarg asc2flt.f90"                 "$srcdir"
-$make "flt2asc $getarg flt2asc.f90"                 "$srcdir"
-$make "stats $getarg stats.f90"                     "$srcdir"
-$make "drape drape.f90"                             "$srcdir"
-$make "ll2utm $getarg utm.f90 ll2utm.f90"           "$srcdir"
-$make "safgrid utm.f90 tscoords.f90 safgrid.f90"    "$srcdir"
-$make "ts2ll utm.f90 tscoords.f90 ts2ll.f90"        "$srcdir"
-$make "ll2ts utm.f90 tscoords.f90 ll2ts.f90"        "$srcdir"
-$make "ps2ll utm.f90 pscoords.f90 ps2ll.f90"        "$srcdir"
-$make "ll2ps utm.f90 pscoords.f90 ll2ps.f90"        "$srcdir"
-$make "gearthdrape $getarg utm.f90 gearthdrape.f90" "$srcdir"
+mkdir -p ../tmp
+../sh/config
+../sh/compile "$sfc $oflags -o" ../tmp/swab        $getarg swab.f90
+../sh/compile "$sfc $oflags -o" ../tmp/swab-safe   $getarg swab-safe.f90
+../sh/compile "$sfc $oflags -o" ../tmp/asc2flt     $getarg asc2flt.f90
+../sh/compile "$sfc $oflags -o" ../tmp/flt2asc     $getarg flt2asc.f90
+../sh/compile "$sfc $oflags -o" ../tmp/stats       $getarg stats.f90
+../sh/compile "$sfc $oflags -o" ../tmp/ll2utm      $getarg utm.f90 ll2utm.f90
+../sh/compile "$sfc $oflags -o" ../tmp/drape       drape.f90
+../sh/compile "$sfc $oflags -o" ../tmp/ts2ll       utm.f90 tscoords.f90 ts2ll.f90
+../sh/compile "$sfc $oflags -o" ../tmp/ll2ts       utm.f90 tscoords.f90 ll2ts.f90
+../sh/compile "$sfc $oflags -o" ../tmp/ps2ll       utm.f90 pscoords.f90 ps2ll.f90
+../sh/compile "$sfc $oflags -o" ../tmp/ll2ps       utm.f90 pscoords.f90 ll2ps.f90
+../sh/compile "$sfc $oflags -o" ../tmp/safgrid     utm.f90 tscoords.f90 safgrid.f90
+../sh/compile "$sfc $oflags -o" ../tmp/gearthdrape $getarg utm.f90 gearthdrape.f90
 

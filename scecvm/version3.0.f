@@ -22,12 +22,9 @@ c scum v2i     8-00   new tomo interpolator, vent glitch fixes HM
 c scum v2j     0-00   various glitch fixes
 c
 c version 3.0  8-01   install upper mantle tomography
-c version 4.0  6-05   new Vp-density, new San Berdo, new Imperial Valley
-c 
-c Bug fixes and modifications for binary and MPI I/O. Geoffrey Ely 6/8/06
 c                   
 c
-         include 'newin.h'
+         include 'in.h'
          include 'surface.h'
          include 'innum.h'
          include 'labup.h'
@@ -39,37 +36,6 @@ c
          include 'surfaced.h'
          include 'genpro.h'
          include 'genprod.h'
-
-c initialize to zero, add by Ely
-      inct = 0
-      incto = 0
-      do i = 1,isurmx
-        iiiold(i) = 0
-        inorold(i) = 0
-        rsuqold(i) = 0.
-      end do
-      iupm = 0
-      idnm = 0
-      rshcor = 0.
-      rtemp01 = 0.
-      rtemp05 = 0.
-      rtemp07 = 0.
-      rtemp22 = 0.
-      rtemp36 = 0.
-      rtemp47 = 0.
-      rtemp50 = 0.
-      rtemp55 = 0.
-      rtemp56 = 0.
-      rtemp57 = 0.
-      rtemp62 = 0.
-      rtemp63 = 0.
-      rtemp64 = 0.
-      rtemp65 = 0.
-      rtemp68 = 0.
-      rtemp69 = 0.
-      rtemp70 = 0.
-      rtemp73 = 0.
-
 c some constants
          rd2rad=3.141593/180.
          rckval=5000000.
@@ -202,8 +168,7 @@ c--start loop over points in question-------------------
          rnelat=rlat(l0)
          rnelon=rlon(l0)
 c---see if same lat and long as previous---------------
-         if(rlat(l0).eq.roldlat.and.rlon(l0).eq.roldlon.and.
-     1   ivinot(l0).ne.1)then
+         if(rlat(l0).eq.roldlat.and.rlon(l0).eq.roldlon)then
          ioldfg=1
          if(incto.eq.0)go to 980
          do 333 i=1,incto
@@ -573,7 +538,7 @@ c check for LAB and SMM and SAN BERDO ---99 is a flag---
 c diag      write(*,*)l0,iup,idn
             go to 1177
             endif
-           iup=idn
+1188       iup=idn
            iupm=idnm
            ishal=idn
            goto 1177
@@ -851,23 +816,19 @@ c         if(beta(l0).lt.1000.)beta(l0)=1000.
 c clamp for beta =0.5 km/s
 c         if(alpha(l0).lt.1225.)alpha(l0)=1225.
 c         if(beta(l0).lt.500.)beta(l0)=500.
-C comment out with version 3 Vp-density-------------
-cc---find rho----------------------------------------------
-cc --see lab model for citations---------------------------
-cc--assume density in case of velocity lt 1500 m/s---------
-cc        rho(l0)=1000.
-          rho(l0)=1500.
-cc--for velocities 1586.1 to 1625 m/s------------------------
-c         if(alpha(l0).ge.1586.1)rho(l0)=(alpha(l0)*5.8971675)-7853.4328
-cc--for velocities 1500 to 1625 m/s------------------------
-cc        if(alpha(l0).ge.1500.)rho(l0)=(alpha(l0)*5.8971675)-7853.4328
-cc--for velocities 1625 to 2500 m/s------------------------ 
-c         if(alpha(l0).gt.1625.)rho(l0)=(alpha(l0)*.444174)+1000.
-cc--for velocities 2500 to 7000 (and above) m/s------------
-c         if(alpha(l0).gt.2500.)rho(l0)=(alpha(l0)*.17333)+1695.65
-C
-C version 4 Vp-density  linear 
-          rho(l0)=1865.+(.1579*alpha(l0))
+c---find rho----------------------------------------------
+c --see lab model for citations---------------------------
+c--assume density in case of velocity lt 1500 m/s---------
+c        rho(l0)=1000.
+         rho(l0)=1500.
+c--for velocities 1586.1 to 1625 m/s------------------------
+         if(alpha(l0).ge.1586.1)rho(l0)=(alpha(l0)*5.8971675)-7853.4328
+c--for velocities 1500 to 1625 m/s------------------------
+c        if(alpha(l0).ge.1500.)rho(l0)=(alpha(l0)*5.8971675)-7853.4328
+c--for velocities 1625 to 2500 m/s------------------------ 
+         if(alpha(l0).gt.1625.)rho(l0)=(alpha(l0)*.444174)+1000.
+c--for velocities 2500 to 7000 (and above) m/s------------
+         if(alpha(l0).gt.2500.)rho(l0)=(alpha(l0)*.17333)+1695.65
 c------ find beta------------------------------------------
 c --see lab model for citations----------------------------
          sigma=0.40
@@ -966,7 +927,7 @@ c---file name assignment-------
          fileii='lab_geo2_geology'
          k2err=0
 c read file
-           open(12,file=fileii,status='old',err=977)
+           open(12,file=fileii,type='old',err=977)
            do 300 k=1,ngeo
            read(12,*)np(k)
             do 310 k1=1,np(k)
@@ -1083,8 +1044,6 @@ c temp turned off for historical reason
 c          read(16,11440) rlaup(i),rloup(j),rzupl(i,j) 
 c11440     format(f9.5,1x,f10.5,1x,f10.2)
 c convert thousands of feet to feet---------------
-           rlaup(i) = 0.
-           rloup(i) = 0.
           rzupl(i,j)=rzupl(i,j)*1000. 
 440       continue 
 400      continue  
@@ -1098,7 +1057,7 @@ c convert thousands of feet to feet---------------
 c--gets uplift for LAB---------------
 c find uplift amount at current lat long
         include 'labup.h'
-           do 817 l7=1,nlaup-1
+877        do 817 l7=1,nlaup-1
            if(rlatl0.le.rlaup(l7).and.rlatl0.gt.rlaup(l7+1))then
             do 828 l8=1,nloup-1 
             if(rlonl0.gt.rloup(l8).and.rlonl0.le.rloup(l8+1))then
@@ -1148,7 +1107,7 @@ c
 c POST PROcessing for LAB model
 c continues velocities out from realm of
 c credibility to beyond
-         include 'newin.h'
+         include 'in.h'
 c
 c linear interpolation distance rinterp
 c    - KLM -
@@ -1202,18 +1161,60 @@ c
          return
          end
 
+         subroutine readpts(kerr)
+c-----read points of interest-----------------
+         include 'in.h'
+         kerr=0
+         open(15,file='btestin',status='old',err=1099) 
+c        nn=51456
+         read(15,*)nn 
+         do 150 i=1,nn 
+         read(15,*)rlat(i),rlon(i),rdep(i) 
+c now read in meters
+         rdep(i)=rdep(i)*3.2808399
+         if(rdep(i).lt.rdepmin)rdep(i)=rdepmin 
+150      continue 
+         close(15)
+         go to 1088
+1099     kerr=1
+1088     return
+         end
+ 
+         subroutine writepts(kerr)
+c----write points of interest-----------------
+         include 'in.h'
+         kerr=0
+         open(17,file='btestout',status='new')
+         do 155 i=1,nn
+          rdep(i)=rdep(i)/3.2808399
+          write(17,77)rlat(i),rlon(i),rdep(i),alpha(i)
+     1    ,beta(i),rho(i)
+77       format(f8.5,1x,f10.5,1x,f9.2,1x,f8.1,1x,f8.1,1x,f8.1)
+155      continue
+         close(17)
+         return
+         end
+
          subroutine readivsurf(kerr)
 c-----read Imperial Valley surfaces--------------
-         include 'newin.h'
+         include 'in.h'
          include 'ivsurface.h'
+         character*8 aname4, asuf4*6,asrnam(numsiv)*2
+         character*9 aname42, a418*1
+         data (asrnam(i),i=1,numsiv)/'25','55','60','65',
+     1    '70','Mo'/
+         asuf4='.ascii'
+         a418='2'
          kerr=0
 c---loop to read-------------------
          do 2117 i=1,numsiv
-          open(16,file='salton_base.sur',status='old',err=2199)
+          aname4=asrnam(i)//asuf4
+          aname42=asrnam(i)//asuf4//a418
+          open(16,file=aname42,status='old',err=2199)
            do 2118 k=1,nlasiv(i)
            do 2118 j=1,nlosiv(i)
-           read(16,*)rlasiv(i,k),rlosiv(i,j),rsuvil(i,j,k)
-c11777      format(t1,f7.2,1x,f10.5,1x,f10.2)
+           read(16,11777)rlasiv(i,k),rlosiv(i,j),rsuvil(i,j,k)
+11777      format(f9.5,1x,f10.5,1x,f10.2)
 cc convert km depths to feet
           rsuvil(i,j,k)=rsuvil(i,j,k)*3280.84
 2118        continue
@@ -1227,7 +1228,7 @@ cc convert km depths to feet
          subroutine readivedge(kerr)
 c-----read Imp valley- Salton Trough edge file,-----------------
 c  and iv model edge file
-         include 'newin.h'
+         include 'in.h'
          include 'ivsurface.h'
          kerr=0
 c----ivi2=number of xy pairs-------
@@ -1253,7 +1254,7 @@ c  nregv  = total number P or S velocities in regional model
 c  nregly = number layers in regional model
 c Using Egill Hauksson's so cal model at 15 km horizontal
 c  spacing, variable vertical spacing
-         include 'newin.h'
+         include 'in.h'
          include 'regional.h'
           kerr=0
          open(19,file='eh.modPS',status='old',err=2999)
@@ -1275,27 +1276,36 @@ c -- convert to m/s
 1901     return
          end
 
-          subroutine makevel2(rla,rlo,rde,alp,betm,imanfl)
+          subroutine makevel2(rla2,rlo2,rde,alp,betm,imanfl)
 c--Calculates the Imperial Valley model velocities--
 c note betm returned is temporary dummy valus unless it is from mantle
-         include 'newin.h'
+         include 'in.h'
          include 'ivsurface.h'
          include 'dim2.h'
          dimension rsuqiv(numsiv)
          include 'ivsurfaced.h'
-c ver 4  include 'generic_loc.h'
-c VER 4 USING ORDINARY regional moho FOR NOW
-c
+         include 'generic_loc.h'
+c---see if in constrained or generic Imperial Valley
+         xref=rmoivx(ivi3)
+         yref=rmoivy(ivi3)
+         reflat=yref*rd2rad
+         do 2179 i=1,ivi3
+          y2iv(i) = (rmoivy(i) - yref)*111.1
+          x2iv(i) = (rmoivx(i) - xref)*111.1*cos(reflat)
+2179      continue
+         yp=(rla2-yref)*111.1
+         xp=(rlo2-xref)*111.1*cos(reflat)
+         call inside(xp,yp,x2iv,y2iv,ivi3,ins)
+         if(ins.eq.0)then
+         rla=rlagen
+         rlo=rlogen
+         else
+         rla=rla2
+         rlo=rlo2
+         endif
 c---find appropriate surface depths-------------------
-c        do 6009 i9=1,numsiv
+         do 6009 i9=1,numsiv
 c---find valid surfaces-------------------
-         rd2rad=3.141593/180.
-         i9=1
-      do i = 1, numsiv
-        rsuqiv(i) = 0.
-      end do
-
-         
          do 8139 l3=1,nlasiv(i9)-1
       if(rla.le.rlasiv(i9,l3).and.rla.gt.rlasiv(i9,l3+1))then
          do 8249 l4=1,nlosiv(i9)-1
@@ -1309,46 +1319,66 @@ c---find valid surfaces-------------------
 8249       continue
           endif
 8139     continue
-c6009     continue
-c---if basin = 0 depth or point below basement, use tomo
-c rsugiv index of 1 is the salton basement
-         if(rde.gt.rsuqiv(1))then
-         call makereg(rla,rlo,rde,alp,betm,imanfl)
-c -- find moho depth, rdemoh--
-          call mohodepth(rla,rlo,rdemoh)
-          if(rde.ge.rdemoh)then
-          iregfl=0
-c---assign upper mantle velocities
-          call makeman(rla,rlo,rde,alpm,betm2,imanfl)
-          alp=alpm
-          betm=betm2
+6009     continue
+c---check which surface is above------------------------------------
+c---surface sign note: (+) are below sea level, (-) are above-------
+c---check which surface is below------------------------------------
+c--also, find shallowest surface-----
+           rchk=rckval
+           rchk2=rckval
+           rshal=rckval
+           ivup=0
+           ivdn=0
+           ivshal=0
+           do 1429 i8=1,numsiv
+           rdelt=abs(rde-rsuqiv(i8))
+           rdelt2=abs(rsuqiv(i8)-rde)
+           if(rdelt.lt.rchk.and.rsuqiv(i8).le.rde)then
+            rchk=rdelt
+            ivup=i8
+            endif
+           if(rdelt2.lt.rchk2.and.rde.lt.rsuqiv(i8))then
+            rchk2=rdelt2
+            ivdn=i8
+            endif
+           if(rsuqiv(i8).lt.rshal)then
+            rshal=rsuqiv(i8)
+            ivshal=i8
+            endif
+1429       continue
+c-diag---  write(*,*)l0, ivup, ivdn, ivshal
+c -- case between layers -----
+           if(ivup.ne.0.and.ivdn.ne.0)goto 1179
+c -- case above layers, below surface ----
+c 1800 m/s is assumed surface velcity
+           if(ivup.eq.0.and.ivdn.ne.0)then
+           rscal=(rde)/(rsuqiv(ivdn))
+           alp=(rscal*rv(ivdn))+((1.-rscal)*1800.)
+           go to 1181
+           endif
+c -- case where found something above and nothing below----
+c -- ie, below Moho
+           if(ivup.ne.0.and.ivdn.eq.0)then
+           call makeman(rla2,rlo2,rde,alp,betm,imanfl)
+           go to 1182
+           endif
+1179       continue
+c---interpolate velocity from reference layers----------------------
+          if(ivup.ne.ivdn)then
+        rscal=(rde-rsuqiv(ivup))/(rsuqiv(ivdn)-rsuqiv(ivup))
+          else
+          rscal=1.
           endif
-         return
-         endif
-c---see if metased basement or crystalline basement
-         xref=rmoivx(ivi3)
-         yref=rmoivy(ivi3)
-         reflat=yref*rd2rad
-         do 2179 i=1,ivi3
-          y2iv(i) = (rmoivy(i) - yref)*111.1
-          x2iv(i) = (rmoivx(i) - xref)*111.1*cos(reflat)
-2179      continue
-         yp=(rla-yref)*111.1
-         xp=(rlo-xref)*111.1*cos(reflat)
-         call inside(xp,yp,x2iv,y2iv,ivi3,ins)
-c
-         if(ins.eq.0)then
-c over crystalline basement
-         alp=1800.+(430.*(rde/3280.84))
-         go to 1181
-         endif
-c over metaseds
-           rscal=(rde)/(rsuqiv(1))
-           alp=(rscal*rv(1))+((1.-rscal)*1800.)
-c
+c -- assign vels to interpolate -- can mess with 'em here---------
+          rvelup=rv(ivup)
+          rveldn=rv(ivdn)
+c---check if just above Moho- make gradient gentle, Moho jump sharp
+          if(ivdn.eq.numsiv.and.ivup.ne.ivdn)rveldn=7100.
+c---find alpha in m/s-----dummy beta when installed mantle--------
+          alp=(rscal*rveldn)+((1.-rscal)*rvelup)
 1181      betm=alp/(sqrt(2.))
 c -- all done
-          return
+1182      return
           end
 
           subroutine makereg(rla,rlo,rde,alp,bet,iregfl)
@@ -1356,11 +1386,7 @@ c -- define the regional tomo velocities -----------------------
          include 'regional.h'
          include 'regionald.h'
          dimension vervep(4),verves(4)
-         rscal = 0.
-         iinum = 0
          rd2rad=3.141593/180.
-         alp = 0.
-         bet = 0.
 c -- find which box point is in--
          do 1927 n=1,nregll-ninrow
          rckbox=mod(n,ninrow)
@@ -1537,7 +1563,7 @@ c Do the interpolation
       return
       end
 
-         subroutine readbore(k2err) 
+         subroutine readbore(kerr) 
 c--read geotech borehole data-------------- 
          include 'borehole.h'
          character*9 fileib
@@ -1545,7 +1571,7 @@ c---file name assignment-------
          fileib='boreholes'
          k2err=0
 c read file
-         open(15,file=fileib,status='old',err=2978)
+         open(15,file=fileib,type='old',err=2978)
          iprono=0
          ibhct=0
          ieach=0
@@ -1576,7 +1602,7 @@ c read file
 2915      return
            end
 
-         subroutine readgene(k2err)
+         subroutine readgene(kerr)
 c--read generic borehole profiles--------------
          include 'genpro.h'
          character*12 fileig,ag1*50
@@ -1584,7 +1610,7 @@ c---file name assignment-------
          fileig='soil_generic'
          k2err=0
 c read file
-         open(12,file=fileig,status='old',err=2977)
+         open(12,file=fileig,type='old',err=2977)
          do 2300 k=1,numgen
           read(12,*)irt2
           numptge2(k)=irt2
@@ -1659,7 +1685,6 @@ c--looks up soil type---------------------------
         dimension inindex(inct)
         dimension rdelz(nx,ny)
         rdmi2=40.
-        iteisb = 0
 c
         icolnm=abs(int((rlonmax-rlonl0)/rdelx))
         irownm=int((rlatmax-rlatl0)/rdely)
@@ -1774,13 +1799,12 @@ c chino - berdo need to split this!
          return
         end
 
-        subroutine readsoil(k2err)
+        subroutine readsoil(kerr)
 c--reads soil type info---------------------------------
 c Reads a modified .pgm ascii file
         include 'soil1.h'
         character*50 filesb
 c here's input file name-----------------------------------
-        k2err=0
         filesb='soil.pgm'
         open(16,file=filesb,status='old',err=5977)
         read(16,*)rlonmax,rlonmin,rlatmax,rlatmin
@@ -1812,17 +1836,12 @@ c iradcts=number of nearby boreholes with data
          include 'genpro.h'
          include 'wtbh1.h'
          include 'wtbh2.h'
-         roff = 0.
-         rvte3 = 0.
-         rvte8 = 0.
          ihtfg=0
          rtvelges=0.
          rdep=rdep2
          do 7013 n=1,nrad
          iradcts(n)=0
          radvs(n)=0.
-         rtvels(n)=0.
-         rtewts(n)=0.
 7013     continue
 c--check ifs flag--
          if(ifs.eq.0)then
@@ -2047,7 +2066,6 @@ c convert from km to feet
          subroutine mohodepth(rla,rlo,rdemoh)
 c--finds moho depth
         include 'moho1.h'
-        dimension rrtemp(imohlo,imohla)
          do 3313 n3=1,imohla-1
          if(rla.le.rmohla(n3).and.rla.gt.rmohla(n3+1))then
          do 3324 n4=1,imohlo-1
@@ -2063,47 +2081,6 @@ c--note here rmohde indexes are (long, lat)------
 3324      continue
           endif
 3313      continue
-c fall here if point is outside of moho definition
-c as may happen for southern Salton Trough,
-c find nearest moho definition and use that
-c  going counterclockwise around moho surface from SW corner
-           rtedis=1000.
-           do 5101 k=1,imohlo
-           rrtelo=(rlo-rmohlo(k))*92.3820
-           rrtela=(rla-rmohla(imohla))*110.9220
-           rrtemp(k,imohla)=sqrt((rrtelo**2.)+(rrtela**2.))
-           if(rrtemp(k,imohla).lt.rtedis)then
-           rtedis=rrtemp(k,imohla)
-           rdemoh=rmohde(k,imohla)
-           endif
-5101       continue
-           do 5102 k2=imohla,1,-1
-           rrtelo=(rlo-rmohlo(imohlo))*92.3820
-           rrtela=(rla-rmohla(k2))*110.9220
-           rrtemp(imohlo,k2)=sqrt((rrtelo**2.)+(rrtela**2.))
-           if(rrtemp(imohlo,k2).lt.rtedis)then 
-           rtedis=rrtemp(imohlo,k2) 
-           rdemoh=rmohde(imohlo,k2) 
-           endif
-5102       continue
-           do 5103 k3=imohlo,1,-1
-           rrtelo=(rlo-rmohlo(k3))*92.3820
-           rrtela=(rla-rmohla(1))*110.9220
-           rrtemp(k3,imohla)=sqrt((rrtelo**2.)+(rrtela**2.))
-           if(rrtemp(k3,imohla).lt.rtedis)then  
-           rtedis=rrtemp(k3,imohla)  
-           rdemoh=rmohde(k3,imohla)  
-           endif
-5103       continue
-           do 5104 k4=1,imohla
-           rrtelo=(rlo-rmohlo(1))*92.3820
-           rrtela=(rla-rmohla(k4))*110.9220
-           rrtemp(imohlo,k4)=sqrt((rrtelo**2.)+(rrtela**2.))
-           if(rrtemp(imohlo,k4).lt.rtedis)then   
-           rtedis=rrtemp(imohlo,k4)   
-           rdemoh=rmohde(imohlo,k4)   
-           endif
-5104       continue
 3315      return
           end
 

@@ -36,8 +36,8 @@ pgf90)
   ;;
 gfortran)
   flags='-Wall -O -g -pg'
-  flags='-Wall -O -g -fbounds-check'
   flags='-Wall -O3'
+  flags='-Wall -O -g -fbounds-check'
   ;;
 f95)
   flags='-g'
@@ -56,47 +56,24 @@ esac
 
 cd "$( dirname $0 )"
 srcdir=$( /bin/pwd )
-cd ..
+mkdir -p ../tmp/scecvm3
+mkdir -p ../tmp/scecvm4
+cp xsec.f $getarg iobin.f iompi.f newin.h scecvm3.f ../tmp/scecvm3/
+cp xsec.f $getarg iobin.f iompi.f newin.h scecvm4.f ../tmp/scecvm4/
 
-mkdir -p tmp/scecvm
-cd tmp/scecvm
-ln -s "$srcdir/newin.h" &> /dev/null || :
+cd ../tmp
+$tar xzf "../data/scecvm4.tgz"
+cd scecvm4
 sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
+../../sh/compile "$sfc $flags -o" xsec xsec.f
+../../sh/compile "$sfc $flags -o" scecvm4-s $getarg iobin.f scecvm4.f
+../../sh/compile "$pfc $flags -o" scecvm4-p $getarg iompi.f scecvm4.f
 
-makes="\
-  $sfc $flags xsec.f -o xsec
-  $sfc $flags $getarg iobin.f scecvm4.f -o scecvm4-s
-  $pfc $flags $getarg iompi.f scecvm4.f -o scecvm4-p"
-
-IFS_save=$IFS
-IFS=${IFS// /}
-makes=( $makes )
-IFS=$IFS_save
-
-for make in "${makes[@]}"; do
-  set $make
-  echo $make > state
-  obj=${!#}
-  files=""
-  cat newin.h >> state
-  for arg in $*; do
-  if [ "${arg#*\.}" = f ]; then
-    ln -s "$srcdir/$arg" &> /dev/null || :
-    files="$files $arg"
-    cat "$arg" >> state
-  fi
-  done
-  compile=yes
-  if [ -f $obj.state ]; then
-    compile=$( cmp state $obj.state || : )
-  fi
-  if [ "$compile" ]; then
-    [ -f "in.h" ] || $tar xzf "$srcdir/../data/scecvm4.tgz"
-    echo $make
-    $make || :
-    mv state $obj.state
-  fi 
-  rm -f $files *.o *.mod *.ipo *.il *.stb
-done
-rm -f *.h
+cd ..
+$tar xzf "../data/scecvm3.tgz"
+cd scecvm3
+sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
+../../sh/compile "$sfc $flags -o" xsec xsec.f
+../../sh/compile "$sfc $flags -o" scecvm3-s $getarg iobin.f scecvm3.f
+../../sh/compile "$pfc $flags -o" scecvm3-p $getarg iompi.f scecvm3.f
 

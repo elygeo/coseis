@@ -1,0 +1,34 @@
+#!/bin/bash -e
+
+dryrun=
+if [ "x$1" = "x-n" ]; then
+  dryrun=yes
+  shift 1
+fi
+
+me=$( basename $0 )
+cmd="${1?}"
+obj="${2?}"
+shift 2
+
+echo "$cmd $obj $@" > "$obj.state.tmp"
+cat "$@" >> "$obj.state.tmp"
+
+compile=yes
+if [ -f "$obj.state" ]; then
+  compile=$( diff "$obj.state" "$obj.state.tmp" || : )
+  [ "$compile" ] && echo "$compile"
+fi
+
+if [ "$compile" ]; then
+  echo $cmd "$obj" "$@"
+  if [ -z "$dryrun" ]; then
+    rm -f "$obj.state"
+    $cmd "$obj" "$@"
+    mv "$obj.state.tmp" "$obj.state"
+    rm -f *.o *.mod *.ipo *.il *.stb
+  fi
+fi 
+
+rm -f "$obj.state.tmp"
+
