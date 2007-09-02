@@ -159,7 +159,6 @@ case $mode in
   p) ../sh/compile "$pfc $fflags -o" ../tmp/sord-p $base mpi.f90 $common ;;
 esac
 cd "$srcdir"
-exit
 
 #------------------------------------------------------------------------------#
 # Set-up and run

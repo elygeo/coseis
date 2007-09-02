@@ -1,6 +1,8 @@
 % SAF 200 m - suface
 % np(3) = 1:24, 16, 27, 29, 31, 34, 37, 41, 45, 51, 58, 67, 81, 101, 134, 201, 401
-  datadir = 'saf/data/0200'; itio = 500; itcheck = 2000; itstats = 10;
+  datadir = 'saf/scecvm3/0200';
+  datadir = 'saf/scecvm4/0200';
+  itio = 500; itcheck = 2000; itstats = 10;
   nt = 15000;
   np = [ 1 1 401 ] % TG 201/256
   np = [ 1 4 401 ] % DS 201/265

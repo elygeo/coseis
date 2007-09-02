@@ -1,6 +1,8 @@
 % SAF 1000 m - fault
 
-  datadir = 'saf/data/1000'; itio = 100; itcheck = 0; itstats = 10;
+  datadir = 'saf/scecvm3/1000';
+  datadir = 'saf/scecvm4/1000';
+  itio = 100; itcheck = 0; itstats = 10;
   nt = 3000;
   np = [ 1 8 4 ];
 
