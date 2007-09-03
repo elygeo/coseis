@@ -10,6 +10,8 @@ status='old'.
 
 Remove unused labels (stops warning messages): 1188 877 1182
 
+Change character declarations to character(n) form (stops warnings)
+
 Change argument of subroutine readbore from 'kerr' to 'k2err'
 
 Change argument of subroutine readgene from 'kerr' to 'k2err'

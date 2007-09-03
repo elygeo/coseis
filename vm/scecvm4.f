@@ -918,7 +918,7 @@ c------------- write out points and values---------------
 c-----reads strat surface edges---------------
 c---reads x-y pairs--------------------------
          include 'surface.h'
-         character*9 aname2, asuf2*5
+         character(9) aname2, asuf2*5
          include 'names.h'
          asuf2='_edge'
          kerr=0
@@ -941,7 +941,7 @@ c-------------------------------
 c-----read model edge file, kept separate from surface edge-----
 c-------to simplify index counts--------------------------------
           include 'surface.h'
-          character*9 aname3
+          character(9) aname3
           kerr=0
 c---file name assignment-------
           aname3='bmod_edge'
@@ -960,7 +960,7 @@ c        read(18,*)i3   !i3 now set at top
          subroutine readgeo(k2err)
 c reads geologic contours
          include 'sgeo.h'
-         character*16 fileii,a1*10
+         character(16) fileii,a1*10
          include 'sgeod.h'
 c---file name assignment-------
          fileii='lab_geo2_geology'
@@ -1031,8 +1031,8 @@ c
 c---reads stratigraphic surfaces-------------------------
 c---reads spyglass ascii output--------------------------
          include 'surface.h'
-         character*8 aname, asuf*4
-         character*9 aname2, a18*1
+         character(8) aname, asuf*4
+         character(9) aname2, a18*1
          include 'names.h'
          asuf='_sur'
          a18='2'
@@ -1071,7 +1071,7 @@ cc---For SGV (i=72,73,74) convert depth thousands of feet to feet---
 c-reads uplift file for LAB--------------------
 c-----just like readsur-------------
         include 'labup.h'
-        character*9 filei4
+        character(9) filei4
 c file name assignment
         filei4='laup_sur2'
 c
@@ -1540,7 +1540,7 @@ c Do the interpolation
          subroutine readbore(k2err) 
 c--read geotech borehole data-------------- 
          include 'borehole.h'
-         character*9 fileib
+         character(9) fileib
 c---file name assignment-------
          fileib='boreholes'
          k2err=0
@@ -1579,7 +1579,7 @@ c read file
          subroutine readgene(k2err)
 c--read generic borehole profiles--------------
          include 'genpro.h'
-         character*12 fileig,ag1*50
+         character(12) fileig,ag1*50
 c---file name assignment-------
          fileig='soil_generic'
          k2err=0
@@ -1778,7 +1778,7 @@ c chino - berdo need to split this!
 c--reads soil type info---------------------------------
 c Reads a modified .pgm ascii file
         include 'soil1.h'
-        character*50 filesb
+        character(50) filesb
 c here's input file name-----------------------------------
         k2err=0
         filesb='soil.pgm'
@@ -2027,7 +2027,7 @@ c remember a better number to interpolate from rather than hard generic
         subroutine readmoho(k2err)
 c--reads the moho surface file--------------------------
         include 'moho1.h'
-        character*50 filemo
+        character(50) filemo
 c here's input file name-----------------------------------
         filemo='moho_sur'
         open(16,file=filemo,status='old',err=3233)
@@ -2112,7 +2112,7 @@ c -- read upper mantle model info---------------------------
 c Using Monica Kohler's so cal model at xx km horizontal
 c  spacing, 10 km vertical spacing
          include 'mantle.h'
-         character*1 atra
+         character(1) atra
          kerr=0
          open(29,file='3D.out',status='old',err=2998)
          do 1129 j=1,nmanll
