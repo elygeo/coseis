@@ -92,11 +92,11 @@ write( 1, '(a,3i8,a)'   ) '  ihypo       = [ ', jf0-j+nf1, kf0, n(3)-l, ' ];'
 write( 1, '(a,i8,a)'    ) '  npml        = ', npml, ';'
 write( 1, '(a)'         ) '  faultnormal = 2;'
 write( 1, '(3a)'        ) '  endian      = ''', endian, ''';'
-write( 1, '(a,i8,a)'    ) '  out{1}      = { 3 ''x''    0   1 1 1 0 ', n, ' 0 };'
-write( 1, '(a,i8,a)'    ) '  out{2}      = { 1 ''rho''  0   1 1 1 0 ', n-1, ' 0 };'
-write( 1, '(a,i8,a)'    ) '  out{3}      = { 1 ''vp''   0   1 1 1 0 ', n-1, ' 0 };'
-write( 1, '(a,i8,a)'    ) '  out{4}      = { 1 ''vs''   0   1 1 1 0 ', n-1, ' 0 };'
-write( 1, '(a,i8,a)'    ) '  out{5}      = { 1 ''ts1''  0   1 1 1 0 ', n, ' 0 };'
+write( 1, '(a,3i8,a)'   ) '  out{1}      = { 3 ''x''    0   1 1 1 0 ', n,   ' 0 };'
+write( 1, '(a,3i8,a)'   ) '  out{2}      = { 1 ''rho''  0   1 1 1 0 ', n-1, ' 0 };'
+write( 1, '(a,3i8,a)'   ) '  out{3}      = { 1 ''vp''   0   1 1 1 0 ', n-1, ' 0 };'
+write( 1, '(a,3i8,a)'   ) '  out{4}      = { 1 ''vs''   0   1 1 1 0 ', n-1, ' 0 };'
+write( 1, '(a,3i8,a)'   ) '  out{5}      = { 1 ''ts1''  0   1 1 1 0 ', n,   ' 0 };'
 close( 1 )
 
 ! SORD input parameters
