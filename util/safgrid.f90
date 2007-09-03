@@ -2,7 +2,7 @@
 program main
 use m_tscoords
 implicit none
-real :: dx, h, o1, o2, xx, yy, h1, h2, h3, h4, ell(3), x0, y0, z0, &
+real :: dx, h, o1, o2, x1, x2, h1, h2, h3, h4, ell(3), x0, y0, z0, &
   xf(6), yf(6), rf(6), zf, exag, mus, mud, tn, ts, rho, vp, vs, dc
 integer :: n(3), npml, i, j, k, l, j1, k1, l1, j2, k2, l2, jf0, kf0, lf0, &
   nf, nf1, nf2, nf3, ii(3)
@@ -193,10 +193,10 @@ write( 0, * ) 'latgitude range: ', minval( w1(:,:,:,2) ), maxval( w1(:,:,:,2) )
 doline: do
 open( 1, file='safsites.ll', status='old' )
 open( 2, file='insord.m', status='old', position='append' )
-read( 1, *, iostat=i ) xx, yy, str
+read( 1, *, iostat=i ) x1, x2, str
 if ( i /= 0 ) exit doline
-s1 = ( w1(:,:,:,1) - xx ) * ( w1(:,:,:,1) - xx ) &
-   + ( w1(:,:,:,2) - yy ) * ( w1(:,:,:,2) - yy )
+s1 = ( w1(:,:,:,1) - x1 ) * ( w1(:,:,:,1) - x1 ) &
+   + ( w1(:,:,:,2) - x2 ) * ( w1(:,:,:,2) - x2 )
 ii = minloc( s1 )
 write( 2, * ) 'out = { ''v'' 1   ', ii(1:2), ' -1 0   ', ii(1:2), ' -1 -1 }; % ', trim(str)
 end do doline
@@ -228,14 +228,14 @@ o1 = .5 * h - 121.5 * 3600.
 o2 = .5 * h +  30.5 * 3600.
 do k1 = 1, size(w1,2)
 do j1 = 1, size(w1,1)
-  xx = ( ( w1(j1,k1,1,1) * 3600 ) - o1 ) / h
-  yy = ( ( w1(j1,k1,1,2) * 3600 ) - o2 ) / h
-  j = int( xx ) + 1
-  k = int( yy ) + 1
-  h1 =  xx - j + 1
-  h2 = -xx + j
-  h3 =  yy - k + 1
-  h4 = -yy + k
+  x1 = ( ( w1(j1,k1,1,1) * 3600 ) - o1 ) / h
+  x2 = ( ( w1(j1,k1,1,2) * 3600 ) - o2 ) / h
+  j = int( x1 ) + 1
+  k = int( x2 ) + 1
+  h1 =  x1 - j + 1
+  h2 = -x1 + j
+  h3 =  x2 - k + 1
+  h4 = -x2 + k
   x(j1,k1,1,3) = ( &
     h2 * h4 * t(j,k)   + &
     h1 * h4 * t(j+1,k) + &
