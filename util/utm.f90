@@ -1,9 +1,10 @@
-! UTM projection, reference: John Snyder, 1987, USGS Professional Paper 1395
+! UTM projection routines
+! Reference: John Snyder, 1987, USGS Professional Paper 1395
 ! Geoffrey Ely, gely@ucsd.edu, 6/8/2006
 module m_utm
 contains
 
-! UTM projection
+! UTM projection: lon/lat to meters
 subroutine ll2utm( x, i1, i2, zone )
 implicit none
 real, intent(inout) :: x(:,:,:,:)
@@ -48,7 +49,7 @@ end do
 x(:,:,:,i1) = x(:,:,:,i1) + 500000.
 end subroutine
 
-! Inverse UTM projection
+! Inverse UTM projection: meters to lon/lat
 subroutine utm2ll( x, i1, i2, zone )
 implicit none
 real, intent(inout) :: x(:,:,:,:)

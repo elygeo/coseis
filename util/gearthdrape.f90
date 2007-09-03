@@ -5,7 +5,6 @@
 ! compile: f95 -O utm.f90 gearthdrape.f90 -o gearthdrape
 ! usage: ./gearthdrape [-s] <file1> <file2> <file3> ...
 !   -s   swap bytes
-
 program main
 use m_utm
 implicit none

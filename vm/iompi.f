@@ -16,7 +16,7 @@
       call mpi_comm_size( mpi_comm_world, np, ierr )
       call mpi_file_set_errhandler( mpi_file_null,
      $  MPI_ERRORS_ARE_FATAL, ierr )
-      if ( ip == 0 ) write( 0, '(a)' ) 'SCEC Velocity Model version 4'
+      if ( ip == 0 ) write( 0, '(a)' ) 'SCEC Velocity Model'
       npd = np
       nnl = nnd / npd
       if ( modulo( nnd, npd ) /= 0 ) nnl = nnl + 1

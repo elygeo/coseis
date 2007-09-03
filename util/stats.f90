@@ -1,4 +1,4 @@
-! Floating point stats
+! Calculated statistics for a floating point binary file
 program main
 implicit none
 integer, parameter :: nr = 8192

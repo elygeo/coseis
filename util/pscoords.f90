@@ -1,5 +1,4 @@
 ! Routines for converting between lon/lat and PetaShake coordinates
-! Geoffrey Ely, gely@ucsd.edu, 10/6/2006
 module m_pscoords
 use m_utm
 contains

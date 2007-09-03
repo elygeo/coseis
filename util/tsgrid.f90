@@ -1,37 +1,56 @@
-! Generate TeraShake mesh for input to the SCEC VM
-! Geoffrey Ely, gely@ucsd.edu
-! compile: f95 utm.f90 tsgrid.f90 -o tsgrid
-
+! Generate TeraShake mesh
 program main
 use m_tscoords
 implicit none
-real :: ell(2), dx, theta, o1, o2, h1, h2, h3, h4, o1, o2
+real :: ell(2), dx, x1, x2, o1, o2, h, h1, h2, h3, h4
 real, allocatable :: x(:,:,:,:), t(:,:)
-integer :: n(2), i
+integer :: n(2), i, j, k, j1, k1
 character :: endian0, endian, b1(4), b2(4)
 equivalence (h1,b1), (h2,b2)
 
-! byte order
+! Byte order
 endian = 'l'
 if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
 open( 1, file='endian0', status='old' )
 read( 1, * ) endian0
 close( 1 )
 
-! dimentions
+! Dimensions
 dx = 200.
 ell = (/ 600, 300 /) * 1000
-n = nint( ell / dx ) + 1
 
-! node centered mesh
+! Cell centered mesh for SCECVM input
+n = nint( ell / dx )
+deallocate( x, t )
+allocate( x(n(1),n(2),1,3) )
+forall( i=1:n(1) ) x(i,:,:,1) = dx * ( i - 1 ) + .5 * dx
+forall( i=1:n(2) ) x(:,i,:,2) = dx * ( i - 1 ) + .5 * dx
+call ts2ll( x, 1, 2 )
+x(:,:,:,3) = 1000.
+
+! Output
+open( 1, file='nn' )
+write( 1, * ) product( n )
+close( 1 )
+inquire( iolength=i ) x(:,:,:,1)
+open( 1, file='rlon', recl=i, form='unformatted', access='direct', status='replace' )
+open( 2, file='rlat', recl=i, form='unformatted', access='direct', status='replace' )
+open( 3, file='rdep', recl=i, form='unformatted', access='direct', status='replace' )
+write( 1, rec=i ) x(:,:,:,1)
+write( 2, rec=i ) x(:,:,:,2)
+write( 3, rec=i ) x(:,:,:,3)
+close( 1 )
+close( 2 )
+close( 3 )
+
+! Node centered mesh for topography
+n = nint( ell / dx ) + 1
 allocate( x(n(1),n(2),1,3), t(960,780) )
 forall( i=1:n(1) ) x(i,:,:,1) = dx * ( i - 1 )
 forall( i=1:n(2) ) x(:,i,:,2) = dx * ( i - 1 )
-
-! lon/lat
 call ts2ll( x, 1, 2 )
 
-! topo
+! Interpolate topography
 inquire( iolength=i ) t
 open( 1, file='topo3.f32', recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
@@ -51,8 +70,8 @@ end if
 h = 30.
 o1 = .5 * h - 121.5 * 3600.
 o2 = .5 * h +  30.5 * 3600.
-do k1 = 1, size(w1,2)
-do j1 = 1, size(w1,1)
+do k1 = 1, size( x, 2 )
+do j1 = 1, size( x, 1 )
   x1 = ( ( x(j1,k1,1,1) * 3600 ) - o1 ) / h
   x2 = ( ( x(j1,k1,1,2) * 3600 ) - o2 ) / h
   j = int( x1 ) + 1
@@ -69,35 +88,10 @@ do j1 = 1, size(w1,1)
 end do
 end do
 
-! output
+! Output
 inquire( iolength=i ) x(:,:,:,3)
 open( 3, file='z', recl=i, form='unformatted', access='direct', status='replace' )
 write( 3, rec=i ) x(:,:,:,3)
-close( 3 )
-
-! cell centered mesh
-n = n - 1
-deallocate( x, t )
-allocate( x(n(1),n(2),1,3) )
-forall( i=1:n(1) ) x(i,:,:,1) = dx * ( i - 1 ) + .5 * dx
-forall( i=1:n(2) ) x(:,i,:,2) = dx * ( i - 1 ) + .5 * dx
-
-! lon/lat
-call ts2ll( x, 1, 2 )
-
-! output
-open( 1, file='nn' )
-write( 1, * ) product( n )
-close( 1 )
-inquire( iolength=i ) x(:,:,:,1)
-open( 1, file='rlon', recl=i, form='unformatted', access='direct', status='replace' )
-open( 2, file='rlat', recl=i, form='unformatted', access='direct', status='replace' )
-open( 3, file='rdep', recl=i, form='unformatted', access='direct', status='replace' )
-write( 1, rec=i ) x(:,:,:,1)
-write( 2, rec=i ) x(:,:,:,2)
-write( 3, rec=i ) x(:,:,:,3)
-close( 1 )
-close( 2 )
 close( 3 )
 
 end program

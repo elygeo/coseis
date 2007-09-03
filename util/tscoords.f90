@@ -1,5 +1,4 @@
 ! Routines for converting between lon/lat and TeraShake coordinates
-! Geoffrey Ely, gely@ucsd.edu, 6/8/2006
 module m_tscoords
 use m_utm
 contains

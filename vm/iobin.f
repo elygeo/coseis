@@ -5,7 +5,7 @@
       include 'newin.h'
       integer :: kerr, nio, i
       character(160) :: str
-      write( 0, '(a)' ) 'SCEC Velocity Model version 4'
+      write( 0, '(a)' ) 'SCEC Velocity Model'
       call get_command_argument( 1, str )
       open( 1, file=str, status='old' )
       read( 1, * ) nn

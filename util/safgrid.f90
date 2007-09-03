@@ -82,36 +82,36 @@ l = nint( 5000. / dx )
 
 ! Mesh metadata
 open( 1, file='meta.m', status='replace' )
-write( 1, '(a)' ) '% SORD metadata'
-write( 1, * ) ' dx          = ', dx, ';'
-write( 1, * ) ' dt          = ', dx * .00006, ';'
-write( 1, * ) ' nt          = 0;'
-write( 1, * ) ' nn          = [ ', n, ' ];'
-write( 1, * ) ' ihypo       = [ ', jf0+j,     kf0, n(3)-l, ' ];'
-write( 1, * ) ' ihypo       = [ ', jf0-j+nf1, kf0, n(3)-l, ' ];'
-write( 1, * ) ' npml        = ', npml, ';'
-write( 1, * ) ' faultnormal = 2;'
-write( 1, * ) ' endian      = ''', endian, ''';'
-write( 1, * ) ' out{1}      = { 3 ''x''    0   1 1 1 0 ', n, ' 0 };'
-write( 1, * ) ' out{2}      = { 1 ''rho''  0   1 1 1 0 ', n-1, ' 0 };'
-write( 1, * ) ' out{3}      = { 1 ''vp''   0   1 1 1 0 ', n-1, ' 0 };'
-write( 1, * ) ' out{4}      = { 1 ''vs''   0   1 1 1 0 ', n-1, ' 0 };'
-write( 1, * ) ' out{5}      = { 1 ''ts1''  0   1 1 1 0 ', n, ' 0 };'
+write( 1, '(a)'         ) '% SORD metadata'
+write( 1, '(a,g15.7,a)' ) '  dx          = ', dx, ';'
+write( 1, '(a,g15.7,a)' ) '  dt          = ', dx * .00006, ';'
+write( 1, '(a)'         ) '  nt          = 0;'
+write( 1, '(a,3i8,a)'   ) '  nn          = [ ', n, ' ];'
+write( 1, '(a,3i8,a)'   ) '  ihypo       = [ ', jf0+j,     kf0, n(3)-l, ' ];'
+write( 1, '(a,3i8,a)'   ) '  ihypo       = [ ', jf0-j+nf1, kf0, n(3)-l, ' ];'
+write( 1, '(a,i8,a)'    ) '  npml        = ', npml, ';'
+write( 1, '(a)'         ) '  faultnormal = 2;'
+write( 1, '(3a)'        ) '  endian      = ''', endian, ''';'
+write( 1, '(a,i8,a)'    ) '  out{1}      = { 3 ''x''    0   1 1 1 0 ', n, ' 0 };'
+write( 1, '(a,i8,a)'    ) '  out{2}      = { 1 ''rho''  0   1 1 1 0 ', n-1, ' 0 };'
+write( 1, '(a,i8,a)'    ) '  out{3}      = { 1 ''vp''   0   1 1 1 0 ', n-1, ' 0 };'
+write( 1, '(a,i8,a)'    ) '  out{4}      = { 1 ''vs''   0   1 1 1 0 ', n-1, ' 0 };'
+write( 1, '(a,i8,a)'    ) '  out{5}      = { 1 ''ts1''  0   1 1 1 0 ', n, ' 0 };'
 close( 1 )
 
 ! SORD input parameters
 open( 1, file='insord.m', status='replace' )
-write( 1, '(a)' ) '% SORD input'
-write( 1, * ) ' dx = ', dx, ';'
-write( 1, * ) ' dt = ', dx * .00006, ';'
-write( 1, * ) ' nt = ', 180. / dx / .00006, ';'
-write( 1, * ) ' nn = [ ', n, ' ];'
-write( 1, * ) ' ihypo = [ ', jf0+j,     kf0, -1-l, ' ];'
-write( 1, * ) ' ihypo = [ ', jf0-j+nf1, kf0, -1-l, ' ];'
-write( 1, * ) ' npml = ', npml, ';'
-write( 1, * ) ' dc = ', dc, ';'
-write( 1, * ) ' mud = ', mud, ';'
-write( 1, * ) ' mus = { ', mus, '''zone''', jf0, 0, -1-nf3, jf0+nf1, 0, -1, ' };'
+write( 1, '(a)'         ) '% SORD input'
+write( 1, '(a,g15.7,a)' ) '  dx = ', dx, ';'
+write( 1, '(a,g15.7,a)' ) '  dt = ', dx * .00006, ';'
+write( 1, '(a,g15.7,a)' ) '  nt = ', 180. / dx / .00006, ';'
+write( 1, '(a,3i8,a)'   ) '  nn = [ ', n, ' ];'
+write( 1, '(a,3i8,a)'   ) '  ihypo = [ ', jf0+j,     kf0, -1-l, ' ];'
+write( 1, '(a,3i8,a)'   ) '  ihypo = [ ', jf0-j+nf1, kf0, -1-l, ' ];'
+write( 1, '(a,i8,a)'    ) '  npml = ', npml, ';'
+write( 1, '(a,g15.7,a)' ) '  dc = ', dc, ';'
+write( 1, '(a,g15.7,a)' ) '  mud = ', mud, ';'
+write( 1, * ) ' mus = { ', mus, '''zone''', jf0, 0, -1-nf3, jf0+nf1, ' 0 -1 };'
 close( 1 )
 
 ! 2D mesh
@@ -203,7 +203,7 @@ end do doline
 close( 1 )
 close( 2 )
 
-! Topo
+! Interpolate topography
 if ( exag < .00001 ) then
 x(:,:,:,3) = 0.
 else
@@ -226,8 +226,8 @@ end if
 h = 30.
 o1 = .5 * h - 121.5 * 3600.
 o2 = .5 * h +  30.5 * 3600.
-do k1 = 1, size(w1,2)
-do j1 = 1, size(w1,1)
+do k1 = 1, size( w1, 2 )
+do j1 = 1, size( w1, 1 )
   x1 = ( ( w1(j1,k1,1,1) * 3600 ) - o1 ) / h
   x2 = ( ( w1(j1,k1,1,2) * 3600 ) - o2 ) / h
   j = int( x1 ) + 1
