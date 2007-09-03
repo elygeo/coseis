@@ -2,6 +2,7 @@
 
 function [ f, izone ] = read4d( varargin )
 
+dirfmt = '';
 meta
 currentstep
 f = [];

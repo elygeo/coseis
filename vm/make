@@ -65,7 +65,6 @@ cd ../tmp
 $tar xzf "../data/scecvm4.tgz"
 cd scecvm4
 sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
-../../sh/compile "$sfc $flags -o" xsec xsec.f
 ../../sh/compile "$sfc $flags -o" scecvm4-s $getarg iobin.f scecvm4.f
 ../../sh/compile "$pfc $flags -o" scecvm4-p $getarg iompi.f scecvm4.f
 
@@ -73,7 +72,6 @@ cd ..
 $tar xzf "../data/scecvm3.tgz"
 cd scecvm3
 sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
-../../sh/compile "$sfc $flags -o" xsec xsec.f
 ../../sh/compile "$sfc $flags -o" scecvm3-s $getarg iobin.f scecvm3.f
 ../../sh/compile "$pfc $flags -o" scecvm3-p $getarg iompi.f scecvm3.f
 

@@ -16,12 +16,11 @@ read( 1, * ) endian0
 close( 1 )
 
 ! Dimensions
-dx = 200.
+dx = 300.
 ell = (/ 600, 300 /) * 1000
 
 ! Cell centered mesh for SCECVM input
 n = nint( ell / dx )
-deallocate( x, t )
 allocate( x(n(1),n(2),1,3) )
 forall( i=1:n(1) ) x(i,:,:,1) = dx * ( i - 1 ) + .5 * dx
 forall( i=1:n(2) ) x(:,i,:,2) = dx * ( i - 1 ) + .5 * dx
@@ -29,22 +28,23 @@ call ts2ll( x, 1, 2 )
 x(:,:,:,3) = 1000.
 
 ! Output
-open( 1, file='nn' )
+open( 1, file='nc' )
 write( 1, * ) product( n )
 close( 1 )
 inquire( iolength=i ) x(:,:,:,1)
 open( 1, file='rlon', recl=i, form='unformatted', access='direct', status='replace' )
 open( 2, file='rlat', recl=i, form='unformatted', access='direct', status='replace' )
 open( 3, file='rdep', recl=i, form='unformatted', access='direct', status='replace' )
-write( 1, rec=i ) x(:,:,:,1)
-write( 2, rec=i ) x(:,:,:,2)
-write( 3, rec=i ) x(:,:,:,3)
+write( 1, rec=1 ) x(:,:,:,1)
+write( 2, rec=1 ) x(:,:,:,2)
+write( 3, rec=1 ) x(:,:,:,3)
 close( 1 )
 close( 2 )
 close( 3 )
 
 ! Node centered mesh for topography
 n = nint( ell / dx ) + 1
+deallocate( x )
 allocate( x(n(1),n(2),1,3), t(960,780) )
 forall( i=1:n(1) ) x(i,:,:,1) = dx * ( i - 1 )
 forall( i=1:n(2) ) x(:,i,:,2) = dx * ( i - 1 )
@@ -89,10 +89,31 @@ end do
 end do
 
 ! Output
-inquire( iolength=i ) x(:,:,:,3)
-open( 3, file='z', recl=i, form='unformatted', access='direct', status='replace' )
-write( 3, rec=i ) x(:,:,:,3)
+forall( i=1:n(1) ) x(i,:,:,1) = dx * ( i - 1 )
+forall( i=1:n(2) ) x(:,i,:,2) = dx * ( i - 1 )
+inquire( iolength=i ) x(:,:,:,1)
+open( 1, file='x1', recl=i, form='unformatted', access='direct', status='replace' )
+open( 2, file='x2', recl=i, form='unformatted', access='direct', status='replace' )
+open( 3, file='x3', recl=i, form='unformatted', access='direct', status='replace' )
+write( 1, rec=1 ) x(:,:,:,1)
+write( 2, rec=1 ) x(:,:,:,2)
+write( 3, rec=1 ) x(:,:,:,3)
+close( 1 )
+close( 2 )
 close( 3 )
+
+! Mesh metadata
+open( 1, file='meta.m', status='replace' )
+write( 1, '(a)'         ) '% SORD metadata'
+write( 1, '(a,g15.7,a)' ) '  dx          = ', dx, ';'
+write( 1, '(a)'         ) '  nt          = 0;'
+write( 1, '(a,2i8,a)'   ) '  nn          = [ ', n, ' 1 ];'
+write( 1, '(3a)'        ) '  endian      = ''', endian, ''';'
+write( 1, '(a,2i8,a)'   ) '  out{1}      = { 3 ''x''    0   1 1 1 0 ', n,   ' 1 0 };'
+write( 1, '(a,2i8,a)'   ) '  out{2}      = { 1 ''rho''  0   1 1 1 0 ', n-1, ' 1 0 };'
+write( 1, '(a,2i8,a)'   ) '  out{3}      = { 1 ''vp''   0   1 1 1 0 ', n-1, ' 1 0 };'
+write( 1, '(a,2i8,a)'   ) '  out{4}      = { 1 ''vs''   0   1 1 1 0 ', n-1, ' 1 0 };'
+close( 1 )
 
 end program
 
