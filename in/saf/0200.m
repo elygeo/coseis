@@ -11,7 +11,7 @@
 
   x1    = { 'read' 'zone' 1 1 1   -1 -1 1 };
   x2    = { 'read' 'zone' 1 1 1   -1 -1 1 };
-  x3    = 'read';
+% x3    = 'read';
   rho   = 'read';
   vp    = 'read'; vp1  = 1500.;
   vs    = 'read'; vs1  = 500.;

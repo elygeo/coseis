@@ -1,7 +1,7 @@
 % SAF 500 m - fault
 % np(2) = 1:29, 32, 34, 36, 38, 76, 86, 101, 121, 151, 201, 301, 602
-  datadir = 'saf/scecvm3/0500';
   datadir = 'saf/scecvm4/0500';
+  datadir = 'saf/scecvm3/0500';
   itio = 500; itcheck = 0; itstats = 10;
   nt = 6000;
   np = [ 1  8 4 ];
@@ -11,7 +11,7 @@
 
   x1    = { 'read' 'zone' 1 1 1   -1 -1 1 };
   x2    = { 'read' 'zone' 1 1 1   -1 -1 1 };
-  x3    = 'read';
+  %x3    = 'read';
   rho   = 'read';
   vp    = 'read'; vp1  = 1500.;
   vs    = 'read'; vs1  = 500.;

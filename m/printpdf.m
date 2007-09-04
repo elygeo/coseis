@@ -13,5 +13,5 @@ else
 end
 
 movefile( 'tmp.pdf', [ file '.pdf' ] )
-%delete( 'tmp.eps' )
+delete( 'tmp.eps' )
 
