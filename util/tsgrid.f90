@@ -2,7 +2,7 @@
 program main
 use m_tscoords
 implicit none
-real :: ell(2), dx, x1, x2, o1, o2, h, h1, h2, h3, h4
+real :: ell(2), dx, x1, x2, o1, o2, h, h1, h2, h3, h4, z
 real, allocatable :: x(:,:,:,:), t(:,:)
 integer :: n(2), i, j, k, j1, k1
 character :: endian0, endian, b1(4), b2(4)
@@ -16,7 +16,8 @@ read( 1, * ) endian0
 close( 1 )
 
 ! Dimensions
-dx = 300.
+z = 500.
+dx = 200.
 ell = (/ 600, 300 /) * 1000
 
 ! Cell centered mesh for SCECVM input
@@ -25,7 +26,7 @@ allocate( x(n(1),n(2),1,3) )
 forall( i=1:n(1) ) x(i,:,:,1) = dx * ( i - 1 ) + .5 * dx
 forall( i=1:n(2) ) x(:,i,:,2) = dx * ( i - 1 ) + .5 * dx
 call ts2ll( x, 1, 2 )
-x(:,:,:,3) = 1000.
+x(:,:,:,3) = z
 
 ! Output
 open( 1, file='nc' )
@@ -108,11 +109,11 @@ write( 1, '(a)'         ) '% SORD metadata'
 write( 1, '(a,g15.7,a)' ) '  dx          = ', dx, ';'
 write( 1, '(a)'         ) '  nt          = 0;'
 write( 1, '(a,2i8,a)'   ) '  nn          = [ ', n, ' 1 ];'
-write( 1, '(3a)'        ) '  endian      = ''', endian, ''';'
 write( 1, '(a,2i8,a)'   ) '  out{1}      = { 3 ''x''    0   1 1 1 0 ', n,   ' 1 0 };'
 write( 1, '(a,2i8,a)'   ) '  out{2}      = { 1 ''rho''  0   1 1 1 0 ', n-1, ' 1 0 };'
 write( 1, '(a,2i8,a)'   ) '  out{3}      = { 1 ''vp''   0   1 1 1 0 ', n-1, ' 1 0 };'
 write( 1, '(a,2i8,a)'   ) '  out{4}      = { 1 ''vs''   0   1 1 1 0 ', n-1, ' 1 0 };'
+write( 1, '(3a)'        ) '  endian      = ''', endian, ''';'
 close( 1 )
 
 end program
