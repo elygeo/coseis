@@ -15,10 +15,10 @@ doline: do
     cycle doline
   end if
   read( str, * ) x
-  i = verify( str, ' ' ); str = str(i:)
-  i = scan(   str, ' ' ); str = str(i:)
-  i = verify( str, ' ' ); str = str(i:)
-  i = scan(   str, ' ' ); str = str(i:)
+  i = verify( str, ' 	' ); str = str(i:)
+  i = scan(   str, ' 	' ); str = str(i:)
+  i = verify( str, ' 	' ); str = str(i:)
+  i = scan(   str, ' 	' ); str = str(i:)
   call ll2ps( x, 1, 2 )
   print '(2f10.0,a)', x, trim( str )
 end do doline

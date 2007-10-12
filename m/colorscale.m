@@ -3,6 +3,8 @@ function [ h1, h2 ] = colorscale( varargin )
 
 % size
 str = '';
+lim1 = '';
+lim2 = '';
 orientation = 'b';
 x = get( gca, 'XLim' );
 y = get( gca, 'YLim' );
@@ -12,6 +14,8 @@ if nargin >= 1, str = varargin{1}; end
 if nargin >= 2, x = varargin{2}; end
 if nargin >= 3, y = varargin{3}; end
 if nargin >= 4, orientation = varargin{4}; end
+if nargin >= 5, lim1 = varargin{5}; end
+if nargin >= 6, lim2 = varargin{6}; end
 x = x(:)';
 y = y(:)';
 
@@ -46,7 +50,9 @@ case 'l', y = y * w; x = x(1) - x * h; ver = 'bottom'; rot = 90;
 case 'r', y = y * w; x = x(2) + x * h; ver = 'top';    rot = 90;
 otherwise, error
 end
-h2 = text( x, y, { num2str(clim(1)) str num2str(clim(2)) } )';
+if ~length( lim1 ), lim1 = num2str(clim(1)); end
+if ~length( lim2 ), lim2 = num2str(clim(2)); end
+h2 = text( x, y, { lim1 str lim2 } )';
 set( h2, 'Hor', 'center', 'Ver', ver, 'Rot', rot, 'Clipping', 'off', 'HitTest', 'off' )
 if nargout < 2, clear h2, end
 

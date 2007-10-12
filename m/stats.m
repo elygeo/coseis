@@ -131,7 +131,7 @@ pos = get( gcf, 'Pos' );
 set( gcf, 'PaperPositionMode', 'auto', 'Pos', [ pos(1:2) 640 640 ] )
 set( gcf, 'DefaultLineLinewidth', 1 )
 axes( 'Pos', [ .13 .57 .84 .4 ] )
-f = diff( readf32( 'stats/moment' ) ) / dt;
+f = diff( readf32( 'stats/moment' ) ) / ( dt * itstats );
 t = ( 1:length(f) ) * dt * itstats;
 plot( t, 1e-18 * f )
 xlim( tlim )

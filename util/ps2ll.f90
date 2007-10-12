@@ -15,10 +15,10 @@ doline: do
     cycle doline
   end if
   read( line, * ) x
-  i = verify( line, ' ' ); line = line(i:)
-  i = scan(   line, ' ' ); line = line(i:)
-  i = verify( line, ' ' ); line = line(i:)
-  i = scan(   line, ' ' ); line = line(i:)
+  i = verify( line, ' 	' ); line = line(i:)
+  i = scan(   line, ' 	' ); line = line(i:)
+  i = verify( line, ' 	' ); line = line(i:)
+  i = scan(   line, ' 	' ); line = line(i:)
   call ps2ll( x, 1, 2 )
   print '(2f10.5,1x,a)', x, trim( line )
 end do doline

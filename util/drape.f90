@@ -29,10 +29,10 @@ doline: do
     cycle doline
   end if
   read( line, * ) x, y
-  i = verify( line, ' ' ); line = line(i:)
-  i = scan(   line, ' ' ); line = line(i:)
-  i = verify( line, ' ' ); line = line(i:)
-  i = scan(   line, ' ' ); line = line(i:)
+  i = verify( line, ' 	' ); line = line(i:)
+  i = scan(   line, ' 	' ); line = line(i:)
+  i = verify( line, ' 	' ); line = line(i:)
+  i = scan(   line, ' 	' ); line = line(i:)
   xx = ( ( x * 3600 ) - o1 ) / h
   yy = ( ( y * 3600 ) - o2 ) / h
   j = int( xx ) + 1

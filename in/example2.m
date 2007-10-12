@@ -41,7 +41,7 @@
   n2expand = [ 50 50 50 ];
 
 % Code execution and output
-  np = [ 4 2 2 ];
+  np = [ 1 1 8 ];
   out = { 'x'    1   1 1 0  0   -1 -1  0  0 };
   out = { 'trup' 1   1 1 0 -1   -1 -1  0 -1 };
   out = { 'u'  1    91 1 101 0    91 1 101 1500 };

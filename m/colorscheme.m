@@ -45,21 +45,26 @@ case 'k2'
     0 0 0 8 8
     8 0 0 0 8
     8 8 0 0 0 ]' / 8;
-case 'w0'
-  cmap = [
-    8 1 0 3 4 8 8
-    8 3 5 8 8 8 3
-    8 8 8 8 4 3 3 ]' / 8;
 case 'lg0'
   cmap = [
     7 3 0 2 8 8
     7 4 8 8 8 2
     7 8 8 2 0 2 ]' / 8;
+case 'w0'
+  cmap = [
+    8 0 0 0 0 8 8 8 8
+    8 4 6 8 8 8 6 4 0
+    8 8 8 8 0 0 0 0 0 ]' / 8;
+case 'w00'
+  cmap = [
+    8 8 0 0 0 0 8 8 8 8 8
+    8 8 4 6 8 8 8 6 4 0 0
+    8 8 8 8 8 0 0 0 0 0 0 ]' / 8;
 case 'w1'
   cmap = [
-    1 0 3 4 8 8
-    3 5 8 8 8 3
-    8 8 8 4 3 3 ]' / 8;
+    0 0 0 0 0 8 8 8 8
+    0 4 6 8 8 8 6 4 0
+    8 8 8 8 0 0 0 0 0 ]' / 8;
 case 'w2'
   centered = 1;
   cmap = [
@@ -119,13 +124,6 @@ colormap( max( 0, min( 1, interp1( x1, cmap, x2 ) ) ) );
 bg = 1 - fg;
 set( gcf, ...
   'InvertHardcopy', 'off', ...
-  'DefaultTextInterpreter', 'tex', ...
-  'DefaultAxesFontName', 'Helvetica', ...
-  'DefaultTextFontName', 'Helvetica', ...
-  'DefaultAxesFontSize', 9, ...
-  'DefaultTextFontSize', 9, ...
-  'DefaultAxesLinewidth', .5, ...
-  'DefaultLineLinewidth', .5, ...
   'DefaultAxesColor', bg, ...
   'Color', bg, ...
   'DefaultTextColor', fg, ...

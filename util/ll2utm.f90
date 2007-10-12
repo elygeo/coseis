@@ -20,10 +20,10 @@ doline: do
     cycle doline
   end if
   read( str, * ) x
-  i = verify( str, ' ' ); str = str(i:)
-  i = scan(   str, ' ' ); str = str(i:)
-  i = verify( str, ' ' ); str = str(i:)
-  i = scan(   str, ' ' ); str = str(i:)
+  i = verify( str, ' 	' ); str = str(i:)
+  i = scan(   str, ' 	' ); str = str(i:)
+  i = verify( str, ' 	' ); str = str(i:)
+  i = scan(   str, ' 	' ); str = str(i:)
   call ll2utm( x, 1, 2, zone )
   print '(2f14.4,a)', x, trim( str )
 end do doline

@@ -1,9 +1,12 @@
 function h2 = pmb( varargin )
 
-dim = -3;
 h1 = varargin{1};
-dx = varargin{2};
-dy = varargin{3};
+x = xlim;
+dx = ( x(2) - x(1) ) / 400;
+dy = dx;
+dim = -3;
+if nargin > 1, dx  = varargin{2}; end
+if nargin > 2, dy  = varargin{3}; end
 if nargin > 3, dim = varargin{4}; end
 
 l = abs( dim );
