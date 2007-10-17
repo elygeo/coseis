@@ -1,6 +1,6 @@
 USAGE
 
-SORD is run by a shell script called sord:
+SORD is run by a shell script called 'sord':
 
   ./sord infile
 
@@ -10,13 +10,17 @@ with 'run/01'.  In the directory will be a script called 'run' to start the job
 interactively and a script 'que' for batch submission.
 
 Options:
-  -s  serial mode, no MPI (default if np == 1)
-  -p  parallel mode, requires MPI (default if np > 1)
-  -i  run interactively
-  -g  compile with debugging and syntax checking flags
-  -G  run in debugger
-  -n  check input and exit
-  -d  delete output from previous runs before starting
+  -s       serial mode, no MPI (default if np == 1)
+  -p       parallel mode, requires MPI (default if np > 1)
+  -i       run interactively
+  -q       submit job to batch system, or run in the background
+  -g       compile with debugging and syntax checking flags
+  -G       run in debugger
+  -n       check input and exit
+  -v opt   generate SAF mesh and SCECVM, opt indicates version 3 or 4
+  -m opt   emulate alternate machine configuration, e.g. 'datastar'
+  -d       delete output from previous runs before starting
+  -f       force recompile
 
 Compiler flags are set in 'sh/config'.  When porting to a new machine, you may
 want to modify the sord script at the 'Machine attributes' section.  This helps
@@ -25,8 +29,7 @@ specialized parallel environments, may need a custom run script added to the
 section 'Run scripts'.  See 'sh/datastar' and 'sh/teragrid' for example custom
 run scripts.
 
-  the proper compiling and batch submission parameters. For the parallel
-  version you will need MPI installed.
+For the parallel version you will need MPI.
 
 MPICH2 install
   ./configure -prefix=/usr/local --with-device=ch3:shm --enable-f90 --disable-cxx
@@ -37,69 +40,4 @@ MPICH2 SunOS install
   export CC=cc F77=f77 F90=f95 CXX=CC
   export CFLAGS=-fast FFLAGS=-fast F90FLAGS=-fast CXXFLAGS=-fast
   ./configure -prefix=/d0/gely/local --with-device=ch3:shm --enable-f90 --disable-cxx
-
-MACHINE NOTES
-
-SDSC DataStar IBM
-  http://www.sdsc.edu/user_services/datastar/
-  p655+ interactive nodes:
-    dspoe.sdsc.edu
-    5,   8 x 1.5GHz IBM Power4+, 16GB, 13.5GB usable
-  p655+ batch nodes:
-    dslogin.sdsc.edu
-    265, 8 x [1.5,1.7]GHz IBM Power4+, [16,32]GB, 13.5GB usable
-  Always run from a subdirectory of /gpfs/
-  Useful commands:
-    reslist
-    showq
-    show_bf
-    llsubmit batchjob
-    llcancel <jobID>
-    llq
-    llq -s <jobID>
-  Login to dslogin.sdsc.edu to submit batch jobs
-  Login to dspoe.sdsc.edu to run interactively
-
-SDSC TeraGrid IA64 cluster
-  http://www.sdsc.edu/user_services/ia64/
-  http://clumon.sdsc.edu/
-  http://grid.ncsa.uiuc.edu/teragrid/status/
-  Interactive nodes
-    tg-c127, tg-c128, tg-c129 and tg-c130
-    4, 2 x 1.5GHz Intel Itanium 2, 4GB, 3GB usable
-  Batch nodes:
-    tg-login1.sdsc.teragrid.org
-    tg-login2.sdsc.teragrid.org
-    252, 2 x 1.5GHz Intel Itanium 2, 4GB, 3GB usable
-  Intel Fortran compiler
-  vi ~/.soft
-    @remove +intel-compilers
-    @remove +intel-c-8.0.066-f-8.0.046-r1
-    @remove +mpich-gm-intel
-    +intel-c-9.0.032-f-9.0.033
-    +mpich-gm-1.2.6-intel9032
-    @teragrid
-  Always run from a subdirectory of /gpfs/
-  Useful commands:
-    myprojects
-    reslist
-    showq
-    show_bf
-    show_bf-all
-    qsub batchjob
-    qdel
-
-SDSU CSRC Babieca cluster
-  http://babieca.sdsu.edu/
-  http://www.csrc.sdsu.edu/csrc/about/computing/
-  interactive nodes:
-    10, 2 x 2.4GHz Intel Xeon, 1 GB
-  batch nodes:
-    30, 2 x 2.4GHz Intel Xeon, 2 GB (node8 has 1 GB)
-  Portland Group compilers http://moocow.sdsu.edu/csrc/pgi/
-  Useful commands:
-    qsub batchjob
-    pbsnodes -a
-    qstat
-    qdel
 

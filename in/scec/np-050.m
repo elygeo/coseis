@@ -8,6 +8,7 @@
   bc2      = [   10   2   0 ];
   ihypo    = [    0  -2 256 ];
   fixhypo  =     -2;
+  xhypo    = [   0.  0.  0. ];
   datadir = 'scec/data/k05';
   datadir = 'scec/data/c05';
   x1  = { 'read' 'zone' 1 1 1   -1 1 -1 };

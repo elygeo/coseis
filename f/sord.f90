@@ -1,4 +1,6 @@
 ! SORD - main program
+! Copyright 2007 Geoffrey Ely
+! This software is released under the GNU General Public License
 program sord
 
 ! Modules

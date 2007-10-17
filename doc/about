@@ -1,50 +1,39 @@
-Support Operator Rupture Dynamics (SORD)
+Support Operator Rupture Dynamics (SORD): a rupture dynamics simulation code
 
-Solver
 
-SORD solves the isotropic viscoelastic wave equation, and includes dynamic
-rupture and PML absorbing boundaries.  The mesh is logically rectangular.  The
-method of Support Operators for constructing the spatial difference operators
-is similar to finite elements.
+AUTHOR
 
-Optimization
+Geoffrey Ely
+Institute of Geophysics and Planetary Physics
+Scripps Institution of Oceanography
+University of California, San Diego
+http://igpppublic.ucsd.edu/~gely
+gely@ucsd.edu
 
-All volumetric calculations are vectorized with Fortan 95 array operations or
-forall statements.  Course grained profiling for computations, communications,
-and I/O, is automatically performed for each time step using the system clock,
-and saved for analysis.  Finer grain profiling and tuning was done with the
-Portland Group Profiler.
 
-MPI Communications
+FEATURES
 
-The topology is rectangular domain decomposition.  Sub-divisions may be in one,
-two, or three dimensions.  Communications are synchronous and blocking.  After
-initialization, only nearest neighbor communications are required, allowing for
-high scalability.  The code has achieved 80% efficiency on 1920 processors on
-SDSC DataStar.  Output may call for global collective operations, so must be
-chosen with caution.
+* Hexahedral mesh
+* Explicit, second-order, support-operator solver
+* Stiffness and viscous hourglass corrections
+* Traction at split-node spontaneous rupture dynamics
+* Perfectly matched layer absorbing boundary
+* Vectorized Fortran 95
+* Domain decomposition with Message Passing Interface (MPI)
+* Parallel input and output with MPI-IO 
+* Open source GPL license
 
-I/O
 
-Time series output is buffered.  Volume output snapshots, though not buffered,
-are typically written only periodically, so multiple steps can be completed
-between I/O operations.  Volume input of the mesh and material model, as well
-as volume output, use 'level 3' collective MPII/O with MPI derived data types,
-thus optimizing performance on parallel files systems such as GPFS.  MPII/O may
-optionally be switched off.  In that case, volume I/O is performed with a
-separate file for each process.  Parallel HDF5 was considered, but rejected due
-to the added level or library dependency on top of MPII/O.  HDF5 headers can be
-added in post-processing when needed.
+TESTED SYSTEM CONFIGURATION 
 
-Fault detection
+Operating systems: Linux, IBM AIX, Apple OSX, Sun Solaris
+Fortran 95 compilers: GNU, IBM, Intel, Sun, Portland Group
+MPI implementations: ANL, IBM, Myricom
 
-Periodically, statics are taken for the field variables and checked for
-overflows and invalid numbers, and if found, the run is halted.  The statistics
-are also written to disk for monitoring the run.
-
-Tools used
-
-Totalview debugger
-Portland Group profiler
-Jumpshop-4 MPI profiler
+<p class=ref>
+Ely, G. P., S. M. Day, and J.-B. Minster (2007),
+<i>A support-operator method for visco-elastic wave modeling in 3D heterogeneous media</i>,
+Geophys. J. Int., in press<br>
+[<a href="Ely2007.pdf">PDF</a>]
+</p>
 

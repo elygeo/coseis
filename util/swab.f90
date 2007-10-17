@@ -1,4 +1,6 @@
 ! Swap endian of files
+! Copyright 2007 Geoffrey Ely
+! This software is released under the GNU General Public License
 program main
 implicit none
 integer, parameter :: nb = 4, nr = 8192

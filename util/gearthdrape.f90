@@ -1,10 +1,11 @@
 ! Project TeraShake surface snapshot data to lon/lat for viewing in Google Earth.
 ! Also generates a Google Earth KML file with time animation called 'doc.kml'.
 ! You must create the images using a separate plotting program of your choice.
-! Geoffrey Ely, 2007-04-28
 ! compile: f95 -O utm.f90 gearthdrape.f90 -o gearthdrape
 ! usage: ./gearthdrape [-s] <file1> <file2> <file3> ...
 !   -s   swap bytes
+! Copyright 2007 Geoffrey Ely
+! This software is released under the GNU General Public License
 program main
 use m_utm
 implicit none

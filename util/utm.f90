@@ -1,6 +1,7 @@
 ! UTM projection routines
 ! Reference: John Snyder, 1987, USGS Professional Paper 1395
-! Geoffrey Ely, gely@ucsd.edu, 6/8/2006
+! Copyright 2007 Geoffrey Ely
+! This software is released under the GNU General Public License
 module m_utm
 contains
 

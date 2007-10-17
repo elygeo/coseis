@@ -1,4 +1,4 @@
-! 
+! Attenuation
 module m_attenuation
 implicit none
 contains

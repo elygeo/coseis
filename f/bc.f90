@@ -1,4 +1,6 @@
 ! Boundary conditions, see defaults.m for description
+! Copyright 2007 Geoffrey Ely
+! This software is released under the GNU General Public License
 module m_bc
 implicit none
 contains

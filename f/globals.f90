@@ -1,4 +1,6 @@
 ! Global variables
+! Copyright 2007 Geoffrey Ely
+! This software is released under the GNU General Public License
 module m_globals
 implicit none
 

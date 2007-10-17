@@ -1,4 +1,6 @@
 ! Routines for converting between lon/lat and PetaShake coordinates
+! Copyright 2007 Geoffrey Ely
+! This software is released under the GNU General Public License
 module m_pscoords
 use m_utm
 contains

@@ -1,4 +1,6 @@
 ! Output routines
+! Copyright 2007 Geoffrey Ely
+! This software is released under the GNU General Public License
 module m_output
 implicit none
 integer, private :: jv, jf

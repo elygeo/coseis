@@ -1,0 +1,65 @@
+MACHINE NOTES
+
+SDSC DataStar IBM
+  http://www.sdsc.edu/user_services/datastar/
+  p655+ interactive nodes:
+    dspoe.sdsc.edu
+    5,   8 x 1.5GHz IBM Power4+, 16GB, 13.5GB usable
+  p655+ batch nodes:
+    dslogin.sdsc.edu
+    265, 8 x [1.5,1.7]GHz IBM Power4+, [16,32]GB, 13.5GB usable
+  Always run from a subdirectory of /gpfs/
+  Useful commands:
+    reslist
+    showq
+    show_bf
+    llsubmit batchjob
+    llcancel <jobID>
+    llq
+    llq -s <jobID>
+  Login to dslogin.sdsc.edu to submit batch jobs
+  Login to dspoe.sdsc.edu to run interactively
+
+SDSC TeraGrid IA64 cluster
+  http://www.sdsc.edu/user_services/ia64/
+  http://clumon.sdsc.edu/
+  http://grid.ncsa.uiuc.edu/teragrid/status/
+  Interactive nodes
+    tg-c127, tg-c128, tg-c129 and tg-c130
+    4, 2 x 1.5GHz Intel Itanium 2, 4GB, 3GB usable
+  Batch nodes:
+    tg-login1.sdsc.teragrid.org
+    tg-login2.sdsc.teragrid.org
+    252, 2 x 1.5GHz Intel Itanium 2, 4GB, 3GB usable
+  Intel Fortran compiler
+  vi ~/.soft
+    @remove +intel-compilers
+    @remove +intel-c-8.0.066-f-8.0.046-r1
+    @remove +mpich-gm-intel
+    +intel-c-9.0.032-f-9.0.033
+    +mpich-gm-1.2.6-intel9032
+    @teragrid
+  Always run from a subdirectory of /gpfs/
+  Useful commands:
+    myprojects
+    reslist
+    showq
+    show_bf
+    show_bf-all
+    qsub batchjob
+    qdel
+
+SDSU CSRC Babieca cluster
+  http://babieca.sdsu.edu/
+  http://www.csrc.sdsu.edu/csrc/about/computing/
+  interactive nodes:
+    10, 2 x 2.4GHz Intel Xeon, 1 GB
+  batch nodes:
+    30, 2 x 2.4GHz Intel Xeon, 2 GB (node8 has 1 GB)
+  Portland Group compilers http://moocow.sdsu.edu/csrc/pgi/
+  Useful commands:
+    qsub batchjob
+    pbsnodes -a
+    qstat
+    qdel
+
