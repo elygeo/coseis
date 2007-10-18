@@ -5,8 +5,8 @@
   n1expand = [    0   0   0 ];
   n2expand = [    0   0   0 ];
   bc1      = [   10  10  10 ];
-  bc2      = [   -1   1  -1 ];
-  ihypo    = [   -1  -1  -1 ];
+  bc2      = [   -1   1  -2 ];
+  ihypo    = [   -1  -1  -2 ];
   fixhypo  =     -1;
   xhypo    = [   0.  0.  0. ];
   affine   = [ 1. 0. 0.   0. 1. 0.   0. 0. 1. ];
@@ -54,9 +54,9 @@
   out = { 'vm2'   1   1  0 -1  0   -1  0 -1 -1 };
   out = { 'vm2'   1   0  1 -1  0    0 -1 -1 -1 };
 
-  timeseries = { 'su' -7499.    -1. 0. };
-  timeseries = { 'sv' -7499.    -1. 0. };
-  timeseries = { 'ts' -7499.    -1. 0. };
-  timeseries = { 'su'    -1. -5999. 0. };
-  timeseries = { 'sv'    -1. -5999. 0. };
-  timeseries = { 'ts'    -1. -5999. 0. };
+  timeseries = { 'su' -7500.    -1. 0. };
+  timeseries = { 'sv' -7500.    -1. 0. };
+  timeseries = { 'ts' -7500.    -1. 0. };
+  timeseries = { 'su'    -1. -6000. 0. };
+  timeseries = { 'sv'    -1. -6000. 0. };
+  timeseries = { 'ts'    -1. -6000. 0. };
