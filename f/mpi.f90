@@ -1,6 +1,4 @@
 ! Collective routines - MPI version
-! Copyright 2007 Geoffrey Ely
-! This software is released under the GNU General Public License
 module m_collective
 use m_globals, only: nz
 implicit none

@@ -1,6 +1,4 @@
 ! Checkpoint
-! Copyright 2007 Geoffrey Ely
-! This software is released under the GNU General Public License
 module m_checkpoint
 implicit none
 integer, private :: itcheck0, irank

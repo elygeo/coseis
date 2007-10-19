@@ -1,6 +1,4 @@
 ! Find surface normals
-! Copyright 2007 Geoffrey Ely
-! This software is released under the GNU General Public License
 module m_surfnormals
 implicit none
 contains

@@ -1,6 +1,4 @@
 ! Fortran Real Binary I/O
-! Copyright 2007 Geoffrey Ely
-! This software is released under the GNU General Public License
 module m_frio
 use m_globals, only: nz
 implicit none

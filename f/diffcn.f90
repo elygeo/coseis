@@ -1,6 +1,4 @@
 ! Difference operator, cell to node
-! Copyright 2007 Geoffrey Ely
-! This software is released under the GNU General Public License
 module m_diffcn
 implicit none
 contains

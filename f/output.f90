@@ -1,6 +1,4 @@
 ! Output routines
-! Copyright 2007 Geoffrey Ely
-! This software is released under the GNU General Public License
 module m_output
 implicit none
 integer, private :: jv, jf
@@ -274,6 +272,7 @@ end if
 doiz: do iz = 1, nout
 
 ! Pass
+if ( ditout(iz) < 1 ) cycle doiz
 call outprops( fieldout(iz), nc, onpass, fault, cell )
 if ( pass /= onpass ) cycle doiz
 

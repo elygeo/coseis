@@ -1,6 +1,4 @@
 ! Setup model dimensions
-! Copyright 2007 Geoffrey Ely
-! This software is released under the GNU General Public License
 module m_setup
 implicit none
 contains
@@ -12,6 +10,7 @@ use m_util
 integer :: nl(3), n(3)
 
 ! Hypocenter & halo
+nt = max( nt, 0 )
 n = nn
 where ( ihypo == 0 ) ihypo = ( n + 1 ) / 2
 where ( ihypo <  0 ) ihypo = ihypo + nn + 1
