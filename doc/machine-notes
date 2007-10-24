@@ -1,4 +1,14 @@
-MACHINE NOTES
+SORD MACHINE NOTES
+
+MPICH2 install
+  ./configure -prefix=/usr/local --with-device=ch3:shm --enable-f90 --disable-cxx
+  echo "secretword=<secretword>" > $HOME/.mpd.conf
+  chmod 600 $HOME/.mpd.conf
+
+MPICH2 SunOS install
+  export CC=cc F77=f77 F90=f95 CXX=CC
+  export CFLAGS=-fast FFLAGS=-fast F90FLAGS=-fast CXXFLAGS=-fast
+  ./configure -prefix=/d0/gely/local --with-device=ch3:shm --enable-f90 --disable-cxx
 
 SDSC DataStar IBM
   http://www.sdsc.edu/user_services/datastar/

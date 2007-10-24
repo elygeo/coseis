@@ -15,18 +15,18 @@
   rho   = 'read';
   vp    = 'read'; vp1  = 1500.;
   vs    = 'read'; vs1  = 500.;
-  vdamp = 400.;   gam2 = .8;
+  vdamp = 400.;   gam2 = 0.8;
   bc1   = [ 10 10 10 ];
   bc2   = [ 10 10  0 ];
   fixhypo = 1; faultnormal = 2; slipvector = [ 1. 0. 0. ];
   mus = 1000.;
-  mud = .5;
-  dc  = .5;
+  mud = 0.5;
+  dc  = 0.5;
   tn  = -20e6;
   ts1 = 'read';
   rcrit = 3000.; vrup = 2300.;
 
-  dx = 2000.; dt = .12; trelax = 1.2;
+  dx = 2000.; dt = 0.12; trelax = 1.2;
   nn    = [  301  152  41 ];
   ihypo = [  138  101  -4 ];
   ihypo = [  227  101  -4 ];

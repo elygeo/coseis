@@ -1,0 +1,96 @@
+SORD DOCUMENTATION
+
+SUMMARY
+
+The Support Operator Rupture Dynamics (SORD) code simulates spontaneous rupture
+within a 3D isotropic viscoelastic solid.  Wave motions are computed on a
+logically rectangular hexahedral mesh, using the generalized finite difference
+method of support operators.  Stiffness and viscous hourglass corrections are
+employed to suppress suppress zero-energy grid oscillation modes.  The fault
+surface is modeled by coupled double nodes, where the strength of the coupling
+is determined by a linear a slip-weakening friction law.  Model edge boundaries
+may be reflective or absorbing, where absorbing boundaries are handled using
+the method of perfectly matched layers (PML).  SORD is written in Fortran 95
+and parallelized for multi-processor execution using Message Passing Interface
+(MPI).  
+
+
+AUTHOR
+
+Geoffrey Ely
+Institute of Geophysics and Planetary Physics
+Scripps Institution of Oceanography
+University of California, San Diego
+http://igpppublic.ucsd.edu/~gely
+gely@ucsd.edu
+
+
+USAGE
+
+SORD is distributed as a tar archive.  Installation consists simply of
+unpacking the archive and entering the created directory.  Configuration,
+compilation and execution are all handled by a wrapper script called 'sord'.
+The sord script takes an input file as its argument, with 'in.m' being the
+default if no input file is specified.  Each time sord is executed, a new
+directory is set up, starting with 'run/01'.  In the directory will be a script
+called 'run' to start the job interactively and a script 'que' for submitting
+the job to the batch system.  The sord script has the following options:
+
+  -s       serial mode, no MPI (default if np == 1)
+  -p       parallel mode, requires MPI (default if np > 1)
+  -i       run interactively
+  -q       submit job to batch system, or run in the background
+  -g       compile with debugging and syntax checking flags
+  -G       run in debugger
+  -n       check input and exit
+  -v opt   generate SAF mesh and SCEC-CVM, opt indicates version 3 or 4
+  -m opt   emulate alternate machine configuration, e.g. 'datastar'
+  -d       delete output from previous runs before starting
+  -f       force recompile
+
+
+INPUT AND OUTPUT
+
+Input is specified in a restricted form of the MATLAB programming language.
+Large data are stored separately in flat binary.  The directory 'in/' contains
+annotated examples input scripts.  The file 'defaults.m' is read before any
+other input, and contains a short description of every possible SORD parameter.
+
+Output is stored in raw binary with an associated metadata script 'meta.m'.
+The M-file format facilitates post-processing and visualization with MATLAB.
+Utilities for manipulating and visualizing SORD output are included in the
+directory 'm/'.  Using the 'read4d.m' function for accessing SORD binary output
+correctly accounts for byte order issues when moving data between big-endian
+and little-endian architectures.  Statistic, such as peak acceleration and peak
+velocity, are computed periodically and stored in the directory 'stats/'.
+Inspecting the statistic during a run is one way to check that it is proceeding
+correctly.  Code timing profiles, for benchmarking performance,  are stored
+saved to the 'prof/' directory.
+
+
+PORTING
+
+We have tested the following system configurations:
+
+  Operating systems: Linux, IBM AIX, Apple OSX, Sun Solaris
+  Fortran 95 compilers: GNU, IBM, Intel, Sun, Portland Group
+  MPI implementations: ANL MPICH, IBM, Myricom MPICH-GM
+
+Compiler flags are set in script 'sh/config'.  Machines with specialized
+parallel environments, may need a custom run script added to the section 'Run
+scripts'.  See 'sh/datastar' and 'sh/teragrid' for example custom run scripts.
+
+
+Communications and Parallel I/O
+
+The topology for parallel processing  is rectangular domain decomposition.
+Sub-divisions may be in one, two, or three dimensions.  Communications are
+synchronous and blocking.  After initialization, only nearest neighbor
+communications are required.  Output may call for global collective operations,
+so must be chosen with caution when high scalability is needed.  Time series
+output is buffered; volume output snapshots are not.  Volume input of the mesh
+and material model, as well as volume output, use 'level 3' collective MPI-IO
+with MPI derived data types, thus optimizing performance on parallel files
+systems such as GPFS.  MPI-IO may optionally be switched off.  In that case,
+volume I/O is performed with a separate file for each process.
+
