@@ -206,12 +206,12 @@ tn = sum( t0 * nhat, 4 )
 do i = 1, 3
   t2(:,:,:,i) = tn * nhat(:,:,:,i)
 end do
-t3 = t0 - t2
-ts = sqrt( sum( t3 * t3, 4 ) )
+t1 = t0 - t2
+ts = sqrt( sum( t1 * t1, 4 ) )
 f1 = 0.
 f2 = 0.
-t1 = 0.
 t2 = 0.
+t3 = 0.
 
 ! Halos
 call scalarswaphalo( mus,   nhalo )

@@ -8,14 +8,14 @@
   hourglass = [ 1. 1. ];
   dx  = 100.;
   nt  = 200;
-  dt  = .02;
+  dt  = 0.02;
 
   nn  = [ 101 101 2 ];
   fixhypo = -2;
   rsource = -1.;
   faultnormal = 0;
   tfunc = 'brune';
-  tsource = .2
+  tsource = 0.2;
   ihypo = [ 0 0 0 ];
   i1source = [  1 1  1 ];
   i2source = [  0 1 -1 ];

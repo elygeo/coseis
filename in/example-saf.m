@@ -22,23 +22,25 @@
   vdamp = 400.;				% set viscosity = vdamp / vs
   vp1  = 1500.;				% set minimum V_p
   vs1  = 500.;				% set minimum V_s
-  gam2 = .8;				% set maximum viscosity
+  gam2 = 0.8;				% set maximum viscosity
+  hourglass = [ 1. 1. ];                % hourglass stiffness and viscosity
+
 
 % Fault parameters
   ihypo = [ 2266 997 -26 ];		% hypocenter indices
   faultnormal = 2;			% fault plane at k = ihypo(2) = 997
   slipvector = [ 1. 0. 0. ];		% vector for resolving pre-traction
-  mus = 1000.;				% coefficient of static friction
-  mus = [ 1.10 'zone'   1317 0 -81   2311 0 -1 ];
-  mud = 0.5;				% coefficient of dynamic friction
-  dc  = 0.5;				% slip weakening distance
   tn  = -20e6;				% initial normal traction
   ts1 = 'read';				% read initial shear traction file
+  dc  = 0.5;				% slip weakening distance
+  mud = 0.5;				% coefficient of dynamic friction
+  mus = 1000.;				% coefficient of static friction
+  mus = [ 1.10 'zone'   1317 0 -81   2311 0 -1 ];
 
 % Nucleation
   fixhypo = 1;				% node registered hypocenter
   vrup = 2300.;				% nucleation rupture velocity
-  trelax = .12;				% time 
+  trelax = 0.12;			% time 
   rcrit = 3000.;			% radius of nucleation patch
 
 % Fault plane output

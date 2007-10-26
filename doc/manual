@@ -1,0 +1,90 @@
+SUMMARY
+
+The Support Operator Rupture Dynamics (SORD) code simulates spontaneous rupture
+within a 3D isotropic viscoelastic solid.  Wave motions are computed on a
+logically rectangular hexahedral mesh, using the generalized finite difference
+method of support operators.  Stiffness and viscous hourglass corrections are
+employed to suppress suppress zero-energy grid oscillation modes.  The fault
+surface is modeled by coupled double nodes, where the strength of the coupling
+is determined by a linear a slip-weakening friction law.  Model edge boundaries
+may be reflective or absorbing, where absorbing boundaries are handled using
+the method of perfectly matched layers (PML).  SORD is written in Fortran 95
+and parallelized for multi-processor execution using Message Passing Interface
+(MPI).  
+
+
+AUTHOR
+
+Geoffrey Ely
+gely@ucsd.edu
+Institute of Geophysics and Planetary Physics
+University of California, San Diego
+http://igpppublic.ucsd.edu/~gely
+
+
+USAGE
+
+SORD is distributed as a tar archive.  Installation consists simply of
+unpacking the archive and entering the 'sord/' directory.  Configuration,
+compilation and execution are all handled by a wrapper script called 'sord'.
+The sord script takes an input file as its argument.  Each time sord is
+executed, a new directory is set up for the particular run, starting with
+'run/01'.  In the directory will be a script called 'run' to start the job
+interactively and a script 'que' for submitting the job to the batch system.
+The sord script has the following options:
+
+  -i       run interactively
+  -q       submit job to batch system
+  -n       check input only and exit
+  -g       compile with debugging and syntax checking flags
+  -G       run in debugger
+  -d       delete output from previous runs before starting
+  -f       force recompile
+  -s       serial mode, no MPI (default if np == 1)
+  -p       parallel mode, requires MPI (default if np > 1)
+  -m opt   emulate alternate machine configuration, e.g. 'datastar'
+  -v opt   generate SAF mesh and SCEC-CVM, opt indicates version 3 or 4
+
+
+INPUT AND OUTPUT
+
+Input is specified in a restricted form of the MATLAB programming language.
+Large data, such as the material model are stored separately in floating-point
+binary files.  Annotated example input files are located in the 'in/'
+directory.  The input file 'defaults.m', read before any other input, contains
+a short description of each SORD parameter.
+
+Output is saved in binary formant.  An associated metadata file 'meta.m',
+contains a summary of parameters for the run, and a structured description of
+the binary output.  The M-file format facilitates post-processing and
+visualization with MATLAB.  MATLAB utilities for manipulating and visualizing
+SORD output are included in the 'm/' directory.  Using the 'read4d' function
+for accessing SORD binary output correctly accounts for byte order when moving
+data between big-endian and little-endian architectures.  Separate Fortran
+utilities are also included in the 'util/' directory for converting the byte
+order of binary files, and for converting to and from ASCII text format.
+
+Statistic, such as peak acceleration and peak velocity, are computed
+periodically during each run and stored in the directory 'stats/'.
+Additionally, internal code timings, for benchmarking performance, are
+collected and saved to the 'prof/' directory.  Inspecting these files during a
+run is a good way to check that it is proceeding correctly.  The raw binary
+files can be examined with the standard UNIX command 'od -f' or with the
+included Fortran utilities.  The 'stats' utility computes the minimum, maximum,
+and mean values for binary files.
+
+
+CODE PORTABILITY
+
+SORD has been tested the following system configurations:
+
+  Operating systems: Linux, IBM AIX, Apple OSX, Sun Solaris
+  Fortran 95 compilers: GNU, IBM, Intel, Sun, Portland Group
+  MPI implementations: ANL MPICH, IBM, Myricom MPICH-GM
+
+Porting to new system may require adjusting the compiler flags that are set in
+script 'sh/config'.  Machines with specialized parallel environments, may need
+a custom run script, and modification of the main sord script under the 'Run
+scripts' section.  See 'sh/datastar' and 'sh/teragrid' for example custom run
+scripts.
+

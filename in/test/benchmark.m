@@ -1,7 +1,7 @@
 % Benchmark
 
   dx = 100.;
-  dt = .0075;
+  dt = 0.0075;
   faultnormal = 0;
   fixhypo = 2;
   rsource = 50.;

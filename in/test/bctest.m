@@ -4,12 +4,12 @@
   debug = 3;
   np = [ 1 1 1 ];
   nt = 8;
-  tsource = .1;
+  tsource = 0.1;
   tfunc = 'brune';
   slipvector = [ 1. 0. 0. ];
-  mus = .6;
-  mud = .5;
-  dc  = .4;
+  mus = 0.6;
+  mud = 0.5;
+  dc  = 0.4;
   ts1 = -70e6;
   tn  = -120e6;
   bc1 = [ 0 0 0 ];

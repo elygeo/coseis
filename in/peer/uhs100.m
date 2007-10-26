@@ -1,12 +1,12 @@
 % PEER UHS.1
 
-  dx  = 100;
-  dt  = .008;
+  dx  = 100.;
+  dt  = 0.008;
   nt  = 625;
   vp  = 6000.;
   vs  = 3464.;
   rho = 2700.;
-  gam = .1;
+  gam = 0.1;
   hourglass = [ 1. 1. ];
   bc1 = [ -2 -2  0 ];
   bc2 = [ 10 10 10 ];
@@ -16,7 +16,7 @@
   xhypo = [ 0. 0. 2000. ];
   fixhypo = -2;
   rsource = 50.;
-  tsource = .1;
+  tsource = 0.1;
   tfunc = 'brune';
   moment1 = [ 0. 0. 0. ];
   moment2 = [ 0. 0. 1e18 ];

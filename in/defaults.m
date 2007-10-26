@@ -3,7 +3,7 @@
 % Wave model parameters
   nn = [ 41 41 42 ];		% nx ny nz (double nodes counted)
   nt = 40;			% number of time steps
-  dt = .0075;			% time step length
+  dt = 0.0075;			% time step length
   dx = 100.;			% spatial step length
 % x1 = 'read';			% read mesh x coord from file 'data/x1'
 % x2 = 'read';			% read mesh y coord from file 'data/x2'
@@ -24,7 +24,7 @@
   vs1 = -1.;			% min S-wave speed
   vs2 = -1.;			% max S-wave speed
   gam1 = -1.;			% min viscosity
-  gam2 = .8;			% max viscosity
+  gam2 = 0.8;			% max viscosity
   npml = 10;			% number of PML daming nodes
   bc1 = [ 0 0 0 ];		% j1 k1 l1 boundary condition (see below)
   bc2 = [ 0 0 0 ];		% j2 k2 l2 boundary condition (see below)
@@ -46,7 +46,7 @@
 % tfunc = 'sbrune';		% source time function: smooth Brune
 % rsource = 150.;		% source radius: 1.5*dx = 8 nodes
   rsource = -1.;		% no moment source
-  tsource = .056;		% dominant period of 8*dt
+  tsource = 0.056;		% dominant period of 8*dt
   moment1 = [ 1e16 1e16 1e16 ];	% normal components, explosion source
   moment2 = [ 0. 0. 0. ];       % shear components
 
@@ -54,9 +54,9 @@
   faultnormal = 3;		% normal direction to fault plane (0=no fault)
   faultopening = 0;		% 0=not allowed, 1=allowed
   slipvector = [ 1. 0. 0. ];	% shear traction direction for ts1
-  mus = .6;			% **coef of static friction
-  mud = .5;			% **coef of dynamic friction
-  dc  = .4;			% **slip-weakening distance
+  mus = 0.6;			% **coef of static friction
+  mud = 0.5;			% **coef of dynamic friction
+  dc  = 0.4;			% **slip-weakening distance
 % co  = 0.;			% **cohesion
   ts1 = -70e6;			% **shear traction component 1
 % ts2 = 0.;			% **shear traction component 2
@@ -69,8 +69,8 @@
 % sxy = 0.;			% **prestress Sxy
   vrup = 3184.9;		% nucleation rupture velocity (using Rayleigh speed here)
   rcrit = 1000.;		% nucleation critical radius
-  trelax = .07;			% nucleation relaxation time
-  svtol = .001;			% slip velocity considered rupturing
+  trelax = 0.07;		% nucleation relaxation time
+  svtol = 0.001;		% slip velocity considered rupturing
 
 % I/O and Code execution parameters
   np = [ 1 1 1 ];		% number of processors in j k l

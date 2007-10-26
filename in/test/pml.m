@@ -2,15 +2,15 @@
 
   nt = 500;
   dx = 100.;
-  dt = .0075;
-  gam = .0;
-  hourglass = [ 1. .7 ];
+  dt = 0.0075;
+  gam = 0.;
+  hourglass = [ 1. 0.7 ];
 
   faultnormal = 0;
   tfunc = 'sbrune';
   tfunc = 'brune';
   rsource = 50.;
-  tsource = .056;
+  tsource = 0.056;
   moment1 = [ 1e18 1e18 1e18 ];
   moment2 = [ 0 0 0 ];
   fixhypo = -2;
