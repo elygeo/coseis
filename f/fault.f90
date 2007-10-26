@@ -311,7 +311,7 @@ where ( ts > f1 ) f2 = f1 / ts
 do i = 1, 3
   t3(:,:,:,i) = f2 * t3(:,:,:,i)
 end do
-ts = min( ts, f3 )
+ts = min( ts, f1 )
 
 ! Total traction
 do i = 1, 3
