@@ -352,7 +352,7 @@ do ic = 1, nc
   case( 'co'   ); call rio3( id, mpio, rr, str, co,       i1, i2, i3, i4, i4, ir, nr )
   case( 'sv'   ); call rio4( id, mpio, rr, str, t1, ic,   i1, i2, i3, i4, i4, ir, nr )
   case( 'su'   ); call rio4( id, mpio, rr, str, t2, ic,   i1, i2, i3, i4, i4, ir, nr )
-  case( 'ts'   ); call rio4( id, mpio, rr, str, t1, ic,   i1, i2, i3, i4, i4, ir, nr )
+  case( 'ts'   ); call rio4( id, mpio, rr, str, t3, ic,   i1, i2, i3, i4, i4, ir, nr )
   case( 'sa'   ); call rio4( id, mpio, rr, str, t2, ic,   i1, i2, i3, i4, i4, ir, nr )
   case( 'svm'  ); call rio3( id, mpio, rr, str, f1,       i1, i2, i3, i4, i4, ir, nr )
   case( 'sum'  ); call rio3( id, mpio, rr, str, f2,       i1, i2, i3, i4, i4, ir, nr )

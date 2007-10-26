@@ -206,12 +206,12 @@ tn = sum( t0 * nhat, 4 )
 do i = 1, 3
   t2(:,:,:,i) = tn * nhat(:,:,:,i)
 end do
-t1 = t0 - t2
-ts = sqrt( sum( t1 * t1, 4 ) )
+t3 = t0 - t2
+ts = sqrt( sum( t3 * t3, 4 ) )
 f1 = 0.
 f2 = 0.
+t1 = 0.
 t2 = 0.
-t3 = 0.
 
 ! Halos
 call scalarswaphalo( mus,   nhalo )
@@ -286,9 +286,9 @@ end do
 ! Shear and normal traction
 tn = sum( t1 * nhat, 4 )
 do i = 1, 3
-  t1(:,:,:,i) = t1(:,:,:,i) - tn * nhat(:,:,:,i)
+  t3(:,:,:,i) = t1(:,:,:,i) - tn * nhat(:,:,:,i)
 end do
-ts = sqrt( sum( t1 * t1, 4 ) )
+ts = sqrt( sum( t3 * t3, 4 ) )
 tn = sum( t2 * nhat, 4 )
 if ( faultopening == 1 ) tn = min( 0., tn )
 
@@ -309,18 +309,18 @@ end if
 f2 = 1.
 where ( ts > f1 ) f2 = f1 / ts
 do i = 1, 3
-  t1(:,:,:,i) = f2 * t1(:,:,:,i)
+  t3(:,:,:,i) = f2 * t3(:,:,:,i)
 end do
-ts = min( ts, f1 )
+ts = min( ts, f3 )
 
 ! Total traction
 do i = 1, 3
-  t3(:,:,:,i) = t1(:,:,:,i) + tn * nhat(:,:,:,i)
+  t1(:,:,:,i) = t3(:,:,:,i) + tn * nhat(:,:,:,i)
 end do
 
 ! Update acceleration
 do i = 1, 3
-  f2 = area * ( t3(:,:,:,i) - t0(:,:,:,i) )
+  f2 = area * ( t1(:,:,:,i) - t0(:,:,:,i) )
   w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f2 * mr(j1:j2,k1:k2,l1:l2)
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f2 * mr(j3:j4,k3:k4,l3:l4)
 end do
@@ -328,13 +328,13 @@ call vectorbc( w1, bc1, bc2, i1bc, i2bc )
 
 ! Friction + fracture energy
 t2 = vv(j3:j4,k3:k4,l3:l4,:) - vv(j1:j2,k1:k2,l1:l2,:)
-f2 = sum( t3 * t2, 4 ) * area
+f2 = sum( t1 * t2, 4 ) * area
 call scalarsethalo( f2, 0., i1core, i2core )
 efric = efric + dt * sum( f2 )
 
 ! Strain energy
 t2 = uu(j3:j4,k3:k4,l3:l4,:) - uu(j1:j2,k1:k2,l1:l2,:)
-f2 = sum( ( t0 + t3 ) * t2, 4 ) * area
+f2 = sum( ( t0 + t1 ) * t2, 4 ) * area
 call scalarsethalo( f2, 0., i1core, i2core )
 estrain = .5 * sum( f2 )
 
