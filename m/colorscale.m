@@ -30,12 +30,13 @@ hold on
 if any( strcmp( orientation, { 'l' 'r' } ) )
   xx = x + [ 1 -1 ] * ( x(2) - x(1) ) / 3;
   yy = y + [ 1 -1 ] * .5 * ( y(2) - y(1) ) / ( length( cmap ) - 1 );
-  h1(1) = imagesc( xx, yy, [ clim(1):dc:clim(2) ]' );
+  cc = [ clim(1):dc:clim(2) ]';
 else
   yy = y + [ 1 -1 ] * ( y(2) - y(1) ) / 3;
   xx = x + [ 1 -1 ] * .5 * ( x(2) - x(1) ) / ( length( cmap ) - 1 );
-  h1(1) = imagesc( xx, yy, clim(1):dc:clim(2) );
+  cc = clim(1):dc:clim(2);
 end
+h1(1) = imagesc( sort( xx ), sort( yy ), cc );
 h1(2) = plot( x([1 1 2 2 1]), y([1 2 2 1 1]), 'Color', fg );
 set( h1, 'Clipping', 'off', 'HitTest', 'off' )
 if nargout < 1, clear h1, end
