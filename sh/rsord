@@ -5,6 +5,7 @@ acct="${1:?}"
 
 # Install files
 files="\
+gilead
   email
   doc
   sord

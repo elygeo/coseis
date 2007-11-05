@@ -1,9 +1,9 @@
 % I/O test
   nt = 10;
-  nn = [ 300 300 300 ];
+  nn = [ 50 50 50 ];
   np = [ 4 4 2 ];
-  mpin  = 0;
-  mpout = 0;
+  mpin  = 1;
+  mpout = 1;
   faultnormal = 3;
   out = { 'u'   1   1 1 1  0    1 -1 -1 -1 };
   out = { 'v'   1   1 1 1  0   -1  1 -1 -1 };
