@@ -18,7 +18,7 @@ case "$opt" in
   g) optimize=g ;;
   G) optimize=g; run=g ;;
   n) setup= ; run= ;;
-  v) vm="scecvm$OPTARG" ;;
+  v) vm="cvm$OPTARG" ;;
   m) machine="$OPTARG" ;;
   d) rm -rf run/[0-9][0-9] ;;
   f) rm -rf tmp/* ;;

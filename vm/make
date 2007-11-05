@@ -56,22 +56,22 @@ esac
 
 cd "$( dirname $0 )"
 srcdir=$( /bin/pwd )
-mkdir -p ../tmp/scecvm3
-mkdir -p ../tmp/scecvm4
-cp xsec.f $getarg iobin.f iompi.f newin.h scecvm3.f ../tmp/scecvm3/
-cp xsec.f $getarg iobin.f iompi.f newin.h scecvm4.f ../tmp/scecvm4/
+mkdir -p ../tmp/cvm3
+mkdir -p ../tmp/cvm4
+cp xsec.f $getarg iobin.f iompi.f newin.h cvm3.f ../tmp/cvm3/
+cp xsec.f $getarg iobin.f iompi.f newin.h cvm4.f ../tmp/cvm4/
 
 cd ../tmp
-$tar xzf "../data/scecvm4.tgz"
-cd scecvm4
+$tar xzf "../data/cvm4.tgz"
+cd cvm4
 sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
-../../sh/compile "$sfc $flags -o" scecvm4-s $getarg iobin.f scecvm4.f
-../../sh/compile "$pfc $flags -o" scecvm4-p $getarg iompi.f scecvm4.f
+../../sh/compile "$sfc $flags -o" cvm4-s $getarg iobin.f cvm4.f
+../../sh/compile "$pfc $flags -o" cvm4-p $getarg iompi.f cvm4.f
 
 cd ..
-$tar xzf "../data/scecvm3.tgz"
-cd scecvm3
+$tar xzf "../data/cvm3.tgz"
+cd cvm3
 sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
-../../sh/compile "$sfc $flags -o" scecvm3-s $getarg iobin.f scecvm3.f
-../../sh/compile "$pfc $flags -o" scecvm3-p $getarg iompi.f scecvm3.f
+../../sh/compile "$sfc $flags -o" cvm3-s $getarg iobin.f cvm3.f
+../../sh/compile "$pfc $flags -o" cvm3-p $getarg iompi.f cvm3.f
 

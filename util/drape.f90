@@ -6,12 +6,16 @@ integer, parameter :: n1=960, n2=780
 real :: t(n1,n2), x, y, z, h, o1, o2, h1, h2, h3, h4, xx, yy
 integer :: i, j, k
 character(1024) :: line
-character :: endian
+character :: endian, endian0
 
 endian = 'l'
 if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
 inquire( iolength=i ) t
-open( 1, file='topo3.'//endian, recl=i, form='unformatted', access='direct', status='old' )
+open( 1, file='endian0', status='old' )
+read( 1, * ) endian0
+close( 1 )
+if ( endian /= endian0 ) stop 'wrong byte order'
+open( 1, file='topo3.f32', recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 ) 
 

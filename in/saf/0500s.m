@@ -1,7 +1,7 @@
 % SAF 500 m - surface
 % np(3) = 1:15, 17, 18, 21, 23, 27, 33, 41, 54, 81, 161
-  datadir = 'saf/scecvm3/0500';
-  datadir = 'saf/scecvm4/0500';
+  datadir = 'saf/cvm3/0500';
+  datadir = 'saf/cvm4/0500';
   itio = 500; itcheck = 0; itstats = 10;
   nt = 6000;
   np = [ 1 1 82 ];

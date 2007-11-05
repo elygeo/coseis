@@ -1,7 +1,7 @@
 % SAF 4000 m - fault
 
-  datadir = 'saf/scecvm3/4000';
-  datadir = 'saf/scecvm4/4000';
+  datadir = 'saf/cvm3/4000';
+  datadir = 'saf/cvm4/4000';
   itio = 100; itcheck = 0; itstats = 10;
   nt = 750;
   np = [ 1 1 2 ];
