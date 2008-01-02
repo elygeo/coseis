@@ -64,14 +64,14 @@ cp xsec.f $getarg iobin.f iompi.f newin.h cvm4.f ../tmp/cvm4/
 cd ../tmp
 $tar xzf "../data/cvm4.tgz"
 cd cvm4
-sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
+sed -n '/^ *[^!]/s/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
 ../../sh/compile "$sfc $flags -o" cvm4-s $getarg iobin.f cvm4.f
 ../../sh/compile "$pfc $flags -o" cvm4-p $getarg iompi.f cvm4.f
 
 cd ..
 $tar xzf "../data/cvm3.tgz"
 cd cvm3
-sed -n 's/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
+sed -n '/^ *[^!]/s/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
 ../../sh/compile "$sfc $flags -o" cvm3-s $getarg iobin.f cvm3.f
 ../../sh/compile "$pfc $flags -o" cvm3-p $getarg iompi.f cvm3.f
 

@@ -1,1 +1,1 @@
-in/test/iotest.m
+in/test/minifault.m

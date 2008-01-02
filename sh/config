@@ -34,6 +34,7 @@ ifort)
   gflags='-g -O0 -CB -traceback'
   oflags='-O -override_limits -CB -traceback'
   oflags='-O3 -override_limits'
+  oflags='-O3'
   ;;
 pgf90)
   getarg='getarg-pgf.f90'
@@ -76,6 +77,7 @@ esac
 
 # Host
 if [ "$machine" ]; then :
+elif [ "$HOSTNAME" = 'cluster.geo.berkeley.edu' ]; then machine=calgeo
 elif [ "$HOSTNAME" = master ];   then machine=babieca
 elif [ "$HOSTNAME" = ds011 ];    then machine=datastar32
 elif [ "${HOSTNAME:0:2}" = ds ]; then machine=datastar
@@ -90,6 +92,7 @@ case $machine in
   kim)                      maxcpus=2;  maxram=800  ;;
   phim)                                 maxram=2800;   rate=400 ;;
   altai)                    maxcpus=8;  maxram=30000;  rate=100 ;;
+  calgeo)     maxnodes=16;  maxcpus=4;  maxram=1500 ;;
   babieca)    maxnodes=32;  maxcpus=2;  maxram=1800;   rate=100 ;;
   teragrid)   maxnodes=256; maxcpus=2;  maxram=3000;   rate=1000; maxmm=1080 ;;
   datastar)   maxnodes=265; maxcpus=8;  maxram=13500;  rate=500;  maxmm=1080 ;;

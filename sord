@@ -204,10 +204,10 @@ bin="./sord-$mode"
 [ -x "$srcdir/sh/$machine" ] || . "$srcdir/sh/default"
 [ -x "$srcdir/sh/$machine" ] && . "$srcdir/sh/$machine"
 
-# SCECVM
+# SCEC CVM
 if [ "$vm" ]; then
   if grep SAF "$srcdir/$infile" > /dev/null; then :; else
-    echo "Error: SAF input file required for SCECVM"
+    echo "Error: SAF input file required for SCEC CVM"
     exit 1
   fi
   mkdir data

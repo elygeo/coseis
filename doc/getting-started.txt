@@ -51,8 +51,8 @@ INPUT AND OUTPUT
 Input is specified in a restricted form of the MATLAB programming language.
 Large data, such as the material model are stored separately in floating-point
 binary files.  Annotated example input files are located in the 'in/'
-directory.  The input file 'defaults.m', read before any other input, contains
-a short description of each SORD parameter.
+directory.  The input file 'defaults.m', that is read before any other input,
+contains a short description of each SORD parameter.
 
 Output is saved in binary formant.  An associated metadata file 'meta.m',
 contains a summary of parameters for the run, and a structured description of
@@ -84,7 +84,6 @@ SORD has been tested the following system configurations:
 
 Porting to new system may require adjusting the compiler flags that are set in
 script 'sh/config'.  Machines with specialized parallel environments, may need
-a custom run script, and modification of the main sord script under the 'Run
-scripts' section.  See 'sh/datastar' and 'sh/teragrid' for example custom run
-scripts.
+a custom run script.  See 'sh/datastar' and 'sh/teragrid' for example custom
+run scripts.
 
