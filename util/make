@@ -17,6 +17,7 @@ mkdir -p ../tmp
 ../sh/compile "$sfc $oflags -o" ../tmp/safgrid     utm.f90 tscoords.f90 safgrid.f90
 ../sh/compile "$sfc $oflags -o" ../tmp/tsgrid      utm.f90 tscoords.f90 tsgrid.f90
 ../sh/compile "$sfc $oflags -o" ../tmp/basindepth  basindepth.f90
+../sh/compile "$sfc $oflags -o" ../tmp/soil        utm.f90 tscoords.f90 soil.f90
 ../sh/compile "$sfc $oflags -o" ../tmp/xsec        xsec.f90
 ../sh/compile "$sfc $oflags -o" ../tmp/gearthdrape $getarg utm.f90 gearthdrape.f90
 
