@@ -4,17 +4,28 @@ echo "SORD setup"
 starttime=$(date)
 
 # Get command line options
+# -i       run interactively
+# -q       submit job to batch system
+# -n       check input only and exit
+# -g       compile with debugging and syntax checking flags
+# -G       run in debugger
+# -d       delete output from previous runs before starting
+# -f       force recompile
+# -s       serial mode, no MPI (default if np == 1)
+# -p       parallel mode, requires MPI (default if np > 1)
+# -m opt   emulate alternate machine configuration, e.g. 'datastar'
+# -v opt   generate SAF mesh and SCEC-CVM, opt indicates version 3 or 4
 mode=guess
 optimize=O
 setup=yes
 run=
 velmodel=
-while getopts spiqgGnv:m:df opt; do
+while getopts iqspgGnv:m:df opt; do
 case "$opt" in
-  s) mode=s ;;
-  p) mode=p ;;
   i) run=i ;;
   q) run=q ;;
+  s) mode=s ;;
+  p) mode=p ;;
   g) optimize=g ;;
   G) optimize=g; run=g ;;
   n) setup= ; run= ;;
