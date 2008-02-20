@@ -12,8 +12,11 @@ centered = 0;
 
 %Y = 0.3R + 0.6G + 0.1B
 switch scheme
-case 'wk1'; cmap = [ 1 1 1; 0 0 0 ];
+case 'hot'; cmap = [ 8 0 0; 8 0 0; 8 8 0 ] / 8; fg = [ 1 1 1 ];
+case 'kw2'; cmap = [ 0 0 0; 1 1 1 ]; fg = [ 1 1 1 ]; centered = 1;
+case 'kw1'; cmap = [ 0 0 0; 1 1 1 ]; fg = [ 1 1 1 ];
 case 'wk2'; cmap = [ 1 1 1; 0 0 0 ]; centered = 1;
+case 'wk1'; cmap = [ 1 1 1; 0 0 0 ];
 case 'wk0'
   cmap = [
     8 8:-1:1
