@@ -11,7 +11,7 @@ if nargin > 2, aa   = varargin{3}; end
 if dpi < 10, error( 'snap is changed' ), end
 
 res = sprintf( '-r%d', dpi * aa );
-print( '-dtiff', res, [ file '.tmp' ] )
+print( '-dtiff', res, [ file '.tmp.tif' ] )
 img1 = single( imread( [ file '.tmp.tif' ] ) );
 delete( [ file '.tmp.tif' ] )
 
@@ -30,16 +30,15 @@ if aa > 1
   clear img2
 end
 
-if length( file ) >= 4 && strcmp( file(end-3:end), '.png' )
-  imwrite( uint8( img1 ), file, ...
-    'XResolution', dpi / 0.0254, ...
-    'YResolution', dpi / 0.0254, ...
-    'ResolutionUnit', 'meter' )
-elseif file
-  imwrite( uint8( img1 ), file )
-end
-
 if nargout == 0
+  if length( file ) >= 4 && strcmp( file(end-3:end), '.png' )
+    imwrite( uint8( img1 ), file, ...
+      'XResolution', dpi / 0.0254, ...
+      'YResolution', dpi / 0.0254, ...
+      'ResolutionUnit', 'meter' )
+  elseif file
+    imwrite( uint8( img1 ), file )
+  end
   clear img1
 end
 

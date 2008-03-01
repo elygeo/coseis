@@ -10,21 +10,19 @@ res = [ 1024 576 ];
 res = [ 800 755 ];
 scl = 1.6;
 
-theta = 0;  phi = 0;
 theta = 0;  phi = 40;
 theta = 40; phi = 0;
-zoom = 5.70; % kim
-zoom = 5.71; % wide
-dpi = 72;  res = [ 800 800 ]; scl = 2.0; % Box
+zoom = 5.71;
 dpi = 72;  res = [ 1024 576 ]; scl = 1.6; % Projector
-dpi = 72;  res = [ 1024 512 ]; scl = 2.0; % Amit
 dpi = 72;  res = [ 1280 720 ]; scl = 2.2; % 720p
-dpi = 144; res = [  960  540 ]; scl = 1.5; % 1080p
+dpi = 144; res = [  750 375 ]; scl = 1.5; % Amit
+dpi = 144; res = [  960 540 ]; scl = 1.5; % 1080p
 dpi = 72;  res = [  848 480 ]; scl = 1.5; % 480p
 ppi = 72;
 aa = 3;
 
 colorscheme( 'earth', .4 )
+%colorscheme( 'kw1' )
 pos = get( gcf, 'Position' );
 set( 0, 'ScreenPixelsPerInch', ppi )
 set( gcf, ...
@@ -33,7 +31,7 @@ set( gcf, ...
   'Color', 'k', ...
   'DefaultTextColor', fg, ...
   'DefaultTextFontWeight', 'bold', ...
-  'DefaultTextFontSize', 8 * scl, ...
+  'DefaultTextFontSize', 9 * scl, ...
   'DefaultLineLinewidth', .5 * scl, ...
   'DefaultLineMarkerEdgeColor', bg, ...
   'DefaultLineMarkerFaceColor', fg, ...
@@ -74,8 +72,9 @@ axis off
 [ x, y, z ] = textread( 'ca_roads.xyz', '%n%n%n%*[^\n]' ); hmap(end+1) = plot3( x, y, z-1000, 'Color', [ .6 .6 .6 ] );
 [ x, y, z ] = textread( 'borders.xyz',  '%n%n%n%*[^\n]' ); hmap(end+1) = plot3( x, y, z );
 [ x, y, z ] = textread( 'coast.xyz',    '%n%n%n%*[^\n]' ); hmap(end+1) = plot3( x, y, z );
-[ x, y, z ] = textread( 'fault.xyz',    '%n%n%n%*[^\n]' );
+%[ x, y ] = textread( 'puente-hills.xy',  '%n%n%*[^\n]' ); plot3( x, y, 4000 + zeros( size( x ) ) );
 %[ x, y, z ] = textread( 'sosafe.xyz',  '%n%n%n%*[^\n]' );
+[ x, y, z ] = textread( 'fault.xyz',    '%n%n%n%*[^\n]' );
 hmap(end+1) = plot3( x, y, z+2000, '-',  'LineW', 2.2*scl, 'Color', bg );
 hmap(end+1) = plot3( x, y, z+3000, '--', 'LineW', 1.5*scl, 'Color', fg );
 x = 6e5 * [ 0 0 1 1 0 -2  3  3 -2 -2 ];
@@ -101,14 +100,16 @@ z = [ sites{:,3} ];
 ver = sites(:,4);
 hor = sites(:,5);
 txt = sites(:,6);
-plot3( x, y, z + 4000, 'o', 'MarkerSize', 2.5*scl, 'LineWidth', .6*scl );
-h = [];
+hcity = plot3( x, y, z + 4000, 'o', 'MarkerSize', 2.5*scl, 'LineWidth', .6*scl );
+htxt = [];
 for i = 1:length(x)
   dy = 1000;
   if strcmp( ver{i}, 'top' ), dy = -1000; end
-  h(i) = text( x(i), y(i)+dy, z(i)+5000, txt{i}, 'Ver', ver{i}, 'Hor', hor{i}, 'Rot', phi );
+  htxt(end+1) = text( x(i), y(i)+dy, z(i)+5000, txt{i}, 'Ver', ver{i}, 'Hor', hor{i}, 'Rot', phi );
 end
-set( pmb( h, 400, 400 ), 'Color', [ .1 .1 .1 ] )
+h = pmb( htxt, 400, 400 );
+set( h, 'Color', [ .1 .1 .1 ] );
+hcity = [ hcity htxt h ];
 
 camlight;
 caxis( 4000 * [ -1 1 ] )
