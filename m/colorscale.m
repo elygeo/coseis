@@ -5,6 +5,7 @@ function [ h1, h2 ] = colorscale( varargin )
 str = '';
 lim1 = '';
 lim2 = '';
+clim = caxis;
 orientation = 'b';
 x = get( gca, 'XLim' );
 y = get( gca, 'YLim' );
@@ -13,16 +14,16 @@ y = y(1) - [ .1  .05 ] * ( y(2) - y(1) );
 if nargin >= 1, str = varargin{1}; end
 if nargin >= 2, x = varargin{2}; end
 if nargin >= 3, y = varargin{3}; end
-if nargin >= 4, orientation = varargin{4}; end
-if nargin >= 5, lim1 = varargin{5}; end
-if nargin >= 6, lim2 = varargin{6}; end
+if nargin >= 4, clim = varargin{4}; end
+if nargin >= 5, orientation = varargin{5}; end
+if nargin >= 6, lim1 = varargin{6}; end
+if nargin >= 7, lim2 = varargin{7}; end
 x = x(:)';
 y = y(:)';
 
 % color image
 fg = get( gcf, 'DefaultTextColor' );
 cmap = colormap;
-clim = caxis;
 folded = -clim(1) == clim(2) && all( all( cmap == cmap(end:-1:1,:) ) );
 dc = ( clim(2) - clim(1) ) / ( length( cmap ) - 1 );
 if folded, clim(1) = 0; end

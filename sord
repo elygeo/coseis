@@ -223,7 +223,7 @@ if [ "$vm" ]; then
   fi
   mkdir data
   "$srcdir/util/make"
-  "$srcdir/vm/make"
+  "$srcdir/cvm/make"
   cp -r "$srcdir/tmp/$vm" vm
   cd vm
   ibig=$( cat ibig )
