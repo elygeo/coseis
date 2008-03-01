@@ -1,0 +1,77 @@
+#!/bin/bash -e
+
+IFS=":$IFS"
+tar=tar
+for dir in $PATH; do [ -x $dir/gtar ] && tar=gtar; done
+for dir in $PATH; do
+for file in xlf95_r ifort pgf90 gfortran f95; do
+  if [ -x $dir/$file ]; then
+    sfc=$file
+    break 2
+  fi
+done
+done
+IFS="${IFS:1}"
+
+pfc='mpif90'
+getarg=''
+case $sfc in
+xlf95_r)
+  sfc='xlf95_r -q64 -qsuppress=cmpmsg -qfixed'
+  pfc='mpxlf95_r -q64 -qsuppress=cmpmsg -qfixed'
+  flags='-g -C -qflttrap -qsigtrap'
+  flags='-O -C'
+  flags='-O4'
+  ;;
+ifort)
+  flags='-warn -CB -traceback'
+  flags='-O -CB -traceback'
+  flags='-O3'
+  ;;
+pgf90)
+  getarg='getarg-pgf.f'
+  sfc='pgf90'
+  flags='-O -Ktrap=fp -Mbounds'
+  flags='-O0' # optimization breaks it
+  ;;
+gfortran)
+  flags='-Wall -O -g -pg'
+  flags='-Wall -O -g -fbounds-check'
+  flags='-Wall -O3'
+  ;;
+f95)
+  flags='-g'
+  flags=''
+  if [ $( uname ) = SunOS ]; then
+    getarg='getarg.f'
+    flags='-g -w4 -u -C'
+    flags='-w4 -O -C'
+    flags='-w1 -O2' # anything higher than -O2 breaks it
+  fi
+  ;;
+*)
+  echo "Error: no Fortran 95 compiler found"
+  exit
+esac
+
+cd "$( dirname $0 )"
+srcdir=$( /bin/pwd )
+mkdir -p ../tmp/cvm3
+mkdir -p ../tmp/cvm4
+cp compile xsec.f $getarg iotxt.f iobin.f iompi.f newin.h cvm3.f ../tmp/cvm3/
+cp compile xsec.f $getarg iotxt.f iobin.f iompi.f newin.h cvm4.f ../tmp/cvm4/
+
+cd ../tmp/cvm3
+$tar xzf "../../data/scec-cvm/Version3.0.tar.gz"
+sed -n '/^ *[^!]/s/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
+./compile "$sfc $flags -o" cvm3   $getarg iotxt.f cvm3.f
+./compile "$sfc $flags -o" cvm3-s $getarg iobin.f cvm3.f
+./compile "$pfc $flags -o" cvm3-p $getarg iompi.f cvm3.f
+
+cd ../cvm4
+$tar xzf "../../data/scec-cvm/Version4.tar.gz"
+sed -n '/^ *[^!]/s/.*ibig *= *\([0-9]*\).*/\1/p' newin.h > ibig
+./compile "$sfc $flags -o" cvm4   $getarg iotxt.f cvm4.f
+./compile "$sfc $flags -o" cvm4-s $getarg iobin.f cvm4.f
+./compile "$pfc $flags -o" cvm4-p $getarg iompi.f cvm4.f
+

@@ -26,7 +26,7 @@ files="
   $base/f
   $base/m
   $base/util
-  $base/vm
+  $base/cvm
 "
 mkdir -p tmp
 cd $( dirname "$dir" )
