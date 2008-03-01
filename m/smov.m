@@ -12,7 +12,6 @@ dit =  out{fzone}{3};
 i1 = [ out{fzone}{4:7} ];
 i2 = [ out{fzone}{8:11} ];
 its = i1(4):dit:i2(4);
-its = 600;
 tt = nt * dt;
 xbar = 450;
 
