@@ -12,6 +12,7 @@ dit =  out{fzone}{3};
 i1 = [ out{fzone}{4:7} ];
 i2 = [ out{fzone}{8:11} ];
 its = i1(4):dit:i2(4);
+its = 3000;
 tt = nt * dt;
 xbar = 450;
 
@@ -27,13 +28,18 @@ for t = 60:60:tt-1
 end
 axis( [ 0 x 0 y ] )
 axis off
-if ~exist( 'basemap.png', 'file' ), snap( 'basemap.png', dpi*aa, 1 ), end
+if ~exist( 'tmp', 'dir' ), mkdir tmp, end
+if ~exist( 'tmp/basemap.png', 'file' )
+  disp( 'rendering basemap' )
+  snap( 'tmp/basemap.png', dpi*aa, 1 )
+else
+  disp( 'using cached basemap' )
+end
 delete( hmap )
 htime = text( 40 + xbar, 30, '0:00', 'Hor', 'left', 'Ver', 'middle' );
-basemapimg = single( imread( 'basemap.png' ) );
+basemapimg = single( imread( 'tmp/basemap.png' ) );
 
 % Data
-if ~exist( 'tmp', 'dir' ), mkdir tmp, end
 meta
 [ x, x2 ] = ndgrid( 0:dx:dx*nn(1), 0:dx:dx*nn(2) );
 x(:,:,2) = x2;
@@ -57,7 +63,7 @@ set( hsurf, ...
 for it = its
 file = sprintf( 'tmp/surface%04d.png', it );
 if ~exist( file, 'file' ) & ~system( [ 'mkdir ' file '.lock' ] )
-it
+disp( file )
 t = it * dt;
 mm = floor( t / 60 );
 ss = round( rem( t, 60 ) );
@@ -100,7 +106,7 @@ if aa > 1
   clear img2
 end
 imwrite( uint8( img ), file )
-system( [ 'rmdir ' file '.lock' ] )
+system( [ 'rmdir ' file '.lock' ] );
 end
 end
 

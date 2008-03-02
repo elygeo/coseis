@@ -16,8 +16,9 @@ zoom = 5.71;
 dpi = 72;  res = [ 1024 576 ]; scl = 1.6; % Projector
 dpi = 72;  res = [ 1280 720 ]; scl = 2.2; % 720p
 dpi = 144; res = [  750 375 ]; scl = 1.5; % Amit
-dpi = 144; res = [  960 540 ]; scl = 1.5; % 1080p
 dpi = 72;  res = [  848 480 ]; scl = 1.5; % 480p
+dpi = 72;  res = [  960 540 ]; scl = 2.0; % 540p
+dpi = 144; res = [  960 540 ]; scl = 2.0; % 1080p
 ppi = 72;
 aa = 3;
 
@@ -100,7 +101,7 @@ z = [ sites{:,3} ];
 ver = sites(:,4);
 hor = sites(:,5);
 txt = sites(:,6);
-hcity = plot3( x, y, z + 4000, 'o', 'MarkerSize', 2.5*scl, 'LineWidth', .6*scl );
+hcity = plot3( x, y, z + 4000, 'o', 'MarkerSize', 3*scl, 'LineWidth', .6*scl );
 htxt = [];
 for i = 1:length(x)
   dy = 1000;

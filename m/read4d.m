@@ -3,6 +3,8 @@
 function [ f, izone ] = read4d( varargin )
 
 dirfmt = '';
+faultnormal = 0;
+ihypo = [ 0 0 0 ];
 meta
 currentstep
 f = [];
@@ -81,10 +83,13 @@ di = [ 1 1 1 dit ];
 i0 = ( i3 - i1 ) ./ di;
 m = ( i2 - i1 ) ./ di + 1;
 n = ( i4 - i3 ) ./ di + 1;
-i = [ find( m~=1 ) find( m==1 ) ];
-i0 = i0(i);
-m = m(i);
-n = n(i);
+for i = 3:-1:1
+if m(i) == n(i)
+  i0(i+1) = m(i) * i0(i+1); i0(i:end) = [ i0(i+1:end) 0 ];
+  n(i+1)  = m(i) * n(i+1);  n(i:end)  = [ n(i+1:end) 1 ];
+  m(i+1)  = m(i) * m(i+1);  m(i:end)  = [ m(i+1:end) 1 ];
+end
+end
 n = [ n nc ];
 f = zeros( n );
 skip = 4 * ( m(1) - n(1) );
@@ -99,7 +104,15 @@ for l = 1:nc
   for j = 1:n(3)
     seek = 4 * ( i0(1) + m(1) * ( i0(2) + m(2) * ( i0(3) + j-1 + m(3) * ( i0(4) + k-1 ) ) ) );
     fseek( fid, seek, 'bof' );
-    tmp = fread( fid, n(1)*n(2), block, skip );
+    [ tmp, count ]  = fread( fid, n(1)*n(2), block, skip );
+    if count ~= n(1) * n(2)
+      count
+      n
+      seek
+      block
+      skip
+      error( [ 'Reading file:' file ] ) 
+    end
     f(:,:,j,k,l) = reshape( tmp, n(1:2) );
   end
   end
