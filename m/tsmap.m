@@ -6,24 +6,20 @@ drawnow
 
 bg = [ .1 .1 .1 ];
 fg = [ 1 1 1 ];
-res = [ 1024 576 ];
-res = [ 800 755 ];
-scl = 1.6;
 
+ppi = 72;
+zoom = 5.71;
 theta = 0;  phi = 40;
 theta = 40; phi = 0;
-zoom = 5.71;
-dpi = 72;  res = [ 1024 576 ]; scl = 1.6; % Projector
-dpi = 72;  res = [ 1280 720 ]; scl = 2.2; % 720p
-dpi = 144; res = [  750 375 ]; scl = 1.5; % Amit
-dpi = 72;  res = [  848 480 ]; scl = 1.5; % 480p
-dpi = 72;  res = [  960 540 ]; scl = 2.0; % 540p
-dpi = 144; res = [  960 540 ]; scl = 2.0; % 1080p
-ppi = 72;
-aa = 3;
+aa = 3; dpi = 72;  scl = 1.0; res = [ 1280  720 ]; % 720p
+aa = 3; dpi = 144; scl = 1.0; res = [  750  375 ]; % 1500x750
+aa = 3; dpi = 72;  scl = 1.0; res = [  848  480 ]; % 480p
+aa = 3; dpi = 72;  scl = 1.0; res = [ 1024  576 ]; % Projector
+aa = 3; dpi = 72;  scl = 1.0; res = [  960  540 ]; % 540p
+aa = 3; dpi = 144; scl = 1.0; res = [  960  540 ]; % 1080p
 
-colorscheme( 'earth', .4 )
 %colorscheme( 'kw1' )
+colorscheme( 'earth', .4 )
 pos = get( gcf, 'Position' );
 set( 0, 'ScreenPixelsPerInch', ppi )
 set( gcf, ...
@@ -32,8 +28,8 @@ set( gcf, ...
   'Color', 'k', ...
   'DefaultTextColor', fg, ...
   'DefaultTextFontWeight', 'bold', ...
-  'DefaultTextFontSize', 9 * scl, ...
-  'DefaultLineLinewidth', .5 * scl, ...
+  'DefaultTextFontSize', 16*scl, ...
+  'DefaultLineLinewidth', .75*scl, ...
   'DefaultLineMarkerEdgeColor', bg, ...
   'DefaultLineMarkerFaceColor', fg, ...
   'DefaultAxesColorOrder', bg, ...
@@ -41,10 +37,19 @@ set( gcf, ...
   'DefaultTextVerticalAlignment', 'middle' )
 haxes = axes( 'Position', [ 0 0 1 1 ] );
 
-fid = fopen( 'topo1.f32', 'r' ); x1 = fread( fid, [ 960 780 ], 'float32' ); fclose( fid );
-fid = fopen( 'topo2.f32', 'r' ); x2 = fread( fid, [ 960 780 ], 'float32' ); fclose( fid );
-fid = fopen( 'topo3.f32', 'r' ); x3 = fread( fid, [ 960 780 ], 'float32' ); fclose( fid );
-
+n = [ 960 780 ];
+fid = fopen( 'topo1.f32', 'r' ); x(:,:,1) = fread( fid, n, 'float32' ); fclose( fid );
+fid = fopen( 'topo2.f32', 'r' ); x(:,:,2) = fread( fid, n, 'float32' ); fclose( fid );
+fid = fopen( 'topo3.f32', 'r' ); x(:,:,3) = fread( fid, n, 'float32' ); fclose( fid );
+xx = zeros( [ 2*n-1 3 ] );
+xx(1:2:end,1:2:end,:) = x;
+xx(1:2:end,2:2:end,:) = .50 * ( x(:,1:end-1,:) + x(:,2:end,:) );
+xx(2:2:end,1:2:end,:) = .50 * ( x(1:end-1,:,:) + x(2:end,:,:) );
+xx(2:2:end,2:2:end,:) = .25 * ( x(1:end-1,1:end-1,:) + x(2:end,2:end,:) + x(1:end-1,2:end,:) + x(2:end,1:end-1,:) );
+x1 = xx(:,:,1);
+x2 = xx(:,:,2);
+x3 = xx(:,:,3);
+clear x xx
 c = max( x3, 10. );
 c( x2 < 102000 ) = x3( x2 < 102000 );
 hmap = surf( x1, x2, x3 - 4000, c );
@@ -76,8 +81,8 @@ axis off
 %[ x, y ] = textread( 'puente-hills.xy',  '%n%n%*[^\n]' ); plot3( x, y, 4000 + zeros( size( x ) ) );
 %[ x, y, z ] = textread( 'sosafe.xyz',  '%n%n%n%*[^\n]' );
 [ x, y, z ] = textread( 'fault.xyz',    '%n%n%n%*[^\n]' );
-hmap(end+1) = plot3( x, y, z+2000, '-',  'LineW', 2.2*scl, 'Color', bg );
-hmap(end+1) = plot3( x, y, z+3000, '--', 'LineW', 1.5*scl, 'Color', fg );
+hmap(end+1) = plot3( x, y, z+2000, '-',  'LineW', 3*scl,   'Color', bg );
+hmap(end+1) = plot3( x, y, z+3000, '--', 'LineW', 2*scl, 'Color', fg );
 x = 6e5 * [ 0 0 1 1 0 -2  3  3 -2 -2 ];
 y = 3e5 * [ 0 1 1 0 0 -2 -2  3  3 -2 ];
 z = 4e3 * [ 1 1 1 1 1  1  1  1  1  1 ];
@@ -101,14 +106,14 @@ z = [ sites{:,3} ];
 ver = sites(:,4);
 hor = sites(:,5);
 txt = sites(:,6);
-hcity = plot3( x, y, z + 4000, 'o', 'MarkerSize', 3*scl, 'LineWidth', .6*scl );
+hcity = plot3( x, y, z + 4000, 'o', 'MarkerSize', 4*scl );
 htxt = [];
 for i = 1:length(x)
-  dy = 1000;
-  if strcmp( ver{i}, 'top' ), dy = -1000; end
+  dy = 1400;
+  if strcmp( ver{i}, 'top' ), dy = -700; end
   htxt(end+1) = text( x(i), y(i)+dy, z(i)+5000, txt{i}, 'Ver', ver{i}, 'Hor', hor{i}, 'Rot', phi );
 end
-h = pmb( htxt, 400, 400 );
+h = pmb( htxt, 500, 500 );
 set( h, 'Color', [ .1 .1 .1 ] );
 hcity = [ hcity htxt h ];
 

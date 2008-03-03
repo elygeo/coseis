@@ -20,24 +20,26 @@ xbar = 450;
 x = 1000 * res(1) / res(2); 
 y = 1000;
 axes( 'Position', [ 0 0 1 1 ] )
-plot( 20 + [ 0 xbar ], [ 30 30 ], '-', 'Color', .3*[1 1 1], 'LineWidth', 3*scl )
+plot( 20 + [ 0 xbar ], [ 30 30 ], '-', 'Color', .3*[1 1 1], 'LineWidth', 5*scl )
 hold on
-hbar = plot( 20 + [ 0 0 ], [ 30 30 ], 'w-', 'LineWidth', 3*scl );
+hbar = plot( 20 + [ 0 0 ], [ 30 30 ], 'w-', 'LineWidth', 5*scl );
 for t = 60:60:tt-1
-  plot( 20 + [ 1 1 ] * xbar * t / tt, [ 20 30 ], 'k-', 'LineWidth', scl )
+  plot( 20 + [ 1 1 ] * xbar * t / tt, [ 20 30 ], 'k-' )
 end
 axis( [ 0 x 0 y ] )
 axis off
 if ~exist( 'tmp', 'dir' ), mkdir tmp, end
-if ~exist( 'tmp/basemap.png', 'file' )
-  disp( 'rendering basemap' )
-  snap( 'tmp/basemap.png', dpi*aa, 1 )
+if ~exist( '/tmp/gely/tmp', 'dir' ), mkdir /tmp/gely/tmp, end
+file = 'tmp/basemap.png';
+if ~exist( file, 'file' )
+  disp( file )
+  basemap = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
+  imwrite( uint8( basemap ), file )
 else
-  disp( 'using cached basemap' )
+  basemap = single( imread( file ) );
 end
 delete( hmap )
-htime = text( 40 + xbar, 30, '0:00', 'Hor', 'left', 'Ver', 'middle' );
-basemapimg = single( imread( 'tmp/basemap.png' ) );
+htime = text( 40 + xbar, 23, '0:00', 'Hor', 'left', 'Ver', 'baseline' );
 
 % Data
 meta
@@ -61,8 +63,8 @@ set( hsurf, ...
   'EdgeLighting', 'none', ...
   'FaceLighting', 'phong' );
 for it = its
-file = sprintf( 'tmp/surface%04d.png', it );
-if ~exist( file, 'file' ) & ~system( [ 'mkdir ' file '.lock' ] )
+file = sprintf( 'tmp/f%05d.png', it );
+if ~exist( file, 'file' ) & ~system( [ 'mkdir ' file '.lock >& /dev/null' ] )
 disp( file )
 t = it * dt;
 mm = floor( t / 60 );
@@ -83,14 +85,14 @@ set( hsurf, 'ZData', 2000 * z - 4000 )
 set( hsurf, 'FaceLighting', 'phong' )
 colorscheme( 'hot', .25 )
 caxis( haxes, flim )
-img = snap( file, dpi*aa, 1 );
+img = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
 set( hsurf, 'FaceLighting', 'none' )
 colorscheme( 'kw1' )
 caxis( haxes, [ .04 .06 ] )
-w = snap( file, dpi*aa, 1 );
+w = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
 w = w(:,:,1) ./ 255;
 for i = 1:3
-  img(:,:,i) = ( 1 - w ) .* basemapimg(:,:,i) + w .* img(:,:,i);
+  img(:,:,i) = ( 1 - w ) .* basemap(:,:,i) + w .* img(:,:,i);
 end
 n1 = size( img );
 n2 = floor( n1 ./ aa );

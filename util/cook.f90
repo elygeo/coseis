@@ -1,5 +1,4 @@
 ! Cook TS data
-! call system( '' )
 
 program main
 implicit none
@@ -7,7 +6,7 @@ integer, parameter :: &
   n1 = 3000, &
   n2 = 1500, &
   h = 2, &
-  ditfile = 20, &
+  ditfile = 1, &
   dit = 30, &
   nt = 22728
 integer :: io, it, i, j, k, jj, kk

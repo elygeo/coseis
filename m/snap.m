@@ -11,9 +11,9 @@ if nargin > 2, aa   = varargin{3}; end
 if dpi < 10, error( 'snap is changed' ), end
 
 res = sprintf( '-r%d', dpi * aa );
-print( '-dtiff', res, [ file '.tmp.tif' ] )
-img1 = single( imread( [ file '.tmp.tif' ] ) );
-delete( [ file '.tmp.tif' ] )
+print( '-dtiff', res, [ file '.tif' ] )
+img1 = single( imread( [ file '.tif' ] ) );
+delete( [ file '.tif' ] )
 
 if aa > 1
   n1 = size( img1 );

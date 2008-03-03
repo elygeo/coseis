@@ -35,7 +35,10 @@
       open( 1, file=str, status='replace' )
       do i = 1, nn
         rdep(i) = rdep(i) / 3.2808399
-        write( 1, '(f8.5,1x,f10.5,1x,f9.2,1x,f8.1,1x,f8.1,1x,f8.1)' ) 
+        if(rho(i)/=rho(i).or.alpha(i)/=alpha(i).or.beta(i)/=beta(i))
+     $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
+        write( 1, '(f8.5,1x,f10.5,1x,f9.2,1x,f8.1,1x,f8.1,1x,f8.1)' )
+     $    rlat(i), rlon(i), rdep(i), alpha(i), beta(i), rho(i)
       end do
       close( 1 )
       kerr = 0
