@@ -20,14 +20,13 @@ aa = 3; dpi = 288; scl = 0.7; res = [  750 375 ]; % 3000x1500
 aa = 3; dpi = 144; scl = 1.0; res = [  960 540 ]; % 1080p
 aa = 3; dpi = 72;  scl = 1.0; res = [  960 540 ]; % 540p
 
-%colorscheme( 'kw1' )
 colorscheme( 'earth', .4 )
 pos = get( gcf, 'Position' );
 set( 0, 'ScreenPixelsPerInch', ppi )
 set( gcf, ...
   'PaperPositionMode', 'auto', ...
   'Position', [ pos(1:2) res ], ...
-  'Color', 'w', ...
+  'Color', 'k', ...
   'DefaultTextColor', fg, ...
   'DefaultTextFontWeight', 'bold', ...
   'DefaultTextFontSize', 16*scl, ...
@@ -56,7 +55,8 @@ camup( [ -s c 0 ] )
 axis off
 
 hmap = [];
-if 0
+if 1
+clear x
 n = [ 960 780 ];
 fid = fopen( 'topo1.f32', 'r' ); x(:,:,1) = fread( fid, n, 'float32' ); fclose( fid );
 fid = fopen( 'topo2.f32', 'r' ); x(:,:,2) = fread( fid, n, 'float32' ); fclose( fid );
@@ -76,7 +76,7 @@ clear x xx c
 [ x, y, z ] = textread( 'salton.xyz',   '%n%n%n%*[^\n]' );
 c = -1 * ones( size( z ) );
 hmap(end+1) = patch( x, y, z - 3990, c );
-set( hmap(2:3), ...
+set( hmap, ...
   'EdgeColor', 'none', ...
   'AmbientStrength',  .5, ...
   'DiffuseStrength',  .5, ...
@@ -117,16 +117,16 @@ z = [ sites{:,3} ];
 ver = sites(:,4);
 hor = sites(:,5);
 txt = sites(:,6);
-hover = plot3( x, y, z + 4000, 'o', 'MarkerSize', 5*scl );
+hdots = plot3( x, y, z + 4000, 'o', 'MarkerSize', 5*scl );
 htxt = [];
 for i = 1:length(x)
   dy = 1400;
   if strcmp( ver{i}, 'top' ), dy = -700; end
   htxt(end+1) = text( x(i), y(i)+dy, z(i)+5000, txt{i}, 'Ver', ver{i}, 'Hor', hor{i}, 'Rot', phi );
 end
-h = pmb( htxt, 400, 400 );
-set( h, 'Color', bg );
-hover = [ hover htxt h ];
+htxtb = pmb( htxt, 400, 400 );
+set( htxtb, 'Color', bg );
+hover = [ hdots htxt htxtb ];
 
 % Legened
 axes( 'Position', [ 0 0 1 1 ] )
@@ -147,28 +147,32 @@ hclk(6) = plot( xx(2) + x(:), yy(2) + y(:), 'w-' );
 a = pi * ( 0:12 ) / 6;
 x = [ 1 .8 nan ]' * rr * sin( a );
 y = [ 1 .8 nan ]' * rr * cos( a );
-hclk(6) = plot( xx(2) + x(:), yy(2) + y(:), 'w-' );
+hclk(7) = plot( xx(2) + x(:), yy(2) + y(:), 'w-' );
 hclk(8) = plot( xx, yy, 'o', 'MarkerSize', 5*scl );
 hclk(9) = text( xx(1), yy(1)-20, 'm', 'Hor', 'center', 'Ver', 'middle' );
 hclk(10) = text( xx(2), yy(2)-20, 's', 'Hor', 'center', 'Ver', 'middle' );
 hclk(1) = plot( xx(1) + [ 0 0 ], yy(1) + rr * [ -.2 1 ], 'w-' );
 hclk(2) = plot( xx(2) + [ 0 0 ], yy(2) + rr * [ -.2 1 ], 'w-' );
-set( hclk(1:2), 'LineWidth', scl )
+set( hclk(1:2), 'LineWidth', 1.5*scl )
 x = 1000 * res(1) / res(2);
 y = 1000;
 axis( [ 0 x 0 y ] )
 axis off
 
+%return
 set( [ hover hclk(1:2) ], 'Visible', 'off' )
 basemap = snap( '', dpi*aa, 1 );
-imwrite( uint8( 'basemap.png' ), file )
+imwrite( uint8( basemap ), 'basemap.png' )
 set( [ hmap hclk ], 'Visible', 'off' )
 set( hover, 'Visible', 'on' )
 overlay = snap( '', dpi*aa, 1 );
-set( hover, 'Color', fg )
+set( htxtb, 'Color', fg )
+set( hdots, 'MarkerEdgeColor', fg )
 alpha = snap( '', dpi*aa, 1 );
 alpha = alpha(:,:,1);
 imwrite( uint8( overlay ), 'overlay.png', 'Alpha', alpha )
-set( hover, 'Color', bg )
+set( htxtb, 'Color', bg )
+set( hdots, 'MarkerEdgeColor', bg )
 set( [ hmap hclk ], 'Visible', 'on' )
+clear all
 
