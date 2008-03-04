@@ -7,6 +7,7 @@ drawnow
 bg = [ .1 .1 .1 ];
 fg = [ 1 1 1 ];
 
+render = 1;
 ppi = 72;
 zoom = 5.71;
 theta = 0;  phi = 40;
@@ -46,13 +47,13 @@ xx(1:2:end,1:2:end,:) = x;
 xx(1:2:end,2:2:end,:) = .50 * ( x(:,1:end-1,:) + x(:,2:end,:) );
 xx(2:2:end,1:2:end,:) = .50 * ( x(1:end-1,:,:) + x(2:end,:,:) );
 xx(2:2:end,2:2:end,:) = .25 * ( x(1:end-1,1:end-1,:) + x(2:end,2:end,:) + x(1:end-1,2:end,:) + x(2:end,1:end-1,:) );
-x1 = xx(:,:,1);
-x2 = xx(:,:,2);
-x3 = xx(:,:,3);
-clear x xx
-c = max( x3, 10. );
-c( x2 < 102000 ) = x3( x2 < 102000 );
-hmap = surf( x1, x2, x3 - 4000, c );
+c = xx(:,:,3);
+c(xx(:,:,2)>102000) = max( 10., c(xx(:,:,2)>102000) );
+c = .25 * ...
+  ( c(1:end-1,1:end-1) + c(2:end,2:end) ...
+  + c(1:end-1,2:end) + c(2:end,1:end-1) );
+hmap = surf( xx(:,:,1), xx(:,:,2), xx(:,:,3) - 4000, c );
+clear x xx c
 [ x, y, z ] = textread( 'salton.xyz',   '%n%n%n%*[^\n]' );
 c = -1 * ones( size( z ) );
 hmap(end+1) = patch( x, y, z - 3990, c );
@@ -94,28 +95,28 @@ sites = {
   229657 119310 107 'bottom' 'right'  'Los Angeles'
   256108 263112 648 'bottom' 'center' 'Barstow'
   263052 216515 831 'bottom' 'center' 'Victorville'
-  278097 115102  36 'top'    'center' 'Santa Ana'
+  268435 120029  47 'top'    'center' 'Anaheim'
   293537 180173 327 'top'    'center' 'San Bernardino'
   366020 200821 140 'top'    'right'  'Palm Springs'
   402013  69548  23 'bottom' 'center' 'San Diego'
   526989 167029   1 'bottom' 'center' 'Mexicali'
 };
+% 278097 115102  36 'top'    'center' 'Santa Ana'
 x = [ sites{:,1} ];
 y = [ sites{:,2} ];
 z = [ sites{:,3} ];
 ver = sites(:,4);
 hor = sites(:,5);
 txt = sites(:,6);
-hcity = plot3( x, y, z + 4000, 'o', 'MarkerSize', 4*scl );
+hcity = plot3( x, y, z + 4000, 'o', 'MarkerSize', 5*scl );
 htxt = [];
 for i = 1:length(x)
   dy = 1400;
   if strcmp( ver{i}, 'top' ), dy = -700; end
   htxt(end+1) = text( x(i), y(i)+dy, z(i)+5000, txt{i}, 'Ver', ver{i}, 'Hor', hor{i}, 'Rot', phi );
 end
-h = pmb( htxt, 500, 500 );
-set( h, 'Color', [ .1 .1 .1 ] );
-hcity = [ hcity htxt h ];
+htxtb = pmb( htxt, 400, 400 );
+set( htxtb, 'Color', [ .1 .1 .1 ] );
 
 camlight;
 caxis( 4000 * [ -1 1 ] )

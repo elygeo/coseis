@@ -2,37 +2,6 @@
 
 clear all
 tsmap
-if ~exist( 'tmp', 'dir' ), mkdir tmp, end
-if ~exist( '/tmp/gely/tmp', 'dir' ), mkdir /tmp/gely/tmp, end
-file = 'tmp/basemap.png';
-if ~exist( file, 'file' )
-  disp( file )
-  set( [ hcity htxt htxtb ], 'Visible', 'off' )
-  basemap = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
-  imwrite( uint8( basemap ), file )
-else
-  basemap = single( imread( file ) );
-end
-delete( hmap )
-file = 'tmp/overlay.png';
-if ~exist( file, 'file' )
-  disp( file )
-  set( [ hcity htxt htxtb ], 'Visible', 'on' )
-  overlay = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
-  set( [ hcity htxt htxtb ], 'Color', 'w' )
-  alpha = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
-  alpha = alpha(:,:,1);
-  imwrite( uint8( overlay ), file, 'Alpha', alpha )
-else
-  [ overlay, tmp, alpha ] = imread( file );
-  alpha = single( alpha );
-  overlay = single( overlay );
-end
-delete( [ hcity htxt htxtb ] )
-alpha = ( 1. - alpha / 255 );
-for i = 1:3
-  basemap(:,:,i) = alpha .* basemap(:,:,i);
-end
 meta
 
 fzone = 1;
@@ -42,8 +11,8 @@ flim = [ 0 1 ];
 dit =  out{fzone}{3};
 i1 = [ out{fzone}{4:7} ];
 i2 = [ out{fzone}{8:11} ];
-its = i1(4):dit:i2(4);
 its = 3000;
+its = i1(4):dit:i2(4);
 tt = nt * dt;
 xbar = 450;
 
@@ -59,6 +28,17 @@ for t = 60:60:tt-1
 end
 axis( [ 0 x 0 y ] )
 axis off
+if ~exist( 'tmp', 'dir' ), mkdir tmp, end
+if ~exist( '/tmp/gely/tmp', 'dir' ), mkdir /tmp/gely/tmp, end
+file = 'tmp/basemap.png';
+if ~exist( file, 'file' )
+  disp( file )
+  basemap = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
+  imwrite( uint8( basemap ), file )
+else
+  basemap = single( imread( file ) );
+end
+delete( hmap )
 htime = text( 40 + xbar, 23, '0:00', 'Hor', 'left', 'Ver', 'baseline' );
 
 % Data
@@ -110,9 +90,9 @@ set( hsurf, 'FaceLighting', 'none' )
 colorscheme( 'kw1' )
 caxis( haxes, [ .04 .06 ] )
 w = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
-w = alpha .* w(:,:,1) ./ 255;
+w = w(:,:,1) ./ 255;
 for i = 1:3
-  img(:,:,i) = ( 1 - w ) .* basemap(:,:,i) + w .* img(:,:,i) + overlay(:,:,i);
+  img(:,:,i) = ( 1 - w ) .* basemap(:,:,i) + w .* img(:,:,i);
 end
 n1 = size( img );
 n2 = floor( n1 ./ aa );

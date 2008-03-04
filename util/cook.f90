@@ -5,9 +5,9 @@ implicit none
 integer, parameter :: &
   n1 = 3000, &
   n2 = 1500, &
-  h = 2, &
+  h = 1, &
   ditfile = 1, &
-  dit = 30, &
+  dit = 10, &
   nt = 22728
 integer :: io, it, i, j, k, jj, kk
 real :: x(n1,n2), y(n1,n2), m(n1/h,n2/h)
