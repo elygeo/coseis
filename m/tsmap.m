@@ -108,17 +108,18 @@ z = [ sites{:,3} ];
 ver = sites(:,4);
 hor = sites(:,5);
 txt = sites(:,6);
-hcity = plot3( x, y, z + 4000, 'o', 'MarkerSize', 5*scl );
+hover = plot3( x, y, z + 4000, 'o', 'MarkerSize', 5*scl );
 htxt = [];
 for i = 1:length(x)
   dy = 1400;
   if strcmp( ver{i}, 'top' ), dy = -700; end
   htxt(end+1) = text( x(i), y(i)+dy, z(i)+5000, txt{i}, 'Ver', ver{i}, 'Hor', hor{i}, 'Rot', phi );
 end
-htxtb = pmb( htxt, 400, 400 );
-set( htxtb, 'Color', [ .1 .1 .1 ] );
+h = pmb( htxt, 400, 400 );
+set( h, 'Color', [ .1 .1 .1 ] );
+hover = [ hover htxt h ];
 
-camlight;
+hlit = camlight;
 caxis( 4000 * [ -1 1 ] )
 %snap( 'basemap.png', dpi )
 

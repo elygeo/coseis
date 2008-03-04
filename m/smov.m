@@ -7,7 +7,7 @@ if ~exist( '/tmp/gely/tmp', 'dir' ), mkdir /tmp/gely/tmp, end
 file = 'tmp/basemap.png';
 if ~exist( file, 'file' )
   disp( file )
-  set( [ hcity htxt htxtb ], 'Visible', 'off' )
+  set( hover, 'Visible', 'off' )
   basemap = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
   imwrite( uint8( basemap ), file )
 else
@@ -17,9 +17,9 @@ delete( hmap )
 file = 'tmp/overlay.png';
 if ~exist( file, 'file' )
   disp( file )
-  set( [ hcity htxt htxtb ], 'Visible', 'on' )
+  set( hover, 'Visible', 'on' )
   overlay = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
-  set( [ hcity htxt htxtb ], 'Color', 'w' )
+  set( hover, 'Color', 'w' )
   alpha = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
   alpha = alpha(:,:,1);
   imwrite( uint8( overlay ), file, 'Alpha', alpha )
@@ -28,7 +28,7 @@ else
   alpha = single( alpha );
   overlay = single( overlay );
 end
-delete( [ hcity htxt htxtb ] )
+delete( hover )
 alpha = ( 1. - alpha / 255 );
 for i = 1:3
   basemap(:,:,i) = alpha .* basemap(:,:,i);
@@ -102,11 +102,11 @@ z(2:end-1,:) = .5 * ( z(1:end-2,:) + z(2:end-1,:) );
 z(:,2:end-1) = .5 * ( z(:,1:end-2) + z(:,2:end-1) );
 set( hsurf, 'CData', s )
 set( hsurf, 'ZData', 2000 * z - 4000 )
-set( hsurf, 'FaceLighting', 'phong' )
+set( hlit, 'Visible', 'on' )
 colorscheme( 'hot', .25 )
 caxis( haxes, flim )
 img = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
-set( hsurf, 'FaceLighting', 'none' )
+set( hlit, 'Visible', 'off' )
 colorscheme( 'kw1' )
 caxis( haxes, [ .04 .06 ] )
 w = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
