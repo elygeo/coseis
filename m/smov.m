@@ -15,23 +15,48 @@ end
 delete( [ hmap hover ] )
 
 meta
-fzone = 1;
-squared = 0;
-node = 0;
+xzone = 0;  fzone = 1;  squared = 0; node = 0;
+xzone = 13; fzone = 18; squared = 1; node = 1;
 flim = [ 0 1 ];
 dit =  out{fzone}{3};
 i1 = [ out{fzone}{4:7} ];
 i2 = [ out{fzone}{8:11} ];
 its = i1(4):dit:i2(4);
-its = 3000;
 tt = nt * dt;
+
+% Legend
+if 0
+axes( haxes(2) )
+text( x-20, y-20, { 'Earthquake on Southernmost' 'San Andreas Fault' }, 'Color', 'w', 'FontWeight', 'normal', 'FontSize', 12*scl, 'Ver', 'top', 'Hor', 'right' );
+text( 20, 60, { 'SORD rupture dynamics simulation' }, 'Color', 'w', 'FontWeight', 'normal', 'Ver', 'bottom', 'Hor', 'left' );
+scec = imread( 'scec.png'  );
+sdsu = imread( 'sdsu.png' );
+sio  = imread( 'sio.png'  );
+igpp = imread( 'igpp.png' );
+y = 70 * [ 1 0 ];
+x = 70 * cumsum( [ 0
+  size(igpp,2) / size(igpp,1)
+  size(sio,2)  / size(sio,1)
+  size(sdsu,2) / size(sdsu,1)
+  size(scec,2) / size(scec,1) ] );
+image( x(1:2) + 20, y + 100, igpp );
+image( x(2:3) + 40, y + 100, sio  );
+image( x(3:4) + 60, y + 100, sdsu );
+image( x(4:5) + 80, y + 100, scec );
+end
 
 % Data
 if ~exist( 'tmp', 'dir' ), mkdir tmp, end
 if ~exist( '/tmp/gely/tmp', 'dir' ), mkdir /tmp/gely/tmp, end
-meta
-[ x, x2 ] = ndgrid( 0:dx:dx*nn(1), 0:dx:dx*nn(2) );
-x(:,:,2) = x2;
+if xzone
+  x = read4d( xzone, [ 0 0 -1 0 ] );
+  if isempty( x ), error, end
+  x = squeeze( x );
+else
+  [ x, x2 ] = ndgrid( 0:dx:dx*nn(1), 0:dx:dx*nn(2) );
+  x(:,:,2) = x2;
+  clear x2
+end
 if node
   x(end+1,:,:) = x(end,:,:);
   x(:,end+1,:) = x(:,end,:);
@@ -40,6 +65,7 @@ if node
 end
 axes( haxes(1) )
 hsurf = surf( x(:,:,1), x(:,:,2), x(:,:,2) );
+clear x
 set( hsurf, ...
   'EdgeColor', 'none', ...
   'AmbientStrength',  .5, ...
@@ -49,17 +75,18 @@ set( hsurf, ...
   'SpecularColorReflectance', 1, ...
   'EdgeLighting', 'none', ...
   'FaceLighting', 'phong' );
+axes( haxes(2) )
 for it = its
 file = sprintf( 'tmp/f%05d.png', it );
 if ~exist( file, 'file' ) & ~system( [ 'mkdir ' file '.lock >& /dev/null' ] )
 disp( file )
-t = 2 * pi * it * dt;
-set( hclk(1), ...
-  'XData', xx(1) + rr * sin( t / 360 ) * [ -.2 1 ], ...
-  'YData', yy(1) + rr * cos( t / 360 ) * [ -.2 1 ] );
-set( hclk(1), ...
-  'XData', xx(1) + rr * sin( t ) * [ -.2 1 ], ...
-  'YData', yy(1) + rr * cos( t ) * [ -.2 1 ] );
+t = it * dt;
+set( hclk, 'Visible', 'on' )
+m = floor( t / 60 );
+s10 = floor( mod( t, 60 ) / 10 );
+s1 = floor( mod( t, 10 ) );
+set( hclk, 'Visible', 'off' )
+set( [ hclk(1,m+1) hclk(2,s10+1) hclk(3,s1+1) ], 'Visible', 'on' )
 s = read4d( fzone, it );
 if isempty( s ), error, end 
 if size( s, 5 ) > 1, s = sqrt( sum( s .* s, 5 ) ); end
@@ -73,11 +100,11 @@ set( hsurf, 'CData', s )
 set( hsurf, 'ZData', 2000 * z - 4000 )
 set( hlit, 'Visible', 'on' )
 colorscheme( 'hot', .25 )
-caxis( haxes, flim )
+caxis( haxes(1), flim )
 img = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
 set( hlit, 'Visible', 'off' )
 colorscheme( 'kw1' )
-caxis( haxes, [ .04 .06 ] )
+caxis( haxes(1), [ .04 .06 ] )
 w = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
 w = alpha .* w(:,:,1) ./ 255;
 for i = 1:3

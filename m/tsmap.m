@@ -17,8 +17,8 @@ aa = 3; dpi = 72;  scl = 1.0; res = [  848 480 ]; % 480p
 aa = 3; dpi = 72;  scl = 1.0; res = [ 1024 576 ]; % Projector
 aa = 3; dpi = 144; scl = 0.8; res = [  750 375 ]; % 1500x750
 aa = 3; dpi = 288; scl = 0.7; res = [  750 375 ]; % 3000x1500
-aa = 3; dpi = 144; scl = 1.0; res = [  960 540 ]; % 1080p
 aa = 3; dpi = 72;  scl = 1.0; res = [  960 540 ]; % 540p
+aa = 3; dpi = 144; scl = 1.0; res = [  960 540 ]; % 1080p
 
 colorscheme( 'earth', .4 )
 pos = get( gcf, 'Position' );
@@ -34,7 +34,7 @@ set( gcf, ...
   'DefaultLineMarkerEdgeColor', bg, ...
   'DefaultLineMarkerFaceColor', fg, ...
   'DefaultAxesColorOrder', bg, ...
-  'DefaultTextHorizontalAlignment', 'left', ...
+  'DefaultTextHorizontalAlignment', 'center', ...
   'DefaultTextVerticalAlignment', 'middle' )
 haxes = axes( 'Position', [ 0 0 1 1 ] );
 
@@ -129,41 +129,33 @@ set( htxtb, 'Color', bg );
 hover = [ hdots htxt htxtb ];
 
 % Legened
-axes( 'Position', [ 0 0 1 1 ] )
-xx = [ 140 260 ];
-yy = [ 140 140 ];
-rr = 50;
-a = pi * ( 0:120 ) / 60;
-hclk(3) = plot( xx(1) + rr * sin( a ), yy(1) + rr * cos( a ), 'w-' ); hold on
-hclk(4) = plot( xx(2) + rr * sin( a ), yy(2) + rr * cos( a ), 'w-' );
-a = pi * ( 0:6 ) / 3;
-x = [ 1 .8 nan ]' * rr * sin( a );
-y = [ 1 .8 nan ]' * rr * cos( a );
-hclk(5) = plot( xx(1) + x(:), yy(1) + y(:), 'w-' );
-a = pi * ( 0:60 ) / 30;
-x = [ 1 .9 nan ]' * rr * sin( a );
-y = [ 1 .9 nan ]' * rr * cos( a );
-hclk(6) = plot( xx(2) + x(:), yy(2) + y(:), 'w-' );
-a = pi * ( 0:12 ) / 6;
-x = [ 1 .8 nan ]' * rr * sin( a );
-y = [ 1 .8 nan ]' * rr * cos( a );
-hclk(7) = plot( xx(2) + x(:), yy(2) + y(:), 'w-' );
-hclk(8) = plot( xx, yy, 'o', 'MarkerSize', 5*scl );
-hclk(9) = text( xx(1), yy(1)-20, 'm', 'Hor', 'center', 'Ver', 'middle' );
-hclk(10) = text( xx(2), yy(2)-20, 's', 'Hor', 'center', 'Ver', 'middle' );
-hclk(1) = plot( xx(1) + [ 0 0 ], yy(1) + rr * [ -.2 1 ], 'w-' );
-hclk(2) = plot( xx(2) + [ 0 0 ], yy(2) + rr * [ -.2 1 ], 'w-' );
-set( hclk(1:2), 'LineWidth', 1.5*scl )
+haxes(2) = axes( 'Position', [ 0 0 1 1 ] );
+xx = [ 100 150 185 ];
+yy = 100;
+xdig = .2*[11 20 nan; 111 120 nan; 0 9 nan; 100 109 nan; 30 110 nan; 20 100 nan; 10 90 nan]';
+ydig = .2*[110 190 nan; 110 190 nan; 10 90 nan; 10 90 nan; 200 200 nan; 100 100 nan; 0 0 nan]';
+idig = { 6 [ 1 3 5 6 7 ] [ 1 4 ] [ 1 3 ] [ 3 5 7 ] [ 2 3 ] 2 [ 1 3 6 7 ] [] 3 };
+for j = 1:3
+for i = 1:10
+  ii = 1:7;
+  ii(idig{i}) = [];
+  x = xx(j) + xdig(:,ii);
+  y = yy + ydig(:,ii);
+  hclk(j,i) = plot( x(:), y(:), 'r-', 'LineWidth', scl*3 );
+  hold on
+end
+end
+hcolon = plot( [ 136 138 ], [ 112 128 ], 'rs', 'MarkerSize', scl*3, 'MarkerFace', 'r', 'MarkerEdgeColor', 'none' );
 x = 1000 * res(1) / res(2);
 y = 1000;
 axis( [ 0 x 0 y ] )
 axis off
 
-%return
-set( [ hover hclk(1:2) ], 'Visible', 'off' )
+if exist( 'basemap.png', 'file' ), return, end
+set( [ hover hclk(:)' hcolon ], 'Visible', 'off' )
 basemap = snap( '', dpi*aa, 1 );
 imwrite( uint8( basemap ), 'basemap.png' )
-set( [ hmap hclk ], 'Visible', 'off' )
+set( hmap, 'Visible', 'off' )
 set( hover, 'Visible', 'on' )
 overlay = snap( '', dpi*aa, 1 );
 set( htxtb, 'Color', fg )
@@ -173,6 +165,6 @@ alpha = alpha(:,:,1);
 imwrite( uint8( overlay ), 'overlay.png', 'Alpha', alpha )
 set( htxtb, 'Color', bg )
 set( hdots, 'MarkerEdgeColor', bg )
-set( [ hmap hclk ], 'Visible', 'on' )
+set( [ hmap hclk(:)' hcolon ], 'Visible', 'on' )
 clear all
 
