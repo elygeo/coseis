@@ -381,7 +381,7 @@ l1 = lf0
 l2 = lf0 + nf3
 
 inquire( iolength=i ) t
-open( 1, file='ts-ts1.f32', recl=i, form='unformatted', access='direct', status='old' )
+open( 1, file='ts1-ts22.f32', recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
 if ( endian /= endian0 ) then

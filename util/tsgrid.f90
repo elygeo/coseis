@@ -22,7 +22,7 @@ ell = (/ 600, 300 /) * 1000
 
 ! Cell centered mesh for SCECVM input
 n = nint( ell / dx )
-allocate( x(n(1),n(2),1,3) )
+allocate( x(n(1),n(2),1,3), t(960,780) )
 forall( i=1:n(1) ) x(i,:,:,1) = dx * ( i - 1 ) + .5 * dx
 forall( i=1:n(2) ) x(:,i,:,2) = dx * ( i - 1 ) + .5 * dx
 call ts2ll( x, 1, 2 )

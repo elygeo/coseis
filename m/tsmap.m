@@ -1,4 +1,4 @@
-% SAF surface movie
+% TeraShake region map
 
 clear all
 clf
@@ -7,16 +7,13 @@ drawnow
 bg = [ .1 .1 .1 ];
 fg = [ 1 1 1 ];
 
-render = 1;
+render = 0;
 ppi = 72;
 zoom = 5.71;
 theta = 0;  phi = 40;
 theta = 40; phi = 0;
-aa = 3; dpi = 72;  scl = 1.0; res = [ 1280 720 ]; % 720p
-aa = 3; dpi = 72;  scl = 1.0; res = [  848 480 ]; % 480p
-aa = 3; dpi = 72;  scl = 1.0; res = [ 1024 576 ]; % Projector
-aa = 3; dpi = 144; scl = 0.8; res = [  750 375 ]; % 1500x750
 aa = 3; dpi = 288; scl = 0.7; res = [  750 375 ]; % 3000x1500
+aa = 3; dpi = 72;  scl = 1.0; res = [ 1024 576 ]; % Projector
 aa = 3; dpi = 72;  scl = 1.0; res = [  960 540 ]; % 540p
 aa = 3; dpi = 144; scl = 1.0; res = [  960 540 ]; % 1080p
 
@@ -90,9 +87,9 @@ caxis( 4000 * [ -1 1 ] )
 [ x, y, z ] = textread( 'ca_roads.xyz', '%n%n%n%*[^\n]' ); hmap(end+1) = plot3( x, y, z-1000, 'Color', [ .6 .6 .6 ] );
 [ x, y, z ] = textread( 'borders.xyz',  '%n%n%n%*[^\n]' ); hmap(end+1) = plot3( x, y, z );
 [ x, y, z ] = textread( 'coast.xyz',    '%n%n%n%*[^\n]' ); hmap(end+1) = plot3( x, y, z );
-%[ x, y ] = textread( 'puente-hills.xy',  '%n%n%*[^\n]' ); plot3( x, y, 4000 + zeros( size( x ) ) );
-%[ x, y, z ] = textread( 'sosafe.xyz',  '%n%n%n%*[^\n]' );
-[ x, y, z ] = textread( 'fault.xyz',    '%n%n%n%*[^\n]' );
+%[ x, y, z ] = textread( 'fault-ph.xy',  '%n%n%n%*[^\n]' );
+%[ x, y, z ] = textread( 'fault-ts.xyz', '%n%n%n%*[^\n]' );
+[ x, y, z ] = textread( 'fault-so.xyz', '%n%n%n%*[^\n]' );
 hmap(end+1) = plot3( x, y, z+2000, '-',  'LineW', 3*scl,   'Color', bg );
 hmap(end+1) = plot3( x, y, z+3000, '--', 'LineW', 2*scl, 'Color', fg );
 end 
@@ -151,7 +148,7 @@ y = 1000;
 axis( [ 0 x 0 y ] )
 axis off
 
-if exist( 'basemap.png', 'file' ), return, end
+if render
 set( [ hover hclk(:)' hcolon ], 'Visible', 'off' )
 basemap = snap( '', dpi*aa, 1 );
 imwrite( uint8( basemap ), 'basemap.png' )
@@ -167,4 +164,5 @@ set( htxtb, 'Color', bg )
 set( hdots, 'MarkerEdgeColor', bg )
 set( [ hmap hclk(:)' hcolon ], 'Visible', 'on' )
 clear all
+end
 
