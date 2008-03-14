@@ -4,7 +4,7 @@
 clear all
 
 file = 'overlay-sdsu.png'; t2 = 'SDSU/SDSC'; t1 = '';
-file = 'overlay-cmu.png'; t2 = 'CMU/PCS'; t1 = 'SCEC ShakeOut Simulations';
+file = 'overlay-cmu.png'; t2 = 'CMU/PSC'; t1 = 'SCEC ShakeOut Simulations';
 file = 'overlay-urs.png'; t2 = 'URS/USC'; t1 = '';
 render = 1;
 aa = 1;
