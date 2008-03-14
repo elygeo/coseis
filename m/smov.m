@@ -17,14 +17,16 @@ if ~exist( '/tmp/gely/tmp', 'dir' ), mkdir /tmp/gely/tmp, end
 meta
 
 % Parameters
-xzone = 13; fzone = 18; squared = 1; node = 1;
-xzone = 0;  fzone = 1;  squared = 0; node = 0;
-xzone = 2;  fzone = 1;  squared = 0; node = 0;
-flim = [ 0 1 ];
+xzone = 0;  fzone = 1;  squared = 0; node = 0; flim = [ 0 1 ]; alim = [ .04 .06 ];
+xzone = 13; fzone = 18; squared = 1; node = 1; flim = [ 0 1 ]; alim = [ .04 .06 ];
+xzone = 2;  fzone = 1;  squared = 0; node = 0; flim = [ 0 1 ]; alim = [ .04 .06 ];
+xzone = 2;  fzone = 1;  squared = 0; node = 1; flim = [ 0 100 ]; alim = [ 4 6 ];
 dit =  out{fzone}{3};
 i1 = [ out{fzone}{4:7} ];
 i2 = [ out{fzone}{8:11} ];
 its = i1(4):dit:i2(4);
+its = 4;
+its = 3000;
 
 % Surface
 axes( haxes(1) )
@@ -36,6 +38,9 @@ else
   [ x, x2 ] = ndgrid( 0:dx:dx*nn(1), 0:dx:dx*nn(2) );
   x(:,:,2) = x2;
   clear x2
+end
+if node == -1
+  x = upsamp( x );
 end
 if node
   x(end+1,:,:) = x(end,:,:);
@@ -76,6 +81,7 @@ image( x(3:4) + 60, y + 100, sdsu );
 image( x(4:5) + 80, y + 100, scec );
 end
 
+fid = fopen( 'vh', 'r', endian );
 % Time loop
 for it = its
 file = sprintf( 'tmp/f%05d.png', it );
@@ -86,12 +92,17 @@ m = floor( t / 60 );
 s10 = floor( mod( t, 60 ) / 10 );
 s1 = floor( mod( t, 10 ) );
 set( hclk, 'Visible', 'off' )
-set( [ hclk(1,m+1) hclk(2,s10+1) hclk(3,s1+1) ], 'Visible', 'on' )
-s = read4d( fzone, it );
+set( [ hclk(1,m+1) hclk(2,s10+1) hclk(3,s1+1) hclk(1,11) ], 'Visible', 'on' )
+%s = read4d( fzone, it );
+fseek( fid, 60 + 4 * nn(1) * nn(2) * ( it / dit - 1 ), 'bof' );
+s = fread( fid, nn(1:2), 'float32' );
 if isempty( s ), error, end 
 if size( s, 5 ) > 1, s = sqrt( sum( s .* s, 5 ) ); end
 if squared, s = sqrt( s ); end
-z = s;
+if node == -1
+  s = upsamp( s );
+end
+z = s ./ flim(2);
 z(end+1,:) = z(end,:);
 z(:,end+1) = z(:,end);
 z(2:end-1,:) = .5 * ( z(1:end-2,:) + z(2:end-1,:) );
@@ -99,13 +110,16 @@ z(:,2:end-1) = .5 * ( z(:,1:end-2) + z(:,2:end-1) );
 set( hsurf, 'CData', s )
 set( hsurf, 'ZData', 2000 * z - 4000 )
 set( hlit, 'Visible', 'on' )
+set( hclk, 'Color', 'r', 'MarkerFaceColor', 'r' )
 colorscheme( 'hot', .25 )
 caxis( haxes(1), flim )
 img = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
 set( hlit, 'Visible', 'off' )
+set( hclk, 'Color', 'w', 'MarkerFaceColor', 'w' )
 colorscheme( 'kw1' )
-caxis( haxes(1), [ .04 .06 ] )
+caxis( haxes(1), alim )
 w = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
+%imwrite( uint8( img ), 'tmp/img.png', 'Alpha', w / 255 )
 w = alpha .* w(:,:,1) ./ 255;
 for i = 1:3
   img(:,:,i) = ( 1 - w ) .* basemap(:,:,i) + w .* img(:,:,i) + overlay(:,:,i);

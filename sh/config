@@ -88,7 +88,7 @@ fi
 # Machine attributes
 maxnodes=1; maxcpus=1; maxram=800; maxmm=0; rate=500
 case $machine in
-  wide)                     maxcpus=2;  maxram=1800 ;;
+  wide)                     maxcpus=2;  maxram=3800 ;;
   kim)                      maxcpus=2;  maxram=800  ;;
   phim)                                 maxram=2800;   rate=400 ;;
   altai)                    maxcpus=8;  maxram=30000;  rate=100 ;;

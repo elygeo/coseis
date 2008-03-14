@@ -2,6 +2,9 @@
 
 program main
 implicit none
+real, parameter :: &
+  dtnative = 0.0055, &
+  dt = 0.1
 integer, parameter :: &
   n1 = 3000, &
   n2 = 1500, &
