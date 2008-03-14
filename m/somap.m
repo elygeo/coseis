@@ -2,14 +2,20 @@
 
 clear all
 
-bb = 4;
-dpi = 144; scl = 1.0; theta = 90; res = [ 320+bb 540 ]; % 1080p
-dpi = 72;  scl = 1.0; theta = 90; res = [ 320+bb 540 ]; % 540p
-render = 0;
+file = 'overlay-cmu.png'; run = 'CMU';
+file = 'overlay-rg.png';  run = 'Graves';
+file = 'overlay-kbo.png'; run = 'Olsen';
+file = 'overlay.png';     run = 'ShakeOut';
+aa = 3;
+aa = 1;
+dpi = 72;
+scl = 1.0;
+theta = 90;
+res = [ 320 540 ];
+render = 1;
 ppi = 72;
 phi = 0;
 zoom = 5.73;
-aa = 1;
 bg = [ .1 .1 .1 ];
 fg = [ 1 1 1 ];
 
@@ -51,8 +57,7 @@ n = [ 960 780 ];
 fid = fopen( 'topo1.f32', 'r' ); x(:,:,1) = fread( fid, n, 'float32' ); fclose( fid );
 fid = fopen( 'topo2.f32', 'r' ); x(:,:,2) = fread( fid, n, 'float32' ); fclose( fid );
 fid = fopen( 'topo3.f32', 'r' ); x(:,:,3) = fread( fid, n, 'float32' ); fclose( fid );
-xx = x;
-%xx = upsample( x );
+xx = upsamp( x );
 c = xx(:,:,3);
 c(xx(:,:,2)>102000) = max( 10., c(xx(:,:,2)>102000) );
 c = .25 * ...
@@ -109,11 +114,11 @@ txt = sites(:,6);
 hdots = plot3( x, y, z + 4000, 'o', 'MarkerSize', 5*scl );
 htxt = [];
 for i = 1:length(x)
-  dy = 1400;
-  if strcmp( ver{i}, 'top' ), dy = -1400; end
+  dy = 2200;
+  if strcmp( ver{i}, 'top' ), dy = -2200; end
   htxt(end+1) = text( x(i), y(i)+dy, z(i)+9000, txt{i}, 'Ver', ver{i}, 'Hor', hor{i}, 'Rot', phi );
 end
-htxtb = pmb( htxt, 400, 400 );
+htxtb = pmb( htxt, 500, 500 );
 set( htxtb, 'Color', bg );
 hover = [ hdots htxt htxtb ];
 
@@ -121,11 +126,13 @@ hover = [ hdots htxt htxtb ];
 haxes(2) = axes( 'Position', [ 0 0 1 1 ] );
 xl = 300;
 yl = 600;
-htitle = text( 6, 6, 'ShakeOut', 'Hor', 'left', 'Ver', 'baseline', 'FontSize', 20, 'FontWeight', 'normal' );
+hhud = patch( [ 0 0 300 300 0 ], [ 0 32 32 0 0 ], [ 0 0 0 0 0 ] );
+set( hhud, 'FaceColor', 'k' )
+htitle = text( 6, 6, run, 'Hor', 'left', 'Ver', 'baseline', 'FontSize', 20, 'FontWeight', 'normal' );
 hold on
 axis( [ 0 xl 0 yl ] )
 s =  .08;
-xx = 110 + s * [ 0 200 350 ];
+xx = 125 + s * [ 0 200 350 ];
 yy = 7;
 xdig = s*[11 20 nan; 111 120 nan; 0 9 nan; 100 109 nan; 30 110 nan; 20 100 nan; 10 90 nan]';
 ydig = s*[110 190 nan; 110 190 nan; 10 90 nan; 10 90 nan; 200 200 nan; 100 100 nan; 0 0 nan]';
@@ -153,9 +160,10 @@ set( hmap, 'Visible', 'off' )
 set( hover, 'Visible', 'on' )
 colorscheme( 'hot', .25 )
 overlay = snap( '', dpi*aa, 1 );
-alpha = snap( '', dpi*aa, 1 );
-alpha = sum( alpha, 3 );
-imwrite( uint8( overlay ), 'overlay.png', 'Alpha', alpha )
+alpha = sum( overlay, 3 );
+alpha([1 end],:) = 1;
+alpha(:,[1 end]) = 1;
+imwrite( uint8( overlay ), file, 'Alpha', alpha )
 set( [ hmap hclk(:)' ], 'Visible', 'on' )
 clear all
 end
