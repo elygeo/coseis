@@ -17,7 +17,7 @@ xzone = 2;  fzone = 1;  squared = 0; node = 0; flim = [ 0 1 ]; alim = [ .04 .06 
 dit =  out{fzone}{3};
 i1 = [ out{fzone}{4:7} ];
 i2 = [ out{fzone}{8:11} ];
-its = 1000;
+its = 900;
 its = i1(4):dit:i2(4);
 
 % Surface
