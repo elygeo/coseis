@@ -3,10 +3,10 @@
 
 clear all
 
-file = 'overlay-sdsu.png'; t2 = 'SDSU/SDSC'; t1 = '';
 file = 'overlay-cmu.png'; t2 = 'CMU/PSC'; t1 = 'SCEC ShakeOut Simulations';
+file = 'overlay-sdsu.png'; t2 = 'SDSU/SDSC'; t1 = '';
 file = 'overlay-urs.png'; t2 = 'URS/USC'; t1 = '';
-render = 1;
+render = 0;
 aa = 1;
 aa = 3;
 dpi = 72;
@@ -160,7 +160,6 @@ basemap = snap( '', dpi*aa, 1 );
 imwrite( uint8( basemap ), 'basemap.png' )
 set( hmap, 'Visible', 'off' )
 set( hover, 'Visible', 'on' )
-set( hclk, 'Visible', 'on' ), 11111111111
 colorscheme( 'hot', .25 )
 overlay = snap( '', dpi*aa, 1 );
 alpha = sum( overlay, 3 );
