@@ -9,7 +9,7 @@ if nargin > 1, dx  = varargin{2}; end
 if nargin > 2, dy  = varargin{3}; end
 if nargin > 3, dim = varargin{4}; end
 
-l = abs( dim );
+l = mod( abs( dim ) + 2, 3 ) + 1;
 j = mod( l, 3 ) + 1;
 k = mod( l + 1, 3 ) + 1;
 

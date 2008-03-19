@@ -3,10 +3,10 @@
 
 clear all
 
-file = 'overlay.cmu.png'; t2 = 'CMU/PSC'; t1 = 'SCEC ShakeOut Simulations';
-file = 'overlay.sdsu.png'; t2 = 'SDSU/SDSC'; t1 = '';
-file = 'overlay.urs.png'; t2 = 'URS/USC'; t1 = '';
 render = 0;
+file = 'overlay.urs.png'; t2 = 'URS/USC'; t1 = '';
+file = 'overlay.sdsu.png'; t2 = 'SDSU/SDSC'; t1 = '';
+file = 'overlay.cmu.png'; t2 = 'CMU/PSC'; t1 = 'SCEC ShakeOut Simulations';
 aa = 1;
 aa = 3;
 dpi = 72;
@@ -18,6 +18,8 @@ phi = 0;
 zoom = 5.73;
 bg = [ .1 .1 .1 ];
 fg = [ 1 1 1 ];
+flim = [ 0 1 ];
+alim = [ 0.04 0.06 ];
 
 clf
 drawnow
@@ -114,9 +116,9 @@ txt = sites(:,6);
 hdots = plot3( x, y, z + 4000, 'o', 'MarkerSize', 5*scl );
 htxt = [];
 for i = 1:length(x)
-  dy = 2600;
-  if strcmp( ver{i}, 'top' ), dy = -2600; end
-  htxt(end+1) = text( x(i), y(i)+dy, z(i)+9000, txt{i}, 'Ver', ver{i}, 'Hor', hor{i}, 'Rot', phi );
+  dx = -1600;
+  if strcmp( ver{i}, 'top' ), dx = 1600; end
+  htxt(end+1) = text( x(i)+dx, y(i), z(i)+9000, txt{i}, 'Ver', ver{i}, 'Hor', hor{i}, 'Rot', phi );
 end
 htxtb = pmb( htxt, 500, 500 );
 set( htxtb, 'Color', bg );
@@ -130,27 +132,13 @@ yl = 600;
 hhud = patch( [ 0 0 xl xl 0 ], [ 0 31 31 0 0 ], [ 0 0 0 0 0 ] );
 set( hhud, 'FaceColor', 'k' )
 htitle = text( 150, yl-1, t1, 'Hor', 'center', 'Ver', 'top', 'FontSize', 20, 'FontWeight', 'normal' );
-htitle = text( 112, 7, t2, 'Hor', 'center', 'Ver', 'baseline', 'FontSize', 20, 'FontWeight', 'normal' );
+htitle(2) = text( 112, 7, t2, 'Hor', 'center', 'Ver', 'baseline', 'FontSize', 20, 'FontWeight', 'normal' );
 hold on
 axis( [ 0 xl 0 yl ] )
-s =  .08;
-xx = 7 + s * [ 0 200 350 ];
-yy = 7;
-xdig = s*[11 20 nan; 111 120 nan; 0 9 nan; 100 109 nan; 30 110 nan; 20 100 nan; 10 90 nan]';
-ydig = s*[110 190 nan; 110 190 nan; 10 90 nan; 10 90 nan; 200 200 nan; 100 100 nan; 0 0 nan]';
-idig = { 6 [ 1 3 5 6 7 ] [ 1 4 ] [ 1 3 ] [ 3 5 7 ] [ 2 3 ] 2 [ 1 3 6 7 ] [] 3 };
-for j = 1:3
-for i = 1:10
-  ii = 1:7;
-  ii(idig{i}) = [];
-  x = xx(j) + xdig(:,ii);
-  y = yy + ydig(:,ii);
-  hclk(j,i) = plot( x(:), y(:), 'g-', 'LineWidth', scl*s*20 );
-  hold on
-end
-end
-hclk(:,11) = plot( xx(1) + s * [ 155 165 ], yy + s * [ 50 150 ], 'gs', 'MarkerSize', scl*3, 'MarkerFace', 'g', 'MarkerEdgeColor', 'none' );
-[ h1, h2 ] = colorscale( 'cm/s', 235 + [ -50 50 ], 23 + [ -3 3 ], [ 0.05 1 ], 'b', '5', '100' );
+hclk = digitalclock( 7, 7, 16 );
+x = 235 + [ -50 50 ];
+y = 23 + [ -3 3 ];
+[ h1, h2 ] = colorscale( '0.525', x, y, [ 0.05 1 ], 'b', '0.05', '1 m/s' );
 axis off
 hover = [ hover htitle h1 h2 ];
 
