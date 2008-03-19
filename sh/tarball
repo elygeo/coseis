@@ -5,7 +5,6 @@ base=$( basename "$dir" )
 version=$( date +%Y%m%d%H%M%S )
 
 s=""
-g=""
 while getopts sg opt; do eval "$opt=y"; done
 
 cat << END > versionmeta.m
@@ -33,9 +32,14 @@ cd $( dirname "$dir" )
 tar cf - $files | gzip > "$dir/tmp/$base.tgz"
 cd "$dir"
 
-mkdir -p save/good
-[ "$g" -o "$s" ] && cp "tmp/$base.tgz" "save/$base-$version.tgz"
-[ "$g" ]         && cp "tmp/$base.tgz" "save/good/$base-$version.tgz"
+if [ "$s" ]; then
+  mkdir -p save
+  if ls "save/${base}-*.tgz" &> /dev/null; then
+     mkdir -p save/old
+     mv "save/${base}-*.tgz" "save/old/"
+  fi
+  cp "tmp/$base.tgz" "save/$base-$version.tgz"
+fi
 
 exit 0
 

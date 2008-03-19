@@ -2,8 +2,8 @@
 
 clear all
 
-render = 1;
 render = 0;
+render = 1;
 runs = {
   'CMU/PSC'   'overlay.cmu.png'
   'SDSU/SDSC' 'overlay.sdsu.png'
@@ -14,7 +14,8 @@ ce = .2;
 as = 'wk1';
 ae = .5;
 atran = [ 1 -1 ];
-flim = [ .04 2 ]; alim = [ .02 .03 ];
+flim = [ .04 2 ];
+alim = [ .02 .03 ];
 inches = [ 2 4.3 ];
 ppi = 150;
 dpi = 600; aa = 1;
@@ -116,7 +117,7 @@ xl = 300;
 yl = xl * inches(2) / inches(1);
 haxes(2) = axes( 'Position', [ 0 0 1 1 ] );
 htitle = text( 150, yl-1, 'Title', 'Hor', 'center', 'Ver', 'top' );
-x = 200 + [ -75 75 ];
+x = 175 + [ -100 100 ];
 y = 26 + [ -3 3 ];
 caxis( flim )
 colorscale( '1', x, y, [ 0 2 ], 'b', '0', '2 m/s' )
