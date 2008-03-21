@@ -32,14 +32,8 @@ cd $( dirname "$dir" )
 tar cf - $files | gzip > "$dir/tmp/$base.tgz"
 cd "$dir"
 
-if [ "$s" ]; then
-  mkdir -p save
-  if ls "save/${base}-*.tgz" &> /dev/null; then
-     mkdir -p save/old
-     mv "save/${base}-*.tgz" "save/old/"
-  fi
-  cp "tmp/$base.tgz" "save/$base-$version.tgz"
-fi
+mkdir -p save
+[ "$s" ] && cp "tmp/$base.tgz" "save/$base-$version.tgz"
 
 exit 0
 

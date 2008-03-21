@@ -110,7 +110,10 @@ colorscheme( as, ae )
 caxis( haxes(1), alim )
 alpha = snap( [ '/tmp/gely/' file ], dpi*aa, 1 );
 alpha = atran(1) + atran(2) / 765 * sum( alpha, 3 );
-imwrite( uint8( img ), file, 'Alpha', alpha )
+imwrite( uint8( img ), file, 'Alpha', alpha, ...
+  'XResolution', dpi / 0.0254, ...
+  'YResolution', dpi / 0.0254, ...
+  'ResolutionUnit', 'meter' )
 system( [ 'rmdir ' file '.lock' ] );
 end
 end

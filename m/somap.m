@@ -1,13 +1,21 @@
-% TeraShake base map
-% montage -geometry 960+0+0 1.png 2.png 3.png shakeout.png
+% ShakeOut base map
 
 clear all
 
 render = 0;
-file = 'overlay.urs.png'; t2 = 'URS/USC'; t1 = '';
-file = 'overlay.sdsu.png'; t2 = 'SDSU/SDSC'; t1 = '';
-file = 'overlay.cmu.png'; t2 = 'CMU/PSC'; t1 = 'SCEC ShakeOut Simulations';
-aa = 1;
+runs = {
+  'CMU/PSC'   'overlay.cmu.png' ''
+  'SDSU/SDSC' 'overlay.sdsu.png' 'SCEC ShakeOut Simulations'
+  'URS/USC'   'overlay.urs.png' ''
+};
+runs = { 'CMU/PSC'   'overlay.cmu.png' };
+cs = 'hot';
+ce = .2;
+as = 'wk1';
+ae = .5;
+atran = [ 1 -1 ];
+flim = [ .04   2 ];
+alim = [ .02 .03 ];
 aa = 3;
 dpi = 72;
 scl = 1.0;
@@ -32,8 +40,8 @@ set( gcf, ...
   'Color', 'k', ...
   'DefaultTextColor', fg, ...
   'DefaultTextFontWeight', 'bold', ...
-  'DefaultTextFontSize', 12*scl, ...
-  'DefaultLineLinewidth', .75*scl, ...
+  'DefaultTextFontSize', scl * 12, ...
+  'DefaultLineLinewidth', scl * 0.75, ...
   'DefaultLineMarkerEdgeColor', bg, ...
   'DefaultLineMarkerFaceColor', fg, ...
   'DefaultAxesColorOrder', bg, ...
@@ -79,14 +87,11 @@ set( hmap, ...
   'SpecularColorReflectance', 1, ...
   'EdgeLighting', 'none', ...
   'FaceLighting', 'phong' );
-%set( hmap(end), 'FaceLighting', 'none' )
 hlit = camlight;
 caxis( 4000 * [ -1 1 ] )
 [ x, y, z ] = textread( 'ca_roads.xyz', '%n%n%n%*[^\n]' ); hmap(end+1) = plot3( x, y, z-1000, 'Color', [ .6 .6 .6 ] );
 [ x, y, z ] = textread( 'borders.xyz',  '%n%n%n%*[^\n]' ); hmap(end+1) = plot3( x, y, z );
 [ x, y, z ] = textread( 'coast.xyz',    '%n%n%n%*[^\n]' ); hmap(end+1) = plot3( x, y, z );
-%[ x, y, z ] = textread( 'fault-ph.xy',  '%n%n%n%*[^\n]' );
-%[ x, y, z ] = textread( 'fault-ts.xyz', '%n%n%n%*[^\n]' );
 [ x, y, z ] = textread( 'fault-so.xyz', '%n%n%n%*[^\n]' );
 hmap(end+1) = plot3( x, y, z+2000, '-',  'LineW', 3*scl,   'Color', bg );
 hmap(end+1) = plot3( x, y, z+3000, '--', 'LineW', 2*scl, 'Color', fg );
@@ -106,7 +111,6 @@ sites = {
   402013  69548  23 'top'    'center' 'San Diego'
   501570  31135  24 'bottom' 'left'   'Ensenada'
 };
-% 278097 115102  36 'top'    'center' 'Santa Ana'
 x = [ sites{:,1} ];
 y = [ sites{:,2} ];
 z = [ sites{:,3} ];
