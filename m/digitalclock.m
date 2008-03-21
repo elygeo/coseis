@@ -19,7 +19,7 @@ for i = 1:10
   ii(idig{i}) = [];
   x = xx(j) + xdig(:,ii);
   y = yy + ydig(:,ii);
-  h(j,i) = plot( x(:), y(:), '-', 'LineWidth', .75, 'Color', c );
+  h(j,i) = plot( x(:), y(:), '-', 'LineWidth', 1, 'Color', c );
   hold on
 end
 end

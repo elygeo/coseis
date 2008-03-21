@@ -8,7 +8,7 @@ for dir in $PATH; do
 done
 
 for dir in $PATH; do
-for file in xlf95_r ifort pgf90 gfortran f95; do
+for file in xlf95_r gfortran ifort pgf90 f95; do
   if [ -x "$dir/$file" ]; then sfc="$file"; break 2; fi
 done
 done

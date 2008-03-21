@@ -3,9 +3,9 @@
 program main
 implicit none
 integer, parameter :: n1 = 6000, n2 = 3000, nt = 4545, nblock = 20, nskip = 10, ndec = 5
-real, parameter :: dt0 = 0.055, dt = 0.1, rr = 1. / ( ndec * ndec )
-integer :: i, j, k, jj, kk, io, it0 = 0, it = 0
-real :: v1(n1,n2), v2(n1,n2), vh(n1/ndec,n2/ndec), t = 0.
+real, parameter :: t0 = -0.73, dt0 = 0.055, dt = 0.1, rr = 1. / ( ndec * ndec )
+integer :: i, j, k, jj, kk, io, it0, it = 0
+real :: v1(n1,n2), v2(n1,n2), vh(n1/ndec,n2/ndec), t
 character(256) :: str
 
 inquire( iolength=io ) vh
@@ -13,8 +13,9 @@ open( 1, file='vh', recl=io, form='unformatted', access='direct', status='replac
 inquire( iolength=io ) v1
 do while ( it0 < nt )
   it = it + 1
-  t = dt * it
-  it0 = nint( t / dt0 )
+  t = dt * ( it - 1 )
+  it0 = nint( ( t - t0 ) / dt0 ) + 1
+  it0 = max( it0, 1 )
   print *, it, it0, t
   i = modulo( it0 - 1, nblock ) + 1
   write( str, '(a,i5.5)' ) 'SX96PS', ( ( it0 - 1 ) / nblock + 1 ) * nblock * nskip
