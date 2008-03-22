@@ -13,7 +13,7 @@ starttime=$(date)
 # -f       force recompile
 # -s       serial mode, no MPI (default if np == 1)
 # -p       parallel mode, requires MPI (default if np > 1)
-# -m opt   emulate alternate machine configuration, e.g. 'datastar'
+# -m opt   emulate alternative machine configuration, e.g. 'datastar'
 # -v opt   generate SAF mesh and SCEC-CVM, opt indicates version 3 or 4
 mode=guess
 optimize=O

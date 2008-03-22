@@ -6,11 +6,11 @@ logically rectangular hexahedral mesh, using the generalized finite difference
 method of support operators.  Stiffness and viscous hourglass corrections are
 employed to suppress suppress zero-energy grid oscillation modes.  The fault
 surface is modeled by coupled double nodes, where the strength of the coupling
-is determined by a linear a slip-weakening friction law.  Model edge boundaries
-may be reflective or absorbing, where absorbing boundaries are handled using
-the method of perfectly matched layers (PML).  SORD is written in Fortran 95
-and parallelized for multi-processor execution using Message Passing Interface
-(MPI).  
+is determined by a linear slip-weakening friction law.  External boundaries may
+be reflective or absorbing, where absorbing boundaries are handled using the
+method of perfectly matched layers (PML).  SORD is written in Fortran 95 and
+parallelized for multi-processor execution using Message Passing Interface
+(MPI).
 
 
 AUTHOR
@@ -96,10 +96,10 @@ script for examples.
 INPUT AND OUTPUT
 
 Input is specified in a restricted form of the MATLAB programming language.
-Large data, such as the material model are stored separately in floating-point
-binary files.  Annotated example input files are located in the 'in/'
-directory.  The input file 'defaults.m', that is read before any other input,
-contains a short description of each SORD parameter.
+Large data sets such as the material model are stored separately in
+floating-point binary files.  Annotated example input files are located in the
+'in/' directory.  The input file 'defaults.m', that is read before any other
+input, contains a short description of each SORD parameter.
 
 Output is saved in binary formant.  An associated metadata file 'meta.m',
 contains a summary of parameters for the run, and a structured description of

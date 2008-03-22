@@ -1,0 +1,44 @@
+#!/bin/bash -e
+
+opt="-geometry 320x540 -units PixelsPerInch -density 100"
+opt="-geometry +0+0 -units PixelsPerInch -density 300"
+i1=1; i2=2493
+i1=1; i2=1729
+i1=300; i2=1500
+i1=900; i2=900
+i1=2000; i2=2000
+panes="urs"
+panes="sdsu urs cmu"
+t="tif"
+
+if false; then
+for p in $panes; do
+  echo prep $p
+  convert $p/tmp/basemap.png tmp/basemap.$p.$t
+  convert $p/tmp/overlay.png tmp/overlay.$p.$t
+  convert tmp/basemap.$p.tif tmp/overlay.$p.$t -composite tmp/blank.$p.$t
+done
+fi
+
+for (( ii=i1; ii<=i2; ii=ii+i1 )); do
+  f=$( echo "$ii" | awk '{ printf "f%05d", $1 }' )
+  if [ ! -f tmp/$f.png ]; then
+  if mkdir tmp/$f.lock >& /dev/null; then
+    unset new conv
+    for p in $panes; do
+      if [ -f $p/tmp/$f.png ]; then
+        new=yes
+        conv="$conv ( tmp/basemap.$p.tif $p/tmp/$f.png -composite tmp/overlay.$p.tif -composite )"
+      else
+        conv="$conv tmp/blank.$p.$t"
+      fi
+    done
+    if [ "$new" ]; then
+      echo $f
+      convert $conv $opt +append tmp/$f.png
+    fi
+    rmdir tmp/$f.lock
+  fi
+  fi
+done
+

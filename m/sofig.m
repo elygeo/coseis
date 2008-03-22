@@ -1,8 +1,6 @@
 % ShakeOut figure
 
 clear all
-mov = 0; bg = 'w'; fg = 'k'; clockcolor = 'k'; atran = [ 1 -1 ]; dpi = 600;
-mov = 1; bg = 'k'; fg = 'w'; clockcolor = 'g'; atran = [ 0  1 ]; dpi = 300;
 xzone = 0;  fzone = 1;  squared = 0; % TeraShake
 xzone = 13; fzone = 18; squared = 1; % SORD
 xzone = 2;  fzone = 1;  squared = 0; % ShakeOut
@@ -13,11 +11,11 @@ meta
 dit =  out{fzone}{3};
 i1 = [ out{fzone}{4:7} ];
 i2 = [ out{fzone}{8:11} ];
-node = all( nn(1:2) == i2(1:2) - i1(1:2) + 1 );
-its = 300:300:1500;
 its = 900;
-its = i1(4):dit:i2(4);
+bg = 'w'; fg = 'k'; clk = 'k'; atran = [ 1 -1 ]; its = 300:300:1500;
+bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = i1(4):dit:i2(4)-itoff;
 
+panes = { 'SDSU/SDSC' 'URS/USC' 'CMU/PSC' };
 flim = [ .07   2 ];
 alim = [ .03 .05 ];
 shadow = [ .1 .1 .1 ];
@@ -27,11 +25,11 @@ as = [ bg fg '1' ];
 ce = .5;
 ae = 1;
 inches = [ 3.2 5.4 ];
-ppi = 150;
+dpi = 300;
+ppi = 100;
 
 % Setup
 if ~exist( 'tmp', 'dir' ), mkdir tmp, end
-if ~exist( '/tmp/gely/tmp', 'dir' ), mkdir /tmp/gely/tmp, end
 clf
 drawnow
 colorscheme( ms, .4 )
@@ -42,20 +40,19 @@ set( gcf, ...
   'PaperPosition', [ 0 0 inches ], ...
   'DefaultAxesColor', 'none', ...
   'DefaultAxesColorOrder', [ 0 0 0 ], ...
-  'DefaultTextFontSize', 10, ...
+  'DefaultTextFontSize', 8, ...
+  'DefaultTextFontWeight', 'bold', ...
   'DefaultTextHorizontalAlignment', 'center', ...
   'DefaultTextVerticalAlignment', 'middle' )
-haxes(2) = axes( 'Position', [ .005 .005 .99 .99 ] );
+haxes(2) = axes( 'Position', [ .005 .003 .99 .994 ] );
 axis off
 hold on
-xl = 300;
-yl = xl * inches(2) / inches(1);
-axis( [ .01 xl .98 yl ] )
-haxes(1) = axes( 'Position', [ .005 .04 .99 .94 ] );
+axis( 100 * [ 0 inches(1) 0 inches(2) ] )
+haxes(1) = axes( 'Position', [ .005 .013 .99 .984 ] );
 axis off
 hold on
 axis equal
-axis( 1000 * [ 0 300 50 510 -80 80 ] )
+axis( 1000 * [ 0 290 60 510 -80 80 ] )
 axis ij
 
 % Basemap
@@ -95,7 +92,7 @@ plot( x, y, 'LineWidth', .2, 'Color', [ .6 .6 .6 ] );
 [ y, x, z ] = textread( 'fault-so.xyz', '%n%n%n%*[^\n]' );
 plot( x, y, '-',  'Color', shadow,  'LineWidth', 2.5 );
 plot( x, y, '--', 'Color', 'w', 'LineWidth', 1.5 );
-img = snap( [ '/tmp/gely/' file ], dpi, 1 );
+img = snap( file, dpi, 1 );
 imwrite( uint8( img ), file, ...
   'XResolution', dpi / 0.0254, ...
   'YResolution', dpi / 0.0254, ...
@@ -110,49 +107,51 @@ x = xlim; x = x([ 1 1 2 2 1]);
 y = ylim; y = y([ 1 2 2 1 1]);
 plot( x, y, 'Clipping', 'off' );
 sites = {
-   82188 188340 129 'bottom' 'center' 'Bakersfield'
-   99691  67008  21 'bottom' 'center' 'Santa Barbara'
-  152641  77599  16 'bottom' 'right'  'Oxnard'
+   82188 188340 129 'top'    'center' 'Bakersfield'
+   99691  67008  21 'top'    'center' 'Santa Barbara'
+  152641  77599  16 'top'    'right'  'Oxnard'
   191871 180946 714 'bottom' 'left'   'Lancaster'
   229657 119310 107 'bottom' 'right'  'Los Angeles'
   263052 216515 831 'bottom' 'left'   'Victorville'
-  268435 120029  47 'bottom' 'right'  'Anaheim'
+  268435 120029  47 'top'    'right'  'Anaheim'
   293537 180173 327 'top'    'right'  'San Bernardino'
-  366020 200821 140 'bottom' 'right'  'Palm Springs'
+  366020 200821 140 'top'    'right'  'Palm Springs'
   402013  69548  23 'top'    'center' 'San Diego'
+  501570  31135  24 'bottom' 'left'   'Ensenada'
 };
 x = [ sites{:,2} ];
 y = [ sites{:,1} ];
 ver = sites(:,4);
 hor = sites(:,5);
 txt = sites(:,6);
-hdots = plot( x, y, 'o', 'MarkerSize', 3.5, 'LineWidth', .75 );
+hdots = plot( x, y, 'o', 'MarkerSize', 3.2, 'LineWidth', .5 );
 htxtf = [];
 for i = 1:length(x)
   dy = -1600;
   if strcmp( ver{i}, 'top' ), dy = 1600; end
   htxtf(end+1) = text( x(i), y(i)+dy, 10, txt{i}, 'Ver', ver{i}, 'Hor', hor{i} );
 end
-set( htxtf, 'FontWeight', 'bold', 'FontSize', 9 );
-htxtb = pmb( htxtf, 800, 800 );
-
+htxtb = pmb( htxtf, 500, 500 );
 axes( haxes(2) )
-htitle = text( 150, yl, name, 'Hor', 'center', 'Ver', 'top' );
-x = 175 + [ -100 100 ];
-y = 22 + [ -3 3 ];
-caxis( flim )
+h = text( 125, 12, name );
+if strcmp( name, panes{2} )
+  h(2) = text( 160, 531, 'SCEC ShakeOut Simulations' );
+end
+set( h, 'FontSize', 12, 'FontWeight', 'normal' )
+x = 250 + [ -40 40 ];
+y = 18 + [ -2.5 2.5 ];
 h = colorscale( '1', x, y, [ alim(2) flim(2) ], 'b', num2str(alim(2)), '2 m/s' );
-if mov, set( h(2), 'Visible', 'off' ), end
+caxis( flim )
 axis off
 colorscheme( as, ae )
 caxis( haxes(2), alim )
-alpha = snap( '', dpi, 1 );
+alpha = snap( file, dpi, 1 );
 colorscheme( cs, ce )
 set( hdots, 'MarkerFaceColor', 'w', 'MarkerEdgeColor', shadow )
 set( htxtf, 'Color', 'w' )
 set( htxtb, 'Color', shadow )
 caxis( haxes(2), flim )
-img = snap( '', dpi, 1 );
+img = snap( file, dpi, 1 );
 alpha = atran(1) + atran(2) / 765 * sum( alpha, 3 );
 imwrite( uint8( img ), file, 'Alpha', alpha, ...
   'XResolution', dpi / 0.0254, ...
@@ -166,13 +165,14 @@ end
 axes( haxes(1) )
 if xzone
   x = read4d( xzone, [ 0 0 -1 0 ] );
-  if isempty( x ), error, end
+  if isempty( x ), error 'no x data found', end
   x = squeeze( x );
 else
   [ x, x2 ] = ndgrid( 0:dx:dx*nn(1), 0:dx:dx*nn(2) );
   x(:,:,2) = x2;
   clear x2
 end
+node = all( nn(1:2) == i2(1:2) - i1(1:2) + 1 );
 if node
   x(end+1,:,:) = x(end,:,:);
   x(:,end+1,:) = x(:,end,:);
@@ -194,7 +194,7 @@ hlit = camlight;
 
 % Clock
 axes( haxes(2) )
-hclk = digitalclock( 5, 5, 16, clockcolor );
+hclk = digitalclock( 20, 5, 14, clk );
 
 % Time loop
 for it = its
@@ -208,7 +208,7 @@ s1 = floor( mod( t, 10 ) );
 set( hclk, 'Visible', 'off' )
 set( [ hclk(1,m+1) hclk(2,s10+1) hclk(3,s1+1) hclk(1,11) ], 'Visible', 'on' )
 s = vscale * read4d( fzone, it+itoff );
-if isempty( s ), error, end 
+if isempty( s ), error 'no v data found', end 
 if size( s, 5 ) > 1, s = sqrt( sum( s .* s, 5 ) ); end
 if squared, s = sqrt( s ); end
 z = s ./ flim(2);
@@ -223,14 +223,14 @@ set( hlit, 'Visible', 'off' )
 set( hclk, 'Color', fg, 'MarkerFaceColor', fg )
 colorscheme( as, ae )
 caxis( haxes(1), alim )
-alpha = snap( [ '/tmp/gely/' file ], dpi, 1 );
+alpha = snap( file, dpi, 1 );
 alpha = atran(1) + atran(2) / 765 * sum( alpha, 3 );
 set( hlit, 'Visible', 'on' )
 c = get( hclk(1), 'Tag' );
 set( hclk, 'Color', c, 'MarkerFaceColor', c )
 colorscheme( cs, ce )
 caxis( haxes(1), flim )
-img = snap( [ '/tmp/gely/' file ], dpi, 1 );
+img = snap( file, dpi, 1 );
 imwrite( uint8( img ), file, 'Alpha', alpha, ...
   'XResolution', dpi / 0.0254, ...
   'YResolution', dpi / 0.0254, ...
