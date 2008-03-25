@@ -11,13 +11,13 @@ meta
 dit =  out{fzone}{3};
 i1 = [ out{fzone}{4:7} ];
 i2 = [ out{fzone}{8:11} ];
-its = 900;
-bg = 'w'; fg = 'k'; clk = 'k'; atran = [ 1 -1 ]; its = 300:300:1500;
+bg = 'w'; fg = 'k'; clk = 'k'; atran = [ 1 -1 ]; its = 300:300:nt-itoff;
 bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = i1(4):dit:i2(4)-itoff;
+its = 900;
 
-panes = { 'SDSU/SDSC' 'URS/USC' 'CMU/PSC' };
-flim = [ .07   2 ];
-alim = [ .03 .05 ];
+panes = { 'URS/USC' 'SDSU/SDSC' 'CMU/PSC' };
+flim = [ .08   2 ];
+alim = [ .035 .065 ];
 shadow = [ .1 .1 .1 ];
 ms = [ bg 'earth' ];
 cs = [ bg 'hot' ];
@@ -58,6 +58,7 @@ axis ij
 % Basemap
 file = 'tmp/basemap.png';
 if ~exist( file, 'file' )
+disp( file )
 n = [ 960 780 ];
 fid = fopen( 'topo2.f32', 'r' ); x(:,:,1) = fread( fid, n, 'float32' ); fclose( fid );
 fid = fopen( 'topo1.f32', 'r' ); x(:,:,2) = fread( fid, n, 'float32' ); fclose( fid );
@@ -76,14 +77,14 @@ h(end+1) = patch( x, y, z - 4000, z );
 set( h, ...
   'EdgeColor', 'none', ...
   'FaceColor', 'flat', ...
-  'AmbientStrength',  .5, ...
-  'DiffuseStrength',  .5, ...
-  'SpecularStrength', .5, ...
+  'AmbientStrength',  0.5, ...
+  'DiffuseStrength',  0.5, ...
+  'SpecularStrength', 0.5, ...
   'SpecularExponent', 3, ...
   'SpecularColorReflectance', 1, ...
   'EdgeLighting', 'none', ...
   'FaceLighting', 'phong' );
-camlight;
+camlight( 'infinite' )
 caxis( 4000 * [ -1 1 ] )
 [ y, x, z ] = textread( 'ca_roads.xyz', '%n%n%n%*[^\n]' );
 plot( x, y, 'LineWidth', .2, 'Color', [ .6 .6 .6 ] );
@@ -102,6 +103,7 @@ end
 
 % Overlay
 file = 'tmp/overlay.png';
+disp( file )
 if ~exist( file, 'file' )
 x = xlim; x = x([ 1 1 2 2 1]);
 y = ylim; y = y([ 1 2 2 1 1]);
@@ -140,7 +142,7 @@ end
 set( h, 'FontSize', 12, 'FontWeight', 'normal' )
 x = 250 + [ -40 40 ];
 y = 18 + [ -2.5 2.5 ];
-h = colorscale( '1', x, y, [ alim(2) flim(2) ], 'b', num2str(alim(2)), '2 m/s' );
+h = colorscale( '1', x, y, [ alim(2) flim(2) ], 'b', num2str(.5*sum(alim)), '2 m/s' );
 caxis( flim )
 axis off
 colorscheme( as, ae )
@@ -183,14 +185,12 @@ hsurf = surf( x(:,:,2), x(:,:,1), x(:,:,2) );
 clear x
 set( hsurf, ...
   'EdgeColor', 'none', ...
-  'AmbientStrength',  .5, ...
-  'DiffuseStrength',  .5, ...
-  'SpecularStrength', .5, ...
-  'SpecularExponent', 3, ...
-  'SpecularColorReflectance', 1, ...
+  'AmbientStrength',  0, ...
+  'DiffuseStrength',  1.3, ...
+  'SpecularStrength', .0, ...
   'EdgeLighting', 'none', ...
   'FaceLighting', 'phong' );
-hlit = camlight;
+hlit = camlight( 'infinite' );
 
 % Clock
 axes( haxes(2) )

@@ -24,5 +24,5 @@ mkdir -p ../tmp
 ../sh/compile "$sfc $oflags -o" ../tmp/cook-sdsu   cook-sdsu.f90
 ../sh/compile "$sfc $oflags -o" ../tmp/cook-cmu    cook-cmu.f90
 ../sh/compile "$sfc $oflags -o" ../tmp/cook-urs    cook-urs.f90
-../sh/compile "gcc -O -o" ../tmp/split-rwg split-rwg.c
+../sh/compile "$scc -O -o" ../tmp/split-urs split-urs.c
 

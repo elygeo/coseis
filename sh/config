@@ -8,13 +8,15 @@ for dir in $PATH; do
 done
 
 for dir in $PATH; do
-for file in xlf95_r gfortran ifort pgf90 f95; do
+for file in xlf95_r ifort pgf90 gfortran f95; do
   if [ -x "$dir/$file" ]; then sfc="$file"; break 2; fi
 done
 done
 
 IFS="${IFS:1}"
 
+scc='cc'
+pcc='mpicc'
 pfc='mpif90'
 getarg=''
 case $sfc in
@@ -97,5 +99,6 @@ case $machine in
   teragrid)   maxnodes=256; maxcpus=2;  maxram=3000;   rate=1000; maxmm=1080 ;;
   datastar)   maxnodes=265; maxcpus=8;  maxram=13500;  rate=500;  maxmm=1080 ;;
   datastar32) maxnodes=5;   maxcpus=32; maxram=124000; rate=500;  maxmm=1080 ;;
+  intensity)  sfc='ifort'; oflags='-std95 -warn -O3'; gflags='-g -O0 -CB -traceback' ;;
 esac
 
