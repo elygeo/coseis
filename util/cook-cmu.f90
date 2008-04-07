@@ -2,7 +2,7 @@
 
 program main
 implicit none
-real, parameter :: dt0 = 0.096, t0 = 0.5 * dt0, dt = 0.1, dt0r = 1. / dt0
+real, parameter :: dt0 = 0.096, t0 = 0.5 * dt0, dt = 0.2, dt0r = 1. / dt0
 integer, parameter :: nn = 600*300, nt = 2291
 real(8) :: x1(nn), x2(nn), y1(nn), y2(nn)
 real :: vh(nn), t

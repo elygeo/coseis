@@ -129,7 +129,7 @@ select case( tfunc )
 case( 'delta'  )
   if ( it == 0 ) srcft = 1.
 case( 'brune' )
-  srcft = exp( -tm / tsource ) * tm / tsource
+  srcft = exp( -tm / tsource ) * tm / ( tsource * tsource )
 case( 'ricker1' )
   t = tm - tsource
   srcft = t * exp( -2. * ( pi * t / tsource ) ** 2. )

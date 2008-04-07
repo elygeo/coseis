@@ -8,16 +8,15 @@ name = '';
 vscale = 1;
 itoff = 0;
 meta
-dit =  out{fzone}{3};
-i1 = [ out{fzone}{4:7} ];
-i2 = [ out{fzone}{8:11} ];
-bg = 'w'; fg = 'k'; clk = 'k'; atran = [ 1 -1 ]; its = 300:300:nt-itoff;
-bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = i1(4):dit:i2(4)-itoff;
 its = 900;
+bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = 300:300:nt-itoff;
+bg = 'w'; fg = 'k'; clk = 'k'; atran = [ 1 -1 ]; its = 300:300:nt-itoff;
+bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = 0:2:nt-itoff;
 
 panes = { 'URS/USC' 'SDSU/SDSC' 'CMU/PSC' };
 flim = [ .08   2 ];
-alim = [ .035 .065 ];
+alim = [ -2 -1 ]; lite = 1; cslim = [ 0 2 ];
+alim = [ .035 .065 ]; lite = 0; cslim = [ 0.05 2 ];
 shadow = [ .1 .1 .1 ];
 ms = [ bg 'earth' ];
 cs = [ bg 'hot' ];
@@ -39,7 +38,6 @@ set( gcf, ...
   'Position', [ pos(1:2) inches * ppi ], ...
   'PaperPosition', [ 0 0 inches ], ...
   'DefaultAxesColor', 'none', ...
-  'DefaultAxesColorOrder', [ 0 0 0 ], ...
   'DefaultTextFontSize', 8, ...
   'DefaultTextFontWeight', 'bold', ...
   'DefaultTextHorizontalAlignment', 'center', ...
@@ -103,11 +101,14 @@ end
 
 % Overlay
 file = 'tmp/overlay.png';
-disp( file )
 if ~exist( file, 'file' )
-x = xlim; x = x([ 1 1 2 2 1]);
-y = ylim; y = y([ 1 2 2 1 1]);
-plot( x, y, 'Clipping', 'off' );
+disp( file )
+hlite = [];
+if lite
+  [ y, x, z ] = textread( 'borders.xyz', '%n%n%n%*[^\n]' );  hlite    = plot( x, y );
+  [ y, x, z ] = textread( 'coast.xyz',   '%n%n%n%*[^\n]' );  hlite(2) = plot( x, y );
+  [ y, x, z ] = textread( 'fault-so.xyz', '%n%n%n%*[^\n]' ); hlite(3) = plot( x, y, '--' ); 
+end
 sites = {
    82188 188340 129 'top'    'center' 'Bakersfield'
    99691  67008  21 'top'    'center' 'Santa Barbara'
@@ -134,6 +135,9 @@ for i = 1:length(x)
   htxtf(end+1) = text( x(i), y(i)+dy, 10, txt{i}, 'Ver', ver{i}, 'Hor', hor{i} );
 end
 htxtb = pmb( htxtf, 500, 500 );
+x = xlim; x = x([ 1 1 2 2 1]);
+y = ylim; y = y([ 1 2 2 1 1]);
+plot( x, y, 'Clipping', 'off' );
 axes( haxes(2) )
 h = text( 125, 12, name );
 if strcmp( name, panes{2} )
@@ -142,7 +146,7 @@ end
 set( h, 'FontSize', 12, 'FontWeight', 'normal' )
 x = 250 + [ -40 40 ];
 y = 18 + [ -2.5 2.5 ];
-h = colorscale( '1', x, y, [ alim(2) flim(2) ], 'b', num2str(.5*sum(alim)), '2 m/s' );
+h = colorscale( '1', x, y, cslim, 'b', num2str( cslim(1) ), [ num2str( cslim(2) ) ' m/s' ] );
 caxis( flim )
 axis off
 colorscheme( as, ae )
@@ -152,6 +156,7 @@ colorscheme( cs, ce )
 set( hdots, 'MarkerFaceColor', 'w', 'MarkerEdgeColor', shadow )
 set( htxtf, 'Color', 'w' )
 set( htxtb, 'Color', shadow )
+set( hlite, 'Color', shadow )
 caxis( haxes(2), flim )
 img = snap( file, dpi, 1 );
 alpha = atran(1) + atran(2) / 765 * sum( alpha, 3 );
@@ -174,6 +179,8 @@ else
   x(:,:,2) = x2;
   clear x2
 end
+i1 = [ out{fzone}{4:7} ];
+i2 = [ out{fzone}{8:11} ];
 node = all( nn(1:2) == i2(1:2) - i1(1:2) + 1 );
 if node
   x(end+1,:,:) = x(end,:,:);

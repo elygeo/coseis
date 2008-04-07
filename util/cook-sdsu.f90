@@ -3,7 +3,7 @@
 program main
 implicit none
 integer, parameter :: n1 = 6000, n2 = 3000, nt = 4545, nblock = 20, nskip = 10, ndec = 5
-real, parameter :: t0 = -0.73, dt0 = 0.055, dt = 0.1, rr = 1. / ( ndec * ndec )
+real, parameter :: t0 = -0.73, dt0 = 0.055, dt = 0.2, rr = 1. / ( ndec * ndec )
 integer :: i, j, k, jj, kk, io, it0, it = 0
 real :: v1(n1,n2), v2(n1,n2), vh(n1/ndec,n2/ndec), t
 character(256) :: str
