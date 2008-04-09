@@ -1,9 +1,9 @@
-SORD MACHINE NOTES
+MACHINE NOTES
+
+Brief notes for various machines SORD has been used on.
 
 MPICH2 install
   ./configure -prefix=$HOME/local --with-device=ch3:shm --enable-f90 --disable-cxx
-  echo "secretword=<secretword>" > $HOME/.mpd.conf
-  chmod 600 $HOME/.mpd.conf
 
 MPICH2 SunOS install
   export CC=cc F77=f77 F90=f95 CXX=CC

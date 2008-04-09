@@ -1,0 +1,23 @@
+SUMMARY
+
+The Support Operator Rupture Dynamics (SORD) code simulates spontaneous rupture
+within a 3D isotropic viscoelastic solid.  Wave motions are computed on a
+logically rectangular hexahedral mesh, using the generalized finite difference
+method of support operators.  Stiffness and viscous hourglass corrections are
+employed to suppress suppress zero-energy grid oscillation modes.  The fault
+surface is modeled by coupled double nodes, where the strength of the coupling
+is determined by a linear slip-weakening friction law.  External boundaries may
+be reflective or absorbing, where absorbing boundaries are handled using the
+method of perfectly matched layers (PML).  SORD is written in Fortran 95 and
+parallelized for multi-processor execution using Message Passing Interface
+(MPI).
+
+
+AUTHOR
+
+Geoffrey Ely
+gely@ucsd.edu
+Institute of Geophysics and Planetary Physics
+University of California, San Diego
+http://igpppublic.ucsd.edu/~gely
+

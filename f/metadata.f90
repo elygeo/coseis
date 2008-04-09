@@ -119,7 +119,8 @@ write( 1, "('ess         =   ',g15.7,';')"                ) ess
 write( 1, "('lc          =   ',g15.7,';')"                ) lc
 write( 1, "('rctest      =   ',g15.7,';')"                ) rctest
 end if
-write( 1, "('dirfmt      =  ''out/%02d'';')"              )
+write( 1, "('dirfmt      =  ''out/%02d'';')" )
+write( 1, "('out         =  {')" )
 do iz = 1, nout
   i = ditout(iz)
   i1 = i1out(iz,:)
@@ -128,8 +129,9 @@ do iz = 1, nout
   i2(1:3) = i2(1:3) + nnoff
   call outprops( fieldout(iz), nc, onpass, fault, cell )
   write( field, "('''',a,'''')" ) trim( fieldout(iz) )
-  write( 1, "('out{',i3.3,'} = {',i1,',',a,9(',',i7),'};')" ) iz, nc, field, i, i1, i2
+  write( 1, "('{',i1,',',a,9(',',i7),'}, % ',i3)" ) nc, field, i, i1, i2, iz
 end do
+write( 1, "('};')" )
 close( 1 )
 
 ! Translate MATALB to Python

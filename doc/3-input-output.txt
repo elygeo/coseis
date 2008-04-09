@@ -1,0 +1,28 @@
+INPUT AND OUTPUT
+
+Input is specified in a restricted form of the MATLAB programming language.
+Large data sets such as the material model are stored separately in
+floating-point binary files.  Annotated example input files are located in the
+'in/' directory.  The input file 'defaults.m', that is read before any other
+input, contains a short description of each SORD parameter.
+
+Output is saved in binary formant.  An associated metadata file 'meta.m',
+contains a summary of parameters for the run, and a structured description of
+the binary output.  The M-file format facilitates post-processing and
+visualization with MATLAB.  MATLAB utilities for manipulating and visualizing
+SORD output are included in the 'm/' directory.  Using the 'read4d' function
+for accessing SORD binary output correctly accounts for byte order when moving
+data between big-endian and little-endian architectures.  Separate Fortran
+utilities are also included in the 'util/' directory for converting the byte
+order of binary files, and for converting to and from ASCII text format.
+
+Statistic, such as peak acceleration and peak velocity, are computed
+periodically during each run and stored in the directory 'stats/'.
+Additionally, internal code timings, for benchmarking performance, are
+collected and saved to the 'prof/' directory.  Inspecting these files during a
+run is a good way to check that it is proceeding correctly.  The raw binary
+files can be examined with the standard UNIX command 'od -f' or with the
+included Fortran utilities.  The 'stats' utility computes the minimum, maximum,
+and mean values for binary files.
+
+
