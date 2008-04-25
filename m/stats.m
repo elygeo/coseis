@@ -38,7 +38,9 @@ if ~isempty( f )
   g = cumsum( g ) / 3600;
   e = 100 * f(end) / ( f(end) + g(end) );
   axes( 'Pos', [ .13 .13 .82 .4 ] )
-  area( [ f g ] )
+% area( [ f g ] )
+  plot( f, '-', 'Color', [ 0 0 .5 ], 'LineW', 2 ), hold on
+  plot( g, '-', 'Color', [ .5 0 0 ], 'LineW', 2 )
   xlim( tlim ./ dt )
   ptitle( { [ 'NP=' num2str( prod( np ) ) ] sprintf( 'E=%.0f%%', e ) } )
   xlabel( 'Step' )

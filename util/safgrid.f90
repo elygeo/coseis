@@ -381,7 +381,7 @@ l1 = lf0
 l2 = lf0 + nf3
 
 inquire( iolength=i ) t
-open( 1, file='ts1-ts22.f32', recl=i, form='unformatted', access='direct', status='old' )
+open( 1, file='ts23-raw-ts1.f32', recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) t
 close( 1 )
 if ( endian /= endian0 ) then
@@ -403,7 +403,7 @@ do j = 1, 1991
   t(j,:) = t(j,:) * ( 1. + .1 * ( 996. - j ) / 1990. )
 end do
 
-! Sample shear stress onto mesh
+! Sample shear stress onto mesh. Using TS2.3 so need to flip it north-south
 s1 = 0.
 i = nint( dx / 100. )
 do l = l1, l2

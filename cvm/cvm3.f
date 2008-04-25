@@ -1980,6 +1980,7 @@ c iradctp=number of nearby boreholes with data
          include 'wtbh1.h'
          include 'wtbh3.h'
          rtvelges=0.
+         rva=0.
          do 97013 n=1,nrad
          iradctp(n)=0
          radvp(n)=0.

@@ -5,10 +5,10 @@ xzone = 2;  fzone = 1;  squared = 0; % ShakeOut
 vscale = 1;
 itoff = 0;
 meta
+its = 900;
 bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = 300:300:nt-itoff;
 bg = 'w'; fg = 'k'; clk = 'k'; atran = [ 1 -1 ]; its = 300:300:nt-itoff;
 bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = 0:2:nt-itoff;
-its = 900;
 
 theta = 40;
 zoom = 4.70; mapalpha = .7;
