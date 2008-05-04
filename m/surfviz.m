@@ -38,12 +38,11 @@ for iz = 1:size( ii, 1 )
   x3 = squeeze( x(j,k,l,3) );
   if color
     if cell
-      i1 = i1 - 1;
       i2 = i2 - 1;
-      i = find( n == 1 );
       if i1(i) == 1
-        i1(i) = i1(i) + 1;
         i2(i) = i2(i) + 1;
+      else
+        i1(i) = i1(i) - 1;
       end
       facecolor = 'flat';
     else

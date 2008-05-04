@@ -9,7 +9,7 @@ use m_outprops
 real :: courant
 integer :: i1(4), i2(4), i, nc, iz, onpass
 character :: endian
-character(6) :: field
+character(7) :: field
 logical :: fault, cell
 
 if ( master ) write( 0, * ) 'Write metadata'
@@ -95,7 +95,7 @@ write( 1, "('bc1         =  [ ',i8,2(', ',i8),' ];')"        ) bc1
 write( 1, "('bc2         =  [ ',i8,2(', ',i8),' ];')"        ) bc2
 write( 1, "('i1source    =  [ ',i8,2(', ',i8),' ];')"        ) i1source
 write( 1, "('i2source    =  [ ',i8,2(', ',i8),' ];')"        ) i2source
-write( 1, "('endian      =   ''',a,'''')"                    ) endian
+write( 1, "('endian      =   ''',a,''';')"                   ) endian
 write( 1, "('rsource     =    ',g15.7,';')"                  ) rsource
 write( 1, "('tsource     =    ',g15.7,';')"                  ) tsource
 write( 1, "('moment1     =  [ ',g15.7,2(', ',g15.7),' ];')"  ) moment1
@@ -128,8 +128,8 @@ do iz = 1, nout
   i1(1:3) = i1(1:3) + nnoff
   i2(1:3) = i2(1:3) + nnoff
   call outprops( fieldout(iz), nc, onpass, fault, cell )
-  write( field, "('''',a,'''')" ) trim( fieldout(iz) )
-  write( 1, "('  { ',i1,', ',a,9(', ',i7),' }, % ',i3)" ) nc, field, i, i1, i2, iz
+  write( field, "('''',a,''',')" ) trim( fieldout(iz) )
+  write( 1, "('  { ',i1,' ',a,9(', ',i7),' }, % ',i3)" ) nc, field, i, i1, i2, iz
 end do
 write( 1, "('};')" )
 close( 1 )

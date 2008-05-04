@@ -83,39 +83,40 @@ l = nint( 5000. / dx )
 ! Mesh metadata
 open( 1, file='meta.m', status='replace' )
 write( 1, '(a)'         ) '% SORD metadata'
-write( 1, '(a,g15.7,a)' ) '  dx          = ', dx, ';'
-write( 1, '(a,g15.7,a)' ) '  dt          = ', dx * .00006, ';'
-write( 1, '(a)'         ) '  nt          = 0;'
-write( 1, '(a,3i8,a)'   ) '  nn          = [ ', n, ' ];'
-write( 1, '(a,3i8,a)'   ) '  ihypo       = [ ', jf0+j,     kf0, n(3)-l, ' ];'
-write( 1, '(a,3i8,a)'   ) '  ihypo       = [ ', jf0-j+nf1, kf0, n(3)-l, ' ];'
-write( 1, '(a,i8,a)'    ) '  npml        = ', npml, ';'
-write( 1, '(a)'         ) '  faultnormal = 2;'
-write( 1, '(3a)'        ) '  endian      = ''', endian, ''';'
-write( 1, '(a)'         ) '  out{1}      = { 1 ''x1''   0   1 1 -1 0   -1 -1 -1 0 };'
-write( 1, '(a)'         ) '  out{2}      = { 1 ''x2''   0   1 1 -1 0   -1 -1 -1 0 };'
-write( 1, '(a)'         ) '  out{3}      = { 1 ''x3''   0   1 1  1 0   -1 -1 -1 0 };'
-write( 1, '(a)'         ) '  out{4}      = { 1 ''rho''  0   1 1  1 0   -2 -2 -2 0 };'
-write( 1, '(a)'         ) '  out{5}      = { 1 ''vp''   0   1 1  1 0   -2 -2 -2 0 };'
-write( 1, '(a)'         ) '  out{6}      = { 1 ''vs''   0   1 1  1 0   -2 -2 -2 0 };'
-write( 1, '(a)'         ) '  out{7}      = { 1 ''ts1''  0   1 1  0 0   -1 -1  0 0 };'
-write( 1, '(a)'         ) '  out{8}      = { 1 ''bd1''  0   1 1 -1 0   -1 -1 -1 0 };'
-write( 1, '(a)'         ) '  out{9}      = { 1 ''bd2''  0   1 1 -1 0   -1 -1 -1 0 };'
+write( 1, '(a,g15.7,a)' ) 'dx          = ', dx, ';'
+write( 1, '(a,g15.7,a)' ) 'dt          = ', dx * .00006, ';'
+write( 1, '(a)'         ) 'nt          = 0;'
+write( 1, '(a)'         ) 'faultnormal = 2;'
+write( 1, "('nn          =  [ ',i8,2(', ',i8),' ];')" ) n
+write( 1, "('ihypo       =  [ ',i8,2(', ',i8),' ];')" ) jf0+j,     kf0, n(3)-l
+write( 1, "('ihypo       =  [ ',i8,2(', ',i8),' ];')" ) jf0-j+nf1, kf0, n(3)-l
+write( 1, "('npml        =    ',i8,';')"              ) npml
+write( 1, "('endian      =   ''',a,''';')"            ) endian
+write( 1, '(a)'         ) 'out         = {'
+write( 1, '(a)'         ) '{ 1, ''x1'',   0,   1, 1, -1, 0,   -1, -1, -1, 0 },'
+write( 1, '(a)'         ) '{ 1, ''x2'',   0,   1, 1, -1, 0,   -1, -1, -1, 0 },'
+write( 1, '(a)'         ) '{ 1, ''x3'',   0,   1, 1,  1, 0,   -1, -1, -1, 0 },'
+write( 1, '(a)'         ) '{ 1, ''rho'',  0,   1, 1,  1, 0,   -2, -2, -2, 0 },'
+write( 1, '(a)'         ) '{ 1, ''vp'',   0,   1, 1,  1, 0,   -2, -2, -2, 0 },'
+write( 1, '(a)'         ) '{ 1, ''vs'',   0,   1, 1,  1, 0,   -2, -2, -2, 0 },'
+write( 1, '(a)'         ) '{ 1, ''ts1'',  0,   1, 1,  0, 0,   -1, -1,  0, 0 },'
+write( 1, '(a)'         ) '{ 1, ''bd1'',  0,   1, 1, -1, 0,   -1, -1, -1, 0 },'
+write( 1, '(a)'         ) '{ 1, ''bd2'',  0,   1, 1, -1, 0,   -1, -1, -1, 0 }};'
 close( 1 )
 
 ! SORD input parameters
 open( 1, file='insord.m', status='replace' )
 write( 1, '(a)'         ) '% SORD input'
-write( 1, '(a,g15.7,a)' ) '  dx = ', dx, ';'
-write( 1, '(a,g15.7,a)' ) '  dt = ', dx * .00006, ';'
-write( 1, '(a,g15.7,a)' ) '  nt = ', 180. / dx / .00006, ';'
-write( 1, '(a,3i8,a)'   ) '  nn = [ ', n, ' ];'
-write( 1, '(a,3i8,a)'   ) '  ihypo = [ ', jf0+j,     kf0, -1-l, ' ];'
-write( 1, '(a,3i8,a)'   ) '  ihypo = [ ', jf0-j+nf1, kf0, -1-l, ' ];'
-write( 1, '(a,i8,a)'    ) '  npml = ', npml, ';'
-write( 1, '(a,g15.7,a)' ) '  dc = ', dc, ';'
-write( 1, '(a,g15.7,a)' ) '  mud = ', mud, ';'
-write( 1, * ) ' mus = { ', mus, '''zone''', jf0, 0, -1-nf3, jf0+nf1, ' 0 -1 };'
+write( 1, "('dx          =    ',g15.7,';')"           ) dx
+write( 1, "('dt          =    ',g15.7,';')"           ) dx * .00006
+write( 1, "('nt          =    ',i8,';')"              ) 180. / dx / .00006
+write( 1, "('nn          =  [ ',i8,2(', ',i8),' ];')" ) n
+write( 1, "('ihypo       =  [ ',i8,2(', ',i8),' ];')" ) jf0+j,     kf0, n(3)-l
+write( 1, "('ihypo       =  [ ',i8,2(', ',i8),' ];')" ) jf0-j+nf1, kf0, n(3)-l
+write( 1, "('npml        =    ',i8,';')"              ) npml
+write( 1, "('dc          =    ',g15.7,';')"           ) dc
+write( 1, "('mud         =    ',g15.7,';')"           ) mud
+write( 1, "(mus = { ',g15.7,', ''zone'', ',i8,5(', ',i8),' };')" ) mus, jf0, 0, -1-nf3, jf0+nf1, 0, -1
 close( 1 )
 
 ! 2D mesh

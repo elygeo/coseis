@@ -20,12 +20,14 @@ Change argument of subroutine readsoil from 'kerr' to 'k2err', and add to
 beginning:
        k2err = 0
 
-
 Add to the beginning of subroutine makevel2:
       rd2rad=3.141593/180.
       do i = 1, numsiv
         rsuqiv(i) = 0.
       end do
+
+Add to the beginning of subroutine addtopp:
+      rva = 0.
 
 Add to the beginning of subroutine addtops:
       roff = 0.
@@ -48,9 +50,6 @@ Add inside of do loops in subroutine readup:
 
 Add to the beginning of subroutine getsoil:
       iteisb = 0
-
-Add to the beginning of subroutine addtopp:
-      rva = 0.
 
 Add to the beginning of the main program:
       inct = 0

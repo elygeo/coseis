@@ -1,5 +1,5 @@
 % Semi-cylindrical canyon with vertically incident P-wave.
-np  = [ 1, 1, 2 ];		% number of processors
+np  = [ 1, 1, 1 ];		% number of processors
 nn  = [ 301, 321, 2 ];		% number of nodes
 nt  = 6000;			% number of time steps
 dt  = 0.002;			% time step length
@@ -29,7 +29,8 @@ i2source = [ -1, -1, -1  ];
 
 % Output
 out = { 'x',   1,  1,  1, 1, 0,  -1, -1, 1,  0 };
-out = { 'u', 500,  1,  1, 1, 0,  -1, -1, 1, -1 }; % snaps
+out = { 'u',  10,  1,  1, 1, 0,  -1, -1, 1, -1 }; % snaps
+out = { 'v',  10,  1,  1, 1, 0,  -1, -1, 1, -1 }; % snaps
 out = { 'u',   1,  1,  1, 1, 0,   1, -1, 1, -1 }; % canyon
 out = { 'u',   1,  2,  1, 1, 0, 158,  1, 1, -1 }; % flank
 out = { 'u',   1, -1, -1, 1, 0,  -1, -1, 1, -1 }; % source

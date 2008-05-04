@@ -238,7 +238,7 @@ if [ "$vm" ]; then
   cp "$srcdir/tmp/safgrid" .
   cp "$srcdir/data/safsites.ll" .
   cp "$srcdir/data/topo3.f32" .
-  cp "$srcdir/data/ts-ts1.f32" .
+  cp "$srcdir/data/ts23-raw-ts1.f32" .
   cp "$srcdir/data/endian0" .
   echo "./safgrid"
   ./safgrid
