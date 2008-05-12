@@ -22,7 +22,7 @@ gam = 0.;
 hourglass = [ 1., 2. ];
 
 faultnormal = 0;
-ihypo = [ 1, 1,, 21 ];
+ihypo = [ 1, 1, 21 ];
 xhypo = [ 0., 0., 2000. ];
 fixhypo = -2;
 tfunc = 'brune';
