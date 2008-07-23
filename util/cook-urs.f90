@@ -28,9 +28,8 @@ do it0 = 1, nt-1
   v = sqrt( vx * vx + vy * vy )
   pvh = max( v, pvh )
   t = dt * ( it - 1 )
-  it0 = nint( ( t - t0 ) / dt0 ) + 1
-  it0 = max( it0, 1 )
-  if ( it0 > nt ) then
+  it1 = nint( ( t - t0 ) / dt0 ) + 1
+  if ( it0 == it1 ) then
     write( 4, rec=it ) v
     it = it + 1
   end if

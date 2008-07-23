@@ -8,6 +8,8 @@ real(8) :: x1(nn), y1(nn), z1(nn), x2(nn), y2(nn), z2(nn)
 real :: v(nn), pv(nn), pvh(nn), t
 integer :: io, it0, it1, it = 1
 
+pv = 0.
+pvh = 0.
 inquire( iolength=io ) x1
 open( 1, file='uu', recl=io, form='unformatted', access='direct', status='old' )
 inquire( iolength=io ) vh
