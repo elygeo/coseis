@@ -6,9 +6,9 @@
 
 int main( int argc, char** argv ) {
   FILE* input = fopen( argv[1], "rb" );
-  FILE* v1 = fopen( "v1", "wb" );
-  FILE* v2 = fopen( "v2", "wb" );
-  FILE* v3 = fopen( "v3", "wb" );
+  FILE* v1 = fopen( "vx", "wb" );
+  FILE* v2 = fopen( "vy", "wb" );
+  FILE* v3 = fopen( "vz", "wb" );
   int i, nx, ny, nz, nt, n, it;
   float x;
   float* vv;
