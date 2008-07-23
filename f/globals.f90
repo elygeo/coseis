@@ -13,7 +13,7 @@ real, allocatable, dimension(:,:,:,:,:) :: &
   bb               ! B matrix
 
 ! 3d vectors
-real, allocatable, dimension(:,:,:,:) :: &
+real, allocatable, target, dimension(:,:,:,:) :: &
   xx,            & ! node locations
   vv,            & ! velocity
   uu,            & ! displacement
@@ -23,7 +23,7 @@ real, allocatable, dimension(:,:,:,:) :: &
   w2               ! temporary storage
 
 ! 3d scalars
-real, allocatable, dimension(:,:,:) :: &
+real, allocatable, target, dimension(:,:,:) :: &
   mr,            & ! mass ratio
   lam,           & ! Lame parameter
   mu,            & ! Lame parameter
@@ -61,7 +61,7 @@ real, allocatable, dimension(:) :: &
   dc2              ! pml cell damping  2*dt    / (2+d*dt)
 
 ! Fault vectors
-real, allocatable, dimension(:,:,:,:) :: &
+real, allocatable, target, dimension(:,:,:,:) :: &
   nhat,          & ! fault surface normals
   t0,            & ! initial traction
   t1,            & ! temporary storage
@@ -69,7 +69,7 @@ real, allocatable, dimension(:,:,:,:) :: &
   t3               ! temporary storage
 
 ! Fault scalars
-real, allocatable, dimension(:,:,:) :: &
+real, allocatable, target, dimension(:,:,:) :: &
   mus,           & ! coef of static friction
   mud,           & ! coef of dynamic friction
   dc,            & ! slip weakening distance
@@ -212,6 +212,27 @@ character(256) :: &
 logical :: &
   sync,          & ! synchronize processes
   master           ! master process flag
+
+! Preparation for new i/o scheme. Not in use yet.
+type t_io          ! output structure
+  character(4) :: &
+    field          ! variable name
+  integer :: &
+    di(4),       & ! j,k,l,t decimation interval
+    i1(4),       & ! j,k,l,t start index
+    i2(4),       & ! j,k,l,t end index
+    i3(3),       & ! j,k,l local start index
+    i4(3),       & ! j,k,l local end index
+    nbuff          ! number of time steps to buffer
+  real, pointer :: &
+    ptr(:,:,:)     ! pointer to data
+  real, allocatable :: &
+    buff(:,:,:,:)  ! hold buffer
+end type
+
+type( t_io ) :: &
+  ins(nz),       & ! input descriptions
+  outs(nz)         ! output descriptions
 
 end module
 

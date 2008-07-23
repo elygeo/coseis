@@ -82,41 +82,42 @@ l = nint( 5000. / dx )
 
 ! Mesh metadata
 open( 1, file='meta.m', status='replace' )
-write( 1, '(a)'         ) '% SORD metadata'
-write( 1, '(a,g15.7,a)' ) 'dx          = ', dx, ';'
-write( 1, '(a,g15.7,a)' ) 'dt          = ', dx * .00006, ';'
-write( 1, '(a)'         ) 'nt          = 0;'
-write( 1, '(a)'         ) 'faultnormal = 2;'
-write( 1, "('nn          =  [ ',i8,2(', ',i8),' ];')" ) n
-write( 1, "('ihypo       =  [ ',i8,2(', ',i8),' ];')" ) jf0+j,     kf0, n(3)-l
-write( 1, "('ihypo       =  [ ',i8,2(', ',i8),' ];')" ) jf0-j+nf1, kf0, n(3)-l
-write( 1, "('npml        =    ',i8,';')"              ) npml
-write( 1, "('endian      =   ''',a,''';')"            ) endian
-write( 1, '(a)'         ) 'out         = {'
-write( 1, '(a)'         ) '{ 1, ''x1'',   0,   1, 1, -1, 0,   -1, -1, -1, 0 },'
-write( 1, '(a)'         ) '{ 1, ''x2'',   0,   1, 1, -1, 0,   -1, -1, -1, 0 },'
-write( 1, '(a)'         ) '{ 1, ''x3'',   0,   1, 1,  1, 0,   -1, -1, -1, 0 },'
-write( 1, '(a)'         ) '{ 1, ''rho'',  0,   1, 1,  1, 0,   -2, -2, -2, 0 },'
-write( 1, '(a)'         ) '{ 1, ''vp'',   0,   1, 1,  1, 0,   -2, -2, -2, 0 },'
-write( 1, '(a)'         ) '{ 1, ''vs'',   0,   1, 1,  1, 0,   -2, -2, -2, 0 },'
-write( 1, '(a)'         ) '{ 1, ''ts1'',  0,   1, 1,  0, 0,   -1, -1,  0, 0 },'
-write( 1, '(a)'         ) '{ 1, ''bd1'',  0,   1, 1, -1, 0,   -1, -1, -1, 0 },'
-write( 1, '(a)'         ) '{ 1, ''bd2'',  0,   1, 1, -1, 0,   -1, -1, -1, 0 }};'
+write( 1, "( '% SORD metadata'                              )" )
+write( 1, "( 'dx          =    ',g15.7,';'                  )" ) dx
+write( 1, "( 'dt          =    ',g15.7,';'                  )" ) dx * .00006
+write( 1, "( 'nt          =    ',i8,';'                     )" ) 0
+write( 1, "( 'faultnormal =    ',i8,';'                     )" ) 0
+write( 1, "( 'nn          =  [ ',i8,2(', ',i8),' ];'        )" ) n
+write( 1, "( 'ihypo       =  [ ',i8,2(', ',i8),' ];'        )" ) jf0+j,     kf0, n(3)-l
+write( 1, "( 'ihypo       =  [ ',i8,2(', ',i8),' ];'        )" ) jf0-j+nf1, kf0, n(3)-l
+write( 1, "( 'npml        =    ',i8,';'                     )" ) npml
+write( 1, "( 'endian      =   ''',a,''';'                   )" ) endian
+write( 1, "( 'out         =   {'                            )" )
+write( 1, "( '{ 1, ''x1'',   0,   1, 1, -1, 0,   -1, -1, -1, 0 },' )" )
+write( 1, "( '{ 1, ''x2'',   0,   1, 1, -1, 0,   -1, -1, -1, 0 },' )" )
+write( 1, "( '{ 1, ''x3'',   0,   1, 1,  1, 0,   -1, -1, -1, 0 },' )" )
+write( 1, "( '{ 1, ''rho'',  0,   1, 1,  1, 0,   -2, -2, -2, 0 },' )" )
+write( 1, "( '{ 1, ''vp'',   0,   1, 1,  1, 0,   -2, -2, -2, 0 },' )" )
+write( 1, "( '{ 1, ''vs'',   0,   1, 1,  1, 0,   -2, -2, -2, 0 },' )" )
+write( 1, "( '{ 1, ''ts1'',  0,   1, 1,  0, 0,   -1, -1,  0, 0 },' )" )
+write( 1, "( '{ 1, ''bd1'',  0,   1, 1, -1, 0,   -1, -1, -1, 0 },' )" )
+write( 1, "( '{ 1, ''bd2'',  0,   1, 1, -1, 0,   -1, -1, -1, 0 },' )" )
+write( 1, "( '};'                                           )" )
 close( 1 )
 
 ! SORD input parameters
 open( 1, file='insord.m', status='replace' )
-write( 1, '(a)'         ) '% SORD input'
-write( 1, "('dx          =    ',g15.7,';')"           ) dx
-write( 1, "('dt          =    ',g15.7,';')"           ) dx * .00006
-write( 1, "('nt          =    ',i8,';')"              ) 180. / dx / .00006
-write( 1, "('nn          =  [ ',i8,2(', ',i8),' ];')" ) n
-write( 1, "('ihypo       =  [ ',i8,2(', ',i8),' ];')" ) jf0+j,     kf0, n(3)-l
-write( 1, "('ihypo       =  [ ',i8,2(', ',i8),' ];')" ) jf0-j+nf1, kf0, n(3)-l
-write( 1, "('npml        =    ',i8,';')"              ) npml
-write( 1, "('dc          =    ',g15.7,';')"           ) dc
-write( 1, "('mud         =    ',g15.7,';')"           ) mud
-write( 1, "(mus = { ',g15.7,', ''zone'', ',i8,5(', ',i8),' };')" ) mus, jf0, 0, -1-nf3, jf0+nf1, 0, -1
+write( 1, "( '% SORD input'                                 )" )
+write( 1, "( 'dx          =    ',g15.7,';'                  )" ) dx
+write( 1, "( 'dt          =    ',g15.7,';'                  )" ) dx * .00006
+write( 1, "( 'nt          =    ',i8,';'                     )" ) 180. / dx / .00006
+write( 1, "( 'nn          =  [ ',i8,2(', ',i8),' ];'        )" ) n
+write( 1, "( 'ihypo       =  [ ',i8,2(', ',i8),' ];'        )" ) jf0+j,     kf0, n(3)-l
+write( 1, "( 'ihypo       =  [ ',i8,2(', ',i8),' ];'        )" ) jf0-j+nf1, kf0, n(3)-l
+write( 1, "( 'npml        =    ',i8,';'                     )" ) npml
+write( 1, "( 'dc          =    ',g15.7,';'                  )" ) dc
+write( 1, "( 'mud         =    ',g15.7,';'                  )" ) mud
+write( 1, "( 'mus = { ',g15.7,', ''zone'', ',i8,5(', ',i8),' };' )" ) mus, jf0, 0, -1-nf3, jf0+nf1, 0, -1
 close( 1 )
 
 ! 2D mesh
@@ -228,13 +229,13 @@ do j = 1, size( t, 1 )
 end do
 end do
 end if
-h = 30.
-o1 = .5 * h - 121.5 * 3600.
-o2 = .5 * h +  30.5 * 3600.
+h = 3600. / 30.
+o1 = .5 - 121.5 * h
+o2 = .5 +  30.5 * h
 do k1 = 1, size( w1, 2 )
 do j1 = 1, size( w1, 1 )
-  x1 = ( ( w1(j1,k1,1,1) * 3600 ) - o1 ) / h
-  x2 = ( ( w1(j1,k1,1,2) * 3600 ) - o2 ) / h
+  x1 = w1(j1,k1,1,1) * h - o1
+  x2 = w1(j1,k1,1,2) * h - o2
   j = int( x1 ) + 1
   k = int( x2 ) + 1
   h1 =  x1 - j + 1

@@ -9,9 +9,9 @@ vscale = 1;
 itoff = 0;
 meta
 its = 900;
-bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = 300:300:nt-itoff;
-bg = 'w'; fg = 'k'; clk = 'k'; atran = [ 1 -1 ]; its = 300:300:nt-itoff;
+bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = 100:100:nt-itoff;
 bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = 0:2:nt-itoff;
+bg = 'w'; fg = 'k'; clk = 'k'; atran = [ 1 -1 ]; its = 100:100:nt-itoff;
 
 panes = { 'URS/USC' 'SDSU/SDSC' 'CMU/PSC' };
 flim = [ .08   2 ];
@@ -122,19 +122,25 @@ sites = {
   402013  69548  23 'top'    'center' 'San Diego'
   501570  31135  24 'bottom' 'left'   'Ensenada'
 };
-x = [ sites{:,2} ];
-y = [ sites{:,1} ];
-ver = sites(:,4);
-hor = sites(:,5);
-txt = sites(:,6);
-hdots = plot( x, y, 'o', 'MarkerSize', 3.2, 'LineWidth', .5 );
+sites = {};
+hdots = [];
 htxtf = [];
-for i = 1:length(x)
-  dy = -1600;
-  if strcmp( ver{i}, 'top' ), dy = 1600; end
-  htxtf(end+1) = text( x(i), y(i)+dy, 10, txt{i}, 'Ver', ver{i}, 'Hor', hor{i} );
+htxtb = [];
+if length( sites )
+  x = [ sites{:,2} ];
+  y = [ sites{:,1} ];
+  ver = sites(:,4);
+  hor = sites(:,5);
+  txt = sites(:,6);
+  hdots = plot( x, y, 'o', 'MarkerSize', 3.2, 'LineWidth', .5 );
+  htxtf = [];
+  for i = 1:length(x)
+    dy = -1600;
+    if strcmp( ver{i}, 'top' ), dy = 1600; end
+    htxtf(end+1) = text( x(i), y(i)+dy, 10, txt{i}, 'Ver', ver{i}, 'Hor', hor{i} );
+  end
+  htxtb = pmb( htxtf, 500, 500 );
 end
-htxtb = pmb( htxtf, 500, 500 );
 x = xlim; x = x([ 1 1 2 2 1]);
 y = ylim; y = y([ 1 2 2 1 1]);
 plot( x, y, 'Clipping', 'off' );

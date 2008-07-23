@@ -7,8 +7,8 @@ itoff = 0;
 meta
 its = 900;
 bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = 300:300:nt-itoff;
-bg = 'w'; fg = 'k'; clk = 'k'; atran = [ 1 -1 ]; its = 300:300:nt-itoff;
 bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = 0:2:nt-itoff;
+bg = 'w'; fg = 'k'; clk = 'k'; atran = [ 1 -1 ]; its = 300:300:nt-itoff;
 
 theta = 40;
 zoom = 4.70; mapalpha = .7;
@@ -143,21 +143,16 @@ axes( haxes(2) )
 x = xlim;
 y = ylim;
 
-if 0
-h = text( x(2)-20, y(2)-20, { 'SCEC ShakeOut Simulation' 'by R. Graves' }, 'Ver', 'top', 'Hor', 'right', 'FontWeight', 'normal', 'FontSize', 13 );
+h = text( x(2)-300, y(2)-40, 'SCEC ShakeOut Simulation', 'Ver', 'top', 'Hor', 'center', 'FontWeight', 'normal', 'FontSize', 16 );
+h(2) = text( x(2)-300, y(2)-100, 'by R. Graves', 'Ver', 'top', 'Hor', 'center', 'FontWeight', 'normal', 'FontSize', 10 );
 htxtb = [ htxtb pmb( h, 2, 2 ) ];
-scec = imread( 'scec.png' );
-x = xlim; x = x(2) - 20 - [ 150 0 ];
-y = 750 + [ 150 0 ] * size(scec,1) / size(scec,2);
-image( x, y, scec )
-end
-
-h = text( x(2)-300, y(2)-20, { 'SCEC ShakeOut Simulation' 'by R. Graves' }, 'Ver', 'top', 'Hor', 'center', 'FontWeight', 'normal', 'FontSize', 13 );
-htxtb = [ htxtb pmb( h, 2, 2 ) ];
-scec = imread( 'scec.png' );
-x = xlim; x = x(2) - 300 + [ -65 65 ];
-y = 880 - [ 0 130 ] * size(scec,1) / size(scec,2);
-image( x, y, scec )
+y = ylim; y = y(2) - 170 - [ 0 100 ];
+img = imread( 'shakeout.png' );
+x = xlim; x = x(2) - 400 + [ -50 50 ] * size(img,2) / size(img,1);
+image( x, y, img )
+img = imread( 'scec.png' );
+x = xlim; x = x(2) - 200 + [ -50 50 ] * size(img,2) / size(img,1);
+image( x, y, img )
 
 h = text( 215, 105, 'Ground velocity magnitude' );
 htxtb = [ htxtb pmb( h, 2, 2 ) ];

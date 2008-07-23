@@ -1,4 +1,4 @@
-! Generate TeraShake mesh
+! Generate TeraShake 2D surface mesh
 program main
 use m_tscoords
 implicit none
@@ -22,7 +22,7 @@ ell = (/ 600, 300 /) * 1000
 
 ! Cell centered mesh for SCECVM input
 n = nint( ell / dx )
-allocate( x(n(1),n(2),1,3), t(960,780) )
+allocate( x(n(1),n(2),1,3) )
 forall( i=1:n(1) ) x(i,:,:,1) = dx * ( i - 1 ) + .5 * dx
 forall( i=1:n(2) ) x(:,i,:,2) = dx * ( i - 1 ) + .5 * dx
 call ts2ll( x, 1, 2 )
@@ -68,13 +68,13 @@ do j = 1, size( t, 1 )
 end do
 end do
 end if
-h = 30.
-o1 = .5 * h - 121.5 * 3600.
-o2 = .5 * h +  30.5 * 3600.
+h = 3600. / 30.
+o1 = .5 - 121.5 * h
+o2 = .5 +  30.5 * h
 do k1 = 1, size( x, 2 )
 do j1 = 1, size( x, 1 )
-  x1 = ( ( x(j1,k1,1,1) * 3600 ) - o1 ) / h
-  x2 = ( ( x(j1,k1,1,2) * 3600 ) - o2 ) / h
+  x1 = x(j1,k1,1,1) * h - o1
+  x2 = x(j1,k1,1,2) * h - o2
   j = int( x1 ) + 1
   k = int( x2 ) + 1
   h1 =  x1 - j + 1
@@ -105,15 +105,17 @@ close( 3 )
 
 ! Mesh metadata
 open( 1, file='meta.m', status='replace' )
-write( 1, '(a)'         ) '% SORD metadata'
-write( 1, '(a,g15.7,a)' ) '  dx          = ', dx, ';'
-write( 1, '(a)'         ) '  nt          = 0;'
-write( 1, '(a,2i8,a)'   ) '  nn          = [ ', n, ' 1 ];'
-write( 1, '(a,2i8,a)'   ) '  out{1}      = { 3 ''x''    0   1 1 1 0 ', n,   ' 1 0 };'
-write( 1, '(a,2i8,a)'   ) '  out{2}      = { 1 ''rho''  0   1 1 1 0 ', n-1, ' 1 0 };'
-write( 1, '(a,2i8,a)'   ) '  out{3}      = { 1 ''vp''   0   1 1 1 0 ', n-1, ' 1 0 };'
-write( 1, '(a,2i8,a)'   ) '  out{4}      = { 1 ''vs''   0   1 1 1 0 ', n-1, ' 1 0 };'
-write( 1, '(3a)'        ) '  endian      = ''', endian, ''';'
+write( 1, "( '% SORD metadata'                                         )" )
+write( 1, "( 'dx          =    ', g15.7, ';'                           )" ) dx
+write( 1, "( 'nt          =    0;'                                     )" )
+write( 1, "( 'nn          =  [ ', 2(i8,', '), ' 1 ];'                  )" ) n
+write( 1, "( 'endian      =   ''', a, ''';'                            )" ) endian
+write( 1, "( 'out         = {'                                         )" )
+write( 1, "( '{ 3, ''x'',    0,   1, 1, 1, 0', 2(', ',i7), ', 1, 0 },' )" ) n
+write( 1, "( '{ 1, ''rho'',  0,   1, 1, 1, 0', 2(', ',i7), ', 1, 0 },' )" ) n-1
+write( 1, "( '{ 1, ''vp'',   0,   1, 1, 1, 0', 2(', ',i7), ', 1, 0 },' )" ) n-1
+write( 1, "( '{ 1, ''vs'',   0,   1, 1, 1, 0', 2(', ',i7), ', 1, 0 },' )" ) n-1
+write( 1, "( '};'                                                      )" )
 close( 1 )
 
 end program

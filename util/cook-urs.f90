@@ -3,7 +3,8 @@
 program main
 implicit none
 real, parameter :: t0 = -2.0, dt0 = 0.2, dt = 0.2
-integer, parameter :: nn = 417*834, nt = 1200
+!integer, parameter :: nn = 417*834, nt = 1200
+integer, parameter :: nn = 250*500, nt = 1200
 integer :: io, it0, it = 0
 real :: v1(nn), v2(nn), vh(nn), t
 

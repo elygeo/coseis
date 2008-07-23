@@ -18,11 +18,11 @@ do while ( it0 < nt )
   it0 = max( it0, 1 )
   print *, it, it0, t
   i = modulo( it0 - 1, nblock ) + 1
-  write( str, '(a,i5.5)' ) 'SX96PS', ( ( it0 - 1 ) / nblock + 1 ) * nblock * nskip
+  write( str, '(a,i5.5)' ) 'data/SX96PS', ( ( it0 - 1 ) / nblock + 1 ) * nblock * nskip
   open( 2, file=str, recl=io, form='unformatted', access='direct', status='old' )
   read( 2, rec=i ) v1
   close( 2 )
-  write( str, '(a,i5.5)' ) 'SY96PS', ( ( it0 - 1 ) / nblock + 1 ) * nblock * nskip
+  write( str, '(a,i5.5)' ) 'data/SY96PS', ( ( it0 - 1 ) / nblock + 1 ) * nblock * nskip
   open( 2, file=str, recl=io, form='unformatted', access='direct', status='old' )
   read( 2, rec=i ) v2
   close( 2 )
