@@ -5,7 +5,7 @@ implicit none
 real, parameter :: t0 = -2.0, dt0 = 0.2, dt = 0.2
 !integer, parameter :: nn = 417*834, nt = 1200
 integer, parameter :: nn = 250*500, nt = 1200
-integer :: io, it0, it1, it = 0
+integer :: io, it0, it1, it = 1
 real :: vx(nn), vy(nn), vz(nn), ux(nn), uy(nn), uz(nn), v(nn), pv(nn), pvh(nn), t
 
 pv = 0.

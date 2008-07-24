@@ -2,9 +2,9 @@
 
 program main
 implicit none
-integer, parameter :: n1 = 6000, n2 = 3000, nt = 4545, nblock = 20, nskip = 10, ndec = 5
+integer, parameter :: n1 = 6000, n2 = 3000, nt = 4540, nblock = 20, nskip = 10, ndec = 5
 real, parameter :: t0 = -0.73, dt0 = 0.055, dt = 0.2, rr = 1. / ( ndec * ndec )
-integer :: i, j, k, jj, kk, io, it0, it1, it = 0
+integer :: i, j, k, jj, kk, io, it0, it1, it = 1
 real :: vx(n1,n2), vy(n1,n2), vz(n1,n2), ux(n1,n2), uy(n1,n2), uz(n1,n2), &
   v(n1,n2), pv(n1,n2), pvh(n1,n2), vh(n1/ndec,n2/ndec), t
 character(256) :: f1, f2, f3
@@ -50,7 +50,7 @@ do it0 = 1, nt-1
     it = it + 1
   end if
 enddo
-close( 1 )
+close( 4 )
 
 open( 1, file='ux',  recl=io, form='unformatted', access='direct', status='replace' )
 open( 2, file='uy',  recl=io, form='unformatted', access='direct', status='replace' )
