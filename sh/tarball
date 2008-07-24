@@ -5,7 +5,7 @@ base=$( basename "$dir" )
 version=$( date +%Y%m%d%H%M%S )
 
 s=""
-while getopts sg opt; do eval "$opt=y"; done
+while getopts s opt; do eval "$opt=y"; done
 
 cat << END > versionmeta.m
 version = '$version';

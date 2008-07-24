@@ -5,7 +5,7 @@ implicit none
 real, parameter :: t0 = -2.0, dt0 = 0.2, dt = 0.2
 !integer, parameter :: nn = 417*834, nt = 1200
 integer, parameter :: nn = 250*500, nt = 1200
-integer :: io, it0, it = 0
+integer :: io, it0, it1, it = 0
 real :: vx(nn), vy(nn), vz(nn), ux(nn), uy(nn), uz(nn), v(nn), pv(nn), pvh(nn), t
 
 pv = 0.
@@ -16,7 +16,6 @@ open( 2, file='v2', recl=io, form='unformatted', access='direct', status='old' )
 open( 3, file='v3', recl=io, form='unformatted', access='direct', status='old' )
 open( 4, file='vh', recl=io, form='unformatted', access='direct', status='replace' )
 do it0 = 1, nt-1
-  print *, it, it0, t
   read( 1, rec=it0 ) vx
   read( 2, rec=it0 ) vy
   read( 3, rec=it0 ) vz
@@ -30,6 +29,7 @@ do it0 = 1, nt-1
   t = dt * ( it - 1 )
   it1 = nint( ( t - t0 ) / dt0 ) + 1
   if ( it0 == it1 ) then
+    print *, it, it0
     write( 4, rec=it ) v
     it = it + 1
   end if

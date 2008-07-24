@@ -12,13 +12,12 @@ pv = 0.
 pvh = 0.
 inquire( iolength=io ) x1
 open( 1, file='uu', recl=io, form='unformatted', access='direct', status='old' )
-inquire( iolength=io ) vh
+inquire( iolength=io ) v
 open( 2, file='vh', recl=io, form='unformatted', access='direct', status='replace' )
 read( 1, rec=1 ) x1
 read( 1, rec=2 ) y1
 read( 1, rec=3 ) z1
 do it0 = 1, nt-1
-  it0 = it0 + 1
   read( 1, rec=3*it0+1 ) x2
   read( 1, rec=3*it0+2 ) y2
   read( 1, rec=3*it0+3 ) z2
@@ -35,6 +34,7 @@ do it0 = 1, nt-1
   t = dt * ( it - 1 )
   it1 = nint( ( t - t0 ) / dt0 ) + 1
   if ( it0 == it1 ) then
+    print *, it, it0
     write( 2, rec=it ) v
     it = it + 1
   end if
