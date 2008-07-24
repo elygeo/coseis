@@ -33,6 +33,7 @@ do it0 = 1, nt-1
   z1 = z2
   t = dt * ( it - 1 )
   it1 = nint( ( t - t0 ) / dt0 ) + 1
+  it1 = max( it1, 1 )
   if ( it0 == it1 ) then
     print *, it, it0
     write( 2, rec=it ) v

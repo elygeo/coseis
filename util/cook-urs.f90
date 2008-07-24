@@ -28,6 +28,7 @@ do it0 = 1, nt-1
   pvh = max( v, pvh )
   t = dt * ( it - 1 )
   it1 = nint( ( t - t0 ) / dt0 ) + 1
+  it1 = max( it1, 1 )
   if ( it0 == it1 ) then
     print *, it, it0
     write( 4, rec=it ) v
