@@ -40,9 +40,9 @@ close( 2 )
 close( 3 )
 close( 4 )
 
-open( 1, file='ux',  recl=io, form='unformatted', access='direct', status='replace' )
-open( 2, file='uy',  recl=io, form='unformatted', access='direct', status='replace' )
-open( 3, file='uz',  recl=io, form='unformatted', access='direct', status='replace' )
+open( 1, file='u1',  recl=io, form='unformatted', access='direct', status='replace' )
+open( 2, file='u2',  recl=io, form='unformatted', access='direct', status='replace' )
+open( 3, file='u3',  recl=io, form='unformatted', access='direct', status='replace' )
 write( 1, rec=1 ) ux
 write( 2, rec=1 ) uy
 write( 3, rec=1 ) uz
@@ -50,16 +50,20 @@ close( 1 )
 close( 2 )
 close( 3 )
 
-v = sqrt( ux * ux + uy * uy + uz * uz )
 open( 1, file='um',  recl=io, form='unformatted', access='direct', status='replace' )
-open( 2, file='pv',  recl=io, form='unformatted', access='direct', status='replace' )
-open( 3, file='pvh', recl=io, form='unformatted', access='direct', status='replace' )
+open( 2, file='uh',  recl=io, form='unformatted', access='direct', status='replace' )
+open( 3, file='pv',  recl=io, form='unformatted', access='direct', status='replace' )
+open( 4, file='pvh', recl=io, form='unformatted', access='direct', status='replace' )
+v = sqrt( ux * ux + uy * uy + uz * uz )
 write( 1, rec=1 ) v
-write( 2, rec=1 ) pv
-write( 3, rec=1 ) pvh
+v = sqrt( ux * ux + uy * uy )
+write( 2, rec=1 ) v
+write( 3, rec=1 ) pv
+write( 4, rec=1 ) pvh
 close( 1 )
 close( 2 )
 close( 3 )
+close( 4 )
 
 end program
 

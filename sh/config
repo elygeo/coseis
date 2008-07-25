@@ -99,6 +99,6 @@ case $machine in
   teragrid)   maxnodes=256; maxcpus=2;  maxram=3000;   rate=1000; maxmm=1080 ;;
   datastar)   maxnodes=265; maxcpus=8;  maxram=13500;  rate=500;  maxmm=1080 ;;
   datastar32) maxnodes=5;   maxcpus=32; maxram=124000; rate=500;  maxmm=1080 ;;
-# intensity)  sfc='ifort'; oflags='-std95 -warn -O3'; gflags='-g -O0 -CB -traceback' ;;
+  intensity)  sfc='gfortran'; oflags='-O3'; gflags='-g' ;;
 esac
 

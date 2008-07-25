@@ -43,21 +43,30 @@ end do
 close( 1 )
 close( 2 )
 
-v = sqrt( x1 * x1 + y1 * y1 + z1 * z1 )
-open( 1, file='u',  recl=io, form='unformatted', access='direct', status='replace' )
-open( 2, file='pv', recl=io, form='unformatted', access='direct', status='replace' )
-write( 1, rec=1 ) v
-write( 2, rec=1 ) pv
+open( 1, file='u1',  recl=io, form='unformatted', access='direct', status='replace' )
+open( 2, file='u2',  recl=io, form='unformatted', access='direct', status='replace' )
+open( 3, file='u3',  recl=io, form='unformatted', access='direct', status='replace' )
+write( 1, rec=1 ) x1
+write( 2, rec=1 ) y1
+write( 3, rec=1 ) z1
 close( 1 )
 close( 2 )
+close( 3 )
 
-v = sqrt( x1 * x1 + y1 * y1 )
-open( 1, file='uh',  recl=io, form='unformatted', access='direct', status='replace' )
-open( 2, file='pvh', recl=io, form='unformatted', access='direct', status='replace' )
+open( 1, file='um',  recl=io, form='unformatted', access='direct', status='replace' )
+open( 2, file='uh',  recl=io, form='unformatted', access='direct', status='replace' )
+open( 3, file='pv',  recl=io, form='unformatted', access='direct', status='replace' )
+open( 4, file='pvh', recl=io, form='unformatted', access='direct', status='replace' )
+v = sqrt( x1 * x1 + y1 * y1 + z1 * z1 )
 write( 1, rec=1 ) v
-write( 2, rec=1 ) pvh
+v = sqrt( x1 * x1 + y1 * y1 )
+write( 2, rec=1 ) v
+write( 3, rec=1 ) pv
+write( 4, rec=1 ) pvh
 close( 1 )
 close( 2 )
+close( 3 )
+close( 4 )
 
 end program
 
