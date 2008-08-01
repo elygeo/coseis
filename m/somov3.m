@@ -3,23 +3,23 @@
 clear all
 xzone = 0;  fzone = 1;  squared = 0; % TeraShake
 xzone = 13; fzone = 18; squared = 1; % SORD
-xzone = 2;  fzone = 1;  squared = 0; % ShakeOut
 name = '';
 vscale = 1;
 itoff = 0;
 meta
+xzone = 1; fzone = 2; squared = 0; % ShakeOut
 its = 900;
-bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = 100:100:nt-itoff;
 bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = 0:2:nt-itoff;
-bg = 'w'; fg = 'k'; clk = 'k'; atran = [ 1 -1 ]; its = 100:100:nt-itoff;
+bg = 'w'; fg = 'k'; clk = 'k'; atran = [ 1 -1 ]; its = 300:300:nt-itoff;
+its = nt; fzone = 3; % Shakeout Disp
+its = nt; fzone = 5; % Shakeout PGV
 
 panes = { 'URS/USC' 'SDSU/SDSC' 'CMU/PSC' };
 flim = [ .08   2 ];
-alim = [ -2 -1 ]; lite = 1; cslim = [ 0 2 ];
-alim = [ .035 .065 ]; lite = 0; cslim = [ 0.05 2 ];
+cs = [ bg 'hot' ]; alim = [ .035 .065 ]; lite = 0; cslim = [ 0.05 2 ]; fc = 'flat';
+cs = [ bg '0'  ];  alim = [ -2 -1 ]; lite = 1; cslim = [ 0 2 ]; fc = [ .7 .7 .7 ];
 shadow = [ .1 .1 .1 ];
 ms = [ bg 'earth' ];
-cs = [ bg 'hot' ];
 as = [ bg fg '1' ]; 
 ce = .5;
 ae = 1;
@@ -74,7 +74,7 @@ z(:) = -1;
 h(end+1) = patch( x, y, z - 4000, z );
 set( h, ...
   'EdgeColor', 'none', ...
-  'FaceColor', 'flat', ...
+  'FaceColor', fc, ...
   'AmbientStrength',  0.5, ...
   'DiffuseStrength',  0.5, ...
   'SpecularStrength', 0.5, ...
@@ -122,7 +122,6 @@ sites = {
   402013  69548  23 'top'    'center' 'San Diego'
   501570  31135  24 'bottom' 'left'   'Ensenada'
 };
-sites = {};
 hdots = [];
 htxtf = [];
 htxtb = [];

@@ -30,7 +30,7 @@ int main( int argc, char** argv ) {
   fread( &x, FLOAT_SIZE, 1, input ); printf( "lon: %f\n", x );
   n = nx * ny * nz;
   vv = malloc( n * sizeof( float ) );
-  if ( vv == NULL) { printf( "Malloc error.\n" ); exit(1); }
+  if ( vv == NULL ) { printf( "Malloc error.\n" ); exit(1); }
   fseek( input, 60, SEEK_SET );
   for ( it = 1; it <= nt; it++ ) {
     printf( "%d\n", it );

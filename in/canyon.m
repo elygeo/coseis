@@ -8,7 +8,7 @@ rho = 1.;			% density
 vp  = 2.;			% P-wave speed
 vs  = 1.;			% S-wave speed
 gam = 0.0;			% viscosity
-hourglass = [ 1., 2. ];	% hourglass stiffness and viscosity
+hourglass = [ 1., 2. ];		% hourglass stiffness and viscosity
 
 % Read mesh from disk
 datadir = 'canyon/data';

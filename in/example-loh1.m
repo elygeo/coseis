@@ -14,9 +14,9 @@ gam = 0.;			% viscosity
 hourglass = [ 1., 2. ];		% hourglass stiffness and viscosity
 
 % Material properties of the layer
-vp  = { 4000.,'zone',  1,1,1,  -1,-1,21 };
-vs  = { 2000.,'zone',  1,1,1,  -1,-1,21 };
-rho = { 2600.,'zone',  1,1,1,  -1,-1,21 };
+vp  = { 4000., 'zone',  1, 1, 1,  -1, -1, 21 };
+vs  = { 2000., 'zone',  1, 1, 1,  -1, -1, 21 };
+rho = { 2600., 'zone',  1, 1, 1,  -1, -1, 21 };
 
 % Near side boundary conditions:
 % Anti-mirror symmetry at the near x and y boundaries

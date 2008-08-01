@@ -13,12 +13,12 @@ use m_globals
 use m_collective
 use m_outprops
 use m_util
+type( t_io ), pointer :: io
 real :: rout, x0(3)
 integer :: i1(3), i2(3), n(3), noff(3), i, nc, iz, onpass, nbuff
 logical :: dofault, fault, cell
 
 if ( master ) write( 0, * ) 'Output initialization'
-if ( nout > nz ) stop 'too many output zones, make nz bigger'
 
 ! I/O intervals
 if ( itstats < 1 ) itstats = itstats + nt + 1
@@ -37,33 +37,35 @@ end if
 nbuff = 0
 ibuff = 0
 
-doiz: do iz = 1, nout
+io => out0
+doiz: do while( associated( io%next ) )
+io => io%next
 
 ! Output field properties
-call outprops( fieldout(iz), nc, onpass, fault, cell )
+call outprops( io%field, nc, onpass, fault, cell )
 if ( fault .and. .not. dofault ) then
-  i1out(iz,4) = nt + 1
+  io%i1(4) = nt + 1
   cycle doiz
 end if
 
 ! Time indices 
-if ( i1out(iz,4) < 0 ) i1out(iz,4) = nt + i1out(iz,4) + 1
-if ( i2out(iz,4) < 0 ) i2out(iz,4) = nt + i2out(iz,4) + 1
-if ( ditout(iz)  < 0 ) ditout(iz)  = nt + ditout(iz)  + 1
+if ( io%i1(4) < 0 ) io%i1(4) = nt + io%i1(4) + 1
+if ( io%i2(4) < 0 ) io%i2(4) = nt + io%i2(4) + 1
+if ( io%di(4) < 0 ) io%di(4) = nt + io%di(4) + 1
 if ( onpass == 0 ) then
-  ditout(iz) = 1
-  i1out(iz,4) = 0
-  i2out(iz,4) = 0
+  io%di(4) = 1
+  io%i1(4) = 0
+  io%i2(4) = 0
 end if
-i2out(iz,4) = min( i2out(iz,4), nt )
+io%i2(4) = min( io%i2(4), nt )
 
 ! Spatial indices
 n = nn + 2 * nhalo
 noff = nnoff + nhalo
-select case( outtype(iz) )
+select case( io%outtype )
 case( 'z' )
-  i1 = i1out(iz,1:3)
-  i2 = i2out(iz,1:3)
+  i1 = io%i1(1:3)
+  i2 = io%i2(1:3)
   call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
   if ( cell ) i2 = i2 - 1
   if ( fault ) then
@@ -71,13 +73,13 @@ case( 'z' )
     i1(i) = ihypo(i)
     i2(i) = ihypo(i)
   end if
-  if ( any( i2 < i1 ) ) i1out(iz,4) = nt + 1
+  if ( any( i2 < i1 ) ) io%i1(4) = nt + 1
 case( 'x' )
-  x0 = xout(iz,:)
-  ditout(iz) = 1
-  i1out(iz,4) = 0
-  i2out(iz,4) = nt
-  if ( onpass == 0 ) i2out(iz,4) = 0
+  x0 = io%x
+  io%di(4) = 1
+  io%i1(4) = 0
+  io%i2(4) = nt
+  if ( onpass == 0 ) io%i2(4) = 0
   rout = huge( rout )
   if ( fault ) then
     i1 = nnoff
@@ -106,31 +108,35 @@ case( 'x' )
     call reduceloc( rout, i1, s2, 'allmin', n, noff, 0 )
   end if
   i2 = i1
-  if ( rout > dx * dx ) i1out(iz,4) = nt + 1
+  if ( rout > dx * dx ) io%i1(4) = nt + 1
 end select
 
 ! Save indices
-i1out(iz,1:3) = i1
-i2out(iz,1:3) = i2
+io%i1(1:3) = i1
+io%i2(1:3) = i2
 
-! Buffer timer series
+! Find local zone
+do j = i1(1), i2(1), di(1)
+  if j < i1core(1) i1(1) = 
+end do
+do k = i1(2), i2(2), di(2)
+do l = i1(3), i2(3), di(3)
+
+  if 
 i1 = max( i1, i1core )
 i2 = min( i2, i2core )
-if ( all( i1 == i2 ) .and. i1out(iz,4) <= i2out(iz,4) ) then
-  ibuff(iz) = nbuff + 1
-  nbuff = nbuff + nc
-end if
+j = i2(1) - i1(1) + 1
+k = i2(2) - i1(2) + 1
+l = i2(3) - i1(3) + 1
+allocate( io%buff(j,k,l,io%nt,nc,2) )
 
 end do doiz
 
-! Allocate buffers
-allocate( jb(nbuff), iobuffer(itio,nbuff), &
-  vstats(itio,4), fstats(itio,8), estats(itio,3), &
+! Allocate stats buffers
+allocate( vstats(itio,4), fstats(itio,8), estats(itio,3), &
   gvstats(itio,4), gfstats(itio,8), gestats(itio,3) )
-jb = 0
 jv = 0
 jf = 0
-iobuffer = 0.
 vstats = 0.
 fstats = 0.
 estats = 0.
@@ -269,21 +275,23 @@ case( 2 )
 end select
 end if
 
-doiz: do iz = 1, nout
+out => out0
+doiz: do while( associated( io%next ) )
+out => io%next
 
 ! Pass
-if ( ditout(iz) < 1 ) cycle doiz
-call outprops( fieldout(iz), nc, onpass, fault, cell )
+if ( io%di(4) < 1 ) cycle doiz
+call outprops( io%field, nc, onpass, fault, cell )
 if ( pass /= onpass ) cycle doiz
 
 ! Indices
-i1 = i1out(iz,1:3)
-i2 = i2out(iz,1:3)
+i1 = io%i1(1:3)
+i2 = io%i2(1:3)
 i3 = max( i1, i1core )
 i4 = min( i2, i2core )
 
 ! Peak velocity calculation
-if ( fieldout(iz) == 'pv2' .and. all( i3 <= i4 ) ) then
+if ( io%field == 'pv2' .and. all( i3 <= i4 ) ) then
   if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, vv, i3, i4 )
   do l = i3(3), i4(3)
   do k = i3(2), i4(2)
@@ -295,19 +303,19 @@ if ( fieldout(iz) == 'pv2' .and. all( i3 <= i4 ) ) then
 end if
 
 ! Time indices
-if ( it < i1out(iz,4) .or. it > i2out(iz,4) ) cycle doiz
-if ( modulo( it - i1out(iz,4), ditout(iz) ) /= 0 ) cycle doiz
+if ( it < io%i1(4) .or. it > io%i2(4) ) cycle doiz
+if ( modulo( it - io%i1(4), io%di(4) ) /= 0 ) cycle doiz
 
 ! Test if any thing to do on this processor, can't cycle yet though
 ! because all processors have to call mpi_split
 if ( any( i3 > i4 ) ) then
-  i1out(iz,4) = nt + 1
+  io%i1(4) = nt + 1
   if ( all( i1 == i2 ) ) cycle doiz
 end if
 
 ! Record number and number of records
-ir = ( it          - i1out(iz,4) ) / ditout(iz) + 1
-nr = ( i2out(iz,4) - i1out(iz,4) ) / ditout(iz) + 1
+ir = ( it          - io%i1(4) ) / io%di(4) + 1
+nr = ( io%i2(4) - io%i1(4) ) / io%di(4) + 1
 
 ! Fault plane
 mpio = mpout * 4
@@ -323,13 +331,13 @@ end if
 ! Binary output
 do ic = 1, nc
   id = 64 + 6 * ( iz - 1 ) + ic
-  write( str, '(a,i2.2,a)' ) 'out/', iz, fieldout(iz)
+  write( str, '(a,i2.2,a)' ) 'out/', iz, io%field
   if ( nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic
   if ( mpout == 0 ) then
     i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
     if ( any( i1 /= i3 .or. i2 /= i4 ) ) write( str, '(a,i6.6)' ) trim( str ), i
   end if
-  select case( fieldout(iz) )
+  select case( io%field )
   case( 'x'    ); call rio4( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, i4, ir, nr )
   case( 'rho'  ); call rio3( id, mpio, rr, str, mr,       i1, i2, i3, i4, i4, ir, nr )
   case( 'vp'   ); call rio3( id, mpio, rr, str, s1,       i1, i2, i3, i4, i4, ir, nr )
@@ -378,7 +386,7 @@ do ic = 1, nc
     if ( modulo( it, itstats ) /= 0 ) call vectornorm( s2, w1, i3, i4 )
     call rio3( id, mpio, rr, str, s2, i1, i2, i3, i4, i4, ir, nr )
   case default
-    write( 0, * ) 'error: unknown output field: ', fieldout(iz)
+    write( 0, * ) 'error: unknown output field: ', io%field
     stop
   end select
   if ( all( i1 == i2 .and. i3 == i4 ) ) then

@@ -110,7 +110,6 @@ real :: &
   inval(nz),     & ! input value
   x1in(nz,3),    & ! input cube - near corner
   x2in(nz,3),    & ! input cube - far corner 
-  xout(nz,3),    & ! timeseries output location
   xhypo(3),      & ! hypocenter location
   slipvector(3)    ! slip direction for finding traction vectors
 
@@ -183,24 +182,16 @@ integer :: &
   nin = 2,       & ! number of zones for input, hold two spots
   i1in(nz,3),    & ! j1 k1 l1 input start index
   i2in(nz,3),    & ! j1 k1 l1 input end index
-  nout = 0,      & ! number of zones for output
-  ditout(nz),    & ! interval for writing output
-  i1out(nz,4),   & ! j1 k1 l1 output zone start index
-  i2out(nz,4),   & ! j2 k2 l2 output zone end index
-  i3out(nz,3),   & ! j1 k1 l1 local output zone start index
-  i4out(nz,3),   & ! j2 k2 l2 local output zone end index
   mpin,          & ! input, 0=separate files, 1=MPI-IO
   mpout,         & ! output, 0=separate files, 1=MPI-IO
   ifile(nz),     & ! file output flag
   ibuff(nz)        ! buffered i/o flag
 
 character :: &
-  intype(nz),    & ! input type: z=zone, c=cube, r=read
-  outtype(nz)      ! output type: z=zone, x=location
+  intype(nz)       ! input type: z=zone, c=cube, r=read
 
 character(4) :: &
-  fieldin(nz),   & ! input variable
-  fieldout(nz)     ! output variable
+  fieldin(nz)      ! input variable
 
 character(16) :: &
   rfunc,         & ! moment source space function
@@ -213,26 +204,31 @@ logical :: &
   sync,          & ! synchronize processes
   master           ! master process flag
 
-! Preparation for new i/o scheme. Not in use yet.
-type t_io          ! output structure
+! output structure
+type t_io
   character(4) :: &
     field          ! variable name
+  character :: &
+    otype          ! output type
+  real :: &
+    x0(3)          ! location
   integer :: &
-    di(4),       & ! j,k,l,t decimation interval
     i1(4),       & ! j,k,l,t start index
     i2(4),       & ! j,k,l,t end index
+    di(4),       & ! j,k,l,t decimation interval
     i3(3),       & ! j,k,l local start index
     i4(3),       & ! j,k,l local end index
-    nbuff          ! number of time steps to buffer
-  real, pointer :: &
-    ptr(:,:,:)     ! pointer to data
+    nt,          & ! number of time steps to buffer
+    it,          & ! number of timesteps in buffer
+    ib             ! current buffer in double buffer
+  type( t_io ), pointer :: &
+    next           ! pointer to next in linked list
   real, allocatable :: &
-    buff(:,:,:,:)  ! hold buffer
-end type
+    buff(:,:,:,:,:,:)  ! hold buffer, j,k,l,it,ic,ibuff
+end type t_io
 
-type( t_io ) :: &
-  ins(nz),       & ! input descriptions
-  outs(nz)         ! output descriptions
+type( t_io ), pointer :: &
+  out0             ! intitial output
 
 end module
 

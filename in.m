@@ -1,1 +1,1 @@
-in/saf/0200s.m
+in/test/minifault.m

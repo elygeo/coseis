@@ -135,7 +135,7 @@ case 'wmelt'
     3 6 8 8
     3 3 3 8
     8 6 3 3 ]' / 8;
-otherwise, error( 'colormap scheme' )
+otherwise, scheme, error( 'colormap scheme' )
 end
 
 if strcmp( folded, 'folded' )

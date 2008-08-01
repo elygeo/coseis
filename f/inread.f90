@@ -11,6 +11,9 @@ logical :: inzone
 character(12) :: key
 character(256) :: line
 
+allocate( in0, out0 )
+in1 => in0
+out1 => out0       
 open( 1, file='input', status='old' )
 
 doline: do
@@ -108,10 +111,9 @@ case( 'timeseries' );
   outtype(i) = 'x'
   read( str, *, iostat=io ) fieldout(i), xout(i,:)
 case( 'out' );
-  nout = nout + 1
-  i = nout
-  outtype(i) = 'z'
-  read( str, *, iostat=io ) fieldout(i), ditout(i), i1out(i,:), i2out(i,:)
+  out1 => out1%next
+  allocate( out1 )
+  read( str, *, iostat=io ) out1%field, out1%dit, out1%i1, out1%i2
 case default; io = 1
 end select
 

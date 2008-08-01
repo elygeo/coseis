@@ -1,32 +1,29 @@
-% ShakeOut movie
+% ShakeOut figure
 
 clear all
+xzone = 0;  fzone = 1;  squared = 0; % TeraShake
+xzone = 13; fzone = 18; squared = 1; % SORD
+name = '';
 vscale = 1;
 itoff = 0;
 meta
 xzone = 1; fzone = 2; squared = 0; % ShakeOut
 its = 900;
-label = 'Ground velocity magnitude';
 bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = 0:2:nt-itoff;
 bg = 'w'; fg = 'k'; clk = 'k'; atran = [ 1 -1 ]; its = 300:300:nt-itoff;
-its = nt; fzone = 3; label = 'Displacement velocity magnitude';
-its = nt; fzone = 5; lable = 'Peak ground velocity';
+its = nt; fzone = 3; % Shakeout Disp
+its = nt; fzone = 5; % Shakeout PGV
 
-theta = 40;
-zoom = 4.70; mapalpha = .7;
-zoom = 9.00; mapalpha = 1;
-zoom = 5.72; mapalpha = .7;
-zoom = 6.00; mapalpha = .7;
+panes = { 'URS/USC' 'SDSU/SDSC' 'CMU/PSC' };
 flim = [ .08   2 ];
-alim = [ .035 .065 ];
-cslim = [ 0.05 2 ];
+cs = [ bg 'hot' ]; alim = [ .035 .065 ]; lite = 0; cslim = [ 0.05 2 ]; fc = 'flat';
+cs = [ bg '0'  ];  alim = [ -2 -1 ]; lite = 1; cslim = [ 0 2 ]; fc = [ .6 .6 .6 ];
 shadow = [ .1 .1 .1 ];
 ms = [ bg 'earth' ];
-cs = [ bg 'hot' ];
 as = [ bg fg '1' ]; 
 ce = .5;
 ae = 1;
-inches = [ 9.6 5.4 ];
+inches = [ 3.2 5.4 ];
 dpi = 300;
 ppi = 100;
 
@@ -41,50 +38,43 @@ set( gcf, ...
   'Position', [ pos(1:2) inches * ppi ], ...
   'PaperPosition', [ 0 0 inches ], ...
   'DefaultAxesColor', 'none', ...
-  'DefaultTextFontSize', 10, ...
+  'DefaultTextFontSize', 8, ...
   'DefaultTextFontWeight', 'bold', ...
   'DefaultTextHorizontalAlignment', 'center', ...
   'DefaultTextVerticalAlignment', 'middle' )
-haxes(2) = axes( 'Position', [ 0 0 1 1 ] );
+haxes(2) = axes( 'Position', [ .005 .003 .99 .994 ] );
 axis off
 hold on
-axis( 1000 * [ 0 inches(1)/inches(2) 0 1 ] )
-haxes(1) = axes( 'Position', [ 0 0 1 1 ] );
+axis( 100 * [ 0 inches(1) 0 inches(2) ] )
+haxes(1) = axes( 'Position', [ .005 .013 .99 .984 ] );
 axis off
 hold on
 axis equal
-axis( 1000 * [ 0 600 0 300 -80 10 ] )
-campos( [ 291 167 3000 ] * 1000 )
-camtarget( [ 291 167 0 ] * 1000 )
-camva( zoom )
-c = cos( theta / 180 * pi );
-s = sin( theta / 180 * pi );
-camup( [ -s c 0 ] )
+axis( 1000 * [ 0 290 60 510 -80 80 ] )
+axis ij
 
 % Basemap
 file = 'tmp/basemap.png';
 if ~exist( file, 'file' )
 disp( file )
 n = [ 960 780 ];
-clear x
-fid = fopen( 'topo1.f32', 'r' ); x(:,:,1) = fread( fid, n, 'float32' ); fclose( fid );
-fid = fopen( 'topo2.f32', 'r' ); x(:,:,2) = fread( fid, n, 'float32' ); fclose( fid );
+fid = fopen( 'topo2.f32', 'r' ); x(:,:,1) = fread( fid, n, 'float32' ); fclose( fid );
+fid = fopen( 'topo1.f32', 'r' ); x(:,:,2) = fread( fid, n, 'float32' ); fclose( fid );
 fid = fopen( 'topo3.f32', 'r' ); x(:,:,3) = fread( fid, n, 'float32' ); fclose( fid );
 x = upsamp( x );
 c = x(:,:,3);
-c(x(:,:,2)>102000) = max( 10., c(x(:,:,2)>102000) );
+c(x(:,:,1)>102000) = max( 10., c(x(:,:,1)>102000) );
 c = .25 * ...
   ( c(1:end-1,1:end-1) + c(2:end,2:end) ...
   + c(1:end-1,2:end) + c(2:end,1:end-1) );
 h = surf( x(:,:,1), x(:,:,2), x(:,:,3) - 4000, c );
 clear x c
-[ x, y, z ] = textread( 'salton.xyz', '%n%n%n%*[^\n]' );
+[ y, x, z ] = textread( 'salton.xyz', '%n%n%n%*[^\n]' );
 z(:) = -1;
 h(end+1) = patch( x, y, z - 4000, z );
 set( h, ...
-  'Clipping', 'off', ...
   'EdgeColor', 'none', ...
-  'FaceColor', 'flat', ...
+  'FaceColor', fc, ...
   'AmbientStrength',  0.5, ...
   'DiffuseStrength',  0.5, ...
   'SpecularStrength', 0.5, ...
@@ -94,11 +84,11 @@ set( h, ...
   'FaceLighting', 'phong' );
 camlight( 'infinite' )
 caxis( 4000 * [ -1 1 ] )
-[ x, y, z ] = textread( 'ca_roads.xyz', '%n%n%n%*[^\n]' );
+[ y, x, z ] = textread( 'ca_roads.xyz', '%n%n%n%*[^\n]' );
 plot( x, y, 'LineWidth', .2, 'Color', [ .6 .6 .6 ] );
-[ x, y, z ] = textread( 'borders.xyz', '%n%n%n%*[^\n]' ); plot( x, y, 'Color', shadow );
-[ x, y, z ] = textread( 'coast.xyz',   '%n%n%n%*[^\n]' ); plot( x, y, 'Color', shadow );
-[ x, y, z ] = textread( 'fault-so.xyz', '%n%n%n%*[^\n]' );
+[ y, x, z ] = textread( 'borders.xyz', '%n%n%n%*[^\n]' ); plot( x, y, 'Color', shadow );
+[ y, x, z ] = textread( 'coast.xyz',   '%n%n%n%*[^\n]' ); plot( x, y, 'Color', shadow );
+[ y, x, z ] = textread( 'fault-so.xyz', '%n%n%n%*[^\n]' );
 plot( x, y, '-',  'Color', shadow,  'LineWidth', 2.5 );
 plot( x, y, '--', 'Color', 'w', 'LineWidth', 1.5 );
 img = snap( file, dpi, 1 );
@@ -113,55 +103,55 @@ end
 file = 'tmp/overlay.png';
 if ~exist( file, 'file' )
 disp( file )
+hlite = [];
+if lite
+  [ y, x, z ] = textread( 'borders.xyz', '%n%n%n%*[^\n]' );  hlite    = plot( x, y );
+  [ y, x, z ] = textread( 'coast.xyz',   '%n%n%n%*[^\n]' );  hlite(2) = plot( x, y );
+  [ y, x, z ] = textread( 'fault-so.xyz', '%n%n%n%*[^\n]' ); hlite(3) = plot( x, y, '--' ); 
+end
 sites = {
    82188 188340 129 'top'    'center' 'Bakersfield'
-   99691  67008  21 'bottom' 'center' 'Santa Barbara'
-  152641  77599  16 'bottom' 'center' 'Oxnard'
-  191871 180946 714 'bottom' 'center' 'Lancaster'
+   99691  67008  21 'top'    'center' 'Santa Barbara'
+  152641  77599  16 'top'    'right'  'Oxnard'
+  191871 180946 714 'bottom' 'left'   'Lancaster'
   229657 119310 107 'bottom' 'right'  'Los Angeles'
-  256108 263112 648 'top'    'center' 'Barstow'
-  263052 216515 831 'bottom' 'center' 'Victorville'
-  268435 120029  47 'top'    'center' 'Anaheim'
+  263052 216515 831 'bottom' 'left'   'Victorville'
+  268435 120029  47 'top'    'right'  'Anaheim'
   293537 180173 327 'top'    'right'  'San Bernardino'
-  351928  97135  18 'bottom' 'center' 'Oceanside'
   366020 200821 140 'top'    'right'  'Palm Springs'
-  402013  69548  23 'bottom' 'center' 'San Diego'
-  526989 167029   1 'bottom' 'center' 'Mexicali'
+  402013  69548  23 'top'    'center' 'San Diego'
+  501570  31135  24 'bottom' 'left'   'Ensenada'
 };
-x = [ sites{:,1} ];
-y = [ sites{:,2} ];
-ver = sites(:,4);
-hor = sites(:,5);
-txt = sites(:,6);
-hdots = plot( x, y, 'o', 'MarkerSize', 3.6, 'LineWidth', .75 );
+hdots = [];
 htxtf = [];
-for i = 1:length(x)
-  dy = 1000;
-  if strcmp( ver{i}, 'top' ), dy = -600; end
-  htxtf(end+1) = text( x(i), y(i)+dy, 10, txt{i}, 'Ver', ver{i}, 'Hor', hor{i} );
+htxtb = [];
+if length( sites )
+  x = [ sites{:,2} ];
+  y = [ sites{:,1} ];
+  ver = sites(:,4);
+  hor = sites(:,5);
+  txt = sites(:,6);
+  hdots = plot( x, y, 'o', 'MarkerSize', 3.2, 'LineWidth', .5 );
+  htxtf = [];
+  for i = 1:length(x)
+    dy = -1600;
+    if strcmp( ver{i}, 'top' ), dy = 1600; end
+    htxtf(end+1) = text( x(i), y(i)+dy, 10, txt{i}, 'Ver', ver{i}, 'Hor', hor{i} );
+  end
+  htxtb = pmb( htxtf, 500, 500 );
 end
-htxtb = pmb( htxtf, 500, 500 );
+x = xlim; x = x([ 1 1 2 2 1]);
+y = ylim; y = y([ 1 2 2 1 1]);
+plot( x, y, 'Clipping', 'off' );
 axes( haxes(2) )
-x = xlim;
-y = ylim;
-
-h = text( x(2)-300, y(2)-40, 'SCEC ShakeOut Simulation', 'Ver', 'top', 'Hor', 'center', 'FontWeight', 'normal', 'FontSize', 16 );
-h(2) = text( x(2)-300, y(2)-100, 'by R. Graves', 'Ver', 'top', 'Hor', 'center', 'FontWeight', 'normal', 'FontSize', 10 );
-htxtb = [ htxtb pmb( h, 2, 2 ) ];
-y = ylim; y = y(2) - 170 - [ 0 100 ];
-img = imread( 'shakeout.png' );
-x = xlim; x = x(2) - 400 + [ -50 50 ] * size(img,2) / size(img,1);
-image( x, y, img )
-img = imread( 'scec.png' );
-x = xlim; x = x(2) - 200 + [ -50 50 ] * size(img,2) / size(img,1);
-image( x, y, img )
-
-h = text( 215, 105, 'Ground velocity magnitude' );
-htxtb = [ htxtb pmb( h, 2, 2 ) ];
-x = 215 + [ -150 150 ];
-y = 70 + [ -5 5 ];
-[ h1, h2 ] = colorscale( '1', x, y, cslim, 'b', num2str( cslim(1) ), [ num2str( cslim(2) ) ' m/s' ] );
-htxtb = [ htxtb pmb( h2, 2, 2 ) ];
+h = text( 125, 12, name );
+if strcmp( name, panes{2} )
+  h(2) = text( 160, 531, 'SCEC ShakeOut Simulations' );
+end
+set( h, 'FontSize', 12, 'FontWeight', 'normal' )
+x = 250 + [ -40 40 ];
+y = 18 + [ -2.5 2.5 ];
+h = colorscale( '1', x, y, cslim, 'b', num2str( cslim(1) ), [ num2str( cslim(2) ) ' m/s' ] );
 caxis( flim )
 axis off
 colorscheme( as, ae )
@@ -171,6 +161,7 @@ colorscheme( cs, ce )
 set( hdots, 'MarkerFaceColor', 'w', 'MarkerEdgeColor', shadow )
 set( htxtf, 'Color', 'w' )
 set( htxtb, 'Color', shadow )
+set( hlite, 'Color', shadow )
 caxis( haxes(2), flim )
 img = snap( file, dpi, 1 );
 alpha = atran(1) + atran(2) / 765 * sum( alpha, 3 );
@@ -202,7 +193,7 @@ if node
   x(2:end-1,:,:) = .5 * ( x(1:end-2,:,:) + x(2:end-1,:,:) );
   x(:,2:end-1,:) = .5 * ( x(:,1:end-2,:) + x(:,2:end-1,:) );
 end
-hsurf = surf( x(:,:,1), x(:,:,2), x(:,:,2) );
+hsurf = surf( x(:,:,2), x(:,:,1), x(:,:,2) );
 clear x
 set( hsurf, ...
   'EdgeColor', 'none', ...
@@ -215,8 +206,7 @@ hlit = camlight( 'infinite' );
 
 % Clock
 axes( haxes(2) )
-hclk = digitalclock( 160, 160, 40, clk );
-set( hclk, 'LineWidth', 1.5 )
+hclk = digitalclock( 20, 5, 14, clk );
 
 % Time loop
 for it = its
@@ -224,7 +214,11 @@ file = sprintf( 'tmp/f%05d.png', it );
 if ~exist( file, 'file' ) & ~system( [ 'mkdir ' file '.lock >& /dev/null' ] )
 disp( file )
 t = it * dt;
-digitalclockset( hclk, t )
+m = floor( t / 60 );
+s10 = floor( mod( t, 60 ) / 10 );
+s1 = floor( mod( t, 10 ) );
+set( hclk, 'Visible', 'off' )
+set( [ hclk(1,m+1) hclk(2,s10+1) hclk(3,s1+1) hclk(1,11) ], 'Visible', 'on' )
 s = vscale * read4d( fzone, it+itoff );
 if isempty( s ), error 'no v data found', end 
 if size( s, 5 ) > 1, s = sqrt( sum( s .* s, 5 ) ); end
@@ -240,7 +234,6 @@ set( hsurf, 'ZData', 2000 * z - 4000 )
 set( hlit, 'Visible', 'off' )
 set( hclk, 'Color', fg, 'MarkerFaceColor', fg )
 colorscheme( as, ae )
-set( gcf, 'Color', mapalpha * [ 1 1 1 ] )
 caxis( haxes(1), alim )
 alpha = snap( file, dpi, 1 );
 alpha = atran(1) + atran(2) / 765 * sum( alpha, 3 );

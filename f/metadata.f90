@@ -26,7 +26,6 @@ if ( debug /= 0 ) then
   write( 1, "( 'ip     =    ',i8,';'                                            )" ) ip
   write( 1, "( 'ifn    =    ',i8,';'                                            )" ) ifn
   write( 1, "( 'nin    =    ',i8,';'                                            )" ) nin
-  write( 1, "( 'nout   =    ',i8,';'                                            )" ) nout
   write( 1, "( 'ip3    =  [ ',i8,2(', ',i8),'];'                                )" ) ip3
   write( 1, "( 'np     =  [ ',i8,2(', ',i8),'];'                                )" ) np
   write( 1, "( 'nhalo  =  [ ',i8,2(', ',i8),'];'                                )" ) nhalo
