@@ -14,8 +14,9 @@ use m_collective
 use m_outprops
 use m_util
 type( t_io ), pointer :: o
+real, pointer :: ps0(:,:,:), pw1(:,:,:,:), pw2(:,:,:,:)
 real :: rout, x0(3)
-integer :: i1(3), i2(3), di(3), n(3), noff(3), i, nc, iz, onpass
+integer :: i1(3), i2(3), di(3), n(3), noff(3), i, nc, pass
 logical :: dofault, fault, cell
 
 if ( master ) write( 0, * ) 'Output initialization'
@@ -37,18 +38,63 @@ o => out0
 doiz: do while( associated( o%next ) )
 o => o%next
 
-! Output field properties
-call outprops( o%field, nc, onpass, fault, cell )
+! Properties
+nc = 1
+fault = .false.
+pass = 2
+cell = .false.
+select case( o%field )
+case( 'x'    ); pw1 => w1;   pass = 0; nc = 3
+case( 'rho'  ); ps0 => mr;   pass = 0; cell = .true.
+case( 'vp'   ); ps0 => s1;   pass = 0; cell = .true.
+case( 'vs'   ); ps0 => s2;   pass = 0; cell = .true.
+case( 'lam'  ); ps0 => lam;  pass = 0; cell = .true.
+case( 'mu'   ); ps0 => mu;   pass = 0; cell = .true.
+case( 'gam'  ); ps0 => gam;  pass = 0; cell = .true.
+case( 'gamt' ); ps0 => gam
+case( 'mr'   ); ps0 => mr
+case( 'v'    ); pw1 => vv;   nc = 3
+case( 'u'    ); pw1 => uu;   nc = 3
+case( 'w'    ); pw1 => w1; pw2 => w2; pass = 1; cell = .true.; nc = 6
+case( 'a'    ); pw1 => w1;   nc = 3
+case( 'nhat' ); pw1 => nhat; fault = .true.; pass = 0; nc = 3
+case( 'mus'  ); ps0 => mus;  fault = .true.; pass = 0
+case( 'mud'  ); ps0 => mud;  fault = .true.; pass = 0
+case( 'dc'   ); ps0 => dc;   fault = .true.; pass = 0
+case( 'co'   ); ps0 => co;   fault = .true.; pass = 0
+case( 'sv'   ); pw1 => t1;   fault = .true.; pass = 1; nc = 3
+case( 'su'   ); pw1 => t2;   fault = .true.; pass = 1; nc = 3
+case( 'ts'   ); pw1 => t3;   fault = .true.; nc = 3
+case( 'sa'   ); pw1 => t2;   fault = .true.; nc = 3
+case( 'svm'  ); ps0 => f1;   fault = .true.; pass = 1
+case( 'sum'  ); ps0 => f2;   fault = .true.; pass = 1
+case( 'tsm'  ); ps0 => ts;   fault = .true.
+case( 'sam'  ); ps0 => f2;   fault = .true.
+case( 'tn'   ); ps0 => tn;   fault = .true.
+case( 'fr'   ); ps0 => f1;   fault = .true.
+case( 'sl'   ); ps0 => sl;   fault = .true.
+case( 'psv'  ); ps0 => psv;  fault = .true.; pass = 1
+case( 'trup' ); ps0 => trup; fault = .true.
+case( 'tarr' ); ps0 => tarr; fault = .true.
+case( 'pv2'  ); ps0 => pv;   pass = 1
+case( 'vm2'  ); ps0 => s1;   pass = 1;
+case( 'um2'  ); ps0 => s1
+case( 'wm2'  ); ps0 => s2;   pass = 1; cell = .true.            
+case( 'am2'  ); ps0 => s2
+case default
+  write( 0, * ) 'error: unknown output field: ', o%field
+  stop
+end select
 if ( fault .and. .not. dofault ) then
   o%i1(4) = nt + 1
   cycle doiz
 end if
 
-! Time indices 
+! Time indices
 if ( o%i1(4) < 0 ) o%i1(4) = nt + o%i1(4) + 1
 if ( o%i2(4) < 0 ) o%i2(4) = nt + o%i2(4) + 1
 if ( o%di(4) < 0 ) o%di(4) = nt + o%di(4) + 1
-if ( onpass == 0 ) then
+if ( o%pass == 0 ) then
   o%di(4) = 1
   o%i1(4) = 0
   o%i2(4) = 0
@@ -75,7 +121,7 @@ case( 'x' )
   o%di(4) = 1
   o%i1(4) = 0
   o%i2(4) = nt
-  if ( onpass == 0 ) o%i2(4) = 0
+  if ( o%pass == 0 ) o%i2(4) = 0
   rout = huge( rout )
   if ( fault ) then
     i1 = nnoff
@@ -109,6 +155,7 @@ end select
 
 ! Save paramters and allocate buffer
 di = o%di(1:3)
+o%nc = nc
 o%it = 0
 o%ib = 1
 o%i1(1:3) = i1
@@ -146,9 +193,10 @@ use m_outprops
 use m_util
 use m_debug_out
 integer, intent(in) :: pass
-integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, onpass, nc, ic, nr, ir, iz, id, mpio
-real :: rr
+integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, ic, iz, nr, ir, id, mpio
 logical :: dofault, fault, cell
+real :: rr
+real, pointer :: f(:,:,:)
 type( t_io ), pointer :: o
 
 ! Stats
@@ -248,7 +296,7 @@ case( 2 )
       call rio1( 34, mpout, 'stats/estrain', gestats(:jf,2), it/itstats, nt/itstats )
       call rio1( 35, mpout, 'stats/moment',  gestats(:jf,3), it/itstats, nt/itstats )
       do i = 1, jf
-      if ( gestats(i,3) > 0. ) then 
+      if ( gestats(i,3) > 0. ) then
         gestats(i,3) = ( log10( gestats(i,3) ) - 9.05 ) / 1.5
       else
         gestats(i,3) = -999
@@ -266,14 +314,17 @@ case( 2 )
 end select
 end if
 
+! Loop
+iz = 0
 o => out0
 doiz: do while( associated( o%next ) )
+iz = iz + 1
 o => o%next
 
 ! Pass
 if ( o%di(4) < 1 ) cycle doiz
 call outprops( o%field, nc, onpass, fault, cell )
-if ( pass /= onpass ) cycle doiz
+if ( pass /= o%pass ) cycle doiz
 
 ! Indices
 i1 = o%i1(1:3)
@@ -305,12 +356,13 @@ if ( any( i3 > i4 ) ) then
 end if
 
 ! Record number and number of records
+FIXME
 ir = ( it      - o%i1(4) ) / o%di(4) + 1
 nr = ( o%i2(4) - o%i1(4) ) / o%di(4) + 1
 
 ! Fault plane
 mpio = mpout * 4
-if ( fault ) then
+if ( o%fault ) then
   i = abs( faultnormal )
   mpio = mpout * i
   i1(i) = 1
@@ -319,76 +371,32 @@ if ( fault ) then
   i4(i) = 1
 end if
 
+! Magnitudes
+select case( o%field )
+case( 'vm2' ); if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, vv, i3, i4 )
+case( 'um2' ); if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, uu, i3, i4 )
+case( 'wm2' ); if ( modulo( it, itstats ) /= 0 ) call tensornorm( s2, w1, w2, i3, i4 )
+case( 'am2' ); if ( modulo( it, itstats ) /= 0 ) call vectornorm( s2, w1, i3, i4 )
+end select
+
 ! Binary output
-do ic = 1, nc
-  id = 64 + 6 * ( iz - 1 ) + ic
-  write( str, '(a,i2.2,a)' ) 'out/', iz, o%field
-  if ( nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic
-  if ( mpout == 0 ) then
-    i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
-    if ( any( i1 /= i3 .or. i2 /= i4 ) ) write( str, '(a,i6.6)' ) trim( str ), i
+do ic = 1, o%nc
+  if ( nc == 1 ) then
+    o%buff(:,:,:,o%it,o%ib,1)    = o%ps0(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3))
+  elseif ( ic < 4 ) then
+    o%buff(:,:,:,o%it,o%ib,ic)   = o%pw1(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3),ic)
+  else
+    o%buff(:,:,:,o%it,o%ib,ic-3) = o%pw2(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3),ic)
   end if
-  select case( o%field )
-  case( 'x'    ); call rio4( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, i4, ir, nr )
-  case( 'rho'  ); call rio3( id, mpio, rr, str, mr,       i1, i2, i3, i4, i4, ir, nr )
-  case( 'vp'   ); call rio3( id, mpio, rr, str, s1,       i1, i2, i3, i4, i4, ir, nr )
-  case( 'vs'   ); call rio3( id, mpio, rr, str, s2,       i1, i2, i3, i4, i4, ir, nr )
-  case( 'lam'  ); call rio3( id, mpio, rr, str, lam,      i1, i2, i3, i4, i4, ir, nr )
-  case( 'mu'   ); call rio3( id, mpio, rr, str, mu,       i1, i2, i3, i4, i4, ir, nr )
-  case( 'gam'  ); call rio3( id, mpio, rr, str, gam,      i1, i2, i3, i4, i4, ir, nr )
-  case( 'gamt' ); call rio3( id, mpio, rr, str, gam,      i1, i2, i3, i4, i4, ir, nr )
-  case( 'mr'   ); call rio3( id, mpio, rr, str, mr,       i1, i2, i3, i4, i4, ir, nr )
-  case( 'v'    ); call rio4( id, mpio, rr, str, vv, ic,   i1, i2, i3, i4, i4, ir, nr )
-  case( 'u'    ); call rio4( id, mpio, rr, str, uu, ic,   i1, i2, i3, i4, i4, ir, nr )
-  case( 'w'    );
-   if ( ic < 4 )  call rio4( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, i4, ir, nr )
-   if ( ic > 3 )  call rio4( id, mpio, rr, str, w2, ic-3, i1, i2, i3, i4, i4, ir, nr )
-  case( 'a'    ); call rio4( id, mpio, rr, str, w1, ic,   i1, i2, i3, i4, i4, ir, nr )
-  case( 'nhat' ); call rio4( id, mpio, rr, str, nhat, ic, i1, i2, i3, i4, i4, ir, nr )
-  case( 'mus'  ); call rio3( id, mpio, rr, str, mus,      i1, i2, i3, i4, i4, ir, nr )
-  case( 'mud'  ); call rio3( id, mpio, rr, str, mud,      i1, i2, i3, i4, i4, ir, nr )
-  case( 'dc'   ); call rio3( id, mpio, rr, str, dc,       i1, i2, i3, i4, i4, ir, nr )
-  case( 'co'   ); call rio3( id, mpio, rr, str, co,       i1, i2, i3, i4, i4, ir, nr )
-  case( 'sv'   ); call rio4( id, mpio, rr, str, t1, ic,   i1, i2, i3, i4, i4, ir, nr )
-  case( 'su'   ); call rio4( id, mpio, rr, str, t2, ic,   i1, i2, i3, i4, i4, ir, nr )
-  case( 'ts'   ); call rio4( id, mpio, rr, str, t3, ic,   i1, i2, i3, i4, i4, ir, nr )
-  case( 'sa'   ); call rio4( id, mpio, rr, str, t2, ic,   i1, i2, i3, i4, i4, ir, nr )
-  case( 'svm'  ); call rio3( id, mpio, rr, str, f1,       i1, i2, i3, i4, i4, ir, nr )
-  case( 'sum'  ); call rio3( id, mpio, rr, str, f2,       i1, i2, i3, i4, i4, ir, nr )
-  case( 'tsm'  ); call rio3( id, mpio, rr, str, ts,       i1, i2, i3, i4, i4, ir, nr )
-  case( 'sam'  ); call rio3( id, mpio, rr, str, f2,       i1, i2, i3, i4, i4, ir, nr )
-  case( 'tn'   ); call rio3( id, mpio, rr, str, tn,       i1, i2, i3, i4, i4, ir, nr )
-  case( 'fr'   ); call rio3( id, mpio, rr, str, f1,       i1, i2, i3, i4, i4, ir, nr )
-  case( 'sl'   ); call rio3( id, mpio, rr, str, sl,       i1, i2, i3, i4, i4, ir, nr )
-  case( 'psv'  ); call rio3( id, mpio, rr, str, psv,      i1, i2, i3, i4, i4, ir, nr )
-  case( 'trup' ); call rio3( id, mpio, rr, str, trup,     i1, i2, i3, i4, i4, ir, nr )
-  case( 'tarr' ); call rio3( id, mpio, rr, str, tarr,     i1, i2, i3, i4, i4, ir, nr )
-  case( 'pv2'  ); call rio3( id, mpio, rr, str, pv,       i1, i2, i3, i4, i4, ir, nr )
-  case( 'vm2'  )
-    if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, vv, i3, i4 )
-    call rio3( id, mpio, rr, str, s1, i1, i2, i3, i4, i4, ir, nr )
-  case( 'um2'  )
-    if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, uu, i3, i4 )
-    call rio3( id, mpio, rr, str, s1, i1, i2, i3, i4, i4, ir, nr )
-  case( 'wm2'  )
-    if ( modulo( it, itstats ) /= 0 ) call tensornorm( s2, w1, w2, i3, i4 )
-    call rio3( id, mpio, rr, str, s2, i1, i2, i3, i4, i4, ir, nr )
-  case( 'am2'  )
-    if ( modulo( it, itstats ) /= 0 ) call vectornorm( s2, w1, i3, i4 )
-    call rio3( id, mpio, rr, str, s2, i1, i2, i3, i4, i4, ir, nr )
-  case default
-    write( 0, * ) 'error: unknown output field: ', o%field
-    stop
-  end select
-  if ( all( i1 == i2 .and. i3 == i4 ) ) then
-    i = ibuff(iz) + ic - 1
-    if ( i == 0 ) stop 'unknown buffer'
-    jb(i) = jb(i) + 1
-    iobuffer(jb(i),i) = rr
-    if ( it == nt .or. modulo( it, itio ) == 0 ) then
-      call rio1( id, mpout, str, iobuffer(:jb(i),i), ir, nr )
-      jb(i) = 0
+  if ( o&it == o%nt ) then
+    id = 64 + 6 * ( iz - 1 ) + ic
+    write( str, '(a,i2.2,a)' ) 'out/', iz, o%field
+    if ( o%nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic
+    if ( mpout == 0 ) then
+      i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
+      if ( any( i1 /= i3 .or. i2 /= i4 ) ) write( str, '(a,i6.6)' ) trim( str ), i
     end if
+    FIXME
   end if
 end do
 

@@ -218,13 +218,18 @@ type t_io
     di(4),       & ! j,k,l,t decimation interval
     i3(3),       & ! j,k,l local start index
     i4(3),       & ! j,k,l local end index
+    nc,          & ! number of components
     nt,          & ! number of time steps to buffer
     it,          & ! number of timesteps in buffer
     ib             ! current buffer in double buffer
   type( t_io ), pointer :: &
     next           ! pointer to next in linked list
-  real, allocatable :: &
-    buff(:,:,:,:,:,:)  ! hold buffer, j,k,l,it,ic,ibuff
+  real, pointer, dimension(:,:,:) :: &
+    ps0            ! pointer to scalar source data
+  real, pointer, dimension(:,:,:,:) :: &
+    pw1, pw2       ! pointer to vector source data
+  real, allocatable, dimension(:,:,:,:,:,:) :: &
+    buff           ! hold buffer, j,k,l,it,ic,ibuff
 end type t_io
 
 type( t_io ), pointer :: &

@@ -22,33 +22,38 @@ case( 'gam'  ); onpass = 0; cell = .true.
 case( 'gamt' )
 case( 'mr'   )
 case( 'v'    ); nc = 3
-case( 'vm2'  ); onpass = 1
-case( 'pv2'  ); onpass = 1
-case( 'w'    ); onpass = 1; cell = .true.; nc = 6
-case( 'wm2'  ); onpass = 1; cell = .true.
 case( 'u'    ); nc = 3
-case( 'um2'  )
+case( 'w'    ); onpass = 1; cell = .true.; nc = 6
+
+
 case( 'a'    ); nc = 3
-case( 'am2'  )
 case( 'nhat' ); fault = .true.; onpass = 0; nc = 3
 case( 'mus'  ); fault = .true.; onpass = 0
 case( 'mud'  ); fault = .true.; onpass = 0
 case( 'dc'   ); fault = .true.; onpass = 0
 case( 'co'   ); fault = .true.; onpass = 0
 case( 'sv'   ); fault = .true.; onpass = 1; nc = 3
-case( 'svm'  ); fault = .true.; onpass = 1
-case( 'psv'  ); fault = .true.; onpass = 1
 case( 'su'   ); fault = .true.; onpass = 1; nc = 3
-case( 'sum'  ); fault = .true.; onpass = 1
-case( 'sl'   ); fault = .true.
 case( 'ts'   ); fault = .true.; nc = 3
+case( 'sa'   ); fault = .true.; nc = 3
+case( 'svm'  ); fault = .true.; onpass = 1
+case( 'sum'  ); fault = .true.; onpass = 1
 case( 'tsm'  ); fault = .true.
+case( 'sam'  ); fault = .true.
 case( 'tn'   ); fault = .true.
 case( 'fr'   ); fault = .true.
-case( 'sa'   ); fault = .true.; nc = 3
-case( 'sam'  ); fault = .true.
+case( 'sl'   ); fault = .true.
+case( 'psv'  ); fault = .true.; onpass = 1
 case( 'trup' ); fault = .true.
 case( 'tarr' ); fault = .true.
+case( 'pv2'  ); onpass = 1
+case( 'vm2'  ); onpass = 1
+
+case( 'um2'  )
+
+case( 'wm2'  ); onpass = 1; cell = .true.
+
+case( 'am2'  )
 case default
   write( 0, * ) 'error: unknown output field: ', field
   stop
