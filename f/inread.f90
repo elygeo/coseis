@@ -106,14 +106,15 @@ case( 'syz' );          inzone = .true.
 case( 'szx' );          inzone = .true.
 case( 'sxy' );          inzone = .true.
 case( 'timeseries' );
-  nout = nout + 1
-  i = nout
-  outtype(i) = 'x'
-  read( str, *, iostat=io ) fieldout(i), xout(i,:)
+  out1 => out1%next
+  allocate( out1 )
+  read( str, *, iostat=io ) out1%field, out1%x0
+  out1%otype = 'x'
 case( 'out' );
   out1 => out1%next
   allocate( out1 )
   read( str, *, iostat=io ) out1%field, out1%dit, out1%i1, out1%i2
+  out1%otype = 'z'
 case default; io = 1
 end select
 

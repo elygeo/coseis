@@ -371,7 +371,7 @@ if ( o%fault ) then
   i4(i) = 1
 end if
 
-! Magnitudes
+! Magnitude
 select case( o%field )
 case( 'vm2' ); if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, vv, i3, i4 )
 case( 'um2' ); if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, uu, i3, i4 )
@@ -379,16 +379,21 @@ case( 'wm2' ); if ( modulo( it, itstats ) /= 0 ) call tensornorm( s2, w1, w2, i3
 case( 'am2' ); if ( modulo( it, itstats ) /= 0 ) call vectornorm( s2, w1, i3, i4 )
 end select
 
-! Binary output
+! Buffer
+o%ib = o%ib + 1
 do ic = 1, o%nc
   if ( nc == 1 ) then
-    o%buff(:,:,:,o%it,o%ib,1) = o%ps0(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3))
+    o%buff(:,:,:,o%ib,1)  = o%ps0(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3))
   elseif ( ic < 4 ) then
-    o%buff(:,:,:,o%it,o%ib,ic) = o%pw1(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3),ic)
+    o%buff(:,:,:,o%ib,ic) = o%pw1(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3),ic)
   else
-    o%buff(:,:,:,o%it,o%ib,ic-3) = o%pw2(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3),ic)
+    o%buff(:,:,:,o%ib,ic) = o%pw2(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3),ic-3)
   end if
-  if ( o&it == o%nt ) then
+end do
+
+! Write to disk
+if ( o&it == o%nt ) then
+  do ic = 1, o%nc
     id = 64 + 6 * ( iz - 1 ) + ic
     write( str, '(a,i2.2,a)' ) 'out/', iz, o%field
     if ( o%nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic
@@ -396,9 +401,9 @@ do ic = 1, o%nc
       i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
       if ( any( i1 /= i3 .or. i2 /= i4 ) ) write( str, '(a,i6.6)' ) trim( str ), i
     end if
-    FIXME
-  end if
-end do
+    call rio4(
+  end do
+end if
 
 end do doiz
 

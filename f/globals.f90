@@ -220,8 +220,8 @@ type t_io
     i4(4),       & ! j,k,l,t local end index
     fh,          & ! file handle
     nc,          & ! number of components
-    nt,          & ! number of time steps to buffer
-    it           & ! number of timesteps in buffer
+    nb,          & ! number of time steps to buffer
+    ib             ! number of timesteps in buffer
   type( t_io ), pointer :: &
     next           ! pointer to next in linked list
   real, pointer, dimension(:,:,:) :: &
