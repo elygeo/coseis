@@ -165,7 +165,7 @@ where( i2 > i2core ) i2 = i1 + (   i2core - i1     ) / di       * di
 o%i3 = i1
 o%i4 = i2
 n = i2 - i1 + 1
-allocate( o%buff(n(1),n(2),n(3),o%nt,nc,2) )
+allocate( o%buff(n(1),n(2),n(3),o%nt,nc) )
 
 end do doiz
 
@@ -382,9 +382,9 @@ end select
 ! Binary output
 do ic = 1, o%nc
   if ( nc == 1 ) then
-    o%buff(:,:,:,o%it,o%ib,1)    = o%ps0(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3))
+    o%buff(:,:,:,o%it,o%ib,1) = o%ps0(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3))
   elseif ( ic < 4 ) then
-    o%buff(:,:,:,o%it,o%ib,ic)   = o%pw1(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3),ic)
+    o%buff(:,:,:,o%it,o%ib,ic) = o%pw1(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3),ic)
   else
     o%buff(:,:,:,o%it,o%ib,ic-3) = o%pw2(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3),ic)
   end if
