@@ -1,29 +1,39 @@
 % ShakeOut figure
 
 clear all
-xzone = 0;  fzone = 1;  squared = 0; % TeraShake
-xzone = 13; fzone = 18; squared = 1; % SORD
+%xzone = 0;  fzone = 1;  squared = 0; % TeraShake
+%xzone = 13; fzone = 18; squared = 1; % SORD
 name = '';
 vscale = 1;
 itoff = 0;
 meta
-xzone = 1; fzone = 2; squared = 0; % ShakeOut
+xzone = 1;
+squared = 0;
+bg = 'w'; fg = 'k'; atran = [ 1 -1 ];
+
+alim = [ .035 .065 ]; cslim = [ 0.05 2 ]; flim = [ .08 2 ]; clk = 'k'; units = 'm/s'; fzone = 2;
+filename = 'tmp/f%05d.png';
+lite = 0;
 its = 900;
-bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = 0:2:nt-itoff;
-bg = 'w'; fg = 'k'; clk = 'k'; atran = [ 1 -1 ]; its = 300:300:nt-itoff;
-its = nt; fzone = 3; % Shakeout Disp
-its = nt; fzone = 5; % Shakeout PGV
+its = 300:300:nt-itoff;
+
+alim = [ .14 .26  ];  cslim = [ 0.2  4 ]; flim = [ .32 4 ]; clk = 'w'; its = nt;
+lite = 1;
+fzone = 5; units = 'm'; filename = 'tmp/pgd.png';
+fzone = 7; units = 'm/s'; filename = 'tmp/pgv.png';
+
+%bg = 'k'; fg = 'w'; clk = 'g'; atran = [ 0  1 ]; its = 0:2:nt-itoff;
+%cs = [ bg '0'  ];  lite = 1; fc = [ .6 .6 .6 ]; alim = [ -2 -1 ]; cslim = [ 0 2 ];
 
 panes = { 'URS/USC' 'SDSU/SDSC' 'CMU/PSC' };
-flim = [ .08   2 ];
-cs = [ bg 'hot' ]; alim = [ .035 .065 ]; lite = 0; cslim = [ 0.05 2 ]; fc = 'flat';
-cs = [ bg '0'  ];  alim = [ -2 -1 ]; lite = 1; cslim = [ 0 2 ]; fc = [ .6 .6 .6 ];
+cs = [ bg 'hot' ];
+fc = 'flat';
 shadow = [ .1 .1 .1 ];
 ms = [ bg 'earth' ];
 as = [ bg fg '1' ]; 
 ce = .5;
 ae = 1;
-inches = [ 3.2 5.4 ];
+inches = [ 3.2 6.8 ];
 dpi = 300;
 ppi = 100;
 
@@ -50,7 +60,7 @@ haxes(1) = axes( 'Position', [ .005 .013 .99 .984 ] );
 axis off
 hold on
 axis equal
-axis( 1000 * [ 0 290 60 510 -80 80 ] )
+axis( 1000 * [ 0 300 0 600 -80 80 ] )
 axis ij
 
 % Basemap
@@ -146,12 +156,12 @@ plot( x, y, 'Clipping', 'off' );
 axes( haxes(2) )
 h = text( 125, 12, name );
 if strcmp( name, panes{2} )
-  h(2) = text( 160, 531, 'SCEC ShakeOut Simulations' );
+  h(2) = text( 150, 673, 'SCEC ShakeOut Simulations' );
 end
 set( h, 'FontSize', 12, 'FontWeight', 'normal' )
 x = 250 + [ -40 40 ];
 y = 18 + [ -2.5 2.5 ];
-h = colorscale( '1', x, y, cslim, 'b', num2str( cslim(1) ), [ num2str( cslim(2) ) ' m/s' ] );
+h = colorscale( '1', x, y, cslim, 'b', num2str( cslim(1) ), [ num2str( cslim(2) ) ' ' units ] );
 caxis( flim )
 axis off
 colorscheme( as, ae )
@@ -210,7 +220,7 @@ hclk = digitalclock( 20, 5, 14, clk );
 
 % Time loop
 for it = its
-file = sprintf( 'tmp/f%05d.png', it );
+file = sprintf( filename, it );
 if ~exist( file, 'file' ) & ~system( [ 'mkdir ' file '.lock >& /dev/null' ] )
 disp( file )
 t = it * dt;

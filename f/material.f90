@@ -29,6 +29,7 @@ do while( associated( p%next ) )
   case( 'vp'  ); f => s1
   case( 'vs'  ); f => s2
   case( 'gam' ); f => gam
+  case default; cycle
   end select
   i1 = p%i1
   i2 = p%i2
@@ -51,7 +52,7 @@ do while( associated( p%next ) )
       ifill = 0
     end where
     i = mpin * 4
-    rio3( -1, i, 'data/'//p%field, f, i1, i2, i3, i4, ifill )
+    call rio3( -1, i, 'data/'//p%field, f, i1, i2, i3, i4, ifill )
   end select
 end do
 

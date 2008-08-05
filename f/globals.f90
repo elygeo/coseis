@@ -104,9 +104,6 @@ real :: &
   rexpand,       & ! grid expansion ratio
   affine(9),     & ! grid transformation
   gridnoise,     & ! random noise in grid
-  inval(nz),     & ! input value
-  x1in(nz,3),    & ! input cube - near corner
-  x2in(nz,3),    & ! input cube - far corner 
   xhypo(3),      & ! hypocenter location
   slipvector(3)    ! slip direction for finding traction vectors
 
@@ -207,11 +204,12 @@ type t_io
     i4(4),       & ! j,k,l,t local end index
     di(4),       & ! j,k,l,t decimation interval
     nc,          & ! number of components
-    nb             ! number of timesteps to buffer
+    nb,          & ! number of timesteps to buffer
+    fh             ! file hangle
   real :: &
     x1(3),       & ! location 1
     x2(3),       & ! location 2
-    val          & ! value
+    val            ! value
   real, pointer, dimension(:,:,:) :: &
     ps0            ! pointer to scalar array
   real, pointer, dimension(:,:,:,:) :: &
@@ -221,7 +219,7 @@ type t_io
 end type t_io
 
 type( t_io ), pointer :: &
-  inp0,            ! intitial input pointer
+  inp0,          & ! intitial input pointer
   outp0            ! intitial output pointer
 
 end module

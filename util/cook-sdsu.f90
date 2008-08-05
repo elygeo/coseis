@@ -9,6 +9,9 @@ real :: v1(n1,n2), v2(n1,n2), v3(n1,n2), u1(n1,n2), u2(n1,n2), u3(n1,n2), &
   f(n1,n2), pu(n1,n2), puh(n1,n2), pv(n1,n2), pvh(n1,n2), vh(n1/ndec,n2/ndec), t
 character(256) :: f1, f2, f3
 
+u1  = 0.
+u2  = 0.
+u3  = 0.
 pu  = 0.
 puh = 0.
 pv  = 0.
@@ -30,9 +33,9 @@ do it0 = 1, nt-1
   close( 1 )
   close( 2 )
   close( 3 )
-  u1 = u1 + dt * v1
-  u2 = u2 + dt * v2
-  u3 = u3 + dt * v3
+  u1 = u1 + dt0 * v1
+  u2 = u2 + dt0 * v2
+  u3 = u3 + dt0 * v3
   f = sqrt( u1 * u1 + u2 * u2 + u3 * u3 ); pu  = max( f, pu )
   f = sqrt( u1 * u1 + u2 * u2 );           puh = max( f, puh )
   f = sqrt( v1 * v1 + v2 * v2 + v3 * v3 ); pv  = max( f, pv )

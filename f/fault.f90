@@ -44,6 +44,7 @@ do while( associated( p%next ) )
   case( 'ts1' ); f => t3(:,:,:,1)
   case( 'ts2' ); f => t3(:,:,:,2)
   case( 'tn'  ); f => t3(:,:,:,3)
+  case default; cycle
   end select
   i1 = p%i1
   i2 = p%i2
