@@ -12,6 +12,8 @@ integer :: i1(3), i2(3), i3(3), i4(3), ifill(3), bc(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, iz, b, c
 real :: x0(3), m(9), tol, r
 integer, allocatable :: seed(:)
+real, pointer :: f(:,:,:)
+type( t_io ), pointer :: p
 
 if ( master ) write( 0, * ) 'Grid generation'
 
@@ -31,11 +33,18 @@ if ( faultnormal /= 0 ) then
 end if
 
 ! Read grid
-doiz: do iz = 1, nin
-select case( intype(iz) )
-case( 'r' )
-  i1 = i1in(iz,:)
-  i2 = i2in(iz,:)
+p => inp0
+do while( associated( p%next ) )
+  p => p%next
+  if ( p%mode /= 'r' ) cycle
+  select case( p%field )
+  case( 'x1' ); f => w1(:,:,:,1)
+  case( 'x2' ); f => w1(:,:,:,2)
+  case( 'x3' ); f => w1(:,:,:,3)
+  case default; cycle
+  end select
+  i1 = p%i1
+  i2 = p%i2
   call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
   i3 = max( i1, i1core )
   i4 = min( i2, i2core )
@@ -48,13 +57,9 @@ case( 'r' )
     ifill = i2core
   end where
   i = mpin * 4
-  select case( fieldin(iz) )
-  case( 'x1' ); call rio3( -1, i, 'data/x1', w1(:,:,:,1), i1, i2, i3, i4, ifill )
-  case( 'x2' ); call rio3( -1, i, 'data/x2', w1(:,:,:,2), i1, i2, i3, i4, ifill )
-  case( 'x3' ); call rio3( -1, i, 'data/x3', w1(:,:,:,3), i1, i2, i3, i4, ifill )
-  end select
+  call rio3( -1, i, 'data/'//p%field, f, i1, i2, i3, i4, ifill )
 end select
-end do doiz
+end do
 
 ! Add random noise except at boundaries and in PML
 if ( gridnoise > 0. ) then

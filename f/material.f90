@@ -7,8 +7,10 @@ subroutine material
 use m_globals
 use m_collective
 use m_util
-real :: x1(3), x2(3), stats(8), gstats(8), r, rr(3)
-integer :: i1(3), i2(3), i3(3), i4(3), ifill(3), i, j1, k1, l1, j2, k2, l2, iz
+real :: stats(8), gstats(8), r, rr(3)
+integer :: i1(3), i2(3), i3(3), i4(3), ifill(3), i
+real, pointer :: f(:,:,:)
+type( t_io ), pointer :: p
 
 if ( master ) write( 0, * ) 'Material model'
 
@@ -19,52 +21,39 @@ s2 = 0.
 gam = 0.
 
 ! Inputs
-doiz: do iz = 1, nin
-r = inval(iz)
-x1 = x1in(iz,:)
-x2 = x2in(iz,:)
-i1 = i1in(iz,:)
-i2 = i2in(iz,:)
-call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
-i2 = i2 - 1
-i3 = max( i1, i1core )
-i4 = min( i2, i2core )
-j1 = i3(1); j2 = i4(1)
-k1 = i3(2); k2 = i4(2)
-l1 = i3(3); l2 = i4(3)
-select case( intype(iz) )
-case( 'r' )
-  ifill = 0
-  where ( i1 == i2 )
-    i1 = i1core
-    i2 = i1core
-    i3 = i1core
-    i4 = i1core
+p => inp0
+do while( associated( p%next ) )
+  p => p%next
+  select case( p%field )
+  case( 'rho' ); f => mr
+  case( 'vp'  ); f => s1
+  case( 'vs'  ); f => s2
+  case( 'gam' ); f => gam
+  end select
+  i1 = p%i1
+  i2 = p%i2
+  call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
+  i2 = i2 - 1
+  i3 = max( i1, i1core )
+  i4 = min( i2, i2core )
+  select case( p%mode )
+  case( 'z' )
+    f(i1(1):i2(1),i1(2):i2(2),i1(3):i2(3)) = p%val
+  case( 'c' )
+    call cube( f, w2, i3, i4, p%x1, p%x2, p%val )
+  case( 'r' )
     ifill = 0
-  end where
-  i = mpin * 4
-  select case( fieldin(iz) )
-  case( 'rho' ); call rio3( -1, i, 'data/rho', mr,  i1, i2, i3, i4, ifill )
-  case( 'vp'  ); call rio3( -1, i, 'data/vp',  s1,  i1, i2, i3, i4, ifill )
-  case( 'vs'  ); call rio3( -1, i, 'data/vs',  s2,  i1, i2, i3, i4, ifill )
-  case( 'gam' ); call rio3( -1, i, 'data/gam', gam, i1, i2, i3, i4, ifill )
+    where ( i1 == i2 )
+      i1 = i1core
+      i2 = i1core
+      i3 = i1core
+      i4 = i1core
+      ifill = 0
+    end where
+    i = mpin * 4
+    rio3( -1, i, 'data/'//p%field, f, i1, i2, i3, i4, ifill )
   end select
-case( 'z' )
-  select case( fieldin(iz) )
-  case( 'rho' ); mr(j1:j2,k1:k2,l1:l2)  = r
-  case( 'vp'  ); s1(j1:j2,k1:k2,l1:l2)  = r
-  case( 'vs'  ); s2(j1:j2,k1:k2,l1:l2)  = r
-  case( 'gam' ); gam(j1:j2,k1:k2,l1:l2) = r
-  end select
-case( 'c' )
-  select case( fieldin(iz) )
-  case( 'rho' ); call cube( mr,  w2, i3, i4, x1, x2, r )
-  case( 'vp'  ); call cube( s1,  w2, i3, i4, x1, x2, r )
-  case( 'vs'  ); call cube( s2,  w2, i3, i4, x1, x2, r )
-  case( 'gam' ); call cube( gam, w2, i3, i4, x1, x2, r )
-  end select
-end select
-end do doiz
+end do
 
 ! Test for endian problems
 if ( any( mr  /= mr  ) .or. maxval( mr  ) > huge( r ) ) stop 'NaN/Inf in rho'

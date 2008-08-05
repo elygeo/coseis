@@ -113,7 +113,7 @@ case( 'timeseries' );
   outp => outp%next
   allocate( outp )
   outp%mode = 'x'
-  read( str, *, iostat=io ) outp%field, outp%x0
+  read( str, *, iostat=io ) outp%field, outp%x1
 case( 'out' );
   nout = nout + 1
   outp => outp%next
@@ -121,7 +121,7 @@ case( 'out' );
   outp%mode = 'z'
   outp%di = 1
   outp%nb = 4
-  write( *,* ) 'FIXME output style'
+  write( *, * ) 'FIXME output style'
   read( str, *, iostat=io ) outp%field, outp%di(4), outp%i1, outp%i2
 case default; io = 1
 end select

@@ -9,8 +9,10 @@ use m_globals
 use m_collective
 use m_surfnormals
 use m_util
-real :: x1(3), x2(3), rr
-integer :: iz, i1(3), i2(3), i3(3), i4(3), ifill(3), i, j, k, l, j1, k1, l1, j2, k2, l2
+real :: rr
+integer :: i1(3), i2(3), i3(3), i4(3), ifill(3), i, j, k, l
+real, pointer :: f(:,:,:)
+type( t_io ), pointer :: p
 
 if ( ifn == 0 ) return
 if ( master ) write( 0, * ) 'Fault initialization'
@@ -25,83 +27,52 @@ t2 = 0.
 t3 = 0.
 
 ! Inputs
-do iz = 1, nin
-rr = inval(iz)
-x1 = x1in(iz,:)
-x2 = x2in(iz,:)
-i1 = i1in(iz,:)
-i2 = i2in(iz,:)
-call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
-i3 = max( i1, i1core )
-i4 = min( i2, i2core )
-i1(ifn) = 1
-i2(ifn) = 1
-i3(ifn) = 1
-i4(ifn) = 1
-j1 = i3(1); j2 = i4(1)
-k1 = i3(2); k2 = i4(2)
-l1 = i3(3); l2 = i4(3)
-select case( intype(iz) )
-case( 'r' )
-  ifill = 0
-  where ( i1 == i2 .and. ifn /= (/ 1, 2, 3 /) )
-    i1 = i1core
-    i2 = i1core
-    i3 = i1core
-    i4 = i1core
-    ifill = i2core
-  end where
-  i = mpin * ifn
-  select case( fieldin(iz) )
-  case( 'mus' ); call rio3( -1, i, 'data/mus', mus,         i1, i2, i3, i4, ifill )
-  case( 'mud' ); call rio3( -1, i, 'data/mud', mud,         i1, i2, i3, i4, ifill )
-  case( 'dc'  ); call rio3( -1, i, 'data/dc',  dc,          i1, i2, i3, i4, ifill )
-  case( 'co'  ); call rio3( -1, i, 'data/co',  co,          i1, i2, i3, i4, ifill )
-  case( 'sxx' ); call rio3( -1, i, 'data/sxx', t1(:,:,:,1), i1, i2, i3, i4, ifill )
-  case( 'syy' ); call rio3( -1, i, 'data/syy', t1(:,:,:,2), i1, i2, i3, i4, ifill )
-  case( 'szz' ); call rio3( -1, i, 'data/szz', t1(:,:,:,3), i1, i2, i3, i4, ifill )
-  case( 'syz' ); call rio3( -1, i, 'data/syz', t2(:,:,:,1), i1, i2, i3, i4, ifill )
-  case( 'szx' ); call rio3( -1, i, 'data/szx', t2(:,:,:,2), i1, i2, i3, i4, ifill )
-  case( 'sxy' ); call rio3( -1, i, 'data/sxy', t2(:,:,:,3), i1, i2, i3, i4, ifill )
-  case( 'ts1' ); call rio3( -1, i, 'data/ts1', t3(:,:,:,1), i1, i2, i3, i4, ifill )
-  case( 'ts2' ); call rio3( -1, i, 'data/ts2', t3(:,:,:,2), i1, i2, i3, i4, ifill )
-  case( 'tn'  ); call rio3( -1, i, 'data/tn',  t3(:,:,:,3), i1, i2, i3, i4, ifill )
+p => inp0
+do while( associated( p%next ) )
+  p => p%next
+  select case( p%field )
+  case( 'mus' ); f => mus
+  case( 'mud' ); f => mud
+  case( 'dc'  ); f => dc
+  case( 'co'  ); f => co
+  case( 'sxx' ); f => t1(:,:,:,1)
+  case( 'syy' ); f => t1(:,:,:,2)
+  case( 'szz' ); f => t1(:,:,:,3)
+  case( 'syz' ); f => t2(:,:,:,1)
+  case( 'szx' ); f => t2(:,:,:,2)
+  case( 'sxy' ); f => t2(:,:,:,3)
+  case( 'ts1' ); f => t3(:,:,:,1)
+  case( 'ts2' ); f => t3(:,:,:,2)
+  case( 'tn'  ); f => t3(:,:,:,3)
   end select
-case( 'z' )
-  select case ( fieldin(iz) )
-  case( 'mus' ); mus(j1:j2,k1:k2,l1:l2)  = rr
-  case( 'mud' ); mud(j1:j2,k1:k2,l1:l2)  = rr
-  case( 'dc'  ); dc(j1:j2,k1:k2,l1:l2)   = rr
-  case( 'co'  ); co(j1:j2,k1:k2,l1:l2)   = rr
-  case( 'sxx' ); t1(j1:j2,k1:k2,l1:l2,1) = rr
-  case( 'syy' ); t1(j1:j2,k1:k2,l1:l2,2) = rr
-  case( 'szz' ); t1(j1:j2,k1:k2,l1:l2,3) = rr
-  case( 'syz' ); t2(j1:j2,k1:k2,l1:l2,1) = rr
-  case( 'szx' ); t2(j1:j2,k1:k2,l1:l2,2) = rr
-  case( 'sxy' ); t2(j1:j2,k1:k2,l1:l2,3) = rr
-  case( 'ts1' ); t3(j1:j2,k1:k2,l1:l2,1) = rr
-  case( 'ts2' ); t3(j1:j2,k1:k2,l1:l2,2) = rr
-  case( 'tn'  ); t3(j1:j2,k1:k2,l1:l2,3) = rr
+  i1 = p%i1
+  i2 = p%i2
+  call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
+  i3 = max( i1, i1core )
+  i4 = min( i2, i2core )
+  i1(ifn) = 1
+  i2(ifn) = 1
+  i3(ifn) = 1
+  i4(ifn) = 1
+  select case( p%mode )
+  case( 'z' )
+    f(i1(1):i2(1),i1(2):i2(2),i1(3):i2(3)) = p%val
+  case( 'c' )
+    i3(ifn) = ihypo(ifn)
+    i4(ifn) = ihypo(ifn)
+    call cube( f, w1, i3, i4, p%x1, p%x2, p%val )
+  case( 'r' )
+    ifill = 0
+    where ( i1 == i2 .and. ifn /= (/ 1, 2, 3 /) )
+      i1 = i1core
+      i2 = i1core
+      i3 = i1core
+      i4 = i1core
+      ifill = i2core
+    end where
+    i = mpin * ifn
+    call rio3( -1, i, 'data/'//p%field, f, i1, i2, i3, i4, ifill )
   end select
-case( 'c' )
-  i3(ifn) = ihypo(ifn)
-  i4(ifn) = ihypo(ifn)
-  select case ( fieldin(iz) )
-  case( 'mus' ); call cube( mus,         w1, i3, i4, x1, x2, rr )
-  case( 'mud' ); call cube( mud,         w1, i3, i4, x1, x2, rr )
-  case( 'dc'  ); call cube( dc,          w1, i3, i4, x1, x2, rr )
-  case( 'co'  ); call cube( co,          w1, i3, i4, x1, x2, rr )
-  case( 'sxx' ); call cube( t1(:,:,:,1), w1, i3, i4, x1, x2, rr )
-  case( 'syy' ); call cube( t1(:,:,:,2), w1, i3, i4, x1, x2, rr )
-  case( 'szz' ); call cube( t1(:,:,:,3), w1, i3, i4, x1, x2, rr )
-  case( 'syz' ); call cube( t2(:,:,:,1), w1, i3, i4, x1, x2, rr )
-  case( 'szx' ); call cube( t2(:,:,:,2), w1, i3, i4, x1, x2, rr )
-  case( 'sxy' ); call cube( t2(:,:,:,3), w1, i3, i4, x1, x2, rr )
-  case( 'ts1' ); call cube( t3(:,:,:,1), w1, i3, i4, x1, x2, rr )
-  case( 'ts2' ); call cube( t3(:,:,:,2), w1, i3, i4, x1, x2, rr )
-  case( 'tn'  ); call cube( t3(:,:,:,3), w1, i3, i4, x1, x2, rr )
-  end select
-end select
 end do
 
 ! Test for endian problems

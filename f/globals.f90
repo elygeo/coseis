@@ -176,8 +176,8 @@ integer :: &
 
 integer :: &
   oplevel,       & ! 1=constant, 2=rectangular, 3=parallelepiped, 4=one-point quadrature, 5=exact
-  nin,           & ! numpber of input zones
-  nout,          & ! numpber of output zones
+  nin = 2,       & ! numpber of input zones
+  nout = 0,      & ! numpber of output zones
   mpin,          & ! input, 0=separate files, 1=MPI-IO
   mpout            ! output, 0=separate files, 1=MPI-IO
 
