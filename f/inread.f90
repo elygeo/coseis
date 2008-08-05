@@ -10,11 +10,13 @@ integer :: i, io
 logical :: inzone
 character(12) :: key
 character(256) :: line
-type( t_io ), pointer :: o
+type( t_io ), pointer :: inp, outp
 
-allocate( in0, out0 )
-!in1 => in0
-o => out0       
+! I/O pointers
+allocate( inp, inp0, outp, outp0 )
+inp => inp0
+outp => outp0
+
 open( 1, file='input', status='old' )
 
 doline: do
@@ -107,45 +109,48 @@ case( 'syz' );          inzone = .true.
 case( 'szx' );          inzone = .true.
 case( 'sxy' );          inzone = .true.
 case( 'timeseries' );
-  o => o%next
-  allocate( o )
-  o%mode = 'x'
-  read( str, *, iostat=io ) o%field, o%x0
+  nout = nout + 1
+  outp => outp%next
+  allocate( outp )
+  outp%mode = 'x'
+  read( str, *, iostat=io ) outp%field, outp%x0
 case( 'out' );
-  o => o%next
-  allocate( o )
-  o%mode = 'z'
-  o%di = 1
-  o%nb = 4
+  nout = nout + 1
+  outp => outp%next
+  allocate( outp )
+  outp%mode = 'z'
+  outp%di = 1
+  outp%nb = 4
   write( *,* ) 'FIXME output style'
-  read( str, *, iostat=io ) o%field, o%di(4), o%i1, o%i2
+  read( str, *, iostat=io ) outp%field, outp%di(4), outp%i1, outp%i2
 case default; io = 1
 end select
 
 ! Input zone
 if ( inzone ) then
   nin = nin + 1
-  i = nin
-  fieldin(i) = key(1:4)
-  intype(i) = 'z'
-  i1in(i,:) = 1
-  i2in(i,:) = -1
+  inp => inp%next
+  allocate( inp )
+  inp%field = key(1:4)
+  inp%mode = 'z'
+  inp%i1 = 1
+  inp%i2 = -1
   call strtok( str, key )
   if ( key == 'read' ) then
-    intype(i) = 'r'
+    inp%mode = 'r'
     call strtok( str, key )
     select case( key )
     case( '' )
-    case( 'zone' ); read( str, *, iostat=io ) i1in(i,:), i2in(i,:)
+    case( 'zone' ); read( str, *, iostat=io ) inp%i1, inp%i2
     case default; io = 1
     end select
   else
-    read( key, * ) inval(i)
+    read( key, * ) inp%val
     call strtok( str, key )
     select case( key )
     case( '' )
-    case( 'zone' ); read( str, *, iostat=io ) i1in(i,:), i2in(i,:)
-    case( 'cube' ); read( str, *, iostat=io ) x1in(i,:), x2in(i,:); intype(i) = 'c'
+    case( 'zone' ); read( str, *, iostat=io ) inp%i1, inp%i2
+    case( 'cube' ); read( str, *, iostat=io ) inp%x1, inp%x2; inp%mode = 'c'
     case default; io = 1
     end select
   end if

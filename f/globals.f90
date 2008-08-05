@@ -5,9 +5,6 @@ implicit none
 real, parameter :: &
   pi = 3.14159
 
-integer, parameter :: &
-  nz = 100         ! max number of input and output zones, also see mpi.f90
-
 ! 4d vectors
 real, allocatable, dimension(:,:,:,:,:) :: &
   bb               ! B matrix
@@ -179,17 +176,10 @@ integer :: &
 
 integer :: &
   oplevel,       & ! 1=constant, 2=rectangular, 3=parallelepiped, 4=one-point quadrature, 5=exact
-  nin = 2,       & ! number of zones for input, hold two spots
-  i1in(nz,3),    & ! j1 k1 l1 input start index
-  i2in(nz,3),    & ! j1 k1 l1 input end index
+  nin,           & ! numpber of input zones
+  nout,          & ! numpber of output zones
   mpin,          & ! input, 0=separate files, 1=MPI-IO
   mpout            ! output, 0=separate files, 1=MPI-IO
-
-character :: &
-  intype(nz)       ! input type: z=zone, c=cube, r=read
-
-character(4) :: &
-  fieldin(nz)      ! input variable
 
 character(16) :: &
   rfunc,         & ! moment source space function
@@ -202,14 +192,14 @@ logical :: &
   sync,          & ! synchronize processes
   master           ! master process flag
 
-! output structure
+! input/output structure
 type t_io
   type( t_io ), pointer :: &
     next           ! pointer to next in linked list
   character(4) :: &
     field          ! variable name
   character :: &
-    mode           ! output type
+    mode
   integer :: &
     i1(4),       & ! j,k,l,t start index
     i2(4),       & ! j,k,l,t end index
@@ -219,17 +209,20 @@ type t_io
     nc,          & ! number of components
     nb             ! number of timesteps to buffer
   real :: &
-    x0(3)          ! location
+    x1(3),       & ! location 1
+    x2(3),       & ! location 2
+    val          & ! value
   real, pointer, dimension(:,:,:) :: &
-    ps0            ! pointer to scalar source data
+    ps0            ! pointer to scalar array
   real, pointer, dimension(:,:,:,:) :: &
-    pw1, pw2       ! pointer to vector source data
+    pw1, pw2       ! pointer to vector arrays
   real, allocatable, dimension(:,:,:,:,:) :: &
-    buff           ! hold buffer, j,k,l,it,ic,ibuff
+    buff           ! hold buffer, j,k,l,it,ic
 end type t_io
 
 type( t_io ), pointer :: &
-  out0             ! intitial output
+  inp0,            ! intitial input pointer
+  outp0            ! intitial output pointer
 
 end module
 

@@ -135,6 +135,24 @@ call frio1( id, str, ft, ir, nr )
 i = mpio
 end subroutine
 
+! 3D I/O
+subroutine rio3( id, mpio, str, f, i1, i2, i3, i4, ifill )
+use m_frio
+real, intent(inout) :: f(:,:,:)
+integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), ifill(3)
+character(*), intent(in) :: str
+integer :: i
+if ( id == 0 ) return
+if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
+  write( 0, * ) 'Error in rio3: ', id, str
+  write( 0, * ) i1, i2
+  write( 0, * ) i3, i4
+  stop
+end if
+call frio3( id, str, f, i1, i2, ifill )
+i = mpio
+end subroutine
+
 ! 4D I/O
 subroutine rio4( id, mpio, str, f, i1, i2, i3, i4, ifill )
 use m_frio

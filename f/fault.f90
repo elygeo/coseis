@@ -53,19 +53,19 @@ case( 'r' )
   end where
   i = mpin * ifn
   select case( fieldin(iz) )
-  case( 'mus' ); call rio3( -1, i, 'data/mus', mus,   i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'mud' ); call rio3( -1, i, 'data/mud', mud,   i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'dc'  ); call rio3( -1, i, 'data/dc',  dc,    i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'co'  ); call rio3( -1, i, 'data/co',  co,    i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'sxx' ); call rio4( -1, i, 'data/sxx', t1, 1, i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'syy' ); call rio4( -1, i, 'data/syy', t1, 2, i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'szz' ); call rio4( -1, i, 'data/szz', t1, 3, i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'syz' ); call rio4( -1, i, 'data/syz', t2, 1, i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'szx' ); call rio4( -1, i, 'data/szx', t2, 2, i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'sxy' ); call rio4( -1, i, 'data/sxy', t2, 3, i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'ts1' ); call rio4( -1, i, 'data/ts1', t3, 1, i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'ts2' ); call rio4( -1, i, 'data/ts2', t3, 2, i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'tn'  ); call rio4( -1, i, 'data/tn',  t3, 3, i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'mus' ); call rio3( -1, i, 'data/mus', mus,         i1, i2, i3, i4, ifill )
+  case( 'mud' ); call rio3( -1, i, 'data/mud', mud,         i1, i2, i3, i4, ifill )
+  case( 'dc'  ); call rio3( -1, i, 'data/dc',  dc,          i1, i2, i3, i4, ifill )
+  case( 'co'  ); call rio3( -1, i, 'data/co',  co,          i1, i2, i3, i4, ifill )
+  case( 'sxx' ); call rio3( -1, i, 'data/sxx', t1(:,:,:,1), i1, i2, i3, i4, ifill )
+  case( 'syy' ); call rio3( -1, i, 'data/syy', t1(:,:,:,2), i1, i2, i3, i4, ifill )
+  case( 'szz' ); call rio3( -1, i, 'data/szz', t1(:,:,:,3), i1, i2, i3, i4, ifill )
+  case( 'syz' ); call rio3( -1, i, 'data/syz', t2(:,:,:,1), i1, i2, i3, i4, ifill )
+  case( 'szx' ); call rio3( -1, i, 'data/szx', t2(:,:,:,2), i1, i2, i3, i4, ifill )
+  case( 'sxy' ); call rio3( -1, i, 'data/sxy', t2(:,:,:,3), i1, i2, i3, i4, ifill )
+  case( 'ts1' ); call rio3( -1, i, 'data/ts1', t3(:,:,:,1), i1, i2, i3, i4, ifill )
+  case( 'ts2' ); call rio3( -1, i, 'data/ts2', t3(:,:,:,2), i1, i2, i3, i4, ifill )
+  case( 'tn'  ); call rio3( -1, i, 'data/tn',  t3(:,:,:,3), i1, i2, i3, i4, ifill )
   end select
 case( 'z' )
   select case ( fieldin(iz) )
@@ -87,19 +87,19 @@ case( 'c' )
   i3(ifn) = ihypo(ifn)
   i4(ifn) = ihypo(ifn)
   select case ( fieldin(iz) )
-  case( 'mus' ); call cube( mus, w1, i3, i4, x1, x2, rr )
-  case( 'mud' ); call cube( mud, w1, i3, i4, x1, x2, rr )
-  case( 'dc'  ); call cube( dc,  w1, i3, i4, x1, x2, rr )
-  case( 'co'  ); call cube( co,  w1, i3, i4, x1, x2, rr )
-  case( 'sxx' ); f1 = t1(:,:,:,1); call cube( f1, w1, i3, i4, x1, x2, rr ); t1(:,:,:,1) = f1
-  case( 'syy' ); f1 = t1(:,:,:,2); call cube( f1, w1, i3, i4, x1, x2, rr ); t1(:,:,:,2) = f1
-  case( 'szz' ); f1 = t1(:,:,:,3); call cube( f1, w1, i3, i4, x1, x2, rr ); t1(:,:,:,3) = f1
-  case( 'syz' ); f1 = t2(:,:,:,1); call cube( f1, w1, i3, i4, x1, x2, rr ); t2(:,:,:,1) = f1
-  case( 'szx' ); f1 = t2(:,:,:,2); call cube( f1, w1, i3, i4, x1, x2, rr ); t2(:,:,:,2) = f1
-  case( 'sxy' ); f1 = t2(:,:,:,3); call cube( f1, w1, i3, i4, x1, x2, rr ); t2(:,:,:,3) = f1
-  case( 'ts1' ); f1 = t3(:,:,:,1); call cube( f1, w1, i3, i4, x1, x2, rr ); t3(:,:,:,1) = f1
-  case( 'ts2' ); f1 = t3(:,:,:,2); call cube( f1, w1, i3, i4, x1, x2, rr ); t3(:,:,:,2) = f1
-  case( 'tn'  ); f1 = t3(:,:,:,3); call cube( f1, w1, i3, i4, x1, x2, rr ); t3(:,:,:,3) = f1
+  case( 'mus' ); call cube( mus,         w1, i3, i4, x1, x2, rr )
+  case( 'mud' ); call cube( mud,         w1, i3, i4, x1, x2, rr )
+  case( 'dc'  ); call cube( dc,          w1, i3, i4, x1, x2, rr )
+  case( 'co'  ); call cube( co,          w1, i3, i4, x1, x2, rr )
+  case( 'sxx' ); call cube( t1(:,:,:,1), w1, i3, i4, x1, x2, rr )
+  case( 'syy' ); call cube( t1(:,:,:,2), w1, i3, i4, x1, x2, rr )
+  case( 'szz' ); call cube( t1(:,:,:,3), w1, i3, i4, x1, x2, rr )
+  case( 'syz' ); call cube( t2(:,:,:,1), w1, i3, i4, x1, x2, rr )
+  case( 'szx' ); call cube( t2(:,:,:,2), w1, i3, i4, x1, x2, rr )
+  case( 'sxy' ); call cube( t2(:,:,:,3), w1, i3, i4, x1, x2, rr )
+  case( 'ts1' ); call cube( t3(:,:,:,1), w1, i3, i4, x1, x2, rr )
+  case( 'ts2' ); call cube( t3(:,:,:,2), w1, i3, i4, x1, x2, rr )
+  case( 'tn'  ); call cube( t3(:,:,:,3), w1, i3, i4, x1, x2, rr )
   end select
 end select
 end do

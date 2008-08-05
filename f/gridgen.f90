@@ -49,9 +49,9 @@ case( 'r' )
   end where
   i = mpin * 4
   select case( fieldin(iz) )
-  case( 'x1' ); call rio4( -1, i, 'data/x1', w1, 1, i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'x2' ); call rio4( -1, i, 'data/x2', w1, 2, i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'x3' ); call rio4( -1, i, 'data/x3', w1, 3, i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'x1' ); call rio3( -1, i, 'data/x1', w1(:,:,:,1), i1, i2, i3, i4, ifill )
+  case( 'x2' ); call rio3( -1, i, 'data/x2', w1(:,:,:,2), i1, i2, i3, i4, ifill )
+  case( 'x3' ); call rio3( -1, i, 'data/x3', w1(:,:,:,3), i1, i2, i3, i4, ifill )
   end select
 end select
 end do doiz

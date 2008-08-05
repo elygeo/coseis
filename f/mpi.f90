@@ -352,6 +352,50 @@ if ( ir == nr ) then
 end if
 end subroutine
 
+! 3D input/output
+subroutine rio3( id, mpio, str, f, i1, i2, i3, i4, ifill )
+use m_frio
+use mpi
+real, intent(inout) :: f(:,:,:)
+integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), ifill(3)
+character(*), intent(in) :: str
+integer :: i, fh, mtype, nl(3), n(3), i0(3), e
+integer(kind=mpi_offset_kind) :: ir0
+if ( id == 0 ) return
+if ( mpio == 0 ) then
+  call frio3( id, str, f, i3, i4, ifill )
+  return
+end if
+i = abs( id )
+call mpopen( fh, id, mpio, str, i1, i2, i3, i4, 1 )
+if ( any( i3 > i4 ) ) return
+i0 = i3 - 1
+nl = i4 - i3 + 1
+ir0 = ir - 1
+ir0 = ir0 * nl(1) * nl(2) * nl(3)
+n = (/ size(f,1), size(f,2), size(f,3) /)
+call mpi_type_create_subarray( 3, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
+call mpi_type_commit( mtype, e )
+if ( id > 0 ) then
+  if ( mpio > 0 ) then
+    call mpi_file_write_at_all( fh, ir0, f(1,1,1), 1, mtype, mpi_status_ignore, e )
+  else
+    call mpi_file_write_at( fh, ir0, f(1,1,1), 1, mtype, mpi_status_ignore, e )
+  end if
+else
+  if ( mpio > 0 ) then
+    call mpi_file_read_at_all( fh, ir0, f(1,1,1), 1, mtype, mpi_status_ignore, e )
+  else
+    call mpi_file_read_at( fh, ir0, f(1,1,1), 1, mtype, mpi_status_ignore, e )
+  end if
+  do i = i4(1)+1, ifill(1); f(i,:,:) = f(i4(1),:,:); end do
+  do i = i4(2)+1, ifill(2); f(:,i,:) = f(:,i4(2),:); end do
+  do i = i4(3)+1, ifill(3); f(:,:,i) = f(:,:,i4(3)); end do
+end if
+call mpi_file_close( fh, e )
+call mpi_type_free( mtype, e )
+end subroutine
+
 ! 4D input/output
 subroutine rio4( id, mpio, str, f, i1, i2, i3, i4, ifill )
 use m_frio
@@ -383,15 +427,15 @@ ir0 = i3(4) - i1(4)
 ir0 = ir0 * nl(1) * nl(2) * nl(3)
 if ( id > 0 ) then
   if ( mpio > 0 ) then
-    call mpi_file_write_at_all( fh, ir0, f, 1, mtype, mpi_status_ignore, e )
+    call mpi_file_write_at_all( fh, ir0, f(1,1,1,1), 1, mtype, mpi_status_ignore, e )
   else
-    call mpi_file_write_at( fh, ir0, f, 1, mtype, mpi_status_ignore, e )
+    call mpi_file_write_at( fh, ir0, f(1,1,1,1), 1, mtype, mpi_status_ignore, e )
   end if
 else
   if ( mpio > 0 ) then
-    call mpi_file_read_at_all( fh, ir0, f, 1, mtype, mpi_status_ignore, e )
+    call mpi_file_read_at_all( fh, ir0, f(1,1,1,1), 1, mtype, mpi_status_ignore, e )
   else
-    call mpi_file_read_at( fh, ir0, f, 1, mtype, mpi_status_ignore, e )
+    call mpi_file_read_at( fh, ir0, f(1,1,1,1), 1, mtype, mpi_status_ignore, e )
   end if
   do i = i4(1)+1, ifill(1); f(i,:,:,:) = f(i4(1),:,:,:); end do
   do i = i4(2)+1, ifill(2); f(:,i,:,:) = f(:,i4(2),:,:); end do

@@ -44,10 +44,10 @@ case( 'r' )
   end where
   i = mpin * 4
   select case( fieldin(iz) )
-  case( 'rho' ); call rio3( -1, i, 'data/rho', mr,  i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'vp'  ); call rio3( -1, i, 'data/vp',  s1,  i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'vs'  ); call rio3( -1, i, 'data/vs',  s2,  i1, i2, i3, i4, ifill, 1, 1 )
-  case( 'gam' ); call rio3( -1, i, 'data/gam', gam, i1, i2, i3, i4, ifill, 1, 1 )
+  case( 'rho' ); call rio3( -1, i, 'data/rho', mr,  i1, i2, i3, i4, ifill )
+  case( 'vp'  ); call rio3( -1, i, 'data/vp',  s1,  i1, i2, i3, i4, ifill )
+  case( 'vs'  ); call rio3( -1, i, 'data/vs',  s2,  i1, i2, i3, i4, ifill )
+  case( 'gam' ); call rio3( -1, i, 'data/gam', gam, i1, i2, i3, i4, ifill )
   end select
 case( 'z' )
   select case( fieldin(iz) )

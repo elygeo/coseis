@@ -43,6 +43,35 @@ if ( ir == nr ) then
 end if
 end subroutine
 
+! 3D I/O
+subroutine frio3( id, str, f, i1, i2, ifill )
+real, intent(inout) :: f(:,:,:)
+integer, intent(in) :: id, i1(3), i2(3), ifill(3)
+character(*), intent(in) :: str
+integer :: i, fh, nb, j1, k1, l1, j2, k2, l2
+if ( id == 0 .or. any( i1 > i2 ) ) return
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+fh = id + 65536
+write( 0, * ) 'Opening file: ', trim( str )
+inquire( iolength=nb ) f(j1:j2,k1:k2,l1:l2)
+if ( id < 0 .or. ir > 1 ) then
+  open( fh, file=str, recl=nb, form='unformatted', access='direct', status='old' )
+else
+  open( fh, file=str, recl=nb, form='unformatted', access='direct', status='new' )
+end if
+if ( id < 0 ) then
+  read(  fh, rec=ir ) f(j1:j2,k1:k2,l1:l2)
+  do i = i2(1)+1, ifill(1); f(i,:,:) = f(i2(1),:,:); end do
+  do i = i2(2)+1, ifill(2); f(:,i,:) = f(:,i2(2),:); end do
+  do i = i2(3)+1, ifill(3); f(:,:,i) = f(:,:,i2(3)); end do
+else
+  write( fh, rec=ir ) f(j1:j2,k1:k2,l1:l2)
+end if
+close( fh )
+end subroutine
+
 ! 4D I/O
 subroutine frio4( id, str, f, i1, i2, nr, ifill )
 real, intent(inout) :: f(:,:,:,:)
