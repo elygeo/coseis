@@ -6,11 +6,10 @@ contains
 subroutine metadata
 use m_globals
 real :: courant
-integer :: i1(4), i2(4), i, nc, iz, onpass
+integer :: i1(4), i2(4), i, iz
 character :: endian
 character(7) :: field
-logical :: fault, cell
-type( t_io ), pointer :: o
+type( t_io ), pointer :: p
 
 if ( master ) write( 0, * ) 'Write metadata'
 
@@ -37,12 +36,14 @@ if ( debug /= 0 ) then
   write( 1, "( 'i1core =  [ ',i8,2(', ',i8),']; i2core =  [',i8,2(', ',i8),' ];')" ) i1core, i2core
   write( 1, "( 'i1node =  [ ',i8,2(', ',i8),']; i2node =  [',i8,2(', ',i8),' ];')" ) i1node, i2node
   write( 1, "( 'i1cell =  [ ',i8,2(', ',i8),']; i2cell =  [',i8,2(', ',i8),' ];')" ) i1cell, i2cell
-  do iz = 1, nin
-    select case( intype(iz) )
+  p => inp0
+  do while( associated( p%next ) )
+    p => p%next
+    select case( p%mode )
     case( 'z' ); write( 1, "( a,' = { ',g15.7,', ''zone'', ',i8,5(', ',i8),' };' )" ) &
-      fieldin(iz), inval(iz), i1in(iz,:), i2in(iz,:)
+      p%field, p%val, p%i1, p%i2
     case( 'c' ); write( 1, "( a,' = { ',g15.7,', ''cube'', ',g15.7,5(', ',g15.7),' };' )" ) &
-      fieldin(iz), inval(iz), x1in(iz,:), x2in(iz,:)
+      p%field, p%val, p%x1, p%x2
     end select
   end do
   close( 1 )
@@ -121,17 +122,16 @@ end if
 write( 1, "( 'dirfmt      =   ''out/%02d'';'                )" )
 write( 1, "( 'out         =   {'                            )" )
 iz = 0
-o => out0
-do while( associated( o%next ) )
+p => outp0
+do while( associated( p%next ) )
   iz = iz + 1
-  o => o%next
-  i = o&di(4)
-  i1 = o%i1
-  i2 = o%i2
-  i1(1:3) = o%i1(1:3) + nnoff
-  i2(1:3) = o%i2(1:3) + nnoff
-  write( field, "( '''',a,''',')" ) trim( o%field )
-  write( 1, "( '  { ',i1,' ',a,9(', ',i7),' }, % ',i3 )" ) o%nc, field, i, i1, i2, iz
+  p => p%next
+  i1 = p%i1
+  i2 = p%i2
+  i1(1:3) = p%i1(1:3) + nnoff
+  i2(1:3) = p%i2(1:3) + nnoff
+  write( field, "( '''',a,''',')" ) trim( p%field )
+  write( 1, "( '  { ',i1,' ',a,9(', ',i7),' }, % ',i3 )" ) p%nc, field, p%di(4), i1, i2, iz
 end do
 write( 1, "( '};' )" )
 close( 1 )
@@ -139,14 +139,14 @@ close( 1 )
 ! Translate MATALB to Python
 open( 1, file='meta.m', status='old' )
 open( 2, file='meta.py', status='replace' )
-doline: do
+do
   read( 1, "(a)", iostat=i ) str
   if ( i /= 0 ) exit
   do; i = scan( str, "%" ); if ( i == 0 ) exit; str(i:i) = '#'; end do
   do; i = scan( str, "{" ); if ( i == 0 ) exit; str(i:i) = '['; end do
   do; i = scan( str, "}" ); if ( i == 0 ) exit; str(i:i) = ']'; end do
   write( 2, "(a)" ) trim( str )
-end do doline
+end do
 close( 1 )
 close( 2 )
 
@@ -156,17 +156,17 @@ if ( mpout == 0 ) then
   write( 1, "(3i8)" ) nn
   write( 1, "(3i8)" ) np
   iz = 0
-  o => out0
-  do while( associated( o%next ) )
+  p => outp0
+  do while( associated( p%next ) )
     iz = iz + 1
-    o => o%next
-    i1 = o%i1
-    i2 = o%i2
+    p => p%next
+    i1 = p%i1
+    i2 = p%i2
     i1(1:3) = i1(1:3) + nnoff
     i2(1:3) = i2(1:3) + nnoff
-    do i = 1, nc
+    do i = 1, p%nc
       write( 1, "( 9(i7,', '),i2.2,', ',a,', ',i1 )" ) &
-      o%di(4), i1, i2, iz, trim( o%field ), i
+      p%di(4), i1, i2, iz, trim( p%field ), i
     end do
   end do
   close( 1 )
