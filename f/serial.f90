@@ -1,6 +1,7 @@
 ! Collective routines - hooks for parallelization
 module m_collective
 implicit none
+integer :: fh0 = 0
 contains
 
 ! Initialize

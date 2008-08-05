@@ -1,9 +1,9 @@
 ! Collective routines - MPI version
 module m_collective
-use m_globals, only: nz
+use mpi
 implicit none
-!integer, private, parameter :: nz = 100
-integer, private :: np(3), root3d, root2d(3), comm3d, comm2d(3), filehandles(64+6*nz)
+integer :: fh0 = mpi_file_null
+integer, private :: np(3), root3d, root2d(3), comm3d, comm2d(3)
 contains
 
 ! Initialize
