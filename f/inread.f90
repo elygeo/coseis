@@ -10,10 +10,11 @@ integer :: i, io
 logical :: inzone
 character(12) :: key
 character(256) :: line
+type( t_io ), pointer :: o
 
 allocate( in0, out0 )
-in1 => in0
-out1 => out0       
+!in1 => in0
+o => out0       
 open( 1, file='input', status='old' )
 
 doline: do
@@ -106,15 +107,18 @@ case( 'syz' );          inzone = .true.
 case( 'szx' );          inzone = .true.
 case( 'sxy' );          inzone = .true.
 case( 'timeseries' );
-  out1 => out1%next
-  allocate( out1 )
-  read( str, *, iostat=io ) out1%field, out1%x0
-  out1%otype = 'x'
+  o => o%next
+  allocate( o )
+  o%mode = 'x'
+  read( str, *, iostat=io ) o%field, o%x0
 case( 'out' );
-  out1 => out1%next
-  allocate( out1 )
-  read( str, *, iostat=io ) out1%field, out1%dit, out1%i1, out1%i2
-  out1%otype = 'z'
+  o => o%next
+  allocate( o )
+  o%mode = 'z'
+  o%di = 1
+  o%nb = 4
+  write( *,* ) 'FIXME output style'
+  read( str, *, iostat=io ) o%field, o%di(4), o%i1, o%i2
 case default; io = 1
 end select
 

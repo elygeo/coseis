@@ -138,7 +138,6 @@ base="
   hourglass.f90
   bc.f90
   surfnormals.f90
-  outprops.f90
   util.f90
   frio.f90"
 common="

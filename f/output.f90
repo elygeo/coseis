@@ -11,7 +11,6 @@ contains
 subroutine output_init
 use m_globals
 use m_collective
-use m_outprops
 use m_util
 type( t_io ), pointer :: o
 real, pointer :: ps0(:,:,:), pw1(:,:,:,:), pw2(:,:,:,:)
@@ -100,11 +99,13 @@ if ( o%pass == 0 ) then
   o%i2(4) = 0
 end if
 o%i2(4) = min( o%i2(4), nt )
+o%i3(4) = o%i1(4)
+o%i4(4) = 0
 
 ! Spatial indices
 n = nn + 2 * nhalo
 noff = nnoff + nhalo
-select case( o%otype )
+select case( o%mode )
 case( 'z' )
   i1 = o%i1(1:3)
   i2 = o%i2(1:3)
@@ -156,16 +157,14 @@ end select
 ! Save paramters and allocate buffer
 di = o%di(1:3)
 o%nc = nc
-o%it = 0
-o%ib = 1
 o%i1(1:3) = i1
 o%i2(1:3) = i2
 where( i1 < i1core ) i1 = i1 + ( ( i1core - i1 - 1 ) / di + 1 ) * di
 where( i2 > i2core ) i2 = i1 + (   i2core - i1     ) / di       * di
-o%i3 = i1
-o%i4 = i2
+o%i3(1:3) = i1
+o%i4(1:3) = i2
 n = i2 - i1 + 1
-allocate( o%buff(n(1),n(2),n(3),o%nt,nc) )
+allocate( o%buff(n(1),n(2),n(3),o%nb,nc) )
 
 end do doiz
 
@@ -193,7 +192,7 @@ use m_outprops
 use m_util
 use m_debug_out
 integer, intent(in) :: pass
-integer :: i1(3), i2(3), i3(3), i4(3), i, j, k, l, ic, iz, nr, ir, id, mpio
+integer :: i1(4), i2(4), i3(4), i4(4), id(4), i, j, k, l, ic, iz, id, mpio
 logical :: dofault, fault, cell
 real :: rr
 real, pointer :: f(:,:,:)
@@ -322,19 +321,18 @@ iz = iz + 1
 o => o%next
 
 ! Pass
-if ( o%di(4) < 1 ) cycle doiz
-call outprops( o%field, nc, onpass, fault, cell )
-if ( pass /= o%pass ) cycle doiz
+if ( o%di(4) < 1 .or. pass /= o%pass ) cycle doiz
 
 ! Indices
-i1 = o%i1(1:3)
-i2 = o%i2(1:3)
+i1 = o%i1
+i2 = o%i2
 i3 = o%i3
 i4 = o%i4
+di = o%di
 
 ! Peak velocity calculation
-if ( o%field == 'pv2' .and. all( i3 <= i4 ) ) then
-  if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, vv, i3, i4 )
+if ( o%field == 'pv2' .and. all( i3(1:3) <= i4(1:3) ) ) then
+  if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, vv, i3(1:3), i4(1:3) )
   do l = i3(3), i4(3)
   do k = i3(2), i4(2)
   do j = i3(1), i4(1)
@@ -347,18 +345,15 @@ end if
 ! Time indices
 if ( it < o%i1(4) .or. it > o%i2(4) ) cycle doiz
 if ( modulo( it - o%i1(4), o%di(4) ) /= 0 ) cycle doiz
+o%i4(4) = it
+i4(4) = it
 
 ! Test if any thing to do on this processor, can't cycle yet though
 ! because all processors have to call mpi_split
-if ( any( i3 > i4 ) ) then
+if ( any( i3(1:3) > i4(1:3) ) ) then
   o%i1(4) = nt + 1
   if ( all( i1 == i2 ) ) cycle doiz
 end if
-
-! Record number and number of records
-FIXME
-ir = ( it      - o%i1(4) ) / o%di(4) + 1
-nr = ( o%i2(4) - o%i1(4) ) / o%di(4) + 1
 
 ! Fault plane
 mpio = mpout * 4
@@ -371,28 +366,34 @@ if ( o%fault ) then
   i4(i) = 1
 end if
 
-! Magnitude
-select case( o%field )
-case( 'vm2' ); if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, vv, i3, i4 )
-case( 'um2' ); if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, uu, i3, i4 )
-case( 'wm2' ); if ( modulo( it, itstats ) /= 0 ) call tensornorm( s2, w1, w2, i3, i4 )
-case( 'am2' ); if ( modulo( it, itstats ) /= 0 ) call vectornorm( s2, w1, i3, i4 )
-end select
-
-! Buffer
-o%ib = o%ib + 1
-do ic = 1, o%nc
-  if ( nc == 1 ) then
-    o%buff(:,:,:,o%ib,1)  = o%ps0(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3))
-  elseif ( ic < 4 ) then
-    o%buff(:,:,:,o%ib,ic) = o%pw1(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3),ic)
-  else
-    o%buff(:,:,:,o%ib,ic) = o%pw2(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3),ic-3)
+! Compute magnitudes and buffer output
+if ( all( i3 <= i4 ) ) then
+  if ( modulo( it, itstats ) /= 0 ) then
+    select case( o%field )
+    case( 'vm2' ); call vectornorm( s1, vv, i3(1:3), i4(1:3) )
+    case( 'um2' ); call vectornorm( s1, uu, i3(1:3), i4(1:3) )
+    case( 'wm2' ); call tensornorm( s2, w1, w2, i3(1:3), i4(1:3) )
+    case( 'am2' ); call vectornorm( s2, w1, i3(1:3), i4(1:3) )
+    end select
   end if
-end do
+  i = ( it - i3(4) ) / di(4)
+  do ic = 1, o%nc
+    if ( nc == 1 ) then
+      o%buff(:,:,:,i,1)  = o%ps0(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3))
+    elseif ( ic < 4 ) then
+      o%buff(:,:,:,i,ic) = o%pw1(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3),ic)
+    else
+      o%buff(:,:,:,i,ic) = o%pw2(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3),ic-3)
+    end if
+  end do
+end if
 
 ! Write to disk
-if ( o&it == o%nt ) then
+i1 = ( i1 - i3 ) / di + 1
+i2 = ( i2 - i3 ) / di + 1
+i4 = ( i4 - i3 ) / di + 1
+i3 = 1
+if ( i4(4) == o%nb .or. i4(4) == i2(4) ) then
   do ic = 1, o%nc
     id = 64 + 6 * ( iz - 1 ) + ic
     write( str, '(a,i2.2,a)' ) 'out/', iz, o%field
@@ -401,8 +402,10 @@ if ( o&it == o%nt ) then
       i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
       if ( any( i1 /= i3 .or. i2 /= i4 ) ) write( str, '(a,i6.6)' ) trim( str ), i
     end if
-    call rio4(
+    call rio4( id, mpio, o%buff, i1, i2, i3, i4, i4 )
   end do
+  o%i3(4) = it + di(4)
+  o%i4(4) = 0
 end if
 
 end do doiz

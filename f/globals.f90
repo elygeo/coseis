@@ -183,9 +183,7 @@ integer :: &
   i1in(nz,3),    & ! j1 k1 l1 input start index
   i2in(nz,3),    & ! j1 k1 l1 input end index
   mpin,          & ! input, 0=separate files, 1=MPI-IO
-  mpout,         & ! output, 0=separate files, 1=MPI-IO
-  ifile(nz),     & ! file output flag
-  ibuff(nz)        ! buffered i/o flag
+  mpout            ! output, 0=separate files, 1=MPI-IO
 
 character :: &
   intype(nz)       ! input type: z=zone, c=cube, r=read
@@ -206,24 +204,22 @@ logical :: &
 
 ! output structure
 type t_io
+  type( t_io ), pointer :: &
+    next           ! pointer to next in linked list
   character(4) :: &
     field          ! variable name
   character :: &
-    otype          ! output type
-  real :: &
-    x0(3)          ! location
+    mode           ! output type
   integer :: &
     i1(4),       & ! j,k,l,t start index
     i2(4),       & ! j,k,l,t end index
-    di(4),       & ! j,k,l,t decimation interval
     i3(4),       & ! j,k,l,t local start index
     i4(4),       & ! j,k,l,t local end index
-    fh,          & ! file handle
+    di(4),       & ! j,k,l,t decimation interval
     nc,          & ! number of components
-    nb,          & ! number of time steps to buffer
-    ib             ! number of timesteps in buffer
-  type( t_io ), pointer :: &
-    next           ! pointer to next in linked list
+    nb             ! number of timesteps to buffer
+  real :: &
+    x0(3)          ! location
   real, pointer, dimension(:,:,:) :: &
     ps0            ! pointer to scalar source data
   real, pointer, dimension(:,:,:,:) :: &
