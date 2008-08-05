@@ -21,9 +21,9 @@ do it0 = 1, nt-1
   read( 1, rec=it0 ) v1
   read( 2, rec=it0 ) v2
   read( 3, rec=it0 ) v3
-  u1 = u1 + dt * v1
-  u2 = u2 + dt * v2
-  u3 = u3 + dt * v3
+  u1 = u1 + dt0 * v1
+  u2 = u2 + dt0 * v2
+  u3 = u3 + dt0 * v3
   f = sqrt( u1 * u1 + u2 * u2 + u3 * u3 ); pu  = max( f, pu )
   f = sqrt( u1 * u1 + u2 * u2 );           puh = max( f, puh )
   f = sqrt( v1 * v1 + v2 * v2 + v3 * v3 ); pv  = max( f, pv )
