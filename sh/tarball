@@ -7,29 +7,26 @@ version=$( date +%Y%m%d%H%M%S )
 s=""
 while getopts s opt; do eval "$opt=y"; done
 
-cat << END > versionmeta.m
-version = '$version';
-login   = '$LOGNAME';
-name    = '$( finger $LOGNAME | sed -n 's/^Login.*:.*e: //p' )';
-host    = '$HOSTNAME';
-dir     = '$dir';
+cat << END > versionmeta.py
+version = '$version'
+login   = '$LOGNAME'
+name    = '$( finger $LOGNAME | sed -n 's/^Login.*:.*e: //p' )'
+host    = '$HOSTNAME'
+dir     = '$dir'
 END
 
 files="
-  $base/versionmeta.m
+  $base/versionmeta.py
   $base/doc
   $base/sord
-  $base/in.m
+  $base/in.py
   $base/in
   $base/sh
-  $base/f
-  $base/m
-  $base/util
-  $base/cvm
+  $base/src
 "
 mkdir -p tmp
 cd $( dirname "$dir" )
-tar cf - $files | gzip > "$dir/tmp/$base.tgz"
+tar cfh - $files | gzip > "$dir/tmp/$base.tgz"
 cd "$dir"
 
 mkdir -p save

@@ -1,0 +1,33 @@
+#!/bin/bash -e
+# Remote install & execution
+
+account="${1:?}"
+
+# Install files
+files="\
+  email
+  sord
+  in.py
+  in
+  sh
+  src
+  util
+  cvm/make.sh
+  cvm/sh
+  cvm/cvm3*
+  cvm/cvm4*
+"
+files=$( echo $files )
+target="${account##* }"
+rsh="${account% *}"
+echo "rsync -avR --delete --exclude=tmp -e \"$rsh\" $files $target:sord"
+rsync -avR --delete -e "$rsh" $files $target:sord 
+
+# Execute command
+[ -z "$2" ] && exit 0
+shift 1
+cmd="cd sord; $*"
+rsh="${account//ssh/ssh -tX}"
+echo "$rsh bash --login -c \"$cmd\""
+$rsh "bash --login -c \"$cmd\""
+

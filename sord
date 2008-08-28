@@ -1,26 +1,25 @@
 #!/bin/bash -e
 
-echo "SORD setup"
 starttime=$(date)
+echo "SORD setup"
 
-# Get command line options
-# -i       run interactively
-# -q       submit job to batch system
-# -n       check input only and exit
-# -g       compile with debugging and syntax checking flags
-# -G       run in debugger
-# -d       delete output from previous runs before starting
-# -f       force recompile
-# -s       serial mode, no MPI (default if np == 1)
-# -p       parallel mode, requires MPI (default if np > 1)
-# -m opt   emulate alternative machine configuration, e.g. 'datastar'
-# -v opt   generate SAF mesh and SCEC-CVM, opt indicates version 3 or 4
+# Command line options
+# -i      run interactively
+# -q      submit job to batch system
+# -n      check input only and exit
+# -g      compile with debugging and syntax checking flags
+# -G      run in debugger
+# -d      delete output from previous runs before starting
+# -f      force recompile
+# -s      serial mode, no MPI (default if np == 1)
+# -p      parallel mode, requires MPI (default if np > 1)
+# -m opt  emulate alternative machine configuration, e.g. 'datastar'
 mode=guess
 optimize=O
 setup=yes
 run=
 velmodel=
-while getopts iqspgGnv:m:df opt; do
+while getopts iqspgGnm:df opt; do
 case "$opt" in
   i) run=i ;;
   q) run=q ;;
@@ -29,7 +28,6 @@ case "$opt" in
   g) optimize=g ;;
   G) optimize=g; run=g ;;
   n) setup= ; run= ;;
-  v) vm="cvm$OPTARG" ;;
   m) machine="$OPTARG" ;;
   d) rm -rf run/[0-9][0-9] ;;
   f) rm -rf tmp/* ;;
@@ -38,9 +36,10 @@ esac
 done
 shift $(( OPTIND - 1 ))
 
-# Email address
-email="$LOGNAME"
-[ -f email ] && email="$( cat email )"
+# Locations
+cwdir=$( /bin/pwd )
+srcdir=$( basename $0 )
+[ "$0" == "$( basename $0 )" ] && srcdir="$HOME/sord"
 
 # Symlink input file specified on command line
 if [ "$1" ]; then 
@@ -49,9 +48,9 @@ if [ "$1" ]; then
     echo "Error: $infile not found"
     exit 1
   fi
-  ln -sf "$infile" 'in.m'
+  [ "$infile" == 'in.py' ] || ln -sf "$infile" 'in.py'
 fi
-infile=$( readlink 'in.m' 2> /dev/null ) || infile='in.m'
+infile=$( readlink 'in.py' 2> /dev/null ) || infile='in.py'
 
 # Make diretories
 mkdir -p tmp
@@ -62,18 +61,21 @@ else
   mkdir -p run
 fi
 
-# Locations
-srcdir=$( /bin/pwd )
+# Email address
+email="$LOGNAME"
+[ -f "$srcdir/email" ] && email="$( cat "$srcdir/email" )"
+[ -f email ] && email="$( cat email )"
+
+# Run count
 count=$( echo run/[0-9][0-9] | sed 's/.*\///' )
 [ "$count" = '[0-9][0-9]' ] && count=00
 count=$( echo $count | awk '{ printf "%02d", $1+1 }' )
-echo "$count" > tmp/count
 
-# Prepare input file
-. sh/inread
+# Read SORD input file 'in.py'
+. "$srcdir/sh/inread"
 
 # Configure
-. sh/config
+. "$srcdir/sh/config"
 echo "Machine: $machine"
 
 # Number of processors
@@ -129,63 +131,27 @@ echo "SUs: $sus"
 [ "$setup" ] || exit 0
 
 #------------------------------------------------------------------------------#
-
-# Source files
-base="
-  globals.f90
-  diffcn.f90
-  diffnc.f90
-  hourglass.f90
-  bc.f90
-  surfnormals.f90
-  util.f90
-  frio.f90"
-common="
-  inread.f90
-  setup.f90
-  arrays.f90
-  gridgen.f90
-  debug.f90
-  output.f90
-  source.f90
-  material.f90
-  fault.f90
-  metadata.f90
-  resample.f90
-  checkpoint.f90
-  timestep.f90
-  stress.f90
-  acceleration.f90
-  sord.f90"
-
-# Compile
-cd f
-case $optimize in
-  O) fflags=$oflags; ;;
-  g) fflags=$gflags; ;;
-esac
-case $mode in
-  s) ../sh/compile "$sfc $fflags -o" ../tmp/sord-s $base serial.f90 $common ;;
-  p) ../sh/compile "$pfc $fflags -o" ../tmp/sord-p $base mpi.f90 $common ;;
-esac
-cd "$srcdir"
-
-#------------------------------------------------------------------------------#
 # Set-up and run
 
+"$srcdir/make.sh" -"$mode$optimize"
+
 # Setup run directory
-sh/tarball
 rundir="run/$count"
 echo "Run directory: $rundir"
 mkdir "$rundir"
 echo "$starttime: SORD setup started" >> "$rundir/log"
-cp 'in.m' tmp/sord.tgz tmp/sord-$mode tmp/input sh/clean "$rundir"
+cp 'in.py' \
+  "$srcdir/tmp/sord.tgz" \
+  "$srcdir/tmp/sord-$mode" \
+  "$srcdir/tmp/input" \
+  "$srcdir/sh/clean" \
+  "$rundir"
 if [ $optimize = g ]; then
-  cp f/*.f90 "$rundir"
+  cp "$srcdir/src/*.f90" "$rundir"
   chmod a-w "$rundir"/*.f90
 fi
 cd "$rundir"
-chmod a-w 'in.m'
+chmod a-w 'in.py'
 rundir=$( /bin/pwd )
 mkdir out
 mkdir prof
@@ -194,74 +160,31 @@ mkdir debug
 mkdir checkpoint
 
 # Write run metadata
-cat << END > runmeta.m
-% SORD run metadata
-  login   = '$LOGNAME';
-  name    = '$( finger $LOGNAME | sed -n '1s/^.*e: //p' )';
-  rundate = '$( date )';
-  rundir  = '$rundir';
-  infile  = '$infile';
-  machine = '$machine';
-  host    = '$HOSTNAME';
-  os      = '$( uname -a )';
-  mode    = '$mode';
-  np      = [ ${np3[*]} ];
+cat << END > runmeta.py
+# SORD run metadata
+  login   = '$LOGNAME'
+  name    = '$( finger $LOGNAME | sed -n '1s/^.*e: //p' )'
+  rundate = '$( date )'
+  rundir  = '$rundir'
+  infile  = '$infile'
+  machine = '$machine'
+  host    = '$HOSTNAME'
+  os      = '$( uname -a )'
+  mode    = '$mode'
+  np      = [ ${np3[0]}, ${np3[1]}, ${np3[2]} ]
 END
 
 # Run scripts
 code="sord"
 bin="./sord-$mode"
-[ -x "$srcdir/sh/$machine" ] || . "$srcdir/sh/default"
-[ -x "$srcdir/sh/$machine" ] && . "$srcdir/sh/$machine"
+[ -x "$srcdir/sh/machine/$machine" ] || . "$srcdir/sh/machine/default"
+[ -x "$srcdir/sh/machine/$machine" ] && . "$srcdir/sh/machine/$machine"
 
-# SCEC CVM
-if [ "$vm" ]; then
-  if grep SAF "$srcdir/$infile" > /dev/null; then :; else
-    echo "Error: SAF input file required for SCEC CVM"
-    exit 1
-  fi
-  mkdir data
-  "$srcdir/util/make"
-  "$srcdir/cvm/make"
-  cp -r "$srcdir/tmp/$vm" vm
-  cd vm
-  ibig=$( cat ibig )
-  nnl=$(( nc / np + ( nc % np > 0 ? 1 : 0 ) ))
-  if [ "$ibig" -lt "$nnl" ]; then
-    echo "Error: ibig=$ibig in newin.h must be >= $nnl"
-    exit 1
-  fi
-  echo 1 > exag
-  echo "$dx" > dx
-  echo "$npml" > npml
-  cp "$srcdir/tmp/safgrid" .
-  cp "$srcdir/data/safsites.ll" .
-  cp "$srcdir/data/topo3.f32" .
-  cp "$srcdir/data/ts23-raw-ts1.f32" .
-  cp "$srcdir/data/endian0" .
-  echo "./safgrid"
-  ./safgrid
-  code="$vm"
-  bin="./$vm-$mode nc rlon rlat rdep rho vp vs"
-  post="mv endian meta.m ts1 x1 x2 x3 rho vp vs $rundir/data"
-  walltime="02:00:00"
-  topdir="$rundir"
-  rundir="$topdir/vm"
-  [ -x "$srcdir/sh/$machine" ] || . "$srcdir/sh/default"
-  [ -x "$srcdir/sh/$machine" ] && . "$srcdir/sh/$machine"
-  if [ "$run" = q ]; then
-    echo ./que
-    ./que
-    run=""
-  elif [ "$run" ]; then
-    echo ./run "-$run"
-    ./run "-$run"
-  fi
-  cd "$topdir"
-elif [ "$datadir" ]; then
+# Data directory
+if [ "$datadir" ]; then
   mkdir data
   cd data
-  for file in "$srcdir/$datadir/"*; do
+  for file in "$cwdir/$datadir/"*; do
     [ -f "$file" ] && ln "$file" . 2> /dev/null || cp "$file" .
   done
   endian="(not found)"
@@ -276,7 +199,7 @@ fi
 
 echo "$(date): setup finished" >> log
 
-# Run SORD
+# Que or run job
 if [ "$run" = q ]; then
   echo ./que
   ./que

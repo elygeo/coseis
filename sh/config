@@ -1,4 +1,5 @@
 #!/bin/bash -e
+# Put all your machine specific configuration in here
 
 IFS=":$IFS"
 
@@ -83,7 +84,7 @@ elif [ "$HOSTNAME" = 'cluster.geo.berkeley.edu' ]; then machine=calgeo
 elif [ "$HOSTNAME" = master ];   then machine=babieca
 elif [ "$HOSTNAME" = ds011 ];    then machine=datastar32
 elif [ "${HOSTNAME:0:2}" = ds ]; then machine=datastar
-elif [ "${HOSTNAME:0:2}" = tg ]; then machine=teragrid
+elif [ "${HOSTNAME:0:2}" = tg ]; then machine=tgsdsc
 else machine=${HOSTNAME%%.*}
 fi
 
@@ -96,7 +97,7 @@ case $machine in
   altai)                    maxcpus=8;  maxram=30000;  rate=100 ;;
   calgeo)     maxnodes=16;  maxcpus=4;  maxram=1500 ;;
   babieca)    maxnodes=32;  maxcpus=2;  maxram=1800;   rate=100 ;;
-  teragrid)   maxnodes=256; maxcpus=2;  maxram=3000;   rate=1000; maxmm=1080 ;;
+  tgsdsc)     maxnodes=256; maxcpus=2;  maxram=3000;   rate=1000; maxmm=1080 ;;
   datastar)   maxnodes=265; maxcpus=8;  maxram=13500;  rate=500;  maxmm=1080 ;;
   datastar32) maxnodes=5;   maxcpus=32; maxram=124000; rate=500;  maxmm=1080 ;;
   intensity)  sfc='gfortran'; oflags='-O3'; gflags='-g' ;;
