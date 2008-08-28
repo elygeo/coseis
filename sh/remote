@@ -6,6 +6,7 @@ account="${1:?}"
 # Install files
 files="\
   email
+  make.sh
   sord
   in.py
   in
