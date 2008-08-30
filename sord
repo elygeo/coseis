@@ -1,37 +1,39 @@
 #!/bin/bash -e
+# Usage: sord [-niqspgGfd] [-m <machine-name>] [<input-file>]
+#   -n   check input only and exit
+#   -i   run interactively
+#   -q   submit job to batch system
+#   -s   serial mode, no MPI (default if np == 1)
+#   -p   parallel mode, requires MPI (default if np > 1)
+#   -g   compile with debugging and syntax checking flags
+#   -G   run in debugger
+#   -f   force recompile
+#   -d   delete output from previous runs before starting
+#   -m   emulate alternative machine configuration, e.g. 'datastar'
+#   <input-file> defaults is 'in.py'
 
+# Log start time
 starttime=$(date)
 echo "SORD setup"
 
 # Command line options
-# -i      run interactively
-# -q      submit job to batch system
-# -n      check input only and exit
-# -g      compile with debugging and syntax checking flags
-# -G      run in debugger
-# -d      delete output from previous runs before starting
-# -f      force recompile
-# -s      serial mode, no MPI (default if np == 1)
-# -p      parallel mode, requires MPI (default if np > 1)
-# -m opt  emulate alternative machine configuration, e.g. 'datastar'
-mode=guess
-optimize=O
 setup=yes
 run=
-velmodel=
-while getopts iqspgGnm:df opt; do
+mode=guess
+optimize=O
+while getopts niqspgGfdm: opt; do
 case "$opt" in
-  i) run=i ;;
-  q) run=q ;;
-  s) mode=s ;;
-  p) mode=p ;;
-  g) optimize=g ;;
-  G) optimize=g; run=g ;;
-  n) setup= ; run= ;;
-  m) machine="$OPTARG" ;;
-  d) rm -rf run/[0-9][0-9] ;;
-  f) rm -rf tmp/* ;;
-  *) exit 1 ;;
+    n) setup= ; run= ;;
+    i) run=i ;;
+    q) run=q ;;
+    s) mode=s ;;
+    p) mode=p ;;
+    g) optimize=g ;;
+    G) optimize=g; run=g ;;
+    f) rm -rf tmp/* ;;
+    d) rm -rf run/[0-9][0-9] ;;
+    m) machine="$OPTARG" ;;
+    *) exit 1 ;;
 esac
 done
 shift $(( OPTIND - 1 ))
@@ -40,31 +42,32 @@ shift $(( OPTIND - 1 ))
 cwdir=$( /bin/pwd )
 srcdir=$( basename $0 )
 [ "$0" == "$( basename $0 )" ] && srcdir="$HOME/sord"
+srcdir="$( cd $srcdir; /bin/pwd )"
 
 # Symlink input file specified on command line
 if [ "$1" ]; then 
-  infile="$1"
-  if [ ! -f "$infile" ]; then
-    echo "Error: $infile not found"
-    exit 1
-  fi
-  [ "$infile" == 'in.py' ] || ln -sf "$infile" 'in.py'
+    infile="$1"
+    if [ ! -f "$infile" ]; then
+        echo "Error: $infile not found"
+        exit 1
+    fi
+    [ "$infile" == 'in.py' ] || ln -sf "$infile" 'in.py'
 fi
 infile=$( readlink 'in.py' 2> /dev/null ) || infile='in.py'
-
-# Make diretories
-mkdir -p tmp
-if [ -d /gpfs ]; then
-  mkdir -p /gpfs/$LOGNAME/sord/run
-  ln -sf /gpfs/$LOGNAME/sord/run
-else
-  mkdir -p run
-fi
 
 # Email address
 email="$LOGNAME"
 [ -f "$srcdir/email" ] && email="$( cat "$srcdir/email" )"
 [ -f email ] && email="$( cat email )"
+
+# Make diretories
+mkdir -p tmp
+if [ -d /gpfs ]; then
+    mkdir -p /gpfs/$LOGNAME/sord/run
+    ln -sf /gpfs/$LOGNAME/sord/run
+else
+    mkdir -p run
+fi
 
 # Run count
 count=$( echo run/[0-9][0-9] | sed 's/.*\///' )
@@ -72,7 +75,7 @@ count=$( echo run/[0-9][0-9] | sed 's/.*\///' )
 count=$( echo $count | awk '{ printf "%02d", $1+1 }' )
 
 # Read SORD input file 'in.py'
-. "$srcdir/sh/inread"
+. "$srcdir/sh/inread" "$srcdir/in/defaults.py" "$infile"
 
 # Configure
 . "$srcdir/sh/config"
@@ -91,7 +94,6 @@ cpus=$ppn
 [ $cpus -gt $maxcpus ] && cpus=$maxcpus
 
 # Domain size
-nc=$( echo ${nm3[*]} | awk '{ print ( $1 - 1 ) * ( $2 - 1 ) * ( $3 - 1 ) }' )
 nm3[0]=$(( nm3[0] / np3[0] + 2 + ( nm3[0] % np3[0] > 0 ? 1 : 0 ) ))
 nm3[1]=$(( nm3[1] / np3[1] + 2 + ( nm3[1] % np3[1] > 0 ? 1 : 0 ) ))
 nm3[2]=$(( nm3[2] / np3[2] + 2 + ( nm3[2] % np3[2] > 0 ? 1 : 0 ) ))
@@ -102,18 +104,18 @@ nm=$( echo ${nm3[*]} | awk '{ print $1 * $2 * $3 }' )
 # RAM and Wall time usage
 floatsize=4
 case "$oplevel" in
-  1|2)   nvars=20 ;;
-  3|4|5) nvars=23 ;;
-  *)     nvars=44 ;;
+    1|2)   nvars=20 ;;
+    3|4|5) nvars=23 ;;
+    *)     nvars=44 ;;
 esac
 ramproc=$( echo $nm $nvars $floatsize 1.5 | \
-  awk '{ printf "%.0f", ( $1 * $2 * $3 / 1024 / 1024 + 10 ) * $4 } ' )
+    awk '{ printf "%.0f", ( $1 * $2 * $3 / 1024 / 1024 + 10 ) * $4 } ' )
 ramnode=$( echo $nm $nvars $floatsize $ppn | \
-  awk '{ printf "%.0f", ( $1 * $2 * $3 / 1024 / 1024 + 10 ) * $4 }' )
+    awk '{ printf "%.0f", ( $1 * $2 * $3 / 1024 / 1024 + 10 ) * $4 }' )
 sus=$( echo $nt $ppn $nm $cpus $rate $nodes $maxcpus | \
-  awk '{ printf "%.0f", ( $1 + 10 ) * $2 * $3 / $4 / $5 / 3600000 * $6 * $7 }' )
+    awk '{ printf "%.0f", ( $1 + 10 ) * $2 * $3 / $4 / $5 / 3600000 * $6 * $7 }' )
 mm=$(  echo $nt $ppn $nm $cpus $rate 1.5 | \
-  awk '{ printf "%.0f", ( $1 + 10 ) * $2 * $3 / $4 / $5 / 60000 * $6 + 10 }' )
+    awk '{ printf "%.0f", ( $1 + 10 ) * $2 * $3 / $4 / $5 / 60000 * $6 + 10 }' )
 [ $maxmm -gt 0 -a $mm -gt $maxmm ] && mm=$maxmm
 hh=$(( mm / 60 ))
 mm=$(( mm % 60 ))
@@ -124,9 +126,9 @@ echo "RAM: ${ramnode}Mb of ${maxram}Mb per node"
 echo "Time limit: $walltime"
 echo "SUs: $sus"
 [ $ppn -gt $maxcpus ] && \
-  echo "Warning: exceding available CPUs per node ($maxcpus)"
+    echo "Warning: exceding available CPUs per node ($maxcpus)"
 [ $ramnode -gt $maxram ] && \
-  echo "Warning: exceding available RAM per node (${maxram}Mb)"
+    echo "Warning: exceding available RAM per node (${maxram}Mb)"
 
 [ "$setup" ] || exit 0
 
@@ -140,19 +142,18 @@ rundir="run/$count"
 echo "Run directory: $rundir"
 mkdir "$rundir"
 echo "$starttime: SORD setup started" >> "$rundir/log"
-cp 'in.py' \
-  "$srcdir/tmp/sord.tgz" \
-  "$srcdir/tmp/sord-$mode" \
-  "$srcdir/tmp/input" \
-  "$srcdir/sh/clean" \
-  "$rundir"
-if [ $optimize = g ]; then
-  cp "$srcdir/src/*.f90" "$rundir"
-  chmod a-w "$rundir"/*.f90
-fi
+cp 'in.py' "$rundir"
 cd "$rundir"
 chmod a-w 'in.py'
-rundir=$( /bin/pwd )
+cp \
+    "$srcdir/tmp/sord.tgz" \
+    "$srcdir/tmp/sord-$mode" \
+    "$srcdir/tmp/input" \
+    "$srcdir/sh/clean" .
+if [ $optimize = g ]; then
+    cp "$srcdir/src/*.f90" .
+    chmod a-w *.f90
+fi
 mkdir out
 mkdir prof
 mkdir stats
@@ -162,50 +163,54 @@ mkdir checkpoint
 # Write run metadata
 cat << END > runmeta.py
 # SORD run metadata
-  login   = '$LOGNAME'
-  name    = '$( finger $LOGNAME | sed -n '1s/^.*e: //p' )'
-  rundate = '$( date )'
-  rundir  = '$rundir'
-  infile  = '$infile'
-  machine = '$machine'
-  host    = '$HOSTNAME'
-  os      = '$( uname -a )'
-  mode    = '$mode'
-  np      = [ ${np3[0]}, ${np3[1]}, ${np3[2]} ]
+login   = '$LOGNAME'
+name    = '$( finger $LOGNAME | sed -n '1s/^.*e: //p' )'
+rundate = '$( date )'
+rundir  = '$rundir'
+infile  = '$infile'
+machine = '$machine'
+host    = '$HOSTNAME'
+os      = '$( uname -a )'
+mode    = '$mode'
+np      = [ ${np3[0]}, ${np3[1]}, ${np3[2]} ]
 END
 
 # Run scripts
+rundir=$( /bin/pwd )
 code="sord"
 bin="./sord-$mode"
-[ -x "$srcdir/sh/machine/$machine" ] || . "$srcdir/sh/machine/default"
-[ -x "$srcdir/sh/machine/$machine" ] && . "$srcdir/sh/machine/$machine"
+dir="$srcdir/sh/machine"
+if [ -x  "$dir/$machine" ]
+    then "$dir/$machine"
+    else "$dir/default"
+fi  
 
 # Data directory
 if [ "$datadir" ]; then
-  mkdir data
-  cd data
-  for file in "$cwdir/$datadir/"*; do
-    [ -f "$file" ] && ln "$file" . 2> /dev/null || cp "$file" .
-  done
-  endian="(not found)"
-  [ -f endian ] && endian=$( cat endian )
-  native="$( perl -le 'print pack('V',1) eq pack('L',1) ? "l" : "b"' )"
-  if [ "$endian" != "$native" ]; then
-    echo "Error: data endian=$endian, native endian=$native"
-    exit 1
-  fi
-  cd "$rundir"
+    mkdir data
+    cd data
+    for file in "$cwdir/$datadir/"*; do
+        [ -f "$file" ] && ln "$file" . 2> /dev/null || cp "$file" .
+    done
+    endian="(not found)"
+    [ -f endian ] && endian=$( cat endian )
+    native="$( perl -le 'print pack('V',1) eq pack('L',1) ? "l" : "b"' )"
+    if [ "$endian" != "$native" ]; then
+        echo "Error: data endian=$endian, native endian=$native"
+        exit 1
+    fi
+    cd "$rundir"
 fi
 
 echo "$(date): setup finished" >> log
 
 # Que or run job
 if [ "$run" = q ]; then
-  echo ./que
-  ./que
+    echo ./que
+    ./que
 elif [ "$run" ]; then
-  echo ./run "-$run"
-  ./run "-$run"
+    echo ./run "-$run"
+    ./run "-$run"
 fi
 
 exit 0

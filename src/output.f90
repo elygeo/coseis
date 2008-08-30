@@ -33,6 +33,7 @@ if ( faultnormal /= 0 ) then
   if ( ip3(i) == ip3root(i) ) dofault = .true.
 end if
 
+! Loop over output zones
 p => outp0
 doiz: do while( associated( p%next ) )
 p => p%next
@@ -313,12 +314,12 @@ case( 2 )
 end select
 end if
 
-! Loop
+! Loop over output zones
 iz = 0
 o => out0
 doiz: do while( associated( p%next ) )
-iz = iz + 1
 o => p%next
+iz = iz + 1
 
 ! Pass
 if ( p%di(4) < 1 .or. pass /= p%pass ) cycle doiz

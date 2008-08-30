@@ -1,4 +1,4 @@
-version = '20080828143000'
+version = '20080830095229'
 login   = 'gely'
 name    = 'Geoffrey Ely'
 host    = 'wide'

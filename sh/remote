@@ -5,18 +5,18 @@ account="${1:?}"
 
 # Install files
 files="\
-  email
-  make.sh
-  sord
-  in.py
-  in
-  sh
-  src
-  util
-  cvm/make.sh
-  cvm/sh
-  cvm/cvm3*
-  cvm/cvm4*
+    email
+    make.sh
+    sord
+    in.py
+    in
+    sh
+    src
+    util
+    cvm/make.sh
+    cvm/sh
+    cvm/cvm3*
+    cvm/cvm4*
 "
 files=$( echo $files )
 target="${account##* }"

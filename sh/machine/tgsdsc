@@ -6,17 +6,17 @@ cat << END > run
 mode=$mode
 cd "$rundir"
 if [ \$( /bin/pwd | grep -v gpfs ) ]; then
-  echo "Error: jobs must be run from /gpfs"
-  exit
+    echo "Error: jobs must be run from /gpfs"
+    exit
 fi
 echo "\$( date ): $code started" >> log
 $pre
 case "\$mode\${1:--i}" in
-  s-i)  time $bin ;;
-  s-g)  gdb $bin ;;
-  s-tv) totalview $bin ;;
-  p-i)  mpirun -machinefile mf -np $np $bin ;;
-  p-tv) mpirun -tv -machinefile mf -np $np $bin ;;
+    s-i)  time $bin ;;
+    s-g)  gdb $bin ;;
+    s-tv) totalview $bin ;;
+    p-i)  mpirun -machinefile mf -np $np $bin ;;
+    p-tv) mpirun -tv -machinefile mf -np $np $bin ;;
 esac
 $post
 echo "\$( date ): $code finished" >> log
@@ -34,8 +34,8 @@ cat << END > que
 # qsub -W depend=afterok:$1
 cd "$rundir"
 if [ \$( /bin/pwd | grep -v gpfs ) ]; then
-  echo "Error: jobs must be run from /gpfs"
-  exit
+    echo "Error: jobs must be run from /gpfs"
+    exit
 fi
 echo "\$( date ): $code qued with ID: \$( qsub script )" >> log
 END

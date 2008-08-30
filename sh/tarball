@@ -16,14 +16,14 @@ dir     = '$dir'
 END
 
 files="
-  $base/versionmeta.py
-  $base/doc
-  $base/make.sh
-  $base/sord
-  $base/in.py
-  $base/in
-  $base/sh
-  $base/src
+    $base/versionmeta.py
+    $base/doc
+    $base/make.sh
+    $base/sord
+    $base/in.py
+    $base/in
+    $base/sh
+    $base/src
 "
 mkdir -p tmp
 cd $( dirname "$dir" )

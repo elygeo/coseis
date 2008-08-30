@@ -6,18 +6,18 @@ cat << END > run
 mode=$mode
 cd "$rundir"
 if [ \$( /bin/pwd | grep -v gpfs ) ]; then
-  echo "Error: jobs must be run from /gpfs"
-  exit
+    echo "Error: jobs must be run from /gpfs"
+    exit
 fi
 echo "\$( date ): $code started" >> log
 opts="-labelio yes -tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
 $pre
 case "\$mode\${1:--i}" in
-  s-i)  hpmcount -nao prof/hpm $bin ;;
-  s-g)  pdx $bin ;;
-  s-tv) totalview $bin ;;
-  p-i)  poe32 hpmcount -nao prof/hpm $bin \$opts ;;
-  p-tv) tvpoe32 $bin \$opts ;;
+    s-i)  hpmcount -nao prof/hpm $bin ;;
+    s-g)  pdx $bin ;;
+    s-tv) totalview $bin ;;
+    p-i)  poe32 hpmcount -nao prof/hpm $bin \$opts ;;
+    p-tv) tvpoe32 $bin \$opts ;;
 esac
 $post
 echo "\$( date ): $code finished" >> log
@@ -27,8 +27,8 @@ cat << END > que
 #!/bin/bash
 cd "$rundir"
 if [ \$( /bin/pwd | grep -v gpfs ) ]; then
-  echo "Error: jobs must be run from /gpfs"
-  exit
+    echo "Error: jobs must be run from /gpfs"
+    exit
 fi
 llsubmit script >> log
 END

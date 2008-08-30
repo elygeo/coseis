@@ -7,11 +7,11 @@ s=yes
 optimize=O
 while getopts spOg opt; do
 case "$opt" in
-  s) unset p ;;    # serial mode
-  p) unset s ;;    # parallel mode
-  O) optimize=O ;; # optimize
-  g) optimize=g ;; # debug
-  *) exit 1 ;;
+    s) unset p ;;    # serial mode
+    p) unset s ;;    # parallel mode
+    O) optimize=O ;; # optimize
+    g) optimize=g ;; # debug
+    *) exit 1 ;;
 esac
 done
 
@@ -22,37 +22,37 @@ mkdir -p tmp
 # Configure
 . sh/config
 case $optimize in
-  O) fflags=$oflags; ;;
-  g) fflags=$gflags; ;;
+    O) fflags=$oflags; ;;
+    g) fflags=$gflags; ;;
 esac
 
 # Source files
 base="
-  globals.f90
-  diffcn.f90
-  diffnc.f90
-  hourglass.f90
-  bc.f90
-  surfnormals.f90
-  util.f90
-  frio.f90"
+    globals.f90
+    diffcn.f90
+    diffnc.f90
+    hourglass.f90
+    bc.f90
+    surfnormals.f90
+    util.f90
+    frio.f90"
 common="
-  inread.f90
-  setup.f90
-  arrays.f90
-  gridgen.f90
-  debug.f90
-  output.f90
-  source.f90
-  material.f90
-  fault.f90
-  metadata.f90
-  resample.f90
-  checkpoint.f90
-  timestep.f90
-  stress.f90
-  acceleration.f90
-  sord.f90"
+    inread.f90
+    setup.f90
+    arrays.f90
+    gridgen.f90
+    debug.f90
+    output.f90
+    source.f90
+    material.f90
+    fault.f90
+    metadata.f90
+    resample.f90
+    checkpoint.f90
+    timestep.f90
+    stress.f90
+    acceleration.f90
+    sord.f90"
 
 # Compile
 cd src

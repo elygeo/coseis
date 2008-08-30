@@ -1,7 +1,8 @@
 #!/bin/bash -e
 
 # Prepare input file
-cat 'in/defaults.py' 'in.py' | sed "
+mkdir -p tmp
+cat $@ | sed "
 s/%.*$//;
 s/;/\\
 /g;
@@ -23,15 +24,15 @@ s/ $//;
 while read key params; do
 set -- $params
 case "$key" in
-  nt) nt=$1 ;;
-  nn) nm3=( $1 $2 $3 ) ;;
-  np) np3=( $1 $2 $3 ) ;;
-  dx) dx=$1 ;;
-  npml) npml=$1 ;;
-  oplevel) oplevel=$1 ;;
-  datadir) datadir="$1" ;;
-  faultnormal) faultnormal=$1 ;;
-  return) break ;;
+    nt) nt=$1 ;;
+    nn) nm3=( $1 $2 $3 ) ;;
+    np) np3=( $1 $2 $3 ) ;;
+    dx) dx=$1 ;;
+    npml) npml=$1 ;;
+    oplevel) oplevel=$1 ;;
+    datadir) datadir="$1" ;;
+    faultnormal) faultnormal=$1 ;;
+    return) break ;;
 esac
 done < tmp/input
 

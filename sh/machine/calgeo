@@ -8,10 +8,10 @@ cd "$rundir"
 echo "\$( date ): $code started" >> log
 $pre
 case "\$mode\${1:--i}" in
-  s-i)   time $bin ;;
-  s-g)   gdb $bin ;;
-  p-i)   mpiexec -np $np time $bin ;;
-  p-g)   mpiexec -gdb -np $np $bin ;;
+    s-i)   time $bin ;;
+    s-g)   gdb $bin ;;
+    p-i)   mpiexec -np $np time $bin ;;
+    p-g)   mpiexec -gdb -np $np $bin ;;
 esac
 $post
 echo "\$( date ): $code finished" >> log
