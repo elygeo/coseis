@@ -163,7 +163,7 @@ do i = 1, 3
 end do
 
 ! Boundary conditions
-call vectorbc( w1, bc1, bc2, i1bc, i2bc )
+call vector_bc( w1, bc1, bc2, i1bc, i2bc )
 
 end subroutine
 

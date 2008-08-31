@@ -15,7 +15,7 @@ if ( master .and. debug == 2 ) write( 0, * ) 'Stress'
 do i = 1, 3
   w1(:,:,:,i) = uu(:,:,:,i) + gam * vv(:,:,:,i)
 end do
-call scalarsethalo( s1, 0., i1cell, i2cell )
+call scalar_set_halo( s1, 0., i1cell, i2cell )
 
 ! Loop over component and derivative direction
 doic: do ic  = 1, 3

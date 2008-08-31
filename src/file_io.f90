@@ -1,6 +1,35 @@
 ! Output routines
-module m_output
+module m_file_io
 implicit none
+type t_io          ! input/output structure
+  type( t_io ), pointer :: &
+    next           ! pointer to next in linked list
+  character(4) :: &
+    field          ! variable name
+  character :: & 
+    mode
+  integer :: &   
+    i1(4),       & ! j,k,l,t start index
+    i2(4),       & ! j,k,l,t end index
+    i3(4),       & ! j,k,l,t local start index
+    i4(4),       & ! j,k,l,t local end index
+    di(4),       & ! j,k,l,t decimation interval
+    nc,          & ! number of components
+    nb,          & ! number of timesteps to buffer
+    fh(6)          ! file hangle
+  real :: &      
+    x1(3),       & ! location 1
+    x2(3),       & ! location 2
+    val            ! value
+  real, pointer, dimension(:,:,:) :: &
+    ptr1, 
+  real, allocatable, dimension(:,:,:,:,:) :: &
+    buff           ! hold buffer, j,k,l,it,ic
+end type t_io
+type( t_io ), pointer :: &
+  pio0             ! intitial pointer
+integer :: &
+  fh               ! global file handle counter
 integer, private :: jv, jf
 integer, private, allocatable :: jb(:)
 real, private, allocatable, dimension(:,:) :: &
@@ -8,7 +37,7 @@ real, private, allocatable, dimension(:,:) :: &
 contains
 
 ! Initialize output
-subroutine output_init
+subroutine file_io_init
 use m_globals
 use m_collective
 use m_util
@@ -43,6 +72,7 @@ nc = 1
 fault = .false.
 pass = 2
 cell = .false.
+do i = 1, nc
 select case( p%field )
 case( 'x'    ); pw1 => w1;   pass = 0; nc = 3
 case( 'rho'  ); ps0 => mr;   pass = 0; cell = .true.
@@ -85,6 +115,19 @@ case default
   write( 0, * ) 'error: unknown output field: ', p%field
   stop
 end select
+end do
+p%nc = nc
+p%pass = pass
+p%fault = fault
+do ic = 1, nc
+  if ( nc == 1 ) then
+    p%ptr(i) = ps0
+  elseif ( ic < 4 ) then
+    p%ptr(i) = pw1(:,:,:,ic)
+  else
+    p%ptr(i) = pw2(:,:,:,ic-3)
+  end if
+end do
 if ( fault .and. .not. dofault ) then
   p%i1(4) = nt + 1
   cycle doiz
@@ -123,6 +166,7 @@ case( 'x' )
   p%di(4) = 1
   p%i1(4) = 0
   p%i2(4) = nt
+  p%nb = itio
   if ( p%pass == 0 ) p%i2(4) = 0
   rout = huge( rout )
   if ( fault ) then
@@ -186,7 +230,7 @@ end subroutine
 !------------------------------------------------------------------------------!
 
 ! Write output
-subroutine output( pass )
+subroutine file_io( pass )
 use m_globals
 use m_collective
 use m_outprops
@@ -383,7 +427,7 @@ if ( all( i3 <= i4 ) ) then
       p%buff(:,:,:,i,1)  = p%ps0(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3))
     elseif ( ic < 4 ) then
       p%buff(:,:,:,i,ic) = p%pw1(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3),ic)
-    else
+    else 
       p%buff(:,:,:,i,ic) = p%pw2(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3),ic-3)
     end if
   end do

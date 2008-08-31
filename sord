@@ -37,23 +37,13 @@ case "$opt" in
 esac
 done
 shift $(( OPTIND - 1 ))
+infile="$1"
 
 # Locations
 cwdir=$( /bin/pwd )
 srcdir=$( basename $0 )
 [ "$0" == "$( basename $0 )" ] && srcdir="$HOME/sord"
 srcdir="$( cd $srcdir; /bin/pwd )"
-
-# Symlink input file specified on command line
-if [ "$1" ]; then 
-    infile="$1"
-    if [ ! -f "$infile" ]; then
-        echo "Error: $infile not found"
-        exit 1
-    fi
-    [ "$infile" == 'in.py' ] || ln -sf "$infile" 'in.py'
-fi
-infile=$( readlink 'in.py' 2> /dev/null ) || infile='in.py'
 
 # Email address
 email="$LOGNAME"
@@ -74,7 +64,7 @@ count=$( echo run/[0-9][0-9] | sed 's/.*\///' )
 [ "$count" = '[0-9][0-9]' ] && count=00
 count=$( echo $count | awk '{ printf "%02d", $1+1 }' )
 
-# Read SORD input file 'in.py'
+# Read SORD input file
 . "$srcdir/sh/inread" "$srcdir/in/defaults.py" "$infile"
 
 # Configure

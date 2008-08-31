@@ -5,7 +5,7 @@ integer, private :: itcheck0, irank
 contains
 
 ! Look for checkpoint
-subroutine lookforcheckpoint
+subroutine look_for_checkpoint
 use m_globals
 use m_collective
 integer :: i
@@ -23,7 +23,7 @@ it = i
 end subroutine
 
 ! Read checkpoint
-subroutine readcheckpoint
+subroutine read_checkpoint
 use m_globals
 integer :: i
 if ( it == 0 ) return
@@ -39,7 +39,7 @@ close( 1 )
 end subroutine
 
 ! Write checkpoint
-subroutine writecheckpoint
+subroutine write_checkpoint
 use m_globals
 integer :: i
 open( 1, file='itcheck', status='old', iostat=i )

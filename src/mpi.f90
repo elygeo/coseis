@@ -233,7 +233,7 @@ ii = ii + 1 - noff
 end subroutine
 
 ! Scalar swap halo
-subroutine scalarswaphalo( f, nh )
+subroutine scalar_swap_halo( f, nh )
 use mpi
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: nh(3)
@@ -269,7 +269,7 @@ end do
 end subroutine
 
 ! Vector swap halo
-subroutine vectorswaphalo( f, nh )
+subroutine vector_swap_halo( f, nh )
 use mpi
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: nh(3)

@@ -19,8 +19,8 @@ call diffnc( s1, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
 ! Zero volume and hourglass viscosity outside boundary, and at fault cell
 i1 = i1bc
 i2 = i2bc - 1
-call scalarsethalo( s1, 0., i1, i2 )
-call scalarsethalo( yy, 0., i1, i2 )
+call scalar_set_halo( s1, 0., i1, i2 )
+call scalar_set_halo( yy, 0., i1, i2 )
 select case( ifn )
 case( 1 ); i = ihypo(1); s1(i,:,:) = 0.; yy(i,:,:) = 0.
 case( 2 ); i = ihypo(2); s1(:,i,:) = 0.; yy(:,i,:) = 0.
@@ -29,9 +29,9 @@ end select
 
 ! Mass ratio
 s2 = mr * s1
-call scalaraverage( mr, s2, i1node, i2node, -1 )
+call scalar_average( mr, s2, i1node, i2node, -1 )
 call invert( mr )
-call scalarswaphalo( mr, nhalo )
+call scalar_swap_halo( mr, nhalo )
 call scalarbc( mr, bc1, bc2, i1bc, i2bc )
 
 ! Viscosity, bc=4 means copy into halo for resampling at the node
@@ -40,10 +40,10 @@ i1 = i1bc - 1
 i2 = i2bc
 call scalarbc( gam, bc, bc, i1, i2 )
 s2 = gam * dt
-call scalaraverage( gam, s2, i1node, i2node, -1 )
-call scalarsethalo( gam, 0., i1bc, i2bc )
-call scalarswaphalo( gam, nhalo )
-call scalarbc( gam, bc1, bc2, i1bc, i2bc )
+call scalar_average( gam, s2, i1node, i2node, -1 )
+call scalar_set_halo( gam, 0., i1bc, i2bc )
+call scalar_swap_halo( gam, nhalo )
+call scalar_bc( gam, bc1, bc2, i1bc, i2bc )
 
 ! Moduli
 call invert( s1 )

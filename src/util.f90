@@ -61,13 +61,13 @@ end do
 end do
 end subroutine
 
-subroutine scalaraverage( f2, f1, i1, i2, d )
+subroutine scalar_average( f2, f1, i1, i2, d )
 real, intent(out) :: f2(:,:,:)
 real, intent(in) :: f1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), d
 integer :: n(3), j, k, l
 n = (/ size(f1,1), size(f1,2), size(f1,3) /)
-if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in scalaraverage'
+if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in scalar_average'
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
@@ -79,16 +79,16 @@ do j = i1(1), i2(1)
 end do
 end do
 end do
-call scalarsethalo( f2, 0., i1, i2 )
+call scalar_set_halo( f2, 0., i1, i2 )
 end subroutine
 
-subroutine vectoraverage( f2, f1, i1, i2, d )
+subroutine vector_average( f2, f1, i1, i2, d )
 real, intent(out) :: f2(:,:,:,:)
 real, intent(in) :: f1(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), d
 integer :: n(3), i, j, k, l
 n = (/ size(f1,1), size(f1,2), size(f1,3) /)
-if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vectoraverage'
+if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vector_average'
 do i = 1, 3
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
@@ -102,7 +102,7 @@ end do
 end do
 end do
 end do
-call vectorsethalo( f2, 0., i1, i2 )
+call vector_set_halo( f2, 0., i1, i2 )
 end subroutine
 
 subroutine radius( r, x, x0, i1, i2 )
@@ -124,13 +124,13 @@ end do
 end do
 end subroutine
 
-subroutine vectornorm( s, f, i1, i2 )
+subroutine vector_norm( s, f, i1, i2 )
 real, intent(out) :: s(:,:,:)
 real, intent(in) :: f(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3)
 integer :: n(3), j, k, l
 n = (/ size(s,1), size(s,2), size(s,3) /)
-if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vectornorm'
+if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vector_norm'
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
@@ -143,13 +143,13 @@ end do
 end do
 end subroutine
 
-subroutine tensornorm( s, f1, f2, i1, i2 )
+subroutine tensor_norm( s, f1, f2, i1, i2 )
 real, intent(out) :: s(:,:,:)
 real, intent(in) :: f1(:,:,:,:), f2(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3)
 integer :: n(3), j, k, l
 n = (/ size(s,1), size(s,2), size(s,3) /)
-if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in tensornorm'
+if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in tensor_norm'
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
@@ -165,7 +165,7 @@ end do
 end do
 end subroutine
 
-subroutine scalarsethalo( f, r, i1, i2 )
+subroutine scalar_set_halo( f, r, i1, i2 )
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
 integer, intent(in) :: i1(3), i2(3)
@@ -181,7 +181,7 @@ if ( n(2) > 1 ) f(:,i4(2)+1:,:) = r
 if ( n(3) > 1 ) f(:,:,i4(3)+1:) = r
 end subroutine
 
-subroutine vectorsethalo( f, r, i1, i2 )
+subroutine vector_set_halo( f, r, i1, i2 )
 real, intent(inout) :: f(:,:,:,:)
 real, intent(in) :: r
 integer, intent(in) :: i1(3), i2(3)

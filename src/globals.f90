@@ -164,19 +164,13 @@ integer :: &
   itio,          & ! interval for writing i/o buffers
   itcheck,       & ! interval for checkpointing, must be a multiple of itio
   itstop,        & ! stop time, for simulating a killed job
+  oplevel,       & ! 1=constant, 2=rectangular, 3=parallelepiped, 4=one-point quadrature, 5=exact
   debug,         & ! debugging flag
   npml,          & ! number of PML damping nodes
   fixhypo,       & ! fix hypocenter to 0=none, 1,2=ihypo node, cell, -1,-2=xhypo node, cell
   faultopening,  & ! flag to allow fault opening
   faultnormal,   & ! fault normal direction
   ifn              ! fault normal component=abs(faultnormal)
-
-integer :: &
-  oplevel,       & ! 1=constant, 2=rectangular, 3=parallelepiped, 4=one-point quadrature, 5=exact
-  nin = 2,       & ! numpber of input zones
-  nout = 0,      & ! numpber of output zones
-  mpin,          & ! input, 0=separate files, 1=MPI-IO
-  mpout            ! output, 0=separate files, 1=MPI-IO
 
 character(16) :: &
   rfunc,         & ! moment source space function
@@ -188,39 +182,6 @@ character(256) :: &
 logical :: &
   sync,          & ! synchronize processes
   master           ! master process flag
-
-! input/output structure
-type t_io
-  type( t_io ), pointer :: &
-    next           ! pointer to next in linked list
-  character(4) :: &
-    field          ! variable name
-  character :: &
-    mode
-  integer :: &
-    i1(4),       & ! j,k,l,t start index
-    i2(4),       & ! j,k,l,t end index
-    i3(4),       & ! j,k,l,t local start index
-    i4(4),       & ! j,k,l,t local end index
-    di(4),       & ! j,k,l,t decimation interval
-    nc,          & ! number of components
-    nb,          & ! number of timesteps to buffer
-    fh             ! file hangle
-  real :: &
-    x1(3),       & ! location 1
-    x2(3),       & ! location 2
-    val            ! value
-  real, pointer, dimension(:,:,:) :: &
-    ps0            ! pointer to scalar array
-  real, pointer, dimension(:,:,:,:) :: &
-    pw1, pw2       ! pointer to vector arrays
-  real, allocatable, dimension(:,:,:,:,:) :: &
-    buff           ! hold buffer, j,k,l,it,ic
-end type t_io
-
-type( t_io ), pointer :: &
-  inp0,          & ! intitial input pointer
-  outp0            ! intitial output pointer
 
 end module
 

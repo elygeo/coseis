@@ -95,7 +95,7 @@ if ( rr > 0. ) write( 0, * ) 'warning: positive normal traction: ', rr, i1
 ! Lock fault in PML region
 i1 = i1pml + 1
 i2 = i2pml - 1
-call scalarsethalo( co, 1e20, i1, i2 )
+call scalar_set_halo( co, 1e20, i1, i2 )
 
 ! Normal vectors
 i1 = i1core
@@ -186,14 +186,14 @@ t1 = 0.
 t2 = 0.
 
 ! Halos
-call scalarswaphalo( mus,   nhalo )
-call scalarswaphalo( mud,   nhalo )
-call scalarswaphalo( dc,    nhalo )
-call scalarswaphalo( co,    nhalo )
-call scalarswaphalo( area,  nhalo )
-call scalarswaphalo( rhypo, nhalo )
-call vectorswaphalo( nhat,  nhalo )
-call vectorswaphalo( t0,    nhalo )
+call scalar_swap_halo( mus,   nhalo )
+call scalar_swap_halo( mud,   nhalo )
+call scalar_swap_halo( dc,    nhalo )
+call scalar_swap_halo( co,    nhalo )
+call scalar_swap_halo( area,  nhalo )
+call scalar_swap_halo( rhypo, nhalo )
+call vector_swap_halo( nhat,  nhalo )
+call vector_swap_halo( t0,    nhalo )
 
 ! Metadata
 if ( master ) then
@@ -301,18 +301,18 @@ call vectorbc( w1, bc1, bc2, i1bc, i2bc )
 ! Friction + fracture energy
 t2 = vv(j3:j4,k3:k4,l3:l4,:) - vv(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( t1 * t2, 4 ) * area
-call scalarsethalo( f2, 0., i1core, i2core )
+call scalar_set_halo( f2, 0., i1core, i2core )
 efric = efric + dt * sum( f2 )
 
 ! Strain energy
 t2 = uu(j3:j4,k3:k4,l3:l4,:) - uu(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( ( t0 + t1 ) * t2, 4 ) * area
-call scalarsethalo( f2, 0., i1core, i2core )
+call scalar_set_halo( f2, 0., i1core, i2core )
 estrain = .5 * sum( f2 )
 
 ! Moment
 f2 = muf * area * sqrt( sum( t2 * t2, 4 ) )
-call scalarsethalo( f2, 0., i1core, i2core )
+call scalar_set_halo( f2, 0., i1core, i2core )
 moment = sum( f2 )
 
 ! Slip acceleration

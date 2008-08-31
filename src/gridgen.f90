@@ -1,9 +1,9 @@
 ! Grid generation
-module m_gridgen
+module m_grid_gen
 implicit none
 contains
 
-subroutine gridgen
+subroutine grid_gen
 use m_globals
 use m_collective
 use m_bc
@@ -71,10 +71,10 @@ if ( gridnoise > 0. ) then
   w2 = dx * gridnoise * ( w2 - .5 )
   i1 = i1pml + 1
   i2 = i2pml - 1
-  call vectorsethalo( w2, 0., i1, i2 )
+  call vector_set_halo( w2, 0., i1, i2 )
   i1 = i1bc + 1
   i2 = i2bc - 1
-  call vectorsethalo( w2, 0., i1, i2 )
+  call vector_set_halo( w2, 0., i1, i2 )
   i1 = max( i1core, ihypo )
   i2 = min( i2core, ihypo + 1 )
   select case( abs( faultnormal ) )
@@ -140,12 +140,12 @@ w1 = w2
 bc = 4
 i1 = i1bc - 1
 i2 = i2bc + 1
-call vectorswaphalo( w1, nhalo )
-call vectorbc( w1, bc, bc, i1, i2 )
+call vector_swap_halo( w1, nhalo )
+call vector_bc( w1, bc, bc, i1, i2 )
 
 ! Find cell centers
-call vectoraverage( w2, w1, i1cell, i2cell, 1 )
-call vectorsethalo( w2, huge(r), i1cell, i2cell )
+call vector_average( w2, w1, i1cell, i2cell, 1 )
+call vector_set_halo( w2, huge(r), i1cell, i2cell )
 
 ! Hypocenter location
 j = ihypo(1)
