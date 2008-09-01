@@ -67,7 +67,7 @@ def main():
         'tgsdsc':     ( 256, 2,  3000,   1000, 1080 ),
         'datastar':   ( 265, 8,  13500,  500,  1080 ),
         'datastar32': ( 5,   32, 124000, 500,  1080 ) }
-    maxnodes, maxcpus, maxram, rate, maxmm = machines[ machine ]
+    maxnodes, maxcpus, maxram, rate, maxmm = machines[machine]
 
     # Number of processors
     np3 = np
@@ -139,9 +139,12 @@ def main():
     os.mkdir( 'debug' )
     os.mkdir( 'checkpoint' )
 
-    # Write run metadata
+    # Process input file
+
+    # Process templates
     cfg = 'default'
-    if os.path.isdir( 'py/' + machine ): cfg = machine
+    if os.path.isdir( 'py/' + machine ):
+        cfg = machine
     login = os.getlogin()
     rundate = time.asctime()
     os_ = os.uname()[3]

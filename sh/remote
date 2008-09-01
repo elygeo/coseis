@@ -8,11 +8,14 @@ files="\
     email
     make.sh
     sord
-    in.py
+    sord.py
     in
     sh
+    py
     src
+    templates
     util
+    templates
     cvm/make.sh
     cvm/sh
     cvm/cvm3*

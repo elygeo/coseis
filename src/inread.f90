@@ -85,73 +85,48 @@ case( 'itstop' );       read( str, *, iostat=io ) itstop
 case( 'debug' );        read( str, *, iostat=io ) debug
 case( 'mpin' );         read( str, *, iostat=io ) mpin
 case( 'mpout' );        read( str, *, iostat=io ) mpout
-case( 'x1' );           inzone = .true.
-case( 'x2' );           inzone = .true.
-case( 'x3' );           inzone = .true.
-case( 'rho' );          inzone = .true.
-case( 'vp' );           inzone = .true.
-case( 'vs' );           inzone = .true.
-!case( 'qp' );           inzone = .true.
-!case( 'qs' );           inzone = .true.
-case( 'gam' );          inzone = .true.
-case( 'mus' );          inzone = .true.
-case( 'mud' );          inzone = .true.
-case( 'dc' );           inzone = .true.
-case( 'co' );           inzone = .true.
-case( 'tn' );           inzone = .true.
-case( 'ts1' );          inzone = .true.
-case( 'ts2' );          inzone = .true.
-case( 'sxx' );          inzone = .true.
-case( 'syy' );          inzone = .true.
-case( 'szz' );          inzone = .true.
-case( 'syz' );          inzone = .true.
-case( 'szx' );          inzone = .true.
-case( 'sxy' );          inzone = .true.
-case( 'zone' );
-case( 'xtimeseries' );
+
+select case( key )
+case( 'x1' )
+case( 'x2' )
+case( 'x3' )
+case( 'rho' )
+case( 'vp' )
+case( 'vs' )
+!case( 'qp' )
+!case( 'qs' )
+case( 'gam' )
+case( 'mus' )
+case( 'mud' )
+case( 'dc' )
+case( 'co' )
+case( 'tn' )
+case( 'ts1' )
+case( 'ts2' )
+case( 'sxx' )
+case( 'syy' )
+case( 'szz' )
+case( 'syz' )
+case( 'szx' )
+case( 'sxy' )
+case( 'sz', 'sn', 'sx', 'sc', 'rx', 'wx', 'rn', 'wn', 'rz', 'wz' )
   p => p%next
   allocate( p )
-  p%mode = 'x'
-  read( str, *, iostat=io ) p%field, p%x1
-case( 'out' );
-  p => p%next
-  allocate( p )
-  call strtok( str, key )
-  p%field = key
-  p%mode = 'w'
-  p%i1 = (/  1,  1,  1, 0 /)
-  p%i2 = (/ -1, -1, -1, 0 /)
-  p%di = 1
-  p%nb = 1
-  if ( str /= '' ) read( str, *, iostat=io ) p%i1, p%i2, p%di, p%nb
+  p%mode = key
+  case( 'sz' );       read( str, *, iostat=io ) p%field, p%val, p%i1, p%i2, p%di
+  case( 'sn' );       read( str, *, iostat=io ) p%field, p%val, p%i1
+  case( 'sx' );       read( str, *, iostat=io ) p%field, p%val, p%x1
+  case( 'sc' );       read( str, *, iostat=io ) p%field, p%val, p%x1, p%x2
+  case( 'rx', 'wx' ); read( str, *, iostat=io ) p%field, p%x1
+  case( 'rn', 'wn' ); read( str, *, iostat=io ) p%field, p%i1
+  case( 'rz', 'wz' ); read( str, *, iostat=io ) p%field, p%i1, p%i2, p%di, p%nb
+  end select
+  if key(2) = 'n' then
+    p%i2 = p%i1
+    p%di = 1
+    p%nb = itio
 case default; io = 1
 end select
-
-! Input zone
-if ( inzone ) then
-  p => p%next
-  allocate( p )
-  p%field = key
-  p%mode = 'z'
-  p%i1 = 1
-  p%i2 = -1
-  p%di = 1
-  p%nb = 1
-  call strtok( str, key )
-  if ( key == 'read' ) then
-    p%mode = 'r'
-    if ( str /= '' ) read( str, *, iostat=io ) p%i1, p%i2, p%di, p%nb
-  else
-    read( key, * ) p%val
-    call strtok( str, key )
-    select case( key )
-    case( '' )
-    case( 'zone' ); read( str, *, iostat=io ) p%i1, p%i2
-    case( 'cube' ); read( str, *, iostat=io ) p%x1, p%x2; p%mode = 'c'
-    case default; io = 1
-    end select
-  end if
-end if
 
 ! Error check
 if ( io /= 0 ) then
