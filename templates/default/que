@@ -1,5 +1,7 @@
 #!/bin/bash -e
+
 cd "%(rundir)s"
+
 nice nohup ./run > out.log &
 pid=$!
 echo "$( date ): PID: $pid" >> log

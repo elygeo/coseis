@@ -140,21 +140,15 @@ def main():
     os.mkdir( 'checkpoint' )
 
     # Write run metadata
+    cfg = 'default'
+    if os.path.isdir( 'py/' + machine ): cfg = machine
     login = os.getlogin()
     rundate = time.asctime()
     os_ = os.uname()[3]
-    file( 'meta.py', 'w' ).write( """\
-# SORD run metadata
-login   = '%(login)s'
-rundate = '%(rundate)s'
-rundir  = '%(rundir)s'
-infile  = '%(infile)s'
-machine = '%(machine)s'
-host    = '%(host)s'
-os      = '%(os_)s'
-mode    = '%(mode)s'
-np      = %(np3)s
-""" % locals() )
+    templates = [ srcdir + 'templates/meta.py' ]
+    templates += glob.glob( srddir + '/templates/' + machine
+    for f in templates:
+        file( 'meta.py', 'w' ).write( % locals() )
 
 
     # sys.byteorder

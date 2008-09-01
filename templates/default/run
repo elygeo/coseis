@@ -1,7 +1,10 @@
 #!/bin/bash -e
+
 mode=%(mode)s
+
 cd "%(rundir)s"
 ./mpd
+
 echo "$( date ): %(code)s started" >> log
 %(pre)s
 case "$mode${1:--i}" in
@@ -14,3 +17,4 @@ case "$mode${1:--i}" in
 esac
 %(post)s
 echo "$( date ): %(code)s finished"
+
