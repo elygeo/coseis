@@ -20,7 +20,6 @@ files="
     $base/doc
     $base/make.sh
     $base/sord
-    $base/sord.py
     $base/in
     $base/sh
     $base/py

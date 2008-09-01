@@ -16,7 +16,7 @@ type( t_io ), pointer :: p
 allocate( pio0, p )
 p => pio0
 
-open( 1, file='input.py', status='old' )
+open( 1, file='sord-input.py', status='old' )
 
 doline: do
 
