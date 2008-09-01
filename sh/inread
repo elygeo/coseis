@@ -1,9 +1,10 @@
 #!/bin/bash -e
 
 # Prepare input file
+
 mkdir -p tmp
 cat $@ | sed "
-s/%.*$//;
+s/#.*$//;
 s/;/\\
 /g;
 " | sed "

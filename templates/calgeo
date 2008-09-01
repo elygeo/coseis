@@ -1,0 +1,44 @@
+#!/bin/bash -e
+# UC Berkeley Geo Cluster
+
+cat << END > run
+#!/bin/bash -e
+mode=$mode
+cd "$rundir"
+echo "\$( date ): $code started" >> log
+$pre
+case "\$mode\${1:--i}" in
+    s-i)   time $bin ;;
+    s-g)   gdb $bin ;;
+    p-i)   mpiexec -np $np time $bin ;;
+    p-g)   mpiexec -gdb -np $np $bin ;;
+esac
+$post
+echo "\$( date ): $code finished" >> log
+END
+
+cat << END > que
+#!/bin/bash
+cd "$rundir"
+echo "\$( date ): $code qued with ID: \$( qsub script )" >> log
+END
+
+cat << END > script
+#!/bin/bash
+#PBS -N $code$count
+#PBS -l nodes=$nodes:ppn=$ppn:smallmem
+#PBS -j oe
+#PBS -k oe
+#PBS -V
+#PBS -r n
+cd "$rundir"
+echo "\$( date ): $code started" >> log
+$pre
+/home/doug/bin/clean_ipc_r \$( cat \$PBS_NODEFILE )
+mpiexec -kill $bin
+$post
+echo "\$( date ): $code finished" >> log
+END
+
+chmod u+x run que script
+

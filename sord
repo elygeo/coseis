@@ -37,11 +37,11 @@ case "$opt" in
 esac
 done
 shift $(( OPTIND - 1 ))
-infile="$1"
+infile="${1:?}"
 
 # Locations
 cwdir=$( /bin/pwd )
-srcdir=$( basename $0 )
+srcdir=$( dirname $0 )
 [ "$0" == "$( basename $0 )" ] && srcdir="$HOME/sord"
 srcdir="$( cd $srcdir; /bin/pwd )"
 
@@ -73,6 +73,7 @@ echo "Machine: $machine"
 
 # Number of processors
 [ $mode = guess -a $(( maxnodes * maxcpus )) -eq 1 ] && mode=s
+echo $mode ${np3[*]}
 [ $mode = s ] && np3=( 1 1 1 )
 np=$(( np3[0] * np3[1] * np3[2] ));
 [ $mode = guess -a $np -eq 1 ] && mode=s

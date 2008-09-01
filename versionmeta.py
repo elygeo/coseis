@@ -1,5 +1,5 @@
-version = '20080831130241'
+version = '20080831183600'
 login   = 'gely'
 name    = 'Geoffrey Ely'
 host    = 'wide'
-dir     = '/Users/gely/files/sord'
+dir     = '/Users/gely/sord'

@@ -23,6 +23,8 @@ files="
     $base/sord.py
     $base/in
     $base/sh
+    $base/py
+    $base/templates
     $base/src
 "
 mkdir -p tmp

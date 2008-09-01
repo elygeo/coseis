@@ -1,0 +1,78 @@
+#!/bin/bash -e
+# SDSC DataStar p690 nodes
+
+cat << END > run
+#!/bin/bash -e
+mode=$mode
+cd "$rundir"
+if [ \$( /bin/pwd | grep -v gpfs ) ]; then
+    echo "Error: jobs must be run from /gpfs"
+    exit
+fi
+echo "\$( date ): $code started" >> log
+opts="-labelio yes -tasks_per_node $ppn -nodes $nodes -rmpool 1 -euilib us -euidevice sn_all"
+$pre
+case "\$mode\${1:--i}" in
+    s-i)  hpmcount -nao prof/hpm $bin ;;
+    s-g)  pdx $bin ;;
+    s-tv) totalview $bin ;;
+    p-i)  poe32 hpmcount -nao prof/hpm $bin \$opts ;;
+    p-tv) tvpoe32 $bin \$opts ;;
+esac
+$post
+echo "\$( date ): $code finished" >> log
+END
+
+cat << END > que
+#!/bin/bash
+cd "$rundir"
+if [ \$( /bin/pwd | grep -v gpfs ) ]; then
+    echo "Error: jobs must be run from /gpfs"
+    exit
+fi
+llsubmit script >> log
+END
+
+cat << END > script
+#!/bin/bash
+#@environment = COPY_ALL;\\
+#AIXTHREAD_SCOPE=S;\\
+#MP_ADAPTER_USE=dedicated;\\
+#MP_CPU_USE=unique;\\
+#MP_CSS_INTERRUPT=no;\\
+#MP_EAGER_LIMIT=16384;\\
+#MP_EUIDEVELOP=min;\\
+#MP_LABELIO=yes;\\
+#MP_POLLING_INTERVAL=100000;\\
+#MP_PULSE=0;\\
+#MP_SHARED_MEMORY=yes;\\
+#MP_SINGLE_THREAD=no;\\
+#RT_GRQ=ON;\\
+#XLSMPOPTS="stack=67108864"
+#@ job_name = $code$count
+#@ initialdir = $rundir
+#@ node = $nodes
+#@ tasks_per_node = $ppn
+#@ wall_clock_limit = $walltime
+#@ resources = ConsumableCpus(1) ConsumableMemory(${ramproc}mb)
+#@ notification = always
+#@ notify_user = $email
+#@ job_type = parallel
+#@ class = normal32
+#@ node_usage = shared
+#@ network.MPI = sn_all, shared, US
+#@ output = stdout
+#@ error = stderr
+#@ queue
+export MEMORY_AFFINITY=MCM
+export MP_TASK_AFFINITY=MCM
+cd "$rundir"
+echo "\$( date ): $code started" >> log
+$pre
+poe hpmcount -nao prof/hpm $bin
+$post
+echo "\$( date ): $code finished" >> log
+END
+
+chmod u+x run que script
+
