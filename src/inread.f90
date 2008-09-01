@@ -5,9 +5,9 @@ contains
 
 subroutine inread
 use m_globals
-use m_util
-integer :: i, io
-logical :: inzone
+use m_sequence
+integer :: io
+logical :: zone
 character(12) :: key
 character(256) :: line
 type( t_io ), pointer :: p
@@ -16,26 +16,31 @@ type( t_io ), pointer :: p
 allocate( pio0, p )
 p => pio0
 
-open( 1, file='input', status='old' )
+open( 1, file='input.py', status='old' )
 
 doline: do
 
 ! Read line
 read( 1, '(a)', iostat=io ) line
 if ( io /= 0 ) exit doline
-if ( line == '' ) cycle doline
-str = line
 
-! Read tokens
-call strtok( str, key )
-inzone = .false.
-i = 0
+! Strip comments and punctuation
+i = index( str, '#%' )
+if ( i > 0 ) str(i:) = ' '
+do
+  i = scan( str, "{}=[]',;" )
+  if ( i == 0 ) exit
+  str(i:i) = ' '
+end do
+
+! Read key val pair
+if ( line == '' ) cycle doline
+read( line, *, iostat=io ) key, str
+ioseq = .false.
 
 ! Select input key
 select case( key )
-case( '' )
-case( 'datadir' )
-case( 'return' );       exit doline
+case( '', 'io', 'datadir' )
 case( 'rfunc' );        rfunc = str(1:16)
 case( 'tfunc' );        tfunc = str(1:16)
 case( 'oplevel' );      read( str, *, iostat=io ) oplevel
@@ -85,48 +90,44 @@ case( 'itstop' );       read( str, *, iostat=io ) itstop
 case( 'debug' );        read( str, *, iostat=io ) debug
 case( 'mpin' );         read( str, *, iostat=io ) mpin
 case( 'mpout' );        read( str, *, iostat=io ) mpout
+case( 's0', 'sx', 'sn', 'sz', 'sc' );  ioseq = .true.
+case( 'r0', 'rx', 'rn', 'rz' );        ioseq = .true.
+case( 'w0', 'wx', 'wb', 'wz' );        ioseq = .true.
+case default; io = 1
+end select
 
-select case( key )
-case( 'x1' )
-case( 'x2' )
-case( 'x3' )
-case( 'rho' )
-case( 'vp' )
-case( 'vs' )
-!case( 'qp' )
-!case( 'qs' )
-case( 'gam' )
-case( 'mus' )
-case( 'mud' )
-case( 'dc' )
-case( 'co' )
-case( 'tn' )
-case( 'ts1' )
-case( 'ts2' )
-case( 'sxx' )
-case( 'syy' )
-case( 'szz' )
-case( 'syz' )
-case( 'szx' )
-case( 'sxy' )
-case( 'sz', 'sn', 'sx', 'sc', 'rx', 'wx', 'rn', 'wn', 'rz', 'wz' )
+! I/O sequence
+if ( ioseq ) then
   p => p%next
   allocate( p )
   p%mode = key
-  case( 'sz' );       read( str, *, iostat=io ) p%field, p%val, p%i1, p%i2, p%di
-  case( 'sn' );       read( str, *, iostat=io ) p%field, p%val, p%i1
-  case( 'sx' );       read( str, *, iostat=io ) p%field, p%val, p%x1
-  case( 'sc' );       read( str, *, iostat=io ) p%field, p%val, p%x1, p%x2
-  case( 'rx', 'wx' ); read( str, *, iostat=io ) p%field, p%x1
+  p%i1 = (/  1,  1,  1,  0 /)
+  p%i2 = (/ -1, -1, -1,  0 /)
+  p%di = (/  1,  1,  1,  1 /)
+  p%nb = itio
+  select case( key )
+  case( 's0' );       read( str, *, iostat=io ) p%field, p%val
+  case( 'sn' );       read( str, *, iostat=io ) p%field, p%i1, p%val
+  case( 'sz' );       read( str, *, iostat=io ) p%field, p%i1, p%i2, p%di, p%val
+  case( 'sx' );       read( str, *, iostat=io ) p%field, p%x1, p%val
+  case( 'sc' );       read( str, *, iostat=io ) p%field, p%x1, p%x2, p%val
+  case( 'r0', 'w0' ); read( str, *, iostat=io ) p%field
   case( 'rn', 'wn' ); read( str, *, iostat=io ) p%field, p%i1
   case( 'rz', 'wz' ); read( str, *, iostat=io ) p%field, p%i1, p%i2, p%di, p%nb
+  case( 'rx', 'wx' ); read( str, *, iostat=io ) p%field, p%x1
+  case default; io = 1
   end select
-  if key(2) = 'n' then
+  if ( key(2) = 'n' .or. key(2) == 'x' ) then
     p%i2 = p%i1
-    p%di = 1
-    p%nb = itio
-case default; io = 1
-end select
+    p%i2(4) = -1
+  end if
+  select case( p%field )
+  case( 'x1', 'x2', 'x3', 'rho', 'vp', 'vs', 'gam', 'qp', 'qs' )
+  case( 'mus', 'mud', 'dc' , 'co', 'tn' , 'ts1', 'ts2' )
+  case( 'sxx', 'syy', 'szz', 'syz', 'szx', 'sxy' )
+  case default; io = 1
+  end select
+end if
 
 ! Error check
 if ( io /= 0 ) then

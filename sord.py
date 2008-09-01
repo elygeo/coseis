@@ -43,8 +43,11 @@ def main():
     count = '%02d' % ( int( count ) + 1 )
 
     # Read input file
-    execfile( srcdir + '/in/defaults.py' )
-    execfile( infile )
+    params  = __inport__( srcdir + '/in/defaults.py' )
+    params_ = __inport__( infile )
+    for key in dir( params ):
+        if key[:2] not in [ '__', 'i1', 'i2', 'di' ]:
+            setattr( params, key, getattr( params_, key ) )
 
     # Host
     host = os.uname()[1]
@@ -70,7 +73,7 @@ def main():
     maxnodes, maxcpus, maxram, rate, maxmm = machines[machine]
 
     # Number of processors
-    np3 = np
+    np3 = params.np
     if mode == 'guess' and maxnodes*maxcpus == 1: mode = 's'
     print mode, maxnodes, maxcpus
     if mode == 's': np3 = [ 1, 1, 1 ]
@@ -83,15 +86,15 @@ def main():
     cpus = min( maxcpus, ppn )
 
     # Domain size
-    nm3 = [ ( nn[i] - 1 ) / np3[i] + 3 for i in range(3) ]
-    i = faultnormal - 1
+    nm3 = [ ( params.nn[i] - 1 ) / np3[i] + 3 for i in range(3) ]
+    i = params.faultnormal - 1
     if i >= 0: nm3[i] = nm3[i] + 2
     nm = nm3[0] * nm3[1] * nm3[2]
 
     # RAM and Wall time usage
     floatsize = 4
-    if oplevel in (1,2): nvars = 20
-    elif oplevel in (3,4,5): nvars = 23
+    if p.oplevel in (1,2): nvars = 20
+    elif p.oplevel in (3,4,5): nvars = 23
     else: nvars = 44
     ramproc = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * 1.5
     ramnode = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * ppn
@@ -139,7 +142,11 @@ def main():
     os.mkdir( 'debug' )
     os.mkdir( 'checkpoint' )
 
-    # Process input file
+    # Write input file
+    f = file( 'input', 'w' )
+    for key in dir( params ):
+        if key[:2] not in [ '__', 'io' ]:
+            file.write( 
 
     # Process templates
     cfg = 'default'

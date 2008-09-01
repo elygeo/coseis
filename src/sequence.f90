@@ -1,12 +1,12 @@
 ! Output routines
-module m_file_io
+module m_sequence
 implicit none
 type t_io          ! input/output structure
   type( t_io ), pointer :: &
     next           ! pointer to next in linked list
   character(4) :: &
     field          ! variable name
-  character :: & 
+  character(2) :: & 
     mode
   integer :: &   
     i1(4),       & ! j,k,l,t start index
@@ -37,7 +37,7 @@ real, private, allocatable, dimension(:,:) :: &
 contains
 
 ! Initialize output
-subroutine file_io_init
+subroutine sequence_init
 use m_globals
 use m_collective
 use m_util
@@ -116,6 +116,7 @@ case default
   stop
 end select
 end do
+FIXME array of pointers
 p%nc = nc
 p%pass = pass
 p%fault = fault
@@ -230,7 +231,7 @@ end subroutine
 !------------------------------------------------------------------------------!
 
 ! Write output
-subroutine file_io( pass )
+subroutine sequence_pass( pass )
 use m_globals
 use m_collective
 use m_outprops
