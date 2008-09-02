@@ -6,7 +6,7 @@ nt = 15000				# number of time steps
 dt = 0.012				# time step length
 
 # Read mesh coordinates from disk
-datadir = 'saf/scecvm4/0200'		# directory location
+datadir = 'saf/cvm4/0200'		# directory location
 io = [
   ( 'rz', 'x1', 1,1,1,0, -1,-1,1,0, 1,1,1,1, 1 ),	# read 2D x coordinate file
   ( 'rz', 'x2', 1,1,1,0, -1,-1,1,0, 1,1,1,1, 1 ),	# read 2D y coordinate file
@@ -28,7 +28,6 @@ vp1  = 1500.				# set minimum V_p
 vs1  = 500.				# set minimum V_s
 gam2 = 0.8				# set maximum viscosity
 hourglass = ( 1., 1. )			# hourglass stiffness and viscosity
-
 
 # Fault parameters
 ihypo = ( 2266, 997, -26 )		# hypocenter indices

@@ -25,6 +25,7 @@ def main():
         elif o == '-m': machine = a
         elif o == '-f':
             for f in glob.glob( 'tmp/*' ): shutil.rmtree( f )
+            #for f in os.listdir( 'tmp' ): shutil.rmtree( 'tmp/' + f )
         elif o == '-d':
             for f in glob.glob( 'run/[0-9][0-9]' ): shutil.rmtree( f )
         else: assert False, 'unhandled option'
@@ -129,22 +130,22 @@ def main():
         'tmp/sord.tgz',
         'tmp/sord-' + mode,
         'sh/clean' ]
-    file = []
+    files = []
     if optimize == 'g':
         files += glob.glob( 'src/*.f90' )
     for f in files:
         shutil.copy( f, rundir )
 
     # Write input file
-    os.cwdir( rundir )
+    os.chdir( rundir )
     log = file( 'log', 'w' )
     log.write( starttime + ': SORD setup started' )
     f = file( 'sord-input.py', 'w' )
     for key in dir( params ):
         if key[:2] not in [ '__', 'io' ]:
-            f.write( '%s = %s' % ( key, getattr( params, key ) ) )
+            f.write( '%s = %s\n' % ( key, getattr( params, key ) ) )
     f.write( 'io = [' )
-    for line in params.io: f.write( str( line ) + ',' )
+    for line in params.io: f.write( str( line ) + ',\n' )
     f.write( ']' )
     for f in glob.glob( '*' ): os.chmod( f, 444 )
     for f in ( 'data', 'out', 'prof', 'stats', 'debug', 'checkpoint' ):
@@ -154,34 +155,34 @@ def main():
     login = os.getlogin()
     rundate = time.asctime()
     os_ = os.uname()[3]
-    cfg = 'default'
-    if os.path.isdir( 'py/' + machine ): cfg = machine
-    templates = [ srcdir + 'templates/meta.py' ]
-    templates += glob.glob( srddir + '/templates/' + machine
+    os.chdir( srcdir + '/templates' )
+    templates = 'default'
+    if os.path.isdir( machine ): templates = machine
+    templates = glob.glob( templates + '/*' ) + [ 'runmeta.py' ]
     for f in templates:
-        ff = os.path.basename( file )
+        ff = rundir + os.path.basename( f )
         out = file( f, 'r' ).read() % locals()
         file( ff, 'w' ).write( out )
         shutil.copymode( f, ff )
 
     # Data directory
     if params.datadir:
-        os.cwdir( initdir )
+        os.chdir( initdir )
         datadir = os.path.abspath( params.datadir )
-        os.cwdir( rundir + '/data' )
-        for f in glob.glob( datadir + '/*' ):
-            ff = os.path.basename( file )
+        os.chdir( rundir + '/data' )
+        for f in os.listdir( datadir ):
+            ff = os.path.basename( f )
             os.symlink( f, ff )
         endian = file( 'endian', 'r' ).read()
         assert endian[0] == sys.byteorder[0]
-        os.cwdir( rundir )
 
     # Run of que job
+    os.chdir( rundir )
     if run == 'q':
         print './que'
         err = os.system( './que' )
         assert not err
-    elif run
+    elif run:
         print './run -' + run
         err = os.system( './run -' + run )
         assert not err
