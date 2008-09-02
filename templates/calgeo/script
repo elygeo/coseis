@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#PBS -N %(code)s%cound)s
+#PBS -l nodes=%(nodes):ppn=%(ppn):smallmem
+#PBS -j oe
+#PBS -k oe
+#PBS -V
+#PBS -r n
+
+cd %(rundir)r
+
+echo "$( date ): %(code)s started" >> log
+%(pre)s
+/home/doug/bin/clean_ipc_r $( cat $PBS_NODEFILE )
+mpiexec -kill %(bin)s
+%(post)s
+echo "$( date ): %(code)s finished" >> log
+
