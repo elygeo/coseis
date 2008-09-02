@@ -40,7 +40,7 @@ ioseq = .false.
 
 ! Select input key
 select case( key )
-case( '', 'io', 'datadir' )
+case( 'io', 'datadir', '' )
 case( 'rfunc' );        rfunc = str(1:16)
 case( 'tfunc' );        tfunc = str(1:16)
 case( 'oplevel' );      read( str, *, iostat=io ) oplevel

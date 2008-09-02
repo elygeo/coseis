@@ -30,17 +30,9 @@ def main():
         else: assert False, 'unhandled option'
 
     # Locations
-    infile = os.path.abspath( argv[0] )
-    srcdir = os.path.abspath( os.path.dirname( sys.argv[0] ) )
-    cwdir  = os.path.abspath( os.getcwd() )
-
-    # Make directories
-    if not os.path.isdir( 'tmp' ): os.mkdir( 'tmp' )
-    if not os.path.isdir( 'run' ): os.mkdir( 'run' )
-
-    # Run count
-    count = glob.glob( 'run/[0-9][0-9]' )[-1].split( '/' )[-1]
-    count = '%02d' % ( int( count ) + 1 )
+    infile  = os.path.abspath( argv[0] )
+    srcdir  = os.path.abspath( os.path.dirname( sys.argv[0] ) )
+    initdir = os.path.abspath( os.getcwd() )
 
     # Read input file
     params  = imp.load_source( '', srcdir + '/in/defaults.py' )
@@ -48,6 +40,16 @@ def main():
     for key in dir( params ):
         if key[:2] not in [ '__', 'i1', 'i2', 'di' ]:
             setattr( params, key, getattr( params_, key ) )
+
+    # Make directories
+    if not os.path.isdir( 'tmp' ): os.mkdir( 'tmp' )
+    if not os.path.isdir( 'run' ): os.mkdir( 'run' )
+
+    # Run count
+    count = glob.glob( 'run/[0-9][0-9]' )
+    try: count = count[-1].split( '/' )[-1]
+    except: count = 0
+    count = '%02d' % ( int( count ) + 1 )
 
     # Host
     host = os.uname()[1]
@@ -144,24 +146,45 @@ def main():
     f.write( 'io = [' )
     for line in params.io: f.write( str( line ) + ',' )
     f.write( ']' )
-    for f in glob.glob( '*' ):
-        os.chmod( f, 444 )
-    for f in ( 'out', 'prof', 'stats', 'debug', 'checkpoint' ):
+    for f in glob.glob( '*' ): os.chmod( f, 444 )
+    for f in ( 'data', 'out', 'prof', 'stats', 'debug', 'checkpoint' ):
         os.mkdir( f )
 
     # Process templates
-    cfg = 'default'
-    if os.path.isdir( 'py/' + machine ):
-        cfg = machine
     login = os.getlogin()
     rundate = time.asctime()
     os_ = os.uname()[3]
-  #  templates = [ srcdir + 'templates/meta.py' ]
-  #  templates += glob.glob( srddir + '/templates/' + machine
-  #  for f in templates:
-  #      file( 'meta.py', 'w' ).write( f % locals() )
+    cfg = 'default'
+    if os.path.isdir( 'py/' + machine ): cfg = machine
+    templates = [ srcdir + 'templates/meta.py' ]
+    templates += glob.glob( srddir + '/templates/' + machine
+    for f in templates:
+        ff = os.path.basename( file )
+        out = file( f, 'r' ).read() % locals()
+        file( ff, 'w' ).write( out )
+        shutil.copymode( f, ff )
 
-    # sys.byteorder
+    # Data directory
+    if params.datadir:
+        os.cwdir( initdir )
+        datadir = os.path.abspath( params.datadir )
+        os.cwdir( rundir + '/data' )
+        for f in glob.glob( datadir + '/*' ):
+            ff = os.path.basename( file )
+            os.symlink( f, ff )
+        endian = file( 'endian', 'r' ).read()
+        assert endian[0] == sys.byteorder[0]
+        os.cwdir( rundir )
+
+    # Run of que job
+    if run == 'q':
+        print './que'
+        err = os.system( './que' )
+        assert not err
+    elif run
+        print './run -' + run
+        err = os.system( './run -' + run )
+        assert not err
 
 if __name__ == "__main__":
     main()
