@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, sys, getopt, time, glob, shutil
+import os, sys, getopt, time, glob, shutil, imp
 
 def main():
 
@@ -27,7 +27,7 @@ def main():
             for f in glob.glob( 'tmp/*' ): shutil.rmtree( f )
         elif o == '-d':
             for f in glob.glob( 'run/[0-9][0-9]' ): shutil.rmtree( f )
-        else: assert False, "unhandled option"
+        else: assert False, 'unhandled option'
 
     # Locations
     infile = os.path.abspath( argv[0] )
@@ -43,8 +43,8 @@ def main():
     count = '%02d' % ( int( count ) + 1 )
 
     # Read input file
-    params  = __inport__( srcdir + '/in/defaults.py' )
-    params_ = __inport__( infile )
+    params  = imp.load_source( '', srcdir + '/in/defaults.py' )
+    params_ = imp.load_source( '', infile )
     for key in dir( params ):
         if key[:2] not in [ '__', 'i1', 'i2', 'di' ]:
             setattr( params, key, getattr( params_, key ) )
@@ -97,12 +97,12 @@ def main():
     else: nvars = 44
     ramproc = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * 1.5
     ramnode = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * ppn
-    sus = ( nt + 10 ) * ppn * nm / cpus / rate / 3600000 * nodes * maxcpus
-    mm  = ( nt + 10 ) * ppn * nm / cpus / rate / 60000 * 1.5 + 10
+    sus = ( params.nt + 10 ) * ppn * nm / cpus / rate / 3600000 * nodes * maxcpus
+    mm  = ( params.nt + 10 ) * ppn * nm / cpus / rate / 60000 * 1.5 + 10
     if maxmm > 0: mm = min( maxmm, mm )
     hh = mm / 60
     mm = mm % 60
-    walltime = '%s:%02d:00' % ( hh, mm )
+    walltime = '%d:%02d:00' % ( hh, mm )
     print 'Procs: %s of %s' % ( np, maxnodes * maxcpus )
     print 'Nodes: %s of %s' % ( nodes, maxnodes )
     print 'RAM: %sMb of %sMb per node' % ( ramnode, maxram )
@@ -115,26 +115,28 @@ def main():
     # Set-up and run
 
     if not setup: return
-    assert not os.system( srcdir + '/make.sh -' + mode + optimize )
-
+    err = os.system( srcdir + '/make.sh -' + mode + optimize )
+    #assert not err, 'Trouble building build SORD code'
+       
     # Setup run directory
-    rundir = 'run/$count'
+    rundir = 'run/%s' % count
     print 'Run directory: ' + rundir
     os.mkdir( rundir )
-    log = file( rundir + '/log', 'w' )
-    log.write( starttime + ': SORD setup started' )
     files = [
         infile,
         'tmp/sord.tgz',
         'tmp/sord-' + mode,
         'sh/clean' ]
+    file = []
     if optimize == 'g':
-        files += glob.glob( 'src/*.f90' ):
+        files += glob.glob( 'src/*.f90' )
     for f in files:
         shutil.copy( f, rundir )
-    os.cwdir( rundir )
 
     # Write input file
+    os.cwdir( rundir )
+    log = file( 'log', 'w' )
+    log.write( starttime + ': SORD setup started' )
     f = file( 'sord-input.py', 'w' )
     for key in dir( params ):
         if key[:2] not in [ '__', 'io' ]:
@@ -142,6 +144,10 @@ def main():
     f.write( 'io = [' )
     for line in params.io: f.write( str( line ) + ',' )
     f.write( ']' )
+    for f in glob.glob( '*' ):
+        os.chmod( f, 444 )
+    for f in ( 'out', 'prof', 'stats', 'debug', 'checkpoint' ):
+        os.mkdir( f )
 
     # Process templates
     cfg = 'default'
@@ -154,15 +160,6 @@ def main():
   #  templates += glob.glob( srddir + '/templates/' + machine
   #  for f in templates:
   #      file( 'meta.py', 'w' ).write( f % locals() )
-
-    # Write protect files
-    for f in glob.glob( '*' ):
-        os.chmod( f, 444 )
-    os.mkdir( 'out' )
-    os.mkdir( 'prof' )
-    os.mkdir( 'stats' )
-    os.mkdir( 'debug' )
-    os.mkdir( 'checkpoint' )
 
     # sys.byteorder
 

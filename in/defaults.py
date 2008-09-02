@@ -26,10 +26,10 @@ oplevel = 0			# *spatial difference operator level (see below)
 vdamp = -1.			# Vs dependent damping
 hourglass = ( 1., 1. )		# hourglass stiffness (1) and viscosity (2)
 io += [				# *I/O sequence (see below)
-  ( 's0', 'vp'  ),		# density
-  ( 's0', 'vp'  ),		# P-wave speed
-  ( 's0', 'vs'  ),		# S-wave speed
-  ( 's0', 'gam' ),		# viscosity
+  ( 's0', 'rho', 2670.     ),	# density
+  ( 's0', 'vp',  6000.     ),	# P-wave speed
+  ( 's0', 'vs',  3464.1016 ),	# S-wave speed
+  ( 's0', 'gam',    0.     ),	# viscosity
 ]
 rho1 = -1.			# min density
 rho2 = -1.			# max density
