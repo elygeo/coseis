@@ -2,18 +2,18 @@
 
 import os, sys, getopt, time, glob, shutil, imp
 
-def main():
+def sord( argv ):
 
-    # Log start time
+    # Save start time
     starttime = time.asctime()
     print "SORD setup"
 
     # Command line options
     setup = True
     run = False
-    mode = 'guess'
+    mode = None
     optimize = 'O'
-    opt, argv = getopt.getopt( sys.argv[1:], 'niqspgGm:fd' )
+    opt, infiles = getopt.getopt( argv[1:], 'niqspgGm:fd' )
     for o, a in opt:
         if   o == '-n': setup = False; run = False
         elif o == '-i': run = 'i'
@@ -24,31 +24,33 @@ def main():
         elif o == '-G': optimize = 'g'; run = 'g'
         elif o == '-m': machine = a
         elif o == '-f':
-            for f in glob.glob( 'tmp/*' ): shutil.rmtree( f )
-            #for f in os.listdir( 'tmp' ): shutil.rmtree( 'tmp/' + f )
+            for f in glob.glob( 'tmp' + os.sep + '*' ): shutil.rmtree( f )
         elif o == '-d':
-            for f in glob.glob( 'run/[0-9][0-9]' ): shutil.rmtree( f )
+            for f in glob.glob( 'run' + os.sep + '[0-9][0-9]' ): shutil.rmtree( f )
         else: assert False, 'unhandled option'
 
     # Locations
-    infile  = os.path.abspath( argv[0] )
-    srcdir  = os.path.abspath( os.path.dirname( sys.argv[0] ) )
-    initdir = os.path.abspath( os.getcwd() )
+    initdir =   os.path.abspath( os.getcwd() )
+    srcdir  =   os.path.abspath( os.path.dirname( argv[0] ) )
+    infiles = [ os.path.abspath( f ) for f in infiles ]
 
     # Read input file
-    params  = imp.load_source( '', srcdir + '/in/defaults.py' )
-    params_ = imp.load_source( '', infile )
-    for key in dir( params ):
-        if key[:2] not in [ '__', 'i1', 'i2', 'di' ]:
-            setattr( params, key, getattr( params_, key ) )
+    print srcdir + os.sep + 'in' + os.sep + 'defaults.py'
+    params = imp.load_source( 'params', srcdir + os.sep + 'in' + os.sep + 'defaults.py' )
+    for f in infiles:
+        newparams = imp.load_source( 'newparams', f )
+        for key in dir( newparams ):
+            if len(key) > 1 and key[:2] is not '__':
+                if not hasattr( params, key ): raise AttributeError, key
+                setattr( params, key, getattr( newparams, key ) )
 
     # Make directories
     if not os.path.isdir( 'tmp' ): os.mkdir( 'tmp' )
     if not os.path.isdir( 'run' ): os.mkdir( 'run' )
 
     # Run count
-    count = glob.glob( 'run/[0-9][0-9]' )
-    try: count = count[-1].split( '/' )[-1]
+    count = glob.glob( 'run' + os.sep + '[0-9][0-9]' )
+    try: count = count[-1].split( os.sep )[-1]
     except: count = 0
     count = '%02d' % ( int( count ) + 1 )
 
@@ -77,10 +79,10 @@ def main():
 
     # Number of processors
     np3 = params.np
-    if mode == 'guess' and maxnodes*maxcpus == 1: mode = 's'
+    if not mode and maxnodes*maxcpus == 1: mode = 's'
     if mode == 's': np3 = [ 1, 1, 1 ]
     np = np3[0] * np3[1] * np3[2]
-    if mode == 'guess':
+    if not mode:
         mode = 's'
         if np > 1: mode = 'p'
     nodes = min( maxnodes, ( np - 1 ) / maxcpus + 1 )
@@ -118,58 +120,63 @@ def main():
     # Set-up and run
 
     if not setup: return
-    err = os.system( srcdir + '/make.sh -' + mode + optimize )
+    err = os.system( srcdir + os.sep + 'make.sh -' + mode + optimize )
     #assert not err, 'Trouble building build SORD code'
        
     # Setup run directory
-    rundir = 'run/%s' % count
+    rundir = 'run' + os.sep + str( count )
     print 'Run directory: ' + rundir
     os.mkdir( rundir )
-    files = [
-        infile,
-        'tmp/sord.tgz',
-        'tmp/sord-' + mode,
-        'sh/clean' ]
-    files = []
+    files = infiles + [
+        'tmp' + os.sep + 'sord.tgz',
+        'tmp' + os.sep + 'sord-' + mode,
+        'sh' + os.sep + 'clean' ]
     if optimize == 'g':
-        files += glob.glob( 'src/*.f90' )
+        files += glob.glob( 'src' + os.sep + '*.f90' )
     for f in files:
         shutil.copy( f, rundir )
 
     # Write input file
+    rundir = os.path.abspath( rundir )
     os.chdir( rundir )
     log = file( 'log', 'w' )
-    log.write( starttime + ': SORD setup started' )
+    log.write( starttime + ': SORD setup started\n' )
     f = file( 'sord-input.py', 'w' )
     for key in dir( params ):
         if key[:2] not in [ '__', 'io' ]:
-            f.write( '%s = %s\n' % ( key, getattr( params, key ) ) )
-    f.write( 'io = [' )
-    for line in params.io: f.write( str( line ) + ',\n' )
-    f.write( ']' )
+            f.write( '%s = %r\n' % ( key, getattr( params, key ) ) )
+    f.write( 'io = [\n' )
+    for line in params.io: f.write( repr( line ) + ',\n' )
+    f.write( ']\n' )
     for f in glob.glob( '*' ): os.chmod( f, 444 )
     for f in ( 'data', 'out', 'prof', 'stats', 'debug', 'checkpoint' ):
         os.mkdir( f )
 
-    # Process templates
+    # Template variables
+    code = 'sord'
+    pre = ''
+    bin = './sord-' + mode
+    post = ''
     login = os.getlogin()
     rundate = time.asctime()
     os_ = os.uname()[3]
-    os.chdir( srcdir + '/templates' )
+
+    # Process templates
+    os.chdir( srcdir + os.sep + 'templates' )
     templates = 'default'
     if os.path.isdir( machine ): templates = machine
-    templates = glob.glob( templates + '/*' ) + [ 'runmeta.py' ]
+    templates = glob.glob( templates + os.sep + '*' ) + [ 'runmeta.py' ]
     for f in templates:
-        ff = rundir + os.path.basename( f )
+        ff = rundir + os.sep + os.path.basename( f )
         out = file( f, 'r' ).read() % locals()
         file( ff, 'w' ).write( out )
-        shutil.copymode( f, ff )
+        #shutil.copymode( f, ff )
 
     # Data directory
     if params.datadir:
         os.chdir( initdir )
         datadir = os.path.abspath( params.datadir )
-        os.chdir( rundir + '/data' )
+        os.chdir( rundir + os.sep + 'data' )
         for f in os.listdir( datadir ):
             ff = os.path.basename( f )
             os.symlink( f, ff )
@@ -188,5 +195,5 @@ def main():
         assert not err
 
 if __name__ == "__main__":
-    main()
+    sord( sys.argv )
 

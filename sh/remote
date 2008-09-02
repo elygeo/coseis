@@ -2,6 +2,7 @@
 # Remote install & execution
 
 account="${1:?}"
+dest='sord'
 
 # Install files
 files="\
@@ -22,15 +23,15 @@ files="\
     cvm/cvm4*
 "
 files=$( echo $files )
-target="${account##* }"
+host="${account##* }"
 rsh="${account% *}"
-echo "rsync -avR --delete --exclude=tmp -e \"$rsh\" $files $target:sord"
-rsync -avR --delete -e "$rsh" $files $target:sord 
+echo "rsync -avR --delete --exclude=tmp -e \"$rsh\" $files $host:$dest"
+rsync -avR --delete --exclude=tmp -e "$rsh" $files "$host:$dest"
 
 # Execute command
 [ -z "$2" ] && exit 0
 shift 1
-cmd="cd sord; $*"
+cmd="cd $dest; $*"
 rsh="${account//ssh/ssh -tX}"
 echo "$rsh bash --login -c \"$cmd\""
 $rsh "bash --login -c \"$cmd\""

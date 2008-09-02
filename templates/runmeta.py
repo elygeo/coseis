@@ -1,10 +1,10 @@
 # SORD run metadata
-login   = '%(login)s'
-rundate = '%(rundate)s'
-rundir  = '%(rundir)s'
-infile  = '%(infile)s'
-machine = '%(machine)s'
-host    = '%(host)s'
-os      = '%(os_)s'
-mode    = '%(mode)s'
-np      = %(np3)s
+login   = %(login)r
+rundate = %(rundate)r
+rundir  = %(rundir)r
+infiles = %(infiles)r
+machine = %(machine)r
+host    = %(host)r
+os      = %(os_)r
+mode    = %(mode)r
+np      = %(np3)r

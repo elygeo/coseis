@@ -1,5 +1,6 @@
 # San Andreas Fault, northward dynamic rupture, topography, SCEC-CVM4
 
+i2 = 666
 np = ( 1, 80, 24 )			# 1920 total processors on DataStar
 nn = ( 3001, 1502, 401 )		# number of mesh nodes nx ny nz
 nt = 15000				# number of time steps
@@ -32,9 +33,9 @@ hourglass = ( 1., 1. )			# hourglass stiffness and viscosity
 # Fault parameters
 ihypo = ( 2266, 997, -26 )		# hypocenter indices
 faultnormal = 2				# fault plane at k = ihypo(2) = 997
-i1 = ( 1317, ihypo[faultnormal], -81 )	# temporary variable
-i2 = ( 2311, ihypo[faultnormal],  -1 )	# temporary variable
-di = ( 1, 1, 1, 1 )			# temporary variable
+j = ( 1317, ihypo[faultnormal], -81 )	# temporary variable
+k = ( 2311, ihypo[faultnormal],  -1 )	# temporary variable
+d = ( 1, 1, 1, 1 )			# temporary variable
 slipvector = ( 1., 0., 0. )		# vector for resolving pre-traction
 io += [
   ( 's0', 'tn', -20e6                ),	# initial normal traction
@@ -42,7 +43,7 @@ io += [
   ( 's0', 'dc',  0.5                 ),	# slip weakening distance
   ( 's0', 'mud', 0.5                 ),	# coefficient of dynamic friction
   ( 's0', 'mus', 1000.               ),	# coefficient of static friction, non-slip section
-  ( 'sz', 'mus', i1,0, i2,0, di, 1.1 ),	# coefficient of static friction, slipping section
+  ( 'sz', 'mus', j,0,  k,0,  d,  1.1 ),	# coefficient of static friction, slipping section
 ]
 
 # Nucleation
@@ -53,27 +54,27 @@ rcrit = 3000.				# radius of nucleation patch
 
 # Fault plane output
 io += [
-  ( 'wz', 'su',  i1,-1, i2,-1, di,10 ), # final slip
-  ( 'wz', 'psv', i1,-1, i2,-1, di,10 ), # peak slip velocity
-  ( 'wz', 'trup',i1,-1, i2,-1, di,10 ), # rupture time
+  ( 'w1', 'su',   10 ),			# final slip
+  ( 'w1', 'psv',  10 ),			# peak slip velocity
+  ( 'w1', 'trup', 10 ),			# rupture time
 ]
 
 # Velocity time series output
 io += [
-  ( 'wn', 'v', 2642, 813, -1 ), # Mexicali
-  ( 'wn', 'v', 2028, 979, -1 ), # Coachella
-  ( 'wn', 'v', 2015, 324, -1 ), # San Diego
-  ( 'wn', 'v', 1842, 940, -1 ), # Palm Springs
-  ( 'wn', 'v', 1457, 960, -1 ), # San Bernardino
-  ( 'wn', 'v', 1476, 852, -1 ), # Riverside
-  ( 'wn', 'v', 1307,1141, -1 ), # Victorville
-  ( 'wn', 'v', 1345, 840, -1 ), # Ontario
-  ( 'wn', 'v', 1278,1341, -1 ), # Barstow
-  ( 'wn', 'v', 1384, 620, -1 ), # Santa Ana
-  ( 'wn', 'v', 1205, 668, -1 ), # Montebello
-  ( 'wn', 'v', 1142, 642, -1 ), # Los Angeles
-  ( 'wn', 'v', 1262, 532, -1 ), # Long Beach
-  ( 'wn', 'v', 1079, 589, -1 ), # Westwood
-  ( 'wn', 'v',  951, 961, -1 ), # Lancaster
+  ( 'wn', 'v', 2642, 813, -1 ),		# Mexicali
+  ( 'wn', 'v', 2028, 979, -1 ),		# Coachella
+  ( 'wn', 'v', 2015, 324, -1 ),		# San Diego
+  ( 'wn', 'v', 1842, 940, -1 ),		# Palm Springs
+  ( 'wn', 'v', 1457, 960, -1 ),		# San Bernardino
+  ( 'wn', 'v', 1476, 852, -1 ),		# Riverside
+  ( 'wn', 'v', 1307,1141, -1 ),		# Victorville
+  ( 'wn', 'v', 1345, 840, -1 ),		# Ontario
+  ( 'wn', 'v', 1278,1341, -1 ),		# Barstow
+  ( 'wn', 'v', 1384, 620, -1 ),		# Santa Ana
+  ( 'wn', 'v', 1205, 668, -1 ),		# Montebello
+  ( 'wn', 'v', 1142, 642, -1 ),		# Los Angeles
+  ( 'wn', 'v', 1262, 532, -1 ),		# Long Beach
+  ( 'wn', 'v', 1079, 589, -1 ),		# Westwood
+  ( 'wn', 'v',  951, 961, -1 ),		# Lancaster
 ]
 

@@ -36,16 +36,6 @@ if ( debug /= 0 ) then
   write( 1, "( 'i1core =  [ ',i8,2(', ',i8),']; i2core =  [',i8,2(', ',i8),' ];')" ) i1core, i2core
   write( 1, "( 'i1node =  [ ',i8,2(', ',i8),']; i2node =  [',i8,2(', ',i8),' ];')" ) i1node, i2node
   write( 1, "( 'i1cell =  [ ',i8,2(', ',i8),']; i2cell =  [',i8,2(', ',i8),' ];')" ) i1cell, i2cell
-  p => inp0
-  do while( associated( p%next ) )
-    p => p%next
-    select case( p%mode )
-    case( 'z' ); write( 1, "( a,' = { ',g15.7,', ''zone'', ',i8,5(', ',i8),' };' )" ) &
-      p%field, p%val, p%i1, p%i2
-    case( 'c' ); write( 1, "( a,' = { ',g15.7,', ''cube'', ',g15.7,5(', ',g15.7),' };' )" ) &
-      p%field, p%val, p%x1, p%x2
-    end select
-  end do
   close( 1 )
 end if
 
@@ -126,12 +116,14 @@ p => outp0
 do while( associated( p%next ) )
   iz = iz + 1
   p => p%next
-  i1 = p%i1
-  i2 = p%i2
-  i1(1:3) = p%i1(1:3) + nnoff
-  i2(1:3) = p%i2(1:3) + nnoff
-  write( field, "( '''',a,''',')" ) trim( p%field )
-  write( 1, "( '  { ',i1,' ',a,9(', ',i7),' }, % ',i3 )" ) p%nc, field, p%di(4), i1, i2, iz
+  if ( p%mode(1) = 'w' ) then
+    i1 = p%i1
+    i2 = p%i2
+    i1(1:3) = p%i1(1:3) + nnoff
+    i2(1:3) = p%i2(1:3) + nnoff
+    write( field, "( '''',a,''',')" ) trim( p%field )
+    write( 1, "( '  { ',i1,' ',a,12(', ',i7),' }, % ',i3 )" ) p%nc, field, i1, i2, p%di, iz
+  end if
 end do
 write( 1, "( '};' )" )
 close( 1 )

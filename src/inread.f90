@@ -90,9 +90,9 @@ case( 'itstop' );       read( str, *, iostat=io ) itstop
 case( 'debug' );        read( str, *, iostat=io ) debug
 case( 'mpin' );         read( str, *, iostat=io ) mpin
 case( 'mpout' );        read( str, *, iostat=io ) mpout
-case( 's0', 'sx', 'sn', 'sz', 'sc' );  ioseq = .true.
-case( 'r0', 'rx', 'rn', 'rz' );        ioseq = .true.
-case( 'w0', 'wx', 'wb', 'wz' );        ioseq = .true.
+case( 's*', 's0', 'sx', 'sn', 'sz', 'sc' ); ioseq = .true.
+case( 'r*', 'r0', 'r1', 'rx', 'rn', 'rz' ); ioseq = .true.
+case( 'w*', 'w0', 'w1', 'wx', 'wb', 'wz' ); ioseq = .true.
 case default; io = 1
 end select
 
@@ -102,25 +102,23 @@ if ( ioseq ) then
   allocate( p )
   p%mode = key
   p%i1 = (/  1,  1,  1,  0 /)
-  p%i2 = (/ -1, -1, -1,  0 /)
+  p%i2 = (/ -1, -1, -1, -1 /)
   p%di = (/  1,  1,  1,  1 /)
   p%nb = itio
   select case( key )
-  case( 's0' );       read( str, *, iostat=io ) p%field, p%val
+  case( 's*' );       read( str, *, iostat=io ) p%field, p%val
+  case( 's0' );       read( str, *, iostat=io ) p%field, p%val; p%i2(4) = 0
   case( 'sn' );       read( str, *, iostat=io ) p%field, p%i1, p%val
   case( 'sz' );       read( str, *, iostat=io ) p%field, p%i1, p%i2, p%di, p%val
   case( 'sx' );       read( str, *, iostat=io ) p%field, p%x1, p%val
   case( 'sc' );       read( str, *, iostat=io ) p%field, p%x1, p%x2, p%val
-  case( 'r0', 'w0' ); read( str, *, iostat=io ) p%field
+  case( 'r*', 'w*' ); read( str, *, iostat=io ) p%field, p%nb
+  case( 'r0', 'w0' ); read( str, *, iostat=io ) p%field; p%i2(4) = 0
+  case( 'r1', 'w1' ); read( str, *, iostat=io ) p%field; p%i1(4) = -1
   case( 'rn', 'wn' ); read( str, *, iostat=io ) p%field, p%i1
   case( 'rz', 'wz' ); read( str, *, iostat=io ) p%field, p%i1, p%i2, p%di, p%nb
   case( 'rx', 'wx' ); read( str, *, iostat=io ) p%field, p%x1
   case default; io = 1
-  end select
-  if ( key(2) = 'n' .or. key(2) == 'x' ) then
-    p%i2 = p%i1
-    p%i2(4) = -1
-  end if
   select case( p%field )
   case( 'x1', 'x2', 'x3', 'rho', 'vp', 'vs', 'gam', 'qp', 'qs' )
   case( 'mus', 'mud', 'dc' , 'co', 'tn' , 'ts1', 'ts2' )

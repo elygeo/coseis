@@ -43,9 +43,9 @@ io += [
 # Fault plane output
 io += [
   ( 'wz', 'x',    1,1,-2, 0,  -1,-1,-2, 0,  1,1,1,1, 1 ), # Mesh coordinates
-  ( 'wz', 'su',   1,1, 0,-1,  -1,-1, 0,-1,  1,1,1,1, 1 ), # Final slip
-  ( 'wz', 'psv',  1,1, 0,-1,  -1,-1, 0,-1,  1,1,1,1, 1 ), # Peak slip velocity
-  ( 'wz', 'trup', 1,1, 0,-1,  -1,-1, 0,-1,  1,1,1,1, 1 ), # Rupture time
+  ( 'w1', 'su'   ),		# Final slip
+  ( 'w1', 'psv'  ),		# Peak slip velocity
+  ( 'w1', 'trup' ),		# Rupture time
 ]
 
 # Time series output, mode II point
