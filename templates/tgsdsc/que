@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd "%(rundir)s"
+cd %(rundir)r
 if [ $( /bin/pwd | grep -v gpfs ) ]; then
     echo "Error: jobs must be run from /gpfs"
     exit

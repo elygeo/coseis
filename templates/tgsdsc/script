@@ -10,7 +10,7 @@
 #PBS -o stdout
 #PBS -V
 
-cd "%(rundir)s"
+cd %(rundir)r
 
 echo "$( date ): %(code)s started" >> log
 %(pre)s

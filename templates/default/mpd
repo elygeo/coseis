@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-mode=%(mode)s
+mode=%(mode)r
 
 if [ "$mode" = p ] && mpich2version &> /dev/null && ! mpdtrace &> /dev/null; then
 if [ ! -e $HOME/.mpd.conf ]; then

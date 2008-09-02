@@ -15,8 +15,8 @@ case "$mode${1:--i}" in
     s-i)  hpmcount -nao prof/hpm %(bin)s ;;
     s-g)  pdx %(bin)s ;;
     s-tv) totalview %(bin)s ;;
-    p-i)  poe hpmcount -nao prof/hpm %(bin)s $opts ;;
-    p-tv) tvpoe %(bin)s $opts ;;
+    p-i)  poe32 hpmcount -nao prof/hpm %(bin)s $opts ;;
+    p-tv) tvpoe32 %(bin)s $opts ;;
 esac
 %(post)s
 echo "$( date ): %(code)s finished" >> log

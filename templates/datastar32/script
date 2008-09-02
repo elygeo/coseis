@@ -13,8 +13,7 @@
 #MP_SHARED_MEMORY=yes;\\
 #MP_SINGLE_THREAD=no;\\
 #RT_GRQ=ON;\\
-#SPINLOOPTIME=0;\\
-#YIELDLOOPTIME=0;
+#XLSMPOPTS="stack=67108864"
 #@ job_name = %(code)s%(count)s
 #@ initialdir = %(rundir)s
 #@ node = %(nodes)s
@@ -24,12 +23,15 @@
 #@ notification = always
 #@ notify_user = %(email)s
 #@ job_type = parallel
-#@ class = normal
-#@ node_usage = not_shared
+#@ class = normal32
+#@ node_usage = shared
 #@ network.MPI = sn_all, shared, US
 #@ output = stdout
 #@ error = stderr
 #@ queue
+
+export MEMORY_AFFINITY=MCM
+export MP_TASK_AFFINITY=MCM
 
 cd %(rundir)r
 

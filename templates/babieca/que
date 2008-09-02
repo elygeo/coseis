@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd "%(rundir)s"
+cd %(rundir)r
 
 echo "$( date ): %(code)s qued with ID: $( qsub script )" >> log
 

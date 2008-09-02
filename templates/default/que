@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-cd "%(rundir)s"
+cd %(rundir)r
 
 nice nohup ./run > out.log &
 pid=$!
