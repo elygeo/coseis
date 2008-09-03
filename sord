@@ -197,7 +197,7 @@ def sord( argv ):
         endian = file( 'endian', 'r' ).read()
         assert endian[0] == sys.byteorder[0]
 
-    # Run of que job
+    # Run or que job
     os.chdir( rundir )
     if run == 'q':
         print 'que'
