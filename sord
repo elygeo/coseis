@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, sys, getopt, time, glob, shutil, imp
+import os, sys, getopt, time, glob, shutil, imp, subprocess
 
 def sord( argv ):
 
@@ -12,9 +12,10 @@ def sord( argv ):
     setup = True
     run = False
     mode = None
+    machine = None
     optimize = 'O'
     opt, infiles = getopt.getopt( argv[1:], 'niqspgGm:fd' )
-    for o, a in opt:
+    for o, v in opt:
         if   o == '-n': setup = False; run = False
         elif o == '-i': run = 'i'
         elif o == '-q': run = 'q'
@@ -22,31 +23,39 @@ def sord( argv ):
         elif o == '-p': mode = 'p'
         elif o == '-g': optimize = 'g'
         elif o == '-G': optimize = 'g'; run = 'g'
-        elif o == '-m': machine = a
+        elif o == '-m': machine = v
         elif o == '-f':
-            for f in glob.glob( 'tmp' + os.sep + '*' ): shutil.rmtree( f )
+            f = 'tmp' + os.sep + '*'
+            for f in glob.glob( f ): shutil.rmtree( f )
         elif o == '-d':
-            for f in glob.glob( 'run' + os.sep + '[0-9][0-9]' ): shutil.rmtree( f )
+            f = 'run' + os.sep + '[0-9][0-9]'
+            for f in glob.glob( f ): shutil.rmtree( f )
         else: assert False, 'unhandled option'
 
     # Locations
-    initdir =   os.path.abspath( os.getcwd() )
-    srcdir  =   os.path.abspath( os.path.dirname( argv[0] ) )
-    infiles = [ os.path.abspath( f ) for f in infiles ]
+    initdir = os.path.abspath( os.getcwd() )
+    srcdir  = os.path.abspath( os.path.dirname( argv[0] ) )
 
     # Read input file
-    print srcdir + os.sep + 'in' + os.sep + 'defaults.py'
-    params = imp.load_source( 'params', srcdir + os.sep + 'in' + os.sep + 'defaults.py' )
+    f = srcdir + os.sep + 'in' + os.sep + 'defaults.py'
+    params = imp.load_source( 'params', f )
     for f in infiles:
+        print f
+        f = os.path.abspath( f )
         newparams = imp.load_source( 'newparams', f )
         for key in dir( newparams ):
-            if len(key) > 1 and key[:2] is not '__':
-                if not hasattr( params, key ): raise AttributeError, key
+            if key is 'io':
+                params.io += newparams.io
+            elif key[:2] is not '__' and len(key) > 1:
+                if not hasattr( params, key ):
+                    raise SystemExit, 'Unknown SORD parameter: ' + repr( key )
                 setattr( params, key, getattr( newparams, key ) )
 
     # Make directories
-    if not os.path.isdir( 'tmp' ): os.mkdir( 'tmp' )
-    if not os.path.isdir( 'run' ): os.mkdir( 'run' )
+    try: os.mkdir( 'tmp' )
+    except: pass
+    try: os.mkdir( 'run' )
+    except: pass
 
     # Run count
     count = glob.glob( 'run' + os.sep + '[0-9][0-9]' )
@@ -56,12 +65,13 @@ def sord( argv ):
 
     # Host
     host = os.uname()[1]
-    if host == 'cluster.geo.berkeley.edu': machine = 'calgeo'
-    elif host == 'master': machine = 'babieca'
-    elif host == 'ds011':  machine = 'datastar32'
-    elif host[:2] == 'ds': machine = 'datastar'
-    elif host[:2] == 'tg': machine = 'tgsdsc'
-    else: machine = host
+    if not machine:
+        if   host == 'cluster.geo.berkeley.edu': machine = 'calgeo'
+        elif host == 'master': machine = 'babieca'
+        elif host == 'ds011':  machine = 'datastar32'
+        elif host[:2] == 'ds': machine = 'datastar'
+        elif host[:2] == 'tg': machine = 'tgsdsc'
+        else: machine = host
     print 'Machine: ' + machine
 
     # Machine attributes
@@ -113,15 +123,17 @@ def sord( argv ):
     print 'RAM: %sMb of %sMb per node' % ( ramnode, maxram )
     print 'Time limit: ' + walltime
     print 'SUs: %s' % sus
-    if ppn > maxcpus: print 'Warning: exceding available CPUs per node (%s)' % maxcpus
-    if ramnode > maxram: print 'Warning: exceding available RAM per node (%sMb)' % maxram
+    if ppn > maxcpus:
+        print 'Warning: exceding available CPUs per node (%s)' % maxcpus
+    if ramnode > maxram:
+        print 'Warning: exceding available RAM per node (%sMb)' % maxram
 
     #------------------------------------------------------------------------------#
     # Set-up and run
 
     if not setup: return
-    err = os.system( srcdir + os.sep + 'make.sh -' + mode + optimize )
-    #assert not err, 'Trouble building build SORD code'
+    if subprocess.call( [ srcdir+os.sep+'make.sh', '-'+mode+optimize ] ):
+        raise SystemExit, 'Error building build SORD code'
        
     # Setup run directory
     rundir = 'run' + os.sep + str( count )
@@ -158,6 +170,8 @@ def sord( argv ):
     bin = './sord-' + mode
     post = ''
     login = os.getlogin()
+    try: email = file( 'email', 'r' ).read()
+    except: email = login
     rundate = time.asctime()
     os_ = os.uname()[3]
 
@@ -170,7 +184,7 @@ def sord( argv ):
         ff = rundir + os.sep + os.path.basename( f )
         out = file( f, 'r' ).read() % locals()
         file( ff, 'w' ).write( out )
-        #shutil.copymode( f, ff )
+        shutil.copymode( f, ff )
 
     # Data directory
     if params.datadir:
@@ -186,13 +200,13 @@ def sord( argv ):
     # Run of que job
     os.chdir( rundir )
     if run == 'q':
-        print './que'
-        err = os.system( './que' )
-        assert not err
+        print 'que'
+        if subprocess.call( '.' + os.sep + 'que' ):
+            raise SystemExit, 'Error queing job'
     elif run:
-        print './run -' + run
-        err = os.system( './run -' + run )
-        assert not err
+        print 'run -' + run
+        if suprocess.call( [ '.' + os.sep + 'run', '-' + run ] ):
+            raise SystemExit, 'Error running job'
 
 if __name__ == "__main__":
     sord( sys.argv )

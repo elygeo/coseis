@@ -10,13 +10,11 @@ ihypo = ( 2, 2, 2 )
 gridnoise = -0.1
 gridnoise = 0.1
 
-return
-
 # affine = (( 1., 0., 1. ), ( 1., 1., 0. ), ( 0., 0., 1. ))
 # n1expand = ( 2, 2, 2 )
 # n2expand = ( 2, 2, 2 )
 
-io += [
+io = [
   ( 'w0', 'x'   ),
   ( 'w0', 'rho' ),
   ( 'w0', 'vp'  ),

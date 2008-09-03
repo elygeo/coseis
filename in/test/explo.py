@@ -32,15 +32,16 @@ io += [
   ( 'wx', 'v', 3999., 3999., 0. ),
 ]
 
-fixhypo = -2
-rsource = 50.
-ihypo = ( 1, 1, 1 )
-bc1   = ( 2, 2, 2 )
-return
 
-fixhypo = -1
-rsource = 100.
-ihypo = ( 2, 2, 2 )
-bc1   = ( 1, 1, 1 )
-return
+if 1:
+  fixhypo = -2
+  rsource = 50.
+  ihypo = ( 1, 1, 1 )
+  bc1   = ( 2, 2, 2 )
+
+if 0:
+  fixhypo = -1
+  rsource = 100.
+  ihypo = ( 2, 2, 2 )
+  bc1   = ( 1, 1, 1 )
 

@@ -1,13 +1,14 @@
 # San Andreas Fault, northward dynamic rupture, topography, SCEC-CVM4
 
-i2 = 666
+iii = 88
+
 np = ( 1, 80, 24 )			# 1920 total processors on DataStar
 nn = ( 3001, 1502, 401 )		# number of mesh nodes nx ny nz
 nt = 15000				# number of time steps
 dt = 0.012				# time step length
 
 # Read mesh coordinates from disk
-datadir = 'saf/cvm4/0200'		# directory location
+#datadir = 'saf/cvm4/0200'		# directory location
 io = [
   ( 'rz', 'x1', 1,1,1,0, -1,-1,1,0, 1,1,1,1, 1 ),	# read 2D x coordinate file
   ( 'rz', 'x2', 1,1,1,0, -1,-1,1,0, 1,1,1,1, 1 ),	# read 2D y coordinate file

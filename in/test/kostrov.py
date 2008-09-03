@@ -10,7 +10,7 @@ vrup = 3117.6914
 rcrit = 1e9
 trelax = 0.
 
-io += [
+io = [
   ( 's0', 'mus',   1e9 ),
   ( 's0', 'mud',   0.  ),
   ( 's0', 'dc',    1e9 ),
