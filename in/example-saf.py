@@ -1,7 +1,5 @@
 # San Andreas Fault, northward dynamic rupture, topography, SCEC-CVM4
 
-iii = 88
-
 np = ( 1, 80, 24 )			# 1920 total processors on DataStar
 nn = ( 3001, 1502, 401 )		# number of mesh nodes nx ny nz
 nt = 15000				# number of time steps

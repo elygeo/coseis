@@ -6,27 +6,36 @@ dest='sord'
 
 # Install files
 files="\
-    email
-    make.sh
-    sord
-    sord.py
-    in
-    sh
-    py
-    src
-    templates
-    util
-    templates
-    cvm/make.sh
-    cvm/sh
-    cvm/cvm3*
-    cvm/cvm4*
+email
+make.sh
+sord
+sord.py
+in
+sh
+py
+src
+templates
+util
+templates
+cvm/make.sh
+cvm/sh
+cvm/cvm3*
+cvm/cvm4*
 "
+
+exclude="
+tmp
+a.out
+*.mod
+*.o
+*.pyc
+"
+
 files=$( echo $files )
 host="${account##* }"
 rsh="${account% *}"
-echo "rsync -avR --delete --exclude=tmp -e \"$rsh\" $files $host:$dest"
-rsync -avR --delete --exclude=tmp -e "$rsh" $files "$host:$dest"
+echo "rsync -avR --delete --exclude-from - -e \"$rsh\" $files $host:$dest"
+echo "$exclude" | rsync -avR --delete --exclude-from - -e "$rsh" $files "$host:$dest"
 
 # Execute command
 [ -z "$2" ] && exit 0

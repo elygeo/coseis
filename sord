@@ -30,7 +30,7 @@ def sord( argv ):
         elif o == '-d':
             f = 'run' + os.sep + '[0-9][0-9]'
             for f in glob.glob( f ): shutil.rmtree( f )
-        else: assert False, 'unhandled option'
+        else: sys.exit( 'Unknown option: %s %s' % ( o, v ) )
 
     # Locations
     initdir = os.path.abspath( os.getcwd() )
@@ -42,14 +42,14 @@ def sord( argv ):
     for f in infiles:
         print f
         f = os.path.abspath( f )
-        newparams = imp.load_source( 'newparams', f )
-        for key in dir( newparams ):
+        new = imp.load_source( 'newparams', f )
+        for key in dir( new ):
             if key is 'io':
-                params.io += newparams.io
+                params.io += new.io
             elif key[:2] is not '__' and len(key) > 1:
                 if not hasattr( params, key ):
-                    raise SystemExit, 'Unknown SORD parameter: ' + repr( key )
-                setattr( params, key, getattr( newparams, key ) )
+                    sys.exit( 'Unknown SORD parameter: %r in %s' % ( key, new.__file__ ) )
+                setattr( params, key, getattr( new, key ) )
 
     # Make directories
     try: os.mkdir( 'tmp' )
@@ -133,7 +133,7 @@ def sord( argv ):
 
     if not setup: return
     if subprocess.call( [ srcdir+os.sep+'make.sh', '-'+mode+optimize ] ):
-        raise SystemExit, 'Error building build SORD code'
+        sys.exit( 'Error building code' )
        
     # Setup run directory
     rundir = 'run' + os.sep + str( count )
@@ -202,11 +202,11 @@ def sord( argv ):
     if run == 'q':
         print 'que'
         if subprocess.call( '.' + os.sep + 'que' ):
-            raise SystemExit, 'Error queing job'
+            sys.exit( 'Error queing job' )
     elif run:
         print 'run -' + run
         if suprocess.call( [ '.' + os.sep + 'run', '-' + run ] ):
-            raise SystemExit, 'Error running job'
+            sys.exit( 'Error running job' )
 
 if __name__ == "__main__":
     sord( sys.argv )
