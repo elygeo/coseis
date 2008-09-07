@@ -106,10 +106,6 @@ if ( seq ) then
   p => p%next
   allocate( p )
   p%mode = key
-  p%i1 = (/  1,  1,  1,  0 /)
-  p%i2 = (/ -1, -1, -1, -1 /)
-  p%di = (/  1,  1,  1,  1 /)
-  p%nb = itio
   select case( key )
   case( 'si' );       read( str, *, iostat=io ) p%field, p%i1, p%i2, p%di, p%val
   case( 'ri', 'wi' ); read( str, *, iostat=io ) p%field, p%i1, p%i2, p%di, p%nb
@@ -118,12 +114,6 @@ if ( seq ) then
   case( 'rx', 'wx' ); read( str, *, iostat=io ) p%field, p%x1
   case( 'rX', 'wX' ); read( str, *, iostat=io ) p%field, p%x1
   case default; io = 1
-  select case( p%field )
-  case( 'x1', 'x2', 'x3', 'rho', 'vp', 'vs', 'gam', 'qp', 'qs' )
-  case( 'mus', 'mud', 'dc' , 'co', 'tn' , 'ts1', 'ts2' )
-  case( 'sxx', 'syy', 'szz', 'syz', 'szx', 'sxy' )
-  case default; io = 1
-  end select
 end if
 
 ! Error check
