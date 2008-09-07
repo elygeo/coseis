@@ -42,7 +42,7 @@ io += [
 
 # Fault plane output
 io += [
-  ( 'wz', 'x', (1,1,-2,0), (-1,-1,-2,0), (1,1,1,1), 1 ), # Mesh coordinates
+  ( 'wi', 'x', (1,1,-2,0), (-1,-1,-2,0), (1,1,1,1), 1 ), # Mesh coordinates
   ( 'w1', 'su'   ),		# Final slip
   ( 'w1', 'psv'  ),		# Peak slip velocity
   ( 'w1', 'trup' ),		# Rupture time

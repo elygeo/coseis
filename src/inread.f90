@@ -77,6 +77,8 @@ case( 'n1expand' );     read( str, *, iostat=io ) n1expand
 case( 'n2expand' );     read( str, *, iostat=io ) n2expand
 case( 'i1source' );     read( str, *, iostat=io ) i1source
 case( 'i2source' );     read( str, *, iostat=io ) i2source
+case( 'i1pml' );        read( str, *, iostat=io ) i1pml
+case( 'i2pml' );        read( str, *, iostat=io ) i2pml
 case( 'ihypo' );        read( str, *, iostat=io ) ihypo
 case( 'vrup' );         read( str, *, iostat=io ) vrup
 case( 'rcrit' );        read( str, *, iostat=io ) rcrit
@@ -90,9 +92,12 @@ case( 'itstop' );       read( str, *, iostat=io ) itstop
 case( 'debug' );        read( str, *, iostat=io ) debug
 case( 'mpin' );         read( str, *, iostat=io ) mpin
 case( 'mpout' );        read( str, *, iostat=io ) mpout
-case( 'sx', 'sX', 'sz', 'c0' ); seq = .true.
-case( 'rx', 'rX', 'rz' ); seq = .true.
-case( 'wx', 'wX', 'wz' ); seq = .true.
+case( 'si' );           seq = .true.
+case( 'ri', 'wi' );     seq = .true.
+case( 'c0' );           seq = .true.
+case( 'sx', 'sX' );     seq = .true.
+case( 'rx', 'wx' );     seq = .true.
+case( 'rX', 'wX' );     seq = .true.
 case default; io = 1
 end select
 
@@ -106,10 +111,10 @@ if ( seq ) then
   p%di = (/  1,  1,  1,  1 /)
   p%nb = itio
   select case( key )
-  case( 'sz' );       read( str, *, iostat=io ) p%field, p%i1, p%i2, p%di, p%val
-  case( 'sx', 'sX' ); read( str, *, iostat=io ) p%field, p%x1, p%val
+  case( 'si' );       read( str, *, iostat=io ) p%field, p%i1, p%i2, p%di, p%val
+  case( 'ri', 'wi' ); read( str, *, iostat=io ) p%field, p%i1, p%i2, p%di, p%nb
   case( 'c0' );       read( str, *, iostat=io ) p%field, p%x1, p%x2, p%val
-  case( 'rz', 'wz' ); read( str, *, iostat=io ) p%field, p%i1, p%i2, p%di, p%nb
+  case( 'sx', 'sX' ); read( str, *, iostat=io ) p%field, p%x1, p%val
   case( 'rx', 'wx' ); read( str, *, iostat=io ) p%field, p%x1
   case( 'rX', 'wX' ); read( str, *, iostat=io ) p%field, p%x1
   case default; io = 1

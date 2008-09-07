@@ -93,15 +93,15 @@ io += [				# *I/O sequence (see below)
 #   ( 's0', 'f', val ):               Set initial array to val
 #   ( 'sc', 'f', x1, x2, di, val ):   Set Cartesian cube to val
 #   ( 'sn', 'f', i1, val ):           Set single node to val
-#   ( 'sz', 'f', i1, i2, di, val ):   Set array slice to val
+#   ( 'si', 'f', i1, i2, di, val ):   Set array slice to val
 #   ( 'r0', 'f' ):                    Read initial array from disk
 #   ( 'rx', 'f', x1 ):                Read time history (Cartesian coords) from disk
 #   ( 'rn', 'f', i1 ):                Read time history (node index) from disk 
-#   ( 'rz', 'f', i1, i2, di, nb ):    Read array slice from disk 
+#   ( 'ri', 'f', i1, i2, di, nb ):    Read array slice from disk 
 #   ( 'w0', 'f' ):                    Write initial array to disk
 #   ( 'wx', 'f', x1 ):                Write time history (Cartesian coords) to disk
 #   ( 'wn', 'f', i1 ):                Write time history (node index) to disk 
-#   ( 'wz', 'f', i1, i2, di, nb ):    Write array slice to disk 
+#   ( 'wi', 'f', i1, i2, di, nb ):    Write array slice to disk 
 # Key:
 #  'f': Field name
 #   x1: Start coordinate  ( x1, y1, z1, t1 )

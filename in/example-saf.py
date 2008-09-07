@@ -8,8 +8,8 @@ dt = 0.012				# time step length
 # Read mesh coordinates from disk
 #datadir = 'saf/cvm4/0200'		# directory location
 io = [
-  ( 'rz', 'x1', (1,1,1,0), (-1,-1,1,0), (1,1,1,1), 1 ),	# read 2D x coordinate file
-  ( 'rz', 'x2', (1,1,1,0), (-1,-1,1,0), (1,1,1,1), 1 ),	# read 2D y coordinate file
+  ( 'ri', 'x1', (1,1,1,0), (-1,-1,1,0), (1,1,1,1), 1 ),	# read 2D x coordinate file
+  ( 'ri', 'x2', (1,1,1,0), (-1,-1,1,0), (1,1,1,1), 1 ),	# read 2D y coordinate file
   ( 'r0', 'x3' ),			# read 3D z coordinate file
 ]
 
@@ -41,7 +41,7 @@ io += [
   ( 's0', 'mud', 0.5          ),	# coefficient of dynamic friction
   ( 's0', 'mus', 1000.        ),	# coefficient of static friction, non-slip section
   # coefficient of static friction, slipping section
-  ( 'sz', 'mus', (1217,k,-81,0), (2311,k,-1,0), (1,1,1,1), 1.1 ),
+  ( 'si', 'mus', (1217,k,-81,0), (2311,k,-1,0), (1,1,1,1), 1.1 ),
 ]
 
 # Nucleation
