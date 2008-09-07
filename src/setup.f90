@@ -7,19 +7,10 @@ subroutine setup
 use m_globals
 use m_collective
 use m_util
-integer :: nl(3), n(3)
+integer :: nl(3)
 
-! Hypocenter & halo
 nt = max( nt, 0 )
-n = nn
-where ( ihypo == 0 ) ihypo = ( n + 1 ) / 2
-where ( ihypo <  0 ) ihypo = ihypo + nn + 1
-if ( any( ihypo < 1 .or. ihypo > nn ) ) stop 'ihypo out of bounds'
 ifn = abs( faultnormal )
-if ( ifn /= 0 ) then
-  if ( ihypo(ifn) == nn(ifn) ) stop 'ihypo out of bounds'
-  nhalo(ifn) = 2
-end if
 
 ! Partition for parallelization
 if ( np0 == 1 ) np = 1
@@ -45,10 +36,6 @@ nl = min( nl, nn - nnoff - nhalo )
 nm = nl + 2 * nhalo
 
 ! Boundary conditions
-if ( ifn /= 0 ) then
-  if ( ihypo(ifn) == 1           ) bc1(ifn) = -2
-  if ( ihypo(ifn) == nn(ifn) - 1 ) bc2(ifn) = -2
-end if
 i1bc = 1  - nnoff
 i2bc = nn - nnoff
 

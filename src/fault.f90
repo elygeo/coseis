@@ -25,56 +25,19 @@ co = 0.
 t1 = 0.
 t2 = 0.
 t3 = 0.
-
-! Inputs
-p => inp0
-do while( associated( p%next ) )
-  p => p%next
-  select case( p%field )
-  case( 'mus' ); f => mus
-  case( 'mud' ); f => mud
-  case( 'dc'  ); f => dc
-  case( 'co'  ); f => co
-  case( 'sxx' ); f => t1(:,:,:,1)
-  case( 'syy' ); f => t1(:,:,:,2)
-  case( 'szz' ); f => t1(:,:,:,3)
-  case( 'syz' ); f => t2(:,:,:,1)
-  case( 'szx' ); f => t2(:,:,:,2)
-  case( 'sxy' ); f => t2(:,:,:,3)
-  case( 'ts1' ); f => t3(:,:,:,1)
-  case( 'ts2' ); f => t3(:,:,:,2)
-  case( 'tn'  ); f => t3(:,:,:,3)
-  case default; cycle
-  end select
-  i1 = p%i1
-  i2 = p%i2
-  call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
-  i3 = max( i1, i1core )
-  i4 = min( i2, i2core )
-  i1(ifn) = 1
-  i2(ifn) = 1
-  i3(ifn) = 1
-  i4(ifn) = 1
-  select case( p%mode )
-  case( 'z' )
-    f(i1(1):i2(1),i1(2):i2(2),i1(3):i2(3)) = p%val
-  case( 'c' )
-    i3(ifn) = ihypo(ifn)
-    i4(ifn) = ihypo(ifn)
-    call cube( f, w1, i3, i4, p%x1, p%x2, p%val )
-  case( 'r' )
-    ifill = 0
-    where ( i1 == i2 .and. ifn /= (/ 1, 2, 3 /) )
-      i1 = i1core
-      i2 = i1core
-      i3 = i1core
-      i4 = i1core
-      ifill = i2core
-    end where
-    i = mpin * ifn
-    call rio3( -1, i, 'data/'//p%field, f, i1, i2, i3, i4, ifill )
-  end select
-end do
+call input( 'mus', mus )
+call input( 'mud', mud )
+call input( 'dc',  dc  )
+call input( 'co',  co  )
+call input( 'sxx', t1(:,:,:,1) )
+call input( 'syy', t1(:,:,:,2) )
+call input( 'szz', t1(:,:,:,3) )
+call input( 'syz', t2(:,:,:,1) )
+call input( 'szx', t2(:,:,:,2) )
+call input( 'sxy', t2(:,:,:,3) )
+call input( 'ts1', t3(:,:,:,1) )
+call input( 'ts2', t3(:,:,:,2) )
+call input( 'tn',  t3(:,:,:,3) )
 
 ! Test for endian problems
 if ( any( mus /= mus ) .or. maxval( mus ) > huge( rr ) ) stop 'NaN/Inf in mus'
@@ -145,7 +108,7 @@ do i = 1, 3
   t0(:,:,:,i) = t0(:,:,:,i) + &
   t3(:,:,:,1) * t1(:,:,:,i) + &
   t3(:,:,:,2) * t2(:,:,:,i) + &
-  t3(:,:,:,3) * nhat(:,:,:,i)
+  tn * nhat(:,:,:,i)
 end do
 
 ! Hypocentral radius
@@ -184,6 +147,44 @@ f1 = 0.
 f2 = 0.
 t1 = 0.
 t2 = 0.
+
+! Initial state, can be overwritten by read_checkpoint
+psv   =  0.
+trup  =  1e9
+tarr  =  0.
+efric =  0.
+
+! Output
+call output( 'mus',  mus         )
+call output( 'mud',  mud         )
+call output( 'dc',   dc          )
+call output( 'co',   co          )
+call output( 'ts1',  t3(:,:,:,1) )
+call output( 'ts2',  t3(:,:,:,2) )
+call output( 'ts3',  t3(:,:,:,2) )
+call output( 'sa1',  t2(:,:,:,1) )
+call output( 'sa2',  t2(:,:,:,2) )
+call output( 'sa3',  t2(:,:,:,3) )
+
+call output( 'sv1',  t1(:,:,:,1) )
+call output( 'sv2',  t1(:,:,:,2) )
+call output( 'sv3',  t1(:,:,:,3) )
+call output( 'su',   t2(:,:,:,1) )
+call output( 'su',   t2(:,:,:,2) )
+call output( 'su',   t2(:,:,:,3) )
+call output( 'svm',  f1          )
+call output( 'sum',  f2          )
+call output( 'psv',  psv         )
+
+call output( 'tn',   tn          )
+call output( 'tsm',  ts          )
+call output( 'sam',  f2          )
+call output( 'tn',   tn          )
+call output( 'fr',   f1          )
+call output( 'sl',   sl          )
+call output( 'trup', trup        )
+call output( 'tarr', tarr        )
+
 
 ! Halos
 call scalar_swap_halo( mus,   nhalo )

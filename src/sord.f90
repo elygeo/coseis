@@ -8,7 +8,7 @@ use m_inread
 use m_setup
 use m_arrays
 use m_grid_gen
-use m_file_io
+use m_ioseq
 use m_source
 use m_material
 use m_fault
@@ -32,18 +32,18 @@ call setup                                                  ; prof0(3) = timer( 
 if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
 if ( sync ) call barrier ; call arrays                      ; prof0(4) = timer( 6 )
 if ( sync ) call barrier ; call grid_gen                    ; prof0(5) = timer( 6 )
-if ( sync ) call barrier ; call file_io_init                ; prof0(6) = timer( 6 )
+if ( sync ) call barrier ; call ioseq_init                  ; prof0(6) = timer( 6 )
 if ( sync ) call barrier ; call source_init                 ; prof0(7) = timer( 6 )
 if ( sync ) call barrier ; call material                    ; prof0(8) = timer( 6 )
 if ( sync ) call barrier ; call pml
 if ( sync ) call barrier ; call fault_init                  ; prof0(9) = timer( 6 )
 if ( sync ) call barrier ; call metadata                    ; prof0(10) = timer( 6 )
-if ( sync ) call barrier ; call look_for_checkpoint           ; prof0(11) = timer( 6 )
-if ( sync ) call barrier ; if ( it == 0 ) call file_io( 0 ) ; prof0(12) = timer( 6 )
+if ( sync ) call barrier ; call look_for_checkpoint         ; prof0(11) = timer( 6 )
+if ( sync ) call barrier ; if ( it == 0 ) call ioseq( 0 )   ; prof0(12) = timer( 6 )
 if ( sync ) call barrier ; call resample                    ; prof0(13) = timer( 6 )
 if ( sync ) call barrier ; call read_checkpoint             ; prof0(14) = timer( 6 )
-if ( sync ) call barrier ; if ( it == 0 ) call file_io( 1 ) ; prof0(15) = timer( 6 )
-if ( sync ) call barrier ; if ( it == 0 ) call file_io( 2 ) ; prof0(16) = timer( 6 )
+if ( sync ) call barrier ; if ( it == 0 ) call ioseq( 1 )   ; prof0(15) = timer( 6 )
+if ( sync ) call barrier ; if ( it == 0 ) call ioseq( 2 )   ; prof0(16) = timer( 6 )
 if ( sync ) call barrier ; prof0(17) = timer( 7 )
 if ( master .and. it == 0 ) call rio1( 10, mpout, 'prof/main', prof0, 17, 19 )
 allocate( prof(itio,4) )
@@ -58,14 +58,14 @@ do while ( it < nt )
   if ( sync ) call barrier ; call stress
   if ( sync ) call barrier ; call moment_source
   if ( sync ) call barrier ; prof(jp,1) = timer( 5 )
-  if ( sync ) call barrier ; call output( 1 )
+  if ( sync ) call barrier ; call ioseq( 1 )
   if ( sync ) call barrier ; prof(jp,2) = timer( 5 )
   if ( sync ) call barrier ; call acceleration   
   if ( sync ) call barrier ; call fault
   if ( sync ) call barrier ; prof(jp,1) = prof(jp,1) + timer( 5 )
   if ( sync ) call barrier ; call vector_swap_halo( w1, nhalo )
   if ( sync ) call barrier ; prof(jp,3) = timer( 5 )
-  if ( sync ) call barrier ; call output( 2 )
+  if ( sync ) call barrier ; call ioseq( 2 )
   if ( modulo( it, itcheck ) == 0 ) then
     if ( sync ) call barrier ; call write_checkpoint
   end if

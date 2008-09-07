@@ -5,43 +5,41 @@ account="${1:?}"
 dest='sord'
 
 # Install files
-files="\
-email
-make.sh
-sord
-sord.py
-in
-sh
-py
-src
-templates
-util
-templates
-cvm/make.sh
-cvm/sh
-cvm/cvm3*
-cvm/cvm4*
-"
+files="
+    email
+    setup.sh
+    sord
+    in
+    sh
+    py
+    src
+    util
+    templates
+    cvm/make.sh
+    cvm/sh
+    cvm/cvm3*
+    cvm/cvm4*"
 
 exclude="
-tmp
-a.out
-*.mod
-*.o
-*.pyc
-"
+    tmp
+    run
+    a.out
+    *.mod
+    *.o
+    *.pyc"
 
 files=$( echo $files )
+exclude=$( echo $exclude )
 host="${account##* }"
 rsh="${account% *}"
-echo "rsync -avR --delete --exclude-from - -e \"$rsh\" $files $host:$dest"
-echo "$exclude" | rsync -avR --delete --exclude-from - -e "$rsh" $files "$host:$dest"
+echo "echo $exclude | rsync -avR --delete --exclude-from - -e \"$rsh\" $files \"$host:$dest\""
+      echo $exclude | rsync -avR --delete --exclude-from - -e  "$rsh"  $files  "$host:$dest"
 
 # Execute command
 [ -z "$2" ] && exit 0
 shift 1
 cmd="cd $dest; $*"
 rsh="${account//ssh/ssh -tX}"
-echo "$rsh bash --login -c \"$cmd\""
-$rsh "bash --login -c \"$cmd\""
+echo "$rsh \"bash --login -c \\\"$cmd\\\"\""
+      $rsh  "bash --login -c   \"$cmd\""
 

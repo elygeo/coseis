@@ -42,7 +42,7 @@ common="
     arrays.f90
     gridgen.f90
     debug.f90
-    output.f90
+    iosequence.f90
     source.f90
     material.f90
     fault.f90

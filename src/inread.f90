@@ -5,7 +5,7 @@ contains
 
 subroutine inread
 use m_globals
-use m_sequence
+use m_iosequence
 integer :: io
 logical :: zone
 character(12) :: key
@@ -36,7 +36,7 @@ end do
 ! Read key val pair
 if ( line == '' ) cycle doline
 read( line, *, iostat=io ) key, str
-ioseq = .false.
+seq = .false.
 
 ! Select input key
 select case( key )
@@ -90,14 +90,14 @@ case( 'itstop' );       read( str, *, iostat=io ) itstop
 case( 'debug' );        read( str, *, iostat=io ) debug
 case( 'mpin' );         read( str, *, iostat=io ) mpin
 case( 'mpout' );        read( str, *, iostat=io ) mpout
-case( 's*', 's0', 'sx', 'sn', 'sz', 'sc' ); ioseq = .true.
-case( 'r*', 'r0', 'r1', 'rx', 'rn', 'rz' ); ioseq = .true.
-case( 'w*', 'w0', 'w1', 'wx', 'wb', 'wz' ); ioseq = .true.
+case( 'sx', 'sX', 'sz', 'c0' ); seq = .true.
+case( 'rx', 'rX', 'rz' ); seq = .true.
+case( 'wx', 'wX', 'wz' ); seq = .true.
 case default; io = 1
 end select
 
 ! I/O sequence
-if ( ioseq ) then
+if ( seq ) then
   p => p%next
   allocate( p )
   p%mode = key
@@ -106,18 +106,12 @@ if ( ioseq ) then
   p%di = (/  1,  1,  1,  1 /)
   p%nb = itio
   select case( key )
-  case( 's*' );       read( str, *, iostat=io ) p%field, p%val
-  case( 's0' );       read( str, *, iostat=io ) p%field, p%val; p%i2(4) = 0
-  case( 'sn' );       read( str, *, iostat=io ) p%field, p%i1, p%val
   case( 'sz' );       read( str, *, iostat=io ) p%field, p%i1, p%i2, p%di, p%val
-  case( 'sx' );       read( str, *, iostat=io ) p%field, p%x1, p%val
-  case( 'sc' );       read( str, *, iostat=io ) p%field, p%x1, p%x2, p%val
-  case( 'r*', 'w*' ); read( str, *, iostat=io ) p%field, p%nb
-  case( 'r0', 'w0' ); read( str, *, iostat=io ) p%field; p%i2(4) = 0
-  case( 'r1', 'w1' ); read( str, *, iostat=io ) p%field; p%i1(4) = -1
-  case( 'rn', 'wn' ); read( str, *, iostat=io ) p%field, p%i1
+  case( 'sx', 'sX' ); read( str, *, iostat=io ) p%field, p%x1, p%val
+  case( 'c0' );       read( str, *, iostat=io ) p%field, p%x1, p%x2, p%val
   case( 'rz', 'wz' ); read( str, *, iostat=io ) p%field, p%i1, p%i2, p%di, p%nb
   case( 'rx', 'wx' ); read( str, *, iostat=io ) p%field, p%x1
+  case( 'rX', 'wX' ); read( str, *, iostat=io ) p%field, p%x1
   case default; io = 1
   select case( p%field )
   case( 'x1', 'x2', 'x3', 'rho', 'vp', 'vs', 'gam', 'qp', 'qs' )

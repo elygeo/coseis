@@ -104,10 +104,10 @@ io += [				# *I/O sequence (see below)
 #   ( 'wz', 'f', i1, i2, di, nb ):    Write array slice to disk 
 # Key:
 #  'f': Field name
-#   x1: Start coordinate  x1, y1, z1, t1
-#   x2: End coordinate    x2, y2, z2, t2
-#   i1: Start indices     j1, k1, l1, it1
-#   i2: End indices       j2, k2, l2, it2
+#   x1: Start coordinate  ( x1, y1, z1, t1 )
+#   x2: End coordinate    ( x2, y2, z2, t2 )
+#   i1: Start indices     ( j1, k1, l1, it1 )
+#   i2: End indices       ( j2, k2, l2, it2 )
 #   di: Decimation interval dj, dk, dl, dit
 #   nb: Number of time steps to buffer
 

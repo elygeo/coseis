@@ -15,56 +15,30 @@ if ( master ) write( 0, * ) 'Write metadata'
 
 ! Debug info
 if ( debug /= 0 ) then
-  i = 0
-  if ( master ) i = 1
-  write( str, "( a,i6.6,a )" ) 'debug/db', ip, '.m'
-  open( 1, file=str, status='replace' )
-  write( 1, "( '% SORD debug info'                                              )" )
-  write( 1, "( 'debug  =    ',i8,';'                                            )" ) debug
-  write( 1, "( 'master =    ',i8,';'                                            )" ) i
-  write( 1, "( 'ip     =    ',i8,';'                                            )" ) ip
-  write( 1, "( 'ifn    =    ',i8,';'                                            )" ) ifn
-  write( 1, "( 'nin    =    ',i8,';'                                            )" ) nin
-  write( 1, "( 'ip3    =  [ ',i8,2(', ',i8),'];'                                )" ) ip3
-  write( 1, "( 'np     =  [ ',i8,2(', ',i8),'];'                                )" ) np
-  write( 1, "( 'nhalo  =  [ ',i8,2(', ',i8),'];'                                )" ) nhalo
-  write( 1, "( 'ihypo  =  [ ',i8,2(', ',i8),'];'                                )" ) ihypo
-  write( 1, "( 'nm     =  [ ',i8,2(', ',i8),'];'                                )" ) nm
-  write( 1, "( 'nnoff  =  [ ',i8,2(', ',i8),'];'                                )" ) nnoff
-  write( 1, "( 'i1bc   =  [ ',i8,2(', ',i8),']; i2bc   =  [',i8,2(', ',i8),' ];')" ) i1bc, i2bc
-  write( 1, "( 'i1pml  =  [ ',i8,2(', ',i8),']; i2pml  =  [',i8,2(', ',i8),' ];')" ) i1pml, i2pml
-  write( 1, "( 'i1core =  [ ',i8,2(', ',i8),']; i2core =  [',i8,2(', ',i8),' ];')" ) i1core, i2core
-  write( 1, "( 'i1node =  [ ',i8,2(', ',i8),']; i2node =  [',i8,2(', ',i8),' ];')" ) i1node, i2node
-  write( 1, "( 'i1cell =  [ ',i8,2(', ',i8),']; i2cell =  [',i8,2(', ',i8),' ];')" ) i1cell, i2cell
-  close( 1 )
-end if
-
-! Metadata
-if ( .not. master ) return
-endian = 'l'
-if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
-courant = dt * vp2 * sqrt( 3. ) / abs( dx )
-open( 1, file='meta.m', status='replace' )
-write( 1, "( '% SORD metadata'                              )" )
+i = 0
+if ( master ) i = 1
+write( str, "( a,i6.6,a )" ) 'debug/db', ip, '.m'
+open( 1, file=str, status='replace' )
+write( 1, "( '% SORD debug info'                                              )" )
+write( 1, "( 'debug  =    ',i8,';'                                            )" ) debug
+write( 1, "( 'master =    ',i8,';'                                            )" ) i
+write( 1, "( 'ip     =    ',i8,';'                                            )" ) ip
+write( 1, "( 'ifn    =    ',i8,';'                                            )" ) ifn
+write( 1, "( 'nin    =    ',i8,';'                                            )" ) nin
+write( 1, "( 'ip3    =  [ ',i8,2(', ',i8),'];'                                )" ) ip3
+write( 1, "( 'np     =  [ ',i8,2(', ',i8),'];'                                )" ) np
+write( 1, "( 'nhalo  =  [ ',i8,2(', ',i8),'];'                                )" ) nhalo
+write( 1, "( 'ihypo  =  [ ',i8,2(', ',i8),'];'                                )" ) ihypo
+write( 1, "( 'nm     =  [ ',i8,2(', ',i8),'];'                                )" ) nm
+write( 1, "( 'nnoff  =  [ ',i8,2(', ',i8),'];'                                )" ) nnoff
+write( 1, "( 'i1bc   =  [ ',i8,2(', ',i8),']; i2bc   =  [',i8,2(', ',i8),' ];')" ) i1bc, i2bc
+write( 1, "( 'i1pml  =  [ ',i8,2(', ',i8),']; i2pml  =  [',i8,2(', ',i8),' ];')" ) i1pml, i2pml
+write( 1, "( 'i1core =  [ ',i8,2(', ',i8),']; i2core =  [',i8,2(', ',i8),' ];')" ) i1core, i2core
+write( 1, "( 'i1node =  [ ',i8,2(', ',i8),']; i2node =  [',i8,2(', ',i8),' ];')" ) i1node, i2node
+write( 1, "( 'i1cell =  [ ',i8,2(', ',i8),']; i2cell =  [',i8,2(', ',i8),' ];')" ) i1cell, i2cell
 write( 1, "( 'dx          =    ',g15.7,';'                  )" ) dx
 write( 1, "( 'dt          =    ',g15.7,';'                  )" ) dt
-write( 1, "( 'rho_        =    ',g15.7,';'                  )" ) rho_
-write( 1, "( 'rho1        =    ',g15.7,';'                  )" ) rho1
-write( 1, "( 'rho2        =    ',g15.7,';'                  )" ) rho2
-write( 1, "( 'vp_         =    ',g15.7,';'                  )" ) vp_
-write( 1, "( 'vp1         =    ',g15.7,';'                  )" ) vp1
-write( 1, "( 'vp2         =    ',g15.7,';'                  )" ) vp2
-write( 1, "( 'vs_         =    ',g15.7,';'                  )" ) vs_
-write( 1, "( 'vs1         =    ',g15.7,';'                  )" ) vs1
-write( 1, "( 'vs2         =    ',g15.7,';'                  )" ) vs2
-write( 1, "( 'gam_        =    ',g15.7,';'                  )" ) gam_
-write( 1, "( 'gam1        =    ',g15.7,';'                  )" ) gam1
-write( 1, "( 'gam2        =    ',g15.7,';'                  )" ) gam2
-write( 1, "( 'vdamp       =    ',g15.7,';'                  )" ) vdamp
-write( 1, "( 'rexpand     =    ',g15.7,';'                  )" ) rexpand
-write( 1, "( 'courant     =    ',g15.7,';'                  )" ) courant
 write( 1, "( 'hourglass   =  [ ',g15.7,', ',g15.7,' ];'     )" ) hourglass
-write( 1, "( 'xhypo       =  [ ',g15.7,2(', ',g15.7),' ];'  )" ) xhypo
 write( 1, "( 'affine      = [[ ',g15.7,2(', ',g15.7),' ],'  )" ) affine(1:3)
 write( 1, "( '               [ ',g15.7,2(', ',g15.7),' ],'  )" ) affine(4:6)
 write( 1, "( '               [ ',g15.7,2(', ',g15.7),' ]];' )" ) affine(7:9)
@@ -74,11 +48,9 @@ write( 1, "( 'itio        =    ',i8,';'                     )" ) itio
 write( 1, "( 'itcheck     =    ',i8,';'                     )" ) itcheck
 write( 1, "( 'fixhypo     =    ',i8,';'                     )" ) fixhypo
 write( 1, "( 'npml        =    ',i8,';'                     )" ) npml
-write( 1, "( 'oplevel     =    ',i8,';'                     )" ) oplevel
 write( 1, "( 'mpin        =    ',i8,';'                     )" ) mpin
 write( 1, "( 'mpout       =    ',i8,';'                     )" ) mpout
 write( 1, "( 'nn          =  [ ',i8,2(', ',i8),' ];'        )" ) nn
-write( 1, "( 'ihypo       =  [ ',i8,2(', ',i8),' ];'        )" ) ihypo + nnoff
 write( 1, "( 'n1expand    =  [ ',i8,2(', ',i8),' ];'        )" ) n1expand
 write( 1, "( 'n2expand    =  [ ',i8,2(', ',i8),' ];'        )" ) n2expand
 write( 1, "( 'bc1         =  [ ',i8,2(', ',i8),' ];'        )" ) bc1
@@ -93,6 +65,33 @@ write( 1, "( 'moment2     =  [ ',g15.7,2(', ',g15.7),' ];'  )" ) moment2
 write( 1, "( 'rfunc       =   ''',a,''';'                   )" ) trim( rfunc )
 write( 1, "( 'tfunc       =   ''',a,''';'                   )" ) trim( tfunc )
 write( 1, "( 'faultnormal =    ',i8,';'                     )" ) faultnormal
+close( 1 )
+end if
+
+! Metadata
+if ( .not. master ) return
+endian = 'l'
+if ( iachar( transfer( 1, 'a' ) ) == 0 ) endian = 'b'
+courant = dt * vp2 * sqrt( 3. ) / abs( dx )
+open( 1, file='meta.m', status='replace' )
+write( 1, "( '% SORD metadata'                              )" )
+write( 1, "( 'rho_        =    ',g15.7,';'                  )" ) rho_
+write( 1, "( 'rho1        =    ',g15.7,';'                  )" ) rho1
+write( 1, "( 'rho2        =    ',g15.7,';'                  )" ) rho2
+write( 1, "( 'vp_         =    ',g15.7,';'                  )" ) vp_
+write( 1, "( 'vp1         =    ',g15.7,';'                  )" ) vp1
+write( 1, "( 'vp2         =    ',g15.7,';'                  )" ) vp2
+write( 1, "( 'vs_         =    ',g15.7,';'                  )" ) vs_
+write( 1, "( 'vs1         =    ',g15.7,';'                  )" ) vs1
+write( 1, "( 'vs2         =    ',g15.7,';'                  )" ) vs2
+write( 1, "( 'gam_        =    ',g15.7,';'                  )" ) gam_
+write( 1, "( 'gam1        =    ',g15.7,';'                  )" ) gam1
+write( 1, "( 'gam2        =    ',g15.7,';'                  )" ) gam2
+write( 1, "( 'xhypo       =  [ ',g15.7,2(', ',g15.7),' ];'  )" ) xhypo
+write( 1, "( 'ihypo       =  [ ',i8,2(', ',i8),' ];'        )" ) ihypo + nnoff
+
+write( 1, "( 'courant     =    ',g15.7,';'                  )" ) courant
+write( 1, "( 'oplevel     =    ',i8,';'                     )" ) oplevel
 if ( faultnormal /= 0 ) then
 write( 1, "( 'slipvector  =  [',g15.7,2(',',g15.7),'];'     )" ) slipvector
 write( 1, "( 'vrup        =   ',g15.7,';'                   )" ) vrup
@@ -110,7 +109,7 @@ write( 1, "( 'lc          =   ',g15.7,';'                   )" ) lc
 write( 1, "( 'rctest      =   ',g15.7,';'                   )" ) rctest
 end if
 write( 1, "( 'dirfmt      =   ''out/%02d'';'                )" )
-write( 1, "( 'out         =   {'                            )" )
+write( 1, "( 'io          =   {'                            )" )
 iz = 0
 p => outp0
 do while( associated( p%next ) )

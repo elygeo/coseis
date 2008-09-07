@@ -18,7 +18,7 @@ END
 files="
     $base/versionmeta.py
     $base/doc
-    $base/make.sh
+    $base/setup.sh
     $base/sord
     $base/in
     $base/sh

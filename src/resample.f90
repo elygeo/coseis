@@ -71,10 +71,12 @@ mu = mu * s1
   g5    =  0.
   g6    =  0.
   pv    =  0.
-  psv   =  0.
-  trup  =  1e9
-  tarr  =  0.
-  efric =  0.
+
+! now setting these in fault subroutine
+! psv   =  0.
+! trup  =  1e9
+! tarr  =  0.
+! efric =  0.
 
   w2    =  0.
   s1    =  0.

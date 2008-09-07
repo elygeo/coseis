@@ -21,7 +21,7 @@ io = [
   ( 's0', 'vp',  6000. ),	# P-wave speed
   ( 's0', 'vs',  3464. ),	# S-wave speed
   ( 's0', 'gam',  0.2  ),	# viscosity
-  ( 'sc', 'gam', -15001.,-7501.,-4000.,   15001.,7501.,4000.,   0.02 )
+  ( 'sc', 'gam', (-15001.,-7501.,-4000.), (15001.,7501.,4000.), 0.02 )
 ]
 hourglass = ( 1., 2. )
 
@@ -34,15 +34,15 @@ io += [
   ( 's0', 'dc',   0.4    ),	# slip weakening distance
   ( 's0', 'mud',  0.525  ),	# coefficient of dynamic friction
   ( 's0', 'mus',  10000. ),	# coefficient of static friction
-  ( 'sc', 'mus', -15001.,-7501.,-1., 15001.,7501.,1.,   0.677 ),
+  ( 'sc', 'mus', (-15001.,-7501.,-1.), (15001.,7501.,1.), 0.677 ),
   ( 's0', 'tn',  -120e6  ),	# normal traction
   ( 's0', 'ts1',   70e6  ),	# shear traction
-  ( 'sc', 'ts1',  -1501.,-1501.,-1.,  1501.,1501.,1.,  81.6e6 ),
+  ( 'sc', 'ts1',  (-1501.,-1501.,-1.),  (1501.,1501.,1.), 81.6e6 ),
 ]
 
 # Fault plane output
 io += [
-  ( 'wz', 'x',    1,1,-2, 0,  -1,-1,-2, 0,  1,1,1,1, 1 ), # Mesh coordinates
+  ( 'wz', 'x', (1,1,-2,0), (-1,-1,-2,0), (1,1,1,1), 1 ), # Mesh coordinates
   ( 'w1', 'su'   ),		# Final slip
   ( 'w1', 'psv'  ),		# Peak slip velocity
   ( 'w1', 'trup' ),		# Rupture time
@@ -50,15 +50,15 @@ io += [
 
 # Time series output, mode II point
 io += [
-  ( 'wx', 'su', -7499., -1., 0. ), # Slip
-  ( 'wx', 'sv', -7499., -1., 0. ), # Slip velocity
-  ( 'wx', 'ts', -7499., -1., 0. ), # Shear traction
+  ( 'wx', 'su', ( -7499., -1., 0. ) ), # Slip
+  ( 'wx', 'sv', ( -7499., -1., 0. ) ), # Slip velocity
+  ( 'wx', 'ts', ( -7499., -1., 0. ) ), # Shear traction
 ]
 
 # Time series output, mode III point
 io += [
-  ( 'wx', 'su', -1., -5999., 0. ), # Slip
-  ( 'wx', 'sv', -1., -5999., 0. ), # Slip velocity
-  ( 'wx', 'ts', -1., -5999., 0. ), # Shear traction
+  ( 'wx', 'su', ( -1., -5999., 0. ) ), # Slip
+  ( 'wx', 'sv', ( -1., -5999., 0. ) ), # Slip velocity
+  ( 'wx', 'ts', ( -1., -5999., 0. ) ), # Shear traction
 ]
 

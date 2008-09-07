@@ -1,7 +1,7 @@
 ! Fortran Real Binary I/O
 module m_frio
-use m_globals, only: nz
 implicit none
+integer, private, parameter :: nz = 1000
 integer, private :: filehandles(64+6*nz) = 0
 contains
 
