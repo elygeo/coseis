@@ -103,7 +103,7 @@ def sord( argv ):
     if not setup: return
     if subprocess.call( [ srcdir+os.sep+'setup.sh', '-'+mode+optimize ] ):
         sys.exit( 'Error building code' )
-       
+
     # Setup run directory
     rundir = 'run' + os.sep + str( count )
     print 'Run directory: ' + rundir
@@ -247,24 +247,33 @@ def pprep( params ):
     io = []
     n = p.nn + [ p.nt ]
     for f in params.io:
+        f = list( f )
         mode = f[0]
         field = f[1]
-        readable = [
-            'x1', 'x2', 'x3', 'rho', 'vp', 'vs', 'gam' ]
-        writable = [ 
-            'x', 'rho', 'vp', 'vs', 'v', 'u', 'w', 'a', 'vm2', 'um2', 'wm2', 'am2', 'pv2' ]
-        if p.faultnormal != 0:
-            readable += [
-                'mus', 'mud', 'dc' , 'co', 'tn' , 'ts1', 'ts2',
-                'sxx', 'syy', 'szz', 'syz', 'szx', 'sxy' ]
-            writable += [
-                'nhat', 'mus', 'mud', 'dc', 'co', 'sv', 'su', 'ts', 'sa', 
-                'svm', 'sum', 'tsm', 'sam', 'tn', 'fr', 'sl', 'psv', 'trup', 'tarr' ]
-        if mode[0] in 'rsc': if field not in readable: sys.exit( 'unknown input var in: %r'  % f )
-        elif mode[0] is 'w': if field not in writable: sys.exit( 'unknown output var in: %r' % f )
+        readable = set([
+            'x1', 'x2', 'x3', 'rho', 'vp', 'vs', 'gam',
+            'mus', 'mud', 'dc' , 'co',
+            'ts1', 'ts2', 'tn',
+            'sxx', 'syy', 'szz', 'syz', 'szx', 'sxy', ])
+        writable = set([
+            'x1', 'x2', 'x3', 'rho', 'vp', 'vs',
+            'u1', 'u2', 'u3', 'um2',
+            'v1', 'v2', 'v3', 'vm2', 'pv2',
+            'a1', 'a2', 'a3', 'am2',
+            'wxx', 'wyy', 'wzz', 'wyz', 'wzx', 'wxy', 'wm',
+            'mus', 'mud', 'dc', 'co',
+            'ts1', 'ts2', 'ts3', 'tsm', 'tn', 'fr',
+            'su1', 'su2', 'su3', 'sum', 'sl',
+            'sv1', 'sv2', 'sv3', 'svm', 'psv',
+            'sa1', 'sa2', 'sa3', 'sam',
+            'nhat1', 'nhat2', 'nhat3', 'trup', 'tarr' ])
+        if mode[0] in 'rsc': if field not in readable: sys.exit( 'unknown input var: %s'  % f )
+        elif mode[0] is 'w': if field not in writable: sys.exit( 'unknown output var: %s' % f )
         else: sys.exit( 'unknown mode in: %r' % f )
         di = 1, 1, 1, 1
         nb = 1
+        cellval = set([
+            'w', 'rho', 'vp', 'vs', 'gam' ])
         if mode[1] == 'i':
             i1, i2, di, nb = f[2:]
         elif mode[1] == '*': mode[1] = 'i'
@@ -291,13 +300,12 @@ def pprep( params ):
                 if i1[i] < 1 or i1[i] > n[i]: sys.exit( 'bad zone: %s' % f )
                 if i2[i] < 1 or i2[i] > n[i]: sys.exit( 'bad zone: %s' % f )
                 if di[i] < 1 or di[i] > n[i]: sys.exit( 'bad zone: %s' % f )
-            f = ( mode, field, tuple(i1), tuple(i2), di, nb )
-        io += f
+            f = [ mode, field, tuple(i1), tuple(i2), di, nb ]
+
+        if field in 'a': f = ( mode, 'a1',
+        io += [ f ]
     p.io = io
     return p
-
-def zone( i1, i2, n ):
-    for i in range( len( n ) ):
 
 # Write input files
 def pwrite( filename ):
@@ -311,7 +319,7 @@ def pwrite( filename ):
     f.write( ']\n' )
 
 # Field properties
-def fieldprops( p, field ):
+def fieldprops( field ):
     props = {
         'x1':   ( 'X',                            'x' )
         'x2':   ( 'Y',                            'y' )
