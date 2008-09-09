@@ -43,6 +43,6 @@ moment2 = ( 0., 0., 1e18 )	# moment tensor M_yz, M_zx, M_yz
 
 # Velocity time series output for surface station
 io += [
-  ( 'wx', 'v', 6000., 80000., 0. ),
+  ( 'wx', ('v1','v2','v3'), (6000.,80000.,0.) ),
 ]
 

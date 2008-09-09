@@ -139,6 +139,30 @@ end if
 end do doid
 end do doic
 
+! Strain I/O
+p => iolist0
+do while( associated( p%next ) )
+  p => p%next
+  select case( p%field )
+  case( 'exx' ); call rio4( 'in', p, .false., w1(:,:,:1) )
+  case( 'eyy' ); call rio4( 'in', p, .false., w1(:,:,:2) )
+  case( 'ezz' ); call rio4( 'in', p, .false., w1(:,:,:3) )
+  case( 'eyz' ); call rio4( 'in', p, .false., w2(:,:,:1) )
+  case( 'ezx' ); call rio4( 'in', p, .false., w2(:,:,:2) )
+  case( 'exy' ); call rio4( 'in', p, .false., w2(:,:,:3) )
+end do
+p => iolist0
+do while( associated( p%next ) )
+  p => p%next
+  select case( p%field )
+  case( 'exx' ); call rio4( 'out', p, .false., w1(:,:,:1) )
+  case( 'eyy' ); call rio4( 'out', p, .false., w1(:,:,:2) )
+  case( 'ezz' ); call rio4( 'out', p, .false., w1(:,:,:3) )
+  case( 'eyz' ); call rio4( 'out', p, .false., w2(:,:,:1) )
+  case( 'ezx' ); call rio4( 'out', p, .false., w2(:,:,:2) )
+  case( 'exy' ); call rio4( 'out', p, .false., w2(:,:,:3) )
+end do
+
 ! Attenuation
 !do j = 1, 2
 !do k = 1, 2
@@ -155,6 +179,30 @@ s1 = lam * sum( w1, 4 )
 do i = 1, 3
   w1(:,:,:,i) = 2. * mu * w1(:,:,:,i) + s1
   w2(:,:,:,i) =      mu * w2(:,:,:,i)
+end do
+
+! Sress I/O
+p => iolist0
+do while( associated( p%next ) )
+  p => p%next
+  select case( p%field )
+  case( 'wxx' ); call rio4( 'in', p, .false., w1(:,:,:1) )
+  case( 'wyy' ); call rio4( 'in', p, .false., w1(:,:,:2) )
+  case( 'wzz' ); call rio4( 'in', p, .false., w1(:,:,:3) )
+  case( 'wyz' ); call rio4( 'in', p, .false., w2(:,:,:1) )
+  case( 'wzx' ); call rio4( 'in', p, .false., w2(:,:,:2) )
+  case( 'wxy' ); call rio4( 'in', p, .false., w2(:,:,:3) )
+end do
+p => inp0
+do while( associated( p%next ) )
+  p => p%next
+  select case( p%field )
+  case( 'wxx' ); call rio4( 'out', p, .false., w1(:,:,:1) )
+  case( 'wyy' ); call rio4( 'out', p, .false., w1(:,:,:2) )
+  case( 'wzz' ); call rio4( 'out', p, .false., w1(:,:,:3) )
+  case( 'wyz' ); call rio4( 'out', p, .false., w2(:,:,:1) )
+  case( 'wzx' ); call rio4( 'out', p, .false., w2(:,:,:2) )
+  case( 'wxy' ); call rio4( 'out', p, .false., w2(:,:,:3) )
 end do
 
 end subroutine

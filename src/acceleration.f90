@@ -157,13 +157,49 @@ end do
 end do
 end if
 
+! Boundary conditions
+call vector_bc( w1, bc1, bc2, i1bc, i2bc )
+
+! Nodal force I/O
+p => pio0
+do while( associated( p%next ) )
+  p => p%next
+  select case( p%field )
+  case( 'f1' ); call rio4( 'in', p, .false., w1(:,:,:1) )
+  case( 'f2' ); call rio4( 'in', p, .false., w1(:,:,:2) )
+  case( 'f3' ); call rio4( 'in', p, .false., w1(:,:,:3) )
+end do
+p => pio0
+do while( associated( p%next ) )
+  p => p%next
+  select case( p%field )
+  case( 'f1' ); call rio4( 'out', p, .false., w1(:,:,:1) )
+  case( 'f2' ); call rio4( 'out', p, .false., w1(:,:,:2) )
+  case( 'f3' ); call rio4( 'out', p, .false., w1(:,:,:3) )
+end do
+
 ! Newton's law: a_i = f_i / m
 do i = 1, 3
   w1(:,:,:,i) = w1(:,:,:,i) * mr
 end do
 
-! Boundary conditions
-call vector_bc( w1, bc1, bc2, i1bc, i2bc )
+! Acceleration I/O
+p => pio0
+do while( associated( p%next ) )
+  p => p%next
+  select case( p%field )
+  case( 'a1' ); call rio4( 'in', p, .false., w1(:,:,:1) )
+  case( 'a2' ); call rio4( 'in', p, .false., w1(:,:,:2) )
+  case( 'a3' ); call rio4( 'in', p, .false., w1(:,:,:3) )
+end do
+p => pio0
+do while( associated( p%next ) )
+  p => p%next
+  select case( p%field )
+  case( 'a1' ); call rio4( 'out', p, .false., w1(:,:,:1) )
+  case( 'a2' ); call rio4( 'out', p, .false., w1(:,:,:2) )
+  case( 'a3' ); call rio4( 'out', p, .false., w1(:,:,:3) )
+end do
 
 end subroutine
 

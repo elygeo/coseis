@@ -43,22 +43,12 @@ io += [
 # Fault plane output
 io += [
   ( 'wi', 'x', (1,1,-2,0), (-1,-1,-2,0), (1,1,1,1), 1 ), # Mesh coordinates
-  ( 'w1', 'su'   ),		# Final slip
-  ( 'w1', 'psv'  ),		# Peak slip velocity
-  ( 'w1', 'trup' ),		# Rupture time
+  ( 'w1', ('sl','psv','trup') ), # Final slip, peak slip velocity, and rupture time
 ]
 
-# Time series output, mode II point
+# Slip, slip velocity, and shear traction time history output
 io += [
-  ( 'wx', 'su', ( -7499., -1., 0. ) ), # Slip
-  ( 'wx', 'sv', ( -7499., -1., 0. ) ), # Slip velocity
-  ( 'wx', 'ts', ( -7499., -1., 0. ) ), # Shear traction
-]
-
-# Time series output, mode III point
-io += [
-  ( 'wx', 'su', ( -1., -5999., 0. ) ), # Slip
-  ( 'wx', 'sv', ( -1., -5999., 0. ) ), # Slip velocity
-  ( 'wx', 'ts', ( -1., -5999., 0. ) ), # Shear traction
+  ( 'wx', ('su1','su2','sv1','sv2','ts1','ts2'), (-7499.,-1.,0.) ), # Mode II point
+  ( 'wx', ('su1','su2','sv1','sv2','ts1','ts2'), (-1.,-5999.,0.) ), # Mode III point
 ]
 

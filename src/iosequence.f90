@@ -4,9 +4,9 @@ implicit none
 type t_io
   character(4) :: field
   character(2) :: mode
-  integer :: i1(4), i2(4), i3(4), i4(4), nc, nb, fh(6)
+  integer :: i1(4), i2(4), i3(4), i4(4), nb, fh
   real :: x1(3), x2(3), val
-  real, allocatable :: buff(:,:,:,:,:)
+  real, allocatable :: buff(:,:,:,:)
   type( t_io ), pointer :: next
 end type t_io
 real, pointer :: f(:,:,:)
@@ -76,7 +76,7 @@ end subroutine
 !------------------------------------------------------------------------------!
 
 ! Write output
-subroutine stats( pass )
+subroutine stats( pass ) FIXME
 use m_globals
 use m_collective
 use m_util
@@ -185,16 +185,13 @@ i2 = ( i2 - i3 ) / di + 1
 i4 = ( i4 - i3 ) / di + 1
 i3 = 1
 if ( i4(4) == p%nb .or. i4(4) == i2(4) ) then
-  do ic = 1, p%nc
-    id = 64 + 6 * ( iz - 1 ) + ic
-    write( str, '(a,i2.2,a)' ) 'out/', iz, p%field
-    if ( p%nc > 1 ) write( str, '(a,i1)' ) trim( str ), ic
-    if ( mpout == 0 ) then
-      i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
-      if ( any( i1 /= i3 .or. i2 /= i4 ) ) write( str, '(a,i6.6)' ) trim( str ), i
-    end if
-    call rio4( id, mpio, p%buff, i1, i2, i3, i4, i4 )
-  end do
+  id = 64 + 6 * ( iz - 1 ) + ic
+  write( str, '(a,i2.2,a)' ) 'out/', iz, p%field
+  if ( mpout == 0 ) then
+    i = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
+    if ( any( i1 /= i3 .or. i2 /= i4 ) ) write( str, '(a,i6.6)' ) trim( str ), i
+  end if
+  call rio4( id, mpio, p%buff, i1, i2, i3, i4, i4 )
   p%i3(4) = it + di(4)
   p%i4(4) = 0
 end if

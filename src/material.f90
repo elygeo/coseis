@@ -25,35 +25,11 @@ p => inp0
 do while( associated( p%next ) )
   p => p%next
   select case( p%field )
-  case( 'rho' ); f => mr
-  case( 'vp'  ); f => s1
-  case( 'vs'  ); f => s2
-  case( 'gam' ); f => gam
+  case( 'rho' ); call rio4( 'in', p, .true., mr  )
+  case( 'vp'  ); call rio4( 'in', p, .true., s1  )
+  case( 'vs'  ); call rio4( 'in', p, .true., s2  )
+  case( 'gam' ); call rio4( 'in', p, .true., gam )
   case default; cycle
-  end select
-  i1 = p%i1
-  i2 = p%i2
-  call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
-  i2 = i2 - 1
-  i3 = max( i1, i1core )
-  i4 = min( i2, i2core )
-  select case( p%mode )
-  case( 'z' )
-    f(i1(1):i2(1),i1(2):i2(2),i1(3):i2(3)) = p%val
-  case( 'c' )
-    call cube( f, w2, i3, i4, p%x1, p%x2, p%val )
-  case( 'r' )
-    ifill = 0
-    where ( i1 == i2 )
-      i1 = i1core
-      i2 = i1core
-      i3 = i1core
-      i4 = i1core
-      ifill = 0
-    end where
-    i = mpin * 4
-    call rio3( -1, i, 'data/'//p%field, f, i1, i2, i3, i4, ifill )
-  end select
 end do
 
 ! Test for endian problems
@@ -143,6 +119,21 @@ yy = 12. * ( lam + 2. * mu )
 call invert( yy )
 yy = yy * dx * mu * ( lam + mu )
 !yy = .3 / 16. * ( lam + 2. * mu ) * dx ! like Ma & Liu, 2006
+
+! Outputs
+p => inp0
+do while( associated( p%next ) )
+  p => p%next
+  select case( p%field )
+  case( 'rho' ); call rio4( 'out', p, .true., mr  )
+  case( 'vp'  ); call rio4( 'out', p, .true., s1  )
+  case( 'vs'  ); call rio4( 'out', p, .true., s2  )
+  case( 'gam' ); call rio4( 'out', p, .true., gam )
+  case( 'mu'  ); call rio4( 'out', p, .true., mu  )
+  case( 'lam' ); call rio4( 'out', p, .true., lam )
+  case( 'yy'  ); call rio4( 'out', p, .true., yy  )
+  case default; cycle
+end do
 
 end subroutine
 
