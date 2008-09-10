@@ -21,7 +21,7 @@ s2 = 0.
 gam = 0.
 
 ! Inputs
-p => inp0
+p => pio0
 do while( associated( p%next ) )
   p => p%next
   select case( p%field )
@@ -120,20 +120,22 @@ call invert( yy )
 yy = yy * dx * mu * ( lam + mu )
 !yy = .3 / 16. * ( lam + 2. * mu ) * dx ! like Ma & Liu, 2006
 
-! Outputs
-p => inp0
-do while( associated( p%next ) )
-  p => p%next
-  select case( p%field )
-  case( 'rho' ); call rio4( 'out', p, .true., mr  )
-  case( 'vp'  ); call rio4( 'out', p, .true., s1  )
-  case( 'vs'  ); call rio4( 'out', p, .true., s2  )
-  case( 'gam' ); call rio4( 'out', p, .true., gam )
-  case( 'mu'  ); call rio4( 'out', p, .true., mu  )
-  case( 'lam' ); call rio4( 'out', p, .true., lam )
-  case( 'yy'  ); call rio4( 'out', p, .true., yy  )
-  case default; cycle
-end do
+! Output
+if ( it == 0 ) then
+  p => inp0
+  do while( associated( p%next ) )
+    p => p%next
+    select case( p%field )
+    case( 'rho' ); call rio4( 'out', p, .true., mr  )
+    case( 'vp'  ); call rio4( 'out', p, .true., s1  )
+    case( 'vs'  ); call rio4( 'out', p, .true., s2  )
+    case( 'gam' ); call rio4( 'out', p, .true., gam )
+    case( 'mu'  ); call rio4( 'out', p, .true., mu  )
+    case( 'lam' ); call rio4( 'out', p, .true., lam )
+    case( 'yy'  ); call rio4( 'out', p, .true., yy  )
+    case default; cycle
+  end do
+end if
 
 end subroutine
 

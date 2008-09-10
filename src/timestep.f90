@@ -36,6 +36,20 @@ tm = it * dt
 vv = vv + w1 * dt
 uu = uu + vv * dt
 
+! Velocity and displacement output
+p => pio0
+do while( associated( p%next ) )
+  p => p%next
+  select case( p%field )
+  case( 'v1' ); call rio4( 'out', p, .false., vv(:,:,:1) )
+  case( 'v2' ); call rio4( 'out', p, .false., vv(:,:,:2) )
+  case( 'v3' ); call rio4( 'out', p, .false., vv(:,:,:3) )
+  case( 'u1' ); call rio4( 'out', p, .false., uu(:,:,:1) )
+  case( 'u2' ); call rio4( 'out', p, .false., uu(:,:,:2) )
+  case( 'u3' ); call rio4( 'out', p, .false., uu(:,:,:3) )
+  end select
+end do
+
 ! Fault time integration
 if ( ifn /= 0 ) then
   select case( ifn )
@@ -63,6 +77,23 @@ if ( ifn /= 0 ) then
   case( 3 ); t2(:,:,1,:) = uu(:,:,l+1,:) - uu(:,:,l,:)
   end select
   f2 = sqrt( sum( t2 * t2, 4 ) )
+  p => pio0
+  do while( associated( p%next ) )
+    p => p%next
+    call rio4( 'out', 'sv1',  t1(:,:,:,1) )
+    call rio4( 'out', 'sv2',  t1(:,:,:,2) )
+    call rio4( 'out', 'sv3',  t1(:,:,:,3) )
+    call rio4( 'out', 'svm',  f1          )
+    call rio4( 'out', 'su1',  t2(:,:,:,1) )
+    call rio4( 'out', 'su2',  t2(:,:,:,2) )
+    call rio4( 'out', 'su3',  t2(:,:,:,3) )
+    call rio4( 'out', 'sum',  f2          )
+    call rio4( 'out', 'psv',  psv         )
+    call rio4( 'out', 'fr',   f1          )
+    call rio4( 'out', 'sl',   sl          )
+    call rio4( 'out', 'trup', trup        )
+    call rio4( 'out', 'tarr', tarr        )
+  end do
 end if
 
 end subroutine

@@ -168,6 +168,7 @@ do while( associated( p%next ) )
   case( 'f1' ); call rio4( 'in', p, .false., w1(:,:,:1) )
   case( 'f2' ); call rio4( 'in', p, .false., w1(:,:,:2) )
   case( 'f3' ); call rio4( 'in', p, .false., w1(:,:,:3) )
+  end select
 end do
 p => pio0
 do while( associated( p%next ) )
@@ -176,6 +177,7 @@ do while( associated( p%next ) )
   case( 'f1' ); call rio4( 'out', p, .false., w1(:,:,:1) )
   case( 'f2' ); call rio4( 'out', p, .false., w1(:,:,:2) )
   case( 'f3' ); call rio4( 'out', p, .false., w1(:,:,:3) )
+  end select
 end do
 
 ! Newton's law: a_i = f_i / m
@@ -191,6 +193,7 @@ do while( associated( p%next ) )
   case( 'a1' ); call rio4( 'in', p, .false., w1(:,:,:1) )
   case( 'a2' ); call rio4( 'in', p, .false., w1(:,:,:2) )
   case( 'a3' ); call rio4( 'in', p, .false., w1(:,:,:3) )
+  end select
 end do
 p => pio0
 do while( associated( p%next ) )
@@ -199,6 +202,7 @@ do while( associated( p%next ) )
   case( 'a1' ); call rio4( 'out', p, .false., w1(:,:,:1) )
   case( 'a2' ); call rio4( 'out', p, .false., w1(:,:,:2) )
   case( 'a3' ); call rio4( 'out', p, .false., w1(:,:,:3) )
+  end select
 end do
 
 end subroutine

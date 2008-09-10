@@ -25,10 +25,10 @@ co = 0.
 t1 = 0.
 t2 = 0.
 t3 = 0.
-call input( 'mus', mus )
-call input( 'mud', mud )
-call input( 'dc',  dc  )
-call input( 'co',  co  )
+call input( 'mus', mus         )
+call input( 'mud', mud         )
+call input( 'dc',  dc          )
+call input( 'co',  co          )
 call input( 'sxx', t1(:,:,:,1) )
 call input( 'syy', t1(:,:,:,2) )
 call input( 'szz', t1(:,:,:,3) )
@@ -155,36 +155,39 @@ tarr  =  0.
 efric =  0.
 
 ! Output
-call output( 'mus',  mus         )
-call output( 'mud',  mud         )
-call output( 'dc',   dc          )
-call output( 'co',   co          )
-call output( 'ts1',  t3(:,:,:,1) )
-call output( 'ts2',  t3(:,:,:,2) )
-call output( 'ts3',  t3(:,:,:,2) )
-call output( 'sa1',  t2(:,:,:,1) )
-call output( 'sa2',  t2(:,:,:,2) )
-call output( 'sa3',  t2(:,:,:,3) )
-
-call output( 'sv1',  t1(:,:,:,1) )
-call output( 'sv2',  t1(:,:,:,2) )
-call output( 'sv3',  t1(:,:,:,3) )
-call output( 'su',   t2(:,:,:,1) )
-call output( 'su',   t2(:,:,:,2) )
-call output( 'su',   t2(:,:,:,3) )
-call output( 'svm',  f1          )
-call output( 'sum',  f2          )
-call output( 'psv',  psv         )
-
-call output( 'tn',   tn          )
-call output( 'tsm',  ts          )
-call output( 'sam',  f2          )
-call output( 'tn',   tn          )
-call output( 'fr',   f1          )
-call output( 'sl',   sl          )
-call output( 'trup', trup        )
-call output( 'tarr', tarr        )
-
+if ( it == 0 ) then
+  p => pio0
+  do while( associated( p%next ) )
+    p => p%next
+    call rio4( 'out', 'mus',  mus         )
+    call rio4( 'out', 'mud',  mud         )
+    call rio4( 'out', 'dc',   dc          )
+    call rio4( 'out', 'co',   co          )
+    call rio4( 'out', 'ts1',  t3(:,:,:,1) )
+    call rio4( 'out', 'ts2',  t3(:,:,:,2) )
+    call rio4( 'out', 'ts3',  t3(:,:,:,2) )
+    call rio4( 'out', 'sa1',  t2(:,:,:,1) )
+    call rio4( 'out', 'sa2',  t2(:,:,:,2) )
+    call rio4( 'out', 'sa3',  t2(:,:,:,3) )
+    call rio4( 'out', 'sv1',  t1(:,:,:,1) )
+    call rio4( 'out', 'sv2',  t1(:,:,:,2) )
+    call rio4( 'out', 'sv3',  t1(:,:,:,3) )
+    call rio4( 'out', 'su1',  t2(:,:,:,1) )
+    call rio4( 'out', 'su2',  t2(:,:,:,2) )
+    call rio4( 'out', 'su3',  t2(:,:,:,3) )
+    call rio4( 'out', 'svm',  f1          )
+    call rio4( 'out', 'sum',  f2          )
+    call rio4( 'out', 'psv',  psv         )
+    call rio4( 'out', 'tn',   tn          )
+    call rio4( 'out', 'tsm',  ts          )
+    call rio4( 'out', 'sam',  f2          )
+    call rio4( 'out', 'tn',   tn          )
+    call rio4( 'out', 'fr',   f1          )
+    call rio4( 'out', 'sl',   sl          )
+    call rio4( 'out', 'trup', trup        )
+    call rio4( 'out', 'tarr', tarr        )
+  end do
+end if
 
 ! Halos
 call scalar_swap_halo( mus,   nhalo )
@@ -319,6 +322,25 @@ moment = sum( f2 )
 ! Slip acceleration
 t2 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
 f2 = sqrt( sum( t2 * t2, 4 ) )
+
+! Output
+p => pio0
+do while( associated( p%next ) )
+  p => p%next
+  call rio4( 'out', 't1',   t1(:,:,:,1) )
+  call rio4( 'out', 't2',   t1(:,:,:,2) )
+  call rio4( 'out', 't3',   t1(:,:,:,3) )
+  call rio4( 'out', 'fr',   f1          )
+  call rio4( 'out', 'tn',   tn          )
+  call rio4( 'out', 'sa1',  t2(:,:,:,1) )
+  call rio4( 'out', 'sa2',  t2(:,:,:,2) )
+  call rio4( 'out', 'sa3',  t2(:,:,:,3) )
+  call rio4( 'out', 'sam',  f2          )
+  call rio4( 'out', 'ts1',  t3(:,:,:,1) )
+  call rio4( 'out', 'ts2',  t3(:,:,:,2) )
+  call rio4( 'out', 'ts3',  t3(:,:,:,2) )
+  call rio4( 'out', 'tsm',  ts          )
+end do
 
 end subroutine
 

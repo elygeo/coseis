@@ -21,7 +21,7 @@ use m_acceleration
 use m_util
 implicit none
 integer :: jp = 0
-real :: prof0(17) = 0.
+real :: prof0(14) = 0.
 real, allocatable :: prof(:,:)
 
 ! Initialization
@@ -30,22 +30,19 @@ call initialize( np0, ip, master )                          ; prof0(1) = timer( 
 call inread                                                 ; prof0(2) = timer( 6 )
 call setup                                                  ; prof0(3) = timer( 6 )
 if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
-if ( sync ) call barrier ; call arrays                      ; prof0(4) = timer( 6 )
-if ( sync ) call barrier ; call grid_gen                    ; prof0(5) = timer( 6 )
-if ( sync ) call barrier ; call ioseq_init                  ; prof0(6) = timer( 6 )
-if ( sync ) call barrier ; call source_init                 ; prof0(7) = timer( 6 )
-if ( sync ) call barrier ; call material                    ; prof0(8) = timer( 6 )
+if ( sync ) call barrier ; call look_for_checkpoint         ; prof0(4) = timer( 6 )
+if ( sync ) call barrier ; call arrays                      ; prof0(5) = timer( 6 )
+if ( sync ) call barrier ; call grid_gen                    ; prof0(6) = timer( 6 )
+if ( sync ) call barrier ; call ioseq_init                  ; prof0(7) = timer( 6 )
+if ( sync ) call barrier ; call source_init                 ; prof0(8) = timer( 6 )
+if ( sync ) call barrier ; call material                    ; prof0(9) = timer( 6 )
 if ( sync ) call barrier ; call pml
-if ( sync ) call barrier ; call fault_init                  ; prof0(9) = timer( 6 )
-if ( sync ) call barrier ; call metadata                    ; prof0(10) = timer( 6 )
-if ( sync ) call barrier ; call look_for_checkpoint         ; prof0(11) = timer( 6 )
-if ( sync ) call barrier ; if ( it == 0 ) call ioseq( 0 )   ; prof0(12) = timer( 6 )
-if ( sync ) call barrier ; call resample                    ; prof0(13) = timer( 6 )
-if ( sync ) call barrier ; call read_checkpoint             ; prof0(14) = timer( 6 )
-if ( sync ) call barrier ; if ( it == 0 ) call ioseq( 1 )   ; prof0(15) = timer( 6 )
-if ( sync ) call barrier ; if ( it == 0 ) call ioseq( 2 )   ; prof0(16) = timer( 6 )
-if ( sync ) call barrier ; prof0(17) = timer( 7 )
-if ( master .and. it == 0 ) call rio1( 10, mpout, 'prof/main', prof0, 17, 19 )
+if ( sync ) call barrier ; call fault_init                  ; prof0(10) = timer( 6 )
+if ( sync ) call barrier ; call metadata                    ; prof0(11) = timer( 6 )
+if ( sync ) call barrier ; call resample                    ; prof0(12) = timer( 6 )
+if ( sync ) call barrier ; call read_checkpoint             ; prof0(13) = timer( 6 )
+if ( sync ) call barrier ; prof0(14) = timer( 7 )
+if ( master .and. it == 0 ) call rio1( 10, mpout, 'prof/main', prof0, 14, 16 )
 allocate( prof(itio,4) )
 
 ! Main loop
@@ -88,7 +85,7 @@ if ( sync ) call barrier
 if ( master ) then
   prof0(1) = timer( 7 )
   prof0(2) = timer( 8 )
-  call rio1( 10, mpout, 'prof/main', prof0(:2), 19, 19 )
+  call rio1( 10, mpout, 'prof/main', prof0(:2), 16, 16 )
   write( 0, * ) 'Finished!'
 end if
 call finalize
