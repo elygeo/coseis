@@ -3,14 +3,14 @@ module m_io_sequence
 implicit none
 type t_io
   character(4) :: field
+  character(8) :: tfunc
   character(2) :: mode
   integer :: i1(4), i2(4), i3(4), i4(4), nb, fh
-  real :: x1(3), x2(3), val
+  real :: x1(3), x2(3), val, t
   real, allocatable :: buff(:,:,:,:)
   type( t_io ), pointer :: next
 end type t_io
-real, pointer :: f(:,:,:)
-type( t_io ), pointer :: pio0, prev, curr
+type( t_io ), pointer :: pio0, pprev, p
 integer, private :: fh
 contains
 
@@ -21,29 +21,31 @@ use m_collective
 use m_util
 real :: rout
 integer :: i1(3), i2(3), di(3)
-type( t_io ), pointer :: curr, prev
 
 ! Loop over output zones
-prev => pio0
-dosequence: do while( associated( prev%next ) )
-curr => prev%next
+pprev => pio0
+dosequence: do while( associated( pprev%next ) )
+p => pprev%next
 
 ! Spatial indices
-i1 = curr%i1(1:3) - nnoff
-i2 = curr%i2(1:3) - nnoff
-di = curr%di(1:3)
-select case( curr%mode(2) )
+i1 = p%i1(1:3) - nnoff
+i2 = p%i2(1:3) - nnoff
+di = p%di(1:3)
+select case( p%mode(2) )
 case( 'x' )
+  p%mode(2) = 'i'
   rout = huge( rout )
   call radius( s2, w1, p%x1, i1core, i2core )
   call scalarsethalo( s2, rout, i1core, i2core )
   call reduceloc( rout, i1, s2, 'allmin', n, noff, 0 )
   i2 = i1
   if ( rout > dx * dx ) then
-    prev%next = curr%next
+    pprev%next => p%next
+    deallocate( p )
     cycle dosequence
   end if
 case( 'X' )
+  p%mode(2) = 'i'
   rout = huge( rout )
   i1 = max( i1core, i1cell )
   i2 = min( i2core, i2cell )
@@ -52,23 +54,20 @@ case( 'X' )
   call reduceloc( rout, i1, s2, 'allmin', n, noff, 0 )
   i2 = i1
   if ( rout > dx * dx ) then
-    prev%next = curr%next
+    pprev%next => p%next
+    deallocate( p )
     cycle dosequence
   end if
 end select
 
-! Save indices and allocate buffer
-curr%i1(1:3) = i1
-curr%i2(1:3) = i2
+! Save indices
+p%i1(1:3) = i1
+p%i2(1:3) = i2
 where( i1 < i1core ) i1 = i1 + ( ( i1core - i1 - 1 ) / di + 1 ) * di
 where( i2 > i2core ) i2 = i1 + (   i2core - i1     ) / di       * di
-curr%i3(1:3) = i1
-curr%i4(1:3) = i2
-n = i2 - i1 + 1
-allocate( curr%buff(n(1),n(2),n(3),curr%nb,nc) )
-
-! Initialize file handle
-curr%fh = 0
+p%i3(1:3) = i1
+p%i4(1:3) = i2
+p%fh = 0
 
 end do dosequence
 end subroutine
@@ -76,59 +75,29 @@ end subroutine
 !------------------------------------------------------------------------------!
 
 ! Write output
-subroutine stats( pass ) FIXME
+subroutine ioseq( pass, p, cell, f )
 use m_globals
 use m_collective
 use m_util
 use m_debug_out
-integer, intent(in) :: pass
+character(3), intent(in) :: pass
+type( t_io ), pointer, intent(in) :: p
+logical, intent(in) :: cell
+real, pointer, intent(in) :: f(:,:,:)
 integer :: i1(4), i2(4), i3(4), i4(4), id(4), i, j, k, l, ic, iz, id, mpio
-logical :: dofault, fault, cell
 real :: rr
-real, pointer :: f(:,:,:)
-type( t_io ), pointer :: o
 
+! TODO allocate dellallocate
 
-if ( master .and. ( it == 0 .or. debug == 2 ) ) write( 0, '(a,i2)' ) ' Output pass', pass
-if ( debug > 2 ) call debug_out( pass )
+! FIXME debug
+n = i2 - i1 + 1
+allocate( p%buff(n(1),n(2),n(3),p%nb) )
 
-! Test for fault
-dofault = .false.
-if ( faultnormal /= 0 ) then
-  i = abs( faultnormal )
-  if ( ip3(i) == ip3root(i) ) dofault = .true.
-end if
-
-end subroutine
-
-! Loop over output zones
-iz = 0
-o => out0
-dosequence: do while( associated( p%next ) )
-o => p%next
-iz = iz + 1
-
-! Pass
-if ( p%di(4) < 1 .or. pass /= p%pass ) cycle dosequence
-
-! Indices
 i1 = p%i1
 i2 = p%i2
 i3 = p%i3
 i4 = p%i4
 di = p%di
-
-! Peak velocity calculation
-if ( p%field == 'pv2' .and. all( i3(1:3) <= i4(1:3) ) ) then
-  if ( modulo( it, itstats ) /= 0 ) call vectornorm( s1, vv, i3(1:3), i4(1:3) )
-  do l = i3(3), i4(3)
-  do k = i3(2), i4(2)
-  do j = i3(1), i4(1)
-    pv(j,k,l) = max( pv(j,k,l), s1(j,k,l) )
-  end do
-  end do
-  end do
-end if
 
 ! Time indices
 if ( it < p%i1(4) .or. it > p%i2(4) ) cycle dosequence
@@ -167,15 +136,34 @@ if ( all( i3 <= i4 ) ) then
   i = ( it - i3(4) ) / di(4)
   select case( p%mode(1) )
   case( 's' )
-    if ( p%mode(2) == 'c' ) then
-      !call cube( f, w2, i3, i4, p%x1, p%x2, p%val ) FIXME
-    else
-      f(i1(1):i2(1),i1(2):i2(2),i1(3):i2(3)) = p%val
-    end if
+    f(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3)) = p%val
+  case( 'c' )
+! FIXME
+    call cube( f, w1, i3, i4, p%x1, p%x2, p%val )
+  case( 'C' )
+! FIXME
+    call cube( f, w2, i3, i4, p%x1, p%x2, p%val )
   case( 'r' )
     f(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3)) = p%buff(:,:,:,i,1)
   case( 'w' )
     p%buff(:,:,:,i,1) = f(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3))
+  case( 't' )
+    select case( p%tfunc )
+    case( 'delta'  )
+      if ( it == 0 ) ft = 1.
+    case( 'brune' )
+      ft = exp( -tm / p%t ) * tm / ( p%t * p%t )
+    case( 'ricker1' )
+      t = tm - p%t
+      ft = t * exp( -2. * ( pi * t / p%t ) ** 2. )
+    case( 'ricker2' )
+      t = ( pi * ( tm - p%t ) / p%t ) ** 2.
+      ft = ( 1. - 2. * t ) * exp( -t )
+    case default 
+      write( 0, * ) 'invalid tfunc: ', trim( p%tfunc )
+      stop
+    end select
+    f(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3)) = ft * p%val
   end select
 end if
 
@@ -195,8 +183,6 @@ if ( i4(4) == p%nb .or. i4(4) == i2(4) ) then
   p%i3(4) = it + di(4)
   p%i4(4) = 0
 end if
-
-end do dosequence
 
 ! Iteration counter
 if ( master .and. pass == 2 .and. ( modulo( it, itio ) == 0 .or. it == nt ) ) then

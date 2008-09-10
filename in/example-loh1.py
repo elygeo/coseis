@@ -9,17 +9,17 @@ dt = 0.004			# time step size
 # Material properties
 hourglass = ( 1., 2. )		# hourglass stiffness and viscosity
 io = [
-  ( 's0', 'rho', 2700. ),	# density
-  ( 's0', 'vp',  6000. ),	# P-wave speed
-  ( 's0', 'vs',  3464. ),	# S-wave speed
-  ( 's0', 'gam', 0.    ),	# viscosity
+  ( 'set', 'rho', 2700. ),	# density
+  ( 'set', 'vp',  6000. ),	# P-wave speed
+  ( 'set', 'vs',  3464. ),	# S-wave speed
+  ( 'set', 'gam', 0.    ),	# viscosity
 ]
 
 # Material properties of the layer
 io += [
-  ( 'si', 'rho', (1,1,1,0), (-1,-1,21,0), (1,1,1,1), 2600. ),
-  ( 'si', 'vp',  (1,1,1,0), (-1,-1,21,0), (1,1,1,1), 4000. ),
-  ( 'si', 'vs',  (1,1,1,0), (-1,-1,21,0), (1,1,1,1), 2000. ),
+  ( 'set', 'slice',  'rho', 'slice', (1,1,1,0), (-1,-1,21,0), (1,1,1,1), 2600. ),
+  ( 'set', 'vp',  'slice', (1,1,1,0), (-1,-1,21,0), (1,1,1,1), 4000. ),
+  ( 'set', 'vs',  'slice', (1,1,1,0), (-1,-1,21,0), (1,1,1,1), 2000. ),
 ]
 
 # Near side boundary conditions:

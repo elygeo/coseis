@@ -55,14 +55,14 @@ do while ( it < nt )
   if ( sync ) call barrier ; call stress
   if ( sync ) call barrier ; call moment_source
   if ( sync ) call barrier ; prof(jp,1) = timer( 5 )
-  if ( sync ) call barrier ; call ioseq( 1 )
+  if ( sync ) call barrier ; call stats( 1 )
   if ( sync ) call barrier ; prof(jp,2) = timer( 5 )
   if ( sync ) call barrier ; call acceleration   
   if ( sync ) call barrier ; call fault
   if ( sync ) call barrier ; prof(jp,1) = prof(jp,1) + timer( 5 )
   if ( sync ) call barrier ; call vector_swap_halo( w1, nhalo )
   if ( sync ) call barrier ; prof(jp,3) = timer( 5 )
-  if ( sync ) call barrier ; call ioseq( 2 )
+  if ( sync ) call barrier ; call stats( 2 )
   if ( modulo( it, itcheck ) == 0 ) then
     if ( sync ) call barrier ; call write_checkpoint
   end if

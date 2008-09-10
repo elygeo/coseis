@@ -2,6 +2,7 @@
 
 import os, sys, getopt, time, glob
 import shutil, imp, subprocess
+from numpy import s_
 
 # Main SORD setup routine
 def sord( argv ):
@@ -40,7 +41,7 @@ def sord( argv ):
 
     # Read and prep input files
     f = srcdir + os.sep + 'in' + os.sep + 'defaults.py'
-    params = pprep( pread( f + infiles ) )
+    params = pprep( pread( [ f ] + infiles ) )
 
     # Make directories
     try: os.mkdir( 'tmp' )
@@ -267,8 +268,10 @@ def pprep( params ):
             'sv1', 'sv2', 'sv3', 'svm', 'psv',
             'sa1', 'sa2', 'sa3', 'sam',
             'nhat1', 'nhat2', 'nhat3', 'trup', 'tarr' ])
-        if mode[0] in 'rsc': if field not in readable: sys.exit( 'unknown input var: %s'  % f )
-        elif mode[0] is 'w': if field not in writable: sys.exit( 'unknown output var: %s' % f )
+        if mode[0] in 'rsc':
+            if field not in readable: sys.exit( 'unknown input var: %s'  % f )
+        elif mode[0] is 'w':
+            if field not in writable: sys.exit( 'unknown output var: %s' % f )
         else: sys.exit( 'unknown mode in: %r' % f )
         di = 1, 1, 1, 1
         nb = 1
@@ -276,24 +279,28 @@ def pprep( params ):
             'w', 'rho', 'vp', 'vs', 'gam' ])
         if mode[1] == 'i':
             i1, i2, di, nb = f[2:]
-        elif mode[1] == '*': mode[1] = 'i'
+        elif mode[1] == '*':
+            mode[1] = 'i'
             nb = f[2:]
             i1 =  1,  1,  1,  0
             i2 = -1, -1, -1, -1
-        elif mode[1] == '0': mode[1] = 'i'
+        elif mode[1] == '0':
+            mode[1] = 'i'
             i1 =  1,  1,  1,  0
             i2 = -1, -1, -1,  0
-        elif mode[1] == '1': mode[1] = 'i'
+        elif mode[1] == '1':
+            mode[1] = 'i'
             i1 =  1,  1,  1, -1
             i2 = -1, -1, -1, -1
-        elif mode[1] == 'n': mode[1] = 'i'
+        elif mode[1] == 'n':
+            mode[1] = 'i'
             i1 = f[2:] + (  0, )
             i2 = f[2:] + ( -1, )
             nb = p.itio
         if mode[1] == 'i':
             i1 = list( i1 )
             i2 = list( i2 )
-            for i in range(4)
+            for i in range(4):
                 if i1[i] < 0: i1[i] + n[i] + 1
                 if i2[i] < 0: i2[i] + n[i] + 1
                 if di[i] < 0: di[i] + n[i] + 1
@@ -301,8 +308,6 @@ def pprep( params ):
                 if i2[i] < 1 or i2[i] > n[i]: sys.exit( 'bad zone: %s' % f )
                 if di[i] < 1 or di[i] > n[i]: sys.exit( 'bad zone: %s' % f )
             f = [ mode, field, tuple(i1), tuple(i2), di, nb ]
-
-        if field in 'a': f = ( mode, 'a1',
         io += [ f ]
     p.io = io
     return p
@@ -312,7 +317,7 @@ def pwrite( filename ):
     f = file( filename, 'w' )
     f.write( '# Auto-generated SORD input file' )
     for key in dir( params ):
-        if key[:2] not '__' and key not 'io':
+        if key[:2] != '__' and key != 'io':
             f.write( '%s = %r\n' % ( key, getattr( params, key ) ) )
     f.write( 'io = [\n' )
     for line in params.io: f.write( repr( line ) + ',\n' )
@@ -321,43 +326,43 @@ def pwrite( filename ):
 # Field properties
 def fieldprops( field ):
     props = {
-        'x1':   ( 'X',                            'x' )
-        'x2':   ( 'Y',                            'y' )
-        'x3':   ( 'Z',                            'z' )
-        'x':    ( 'Position',                     '|X|', 'x', 'y', 'z' ),
-        'rho':  ( 'Density',                      '\rho' ),
-        'vp':   ( 'P-wave velocity',              'V_p' ),
-        'vs':   ( 'S-wave velocity',              'V_s' ),
-       #'mu':   ( '\mu',                          '\mu' ),
-       #'lam':  ( '\lambda',                      '\lambda' ),
-        'v':    ( 'Velocity',                     '|V|', 'V_x', 'V_y', 'V_z' ),
-        'u':    ( 'Displacement',                 '|U|', 'U_x', 'U_y', 'U_z' ),
-        'w':    ( 'Stress', '|W|', 'W_{xx}', 'W_{yy}', 'W_{zz}', 'W_{yz}', 'W_{zx}', 'W_{xy}' ),
-        'a':    ( 'Acceleration',                 '|A|', 'A_x', 'A_y', 'A_z' ),
-        'vm2':  ( 'Velocity',                     '|V|' ),
-        'um2':  ( 'Displacement',                 '|U|' ),
-        'wm2':  ( 'Stress',                       '|W|' ),
-        'am2':  ( 'Acceleration',                 '|A|' ),
-        'pv2':  ( 'Peak velocity',                '|V|_{peak}' ),
-        'nhat': ( 'Fault surface normals',        '|n|', 'n_x', 'n_y', 'n_z' ),
-        'mus':  ( 'Static friction coefficient',  '\mu_s' ),
-        'mud':  ( 'Dynamic friction coefficient', '\mu_d' ),
-        'dc':   ( 'Slip weakening sistance',      'D_c' ),
-        'co':   ( 'Cohesion',                     'co' ),
-        'sv':   ( 'Slip velocity',                '|V_s|', 'V_s_x', 'V_s_y', 'V_s_z' ),
-        'su':   ( 'Slip',                         '|U_s|', 'U_s_x', 'U_s_y', 'U_s_z' ),
-        'ts':   ( 'Shear traction',               '|T_s|', 'T_s_x', 'T_s_y', 'T_s_z' ),
-        'sa':   ( 'Slip acceleration',            '|A_s|', 'A_s_x', 'A_s_y', 'A_s_z' ),
-        'svm':  ( 'Slip velocity',                '|V_s|' ),
-        'sum':  ( 'Slip',                         '|U_s|' ),
-        'tsm':  ( 'Shear traction',               '|T_s|' ),
-        'sam':  ( 'Slip acceleration',            '|A_s|' ),
-        'tn':   ( 'Normal traction',              'T_n' ),
-        'fr':   ( 'Friction',                     'f' ),
-        'sl':   ( 'Slip path length',             'l' ),
-        'psv':  ( 'Peak slip velocity',           '|V_s|_{peak}' ),
-        'trup': ( 'Rupture time',                 't_{rupture}' ),
-        'tarr': ( 'Arrest time',                  't_{arrest}' ),
+        'x1':( 'X',                            'x' ),
+        'x2':( 'Y',                            'y' ),
+        'x3':( 'Z',                            'z' ),
+        'x':( 'Position',                     '|X|', 'x', 'y', 'z' ),
+        'rho':( 'Density',                      '\rho' ),
+        'vp':( 'P-wave velocity',              'V_p' ),
+        'vs':( 'S-wave velocity',              'V_s' ),
+       #'mu':( '\mu',                          '\mu' ),
+       #'lam':( '\lambda',                      '\lambda' ),
+        'v':( 'Velocity',                     '|V|', 'V_x', 'V_y', 'V_z' ),
+        'u':( 'Displacement',                 '|U|', 'U_x', 'U_y', 'U_z' ),
+        'w':( 'Stress', '|W|', 'W_{xx}', 'W_{yy}', 'W_{zz}', 'W_{yz}', 'W_{zx}', 'W_{xy}' ),
+        'a':( 'Acceleration',                 '|A|', 'A_x', 'A_y', 'A_z' ),
+        'vm2':( 'Velocity',                     '|V|' ),
+        'um2':( 'Displacement',                 '|U|' ),
+        'wm2':( 'Stress',                       '|W|' ),
+        'am2':( 'Acceleration',                 '|A|' ),
+        'pv2':( 'Peak velocity',                '|V|_{peak}' ),
+        'nhat':( 'Fault surface normals',        '|n|', 'n_x', 'n_y', 'n_z' ),
+        'mus':( 'Static friction coefficient',  '\mu_s' ),
+        'mud':( 'Dynamic friction coefficient', '\mu_d' ),
+        'dc':( 'Slip weakening sistance',      'D_c' ),
+        'co':( 'Cohesion',                     'co' ),
+        'sv':( 'Slip velocity',                '|V_s|', 'V_s_x', 'V_s_y', 'V_s_z' ),
+        'su':( 'Slip',                         '|U_s|', 'U_s_x', 'U_s_y', 'U_s_z' ),
+        'ts':( 'Shear traction',               '|T_s|', 'T_s_x', 'T_s_y', 'T_s_z' ),
+        'sa':( 'Slip acceleration',            '|A_s|', 'A_s_x', 'A_s_y', 'A_s_z' ),
+        'svm':( 'Slip velocity',                '|V_s|' ),
+        'sum':( 'Slip',                         '|U_s|' ),
+        'tsm':( 'Shear traction',               '|T_s|' ),
+        'sam':( 'Slip acceleration',            '|A_s|' ),
+        'tn':( 'Normal traction',              'T_n' ),
+        'fr':( 'Friction',                     'f' ),
+        'sl':( 'Slip path length',             'l' ),
+        'psv':( 'Peak slip velocity',           '|V_s|_{peak}' ),
+        'trup':( 'Rupture time',                 't_{rupture}' ),
+        'tarr':( 'Arrest time',                  't_{arrest}' ),
     }
 
 # If called from the command line

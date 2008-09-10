@@ -19,7 +19,7 @@ files="
     $base/versionmeta.py
     $base/doc
     $base/setup.sh
-    $base/sord
+    $base/sord.py
     $base/in
     $base/sh
     $base/py
