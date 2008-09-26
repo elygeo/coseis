@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+from sord import *
+
 # PML test problem
 
 nt = 500

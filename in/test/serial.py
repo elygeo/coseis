@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+from sord import *
+
 # Test
 
 nt = 10

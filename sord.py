@@ -2,7 +2,7 @@
 
 import os, sys, getopt, time, glob
 import shutil, imp, subprocess
-from numpy import s_
+from numpy import index_exp as _
 
 # Main SORD setup routine
 def sord( argv ):
@@ -42,6 +42,7 @@ def sord( argv ):
     # Read and prep input files
     f = srcdir + os.sep + 'in' + os.sep + 'defaults.py'
     params = pprep( pread( [ f ] + infiles ) )
+    print dir( params )
 
     # Make directories
     try: os.mkdir( 'tmp' )
@@ -198,21 +199,21 @@ def config( machine=None ):
 
 # Read input files
 def pread( infiles ):
-    p = imp.load_source( 'params', infiles[0] )
+    p = imp.load_source( 'p', infiles[0] )
     for f in infiles[1:]:
         print f
         #f = os.path.abspath( f )
-        pp = imp.load_source( 'newparams', f )
-        for key in dir( new ):
+        pp = imp.load_source( 'pp', f )
+        for key in dir( pp ):
             if key is 'io':
                 p.io += pp.io
-            elif key[:2] is not '__':
-                if not hasattr( params, key ):
+            elif key[:2] is not '__' and key is not 's_':
+                if not hasattr( p, key ):
                     sys.exit( 'Unknown SORD parameter: %r in %s' % ( key, pp.__file__ ) )
                 setattr( p, key, getattr( pp, key ) )
 
 # Prepare input
-def pprep( params ):
+def pprep( p ):
 
     # hypocenter
     ii = list( p.ihypo )
@@ -268,7 +269,7 @@ def pprep( params ):
             'sv1', 'sv2', 'sv3', 'svm', 'psv',
             'sa1', 'sa2', 'sa3', 'sam',
             'nhat1', 'nhat2', 'nhat3', 'trup', 'tarr' ])
-        if mode[0] in 'rsc':
+        if mode[0] in 'r=':
             if field not in readable: sys.exit( 'unknown input var: %s'  % f )
         elif mode[0] is 'w':
             if field not in writable: sys.exit( 'unknown output var: %s' % f )

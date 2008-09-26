@@ -138,7 +138,7 @@ if ( all( i3 <= i4 ) ) then
   case( 's' )
     f(i3(1):i4(1):di(1),i3(2):i4(2):di(2),i3(3):i4(3):di(3)) = p%val
   case( 'c' )
-! FIXME
+! FIXME 
     call cube( f, w1, i3, i4, p%x1, p%x2, p%val )
   case( 'C' )
 ! FIXME
