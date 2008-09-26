@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from sord import *
+from sord import _
 
 # SORD Defaults
 
@@ -24,11 +24,11 @@ gridnoise = 0.			# random noise added to mesh, assumes planar fault
 oplevel = 0			# *spatial difference operator level (see below)
 vdamp = -1.			# Vs dependent damping
 hourglass = 1., 1.		# hourglass stiffness (1) and viscosity (2)
-io += [				# *I/O sequence (see below)
+io = [				# *I/O sequence (see below)
   ( '=', 'rho', _[:,:,:,0], 2670.     ),	# density
   ( '=', 'vp',  _[:,:,:,0], 6000.     ),	# P-wave speed
   ( '=', 'vs',  _[:,:,:,0], 3464.1016 ),	# S-wave speed
-  ( '=', 'gam', _[:,:,:,0],   0.      ),	# viscosity
+  ( '=', 'gam', _[:,:,:,0],    0.     ),	# viscosity
 ]
 rho1 = -1.			# min density
 rho2 = -1.			# max density
@@ -72,26 +72,26 @@ rcrit = 1000.			# nucleation critical radius
 trelax = 0.07			# nucleation relaxation time
 svtol = 0.001			# slip velocity considered rupturing
 io += [				# *I/O sequence (see below)
-   ( '=', 'mus', _[:,:,:,0]    0.6 ),	# coef of static friction
-   ( '=', 'mud', _[:,:,:,0]    0.5 ),	# coef of dynamic friction
-   ( '=',  'dc', _[:,:,:,0]    0.4 ),	# slip-weakening distance
-  #( '=',  'co', _[:,:,:,0]     0. ),	# cohesion
-   ( '=', 'ts1', _[:,:,:,0]  -70e6 ),	# shear traction component 1
-  #( '=', 'ts2', _[:,:,:,0]     0. ),	# shear traction component 2
-   ( '=',  'tn', _[:,:,:,0] -120e6 ),	# normal traction
-  #( '=', 'sxx', _[:,:,:,0]     0. ),	# prestress Sxx
-  #( '=', 'syy', _[:,:,:,0]     0. ),	# prestress Syy
-  #( '=', 'szz', _[:,:,:,0]     0. ),	# prestress Szz
-  #( '=', 'syz', _[:,:,:,0]     0. ),	# prestress Syz
-  #( '=', 'szx', _[:,:,:,0]     0. ),	# prestress Szx
-  #( '=', 'sxy', _[:,:,:,0]     0. ),	# prestress Sxy
+   ( '=', 'mus', _[:,:,:,0],    0.6 ),	# coef of static friction
+   ( '=', 'mud', _[:,:,:,0],    0.5 ),	# coef of dynamic friction
+   ( '=', 'dc',  _[:,:,:,0],    0.4 ),	# slip-weakening distance
+  #( '=', 'co',  _[:,:,:,0],    0.  ),	# cohesion
+   ( '=', 'ts1', _[:,:,:,0],  -70e6 ),	# shear traction component 1
+  #( '=', 'ts2', _[:,:,:,0],    0.  ),	# shear traction component 2
+   ( '=', 'tn',  _[:,:,:,0], -120e6 ),	# normal traction
+  #( '=', 'sxx', _[:,:,:,0],    0.  ),	# prestress Sxx
+  #( '=', 'syy', _[:,:,:,0],    0.  ),	# prestress Syy
+  #( '=', 'szz', _[:,:,:,0],    0.  ),	# prestress Szz
+  #( '=', 'syz', _[:,:,:,0],    0.  ),	# prestress Syz
+  #( '=', 'szx', _[:,:,:,0],    0.  ),	# prestress Szx
+  #( '=', 'sxy', _[:,:,:,0],    0.  ),	# prestress Sxy
 ]
 
 # I/O sequence types:
-#   ( '=', 'f', _[....], val ):           Set initial array to val
+#   ( '=', 'f', _[....], val ):           Set array to val
 #   ( '=', 'f', _[....], x1, x2, val ):   Set Cartesian cube to val
-#   ( 'r', 'f', _[....], nb ):            Read initial array from disk
-#   ( 'w', 'f', _[....], nb ):            Read initial array from disk
+#   ( 'r', 'f', _[....], nb ):            Read array from disk
+#   ( 'w', 'f', _[....], nb ):            Write array to disk
 # Key:
 #  'f': Field name
 #   _[....]: Slice indices

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from sord import *
+from sord import _
 
 # Explosion test problem for comparison with DFM
 np = 1, 2, 1

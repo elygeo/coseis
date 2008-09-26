@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from sord import *
+from sord import _
 
 # PEER LOH.1 - Layer over a halfspace, buried double couple source
 

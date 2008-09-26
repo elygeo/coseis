@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from sord import *
+from sord import _
 
 # TPV3 - SCEC validation problem version 3
 

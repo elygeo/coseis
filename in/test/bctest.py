@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from sord import *
+from sord import _
 
 # Boundary condition test
 # numerical noise will make these differ slighly

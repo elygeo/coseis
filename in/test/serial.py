@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-from sord import *
+from sord import _
 
 # Test
 
 nt = 10
-np = ( 1, 1, 1 )
+np = 1, 1, 1
