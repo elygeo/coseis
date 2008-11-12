@@ -23,10 +23,10 @@ bc2 = -2, 2, -2
 
 # Material properties
 fieldio = [
-    ( '=',  'rho', [], 2670. ),	# density
-    ( '=',  'vp',  [], 6000. ),	# P-wave speed
-    ( '=',  'vs',  [], 3464. ),	# S-wave speed
-    ( '=',  'gam', [], 0.2   ),	# viscosity
+    ( '=',  'rho', [], 2670. ),		# density
+    ( '=',  'vp',  [], 6000. ),		# P-wave speed
+    ( '=',  'vs',  [], 3464. ),		# S-wave speed
+    ( '=',  'gam', [], 0.2   ),		# viscosity
     ( '=c', 'gam', [], 0.02, (-15001.,-7501.,-4000.), (15001.,7501.,4000.) ),
 ]
 hourglass = 1., 2.
@@ -48,19 +48,19 @@ fieldio += [
 
 # Write fault plane output
 fieldio += [
-    ( '=w', 'x1',   [0,0,-2,0], 'x1'   ),	# Mesh coordinate X
-    ( '=w', 'x2',   [0,0,-2,0], 'x2'   ),	# Mesh coordinate Y
-    ( '=w', 'x3',   [0,0,-2,0], 'x3'   ),	# Mesh coordinate Z
-    ( '=w', 'sl',   [0,0,0,-1], 'sl'   ),	# Final slip
-    ( '=w', 'psv',  [0,0,0,-1], 'psv'  ),	# Peak slip velocity
-    ( '=w', 'trup', [0,0,0,-1], 'trup' ),	# Rupture time
+    ( '=w', 'x1',   [0,0,-2, 0], 'x1'   ),	# mesh coordinate X
+    ( '=w', 'x2',   [0,0,-2, 0], 'x2'   ),	# mesh coordinate Y
+    ( '=w', 'su1',  [0,0,-2,-1], 'su1'  ),	# final horizontal slip
+    ( '=w', 'su2',  [0,0,-2,-1], 'su2'  ),	# final vertical slip
+    ( '=w', 'psv',  [0,0,-2,-1], 'psv'  ),	# peak slip velocity
+    ( '=w', 'trup', [0,0,-2,-1], 'trup' ),	# rupture time
 ]
 
 # Write slip, slip velocity, and shear traction time history
 for _f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':
     fieldio += [
-        ( '=wx', _f, [], 'P1_'+_f, (-7499.,-1.,0.) ), # Mode II point
-        ( '=wx', _f, [], 'P2_'+_f, (-1.,-5999.,0.) ), # Mode III point
+        ( '=wx', _f, [], 'P1_'+_f, (-7499.,-1.,0.) ), # mode II point
+        ( '=wx', _f, [], 'P2_'+_f, (-1.,-5999.,0.) ), # mode III point
     ]
 
 sord.run( locals() )

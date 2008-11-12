@@ -60,6 +60,8 @@ def build( mode='sm', optimize='gpO' ):
             object = '..' + os.sep + 'bin' + os.sep + 'sord-m' + opt
             compiler = cfg['mfc'] + cfg[opt]
             new |= util.compile( compiler, object, source )
+    if new:
+        util.tarball()
     os.chdir( cwd )
     return
 
@@ -161,6 +163,8 @@ if __name__ == '__main__':
             docs()
         elif sys.argv[1] == 'install':
             util.install()
+        elif sys.argv[1] == 'uninstall':
+            util.uninstall()
         else:
             sys.exit( 'Error: unknown option: %r' % sys.argv[1] )
 

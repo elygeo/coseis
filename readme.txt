@@ -212,9 +212,10 @@ making it clean and understandable.
 Development
 -----------
 
-Contributions to the SORD code and documentation are greatly appreciated.  The
-latest development version is under `Bazaar <http://bazaar-vcs.org/>`_ version
-control.  To grab the latest run::
+Suggestions for improvements, and contributions to the SORD code and
+documentation are greatly appreciated.  The latest development version can be
+obtained from our `Bazaar <http://bazaar-vcs.org/>`_ source code repository
+with::
 
     bzr checkout http://earth.usc.edu/~gely/sord
 

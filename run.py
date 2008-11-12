@@ -111,6 +111,20 @@ def run( params ):
     print 'Run directory: ' + rundir
     rundir = os.path.realpath( rundir )
     os.mkdir( rundir )
+    for f in ( 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint' ):
+        os.mkdir( rundir + os.sep + f )
+
+    # Link input files
+    for i, line in enumerate( params.fieldio ):
+        if 'r' in line[0]:
+            filename = line[3]
+            f = 'in' + os.sep + os.path.basename( filename )
+            try:
+                os.symlink( filename, rundir + os.sep + f )
+            except:
+                shutil.copy( filename, rundir + os.sep + f )
+            line = line[:3] + ( f, ) + line[4:]
+            params.fieldio[i] = line
 
     # Template variables
     code = 'sord'
@@ -148,13 +162,11 @@ def run( params ):
             file( ff, 'w' ).write( out )
             shutil.copymode( f, ff )
 
-    # Write input file
+    # Write parameter file
     os.chdir( rundir )
     log = file( 'log', 'w' )
     log.write( starttime + ': SORD setup started\n' )
     write_params( params )
-    for f in ( 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint' ):
-        os.mkdir( f )
 
     # Run or que job
     if run == 'q':
@@ -220,7 +232,7 @@ def prepare_params( pp ):
         line = list( line )
         filename = '-'
         x1 = x2 = 0., 0., 0.
-        tfunc, period = 'const', 1.0
+        tfunc, val, period = 'const', 1.0, 1.0
         op = line[0][0]
         mode = line[0][1:]
         if op not in '=+': sys.exit( 'Error: unsupported operator: %r' % line )
@@ -255,12 +267,6 @@ def prepare_params( pp ):
             fn = os.path.dirname( filename ) + os.sep + 'endian'
             if file( fn, 'r' ).read()[0] != sys.byteorder[0]:
                 sys.exit( 'Error: wrong byte order for ' + filename )
-            fn = 'in' + os.sep + os.path.basename( filename )
-            try:
-                os.symlink( filename, fn )
-            except:
-                shutil.copy( filename, fn )
-            filename = fn
         if f in fieldnames.cell:
             mode = mode.replace( 'x', 'X' )
             mode = mode.replace( 'c', 'C' )

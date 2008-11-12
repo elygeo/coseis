@@ -141,6 +141,16 @@ def install():
     shutil.copytree( srcdir, dstdir )
     return
 
+def uninstall():
+    """Remove package from site-packages directory"""
+    from distutils.sysconfig import get_python_lib
+    import os, shutil
+    dstdir = get_python_lib() + os.sep + os.path.basename( srcdir )
+    print dstdir
+    try: shutil.rmtree( dstdir )
+    except: pass
+    return
+
 def tarball( filename=None, ignorefile='.bzrignore' ):
     """Make a tar archinve of the current directory skipping patterns from ignorefile"""
     import os, pwd, glob, tarfile, re, fnmatch, datetime
