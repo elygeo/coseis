@@ -120,7 +120,7 @@ def run( params ):
             filename = line[3]
             f = 'in' + os.sep + os.path.basename( filename )
             try:
-                os.symlink( filename, rundir + os.sep + f )
+                os.link( filename, rundir + os.sep + f )
             except:
                 shutil.copy( filename, rundir + os.sep + f )
             line = line[:3] + ( f, ) + line[4:]
