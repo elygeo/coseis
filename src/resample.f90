@@ -1,4 +1,4 @@
-! Initial state
+! Resample material arrays
 module m_resample
 implicit none
 contains
@@ -32,13 +32,13 @@ s2 = mr * s1
 call scalar_average( mr, s2, i1node, i2node, -1 )
 call invert( mr )
 call scalar_swap_halo( mr, nhalo )
-call scalarbc( mr, bc1, bc2, i1bc, i2bc )
+call scalar_bc( mr, bc1, bc2, i1bc, i2bc )
 
 ! Viscosity, bc=4 means copy into halo for resampling at the node
 bc = 4
 i1 = i1bc - 1
 i2 = i2bc
-call scalarbc( gam, bc, bc, i1, i2 )
+call scalar_bc( gam, bc, bc, i1, i2 )
 s2 = gam * dt
 call scalar_average( gam, s2, i1node, i2node, -1 )
 call scalar_set_halo( gam, 0., i1bc, i2bc )
@@ -51,40 +51,29 @@ lam = lam * s1
 mu = mu * s1
 
 ! Initial state
-  tm    =  0.
-  vv    =  0.
-  uu    =  0.
-  w1    =  0.
-! z1    =  0.
-! z2    =  0.
-  sl    =  0.
-  p1    =  0.
-  p2    =  0.
-  p3    =  0.
-  p4    =  0.
-  p5    =  0.
-  p6    =  0.
-  g1    =  0.
-  g2    =  0.
-  g3    =  0.
-  g4    =  0.
-  g5    =  0.
-  g6    =  0.
-  pv    =  0.
+tm = 0.
+vv = 0.
+uu = 0.
+w1 = 0.
+!z1 = 0.
+!z2 = 0.
+sl = 0.
+p1 = 0.
+p2 = 0.
+p3 = 0.
+p4 = 0.
+p5 = 0.
+p6 = 0.
+g1 = 0.
+g2 = 0.
+g3 = 0.
+g4 = 0.
+g5 = 0.
+g6 = 0.
 
-! now setting these in fault subroutine
-! psv   =  0.
-! trup  =  1e9
-! tarr  =  0.
-! efric =  0.
-
-  w2    =  0.
-  s1    =  0.
-  s2    =  0.
-  t1    =  0.
-  t2    =  0.
-  f1    =  0.
-  f2    =  0.
+w2 = 0.
+s1 = 0.
+s2 = 0.
 
 end subroutine
 

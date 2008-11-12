@@ -1,4 +1,4 @@
-! Acceleration Calculation
+! Acceleration calculation
 module m_acceleration
 implicit none
 contains
@@ -9,10 +9,12 @@ use m_diffcn
 use m_hourglass
 use m_bc
 use m_util
+use m_fieldio
+use m_stats
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq
 
 if ( master .and. debug == 2 ) write( 0, * ) 'Acceleration'
-call scalarsethalo( s1, 0., i1node, i2node )
+call scalar_set_halo( s1, 0., i1node, i2node )
 
 ! Loop over component and derivative direction
 doic: do ic  = 1, 3
@@ -104,8 +106,8 @@ end do doic
 
 ! Hourglass control. Only viscous in PML
 if ( any( hourglass > 0. ) ) then
-call scalarsethalo( s1, 0., i1cell, i2cell )
-call scalarsethalo( s2, 0., i1node, i2node )
+call scalar_set_halo( s1, 0., i1cell, i2cell )
+call scalar_set_halo( s2, 0., i1node, i2node )
 w2 = hourglass(1) * uu + dt * hourglass(2) * vv
 do iq = 1, 4
 do ic = 1, 3
@@ -161,24 +163,9 @@ end if
 call vector_bc( w1, bc1, bc2, i1bc, i2bc )
 
 ! Nodal force I/O
-p => pio0
-do while( associated( p%next ) )
-  p => p%next
-  select case( p%field )
-  case( 'f1' ); call rio4( 'in', p, .false., w1(:,:,:1) )
-  case( 'f2' ); call rio4( 'in', p, .false., w1(:,:,:2) )
-  case( 'f3' ); call rio4( 'in', p, .false., w1(:,:,:3) )
-  end select
-end do
-p => pio0
-do while( associated( p%next ) )
-  p => p%next
-  select case( p%field )
-  case( 'f1' ); call rio4( 'out', p, .false., w1(:,:,:1) )
-  case( 'f2' ); call rio4( 'out', p, .false., w1(:,:,:2) )
-  case( 'f3' ); call rio4( 'out', p, .false., w1(:,:,:3) )
-  end select
-end do
+call fieldio( '<>', 'f1', w1(:,:,:,1) )
+call fieldio( '<>', 'f2', w1(:,:,:,2) )
+call fieldio( '<>', 'f3', w1(:,:,:,3) )
 
 ! Newton's law: a_i = f_i / m
 do i = 1, 3
@@ -186,24 +173,15 @@ do i = 1, 3
 end do
 
 ! Acceleration I/O
-p => pio0
-do while( associated( p%next ) )
-  p => p%next
-  select case( p%field )
-  case( 'a1' ); call rio4( 'in', p, .false., w1(:,:,:1) )
-  case( 'a2' ); call rio4( 'in', p, .false., w1(:,:,:2) )
-  case( 'a3' ); call rio4( 'in', p, .false., w1(:,:,:3) )
-  end select
-end do
-p => pio0
-do while( associated( p%next ) )
-  p => p%next
-  select case( p%field )
-  case( 'a1' ); call rio4( 'out', p, .false., w1(:,:,:1) )
-  case( 'a2' ); call rio4( 'out', p, .false., w1(:,:,:2) )
-  case( 'a3' ); call rio4( 'out', p, .false., w1(:,:,:3) )
-  end select
-end do
+call fieldio( '<>', 'a1', w1(:,:,:,1) )
+call fieldio( '<>', 'a2', w1(:,:,:,2) )
+call fieldio( '<>', 'a3', w1(:,:,:,3) )
+if ( modulo( it, itstats ) == 0 ) then
+  call vector_norm( s1, w1, i1core, i2core, (/ 1, 1, 1 /) )
+  call scalar_set_halo( s1, -1., i1core, i2core )
+  amax = maxval( s1 )
+end if
+call fieldio( '>', 'am2', s1  )
 
 end subroutine
 

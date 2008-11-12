@@ -1,4 +1,4 @@
-! Moment source and finite source
+! Moment source
 module m_source
 implicit none
 real, private, allocatable :: srcfr(:)
@@ -14,11 +14,6 @@ use m_util
 real, allocatable :: cellvol(:)
 integer :: i1(3), i2(3), i, j, k, l, nsrc
 real :: sumsrcfr, allsumsrcfr
-
-! Finite source indices
-call zone( i1source, i2source, nn, nnoff, ihypo, faultnormal )
-i1source = max( i1source, 1  )
-i2source = min( i2source, nm )
 
 ! Moment source
 if ( rsource <= 0. ) return
@@ -108,47 +103,6 @@ do i = 1, nsrc
   l = ll(i)
   w1(j,k,l,ic) = w1(j,k,l,ic) - srcft * srcfr(i) * moment1(ic)
   w2(j,k,l,ic) = w2(j,k,l,ic) - srcft * srcfr(i) * moment2(ic)
-end do
-end do
-
-end subroutine
-
-!------------------------------------------------------------------------------!
-
-! Add finite source
-subroutine finite_source
-use m_globals
-integer :: j, k, l
-real :: t, srcft = 0.
-
-if ( any( i1source > i2source ) ) return
-if ( master .and. debug == 2 ) write( 0, * ) 'Finite source'
-
-! Source time function
-select case( tfunc )
-case( 'delta'  )
-  if ( it == 0 ) srcft = 1.
-case( 'brune' )
-  srcft = exp( -tm / tsource ) * tm / ( tsource * tsource )
-case( 'ricker1' )
-  t = tm - tsource
-  srcft = t * exp( -2. * ( pi * t / tsource ) ** 2. )
-case( 'ricker2' )
-  t = ( pi * ( tm - tsource ) / tsource ) ** 2.
-  srcft = ( 1. - 2. * t ) * exp( -t )
-case default
-  write( 0, * ) 'invalid tfunc: ', trim( tfunc )
-  stop
-end select
-
-! Set displacement
-do l = i1source(3), i2source(3)
-do k = i1source(2), i2source(2)
-do j = i1source(1), i2source(1)
-  uu(j,k,l,1) = srcft * moment1(1)
-  uu(j,k,l,2) = srcft * moment1(2)
-  uu(j,k,l,3) = srcft * moment1(3)
-end do
 end do
 end do
 

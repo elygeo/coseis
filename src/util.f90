@@ -1,52 +1,7 @@
-! Misc utilities
+! Miscellaneous utilities
 module m_util
 implicit none
 contains
-
-subroutine zone( i1, i2, nn, nnoff, ihypo, faultnormal )
-integer, intent(inout) :: i1(3), i2(3)
-integer, intent(in) :: nn(3), nnoff(3), ihypo(3), faultnormal
-integer :: i, nshift(3)
-logical :: m0(3), m1(3), m2(3), m3(3), m4(3)
-nshift = 0
-i = abs( faultnormal )
-if ( i /= 0 ) nshift(i) = 1
-m0 = i1 == 0 .and. i2 == 0
-m1 = i1 == 0 .and. i2 /= 0
-m2 = i1 /= 0 .and. i2 == 0
-m3 = i1 < 0
-m4 = i2 < 0
-where ( m0 ) i1 = ihypo + nnoff
-where ( m0 ) i2 = ihypo + nnoff + nshift
-where ( m1 ) i1 = ihypo + nnoff + nshift
-where ( m2 ) i2 = ihypo + nnoff
-where ( m3 ) i1 = i1 + nn + 1
-where ( m4 ) i2 = i2 + nn + 1
-i1 = max( i1, 1 )
-i2 = min( i2, nn )
-i1 = i1 - nnoff
-i2 = i2 - nnoff
-end subroutine
-
-subroutine cube( f, x, i1, i2, x1, x2, r )
-real, intent(inout) :: f(:,:,:)
-real, intent(in) :: x(:,:,:,:), x1(3), x2(3), r
-integer, intent(in) :: i1(3), i2(3)
-integer :: n(3), o(3), j, k, l
-n = (/ size(f,1), size(f,2), size(f,3) /)
-o = 0
-where ( n == 1 ) o = 1 - i1
-do l = i1(3), i2(3)
-do k = i1(2), i2(2)
-do j = i1(1), i2(1)
-if( x(j,k,l,1) >= x1(1) .and. x(j,k,l,1) <= x2(1) .and. &
-    x(j,k,l,2) >= x1(2) .and. x(j,k,l,2) <= x2(2) .and. &
-    x(j,k,l,3) >= x1(3) .and. x(j,k,l,3) <= x2(3) ) &
-    f(j+o(1),k+o(2),l+o(3)) = r
-end do
-end do
-end do
-end subroutine
 
 subroutine invert( f )
 real, intent(inout) :: f(:,:,:)
@@ -124,16 +79,16 @@ end do
 end do
 end subroutine
 
-subroutine vector_norm( s, f, i1, i2 )
+subroutine vector_norm( s, f, i1, i2, di )
 real, intent(out) :: s(:,:,:)
 real, intent(in) :: f(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3)
+integer, intent(in) :: i1(3), i2(3), di(3)
 integer :: n(3), j, k, l
 n = (/ size(s,1), size(s,2), size(s,3) /)
 if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vector_norm'
-do l = i1(3), i2(3)
-do k = i1(2), i2(2)
-do j = i1(1), i2(1)
+do l = i1(3), i2(3), di(3)
+do k = i1(2), i2(2), di(2)
+do j = i1(1), i2(1), di(1)
   s(j,k,l) = &
   f(j,k,l,1) * f(j,k,l,1) + &
   f(j,k,l,2) * f(j,k,l,2) + &
@@ -143,16 +98,16 @@ end do
 end do
 end subroutine
 
-subroutine tensor_norm( s, f1, f2, i1, i2 )
+subroutine tensor_norm( s, f1, f2, i1, i2, di )
 real, intent(out) :: s(:,:,:)
 real, intent(in) :: f1(:,:,:,:), f2(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3)
+integer, intent(in) :: i1(3), i2(3), di(3)
 integer :: n(3), j, k, l
 n = (/ size(s,1), size(s,2), size(s,3) /)
 if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in tensor_norm'
-do l = i1(3), i2(3)
-do k = i1(2), i2(2)
-do j = i1(1), i2(1)
+do l = i1(3), i2(3), di(3)
+do k = i1(2), i2(2), di(2)
+do j = i1(1), i2(1), di(1)
   s(j,k,l) = &
   f1(j,k,l,1) * f1(j,k,l,1) + &
   f1(j,k,l,2) * f1(j,k,l,2) + &
@@ -196,6 +151,32 @@ if ( n(1) > 1 ) f(i4(1)+1:,:,:,:) = r
 if ( n(2) > 1 ) f(:,i4(2)+1:,:,:) = r
 if ( n(3) > 1 ) f(:,:,i4(3)+1:,:) = r
 end subroutine
+
+! Time function
+real function time_function( tfunc, tm, dt, period )
+character(*), intent(in) :: tfunc
+real, intent(in) :: tm, dt, period
+real, parameter :: pi = 3.14159
+real :: t
+time_function = 0.
+select case( tfunc )
+case( 'const'  )
+  time_function = 1.
+case( 'delta'  )
+  if ( abs( tm ) < 0.25 * dt ) time_function = 1.
+case( 'brune' )
+  time_function = exp( -tm / period ) * tm / ( period * period )
+case( 'ricker1' )
+  t = tm - period
+  time_function = t * exp( -2. * ( pi * t / period ) ** 2. )
+case( 'ricker2' )
+  t = ( pi * ( tm - period ) / period ) ** 2.
+  time_function = ( 1. - 2. * t ) * exp( -t )
+case default
+  write( 0, * ) 'invalid time func: ', trim( tfunc )
+  stop
+end select
+end function
 
 ! Timer
 real function timer( i )

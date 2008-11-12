@@ -1,7 +1,8 @@
-! Collective routines - hooks for parallelization
+! Collective routines - serial version
 module m_collective
+use m_frio
 implicit none
-integer :: fh0 = 0
+integer :: file_null = -1
 contains
 
 ! Initialize
@@ -18,11 +19,12 @@ subroutine finalize
 end subroutine
 
 ! Process rank
-subroutine rank( ip3, np )
-integer, intent(out) :: ip3(3)
+subroutine rank( ip3, ipid, np )
+integer, intent(out) :: ip3(3), ipid
 integer, intent(in) :: np(3)
 ip3 = np
 ip3 = 0
+ipid = 0
 end subroutine
 
 ! Set root process
@@ -123,53 +125,35 @@ return
 f(1,1,1,1) = f(1,1,1,1) - n(1) + n(1)
 end subroutine
 
-! 1D I/O
-subroutine rio1( id, mpio, str, ft, ir, nr )
+! 1D input/output
+subroutine rio1( fh, f, mode, filename, m, o, mpio )
 use m_frio
-real, intent(inout) :: ft(:)
-integer, intent(in) :: id, mpio, ir, nr
-character(*), intent(in) :: str
+integer, intent(inout) :: fh
+real, intent(inout) :: f(:)
+character(1), intent(in) :: mode
+character(*), intent(in) :: filename
+integer, intent(in) :: m, o, mpio
+real :: ff(1,size(f))
 integer :: i
-if ( size( ft ) == 0 .or. id == 0 ) return
-if ( size( ft ) > ir .or. ir > nr ) stop 'error in rio1'
-call frio1( id, str, ft, ir, nr )
+if ( mode == 'w' ) ff(1,:) = f
+call frio2( fh, ff, mode, filename, m, o )
+if ( mode == 'r' ) f = ff(1,:) 
 i = mpio
 end subroutine
 
-! 3D I/O
-subroutine rio3( id, mpio, str, f, i1, i2, i3, i4, ifill )
+! 2D input/output
+subroutine rio2( fh, f, mode, filename, mm, nn, oo, mpio )
 use m_frio
-real, intent(inout) :: f(:,:,:)
-integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), ifill(3)
-character(*), intent(in) :: str
+integer, intent(inout) :: fh
+real, intent(inout) :: f(:,:)
+character(1), intent(in) :: mode
+character(*), intent(in) :: filename
+integer, intent(in) :: mm(:), nn(:), oo(:), mpio
 integer :: i
-if ( id == 0 ) return
-if ( any( i1 /= i3 .or. i2 /= i4 ) ) then
-  write( 0, * ) 'Error in rio3: ', id, str
-  write( 0, * ) i1, i2
-  write( 0, * ) i3, i4
-  stop
-end if
-call frio3( id, str, f, i1, i2, ifill )
-i = mpio
-end subroutine
-
-! 4D I/O
-subroutine rio4( id, mpio, str, f, i1, i2, i3, i4, ifill )
-use m_frio
-real, intent(inout) :: f(:,:,:,:)
-integer, intent(in) :: id, mpio, i1(4), i2(4), i3(4), i4(4), ifill(4)
-character(*), intent(in) :: str
-integer :: i
-if ( id == 0 ) return
-if ( any( i1(1:3) /= i3(1:3) .or. i2(1:3) /= i4(1:3) .or. i4(4) > i2(4) ) ) then
-  write( 0, * ) 'Error in rio4: ', id, str
-  write( 0, * ) i1, i2
-  write( 0, * ) i3, i4
-  stop
-end if
-call frio4( id, str, f, i3, i4, i2(4), ifill )
-i = mpio
+if ( any( nn < 1 ) ) return
+i = size( oo )
+call frio2( fh, f, mode, filename, mm(i), oo(i) )
+i = mpio + nn(1)
 end subroutine
 
 end module

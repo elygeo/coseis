@@ -7,6 +7,8 @@ subroutine stress
 use m_globals
 use m_diffnc
 use m_util
+use m_fieldio
+use m_stats
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id
 
 if ( master .and. debug == 2 ) write( 0, * ) 'Stress'
@@ -140,28 +142,12 @@ end do doid
 end do doic
 
 ! Strain I/O
-p => iolist0
-do while( associated( p%next ) )
-  p => p%next
-  select case( p%field )
-  case( 'exx' ); call rio4( 'in', p, .false., w1(:,:,:1) )
-  case( 'eyy' ); call rio4( 'in', p, .false., w1(:,:,:2) )
-  case( 'ezz' ); call rio4( 'in', p, .false., w1(:,:,:3) )
-  case( 'eyz' ); call rio4( 'in', p, .false., w2(:,:,:1) )
-  case( 'ezx' ); call rio4( 'in', p, .false., w2(:,:,:2) )
-  case( 'exy' ); call rio4( 'in', p, .false., w2(:,:,:3) )
-end do
-p => iolist0
-do while( associated( p%next ) )
-  p => p%next
-  select case( p%field )
-  case( 'exx' ); call rio4( 'out', p, .false., w1(:,:,:1) )
-  case( 'eyy' ); call rio4( 'out', p, .false., w1(:,:,:2) )
-  case( 'ezz' ); call rio4( 'out', p, .false., w1(:,:,:3) )
-  case( 'eyz' ); call rio4( 'out', p, .false., w2(:,:,:1) )
-  case( 'ezx' ); call rio4( 'out', p, .false., w2(:,:,:2) )
-  case( 'exy' ); call rio4( 'out', p, .false., w2(:,:,:3) )
-end do
+call fieldio( '<>', 'exx', w1(:,:,:,1) )
+call fieldio( '<>', 'eyy', w1(:,:,:,2) )
+call fieldio( '<>', 'ezz', w1(:,:,:,3) )
+call fieldio( '<>', 'eyz', w2(:,:,:,1) )
+call fieldio( '<>', 'ezx', w2(:,:,:,2) )
+call fieldio( '<>', 'exy', w2(:,:,:,3) )
 
 ! Attenuation
 !do j = 1, 2
@@ -181,29 +167,19 @@ do i = 1, 3
   w2(:,:,:,i) =      mu * w2(:,:,:,i)
 end do
 
-! Sress I/O
-p => iolist0
-do while( associated( p%next ) )
-  p => p%next
-  select case( p%field )
-  case( 'wxx' ); call rio4( 'in', p, .false., w1(:,:,:1) )
-  case( 'wyy' ); call rio4( 'in', p, .false., w1(:,:,:2) )
-  case( 'wzz' ); call rio4( 'in', p, .false., w1(:,:,:3) )
-  case( 'wyz' ); call rio4( 'in', p, .false., w2(:,:,:1) )
-  case( 'wzx' ); call rio4( 'in', p, .false., w2(:,:,:2) )
-  case( 'wxy' ); call rio4( 'in', p, .false., w2(:,:,:3) )
-end do
-p => inp0
-do while( associated( p%next ) )
-  p => p%next
-  select case( p%field )
-  case( 'wxx' ); call rio4( 'out', p, .false., w1(:,:,:1) )
-  case( 'wyy' ); call rio4( 'out', p, .false., w1(:,:,:2) )
-  case( 'wzz' ); call rio4( 'out', p, .false., w1(:,:,:3) )
-  case( 'wyz' ); call rio4( 'out', p, .false., w2(:,:,:1) )
-  case( 'wzx' ); call rio4( 'out', p, .false., w2(:,:,:2) )
-  case( 'wxy' ); call rio4( 'out', p, .false., w2(:,:,:3) )
-end do
+! Stress I/O
+call fieldio( '<>', 'wxx', w1(:,:,:,1) )
+call fieldio( '<>', 'wyy', w1(:,:,:,2) )
+call fieldio( '<>', 'wzz', w1(:,:,:,3) )
+call fieldio( '<>', 'wyz', w2(:,:,:,1) )
+call fieldio( '<>', 'wzx', w2(:,:,:,2) )
+call fieldio( '<>', 'wxy', w2(:,:,:,3) )
+if ( modulo( it, itstats ) == 0 ) then
+  call tensor_norm( s1, w1, w2, i1core, i2core, (/ 1, 1, 1 /) )
+  call scalar_set_halo( s1, -1., i1core, i2core )
+  wmax = maxval( s1 )
+end if
+call fieldio( '>', 'wm2', s1  )
 
 end subroutine
 

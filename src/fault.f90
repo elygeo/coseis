@@ -9,15 +9,15 @@ use m_globals
 use m_collective
 use m_surfnormals
 use m_util
-real :: rr
-integer :: i1(3), i2(3), i3(3), i4(3), ifill(3), i, j, k, l
-real, pointer :: f(:,:,:)
-type( t_io ), pointer :: p
+use m_fieldio
+use m_stats
+real :: rr, mu0, mus0, mud0, dc0, tn0, ts0, ess, lc,  rctest          
+integer :: i1(3), i2(3), i, j, k, l
 
 if ( ifn == 0 ) return
 if ( master ) write( 0, * ) 'Fault initialization'
 
-! Input
+! I/O
 mus = 0.
 mud = 0.
 dc = 0.
@@ -25,19 +25,19 @@ co = 0.
 t1 = 0.
 t2 = 0.
 t3 = 0.
-call input( 'mus', mus         )
-call input( 'mud', mud         )
-call input( 'dc',  dc          )
-call input( 'co',  co          )
-call input( 'sxx', t1(:,:,:,1) )
-call input( 'syy', t1(:,:,:,2) )
-call input( 'szz', t1(:,:,:,3) )
-call input( 'syz', t2(:,:,:,1) )
-call input( 'szx', t2(:,:,:,2) )
-call input( 'sxy', t2(:,:,:,3) )
-call input( 'ts1', t3(:,:,:,1) )
-call input( 'ts2', t3(:,:,:,2) )
-call input( 'tn',  t3(:,:,:,3) )
+call fieldio( '<>', 'mus', mus         )
+call fieldio( '<>', 'mud', mud         )
+call fieldio( '<>', 'dc',  dc          )
+call fieldio( '<>', 'co',  co          )
+call fieldio( '<>', 'sxx', t1(:,:,:,1) )
+call fieldio( '<>', 'syy', t1(:,:,:,2) )
+call fieldio( '<>', 'szz', t1(:,:,:,3) )
+call fieldio( '<>', 'syz', t2(:,:,:,1) )
+call fieldio( '<>', 'szx', t2(:,:,:,2) )
+call fieldio( '<>', 'sxy', t2(:,:,:,3) )
+call fieldio( '<>', 'ts',  t3(:,:,:,1) )
+call fieldio( '<>', 'td',  t3(:,:,:,2) )
+call fieldio( '<>', 'tn',  t3(:,:,:,3) )
 
 ! Test for endian problems
 if ( any( mus /= mus ) .or. maxval( mus ) > huge( rr ) ) stop 'NaN/Inf in mus'
@@ -72,6 +72,9 @@ call invert( f1 )
 do i = 1, 3
   nhat(:,:,:,i) = nhat(:,:,:,i) * f1
 end do
+call fieldio( '>', 'nhat1', nhat(:,:,:,1) )
+call fieldio( '>', 'nhat2', nhat(:,:,:,2) )
+call fieldio( '>', 'nhat3', nhat(:,:,:,3) )
 
 ! Resolve prestress onto fault
 do i = 1, 3
@@ -136,58 +139,11 @@ if ( ifn /= 2 ) muf(:,2:k,:) = .5 * ( muf(:,2:k,:) + muf(:,1:k-1,:) )
 if ( ifn /= 3 ) muf(:,:,2:l) = .5 * ( muf(:,:,2:l) + muf(:,:,1:l-1) )
 call invert( muf )
 
-! Save for output
-tn = sum( t0 * nhat, 4 )
-do i = 1, 3
-  t2(:,:,:,i) = tn * nhat(:,:,:,i)
-end do
-t3 = t0 - t2
-ts = sqrt( sum( t3 * t3, 4 ) )
-f1 = 0.
-f2 = 0.
-t1 = 0.
-t2 = 0.
-
 ! Initial state, can be overwritten by read_checkpoint
 psv   =  0.
 trup  =  1e9
 tarr  =  0.
 efric =  0.
-
-! Output
-if ( it == 0 ) then
-  p => pio0
-  do while( associated( p%next ) )
-    p => p%next
-    call rio4( 'out', 'mus',  mus         )
-    call rio4( 'out', 'mud',  mud         )
-    call rio4( 'out', 'dc',   dc          )
-    call rio4( 'out', 'co',   co          )
-    call rio4( 'out', 'ts1',  t3(:,:,:,1) )
-    call rio4( 'out', 'ts2',  t3(:,:,:,2) )
-    call rio4( 'out', 'ts3',  t3(:,:,:,2) )
-    call rio4( 'out', 'sa1',  t2(:,:,:,1) )
-    call rio4( 'out', 'sa2',  t2(:,:,:,2) )
-    call rio4( 'out', 'sa3',  t2(:,:,:,3) )
-    call rio4( 'out', 'sv1',  t1(:,:,:,1) )
-    call rio4( 'out', 'sv2',  t1(:,:,:,2) )
-    call rio4( 'out', 'sv3',  t1(:,:,:,3) )
-    call rio4( 'out', 'su1',  t2(:,:,:,1) )
-    call rio4( 'out', 'su2',  t2(:,:,:,2) )
-    call rio4( 'out', 'su3',  t2(:,:,:,3) )
-    call rio4( 'out', 'svm',  f1          )
-    call rio4( 'out', 'sum',  f2          )
-    call rio4( 'out', 'psv',  psv         )
-    call rio4( 'out', 'tn',   tn          )
-    call rio4( 'out', 'tsm',  ts          )
-    call rio4( 'out', 'sam',  f2          )
-    call rio4( 'out', 'tn',   tn          )
-    call rio4( 'out', 'fr',   f1          )
-    call rio4( 'out', 'sl',   sl          )
-    call rio4( 'out', 'trup', trup        )
-    call rio4( 'out', 'tarr', tarr        )
-  end do
-end if
 
 ! Halos
 call scalar_swap_halo( mus,   nhalo )
@@ -199,7 +155,7 @@ call scalar_swap_halo( rhypo, nhalo )
 call vector_swap_halo( nhat,  nhalo )
 call vector_swap_halo( t0,    nhalo )
 
-! Metadata
+! Stats
 if ( master ) then
   i1 = ihypo
   i1(ifn) = 1
@@ -217,6 +173,17 @@ if ( master ) then
   lc =  dc0 * mu0 / tn0 / ( mus0 - mud0 )
   if ( tn0 * ( mus0 - mud0 ) == 0. ) lc = 0.
   rctest = mu0 * tn0 * ( mus0 - mud0 ) * dc0 / ( ts0 - tn0 * mud0 ) ** 2
+  open( 1, file='stats/fault.py', status='replace' )
+  write( 1, "( 'mu0    = ', g15.7, ' # shear modulus at hypocenter'          )" ) mu0
+  write( 1, "( 'mus0   = ', g15.7, ' # static friction at hypocenter'        )" ) mus0
+  write( 1, "( 'mud0   = ', g15.7, ' # dynamic friction at hypocenter'       )" ) mud0
+  write( 1, "( 'dc0    = ', g15.7, ' # dc at hypocenter'                     )" ) dc0
+  write( 1, "( 'tn0    = ', g15.7, ' # normal traction at hypocenter'        )" ) tn0
+  write( 1, "( 'ts0    = ', g15.7, ' # shear traction at hypocenter'         )" ) ts0
+  write( 1, "( 'ess    = ', g15.7, ' # strength parameter'                   )" ) ess
+  write( 1, "( 'lc     = ', g15.7, ' # breakdown width'                      )" ) lc
+  write( 1, "( 'rctest = ', g15.7, ' # rcrit needed for spontaneous rupture' )" ) rctest
+  close( 1 )
 end if
 
 end subroutine
@@ -229,6 +196,8 @@ use m_globals
 use m_collective
 use m_bc
 use m_util
+use m_fieldio
+use m_stats
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
 if ( ifn == 0 ) return
@@ -265,34 +234,40 @@ do i = 1, 3
   t3(:,:,:,i) = t1(:,:,:,i) - tn * nhat(:,:,:,i)
 end do
 ts = sqrt( sum( t3 * t3, 4 ) )
-tn = sum( t2 * nhat, 4 )
-if ( faultopening == 1 ) tn = min( 0., tn )
 
-! Slip-weakening friction law
-f1 = mud
-where ( sl < dc ) f1 = f1 + ( 1. - sl / dc ) * ( mus - mud )
-f1 = -min( 0., tn ) * f1 + co
+! Delay slip till after first iteration
+if ( it > 1 ) then
 
-! Nucleation
-if ( rcrit > 0. .and. vrup > 0. ) then
+  tn = sum( t2 * nhat, 4 )
+  if ( faultopening == 1 ) tn = min( 0., tn )
+
+  ! Slip-weakening friction law
+  f1 = mud
+  where ( sl < dc ) f1 = f1 + ( 1. - sl / dc ) * ( mus - mud )
+  f1 = -min( 0., tn ) * f1 + co
+
+  ! Nucleation
+  if ( rcrit > 0. .and. vrup > 0. ) then
+    f2 = 1.
+    if ( trelax > 0. ) f2 = min( ( tm - rhypo / vrup ) / trelax, 1. )
+    f2 = ( 1. - f2 ) * ts + f2 * ( -tn * mud + co )
+    where ( rhypo < min( rcrit, tm * vrup ) .and. f2 < f1 ) f1 = f2
+  end if
+
+  ! Shear traction bounded by friction
   f2 = 1.
-  if ( trelax > 0. ) f2 = min( ( tm - rhypo / vrup ) / trelax, 1. )
-  f2 = ( 1. - f2 ) * ts + f2 * ( -tn * mud + co )
-  where ( rhypo < min( rcrit, tm * vrup ) .and. f2 < f1 ) f1 = f2
+  where ( ts > f1 ) f2 = f1 / ts
+  do i = 1, 3
+    t3(:,:,:,i) = f2 * t3(:,:,:,i)
+  end do
+  ts = min( ts, f1 )
+
+  ! Total traction
+  do i = 1, 3
+    t1(:,:,:,i) = t3(:,:,:,i) + tn * nhat(:,:,:,i)
+  end do
+
 end if
-
-! Shear traction bounded by friction
-f2 = 1.
-where ( ts > f1 ) f2 = f1 / ts
-do i = 1, 3
-  t3(:,:,:,i) = f2 * t3(:,:,:,i)
-end do
-ts = min( ts, f1 )
-
-! Total traction
-do i = 1, 3
-  t1(:,:,:,i) = t3(:,:,:,i) + tn * nhat(:,:,:,i)
-end do
 
 ! Update acceleration
 do i = 1, 3
@@ -300,7 +275,22 @@ do i = 1, 3
   w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f2 * mr(j1:j2,k1:k2,l1:l2)
   w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f2 * mr(j3:j4,k3:k4,l3:l4)
 end do
-call vectorbc( w1, bc1, bc2, i1bc, i2bc )
+call vector_bc( w1, bc1, bc2, i1bc, i2bc )
+
+! Output
+call fieldio( '>', 't1',  t1(:,:,:,1) )
+call fieldio( '>', 't2',  t1(:,:,:,2) )
+call fieldio( '>', 't3',  t1(:,:,:,3) )
+call fieldio( '>', 'ts1', t3(:,:,:,1) )
+call fieldio( '>', 'ts2', t3(:,:,:,2) )
+call fieldio( '>', 'ts3', t3(:,:,:,2) )
+call fieldio( '>', 'tsm', ts          )
+call fieldio( '>', 'tn',  tn          )
+call fieldio( '>', 'fr',  f1          )
+call scalar_set_halo( ts,       -1., i1core, i2core ); tsmax = maxval( ts ) 
+call scalar_set_halo( tn,  huge(dt), i1core, i2core ); tnmin = minval( tn )
+call scalar_set_halo( tn, -huge(dt), i1core, i2core ); tnmax = maxval( tn )
+call scalar_set_halo( tn,        0., i1core, i2core )
 
 ! Friction + fracture energy
 t2 = vv(j3:j4,k3:k4,l3:l4,:) - vv(j1:j2,k1:k2,l1:l2,:)
@@ -322,25 +312,12 @@ moment = sum( f2 )
 ! Slip acceleration
 t2 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
 f2 = sqrt( sum( t2 * t2, 4 ) )
-
-! Output
-p => pio0
-do while( associated( p%next ) )
-  p => p%next
-  call rio4( 'out', 't1',   t1(:,:,:,1) )
-  call rio4( 'out', 't2',   t1(:,:,:,2) )
-  call rio4( 'out', 't3',   t1(:,:,:,3) )
-  call rio4( 'out', 'fr',   f1          )
-  call rio4( 'out', 'tn',   tn          )
-  call rio4( 'out', 'sa1',  t2(:,:,:,1) )
-  call rio4( 'out', 'sa2',  t2(:,:,:,2) )
-  call rio4( 'out', 'sa3',  t2(:,:,:,3) )
-  call rio4( 'out', 'sam',  f2          )
-  call rio4( 'out', 'ts1',  t3(:,:,:,1) )
-  call rio4( 'out', 'ts2',  t3(:,:,:,2) )
-  call rio4( 'out', 'ts3',  t3(:,:,:,2) )
-  call rio4( 'out', 'tsm',  ts          )
-end do
+call fieldio( '>', 'sa1', t2(:,:,:,1) )
+call fieldio( '>', 'sa2', t2(:,:,:,2) )
+call fieldio( '>', 'sa3', t2(:,:,:,3) )
+call fieldio( '>', 'sam', f2          )
+call scalar_set_halo( f2, -1., i1core, i2core )
+samax = maxval( f2 )
 
 end subroutine
 

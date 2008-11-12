@@ -21,7 +21,7 @@ if ( ifn /= 0 ) nhalo(ifn) = 2
 nl = max( nl, nhalo )
 np = nn / nl
 where ( modulo( nn, nl ) /= 0 ) np = np + 1
-call rank( ip3, np )
+call rank( ip3, ipid, np )
 nnoff = nl * ip3 - nhalo
 
 ! Master process
@@ -72,6 +72,30 @@ end if
 
 ! Synchronize processes if debugging
 sync = debug > 1
+
+! Write debug info
+if ( debug > 0 ) then
+  write( str, "( a,i6.6,a )" ) 'debug/db', ipid, '.py'
+  open( 1, file=str, status='replace' )
+  write( 1, "( 'ifn     =   ',i8                        )" ) ifn
+  write( 1, "( 'ip      =   ',i8                        )" ) ip
+  write( 1, "( 'ipid    =   ',i8                        )" ) ipid
+  write( 1, "( 'np      = ( ',i8,2(', ',i8),' )'        )" ) np
+  write( 1, "( 'ip3     = ( ',i8,2(', ',i8),' )'        )" ) ip3
+  write( 1, "( 'nn      = ( ',i8,2(', ',i8),' )'        )" ) nn
+  write( 1, "( 'nm      = ( ',i8,2(', ',i8),' )'        )" ) nm
+  write( 1, "( 'bc1     = ( ',i8,2(', ',i8),' )'        )" ) bc1
+  write( 1, "( 'bc2     = ( ',i8,2(', ',i8),' )'        )" ) bc2
+  write( 1, "( 'nhalo   = ( ',i8,2(', ',i8),' )'        )" ) nhalo
+  write( 1, "( 'ihypo   = ( ',i8,2(', ',i8),' )'        )" ) ihypo
+  write( 1, "( 'nnoff   = ( ',i8,2(', ',i8),' )'        )" ) nnoff
+  write( 1, "( 'i1bc    = ( ',i8,2(', ',i8),' ); i2bc   = (',i8,2(', ',i8),' )' )" ) i1bc, i2bc
+  write( 1, "( 'i1pml   = ( ',i8,2(', ',i8),' ); i2pml  = (',i8,2(', ',i8),' )' )" ) i1pml, i2pml
+  write( 1, "( 'i1core  = ( ',i8,2(', ',i8),' ); i2core = (',i8,2(', ',i8),' )' )" ) i1core, i2core
+  write( 1, "( 'i1node  = ( ',i8,2(', ',i8),' ); i2node = (',i8,2(', ',i8),' )' )" ) i1node, i2node
+  write( 1, "( 'i1cell  = ( ',i8,2(', ',i8),' ); i2cell = (',i8,2(', ',i8),' )' )" ) i1cell, i2cell
+  close( 1 )
+end if
 
 end subroutine
 

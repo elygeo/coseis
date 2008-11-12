@@ -7,10 +7,9 @@ subroutine material
 use m_globals
 use m_collective
 use m_util
-real :: stats(8), gstats(8), r, rr(3)
-integer :: i1(3), i2(3), i3(3), i4(3), ifill(3), i
-real, pointer :: f(:,:,:)
-type( t_io ), pointer :: p
+use m_fieldio
+real :: stats(8), gstats(8), r, rr(3), rho_, vp_, vs_, gam_, courant
+integer :: i1(3), i2(3)
 
 if ( master ) write( 0, * ) 'Material model'
 
@@ -21,16 +20,10 @@ s2 = 0.
 gam = 0.
 
 ! Inputs
-p => pio0
-do while( associated( p%next ) )
-  p => p%next
-  select case( p%field )
-  case( 'rho' ); call rio4( 'in', p, .true., mr  )
-  case( 'vp'  ); call rio4( 'in', p, .true., s1  )
-  case( 'vs'  ); call rio4( 'in', p, .true., s2  )
-  case( 'gam' ); call rio4( 'in', p, .true., gam )
-  case default; cycle
-end do
+call fieldio( '<', 'rho', mr  )
+call fieldio( '<', 'vp',  s1  )
+call fieldio( '<', 'vs',  s2  )
+call fieldio( '<', 'gam', gam )
 
 ! Test for endian problems
 if ( any( mr  /= mr  ) .or. maxval( mr  ) > huge( r ) ) stop 'NaN/Inf in rho'
@@ -61,41 +54,41 @@ if ( gam2 > 0. ) gam = min( gam, gam2 )
 stats = 0.
 i1 = max( i1core, i1bc )
 i2 = min( i2core, i2bc - 1 )
-call scalarsethalo( mr,  0., i1, i2 )
-call scalarsethalo( s1,  0., i1, i2 )
-call scalarsethalo( s2,  0., i1, i2 )
-call scalarsethalo( gam, 0., i1, i2 )
+call scalar_set_halo( mr,  0., i1, i2 )
+call scalar_set_halo( s1,  0., i1, i2 )
+call scalar_set_halo( s2,  0., i1, i2 )
+call scalar_set_halo( gam, 0., i1, i2 )
 stats(1) = sum( mr  )
 stats(2) = sum( s1  )
 stats(3) = sum( s2  )
 stats(4) = sum( gam )
 call rreduce1( gstats, stats, 'sum', 0 )
 rr = nn - 1
-r = 1. / product( rr ) 
+r = 1. / product( nn - 1 ) 
 rho_ = r * gstats(1)
 vp_  = r * gstats(2)
 vs_  = r * gstats(3)
 gam_ = r * gstats(4)
 
 ! Fill halo
-call scalarswaphalo( mr,  nhalo )
-call scalarswaphalo( s1,  nhalo )
-call scalarswaphalo( s2,  nhalo )
-call scalarswaphalo( gam, nhalo )
+call scalar_swap_halo( mr,  nhalo )
+call scalar_swap_halo( s1,  nhalo )
+call scalar_swap_halo( s2,  nhalo )
+call scalar_swap_halo( gam, nhalo )
 
 ! Extrema
-call scalarsethalo( mr,  huge(r), i1cell, i2cell )
-call scalarsethalo( s1,  huge(r), i1cell, i2cell )
-call scalarsethalo( s2,  huge(r), i1cell, i2cell )
-call scalarsethalo( gam, huge(r), i1cell, i2cell )
+call scalar_set_halo( mr,  huge(r), i1cell, i2cell )
+call scalar_set_halo( s1,  huge(r), i1cell, i2cell )
+call scalar_set_halo( s2,  huge(r), i1cell, i2cell )
+call scalar_set_halo( gam, huge(r), i1cell, i2cell )
 stats(1) = -minval( mr  )
 stats(2) = -minval( s1  )
 stats(3) = -minval( s2  )
 stats(4) = -minval( gam )
-call scalarsethalo( mr,  0., i1cell, i2cell )
-call scalarsethalo( s1,  0., i1cell, i2cell )
-call scalarsethalo( s2,  0., i1cell, i2cell )
-call scalarsethalo( gam, 0., i1cell, i2cell )
+call scalar_set_halo( mr,  0., i1cell, i2cell )
+call scalar_set_halo( s1,  0., i1cell, i2cell )
+call scalar_set_halo( s2,  0., i1cell, i2cell )
+call scalar_set_halo( gam, 0., i1cell, i2cell )
 stats(5) = maxval( mr  )
 stats(6) = maxval( s1  )
 stats(7) = maxval( s2  )
@@ -110,6 +103,26 @@ vp2  =  gstats(6)
 vs2  =  gstats(7)
 gam2 =  gstats(8)
 
+! Stats
+if ( master ) then
+  courant = dt * vp2 * sqrt( 3. ) / abs( dx )
+  open( 1, file='stats/material.py', status='replace' )
+  write( 1, "( 'courant = ',g15.7 )" ) courant
+  write( 1, "( 'rho_    = ',g15.7 )" ) rho_
+  write( 1, "( 'rho1    = ',g15.7 )" ) rho1
+  write( 1, "( 'rho2    = ',g15.7 )" ) rho2
+  write( 1, "( 'vp_     = ',g15.7 )" ) vp_
+  write( 1, "( 'vp1     = ',g15.7 )" ) vp1
+  write( 1, "( 'vp2     = ',g15.7 )" ) vp2
+  write( 1, "( 'vs_     = ',g15.7 )" ) vs_
+  write( 1, "( 'vs1     = ',g15.7 )" ) vs1
+  write( 1, "( 'vs2     = ',g15.7 )" ) vs2
+  write( 1, "( 'gam_    = ',g15.7 )" ) gam_
+  write( 1, "( 'gam1    = ',g15.7 )" ) gam1
+  write( 1, "( 'gam2    = ',g15.7 )" ) gam2
+  close( 1 )
+end if
+
 ! Lame' parameters
 mu  = mr * s2 * s2
 lam = mr * ( s1 * s1 ) - 2. * mu
@@ -121,21 +134,12 @@ yy = yy * dx * mu * ( lam + mu )
 !yy = .3 / 16. * ( lam + 2. * mu ) * dx ! like Ma & Liu, 2006
 
 ! Output
-if ( it == 0 ) then
-  p => inp0
-  do while( associated( p%next ) )
-    p => p%next
-    select case( p%field )
-    case( 'rho' ); call rio4( 'out', p, .true., mr  )
-    case( 'vp'  ); call rio4( 'out', p, .true., s1  )
-    case( 'vs'  ); call rio4( 'out', p, .true., s2  )
-    case( 'gam' ); call rio4( 'out', p, .true., gam )
-    case( 'mu'  ); call rio4( 'out', p, .true., mu  )
-    case( 'lam' ); call rio4( 'out', p, .true., lam )
-    case( 'yy'  ); call rio4( 'out', p, .true., yy  )
-    case default; cycle
-  end do
-end if
+call fieldio( '>', 'rho', mr  )
+call fieldio( '>', 'vp',  s1  )
+call fieldio( '>', 'vs',  s2  )
+call fieldio( '>', 'gam', gam )
+call fieldio( '>', 'mu',  mu  )
+call fieldio( '>', 'lam', lam )
 
 end subroutine
 

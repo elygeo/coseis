@@ -8,12 +8,11 @@ use m_globals
 use m_collective
 use m_bc
 use m_util
-integer :: i1(3), i2(3), i3(3), i4(3), ifill(3), bc(3), &
-  i, j, k, l, j1, k1, l1, j2, k2, l2, iz, b, c
+use m_fieldio
+integer :: i1(3), i2(3), i3(3), i4(3), bc(3), &
+  i, j, k, l, j1, k1, l1, j2, k2, l2, b, c
 real :: x0(3), m(9), tol, r
 integer, allocatable :: seed(:)
-real, pointer :: f(:,:,:)
-type( t_io ), pointer :: p
 
 if ( master ) write( 0, * ) 'Grid generation'
 
@@ -33,33 +32,9 @@ if ( faultnormal /= 0 ) then
 end if
 
 ! Read grid
-p => inp0
-do while( associated( p%next ) )
-  p => p%next
-  if ( p%mode /= 'r' ) cycle
-  select case( p%field )
-  case( 'x1' ); f => w1(:,:,:,1)
-  case( 'x2' ); f => w1(:,:,:,2)
-  case( 'x3' ); f => w1(:,:,:,3)
-  case default; cycle
-  end select
-  i1 = p%i1
-  i2 = p%i2
-  call zone( i1, i2, nn, nnoff, ihypo, faultnormal )
-  i3 = max( i1, i1core )
-  i4 = min( i2, i2core )
-  ifill = 0
-  where ( i1 == i2 )
-    i1 = i1core
-    i2 = i1core
-    i3 = i1core
-    i4 = i1core
-    ifill = i2core
-  end where
-  i = mpin * 4
-  call rio3( -1, i, 'data/'//p%field, f, i1, i2, i3, i4, ifill )
-end select
-end do
+call fieldio( '<', 'x1', w1(:,:,:,1) )
+call fieldio( '<', 'x2', w1(:,:,:,2) )
+call fieldio( '<', 'x3', w1(:,:,:,3) )
 
 ! Add random noise except at boundaries and in PML
 if ( gridnoise > 0. ) then
@@ -175,6 +150,14 @@ elseif ( fixhypo < 0 ) then
   end do
   end do
 end if
+
+! Write grid
+call fieldio( '>', 'x1', w1(:,:,:,1) )
+call fieldio( '>', 'x2', w1(:,:,:,2) )
+call fieldio( '>', 'x3', w1(:,:,:,3) )
+call fieldio( '>', 'X1', w2(:,:,:,1) )
+call fieldio( '>', 'X2', w2(:,:,:,2) )
+call fieldio( '>', 'X3', w2(:,:,:,3) )
 
 ! Orthogonality test
 if ( oplevel == 0 ) then

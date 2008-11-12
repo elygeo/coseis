@@ -28,7 +28,6 @@ real, allocatable, target, dimension(:,:,:) :: &
   qp,            & ! anelastic coefficient
   qs,            & ! anelastic coefficient
   yy,            & ! hourglass constant
-  pv,            & ! peak velocity
   s1,            & ! temporary storage
   s2               ! temporary storage
 
@@ -83,20 +82,18 @@ real, allocatable, target, dimension(:,:,:) :: &
   f1,            & ! temporary storage
   f2               ! temporary storage
 
+! Parameters
 real :: &
-  tm,            & ! time
   dt,            & ! time step
+  tm,            & ! time
+  tm0,           & ! initial time
   dx,            & ! spatial step
-  rho_,          & ! ave density
   rho1,          & ! min density
   rho2,          & ! max density
-  vp_,           & ! ave P-wave speed
   vp1,           & ! min P-wave speed
   vp2,           & ! max P-wave speed
-  vs_,           & ! ave S-wave speed
   vs1,           & ! min S-wave speed
   vs2,           & ! max S-wave speed
-  gam_,          & ! ave viscosity
   gam1,          & ! min viscosity
   gam2,          & ! max viscosity
   hourglass(2),  & ! hourglass stiffness (1) and viscosity (2)
@@ -107,6 +104,7 @@ real :: &
   xhypo(3),      & ! hypocenter location
   slipvector(3)    ! slip direction for finding traction vectors
 
+! Source parameters
 real :: &
   tsource,       & ! dominant period
   rsource,       & ! source radius
@@ -115,62 +113,51 @@ real :: &
   vrup,          & ! nucleation rupture velocity
   rcrit,         & ! nucleation critical radius
   trelax,        & ! nucleation relaxation time
-  efric,         & ! friction + fracture energy
-  estrain,       & ! strain energy
-  moment,        & ! strain energy
-  mu0,           & ! shear modulus at hypocenter
-  mus0,          & ! static friction at hypocenter
-  mud0,          & ! dynamic friction at hypocenter
-  dc0,           & ! dc at hypocenter
-  tn0,           & ! normal traction at hypocenter
-  ts0,           & ! shear traction at hypocenter
-  ess,           & ! strength parameter
-  lc,            & ! breakdown width
-  rctest,        & ! rcrit needed for spontaneous rupture
   svtol            ! slip velocity for determining rupture time
 
 integer, dimension(3) :: &
-  nn,            & ! number of global nodes, count double nodes twice
-  nm,            & ! size of local 3D arrays
-  nhalo,         & ! number of ghost nodes
   np,            & ! number of processes
-  ip3,           & ! 3D process rank
-  ip3root,       & ! 3D master process rank
+  nn,            & ! number of global nodes, count double nodes twice
+  ihypo,         & ! hypocenter node
   bc1,           & ! boundary conditions - near side
   bc2,           & ! boundary conditions - far side
+  n1expand,      & ! grid expansion nodes - near side
+  n2expand,      & ! grid expansion nodes - far side
+  nm,            & ! size of local 3D arrays
+  nhalo,         & ! number of ghost nodes
+  ip3,           & ! 3D process rank
+  ip3root,       & ! 3D master process rank
   i1bc,          & ! model boundary
   i2bc,          & ! model boundary
-  nnoff,         & ! offset between local and global indices
-  ihypo,         & ! hypocenter node
-  n1expand,      & ! # grid expansion nodes - near side
-  n2expand,      & ! # grid expansion nodes - far side
-  i1source,      & ! finite source start index
-  i2source,      & ! finite source end index
+  i1pml,         & ! PML boundary
+  i2pml,         & ! PML boundary
   i1core,        & ! core region start index
   i2core,        & ! core region end index
   i1node,        & ! node calculations start index
   i2node,        & ! node calculations end index
   i1cell,        & ! cell calculations start index
   i2cell,        & ! cell calculations end index
-  i1pml,         & ! PML boundary
-  i2pml            ! PML boundary
+  nnoff            ! offset between local and global indices
 
 integer :: &
-  ip,            & ! process rank
-  np0,           & ! number of processes available
-  nt,            & ! number of time steps
   it,            & ! current time step
+  nt,            & ! number of time steps
   itstats,       & ! interval for calculating statistics
   itio,          & ! interval for writing i/o buffers
   itcheck,       & ! interval for checkpointing, must be a multiple of itio
   itstop,        & ! stop time, for simulating a killed job
-  oplevel,       & ! 1=constant, 2=rectangular, 3=parallelepiped, 4=one-point quadrature, 5=exact
-  debug,         & ! debugging flag
   npml,          & ! number of PML damping nodes
+  oplevel,       & ! 1=constant, 2=rectangular, 3=parallelepiped, 4=one-point quadrature, 5=exact
   fixhypo,       & ! fix hypocenter to 0=none, 1,2=ihypo node, cell, -1,-2=xhypo node, cell
+  mpin,          & ! collective MPI input flag
+  mpout,         & ! collective MPI output flag
+  debug,         & ! debugging flag
   faultopening,  & ! flag to allow fault opening
   faultnormal,   & ! fault normal direction
-  ifn              ! fault normal component=abs(faultnormal)
+  ifn,           & ! fault normal component=abs(faultnormal)
+  ip,            & ! process rank
+  ipid,          & ! processor ID
+  np0              ! number of processes available
 
 character(16) :: &
   rfunc,         & ! moment source space function

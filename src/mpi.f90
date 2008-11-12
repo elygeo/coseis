@@ -2,8 +2,8 @@
 module m_collective
 use mpi
 implicit none
-integer :: fh0 = mpi_file_null
-integer, private :: np(3), root3d, root2d(3), comm3d, comm2d(3)
+integer :: file_null = mpi_file_null
+integer, private :: np(3), root3d, root2d(3), comm3d, comm2d(3), comm1d(3)
 contains
 
 ! Initialize
@@ -27,9 +27,9 @@ call mpi_finalize( e )
 end subroutine
 
 ! Process rank
-subroutine rank( ip3, npin )
+subroutine rank( ip3, ipid, npin )
 use mpi
-integer, intent(out) :: ip3(3)
+integer, intent(out) :: ip3(3), ipid
 integer, intent(in) :: npin(3)
 integer :: ip, e
 logical :: period(3) = .false.
@@ -43,7 +43,7 @@ if ( comm3d == mpi_comm_null ) then
 end if
 call mpi_comm_rank( comm3d, ip, e  )
 call mpi_cart_coords( comm3d, ip, 3, ip3, e )
-filehandles = mpi_undefined
+ipid = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
 end subroutine
 
 ! Set root process and creat 2D communicators
@@ -54,9 +54,13 @@ integer :: ip2root(2), e, i
 logical :: hat(3)
 call mpi_cart_rank( comm3d, ip3root, root3d, e )
 root2d = 0
+comm1d = mpi_comm_self
 comm2d = mpi_comm_self
 do i = 1, 3
 if ( product( (/ np(:i-1), np(i+1:) /) ) > 1 ) then
+  hat = .false.
+  hat(i) = .true.
+  call mpi_cart_sub( comm3d, hat, comm1d(i), e )
   hat = .true.
   hat(i) = .false.
   call mpi_cart_sub( comm3d, hat, comm2d(i), e )
@@ -304,152 +308,114 @@ end if
 end do
 end subroutine
 
-! Time series input/output
-subroutine rio1( id, mpio, str, ft, ir, nr )
+! 2D input/output
+subroutine rio2( fh, f, mode, filename, mm, nn, oo, mpio )
 use m_frio
 use mpi
-real, intent(inout) :: ft(:)
-integer, intent(in) :: id, mpio, ir, nr
-character(*), intent(in) :: str
-integer :: i, ip, n, fh, e
-integer(kind=mpi_offset_kind) :: ir0
-n = size( ft )
-if ( n == 0 .or. id == 0 ) return
-if ( n > ir .or. ir > nr ) stop 'error in rio1'
+integer, intent(inout) :: fh
+real, intent(inout) :: f(:,:)
+character(1), intent(in) :: mode
+character(*), intent(in) :: filename
+integer, intent(inout) :: mm(:), nn(:), oo(:)
+integer, intent(in) :: mpio
+integer :: i, e
+integer(kind=mpi_offset_kind) :: offset
+i = size( oo )
 if ( mpio == 0 ) then
-  call frio1( id, str, ft, ir, nr )
+  call frio2( fh, f, mode, filename, mm(i), oo(i) )
   return
 end if
-i = abs( id )
-fh = filehandles(i)
-if ( fh == mpi_undefined ) then
-  if ( id < 0 ) then
-    i = mpi_mode_rdonly
-  elseif ( ir == n ) then
-    i = mpi_mode_wronly + mpi_mode_create + mpi_mode_excl
+if ( fh == mpi_file_null ) then
+  call mpopen( fh, mode, filename, mm, nn, oo )
+  if ( any( nn <= 0 ) ) return
+end if
+offset = oo(i)
+offset = offset * size( f, 1 )
+i = size( f )
+if ( mode == 'r' ) then
+  if ( mpio > 0 ) then
+    call mpi_file_read_at_all( fh, offset, f(1,1), i, mpi_real, mpi_status_ignore, e )
   else
-    i = mpi_mode_wronly
+    call mpi_file_read_at( fh, offset, f(1,1), i, mpi_real, mpi_status_ignore, e )
   end if
-  call mpi_comm_rank( mpi_comm_world, ip, e  )
-  write( 0, '(i8,2a)' ) ip, ' Opening 1D buffered file: ', trim(str)
-  call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
-  call mpi_file_open( mpi_comm_self, str, i, mpi_info_null, fh, e )
-  ir0 = 0
-  call mpi_file_set_view( fh, ir0, mpi_real, mpi_real, 'native', mpi_info_null, e )
-  i = abs( id )
-  filehandles(i) = fh
-end if
-ir0 = ir - n
-if ( id < 0 ) then
-  call mpi_file_read_at( fh, ir0, ft(1), n, mpi_real, mpi_status_ignore, e )
 else
-  call mpi_file_write_at( fh, ir0, ft(1), n, mpi_real, mpi_status_ignore, e )
+  if ( mpio > 0 ) then
+    call mpi_file_write_at_all( fh, offset, f(1,1), i, mpi_real, mpi_status_ignore, e )
+  else
+    call mpi_file_write_at( fh, offset, f(1,1), i, mpi_real, mpi_status_ignore, e )
+  end if
 end if
-if ( ir == nr ) then
-  i = abs( id )
-  filehandles(i) = mpi_undefined
+i = size( oo )
+if ( oo(i) + nn(i) == mm(i) ) then
   call mpi_file_close( fh, e )
+  fh = mpi_file_null
 end if
 end subroutine
 
-! 4D input/output
-subroutine rio4( id, mpio, str, f, i1, i2, i3, i4 )
-use m_frio
-use mpi
-real, intent(inout) :: f(:,:,:,:)
-integer, intent(in) :: id, mpio, i1(4), i2(4), i3(4), i4(4)
-character(*), intent(in) :: str
-integer :: i, fh, mtype, nl(4), n(4), i0(4), e
-integer(kind=mpi_offset_kind) :: ir0 = 0
-if ( id == 0 ) return
-if ( mpio == 0 ) then
-  call frio4( id, str, f, i3, i4, i2(4), ifill )
-  return
-end if
-i = abs( id )
-fh = filehandles(i)
-if ( fh == mpi_undefined ) then
-  call mpopen( fh, id, mpio, str, i1(1:3), i2(1:3), i3(1:3), i4(1:3), i3(4)-i1(4)+1 )
-  if ( any( i3 > i4 ) ) return
-  filehandles(i) = fh
-end if
-if ( any( i3 > i4 ) ) stop 'error in rio4'
-i0 = i3 - 1
-nl = i4 - i3 + 1
-n = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
-call mpi_type_create_subarray( 4, n, nl, i0, mpi_order_fortran, mpi_real, mtype, e )
-call mpi_type_commit( mtype, e )
-ir0 = i3(4) - i1(4)
-ir0 = ir0 * nl(1) * nl(2) * nl(3)
-if ( id > 0 ) then
-  if ( mpio > 0 ) then
-    call mpi_file_write_at_all( fh, ir0, f(1,1,1,1), 1, mtype, mpi_status_ignore, e )
-  else
-    call mpi_file_write_at( fh, ir0, f(1,1,1,1), 1, mtype, mpi_status_ignore, e )
-  end if
-else
-  if ( mpio > 0 ) then
-    call mpi_file_read_at_all( fh, ir0, f(1,1,1,1), 1, mtype, mpi_status_ignore, e )
-  else
-    call mpi_file_read_at( fh, ir0, f(1,1,1,1), 1, mtype, mpi_status_ignore, e )
-  end if
-end if
-if ( i4(4) == i2(4) ) then
-  i = abs( id )
-  filehandles(i) = mpi_undefined
-  call mpi_file_close( fh, e )
-end if
-call mpi_type_free( mtype, e )
+! 1D input/output
+subroutine rio1( fh, f, mode, filename, m, o, mpio )
+integer, intent(inout) :: fh
+real, intent(inout) :: f(:)
+character(1), intent(in) :: mode
+character(*), intent(in) :: filename
+integer, intent(in) :: m, o, mpio
+integer :: mm(2), nn(2), oo(2)
+real :: ff(1,size(f))
+if ( mode == 'w' ) ff(1,:) = f
+mm = (/ 1, m /)
+nn = (/ 1, size(f) /)
+oo = (/ 1, o /)
+call rio2( fh, ff, mode, filename, mm, nn, oo, mpio )
+if ( mode == 'r' ) f = ff(1,:)
 end subroutine
 
 ! Open file with MPIIO
-subroutine mpopen( fh, id, mpio, str, i1, i2, i3, i4, ir )
+! does not use mm(4) or nn(4)
+subroutine mpopen( fh, mode, filename, mm, nn, oo )
 use mpi
-integer, intent(in) :: id, mpio, i1(3), i2(3), i3(3), i4(3), ir
 integer, intent(out) :: fh
-character(*), intent(in) :: str
-integer :: i, ip, iio, nio, ndims, ftype, nl(3), n(3), i0(3), comm0, comm, e
-integer(kind=mpi_offset_kind) :: ir0 = 0
-i = abs( mpio )
-comm0 = comm3d
-if ( i < 4 ) comm0 = comm2d(i)
-if ( any( i3 > i4 ) ) then
+character(1), intent(in) :: mode
+character(*), intent(in) :: filename
+integer, intent(in) :: mm(:), nn(:), oo(:)
+integer :: mmm(size(mm)), nnn(size(nn)), ooo(size(oo)), ndims, i, n, ip, ftype, comm0, comm, e
+integer(kind=mpi_offset_kind) :: offset = 0
+n = size( mm )
+ndims = count( mm(1:n-1) > 1 )
+do i = 1, n-1
+  select case( ndims )
+  case( 0 ); comm0 = mpi_comm_self
+  case( 1 ); if ( mm(i) == 1 ) comm0 = comm1d(i)
+  case( 2 ); if ( mm(i) == 1 ) comm0 = comm2d(i)
+  case( 3 ); comm0 = comm3d
+  end select
+end do
+if ( any( nn < 1 ) ) then
   call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
   fh = mpi_file_null
   return
 end if
-i = abs( id )
-call mpi_comm_split( comm0, i, 0, comm, e )
-if ( id < 0 ) then
+call mpi_comm_split( comm0, 1, 0, comm, e )
+if ( mode == 'r' ) then
   i = mpi_mode_rdonly
-elseif ( ir == 1 ) then
+elseif ( oo(n) == 0 ) then
   i = mpi_mode_wronly + mpi_mode_create + mpi_mode_excl
 else
   i = mpi_mode_wronly
 end if
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
-call mpi_file_open( comm, str, i, mpi_info_null, fh, e )
-i0 = i3 - i1
-n  = i2 - i1 + 1
-nl = i4 - i3 + 1
-ndims = 3
-do i = ndims, 1, -1
-if ( n(i) == 1 ) then
-  ndims = ndims - 1
-  i0(i:) = (/ i0(i+1:), 0 /)
-  n(i:)  = (/ n(i+1:),  1 /)
-  nl(i:) = (/ nl(i+1:), 1 /)
-end if
-end do
-call mpi_comm_rank( comm, iio, e  )
-call mpi_comm_size( comm, nio, e  )
+call mpi_file_open( comm, filename, i, mpi_info_null, fh, e )
+mmm = pack( mm, mm > 1, mm )
+nnn = pack( nn, mm > 1, nn )
+ooo = pack( oo, mm > 1, oo )
+call mpi_comm_size( comm, n, e  )
+call mpi_comm_rank( comm, i, e  )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
-if ( iio == 0 ) write( 0, '(i8,a,i2,a,i8,2a)' ) &
-  ip, ' Opening', ndims, 'D', nio, 'P file: ', trim(str)
-if ( ndims < 1 ) ndims = 1
-call mpi_type_create_subarray( ndims, n, nl, i0, mpi_order_fortran, mpi_real, ftype, e )
+if ( i == 0 ) write( 0, '(i8,a,i2,a,i8,2a)' ) &
+  ip, ' Opened', ndims, 'D', n, 'P file: ', trim( filename )
+if ( ndims == 0 ) ndims = 1
+call mpi_type_create_subarray( ndims, mmm, nnn, ooo, mpi_order_fortran, mpi_real, ftype, e )
 call mpi_type_commit( ftype, e )
-call mpi_file_set_view( fh, ir0, mpi_real, ftype, 'native', mpi_info_null, e )
+call mpi_file_set_view( fh, offset, mpi_real, ftype, 'native', mpi_info_null, e )
 end subroutine
 
 end module

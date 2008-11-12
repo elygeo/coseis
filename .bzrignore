@@ -1,0 +1,13 @@
+*.pyc
+*.mod
+*.o
+*.ipo
+*.il
+*.stb
+*.swp
+.bzr
+sord.tgz
+email
+machine
+bin/*
+**/run/**

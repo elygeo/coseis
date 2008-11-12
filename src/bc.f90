@@ -1,10 +1,10 @@
-! Boundary conditions, see defaults.m for description
+! Boundary conditions
 module m_bc
 implicit none
 contains
 
 ! Scalar field
-subroutine scalarbc( f, bc1, bc2, i1, i2 )
+subroutine scalar_bc( f, bc1, bc2, i1, i2 )
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: bc1(3), bc2(3), i1(3), i2(3)
 integer :: b1(3), b2(3), nm(3), j1, k1, l1, j2, k2, l2
@@ -27,7 +27,7 @@ if ( b2(3) == 2 ) f(:,:,l2) = f(:,:,l2-1)
 end subroutine
 
 ! Vector field
-subroutine vectorbc( f, bc1, bc2, i1, i2 )
+subroutine vector_bc( f, bc1, bc2, i1, i2 )
 implicit none
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: bc1(3), bc2(3), i1(3), i2(3)

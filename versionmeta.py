@@ -1,5 +1,0 @@
-version = '20080926103925'
-login   = 'gely'
-name    = 'Geoffrey Ely'
-host    = 'wide'
-dir     = '/Users/gely/sord'

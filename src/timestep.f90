@@ -1,4 +1,4 @@
-! Time step
+! Time integration
 module m_timestep
 implicit none
 contains
@@ -6,6 +6,8 @@ contains
 subroutine timestep
 use m_globals
 use m_util
+use m_fieldio
+use m_stats
 integer :: j, k, l
 
 ! Status
@@ -31,10 +33,31 @@ if ( ifn /= 0 ) then
   f2 = sqrt( sum( t2 * t2, 4 ) )
 end if
 
-! Time integration
-tm = it * dt
-vv = vv + w1 * dt
-uu = uu + vv * dt
+! Velocity time integration
+tm = tm0 + dt * ( it - 1 ) - dt * 0.5
+vv = vv + dt * w1
+call fieldio( '<>', 'v1', vv(:,:,:,1) )
+call fieldio( '<>', 'v2', vv(:,:,:,2) )
+call fieldio( '<>', 'v3', vv(:,:,:,3) )
+if ( modulo( it, itstats ) == 0 ) then
+  call vector_norm( s1, vv, i1core, i2core, (/ 1, 1, 1 /) )
+  call scalar_set_halo( s1, -1., i1core, i2core )
+  vmax = maxval( s1 )
+end if
+call fieldio( '>', 'vm2', s1  )
+
+! Displacement time integration
+tm = tm0 + dt * ( it - 1 )
+uu = uu + dt * vv
+call fieldio( '<>', 'u1', uu(:,:,:,1) )
+call fieldio( '<>', 'u2', uu(:,:,:,2) )
+call fieldio( '<>', 'u3', uu(:,:,:,3) )
+if ( modulo( it, itstats ) == 0 ) then
+  call vector_norm( s1, uu, i1core, i2core, (/ 1, 1, 1 /) )
+  call scalar_set_halo( s1, -1., i1core, i2core )
+  umax = maxval( s1 )
+end if
+call fieldio( '>', 'um2', s1  )
 
 ! Fault time integration
 if ( ifn /= 0 ) then
@@ -63,38 +86,26 @@ if ( ifn /= 0 ) then
   case( 3 ); t2(:,:,1,:) = uu(:,:,l+1,:) - uu(:,:,l,:)
   end select
   f2 = sqrt( sum( t2 * t2, 4 ) )
+  call fieldio( '>', 'sv1',  t1(:,:,:,1) )
+  call fieldio( '>', 'sv2',  t1(:,:,:,2) )
+  call fieldio( '>', 'sv3',  t1(:,:,:,3) )
+  call fieldio( '>', 'svm',  f1          )
+  call fieldio( '>', 'psv',  psv         )
+  call fieldio( '>', 'su1',  t2(:,:,:,1) )
+  call fieldio( '>', 'su2',  t2(:,:,:,2) )
+  call fieldio( '>', 'su3',  t2(:,:,:,3) )
+  call fieldio( '>', 'sum',  f2          )
+  call fieldio( '>', 'sl',   sl          )
+  call fieldio( '>', 'trup', trup        )
+  call fieldio( '>', 'tarr', tarr        )
+  call scalar_set_halo( f1,   -1., i1core, i2core )
+  call scalar_set_halo( f2,   -1., i1core, i2core )
+  call scalar_set_halo( tarr, -1., i1core, i2core )
+  svmax = maxval( f1 )
+  sumax = maxval( f2 )
+  slmax = maxval( sl )
+  tarrmax = maxval( tarr )
 end if
-
-! Output
-p => pio0
-do while( associated( p%next ) )
-  p => p%next
-  select case( p%field )
-  case( 'v1' ); call rio4( 'out', p, .false., vv(:,:,:1) )
-  case( 'v2' ); call rio4( 'out', p, .false., vv(:,:,:2) )
-  case( 'v3' ); call rio4( 'out', p, .false., vv(:,:,:3) )
-  case( 'u1' ); call rio4( 'out', p, .false., uu(:,:,:1) )
-  case( 'u2' ); call rio4( 'out', p, .false., uu(:,:,:2) )
-  case( 'u3' ); call rio4( 'out', p, .false., uu(:,:,:3) )
-  end select
-  if ( ifn /= 0 ) then
-    select case( p%field )
-    case( 'sv1'  ); call rio4( 'out', p, t1(:,:,:,1) )
-    case( 'sv2'  ); call rio4( 'out', p, t1(:,:,:,2) )
-    case( 'sv3'  ); call rio4( 'out', p, t1(:,:,:,3) )
-    case( 'svm'  ); call rio4( 'out', p, f1          )
-    case( 'su1'  ); call rio4( 'out', p, t2(:,:,:,1) )
-    case( 'su2'  ); call rio4( 'out', p, t2(:,:,:,2) )
-    case( 'su3'  ); call rio4( 'out', p, t2(:,:,:,3) )
-    case( 'sum'  ); call rio4( 'out', p, f2          )
-    case( 'psv'  ); call rio4( 'out', p, psv         )
-    case( 'fr'   ); call rio4( 'out', p, f1          )
-    case( 'sl'   ); call rio4( 'out', p, sl          )
-    case( 'trup' ); call rio4( 'out', p, trup        )
-    case( 'tarr' ); call rio4( 'out', p, tarr        )
-    end select
-  end if
-end do
 
 end subroutine
 end module
