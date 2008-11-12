@@ -203,8 +203,8 @@ little-endian, and computing minimum, maximum, and mean values.
 
 The best place to go from here to learn more is to look at the example scripts
 and `defaults.py <defaults.py>`__.  Studying the Fortran source code in the
-``src/`` directory will be educational as well.  Substantial effort went into
-making it clean and understandable.
+``src/`` directory will be educational as well.  As much as possible, I have
+tried to keep it clean and readable.
 
 .. include:: sources.txt
 
@@ -214,7 +214,7 @@ Development
 
 Suggestions for improvements, and contributions to the SORD code and
 documentation are greatly appreciated.  The latest development version can be
-obtained from our `Bazaar <http://bazaar-vcs.org/>`_ source code repository
+obtained from my `Bazaar <http://bazaar-vcs.org/>`_ source code repository
 with::
 
     bzr checkout http://earth.usc.edu/~gely/sord
