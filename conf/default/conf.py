@@ -12,7 +12,7 @@ timelimit = 0
 sfc = None
 mfc = None
 for _dir in os.environ['PATH'].split(':'):
-    for _f in [ 'xlf95_r', 'ifort', 'pgf90', 'gfortran', 'f95' ]:
+    for _f in [ 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95' ]:
         if os.path.isfile( _dir + os.sep + _f ):
             sfc = _f
             break
@@ -37,6 +37,8 @@ elif sfc == 'ifort':
     _ = [ '-u', '-std95', '-warn', '-o' ]
     g = [ '-g', '-CB', '-traceback' ]
     O = [ '-O3' ]
+elif sfc == 'pathf95':
+    O = [ '-i8', '-O3', '-OPT:Ofast', '-fno-math-errno' ] + _
 elif sfc == 'pgf90':
     getarg = 'getarg-pgf.f90'
     g = [ '-g', '-Ktrap=fp', '-Mbounds', '-Mdclchk' ]

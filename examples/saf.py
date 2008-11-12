@@ -13,7 +13,6 @@ dt = 0.012					# time step length
 
 # Read mesh coordinates from disk
 _dir = 'saf/cvm4/0200/'				# data directory location
-_dir = 'saf/cvm4/4000/'				# data directory location
 fieldio = [
     ( '=r', 'x1', [0,0,1,0], _dir+'x1' ),	# read 2D x coordinate file
     ( '=r', 'x2', [0,0,1,0], _dir+'x2' ),	# read 2D y coordinate file
