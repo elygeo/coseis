@@ -214,15 +214,15 @@ Development
 
 Suggestions for improvements, and contributions to the SORD code and
 documentation are greatly appreciated.  The latest development version can be
-obtained from my `Bazaar <http://bazaar-vcs.org/>`_ source code repository
+obtained from the `Bazaar <http://bazaar-vcs.org/>`_ source code repository
 with::
 
     bzr checkout http://earth.usc.edu/~gely/sord
 
 Why Bazaar?  Because Subversion is painful to use in my opinion.  Better,
-modern alternatives are available.  Another strong candidate that was
-considered is `Mercurial <http://www.selenic.com/mercurial/wiki/>`_.  The
-simplest way to install Bazaar is to use Python `Easy Install
+modern alternatives are available.  `Mercurial
+<http://www.selenic.com/mercurial/wiki/>`_, another strong candidate, was also
+considered.  The simplest way to install Bazaar is to use Python `Easy Install
 <http://pypi.python.org/pypi/setuptools>`_::
 
     easy_install bzr
