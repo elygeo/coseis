@@ -3,8 +3,6 @@
 Miniature point source problem
 """
 
-import sys
-sys.path.insert( 0, '../..' )
 import sord
 
 debug = 1

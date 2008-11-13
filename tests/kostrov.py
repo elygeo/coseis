@@ -3,8 +3,6 @@
 Kostrov constant rupture velocity test
 """
 
-import sys
-sys.path.insert( 0, '../..' )
 import sord
 
 np = 1, 1, 1

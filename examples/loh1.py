@@ -2,8 +2,7 @@
 """
 PEER LOH.1 - Layer over a halfspace, buried double couple source
 """
-import sys
-sys.path.insert( 0, '../..' )
+
 import sord
 
 np = 1, 16, 1			# number of processors in each dimension

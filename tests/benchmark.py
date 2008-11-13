@@ -3,8 +3,6 @@
 Benchmarks
 """
 
-import sys
-sys.path.insert( 0, '../..' )
 import sord, numpy
 
 dx = 100.

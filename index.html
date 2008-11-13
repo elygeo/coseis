@@ -107,7 +107,7 @@ BSSA, in revision.
 </div>
 <div class="section" id="download">
 <h3>Download</h3>
-<p>Latest source code version <a class="reference external" href="sord.tgz">3.0.13</a></p>
+<p>Latest source code version <a class="reference external" href="sord.tgz">3.0.14</a></p>
 <p>Older versions can be extracted from the source code repository (see
 <a class="reference internal" href="#development">Development</a>).</p>
 </div>
@@ -162,14 +162,23 @@ sub-directory following the format of the supplied configurations.</p>
 ./setup.py
 </pre>
 </li>
-<li><p class="first">Some systems can send email status reports from your batch jobs, and you
-may specify the address for SORD to use by creating a text file called 'email'
-with your address in it.</p>
-</li>
-<li><p class="first">If you want the SORD Python module to be available anywhere on your system
-you can install it into your Python site packages directory with:</p>
+<li><p class="first">To make the SORD module available you must add the enclosing directory to
+your Python path. If you have write permission to you Python install, you can
+do:</p>
 <pre class="literal-block">
 ./setup.py install
+</pre>
+<p>Alternatively you can use the PYTHONPATH environmental variable. For bash
+shell do:</p>
+<pre class="literal-block">
+export PYTHONPATH=$( dirname $( /bin/pwd ) )
+</pre>
+</li>
+<li><p class="first">Some systems can send email status reports from your batch jobs, and you
+may specify the address for SORD to use by creating a text file called 'email'
+with your address in it:</p>
+<pre class="literal-block">
+echo 'email&#64;address' &gt; email
 </pre>
 </li>
 </ol>

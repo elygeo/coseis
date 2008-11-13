@@ -2,8 +2,7 @@
 """
 TPV3 - SCEC validation problem version 3
 """
-import sys
-sys.path.insert( 0, '../..' )
+
 import sord
 
 np = 1, 1, 32				# number of processors in each dimension

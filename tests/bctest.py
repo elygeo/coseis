@@ -3,8 +3,6 @@
 Boundary condition test
 """
 
-import sys
-sys.path.insert( 0, '../..' )
 import sord
 
 # numerical noise will make these differ slighly

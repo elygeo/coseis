@@ -129,27 +129,45 @@ def compile( compiler, object, source ):
     return compile
 
 def install():
+    """Install pth file in site-packages directory"""
+    from distutils.sysconfig import get_python_lib
+    import os
+    src = os.path.realpath( os.path.dirname( os.path.dirname( __file__ ) ) )
+    dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
+    print src
+    print dst
+    file( dst, 'w' ).write( src )
+    return
+
+def install_copy():
     """Copy package to site-packages directory"""
     from distutils.sysconfig import get_python_lib
     import os, shutil
-    srcdir = os.path.realpath( os.path.dirname( __file__ ) )
-    dstdir = get_python_lib() + os.sep + os.path.basename( srcdir )
-    print srcdir
-    print dstdir
-    try: shutil.rmtree( dstdir )
+    src = os.path.realpath( os.path.dirname( __file__ ) )
+    dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) )
+    print src
+    print dst
+    try: shutil.rmtree( dst )
     except: pass
-    shutil.copytree( srcdir, dstdir )
+    shutil.copytree( src, dst )
     return
 
 def uninstall():
+    """Remove pth file from site-packages directory"""
+    from distutils.sysconfig import get_python_lib
+    import os
+    dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
+    print dst
+    os.unlink( dst )
+    return
+
+def uninstall_copy():
     """Remove package from site-packages directory"""
     from distutils.sysconfig import get_python_lib
     import os, shutil
-    srcdir = os.path.realpath( os.path.dirname( __file__ ) )
-    dstdir = get_python_lib() + os.sep + os.path.basename( srcdir )
-    print dstdir
-    try: shutil.rmtree( dstdir )
-    except: pass
+    dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) )
+    print dst
+    shutil.rmtree( dst )
     return
 
 def tarball( filename=None, ignorefile='.bzrignore' ):

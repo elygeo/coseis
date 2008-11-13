@@ -2,6 +2,7 @@
 """
 TPV3 - SCEC validation problem version 3
 """
+
 import sord
 
 debug = 3

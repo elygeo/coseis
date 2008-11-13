@@ -2,8 +2,7 @@
 """
 San Andreas Fault, northward dynamic rupture, topography, SCEC-CVM4
 """
-import sys
-sys.path.insert( 0, '../..' )
+
 import sord
 
 np = 1, 80, 24					# 1920 total processors on DataStar

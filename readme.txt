@@ -152,14 +152,22 @@ Installation
 
         ./setup.py
 
-7.  Some systems can send email status reports from your batch jobs, and you
-    may specify the address for SORD to use by creating a text file called 'email'
-    with your address in it.
-
-8.  If you want the SORD Python module to be available anywhere on your system
-    you can install it into your Python site packages directory with::
+7.  To make the SORD module available you must add the enclosing directory to
+    your Python path. If you have write permission to you Python install, you can
+    do::
 
         ./setup.py install
+
+    Alternatively you can use the PYTHONPATH environmental variable. For bash
+    shell do::
+
+        export PYTHONPATH=$( dirname $( /bin/pwd ) )
+
+8.  Some systems can send email status reports from your batch jobs, and you
+    may specify the address for SORD to use by creating a text file called 'email'
+    with your address in it::
+
+        echo 'email@address' > email
 
 
 Basic usage

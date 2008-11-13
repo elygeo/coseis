@@ -3,8 +3,6 @@
 Explosion test problem for comparison with DFM
 """
 
-import sys
-sys.path.insert( 0, '../..' )
 import sord
 
 np = 1, 2, 1
