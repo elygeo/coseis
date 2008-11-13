@@ -160,8 +160,9 @@ def docs():
 
 if __name__ == '__main__':
     import sys, util
-    build( 'sm', 'gpO' )
-    if len( sys.argv ) > 1:
+    if len( sys.argv ) == 1:
+        build( 'sm', 'gpO' )
+    else:
         if sys.argv[1] == 'docs':
             docs()
         elif sys.argv[1] == 'install':

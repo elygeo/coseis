@@ -203,7 +203,7 @@ case( '=r', '+r' )
     n(4) = min( p%nb, ( it2 - it  ) / dit + 1 )
     m(4) = ( it2 - it1 ) / dit + 1
     o(4) = ( it  - it1 ) / dit
-    str = p%filename
+    str = 'in/' // p%filename
     if ( any( n(1:3) /= m(1:3) ) .and. mpin == 0 ) write( str, '(a,i6.6)' ) trim( str ), ipid
     call rio2( p%fh, p%buff(:,:n(4)), 'w', str, m, n, o, mpin )
     p%ib = 0
@@ -264,7 +264,7 @@ case( '=w' )
     n(4) = p%ib
     m(4) = ( it2 - it1 ) / dit + 1
     o(4) = ( it  - it1 ) / dit + 1 - n(4)
-    str = p%filename
+    str = 'out/' // p%filename
     if ( any( n(1:3) /= m(1:3) ) .and. mpout == 0 ) write( str, '(a,i6.6)' ) trim( str ), ipid
     call rio2( p%fh, p%buff(:,:n(4)), 'w', str, m, n, o, mpout )
     p%ib = 0

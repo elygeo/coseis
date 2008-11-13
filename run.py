@@ -116,15 +116,16 @@ def run( params ):
 
     # Link input files
     for i, line in enumerate( params.fieldio ):
-        if 'r' in line[0]:
+        if 'r' in line[0] and os.sep in line[3]:
             filename = line[3]
-            f = 'in' + os.sep + os.path.basename( filename )
+            f = os.path.basename( filename )
+            line = line[:3] + ( f, ) + line[4:]
+            params.fieldio[i] = line
+            f = 'in' + os.sep + filename
             try:
                 os.link( filename, rundir + os.sep + f )
             except:
                 shutil.copy( filename, rundir + os.sep + f )
-            line = line[:3] + ( f, ) + line[4:]
-            params.fieldio[i] = line
 
     # Template variables
     code = 'sord'
@@ -209,7 +210,7 @@ def prepare_params( pp ):
     for i in range( 3 ):
         if ii[i] < 1:
             ii[i] = ii[i] + p.nn[i] + 1
-    p.ihypo = ii
+    p.ihypo = tuple( ii )
 
     # boundary conditions
     i1 = list( p.bc1 )
@@ -266,9 +267,7 @@ def prepare_params( pp ):
             sys.exit( 'Error: unknown field: %r' % line )
         if p.faultnormal == 0 and f in fieldnames.fault:
             sys.exit( 'Error: field only for ruptures: %r' % line )
-        if 'w' in mode:
-            filename = 'out' + os.sep + filename
-        elif f not in fieldnames.input:
+        if 'w' not in mode and f not in fieldnames.input:
             sys.exit( 'Error: field is ouput only: %r' % line )
         if 'r' in mode:
             fn = os.path.dirname( filename ) + os.sep + 'endian'

@@ -79,22 +79,15 @@ end subroutine
 ! Add moment source
 subroutine moment_source
 use m_globals
+use m_util
 integer :: i, j, k, l, ic, nsrc
 real :: srcft = 0.
 
 if ( rsource <= 0. ) return
 if ( master .and. debug == 2 ) write( 0, * ) 'Moment source'
 
-! Source time function
-select case( tfunc )
-case( 'delta' ); srcft = 1.
-case( 'brune' ); srcft = 1. - exp( -tm / tsource ) / tsource * ( tm + tsource )
-case default
-  write( 0, * ) 'invalid tfunc: ', trim( tfunc )
-  stop
-end select
-
 ! Add to stress variables
+srcft = time_function( tfunc, tm, dt, tsource )
 nsrc = size( srcfr )
 do ic = 1, 3
 do i = 1, nsrc

@@ -165,11 +165,18 @@ case( 'const'  )
 case( 'delta'  )
   if ( abs( tm ) < 0.25 * dt ) time_function = 1.
 case( 'brune' )
-  time_function = exp( -tm / period ) * tm / ( period * period )
-case( 'ricker1' )
+  time_function = -exp( -tm / period ) / period * ( tm + period ) + 1.
+case( 'dbrune' )
+  time_function =  exp( -tm / period ) * period ** 2. * tm
+case( 'ddbrune' )
+  time_function = -exp( -tm / period ) / period ** 3. * ( tm - period ) 
+case( 'gaussian' )
+  t = ( tm - 4. * period ) / period
+  time_function = exp( -0.5 * t * t ) / ( period * sqrt( 2. * pi ) )
+case( 'dgaussian', 'ricker1' )
   t = tm - period
   time_function = t * exp( -2. * ( pi * t / period ) ** 2. )
-case( 'ricker2' )
+case( 'ddgaussian', 'ricker2' )
   t = ( pi * ( tm - period ) / period ) ** 2.
   time_function = ( 1. - 2. * t ) * exp( -t )
 case default
