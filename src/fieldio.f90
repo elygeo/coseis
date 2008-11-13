@@ -294,7 +294,7 @@ if ( i > 0 .and. debug > 2 .and. it <= 8 ) then
   idebug = idebug + 1
   write( str, '(2(a,i6.6),2a)' ) 'debug/f', it, '-', ipid, '-', field
   write( 0, * ) 'Opening file: ', trim( str )
-  open( 1, file=str, status='new' )
+  open( 1, file=str, status='replace' )
   do l = 1, size( f, 3 )
     write( 1, * ) ip3, field, l
     do k = 1, nm(2)-1
