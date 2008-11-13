@@ -153,15 +153,12 @@ Installation
         ./setup.py
 
 7.  To make the SORD module available you must add the enclosing directory to
-    your Python path. If you have write permission to you Python install, you can
-    do::
+    your Python path. If you have write permission to your Python install
+    directory, do::
 
         ./setup.py install
 
-    Alternatively you can use the PYTHONPATH environmental variable. For bash
-    shell do::
-
-        export PYTHONPATH=$( dirname $( /bin/pwd ) )
+    Alternatively you can use the PYTHONPATH environmental variable.
 
 8.  Some systems can send email status reports from your batch jobs, and you
     may specify the address for SORD to use by creating a text file called 'email'

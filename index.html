@@ -107,7 +107,7 @@ BSSA, in revision.
 </div>
 <div class="section" id="download">
 <h3>Download</h3>
-<p>Latest source code version <a class="reference external" href="sord.tgz">3.0.15</a></p>
+<p>Latest source code version <a class="reference external" href="sord.tgz">3.0.16</a></p>
 <p>Older versions can be extracted from the source code repository (see
 <a class="reference internal" href="#development">Development</a>).</p>
 </div>
@@ -163,16 +163,12 @@ sub-directory following the format of the supplied configurations.</p>
 </pre>
 </li>
 <li><p class="first">To make the SORD module available you must add the enclosing directory to
-your Python path. If you have write permission to you Python install, you can
-do:</p>
+your Python path. If you have write permission to your Python install
+directory, do:</p>
 <pre class="literal-block">
 ./setup.py install
 </pre>
-<p>Alternatively you can use the PYTHONPATH environmental variable. For bash
-shell do:</p>
-<pre class="literal-block">
-export PYTHONPATH=$( dirname $( /bin/pwd ) )
-</pre>
+<p>Alternatively you can use the PYTHONPATH environmental variable.</p>
 </li>
 <li><p class="first">Some systems can send email status reports from your batch jobs, and you
 may specify the address for SORD to use by creating a text file called 'email'
