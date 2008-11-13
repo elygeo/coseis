@@ -129,36 +129,36 @@ def compile( compiler, object, source ):
     return compile
 
 def install():
-    """Install pth file in site-packages directory"""
+    """Install path file in site-packages directory"""
     from distutils.sysconfig import get_python_lib
     import os
-    src = os.path.realpath( os.path.dirname( os.path.dirname( __file__ ) ) )
+    src = os.path.dirname( os.path.dirname( os.path.realpath( __file__ ) ) )
     dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
     print src
     print dst
     file( dst, 'w' ).write( src )
     return
 
+def uninstall():
+    """Remove path file from site-packages directory"""
+    from distutils.sysconfig import get_python_lib
+    import os
+    dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
+    print dst
+    os.unlink( dst )
+    return
+
 def install_copy():
     """Copy package to site-packages directory"""
     from distutils.sysconfig import get_python_lib
     import os, shutil
-    src = os.path.realpath( os.path.dirname( __file__ ) )
+    src = os.path.dirname( os.path.realpath( __file__ ) )
     dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) )
     print src
     print dst
     try: shutil.rmtree( dst )
     except: pass
     shutil.copytree( src, dst )
-    return
-
-def uninstall():
-    """Remove pth file from site-packages directory"""
-    from distutils.sysconfig import get_python_lib
-    import os
-    dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
-    print dst
-    os.unlink( dst )
     return
 
 def uninstall_copy():
