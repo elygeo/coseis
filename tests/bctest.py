@@ -5,8 +5,6 @@ Boundary condition test
 
 import sord
 
-# numerical noise will make these differ slighly
-# turn on debug=3
 debug = 3
 np = 1, 1, 1
 nt = 8

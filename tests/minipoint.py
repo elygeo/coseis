@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Miniature point source problem
+Miniature point source test
 """
 
 import sord
