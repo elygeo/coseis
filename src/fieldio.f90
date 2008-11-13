@@ -292,8 +292,8 @@ if ( i > 0 .and. debug > 2 .and. it <= 8 ) then
     idebug = 0
   end if
   idebug = idebug + 1
-  write( str, '(a,i6.6,a,i6.6,a)' ) 'debug/f', it, '-', ipid, field
-print *, 111, trim( str )
+  write( str, '(2(a,i6.6),2a)' ) 'debug/f', it, '-', ipid, '-', field
+  write( 0, * ) 'Opening file: ', trim( str )
   open( 1, file=str, status='new' )
   do l = 1, size( f, 3 )
     write( 1, * ) ip3, field, l
