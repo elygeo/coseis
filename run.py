@@ -204,6 +204,13 @@ def prepare_params( pp ):
             p[k] = v
     p = util.objectify( p )
 
+    # hypocenter node
+    ii = list( p.ihypo )
+    for i in range( 3 ):
+        if ii[i] < 1:
+            ii[i] = ii[i] + p.nn[i] + 1
+    p.ihypo = ii
+
     # boundary conditions
     i1 = list( p.bc1 )
     i2 = list( p.bc2 )

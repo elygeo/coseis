@@ -145,6 +145,7 @@ def uninstall():
     """Remove package from site-packages directory"""
     from distutils.sysconfig import get_python_lib
     import os, shutil
+    srcdir = os.path.realpath( os.path.dirname( __file__ ) )
     dstdir = get_python_lib() + os.sep + os.path.basename( srcdir )
     print dstdir
     try: shutil.rmtree( dstdir )
