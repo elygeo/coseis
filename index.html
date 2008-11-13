@@ -107,7 +107,7 @@ BSSA, in revision.
 </div>
 <div class="section" id="download">
 <h3>Download</h3>
-<p>Latest source code version <a class="reference external" href="sord.tgz">3.0.20</a></p>
+<p>Latest source code version <a class="reference external" href="sord.tgz">3.0.21</a></p>
 <p>Older versions can be extracted from the source code repository (see
 <a class="reference internal" href="#development">Development</a>).</p>
 </div>
@@ -194,15 +194,15 @@ cd examples/
 <p>Each time <tt class="docutils literal"><span class="pre">sord.run()</span></tt> is called, a new run directory is set up, starting with
 <tt class="docutils literal"><span class="pre">run/01/</span></tt>.  The directory contains the executable and scripts to run the
 code, and will contain all of the generated output and metadata.  From the run
-directory start the job interactively with the <tt class="docutils literal"><span class="pre">run</span></tt> script:</p>
+directory start the job interactively with the <tt class="docutils literal"><span class="pre">run.sh</span></tt> script:</p>
 <pre class="literal-block">
 cd run/01/
-./run
+./run.sh
 </pre>
-<p>Or, submit the job to the batch system with the <tt class="docutils literal"><span class="pre">que</span></tt> script</p>
+<p>Or, submit the job to the batch system with the <tt class="docutils literal"><span class="pre">que.sh</span></tt> script</p>
 <pre class="literal-block">
 cd run/01/
-./que
+./que.sh
 </pre>
 <p>Output (and large input, such as the material model) is stored in flat binary
 binary files.  Statistic, such as peak acceleration and peak velocity, are

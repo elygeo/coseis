@@ -5,7 +5,7 @@ TPV3 - SCEC validation problem version 3
 
 import sord
 
-debug = 0
+debug = 2
 np = 1, 1, 32
 np = 1, 1, 2
 np = 1, 1, 1

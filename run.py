@@ -171,18 +171,18 @@ def run( params ):
 
     # Run or que job
     if run == 'q':
-        print 'que'
+        print 'que.sh'
         if os.uname()[1] not in cfg.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r' % ( host, machine ) )
-        #if subprocess.call( '.' + os.sep + 'que' ):
-        if os.system( '.' + os.sep + 'que' ):
+        #if subprocess.call( '.' + os.sep + 'que.sh' ):
+        if os.system( '.' + os.sep + 'que.sh' ):
             sys.exit( 'Error queing job' )
     elif run:
-        print 'run -' + run
+        print 'run.sh -' + run
         if os.uname()[1] not in cfg.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r' % ( host, machine ) )
-        #if subprocess.call( [ '.' + os.sep + 'run', '-' + run ] ):
-        if os.system( '.' + os.sep + 'run -' + run ):
+        #if subprocess.call( [ '.' + os.sep + 'run.sh', '-' + run ] ):
+        if os.system( '.' + os.sep + 'run.sh -' + run ):
             sys.exit( 'Error running job' )
 
     # Return to initial directory

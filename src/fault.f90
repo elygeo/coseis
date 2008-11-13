@@ -53,7 +53,7 @@ i1 = maxloc( t3(:,:,:,3) )
 rr = t3(i1(1),i1(2),i1(3),3)
 i1(ifn) = ihypo(ifn)
 i1 = i1 + nnoff
-if ( rr > 0. ) write( 0, * ) 'warning: positive normal traction: ', rr, i1
+if ( rr >= 0. ) write( 0, * ) 'warning: positive normal traction: ', rr, i1
 
 ! Lock fault in PML region
 i1 = i1pml + 1
@@ -111,7 +111,7 @@ do i = 1, 3
   t0(:,:,:,i) = t0(:,:,:,i) + &
   t3(:,:,:,1) * t1(:,:,:,i) + &
   t3(:,:,:,2) * t2(:,:,:,i) + &
-  tn * nhat(:,:,:,i)
+  t3(:,:,:,3) * nhat(:,:,:,i)
 end do
 
 ! Hypocentral radius
@@ -169,7 +169,11 @@ if ( master ) then
   tn0 = sum( t0(j,k,l,:) * nhat(j,k,l,:) )
   ts0 = sqrt( sum( ( t0(j,k,l,:) - tn0 * nhat(j,k,l,:) ) ** 2. ) )
   tn0 = max( -tn0, 0. )
+  print *, 111, j,k,l
+  print *, 111, tn0, ts0, mus0, mud0, mu0
+  print *, 222, ts0 - tn0 * mud0
   ess = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 )
+  print *, 333, mus0 - mud0
   lc =  dc0 * mu0 / tn0 / ( mus0 - mud0 )
   if ( tn0 * ( mus0 - mud0 ) == 0. ) lc = 0.
   rctest = mu0 * tn0 * ( mus0 - mud0 ) * dc0 / ( ts0 - tn0 * mud0 ) ** 2
