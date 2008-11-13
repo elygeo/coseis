@@ -40,6 +40,8 @@ use m_collective
 real :: rr
 integer :: i1(3), i2(3), n(3), noff(3), i
 
+if ( master .and. debug == 2 ) write( 0, * ) 'Field I/O init'
+
 ! Store locations
 if ( master ) open( 1, file='locations', status='replace' )
 
@@ -95,6 +97,7 @@ real :: val
 
 ! Start timer
 val = timer( 2 )
+if ( master .and. debug == 2 ) write( 0, * ) 'Field I/O ', passes, field
 
 ! Pass loop
 do ipass = 1, len( passes )
@@ -282,13 +285,15 @@ end do loop
 end do
 
 ! Debug output
-if ( debug > 2 .and. it <= 8 ) then
+i = scan( passes, '>' )
+if ( i > 0 .and. debug > 2 .and. it <= 8 ) then
   if ( itdebug /= it ) then
     itdebug = it
     idebug = 0
   end if
   idebug = idebug + 1
   write( str, '(a,i6.6,a,i6.6,a)' ) 'debug/f', it, '-', ipid, field
+print *, 111, trim( str )
   open( 1, file=str, status='new' )
   do l = 1, size( f, 3 )
     write( 1, * ) ip3, field, l

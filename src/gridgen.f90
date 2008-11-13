@@ -155,9 +155,9 @@ end if
 call fieldio( '>', 'x1', w1(:,:,:,1) )
 call fieldio( '>', 'x2', w1(:,:,:,2) )
 call fieldio( '>', 'x3', w1(:,:,:,3) )
-call fieldio( '>', 'X1', w2(:,:,:,1) )
-call fieldio( '>', 'X2', w2(:,:,:,2) )
-call fieldio( '>', 'X3', w2(:,:,:,3) )
+call fieldio( '>', 'c1', w2(:,:,:,1) )
+call fieldio( '>', 'c2', w2(:,:,:,2) )
+call fieldio( '>', 'c3', w2(:,:,:,3) )
 
 ! Orthogonality test
 if ( oplevel == 0 ) then

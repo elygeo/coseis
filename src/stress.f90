@@ -142,12 +142,12 @@ end do doid
 end do doic
 
 ! Strain I/O
-call fieldio( '<>', 'exx', w1(:,:,:,1) )
-call fieldio( '<>', 'eyy', w1(:,:,:,2) )
-call fieldio( '<>', 'ezz', w1(:,:,:,3) )
-call fieldio( '<>', 'eyz', w2(:,:,:,1) )
-call fieldio( '<>', 'ezx', w2(:,:,:,2) )
-call fieldio( '<>', 'exy', w2(:,:,:,3) )
+call fieldio( '<>', 'e11', w1(:,:,:,1) )
+call fieldio( '<>', 'e22', w1(:,:,:,2) )
+call fieldio( '<>', 'e33', w1(:,:,:,3) )
+call fieldio( '<>', 'e23', w2(:,:,:,1) )
+call fieldio( '<>', 'e31', w2(:,:,:,2) )
+call fieldio( '<>', 'e12', w2(:,:,:,3) )
 
 ! Attenuation
 !do j = 1, 2
@@ -168,12 +168,12 @@ do i = 1, 3
 end do
 
 ! Stress I/O
-call fieldio( '<>', 'wxx', w1(:,:,:,1) )
-call fieldio( '<>', 'wyy', w1(:,:,:,2) )
-call fieldio( '<>', 'wzz', w1(:,:,:,3) )
-call fieldio( '<>', 'wyz', w2(:,:,:,1) )
-call fieldio( '<>', 'wzx', w2(:,:,:,2) )
-call fieldio( '<>', 'wxy', w2(:,:,:,3) )
+call fieldio( '<>', 'w11', w1(:,:,:,1) )
+call fieldio( '<>', 'w22', w1(:,:,:,2) )
+call fieldio( '<>', 'w33', w1(:,:,:,3) )
+call fieldio( '<>', 'w23', w2(:,:,:,1) )
+call fieldio( '<>', 'w31', w2(:,:,:,2) )
+call fieldio( '<>', 'w12', w2(:,:,:,3) )
 if ( modulo( it, itstats ) == 0 ) then
   call tensor_norm( s1, w1, w2, i1core, i2core, (/ 1, 1, 1 /) )
   call scalar_set_halo( s1, -1., i1core, i2core )
