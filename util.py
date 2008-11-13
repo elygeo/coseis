@@ -145,7 +145,8 @@ def uninstall():
     import os
     dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
     print dst
-    os.unlink( dst )
+    try: os.unlink( dst )
+    except: pass
     return
 
 def install_copy():
@@ -167,7 +168,8 @@ def uninstall_copy():
     import os, shutil
     dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) )
     print dst
-    shutil.rmtree( dst )
+    try: shutil.rmtree( dst )
+    except: pass
     return
 
 def tarball( filename=None, ignorefile='.bzrignore' ):
