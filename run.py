@@ -22,7 +22,7 @@ def run( params ):
     run = False
     mode = None
     optimize = 'O'
-    opts, machine = getopt.getopt( sys.argv[1:], 'niqsmgGpOd' )
+    opts, machine = getopt.getopt( sys.argv[1:], 'niqsmgGtpOd' )
     for o, v in opts:
         if   o == '-n': prepare = False; run = False
         elif o == '-i': run = 'i'
@@ -31,6 +31,7 @@ def run( params ):
         elif o == '-m': mode = 'm'
         elif o == '-g': optimize = 'g'
         elif o == '-G': optimize = 'g'; run = 'g'
+        elif o == '-t': optimize = 't'
         elif o == '-p': optimize = 'p'
         elif o == '-O': optimize = 'O'
         elif o == '-d':

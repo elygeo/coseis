@@ -25,6 +25,7 @@ for _dir in os.environ['PATH'].split(':'):
     if mfc: break
 _ = [ '-o' ]
 g = [ '-g' ]
+t = []
 p = [ '-O', '-p' ]
 O = [ '-O' ]
 getarg = ''
@@ -35,18 +36,22 @@ if sfc == 'gfortran':
     O = [ '-O3' ]
 elif sfc == 'ifort':
     _ = [ '-u', '-std95', '-warn', '-o' ]
-    g = [ '-g', '-CB', '-traceback' ]
+    g = [ '-CB', '-traceback', '-g' ]
+    t = [ '-CB', '-traceback' ]
     O = [ '-O3' ]
 elif sfc == 'pathf95':
     O = [ '-i8', '-O3', '-OPT:Ofast', '-fno-math-errno' ] + _
 elif sfc == 'pgf90':
     getarg = 'getarg-pgf.f90'
-    g = [ '-g', '-Ktrap=fp', '-Mbounds', '-Mdclchk' ]
+    _ = [ '-Mdclchkk', '-o' ]
+    g = [ '-Ktrap=fp', '-Mbounds', '-g' ]
+    t = [ '-Ktrap=fp', '-Mbounds' ]
     p = [ '-O', '-Mprof=func' ]
     O = [ '-fast' ]
 elif sfc == 'xlf95_r':
     _ = [ '-u', '-q64', '-qsuppress=cmpmsg', '-qlanglvl=2003pure', '-qsuffix=f=f90', '-o' ]
-    g = [ '-g', '-C', '-qflttrap', '-qsigtrap' ]
+    g = [ '-C', '-qflttrap', '-qsigtrap', '-g' ]
+    t = [ '-C', '-qflttrap', '-qsigtrap' ]
     O = [ '-O4' ]
 elif sfc == 'f95' and os.uname()[0] == 'SunOS':
     getarg = 'getarg.f90'
@@ -55,6 +60,7 @@ elif sfc == 'f95' and os.uname()[0] == 'SunOS':
 if sfc: sfc = [ sfc ]
 if mfc: mfc = [ mfc ]
 g = g + _
+t = t + _
 O = O + _
 p = p + _
 

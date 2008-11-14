@@ -5,7 +5,7 @@ lfs quota -u <username> $WORK
 lfs quota -u <username> $SCRATCH
 """
 login = 'tg-login.ranger.tacc.teragrid.org'
-hosts = [ 'login3' ]
+hosts = [ 'login3.ranger.tacc.utexas.edu' ]
 nodes = 3936 # total
 nodes = 16   # development
 nodes = 256  # normal
@@ -18,8 +18,9 @@ timelimit = 24, 00
 getarg = 'getarg-pgf.f90'
 sfc = [ 'pgf95' ]
 mfc = [ 'mpif90' ]
-_ = [ '-o' ]
-g = [ '-g', '-Ktrap=fp', '-Mbounds', '-Mdclchk' ] + _
+_ = [ '-Mdclchk', '-o' ]
+g = [ '-g', '-Ktrap=fp', '-Mbounds' ] + _
+t = [ '-Ktrap=fp', '-Mbounds' ] + _
 p = [ '-fast', '-tp', 'barcelona-64', '-Mprof=func' ] + _
 O = [ '-fast', '-tp', 'barcelona-64' ] + _
 

@@ -8,7 +8,7 @@ import sord
 debug = 3
 np = 1, 1, 1
 nn = 2, 2, 2
-nt = 1
+nt = 2
 dx = 100
 dt = 0.0075
 bc1 = 0, 0, 0

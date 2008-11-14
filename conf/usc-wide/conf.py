@@ -16,6 +16,7 @@ _ = [ '-fimplicit-none', '-Wall', '-std=f95', '-pedantic', '-o' ]
 _ = [ '-fimplicit-none', '-Wall', '-std=f95', '-o' ]
 _ = [ '-fimplicit-none', '-Wall', '-o' ]
 g = [ '-g', '-fbounds-check', '-ffpe-trap=invalid,zero,overflow' ] + _
+t = _
 p = [ '-O', '-pg' ] + _
 O = [ '-O3' ] + _
 

@@ -21,8 +21,8 @@ timelimit = 24, 00
 getarg = 'getarg-pgf.f90'
 sfc = [ 'pgf90', ]
 mfc = [ 'mpif90' ]
-_ = [ '-o' ]
-g = [ '-g', '-Ktrap=fp', '-Mbounds', '-Mdclchk' ] + _
+_ = [ '-Mdclchk', '-o' ]
+g = [ '-g', '-Ktrap=fp', '-Mbounds' ] + _
 p = [ '-O', '-Mprof=func' ] + _
 O = [ '-fast' ] + _
 

@@ -161,7 +161,7 @@ def docs():
 if __name__ == '__main__':
     import sys, util
     if len( sys.argv ) == 1:
-        build( 'sm', 'gpO' )
+        build( 'sm', 'O' )
     else:
         if sys.argv[1] == 'docs':
             docs()
