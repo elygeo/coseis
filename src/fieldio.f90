@@ -32,15 +32,15 @@ deallocate( p )
 p => pprev
 end subroutine
 
-! Field I/O initialization
-subroutine fieldio_init
+! Field I/O locations
+subroutine fieldio_locs
 use m_globals
 use m_util
 use m_collective
 real :: rr
 integer :: i1(3), i2(3), n(3), noff(3), i
 
-if ( master .and. debug == 2 ) write( 0, * ) 'Field I/O init'
+if ( verbose ) write( 0, * ) 'Field I/O locations'
 
 ! Store locations
 if ( master ) open( 1, file='locations', status='replace' )
@@ -97,7 +97,7 @@ real :: val
 
 ! Start timer
 val = timer( 2 )
-if ( master .and. debug == 2 ) write( 0, * ) 'Field I/O ', passes, field
+if ( verbose ) write( 0, * ) 'Field I/O ', passes, field
 
 ! Pass loop
 do ipass = 1, len( passes )
@@ -286,7 +286,7 @@ end do
 
 ! Debug output
 i = scan( passes, '>' )
-if ( i > 0 .and. debug > 2 .and. it <= 8 ) then
+if ( i > 0 .and. debug > 3 .and. it <= 8 ) then
   if ( itdebug /= it ) then
     itdebug = it
     idebug = 0

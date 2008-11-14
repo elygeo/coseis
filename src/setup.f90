@@ -70,10 +70,9 @@ if ( ifn /= 0 ) then
   if ( ihypo(ifn) + 1 < i1core(ifn) .or. ihypo(ifn) > i2core(ifn) ) ifn = 0
 end if
 
-! Synchronize processes if debugging
-sync = debug > 1
-
-! Write debug info
+! Debugging
+verbose = master .and. debug > 1
+sync = debug > 2
 if ( debug > 0 ) then
   write( str, "( a,i6.6,a )" ) 'debug/db', ipid, '.py'
   open( 1, file=str, status='replace' )

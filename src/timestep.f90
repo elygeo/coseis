@@ -12,7 +12,7 @@ integer :: j, k, l
 
 ! Status
 if ( master ) then
-  if ( debug == 2 ) then
+  if ( verbose ) then
     write( 0, * ) 'Time step', it
   else
     write( 0, '(a)', advance='no' ) '.'

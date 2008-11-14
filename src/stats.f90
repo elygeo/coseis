@@ -18,7 +18,7 @@ real :: rr
 real, save, allocatable, dimension(:,:) :: &
   vstats, fstats, estats, gvstats, gfstats, gestats
 
-if ( master .and. debug == 2 ) write( 0, * ) 'Statistics'
+if ( verbose ) write( 0, * ) 'Statistics'
 
 ! Allocate buffers
 if ( init ) then

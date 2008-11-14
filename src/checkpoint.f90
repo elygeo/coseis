@@ -43,7 +43,7 @@ subroutine write_checkpoint
 use m_globals
 use m_stats
 integer :: i
-if ( master .and. debug == 2 ) write( 0, * ) 'Checkpoint'
+if ( verbose ) write( 0, * ) 'Checkpoint'
 open( 1, file='itcheck', status='old', iostat=i )
 if ( i == 0 ) then
   read( 1, * ) itcheck

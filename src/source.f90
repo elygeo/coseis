@@ -84,7 +84,7 @@ integer :: i, j, k, l, ic, nsrc
 real :: srcft = 0.
 
 if ( rsource <= 0. ) return
-if ( master .and. debug == 2 ) write( 0, * ) 'Moment source'
+if ( verbose ) write( 0, * ) 'Moment source'
 
 ! Add to stress variables
 srcft = time_function( tfunc, tm, dt, tsource )

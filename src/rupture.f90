@@ -1,9 +1,9 @@
-! Fault boundary condition
+! Rupture boundary condition
 module m_rupture
 implicit none
 contains
 
-! Fault initialization
+! Rupture initialization
 subroutine rupture_init
 use m_globals
 use m_collective
@@ -15,7 +15,7 @@ real :: rr, mu0, mus0, mud0, dc0, tn0, ts0, ess, lc,  rctest
 integer :: i1(3), i2(3), i, j, k, l
 
 if ( ifn == 0 ) return
-if ( master ) write( 0, * ) 'Fault initialization'
+if ( master ) write( 0, * ) 'Rupture initialization'
 
 ! I/O
 mus = 0.
@@ -190,7 +190,7 @@ end subroutine
 
 !------------------------------------------------------------------------------!
 
-! Fault boundary condition
+! Rupture boundary condition
 subroutine rupture
 use m_globals
 use m_collective
@@ -201,7 +201,7 @@ use m_stats
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
 if ( ifn == 0 ) return
-if ( master .and. debug == 2 ) write( 0, * ) 'Fault'
+if ( verbose ) write( 0, * ) 'Rupture'
 
 ! Indices
 i1 = 1
