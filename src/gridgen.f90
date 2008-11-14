@@ -120,7 +120,6 @@ call vector_swap_halo( w1, nhalo )
 call vector_bc( w1, bc, bc, i1, i2 )
 
 ! Find cell centers
-w2 = 0.
 call vector_average( w2, w1, i1cell, i2cell, 1 )
 
 ! Hypocenter location
@@ -156,6 +155,7 @@ end if
 call fieldio( '>', 'x1', w1(:,:,:,1) )
 call fieldio( '>', 'x2', w1(:,:,:,2) )
 call fieldio( '>', 'x3', w1(:,:,:,3) )
+call vector_set_halo( w2, 0., i1cell, i2cell )
 call fieldio( '>', 'c1', w2(:,:,:,1) )
 call fieldio( '>', 'c2', w2(:,:,:,2) )
 call fieldio( '>', 'c3', w2(:,:,:,3) )

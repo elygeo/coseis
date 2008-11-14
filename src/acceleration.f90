@@ -8,6 +8,7 @@ use m_globals
 use m_diffcn
 use m_hourglass
 use m_bc
+use m_rupture
 use m_util
 use m_fieldio
 use m_stats
@@ -171,6 +172,9 @@ call fieldio( '<>', 'f3', w1(:,:,:,3) )
 do i = 1, 3
   w1(:,:,:,i) = w1(:,:,:,i) * mr
 end do
+
+! Spontaneous rupture
+call rupture
 
 ! Acceleration I/O
 call fieldio( '<>', 'a1', w1(:,:,:,1) )

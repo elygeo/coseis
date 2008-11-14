@@ -6,6 +6,7 @@ contains
 subroutine stress
 use m_globals
 use m_diffnc
+use m_source
 use m_util
 use m_fieldio
 use m_stats
@@ -166,6 +167,9 @@ do i = 1, 3
   w1(:,:,:,i) = 2. * mu * w1(:,:,:,i) + s1
   w2(:,:,:,i) =      mu * w2(:,:,:,i)
 end do
+
+! Add moment source to stress
+call moment_source
 
 ! Stress I/O
 call fieldio( '<>', 'w11', w1(:,:,:,1) )

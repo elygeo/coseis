@@ -11,7 +11,7 @@ use m_grid_gen
 use m_fieldio
 use m_source
 use m_material
-use m_fault
+use m_rupture
 use m_resample
 use m_checkpoint
 use m_timestep
@@ -39,7 +39,7 @@ if ( sync ) call barrier ; call fieldio_init                ; prof0(7) = timer( 
 if ( sync ) call barrier ; call source_init                 ; prof0(8) = timer( 6 )
 if ( sync ) call barrier ; call material
 if ( sync ) call barrier ; call pml                         ; prof0(9) = timer( 6 )
-if ( sync ) call barrier ; call fault_init                  ; prof0(10) = timer( 6 )
+if ( sync ) call barrier ; call rupture_init                ; prof0(10) = timer( 6 )
 if ( sync ) call barrier ; call resample                    ; prof0(11) = timer( 6 )
 if ( sync ) call barrier ; call read_checkpoint             ; prof0(12) = timer( 6 )
 if ( sync ) call barrier ; prof0(13) = iotimer              ; prof0(14) = timer( 7 )
@@ -54,9 +54,7 @@ do while ( it < nt )
   iotimer = 0.
   if ( sync ) call barrier ; call timestep
   if ( sync ) call barrier ; call stress
-  if ( sync ) call barrier ; call moment_source
   if ( sync ) call barrier ; call acceleration   
-  if ( sync ) call barrier ; call fault
   if ( sync ) call barrier ; prof(1,jp) = timer( 5 )
   if ( sync ) call barrier ; call vector_swap_halo( w1, nhalo )
   if ( sync ) call barrier ; call stats()
