@@ -263,7 +263,7 @@ case( '=w' )
   end do
   end do
   end do
-  if ( p%ib == p%nb .or. it == it2 .or. modulo( it, itcheck ) == 0 ) then
+  if ( p%ib == p%nb .or. it == it2 .or. modulo( it, itio ) == 0 ) then
     n(4) = p%ib
     m(4) = ( it2 - it1 ) / dit + 1
     o(4) = ( it  - it1 ) / dit + 1 - n(4)

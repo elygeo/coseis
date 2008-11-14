@@ -21,7 +21,12 @@ ihypo = 1, 1, 1
 fixhypo = 2
 rsource = 50.
 
-fieldio = []
+fieldio = [
+    ( '=', 'rho', [], 2670.     ),      
+    ( '=', 'vp',  [], 6000.     ),      
+    ( '=', 'vs',  [], 3464.1016 ),      
+    ( '=', 'gam', [],    0.     ),      
+]
 for _f in sord.fieldnames.volume:
     fieldio += [ ( '=w', _f, [], _f ) ]
 

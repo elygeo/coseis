@@ -14,13 +14,11 @@ ifn = abs( faultnormal )
 
 ! Partition for parallelization
 if ( np0 == 1 ) np = 1
-nl = nn / np
-where ( modulo( nn, np ) /= 0 ) nl = nl + 1
+nl = ( nn - 1 ) / np + 1
 nhalo = 1
 if ( ifn /= 0 ) nhalo(ifn) = 2
 nl = max( nl, nhalo )
-np = nn / nl
-where ( modulo( nn, nl ) /= 0 ) np = np + 1
+np = ( nn - 1 ) / nl + 1
 call rank( ip3, ipid, np )
 nnoff = nl * ip3 - nhalo
 
@@ -50,15 +48,6 @@ i2node = min( i2bc, nm - 1 )
 ! Cell region
 i1cell = max( i1bc, 1 )
 i2cell = min( i2bc - 1, nm - 1 )
-
-! PML region code moved to Python wrapper. catch error sooner
-!i1pml = 0
-!i2pml = nn + 1
-!if ( npml > 0 ) then
-!  where ( bc1 == 10 ) i1pml = npml
-!  where ( bc2 == 10 ) i2pml = nn - npml + 1
-!end if
-!if ( any( i1pml > i2pml ) ) stop 'model too small for PML'
 
 ! PML region
 i1pml = i1pml - nnoff

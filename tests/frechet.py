@@ -18,10 +18,10 @@ _vol = (1,-1,3), (1,-1,3), (1,-1,3), (1,-1,5)
 
 for _f in 'f1', 'f2', 'f3':
     fieldio = [
-        ( '=',  'gam', [],   0.    ),		# viscosity
         ( '=r', 'rho', [],   'rho' ),		# density
         ( '=r', 'vp',  [],   'vp'  ),		# P-wave speed
         ( '=r', 'vs',  [],   'vs'  ),		# S-wave speed
+        ( '=',  'gam', [],   0.    ),		# viscosity
         ( '=',  'f1', _src, 1., 'brune', 0.1 ),	# point source time function
         ( '=w', 'e11', _vol, 'g11' ),		# dG: Green's function
         ( '=w', 'e22', _vol, 'g22' ),		# dG: Green's function

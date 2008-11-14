@@ -64,11 +64,16 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     # Prep parameters 
     params = prepare_params( params )
 
-    # Number of processors
+    # Partition for parallelization
     np3 = params.np[:]
     totalcores = cfg.nodes * cfg.cores
     if not mode and totalcores == 1: mode = 's'
     if mode == 's': np3 = [ 1, 1, 1 ]
+    nl = [ ( params.nn[i] - 1 ) / np3[i] + 1 for i in range(3) ]
+    i  = abs( params.faultnormal ) - 1
+    if i >= 0: nl[i] = max( nl[i], 2 )
+    np3 = [ ( params.nn[i] - 1 ) / nl[i] + 1 for i in range(3) ]
+    params.np = np3
     np = np3[0] * np3[1] * np3[2]
     if not mode:
         mode = 's'
@@ -82,17 +87,12 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
         ppn = np
         cores = np
 
-    # Domain size
-    nm3 = [ ( params.nn[i] - 1 ) / np3[i] + 3 for i in range(3) ]
-    i = params.faultnormal - 1
-    if i >= 0: nm3[i] = nm3[i] + 2
-    nm = nm3[0] * nm3[1] * nm3[2]
-
     # RAM and Wall time usage
     floatsize = 4
     if params.oplevel in (1,2): nvars = 20
     elif params.oplevel in (3,4,5): nvars = 23
     else: nvars = 44
+    nm = ( nl[0] + 2 ) * ( nl[1] + 2 ) * ( nl[2] + 2 )
     ramcore = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * 1.5
     ramnode = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * ppn
     sus = ( params.nt + 10 ) * ppn * nm / cores / cfg.rate / 3600000 * nodes * cfg.cores
@@ -208,7 +208,8 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
 def prepare_params( pp ):
     """Prepare input paramers"""
 
-    itbuff = 10 # XXX should this go in a settings file?
+    # max buffer size for 2D slices. should this go in a settings file?
+    itbuff = 10
 
     # merge input parameters with defaults
     f = os.path.dirname( __file__ ) + os.sep + 'defaults.py'
@@ -261,8 +262,8 @@ def prepare_params( pp ):
     for line in p.fieldio:
         line = list( line )
         filename = '-'
-        x1 = x2 = 0., 0., 0.
         tfunc, val, period = 'const', 1.0, 1.0
+        x1 = x2 = 0., 0., 0.
         op = line[0][0]
         mode = line[0][1:]
         if op not in '=+': sys.exit( 'Error: unsupported operator: %r' % line )
@@ -310,8 +311,11 @@ def prepare_params( pp ):
             i = p.faultnormal - 1
             ii[i] = 2 * ( p.ihypo[i], ) + ( 1, )
         nn = [ ( ii[i][1] - ii[i][0] + 1 ) / ii[i][2] for i in range(4) ]
-        nb = min( nn[3], min( p.nt, p.itio ) )
+        nb = ( min( p.itio, p.nt ) - 1 ) / ii[3][2] + 1
+        nb = min( nb, nn[3] )
         n = nn[0] * nn[1] * nn[2]
+        print 111, nn
+        print field, n, ( p.nn[0] + p.nn[1] + p.nn[2] ) ** 2
         if n > ( p.nn[0] + p.nn[1] + p.nn[2] ) ** 2:
             nb = 1
         elif n > 1:
