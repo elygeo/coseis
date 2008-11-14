@@ -7,21 +7,16 @@ import os, sys, pwd, glob, time, getopt, shutil
 import util, setup, configure, fieldnames
 callcount = 0
 
-def run( params ):
+def run( params, prepare=True, run=False, mode=None, optimize='O' ):
     """Setup, and optionally launch, a SORD job"""
-
-    global callcount
-    callcount += 1
 
     # Save start time
     starttime = time.asctime()
     print "SORD setup"
+    global callcount
+    callcount += 1
 
     # Command line options
-    prepare = True
-    run = False
-    mode = None
-    optimize = 'O'
     opts, machine = getopt.getopt( sys.argv[1:], 'niqsmgGtpOd' )
     for o, v in opts:
         if   o == '-n': prepare = False; run = False
@@ -205,6 +200,11 @@ def prepare_params( pp ):
                 sys.exit( 'Unknown SORD parameter: %s = %r' % ( k, v ) )
             p[k] = v
     p = util.objectify( p )
+
+    # inervals
+    p.itio = min( p.itio, p.nt )
+    if p.itcheck % p.itio != 0:
+        p.itcheck = ( p.itcheck / p.itio + 1 ) * p.itio
 
     # hypocenter node
     ii = list( p.ihypo )
