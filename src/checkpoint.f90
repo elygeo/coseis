@@ -44,12 +44,14 @@ use m_globals
 use m_stats
 integer :: i
 if ( verbose ) write( 0, * ) 'Checkpoint'
-open( 1, file='itcheck', status='old', iostat=i )
-if ( i == 0 ) then
-  read( 1, * ) itcheck
-  close( 1 )
+if ( itcheck >= 0 .and. ( it == nt .or. modulo( it, itio ) == 0 ) ) then
+  open( 1, file='itcheck', status='old', iostat=i )
+  if ( i == 0 ) then
+    read( 1, * ) itcheck
+    close( 1 )
+  end if
 end if
-if ( itcheck == 0 ) return
+if ( itcheck <= 0 ) return
 if ( modulo( it, itcheck ) /= 0 ) return
 i = modulo( it / itcheck, 2 )
 write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', i, '-', ipid

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Mini fault test
+Fault test
 """
 
 import sord
@@ -32,8 +32,8 @@ fieldio = [
     ( '=',  'ts',  [],   -70e6 ),
     ( '=c', 'ts',  [], -81.6e6, (-401.,-401.,-1.), (401.,401.,1.) ),
 ]
-#for _f in sord.fieldnames.all:
-#    fieldio += [ ( '=w', _f, [], _f ), ]
+for _f in sord.fieldnames.all:
+    fieldio += [ ( '=w', _f, [], _f ), ]
 
 sord.run( locals() )
 
