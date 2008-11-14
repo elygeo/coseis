@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-echo -n "Installing Python, Numpy and Bazaar in ${HOME}/local. Are you sure? [y/N]: "
+echo -n "Installing Python and setuptools in ${HOME}/local. Are you sure? [y/N]: "
 read confirm
 [ "$confirm" = "y" ]
 
@@ -15,10 +15,8 @@ cd Python-2.6
 make
 make install
 
-wget http://pypi.python.org/packages/2.6/s/setuptools/setuptools-0.6c9-py2.6.egg
-bash setuptools-0.6c9-py2.6.egg
-easy_install numpy
-easy_install bzr
+wget http://peak.telecommunity.com/dist/ez_setup.py
+python ez_setup.py --prefix=$HOME/local
 
 echo "Don't forget to add \${HOME}/local/bin to your path"
 
