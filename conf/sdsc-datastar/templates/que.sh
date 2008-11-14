@@ -6,5 +6,5 @@ if [ $( /bin/pwd | grep -v gpfs ) ]; then
     exit
 fi
 
-llsubmit script >> log
+llsubmit script.sh >> log
 

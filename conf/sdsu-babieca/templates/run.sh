@@ -1,7 +1,6 @@
 #!/bin/bash -e
 
 mode=%(mode)r
-
 cd %(rundir)r
 
 echo "$( date ): %(code)s started" >> log

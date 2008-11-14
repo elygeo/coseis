@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 #PBS -N %(code)s%(count)s
 #PBS -l nodes=%(nodes)s:ppn=%(ppn)s
@@ -11,8 +11,7 @@
 #PBS -M %(email)s
 #PBS -V
 
-module load intel
-module load vmpi
+module load intel vmpi
 
 cd %(rundir)r
 

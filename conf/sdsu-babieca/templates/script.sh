@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 #PBS -N %(code)s%(count)s
 #PBS -l nodes=%(nodes)s:ppn=%(ppn)s:mpi

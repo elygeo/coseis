@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 #$ -N %(code)s%(count)s
 #$ -pe %(ppn)sway %(np)s

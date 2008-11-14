@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 #PBS -N %(code)s%cound)s
 #PBS -l nodes=%(nodes):ppn=%(ppn):smallmem

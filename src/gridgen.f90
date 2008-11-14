@@ -11,12 +11,13 @@ use m_util
 use m_fieldio
 integer :: i1(3), i2(3), i3(3), i4(3), bc(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, b, c
-real :: x0(3), m(9), tol, r
+real :: x0(3), m(9), tol
 integer, allocatable :: seed(:)
 
 if ( master ) write( 0, * ) 'Grid generation'
 
 ! Create rectangular mesh with double nodes at the fault
+w1 = 0.
 i1 = i1core
 i2 = i2core
 do i = i1(1), i2(1); w1(i,:,:,1) = dx * ( i + nnoff(1) - 1 ); end do
@@ -119,8 +120,8 @@ call vector_swap_halo( w1, nhalo )
 call vector_bc( w1, bc, bc, i1, i2 )
 
 ! Find cell centers
+w2 = 0.
 call vector_average( w2, w1, i1cell, i2cell, 1 )
-call vector_set_halo( w2, huge(r), i1cell, i2cell )
 
 ! Hypocenter location
 j = ihypo(1)

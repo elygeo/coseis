@@ -54,10 +54,7 @@ p => p%next
 ! Locate nearest node/cell to given location
 i = scan( p%mode, 'xX' )
 if ( i > 0 ) then
-  p%mode(i:i) = ' '
-  n = nn + 2 * nhalo
-  noff = nnoff + nhalo
-  rr = huge( rr )
+  s2 = huge( rr )
   select case( p%mode(i:i) )
   case( 'x' )
     i1 = i1core
@@ -68,8 +65,11 @@ if ( i > 0 ) then
     i2 = min( i2core, i2cell )
     call radius( s2, w2, p%x1, i1, i2 )
   end select
-  call scalar_set_halo( s2, rr, i1, i2 )
+  p%mode(i:i) = ' '
+  n = nn + 2 * nhalo
+  noff = nnoff + nhalo
   call reduceloc( rr, i1, s2, 'allmin', n, noff, 0 )
+  i1 = i1 + nnoff
   p%ii(1,1:3) = i1
   p%ii(2,1:3) = i1
   if ( rr > dx * dx ) call pdelete

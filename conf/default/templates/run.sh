@@ -2,7 +2,7 @@
 
 mode=%(mode)r
 cd %(rundir)r
-[ "$mode" = m ] && ./mpd
+[ "$mode" = m ] && ./mpd.sh
 
 echo "$( date ): %(code)s started" >> log
 %(pre)s

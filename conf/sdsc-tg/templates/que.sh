@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 cd %(rundir)r
 if [ $( /bin/pwd | grep -v gpfs ) ]; then
@@ -6,5 +6,5 @@ if [ $( /bin/pwd | grep -v gpfs ) ]; then
     exit
 fi
 
-echo "$( date ): %(code)s qued with ID: $( qsub script )" >> log
+echo "$( date ): %(code)s qued with ID: $( qsub script.sh )" >> log
 
