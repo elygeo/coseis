@@ -26,4 +26,3 @@ t = [] + _
 p = [ '-O', '-p' ] + _
 O = [ '-i8', '-O3', '-OPT:Ofast', '-fno-math-errno' ] + _
 
-

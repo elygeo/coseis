@@ -9,9 +9,10 @@ batch nodes:
   32 x 2 Intel Xeon 2.4GHz
   2GB (node8 has 1GB)
 """
-login = 'altai.sdsu.edu ssh babieca.sdsu.edu'
+login = 'babieca.sdsu.edu'
 hosts = [ 'master' ]
 nodes = 32
 cores = 2
 ram = 1800
 rate = 100
+
