@@ -7,8 +7,28 @@ import os, sys, pwd, glob, time, getopt, shutil
 import util, setup, configure, fieldnames
 callcount = 0
 
-def run( params, prepare=True, run=False, mode=None, optimize='O' ):
-    """Setup, and optionally launch, a SORD job"""
+def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None ):
+    """
+    Prepare, and optionally launch, a SORD job.
+
+    machine: site specific configuration located in conf/
+    params: a dictionary of simulation parameters
+    prepare:
+        True:  compile code and setup run/ directory
+        False: dry run. parameter check only
+    run:
+        i' run interactively
+       'q' que batch job
+       'g' run in a debugger
+    mode:
+       's' serial
+       'm' multiprocessor
+    optimize:
+       'O' fully optimized
+       'g' debugging
+       't' testing
+       'p' profiling
+    """
 
     # Save start time
     starttime = time.asctime()
@@ -17,9 +37,9 @@ def run( params, prepare=True, run=False, mode=None, optimize='O' ):
     callcount += 1
 
     # Command line options
-    opts, machine = getopt.getopt( sys.argv[1:], 'niqsmgGtpOd' )
+    opts, args = getopt.getopt( sys.argv[1:], 'niqsmgGtpOd' )
     for o, v in opts:
-        if   o == '-n': prepare = False; run = False
+        if   o == '-n': prepare = False
         elif o == '-i': run = 'i'
         elif o == '-q': run = 'q'
         elif o == '-s': mode = 's'
@@ -34,9 +54,10 @@ def run( params, prepare=True, run=False, mode=None, optimize='O' ):
                 f = 'run' + os.sep + '[0-9][0-9]'
                 for f in glob.glob( f ): shutil.rmtree( f )
         else: sys.exit( 'Error: unknown option: %s %s' % ( o, v ) )
+    if not prepare: run = False
 
     # Configure machine
-    if machine: machine = machine[0]
+    if args: machine = args[0]
     cfg = util.objectify( configure.configure( machine ) )
     print 'Machine: ' + cfg.machine
 
