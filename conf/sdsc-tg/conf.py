@@ -34,8 +34,10 @@ rate = 500
 timelimit = 18,00
 sfc = [ 'ifort' ]
 mfc = [ 'mpif90' ]
+getarg = ''
 _ = [ '-u', '-std95', '-warn', '-o' ]
-g = [ '-g', '-CB', '-traceback' ] + _
-p = [ '-O', '-p' ] + _
+g = [ '-CB', '-traceback', '-g' ] + _
+t = [ '-CB', '-traceback' ] + _
+p = [ '-O', '-pg' ] + _
 O = [ '-O3' ] + _
 

@@ -267,55 +267,57 @@ def prepare_params( pp ):
         mode = line[0][1:]
         if op not in '=+': sys.exit( 'Error: unsupported operator: %r' % line )
         try:
-            if   mode == '':    f, ii, val                        = line[1:]
-            elif mode == 's':   f, ii, val                        = line[1:]
-            elif mode == 'x':   f, ii, val, x1                    = line[1:]
-            elif mode == 'sx':  f, ii, val, x1                    = line[1:]
-            elif mode == 'c':   f, ii, val, x1, x2                = line[1:]
-            elif mode == 'f':   f, ii, val, tfunc, period         = line[1:]
-            elif mode == 'fs':  f, ii, val, tfunc, period         = line[1:]
-            elif mode == 'fx':  f, ii, val, tfunc, period, x1     = line[1:]
-            elif mode == 'fsx': f, ii, val, tfunc, period, x1     = line[1:]
-            elif mode == 'fc':  f, ii, val, tfunc, period, x1, x2 = line[1:]
-            elif mode == 'r':   f, ii, filename                   = line[1:]
-            elif mode == 'w':   f, ii, filename                   = line[1:]
-            elif mode == 'rx':  f, ii, filename, x1               = line[1:]
-            elif mode == 'wx':  f, ii, filename, x1               = line[1:]
+            if len(line) is 10:
+                tfunc, period, x1, x2, nb, ii, field, filename, val   = line[1:]
+            elif mode == '':    field, ii, val                        = line[1:]
+            elif mode == 's':   field, ii, val                        = line[1:]
+            elif mode == 'x':   field, ii, val, x1                    = line[1:]
+            elif mode == 'sx':  field, ii, val, x1                    = line[1:]
+            elif mode == 'c':   field, ii, val, x1, x2                = line[1:]
+            elif mode == 'f':   field, ii, val, tfunc, period         = line[1:]
+            elif mode == 'fs':  field, ii, val, tfunc, period         = line[1:]
+            elif mode == 'fx':  field, ii, val, tfunc, period, x1     = line[1:]
+            elif mode == 'fsx': field, ii, val, tfunc, period, x1     = line[1:]
+            elif mode == 'fc':  field, ii, val, tfunc, period, x1, x2 = line[1:]
+            elif mode == 'r':   field, ii, filename                   = line[1:]
+            elif mode == 'w':   field, ii, filename                   = line[1:]
+            elif mode == 'rx':  field, ii, filename, x1               = line[1:]
+            elif mode == 'wx':  field, ii, filename, x1               = line[1:]
             else: sys.exit( 'Error: bad i/o mode: %r' % line )
         except:
             sys.exit( 'Error: bad i/o spec: %r' % line )
         mode = mode.replace( 'f', '' )
-        if f not in fieldnames.all:
+        if field not in fieldnames.all:
             sys.exit( 'Error: unknown field: %r' % line )
-        if p.faultnormal == 0 and f in fieldnames.fault:
+        if p.faultnormal == 0 and field in fieldnames.fault:
             sys.exit( 'Error: field only for ruptures: %r' % line )
-        if 'w' not in mode and f not in fieldnames.input:
+        if 'w' not in mode and field not in fieldnames.input:
             sys.exit( 'Error: field is ouput only: %r' % line )
         if 'r' in mode:
             fn = os.path.dirname( filename ) + os.sep + 'endian'
             if file( fn, 'r' ).read()[0] != sys.byteorder[0]:
                 sys.exit( 'Error: wrong byte order for ' + filename )
-        if f in fieldnames.cell:
+        if field in fieldnames.cell:
             mode = mode.replace( 'x', 'X' )
             mode = mode.replace( 'c', 'C' )
             nn = [ n-1 for n in p.nn ] + [ p.nt ]
         else:
             nn = list( p.nn ) + [ p.nt ]
         ii = util.indices( ii, nn )
-        if f in fieldnames.initial:
+        if field in fieldnames.initial:
             ii[3] = 0, 0, 1
-        if f in fieldnames.fault:
+        if field in fieldnames.fault:
             i = p.faultnormal - 1
             ii[i] = 2 * ( p.ihypo[i], ) + ( 1, )
         nn = [ ( ii[i][1] - ii[i][0] + 1 ) / ii[i][2] for i in range(4) ]
-        nb = min( nn[3], min( p.itio, itbuff ) )
+        nb = min( nn[3], min( p.nt, p.itio ) )
         n = nn[0] * nn[1] * nn[2]
-        if n == 1:
-            nb = p.itio
-        elif n > ( p.nn[0] + p.nn[1] + p.nn[2] ) ** 2:
+        if n > ( p.nn[0] + p.nn[1] + p.nn[2] ) ** 2:
             nb = 1
-        fieldio += [( op+mode, f, ii, filename, nb, val, tfunc, period, x1, x2 )]
-    f = [ line[3] for line in fieldio if line[3] != '-' ]
+        elif n > 1:
+            nb = min( nb, itbuff )
+        fieldio += [( op+mode, tfunc, period, x1, x2, nb, ii, field, filename, val )]
+    f = [ line[8] for line in fieldio if line[8] != '-' ]
     for i in range( len( f ) ):
         if f[i] in f[:i]:
             sys.exit( 'Error: duplicate filename: %r' % f[i] )

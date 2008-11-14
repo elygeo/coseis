@@ -15,11 +15,3 @@ nodes = 32
 cores = 2
 ram = 1800
 rate = 100
-getarg = 'getarg-pgf.f90'
-sfc = [ 'pgf90', ]
-mfc = [ 'mpif90' ]
-_ = [ '-Mdclchk', '-o' ]
-g = [ '-g', '-Ktrap=fp', '-Mbounds' ] + _
-p = [ '-fast', '-Mprof=func' ] + _
-O = [ '-fast' ] + _
-

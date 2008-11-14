@@ -15,11 +15,11 @@ cores = 16
 ram = 30000
 rate = 500
 timelimit = 24, 00
-getarg = 'getarg-pgf.f90'
 sfc = [ 'pgf95' ]
 mfc = [ 'mpif90' ]
+getarg = 'getarg-pgf.f90'
 _ = [ '-Mdclchk', '-o' ]
-g = [ '-g', '-Ktrap=fp', '-Mbounds' ] + _
+g = [ '-Ktrap=fp', '-Mbounds', '-g' ] + _
 t = [ '-Ktrap=fp', '-Mbounds' ] + _
 p = [ '-fast', '-tp', 'barcelona-64', '-Mprof=func' ] + _
 O = [ '-fast', '-tp', 'barcelona-64' ] + _

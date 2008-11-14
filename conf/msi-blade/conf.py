@@ -19,8 +19,11 @@ ram = 7000
 timelimit = 48, 00
 sfc = [ 'pathf95' ]
 mfc = [ 'mpif90' ]
+getarg = ''
 _ = [ '-o' ]
 g = [ '-g' ] + _
+t = [] + _
 p = [ '-O', '-p' ] + _
 O = [ '-i8', '-O3', '-OPT:Ofast', '-fno-math-errno' ] + _
+
 
