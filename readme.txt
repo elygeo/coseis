@@ -120,11 +120,15 @@ Installation
     <extras/install-mpich.sh>`__ in the ``extras/`` directory can automate this for
     you.
 
-3.  Most system already have `Python <http://www.python.org/download/>`_. But
-    if you need to install it, the `install-python.sh <extras/install-python.sh>`__
-    script in the ``extras/`` directory can automate this for you.
+3.  Most system already have `Python <http://www.python.org/download/>`_.
+    However, if you are not the system administrator it is helpful to install your
+    own personal copy. This will enable you to install the SORD package, as well as
+    other useful items like `matplotlib <http://matplotlib.sourceforge.net/>`_ and
+    `SciPy <http://www.scipy.org/>`_.  The `install-python.sh
+    <extras/install-python.sh>`__ script in the ``extras/`` directory can automate
+    this for you.
 
-4.  Unpack the archive and enter the ``sord/`` directory:
+4.  Next, unpack the tar archive and enter the ``sord/`` directory:
     ::
 
         tar zxvf sord.tgz

@@ -128,7 +128,7 @@ def compile( compiler, object, source ):
                 os.unlink( f )
     return compile
 
-def install():
+def install_path():
     """Install path file in site-packages directory"""
     from distutils.sysconfig import get_python_lib
     import os
@@ -136,40 +136,44 @@ def install():
     dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
     print src
     print dst
-    file( dst, 'w' ).write( src )
+    try: file( dst, 'w' ).write( src )
+    except: sys.exit( 'You do not have write permission for this Python install' )
     return
 
-def uninstall():
+def uninstall_path():
     """Remove path file from site-packages directory"""
     from distutils.sysconfig import get_python_lib
     import os
     dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
     print dst
-    try: os.unlink( dst )
-    except: pass
+    if os.path.isfile( dst ):
+        try: os.unlink( dst )
+        except: sys.exit( 'You do not have write permission for this Python install' )
     return
 
-def install_copy():
+def install():
     """Copy package to site-packages directory"""
     from distutils.sysconfig import get_python_lib
-    import os, shutil
+    import os, sys, shutil
     src = os.path.dirname( os.path.realpath( __file__ ) )
     dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) )
     print src
     print dst
     try: shutil.rmtree( dst )
     except: pass
-    shutil.copytree( src, dst )
+    try: shutil.copytree( src, dst )
+    except: sys.exit( 'You do not have write permission for this Python install' )
     return
 
-def uninstall_copy():
+def uninstall():
     """Remove package from site-packages directory"""
     from distutils.sysconfig import get_python_lib
     import os, shutil
     dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) )
     print dst
-    try: shutil.rmtree( dst )
-    except: pass
+    if os.path.isdir( dst ):
+        try: shutil.rmtree( dst )
+        except: sys.exit( 'You do not have write permission for this Python install' )
     return
 
 def tarball( filename=None, ignorefile='.ignore' ):

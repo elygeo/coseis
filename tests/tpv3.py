@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-TPV3 - SCEC validation problem version 3
+TPV3 - SCEC validation problem version 3, convergence test
 """
 
 import sord
@@ -10,11 +10,15 @@ np = 1, 1, 32
 np = 1, 1, 2
 np = 1, 1, 1
 _reg = 1
-_dx = 50.0, 100.0, 200.0
-_dx = ( 200.0, )
+_dx = [ 1500.0 ]
+_dx = 1500.0, 500.0, 300.0, 250.0, 150.0, 100.0, 75.0, 50.0, 30.0, 25.0
 vrup = -1.
 faultnormal = 3	
 hourglass = 1.0, 2.0
+
+for x in _dx:
+   print x, 1500. / x, 2500. / x
+asdf
 
 for dx in _dx:
     dt = dx / 12500.0
@@ -22,7 +26,7 @@ for dx in _dx:
     nn = ( 
         int( 17500.0 / dx + 1.5 ),
         int( 10000.0 / dx + 1.5 ),
-        int(  6400.0 / dx + 0.5 ),
+        int(  6000.0 / dx + 0.5 ),
     )
     bc1     =    10,    10, 10
     bc2     = -_reg,  _reg, -2
@@ -32,7 +36,7 @@ for dx in _dx:
     _j, _k, _l = ihypo
     _jj = -int( 15000.0 / dx + 1.5 ),        -1
     _kk = -int(  7500.0 / dx + 1.5 ),        -1
-    _ll = -int(  4000.0 / dx + 1.5 ),        -1
+    _ll = -int(  3000.0 / dx + 1.5 ),        -1
     _oo = -int(  1500.0 / dx + 1.5 ),        -1
     _xx = -int(  1500.0 / dx - 0.5 ) - _reg, -1
 

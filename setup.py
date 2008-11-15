@@ -165,6 +165,10 @@ if __name__ == '__main__':
     else:
         if sys.argv[1] == 'docs':
             docs()
+        elif sys.argv[1] == 'path':
+            util.install_path()
+        elif sys.argv[1] == 'unpath':
+            util.uninstall_path()
         elif sys.argv[1] == 'install':
             util.install()
         elif sys.argv[1] == 'uninstall':
