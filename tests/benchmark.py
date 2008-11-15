@@ -3,7 +3,7 @@
 Benchmarks
 """
 
-import sord, numpy
+import sord
 
 dx = 100.
 dt = 0.0075
@@ -41,17 +41,13 @@ _np = [
     ( 1,  32,  32 ),
     ( 1,  64,  64 ),
     ( 1, 128,  96 ),
-#   ( 1, 128, 128 ),
+    ( 1, 128, 128 ),
 ]
 
-_np = [
-#   ( 1,  1,  1 ),
-    ( 1,  1,  2 ),
-]
-
-#for np in _np:
-#    _np = numpy.prod( np )
-#    print numpy.log2(_np), _np / 16, _np
+import numpy
+for np in _np:
+    _n = numpy.prod( np )
+    print numpy.log2(_n), _n / 16, _n
 
 for np in _np:
     nn = [ _n * _p for _p in np ]
