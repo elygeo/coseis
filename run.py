@@ -73,7 +73,7 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     i  = abs( params.faultnormal ) - 1
     if i >= 0: nl[i] = max( nl[i], 2 )
     np3 = [ ( params.nn[i] - 1 ) / nl[i] + 1 for i in range(3) ]
-    params.np = np3
+    params.np = tuple( np3 )
     np = np3[0] * np3[1] * np3[2]
     if not mode:
         mode = 's'
@@ -222,7 +222,7 @@ def prepare_params( pp ):
     p = util.objectify( p )
 
     # inervals
-    p.itio = min( p.itio, p.nt )
+    p.itio = max( 1, min( p.itio, p.nt ) )
     if p.itcheck % p.itio != 0:
         p.itcheck = ( p.itcheck / p.itio + 1 ) * p.itio
 
@@ -310,7 +310,7 @@ def prepare_params( pp ):
             ii[i] = 2 * ( p.ihypo[i], ) + ( 1, )
         nn = [ ( ii[i][1] - ii[i][0] + 1 ) / ii[i][2] for i in range(4) ]
         nb = ( min( p.itio, p.nt ) - 1 ) / ii[3][2] + 1
-        nb = min( nb, nn[3] )
+        nb = max( 1, min( nb, nn[3] ) )
         n = nn[0] * nn[1] * nn[2]
         if n > ( p.nn[0] + p.nn[1] + p.nn[2] ) ** 2:
             nb = 1

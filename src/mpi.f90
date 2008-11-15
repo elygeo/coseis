@@ -364,7 +364,7 @@ real :: ff(1,size(f))
 if ( mode == 'w' ) ff(1,:) = f
 mm = (/ 1, m /)
 nn = (/ 1, size(f) /)
-oo = (/ 1, o /)
+oo = (/ 0, o /)
 call rio2( fh, ff, mode, filename, mm, nn, oo, mpio )
 if ( mode == 'r' ) f = ff(1,:)
 end subroutine

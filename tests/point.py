@@ -5,11 +5,11 @@ Miniature point source test
 
 import sord
 
-debug = 3
+debug = 0
 np = 1, 1, 1
 np = 1, 2, 1
 nn = 2, 2, 2
-nt = 10
+nt = 1
 dx = 100.0
 dt = 0.0075
 bc1 = 0, 0, 0
