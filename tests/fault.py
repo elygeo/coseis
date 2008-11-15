@@ -5,7 +5,7 @@ Fault test
 
 import sord
 
-debug = 3
+debug = 0
 np    =  2,  3,  2
 nn    =  8,  8,  9
 ihypo = -1, -1, -2
