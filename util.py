@@ -172,7 +172,7 @@ def uninstall_copy():
     except: pass
     return
 
-def tarball( filename=None, ignorefile='.bzrignore' ):
+def tarball( filename=None, ignorefile='.ignore' ):
     """Make a tar archinve of the current directory skipping patterns from ignorefile"""
     import os, pwd, glob, tarfile, re, fnmatch, datetime
     cwd = os.getcwd()

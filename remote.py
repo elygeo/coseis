@@ -7,7 +7,7 @@ def remote( rsh, dest, command=[] ):
     import os, sys
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    rsync = 'rsync -avR --delete --include=email --exclude-from=.bzrignore -e %r . %r' % ( rsh, dest )
+    rsync = 'rsync -avR --delete --include=email --exclude-from=.ignore -e %r . %r' % ( rsh, dest )
     print dest
     print rsync
     os.system( rsync )
