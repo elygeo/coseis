@@ -11,6 +11,7 @@ contains
 subroutine stats()
 use m_globals
 use m_collective
+use m_util
 logical, save :: init = .true., dofault = .false.
 integer, save :: fh(16), j = 0
 integer :: ii(3), m, o, i
@@ -18,6 +19,8 @@ real :: rr
 real, save, allocatable, dimension(:,:) :: &
   vstats, fstats, estats, gvstats, gfstats, gestats
 
+! Start timer
+rr = timer( 2 )
 if ( verbose ) write( 0, * ) 'Statistics'
 
 ! Allocate buffers
@@ -107,6 +110,9 @@ if ( j > 0 .and. ( modulo( it, itio ) == 0 .or. it == nt ) ) then
   end if
   j = 0
 end if
+
+! Timer
+iotimer = iotimer + timer( 2 )
 
 end subroutine
 

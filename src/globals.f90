@@ -13,7 +13,9 @@ character(16) :: rfunc, tfunc
 
 ! Miscellaneous parameters
 real, parameter :: pi = 3.14159
-real :: tm         ! time
+real :: &
+  iotimer,        & ! I/O timing
+  tm                ! time
 integer :: &
   it,             & ! current time step
   ifn,            & ! fault normal component=abs(faultnormal)

@@ -32,7 +32,7 @@ _n = 128
 _n = 64
 _n = 96
 
-_nps = [
+_np = [
     ( 1,   1,   1 ),
     ( 1,   2,   2 ),
     ( 1,   4,   4 ),
@@ -44,16 +44,16 @@ _nps = [
 #   ( 1, 128, 128 ),
 ]
 
-_nps = [
+_np = [
     ( 1,  1,  1 ),
-   #( 1,  1,  2 ),
+    ( 1,  1,  2 ),
 ]
 
-#for np in _nps:
+#for np in _np:
 #    _np = numpy.prod( np )
 #    print numpy.log2(_np), _np / 16, _np
 
-for np in _nps:
+for np in _np:
     nn = [ _n * _p for _p in np ]
     sord.run( locals() )
 

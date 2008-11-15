@@ -13,7 +13,6 @@ type t_io
   type( t_io ), pointer :: next
 end type t_io
 type( t_io ), pointer :: pio0, p, pprev
-real :: iotimer
 integer, private :: itdebug = -1, idebug
 contains
 
@@ -305,7 +304,7 @@ if ( i > 0 .and. debug > 3 .and. it <= 8 ) then
 end if
 
 ! Timer
-iotimer = iotimer + timer(2)
+iotimer = iotimer + timer( 2 )
 
 end subroutine
 

@@ -8,6 +8,7 @@
 .bzr
 bin/*
 run
+tmp
 email
 machine
 sord.tgz

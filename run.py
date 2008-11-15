@@ -229,8 +229,12 @@ def prepare_params( pp ):
     # hypocenter node
     ii = list( p.ihypo )
     for i in range( 3 ):
-        if ii[i] < 1:
+        if ii[i] == 0:
+            ii[i] = p.nn[i] / 2
+        elif ii[i] < 0:
             ii[i] = ii[i] + p.nn[i] + 1
+        if ii[i] < 1 or ii[i] > p.nn[i]:
+            sys.exit( 'Error: ihypo %s out of bounds' % ii )
     p.ihypo = tuple( ii )
 
     # boundary conditions
