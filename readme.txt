@@ -121,12 +121,12 @@ Installation
     you.
 
 3.  Most system already have `Python <http://www.python.org/download/>`_.
-    However, if you are not the system administrator it is helpful to install your
+    However, if you are not the system administrator, it is helpful to install your
     own personal copy. This will enable you to install the SORD package, as well as
-    other useful items like `matplotlib <http://matplotlib.sourceforge.net/>`_ and
-    `SciPy <http://www.scipy.org/>`_.  The `install-python.sh
-    <extras/install-python.sh>`__ script in the ``extras/`` directory can automate
-    this for you.
+    other useful Python packages like `matplotlib
+    <http://matplotlib.sourceforge.net/>`_ and `SciPy <http://www.scipy.org/>`_.
+    The `install-python.sh <extras/install-python.sh>`__ script in the ``extras/``
+    directory can automate this for you.
 
 4.  Next, unpack the tar archive and enter the ``sord/`` directory:
     ::
@@ -157,10 +157,9 @@ Installation
         ./setup.py
 
 7.  To make the SORD module available you must add the enclosing directory to
-    your Python path. If you have write permission to your Python install
-    directory, do::
+    your Python path. If you administer your Python installation, you can do::
 
-        ./setup.py install
+        ./setup.py path
 
     Alternatively you can use the PYTHONPATH environmental variable.
 
