@@ -312,8 +312,6 @@ def prepare_params( pp ):
         nb = ( min( p.itio, p.nt ) - 1 ) / ii[3][2] + 1
         nb = min( nb, nn[3] )
         n = nn[0] * nn[1] * nn[2]
-        print 111, nn
-        print field, n, ( p.nn[0] + p.nn[1] + p.nn[2] ) ** 2
         if n > ( p.nn[0] + p.nn[1] + p.nn[2] ) ** 2:
             nb = 1
         elif n > 1:

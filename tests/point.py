@@ -7,13 +7,14 @@ import sord
 
 debug = 3
 np = 1, 1, 1
+np = 1, 2, 1
 nn = 2, 2, 2
-nt = 2
+nt = 10
 dx = 100.0
 dt = 0.0075
 bc1 = 0, 0, 0
 bc2 = 0, 0, 0
-hourglass = 0., 0.
+hourglass = 0.0, 0.0
 faultnormal = 0
 moment1 = 1e16, 1e16, 1e16
 moment2 = 0.0, 0.0, 0.0
