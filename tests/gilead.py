@@ -3,7 +3,7 @@
 Wurman and Oglesby problem
 """
 
-import sord
+import sord, os, sys
 
 np = 4, 7, 2
 dx = 100.0
@@ -27,7 +27,7 @@ fieldio = [
   ( '=',  'vp',  [],                  6000.0 ),
   ( '=',  'vs',  [],                  3464.0 ),
   ( '=',  'gam', [],                    0.15 ),
-  ( '=r', 'ts',  [],                   'ts1' ),
+  ( '=r', 'ts',  [],                    'ts' ),
   ( '=',  'tn',  [],                  -120e6 ),
   ( '=',  'td',  [],                     0.0 ),
   ( '=',  'mus', [],                     1e4 ),
@@ -46,5 +46,14 @@ fieldio = [
   ( '=w', 'ts2', [_j,_k,_l,(1,-1,10)], 'ts2' ),
 ]
 
-sord.run( locals() )
+file( 'endian', 'w' ).write( sys.byteorder[0] )
+_home = '/home/gwurman/sord/'
+_i = 0
+while True:
+    _i += 1
+    _f = _home + 'stresses/initial.stressx.%02d' % i
+    print f
+    if not os.path.isfile( _f ): break
+    os.system( _home + 'bin/asc2flt < %r > ts' % f )
+    sord.run( locals() )
 
