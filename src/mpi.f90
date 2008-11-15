@@ -404,18 +404,19 @@ else
 end if
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
 call mpi_file_open( comm, filename, i, mpi_info_null, fh, e )
-mmm = pack( mm, mm > 1, mm )
-nnn = pack( nn, mm > 1, nn )
-ooo = pack( oo, mm > 1, oo )
 call mpi_comm_size( comm, n, e  )
 call mpi_comm_rank( comm, i, e  )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
 if ( i == 0 ) write( 0, '(i8,a,i2,a,i8,2a)' ) &
   ip, ' Opened', ndims, 'D', n, 'P file: ', trim( filename )
-if ( ndims == 0 ) ndims = 1
-call mpi_type_create_subarray( ndims, mmm, nnn, ooo, mpi_order_fortran, mpi_real, ftype, e )
-call mpi_type_commit( ftype, e )
-call mpi_file_set_view( fh, offset, mpi_real, ftype, 'native', mpi_info_null, e )
+if ( ndims > 0 ) then
+  mmm = pack( mm, mm > 1, mm )
+  nnn = pack( nn, mm > 1, nn )
+  ooo = pack( oo, mm > 1, oo )
+  call mpi_type_create_subarray( ndims, mmm, nnn, ooo, mpi_order_fortran, mpi_real, ftype, e )
+  call mpi_type_commit( ftype, e )
+  call mpi_file_set_view( fh, offset, mpi_real, ftype, 'native', mpi_info_null, e )
+end if
 end subroutine
 
 end module
