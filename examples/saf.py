@@ -28,31 +28,31 @@ fieldio += [
     ( '=r', 'vp',  [], _dir+'vp'  ),		# Read 3D V_p file
     ( '=r', 'vs',  [], _dir+'vs'  ),		# Read 3D V_s file
 ]
-vdamp = 400.					# viscosity = vdamp / vs
-vp1  = 1500.					# minimum V_p
-vs1  = 500.					# minimum V_s
+vdamp = 400.0					# viscosity = vdamp / vs
+vp1  = 1500.0					# minimum V_p
+vs1  = 500.0					# minimum V_s
 gam2 = 0.8					# maximum viscosity
-hourglass = 1., 1.				# hourglass stiffness and viscosity
+hourglass = 1.0, 1.0				# hourglass stiffness and viscosity
 
 # Fault parameters
-slipvector = 1., 0., 0.				# vector for resolving pre-traction
+slipvector = 1.0, 0.0, 0.0				# vector for resolving pre-traction
 faultnormal = 2					# fault plane at k = ihypo(2)
 _k = 997					# temporary variable
 ihypo = 2266, _k, -25				# hypocenter indices
 fieldio += [
     ( '=r', 'ts',  [0,_k,0,0], _dir+'ts1' ),	# read initial shear traction file
     ( '=',  'tn',  [0,_k,0,0], -20e6      ),	# initial normal traction
-    ( '=',  'dc',  [0,_k,0,0], 0.5        ),	# slip weakening distance
-    ( '=',  'mud', [0,_k,0,0], 0.5        ),	# coeff of dynamic friction
-    ( '=',  'mus', [0,_k,0,0], 1000.      ),	# coeff of static friction, non-slip section
+    ( '=',  'dc',  [0,_k,0,0],   0.5      ),	# slip weakening distance
+    ( '=',  'mud', [0,_k,0,0],   0.5      ),	# coeff of dynamic friction
+    ( '=',  'mus', [0,_k,0,0],   1e4      ),	# coeff of static friction, non-slip section
     ( '=',  'mus', [ (1217,2312), _k, (-81,-1), 0 ], 1.1 ), # coeff of static friction, slipping section
 ]
 
 # Nucleation
 fixhypo = 1					# node registered hypocenter
-vrup = 2300.					# nucleation rupture velocity
+vrup = 2300.0					# nucleation rupture velocity
 trelax = 0.12					# time 
-rcrit = 3000.					# radius of nucleation patch
+rcrit = 3000.0					# radius of nucleation patch
 
 # Write fault plane output
 fieldio += [

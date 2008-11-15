@@ -215,9 +215,7 @@ def prepare_params( pp ):
     f = os.path.dirname( __file__ ) + os.sep + 'defaults.py'
     p = util.load( f )
     for k, v in pp.iteritems():
-        if k is 'fieldio':
-            p['fieldio'] += pp['fieldio']
-        elif k[0] is not '_' and type(v) is not type(sys):
+        if k[0] is not '_' and type(v) is not type(sys):
             if k not in p:
                 sys.exit( 'Unknown SORD parameter: %s = %r' % ( k, v ) )
             p[k] = v
