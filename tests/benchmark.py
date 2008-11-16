@@ -22,16 +22,18 @@ for np in _np:
     print _n/16, _n, math.log(_n,4)
 
 _n = 200
-nt = 4
+nt = 8
+itstats = 4
+itcheck = -1
+itio = nt
+debug = 0
+oplevel = 2
 dx = 100.
 dt = 0.0075
-faultnormal = 0
-debug = 0
 bc1 = bc2 = 0, 0, 0
-hourglass = 1., 1.
-oplevel = 2
 npml = 0
-itstats = 1
+hourglass = 1., 1.
+faultnormal = 0
 fieldio = [
     ( '=', 'rho', [],     2670.0 ),      
     ( '=', 'vp',  [],     6000.0 ),      
