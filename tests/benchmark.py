@@ -23,7 +23,7 @@ for np in _np:
 
 _n = 200
 nt = 8
-itstats = 4
+itstats = 2
 itcheck = -1
 itio = nt
 debug = 0

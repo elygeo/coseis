@@ -14,5 +14,5 @@ hosts = [ 'master' ]
 nodes = 32
 cores = 2
 ram = 1800
-rate = 100
+rate = 1e5
 

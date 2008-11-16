@@ -9,5 +9,6 @@ hosts = [ 'wide' ]
 nodes = 1
 cores = 2
 ram = 3800
+rate = 1.4e6
 mfc = [ 'mpif90', '-mpe=mpilog' ]
 mfc = [ 'mpif90' ]
