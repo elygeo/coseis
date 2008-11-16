@@ -57,35 +57,44 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     if not prepare: run = False
 
     # Configure machine
-    if args: machine = args[0]
-    cfg = util.objectify( configure.configure( machine ) )
+    if args:
+        machine = args[0]
+    cfg = util.objectify( configure.configure( False, machine ) )
     print 'Machine: ' + cfg.machine
 
-    # Prep parameters 
+    # Prepare parameters 
     params = prepare_params( params )
 
     # Partition for parallelization
+    maxcores = cfg.nodes * cfg.cores
+    if not mode and maxcores == 1:
+        mode = 's'
     np3 = params.np[:]
-    totalcores = cfg.nodes * cfg.cores
-    if not mode and totalcores == 1: mode = 's'
-    if mode == 's': np3 = [ 1, 1, 1 ]
+    if mode == 's':
+        np3 = [ 1, 1, 1 ]
     nl = [ ( params.nn[i] - 1 ) / np3[i] + 1 for i in range(3) ]
     i  = abs( params.faultnormal ) - 1
-    if i >= 0: nl[i] = max( nl[i], 2 )
+    if i >= 0:
+        nl[i] = max( nl[i], 2 )
     np3 = [ ( params.nn[i] - 1 ) / nl[i] + 1 for i in range(3) ]
     params.np = tuple( np3 )
     np = np3[0] * np3[1] * np3[2]
     if not mode:
         mode = 's'
-        if np > 1: mode = 'm'
+        if np > 1:
+            mode = 'm'
+
+    # Resources
     if cfg.cores:
         nodes = min( cfg.nodes, ( np - 1 ) / cfg.cores + 1 )
         ppn = ( np - 1 ) / nodes + 1
         cores = min( cfg.cores, ppn )
+        totalcores = nodes * cfg.cores
     else:
         nodes = 1
         ppn = np
         cores = np
+        totalcores = np
 
     # RAM and Wall time usage
     floatsize = 4
@@ -101,7 +110,7 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     hh = mm / 60
     mm = mm % 60
     walltime = '%d:%02d:00' % ( hh, mm )
-    print 'Cores: %s of %s' % ( np, totalcores )
+    print 'Cores: %s of %s' % ( np, maxcores )
     print 'Nodes: %s of %s' % ( nodes, cfg.nodes )
     print 'RAM: %sMb of %sMb per node' % ( ramnode, cfg.ram )
     print 'Time limit: ' + walltime
@@ -111,10 +120,8 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     if cfg.ram and ramnode > cfg.ram:
         print 'Warning: exceding available RAM per node (%sMb)' % cfg.ram
 
-    # Set-up and run
-    if not prepare: return
-
     # Compile code
+    if not prepare: return
     setup.build( mode, optimize )
 
     # Create run directory

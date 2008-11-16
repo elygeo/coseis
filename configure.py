@@ -3,7 +3,7 @@
 Read configuration files
 """
 
-def configure( machine=None ):
+def configure( save=False, machine=None ):
     """Read configuration files"""
     import os
     import util
@@ -16,7 +16,8 @@ def configure( machine=None ):
     if machine:
         util.load( 'conf/' + machine + '/conf.py', cfg )
         cfg['machine'] = machine
-    file( 'machine', 'w' ).write( cfg['machine'] )
+    if save:
+        file( 'machine', 'w' ).write( cfg['machine'] )
     f = 'conf/' + cfg['machine'] + '/templates'
     if not os.path.isdir( f ):
         f = 'conf/default/templates'
@@ -27,7 +28,7 @@ def configure( machine=None ):
 if __name__ == '__main__':
     """Test configuration"""
     import os, sys
-    c = configure( *sys.argv[1:] )
+    c = configure( True, *sys.argv[1:2] )
     print c['notes']
     for k, v in c.iteritems():
         if k != 'notes':

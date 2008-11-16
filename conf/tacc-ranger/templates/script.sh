@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 #$ -N %(code)s%(count)s
-#$ -pe %(ppn)sway %(np)s
+#$ -pe %(cores)sway %(totalcores)s
 #$ -l h_rt=%(walltime)s
 #$ -q serial
 ##$ -q development
