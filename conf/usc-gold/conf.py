@@ -9,4 +9,5 @@ hosts = [ login ]
 nodes = 1
 cores = 8
 ram = 31000
+rate = 1.6e6
 

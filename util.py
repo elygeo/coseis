@@ -187,16 +187,19 @@ def tarball( filename=None, ignorefile='.ignore' ):
     basename = os.path.basename( os.getcwd() )
     if not filename:
         filename = basename + '.tgz'
-    tar = tarfile.open( filename, 'w:gz' )
-    for root, dirs, files in os.walk( '.' ):
-        if ignore.search( root ):
-            dirs[:] = []
-            continue
-        for f in files:
-            if not ignore.search( f ):
-                ff = root + os.sep + f
-                tar.add( ff, basename + os.sep + ff )
-    tar.close()
+    try:
+        tar = tarfile.open( filename, 'w:gz' )
+        for root, dirs, files in os.walk( '.' ):
+            if ignore.search( root ):
+                dirs[:] = []
+                continue
+            for f in files:
+                if not ignore.search( f ):
+                    ff = root + os.sep + f
+                    tar.add( ff, basename + os.sep + ff )
+        tar.close()
+    except:
+        print 'Could not create tarball'
     os.chdir( cwd )
     return
 

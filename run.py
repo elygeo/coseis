@@ -167,12 +167,12 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
         file( 'email', 'w' ).write( email )
 
     # Copy files to run directory
-    files = [ 'sord.tgz', 'bin' + os.sep + 'sord-' + mode + optimize ]
+    shutil.copy( 'bin' + os.sep + 'sord-' + mode + optimize, rundir )
+    try: shutil.cop( 'sord.tgz', rundir )
+    except: pass
     if optimize == 'g':
-        files += glob.glob( 'src/*.f90' )
-    for f in files:
-        f = f.replace( '/', os.sep )
-        shutil.copy( f, rundir )
+        for f in glob.glob( 'src/*.f90' ):
+            shutil.copy( f, rundir )
     for d in cfg.templates:
         for f in glob.glob( d + os.sep + '*' ):
             ff = rundir + os.sep + os.path.basename( f )
