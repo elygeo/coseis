@@ -3,12 +3,16 @@
 #$ -N %(code)s%(count)s
 #$ -pe %(ppn)sway %(np)s
 #$ -l h_rt=%(walltime)s
-#$ -q normal
-#$ -e stderr
-#$ -o stdout
+#$ -q serial
+##$ -q development
+##$ -q normal
+##$ -q large
+#$ -e %(rundir)sstderr
+#$ -o %(rundir)sstdout
 #$ -m abe
 #$ -M %(email)s
 #$ -V
+#$ -cwd
 
 cd %(rundir)r
 

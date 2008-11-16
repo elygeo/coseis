@@ -3,7 +3,10 @@
 #PBS -N %(code)s%(count)s
 #PBS -l nodes=%(nodes)s:myri:ppn=%(ppn)s
 #PBS -l walltime=%(walltime)s
-#PBS -q large
+##PBS -q main
+##PBS -q scec
+##PBS -q large
+#PBS -q quick
 #PBS -e stderr
 #PBS -o stdout
 #PBS -m abe

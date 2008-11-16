@@ -7,5 +7,5 @@ login = 'phim.usc.edu'
 hosts = [ login ]
 nodes = 1
 cores = 1
-rate = 4e5
+rate = 1.2e6
 ram = 2800

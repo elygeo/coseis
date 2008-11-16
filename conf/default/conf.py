@@ -8,7 +8,7 @@ hosts = [ login ]
 nodes = 1
 cores = 0
 ram = 0
-rate = 5e5
+rate = 1e6
 timelimit = 0
 sfc = None
 mfc = None
@@ -45,7 +45,7 @@ elif sfc == 'ifort':
     O = [ '-O3' ] + _
 elif sfc == 'pgf90':
     getarg = 'getarg-pgf.f90'
-    _ = [ '-Mdclchkk', '-o' ]
+    _ = [ '-Mdclchk', '-o' ]
     g = [ '-Ktrap=fp', '-Mbounds', '-g' ] + _
     t = [ '-Ktrap=fp', '-Mbounds' ] + _
     p = [ '-O', '-Mprof=func' ] + _

@@ -16,5 +16,6 @@ hosts = [ 'hpc-login1', 'hpc-login2' ]
 nodes = 256
 cores = 4
 ram = 13500
-rate = 5e5
+rate = 1.1e6
 timelimit = 24, 00
+
