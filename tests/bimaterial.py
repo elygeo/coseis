@@ -5,6 +5,9 @@ Bimaterial problem
 
 import sord
 
+itio = 1
+istats = 1
+debug = 0
 np = 1, 1, 1
 nn = 401, 402, 2
 nt = 100

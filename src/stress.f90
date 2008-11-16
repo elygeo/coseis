@@ -162,7 +162,7 @@ call fieldio( '<>', 'e12', w2(:,:,:,3) )
 !end do
 
 ! Hook's Law: w_ij = lam*g_ij*delta_ij + mu*(g_ij + g_ji)
-s1 = lam * sum( w1, 4 )
+s1 = lam * ( w1(:,:,:,1) + w1(:,:,:,2) + w1(:,:,:,3 ) )
 do i = 1, 3
   w1(:,:,:,i) = 2. * mu * w1(:,:,:,i) + s1
   w2(:,:,:,i) =      mu * w2(:,:,:,i)

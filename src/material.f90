@@ -8,7 +8,7 @@ use m_globals
 use m_collective
 use m_util
 use m_fieldio
-real :: stats(8), gstats(8), r, rr(3), rho_, vp_, vs_, gam_, courant
+real :: stats(8), gstats(8), r, rho_, vp_, vs_, gam_, courant
 integer :: i1(3), i2(3)
 
 if ( master ) write( 0, * ) 'Material model'
@@ -63,12 +63,10 @@ stats(2) = sum( s1  )
 stats(3) = sum( s2  )
 stats(4) = sum( gam )
 call rreduce1( gstats, stats, 'sum', 0 )
-rr = nn - 1
-r = 1. / product( nn - 1 ) 
-rho_ = r * gstats(1)
-vp_  = r * gstats(2)
-vs_  = r * gstats(3)
-gam_ = r * gstats(4)
+rho_ = gstats(1) / product( nn - 1 ) 
+vp_  = gstats(2) / product( nn - 1 ) 
+vs_  = gstats(3) / product( nn - 1 ) 
+gam_ = gstats(4) / product( nn - 1 ) 
 
 ! Fill halo
 call scalar_swap_halo( mr,  nhalo )
