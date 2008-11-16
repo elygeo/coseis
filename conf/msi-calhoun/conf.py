@@ -1,5 +1,7 @@
 notes = """
 UMN/MSI Calhoun
+
+http://www.msi.umn.edu/hardware/calhoun/
 SGI Altix XE 1300 cluster
 256 x 8 2.66 GHz Intel Xeon
 16 GB

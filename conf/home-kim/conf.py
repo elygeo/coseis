@@ -1,5 +1,6 @@
 notes = """
 Kim
+
 MacBook
 """
 login = 'kim'

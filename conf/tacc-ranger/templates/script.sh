@@ -3,10 +3,7 @@
 #$ -N %(code)s%(count)s
 #$ -pe %(cores)sway %(totalcores)s
 #$ -l h_rt=%(walltime)s
-#$ -q serial
-##$ -q development
-##$ -q normal
-##$ -q large
+#$ -q %(queue)s
 #$ -e %(rundir)sstderr
 #$ -o %(rundir)sstdout
 #$ -m abe

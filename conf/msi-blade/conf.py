@@ -1,5 +1,7 @@
 notes = """
 UMN/MSI Blade
+
+http://www.msi.umn.edu/hardware/blade/
 IBM Bladecenter Linux cluster
 268 x 2 dual-core 2.6 GHz AMD Opteron
 8 GB

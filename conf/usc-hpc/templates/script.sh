@@ -4,9 +4,9 @@
 #PBS -l nodes=%(nodes)s:myri:ppn=%(ppn)s
 #PBS -l walltime=%(walltime)s
 ##PBS -q main
-##PBS -q scec
 ##PBS -q large
-#PBS -q quick
+##PBS -q quick
+#PBS -q scec
 #PBS -e stderr
 #PBS -o stdout
 #PBS -m abe

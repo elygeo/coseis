@@ -1,5 +1,6 @@
 notes = """
 USC Gold
+
 https://geosys.usc.edu/wiki/index.php/Specifications
 4 Dual Core AMD Opteron 875 2.2GHz
 32GB
