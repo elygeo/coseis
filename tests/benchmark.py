@@ -13,10 +13,13 @@ _np = [
     (1,  16,  16),
     (1,  32,  32),
     (1,  64,  64),
-    (1, 128,  96),
-    (1, 128, 128),
+#   (1, 128,  96),
+#   (1, 128, 128),
 ]
+#_np = [ (1, 128, 96) ]
 _np = [ (1, 1, 1) ]
+_mode = 's'
+_mode = 'm'
 for np in _np:
     _n = np[0] * np[1] * np[2]
     print _n/16, _n, math.log(_n,4)
@@ -46,5 +49,5 @@ fieldio = [
 
 for np in _np:
     nn = [ _n * _p for _p in np ]
-    sord.run( locals() )
+    sord.run( locals(), mode=_mode )
 

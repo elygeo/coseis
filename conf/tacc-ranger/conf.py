@@ -13,11 +13,11 @@ lfs quota -u <username> $SCRATCH
 """
 login = 'tg-login.ranger.tacc.teragrid.org'
 hosts = [ 'login3.ranger.tacc.utexas.edu' ]
-queue = 'normal',      nodes = 256,  timelimit = 24, 00
-queue = 'development', nodes = 16,   timelimit =  2, 00
-queue = 'serial',      nodes = 1,    timelimit =  2, 00
-queue = 'Request',     nodes = 1024, timelimit = 24, 00
-queue = 'large',       nodes = 768,  timelimit = 24, 00
+queue = 'request';     nodes = 1024; timelimit = 24, 00
+queue = 'serial';      nodes = 1;    timelimit =  2, 00
+queue = 'development'; nodes = 16;   timelimit =  2, 00
+queue = 'large';       nodes = 768;  timelimit = 24, 00
+queue = 'normal';      nodes = 256;  timelimit = 24, 00
 cores = 16
 ram = 30000
 rate = 2.1e6

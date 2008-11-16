@@ -4,12 +4,12 @@
 #$ -pe %(cores)sway %(totalcores)s
 #$ -l h_rt=%(walltime)s
 #$ -q %(queue)s
-#$ -e %(rundir)sstderr
-#$ -o %(rundir)sstdout
+#$ -e stderr
+#$ -o stdout
 #$ -m abe
 #$ -M %(email)s
 #$ -V
-#$ -cwd
+#$ -wd %(rundir)s
 
 cd %(rundir)r
 

@@ -162,6 +162,7 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     #user = os.getlogin()
     rundate = time.asctime()
     machine = cfg.machine
+    queue = cfg.queue
 
     # Email address
     cwd = os.path.realpath( os.getcwd() )
