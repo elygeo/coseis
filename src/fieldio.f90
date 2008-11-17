@@ -26,7 +26,6 @@ end subroutine
 ! Remove linked list item
 subroutine pdelete
 pprev%next => p%next
-if ( associated( p%buff ) ) deallocate( p%buff )
 deallocate( p )
 p => pprev
 end subroutine
@@ -210,6 +209,7 @@ case( '=r', '+r' )
     call rio2( p%fh, p%buff(:,:n(4)), 'w', str, m, n, o, mpin )
     p%ib = 0
     if ( any( n < 1 ) ) then
+      deallocate( p%buff )
       call pdelete
       cycle loop
     end if
@@ -237,6 +237,11 @@ case( '=r', '+r' )
     end do
   end select
   ! XXX TODO: fill, interpolate
+  if ( it == it2 ) then
+    deallocate( p%buff )
+    call pdelete
+    cycle loop
+  end if
 case( '=w' )
   if ( .not. associated( p%buff ) ) then
     allocate( p%buff(n(1)*n(2)*n(3),p%nb) )
@@ -270,7 +275,8 @@ case( '=w' )
     if ( any( n(1:3) /= m(1:3) ) .and. mpout == 0 ) write( str, '(a,i6.6)' ) trim( str ), ipid
     call rio2( p%fh, p%buff(:,:n(4)), 'w', str, m, n, o, mpout )
     p%ib = 0
-    if ( any( n < 1 ) ) then
+    if ( it == it2 .or. any( n < 1 ) ) then
+      deallocate( p%buff )
       call pdelete
       cycle loop
     end if

@@ -10,12 +10,13 @@
 #$ -M %(email)s
 #$ -V
 #$ -wd %(rundir)s
+export MY_NSLOTS=%(np)s
 
 cd %(rundir)r
 
 echo "$( date ): %(code)s started" >> log
 %(pre)s
-/usr/bin/time -p ibrun -np %(np)s %(bin)s
+/usr/bin/time -p ibrun %(bin)s
 %(post)s
 echo "$( date ): %(code)s finished" >> log
 

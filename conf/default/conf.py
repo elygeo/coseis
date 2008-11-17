@@ -12,6 +12,7 @@ rate = 1.0e6
 timelimit = 0
 sfc = None
 mfc = None
+queue = None
 
 for _dir in os.environ['PATH'].split(':'):
     for _f in [ 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95' ]:

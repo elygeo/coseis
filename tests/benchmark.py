@@ -13,18 +13,18 @@ _np = [
     (1,  16,  16),
     (1,  32,  32),
     (1,  64,  64),
-#   (1, 128,  96),
-#   (1, 128, 128),
 ]
-#_np = [ (1, 128, 96) ]
+#_np = [ (1, 128, 96), (1, 128, 128) ]
 _np = [ (1, 1, 1) ]
+_np = [ (1, 4, 4) ]
 _mode = 's'
 _mode = 'm'
 for np in _np:
     _n = np[0] * np[1] * np[2]
-    print _n/16, _n, math.log(_n,4)
+    print 'Benchmark', _n/16, _n, math.log(_n,4)
 
 _n = 200
+_n = 20
 nt = 8
 itstats = 2
 itcheck = -1

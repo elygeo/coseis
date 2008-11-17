@@ -7,16 +7,18 @@ qstat
 showq
 qdel
 qconf -sql 
+qconf -sq large
+cat /share/sge/default/tacc/sge_esub_control
 lfs quota -u <username> $HOME
 lfs quota -u <username> $WORK
 lfs quota -u <username> $SCRATCH
 """
 login = 'tg-login.ranger.tacc.teragrid.org'
-hosts = [ 'login3.ranger.tacc.utexas.edu' ]
+hosts = [ 'login3.ranger.tacc.utexas.edu', 'login4.ranger.tacc.utexas.edu' ]
 queue = 'request';     nodes = 1024; timelimit = 24, 00
 queue = 'serial';      nodes = 1;    timelimit =  2, 00
 queue = 'development'; nodes = 16;   timelimit =  2, 00
-queue = 'large';       nodes = 768;  timelimit = 24, 00
+queue = 'large';       nodes = 1024; timelimit = 24, 00
 queue = 'normal';      nodes = 256;  timelimit = 24, 00
 cores = 16
 ram = 30000
