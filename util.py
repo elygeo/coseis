@@ -132,11 +132,11 @@ def install_path():
     """Install path file in site-packages directory"""
     from distutils.sysconfig import get_python_lib
     import os
-    src = os.path.dirname( os.path.dirname( os.path.realpath( __file__ ) ) )
-    dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
-    print src
-    print dst
-    try: file( dst, 'w' ).write( src )
+    pth = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
+    dir = os.path.dirname( os.path.dirname( os.path.realpath( __file__ ) ) )
+    print 'Installing ' + pth
+    print 'for path ' + dir
+    try: file( pth, 'w' ).write( dir )
     except: sys.exit( 'You do not have write permission for this Python install' )
     return
 
@@ -144,10 +144,10 @@ def uninstall_path():
     """Remove path file from site-packages directory"""
     from distutils.sysconfig import get_python_lib
     import os
-    dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
-    print dst
-    if os.path.isfile( dst ):
-        try: os.unlink( dst )
+    pth = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
+    print 'Removing ' + pth
+    if os.path.isfile( pth ):
+        try: os.unlink( pth )
         except: sys.exit( 'You do not have write permission for this Python install' )
     return
 
@@ -157,8 +157,8 @@ def install():
     import os, sys, shutil
     src = os.path.dirname( os.path.realpath( __file__ ) )
     dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) )
-    print src
-    print dst
+    print 'Installing ' + dst
+    print 'From ' + src
     try: shutil.rmtree( dst )
     except: pass
     try: shutil.copytree( src, dst )
@@ -170,36 +170,9 @@ def uninstall():
     from distutils.sysconfig import get_python_lib
     import os, shutil
     dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) )
-    print dst
+    print 'Removing ' + dst
     if os.path.isdir( dst ):
         try: shutil.rmtree( dst )
         except: sys.exit( 'You do not have write permission for this Python install' )
-    return
-
-def tarball( filename=None, ignorefile='.ignore' ):
-    """Make a tar archinve of the current directory skipping patterns from ignorefile"""
-    import os, pwd, glob, tarfile, re, fnmatch, datetime
-    cwd = os.getcwd()
-    os.chdir( os.path.dirname( __file__ ) )
-    ignore = file( ignorefile, 'r' ).read().split('\n')
-    ignore = '|'.join([ fnmatch.translate( f ) for f in ignore if f ])
-    ignore = re.compile( ignore )
-    basename = os.path.basename( os.getcwd() )
-    if not filename:
-        filename = basename + '.tgz'
-    try:
-        tar = tarfile.open( filename, 'w:gz' )
-        for root, dirs, files in os.walk( '.' ):
-            if ignore.search( root ):
-                dirs[:] = []
-                continue
-            for f in files:
-                if not ignore.search( f ):
-                    ff = root + os.sep + f
-                    tar.add( ff, basename + os.sep + ff )
-        tar.close()
-    except:
-        print 'Could not create tarball'
-    os.chdir( cwd )
     return
 

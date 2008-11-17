@@ -63,7 +63,10 @@ def build( mode='sm', optimize='gpO' ):
             compiler = cfg['mfc'] + cfg[opt]
             new |= util.compile( compiler, object, source )
     if new:
-        util.tarball()
+        try:
+            os.link( '.ignore', '.bzrignore' )
+            os.system( 'bzr export sord.tgz' )
+        except: pass
     os.chdir( cwd )
     return
 
