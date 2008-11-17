@@ -40,6 +40,8 @@ def build( mode='sm', optimize='gpO' ):
         'sord.f90', )
     cwd = os.getcwd()
     srcdir = os.path.realpath( os.path.dirname( __file__ ) )
+    try: os.mkdir( srcdir + os.sep + 'bin' )
+    except: pass
     os.chdir( srcdir + os.sep + 'extras' )
     new = False
     for f in extras:
