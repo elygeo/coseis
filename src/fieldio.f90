@@ -133,6 +133,8 @@ n(1:3) = ( i2 - i1 ) / di + 1
 o(1:3) = ( i1 - i3 ) / di
 
 ! Dimensionality
+i3 = i1
+i4 = i2
 do i = 1, 3
   if ( size( f, i ) == 1 ) then
     if ( n(i) < 1 ) then
@@ -156,9 +158,9 @@ if ( pass == '>' .and. p%mode(2:2) /= 'w' ) cycle loop
 val = p%val * time_function( p%tfunc, tm, dt, p%period )
 select case( p%mode )
 case( '=c', '+c' )
-  call setcube( f, w1, i1, i2, p%x1, p%x2, val, p%mode )
+  call setcube( f, w1, i3, i4, di, p%x1, p%x2, val, p%mode )
 case( '=C', '+C' )
-  call setcube( f, w2, i1, i2, p%x1, p%x2, val, p%mode )
+  call setcube( f, w2, i3, i4, di, p%x1, p%x2, val, p%mode )
 case( '=' )
   do l = i1(3), i2(3), di(3)
   do k = i1(2), i2(2), di(2)
@@ -316,10 +318,10 @@ end subroutine
 
 !------------------------------------------------------------------------------!
 
-subroutine setcube( f, x, i1, i2, x1, x2, r, mode )
+subroutine setcube( f, x, i1, i2, di, x1, x2, r, mode )
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: x(:,:,:,:), x1(3), x2(3), r
-integer, intent(in) :: i1(3), i2(3)
+integer, intent(in) :: i1(3), i2(3), di(3)
 character(*), intent(in) :: mode
 integer :: n(3), o(3), j, k, l
 n = (/ size(f,1), size(f,2), size(f,3) /)
@@ -327,9 +329,9 @@ o = 0
 where ( n == 1 ) o = 1 - i1
 select case( mode(1:1) )
 case( '=' )
-  do l = i1(3), i2(3)
-  do k = i1(2), i2(2)
-  do j = i1(1), i2(1)
+  do l = i1(3), i2(3), di(3)
+  do k = i1(2), i2(2), di(2)
+  do j = i1(1), i2(1), di(1)
   if( x(j,k,l,1) >= x1(1) .and. x(j,k,l,1) <= x2(1) .and. &
       x(j,k,l,2) >= x1(2) .and. x(j,k,l,2) <= x2(2) .and. &
       x(j,k,l,3) >= x1(3) .and. x(j,k,l,3) <= x2(3) ) &
@@ -338,9 +340,9 @@ case( '=' )
   end do
   end do
 case( '+' )
-  do l = i1(3), i2(3)
-  do k = i1(2), i2(2)
-  do j = i1(1), i2(1)
+  do l = i1(3), i2(3), di(3)
+  do k = i1(2), i2(2), di(2)
+  do j = i1(1), i2(1), di(1)
   if( x(j,k,l,1) >= x1(1) .and. x(j,k,l,1) <= x2(1) .and. &
       x(j,k,l,2) >= x1(2) .and. x(j,k,l,2) <= x2(2) .and. &
       x(j,k,l,3) >= x1(3) .and. x(j,k,l,3) <= x2(3) ) &
