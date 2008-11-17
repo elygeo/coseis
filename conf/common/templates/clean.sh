@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-/bin/rm -rf scecvm checkpoint input sord-*
+/bin/rm -rf sord-* checkpoint in
 
 for file in *; do
   [ -s "$file" ] || rm "$file"
