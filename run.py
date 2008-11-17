@@ -105,7 +105,7 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     ramcore = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * 1.5
     ramnode = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * ppn
     sus = int( ( params.nt + 10 ) * ppn * nm / cores / cfg.rate / 3600 * nodes * cfg.cores + 1 )
-    mm  = ( params.nt + 10 ) * ppn * nm / cores / cfg.rate / 60 * 1.5 + 10
+    mm  = ( params.nt + 10 ) * ppn * nm / cores / cfg.rate / 60 * 3.0 + 10
     if cfg.timelimit: mm = min( 60*cfg.timelimit[0] + cfg.timelimit[1], mm )
     hh = mm / 60
     mm = mm % 60
