@@ -6,6 +6,7 @@
 *.il
 *.o
 .bzr
+,
 bin
 run
 tmp
