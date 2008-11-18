@@ -159,7 +159,6 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     os_ = os.uname()[3]
     host = os.uname()[1]
     user = pwd.getpwuid(os.geteuid())[0]
-    #user = os.getlogin()
     rundate = time.asctime()
     machine = cfg.machine
     queue = cfg.queue
@@ -167,12 +166,10 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     # Email address
     cwd = os.path.realpath( os.getcwd() )
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    if os.path.isfile( 'email' ):
+    try:
         email = file( 'email', 'r' ).read().strip()
-    else:
-        #email = os.getlogin()
-        email = pwd.getpwuid(os.geteuid())[0]
-        file( 'email', 'w' ).write( email )
+    except:
+        email = user
 
     # Copy files to run directory
     shutil.copy( 'bin' + os.sep + 'sord-' + mode + optimize, rundir )
