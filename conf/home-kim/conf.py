@@ -5,5 +5,5 @@ MacBook
 """
 login = 'kim'
 hosts = [ login ]
-cores = 2
-ram = 800
+maxcores = 2
+maxram = 800

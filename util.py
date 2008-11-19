@@ -32,13 +32,18 @@ def load( filename, d=None ):
         if k[0] is '_' or type(d[k]) is type(sys): del( d[k] )
     return d
 
-def save( filename, d ):
+def save( filename, d, expandlist=[] ):
     """Write variables from a dict into a Python source file"""
     import sys
     f = file( filename, 'w' )
-    for k, v in d.iteritems():
-        if k[0] is not '_' and type(v) is not type(sys):
-            f.write( '%s = %r\n' % ( k, v ) )
+    for k in sorted( d.keys() ):
+        if k[0] is not '_' and type(d[k]) is not type(sys) and k not in expandlist:
+            f.write( '%s = %r\n' % ( k, d[k] ) )
+    for k in expandlist:
+        f.write( k + ' = [\n' )
+        for line in d[k]:
+            f.write( repr( line ) + ',\n' )
+        f.write( ']\n' )
     f.close()
     return
 

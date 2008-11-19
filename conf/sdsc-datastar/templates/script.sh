@@ -20,7 +20,7 @@
 #@ node = %(nodes)s
 #@ tasks_per_node = %(ppn)s
 #@ wall_clock_limit = %(walltime)s
-#@ resources = ConsumableCpus(1) ConsumableMemory(%(ramproc)smb)
+#@ resources = ConsumableCpus(1) ConsumableMemory(%(ram)smb)
 #@ notification = always
 #@ notify_user = %(email)s
 #@ job_type = parallel

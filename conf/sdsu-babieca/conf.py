@@ -13,7 +13,7 @@ batch nodes:
 login = 'babieca.sdsu.edu'
 hosts = [ 'master' ]
 nodes = 32
-cores = 2
-ram = 1800
+maxcores = 2
+maxram = 1800
 rate = 0.5e6
 

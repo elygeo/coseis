@@ -39,7 +39,7 @@ def run( inputs ):
     f = os.path.dirname( __file__ ) + os.sep + 'default-prm.py'
     prm = util.load( f )
     if 'machine' in inputs:
-        cfg = configure.configure( inputs['machine'] )
+        cfg = configure.configure( machine=inputs['machine'] )
     else:
         cfg = configure.configure()
 
@@ -48,23 +48,23 @@ def run( inputs ):
         if k[0] is not '_' and type(v) is not type(sys):
             if k in cfg:
                 cfg[k] = v
-            if k in prm:
+            elif k in prm:
                 prm[k] = v
             else:
                 sys.exit( 'Unknown SORD parameter: %s = %r' % ( k, v ) )
     cfg = util.objectify( cfg )
-    prm = util.objectify( prepare_params( prm ) )
+    prm = prepare_prm( util.objectify( prm ) )
     print 'Machine: ' + cfg.machine
 
     if not cfg.prepare:
         cfg.run = False
 
     # Partition for parallelization
-    maxcores = cfg.nodes * cfg.cores
-    if not mode and maxcores == 1:
-        mode = 's'
+    maxtotalcores = cfg.maxnodes * cfg.maxcores
+    if not cfg.mode and maxtotalcores == 1:
+        cfg.mode = 's'
     np3 = prm.np3[:]
-    if mode == 's':
+    if cfg.mode == 's':
         np3 = [ 1, 1, 1 ]
     nl = [ ( prm.nn[i] - 1 ) / np3[i] + 1 for i in range(3) ]
     i  = abs( prm.faultnormal ) - 1
@@ -72,65 +72,68 @@ def run( inputs ):
         nl[i] = max( nl[i], 2 )
     np3 = [ ( prm.nn[i] - 1 ) / nl[i] + 1 for i in range(3) ]
     prm.np3 = tuple( np3 )
-    np = np3[0] * np3[1] * np3[2]
-    if not mode:
-        mode = 's'
-        if np > 1:
-            mode = 'm'
+    cfg.np = np3[0] * np3[1] * np3[2]
+    if not cfg.mode:
+        cfg.mode = 's'
+        if cfg.np > 1:
+            cfg.mode = 'm'
 
     # Resources
-    if cfg.cores:
-        nodes = min( cfg.nodes, ( np - 1 ) / cfg.cores + 1 )
-        ppn = ( np - 1 ) / nodes + 1
-        cores = min( cfg.cores, ppn )
-        totalcores = nodes * cfg.cores
+    if cfg.maxcores:
+        cfg.nodes = min( cfg.maxnodes, ( cfg.np - 1 ) / cfg.maxcores + 1 )
+        cfg.ppn = ( cfg.np - 1 ) / cfg.nodes + 1
+        cfg.cores = min( cfg.maxcores, cfg.ppn )
+        cfg.totalcores = cfg.nodes * cfg.maxcores
     else:
-        nodes = 1
-        ppn = np
-        cores = np
-        totalcores = np
+        cfg.nodes = 1
+        cfg.ppn = cfg.np
+        cfg.cores = cfg.np
+        cfg.totalcores = cfg.np
 
     # RAM and Wall time usage
     floatsize = 4
-    if prm.oplevel in (1,2): nvars = 20
-    elif prm.oplevel in (3,4,5): nvars = 23
-    else: nvars = 44
+    if prm.oplevel in (1,2):
+         nvars = 20
+    elif prm.oplevel in (3,4,5):
+         nvars = 23
+    else:
+         nvars = 44
     nm = ( nl[0] + 2 ) * ( nl[1] + 2 ) * ( nl[2] + 2 )
-    ramcore = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * 1.5
-    ramnode = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * ppn
-    sus = int( ( prm.nt + 10 ) * ppn * nm / cores / cfg.rate / 3600 * nodes * cfg.cores + 1 )
-    mm  = ( prm.nt + 10 ) * ppn * nm / cores / cfg.rate / 60 * 3.0 + 10
-    if cfg.timelimit: mm = min( 60*cfg.timelimit[0] + cfg.timelimit[1], mm )
+    cfg.ram = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * cfg.ppn
+    sus = int( ( prm.nt + 10 ) * cfg.ppn * nm / cfg.cores / cfg.rate / 3600 * cfg.totalcores + 1 )
+    mm  =      ( prm.nt + 10 ) * cfg.ppn * nm / cfg.cores / cfg.rate / 60 * 3.0 + 10
+    if cfg.maxtime:
+        mm = min( 60*cfg.maxtime[0] + cfg.maxtime[1], mm )
     hh = mm / 60
     mm = mm % 60
-    walltime = '%d:%02d:00' % ( hh, mm )
-    print 'Cores: %s of %s' % ( np, maxcores )
-    print 'Nodes: %s of %s' % ( nodes, cfg.nodes )
-    print 'RAM: %sMb of %sMb per node' % ( ramnode, cfg.ram )
-    print 'Time limit: ' + walltime
+    cfg.walltime = '%d:%02d:00' % ( hh, mm )
+    print 'Cores: %s of %s' % ( cfg.np, maxtotalcores )
+    print 'Nodes: %s of %s' % ( cfg.nodes, cfg.maxnodes )
+    print 'RAM: %sMb of %sMb per node' % ( cfg.ram, cfg.maxram )
+    print 'Time limit: ' + cfg.walltime
     print 'SUs: %s' % sus
-    if cfg.cores and ppn > cfg.cores:
-        print 'Warning: exceding available cores per node (%s)' % cfg.cores
-    if cfg.ram and ramnode > cfg.ram:
-        print 'Warning: exceding available RAM per node (%sMb)' % cfg.ram
+    if cfg.maxcores and cfg.ppn > cfg.maxcores:
+        print 'Warning: exceding available cores per node (%s)' % cfg.maxcores
+    if cfg.ram and cfg.ram > cfg.maxram:
+        print 'Warning: exceding available RAM per node (%sMb)' % cfg.maxram
 
     # Compile code
-    if not prepare: return
-    setup.build( mode, optimize )
+    if not cfg.prepare: return
+    setup.build( cfg.mode, cfg.optimize )
 
     # Create run directory
     try: os.mkdir( 'run' )
     except: pass
-    count = glob.glob( 'run' + os.sep + '[0-9][0-9]' )
-    try: count = count[-1].split( os.sep )[-1]
-    except: count = 0
-    count = '%02d' % ( int( count ) + 1 )
-    rundir = 'run' + os.sep + str( count )
-    print 'Run directory: ' + rundir
-    rundir = os.path.realpath( rundir )
-    os.mkdir( rundir )
+    cfg.count = glob.glob( 'run' + os.sep + '[0-9][0-9]' )
+    try: cfg.count = cfg.count[-1].split( os.sep )[-1]
+    except: cfg.count = 0
+    cfg.count = '%02d' % ( int( cfg.count ) + 1 )
+    cfg.rundir = 'run' + os.sep + str( cfg.count )
+    print 'Run directory: ' + cfg.rundir
+    cfg.rundir = os.path.realpath( cfg.rundir )
+    os.mkdir( cfg.rundir )
     for f in ( 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint' ):
-        os.mkdir( rundir + os.sep + f )
+        os.mkdir( cfg.rundir + os.sep + f )
 
     # Link input files
     for i, line in enumerate( prm.fieldio ):
@@ -141,21 +144,16 @@ def run( inputs ):
             prm.fieldio[i] = line
             f = 'in' + os.sep + filename
             try:
-                os.link( filename, rundir + os.sep + f )
+                os.link( filename, cfg.rundir + os.sep + f )
             except:
-                shutil.copy( filename, rundir + os.sep + f )
+                shutil.copy( filename, cfg.rundir + os.sep + f )
 
     # Template variables
-    code = 'sord'
-    pre = ''
-    bin = './sord-' + mode + optimize
-    post = ''
-    os_ = os.uname()[3]
-    host = os.uname()[1]
-    user = pwd.getpwuid(os.geteuid())[0]
-    rundate = time.asctime()
-    machine = cfg.machine
-    queue = cfg.queue
+    cfg.code = 'sord'
+    cfg.pre = ''
+    cfg.bin = './sord-' + cfg.mode + cfg.optimize
+    cfg.post = ''
+    cfg.rundate = time.asctime()
 
     # Email address
     cwd = os.path.realpath( os.getcwd() )
@@ -166,48 +164,47 @@ def run( inputs ):
         email = user
 
     # Copy files to run directory
-    shutil.copy( 'bin' + os.sep + 'sord-' + mode + optimize, rundir )
-    try: shutil.cop( 'sord.tgz', rundir )
+    shutil.copy( 'bin' + os.sep + 'sord-' + cfg.mode + cfg.optimize, cfg.rundir )
+    try: shutil.cop( 'sord.tgz', cfg.rundir )
     except: pass
-    if optimize == 'g':
+    if cfg.optimize == 'g':
         for f in glob.glob( 'src/*.f90' ):
-            shutil.copy( f, rundir )
-    f = 'conf/' + machine + '/templates'
+            shutil.copy( f, cfg.rundir )
+    f = 'conf/' + cfg.machine + '/templates'
     if not os.path.isdir( f ):
         f = 'conf/default/templates'
     for d in [ 'conf/common/templates', f ]:
         for f in glob.glob( d + os.sep + '*' ):
-            ff = rundir + os.sep + os.path.basename( f )
-            out = file( f, 'r' ).read() % locals()
+            ff = cfg.rundir + os.sep + os.path.basename( f )
+            out = file( f, 'r' ).read() % util.dictify( cfg )
             file( ff, 'w' ).write( out )
             shutil.copymode( f, ff )
 
-    # Write parameter file
-    os.chdir( rundir )
+    # Write files
+    os.chdir( cfg.rundir )
     log = file( 'log', 'w' )
     log.write( starttime + ': SORD setup started\n' )
-    write_params( params )
+    util.save( 'parameters.py', util.dictify( prm ), [ 'fieldio' ] )
+    util.save( 'conf.py', util.dictify( cfg ) )
 
     # Run or que job
-    if run == 'q':
+    if cfg.run == 'q':
         print 'que.sh'
-        if os.uname()[1] not in cfg.hosts:
-            sys.exit( 'Error: hostname %r does not match configuration %r' % ( host, machine ) )
-        #if subprocess.call( '.' + os.sep + 'que.sh' ):
+        if cfg.host not in cfg.hosts:
+            sys.exit( 'Error: hostname %r does not match configuration %r' % ( cfg.host, cfg.machine ) )
         if os.system( '.' + os.sep + 'que.sh' ):
             sys.exit( 'Error queing job' )
-    elif run:
-        print 'run.sh -' + run
-        if os.uname()[1] not in cfg.hosts:
-            sys.exit( 'Error: hostname %r does not match configuration %r' % ( host, machine ) )
-        #if subprocess.call( [ '.' + os.sep + 'run.sh', '-' + run ] ):
-        if os.system( '.' + os.sep + 'run.sh -' + run ):
+    elif cfg.run:
+        print 'run.sh -' + cfg.run
+        if cfg.host not in cfg.hosts:
+            sys.exit( 'Error: hostname %r does not match configuration %r' % ( cfg.host, cfg.machine ) )
+        if os.system( '.' + os.sep + 'run.sh -' + cfg.run ):
             sys.exit( 'Error running job' )
 
     # Return to initial directory
     os.chdir( cwd )
 
-def prepare_params( prm ):
+def prepare_prm( prm ):
     """Prepare input paramers"""
 
     # inervals
@@ -316,16 +313,4 @@ def prepare_params( prm ):
             sys.exit( 'Error: duplicate filename: %r' % f[i] )
     prm.fieldio = fieldio
     return prm
-
-def write_params( prm, filename='parameters.py' ):
-    """Write input file that will be read by SORD Fortran code"""
-    f = file( filename, 'w' )
-    f.write( '# Auto-generated SORD input file\n' )
-    for k in dir( params ):
-        v = getattr( params, k )
-        if k[0] is not '_' and k is not 'fieldio' and type(v) is not type(os):
-            f.write( '%s = %r\n' % ( k, v ) )
-    f.write( 'fieldio = [\n' )
-    for line in prm.fieldio: f.write( repr( line ) + ',\n' )
-    f.write( ']\n' )
 

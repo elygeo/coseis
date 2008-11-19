@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-notes = """
-Default configuration
+"""
+Default configuration parameters
 """
 
-import os, sys
+import os, sys, pwd
 
 # Setup options. These are also accessible with command line flags.
 prepare = True		# True: compile code and setup run/ directory, False: dry run
@@ -13,19 +13,22 @@ optimize = 'O'		# O: fully optimized, g: debugging, t: testing, p: profiling
 itbuff = 10		# max number of timesteps to buffer for 2D & 3D output
 
 # Machine specific configuration
-machine = None		# optional name of custome machine configuration
-login = os.uname()[1]	# login address
-hosts = [ login ]	# possible hostnames
-nodes = 1		#
-cores = 0		#
-ram = 0			# 
-rate = 1.0e6		#
-timelimit = 0		#
-queue = None		# batch queue name
+notes = "Default machine"
+machine = 'default'
+user = pwd.getpwuid(os.geteuid())[0]
+os_ = os.uname()[3]
+login = os.uname()[1]
+host = login
+hosts = [ login ]
+maxnodes = 1
+maxcores = 0
+maxram = 0	
+maxtime = 0
+rate = 1.0e6
+queue = None
 
-# Detect Fortran compiler
-sfc = None		# serial fortran compiler
-mfc = None		# MPI fortran compiler
+# Detect serial Fortran compiler
+sfc = None
 for _dir in os.environ['PATH'].split(':'):
     if sfc: break
     for _f in [ 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95' ]:
@@ -33,6 +36,8 @@ for _dir in os.environ['PATH'].split(':'):
             sfc = [ _f ]
             break
 
+# Detect MPI fortran compiler
+mfc = None
 for _dir in os.environ['PATH'].split(':'):
     if mfc: break
     for _f in [ 'mpxlf95_r', 'mpif90' ]:
@@ -40,6 +45,7 @@ for _dir in os.environ['PATH'].split(':'):
             mfc = [ _f ]
             break
 
+# Fortran comiler flags
 if sfc[0] == 'xlf95_r':
     getarg = ''
     _ = [ '-u', '-q64', '-qsuppress=cmpmsg', '-qlanglvl=2003pure', '-qsuffix=f=f90', '-o' ]

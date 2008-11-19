@@ -28,11 +28,11 @@ Useful commands:
 """
 login = 'tg-login2.sdsc.teragrid.org'
 hosts = [ 'tg-login1', 'tg-login2' ]
-nodes = 256
-cores = 2
-ram = 3000
+maxnodes = 256
+maxcores = 2
+maxram = 3000
+maxtime = 18,00
 rate = 2.2e6
-timelimit = 18,00
 sfc = [ 'ifort' ]
 mfc = [ 'mpif90' ]
 getarg = ''

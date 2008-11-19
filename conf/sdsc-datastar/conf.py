@@ -1,9 +1,9 @@
 notes = """
 SDSC DataStar - (retired)
 """
-nodes = 265
-cores = 8
-ram = 13500
-timelimit = 18, 00
+maxnodes = 265
+maxcores = 8
+maxram = 13500
+maxtime = 18, 00
 timer = [ 'hpmcount', '-nao', 'prof/hpm' ]
 

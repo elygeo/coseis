@@ -14,9 +14,9 @@ Run from disks located at HPC:
 """
 login = 'hpc-login1.usc.edu'
 hosts = [ 'hpc-login1', 'hpc-login2' ]
-nodes = 256
-cores = 4
-ram = 13500
+maxnodes = 256
+maxcores = 4
+maxram = 13500
+maxtime = 24, 00
 rate = 1.1e6
-timelimit = 24, 00
 

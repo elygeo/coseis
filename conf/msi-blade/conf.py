@@ -15,10 +15,10 @@ module load pathmpi
 """
 login = 'blade.msi.umn.edu'
 hosts = [ 'blade287' ]
-nodes = 268
-cores = 8
-ram = 7000
-timelimit = 48, 00
+maxnodes = 268
+maxcores = 8
+maxram = 7000
+maxtime = 48, 00
 sfc = [ 'pathf95' ]
 mfc = [ 'mpif90' ]
 getarg = ''

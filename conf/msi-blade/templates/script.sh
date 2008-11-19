@@ -2,7 +2,7 @@
 
 #PBS -N %(code)s%(count)s
 #PBS -l nodes=%(nodes)s:ppn=%(ppn)s
-#PBS -l mem=%(ramnode)smb
+#PBS -l mem=%(ram)smb
 #PBS -l walltime=%(walltime)s
 #PBS -q large
 #PBS -e stderr

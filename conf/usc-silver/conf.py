@@ -7,7 +7,7 @@ https://geosys.usc.edu/wiki/index.php/Specifications
 """
 login = 'silver.usc.edu'
 hosts = [ login ]
-nodes = 1
-cores = 4
-ram = 31000
+maxnodes = 1
+maxcores = 4
+maxram = 31000
 

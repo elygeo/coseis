@@ -8,7 +8,7 @@ https://geosys.usc.edu/wiki/index.php/MPI_on_dynamic
 """
 login = 'dynamic.usc.edu'
 hosts = [ login ]
-nodes = 8
-cores = 4
-ram = 1800
+maxnodes = 8
+maxcores = 4
+maxram = 1800
 

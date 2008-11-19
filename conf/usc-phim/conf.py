@@ -6,7 +6,7 @@ Intel Xeon CPU 3GHz
 """
 login = 'phim.usc.edu'
 hosts = [ login ]
-nodes = 1
-cores = 1
+maxnodes = 1
+maxcores = 1
+maxram = 2800
 rate = 1.2e6
-ram = 2800

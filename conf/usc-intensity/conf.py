@@ -6,8 +6,8 @@ USC Intensity
 """
 login = 'intensity.usc.edu'
 hosts = [ login ]
-nodes = 1
-cores = 8
-ram = 7000
+maxnodes = 1
+maxcores = 8
+maxram = 7000
 rate = 1.7e6
 
