@@ -3,14 +3,14 @@
 Read configuration files
 """
 
-def configure( save=False, machine=None ):
+def configure( machine=None, save=False ):
     """Read configuration files"""
     import os
     import util
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
     conf = { 'machine': 'default' }
-    util.load( 'default-conf.py', conf )
+    util.load( 'default-cfg.py', conf )
     if not machine and os.path.isfile( 'machine' ):
         machine = file( 'machine', 'r' ).read().strip()
     if machine:
@@ -24,7 +24,7 @@ def configure( save=False, machine=None ):
 if __name__ == '__main__':
     """Test configuration"""
     import os, sys
-    c = configure( True, *sys.argv[1:2] )
+    c = configure( *sys.argv[1:2], True )
     print c['notes']
     for k, v in c.iteritems():
         if k != 'notes':

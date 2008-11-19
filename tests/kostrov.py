@@ -5,7 +5,7 @@ Kostrov constant rupture velocity test
 
 import sord
 
-np = 1, 1, 1
+np3 = 1, 1, 1
 nt = 400
 ihypo = 61, 61, 21
 _j, _k, _l = ihypo

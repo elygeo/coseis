@@ -7,7 +7,7 @@ import sord
 
 dx = 50.0
 dt = 0.004
-np = 1, 16, 1
+np3 = 1, 16, 1
 _ell  = 7000.0, 9000.0, 4000.0
 xhypo =    0.0,    0.0, 2000.0
 nn    = [ int( x / dx + 21.5 ) for x in _ell  ]

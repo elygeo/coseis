@@ -3,7 +3,7 @@ module m_collective
 use mpi
 implicit none
 integer :: file_null = mpi_file_null
-integer, private :: np(3), root3d, root2d(3), comm3d, comm2d(3), comm1d(3)
+integer, private :: np3(3), root3d, root2d(3), comm3d, comm2d(3), comm1d(3)
 contains
 
 ! Initialize
@@ -27,14 +27,14 @@ call mpi_finalize( e )
 end subroutine
 
 ! Process rank
-subroutine rank( ip3, ipid, npin )
+subroutine rank( ip3, ipid, np3in )
 use mpi
 integer, intent(out) :: ip3(3), ipid
-integer, intent(in) :: npin(3)
+integer, intent(in) :: np3in(3)
 integer :: ip, e
 logical :: period(3) = .false.
-np = npin
-call mpi_cart_create( mpi_comm_world, 3, np, period, .true., comm3d, e )
+np3 = np3in
+call mpi_cart_create( mpi_comm_world, 3, np3, period, .true., comm3d, e )
 if ( comm3d == mpi_comm_null ) then
   call mpi_comm_rank( mpi_comm_world, ip, e  )
   write( 0, * ) 'Unused process:', ip
@@ -43,7 +43,7 @@ if ( comm3d == mpi_comm_null ) then
 end if
 call mpi_comm_rank( comm3d, ip, e  )
 call mpi_cart_coords( comm3d, ip, 3, ip3, e )
-ipid = ip3(1) + np(1) * ( ip3(2) + np(2) * ip3(3) )
+ipid = ip3(1) + np3(1) * ( ip3(2) + np3(2) * ip3(3) )
 end subroutine
 
 ! Set root process and creat 2D communicators
@@ -57,7 +57,7 @@ root2d = 0
 comm1d = mpi_comm_self
 comm2d = mpi_comm_self
 do i = 1, 3
-if ( product( (/ np(:i-1), np(i+1:) /) ) > 1 ) then
+if ( product( (/ np3(:i-1), np3(i+1:) /) ) > 1 ) then
   hat = .false.
   hat(i) = .true.
   call mpi_cart_sub( comm3d, hat, comm1d(i), e )
@@ -244,7 +244,7 @@ integer, intent(in) :: nh(3)
 integer :: i, e, prev, next, nm(3), n(3), isend(3), irecv(3), tsend, trecv, comm
 nm = (/ size(f,1), size(f,2), size(f,3) /)
 do i = 1, 3
-if ( np(i) > 1 .and. nm(i) > 1 ) then
+if ( np3(i) > 1 .and. nm(i) > 1 ) then
   comm = comm3d
   call mpi_cart_shift( comm, i-1, 1, prev, next, e )
   n = nm
@@ -280,7 +280,7 @@ integer, intent(in) :: nh(3)
 integer :: i, e, prev, next, nm(4), n(4), isend(4), irecv(4), tsend, trecv, comm
 nm = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
 do i = 1, 3
-if ( np(i) > 1 .and. nm(i) > 1 ) then
+if ( np3(i) > 1 .and. nm(i) > 1 ) then
   comm = comm3d
   call mpi_cart_shift( comm, i-1, 1, prev, next, e )
   n = nm

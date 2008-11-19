@@ -5,14 +5,14 @@ Benchmarks
 
 import sord, math
 
-_np = [ (1,1,1) ]
-_np = [ (1,128,96), (1,128,128) ]
-_np = [ (1,1,1), (1,2,2), (1,4,4), (1,8,8), (1,16,16), (1,32,32), (1,64,64) ]
-_np = [ (1,1,1), (1,2,2), (1,4,4) ]
-_optimize = 'O'
-_optimize = 'p'
-_mode = 's'
-_mode = 'm'
+_np3 = [ (1,1,1) ]
+_np3 = [ (1,128,96), (1,128,128) ]
+_np3 = [ (1,1,1), (1,2,2), (1,4,4), (1,8,8), (1,16,16), (1,32,32), (1,64,64) ]
+_np3 = [ (1,1,1), (1,2,2), (1,4,4) ]
+optimize = 'O'
+optimize = 'p'
+mode = 's'
+mode = 'm'
 _n = 20
 _n = 200
 nt = 8
@@ -22,10 +22,10 @@ itstats = 1
 oplevel = 2
 oplevel = 6
 
-print _np
-for np in _np:
-    _n = np[0] * np[1] * np[2]
-    print 'Benchmark', math.log(_n,4), _n/16, _n
+print _np3
+for np3 in _np3:
+    _np = np3[0] * np3[1] * np3[2]
+    print 'Benchmark', math.log(_np,4), _np/16, _np
 print
 
 itcheck = -1
@@ -47,7 +47,7 @@ fieldio = [
     ( '=s', 'v3', [0,0,0,1], 1.0 ),
 ]
 
-for np in _np:
-    nn = [ _n * _p for _p in np ]
-    sord.run( locals(), mode=_mode, optimize=_optimize )
+for np3 in _np3:
+    nn = [ _n * _np for _np in np3 ]
+    sord.run( locals() )
 

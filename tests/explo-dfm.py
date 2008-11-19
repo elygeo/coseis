@@ -5,7 +5,7 @@ Explosion test problem for comparison with DFM
 
 import sord
 
-np = 1, 2, 1
+np3 = 1, 2, 1
 nn = 101, 101, 61
 dx = 100.0
 dt = 0.008

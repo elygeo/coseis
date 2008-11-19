@@ -13,13 +13,13 @@ nt = max( nt, 0 )
 ifn = abs( faultnormal )
 
 ! Partition for parallelization
-if ( np0 == 1 ) np = 1
-nl = ( nn - 1 ) / np + 1
+if ( np0 == 1 ) np3 = 1
+nl = ( nn - 1 ) / np3 + 1
 nhalo = 1
 if ( ifn /= 0 ) nhalo(ifn) = 2
 nl = max( nl, nhalo )
-np = ( nn - 1 ) / nl + 1
-call rank( ip3, ipid, np )
+np3 = ( nn - 1 ) / nl + 1
+call rank( ip3, ipid, np3 )
 nnoff = nl * ip3 - nhalo
 
 ! Master process
@@ -68,7 +68,7 @@ if ( debug > 0 ) then
   write( 1, "( 'ifn     =   ',i8                        )" ) ifn
   write( 1, "( 'ip      =   ',i8                        )" ) ip
   write( 1, "( 'ipid    =   ',i8                        )" ) ipid
-  write( 1, "( 'np      = ( ',i8,2(', ',i8),' )'        )" ) np
+  write( 1, "( 'np3     = ( ',i8,2(', ',i8),' )'        )" ) np3
   write( 1, "( 'ip3     = ( ',i8,2(', ',i8),' )'        )" ) ip3
   write( 1, "( 'nn      = ( ',i8,2(', ',i8),' )'        )" ) nn
   write( 1, "( 'nm      = ( ',i8,2(', ',i8),' )'        )" ) nm

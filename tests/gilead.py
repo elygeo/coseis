@@ -5,7 +5,7 @@ Wurman and Oglesby problem
 
 import sord, os, sys
 
-np = 4, 7, 2
+np3 = 4, 7, 2
 dx = 100.0
 dt = 0.008
 nt = 3200

@@ -5,7 +5,7 @@ Explosion test problem
 
 import sord
 
-np = 1, 2, 1
+np3 = 1, 2, 1
 nn = 71, 71, 61
 dx = 100.
 dt = 0.008

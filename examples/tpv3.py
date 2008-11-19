@@ -5,7 +5,7 @@ TPV3 - SCEC validation problem version 3
 
 import sord
 
-np = 1, 1, 32				# number of processors in each dimension
+np3 = 1, 1, 32				# number of processors in each dimension
 nn = 351, 201, 128			# number of mesh nodes, nx ny nz
 nt = 3000				# number of time steps
 dx = 50.0				# spatial step size

@@ -4,7 +4,7 @@ Tomography Frechet kernel computation
 """
 import sord
 
-np = 1, 1, 1			# number of processors in each dimension
+np3 = 1, 1, 1			# number of processors in each dimension
 nn = 301, 201, 151		# number of mesh nodes, nx ny nz
 nt = 1000			# number of time steps
 dx = 200.0			# spatial step size

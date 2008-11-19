@@ -6,8 +6,8 @@ Miniature point source test
 import sord
 
 debug = 0
-np = 1, 1, 1
-np = 1, 2, 1
+np3 = 1, 1, 1
+np3 = 1, 2, 1
 nn = 2, 2, 2
 nt = 10
 dx = 100.0

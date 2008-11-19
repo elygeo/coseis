@@ -6,7 +6,7 @@ Test
 import sord
 
 nt = 10
-np = 1, 1, 1
+np3 = 1, 1, 1
 
 sord.run( locals() )
 

@@ -175,9 +175,9 @@ Basic usage
 
 SORD is run from Python by importing the ``sord`` module and passing a
 dictionary containing the input parameters to the ``sord.run()`` function.  The
-file `default-param.py <default-param.py>`__ contains a short description of
-each SORD input parameter and it's default value.  Annotated example scripts
-are located in the ``examples/`` directory.  To run the layer over halfspace
+file `default-prm.py <default-prm.py>`__ contains a short description of each
+SORD input parameter and it's default value.  Annotated example scripts are
+located in the ``examples/`` directory.  To run the layer over halfspace
 example (LOH.1), do::
 
     cd examples/
@@ -210,8 +210,8 @@ binary and ASCII text format, converting the byte order between big and
 little-endian, and computing minimum, maximum, and mean values.
 
 The best place to go from here to learn more is to look at the example scripts
-and `default-param.py <default-param.py>`__.  Studying the Fortran source code
-in the ``src/`` directory will be educational as well.  As much as possible, I
+and `default-prm.py <default-prm.py>`__.  Studying the Fortran source code in
+the ``src/`` directory will be educational as well.  As much as possible, I
 have tried to keep it clean and readable.
 
 .. include:: sources.txt

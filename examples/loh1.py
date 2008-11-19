@@ -5,7 +5,7 @@ PEER LOH.1 - Layer over a halfspace, buried double couple source
 
 import sord
 
-np = 1, 16, 1			# number of processors in each dimension
+np3 = 1, 16, 1			# number of processors in each dimension
 nn = 261, 301, 161		# number of mesh nodes, nx ny nz
 nt = 2250			# number of time steps
 dx = 50.0			# spatial step size

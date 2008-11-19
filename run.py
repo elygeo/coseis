@@ -7,28 +7,8 @@ import os, sys, pwd, glob, time, getopt, shutil
 import util, setup, configure, fieldnames
 callcount = 0
 
-def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None ):
-    """
-    Prepare, and optionally launch, a SORD job.
-
-    machine: site specific configuration located in conf/
-    params: a dictionary of simulation parameters
-    prepare:
-        True:  compile code and setup run/ directory
-        False: dry run. parameter check only
-    run:
-        i' run interactively
-       'q' que batch job
-       'g' run in a debugger
-    mode:
-       's' serial
-       'm' multiprocessor
-    optimize:
-       'O' fully optimized
-       'g' debugging
-       't' testing
-       'p' profiling
-    """
+def run( inputs ):
+    """Setup, and optionally launch, a SORD job."""
 
     # Save start time
     starttime = time.asctime()
@@ -39,45 +19,59 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     # Command line options
     opts, args = getopt.getopt( sys.argv[1:], 'niqsmgGtpOd' )
     for o, v in opts:
-        if   o == '-n': prepare = False
-        elif o == '-i': run = 'i'
-        elif o == '-q': run = 'q'
-        elif o == '-s': mode = 's'
-        elif o == '-m': mode = 'm'
-        elif o == '-g': optimize = 'g'
-        elif o == '-G': optimize = 'g'; run = 'g'
-        elif o == '-t': optimize = 't'
-        elif o == '-p': optimize = 'p'
-        elif o == '-O': optimize = 'O'
+        if   o == '-n': inputs['prepare'] = False
+        elif o == '-i': inputs['run'] = 'i'
+        elif o == '-q': inputs['run'] = 'q'
+        elif o == '-s': inputs['mode'] = 's'
+        elif o == '-m': inputs['mode'] = 'm'
+        elif o == '-g': inputs['optimize'] = 'g'
+        elif o == '-G': inputs['optimize'] = 'g'; run = 'g'
+        elif o == '-t': inputs['optimize'] = 't'
+        elif o == '-p': inputs['optimize'] = 'p'
+        elif o == '-O': inputs['optimize'] = 'O'
         elif o == '-d':
             if callcount is 1:
                 f = 'run' + os.sep + '[0-9][0-9]'
                 for f in glob.glob( f ): shutil.rmtree( f )
-        else: sys.exit( 'Error: unknown option: %s %s' % ( o, v ) )
-    if not prepare: run = False
+        else: sys.exit( 'Error: unknown option: ' + o )
 
-    # Configure machine
-    if args:
-        machine = args[0]
-    conf = util.objectify( configure.configure( False, machine ) )
-    print 'Machine: ' + conf.machine
+    # Read defaults
+    f = os.path.dirname( __file__ ) + os.sep + 'default-prm.py'
+    prm = util.load( f )
+    if 'machine' in inputs:
+        cfg = configure.configure( inputs['machine'] )
+    else:
+        cfg = configure.configure()
 
-    # Prepare parameters 
-    params = prepare_params( params )
+    # Merge inputs
+    for k, v in inputs.iteritems():
+        if k[0] is not '_' and type(v) is not type(sys):
+            if k in cfg:
+                cfg[k] = v
+            if k in prm:
+                prm[k] = v
+            else:
+                sys.exit( 'Unknown SORD parameter: %s = %r' % ( k, v ) )
+    cfg = util.objectify( cfg )
+    prm = util.objectify( prepare_params( prm ) )
+    print 'Machine: ' + cfg.machine
+
+    if not cfg.prepare:
+        cfg.run = False
 
     # Partition for parallelization
-    maxcores = conf.nodes * conf.cores
+    maxcores = cfg.nodes * cfg.cores
     if not mode and maxcores == 1:
         mode = 's'
-    np3 = params.np[:]
+    np3 = prm.np3[:]
     if mode == 's':
         np3 = [ 1, 1, 1 ]
-    nl = [ ( params.nn[i] - 1 ) / np3[i] + 1 for i in range(3) ]
-    i  = abs( params.faultnormal ) - 1
+    nl = [ ( prm.nn[i] - 1 ) / np3[i] + 1 for i in range(3) ]
+    i  = abs( prm.faultnormal ) - 1
     if i >= 0:
         nl[i] = max( nl[i], 2 )
-    np3 = [ ( params.nn[i] - 1 ) / nl[i] + 1 for i in range(3) ]
-    params.np = tuple( np3 )
+    np3 = [ ( prm.nn[i] - 1 ) / nl[i] + 1 for i in range(3) ]
+    prm.np3 = tuple( np3 )
     np = np3[0] * np3[1] * np3[2]
     if not mode:
         mode = 's'
@@ -85,11 +79,11 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
             mode = 'm'
 
     # Resources
-    if conf.cores:
-        nodes = min( conf.nodes, ( np - 1 ) / conf.cores + 1 )
+    if cfg.cores:
+        nodes = min( cfg.nodes, ( np - 1 ) / cfg.cores + 1 )
         ppn = ( np - 1 ) / nodes + 1
-        cores = min( conf.cores, ppn )
-        totalcores = nodes * conf.cores
+        cores = min( cfg.cores, ppn )
+        totalcores = nodes * cfg.cores
     else:
         nodes = 1
         ppn = np
@@ -98,27 +92,27 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
 
     # RAM and Wall time usage
     floatsize = 4
-    if params.oplevel in (1,2): nvars = 20
-    elif params.oplevel in (3,4,5): nvars = 23
+    if prm.oplevel in (1,2): nvars = 20
+    elif prm.oplevel in (3,4,5): nvars = 23
     else: nvars = 44
     nm = ( nl[0] + 2 ) * ( nl[1] + 2 ) * ( nl[2] + 2 )
     ramcore = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * 1.5
     ramnode = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * ppn
-    sus = int( ( params.nt + 10 ) * ppn * nm / cores / conf.rate / 3600 * nodes * conf.cores + 1 )
-    mm  = ( params.nt + 10 ) * ppn * nm / cores / conf.rate / 60 * 3.0 + 10
-    if conf.timelimit: mm = min( 60*conf.timelimit[0] + conf.timelimit[1], mm )
+    sus = int( ( prm.nt + 10 ) * ppn * nm / cores / cfg.rate / 3600 * nodes * cfg.cores + 1 )
+    mm  = ( prm.nt + 10 ) * ppn * nm / cores / cfg.rate / 60 * 3.0 + 10
+    if cfg.timelimit: mm = min( 60*cfg.timelimit[0] + cfg.timelimit[1], mm )
     hh = mm / 60
     mm = mm % 60
     walltime = '%d:%02d:00' % ( hh, mm )
     print 'Cores: %s of %s' % ( np, maxcores )
-    print 'Nodes: %s of %s' % ( nodes, conf.nodes )
-    print 'RAM: %sMb of %sMb per node' % ( ramnode, conf.ram )
+    print 'Nodes: %s of %s' % ( nodes, cfg.nodes )
+    print 'RAM: %sMb of %sMb per node' % ( ramnode, cfg.ram )
     print 'Time limit: ' + walltime
     print 'SUs: %s' % sus
-    if conf.cores and ppn > conf.cores:
-        print 'Warning: exceding available cores per node (%s)' % conf.cores
-    if conf.ram and ramnode > conf.ram:
-        print 'Warning: exceding available RAM per node (%sMb)' % conf.ram
+    if cfg.cores and ppn > cfg.cores:
+        print 'Warning: exceding available cores per node (%s)' % cfg.cores
+    if cfg.ram and ramnode > cfg.ram:
+        print 'Warning: exceding available RAM per node (%sMb)' % cfg.ram
 
     # Compile code
     if not prepare: return
@@ -139,12 +133,12 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
         os.mkdir( rundir + os.sep + f )
 
     # Link input files
-    for i, line in enumerate( params.fieldio ):
+    for i, line in enumerate( prm.fieldio ):
         if 'r' in line[0] and os.sep in line[3]:
             filename = line[3]
             f = os.path.basename( filename )
             line = line[:3] + ( f, ) + line[4:]
-            params.fieldio[i] = line
+            prm.fieldio[i] = line
             f = 'in' + os.sep + filename
             try:
                 os.link( filename, rundir + os.sep + f )
@@ -160,8 +154,8 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     host = os.uname()[1]
     user = pwd.getpwuid(os.geteuid())[0]
     rundate = time.asctime()
-    machine = conf.machine
-    queue = conf.queue
+    machine = cfg.machine
+    queue = cfg.queue
 
     # Email address
     cwd = os.path.realpath( os.getcwd() )
@@ -197,14 +191,14 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     # Run or que job
     if run == 'q':
         print 'que.sh'
-        if os.uname()[1] not in conf.hosts:
+        if os.uname()[1] not in cfg.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r' % ( host, machine ) )
         #if subprocess.call( '.' + os.sep + 'que.sh' ):
         if os.system( '.' + os.sep + 'que.sh' ):
             sys.exit( 'Error queing job' )
     elif run:
         print 'run.sh -' + run
-        if os.uname()[1] not in conf.hosts:
+        if os.uname()[1] not in cfg.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r' % ( host, machine ) )
         #if subprocess.call( [ '.' + os.sep + 'run.sh', '-' + run ] ):
         if os.system( '.' + os.sep + 'run.sh -' + run ):
@@ -213,63 +207,50 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     # Return to initial directory
     os.chdir( cwd )
 
-def prepare_params( pp ):
+def prepare_params( prm ):
     """Prepare input paramers"""
 
-    # max buffer size for 2D slices. should this go in a settings file?
-    itbuff = 10
-
-    # merge input parameters with defaults
-    f = os.path.dirname( __file__ ) + os.sep + 'default-param.py'
-    p = util.load( f )
-    for k, v in pp.iteritems():
-        if k[0] is not '_' and type(v) is not type(sys):
-            if k not in p:
-                sys.exit( 'Unknown SORD parameter: %s = %r' % ( k, v ) )
-            p[k] = v
-    p = util.objectify( p )
-
     # inervals
-    p.itio = max( 1, min( p.itio, p.nt ) )
-    if p.itcheck % p.itio != 0:
-        p.itcheck = ( p.itcheck / p.itio + 1 ) * p.itio
+    prm.itio = max( 1, min( prm.itio, prm.nt ) )
+    if prm.itcheck % prm.itio != 0:
+        prm.itcheck = ( prm.itcheck / prm.itio + 1 ) * prm.itio
 
     # hypocenter node
-    ii = list( p.ihypo )
+    ii = list( prm.ihypo )
     for i in range( 3 ):
         if ii[i] == 0:
-            ii[i] = p.nn[i] / 2
+            ii[i] = prm.nn[i] / 2
         elif ii[i] < 0:
-            ii[i] = ii[i] + p.nn[i] + 1
-        if ii[i] < 1 or ii[i] > p.nn[i]:
+            ii[i] = ii[i] + prm.nn[i] + 1
+        if ii[i] < 1 or ii[i] > prm.nn[i]:
             sys.exit( 'Error: ihypo %s out of bounds' % ii )
-    p.ihypo = tuple( ii )
+    prm.ihypo = tuple( ii )
 
     # boundary conditions
-    i1 = list( p.bc1 )
-    i2 = list( p.bc2 )
-    i = abs( p.faultnormal ) - 1
+    i1 = list( prm.bc1 )
+    i2 = list( prm.bc2 )
+    i = abs( prm.faultnormal ) - 1
     if i >= 0:
-        if p.ihypo[i] >= p.nn[i]: sys.exit( 'Error: ihypo %s out of bounds' % ii )
-        if p.ihypo[i] == p.nn[i] - 1: i1[i] = -2
-        if p.ihypo[i] == 1:           i2[i] = -2
-    p.bc1 = tuple( i1 )
-    p.bc2 = tuple( i2 )
+        if prm.ihypo[i] >= prm.nn[i]: sys.exit( 'Error: ihypo %s out of bounds' % ii )
+        if prm.ihypo[i] == prm.nn[i] - 1: i1[i] = -2
+        if prm.ihypo[i] == 1:           i2[i] = -2
+    prm.bc1 = tuple( i1 )
+    prm.bc2 = tuple( i2 )
 
     # PML region
     i1 = [ 0, 0, 0 ]
-    i2 = [ n+1 for n in p.nn ]
-    if p.npml > 0:
+    i2 = [ n+1 for n in prm.nn ]
+    if prm.npml > 0:
         for i in range( 3 ):
-            if p.bc1[i] == 10: i1[i] = p.npml
-            if p.bc2[i] == 10: i2[i] = p.nn[i] - p.npml + 1
+            if prm.bc1[i] == 10: i1[i] = prm.npml
+            if prm.bc2[i] == 10: i2[i] = prm.nn[i] - prm.npml + 1
             if i1[i] > i2[i]: sys.exit( 'Error: model too small for PML' )
-    p.i1pml = tuple( i1 )
-    p.i2pml = tuple( i2 )
+    prm.i1pml = tuple( i1 )
+    prm.i2pml = tuple( i2 )
 
     # I/O sequence
     fieldio = []
-    for line in p.fieldio:
+    for line in prm.fieldio:
         line = list( line )
         filename = '-'
         tfunc, val, period = 'const', 1.0, 1.0
@@ -300,7 +281,7 @@ def prepare_params( pp ):
         mode = mode.replace( 'f', '' )
         if field not in fieldnames.all:
             sys.exit( 'Error: unknown field: %r' % line )
-        if p.faultnormal == 0 and field in fieldnames.fault:
+        if prm.faultnormal == 0 and field in fieldnames.fault:
             sys.exit( 'Error: field only for ruptures: %r' % line )
         if 'w' not in mode and field not in fieldnames.input:
             sys.exit( 'Error: field is ouput only: %r' % line )
@@ -311,32 +292,32 @@ def prepare_params( pp ):
         if field in fieldnames.cell:
             mode = mode.replace( 'x', 'X' )
             mode = mode.replace( 'c', 'C' )
-            nn = [ n-1 for n in p.nn ] + [ p.nt ]
+            nn = [ n-1 for n in prm.nn ] + [ prm.nt ]
         else:
-            nn = list( p.nn ) + [ p.nt ]
+            nn = list( prm.nn ) + [ prm.nt ]
         ii = util.indices( ii, nn )
         if field in fieldnames.initial:
             ii[3] = 0, 0, 1
         if field in fieldnames.fault:
-            i = p.faultnormal - 1
-            ii[i] = 2 * ( p.ihypo[i], ) + ( 1, )
+            i = prm.faultnormal - 1
+            ii[i] = 2 * ( prm.ihypo[i], ) + ( 1, )
         nn = [ ( ii[i][1] - ii[i][0] + 1 ) / ii[i][2] for i in range(4) ]
-        nb = ( min( p.itio, p.nt ) - 1 ) / ii[3][2] + 1
+        nb = ( min( prm.itio, prm.nt ) - 1 ) / ii[3][2] + 1
         nb = max( 1, min( nb, nn[3] ) )
         n = nn[0] * nn[1] * nn[2]
-        if n > ( p.nn[0] + p.nn[1] + p.nn[2] ) ** 2:
+        if n > ( prm.nn[0] + prm.nn[1] + prm.nn[2] ) ** 2:
             nb = 1
         elif n > 1:
-            nb = min( nb, itbuff )
+            nb = min( nb, cfg.itbuff )
         fieldio += [( op+mode, tfunc, period, x1, x2, nb, ii, field, filename, val )]
     f = [ line[8] for line in fieldio if line[8] != '-' ]
     for i in range( len( f ) ):
         if f[i] in f[:i]:
             sys.exit( 'Error: duplicate filename: %r' % f[i] )
-    p.fieldio = fieldio
-    return p
+    prm.fieldio = fieldio
+    return prm
 
-def write_params( params, filename='parameters.py' ):
+def write_params( prm, filename='parameters.py' ):
     """Write input file that will be read by SORD Fortran code"""
     f = file( filename, 'w' )
     f.write( '# Auto-generated SORD input file\n' )
@@ -345,6 +326,6 @@ def write_params( params, filename='parameters.py' ):
         if k[0] is not '_' and k is not 'fieldio' and type(v) is not type(os):
             f.write( '%s = %r\n' % ( k, v ) )
     f.write( 'fieldio = [\n' )
-    for line in params.fieldio: f.write( repr( line ) + ',\n' )
+    for line in prm.fieldio: f.write( repr( line ) + ',\n' )
     f.write( ']\n' )
 

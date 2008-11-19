@@ -6,8 +6,8 @@ Fault test
 import sord
 
 debug = 0
-np    =  2,  3,  2
-np    =  1,  1,  1
+np3   =  2,  3,  2
+np3   =  1,  1,  1
 nn    =  8,  8,  9
 ihypo = -1, -1, -2
 bc1   =  0,  0,  0

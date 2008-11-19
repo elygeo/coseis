@@ -133,8 +133,8 @@ def docs():
     out += '---------------\n'
     sources = [
       'run.py',
-      'default-conf.py',
-      'default-param.py',
+      'default-cfg.py',
+      'default-prm.py',
       'fieldnames.py',
       'configure.py',
       'setup.py',

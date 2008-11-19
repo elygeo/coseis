@@ -6,7 +6,7 @@ Boundary condition test
 import sord
 
 debug = 3
-np = 1, 1, 1
+np3 = 1, 1, 1
 nt = 8
 tsource = 0.1
 tfunc = 'brune'

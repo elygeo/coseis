@@ -6,9 +6,9 @@ TPV3 - SCEC validation problem version 3, convergence test
 import sord
 
 debug = 2
-np = 1, 1, 32
-np = 1, 1, 2
-np = 1, 1, 1
+np3 = 1, 1, 32
+np3 = 1, 1, 2
+np3 = 1, 1, 1
 _reg = 1
 _dx = 500.0, 300.0, 250.0, 150.0, 100.0, 75.0, 50.0, 30.0, 25.0
 _dx = [ 100.0 ]
