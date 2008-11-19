@@ -14,7 +14,7 @@ itbuff = 10		# max number of timesteps to buffer for 2D & 3D output
 
 # Machine specific configuration
 notes = "Default machine"
-machine = 'default'
+machine = None
 user = pwd.getpwuid(os.geteuid())[0]
 os_ = os.uname()[3]
 login = os.uname()[1]
