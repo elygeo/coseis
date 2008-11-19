@@ -51,9 +51,9 @@ def run( inputs ):
             elif k in prm:
                 prm[k] = v
             else:
-                sys.exit( 'Unknown SORD parameter: %s = %r' % ( k, v ) )
+                sys.exit( 'Unknown parameter: %s = %r' % ( k, v ) )
     cfg = util.objectify( cfg )
-    prm = prepare_prm( util.objectify( prm ) )
+    prm = prepare_prm( util.objectify( prm ), cfg )
     print 'Machine: ' + cfg.machine
 
     if not cfg.prepare:
@@ -204,7 +204,7 @@ def run( inputs ):
     # Return to initial directory
     os.chdir( cwd )
 
-def prepare_prm( prm ):
+def prepare_prm( prm, cfg ):
     """Prepare input paramers"""
 
     # inervals
