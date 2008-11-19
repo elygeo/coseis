@@ -9,21 +9,17 @@ def configure( save=False, machine=None ):
     import util
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    cfg = { 'machine':'default' }
-    util.load( 'conf/default/conf.py', cfg )
+    conf = { 'machine': 'default' }
+    util.load( 'default-conf.py', conf )
     if not machine and os.path.isfile( 'machine' ):
         machine = file( 'machine', 'r' ).read().strip()
     if machine:
-        util.load( 'conf/' + machine + '/conf.py', cfg )
-        cfg['machine'] = machine
+        util.load( 'conf/' + machine + '/conf.py', conf )
+        conf['machine'] = machine
     if save:
-        file( 'machine', 'w' ).write( cfg['machine'] )
-    f = 'conf/' + cfg['machine'] + '/templates'
-    if not os.path.isdir( f ):
-        f = 'conf/default/templates'
-    cfg['templates'] = [ 'conf/common/templates', f ]
+        file( 'machine', 'w' ).write( conf['machine'] )
     os.chdir( cwd )
-    return cfg
+    return conf
 
 if __name__ == '__main__':
     """Test configuration"""

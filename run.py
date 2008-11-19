@@ -59,14 +59,14 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     # Configure machine
     if args:
         machine = args[0]
-    cfg = util.objectify( configure.configure( False, machine ) )
-    print 'Machine: ' + cfg.machine
+    conf = util.objectify( configure.configure( False, machine ) )
+    print 'Machine: ' + conf.machine
 
     # Prepare parameters 
     params = prepare_params( params )
 
     # Partition for parallelization
-    maxcores = cfg.nodes * cfg.cores
+    maxcores = conf.nodes * conf.cores
     if not mode and maxcores == 1:
         mode = 's'
     np3 = params.np[:]
@@ -85,11 +85,11 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
             mode = 'm'
 
     # Resources
-    if cfg.cores:
-        nodes = min( cfg.nodes, ( np - 1 ) / cfg.cores + 1 )
+    if conf.cores:
+        nodes = min( conf.nodes, ( np - 1 ) / conf.cores + 1 )
         ppn = ( np - 1 ) / nodes + 1
-        cores = min( cfg.cores, ppn )
-        totalcores = nodes * cfg.cores
+        cores = min( conf.cores, ppn )
+        totalcores = nodes * conf.cores
     else:
         nodes = 1
         ppn = np
@@ -104,21 +104,21 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     nm = ( nl[0] + 2 ) * ( nl[1] + 2 ) * ( nl[2] + 2 )
     ramcore = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * 1.5
     ramnode = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * ppn
-    sus = int( ( params.nt + 10 ) * ppn * nm / cores / cfg.rate / 3600 * nodes * cfg.cores + 1 )
-    mm  = ( params.nt + 10 ) * ppn * nm / cores / cfg.rate / 60 * 3.0 + 10
-    if cfg.timelimit: mm = min( 60*cfg.timelimit[0] + cfg.timelimit[1], mm )
+    sus = int( ( params.nt + 10 ) * ppn * nm / cores / conf.rate / 3600 * nodes * conf.cores + 1 )
+    mm  = ( params.nt + 10 ) * ppn * nm / cores / conf.rate / 60 * 3.0 + 10
+    if conf.timelimit: mm = min( 60*conf.timelimit[0] + conf.timelimit[1], mm )
     hh = mm / 60
     mm = mm % 60
     walltime = '%d:%02d:00' % ( hh, mm )
     print 'Cores: %s of %s' % ( np, maxcores )
-    print 'Nodes: %s of %s' % ( nodes, cfg.nodes )
-    print 'RAM: %sMb of %sMb per node' % ( ramnode, cfg.ram )
+    print 'Nodes: %s of %s' % ( nodes, conf.nodes )
+    print 'RAM: %sMb of %sMb per node' % ( ramnode, conf.ram )
     print 'Time limit: ' + walltime
     print 'SUs: %s' % sus
-    if cfg.cores and ppn > cfg.cores:
-        print 'Warning: exceding available cores per node (%s)' % cfg.cores
-    if cfg.ram and ramnode > cfg.ram:
-        print 'Warning: exceding available RAM per node (%sMb)' % cfg.ram
+    if conf.cores and ppn > conf.cores:
+        print 'Warning: exceding available cores per node (%s)' % conf.cores
+    if conf.ram and ramnode > conf.ram:
+        print 'Warning: exceding available RAM per node (%sMb)' % conf.ram
 
     # Compile code
     if not prepare: return
@@ -160,8 +160,8 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     host = os.uname()[1]
     user = pwd.getpwuid(os.geteuid())[0]
     rundate = time.asctime()
-    machine = cfg.machine
-    queue = cfg.queue
+    machine = conf.machine
+    queue = conf.queue
 
     # Email address
     cwd = os.path.realpath( os.getcwd() )
@@ -178,7 +178,10 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     if optimize == 'g':
         for f in glob.glob( 'src/*.f90' ):
             shutil.copy( f, rundir )
-    for d in cfg.templates:
+    f = 'conf/' + machine + '/templates'
+    if not os.path.isdir( f ):
+        f = 'conf/default/templates'
+    for d in [ 'conf/common/templates', f ]:
         for f in glob.glob( d + os.sep + '*' ):
             ff = rundir + os.sep + os.path.basename( f )
             out = file( f, 'r' ).read() % locals()
@@ -194,14 +197,14 @@ def run( params, prepare=True, run=False, mode=None, optimize='O', machine=None 
     # Run or que job
     if run == 'q':
         print 'que.sh'
-        if os.uname()[1] not in cfg.hosts:
+        if os.uname()[1] not in conf.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r' % ( host, machine ) )
         #if subprocess.call( '.' + os.sep + 'que.sh' ):
         if os.system( '.' + os.sep + 'que.sh' ):
             sys.exit( 'Error queing job' )
     elif run:
         print 'run.sh -' + run
-        if os.uname()[1] not in cfg.hosts:
+        if os.uname()[1] not in conf.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r' % ( host, machine ) )
         #if subprocess.call( [ '.' + os.sep + 'run.sh', '-' + run ] ):
         if os.system( '.' + os.sep + 'run.sh -' + run ):
@@ -217,7 +220,7 @@ def prepare_params( pp ):
     itbuff = 10
 
     # merge input parameters with defaults
-    f = os.path.dirname( __file__ ) + os.sep + 'defaults.py'
+    f = os.path.dirname( __file__ ) + os.sep + 'default-param.py'
     p = util.load( f )
     for k, v in pp.iteritems():
         if k[0] is not '_' and type(v) is not type(sys):
