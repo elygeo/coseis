@@ -19,7 +19,7 @@ except: email = user
 
 # Machine specific
 notes = "Default machine"
-machine = None
+machine = ''
 os_ = os.uname()[3]
 login = os.uname()[1]
 host = login

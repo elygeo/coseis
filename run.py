@@ -295,11 +295,12 @@ def prepare_prm( prm, cfg ):
         nn = [ ( ii[i][1] - ii[i][0] + 1 ) / ii[i][2] for i in range(4) ]
         nb = ( min( prm.itio, prm.nt ) - 1 ) / ii[3][2] + 1
         nb = max( 1, min( nb, nn[3] ) )
-        n = nn[0] * nn[1] * nn[2]
-        if n > ( prm.nn[0] + prm.nn[1] + prm.nn[2] ) ** 2:
-            nb = 1
-        elif n > 1:
-            nb = min( nb, cfg.itbuff )
+        if 'x' not in mode and 'X' not in mode:
+            n = nn[0] * nn[1] * nn[2]
+            if n > ( prm.nn[0] + prm.nn[1] + prm.nn[2] ) ** 2:
+                nb = 1
+            elif n > 1:
+                nb = min( nb, cfg.itbuff )
         fieldio += [( op+mode, tfunc, period, x1, x2, nb, ii, field, filename, val )]
     f = [ line[8] for line in fieldio if line[8] != '-' ]
     for i in range( len( f ) ):

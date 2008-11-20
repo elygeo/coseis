@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 #$ -N %(code)s%(count)s
-#$ -pe %(cores)sway %(totalcores)s
+#$ -pe %(maxcores)sway %(totalcores)s
 #$ -l h_rt=%(walltime)s
 #$ -q %(queue)s
 #$ -e stderr
