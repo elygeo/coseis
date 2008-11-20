@@ -6,8 +6,6 @@
 *.stb
 *.swp
 .bzr
-bin
-bin/
 bin/*
 email
 machine

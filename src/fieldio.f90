@@ -41,7 +41,10 @@ integer :: i1(3), i2(3), n(3), noff(3), i
 if ( verbose ) write( 0, * ) 'Field I/O locations'
 
 ! Store locations
-if ( master ) open( 1, file='locations', status='replace' )
+if ( master ) then
+  open( 1, file='locations.py', status='replace' )
+  write( 1, '(a)' ) 'fieldio = ['
+end if
 
 ! Loop over output zones
 p => pio0
@@ -71,13 +74,15 @@ if ( i > 0 ) then
   p%ii(1,1:3) = i1
   p%ii(2,1:3) = i1
   if ( rr > dx * dx ) call pdelete
-  if ( master ) write( 1, * ) i1, p%x1, trim( p%filename )
-  if ( master ) write( 1, '( "([", i8, 2(",", i8), "], '", a, "')," )' ) &
-    i1, trim( p%filename )
+  if ( master ) write( 1, '( "    ( ", 2("''",a,"'', "), "[",i8,2(",",i8),",0], ''",a,"'' )," )' )&
+    trim( p%mode ), trim( p%field ), i1, trim( p%filename )
 end if
 
 end do loop
-if ( master ) close( 1 )
+if ( master ) then
+  write( 1, '(a)' ) ']'
+  if ( master ) close( 1 )
+end if
 
 end subroutine
 
