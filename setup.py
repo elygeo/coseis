@@ -3,7 +3,7 @@
 Build SORD binaries and documentation
 """
 
-def build( mode='sm', optimize='gpO' ):
+def build( mode='sm', optimize='O' ):
     import os
     import util, configure
     cfg = configure.configure()
@@ -168,19 +168,29 @@ def docs():
     return
 
 if __name__ == '__main__':
-    import sys, util
-    if len( sys.argv ) == 1:
-        build( 'sm', 'O' )
+    import sys, util, getopt
+    opts, args = getopt.getopt( sys.argv[1:], 'smgtpO' )
+    mode = 'sm'
+    optimize = 'O'
+    for o, v in opts:
+        if   o == '-s': mode = 's'
+        elif o == '-m': mode = 'm'
+        elif o == '-g': optimize = 'g'
+        elif o == '-t': optimize = 't'
+        elif o == '-p': optimize = 'p'
+        elif o == '-O': optimize = 'O'
+    if not args:
+        build( mode, optimize )
     else:
-        if sys.argv[1] == 'docs':
+        if args[0] == 'docs':
             docs()
-        elif sys.argv[1] == 'path':
+        elif args[0] == 'path':
             util.install_path()
-        elif sys.argv[1] == 'unpath':
+        elif args[0] == 'unpath':
             util.uninstall_path()
-        elif sys.argv[1] == 'install':
+        elif args[0] == 'install':
             util.install()
-        elif sys.argv[1] == 'uninstall':
+        elif args[0] == 'uninstall':
             util.uninstall()
         else:
             sys.exit( 'Error: unknown option: %r' % sys.argv[1] )
