@@ -163,12 +163,6 @@ Installation
 
     Alternatively you can use the PYTHONPATH environmental variable.
 
-8.  Some systems can send email status reports from your batch jobs, and you
-    may specify the address for SORD to use by creating a text file called 'email'
-    with your address in it::
-
-        echo 'email@address' > email
-
 
 Basic usage
 -----------
