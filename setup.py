@@ -48,7 +48,10 @@ def build( mode='sm', optimize='gpO' ):
         source = cfg['getarg'], f + '.f90'
         object = '..' + os.sep + 'bin' + os.sep + f
         compiler = cfg['sfc'] + cfg['O']
-        new |= util.compile( compiler, object, source )
+        try:
+            new |= util.compile( compiler, object, source )
+        except:
+            pass
     os.chdir( srcdir + os.sep + 'src' )
     if 's' in mode:
         source = base + ( 'serial.f90', ) + common
