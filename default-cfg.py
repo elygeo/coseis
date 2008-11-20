@@ -20,10 +20,10 @@ except: email = user
 # Machine specific
 notes = "Default machine"
 machine = ''
-os_ = os.uname()[3]
-login = os.uname()[1]
-host = login
-hosts = [ login ]
+os_ = os.uname()
+host = os.uname()[1]
+hosts = [ host ]
+login = host
 maxnodes = 1
 maxcores = 0
 maxram = 0	
