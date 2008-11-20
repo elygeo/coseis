@@ -155,15 +155,9 @@ def run( inputs ):
     cfg.post = ''
     cfg.rundate = time.asctime()
 
-    # Email address
+    # Copy files to run directory
     cwd = os.path.realpath( os.getcwd() )
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    try:
-        email = file( 'email', 'r' ).read().strip()
-    except:
-        email = user
-
-    # Copy files to run directory
     shutil.copy( 'bin' + os.sep + 'sord-' + cfg.mode + cfg.optimize, cfg.rundir )
     try: shutil.cop( 'sord.tgz', cfg.rundir )
     except: pass

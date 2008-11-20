@@ -4,14 +4,15 @@
 #PBS -l nodes=%(nodes)s:ppn=%(ppn)s
 #PBS -l mem=%(ram)smb
 #PBS -l walltime=%(walltime)s
-#PBS -q large
+#PBS -q %(queue)s
 #PBS -e stderr
 #PBS -o stdout
 #PBS -m abe
 #PBS -M %(email)s
 #PBS -V
 
-module load pathmpi
+#module load pathmpi
+module load intelmpi
 
 cd %(rundir)r
 
@@ -20,6 +21,4 @@ echo "$( date ): %(code)s started" >> log
 mpirun -np %(np)s -hostfile $PBS_NODEFILE %(bin)s
 %(post)s
 echo "$( date ): %(code)s finished" >> log
-
-#mv "/scratch/$dir" %(rundir)r
 
