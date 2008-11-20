@@ -44,9 +44,9 @@ if ( any( mus /= mus ) .or. maxval( mus ) > huge( rr ) ) stop 'NaN/Inf in mus'
 if ( any( mud /= mud ) .or. maxval( mud ) > huge( rr ) ) stop 'NaN/Inf in mud'
 if ( any( dc  /= dc  ) .or. maxval( dc  ) > huge( rr ) ) stop 'NaN/Inf in dc'
 if ( any( co  /= co  ) .or. maxval( co  ) > huge( rr ) ) stop 'NaN/Inf in co'
-if ( any( t1  /= t1  ) .or. maxval( t1  ) > huge( rr ) ) stop 'NaN/Inf in stress model'
-if ( any( t2  /= t2  ) .or. maxval( t2  ) > huge( rr ) ) stop 'NaN/Inf in stress model'
-if ( any( t3  /= t3  ) .or. maxval( t3  ) > huge( rr ) ) stop 'NaN/Inf in traction model'
+if ( any( t1  /= t1  ) .or. maxval( t1  ) > huge( rr ) ) stop 'NaN/Inf in sigma'
+if ( any( t2  /= t2  ) .or. maxval( t2  ) > huge( rr ) ) stop 'NaN/Inf in sigma'
+if ( any( t3  /= t3  ) .or. maxval( t3  ) > huge( rr ) ) stop 'NaN/Inf in tau'
 
 ! Normal traction check
 i1 = maxloc( t3(:,:,:,3) )
@@ -174,15 +174,15 @@ if ( master ) then
   if ( tn0 * ( mus0 - mud0 ) == 0. ) lc = 0.
   rctest = mu0 * tn0 * ( mus0 - mud0 ) * dc0 / ( ts0 - tn0 * mud0 ) ** 2
   open( 1, file='stats/rupture.py', status='replace' )
-  write( 1, "( 'mu0    = ', g15.7, ' # shear modulus at hypocenter'          )" ) mu0
-  write( 1, "( 'mus0   = ', g15.7, ' # static friction at hypocenter'        )" ) mus0
-  write( 1, "( 'mud0   = ', g15.7, ' # dynamic friction at hypocenter'       )" ) mud0
-  write( 1, "( 'dc0    = ', g15.7, ' # dc at hypocenter'                     )" ) dc0
-  write( 1, "( 'tn0    = ', g15.7, ' # normal traction at hypocenter'        )" ) tn0
-  write( 1, "( 'ts0    = ', g15.7, ' # shear traction at hypocenter'         )" ) ts0
-  write( 1, "( 'ess    = ', g15.7, ' # strength parameter'                   )" ) ess
-  write( 1, "( 'lc     = ', g15.7, ' # breakdown width'                      )" ) lc
-  write( 1, "( 'rctest = ', g15.7, ' # rcrit needed for spontaneous rupture' )" ) rctest
+  write( 1, "('mu0    = ', g15.7, ' # shear modulus at hypocenter'   )" ) mu0
+  write( 1, "('mus0   = ', g15.7, ' # static friction at hypocenter' )" ) mus0
+  write( 1, "('mud0   = ', g15.7, ' # dynamic friction at hypocenter')" ) mud0
+  write( 1, "('dc0    = ', g15.7, ' # dc at hypocenter'              )" ) dc0
+  write( 1, "('tn0    = ', g15.7, ' # normal traction at hypocenter' )" ) tn0
+  write( 1, "('ts0    = ', g15.7, ' # shear traction at hypocenter'  )" ) ts0
+  write( 1, "('ess    = ', g15.7, ' # strength parameter'            )" ) ess
+  write( 1, "('lc     = ', g15.7, ' # breakdown width'               )" ) lc
+  write( 1, "('rctest = ', g15.7, ' # rcrit for spontaneous rupture' )" ) rctest
   close( 1 )
 end if
 

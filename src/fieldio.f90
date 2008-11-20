@@ -72,6 +72,8 @@ if ( i > 0 ) then
   p%ii(2,1:3) = i1
   if ( rr > dx * dx ) call pdelete
   if ( master ) write( 1, * ) i1, p%x1, trim( p%filename )
+  if ( master ) write( 1, '( "([", i8, 2(",", i8), "], '", a, "')," )' ) &
+    i1, trim( p%filename )
 end if
 
 end do loop
@@ -207,7 +209,8 @@ case( '=r', '+r' )
     m(4) = ( it2 - it1 ) / dit + 1
     o(4) = ( it  - it1 ) / dit
     str = 'in/' // p%filename
-    if ( any( n(1:3) /= m(1:3) ) .and. mpin == 0 ) write( str, '(a,i6.6)' ) trim( str ), ipid
+    if ( any( n(1:3) /= m(1:3) ) .and. mpin == 0 ) &
+      write( str, '(a,i6.6)' ) trim( str ), ipid
     call rio2( p%fh, p%buff(:,:n(4)), 'w', str, m, n, o, mpin )
     p%ib = 0
     if ( any( n < 1 ) ) then
@@ -274,7 +277,8 @@ case( '=w' )
     m(4) = ( it2 - it1 ) / dit + 1
     o(4) = ( it  - it1 ) / dit + 1 - n(4)
     str = 'out/' // p%filename
-    if ( any( n(1:3) /= m(1:3) ) .and. mpout == 0 ) write( str, '(a,i6.6)' ) trim( str ), ipid
+    if ( any( n(1:3) /= m(1:3) ) .and. mpout == 0 ) &
+      write( str, '(a,i6.6)' ) trim( str ), ipid
     call rio2( p%fh, p%buff(:,:n(4)), 'w', str, m, n, o, mpout )
     p%ib = 0
     if ( it == it2 .or. any( n < 1 ) ) then

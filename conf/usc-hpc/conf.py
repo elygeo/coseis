@@ -14,6 +14,10 @@ Run from disks located at HPC:
 """
 login = 'hpc-login1.usc.edu'
 hosts = [ 'hpc-login1', 'hpc-login2' ]
+queue = 'main'
+queue = 'large'
+queue = 'quick'
+queue = 'scec'
 maxnodes = 256
 maxcores = 4
 maxram = 13500

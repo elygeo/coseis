@@ -2,10 +2,10 @@
 
 #PBS -N %(code)s%cound)s
 #PBS -l nodes=%(nodes):ppn=%(ppn)
+#PBS -M %(email)s
+#PBS -m abe
 #PBS -e stderr
 #PBS -o stdout
-#PBS -m abe
-#PBS -M %(email)s
 #PBS -V
 #PBS -r n
 

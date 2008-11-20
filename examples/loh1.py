@@ -48,9 +48,9 @@ moment2 = 0.0, 0.0, 1e18	# moment tensor M_yz, M_zx, M_yz
 
 # Velocity time series output for surface station
 fieldio += [
-    ( '=wx', 'v1', [], 'v1', (6000.0, 80000.0, 0.0) ),
-    ( '=wx', 'v2', [], 'v2', (6000.0, 80000.0, 0.0) ),
-    ( '=wx', 'v3', [], 'v3', (6000.0, 80000.0, 0.0) ),
+    ( '=wx', 'v1', [], 'station1-v1', (6001.0, 80001.0, -1.0) ),
+    ( '=wx', 'v2', [], 'station1-v2', (6001.0, 80001.0, -1.0) ),
+    ( '=wx', 'v3', [], 'station1-v3', (6001.0, 80001.0, -1.0) ),
 ]
 
 sord.run( locals() )

@@ -5,7 +5,8 @@ contains
 
 subroutine diffcn( df, f, i, a, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx )
 real, intent(out) :: df(:,:,:)
-real, intent(in) :: f(:,:,:,:), bb(:,:,:,:,:), x(:,:,:,:), dx1(:), dx2(:), dx3(:), dx
+real, intent(in) :: f(:,:,:,:), bb(:,:,:,:,:), x(:,:,:,:), &
+  dx1(:), dx2(:), dx3(:), dx
 integer, intent(in) :: i, a, i1(3), i2(3), oplevel
 real :: h
 integer :: j, k, l, b, c

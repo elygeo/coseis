@@ -18,9 +18,11 @@ if ( fh == frio_file_null ) then
   write( 0, * ) 'Opening file: ', trim( filename )
   inquire( iolength=i ) f(:,1)
   if ( mode == 'r' .or. o > 0 ) then
-    open( fh, file=filename, recl=i, form='unformatted', access='direct', status='old' )
+    open( fh, file=filename, recl=i, form='unformatted', access='direct', &
+    status='old' )
   else
-    open( fh, file=filename, recl=i, form='unformatted', access='direct', status='new' )
+    open( fh, file=filename, recl=i, form='unformatted', access='direct', &
+    status='new' )
   end if
 end if
 n = size( f, 2 )

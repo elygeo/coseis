@@ -4,11 +4,11 @@
 #PBS -l nodes=%(nodes)s:ppn=%(ppn)s
 #PBS -l mem=%(ram)smb
 #PBS -l walltime=%(walltime)s
-#PBS -q large
+#PBS -q %(queue)s
+#PBS -M %(email)s
+#PBS -m abe
 #PBS -e stderr
 #PBS -o stdout
-#PBS -m abe
-#PBS -M %(email)s
 #PBS -V
 
 module load intel vmpi

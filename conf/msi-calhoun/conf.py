@@ -14,16 +14,17 @@ module load intel vmpi
 """
 login = 'calhoun.msi.umn.edu'
 hosts = [ 'login1' ]
+queue = 'large'
 maxnodes = 256
 maxcores = 8
 maxram = 15000
 maxtime = 24, 00
 sfc = [ 'ifort' ]
 mfc = [ 'mpif90' ]
-getarg = ''
 _ = [ '-u', '-std95', '-warn', '-o' ]
 g = [ '-CB', '-traceback', '-g' ] + _
 t = [ '-CB', '-traceback' ] + _
 p = [ '-O', '-pg' ] + _
 O = [ '-O3' ] + _
+getarg = ''
 

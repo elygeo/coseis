@@ -4,10 +4,10 @@
 #$ -pe %(maxcores)sway %(totalcores)s
 #$ -l h_rt=%(walltime)s
 #$ -q %(queue)s
+#$ -M %(email)s
+#$ -m abe
 #$ -e stderr
 #$ -o stdout
-#$ -m abe
-#$ -M %(email)s
 #$ -V
 #$ -wd %(rundir)s
 export MY_NSLOTS=%(np)s

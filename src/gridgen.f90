@@ -20,15 +20,15 @@ if ( master ) write( 0, * ) 'Grid generation'
 w1 = 0.
 i1 = i1core
 i2 = i2core
-do i = i1(1), i2(1); w1(i,:,:,1) = dx * ( i + nnoff(1) - 1 ); end do
-do i = i1(2), i2(2); w1(:,i,:,2) = dx * ( i + nnoff(2) - 1 ); end do
-do i = i1(3), i2(3); w1(:,:,i,3) = dx * ( i + nnoff(3) - 1 ); end do
+do i = i1(1), i2(1); w1(i,:,:,1) = dx * (i + nnoff(1) - 1); end do
+do i = i1(2), i2(2); w1(:,i,:,2) = dx * (i + nnoff(2) - 1); end do
+do i = i1(3), i2(3); w1(:,:,i,3) = dx * (i + nnoff(3) - 1); end do
 if ( faultnormal /= 0 ) then
   i1 = max( i1core, ihypo + 1 )
   select case( abs( faultnormal ) )
-  case( 1 ); do i = i1(1), i2(1); w1(i,:,:,1) = dx * ( i + nnoff(1) - 2 ); end do
-  case( 2 ); do i = i1(2), i2(2); w1(:,i,:,2) = dx * ( i + nnoff(2) - 2 ); end do
-  case( 3 ); do i = i1(3), i2(3); w1(:,:,i,3) = dx * ( i + nnoff(3) - 2 ); end do
+  case( 1 ); do i = i1(1), i2(1); w1(i,:,:,1) = dx * (i + nnoff(1) - 2); end do
+  case( 2 ); do i = i1(2), i2(2); w1(:,i,:,2) = dx * (i + nnoff(2) - 2); end do
+  case( 3 ); do i = i1(3), i2(3); w1(:,:,i,3) = dx * (i + nnoff(3) - 2); end do
   end select
 end if
 

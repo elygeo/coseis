@@ -3,11 +3,11 @@
 #PBS -N %(code)s%(count)s
 #PBS -l nodes=%(nodes)s:ppn=%(ppn)s:mpi
 #PBS -l walltime=%(walltime)s
-#PBS -q workq
+#PBS -q %(queue)s
+#PBS -M %(email)s
 #PBS -e stderr
 #PBS -o stdout
 #PBS -m abe
-#PBS -M %(email)s
 #PBS -V
 
 cd %(rundir)r

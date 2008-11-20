@@ -28,6 +28,7 @@ Useful commands:
 """
 login = 'tg-login2.sdsc.teragrid.org'
 hosts = [ 'tg-login1', 'tg-login2' ]
+queue = 'dque'
 maxnodes = 256
 maxcores = 2
 maxram = 3000
@@ -35,10 +36,10 @@ maxtime = 18,00
 rate = 2.2e6
 sfc = [ 'ifort' ]
 mfc = [ 'mpif90' ]
-getarg = ''
 _ = [ '-u', '-std95', '-warn', '-o' ]
 g = [ '-CB', '-traceback', '-g' ] + _
 t = [ '-CB', '-traceback' ] + _
 p = [ '-O', '-pg' ] + _
 O = [ '-O3' ] + _
+getarg = ''
 
