@@ -20,24 +20,27 @@ queue = 'devel'; maxnodes = 16;  maxtime = 1, 00
 queue = 'bc';    maxnodes = 268; maxtime = 48, 00
 maxcores = 4;
 maxram = 7000
-mfc = [ 'mpif90' ]
+fortran_mpi = [ 'mpif90' ]
 
 # Pathscale
-sfc = [ 'pathf95' ]
-getarg = ''
+fortran_serial = [ 'pathf95' ]
+fortran_getarg = ''
 _ = [ '-o' ]
-g = [ '-g' ] + _
-t = [] + _
-p = [ '-O', '-p' ] + _
-O = [ '-i8', '-O3', '-OPT:Ofast', '-fno-math-errno' ] + _
+fortran_flags = {
+    'g': [ '-g' ] + _,
+    't': [] + _,
+    'p': [ '-O', '-p' ] + _,
+    'O': [ '-i8', '-O3', '-OPT:Ofast', '-fno-math-errno' ] + _,
+}
 
 # Intel
-sfc = [ 'ifort' ]
+fortran_serial = [ 'ifort' ]
+fortran_getarg = ''
 _ = [ '-u', '-std95', '-warn', '-o' ]
-g = [ '-CB', '-traceback', '-g' ] + _
-t = [ '-CB', '-traceback' ] + _
-p = [ '-O', '-pg' ] + _
-O = [ '-ipo', '-O3', '-no-prec-div' ] + _
-getarg = ''
-
+fortran_flags = {
+    'g': [ '-CB', '-traceback', '-g' ] + _,
+    't': [ '-CB', '-traceback' ] + _,
+    'p': [ '-O', '-pg' ] + _,
+    'O': [ '-ipo', '-O3', '-no-prec-div' ] + _,
+}
 

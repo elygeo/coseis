@@ -11,5 +11,5 @@ maxnodes = 1
 maxcores = 2
 maxram = 3800
 rate = 1.4e6
-mfc = [ 'mpif90', '-mpe=mpilog' ]
-mfc = [ 'mpif90' ]
+fortran_mpi = [ 'mpif90', '-mpe=mpilog' ]
+fortran_mpi = [ 'mpif90' ]

@@ -23,12 +23,14 @@ queue = 'normal';      maxnodes = 256;  maxtime = 24, 00
 maxcores = 16
 maxram = 30000
 rate = 2.1e6
-sfc = [ 'pgf95' ]
-mfc = [ 'mpif90' ]
-getarg = 'getarg-pgf.f90'
+fortran_serial = [ 'pgf95' ]
+fortran_mpi = [ 'mpif90' ]
+fortran_getarg = 'getarg-pgf.f90'
 _ = [ '-Mdclchk', '-o' ]
-g = [ '-Ktrap=fp', '-Mbounds', '-g' ] + _
-t = [ '-Ktrap=fp', '-Mbounds' ] + _
-p = [ '-fast', '-tp', 'barcelona-64', '-Mprof=func' ] + _
-O = [ '-fast', '-tp', 'barcelona-64' ] + _
+fortran_flags = {
+    'g': [ '-Ktrap=fp', '-Mbounds', '-g' ] + _,
+    't': [ '-Ktrap=fp', '-Mbounds' ] + _,
+    'p': [ '-fast', '-tp', 'barcelona-64', '-Mprof=func' ] + _,
+    'O': [ '-fast', '-tp', 'barcelona-64' ] + _,
+}
 

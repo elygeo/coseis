@@ -45,9 +45,9 @@ def build( mode='sm', optimize='gpO' ):
     os.chdir( srcdir + os.sep + 'extras' )
     new = False
     for f in extras:
-        source = cfg['getarg'], f + '.f90'
+        source = cfg['fortran_getarg'], f + '.f90'
         object = '..' + os.sep + 'bin' + os.sep + f
-        compiler = cfg['sfc'] + cfg['O']
+        compiler = cfg['fortran_serial'] + cfg['fortran_flags']['O']
         try:
             new |= util.compile( compiler, object, source )
         except:
@@ -57,13 +57,13 @@ def build( mode='sm', optimize='gpO' ):
         source = base + ( 'serial.f90', ) + common
         for opt in optimize:
             object = '..' + os.sep + 'bin' + os.sep + 'sord-s' + opt
-            compiler = cfg['sfc'] + cfg[opt]
+            compiler = cfg['fortran_serial'] + cfg['fortran_flags'][opt]
             new |= util.compile( compiler, object, source )
-    if 'm' in mode and cfg['mfc']:
+    if 'm' in mode and cfg['fortran_mpi']:
         source = base + ( 'mpi.f90', ) + common
         for opt in optimize:
             object = '..' + os.sep + 'bin' + os.sep + 'sord-m' + opt
-            compiler = cfg['mfc'] + cfg[opt]
+            compiler = cfg['fortran_mpi'] + cfg['fortran_flags'][opt]
             new |= util.compile( compiler, object, source )
     if new:
         try:

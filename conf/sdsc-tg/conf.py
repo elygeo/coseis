@@ -34,12 +34,14 @@ maxcores = 2
 maxram = 3000
 maxtime = 18,00
 rate = 2.2e6
-sfc = [ 'ifort' ]
-mfc = [ 'mpif90' ]
+fortran_serial = [ 'ifort' ]
+fortran_mpi = [ 'mpif90' ]
+fortran_getarg = ''
 _ = [ '-u', '-std95', '-warn', '-o' ]
-g = [ '-CB', '-traceback', '-g' ] + _
-t = [ '-CB', '-traceback' ] + _
-p = [ '-O', '-pg' ] + _
-O = [ '-O3' ] + _
-getarg = ''
+fortran_flags = {
+    'g': [ '-CB', '-traceback', '-g' ] + _,
+    't': [ '-CB', '-traceback' ] + _,
+    'p': [ '-O', '-pg' ] + _,
+    'O': [ '-O3' ] + _,
+}
 

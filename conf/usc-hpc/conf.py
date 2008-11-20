@@ -18,12 +18,12 @@ pbsnodes -a | grep properties | sort | uniq -c
 """
 login = 'hpc-login1.usc.edu'
 hosts = [ 'hpc-login1', 'hpc-login2' ]
-queue = 'quick'
-queue = 'large'
-queue = 'largemem'; maxnodes = 5;   maxcores = 8; maxram = 63000 # dualcore
-queue = 'main';     maxnodes = 378; maxcores = 4; maxram = 3500  # dualcore
-queue = 'main';     maxnodes = 382; maxcores = 8; maxram = 11000 # quadcore
-queue = 'scec';     maxnodes = 100; maxcores = 2; maxram = 1500  # singlecore
-maxtime = 24, 00
+queue = 'largemem'; maxnodes = 5;   maxcores = 8; maxram = 63000; maxtime = 336, 00
+queue = 'large';    maxnodes = 256; maxcores = 8; maxram = 11000; maxtime = 24, 00
+queue = 'quick';    maxnodes = 4;   maxcores = 4; maxram = 3500;  maxtime = 1, 00
+queue = 'main';     maxnodes = 378; maxcores = 4; maxram = 3500;  maxtime = None
+queue = 'quick';    maxnodes = 4;   maxcores = 8; maxram = 11000; maxtime = 1, 00
+queue = 'main';     maxnodes = 382; maxcores = 8; maxram = 11000; maxtime = None
+queue = 'scec';     maxnodes = 100; maxcores = 2; maxram = 1500;  maxtime = 336, 00
 rate = 1.1e6
 
