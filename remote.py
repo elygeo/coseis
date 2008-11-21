@@ -37,7 +37,7 @@ if __name__ == '__main__':
     if input[0]:
         list = [ int(i) for i in input ]
     for i in list:
-        a = accounts[i-1].strip()
+        a = accounts[i-1]
         rsh = ' '.join( a.split(' ')[:-1] )
         dest = a.split(' ')[-1]
         deploy( rsh, dest, sys.argv[1:] )
