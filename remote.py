@@ -10,14 +10,14 @@ def deploy( rsh, dest, command=[] ):
     rsync = 'rsync -avR --delete --include=accounts --include=email --include=w --include=sord.tgz --exclude-from=.ignore -e %r . %r' % ( rsh, dest )
     print dest
     print rsync
-    #os.system( rsync )
+    os.system( rsync )
     for cmd in command:
         host = dest.split(':')[0]
         dir = dest.split(':')[1]
         cmd = 'cd %s; %s' % ( dir, cmd )
         cmd = '%s %s "bash --login -c %r"' % ( rsh, host, cmd )
         print cmd
-        #os.system( cmd )
+        os.system( cmd )
     os.chdir( cwd )
     return
 
