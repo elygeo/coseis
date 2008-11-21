@@ -9,12 +9,12 @@ SGI Altix XE 1300 cluster
 ulimit -s unlimited
 ulimit -n 4096
 vi ~/.modulerc
+qstat -a
 #%Module1.0
 module load intel vmpi
 """
 login = 'calhoun.msi.umn.edu'
 hosts = [ 'login1' ]
-queue = 'large'
 maxnodes = 256
 maxcores = 8
 maxram = 15000

@@ -9,7 +9,7 @@ echo "$( date ): %(code)s started" >> log
 case "$mode${1:--i}" in
     s-i) time %(bin)s ;;
     s-g) gdb  %(bin)s ;;
-    m-i) mpirun -np %(np)s -hostfile $PBS_NODEFILE time %(bin)s ;;
+    m-i) mpirun -np %(np)s -hostfile mf time %(bin)s ;;
 esac
 %(post)s
 echo "$( date ): %(code)s finished" >> log

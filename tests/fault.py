@@ -7,7 +7,7 @@ import sord
 
 debug = 0
 np3   =  2,  3,  2
-np3   =  1,  1,  1
+np3   =  1,  2,  1
 nn    =  8,  8,  9
 ihypo = -1, -1, -2
 bc1   =  0,  0,  0

@@ -8,4 +8,5 @@ hosts = [ 'altai' ]
 maxcores = 8
 maxram = 30000
 rate = 2.6e5
+fortran_m = []
 
