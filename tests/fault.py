@@ -4,7 +4,7 @@ Fault test
 """
 
 import sord
-print __file__
+rundir = 'run/asdf'
 
 debug = 0
 np3   =  2,  3,  2

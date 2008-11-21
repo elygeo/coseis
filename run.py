@@ -115,7 +115,7 @@ def run( inputs ):
 
     # Create run directory
     print 'Run directory: ' + cfg.rundir
-    os.mkdir( cfg.rundir )
+    os.makedirs( cfg.rundir )
     for f in ( 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint' ):
         os.mkdir( cfg.rundir + os.sep + f )
 
