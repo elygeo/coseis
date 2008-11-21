@@ -134,7 +134,7 @@ def run( inputs ):
 
     # Copy files to run directory
     cfg.rundate = time.asctime()
-    cfg.name = cfg.rundir
+    cfg.name = os.path.basename( cfg.rundir )
     cfg.rundir = os.path.realpath( cfg.rundir )
     cwd = os.path.realpath( os.getcwd() )
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
@@ -164,10 +164,10 @@ def run( inputs ):
 
     # Run or queue job
     if cfg.run == 'q':
-        print 'que.sh'
+        print 'queue.sh'
         if cfg.host not in cfg.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r' % ( cfg.host, cfg.machine ) )
-        if os.system( '.' + os.sep + 'que.sh' ):
+        if os.system( '.' + os.sep + 'queue.sh' ):
             sys.exit( 'Error queing job' )
     elif cfg.run:
         print 'run.sh -' + cfg.run
