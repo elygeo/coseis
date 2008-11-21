@@ -238,8 +238,15 @@ ts = sqrt( sum( t3 * t3, 4 ) )
 ! Delay slip till after first iteration
 if ( it > 1 ) then
 
+  ! Normal traction
   tn = sum( t2 * nhat, 4 )
   if ( faultopening == 1 ) tn = min( 0., tn )
+
+  ! Slip velocity
+  do i = 1, 3
+    t2(:,:,:,i) = vv(j3:j4,k3:k4,l3:l4,i) - vv(j1:j2,k1:k2,l1:l2,i)
+  end do
+  f2 = sum( t2 * t2, 4 )
 
   ! Slip-weakening friction law
   f1 = mud

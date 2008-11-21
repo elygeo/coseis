@@ -7,10 +7,11 @@ import sord
 
 np3 = 1, 1, 1
 np3 = 1, 2, 1
-dx = 0.06
-dt = 0.01
-nn = 401, 402, 2
-nt = 200
+dx = 0.15
+dt = 0.008
+_X, _Y, _T = 400., 400., 200.
+nn = int( _X / dx + 1.5 ), int( _Y / dx + 2.5 ), 2
+nt = int( _T / dt + 1.5 )
 ihypo = nn[0]/2, nn[1]/2, 1
 fixhypo = -1
 xhypo = 0.0, 0.0, -0.5*dx
