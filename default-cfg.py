@@ -33,7 +33,7 @@ maxram = 0
 maxtime = 0
 rate = 1.0e6
 queue = None
-endian = sys.byteorder
+endian = sys.byteorder[0]
 floatsize = 4
 
 # Serial Fortran compiler

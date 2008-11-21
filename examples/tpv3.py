@@ -7,7 +7,7 @@ import sord
 
 np3 = 1, 1, 32				# number of processors in each dimension
 nn = 351, 201, 128			# number of mesh nodes, nx ny nz
-nt = 3000				# number of time steps
+nt = 3001				# number of time steps
 dx = 50.0				# spatial step size
 dt = 0.004				# time step size
 
@@ -62,5 +62,6 @@ for _f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':
         ( '=wx', _f, [], 'P2_'+_f, (-1., -5999., 0.) ), # mode III point
     ]
 
+rundir = 'run/tpv3'
 sord.run( locals() )
 

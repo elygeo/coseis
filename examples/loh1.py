@@ -7,7 +7,7 @@ import sord
 
 np3 = 1, 16, 1			# number of processors in each dimension
 nn = 261, 301, 161		# number of mesh nodes, nx ny nz
-nt = 2250			# number of time steps
+nt = 2251			# number of time steps
 dx = 50.0			# spatial step size
 dt = 0.004			# time step size
 
@@ -53,5 +53,6 @@ fieldio += [
     ( '=wx', 'v3', [], 'station1-v3', (6001.0, 80001.0, -1.0) ),
 ]
 
+rundir = 'run/loh1'
 sord.run( locals() )
 

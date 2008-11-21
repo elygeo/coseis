@@ -46,11 +46,11 @@ fieldio = [
   ( '=w', 'ts2', [_j,_k,_l,(1,-1,10)], 'ts2' ),
 ]
 
-file( 'endian', 'w' ).write( sys.byteorder[0] )
 _home = '/home/gwurman/sord/'
 _i = 0
 while True:
     _i += 1
+    rundir = _home + '%02d' % i
     _f = _home + 'stresses/initial.stressx.%02d' % i
     print f
     if not os.path.isfile( _f ): break
