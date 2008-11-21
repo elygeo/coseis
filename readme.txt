@@ -177,19 +177,20 @@ example (LOH.1), do::
     cd examples/
     ./loh1.py
 
-Each time ``sord.run()`` is called, a new run directory is set up, starting with
-``run/01/``.  The directory contains the executable and scripts to run the
-code, and will contain all of the generated output and metadata.  From the run
-directory start the job interactively with the ``run.sh`` script::
+Each time ``sord.run()`` is called, a run directory is created at the location
+set by the ``rundir`` parameter, which defaults to ``run/``.  The directory
+contains the executable and scripts to run the code, and will contain all of
+the generated output and metadata.  From the run directory start the job
+interactively with the ``run.sh`` script::
 
-    cd run/01/
+    cd run/
     ./run.sh
 
-Or, submit the job to the batch system with the ``que.sh`` script
+Or, submit the job to the batch system with the ``queue.sh`` script
 ::
 
-    cd run/01/
-    ./que.sh
+    cd run/
+    ./queue.sh
 
 Output (and large input, such as the material model) is stored in flat binary
 binary files.  Statistic, such as peak acceleration and peak velocity, are

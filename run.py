@@ -5,7 +5,6 @@ SORD main module
 
 import os, sys, pwd, glob, time, getopt, shutil
 import util, setup, configure, fieldnames
-callcount = 0
 
 def run( inputs ):
     """Setup, and optionally launch, a SORD job."""
@@ -13,28 +12,9 @@ def run( inputs ):
     # Save start time
     starttime = time.asctime()
     print "SORD setup"
-    global callcount
-    callcount += 1
-
-    # Command line options
-    opts, args = getopt.getopt( sys.argv[1:], 'niqsmgGtpOd' )
-    for o, v in opts:
-        if   o == '-n': inputs['prepare'] = False
-        elif o == '-i': inputs['run'] = 'i'
-        elif o == '-q': inputs['run'] = 'q'
-        elif o == '-s': inputs['mode'] = 's'
-        elif o == '-m': inputs['mode'] = 'm'
-        elif o == '-g': inputs['optimize'] = 'g'
-        elif o == '-G': inputs['optimize'] = 'g'; run = 'g'
-        elif o == '-t': inputs['optimize'] = 't'
-        elif o == '-p': inputs['optimize'] = 'p'
-        elif o == '-O': inputs['optimize'] = 'O'
-        elif o == '-d': shutil.rmtree( inputs['rundir'] )
-        else: sys.exit( 'Error: unknown option: ' + o )
 
     # Read defaults
-    f = os.path.dirname( __file__ ) + os.sep + 'default-prm.py'
-    prm = util.load( f )
+    prm = util.load( os.path.dirname( __file__ ) + os.sep + 'default-prm.py' )
     if 'machine' in inputs:
         cfg = configure.configure( machine=inputs['machine'] )
     else:
@@ -50,11 +30,27 @@ def run( inputs ):
             else:
                 sys.exit( 'Unknown parameter: %s = %r' % ( k, v ) )
     cfg = util.objectify( cfg )
-    prm = prepare_prm( util.objectify( prm ), cfg )
     print 'Machine: ' + cfg.machine
 
-    if not cfg.prepare:
-        cfg.run = False
+    # Command line options
+    opts, args = getopt.getopt( sys.argv[1:], 'niqsmgGtpOd' )
+    for o, v in opts:
+        if   o == '-n': cfg.prepare = False
+        elif o == '-i': cfg.run = 'i'
+        elif o == '-q': cfg.run = 'q'
+        elif o == '-s': cfg.mode = 's'
+        elif o == '-m': cfg.mode = 'm'
+        elif o == '-g': cfg.optimize = 'g'
+        elif o == '-G': cfg.optimize = 'g'; cfg.run = 'g'
+        elif o == '-t': cfg.optimize = 't'
+        elif o == '-p': cfg.optimize = 'p'
+        elif o == '-O': cfg.optimize = 'O'
+        elif o == '-d': shutil.rmtree( cfg.rundir )
+        else: sys.exit( 'Error: unknown option: ' + o )
+    if not cfg.prepare: cfg.run = False
+
+    # Prepare simulation parameters
+    prm = prepare_prm( util.objectify( prm ), cfg )
 
     # Partition for parallelization
     maxtotalcores = cfg.maxnodes * cfg.maxcores
@@ -88,7 +84,6 @@ def run( inputs ):
         cfg.totalcores = cfg.np
 
     # RAM and Wall time usage
-    floatsize = 4
     if prm.oplevel in (1,2):
          nvars = 20
     elif prm.oplevel in (3,4,5):
@@ -96,7 +91,7 @@ def run( inputs ):
     else:
          nvars = 44
     nm = ( nl[0] + 2 ) * ( nl[1] + 2 ) * ( nl[2] + 2 )
-    cfg.ram = ( nm * nvars * floatsize / 1024 / 1024 + 10 ) * cfg.ppn
+    cfg.ram = ( nm * nvars * cfg.floatsize / 1024 / 1024 + 10 ) * cfg.ppn
     sus = int( ( prm.nt + 10 ) * cfg.ppn * nm / cfg.cores / cfg.rate / 3600 * cfg.totalcores + 1 )
     mm  =      ( prm.nt + 10 ) * cfg.ppn * nm / cfg.cores / cfg.rate / 60 * 3.0 + 10
     if cfg.maxtime:
@@ -167,7 +162,7 @@ def run( inputs ):
     util.save( 'parameters.py', util.dictify( prm ), [ 'fieldio' ] )
     util.save( 'conf.py', util.dictify( cfg ) )
 
-    # Run or que job
+    # Run or queue job
     if cfg.run == 'q':
         print 'que.sh'
         if cfg.host not in cfg.hosts:
