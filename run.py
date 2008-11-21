@@ -29,10 +29,7 @@ def run( inputs ):
         elif o == '-t': inputs['optimize'] = 't'
         elif o == '-p': inputs['optimize'] = 'p'
         elif o == '-O': inputs['optimize'] = 'O'
-        elif o == '-d':
-            if callcount is 1:
-                f = 'run' + os.sep + '[0-9][0-9]'
-                for f in glob.glob( f ): shutil.rmtree( f )
+        elif o == '-d': shutil.rmtree( inputs['rundir'] )
         else: sys.exit( 'Error: unknown option: ' + o )
 
     # Read defaults
@@ -122,15 +119,7 @@ def run( inputs ):
     setup.build( cfg.mode, cfg.optimize )
 
     # Create run directory
-    try: os.mkdir( 'run' )
-    except: pass
-    cfg.count = glob.glob( 'run' + os.sep + '[0-9][0-9]' )
-    try: cfg.count = cfg.count[-1].split( os.sep )[-1]
-    except: cfg.count = 0
-    cfg.count = '%02d' % ( int( cfg.count ) + 1 )
-    cfg.rundir = 'run' + os.sep + str( cfg.count )
     print 'Run directory: ' + cfg.rundir
-    cfg.rundir = os.path.realpath( cfg.rundir )
     os.mkdir( cfg.rundir )
     for f in ( 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint' ):
         os.mkdir( cfg.rundir + os.sep + f )
@@ -148,16 +137,13 @@ def run( inputs ):
             except:
                 shutil.copy( filename, cfg.rundir + os.sep + f )
 
-    # Template variables
-    cfg.code = 'sord'
-    cfg.pre = ''
-    cfg.bin = './sord-' + cfg.mode + cfg.optimize
-    cfg.post = ''
-    cfg.rundate = time.asctime()
-
     # Copy files to run directory
+    cfg.rundate = time.asctime()
+    cfg.name = cfg.rundir
+    cfg.rundir = os.path.realpath( cfg.rundir )
     cwd = os.path.realpath( os.getcwd() )
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
+    cfg.bin = '.' + os.sep + 'sord-' + cfg.mode + cfg.optimize
     shutil.copy( 'bin' + os.sep + 'sord-' + cfg.mode + cfg.optimize, cfg.rundir )
     try: shutil.cop( 'sord.tgz', cfg.rundir )
     except: pass

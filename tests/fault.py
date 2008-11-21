@@ -4,6 +4,7 @@ Fault test
 """
 
 import sord
+print __file__
 
 debug = 0
 np3   =  2,  3,  2

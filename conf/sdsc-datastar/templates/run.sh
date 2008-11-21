@@ -9,7 +9,7 @@ if [ $( /bin/pwd | grep -v gpfs ) ]; then
     exit
 fi
 
-echo "$( date ): %(code)s started" >> log
+echo "$( date ): %(name) started" >> log
 %(pre)s
 case "$mode${1:--i}" in
     s-i)  hpmcount -nao prof/hpm %(bin)s ;;
@@ -19,5 +19,5 @@ case "$mode${1:--i}" in
     m-tv) tvpoe %(bin)s $opts ;;
 esac
 %(post)s
-echo "$( date ): %(code)s finished" >> log
+echo "$( date ): %(name) finished" >> log
 

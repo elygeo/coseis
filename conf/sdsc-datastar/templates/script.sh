@@ -15,7 +15,7 @@
 #RT_GRQ=ON;\\
 #SPINLOOPTIME=0;\\
 #YIELDLOOPTIME=0;
-#@ job_name = %(name)s
+#@ job_name = %(name)s%(count)s
 #@ initialdir = %(rundir)s
 #@ node = %(nodes)s
 #@ tasks_per_node = %(ppn)s
@@ -33,9 +33,9 @@
 
 cd %(rundir)r
 
-echo "$( date ): %(code)s started" >> log
+echo "$( date ): %(name)s started" >> log
 %(pre)s
 poe hpmcount -nao prof/hpm %(bin)s
 %(post)s
-echo "$( date ): %(code)s finished" >> log
+echo "$( date ): %(name)s finished" >> log
 

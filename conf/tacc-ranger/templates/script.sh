@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
+#$ -N %(name)s%(count)s
 #$ -M %(email)s
-#$ -N %(name)s
 #$ -q %(queue)s
 #$ -pe %(maxcores)sway %(totalcores)s
 #$ -l h_rt=%(walltime)s
@@ -14,9 +14,9 @@ export MY_NSLOTS=%(np)s
 
 cd %(rundir)r
 
-echo "$( date ): %(code)s started" >> log
+echo "$( date ): %(name)s started" >> log
 %(pre)s
 /usr/bin/time -p ibrun %(bin)s
 %(post)s
-echo "$( date ): %(code)s finished" >> log
+echo "$( date ): %(name)s finished" >> log
 

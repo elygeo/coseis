@@ -1,5 +1,5 @@
 #!/bin/bash -e
 
 cd %(rundir)r
-echo "$( date ): %(code)s qued with ID: $( qsub script.sh )" >> log
+echo "$( date ): %(name)s queued with ID: $( qsub script.sh )" >> log
 

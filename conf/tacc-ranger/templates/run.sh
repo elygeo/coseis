@@ -3,7 +3,7 @@
 mode=%(mode)r
 cd %(rundir)r
 
-echo "$( date ): %(code)s started" >> log
+echo "$( date ): %(name)s started" >> log
 %(pre)s
 case "$mode${1:--i}" in
     s-i)  /usr/bin/time -p %(bin)s ;;
@@ -11,5 +11,5 @@ case "$mode${1:--i}" in
     s-pg) pgdb %(bin)s ;;
 esac
 %(post)s
-echo "$( date ): %(code)s finished" >> log
+echo "$( date ): %(name)s finished" >> log
 

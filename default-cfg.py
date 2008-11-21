@@ -6,20 +6,23 @@ Default configuration parameters
 import os, sys, pwd
 
 # Setup options (also accessible with command line options).
-prepare = True	# True: compile code and setup run/ directory, False: dry run
-run = False	# i: interactive, q: batch queue, g: debugger
-mode = None	# None: guess, s: serial, m: MPI
+prepare = True	# True: compile code and setup run directory, False: dry run
 optimize = 'O'	# O: fully optimized, g: debugging, t: testing, p: profiling
+mode = None	# s: serial, m: MPI, None: guess from np3 
+run = False	# i: interactive, q: batch queue, g: debugger
+rundir = 'run'	# run directory
+pre = ''	# pre-processing command
+post = ''	# post-processing command
 itbuff = 10	# max number of timesteps to buffer for 2D & 3D output
 
-# User
+# User info
 user = pwd.getpwuid(os.geteuid())[0]
 try: email = file( 'email', 'r' ).read().strip()
 except: email = user
 
 # Machine specific
-notes = "Default machine"
 machine = ''
+notes = "Default machine"
 os_ = os.uname()
 host = os.uname()[1]
 hosts = [ host ]
