@@ -1,13 +1,13 @@
 #!/bin/bash -e
 
-#PBS -N %(code)s%(count)s
+#PBS -M %(email)s
+#PBS -N %(name)s
+#PBS -q %(queue)s
 #PBS -l nodes=%(nodes)s:ppn=%(ppn)s
 #PBS -l walltime=%(walltime)s
-#PBS -q %(queue)s
-#PBS -M %(email)s
-#PBS -m abe
 #PBS -e stderr
 #PBS -o stdout
+#PBS -m abe
 #PBS -V
 
 cd %(rundir)r

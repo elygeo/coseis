@@ -1,13 +1,13 @@
 #!/bin/bash -e
 
-#$ -N %(code)s%(count)s
+#$ -M %(email)s
+#$ -N %(name)s
+#$ -q %(queue)s
 #$ -pe %(maxcores)sway %(totalcores)s
 #$ -l h_rt=%(walltime)s
-#$ -q %(queue)s
-#$ -M %(email)s
-#$ -m abe
 #$ -e stderr
 #$ -o stdout
+#$ -m abe
 #$ -V
 #$ -wd %(rundir)s
 export MY_NSLOTS=%(np)s

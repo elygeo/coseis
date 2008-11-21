@@ -15,7 +15,7 @@
 #RT_GRQ=ON;\\
 #SPINLOOPTIME=0;\\
 #YIELDLOOPTIME=0;
-#@ job_name = %(code)s%(count)s
+#@ job_name = %(name)s
 #@ initialdir = %(rundir)s
 #@ node = %(nodes)s
 #@ tasks_per_node = %(ppn)s

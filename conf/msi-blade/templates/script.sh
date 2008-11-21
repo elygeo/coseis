@@ -1,14 +1,14 @@
 #!/bin/bash -l
 
-#PBS -N %(code)s%(count)s
-#PBS -l nodes=%(nodes)s:ppn=%(ppn)s
-#PBS -l mem=%(ram)smb
-#PBS -l walltime=%(walltime)s
-#PBS -q %(queue)s
+#PBS -N %(name)s
 #PBS -M %(email)s
-#PBS -m abe
+#PBS -q %(queue)s
+#PBS -l nodes=%(nodes)s:ppn=%(ppn)s
+#PBS -l walltime=%(walltime)s
+#PBS -l mem=%(ram)smb
 #PBS -e stderr
 #PBS -o stdout
+#PBS -m abe
 #PBS -V
 
 #module load pathmpi
