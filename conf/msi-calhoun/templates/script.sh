@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-#PBS -N %(name)s%(count)s
+#PBS -N %(name)s
 #PBS -M %(email)s
 #PBS -l nodes=%(nodes)s:ppn=%(ppn)s
 #PBS -l walltime=%(walltime)s

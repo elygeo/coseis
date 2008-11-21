@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-#$ -N %(name)s%(count)s
+#$ -N %(name)s
 #$ -M %(email)s
 #$ -q %(queue)s
 #$ -pe %(maxcores)sway %(totalcores)s
