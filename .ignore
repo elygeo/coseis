@@ -8,7 +8,7 @@
 .bzr
 bin/*
 email
-accounts
+destinations
 machine
 run
 sord.tgz

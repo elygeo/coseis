@@ -7,7 +7,7 @@ def deploy( rsh, dest, command=[] ):
     import os, sys
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    rsync = 'rsync -avR --delete --include=accounts --include=email --include=w --include=sord.tgz --exclude-from=.ignore -e %r . %r' % ( rsh, dest )
+    rsync = 'rsync -avR --delete --include=destinations --include=email --include=w --include=sord.tgz --exclude-from=.ignore -e %r . %r' % ( rsh, dest )
     print dest
     print rsync
     os.system( rsync )
@@ -25,20 +25,18 @@ def deploy( rsh, dest, command=[] ):
 if __name__ == '__main__':
     import sys
     print __doc__
-    accounts = file( 'accounts', 'r' ).readlines()
-    accounts = [ a.strip() for a in accounts ]
-    accounts = [ a for a in accounts if a[0] is not '#' ]
-    i = 0
-    for a in accounts:
-        i = i + 1
-        print '%3s  %s' % ( i, a )
-    list = range( 1, len(accounts)+1 )
-    input = raw_input( '\nhosts %r: ' % list ).split(',')
+    destinations = [ a.strip() for a in file( 'destinations', 'r' ).readlines() ]
+    list = []
+    for i, a in enumerate( destinations ):
+        print '%3s  %s' % ( i+1, a.strip('#') )
+        if a[0] is not '#':
+            list += [ i+1 ]
+    input = raw_input( '\nDestinations %r: ' % list ).split(',')
     if input[0]:
         list = [ int(i) for i in input ]
     for i in list:
-        a = accounts[i-1]
-        rsh = ' '.join( a.split(' ')[:-1] )
-        dest = a.split(' ')[-1]
+        a = destinations[i-1].strip('#').split(' ')
+        rsh = ' '.join( a[:-1] )
+        dest = a[-1]
         deploy( rsh, dest, sys.argv[1:] )
 
