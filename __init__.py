@@ -3,4 +3,5 @@
 Support Operator Rupture Dynamics
 """
 from run import run
-import util
+import util, configure, fieldnames
+

@@ -4,7 +4,7 @@ SORD main module
 """
 
 import os, sys, pwd, glob, time, getopt, shutil
-import util, setup, configure, fieldnames
+import util, configure, setup, fieldnames
 
 def run( inputs ):
     """Setup, and optionally launch, a SORD job."""
