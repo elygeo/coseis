@@ -35,23 +35,22 @@ def run( inputs ):
     # Command line options
     opts = [
         'n', 'dryrun',
-        '',  'force',
         's', 'serial',
         'm', 'mpi',
         'i', 'interactive',
         'q', 'queue',
-        'd', 'debug',
+        '', 'debug',
         'g', 'debugging',
         't', 'testing',
         'p', 'profiling',
         'O', 'optimized',
+        'f', 'force',
     ]
     options = ''.join( opts[::2] )
     long_options = opts[1::2]
     opts, args = getopt.getopt( sys.argv[1:], options, long_options )
     for o, v in opts:
         if   o in ('-n', '--dry-run'):     cfg.prepare = False
-        elif o in ('-f', '--force'):       shutil.rmtree( cfg.rundir )
         elif o in ('-s', '--serial'):      cfg.mode = 's'
         elif o in ('-m', '--mpi'):         cfg.mode = 'm'
         elif o in ('-i', '--interactive'): cfg.run = 'i'
@@ -61,6 +60,8 @@ def run( inputs ):
         elif o in ('-t', '--testing'):     cfg.optimize = 't'
         elif o in ('-p', '--profiling'):   cfg.optimize = 'p'
         elif o in ('-O', '--optimized'):   cfg.optimize = 'O'
+        elif o in ('-f', '--force'):
+            if os.path.isdir( cfg.rundir ): shutil.rmtree( cfg.rundir )
         else: sys.exit( 'Error: unknown option: ' + o )
     if not cfg.prepare: cfg.run = False
 

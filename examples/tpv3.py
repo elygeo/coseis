@@ -62,6 +62,5 @@ for _f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':
         ( '=wx', _f, [], 'P2_'+_f, (-1., -5999., 0.) ), # mode III point
     ]
 
-rundir = 'tpv3-run'
 sord.run( locals() )
 
