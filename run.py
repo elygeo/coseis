@@ -33,19 +33,34 @@ def run( inputs ):
     print 'Machine: ' + cfg.machine
 
     # Command line options
-    opts, args = getopt.getopt( sys.argv[1:], 'niqsmgGtpOd' )
+    opts = [
+        'n', 'dryrun',
+        '',  'force',
+        's', 'serial',
+        'm', 'mpi',
+        'i', 'interactive',
+        'q', 'queue',
+        'd', 'debug',
+        'g', 'debugging',
+        't', 'testing',
+        'p', 'profiling',
+        'O', 'optimized',
+    ]
+    options = ''.join( opts[::2] )
+    long_options = opts[1::2]
+    opts, args = getopt.getopt( sys.argv[1:], options, long_options )
     for o, v in opts:
-        if   o == '-n': cfg.prepare = False
-        elif o == '-i': cfg.run = 'i'
-        elif o == '-q': cfg.run = 'q'
-        elif o == '-s': cfg.mode = 's'
-        elif o == '-m': cfg.mode = 'm'
-        elif o == '-g': cfg.optimize = 'g'
-        elif o == '-G': cfg.optimize = 'g'; cfg.run = 'g'
-        elif o == '-t': cfg.optimize = 't'
-        elif o == '-p': cfg.optimize = 'p'
-        elif o == '-O': cfg.optimize = 'O'
-        elif o == '-d': shutil.rmtree( cfg.rundir )
+        if   o in ('-n', '--dry-run'):     cfg.prepare = False
+        elif o in ('-f', '--force'):       shutil.rmtree( cfg.rundir )
+        elif o in ('-s', '--serial'):      cfg.mode = 's'
+        elif o in ('-m', '--mpi'):         cfg.mode = 'm'
+        elif o in ('-i', '--interactive'): cfg.run = 'i'
+        elif o in ('-q', '--queue'):       cfg.run = 'q'
+        elif o in ('-d', '--debug'):       cfg.optimize = 'g'; cfg.run = 'g'
+        elif o in ('-g', '--debugging'):   cfg.optimize = 'g'
+        elif o in ('-t', '--testing'):     cfg.optimize = 't'
+        elif o in ('-p', '--profiling'):   cfg.optimize = 'p'
+        elif o in ('-O', '--optimized'):   cfg.optimize = 'O'
         else: sys.exit( 'Error: unknown option: ' + o )
     if not cfg.prepare: cfg.run = False
 
@@ -115,7 +130,10 @@ def run( inputs ):
 
     # Create run directory
     print 'Run directory: ' + cfg.rundir
-    os.makedirs( cfg.rundir )
+    try:
+        os.makedirs( cfg.rundir )
+    except:
+        sys.exit( 'Directory %r already exists or cannot be created. Use --force to overwrite.' % cfg.rundir )
     for f in ( 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint' ):
         os.mkdir( cfg.rundir + os.sep + f )
 
@@ -158,7 +176,7 @@ def run( inputs ):
     # Write files
     os.chdir( cfg.rundir )
     log = file( 'log', 'w' )
-    log.write( starttime + ': SORD setup started\n' )
+    log.write( starttime + ': setup started\n' )
     util.save( 'parameters.py', util.dictify( prm ), [ 'fieldio' ] )
     util.save( 'conf.py', util.dictify( cfg ) )
 
