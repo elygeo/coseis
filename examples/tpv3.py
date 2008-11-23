@@ -8,7 +8,7 @@ import sord
 np3 = 1, 1, 32				# number of processors in each dimension
 nn = 351, 201, 128			# number of mesh nodes, nx ny nz
 nt = 3001				# number of time steps
-dx = 50.0				# spatial step size
+dx = 50.				# spatial step size
 dt = 0.004				# time step size
 
 # Near side boundary conditions:
@@ -22,10 +22,10 @@ bc2 = -2, 2, -2
 
 # Material properties
 fieldio = [
-    ( '=',  'rho', [], 2670.0 ),	# density
-    ( '=',  'vp',  [], 6000.0 ),	# P-wave speed
-    ( '=',  'vs',  [], 3464.0 ),	# S-wave speed
-    ( '=',  'gam', [], 0.2    ),	# viscosity
+    ( '=',  'rho', [], 2670. ),		# density
+    ( '=',  'vp',  [], 6000. ),		# P-wave speed
+    ( '=',  'vs',  [], 3464. ),		# S-wave speed
+    ( '=',  'gam', [], 0.2   ),		# viscosity
     ( '=c', 'gam', [], 0.02, (-15001., -7501., -4000.), (15001., 7501., 4000.) ),
 ]
 hourglass = 1., 2.

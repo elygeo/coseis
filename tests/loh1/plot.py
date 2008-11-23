@@ -5,9 +5,10 @@ PEER LOH.1 - Plot comparison of FK and SOM.
 import math, numpy, pylab, scipy, scipy.signal, sord
 
 # Parameters
-p = sord.util.objectify( sord.util.load( 'run/parameters.py' ) )
-sig = p.dt * 22.5
-T = p.tsource
+cfg = sord.util.objectify( sord.util.load( 'run/conf.py' ) )
+prm = sord.util.objectify( sord.util.load( 'run/parameters.py' ) )
+sig = prm.dt * 22.5
+T = prm.tsource
 ts = 4 * sig
 
 # Setup plot
@@ -38,6 +39,27 @@ peakv = numpy.max( vm )
 for i in 0, 1, 2:
     pylab.axes( ax[i] )
     pylab.plot( t, v[i], '--' )
+    pylab.xlim( 1.5, 8.5 )
+    pylab.ylim( -1, 1 )
+    pylab.hold()
+
+# SORD results
+fdrot = numpy.array([[3./5., 4./5., 0.], [-4./5., 3./5., 0.], [0., 0., 1.]])
+t = prm.nt * numpy.arange( prm.nt )
+x = sord.util.ndread( 'run/out/v1', endian=cfg.endian )
+y = sord.util.ndread( 'run/out/v2', endian=cfg.endian )
+z = sord.util.ndread( 'run/out/v3', endian=cfg.endian )
+v = numpy.vstack((x,y,z))
+v = numpy.dot( fdrot, v )
+tau = t - ts
+factor = 1. - 2.*T/sig**2.*tau - ( T/sig )**2. * ( 1. - ( tau/sig )**2. );
+b = ( 1. / math.sqrt( 2.*math.pi ) / sig ) * factor * numpy.exp( -0.5 * ( tau/sig ) ** 2. )
+v = dt * scipy.signal.lfilter( b, 1., v )
+vm = numpy.sqrt( numpy.sum( v * v, 0 ) )
+peakv = numpy.max( vm )
+for i in 0, 1, 2:
+    pylab.axes( ax[i] )
+    pylab.plot( t, v[i] )
     pylab.xlim( 1.5, 8.5 )
     pylab.ylim( -1, 1 )
     pylab.hold()

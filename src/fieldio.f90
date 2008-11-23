@@ -73,7 +73,10 @@ if ( i > 0 ) then
   i1 = i1 + nnoff
   p%ii(1,1:3) = i1
   p%ii(2,1:3) = i1
-  if ( rr > dx * dx ) call pdelete
+  if ( rr > dx * dx ) then
+    call pdelete
+    cycle loop
+  end if
   if ( master ) write( 1, '( "    ( ", 2("''",a,"'', "), "[",i8,2(",",i8),",0], ''",a,"'' )," )' )&
     trim( p%mode ), trim( p%field ), i1, trim( p%filename )
 end if

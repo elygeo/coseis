@@ -28,14 +28,14 @@ fieldio += [
     ( '=r', 'vp',  [], _dir+'vp'  ),		# Read 3D V_p file
     ( '=r', 'vs',  [], _dir+'vs'  ),		# Read 3D V_s file
 ]
-vdamp = 400.0					# viscosity = vdamp / vs
-vp1  = 1500.0					# minimum V_p
-vs1  = 500.0					# minimum V_s
+vdamp = 400.					# viscosity = vdamp / vs
+vp1  = 1500.					# minimum V_p
+vs1  = 500.					# minimum V_s
 gam2 = 0.8					# maximum viscosity
-hourglass = 1.0, 1.0				# hourglass stiffness and viscosity
+hourglass = 1., 1.				# hourglass stiffness and viscosity
 
 # Fault parameters
-slipvector = 1.0, 0.0, 0.0				# vector for resolving pre-traction
+slipvector = 1., 0., 0.				# vector for resolving pre-traction
 faultnormal = 2					# fault plane at k = ihypo(2)
 _k = 997					# temporary variable
 ihypo = 2266, _k, -25				# hypocenter indices
@@ -50,9 +50,9 @@ fieldio += [
 
 # Nucleation
 fixhypo = 1					# node registered hypocenter
-vrup = 2300.0					# nucleation rupture velocity
+vrup = 2300.					# nucleation rupture velocity
 trelax = 0.12					# time 
-rcrit = 3000.0					# radius of nucleation patch
+rcrit = 3000.					# radius of nucleation patch
 
 # Write fault plane output
 fieldio += [
@@ -85,6 +85,5 @@ for _j, _k, _f in [
         ( '=w', 'v3', [_j,_k,-1,0], _f+'_v3' ),
     ]
 
-rundir = 'saf-run'
 sord.run( locals() )
 
