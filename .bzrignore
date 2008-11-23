@@ -1,3 +1,4 @@
+.bzr
 *.il
 *.ipo
 *.mod
@@ -5,12 +6,11 @@
 *.pyc
 *.stb
 *.swp
-.bzr
+*run
 bin/*
 email
 destinations
 machine
-run
 sord.tgz
 tmp
 w

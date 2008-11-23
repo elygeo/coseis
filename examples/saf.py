@@ -85,6 +85,6 @@ for _j, _k, _f in [
         ( '=w', 'v3', [_j,_k,-1,0], _f+'_v3' ),
     ]
 
-rundir = 'run/saf'
+rundir = 'saf-run'
 sord.run( locals() )
 

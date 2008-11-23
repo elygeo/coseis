@@ -53,6 +53,6 @@ fieldio += [
     ( '=wx', 'v3', [], 'station1-v3', (6001.0, 80001.0, -1.0) ),
 ]
 
-rundir = 'run/loh1'
+rundir = 'loh1-run'
 sord.run( locals() )
 
