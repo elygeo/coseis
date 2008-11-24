@@ -19,7 +19,7 @@ _run = [
     25.,  (1, 8, 16),
 ]
 _run = [ 500., (1, 1, 2) ]
-_run = [ 100., (1, 1, 2) ]
+_run = [ 50., (1, 1, 2) ]
 vrup = -1.
 faultnormal = 3	
 hourglass = 1., 2.
@@ -68,27 +68,27 @@ for _i in range( 0, len( _run ), 2 ):
         ( '=',  'ts',   [_xx,_oo,_l, 0],  75.8e6    ),
         ( '=',  'ts',   [_oo,_xx,_l, 0],  75.8e6    ),
         ( '=',  'ts',   [_xx,_xx,_l, 0],  81.6e6    ),
-        ( '=w', 'x1',   [_jj,_kk,_l, 0], 'flt_x1'   ),
-        ( '=w', 'x2',   [_jj,_kk,_l, 0], 'flt_x2'   ),
-        ( '=w', 'tsm',  [_jj,_kk,_l, 1], 'flt_tsm0' ),
-        ( '=w', 'tsm',  [_jj,_kk,_l,-1], 'flt_tsm'  ),
-        ( '=w', 'su1',  [_jj,_kk,_l,-1], 'flt_su1'  ),
-        ( '=w', 'su2',  [_jj,_kk,_l,-1], 'flt_su2'  ),
-        ( '=w', 'psv',  [_jj,_kk,_l,-1], 'flt_psv'  ),
-        ( '=w', 'trup', [_jj,_kk,_l,-1], 'flt_trup' ),
-        ( '=w', 'tnm',  [_jj,_k, _l, 0], 'xt_tnm'   ),
-        ( '=w', 'tsm',  [_jj,_k, _l, 0], 'xt_tsm'   ),
-        ( '=w', 'sam',  [_jj,_k, _l, 0], 'xt_sam'   ),
-        ( '=w', 'svm',  [_jj,_k, _l, 0], 'xt_svm'   ),
-        ( '=w', 'sl',   [_jj,_k, _l, 0], 'xt_sl'    ),
+        ( '=w', 'x1',   [_jj,_kk,_l, 0], 'flt-x1'   ),
+        ( '=w', 'x2',   [_jj,_kk,_l, 0], 'flt-x2'   ),
+        ( '=w', 'tsm',  [_jj,_kk,_l, 1], 'flt-tsm0' ),
+        ( '=w', 'tsm',  [_jj,_kk,_l,-1], 'flt-tsm'  ),
+        ( '=w', 'su1',  [_jj,_kk,_l,-1], 'flt-su1'  ),
+        ( '=w', 'su2',  [_jj,_kk,_l,-1], 'flt-su2'  ),
+        ( '=w', 'psv',  [_jj,_kk,_l,-1], 'flt-psv'  ),
+        ( '=w', 'trup', [_jj,_kk,_l,-1], 'flt-trup' ),
+        ( '=w', 'tnm',  [_jj,_k, _l, 0], 'xt-tnm'   ),
+        ( '=w', 'tsm',  [_jj,_k, _l, 0], 'xt-tsm'   ),
+        ( '=w', 'sam',  [_jj,_k, _l, 0], 'xt-sam'   ),
+        ( '=w', 'svm',  [_jj,_k, _l, 0], 'xt-svm'   ),
+        ( '=w', 'sl',   [_jj,_k, _l, 0], 'xt-sl'    ),
     ]
 
     for _f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':
         fieldio += [
-            ( '=wx', _f, [], 'P1a_'+_f, (-7499.,  -1., 0.) ),
-            ( '=wx', _f, [], 'P1b_'+_f, (-7451., -49., 0.) ),
-            ( '=wx', _f, [], 'P2a_'+_f, ( -1., -5999., 0.) ),
-            ( '=wx', _f, [], 'P2b_'+_f, (-49., -5951., 0.) ),
+            ( '=wx', _f, [], 'P1a-'+_f, (-7499.,  -1., 0.) ),
+            ( '=wx', _f, [], 'P1b-'+_f, (-7451., -49., 0.) ),
+            ( '=wx', _f, [], 'P2a-'+_f, ( -1., -5999., 0.) ),
+            ( '=wx', _f, [], 'P2b-'+_f, (-49., -5951., 0.) ),
         ]
 
     rundir = 'run/tpv3/%03.0f' % dx
