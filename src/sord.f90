@@ -48,7 +48,7 @@ prof0(14) = timer(7)
 if ( master ) call rio1( fh(9), prof0, 'w', 'prof/main', 16, 0, mpout, verb )
 
 ! Main loop
-if ( master ) write( 0, * ) 'Main loop'
+if ( master ) write( 0, * ) 'Main loop:', nt, ' steps'
 loop: do while ( it < nt )
 it = it + 1
 jp = jp + 1
