@@ -7,12 +7,6 @@ def build( mode='sm', optimize='O' ):
     import os
     import util, configure
     cfg = configure.configure()
-    extras = (
-        'swab',
-        'swab-safe',
-        'asc2flt',
-        'flt2asc',
-        'stats', )
     base = (
         'globals.f90',
         'diffcn.f90',
@@ -42,16 +36,7 @@ def build( mode='sm', optimize='O' ):
     srcdir = os.path.realpath( os.path.dirname( __file__ ) )
     try: os.mkdir( srcdir + os.sep + 'bin' )
     except: pass
-    os.chdir( srcdir + os.sep + 'extras' )
     new = False
-    for f in extras:
-        source = cfg['fortran_getarg'], f + '.f90'
-        object = '..' + os.sep + 'bin' + os.sep + f
-        compiler = cfg['fortran_serial'] + cfg['fortran_flags']['O']
-        try:
-            new |= util.compile( compiler, object, source )
-        except:
-            pass
     os.chdir( srcdir + os.sep + 'src' )
     if 's' in mode:
         source = base + ( 'serial.f90', ) + common

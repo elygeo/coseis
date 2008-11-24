@@ -198,11 +198,7 @@ computed periodically during each run and stored in the ``stats/`` directory.
 Internal code timings, for benchmarking performance, are collected and saved to
 the ``prof/`` directory.  Inspecting these files during a run is a good way to
 check that it is proceeding correctly.  The binary files can be examined with
-the UNIX command ``od -f`` or with separate utilities included with SORD.  The
-utilities are located in the ``extras/`` directory with the executables built
-in the ``bin/`` directory.  They include utilities for converting between
-binary and ASCII text format, converting the byte order between big and
-little-endian, and computing minimum, maximum, and mean values.
+the UNIX command ``od -f``.
 
 The best place to go from here to learn more is to look at the example scripts
 and `default-prm.py <default-prm.py>`__.  Studying the Fortran source code in

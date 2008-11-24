@@ -30,7 +30,7 @@ def run( inputs ):
             else:
                 sys.exit( 'Unknown parameter: %s = %r' % ( k, v ) )
     cfg = util.objectify( cfg )
-    print 'Machine: ' + cfg.machine
+    prm = prepare_prm( util.objectify( prm ), cfg.itbuff )
 
     # Command line options
     opts = [
@@ -39,7 +39,7 @@ def run( inputs ):
         'm', 'mpi',
         'i', 'interactive',
         'q', 'queue',
-        '', 'debug',
+        '',  'debug',
         'g', 'debugging',
         't', 'testing',
         'p', 'profiling',
@@ -64,9 +64,6 @@ def run( inputs ):
             if os.path.isdir( cfg.rundir ): shutil.rmtree( cfg.rundir )
         else: sys.exit( 'Error: unknown option: ' + o )
     if not cfg.prepare: cfg.run = False
-
-    # Prepare simulation parameters
-    prm = prepare_prm( util.objectify( prm ), cfg )
 
     # Partition for parallelization
     prm.nn = tuple( prm.nn )
@@ -116,6 +113,7 @@ def run( inputs ):
     hh = mm / 60
     mm = mm % 60
     cfg.walltime = '%d:%02d:00' % ( hh, mm )
+    print 'Machine: ' + cfg.machine
     print 'Cores: %s of %s' % ( cfg.np, maxtotalcores )
     print 'Nodes: %s of %s' % ( cfg.nodes, cfg.maxnodes )
     print 'RAM: %sMb of %sMb per node' % ( cfg.ram, cfg.maxram )
@@ -199,7 +197,7 @@ def run( inputs ):
     # Return to initial directory
     os.chdir( cwd )
 
-def prepare_prm( prm, cfg ):
+def prepare_prm( prm, itbuff ):
     """Prepare input paramers"""
 
     # inervals
@@ -300,7 +298,7 @@ def prepare_prm( prm, cfg ):
             if n > ( prm.nn[0] + prm.nn[1] + prm.nn[2] ) ** 2:
                 nb = 1
             elif n > 1:
-                nb = min( nb, cfg.itbuff )
+                nb = min( nb, itbuff )
         fieldio += [( op+mode, tfunc, period, x1, x2, nb, ii, field, filename, val )]
     f = [ line[8] for line in fieldio if line[8] != '-' ]
     for i in range( len( f ) ):
