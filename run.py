@@ -156,6 +156,7 @@ def run( inputs ):
     # Copy files to run directory
     cwd = os.path.realpath( os.getcwd() )
     cfg.rundate = time.asctime()
+    cfg.name += '-' + os.path.basename( cfg.rundir )
     cfg.rundir = os.path.realpath( cfg.rundir )
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
     cfg.bin = '.' + os.sep + 'sord-' + cfg.mode + cfg.optimize
