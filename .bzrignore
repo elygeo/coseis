@@ -6,10 +6,8 @@
 *.pyc
 *.stb
 *.swp
-*-run
-run-*
-run
 bin/*
+run
 email
 destinations
 machine
