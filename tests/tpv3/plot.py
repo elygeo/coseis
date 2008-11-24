@@ -13,34 +13,35 @@ for f in prm.fieldio:
     if f[7] is 'trup': break
 ii = f[6]
 n = [ ( i[1] - i[0] ) / i[2] + 1 for i in ii[:2] ]
-x1 = sord.util.ndread( so_dir + 'out/flt_x1',   n )
-x2 = sord.util.ndread( so_dir + 'out/flt_x2',   n )
+x1 = 0.001 * sord.util.ndread( so_dir + 'out/flt_x1',   n )
+x2 = 0.001 * sord.util.ndread( so_dir + 'out/flt_x2',   n )
 
 # Initial shear stress
 f = sord.util.ndread( so_dir + 'out/flt_tsm0', n )
 pylab.figure(4)
 pylab.clf()
 pylab.pcolor( x1, x2, f )
+pylab.axis( 'image' )
 pylab.draw()
 
-# Rupture time
+# Rupture time contour
+v = 0.5 * numpy.arange( 20 )
 f = sord.util.ndread( so_dir + 'out/flt_trup', n )
 pylab.figure(1)
 pylab.clf()
-pylab.contour( x1, x2, f )
+pylab.contour( x1, x2, f, v, colors='k' )
 pylab.hold( True )
-
-# BI
 n = 300, 150
-dx = 100.
+dx = 0.1
 x1 = dx * numpy.arange( n[0] )
 x2 = dx * numpy.arange( n[1] )
 x1 = x1 - 0.5 * x1[-1]
 x2 = x2 - 0.5 * x2[-1]
 x2, x1 = numpy.meshgrid( x2, x1 )
 trup = sord.util.ndread( bi_dir + 'trup', n )
-pylab.contour( x1, x2, trup )
+pylab.contour( x1, x2, trup, v )
 pylab.axis( 'image' )
+pylab.axis( [ -15, 15, -7.5, 7.5 ] )
 pylab.draw()
 
 # Time histories
