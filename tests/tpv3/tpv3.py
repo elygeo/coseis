@@ -19,7 +19,7 @@ _run = [
     25.,  (1, 8, 16),
 ]
 _run = [ 500., (1, 1, 2) ]
-_run = [ 50., (1, 1, 2) ]
+_run = [ 150., (1, 1, 2) ]
 vrup = -1.
 faultnormal = 3	
 hourglass = 1., 2.
@@ -34,6 +34,7 @@ for _i in range( 0, len( _run ), 2 ):
         int(  9000. / dx + 21.5 ),
         int(  6000. / dx + 20.5 ),
     )
+    bc1     =     0,     0,  0
     bc1     =    10,    10, 10
     bc2     = -_reg,  _reg, -2
     ihypo   = -_reg, -_reg, -2
@@ -81,6 +82,8 @@ for _i in range( 0, len( _run ), 2 ):
         ( '=w', 'sam',  [_jj,_k, _l, 0], 'xt-sam'   ),
         ( '=w', 'svm',  [_jj,_k, _l, 0], 'xt-svm'   ),
         ( '=w', 'sl',   [_jj,_k, _l, 0], 'xt-sl'    ),
+        ( '=w', 'vm2',  [0,_k,0,(1,-1,10)], 'xh' ),
+        ( '=w', 'vm2',  [_j,0,0,(1,-1,10)], 'xv' ),
     ]
 
     for _f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':

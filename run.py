@@ -223,9 +223,9 @@ def prepare_prm( prm, itbuff ):
     i2 = list( prm.bc2 )
     i = abs( prm.faultnormal ) - 1
     if i >= 0:
+        if prm.ihypo[i] == 1:             i1[i] = -2
+        if prm.ihypo[i] == prm.nn[i] - 1: i2[i] = -2
         if prm.ihypo[i] >= prm.nn[i]: sys.exit( 'Error: ihypo %s out of bounds' % ii )
-        if prm.ihypo[i] == prm.nn[i] - 1: i1[i] = -2
-        if prm.ihypo[i] == 1:           i2[i] = -2
     prm.bc1 = tuple( i1 )
     prm.bc2 = tuple( i2 )
 
