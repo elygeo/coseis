@@ -178,18 +178,19 @@ example (LOH.1), do::
     ./loh1.py
 
 Each time ``sord.run()`` is called, a run directory is created at the location
-set by the ``rundir`` parameter, which defaults to ``run/``.  The directory
-contains the executable and scripts to run the code, and will contain all of
-the generated output and metadata.  From the run directory start the job
-interactively with the ``run.sh`` script::
+set by the ``rundir`` parameter, which defaults to ``run/`` plus the script
+file name (``run/loh1`` in this case).  The directory contains the executable
+and scripts to run the code, and will contain all of the generated output and
+metadata.  From the run directory start the job interactively with the
+``run.sh`` script::
 
-    cd run/
+    cd run/loh1/
     ./run.sh
 
 Or, submit the job to the batch system with the ``queue.sh`` script
 ::
 
-    cd run/
+    cd run/loh1/
     ./queue.sh
 
 Output (and large input, such as the material model) is stored in flat binary

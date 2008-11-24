@@ -60,9 +60,9 @@ if ( ifn /= 0 ) then
 end if
 
 ! Debugging
-verbose = master .and. debug > 1
-sync = debug > 2
-if ( debug > 0 ) then
+verb = master .and. debug > 0
+sync = debug > 1
+if ( debug > 2 ) then
   write( str, "( a,i6.6,a )" ) 'debug/db', ipid, '.py'
   open( 1, file=str, status='replace' )
   write( 1, "( 'ifn     = ', i8                                            )" ) ifn

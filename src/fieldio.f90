@@ -38,7 +38,7 @@ use m_collective
 real :: rr
 integer :: i1(3), i2(3), n(3), noff(3), i
 
-if ( verbose ) write( 0, * ) 'Field I/O locations'
+if ( verb ) write( 0, * ) 'Field I/O locations'
 
 ! Store locations
 if ( master ) then
@@ -105,7 +105,7 @@ real :: val
 
 ! Start timer
 val = timer( 2 )
-if ( verbose ) write( 0, * ) 'Field I/O ', passes, field
+!if ( verb ) write( 0, * ) 'Field I/O ', passes, field
 
 ! Pass loop
 do ipass = 1, len( passes )
@@ -219,7 +219,7 @@ case( '=r', '+r' )
     str = 'in/' // p%filename
     if ( any( n(1:3) /= m(1:3) ) .and. mpin == 0 ) &
       write( str, '(a,i6.6)' ) trim( str ), ipid
-    call rio2( p%fh, p%buff(:,:n(4)), 'w', str, m, n, o, mpin )
+    call rio2( p%fh, p%buff(:,:n(4)), 'w', str, m, n, o, mpin, verb )
     p%ib = 0
     if ( any( n < 1 ) ) then
       deallocate( p%buff )
@@ -287,7 +287,7 @@ case( '=w' )
     str = 'out/' // p%filename
     if ( any( n(1:3) /= m(1:3) ) .and. mpout == 0 ) &
       write( str, '(a,i6.6)' ) trim( str ), ipid
-    call rio2( p%fh, p%buff(:,:n(4)), 'w', str, m, n, o, mpout )
+    call rio2( p%fh, p%buff(:,:n(4)), 'w', str, m, n, o, mpout, verb )
     p%ib = 0
     if ( it == it2 .or. any( n < 1 ) ) then
       deallocate( p%buff )

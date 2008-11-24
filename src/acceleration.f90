@@ -14,7 +14,7 @@ use m_fieldio
 use m_stats
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq
 
-if ( verbose ) write( 0, * ) 'Acceleration'
+if ( verb ) write( 0, * ) 'Acceleration'
 call scalar_set_halo( s1, 0., i1node, i2node )
 
 ! Loop over component and derivative direction

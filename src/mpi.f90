@@ -309,7 +309,7 @@ end do
 end subroutine
 
 ! 2D input/output
-subroutine rio2( fh, f, mode, filename, mm, nn, oo, mpio )
+subroutine rio2( fh, f, mode, filename, mm, nn, oo, mpio, verb )
 use m_frio
 use mpi
 integer, intent(inout) :: fh
@@ -318,15 +318,16 @@ character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(inout) :: mm(:), nn(:), oo(:)
 integer, intent(in) :: mpio
+logical, intent(in) :: verb
 integer :: i, e
 integer(kind=mpi_offset_kind) :: offset
 i = size( oo )
 if ( mpio == 0 ) then
-  call frio2( fh, f, mode, filename, mm(i), oo(i) )
+  call frio2( fh, f, mode, filename, mm(i), oo(i), verb )
   return
 end if
 if ( fh == mpi_file_null ) then
-  call mpopen( fh, mode, filename, mm, nn, oo )
+  call mpopen( fh, mode, filename, mm, nn, oo, verb )
   if ( any( nn <= 0 ) ) return
 end if
 offset = oo(i)
@@ -353,30 +354,32 @@ end if
 end subroutine
 
 ! 1D input/output
-subroutine rio1( fh, f, mode, filename, m, o, mpio )
+subroutine rio1( fh, f, mode, filename, m, o, mpio, verb )
 integer, intent(inout) :: fh
 real, intent(inout) :: f(:)
 character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(in) :: m, o, mpio
+logical, intent(in) :: verb
 integer :: mm(2), nn(2), oo(2)
 real :: ff(1,size(f))
 if ( mode == 'w' ) ff(1,:) = f
 mm = (/ 1, m /)
 nn = (/ 1, size(f) /)
 oo = (/ 0, o /)
-call rio2( fh, ff, mode, filename, mm, nn, oo, mpio )
+call rio2( fh, ff, mode, filename, mm, nn, oo, mpio, verb )
 if ( mode == 'r' ) f = ff(1,:)
 end subroutine
 
 ! Open file with MPIIO
 ! does not use mm(4) or nn(4)
-subroutine mpopen( fh, mode, filename, mm, nn, oo )
+subroutine mpopen( fh, mode, filename, mm, nn, oo, verb )
 use mpi
 integer, intent(out) :: fh
 character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(in) :: mm(:), nn(:), oo(:)
+logical, intent(in) :: verb
 integer :: mmm(size(mm)), nnn(size(nn)), ooo(size(oo)), ndims, i, n, ip, ftype, comm0, comm, e
 integer(kind=mpi_offset_kind) :: offset = 0
 n = size( mm )
@@ -407,7 +410,7 @@ call mpi_file_open( comm, filename, i, mpi_info_null, fh, e )
 call mpi_comm_size( comm, n, e  )
 call mpi_comm_rank( comm, i, e  )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
-if ( i == 0 ) write( 0, '(i8,a,i2,a,i8,2a)' ) &
+if ( verb .and. i == 0 ) write( 0, '(i8,a,i2,a,i8,2a)' ) &
   ip, ' Opened', ndims, 'D', n, 'P file: ', trim( filename )
 ftype = mpi_real
 if ( ndims > 0 ) then

@@ -56,7 +56,7 @@ use m_util
 integer :: i
 real :: r
 r = timer( 2 )
-if ( verbose ) write( 0, * ) 'Checkpoint'
+if ( verb ) write( 0, * ) 'Checkpoint'
 if ( itcheck >= 0 .and. ( it == nt .or. modulo( it, itio ) == 0 ) ) then
   open( 1, file='itcheck', status='old', iostat=i )
   if ( i == 0 ) then

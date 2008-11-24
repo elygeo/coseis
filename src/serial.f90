@@ -126,33 +126,35 @@ f(1,1,1,1) = f(1,1,1,1) - n(1) + n(1)
 end subroutine
 
 ! 1D input/output
-subroutine rio1( fh, f, mode, filename, m, o, mpio )
+subroutine rio1( fh, f, mode, filename, m, o, mpio, verb )
 use m_frio
 integer, intent(inout) :: fh
 real, intent(inout) :: f(:)
 character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(in) :: m, o, mpio
+logical, intent(in) :: verb
 real :: ff(1,size(f))
 integer :: i
 if ( mode == 'w' ) ff(1,:) = f
-call frio2( fh, ff, mode, filename, m, o )
+call frio2( fh, ff, mode, filename, m, o, verb )
 if ( mode == 'r' ) f = ff(1,:) 
 i = mpio
 end subroutine
 
 ! 2D input/output
-subroutine rio2( fh, f, mode, filename, mm, nn, oo, mpio )
+subroutine rio2( fh, f, mode, filename, mm, nn, oo, mpio, verb )
 use m_frio
 integer, intent(inout) :: fh
 real, intent(inout) :: f(:,:)
 character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(in) :: mm(:), nn(:), oo(:), mpio
+logical, intent(in) :: verb
 integer :: i
 if ( any( nn < 1 ) ) return
 i = size( oo )
-call frio2( fh, f, mode, filename, mm(i), oo(i) )
+call frio2( fh, f, mode, filename, mm(i), oo(i), verb )
 i = mpio + nn(1)
 end subroutine
 

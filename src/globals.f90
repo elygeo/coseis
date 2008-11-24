@@ -35,7 +35,7 @@ integer, dimension(3) :: &
   nnoff             ! offset between local and global indices
 logical :: &
   sync,           & ! synchronize processes
-  verbose,        & ! print messages
+  verb,           & ! print messages
   master            ! master process flag
 character(256) :: &
   str               ! string for storing file names

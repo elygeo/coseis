@@ -5,19 +5,27 @@ TPV3 - SCEC validation problem version 3, convergence test
 
 import sord
 
-debug = 2
-np3 = 1, 1, 2
-np3 = 1, 1, 1
-np3 = 1, 1, 32
+debug = 0
 _reg = 1
-_dx = [ 100. ]
-_dx = 500., 300., 250., 150., 100., 75., 50., 30., 25.
-_dx = [ 100. ]
+_run = [ 
+    500., (1, 4,  4),
+    300., (1, 4,  4),
+    250., (1, 4,  4),
+    150., (1, 4,  4),
+    100., (1, 4,  4),
+    75.,  (1, 4,  4),
+    50.,  (1, 4,  8),
+    30.,  (1, 8,  8),
+    25.,  (1, 8, 16),
+]
+_run = [ 500., (1, 1, 2) ]
 vrup = -1.
 faultnormal = 3	
 hourglass = 1., 2.
 
-for dx in _dx:
+for _i in range( 0, len( _run ), 2 ):
+    np3 = _run[_i+1]
+    dx = _run[_i]
     dt = dx / 12500.
     nt = int( 12. / dt + 1.5 )
     nn = ( 
@@ -83,6 +91,5 @@ for dx in _dx:
         ]
 
     rundir = 'run/tpv3/%03.0f' % dx
-    print rundir
     sord.run( locals() )
 

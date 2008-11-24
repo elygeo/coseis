@@ -107,7 +107,7 @@ BSSA, in revision.
 </div>
 <div class="section" id="download">
 <h3>Download</h3>
-<p>Latest source code version <a class="reference external" href="sord.tgz">3.0.121</a></p>
+<p>Latest source code version <a class="reference external" href="sord.tgz">3.0.122</a></p>
 <p>Older versions can be extracted from the source code repository (see
 <a class="reference internal" href="#development">Development</a>).</p>
 </div>
@@ -187,17 +187,18 @@ cd examples/
 ./loh1.py
 </pre>
 <p>Each time <tt class="docutils literal"><span class="pre">sord.run()</span></tt> is called, a run directory is created at the location
-set by the <tt class="docutils literal"><span class="pre">rundir</span></tt> parameter, which defaults to <tt class="docutils literal"><span class="pre">run/</span></tt>.  The directory
-contains the executable and scripts to run the code, and will contain all of
-the generated output and metadata.  From the run directory start the job
-interactively with the <tt class="docutils literal"><span class="pre">run.sh</span></tt> script:</p>
+set by the <tt class="docutils literal"><span class="pre">rundir</span></tt> parameter, which defaults to <tt class="docutils literal"><span class="pre">run/</span></tt> plus the script
+file name (<tt class="docutils literal"><span class="pre">run/loh1</span></tt> in this case).  The directory contains the executable
+and scripts to run the code, and will contain all of the generated output and
+metadata.  From the run directory start the job interactively with the
+<tt class="docutils literal"><span class="pre">run.sh</span></tt> script:</p>
 <pre class="literal-block">
-cd run/
+cd run/loh1/
 ./run.sh
 </pre>
 <p>Or, submit the job to the batch system with the <tt class="docutils literal"><span class="pre">queue.sh</span></tt> script</p>
 <pre class="literal-block">
-cd run/
+cd run/loh1/
 ./queue.sh
 </pre>
 <p>Output (and large input, such as the material model) is stored in flat binary
