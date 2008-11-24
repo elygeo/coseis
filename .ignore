@@ -6,7 +6,9 @@
 *.pyc
 *.stb
 *.swp
-*run
+*-run
+run-*
+run
 bin/*
 email
 destinations

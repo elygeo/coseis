@@ -280,13 +280,12 @@ def prepare_prm( prm, cfg ):
             fn = os.path.dirname( filename ) + os.sep + 'endian'
             if file( fn, 'r' ).read()[0] != sys.byteorder[0]:
                 sys.exit( 'Error: wrong byte order for ' + filename )
+        nn = list( prm.nn ) + [ prm.nt ]
+        ii = util.indices( ii, nn )
         if field in fieldnames.cell:
+            ii = [ (i[0], i[1]-1, i[2]) for i in ii ]
             mode = mode.replace( 'x', 'X' )
             mode = mode.replace( 'c', 'C' )
-            nn = [ n-1 for n in prm.nn ] + [ prm.nt ]
-        else:
-            nn = list( prm.nn ) + [ prm.nt ]
-        ii = util.indices( ii, nn )
         if field in fieldnames.initial:
             ii[3] = 0, 0, 1
         if field in fieldnames.fault:
