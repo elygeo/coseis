@@ -36,15 +36,13 @@ for i in 0, 1, 2:
     pylab.hold(True)
 
 # Prose F/K results
-fkrot = 1e5 * numpy.array([[0., 1., 0.], [0., 0., 1.], [-1., 0., 0.]])
-t = sord.util.ndread( 'fk-t',  endian='l' )
-x = sord.util.ndread( 'fk-v1', endian='l' )
-y = sord.util.ndread( 'fk-v2', endian='l' )
-z = sord.util.ndread( 'fk-v3', endian='l' )
-v = numpy.vstack((x,y,z))
-v = numpy.dot( fkrot, v )
-dt = t[1] - t[0]
-tau = t - ts
+tm = sord.util.ndread( 'fk/time',  endian='l' )
+v1 =  1e5 * sord.util.ndread( 'fk/v-radial', endian='l' )
+v2 =  1e5 * sord.util.ndread( 'fk/v-transverse', endian='l' )
+v3 = -1e5 * sord.util.ndread( 'fk/v-vertical', endian='l' )
+v = numpy.vstack((v1,v2,v3))
+dt = tm[1] - tm[0]
+tau = tm - ts
 b = ( 1. / math.sqrt( 2.*math.pi ) / sig ) * numpy.exp( -0.5 * ( tau/sig ) ** 2. )
 v = dt * scipy.signal.lfilter( b, 1., v )
 vm = numpy.sqrt( numpy.sum( v * v, 0 ) )
@@ -52,7 +50,7 @@ peakv = numpy.max( vm )
 print peakv
 for i in 0, 1, 2:
     pylab.axes( ax[i] )
-    pylab.plot( t, v[i], 'k--' )
+    pylab.plot( tm, v[i], 'k--' )
 
 # Decorations
 pylab.axes( ax[0] )
