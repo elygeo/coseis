@@ -19,6 +19,9 @@ def run( inputs ):
         cfg = configure.configure( machine=inputs['machine'] )
     else:
         cfg = configure.configure()
+    if '__file__' in inputs:
+        cfg['name'] = os.path.splitext( os.path.basename( inputs['__file__'] ) )[0]
+        cfg['rundir'] += os.sep + cfg['name'] 
 
     # Merge inputs
     for k, v in inputs.iteritems():
@@ -153,7 +156,6 @@ def run( inputs ):
     # Copy files to run directory
     cwd = os.path.realpath( os.getcwd() )
     cfg.rundate = time.asctime()
-    cfg.name = os.path.basename( cwd ) + '-' + os.path.basename( cfg.rundir )
     cfg.rundir = os.path.realpath( cfg.rundir )
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
     cfg.bin = '.' + os.sep + 'sord-' + cfg.mode + cfg.optimize

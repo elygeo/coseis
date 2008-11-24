@@ -82,7 +82,7 @@ for dx in _dx:
             ( '=wx', _f, [], 'P2b_'+_f, (-49., -5951., 0.) ),
         ]
 
-    rundir = 'tpv3-%03.0f-run' % dx
+    rundir = 'run/tpv3/%03.0f' % dx
     print rundir
     sord.run( locals() )
 
