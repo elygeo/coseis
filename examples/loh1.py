@@ -41,8 +41,10 @@ faultnormal = 0			# disable rupture dynamics
 ihypo = 1, 1, 41		# hypocenter indices
 xhypo = 0., 0., 2000.		# hypocenter coordinates
 fixhypo = -2			# fix source at element center
-tfunc = 'brune'			# Brune pulse time function
-tsource = 0.1			# dominant period
+rfunc = 'point'			# spatial function: point source
+rsource = 0.5 * dx		# spatial function radius
+tfunc = 'brune'			# time function: Brune pulse
+tsource = 0.1			# time function dominant period
 moment1 = 0., 0., 0.		# moment tensor M_xx, M_yy, M_zz
 moment2 = 0., 0., 1e18		# moment tensor M_yz, M_zx, M_yz
 

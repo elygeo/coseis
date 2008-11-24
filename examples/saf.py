@@ -37,7 +37,9 @@ hourglass = 1., 1.				# hourglass stiffness and viscosity
 # Fault parameters
 slipvector = 1., 0., 0.				# vector for resolving pre-traction
 faultnormal = 2					# fault plane at k = ihypo(2)
-_k = 997					# temporary variable
+_j =  1217, 2312				# temporary variable
+_k =  997					# temporary variable
+_l = -81, -1					# temporary variable
 ihypo = 2266, _k, -25				# hypocenter indices
 fieldio += [
     ( '=r', 'ts',  [0,_k,0,0], _dir+'ts1' ),	# read initial shear traction file
@@ -45,7 +47,7 @@ fieldio += [
     ( '=',  'dc',  [0,_k,0,0],   0.5      ),	# slip weakening distance
     ( '=',  'mud', [0,_k,0,0],   0.5      ),	# coeff of dynamic friction
     ( '=',  'mus', [0,_k,0,0],   1e4      ),	# coeff of static friction, non-slip section
-    ( '=',  'mus', [ (1217,2312), _k, (-81,-1), 0 ], 1.1 ), # coeff of static friction, slipping section
+    ( '=',  'mus', [_j,_k,_l,0], 1.1      ),	# coeff of static friction, slipping section
 ]
 
 # Nucleation

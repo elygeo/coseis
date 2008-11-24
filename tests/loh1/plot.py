@@ -46,9 +46,9 @@ for i in 0, 1, 2:
 # SORD results
 fdrot = numpy.array([[3./5., 4./5., 0.], [-4./5., 3./5., 0.], [0., 0., 1.]])
 t = prm.nt * numpy.arange( prm.nt )
-x = sord.util.ndread( 'run/out/v1', endian=cfg.endian )
-y = sord.util.ndread( 'run/out/v2', endian=cfg.endian )
-z = sord.util.ndread( 'run/out/v3', endian=cfg.endian )
+x = sord.util.ndread( 'run/out/vx', endian=cfg.endian )
+y = sord.util.ndread( 'run/out/vy', endian=cfg.endian )
+z = sord.util.ndread( 'run/out/vz', endian=cfg.endian )
 v = numpy.vstack((x,y,z))
 v = numpy.dot( fdrot, v )
 tau = t - ts

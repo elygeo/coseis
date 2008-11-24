@@ -6,14 +6,14 @@ PML test problem
 import sord
 
 nt = 500
-dx = 100.0
+dx = 100.
 dt = 0.0075
-hourglass = 1.0, 1.0
+hourglass = 1., 1.
 
 faultnormal = 0
 tfunc = 'sbrune'
 tfunc = 'brune'
-rsource = 50.0
+rsource = 50.
 tsource = 0.056
 moment1 = 1e18, 1e18, 1e18
 moment2 = 0, 0, 0
@@ -22,10 +22,10 @@ fixhypo = -2
 _l = 1 # FIXME
 np3 = 1, 1, 2
 fieldio = [
-    ( '=', 'rho', [], 2670.0 ),      
-    ( '=', 'vp',  [], 6000.0 ),      
-    ( '=', 'vs',  [], 3464.0 ),      
-    ( '=', 'gam', [],    0.0 ),      
+    ( '=', 'rho', [], 2670. ),      
+    ( '=', 'vp',  [], 6000. ),      
+    ( '=', 'vs',  [], 3464. ),      
+    ( '=', 'gam', [],    0. ),      
 ]
 for _f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
     fieldio += [
