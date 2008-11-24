@@ -5,8 +5,10 @@ PEER LOH.1 - Plot comparison of FK and SOM.
 import math, numpy, pylab, scipy, scipy.signal, sord
 
 # Parameters
-cfg = sord.util.objectify( sord.util.load( 'run/conf.py' ) )
-prm = sord.util.objectify( sord.util.load( 'run/parameters.py' ) )
+so_dir = 'out/'
+fk_dir = '../fk/'
+cfg = sord.util.objectify( sord.util.load( 'conf.py' ) )
+prm = sord.util.objectify( sord.util.load( 'parameters.py' ) )
 sig = prm.dt * 22.5
 T = prm.tsource
 ts = 4 * sig
@@ -18,9 +20,9 @@ ax = [ pylab.subplot( 3, 1, i ) for i in 1, 2, 3 ]
 # SORD results
 fdrot = numpy.array([[3./5., 4./5., 0.], [-4./5., 3./5., 0.], [0., 0., 1.]])
 t = prm.dt * numpy.arange( prm.nt )
-x = sord.util.ndread( 'run/out/vx', endian=cfg.endian )
-y = sord.util.ndread( 'run/out/vy', endian=cfg.endian )
-z = sord.util.ndread( 'run/out/vz', endian=cfg.endian )
+x = sord.util.ndread( so_dir+'vx', endian=cfg.endian )
+y = sord.util.ndread( so_dir+'vy', endian=cfg.endian )
+z = sord.util.ndread( so_dir+'vz', endian=cfg.endian )
 v = numpy.vstack((x,y,z))
 v = numpy.dot( fdrot, v )
 tau = t - ts
@@ -36,10 +38,10 @@ for i in 0, 1, 2:
     pylab.hold(True)
 
 # Prose F/K results
-tm = sord.util.ndread( 'fk/time',  endian='l' )
-v1 =  1e5 * sord.util.ndread( 'fk/v-radial', endian='l' )
-v2 =  1e5 * sord.util.ndread( 'fk/v-transverse', endian='l' )
-v3 = -1e5 * sord.util.ndread( 'fk/v-vertical', endian='l' )
+tm = sord.util.ndread( fk_dir+'time', endian='l' )
+v1 =  1e5 * sord.util.ndread( fk_dir+'v-radial', endian='l' )
+v2 =  1e5 * sord.util.ndread( fk_dir+'v-transverse', endian='l' )
+v3 = -1e5 * sord.util.ndread( fk_dir+'v-vertical', endian='l' )
 v = numpy.vstack((v1,v2,v3))
 dt = tm[1] - tm[0]
 tau = tm - ts

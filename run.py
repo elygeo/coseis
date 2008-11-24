@@ -151,10 +151,10 @@ def run( inputs ):
                 shutil.copy( filename, cfg.rundir + os.sep + f )
 
     # Copy files to run directory
-    cfg.rundate = time.asctime()
-    cfg.name = os.path.basename( cfg.rundir )
-    cfg.rundir = os.path.realpath( cfg.rundir )
     cwd = os.path.realpath( os.getcwd() )
+    cfg.rundate = time.asctime()
+    cfg.name = os.path.basename( cwd ) + '-' + os.path.basename( cfg.rundir )
+    cfg.rundir = os.path.realpath( cfg.rundir )
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
     cfg.bin = '.' + os.sep + 'sord-' + cfg.mode + cfg.optimize
     shutil.copy( 'bin' + os.sep + 'sord-' + cfg.mode + cfg.optimize, cfg.rundir )
