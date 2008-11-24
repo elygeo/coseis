@@ -69,6 +69,7 @@ def run( inputs ):
     prm = prepare_prm( util.objectify( prm ), cfg )
 
     # Partition for parallelization
+    prm.nn = tuple( prm.nn )
     maxtotalcores = cfg.maxnodes * cfg.maxcores
     if not cfg.mode and maxtotalcores == 1:
         cfg.mode = 's'

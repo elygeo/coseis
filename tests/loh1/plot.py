@@ -33,7 +33,7 @@ print peakv
 for i in 0, 1, 2:
     pylab.axes( ax[i] )
     pylab.plot( t, v[i], 'k' )
-    pylab.hold()
+    pylab.hold(True)
 
 # Prose F/K results
 fkrot = 1e5 * numpy.array([[0., 1., 0.], [0., 0., 1.], [-1., 0., 0.]])
@@ -53,7 +53,6 @@ print peakv
 for i in 0, 1, 2:
     pylab.axes( ax[i] )
     pylab.plot( t, v[i], 'k--' )
-    pylab.hold()
 
 # Decorations
 pylab.axes( ax[0] )
@@ -68,4 +67,5 @@ pylab.axis( [ 1.5, 8.5, -1., 1. ] )
 pylab.title( 'Vertical',   position=(.98,.83), ha='right', va='center' )
 pylab.xlabel( 'Time (/s)' )
 pylab.draw()
-pylab.show()
+#pylab.show()
+pylab.savefig( 'loh.pdf', format='pdf' )

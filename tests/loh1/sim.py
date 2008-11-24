@@ -5,9 +5,9 @@ PEER LOH.1
 
 import sord
 
-np3 = 1, 16, 1
 np3 = 1, 2, 1
 np3 = 1, 1, 1
+np3 = 1, 16, 1
 dx = 50.
 dt = 0.004
 _T = 9.
@@ -29,7 +29,7 @@ moment2 = 0., 0., 1e18
 faultnormal = 0
 hourglass = 1., 2.
 
-_l = 1, int( 1000 ./ dx + 1.5 )
+_l = 1, int( 1000. / dx + 1.5 )
 fieldio = [
     ( '=',   'rho', [], 2700. ),
     ( '=',   'vp',  [], 6000. ),
