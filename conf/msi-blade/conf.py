@@ -24,7 +24,6 @@ maxcores = 4;
 maxram = 7000
 fortran_serial = [ 'ifort' ]
 fortran_mpi = [ 'mpif90' ]
-fortran_getarg = ''
 _ = [ '-u', '-std95', '-warn', '-o' ]
 fortran_flags = {
     'g': [ '-CB', '-traceback', '-g' ] + _,

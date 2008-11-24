@@ -57,7 +57,6 @@ for _dir in os.environ['PATH'].split(':'):
 # Fortran compiler flags
 if fortran_serial[0] == 'xlf95_r':
     _ = [ '-u', '-q64', '-qsuppress=cmpmsg', '-qlanglvl=2003pure', '-qsuffix=f=f90', '-o' ]
-    fortran_getarg = ''
     fortran_flags = {
         'g': [ '-C', '-qflttrap', '-qsigtrap', '-g' ] + _,
         't': [ '-C', '-qflttrap', '-qsigtrap' ] + _,
@@ -66,7 +65,6 @@ if fortran_serial[0] == 'xlf95_r':
     }
 elif fortran_serial[0] == 'ifort':
     _ = [ '-u', '-std95', '-warn', '-o' ]
-    fortran_getarg = ''
     fortran_flags = {
         'g': [ '-CB', '-traceback', '-g' ] + _,
         't': [ '-CB', '-traceback' ] + _,
@@ -75,7 +73,6 @@ elif fortran_serial[0] == 'ifort':
     }
 elif fortran_serial[0] == 'pgf90':
     _ = [ '-Mdclchk', '-o' ]
-    fortran_getarg = 'getarg-pgf.f90'
     fortran_flags = {
         'g': [ '-Ktrap=fp', '-Mbounds', '-g' ] + _,
         't': [ '-Ktrap=fp', '-Mbounds' ] + _,
@@ -84,7 +81,6 @@ elif fortran_serial[0] == 'pgf90':
     }
 elif fortran_serial[0] == 'pathf95':
     _ = [ '-o' ]
-    fortran_getarg = ''
     fortran_flags = {
         'g': [ '-g' ] + _,
         't': [] + _,
@@ -95,7 +91,6 @@ elif fortran_serial[0] == 'gfortran':
     _ = [ '-fimplicit-none', '-Wall', '-std=f95', '-pedantic', '-o' ]
     _ = [ '-fimplicit-none', '-Wall', '-std=f95', '-o' ]
     _ = [ '-fimplicit-none', '-Wall', '-o' ]
-    fortran_getarg = ''
     fortran_flags = {
         'g': [ '-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g' ] + _,
         't': [ '-fbounds-check', '-ffpe-trap=invalid,zero,overflow' ] + _,
@@ -104,7 +99,6 @@ elif fortran_serial[0] == 'gfortran':
     }
 elif fortran_serial[0] == 'f95' and os.uname()[0] == 'SunOS':
     _ = [ '-u', '-o' ]
-    fortran_getarg = 'getarg.f90'
     fortran_flags = {
         'g': [ '-C', '-ftrap=common', '-w4', '-g' ] + _,
         't': [ '-C', '-ftrap=common'  ] + _,

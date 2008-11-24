@@ -36,7 +36,6 @@ maxtime = 18,00
 rate = 2.2e6
 fortran_serial = [ 'ifort' ]
 fortran_mpi = [ 'mpif90' ]
-fortran_getarg = ''
 _ = [ '-u', '-std95', '-warn', '-o' ]
 fortran_flags = {
     'g': [ '-CB', '-traceback', '-g' ] + _,

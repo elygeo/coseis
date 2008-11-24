@@ -21,7 +21,6 @@ maxram = 15000
 maxtime = 24, 00
 fortran_serial = [ 'ifort' ]
 fortran_mpi = [ 'mpif90' ]
-fortran_getarg = ''
 _ = [ '-u', '-std95', '-warn', '-o' ]
 fortran_flags = {
     'g': [ '-CB', '-traceback', '-g' ] + _,

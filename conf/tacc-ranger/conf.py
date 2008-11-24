@@ -25,7 +25,6 @@ maxram = 30000
 rate = 2.1e6
 fortran_serial = [ 'pgf95' ]
 fortran_mpi = [ 'mpif90' ]
-fortran_getarg = 'getarg-pgf.f90'
 _ = [ '-Mdclchk', '-o' ]
 fortran_flags = {
     'g': [ '-Ktrap=fp', '-Mbounds', '-g' ] + _,
