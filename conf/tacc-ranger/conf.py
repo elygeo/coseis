@@ -3,15 +3,18 @@ TACC Ranger
 
 http://www.tacc.utexas.edu/services/userguides/ranger/
 ppn must be one of (1, 2, 4, 8, 12, 15, 16)
-alias showme='showq -u'
-qstat
-qdel
-qconf -sql 
-qconf -sq large
+
 cat /share/sge/default/tacc/sge_esub_control
-lfs quota -u <username> $HOME
-lfs quota -u <username> $WORK
-lfs quota -u <username> $SCRATCH
+module list
+qconf -sql 
+lfs quota -u $USER $HOME
+lfs quota -u $USER $WORK
+lfs quota -u $USER $SCRATCH
+
+.bashrc
+module unload mvapich
+module load mvapich2
+alias showme='showq -u'
 """
 login = 'tg-login.ranger.tacc.teragrid.org'
 hosts = [ 'login3.ranger.tacc.utexas.edu', 'login4.ranger.tacc.utexas.edu' ]

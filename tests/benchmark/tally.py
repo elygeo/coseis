@@ -1,13 +1,12 @@
 #!/usr/bin/env python
-import numpy
-from sord import util
+import numpy, sord
 
 dir = 'run'
 np = []
 tt = []
 for i in range( 1, 8 ):
     f = dir + '/%02d/parameters.py' % i
-    p = util.load( f )
+    p = sord.util.load( f )
     np += [ numpy.product( p['np'] ) ]
     f = dir + '/%02d/prof/step' % i
     t = numpy.fromfile( f, numpy.float32 )
