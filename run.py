@@ -108,7 +108,8 @@ def run( inputs ):
     else:
          nvars = 44
     nm = ( nl[0] + 2 ) * ( nl[1] + 2 ) * ( nl[2] + 2 )
-    cfg.ram = ( nm * nvars * cfg.floatsize / 1024 / 1024 + 10 ) * cfg.ppn
+    cfg.pmem = ( nm * nvars * cfg.floatsize / 1024 / 1024 + 10 ) * 1.2
+    cfg.ram  = ( nm * nvars * cfg.floatsize / 1024 / 1024 + 10 ) * cfg.ppn
     sus = int( ( prm.nt + 10 ) * cfg.ppn * nm / cfg.cores / cfg.rate / 3600 * cfg.totalcores + 1 )
     mm  =      ( prm.nt + 10 ) * cfg.ppn * nm / cfg.cores / cfg.rate / 60 * 3.0 + 10
     if cfg.maxtime:
