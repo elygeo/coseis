@@ -1,10 +1,15 @@
 #!/usr/bin/env python
 """
-Remote operations
+Remote operations: deploy, publish, get
+
+Reads 'destinations' file with entries like:
+ssh user@host.domain:sord
 """
 import os
 
 def deploy( rsh, dest, command=[] ):
+    """Deploy code and execute remote commands
+    """
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
     rsync = 'rsync -avR --delete --include=destinations --include=email --include=work --include=sord.tgz --exclude-from=.ignore -e %r . %r' % ( rsh, dest )
@@ -21,6 +26,8 @@ def deploy( rsh, dest, command=[] ):
     return
 
 def publish( rsh, dest ):
+    """Publish web page and code repository
+    """
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
     rsync = 'rsync -avR --delete --delete-excluded --include=sord.tgz --include=.bzr --exclude-from=.ignore -e %r . %r' % ( rsh, dest )
@@ -30,6 +37,8 @@ def publish( rsh, dest ):
     return
 
 def get( rsh, rdir, rfile ):
+    """Get remote files
+    """
     for f in rfile:
         src = rdir + '/' + f.rstrip('/')
         rsync = 'rsync -av --delete -e %r %r .' % ( rsh, src )
@@ -42,6 +51,9 @@ if __name__ == '__main__':
     opts, args = getopt.getopt( sys.argv[1:], 'dpg' )
     mode = '-d'
     if opts: mode = opts[-1][0]
+    if   mode == '-d': print deploy.__doc__
+    elif mode == '-p': print publish.__doc__
+    elif mode == '-g': print get.__doc__
     f = os.path.dirname( __file__ ) + os.sep + 'destinations'
     destinations = [ a.strip() for a in open( f, 'r' ).readlines() ]
     list = []
@@ -49,7 +61,6 @@ if __name__ == '__main__':
         print '%3s  %s' % ( i+1, a.strip('#') )
         if a[0] is not '#':
             list += [ i+1 ]
-    print mode, mode is '-p'
     if   mode == '-p': list = [ len( destinations ) ]
     elif mode == '-g': list = []
     input = raw_input( '\nDestinations %r: ' % list ).split(',')
