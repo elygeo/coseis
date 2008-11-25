@@ -24,16 +24,15 @@ for i, sta in enumerate( [ 'P1', 'P2' ] ):
     pylab.gca().set_xticklabels([])
     pylab.ylabel( 'Shear stress (MPa)' )
     leg = pylab.legend( [ 'SOM', 'BI' ], loc=(.78, .6) )
-    pylab.draw()
 
     pylab.subplot( 2, 1, 2 )
     f1 = sord.util.ndread( so_dir + 'out/' + sta + 'a-sv1' )
     f2 = sord.util.ndread( bi_dir + sta + '-sv' )
     pylab.plot( t1, f1, 'k-', t2, f2, 'k--' )
+    pylab.gca().set_yticks([0., 1., 2., 3.])
     pylab.ylabel( 'Slip rate (m/s)' )
-    pylab.draw()
 
-    pylab.subplot( 2, 1, 2 )
+    pylab.gca().twinx()
     f1 = sord.util.ndread( so_dir + 'out/' + sta + 'a-su1' )
     f2 = sord.util.ndread( bi_dir + sta + '-su' )
     pylab.plot( t1, f1, 'k-', t2, f2, 'k--' )
