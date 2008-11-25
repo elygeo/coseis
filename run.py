@@ -173,13 +173,13 @@ def run( inputs ):
     for d in [ 'conf/common/templates', f ]:
         for f in glob.glob( d + os.sep + '*' ):
             ff = cfg.rundir + os.sep + os.path.basename( f )
-            out = file( f, 'r' ).read() % util.dictify( cfg )
-            file( ff, 'w' ).write( out )
+            out = open( f, 'r' ).read() % util.dictify( cfg )
+            open( ff, 'w' ).write( out )
             shutil.copymode( f, ff )
 
     # Write files
     os.chdir( cfg.rundir )
-    log = file( 'log', 'w' )
+    log = open( 'log', 'w' )
     log.write( starttime + ': setup started\n' )
     util.save( 'parameters.py', util.dictify( prm ), [ 'fieldio' ] )
     util.save( 'conf.py', util.dictify( cfg ) )
@@ -281,7 +281,7 @@ def prepare_prm( prm, itbuff ):
             sys.exit( 'Error: field is ouput only: %r' % line )
         if 'r' in mode:
             fn = os.path.dirname( filename ) + os.sep + 'endian'
-            if file( fn, 'r' ).read()[0] != sys.byteorder[0]:
+            if open( fn, 'r' ).read()[0] != sys.byteorder[0]:
                 sys.exit( 'Error: wrong byte order for ' + filename )
         nn = list( prm.nn ) + [ prm.nt ]
         ii = util.indices( ii, nn )

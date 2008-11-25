@@ -11,12 +11,12 @@ def configure( save=False, machine=None ):
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
     cfg = util.load( 'default-cfg.py' )
     if not machine and os.path.isfile( 'machine' ):
-        machine = file( 'machine', 'r' ).read().strip()
+        machine = open( 'machine', 'r' ).read().strip()
     if machine:
         util.load( 'conf/' + machine + '/conf.py', cfg )
         cfg['machine'] = machine
         if save:
-            file( 'machine', 'w' ).write( cfg['machine'] )
+            open( 'machine', 'w' ).write( cfg['machine'] )
     os.chdir( cwd )
     return cfg
 

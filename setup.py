@@ -81,7 +81,7 @@ def docs():
     out += '--------\n'
     sources = [ 'loh1.py', 'tpv3.py', 'saf.py', ]
     for f in sources:
-      doc = file( 'examples/' + f, 'r' ).readlines()[2].strip()
+      doc = open( 'examples/' + f, 'r' ).readlines()[2].strip()
       #out += '| %s: `%s <examples/%s>`_\n' % ( doc, f, f )
       out += '| `%s <examples/%s>`_: %s\n' % ( f, f, doc )
     out += '\nFortran source code\n'
@@ -114,7 +114,7 @@ def docs():
       'util.f90',
     ]
     for f in sources:
-      doc = file( 'src/' + f, 'r' ).readlines()[0].strip().replace( '! ', '' )
+      doc = open( 'src/' + f, 'r' ).readlines()[0].strip().replace( '! ', '' )
       #out += '| %s: `%s <src/%s>`_\n' % ( doc, f, f )
       out += '| `%s <src/%s>`_: %s\n' % ( f, f, doc )
     out += '\nPython wrappers\n'
@@ -130,13 +130,13 @@ def docs():
       'util.py',
     ]
     for f in sources:
-      doc = file( f, 'r' ).readlines()[2].strip()
+      doc = open( f, 'r' ).readlines()[2].strip()
       #out += '| %s: `%s <%s>`_\n' % ( doc, f, f )
       out += '| `%s <%s>`_: %s\n' % ( f, f, doc )
-    download = "Latest source code version `%s <sord.tgz>`_" % file( 'version', 'r' ).read().strip()
-    file( 'download.txt', 'w' ).write( download )
-    file( 'sources.txt', 'w' ).write( out )
-    file( 'style.css', 'w' ).write( css )
+    download = "Latest source code version `%s <sord.tgz>`_" % open( 'version', 'r' ).read().strip()
+    open( 'download.txt', 'w' ).write( download )
+    open( 'sources.txt', 'w' ).write( out )
+    open( 'style.css', 'w' ).write( css )
     os.system(' \
         rst2html.py \
         -g -d -s \

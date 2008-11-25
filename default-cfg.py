@@ -18,7 +18,7 @@ itbuff = 10	# max number of timesteps to buffer for 2D & 3D output
 
 # User info
 user = pwd.getpwuid(os.geteuid())[0]
-try: email = file( 'email', 'r' ).read().strip()
+try: email = open( 'email', 'r' ).read().strip()
 except: email = user
 
 # Machine specific

@@ -35,7 +35,7 @@ def load( filename, d=None ):
 def save( filename, d, expandlist=[] ):
     """Write variables from a dict into a Python source file"""
     import sys
-    f = file( filename, 'w' )
+    f = open( filename, 'w' )
     for k in sorted( d.keys() ):
         if k[0] is not '_' and type(d[k]) is not type(sys) and k not in expandlist:
             f.write( '%s = %r\n' % ( k, d[k] ) )
@@ -73,7 +73,7 @@ def indices( ii, mm ):
 def ndread( filename, mm=None, ii=[], endian='=' ):
     """Read n-dimensional slice from binary file"""
     import numpy
-    fd = file( filename, 'rb' )
+    fd = open( filename, 'rb' )
     dtype = numpy.dtype( numpy.float32 ).newbyteorder( endian )
     if not mm: return numpy.fromfile( fd, dtype )
     elif type( mm ) == int: mm = [ mm ]
@@ -111,11 +111,11 @@ def compile( compiler, object, source ):
     command = compiler + [ object ] + [ f for f in source if f ]
     state = [ ' '.join( command ) + '\n' ]
     for f in source:
-        if f: state += file( f, 'r' ).readlines()
+        if f: state += open( f, 'r' ).readlines()
     compile = True
     if os.path.isfile( object ):
         try:
-            oldstate = file( statefile ).readlines()
+            oldstate = open( statefile ).readlines()
             diff = ''.join( difflib.unified_diff( oldstate, state, n=0 ) )
             if diff: print diff
             else: compile = False
@@ -127,7 +127,7 @@ def compile( compiler, object, source ):
         #if subprocess.call( command ):
         if os.system( ' '.join( command ) ):
             sys.exit( 'Compile error' )
-        file( statefile, 'w' ).writelines( state )
+        open( statefile, 'w' ).writelines( state )
         for pat in [ '*.o', '*.mod', '*.ipo', '*.il', '*.stb' ]:
             for f in glob.glob( pat ):
                 os.unlink( f )
@@ -141,7 +141,7 @@ def install_path():
     dir = os.path.dirname( os.path.dirname( os.path.realpath( __file__ ) ) )
     print 'Installing ' + pth
     print 'for path ' + dir
-    try: file( pth, 'w' ).write( dir )
+    try: open( pth, 'w' ).write( dir )
     except: sys.exit( 'You do not have write permission for this Python install' )
     return
 

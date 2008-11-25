@@ -64,7 +64,7 @@ prof(7,jp) = iotimer
 prof(8,jp) = timer(6)
 if ( it == nt .or. modulo( it, itio ) == 0 ) then
   if ( master ) then
-    call rio1( fh(1), prof(1,:jp), 'w', 'prof/1step',   nt, it-jp, mpout, verb )
+    call rio1( fh(1), prof(1,:jp), 'w', 'prof/1time',   nt, it-jp, mpout, verb )
     call rio1( fh(2), prof(2,:jp), 'w', 'prof/2stress', nt, it-jp, mpout, verb )
     call rio1( fh(3), prof(3,:jp), 'w', 'prof/3accel',  nt, it-jp, mpout, verb )
     call rio1( fh(4), prof(4,:jp), 'w', 'prof/4swap',   nt, it-jp, mpout, verb )
