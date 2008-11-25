@@ -103,7 +103,6 @@ def ndread( filename, mm=None, ii=[], endian='=' ):
 def compile( compiler, object, source ):
     """An alternative to Make that uses state files"""
     import os, sys, glob, difflib
-    #import subprocess
     statedir = os.path.dirname( object ) + os.sep + '.state'
     if not os.path.isdir( statedir ):
         os.mkdir( statedir )
@@ -124,7 +123,6 @@ def compile( compiler, object, source ):
         try: os.unlink( statefile )
         except: pass
         print ' '.join( command )
-        #if subprocess.call( command ):
         if os.system( ' '.join( command ) ):
             sys.exit( 'Compile error' )
         open( statefile, 'w' ).writelines( state )
