@@ -11,7 +11,7 @@ Add these to your .bashrc:
 Run from disks located at HPC:
   /auto/scec-00
   /auto/rcf-104
-alias showme='qstat -u <user>'
+alias showme='qstat -u $USER'
 qbalance -h
 showstart
 qstat

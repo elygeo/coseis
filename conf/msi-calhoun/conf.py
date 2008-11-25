@@ -10,6 +10,7 @@ ulimit -s unlimited
 ulimit -n 4096
 vi ~/.modulerc
 qstat -a
+alias showme=qstat -u $USER'
 #%Module1.0
 module load intel vmpi
 """

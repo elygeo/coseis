@@ -5,24 +5,23 @@ Benchmarks
 
 import sord, math
 
+name = 'bm'
 _np3 = [ (1,1,1) ]
 _np3 = [ (1,1,1), (1,1,2) ]
 _np3 = [ (1,1,1), (1,2,2), (1,4,4) ]
 _np3 = [ (1,1,1), (1,2,2), (1,4,4), (1,8,8), (1,16,16), (1,32,32), (1,64,64) ]
 #machine = queue = 'large'; _np3 = [ (1,128,128) ]
-optimize = 'O'
 optimize = 'p'
+optimize = 'O'
 mode = 's'
 mode = 'm'
+oplevel = 6
+oplevel = 2
 _n = 20
 _n = 200
-nt = 8
-nt = 16
-itstats = 2
-itstats = 1
-oplevel = 2
-oplevel = 6
 
+nt = 16
+itstats = 1
 itcheck = -1
 itio = nt
 debug = 0

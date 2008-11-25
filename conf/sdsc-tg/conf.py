@@ -20,7 +20,7 @@ vi ~/.soft
   +mpich-gm-1.2.6-intel9032
   @teragrid
 Useful commands:
-  alias showme='showq | sed -n "/JOBNAME/p; /^[^ ]/p; /ux451302/p"'
+  alias showme='showq | sed -n "/JOBNAME/p; /^[^ ]/p; /$USER/p"'
   myprojects
   reslist
   showq
