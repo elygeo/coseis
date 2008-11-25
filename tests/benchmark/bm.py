@@ -5,7 +5,6 @@ Benchmarks
 
 import sord, math
 
-name = 'bm'
 _np3 = [ (1,1,1) ]
 _np3 = [ (1,1,1), (1,1,2) ]
 _np3 = [ (1,1,1), (1,2,2), (1,4,4) ]

@@ -4,8 +4,8 @@ TPV3
 """
 import math, numpy, pylab, sord
 
-so_dir = ''
-bi_dir = '../../bi/'
+so_dir = ''; bi_dir = '../../bi/'
+so_dir = 'run/500/'; bi_dir = 'bi/'
 prm = sord.util.objectify( sord.util.load( so_dir + 'parameters.py' ) )
 
 # Time histories
