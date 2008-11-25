@@ -3,8 +3,8 @@ TACC Ranger
 
 http://www.tacc.utexas.edu/services/userguides/ranger/
 ppn must be one of (1, 2, 4, 8, 12, 15, 16)
+alias showme='showq -u'
 qstat
-showq
 qdel
 qconf -sql 
 qconf -sq large

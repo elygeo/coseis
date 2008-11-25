@@ -22,8 +22,8 @@ queue = 'devel'; maxnodes = 16;  maxtime = 1, 00
 queue = 'bc';    maxnodes = 268; maxtime = 48, 00
 maxcores = 4;
 maxram = 7000
-fortran_serial = [ 'ifort' ]
 fortran_mpi = [ 'mpif90' ]
+fortran_serial = [ 'ifort' ]
 _ = [ '-u', '-std95', '-warn', '-o' ]
 fortran_flags = {
     'g': [ '-CB', '-traceback', '-g' ] + _,
