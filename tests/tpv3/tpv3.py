@@ -18,7 +18,7 @@ _run = [
     30.,  (1, 8,  8),
     25.,  (1, 8, 16),
 ]
-_run = [ 150., (1, 1, 2) ]
+_run = [ 150., (1, 1, 2), ]
 vrup = -1.
 faultnormal = 3	
 hourglass = 1., 2.
@@ -76,12 +76,12 @@ for _i in range( 0, len( _run ), 2 ):
         ( '=w', 'psv',  [_jj,_kk,_l,-1], 'flt-psv'  ),
         ( '=w', 'trup', [_jj,_kk,_l,-1], 'flt-trup' ),
         ( '=w', 'tnm',  [_jj,_k, _l, 0], 'xt-tnm'   ),
-        ( '=w', 'tsm',  [_jj,_k, _l, 0], 'xt-tsm'   ),
-        ( '=w', 'sam',  [_jj,_k, _l, 0], 'xt-sam'   ),
-        ( '=w', 'svm',  [_jj,_k, _l, 0], 'xt-svm'   ),
-        ( '=w', 'sl',   [_jj,_k, _l, 0], 'xt-sl'    ),
-        #( '=w', 'vm2',  [0,_k,0,(1,-1,10)], 'xh' ),
-        #( '=w', 'vm2',  [_j,0,0,(1,-1,10)], 'xv' ),
+       #( '=w', 'tsm',  [_jj,_k, _l, 0], 'xt-tsm'   ),
+       #( '=w', 'sam',  [_jj,_k, _l, 0], 'xt-sam'   ),
+       #( '=w', 'svm',  [_jj,_k, _l, 0], 'xt-svm'   ),
+       #( '=w', 'sl',   [_jj,_k, _l, 0], 'xt-sl'    ),
+       #( '=w', 'vm2',  [0,_k,0,(1,-1,10)], 'xh' ),
+       #( '=w', 'vm2',  [_j,0,0,(1,-1,10)], 'xv' ),
     ]
 
     for _f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':

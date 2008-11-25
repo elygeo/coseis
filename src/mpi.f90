@@ -57,10 +57,14 @@ root2d = 0
 comm1d = mpi_comm_self
 comm2d = mpi_comm_self
 do i = 1, 3
-if ( product( (/ np3(:i-1), np3(i+1:) /) ) > 1 ) then
+if ( np3(i) > 1 ) then
   hat = .false.
   hat(i) = .true.
   call mpi_cart_sub( comm3d, hat, comm1d(i), e )
+end if
+end do
+do i = 1, 3
+if ( product( (/ np3(:i-1), np3(i+1:) /) ) > 1 ) then
   hat = .true.
   hat(i) = .false.
   call mpi_cart_sub( comm3d, hat, comm2d(i), e )
@@ -387,7 +391,7 @@ ndims = count( mm(1:n-1) > 1 )
 do i = 1, n-1
   select case( ndims )
   case( 0 ); comm0 = mpi_comm_self
-  case( 1 ); if ( mm(i) == 1 ) comm0 = comm1d(i)
+  case( 1 ); if ( mm(i) /= 1 ) comm0 = comm1d(i)
   case( 2 ); if ( mm(i) == 1 ) comm0 = comm2d(i)
   case( 3 ); comm0 = comm3d
   end select
