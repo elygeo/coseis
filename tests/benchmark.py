@@ -46,6 +46,6 @@ for np3 in _np3:
     nn = [ _n * _np for _np in np3 ]
     _np = np3[0] * np3[1] * np3[2]
     print '\nBenchmark: %s, %s, %s, %s' % ( np3, math.log(_np,2), _np/16, _np )
-    rundir = 'run/bench/%05d' % _np
+    rundir = 'run/%05d' % _np
     sord.run( locals() )
 

@@ -4,8 +4,8 @@ TPV3
 """
 import math, numpy, pylab, sord
 
-bi_dir = '../../../bi/'
 so_dir = ''
+bi_dir = '../../bi/'
 prm = sord.util.objectify( sord.util.load( so_dir + 'parameters.py' ) )
 
 # Time histories
@@ -14,29 +14,34 @@ t2 = sord.util.ndread( bi_dir + 'time' )
 for i, sta in enumerate( [ 'P1', 'P2' ] ):
     pylab.figure(i+1)
     pylab.clf()
+
     pylab.subplot( 2, 1, 1 )
     f1 = 1e-6 * sord.util.ndread( so_dir + 'out/' + sta + 'a-ts1' )
     f2 = sord.util.ndread( bi_dir + sta + '-ts' )
     pylab.plot( t1, f1, 'k-', t2, f2, 'k--' )
     pylab.axis([ 1., 11., 60., 85. ])
     pylab.title( sta, position=(0.05,0.83), ha='left', va='center' )
-    pylab.ylabel( 'Shear stress (MPa)' )
     pylab.gca().set_xticklabels([])
+    pylab.ylabel( 'Shear stress (MPa)' )
+    leg = pylab.legend( [ 'SOM', 'BI' ], loc=(.78, .6) )
     pylab.draw()
+
+    pylab.subplot( 2, 1, 2 )
+    f1 = sord.util.ndread( so_dir + 'out/' + sta + 'a-sv1' )
+    f2 = sord.util.ndread( bi_dir + sta + '-sv' )
+    pylab.plot( t1, f1, 'k-', t2, f2, 'k--' )
+    pylab.ylabel( 'Slip rate (m/s)' )
+    pylab.draw()
+
     pylab.subplot( 2, 1, 2 )
     f1 = sord.util.ndread( so_dir + 'out/' + sta + 'a-su1' )
     f2 = sord.util.ndread( bi_dir + sta + '-su' )
     pylab.plot( t1, f1, 'k-', t2, f2, 'k--' )
-    pylab.ylabel( 'Slip (m)' )
-    pylab.hold( True )
-    f1 = sord.util.ndread( so_dir + 'out/' + sta + 'a-sv1' )
-    f2 = sord.util.ndread( bi_dir + sta + '-sv' )
-    pylab.plot( t1, f1, 'k-', t2, f2, 'k--' )
     pylab.axis([ 1., 11., -0.5, 3.5 ])
-    pylab.title( sta, position=(0.05,0.83), ha='left', va='center' )
-    pylab.ylabel( 'Slip rate (m/s)' )
-    pylab.xlabel( 'Time (s)' )
     pylab.gca().set_yticks([0., 1., 2., 3.])
+    lab = pylab.ylabel( 'Slip (m)' )
+    pylab.xlabel( 'Time (s)' )
+    pylab.title( sta, position=(0.05,0.83), ha='left', va='center' )
     pylab.draw()
 
 # Rupture time contour
