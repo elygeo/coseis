@@ -12,7 +12,9 @@
 #PBS -V
 
 #module load pathmpi
-module load intelmpi
+#module load intelmpi
+load intel
+load vmpi/intel
 
 cd %(rundir)r
 
