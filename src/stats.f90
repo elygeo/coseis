@@ -82,7 +82,7 @@ if ( j > 0 .and. ( modulo( it, itio ) == 0 .or. it == nt ) ) then
     call rio1( fh(3), gvstats(3,:j), 'w', 'stats/umax', m, o, mpout, verb )
     call rio1( fh(4), gvstats(4,:j), 'w', 'stats/wmax', m, o, mpout, verb )
     if ( dofault ) then
-      gfstats(8,:j) = -gfstats(8,:j)
+      gfstats(6,:j) = -gfstats(6,:j)
       call rio1( fh(5),  gfstats(1,:j), 'w', 'stats/samax',   m, o, mpout, verb )
       call rio1( fh(6),  gfstats(2,:j), 'w', 'stats/svmax',   m, o, mpout, verb )
       call rio1( fh(7),  gfstats(3,:j), 'w', 'stats/sumax',   m, o, mpout, verb )
