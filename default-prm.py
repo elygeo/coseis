@@ -116,3 +116,7 @@ svtol = 0.001			# slip velocity considered rupturing
 # [] is shorthand for the entire array, more explicitly written as [0,0,0,0],
 # or [(1,-1,1),(1,-1,1),(1,-1,1),(1,-1,1)].
 
+# Placeholders
+i1pml = None
+i2pml = None
+

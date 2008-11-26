@@ -4,12 +4,12 @@ TPV3
 """
 import math, numpy, pylab, sord
 
-so_dir = ''; bi_dir = '../../bi/'
-so_dir = 'run/500/'; bi_dir = 'bi/'
-prm = sord.util.objectify( sord.util.load( so_dir + 'parameters.py' ) )
+so_dir = './'
+bi_dir = '../../bi/'
+meta = sord.util.loadmeta( so_dir )
 
 # Time histories
-t1 = prm.dt * numpy.arange( prm.nt )
+t1 = meta.dt * numpy.arange( meta.nt )
 t2 = sord.util.ndread( bi_dir + 'time' )
 for i, sta in enumerate( [ 'P1', 'P2' ] ):
     pylab.figure(i+1)
@@ -45,12 +45,9 @@ for i, sta in enumerate( [ 'P1', 'P2' ] ):
 
 # Rupture time contour
 v = 0.5 * numpy.arange( -20, 20 )
-for f in prm.fieldio:
-    if f[7] is 'trup': break
-ii = f[6]
-n = [ ( i[1] - i[0] ) / i[2] + 1 for i in ii[:2] ]
-x1 = 0.001 * sord.util.ndread( so_dir + 'out/flt-x1',   n )
-x2 = 0.001 * sord.util.ndread( so_dir + 'out/flt-x2',   n )
+n = meta.out['flt-trup'][1]
+x1 = 0.001 * sord.util.ndread( so_dir + 'out/flt-x1', n )
+x2 = 0.001 * sord.util.ndread( so_dir + 'out/flt-x2', n )
 f = sord.util.ndread( so_dir + 'out/flt-trup', n )
 pylab.figure(3)
 pylab.clf()
@@ -69,6 +66,5 @@ pylab.axis( 'image' )
 #pylab.axis( [ -15., 15., -7.5, 7.5 ] )
 pylab.axis( [ -15., 0., -7.5, 0. ] )
 pylab.draw()
-
 pylab.show()
 
