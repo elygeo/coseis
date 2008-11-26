@@ -47,6 +47,29 @@ def save( filename, d, expandlist=[] ):
     f.close()
     return
 
+def loadmeta( dir='.' ):
+    """Load SORD metadata"""
+    import os
+    locs = load( dir + os.sep + 'locations.py' )
+    meta = load( dir + os.sep + 'parameters.py' )
+    load( dir + os.sep + 'conf.py', meta )
+    mm = meta['nn'] + ( meta['nt'], )
+    meta['out'] = {}
+    for f in meta['fieldio']:
+         if 'w' in f[0] and 'x' not in f[0] and 'X' not in f[0]:
+             ii, field, filename = f[6:9]
+             nn = [ ( i[1] - i[0] ) / i[2] + 1 for i in ii ]
+             nn = [ n for n in nn if n > 1 ]
+             meta['out'][filename] = field, nn, ii
+    for f in locs['fieldio']:
+         if 'w' in f[0]:
+             field, ii, filename = f[1:]
+             ii = indices( ii, mm )
+             nn = [ ( i[1] - i[0] ) / i[2] + 1 for i in ii ]
+             nn = [ n for n in nn if n > 1 ]
+             meta['out'][filename] = field, nn, ii
+    return objectify( meta )
+
 def indices( ii, mm ):
     """Fill in slice index notation"""
     n = len( mm )
