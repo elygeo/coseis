@@ -11,7 +11,7 @@ lfs quota -u $USER $HOME
 lfs quota -u $USER $WORK
 lfs quota -u $USER $SCRATCH
 
-.bashrc
+.profile
 module unload mvapich
 module load mvapich2
 alias showme='showq -u'

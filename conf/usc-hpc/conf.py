@@ -12,10 +12,10 @@ Run from disks located at HPC:
   /auto/scec-00
   /auto/rcf-104
 alias showme='qstat -u $USER'
+qstat -q
+pbsnodes -a | grep properties | sort | uniq -c
 qbalance -h
 showstart
-qstat
-pbsnodes -a | grep properties | sort | uniq -c
 """
 login = 'hpc-login1.usc.edu'
 hosts = [ 'hpc-login1', 'hpc-login2' ]
@@ -26,5 +26,6 @@ queue = 'main';     maxnodes = 378; maxcores = 4; maxram = 3500;  maxtime = None
 queue = 'quick';    maxnodes = 4;   maxcores = 8; maxram = 11000; maxtime = 1, 00
 queue = 'main';     maxnodes = 382; maxcores = 8; maxram = 11000; maxtime = None
 queue = 'scec';     maxnodes = 100; maxcores = 2; maxram = 1500;  maxtime = 336, 00
+queue = 'nbns';     maxnodes =  48; maxcores = 8; maxram = 11000; maxtime = 336, 00
 rate = 1.1e6
 
