@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-import numpy, sord
+import numpy, sord, os
 
-dir = 'run'
+dir = 'run/'
 np = []
 tt = []
-for i in range( 1, 8 ):
-    f = dir + '/%02d/parameters.py' % i
+for d in os.listdir( dir ):
+    f = dir + d + '/parameters.py'
     p = sord.util.load( f )
-    np += [ numpy.product( p['np'] ) ]
-    f = dir + '/%02d/prof/step' % i
+    np += [ numpy.product( p['np3'] ) ]
+    f = dir + d + '/prof/8step'
     t = numpy.fromfile( f, numpy.float32 )
-    tt += [ numpy.sum( t[1:7] ) / 6 ]
+    tt += [ numpy.sum( t[1:15] ) / 6 ]
 
 pp = [ numpy.log2(p) for p in np ]
 tt = [ t / tt[0] for t in tt ]
