@@ -32,7 +32,7 @@ vrup = -1.
 faultnormal = 3	
 hourglass = 1., 2.
 
-mpout = 0; debug = 1 # XXXXXXXXXXXXXX
+mpout = 0
 
 for _i in range( 0, len( _run ), 2 ):
     np3 = _run[_i+1]
