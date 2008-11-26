@@ -1,6 +1,5 @@
 ! Fortran real binary I/O
 module m_frio
-integer, parameter :: frio_file_null = -1
 contains
 
 subroutine frio2( fh, f, mode, filename, m, o, verb )
@@ -11,9 +10,10 @@ character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(in) :: m, o
 logical, intent(in) :: verb
+integer, parameter :: file_null = -1
 integer, save :: filehandle = 10
 integer :: i, n
-if ( fh == frio_file_null ) then
+if ( fh == file_null ) then
   filehandle = filehandle + 1
   fh = filehandle
   if ( verb ) write( 0, * ) 'Opening file: ', trim( filename )
@@ -26,6 +26,7 @@ if ( fh == frio_file_null ) then
     status='new' )
   end if
 end if
+if ( verb ) write( 0, * ) 'Writing file: ', trim( filename )
 n = size( f, 2 )
 if ( mode == 'r' ) then
   do i = 1, n
@@ -39,7 +40,7 @@ end if
 if ( o+n == m ) then
   close( fh )
   if ( fh == filehandle ) filehandle = filehandle - 1
-  fh = frio_file_null
+  fh = file_null
 end if
 end subroutine
 

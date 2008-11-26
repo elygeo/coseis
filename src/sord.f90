@@ -23,7 +23,8 @@ implicit none
 integer :: jp = 0, fh(9)
 real :: prof0(14) = 0.
 real, allocatable :: prof(:,:)
-fh = file_null
+fh = -1
+if ( mpout /= 0 ) fh = file_null
 
 ! Initialization
 iotimer = 0.

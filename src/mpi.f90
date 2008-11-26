@@ -327,6 +327,7 @@ integer :: i, e
 integer(kind=mpi_offset_kind) :: offset
 i = size( oo )
 if ( mpio == 0 ) then
+  if ( any( nn <= 0 ) ) return
   call frio2( fh, f, mode, filename, mm(i), oo(i), verb )
   return
 end if

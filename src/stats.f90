@@ -38,7 +38,8 @@ if ( init ) then
   gvstats = 0.
   gfstats = 0.
   gestats = 0.
-  fh = file_null
+  fh = -1
+  if ( mpout /= 0 ) fh = file_null
 end if
 
 ! Buffer stats
