@@ -67,5 +67,6 @@ pylab.axis( [ 1.5, 8.5, -1., 1. ] )
 pylab.title( 'Vertical',   position=(.98,.83), ha='right', va='center' )
 pylab.xlabel( 'Time (/s)' )
 pylab.draw()
-#pylab.show()
 pylab.savefig( 'loh.pdf', format='pdf' )
+pylab.show()
+

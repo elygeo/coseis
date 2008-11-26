@@ -41,7 +41,7 @@ def get( rsh, rdir, rfile ):
     """
     for f in rfile:
         src = rdir + '/' + f.rstrip('/')
-        rsync = 'rsync -avP --delete -e %r %r .' % ( rsh, src )
+        rsync = 'rsync -av --delete -e %r %r .' % ( rsh, src )
         print rsync
         os.system( rsync )
     return
