@@ -27,12 +27,12 @@ _run = [
     15.,  (1, 16, 16),
     10.,  (4, 16, 16),
 ]
-_run = [ 500., (1, 1, 2), ]
+_run = [ 500., (1, 4, 4), ]
 vrup = -1.
 faultnormal = 3	
 hourglass = 1., 2.
 
-mpout = 0
+mpout = 0 # XXX
 
 for _i in range( 0, len( _run ), 2 ):
     np3 = _run[_i+1]
