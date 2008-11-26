@@ -13,8 +13,8 @@
 
 #module load pathmpi
 #module load intelmpi
-load intel
-load vmpi/intel
+module load intel
+module load vmpi/intel
 
 cd %(rundir)r
 

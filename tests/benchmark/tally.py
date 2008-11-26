@@ -32,9 +32,9 @@ if normalize:
     pylab.ylabel( 'Normalized run time' )
     pylab.axis([-1, n, 0, 4])
 else:
-    pylab.ylabel( 'Time per step (s)' )
+    pylab.ylabel( 'Time/step (s)' )
     pylab.axis([-1, n, 0, 2*int(numpy.average(tt)+0.5) ])
 pylab.draw()
 pylab.savefig( 'bench.pdf', format='pdf' )
-pylab.show()
+#pylab.show()
 
