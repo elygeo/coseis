@@ -5,6 +5,8 @@ TPV3 convergence test
 import glob, sord, numpy, pylab, scipy.interpolate
 ndread = sord.util.ndread
 interp2d = scipy.interpolate.RectBivariateSpline
+#from matplotlib import rc
+#rc('text', usetex=True)
 
 dirs = glob.glob( '[0-9]*' )
 
@@ -50,7 +52,8 @@ pylab.loglog( dx, ttres, 'ko-', dx, sures, 'ks-', dx, svres, 'k^-' )
 del( dx[8], dx[2] )
 pylab.gca().set_xticks( dx )
 pylab.gca().set_xticklabels( dx )
-pylab.xlabel( 'Grid interval \nabla x (m)' )
+#pylab.xlabel( r'Grid interval $\Delta x$ (m)' )
+pylab.xlabel( 'Grid interval (m)' )
 pylab.ylabel( 'RMS difference' )
 pylab.legend( [ 'Rupture time', 'Slip', 'Peak slip rate' ], loc='upper left' )
 pylab.draw()
