@@ -43,7 +43,9 @@ if ( verb ) write( 0, * ) 'Field I/O locations'
 ! Store locations
 if ( master ) then
   open( 1, file='locations.py', status='replace' )
-  write( 1, '(a)' ) 'fieldio = ['
+  open( 2, file='out.py', status='replace' )
+  write( 1, '(a)' ) 'locations = ['
+  write( 2, '(a)' ) 'out = {'
 end if
 
 ! Loop over output zones
@@ -77,14 +79,27 @@ if ( i > 0 ) then
     call pdelete
     cycle loop
   end if
-  if ( master ) write( 1, '( "    ( ", 2("''",a,"'', "), "[",i8,2(",",i8),",0], ''",a,"'' )," )' )&
-    trim( p%mode ), trim( p%field ), i1, trim( p%filename )
+  if ( master ) write( 1, '( "[", 3(i8, ", "), "(", i8, 2(", ", i8), ")]," )' ) &
+    i1, p%ii(:,4)
+end if
+i = scan( p%mode, 'w' )
+if ( master .and. i > 0 ) then
+  write( 2, '( "''", a, "'': {" )' ) trim( p%filename )
+  write( 2, '( "  ''field'': ''", a, "''," )' ) trim( p%field )
+  write( 2, '( "  ''shape'': [", i8, 3(", ", i8), "]," )' ) &
+    ( p%ii(2,:) - p%ii(1,:) ) / p%ii(3,:) + 1
+  write( 2, '( "  ''indices'': [", 4("(", i8, 2(", ", i8), "), "), "]," )' ) &
+    p%ii
+  write( 2, '(a)' ) '},'
 end if
 
 end do loop
+
 if ( master ) then
   write( 1, '(a)' ) ']'
-  if ( master ) close( 1 )
+  write( 2, '(a)' ) '}'
+  close( 1 )
+  close( 2 )
 end if
 
 end subroutine

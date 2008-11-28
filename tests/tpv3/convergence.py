@@ -11,7 +11,7 @@ dirs = glob.glob( '[0-9]*' )[3:]
 dirs = glob.glob( '[0-9]*' )
 
 meta = sord.util.loadmeta( dirs[0] )
-n   = meta.out['flt-trup'][1]
+n   = meta.out['flt-trup']['shape']
 x0  = ndread( dirs[0] + '/out/flt-x1', n, [0,1] )
 y0  = ndread( dirs[0] + '/out/flt-x2', n, [1,0] )
 tt0 = ndread( dirs[0] + '/out/flt-trup', n ); tt_ = numpy.average( tt0 )
@@ -27,7 +27,7 @@ svres = []
 for d in dirs[1:]:
     meta = sord.util.loadmeta( d )
     dx += [ int( meta.dx +0.5 ) ]
-    n = meta.out['flt-trup'][1]
+    n = meta.out['flt-trup']['shape']
     x = ndread( d + '/out/flt-x1', n, [0,1] )
     y = ndread( d + '/out/flt-x2', n, [1,0] )
 

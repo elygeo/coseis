@@ -45,7 +45,7 @@ for i, sta in enumerate( [ 'P1', 'P2' ] ):
 
 # Rupture time contour
 v = 0.5 * numpy.arange( -20, 20 )
-n = meta.out['flt-trup'][1]
+n = meta.out['flt-trup']['shape']
 x1 = 0.001 * sord.util.ndread( so_dir + 'out/flt-x1', n )
 x2 = 0.001 * sord.util.ndread( so_dir + 'out/flt-x2', n )
 f = sord.util.ndread( so_dir + 'out/flt-trup', n )
