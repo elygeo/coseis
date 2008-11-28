@@ -53,7 +53,7 @@ def loadmeta( dir='.' ):
     meta = load( dir + os.sep + 'parameters.py' )
     load( dir + os.sep + 'conf.py', meta )
     try:
-        load( dir + os.sep + 'out.py', meta )
+        load( dir + os.sep + 'out' + os.sep + 'header.py', meta )
     except:
         meta['out'] = dict()
         locs = load( dir + os.sep + 'locations.py' )

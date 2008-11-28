@@ -43,7 +43,7 @@ if ( verb ) write( 0, * ) 'Field I/O locations'
 ! Store locations
 if ( master ) then
   open( 1, file='locations.py', status='replace' )
-  open( 2, file='out.py', status='replace' )
+  open( 2, file='out/header.py', status='replace' )
   write( 1, '(a)' ) 'locations = ['
   write( 2, '(a)' ) 'out = {'
 end if
@@ -79,8 +79,9 @@ if ( i > 0 ) then
     call pdelete
     cycle loop
   end if
-  if ( master ) write( 1, '( "[", 3(i8, ", "), "(", i8, 2(", ", i8), ")]," )' ) &
-    i1, p%ii(:,4)
+  if ( master ) then
+    write( 1,'( "[", 3(i8, ", "), "(", i8, 2(", ", i8), ")]," )' ) i1, p%ii(:,4)
+  end if
 end if
 i = scan( p%mode, 'w' )
 if ( master .and. i > 0 ) then
