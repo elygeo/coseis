@@ -38,7 +38,6 @@ for _i in range( 0, len( _run ), 2 ):
     dx = _run[_i]
     dt = dx / 12500.
     nt = int( 12. / dt + 1.5 )
-    nt = 0 # XXX
     nn = ( 
         int( 16500. / dx + 21.5 ),
         int(  9000. / dx + 21.5 ),

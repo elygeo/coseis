@@ -80,7 +80,7 @@ if ( i > 0 ) then
     cycle loop
   end if
   if ( master ) then
-    write( 1,'( "[", 3(i8, ", "), "(", i8, 2(", ", i8), ")]," )' ) i1, p%ii(:,4)
+    write(1, '( "[", 3(i8, ", "), "(", i8, 2(", ", i8), ")]," )') i1, p%ii(:,4)
   end if
 end if
 i = scan( p%mode, 'w' )
@@ -89,7 +89,7 @@ if ( master .and. i > 0 ) then
   write( 2, '( "  ''field'': ''", a, "''," )' ) trim( p%field )
   write( 2, '( "  ''shape'': [", i8, 3(", ", i8), "]," )' ) &
     ( p%ii(2,:) - p%ii(1,:) ) / p%ii(3,:) + 1
-  write( 2, '( "  ''indices'': [", 4("(", i8, 2(", ", i8), "), "), "]," )' ) &
+  write( 2, '( "  ''indices'': [ ", 4("(", i8, 2(", ", i8), "), "), "]," )' ) &
     p%ii
   write( 2, '(a)' ) '},'
 end if
