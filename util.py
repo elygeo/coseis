@@ -36,7 +36,7 @@ def save( filename, d, expandlist=[] ):
     """Write variables from a dict into a Python source file"""
     import sys
     f = open( filename, 'w' )
-    for k in sorted( d.keys() ):
+    for k in sorted( d ):
         if k[0] is not '_' and type(d[k]) is not type(sys) and k not in expandlist:
             f.write( '%s = %r\n' % ( k, d[k] ) )
     for k in expandlist:
@@ -49,28 +49,35 @@ def save( filename, d, expandlist=[] ):
 
 def loadmeta( dir='.' ):
     """Load SORD metadata"""
-    import os
+    import os, pprint
     meta = load( dir + os.sep + 'parameters.py' )
     load( dir + os.sep + 'conf.py', meta )
     try:
         load( dir + os.sep + 'out' + os.sep + 'header.py', meta )
+        out = meta['indices']
     except:
-        meta['out'] = dict()
+        out = dict()
         locs = load( dir + os.sep + 'locations.py' )
         mm = meta['nn'] + ( meta['nt'], )
         for f in meta['fieldio']:
              if 'w' in f[0] and 'x' not in f[0] and 'X' not in f[0]:
                  ii, field, filename = f[6:9]
-                 nn = [ ( i[1] - i[0] ) / i[2] + 1 for i in ii ]
-                 nn = [ n for n in nn if n > 1 ]
-                 meta['out'][filename] = dict( field=field, shape=nn, indices=ii )
+                 out[filename] = ii
         for f in locs['fieldio']:
              if 'w' in f[0]:
                  field, ii, filename = f[1:]
                  ii = indices( ii, mm )
-                 nn = [ ( i[1] - i[0] ) / i[2] + 1 for i in ii ]
-                 nn = [ n for n in nn if n > 1 ]
-                 meta['out'][filename] = dict( field=field, shape=nn, indices=ii )
+                 out[filename] = ii
+        meta['indices'] = out
+    f = open( dir + os.sep + 'out' + os.sep + 'header.py', 'w' )
+    f.write( 'indices = ' + pprint.pformat( out ) )
+    f.close()
+    shape = dict()
+    for k in out:
+        nn = [ ( i[1] - i[0] ) / i[2] + 1 for i in out[k] ]
+        nn = [ n for n in nn if n > 1 ]
+        shape[k] = nn
+    meta['shape'] = nn
     return objectify( meta )
 
 def indices( ii, mm ):

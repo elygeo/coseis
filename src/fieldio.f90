@@ -45,7 +45,7 @@ if ( master ) then
   open( 1, file='locations.py', status='replace' )
   open( 2, file='out/header.py', status='replace' )
   write( 1, '(a)' ) 'locations = ['
-  write( 2, '(a)' ) 'out = {'
+  write( 2, '(a)' ) 'indices = {'
 end if
 
 ! Loop over output zones
@@ -80,18 +80,14 @@ if ( i > 0 ) then
     cycle loop
   end if
   if ( master ) then
-    write(1, '( "[", 3(i8, ", "), "(", i8, 2(", ", i8), ")]," )') i1, p%ii(:,4)
+    write( 1, '( "  [", 3(i8, ", "), "(", i8, 2(", ", i8), ")]," )' ) &
+      i1, p%ii(:,4)
   end if
 end if
 i = scan( p%mode, 'w' )
 if ( master .and. i > 0 ) then
-  write( 2, '( "''", a, "'': {" )' ) trim( p%filename )
-  write( 2, '( "  ''field'': ''", a, "''," )' ) trim( p%field )
-  write( 2, '( "  ''shape'': [", i8, 3(", ", i8), "]," )' ) &
-    ( p%ii(2,:) - p%ii(1,:) ) / p%ii(3,:) + 1
-  write( 2, '( "  ''indices'': [ ", 4("(", i8, 2(", ", i8), "), "), "]," )' ) &
-    p%ii
-  write( 2, '(a)' ) '},'
+  write( 2, '( "  ''", a, "'': [ ", 4("(", i8, 2(", ", i8), "), "), "]," )' ) &
+    trim( p%filename ), p%ii
 end if
 
 end do loop
