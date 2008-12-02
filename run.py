@@ -42,7 +42,7 @@ def run( inputs ):
         'm', 'mpi',
         'i', 'interactive',
         'q', 'queue',
-        '',  'debug',
+        'd', 'debug',
         'g', 'debugging',
         't', 'testing',
         'p', 'profiling',

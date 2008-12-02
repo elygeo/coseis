@@ -23,8 +23,6 @@ implicit none
 integer :: jp = 0, fh(9)
 real :: prof0(14) = 0.
 real, allocatable :: prof(:,:)
-fh = -1
-if ( mpout /= 0 ) fh = file_null
 
 ! Initialization
 iotimer = 0.
@@ -43,10 +41,13 @@ call pml                        ; if (sync) call barrier
 call rupture_init               ; if (sync) call barrier ; prof0(10) = timer(6)
 call resample                   ; if (sync) call barrier ; prof0(11) = timer(6)
 call read_checkpoint            ; if (sync) call barrier ; prof0(12) = timer(6)
+fh = -1
+if ( mpout /= 0 ) fh = file_null
 allocate( prof(8,itio) )
 prof0(13) = iotimer
 prof0(14) = timer(7)
 if ( master ) call rio1( fh(9), prof0, 'w', 'prof/main', 16, 0, mpout, verb )
+prof0(14) = timer(7)
 
 ! Main loop
 if ( master ) write( 0, * ) 'Main loop:', nt, ' steps'
