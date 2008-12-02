@@ -3,6 +3,57 @@ module m_util
 implicit none
 contains
 
+! In-place linear interpolation 
+subroutine interpolate( f, i3, i4, di )
+real, intent(inout) :: f(:,:,:)
+integer, intent(in) :: i3(3), i4(3), di(3)
+integer :: i1(3), i2(3), n(3), i, j, k, l, d
+real :: h1, h2
+if ( all( di <= 1 ) ) return
+n = (/ size(f,1), size(f,2), size(f,3) /)
+i1 = i3
+i2 = i4
+where( i1 < 1 ) i1 = i1 + ( -i1 / di + 1 ) * di
+where( i2 > n ) i2 = i1 + ( n - i1 ) / di * di
+d = di(1)
+do i = 1, d - 1
+  h1 = 1. / d * i
+  h2 = 1. / d * ( d - i )
+  do l = i1(3), i2(3), di(3)
+  do k = i1(2), i2(2), di(2)
+  do j = i1(1), i2(1) - d, d
+    f(j+i,k,l) = h1 * f(j,k,l) + h2 * f(j+d,k,l)
+  end do
+  end do
+  end do
+end do
+d = di(2)
+do i = 1, d - 1
+  h1 = 1. / d * i
+  h2 = 1. / d * ( d - i )
+  do l = i1(3), i2(3), di(1)
+  do k = i1(2), i2(2) - d, d
+  do j = i1(1), i2(1)
+    f(j,k+i,l) = h1 * f(j,k,l) + h2 * f(j,k+d,l)
+  end do
+  end do
+  end do
+end do
+d = di(3)
+do i = 1, d - 1
+  h1 = 1. / d * i
+  h2 = 1. / d * ( d - i )
+  do l = i1(3), i2(3) - d, d
+  do k = i1(2), i2(2)
+  do j = i1(1), i2(1)
+    f(j,k,l+i) = h1 * f(j,k,l) + h2 * f(j,k,l+d)
+  end do
+  end do
+  end do
+end do
+end subroutine
+
+! Array reciprocal
 subroutine invert( f )
 real, intent(inout) :: f(:,:,:)
 integer :: n(3), j, k, l
@@ -16,50 +67,7 @@ end do
 end do
 end subroutine
 
-subroutine scalar_average( f2, f1, i1, i2, d )
-real, intent(out) :: f2(:,:,:)
-real, intent(in) :: f1(:,:,:)
-integer, intent(in) :: i1(3), i2(3), d
-integer :: n(3), j, k, l
-n = (/ size(f1,1), size(f1,2), size(f1,3) /)
-if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in scalar_average'
-do l = i1(3), i2(3)
-do k = i1(2), i2(2)
-do j = i1(1), i2(1)
-  f2(j,k,l) = 0.125 * &
-  ( f1(j,k,l) + f1(j+d,k+d,l+d) &
-  + f1(j,k+d,l+d) + f1(j+d,k,l) &
-  + f1(j+d,k,l+d) + f1(j,k+d,l) &
-  + f1(j+d,k+d,l) + f1(j,k,l+d) )
-end do
-end do
-end do
-call scalar_set_halo( f2, 0., i1, i2 )
-end subroutine
-
-subroutine vector_average( f2, f1, i1, i2, d )
-real, intent(out) :: f2(:,:,:,:)
-real, intent(in) :: f1(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3), d
-integer :: n(3), i, j, k, l
-n = (/ size(f1,1), size(f1,2), size(f1,3) /)
-if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vector_average'
-do i = 1, 3
-do l = i1(3), i2(3)
-do k = i1(2), i2(2)
-do j = i1(1), i2(1)
-  f2(j,k,l,i) = 0.125 * &
-  ( f1(j,k,l,i) + f1(j+d,k+d,l+d,i) &
-  + f1(j,k+d,l+d,i) + f1(j+d,k,l,i) &
-  + f1(j+d,k,l+d,i) + f1(j,k+d,l,i) &
-  + f1(j+d,k+d,l,i) + f1(j,k,l+d,i) )
-end do
-end do
-end do
-end do
-call vector_set_halo( f2, 0., i1, i2 )
-end subroutine
-
+! Distance to x0
 subroutine radius( r, x, x0, i1, i2 )
 real, intent(out) :: r(:,:,:)
 real, intent(in) :: x(:,:,:,:), x0(3)
@@ -79,48 +87,30 @@ end do
 end do
 end subroutine
 
-subroutine vector_norm( s, f, i1, i2, di )
-real, intent(out) :: s(:,:,:)
-real, intent(in) :: f(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3), di(3)
+! Average of local eight values
+subroutine average( f2, f1, i1, i2, d )
+real, intent(out) :: f2(:,:,:)
+real, intent(in) :: f1(:,:,:)
+integer, intent(in) :: i1(3), i2(3), d
 integer :: n(3), j, k, l
-n = (/ size(s,1), size(s,2), size(s,3) /)
-if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vector_norm'
-do l = i1(3), i2(3), di(3)
-do k = i1(2), i2(2), di(2)
-do j = i1(1), i2(1), di(1)
-  s(j,k,l) = &
-  f(j,k,l,1) * f(j,k,l,1) + &
-  f(j,k,l,2) * f(j,k,l,2) + &
-  f(j,k,l,3) * f(j,k,l,3)
+n = (/ size(f1,1), size(f1,2), size(f1,3) /)
+if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in average'
+do l = i1(3), i2(3)
+do k = i1(2), i2(2)
+do j = i1(1), i2(1)
+  f2(j,k,l) = 0.125 * &
+  ( f1(j,k,l) + f1(j+d,k+d,l+d) &
+  + f1(j,k+d,l+d) + f1(j+d,k,l) &
+  + f1(j+d,k,l+d) + f1(j,k+d,l) &
+  + f1(j+d,k+d,l) + f1(j,k,l+d) )
 end do
 end do
 end do
+call set_halo( f2, 0., i1, i2 )
 end subroutine
 
-subroutine tensor_norm( s, f1, f2, i1, i2, di )
-real, intent(out) :: s(:,:,:)
-real, intent(in) :: f1(:,:,:,:), f2(:,:,:,:)
-integer, intent(in) :: i1(3), i2(3), di(3)
-integer :: n(3), j, k, l
-n = (/ size(s,1), size(s,2), size(s,3) /)
-if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in tensor_norm'
-do l = i1(3), i2(3), di(3)
-do k = i1(2), i2(2), di(2)
-do j = i1(1), i2(1), di(1)
-  s(j,k,l) = &
-  f1(j,k,l,1) * f1(j,k,l,1) + &
-  f1(j,k,l,2) * f1(j,k,l,2) + &
-  f1(j,k,l,3) * f1(j,k,l,3) + &
-  ( f2(j,k,l,1) * f2(j,k,l,1) &
-  + f2(j,k,l,2) * f2(j,k,l,2) &
-  + f2(j,k,l,3) * f2(j,k,l,3) ) * 2.
-end do
-end do
-end do
-end subroutine
-
-subroutine scalar_set_halo( f, r, i1, i2 )
+! Set array to real value outside specified region
+subroutine set_halo( f, r, i1, i2 )
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
 integer, intent(in) :: i1(3), i2(3)
@@ -136,20 +126,47 @@ if ( n(2) > 1 ) f(:,i4(2)+1:,:) = r
 if ( n(3) > 1 ) f(:,:,i4(3)+1:) = r
 end subroutine
 
-subroutine vector_set_halo( f, r, i1, i2 )
-real, intent(inout) :: f(:,:,:,:)
-real, intent(in) :: r
-integer, intent(in) :: i1(3), i2(3)
-integer :: n(3), i3(3), i4(3)
+! L2 vector norm
+subroutine vector_norm( f, w, i1, i2, di )
+real, intent(out) :: f(:,:,:)
+real, intent(in) :: w(:,:,:,:)
+integer, intent(in) :: i1(3), i2(3), di(3)
+integer :: n(3), j, k, l
 n = (/ size(f,1), size(f,2), size(f,3) /)
-i3 = min( i1, n + 1 )
-i4 = max( i2, 0 )
-if ( n(1) > 1 ) f(:i3(1)-1,:,:,:) = r
-if ( n(2) > 1 ) f(:,:i3(2)-1,:,:) = r
-if ( n(3) > 1 ) f(:,:,:i3(3)-1,:) = r
-if ( n(1) > 1 ) f(i4(1)+1:,:,:,:) = r
-if ( n(2) > 1 ) f(:,i4(2)+1:,:,:) = r
-if ( n(3) > 1 ) f(:,:,i4(3)+1:,:) = r
+if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vector_norm'
+do l = i1(3), i2(3), di(3)
+do k = i1(2), i2(2), di(2)
+do j = i1(1), i2(1), di(1)
+  f(j,k,l) = &
+  w(j,k,l,1) * w(j,k,l,1) + &
+  w(j,k,l,2) * w(j,k,l,2) + &
+  w(j,k,l,3) * w(j,k,l,3)
+end do
+end do
+end do
+end subroutine
+
+! Frobenius tensor norm - much faster than L2 norm for tensors
+subroutine tensor_norm( f, w1, w2, i1, i2, di )
+real, intent(out) :: f(:,:,:)
+real, intent(in) :: w1(:,:,:,:), w2(:,:,:,:)
+integer, intent(in) :: i1(3), i2(3), di(3)
+integer :: n(3), j, k, l
+n = (/ size(f,1), size(f,2), size(f,3) /)
+if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in tensor_norm'
+do l = i1(3), i2(3), di(3)
+do k = i1(2), i2(2), di(2)
+do j = i1(1), i2(1), di(1)
+  f(j,k,l) = &
+  w1(j,k,l,1) * w1(j,k,l,1) + &
+  w1(j,k,l,2) * w1(j,k,l,2) + &
+  w1(j,k,l,3) * w1(j,k,l,3) + &
+  ( w2(j,k,l,1) * w2(j,k,l,1) &
+  + w2(j,k,l,2) * w2(j,k,l,2) &
+  + w2(j,k,l,3) * w2(j,k,l,3) ) * 2.
+end do
+end do
+end do
 end subroutine
 
 ! Time function

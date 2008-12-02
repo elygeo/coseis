@@ -18,7 +18,7 @@ if ( verb ) write( 0, * ) 'Stress'
 do i = 1, 3
   w1(:,:,:,i) = uu(:,:,:,i) + gam * vv(:,:,:,i)
 end do
-call scalar_set_halo( s1, 0., i1cell, i2cell )
+call set_halo( s1, 0., i1cell, i2cell )
 
 ! Loop over component and derivative direction
 doic: do ic  = 1, 3
@@ -180,7 +180,7 @@ call fieldio( '<>', 'w31', w2(:,:,:,2) )
 call fieldio( '<>', 'w12', w2(:,:,:,3) )
 if ( modulo( it, itstats ) == 0 ) then
   call tensor_norm( s1, w1, w2, i1core, i2core, (/ 1, 1, 1 /) )
-  call scalar_set_halo( s1, -1., i1core, i2core )
+  call set_halo( s1, -1., i1core, i2core )
   wmax = maxval( s1 )
 end if
 call fieldio( '>', 'wm2', s1  )

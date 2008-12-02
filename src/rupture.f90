@@ -58,7 +58,7 @@ if ( rr > 0. ) write( 0, * ) 'warning: positive normal traction: ', rr, i1
 ! Lock fault in PML region
 i1 = i1pml + 1
 i2 = i2pml - 1
-call scalar_set_halo( co, 1e20, i1, i2 )
+call set_halo( co, 1e20, i1, i2 )
 
 ! Normal vectors
 i1 = i1core
@@ -294,26 +294,26 @@ call fieldio( '>', 'ts3', t3(:,:,:,2) )
 call fieldio( '>', 'tsm', ts          )
 call fieldio( '>', 'tnm', tn          )
 call fieldio( '>', 'fr',  f1          )
-call scalar_set_halo( ts,       -1., i1core, i2core ); tsmax = maxval( ts ) 
-call scalar_set_halo( tn,  huge(dt), i1core, i2core ); tnmin = minval( tn )
-call scalar_set_halo( tn, -huge(dt), i1core, i2core ); tnmax = maxval( tn )
-call scalar_set_halo( tn,        0., i1core, i2core )
+call set_halo( ts,       -1., i1core, i2core ); tsmax = maxval( ts ) 
+call set_halo( tn,  huge(dt), i1core, i2core ); tnmin = minval( tn )
+call set_halo( tn, -huge(dt), i1core, i2core ); tnmax = maxval( tn )
+call set_halo( tn,        0., i1core, i2core )
 
 ! Friction + fracture energy
 t2 = vv(j3:j4,k3:k4,l3:l4,:) - vv(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( t1 * t2, 4 ) * area
-call scalar_set_halo( f2, 0., i1core, i2core )
+call set_halo( f2, 0., i1core, i2core )
 efric = efric + dt * sum( f2 )
 
 ! Strain energy
 t2 = uu(j3:j4,k3:k4,l3:l4,:) - uu(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( ( t0 + t1 ) * t2, 4 ) * area
-call scalar_set_halo( f2, 0., i1core, i2core )
+call set_halo( f2, 0., i1core, i2core )
 estrain = .5 * sum( f2 )
 
 ! Moment
 f2 = muf * area * sqrt( sum( t2 * t2, 4 ) )
-call scalar_set_halo( f2, 0., i1core, i2core )
+call set_halo( f2, 0., i1core, i2core )
 moment = sum( f2 )
 
 ! Slip acceleration
@@ -323,7 +323,7 @@ call fieldio( '>', 'sa1', t2(:,:,:,1) )
 call fieldio( '>', 'sa2', t2(:,:,:,2) )
 call fieldio( '>', 'sa3', t2(:,:,:,3) )
 call fieldio( '>', 'sam', f2          )
-call scalar_set_halo( f2, -1., i1core, i2core )
+call set_halo( f2, -1., i1core, i2core )
 samax = maxval( f2 )
 
 end subroutine

@@ -255,20 +255,14 @@ def prepare_prm( prm, itbuff ):
         try:
             if len(line) is 10:
                 tfunc, period, x1, x2, nb, ii, field, filename, val   = line[1:]
-            elif mode == '':    field, ii, val                        = line[1:]
-            elif mode == 's':   field, ii, val                        = line[1:]
-            elif mode == 'x':   field, ii, val, x1                    = line[1:]
-            elif mode == 'sx':  field, ii, val, x1                    = line[1:]
-            elif mode == 'c':   field, ii, val, x1, x2                = line[1:]
-            elif mode == 'f':   field, ii, val, tfunc, period         = line[1:]
-            elif mode == 'fs':  field, ii, val, tfunc, period         = line[1:]
-            elif mode == 'fx':  field, ii, val, tfunc, period, x1     = line[1:]
-            elif mode == 'fsx': field, ii, val, tfunc, period, x1     = line[1:]
-            elif mode == 'fc':  field, ii, val, tfunc, period, x1, x2 = line[1:]
-            elif mode == 'r':   field, ii, filename                   = line[1:]
-            elif mode == 'w':   field, ii, filename                   = line[1:]
-            elif mode == 'rx':  field, ii, filename, x1               = line[1:]
-            elif mode == 'wx':  field, ii, filename, x1               = line[1:]
+            elif mode in [ '', 's']:        field, ii, val                        = line[1:]
+            elif mode in [ 'x', 'sx']:      field, ii, val, x1                    = line[1:]
+            elif mode in [ 'c' ]:           field, ii, val, x1, x2                = line[1:]
+            elif mode in [ 'f', 'fs' ]:     field, ii, val, tfunc, period         = line[1:]
+            elif mode in [ 'fx', 'fsx' ]:   field, ii, val, tfunc, period, x1     = line[1:]
+            elif mode in [ 'fc' ]:          field, ii, val, tfunc, period, x1, x2 = line[1:]
+            elif mode in [ 'r', 'R', 'w' ]: field, ii, filename                   = line[1:]
+            elif mode in [ 'rx', 'wx' ]:    field, ii, filename, x1               = line[1:]
             else: sys.exit( 'Error: bad i/o mode: %r' % line )
         except:
             sys.exit( 'Error: bad i/o spec: %r' % line )
@@ -279,7 +273,7 @@ def prepare_prm( prm, itbuff ):
             sys.exit( 'Error: field only for ruptures: %r' % line )
         if 'w' not in mode and field not in fieldnames.input:
             sys.exit( 'Error: field is ouput only: %r' % line )
-        if 'r' in mode:
+        if 'r' in mode or 'R' in mode:
             fn = os.path.dirname( filename ) + os.sep + 'endian'
             if open( fn, 'r' ).read()[0] != sys.byteorder[0]:
                 sys.exit( 'Error: wrong byte order for ' + filename )

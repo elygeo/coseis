@@ -15,15 +15,17 @@ if ( master ) write( 0, * ) 'Material model'
 
 ! Init
 mr = 0.
-s1 = 0.
-s2 = 0.
+lam = 0.
+mu = 0.
 gam = 0.
 
 ! Inputs
 call fieldio( '<', 'rho', mr  )
-call fieldio( '<', 'vp',  s1  )
-call fieldio( '<', 'vs',  s2  )
+call fieldio( '<', 'vp',  lam  )
+call fieldio( '<', 'vs',  mu  )
 call fieldio( '<', 'gam', gam )
+s1 = lam
+s2 = mu
 
 ! Test for endian problems
 if ( any( mr  /= mr  ) .or. maxval( mr  ) > huge( r ) ) stop 'NaN/Inf in rho'
@@ -54,10 +56,10 @@ if ( gam2 > 0. ) gam = min( gam, gam2 )
 stats = 0.
 i1 = max( i1core, i1bc )
 i2 = min( i2core, i2bc - 1 )
-call scalar_set_halo( mr,  0., i1, i2 )
-call scalar_set_halo( s1,  0., i1, i2 )
-call scalar_set_halo( s2,  0., i1, i2 )
-call scalar_set_halo( gam, 0., i1, i2 )
+call set_halo( mr,  0., i1, i2 )
+call set_halo( s1,  0., i1, i2 )
+call set_halo( s2,  0., i1, i2 )
+call set_halo( gam, 0., i1, i2 )
 stats(1) = sum( mr  )
 stats(2) = sum( s1  )
 stats(3) = sum( s2  )
@@ -75,18 +77,18 @@ call scalar_swap_halo( s2,  nhalo )
 call scalar_swap_halo( gam, nhalo )
 
 ! Extrema
-call scalar_set_halo( mr,  huge(r), i1cell, i2cell )
-call scalar_set_halo( s1,  huge(r), i1cell, i2cell )
-call scalar_set_halo( s2,  huge(r), i1cell, i2cell )
-call scalar_set_halo( gam, huge(r), i1cell, i2cell )
+call set_halo( mr,  huge(r), i1cell, i2cell )
+call set_halo( s1,  huge(r), i1cell, i2cell )
+call set_halo( s2,  huge(r), i1cell, i2cell )
+call set_halo( gam, huge(r), i1cell, i2cell )
 stats(1) = -minval( mr  )
 stats(2) = -minval( s1  )
 stats(3) = -minval( s2  )
 stats(4) = -minval( gam )
-call scalar_set_halo( mr,  0., i1cell, i2cell )
-call scalar_set_halo( s1,  0., i1cell, i2cell )
-call scalar_set_halo( s2,  0., i1cell, i2cell )
-call scalar_set_halo( gam, 0., i1cell, i2cell )
+call set_halo( mr,  0., i1cell, i2cell )
+call set_halo( s1,  0., i1cell, i2cell )
+call set_halo( s2,  0., i1cell, i2cell )
+call set_halo( gam, 0., i1cell, i2cell )
 stats(5) = maxval( mr  )
 stats(6) = maxval( s1  )
 stats(7) = maxval( s2  )

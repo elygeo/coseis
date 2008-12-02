@@ -47,10 +47,14 @@ if ( gridnoise > 0. ) then
   w2 = dx * gridnoise * ( w2 - .5 )
   i1 = i1pml + 1
   i2 = i2pml - 1
-  call vector_set_halo( w2, 0., i1, i2 )
+  call set_halo( w2(:,:,:,1), 0., i1, i2 )
+  call set_halo( w2(:,:,:,2), 0., i1, i2 )
+  call set_halo( w2(:,:,:,3), 0., i1, i2 )
   i1 = i1bc + 1
   i2 = i2bc - 1
-  call vector_set_halo( w2, 0., i1, i2 )
+  call set_halo( w2(:,:,:,1), 0., i1, i2 )
+  call set_halo( w2(:,:,:,2), 0., i1, i2 )
+  call set_halo( w2(:,:,:,3), 0., i1, i2 )
   i1 = max( i1core, ihypo )
   i2 = min( i2core, ihypo + 1 )
   select case( abs( faultnormal ) )
@@ -120,7 +124,9 @@ call vector_swap_halo( w1, nhalo )
 call vector_bc( w1, bc, bc, i1, i2 )
 
 ! Find cell centers
-call vector_average( w2, w1, i1cell, i2cell, 1 )
+call average( w2(:,:,:,1), w1(:,:,:,1), i1cell, i2cell, 1 )
+call average( w2(:,:,:,2), w1(:,:,:,2), i1cell, i2cell, 1 )
+call average( w2(:,:,:,3), w1(:,:,:,3), i1cell, i2cell, 1 )
 
 ! Hypocenter location
 j = ihypo(1)
@@ -155,7 +161,9 @@ end if
 call fieldio( '>', 'x1', w1(:,:,:,1) )
 call fieldio( '>', 'x2', w1(:,:,:,2) )
 call fieldio( '>', 'x3', w1(:,:,:,3) )
-call vector_set_halo( w2, 0., i1cell, i2cell )
+call set_halo( w2(:,:,:,1), 0., i1cell, i2cell )
+call set_halo( w2(:,:,:,2), 0., i1cell, i2cell )
+call set_halo( w2(:,:,:,3), 0., i1cell, i2cell )
 call fieldio( '>', 'c1', w2(:,:,:,1) )
 call fieldio( '>', 'c2', w2(:,:,:,2) )
 call fieldio( '>', 'c3', w2(:,:,:,3) )

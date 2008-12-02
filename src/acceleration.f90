@@ -15,7 +15,7 @@ use m_stats
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq
 
 if ( verb ) write( 0, * ) 'Acceleration'
-call scalar_set_halo( s1, 0., i1node, i2node )
+call set_halo( s1, 0., i1node, i2node )
 
 ! Loop over component and derivative direction
 doic: do ic  = 1, 3
@@ -107,8 +107,8 @@ end do doic
 
 ! Hourglass control. Only viscous in PML
 if ( any( hourglass > 0. ) ) then
-call scalar_set_halo( s1, 0., i1cell, i2cell )
-call scalar_set_halo( s2, 0., i1node, i2node )
+call set_halo( s1, 0., i1cell, i2cell )
+call set_halo( s2, 0., i1node, i2node )
 w2 = hourglass(1) * uu + dt * hourglass(2) * vv
 do iq = 1, 4
 do ic = 1, 3
@@ -182,7 +182,7 @@ call fieldio( '<>', 'a2', w1(:,:,:,2) )
 call fieldio( '<>', 'a3', w1(:,:,:,3) )
 if ( modulo( it, itstats ) == 0 ) then
   call vector_norm( s1, w1, i1core, i2core, (/ 1, 1, 1 /) )
-  call scalar_set_halo( s1, -1., i1core, i2core )
+  call set_halo( s1, -1., i1core, i2core )
   amax = maxval( s1 )
 end if
 call fieldio( '>', 'am2', s1  )

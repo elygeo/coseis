@@ -200,24 +200,24 @@ case( '+' )
   end do
   end do
 case( '=s' )
-  call random_number( s2 )
+  call random_number( s1 )
   do l = i1(3), i2(3), di(3)
   do k = i1(2), i2(2), di(2)
   do j = i1(1), i2(1), di(1)
-    f(j,k,l) = val * s2(j,k,l)
+    f(j,k,l) = val * s1(j,k,l)
   end do
   end do
   end do
 case( '+s' )
-  call random_number( s2 )
+  call random_number( s1 )
   do l = i1(3), i2(3), di(3)
   do k = i1(2), i2(2), di(2)
   do j = i1(1), i2(1), di(1)
-    f(j,k,l) = f(j,k,l) + val * s2(j,k,l)
+    f(j,k,l) = f(j,k,l) + val * s1(j,k,l)
   end do
   end do
   end do
-case( '=r', '+r' )
+case( '=r', '+r', '=R', '+R' )
   if ( .not. associated( p%buff ) ) then
     allocate( p%buff(n(1)*n(2)*n(3),p%nb) )
     p%ib = p%nb
@@ -241,27 +241,23 @@ case( '=r', '+r' )
   end if
   i = 0
   p%ib = p%ib + 1
-  select case( p%mode )
-  case( '=r' )
-    do l = i1(3), i2(3), di(3)
-    do k = i1(2), i2(2), di(2)
-    do j = i1(1), i2(1), di(1)
-      i = i + 1
-      f(j,k,l) = p%buff(i,p%ib)
-    end do
-    end do
-    end do
-  case( '+r' )
-    do l = i1(3), i2(3), di(3)
-    do k = i1(2), i2(2), di(2)
-    do j = i1(1), i2(1), di(1)
-      i = i + 1
-      f(j,k,l) = f(j,k,l) + p%buff(i,p%ib)
-    end do
-    end do
-    end do
-  end select
-  ! XXX TODO: fill, interpolate
+  do l = i1(3), i2(3), di(3)
+  do k = i1(2), i2(2), di(2)
+  do j = i1(1), i2(1), di(1)
+    i = i + 1
+    s1(j,k,l) = p%buff(i,p%ib)
+  end do
+  end do
+  end do
+  if ( any( di > 1 ) ) then
+    i1 = p%ii(1,1:3) - nnoff
+    i2 = p%ii(2,1:3) - nnoff
+    call scalar_swap_halo( s1, nhalo )
+    call interpolate( s1, i1, i2, di )
+  if ( any( mm == 1 ) ) then
+  !do i = i2(1)+1, ifill(1); f(i,:,:) = f(i2(1),:,:); end do
+  !do i = i2(2)+1, ifill(2); f(:,i,:) = f(:,i2(2),:); end do
+  !do i = i2(3)+1, ifill(3); f(:,:,i) = f(:,:,i2(3)); end do
   if ( it == it2 ) then
     deallocate( p%buff )
     call pdelete

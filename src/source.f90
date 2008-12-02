@@ -23,11 +23,11 @@ if ( master ) write( 0, * ) 'Moment source initialize'
 i1 = i1bc
 i2 = i2bc - 1
 call diffnc( s1, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
-call scalar_set_halo( s1, 0., i1, i2 )
+call set_halo( s1, 0., i1, i2 )
 
 ! Hypocenter/cell radius (squared)
 call radius( s2, w2, xhypo, i1cell, i2cell )
-call scalar_set_halo( s2, huge(sumsrcfr), i1cell, i2cell )
+call set_halo( s2, huge(sumsrcfr), i1cell, i2cell )
 nsrc = count( s2 < rsource*rsource )
 allocate( jj(nsrc), kk(nsrc), ll(nsrc), cellvol(nsrc), srcfr(nsrc) )
 
@@ -59,7 +59,7 @@ end if
 end do
 end do
 end do
-call scalar_set_halo( s2, 0., i1cell, i2cell )
+call set_halo( s2, 0., i1cell, i2cell )
 
 ! Normalize and divide by cell volume
 if ( rfunc == 'point' ) then
