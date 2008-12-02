@@ -20,6 +20,7 @@ maxnodes = 256
 maxcores = 8
 maxram = 15000
 maxtime = 24, 00
+mode = 'm'
 fortran_serial = [ 'ifort' ]
 fortran_mpi = [ 'mpif90' ]
 _ = [ '-u', '-std95', '-warn', '-o' ]

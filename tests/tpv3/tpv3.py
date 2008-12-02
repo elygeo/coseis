@@ -5,8 +5,6 @@ TPV3 - SCEC validation problem version 3, convergence test
 
 import sord
 
-debug = 0
-mpout = 1
 _reg = 1
 _run = [ 
     500., (1, 1, 2),
@@ -28,8 +26,8 @@ _run = [
     15.,  (1, 16, 16),
     10.,  (4, 16, 16),
 ]
-_run = [ 500., (1, 4, 4), ]
 _run = [ 50., (1, 1, 2), ]
+_run = [ 500., (1, 4, 4), ]
 vrup = -1.
 faultnormal = 3	
 hourglass = 1., 2.

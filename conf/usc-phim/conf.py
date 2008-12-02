@@ -10,3 +10,5 @@ maxnodes = 1
 maxcores = 1
 maxram = 2800
 rate = 1.2e6
+mode = 's'
+

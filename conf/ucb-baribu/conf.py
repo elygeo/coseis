@@ -6,3 +6,5 @@ hosts = [ login ]
 maxnodes = 7
 maxcores = 8
 maxram = 30000
+mode = 'm'
+

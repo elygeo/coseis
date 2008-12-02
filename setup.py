@@ -3,10 +3,13 @@
 Build SORD binaries and documentation
 """
 
-def build( mode='sm', optimize='O' ):
+def build( mode=None, optimize=None ):
     import os
     import util, configure
     cfg = configure.configure()
+    if not optimize: optimize = cfg['optimize']
+    if not mode: mode = cfg['mode']
+    if not mode: mode = 'sm'
     base = (
         'globals.f90',
         'diffcn.f90',
@@ -155,8 +158,8 @@ def docs():
 if __name__ == '__main__':
     import sys, util, getopt
     opts, args = getopt.getopt( sys.argv[1:], 'smgtpO' )
-    mode = 'sm'
-    optimize = 'O'
+    mode = None
+    optimize = None
     for o, v in opts:
         if   o == '-s': mode = 's'
         elif o == '-m': mode = 'm'
