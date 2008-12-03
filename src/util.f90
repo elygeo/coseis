@@ -183,7 +183,7 @@ case( 'delta'  )
 case( 'brune' )
   time_function = -exp( -tm / period ) / period * ( tm + period ) + 1.
 case( 'dbrune' )
-  time_function =  exp( -tm / period ) * period ** 2. * tm
+  time_function =  exp( -tm / period ) / period ** 2. * tm
 case( 'ddbrune' )
   time_function = -exp( -tm / period ) / period ** 3. * ( tm - period ) 
 case( 'gaussian' )
