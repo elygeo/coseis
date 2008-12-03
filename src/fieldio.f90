@@ -218,6 +218,16 @@ case( '+s' )
   end do
   end do
 case( '=r', '+r', '=R', '+R' )
+  if ( p%mode(2:2) == 'R' ) then
+    do i = 1, 3
+      if ( m(i) == 1 ) then
+        i1(i) = 1
+        i2(i) = 1
+        n(i) = 1
+        o(i) = 0
+      end if
+    end do
+  end if
   if ( .not. associated( p%buff ) ) then
     allocate( p%buff(n(1)*n(2)*n(3),p%nb) )
     p%ib = p%nb
@@ -252,12 +262,25 @@ case( '=r', '+r', '=R', '+R' )
   if ( any( di > 1 ) ) then
     i1 = p%ii(1,1:3) - nnoff
     i2 = p%ii(2,1:3) - nnoff
-    if ( any( di > nhalo ) ) stop 'di too large for nhalo'
+    if ( any( di > nhalo .and. np3 > 1 ) ) stop 'di too large for nhalo'
     call scalar_swap_halo( s1, nhalo )
     call interpolate( s1, i1, i2, di )
   end if
-  select case( p%mode )
-  case( '=r', '=R' )
+  if ( p%mode(2:2) == 'R' ) then
+    if ( m(1) == 1 ) then
+      i2(1) = size( s1, 1 )
+      do i = 2, i2(1); s1(i,:,:) = s1(1,:,:); end do
+    end if
+    if ( m(2) == 1 ) then
+      i2(2) = size( s1, 2 )
+      do i = 2, i2(2); s1(:,i,:) = s1(:,1,:); end do
+    end if
+    if ( m(3) == 1 ) then
+      i2(3) = size( s1, 3 )
+      do i = 2, i2(3); s1(:,:,i) = s1(:,:,1); end do
+    end if
+  end if
+  if ( p%mode(1:1) == '=' ) then
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -265,7 +288,7 @@ case( '=r', '+r', '=R', '+R' )
     end do
     end do
     end do
-  case( '+r', '+R' )
+  elseif ( p%mode(1:1) == '+' ) then
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -273,12 +296,6 @@ case( '=r', '+r', '=R', '+R' )
     end do
     end do
     end do
-  case default; stop 'bug in fieldio r'
-  end select
-  if ( any( m == 1 ) ) then
-    !do i = i2(1)+1, ifill(1); f(i,:,:) = f(i2(1),:,:); end do
-    !do i = i2(2)+1, ifill(2); f(:,i,:) = f(:,i2(2),:); end do
-    !do i = i2(3)+1, ifill(3); f(:,:,i) = f(:,:,i2(3)); end do
   end if
   if ( it == it2 ) then
     deallocate( p%buff )
