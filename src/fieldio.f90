@@ -255,10 +255,12 @@ case( '=r', '+r', '=R', '+R' )
     if ( any( di > nhalo ) ) stop 'di too large for nhalo'
     call scalar_swap_halo( s1, nhalo )
     call interpolate( s1, i1, i2, di )
-  if ( any( mm == 1 ) ) then
+  end if
+  if ( any( m == 1 ) ) then
     !do i = i2(1)+1, ifill(1); f(i,:,:) = f(i2(1),:,:); end do
     !do i = i2(2)+1, ifill(2); f(:,i,:) = f(:,i2(2),:); end do
     !do i = i2(3)+1, ifill(3); f(:,:,i) = f(:,:,i2(3)); end do
+  end if
   if ( it == it2 ) then
     deallocate( p%buff )
     call pdelete
