@@ -256,6 +256,25 @@ case( '=r', '+r', '=R', '+R' )
     call scalar_swap_halo( s1, nhalo )
     call interpolate( s1, i1, i2, di )
   end if
+  select case( p%mode )
+  case( '=r', '=R' )
+    do l = i1(3), i2(3)
+    do k = i1(2), i2(2)
+    do j = i1(1), i2(1)
+      f(j,k,l) = s1(j,k,l)
+    end do
+    end do
+    end do
+  case( '+r', '+R' )
+    do l = i1(3), i2(3)
+    do k = i1(2), i2(2)
+    do j = i1(1), i2(1)
+      f(j,k,l) = f(j,k,l) + s1(j,k,l)
+    end do
+    end do
+    end do
+  case default; stop 'bug in fieldio r'
+  end select
   if ( any( m == 1 ) ) then
     !do i = i2(1)+1, ifill(1); f(i,:,:) = f(i2(1),:,:); end do
     !do i = i2(2)+1, ifill(2); f(:,i,:) = f(:,i2(2),:); end do
