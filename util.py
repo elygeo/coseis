@@ -54,24 +54,22 @@ def loadmeta( dir='.' ):
     load( dir + os.sep + 'conf.py', meta )
     try:
         load( dir + os.sep + 'out' + os.sep + 'header.py', meta )
-        out = meta['indices']
     except:
         out = dict()
+        for f in meta['fieldio']:
+             ii, field, filename = f[6:9]
+             if filename is not '-':
+                 out[filename] = ii
         locs = load( dir + os.sep + 'locations.py' )
         mm = meta['nn'] + ( meta['nt'], )
-        for f in meta['fieldio']:
-             if 'w' in f[0] and 'x' not in f[0] and 'X' not in f[0]:
-                 ii, field, filename = f[6:9]
-                 out[filename] = ii
-        for f in locs['fieldio']:
-             if 'w' in f[0]:
-                 field, ii, filename = f[1:]
+        for ii, filename in locs['locations']:
+             if filename is not '-':
                  ii = indices( ii, mm )
                  out[filename] = ii
         meta['indices'] = out
-    f = open( dir + os.sep + 'out' + os.sep + 'header.py', 'w' )
-    f.write( 'indices = ' + pprint.pformat( out ) )
-    f.close()
+        f = open( dir + os.sep + 'out' + os.sep + 'header.py', 'w' )
+        f.write( 'indices = ' + pprint.pformat( out ) )
+        f.close()
     shape = dict()
     for k in out:
         nn = [ ( i[1] - i[0] ) / i[2] + 1 for i in out[k] ]

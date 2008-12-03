@@ -43,9 +43,7 @@ if ( verb ) write( 0, * ) 'Field I/O locations'
 ! Store locations
 if ( master ) then
   open( 1, file='locations.py', status='replace' )
-  open( 2, file='out/header.py', status='replace' )
   write( 1, '(a)' ) 'locations = ['
-  write( 2, '(a)' ) 'indices = {'
 end if
 
 ! Loop over output zones
@@ -80,23 +78,16 @@ if ( i > 0 ) then
     cycle loop
   end if
   if ( master ) then
-    write( 1, '( "  [", 3(i8, ", "), "(", i8, 2(", ", i8), ")]," )' ) &
-      i1, p%ii(:,4)
+    write(1, '( "( [ ", 4("(", i8, 2(", ", i8), "), "), "], ''", a, "'' )," )')&
+      p%ii, trim( p%filename )
   end if
-end if
-i = scan( p%mode, 'w' )
-if ( master .and. i > 0 ) then
-  write( 2, '( "  ''", a, "'': [ ", 4("(", i8, 2(", ", i8), "), "), "]," )' ) &
-    trim( p%filename ), p%ii
 end if
 
 end do loop
 
 if ( master ) then
   write( 1, '(a)' ) ']'
-  write( 2, '(a)' ) '}'
   close( 1 )
-  close( 2 )
 end if
 
 end subroutine
