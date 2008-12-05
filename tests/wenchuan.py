@@ -12,7 +12,6 @@ _L = 400e3, 300e3, 60e3
 dt = dx / 12500.
 nt = int( _T / dt + 1.5 )
 nn = [ int( _X / dx + 1.5 ) for _X in _L ]
-hourglass = 1., 1.
 bc1 = 10, 10, 10
 bc2 = 10, 10, 0
 faultnormal = 0

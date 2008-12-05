@@ -85,7 +85,7 @@ def indices( ii, mm ):
         ii = n * [ 0 ]
     elif len( ii ) != n:
         sys.exit( 'error in indices' )
-    ii = ii[:]
+    ii = list( ii )
     for i in range( n ):
         if ii[i] == 0:
             ii[i] = [ 1, -1, 1 ]
