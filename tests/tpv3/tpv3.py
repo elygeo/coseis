@@ -3,7 +3,7 @@
 TPV3 - SCEC validation problem version 3, convergence test
 """
 
-import sord
+import sord, os
 
 _reg = 1
 _run = [ 
@@ -101,6 +101,6 @@ for _i in range( 0, len( _run ), 2 ):
             ( '=wx', _f, [], 'P2b-'+_f, (-49., -5951., 0.) ),
         ]
 
-    rundir = 'run/%03.0f' % dx
+    rundir = os.path.expanduser('~') + '/run/%03.0f' % dx
     sord.run( locals() )
 

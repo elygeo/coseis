@@ -10,11 +10,11 @@ prepare = True		# True: compile code and setup run directory, False: dry run
 optimize = 'O'		# O: fully optimized, g: debugging, t: testing, p: profiling
 mode = None		# s: serial, m: MPI, None: guess from np3 
 run = False		# i: interactive, q: batch queue, g: debugger
-rundir = '~/run'	# run directory
 name = 'sord'		# name of current simulation
 pre = ''		# pre-processing command
 post = ''		# post-processing command
 itbuff = 10		# max number of timesteps to buffer for 2D & 3D output
+rundir = os.path.expanduser('~') + os.sep + 'run'	# run directory
 
 # User info
 user = pwd.getpwuid(os.geteuid())[0]

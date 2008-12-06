@@ -46,14 +46,14 @@ fieldio = [
   ( '=w', 'ts2', [_j,_k,_l,(1,-1,10)], 'ts2' ),
 ]
 
-_home = '/home/gwurman/sord/'
+_home = os.path.expanduser('~')
 _i = 0
 while True:
     _i += 1
-    _f = _home + 'stresses/initial.stressx.%02d' % i
+    _f = _home + 'sord/stresses/initial.stressx.%02d' % i
     print _f
     if not os.path.isfile( _f ): break
-    os.system( _home + 'bin/asc2flt < %r > ts' % f )
-    rundir = _home + 'run/%02d' % i
+    os.system( _home + 'sord/bin/asc2flt < %r > ts' % f )
+    rundir = _home + 'sord/run/%02d' % i
     sord.run( locals() )
 
