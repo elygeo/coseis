@@ -1,6 +1,7 @@
 notes = """
 SDSC TeraGrid IA64 cluster
 
+gsiftp://tg-gridftp.sdsc.teragrid.org:2811/
 http://www.sdsc.edu/user_services/ia64/
 http://clumon.sdsc.edu/
 http://grid.ncsa.uiuc.edu/teragrid/status/

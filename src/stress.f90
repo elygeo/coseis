@@ -129,18 +129,20 @@ case( 3 )
 end select
 
 ! Add contribution to gradient
+i = 6 - ic - id
 if ( ic < id ) then
-  i = 6 - ic - id
   w2(:,:,:,i) = s1
 elseif ( ic > id ) then
-  i = 6 - ic - id
-  w2(:,:,:,i) = w2(:,:,:,i) + s1
+  w2(:,:,:,i) = s1 + w2(:,:,:,i)
 else
   w1(:,:,:,ic) = s1
 end if
 
 end do doid
 end do doic
+
+! Scale shear strain
+w2 = 0.5 * w2
 
 ! Strain I/O
 call fieldio( '<>', 'e11', w1(:,:,:,1) )
@@ -165,7 +167,7 @@ call fieldio( '<>', 'e12', w2(:,:,:,3) )
 s1 = lam * ( w1(:,:,:,1) + w1(:,:,:,2) + w1(:,:,:,3 ) )
 do i = 1, 3
   w1(:,:,:,i) = 2. * mu * w1(:,:,:,i) + s1
-  w2(:,:,:,i) =      mu * w2(:,:,:,i)
+  w2(:,:,:,i) = 2. * mu * w2(:,:,:,i)
 end do
 
 ! Add moment source to stress

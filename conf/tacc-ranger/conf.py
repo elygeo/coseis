@@ -1,6 +1,7 @@
 notes = """
 TACC Ranger
 
+gsiftp://gridftp.ranger.tacc.teragrid.org:2811/
 http://www.tacc.utexas.edu/services/userguides/ranger/
 ppn must be one of (1, 2, 4, 8, 12, 15, 16)
 
