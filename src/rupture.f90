@@ -315,7 +315,7 @@ f2 = sum( ( t0 + t1 ) * t2, 4 ) * area
 call set_halo( f2, 0., i1core, i2core )
 estrain = .5 * sum( f2 )
 
-! Moment XXX FIXME lambda contribution
+! Moment (negelcts opening lambda contribution)
 f2 = muf * area * sqrt( sum( t2 * t2, 4 ) )
 call set_halo( f2, 0., i1core, i2core )
 moment = sum( f2 )

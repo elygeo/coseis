@@ -15,7 +15,6 @@ real, allocatable :: cellvol(:)
 integer :: i1(3), i2(3), i, j, k, l, nsrc
 real :: sumsrcfr, allsumsrcfr
 
-! Moment source
 if ( rsource <= 0. ) return
 if ( master ) write( 0, * ) 'Moment source initialize'
 
@@ -75,18 +74,14 @@ where ( cellvol > 0. ) srcfr = srcfr / cellvol
 end subroutine
 
 !------------------------------------------------------------------------------!
-
-! Add moment source
+! Add moment source to stress tensor
 subroutine moment_source
 use m_globals
 use m_util
 integer :: i, j, k, l, ic, nsrc
 real :: srcft = 0.
-
 if ( rsource <= 0. ) return
 if ( verb ) write( 0, * ) 'Moment source'
-
-! Add to stress variables
 srcft = time_function( tfunc, tm, dt, tsource )
 nsrc = size( srcfr )
 do ic = 1, 3
