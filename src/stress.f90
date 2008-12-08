@@ -131,18 +131,15 @@ end select
 ! Add contribution to gradient
 i = 6 - ic - id
 if ( ic < id ) then
-  w2(:,:,:,i) = s1
+  w2(:,:,:,i) = 0.5 * s1
 elseif ( ic > id ) then
-  w2(:,:,:,i) = s1 + w2(:,:,:,i)
+  w2(:,:,:,i) = s1 + 0.5 * w2(:,:,:,i)
 else
   w1(:,:,:,ic) = s1
 end if
 
 end do doid
 end do doic
-
-! Scale shear strain
-w2 = 0.5 * w2
 
 ! Strain I/O
 call fieldio( '<>', 'e11', w1(:,:,:,1) )

@@ -126,14 +126,18 @@ rhypo = sqrt( sum( t2 * t2, 4 ) )
 
 ! Resample mu on to fault plane nodes for moment calculatioin
 select case( ifn )
-case ( 1 ); muf(1,:,:) = mu(ihypo(1),:,:)
-case ( 2 ); muf(:,1,:) = mu(:,ihypo(2),:)
-case ( 3 ); muf(:,:,1) = mu(:,:,ihypo(3))
+case ( 1 ); lamf(1,:,:) = lam(ihypo(1),:,:); muf(1,:,:) = mu(ihypo(1),:,:)
+case ( 2 ); lamf(:,1,:) = lam(:,ihypo(2),:); muf(:,1,:) = mu(:,ihypo(2),:)
+case ( 3 ); lamf(:,:,1) = lam(:,:,ihypo(3)); muf(:,:,1) = mu(:,:,ihypo(3))
 end select
+call invert( lamf )
 call invert( muf )
 j = nm(1) - 1
 k = nm(2) - 1
 l = nm(3) - 1
+if ( ifn /= 1 ) lamf(2:j,:,:) = .5 * ( lamf(2:j,:,:) + lamf(1:j-1,:,:) )
+if ( ifn /= 2 ) lamf(:,2:k,:) = .5 * ( lamf(:,2:k,:) + lamf(:,1:k-1,:) )
+if ( ifn /= 3 ) lamf(:,:,2:l) = .5 * ( lamf(:,:,2:l) + lamf(:,:,1:l-1) )
 if ( ifn /= 1 ) muf(2:j,:,:) = .5 * ( muf(2:j,:,:) + muf(1:j-1,:,:) )
 if ( ifn /= 2 ) muf(:,2:k,:) = .5 * ( muf(:,2:k,:) + muf(:,1:k-1,:) )
 if ( ifn /= 3 ) muf(:,:,2:l) = .5 * ( muf(:,:,2:l) + muf(:,:,1:l-1) )
@@ -311,7 +315,7 @@ f2 = sum( ( t0 + t1 ) * t2, 4 ) * area
 call set_halo( f2, 0., i1core, i2core )
 estrain = .5 * sum( f2 )
 
-! Moment
+! Moment XXX FIXME lambda contribution
 f2 = muf * area * sqrt( sum( t2 * t2, 4 ) )
 call set_halo( f2, 0., i1core, i2core )
 moment = sum( f2 )

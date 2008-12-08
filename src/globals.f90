@@ -75,13 +75,12 @@ real, allocatable, target, dimension(:,:,:,:) :: &
 
 ! Fault surface fields
 real, allocatable, target, dimension(:,:,:) :: &
-  mus,            & ! coef of static friction
-  mud,            & ! coef of dynamic friction
+  mus, mud,       & ! coefs of static and dynamic friction
   dc,             & ! slip weakening distance
   co,             & ! cohesion
   area,           & ! fault element area
   rhypo,          & ! radius to hypocenter
-  muf,            & ! shear modulus at the fault nodes
+  lamf, muf,      & ! moduli at the fault nodes
   sl,             & ! slip path length
   psv,            & ! peak slip velocity
   trup,           & ! rupture time
