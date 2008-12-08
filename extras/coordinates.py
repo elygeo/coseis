@@ -1,5 +1,34 @@
 #!/usr/bin/env python
-"Convert between lon/lat and TeraShake coordinates."
+"Coordinate conversions"
+
+def rotmat( strike, dip, rake ):
+    """
+    For given strike, dip, and rake, in degrees, and using the Aki & Richards
+    convention of dip to the right of the strike vector, find rotation matrix from
+    (slip, rake, normal) coordinate system, to (north, east, up) coordinate system.
+    """
+    from numpy import pi, cos, sin, dot, zeros, ones, array, asarray
+    strike = pi / 180. * asarray( strike )
+    dip    = pi / 180. * asarray( dip )
+    rake   = pi / 180. * asarray( rake )
+    zero   = zeros( strike.shape )
+    one    = ones( strike.shape )
+    A = array(
+        [ sin(strike), -cos(strike), zero ],
+        [ cos(strike),  sin(strike), zero ],
+        [ zero,         zero,        one  ],
+    ]
+    B = array(
+        [ one,  zero,      zero     ],
+        [ zero, cos(dip), -sin(dip) ],
+        [ zero, sin(dip),  cos(dip) ],
+    ]
+    C = array(
+        [ cos(rake), -sin(rake), zero ],
+        [ sin(rake),  cos(rake), zero ],
+        [ zero,       zero,      one  ],
+    ]
+    return dot( dot( A, B ), C ) )
 
 def ll2ts( lon, lat ):
     "Project lon/lat to UTM and rotate to TeraShake coordinates"
