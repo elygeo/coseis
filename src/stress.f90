@@ -6,7 +6,8 @@ contains
 subroutine stress
 use m_globals
 use m_diffnc
-use m_source
+use m_point_source
+use m_finite_source
 use m_util
 use m_fieldio
 use m_stats
@@ -141,8 +142,8 @@ end if
 end do doid
 end do doic
 
-! Finite fault
-call ffault
+! Finite source
+call finite_source
 
 ! Potency I/O
 call fieldio( '<>', 'p11', w1(:,:,:,1) )
@@ -185,7 +186,7 @@ do i = 1, 3
 end do
 
 ! Add moment source to stress
-call moment_source
+call point_source
 
 ! Stress I/O
 call fieldio( '<>', 'w11', w1(:,:,:,1) )

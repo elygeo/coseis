@@ -48,7 +48,7 @@ rexpand = 1.06			# grid expansion ratio
 n1expand = 0, 0, 0		# number of grid expansion nodes - near side
 n2expand = 0, 0, 0		# number of grid expansion nodes - far side
 
-# Moment source parameters
+# Point source parameters
 rfunc = 'point'			# space function
 tfunc = 'brune'			# time function, see util.f90 for details.
 rsource = -1.			# source radius
@@ -56,9 +56,10 @@ tsource = 0.056			# dominant period
 moment1 = 1e16, 1e16, 1e16	# normal components
 moment2 =   0.,   0.,   0.	# shear components
 
-# Finite fault parameters
-ff_np = 0			# number of point sources
-ff_nt = 0			# number of time steps
+# Finite source parameters
+nsource = 0			# number of sources
+ntsource = 0			# number of time steps
+locatesource = 1		# 0=indices, 1=coordinates
 
 # Fault parameters
 faultnormal = 3			# normal direction to fault plane (0=no fault)
