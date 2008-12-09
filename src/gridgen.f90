@@ -8,6 +8,7 @@ use m_globals
 use m_collective
 use m_bc
 use m_util
+use m_diffnc
 use m_fieldio
 integer :: i1(3), i2(3), i3(3), i4(3), bc(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, b, c
