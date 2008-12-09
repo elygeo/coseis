@@ -55,21 +55,22 @@ integer :: j, k, l, i, ii
 real :: su(3), nhat(3), t, h
 if ( ff_np <= 0 ) return
 if ( verb ) write( 0, * ) 'Finite fault source'
-loop: do ii = 1, ff_np
+do ii = 1, ff_np
   i = ( tm - ff_tm0(ii) ) / ff_dt(ii) + 1.5
-  if ( i < 1 .or. i >= ff_nt(ii) ) cycle loop
-  t = ff_tm0(ii) + ff_dt(ii) * ( i - 1 )
-  h = ( t - tm ) / ff_dt(ii)
-  su = h * ff_su(ii,i,:) + ( 1. - h ) * ff_su(ii,i+1,:)
-  nhat = ff_nhat(ii,:)
-  j = ff_x(ii,1) + 0.5 - nnoff(1)
-  k = ff_x(ii,2) + 0.5 - nnoff(2)
-  l = ff_x(ii,3) + 0.5 - nnoff(3)
-  w1(j,k,l,:) = w1(j,k,l,:) + su * nhat
-  w2(j,k,l,1) = w2(j,k,l,1) + 0.5 * ( su(3) * nhat(2) + su(2) * nhat(3) )
-  w2(j,k,l,2) = w2(j,k,l,2) + 0.5 * ( su(1) * nhat(3) + su(3) * nhat(1) )
-  w2(j,k,l,3) = w2(j,k,l,3) + 0.5 * ( su(2) * nhat(1) + su(1) * nhat(2) )
-end do loop
+  if ( i >= 1 .and. i < ff_nt(ii) ) then
+    t = ff_tm0(ii) + ff_dt(ii) * ( i - 1 )
+    h = ( tm - t ) / ff_dt(ii)
+    su = ( 1. - h ) * ff_su(ii,i,:) + h * ff_su(ii,i+1,:)
+    nhat = ff_nhat(ii,:)
+    j = ff_x(ii,1) + 0.5 - nnoff(1)
+    k = ff_x(ii,2) + 0.5 - nnoff(2)
+    l = ff_x(ii,3) + 0.5 - nnoff(3)
+    w1(j,k,l,:) = w1(j,k,l,:) + su * nhat
+    w2(j,k,l,1) = w2(j,k,l,1) + 0.5 * ( su(3) * nhat(2) + su(2) * nhat(3) )
+    w2(j,k,l,2) = w2(j,k,l,2) + 0.5 * ( su(1) * nhat(3) + su(3) * nhat(1) )
+    w2(j,k,l,3) = w2(j,k,l,3) + 0.5 * ( su(2) * nhat(1) + su(1) * nhat(2) )
+  end if
+end do
 end subroutine
 
 end module

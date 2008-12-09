@@ -56,6 +56,10 @@ tsource = 0.056			# dominant period
 moment1 = 1e16, 1e16, 1e16	# normal components
 moment2 =   0.,   0.,   0.	# shear components
 
+# Finite fault parameters
+ff_np = 0			# number of point sources
+ff_nt = 0			# number of time steps
+
 # Fault parameters
 faultnormal = 3			# normal direction to fault plane (0=no fault)
 faultopening = 0		# 0=not allowed, 1=allowed
