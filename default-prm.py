@@ -57,9 +57,8 @@ moment1 = 1e16, 1e16, 1e16	# normal components
 moment2 =   0.,   0.,   0.	# shear components
 
 # Finite source parameters
-nsource = 0			# number of sources
-ntsource = 0			# number of time steps
-locatesource = 1		# 0=indices, 1=coordinates
+nsource = 0			# number of sub-faults
+locatesource = 1		# 0: by indices, 1: by coordinates
 
 # Fault parameters
 faultnormal = 3			# normal direction to fault plane (0=no fault)
