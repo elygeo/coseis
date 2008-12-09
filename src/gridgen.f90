@@ -123,10 +123,11 @@ i2 = i2bc + 1
 call vector_swap_halo( w1, nhalo )
 call vector_bc( w1, bc, bc, i1, i2 )
 
-! Find cell centers
+! Cell centers and volume
 call average( w2(:,:,:,1), w1(:,:,:,1), i1cell, i2cell, 1 )
 call average( w2(:,:,:,2), w1(:,:,:,2), i1cell, i2cell, 1 )
 call average( w2(:,:,:,3), w1(:,:,:,3), i1cell, i2cell, 1 )
+call diffnc( vc, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
 
 ! Hypocenter location
 j = ihypo(1)
@@ -157,16 +158,25 @@ elseif ( fixhypo < 0 ) then
   end do
 end if
 
-! Write grid
-call fieldio( '>', 'x1', w1(:,:,:,1) )
-call fieldio( '>', 'x2', w1(:,:,:,2) )
-call fieldio( '>', 'x3', w1(:,:,:,3) )
+! Zero external cells, and fault cell volume
 call set_halo( w2(:,:,:,1), 0., i1cell, i2cell )
 call set_halo( w2(:,:,:,2), 0., i1cell, i2cell )
 call set_halo( w2(:,:,:,3), 0., i1cell, i2cell )
+call set_halo( vc,          0., i1cell, i2cell )
+select case( ifn ) 
+case( 1 ); i = ihypo(1); vc(i,:,:) = 0.
+case( 2 ); i = ihypo(2); vc(:,i,:) = 0.
+case( 3 ); i = ihypo(3); vc(:,:,i) = 0.
+end select
+
+! Output
+call fieldio( '>', 'x1', w1(:,:,:,1) )
+call fieldio( '>', 'x2', w1(:,:,:,2) )
+call fieldio( '>', 'x3', w1(:,:,:,3) )
 call fieldio( '>', 'c1', w2(:,:,:,1) )
 call fieldio( '>', 'c2', w2(:,:,:,2) )
 call fieldio( '>', 'c3', w2(:,:,:,3) )
+call fieldio( '>', 'vc', vc  )
 
 ! Orthogonality test
 if ( oplevel == 0 ) then

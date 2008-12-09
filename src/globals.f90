@@ -60,6 +60,7 @@ real, allocatable, dimension(:,:,:,:,:) :: bb
 
 ! Volume fields
 real, allocatable, target, dimension(:,:,:) :: &
+  vc,             & ! cell volume
   mr,             & ! mass ratio
   lam, mu,        & ! Lame parameters
   gam,            & ! viscosity

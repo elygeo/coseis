@@ -8,7 +8,6 @@ contains
 ! Initialize source
 subroutine source_init
 use m_globals
-use m_diffnc
 use m_collective
 use m_util
 real, allocatable :: cellvol(:)
@@ -17,12 +16,6 @@ real :: sumsrcfr, allsumsrcfr
 
 if ( rsource <= 0. ) return
 if ( master ) write( 0, * ) 'Moment source initialize'
-
-! Cell volumes
-i1 = i1bc
-i2 = i2bc - 1
-call diffnc( s1, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
-call set_halo( s1, 0., i1, i2 )
 
 ! Hypocenter/cell radius (squared)
 call radius( s2, w2, xhypo, i1cell, i2cell )
@@ -42,7 +35,7 @@ if ( s2(j,k,l) < rsource*rsource ) then
   jj(i) = j
   kk(i) = k
   ll(i) = l
-  cellvol(i) = s1(j,k,l)
+  cellvol(i) = vc(j,k,l)
   select case( rfunc )
   case( 'point' )
   case( 'box'  ); srcfr(i) = 1.
@@ -60,7 +53,7 @@ end do
 end do
 call set_halo( s2, 0., i1cell, i2cell )
 
-! Normalize and divide by cell volume
+! Normalize
 if ( rfunc == 'point' ) then
   if ( nsrc > 8 ) stop 'rsource too large for point source'
   srcfr = ( .5 * dx / rsource ) ** 3
@@ -69,12 +62,14 @@ else
   if ( allsumsrcfr <= 0. ) stop 'bad source space function'
   srcfr = srcfr / allsumsrcfr
 end if
-where ( cellvol > 0. ) srcfr = srcfr / cellvol
+
+! Moment density
+srcfr = srcfr / cellvol
 
 end subroutine
 
 !------------------------------------------------------------------------------!
-! Add moment source to stress tensor
+! Add moment density source to stress tensor
 subroutine moment_source
 use m_globals
 use m_util

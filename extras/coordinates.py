@@ -13,21 +13,21 @@ def rotmat( strike, dip, rake ):
     rake   = pi / 180. * asarray( rake )
     zero   = zeros( strike.shape )
     one    = ones( strike.shape )
-    A = array(
+    A = array([
         [ sin(strike), -cos(strike), zero ],
         [ cos(strike),  sin(strike), zero ],
         [ zero,         zero,        one  ],
-    ]
-    B = array(
+    ])
+    B = array([
         [ one,  zero,      zero     ],
         [ zero, cos(dip), -sin(dip) ],
         [ zero, sin(dip),  cos(dip) ],
-    ]
-    C = array(
+    ])
+    C = array([
         [ cos(rake), -sin(rake), zero ],
         [ sin(rake),  cos(rake), zero ],
         [ zero,       zero,      one  ],
-    ]
+    ])
     return dot( dot( A, B ), C ) )
 
 def ll2ts( lon, lat ):

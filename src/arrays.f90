@@ -23,6 +23,7 @@ allocate(       &
 
 ! 3d scalars
 allocate(       &
+  vc(j,k,l),    &
   mr(j,k,l),    &
   lam(j,k,l),   &
   mu(j,k,l),    &

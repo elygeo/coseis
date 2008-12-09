@@ -140,6 +140,7 @@ call fieldio( '>', 'vs',  s2  )
 call fieldio( '>', 'gam', gam )
 call fieldio( '>', 'mu',  mu  )
 call fieldio( '>', 'lam', lam )
+call fieldio( '>', 'yy',  yy  )
 
 end subroutine
 

@@ -6,33 +6,21 @@ contains
 subroutine resample
 use m_globals
 use m_collective
-use m_diffnc
 use m_bc
 use m_util
 integer :: i, i1(3), i2(3), bc(3)
 
 if ( master ) write( 0, * ) 'Resample material model'
 
-! Cell volume
-call diffnc( s1, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
-
-! Zero volume and hourglass viscosity outside boundary, and at fault cell
-i1 = i1bc
-i2 = i2bc - 1
-call set_halo( s1, 0., i1, i2 )
-call set_halo( yy, 0., i1, i2 )
-select case( ifn )
-case( 1 ); i = ihypo(1); s1(i,:,:) = 0.; yy(i,:,:) = 0.
-case( 2 ); i = ihypo(2); s1(:,i,:) = 0.; yy(:,i,:) = 0.
-case( 3 ); i = ihypo(3); s1(:,:,i) = 0.; yy(:,:,i) = 0.
-end select
-
 ! Mass ratio
-s2 = mr * s1
+s2 = mr * vc
 call average( mr, s2, i1node, i2node, -1 )
 call invert( mr )
 call scalar_swap_halo( mr, nhalo )
 call scalar_bc( mr, bc1, bc2, i1bc, i2bc )
+
+! Invert cell volume
+call invert( vc )
 
 ! Viscosity, bc=4 means copy into halo for resampling at the node
 bc = 4
@@ -45,10 +33,15 @@ call set_halo( gam, 0., i1bc, i2bc )
 call scalar_swap_halo( gam, nhalo )
 call scalar_bc( gam, bc1, bc2, i1bc, i2bc )
 
-! Moduli
-call invert( s1 )
-lam = lam * s1
-mu = mu * s1
+! Zero hourglass viscosity outside boundary, and at fault cell
+i1 = i1bc
+i2 = i2bc - 1
+call set_halo( yy, 0., i1, i2 )
+select case( ifn )
+case( 1 ); i = ihypo(1); yy(i,:,:) = 0.
+case( 2 ); i = ihypo(2); yy(:,i,:) = 0.
+case( 3 ); i = ihypo(3); yy(:,:,i) = 0.
+end select
 
 ! Initial state
 tm = 0.

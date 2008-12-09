@@ -128,7 +128,7 @@ case( 3 )
   end do
 end select
 
-! Add contribution to gradient
+! Add contribution to potency
 i = 6 - ic - id
 if ( ic < id ) then
   w2(:,:,:,i) = 0.5 * s1
@@ -140,6 +140,23 @@ end if
 
 end do doid
 end do doic
+
+! Finite fault
+call ffault
+
+! Potency I/O
+call fieldio( '<>', 'p11', w1(:,:,:,1) )
+call fieldio( '<>', 'p22', w1(:,:,:,2) )
+call fieldio( '<>', 'p33', w1(:,:,:,3) )
+call fieldio( '<>', 'p23', w2(:,:,:,1) )
+call fieldio( '<>', 'p31', w2(:,:,:,2) )
+call fieldio( '<>', 'p12', w2(:,:,:,3) )
+
+! Strain
+do i = 1, 3
+  w1(:,:,:,1) = w1(:,:,:,i) * vc
+  w2(:,:,:,1) = w2(:,:,:,i) * vc
+end do
 
 ! Strain I/O
 call fieldio( '<>', 'e11', w1(:,:,:,1) )
