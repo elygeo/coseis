@@ -2,11 +2,12 @@
 """
 Convert SRF file to slip vectors and fault normals
 
-Reads Standard Rupture Format by R. Graves:
+Standard Rupture Format by R. Graves:
 http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
 """
 import sys, numpy, coordinates
 
+f32 = numpy.float32
 filename = sys.argv[1]
 fh = open( filename, 'r' )
 version = fh.readline().split()[0]
@@ -22,15 +23,21 @@ if k[0] == 'PLANE':
     hypocenter = float( k[11] ), float( k[12] )			# in strike and dip coords
     k = fh.readline().split() + fh.readline().split() + fh.readline().split()
 
+# Coordinate rotation
+x1, x2 = q
+
 # Data block
 if k[0] != 'POINTS':
-    sys.exit( 'error' )
+    sys.exit( 'error reading SRF file' )
 nsource = int( k[1] )
 ntall = []
 lon = []
 lat = []
 depth = []
 nsource = 4
+f1 = open( 'src_su1', 'wb' )
+f2 = open( 'src_su2', 'wb' )
+f3 = open( 'src_su3', 'wb' )
 for isrc in range( nsource ):
     nt3 = float( k[12] ), float( k[14] ), float( k[16] )
     nt  = nt3[0] + nt3[1] + nt3[2]
@@ -60,7 +67,9 @@ for isrc in range( nsource ):
         # rotate
         # write
 
-t = numpy.float32
-numpy.array( ntall, dtype=t ).tofile( 'src_nt' )
-numpy.array( tm0, dtype=t ).tofile( 'src_lat' )
-numpy.array( depth, dtype=t ).tofile( 'depth' )
+x1, x2 = coordinates.ll2ts( lon, lat )
+x1.tofile( 'src_x1' )
+x2.tofile( 'src_x2' )
+numpy.array( ntall, dtype=f32 ).tofile( 'src_nt' )
+numpy.array( tm0, dtype=f32 ).tofile( 'src_lat' )
+numpy.array( depth, dtype=f32 ).tofile( 'depth' )
