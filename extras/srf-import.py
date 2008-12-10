@@ -7,7 +7,6 @@ http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
 """
 import sys, numpy, coordinates
 
-f32 = numpy.float32
 filename = sys.argv[1]
 fh = open( filename, 'r' )
 version = fh.readline().split()[0]
@@ -23,53 +22,54 @@ if k[0] == 'PLANE':
     hypocenter = float( k[11] ), float( k[12] )			# in strike and dip coords
     k = fh.readline().split() + fh.readline().split() + fh.readline().split()
 
-# Coordinate rotation
-x1, x2 = q
-
 # Data block
 if k[0] != 'POINTS':
     sys.exit( 'error reading SRF file' )
 nsource = int( k[1] )
-ntall = []
 lon = []
 lat = []
 depth = []
-nsource = 4
-f1 = open( 'src_su1', 'wb' )
-f2 = open( 'src_su2', 'wb' )
-f3 = open( 'src_su3', 'wb' )
+strike = []
+dip = []
+rake = []
+t0 = []
+dt = []
+nt = []
+pv = []
+nsource = 4 # XXX
 for isrc in range( nsource ):
-    nt3 = float( k[12] ), float( k[14] ), float( k[16] )
-    nt  = nt3[0] + nt3[1] + nt3[2]
-    if nt > 0:
-        ntall += max( nt3 )
-        lon   += [ float( k[2]  ) ]
-        lat   += [ float( k[3]  ) ]
-        depth += [ float( k[4]  ) ]
-        strike =   float( k[5]  )
-        dip    =   float( k[6]  )
-        rake   =   float( k[10] )
-        area   =   float( k[7]  )
-        tm0    =   float( k[8]  )
-        dt     =   float( k[9]  )
-        slip   =   float( k[11] ), float( k[13] ), float( k[15] )
-        sv     =   []
-        while len( sv ) < nt:
+    nt1, nt2, nt3 = int( k[12] ), int( k[14] ), int( k[16] )
+    nt0 = nt1 + nt2 + nt3
+    if nt0 > 0:
+        nt     += [[ nt1, nt2, nt3 ]]
+        lon    += [ float( k[2]  ) ]
+        lat    += [ float( k[3]  ) ]
+        depth  += [ float( k[4]  ) ]
+        strike += [ float( k[5]  ) ]
+        dip    += [ float( k[6]  ) ]
+        rake   += [ float( k[10] ) ]
+        t0     += [ float( k[8]  ) ]
+        dt     += [ float( k[9]  ) ]
+        area    =   float( k[7]  )
+        slip    =   float( k[11] ), float( k[13] ), float( k[15] )
+        sv = []
+        while len( sv ) < nt0:
             sv += fh.readline().split()
-        if len( sv ) > nt:
-            sys.exit( 'error in sv' )
-        it = 0
-        nt = max( nt3 )
-        sv3 = numpy.zeros( ( 3, nt ) )
-        for i, n in enumerate( nt3 )
-            sv3[i,0:n] = numpy.array( sv[it:it+n] )
-            it += n
-        # rotate
-        # write
+        pv += [[ area * float( f ) for f in sv ]]
+
+# Preprocess
+nsource = len( dt )
+f32 = numpy.float32
+i32 = numpy.int32
+nt     = numpy.array( nt, dtype=i32 )
+lon    = numpy.array( lon, dtype=f32 )
+lat    = numpy.array( lat, dtype=f32 )
+depth  = numpy.array( depth, dtype=f32 )
+strike = numpy.array( strike, dtype=f32 )
+dip    = numpy.array( dip, dtype=f32 )
+rake   = numpy.array( rake, dtype=f32 )
+t0     = numpy.array( t0, dtype=f32 )
+dt     = numpy.array( dt, dtype=f32 )
 
 x1, x2 = coordinates.ll2ts( lon, lat )
-x1.tofile( 'src_x1' )
-x2.tofile( 'src_x2' )
-numpy.array( ntall, dtype=f32 ).tofile( 'src_nt' )
-numpy.array( tm0, dtype=f32 ).tofile( 'src_lat' )
-numpy.array( depth, dtype=f32 ).tofile( 'depth' )
+

@@ -58,21 +58,30 @@ def ts2ll( x, y ):
     lon, lat = proj( x, y, inverse=True )
     return lon, lat
 
-def tsrotation( x, y ):
-    "Rotation matrix for TeraShake coordinates"
+def tsrotation( lon, lat ):
+    """
+    mat, theta = tsrotation( lon, lat )
+
+    Rotation matrix and clockwise rotation angle to transform components in the
+    geographic coordinate system to components in the TeraShake system.
+
+    ts_components = dot( mat, components )
+    ts_strike = strike + theta
+    """
     import numpy
-    lon0, lat0 = ts2ll( x, y )
-    eps = 0.01
-    lon = [ lon0-eps, lon0, lon0+eps, lon0 ]
-    lat = [ lat0, lat0-eps, lat0, lat0+eps ]
+    eps = 0.001
+    lon = numpy.asarray( lon )
+    lat = numpy.asarray( lat )
+    lon = [[lon-eps, lon    ], [lon+eps, lon    ]]
+    lat = [[lat,     lat-eps], [lat,     lat+eps]]
     x, y = ll2ts( lon, lat )
-    x = x[2:] - x[:2]
-    y = y[2:] - y[:2]
+    x = x[1] - x[0]
+    y = y[1] - y[0]
     s = 1. / numpy.sqrt( x*x + y*y )
     mat = numpy.array([ s*x, s*y ])
-    phi = 180. / numpy.pi * numpy.arctan2( mat[1], mat[0] )
-    phi[1] = phi[1] - 90.
-    return mat, phi
+    theta = 180. / numpy.pi * numpy.arctan2( mat[0], mat[1] )
+    theta = 0.5 * ( theta[0] - 90. + theta[1] )
+    return mat, theta
 
 if __name__ == '__main__':
     import sys, getopt, numpy
