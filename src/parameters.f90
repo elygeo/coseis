@@ -78,7 +78,6 @@ case( 'tsource' );      read( str, *, iostat=io ) key, op, tsource
 case( 'moment1' );      read( str, *, iostat=io ) key, op, moment1
 case( 'moment2' );      read( str, *, iostat=io ) key, op, moment2
 case( 'nsource' );      read( str, *, iostat=io ) key, op, nsource
-case( 'locatesource' ); read( str, *, iostat=io ) key, op, locatesource
 case( 'faultnormal' );  read( str, *, iostat=io ) key, op, faultnormal
 case( 'slipvector' );   read( str, *, iostat=io ) key, op, slipvector
 case( 'faultopening' ); read( str, *, iostat=io ) key, op, faultopening

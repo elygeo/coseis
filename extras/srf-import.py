@@ -57,19 +57,22 @@ for isrc in range( nsource ):
             sv += fh.readline().split()
         pv += [[ area * float( f ) for f in sv ]]
 
-# Preprocess
+# Process
+ll2xy = coordinates.ll2ts
+rotation = coordinates.tsrotation
 nsource = len( dt )
-f32 = numpy.float32
 i32 = numpy.int32
+f32 = numpy.float32
 nt     = numpy.array( nt, dtype=i32 )
 lon    = numpy.array( lon, dtype=f32 )
 lat    = numpy.array( lat, dtype=f32 )
-depth  = numpy.array( depth, dtype=f32 )
+depth  = numpy.array( depth, dtype=f32 ) * 1000.
 strike = numpy.array( strike, dtype=f32 )
 dip    = numpy.array( dip, dtype=f32 )
 rake   = numpy.array( rake, dtype=f32 )
 t0     = numpy.array( t0, dtype=f32 )
 dt     = numpy.array( dt, dtype=f32 )
 
-x1, x2 = coordinates.ll2ts( lon, lat )
+x1, x2 = ll2xy( lon, lat )
+strike = strike + rotation( lon, lat )
 
