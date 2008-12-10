@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 "Coordinate conversions"
 
-def rotation( strike, dip, rake ):
+def slipvectors( strike, dip, rake ):
     """
     For given strike, dip, and rake, in degrees, and using the Aki & Richards
     convention of dip to the right of the strike vector, find rotation matrix from
