@@ -1,12 +1,18 @@
 #!/usr/bin/env python
 "Coordinate conversions"
 
+def dot( A, B ):
+    "Vectorized dot product. Not the same as numpy.dot()"
+    import numpy
+    return ( A[:,:,numpy.newaxis,...] * B ).sum( axis=1 )
+
 def slipvectors( strike, dip, rake ):
     """
-    For given strike, dip, and rake, in degrees, and using the Aki & Richards
-    convention of dip to the right of the strike vector, find rotation matrix from
-    the (slip, rake, normal) coordinate system, to the (east, north, up) coordinate
-    system.
+    For given strike, dip, and rake (degrees), using the Aki & Richards
+    convention of dip to the right of the strike vector, find the transposed
+    rotation matrix from the (slip, rake, normal) coordinate system, to the (east,
+    north, up) coordinate system.  The rows of the transposed matrix are the unit
+    normals for the slip, rake, and fault normal directions.
     """
     import numpy
     strike = numpy.pi / 180. * numpy.asarray( strike )
@@ -23,11 +29,7 @@ def slipvectors( strike, dip, rake ):
     c = numpy.cos( rake )
     s = numpy.sin( rake )
     C = numpy.array([[ c, -s, z ], [ s, c, z ], [ z, z, u ]])
-    print A.shape, B.shape, C.shape
-    print numpy.dot( C.T, B.T ).shape
-    print numpy.dot( numpy.dot( C.T, B.T ), A.T ).shape
-    print numpy.dot( numpy.dot( C.T, B.T ), A.T ).T.shape
-    return numpy.dot( numpy.dot( C.T, B.T ), A.T ).T
+    return dot( dot( A, B ), C ).swapaxes( 0, 1 )
 
 def ll2ts( lon, lat ):
     "Project lon/lat to UTM and rotate to TeraShake coordinates"
