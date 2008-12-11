@@ -23,6 +23,10 @@ def slipvectors( strike, dip, rake ):
     c = numpy.cos( rake )
     s = numpy.sin( rake )
     C = numpy.array([[ c, -s, z ], [ s, c, z ], [ z, z, u ]])
+    print A.shape, B.shape, C.shape
+    print numpy.dot( C.T, B.T ).shape
+    print numpy.dot( numpy.dot( C.T, B.T ), A.T ).shape
+    print numpy.dot( numpy.dot( C.T, B.T ), A.T ).T.shape
     return numpy.dot( numpy.dot( C.T, B.T ), A.T ).T
 
 def ll2ts( lon, lat ):
