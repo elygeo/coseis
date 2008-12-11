@@ -3,7 +3,7 @@ module m_finite_source
 implicit none
 integer, private, allocatable :: src_nt(:)
 real, private, allocatable :: src_dt(:), src_tm0(:), &
-  src_x(:,:), src_nhat(:,:), src_shat(:,:), src_slip(:)
+  src_x(:,:), src_nhat(:,:), src_svec(:,:), src_slip(:)
 contains
 
 ! Initialize finite source
@@ -17,7 +17,7 @@ if ( nsource == 0 ) return
 if ( master ) write( 0, * ) 'Finite source initialize'
 nsrc = abs( nsrc )
 allocate( src_nt(nsrc), src_dt(nsrc), src_tm0(nsrc), &
-  src_x(nsrc,3), src_nhat(nsrc,3), src_shat(nsrc,3) )
+  src_x(nsrc,3), src_nhat(nsrc,3), src_svec(nsrc,3) )
 fh = -1
 if ( mpin /= 0 ) fh = file_null
 call rio1( fh, src_dt,        'r', 'in/src_nt',    nsrc, 0, mpin, verb )
@@ -30,9 +30,9 @@ call rio1( fh, src_x(:,3),    'r', 'in/src_x3',    nsrc, 0, mpin, verb )
 call rio1( fh, src_nhat(:,1), 'r', 'in/src_nhat1', nsrc, 0, mpin, verb )
 call rio1( fh, src_nhat(:,2), 'r', 'in/src_nhat2', nsrc, 0, mpin, verb )
 call rio1( fh, src_nhat(:,3), 'r', 'in/src_nhat3', nsrc, 0, mpin, verb )
-call rio1( fh, src_shat(:,1), 'r', 'in/src_shat1', nsrc, 0, mpin, verb )
-call rio1( fh, src_shat(:,2), 'r', 'in/src_shat2', nsrc, 0, mpin, verb )
-call rio1( fh, src_shat(:,3), 'r', 'in/src_shat3', nsrc, 0, mpin, verb )
+call rio1( fh, src_svec(:,1), 'r', 'in/src_svec1', nsrc, 0, mpin, verb )
+call rio1( fh, src_svec(:,2), 'r', 'in/src_svec2', nsrc, 0, mpin, verb )
+call rio1( fh, src_svec(:,3), 'r', 'in/src_svec3', nsrc, 0, mpin, verb )
 n = sum( src_nt )
 allocate( src_slip(n) )
 call rio1( fh, src_slip,      'r', 'in/src_slip',  n,    0, mpin, verb )
@@ -71,7 +71,7 @@ do isrc = 1, abs( nsource )
     h = ( tm - t ) / src_dt(isrc)
     slip = ( 1. - h ) * src_slip(itoff+i) + h * src_slip(itoff+i+1)
     itoff = itoff + src_nt(isrc)
-    su = src_shat(isrc,:) * slip
+    su = src_svec(isrc,:) * slip
     nu = src_nhat(isrc,:)
     j = src_x(isrc,1) + 0.5 - nnoff(1)
     k = src_x(isrc,2) + 0.5 - nnoff(2)
