@@ -3,10 +3,12 @@
 Reader for Graves Standard Rupture Format:
 http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
 """
-import sys, numpy
 
-def read( filename, noslip=False ):
+
+def read( filename, headeronly=False, noslip=False ):
     "Read file and return SRF object. Optionally include points with zero slip."
+    import sys, numpy
+    class obj: pass
     fh = open( filename, 'r' )
     srf = obj()
     srf.version = fh.readline().split()[0]
@@ -24,7 +26,9 @@ def read( filename, noslip=False ):
         k = fh.readline().split()
     if k[0] != 'POINTS':
         sys.exit( 'error reading ' + filename )
-    nsource = int( k[1] )
+    srf.nsource = int( k[1] )
+    if headeronly:
+        return srf
     srf.nt   = []
     srf.dt   = []
     srf.t0   = []
@@ -37,7 +41,7 @@ def read( filename, noslip=False ):
     srf.area = []
     srf.slip = []
     srf.sv   = []
-    for isrc in range( nsource ):
+    for isrc in range( srf.nsource ):
         k = fh.readline().split() + fh.readline().split()
         if len( k ) != 15:
             sys.exit( 'error reading ' + filename )
@@ -60,7 +64,7 @@ def read( filename, noslip=False ):
             if len( sv ) != sum( nt ):
                 sys.exit( 'error reading ' + filename )
             srf.sv += [ float( f ) for f in sv ]
-    srf.nsource = len( dt )
+    srf.nsource = len( srf.dt )
     srf.nt   = numpy.array( srf.nt )
     srf.dt   = numpy.array( srf.dt )
     srf.t0   = numpy.array( srf.t0 )
@@ -71,11 +75,12 @@ def read( filename, noslip=False ):
     srf.dip  = numpy.array( srf.dip )
     srf.rake = numpy.array( srf.rake )
     srf.area = numpy.array( srf.area )
+    srf.slip = numpy.array( srf.slip )
     srf.sv   = numpy.array( srf.sv )
     return srf
 
 if __name__ == '__main__':
-    import pprint, sord
-    srf = read( sys.argv[1] )
+    import sys, pprint, sord
+    srf = read( sys.argv[1], True )
     pprint.pprint( sord.util.dictify( srf ) )
     
