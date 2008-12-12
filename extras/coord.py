@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 "Coordinate conversions"
 
-def dot( A, B ):
-    "Vectorized dot product. Not the same as numpy.dot()"
+def matmul( A, B ):
+    "Vectorized matrix multiplication. Not the same as numpy.dot()"
     import numpy
     return ( A[:,:,numpy.newaxis,...] * B ).sum( axis=1 )
 
@@ -29,7 +29,7 @@ def slipvectors( strike, dip, rake ):
     c = numpy.cos( rake )
     s = numpy.sin( rake )
     C = numpy.array([[ c, -s, z ], [ s, c, z ], [ z, z, u ]])
-    return dot( dot( A, B ), C ).swapaxes( 0, 1 )
+    return matmul( matmul( A, B ), C ).swapaxes( 0, 1 )
 
 def ll2ts( lon, lat ):
     "Project lon/lat to UTM and rotate to TeraShake coordinates"

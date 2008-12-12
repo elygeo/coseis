@@ -70,9 +70,8 @@ if ( i > 0 ) then
   n = nn + 2 * nhalo
   noff = nnoff + nhalo
   call reduceloc( rr, i1, s2, 'allmin', n, noff, 0 )
-  i1 = i1 + nnoff
-  p%ii(1,1:3) = i1
-  p%ii(2,1:3) = i1
+  p%ii(1,1:3) = i1 + nnoff
+  p%ii(2,1:3) = i1 + nnoff
   if ( rr > dx * dx ) then
     call pdelete
     cycle loop
