@@ -34,14 +34,14 @@ def slipvectors( strike, dip, rake ):
 
 utm11 = pyproj.Proj( proj='utm', zone=11, ellps='WGS84' )
 
-def terashake( x, y, inverse=False, projection=utm11, rot=40., lon0=-121., lat0=34.5,  ):
+def ll2xy( x, y, z=None, inverse=False, projection=utm11, rot=40., lon0=-121., lat0=34.5,  ):
     "TeraShake coordinate projection"
     import numpy, pyproj
     x0, y0 = projection( lon0, lat0 )
-    x = numpy.asarray( x )
-    y = numpy.asarray( y )
     c = numpy.cos( numpy.pi / 180. * rot )
     s = numpy.sin( numpy.pi / 180. * rot )
+    x = numpy.asarray( x )
+    y = numpy.asarray( y )
     if inverse:
         x, y =  c*x + s*y, -s*x + c*y
         x = x + x0
@@ -52,9 +52,9 @@ def terashake( x, y, inverse=False, projection=utm11, rot=40., lon0=-121., lat0=
         x = x - x0
         y = y - y0
         x, y = c*x - s*y, s*x + c*y
-    return x, y
+    return x, y, z
 
-def rotation( lon, lat, projection=terashake, eps=0.001 ):
+def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
     """
     mat, theta = rotation( lon, lat, proj )
 
