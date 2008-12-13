@@ -37,7 +37,10 @@ n = sum( src_nt )
 allocate( src_sv(n) )
 call rio1( fh, src_sv,        'r', 'in/src_slip',  n,    0, mpin, verb )
 if ( nsource > 0 ) then
-  src_ii = src_x + 0.5
+  do isrc = 1, nsrc
+    ii = src_x(isrc,:) / dx + 1.5
+    src_ii(isrc,:) = ii - nnoff
+  end do
 else
   s2 = huge( r )
   mm = nn + 2 * nhalo
@@ -50,10 +53,10 @@ else
       call radius( s2, w2, x, i1, i2 )
       call reduceloc( r, ii, s2, 'allmin', mm, mmoff, 0 )
     end if
-    src_ii(isrc,:) = ii + nnoff
+    src_ii(isrc,:) = ii
+    src_x(isrc,:) = ii + nnoff
   end do
   if ( master ) then
-    src_x = src_ii
     call rio1( fh, src_x(:,1), 'w', 'out/src_x1', nsrc, 0, mpout, verb )
     call rio1( fh, src_x(:,2), 'w', 'out/src_x2', nsrc, 0, mpout, verb )
     call rio1( fh, src_x(:,3), 'w', 'out/src_x3', nsrc, 0, mpout, verb )
@@ -62,7 +65,6 @@ end if
 deallocate( src_x )
 itoff = 0
 do isrc = 1, nsrc
-  src_ii(isrc,:) = src_ii(isrc,:) - nnoff
   r = 0.
   do i = 1, src_nt(isrc)
     r = r + src_sv(itoff+i) * src_dt(isrc)

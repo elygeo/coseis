@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+
+import numpy, pyproj, scipy.interpolate
+import coord
+
+nn = 1056, 752, 202
+dx = 100000.
+L = 600000., 300000., 80000.
+L = 160000., 110000., 80000.
+x = numpy.arange( 0.5*dx, L[0], dx )
+y = numpy.arange( 0.5*dx, L[1], dx )
+z = numpy.arange( 0.5*dx, L[2], dx )
+
+xx, yy = numpy.meshgrid( x, y )
+zz = numpy.zeros_like( xx )
+lon, lat = coord.ts2ll( xx, yy )
+
+#f1 = open( 'lon', 'wb' )
+#f2 = open( 'lat', 'wb' )
+#f3 = open( 'dep', 'wb' )
+for z in numpy.arange( 0.5*dx, L[2], dx ):
+  zz.fill( L[2] - z )
+
+proj = pyproj.Proj( proj='utm', zone=11, ellps='WGS84' )
+x = [ 332984.368775764, 334968.783702151, 493193.454179488, 491209.039253102 ]
+y = [ 3719052.86981527, 3831684.83903658, 3828897.14563133, 3716265.17641002 ]
+
+interp2d = scipy.interpolate.RectBivariateSpline
+
+
+
+
+lon, lat = proj( x, y, inverse=True )
+print lon
+print lat
+print coord.utmrotation( lon, lat )[1]
+
+x = numpy.array( x ) - x[2]
+y = numpy.array( y ) - y[2]
+l = 0.001 * numpy.sqrt( x * x + y * y )
+print 'ell', l
+x = numpy.array( x ) - x[0]
+y = numpy.array( y ) - y[0]
+l = 0.001 * numpy.sqrt( x * x + y * y )
+print 'ell', l, 0.150 * ( numpy.array( nn ) - 1 )
+phi = numpy.arctan2( x[1], y[1] ) * 180. / numpy.pi
+print phi
+phi = numpy.arctan2( y[3], x[3] ) * 180. / numpy.pi
+print phi
+
+import pylab
+pylab.plot( x, y, 'k-' )
+pylab.show()
