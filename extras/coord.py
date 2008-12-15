@@ -34,7 +34,7 @@ def slipvectors( strike, dip, rake ):
 
 utm11 = pyproj.Proj( proj='utm', zone=11, ellps='WGS84' )
 
-def ll2xy( x, y, z=None, inverse=False, projection=utm11, rot=40., lon0=-121., lat0=34.5,  ):
+def ll2xy( x, y, inverse=False, projection=utm11, rot=40., lon0=-121., lat0=34.5,  ):
     "TeraShake coordinate projection"
     import numpy, pyproj
     x0, y0 = projection( lon0, lat0 )
@@ -46,13 +46,13 @@ def ll2xy( x, y, z=None, inverse=False, projection=utm11, rot=40., lon0=-121., l
         x, y =  c*x + s*y, -s*x + c*y
         x = x + x0
         y = y + y0
-        y, y = projection( x, y, inverse=True )
+        x, y = projection( x, y, inverse=True )
     else:
         x, y = projection( lon, lat )
         x = x - x0
         y = y - y0
         x, y = c*x - s*y, s*x + c*y
-    return x, y, z
+    return x, y
 
 def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
     """
@@ -74,6 +74,19 @@ def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
     theta = 180. / numpy.pi * numpy.arctan2( mat[0], mat[1] )
     theta = 0.5 * theta.sum() - 45.
     return mat, theta
+
+def interp2( x0, y0, dx, dy, z, xi, yi ):
+    "2D interpolation on a regular grid"
+    import numpy
+    xi = ( numpy.asarray( xi ) - x0 ) / dx
+    yi = ( numpy.asarray( yi ) - y0 ) / dy
+    j = numpy.int32( xi )
+    k = numpy.int32( yi )
+    zi = ( 1. - xi + j ) * ( 1. - yi + k ) * z[j,k] \
+       + ( 1. - xi + j ) * (      yi - k ) * z[j,k+1] \
+       + (      xi - j ) * ( 1. - yi + k ) * z[j+1,k] \
+       + (      xi - j ) * (      yi - k ) * z[j+1,k+1]
+    return zi
 
 if __name__ == '__main__':
     import sys, getopt, numpy

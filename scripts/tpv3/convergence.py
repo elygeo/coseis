@@ -7,8 +7,8 @@ ndread = sord.util.ndread
 interp2d = scipy.interpolate.RectBivariateSpline
 degree = 1
 
-dirs = glob.glob( '[0-9]*' )[3:]
 dirs = glob.glob( '[0-9]*' )
+dirs = glob.glob( '[0-9]*' )[3:]
 
 meta = sord.util.loadmeta( dirs[0] )
 n = meta.shape['flt-trup']
@@ -49,34 +49,35 @@ for i in range( len( ttres ) ):
     print dirs[i+1], ttres[i], sures[i], svres[i]
 
 # Plotting
-pylab.rcdefaults()
-font = { 'size': 8 }
-pylab.rc( 'font', **font )
-pylab.rc( 'figure', figsize=[3.2,3.2] )
-pylab.rc( 'axes', linewidth=0.5 )
-pylab.rc( 'ytick.minor', size=1 )
-pylab.rc( 'ytick.major', size=2 )
-pylab.rc( 'xtick.minor', size=0 )
-pylab.rc( 'xtick.major', size=2 )
-pylab.rc( 'lines', linewidth=0.5, color='k', markersize=3 )
-pylab.subplots_adjust( left=.15, right=.95, bottom=.15, top=.95 )
-pylab.clf()
-pylab.loglog( dx, ttres, 'ko-' )
-pylab.loglog( dx, sures, 'ks-', markerfacecolor=(.5,.5,.5) )
-pylab.loglog( dx, svres, 'k^-', markerfacecolor='w', markersize=3.5 )
-pylab.text( 0.8*dx[0], 0.8*ttres[0], 'Rupture time', ha='left', va='top' )
-pylab.text( dx[-1], 0.8*sures[-1], 'Slip', ha='center', va='top' )
-pylab.text( 0.8*dx[6], svres[6],  'Peak slip rate', ha='right' )
-dx = [ x for x in dx if x not in [ 30, 100, 300 ] ]
-pylab.xlim( 10, 750 )
-pylab.gca().set_xticks( dx )
-pylab.gca().set_xticklabels( dx )
-y = [ '%g' % y for y in pylab.gca().get_yticks() ]
-pylab.gca().set_yticklabels( y )
-pylab.gca().yaxis.set_label_coords( -.12, .5 )
-pylab.xlabel( 'Grid interval (m)' )
-pylab.ylabel( 'RMS difference (%)' )
-pylab.draw()
-pylab.savefig( 'convergence.pdf', format='pdf' )
-os.system( 'open convergence.pdf' )
+if 0:
+    pylab.rcdefaults()
+    font = { 'size': 8 }
+    pylab.rc( 'font', **font )
+    pylab.rc( 'figure', figsize=[3.2,3.2] )
+    pylab.rc( 'axes', linewidth=0.5 )
+    pylab.rc( 'ytick.minor', size=1 )
+    pylab.rc( 'ytick.major', size=2 )
+    pylab.rc( 'xtick.minor', size=0 )
+    pylab.rc( 'xtick.major', size=2 )
+    pylab.rc( 'lines', linewidth=0.5, color='k', markersize=3 )
+    pylab.subplots_adjust( left=.15, right=.95, bottom=.15, top=.95 )
+    pylab.clf()
+    pylab.loglog( dx, ttres, 'ko-' )
+    pylab.loglog( dx, sures, 'ks-', markerfacecolor=(.5,.5,.5) )
+    pylab.loglog( dx, svres, 'k^-', markerfacecolor='w', markersize=3.5 )
+    pylab.text( 0.8*dx[0], 0.8*ttres[0], 'Rupture time', ha='left', va='top' )
+    pylab.text( dx[-1], 0.8*sures[-1], 'Slip', ha='center', va='top' )
+    pylab.text( 0.8*dx[6], svres[6],  'Peak slip rate', ha='right' )
+    dx = [ x for x in dx if x not in [ 30, 100, 300 ] ]
+    pylab.xlim( 10, 750 )
+    pylab.gca().set_xticks( dx )
+    pylab.gca().set_xticklabels( dx )
+    y = [ '%g' % y for y in pylab.gca().get_yticks() ]
+    pylab.gca().set_yticklabels( y )
+    pylab.gca().yaxis.set_label_coords( -.12, .5 )
+    pylab.xlabel( 'Grid interval (m)' )
+    pylab.ylabel( 'RMS difference (%)' )
+    pylab.draw()
+    pylab.savefig( 'convergence.pdf', format='pdf' )
+    os.system( 'open convergence.pdf' )
 

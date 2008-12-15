@@ -54,6 +54,7 @@ def loadmeta( dir='.' ):
     load( dir + os.sep + 'conf.py', meta )
     try:
         load( dir + os.sep + 'out' + os.sep + 'header.py', meta )
+        out = meta['indices']
     except:
         out = dict()
         for f in meta['fieldio']:
@@ -75,7 +76,7 @@ def loadmeta( dir='.' ):
         nn = [ ( i[1] - i[0] ) / i[2] + 1 for i in out[k] ]
         nn = [ n for n in nn if n > 1 ]
         shape[k] = nn
-    meta['shape'] = nn
+    meta['shape'] = shape
     return objectify( meta )
 
 def indices( ii, mm ):
