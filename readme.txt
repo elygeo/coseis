@@ -122,10 +122,10 @@ Installation
 
 3.  Most systems already have `Python <http://www.python.org/download/>`_, but
     you may want to update it.  The `Enthought Python Distribution
-    <http://www.enthought.com/products/epddownload.php>` is a convenient way to
+    <http://www.enthought.com/products/epddownload.php>`_ is a convenient way to
     install Python with many useful included packages such as `matplotlib
     <http://matplotlib.sourceforge.net/>`_, `SciPy <http://www.scipy.org/>`_, and
-    `Mayavi <http://code.enthought.com/projects/mayavi>`.  If you want to install
+    `Mayavi <http://code.enthought.com/projects/mayavi>`_.  If you want to install
     only Python without the bells a whistles (on a remote server, for example), the
     `install-python.sh <extras/install-python.sh>`__ script in the ``extras/``
     directory can automate this for you.
