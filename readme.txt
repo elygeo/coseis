@@ -113,19 +113,21 @@ Installation
     <http://r.research.att.com/tools>`_ is recommended (versions from MacPorts and
     Fink seem to be problematic).
 
-2.  MPI is required if you will be using SORD in multiprocessor mode.  SORD has
-    been tested with ANL MPICH2, IBM MPI, and Myricom MPICH-GM.  The `MPICH2
-    <http://www.mcs.anl.gov/research/projects/mpich2/>`_ implementation is
-    recommended if you do not already have one.  The script `install-mpich.sh
-    <extras/install-mpich.sh>`__ in the ``extras/`` directory can automate this for
-    you.
+2.  MPI is required if you wish to use multiple cores or processors to speed-up
+    computations.  SORD has been tested with ANL MPICH2, IBM MPI, and Myricom
+    MPICH-GM.  The `MPICH2 <http://www.mcs.anl.gov/research/projects/mpich2/>`_
+    implementation is recommended if you do not already have one.  The script
+    `install-mpich.sh <extras/install-mpich.sh>`__ in the ``extras/`` directory can
+    automate this for you.
 
-3.  Most system already have `Python <http://www.python.org/download/>`_.
-    However, if you are not the system administrator, it is helpful to install your
-    own personal copy. This will enable you to install the SORD package, as well as
-    other useful Python packages like `matplotlib
-    <http://matplotlib.sourceforge.net/>`_ and `SciPy <http://www.scipy.org/>`_.
-    The `install-python.sh <extras/install-python.sh>`__ script in the ``extras/``
+3.  Most systems already have `Python <http://www.python.org/download/>`_, but
+    you may want to update it.  The `Enthought Python Distribution
+    <http://www.enthought.com/products/epddownload.php>` is a convenient way to
+    install Python with many useful included packages such as `matplotlib
+    <http://matplotlib.sourceforge.net/>`_, `SciPy <http://www.scipy.org/>`_, and
+    `Mayavi <http://code.enthought.com/projects/mayavi>`.  If you want to install
+    only Python without the bells a whistles (on a remote server, for example), the
+    `install-python.sh <extras/install-python.sh>`__ script in the ``extras/``
     directory can automate this for you.
 
 4.  Next, unpack the tar archive and enter the ``sord/`` directory:
@@ -139,8 +141,8 @@ Installation
 
         ./configure.py
 
-    Larger systems with batch schedulers (such as PBS or LoadLeveler) generally
-    require custom configuration to specify system resources, compiler options, and
+    Systems with batch schedulers (such as PBS or LoadLeveler) generally require
+    custom configuration to specify system resources, compiler options, and
     scheduler scripts.  If SORD has already been configured for your system you can
     use one of the included configurations.  For example, for the TeraGrid Ranger
     system at TACC, run::
@@ -156,12 +158,14 @@ Installation
 
         ./setup.py
 
-7.  To make the SORD module available you must add the enclosing directory to
-    your Python path. If you administer your Python installation, you can do::
+7.  To use SORD, Python needs to be able to find the ``sord`` module.  The
+    simplest way is to make sure you have a copy of, or a symbolic link to the
+    ``sord`` directory in your working directory.  More convenient is to add the
+    enclosing directory to your Python path so that the module can be found from
+    any directory.  The PYTHONPATH environmental variable can be used, or if you
+    are the administrator of your Python installation, you can do::
 
         ./setup.py path
-
-    Alternatively you can use the PYTHONPATH environmental variable.
 
 
 Basic usage

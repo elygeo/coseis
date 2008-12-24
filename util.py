@@ -166,7 +166,7 @@ def compile( compiler, object, source ):
 def install_path():
     """Install path file in site-packages directory"""
     from distutils.sysconfig import get_python_lib
-    import os
+    import os, sys
     pth = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
     dir = os.path.dirname( os.path.dirname( os.path.realpath( __file__ ) ) )
     print 'Installing ' + pth

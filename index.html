@@ -107,7 +107,7 @@ BSSA, in revision.
 </div>
 <div class="section" id="download">
 <h3>Download</h3>
-<p>Latest source code version <a class="reference external" href="sord.tgz">3.0.200</a></p>
+<p>Latest source code version <a class="reference external" href="sord.tgz">3.0.201</a></p>
 <p>Older versions can be extracted from the source code repository (see
 <a class="reference internal" href="#development">Development</a>).</p>
 </div>
@@ -125,16 +125,20 @@ yum install gfortran
 version available from the <a class="reference external" href="http://r.research.att.com/tools">R for Mac OS X Developer's Page</a> is recommended (versions from MacPorts and
 Fink seem to be problematic).</p>
 </li>
-<li><p class="first">MPI is required if you will be using SORD in multiprocessor mode.  SORD has
-been tested with ANL MPICH2, IBM MPI, and Myricom MPICH-GM.  The <a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a> implementation is
-recommended if you do not already have one.  The script <a class="reference external" href="extras/install-mpich.sh">install-mpich.sh</a> in the <tt class="docutils literal"><span class="pre">extras/</span></tt> directory can automate this for
-you.</p>
+<li><p class="first">MPI is required if you wish to use multiple cores or processors to speed-up
+computations.  SORD has been tested with ANL MPICH2, IBM MPI, and Myricom
+MPICH-GM.  The <a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a>
+implementation is recommended if you do not already have one.  The script
+<a class="reference external" href="extras/install-mpich.sh">install-mpich.sh</a> in the <tt class="docutils literal"><span class="pre">extras/</span></tt> directory can
+automate this for you.</p>
 </li>
-<li><p class="first">Most system already have <a class="reference external" href="http://www.python.org/download/">Python</a>.
-However, if you are not the system administrator, it is helpful to install your
-own personal copy. This will enable you to install the SORD package, as well as
-other useful Python packages like <a class="reference external" href="http://matplotlib.sourceforge.net/">matplotlib</a> and <a class="reference external" href="http://www.scipy.org/">SciPy</a>.
-The <a class="reference external" href="extras/install-python.sh">install-python.sh</a> script in the <tt class="docutils literal"><span class="pre">extras/</span></tt>
+<li><p class="first">Most systems already have <a class="reference external" href="http://www.python.org/download/">Python</a>, but
+you may want to update it.  The <cite>Enthought Python Distribution
+&lt;http://www.enthought.com/products/epddownload.php&gt;</cite> is a convenient way to
+install Python with many useful included packages such as <a class="reference external" href="http://matplotlib.sourceforge.net/">matplotlib</a>, <a class="reference external" href="http://www.scipy.org/">SciPy</a>, and
+<cite>Mayavi &lt;http://code.enthought.com/projects/mayavi&gt;</cite>.  If you want to install
+only Python without the bells a whistles (on a remote server, for example), the
+<a class="reference external" href="extras/install-python.sh">install-python.sh</a> script in the <tt class="docutils literal"><span class="pre">extras/</span></tt>
 directory can automate this for you.</p>
 </li>
 <li><p class="first">Next, unpack the tar archive and enter the <tt class="docutils literal"><span class="pre">sord/</span></tt> directory:</p>
@@ -148,8 +152,8 @@ configuration may be adequate.  To test the default configuration run:</p>
 <pre class="literal-block">
 ./configure.py
 </pre>
-<p>Larger systems with batch schedulers (such as PBS or LoadLeveler) generally
-require custom configuration to specify system resources, compiler options, and
+<p>Systems with batch schedulers (such as PBS or LoadLeveler) generally require
+custom configuration to specify system resources, compiler options, and
 scheduler scripts.  If SORD has already been configured for your system you can
 use one of the included configurations.  For example, for the TeraGrid Ranger
 system at TACC, run:</p>
@@ -165,12 +169,15 @@ sub-directory following the format of the supplied configurations.</p>
 ./setup.py
 </pre>
 </li>
-<li><p class="first">To make the SORD module available you must add the enclosing directory to
-your Python path. If you administer your Python installation, you can do:</p>
+<li><p class="first">To use SORD, Python needs to be able to find the <tt class="docutils literal"><span class="pre">sord</span></tt> module.  The
+simplest way is to make sure you have a copy of, or a symbolic link to the
+<tt class="docutils literal"><span class="pre">sord</span></tt> directory in your working directory.  More convenient is to add the
+enclosing directory to your Python path so that the module can be found from
+any directory.  The PYTHONPATH environmental variable can be used, or if you
+are the administrator of your Python installation, you can do:</p>
 <pre class="literal-block">
 ./setup.py path
 </pre>
-<p>Alternatively you can use the PYTHONPATH environmental variable.</p>
 </li>
 </ol>
 </div>
@@ -285,7 +292,7 @@ easy_install bzr
 <div class="footer">
 <hr class="footer" />
 <a class="reference external" href="readme.txt">View document source</a>.
-Generated on: 2008-12-15.
+Generated on: 2008-12-24.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>
