@@ -97,8 +97,8 @@ Older versions can be extracted from the source code repository (see
 Development_).
 
 
-Installation
-------------
+Installation - Linux or Mac
+---------------------------
 
 1.  A Fortran 95 compiler is required.  SORD has been tested with GNU, IBM,
     SUN, Intel, and Portland Group compilers.  GNU Fortran is a fine option if you
@@ -107,11 +107,12 @@ Installation
 
         yum install gfortran
 
-    For OSX you must first install `Xcode Tools
-    <http://developer.apple.com/tools/xcode/>`_ from Apple.  The GNU Fortran
-    version available from the `R for Mac OS X Developer's Page
-    <http://r.research.att.com/tools>`_ is recommended (versions from MacPorts and
-    Fink seem to be problematic).
+    For OSX, first install `Xcode Tools <http://developer.apple.com/tools/xcode/>`_
+    available from Apple Developer Connection (free `membership
+    <http://developer.apple.com/products/membership.html>`__ required).  Then
+    install the GNU Fortran version available from the `R for Mac OS X Developer's
+    Page <http://r.research.att.com/tools>`_ (versions from MacPorts and Fink seem
+    to be problematic and are not recommended).
 
 2.  MPI is required if you wish to use multiple cores or processors to speed-up
     computations.  SORD has been tested with ANL MPICH2, IBM MPI, and Myricom
@@ -149,9 +150,10 @@ Installation
 
         ./configure.py tacc-ranger
 
-    Each custom configuration is located in a separate sub-directory of the
-    ``conf/`` directory.  To create a new custom configuration, make a new
-    sub-directory following the format of the supplied configurations.
+    To see the list of included configurations look in the ``conf/`` directory.
+    Each custom configuration is located in a separate sub-directory.  To create a
+    new custom configuration, make a new sub-directory following the example of
+    the supplied configurations.
 
 6.  Compile the code by running:
     ::
@@ -160,10 +162,11 @@ Installation
 
 7.  To use SORD, Python needs to be able to find the ``sord`` module.  The
     simplest way is to make sure you have a copy of, or a symbolic link to the
-    ``sord`` directory in your working directory.  More convenient is to add the
-    enclosing directory to your Python path so that the module can be found from
-    any directory.  The PYTHONPATH environmental variable can be used, or if you
-    are the administrator of your Python installation, you can do::
+    ``sord`` directory in your current working directory.  More convenient is to
+    add the directory above the ``sord`` directory to your Python path so that the
+    module can be found from any location.  The PYTHONPATH environmental variable
+    can be used, or if you are the administrator of your Python installation, you
+    can do::
 
         ./setup.py path
 

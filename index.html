@@ -38,7 +38,7 @@ img { border: 15px solid #fff; padding: 0px; }
 <li><a class="reference internal" href="#author" id="id6">Author</a></li>
 <li><a class="reference internal" href="#publications" id="id7">Publications</a></li>
 <li><a class="reference internal" href="#download" id="id8">Download</a></li>
-<li><a class="reference internal" href="#installation" id="id9">Installation</a></li>
+<li><a class="reference internal" href="#installation-linux-or-mac" id="id9">Installation - Linux or Mac</a></li>
 <li><a class="reference internal" href="#basic-usage" id="id10">Basic usage</a></li>
 <li><a class="reference internal" href="#examples" id="id11">Examples</a></li>
 <li><a class="reference internal" href="#fortran-source-code" id="id12">Fortran source code</a></li>
@@ -107,12 +107,12 @@ BSSA, in revision.
 </div>
 <div class="section" id="download">
 <h3>Download</h3>
-<p>Latest source code version <a class="reference external" href="sord.tgz">3.0.202</a></p>
+<p>Latest source code version <a class="reference external" href="sord.tgz">3.0.203</a></p>
 <p>Older versions can be extracted from the source code repository (see
 <a class="reference internal" href="#development">Development</a>).</p>
 </div>
-<div class="section" id="installation">
-<h3>Installation</h3>
+<div class="section" id="installation-linux-or-mac">
+<h3>Installation - Linux or Mac</h3>
 <ol class="arabic">
 <li><p class="first">A Fortran 95 compiler is required.  SORD has been tested with GNU, IBM,
 SUN, Intel, and Portland Group compilers.  GNU Fortran is a fine option if you
@@ -121,9 +121,11 @@ do not already have one.  To install GNU Fortran on Fedora or Red Hat Linux use
 <pre class="literal-block">
 yum install gfortran
 </pre>
-<p>For OSX you must first install <a class="reference external" href="http://developer.apple.com/tools/xcode/">Xcode Tools</a> from Apple.  The GNU Fortran
-version available from the <a class="reference external" href="http://r.research.att.com/tools">R for Mac OS X Developer's Page</a> is recommended (versions from MacPorts and
-Fink seem to be problematic).</p>
+<p>For OSX, first install <a class="reference external" href="http://developer.apple.com/tools/xcode/">Xcode Tools</a>
+available from Apple Developer Connection (free <a class="reference external" href="http://developer.apple.com/products/membership.html">membership</a> required).  Then
+install the GNU Fortran version available from the <a class="reference external" href="http://r.research.att.com/tools">R for Mac OS X Developer's
+Page</a> (versions from MacPorts and Fink seem
+to be problematic and are not recommended).</p>
 </li>
 <li><p class="first">MPI is required if you wish to use multiple cores or processors to speed-up
 computations.  SORD has been tested with ANL MPICH2, IBM MPI, and Myricom
@@ -159,9 +161,10 @@ system at TACC, run:</p>
 <pre class="literal-block">
 ./configure.py tacc-ranger
 </pre>
-<p>Each custom configuration is located in a separate sub-directory of the
-<tt class="docutils literal"><span class="pre">conf/</span></tt> directory.  To create a new custom configuration, make a new
-sub-directory following the format of the supplied configurations.</p>
+<p>To see the list of included configurations look in the <tt class="docutils literal"><span class="pre">conf/</span></tt> directory.
+Each custom configuration is located in a separate sub-directory.  To create a
+new custom configuration, make a new sub-directory following the example of
+the supplied configurations.</p>
 </li>
 <li><p class="first">Compile the code by running:</p>
 <pre class="literal-block">
@@ -170,10 +173,11 @@ sub-directory following the format of the supplied configurations.</p>
 </li>
 <li><p class="first">To use SORD, Python needs to be able to find the <tt class="docutils literal"><span class="pre">sord</span></tt> module.  The
 simplest way is to make sure you have a copy of, or a symbolic link to the
-<tt class="docutils literal"><span class="pre">sord</span></tt> directory in your working directory.  More convenient is to add the
-enclosing directory to your Python path so that the module can be found from
-any directory.  The PYTHONPATH environmental variable can be used, or if you
-are the administrator of your Python installation, you can do:</p>
+<tt class="docutils literal"><span class="pre">sord</span></tt> directory in your current working directory.  More convenient is to
+add the directory above the <tt class="docutils literal"><span class="pre">sord</span></tt> directory to your Python path so that the
+module can be found from any location.  The PYTHONPATH environmental variable
+can be used, or if you are the administrator of your Python installation, you
+can do:</p>
 <pre class="literal-block">
 ./setup.py path
 </pre>
