@@ -98,7 +98,7 @@ Development_).
 
 
 Installation - Linux or Mac OS X
----------------------------
+--------------------------------
 
 1.  A Fortran 95 compiler is required.  SORD has been tested with GNU, IBM,
     SUN, Intel, and Portland Group compilers.  GNU Fortran is a fine option if you
