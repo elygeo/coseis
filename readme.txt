@@ -27,7 +27,7 @@ SORD is a Python module that allows for flexible scripting of jobs.  Underlying
 computations are coded in Fortran 95 and parallelized for multi-processor
 execution using Message Passing Interface (MPI).  The code is portable and
 tested with a variety of Fortran 95 compilers, MPI implementations, operating
-systems (Linux, IBM AIX, Apple OSX, SUN Solaris).
+systems (Linux, IBM AIX, Mac OS X, SUN Solaris).
 
 
 News
@@ -97,7 +97,7 @@ Older versions can be extracted from the source code repository (see
 Development_).
 
 
-Installation - Linux or Mac
+Installation - Linux or Mac OS X
 ---------------------------
 
 1.  A Fortran 95 compiler is required.  SORD has been tested with GNU, IBM,
@@ -107,7 +107,7 @@ Installation - Linux or Mac
 
         yum install gfortran
 
-    For OSX, first install `Xcode Tools
+    For Mac OS X, first install `Xcode Tools
     <http://developer.apple.com/technology/xcode.html>`_ available from Apple
     Developer Connection (free `membership <http://connect.apple.com>`__ required).
     Then install the GNU Fortran version available from the `R for Mac OS X
