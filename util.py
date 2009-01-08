@@ -50,10 +50,10 @@ def save( filename, d, expandlist=[] ):
 def loadmeta( dir='.' ):
     """Load SORD metadata"""
     import os, pprint
-    meta = load( dir + os.sep + 'parameters.py' )
-    load( dir + os.sep + 'conf.py', meta )
+    meta = load( os.path.join( dir, 'parameters.py' ) )
+    load( os.path.join( dir, 'conf.py' ), meta )
     try:
-        load( dir + os.sep + 'out' + os.sep + 'header.py', meta )
+        load( os.path.join( dir, 'out', 'header.py' ), meta )
         out = meta['indices']
     except:
         out = dict()
@@ -61,14 +61,14 @@ def loadmeta( dir='.' ):
              ii, field, filename = f[6:9]
              if filename is not '-':
                  out[filename] = ii
-        locs = load( dir + os.sep + 'locations.py' )
+        locs = load( os.path.join( dir, 'locations.py' ) )
         mm = meta['nn'] + ( meta['nt'], )
         for ii, filename in locs['locations']:
              if filename is not '-':
                  ii = indices( ii, mm )
                  out[filename] = ii
         meta['indices'] = out
-        f = open( dir + os.sep + 'out' + os.sep + 'header.py', 'w' )
+        f = open( os.path.join( dir, 'out', 'header.py' ), 'w' )
         f.write( 'indices = ' + pprint.pformat( out ) )
         f.close()
     shape = dict()
@@ -135,10 +135,10 @@ def ndread( filename, mm=None, ii=[], endian='=' ):
 def compile( compiler, object, source ):
     """An alternative to Make that uses state files"""
     import os, sys, glob, difflib
-    statedir = os.path.dirname( object ) + os.sep + '.state'
+    statedir = os.path.join( os.path.dirname( object ), '.state' )
     if not os.path.isdir( statedir ):
         os.mkdir( statedir )
-    statefile = statedir + os.sep + os.path.basename( object )
+    statefile = os.path.join( statedir, os.path.basename( object ) )
     command = compiler + [ object ] + [ f for f in source if f ]
     state = [ ' '.join( command ) + '\n' ]
     for f in source:
@@ -167,7 +167,8 @@ def install_path():
     """Install path file in site-packages directory"""
     from distutils.sysconfig import get_python_lib
     import os, sys
-    pth = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
+    f   = os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
+    pth = os.path.join( get_python_lib(), f )
     dir = os.path.dirname( os.path.dirname( os.path.realpath( __file__ ) ) )
     print 'Installing ' + pth
     print 'for path ' + dir
@@ -179,7 +180,8 @@ def uninstall_path():
     """Remove path file from site-packages directory"""
     from distutils.sysconfig import get_python_lib
     import os
-    pth = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
+    f = os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
+    pth = os.path.join( get_python_lib(), f )
     print 'Removing ' + pth
     if os.path.isfile( pth ):
         try: os.unlink( pth )
@@ -191,7 +193,8 @@ def install():
     from distutils.sysconfig import get_python_lib
     import os, sys, shutil
     src = os.path.dirname( os.path.realpath( __file__ ) )
-    dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) )
+    f   = os.path.basename( os.path.dirname( __file__ ) )
+    dst = os.path.join( get_python_lib(), f )
     print 'Installing ' + dst
     print 'From ' + src
     try: shutil.rmtree( dst )
@@ -204,7 +207,8 @@ def uninstall():
     """Remove package from site-packages directory"""
     from distutils.sysconfig import get_python_lib
     import os, shutil
-    dst = get_python_lib() + os.sep + os.path.basename( os.path.dirname( __file__ ) )
+    f   = os.path.basename( os.path.dirname( __file__ ) )
+    dst = os.path.join( get_python_lib(), f )
     print 'Removing ' + dst
     if os.path.isdir( dst ):
         try: shutil.rmtree( dst )

@@ -14,14 +14,14 @@ def run( inputs ):
     print "SORD setup"
 
     # Read defaults
-    prm = util.load( os.path.dirname( __file__ ) + os.sep + 'default-prm.py' )
+    prm = util.load( os.path.join( os.path.dirname( __file__ ), 'default-prm.py' ) )
     if 'machine' in inputs:
         cfg = configure.configure( machine=inputs['machine'] )
     else:
         cfg = configure.configure()
     if '__file__' in inputs:
         cfg['name'] = os.path.splitext( os.path.basename( inputs['__file__'] ) )[0]
-        cfg['rundir'] += os.sep + cfg['name'] 
+        cfg['rundir'] = os.path.join( cfg['rundir'], cfg['name'] )
 
     # Merge inputs
     for k, v in inputs.iteritems():
@@ -139,7 +139,7 @@ def run( inputs ):
     except:
         sys.exit( 'Directory %r already exists or cannot be created. Use --force to overwrite.' % cfg.rundir )
     for f in ( 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint' ):
-        os.mkdir( cfg.rundir + os.sep + f )
+        os.mkdir( os.path.join( cfg.rundir, f ) )
 
     # Link input files
     for i, line in enumerate( prm.fieldio ):
@@ -148,11 +148,11 @@ def run( inputs ):
             f = os.path.basename( filename )
             line = line[:3] + ( f, ) + line[4:]
             prm.fieldio[i] = line
-            f = 'in' + os.sep + filename
+            f = os.path.join( 'in', filename )
             try:
-                os.link( filename, cfg.rundir + os.sep + f )
+                os.link( filename, os.path.join( cfg.rundir, f ) )
             except:
-                shutil.copy( filename, cfg.rundir + os.sep + f )
+                shutil.copy( filename, os.path.join( cfg.rundir, f ) )
 
     # Copy files to run directory
     cwd = os.path.realpath( os.getcwd() )
@@ -160,8 +160,8 @@ def run( inputs ):
     cfg.name += '-' + os.path.basename( cfg.rundir )
     cfg.rundir = os.path.realpath( cfg.rundir )
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    cfg.bin = '.' + os.sep + 'sord-' + cfg.mode + cfg.optimize
-    shutil.copy( 'bin' + os.sep + 'sord-' + cfg.mode + cfg.optimize, cfg.rundir )
+    cfg.bin = os.path.join( '.', 'sord-' + cfg.mode + cfg.optimize )
+    shutil.copy( os.path.join( 'bin', 'sord-' + cfg.mode + cfg.optimize ), cfg.rundir )
     try: shutil.cop( 'sord.tgz', cfg.rundir )
     except: pass
     if cfg.optimize == 'g':
@@ -171,8 +171,8 @@ def run( inputs ):
     if not os.path.isdir( f ):
         f = 'conf/default/templates'
     for d in [ 'conf/common/templates', f ]:
-        for f in glob.glob( d + os.sep + '*' ):
-            ff = cfg.rundir + os.sep + os.path.basename( f )
+        for f in glob.glob( os.path.join( d, '*' ) ):
+            ff = os.path.join( cfg.rundir, os.path.basename( f ) )
             out = open( f, 'r' ).read() % util.dictify( cfg )
             open( ff, 'w' ).write( out )
             shutil.copymode( f, ff )
@@ -189,13 +189,13 @@ def run( inputs ):
         print 'queue.sh'
         if cfg.host not in cfg.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r' % ( cfg.host, cfg.machine ) )
-        if os.system( '.' + os.sep + 'queue.sh' ):
+        if os.system( os.path.join( '.', 'queue.sh' ) ):
             sys.exit( 'Error queing job' )
     elif cfg.run:
         print 'run.sh -' + cfg.run
         if cfg.host not in cfg.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r' % ( cfg.host, cfg.machine ) )
-        if os.system( '.' + os.sep + 'run.sh -' + cfg.run ):
+        if os.system( os.path.join( '.', 'run.sh -' + cfg.run ) ):
             sys.exit( 'Error running job' )
 
     # Return to initial directory
@@ -274,7 +274,7 @@ def prepare_prm( prm, itbuff ):
         if 'w' not in mode and field not in fieldnames.input:
             sys.exit( 'Error: field is ouput only: %r' % line )
         if 'r' in mode or 'R' in mode:
-            fn = os.path.dirname( filename ) + os.sep + 'endian'
+            fn = os.path.join( os.path.dirname( filename ), 'endian' )
             if open( fn, 'r' ).read()[0] != sys.byteorder[0]:
                 sys.exit( 'Error: wrong byte order for ' + filename )
         nn = list( prm.nn ) + [ prm.nt ]

@@ -54,7 +54,7 @@ if __name__ == '__main__':
     if   mode == '-d': print deploy.__doc__
     elif mode == '-p': print publish.__doc__
     elif mode == '-g': print get.__doc__
-    f = os.path.dirname( __file__ ) + os.sep + 'destinations'
+    f = os.path.join( os.path.dirname( __file__ ), 'destinations' )
     destinations = [ a.strip() for a in open( f, 'r' ).readlines() ]
     list = []
     for i, a in enumerate( destinations ):

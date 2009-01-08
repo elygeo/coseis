@@ -14,7 +14,7 @@ name = 'sord'		# name of current simulation
 pre = ''		# pre-processing command
 post = ''		# post-processing command
 itbuff = 10		# max number of timesteps to buffer for 2D & 3D output
-rundir = os.path.expanduser('~') + os.sep + 'run'	# run directory
+rundir = os.path.join( os.path.expanduser('~'), 'run' )	# run directory
 
 # User info
 user = pwd.getpwuid(os.geteuid())[0]
@@ -42,7 +42,7 @@ fortran_serial = None
 for _dir in os.environ['PATH'].split(':'):
     if fortran_serial: break
     for _f in [ 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95' ]:
-        if os.path.isfile( _dir + os.sep + _f ):
+        if os.path.isfile( os.path.join( _dir, _f ) ):
             fortran_serial = [ _f ]
             break
 
@@ -51,7 +51,7 @@ fortran_mpi = None
 for _dir in os.environ['PATH'].split(':'):
     if fortran_mpi: break
     for _f in [ 'mpxlf95_r', 'mpif90' ]:
-        if os.path.isfile( _dir + os.sep + _f ):
+        if os.path.isfile( os.path.join( _dir, _f ) ):
             fortran_mpi = [ _f ]
             break
 

@@ -38,20 +38,20 @@ def build( mode=None, optimize=None ):
         'sord.f90', )
     cwd = os.getcwd()
     srcdir = os.path.realpath( os.path.dirname( __file__ ) )
-    try: os.mkdir( srcdir + os.sep + 'bin' )
+    try: os.mkdir( os.path.join( srcdir, 'bin' ) )
     except: pass
     new = False
-    os.chdir( srcdir + os.sep + 'src' )
+    os.chdir( os.path.join( srcdir, 'src' ) )
     if 's' in mode:
         source = base + ( 'serial.f90', ) + common
         for opt in optimize:
-            object = '..' + os.sep + 'bin' + os.sep + 'sord-s' + opt
+            object = os.path.join( '..', 'bin', 'sord-s' + opt )
             compiler = cfg['fortran_serial'] + cfg['fortran_flags'][opt]
             new |= util.compile( compiler, object, source )
     if 'm' in mode and cfg['fortran_mpi']:
         source = base + ( 'mpi.f90', ) + common
         for opt in optimize:
-            object = '..' + os.sep + 'bin' + os.sep + 'sord-m' + opt
+            object = os.path.join( '..', 'bin', 'sord-m' + opt )
             compiler = cfg['fortran_mpi'] + cfg['fortran_flags'][opt]
             new |= util.compile( compiler, object, source )
     if new:
