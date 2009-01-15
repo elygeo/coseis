@@ -32,19 +32,19 @@ def load( filename, d=None ):
         if k[0] is '_' or type(d[k]) is type(sys): del( d[k] )
     return d
 
-def save( filename, d, expandlist=[] ):
+def save( fd, d, expandlist=[] ):
     """Write variables from a dict into a Python source file"""
     import sys
-    f = open( filename, 'w' )
+    if type( fd ) is not file: fd = open( fd, 'w' )
     for k in sorted( d ):
         if k[0] is not '_' and type(d[k]) is not type(sys) and k not in expandlist:
-            f.write( '%s = %r\n' % ( k, d[k] ) )
+            fd.write( '%s = %r\n' % ( k, d[k] ) )
     for k in expandlist:
-        f.write( k + ' = [\n' )
+        fd.write( k + ' = [\n' )
         for line in d[k]:
-            f.write( repr( line ) + ',\n' )
-        f.write( ']\n' )
-    f.close()
+            fd.write( repr( line ) + ',\n' )
+        fd.write( ']\n' )
+    fd.close()
     return
 
 def loadmeta( dir='.' ):
@@ -102,10 +102,10 @@ def indices( ii, mm ):
         ii[i] = tuple( ii[i] )
     return ii
 
-def ndread( filename, mm=None, ii=[], endian='=' ):
+def ndread( fd, mm=None, ii=[], endian='=' ):
     """Read n-dimensional slice from binary file"""
     import numpy
-    fd = open( filename, 'rb' )
+    if type( fd ) is not file: fd = open( fd, 'rb' )
     dtype = numpy.dtype( numpy.float32 ).newbyteorder( endian )
     if not mm: return numpy.fromfile( fd, dtype )
     elif type( mm ) == int: mm = [ mm ]

@@ -124,11 +124,10 @@ i2 = i2bc + 1
 call vector_swap_halo( w1, nhalo )
 call vector_bc( w1, bc, bc, i1, i2 )
 
-! Cell centers and volume
+! Cell centers
 call average( w2(:,:,:,1), w1(:,:,:,1), i1cell, i2cell, 1 )
 call average( w2(:,:,:,2), w1(:,:,:,2), i1cell, i2cell, 1 )
 call average( w2(:,:,:,3), w1(:,:,:,3), i1cell, i2cell, 1 )
-call diffnc( vc, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
 
 ! Hypocenter location
 j = ihypo(1)
@@ -252,6 +251,9 @@ case( 6 )
   end do
 case default; stop 'illegal operator'
 end select
+
+! Cell volume
+call diffnc( vc, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
 
 end subroutine
 
