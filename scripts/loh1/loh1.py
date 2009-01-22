@@ -5,9 +5,9 @@ PEER LOH.1
 
 import sord
 
-np3 = 1, 2, 1
 np3 = 1, 1, 1
 np3 = 1, 16, 1
+np3 = 1, 2, 1
 dx = 50.
 dt = 0.004
 _T = 9.

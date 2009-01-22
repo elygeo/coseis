@@ -134,7 +134,7 @@ i = 6 - ic - id
 if ( ic < id ) then
   w2(:,:,:,i) = 0.5 * s1
 elseif ( ic > id ) then
-  w2(:,:,:,i) = s1 + 0.5 * w2(:,:,:,i)
+  w2(:,:,:,i) = w2(:,:,:,i) + 0.5 * s1
 else
   w1(:,:,:,ic) = s1
 end if
