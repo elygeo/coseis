@@ -79,58 +79,124 @@ def loadmeta( dir='.' ):
     meta['shape'] = shape
     return objectify( meta )
 
-def indices( ii, mm ):
+def expand_indices( indices, shape ):
     """Fill in slice index notation"""
-    n = len( mm )
-    if len( ii ) == 0:
-        ii = n * [ 0 ]
-    elif len( ii ) != n:
+    n = len( shape )
+    if len( indices ) == 0:
+        indices = n * [ 0 ]
+    elif len( indices ) != n:
         sys.exit( 'error in indices' )
-    ii = list( ii )
+    indices = list( indices )
     for i in range( n ):
-        if ii[i] == 0:
-            ii[i] = [ 1, -1, 1 ]
-        elif type( ii[i] ) == int:
-            ii[i] = [ ii[i], ii[i], 1 ]
+        if indices[i] == 0:
+            indices[i] = [ 1, -1, 1 ]
+        elif type( indices[i] ) == int:
+            indices[i] = [ indices[i], indices[i], 1 ]
         else:
-            ii[i] = list( ii[i] )
-        if len( ii[i] ) == 2:
-            ii[i] = ii[i] + [ 1 ]
+            indices[i] = list( indices[i] )
+        if len( indices[i] ) == 2:
+            indices[i] = indices[i] + [ 1 ]
         for j in range( 3 ):
-            if ii[i][j] < 1:
-                ii[i][j] = ii[i][j] + mm[i] + 1
-        ii[i] = tuple( ii[i] )
-    return ii
+            if indices[i][j] < 1:
+                indices[i][j] = indices[i][j] + shape[i] + 1
+        indices[i] = tuple( indices[i] )
+    return indices
 
-def ndread( fd, mm=None, ii=[], endian='=' ):
-    """Read n-dimensional slice from binary file"""
+def ndread( fd, shape=None, indices=[], endian='=', order='F' ):
+    """Read slice from n-dimentional binary file"""
     import numpy
-    if type( fd ) is not file: fd = open( fd, 'rb' )
+    if type( fd ) is not file:
+        fd = open( fd, 'rb' )
     dtype = numpy.dtype( numpy.float32 ).newbyteorder( endian )
-    if not mm: return numpy.fromfile( fd, dtype )
-    elif type( mm ) == int: mm = [ mm ]
-    else: mm = list( mm )
+    if not shape:
+        return numpy.fromfile( fd, dtype )
+    elif type( shape ) == int:
+        mm = [ shape ]
+    else:
+        mm = list( shape )
     ndim = len( mm )
-    ii = indices( ii, mm )
+    ii = expand_indices( indices, mm )
+    if order is 'F':
+        ii = ii[::-1]
+        mm = mm[::-1]
+    elif order is not 'C':
+        sys.exit( "Invalid order %s, must be 'C' or 'F'" % order )
     i0 = [ ii[i][0] - 1             for i in range( ndim ) ]
     nn = [ ii[i][1] - ii[i][0] + 1  for i in range( ndim ) ]
+    nn0 = nn
     for i in xrange( ndim-1, 0, -1 ):
-        if mm[i-1] == nn[i-1]:
-            i0[i-1] = mm[i-1] * i0[i]; del i0[i]
-            nn[i-1] = mm[i-1] * nn[i]; del nn[i]
+        if mm[i] == nn[i]:
+            i0[i-1] = i0[i-1] * mm[i]; del i0[i]
+            nn[i-1] = nn[i-1] * mm[i]; del nn[i]
             mm[i-1] = mm[i-1] * mm[i]; del mm[i]
-    nb = dtype.itemsize
-    i0 = ( i0 + [ 0, 0 ] )[:3]
-    nn = ( nn + [ 1, 1 ] )[:3]
-    mm = ( mm + [ 1, 1 ] )[:3]
-    f = numpy.empty( nn[::-1], dtype )
-    for l in xrange( nn[2] ):
+    i0 = ( [0,0,0] + i0 )[-4:]
+    nn = ( [1,1,1] + nn )[-4:]
+    mm = ( [1,1,1] + mm )[-4:]
+    f = numpy.empty( nn, dtype )
+    offset = numpy.array( i0 )
+    stride = numpy.cumprod( [1] + mm[:0:-1] )[::-1] * dtype.itemsize
+    for j in xrange( nn[0] ):
         for k in xrange( nn[1] ):
-            i = i0[0] + mm[0] * ( i0[1] + k + mm[1] * ( i0[2] + l ) )
-            fd.seek( nb * i, 0 )
-            f[l,k,:] = numpy.fromfile( fd, dtype, nn[0] )
-    nn = [ ii[i][1] - ii[i][0] + 1  for i in range( ndim ) ]
-    return f.reshape( nn[::-1] ).T
+            for l in xrange( nn[2] ):
+                i = numpy.sum( stride * ( offset + numpy.array( [j,k,l,0] ) ) )
+                fd.seek( i, 0 )
+                f[j,k,l,:] = numpy.fromfile( fd, dtype, nn[-1] )
+    if order is 'F':
+        f = f.reshape( nn0 ).T
+    else:
+        f = f.reshape( nn0 )
+    return f
+
+def transpose( f0, f1, shape, axes=None, order='F', hold=2, dtype=None ):
+    """Transpose array on disk holding two dimensions in memory"""
+    import sys, numpy
+    ndim = len( shape )
+    if not axes:
+        axes = range( ndim )[::-1]
+    if not dtype:
+        dtype = numpy.dtype( numpy.float32 )
+    if len( shape ) != len( axes ):
+        sys.exit( 'Length of shape and axes must match: %s, %s' % ( shape, axes ) )
+    if min( axes ) == 1:
+        axes = [ i-1 for i in axes ]
+    if sorted( axes ) != range( ndim ):
+        sys.exit( 'bad axes: %s' % axes )
+    if order is 'F':
+        shape = shape[::-1]
+        axes  = [ ndim-i-1 for i in axes[::-1] ]
+    elif order is not 'C':
+        sys.exit( "Invalid order %s, must be 'C' or 'F'" % order )
+    hold += 1
+    shape = numpy.array( list( shape ) + [1] )
+    axes  = [ i for i in axes if shape[i] > 1 ] + [ndim]
+    if len( axes ) < 3:
+        sys.exit( 'Nothing to transpose' )
+    if type( f0 ) is not file:
+         f0 = open( f0, 'rb' )
+    if type( f1 ) is not file:
+         f1 = open( f1, 'wb' )
+    i  = len( axes ) - hold
+    a0 = axes[:i]
+    a1 = axes[i:]
+    T = numpy.array( a1 )
+    T[T.argsort()] = numpy.arange( T.size )
+    a1.sort()
+    shape0 = shape[a0]
+    shape1 = shape[a1]
+    stride0 = numpy.cumprod( [1] + list( shape[a0][:0:-1] ) )[::-1]
+    stride1 = numpy.cumprod( [1] + list( shape[:0:-1] ) )[::-1][a0] * dtype.itemsize
+    i = ( numpy.diff( a1 ) != 1 ).nonzero()[0].max()
+    stride2 = shape[a1[i]+1:].prod() * dtype.itemsize
+    n0 = shape0.prod()
+    n1 = shape1[:i+1].prod()
+    n2 = shape1[i+1:].prod()
+    v = numpy.empty( ( n1, n2 ), dtype )
+    for j in xrange( n0 ):
+        offset = numpy.sum( stride1 * ( j / stride0 % shape0 ) )
+        for k in xrange( n1 ):
+           f0.seek( offset + k * stride2, 0 )
+           v[k,:] = numpy.fromfile( f0, dtype, n2 )
+        v.reshape( shape1 ).transpose( T ).tofile( f1 )
 
 def compile( compiler, object, source ):
     """An alternative to Make that uses state files"""

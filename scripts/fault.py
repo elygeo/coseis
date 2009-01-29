@@ -5,7 +5,7 @@ Fault test
 
 import sord
 
-debug = 0
+debug = 4
 np3   =  2,  3,  2
 np3   =  1,  2,  1
 nn    =  8,  8,  9

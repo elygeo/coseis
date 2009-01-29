@@ -22,7 +22,7 @@ for _f in 'f1', 'f2', 'f3':
         ( '=r', 'vp',  [], 'vp'  ),		# P-wave speed
         ( '=r', 'vs',  [], 'vs'  ),		# S-wave speed
         ( '=',  'gam', [],  0.   ),		# viscosity
-        ( '=',  'f1', _src, 1., 'brune', 0.1 ),	# point source time function
+        ( '=',  _f, _src, 1., 'brune', 0.1 ),	# point source time function
         ( '=w', 'e11', _vol, 'g11' ),		# dG: Green's function
         ( '=w', 'e22', _vol, 'g22' ),		# dG: Green's function
         ( '=w', 'e33', _vol, 'g33' ),		# dG: Green's function

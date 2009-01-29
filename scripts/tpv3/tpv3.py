@@ -5,6 +5,7 @@ TPV3 - SCEC validation problem version 3, convergence test
 
 import sord, os
 
+debug = 4
 _reg = 1
 _run = [ 
     500., (1, 1, 2),
@@ -37,6 +38,7 @@ for _i in range( 0, len( _run ), 2 ):
     dx = _run[_i]
     dt = dx / 12500.
     nt = int( 12. / dt + 1.5 )
+    nt = 10
     nn = ( 
         int( 16500. / dx + 21.5 ),
         int(  9000. / dx + 21.5 ),
