@@ -147,8 +147,8 @@ def ndread( fd, shape=None, indices=[], order='F', dtype=None, endian=None ):
     nn = ( [1,1,1] + nn )[-4:]
     mm = ( [1,1,1] + mm )[-4:]
     f = numpy.empty( nn, dtype )
-    offset = numpy.array( i0 )
-    stride = numpy.cumprod( [1] + mm[:0:-1] )[::-1] * dtype.itemsize
+    offset = numpy.array( i0, dtype=numpy.int64 )
+    stride = numpy.cumprod( [1] + mm[:0:-1], dtype=numpy.int64 )[::-1] * dtype.itemsize
     for j in xrange( nn[0] ):
         for k in xrange( nn[1] ):
             for l in xrange( nn[2] ):
@@ -191,7 +191,7 @@ def transpose( fd_in, fd_out, shape, axes=None, order='F', hold=2, dtype=None ):
     elif order is not 'C':
         sys.exit( "Invalid order %s, must be 'C' or 'F'" % order )
     hold += 1
-    shape = numpy.array( list( shape ) + [1] )
+    shape = numpy.array( list( shape ) + [1], dtype=numpy.int64 )
     axes  = [ i for i in axes if shape[i] > 1 ] + [ndim]
     if len( axes ) < 3:
         sys.exit( 'Nothing to transpose' )
@@ -204,8 +204,8 @@ def transpose( fd_in, fd_out, shape, axes=None, order='F', hold=2, dtype=None ):
     T[T.argsort()] = numpy.arange( T.size )
     axes = axes[:n] + sorted( axes[n:] )
     s  = shape[axes]
-    w0 = numpy.cumprod( [1] + list( s[:n][:0:-1] ) )[::-1]
-    w1 = numpy.cumprod( [1] + list( shape[:0:-1] ) )[::-1][axes][:n] * dtype.itemsize
+    w0 = numpy.cumprod( [1] + list( s[:n][:0:-1] ), dtype=numpy.int64 )[::-1]
+    w1 = numpy.cumprod( [1] + list( shape[:0:-1] ), dtype=numpy.int64 )[::-1][axes][:n] * dtype.itemsize
     w2 = 0
     i  = n
     ii = ( numpy.diff( axes ) != 1 ).nonzero()[0]
