@@ -88,7 +88,9 @@ def expand_indices( indices, shape ):
         sys.exit( 'error in indices' )
     indices = list( indices )
     for i in range( n ):
-        if indices[i] == 0:
+        if len( indices[i] ) == 0:
+            indices[i] = [ 1, -1, 1 ]
+        elif indices[i] == 0:
             indices[i] = [ 1, -1, 1 ]
         elif type( indices[i] ) == int:
             indices[i] = [ indices[i], indices[i], 1 ]

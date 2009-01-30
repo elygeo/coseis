@@ -47,12 +47,12 @@ fieldio += [
 
 # Write fault plane output
 fieldio += [
-    ( '=w', 'x1',   [0,0,-2, 0], 'x1'   ),	# mesh coordinate X
-    ( '=w', 'x2',   [0,0,-2, 0], 'x2'   ),	# mesh coordinate Y
-    ( '=w', 'su1',  [0,0,-2,-1], 'su1'  ),	# final horizontal slip
-    ( '=w', 'su2',  [0,0,-2,-1], 'su2'  ),	# final vertical slip
-    ( '=w', 'psv',  [0,0,-2,-1], 'psv'  ),	# peak slip velocity
-    ( '=w', 'trup', [0,0,-2,-1], 'trup' ),	# rupture time
+    ( '=w', 'x1',   [(),(),-2,()], 'x1'   ),	# mesh coordinate X
+    ( '=w', 'x2',   [(),(),-2,()], 'x2'   ),	# mesh coordinate Y
+    ( '=w', 'su1',  [(),(),-2,-1], 'su1'  ),	# final horizontal slip
+    ( '=w', 'su2',  [(),(),-2,-1], 'su2'  ),	# final vertical slip
+    ( '=w', 'psv',  [(),(),-2,-1], 'psv'  ),	# peak slip velocity
+    ( '=w', 'trup', [(),(),-2,-1], 'trup' ),	# rupture time
 ]
 
 # Write slip, slip velocity, and shear traction time history

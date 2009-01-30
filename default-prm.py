@@ -115,9 +115,9 @@ svtol = 0.001			# slip velocity considered rupturing
 # [j,k,l,t] are 1-based (Fortran style) indices.
 # Indices can be a single index, a range (start,end) or a strided range (start,end,step).
 # Negative indices count backward from the end of the array.
-# 0 is shorthand for (1,-1,1), i.e., the entire range, with stride 1.
-# [] is shorthand for the entire array, more explicitly written as [0,0,0,0],
-# or [(1,-1,1),(1,-1,1),(1,-1,1),(1,-1,1)].
+# () is shorthand for (1,-1,1), i.e., the entire range, with stride 1.
+# [] is shorthand for the entire array, more explicitly written as
+# [(),(),(),()] or [(1,-1,1),(1,-1,1),(1,-1,1),(1,-1,1)].
 
 # Placeholders
 i1pml = None

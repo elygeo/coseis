@@ -13,9 +13,9 @@ dt = 0.012					# time step length
 # Read mesh coordinates from disk
 _dir = 'saf/cvm4/0200/'				# data directory location
 fieldio = [
-    ( '=r', 'x1', [0,0,1,0], _dir+'x1' ),	# read 2D x coordinate file
-    ( '=r', 'x2', [0,0,1,0], _dir+'x2' ),	# read 2D y coordinate file
-    ( '=r', 'x3', [],        _dir+'x3' ),	# read 3D z coordinate file
+    ( '=r', 'x1', [(),(),1,()], _dir+'x1' ),	# read 2D x coordinate file
+    ( '=r', 'x2', [(),(),1,()], _dir+'x2' ),	# read 2D y coordinate file
+    ( '=r', 'x3', [],           _dir+'x3' ),	# read 3D z coordinate file
 ]
 
 # Boundary conditions, PML on all side except for free surface
@@ -42,12 +42,12 @@ _k =  997					# temporary variable
 _l = -81, -1					# temporary variable
 ihypo = 2266, _k, -25				# hypocenter indices
 fieldio += [
-    ( '=r', 'ts',  [0,_k,0,0], _dir+'ts1' ),	# read initial shear traction file
-    ( '=',  'tn',  [0,_k,0,0], -20e6      ),	# initial normal traction
-    ( '=',  'dc',  [0,_k,0,0],   0.5      ),	# slip weakening distance
-    ( '=',  'mud', [0,_k,0,0],   0.5      ),	# coeff of dynamic friction
-    ( '=',  'mus', [0,_k,0,0],   1e4      ),	# coeff of static friction, non-slip section
-    ( '=',  'mus', [_j,_k,_l,0], 1.1      ),	# coeff of static friction, slipping section
+    ( '=r', 'ts',  [(),_k,(),()], _dir+'ts1' ),	# read initial shear traction file
+    ( '=',  'tn',  [(),_k,(),()], -20e6      ),	# initial normal traction
+    ( '=',  'dc',  [(),_k,(),()],   0.5      ),	# slip weakening distance
+    ( '=',  'mud', [(),_k,(),()],   0.5      ),	# coeff of dynamic friction
+    ( '=',  'mus', [(),_k,(),()],   1e4      ),	# coeff of static friction, non-slip section
+    ( '=',  'mus', [_j,_k,_l,()],   1.1      ),	# coeff of static friction, slipping section
 ]
 
 # Nucleation
@@ -58,9 +58,9 @@ rcrit = 3000.					# radius of nucleation patch
 
 # Write fault plane output
 fieldio += [
-    ( '=w', 'sl',   [0,_k,0,-1], 'sl'   ),	# slip path length
-    ( '=w', 'psv',  [0,_k,0,-1], 'psv'  ),	# peak slip velocity
-    ( '=w', 'trup', [0,_k,0,-1], 'trup' ),	# rupture time
+    ( '=w', 'sl',   [(),_k,(),-1], 'sl'   ),	# slip path length
+    ( '=w', 'psv',  [(),_k,(),-1], 'psv'  ),	# peak slip velocity
+    ( '=w', 'trup', [(),_k,(),-1], 'trup' ),	# rupture time
 ]
 
 # Write velocity time histories
@@ -82,9 +82,9 @@ for _j, _k, _f in [
     (  950,  960, 'Lancaster' ),
 ]:
     fieldio += [
-        ( '=w', 'v1', [_j,_k,-1,0], _f+'_v1' ),
-        ( '=w', 'v2', [_j,_k,-1,0], _f+'_v2' ),
-        ( '=w', 'v3', [_j,_k,-1,0], _f+'_v3' ),
+        ( '=w', 'v1', [_j,_k,-1,()], _f+'_v1' ),
+        ( '=w', 'v2', [_j,_k,-1,()], _f+'_v2' ),
+        ( '=w', 'v3', [_j,_k,-1,()], _f+'_v3' ),
     ]
 
 sord.run( locals() )
