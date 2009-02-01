@@ -79,28 +79,31 @@ def loadmeta( dir='.' ):
     meta['shape'] = shape
     return objectify( meta )
 
-def expand_indices( indices, shape ):
-    """Fill in slice index notation"""
+def expand_indices( indices, shape, base=1 ):
+    """
+    Fill in slice index notation.
+
+    FIXME: document
+    """
     n = len( shape )
     if len( indices ) == 0:
-        indices = n * [ 0 ]
+        indices = n * [()]
     elif len( indices ) != n:
         sys.exit( 'error in indices' )
     indices = list( indices )
     for i in range( n ):
-        if len( indices[i] ) == 0:
-            indices[i] = [ 1, -1, 1 ]
-        elif indices[i] == 0:
-            indices[i] = [ 1, -1, 1 ]
-        elif type( indices[i] ) == int:
-            indices[i] = [ indices[i], indices[i], 1 ]
+        if type( indices[i] ) == int:
+            indices[i] = [ indices[i], indices[i]-base+1, 1 ]
+        elif len( indices[i] ) == 0:
+            indices[i] = [ base, -1, 1 ]
         else:
             indices[i] = list( indices[i] )
-        if len( indices[i] ) == 2:
+        if  len( indices[i] ) == 2:
             indices[i] = indices[i] + [ 1 ]
-        for j in range( 3 ):
-            if indices[i][j] < 1:
-                indices[i][j] = indices[i][j] + shape[i] + 1
+        if  indices[i][0] < 0:
+            indices[i][0] = indices[i][0] + shape[i] + base
+        if  indices[i][1] < 0:
+            indices[i][1] = indices[i][1] + shape[i] + 1
         indices[i] = tuple( indices[i] )
     return indices
 
