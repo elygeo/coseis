@@ -278,7 +278,7 @@ def prepare_prm( prm, itbuff ):
             if open( fn, 'r' ).read()[0] != sys.byteorder[0]:
                 sys.exit( 'Error: wrong byte order for ' + filename )
         nn = list( prm.nn ) + [ prm.nt ]
-        ii = util.indices( ii, nn )
+        ii = util.expand_indices( ii, nn )
         if field in fieldnames.cell:
             ii = [ (i[0], i[1]-1, i[2]) for i in ii ]
             mode = mode.replace( 'x', 'X' )

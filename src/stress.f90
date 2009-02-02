@@ -155,8 +155,8 @@ call fieldio( '<>', 'p12', w2(:,:,:,3) )
 
 ! Strain
 do i = 1, 3
-  w1(:,:,:,1) = w1(:,:,:,i) * vc
-  w2(:,:,:,1) = w2(:,:,:,i) * vc
+  w1(:,:,:,i) = w1(:,:,:,i) * vc
+  w2(:,:,:,i) = w2(:,:,:,i) * vc
 end do
 
 ! Strain I/O
