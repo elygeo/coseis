@@ -5,8 +5,8 @@ TPV3
 import math, numpy, pylab, sord
 
 so_dir = './'; bi_dir = '../../bi/'
-so_dir = 'run/300/'; bi_dir = 'bi/'
-so_dir = 'run/500/'; bi_dir = 'bi/'
+so_dir = './run/500/'; bi_dir = 'bi/'
+so_dir = './run/150/'; bi_dir = 'bi/'
 meta = sord.util.loadmeta( so_dir )
 
 # Time histories

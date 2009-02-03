@@ -65,7 +65,7 @@ def loadmeta( dir='.' ):
         mm = meta['nn'] + ( meta['nt'], )
         for ii, filename in locs['locations']:
              if filename is not '-':
-                 ii = indices( ii, mm )
+                 ii = expand_indices( ii, mm )
                  out[filename] = ii
         meta['indices'] = out
         f = open( os.path.join( dir, 'out', 'header.py' ), 'w' )

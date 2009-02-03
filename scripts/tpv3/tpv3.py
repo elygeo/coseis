@@ -5,7 +5,7 @@ TPV3 - SCEC validation problem version 3, convergence test
 
 import sord, os
 
-debug = 4
+debug = 0
 _reg = 1
 _run = [ 
     500., (1, 1, 2),
@@ -28,7 +28,7 @@ _run = [
     10.,  (4, 16, 16),
 ]
 _run = [ 50., (1, 1, 2), ]
-_run = [ 500., (1, 4, 4), ]
+_run = [ 150., (1, 1, 2), ]
 vrup = -1.
 faultnormal = 3	
 hourglass = 1., 2.
@@ -38,7 +38,6 @@ for _i in range( 0, len( _run ), 2 ):
     dx = _run[_i]
     dt = dx / 12500.
     nt = int( 12. / dt + 1.5 )
-    nt = 10
     nn = ( 
         int( 16500. / dx + 21.5 ),
         int(  9000. / dx + 21.5 ),
