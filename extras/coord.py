@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-"Coordinate conversions"
-import pyproj
+"""Coordinate conversions"""
 
 def matmul( A, B ):
-    "Vectorized matrix multiplication. Not the same as numpy.dot()"
+    """Vectorized matrix multiplication. Not the same as numpy.dot()"""
     import numpy
     return ( A[:,:,numpy.newaxis,...] * B ).sum( axis=1 )
 
@@ -32,28 +31,6 @@ def slipvectors( strike, dip, rake ):
     C = numpy.array([[ c, -s, z ], [ s, c, z ], [ z, z, u ]])
     return matmul( matmul( A, B ), C ).swapaxes( 0, 1 )
 
-utm11 = pyproj.Proj( proj='utm', zone=11, ellps='WGS84' )
-
-def ll2xy( x, y, inverse=False, projection=utm11, rot=40., lon0=-121., lat0=34.5,  ):
-    "TeraShake coordinate projection"
-    import numpy, pyproj
-    x0, y0 = projection( lon0, lat0 )
-    c = numpy.cos( numpy.pi / 180. * rot )
-    s = numpy.sin( numpy.pi / 180. * rot )
-    x = numpy.asarray( x )
-    y = numpy.asarray( y )
-    if inverse:
-        x, y =  c*x + s*y, -s*x + c*y
-        x = x + x0
-        y = y + y0
-        x, y = projection( x, y, inverse=True )
-    else:
-        x, y = projection( lon, lat )
-        x = x - x0
-        y = y - y0
-        x, y = c*x - s*y, s*x + c*y
-    return x, y
-
 def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
     """
     mat, theta = rotation( lon, lat, proj )
@@ -76,8 +53,9 @@ def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
     return mat, theta
 
 def interp2( x0, y0, dx, dy, z, xi, yi ):
-    "2D interpolation on a regular grid"
+    """2D interpolation on a regular grid"""
     import numpy
+    z  = numpy.asarray( z )
     xi = ( numpy.asarray( xi ) - x0 ) / dx
     yi = ( numpy.asarray( yi ) - y0 ) / dy
     j = numpy.int32( xi )
@@ -87,6 +65,39 @@ def interp2( x0, y0, dx, dy, z, xi, yi ):
        + (      xi - j ) * ( 1. - yi + k ) * z[j+1,k] \
        + (      xi - j ) * (      yi - k ) * z[j+1,k+1]
     return zi
+
+def ll2cmu( x, y, inverse=False ):
+    """CMU TeraShake coordinates projection"""
+    import numpy, sys
+    z = [[[ -121.      , 34.5     ], [ -118.951292, 36.621696 ]], 
+         [[ -116.032285, 31.08292 ], [ -113.943965, 33.122341 ]]]
+    if inverse:
+        sys.exit( 'not implemented' )
+    else:
+        zi = interp2( 0., 0., 600000., 300000., z, x, y )
+    return zi[:,:,0], zi[:,:,1]
+
+def ll2xy( x, y, inverse=False, projection=None, rot=40., lon0=-121., lat0=34.5,  ):
+    """UTM TeraShake coordinate projection"""
+    import numpy, pyproj
+    if not projection:
+        projection = pyproj.Proj( proj='utm', zone=11, ellps='WGS84' )
+    x0, y0 = projection( lon0, lat0 )
+    c = numpy.cos( numpy.pi / 180. * rot )
+    s = numpy.sin( numpy.pi / 180. * rot )
+    x = numpy.asarray( x )
+    y = numpy.asarray( y )
+    if inverse:
+        x, y =  c*x + s*y, -s*x + c*y
+        x = x + x0
+        y = y + y0
+        x, y = projection( x, y, inverse=True )
+    else:
+        x, y = projection( lon, lat )
+        x = x - x0
+        y = y - y0
+        x, y = c*x - s*y, s*x + c*y
+    return x, y
 
 if __name__ == '__main__':
     import sys, getopt, numpy
