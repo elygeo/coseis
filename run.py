@@ -22,6 +22,7 @@ def run( inputs ):
     if '__file__' in inputs:
         cfg['name'] = os.path.splitext( os.path.basename( inputs['__file__'] ) )[0]
         cfg['rundir'] = os.path.join( cfg['rundir'], cfg['name'] )
+    cfg['rundir'] = os.path.expanduser( cfg['rundir'] )
 
     # Merge inputs
     for k, v in inputs.iteritems():

@@ -14,7 +14,7 @@ name = 'sord'		# name of current simulation
 pre = ''		# pre-processing command
 post = ''		# post-processing command
 itbuff = 10		# max number of timesteps to buffer for 2D & 3D output
-rundir = os.path.join( os.path.expanduser('~'), 'run' )	# run directory
+rundir = os.path.join( '~', 'run' )	# run directory
 
 # User info
 user = pwd.getpwuid(os.geteuid())[0]

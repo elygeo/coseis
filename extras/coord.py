@@ -31,27 +31,6 @@ def slipvectors( strike, dip, rake ):
     C = numpy.array([[ c, -s, z ], [ s, c, z ], [ z, z, u ]])
     return matmul( matmul( A, B ), C ).swapaxes( 0, 1 )
 
-def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
-    """
-    mat, theta = rotation( lon, lat, proj )
-
-    Rotation matrix and clockwise rotation angle to transform components in the
-    geographic coordinate system to components in the local system.
-    local_components = dot( mat, components )
-    local_strike = strike + theta
-    """
-    import numpy
-    lon = numpy.asarray( [[lon-eps, lon    ], [lon+eps, lon    ]] )
-    lat = numpy.asarray( [[lat,     lat-eps], [lat,     lat+eps]] )
-    x, y = projection( lon, lat )
-    x = x[1] - x[0]
-    y = y[1] - y[0]
-    s = 1. / numpy.sqrt( x*x + y*y )
-    mat = numpy.array([ s*x, s*y ])
-    theta = 180. / numpy.pi * numpy.arctan2( mat[0], mat[1] )
-    theta = 0.5 * theta.sum() - 45.
-    return mat, theta
-
 def interp2( x0, y0, dx, dy, z, xi, yi ):
     """2D interpolation on a regular grid"""
     import numpy
@@ -98,6 +77,27 @@ def ll2xy( x, y, inverse=False, projection=None, rot=40., lon0=-121., lat0=34.5,
         y = y - y0
         x, y = c*x - s*y, s*x + c*y
     return x, y
+
+def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
+    """
+    mat, theta = rotation( lon, lat, proj )
+
+    Rotation matrix and clockwise rotation angle to transform components in the
+    geographic coordinate system to components in the local system.
+    local_components = dot( mat, components )
+    local_strike = strike + theta
+    """
+    import numpy
+    lon = numpy.asarray( [[lon-eps, lon    ], [lon+eps, lon    ]] )
+    lat = numpy.asarray( [[lat,     lat-eps], [lat,     lat+eps]] )
+    x, y = projection( lon, lat )
+    x = x[1] - x[0]
+    y = y[1] - y[0]
+    s = 1. / numpy.sqrt( x*x + y*y )
+    mat = numpy.array([ s*x, s*y ])
+    theta = 180. / numpy.pi * numpy.arctan2( mat[0], mat[1] )
+    theta = 0.5 * theta.sum() - 45.
+    return mat, theta
 
 if __name__ == '__main__':
     import sys, getopt, numpy
