@@ -144,16 +144,16 @@ def run( inputs ):
 
     # Link input files
     for i, line in enumerate( prm.fieldio ):
-        if 'r' in line[0] and os.sep in line[3]:
-            filename = line[3]
+        if 'r' in line[0] and os.sep in line[8]:
+            filename = line[8]
             f = os.path.basename( filename )
-            line = line[:3] + ( f, ) + line[4:]
+            line = line[:8] + ( f, ) + line[9:]
             prm.fieldio[i] = line
-            f = os.path.join( 'in', filename )
+            f = os.path.join( cfg.rundir, 'in', f )
             try:
-                os.link( filename, os.path.join( cfg.rundir, f ) )
+                os.link( filename, f )
             except:
-                shutil.copy( filename, os.path.join( cfg.rundir, f ) )
+                os.symlink( filename, f )
 
     # Copy files to run directory
     cwd = os.path.realpath( os.getcwd() )
@@ -268,6 +268,7 @@ def prepare_prm( prm, itbuff ):
             else: sys.exit( 'Error: bad i/o mode: %r' % line )
         except:
             sys.exit( 'Error: bad i/o spec: %r' % line )
+        filename = os.path.expanduser( filename )
         mode = mode.replace( 'f', '' )
         if field not in fieldnames.all:
             sys.exit( 'Error: unknown field: %r' % line )
@@ -277,7 +278,7 @@ def prepare_prm( prm, itbuff ):
             sys.exit( 'Error: field is ouput only: %r' % line )
         if 'r' in mode or 'R' in mode:
             fn = os.path.join( os.path.dirname( filename ), 'endian' )
-            if open( fn, 'r' ).read()[0] != sys.byteorder[0]:
+            if os.path.isfile( fn ) and open( fn, 'r' ).read()[0] != sys.byteorder[0]:
                 sys.exit( 'Error: wrong byte order for ' + filename )
         nn = list( prm.nn ) + [ prm.nt ]
         ii = util.expand_indices( ii, nn )
