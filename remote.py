@@ -3,7 +3,7 @@
 Remote operations: deploy, publish, get
 
 Reads 'destinations' file with entries like:
-ssh user@host.domain:sord
+ssh user@host.domain:dir
 """
 import os
 

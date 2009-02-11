@@ -3,11 +3,11 @@
 SORD main module
 """
 
-import os, sys, pwd, glob, time, getopt, shutil
-import util, configure, setup, fieldnames
 
 def run( inputs ):
     """Setup, and optionally launch, a SORD job."""
+    import os, sys, pwd, glob, time, getopt, shutil
+    import util, configure, setup
 
     # Save start time
     starttime = time.asctime()
@@ -165,12 +165,12 @@ def run( inputs ):
     try: shutil.cop( 'sord.tgz', cfg.rundir )
     except: pass
     if cfg.optimize == 'g':
-        for f in glob.glob( 'src/*.f90' ):
+        for f in glob.glob( os.path.join( 'src', '*.f90' ) ):
             shutil.copy( f, cfg.rundir )
-    f = 'conf/' + cfg.machine + '/templates'
+    f = os.path.join( 'conf', cfg.machine, 'templates' )
     if not os.path.isdir( f ):
-        f = 'conf/default/templates'
-    for d in [ 'conf/common/templates', f ]:
+        f = os.path.join( 'conf', 'default', 'templates' )
+    for d in [ os.path.join( 'conf', 'common', 'templates' ), f ]:
         for f in glob.glob( os.path.join( d, '*' ) ):
             ff = os.path.join( cfg.rundir, os.path.basename( f ) )
             out = open( f, 'r' ).read() % util.dictify( cfg )
@@ -203,6 +203,7 @@ def run( inputs ):
 
 def prepare_prm( prm, itbuff ):
     """Prepare input paramers"""
+    import os, sys, util, fieldnames
 
     # inervals
     prm.itio = max( 1, min( prm.itio, prm.nt ) )

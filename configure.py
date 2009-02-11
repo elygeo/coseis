@@ -5,15 +5,14 @@ Read configuration files
 
 def configure( save=False, machine=None ):
     """Read configuration files"""
-    import os
-    import util
+    import os, util
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
     cfg = util.load( 'default-cfg.py' )
     if not machine and os.path.isfile( 'machine' ):
         machine = open( 'machine', 'r' ).read().strip()
     if machine:
-        util.load( 'conf/' + machine + '/conf.py', cfg )
+        util.load( os.path.join( 'conf', machine, 'conf.py' ), cfg )
         cfg['machine'] = machine
         if save:
             open( 'machine', 'w' ).write( cfg['machine'] )
