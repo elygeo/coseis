@@ -231,7 +231,7 @@ case( '=r', '+r', '=R', '+R' )
     str = 'in/' // p%filename
     if ( any( n(1:3) /= m(1:3) ) .and. mpin == 0 ) &
       write( str, '(2a,i6.6)' ) trim( str ), '-', ipid
-    call rio2( p%fh, p%buff(:,:n(4)), 'w', str, m, n, o, mpin, verb )
+    call rio2( p%fh, p%buff(:,:n(4)), 'r', str, m, n, o, mpin, verb )
     p%ib = 0
     if ( any( n < 1 ) ) then
       deallocate( p%buff )

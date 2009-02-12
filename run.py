@@ -144,7 +144,7 @@ def run( inputs ):
 
     # Link input files
     for i, line in enumerate( prm.fieldio ):
-        if 'r' in line[0] and os.sep in line[8]:
+        if 'r' in line[0] or 'R' in line[0] and os.sep in line[8]:
             filename = line[8]
             f = os.path.basename( filename )
             line = line[:8] + ( f, ) + line[9:]
