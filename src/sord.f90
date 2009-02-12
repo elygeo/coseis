@@ -22,11 +22,11 @@ use m_util
 use m_stats
 implicit none
 integer :: jp = 0, fh(9)
-real :: prof0(14) = 0.
+real :: prof0(14) = 0.0
 real, allocatable :: prof(:,:)
 
 ! Initialization
-iotimer = 0.
+iotimer = 0.0
 prof0(1) = timer(0)
 call initialize( np0, ip, master )                       ; prof0(1)  = timer(6)
 call read_parameters                                     ; prof0(2)  = timer(6)
