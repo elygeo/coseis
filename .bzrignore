@@ -1,4 +1,3 @@
-.bzr
 *.il
 *.ipo
 *.mod
@@ -6,6 +5,8 @@
 *.pyc
 *.stb
 *.swp
+.DS_Store
+.bzr
 bin/*
 run
 email
