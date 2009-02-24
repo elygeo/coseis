@@ -85,15 +85,19 @@ def expand_indices( indices, shape, base=1 ):
 
     FIXME: document
     """
+    import sys
     n = len( shape )
     if len( indices ) == 0:
         indices = n * [()]
     elif len( indices ) != n:
-        sys.exit( 'error in indices' )
+        sys.exit( 'error in indices: %r' % indices )
     indices = list( indices )
     for i in range( n ):
         if type( indices[i] ) == int:
-            indices[i] = [ indices[i], indices[i]-base+1, 1 ]
+            if base == 1 and indices[i] == 0:
+                indices[i] = [ base, -1, 1 ]
+            else:
+                indices[i] = [ indices[i], indices[i]-base+1, 1 ]
         elif len( indices[i] ) == 0:
             indices[i] = [ base, -1, 1 ]
         else:
@@ -158,7 +162,7 @@ def ndread( fd, shape=None, indices=[], order='F', dtype=None, endian=None ):
         for k in xrange( nn[1] ):
             for l in xrange( nn[2] ):
                 i = numpy.sum( stride * ( offset + numpy.array( [j,k,l,0] ) ) )
-                fd.seek( i, 0 )
+                fd.seek( long(i), 0 )
                 f[j,k,l,:] = numpy.fromfile( fd, dtype, nn[-1] )
     if order is 'F':
         f = f.reshape( nn0 ).T
@@ -224,10 +228,9 @@ def transpose( fd_in, fd_out, shape, axes=None, order='F', hold=2, dtype=None ):
     n2 = s[i: ].prod()
     v = numpy.empty( ( n1, n2 ), dtype )
     for j in xrange( n0 ):
-        print j, n0
         offset = numpy.sum( w1 * ( j / w0 % s0 ) )
         for k in xrange( n1 ):
-            fd_in.seek( offset + k * w2, 0 )
+            fd_in.seek( long( offset + k * w2 ), 0 )
             v[k,:] = numpy.fromfile( fd_in, dtype, n2 )
         v.reshape( s1 ).transpose( T ).tofile( fd_out )
     return

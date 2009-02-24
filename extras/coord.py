@@ -72,7 +72,7 @@ def ll2xy( x, y, inverse=False, projection=None, rot=40., lon0=-121., lat0=34.5,
         y = y + y0
         x, y = projection( x, y, inverse=True )
     else:
-        x, y = projection( lon, lat )
+        x, y = projection( x, y )
         x = x - x0
         y = y - y0
         x, y = c*x - s*y, s*x + c*y
