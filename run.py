@@ -283,7 +283,7 @@ def prepare_prm( prm, itbuff ):
         nn = list( prm.nn ) + [ prm.nt ]
         ii = util.expand_indices( ii, nn )
         if field in fieldnames.cell:
-            ii = [ (i[0], i[1]-1, i[2]) for i in ii ]
+            ii = [ (i[0], i[1]-1, i[2]) for i in ii[:3] ] + [ii[3]]
             mode = mode.replace( 'x', 'X' )
             mode = mode.replace( 'c', 'C' )
         if field in fieldnames.initial:
