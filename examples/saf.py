@@ -8,13 +8,14 @@ import sord
 np3 = 1, 80, 24					# 1920 total processors on DataStar
 nn = 3001, 1502, 401				# number of mesh nodes nx ny nz
 nt = 15001					# number of time steps
+dx = 200.					# spatial step length
 dt = 0.012					# time step length
 
 # Read mesh coordinates from disk
 _dir = 'saf/cvm4/0200/'				# data directory location
 fieldio = [
-    ( '=r', 'x1', [(),(),1,()], _dir+'x1' ),	# read 2D x coordinate file
-    ( '=r', 'x2', [(),(),1,()], _dir+'x2' ),	# read 2D y coordinate file
+    ( '=R', 'x1', [(),(),1,()], _dir+'x1' ),	# read 2D x coordinate file
+    ( '=R', 'x2', [(),(),1,()], _dir+'x2' ),	# read 2D y coordinate file
     ( '=r', 'x3', [],           _dir+'x3' ),	# read 3D z coordinate file
 ]
 
