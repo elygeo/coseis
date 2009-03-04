@@ -1,8 +1,8 @@
-*.il
-*.ipo
+*.pyc
 *.mod
 *.o
-*.pyc
+*.ipo
+*.il
 *.stb
 *.swp
 .DS_Store

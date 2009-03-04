@@ -28,7 +28,7 @@ for filename in sys.argv[1:]:
             r = numpy.fromfile( fh, dtype=dtype, count=b )
             rmin = min( rmin, r.min() )
             rmax = max( rmax, r.max() )
-            rsum += r.sum()
+            rsum += numpy.float64( r ).sum()
             i += b
         print '%12g %12g %12g %12d %s' % ( rmin, rmax, rsum/n, n, filename )
 
