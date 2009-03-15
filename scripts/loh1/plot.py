@@ -18,13 +18,13 @@ pylab.clf()
 ax = [ pylab.subplot( 3, 1, i ) for i in 1, 2, 3 ]
 
 # SORD results
-fdrot = numpy.array([[3./5., 4./5., 0.], [-4./5., 3./5., 0.], [0., 0., 1.]])
+rotation = numpy.array([[3./5., 4./5., 0.], [-4./5., 3./5., 0.], [0., 0., 1.]])
 t = prm.dt * numpy.arange( prm.nt )
 x = sord.util.ndread( so_dir+'vx', endian=cfg.endian )
 y = sord.util.ndread( so_dir+'vy', endian=cfg.endian )
 z = sord.util.ndread( so_dir+'vz', endian=cfg.endian )
 v = numpy.vstack((x,y,z))
-v = numpy.dot( fdrot, v )
+v = numpy.dot( rotation, v )
 tau = t - ts
 factor = 1. - 2.*T/sig**2.*tau - ( T/sig )**2. * ( 1. - ( tau/sig )**2. );
 b = ( 1. / math.sqrt( 2.*math.pi ) / sig ) * factor * numpy.exp( -0.5 * ( tau/sig ) ** 2. )

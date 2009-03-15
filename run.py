@@ -163,8 +163,8 @@ def run( inputs ):
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
     cfg.bin = os.path.join( '.', 'sord-' + cfg.mode + cfg.optimize )
     shutil.copy( os.path.join( 'bin', 'sord-' + cfg.mode + cfg.optimize ), cfg.rundir )
-    try: shutil.cop( 'sord.tgz', cfg.rundir )
-    except: pass
+    if os.path.isfile( 'sord.tgz' ):
+        shutil.copy( 'sord.tgz', cfg.rundir )
     if cfg.optimize == 'g':
         for f in glob.glob( os.path.join( 'src', '*.f90' ) ):
             shutil.copy( f, cfg.rundir )
