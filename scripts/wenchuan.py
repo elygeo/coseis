@@ -6,12 +6,12 @@ Wenchuan earthquake
 import sord, math
 
 np3 = 1, 1, 2
-dx = 1000.
+dx = 1000., 1000., 1000.
 _T = 120.
 _L = 400e3, 300e3, 60e3
-dt = dx / 12500.
+dt = dx[0] / 12500.
 nt = int( _T / dt + 1.5 )
-nn = [ int( _X / dx + 1.5 ) for _X in _L ]
+nn = [ int( _X / dx[0] + 1.5 ) for _X in _L ]
 bc1 = 10, 10, 10
 bc2 = 10, 10, 0
 faultnormal = 0
@@ -21,14 +21,14 @@ xhypo = 0., 0., -12e3
 ihypo = [
     nn[0] / 2,
     nn[1] / 2,
-    -int( -xhypo[2] / dx + 1.5 )
+    -int( -xhypo[2] / dx[2] + 1.5 )
 ]
 moment1 = -5.79e20, 0.10e20, 5.69e20    #  Mpp,  Mtt,  Mrr
 moment2 = -1.99e20, 5.61e20, 3.48e20    # -Mrt,  Mrp, -Mtp
 tfunc = 'brune'
 rfunc = 'point'
 tsource = 0.1
-rsource = dx
+rsource = dx[0]
 fixhypo = -1
 
 # Velocity model
@@ -42,7 +42,7 @@ _material = [
 ]
 for _depth, _vp, _vs in _material:
     _rho = _vp / 3. + 1280.
-    _i = -int( _depth / dx + 1.5 )
+    _i = -int( _depth / dx[2] + 1.5 )
     fieldio += [
         ( '=', 'rho', [(),(),(1,_i),()], _rho ),
         ( '=', 'vp',  [(),(),(1,_i),()], _vp  ),

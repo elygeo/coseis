@@ -7,8 +7,8 @@ import sord
 
 np3 = 1, 1, 32				# number of processors in each dimension
 nn = 351, 201, 128			# number of mesh nodes, nx ny nz
+dx = 50., 50., 50.			# spatial step size
 nt = 3001				# number of time steps
-dx = 50.				# spatial step size
 dt = 0.004				# time step size
 
 # Near side boundary conditions:

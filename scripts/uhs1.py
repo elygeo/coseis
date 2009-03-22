@@ -7,20 +7,20 @@ import sord
 
 np3 = 1, 16, 1
 np3 = 1, 2, 1
-dx = 50.
+dx = 50., 50., 50.
 dt = 0.004
 _ell  = 7000., 9000., 4000.
 xhypo =    0.,    0., 20000
-nn    = [ int( _x / dx + 21.5 ) for _x in _ell  ]
-ihypo = [ int( _x / dx +  1.5 ) for _x in xhypo ]
-nt    =   int( 5. / dt +  1.5 )
+nn    = [ int( _x / dx[0] + 21.001 ) for _x in _ell  ]
+ihypo = [ int( _x / dx[0] +  1.5 ) for _x in xhypo ]
+nt    =   int( 5. / dt +  1.001 )
 fixhypo = -2
 bc1 = -2, -2,  0
 bc2 = 10, 10, 10
 tfunc = 'brune'
 rfunc = 'point'
 tsource = 0.1
-rsource = dx
+rsource = dx[0]
 moment1 = 0., 0., 0.
 moment2 = 0., 0., 1e18
 faultnormal = 0

@@ -4,12 +4,12 @@ import numpy, pyproj, scipy.interpolate
 import coord
 
 nn = 1056, 752, 202
-dx = 100000.
+dx = 100000., 100000., 10000.
 L = 600000., 300000., 80000.
 L = 160000., 110000., 80000.
-x = numpy.arange( 0.5*dx, L[0], dx )
-y = numpy.arange( 0.5*dx, L[1], dx )
-z = numpy.arange( 0.5*dx, L[2], dx )
+x = numpy.arange( 0.5*dx[0], L[0], dx[0] )
+y = numpy.arange( 0.5*dx[1], L[1], dx[1] )
+z = numpy.arange( 0.5*dx[2], L[2], dx[2] )
 
 xx, yy = numpy.meshgrid( x, y )
 zz = numpy.zeros_like( xx )
@@ -18,7 +18,7 @@ lon, lat = coord.ts2ll( xx, yy )
 #f1 = open( 'lon', 'wb' )
 #f2 = open( 'lat', 'wb' )
 #f3 = open( 'dep', 'wb' )
-for z in numpy.arange( 0.5*dx, L[2], dx ):
+for z in numpy.arange( 0.5*dx[2], L[2], dx[2] ):
   zz.fill( L[2] - z )
 
 proj = pyproj.Proj( proj='utm', zone=11, ellps='WGS84' )

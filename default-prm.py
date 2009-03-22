@@ -16,7 +16,7 @@ debug = 0			# >0 verbose, >1 sync, >2 mpi vars, >3 I/O
 # Wave model parameters
 nn = 41, 41, 42			# number of nodes in j, k, l (double nodes counted)
 nt = 41				# number of time steps
-dx = 100.0			# spatial step length
+dx = 100.0, 100.0, 100.0	# spatial step length
 dt = 0.0075			# time step length
 tm0 = 0.0			# initial time
 affine = (1.,0.,0.), (0.,1.,0.), (0.,0.,1.) # grid transformation

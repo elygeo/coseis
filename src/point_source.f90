@@ -56,7 +56,7 @@ call set_halo( s2, 0., i1cell, i2cell )
 ! Normalize
 if ( rfunc == 'point' ) then
   if ( nsrc > 8 ) stop 'rsource too large for point source'
-  srcfr = ( .5 * dx / rsource ) ** 3
+  srcfr = ( .5 * sqrt( sum( dx * dx ) / 3. ) / rsource ) ** 3
 else
   call rreduce( allsumsrcfr, sumsrcfr, 'allsum', 0 )
   if ( allsumsrcfr <= 0. ) stop 'bad source space function'

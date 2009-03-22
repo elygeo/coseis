@@ -6,7 +6,7 @@ PML test problem
 import sord
 
 nt = 500
-dx = 100.
+dx = 100., 100., 100.
 dt = 0.0075
 hourglass = 1., 1.
 

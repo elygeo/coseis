@@ -12,7 +12,7 @@ use m_diffnc
 use m_fieldio
 integer :: i1(3), i2(3), i3(3), i4(3), bc(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, b, c
-real :: x0(3), m(9), tol
+real :: x0(3), m(9), tol, h
 integer, allocatable :: seed(:)
 
 if ( master ) write( 0, * ) 'Grid generation'
@@ -21,15 +21,15 @@ if ( master ) write( 0, * ) 'Grid generation'
 w1 = 0.
 i1 = i1core
 i2 = i2core
-do i = i1(1), i2(1); w1(i,:,:,1) = dx * (i + nnoff(1) - 1); end do
-do i = i1(2), i2(2); w1(:,i,:,2) = dx * (i + nnoff(2) - 1); end do
-do i = i1(3), i2(3); w1(:,:,i,3) = dx * (i + nnoff(3) - 1); end do
+do i = i1(1), i2(1); w1(i,:,:,1) = dx(1) * (i + nnoff(1) - 1); end do
+do i = i1(2), i2(2); w1(:,i,:,2) = dx(2) * (i + nnoff(2) - 1); end do
+do i = i1(3), i2(3); w1(:,:,i,3) = dx(3) * (i + nnoff(3) - 1); end do
 if ( faultnormal /= 0 ) then
   i1 = max( i1core, ihypo + 1 )
   select case( abs( faultnormal ) )
-  case( 1 ); do i = i1(1), i2(1); w1(i,:,:,1) = dx * (i + nnoff(1) - 2); end do
-  case( 2 ); do i = i1(2), i2(2); w1(:,i,:,2) = dx * (i + nnoff(2) - 2); end do
-  case( 3 ); do i = i1(3), i2(3); w1(:,:,i,3) = dx * (i + nnoff(3) - 2); end do
+  case( 1 ); do i = i1(1), i2(1); w1(i,:,:,1) = dx(1) * (i + nnoff(1) - 2); end do
+  case( 2 ); do i = i1(2), i2(2); w1(:,i,:,2) = dx(2) * (i + nnoff(2) - 2); end do
+  case( 3 ); do i = i1(3), i2(3); w1(:,:,i,3) = dx(3) * (i + nnoff(3) - 2); end do
   end select
 end if
 
@@ -45,7 +45,7 @@ if ( gridnoise > 0. ) then
   seed = ip
   call random_seed( put=seed )
   call random_number( w2 )
-  w2 = dx * gridnoise * ( w2 - .5 )
+  w2 = sqrt( sum( dx * dx ) ) * gridnoise * ( w2 - .5 )
   i1 = i1pml + 1
   i2 = i2pml - 1
   call set_halo( w2(:,:,:,1), 0., i1, i2 )
@@ -75,32 +75,32 @@ if ( rexpand > 1. ) then
   do j = i3(1), min( i4(1), i1(1) )
     i = i1(1) - j
     w1(j,:,:,1) = w1(j,:,:,1) + &
-      dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+      dx(1) * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
   do j = max( i3(1), i2(1) ), i4(1)
     i = j - i2(1)
     w1(j,:,:,1) = w1(j,:,:,1) - &
-      dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+      dx(1) * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
   do k = i3(2), min( i4(2), i1(2) )
     i = i1(2) - k
     w1(:,k,:,2) = w1(:,k,:,2) + &
-      dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+      dx(2) * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
   do k = max( i3(2), i2(2) ), i4(2)
     i = k - i2(2)
     w1(:,k,:,2) = w1(:,k,:,2) - &
-      dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+      dx(2) * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
   do l = i3(3), min( i4(3), i1(3) )
     i = i1(3) - l
     w1(:,:,l,3) = w1(:,:,l,3) + &
-      dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+      dx(3) * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
   do l = max( i3(3), i2(3) ), i4(3)
     i = l - i2(3)
     w1(:,:,l,3) = w1(:,:,l,3) - &
-      dx * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+      dx(3) * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
   end do
 end if
 
@@ -192,49 +192,50 @@ select case( oplevel )
 case( 1 )
 case( 2 )
   allocate( dx1(nm(1)), dx2(nm(2)), dx3(nm(3)) )
-  do i = 1, nm(1)-1; dx1(i) = .5 * ( w1(i+1,3,3,1) - w1(i,3,3,1) ); end do
-  do i = 1, nm(2)-1; dx2(i) = .5 * ( w1(3,i+1,3,2) - w1(3,i,3,2) ); end do
-  do i = 1, nm(3)-1; dx3(i) = .5 * ( w1(3,3,i+1,3) - w1(3,3,i,3) ); end do
+  do i = 1, nm(1)-1; dx1(i) = w1(i+1,3,3,1) - w1(i,3,3,1); end do
+  do i = 1, nm(2)-1; dx2(i) = w1(3,i+1,3,2) - w1(3,i,3,2); end do
+  do i = 1, nm(3)-1; dx3(i) = w1(3,3,i+1,3) - w1(3,3,i,3); end do
 case( 3:5 )
   allocate( xx(nm(1),nm(2),nm(3),3) )
   xx = w1
 case( 6 )
   allocate( bb(nm(1),nm(2),nm(3),8,3) )
   do i = 1, 3
+  h = sign( 1. / 12., product( dx ) )
   b = modulo( i, 3 ) + 1
   c = modulo( i + 1, 3 ) + 1
   do l = 1, nm(3)-1
   do k = 1, nm(2)-1
   do j = 1, nm(1)-1
-  bb(j,k,l,1,i) = 1. / 12. * &
+  bb(j,k,l,1,i) = h * &
     ((w1(j+1,k,l,b)-w1(j,k+1,l+1,b))*(w1(j+1,k+1,l,c)-w1(j+1,k,l+1,c))+w1(j,k+1,l+1,b)*(w1(j,k,l+1,c)-w1(j,k+1,l,c)) &
     +(w1(j,k+1,l,b)-w1(j+1,k,l+1,b))*(w1(j,k+1,l+1,c)-w1(j+1,k+1,l,c))+w1(j+1,k,l+1,b)*(w1(j+1,k,l,c)-w1(j,k,l+1,c)) &
     +(w1(j,k,l+1,b)-w1(j+1,k+1,l,b))*(w1(j+1,k,l+1,c)-w1(j,k+1,l+1,c))+w1(j+1,k+1,l,b)*(w1(j,k+1,l,c)-w1(j+1,k,l,c)))
-  bb(j,k,l,2,i) = 1. / 12. * &
+  bb(j,k,l,2,i) = h * &
     ((w1(j+1,k+1,l+1,b)-w1(j,k,l,b))*(w1(j+1,k,l+1,c)-w1(j+1,k+1,l,c))+w1(j,k,l,b)*(w1(j,k+1,l,c)-w1(j,k,l+1,c)) &
     +(w1(j,k+1,l,b)-w1(j+1,k,l+1,b))*(w1(j+1,k+1,l,c)-w1(j,k,l,c))+w1(j+1,k,l+1,b)*(w1(j,k,l+1,c)-w1(j+1,k+1,l+1,c)) &
     +(w1(j,k,l+1,b)-w1(j+1,k+1,l,b))*(w1(j,k,l,c)-w1(j+1,k,l+1,c))+w1(j+1,k+1,l,b)*(w1(j+1,k+1,l+1,c)-w1(j,k+1,l,c)))
-  bb(j,k,l,3,i) = 1. / 12. * &
+  bb(j,k,l,3,i) = h * &
     ((w1(j+1,k+1,l+1,b)-w1(j,k,l,b))*(w1(j+1,k+1,l,c)-w1(j,k+1,l+1,c))+w1(j,k,l,b)*(w1(j,k,l+1,c)-w1(j+1,k,l,c)) &
     +(w1(j+1,k,l,b)-w1(j,k+1,l+1,b))*(w1(j,k,l,c)-w1(j+1,k+1,l,c))+w1(j,k+1,l+1,b)*(w1(j+1,k+1,l+1,c)-w1(j,k,l+1,c)) &
     +(w1(j,k,l+1,b)-w1(j+1,k+1,l,b))*(w1(j,k+1,l+1,c)-w1(j,k,l,c))+w1(j+1,k+1,l,b)*(w1(j+1,k,l,c)-w1(j+1,k+1,l+1,c)))
-  bb(j,k,l,4,i) = 1. / 12. * &
+  bb(j,k,l,4,i) = h * &
     ((w1(j+1,k+1,l+1,b)-w1(j,k,l,b))*(w1(j,k+1,l+1,c)-w1(j+1,k,l+1,c))+w1(j,k,l,b)*(w1(j+1,k,l,c)-w1(j,k+1,l,c)) &
     +(w1(j+1,k,l,b)-w1(j,k+1,l+1,b))*(w1(j+1,k,l+1,c)-w1(j,k,l,c))+w1(j,k+1,l+1,b)*(w1(j,k+1,l,c)-w1(j+1,k+1,l+1,c)) &
     +(w1(j,k+1,l,b)-w1(j+1,k,l+1,b))*(w1(j,k,l,c)-w1(j,k+1,l+1,c))+w1(j+1,k,l+1,b)*(w1(j+1,k+1,l+1,c)-w1(j+1,k,l,c)))
-  bb(j,k,l,5,i) = 1. / 12. * &
+  bb(j,k,l,5,i) = h * &
     ((w1(j,k+1,l+1,b)-w1(j+1,k,l,b))*(w1(j,k+1,l,c)-w1(j,k,l+1,c))+w1(j+1,k,l,b)*(w1(j+1,k,l+1,c)-w1(j+1,k+1,l,c)) &
     +(w1(j+1,k,l+1,b)-w1(j,k+1,l,b))*(w1(j,k,l+1,c)-w1(j+1,k,l,c))+w1(j,k+1,l,b)*(w1(j+1,k+1,l,c)-w1(j,k+1,l+1,c)) &
     +(w1(j+1,k+1,l,b)-w1(j,k,l+1,b))*(w1(j+1,k,l,c)-w1(j,k+1,l,c))+w1(j,k,l+1,b)*(w1(j,k+1,l+1,c)-w1(j+1,k,l+1,c)))
-  bb(j,k,l,6,i) = 1. / 12. * &
+  bb(j,k,l,6,i) = h * &
     ((w1(j,k,l,b)-w1(j+1,k+1,l+1,b))*(w1(j,k,l+1,c)-w1(j,k+1,l,c))+w1(j+1,k+1,l+1,b)*(w1(j+1,k+1,l,c)-w1(j+1,k,l+1,c)) &
     +(w1(j+1,k,l+1,b)-w1(j,k+1,l,b))*(w1(j+1,k+1,l+1,c)-w1(j,k,l+1,c))+w1(j,k+1,l,b)*(w1(j,k,l,c)-w1(j+1,k+1,l,c)) &
     +(w1(j+1,k+1,l,b)-w1(j,k,l+1,b))*(w1(j,k+1,l,c)-w1(j+1,k+1,l+1,c))+w1(j,k,l+1,b)*(w1(j+1,k,l+1,c)-w1(j,k,l,c)))
-  bb(j,k,l,7,i) = 1. / 12. * &
+  bb(j,k,l,7,i) = h * &
     ((w1(j,k,l,b)-w1(j+1,k+1,l+1,b))*(w1(j+1,k,l,c)-w1(j,k,l+1,c))+w1(j+1,k+1,l+1,b)*(w1(j,k+1,l+1,c)-w1(j+1,k+1,l,c)) &
     +(w1(j,k+1,l+1,b)-w1(j+1,k,l,b))*(w1(j,k,l+1,c)-w1(j+1,k+1,l+1,c))+w1(j+1,k,l,b)*(w1(j+1,k+1,l,c)-w1(j,k,l,c)) &
     +(w1(j+1,k+1,l,b)-w1(j,k,l+1,b))*(w1(j+1,k+1,l+1,c)-w1(j+1,k,l,c))+w1(j,k,l+1,b)*(w1(j,k,l,c)-w1(j,k+1,l+1,c)))
-  bb(j,k,l,8,i) = 1. / 12. * &
+  bb(j,k,l,8,i) = h * &
     ((w1(j,k,l,b)-w1(j+1,k+1,l+1,b))*(w1(j,k+1,l,c)-w1(j+1,k,l,c))+w1(j+1,k+1,l+1,b)*(w1(j+1,k,l+1,c)-w1(j,k+1,l+1,c)) &
     +(w1(j,k+1,l+1,b)-w1(j+1,k,l,b))*(w1(j+1,k+1,l+1,c)-w1(j,k+1,l,c))+w1(j+1,k,l,b)*(w1(j,k,l,c)-w1(j+1,k,l+1,c)) &
     +(w1(j+1,k,l+1,b)-w1(j,k+1,l,b))*(w1(j+1,k,l,c)-w1(j+1,k+1,l+1,c))+w1(j,k+1,l,b)*(w1(j,k+1,l+1,c)-w1(j,k,l,c)))
@@ -246,8 +247,11 @@ case default; stop 'illegal operator'
 end select
 
 ! Cell volume
-call diffnc( vc, w1, 1, 1, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
 call set_halo( vc, 0., i1cell, i2cell )
+do i = 1, 3
+  call diffnc( vc, w1, i, i, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
+  if ( minval( vc ) < 0.0 ) stop 'negative cell volume, wrong sign in dx?'
+end do
 select case( ifn ) 
 case( 1 ); i = ihypo(1); vc(i,:,:) = 0.
 case( 2 ); i = ihypo(2); vc(:,i,:) = 0.

@@ -105,7 +105,7 @@ gam2 =  gstats(8)
 
 ! Stats
 if ( master ) then
-  courant = dt * vp2 * sqrt( 3. ) / abs( dx )
+  courant = dt * vp2 * 3. / sqrt( sum( dx * dx ) )
   open( 1, file='stats/material.py', status='replace' )
   write( 1, "( 'courant = ',g15.7 )" ) courant
   write( 1, "( 'rho_    = ',g15.7 )" ) rho_
@@ -130,8 +130,8 @@ lam = mr * ( s1 * s1 ) - 2. * mu
 ! Hourglass constant
 yy = 12. * ( lam + 2. * mu )
 call invert( yy )
-yy = yy * dx * mu * ( lam + mu )
-!yy = .3 / 16. * ( lam + 2. * mu ) * dx ! like Ma & Liu, 2006
+yy = yy * sqrt( sum( dx * dx ) / 3. ) * mu * ( lam + mu )
+!yy = .3 / 16. * ( lam + 2. * mu ) * sqrt( sum( dx * dx ) / 3. ) ! like Ma & Liu, 2006
 
 ! Output
 call fieldio( '>', 'rho', mr  )
@@ -160,7 +160,7 @@ tune = 3.5
 pmlp = 2.
 !hmean = 2. * vp1 * vp2 / ( vp1 + vp2 )
 hmean = 2. * vs1 * vs2 / ( vs1 + vs2 )
-damp = tune * hmean / dx * ( c1 + ( c2 + c3 * npml ) * npml ) / npml ** pmlp
+damp = tune * hmean / sqrt( sum( dx * dx ) / 3. ) * ( c1 + ( c2 + c3 * npml ) * npml ) / npml ** pmlp
 do i = 1, npml
   dampn = damp *   i ** pmlp
   dampc = damp * ( i ** pmlp + ( i - 1 ) ** pmlp ) / 2.

@@ -7,8 +7,8 @@ import sord
 
 np3 = 1, 80, 24					# 1920 total processors on DataStar
 nn = 3001, 1502, 401				# number of mesh nodes nx ny nz
+dx = 200., 200., 200.				# spatial step length
 nt = 15001					# number of time steps
-dx = 200.					# spatial step length
 dt = 0.012					# time step length
 
 # Read mesh coordinates from disk

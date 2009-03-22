@@ -7,7 +7,7 @@ import sord
 np3 = 1, 1, 1			# number of processors in each dimension
 nn = 301, 201, 151		# number of mesh nodes, nx ny nz
 nt = 1000			# number of time steps
-dx = 200.			# spatial step size
+dx = 200., 200., 200.		# spatial step size
 dt = 0.01			# time step size
 hourglass = 1., 2.		# hourglass stiffness and viscosity
 bc1 = 10, 10, 10		# PML boundary conditions

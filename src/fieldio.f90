@@ -72,7 +72,7 @@ if ( i > 0 ) then
   call reduceloc( rr, i1, s2, 'allmin', n, noff, 0 )
   p%ii(1,1:3) = i1 + nnoff
   p%ii(2,1:3) = i1 + nnoff
-  if ( rr > dx * dx ) then
+  if ( rr > sum( dx * dx ) / 3. ) then
     call pdelete
     cycle loop
   end if

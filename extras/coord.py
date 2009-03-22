@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Coordinate conversions"""
 
-def matmul( 2, B ):
+def matmul( A, B ):
     """Vectorized matrix multiplication. Not the same as numpy.dot()"""
     import numpy
     A = numpy.array( A )
@@ -41,7 +41,7 @@ def slipvectors( strike, dip, rake ):
     C = numpy.array([[ c, -s, z ], [ s, c, z ], [ z, z, u ]])
     return matmul( matmul( A, B ), C ).swapaxes( 0, 1 )
 
-def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=True ):
+def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=False ):
     """2D interpolation on a regular grid"""
     import numpy
     z  = numpy.asarray( z )
@@ -50,13 +50,16 @@ def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=True ):
     j = numpy.int32( xi )
     k = numpy.int32( yi )
     n = z.shape
-    if extrapolate:
-        j = numpy.minimum( numpy.maximum( j, 0 ), n[0]-2 )
-        k = numpy.minimum( numpy.maximum( k, 0 ), n[1]-2 )
+    if not extrapolate:
+        i = (j < 0) | (j > n[0]-2) | (k < 0) | (k > n[1]-2)
+    j = numpy.minimum( numpy.maximum( j, 0 ), n[0]-2 )
+    k = numpy.minimum( numpy.maximum( k, 0 ), n[1]-2 )
     zi = ( 1. - xi + j ) * ( 1. - yi + k ) * z[...,j,k] \
        + ( 1. - xi + j ) * (      yi - k ) * z[...,j,k+1] \
        + (      xi - j ) * ( 1. - yi + k ) * z[...,j+1,k] \
        + (      xi - j ) * (      yi - k ) * z[...,j+1,k+1]
+    if not extrapolate: # untested
+        zi[...,i] = numpy.nan
     return zi
 
 def ibilinear( xx, yy, xi, yi ):
@@ -90,12 +93,12 @@ def ll2cmu( x, y, inverse=False ):
     xx = [ -121.0, -118.951292 ], [ -116.032285, -113.943965 ]
     yy = [   34.5,   36.621696 ], [   31.082920,   33.122341 ]
     if inverse:
-        x, y = interp2( 0., 0., 600000., 300000., [xx,yy], x, y )
+        x, y = interp2( 0., 0., 600000., 300000., [xx,yy], x, y, True )
     else:
         x, y = ibilinear( xx, yy, x, y )
         x = ( x + 1. ) * 300000.
         y = ( y + 1. ) * 150000.
-    return x, y
+    return numpy.array( [x, y] )
 
 def ll2xy( x, y, inverse=False, projection=None, rot=40., lon0=-121., lat0=34.5,  ):
     """UTM TeraShake coordinate projection"""
@@ -117,7 +120,7 @@ def ll2xy( x, y, inverse=False, projection=None, rot=40., lon0=-121., lat0=34.5,
         x = x - x0
         y = y - y0
         x, y = c*x - s*y, s*x + c*y
-    return x, y
+    return numpy.array( [x, y] )
 
 def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
     """

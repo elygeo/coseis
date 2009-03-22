@@ -7,8 +7,8 @@ import sord
 
 np3 = 1, 16, 1			# number of processors in each dimension
 nn = 261, 301, 161		# number of mesh nodes, nx ny nz
+dx = 50., 50., 50.		# spatial step size
 nt = 2251			# number of time steps
-dx = 50.			# spatial step size
 dt = 0.004			# time step size
 
 # Material properties

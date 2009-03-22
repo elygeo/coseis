@@ -35,13 +35,13 @@ hourglass = 1., 2.
 
 for _i in range( 0, len( _run ), 2 ):
     np3 = _run[_i+1]
-    dx = _run[_i]
-    dt = dx / 12500.
+    dx = 3 * [ _run[_i] ]
+    dt = dx[0] / 12500.
     nt = int( 12. / dt + 1.5 )
     nn = ( 
-        int( 16500. / dx + 21.5 ),
-        int(  9000. / dx + 21.5 ),
-        int(  6000. / dx + 20.5 ),
+        int( 16500. / dx[0] + 21.5 ),
+        int(  9000. / dx[1] + 21.5 ),
+        int(  6000. / dx[2] + 20.5 ),
     )
     bc1     =    10,    10, 10
     bc2     = -_reg,  _reg, -2
@@ -49,11 +49,11 @@ for _i in range( 0, len( _run ), 2 ):
     fixhypo = -_reg
 
     _j, _k, _l = ihypo
-    _jj = -int( 15000. / dx + 1.5 ),        -1
-    _kk = -int(  7500. / dx + 1.5 ),        -1
-    _ll = -int(  3000. / dx + 1.5 ),        -1
-    _oo = -int(  1500. / dx + 1.5 ),        -1
-    _xx = -int(  1500. / dx - 0.5 ) - _reg, -1
+    _jj = -int( 15000. / dx[0] + 1.5 ),        -1
+    _kk = -int(  7500. / dx[1] + 1.5 ),        -1
+    _ll = -int(  3000. / dx[2] + 1.5 ),        -1
+    _oo = -int(  1500. / dx[0] + 1.5 ),        -1
+    _xx = -int(  1500. / dx[0] - 0.5 ) - _reg, -1
 
     fieldio = [
         ( '=',  'rho',  [],               2670.     ),
@@ -102,6 +102,6 @@ for _i in range( 0, len( _run ), 2 ):
             ( '=wx', _f, [], 'P2b-'+_f, (-49., -5951., 0.) ),
         ]
 
-    rundir = os.path.expanduser('~') + '/run/%03.0f' % dx
+    rundir = os.path.expanduser('~') + '/run/%03.0f' % dx[0]
     sord.run( locals() )
 

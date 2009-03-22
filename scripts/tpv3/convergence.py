@@ -26,7 +26,7 @@ svres = []
 
 for d in dirs[1:]:
     meta = sord.util.loadmeta( d )
-    dx += [ int( meta.dx +0.5 ) ]
+    dx += [ int( meta.dx[0] +0.5 ) ]
     n = meta.shape['flt-trup']
     x = ndread( d + '/out/flt-x1', n, [0,1] )
     y = ndread( d + '/out/flt-x2', n, [1,0] )

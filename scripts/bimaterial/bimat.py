@@ -7,14 +7,14 @@ import sord
 
 np3 = 1, 1, 1
 np3 = 1, 2, 1
-dx = 0.15
+dx = 0.15, 0.15, 0.15
 dt = 0.008
 _X, _Y, _T = 400., 400., 200.
-nn = int( _X / dx + 1.5 ), int( _Y / dx + 2.5 ), 2
+nn = int( _X / dx[0] + 1.5 ), int( _Y / dx[1] + 2.5 ), 2
 nt = int( _T / dt + 1.5 )
 ihypo = nn[0]/2, nn[1]/2, 1
 fixhypo = -1
-xhypo = 0., 0., -0.5*dx
+xhypo = 0., 0., -0.5*dx[2]
 trelax = 0.1
 vrup = 0.5
 rcrit = 1.5

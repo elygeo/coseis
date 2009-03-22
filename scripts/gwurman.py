@@ -6,7 +6,7 @@ Wurman and Oglesby problem
 import sord, os, sys
 
 np3 = 4, 7, 2
-dx = 100.
+dx = 100., 100., 100.
 dt = 0.008
 nt = 3200
 nn       = 421, 271, 128

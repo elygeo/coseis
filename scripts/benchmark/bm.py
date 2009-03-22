@@ -24,7 +24,7 @@ itstats = 1
 itcheck = -1
 itio = nt
 debug = 0
-dx = 100.
+dx = 100., 100., 100.
 dt = 0.0075
 bc1 = bc2 = 0, 0, 0
 npml = 0
