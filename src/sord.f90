@@ -10,8 +10,7 @@ use m_arrays
 use m_grid_gen
 use m_fieldio
 use m_material
-use m_point_source
-use m_finite_source
+use m_source
 use m_rupture
 use m_resample
 use m_checkpoint
@@ -38,7 +37,6 @@ call grid_gen                   ; if (sync) call barrier ; prof0(6)  = timer(6)
 call fieldio_locs               ; if (sync) call barrier ; prof0(7)  = timer(6)
 call material                   ; if (sync) call barrier ; prof0(8)  = timer(6)
 call pml                        ; if (sync) call barrier 
-call point_source_init          ; if (sync) call barrier
 call finite_source_init         ; if (sync) call barrier ; prof0(9)  = timer(6)
 call rupture_init               ; if (sync) call barrier ; prof0(10) = timer(6)
 call resample                   ; if (sync) call barrier ; prof0(11) = timer(6)

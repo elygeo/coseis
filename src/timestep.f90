@@ -8,7 +8,6 @@ use m_globals
 use m_util
 use m_fieldio
 use m_stats
-integer :: j, k, l
 
 ! Status
 if ( master ) then
@@ -21,14 +20,11 @@ if ( master ) then
 end if
 
 ! Save previous slip velocity
-j = ihypo(1)
-k = ihypo(2)
-l = ihypo(3)
 if ( ifn /= 0 ) then
   select case( ifn )
-  case( 1 ); t2(1,:,:,:) = vv(j+1,:,:,:) - vv(j,:,:,:)
-  case( 2 ); t2(:,1,:,:) = vv(:,k+1,:,:) - vv(:,k,:,:)
-  case( 3 ); t2(:,:,1,:) = vv(:,:,l+1,:) - vv(:,:,l,:)
+  case( 1 ); t2(1,:,:,:) = vv(irup+1,:,:,:) - vv(irup,:,:,:)
+  case( 2 ); t2(:,1,:,:) = vv(:,irup+1,:,:) - vv(:,irup,:,:)
+  case( 3 ); t2(:,:,1,:) = vv(:,:,irup+1,:) - vv(:,:,irup,:)
   end select
   f2 = sqrt( sum( t2 * t2, 4 ) )
 end if
@@ -62,9 +58,9 @@ call fieldio( '>', 'um2', s1  )
 ! Fault time integration
 if ( ifn /= 0 ) then
   select case( ifn )
-  case( 1 ); t1(1,:,:,:) = vv(j+1,:,:,:) - vv(j,:,:,:)
-  case( 2 ); t1(:,1,:,:) = vv(:,k+1,:,:) - vv(:,k,:,:)
-  case( 3 ); t1(:,:,1,:) = vv(:,:,l+1,:) - vv(:,:,l,:)
+  case( 1 ); t1(1,:,:,:) = vv(irup+1,:,:,:) - vv(irup,:,:,:)
+  case( 2 ); t1(:,1,:,:) = vv(:,irup+1,:,:) - vv(:,irup,:,:)
+  case( 3 ); t1(:,:,1,:) = vv(:,:,irup+1,:) - vv(:,:,irup,:)
   end select
   f1 = sqrt( sum( t1 * t1, 4 ) )
   sl = sl + dt * f1
@@ -81,9 +77,9 @@ if ( ifn /= 0 ) then
     end where
   end if
   select case( ifn )
-  case( 1 ); t2(1,:,:,:) = uu(j+1,:,:,:) - uu(j,:,:,:)
-  case( 2 ); t2(:,1,:,:) = uu(:,k+1,:,:) - uu(:,k,:,:)
-  case( 3 ); t2(:,:,1,:) = uu(:,:,l+1,:) - uu(:,:,l,:)
+  case( 1 ); t2(1,:,:,:) = uu(irup+1,:,:,:) - uu(irup,:,:,:)
+  case( 2 ); t2(:,1,:,:) = uu(:,irup+1,:,:) - uu(:,irup,:,:)
+  case( 3 ); t2(:,:,1,:) = uu(:,:,irup+1,:) - uu(:,:,irup,:)
   end select
   f2 = sqrt( sum( t2 * t2, 4 ) )
   call fieldio( '>', 'sv1',  t1(:,:,:,1) )

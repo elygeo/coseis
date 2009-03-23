@@ -211,25 +211,19 @@ def prepare_prm( prm, itbuff ):
     if prm.itcheck % prm.itio != 0:
         prm.itcheck = ( prm.itcheck / prm.itio + 1 ) * prm.itio
 
-    # hypocenter node
-    ii = list( prm.ihypo )
-    for i in range( 3 ):
-        if ii[i] == 0:
-            ii[i] = prm.nn[i] / 2
-        elif ii[i] < 0:
-            ii[i] = ii[i] + prm.nn[i] + 1
-        if ii[i] < 1 or ii[i] > prm.nn[i]:
-            sys.exit( 'Error: ihypo %s out of bounds' % ii )
-    prm.ihypo = tuple( ii )
-
-    # boundary conditions
+    # Rupture boundary conditions
     i1 = list( prm.bc1 )
     i2 = list( prm.bc2 )
     i = abs( prm.faultnormal ) - 1
     if i >= 0:
-        if prm.ihypo[i] == 1:             i1[i] = -2
-        if prm.ihypo[i] == prm.nn[i] - 1: i2[i] = -2
-        if prm.ihypo[i] >= prm.nn[i]: sys.exit( 'Error: ihypo %s out of bounds' % ii )
+        if prm.irup == 0
+            prm.irup = prm.nn[i] / 2
+        elif prm.irup < 0:
+            prm.irup = prm.irup + prm.nn[i] + 1
+        if prm.irup < 1 or prm.irup > ( prm.nn[i] - 1 ):
+            sys.exit( 'Error: irup %s out of bounds' % prm.irup )
+        if prm.irup == 1:             i1[i] = -2
+        if prm.irup == prm.nn[i] - 1: i2[i] = -2
     prm.bc1 = tuple( i1 )
     prm.bc2 = tuple( i2 )
 
@@ -290,7 +284,7 @@ def prepare_prm( prm, itbuff ):
             ii[3] = 0, 0, 1
         if field in fieldnames.fault:
             i = prm.faultnormal - 1
-            ii[i] = 2 * ( prm.ihypo[i], ) + ( 1, )
+            ii[i] = 2 * ( prm.irup, ) + ( 1, )
         nn = [ ( ii[i][1] - ii[i][0] + 1 ) / ii[i][2] for i in range(4) ]
         nb = ( min( prm.itio, prm.nt ) - 1 ) / ii[3][2] + 1
         nb = max( 1, min( nb, nn[3] ) )

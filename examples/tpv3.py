@@ -32,8 +32,8 @@ hourglass = 1., 2.
 
 # Fault parameters
 faultnormal = 3				# fault plane of constant z
-ihypo = -2, -2, -2			# hypocenter indices
-fixhypo = -2				# hypocenter is cell centered
+xihypo = -0.5, -0.5, -0.5		# hypocenter logical coordinates
+fixhypo = -1				# set origin at hypocenter
 vrup = -1.				# disable circular nucleation
 fieldio += [
     ( '=',  'dc',  [], 0.4    ),	# slip weakening distance

@@ -41,32 +41,32 @@ gam2 = 0.8			# max viscosity
 npml = 10			# number of PML damping nodes
 bc1 = 0, 0, 0			# boundary condition - near side (see below)
 bc2 = 0, 0, 0			# boundary condition - far side (see below)
-ihypo = 0, 0, 0			# hypocenter node
-xhypo = 0., 0., 0.		# hypocenter location
+xhypo = 0., 0., 0.		# hypocenter location, Cartesian coordinates
+xihypo = 0., 0., 0.		# hypocenter location, logical coordinates
 fixhypo = 1			# 0=none 1=inode, 2=icell, -1=xnode, -2=xcell
 rexpand = 1.06			# grid expansion ratio
 n1expand = 0, 0, 0		# number of grid expansion nodes - near side
 n2expand = 0, 0, 0		# number of grid expansion nodes - far side
 
-# Point source parameters
-rfunc = 'point'			# space function
-tfunc = 'brune'			# time function, see util.f90 for details.
-rsource = -1.			# source radius
-tsource = 0.056			# dominant period
-moment1 = 1e16, 1e16, 1e16	# normal components
-moment2 =   0.,   0.,   0.	# shear components
-
-# Finite source parameters
-nsource = 0			# number of sub-faults, >0: icell, <0: xcell
-
-# Fault parameters
+# Dynamic rupture parameters
 faultnormal = 3			# normal direction to fault plane (0=no fault)
+irup = 0			# fault normal index
 faultopening = 0		# 0=not allowed, 1=allowed
 slipvector = 1., 0., 0.		# shear traction direction for ts1
 vrup = 3184.9			# nucleation rupture velocity
 rcrit = 1000.			# nucleation critical radius
 trelax = 0.07			# nucleation relaxation time
 svtol = 0.001			# slip velocity considered rupturing
+
+# Finite source parameters
+source = ''			# either 'potency' or 'moment'
+nsource = 0			# number of sub-faults, >0: icell, <0: xcell
+
+# Point source parameters (depreciated, used finite source instead)
+tfunc = 'brune'			# time function, see util.f90 for details.
+tsource = 0.056			# dominant period
+moment1 = 1e16, 1e16, 1e16	# normal components
+moment2 =   0.,   0.,   0.	# shear components
 
 
 # Spatial difference operator level:

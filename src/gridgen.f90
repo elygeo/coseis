@@ -25,7 +25,7 @@ do i = i1(1), i2(1); w1(i,:,:,1) = dx(1) * (i + nnoff(1) - 1); end do
 do i = i1(2), i2(2); w1(:,i,:,2) = dx(2) * (i + nnoff(2) - 1); end do
 do i = i1(3), i2(3); w1(:,:,i,3) = dx(3) * (i + nnoff(3) - 1); end do
 if ( faultnormal /= 0 ) then
-  i1 = max( i1core, ihypo + 1 )
+  i1 = max( i1core, irup + 1 )
   select case( abs( faultnormal ) )
   case( 1 ); do i = i1(1), i2(1); w1(i,:,:,1) = dx(1) * (i + nnoff(1) - 2); end do
   case( 2 ); do i = i1(2), i2(2); w1(:,i,:,2) = dx(2) * (i + nnoff(2) - 2); end do
@@ -56,8 +56,8 @@ if ( gridnoise > 0. ) then
   call set_halo( w2(:,:,:,1), 0., i1, i2 )
   call set_halo( w2(:,:,:,2), 0., i1, i2 )
   call set_halo( w2(:,:,:,3), 0., i1, i2 )
-  i1 = max( i1core, ihypo )
-  i2 = min( i2core, ihypo + 1 )
+  i1 = max( i1core, irup )
+  i2 = min( i2core, irup + 1 )
   select case( abs( faultnormal ) )
   case( 1 ); w2(i1(1):i2(1),:,:,:) = 0.
   case( 2 ); w2(:,i1(2):i2(2),:,:) = 0.
@@ -130,29 +130,35 @@ call average( w2(:,:,:,2), w1(:,:,:,2), i1cell, i2cell, 1 )
 call average( w2(:,:,:,3), w1(:,:,:,3), i1cell, i2cell, 1 )
 
 ! Hypocenter location
-j = ihypo(1)
-k = ihypo(2)
-l = ihypo(3)
-select case( abs( fixhypo ) )
-case( 1 )
+i1 = int( xihypo )
+xi = xihypo / dx + 1. - nnoff
+x0 = 0.
+do l = i1(3), i1(3)+1
+do k = i1(2), i1(2)+1
+do j = i1(1), i1(1)+1
+  w = 1. - abs( (xi(1) - j) * (xi(2) - k) * (xi(3) - l) )
+  do i = 1, 3
+    x0(i) = x0(i) + w * w1(j,k,l,i)
+  end do
+end do
+end do
+end do
+
+if ( fixhypo /= 0 ) then
   if ( master ) x0 = w1(j,k,l,:)
   call rbroadcast1( x0 )
-case( 2 )
-  if ( master ) x0 = w2(j,k,l,:)
-  call rbroadcast1( x0 )
 end select
+
 if ( fixhypo > 0 ) then
   xhypo = x0
 elseif ( fixhypo < 0 ) then
+  do i = 1, 3
   do l = 1, nm(3)
   do k = 1, nm(2)
   do j = 1, nm(1)
-    w1(j,k,l,1) = w1(j,k,l,1) - x0(1) + xhypo(1)
-    w1(j,k,l,2) = w1(j,k,l,2) - x0(2) + xhypo(2)
-    w1(j,k,l,3) = w1(j,k,l,3) - x0(3) + xhypo(3)
-    w2(j,k,l,1) = w2(j,k,l,1) - x0(1) + xhypo(1)
-    w2(j,k,l,2) = w2(j,k,l,2) - x0(2) + xhypo(2)
-    w2(j,k,l,3) = w2(j,k,l,3) - x0(3) + xhypo(3)
+    w1(j,k,l,i) = w1(j,k,l,i) - x0(i) + xhypo(i)
+    w2(j,k,l,i) = w2(j,k,l,i) - x0(i) + xhypo(i)
+  end do
   end do
   end do
   end do
@@ -253,9 +259,9 @@ do i = 1, 3
   if ( minval( vc ) < 0.0 ) stop 'negative cell volume, wrong sign in dx?'
 end do
 select case( ifn ) 
-case( 1 ); i = ihypo(1); vc(i,:,:) = 0.
-case( 2 ); i = ihypo(2); vc(:,i,:) = 0.
-case( 3 ); i = ihypo(3); vc(:,:,i) = 0.
+case( 1 ); vc(irup,:,:) = 0.
+case( 2 ); vc(:,irup,:) = 0.
+case( 3 ); vc(:,:,irup) = 0.
 end select
 call fieldio( '>', 'vc', vc  )
 

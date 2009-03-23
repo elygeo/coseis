@@ -102,11 +102,6 @@ if ( j > 0 .and. ( modulo( it, itio ) == 0 .or. it == nt ) ) then
         end if
       end do
       call rio1( fh(16), gestats(3,:j), 'w', 'stats/mw',      m, o, mpout, verb )
-      ii = ihypo
-      ii(ifn) = 1
-      open( 1, file='stats/tarrhypo', status='replace' )
-      write( 1, * ) tarr(ii(1),ii(2),ii(3))
-      close( 1 )
     end if
   end if
   j = 0

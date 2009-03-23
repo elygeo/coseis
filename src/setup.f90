@@ -23,8 +23,8 @@ call rank( ip3, ipid, np3 )
 nnoff = nl * ip3 - nhalo
 
 ! Master process
-ip3root = ( ihypo - 1 ) / nl
-where ( ip3root < 0 ) ip3root = 0
+ip3root = 0
+if ( ifn /= 0 ) ip3root(ifn) = irup / nl
 master = .false.
 if ( all( ip3 == ip3root ) ) master = .true.
 call setroot( ip3root )
@@ -53,10 +53,10 @@ i2cell = min( i2bc - 1, nm - 1 )
 i1pml = i1pml - nnoff
 i2pml = i2pml - nnoff
 
-! Map hypocenter to local indices, and if fault on this process
-ihypo = ihypo - nnoff
+! Map rpture index to local indices, and test if fault on this process
 if ( ifn /= 0 ) then
-  if ( ihypo(ifn) + 1 < i1core(ifn) .or. ihypo(ifn) > i2core(ifn) ) ifn = 0
+  irup = irup - nnoff(ifn)
+  if ( irup + 1 < i1core(ifn) .or. irup > i2core(ifn) ) ifn = 0
 end if
 
 ! Debugging
@@ -66,6 +66,7 @@ if ( debug > 2 ) then
   write( str, "( a,i6.6,a )" ) 'debug/db', ipid, '.py'
   open( 1, file=str, status='replace' )
   write( 1, "( 'ifn     = ', i8                                            )" ) ifn
+  write( 1, "( 'irup    = ', i8                                            )" ) irup
   write( 1, "( 'ip      = ', i8                                            )" ) ip
   write( 1, "( 'ipid    = ', i8                                            )" ) ipid
   write( 1, "( 'np3     = ', i8, 2(',', i8)                                )" ) np3
@@ -75,7 +76,6 @@ if ( debug > 2 ) then
   write( 1, "( 'bc1     = ', i8, 2(',', i8)                                )" ) bc1
   write( 1, "( 'bc2     = ', i8, 2(',', i8)                                )" ) bc2
   write( 1, "( 'nhalo   = ', i8, 2(',', i8)                                )" ) nhalo
-  write( 1, "( 'ihypo   = ', i8, 2(',', i8)                                )" ) ihypo
   write( 1, "( 'nnoff   = ', i8, 2(',', i8)                                )" ) nnoff
   write( 1, "( 'i1bc    = ', i8, 2(',', i8), '; i2bc   = ', i8, 2(',', i8) )" ) i1bc, i2bc
   write( 1, "( 'i1pml   = ', i8, 2(',', i8), '; i2pml  = ', i8, 2(',', i8) )" ) i1pml, i2pml

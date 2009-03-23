@@ -3,13 +3,13 @@ module m_globals
 implicit none
 
 ! Input parameters, see defaults.py for documentation
-integer, dimension(3) :: np3, nn, ihypo, bc1, bc2, n1expand, n2expand
+integer, dimension(3) :: np3, nn, bc1, bc2, n1expand, n2expand
 integer :: nt, itstats, itio, itcheck, itstop, npml, oplevel, fixhypo, mpin, &
-  mpout, debug, faultopening, faultnormal, nsource
+  mpout, debug, faultopening, irup, faultnormal, nsource
 real :: tm0, dt, dx(3), rho1, rho2, vp1, vp2, vs1, vs2, gam1, gam2, hourglass(2), &
-  vdamp, rexpand, affine(9), gridnoise, xhypo(3), slipvector(3)
-real :: tsource, rsource, moment1(3), moment2(3), vrup, rcrit, trelax, svtol
-character(16) :: rfunc, tfunc
+  vdamp, rexpand, affine(9), gridnoise, xhypo(3), xihypo(3), slipvector(3)
+real :: tsource, moment1(3), moment2(3), vrup, rcrit, trelax, svtol
+character(16) :: source, tfunc
 
 ! Miscellaneous parameters
 real, parameter :: pi = 2. * acos(0.)

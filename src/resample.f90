@@ -8,7 +8,7 @@ use m_globals
 use m_collective
 use m_bc
 use m_util
-integer :: i, i1(3), i2(3), bc(3)
+integer :: i1(3), i2(3), bc(3)
 
 if ( master ) write( 0, * ) 'Resample material model'
 
@@ -38,9 +38,9 @@ i1 = i1bc
 i2 = i2bc - 1
 call set_halo( yy, 0., i1, i2 )
 select case( ifn )
-case( 1 ); i = ihypo(1); yy(i,:,:) = 0.
-case( 2 ); i = ihypo(2); yy(:,i,:) = 0.
-case( 3 ); i = ihypo(3); yy(:,:,i) = 0.
+case( 1 ); yy(irup,:,:) = 0.
+case( 2 ); yy(:,irup,:) = 0.
+case( 3 ); yy(:,:,irup) = 0.
 end select
 
 ! Initial state

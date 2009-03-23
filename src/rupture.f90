@@ -51,7 +51,7 @@ if ( any( t3  /= t3  ) .or. maxval( t3  ) > huge( rr ) ) stop 'NaN/Inf in tau'
 ! Normal traction check
 i1 = maxloc( t3(:,:,:,3) )
 rr = t3(i1(1),i1(2),i1(3),3)
-i1(ifn) = ihypo(ifn)
+i1(ifn) = irup
 i1 = i1 + nnoff
 if ( rr > 0. ) write( 0, * ) 'warning: positive normal traction: ', rr, i1
 
@@ -63,8 +63,8 @@ call set_halo( co, 1e20, i1, i2 )
 ! Normal vectors
 i1 = i1core
 i2 = i2core
-i1(ifn) = ihypo(ifn)
-i2(ifn) = ihypo(ifn)
+i1(ifn) = irup
+i2(ifn) = irup
 call surfnormals( nhat, w1, i1, i2, ifn )
 area = sign( 1, faultnormal ) * sqrt( sum( nhat * nhat, 4 ) )
 f1 = area
@@ -117,18 +117,18 @@ end do
 ! Hypocentral radius
 do i = 1, 3
   select case( ifn )
-  case ( 1 ); t2(1,:,:,i) = w1(ihypo(1),:,:,i) - xhypo(i)
-  case ( 2 ); t2(:,1,:,i) = w1(:,ihypo(2),:,i) - xhypo(i)
-  case ( 3 ); t2(:,:,1,i) = w1(:,:,ihypo(3),i) - xhypo(i)
+  case ( 1 ); t2(1,:,:,i) = w1(irup,:,:,i) - xhypo(i)
+  case ( 2 ); t2(:,1,:,i) = w1(:,irup,:,i) - xhypo(i)
+  case ( 3 ); t2(:,:,1,i) = w1(:,:,irup,i) - xhypo(i)
   end select
 end do
 rhypo = sqrt( sum( t2 * t2, 4 ) )
 
 ! Resample mu on to fault plane nodes for moment calculatioin
 select case( ifn )
-case ( 1 ); lamf(1,:,:) = lam(ihypo(1),:,:); muf(1,:,:) = mu(ihypo(1),:,:)
-case ( 2 ); lamf(:,1,:) = lam(:,ihypo(2),:); muf(:,1,:) = mu(:,ihypo(2),:)
-case ( 3 ); lamf(:,:,1) = lam(:,:,ihypo(3)); muf(:,:,1) = mu(:,:,ihypo(3))
+case ( 1 ); lamf(1,:,:) = lam(irup,:,:); muf(1,:,:) = mu(irup,:,:)
+case ( 2 ); lamf(:,1,:) = lam(:,irup,:); muf(:,1,:) = mu(:,irup,:)
+case ( 3 ); lamf(:,:,1) = lam(:,:,irup); muf(:,:,1) = mu(:,:,irup)
 end select
 call invert( lamf )
 call invert( muf )
@@ -159,37 +159,6 @@ call scalar_swap_halo( rhypo, nhalo )
 call vector_swap_halo( nhat,  nhalo )
 call vector_swap_halo( t0,    nhalo )
 
-! Stats
-if ( master ) then
-  i1 = ihypo
-  i1(ifn) = 1
-  j = i1(1)
-  k = i1(2)
-  l = i1(3)
-  mu0 = muf(j,k,l)
-  mus0 = mus(j,k,l)
-  mud0 = mud(j,k,l)
-  dc0 = dc(j,k,l)
-  tn0 = sum( t0(j,k,l,:) * nhat(j,k,l,:) )
-  ts0 = sqrt( sum( ( t0(j,k,l,:) - tn0 * nhat(j,k,l,:) ) ** 2. ) )
-  tn0 = max( -tn0, 0. )
-  ess = ( tn0 * mus0 - ts0 ) / ( ts0 - tn0 * mud0 )
-  lc =  dc0 * mu0 / tn0 / ( mus0 - mud0 )
-  if ( tn0 * ( mus0 - mud0 ) == 0. ) lc = 0.
-  rctest = mu0 * tn0 * ( mus0 - mud0 ) * dc0 / ( ts0 - tn0 * mud0 ) ** 2
-  open( 1, file='stats/rupture.py', status='replace' )
-  write( 1, "('mu0    = ', g15.7, ' # shear modulus at hypocenter'   )" ) mu0
-  write( 1, "('mus0   = ', g15.7, ' # static friction at hypocenter' )" ) mus0
-  write( 1, "('mud0   = ', g15.7, ' # dynamic friction at hypocenter')" ) mud0
-  write( 1, "('dc0    = ', g15.7, ' # dc at hypocenter'              )" ) dc0
-  write( 1, "('tn0    = ', g15.7, ' # normal traction at hypocenter' )" ) tn0
-  write( 1, "('ts0    = ', g15.7, ' # shear traction at hypocenter'  )" ) ts0
-  write( 1, "('ess    = ', g15.7, ' # strength parameter'            )" ) ess
-  write( 1, "('lc     = ', g15.7, ' # breakdown width'               )" ) lc
-  write( 1, "('rctest = ', g15.7, ' # rcrit for spontaneous rupture' )" ) rctest
-  close( 1 )
-end if
-
 end subroutine
 
 !------------------------------------------------------------------------------!
@@ -210,13 +179,13 @@ if ( verb ) write( 0, * ) 'Rupture'
 ! Indices
 i1 = 1
 i2 = nm
-i1(ifn) = ihypo(ifn)
-i2(ifn) = ihypo(ifn)
+i1(ifn) = irup
+i2(ifn) = irup
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
-i1(ifn) = ihypo(ifn) + 1
-i2(ifn) = ihypo(ifn) + 1
+i1(ifn) = irup + 1
+i2(ifn) = irup + 1
 j3 = i1(1); j4 = i2(1)
 k3 = i1(2); k4 = i2(2)
 l3 = i1(3); l4 = i2(3)

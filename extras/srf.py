@@ -3,6 +3,10 @@
 Reader for Graves Standard Rupture Format:
 http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
 """
+# w1(j,k,l,:) = w1(j,k,l,:) + w * su * nu
+# w2(j,k,l,1) = w2(j,k,l,1) + w * 0.5 * ( su(2) * nu(3) + nu(2) * su(3) )
+# w2(j,k,l,2) = w2(j,k,l,2) + w * 0.5 * ( su(3) * nu(1) + nu(3) * su(1) )
+# w2(j,k,l,3) = w2(j,k,l,3) + w * 0.5 * ( su(1) * nu(2) + nu(1) * su(2) )
 
 def read( filename, headeronly=False, noslip=False ):
     """
