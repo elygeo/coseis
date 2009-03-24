@@ -37,7 +37,7 @@ bc2 = 10, 10, 10
 
 # Source parameters
 faultnormal = 0			# disable rupture dynamics
-xihypo = 1.5, 1.5, 41.5		# hypocenter logical coordinates
+ihypo = 1.5, 1.5, 41.5		# hypocenter indices
 xhypo = 0.0, 0.0, 2000.0	# hypocenter coordinates
 fixhypo = -1			# set origin
 tfunc = 'brune'			# time function: Brune pulse

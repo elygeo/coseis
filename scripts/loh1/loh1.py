@@ -2,7 +2,6 @@
 """
 PEER LOH.1
 """
-
 import sord
 
 np3 = 1, 1, 1
@@ -13,9 +12,9 @@ dt = 0.004
 _T = 9.
 _ell  = 8000., 10000., 6000.
 nt    =   int( _T / dt +  1.5 )
-nn    = [ int( _x / dx[0] + 21.5 ) for _x in _ell  ]
-xhypo = 0., 0., 2000.
-xihypo =  0.5*nn[0]/dx[0] - 0.5, 0.5*nn[1]/dx[1] - 0.5, 40.5
+nn    = [ int( _x / dx[0] + 20.5 ) for _x in _ell  ]
+xhypo = 0.0, 0.0, 2000.0
+ihypo =   0,   0,   40.5
 fixhypo = -1
 bc1 = -2, -2,  0
 bc2 = 10, 10, 10

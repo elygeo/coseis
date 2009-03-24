@@ -41,8 +41,8 @@ gam2 = 0.8			# max viscosity
 npml = 10			# number of PML damping nodes
 bc1 = 0, 0, 0			# boundary condition - near side (see below)
 bc2 = 0, 0, 0			# boundary condition - far side (see below)
-xhypo = 0.0, 0.0, 0.0		# hypocenter location, Cartesian coordinates
-xihypo = 0.0, 0.0, 0.0		# hypocenter location, logical coordinates, 0.0 = center
+xhypo = 0.0, 0.0, 0.0		# hypocenter coordinates
+ihypo = 0, 0, 0			# hypocenter indices (fractianl values OK), 0 = center
 fixhypo = 1			# lock xhypo/xihypo, >0 sift xhypo, <0 shift mesh
 rexpand = 1.06			# grid expansion ratio
 n1expand = 0, 0, 0		# number of grid expansion nodes - near side

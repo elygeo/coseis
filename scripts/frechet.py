@@ -7,9 +7,9 @@ import sord
 np3 = 1, 1, 1			# number of processors in each dimension
 nn = 301, 201, 151		# number of mesh nodes, nx ny nz
 nt = 1000			# number of time steps
-dx = 200., 200., 200.		# spatial step size
+dx = 200.0, 200.0, 200.0	# spatial step size
 dt = 0.01			# time step size
-hourglass = 1., 2.		# hourglass stiffness and viscosity
+hourglass = 1.0, 2.0		# hourglass stiffness and viscosity
 bc1 = 10, 10, 10		# PML boundary conditions
 bc2 = 10, 10, 0			# PML boundary conditions & free surface in Z
 faultnormal = 0			# disable rupture dynamics
@@ -34,8 +34,8 @@ for _f in 'f1', 'f2', 'f3':
 
 _sta = 44, 7, -1
 _src = 23, 11, 30
-_xx, _yy, _zz = 0., 0., 0.
-_yz, _zx, _xy = 0., 8., 2.
+_xx, _yy, _zz = 0.0, 0.0, 0.0
+_yz, _zx, _xy = 0.0, 8.0, 2.0
 
 fieldio = [
     ( '=r', 'rho', [], 'rho' ),			# density

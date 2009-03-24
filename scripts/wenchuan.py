@@ -18,7 +18,7 @@ faultnormal = 0
 
 # Source
 xhypo = 0., 0., -12e3
-xihypo = nn[0]/2-0.5, nn[1]/2-0.5, -xhypo[2]/dx[2]
+ihypo = nn[0]/2-0.5, nn[1]/2-0.5, -xhypo[2]/dx[2]
 moment1 = -5.79e20, 0.10e20, 5.69e20    #  Mpp,  Mtt,  Mrr
 moment2 = -1.99e20, 5.61e20, 3.48e20    # -Mrt,  Mrp, -Mtp
 tfunc = 'brune'

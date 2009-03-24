@@ -87,7 +87,7 @@ use m_util
 integer :: i1(3), i2(3), i, j, k, l
 real :: xi(3), f, w
 if ( tfunc == '' ) return
-xi = xihypo - 0.5 - nnoff
+xi = ihypo - 0.5 - nnoff
 i1 = max( i1cell, int( xi )     )
 i2 = min( i2cell, int( xi ) + 1 )
 if ( any( i2 < i1 ) ) then

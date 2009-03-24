@@ -23,7 +23,7 @@ call rank( ip3, ipid, np3 )
 nnoff = nl * ip3 - nhalo
 
 ! Master process
-ip3root = ( xihypo - 1.0 ) / nl
+ip3root = ( ihypo - 1.0 ) / nl
 master = .false.
 if ( all( ip3 == ip3root ) ) master = .true.
 call setroot( ip3root )
@@ -55,7 +55,7 @@ i2pml = i2pml - nnoff
 ! Map rupture index to local indices, and test if fault on this process
 irup = 0
 if ( ifn /= 0 ) then
-  irup = int( xihypo(ifn) ) - nnoff(ifn)
+  irup = int( ihypo(ifn) + 0.000001 ) - nnoff(ifn)
   if ( irup + 1 < i1core(ifn) .or. irup > i2core(ifn) ) ifn = 0
 end if
 

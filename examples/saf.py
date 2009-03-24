@@ -6,7 +6,7 @@ import sord
 
 np3 = 1, 80, 24					# 1920 total processors on DataStar
 nn = 3001, 1502, 401				# number of mesh nodes nx ny nz
-dx = 200., 200., -200.				# spatial step length
+dx = 200.0, 200.0, -200.0			# spatial step length
 nt = 15001					# number of time steps
 dt = 0.012					# time step length
 
@@ -37,9 +37,9 @@ hourglass = 1., 1.				# hourglass stiffness and viscosity
 # Fault parameters
 slipvector = 1., 0., 0.				# vector for resolving pre-traction
 faultnormal = 2					# fault plane normal direction
-xihypo = 2266, 997, -26				# hypocenter logical coordinates
+ihypo = 2266, 997, -26				# hypocenter indices
 _j =  1217, 2312				# temporary variable
-_k = xihypo[1]					# temporary variable
+_k = ihypo[1]					# temporary variable
 _l = -81, -1					# temporary variable
 fieldio += [
     ( '=r', 'ts',  [(),_k,(),()], _dir+'ts1' ), # read initial shear traction file

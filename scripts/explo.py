@@ -35,10 +35,10 @@ for _f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
     ]
 
 if 1:
-    xihypo = 1.5, 1.5, 1.5
+    ihypo = 1.5, 1.5, 1.5
     bc1   = 2, 2, 2
 else:
-    xihypo = 1.0, 1.0, 1.0
+    ihypo = 1, 1, 1
     bc1   = 1, 1, 1
 
 sord.run( locals() )

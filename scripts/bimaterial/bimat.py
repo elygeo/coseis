@@ -12,7 +12,7 @@ dt = 0.008
 _X, _Y, _T = 400., 400., 200.
 nn = int( _X / dx[0] + 1.01 ), int( _Y / dx[1] + 2.01 ), 2
 nt = int( _T / dt + 1.01 )
-xihypo = 0.5*_X/dx[0], 0.5*_Y/dx[1], 0.5
+ihypo = 0.5*_X/dx[0], 0.5*_Y/dx[1], 0.5
 fixhypo = -1
 trelax = 0.1
 vrup = 0.5
@@ -25,7 +25,7 @@ itio = 1
 itstats = 1
 debug = 0
 
-_k = int( xihypo[1] + 1.5 )
+_k = int( ihypo[1] + 0.0001 )
 fieldio = [
     ( '=', 'rho', [], 1.    ),
     ( '=', 'vp',  [], 1.732 ),

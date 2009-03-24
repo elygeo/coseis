@@ -25,8 +25,8 @@ moment1 = 1e18, 1e18, 1e18
 moment2 =  0.0,  0.0,  0.0
 tfunc = 'brune'
 tsource = 0.1
-xihypo = 31.0, 31.0, 31.0
-xihypo = 31.5, 31.5, 31.5
+ihypo = 31, 31, 31
+ihypo = 31.5, 31.5, 31.5
 fixhypo = -1
 
 for _f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':

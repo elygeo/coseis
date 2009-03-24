@@ -18,13 +18,13 @@ hourglass = 1.0, 0.0
 faultnormal = 0
 moment1 = 1e16, 1e16, 1e16
 moment2 =  0.0,  0.0,  0.0
-xihypo = 1.5, 1.5, 1.5
+ihypo = 1.5, 1.5, 1.5
 
 fieldio = [
-    ( '=', 'rho', [], 2670. ),      
-    ( '=', 'vp',  [], 6000. ),      
-    ( '=', 'vs',  [], 3464. ),      
-    ( '=', 'gam', [],    0. ),      
+    ( '=', 'rho', [], 2670.0 ),      
+    ( '=', 'vp',  [], 6000.0 ),      
+    ( '=', 'vs',  [], 3464.0 ),      
+    ( '=', 'gam', [],    0.0 ),      
 ]
 for _f in sord.fieldnames.volume:
     fieldio += [ ( '=w', _f, [], _f ) ]

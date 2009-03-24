@@ -31,7 +31,7 @@ hourglass = 1.0, 2.0
 
 # Fault parameters
 faultnormal = 3				# fault plane of constant z
-xihypo = -1.5, -1.5, -1.5		# hypocenter logical coordinates
+ihypo = -1.5, -1.5, -1.5		# hypocenter indices
 fixhypo = -1				# set origin at hypocenter
 vrup = -1.				# disable circular nucleation
 fieldio += [

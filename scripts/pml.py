@@ -6,14 +6,14 @@ PML test problem
 import sord
 
 nt = 500
-dx = 100., 100., 100.
+dx = 100.0, 100.0, 100.0
 dt = 0.0075
-hourglass = 1., 1.
+hourglass = 1.0, 1.0
 
 faultnormal = 0
 tfunc = 'sbrune'
 tfunc = 'brune'
-rsource = 50.
+rsource = 50.0
 tsource = 0.056
 moment1 = 1e18, 1e18, 1e18
 moment2 = 0, 0, 0
@@ -22,10 +22,10 @@ fixhypo = -1
 _l = 1 # FIXME
 np3 = 1, 1, 2
 fieldio = [
-    ( '=', 'rho', [], 2670. ),      
-    ( '=', 'vp',  [], 6000. ),      
-    ( '=', 'vs',  [], 3464. ),      
-    ( '=', 'gam', [],    0. ),      
+    ( '=', 'rho', [], 2670.0 ),      
+    ( '=', 'vp',  [], 6000.0 ),      
+    ( '=', 'vs',  [], 3464.0 ),      
+    ( '=', 'gam', [],    0.0 ),      
 ]
 for _f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
     fieldio += [
@@ -36,7 +36,7 @@ for _f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
     ]
 
 # Rect
-xihypo = 80.5, 80.5, 80.5
+ihypo = 80.5, 80.5, 80.5
 nn  = 81, 81, 81
 bc1 = 10, 10, 10
 bc2 = 2, 2, 2
@@ -46,7 +46,7 @@ ihypo = 0, 0, 0
 sord.run( locals() )
 
 # Non-rect
-xihypo = 20.5, 20.5, 20.5 # check
+ihypo = 20.5, 20.5, 20.5 # check
 nn = 40, 40, 40
 affine = (1.,0.,0.), (0.,1.,1.), (0.,0.,1.) # shear, 1
 affine = (1.,0.,1.), (0.,1.,0.), (0.,0.,1.) # shear, 2
@@ -61,13 +61,13 @@ bc2 = 0, 0, 0
 
 # Junk
 tfunc = 'sbrune'
-xihypo = 25.5, 25.5, 25.5
+ihypo = 25.5, 25.5, 25.5
 nn = 50, 50, 50
 bc1 = 10, 10, 10
 bc2 = 10, 10, 10
 
 # Mixed rect
-xihypo = 80.5, 80.5, 80.5
+ihypo = 80.5, 80.5, 80.5
 nn = 160, 160, 160
 bc1 = 10, 10, 10
 bc2 = 0, 0, 0

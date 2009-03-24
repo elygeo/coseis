@@ -26,7 +26,7 @@ bc1 = 0, 0, 0
 # Test -2 and 1 with fault
 faultnormal = 3
 tfunc = ''
-xihypo = 2.5, 3., 2.5
+ihypo = 2.5, 3, 2.5
 nn = 4, 5, 4; bc2 =  0, 0,  0
 nn = 3, 3, 3; bc2 = -2, 1, 99
 
@@ -35,28 +35,28 @@ sord.run( locals() )
 # Test -1 and 2 with fault
 faultnormal = 3
 tfunc = ''
-xihypo = 3., 2.5, 2.5
+ihypo = 3, 2.5, 2.5
 nn = 5, 4, 4; bc2 =  0, 0,  0
 nn = 3, 3, 3; bc2 = -1, 2, 99
 
 # Test -2 and 2 with fault
 faultnormal = 3
 tfunc = ''
-xihypo = 2.5, 2.5, 2.5
+ihypo = 2.5, 2.5, 2.5
 nn = 3, 3, 3; bc2 = -2, 2, 99
 nn = 4, 4, 4; bc2 =  0, 0,  0
 
 # Test -1 and 1 with fault
 faultnormal = 3
 tfunc = ''
-xihypo = 3., 3., 2.5
+ihypo = 3, 3, 2.5
 nn = 5, 5, 4; bc2 =  0, 0,  0
 nn = 3, 3, 3; bc2 = -1, 1, 99
 
 # Test -1 and 1
 faultnormal = 0
 tfunc = 'brune'
-xihypo = 3., 3., 3.
+ihypo = 3, 3, 3
 moment1 = 0., 0., 0.
 moment2 = 0., 1e18, 0.
 nn = 3, 3, 3; bc2 = -1, 1, -1
@@ -65,7 +65,7 @@ nn = 5, 5, 5; bc2 =  0, 0,  0
 # Test -2 and 2
 faultnormal = 0
 tfunc = 'brune'
-xihypo = 2.5, 2.5, 2.5
+ihypo = 2.5, 2.5, 2.5
 moment1 = 0., 0., 0.
 moment2 = 0., 1e18, 0.
 nn = 3, 3, 3; bc2 = -2, 2, -2
@@ -74,7 +74,7 @@ nn = 4, 4, 4; bc2 =  0, 0,  0
 # Test 1
 faultnormal = 0
 tfunc = 'brune'
-xihypo = 3., 3., 3.
+ihypo = 3, 3, 3
 moment1 = 1e18, 1e18, 1e18
 moment2 = 0., 0., 0.
 nn = 3, 3, 3; bc2 = 1, 1, 1
