@@ -12,7 +12,7 @@ use m_diffnc
 use m_fieldio
 integer :: i1(3), i2(3), i3(3), i4(3), bc(3), &
   i, j, k, l, j1, k1, l1, j2, k2, l2, b, c
-real :: x0(3), m(9), tol, h
+real :: x0(3), xi(3), m(9), tol, h, w
 integer, allocatable :: seed(:)
 
 if ( master ) write( 0, * ) 'Grid generation'
@@ -130,25 +130,24 @@ call average( w2(:,:,:,2), w1(:,:,:,2), i1cell, i2cell, 1 )
 call average( w2(:,:,:,3), w1(:,:,:,3), i1cell, i2cell, 1 )
 
 ! Hypocenter location
-i1 = int( xihypo )
-xi = xihypo / dx + 1. - nnoff
-x0 = 0.
-do l = i1(3), i1(3)+1
-do k = i1(2), i1(2)+1
-do j = i1(1), i1(1)+1
-  w = 1. - abs( (xi(1) - j) * (xi(2) - k) * (xi(3) - l) )
-  do i = 1, 3
-    x0(i) = x0(i) + w * w1(j,k,l,i)
-  end do
-end do
-end do
-end do
-
 if ( fixhypo /= 0 ) then
-  if ( master ) x0 = w1(j,k,l,:)
+  if ( master ) then
+    xi = xihypo - nnoff FIXME check this
+    i1 = int( xihypo ) + 1
+    x0 = 0.
+    do l = i1(3), i1(3)+1
+    do k = i1(2), i1(2)+1
+    do j = i1(1), i1(1)+1
+      w = 1. - abs( (xi(1) - j) * (xi(2) - k) * (xi(3) - l) )
+      do i = 1, 3
+        x0(i) = x0(i) + w * w1(j,k,l,i)
+      end do
+    end do
+    end do
+    end do
+  end if
   call rbroadcast1( x0 )
-end select
-
+end if
 if ( fixhypo > 0 ) then
   xhypo = x0
 elseif ( fixhypo < 0 ) then

@@ -14,7 +14,7 @@ use m_collective
 use m_util
 logical, save :: init = .true., dofault = .false.
 integer, save :: fh(16), j = 0
-integer :: ii(3), m, o, i
+integer :: m, o, i
 real :: rr
 real, save, allocatable, dimension(:,:) :: &
   vstats, fstats, estats, gvstats, gfstats, gestats

@@ -14,7 +14,7 @@ use m_util
 integer :: n, i, fh
 if ( nsource == 0 ) return
 if ( master ) write( 0, * ) 'Finite source initialize'
-n = abs( nsourse )
+n = abs( nsource )
 allocate( src_xi(n,3) )
 fh = -1
 if ( mpin /= 0 ) fh = file_null
@@ -23,9 +23,10 @@ call rio1( fh, src_xi(:,2), 'r', 'in/src_xi2',     n, 0, mpin, verb )
 call rio1( fh, src_xi(:,3), 'r', 'in/src_xi3',     n, 0, mpin, verb )
 do i = 1, 3
   src_xi(:,i) = src_xi(:,i) + 0.5 - nnoff(i)
-  if all( src_xi(:,i) < (-1.+i1cell(i)) ) .or. all( src_xi(:,i) > (1.+i2cell(i)) ) then
+  if ( all( src_xi(:,i) < (-1.+i1cell(i)) ) .or. &
+       all( src_xi(:,i) > ( 1.+i2cell(i)) ) ) then
     nsource = 0
-    deallocate( scr_xi )
+    deallocate( src_xi )
     return
   end if
 end do
@@ -48,7 +49,7 @@ end subroutine
 ! Add finite source to strain/stress tensor
 subroutine finite_source
 use m_globals
-integer :: i1(3), i1(3), i, j, k, l, isrc, itoff
+integer :: i1(3), i2(3), i, j, k, l, isrc, itoff
 real :: xi(3), t, h, w
 if ( nsource == 0 ) return
 if ( verb ) write( 0, * ) 'Finite source'
@@ -83,14 +84,14 @@ end subroutine
 subroutine point_source
 use m_globals
 use m_util
-integer :: i, j, k, l
+integer :: i1(3), i2(3), i, j, k, l
 real :: xi(3), f, w
 if ( tfunc == '' ) return
 xi = xihypo + 0.5 - nnoff
 i1 = max( i1cell, int( xi )     )
 i2 = min( i2cell, int( xi ) + 1 )
 if ( any( i2 < i1 ) ) then
-  tfunc == ''
+  tfunc = ''
   return
 end if
 if ( verb ) write( 0, * ) 'Point source'

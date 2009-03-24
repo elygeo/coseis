@@ -23,8 +23,7 @@ call rank( ip3, ipid, np3 )
 nnoff = nl * ip3 - nhalo
 
 ! Master process
-ip3root = 0
-if ( ifn /= 0 ) ip3root(ifn) = irup / nl
+ip3root = xihypo / nl
 master = .false.
 if ( all( ip3 == ip3root ) ) master = .true.
 call setroot( ip3root )

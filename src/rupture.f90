@@ -11,7 +11,7 @@ use m_surfnormals
 use m_util
 use m_fieldio
 use m_stats
-real :: rr, mu0, mus0, mud0, dc0, tn0, ts0, ess, lc,  rctest          
+real :: rr
 integer :: i1(3), i2(3), i, j, k, l
 
 if ( ifn == 0 ) return
