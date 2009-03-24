@@ -18,7 +18,7 @@ if ( verb ) write( 0, * ) 'Stress'
 do i = 1, 3
   w1(:,:,:,i) = uu(:,:,:,i) + gam * vv(:,:,:,i)
 end do
-call set_halo( s1, 0., i1cell, i2cell )
+call set_halo( s1, 0.0, i1cell, i2cell )
 
 ! Loop over component and derivative direction
 doic: do ic  = 1, 3
@@ -175,8 +175,8 @@ call fieldio( '<>', 'e12', w2(:,:,:,3) )
 ! Hook's Law: w_ij = lam*g_ij*delta_ij + mu*(g_ij + g_ji)
 s1 = lam * ( w1(:,:,:,1) + w1(:,:,:,2) + w1(:,:,:,3 ) )
 do i = 1, 3
-  w1(:,:,:,i) = 2. * mu * w1(:,:,:,i) + s1
-  w2(:,:,:,i) = 2. * mu * w2(:,:,:,i)
+  w1(:,:,:,i) = 2.0 * mu * w1(:,:,:,i) + s1
+  w2(:,:,:,i) = 2.0 * mu * w2(:,:,:,i)
 end do
 
 ! Add moment source to stress

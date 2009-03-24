@@ -175,7 +175,7 @@ end do
 
 ! General grid exact, flops: 57* 119+
 case( 5 )
-h = sign( 1. / 12., product( dx ) )
+h = sign( 1.0 / 12.0, product( dx ) )
 b = modulo( a, 3 ) + 1
 c = modulo( a + 1, 3 ) + 1
 do l = i1(3), i2(3)

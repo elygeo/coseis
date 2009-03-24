@@ -15,7 +15,7 @@ use m_stats
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq
 
 if ( verb ) write( 0, * ) 'Acceleration'
-call set_halo( s1, 0., i1node, i2node )
+call set_halo( s1, 0.0, i1node, i2node )
 
 ! Loop over component and derivative direction
 doic: do ic  = 1, 3
@@ -106,9 +106,9 @@ end do doid
 end do doic
 
 ! Hourglass control. Only viscous in PML
-if ( any( hourglass > 0. ) ) then
-call set_halo( s1, 0., i1cell, i2cell )
-call set_halo( s2, 0., i1node, i2node )
+if ( any( hourglass > 0.0 ) ) then
+call set_halo( s1, 0.0, i1cell, i2cell )
+call set_halo( s2, 0.0, i1node, i2node )
 w2 = hourglass(1) * uu + dt * hourglass(2) * vv
 do iq = 1, 4
 do ic = 1, 3
@@ -119,7 +119,7 @@ do ic = 1, 3
   i1 = max( i1pml + 1, i1node )
   i2 = min( i2pml - 1, i2node )
   call hourglasscn( s2, s1, iq, i1, i2 )
-  if ( hourglass(2) > 0. .and. npml > 0 ) then
+  if ( hourglass(2) > 0.0 .and. npml > 0 ) then
     do i = 1, 3
       i1 = i1cell
       i2 = i2cell

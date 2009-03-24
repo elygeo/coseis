@@ -39,35 +39,35 @@ call fieldio( '<', 'x2', w1(:,:,:,2) )
 call fieldio( '<', 'x3', w1(:,:,:,3) )
 
 ! Add random noise except at boundaries and in PML
-if ( gridnoise > 0. ) then
+if ( gridnoise > 0.0 ) then
   call random_seed( size=i )
   allocate( seed(i) )
   seed = ip
   call random_seed( put=seed )
   call random_number( w2 )
-  w2 = sqrt( sum( dx * dx ) ) * gridnoise * ( w2 - .5 )
+  w2 = sqrt( sum( dx * dx ) ) * gridnoise * ( w2 - 0.5 )
   i1 = i1pml + 1
   i2 = i2pml - 1
-  call set_halo( w2(:,:,:,1), 0., i1, i2 )
-  call set_halo( w2(:,:,:,2), 0., i1, i2 )
-  call set_halo( w2(:,:,:,3), 0., i1, i2 )
+  call set_halo( w2(:,:,:,1), 0.0, i1, i2 )
+  call set_halo( w2(:,:,:,2), 0.0, i1, i2 )
+  call set_halo( w2(:,:,:,3), 0.0, i1, i2 )
   i1 = i1bc + 1
   i2 = i2bc - 1
-  call set_halo( w2(:,:,:,1), 0., i1, i2 )
-  call set_halo( w2(:,:,:,2), 0., i1, i2 )
-  call set_halo( w2(:,:,:,3), 0., i1, i2 )
+  call set_halo( w2(:,:,:,1), 0.0, i1, i2 )
+  call set_halo( w2(:,:,:,2), 0.0, i1, i2 )
+  call set_halo( w2(:,:,:,3), 0.0, i1, i2 )
   i1 = max( i1core, irup )
   i2 = min( i2core, irup + 1 )
   select case( abs( faultnormal ) )
-  case( 1 ); w2(i1(1):i2(1),:,:,:) = 0.
-  case( 2 ); w2(:,i1(2):i2(2),:,:) = 0.
-  case( 3 ); w2(:,:,i1(3):i2(3),:) = 0.
+  case( 1 ); w2(i1(1):i2(1),:,:,:) = 0.0
+  case( 2 ); w2(:,i1(2):i2(2),:,:) = 0.0
+  case( 3 ); w2(:,:,i1(3):i2(3),:) = 0.0
   end select
   w1 = w1 + w2
 end if
 
 ! Grid expansion
-if ( rexpand > 1. ) then
+if ( rexpand > 1.0 ) then
   i1 = n1expand - nnoff
   i2 = nn - n2expand + 1 - nnoff
   i3 = i1core
@@ -132,13 +132,13 @@ call average( w2(:,:,:,3), w1(:,:,:,3), i1cell, i2cell, 1 )
 ! Hypocenter location
 if ( fixhypo /= 0 ) then
   if ( master ) then
-    xi = xihypo - nnoff FIXME check this
-    i1 = int( xihypo ) + 1
-    x0 = 0.
+    xi = xihypo + 1.0 - nnoff
+    i1 = int( xi )
+    x0 = 0.0
     do l = i1(3), i1(3)+1
     do k = i1(2), i1(2)+1
     do j = i1(1), i1(1)+1
-      w = 1. - abs( (xi(1) - j) * (xi(2) - k) * (xi(3) - l) )
+      w = 1.0 - abs( (xi(1) - j) * (xi(2) - k) * (xi(3) - l) )
       do i = 1, 3
         x0(i) = x0(i) + w * w1(j,k,l,i)
       end do
@@ -164,9 +164,9 @@ elseif ( fixhypo < 0 ) then
 end if
 
 ! Zero external cells
-call set_halo( w2(:,:,:,1), 0., i1cell, i2cell )
-call set_halo( w2(:,:,:,2), 0., i1cell, i2cell )
-call set_halo( w2(:,:,:,3), 0., i1cell, i2cell )
+call set_halo( w2(:,:,:,1), 0.0, i1cell, i2cell )
+call set_halo( w2(:,:,:,2), 0.0, i1cell, i2cell )
+call set_halo( w2(:,:,:,3), 0.0, i1cell, i2cell )
 
 ! Output
 call fieldio( '>', 'x1', w1(:,:,:,1) )
@@ -179,7 +179,7 @@ call fieldio( '>', 'c3', w2(:,:,:,3) )
 ! Orthogonality test
 if ( oplevel == 0 ) then
   oplevel = 6
-  tol = 10. * epsilon( dx )
+  tol = 10.0 * epsilon( dx )
   j1 = i1cell(1); j2 = i2cell(1)
   k1 = i1cell(2); k2 = i2cell(2)
   l1 = i1cell(3); l2 = i2cell(3)
@@ -206,7 +206,7 @@ case( 3:5 )
 case( 6 )
   allocate( bb(nm(1),nm(2),nm(3),8,3) )
   do i = 1, 3
-  h = sign( 1. / 12., product( dx ) )
+  h = sign( 1.0 / 12.0, product( dx ) )
   b = modulo( i, 3 ) + 1
   c = modulo( i + 1, 3 ) + 1
   do l = 1, nm(3)-1
@@ -252,15 +252,15 @@ case default; stop 'illegal operator'
 end select
 
 ! Cell volume
-call set_halo( vc, 0., i1cell, i2cell )
+call set_halo( vc, 0.0, i1cell, i2cell )
 do i = 1, 3
   call diffnc( vc, w1, i, i, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
   if ( minval( vc ) < 0.0 ) stop 'negative cell volume, wrong sign in dx?'
 end do
 select case( ifn ) 
-case( 1 ); vc(irup,:,:) = 0.
-case( 2 ); vc(:,irup,:) = 0.
-case( 3 ); vc(:,:,irup) = 0.
+case( 1 ); vc(irup,:,:) = 0.0
+case( 2 ); vc(:,irup,:) = 0.0
+case( 3 ); vc(:,:,irup) = 0.0
 end select
 call fieldio( '>', 'vc', vc  )
 

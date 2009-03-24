@@ -11,7 +11,7 @@ n = (/ size(f,1), size(f,2), size(f,3) /)
 do l = 1, n(3)
 do k = 1, n(2)
 do j = 1, n(1)
-  if ( f(j,k,l) /= 0. ) f(j,k,l) = 1. / f(j,k,l)
+  if ( f(j,k,l) /= 0.0 ) f(j,k,l) = 1.0 / f(j,k,l)
 end do
 end do
 end do
@@ -56,7 +56,7 @@ do j = i1(1), i2(1)
 end do
 end do
 end do
-call set_halo( f2, 0., i1, i2 )
+call set_halo( f2, 0.0, i1, i2 )
 end subroutine
 
 ! Set array to real value outside specified region
@@ -132,8 +132,8 @@ where( i1 < 1 ) i1 = i1 + ( -i1 / di + 1 ) * di
 where( i2 > n ) i2 = i1 + ( n - i1 ) / di * di
 d = di(1)
 do i = 1, d - 1
-  h1 = 1. / d * i
-  h2 = 1. / d * ( d - i )
+  h1 = 1.0 / d * i
+  h2 = 1.0 / d * ( d - i )
   do l = i1(3), i2(3), di(3)
   do k = i1(2), i2(2), di(2)
   do j = i1(1), i2(1) - d, d
@@ -144,8 +144,8 @@ do i = 1, d - 1
 end do
 d = di(2)
 do i = 1, d - 1
-  h1 = 1. / d * i
-  h2 = 1. / d * ( d - i )
+  h1 = 1.0 / d * i
+  h2 = 1.0 / d * ( d - i )
   do l = i1(3), i2(3), di(1)
   do k = i1(2), i2(2) - d, d
   do j = i1(1), i2(1)
@@ -156,8 +156,8 @@ do i = 1, d - 1
 end do
 d = di(3)
 do i = 1, d - 1
-  h1 = 1. / d * i
-  h2 = 1. / d * ( d - i )
+  h1 = 1.0 / d * i
+  h2 = 1.0 / d * ( d - i )
   do l = i1(3), i2(3) - d, d
   do k = i1(2), i2(2)
   do j = i1(1), i2(1)
@@ -172,29 +172,29 @@ end subroutine
 real function time_function( tfunc, tm, dt, period )
 character(*), intent(in) :: tfunc
 real, intent(in) :: tm, dt, period
-real, parameter :: pi = 2. * acos(0.)
+real, parameter :: pi = 2.0 * acos(0.0)
 real :: t
-time_function = 0.
+time_function = 0.0
 select case( tfunc )
 case( 'const'  )
-  time_function = 1.
+  time_function = 1.0
 case( 'delta'  )
-  if ( abs( tm ) < 0.25 * dt ) time_function = 1.
+  if ( abs( tm ) < 0.25 * dt ) time_function = 1.0
 case( 'brune' )
-  time_function = -exp( -tm / period ) / period * ( tm + period ) + 1.
+  time_function = -exp( -tm / period ) / period * ( tm + period ) + 1.0
 case( 'dbrune' )
-  time_function =  exp( -tm / period ) / period ** 2. * tm
+  time_function =  exp( -tm / period ) / period ** 2.0 * tm
 case( 'ddbrune' )
-  time_function = -exp( -tm / period ) / period ** 3. * ( tm - period ) 
+  time_function = -exp( -tm / period ) / period ** 3.0 * ( tm - period ) 
 case( 'gaussian' )
-  t = ( tm - 4. * period ) / period
-  time_function = exp( -0.5 * t * t ) / ( period * sqrt( 2. * pi ) )
+  t = ( tm - 4.0 * period ) / period
+  time_function = exp( -0.5 * t * t ) / ( period * sqrt( 2.0 * pi ) )
 case( 'dgaussian', 'ricker1' )
   t = tm - period
-  time_function = t * exp( -2. * ( pi * t / period ) ** 2. )
+  time_function = t * exp( -2.0 * ( pi * t / period ) ** 2.0 )
 case( 'ddgaussian', 'ricker2' )
-  t = ( pi * ( tm - period ) / period ) ** 2.
-  time_function = ( 1. - 2. * t ) * exp( -t )
+  t = ( pi * ( tm - period ) / period ) ** 2.0
+  time_function = ( 1.0 - 2.0 * t ) * exp( -t )
 case default
   write( 0, * ) 'invalid time func: ', trim( tfunc )
   stop

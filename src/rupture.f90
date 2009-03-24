@@ -18,13 +18,13 @@ if ( ifn == 0 ) return
 if ( master ) write( 0, * ) 'Rupture initialization'
 
 ! I/O
-mus = 0.
-mud = 0.
-dc = 0.
-co = 0.
-t1 = 0.
-t2 = 0.
-t3 = 0.
+mus = 0.0
+mud = 0.0
+dc = 0.0
+co = 0.0
+t1 = 0.0
+t2 = 0.0
+t3 = 0.0
 call fieldio( '<>', 'mus', mus         )
 call fieldio( '<>', 'mud', mud         )
 call fieldio( '<>', 'dc',  dc          )
@@ -53,7 +53,7 @@ i1 = maxloc( t3(:,:,:,3) )
 rr = t3(i1(1),i1(2),i1(3),3)
 i1(ifn) = irup
 i1 = i1 + nnoff
-if ( rr > 0. ) write( 0, * ) 'warning: positive normal traction: ', rr, i1
+if ( rr > 0.0 ) write( 0, * ) 'warning: positive normal traction: ', rr, i1
 
 ! Lock fault in PML region
 i1 = i1pml + 1
@@ -144,10 +144,10 @@ if ( ifn /= 3 ) muf(:,:,2:l) = .5 * ( muf(:,:,2:l) + muf(:,:,1:l-1) )
 call invert( muf )
 
 ! Initial state, can be overwritten by read_checkpoint
-psv   =  0.
+psv   =  0.0
 trup  =  1e9
-tarr  =  0.
-efric =  0.
+tarr  =  0.0
+efric =  0.0
 
 ! Halos
 call scalar_swap_halo( mus,   nhalo )
@@ -213,7 +213,7 @@ if ( it > 1 ) then
 
   ! Normal traction
   tn = sum( t2 * nhat, 4 )
-  if ( faultopening == 1 ) tn = min( 0., tn )
+  if ( faultopening == 1 ) tn = min( 0.0, tn )
 
   ! Slip velocity
   do i = 1, 3
@@ -223,19 +223,19 @@ if ( it > 1 ) then
 
   ! Slip-weakening friction law
   f1 = mud
-  where ( sl < dc ) f1 = f1 + ( 1. - sl / dc ) * ( mus - mud )
-  f1 = -min( 0., tn ) * f1 + co
+  where ( sl < dc ) f1 = f1 + ( 1.0 - sl / dc ) * ( mus - mud )
+  f1 = -min( 0.0, tn ) * f1 + co
 
   ! Nucleation
-  if ( rcrit > 0. .and. vrup > 0. ) then
-    f2 = 1.
-    if ( trelax > 0. ) f2 = min( ( tm - rhypo / vrup ) / trelax, 1. )
-    f2 = ( 1. - f2 ) * ts + f2 * ( -tn * mud + co )
+  if ( rcrit > 0.0 .and. vrup > 0.0 ) then
+    f2 = 1.0
+    if ( trelax > 0.0 ) f2 = min( ( tm - rhypo / vrup ) / trelax, 1.0 )
+    f2 = ( 1.0 - f2 ) * ts + f2 * ( -tn * mud + co )
     where ( rhypo < min( rcrit, tm * vrup ) .and. f2 < f1 ) f1 = f2
   end if
 
   ! Shear traction bounded by friction
-  f2 = 1.
+  f2 = 1.0
   where ( ts > f1 ) f2 = f1 / ts
   do i = 1, 3
     t3(:,:,:,i) = f2 * t3(:,:,:,i)
@@ -267,26 +267,26 @@ call fieldio( '>', 'ts3', t3(:,:,:,2) )
 call fieldio( '>', 'tsm', ts          )
 call fieldio( '>', 'tnm', tn          )
 call fieldio( '>', 'fr',  f1          )
-call set_halo( ts,       -1., i1core, i2core ); tsmax = maxval( ts ) 
+call set_halo( ts,      -1.0, i1core, i2core ); tsmax = maxval( ts ) 
 call set_halo( tn,  huge(dt), i1core, i2core ); tnmin = minval( tn )
 call set_halo( tn, -huge(dt), i1core, i2core ); tnmax = maxval( tn )
-call set_halo( tn,        0., i1core, i2core )
+call set_halo( tn,       0.0, i1core, i2core )
 
 ! Friction + fracture energy
 t2 = vv(j3:j4,k3:k4,l3:l4,:) - vv(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( t1 * t2, 4 ) * area
-call set_halo( f2, 0., i1core, i2core )
+call set_halo( f2, 0.0, i1core, i2core )
 efric = efric + dt * sum( f2 )
 
 ! Strain energy
 t2 = uu(j3:j4,k3:k4,l3:l4,:) - uu(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( ( t0 + t1 ) * t2, 4 ) * area
-call set_halo( f2, 0., i1core, i2core )
+call set_halo( f2, 0.0, i1core, i2core )
 estrain = .5 * sum( f2 )
 
 ! Moment (negelcts opening lambda contribution)
 f2 = muf * area * sqrt( sum( t2 * t2, 4 ) )
-call set_halo( f2, 0., i1core, i2core )
+call set_halo( f2, 0.0, i1core, i2core )
 moment = sum( f2 )
 
 ! Slip acceleration

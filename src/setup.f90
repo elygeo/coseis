@@ -52,7 +52,7 @@ i2cell = min( i2bc - 1, nm - 1 )
 i1pml = i1pml - nnoff
 i2pml = i2pml - nnoff
 
-! Map rpture index to local indices, and test if fault on this process
+! Map rupture index to local indices, and test if fault on this process
 if ( ifn /= 0 ) then
   irup = irup - nnoff(ifn)
   if ( irup + 1 < i1core(ifn) .or. irup > i2core(ifn) ) ifn = 0

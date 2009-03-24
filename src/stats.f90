@@ -32,12 +32,12 @@ if ( init ) then
   end if
   allocate( vstats(4,itio), fstats(8,itio), estats(3,itio), &
     gvstats(4,itio), gfstats(8,itio), gestats(3,itio) )
-  vstats = 0.
-  fstats = 0.
-  estats = 0.
-  gvstats = 0.
-  gfstats = 0.
-  gestats = 0.
+  vstats = 0.0
+  fstats = 0.0
+  estats = 0.0
+  gvstats = 0.0
+  gfstats = 0.0
+  gestats = 0.0
   fh = -1
   if ( mpout /= 0 ) fh = file_null
 end if
@@ -95,7 +95,7 @@ if ( j > 0 .and. ( modulo( it, itio ) == 0 .or. it == nt ) ) then
       call rio1( fh(14), gestats(2,:j), 'w', 'stats/estrain', m, o, mpout, verb )
       call rio1( fh(15), gestats(3,:j), 'w', 'stats/moment',  m, o, mpout, verb )
       do i = 1, j
-        if ( gestats(3,i) > 0. ) then
+        if ( gestats(3,i) > 0.0 ) then
           gestats(3,i) = ( log10( gestats(3,i) ) - 9.05 ) / 1.5
         else
           gestats(3,i) = -999
