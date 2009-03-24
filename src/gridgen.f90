@@ -132,7 +132,7 @@ call average( w2(:,:,:,3), w1(:,:,:,3), i1cell, i2cell, 1 )
 ! Hypocenter location
 if ( fixhypo /= 0 ) then
   if ( master ) then
-    xi = xihypo + 1.0 - nnoff
+    xi = xihypo - nnoff
     i1 = int( xi )
     x0 = 0.0
     do l = i1(3), i1(3)+1

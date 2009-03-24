@@ -20,53 +20,52 @@ dx = 100.0, 100.0, 100.0	# spatial step length
 dt = 0.0075			# time step length
 tm0 = 0.0			# initial time
 affine = (1.,0.,0.), (0.,1.,0.), (0.,0.,1.) # grid transformation
-gridnoise = 0.			# random noise added to mesh, assumes planar fault
+gridnoise = 0.0			# random noise added to mesh, assumes planar fault
 oplevel = 0			# spatial difference operator level (see below)
-vdamp = -1.			# Vs dependent damping
-hourglass = 1., 1.		# hourglass stiffness (1) and viscosity (2)
+vdamp = -1.0			# Vs dependent damping
+hourglass = 1.0, 1.0		# hourglass stiffness (1) and viscosity (2)
 fieldio = [			# field I/O (see below)
-    ( '=', 'rho', [], 2670. ),	# density
-    ( '=', 'vp',  [], 6000. ),	# P-wave speed
-    ( '=', 'vs',  [], 3464. ),	# S-wave speed
-    ( '=', 'gam', [],    0. ),	# viscosity
+    ( '=', 'rho', [], 2670.0 ),	# density
+    ( '=', 'vp',  [], 6000.0 ),	# P-wave speed
+    ( '=', 'vs',  [], 3464.0 ),	# S-wave speed
+    ( '=', 'gam', [],    0.0 ),	# viscosity
 ]
-rho1 = -1.			# min density
-rho2 = -1.			# max density
-vp1 = -1.			# min P-wave speed
-vp2 = -1.			# max P-wave speed
-vs1 = -1.			# min S-wave speed
-vs2 = -1.			# max S-wave speed
-gam1 = -1.			# min viscosity
+rho1 = -1.0			# min density
+rho2 = -1.0			# max density
+vp1 = -1.0			# min P-wave speed
+vp2 = -1.0			# max P-wave speed
+vs1 = -1.0			# min S-wave speed
+vs2 = -1.0			# max S-wave speed
+gam1 = -1.0			# min viscosity
 gam2 = 0.8			# max viscosity
 npml = 10			# number of PML damping nodes
 bc1 = 0, 0, 0			# boundary condition - near side (see below)
 bc2 = 0, 0, 0			# boundary condition - far side (see below)
-xhypo = 0., 0., 0.		# hypocenter location, Cartesian coordinates
-xihypo = 0., 0., 0.		# hypocenter location, logical coordinates
-fixhypo = 1			# 0=none 1=inode, 2=icell, -1=xnode, -2=xcell
+xhypo = 0.0, 0.0, 0.0		# hypocenter location, Cartesian coordinates
+xihypo = 0.0, 0.0, 0.0		# hypocenter location, logical coordinates, 0.0 = center
+fixhypo = 1			# lock xhypo/xihypo, >0 sift xhypo, <0 shift mesh
 rexpand = 1.06			# grid expansion ratio
 n1expand = 0, 0, 0		# number of grid expansion nodes - near side
 n2expand = 0, 0, 0		# number of grid expansion nodes - far side
 
 # Dynamic rupture parameters
 faultnormal = 0			# normal direction to fault plane (0=no fault)
-irup = 0			# fault normal index
 faultopening = 0		# 0=not allowed, 1=allowed
-slipvector = 1., 0., 0.		# shear traction direction for ts1
+slipvector = 1.0, 0.0, 0.0	# shear traction direction for ts1
 vrup = 3184.9			# nucleation rupture velocity
-rcrit = 1000.			# nucleation critical radius
+rcrit = 1000.0			# nucleation critical radius
 trelax = 0.07			# nucleation relaxation time
 svtol = 0.001			# slip velocity considered rupturing
 
 # Finite source parameters
 source = ''			# either 'potency' or 'moment'
-nsource = 0			# number of sub-faults, >0: icell, <0: xcell
+nsource = 0			# number of sub-faults
 
 # Point source parameters (depreciated, used finite source instead)
 tfunc = ''			# time function, see util.f90 for details.
 tsource = 0.056			# dominant period
 moment1 = 1e16, 1e16, 1e16	# normal components
-moment2 =   0.,   0.,   0.	# shear components
+moment2 =  0.0,  0.0,  0.0	# shear components
 
 
 # Spatial difference operator level:

@@ -211,19 +211,28 @@ def prepare_prm( prm, itbuff ):
     if prm.itcheck % prm.itio != 0:
         prm.itcheck = ( prm.itcheck / prm.itio + 1 ) * prm.itio
 
+    # hypocenter coordinates
+    xi = list( prm.xihypo )
+    for i in range( 3 ):
+        xi[i] = 0.0 + xi[i]
+        if xi[i] == 0.0:
+            xi[i] = 0.5 * ( prm.nn[i] + 1 )
+        elif xi[i] <= -1.0:
+            xi[i] = xi[i] + prm.nn[i] + 1
+        if xi[i] < 1.0 or xi[i] > prm.nn[i]:
+            sys.exit( 'Error: xihypo %s out of bounds' % xi )
+    prm.xihypo = tuple( xi )
+
     # Rupture boundary conditions
     i1 = list( prm.bc1 )
     i2 = list( prm.bc2 )
     i = abs( prm.faultnormal ) - 1
     if i >= 0:
-        if prm.irup == 0
-            prm.irup = prm.nn[i] / 2
-        elif prm.irup < 0:
-            prm.irup = prm.irup + prm.nn[i] + 1
-        if prm.irup < 1 or prm.irup > ( prm.nn[i] - 1 ):
-            sys.exit( 'Error: irup %s out of bounds' % prm.irup )
-        if prm.irup == 1:             i1[i] = -2
-        if prm.irup == prm.nn[i] - 1: i2[i] = -2
+        irup = int( xi[i] )
+        if irup == 1:             i1[i] = -2
+        if irup == prm.nn[i] - 1: i2[i] = -2
+        if irup < 1 or irup > ( prm.nn[i] - 1 ):
+            sys.exit( 'Error: xihypo %s out of bounds' % xi )
     prm.bc1 = tuple( i1 )
     prm.bc2 = tuple( i2 )
 

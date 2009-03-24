@@ -22,7 +22,7 @@ call rio1( fh, src_xi(:,1), 'r', 'in/src_xi1',     n, 0, mpin, verb )
 call rio1( fh, src_xi(:,2), 'r', 'in/src_xi2',     n, 0, mpin, verb )
 call rio1( fh, src_xi(:,3), 'r', 'in/src_xi3',     n, 0, mpin, verb )
 do i = 1, 3
-  src_xi(:,i) = src_xi(:,i) + 0.5 - nnoff(i)
+  src_xi(:,i) = src_xi(:,i) - 0.5 - nnoff(i)
   if ( all( src_xi(:,i) < (-1.+i1cell(i)) ) .or. &
        all( src_xi(:,i) > ( 1.+i2cell(i)) ) ) then
     nsource = 0
@@ -87,7 +87,7 @@ use m_util
 integer :: i1(3), i2(3), i, j, k, l
 real :: xi(3), f, w
 if ( tfunc == '' ) return
-xi = xihypo + 0.5 - nnoff
+xi = xihypo - 0.5 - nnoff
 i1 = max( i1cell, int( xi )     )
 i2 = min( i2cell, int( xi ) + 1 )
 if ( any( i2 < i1 ) ) then

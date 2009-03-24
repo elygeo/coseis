@@ -2,7 +2,6 @@
 """
 San Andreas Fault, northward dynamic rupture, topography, SCEC-CVM4
 """
-
 import sord
 
 np3 = 1, 80, 24					# 1920 total processors on DataStar
@@ -38,20 +37,20 @@ hourglass = 1., 1.				# hourglass stiffness and viscosity
 # Fault parameters
 slipvector = 1., 0., 0.				# vector for resolving pre-traction
 faultnormal = 2					# fault plane normal direction
-irup = 997					# fault plane k index
+xihypo = 2266, 997, -26				# hypocenter logical coordinates
 _j =  1217, 2312				# temporary variable
+_k = xihypo[1]					# temporary variable
 _l = -81, -1					# temporary variable
 fieldio += [
-    ( '=r', 'ts',  [(),irup,(),()], _dir+'ts1' ), # read initial shear traction file
-    ( '=',  'tn',  [(),irup,(),()], -20e6      ), # initial normal traction
-    ( '=',  'dc',  [(),irup,(),()],   0.5      ), # slip weakening distance
-    ( '=',  'mud', [(),irup,(),()],   0.5      ), # coeff of dynamic friction
-    ( '=',  'mus', [(),irup,(),()],   1e4      ), # coeff of static fr., non-slip section
-    ( '=',  'mus', [_j,irup,_l,()],   1.1      ), # coeff of static fr., slipping section
+    ( '=r', 'ts',  [(),_k,(),()], _dir+'ts1' ), # read initial shear traction file
+    ( '=',  'tn',  [(),_k,(),()], -20e6      ), # initial normal traction
+    ( '=',  'dc',  [(),_k,(),()],   0.5      ), # slip weakening distance
+    ( '=',  'mud', [(),_k,(),()],   0.5      ), # coeff of dynamic friction
+    ( '=',  'mus', [(),_k,(),()],   1e4      ), # coeff of static fr., non-slip section
+    ( '=',  'mus', [_j,_k,_l,()],   1.1      ), # coeff of static fr., slipping section
 ]
 
 # Nucleation
-xihypo = 2265., irup-1., -25.			# hypocenter logical coordinates
 vrup = 2300.					# nucleation rupture velocity
 trelax = 0.12					# time 
 rcrit = 3000.					# radius of nucleation patch

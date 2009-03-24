@@ -22,11 +22,11 @@ rexpand = 1.06
 n1expand = 20, 20, 20
 n2expand = 20, 20, 20
 moment1 = 1e18, 1e18, 1e18
-moment2 =   0.,   0.,   0.
+moment2 =  0.0,  0.0,  0.0
 tfunc = 'brune'
 tsource = 0.1
-xihypo = 30., 30., 30.
-xihypo = 30.5, 30.5, 30.5
+xihypo = 31.0, 31.0, 31.0
+xihypo = 31.5, 31.5, 31.5
 fixhypo = -1
 
 for _f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':

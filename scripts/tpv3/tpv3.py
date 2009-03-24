@@ -45,11 +45,10 @@ for _i in range( 0, len( _run ), 2 ):
     )
     bc1     = 10, 10, 10
     bc2     = -1,  1, -2
-    irup    = -2
-    xihypo  = nn[0]-1., nn[1]-1., -2
+    xihypo  = -1, -1, -1.5
     fixhypo = -1
 
-    _j, _k, _l = nn[0]/2, nn[1]/2, irup
+    _j, _k, _l = -1, -1, -2
     _jj = -int( 15000. / dx[0] + 1.5 ),        -1
     _kk = -int(  7500. / dx[1] + 1.5 ),        -1
     _ll = -int(  3000. / dx[2] + 1.5 ),        -1
