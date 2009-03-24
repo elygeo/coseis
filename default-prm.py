@@ -49,7 +49,7 @@ n1expand = 0, 0, 0		# number of grid expansion nodes - near side
 n2expand = 0, 0, 0		# number of grid expansion nodes - far side
 
 # Dynamic rupture parameters
-faultnormal = 3			# normal direction to fault plane (0=no fault)
+faultnormal = 0			# normal direction to fault plane (0=no fault)
 irup = 0			# fault normal index
 faultopening = 0		# 0=not allowed, 1=allowed
 slipvector = 1., 0., 0.		# shear traction direction for ts1
@@ -63,7 +63,7 @@ source = ''			# either 'potency' or 'moment'
 nsource = 0			# number of sub-faults, >0: icell, <0: xcell
 
 # Point source parameters (depreciated, used finite source instead)
-tfunc = 'brune'			# time function, see util.f90 for details.
+tfunc = ''			# time function, see util.f90 for details.
 tsource = 0.056			# dominant period
 moment1 = 1e16, 1e16, 1e16	# normal components
 moment2 =   0.,   0.,   0.	# shear components

@@ -29,7 +29,6 @@ dt = 0.0075
 bc1 = bc2 = 0, 0, 0
 npml = 0
 hourglass = 1., 1.
-faultnormal = 0
 fieldio = [
     ( '=', 'rho', [],     2670. ),      
     ( '=', 'vp',  [],     6000. ),      

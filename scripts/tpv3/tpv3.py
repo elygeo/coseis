@@ -43,12 +43,13 @@ for _i in range( 0, len( _run ), 2 ):
         int(  9000. / dx[1] + 21.5 ),
         int(  6000. / dx[2] + 20.5 ),
     )
-    bc1     =    10,    10, 10
-    bc2     = -_reg,  _reg, -2
-    ihypo   = -_reg, -_reg, -2
-    fixhypo = -_reg
+    bc1     = 10, 10, 10
+    bc2     = -1,  1, -2
+    irup    = -2
+    xihypo  = nn[0]-1., nn[1]-1., -2
+    fixhypo = -1
 
-    _j, _k, _l = ihypo
+    _j, _k, _l = nn[0]/2, nn[1]/2, irup
     _jj = -int( 15000. / dx[0] + 1.5 ),        -1
     _kk = -int(  7500. / dx[1] + 1.5 ),        -1
     _ll = -int(  3000. / dx[2] + 1.5 ),        -1

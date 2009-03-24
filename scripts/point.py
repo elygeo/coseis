@@ -17,10 +17,8 @@ bc2 = 0, 0, 0
 hourglass = 1., 0.
 faultnormal = 0
 moment1 = 1e16, 1e16, 1e16
-moment2 = 0., 0., 0.
-ihypo = 1, 1, 1
-fixhypo = 2
-rsource = 50.
+moment2 =   0.,   0.,   0.
+xihypo = 0.5, 0.5, 0.5
 
 fieldio = [
     ( '=', 'rho', [], 2670. ),      

@@ -17,17 +17,15 @@ fieldio = [
     ( '=', 'vs',  [], 3464. ),
     ( '=', 'gam', [],    0. ),
 ]
-hourglass = 1., 1.
-faultnormal = 0
 rexpand = 1.06
 n1expand =  0,  0,  0
 n2expand = 20, 20, 20
 moment1 = 1e18, 1e18, 1e18
-moment2 = 0, 0, 0
+moment2 = 0., 0., 0.
 tfunc = 'brune'
 tsource = 0.1
-xhypo = 0., 0., 0.
 bc2 = 0, 0, 0
+fixhypo = -1 
 
 for _f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
     fieldio += [
@@ -37,14 +35,10 @@ for _f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
     ]
 
 if 1:
-    fixhypo = -2
-    rsource = 50.
-    ihypo = 1, 1, 1
+    xihypo = 0.5, 0.5, 0.5
     bc1   = 2, 2, 2
 else:
-    fixhypo = -1
-    rsource = 100.
-    ihypo = 2, 2, 2
+    xihypo = 1.0, 1.0, 1.0 # check
     bc1   = 1, 1, 1
 
 sord.run( locals() )

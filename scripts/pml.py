@@ -17,7 +17,7 @@ rsource = 50.
 tsource = 0.056
 moment1 = 1e18, 1e18, 1e18
 moment2 = 0, 0, 0
-fixhypo = -2
+fixhypo = -1
 
 _l = 1 # FIXME
 np3 = 1, 1, 2
@@ -36,7 +36,7 @@ for _f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
     ]
 
 # Rect
-ihypo = -1, -1, -1
+xihypo = 79.5, 79.5, 79.5
 nn  = 81, 81, 81
 bc1 = 10, 10, 10
 bc2 = 2, 2, 2
@@ -46,8 +46,8 @@ ihypo = 0, 0, 0
 sord.run( locals() )
 
 # Non-rect
-ihypo = 0, 0, 0
-nn = 41, 41, 41
+xihypo = 19.5, 19.5, 19.5 # check
+nn = 40, 40, 40
 affine = (1.,0.,0.), (0.,1.,1.), (0.,0.,1.) # shear, 1
 affine = (1.,0.,1.), (0.,1.,0.), (0.,0.,1.) # shear, 2
 affine = (1.,1.,0.), (0.,1.,0.), (0.,0.,1.) # shear, 3
@@ -61,14 +61,14 @@ bc2 = 0, 0, 0
 
 # Junk
 tfunc = 'sbrune'
-ihypo = 0, 0, 0
-nn = 51, 51, 51
+xihypo = 24.5, 24.5, 24.5
+nn = 50, 50, 50
 bc1 = 10, 10, 10
 bc2 = 10, 10, 10
 
 # Mixed rect
-ihypo = 0, 0, 0
-nn = 161, 161, 161
+xihypo = 79.5, 79.5, 79.5
+nn = 160, 160, 160
 bc1 = 10, 10, 10
 bc2 = 0, 0, 0
 

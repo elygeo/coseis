@@ -68,7 +68,6 @@ case( 'bc2' );          read( str, *, iostat=io ) key, op, bc2
 case( 'npml' );         read( str, *, iostat=io ) key, op, npml
 case( 'i1pml' );        read( str, *, iostat=io ) key, op, i1pml
 case( 'i2pml' );        read( str, *, iostat=io ) key, op, i2pml
-case( 'ihypo' );        read( str, *, iostat=io ) key, op, ihypo
 case( 'xhypo' );        read( str, *, iostat=io ) key, op, xhypo
 case( 'xihypo' );       read( str, *, iostat=io ) key, op, xihypo
 case( 'fixhypo' );      read( str, *, iostat=io ) key, op, fixhypo

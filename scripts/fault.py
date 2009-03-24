@@ -5,19 +5,18 @@ Fault test
 
 import sord
 
-debug = 4
-np3   =  2,  3,  2
-np3   =  1,  2,  1
-nn    =  8,  8,  9
-ihypo = -1, -1, -2
-bc1   =  0,  0,  0
-bc2   = -1,  1, -2
+debug  = 4
+np3    =  2,  3,  2
+np3    =  1,  2,  1
+nn     =  8,  8,  9
+xihypo =  0., 0., 0.
+bc1    = -1,  1, -2
+bc2    =  0,  0,  0
 fixhypo = -1
 itstats = 1
 nt = 10
 dx = 100., 100., 100.
 dt = 0.008
-hourglass = 1., 1.
 faultnormal = 3
 vrup = -1.
 

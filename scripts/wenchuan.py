@@ -6,7 +6,7 @@ Wenchuan earthquake
 import sord, math
 
 np3 = 1, 1, 2
-dx = 1000., 1000., 1000.
+dx = 1000., 1000., -1000.
 _T = 120.
 _L = 400e3, 300e3, 60e3
 dt = dx[0] / 12500.
@@ -18,17 +18,11 @@ faultnormal = 0
 
 # Source
 xhypo = 0., 0., -12e3
-ihypo = [
-    nn[0] / 2,
-    nn[1] / 2,
-    -int( -xhypo[2] / dx[2] + 1.5 )
-]
+xihypo = nn[0]/2-0.5, nn[1]/2-0.5, -xhypo[2]/dx[2]
 moment1 = -5.79e20, 0.10e20, 5.69e20    #  Mpp,  Mtt,  Mrr
 moment2 = -1.99e20, 5.61e20, 3.48e20    # -Mrt,  Mrp, -Mtp
 tfunc = 'brune'
-rfunc = 'point'
 tsource = 0.1
-rsource = dx[0]
 fixhypo = -1
 
 # Velocity model
@@ -52,10 +46,10 @@ for _depth, _vp, _vs in _material:
 # Output
 for _f in ( 'v1', 'v2', 'v3' ):
     fieldio += [
-        ( '=wx', _f, [], 'Epicenter-' + _f, (  0.,   0., 0. ), ),
-        ( '=wx', _f, [], 'Wenchuan-'  + _f, ( 30.,  52., 0. ), ),
-        ( '=wx', _f, [], 'Maoxian-'   + _f, ( 60.,  70., 0. ), ),
-        ( '=wx', _f, [], 'Chengdu-'   + _f, ( 84., -36., 0. ), ),
+        ( '=wx', _f, [], 'Epicenter-' + _f, (  0e3,   0e3, 0. ), ),
+        ( '=wx', _f, [], 'Wenchuan-'  + _f, ( 30e3,  52e3, 0. ), ),
+        ( '=wx', _f, [], 'Maoxian-'   + _f, ( 60e3,  70e3, 0. ), ),
+        ( '=wx', _f, [], 'Chengdu-'   + _f, ( 84e3, -36e3, 0. ), ),
     ]
 
 sord.run( locals() )
