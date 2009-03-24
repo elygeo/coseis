@@ -172,7 +172,7 @@ end subroutine
 real function time_function( tfunc, tm, dt, period )
 character(*), intent(in) :: tfunc
 real, intent(in) :: tm, dt, period
-real, parameter :: pi = 2.0 * acos(0.0)
+real, parameter :: pi = 3.14159265
 real :: t
 time_function = 0.0
 select case( tfunc )

@@ -102,7 +102,7 @@ elif fortran_serial[0] == 'f95' and os.uname()[0] == 'SunOS':
     _ = [ '-u', '-o' ]
     fortran_flags = {
         'g': [ '-C', '-ftrap=common', '-w4', '-g' ] + _,
-        't': [ '-C', '-ftrap=common'  ] + _,
+        't': [ '-C', '-ftrap=common' ] + _,
         'p': [ '-O', '-pg' ] + _,
         'O': [ '-fast', '-fns' ] + _,
     }

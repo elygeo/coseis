@@ -12,7 +12,7 @@ real :: tsource, moment1(3), moment2(3), vrup, rcrit, trelax, svtol
 character(16) :: source, tfunc
 
 ! Miscellaneous parameters
-real, parameter :: pi = 2.0 * acos(0.0)
+real, parameter :: pi = 3.14159265
 real :: &
   iotimer,        & ! I/O timing
   tm                ! time
