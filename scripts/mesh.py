@@ -4,9 +4,9 @@ import numpy, pyproj, scipy.interpolate
 import coord
 
 nn = 1056, 752, 202
-dx = 100000., 100000., 10000.
-L = 600000., 300000., 80000.
-L = 160000., 110000., 80000.
+dx = 100000.0, 100000.0, 10000.0
+L = 600000.0, 300000.0, 80000.0
+L = 160000.0, 110000.0, 80000.0
 x = numpy.arange( 0.5*dx[0], L[0], dx[0] )
 y = numpy.arange( 0.5*dx[1], L[1], dx[1] )
 z = numpy.arange( 0.5*dx[2], L[2], dx[2] )
@@ -43,9 +43,9 @@ x = numpy.array( x ) - x[0]
 y = numpy.array( y ) - y[0]
 l = 0.001 * numpy.sqrt( x * x + y * y )
 print 'ell', l, 0.150 * ( numpy.array( nn ) - 1 )
-phi = numpy.arctan2( x[1], y[1] ) * 180. / numpy.pi
+phi = numpy.arctan2( x[1], y[1] ) * 180.0 / numpy.pi
 print phi
-phi = numpy.arctan2( y[3], x[3] ) * 180. / numpy.pi
+phi = numpy.arctan2( y[3], x[3] ) * 180.0 / numpy.pi
 print phi
 
 import pylab

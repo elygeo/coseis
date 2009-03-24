@@ -23,8 +23,8 @@ call rio1( fh, src_xi(:,2), 'r', 'in/src_xi2',     n, 0, mpin, verb )
 call rio1( fh, src_xi(:,3), 'r', 'in/src_xi3',     n, 0, mpin, verb )
 do i = 1, 3
   src_xi(:,i) = src_xi(:,i) - 0.5 - nnoff(i)
-  if ( all( src_xi(:,i) < (-1.+i1cell(i)) ) .or. &
-       all( src_xi(:,i) > ( 1.+i2cell(i)) ) ) then
+  if ( all( src_xi(:,i) < (-1.0 + i1cell(i)) ) .or. &
+       all( src_xi(:,i) > ( 1.0 + i2cell(i)) ) ) then
     nsource = 0
     deallocate( src_xi )
     return
@@ -62,7 +62,7 @@ do isrc = 1, abs( nsource )
   if ( i >= 1 .and. all( i2 >= i1 ) ) then
     i = min( i, src_nt(isrc) - 1 )
     t = src_t0(isrc) + src_dt(isrc) * ( i - 1 )
-    h = min( 1., ( tm - t ) / src_dt(isrc) )
+    h = min( 1.0, ( tm - t ) / src_dt(isrc) )
     h = ( 1.0 - h ) * src_history(itoff+i) + h * src_history(itoff+i+1)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)

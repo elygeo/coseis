@@ -296,7 +296,7 @@ call fieldio( '>', 'sa1', t2(:,:,:,1) )
 call fieldio( '>', 'sa2', t2(:,:,:,2) )
 call fieldio( '>', 'sa3', t2(:,:,:,3) )
 call fieldio( '>', 'sam', f2          )
-call set_halo( f2, -1., i1core, i2core )
+call set_halo( f2, -1.0, i1core, i2core )
 samax = maxval( f2 )
 
 end subroutine

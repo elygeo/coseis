@@ -42,8 +42,8 @@ npml = 10			# number of PML damping nodes
 bc1 = 0, 0, 0			# boundary condition - near side (see below)
 bc2 = 0, 0, 0			# boundary condition - far side (see below)
 xhypo = 0.0, 0.0, 0.0		# hypocenter coordinates
-ihypo = 0, 0, 0			# hypocenter indices (fractianl values OK), 0 = center
-fixhypo = 1			# lock xhypo/xihypo, >0 sift xhypo, <0 shift mesh
+ihypo = 0, 0, 0			# hypocenter indices (with fractional values), 0 = center
+fixhypo = 1			# lock xhypo/ihypo: 1 shift xhypo, -1 shift mesh, 0 unlocked
 rexpand = 1.06			# grid expansion ratio
 n1expand = 0, 0, 0		# number of grid expansion nodes - near side
 n2expand = 0, 0, 0		# number of grid expansion nodes - far side
@@ -58,14 +58,14 @@ trelax = 0.07			# nucleation relaxation time
 svtol = 0.001			# slip velocity considered rupturing
 
 # Finite source parameters
-source = ''			# either 'potency' or 'moment'
+source = ''			# 'moment', 'potency', or ''
 nsource = 0			# number of sub-faults
 
-# Point source parameters (depreciated, used finite source instead)
-tfunc = ''			# time function, see util.f90 for details.
-tsource = 0.056			# dominant period
+# Point source parameters
 moment1 = 1e16, 1e16, 1e16	# normal components
 moment2 =  0.0,  0.0,  0.0	# shear components
+tfunc = ''			# time function, see util.f90 for details.
+tsource = 0.056			# dominant period
 
 
 # Spatial difference operator level:

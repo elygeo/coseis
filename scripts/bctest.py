@@ -9,12 +9,12 @@ debug = 3
 np3 = 1, 1, 1
 nt = 8
 tsource = 0.1
-slipvector = 1., 0., 0.
+slipvector = 1.0, 0.0, 0.0
 fieldio = [
-    ( '=', 'rho', [], 2670.  ),
-    ( '=', 'vp',  [], 6000.  ),
-    ( '=', 'vs',  [], 3464.  ),
-    ( '=', 'gam', [], 0.     ),
+    ( '=', 'rho', [], 2670.0 ),
+    ( '=', 'vp',  [], 6000.0 ),
+    ( '=', 'vs',  [], 3464.0 ),
+    ( '=', 'gam', [], 0.0    ),
     ( '=', 'mus', [], 0.6    ),
     ( '=', 'mud', [], 0.5    ),
     ( '=', 'dc',  [], 0.4    ),
@@ -57,8 +57,8 @@ nn = 3, 3, 3; bc2 = -1, 1, 99
 faultnormal = 0
 tfunc = 'brune'
 ihypo = 3, 3, 3
-moment1 = 0., 0., 0.
-moment2 = 0., 1e18, 0.
+moment1 = 0.0,  0.0, 0.0
+moment2 = 0.0, 1e18, 0.0
 nn = 3, 3, 3; bc2 = -1, 1, -1
 nn = 5, 5, 5; bc2 =  0, 0,  0
 
@@ -66,8 +66,8 @@ nn = 5, 5, 5; bc2 =  0, 0,  0
 faultnormal = 0
 tfunc = 'brune'
 ihypo = 2.5, 2.5, 2.5
-moment1 = 0., 0., 0.
-moment2 = 0., 1e18, 0.
+moment1 = 0.0,  0.0, 0.0
+moment2 = 0.0, 1e18, 0.0
 nn = 3, 3, 3; bc2 = -2, 2, -2
 nn = 4, 4, 4; bc2 =  0, 0,  0
 
@@ -76,7 +76,7 @@ faultnormal = 0
 tfunc = 'brune'
 ihypo = 3, 3, 3
 moment1 = 1e18, 1e18, 1e18
-moment2 = 0., 0., 0.
+moment2 =  0.0,  0.0,  0.0
 nn = 3, 3, 3; bc2 = 1, 1, 1
 nn = 5, 5, 5; bc2 = 0, 0, 0
 

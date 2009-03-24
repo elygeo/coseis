@@ -25,9 +25,9 @@ def slipvectors( strike, dip, rake ):
     normals for the slip, rake, and fault normal directions.
     """
     import numpy
-    strike = numpy.pi / 180. * numpy.asarray( strike )
-    dip    = numpy.pi / 180. * numpy.asarray( dip ) 
-    rake   = numpy.pi / 180. * numpy.asarray( rake )
+    strike = numpy.pi / 180.0 * numpy.asarray( strike )
+    dip    = numpy.pi / 180.0 * numpy.asarray( dip ) 
+    rake   = numpy.pi / 180.0 * numpy.asarray( rake )
     u = numpy.ones( strike.shape )
     z = numpy.zeros( strike.shape )
     c = numpy.cos( strike )
@@ -54,10 +54,10 @@ def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=False ):
         i = (j < 0) | (j > n[0]-2) | (k < 0) | (k > n[1]-2)
     j = numpy.minimum( numpy.maximum( j, 0 ), n[0]-2 )
     k = numpy.minimum( numpy.maximum( k, 0 ), n[1]-2 )
-    zi = ( 1. - xi + j ) * ( 1. - yi + k ) * z[...,j,k] \
-       + ( 1. - xi + j ) * (      yi - k ) * z[...,j,k+1] \
-       + (      xi - j ) * ( 1. - yi + k ) * z[...,j+1,k] \
-       + (      xi - j ) * (      yi - k ) * z[...,j+1,k+1]
+    zi = ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * z[...,j,k] \
+       + ( 1.0 - xi + j ) * (       yi - k ) * z[...,j,k+1] \
+       + (       xi - j ) * ( 1.0 - yi + k ) * z[...,j+1,k] \
+       + (       xi - j ) * (       yi - k ) * z[...,j+1,k+1]
     if not extrapolate: # untested
         zi[...,i] = numpy.nan
     return zi
@@ -93,21 +93,21 @@ def ll2cmu( x, y, inverse=False ):
     xx = [ -121.0, -118.951292 ], [ -116.032285, -113.943965 ]
     yy = [   34.5,   36.621696 ], [   31.082920,   33.122341 ]
     if inverse:
-        x, y = interp2( 0., 0., 600000., 300000., [xx,yy], x, y, True )
+        x, y = interp2( 0.0, 0.0, 600000.0, 300000.0, [xx,yy], x, y, True )
     else:
         x, y = ibilinear( xx, yy, x, y )
-        x = ( x + 1. ) * 300000.
-        y = ( y + 1. ) * 150000.
+        x = ( x + 1.0 ) * 300000.0
+        y = ( y + 1.0 ) * 150000.0
     return numpy.array( [x, y] )
 
-def ll2xy( x, y, inverse=False, projection=None, rot=40., lon0=-121., lat0=34.5,  ):
+def ll2xy( x, y, inverse=False, projection=None, rot=40.0, lon0=-121.0, lat0=34.5,  ):
     """UTM TeraShake coordinate projection"""
     import numpy, pyproj
     if not projection:
         projection = pyproj.Proj( proj='utm', zone=11, ellps='WGS84' )
     x0, y0 = projection( lon0, lat0 )
-    c = numpy.cos( numpy.pi / 180. * rot )
-    s = numpy.sin( numpy.pi / 180. * rot )
+    c = numpy.cos( numpy.pi / 180.0 * rot )
+    s = numpy.sin( numpy.pi / 180.0 * rot )
     x = numpy.asarray( x )
     y = numpy.asarray( y )
     if inverse:
@@ -137,10 +137,10 @@ def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
     x, y = projection( lon, lat )
     x = x[1] - x[0]
     y = y[1] - y[0]
-    s = 1. / numpy.sqrt( x*x + y*y )
+    s = 1.0 / numpy.sqrt( x*x + y*y )
     mat = numpy.array([ s*x, s*y ])
-    theta = 180. / numpy.pi * numpy.arctan2( mat[0], mat[1] )
-    theta = 0.5 * theta.sum() - 45.
+    theta = 180.0 / numpy.pi * numpy.arctan2( mat[0], mat[1] )
+    theta = 0.5 * theta.sum() - 45.0
     return mat, theta
 
 if __name__ == '__main__':

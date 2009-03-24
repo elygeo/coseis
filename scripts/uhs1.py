@@ -2,26 +2,25 @@
 """
 PEER UHS.1
 """
-
 import sord
 
 np3 = 1, 16, 1
 np3 = 1, 2, 1
-dx = 50., 50., 50.
+dx = 50.0, 50.0, 50.0
 dt = 0.004
-ihypo   =   0.5,   0.5, 40.5
-xhypo   =    0.,    0., 2000
-_ell    = 7000., 9000., 4000.
+ihypo   =    0.5,    0.5,   40.5
+xhypo   =    0.0,    0.0, 2000.0
+_ell    = 7000.0, 9000.0, 4000.0
 nn      = [ int( _x / dx[0] + 21.001 ) for _x in _ell  ]
-nt      =   int( 5. / dt +  1.001 )
+nt      =   int( 5.0 / dt +  1.001 )
 fixhypo = -1
 bc1 = -2, -2,  0
 bc2 = 10, 10, 10
 tfunc = 'brune'
 tsource = 0.1
-moment1 = 0., 0., 0.
-moment2 = 0., 0., 1e18
-hourglass = 1., 2.
+moment1 = 0.0, 0.0, 0.0
+moment2 = 0.0, 0.0, 1e18
+hourglass = 1.0, 2.0
 
 fieldio = [
     ( '=',   'rho', [], 2700.0 ),

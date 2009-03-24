@@ -23,7 +23,7 @@ for filename in sys.argv[1:]:
             r = numpy.fromfile( f0, dtype=dtype, count=b )
             r.byteswap( True ).tofile( f1 )
             i += b
-            sys.stdout.write( '\r%s %3d%%' % ( filename, 100. * i / n ) )
+            sys.stdout.write( '\r%s %3d%%' % ( filename, 100.0 * i / n ) )
             sys.stdout.flush()
         print
 
