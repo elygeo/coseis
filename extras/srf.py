@@ -3,14 +3,10 @@
 Reader for Graves Standard Rupture Format:
 http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
 """
-# w1(j,k,l,:) = w1(j,k,l,:) + w * su * nu
-# w2(j,k,l,1) = w2(j,k,l,1) + w * 0.5 * ( su(2) * nu(3) + nu(2) * su(3) )
-# w2(j,k,l,2) = w2(j,k,l,2) + w * 0.5 * ( su(3) * nu(1) + nu(3) * su(1) )
-# w2(j,k,l,3) = w2(j,k,l,3) + w * 0.5 * ( su(1) * nu(2) + nu(1) * su(2) )
 
-def read( filename, headeronly=False, noslip=False ):
+def srf_read( filename, headeronly=False, noslip=False ):
     """
-    Read file and return meta and data objects.
+    Read SRF file and return meta and data objects.
     Optionally include points with zero slip.
     """
     import sys, numpy
@@ -76,7 +72,7 @@ def read( filename, headeronly=False, noslip=False ):
                 sys.exit( 'error reading ' + filename )
             data.sv += [ float( f ) for f in sv ]
     meta.nsource = len( data.dt )
-    data.nt   = numpy.array( data.nt ).T
+    data.nt   = numpy.array( data.nt )
     data.dt   = numpy.array( data.dt )
     data.t0   = numpy.array( data.t0 )
     data.dep  = numpy.array( data.dep )
@@ -86,9 +82,43 @@ def read( filename, headeronly=False, noslip=False ):
     data.dip  = numpy.array( data.dip )
     data.rake = numpy.array( data.rake )
     data.area = numpy.array( data.area )
-    data.slip = numpy.array( data.slip ).T
+    data.slip = numpy.array( data.slip )
     data.sv   = numpy.array( data.sv )
     return meta, data
+
+def srf2potency( meta, data, projection, path='' ): 
+    """
+    Convert SRF representation to potency tensors
+    """
+    import os, numpy
+    dir = os.path.join( path, 'src_' )
+    i = 0
+    for nt, dt in zip( data.nt, data.dt ):
+        data.sv[i:i+nt] = dt * numpy.cumsum( data.sv[i:i+nt] )
+        i += nt
+    ii = data.nt > 0
+    x, y, z = projection( data.lon, data.lat, data.dep ):
+    x = x / dx[0] + 1.0
+    y = y / dx[1] + 1.0
+    z = z / dx[2] + 1.0
+
+    numpy.array( data.sv, numpy.float32 ).tofile( dir + 'history' )
+    numpy.array( x, numpy.float32 ).repeat(3)[ii].tofile( dir + 'xi1' )
+    numpy.array( y, numpy.float32 ).repeat(3)[ii].tofile( dir + 'xi2' )
+    numpy.array( x, numpy.float32 ).repeat(3)[ii].tofile( dir + 'xi3' )
+    numpy.array( data.t0, numpy.float32 ).repeat(3)[ii].tofile( dir + 't0' )
+    numpy.array( data.nt, numpy.float32 ).repeat(3)[ii].tofile( dir + 'nt' )
+    numpy.array( data.dt, numpy.float32 ).repeat(3)[ii].tofile( dir + 'dt' )
+
+
+    v = slipvectors( data.strike, data.dip, data.rake )
+    for i in range( 3 ):
+    # w1 = su * nu
+    # w2 = 0.5 * ( su(2) * nu(3) + nu(2) * su(3) )
+    # w2 = 0.5 * ( su(3) * nu(1) + nu(3) * su(1) )
+    # w2 = 0.5 * ( su(1) * nu(2) + nu(1) * su(2) )
+
+    return
 
 if __name__ == '__main__':
     import sys, getopt, pprint, sord

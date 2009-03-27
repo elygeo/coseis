@@ -55,15 +55,19 @@ if ( nsource == 0 ) return
 if ( verb ) write( 0, * ) 'Finite source'
 itoff = 0
 do isrc = 1, abs( nsource )
-  i = ( tm - src_t0(isrc) ) / src_dt(isrc) + 1.5
+  i = floor( ( tm - src_t0(isrc) ) / src_dt(isrc) ) + 1
   xi = src_xi(isrc,:)
   i1 = max( i1cell, int( xi )     )
   i2 = min( i2cell, int( xi ) + 1 )
-  if ( i >= 1 .and. all( i2 >= i1 ) ) then
+  if ( i >= 0 .and. all( i2 >= i1 ) ) then
     i = min( i, src_nt(isrc) - 1 )
     t = src_t0(isrc) + src_dt(isrc) * ( i - 1 )
     h = min( 1.0, ( tm - t ) / src_dt(isrc) )
-    h = ( 1.0 - h ) * src_history(itoff+i) + h * src_history(itoff+i+1)
+    if ( i == 0 ) then
+      h = h * src_history(itoff+1)
+    else
+      h = ( 1.0 - h ) * src_history(itoff+i) + h * src_history(itoff+i+1)
+    end if
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
