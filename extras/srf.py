@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Reader for Graves Standard Rupture Format:
+Reader for Graves Standard Rupture Format (SRF):
 http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
 """
 
@@ -86,37 +86,62 @@ def srf_read( filename, headeronly=False, noslip=False ):
     data.sv   = numpy.array( data.sv )
     return meta, data
 
-def srf2potency( meta, data, projection, path='' ): 
+def f32( a ):
+    import numpy
+    return numpy.array( a, numpy.float32 )
+
+def srf2potency( data, projection, path='' ): 
     """
     Convert SRF representation to potency tensors
     """
-    import os, numpy
+    import os, numpy, coord
     dir = os.path.join( path, 'src_' )
-    i = 0
-    for nt, dt in zip( data.nt, data.dt ):
-        data.sv[i:i+nt] = dt * numpy.cumsum( data.sv[i:i+nt] )
-        i += nt
+
+    # Time
     ii = data.nt > 0
+    f32( data.nt )[ii].tofile( dir + 'nt' )
+    f32( data.t0 ).repeat(3)[ii].tofile( dir + 't0' )
+    f32( data.dt ).repeat(3)[ii].tofile( dir + 'dt' )
+
+    # Time history
+    su = numpy.zeros_like( data.sv )
+    j = 0
+    for i in xrange( len( data.dt ) ):
+        nt = data.nt[i]
+        su[j:j+nt] = data.dt[i] * numpy.cumsum( su[j:j+nt] )
+        j = j + nt
+    f32( su ).tofile( dir + 'history' )
+
+    # Coordinates
     x, y, z = projection( data.lon, data.lat, data.dep ):
     x = x / dx[0] + 1.0
     y = y / dx[1] + 1.0
     z = z / dx[2] + 1.0
+    f32( x ).repeat(3)[ii].tofile( dir + 'xi1' )
+    f32( y ).repeat(3)[ii].tofile( dir + 'xi2' )
+    f32( z ).repeat(3)[ii].tofile( dir + 'xi3' )
+    del( x, y, z )
 
-    numpy.array( data.sv, numpy.float32 ).tofile( dir + 'history' )
-    numpy.array( x, numpy.float32 ).repeat(3)[ii].tofile( dir + 'xi1' )
-    numpy.array( y, numpy.float32 ).repeat(3)[ii].tofile( dir + 'xi2' )
-    numpy.array( x, numpy.float32 ).repeat(3)[ii].tofile( dir + 'xi3' )
-    numpy.array( data.t0, numpy.float32 ).repeat(3)[ii].tofile( dir + 't0' )
-    numpy.array( data.nt, numpy.float32 ).repeat(3)[ii].tofile( dir + 'nt' )
-    numpy.array( data.dt, numpy.float32 ).repeat(3)[ii].tofile( dir + 'dt' )
+    # Strike dip, and rake components
+    s, d, n = coord.slipvectors( data.strike, data.dip, data.rake )
 
+    # Normal tensor components
+    w = numpy.zeros_like( data.nt )
+    w[:,2] = data.area * n[0] * n[0]; f32( w )[ii].tofile( dir + 'w11' )
+    w[:,2] = data.area * n[1] * n[1]; f32( w )[ii].tofile( dir + 'w22' )
+    w[:,2] = data.area * n[2] * n[2]; f32( w )[ii].tofile( dir + 'w33' )
 
-    v = slipvectors( data.strike, data.dip, data.rake )
-    for i in range( 3 ):
-    # w1 = su * nu
-    # w2 = 0.5 * ( su(2) * nu(3) + nu(2) * su(3) )
-    # w2 = 0.5 * ( su(3) * nu(1) + nu(3) * su(1) )
-    # w2 = 0.5 * ( su(1) * nu(2) + nu(1) * su(2) )
+    # Shear tensor components
+    w = numpy.zeros_like( data.nt )
+    w[:,0] = 0.5 * data.area * ( s[1] * n[2] + n[1] * s[2] )
+    w[:,1] = 0.5 * data.area * ( d[1] * n[2] + n[1] * d[2] )
+    f32( w )[ii].tofile( dir + 'w23' )
+    w[:,0] = 0.5 * data.area * ( s[2] * n[0] + n[2] * s[0] )
+    w[:,1] = 0.5 * data.area * ( d[2] * n[0] + d[2] * d[0] )
+    f32( w )[ii].tofile( dir + 'w31' )
+    w[:,0] = 0.5 * data.area * ( s[0] * n[1] + n[0] * s[1] )
+    w[:,1] = 0.5 * data.area * ( d[0] * n[1] + n[0] * d[1] )
+    f32( w )[ii].tofile( dir + 'w12' )
 
     return
 
