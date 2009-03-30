@@ -96,13 +96,16 @@ def srf2potency( filename, projection, dx, path='' ):
     Read SRF file and write SORD potency tensor source
     """
     import os, numpy, coord
-    dir = os.path.join( path, 'src_' )
+
+    # Read SRF
     meta, data = srf_read( filename )
+    dir = os.path.join( path, 'src_' )
     del( meta, data.slip )
 
     # Time history 
+    np = data.nt.shape
     k = 0
-    for j in xrange( len( data.dt ) ):
+    for j in xrange( np[0] ):
         for i in xrange( 3 ):
             nt = data.nt[j,i]
             data.sv[k:k+nt] = data.dt[j] * numpy.cumsum( data.sv[k:k+nt] )
@@ -111,7 +114,6 @@ def srf2potency( filename, projection, dx, path='' ):
     del( data.sv )
 
     # Time
-    np = data.nt.shape
     ii = data.nt > 0
     f32( data.nt )[ii].tofile( dir + 'nt' )
     f32( data.dt ).repeat(3)[ii].tofile( dir + 'dt' )
