@@ -10,13 +10,10 @@ dx = 100.0, 100.0, 100.0
 dt = 0.0075
 hourglass = 1.0, 1.0
 
-faultnormal = 0
-tfunc = 'sbrune'
 tfunc = 'brune'
-rsource = 50.0
-tsource = 0.056
-moment1 = 1e18, 1e18, 1e18
-moment2 = 0, 0, 0
+source = 'moment'
+tensor1 = 1e18, 1e18, 1e18
+tensor2 = 0, 0, 0
 fixhypo = -1
 
 _l = 1 # FIXME

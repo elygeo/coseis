@@ -8,6 +8,7 @@ import sord
 debug = 3
 np3 = 1, 1, 1
 nt = 8
+source = 'moment'
 tsource = 0.1
 slipvector = 1.0, 0.0, 0.0
 fieldio = [
@@ -57,8 +58,8 @@ nn = 3, 3, 3; bc2 = -1, 1, 99
 faultnormal = 0
 tfunc = 'brune'
 ihypo = 3, 3, 3
-moment1 = 0.0,  0.0, 0.0
-moment2 = 0.0, 1e18, 0.0
+tensor1 = 0.0,  0.0, 0.0
+tensor2 = 0.0, 1e18, 0.0
 nn = 3, 3, 3; bc2 = -1, 1, -1
 nn = 5, 5, 5; bc2 =  0, 0,  0
 
@@ -66,8 +67,8 @@ nn = 5, 5, 5; bc2 =  0, 0,  0
 faultnormal = 0
 tfunc = 'brune'
 ihypo = 2.5, 2.5, 2.5
-moment1 = 0.0,  0.0, 0.0
-moment2 = 0.0, 1e18, 0.0
+tensor1 = 0.0,  0.0, 0.0
+tensor2 = 0.0, 1e18, 0.0
 nn = 3, 3, 3; bc2 = -2, 2, -2
 nn = 4, 4, 4; bc2 =  0, 0,  0
 
@@ -75,8 +76,8 @@ nn = 4, 4, 4; bc2 =  0, 0,  0
 faultnormal = 0
 tfunc = 'brune'
 ihypo = 3, 3, 3
-moment1 = 1e18, 1e18, 1e18
-moment2 =  0.0,  0.0,  0.0
+tensor1 = 1e18, 1e18, 1e18
+tensor2 =  0.0,  0.0,  0.0
 nn = 3, 3, 3; bc2 = 1, 1, 1
 nn = 5, 5, 5; bc2 = 0, 0, 0
 

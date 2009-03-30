@@ -58,12 +58,12 @@ trelax = 0.07			# nucleation relaxation time
 svtol = 0.001			# slip velocity considered rupturing
 
 # Finite source parameters
-source = ''			# 'moment', 'potency', or ''
+source = 'potency'		# 'moment', 'potency', or ''
 nsource = 0			# number of sub-faults
 
 # Point source parameters
-moment1 = 1e16, 1e16, 1e16	# normal components
-moment2 =  0.0,  0.0,  0.0	# shear components
+tensor1 = 1e16, 1e16, 1e16	# normal components
+tensor2 =  0.0,  0.0,  0.0	# shear components
 tfunc = ''			# time function, see util.f90 for details.
 tsource = 0.056			# dominant period
 

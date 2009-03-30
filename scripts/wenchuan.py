@@ -14,13 +14,13 @@ nt = int( _T / dt + 1.5 )
 nn = [ int( _X / dx[0] + 1.5 ) for _X in _L ]
 bc1 = 10, 10, 10
 bc2 = 10, 10, 0
-faultnormal = 0
 
 # Source
 xhypo = 0.0, 0.0, -12e3
 ihypo = nn[0]/2-0.5, nn[1]/2-0.5, -xhypo[2]/dx[2]
-moment1 = -5.79e20, 0.10e20, 5.69e20    #  Mpp,  Mtt,  Mrr
-moment2 = -1.99e20, 5.61e20, 3.48e20    # -Mrt,  Mrp, -Mtp
+source = 'moment'
+tensor1 = -5.79e20, 0.10e20, 5.69e20    #  Mpp,  Mtt,  Mrr
+tensor2 = -1.99e20, 5.61e20, 3.48e20    # -Mrt,  Mrp, -Mtp
 tfunc = 'brune'
 tsource = 0.1
 fixhypo = -1

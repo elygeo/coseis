@@ -105,8 +105,8 @@ do k = i1(2), i2(2)
 do j = i1(1), i2(1)
   w = f * vc(j,k,l) * ( 1.0 - abs( (xi(1) - j) * (xi(2) - k) * (xi(3) - l) ) )
   do i = 1, 3
-    w1(j,k,l,i) = w1(j,k,l,i) - w * moment1(i)
-    w2(j,k,l,i) = w2(j,k,l,i) - w * moment2(i)
+    w1(j,k,l,i) = w1(j,k,l,i) - w * tensor1(i)
+    w2(j,k,l,i) = w2(j,k,l,i) - w * tensor2(i)
   end do
 end do
 end do

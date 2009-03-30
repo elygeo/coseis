@@ -12,7 +12,6 @@ dt = 0.01			# time step size
 hourglass = 1.0, 2.0		# hourglass stiffness and viscosity
 bc1 = 10, 10, 10		# PML boundary conditions
 bc2 = 10, 10, 0			# PML boundary conditions & free surface in Z
-faultnormal = 0			# disable rupture dynamics
 _src = 51, 51, 51, 0
 _vol = (1,-1,3), (1,-1,3), (1,-1,3), (1,-1,5)
 

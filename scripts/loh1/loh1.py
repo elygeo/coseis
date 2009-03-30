@@ -18,10 +18,11 @@ ihypo =   0,   0,   40.5
 fixhypo = -1
 bc1 = -2, -2,  0
 bc2 = 10, 10, 10
+source = 'moment'
+tensor1 = 0.0, 0.0, 0.0
+tensor2 = 0.0, 0.0, 1e18
 tfunc = 'brune'
 tsource = 0.1
-moment1 = 0.0, 0.0, 0.0
-moment2 = 0.0, 0.0, 1e18
 hourglass = 1.0, 2.0
 
 _l = 1, int( 1000.0 / dx[2] + 1.5 )
