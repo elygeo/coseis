@@ -33,12 +33,13 @@ systems (Linux, IBM AIX, Mac OS X, SUN Solaris).
 News
 ----
 
-2009, Mar 30.  
--New finite source module and Python utility to read Graves SRF format.  
--ihypo is now a real number parameter for sub-cell positioning.
--I/O testing and bug fixes.
--new parameter: source, nsource, tensor1, tensor2 (see default-prm.py)
--removed parameters: moment1, moment2, rsource, rfunc
+2009, Mar 30:
+
+  - New finite source module and Python utility to read Graves SRF format.  
+  - ihypo is now a real number parameter for sub-cell positioning.
+  - I/O testing and bug fixes.
+  - new parameters: source, nsource, tensor1, tensor2 (see default-prm.py)
+  - removed parameters: moment1, moment2, rsource, rfunc
 
 2008, Nov 11. New version finished introducing a revamped I/O scheme and Python
 based configuration. Beware that it is not well tested yet.
