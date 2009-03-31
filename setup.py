@@ -123,7 +123,7 @@ def docs():
     out += '\nPython wrappers\n'
     out += '---------------\n'
     sources = [
-      'run.py',
+      '__init__.py',
       'default-cfg.py',
       'default-prm.py',
       'fieldnames.py',
