@@ -143,6 +143,23 @@ def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
     theta = 0.5 * theta.sum() - 45.0
     return mat, theta
 
+def rot_sym_tensor( w1, w2, rot ):
+    """
+    Rotate symmetric 3x3 tensor stored as diagonal and off-diagonal vectors.
+    w1:  components w11, w22, w33
+    w2:  components w23, w31, w12
+    rot: rotation matrix
+    """
+    import numpy
+    rot = numpy.array( rot )
+    mat = numpy.diag( w1 )
+    mat.flat[[5,2,1]] = w2
+    mat.flat[[7,6,3]] = w2
+    mat = matmul( matmul( rot, mat ), rot.T )
+    w1  = numpy.diag( mat )
+    w2  = mat.flat[[5,2,1]]
+    return w1, w2
+
 if __name__ == '__main__':
     import sys, getopt, numpy
     opts, args = getopt.getopt( sys.argv[1:], 'i' )

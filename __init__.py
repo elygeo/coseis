@@ -301,7 +301,7 @@ def prepare_prm( prm, itbuff ):
 
 def launch( cfg ):
     """Launch or queue job."""
-    import os
+    import os, sys
     cwd = os.getcwd()
     os.chdir( cfg.rundir )
     if cfg.run == 'q':
@@ -320,7 +320,7 @@ def launch( cfg ):
     return
 
 def run( inputs ):
-    """Stage and launch in one step."""
+    """Combined stage and launch in one step."""
     cfg = stage( inputs )
     launch( cfg )
     return cfg
