@@ -5,39 +5,39 @@ General utilities
 
 def dictify( o ):
     """Convert object attributes to dict"""
-    import sys
+    import os
     d = dict()
     for k in dir( o ):
         v = getattr( o, k )
-        if k[0] is not '_' and type(v) is not type(sys):
+        if k[0] is not '_' and type(v) not in [type(os), type(os.walk)]:
             d[k] = v
     return d
 
 def objectify( d ):
     """Convert dict to object attributes"""
-    import sys
+    import os
     class obj: pass
     o = obj()
     for k, v in d.iteritems():
-        if k[0] is not '_' and type(v) is not type(sys):
+        if k[0] is not '_' and type(v) not in [type(os), type(os.walk)]:
             setattr( o, k, v )
     return o
 
 def load( filename, d=None ):
     """Load variables from a Python source file into a dict"""
-    import sys
+    import os
     if d is None: d = dict()
     execfile( filename, d )
     for k in d.keys():
-        if k[0] is '_' or type(d[k]) is type(sys): del( d[k] )
+        if k[0] is '_' or type(d[k]) in [type(os), type(os.walk)]: del( d[k] )
     return d
 
 def save( fd, d, expandlist=[] ):
     """Write variables from a dict into a Python source file"""
-    import sys
+    import os
     if type( fd ) is not file: fd = open( fd, 'w' )
     for k in sorted( d ):
-        if k[0] is not '_' and type(d[k]) is not type(sys) and k not in expandlist:
+        if k[0] is not '_' and type(d[k]) not in [type(os), type(os.walk)] and k not in expandlist:
             fd.write( '%s = %r\n' % ( k, d[k] ) )
     for k in expandlist:
         fd.write( k + ' = [\n' )

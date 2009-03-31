@@ -25,7 +25,7 @@ def run( inputs ):
 
     # Merge inputs
     for k, v in inputs.iteritems():
-        if k[0] is not '_' and type(v) is not type(sys):
+        if k[0] is not '_' and type(v) not in [type(os), type(os.walk)]:
             if k in cfg:
                 cfg[k] = v
             elif k in prm:
@@ -130,7 +130,8 @@ def run( inputs ):
         print 'Warning: exceding available RAM per node (%sMb)' % cfg.maxram
 
     # Compile code
-    if not cfg.prepare: return
+    if not cfg.prepare:
+        return cfg
     setup.build( cfg.mode, cfg.optimize )
 
     # Create run directory
@@ -201,6 +202,7 @@ def run( inputs ):
 
     # Return to initial directory
     os.chdir( cwd )
+    return cfg
 
 def prepare_prm( prm, itbuff ):
     """Prepare input paramers"""

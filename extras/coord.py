@@ -128,7 +128,7 @@ def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
 
     Rotation matrix and clockwise rotation angle to transform components in the
     geographic coordinate system to components in the local system.
-    local_components = dot( mat, components )
+    local_components = matmul( mat, components )
     local_strike = strike + theta
     """
     import numpy

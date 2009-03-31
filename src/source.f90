@@ -90,7 +90,7 @@ use m_globals
 use m_util
 integer :: i1(3), i2(3), i, j, k, l
 real :: xi(3), f, w
-if ( tfunc == '' ) return
+if ( tfunc == 'none' ) return
 xi = ihypo - 0.5 - nnoff
 i1 = max( i1cell, int( xi )     )
 i2 = min( i2cell, int( xi ) + 1 )

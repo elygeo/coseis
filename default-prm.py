@@ -64,7 +64,7 @@ nsource = 0			# number of sub-faults
 # Point source parameters
 tensor1 = 1e16, 1e16, 1e16	# normal components
 tensor2 =  0.0,  0.0,  0.0	# shear components
-tfunc = ''			# time function, see util.f90 for details.
+tfunc = 'none'			# time function, see util.f90 for details.
 tsource = 0.056			# dominant period
 
 
