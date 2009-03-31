@@ -2,7 +2,6 @@
 """
 Boundary condition test
 """
-
 import sord
 
 debug = 3

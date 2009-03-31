@@ -2,7 +2,6 @@
 """
 PML test problem
 """
-
 import sord
 
 nt = 500

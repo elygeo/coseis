@@ -153,11 +153,11 @@ def rot_sym_tensor( w1, w2, rot ):
     import numpy
     rot = numpy.array( rot )
     mat = numpy.diag( w1 )
-    mat.flat[[5,2,1]] = w2
-    mat.flat[[7,6,3]] = w2
+    mat.flat[[5,6,1]] = w2
+    mat.flat[[7,2,3]] = w2
     mat = matmul( matmul( rot, mat ), rot.T )
     w1  = numpy.diag( mat )
-    w2  = mat.flat[[5,2,1]]
+    w2  = mat.flat[[5,6,1]]
     return w1, w2
 
 if __name__ == '__main__':

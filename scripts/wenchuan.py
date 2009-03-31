@@ -2,7 +2,6 @@
 """
 Wenchuan earthquake
 """
-
 import sord, math
 
 np3 = 1, 1, 2

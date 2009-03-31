@@ -2,7 +2,6 @@
 """
 Test
 """
-
 import sord
 
 nt = 10

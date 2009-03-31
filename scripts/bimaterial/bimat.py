@@ -4,6 +4,9 @@ Bimaterial problem
 """
 import sord
 
+itio = 1
+itstats = 1
+debug = 0
 np3 = 1, 1, 1
 np3 = 1, 2, 1
 dx = 0.15, 0.15, 0.15
@@ -11,20 +14,18 @@ dt = 0.008
 _X, _Y, _T = 400.0, 400.0, 200.0
 nn = int( _X / dx[0] + 1.01 ), int( _Y / dx[1] + 2.01 ), 2
 nt = int( _T / dt + 1.01 )
+bc1 = 10, 10, 1
+bc2 = 10, 10, 1
+hourglass = 1.0, 2.0
+
+faultnormal = 2	
 ihypo = 0.5*_X/dx[0], 0.5*_Y/dx[1], 0.5
 fixhypo = -1
 trelax = 0.1
 vrup = 0.5
 rcrit = 1.5
-faultnormal = 2	
-hourglass = 1.0, 2.0
-bc1 = 10, 10, 1
-bc2 = 10, 10, 1
-itio = 1
-itstats = 1
-debug = 0
-
 _k = int( ihypo[1] + 0.0001 )
+
 fieldio = [
     ( '=', 'rho', [],  1.0   ),
     ( '=', 'vp',  [],  1.732 ),

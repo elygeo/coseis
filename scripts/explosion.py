@@ -1,35 +1,40 @@
 #!/usr/bin/env python
 """
-Explosion test problem for comparison with DFM
+Explosion test problem
 """
-
 import sord
 
 np3 = 1, 2, 1
-nn = 101, 101, 61
+np3 = 1, 1, 1
+nn = 71, 71, 61
 dx = 100.0, 100.0, 100.0
-nt = 200
 dt = 0.008
-fieldio = [
-    ( '=', 'rho', [], 2700.0 ),
-    ( '=', 'vp',  [], 6000.0 ),
-    ( '=', 'vs',  [], 3464.0 ),
-    ( '=', 'gam', [],    0.3 ),
-]
-
-hourglass = 1.0, 0.3
+nt = 10
+nt = 200
 rexpand = 1.06
-n1expand = 20, 20, 20
+n1expand =  0,  0,  0
 n2expand = 20, 20, 20
-source = 'moment'
+fixhypo = -1 
+bc2 = 0, 0, 0
+
+# source
+bc1 = 2, 2, 2; ihypo = 1.5, 1.5, 1.5
+bc1 = 1, 1, 1; ihypo = 1, 1, 1
+src_type = 'moment'
 src_w1 = 1e18, 1e18, 1e18
 src_w2 =  0.0,  0.0,  0.0
 src_function = 'brune'
-tsource = 0.1
-ihypo = 31, 31, 31
-ihypo = 31.5, 31.5, 31.5
-fixhypo = -1
+src_period = 0.1
 
+# material
+fieldio = [
+    ( '=', 'rho', [], 2670.0 ),
+    ( '=', 'vp',  [], 6000.0 ),
+    ( '=', 'vs',  [], 3464.0 ),
+    ( '=', 'gam', [],    0.0 ),
+]
+
+# output
 for _f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
     fieldio += [
         ( '=wx', _f, [], 'p1_'+_f, (   0., 3999., -1.) ),

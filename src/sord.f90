@@ -34,9 +34,8 @@ if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
 call look_for_checkpoint        ; if (sync) call barrier ; prof0(4)  = timer(6)
 call arrays                     ; if (sync) call barrier ; prof0(5)  = timer(6)
 call grid_gen                   ; if (sync) call barrier ; prof0(6)  = timer(6)
-call fieldio_locs               ; if (sync) call barrier ; prof0(7)  = timer(6)
-call material                   ; if (sync) call barrier ; prof0(8)  = timer(6)
-call pml                        ; if (sync) call barrier 
+call material                   ; if (sync) call barrier ; prof0(7)  = timer(6)
+call pml                        ; if (sync) call barrier ; prof0(8)  = timer(6) 
 call finite_source_init         ; if (sync) call barrier ; prof0(9)  = timer(6)
 call rupture_init               ; if (sync) call barrier ; prof0(10) = timer(6)
 call resample                   ; if (sync) call barrier ; prof0(11) = timer(6)

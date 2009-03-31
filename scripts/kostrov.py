@@ -4,17 +4,17 @@ Kostrov constant rupture velocity test
 """
 import sord
 
-np3 = 1, 1, 1
 nt = 400
 nn = 121, 121, 42
 bc1 = 10, 10, 10
 bc2 = 10, 10, 10
+
 faultnormal = 3
+ihypo = 61, 61, 41.5
 vrup = 3117.7
 rcrit = 1e9
 trelax = 0.0
-
-_l = int( 0.5 * nn[2] + 0.5 )
+_l = ihypo[2]
 fieldio = [
     ( '=',  'rho', [], 2670.0 ),      
     ( '=',  'vp',  [], 6000.0 ),      

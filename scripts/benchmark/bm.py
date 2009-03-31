@@ -2,7 +2,6 @@
 """
 Benchmarks
 """
-
 import sord, math
 
 _np3 = [ (1,1,1) ]

@@ -168,6 +168,9 @@ call set_halo( w2(:,:,:,1), 0.0, i1cell, i2cell )
 call set_halo( w2(:,:,:,2), 0.0, i1cell, i2cell )
 call set_halo( w2(:,:,:,3), 0.0, i1cell, i2cell )
 
+! Find indices for coordinate based i/o
+call fieldio_locs
+
 ! Output
 call fieldio( '>', 'x1', w1(:,:,:,1) )
 call fieldio( '>', 'x2', w1(:,:,:,2) )
