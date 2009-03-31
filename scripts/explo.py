@@ -20,11 +20,11 @@ fieldio = [
 rexpand = 1.06
 n1expand =  0,  0,  0
 n2expand = 20, 20, 20
-source = 'moment'
-tensor1 = 1e18, 1e18, 1e18
-tensor2 =  0.0,  0.0,  0.0
-tfunc = 'brune'
-tsource = 0.1
+src_type = 'moment'
+src_w1 = 1e18, 1e18, 1e18
+src_w2 =  0.0,  0.0,  0.0
+src_function = 'brune'
+src_period = 0.1
 bc2 = 0, 0, 0
 fixhypo = -1 
 

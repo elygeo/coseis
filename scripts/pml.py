@@ -10,10 +10,10 @@ dx = 100.0, 100.0, 100.0
 dt = 0.0075
 hourglass = 1.0, 1.0
 
-tfunc = 'brune'
-source = 'moment'
-tensor1 = 1e18, 1e18, 1e18
-tensor2 = 0, 0, 0
+src_function = 'brune'
+src_type = 'moment'
+src_w1 = 1e18, 1e18, 1e18
+src_w2 = 0, 0, 0
 fixhypo = -1
 
 _l = 1 # FIXME
@@ -57,7 +57,6 @@ bc1 = 0, 0, 0
 bc2 = 0, 0, 0
 
 # Junk
-tfunc = 'sbrune'
 ihypo = 25.5, 25.5, 25.5
 nn = 50, 50, 50
 bc1 = 10, 10, 10

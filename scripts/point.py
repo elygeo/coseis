@@ -15,9 +15,9 @@ dt = 0.0075
 bc1 = 0, 0, 0
 bc2 = 0, 0, 0
 hourglass = 1.0, 0.0
-source = 'moment'
-tensor1 = 1e16, 1e16, 1e16
-tensor2 =  0.0,  0.0,  0.0
+src_type = 'moment'
+src_w1 = 1e16, 1e16, 1e16
+src_w2 =  0.0,  0.0,  0.0
 ihypo = 1.5, 1.5, 1.5
 
 fieldio = [

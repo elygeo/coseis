@@ -10,7 +10,7 @@ fk_dir = '../fk/'
 cfg = sord.util.objectify( sord.util.load( 'conf.py' ) )
 prm = sord.util.objectify( sord.util.load( 'parameters.py' ) )
 sig = prm.dt * 22.5
-T = prm.tsource
+T = prm.src_period
 ts = 4 * sig
 
 # Setup plot

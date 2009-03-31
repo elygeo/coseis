@@ -18,11 +18,11 @@ bc2 = 10, 10, 0
 # Source
 xhypo = 0.0, 0.0, -12e3
 ihypo = nn[0]/2-0.5, nn[1]/2-0.5, -xhypo[2]/dx[2]
-source = 'moment'
-tensor1 = -5.79e20, 0.10e20, 5.69e20    #  Mpp,  Mtt,  Mrr
-tensor2 = -1.99e20, 5.61e20, 3.48e20    # -Mrt,  Mrp, -Mtp
-tfunc = 'brune'
-tsource = 0.1
+src_type = 'moment'
+src_w1 = -5.79e20, 0.10e20, 5.69e20    #  Mpp,  Mtt,  Mrr
+src_w2 = -1.99e20, 5.61e20, 3.48e20    # -Mrt,  Mrp, -Mtp
+src_function = 'brune'
+src_period = 0.1
 fixhypo = -1
 
 # Velocity model
