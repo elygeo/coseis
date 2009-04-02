@@ -27,7 +27,7 @@ def write_src( history, nt, dt, t0, xi, w1, w2, path='' ):
     f32( w2[1]   ).tofile( path + 'w31' )
     f32( w2[2]   ).tofile( path + 'w12' )
 
-def srf_read( filename, headeronly=False, noslip=False ):
+def srf_read( filename, headeronly=False, noslip=False, mks=True ):
     """
     Reader for Graves Standard Rupture Format (SRF).
     SRF is documented at http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
@@ -56,6 +56,9 @@ def srf_read( filename, headeronly=False, noslip=False ):
         meta.topcenter  = float( k[0] ), float( k[1]  ), float( k[8] )
         meta.hypocenter = float( k[9] ), float( k[10] )
         k = fh.readline().split()
+        if mks:
+            meta.length     = 1000.0 * meta.length[0],     1000.0 * meta.length[1]
+            meta.hypocenter = 1000.0 * meta.hypocenter[0], 1000.0 * meta.hypocenter[1]
     if k[0] != 'POINTS':
         sys.exit( 'error reading %s' % filename )
     meta.nsource = int( k[1] )
@@ -112,6 +115,11 @@ def srf_read( filename, headeronly=False, noslip=False ):
     data.area = numpy.array( data.area )
     data.slip = numpy.array( data.slip )
     data.sv   = numpy.array( data.sv )
+    if mks:
+        data.dep  = 1000.0 * data.dep
+        data.area = 0.0001 * data.area
+        data.slip = 0.001  * data.slip
+        data.sv   = 0.001  * data.sv
     return meta, data
 
 def srf2potency( filename, projection, dx, path='' ): 
@@ -139,36 +147,37 @@ def srf2potency( filename, projection, dx, path='' ):
 
     # Time
     ii = data.nt > 0
+    n = ii.shape
     nsource = data.nt[ii].size
     f32( data.nt )[ii].tofile( dir + 'nt' )
-    f32( data.dt ).repeat(3)[ii].tofile( dir + 'dt' )
-    f32( data.t0 ).repeat(3)[ii].tofile( dir + 't0' )
+    f32( data.dt ).repeat(3).reshape(n)[ii].tofile( dir + 'dt' )
+    f32( data.t0 ).repeat(3).reshape(n)[ii].tofile( dir + 't0' )
     del( data.nt, data.dt, data.t0 )
 
     # Strike rotation
     mat, rot = coord.rotation( data.lon, data.lat, projection )
-    data.strike = data.strike + rot
+    data.stk = data.stk + rot
     del( mat, rot )
 
     # Strike, dip, and normal vectors
-    stk, dip, nrm = coord.slipvectors( data.strike, data.dip, data.rake )
-    del( data.strike, data.dip, data.rake )
+    stk, dip, nrm = coord.slipvectors( data.stk, data.dip, data.rake )
+    del( data.stk, data.dip, data.rake )
 
     # Coordinates
-    x, y, z = projection( data.lon, data.lat, data.dep )
+    x, y = projection( data.lon, data.lat )
     x = x / dx[0] + 1.0
     y = y / dx[1] + 1.0
-    z = z / dx[2] + 1.0
-    f32( x ).repeat(3)[ii].tofile( dir + 'xi1' )
-    f32( y ).repeat(3)[ii].tofile( dir + 'xi2' )
-    f32( z ).repeat(3)[ii].tofile( dir + 'xi3' )
+    z = data.dep / dx[2] + 1.0
+    f32( x ).repeat(3).reshape(n)[ii].tofile( dir + 'xi1' )
+    f32( y ).repeat(3).reshape(n)[ii].tofile( dir + 'xi2' )
+    f32( z ).repeat(3).reshape(n)[ii].tofile( dir + 'xi3' )
     del( x, y, z, data.lon, data.lat, data.dep )
 
     # Normal tensor components
     w = numpy.zeros( np )
-    w[:,2] = data.area * nrm[0] * n[0]; f32( w )[ii].tofile( dir + 'w11' )
-    w[:,2] = data.area * nrm[1] * n[1]; f32( w )[ii].tofile( dir + 'w22' )
-    w[:,2] = data.area * nrm[2] * n[2]; f32( w )[ii].tofile( dir + 'w33' )
+    w[:,2] = data.area * nrm[0] * nrm[0]; f32( w )[ii].tofile( dir + 'w11' )
+    w[:,2] = data.area * nrm[1] * nrm[1]; f32( w )[ii].tofile( dir + 'w22' )
+    w[:,2] = data.area * nrm[2] * nrm[2]; f32( w )[ii].tofile( dir + 'w33' )
 
     # Shear tensor components
     w = numpy.zeros( np )

@@ -155,6 +155,14 @@ def stage( inputs ):
                 os.link( filename, f )
             except:
                 os.symlink( filename, f )
+    for d in cfg.indirs:
+        for filename in glob.glob( d + '/*' ):
+            f = os.path.basename( filename )
+            f = os.path.join( cfg.rundir, 'in', f )
+            try:
+                os.link( filename, f )
+            except:
+                os.symlink( filename, f )
 
     # Copy files to run directory
     cwd = os.path.realpath( os.getcwd() )
