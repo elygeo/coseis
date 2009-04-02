@@ -131,7 +131,8 @@ def srf2potency( filename, projection, dx, path='' ):
     for j in xrange( np[0] ):
         for i in xrange( 3 ):
             nt = data.nt[j,i]
-            data.sv[k:k+nt] = data.dt[j] * numpy.cumsum( data.sv[k:k+nt] )
+            #data.sv[k:k+nt] = data.dt[j] * numpy.cumsum( data.sv[k:k+nt] )
+            data.sv[k:k+nt] = numpy.cumsum( data.sv[k:k+nt] )
             k = k + nt
     f32( data.sv ).tofile( dir + 'history' )
     del( data.sv )
@@ -187,6 +188,7 @@ def srf2potency( filename, projection, dx, path='' ):
 if __name__ == '__main__':
     import sys, pprint, sord
     for f in sys.argv[1:]:
-        meta = srf_read( f, true )
+        print f
+        meta = srf_read( f, True )
         pprint.pprint( sord.util.dictify( meta ) )
     
