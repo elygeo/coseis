@@ -50,6 +50,7 @@ def save( fd, d, expandlist=[] ):
 def loadmeta( dir='.' ):
     """Load SORD metadata"""
     import os, pprint
+    dir = os.path.expanduser( dir )
     meta = load( os.path.join( dir, 'parameters.py' ) )
     load( os.path.join( dir, 'conf.py' ), meta )
     try:
