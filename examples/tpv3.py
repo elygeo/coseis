@@ -4,6 +4,7 @@ TPV3 - SCEC validation problem version 3
 """
 import sord
 
+rundir = '~/run/tpv3'			# simulation directory 
 np3 = 1, 1, 32				# number of processors in each dimension
 nn = 351, 201, 128			# number of mesh nodes, nx ny nz
 dx = 50.0, 50.0, 50.0			# spatial step size

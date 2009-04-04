@@ -4,6 +4,7 @@ PEER LOH.1
 """
 import sord
 
+rundir = '~/run/loh1'
 np3 = 1, 16, 1
 np3 = 1, 2, 1
 dx = 50.0, 50.0, 50.0

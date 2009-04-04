@@ -4,6 +4,7 @@ Bimaterial problem
 """
 import sord
 
+rundir = '~/run/bimat'
 itio = 1
 itstats = 1
 debug = 0

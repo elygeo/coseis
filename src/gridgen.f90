@@ -138,7 +138,7 @@ if ( fixhypo /= 0 ) then
     do l = i1(3), i1(3)+1
     do k = i1(2), i1(2)+1
     do j = i1(1), i1(1)+1
-      w = 1.0 - abs( (xi(1) - j) * (xi(2) - k) * (xi(3) - l) )
+      w = (1.0-abs(xi(1)-j)) * (1.0-abs(xi(2)-k)) * (1.0-abs(xi(3)-l))
       do i = 1, 3
         x0(i) = x0(i) + w * w1(j,k,l,i)
       end do

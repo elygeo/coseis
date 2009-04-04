@@ -4,6 +4,7 @@ San Andreas Fault, northward dynamic rupture, topography, SCEC-CVM4
 """
 import sord
 
+rundir = '~/run/saf'				# simulation directory 
 np3 = 1, 80, 24					# 1920 total processors on DataStar
 nn = 3001, 1502, 401				# number of mesh nodes nx ny nz
 dx = 200.0, 200.0, -200.0			# spatial step length

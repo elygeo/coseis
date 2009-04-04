@@ -100,6 +100,6 @@ for _i in range( 0, len( _run ), 2 ):
             ( '=wx', _f, [], 'P2b-'+_f, (-49., -5951., 0.) ),
         ]
 
-    rundir = os.path.expanduser('~') + '/run/%03.0f' % dx[0]
+    rundir = '~/run/tpv3-%03.0f' % dx[0]
     sord.run( locals() )
 

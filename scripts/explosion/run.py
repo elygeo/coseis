@@ -4,6 +4,7 @@ Explosion test problem
 """
 import sord
 
+rundir = '~/run/explosion'
 np3 = 1, 2, 1
 np3 = 1, 1, 1
 nn = 71, 71, 61
@@ -41,7 +42,6 @@ for _f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
         ( '=wx', _f, [], 'p2_'+_f, (2999., 3999., -1.) ),
         ( '=wx', _f, [], 'p3_'+_f, (3999., 3999., -1.) ),
     ]
-
 
 sord.run( locals() )
 

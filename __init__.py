@@ -19,9 +19,6 @@ def stage( inputs ):
         cfg = configure.configure( machine=inputs['machine'] )
     else:
         cfg = configure.configure()
-    if '__file__' in inputs:
-        cfg['name'] = os.path.splitext( os.path.basename( inputs['__file__'] ) )[0]
-        cfg['rundir'] = os.path.join( cfg['rundir'], cfg['name'] )
 
     # Merge inputs
     for k, v in inputs.iteritems():
@@ -32,8 +29,8 @@ def stage( inputs ):
                 prm[k] = v
             else:
                 sys.exit( 'Unknown parameter: %s = %r' % ( k, v ) )
-    cfg['rundir'] = os.path.expanduser( cfg['rundir'] )
     cfg = util.objectify( cfg )
+    cfg.rundir = os.path.expanduser( cfg.rundir )
     prm = prepare_prm( util.objectify( prm ), cfg.itbuff )
 
     # Command line options
@@ -167,7 +164,7 @@ def stage( inputs ):
     # Copy files to run directory
     cwd = os.path.realpath( os.getcwd() )
     cfg.rundate = time.asctime()
-    cfg.name += '-' + os.path.basename( cfg.rundir )
+    cfg.name = os.path.basename( cfg.rundir )
     cfg.rundir = os.path.realpath( cfg.rundir )
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
     cfg.bin = os.path.join( '.', 'sord-' + cfg.mode + cfg.optimize )

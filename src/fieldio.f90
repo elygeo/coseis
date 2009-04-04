@@ -72,13 +72,17 @@ if ( i > 0 ) then
   call reduceloc( rr, i1, s2, 'allmin', n, noff, 0 )
   p%ii(1,1:3) = i1 + nnoff
   p%ii(2,1:3) = i1 + nnoff
-  if ( rr > sum( dx * dx ) / 3.0 ) then
+  if ( rr < sum( dx * dx ) / 3.0 ) then
+    if ( master ) then
+      write(1, '( "( [ ", 4("(", i8, 2(", ", i8), "), "), "], ''", a, "'' )," )')&
+        p%ii, trim( p%filename )
+    end if
+  else
+    if ( master ) then
+      write(1, '( "#( [ ", 4("(", i8, 2(", ", i8), "), "), "], ''", a, "'' )," )')&
+        p%ii, trim( p%filename )
+    end if
     call pdelete
-    cycle loop
-  end if
-  if ( master ) then
-    write(1, '( "( [ ", 4("(", i8, 2(", ", i8), "), "), "], ''", a, "'' )," )')&
-      p%ii, trim( p%filename )
   end if
 end if
 
