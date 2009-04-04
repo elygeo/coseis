@@ -41,10 +41,10 @@ ihypo = 1.5, 1.5, 41.5		# hypocenter indices
 xhypo = 0.0, 0.0, 2000.0	# hypocenter coordinates
 fixhypo = -1			# set origin
 src_type = 'moment'		# specify moment source
-src_w1 = 0.0, 0.0, 0.0		# moment tensor M_xx, M_yy, M_zz
-src_w2 = 0.0, 0.0, 1e18		# moment tensor M_yz, M_zx, M_yz
 src_function = 'brune'		# time function: Brune pulse
 src_period = 0.1		# time function dominant period
+src_w1 = 0.0, 0.0, 0.0		# moment tensor M_xx, M_yy, M_zz
+src_w2 = 0.0, 0.0, 1e18		# moment tensor M_yz, M_zx, M_yz
 
 # Velocity time series output for surface station
 fieldio += [

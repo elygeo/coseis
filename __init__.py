@@ -155,8 +155,8 @@ def stage( inputs ):
                 os.link( filename, f )
             except:
                 os.symlink( filename, f )
-    for d in cfg.indirs:
-        for filename in glob.glob( d + '/*' ):
+    for pat in cfg.infiles:
+        for filename in glob.glob( pat ):
             f = os.path.basename( filename )
             f = os.path.join( cfg.rundir, 'in', f )
             try:

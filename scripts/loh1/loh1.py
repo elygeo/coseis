@@ -16,9 +16,9 @@ bc1 = -2, -2,  0
 bc2 = 10, 10, 10
 
 # source
-fixhypo = -1
+ihypo = 1.5, 1.5,   41.5
 xhypo = 0.0, 0.0, 2000.0
-ihypo =   0,   0,   40.5
+fixhypo = -1
 src_type = 'moment'
 src_function = 'brune'
 src_period = 0.1

@@ -2,13 +2,13 @@
 """
 PEER LOH.1 - Plot comparison of FK and SOM.
 """
-import math, numpy, pylab, scipy, scipy.signal, sord
+import os, numpy, pylab, scipy, scipy.signal, sord
 
 # Parameters
-so_dir = 'out/'
-fk_dir = '../fk/'
-cfg = sord.util.objectify( sord.util.load( 'conf.py' ) )
-prm = sord.util.objectify( sord.util.load( 'parameters.py' ) )
+so_dir = os.path.expanduser( '~/run/loh1/' )
+fk_dir = 'fk/'
+cfg = sord.util.objectify( sord.util.load( so_dir + 'conf.py' ) )
+prm = sord.util.objectify( sord.util.load( so_dir + 'parameters.py' ) )
 sig = prm.dt * 22.5
 T = prm.src_period
 ts = 4 * sig
@@ -20,14 +20,14 @@ ax = [ pylab.subplot( 3, 1, i ) for i in 1, 2, 3 ]
 # SORD results
 rotation = numpy.array([[3./5., 4./5., 0.], [-4./5., 3./5., 0.], [0., 0., 1.]])
 t = prm.dt * numpy.arange( prm.nt )
-x = sord.util.ndread( so_dir+'vx', endian=cfg.endian )
-y = sord.util.ndread( so_dir+'vy', endian=cfg.endian )
-z = sord.util.ndread( so_dir+'vz', endian=cfg.endian )
+x = sord.util.ndread( so_dir+'out/vx', endian=cfg.endian )
+y = sord.util.ndread( so_dir+'out/vy', endian=cfg.endian )
+z = sord.util.ndread( so_dir+'out/vz', endian=cfg.endian )
 v = numpy.vstack((x,y,z))
 v = numpy.dot( rotation, v )
 tau = t - ts
 factor = 1. - 2.*T/sig**2.*tau - ( T/sig )**2. * ( 1. - ( tau/sig )**2. );
-b = ( 1. / math.sqrt( 2.*math.pi ) / sig ) * factor * numpy.exp( -0.5 * ( tau/sig ) ** 2. )
+b = ( 1. / numpy.sqrt( 2.*numpy.pi ) / sig ) * factor * numpy.exp( -0.5 * ( tau/sig ) ** 2. )
 v = prm.dt * scipy.signal.lfilter( b, 1., v )
 vm = numpy.sqrt( numpy.sum( v * v, 0 ) )
 peakv = numpy.max( vm )
@@ -45,7 +45,7 @@ v3 = -1e5 * sord.util.ndread( fk_dir+'v-vertical', endian='l' )
 v = numpy.vstack((v1,v2,v3))
 dt = tm[1] - tm[0]
 tau = tm - ts
-b = ( 1. / math.sqrt( 2.*math.pi ) / sig ) * numpy.exp( -0.5 * ( tau/sig ) ** 2. )
+b = ( 1. / numpy.sqrt( 2.*numpy.pi ) / sig ) * numpy.exp( -0.5 * ( tau/sig ) ** 2. )
 v = dt * scipy.signal.lfilter( b, 1., v )
 vm = numpy.sqrt( numpy.sum( v * v, 0 ) )
 peakv = numpy.max( vm )

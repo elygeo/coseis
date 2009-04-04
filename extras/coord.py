@@ -1,15 +1,21 @@
 #!/usr/bin/env python
-"""Coordinate conversions"""
+"""
+Coordinate conversions
+"""
 
 def matmul( A, B ):
-    """Vectorized matrix multiplication. Not the same as numpy.dot()"""
+    """
+    Vectorized matrix multiplication. Not the same as numpy.dot()
+    """
     import numpy
     A = numpy.array( A )
     B = numpy.array( B )
     return ( A[:,:,numpy.newaxis,...] * B ).sum( axis=1 )
 
 def solve2( A, b ):
-    """Vectorized 2x2 linear equation solver"""
+    """
+    Vectorized 2x2 linear equation solver
+    """
     from numpy import array as _
     A = _( A )
     b = _( b ) / ( A[0,0]*A[1,1] - A[0,1]*A[1,0] )
@@ -42,7 +48,9 @@ def slipvectors( strike, dip, rake ):
     return matmul( matmul( A, B ), C ).swapaxes( 0, 1 )
 
 def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=False ):
-    """2D interpolation on a regular grid"""
+    """
+    2D interpolation on a regular grid
+    """
     import numpy
     z  = numpy.asarray( z )
     xi = ( numpy.asarray( xi ) - x0 ) / dx
@@ -63,7 +71,9 @@ def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=False ):
     return zi
 
 def ibilinear( xx, yy, xi, yi ):
-    """Vectorized inverse bilinear interpolation"""
+    """
+    Vectorized inverse bilinear interpolation
+    """
     import sys
     from numpy import array as _
     xx, yy = _( xx ), _( yy )
@@ -88,7 +98,9 @@ def ibilinear( xx, yy, xi, yi ):
     return x
 
 def ll2cmu( x, y, inverse=False ):
-    """CMU TeraShake coordinates projection"""
+    """
+    CMU TeraShake coordinates projection
+    """
     import numpy, sys
     xx = [ -121.0, -118.951292 ], [ -116.032285, -113.943965 ]
     yy = [   34.5,   36.621696 ], [   31.082920,   33.122341 ]
@@ -101,7 +113,9 @@ def ll2cmu( x, y, inverse=False ):
     return numpy.array( [x, y] )
 
 def ll2xy( x, y, inverse=False, projection=None, rot=40.0, lon0=-121.0, lat0=34.5,  ):
-    """UTM TeraShake coordinate projection"""
+    """
+    UTM TeraShake coordinate projection
+    """
     import numpy, pyproj
     if not projection:
         projection = pyproj.Proj( proj='utm', zone=11, ellps='WGS84' )
@@ -159,6 +173,22 @@ def rot_sym_tensor( w1, w2, rot ):
     w1  = numpy.diag( mat )
     w2  = mat.flat[[5,6,1]]
     return w1, w2
+
+def rotmat( x, upvector=(0,0,1) ):
+    """
+    Given a position vector x, find the rotation matrix for r,h,v coordinates.
+    """
+    import numpy
+    nr = x / numpy.sqrt( (x*x).sum() )
+    nh = numpy.cross( upvector, nr )
+    if all( nh == 0.0 ):
+        nh = numpy.cross( (1,0,0), nr )
+    if all( nh == 0.0 ):
+        nh = numpy.cross( (0,1,0), nr )
+    nh = nh / sqrt( (nh*nh).sum() )
+    nv = numpy.cross( nr, nh )
+    nv = nv / sqrt( (nv*nv).sum() )
+    return numpy.array([ nr, nh, nv ]).T
 
 if __name__ == '__main__':
     import sys, getopt, numpy
