@@ -125,7 +125,7 @@ end if
 
 ! Lame' parameters
 mu  = mr * s2 * s2
-lam = mr * ( s1 * s1 ) - 2.0 * mu
+lam = mr * s1 * s1 - 2.0 * mu
 
 ! Hourglass constant
 yy = 12.0 * ( lam + 2.0 * mu )

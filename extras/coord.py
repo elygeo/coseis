@@ -24,11 +24,13 @@ def solve2( A, b ):
 
 def slipvectors( strike, dip, rake ):
     """
-    For given strike, dip, and rake (degrees), using the Aki & Richards
-    convention of dip to the right of the strike vector, find the transposed
-    rotation matrix from the (slip, rake, normal) coordinate system, to the (east,
-    north, up) coordinate system.  The rows of the transposed matrix are the unit
-    normals for the slip, rake, and fault normal directions.
+    For given strike, dip, and rake (degrees), using the Aki & Richards convention
+    of dip to the right of the strike vector, find the rotation matrix R from world
+    coordinates (east, north, up) to fault local coordinates (slip, rake, normal).
+    The transpose R^T performs the reverse rotation from fault local coordinates to
+    world coordinates.  Rows of R are axis unit vectors of the fault local space in
+    world coordinates.  Columns of R are axis unit vectors of the world space in
+    fault local coordinates.
     """
     import numpy
     strike = numpy.pi / 180.0 * numpy.asarray( strike )
@@ -36,16 +38,16 @@ def slipvectors( strike, dip, rake ):
     rake   = numpy.pi / 180.0 * numpy.asarray( rake )
     u = numpy.ones( strike.shape )
     z = numpy.zeros( strike.shape )
-    c = numpy.cos( strike )
-    s = numpy.sin( strike )
-    A = numpy.array([[ s, -c, z ], [ c, s, z ], [ z, z, u ]])
-    c = numpy.cos( dip )
-    s = numpy.sin( dip )
-    B = numpy.array([[ u, z, z ], [ z, c, -s ], [ z, s, c ]])
     c = numpy.cos( rake )
     s = numpy.sin( rake )
-    C = numpy.array([[ c, -s, z ], [ s, c, z ], [ z, z, u ]])
-    return matmul( matmul( A, B ), C ).swapaxes( 0, 1 )
+    A = numpy.array([[ c, s, z ], [ -s, c, z ], [ z, z, u ]])
+    c = numpy.cos( dip )
+    s = numpy.sin( dip )
+    B = numpy.array([[ u, z, z ], [ z, c, s ], [ z, -s, c ]])
+    c = numpy.cos( strike )
+    s = numpy.sin( strike )
+    C = numpy.array([[ s, c, z ], [ -c, s, z ], [ z, z, u ]])
+    return matmul( matmul( A, B ), C )
 
 def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=False ):
     """
@@ -174,21 +176,22 @@ def rot_sym_tensor( w1, w2, rot ):
     w2  = mat.flat[[5,6,1]]
     return w1, w2
 
-def rotmat( x, upvector=(0,0,1) ):
+def rotmat( x, origin=(0,0,0), upvector=(0,0,1) ):
     """
-    Given a position vector x, find the rotation matrix for r,h,v coordinates.
+    Given a position vector x, find the rotation matrix to r,h,v coordinates.
     """
     import numpy
+    x = numpy.array( x ) - numpy.array( origin )
     nr = x / numpy.sqrt( (x*x).sum() )
     nh = numpy.cross( upvector, nr )
     if all( nh == 0.0 ):
         nh = numpy.cross( (1,0,0), nr )
     if all( nh == 0.0 ):
         nh = numpy.cross( (0,1,0), nr )
-    nh = nh / sqrt( (nh*nh).sum() )
+    nh = nh / numpy.sqrt( (nh*nh).sum() )
     nv = numpy.cross( nr, nh )
-    nv = nv / sqrt( (nv*nv).sum() )
-    return numpy.array([ nr, nh, nv ]).T
+    nv = nv / numpy.sqrt( (nv*nv).sum() )
+    return numpy.array([ nr, nh, nv ])
 
 if __name__ == '__main__':
     import sys, getopt, numpy

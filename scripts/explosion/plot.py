@@ -2,35 +2,58 @@
 """
 Explosion test plot
 """
-import os
+import os, pylab, numpy, scipy.signal
 from sord import util
+from sord.extras import coord
 
-rundir = '~/run/explosion'
-rundir = os.path.expanduser( rundir )
-prm = util.loadmeta( rundir )
-m0 = meta.src_w1[0]
-T = prm.src_period
-pylan.clf()
+rho, vp, vs = 2670.0, 6000.0, 3464.0
+runs = 'tmp/1', 'tmp/2', 'tmp/3'
+stations = 'p1', 'p2', 'p3', 'p4', 'p5', 'p6'
 
-for sta in 'p1_', 'p2_', 'p3_':
-    x1 = numpy.fromfile( rundir + '/out/' + sta + 'x1' )
-    x2 = numpy.fromfile( rundir + '/out/' + sta + 'x2' )
-    x3 = numpy.fromfile( rundir + '/out/' + sta + 'x3' )
-    v1 = numpy.fromfile( rundir + '/out/' + sta + 'v1' )
-    v2 = numpy.fromfile( rundir + '/out/' + sta + 'v2' )
-    v3 = numpy.fromfile( rundir + '/out/' + sta + 'v3' )
-    t  = prm.dt * numpy.arange( prm.nt )
-    v  = coord.matmul( coord.rotmat( [x1, x2, x3] ), [v1, v2, v3] )
-    pylab.plot( t, v, 'k-' )
-    pylab.hold( True )
-    x  = numpy.array([ x1, x2, x3 ])
-    r  = numpy.sqrt( (x*x).sum() )
-    v  = m0 * numpy.exp( -t / T ) * ( t * vp / r - t / T + 1.0 ) \
-       / ( 4.0 * numpy.pi * rho * vp**3.0 * T**2.0 * r )
-    t  = t + r / vp
-    pylab.plot( t, v, 'k--' )
+for rundir in runs:
+    prm = util.loadmeta( rundir )
+    T = prm.src_period
+    cutoff = vp / ( 10 * prm.dx[0] )
+    if 1:
+        Wn = cutoff * 2.0 * prm.dt
+        print Wn
+        b, a = scipy.signal.butter( 4, Wn )
+    else:
+        n = 2 * round( 1 / ( cutoff * prm.dt ) )
+        b = 0.5 * ( 1.0 - numpy.cos( numpy.linspace( 0.0, 2.0 * numpy.pi, n ) ) )
+        a  = b.sum()
+    if prm.src_type == 'moment':
+        m0 = prm.src_w1[0]
+    else:
+        m0 = prm.src_w1[0] * ( 3*rho*vp*vp - 4*rho*vs*vs )
 
+    for sta in stations:
+        x1 = numpy.fromfile( rundir + '/out/' + sta + '_x1', numpy.float32 )
+        x2 = numpy.fromfile( rundir + '/out/' + sta + '_x2', numpy.float32 )
+        x3 = numpy.fromfile( rundir + '/out/' + sta + '_x3', numpy.float32 )
+        v1 = numpy.fromfile( rundir + '/out/' + sta + '_v1', numpy.float32 )
+        v2 = numpy.fromfile( rundir + '/out/' + sta + '_v2', numpy.float32 )
+        v3 = numpy.fromfile( rundir + '/out/' + sta + '_v3', numpy.float32 )
+        x  = numpy.array([ x1, x2, x3 ]).squeeze()
+        v  = numpy.array([ v1, v2, v3 ]).squeeze()
+        v  = coord.matmul( coord.rotmat( x ), v )
+        v  = scipy.signal.lfilter( b, a, v )
+        v  = scipy.signal.lfilter( b, a, v )
+        t  = prm.dt * numpy.arange( prm.nt ) - 0.5 * prm.dt
+        ta = prm.dt * numpy.arange( prm.nt ) + 0.5 * prm.dt
+        r  = numpy.sqrt( (x*x).sum() )
+        va = m0 * numpy.exp( -ta / T ) * ( ta * vp / r - ta / T + 1.0 ) \
+           / ( 4.0 * numpy.pi * rho * vp**3.0 * T**2.0 * r )
+        ta = ta + r / vp
+        va = scipy.signal.lfilter( b, a, va )
+        va = scipy.signal.lfilter( b, a, va )
+        pylab.clf()
+        pylab.plot( t, v.T, '-', ta, va, 'k--' )
+        pylab.xlim( 0.5, prm.dt * prm.nt )
+        pylab.title( rundir + '   %s, %s, %s' % tuple(x) )
+        pylab.draw()
+        pylab.ginput(1,0,False)
+
+pylab.xlim( 0.5, prm.dt * prm.nt )
 pylab.draw()
-pylab.savefig( 'explosion.pdf', format='pdf' )
-pylab.show()
 
