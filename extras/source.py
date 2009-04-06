@@ -34,12 +34,15 @@ def srf_read( filename, headeronly=False, noslip=False, mks=True ):
     Returns separate meta and data objects.
     Optionally include points with zero slip.
     """
-    import sys, numpy
+    import sys, gzip, numpy
     class obj: pass
 
     fh = filename
     if type( fh ) is not file:
-        fh = open( fh, 'r' )
+        if fh.split('.')[-1] == 'gz':
+            fh = gzip.open( fh, 'r' )
+        else:
+            fh = open( fh, 'r' )
 
     # Header block
     meta = obj()
@@ -118,8 +121,9 @@ def srf_read( filename, headeronly=False, noslip=False, mks=True ):
     if mks:
         data.dep  = 1000.0 * data.dep
         data.area = 0.0001 * data.area
-        data.slip = 0.001  * data.slip
-        data.sv   = 0.001  * data.sv
+        data.slip = 0.01   * data.slip
+        data.sv   = 0.01   * data.sv
+    meta.potency = ( data.area * numpy.sqrt( (data.slip**2).sum(1) ) ).sum()
     return meta, data
 
 def srf2potency( filename, projection, dx, path='' ): 
@@ -139,8 +143,7 @@ def srf2potency( filename, projection, dx, path='' ):
     for j in xrange( np[0] ):
         for i in xrange( 3 ):
             nt = data.nt[j,i]
-            #data.sv[k:k+nt] = data.dt[j] * numpy.cumsum( data.sv[k:k+nt] )
-            data.sv[k:k+nt] = numpy.cumsum( data.sv[k:k+nt] )
+            data.sv[k:k+nt] = data.dt[j] * numpy.cumsum( data.sv[k:k+nt] )
             k = k + nt
     f32( data.sv ).tofile( dir + 'history' )
     del( data.sv )
