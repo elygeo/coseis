@@ -62,10 +62,10 @@ src_type = 'potency'		# 'moment', 'potency', or 'none'
 src_n = 0			# number of sub-faults
 
 # Point source parameters
-src_w1 = 1e16, 1e16, 1e16	# normal components
-src_w2 =  0.0,  0.0,  0.0	# shear components
+src_w1 = 0.0, 0.0, 0.0		# normal components
+src_w2 = 0.0, 0.0, 0.0		# shear components
 src_function = 'none'		# time function, see util.f90 for details.
-src_period = 0.056		# dominant period
+src_period = 10 * dt		# dominant period
 
 # Spatial difference operator level:
 #
