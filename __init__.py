@@ -151,7 +151,7 @@ def stage( inputs ):
             try:
                 os.link( filename, f )
             except:
-                os.symlink( filename, f )
+                os.symlink( os.path.realpath( filename ), f )
     for pat in cfg.infiles:
         for filename in glob.glob( pat ):
             f = os.path.basename( filename )
@@ -159,7 +159,7 @@ def stage( inputs ):
             try:
                 os.link( filename, f )
             except:
-                os.symlink( filename, f )
+                os.symlink( os.path.realpath( filename ), f )
 
     # Copy files to run directory
     cwd = os.path.realpath( os.getcwd() )

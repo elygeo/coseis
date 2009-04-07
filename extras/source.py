@@ -12,7 +12,7 @@ def write_src( history, nt, dt, t0, xi, w1, w2, path='' ):
     Write SORD input for moment or potency source.
     """
     import os
-    path = os.path.join( path, 'src_' )
+    path = os.path.join( os.path.expanduser( path ), 'src_' )
     f32( history ).tofile( path + 'history' )
     f32( nt      ).tofile( path + 'nt'  )
     f32( dt      ).tofile( path + 'dt'  )

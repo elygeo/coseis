@@ -8,8 +8,8 @@ from sord.extras import coord
 
 rho, vp, vs = 2670.0, 6000.0, 3464.0
 runs = 'tmp/1', 'tmp/3', 'tmp/2', 'tmp/4'
-stations = 'p1', 'p2', 'p3', 'p4', 'p5', 'p6'
 stations = 'p5',
+stations = 'p1', 'p2', 'p3', 'p4', 'p5', 'p6'
 
 for rundir in runs:
     prm = util.loadmeta( rundir )

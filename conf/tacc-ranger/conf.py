@@ -22,6 +22,7 @@ hosts = [ 'login3.ranger.tacc.utexas.edu', 'login4.ranger.tacc.utexas.edu' ]
 queue = 'request';     maxnodes = 1024; maxtime = 24, 00
 queue = 'serial';      maxnodes = 1;    maxtime =  2, 00
 queue = 'development'; maxnodes = 16;   maxtime =  2, 00
+queue = 'long';        maxnodes = 256;  maxtime = 48, 00
 queue = 'large';       maxnodes = 1024; maxtime = 24, 00
 queue = 'normal';      maxnodes = 256;  maxtime = 24, 00
 maxcores = 16
