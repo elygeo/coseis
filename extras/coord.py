@@ -156,7 +156,7 @@ def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
     s = 1.0 / numpy.sqrt( x*x + y*y )
     mat = numpy.array([ s*x, s*y ])
     theta = 180.0 / numpy.pi * numpy.arctan2( mat[0], mat[1] )
-    theta = 0.5 * theta.sum() - 45.0
+    theta = 0.5 * theta.sum(0) - 45.0
     return mat, theta
 
 def rot_sym_tensor( w1, w2, rot ):
