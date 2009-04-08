@@ -143,7 +143,7 @@ def stage( inputs ):
     # Link input files
     for i, line in enumerate( prm.fieldio ):
         if 'r' in line[0] or 'R' in line[0] and os.sep in line[8]:
-            filename = line[8]
+            filename = os.path.expanduser( line[8] )
             f = os.path.basename( filename )
             line = line[:8] + ( f, ) + line[9:]
             prm.fieldio[i] = line
@@ -151,15 +151,15 @@ def stage( inputs ):
             try:
                 os.link( filename, f )
             except:
-                os.symlink( os.path.realpath( filename ), f )
+                os.symlink( filename, f )
     for pat in cfg.infiles:
-        for filename in glob.glob( pat ):
+        for filename in glob.glob( os.path.expanduser( pat ) ):
             f = os.path.basename( filename )
             f = os.path.join( cfg.rundir, 'in', f )
             try:
                 os.link( filename, f )
             except:
-                os.symlink( os.path.realpath( filename ), f )
+                os.symlink( filename, f )
 
     # Copy files to run directory
     cwd = os.path.realpath( os.getcwd() )

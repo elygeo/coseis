@@ -16,7 +16,8 @@ def dictify( o ):
 def objectify( d ):
     """Convert dict to object attributes"""
     import os
-    class obj: pass
+    class obj:
+        pass
     o = obj()
     for k, v in d.iteritems():
         if k[0] is not '_' and type(v) not in [type(os), type(os.walk)]:
@@ -26,8 +27,9 @@ def objectify( d ):
 def load( filename, d=None ):
     """Load variables from a Python source file into a dict"""
     import os
-    if d is None: d = dict()
-    execfile( filename, d )
+    if d is None:
+        d = dict()
+    execfile( os.path.expanduser( filename ), d )
     for k in d.keys():
         if k[0] is '_' or type(d[k]) in [type(os), type(os.walk)]: del( d[k] )
     return d
@@ -35,7 +37,8 @@ def load( filename, d=None ):
 def save( fd, d, expandlist=[] ):
     """Write variables from a dict into a Python source file"""
     import os
-    if type( fd ) is not file: fd = open( fd, 'w' )
+    if type( fd ) is not file:
+        fd = open( os.path.expanduser( fd ), 'w' )
     for k in sorted( d ):
         if k[0] is not '_' and type(d[k]) not in [type(os), type(os.walk)] and k not in expandlist:
             fd.write( '%s = %r\n' % ( k, d[k] ) )
@@ -123,13 +126,13 @@ def ndread( fd, shape=None, indices=[], order='F', dtype=None, endian=None ):
     dtype :   Data-type of the array. Default is numpy.float32
     endian :  Byte order of the array on disk. 'l' little, 'b' big, or '=' native.
     """
-    import numpy
+    import os, numpy
     if not dtype:
         dtype = numpy.dtype( numpy.float32 )
     if endian:
         dtype = dtype.newbyteorder( endian )
     if type( fd ) is not file:
-        fd = open( fd, 'rb' )
+        fd = open( os.path.expanduser( fd ), 'rb' )
     if not shape:
         return numpy.fromfile( fd, dtype )
     elif type( shape ) == int:
@@ -183,7 +186,7 @@ def transpose( fd_in, fd_out, shape, axes=None, order='F', hold=2, dtype=None ):
     hold :   Number of dimensions to hold in memory at once. Default is 2.
     dtype :  Data-type of the array. Default is numpy.float32
     """
-    import sys, numpy
+    import os, sys, numpy
     ndim = len( shape )
     if not axes:
         axes = range( ndim )[::-1]
@@ -206,9 +209,9 @@ def transpose( fd_in, fd_out, shape, axes=None, order='F', hold=2, dtype=None ):
     if len( axes ) < 3:
         sys.exit( 'Nothing to transpose' )
     if type( fd_in ) is not file:
-        fd_in = open( fd_in, 'rb' )
+        fd_in = open( os.path.expanduser( fd_in ), 'rb' )
     if type( fd_out ) is not file:
-        fd_out = open( fd_out, 'wb' )
+        fd_out = open( os.path.expanduser( fd_out ), 'wb' )
     n = len( axes ) - hold
     T = numpy.array( axes[n:] )
     T[T.argsort()] = numpy.arange( T.size )
@@ -239,14 +242,16 @@ def transpose( fd_in, fd_out, shape, axes=None, order='F', hold=2, dtype=None ):
 def compile( compiler, object, source ):
     """An alternative to Make that uses state files"""
     import os, sys, glob, difflib
+    object =   os.path.expanduser( object )
+    source = [ os.path.expanduser( f ) for f in source if f ]
     statedir = os.path.join( os.path.dirname( object ), '.state' )
     if not os.path.isdir( statedir ):
         os.mkdir( statedir )
     statefile = os.path.join( statedir, os.path.basename( object ) )
-    command = compiler + [ object ] + [ f for f in source if f ]
+    command = compiler + [ object ] + source
     state = [ ' '.join( command ) + '\n' ]
     for f in source:
-        if f: state += open( f, 'r' ).readlines()
+        state += open( f, 'r' ).readlines()
     compile = True
     if os.path.isfile( object ):
         try:

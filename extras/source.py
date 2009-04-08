@@ -34,15 +34,15 @@ def srf_read( filename, headeronly=False, noslip=False, mks=True ):
     Returns separate meta and data objects.
     Optionally include points with zero slip.
     """
-    import sys, gzip, numpy
+    import os, sys, gzip, numpy
     class obj: pass
 
     fh = filename
     if type( fh ) is not file:
         if fh.split('.')[-1] == 'gz':
-            fh = gzip.open( fh, 'r' )
+            fh = gzip.open( os.path.expanduser( fh ), 'r' )
         else:
-            fh = open( fh, 'r' )
+            fh = open( os.path.expanduser( fh ), 'r' )
 
     # Header block
     meta = obj()
@@ -134,7 +134,7 @@ def srf2potency( filename, projection, dx, path='' ):
 
     # Read SRF
     meta, data = srf_read( filename )
-    dir = os.path.join( path, 'src_' )
+    path = os.path.join( os.path.expanduser( path ), 'src_' )
     del( meta, data.slip )
 
     # Time history 
@@ -145,16 +145,16 @@ def srf2potency( filename, projection, dx, path='' ):
             nt = data.nt[j,i]
             data.sv[k:k+nt] = data.dt[j] * numpy.cumsum( data.sv[k:k+nt] )
             k = k + nt
-    f32( data.sv ).tofile( dir + 'history' )
+    f32( data.sv ).tofile( path + 'history' )
     del( data.sv )
 
     # Time
     ii = data.nt > 0
     n = ii.shape
     nsource = data.nt[ii].size
-    f32( data.nt )[ii].tofile( dir + 'nt' )
-    f32( data.dt ).repeat(3).reshape(n)[ii].tofile( dir + 'dt' )
-    f32( data.t0 ).repeat(3).reshape(n)[ii].tofile( dir + 't0' )
+    f32( data.nt )[ii].tofile( path + 'nt' )
+    f32( data.dt ).repeat(3).reshape(n)[ii].tofile( path + 'dt' )
+    f32( data.t0 ).repeat(3).reshape(n)[ii].tofile( path + 't0' )
     del( data.nt, data.dt, data.t0 )
 
     # Strike rotation
@@ -171,28 +171,28 @@ def srf2potency( filename, projection, dx, path='' ):
     x = x / dx[0] + 1.0
     y = y / dx[1] + 1.0
     z = data.dep / dx[2] + 1.0
-    f32( x ).repeat(3).reshape(n)[ii].tofile( dir + 'xi1' )
-    f32( y ).repeat(3).reshape(n)[ii].tofile( dir + 'xi2' )
-    f32( z ).repeat(3).reshape(n)[ii].tofile( dir + 'xi3' )
+    f32( x ).repeat(3).reshape(n)[ii].tofile( path + 'xi1' )
+    f32( y ).repeat(3).reshape(n)[ii].tofile( path + 'xi2' )
+    f32( z ).repeat(3).reshape(n)[ii].tofile( path + 'xi3' )
     del( x, y, z, data.lon, data.lat, data.dep )
 
     # Normal tensor components
     w = numpy.zeros( np )
-    w[:,2] = data.area * nrm[0] * nrm[0]; f32( w )[ii].tofile( dir + 'w11' )
-    w[:,2] = data.area * nrm[1] * nrm[1]; f32( w )[ii].tofile( dir + 'w22' )
-    w[:,2] = data.area * nrm[2] * nrm[2]; f32( w )[ii].tofile( dir + 'w33' )
+    w[:,2] = data.area * nrm[0] * nrm[0]; f32( w )[ii].tofile( path + 'w11' )
+    w[:,2] = data.area * nrm[1] * nrm[1]; f32( w )[ii].tofile( path + 'w22' )
+    w[:,2] = data.area * nrm[2] * nrm[2]; f32( w )[ii].tofile( path + 'w33' )
 
     # Shear tensor components
     w = numpy.zeros( np )
     w[:,0] = 0.5 * data.area * ( stk[1] * nrm[2] + nrm[1] * stk[2] )
     w[:,1] = 0.5 * data.area * ( dip[1] * nrm[2] + nrm[1] * dip[2] )
-    f32( w )[ii].tofile( dir + 'w23' )
+    f32( w )[ii].tofile( path + 'w23' )
     w[:,0] = 0.5 * data.area * ( stk[2] * nrm[0] + nrm[2] * stk[0] )
     w[:,1] = 0.5 * data.area * ( dip[2] * nrm[0] + nrm[2] * dip[0] )
-    f32( w )[ii].tofile( dir + 'w31' )
+    f32( w )[ii].tofile( path + 'w31' )
     w[:,0] = 0.5 * data.area * ( stk[0] * nrm[1] + nrm[0] * stk[1] )
     w[:,1] = 0.5 * data.area * ( dip[0] * nrm[1] + nrm[0] * dip[1] )
-    f32( w )[ii].tofile( dir + 'w12' )
+    f32( w )[ii].tofile( path + 'w12' )
     del( w, stk, dip, nrm, data.area )
 
     return nsource

@@ -17,7 +17,7 @@ end do
 end do
 end subroutine
 
-! Distance to x0
+! Squared distance to x0
 subroutine radius( r, x, x0, i1, i2 )
 real, intent(out) :: r(:,:,:)
 real, intent(in) :: x(:,:,:,:), x0(3)
