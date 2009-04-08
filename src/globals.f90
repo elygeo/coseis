@@ -2,7 +2,7 @@
 module m_globals
 implicit none
 
-! Input parameters, see defaults.py for documentation
+! Input parameters, see default-prm.py for documentation
 integer, dimension(3) :: np3, nn, bc1, bc2, n1expand, n2expand
 integer :: nt, itstats, itio, itcheck, itstop, npml, oplevel, fixhypo, mpin, &
   mpout, debug, faultopening, irup, faultnormal, src_n

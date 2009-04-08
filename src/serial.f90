@@ -2,7 +2,7 @@
 module m_collective
 use m_frio
 implicit none
-integer :: file_null = -1
+integer, parameter :: file_null = frio_file_null
 contains
 
 ! Initialize

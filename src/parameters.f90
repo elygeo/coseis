@@ -96,6 +96,7 @@ case default
   select case( key(1:1) )
   case( '=', '+' )
     call pappend
+    p%ib = -1
     read( str, *, iostat=io ) p%mode, p%tfunc, p%period, p%x1, p%x2, p%nb, &
       p%ii, p%field, p%filename, p%val
   case default; io = 1

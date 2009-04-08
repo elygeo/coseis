@@ -2,7 +2,7 @@
 module m_collective
 use mpi
 implicit none
-integer :: file_null = mpi_file_null
+integer, parameter :: file_null = mpi_file_null
 integer, private :: np3(3), root3d, root2d(3), comm3d, comm2d(3), comm1d(3)
 contains
 

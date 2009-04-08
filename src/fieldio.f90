@@ -1,5 +1,4 @@
 ! Field input and output
-! XXX TODO: fill, interpolation
 module m_fieldio
 implicit none
 type t_io
@@ -102,6 +101,7 @@ subroutine fieldio( passes, field, f )
 use m_globals
 use m_util
 use m_collective
+use m_frio
 character(*), intent(in) :: passes, field
 real, intent(inout) :: f(:,:,:)
 character(4) :: pass
@@ -222,10 +222,10 @@ case( '=r', '+r', '=R', '+R' )
       end if
     end do
   end if
-  if ( .not. associated( p%buff ) ) then
+  if ( p%ib < 0 ) then
     allocate( p%buff(n(1)*n(2)*n(3),p%nb) )
     p%ib = p%nb
-    p%fh = -1
+    p%fh = frio_file_null
     if ( mpin /= 0 ) p%fh = file_null
   end if
   if ( p%ib == p%nb ) then
@@ -297,10 +297,10 @@ case( '=r', '+r', '=R', '+R' )
     cycle loop
   end if
 case( '=w' )
-  if ( .not. associated( p%buff ) ) then
+  if ( p%ib < 0 ) then
     allocate( p%buff(n(1)*n(2)*n(3),p%nb) )
     p%ib = 0
-    p%fh = -1
+    p%fh = frio_file_null
     if ( mpout /= 0 ) p%fh = file_null
   end if
   if ( modulo( it, itstats ) /= 0 ) then
