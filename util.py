@@ -239,6 +239,19 @@ def transpose( fd_in, fd_out, shape, axes=None, order='F', hold=2, dtype=None ):
         v.reshape( s1 ).transpose( T ).tofile( fd_out )
     return
 
+def progress( i, n, t ):
+    """Print progress and time remaining."""
+    import sys
+    percent =  100. * i / n
+    remain = int( t * ( 100. / percent - 1. ) )
+    h = remain / 3600
+    m = remain / 60 % 60
+    s = remain % 60
+    sys.stdout.write( '\r%3d%%  %02d:%02d:%02d' % ( percent, h, m, s ) )
+    sys.stdout.flush()
+    if i == n: print
+    return
+
 def compile( compiler, object, source ):
     """An alternative to Make that uses state files"""
     import os, sys, glob, difflib
