@@ -14,53 +14,53 @@ if ( any( i1 > i2 ) ) return
 
 select case( iq )
 case( 1 )
-  do l = i1(3), i2(3)
-  do k = i1(2), i2(2)
-  do j = i1(1), i2(1)
-    df(j,k,l) = &
-      f(j,k,l,i) + f(j+1,k+1,l+1,i) &
-    + f(j,k+1,l+1,i) + f(j+1,k,l,i) &
-    - f(j+1,k,l+1,i) - f(j,k+1,l,i) &
-    - f(j+1,k+1,l,i) - f(j,k,l+1,i)
-  end do
-  end do
-  end do
+    do l = i1(3), i2(3)
+    do k = i1(2), i2(2)
+    do j = i1(1), i2(1)
+        df(j,k,l) = &
+          f(j,k,l,i) + f(j+1,k+1,l+1,i) &
+        + f(j,k+1,l+1,i) + f(j+1,k,l,i) &
+        - f(j+1,k,l+1,i) - f(j,k+1,l,i) &
+        - f(j+1,k+1,l,i) - f(j,k,l+1,i)
+    end do
+    end do
+    end do
 case( 2 )
-  do l = i1(3), i2(3)
-  do k = i1(2), i2(2)
-  do j = i1(1), i2(1)
-    df(j,k,l) = &
-      f(j,k,l,i) + f(j+1,k+1,l+1,i) &
-    - f(j,k+1,l+1,i) - f(j+1,k,l,i) &
-    + f(j+1,k,l+1,i) + f(j,k+1,l,i) &
-    - f(j+1,k+1,l,i) - f(j,k,l+1,i)
-  end do
-  end do
-  end do
+    do l = i1(3), i2(3)
+    do k = i1(2), i2(2)
+    do j = i1(1), i2(1)
+        df(j,k,l) = &
+          f(j,k,l,i) + f(j+1,k+1,l+1,i) &
+        - f(j,k+1,l+1,i) - f(j+1,k,l,i) &
+        + f(j+1,k,l+1,i) + f(j,k+1,l,i) &
+        - f(j+1,k+1,l,i) - f(j,k,l+1,i)
+    end do
+    end do
+    end do
 case( 3 )
-  do l = i1(3), i2(3)
-  do k = i1(2), i2(2)
-  do j = i1(1), i2(1)
-    df(j,k,l) = &
-      f(j,k,l,i) + f(j+1,k+1,l+1,i) &
-    - f(j,k+1,l+1,i) - f(j+1,k,l,i) &
-    - f(j+1,k,l+1,i) - f(j,k+1,l,i) &
-    + f(j+1,k+1,l,i) + f(j,k,l+1,i)
-  end do
-  end do
-  end do
+    do l = i1(3), i2(3)
+    do k = i1(2), i2(2)
+    do j = i1(1), i2(1)
+        df(j,k,l) = &
+          f(j,k,l,i) + f(j+1,k+1,l+1,i) &
+        - f(j,k+1,l+1,i) - f(j+1,k,l,i) &
+        - f(j+1,k,l+1,i) - f(j,k+1,l,i) &
+        + f(j+1,k+1,l,i) + f(j,k,l+1,i)
+    end do
+    end do
+    end do
 case( 4 )
-  do l = i1(3), i2(3)
-  do k = i1(2), i2(2)
-  do j = i1(1), i2(1)
-    df(j,k,l) = &
-      f(j,k,l,i) - f(j+1,k+1,l+1,i) &
-    + f(j,k+1,l+1,i) - f(j+1,k,l,i) &
-    + f(j+1,k,l+1,i) - f(j,k+1,l,i) &
-    + f(j+1,k+1,l,i) - f(j,k,l+1,i) 
-  end do
-  end do
-  end do
+    do l = i1(3), i2(3)
+    do k = i1(2), i2(2)
+    do j = i1(1), i2(1)
+        df(j,k,l) = &
+          f(j,k,l,i) - f(j+1,k+1,l+1,i) &
+        + f(j,k+1,l+1,i) - f(j+1,k,l,i) &
+        + f(j+1,k,l+1,i) - f(j,k+1,l,i) &
+        + f(j+1,k+1,l,i) - f(j,k,l+1,i) 
+    end do
+    end do
+    end do
 end select
 
 end subroutine
@@ -78,53 +78,53 @@ if ( any( i1 > i2 ) ) return
 
 select case( iq )
 case( 1 )
-  do l = i1(3), i2(3)
-  do k = i1(2), i2(2)
-  do j = i1(1), i2(1)
-    df(j,k,l) = &
-      f(j,k,l) + f(j-1,k-1,l-1) &
-    + f(j,k-1,l-1) + f(j-1,k,l) &
-    - f(j-1,k,l-1) - f(j,k-1,l) &
-    - f(j-1,k-1,l) - f(j,k,l-1)
-  end do
-  end do
-  end do
+    do l = i1(3), i2(3)
+    do k = i1(2), i2(2)
+    do j = i1(1), i2(1)
+        df(j,k,l) = &
+          f(j,k,l) + f(j-1,k-1,l-1) &
+        + f(j,k-1,l-1) + f(j-1,k,l) &
+        - f(j-1,k,l-1) - f(j,k-1,l) &
+        - f(j-1,k-1,l) - f(j,k,l-1)
+    end do
+    end do
+    end do
 case( 2 )
-  do l = i1(3), i2(3)
-  do k = i1(2), i2(2)
-  do j = i1(1), i2(1)
-    df(j,k,l) = &
-      f(j,k,l) + f(j-1,k-1,l-1) &
-    - f(j,k-1,l-1) - f(j-1,k,l) &
-    + f(j-1,k,l-1) + f(j,k-1,l) &
-    - f(j-1,k-1,l) - f(j,k,l-1)
-  end do
-  end do
-  end do
+    do l = i1(3), i2(3)
+    do k = i1(2), i2(2)
+    do j = i1(1), i2(1)
+        df(j,k,l) = &
+          f(j,k,l) + f(j-1,k-1,l-1) &
+        - f(j,k-1,l-1) - f(j-1,k,l) &
+        + f(j-1,k,l-1) + f(j,k-1,l) &
+        - f(j-1,k-1,l) - f(j,k,l-1)
+    end do
+    end do
+    end do
 case( 3 )
-  do l = i1(3), i2(3)
-  do k = i1(2), i2(2)
-  do j = i1(1), i2(1)
-    df(j,k,l) = &
-      f(j,k,l) + f(j-1,k-1,l-1) &
-    - f(j,k-1,l-1) - f(j-1,k,l) &
-    - f(j-1,k,l-1) - f(j,k-1,l) &
-    + f(j-1,k-1,l) + f(j,k,l-1)
-  end do
-  end do
-  end do
+    do l = i1(3), i2(3)
+    do k = i1(2), i2(2)
+    do j = i1(1), i2(1)
+        df(j,k,l) = &
+          f(j,k,l) + f(j-1,k-1,l-1) &
+        - f(j,k-1,l-1) - f(j-1,k,l) &
+        - f(j-1,k,l-1) - f(j,k-1,l) &
+        + f(j-1,k-1,l) + f(j,k,l-1)
+    end do
+    end do
+    end do
 case( 4 )
-  do l = i1(3), i2(3)
-  do k = i1(2), i2(2)
-  do j = i1(1), i2(1)
-    df(j,k,l) = &
-      f(j,k,l) - f(j-1,k-1,l-1) &
-    + f(j,k-1,l-1) - f(j-1,k,l) &
-    + f(j-1,k,l-1) - f(j,k-1,l) &
-    + f(j-1,k-1,l) - f(j,k,l-1)
-  end do
-  end do
-  end do
+    do l = i1(3), i2(3)
+    do k = i1(2), i2(2)
+    do j = i1(1), i2(1)
+        df(j,k,l) = &
+          f(j,k,l) - f(j-1,k-1,l-1) &
+        + f(j,k-1,l-1) - f(j-1,k,l) &
+        + f(j-1,k,l-1) - f(j,k-1,l) &
+        + f(j-1,k-1,l) - f(j,k,l-1)
+    end do
+    end do
+    end do
 end select
 
 end subroutine

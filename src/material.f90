@@ -43,9 +43,9 @@ if ( vs2  > 0.0 ) s2 = min( s2, vs2 )
 
 ! Velocity dependent viscosity
 if ( vdamp > 0.0 ) then
-  gam = s2
-  call invert( gam )
-  gam = gam * vdamp
+    gam = s2
+    call invert( gam )
+    gam = gam * vdamp
 end if
 
 ! Limits
@@ -105,22 +105,22 @@ gam2 =  gstats(8)
 
 ! Stats
 if ( master ) then
-  courant = dt * vp2 * 3.0 / sqrt( sum( dx * dx ) )
-  open( 1, file='stats/material.py', status='replace' )
-  write( 1, "( 'courant = ',g15.7 )" ) courant
-  write( 1, "( 'rho_    = ',g15.7 )" ) rho_
-  write( 1, "( 'rho1    = ',g15.7 )" ) rho1
-  write( 1, "( 'rho2    = ',g15.7 )" ) rho2
-  write( 1, "( 'vp_     = ',g15.7 )" ) vp_
-  write( 1, "( 'vp1     = ',g15.7 )" ) vp1
-  write( 1, "( 'vp2     = ',g15.7 )" ) vp2
-  write( 1, "( 'vs_     = ',g15.7 )" ) vs_
-  write( 1, "( 'vs1     = ',g15.7 )" ) vs1
-  write( 1, "( 'vs2     = ',g15.7 )" ) vs2
-  write( 1, "( 'gam_    = ',g15.7 )" ) gam_
-  write( 1, "( 'gam1    = ',g15.7 )" ) gam1
-  write( 1, "( 'gam2    = ',g15.7 )" ) gam2
-  close( 1 )
+    courant = dt * vp2 * 3.0 / sqrt( sum( dx * dx ) )
+    open( 1, file='stats/material.py', status='replace' )
+    write( 1, "( 'courant = ',g15.7 )" ) courant
+    write( 1, "( 'rho_    = ',g15.7 )" ) rho_
+    write( 1, "( 'rho1    = ',g15.7 )" ) rho1
+    write( 1, "( 'rho2    = ',g15.7 )" ) rho2
+    write( 1, "( 'vp_     = ',g15.7 )" ) vp_
+    write( 1, "( 'vp1     = ',g15.7 )" ) vp1
+    write( 1, "( 'vp2     = ',g15.7 )" ) vp2
+    write( 1, "( 'vs_     = ',g15.7 )" ) vs_
+    write( 1, "( 'vs1     = ',g15.7 )" ) vs1
+    write( 1, "( 'vs2     = ',g15.7 )" ) vs2
+    write( 1, "( 'gam_    = ',g15.7 )" ) gam_
+    write( 1, "( 'gam1    = ',g15.7 )" ) gam1
+    write( 1, "( 'gam2    = ',g15.7 )" ) gam2
+    close( 1 )
 end if
 
 ! Lame' parameters
@@ -162,12 +162,12 @@ pmlp = 2.0
 hmean = 2.0 * vs1 * vs2 / ( vs1 + vs2 )
 damp = tune * hmean / sqrt( sum( dx * dx ) / 3.0 ) * ( c1 + ( c2 + c3 * npml ) * npml ) / npml ** pmlp
 do i = 1, npml
-  dampn = damp *   i ** pmlp
-  dampc = damp * ( i ** pmlp + ( i - 1 ) ** pmlp ) * 0.5
-  dn1(npml-i+1) = - 2.0 * dampn        / ( 2.0 + dt * dampn )
-  dc1(npml-i+1) = ( 2.0 - dt * dampc ) / ( 2.0 + dt * dampc )
-  dn2(npml-i+1) =   2.0                / ( 2.0 + dt * dampn )
-  dc2(npml-i+1) =   2.0 * dt           / ( 2.0 + dt * dampc )
+    dampn = damp *   i ** pmlp
+    dampc = damp * ( i ** pmlp + ( i - 1 ) ** pmlp ) * 0.5
+    dn1(npml-i+1) = - 2.0 * dampn        / ( 2.0 + dt * dampn )
+    dc1(npml-i+1) = ( 2.0 - dt * dampc ) / ( 2.0 + dt * dampc )
+    dn2(npml-i+1) =   2.0                / ( 2.0 + dt * dampn )
+    dc2(npml-i+1) =   2.0 * dt           / ( 2.0 + dt * dampc )
 end do
 
 end subroutine

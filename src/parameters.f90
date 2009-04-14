@@ -30,9 +30,9 @@ str = line
 i = scan( str, '#' )
 if ( i > 0 ) str(i:) = ' '
 do
-  i = scan( str, "()[]{}'," )
-  if ( i == 0 ) exit
-  str(i:i) = ' '
+    i = scan( str, "()[]{}'," )
+    if ( i == 0 ) exit
+    str(i:i) = ' '
 end do
 
 ! Read key val pair
@@ -93,20 +93,20 @@ case( 'debug' );        read( str, *, iostat=io ) key, op, debug
 case( 'mpin' );         read( str, *, iostat=io ) key, op, mpin
 case( 'mpout' );        read( str, *, iostat=io ) key, op, mpout
 case default
-  select case( key(1:1) )
-  case( '=', '+' )
-    call pappend
-    p%ib = -1
-    read( str, *, iostat=io ) p%mode, p%tfunc, p%period, p%x1, p%x2, p%nb, &
-      p%ii, p%field, p%filename, p%val
-  case default; io = 1
-  end select
+    select case( key(1:1) )
+    case( '=', '+' )
+        call pappend
+        p%ib = -1
+        read( str, *, iostat=io ) p%mode, p%tfunc, p%period, p%x1, p%x2, p%nb, &
+            p%ii, p%field, p%filename, p%val
+    case default; io = 1
+    end select
 end select
 
 ! Error check
 if ( io /= 0 ) then
-  if ( master ) write( 0, * ) 'bad input: ', trim( line )
-  stop
+    if ( master ) write( 0, * ) 'bad input: ', trim( line )
+    stop
 end if
 
 end do doline

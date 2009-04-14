@@ -36,10 +36,10 @@ logical :: period(3) = .false.
 np3 = np3in
 call mpi_cart_create( mpi_comm_world, 3, np3, period, .true., comm3d, e )
 if ( comm3d == mpi_comm_null ) then
-  call mpi_comm_rank( mpi_comm_world, ip, e  )
-  write( 0, * ) 'Unused process:', ip
-  call mpi_finalize( e )
-  stop
+    call mpi_comm_rank( mpi_comm_world, ip, e  )
+    write( 0, * ) 'Unused process:', ip
+    call mpi_finalize( e )
+    stop
 end if
 call mpi_comm_rank( comm3d, ip, e  )
 call mpi_cart_coords( comm3d, ip, 3, ip3, e )
@@ -58,18 +58,18 @@ comm1d = mpi_comm_self
 comm2d = mpi_comm_self
 do i = 1, 3
 if ( np3(i) > 1 ) then
-  hat = .false.
-  hat(i) = .true.
-  call mpi_cart_sub( comm3d, hat, comm1d(i), e )
+    hat = .false.
+    hat(i) = .true.
+    call mpi_cart_sub( comm3d, hat, comm1d(i), e )
 end if
 end do
 do i = 1, 3
 if ( product( (/ np3(:i-1), np3(i+1:) /) ) > 1 ) then
-  hat = .true.
-  hat(i) = .false.
-  call mpi_cart_sub( comm3d, hat, comm2d(i), e )
-  ip2root = (/ ip3root(:i-1), ip3root(i+1:) /)
-  call mpi_cart_rank( comm2d(i), ip2root, root2d(i), e )
+    hat = .true.
+    hat(i) = .false.
+    call mpi_cart_sub( comm3d, hat, comm2d(i), e )
+    ip2root = (/ ip3root(:i-1), ip3root(i+1:) /)
+    call mpi_cart_rank( comm2d(i), ip2root, root2d(i), e )
 end if
 end do
 end subroutine
@@ -106,13 +106,13 @@ end select
 comm = comm3d
 root = root3d
 if ( i2d /= 0 ) then
-  comm = comm2d(i2d)
-  root = root2d(i2d)
+    comm = comm2d(i2d)
+    root = root2d(i2d)
 end if
 if ( op(1:3) == 'all' ) then
-  call mpi_allreduce( i, ii, 1, mpi_integer, iop, comm, e )
+    call mpi_allreduce( i, ii, 1, mpi_integer, iop, comm, e )
 else
-  call mpi_reduce( i, ii, 1, mpi_integer, iop, root, comm, e )
+    call mpi_reduce( i, ii, 1, mpi_integer, iop, root, comm, e )
 end if
 end subroutine
 
@@ -133,13 +133,13 @@ end select
 comm = comm3d
 root = root3d
 if ( i2d /= 0 ) then
-  comm = comm2d(i2d)
-  root = root2d(i2d)
+    comm = comm2d(i2d)
+    root = root2d(i2d)
 end if
 if ( op(1:3) == 'all' ) then
-  call mpi_allreduce( r, rr, 1, mpi_real, iop, comm, e )
+    call mpi_allreduce( r, rr, 1, mpi_real, iop, comm, e )
 else
-  call mpi_reduce( r, rr, 1, mpi_real, iop, root, comm, e )
+    call mpi_reduce( r, rr, 1, mpi_real, iop, root, comm, e )
 end if
 end subroutine
 
@@ -160,14 +160,14 @@ end select
 comm = comm3d
 root = root3d
 if ( i2d /= 0 ) then
-  comm = comm2d(i2d)
-  root = root2d(i2d)
+    comm = comm2d(i2d)
+    root = root2d(i2d)
 end if
 i = size(r)
 if ( op(1:3) == 'all' ) then
-  call mpi_allreduce( r(1), rr(1), i, mpi_real, iop, comm, e )
+    call mpi_allreduce( r(1), rr(1), i, mpi_real, iop, comm, e )
 else
-  call mpi_reduce( r(1), rr(1), i, mpi_real, iop, root, comm, e )
+    call mpi_reduce( r(1), rr(1), i, mpi_real, iop, root, comm, e )
 end if
 end subroutine
 
@@ -188,14 +188,14 @@ end select
 comm = comm3d
 root = root3d
 if ( i2d /= 0 ) then
-  comm = comm2d(i2d)
-  root = root2d(i2d)
+    comm = comm2d(i2d)
+    root = root2d(i2d)
 end if
 i = size(r)
 if ( op(1:3) == 'all' ) then
-  call mpi_allreduce( r(1,1), rr(1,1), i, mpi_real, iop, comm, e )
+    call mpi_allreduce( r(1,1), rr(1,1), i, mpi_real, iop, comm, e )
 else
-  call mpi_reduce( r(1,1), rr(1,1), i, mpi_real, iop, root, comm, e )
+    call mpi_reduce( r(1,1), rr(1,1), i, mpi_real, iop, root, comm, e )
 end if
 end subroutine
 
@@ -218,8 +218,8 @@ end select
 comm = comm3d
 root = root3d
 if ( i2d /= 0 ) then
-  comm = comm2d(i2d)
-  root = root2d(i2d)
+    comm = comm2d(i2d)
+    root = root2d(i2d)
 end if
 rr = r(ii(1),ii(2),ii(3))
 ii = ii - 1 + noff
@@ -227,9 +227,9 @@ i = ii(1) + n(1) * ( ii(2) + n(2) * ii(3) )
 local(1) = rr
 local(2) = i
 if ( op(1:3) == 'all' ) then
-  call mpi_allreduce( local, global, 1, mpi_2double_precision, iop, comm, e )
+    call mpi_allreduce( local, global, 1, mpi_2double_precision, iop, comm, e )
 else
-  call mpi_reduce( local, global, 1, mpi_2double_precision, iop, root, comm, e )
+    call mpi_reduce( local, global, 1, mpi_2double_precision, iop, root, comm, e )
 end if
 rr = global(1)
 i = global(2)
@@ -249,29 +249,29 @@ integer :: i, e, prev, next, nm(3), n(3), isend(3), irecv(3), tsend, trecv, comm
 nm = (/ size(f,1), size(f,2), size(f,3) /)
 do i = 1, 3
 if ( np3(i) > 1 .and. nm(i) > 1 ) then
-  comm = comm3d
-  call mpi_cart_shift( comm, i-1, 1, prev, next, e )
-  n = nm
-  n(i) = nh(i)
-  isend = 0
-  irecv = 0
-  isend(i) = nm(i) - 2 * nh(i)
-  call mpi_type_create_subarray( 3, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
-  call mpi_type_create_subarray( 3, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
-  call mpi_type_commit( tsend, e )
-  call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f(1,1,1), 1, tsend, next, 0, f(1,1,1), 1, trecv, prev, 0, comm, mpi_status_ignore, e )
-  call mpi_type_free( tsend, e )
-  call mpi_type_free( trecv, e )
-  isend(i) = nh(i)
-  irecv(i) = nm(i) - nh(i)
-  call mpi_type_create_subarray( 3, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
-  call mpi_type_create_subarray( 3, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
-  call mpi_type_commit( tsend, e )
-  call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f(1,1,1), 1, tsend, prev, 1, f(1,1,1), 1, trecv, next, 1, comm, mpi_status_ignore, e )
-  call mpi_type_free( tsend, e )
-  call mpi_type_free( trecv, e )
+    comm = comm3d
+    call mpi_cart_shift( comm, i-1, 1, prev, next, e )
+    n = nm
+    n(i) = nh(i)
+    isend = 0
+    irecv = 0
+    isend(i) = nm(i) - 2 * nh(i)
+    call mpi_type_create_subarray( 3, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
+    call mpi_type_create_subarray( 3, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
+    call mpi_type_commit( tsend, e )
+    call mpi_type_commit( trecv, e )
+    call mpi_sendrecv( f(1,1,1), 1, tsend, next, 0, f(1,1,1), 1, trecv, prev, 0, comm, mpi_status_ignore, e )
+    call mpi_type_free( tsend, e )
+    call mpi_type_free( trecv, e )
+    isend(i) = nh(i)
+    irecv(i) = nm(i) - nh(i)
+    call mpi_type_create_subarray( 3, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
+    call mpi_type_create_subarray( 3, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
+    call mpi_type_commit( tsend, e )
+    call mpi_type_commit( trecv, e )
+    call mpi_sendrecv( f(1,1,1), 1, tsend, prev, 1, f(1,1,1), 1, trecv, next, 1, comm, mpi_status_ignore, e )
+    call mpi_type_free( tsend, e )
+    call mpi_type_free( trecv, e )
 end if
 end do
 end subroutine
@@ -285,29 +285,29 @@ integer :: i, e, prev, next, nm(4), n(4), isend(4), irecv(4), tsend, trecv, comm
 nm = (/ size(f,1), size(f,2), size(f,3), size(f,4) /)
 do i = 1, 3
 if ( np3(i) > 1 .and. nm(i) > 1 ) then
-  comm = comm3d
-  call mpi_cart_shift( comm, i-1, 1, prev, next, e )
-  n = nm
-  n(i) = nh(i)
-  isend = 0
-  irecv = 0
-  isend(i) = nm(i) - 2 * nh(i)
-  call mpi_type_create_subarray( 4, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
-  call mpi_type_create_subarray( 4, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
-  call mpi_type_commit( tsend, e )
-  call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f(1,1,1,1), 1, tsend, next, 0, f(1,1,1,1), 1, trecv, prev, 0, comm, mpi_status_ignore, e )
-  call mpi_type_free( tsend, e )
-  call mpi_type_free( trecv, e )
-  isend(i) = nh(i)
-  irecv(i) = nm(i) - nh(i)
-  call mpi_type_create_subarray( 4, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
-  call mpi_type_create_subarray( 4, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
-  call mpi_type_commit( tsend, e )
-  call mpi_type_commit( trecv, e )
-  call mpi_sendrecv( f(1,1,1,1), 1, tsend, prev, 1, f(1,1,1,1), 1, trecv, next, 1, comm, mpi_status_ignore, e )
-  call mpi_type_free( tsend, e )
-  call mpi_type_free( trecv, e )
+    comm = comm3d
+    call mpi_cart_shift( comm, i-1, 1, prev, next, e )
+    n = nm
+    n(i) = nh(i)
+    isend = 0
+    irecv = 0
+    isend(i) = nm(i) - 2 * nh(i)
+    call mpi_type_create_subarray( 4, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
+    call mpi_type_create_subarray( 4, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
+    call mpi_type_commit( tsend, e )
+    call mpi_type_commit( trecv, e )
+    call mpi_sendrecv( f(1,1,1,1), 1, tsend, next, 0, f(1,1,1,1), 1, trecv, prev, 0, comm, mpi_status_ignore, e )
+    call mpi_type_free( tsend, e )
+    call mpi_type_free( trecv, e )
+    isend(i) = nh(i)
+    irecv(i) = nm(i) - nh(i)
+    call mpi_type_create_subarray( 4, nm, n, isend, mpi_order_fortran, mpi_real, tsend, e )
+    call mpi_type_create_subarray( 4, nm, n, irecv, mpi_order_fortran, mpi_real, trecv, e )
+    call mpi_type_commit( tsend, e )
+    call mpi_type_commit( trecv, e )
+    call mpi_sendrecv( f(1,1,1,1), 1, tsend, prev, 1, f(1,1,1,1), 1, trecv, next, 1, comm, mpi_status_ignore, e )
+    call mpi_type_free( tsend, e )
+    call mpi_type_free( trecv, e )
 end if
 end do
 end subroutine
@@ -327,34 +327,34 @@ integer :: i, e
 integer(kind=mpi_offset_kind) :: offset
 i = size( oo )
 if ( mpio == 0 ) then
-  if ( any( nn <= 0 ) ) return
-  call frio2( fh, f, mode, filename, mm(i), oo(i), verb )
-  return
+    if ( any( nn <= 0 ) ) return
+    call frio2( fh, f, mode, filename, mm(i), oo(i), verb )
+    return
 end if
 if ( fh == mpi_file_null ) then
-  call mpopen( fh, mode, filename, mm, nn, oo, verb )
-  if ( any( nn <= 0 ) ) return
+    call mpopen( fh, mode, filename, mm, nn, oo, verb )
+    if ( any( nn <= 0 ) ) return
 end if
 offset = oo(i)
 offset = offset * size( f, 1 )
 i = size( f )
 if ( mode == 'r' ) then
-  if ( mpio > 0 ) then
-    call mpi_file_read_at_all( fh, offset, f(1,1), i, mpi_real, mpi_status_ignore, e )
-  else
-    call mpi_file_read_at( fh, offset, f(1,1), i, mpi_real, mpi_status_ignore, e )
-  end if
+    if ( mpio > 0 ) then
+        call mpi_file_read_at_all( fh, offset, f(1,1), i, mpi_real, mpi_status_ignore, e )
+    else
+        call mpi_file_read_at( fh, offset, f(1,1), i, mpi_real, mpi_status_ignore, e )
+    end if
 else
-  if ( mpio > 0 ) then
-    call mpi_file_write_at_all( fh, offset, f(1,1), i, mpi_real, mpi_status_ignore, e )
-  else
-    call mpi_file_write_at( fh, offset, f(1,1), i, mpi_real, mpi_status_ignore, e )
-  end if
+    if ( mpio > 0 ) then
+        call mpi_file_write_at_all( fh, offset, f(1,1), i, mpi_real, mpi_status_ignore, e )
+    else
+        call mpi_file_write_at( fh, offset, f(1,1), i, mpi_real, mpi_status_ignore, e )
+    end if
 end if
 i = size( oo )
 if ( oo(i) + nn(i) == mm(i) ) then
-  call mpi_file_close( fh, e )
-  fh = mpi_file_null
+    call mpi_file_close( fh, e )
+    fh = mpi_file_null
 end if
 end subroutine
 
@@ -390,25 +390,25 @@ integer(kind=mpi_offset_kind) :: offset = 0
 n = size( mm )
 ndims = count( mm(1:n-1) > 1 )
 do i = 1, n-1
-  select case( ndims )
-  case( 0 ); comm0 = mpi_comm_self
-  case( 1 ); if ( mm(i) /= 1 ) comm0 = comm1d(i)
-  case( 2 ); if ( mm(i) == 1 ) comm0 = comm2d(i)
-  case( 3 ); comm0 = comm3d
-  end select
+    select case( ndims )
+    case( 0 ); comm0 = mpi_comm_self
+    case( 1 ); if ( mm(i) /= 1 ) comm0 = comm1d(i)
+    case( 2 ); if ( mm(i) == 1 ) comm0 = comm2d(i)
+    case( 3 ); comm0 = comm3d
+    end select
 end do
 if ( any( nn < 1 ) ) then
-  call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
-  fh = mpi_file_null
-  return
+    call mpi_comm_split( comm0, mpi_undefined, 0, comm, e )
+    fh = mpi_file_null
+    return
 end if
 call mpi_comm_split( comm0, 1, 0, comm, e )
 if ( mode == 'r' ) then
-  i = mpi_mode_rdonly
+    i = mpi_mode_rdonly
 elseif ( oo(n) == 0 ) then
-  i = mpi_mode_wronly + mpi_mode_create + mpi_mode_excl
+    i = mpi_mode_wronly + mpi_mode_create + mpi_mode_excl
 else
-  i = mpi_mode_wronly
+    i = mpi_mode_wronly
 end if
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
 call mpi_file_open( comm, filename, i, mpi_info_null, fh, e )
@@ -416,14 +416,14 @@ call mpi_comm_size( comm, n, e  )
 call mpi_comm_rank( comm, i, e  )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
 if ( verb .and. i == 0 ) write( 0, '(i8,a,i2,a,i8,2a)' ) &
-  ip, ' Opened', ndims, 'D', n, 'P file: ', trim( filename )
+    ip, ' Opened', ndims, 'D', n, 'P file: ', trim( filename )
 ftype = mpi_real
 if ( ndims > 0 ) then
-  mmm = pack( mm, mm > 1, mm )
-  nnn = pack( nn, mm > 1, nn )
-  ooo = pack( oo, mm > 1, oo )
-  call mpi_type_create_subarray( ndims, mmm, nnn, ooo, mpi_order_fortran, mpi_real, ftype, e )
-  call mpi_type_commit( ftype, e )
+    mmm = pack( mm, mm > 1, mm )
+    nnn = pack( nn, mm > 1, nn )
+    ooo = pack( oo, mm > 1, oo )
+    call mpi_type_create_subarray( ndims, mmm, nnn, ooo, mpi_order_fortran, mpi_real, ftype, e )
+    call mpi_type_commit( ftype, e )
 end if
 call mpi_file_set_view( fh, offset, mpi_real, ftype, 'native', mpi_info_null, e )
 end subroutine

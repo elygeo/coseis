@@ -64,20 +64,20 @@ call write_checkpoint           ; if (sync) call barrier ; prof(6,jp) = timer(5)
 prof(7,jp) = iotimer
 prof(8,jp) = timer(6)
 if ( it == nt .or. modulo( it, itio ) == 0 ) then
-  if ( master ) then
-    call rio1( fh(1), prof(1,:jp), 'w', 'prof/1time',   nt, it-jp, mpout, verb )
-    call rio1( fh(2), prof(2,:jp), 'w', 'prof/2stress', nt, it-jp, mpout, verb )
-    call rio1( fh(3), prof(3,:jp), 'w', 'prof/3accel',  nt, it-jp, mpout, verb )
-    call rio1( fh(4), prof(4,:jp), 'w', 'prof/4swap',   nt, it-jp, mpout, verb )
-    call rio1( fh(5), prof(5,:jp), 'w', 'prof/5stats',  nt, it-jp, mpout, verb )
-    call rio1( fh(6), prof(6,:jp), 'w', 'prof/6ckpt',   nt, it-jp, mpout, verb )
-    call rio1( fh(7), prof(7,:jp), 'w', 'prof/7io',     nt, it-jp, mpout, verb )
-    call rio1( fh(8), prof(8,:jp), 'w', 'prof/8step',   nt, it-jp, mpout, verb )
-    open( 1, file='currentstep', status='replace' )
-    write( 1, * ) it
-    close( 1 )
-  end if
-  jp = 0
+    if ( master ) then
+        call rio1( fh(1), prof(1,:jp), 'w', 'prof/1time',   nt, it-jp, mpout, verb )
+        call rio1( fh(2), prof(2,:jp), 'w', 'prof/2stress', nt, it-jp, mpout, verb )
+        call rio1( fh(3), prof(3,:jp), 'w', 'prof/3accel',  nt, it-jp, mpout, verb )
+        call rio1( fh(4), prof(4,:jp), 'w', 'prof/4swap',   nt, it-jp, mpout, verb )
+        call rio1( fh(5), prof(5,:jp), 'w', 'prof/5stats',  nt, it-jp, mpout, verb )
+        call rio1( fh(6), prof(6,:jp), 'w', 'prof/6ckpt',   nt, it-jp, mpout, verb )
+        call rio1( fh(7), prof(7,:jp), 'w', 'prof/7io',     nt, it-jp, mpout, verb )
+        call rio1( fh(8), prof(8,:jp), 'w', 'prof/8step',   nt, it-jp, mpout, verb )
+        open( 1, file='currentstep', status='replace' )
+        write( 1, * ) it
+        close( 1 )
+    end if
+    jp = 0
 end if
 if ( master .and. it == itstop ) stop
 end do loop
@@ -87,8 +87,8 @@ if ( sync ) call barrier
 prof0(1) = timer(7)
 prof0(2) = timer(8)
 if ( master ) then
-  call rio1( fh(9), prof0(:2), 'w', 'prof/main', 16, 14, mpout, verb )
-  write( 0, * ) 'Finished!'
+    call rio1( fh(9), prof0(:2), 'w', 'prof/main', 16, 14, mpout, verb )
+    write( 0, * ) 'Finished!'
 end if
 call finalize
 

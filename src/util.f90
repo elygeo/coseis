@@ -11,7 +11,7 @@ n = (/ size(f,1), size(f,2), size(f,3) /)
 do l = 1, n(3)
 do k = 1, n(2)
 do j = 1, n(1)
-  if ( f(j,k,l) /= 0.0 ) f(j,k,l) = 1.0 / f(j,k,l)
+    if ( f(j,k,l) /= 0.0 ) f(j,k,l) = 1.0 / f(j,k,l)
 end do
 end do
 end do
@@ -28,10 +28,10 @@ if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in radius'
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
-  r(j,k,l) = &
-  ( x(j,k,l,1) - x0(1) ) * ( x(j,k,l,1) - x0(1) ) + &
-  ( x(j,k,l,2) - x0(2) ) * ( x(j,k,l,2) - x0(2) ) + &
-  ( x(j,k,l,3) - x0(3) ) * ( x(j,k,l,3) - x0(3) )
+    r(j,k,l) = &
+    ( x(j,k,l,1) - x0(1) ) * ( x(j,k,l,1) - x0(1) ) + &
+    ( x(j,k,l,2) - x0(2) ) * ( x(j,k,l,2) - x0(2) ) + &
+    ( x(j,k,l,3) - x0(3) ) * ( x(j,k,l,3) - x0(3) )
 end do
 end do
 end do
@@ -48,11 +48,11 @@ if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in average'
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
-  f2(j,k,l) = 0.125 * &
-  ( f1(j,k,l) + f1(j+d,k+d,l+d) &
-  + f1(j,k+d,l+d) + f1(j+d,k,l) &
-  + f1(j+d,k,l+d) + f1(j,k+d,l) &
-  + f1(j+d,k+d,l) + f1(j,k,l+d) )
+    f2(j,k,l) = 0.125 * &
+    ( f1(j,k,l) + f1(j+d,k+d,l+d) &
+    + f1(j,k+d,l+d) + f1(j+d,k,l) &
+    + f1(j+d,k,l+d) + f1(j,k+d,l) &
+    + f1(j+d,k+d,l) + f1(j,k,l+d) )
 end do
 end do
 end do
@@ -87,10 +87,10 @@ if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in vector_norm'
 do l = i1(3), i2(3), di(3)
 do k = i1(2), i2(2), di(2)
 do j = i1(1), i2(1), di(1)
-  f(j,k,l) = &
-  w(j,k,l,1) * w(j,k,l,1) + &
-  w(j,k,l,2) * w(j,k,l,2) + &
-  w(j,k,l,3) * w(j,k,l,3)
+    f(j,k,l) = &
+    w(j,k,l,1) * w(j,k,l,1) + &
+    w(j,k,l,2) * w(j,k,l,2) + &
+    w(j,k,l,3) * w(j,k,l,3)
 end do
 end do
 end do
@@ -107,13 +107,13 @@ if ( any( i1 < 1 .or. i2 > n ) ) stop 'error in tensor_norm'
 do l = i1(3), i2(3), di(3)
 do k = i1(2), i2(2), di(2)
 do j = i1(1), i2(1), di(1)
-  f(j,k,l) = &
-  w1(j,k,l,1) * w1(j,k,l,1) + &
-  w1(j,k,l,2) * w1(j,k,l,2) + &
-  w1(j,k,l,3) * w1(j,k,l,3) + &
-  ( w2(j,k,l,1) * w2(j,k,l,1) &
-  + w2(j,k,l,2) * w2(j,k,l,2) &
-  + w2(j,k,l,3) * w2(j,k,l,3) ) * 2.
+    f(j,k,l) = &
+    w1(j,k,l,1) * w1(j,k,l,1) + &
+    w1(j,k,l,2) * w1(j,k,l,2) + &
+    w1(j,k,l,3) * w1(j,k,l,3) + &
+    ( w2(j,k,l,1) * w2(j,k,l,1) &
+    + w2(j,k,l,2) * w2(j,k,l,2) &
+    + w2(j,k,l,3) * w2(j,k,l,3) ) * 2.
 end do
 end do
 end do
@@ -132,39 +132,39 @@ where( i1 < 1 ) i1 = i1 + ( -i1 / di + 1 ) * di
 where( i2 > n ) i2 = i1 + ( n - i1 ) / di * di
 d = di(1)
 do i = 1, d - 1
-  h1 = 1.0 / d * i
-  h2 = 1.0 / d * ( d - i )
-  do l = i1(3), i2(3), di(3)
-  do k = i1(2), i2(2), di(2)
-  do j = i1(1), i2(1) - d, d
-    f(j+i,k,l) = h1 * f(j,k,l) + h2 * f(j+d,k,l)
-  end do
-  end do
-  end do
+    h1 = 1.0 / d * i
+    h2 = 1.0 / d * ( d - i )
+    do l = i1(3), i2(3), di(3)
+    do k = i1(2), i2(2), di(2)
+    do j = i1(1), i2(1) - d, d
+        f(j+i,k,l) = h1 * f(j,k,l) + h2 * f(j+d,k,l)
+    end do
+    end do
+    end do
 end do
 d = di(2)
 do i = 1, d - 1
-  h1 = 1.0 / d * i
-  h2 = 1.0 / d * ( d - i )
-  do l = i1(3), i2(3), di(1)
-  do k = i1(2), i2(2) - d, d
-  do j = i1(1), i2(1)
-    f(j,k+i,l) = h1 * f(j,k,l) + h2 * f(j,k+d,l)
-  end do
-  end do
-  end do
+    h1 = 1.0 / d * i
+    h2 = 1.0 / d * ( d - i )
+    do l = i1(3), i2(3), di(1)
+    do k = i1(2), i2(2) - d, d
+    do j = i1(1), i2(1)
+        f(j,k+i,l) = h1 * f(j,k,l) + h2 * f(j,k+d,l)
+    end do
+    end do
+    end do
 end do
 d = di(3)
 do i = 1, d - 1
-  h1 = 1.0 / d * i
-  h2 = 1.0 / d * ( d - i )
-  do l = i1(3), i2(3) - d, d
-  do k = i1(2), i2(2)
-  do j = i1(1), i2(1)
-    f(j,k,l+i) = h1 * f(j,k,l) + h2 * f(j,k,l+d)
-  end do
-  end do
-  end do
+    h1 = 1.0 / d * i
+    h2 = 1.0 / d * ( d - i )
+    do l = i1(3), i2(3) - d, d
+    do k = i1(2), i2(2)
+    do j = i1(1), i2(1)
+        f(j,k,l+i) = h1 * f(j,k,l) + h2 * f(j,k,l+d)
+    end do
+    end do
+    end do
 end do
 end subroutine
 
@@ -177,27 +177,27 @@ real :: t
 time_function = 0.0
 select case( tfunc )
 case( 'const'  )
-  time_function = 1.0
+    time_function = 1.0
 case( 'delta'  )
-  if ( abs( tm ) < 0.25 * dt ) time_function = 1.0
+    if ( abs( tm ) < 0.25 * dt ) time_function = 1.0
 case( 'brune' )
-  time_function = -exp( -tm / period ) / period * ( tm + period ) + 1.0
+    time_function = -exp( -tm / period ) / period * ( tm + period ) + 1.0
 case( 'dbrune' )
-  time_function =  exp( -tm / period ) / period ** 2.0 * tm
+    time_function =  exp( -tm / period ) / period ** 2.0 * tm
 case( 'ddbrune' )
-  time_function = -exp( -tm / period ) / period ** 3.0 * ( tm - period ) 
+    time_function = -exp( -tm / period ) / period ** 3.0 * ( tm - period ) 
 case( 'gaussian' )
-  t = ( tm - 4.0 * period ) / period
-  time_function = exp( -0.5 * t * t ) / ( period * sqrt( 2.0 * pi ) )
+    t = ( tm - 4.0 * period ) / period
+    time_function = exp( -0.5 * t * t ) / ( period * sqrt( 2.0 * pi ) )
 case( 'dgaussian', 'ricker1' )
-  t = tm - period
-  time_function = t * exp( -2.0 * ( pi * t / period ) ** 2.0 )
+    t = tm - period
+    time_function = t * exp( -2.0 * ( pi * t / period ) ** 2.0 )
 case( 'ddgaussian', 'ricker2' )
-  t = ( pi * ( tm - period ) / period ) ** 2.0
-  time_function = ( 1.0 - 2.0 * t ) * exp( -t )
+    t = ( pi * ( tm - period ) / period ) ** 2.0
+    time_function = ( 1.0 - 2.0 * t ) * exp( -t )
 case default
-  write( 0, * ) 'invalid time func: ', trim( tfunc )
-  stop
+    write( 0, * ) 'invalid time func: ', trim( tfunc )
+    stop
 end select
 end function
 
@@ -208,16 +208,16 @@ integer, save :: clock0, clockrate, clockmax
 integer(8), save :: timers(8)
 integer :: clock1
 if ( i == 0 ) then
-  call system_clock( clock0, clockrate, clockmax )
-  timer = 0
-  timers = 0
+    call system_clock( clock0, clockrate, clockmax )
+    timer = 0
+    timers = 0
 else
-  call system_clock( clock1 )
-  timers = timers + clock1 - clock0
-  if ( clock0 > clock1 ) timers = timers + clockmax
-  clock0 = clock1
-  timer = real( timers(i) ) / real( clockrate )
-  timers(:i) = 0
+    call system_clock( clock1 )
+    timers = timers + clock1 - clock0
+    if ( clock0 > clock1 ) timers = timers + clockmax
+    clock0 = clock1
+    timer = real( timers(i) ) / real( clockrate )
+    timers(:i) = 0
 end if
 end function
 

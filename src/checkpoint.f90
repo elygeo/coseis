@@ -15,10 +15,10 @@ r = timer( 2 )
 write( str, '(a,i6.6)' ) 'checkpoint/it', ipid
 open( 1, file=str, status='old', iostat=i )
 if ( i == 0 ) then
-  read( 1, * ) it, itcheck0
-  close( 1 )
+    read( 1, * ) it, itcheck0
+    close( 1 )
 else
-  it = 0
+    it = 0
 end if
 call ireduce( i, it, 'allmin', 0 )
 it = i
@@ -38,12 +38,12 @@ if ( master ) write( 0, * ) 'Checkpoint found, starting from ', it
 i = modulo( it / itcheck0, 2 )
 write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', i, '-', ipid
 inquire( iolength=i ) &
-  tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
-  psv, trup, tarr, efric
+    tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
+    psv, trup, tarr, efric
 open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
 read( 1, rec=1 ) &
-  tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
-  psv, trup, tarr, efric
+    tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
+    psv, trup, tarr, efric
 close( 1 )
 iotimer = iotimer + timer( 2 )
 end subroutine
@@ -58,11 +58,11 @@ real :: r
 r = timer( 2 )
 if ( verb ) write( 0, * ) 'Checkpoint'
 if ( itcheck >= 0 .and. ( it == nt .or. modulo( it, itio ) == 0 ) ) then
-  open( 1, file='itcheck', status='old', iostat=i )
-  if ( i == 0 ) then
-    read( 1, * ) itcheck
-    close( 1 )
-  end if
+    open( 1, file='itcheck', status='old', iostat=i )
+    if ( i == 0 ) then
+        read( 1, * ) itcheck
+        close( 1 )
+    end if
 end if
 iotimer = iotimer + timer( 2 )
 if ( itcheck <= 0 ) return
@@ -70,12 +70,12 @@ if ( modulo( it, itcheck ) /= 0 ) return
 i = modulo( it / itcheck, 2 )
 write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', i, '-', ipid
 inquire( iolength=i ) &
-  tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
-  psv, trup, tarr, efric
+    tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
+    psv, trup, tarr, efric
 open( 1, file=str, recl=i, form='unformatted',access='direct',status='replace' )
 write( 1, rec=1 ) &
-  tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
-  psv, trup, tarr, efric
+    tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
+    psv, trup, tarr, efric
 close( 1 )
 write( str, '(a,i6.6)' ) 'checkpoint/it', ipid
 open( 1, file=str, status='replace' )

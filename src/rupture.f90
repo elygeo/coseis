@@ -65,12 +65,12 @@ i1 = i1core
 i2 = i2core
 i1(ifn) = irup
 i2(ifn) = irup
-call surfnormals( nhat, w1, i1, i2, ifn )
+call surfnormals( nhat, w1, dx, i1, i2, ifn )
 area = sign( 1, faultnormal ) * sqrt( sum( nhat * nhat, 4 ) )
 f1 = area
 call invert( f1 )
 do i = 1, 3
-  nhat(:,:,:,i) = nhat(:,:,:,i) * f1
+    nhat(:,:,:,i) = nhat(:,:,:,i) * f1
 end do
 call fieldio( '>', 'nhat1', nhat(:,:,:,1) )
 call fieldio( '>', 'nhat2', nhat(:,:,:,2) )
@@ -78,12 +78,12 @@ call fieldio( '>', 'nhat3', nhat(:,:,:,3) )
 
 ! Resolve prestress onto fault
 do i = 1, 3
-  j = modulo( i , 3 ) + 1
-  k = modulo( i + 1, 3 ) + 1
-  t0(:,:,:,i) = &
-  t1(:,:,:,i) * nhat(:,:,:,i) + &
-  t2(:,:,:,j) * nhat(:,:,:,k) + &
-  t2(:,:,:,k) * nhat(:,:,:,j)
+    j = modulo( i , 3 ) + 1
+    k = modulo( i + 1, 3 ) + 1
+    t0(:,:,:,i) = &
+    t1(:,:,:,i) * nhat(:,:,:,i) + &
+    t2(:,:,:,j) * nhat(:,:,:,k) + &
+    t2(:,:,:,k) * nhat(:,:,:,j)
 end do
 
 ! Ts2 vector
@@ -93,7 +93,7 @@ t2(:,:,:,3) = nhat(:,:,:,1) * slipvector(2) - nhat(:,:,:,2) * slipvector(1)
 f1 = sqrt( sum( t2 * t2, 4 ) )
 call invert( f1 )
 do i = 1, 3
-  t2(:,:,:,i) = t2(:,:,:,i) * f1
+    t2(:,:,:,i) = t2(:,:,:,i) * f1
 end do
 
 ! Ts1 vector
@@ -103,24 +103,24 @@ t1(:,:,:,3) = t2(:,:,:,1) * nhat(:,:,:,2) - t2(:,:,:,2) * nhat(:,:,:,1)
 f1 = sqrt( sum( t1 * t1, 4 ) )
 call invert( f1 )
 do i = 1, 3
-  t1(:,:,:,i) = t1(:,:,:,i) * f1
+    t1(:,:,:,i) = t1(:,:,:,i) * f1
 end do
 
 ! Total pretraction
 do i = 1, 3
-  t0(:,:,:,i) = t0(:,:,:,i) + &
-  t3(:,:,:,1) * t1(:,:,:,i) + &
-  t3(:,:,:,2) * t2(:,:,:,i) + &
-  t3(:,:,:,3) * nhat(:,:,:,i)
+    t0(:,:,:,i) = t0(:,:,:,i) + &
+    t3(:,:,:,1) * t1(:,:,:,i) + &
+    t3(:,:,:,2) * t2(:,:,:,i) + &
+    t3(:,:,:,3) * nhat(:,:,:,i)
 end do
 
 ! Hypocentral radius
 do i = 1, 3
-  select case( ifn )
-  case ( 1 ); t2(1,:,:,i) = w1(irup,:,:,i) - xhypo(i)
-  case ( 2 ); t2(:,1,:,i) = w1(:,irup,:,i) - xhypo(i)
-  case ( 3 ); t2(:,:,1,i) = w1(:,:,irup,i) - xhypo(i)
-  end select
+    select case( ifn )
+    case ( 1 ); t2(1,:,:,i) = w1(irup,:,:,i) - xhypo(i)
+    case ( 2 ); t2(:,1,:,i) = w1(:,irup,:,i) - xhypo(i)
+    case ( 3 ); t2(:,:,1,i) = w1(:,:,irup,i) - xhypo(i)
+    end select
 end do
 rhypo = sqrt( sum( t2 * t2, 4 ) )
 
@@ -194,66 +194,66 @@ l3 = i1(3); l4 = i2(3)
 f1 = dt * dt * area * ( mr(j1:j2,k1:k2,l1:l2) + mr(j3:j4,k3:k4,l3:l4) )
 call invert( f1 )
 do i = 1, 3
-  t1(:,:,:,i) = t0(:,:,:,i) + f1 * dt * &
-    ( ( vv(j3:j4,k3:k4,l3:l4,i) - vv(j1:j2,k1:k2,l1:l2,i) ) &
-    + ( w1(j3:j4,k3:k4,l3:l4,i) - w1(j1:j2,k1:k2,l1:l2,i) ) * dt )
-  t2(:,:,:,i) = t1(:,:,:,i) + f1 * &
-      ( uu(j3:j4,k3:k4,l3:l4,i) - uu(j1:j2,k1:k2,l1:l2,i) )
+    t1(:,:,:,i) = t0(:,:,:,i) + f1 * dt * &
+        ( ( vv(j3:j4,k3:k4,l3:l4,i) - vv(j1:j2,k1:k2,l1:l2,i) ) &
+        + ( w1(j3:j4,k3:k4,l3:l4,i) - w1(j1:j2,k1:k2,l1:l2,i) ) * dt )
+    t2(:,:,:,i) = t1(:,:,:,i) + f1 * &
+          ( uu(j3:j4,k3:k4,l3:l4,i) - uu(j1:j2,k1:k2,l1:l2,i) )
 end do
 
 ! Shear and normal traction
 tn = sum( t1 * nhat, 4 )
 do i = 1, 3
-  t3(:,:,:,i) = t1(:,:,:,i) - tn * nhat(:,:,:,i)
+    t3(:,:,:,i) = t1(:,:,:,i) - tn * nhat(:,:,:,i)
 end do
 ts = sqrt( sum( t3 * t3, 4 ) )
 
 ! Delay slip till after first iteration
 if ( it > 1 ) then
 
-  ! Normal traction
-  tn = sum( t2 * nhat, 4 )
-  if ( faultopening == 1 ) tn = min( 0.0, tn )
+    ! Normal traction
+    tn = sum( t2 * nhat, 4 )
+    if ( faultopening == 1 ) tn = min( 0.0, tn )
 
-  ! Slip velocity
-  do i = 1, 3
-    t2(:,:,:,i) = vv(j3:j4,k3:k4,l3:l4,i) - vv(j1:j2,k1:k2,l1:l2,i)
-  end do
-  f2 = sum( t2 * t2, 4 )
+    ! Slip velocity
+    do i = 1, 3
+        t2(:,:,:,i) = vv(j3:j4,k3:k4,l3:l4,i) - vv(j1:j2,k1:k2,l1:l2,i)
+    end do
+    f2 = sum( t2 * t2, 4 )
 
-  ! Slip-weakening friction law
-  f1 = mud
-  where ( sl < dc ) f1 = f1 + ( 1.0 - sl / dc ) * ( mus - mud )
-  f1 = -min( 0.0, tn ) * f1 + co
+    ! Slip-weakening friction law
+    f1 = mud
+    where ( sl < dc ) f1 = f1 + ( 1.0 - sl / dc ) * ( mus - mud )
+    f1 = -min( 0.0, tn ) * f1 + co
 
-  ! Nucleation
-  if ( rcrit > 0.0 .and. vrup > 0.0 ) then
+    ! Nucleation
+    if ( rcrit > 0.0 .and. vrup > 0.0 ) then
+        f2 = 1.0
+        if ( trelax > 0.0 ) f2 = min( ( tm - rhypo / vrup ) / trelax, 1.0 )
+        f2 = ( 1.0 - f2 ) * ts + f2 * ( -tn * mud + co )
+        where ( rhypo < min( rcrit, tm * vrup ) .and. f2 < f1 ) f1 = f2
+    end if
+
+    ! Shear traction bounded by friction
     f2 = 1.0
-    if ( trelax > 0.0 ) f2 = min( ( tm - rhypo / vrup ) / trelax, 1.0 )
-    f2 = ( 1.0 - f2 ) * ts + f2 * ( -tn * mud + co )
-    where ( rhypo < min( rcrit, tm * vrup ) .and. f2 < f1 ) f1 = f2
-  end if
+    where ( ts > f1 ) f2 = f1 / ts
+    do i = 1, 3
+        t3(:,:,:,i) = f2 * t3(:,:,:,i)
+    end do
+    ts = min( ts, f1 )
 
-  ! Shear traction bounded by friction
-  f2 = 1.0
-  where ( ts > f1 ) f2 = f1 / ts
-  do i = 1, 3
-    t3(:,:,:,i) = f2 * t3(:,:,:,i)
-  end do
-  ts = min( ts, f1 )
-
-  ! Total traction
-  do i = 1, 3
-    t1(:,:,:,i) = t3(:,:,:,i) + tn * nhat(:,:,:,i)
-  end do
+    ! Total traction
+    do i = 1, 3
+        t1(:,:,:,i) = t3(:,:,:,i) + tn * nhat(:,:,:,i)
+    end do
 
 end if
 
 ! Update acceleration
 do i = 1, 3
-  f2 = area * ( t1(:,:,:,i) - t0(:,:,:,i) )
-  w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f2 * mr(j1:j2,k1:k2,l1:l2)
-  w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f2 * mr(j3:j4,k3:k4,l3:l4)
+    f2 = area * ( t1(:,:,:,i) - t0(:,:,:,i) )
+    w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f2 * mr(j1:j2,k1:k2,l1:l2)
+    w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f2 * mr(j3:j4,k3:k4,l3:l4)
 end do
 call vector_bc( w1, bc1, bc2, i1bc, i2bc )
 
