@@ -1,6 +1,7 @@
 *.pyc
 *.mod
 *.o
+*.so
 *.ipo
 *.il
 *.stb
