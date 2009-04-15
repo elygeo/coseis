@@ -110,3 +110,77 @@ def cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb ):
 
     return Y, sigmaT
 
+if __name__ == '__main__':
+    """
+    CBNGA Test - For comparison with OpenSHA Attenuation Relationship Plotter
+    """
+    import numpy, pylab
+
+    # Choose the intensity measure
+    T = 10
+    T = 1
+    T = 0.1
+    T = 0.01
+    T = 'PGD'
+    T = 'PGV'
+    T = 'PGA'
+
+    M = 5.5
+    R_RUP = 0.0
+    R_JB = R_RUP
+    Z_TOR = 0.0
+    Z_25 = 1.0
+    V_S30 = 760.0
+    delta = 90.0
+    lamb = 0.0
+
+    M = numpy.arange( 4.0, 8.501, 0.1 )
+    Y, sigma = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
+    pylab.figure( 1 )
+    pylab.clf()
+    pylab.plot( M, Y )
+    pylab.xlabel( 'M' )
+    pylab.ylabel( T )
+    M = 5.5
+
+    V_S30 = numpy.arange( 180.0, 1500.1, 10.0 )
+    Y, sigma = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
+    pylab.figure( 2 )
+    pylab.clf()
+    pylab.plot( V_S30, sigma )
+    pylab.xlabel( 'V_{S30}' )
+    pylab.ylabel( T )
+    V_S30 = 760.0
+
+    Z_25 = numpy.arange( 0.0, 6.01, 0.1 )
+    Y, sigma = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
+    pylab.figure( 3 )
+    pylab.clf()
+    pylab.plot( Z_25, Y )
+    pylab.xlabel( 'Z_{2.5}' )
+    pylab.ylabel( T )
+    Z_25 = 1.0
+
+    TT = 0.010, 0.020, 0.030, 0.050, 0.075, 0.100, 0.150, 0.200, 0.250, 0.300, 0.400, 0.500, 0.750, 1.000, 1.500, 2.000, 3.000, 4.000, 5.000, 7.500, 10.00
+    Y = []
+    sigma = []
+    for T in TT:
+        tmp = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
+        Y += [ tmp[0] ]
+        sigma += [ tmp[1] ]
+
+    pylab.figure( 4 )
+    pylab.clf()
+    pylab.loglog( T, Y )
+    pylab.xlabel( 'T' )
+    pylab.ylabel( 'SA' )
+
+    pylab.figure( 5 )
+    pylab.clf()
+    pylab.semilogx( T, sigma )
+    pylab.xlabel( 'T' )
+    pylab.ylabel( '\sigma' )
+
+    pylab.draw()
+    pylab.show()
+
