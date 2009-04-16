@@ -16,7 +16,7 @@
 
 ! Wrapper
 ! u  : acceleration time history
-! dt : time step size
+! dt : time step length
 ! w  : angular frequency = 2 pi / T
 ! d  : damping ratio
 ! n  : number of samples

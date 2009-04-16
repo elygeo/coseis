@@ -308,14 +308,15 @@ def launch( cfg ):
     """Launch or queue job."""
     import os, sys
     cwd = os.getcwd()
-    os.chdir( cfg.rundir )
     if cfg.run == 'q':
+        os.chdir( cfg.rundir )
         print 'queue.sh'
         if cfg.host not in cfg.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r' % ( cfg.host, cfg.machine ) )
         if os.system( os.path.join( '.', 'queue.sh' ) ):
             sys.exit( 'Error queing job' )
     elif cfg.run:
+        os.chdir( cfg.rundir )
         print 'run.sh -' + cfg.run
         if cfg.host not in cfg.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r' % ( cfg.host, cfg.machine ) )

@@ -55,22 +55,24 @@ def loadmeta( dir='.' ):
     import os, pprint
     dir = os.path.expanduser( dir )
     meta = load( os.path.join( dir, 'parameters.py' ) )
-    load( os.path.join( dir, 'conf.py' ), meta )
-    try:
+    if os.path.isfile( os.path.join( dir, 'conf.py' ) ):
+        load( os.path.join( dir, 'conf.py' ), meta )
+    if os.path.isfile( os.path.join( dir, 'out', 'header.py' ) ):
         load( os.path.join( dir, 'out', 'header.py' ), meta )
         out = meta['indices']
-    except:
+    else:
         out = dict()
         for f in meta['fieldio']:
-             ii, field, filename = f[6:9]
-             if filename is not '-':
-                 out[filename] = ii
-        locs = load( os.path.join( dir, 'locations.py' ) )
-        mm = meta['nn'] + ( meta['nt'], )
-        for ii, filename in locs['locations']:
-             if filename is not '-':
-                 ii = expand_indices( ii, mm )
-                 out[filename] = ii
+            ii, field, filename = f[6:9]
+            if filename is not '-':
+                out[filename] = ii
+        if os.path.isfile( os.path.join( dir, 'locations.py' ) ):
+            locs = load( os.path.join( dir, 'locations.py' ) )
+            mm = meta['nn'] + ( meta['nt'], )
+            for ii, filename in locs['locations']:
+                if filename is not '-':
+                    ii = expand_indices( ii, mm )
+                    out[filename] = ii
         meta['indices'] = out
         f = open( os.path.join( dir, 'out', 'header.py' ), 'w' )
         f.write( 'indices = ' + pprint.pformat( out ) )
@@ -173,71 +175,6 @@ def ndread( fd, shape=None, indices=[], order='F', dtype=None, endian=None ):
     else:
         f = f.reshape( nn0 )
     return f
-
-def transpose( fd_in, fd_out, shape, axes=None, order='F', hold=2, dtype=None ):
-    """
-    Transpose binary array on disk.
-
-    fd_in :  Source filename or file object.
-    fd_out : Destination filename or file object.
-    shape :  Dimensions of the source array.
-    axes :   List of axes to permute. If None (the default), reverse dimensions.
-    order :  'F' first index varies fastest, or 'C' last index varies fastest.
-    hold :   Number of dimensions to hold in memory at once. Default is 2.
-    dtype :  Data-type of the array. Default is numpy.float32
-    """
-    import os, sys, numpy
-    ndim = len( shape )
-    if not axes:
-        axes = range( ndim )[::-1]
-    if not dtype:
-        dtype = numpy.dtype( numpy.float32 )
-    if len( shape ) != len( axes ):
-        sys.exit( 'Length of shape and axes must match: %s, %s' % ( shape, axes ) )
-    if min( axes ) == 1:
-        axes = [ i-1 for i in axes ]
-    if sorted( axes ) != range( ndim ):
-        sys.exit( 'bad axes: %s' % axes )
-    if order is 'F':
-        shape = shape[::-1]
-        axes  = [ ndim-i-1 for i in axes[::-1] ]
-    elif order is not 'C':
-        sys.exit( "Invalid order %s, must be 'C' or 'F'" % order )
-    hold += 1
-    shape = numpy.array( list( shape ) + [1], dtype=numpy.int64 )
-    axes  = [ i for i in axes if shape[i] > 1 ] + [ndim]
-    if len( axes ) < 3:
-        sys.exit( 'Nothing to transpose' )
-    if type( fd_in ) is not file:
-        fd_in = open( os.path.expanduser( fd_in ), 'rb' )
-    if type( fd_out ) is not file:
-        fd_out = open( os.path.expanduser( fd_out ), 'wb' )
-    n = len( axes ) - hold
-    T = numpy.array( axes[n:] )
-    T[T.argsort()] = numpy.arange( T.size )
-    axes = axes[:n] + sorted( axes[n:] )
-    s  = shape[axes]
-    w0 = numpy.cumprod( [1] + list( s[:n][:0:-1] ), dtype=numpy.int64 )[::-1]
-    w1 = numpy.cumprod( [1] + list( shape[:0:-1] ), dtype=numpy.int64 )[::-1][axes][:n] * dtype.itemsize
-    w2 = 0
-    i  = n
-    ii = ( numpy.diff( axes ) != 1 ).nonzero()[0]
-    if len( ii ):
-        i  = max( n, ii.max() + 1 )
-        w2 = shape[axes[i-1]+1:].prod() * dtype.itemsize
-    s0 = s[ :n]
-    s1 = s[n: ]
-    n0 = s[ :n].prod()
-    n1 = s[n:i].prod()
-    n2 = s[i: ].prod()
-    v = numpy.empty( ( n1, n2 ), dtype )
-    for j in xrange( n0 ):
-        offset = numpy.sum( w1 * ( j / w0 % s0 ) )
-        for k in xrange( n1 ):
-            fd_in.seek( long( offset + k * w2 ), 0 )
-            v[k,:] = numpy.fromfile( fd_in, dtype, n2 )
-        v.reshape( s1 ).transpose( T ).tofile( fd_out )
-    return
 
 def progress( i, n, t ):
     """Print progress and time remaining."""
