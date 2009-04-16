@@ -45,12 +45,14 @@ src_w2 = 3 * [ 0.0 ]
 if 0:
     src_n = 0
     src_function = 'brune'
+
     rundir = 'tmp/1'
     src_type = 'moment'
     bc1 = 2, 2, 2
     ihypo = 1.5, 1.5, 1.5
     src_w1 = 3 * [ 3*_rho*_vp*_vp - 4*_rho*_vs*_vs ]
     sord.run( locals() )
+
     rundir = 'tmp/2'
     src_type = 'potency'
     bc1 = 1, 1, 1
