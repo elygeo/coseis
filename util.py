@@ -34,55 +34,72 @@ def load( filename, d=None ):
         if k[0] is '_' or type(d[k]) in [type(os), type(os.walk)]: del( d[k] )
     return d
 
-def save( fd, d, expandlist=[] ):
+def save( fd, d, expand=[] ):
     """Write variables from a dict into a Python source file"""
-    import os
+    import os, sys
     if type( fd ) is not file:
         fd = open( os.path.expanduser( fd ), 'w' )
     for k in sorted( d ):
-        if k[0] is not '_' and type(d[k]) not in [type(os), type(os.walk)] and k not in expandlist:
+        if k[0] is not '_' and type(d[k]) not in [type(os), type(os.walk)] and k not in expand:
             fd.write( '%s = %r\n' % ( k, d[k] ) )
-    for k in expandlist:
-        fd.write( k + ' = [\n' )
-        for line in d[k]:
-            fd.write( repr( line ) + ',\n' )
-        fd.write( ']\n' )
+    for k in expand:
+        if k in d:
+            if type( d[k] ) == tuple:
+                fd.write( k + ' = (\n' )
+                for item in d[k]:
+                    fd.write( repr( item ) + ',\n' )
+                fd.write( ')\n' )
+            elif type( d[k] ) == list:
+                fd.write( k + ' = [\n' )
+                for item in d[k]:
+                    fd.write( repr( item ) + ',\n' )
+                fd.write( ']\n' )
+            elif type( d[k] ) == dict:
+                fd.write( k + ' = {\n' )
+                for item in sorted( d[k] ):
+                    fd.write( repr( item ) + ': ' + repr( d[k][item] ) + ',\n' )
+                fd.write( '}\n' )
+            else:
+                sys.exit( 'Can expand %s type %s' % ( k, type( d[k] ) ) )
     fd.close()
     return
 
 def loadmeta( dir='.' ):
-    """Load SORD metadata"""
-    import os, pprint
+    """
+    Load SORD metadata
+    """
+    import os
     dir = os.path.expanduser( dir )
-    meta = load( os.path.join( dir, 'parameters.py' ) )
-    if os.path.isfile( os.path.join( dir, 'conf.py' ) ):
-        load( os.path.join( dir, 'conf.py' ), meta )
-    if os.path.isfile( os.path.join( dir, 'out', 'header.py' ) ):
-        load( os.path.join( dir, 'out', 'header.py' ), meta )
-        out = meta['indices']
+    if os.path.isfile( os.path.join( dir, 'meta.py' ) ):
+        meta = load( os.path.join( dir, 'meta.py' ) )
     else:
-        out = dict()
-        for f in meta['fieldio']:
-            ii, field, filename = f[6:9]
-            if filename is not '-':
-                out[filename] = ii
-        if os.path.isfile( os.path.join( dir, 'locations.py' ) ):
-            locs = load( os.path.join( dir, 'locations.py' ) )
-            mm = meta['nn'] + ( meta['nt'], )
-            for ii, filename in locs['locations']:
+        meta = dict()
+        if os.path.isfile( os.path.join( dir, 'conf.py' ) ):
+            cfg = load( os.path.join( dir, 'conf.py' ) )
+            for k in 'name', 'rundate', 'rundir', 'user', 'os_':
+                meta[k] = cfg[k]
+        if os.path.isfile( os.path.join( dir, 'parameters.py' ) ):
+            load( os.path.join( dir, 'parameters.py' ), meta )
+            out = dict()
+            for f in meta['fieldio']:
+                ii, field, filename = f[6:9]
                 if filename is not '-':
-                    ii = expand_indices( ii, mm )
                     out[filename] = ii
-        meta['indices'] = out
-        f = open( os.path.join( dir, 'out', 'header.py' ), 'w' )
-        f.write( 'indices = ' + pprint.pformat( out ) )
-        f.close()
-    shape = dict()
-    for k in out:
-        nn = [ ( i[1] - i[0] ) / i[2] + 1 for i in out[k] ]
-        nn = [ n for n in nn if n > 1 ]
-        shape[k] = nn
-    meta['shape'] = shape
+            if os.path.isfile( os.path.join( dir, 'locations.py' ) ):
+                locs = load( os.path.join( dir, 'locations.py' ) )
+                mm = meta['nn'] + ( meta['nt'], )
+                for ii, filename in locs['locations']:
+                    if filename is not '-':
+                        ii = expand_indices( ii, mm )
+                        out[filename] = ii
+            meta['indices'] = out
+            shape = dict()
+            for k in out:
+                nn = [ ( i[1] - i[0] ) / i[2] + 1 for i in out[k] ]
+                nn = [ n for n in nn if n > 1 ]
+                shape[k] = nn
+            meta['shape'] = shape
+        save( os.path.join( dir, 'meta.py' ), meta, [ 'shape', 'indices', 'fieldio' ] )
     return objectify( meta )
 
 def expand_indices( indices, shape, base=1 ):
