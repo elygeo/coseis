@@ -37,7 +37,7 @@ end subroutine
 !     subroutine cmpmax(dur1,kug,ug,pr,w,d,dt,z)
 !     real ug(*),x(2,3),t(3),z(*),c(3)
       subroutine cmpmax(z,ug,dt,w,d,kug)
-      real ug(:),x(2,3),z(3),c(3)
+      real ug(*),x(2,3),z(3),c(3)
       wd=sqrt(1.-d*d)*w
       w2=w*w
       w3=w2*w
@@ -84,7 +84,7 @@ end subroutine
 !     subroutine ucmpmx(dur1,kug,ug,time,pr,w,d,z)
 !     real ug(*),time(*),z(*),t(3),c(3),x(2,3)
       subroutine ucmpmx(z,ug,dt0,w,d,kug)
-      real ug(:),z(3),c(3),x(2,3)
+      real ug(*),z(3),c(3),x(2,3)
       pr = 4.0 * acos( 0.0 ) / w
       wd=sqrt(1.-d*d)*w
       w2=w*w
