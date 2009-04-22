@@ -134,15 +134,18 @@ def expand_indices( indices, shape, base=1 ):
         indices[i] = tuple( indices[i] )
     return indices
 
-def ndread( fd, shape=None, indices=[], dtype='f4', order='F' ):
+def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
     """
     Read n-dimentional array subsection from binary file.
 
     fd :      Source filename or file object.
     indices : Specify array subsection.
     shape :   Dimensions of the source array.
-    dtype :   Data-type of the array. Default is 'f4' (32 bit float)
-              '<' indicates little endian, '>' indicates big endian
+    dtype :   Numpy style data-type. Default is 'f' (native float)
+              '<f' : little endian float
+              '>f' : big endian float
+              '<d' : little endian double precision
+              '>d' : big endian double precision
     order :   'F' first index varies fastest, or 'C' last index varies fastest.
     """
     import os, numpy

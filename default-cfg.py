@@ -3,7 +3,7 @@
 Default configuration parameters
 """
 
-import os, sys, pwd
+import os, sys, pwd, numpy
 
 # Setup options (also accessible with command line options).
 prepare = True		# True: compile code and setup run directory, False: dry run
@@ -17,7 +17,7 @@ rundir = os.path.join( '~', 'run', 'sord' )	# run directory
 infiles = []		# files to copy to the sord input directory
 
 # User info
-user = pwd.getpwuid(os.geteuid())[0]
+user = pwd.getpwuid( os.geteuid() )[0]
 try: email = open( 'email', 'r' ).read().strip()
 except: email = user
 
@@ -34,8 +34,7 @@ maxram = 0
 maxtime = 0
 rate = 1.0e6
 queue = None
-endian = sys.byteorder[0]
-floatsize = 4
+dtype = numpy.dtype( 'f' )
 
 # Serial Fortran compiler
 fortran_serial = None

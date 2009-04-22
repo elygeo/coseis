@@ -106,7 +106,7 @@ def stage( inputs ):
     else:
          nvars = 44
     nm = ( nl[0] + 2 ) * ( nl[1] + 2 ) * ( nl[2] + 2 )
-    cfg.pmem = 32 + int( 1.2 * nm * nvars * cfg.floatsize / 1024 / 1024 )
+    cfg.pmem = 32 + int( 1.2 * nm * nvars * cfg.dtype[-1] / 1024 / 1024 )
     cfg.ram = cfg.pmem * cfg.ppn
     sus = int( ( prm.nt + 10 ) * cfg.ppn * nm / cfg.cores / cfg.rate / 3600 * cfg.totalcores + 1 )
     mm  =      ( prm.nt + 10 ) * cfg.ppn * nm / cfg.cores / cfg.rate / 60 * 3.0 + 10
@@ -272,10 +272,6 @@ def prepare_prm( prm, itbuff ):
             sys.exit( 'Error: field only for ruptures: %r' % line )
         if 'w' not in mode and field not in fieldnames.input:
             sys.exit( 'Error: field is ouput only: %r' % line )
-        if 'r' in mode or 'R' in mode:
-            fn = os.path.join( os.path.dirname( filename ), 'endian' )
-            if os.path.isfile( fn ) and open( fn, 'r' ).read()[0] != sys.byteorder[0]:
-                sys.exit( 'Error: wrong byte order for ' + filename )
         nn = list( prm.nn ) + [ prm.nt ]
         ii = util.expand_indices( ii, nn )
         if field in fieldnames.cell:
