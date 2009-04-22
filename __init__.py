@@ -106,7 +106,7 @@ def stage( inputs ):
     else:
          nvars = 44
     nm = ( nl[0] + 2 ) * ( nl[1] + 2 ) * ( nl[2] + 2 )
-    cfg.pmem = 32 + int( 1.2 * nm * nvars * cfg.dtype[-1] / 1024 / 1024 )
+    cfg.pmem = 32 + int( 1.2 * nm * nvars * int( cfg.dtype[-1] ) / 1024 / 1024 )
     cfg.ram = cfg.pmem * cfg.ppn
     sus = int( ( prm.nt + 10 ) * cfg.ppn * nm / cfg.cores / cfg.rate / 3600 * cfg.totalcores + 1 )
     mm  =      ( prm.nt + 10 ) * cfg.ppn * nm / cfg.cores / cfg.rate / 60 * 3.0 + 10

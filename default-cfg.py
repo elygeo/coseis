@@ -34,7 +34,7 @@ maxram = 0
 maxtime = 0
 rate = 1.0e6
 queue = None
-dtype = numpy.dtype( 'f' )
+dtype = numpy.dtype( 'f' ).str
 
 # Serial Fortran compiler
 fortran_serial = None
