@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env ipython -pylab -wthread
 """
 EGMM - Empirical Ground Motion Model
 """
@@ -148,7 +148,7 @@ if __name__ == '__main__':
     lamb = 0.0,
 
     M = numpy.arange( 4.0, 8.501, 0.1 )
-    Y, sigma = campbell( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
+    Y, sigma = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
     pylab.figure( 1 )
     pylab.clf()
     pylab.plot( M, Y )
@@ -157,20 +157,20 @@ if __name__ == '__main__':
     M = 5.5,
 
     V_S30 = numpy.arange( 180.0, 1500.1, 10.0 )
-    Y, sigma = campbell( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
+    Y, sigma = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
     pylab.figure( 2 )
     pylab.clf()
     pylab.plot( V_S30, sigma )
-    pylab.xlabel( 'V_{S30}' )
+    pylab.xlabel( '$V_{S30}$' )
     pylab.ylabel( T )
     V_S30 = 760.0,
 
     Z_25 = numpy.arange( 0.0, 6.01, 0.1 )
-    Y, sigma = campbell( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
+    Y, sigma = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
     pylab.figure( 3 )
     pylab.clf()
     pylab.plot( Z_25, Y )
-    pylab.xlabel( 'Z_{2.5}' )
+    pylab.xlabel( '$Z_{2.5}$' )
     pylab.ylabel( T )
     Z_25 = 1.0,
 
@@ -178,7 +178,7 @@ if __name__ == '__main__':
     Y = []
     sigma = []
     for T in TT:
-        tmp = campbell( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
+        tmp = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
         Y += [ tmp[0][0] ]
         sigma += [ tmp[1][0] ]
 
@@ -192,7 +192,7 @@ if __name__ == '__main__':
     pylab.clf()
     pylab.semilogx( TT, sigma )
     pylab.xlabel( 'T' )
-    pylab.ylabel( '\sigma' )
+    pylab.ylabel( '$\sigma$' )
 
     pylab.draw()
     pylab.show()

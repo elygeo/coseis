@@ -12,7 +12,7 @@ asdf
 
 nn = meta.shape['vs']
 n  = nn[0] * nn[1]
-v  = numpy.fromfile( os.path.join( dir, 'out', 'vs' ), numpy.float32 ).reshape( nn[::-1] ).T
+v  = numpy.fromfile( os.path.join( dir, 'out', 'vs' ), 'f' ).reshape( nn[::-1] ).T
 pylab.clf()
 pylab.imshow( v )
 pylab.ginput( 1, 0, 0 )
@@ -26,9 +26,9 @@ f2 = open( os.path.join( dir, 'out', 'v2' ), 'rb' )
 f3 = open( os.path.join( dir, 'out', 'v3' ), 'rb' )
 
 for i in xrange( nt ):
-    v1 = numpy.fromfile( f1, numpy.float32, n ).reshape( nn[::-1] ).T
-    v2 = numpy.fromfile( f2, numpy.float32, n ).reshape( nn[::-1] ).T
-    v3 = numpy.fromfile( f3, numpy.float32, n ).reshape( nn[::-1] ).T
+    v1 = numpy.fromfile( f1, 'f', n ).reshape( nn[::-1] ).T
+    v2 = numpy.fromfile( f2, 'f', n ).reshape( nn[::-1] ).T
+    v3 = numpy.fromfile( f3, 'f', n ).reshape( nn[::-1] ).T
     v  = numpy.array([ v1, v2, v3 ])
     pylab.clf()
     if comp:

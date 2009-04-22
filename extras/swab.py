@@ -6,7 +6,7 @@ import os, sys, numpy
 
 nb = 4
 block = 64*1024*1024
-dtype = numpy.float32
+dtype = numpy.dtype( 'f' )
 
 if len( sys.argv ) == 1:
     print sys.byteorder

@@ -8,7 +8,7 @@ tt = []
 for dir in glob.glob( '[0-9]*' ):
     prm = sord.util.load( dir + '/parameters.py' )
     np += [ numpy.product( prm['np3'] ) ]
-    t = numpy.fromfile( dir + '/prof/8step', numpy.float32 )
+    t = numpy.fromfile( dir + '/prof/8step', 'f' )
     tt += [ numpy.sum( t[1:-1] ) / (len(t)-2) ]
 
 if normalize:

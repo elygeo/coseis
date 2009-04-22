@@ -3,29 +3,26 @@
 Source utilities
 """
 
-def f32( a ):
-    import numpy
-    return numpy.array( a, numpy.float32 )
-
 def write_src( history, nt, dt, t0, xi, w1, w2, path='' ):
     """
     Write SORD input for moment or potency source.
     """
     import os
+    from numpy import array
     path = os.path.join( os.path.expanduser( path ), 'src_' )
-    f32( history ).tofile( path + 'history' )
-    f32( nt      ).tofile( path + 'nt'  )
-    f32( dt      ).tofile( path + 'dt'  )
-    f32( t0      ).tofile( path + 't0'  )
-    f32( xi[0]   ).tofile( path + 'xi1' )
-    f32( xi[1]   ).tofile( path + 'xi2' )
-    f32( xi[2]   ).tofile( path + 'xi3' )
-    f32( w1[0]   ).tofile( path + 'w11' )
-    f32( w1[1]   ).tofile( path + 'w22' )
-    f32( w1[2]   ).tofile( path + 'w33' )
-    f32( w2[0]   ).tofile( path + 'w23' )
-    f32( w2[1]   ).tofile( path + 'w31' )
-    f32( w2[2]   ).tofile( path + 'w12' )
+    array( history, 'f' ).tofile( path + 'history' )
+    array( nt, 'f'      ).tofile( path + 'nt'  )
+    array( dt, 'f'      ).tofile( path + 'dt'  )
+    array( t0, 'f'      ).tofile( path + 't0'  )
+    array( xi[0], 'f'   ).tofile( path + 'xi1' )
+    array( xi[1], 'f'   ).tofile( path + 'xi2' )
+    array( xi[2], 'f'   ).tofile( path + 'xi3' )
+    array( w1[0], 'f'   ).tofile( path + 'w11' )
+    array( w1[1], 'f'   ).tofile( path + 'w22' )
+    array( w1[2], 'f'   ).tofile( path + 'w33' )
+    array( w2[0], 'f'   ).tofile( path + 'w23' )
+    array( w2[1], 'f'   ).tofile( path + 'w31' )
+    array( w2[2], 'f'   ).tofile( path + 'w12' )
 
 def srf_read( filename, headeronly=False, noslip=False, mks=True ):
     """
@@ -131,6 +128,7 @@ def srf2potency( filename, projection, dx, path='' ):
     Read SRF file and write SORD potency tensor source.
     """
     import os, numpy, coord
+    array = numpy.array
 
     # Read SRF
     meta, data = srf_read( filename )
@@ -145,16 +143,16 @@ def srf2potency( filename, projection, dx, path='' ):
             nt = data.nt[j,i]
             data.sv[k:k+nt] = data.dt[j] * numpy.cumsum( data.sv[k:k+nt] )
             k = k + nt
-    f32( data.sv ).tofile( path + 'history' )
+    array( data.sv, 'f' ).tofile( path + 'history' )
     del( data.sv )
 
     # Time
     ii = data.nt > 0
     n = ii.shape
     nsource = data.nt[ii].size
-    f32( data.nt )[ii].tofile( path + 'nt' )
-    f32( data.dt ).repeat(3).reshape(n)[ii].tofile( path + 'dt' )
-    f32( data.t0 ).repeat(3).reshape(n)[ii].tofile( path + 't0' )
+    array( data.nt, 'f' )[ii].tofile( path + 'nt' )
+    array( data.dt, 'f' ).repeat(3).reshape(n)[ii].tofile( path + 'dt' )
+    array( data.t0, 'f' ).repeat(3).reshape(n)[ii].tofile( path + 't0' )
     del( data.nt, data.dt, data.t0 )
 
     # Strike rotation
@@ -171,28 +169,28 @@ def srf2potency( filename, projection, dx, path='' ):
     x = x / dx[0] + 1.0
     y = y / dx[1] + 1.0
     z = data.dep / dx[2] + 1.0
-    f32( x ).repeat(3).reshape(n)[ii].tofile( path + 'xi1' )
-    f32( y ).repeat(3).reshape(n)[ii].tofile( path + 'xi2' )
-    f32( z ).repeat(3).reshape(n)[ii].tofile( path + 'xi3' )
+    array( x, 'f' ).repeat(3).reshape(n)[ii].tofile( path + 'xi1' )
+    array( y, 'f' ).repeat(3).reshape(n)[ii].tofile( path + 'xi2' )
+    array( z, 'f' ).repeat(3).reshape(n)[ii].tofile( path + 'xi3' )
     del( x, y, z, data.lon, data.lat, data.dep )
 
     # Normal tensor components
     w = numpy.zeros( np )
-    w[:,2] = data.area * nrm[0] * nrm[0]; f32( w )[ii].tofile( path + 'w11' )
-    w[:,2] = data.area * nrm[1] * nrm[1]; f32( w )[ii].tofile( path + 'w22' )
-    w[:,2] = data.area * nrm[2] * nrm[2]; f32( w )[ii].tofile( path + 'w33' )
+    w[:,2] = data.area * nrm[0] * nrm[0]; array( w, 'f' )[ii].tofile( path + 'w11' )
+    w[:,2] = data.area * nrm[1] * nrm[1]; array( w, 'f' )[ii].tofile( path + 'w22' )
+    w[:,2] = data.area * nrm[2] * nrm[2]; array( w, 'f' )[ii].tofile( path + 'w33' )
 
     # Shear tensor components
     w = numpy.zeros( np )
     w[:,0] = 0.5 * data.area * ( stk[1] * nrm[2] + nrm[1] * stk[2] )
     w[:,1] = 0.5 * data.area * ( dip[1] * nrm[2] + nrm[1] * dip[2] )
-    f32( w )[ii].tofile( path + 'w23' )
+    array( w, 'f' )[ii].tofile( path + 'w23' )
     w[:,0] = 0.5 * data.area * ( stk[2] * nrm[0] + nrm[2] * stk[0] )
     w[:,1] = 0.5 * data.area * ( dip[2] * nrm[0] + nrm[2] * dip[0] )
-    f32( w )[ii].tofile( path + 'w31' )
+    array( w, 'f' )[ii].tofile( path + 'w31' )
     w[:,0] = 0.5 * data.area * ( stk[0] * nrm[1] + nrm[0] * stk[1] )
     w[:,1] = 0.5 * data.area * ( dip[0] * nrm[1] + nrm[0] * dip[1] )
-    f32( w )[ii].tofile( path + 'w12' )
+    array( w, 'f' )[ii].tofile( path + 'w12' )
     del( w, stk, dip, nrm, data.area )
 
     return nsource

@@ -7,11 +7,13 @@ import os, sys, numpy
 nb = 4
 block = 64*1024*1024
 
-try:
-    endian = open( 'endian', 'rb' ).read()
-    dtype = numpy.dtype( numpy.float32 ).newbyteorder( endian )
-except:
-    dtype = numpy.float32
+dtype = 'f'
+args = []
+for a in sys.argv[1:]:
+    if a[0] == '-':
+        dtype = a[1:]
+    else:
+        args += [ a ]
 
 print '         Min          Max         Mean            N'
 for filename in sys.argv[1:]:

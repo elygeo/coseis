@@ -134,22 +134,18 @@ def expand_indices( indices, shape, base=1 ):
         indices[i] = tuple( indices[i] )
     return indices
 
-def ndread( fd, shape=None, indices=[], order='F', dtype=None, endian=None ):
+def ndread( fd, shape=None, indices=[], dtype='f4', order='F' ):
     """
     Read n-dimentional array subsection from binary file.
 
     fd :      Source filename or file object.
     indices : Specify array subsection.
     shape :   Dimensions of the source array.
+    dtype :   Data-type of the array. Default is 'f4' (32 bit float)
+              '<' indicates little endian, '>' indicates big endian
     order :   'F' first index varies fastest, or 'C' last index varies fastest.
-    dtype :   Data-type of the array. Default is numpy.float32
-    endian :  Byte order of the array on disk. 'l' little, 'b' big, or '=' native.
     """
     import os, numpy
-    if not dtype:
-        dtype = numpy.dtype( numpy.float32 )
-    if endian:
-        dtype = dtype.newbyteorder( endian )
     if type( fd ) is not file:
         fd = open( os.path.expanduser( fd ), 'rb' )
     if not shape:
@@ -179,8 +175,9 @@ def ndread( fd, shape=None, indices=[], order='F', dtype=None, endian=None ):
     nn = ( [1,1,1] + nn )[-4:]
     mm = ( [1,1,1] + mm )[-4:]
     f = numpy.empty( nn, dtype )
-    offset = numpy.array( i0, dtype=numpy.int64 )
-    stride = numpy.cumprod( [1] + mm[:0:-1], dtype=numpy.int64 )[::-1] * dtype.itemsize
+    itemsize = numpy.dtype( dtype ).itemsize
+    offset = numpy.array( i0, 'd' )
+    stride = numpy.cumprod( [1] + mm[:0:-1], dtype='d' )[::-1] * itemsize
     for j in xrange( nn[0] ):
         for k in xrange( nn[1] ):
             for l in xrange( nn[2] ):

@@ -29,12 +29,12 @@ for rundir in runs:
     else:
         m0 = prm.src_w1[0] * ( 3*rho*vp*vp - 4*rho*vs*vs )
     for sta in stations:
-        x1 = numpy.fromfile( rundir + '/out/' + sta + '_x1', numpy.float32 )
-        x2 = numpy.fromfile( rundir + '/out/' + sta + '_x2', numpy.float32 )
-        x3 = numpy.fromfile( rundir + '/out/' + sta + '_x3', numpy.float32 )
-        v1 = numpy.fromfile( rundir + '/out/' + sta + '_v1', numpy.float32 )
-        v2 = numpy.fromfile( rundir + '/out/' + sta + '_v2', numpy.float32 )
-        v3 = numpy.fromfile( rundir + '/out/' + sta + '_v3', numpy.float32 )
+        x1 = numpy.fromfile( rundir + '/out/' + sta + '_x1', 'f' )
+        x2 = numpy.fromfile( rundir + '/out/' + sta + '_x2', 'f' )
+        x3 = numpy.fromfile( rundir + '/out/' + sta + '_x3', 'f' )
+        v1 = numpy.fromfile( rundir + '/out/' + sta + '_v1', 'f' )
+        v2 = numpy.fromfile( rundir + '/out/' + sta + '_v2', 'f' )
+        v3 = numpy.fromfile( rundir + '/out/' + sta + '_v3', 'f' )
         x  = numpy.array([ x1, x2, x3 ]).squeeze()
         r  = numpy.sqrt( (x*x).sum() )
         t  = prm.dt * numpy.arange( prm.nt ) + 0.5 * prm.dt
