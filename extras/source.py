@@ -24,12 +24,11 @@ def write_src( history, nt, dt, t0, xi, w1, w2, path='' ):
     array( w2[1], 'f'   ).tofile( path + 'w31' )
     array( w2[2], 'f'   ).tofile( path + 'w12' )
 
-def srf_read( filename, headeronly=False, noslip=False, mks=True ):
+def srf_read( filename, headeronly=False, mks=True ):
     """
     Reader for Graves Standard Rupture Format (SRF).
     SRF is documented at http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
     Returns separate meta and data objects.
-    Optionally include points with zero slip.
     """
     import os, sys, gzip, numpy
     class obj: pass
@@ -67,63 +66,84 @@ def srf_read( filename, headeronly=False, noslip=False, mks=True ):
 
     # Data block
     data = obj()
-    data.nt   = []
-    data.dt   = []
-    data.t0   = []
-    data.dep  = []
-    data.lon  = []
-    data.lat  = []
-    data.stk  = []
-    data.dip  = []
-    data.rake = []
-    data.area = []
-    data.slip = []
-    data.sv   = []
+    data.nt1   = []
+    data.nt2   = []
+    data.nt3   = []
+    data.dt    = []
+    data.t0    = []
+    data.dep   = []
+    data.lon   = []
+    data.lat   = []
+    data.stk   = []
+    data.dip   = []
+    data.rake  = []
+    data.area  = []
+    data.slip1 = []
+    data.slip2 = []
+    data.slip3 = []
+    data.sv1   = []
+    data.sv2   = []
+    data.sv3   = []
     for isrc in range( meta.nsource ):
         k = fh.readline().split() + fh.readline().split()
         if len( k ) != 15:
             sys.exit( 'error reading %' % filename )
-        nt = int( k[10] ), int( k[12] ), int( k[14] )
-        if noslip or sum( nt ) > 0:
-            data.nt   += [ nt ]
-            data.dt   += [ float( k[7] ) ]
-            data.t0   += [ float( k[6] ) ]
-            data.dep  += [ float( k[2] ) ]
-            data.lon  += [ float( k[0] ) ]
-            data.lat  += [ float( k[1] ) ]
-            data.stk  += [ float( k[3] ) ]
-            data.dip  += [ float( k[4] ) ]
-            data.rake += [ float( k[8] ) ]
-            data.area += [ float( k[5] ) ]
-            data.slip += [ ( float( k[9] ), float( k[11] ), float( k[13] ) ) ]
-            sv = []
-            while len( sv ) < sum( nt ):
-                sv += fh.readline().split()
-            if len( sv ) != sum( nt ):
-                sys.exit( 'error reading %' % filename )
-            data.sv += [ float( f ) for f in sv ]
+        data.nt1   += [ int( k[10] ) ]
+        data.nt2   += [ int( k[12] ) ]
+        data.nt3   += [ int( k[14] ) ]
+        data.dt    += [ float( k[7] ) ]
+        data.t0    += [ float( k[6] ) ]
+        data.dep   += [ float( k[2] ) ]
+        data.lon   += [ float( k[0] ) ]
+        data.lat   += [ float( k[1] ) ]
+        data.stk   += [ float( k[3] ) ]
+        data.dip   += [ float( k[4] ) ]
+        data.rake  += [ float( k[8] ) ]
+        data.area  += [ float( k[5] ) ]
+        data.slip1 += [ float( k[9] ) ]
+        data.slip2 += [ float( k[11] ) ]
+        data.slip3 += [ float( k[13] ) ]
+        sv = []
+        n = numpy.cumsum([ data.nt1[-1], data.nt2[-1], data.nt3[-1] ])
+        while len( sv ) < n[2]:
+            sv += fh.readline().split()
+        if len( sv ) != n[2]:
+            sys.exit( 'error reading %' % filename )
+        data.sv1 += [ float( f ) for f in sv[:n[0]]     ]
+        data.sv2 += [ float( f ) for f in sv[n[0]:n[1]] ]
+        data.sv3 += [ float( f ) for f in sv[n[1]:]     ]
     meta.nsource = len( data.dt )
-    data.nt   = numpy.array( data.nt )
-    data.dt   = numpy.array( data.dt )
-    data.t0   = numpy.array( data.t0 )
-    data.dep  = numpy.array( data.dep )
-    data.lon  = numpy.array( data.lon )
-    data.lat  = numpy.array( data.lat )
-    data.stk  = numpy.array( data.stk )
-    data.dip  = numpy.array( data.dip )
-    data.rake = numpy.array( data.rake )
-    data.area = numpy.array( data.area )
-    data.slip = numpy.array( data.slip )
-    data.sv   = numpy.array( data.sv )
+    data.nt1   = numpy.array( data.nt1   )
+    data.nt2   = numpy.array( data.nt2   )
+    data.nt3   = numpy.array( data.nt3   )
+    data.dt    = numpy.array( data.dt    )
+    data.t0    = numpy.array( data.t0    )
+    data.dep   = numpy.array( data.dep   )
+    data.lon   = numpy.array( data.lon   )
+    data.lat   = numpy.array( data.lat   )
+    data.stk   = numpy.array( data.stk   )
+    data.dip   = numpy.array( data.dip   )
+    data.rake  = numpy.array( data.rake  )
+    data.area  = numpy.array( data.area  )
+    data.slip1 = numpy.array( data.slip1 )
+    data.slip2 = numpy.array( data.slip2 )
+    data.slip3 = numpy.array( data.slip3 )
+    data.sv1   = numpy.array( data.sv1   )
+    data.sv2   = numpy.array( data.sv2   )
+    data.sv3   = numpy.array( data.sv3   )
     if mks:
-        data.dep  = 1000.0 * data.dep
-        data.area = 0.0001 * data.area
-        data.slip = 0.01   * data.slip
-        data.sv   = 0.01   * data.sv
-    meta.potency = ( data.area * numpy.sqrt( (data.slip**2).sum(1) ) ).sum()
+        data.dep   = 1000.0 * data.dep
+        data.area  = 0.0001 * data.area
+        data.slip1 = 0.01   * data.slip1
+        data.slip2 = 0.01   * data.slip2
+        data.slip3 = 0.01   * data.slip3
+        data.sv1   = 0.01   * data.sv1
+        data.sv2   = 0.01   * data.sv2
+        data.sv3   = 0.01   * data.sv3
+    meta.potency = ( data.area * numpy.sqrt( data.slip1**2 + data.slip2**2 + data.slip3**2 ) ).sum()
     return meta, data
 
-def srf2potency( filename, projection, dx, path='' ): 
+def srf2potency( filename, projection, dx, path='' ):
     """
     Read SRF file and write SORD potency tensor source.
     """
@@ -133,27 +153,27 @@ def srf2potency( filename, projection, dx, path='' ):
     # Read SRF
     meta, data = srf_read( filename )
     path = os.path.join( os.path.expanduser( path ), 'src_' )
-    del( meta, data.slip )
+    del( meta, data.slip1, data.slip2, data.slip3 )
 
-    # Time history 
-    np = data.nt.shape
-    k = 0
-    for j in xrange( np[0] ):
-        for i in xrange( 3 ):
-            nt = data.nt[j,i]
-            data.sv[k:k+nt] = data.dt[j] * numpy.cumsum( data.sv[k:k+nt] )
-            k = k + nt
-    array( data.sv, 'f' ).tofile( path + 'history' )
-    del( data.sv )
+    # Time history
+    i1, i2, i3 = 0, 0, 0
+    for i in xrange( data.dt.size ):
+        dt, n1, n2, n3 = data.dt[i], data.nt1[i], data.nt2[i], data.nt3[i]
+        data.sv1[i1:i1+n1] = dt * numpy.cumsum( data.sv1[i1:i1+n1] )
+        data.sv2[i2:i2+n2] = dt * numpy.cumsum( data.sv2[i2:i2+n2] )
+        data.sv3[i3:i3+n3] = dt * numpy.cumsum( data.sv3[i3:i3+n3] )
+        i1, i2, i3 = i1+n1, i2+n2, i3+n3
+    array( [data.sv1, data.sv2, data.sv3], 'f' ).tofile( path + 'history' )
+    del( data.sv1, data.sv2, data.sv3 )
 
     # Time
-    ii = data.nt > 0
-    n = ii.shape
-    nsource = data.nt[ii].size
-    array( data.nt, 'f' )[ii].tofile( path + 'nt' )
-    array( data.dt, 'f' ).repeat(3).reshape(n)[ii].tofile( path + 'dt' )
-    array( data.t0, 'f' ).repeat(3).reshape(n)[ii].tofile( path + 't0' )
-    del( data.nt, data.dt, data.t0 )
+    nt = array([ data.nt1, data.nt2, data.nt3 ])
+    ii = nt > 0
+    nt[ii].tofile( path + 'nt' )
+    array( data.dt, 'f' )[None].repeat(3,0)[ii].tofile( path + 'dt' )
+    array( data.t0, 'f' )[None].repeat(3,0)[ii].tofile( path + 't0' )
+    nsource = nt[ii].size
+    del( nt, data.nt1, data.nt2, data.nt3, data.dt, data.t0 )
 
     # Strike rotation
     mat, rot = coord.rotation( data.lon, data.lat, projection )
@@ -169,27 +189,27 @@ def srf2potency( filename, projection, dx, path='' ):
     x = x / dx[0] + 1.0
     y = y / dx[1] + 1.0
     z = data.dep / dx[2] + 1.0
-    array( x, 'f' ).repeat(3).reshape(n)[ii].tofile( path + 'xi1' )
-    array( y, 'f' ).repeat(3).reshape(n)[ii].tofile( path + 'xi2' )
-    array( z, 'f' ).repeat(3).reshape(n)[ii].tofile( path + 'xi3' )
+    array( x, 'f' )[None].repeat(3,0)[ii].tofile( path + 'xi1' )
+    array( y, 'f' )[None].repeat(3,0)[ii].tofile( path + 'xi2' )
+    array( z, 'f' )[None].repeat(3,0)[ii].tofile( path + 'xi3' )
     del( x, y, z, data.lon, data.lat, data.dep )
 
     # Normal tensor components
-    w = numpy.zeros( np )
-    w[:,2] = data.area * nrm[0] * nrm[0]; array( w, 'f' )[ii].tofile( path + 'w11' )
-    w[:,2] = data.area * nrm[1] * nrm[1]; array( w, 'f' )[ii].tofile( path + 'w22' )
-    w[:,2] = data.area * nrm[2] * nrm[2]; array( w, 'f' )[ii].tofile( path + 'w33' )
+    w = numpy.zeros_lile( nrm )
+    w[2] = data.area * nrm[0] * nrm[0]; array( w, 'f' )[ii].tofile( path + 'w11' )
+    w[2] = data.area * nrm[1] * nrm[1]; array( w, 'f' )[ii].tofile( path + 'w22' )
+    w[2] = data.area * nrm[2] * nrm[2]; array( w, 'f' )[ii].tofile( path + 'w33' )
 
     # Shear tensor components
-    w = numpy.zeros( np )
-    w[:,0] = 0.5 * data.area * ( stk[1] * nrm[2] + nrm[1] * stk[2] )
-    w[:,1] = 0.5 * data.area * ( dip[1] * nrm[2] + nrm[1] * dip[2] )
+    w = numpy.zeros_lile( nrm )
+    w[0] = 0.5 * data.area * ( stk[1] * nrm[2] + nrm[1] * stk[2] )
+    w[1] = 0.5 * data.area * ( dip[1] * nrm[2] + nrm[1] * dip[2] )
     array( w, 'f' )[ii].tofile( path + 'w23' )
-    w[:,0] = 0.5 * data.area * ( stk[2] * nrm[0] + nrm[2] * stk[0] )
-    w[:,1] = 0.5 * data.area * ( dip[2] * nrm[0] + nrm[2] * dip[0] )
+    w[0] = 0.5 * data.area * ( stk[2] * nrm[0] + nrm[2] * stk[0] )
+    w[1] = 0.5 * data.area * ( dip[2] * nrm[0] + nrm[2] * dip[0] )
     array( w, 'f' )[ii].tofile( path + 'w31' )
-    w[:,0] = 0.5 * data.area * ( stk[0] * nrm[1] + nrm[0] * stk[1] )
-    w[:,1] = 0.5 * data.area * ( dip[0] * nrm[1] + nrm[0] * dip[1] )
+    w[0] = 0.5 * data.area * ( stk[0] * nrm[1] + nrm[0] * stk[1] )
+    w[1] = 0.5 * data.area * ( dip[0] * nrm[1] + nrm[0] * dip[1] )
     array( w, 'f' )[ii].tofile( path + 'w12' )
     del( w, stk, dip, nrm, data.area )
 
@@ -201,4 +221,4 @@ if __name__ == '__main__':
         print f
         meta = srf_read( f, True )
         pprint.pprint( sord.util.dictify( meta ) )
-    
+ 
