@@ -252,7 +252,7 @@ def prepare_prm( prm, itbuff ):
         if op not in '=+': sys.exit( 'Error: unsupported operator: %r' % line )
         try:
             if len(line) is 10:
-                tfunc, period, x1, x2, nb, ii, field, filename, val   = line[1:]
+                tfunc, period, x1, x2, nb, ii, field, filename, val               = line[1:]
             elif mode in [ '', 's']:        field, ii, val                        = line[1:]
             elif mode in [ 'x', 'sx']:      field, ii, val, x1                    = line[1:]
             elif mode in [ 'c' ]:           field, ii, val, x1, x2                = line[1:]
@@ -273,11 +273,14 @@ def prepare_prm( prm, itbuff ):
         if 'w' not in mode and field not in fieldnames.input:
             sys.exit( 'Error: field is ouput only: %r' % line )
         nn = list( prm.nn ) + [ prm.nt ]
-        ii = util.expand_indices( ii, nn )
         if field in fieldnames.cell:
-            ii = [ (i[0], i[1]-1, i[2]) for i in ii[:3] ] + [ii[3]]
             mode = mode.replace( 'x', 'X' )
             mode = mode.replace( 'c', 'C' )
+            base = 1.5
+        else:
+            base = 1
+        ii = util.expand_indices( ii[:3], prm.nn, base ) \
+           + util.expand_indices( ii[3:], [prm.nt], 1 )
         if field in fieldnames.initial:
             ii[3] = 0, 0, 1
         if field in fieldnames.fault:

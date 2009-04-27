@@ -110,28 +110,34 @@ def expand_indices( indices, shape, base=1 ):
     """
     import sys
     n = len( shape )
+    off = int( base )
     if len( indices ) == 0:
         indices = n * [()]
     elif len( indices ) != n:
         sys.exit( 'error in indices: %r' % indices )
-    indices = list( indices )
+    else:
+        indices = list( indices )
     for i in range( n ):
-        if type( indices[i] ) == int:
-            if base == 1 and indices[i] == 0:
-                indices[i] = [ base, -1, 1 ]
+        if type( indices[i] ) in ( int, float ):
+            if indices[i] == 0 and base > 0:
+                indices[i] = [ base, shape[i] - base + off, 1 ]
             else:
-                indices[i] = [ indices[i], indices[i]-base+1, 1 ]
+                indices[i] = [ indices[i], indices[i] + 1 - off, 1 ]
         elif len( indices[i] ) == 0:
-            indices[i] = [ base, -1, 1 ]
-        else:
+            indices[i] = [ base, shape[i] - base + off, 1 ]
+        elif len( indices[i] ) == 2:
+            indices[i] = list( indices[i] ) + [ 1 ]
+        elif len( indices[i] ) == 3:
             indices[i] = list( indices[i] )
-        if  len( indices[i] ) == 2:
-            indices[i] = indices[i] + [ 1 ]
+        elif len( indices[i] ) == 1:
+            indices[i] = [ indices[i][0], indices[i][0] + 1 - off, 1 ]
+        else:
+            sys.exit( 'error in indices: %r' % indices )
         if  indices[i][0] < 0:
-            indices[i][0] = indices[i][0] + shape[i] + base
+            indices[i][0] = indices[i][0] + shape[i] + off
         if  indices[i][1] < 0:
-            indices[i][1] = indices[i][1] + shape[i] + 1
-        indices[i] = tuple( indices[i] )
+            indices[i][1] = indices[i][1] + shape[i] + off
+        indices[i] = tuple([ int( j ) for j in indices[i] ])
     return indices
 
 def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
