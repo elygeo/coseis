@@ -67,7 +67,7 @@ def stage( inputs ):
     if not cfg.prepare: cfg.run = False
 
     # Partition for parallelization
-    prm.nn = tuple( prm.nn )
+    prm.nn = tuple([ int( i ) for i in  prm.nn ])
     maxtotalcores = cfg.maxnodes * cfg.maxcores
     if not cfg.mode and maxtotalcores == 1:
         cfg.mode = 's'
