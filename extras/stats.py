@@ -16,9 +16,9 @@ for a in sys.argv[1:]:
         args += [ a ]
 
 print '         Min          Max         Mean            N'
-for filename in sys.argv[1:]:
+for filename in args:
     n = os.path.getsize( filename )
-    if not n % nb:
+    if n > 0 and n % nb == 0:
         n /= nb
         fh = open( filename, 'rb' )
         rmin = numpy.inf

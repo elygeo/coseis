@@ -14,6 +14,26 @@ Run from disks located at HPC:
 I/O to temporary space:
     /scratch
 alias showme='qstat -n | grep -E "Queue|-----|nbns"; qstat -n | grep scec'
+
+--disable-devdebug
+--with-device=ch_mx
+-prefix=/usr/usc/mpich/1.2.7..7/mx-gnu
+-opt=-O2 -c++=/usr/bin/g++
+--enable-sharedlib
+--libdir=/usr/usc/mpich/1.2.7..7/mx-gnu/lib
+--with-romio=--with-file-system=nfs+ufs+pvfs2
+-lib=
+-lmyriexpress
+-lpthread
+-lpvfs2
+-lpthread
+-L/usr/usc/mpich/1.2.7..7/mx-gnu/extras/lib
+-L/usr/X11R6/lib
+-Wl,-rpath
+-Wl,/usr/usc/mpich/1.2.7..7/mx-gnu/extras/lib
+-Wl,-rpath
+-Wl,/usr/usc/mpich/1.2.7..7/mx-gnu/lib
+-c++linker=/usr/bin/g++
 """
 login = 'hpc-login1.usc.edu'
 hosts = [ 'hpc-login1', 'hpc-login2' ]

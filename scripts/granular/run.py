@@ -6,12 +6,12 @@ sources: 500kHz
 """
 import sord
 
-dx = 0.001,   0.001,   0.001   ; np3 = 1, 1,  1 # spatial resolution and number of processors
 dx = 0.00025, 0.00025, 0.00025 ; np3 = 1, 32, 1 # spatial resolution and number of processors
+dx = 0.001,   0.001,   0.001   ; np3 = 1, 32,  1 # spatial resolution and number of processors
 dt = dx[0] / 12500.0		# time step length
 
-_T = 0.00001			# time duration
 _T = 0.0001			# time duration 
+_T = 0.00001			# time duration
 _L = 0.15, 0.06, 0.11		# model dimensions
 bc1 = 0, 0, 0			# reflecting boundary condition
 bc2 = 0, 0, 0			# reflecting boundary condition

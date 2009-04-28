@@ -3,27 +3,6 @@
 Source utilities
 """
 
-def write_src( history, nt, dt, t0, xi, w1, w2, path='' ):
-    """
-    Write SORD input for moment or potency source.
-    """
-    import os
-    from numpy import array
-    path = os.path.join( os.path.expanduser( path ), 'src_' )
-    array( history, 'f' ).tofile( path + 'history' )
-    array( nt, 'f'      ).tofile( path + 'nt'  )
-    array( dt, 'f'      ).tofile( path + 'dt'  )
-    array( t0, 'f'      ).tofile( path + 't0'  )
-    array( xi[0], 'f'   ).tofile( path + 'xi1' )
-    array( xi[1], 'f'   ).tofile( path + 'xi2' )
-    array( xi[2], 'f'   ).tofile( path + 'xi3' )
-    array( w1[0], 'f'   ).tofile( path + 'w11' )
-    array( w1[1], 'f'   ).tofile( path + 'w22' )
-    array( w1[2], 'f'   ).tofile( path + 'w33' )
-    array( w2[0], 'f'   ).tofile( path + 'w23' )
-    array( w2[1], 'f'   ).tofile( path + 'w31' )
-    array( w2[2], 'f'   ).tofile( path + 'w12' )
-
 def srf_read( filename, headeronly=False, mks=True ):
     """
     Reader for Graves Standard Rupture Format (SRF).
@@ -66,71 +45,56 @@ def srf_read( filename, headeronly=False, mks=True ):
 
     # Data block
     data = obj()
-    data.nt1   = []
-    data.nt2   = []
-    data.nt3   = []
-    data.dt    = []
-    data.t0    = []
-    data.dep   = []
-    data.lon   = []
-    data.lat   = []
-    data.stk   = []
-    data.dip   = []
-    data.rake  = []
-    data.area  = []
-    data.slip1 = []
-    data.slip2 = []
-    data.slip3 = []
+    n = meta.nsource
+    data.lon   = numpy.empty( n, 'f' )
+    data.lat   = numpy.empty( n, 'f' )
+    data.dep   = numpy.empty( n, 'f' )
+    data.stk   = numpy.empty( n, 'f' )
+    data.dip   = numpy.empty( n, 'f' )
+    data.rake  = numpy.empty( n, 'f' )
+    data.area  = numpy.empty( n, 'f' )
+    data.t0    = numpy.empty( n, 'f' )
+    data.dt    = numpy.empty( n, 'f' )
+    data.slip1 = numpy.empty( n, 'f' )
+    data.slip2 = numpy.empty( n, 'f' )
+    data.slip3 = numpy.empty( n, 'f' )
+    data.nt1   = numpy.empty( n, 'i' )
+    data.nt2   = numpy.empty( n, 'i' )
+    data.nt3   = numpy.empty( n, 'i' )
     data.sv1   = []
     data.sv2   = []
     data.sv3   = []
-    for isrc in range( meta.nsource ):
+    for i in xrange( meta.nsource ):
         k = fh.readline().split() + fh.readline().split()
         if len( k ) != 15:
-            sys.exit( 'error reading %' % filename )
-        data.nt1   += [ int( k[10] ) ]
-        data.nt2   += [ int( k[12] ) ]
-        data.nt3   += [ int( k[14] ) ]
-        data.dt    += [ float( k[7] ) ]
-        data.t0    += [ float( k[6] ) ]
-        data.dep   += [ float( k[2] ) ]
-        data.lon   += [ float( k[0] ) ]
-        data.lat   += [ float( k[1] ) ]
-        data.stk   += [ float( k[3] ) ]
-        data.dip   += [ float( k[4] ) ]
-        data.rake  += [ float( k[8] ) ]
-        data.area  += [ float( k[5] ) ]
-        data.slip1 += [ float( k[9] ) ]
-        data.slip2 += [ float( k[11] ) ]
-        data.slip3 += [ float( k[13] ) ]
+            sys.exit( 'error reading %s %s' % ( filename, i ) )
+        data.lon[i]   = float( k[0] )
+        data.lat[i]   = float( k[1] )
+        data.dep[i]   = float( k[2] )
+        data.stk[i]   = float( k[3] )
+        data.dip[i]   = float( k[4] )
+        data.rake[i]  = float( k[8] )
+        data.area[i]  = float( k[5] )
+        data.t0[i]    = float( k[6] )
+        data.dt[i]    = float( k[7] )
+        data.slip1[i] = float( k[9] )
+        data.slip2[i] = float( k[11] )
+        data.slip3[i] = float( k[13] )
+        data.nt1[i]   = int( k[10] )
+        data.nt2[i]   = int( k[12] )
+        data.nt3[i]   = int( k[14] )
         sv = []
-        n = numpy.cumsum([ data.nt1[-1], data.nt2[-1], data.nt3[-1] ])
-        while len( sv ) < n[2]:
+        n = numpy.cumsum([ data.nt1[i], data.nt2[i], data.nt3[i] ])
+        while len( sv ) < n[-1]:
             sv += fh.readline().split()
-        if len( sv ) != n[2]:
-            sys.exit( 'error reading %' % filename )
+        if len( sv ) != n[-1]:
+            sys.exit( 'error reading %s %s' % ( filename, i ) )
         data.sv1 += [ float( f ) for f in sv[:n[0]]     ]
         data.sv2 += [ float( f ) for f in sv[n[0]:n[1]] ]
         data.sv3 += [ float( f ) for f in sv[n[1]:]     ]
-    meta.nsource = len( data.dt )
-    data.nt1   = numpy.array( data.nt1   )
-    data.nt2   = numpy.array( data.nt2   )
-    data.nt3   = numpy.array( data.nt3   )
-    data.dt    = numpy.array( data.dt    )
-    data.t0    = numpy.array( data.t0    )
-    data.dep   = numpy.array( data.dep   )
-    data.lon   = numpy.array( data.lon   )
-    data.lat   = numpy.array( data.lat   )
-    data.stk   = numpy.array( data.stk   )
-    data.dip   = numpy.array( data.dip   )
-    data.rake  = numpy.array( data.rake  )
-    data.area  = numpy.array( data.area  )
-    data.slip1 = numpy.array( data.slip1 )
-    data.slip2 = numpy.array( data.slip2 )
-    data.slip3 = numpy.array( data.slip3 )
-    data.sv1   = numpy.array( data.sv1   )
-    data.sv2   = numpy.array( data.sv2   )
-    data.sv3   = numpy.array( data.sv3   )
+    data.sv1 = numpy.array( data.sv1 )
+    data.sv2 = numpy.array( data.sv2 )
+    data.sv3 = numpy.array( data.sv3 )
     if mks:
         data.dep   = 1000.0 * data.dep
         data.area  = 0.0001 * data.area
@@ -143,17 +107,95 @@ def srf_read( filename, headeronly=False, mks=True ):
     meta.potency = ( data.area * numpy.sqrt( data.slip1**2 + data.slip2**2 + data.slip3**2 ) ).sum()
     return meta, data
 
-def srf2potency( filename, projection, dx, path='' ):
+def srfb_write( meta, data, path='' ):
     """
-    Read SRF file and write SORD potency tensor source.
+    Write SRF binary format.
+    """
+    import os, numpy, sord
+    path = os.path.expanduser( path )
+    if not os.path.isdir( path ):
+        os.makedirs( path )
+    sord.util.save( os.path.join( path, 'meta.py' ), sord.util.dictify( meta ) )
+    array = numpy.array
+    array( data.lon,   'f' ).tofile( os.path.join( path, 'lon' ) )
+    array( data.lat,   'f' ).tofile( os.path.join( path, 'lat' ) )
+    array( data.dep,   'f' ).tofile( os.path.join( path, 'dep' ) )
+    array( data.stk,   'f' ).tofile( os.path.join( path, 'stk' ) )
+    array( data.dip,   'f' ).tofile( os.path.join( path, 'dip' ) )
+    array( data.rake,  'f' ).tofile( os.path.join( path, 'rake' ) )
+    array( data.area,  'f' ).tofile( os.path.join( path, 'area' ) )
+    array( data.t0,    'f' ).tofile( os.path.join( path, 't0' ) )
+    array( data.dt,    'f' ).tofile( os.path.join( path, 'dt' ) )
+    array( data.slip1, 'f' ).tofile( os.path.join( path, 'slip1' ) )
+    array( data.slip2, 'f' ).tofile( os.path.join( path, 'slip2' ) )
+    array( data.slip3, 'f' ).tofile( os.path.join( path, 'slip3' ) )
+    array( data.sv1,   'f' ).tofile( os.path.join( path, 'sv1' ) )
+    array( data.sv2,   'f' ).tofile( os.path.join( path, 'sv2' ) )
+    array( data.sv3,   'f' ).tofile( os.path.join( path, 'sv3' ) )
+    array( data.nt1,   'i' ).tofile( os.path.join( path, 'nt1' ) )
+    array( data.nt2,   'i' ).tofile( os.path.join( path, 'nt2' ) )
+    array( data.nt3,   'i' ).tofile( os.path.join( path, 'nt3' ) )
+    return
+
+def srfb_read( path='' ):
+    """
+    Read SRF binary format.
+    """
+    import numpy, sord
+    path = os.path.expanduser( path )
+    if not os.path.isdir( path ):
+        os.makedirs( path )
+    meta = sord.util.objectify( sord.util.load( os.path.join( path, 'meta.py' ) ) )
+    data = obj()
+    data.lon   = fromfile( os.path.join( path, 'lon'   ), 'f' )
+    data.lat   = fromfile( os.path.join( path, 'lat'   ), 'f' )
+    data.dep   = fromfile( os.path.join( path, 'dep'   ), 'f' )
+    data.stk   = fromfile( os.path.join( path, 'stk'   ), 'f' )
+    data.dip   = fromfile( os.path.join( path, 'dip'   ), 'f' )
+    data.rake  = fromfile( os.path.join( path, 'rake'  ), 'f' )
+    data.area  = fromfile( os.path.join( path, 'area'  ), 'f' )
+    data.t0    = fromfile( os.path.join( path, 't0'    ), 'f' )
+    data.dt    = fromfile( os.path.join( path, 'dt'    ), 'f' )
+    data.slip1 = fromfile( os.path.join( path, 'slip1' ), 'f' )
+    data.slip2 = fromfile( os.path.join( path, 'slip2' ), 'f' )
+    data.slip3 = fromfile( os.path.join( path, 'slip3' ), 'f' )
+    data.sv1   = fromfile( os.path.join( path, 'sv1'   ), 'f' )
+    data.sv2   = fromfile( os.path.join( path, 'sv2'   ), 'f' )
+    data.sv3   = fromfile( os.path.join( path, 'sv3'   ), 'f' )
+    data.nt1   = fromfile( os.path.join( path, 'nt1'   ), 'i' )
+    data.nt2   = fromfile( os.path.join( path, 'nt2'   ), 'i' )
+    data.nt3   = fromfile( os.path.join( path, 'nt3'   ), 'i' )
+    return
+
+def src_write( history, nt, dt, t0, xi, w1, w2, path='' ):
+    """
+    Write SORD input for moment or potency source.
+    """
+    import os
+    from numpy import array
+    path = os.path.join( os.path.expanduser( path ), 'src_' )
+    array( history, 'f' ).tofile( path + 'history' )
+    array( nt, 'f'      ).tofile( path + 'nt'  )
+    array( dt, 'f'      ).tofile( path + 'dt'  )
+    array( t0, 'f'      ).tofile( path + 't0'  )
+    array( xi[0], 'f'   ).tofile( path + 'xi1' )
+    array( xi[1], 'f'   ).tofile( path + 'xi2' )
+    array( xi[2], 'f'   ).tofile( path + 'xi3' )
+    array( w1[0], 'f'   ).tofile( path + 'w11' )
+    array( w1[1], 'f'   ).tofile( path + 'w22' )
+    array( w1[2], 'f'   ).tofile( path + 'w33' )
+    array( w2[0], 'f'   ).tofile( path + 'w23' )
+    array( w2[1], 'f'   ).tofile( path + 'w31' )
+    array( w2[2], 'f'   ).tofile( path + 'w12' )
+    return
+
+def srf2potency( data, projection, dx, path='' ):
+    """
+    Convert SRF to potency tensor source and write SORD input files.
     """
     import os, numpy, coord
     array = numpy.array
-
-    # Read SRF
-    meta, data = srf_read( filename )
     path = os.path.join( os.path.expanduser( path ), 'src_' )
-    del( meta, data.slip1, data.slip2, data.slip3 )
 
     # Time history
     i1, i2, i3 = 0, 0, 0
@@ -169,7 +211,7 @@ def srf2potency( filename, projection, dx, path='' ):
     # Time
     nt = array([ data.nt1, data.nt2, data.nt3 ])
     ii = nt > 0
-    nt[ii].tofile( path + 'nt' )
+    array( nt, 'f' )[ii].tofile( path + 'nt' )
     array( data.dt, 'f' )[None].repeat(3,0)[ii].tofile( path + 'dt' )
     array( data.t0, 'f' )[None].repeat(3,0)[ii].tofile( path + 't0' )
     nsource = nt[ii].size
