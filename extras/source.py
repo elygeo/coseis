@@ -117,63 +117,67 @@ def srfb_write( meta, data, path='' ):
         os.makedirs( path )
     sord.util.save( os.path.join( path, 'meta.py' ), sord.util.dictify( meta ) )
     array = numpy.array
-    array( data.lon,   'f' ).tofile( os.path.join( path, 'lon' ) )
-    array( data.lat,   'f' ).tofile( os.path.join( path, 'lat' ) )
-    array( data.dep,   'f' ).tofile( os.path.join( path, 'dep' ) )
-    array( data.stk,   'f' ).tofile( os.path.join( path, 'stk' ) )
-    array( data.dip,   'f' ).tofile( os.path.join( path, 'dip' ) )
-    array( data.rake,  'f' ).tofile( os.path.join( path, 'rake' ) )
-    array( data.area,  'f' ).tofile( os.path.join( path, 'area' ) )
-    array( data.t0,    'f' ).tofile( os.path.join( path, 't0' ) )
-    array( data.dt,    'f' ).tofile( os.path.join( path, 'dt' ) )
-    array( data.slip1, 'f' ).tofile( os.path.join( path, 'slip1' ) )
-    array( data.slip2, 'f' ).tofile( os.path.join( path, 'slip2' ) )
-    array( data.slip3, 'f' ).tofile( os.path.join( path, 'slip3' ) )
-    array( data.sv1,   'f' ).tofile( os.path.join( path, 'sv1' ) )
-    array( data.sv2,   'f' ).tofile( os.path.join( path, 'sv2' ) )
-    array( data.sv3,   'f' ).tofile( os.path.join( path, 'sv3' ) )
-    array( data.nt1,   'i' ).tofile( os.path.join( path, 'nt1' ) )
-    array( data.nt2,   'i' ).tofile( os.path.join( path, 'nt2' ) )
-    array( data.nt3,   'i' ).tofile( os.path.join( path, 'nt3' ) )
+    join = os.path.join
+    array( data.lon,   'f' ).tofile( join( path, 'lon' ) )
+    array( data.lat,   'f' ).tofile( join( path, 'lat' ) )
+    array( data.dep,   'f' ).tofile( join( path, 'dep' ) )
+    array( data.stk,   'f' ).tofile( join( path, 'stk' ) )
+    array( data.dip,   'f' ).tofile( join( path, 'dip' ) )
+    array( data.rake,  'f' ).tofile( join( path, 'rake' ) )
+    array( data.area,  'f' ).tofile( join( path, 'area' ) )
+    array( data.t0,    'f' ).tofile( join( path, 't0' ) )
+    array( data.dt,    'f' ).tofile( join( path, 'dt' ) )
+    array( data.slip1, 'f' ).tofile( join( path, 'slip1' ) )
+    array( data.slip2, 'f' ).tofile( join( path, 'slip2' ) )
+    array( data.slip3, 'f' ).tofile( join( path, 'slip3' ) )
+    array( data.sv1,   'f' ).tofile( join( path, 'sv1' ) )
+    array( data.sv2,   'f' ).tofile( join( path, 'sv2' ) )
+    array( data.sv3,   'f' ).tofile( join( path, 'sv3' ) )
+    array( data.nt1,   'i' ).tofile( join( path, 'nt1' ) )
+    array( data.nt2,   'i' ).tofile( join( path, 'nt2' ) )
+    array( data.nt3,   'i' ).tofile( join( path, 'nt3' ) )
     return
 
 def srfb_read( path='' ):
     """
     Read SRF binary format.
     """
-    import numpy, sord
+    import os, numpy, sord
+    class obj: pass
     path = os.path.expanduser( path )
     if not os.path.isdir( path ):
         os.makedirs( path )
     meta = sord.util.objectify( sord.util.load( os.path.join( path, 'meta.py' ) ) )
     data = obj()
-    data.lon   = fromfile( os.path.join( path, 'lon'   ), 'f' )
-    data.lat   = fromfile( os.path.join( path, 'lat'   ), 'f' )
-    data.dep   = fromfile( os.path.join( path, 'dep'   ), 'f' )
-    data.stk   = fromfile( os.path.join( path, 'stk'   ), 'f' )
-    data.dip   = fromfile( os.path.join( path, 'dip'   ), 'f' )
-    data.rake  = fromfile( os.path.join( path, 'rake'  ), 'f' )
-    data.area  = fromfile( os.path.join( path, 'area'  ), 'f' )
-    data.t0    = fromfile( os.path.join( path, 't0'    ), 'f' )
-    data.dt    = fromfile( os.path.join( path, 'dt'    ), 'f' )
-    data.slip1 = fromfile( os.path.join( path, 'slip1' ), 'f' )
-    data.slip2 = fromfile( os.path.join( path, 'slip2' ), 'f' )
-    data.slip3 = fromfile( os.path.join( path, 'slip3' ), 'f' )
-    data.sv1   = fromfile( os.path.join( path, 'sv1'   ), 'f' )
-    data.sv2   = fromfile( os.path.join( path, 'sv2'   ), 'f' )
-    data.sv3   = fromfile( os.path.join( path, 'sv3'   ), 'f' )
-    data.nt1   = fromfile( os.path.join( path, 'nt1'   ), 'i' )
-    data.nt2   = fromfile( os.path.join( path, 'nt2'   ), 'i' )
-    data.nt3   = fromfile( os.path.join( path, 'nt3'   ), 'i' )
-    return
+    join = os.path.join
+    fromfile = numpy.fromfile
+    data.lon   = fromfile( join( path, 'lon'   ), 'f' )
+    data.lat   = fromfile( join( path, 'lat'   ), 'f' )
+    data.dep   = fromfile( join( path, 'dep'   ), 'f' )
+    data.stk   = fromfile( join( path, 'stk'   ), 'f' )
+    data.dip   = fromfile( join( path, 'dip'   ), 'f' )
+    data.rake  = fromfile( join( path, 'rake'  ), 'f' )
+    data.area  = fromfile( join( path, 'area'  ), 'f' )
+    data.t0    = fromfile( join( path, 't0'    ), 'f' )
+    data.dt    = fromfile( join( path, 'dt'    ), 'f' )
+    data.slip1 = fromfile( join( path, 'slip1' ), 'f' )
+    data.slip2 = fromfile( join( path, 'slip2' ), 'f' )
+    data.slip3 = fromfile( join( path, 'slip3' ), 'f' )
+    data.sv1   = fromfile( join( path, 'sv1'   ), 'f' )
+    data.sv2   = fromfile( join( path, 'sv2'   ), 'f' )
+    data.sv3   = fromfile( join( path, 'sv3'   ), 'f' )
+    data.nt1   = fromfile( join( path, 'nt1'   ), 'i' )
+    data.nt2   = fromfile( join( path, 'nt2'   ), 'i' )
+    data.nt3   = fromfile( join( path, 'nt3'   ), 'i' )
+    return meta, data
 
 def src_write( history, nt, dt, t0, xi, w1, w2, path='' ):
     """
     Write SORD input for moment or potency source.
     """
-    import os
-    from numpy import array
+    import os, numpy
     path = os.path.join( os.path.expanduser( path ), 'src_' )
+    array = numpy.array
     array( history, 'f' ).tofile( path + 'history' )
     array( nt, 'f'      ).tofile( path + 'nt'  )
     array( dt, 'f'      ).tofile( path + 'dt'  )
@@ -194,8 +198,8 @@ def srf2potency( data, projection, dx, path='' ):
     Convert SRF to potency tensor source and write SORD input files.
     """
     import os, numpy, coord
-    array = numpy.array
     path = os.path.join( os.path.expanduser( path ), 'src_' )
+    array = numpy.array
 
     # Time history
     i1, i2, i3 = 0, 0, 0
