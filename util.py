@@ -76,7 +76,7 @@ def loadmeta( dir='.' ):
         meta = dict()
         if os.path.isfile( os.path.join( dir, 'conf.py' ) ):
             cfg = load( os.path.join( dir, 'conf.py' ) )
-            for k in 'name', 'rundate', 'rundir', 'user', 'os_':
+            for k in 'name', 'rundate', 'rundir', 'user', 'os_', 'dtype':
                 meta[k] = cfg[k]
         if os.path.isfile( os.path.join( dir, 'parameters.py' ) ):
             load( os.path.join( dir, 'parameters.py' ), meta )
