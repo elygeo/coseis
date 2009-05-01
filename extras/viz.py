@@ -4,8 +4,10 @@ Visualization utilities
 """
 
 def colormap( name='w0', colorexp=1., output='mayavi', n=2001, nmod=0, modlim=0.5 ):
-    """Colormap library"""
-    import sys, numpy, matplotlib
+    """
+    Colormap library
+    """
+    import sys, numpy
     centered = False
     if type( name ) == str:
         if name == 'w000':

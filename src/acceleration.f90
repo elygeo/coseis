@@ -6,6 +6,7 @@ contains
 subroutine acceleration
 use m_globals
 use m_diffcn
+use m_source
 use m_hourglass
 use m_bc
 use m_rupture
@@ -158,6 +159,11 @@ do ic = 1, 3
     w1(:,:,:,ic) = w1(:,:,:,ic) - s2
 end do
 end do
+end if
+
+! Add source to force
+if ( src_type == 'force' ) then
+    call vector_point_source
 end if
 
 ! Boundary conditions

@@ -11,7 +11,7 @@ dtype = 'f'
 args = []
 for a in sys.argv[1:]:
     if a[0] == '-':
-        dtype = a[1:]
+        dtype = a[1:].replace( 'l', '<' ).replace( 'b', '>' )
     else:
         args += [ a ]
 

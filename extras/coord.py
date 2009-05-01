@@ -99,6 +99,14 @@ def ibilinear( xx, yy, xi, yi ):
         x  = x + dx
     return x
 
+def ll2cvmh( x, y, inverse=False ):
+    import numpy, pyproj
+    projection = pyproj.Proj( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
+    x = numpy.asarray( x )
+    y = numpy.asarray( y )
+    x, y = projection( x, y, inverse=inverse )
+    return numpy.array( [x, y] )
+
 def ll2cmu( x, y, inverse=False ):
     """
     CMU TeraShake coordinates projection

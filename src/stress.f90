@@ -150,7 +150,7 @@ end do
 ! Add potency source to strain
 if ( src_type == 'potency' ) then
     call finite_source
-    call point_source
+    call tensor_point_source
 end if
 
 ! Strain I/O
@@ -182,7 +182,7 @@ end do
 ! Add moment source to stress
 if ( src_type == 'moment' ) then
     call finite_source
-    call point_source
+    call tensor_point_source
 end if
 
 ! Stress I/O

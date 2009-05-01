@@ -31,6 +31,13 @@ for _f in 'f1', 'f2', 'f3':
     ]
     setup( locals(), argv )
 
+# sub-cell postition
+ihypo = 51.2, 50.3, 50.9
+src_w1 = 1.0, 0.0, 0.0
+src_type = 'force'
+src_period = 0.1
+src_function = 'brune'
+
 _sta = 44, 7, -1
 _src = 23, 11, 30
 _xx, _yy, _zz = 0.0, 0.0, 0.0

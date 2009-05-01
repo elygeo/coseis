@@ -85,7 +85,7 @@ end do
 end subroutine
 
 ! Add point source to strain/stress tensor
-subroutine point_source
+subroutine tensor_point_source
 use m_globals
 use m_util
 integer :: i1(3), i2(3), i, j, k, l
@@ -107,6 +107,34 @@ do j = i1(1), i2(1)
     do i = 1, 3
         w1(j,k,l,i) = w1(j,k,l,i) - w * src_w1(i)
         w2(j,k,l,i) = w2(j,k,l,i) - w * src_w2(i)
+    end do
+end do
+end do
+end do
+end subroutine
+
+! Add point source to vector
+subroutine vector_point_source
+use m_globals
+use m_util
+integer :: i1(3), i2(3), i, j, k, l
+real :: xi(3), f, w
+if ( src_function == 'none' ) return
+xi = ihypo - nnoff
+i1 = max( i1node, int( xi )     )
+i2 = min( i2node, int( xi ) + 1 )
+if ( any( i2 < i1 ) ) then
+    src_function = 'none'
+    return
+end if
+if ( verb ) write( 0, * ) 'Point source'
+f = time_function( src_function, tm, dt, src_period )
+do l = i1(3), i2(3)
+do k = i1(2), i2(2)
+do j = i1(1), i2(1)
+    w = f * ( (1.0-abs(xi(1)-j)) * (1.0-abs(xi(2)-k)) * (1.0-abs(xi(3)-l)) )
+    do i = 1, 3
+        w1(j,k,l,i) = w1(j,k,l,i) - w * src_w1(i)
     end do
 end do
 end do
