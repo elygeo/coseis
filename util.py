@@ -29,7 +29,8 @@ def load( filename, d=None ):
     import os
     if d is None:
         d = dict()
-    execfile( os.path.expanduser( filename ), d )
+    f = open( os.path.expanduser( filename ) )
+    exec f in d
     for k in d.keys():
         if k[0] is '_' or type(d[k]) in [type(os), type(os.walk)]: del( d[k] )
     return d
@@ -210,7 +211,8 @@ def progress( i, n, t ):
     s = remain % 60
     sys.stdout.write( '\r%3d%%  %02d:%02d:%02d' % ( percent, h, m, s ) )
     sys.stdout.flush()
-    if i == n: print
+    if i == n:
+        print('')
     return
 
 def compile( compiler, object, source ):
@@ -231,13 +233,17 @@ def compile( compiler, object, source ):
         try:
             oldstate = open( statefile ).readlines()
             diff = ''.join( difflib.unified_diff( oldstate, state, n=0 ) )
-            if diff: print diff
-            else: compile = False
+            if diff:
+                print( diff )
+            else:
+                compile = False
         except: pass
     if compile:
-        try: os.unlink( statefile )
-        except: pass
-        print ' '.join( command )
+        try:
+            os.unlink( statefile )
+        except:
+            pass
+        print( ' '.join( command ) )
         if os.system( ' '.join( command ) ):
             sys.exit( 'Compile error' )
         open( statefile, 'w' ).writelines( state )
@@ -253,10 +259,12 @@ def install_path():
     f   = os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
     pth = os.path.join( get_python_lib(), f )
     dir = os.path.dirname( os.path.dirname( os.path.realpath( __file__ ) ) )
-    print 'Installing ' + pth
-    print 'for path ' + dir
-    try: open( pth, 'w' ).write( dir )
-    except: sys.exit( 'You do not have write permission for this Python install' )
+    print( 'Installing ' + pth )
+    print( 'for path ' + dir )
+    try:
+        open( pth, 'w' ).write( dir )
+    except:
+        sys.exit( 'You do not have write permission for this Python install' )
     return
 
 def uninstall_path():
@@ -265,10 +273,12 @@ def uninstall_path():
     import os
     f = os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
     pth = os.path.join( get_python_lib(), f )
-    print 'Removing ' + pth
+    print( 'Removing ' + pth )
     if os.path.isfile( pth ):
-        try: os.unlink( pth )
-        except: sys.exit( 'You do not have write permission for this Python install' )
+        try:
+            os.unlink( pth )
+        except:
+            sys.exit( 'You do not have write permission for this Python install' )
     return
 
 def install():
@@ -278,12 +288,16 @@ def install():
     src = os.path.dirname( os.path.realpath( __file__ ) )
     f   = os.path.basename( os.path.dirname( __file__ ) )
     dst = os.path.join( get_python_lib(), f )
-    print 'Installing ' + dst
-    print 'From ' + src
-    try: shutil.rmtree( dst )
-    except: pass
-    try: shutil.copytree( src, dst )
-    except: sys.exit( 'You do not have write permission for this Python install' )
+    print( 'Installing ' + dst )
+    print( 'From ' + src )
+    try:
+         shutil.rmtree( dst )
+    except:
+         pass
+    try:
+         shutil.copytree( src, dst )
+    except:
+         sys.exit( 'You do not have write permission for this Python install' )
     return
 
 def uninstall():
@@ -292,9 +306,11 @@ def uninstall():
     import os, shutil
     f   = os.path.basename( os.path.dirname( __file__ ) )
     dst = os.path.join( get_python_lib(), f )
-    print 'Removing ' + dst
+    print( 'Removing ' + dst )
     if os.path.isdir( dst ):
-        try: shutil.rmtree( dst )
-        except: sys.exit( 'You do not have write permission for this Python install' )
+        try:
+            shutil.rmtree( dst )
+        except:
+            sys.exit( 'You do not have write permission for this Python install' )
     return
 

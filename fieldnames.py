@@ -110,4 +110,5 @@ volume  = [ f[0] for f in table if 'f' not in f[-1] ]
 if __name__ == '__main__':
     for i in range( len( all ) ):
         if all[i] in all[:i]:
-            print 'Error: duplicate field: %r' % all[i]
+            print( 'Error: duplicate field: %r' % all[i] )
+

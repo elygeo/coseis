@@ -11,7 +11,7 @@ def stage( inputs ):
 
     # Save start time
     starttime = time.asctime()
-    print "SORD setup"
+    print( 'SORD setup' )
 
     # Read defaults
     prm = util.load( os.path.join( os.path.dirname( __file__ ), 'default-prm.py' ) )
@@ -115,16 +115,16 @@ def stage( inputs ):
     hh = mm / 60
     mm = mm % 60
     cfg.walltime = '%d:%02d:00' % ( hh, mm )
-    print 'Machine: ' + cfg.machine
-    print 'Cores: %s of %s' % ( cfg.np, maxtotalcores )
-    print 'Nodes: %s of %s' % ( cfg.nodes, cfg.maxnodes )
-    print 'RAM: %sMb of %sMb per node' % ( cfg.ram, cfg.maxram )
-    print 'Time limit: ' + cfg.walltime
-    print 'SUs: %s' % sus
+    print( 'Machine: ' + cfg.machine )
+    print( 'Cores: %s of %s' % ( cfg.np, maxtotalcores ) )
+    print( 'Nodes: %s of %s' % ( cfg.nodes, cfg.maxnodes ) )
+    print( 'RAM: %sMb of %sMb per node' % ( cfg.ram, cfg.maxram ) )
+    print( 'Time limit: ' + cfg.walltime )
+    print( 'SUs: %s' % sus )
     if cfg.maxcores and cfg.ppn > cfg.maxcores:
-        print 'Warning: exceding available cores per node (%s)' % cfg.maxcores
+        print( 'Warning: exceding available cores per node (%s)' % cfg.maxcores )
     if cfg.ram and cfg.ram > cfg.maxram:
-        print 'Warning: exceding available RAM per node (%sMb)' % cfg.maxram
+        print( 'Warning: exceding available RAM per node (%sMb)' % cfg.maxram )
 
     # Compile code
     if not cfg.prepare:
@@ -132,7 +132,7 @@ def stage( inputs ):
     setup.build( cfg.mode, cfg.optimize )
 
     # Create run directory
-    print 'Run directory: ' + cfg.rundir
+    print( 'Run directory: ' + cfg.rundir )
     try:
         os.makedirs( cfg.rundir )
     except:
@@ -279,8 +279,8 @@ def prepare_prm( prm, itbuff ):
             base = 1.5
         else:
             base = 1
-        ii = util.expand_indices( ii[:3], prm.nn, base ) \
-           + util.expand_indices( ii[3:], [prm.nt], 1 )
+        ii = ( util.expand_indices( ii[:3], prm.nn, base )
+             + util.expand_indices( ii[3:], [prm.nt], 1 ) )
         if field in fieldnames.initial:
             ii[3] = 0, 0, 1
         if field in fieldnames.fault:
@@ -309,14 +309,14 @@ def launch( cfg ):
     cwd = os.getcwd()
     if cfg.run == 'q':
         os.chdir( cfg.rundir )
-        print 'queue.sh'
+        print( 'queue.sh' )
         if cfg.host not in cfg.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r' % ( cfg.host, cfg.machine ) )
         if os.system( os.path.join( '.', 'queue.sh' ) ):
             sys.exit( 'Error queing job' )
     elif cfg.run:
         os.chdir( cfg.rundir )
-        print 'run.sh -' + cfg.run
+        print( 'run.sh -' + cfg.run )
         if cfg.host not in cfg.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r' % ( cfg.host, cfg.machine ) )
         if os.system( os.path.join( '.', 'run.sh -' + cfg.run ) ):

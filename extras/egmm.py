@@ -89,10 +89,10 @@ def cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb ):
     f_hng = maximum( R_RUP, sqrt( R_JB * R_JB + 1.0 ) )
     f_hng = ( f_hng - R_JB ) / f_hng
     f_hng[i] = ( R_RUP[i] - R_JB[i] ) / R_RUP[i]
-    f_hng = c[9] * f_hng \
-        * minimum( 1.0, maximum( 0.0, 2.0 * M - 12.0 ) ) \
-        * maximum( 0.0, 1.0 - 0.05 * Z_TOR ) \
-        * minimum( 1.0, 4.5 - 0.05 * delta )
+    f_hng = ( c[9] * f_hng
+        * minimum( 1.0, maximum( 0.0, 2.0 * M - 12.0 ) )
+        * maximum( 0.0, 1.0 - 0.05 * Z_TOR )
+        * minimum( 1.0, 4.5 - 0.05 * delta ) )
     f_site = ( c[10] + k[1] * n ) * log( minimum( 1100.0, V_S30 ) / k[0] )
     i = V_S30 < k[0]
     lowvel = any( i )
@@ -101,16 +101,16 @@ def cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb ):
         sigmaT = sigmaT * ones_like( V_S30 )
         V_1100 = 1100.0 * ones_like( V_S30 )
         A_1100 = cbnga( 'PGA', M, R_RUP, R_JB, Z_TOR, Z_25, V_1100, delta, lamb )[0]
-        f_site[i] = ( c[10] * log( V_S30[i] / k[0] ) \
-            + k[1] * ( log( A_1100[i] + cc * ( V_S30[i] / k[0] )**n ) \
+        f_site[i] = ( c[10] * log( V_S30[i] / k[0] )
+            + k[1] * ( log( A_1100[i] + cc * ( V_S30[i] / k[0] )**n )
             - log( A_1100[i] + cc ) ) ).astype( f_site.dtype )
         alpha = k[1] * A_1100 * ( 1.0 / ( A_1100 + cc * ( V_S30 / k[0] )**n ) - 1.0 / ( A_1100 + cc ) )
-        sigma2 = sigma_lnY**2 \
-               + alpha**2 * sigma_lnA_1100B**2 \
-               + 2.0 * alpha * rho_sigma * sigma_lnY_B * sigma_lnA_1100B
-        tau2 = tau_lnY**2 \
-               + alpha**2 * tau_lnA_1100**2 \
-               + 2.0 * alpha * rho_tau * tau_lnY * tau_lnA_1100
+        sigma2 = ( sigma_lnY**2
+               + alpha**2 * sigma_lnA_1100B**2
+               + 2.0 * alpha * rho_sigma * sigma_lnY_B * sigma_lnA_1100B )
+        tau2 = ( tau_lnY**2
+               + alpha**2 * tau_lnA_1100**2
+               + 2.0 * alpha * rho_tau * tau_lnY * tau_lnA_1100 )
         sigmaT[i] = ( sqrt( sigma2[i] + tau2[i] ) ).astype( sigmaT.dtype )
 
     f_sed = zeros_like( Z_25 )

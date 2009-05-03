@@ -8,5 +8,5 @@ dt = 0.1
 a = dt * arange( nt )
 w = 1.0
 d = 0.05
-print rspectra.rspectra( a, dt, w, d )
+print( rspectra.rspectra( a, dt, w, d ) )
 

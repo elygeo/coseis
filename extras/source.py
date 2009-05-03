@@ -265,7 +265,7 @@ def srf2potency( data, projection, dx, path='' ):
 if __name__ == '__main__':
     import sys, pprint, sord
     for f in sys.argv[1:]:
-        print f
+        print( f )
         meta = srf_read( f, True )
         pprint.pprint( sord.util.dictify( meta ) )
  

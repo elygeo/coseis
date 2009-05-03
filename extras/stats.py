@@ -16,7 +16,7 @@ for a in sys.argv[1:]:
 
 nb = dtype( datatype ).itemsize
 
-print '         Min          Max         Mean            N'
+print( '         Min          Max         Mean            N' )
 for filename in args:
     n = os.path.getsize( filename )
     if n > 0 and n % nb == 0:
@@ -33,5 +33,5 @@ for filename in args:
             rmax = max( rmax, r.max() )
             rsum += float64( r ).sum()
             i += b
-        print '%12g %12g %12g %12d %s' % ( rmin, rmax, rsum/n, n, filename )
+        print( '%12g %12g %12g %12d %s' % ( rmin, rmax, rsum/n, n, filename ) )
 

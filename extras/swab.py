@@ -10,7 +10,7 @@ datatype = 'f'
 nb = dtype( datatype ).itemsize
 
 if len( sys.argv ) == 1:
-    print sys.byteorder
+    print( sys.byteorder )
 
 for filename in sys.argv[1:]:
     n = os.path.getsize( filename )
@@ -26,5 +26,5 @@ for filename in sys.argv[1:]:
             i += b
             sys.stdout.write( '\r%s %3d%%' % ( filename, 100.0 * i / n ) )
             sys.stdout.flush()
-        print
+        print( '' )
 

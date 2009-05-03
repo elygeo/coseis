@@ -64,10 +64,10 @@ def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=False ):
         i = (j < 0) | (j > n[0]-2) | (k < 0) | (k > n[1]-2)
     j = minimum( maximum( j, 0 ), n[0]-2 )
     k = minimum( maximum( k, 0 ), n[1]-2 )
-    zi = ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * z[...,j,k] \
-       + ( 1.0 - xi + j ) * (       yi - k ) * z[...,j,k+1] \
-       + (       xi - j ) * ( 1.0 - yi + k ) * z[...,j+1,k] \
-       + (       xi - j ) * (       yi - k ) * z[...,j+1,k+1]
+    zi = ( ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * z[...,j,k]
+         + ( 1.0 - xi + j ) * (       yi - k ) * z[...,j,k+1]
+         + (       xi - j ) * ( 1.0 - yi + k ) * z[...,j+1,k]
+         + (       xi - j ) * (       yi - k ) * z[...,j+1,k+1] )
     if not extrapolate: # untested
         zi[...,i] = nan
     return zi
@@ -215,5 +215,5 @@ if __name__ == '__main__':
         else:
             x, y = ll2xy( x, y )
         for xx, yy in zip( x, y ):
-            print xx, yy
+            print( xx, yy )
 

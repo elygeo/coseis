@@ -29,7 +29,7 @@ def lowpass( x, dt, cutoff, window='hann', repeat=1 ):
             x = scipy.signal.lfilter( b, a, x )
     return x
 
-def spectrum( h, dt=1.0, nf=None, legend=None ):
+def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum' ):
     """
     Plot a time signal and it's Fourier spectrum.
     """
@@ -48,6 +48,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None ):
         f = f[None].repeat( n, 0 )
     H = fft.rfft( h, nf )
     pylab.clf()
+    pylab.gcf().canvas.set_window_title( title )
 
     ax = [ pylab.subplot( 221 ) ]
     pylab.plot( t.T, h.T, '-' )
@@ -55,10 +56,17 @@ def spectrum( h, dt=1.0, nf=None, legend=None ):
     pylab.xlabel( 'Time' )
     pylab.ylabel( 'Amplitude' )
     pylab.title( 'n = %s' % nt )
-    if legend:
-        pylab.legend( legend )
 
     ax += [ pylab.subplot( 222 ) ]
+    y = abs( H )
+    y /= y.max()
+    pylab.semilogx( f.T, y.T, '-' )
+    pylab.axis( 'tight' )
+    pylab.ylim( -0.05, 1.05 )
+    pylab.xlabel( 'Frequency' )
+    pylab.ylabel( 'Amplitude' )
+
+    ax += [ pylab.subplot( 223 ) ]
     y = arctan2( H.imag, H.real )
     pylab.semilogx( f.T, y.T, '.' )
     pylab.axis( 'tight' )
@@ -69,23 +77,16 @@ def spectrum( h, dt=1.0, nf=None, legend=None ):
     pylab.ylabel( 'Phase' )
     pylab.title( 'n = %s' % nf )
 
-    ax += [ pylab.subplot( 223 ) ]
+    ax += [ pylab.subplot( 224 ) ]
     y = 20 * log10( abs( H ) )
     y -= y.max()
-    pylab.semilogx( f.T, y.T, '.-' )
+    pylab.semilogx( f.T, y.T, '-' )
     pylab.axis( 'tight' )
     pylab.ylim( -145, 5 )
     pylab.xlabel( 'Frequency' )
     pylab.ylabel( 'Amplitude (dB)' )
-
-    ax += [ pylab.subplot( 224 ) ]
-    y = abs( H )
-    y /= y.max()
-    pylab.semilogx( f.T, y.T, '.-' )
-    pylab.axis( 'tight' )
-    pylab.ylim( -0.05, 1.05 )
-    pylab.xlabel( 'Frequency' )
-    pylab.ylabel( 'Amplitude' )
+    if legend:
+        pylab.legend( legend, loc='lower left' )
 
     pylab.draw()
     pylab.show()

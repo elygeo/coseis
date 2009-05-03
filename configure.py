@@ -23,8 +23,8 @@ if __name__ == '__main__':
     """Set configuration"""
     import os, sys
     cfg = configure( True, *sys.argv[1:2] )
-    print cfg['notes']
+    print( cfg['notes'] )
     for k in sorted( cfg.keys() ):
         if k != 'notes':
-            print '%s = %r' % ( k, cfg[k] )
+            print( '%s = %r' % ( k, cfg[k] ) )
 

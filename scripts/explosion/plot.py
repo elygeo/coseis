@@ -41,8 +41,8 @@ for rundir in runs:
         ta = t + r / vp
         v  = numpy.array([ v1, v2, v3 ]).squeeze()
         v  = coord.matmul( coord.rotmat( x ), v )
-        va = m0 * numpy.exp( -t / T ) * ( t * vp / r - t / T + 1.0 ) \
-           / ( 4.0 * numpy.pi * rho * vp**3.0 * T**2.0 * r )
+        va = ( m0 * numpy.exp( -t / T ) * ( t * vp / r - t / T + 1.0 )
+             / ( 4.0 * numpy.pi * rho * vp**3.0 * T**2.0 * r ) )
         if cutoff:
             v  = scipy.signal.lfilter( b, a, v )
             v  = scipy.signal.lfilter( b, a, v )
