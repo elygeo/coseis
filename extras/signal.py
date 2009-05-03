@@ -14,13 +14,13 @@ def lowpass( x, dt, cutoff, window='hann', repeat=1 ):
              or an integer n for an n-pole Butterworth filter.
     """
     if window == 'hann':
-        import numpy
+        from numpy import cos, pi, arange, convolve
         n = 2 * int( 0.5 / ( cutoff * dt ) ) + 1
         if n > 0:
-            w = 0.5 - 0.5 * numpy.cos( 2.0 * numpy.pi * numpy.arange( n ) / ( n - 1 ) )
+            w = 0.5 - 0.5 * cos( 2.0 * pi * arange( n ) / ( n - 1 ) )
             w /= w.sum()
             for i in xrange( repeat ):
-                x = numpy.convolve( x, w, 'same' )
+                x = convolve( x, w, 'same' )
     else:
         import scipy.signal
         wn = cutoff * 2.0 * dt
@@ -33,19 +33,20 @@ def spectrum( h, dt=1.0, nf=None, legend=None ):
     """
     Plot a time signal and it's Fourier spectrum.
     """
-    import numpy, pylab
-    h = numpy.array( h )
+    import pylab
+    from numpy import array, arange, fft, pi, arctan2, log10
+    h = array( h )
     nt = h.shape[-1]
     if not nf:
         nf = nt
-    t = numpy.arange( nt ) * dt
-    f = numpy.arange( nf / 2 + 1 ) / ( dt * nf )
+    t = arange( nt ) * dt
+    f = arange( nf / 2 + 1 ) / ( dt * nf )
     tlim = t[0], t[-1]
     if len( h.shape ) > 1:
         n = h.shape[0]
         t = t[None].repeat( n, 0 )
         f = f[None].repeat( n, 0 )
-    H = numpy.fft.rfft( h, nf )
+    H = fft.rfft( h, nf )
     pylab.clf()
 
     ax = [ pylab.subplot( 221 ) ]
@@ -58,8 +59,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None ):
         pylab.legend( legend )
 
     ax += [ pylab.subplot( 222 ) ]
-    pi = numpy.pi
-    y = numpy.arctan2( H.imag, H.real )
+    y = arctan2( H.imag, H.real )
     pylab.semilogx( f.T, y.T, '.' )
     pylab.axis( 'tight' )
     pylab.ylim( -pi*1.1, pi*1.1 )
@@ -70,7 +70,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None ):
     pylab.title( 'n = %s' % nf )
 
     ax += [ pylab.subplot( 223 ) ]
-    y = 20 * numpy.log10( abs( H ) )
+    y = 20 * log10( abs( H ) )
     y -= y.max()
     pylab.semilogx( f.T, y.T, '.-' )
     pylab.axis( 'tight' )
@@ -93,24 +93,24 @@ def spectrum( h, dt=1.0, nf=None, legend=None ):
     return ax
 
 if __name__ == '__main__':
-    import numpy, pylab
+    from numpy import zeros, fft
 
     dt = 0.01
     cutoff = 0.5
     cutoff = 8.0
     cutoff = 2.0
     n = 1000
-    x = numpy.zeros( n+1 )
+    x = zeros( n+1 )
     x[0] = 1
 
     y = [
-        lowpass( numpy.fft.fftshift( x ), dt, cutoff ),
+        lowpass( fft.fftshift( x ), dt, cutoff ),
         lowpass( x, dt, cutoff, 2, 2 ),
         lowpass( x, dt, cutoff, 4 ),
         lowpass( x, dt, cutoff, 4, 2 ),
     ]
     leg = 'Hann', 'Butter-2x2', 'Butter-4', 'Butter-4x2'
 
-    y[0] = numpy.fft.ifftshift( y[0] )
+    y[0] = fft.ifftshift( y[0] )
     spectrum( y, dt, x.size, leg )
 

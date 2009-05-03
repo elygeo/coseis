@@ -10,6 +10,7 @@ def srf_read( filename, headeronly=False, mks=True ):
     Returns separate meta and data objects.
     """
     import os, sys, gzip, numpy
+    from numpy import array, empty, cumsum, sqrt
     class obj: pass
 
     fh = filename
@@ -46,21 +47,21 @@ def srf_read( filename, headeronly=False, mks=True ):
     # Data block
     data = obj()
     n = meta.nsource
-    data.lon   = numpy.empty( n, 'f' )
-    data.lat   = numpy.empty( n, 'f' )
-    data.dep   = numpy.empty( n, 'f' )
-    data.stk   = numpy.empty( n, 'f' )
-    data.dip   = numpy.empty( n, 'f' )
-    data.rake  = numpy.empty( n, 'f' )
-    data.area  = numpy.empty( n, 'f' )
-    data.t0    = numpy.empty( n, 'f' )
-    data.dt    = numpy.empty( n, 'f' )
-    data.slip1 = numpy.empty( n, 'f' )
-    data.slip2 = numpy.empty( n, 'f' )
-    data.slip3 = numpy.empty( n, 'f' )
-    data.nt1   = numpy.empty( n, 'i' )
-    data.nt2   = numpy.empty( n, 'i' )
-    data.nt3   = numpy.empty( n, 'i' )
+    data.lon   = empty( n, 'f' )
+    data.lat   = empty( n, 'f' )
+    data.dep   = empty( n, 'f' )
+    data.stk   = empty( n, 'f' )
+    data.dip   = empty( n, 'f' )
+    data.rake  = empty( n, 'f' )
+    data.area  = empty( n, 'f' )
+    data.t0    = empty( n, 'f' )
+    data.dt    = empty( n, 'f' )
+    data.slip1 = empty( n, 'f' )
+    data.slip2 = empty( n, 'f' )
+    data.slip3 = empty( n, 'f' )
+    data.nt1   = empty( n, 'i' )
+    data.nt2   = empty( n, 'i' )
+    data.nt3   = empty( n, 'i' )
     data.sv1   = []
     data.sv2   = []
     data.sv3   = []
@@ -84,7 +85,7 @@ def srf_read( filename, headeronly=False, mks=True ):
         data.nt2[i]   = int( k[12] )
         data.nt3[i]   = int( k[14] )
         sv = []
-        n = numpy.cumsum([ data.nt1[i], data.nt2[i], data.nt3[i] ])
+        n = cumsum([ data.nt1[i], data.nt2[i], data.nt3[i] ])
         while len( sv ) < n[-1]:
             sv += fh.readline().split()
         if len( sv ) != n[-1]:
@@ -92,9 +93,9 @@ def srf_read( filename, headeronly=False, mks=True ):
         data.sv1 += [ float( f ) for f in sv[:n[0]]     ]
         data.sv2 += [ float( f ) for f in sv[n[0]:n[1]] ]
         data.sv3 += [ float( f ) for f in sv[n[1]:]     ]
-    data.sv1 = numpy.array( data.sv1 )
-    data.sv2 = numpy.array( data.sv2 )
-    data.sv3 = numpy.array( data.sv3 )
+    data.sv1 = array( data.sv1 )
+    data.sv2 = array( data.sv2 )
+    data.sv3 = array( data.sv3 )
     if mks:
         data.dep   = 1000.0 * data.dep
         data.area  = 0.0001 * data.area
@@ -104,19 +105,19 @@ def srf_read( filename, headeronly=False, mks=True ):
         data.sv1   = 0.01   * data.sv1
         data.sv2   = 0.01   * data.sv2
         data.sv3   = 0.01   * data.sv3
-    meta.potency = ( data.area * numpy.sqrt( data.slip1**2 + data.slip2**2 + data.slip3**2 ) ).sum()
+    meta.potency = ( data.area * sqrt( data.slip1**2 + data.slip2**2 + data.slip3**2 ) ).sum()
     return meta, data
 
 def srfb_write( meta, data, path='' ):
     """
     Write SRF binary format.
     """
-    import os, numpy, sord
+    import os, sord
+    from numpy import array
     path = os.path.expanduser( path )
     if not os.path.isdir( path ):
         os.makedirs( path )
     sord.util.save( os.path.join( path, 'meta.py' ), sord.util.dictify( meta ) )
-    array = numpy.array
     join = os.path.join
     array( data.lon,   'f' ).tofile( join( path, 'lon' ) )
     array( data.lat,   'f' ).tofile( join( path, 'lat' ) )
@@ -142,7 +143,8 @@ def srfb_read( path='' ):
     """
     Read SRF binary format.
     """
-    import os, numpy, sord
+    import os, sord
+    from numpy import fromfile
     class obj: pass
     path = os.path.expanduser( path )
     if not os.path.isdir( path ):
@@ -150,7 +152,6 @@ def srfb_read( path='' ):
     meta = sord.util.objectify( sord.util.load( os.path.join( path, 'meta.py' ) ) )
     data = obj()
     join = os.path.join
-    fromfile = numpy.fromfile
     data.lon   = fromfile( join( path, 'lon'   ), 'f' )
     data.lat   = fromfile( join( path, 'lat'   ), 'f' )
     data.dep   = fromfile( join( path, 'dep'   ), 'f' )
@@ -175,9 +176,9 @@ def src_write( history, nt, dt, t0, xi, w1, w2, path='' ):
     """
     Write SORD input for moment or potency source.
     """
-    import os, numpy
+    import os
+    from numpy import array
     path = os.path.join( os.path.expanduser( path ), 'src_' )
-    array = numpy.array
     array( history, 'f' ).tofile( path + 'history' )
     array( nt, 'f'      ).tofile( path + 'nt'  )
     array( dt, 'f'      ).tofile( path + 'dt'  )
@@ -197,17 +198,17 @@ def srf2potency( data, projection, dx, path='' ):
     """
     Convert SRF to potency tensor source and write SORD input files.
     """
-    import os, numpy, coord
+    import os, coord
+    from numpy import array, cumsum, zeros_like
     path = os.path.join( os.path.expanduser( path ), 'src_' )
-    array = numpy.array
 
     # Time history
     i1, i2, i3 = 0, 0, 0
     for i in xrange( data.dt.size ):
         dt, n1, n2, n3 = data.dt[i], data.nt1[i], data.nt2[i], data.nt3[i]
-        data.sv1[i1:i1+n1] = dt * numpy.cumsum( data.sv1[i1:i1+n1] )
-        data.sv2[i2:i2+n2] = dt * numpy.cumsum( data.sv2[i2:i2+n2] )
-        data.sv3[i3:i3+n3] = dt * numpy.cumsum( data.sv3[i3:i3+n3] )
+        data.sv1[i1:i1+n1] = dt * cumsum( data.sv1[i1:i1+n1] )
+        data.sv2[i2:i2+n2] = dt * cumsum( data.sv2[i2:i2+n2] )
+        data.sv3[i3:i3+n3] = dt * cumsum( data.sv3[i3:i3+n3] )
         i1, i2, i3 = i1+n1, i2+n2, i3+n3
     array( [data.sv1, data.sv2, data.sv3], 'f' ).tofile( path + 'history' )
     del( data.sv1, data.sv2, data.sv3 )
@@ -241,13 +242,13 @@ def srf2potency( data, projection, dx, path='' ):
     del( x, y, z, data.lon, data.lat, data.dep )
 
     # Normal tensor components
-    w = numpy.zeros_lile( nrm )
+    w = zeros_lile( nrm )
     w[2] = data.area * nrm[0] * nrm[0]; array( w, 'f' )[ii].tofile( path + 'w11' )
     w[2] = data.area * nrm[1] * nrm[1]; array( w, 'f' )[ii].tofile( path + 'w22' )
     w[2] = data.area * nrm[2] * nrm[2]; array( w, 'f' )[ii].tofile( path + 'w33' )
 
     # Shear tensor components
-    w = numpy.zeros_lile( nrm )
+    w = zeros_like( nrm )
     w[0] = 0.5 * data.area * ( stk[1] * nrm[2] + nrm[1] * stk[2] )
     w[1] = 0.5 * data.area * ( dip[1] * nrm[2] + nrm[1] * dip[2] )
     array( w, 'f' )[ii].tofile( path + 'w23' )

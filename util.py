@@ -155,10 +155,11 @@ def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
     order :   'F' first index varies fastest, or 'C' last index varies fastest.
     """
     import os, numpy
+    from numpy import array, empty, fromfile, sum, cumprod
     if type( fd ) is not file:
         fd = open( os.path.expanduser( fd ), 'rb' )
     if not shape:
-        return numpy.fromfile( fd, dtype )
+        return fromfile( fd, dtype )
     elif type( shape ) == int:
         mm = [ shape ]
     else:
@@ -183,16 +184,16 @@ def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
     i0 = ( [0,0,0] + i0 )[-4:]
     nn = ( [1,1,1] + nn )[-4:]
     mm = ( [1,1,1] + mm )[-4:]
-    f = numpy.empty( nn, dtype )
+    f = empty( nn, dtype )
     itemsize = numpy.dtype( dtype ).itemsize
-    offset = numpy.array( i0, 'd' )
-    stride = numpy.cumprod( [1] + mm[:0:-1], dtype='d' )[::-1] * itemsize
+    offset = array( i0, 'd' )
+    stride = cumprod( [1] + mm[:0:-1], dtype='d' )[::-1] * itemsize
     for j in xrange( nn[0] ):
         for k in xrange( nn[1] ):
             for l in xrange( nn[2] ):
-                i = numpy.sum( stride * ( offset + numpy.array( [j,k,l,0] ) ) )
+                i = sum( stride * ( offset + array( [j,k,l,0] ) ) )
                 fd.seek( long(i), 0 )
-                f[j,k,l,:] = numpy.fromfile( fd, dtype, nn[-1] )
+                f[j,k,l,:] = fromfile( fd, dtype, nn[-1] )
     if order is 'F':
         f = f.reshape( nn0 ).T
     else:
