@@ -3,7 +3,7 @@
 Signal processing utilities
 """
 
-def lowpass( x, dt, cutoff, window='hann' ):
+def lowpass( x, dt, cutoff, window='hann', repeat=1 ):
     """
     Lowpass filter
 
@@ -15,19 +15,21 @@ def lowpass( x, dt, cutoff, window='hann' ):
     """
     if window == 'hann':
         import numpy
-        n = int( 1.0 / ( cutoff * dt ) )
+        n = 2 * int( 0.5 / ( cutoff * dt ) ) + 1
         if n > 0:
             w = 0.5 - 0.5 * numpy.cos( 2.0 * numpy.pi * numpy.arange( n ) / ( n - 1 ) )
             w /= w.sum()
-            x = numpy.convolve( x, w, 'same' )
+            for i in xrange( repeat ):
+                x = numpy.convolve( x, w, 'same' )
     else:
         import scipy.signal
         wn = cutoff * 2.0 * dt
         b, a = scipy.signal.butter( window, wn )
-        x = scipy.signal.lfilter( b, a, x )
+        for i in xrange( repeat ):
+            x = scipy.signal.lfilter( b, a, x )
     return x
 
-def spectrum( h, dt=1.0, nf=None ):
+def spectrum( h, dt=1.0, nf=None, legend=None ):
     """
     Plot a time signal and it's Fourier spectrum.
     """
@@ -38,21 +40,29 @@ def spectrum( h, dt=1.0, nf=None ):
         nf = nt
     t = numpy.arange( nt ) * dt
     f = numpy.arange( nf / 2 + 1 ) / ( dt * nf )
+    tlim = t[0], t[-1]
+    if len( h.shape ) > 1:
+        n = h.shape[0]
+        t = t[None].repeat( n, 0 )
+        f = f[None].repeat( n, 0 )
     H = numpy.fft.rfft( h, nf )
     pylab.clf()
 
     ax = [ pylab.subplot( 221 ) ]
-    pylab.plot( t, h )
-    pylab.plot( [t[0],t[-1]], [0,0], 'k--' )
+    pylab.plot( t.T, h.T, '-' )
+    pylab.plot( tlim, [0,0], 'k--' )
     pylab.xlabel( 'Time' )
     pylab.ylabel( 'Amplitude' )
     pylab.title( 'n = %s' % nt )
+    if legend:
+        pylab.legend( legend )
 
     ax += [ pylab.subplot( 222 ) ]
     pi = numpy.pi
     y = numpy.arctan2( H.imag, H.real )
-    pylab.plot( f, y )
-    pylab.ylim( -pi, pi )
+    pylab.semilogx( f.T, y.T, '.' )
+    pylab.axis( 'tight' )
+    pylab.ylim( -pi*1.1, pi*1.1 )
     pylab.yticks( [ -pi, 0, pi ] )
     pylab.gca().set_yticklabels([ '$-\pi$', 0, '$\pi$' ])
     pylab.xlabel( 'Frequency' )
@@ -61,15 +71,22 @@ def spectrum( h, dt=1.0, nf=None ):
 
     ax += [ pylab.subplot( 223 ) ]
     y = 20 * numpy.log10( abs( H ) )
-    pylab.semilogx( f, y )
+    y -= y.max()
+    pylab.semilogx( f.T, y.T, '.-' )
+    pylab.axis( 'tight' )
+    pylab.ylim( -105, 5 )
     pylab.xlabel( 'Frequency' )
     pylab.ylabel( 'Amplitude (dB)' )
 
     ax += [ pylab.subplot( 224 ) ]
     y = abs( H )
-    pylab.semilogx( f, y )
+    y /= y.max()
+    pylab.semilogx( f.T, y.T, '.-' )
+    pylab.axis( 'tight' )
+    pylab.ylim( -0.05, 1.05 )
     pylab.xlabel( 'Frequency' )
     pylab.ylabel( 'Amplitude' )
+
     pylab.draw()
     pylab.show()
 
@@ -80,30 +97,18 @@ if __name__ == '__main__':
 
     dt = 0.01
     cutoff = 1.0
-    x = numpy.random.randn( 1000 )
-    x -= x.mean()
-    x /= x.sum()
-    w = lowpass( 1, dt, cutoff )
+    n = 1000
+    x = numpy.zeros( n+1 )
+    x[0] = 1
 
-    pylab.figure(1)
-    spectrum( w, dt, 8*w.size )
+    y = [
+        lowpass( numpy.fft.fftshift( x ), dt, cutoff ),
+        lowpass( x, dt, cutoff, 2, 2 ),
+        lowpass( x, dt, cutoff, 4 ),
+        lowpass( x, dt, cutoff, 4, 2 ),
+    ]
+    leg = 'Hann', 'Butter-2x2', 'Butter-4', 'Butter-4x2'
 
-    pylab.figure(2)
-    spectrum( x, dt, 8*x.size )
-
-    pylab.figure(3)
-    y = lowpass( x, dt, cutoff )
-    spectrum( y, dt, 8*x.size )
-
-    pylab.figure(4)
-    y = lowpass( x, dt, cutoff, 1 )
-    spectrum( y, dt, 8*x.size )
-
-    pylab.figure(5)
-    y = lowpass( x, dt, cutoff, 2 )
-    spectrum( y, dt, 8*x.size )
-
-    pylab.figure(6)
-    y = lowpass( x, dt, cutoff, 4 )
-    spectrum( y, dt, 8*x.size )
+    y[0] = numpy.fft.ifftshift( y[0] )
+    spectrum( y, dt, x.size, leg )
 
