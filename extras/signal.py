@@ -74,7 +74,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None ):
     y -= y.max()
     pylab.semilogx( f.T, y.T, '.-' )
     pylab.axis( 'tight' )
-    pylab.ylim( -105, 5 )
+    pylab.ylim( -145, 5 )
     pylab.xlabel( 'Frequency' )
     pylab.ylabel( 'Amplitude (dB)' )
 
@@ -96,7 +96,9 @@ if __name__ == '__main__':
     import numpy, pylab
 
     dt = 0.01
-    cutoff = 1.0
+    cutoff = 0.5
+    cutoff = 8.0
+    cutoff = 2.0
     n = 1000
     x = numpy.zeros( n+1 )
     x[0] = 1
