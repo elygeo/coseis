@@ -86,7 +86,7 @@ def cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb ):
     F_NM[ ( -150 < lamb ) & ( lamb < -30 ) ] = 1.0
     f_flt = c[7] * F_RV * min( 1.0, Z_TOR ) + c[8] * F_NM
     i = ( R_JB > 0.0 ) & ( Z_TOR >= 1.0 )
-    f_hng = numpy.maximum( R_RUP, sqrt( R_JB * R_JB + 1.0 ) )
+    f_hng = numpy.maximum( R_RUP, numpy.sqrt( R_JB * R_JB + 1.0 ) )
     f_hng = ( f_hng - R_JB ) / f_hng
     f_hng[i] = ( R_RUP[i] - R_JB[i] ) / R_RUP[i]
     f_hng = ( c[9] * f_hng
