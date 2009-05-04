@@ -8,7 +8,6 @@ def colormap( name='w0', colorexp=1., output='mayavi', n=2001, nmod=0, modlim=0.
     Colormap library
     """
     import sys, numpy
-    from numpy import array, arange, interp, cos, maximum, minimum, interp, pi, ones_like, c_, size, sign
     centered = False
     if type( name ) == str:
         if name == 'w000':
@@ -37,57 +36,57 @@ def colormap( name='w0', colorexp=1., output='mayavi', n=2001, nmod=0, modlim=0.
             g = 0, 4, 8, 8
             b = 0, 0, 0, 8
         elif name == 'earth':
-            r = array( [00,00,00,10,10,15,15,25,25,25] ) / 80.
-            g = array( [10,10,10,20,20,25,30,25,25,25] ) / 80.
-            b = array( [38,38,38,40,40,25,20,17,17,17] ) / 80.
+            r = numpy.array( [00,00,00,10,10,15,15,25,25,25] ) / 80.
+            g = numpy.array( [10,10,10,20,20,25,30,25,25,25] ) / 80.
+            b = numpy.array( [38,38,38,40,40,25,20,17,17,17] ) / 80.
         elif name == 'wk0':
-            r = 31 - arange(32)
-            g = 31 - arange(32)
-            b = 31 - arange(32)
+            r = 31 - numpy.arange( 32 )
+            g = 31 - numpy.arange( 32 )
+            b = 31 - numpy.arange( 32 )
         else:
             sys.exit( 'colormap %s not found' % name )
     else:
         r, g, b = name
         name = 'custom'
-    n2 = size( r )
+    n2 = r.size
     m = 1. / max( 1., max(r), max(g), max(b) )
-    r = m * array( r )
-    g = m * array( g )
-    b = m * array( b )
+    r = m * numpy.array( r )
+    g = m * numpy.array( g )
+    b = m * numpy.array( b )
     if centered:
-        x1 = 2. / ( n2 - 1 ) * arange( n2 ) - 1
-        x1 = sign( x1 ) * abs( x1 ) ** colorexp * 0.5 + 0.5
+        x1 = 2. / ( n2 - 1 ) * numpy.arange( n2 ) - 1
+        x1 = numpy.sign( x1 ) * abs( x1 ) ** colorexp * 0.5 + 0.5
     else:
-        x1 = 1. / ( n2 - 1 ) * arange( n2 )
-        x1 = sign( x1 ) * abs( x1 ) ** colorexp
+        x1 = 1. / ( n2 - 1 ) * numpy.arange( n2 )
+        x1 = numpy.sign( x1 ) * abs( x1 ) ** colorexp
     if nmod > 0:
-        x2 = arange( n ) / ( n - 1. )
-        r = interp( x2, x1, r )
-        g = interp( x2, x1, g )
-        b = interp( x2, x1, b )
-        w1 = modlim * cos( pi * 2. * nmod * x2 )
-        w1 = 1. - maximum( w1, 0. )
-        w2 = 1. + minimum( w1, 0. ) 
+        x2 = numpy.arange( n ) / ( n - 1. )
+        r  = numpy.interp( x2, x1, r )
+        g  = numpy.interp( x2, x1, g )
+        b  = numpy.interp( x2, x1, b )
+        w1 = modlim * numpy.cos( numpy.pi * 2. * nmod * x2 )
+        w1 = 1. - numpy.maximum( w1, 0. )
+        w2 = 1. + numpy.minimum( w1, 0. ) 
         r = ( 1. - w2 * ( 1. - w1 * r ) )
         g = ( 1. - w2 * ( 1. - w1 * g ) )
         b = ( 1. - w2 * ( 1. - w1 * b ) )
         x1 = x2
     if output in ( 'matplotlib', 'pylab' ):
         import matplotlib
-        cmap = { 'red':c_[x1,r,r],
-               'green':c_[x1,g,g],
-                'blue':c_[x1,b,b] }
+        cmap = { 'red':numpy.c_[x1,r,r],
+               'green':numpy.c_[x1,g,g],
+                'blue':numpy.c_[x1,b,b] }
         cmap = matplotlib.colors.LinearSegmentedColormap( name, cmap, n )
     elif output in ( 'mayavi', 'tvtk', 'mlab' ):
         if nmod <= 0:
-            x2 = arange( n ) / ( n - 1. )
-            r = interp( x2, x1, r )
-            g = interp( x2, x1, g )
-            b = interp( x2, x1, b )
-            a = ones_like( r )
+            x2 = numpy.arange( n ) / ( n - 1. )
+            r  = numpy.interp( x2, x1, r )
+            g  = numpy.interp( x2, x1, g )
+            b  = numpy.interp( x2, x1, b )
+            a  = numpy.ones_like( r )
             x1 = x2
-        cmap = 255 * array([ r, g, b, a ]).T
+        cmap = 255 * numpy.array([ r, g, b, a ]).T
     else:
-        cmap = array([ x1, r, g, b ])
+        cmap = numpy.array([ x1, r, g, b ])
     return cmap
 

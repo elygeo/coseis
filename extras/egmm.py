@@ -29,15 +29,15 @@ def cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb ):
          ground motion parameters, Tech. Rep. PEER 2007/02, Pacific Earthquake
          Engineering Research Center.
     """
-    from numpy import array, log, exp, sqrt, minimum, maximum, zeros_like, ones_like, any
-    M     = array( M )
-    R_RUP = array( R_RUP )
-    R_JB  = array( R_JB )
-    Z_TOR = array( Z_TOR )
-    Z_25  = array( Z_25 )
-    V_S30 = array( V_S30 )
-    delta = array( delta )
-    lamb  = array( lamb )
+    import numpy
+    M     = numpy.array( M )
+    R_RUP = numpy.array( R_RUP )
+    R_JB  = numpy.array( R_JB )
+    Z_TOR = numpy.array( Z_TOR )
+    Z_25  = numpy.array( Z_25 )
+    V_S30 = numpy.array( V_S30 )
+    delta = numpy.array( delta )
+    lamb  = numpy.array( lamb )
     params = {
     'T':   (   'c0', 'c1',  'c2', 'c3',  'c4','c5', 'c6','c7', 'c8','c9','c10','c11','c12',   'k1',  'k2','k3','slY','tlY','sT','ps', 'pt' ),
     0.010: (  -1715,  500,  -530, -262, -2118, 170, 5600, 280, -120, 490, 1058,  40,  610,  865000, -1186, 1839, 478, 219, 526, 1000, 1000 ),
@@ -66,7 +66,7 @@ def cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb ):
     'PGD': (  -5270, 1600,   -70,    0, -2000, 170, 4000,   0,    0,   0, -820, 300, 1000,  400000,     0, 2744, 667, 485, 825,  174,  290 ),
     }
 
-    params = 0.001 * array( params[T] )
+    params = 0.001 * numpy.array( params[T] )
     n  = 1.18
     cc = 1.88
     c  = params[:13]
@@ -75,35 +75,37 @@ def cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb ):
     sigma_lnA_1100  = 0.478
     tau_lnA_1100    = 0.219
     sigma_lnAMP     = 0.3
-    sigma_lnY_B     = sqrt( sigma_lnY**2 - sigma_lnAMP**2 )
-    sigma_lnA_1100B = sqrt( sigma_lnA_1100**2 - sigma_lnAMP**2 )
+    sigma_lnY_B     = numpy.sqrt( sigma_lnY**2 - sigma_lnAMP**2 )
+    sigma_lnA_1100B = numpy.sqrt( sigma_lnA_1100**2 - sigma_lnAMP**2 )
 
-    f_mag = c[0] + c[1] * M + c[2] * maximum( 0.0, M - 5.5 ) + c[3] * maximum( 0.0, M - 6.5 )
-    f_dis = ( c[4] + c[5] * M ) * log( sqrt( R_RUP * R_RUP + c[6] * c[6] ) )
-    F_RV = zeros_like( lamb )
-    F_NM = zeros_like( lamb )
+    f_mag = c[0] + c[1] * M + c[2] * numpy.maximum( 0.0, M - 5.5 ) + c[3] * numpy.maximum( 0.0, M - 6.5 )
+    f_dis = ( c[4] + c[5] * M ) * numpy.log( numpy.sqrt( R_RUP * R_RUP + c[6] * c[6] ) )
+    F_RV = numpy.zeros_like( lamb )
+    F_NM = numpy.zeros_like( lamb )
     F_RV[ (   30 < lamb ) & ( lamb < 150 ) ] = 1.0
     F_NM[ ( -150 < lamb ) & ( lamb < -30 ) ] = 1.0
     f_flt = c[7] * F_RV * min( 1.0, Z_TOR ) + c[8] * F_NM
     i = ( R_JB > 0.0 ) & ( Z_TOR >= 1.0 )
-    f_hng = maximum( R_RUP, sqrt( R_JB * R_JB + 1.0 ) )
+    f_hng = numpy.maximum( R_RUP, sqrt( R_JB * R_JB + 1.0 ) )
     f_hng = ( f_hng - R_JB ) / f_hng
     f_hng[i] = ( R_RUP[i] - R_JB[i] ) / R_RUP[i]
     f_hng = ( c[9] * f_hng
-        * minimum( 1.0, maximum( 0.0, 2.0 * M - 12.0 ) )
-        * maximum( 0.0, 1.0 - 0.05 * Z_TOR )
-        * minimum( 1.0, 4.5 - 0.05 * delta ) )
-    f_site = ( c[10] + k[1] * n ) * log( minimum( 1100.0, V_S30 ) / k[0] )
+        * numpy.minimum( 1.0, numpy.maximum( 0.0, 2.0 * M - 12.0 ) )
+        * numpy.maximum( 0.0, 1.0 - 0.05 * Z_TOR )
+        * numpy.minimum( 1.0, 4.5 - 0.05 * delta ) )
+    f_site = ( c[10] + k[1] * n ) * numpy.log( numpy.minimum( 1100.0, V_S30 ) / k[0] )
     i = V_S30 < k[0]
-    lowvel = any( i )
+    lowvel = numpy.any( i )
 
     if lowvel:
-        sigmaT = sigmaT * ones_like( V_S30 )
-        V_1100 = 1100.0 * ones_like( V_S30 )
+        sigmaT = sigmaT * numpy.ones_like( V_S30 )
+        V_1100 = 1100.0 * numpy.ones_like( V_S30 )
         A_1100 = cbnga( 'PGA', M, R_RUP, R_JB, Z_TOR, Z_25, V_1100, delta, lamb )[0]
-        f_site[i] = ( c[10] * log( V_S30[i] / k[0] )
-            + k[1] * ( log( A_1100[i] + cc * ( V_S30[i] / k[0] )**n )
-            - log( A_1100[i] + cc ) ) ).astype( f_site.dtype )
+        f_site[i] = (
+            c[10] * numpy.log( V_S30[i] / k[0] ) +
+            k[1] * ( numpy.log( A_1100[i] + cc * ( V_S30[i] / k[0] )**n ) -
+            numpy.log( A_1100[i] + cc ) )
+        ).astype( f_site.dtype )
         alpha = k[1] * A_1100 * ( 1.0 / ( A_1100 + cc * ( V_S30 / k[0] )**n ) - 1.0 / ( A_1100 + cc ) )
         sigma2 = ( sigma_lnY**2
                + alpha**2 * sigma_lnA_1100B**2
@@ -111,15 +113,15 @@ def cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb ):
         tau2 = ( tau_lnY**2
                + alpha**2 * tau_lnA_1100**2
                + 2.0 * alpha * rho_tau * tau_lnY * tau_lnA_1100 )
-        sigmaT[i] = ( sqrt( sigma2[i] + tau2[i] ) ).astype( sigmaT.dtype )
+        sigmaT[i] = ( numpy.sqrt( sigma2[i] + tau2[i] ) ).astype( sigmaT.dtype )
 
-    f_sed = zeros_like( Z_25 )
+    f_sed = numpy.zeros_like( Z_25 )
     i = Z_25 < 1; f_sed[i] = c[11] * ( Z_25[i] - 1.0 )
-    i = Z_25 > 3; f_sed[i] = c[12] * k[2] * exp( -0.75 ) * ( 1 - exp( -0.25 * ( Z_25[i] - 3.0 ) ) )
-    Y = exp( f_mag + f_dis + f_flt + f_hng + f_site + f_sed )
+    i = Z_25 > 3; f_sed[i] = c[12] * k[2] * numpy.exp( -0.75 ) * ( 1 - numpy.exp( -0.25 * ( Z_25[i] - 3.0 ) ) )
+    Y = numpy.exp( f_mag + f_dis + f_flt + f_hng + f_site + f_sed )
 
     if not lowvel:
-        sigmaT = sigmaT * ones_like( Y )
+        sigmaT = sigmaT * numpy.ones_like( Y )
 
     return Y, sigmaT
 
@@ -127,8 +129,7 @@ if __name__ == '__main__':
     """
     CBNGA Test - For comparison with OpenSHA Attenuation Relationship Plotter
     """
-    import pylab
-    from numpy import arange
+    import pylab, numpy
 
     # Choose the intensity measure
     T = 10
@@ -148,7 +149,7 @@ if __name__ == '__main__':
     delta = 90.0,
     lamb = 0.0,
 
-    M = arange( 4.0, 8.501, 0.1 )
+    M = numpy.arange( 4.0, 8.501, 0.1 )
     Y, sigma = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
     pylab.figure( 1 )
     pylab.clf()
@@ -157,7 +158,7 @@ if __name__ == '__main__':
     pylab.ylabel( T )
     M = 5.5,
 
-    V_S30 = arange( 180.0, 1500.1, 10.0 )
+    V_S30 = numpy.arange( 180.0, 1500.1, 10.0 )
     Y, sigma = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
     pylab.figure( 2 )
     pylab.clf()
@@ -166,7 +167,7 @@ if __name__ == '__main__':
     pylab.ylabel( T )
     V_S30 = 760.0,
 
-    Z_25 = arange( 0.0, 6.01, 0.1 )
+    Z_25 = numpy.arange( 0.0, 6.01, 0.1 )
     Y, sigma = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
     pylab.figure( 3 )
     pylab.clf()

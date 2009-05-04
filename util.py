@@ -156,11 +156,11 @@ def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
     order :   'F' first index varies fastest, or 'C' last index varies fastest.
     """
     import os, numpy
-    from numpy import array, empty, fromfile, sum, cumprod
+    from numpy import array, fromfile
     if type( fd ) is not file:
         fd = open( os.path.expanduser( fd ), 'rb' )
     if not shape:
-        return fromfile( fd, dtype )
+        return numpy.fromfile( fd, dtype )
     elif type( shape ) == int:
         mm = [ shape ]
     else:
@@ -175,7 +175,7 @@ def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
     i0 = [ ii[i][0] - 1             for i in range( ndim ) ]
     nn = [ ii[i][1] - ii[i][0] + 1  for i in range( ndim ) ]
     nn0 = nn[:]
-    for i in xrange( ndim-1, 0, -1 ):
+    for i in range( ndim-1, 0, -1 ):
         if mm[i] == nn[i]:
             i0[i-1] = i0[i-1] * mm[i]; del i0[i]
             nn[i-1] = nn[i-1] * mm[i]; del nn[i]
@@ -185,14 +185,14 @@ def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
     i0 = ( [0,0,0] + i0 )[-4:]
     nn = ( [1,1,1] + nn )[-4:]
     mm = ( [1,1,1] + mm )[-4:]
-    f = empty( nn, dtype )
+    f = numpy.empty( nn, dtype )
     itemsize = numpy.dtype( dtype ).itemsize
-    offset = array( i0, 'd' )
-    stride = cumprod( [1] + mm[:0:-1], dtype='d' )[::-1] * itemsize
+    offset = numpy.array( i0, 'd' )
+    stride = numpy.cumprod( [1] + mm[:0:-1], dtype='d' )[::-1] * itemsize
     for j in xrange( nn[0] ):
         for k in xrange( nn[1] ):
             for l in xrange( nn[2] ):
-                i = sum( stride * ( offset + array( [j,k,l,0] ) ) )
+                i = ( stride * ( offset + array( [j,k,l,0] ) ) ).sum()
                 fd.seek( long(i), 0 )
                 f[j,k,l,:] = fromfile( fd, dtype, nn[-1] )
     if order is 'F':

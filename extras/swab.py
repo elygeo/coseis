@@ -2,12 +2,11 @@
 """
 Swab byteorder for 32bit float binary files
 """
-import os, sys
-from numpy import dtype, fromfile
+import os, sys, numpy
 
 block = 64*1024*1024
-datatype = 'f'
-nb = dtype( datatype ).itemsize
+dtype = 'f'
+nb = numpy.dtype( dtype ).itemsize
 
 if len( sys.argv ) == 1:
     print( sys.byteorder )
@@ -21,7 +20,7 @@ for filename in sys.argv[1:]:
         i = 0
         while i < n:
             b = min( n-i, block )
-            r = fromfile( f0, dtype=datatype, count=b )
+            r = numpy.fromfile( f0, dtype=datatype, count=b )
             r.byteswap( True ).tofile( f1 )
             i += b
             sys.stdout.write( '\r%s %3d%%' % ( filename, 100.0 * i / n ) )
