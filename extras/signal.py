@@ -3,7 +3,7 @@
 Signal processing utilities
 """
 
-def lowpass( x, dt, cutoff, window='hann', repeat=1 ):
+def lowpass( x, dt, cutoff, window='hann', repeat=0 ):
     """
     Lowpass filter
 
@@ -19,13 +19,17 @@ def lowpass( x, dt, cutoff, window='hann', repeat=1 ):
         if n > 0:
             w = 0.5 - 0.5 * numpy.cos( 2.0 * numpy.pi * numpy.arange( n ) / ( n - 1 ) )
             w /= w.sum()
-            for i in range( repeat ):
+            x = numpy.convolve( x, w, 'same' )
+            if repeat:
                 x = numpy.convolve( x, w, 'same' )
     else:
         import scipy.signal
         wn = cutoff * 2.0 * dt
         b, a = scipy.signal.butter( window, wn )
-        for i in range( repeat ):
+        x = scipy.signal.lfilter( b, a, x )
+        if repeat < 0:
+            x = scipy.signal.lfilter( b, a, x[...,::-1] )[...,::-1]
+        elif repeat:
             x = scipy.signal.lfilter( b, a, x )
     return x
 
@@ -53,7 +57,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum' ):
     pylab.plot( t.T, h.T, '-' )
     pylab.plot( tlim, [0,0], 'k--' )
     pylab.xlabel( 'Time' )
-    pylab.ylabel( 'Amplitude' )
+    pylab.ylabel( 'Impulse response' )
     pylab.title( 'n = %s' % nt )
 
     ax += [ pylab.subplot( 222 ) ]
@@ -103,15 +107,15 @@ if __name__ == '__main__':
     n = 1000
     x = numpy.zeros( n+1 )
     x[0] = 1
+    x = numpy.fft.fftshift( x )
 
     y = [
-        lowpass( numpy.fft.fftshift( x ), dt, cutoff ),
-        lowpass( x, dt, cutoff, 2, 2 ),
-        lowpass( x, dt, cutoff, 4 ),
-        lowpass( x, dt, cutoff, 4, 2 ),
+        numpy.fft.ifftshift( lowpass( x, dt, cutoff ) ),       'Hann',
+        numpy.fft.ifftshift( lowpass( x, dt, cutoff, 2 ) ),    'Butter-2',
+        numpy.fft.ifftshift( lowpass( x, dt, cutoff, 4 ) ),    'Butter-4',
+        numpy.fft.ifftshift( lowpass( x, dt, cutoff, 2,1 ) ),  'Butter-2x2',
+        numpy.fft.ifftshift( lowpass( x, dt, cutoff, 2,-1 ) ), 'Butter-2x-2',
     ]
-    leg = 'Hann', 'Butter-2x2', 'Butter-4', 'Butter-4x2'
 
-    y[0] = numpy.fft.ifftshift( y[0] )
-    spectrum( y, dt, x.size, leg )
+    spectrum( y[::2], dt, x.size, y[1::2] )
 
