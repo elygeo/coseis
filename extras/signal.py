@@ -13,6 +13,8 @@ def lowpass( x, dt, cutoff, window='hann', repeat=0 ):
     window : can be either 'hann' for zero-phase Hann window filter
              or an integer n for an n-pole Butterworth filter.
     """
+    if not cutoff:
+        return x
     if window == 'hann':
         import numpy
         n = 2 * int( 0.5 / ( cutoff * dt ) ) + 1
@@ -33,7 +35,7 @@ def lowpass( x, dt, cutoff, window='hann', repeat=0 ):
             x = scipy.signal.lfilter( b, a, x )
     return x
 
-def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum' ):
+def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum', axes=None ):
     """
     Plot a time signal and it's Fourier spectrum.
     """
@@ -50,17 +52,24 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum' ):
         t = t[None].repeat( n, 0 )
         f = f[None].repeat( n, 0 )
     H = numpy.fft.rfft( h, nf )
-    pylab.clf()
-    pylab.gcf().canvas.set_window_title( title )
+    if axes == None:
+        pylab.clf()
+        pylab.gcf().canvas.set_window_title( title )
+        axes = (
+            pylab.subplot( 221 ),
+            pylab.subplot( 222 ),
+            pylab.subplot( 223 ),
+            pylab.subplot( 224 ),
+        )
 
-    ax = [ pylab.subplot( 221 ) ]
+    pylab.axes( axes[0] )
     pylab.plot( t.T, h.T, '-' )
     pylab.plot( tlim, [0,0], 'k--' )
     pylab.xlabel( 'Time' )
     pylab.ylabel( 'Impulse response' )
     pylab.title( 'n = %s' % nt )
 
-    ax += [ pylab.subplot( 222 ) ]
+    pylab.axes( axes[1] )
     y = abs( H )
     y /= y.max()
     pylab.semilogx( f.T, y.T, '-' )
@@ -69,7 +78,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum' ):
     pylab.xlabel( 'Frequency' )
     pylab.ylabel( 'Amplitude' )
 
-    ax += [ pylab.subplot( 223 ) ]
+    pylab.axes( axes[2] )
     y = numpy.arctan2( H.imag, H.real )
     pylab.semilogx( f.T, y.T, '.' )
     pylab.axis( 'tight' )
@@ -81,7 +90,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum' ):
     pylab.ylabel( 'Phase' )
     pylab.title( 'n = %s' % nf )
 
-    ax += [ pylab.subplot( 224 ) ]
+    pylab.axes( axes[3] )
     y = 20 * numpy.log10( abs( H ) )
     y -= y.max()
     pylab.semilogx( f.T, y.T, '-' )
@@ -95,10 +104,10 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum' ):
     pylab.draw()
     pylab.show()
 
-    return ax
+    return axes
 
 if __name__ == '__main__':
-    import numpy
+    import numpy, pylab
 
     dt = 0.01
     cutoff = 0.5
@@ -107,15 +116,24 @@ if __name__ == '__main__':
     n = 1000
     x = numpy.zeros( n+1 )
     x[0] = 1
-    x = numpy.fft.fftshift( x )
+    shift  = numpy.fft.fftshift
+    ishift = numpy.fft.ifftshift
 
     y = [
-        numpy.fft.ifftshift( lowpass( x, dt, cutoff ) ),       'Hann',
-        numpy.fft.ifftshift( lowpass( x, dt, cutoff, 2 ) ),    'Butter-2',
-        numpy.fft.ifftshift( lowpass( x, dt, cutoff, 4 ) ),    'Butter-4',
-        numpy.fft.ifftshift( lowpass( x, dt, cutoff, 2,1 ) ),  'Butter-2x2',
-        numpy.fft.ifftshift( lowpass( x, dt, cutoff, 2,-1 ) ), 'Butter-2x-2',
+        lowpass( x, dt, cutoff, 1 ),    'Butter-1',
+        lowpass( x, dt, cutoff, 1, 1 ), 'Butter-1x2',
+        lowpass( x, dt, cutoff, 2 ),    'Butter-2',
+        lowpass( x, dt, cutoff, 2, 1 ), 'Butter-2x2',
+        lowpass( x, dt, cutoff, 4 ),    'Butter-4',
     ]
+    pylab.figure( 1 )
+    spectrum( y[::2], dt, x.size, legend=y[1::2] )
 
-    spectrum( y[::2], dt, x.size, y[1::2] )
+    y = [
+        ishift( lowpass( shift( x ), dt, cutoff ) ),        'Hann',
+        ishift( lowpass( shift( x ), dt, cutoff, 1, -1 ) ), 'Butter-1x-2',
+        ishift( lowpass( shift( x ), dt, cutoff, 2, -1 ) ), 'Butter-2x-2',
+    ]
+    pylab.figure( 2 )
+    spectrum( y[::2], dt, x.size, legend=y[1::2] )
 
