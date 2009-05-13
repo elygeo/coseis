@@ -55,6 +55,8 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum', axes=No
     if axes == None:
         pylab.clf()
         pylab.gcf().canvas.set_window_title( title )
+        pylab.subplots_adjust( left=0.125, right=0.975,
+            bottom=0.1, top=0.975, wspace=0.3, hspace=0.3 )
         axes = (
             pylab.subplot( 221 ),
             pylab.subplot( 222 ),
@@ -66,8 +68,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum', axes=No
     pylab.plot( t.T, h.T, '-' )
     pylab.plot( tlim, [0,0], 'k--' )
     pylab.xlabel( 'Time' )
-    pylab.ylabel( 'Impulse response' )
-    pylab.title( 'n = %s' % nt )
+    pylab.ylabel( 'Amplitude' )
 
     pylab.axes( axes[1] )
     y = abs( H )
@@ -88,14 +89,13 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum', axes=No
     pylab.gca().set_yticklabels([ '$-\pi$', 0, '$\pi$' ])
     pylab.xlabel( 'Frequency' )
     pylab.ylabel( 'Phase' )
-    pylab.title( 'n = %s' % nf )
 
     pylab.axes( axes[3] )
     y = 20 * numpy.log10( abs( H ) )
     y -= y.max()
-    pylab.semilogx( f.T, y.T, '-' )
+    pylab.semilogx( f.T, -y.T, '-' )
     pylab.axis( 'tight' )
-    pylab.ylim( -145, 5 )
+    pylab.ylim( 145, -5 )
     pylab.xlabel( 'Frequency' )
     pylab.ylabel( 'Amplitude (dB)' )
     if legend:
@@ -120,20 +120,19 @@ if __name__ == '__main__':
     ishift = numpy.fft.ifftshift
 
     y = [
-        lowpass( x, dt, cutoff, 1 ),    'Butter-1',
-        lowpass( x, dt, cutoff, 1, 1 ), 'Butter-1x2',
-        lowpass( x, dt, cutoff, 2 ),    'Butter-2',
         lowpass( x, dt, cutoff, 2, 1 ), 'Butter-2x2',
+        lowpass( x, dt, cutoff, 4, 1 ), 'Butter-4x2',
         lowpass( x, dt, cutoff, 4 ),    'Butter-4',
+        lowpass( x, dt, cutoff, 8 ),    'Butter-8',
     ]
     pylab.figure( 1 )
-    spectrum( y[::2], dt, x.size, legend=y[1::2] )
+    spectrum( y[::2], dt, legend=y[1::2] )
 
     y = [
-        ishift( lowpass( shift( x ), dt, cutoff ) ),        'Hann',
-        ishift( lowpass( shift( x ), dt, cutoff, 1, -1 ) ), 'Butter-1x-2',
-        ishift( lowpass( shift( x ), dt, cutoff, 2, -1 ) ), 'Butter-2x-2',
+        ishift( lowpass( shift( x ), dt, cutoff, 2, -1 ) ),     'Butter-2x-2',
+        ishift( lowpass( shift( x ), dt, cutoff, 4, -1 ) ),     'Butter-4x-2',
+        ishift( lowpass( shift( x ), dt, cutoff ) ),            'Hann',
     ]
     pylab.figure( 2 )
-    spectrum( y[::2], dt, x.size, legend=y[1::2] )
+    spectrum( y[::2], dt, legend=y[1::2] )
 
