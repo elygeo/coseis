@@ -1,18 +1,11 @@
 #!/bin/bash -e
 # This script installs official Python.
-# For more bells and whistles, the Enthought Python Distribution highly recommended:
-# wget http://download.enthought.com/epd/installs/epd_py25-4.2.30201-macosx-u.dmg
-# wget http://download.enthought.com/epd/installs/epd_py25-4.2.30201-rh3-amd64.installer
-# wget http://download.enthought.com/epd/installs/epd_py25-4.2.30201-rh3-x86.installer
-# wget http://download.enthought.com/epd/installs/epd_py25-4.2.30201-rh5-amd64.installer
-# wget http://download.enthought.com/epd/installs/epd_py25-4.2.30201-rh5-x86.installer
-# wget http://download.enthought.com/epd/installs/epd_py25-4.2.30201-win32-x86.msi
-# wget http://download.enthought.com/epd/installs/epd_py25-4.2.30101-SunOS_5.10-x86.sh
+# For more bells and whistles, the Enthought Python Distribution is highly recommended
 
 version="2.6.2"
 prefix="${HOME}/local"
 
-echo -n "Installing Python-${version} and setuptools in ${prefix}/local. Are you sure? [y/N]: "
+echo -n "Installing Python-${version} and setuptools in ${prefix}. Are you sure? [y/N]: "
 read confirm
 [ "$confirm" = "y" ]
 
@@ -29,6 +22,8 @@ make install
 
 wget http://peak.telecommunity.com/dist/ez_setup.py
 python ez_setup.py --prefix="${prefix}"
+
+easy_install pyproj
 
 echo "Don't forget to add \${prefix}/bin to your path"
 
