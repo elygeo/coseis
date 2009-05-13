@@ -167,7 +167,7 @@ def srfb_read( path='' ):
     data.nt3   = numpy.fromfile( os.path.join( path, 'nt3'   ), 'i' )
     return meta, data
 
-def src_write( history, nt, dt, t0, xi, w1, w2, path='' ):
+def src_write( history, nt, dt, t0, xi, w1, w2=None, path='' ):
     """
     Write SORD input for moment or potency source.
     """
@@ -180,12 +180,17 @@ def src_write( history, nt, dt, t0, xi, w1, w2, path='' ):
     numpy.array( xi[0], 'f'   ).tofile( path + 'xi1' )
     numpy.array( xi[1], 'f'   ).tofile( path + 'xi2' )
     numpy.array( xi[2], 'f'   ).tofile( path + 'xi3' )
-    numpy.array( w1[0], 'f'   ).tofile( path + 'w11' )
-    numpy.array( w1[1], 'f'   ).tofile( path + 'w22' )
-    numpy.array( w1[2], 'f'   ).tofile( path + 'w33' )
-    numpy.array( w2[0], 'f'   ).tofile( path + 'w23' )
-    numpy.array( w2[1], 'f'   ).tofile( path + 'w31' )
-    numpy.array( w2[2], 'f'   ).tofile( path + 'w12' )
+    if not w2:
+        numpy.array( w1[0], 'f'   ).tofile( path + 'w11' )
+        numpy.array( w1[1], 'f'   ).tofile( path + 'w12' )
+        numpy.array( w1[2], 'f'   ).tofile( path + 'w13' )
+    else:
+        numpy.array( w1[0], 'f'   ).tofile( path + 'w11' )
+        numpy.array( w1[1], 'f'   ).tofile( path + 'w22' )
+        numpy.array( w1[2], 'f'   ).tofile( path + 'w33' )
+        numpy.array( w2[0], 'f'   ).tofile( path + 'w23' )
+        numpy.array( w2[1], 'f'   ).tofile( path + 'w31' )
+        numpy.array( w2[2], 'f'   ).tofile( path + 'w12' )
     return
 
 def srf2potency( data, projection, dx, path='' ):

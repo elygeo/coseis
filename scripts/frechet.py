@@ -12,8 +12,7 @@ dt = 0.01			# time step size
 hourglass = 1.0, 2.0		# hourglass stiffness and viscosity
 bc1 = 10, 10, 10		# PML boundary conditions
 bc2 = 10, 10, 0			# PML boundary conditions & free surface in Z
-_src = 51, 51, 51, 0
-_vol = (1,-1,3), (1,-1,3), (1,-1,3), (1,-1,5)
+_vol = (1.5,-1.5,3), (1.5,-1.5,3), (1.5,-1.5,3), (1,-1,5)
 
 for _f in 'f1', 'f2', 'f3':
     fieldio = [
@@ -21,7 +20,6 @@ for _f in 'f1', 'f2', 'f3':
         ( '=r', 'vp',  [], 'vp'  ),		# P-wave speed
         ( '=r', 'vs',  [], 'vs'  ),		# S-wave speed
         ( '=',  'gam', [],  0.0  ),		# viscosity
-        ( '=',  _f, _src, 1.0, 'brune', 0.1 ),	# point source time function
         ( '=w', 'e11', _vol, 'g11' ),		# dG: Green's function
         ( '=w', 'e22', _vol, 'g22' ),		# dG: Green's function
         ( '=w', 'e33', _vol, 'g33' ),		# dG: Green's function
@@ -31,29 +29,18 @@ for _f in 'f1', 'f2', 'f3':
     ]
     setup( locals(), argv )
 
-# sub-cell postition
+# source
 ihypo = 51.2, 50.3, 50.9
 src_w1 = 1.0, 0.0, 0.0
 src_type = 'force'
-src_period = 0.1
-src_function = 'brune'
+src_function = 'delta'
 
 _sta = 44, 7, -1
-_src = 23, 11, 30
-_xx, _yy, _zz = 0.0, 0.0, 0.0
-_yz, _zx, _xy = 0.0, 8.0, 2.0
-
 fieldio = [
     ( '=r', 'rho', [], 'rho' ),			# density
     ( '=r', 'vp',  [], 'vp'  ),			# P-wave speed
     ( '=r', 'vs',  [], 'vs'  ),			# S-wave speed
     ( '=',  'gam', [], 0.0   ),			# viscosity
-    ( '=',  'w11', _src, _xx, 'brune', 0.1 ),	# Moment tensor source
-    ( '=',  'w22', _src, _yy, 'brune', 0.1 ),	# Moment tensor source
-    ( '=',  'w33', _src, _zz, 'brune', 0.1 ),	# Moment tensor source
-    ( '=',  'w23', _src, _yz, 'brune', 0.1 ),	# Moment tensor source
-    ( '=',  'w31', _src, _zx, 'brune', 0.1 ),	# Moment tensor source
-    ( '=',  'w12', _src, _xy, 'brune', 0.1 ),	# Moment tensor source
     ( '=w', 'u1',  _sta, 'sta-u1' ),		# ux displacement at receiver
     ( '=w', 'u2',  _sta, 'sta-u2' ),		# uy displacement at receiver
     ( '=w', 'u3',  _sta, 'sta-u3' ),		# uz displacement at receiver
