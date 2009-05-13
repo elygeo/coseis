@@ -1,17 +1,17 @@
 #!/bin/bash -e
-# This script installs Enthought Python.
+# This script installs Enthought Python under Linux/UNIX.
 
-#version=epd_py25-4.2.30201-win32-x86.msi
-#version=epd_py25-4.2.30201-macosx-u.dmg
+# Set loctions here:
+prefix="${HOME}/local"
 
-# Choose version here:
+# Set version here:
+# version=epd_py25-4.2.30201-win32-x86.msi
+# version=epd_py25-4.2.30201-macosx-u.dmg
 version=epd_py25-4.2.30101-SunOS_5.10-x86.sh
 version=epd_py25-4.2.30201-rh3-x86.installer
-version=epd_py25-4.2.30201-rh3-amd64.installer
 version=epd_py25-4.2.30201-rh5-x86.installer
+version=epd_py25-4.2.30201-rh3-amd64.installer
 version=epd_py25-4.2.30201-rh5-amd64.installer
-
-prefix="${HOME}/local"
 
 echo -n "Installing Enthought Python ${version} in ${prefix}. Are you sure? [y/N]: "
 read confirm
@@ -23,7 +23,6 @@ cd "${prefix}"
 
 wget "http://download.enthought.com/epd/installs/$version"
 bash "$version"
-easy_install pyproj
 
 echo "Don't forget to add \${prefix}/bin to your path"
 
