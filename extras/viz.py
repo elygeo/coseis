@@ -3,16 +3,27 @@
 Visualization utilities
 """
 
-def distill( filename, **kwargs ):
+def distill( fd=None, **kwargs ):
     """
-    Save Matplotlib figure as PDF distilled with Ghostscript.
+    Distill Matplotlib figure to PDF using Ghostscript.
+    This produces much smaller files than pylab.savefig.
+    Talkes the same argnuments as savefig plus:
+    fd : None, filename or file-like object to save PDF to.
     """
-    import pylab, cStringIO, subprocess
-    io = cStringIO.StringIO()
-    pylab.savefig( io, format='eps', **kwargs )
-    pid = subprocess.Popen( [ 'ps2pdf', '-dEPSCrop', '-', filename ], stdin=subprocess.PIPE )
-    io.reset()
-    pid.communicate( io.read() )
+    import os, pylab, subprocess, cStringIO
+    out = cStringIO.StringIO()
+    pylab.savefig( out, format='eps', **kwargs )
+    out.reset()
+    out = out.read()
+    cmd = 'ps2pdf', '-dEPSCrop', '-', '-'
+    pid = subprocess.Popen( cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE )
+    out = pid.communicate( out )[0]
+    if fd:
+        if type( fd ) is not file:
+            fd = open( os.path.expanduser( fd ), 'wb' )
+        fd.write( out )
+        fd.close()
+    return out
 
 def colormap( name='w0', colorexp=1., output='mayavi', n=2001, nmod=0, modlim=0.5 ):
     """
