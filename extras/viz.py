@@ -3,6 +3,17 @@
 Visualization utilities
 """
 
+def distill( filename, **kwargs ):
+    """
+    Save Matplotlib figure as PDF distilled with Ghostscript.
+    """
+    import pylab, cStringIO, subprocess
+    io = cStringIO.StringIO()
+    pylab.savefig( io, format='eps', **kwargs )
+    pid = subprocess.Popen( [ 'ps2pdf', '-dEPSCrop', '-', filename ], stdin=subprocess.PIPE )
+    io.reset()
+    pid.communicate( io.read() )
+
 def colormap( name='w0', colorexp=1., output='mayavi', n=2001, nmod=0, modlim=0.5 ):
     """
     Colormap library
