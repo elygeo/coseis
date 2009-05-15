@@ -34,6 +34,38 @@ def savefig( fd=None, format=None, **kwargs ):
         fd.close()
     return out
 
+def lengthscale( x, y, w=None, label='%s', style='k-', bg='w', **kwargs ):
+    """
+    Draw a length scale bar between the points (x[0], y[0]) and (x[1], y[1]).
+    """
+    import numpy, pylab
+    x0 = 0.5 * ( x[0] + x[1] )
+    y0 = 0.5 * ( y[0] + y[1] )
+    dx = abs( x[1] - x[0] )
+    dy = abs( y[1] - y[0] )
+    l = numpy.sqrt( dx*dx + dy*dy )
+    if not w:
+        x = pylab.xlim()
+        y = pylab.ylim()
+        x = abs( x[1] - x[0] )
+        y = abs( y[1] - y[0] )
+        if pylab.gca().get_aspect() == 'equal':
+            w = 0.005 * ( y + x )
+        else:
+            w = 0.01 / l * ( y * dx + x * dy )
+    try:
+        label = label % l
+    except:
+        pass
+    rot = (dx, -dy), (dy, dx)
+    x = -l, l, numpy.nan, -l, -l, numpy.nan,  l, l
+    y =  0, 0, numpy.nan, -w,  w, numpy.nan, -w, w
+    x, y = 0.5 / l * numpy.dot( rot, [x, y] )
+    theta = numpy.arctan2( dy, dx ) * 180.0 / numpy.pi
+    h1 = pylab.plot( x0 + x, y0 + y, style, clip_on=False, **kwargs )
+    h2 = pylab.text( x0, y0, label, ha='center', va='center', backgroundcolor=bg, rotation=theta )
+    return h1, h2
+
 def colormap( name='w0', colorexp=1., output='mayavi', n=2001, nmod=0, modlim=0.5 ):
     """
     Colormap library
