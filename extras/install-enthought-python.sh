@@ -17,12 +17,12 @@ echo -n "Installing Enthought Python ${version} in ${prefix}. Are you sure? [y/N
 read confirm
 [ "$confirm" = "y" ]
 
-export PATH="${prefix}/bin:${PATH}"
 mkdir -p "${prefix}"
 cd "${prefix}"
 
 wget "http://download.enthought.com/epd/installs/$version"
 bash "$version"
 
-echo "Don't forget to add \${prefix}/bin to your path"
+echo 'Now add this to your .bashrc or .profile:'
+echo 'export PATH="${HOME}/local/epd/bin:${PATH}"'
 

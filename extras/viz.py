@@ -3,24 +3,33 @@
 Visualization utilities
 """
 
-def distill( fd=None, **kwargs ):
+def savefig( fd=None, format=None, **kwargs ):
     """
-    Distill Matplotlib figure to PDF using Ghostscript.
-    This produces much smaller files than pylab.savefig.
-    Talkes the same argnuments as savefig plus:
-    fd : None, filename or file-like object to save PDF to.
+    Enhanced version of Matplotlib pylab.savefig command.
+
+    Returns output as a string and optionally saves to a file.
+    PDF is distilled using Ghostscript to produce smaller files.
+    Takes the same argnuments as pylab.savefig.
     """
-    import os, pylab, subprocess, cStringIO
-    out = cStringIO.StringIO()
-    pylab.savefig( out, format='eps', **kwargs )
-    out.reset()
-    out = out.read()
-    cmd = 'ps2pdf', '-dEPSCrop', '-', '-'
-    pid = subprocess.Popen( cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE )
-    out = pid.communicate( out )[0]
+    import os, pylab, cStringIO, subprocess
     if fd:
         if type( fd ) is not file:
+            if not format:
+                format = fd.split( '.' )[-1]
             fd = open( os.path.expanduser( fd ), 'wb' )
+    out = cStringIO.StringIO()
+    if format == 'pdf':
+        pylab.savefig( out, format='eps', **kwargs )
+        out.reset()
+        out = out.read()
+        cmd = 'ps2pdf', '-dEPSCrop', '-', '-'
+        pid = subprocess.Popen( cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE )
+        out = pid.communicate( out )[0]
+    else:
+        pylab.savefig( out, format=format, **kwargs )
+        out.reset()
+        out = out.read()
+    if fd:
         fd.write( out )
         fd.close()
     return out
