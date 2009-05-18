@@ -14,21 +14,6 @@ bc1 = 10, 10, 10		# PML boundary conditions
 bc2 = 10, 10, 0			# PML boundary conditions & free surface in Z
 _vol = (1.5,-1.5,3), (1.5,-1.5,3), (1.5,-1.5,3), (1,-1,5)
 
-for _f in 'f1', 'f2', 'f3':
-    fieldio = [
-        ( '=r', 'rho', [], 'rho' ),		# density
-        ( '=r', 'vp',  [], 'vp'  ),		# P-wave speed
-        ( '=r', 'vs',  [], 'vs'  ),		# S-wave speed
-        ( '=',  'gam', [],  0.0  ),		# viscosity
-        ( '=w', 'e11', _vol, 'g11' ),		# dG: Green's function
-        ( '=w', 'e22', _vol, 'g22' ),		# dG: Green's function
-        ( '=w', 'e33', _vol, 'g33' ),		# dG: Green's function
-        ( '=w', 'e23', _vol, 'g23' ),		# dG: Green's function
-        ( '=w', 'e31', _vol, 'g31' ),		# dG: Green's function
-        ( '=w', 'e12', _vol, 'g12' ),		# dG: Green's function
-    ]
-    setup( locals(), argv )
-
 # source
 ihypo = 51.2, 50.3, 50.9
 src_w1 = 1.0, 0.0, 0.0
