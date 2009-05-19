@@ -3,9 +3,20 @@
 Fault surface and topography conforming mesh
 """
 import os, sys, numpy, sim, sord, cvm
+reload( sim )
 
 writing = False
 writing = True
+
+# plotting function
+def plot( f, fig=None, title=None, cmap='jet' ):
+    import pylab
+    pylab.figure(fig)
+    pylab.clf()
+    pylab.imshow( f.T, interpolation='nearest', origin='lower', cmap=pylab.get_cmap(cmap) )
+    pylab.colorbar( orientation='horizontal' )
+    pylab.title( title )
+    pylab.draw()
 
 # CVM setup
 np = sim.np3[0] * sim.np3[1] * sim.np3[2]
@@ -16,13 +27,12 @@ dir = cfg.rundir
 # fault parameters
 n = 1991, 161
 d = int( sim.dx[0] / 100.0 + 0.0001 )
-tn = numpy.fromfile( 'ts22-tn', 'f' ).reshape( n[::-1] )[::d,::d].T
-ts = numpy.fromfile( 'ts22-ts', 'f' ).reshape( n[::-1] )[::d,::d].T
-dc = numpy.fromfile( 'ts22-dc', 'f' ).reshape( n[::-1] )[::d,::d].T
+tn = -numpy.fromfile( 'data/ts22-tn', 'f' ).reshape( n[::-1] )[::d,::d].T
+ts =  numpy.fromfile( 'data/ts22-ts', 'f' ).reshape( n[::-1] )[::d,::d].T
+dc =  numpy.fromfile( 'data/ts22-dc', 'f' ).reshape( n[::-1] )[::d,::d].T
 tn.tofile( os.path.join( dir, 'tn' ) )
 ts.tofile( os.path.join( dir, 'ts' ) )
 dc.tofile( os.path.join( dir, 'dc' ) )
-n = tn.shape
 
 # fault indices
 xf = sim._xf
@@ -30,8 +40,9 @@ yf = sim._yf
 kf = sim._kf - 1
 lf = sim._lf[1] - 1
 jf = sim._jf[0] - 1, sim._jf[1]
-if jf[1] - jf[0] != n[0] or lf + 1 != n[1]:
-    sys.exit( 'error in fault indices' )
+n = jf[1] - jf[0], lf + 1
+if n != tn.shape:
+    sys.exit( 'error in fault indices %s != %s' % (n, tn.shape) )
 
 # node mesh
 x = numpy.arange( sim.nn[0] ) * sim.dx[0]
@@ -99,7 +110,7 @@ if writing:
     yy.T.tofile( os.path.join( dir, 'y' ) )
 else:
     import pylab
-    pylab.figure( 1 )
+    pylab.figure(1)
     pylab.clf()
     pylab.plot( xx, yy, 'k-' )
     pylab.hold( True )
@@ -107,7 +118,8 @@ else:
     pylab.plot( xf, yf, 'ko--' )
     pylab.axis( 'image' )
     pylab.draw()
-    pylab.show()
+    plot( xx, 2, 'node x', 'prism' )
+    plot( yy, 3, 'node y', 'prism' )
 
 # lon/lat
 xx, yy = sim.projection( xx, yy, inverse=True )
@@ -125,15 +137,7 @@ zz = numpy.array( zz, 'f' )
 if writing:
     zz.T.tofile( os.path.join( dir, 'z' ) )
 else:
-    pylab.figure( 2 )
-    pylab.clf()
-    pylab.imshow( zz.T, interpolation='nearest' )
-    pylab.axis( 'image' )
-    pylab.gca().invert_yaxis()
-    pylab.title( 'Node elevation' )
-    pylab.colorbar( orientation='horizontal' )
-    pylab.draw()
-    pylab.show()
+    plot( zz, 4, 'node z' )
 
 # PML regions are extruded
 for w in xx, yy, zz:
@@ -181,13 +185,8 @@ if writing:
     f2.close()
     f3.close()
 else:
-    pylab.figure( 3 )
-    pylab.clf()
-    pylab.imshow( zz.T, interpolation='nearest' )
-    pylab.axis( 'image' )
-    pylab.gca().invert_yaxis()
-    pylab.title( 'Cell elevation' )
-    pylab.colorbar( orientation='horizontal' )
-    pylab.draw()
+    plot( xx, 5, 'cell x', 'prism' )
+    plot( yy, 6, 'cell y', 'prism' )
+    plot( zz, 7, 'cell z' )
     pylab.show()
 

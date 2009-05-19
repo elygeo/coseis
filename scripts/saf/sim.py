@@ -5,18 +5,20 @@ SAF parameters
 import sys, numpy, sord
 
 # parameters
-dx =  200.0
-dx = 4000.0
+dx =  200.0; npml = 10
+dx = 4000.0; npml = 10
+dx = 20000.0; npml = 0
+_topo = False
 _topo = True
 _indir = '~/run/cvm4/'
 rundir = '~/run/saf'
-npml = 10
 itstats = 10
 itio = 100
 _T = 180.0
 _L = 600000.0, 300000.0, -80000.0
 
 # number of processors
+np3 = 1, 1, 1
 if dx == 4000:
     np3 = 1, 1, 2 
 elif dx == 2000:
@@ -47,8 +49,6 @@ elif dx == 200:
         np3 = 1, 376, 4 # DS, 188/265
         np3 = 1,  94, 4 # TG, 188/256
         np3 = 1, 126, 4 # TG, 252/256
-else:
-    sys.exit( 'bad dx' )
 
 # dimensions
 dx = dx, dx, -dx
@@ -95,6 +95,9 @@ fieldio += [
     ( '=w', 'v1', [_i,_i,-1,()], 'v1'   ),
     ( '=w', 'v2', [_i,_i,-1,()], 'v2'   ),
     ( '=w', 'v3', [_i,_i,-1,()], 'v3'   ),
+    ( '=w', 'x1', [], 'x1'   ),
+    ( '=w', 'x2', [], 'x2'   ),
+    ( '=w', 'x3', [], 'x3'   ),
 ]
 
 # fault parameters
@@ -112,7 +115,7 @@ _segments = [
 _xf, _yf = projection( _segments[0::2], _segments[1::2] )
 _jf = int( 0.5 * ( _xf.min() + _xf.max() - _F[0] ) / dx[0] + 1.5 )
 _kf = int( 0.5 * ( _yf.min() + _yf.max()         ) / dx[1] + 1.5 )
-_lf = int(                                 _F[2]   / dx[2] + 1.5 )
+_lf = int(                                 _F[2]   / dx[2] + 1.00001 )
 _jf = _jf, _jf + int( _F[0] / dx[0] + 0.01 )
 _lf =   1, _lf
 _nt2 = ( nt + 1 ) / 2
@@ -126,7 +129,9 @@ fieldio += [
     ( '=r', 'tn',   [_jf,_kf,_lf,()], _indir + 'tn'   ),
     ( '=r', 'ts',   [_jf,_kf,_lf,()], _indir + 'ts'   ),
     ( '=r', 'dc',   [_jf,_kf,_lf,()], _indir + 'dc'   ),
-    ( '=w', 'sv',   [_jf,_kf,_lf,(1,_nt2)],    'sv'   ),
+    ( '=w', 'sv1',  [_jf,_kf,_lf,(1,_nt2)],    'sv1'  ),
+    ( '=w', 'sv2',  [_jf,_kf,_lf,(1,_nt2)],    'sv2'  ),
+    ( '=w', 'sv3',  [_jf,_kf,_lf,(1,_nt2)],    'sv3'  ),
     ( '=w', 'sl',   [_jf,_kf,_lf,_nt2],        'sl'   ),
     ( '=w', 'psv',  [_jf,_kf,_lf,_nt2],        'psv'  ),
     ( '=w', 'trup', [_jf,_kf,_lf,_nt2],        'trup' ),

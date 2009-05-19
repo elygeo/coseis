@@ -286,7 +286,7 @@ def prepare_prm( prm, itbuff ):
             ii[3] = 0, 0, 1
         if field in fieldnames.fault:
             i = prm.faultnormal - 1
-            ii[i] = 2 * ( prm.irup, ) + ( 1, )
+            ii[i] = 2 * ( irup, ) + ( 1, )
         nn = [ ( ii[i][1] - ii[i][0] + 1 ) / ii[i][2] for i in range(4) ]
         nb = ( min( prm.itio, prm.nt ) - 1 ) / ii[3][2] + 1
         nb = max( 1, min( nb, nn[3] ) )
