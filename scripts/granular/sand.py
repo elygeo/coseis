@@ -12,13 +12,13 @@ dt = dx[0] / 12500.0		# time step length
 
 _T = 0.0001			# time duration 
 _T = 0.00001			# time duration
-_L = 0.15, 0.06, 0.11		# model dimensions
-bc1 = 0, 0, 0			# reflecting boundary condition
-bc2 = 0, 0, 0			# reflecting boundary condition
+_L = 0.15, 0.0, 0.11		# model dimensions
+bc1 = 0, 1, 0			# reflecting boundary condition
+bc2 = 0, 1, 0			# reflecting boundary condition
 nt = int( _T / dt + 1.00001 )	# number of time steps
 nn = [				# number of sample points 
     int( _L[0] / dx[0] + 0.00001 ),
-    int( _L[1] / dx[1] + 0.00001 ),
+    2,
     int( _L[2] / dx[2] + 0.00001 ),
 ]
 
@@ -31,23 +31,19 @@ src_w1 = 3 * [ 0.0  ]; src_w2 = 0.0, 1e-9, 0.0; rundir = '~/run/shear'
 src_period = 2e-6
 
 # material model
-_3 = 0.0325 / dx[2] + 1.5
-_4 = 0.0375 / dx[2] + 0.5
-_l1 =  _3,  _4
-_l2 = -_4, -_3
+import Image
+_im = Image.open( 'data/granular1.png' )
+_im = numpy.array( _vs.resize( (nn[0], nn[2]) ).convert( 'L' ), 'f' )
+_im = _im / _im.max()
+_vp = 1250.0 + 1000.0 * _im
+_vs = 0.0 + 500.0 * _im
+_vp.T.tofile( 'vp' )
+_vs.T.tofile( 'vs' )
 fieldio = [
-    ( '=',  'gam', [],                0.1 ),
-    ( '=',  'rho', [],             7700.0 ), # steel
-    ( '=',  'vp',  [],             5900.0 ), # steel
-    ( '=',  'vs',  [],             3200.0 ), # steel
-    ( '=',  'gam', [(),(),_l1,()],    0.2 ), # gouge
-    ( '=',  'rho', [(),(),_l1,()], 1800.0 ), # gouge
-    ( '=',  'vp',  [(),(),_l1,()], 1750.0 ), # gouge
-    ( '=',  'vs',  [(),(),_l1,()],  400.0 ), # gouge
-    ( '=',  'gam', [(),(),_l2,()],    0.2 ), # gouge
-    ( '=',  'rho', [(),(),_l2,()], 1800.0 ), # gouge
-    ( '=',  'vp',  [(),(),_l2,()], 1750.0 ), # gouge
-    ( '=',  'vs',  [(),(),_l2,()],  400.0 ), # gouge
+    ( '=',  'gam', [],    0.2 ),
+    ( '=',  'rho', [], 1800.0 ),
+    ( '=r', 'vp',  [], 'vp' ),
+    ( '=r', 'vs',  [], 'vs' ),
 ]
 
 # output

@@ -46,5 +46,6 @@ fieldio = [
     ( '=w', 'sl', [(),201,1,()], 'slip' ),
 ]
 
-sord.run( locals() )
+if __name__ == '__main__':
+    sord.run( locals() )
 

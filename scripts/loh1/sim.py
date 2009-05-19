@@ -46,5 +46,7 @@ fieldio += [
     ( '=wx', 'v3',  [], 'vz', (5999., 7999., -1.) ),
 ]
 
-sord.run( locals() )
+# run job
+if __name__ == '__main__':
+    sord.run( locals() )
 

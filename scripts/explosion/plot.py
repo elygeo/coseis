@@ -2,9 +2,7 @@
 """
 Explosion test plot
 """
-import os, pylab, numpy, scipy.signal
-from sord import util
-from sord.extras import coord
+import os, pylab, numpy, scipy.signal, sord
 
 rho, vp, vs = 2670.0, 6000.0, 3464.0
 runs = 'tmp/1', 'tmp/3', 'tmp/2', 'tmp/4'
@@ -12,18 +10,10 @@ stations = 'p5',
 stations = 'p1', 'p2', 'p3', 'p4', 'p5', 'p6'
 
 for rundir in runs:
-    prm = util.loadmeta( rundir )
+    prm = sord.util.loadmeta( rundir )
     T = prm.src_period
     cutoff = 0
     cutoff = vp / ( 20 * prm.dx[0] )
-    if cutoff:
-        if 1:
-            Wn = cutoff * 2.0 * prm.dt
-            b, a = scipy.signal.butter( 2, Wn )
-        else:
-            n = 2 * round( 1 / ( cutoff * prm.dt ) )
-            b = 0.5 * ( 1.0 - numpy.cos( numpy.linspace( 0.0, 2.0 * numpy.pi, n ) ) )
-            a  = b.sum()
     if prm.src_type == 'moment':
         m0 = prm.src_w1[0]
     else:
@@ -40,14 +30,12 @@ for rundir in runs:
         t  = prm.dt * numpy.arange( prm.nt ) + 0.5 * prm.dt
         ta = t + r / vp
         v  = numpy.array([ v1, v2, v3 ]).squeeze()
-        v  = coord.matmul( coord.rotmat( x ), v )
+        v  = sord.coord.matmul( sord.coord.rotmat( x ), v )
         va = ( m0 * numpy.exp( -t / T ) * ( t * vp / r - t / T + 1.0 )
              / ( 4.0 * numpy.pi * rho * vp**3.0 * T**2.0 * r ) )
         if cutoff:
-            v  = scipy.signal.lfilter( b, a, v )
-            v  = scipy.signal.lfilter( b, a, v )
-            va = scipy.signal.lfilter( b, a, va )
-            va = scipy.signal.lfilter( b, a, va )
+            v  = sord.lowpass( v,  dt, cutoff, 2, 1 )
+            va = sord.lowpass( va, dt, cutoff, 2, 1 )
         pylab.clf()
         pylab.plot( t - prm.dt, v.T, '-', ta - prm.dt, va, 'k--' )
         pylab.xlim( 0.5, prm.dt * prm.nt )
