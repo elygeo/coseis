@@ -40,7 +40,7 @@ dtype = numpy.dtype( 'f' ).str
 fortran_serial = None
 for _dir in os.environ['PATH'].split(':'):
     if fortran_serial: break
-    for _f in [ 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95' ]:
+    for _f in 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95':
         if os.path.isfile( os.path.join( _dir, _f ) ):
             fortran_serial = [ _f ]
             break
@@ -49,7 +49,7 @@ for _dir in os.environ['PATH'].split(':'):
 fortran_mpi = None
 for _dir in os.environ['PATH'].split(':'):
     if fortran_mpi: break
-    for _f in [ 'mpxlf95_r', 'mpif90' ]:
+    for _f in 'mpxlf95_r', 'mpif90':
         if os.path.isfile( os.path.join( _dir, _f ) ):
             fortran_mpi = [ _f ]
             break

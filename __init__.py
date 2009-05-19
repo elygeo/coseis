@@ -3,6 +3,7 @@
 Support Operator Rupture Dynamics
 """
 import util, configure, fieldnames
+from extras import coord, egmm, rspectra, signal, source, viz
 
 def stage( inputs ):
     """Setup, and optionally launch, a SORD job."""
