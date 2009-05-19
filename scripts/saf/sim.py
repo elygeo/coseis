@@ -6,8 +6,8 @@ import sys, numpy, sord
 
 # parameters
 dx =  200.0; npml = 10
-dx = 4000.0; npml = 10
 dx = 20000.0; npml = 0
+dx = 4000.0; npml = 10
 _topo = False
 _topo = True
 _indir = '~/run/cvm4/'

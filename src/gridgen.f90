@@ -182,7 +182,7 @@ call fieldio( '>', 'c3', w2(:,:,:,3) )
 ! Orthogonality test
 if ( oplevel == 0 ) then
     oplevel = 6
-    tol = epsilon( dx ) * maxval( abs( dx ) )
+    tol = 10.0 * epsilon( tol )
     j1 = i1cell(1); j2 = i2cell(1)
     k1 = i1cell(2); k2 = i2cell(2)
     l1 = i1cell(3); l2 = i2cell(3)
@@ -256,16 +256,15 @@ end select
 
 ! Cell volume
 call set_halo( vc, 0.0, i1cell, i2cell )
-tol = sqrt( epsilon( dx ) ) * abs( product( dx ) )
 do i = 1, 3
     call diffnc( vc, w1, i, i, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
-    if ( minval( vc ) < -tol ) stop 'negative cell volume, wrong sign in dx?'
+    select case( ifn ) 
+    case( 1 ); vc(irup,:,:) = 0.0
+    case( 2 ); vc(:,irup,:) = 0.0
+    case( 3 ); vc(:,:,irup) = 0.0
+    end select
+    if ( minval( vc ) < 0.0 ) stop 'negative cell volume, wrong sign in dx?'
 end do
-select case( ifn ) 
-case( 1 ); vc(irup,:,:) = 0.0
-case( 2 ); vc(:,irup,:) = 0.0
-case( 3 ); vc(:,:,irup) = 0.0
-end select
 call fieldio( '>', 'vc', vc  )
 
 end subroutine
