@@ -8,6 +8,7 @@ module
 showusage
 qsub -l debugging
 showbf
+alias showme='showq | sed -n "/JOBID/p; /--/p; /^ /p; /$USER/p"'
 
 Home directories have a 2 GB quota.
 CrayPAT (Cray Performance Analysis Tools) is useful for profiling and
