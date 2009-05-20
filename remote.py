@@ -12,7 +12,7 @@ def deploy( rsh, dest, command=[] ):
     """
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    rsync = 'rsync -avR --delete --include=destinations --include=email --include=work --include=sord.tgz --exclude-from=.ignore -e %r . %r' % ( rsh, dest )
+    rsync = 'rsync -avR --delete --include=destinations --include=email --include=data --include=work --include=sord.tgz --exclude-from=.ignore -e %r . %r' % ( rsh, dest )
     print( rsync )
     os.system( rsync )
     os.chdir( cwd )
