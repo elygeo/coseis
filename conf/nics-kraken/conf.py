@@ -1,6 +1,8 @@
 notes = """
 NICS Kraken
 
+EPD version: rh3-amd64
+
 /lustre/scratch/$USER
 module
 showusage
