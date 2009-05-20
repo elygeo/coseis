@@ -32,7 +32,9 @@ def savefig( fd=None, format=None, **kwargs ):
     if fd:
         fd.write( out )
         fd.close()
-    return out
+        return
+    else:
+        return out
 
 def lengthscale( x, y, w=None, label='%s', style='k-', bg='w', **kwargs ):
     """

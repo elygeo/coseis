@@ -18,8 +18,10 @@ infiles = []		# files to copy to the sord input directory
 
 # User info
 user = pwd.getpwuid( os.geteuid() )[0]
-try: email = open( 'email', 'r' ).read().strip()
-except: email = user
+try:
+    email = open( 'email', 'r' ).read().strip()
+except:
+    email = user
 
 # Machine specific
 machine = ''
