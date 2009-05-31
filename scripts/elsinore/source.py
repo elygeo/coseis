@@ -37,12 +37,12 @@ import pylab, scipy.signal
 
 normalize = 0
 normalize = 1
-lowpass = 0.25
-lowpass = 2.0
-lowpass = 0.5
-lowpass = 1.0
-lowpass = 0.0
-lowpass = 0.1
+lowpass = 0.25,
+lowpass = 2.0,
+lowpass = 0.5,
+lowpass = 1.0,
+lowpass = 0.1,
+lowpass = 0.0,
 
 ns = data.nt1.size
 dt = data.dt.max()
@@ -61,7 +61,7 @@ if normalize:
     m[m>0.0] = 1.0 / m[m>0.0]
     v = ( m * v.T ).T
 if lowpass[0] > 0:
-    v = sord.signal.lowpass( v, **lowpass )
+    v = sord.signal.lowpass( v, *lowpass )
 
 V = abs( numpy.fft.rfft( v, nf, -1 ) )
 

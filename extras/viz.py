@@ -113,7 +113,7 @@ def colormap( name='w0', colorexp=1., output='mayavi', n=2001, nmod=0, modlim=0.
     else:
         r, g, b = name
         name = 'custom'
-    n2 = r.size
+    n2 = len( r )
     m = 1. / max( 1., max(r), max(g), max(b) )
     r = m * numpy.array( r )
     g = m * numpy.array( g )

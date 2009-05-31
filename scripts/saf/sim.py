@@ -90,14 +90,13 @@ fieldio += [
 ]
 
 # surface output
-_i = 1, -1, 10
 fieldio += [
-    ( '=w', 'v1', [_i,_i,-1,()], 'v1'   ),
-    ( '=w', 'v2', [_i,_i,-1,()], 'v2'   ),
-    ( '=w', 'v3', [_i,_i,-1,()], 'v3'   ),
-    ( '=w', 'x1', [], 'x1'   ),
-    ( '=w', 'x2', [], 'x2'   ),
-    ( '=w', 'x3', [], 'x3'   ),
+    ( '=w', 'v1', [], 'v1' ),
+    ( '=w', 'v2', [], 'v2' ),
+    ( '=w', 'v3', [], 'v3' ),
+    ( '=w', 'x1', [], 'x1' ),
+    ( '=w', 'x2', [], 'x2' ),
+    ( '=w', 'x3', [], 'x3' ),
 ]
 
 # fault parameters
@@ -129,12 +128,10 @@ fieldio += [
     ( '=r', 'tn',   [_jf,_kf,_lf,()], _indir + 'tn'   ),
     ( '=r', 'ts',   [_jf,_kf,_lf,()], _indir + 'ts'   ),
     ( '=r', 'dc',   [_jf,_kf,_lf,()], _indir + 'dc'   ),
+    ( '=w', 'tsm',  [_jf,_kf,_lf,(1,_nt2)],    'tsm'  ),
     ( '=w', 'sv1',  [_jf,_kf,_lf,(1,_nt2)],    'sv1'  ),
     ( '=w', 'sv2',  [_jf,_kf,_lf,(1,_nt2)],    'sv2'  ),
     ( '=w', 'sv3',  [_jf,_kf,_lf,(1,_nt2)],    'sv3'  ),
-    ( '=w', 'sl',   [_jf,_kf,_lf,_nt2],        'sl'   ),
-    ( '=w', 'psv',  [_jf,_kf,_lf,_nt2],        'psv'  ),
-    ( '=w', 'trup', [_jf,_kf,_lf,_nt2],        'trup' ),
 ]
 
 # nucleation

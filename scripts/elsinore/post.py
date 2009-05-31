@@ -19,35 +19,35 @@ dtype = meta.dtype
 dt = meta.dt
 dx = meta.dx
 shape = meta.shape['v1']
-x_shape = (shape[0]-1)/dix_x+1, (shape[1]-1)/dix_x+1, 1, (shape[2]-1)/dit_x+1
-t_shape = (shape[2]-1)/dit_t+1, (shape[0]-1)/dix_t+1, (shape[1]-1)/dix_t+1, 1
+x_shape = (shape[0]-1)/dix_x+1, (shape[1]-1)/dix_x+1, (shape[2]-1)/dit_x+1
+t_shape = (shape[2]-1)/dit_t+1, (shape[0]-1)/dix_t+1, (shape[1]-1)/dix_t+1
 websims = dict(
     title = 'Elsinore Mw7.75 scenario'
     author = 'Geoffrey Ely'
     downloadable = True,
     label = ''
-    t_axes = ( 'Time', 'X', 'Y', 'Z' ),
+    t_axes = ( 'Time', 'X', 'Y' ),
     t_shape = t_shape,
-    t_step = ( dt*dit_t, 0.001*dx[0]*dix_t, 0.001*dx[1]*dix_t, 0.001*dx[2]*dix_t ),
-    t_unit = ( 's', 'km', 'km', 'km' ),
-    x_axes = ( 'X', 'Y', 'Z', 'Time' ),
+    t_step = ( dt*dit_t, 0.001*dx[0]*dix_t, 0.001*dx[1]*dix_t ),
+    t_unit = ( 's', 'km', 'km' ),
+    x_axes = ( 'X', 'Y', 'Time' ),
     x_decimate = 1,
     x_shape = x_shape,
-    x_step = ( 0.001*dx[0]*dix_x, 0.001*dx[1]*dix_x, 0.001*dx[2]*dix_x, dt*dit_x ),
-    x_unit = ( 'km', 'km', 'km', 's' ),
+    x_step = ( 0.001*dx[0]*dix_x, 0.001*dx[1]*dix_x, dt*dit_x ),
+    x_unit = ( 'km', 'km', 's' ),
     t_panes = [
         ( ( 'v1_t', ), 'X Velocity (m/s)' ),
         ( ( 'v2_t', ), 'Y Velocity (m/s)' ),
         ( ( 'v3_t', ), 'Z Velocity (m/s)' ),
     ],
     x_initial_panes = [
-        ( 'pgv', 'Peak velocity (m/s)',   'w00', (0, 4.0), 2.0, 0 ),
-        ( 'pgd', 'Peak displacement (m)', 'w00', (0, 8.0), 2.0, 0 ),
+        ( 'pgv', 'Peak velocity (m/s)',   'w00', (0, 4.0), 2.0 ),
+        ( 'pgd', 'Peak displacement (m)', 'w00', (0, 8.0), 2.0 ),
     ],
     x_panes = [
-        ( 'v1_x', 'X velocity (m/s)', 'w2', (-1, 1), 2.0, 0 ),
-        ( 'v2_x', 'Y velocity (m/s)', 'w2', (-1, 1), 2.0, 0 ),
-        ( 'v3_x', 'Z velocity (m/s)', 'w2', (-1, 1), 2.0, 0 ),
+        ( 'v1_x', 'X velocity (m/s)', 'w2', (-1, 1), 2.0 ),
+        ( 'v2_x', 'Y velocity (m/s)', 'w2', (-1, 1), 2.0 ),
+        ( 'v3_x', 'Z velocity (m/s)', 'w2', (-1, 1), 2.0 ),
     ],
     x_plot  = [
         ( 'trace.xyz', 'k-' ),
