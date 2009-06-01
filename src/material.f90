@@ -150,20 +150,18 @@ end subroutine
 subroutine pml
 use m_globals
 integer :: i
-real :: hmean, tune, c1, c2, c3, damp, dampn, dampc, pmlp
+real :: c1, c2, c3, damp, dampn, dampc, tune
 
 if ( npml < 1 ) return
 c1 =  8.0 / 15.0
 c2 = -3.0 / 100.0
 c3 =  1.0 / 1500.0
 tune = 3.5
-pmlp = 2.0
-!hmean = 2.0 * vp1 * vp2 / ( vp1 + vp2 )
-hmean = 2.0 * vs1 * vs2 / ( vs1 + vs2 )
-damp = tune * hmean / sqrt( sum( dx * dx ) / 3.0 ) * ( c1 + ( c2 + c3 * npml ) * npml ) / npml ** pmlp
+if ( vpml <- 0.0 ) vpml = 2.0 * vs1 * vs2 / ( vs1 + vs2 )
+damp = tune * vpml / sqrt( sum( dx * dx ) / 3.0 ) * ( c1 + ( c2 + c3 * npml ) * npml ) / npml ** ppml
 do i = 1, npml
-    dampn = damp *   i ** pmlp
-    dampc = damp * ( i ** pmlp + ( i - 1 ) ** pmlp ) * 0.5
+    dampn = damp *   i ** ppml
+    dampc = damp * ( i ** ppml + ( i - 1 ) ** ppml ) * 0.5
     dn1(npml-i+1) = - 2.0 * dampn        / ( 2.0 + dt * dampn )
     dc1(npml-i+1) = ( 2.0 - dt * dampc ) / ( 2.0 + dt * dampc )
     dn2(npml-i+1) =   2.0                / ( 2.0 + dt * dampn )

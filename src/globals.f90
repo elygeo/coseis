@@ -4,10 +4,10 @@ implicit none
 
 ! Input parameters, see default-prm.py for documentation
 integer, dimension(3) :: np3, nn, bc1, bc2, n1expand, n2expand
-integer :: nt, itstats, itio, itcheck, itstop, npml, oplevel, fixhypo, mpin, &
+integer :: nt, itstats, itio, itcheck, itstop, npml, ppml, oplevel, fixhypo, mpin, &
     mpout, debug, faultopening, irup, faultnormal, src_n
 real :: tm0, dt, dx(3), rho1, rho2, vp1, vp2, vs1, vs2, gam1, gam2, hourglass(2), &
-    vdamp, rexpand, affine(9), gridnoise, xhypo(3), ihypo(3), slipvector(3)
+    vdamp, rexpand, affine(9), gridnoise, xhypo(3), ihypo(3), vpml, slipvector(3)
 real :: src_period, src_w1(3), src_w2(3), vrup, rcrit, trelax, svtol
 character(16) :: src_type, src_function
 

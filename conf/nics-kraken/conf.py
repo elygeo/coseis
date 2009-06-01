@@ -10,6 +10,9 @@ qsub -l debugging
 showbf
 alias showme='showq | sed -n "/JOBID/p; /--/p; /^ /p; /$USER/p"'
 
+vim .bashrc
+module load python/2.5.2
+
 Home directories have a 2 GB quota.
 CrayPAT (Cray Performance Analysis Tools) is useful for profiling and
 collecting hardware performance data
