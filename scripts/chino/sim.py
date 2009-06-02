@@ -2,6 +2,7 @@
 """
 Chino Hills test
 """
+import sys
 
 np3 = 1, 8, 1
 np3 = 1, 2, 1

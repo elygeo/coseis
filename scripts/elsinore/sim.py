@@ -2,7 +2,7 @@
 """
 Elsinore simulation
 """
-import sord
+import sys, sord
 
 projection = sord.coord.ll2xy
 _srf = 'data/cybershake/010-003-001-000'

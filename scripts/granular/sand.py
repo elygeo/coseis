@@ -4,7 +4,7 @@ Granular
 sampling: 2-40 MHz = 5e-7 to 2.5e-8 s
 sources: 500kHz
 """
-import sord
+import numpy, Image, sord
 
 dx = 0.00025, 0.00025, 0.00025 ; np3 = 1, 32, 1 # spatial resolution and number of processors
 dx = 0.001,   0.001,   0.001   ; np3 = 1, 32,  1 # spatial resolution and number of processors
@@ -31,9 +31,8 @@ src_w1 = 3 * [ 0.0  ]; src_w2 = 0.0, 1e-9, 0.0; rundir = '~/run/shear'
 src_period = 2e-6
 
 # material model
-import Image
 _im = Image.open( 'data/granular1.png' )
-_im = numpy.array( _vs.resize( (nn[0], nn[2]) ).convert( 'L' ), 'f' )
+_im = numpy.array( _im.resize( (nn[0], nn[2]) ).convert( 'L' ), 'f' )
 _im = _im / _im.max()
 _vp = 1250.0 + 1000.0 * _im
 _vs = 0.0 + 500.0 * _im

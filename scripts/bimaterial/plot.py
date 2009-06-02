@@ -2,7 +2,7 @@
 """
 Bimaterial problem
 """
-import sord, pylab, sim
+import numpy, pylab, sim
 
 n = sim.nn[0], sim.nt
 sl = numpy.fromfile( sim.rundir + '/out/slip', 'f' ).reshape( n[::-1] ).T

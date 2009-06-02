@@ -2,6 +2,7 @@
 """
 Support Operator Rupture Dynamics
 """
+import os, sys
 import util, configure, fieldnames
 from extras import coord, egmm, signal, source, viz
 try:
@@ -11,8 +12,8 @@ except:
 
 def stage( inputs ):
     """Setup, and optionally launch, a SORD job."""
-    import os, sys, pwd, glob, time, getopt, shutil
-    import util, configure, setup
+    import glob, time, getopt, shutil
+    import setup
 
     # Save start time
     starttime = time.asctime()
@@ -202,7 +203,6 @@ def stage( inputs ):
 
 def prepare_prm( prm, itbuff ):
     """Prepare input paramers"""
-    import os, sys, util, fieldnames
 
     # inervals
     prm.itio = max( 1, min( prm.itio, prm.nt ) )
@@ -310,7 +310,6 @@ def prepare_prm( prm, itbuff ):
 
 def launch( cfg ):
     """Launch or queue job."""
-    import os, sys
     cwd = os.getcwd()
     if cfg.run == 'q':
         os.chdir( cfg.rundir )

@@ -2,7 +2,7 @@
 """
 TPV3
 """
-import math, numpy, pylab, sord
+import numpy, pylab, sord
 
 so_dir = './'; bi_dir = '../../bi/'
 so_dir = './run/500/'; bi_dir = 'bi/'

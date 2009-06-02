@@ -2,7 +2,7 @@
 """
 Wurman and Oglesby problem
 """
-import sord, os, sys
+import sord, os
 
 np3 = 4, 7, 2
 dx = 100.0, 100.0, 100.0
@@ -57,10 +57,10 @@ _home = os.path.expanduser('~')
 _i = 0
 while True:
     _i += 1
-    _f = _home + 'sord/stresses/initial.stressx.%02d' % i
+    _f = _home + 'sord/stresses/initial.stressx.%02d' % _i
     print _f
     if not os.path.isfile( _f ): break
-    os.system( _home + 'sord/bin/asc2flt < %r > ts' % f )
-    rundir = _home + 'sord/run/%02d' % i
+    os.system( _home + 'sord/bin/asc2flt < %r > ts' % _f )
+    rundir = _home + 'sord/run/%02d' % _i
     sord.run( locals() )
 

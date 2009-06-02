@@ -2,7 +2,7 @@
 """
 PEER LOH.1 - Plot comparison of FK and SOM.
 """
-import os, numpy, pylab, scipy, scipy.signal, sord
+import os, numpy, pylab, scipy.signal, sord
 
 # Parameters
 so_dir = os.path.expanduser( '~/run/loh1/' )

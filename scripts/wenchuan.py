@@ -2,7 +2,7 @@
 """
 Wenchuan earthquake
 """
-import sord, math
+import sord
 
 np3 = 1, 1, 2
 dx = 1000.0, 1000.0, -1000.0

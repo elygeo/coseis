@@ -2,7 +2,7 @@
 """
 TPV3 - SCEC validation problem version 3, convergence test
 """
-import sord, os
+import sord
 
 debug = 0
 _run = [ 

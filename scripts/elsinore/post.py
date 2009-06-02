@@ -5,7 +5,7 @@ compute PGV, PGD
 decimate velocities records
 setup WebSims repository
 """
-import os, numpy, sord, time
+import numpy, sord, time
 
 # demimation factors
 dix_x = 1
@@ -22,10 +22,10 @@ shape = meta.shape['v1']
 x_shape = (shape[0]-1)/dix_x+1, (shape[1]-1)/dix_x+1, (shape[2]-1)/dit_x+1
 t_shape = (shape[2]-1)/dit_t+1, (shape[0]-1)/dix_t+1, (shape[1]-1)/dix_t+1
 websims = dict(
-    title = 'Elsinore Mw7.75 scenario'
-    author = 'Geoffrey Ely'
+    title = 'Elsinore Mw7.75 scenario',
+    author = 'Geoffrey Ely',
     downloadable = True,
-    label = ''
+    label = '',
     t_axes = ( 'Time', 'X', 'Y' ),
     t_shape = t_shape,
     t_step = ( dt*dit_t, 0.001*dx[0]*dix_t, 0.001*dx[1]*dix_t ),

@@ -2,12 +2,12 @@
 """
 Coordinate conversions
 """
+import sys, numpy
 
 def matmul( A, B ):
     """
     Vectorized matrix multiplication. Not the same as numpy.dot()
     """
-    import numpy
     A = numpy.array( A )
     B = numpy.array( B )
     return ( A[:,:,numpy.newaxis,...] * B ).sum( axis=1 )
@@ -16,7 +16,6 @@ def solve2( A, b ):
     """
     Vectorized 2x2 linear equation solver
     """
-    import numpy
     A = numpy.array( A )
     b = numpy.array( b ) / ( A[0,0]*A[1,1] - A[0,1]*A[1,0] )
     return numpy.array([ b[0]*A[1,1] - b[1]*A[0,1],
@@ -32,7 +31,6 @@ def slipvectors( strike, dip, rake ):
     world coordinates.  Columns of R are axis unit vectors of the world space in
     fault local coordinates.
     """
-    import numpy
     strike = numpy.pi / 180.0 * numpy.array( strike )
     dip    = numpy.pi / 180.0 * numpy.array( dip ) 
     rake   = numpy.pi / 180.0 * numpy.array( rake )
@@ -53,7 +51,6 @@ def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=False ):
     """
     2D interpolation on a regular grid
     """
-    import numpy
     z  = numpy.array( z )
     xi = ( numpy.array( xi ) - x0 ) / dx
     yi = ( numpy.array( yi ) - y0 ) / dy
@@ -76,7 +73,6 @@ def ibilinear( xx, yy, xi, yi ):
     """
     Vectorized inverse bilinear interpolation
     """
-    import sys, numpy
     xx = numpy.array( xx )
     yy = numpy.array( yy )
     xi = numpy.array( xi ) - 0.25 * xx.sum(0).sum(0)
@@ -100,7 +96,7 @@ def ibilinear( xx, yy, xi, yi ):
     return x
 
 def ll2cvmh( x, y, inverse=False ):
-    import numpy, pyproj
+    import pyproj
     projection = pyproj.Proj( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
     x = numpy.array( x )
     y = numpy.array( y )
@@ -111,7 +107,6 @@ def ll2cmu( x, y, inverse=False ):
     """
     CMU TeraShake coordinates projection
     """
-    import sys, numpy
     xx = [ -121.0, -118.951292 ], [ -116.032285, -113.943965 ]
     yy = [   34.5,   36.621696 ], [   31.082920,   33.122341 ]
     if inverse:
@@ -126,7 +121,7 @@ def ll2xy( x, y, inverse=False, projection=None, rot=40.0, lon0=-121.0, lat0=34.
     """
     UTM TeraShake coordinate projection
     """
-    import numpy, pyproj
+    import pyproj
     if not projection:
         projection = pyproj.Proj( proj='utm', zone=11, ellps='WGS84' )
     x0, y0 = projection( lon0, lat0 )
@@ -155,7 +150,6 @@ def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
     local_components = matmul( mat, components )
     local_strike = strike + theta
     """
-    import numpy
     lon = numpy.array( [[lon-eps, lon    ], [lon+eps, lon    ]] )
     lat = numpy.array( [[lat,     lat-eps], [lat,     lat+eps]] )
     x, y = projection( lon, lat )
@@ -174,7 +168,6 @@ def rot_sym_tensor( w1, w2, rot ):
     w2:  components w23, w31, w12
     rot: rotation matrix
     """
-    import numpy
     rot = numpy.array( rot )
     mat = numpy.diag( w1 )
     mat.flat[[5,6,1]] = w2
@@ -188,7 +181,6 @@ def rotmat( x, origin=(0,0,0), upvector=(0,0,1) ):
     """
     Given a position vector x, find the rotation matrix to r,h,v coordinates.
     """
-    import numpy
     x = numpy.array( x ) - numpy.array( origin )
     nr = x / numpy.sqrt( (x*x).sum() )
     nh = numpy.cross( upvector, nr )
@@ -202,7 +194,7 @@ def rotmat( x, origin=(0,0,0), upvector=(0,0,1) ):
     return numpy.array([ nr, nh, nv ])
 
 if __name__ == '__main__':
-    import sys, getopt, numpy
+    import getopt
     opts, args = getopt.getopt( sys.argv[1:], 'i' )
     for f in args:
         x, y = numpy.loadtxt( f, unpack=True )

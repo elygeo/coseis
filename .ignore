@@ -6,8 +6,6 @@
 *.il
 *.stb
 *.swp
-*.pdf
-*.png
 .DS_Store
 .bzr
 bin/*

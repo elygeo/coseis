@@ -2,7 +2,7 @@
 """
 setup WebSims repository
 """
-import os, numpy, sord
+import numpy, sord
 
 # write WebSims metadata
 meta = sord.util.loadmeta()

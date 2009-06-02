@@ -76,7 +76,6 @@ if 1:
     src_w1 = 3 * [ 3*_rho*_vp*_vp - 4*_rho*_vs*_vs ]
     source.write_src( _f, nt, _dt, 0.0, ihypo, src_w1, src_w2, 'tmp' )
     sord.run( locals() )
-    asdf
 
     rundir = 'tmp/4'
     src_type = 'potency'

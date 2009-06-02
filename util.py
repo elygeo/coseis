@@ -2,10 +2,10 @@
 """
 General utilities
 """
+import os, sys, shutil
 
 def dictify( o ):
     """Convert object attributes to dict"""
-    import os
     d = dict()
     for k in dir( o ):
         v = getattr( o, k )
@@ -15,7 +15,6 @@ def dictify( o ):
 
 def objectify( d ):
     """Convert dict to object attributes"""
-    import os
     class obj:
         pass
     o = obj()
@@ -26,7 +25,6 @@ def objectify( d ):
 
 def load( filename, d=None ):
     """Load variables from a Python source file into a dict"""
-    import os
     if d is None:
         d = dict()
     f = open( os.path.expanduser( filename ) )
@@ -37,7 +35,6 @@ def load( filename, d=None ):
 
 def save( fd, d, expand=[] ):
     """Write variables from a dict into a Python source file"""
-    import os, sys
     if type( fd ) is not file:
         fd = open( os.path.expanduser( fd ), 'w' )
     for k in sorted( d ):
@@ -69,7 +66,6 @@ def loadmeta( dir='.' ):
     """
     Load SORD metadata
     """
-    import os
     dir = os.path.expanduser( dir )
     if os.path.isfile( os.path.join( dir, 'meta.py' ) ):
         meta = load( os.path.join( dir, 'meta.py' ) )
@@ -109,7 +105,6 @@ def expand_indices( indices, shape, base=1 ):
 
     FIXME: document
     """
-    import sys
     n = len( shape )
     off = int( base )
     if len( indices ) == 0:
@@ -155,7 +150,7 @@ def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
               '>d' : big endian double precision
     order :   'F' first index varies fastest, or 'C' last index varies fastest.
     """
-    import os, numpy
+    import numpy
     from numpy import array, fromfile
     if type( fd ) is not file:
         fd = open( os.path.expanduser( fd ), 'rb' )
@@ -203,7 +198,6 @@ def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
 
 def progress( i, n, t ):
     """Print progress and time remaining."""
-    import sys
     percent =  100. * i / n
     remain = int( t * ( 100. / percent - 1. ) )
     h = remain / 3600
@@ -217,7 +211,7 @@ def progress( i, n, t ):
 
 def compile( compiler, object, source ):
     """An alternative to Make that uses state files"""
-    import os, sys, glob, difflib
+    import glob, difflib
     object =   os.path.expanduser( object )
     source = [ os.path.expanduser( f ) for f in source if f ]
     statedir = os.path.join( os.path.dirname( object ), '.state' )
@@ -255,7 +249,6 @@ def compile( compiler, object, source ):
 def install_path():
     """Install path file in site-packages directory"""
     from distutils.sysconfig import get_python_lib
-    import os, sys
     f   = os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
     pth = os.path.join( get_python_lib(), f )
     dir = os.path.dirname( os.path.dirname( os.path.realpath( __file__ ) ) )
@@ -270,7 +263,6 @@ def install_path():
 def uninstall_path():
     """Remove path file from site-packages directory"""
     from distutils.sysconfig import get_python_lib
-    import os
     f = os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
     pth = os.path.join( get_python_lib(), f )
     print( 'Removing ' + pth )
@@ -284,7 +276,6 @@ def uninstall_path():
 def install():
     """Copy package to site-packages directory"""
     from distutils.sysconfig import get_python_lib
-    import os, sys, shutil
     src = os.path.dirname( os.path.realpath( __file__ ) )
     f   = os.path.basename( os.path.dirname( __file__ ) )
     dst = os.path.join( get_python_lib(), f )
@@ -303,7 +294,6 @@ def install():
 def uninstall():
     """Remove package from site-packages directory"""
     from distutils.sysconfig import get_python_lib
-    import os, shutil
     f   = os.path.basename( os.path.dirname( __file__ ) )
     dst = os.path.join( get_python_lib(), f )
     print( 'Removing ' + dst )

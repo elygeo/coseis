@@ -3,7 +3,7 @@
 Default configuration parameters
 """
 
-import os, sys, pwd, numpy
+import os, pwd, numpy
 
 # Setup options (also accessible with command line options).
 prepare = True		# True: compile code and setup run directory, False: dry run

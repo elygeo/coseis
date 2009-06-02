@@ -2,7 +2,7 @@
 """
 SAF parameters
 """
-import sys, numpy, sord
+import sord
 
 # parameters
 dx =  200.0; npml = 10

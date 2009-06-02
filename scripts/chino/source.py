@@ -14,15 +14,15 @@ w2 = 0.0, 0.0, 0.0
 # Coordinates
 x, y = sim.projection( lon, lat )
 ihypo = (
-     x   / dx[0] + 1.0,
-     y   / dx[1] + 1.0,
-    -dep / dx[2] + 1.0,
+     x   / sim.dx[0] + 1.0,
+     y   / sim.dx[1] + 1.0,
+    -dep / sim.dx[2] + 1.0,
 )
 
 # Time function
 tc = 2.0
 s = 0.5
-t = dt * numpy.arange( nt )
+t = sim.dt * numpy.arange( sim.nt )
 history = ( numpy.exp( ( t - tc ) ** 2.0 / ( -2.0 * s ** 2.0 ) )
           / ( s * numpy.sqrt( 2.0 * numpy.pi ) ) )
 history = numpy.cumsum( history )
@@ -34,9 +34,9 @@ t0 = 0.0
 rot = (0, 1, 0), (-1, 0, 0), (0, 0, 1)
 w1, w2 = sord.coord.rot_sym_tensor( w1, w2, rot )
 rot = numpy.eye(3)
-rot[:2,:2] = sord.coord.rotation( lon, lat, projection )[0]
+rot[:2,:2] = sord.coord.rotation( lon, lat, sim.projection )[0]
 w1, w2 = sord.coord.rot_sym_tensor( w1, w2, rot )
 
 # Write SORD source input
-sord.source.write_src( history, nt, dt, t0, ihypo, w1, w2, '~/run/tmp' )
+sord.source.write_src( history, nt, sim.dt, t0, ihypo, w1, w2, '~/run/tmp' )
 

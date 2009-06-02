@@ -8,7 +8,6 @@ dir = os.path.expanduser( os.path.join( '~', 'run', 'granular' ) )
 dir = os.path.expanduser( os.path.join( '~', 'run', 'granular-shear' ) )
 dir = os.path.expanduser( os.path.join( '~', 'run', 'granular-vol' ) )
 meta = sord.util.loadmeta( dir )
-asdf
 
 nn = meta.shape['vs']
 n  = nn[0] * nn[1]

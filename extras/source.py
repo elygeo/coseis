@@ -115,6 +115,7 @@ def srfb_write( meta, data, path='' ):
     path = os.path.expanduser( path )
     if not os.path.isdir( path ):
         os.makedirs( path )
+    meta.dtype = numpy.dtype( 'f' ).str
     sord.util.save( os.path.join( path, 'meta.py' ), sord.util.dictify( meta ) )
     numpy.array( data.lon,   'f' ).tofile( os.path.join( path, 'lon' ) )
     numpy.array( data.lat,   'f' ).tofile( os.path.join( path, 'lat' ) )
@@ -199,6 +200,7 @@ def srf2potency( data, projection, dx, path='' ):
     """
     import os, numpy, coord
     path = os.path.join( os.path.expanduser( path ), 'src_' )
+    del( data.slip1, data.slip2, data.slip3 )
 
     # Time history
     i1, i2, i3 = 0, 0, 0

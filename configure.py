@@ -2,10 +2,10 @@
 """
 Read configuration files
 """
+import os, sys, util
 
 def configure( save=False, machine=None ):
     """Read configuration files"""
-    import os, util
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
     cfg = util.load( 'default-cfg.py' )
@@ -21,7 +21,6 @@ def configure( save=False, machine=None ):
 
 if __name__ == '__main__':
     """Set configuration"""
-    import os, sys
     cfg = configure( True, *sys.argv[1:2] )
     print( cfg['notes'] )
     for k in sorted( cfg.keys() ):

@@ -2,7 +2,7 @@
 """
 Inspect SRF source
 """
-import numpy, sord, sim
+import numpy, pylab, sord, sim
 
 meta, data = sord.source.srfb_read( sim._srf )
 mu = 2670.0 * 3464.0 ** 2.0
@@ -32,8 +32,6 @@ for k, v in [
 ]:
     if len( v ):
         print '%6s %12g %12g %12g %12d' % ( k, v.min(), v.max(), v.mean(), v.size )
-
-import pylab, scipy.signal
 
 normalize = 0
 normalize = 1

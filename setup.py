@@ -140,16 +140,38 @@ def docs():
     open( 'download.txt', 'w' ).write( download )
     open( 'sources.txt', 'w' ).write( out )
     open( 'style.css', 'w' ).write( css )
-    os.system(' \
-        rst2html.py \
-        -g -d -s \
-        --strict \
-        --cloak-email-addresses \
-        --initial-header-level=3 \
-        --no-toc-backlinks \
-        --stylesheet-path=style.css \
-        readme.txt | sed "/\<col/d" > index.html \
-    ')
+    if 1:
+        import re
+        from docutils.core import publish_string
+        # see import docutils.core.OptionParser, docutils.writers.html4css1
+        settings = dict(
+            #title = "WebSims",
+            #template = 'template.txt',
+            datestamp = '%Y-%m-%d',
+            generator = True,
+            source_link = True, # does not work
+            strict = True,
+            toc_backlinks = None,
+            cloak_email_addresses = True,
+            initial_header_level = 3,
+            stylesheet_path = 'style.css',
+        )
+        rst = open( 'readme.txt', 'r' ).read()
+        html = publish_string( rst, writer_name='html4css1', settings_overrides=settings )
+        html = re.sub( '<col.*>\n', '', html )
+        html = re.sub( '</colgroup>', '', html )
+        open( 'index.html', 'w' ).write( html )
+    else:
+        os.system(' \
+            rst2html.py \
+            -g -d -s \
+            --strict \
+            --cloak-email-addresses \
+            --initial-header-level=3 \
+            --no-toc-backlinks \
+            --stylesheet-path=style.css \
+            readme.txt | sed "/\<col/d" > index.html \
+        ')
     os.unlink( 'download.txt' )
     os.unlink( 'sources.txt' )
     os.unlink( 'style.css' )
