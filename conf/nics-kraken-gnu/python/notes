@@ -1,0 +1,117 @@
+PYTHON
+
+This method to build statically-linked Python is based on instructions from the GPAW project.
+
+Starting from the Python source directory, in the directory Python, create a file named dynload_cnl.c:
+
+/* This module provides the simulation of dynamic loading in Kraken */
+
+#include "Python.h"
+#include "importdl.h"
+
+const struct filedescr _PyImport_DynLoadFiletab[] = {
+  {".a", "rb", C_EXTENSION},
+  {0, 0}
+};
+
+extern struct _inittab _PyImport_Inittab[];
+
+dl_funcptr _PyImport_GetDynLoadFunc(const char *fqname, const char *shortname,
+                                    const char *pathname, FILE *fp)
+{
+  struct _inittab *tab = _PyImport_Inittab;
+  while (tab->name && strcmp(shortname, tab->name)) tab++;
+
+  return tab->initfunc;
+}
+
+
+
+In the file Lib/distutils/unixccompiler.py, add this to the end making sure it's a member of class UnixCCompiler(CCompiler):
+
+    def link_shared_object (self,
+                         objects,
+                         output_filename,
+                         output_dir=None,
+                         libraries=None,
+                         library_dirs=None,
+                         runtime_library_dirs=None,
+                         export_symbols=None,
+                         debug=0,
+                         extra_preargs=None,
+                         extra_postargs=None,
+                         build_temp=None,
+                         target_lang=None):
+
+        if output_dir is None:
+            (output_dir, output_filename) = os.path.split(output_filename)
+        output_fullname = os.path.join(output_dir, output_filename)
+        linkline = "%s %s" % (output_filename[:-2], output_fullname)
+        for l in library_dirs:
+            linkline += " -L" + l
+        for l in libraries:
+            linkline += " -l" + l
+        old_fmt = self.static_lib_format
+        self.static_lib_format = "%s%.0s"
+        self.create_static_lib(objects,
+                               output_filename,
+                               output_dir,
+                               debug,
+                               target_lang)
+        
+        self.static_lib_format = old_fmt
+        print "Append to Setup: ", linkline
+    
+
+
+In the file Lib/locale.py, change the third definition of getpreferredencoding() under resetlocale() such that for if do_setlocale: returns None:
+
+        def getpreferredencoding(do_setlocale = True):
+            """Return the charset that the user is likely using,
+            according to the system configuration."""
+            if do_setlocale:
+                return None
+                oldloc = setlocale(LC_CTYPE)
+                setlocale(LC_CTYPE, "")
+                result = nl_langinfo(CODESET)
+                setlocale(LC_CTYPE, oldloc)
+            else:
+                return nl_langinfo(CODESET)
+
+
+
+
+Then in the top level of the Python source directory invoke
+
+./configure --prefix=$ARCH_PATH SO=.a DYNLOADFILE=dynload_cnl.o MACHDEP=cnl --host=x86_64-unknown-linux-gnu --disable-sockets --disable-ssl --enable-static --disable-shared
+
+Modify the file Modules/Setup to include references to modules which will be needed. There is an example at the bottom of this page. Make sure all the lines at the bottom are commented out. Next invoke these commands in the top level Python source directory:
+
+> make -j8
+> make install
+> export PATH=/path/to/new/yt/install/bin:$PATH
+> export PYTHONPATH=/path/to/new/yt/install/lib/python2.6/site-packages/
+> which python
+/path/to/new/yt/install/bin/python
+
+Setting the PATH and PYTHONPATH variables makes things simpler in the future steps.
+
+
+
+NUMPY
+
+In the numpy source directory (numpy-1.2.1 is known to work), invoke
+
+python setup.py install >& numpy.install.log
+
+Inspect numpy.install.log, looking for lines that start with 'Append to Setup:' Make sure that the lines for numpy in Modules/Setup above are in numpy.install.log.
+
+
+Python
+
+Back in the Python source, modify Modules/Setup by commenting out the numpy lines, and making sure CNL_PATH and NUMPY are set and match the install location. Then invoke
+
+make -j8; make install
+
+in the Python source.
+
