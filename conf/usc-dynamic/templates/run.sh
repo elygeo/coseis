@@ -8,7 +8,7 @@ echo "$( date ): %(name)s started" >> log
 case "$mode${1:--i}" in
     s-i) time %(bin)s ;;
     s-g) gdb  %(bin)s ;;
-    m-i) qsub -I script ;;
+    m-i) qsub -I script.sh ;;
 esac
 %(post)s
 echo "$( date ): %(name)s finished" >> log

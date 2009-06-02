@@ -23,6 +23,7 @@ make install
 wget http://peak.telecommunity.com/dist/ez_setup.py
 python ez_setup.py --prefix="${prefix}"
 
+easy_install numpy
 easy_install pyproj
 
 echo "Don't forget to add \${prefix}/bin to your path"

@@ -95,7 +95,7 @@ do isrc = 1, abs( src_n )
             do j = i1(1), i2(1)
                 w = h * ((1.0-abs(xi(1)-j)) * (1.0-abs(xi(2)-k)) * (1.0-abs(xi(3)-l)))
                 do i = 1, 3
-                    w1(j,k,l,i) = w1(j,k,l,i) - w * src_w1_(isrc,i)
+                    w1(j,k,l,i) = w1(j,k,l,i) + w * src_w1_(isrc,i)
                 end do
             end do
             end do
@@ -139,7 +139,7 @@ do k = i1(2), i2(2)
 do j = i1(1), i2(1)
     w = f * ( (1.0-abs(xi(1)-j)) * (1.0-abs(xi(2)-k)) * (1.0-abs(xi(3)-l)) )
     do i = 1, 3
-        w1(j,k,l,i) = w1(j,k,l,i) - w * src_w1(i)
+        w1(j,k,l,i) = w1(j,k,l,i) + w * src_w1(i)
     end do
 end do
 end do
