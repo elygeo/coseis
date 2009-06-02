@@ -5,6 +5,7 @@
 ver_python="2.6.2"
 ver_numpy="1.3.0"
 prefix="${HOME}/local"
+prefix="/lustre/scratch/${USER}/local"
 
 echo -n "Installing Python-${ver_python} and setuptools in ${prefix}. Are you sure? [y/N]: "
 read confirm
@@ -29,11 +30,14 @@ tar zxvf "Python-${ver_python}.tgz"
 tar zxvf "numpy-${ver_numpy}.tar.gz"
 
 # Install Python
-cd "Python-${version}"
+cd "Python-${ver_python}"
 patch -p1 < ../python-cnl.patch
 ./configure --prefix="${prefix}" SO=.a DYNLOADFILE=dynload_cnl.o MACHDEP=cnl --host=x86_64-unknown-linux-gnu --disable-sockets --disable-ssl --enable-static --disable-shared
 make
 make install
+make bininstall
+make inclinstall
+make libainstall
 
 # Install Numpy
 cd "../numpy-${ver_numpy}"
