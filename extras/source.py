@@ -2,6 +2,7 @@
 """
 Source utilities
 """
+import os, sys, numpy, gzip, coord, sord
 
 def srf_read( filename, headeronly=False, mks=True ):
     """
@@ -9,7 +10,6 @@ def srf_read( filename, headeronly=False, mks=True ):
     SRF is documented at http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
     Returns separate meta and data objects.
     """
-    import os, sys, gzip, numpy
     class obj: pass
 
     fh = filename
@@ -111,7 +111,6 @@ def srfb_write( meta, data, path='' ):
     """
     Write SRF binary format.
     """
-    import os, numpy, sord
     path = os.path.expanduser( path )
     if not os.path.isdir( path ):
         os.makedirs( path )
@@ -141,7 +140,6 @@ def srfb_read( path='' ):
     """
     Read SRF binary format.
     """
-    import os, numpy, sord
     class obj: pass
     path = os.path.expanduser( path )
     if not os.path.isdir( path ):
@@ -172,7 +170,6 @@ def src_write( history, nt, dt, t0, xi, w1, w2=None, path='' ):
     """
     Write SORD input for moment or potency source.
     """
-    import os, numpy
     path = os.path.join( os.path.expanduser( path ), 'src_' )
     numpy.array( history, 'f' ).tofile( path + 'history' )
     numpy.array( nt, 'f'      ).tofile( path + 'nt'  )
@@ -198,7 +195,6 @@ def srf2potency( data, projection, dx, path='' ):
     """
     Convert SRF to potency tensor source and write SORD input files.
     """
-    import os, numpy, coord
     path = os.path.join( os.path.expanduser( path ), 'src_' )
     del( data.slip1, data.slip2, data.slip3 )
 
@@ -262,8 +258,67 @@ def srf2potency( data, projection, dx, path='' ):
 
     return nsource
 
+def srf2momrate( data, projection, dx, dt, nt, path='momrate' ):
+    """
+    Convert SRF to moment rate and write Olsen AWM input file.
+    """
+
+    # Strike rotation
+    mat, rot = coord.rotation( data.lon, data.lat, projection )
+    data.stk = data.stk + rot
+    del( mat, rot )
+
+    # Coordinates
+    x, y = projection( data.lon, data.lat )
+    jj = int( x / dx[0] + 1.5 )
+    kk = int( y / dx[1] + 1.5 )
+    ll = int( data.dep / dx[2] + 1.5 )
+    del( x, y, data.lon, data.lat, data.dep )
+
+    # Strike, dip, and normal vectors
+    stk, dip, nrm = coord.slipvectors( data.stk, data.dip, data.rake )
+    del( data.stk, data.dip, data.rake )
+
+    # Tensor components
+    stk = 0.5 * data.mu * data.area * ([
+        stk[1] * nrm[2] + nrm[1] * stk[2],
+        stk[2] * nrm[0] + nrm[2] * stk[0],
+        stk[0] * nrm[1] + nrm[0] * stk[1],
+    ])
+    dip = 0.5 * data.mu * data.area * ([
+        dip[1] * nrm[2] + nrm[1] * dip[2],
+        dip[2] * nrm[0] + nrm[2] * dip[0],
+        dip[0] * nrm[1] + nrm[0] * dip[1],
+    ])
+    nrm = data.area * data.lam * nrm * nrm
+    del( data.area )
+
+    # Time history
+    t = dt * numpy.arange( nt )
+    fd = open( os.path.expanduser( path ), 'wb' )
+    i1, i2, i3 = 0, 0, 0
+    for i in range( data.dt.size ):
+        dt0, t0 = data.dt[i], data.t0[i]
+        n1, n2, n3 = data.nt1[i], data.nt2[i], data.nt3[i]
+        sv1 = sord.coord.interp( t0, dt0, data.sv1[i1:i1+n1], t )
+        sv2 = sord.coord.interp( t0, dt0, data.sv2[i2:i2+n2], t )
+        sv3 = sord.coord.interp( t0, dt0, data.sv3[i3:i3+n3], t )
+        i1, i2, i3 = i1+n1, i2+n2, i3+n3
+        numpy.array([ jj[i], kk[i], ll[i] ], 'i' ).tofile( fd )
+        numpy.array([
+            nrm[0,i] * sv3,
+            nrm[1,i] * sv3,
+            nrm[2,i] * sv3,
+            stk[0,i] * sv1, + dip[0,i] * sv2,
+            stk[1,i] * sv1, + dip[1,i] * sv2,
+            stk[2,i] * sv1, + dip[2,i] * sv2,
+        ], 'f' ).tofile( fd )
+    fd.close()
+
+    return
+
 if __name__ == '__main__':
-    import sys, pprint, sord
+    import pprint
     for f in sys.argv[1:]:
         print( f )
         meta = srf_read( f, True )

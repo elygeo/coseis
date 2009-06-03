@@ -22,22 +22,6 @@ diff -ruN Python-2.6.2/dynload_cnl.c Python-2.6.2-cnl/dynload_cnl.c
 +
 +  return tab->initfunc;
 +}
-diff -ruN Python-2.6.2/Lib/locale.py Python-2.6.2-cnl/Lib/locale.py
---- Python-2.6.2/Lib/locale.py	2009-03-18 13:11:06.000000000 -0400
-+++ Python-2.6.2-cnl/Lib/locale.py	2009-06-02 15:20:30.000000000 -0400
-@@ -545,11 +545,11 @@
-             """Return the charset that the user is likely using,
-             according to the system configuration."""
-             if do_setlocale:
-+                return None
-                 oldloc = setlocale(LC_CTYPE)
-                 setlocale(LC_CTYPE, "")
-                 result = nl_langinfo(CODESET)
-                 setlocale(LC_CTYPE, oldloc)
--                return result
-             else:
-                 return nl_langinfo(CODESET)
- 
 diff -ruN Python-2.6.2/Lib/distutils/unixccompiler.py Python-2.6.2-cnl/Lib/distutils/unixccompiler.py
 --- Python-2.6.2/Lib/distutils/unixccompiler.py	2008-07-16 09:24:06.000000000 -0400
 +++ Python-2.6.2-cnl/Lib/distutils/unixccompiler.py	2009-06-02 15:17:17.000000000 -0400
@@ -79,6 +63,22 @@ diff -ruN Python-2.6.2/Lib/distutils/unixccompiler.py Python-2.6.2-cnl/Lib/distu
 +        self.static_lib_format = old_fmt
 +        print "Append to Setup: ", linkline
 +
+diff -ruN Python-2.6.2/Lib/locale.py Python-2.6.2-cnl/Lib/locale.py
+--- Python-2.6.2/Lib/locale.py	2009-03-18 13:11:06.000000000 -0400
++++ Python-2.6.2-cnl/Lib/locale.py	2009-06-02 15:20:30.000000000 -0400
+@@ -545,11 +545,11 @@
+             """Return the charset that the user is likely using,
+             according to the system configuration."""
+             if do_setlocale:
++                return None
+                 oldloc = setlocale(LC_CTYPE)
+                 setlocale(LC_CTYPE, "")
+                 result = nl_langinfo(CODESET)
+                 setlocale(LC_CTYPE, oldloc)
+-                return result
+             else:
+                 return nl_langinfo(CODESET)
+ 
 diff -ruN Python-2.6.2/Modules/Setup.dist Python-2.6.2-cnl/Modules/Setup.dist
 --- Python-2.6.2/Modules/Setup.dist	2008-11-27 05:15:12.000000000 -0500
 +++ Python-2.6.2-cnl/Modules/Setup.dist	2009-06-02 19:01:07.000000000 -0400
@@ -202,3 +202,20 @@ diff -ruN Python-2.6.2/Modules/Setup.dist Python-2.6.2-cnl/Modules/Setup.dist
  
  
  # Lee Busby's SIGFPE modules.
+@@ -493,3 +493,16 @@
+ 
+ # Another example -- the 'xxsubtype' module shows C-level subtyping in action
+ xxsubtype xxsubtype.c
++
++NUMPY=/lustre/scratch/gely/local/numpy-1.3.0/
++_sort $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/core/_sort.a
++multiarray $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/core/multiarray.a -lnpymath
++umath $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/core/umath.a -lnpymath
++scalarmath $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/core/scalarmath.a
++umath_tests $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/core/umath_tests.a
++_compiled_base $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/lib/_compiled_base.a
++_capi $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/numarray/_capi.a
++fftpack_lite $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/fft/fftpack_lite.a
++lapack_lite $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/linalg/lapack_lite.a
++mtrand $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/random/mtrand.a
+

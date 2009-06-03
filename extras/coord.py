@@ -47,11 +47,27 @@ def slipvectors( strike, dip, rake ):
     C = numpy.array([[ s, c, z ], [ -c, s, z ], [ z, z, u ]])
     return matmul( matmul( A, B ), C )
 
+def interp( x0, dx, z, xi, extrapolate=False ):
+    """
+    1D interpolation on a regular grid
+    """
+    z = numpy.array( z )
+    xi = ( numpy.array( xi ) - x0 ) / dx
+    j = numpy.int32( xi )
+    n = z.size
+    if not extrapolate:
+        i = (j < 0) | (j > n-2)
+    j = numpy.minimum( numpy.maximum( j, 0 ), n-2 )
+    zi = ( 1.0 - xi + j ) * z[...,j] + ( xi - j ) * z[...,j+1]
+    if not extrapolate:
+        zi[...,i] = numpy.nan
+    return zi
+
 def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=False ):
     """
     2D interpolation on a regular grid
     """
-    z  = numpy.array( z )
+    z = numpy.array( z )
     xi = ( numpy.array( xi ) - x0 ) / dx
     yi = ( numpy.array( yi ) - y0 ) / dy
     j = numpy.int32( xi )
@@ -65,7 +81,7 @@ def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=False ):
          + ( 1.0 - xi + j ) * (       yi - k ) * z[...,j,k+1]
          + (       xi - j ) * ( 1.0 - yi + k ) * z[...,j+1,k]
          + (       xi - j ) * (       yi - k ) * z[...,j+1,k+1] )
-    if not extrapolate: # untested
+    if not extrapolate:
         zi[...,i] = numpy.nan
     return zi
 
