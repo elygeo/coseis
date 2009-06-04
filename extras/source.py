@@ -218,15 +218,6 @@ def srf2potency( data, projection, dx, path='' ):
     nsource = nt[ii].size
     del( nt, data.nt1, data.nt2, data.nt3, data.dt, data.t0 )
 
-    # Strike rotation
-    mat, rot = coord.rotation( data.lon, data.lat, projection )
-    data.stk = data.stk + rot
-    del( mat, rot )
-
-    # Strike, dip, and normal vectors
-    stk, dip, nrm = coord.slipvectors( data.stk, data.dip, data.rake )
-    del( data.stk, data.dip, data.rake )
-
     # Coordinates
     x, y = projection( data.lon, data.lat )
     x = x / dx[0] + 1.0
@@ -237,24 +228,25 @@ def srf2potency( data, projection, dx, path='' ):
     numpy.array( z, 'f' )[None].repeat(3,0)[ii].tofile( path + 'xi3' )
     del( x, y, z, data.lon, data.lat, data.dep )
 
-    # Normal tensor components
-    w = numpy.zeros_lile( nrm )
-    w[2] = data.area * nrm[0] * nrm[0]; numpy.array( w, 'f' )[ii].tofile( path + 'w11' )
-    w[2] = data.area * nrm[1] * nrm[1]; numpy.array( w, 'f' )[ii].tofile( path + 'w22' )
-    w[2] = data.area * nrm[2] * nrm[2]; numpy.array( w, 'f' )[ii].tofile( path + 'w33' )
+    # Strike rotation
+    mat, rot = coord.rotation( data.lon, data.lat, projection )
+    data.stk = data.stk + rot
+    del( mat, rot )
 
-    # Shear tensor components
-    w = numpy.zeros_like( nrm )
-    w[0] = 0.5 * data.area * ( stk[1] * nrm[2] + nrm[1] * stk[2] )
-    w[1] = 0.5 * data.area * ( dip[1] * nrm[2] + nrm[1] * dip[2] )
-    numpy.array( w, 'f' )[ii].tofile( path + 'w23' )
-    w[0] = 0.5 * data.area * ( stk[2] * nrm[0] + nrm[2] * stk[0] )
-    w[1] = 0.5 * data.area * ( dip[2] * nrm[0] + nrm[2] * dip[0] )
-    numpy.array( w, 'f' )[ii].tofile( path + 'w31' )
-    w[0] = 0.5 * data.area * ( stk[0] * nrm[1] + nrm[0] * stk[1] )
-    w[1] = 0.5 * data.area * ( dip[0] * nrm[1] + nrm[0] * dip[1] )
-    numpy.array( w, 'f' )[ii].tofile( path + 'w12' )
-    del( w, stk, dip, nrm, data.area )
+    # Strike, dip, and normal vectors
+    R = data.area * coord.slipvectors( data.stk, data.dip, data.rake )
+    del( data.area, data.stk, data.dip, data.rake )
+
+    # Tensor components
+    stk, dip, nrm = coord.source_tensors( R )
+    w = numpy.zeros_like( stk )
+    w[0] = stk[0]; w[1] = dip[0]; numpy.array( w, 'f' )[ii].tofile( path + 'w23' )
+    w[0] = stk[1]; w[1] = dip[1]; numpy.array( w, 'f' )[ii].tofile( path + 'w31' )
+    w[0] = stk[2]; w[1] = dip[2]; numpy.array( w, 'f' )[ii].tofile( path + 'w12' )
+    w = numpy.zeros_lile( nrm )
+    w[2] = nrm[0]; numpy.array( w, 'f' )[ii].tofile( path + 'w11' )
+    w[2] = nrm[1]; numpy.array( w, 'f' )[ii].tofile( path + 'w22' )
+    w[2] = nrm[2]; numpy.array( w, 'f' )[ii].tofile( path + 'w33' )
 
     return nsource
 
@@ -276,22 +268,15 @@ def srf2momrate( data, projection, dx, dt, nt, path='momrate' ):
     del( x, y, data.lon, data.lat, data.dep )
 
     # Strike, dip, and normal vectors
-    stk, dip, nrm = coord.slipvectors( data.stk, data.dip, data.rake )
-    del( data.stk, data.dip, data.rake )
+    R = data.area * coord.slipvectors( data.stk, data.dip, data.rake )
+    del( data.area, data.stk, data.dip, data.rake )
 
-    # Tensor components
-    stk = 0.5 * data.mu * data.area * ([
-        stk[1] * nrm[2] + nrm[1] * stk[2],
-        stk[2] * nrm[0] + nrm[2] * stk[0],
-        stk[0] * nrm[1] + nrm[0] * stk[1],
-    ])
-    dip = 0.5 * data.mu * data.area * ([
-        dip[1] * nrm[2] + nrm[1] * dip[2],
-        dip[2] * nrm[0] + nrm[2] * dip[0],
-        dip[0] * nrm[1] + nrm[0] * dip[1],
-    ])
-    nrm = data.area * data.lam * nrm * nrm
-    del( data.area )
+    # Moment tensor components
+    stk, dip, nrm = coord.source_tensors( R )
+    stk = stk * data.mu
+    dip = dip * data.mu
+    nrm = nrm * data.lam
+    del( R, data.lam, data.mu )
 
     # Time history
     t = dt * numpy.arange( nt )
