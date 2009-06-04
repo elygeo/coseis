@@ -20,6 +20,8 @@ numpy.array( yy, 'f' ).T.tofile( os.path.join( dir, 'y' ) )
 xx, yy = sim.projection( xx, yy, inverse=True )
 xx = numpy.array( xx, 'f' )
 yy = numpy.array( yy, 'f' )
+mat, rot = sord.coord.rotation( xx, yy, sim.projection )
+print( 'rotation = %s' % rot.mean() )
 
 # topography
 n = 960, 780

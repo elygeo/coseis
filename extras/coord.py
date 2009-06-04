@@ -47,6 +47,36 @@ def slipvectors( strike, dip, rake ):
     C = numpy.array([[ s, c, z ], [ -c, s, z ], [ z, z, u ]])
     return matmul( matmul( A, B ), C )
 
+def source_tensors( R ):
+    """
+    Given a rotation matrix R from world coordinates (east, north, up) to fault
+    local coordinates (slip, rake, normal), find tensor components that may be
+    scaled by moment or potency to compute moment tensors or potency tensors,
+    respectively.  Rows of R are axis unit vectors of the fault local space in
+    world coordinates.  R can be computed from strike, dip and rake angles with the
+    'slipvectors' routine.  The return value is a 3x3 matrix T specifying
+    contributions to the tensor W:
+    column 1 is the (shear)  strike contribution to W23, W31, W12
+    column 2 is the (shear)  dip    contribution to W23, W31, W12
+    column 3 is the (volume) normal contribution to W11, W22, W33
+    The columns can unpacked conveniently by:
+    Tstrike, Tdip, Tnormal = coord.sliptensors( strike, dip, rake )
+    """
+    strike, dip, normal = coord.slipvectors( strike, dip, rake )
+    del( rake )
+    strike = 0.5 * ([
+        strike[1] * normal[2] + normal[1] * strike[2],
+        strike[2] * normal[0] + normal[2] * strike[0],
+        strike[0] * normal[1] + normal[0] * strike[1],
+    ])
+    dip = 0.5 * ([
+        dip[1] * normal[2] + normal[1] * dip[2],
+        dip[2] * normal[0] + normal[2] * dip[0],
+        dip[0] * normal[1] + normal[0] * dip[1],
+    ])
+    normal = normal * normal
+    return numpy.array([ strike, dip, normal ])
+
 def interp( x0, dx, z, xi, extrapolate=False ):
     """
     1D interpolation on a regular grid
