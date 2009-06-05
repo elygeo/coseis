@@ -1,0 +1,123 @@
+diff -ruN Python-2.6.2-orig/Modules/Setup Python-2.6.2/Modules/Setup
+--- Python-2.6.2-orig/Modules/Setup	2008-11-27 05:15:12.000000000 -0500
++++ Python-2.6.2/Modules/Setup	2009-06-02 19:01:07.000000000 -0400
+@@ -167,47 +167,47 @@
+ 
+ # Modules that should always be present (non UNIX dependent):
+ 
+-#array arraymodule.c	# array objects
+-#cmath cmathmodule.c # -lm # complex math library functions
+-#math mathmodule.c # -lm # math library functions, e.g. sin()
+-#_struct _struct.c	# binary structure packing/unpacking
+-#time timemodule.c # -lm # time operations and variables
+-#operator operator.c	# operator.add() and similar goodies
+-#_weakref _weakref.c	# basic weak reference support
+-#_testcapi _testcapimodule.c    # Python C API test module
+-#_random _randommodule.c	# Random number generator
+-#_collections _collectionsmodule.c # Container types
+-#itertools itertoolsmodule.c	# Functions creating iterators for efficient looping 
+-#strop stropmodule.c		# String manipulations
+-#_functools _functoolsmodule.c	# Tools for working with functions and callable objects
+-#_elementtree -I$(srcdir)/Modules/expat -DHAVE_EXPAT_CONFIG_H -DUSE_PYEXPAT_CAPI _elementtree.c	# elementtree accelerator
++array arraymodule.c	# array objects
++cmath cmathmodule.c # -lm # complex math library functions
++math mathmodule.c # -lm # math library functions, e.g. sin()
++_struct _struct.c	# binary structure packing/unpacking
++time timemodule.c # -lm # time operations and variables
++operator operator.c	# operator.add() and similar goodies
++_weakref _weakref.c	# basic weak reference support
++_testcapi _testcapimodule.c    # Python C API test module
++_random _randommodule.c	# Random number generator
++_collections _collectionsmodule.c # Container types
++itertools itertoolsmodule.c	# Functions creating iterators for efficient looping 
++strop stropmodule.c		# String manipulations
++_functools _functoolsmodule.c	# Tools for working with functions and callable objects
++_elementtree -I$(srcdir)/Modules/expat -DHAVE_EXPAT_CONFIG_H -DUSE_PYEXPAT_CAPI _elementtree.c	# elementtree accelerator
+ #_pickle _pickle.c	# pickle accelerator
+-#datetime datetimemodule.c	# date/time type
+-#_bisect _bisectmodule.c	# Bisection algorithms
++datetime datetimemodule.c	# date/time type
++_bisect _bisectmodule.c	# Bisection algorithms
+ 
+-#unicodedata unicodedata.c    # static Unicode character database
++unicodedata unicodedata.c    # static Unicode character database
+ 
+ # access to ISO C locale support
+-#_locale _localemodule.c  # -lintl
++_locale _localemodule.c  # -lintl
+ 
+ 
+ # Modules with some UNIX dependencies -- on by default:
+ # (If you have a really backward UNIX, select and socket may not be
+ # supported...)
+ 
+-#fcntl fcntlmodule.c	# fcntl(2) and ioctl(2)
+-#spwd spwdmodule.c		# spwd(3) 
+-#grp grpmodule.c		# grp(3)
+-#select selectmodule.c	# select(2); not on ancient System V
++fcntl fcntlmodule.c	# fcntl(2) and ioctl(2)
++spwd spwdmodule.c		# spwd(3) 
++grp grpmodule.c		# grp(3)
++select selectmodule.c	# select(2); not on ancient System V
+ 
+ # Memory-mapped files (also works on Win32).
+-#mmap mmapmodule.c
++mmap mmapmodule.c
+ 
+ # CSV file helper
+-#_csv _csv.c
++_csv _csv.c
+ 
+ # Socket module helper for socket(2)
+-#_socket socketmodule.c
++_socket socketmodule.c
+ 
+ # Socket module helper for SSL support; you must comment out the other
+ # socket line above, and possibly edit the SSL variable:
+@@ -248,14 +248,14 @@
+ # Message-Digest Algorithm, described in RFC 1321.  The necessary files
+ # md5.c and md5.h are included here.
+ 
+-#_md5 md5module.c md5.c
++_md5 md5module.c md5.c
+ 
+ 
+ # The _sha module implements the SHA checksum algorithms.
+ # (NIST's Secure Hash Algorithms.)
+-#_sha shamodule.c
+-#_sha256 sha256module.c
+-#_sha512 sha512module.c
++_sha shamodule.c
++_sha256 sha256module.c
++_sha512 sha512module.c
+ 
+ 
+ # SGI IRIX specific modules -- off by default.
+@@ -354,7 +354,7 @@
+ #	-lX11
+ 
+ # Lance Ellinghaus's syslog module
+-#syslog syslogmodule.c		# syslog daemon interface
++syslog syslogmodule.c		# syslog daemon interface
+ 
+ 
+ # Curses support, requring the System V version of curses, often
+@@ -430,14 +430,14 @@
+ 
+ 
+ # Helper module for various ascii-encoders
+-#binascii binascii.c
++binascii binascii.c
+ 
+ # Fred Drake's interface to the Python parser
+-#parser parsermodule.c
++parser parsermodule.c
+ 
+ # cStringIO and cPickle
+-#cStringIO cStringIO.c
+-#cPickle cPickle.c
++cStringIO cStringIO.c
++cPickle cPickle.c
+ 
+ 
+ # Lee Busby's SIGFPE modules.

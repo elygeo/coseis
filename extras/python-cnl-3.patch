@@ -1,0 +1,18 @@
+diff -ruN Python-2.6.2-orig/Modules/Setup Python-2.6.2/Modules/Setup
+--- Python-2.6.2-orig/Modules/Setup	2008-11-27 05:15:12.000000000 -0500
++++ Python-2.6.2/Modules/Setup	2009-06-02 19:01:07.000000000 -0400
+@@ -493,3 +493,14 @@
+ 
+ # Another example -- the 'xxsubtype' module shows C-level subtyping in action
+ xxsubtype xxsubtype.c
++
++NUMPY=/lustre/scratch/gely/local/numpy-1.2.1/
++multiarray $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/core/multiarray.a
++umath $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/core/umath.a
++_sort $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/core/_sort.a
++scalarmath $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/core/scalarmath.a
++_compiled_base $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/lib/_compiled_base.a
++_capi $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/numarray/_capi.a
++fftpack_lite $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/fft/fftpack_lite.a
++lapack_lite $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/linalg/lapack_lite.a
++mtrand $(NUMPY)/build/lib.linux-x86_64-2.6/numpy/random/mtrand.a

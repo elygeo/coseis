@@ -1,0 +1,81 @@
+diff -ruN Python-2.6.2-orig/dynload_cnl.c Python-2.6.2/dynload_cnl.c
+--- Python-2.6.2-orig/Python/dynload_cnl.c	1969-12-31 19:00:00.000000000 -0500
++++ Python-2.6.2/Python/dynload_cnl.c	2009-06-02 15:15:19.000000000 -0400
+@@ -0,0 +1,20 @@
++/* This module provides the simulation of dynamic loading for Cray Compute Node Linux (CNL) */
++
++#include "Python.h"
++#include "importdl.h"
++
++const struct filedescr _PyImport_DynLoadFiletab[] = {
++  {".a", "rb", C_EXTENSION},
++  {0, 0}
++};
++
++extern struct _inittab _PyImport_Inittab[];
++
++dl_funcptr _PyImport_GetDynLoadFunc(const char *fqname, const char *shortname,
++                                    const char *pathname, FILE *fp)
++{
++  struct _inittab *tab = _PyImport_Inittab;
++  while (tab->name && strcmp(shortname, tab->name)) tab++;
++
++  return tab->initfunc;
++}
+diff -ruN Python-2.6.2-orig/Lib/distutils/unixccompiler.py Python-2.6.2/Lib/distutils/unixccompiler.py
+--- Python-2.6.2-orig/Lib/distutils/unixccompiler.py	2008-07-16 09:24:06.000000000 -0400
++++ Python-2.6.2/Lib/distutils/unixccompiler.py	2009-06-02 15:17:17.000000000 -0400
+@@ -317,3 +317,37 @@
+ 
+         # Oops, didn't find it in *any* of 'dirs'
+         return None
++
++    def link_shared_object (self,
++                         objects,
++                         output_filename,
++                         output_dir=None,
++                         libraries=None,
++                         library_dirs=None,
++                         runtime_library_dirs=None,
++                         export_symbols=None,
++                         debug=0,
++                         extra_preargs=None,
++                         extra_postargs=None,
++                         build_temp=None,
++                         target_lang=None):
++
++        if output_dir is None:
++            (output_dir, output_filename) = os.path.split(output_filename)
++        output_fullname = os.path.join(output_dir, output_filename)
++        linkline = "%s %s" % (output_filename[:-2], output_fullname)
++        for l in library_dirs:
++            linkline += " -L" + l
++        for l in libraries:
++            linkline += " -l" + l
++        old_fmt = self.static_lib_format
++        self.static_lib_format = "%s%.0s"
++        self.create_static_lib(objects,
++                               output_filename,
++                               output_dir,
++                               debug,
++                               target_lang)
++        
++        self.static_lib_format = old_fmt
++        print "Append to Setup: ", linkline
++
+diff -ruN Python-2.6.2-orig/Lib/locale.py Python-2.6.2/Lib/locale.py
+--- Python-2.6.2-orig/Lib/locale.py	2009-03-18 13:11:06.000000000 -0400
++++ Python-2.6.2/Lib/locale.py	2009-06-02 15:20:30.000000000 -0400
+@@ -545,11 +545,11 @@
+             """Return the charset that the user is likely using,
+             according to the system configuration."""
+             if do_setlocale:
++                return None
+                 oldloc = setlocale(LC_CTYPE)
+                 setlocale(LC_CTYPE, "")
+                 result = nl_langinfo(CODESET)
+                 setlocale(LC_CTYPE, oldloc)
+-                return result
+             else:
+                 return nl_langinfo(CODESET)
+ 
