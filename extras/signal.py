@@ -2,6 +2,7 @@
 """
 Signal processing utilities
 """
+import numpy
 
 def lowpass( x, dt, cutoff, window='hann', repeat=0 ):
     """
@@ -16,10 +17,9 @@ def lowpass( x, dt, cutoff, window='hann', repeat=0 ):
     if not cutoff:
         return x
     if window == 'hann':
-        import numpy
-        n = 2 * int( 0.5 / ( cutoff * dt ) ) + 1
+        n = 2 * int( 0.5 / (cutoff * dt) ) + 1
         if n > 0:
-            w = 0.5 - 0.5 * numpy.cos( 2.0 * numpy.pi * numpy.arange( n ) / ( n - 1 ) )
+            w = 0.5 - 0.5 * numpy.cos( 2.0 * numpy.pi * numpy.arange( n ) / (n - 1) )
             w /= w.sum()
             x = numpy.convolve( x, w, 'same' )
             if repeat:
@@ -39,13 +39,13 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum', axes=No
     """
     Plot a time signal and it's Fourier spectrum.
     """
-    import numpy, pylab
+    import pylab
     h = numpy.array( h )
     nt = h.shape[-1]
     if not nf:
         nf = nt
     t = numpy.arange( nt ) * dt
-    f = numpy.arange( nf / 2 + 1 ) / ( dt * nf )
+    f = numpy.arange( nf / 2 + 1 ) / (dt * nf)
     tlim = t[0], t[-1]
     if len( h.shape ) > 1:
         n = h.shape[0]
@@ -66,7 +66,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum', axes=No
 
     pylab.axes( axes[0] )
     pylab.plot( t.T, h.T, '-' )
-    pylab.plot( tlim, [0,0], 'k--' )
+    pylab.plot( tlim, [0, 0], 'k--' )
     pylab.xlabel( 'Time' )
     pylab.ylabel( 'Amplitude' )
 
@@ -107,7 +107,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum', axes=No
     return axes
 
 if __name__ == '__main__':
-    import numpy, pylab
+    import pylab
 
     dt = 0.01
     cutoff = 0.5

@@ -41,8 +41,8 @@ def lengthscale( x, y, w=None, label='%s', style='k-', bg='w', **kwargs ):
     Draw a length scale bar between the points (x[0], y[0]) and (x[1], y[1]).
     """
     import numpy, pylab
-    x0 = 0.5 * ( x[0] + x[1] )
-    y0 = 0.5 * ( y[0] + y[1] )
+    x0 = 0.5 * (x[0] + x[1])
+    y0 = 0.5 * (y[0] + y[1])
     dx = abs( x[1] - x[0] )
     dy = abs( y[1] - y[0] )
     l = numpy.sqrt( dx*dx + dy*dy )
@@ -52,9 +52,9 @@ def lengthscale( x, y, w=None, label='%s', style='k-', bg='w', **kwargs ):
         x = abs( x[1] - x[0] )
         y = abs( y[1] - y[0] )
         if pylab.gca().get_aspect() == 'equal':
-            w = 0.005 * ( y + x )
+            w = 0.005 * (y + x)
         else:
-            w = 0.01 / l * ( y * dx + x * dy )
+            w = 0.01 / l * (y * dx + x * dy)
     try:
         label = label % l
     except:
@@ -101,9 +101,9 @@ def colormap( name='w0', colorexp=1., output='mayavi', n=2001, nmod=0, modlim=0.
             g = 0, 4, 8, 8
             b = 0, 0, 0, 8
         elif name == 'earth':
-            r = numpy.array( [00,00,00,10,10,15,15,25,25,25] ) / 80.
-            g = numpy.array( [10,10,10,20,20,25,30,25,25,25] ) / 80.
-            b = numpy.array( [38,38,38,40,40,25,20,17,17,17] ) / 80.
+            r = numpy.array( [00, 00, 00, 10, 10, 15, 15, 25, 25, 25] ) / 80.0
+            g = numpy.array( [10, 10, 10, 20, 20, 25, 30, 25, 25, 25] ) / 80.0
+            b = numpy.array( [38, 38, 38, 40, 40, 25, 20, 17, 17, 17] ) / 80.0
         elif name == 'wk0':
             r = 31 - numpy.arange( 32 )
             g = 31 - numpy.arange( 32 )
@@ -114,44 +114,44 @@ def colormap( name='w0', colorexp=1., output='mayavi', n=2001, nmod=0, modlim=0.
         r, g, b = name
         name = 'custom'
     n2 = len( r )
-    m = 1. / max( 1., max(r), max(g), max(b) )
+    m = 1.0 / max( 1., max(r), max(g), max(b) )
     r = m * numpy.array( r )
     g = m * numpy.array( g )
     b = m * numpy.array( b )
     if centered:
-        x1 = 2. / ( n2 - 1 ) * numpy.arange( n2 ) - 1
+        x1 = 2.0 / (n2 - 1) * numpy.arange( n2 ) - 1
         x1 = numpy.sign( x1 ) * abs( x1 ) ** colorexp * 0.5 + 0.5
     else:
-        x1 = 1. / ( n2 - 1 ) * numpy.arange( n2 )
+        x1 = 1.0 / (n2 - 1) * numpy.arange( n2 )
         x1 = numpy.sign( x1 ) * abs( x1 ) ** colorexp
     if nmod > 0:
-        x2 = numpy.arange( n ) / ( n - 1. )
+        x2 = numpy.arange( n ) / (n - 1.0)
         r  = numpy.interp( x2, x1, r )
         g  = numpy.interp( x2, x1, g )
         b  = numpy.interp( x2, x1, b )
         w1 = modlim * numpy.cos( numpy.pi * 2. * nmod * x2 )
-        w1 = 1. - numpy.maximum( w1, 0. )
-        w2 = 1. + numpy.minimum( w1, 0. ) 
-        r = ( 1. - w2 * ( 1. - w1 * r ) )
-        g = ( 1. - w2 * ( 1. - w1 * g ) )
-        b = ( 1. - w2 * ( 1. - w1 * b ) )
+        w1 = 1.0 - numpy.maximum( w1, 0.0 )
+        w2 = 1.0 + numpy.minimum( w1, 0.0 ) 
+        r = ( 1.0 - w2 * (1.0 - w1 * r) )
+        g = ( 1.0 - w2 * (1.0 - w1 * g) )
+        b = ( 1.0 - w2 * (1.0 - w1 * b) )
         x1 = x2
     if output in ( 'matplotlib', 'pylab' ):
         import matplotlib
-        cmap = { 'red':numpy.c_[x1,r,r],
-               'green':numpy.c_[x1,g,g],
-                'blue':numpy.c_[x1,b,b] }
+        cmap = { 'red':numpy.c_[x1, r, r],
+               'green':numpy.c_[x1, g, g],
+                'blue':numpy.c_[x1, b, b] }
         cmap = matplotlib.colors.LinearSegmentedColormap( name, cmap, n )
     elif output in ( 'mayavi', 'tvtk', 'mlab' ):
         if nmod <= 0:
-            x2 = numpy.arange( n ) / ( n - 1. )
+            x2 = numpy.arange( n ) / (n - 1.0)
             r  = numpy.interp( x2, x1, r )
             g  = numpy.interp( x2, x1, g )
             b  = numpy.interp( x2, x1, b )
             a  = numpy.ones_like( r )
             x1 = x2
-        cmap = 255 * numpy.array([ r, g, b, a ]).T
+        cmap = 255 * numpy.array( [r, g, b, a] ).T
     else:
-        cmap = numpy.array([ x1, r, g, b ])
+        cmap = numpy.array( [x1, r, g, b] )
     return cmap
 

@@ -10,16 +10,16 @@ def matmul( A, B ):
     """
     A = numpy.array( A )
     B = numpy.array( B )
-    return ( A[:,:,numpy.newaxis,...] * B ).sum( axis=1 )
+    return ( A[:,:,None,...] * B ).sum( axis=1 )
 
 def solve2( A, b ):
     """
     Vectorized 2x2 linear equation solver
     """
     A = numpy.array( A )
-    b = numpy.array( b ) / ( A[0,0]*A[1,1] - A[0,1]*A[1,0] )
-    return numpy.array([ b[0]*A[1,1] - b[1]*A[0,1],
-                         b[1]*A[0,0] - b[0]*A[1,0] ])
+    b = numpy.array( b ) / (A[0,0]*A[1,1] - A[0,1]*A[1,0])
+    return numpy.array( [b[0]*A[1,1] - b[1]*A[0,1],
+                         b[1]*A[0,0] - b[0]*A[1,0]] )
 
 def slipvectors( strike, dip, rake ):
     """
@@ -38,13 +38,13 @@ def slipvectors( strike, dip, rake ):
     z = numpy.zeros( strike.shape )
     c = numpy.cos( rake )
     s = numpy.sin( rake )
-    A = numpy.array([[ c, s, z ], [ -s, c, z ], [ z, z, u ]])
+    A = numpy.array( [[c, s, z], [-s, c, z], [z, z, u]] )
     c = numpy.cos( dip )
     s = numpy.sin( dip )
-    B = numpy.array([[ u, z, z ], [ z, c, s ], [ z, -s, c ]])
+    B = numpy.array( [[u, z, z], [z, c, s], [z, -s, c]] )
     c = numpy.cos( strike )
     s = numpy.sin( strike )
-    C = numpy.array([[ s, c, z ], [ -c, s, z ], [ z, z, u ]])
+    C = numpy.array( [[s, c, z], [-c, s, z], [z, z, u]] )
     return matmul( matmul( A, B ), C )
 
 def source_tensors( R ):
@@ -62,8 +62,8 @@ def source_tensors( R ):
     The columns can unpacked conveniently by:
     Tstrike, Tdip, Tnormal = coord.sliptensors( strike, dip, rake )
     """
-    strike, dip, normal = coord.slipvectors( strike, dip, rake )
-    del( rake )
+    strike, dip, normal = slipvectors( R )
+    del( R )
     strike = 0.5 * ([
         strike[1] * normal[2] + normal[1] * strike[2],
         strike[2] * normal[0] + normal[2] * strike[0],
@@ -75,20 +75,20 @@ def source_tensors( R ):
         dip[0] * normal[1] + normal[0] * dip[1],
     ])
     normal = normal * normal
-    return numpy.array([ strike, dip, normal ])
+    return numpy.array( [strike, dip, normal] )
 
 def interp( x0, dx, z, xi, extrapolate=False ):
     """
     1D interpolation on a regular grid
     """
     z = numpy.array( z )
-    xi = ( numpy.array( xi ) - x0 ) / dx
+    xi = (numpy.array( xi ) - x0) / dx
     j = numpy.int32( xi )
     n = z.size
     if not extrapolate:
         i = (j < 0) | (j > n-2)
     j = numpy.minimum( numpy.maximum( j, 0 ), n-2 )
-    zi = ( 1.0 - xi + j ) * z[...,j] + ( xi - j ) * z[...,j+1]
+    zi = (1.0 - xi + j) * z[...,j] + (xi - j) * z[...,j+1]
     if not extrapolate:
         zi[...,i] = numpy.nan
     return zi
@@ -98,8 +98,8 @@ def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=False ):
     2D interpolation on a regular grid
     """
     z = numpy.array( z )
-    xi = ( numpy.array( xi ) - x0 ) / dx
-    yi = ( numpy.array( yi ) - y0 ) / dy
+    xi = (numpy.array( xi ) - x0) / dx
+    yi = (numpy.array( yi ) - y0) / dy
     j = numpy.int32( xi )
     k = numpy.int32( yi )
     n = z.shape
@@ -127,7 +127,7 @@ def ibilinear( xx, yy, xi, yi ):
                               [ yy[1,:] - yy[0,:], yy[:,1] - yy[:,0] ] ]).sum(2)
     j2 = 0.25 * numpy.array([   xx[1,1] - xx[0,1] - xx[1,0] + xx[0,0],
                                 yy[1,1] - yy[0,1] - yy[1,0] + yy[0,0] ])
-    x = dx = solve2( j1, [xi,yi] )
+    x = dx = solve2( j1, [xi, yi] )
     i = 0
     while( abs( dx ).max() > 1e-6 ):
         i += 1
@@ -142,6 +142,9 @@ def ibilinear( xx, yy, xi, yi ):
     return x
 
 def ll2cvmh( x, y, inverse=False ):
+    """
+    Harvard CVM5 projection.
+    """
     import pyproj
     projection = pyproj.Proj( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
     x = numpy.array( x )
@@ -153,14 +156,14 @@ def ll2cmu( x, y, inverse=False ):
     """
     CMU TeraShake coordinates projection
     """
-    xx = [ -121.0, -118.951292 ], [ -116.032285, -113.943965 ]
-    yy = [   34.5,   36.621696 ], [   31.082920,   33.122341 ]
+    xx = [-121.0, -118.951292], [-116.032285, -113.943965]
+    yy = [  34.5,   36.621696], [  31.082920,   33.122341]
     if inverse:
-        x, y = interp2( 0.0, 0.0, 600000.0, 300000.0, [xx,yy], x, y, True )
+        x, y = interp2( 0.0, 0.0, 600000.0, 300000.0, [xx, yy], x, y, True )
     else:
         x, y = ibilinear( xx, yy, x, y )
-        x = ( x + 1.0 ) * 300000.0
-        y = ( y + 1.0 ) * 150000.0
+        x = (x + 1.0) * 300000.0
+        y = (y + 1.0) * 150000.0
     return numpy.array( [x, y] )
 
 def ll2xy( x, y, inverse=False, projection=None, rot=40.0, lon0=-121.0, lat0=34.5,  ):
@@ -202,7 +205,7 @@ def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
     x = x[1] - x[0]
     y = y[1] - y[0]
     s = 1.0 / numpy.sqrt( x*x + y*y )
-    mat = numpy.array([ s*x, s*y ])
+    mat = numpy.array( [s*x, s*y] )
     theta = 180.0 / numpy.pi * numpy.arctan2( mat[0], mat[1] )
     theta = 0.5 * theta.sum(0) - 45.0
     return mat, theta
@@ -223,7 +226,7 @@ def rot_sym_tensor( w1, w2, rot ):
     w2  = mat.flat[[5,6,1]]
     return w1, w2
 
-def rotmat( x, origin=(0,0,0), upvector=(0,0,1) ):
+def rotmat( x, origin=(0, 0, 0), upvector=(0, 0, 1) ):
     """
     Given a position vector x, find the rotation matrix to r,h,v coordinates.
     """
@@ -231,13 +234,13 @@ def rotmat( x, origin=(0,0,0), upvector=(0,0,1) ):
     nr = x / numpy.sqrt( (x*x).sum() )
     nh = numpy.cross( upvector, nr )
     if all( nh == 0.0 ):
-        nh = numpy.cross( (1,0,0), nr )
+        nh = numpy.cross( (1, 0, 0), nr )
     if all( nh == 0.0 ):
-        nh = numpy.cross( (0,1,0), nr )
+        nh = numpy.cross( (0, 1, 0), nr )
     nh = nh / numpy.sqrt( (nh*nh).sum() )
     nv = numpy.cross( nr, nh )
     nv = nv / numpy.sqrt( (nv*nv).sum() )
-    return numpy.array([ nr, nh, nv ])
+    return numpy.array( [nr, nh, nv] )
 
 if __name__ == '__main__':
     import getopt

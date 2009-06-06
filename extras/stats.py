@@ -11,7 +11,7 @@ for a in sys.argv[1:]:
     if a[0] == '-':
         dtype = a[1:].replace( 'l', '<' ).replace( 'b', '>' )
     else:
-        args += [ a ]
+        args += [a]
 nb = numpy.dtype( dtype ).itemsize
 
 print( '         Min          Max         Mean            N' )

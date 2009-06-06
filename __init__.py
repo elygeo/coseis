@@ -55,7 +55,7 @@ def stage( inputs ):
     ]
     options = ''.join( opts[::2] )
     long_options = opts[1::2]
-    opts, args = getopt.getopt( sys.argv[1:], options, long_options )
+    opts = getopt.getopt( sys.argv[1:], options, long_options )[0]
     for o, v in opts:
         if   o in ('-n', '--dry-run'):     cfg.prepare = False
         elif o in ('-s', '--serial'):      cfg.mode = 's'
@@ -73,18 +73,18 @@ def stage( inputs ):
     if not cfg.prepare: cfg.run = False
 
     # Partition for parallelization
-    prm.nn = tuple([ int( i ) for i in  prm.nn ])
+    prm.nn = tuple( [ int(i) for i in  prm.nn ] )
     maxtotalcores = cfg.maxnodes * cfg.maxcores
     if not cfg.mode and maxtotalcores == 1:
         cfg.mode = 's'
     np3 = prm.np3[:]
     if cfg.mode == 's':
-        np3 = [ 1, 1, 1 ]
-    nl = [ ( prm.nn[i] - 1 ) / np3[i] + 1 for i in range(3) ]
+        np3 = [1, 1, 1]
+    nl = [ (prm.nn[i] - 1) / np3[i] + 1 for i in range(3) ]
     i  = abs( prm.faultnormal ) - 1
     if i >= 0:
         nl[i] = max( nl[i], 2 )
-    np3 = [ ( prm.nn[i] - 1 ) / nl[i] + 1 for i in range(3) ]
+    np3 = [ (prm.nn[i] - 1) / nl[i] + 1 for i in range(3) ]
     prm.np3 = tuple( np3 )
     cfg.np = np3[0] * np3[1] * np3[2]
     if not cfg.mode:
@@ -94,8 +94,8 @@ def stage( inputs ):
 
     # Resources
     if cfg.maxcores:
-        cfg.nodes = min( cfg.maxnodes, ( cfg.np - 1 ) / cfg.maxcores + 1 )
-        cfg.ppn = ( cfg.np - 1 ) / cfg.nodes + 1
+        cfg.nodes = min( cfg.maxnodes, (cfg.np - 1) / cfg.maxcores + 1 )
+        cfg.ppn = (cfg.np - 1) / cfg.nodes + 1
         cfg.cores = min( cfg.maxcores, cfg.ppn )
         cfg.totalcores = cfg.nodes * cfg.maxcores
     else:
@@ -105,26 +105,26 @@ def stage( inputs ):
         cfg.totalcores = cfg.np
 
     # RAM and Wall time usage
-    if prm.oplevel in (1,2):
-         nvars = 20
-    elif prm.oplevel in (3,4,5):
-         nvars = 23
+    if prm.oplevel in (1, 2):
+        nvars = 20
+    elif prm.oplevel in (3, 4, 5):
+        nvars = 23
     else:
-         nvars = 44
-    nm = ( nl[0] + 2 ) * ( nl[1] + 2 ) * ( nl[2] + 2 )
-    cfg.pmem = 32 + int( 1.2 * nm * nvars * int( cfg.dtype[-1] ) / 1024 / 1024 )
+        nvars = 44
+    nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
+    cfg.pmem = 32 + int(1.2 * nm * nvars * int( cfg.dtype[-1] ) / 1024 / 1024)
     cfg.ram = cfg.pmem * cfg.ppn
-    sus = int( ( prm.nt + 10 ) * cfg.ppn * nm / cfg.cores / cfg.rate / 3600 * cfg.totalcores + 1 )
-    mm  =      ( prm.nt + 10 ) * cfg.ppn * nm / cfg.cores / cfg.rate / 60 * 3.0 + 10
+    sus = int( (prm.nt + 10) * cfg.ppn * nm / cfg.cores / cfg.rate / 3600 * cfg.totalcores + 1 )
+    mm  =      (prm.nt + 10) * cfg.ppn * nm / cfg.cores / cfg.rate / 60 * 3.0 + 10
     if cfg.maxtime:
         mm = min( 60*cfg.maxtime[0] + cfg.maxtime[1], mm )
     hh = mm / 60
     mm = mm % 60
-    cfg.walltime = '%d:%02d:00' % ( hh, mm )
+    cfg.walltime = '%d:%02d:00' % (hh, mm)
     print( 'Machine: ' + cfg.machine )
-    print( 'Cores: %s of %s' % ( cfg.np, maxtotalcores ) )
-    print( 'Nodes: %s of %s' % ( cfg.nodes, cfg.maxnodes ) )
-    print( 'RAM: %sMb of %sMb per node' % ( cfg.ram, cfg.maxram ) )
+    print( 'Cores: %s of %s' % (cfg.np, maxtotalcores) )
+    print( 'Nodes: %s of %s' % (cfg.nodes, cfg.maxnodes) )
+    print( 'RAM: %sMb of %sMb per node' % (cfg.ram, cfg.maxram) )
     print( 'Time limit: ' + cfg.walltime )
     print( 'SUs: %s' % sus )
     if cfg.maxcores and cfg.ppn > cfg.maxcores:
@@ -151,7 +151,7 @@ def stage( inputs ):
         if 'r' in line[0] or 'R' in line[0] and os.sep in line[8]:
             filename = os.path.expanduser( line[8] )
             f = os.path.basename( filename )
-            line = line[:8] + ( f, ) + line[9:]
+            line = line[:8] + (f,) + line[9:]
             prm.fieldio[i] = line
             f = os.path.join( cfg.rundir, 'in', f )
             try:
@@ -205,16 +205,16 @@ def prepare_prm( prm, itbuff ):
     """Prepare input paramers"""
 
     # inervals
-    prm.itio = max( 1, min( prm.itio, prm.nt ) )
+    prm.itio = max( 1, min(prm.itio, prm.nt) )
     if prm.itcheck % prm.itio != 0:
-        prm.itcheck = ( prm.itcheck / prm.itio + 1 ) * prm.itio
+        prm.itcheck = (prm.itcheck / prm.itio + 1) * prm.itio
 
     # hypocenter coordinates
     xi = list( prm.ihypo )
     for i in range( 3 ):
         xi[i] = 0.0 + xi[i]
         if xi[i] == 0.0:
-            xi[i] = 0.5 * ( prm.nn[i] + 1 )
+            xi[i] = 0.5 * (prm.nn[i] + 1)
         elif xi[i] <= -1.0:
             xi[i] = xi[i] + prm.nn[i] + 1
         if xi[i] < 1.0 or xi[i] > prm.nn[i]:
@@ -224,12 +224,12 @@ def prepare_prm( prm, itbuff ):
     # Rupture boundary conditions
     i1 = list( prm.bc1 )
     i2 = list( prm.bc2 )
-    i = abs( prm.faultnormal ) - 1
+    i = abs(prm.faultnormal) - 1
     if i >= 0:
         irup = int( xi[i] )
         if irup == 1:             i1[i] = -2
         if irup == prm.nn[i] - 1: i2[i] = -2
-        if irup < 1 or irup > ( prm.nn[i] - 1 ):
+        if irup < 1 or irup > (prm.nn[i] - 1):
             sys.exit( 'Error: ihypo %s out of bounds' % xi )
     prm.bc1 = tuple( i1 )
     prm.bc2 = tuple( i2 )
@@ -277,7 +277,7 @@ def prepare_prm( prm, itbuff ):
             sys.exit( 'Error: field only for ruptures: %r' % line )
         if 'w' not in mode and field not in fieldnames.input:
             sys.exit( 'Error: field is ouput only: %r' % line )
-        nn = list( prm.nn ) + [ prm.nt ]
+        nn = list( prm.nn ) + [prm.nt]
         if field in fieldnames.cell:
             mode = mode.replace( 'x', 'X' )
             mode = mode.replace( 'c', 'C' )
@@ -290,8 +290,8 @@ def prepare_prm( prm, itbuff ):
             ii[3] = 0, 0, 1
         if field in fieldnames.fault:
             i = prm.faultnormal - 1
-            ii[i] = 2 * ( irup, ) + ( 1, )
-        nn = [ ( ii[i][1] - ii[i][0] + 1 ) / ii[i][2] for i in range(4) ]
+            ii[i] = 2 * (irup,) + (1,)
+        nn = [ (ii[i][1] - ii[i][0] + 1) / ii[i][2] for i in range(4) ]
         nb = ( min( prm.itio, prm.nt ) - 1 ) / ii[3][2] + 1
         nb = max( 1, min( nb, nn[3] ) )
         if 'x' not in mode and 'X' not in mode:

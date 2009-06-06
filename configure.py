@@ -19,8 +19,8 @@ def configure( save=False, machine=None ):
     os.chdir( cwd )
     return cfg
 
+# Set configuration
 if __name__ == '__main__':
-    """Set configuration"""
     cfg = configure( True, *sys.argv[1:2] )
     print( cfg['notes'] )
     for k in sorted( cfg.keys() ):

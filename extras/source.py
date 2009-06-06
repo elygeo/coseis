@@ -4,14 +4,16 @@ Source utilities
 """
 import os, sys, numpy, gzip, coord, sord
 
+class Object:
+    """Class for creating empty objects."""
+    pass
+
 def srf_read( filename, headeronly=False, mks=True ):
     """
     Reader for Graves Standard Rupture Format (SRF).
     SRF is documented at http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
     Returns separate meta and data objects.
     """
-    class obj: pass
-
     fh = filename
     if type( fh ) is not file:
         if fh.split('.')[-1] == 'gz':
@@ -20,7 +22,7 @@ def srf_read( filename, headeronly=False, mks=True ):
             fh = open( os.path.expanduser( fh ), 'r' )
 
     # Header block
-    meta = obj()
+    meta = Object()
     meta.version = fh.readline().split()[0]
     k = fh.readline().split()
     if k[0] == 'PLANE':
@@ -44,7 +46,7 @@ def srf_read( filename, headeronly=False, mks=True ):
         return meta
 
     # Data block
-    data = obj()
+    data = Object()
     n = meta.nsource
     data.lon   = numpy.empty( n, 'f' )
     data.lat   = numpy.empty( n, 'f' )
@@ -112,7 +114,7 @@ def srfb_write( meta, data, path='' ):
     Write SRF binary format.
     """
     path = os.path.expanduser( path )
-    if not os.path.isdir( path ):
+    if path not in '.' and not os.path.isdir( path ):
         os.makedirs( path )
     meta.dtype = numpy.dtype( 'f' ).str
     sord.util.save( os.path.join( path, 'meta.py' ), sord.util.dictify( meta ) )
@@ -140,12 +142,9 @@ def srfb_read( path='' ):
     """
     Read SRF binary format.
     """
-    class obj: pass
     path = os.path.expanduser( path )
-    if not os.path.isdir( path ):
-        os.makedirs( path )
     meta = sord.util.objectify( sord.util.load( os.path.join( path, 'meta.py' ) ) )
-    data = obj()
+    data = Object()
     data.lon   = numpy.fromfile( os.path.join( path, 'lon'   ), 'f' )
     data.lat   = numpy.fromfile( os.path.join( path, 'lat'   ), 'f' )
     data.dep   = numpy.fromfile( os.path.join( path, 'dep'   ), 'f' )
@@ -243,7 +242,7 @@ def srf2potency( data, projection, dx, path='' ):
     w[0] = stk[0]; w[1] = dip[0]; numpy.array( w, 'f' )[ii].tofile( path + 'w23' )
     w[0] = stk[1]; w[1] = dip[1]; numpy.array( w, 'f' )[ii].tofile( path + 'w31' )
     w[0] = stk[2]; w[1] = dip[2]; numpy.array( w, 'f' )[ii].tofile( path + 'w12' )
-    w = numpy.zeros_lile( nrm )
+    w = numpy.zeros_like( nrm )
     w[2] = nrm[0]; numpy.array( w, 'f' )[ii].tofile( path + 'w11' )
     w[2] = nrm[1]; numpy.array( w, 'f' )[ii].tofile( path + 'w22' )
     w[2] = nrm[2]; numpy.array( w, 'f' )[ii].tofile( path + 'w33' )

@@ -4,6 +4,10 @@ General utilities
 """
 import os, sys, shutil
 
+class Object:
+    """Empty class for creating objects with addributes"""
+    pass
+
 def dictify( o ):
     """Convert object attributes to dict"""
     d = dict()
@@ -15,9 +19,7 @@ def dictify( o ):
 
 def objectify( d ):
     """Convert dict to object attributes"""
-    class obj:
-        pass
-    o = obj()
+    o = Object()
     for k, v in d.iteritems():
         if k[0] is not '_' and type(v) not in [type(os), type(os.walk)]:
             setattr( o, k, v )
@@ -30,7 +32,8 @@ def load( filename, d=None ):
     f = open( os.path.expanduser( filename ) )
     exec f in d
     for k in d.keys():
-        if k[0] is '_' or type(d[k]) in [type(os), type(os.walk)]: del( d[k] )
+        if k[0] is '_' or type(d[k]) in [type(os), type(os.walk)]:
+            del( d[k] )
     return d
 
 def save( fd, d, expand=[] ):
@@ -177,9 +180,9 @@ def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
             mm[i-1] = mm[i-1] * mm[i]; del mm[i]
     if len( mm ) > 4:
         sys.exit( 'To many slice dimentions' )
-    i0 = ( [0,0,0] + i0 )[-4:]
-    nn = ( [1,1,1] + nn )[-4:]
-    mm = ( [1,1,1] + mm )[-4:]
+    i0 = ( [0, 0, 0] + i0 )[-4:]
+    nn = ( [1, 1, 1] + nn )[-4:]
+    mm = ( [1, 1, 1] + mm )[-4:]
     f = numpy.empty( nn, dtype )
     itemsize = numpy.dtype( dtype ).itemsize
     offset = numpy.array( i0, 'd' )
@@ -187,7 +190,7 @@ def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
     for j in xrange( nn[0] ):
         for k in xrange( nn[1] ):
             for l in xrange( nn[2] ):
-                i = ( stride * ( offset + array( [j,k,l,0] ) ) ).sum()
+                i = ( stride * ( offset + array( [j, k, l, 0] ) ) ).sum()
                 fd.seek( long(i), 0 )
                 f[j,k,l,:] = fromfile( fd, dtype, nn[-1] )
     if order is 'F':
@@ -199,7 +202,7 @@ def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
 def progress( i, n, t ):
     """Print progress and time remaining."""
     percent =  100. * i / n
-    remain = int( t * ( 100. / percent - 1. ) )
+    remain = int( t * (100. / percent - 1.) )
     h = remain / 3600
     m = remain / 60 % 60
     s = remain % 60
@@ -209,21 +212,21 @@ def progress( i, n, t ):
         print('')
     return
 
-def compile( compiler, object, source ):
+def compile( compiler, object_, source ):
     """An alternative to Make that uses state files"""
     import glob, difflib
-    object =   os.path.expanduser( object )
+    object_ =   os.path.expanduser( object_ )
     source = [ os.path.expanduser( f ) for f in source if f ]
-    statedir = os.path.join( os.path.dirname( object ), '.state' )
+    statedir = os.path.join( os.path.dirname( object_ ), '.state' )
     if not os.path.isdir( statedir ):
         os.mkdir( statedir )
-    statefile = os.path.join( statedir, os.path.basename( object ) )
-    command = compiler + [ object ] + source
+    statefile = os.path.join( statedir, os.path.basename( object_ ) )
+    command = compiler + [object_] + source
     state = [ ' '.join( command ) + '\n' ]
     for f in source:
         state += open( f, 'r' ).readlines()
     compile = True
-    if os.path.isfile( object ):
+    if os.path.isfile( object_ ):
         try:
             oldstate = open( statefile ).readlines()
             diff = ''.join( difflib.unified_diff( oldstate, state, n=0 ) )
@@ -231,7 +234,8 @@ def compile( compiler, object, source ):
                 print( diff )
             else:
                 compile = False
-        except: pass
+        except:
+            pass
     if compile:
         try:
             os.unlink( statefile )
@@ -241,7 +245,7 @@ def compile( compiler, object, source ):
         if os.system( ' '.join( command ) ):
             sys.exit( 'Compile error' )
         open( statefile, 'w' ).writelines( state )
-        for pat in [ '*.o', '*.mod', '*.ipo', '*.il', '*.stb' ]:
+        for pat in ['*.o', '*.mod', '*.ipo', '*.il', '*.stb']:
             for f in glob.glob( pat ):
                 os.unlink( f )
     return compile
@@ -282,13 +286,13 @@ def install():
     print( 'Installing ' + dst )
     print( 'From ' + src )
     try:
-         shutil.rmtree( dst )
+        shutil.rmtree( dst )
     except:
-         pass
+        pass
     try:
-         shutil.copytree( src, dst )
+        shutil.copytree( src, dst )
     except:
-         sys.exit( 'You do not have write permission for this Python install' )
+        sys.exit( 'You do not have write permission for this Python install' )
     return
 
 def uninstall():
