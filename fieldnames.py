@@ -107,6 +107,7 @@ cell    = [ f[0] for f in table if 'c' in f[-1] ]
 fault   = [ f[0] for f in table if 'f' in f[-1] ]
 volume  = [ f[0] for f in table if 'f' not in f[-1] ]
 
+# If run from the command line, check for duplicates.
 if __name__ == '__main__':
     for i in range( len( all ) ):
         if all[i] in all[:i]:

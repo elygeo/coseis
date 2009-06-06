@@ -84,7 +84,7 @@ def interp( x0, dx, z, xi, extrapolate=False ):
     z = numpy.array( z )
     xi = (numpy.array( xi ) - x0) / dx
     j = numpy.int32( xi )
-    n = z.size
+    n = z.shape[-1]
     if not extrapolate:
         i = (j < 0) | (j > n-2)
     j = numpy.minimum( numpy.maximum( j, 0 ), n-2 )
@@ -104,9 +104,9 @@ def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=False ):
     k = numpy.int32( yi )
     n = z.shape
     if not extrapolate:
-        i = (j < 0) | (j > n[0]-2) | (k < 0) | (k > n[1]-2)
-    j = numpy.minimum( numpy.maximum( j, 0 ), n[0]-2 )
-    k = numpy.minimum( numpy.maximum( k, 0 ), n[1]-2 )
+        i = (j < 0) | (j > n[-2]-2) | (k < 0) | (k > n[-1]-2)
+    j = numpy.minimum( numpy.maximum( j, 0 ), n[-2]-2 )
+    k = numpy.minimum( numpy.maximum( k, 0 ), n[-1]-2 )
     zi = ( ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * z[...,j,k]
          + ( 1.0 - xi + j ) * (       yi - k ) * z[...,j,k+1]
          + (       xi - j ) * ( 1.0 - yi + k ) * z[...,j+1,k]
