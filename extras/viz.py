@@ -22,7 +22,7 @@ def savefig( fd=None, format=None, **kwargs ):
         pylab.savefig( out, format='eps', **kwargs )
         out.reset()
         out = out.read()
-        cmd = 'ps2pdf', '-dEPSCrop', '-', '-'
+        cmd = 'ps2pdf', '-dEPSCrop', '-dPDFSETTINGS=/prepress', '-', '-'
         pid = subprocess.Popen( cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE )
         out = pid.communicate( out )[0]
     else:
