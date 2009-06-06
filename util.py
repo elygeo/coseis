@@ -117,7 +117,7 @@ def expand_indices( indices, shape, base=1 ):
     else:
         indices = list( indices )
     for i in range( n ):
-        if type( indices[i] ) in ( int, float ):
+        if type( indices[i] ) not in ( tuple, list ):
             if indices[i] == 0 and base > 0:
                 indices[i] = [ base, shape[i] - base + off, 1 ]
             else:
