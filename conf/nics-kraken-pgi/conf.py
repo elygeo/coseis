@@ -2,6 +2,8 @@ notes = """
 NICS Kraken
 
 EPD version: rh3-amd64
+Compute nodes require statically-compiled Python.
+See extras/intall/python-install-cnl.sh
 
 /lustre/scratch/$USER
 module
@@ -11,7 +13,6 @@ showbf
 alias showme='showq | sed -n "/JOBID/p; /--/p; /^ /p; /$USER/p"'
 
 vim .bashrc
-module load python/2.5.2
 
 Home directories have a 2 GB quota.
 CrayPAT (Cray Performance Analysis Tools) is useful for profiling and
@@ -20,7 +21,7 @@ collecting hardware performance data
 account: TG-MCA03S012
 """
 login = 'kraken-pwd.nics.utk.edu'
-hosts = [ 'kraken-pwd3' ]
+hosts = 'kraken-pwd3',
 queue = 'longsmall';  minnodes = 0;    maxnodes = 32;   maxtime = 60, 00
 queue = 'small';      minnodes = 0;    maxnodes = 64;   maxtime = 24, 00
 queue = 'medium';     minnodes = 65;   maxnodes = 1024; maxtime = 24, 00

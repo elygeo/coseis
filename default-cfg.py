@@ -59,13 +59,15 @@ for d in os.environ['PATH'].split(':'):
             break
 
 # Fortran compiler flags
-if fortran_serial[0] == 'xlf95_r':
-    _ = '-u', '-q64', '-qsuppress=cmpmsg', '-qlanglvl=2003pure', '-qsuffix=f=f90', '-o'
+if fortran_serial[0] == 'gfortran':
+    _ = '-fimplicit-none', '-Wall', '-std=f95', '-pedantic', '-o'
+    _ = '-fimplicit-none', '-Wall', '-std=f95', '-o'
+    _ = '-fimplicit-none', '-Wall', '-o'
     fortran_flags = {
-        'g': ('-C', '-qflttrap', '-qsigtrap', '-g') + _,
-        't': ('-C', '-qflttrap', '-qsigtrap') + _,
-        'p': ('-O', '-p') + _,
-        'O': ('-O4',) + _,
+        'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g') + _,
+        't': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow') + _,
+        'p': ('-O', '-pg') + _,
+        'O': ('-O3',) + _,
     }
 elif fortran_serial[0] == 'ifort':
     _ = '-u', '-std95', '-warn', '-o'
@@ -74,6 +76,14 @@ elif fortran_serial[0] == 'ifort':
         't': ('-CB', '-traceback') + _,
         'p': ('-O', '-pg') + _,
         'O': ('-O3',) + _,
+    }
+elif fortran_serial[0] == 'xlf95_r':
+    _ = '-u', '-q64', '-qsuppress=cmpmsg', '-qlanglvl=2003pure', '-qsuffix=f=f90', '-o'
+    fortran_flags = {
+        'g': ('-C', '-qflttrap', '-qsigtrap', '-g') + _,
+        't': ('-C', '-qflttrap', '-qsigtrap') + _,
+        'p': ('-O', '-p') + _,
+        'O': ('-O4',) + _,
     }
 elif fortran_serial[0] == 'pgf90':
     _ = '-Mdclchk', '-o'
@@ -90,16 +100,6 @@ elif fortran_serial[0] == 'pathf95':
         't': _,
         'p': ('-O', '-p') + _,
         'O': ('-i8', '-O3', '-OPT:Ofast', '-fno-math-errno') + _,
-    }
-elif fortran_serial[0] == 'gfortran':
-    _ = '-fimplicit-none', '-Wall', '-std=f95', '-pedantic', '-o'
-    _ = '-fimplicit-none', '-Wall', '-std=f95', '-o'
-    _ = '-fimplicit-none', '-Wall', '-o'
-    fortran_flags = {
-        'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g') + _,
-        't': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow') + _,
-        'p': ('-O', '-pg') + _,
-        'O': ('-O3',) + _,
     }
 elif fortran_serial[0] == 'f95' and os.uname()[0] == 'SunOS':
     _ = '-u', '-o'

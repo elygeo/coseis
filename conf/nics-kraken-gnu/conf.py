@@ -1,10 +1,11 @@
 notes = """
 NICS Kraken
-http://www.nics.tennessee.edu/computing-resources
-http://yt.enzotools.org/wiki/CrayXT5Installation
-https://wiki.fysik.dtu.dk/gpaw/install/Cray/louhi.html
+
+module swap PrgEnv-pgi PrgEnv-gnu
 
 EPD version: rh3-amd64
+Compute nodes require statically-compiled Python.
+See extras/intall/python-install-cnl.sh
 
 /lustre/scratch/$USER
 module
@@ -14,8 +15,6 @@ showbf
 alias showme='showq | sed -n "/JOBID/p; /--/p; /^ /p; /$USER/p"'
 
 vim .bashrc
-module swap PrgEnv-pgi PrgEnv-gnu
-module load python/2.5.2
 
 Home directories have a 2 GB quota.
 CrayPAT (Cray Performance Analysis Tools) is useful for profiling and
@@ -41,9 +40,9 @@ fortran_serial = 'ftn',
 fortran_mpi = 'ftn',
 _ = '-Mdclchk', '-o'
 fortran_flags = {
-    'g': ('-Ktrap=fp', '-Mbounds', '-Mchkptr', '-g') + _,
-    't': ('-Ktrap=fp', '-Mbounds') + _,
-    'p': ('-pg', '-Mprof=func') + _,
-    'O': ('-fast',) + _,
+    'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g') + _,
+    't': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow') + _,
+    'p': ('-O', '-pg') + _,
+    'O': ('-O3',) + _,
 }
 
