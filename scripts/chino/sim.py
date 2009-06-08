@@ -10,8 +10,8 @@ _vm = 'uhs'
 _vm = '1d'
 _vm = 'cvm'
 _topo = False
-_T = 120.
-_L = 160000.0, 120000.0, -30000.0
+T = 120.
+L = 160000.0, 120000.0, -30000.0
 dx =  150.0,  150.0,  -150.0 ; npml = 10
 dx = 1500.0, 1500.0, -1500.0 ; npml = 5
 dx =  500.0,  500.0,  -500.0 ; npml = 10
@@ -19,11 +19,11 @@ dx =  500.0,  500.0,  -500.0 ; npml = 10
 bc1 = 10, 10, 0
 bc2 = 10, 10, 10
 dt = dx[0] / 12500.0
-nt = int( _T / dt + 1.00001 )
+nt = int( T / dt + 1.00001 )
 nn = [
-    int( _L[0] / dx[0] + 1.00001 ),
-    int( _L[1] / dx[1] + 1.00001 ),
-    int( _L[2] / dx[2] + 1.00001 ),
+    int( L[0] / dx[0] + 1.00001 ),
+    int( L[1] / dx[1] + 1.00001 ),
+    int( L[2] / dx[2] + 1.00001 ),
 ]
 src_n = 1
 src_type = 'moment'
@@ -72,11 +72,11 @@ elif _vm == '1d':
         ( 35.0, 7.8, 4.5,  3.0  ),
     ]
     for _dep, _vp, _vs, _rho in _layers:
-        _i = int( -_dep / dx[2] + 1.5 )
+        i = int( -_dep / dx[2] + 1.5 )
         fieldio += [
-            ( '=',  'rho', [(),(),(_i,-1),()], 1000. * _rho ),
-            ( '=',  'vp',  [(),(),(_i,-1),()], 1000. * _vp  ),
-            ( '=',  'vs',  [(),(),(_i,-1),()], 1000. * _vs  ),
+            ( '=',  'rho', [(),(),(i,-1),()], 1000. * _rho ),
+            ( '=',  'vp',  [(),(),(i,-1),()], 1000. * _vp  ),
+            ( '=',  'vs',  [(),(),(i,-1),()], 1000. * _vs  ),
         ]
 else:
     sys.exit( 'bad vm' )
@@ -94,11 +94,11 @@ if __name__ == '__main__':
         if n == 64:
             print 'Too many stations. Skipping the rest.'
             break
-        if sta[i]['name'] != prev and x[i] > _clip and x[i] < _L[0]-_clip and y[i] > _clip and y[i] < _L[1]-_clip:
+        if sta[i]['name'] != prev and x[i] > _clip and x[i] < L[0]-_clip and y[i] > _clip and y[i] < L[1]-_clip:
             n += 1
             j = int( x[i] / dx[0] + 1.5 )
             k = int( y[i] / dx[1] + 1.5 )
-            for f in ( 'v1', 'v2', 'v3' ):
+            for f in 'v1', 'v2', 'v3':
                 fieldio += [
                     ( '=w', f, [j,k,1,()], sta[i]['name'] + f ),
                 ]

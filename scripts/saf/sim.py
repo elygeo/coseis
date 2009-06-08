@@ -14,8 +14,8 @@ _indir = '~/run/cvm4/'
 rundir = '~/run/saf'
 itstats = 10
 itio = 100
-_T = 180.0
-_L = 600000.0, 300000.0, -80000.0
+T = 180.0
+L = 600000.0, 300000.0, -80000.0
 
 # number of processors
 np3 = 1, 1, 1
@@ -53,11 +53,11 @@ elif dx == 200:
 # dimensions
 dx = dx, dx, -dx
 dt = dx[0] * 0.00006
-nt = int( _T / dt + 1.00001 )
+nt = int( T / dt + 1.00001 )
 nn = [
-    int( _L[0] / dx[0] + 1.00001 ),
-    int( _L[1] / dx[1] + 2.00001 ),
-    int( _L[2] / dx[2] + 1.00001 ),
+    int( L[0] / dx[0] + 1.00001 ),
+    int( L[1] / dx[1] + 2.00001 ),
+    int( L[2] / dx[2] + 1.00001 ),
 ]
 
 # lat/lon to model coordinate projection
@@ -102,7 +102,7 @@ fieldio += [
 # fault parameters
 faultnormal = 2
 slipvector = 1.0, 0.0, 0.0
-_F = 199000.0, 0.0, -16000.0
+F = 199000.0, 0.0, -16000.0
 _segments = [
     -117.4982, 34.2895,
     -117.2382, 34.1547,
@@ -112,10 +112,10 @@ _segments = [
     -115.7119, 33.3501,
 ]
 _xf, _yf = projection( _segments[0::2], _segments[1::2] )
-_jf = int( 0.5 * ( _xf.min() + _xf.max() - _F[0] ) / dx[0] + 1.5 )
+_jf = int( 0.5 * ( _xf.min() + _xf.max() - F[0] ) / dx[0] + 1.5 )
 _kf = int( 0.5 * ( _yf.min() + _yf.max()         ) / dx[1] + 1.5 )
-_lf = int(                                 _F[2]   / dx[2] + 1.00001 )
-_jf = _jf, _jf + int( _F[0] / dx[0] + 0.01 )
+_lf = int(                                 F[2]   / dx[2] + 1.00001 )
+_jf = _jf, _jf + int( F[0] / dx[0] + 0.01 )
 _lf =   1, _lf
 _nt2 = ( nt + 1 ) / 2
 fieldio += [
@@ -165,14 +165,14 @@ _stations = [
     -115.46730, 32.65498, 'Mexicali',
     -114.62361, 32.72528, 'Yuma',
 ]
-_x, _y = projection( _stations[0::3], _stations[1::3] )
-_f = _stations[2::3]
-for _i in range( len( _f ) ):
-    _j = int( _x[_i] / dx[0] + 1.5 )
-    _k = int( _y[_i] / dx[1] + 1.5 )
-    fieldio += [ ( '=w', 'v1', [_j,_k,1,()], _f[_i] + '-v1' ) ]
-    fieldio += [ ( '=w', 'v2', [_j,_k,1,()], _f[_i] + '-v2' ) ]
-    fieldio += [ ( '=w', 'v3', [_j,_k,1,()], _f[_i] + '-v3' ) ]
+x, y = projection( _stations[0::3], _stations[1::3] )
+f = _stations[2::3]
+for i in range( len( f ) ):
+    j = int( x[i] / dx[0] + 1.5 )
+    k = int( y[i] / dx[1] + 1.5 )
+    fieldio += [ ( '=w', 'v1', [j,k,1,()], f[i] + '-v1' ) ]
+    fieldio += [ ( '=w', 'v2', [j,k,1,()], f[i] + '-v2' ) ]
+    fieldio += [ ( '=w', 'v3', [j,k,1,()], f[i] + '-v3' ) ]
 
 # run job
 if __name__ == '__main__':

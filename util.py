@@ -2,46 +2,77 @@
 """
 General utilities
 """
-import os, sys, shutil
+import os, sys, shutil, re
 
 class Object:
-    """Empty class for creating objects with addributes"""
+    """
+    Empty class for creating objects with addributes
+    """
     pass
 
-def dictify( o ):
-    """Convert object attributes to dict"""
+def dictify( o, ignore='(_.*)|(^.$)' ):
+    """
+    Convert object attributes to dict.
+
+    ignore: specifies a regular expression for ignoring names.
+    The default is names of length one or beginning with an underscore.
+    """
     d = dict()
+    grep = re.compile( ignore )
     for k in dir( o ):
         v = getattr( o, k )
-        if k[0] is not '_' and type(v) not in [type(os), type(os.walk)]:
+        if ( not grep.search( k ) and
+            type(v) not in [type(os), type(os.walk)] ):
             d[k] = v
     return d
 
-def objectify( d ):
-    """Convert dict to object attributes"""
+def objectify( d, ignore='(_.*)|(^.$)' ):
+    """
+    Convert dict to object attributes.
+
+    ignore: specifies a regular expression for ignoring names.
+    The default is names of length one or beginning with an underscore.
+    """
     o = Object()
+    grep = re.compile( ignore )
     for k, v in d.iteritems():
-        if k[0] is not '_' and type(v) not in [type(os), type(os.walk)]:
+        if ( not grep.search( k ) and
+            type(v) not in [type(os), type(os.walk)] ):
             setattr( o, k, v )
     return o
 
-def load( filename, d=None ):
-    """Load variables from a Python source file into a dict"""
+def load( filename, d=None, ignore='(_.*)|(^.$)' ):
+    """
+    Load variables from a Python source file into a dict.
+    
+    ignore: specifies a regular expression for ignoring names.
+    The default is names of length one or beginning with an underscore.
+    """
     if d is None:
         d = dict()
     f = open( os.path.expanduser( filename ) )
     exec f in d
+    grep = re.compile( ignore )
     for k in d.keys():
-        if k[0] is '_' or type(d[k]) in [type(os), type(os.walk)]:
+        if ( grep.search( k ) or
+            type(d[k]) in [type(os), type(os.walk)] ):
             del( d[k] )
     return d
 
-def save( fd, d, expand=[] ):
-    """Write variables from a dict into a Python source file"""
+def save( fd, d, expand=[], ignore='(_.*)|(^.$)' ):
+    """
+    Write variables from a dict into a Python source file.
+    
+    ignore: specifies a regular expression for ignoring names.
+    The default is names of length one or beginning with an underscore.
+    """
     if type( fd ) is not file:
         fd = open( os.path.expanduser( fd ), 'w' )
+    grep = re.compile( ignore )
     for k in sorted( d ):
-        if k[0] is not '_' and type(d[k]) not in [type(os), type(os.walk)] and k not in expand:
+        if ( not grep.search( k ) and
+            type(d[k]) not in [type(os), type(os.walk)] and
+            k not in expand ):
             fd.write( '%s = %r\n' % ( k, d[k] ) )
     for k in expand:
         if k in d:
@@ -200,7 +231,9 @@ def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
     return f
 
 def progress( i, n, t ):
-    """Print progress and time remaining."""
+    """
+    Print progress and time remaining.
+    """
     percent =  100. * i / n
     remain = int( t * (100. / percent - 1.) )
     h = remain / 3600
@@ -213,7 +246,9 @@ def progress( i, n, t ):
     return
 
 def compile( compiler, object_, source ):
-    """An alternative to Make that uses state files"""
+    """
+    An alternative to Make that uses state files.
+    """
     import glob, difflib
     object_ =   os.path.expanduser( object_ )
     source = [ os.path.expanduser( f ) for f in source if f ]
@@ -251,7 +286,9 @@ def compile( compiler, object_, source ):
     return compile
 
 def install_path():
-    """Install path file in site-packages directory"""
+    """
+    Install path file in site-packages directory.
+    """
     from distutils.sysconfig import get_python_lib
     f   = os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
     pth = os.path.join( get_python_lib(), f )
@@ -265,7 +302,9 @@ def install_path():
     return
 
 def uninstall_path():
-    """Remove path file from site-packages directory"""
+    """
+    Remove path file from site-packages directory
+    """
     from distutils.sysconfig import get_python_lib
     f = os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
     pth = os.path.join( get_python_lib(), f )
@@ -278,7 +317,9 @@ def uninstall_path():
     return
 
 def install():
-    """Copy package to site-packages directory"""
+    """
+    Copy package to site-packages directory
+    """
     from distutils.sysconfig import get_python_lib
     src = os.path.dirname( os.path.realpath( __file__ ) )
     f   = os.path.basename( os.path.dirname( __file__ ) )
@@ -296,7 +337,9 @@ def install():
     return
 
 def uninstall():
-    """Remove package from site-packages directory"""
+    """
+    Remove package from site-packages directory
+    """
     from distutils.sysconfig import get_python_lib
     f   = os.path.basename( os.path.dirname( __file__ ) )
     dst = os.path.join( get_python_lib(), f )

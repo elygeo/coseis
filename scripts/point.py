@@ -29,8 +29,8 @@ fieldio = [
 ]
 
 # output
-for _f in sord.fieldnames.volume:
-    fieldio += [ ( '=w', _f, [], _f ) ]
+for f in sord.fieldnames.volume:
+    fieldio += [ ( '=w', f, [], f ) ]
 
 sord.run( locals() )
 

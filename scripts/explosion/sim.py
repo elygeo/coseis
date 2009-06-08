@@ -10,10 +10,10 @@ dx = [ 100.0 ] * 3
 np3 = 1, 1, 2
 
 dt = dx[0] / 12500.0
-_T = 3.0
-_L = 6000.0
-nn = [ int( _L / dx[0] + 1.0001 ) ] * 3
-nt =   int( _T / dt + 1.0001 )
+T = 3.0
+L = 6000.0
+nn = [ int( L / dx[0] + 1.0001 ) ] * 3
+nt =   int( T / dt + 1.0001 )
 fixhypo = -1 
 
 # material
@@ -26,14 +26,14 @@ fieldio = [
 ]
 
 # output
-for _f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
+for f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
     fieldio += [
-        ( '=wx', _f, [], 'p1_'+_f, (  -1.,   -1., 3999.) ),
-        ( '=wx', _f, [], 'p2_'+_f, (  -1., 2999., 3999.) ),
-        ( '=wx', _f, [], 'p3_'+_f, (  -1., 3999., 3999.) ),
-        ( '=wx', _f, [], 'p4_'+_f, (2999., 2999., 3999.) ),
-        ( '=wx', _f, [], 'p5_'+_f, (2999., 3999., 3999.) ),
-        ( '=wx', _f, [], 'p6_'+_f, (3999., 3999., 3999.) ),
+        ( '=wx', f, [], 'p1_'+f, (  -1.0,   -1.0, 3999.0) ),
+        ( '=wx', f, [], 'p2_'+f, (  -1.0, 2999.0, 3999.0) ),
+        ( '=wx', f, [], 'p3_'+f, (  -1.0, 3999.0, 3999.0) ),
+        ( '=wx', f, [], 'p4_'+f, (2999.0, 2999.0, 3999.0) ),
+        ( '=wx', f, [], 'p5_'+f, (2999.0, 3999.0, 3999.0) ),
+        ( '=wx', f, [], 'p6_'+f, (3999.0, 3999.0, 3999.0) ),
     ]
 
 # source properties
@@ -66,15 +66,15 @@ if 1:
     src_function = 'none'
     infiles = [ 'tmp/src_*' ]
     _dt = dt * 0.9
-    _t = _dt * numpy.arange( nt )
-    _f = 1.0 - numpy.exp( -_t / src_period ) / src_period * ( _t + src_period )
+    t = _dt * numpy.arange( nt )
+    f = 1.0 - numpy.exp( -t / src_period ) / src_period * ( t + src_period )
 
     rundir = 'tmp/3'
     src_type = 'moment'
     bc1 = 2, 2, 2
     ihypo = 1.5, 1.5, 1.5
     src_w1 = 3 * [ 3*_rho*_vp*_vp - 4*_rho*_vs*_vs ]
-    source.write_src( _f, nt, _dt, 0.0, ihypo, src_w1, src_w2, 'tmp' )
+    source.write_src( f, nt, _dt, 0.0, ihypo, src_w1, src_w2, 'tmp' )
     sord.run( locals() )
 
     rundir = 'tmp/4'
@@ -82,6 +82,6 @@ if 1:
     bc1 = 1, 1, 1
     ihypo = 1, 1, 1
     src_w1 = 3 * [ 1.0 ]
-    source.write_src( _f, nt, _dt, 0.0, ihypo, src_w1, src_w2, 'tmp' )
+    source.write_src( f, nt, _dt, 0.0, ihypo, src_w1, src_w2, 'tmp' )
     sord.run( locals() )
 
