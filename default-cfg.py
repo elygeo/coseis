@@ -14,7 +14,7 @@ pre = ''		# pre-processing command
 post = ''		# post-processing command
 itbuff = 10		# max number of timesteps to buffer for 2D & 3D output
 rundir = os.path.join( '~', 'run', 'sord' )	# run directory
-infiles = []		# files to copy to the sord input directory
+infiles = ()		# files to copy to the sord input directory
 
 # User info
 user = pwd.getpwuid( os.geteuid() )[0]
