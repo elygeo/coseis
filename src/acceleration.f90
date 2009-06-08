@@ -162,7 +162,7 @@ end do
 end if
 
 ! Add source to force
-if ( src_type == 'force' ) then
+if ( source == 'force' ) then
     call finite_source
     call vector_point_source
 end if

@@ -11,13 +11,13 @@ stations = 'p1', 'p2', 'p3', 'p4', 'p5', 'p6'
 
 for rundir in runs:
     prm = sord.util.loadmeta( rundir )
-    T = prm.src_period
+    T = prm.period
     cutoff = 0
     cutoff = vp / ( 20 * prm.dx[0] )
-    if prm.src_type == 'moment':
-        m0 = prm.src_w1[0]
+    if prm.source == 'moment':
+        m0 = prm.source1[0]
     else:
-        m0 = prm.src_w1[0] * ( 3*rho*vp*vp - 4*rho*vs*vs )
+        m0 = prm.source1[0] * ( 3*rho*vp*vp - 4*rho*vs*vs )
     for sta in stations:
         x1 = numpy.fromfile( rundir + '/out/' + sta + '_x1', 'f' )
         x2 = numpy.fromfile( rundir + '/out/' + sta + '_x2', 'f' )

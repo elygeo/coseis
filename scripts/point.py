@@ -15,9 +15,9 @@ bc2 = 0, 0, 0
 
 # source
 ihypo = 1.5, 1.5, 1.5
-src_type = 'moment'
-src_w1 = 1e16, 1e16, 1e16
-src_w2 =  0.0,  0.0,  0.0
+source = 'moment'
+source1 = 1e16, 1e16, 1e16
+source2 =  0.0,  0.0,  0.0
 
 # material
 hourglass = 1.0, 0.0

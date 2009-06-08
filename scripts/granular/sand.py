@@ -23,20 +23,20 @@ nn = [				# number of sample points
 
 # source
 ihypo = (nn[0]+1)/2.0, (nn[1]+1)/2.0, 0.035 / dx[2] + 1.0 # hypocenter location
-src_type = 'potency'
-src_function = 'brune'
-src_w1 = 3 * [ 0.0  ]; src_w2 = 0.0, 1e-9, 0.0; rundir = '~/run/shear'
-#src_w1 = 3 * [ 1e-9 ]; src_w2 = 3 * [ 0.0 ];   rundir = '~/run/vol'
-src_period = 2e-6
+source = 'potency'
+timefunction = 'brune'
+sourc1 = 3 * [ 0.0  ]; source2 = 0.0, 1e-9, 0.0; rundir = '~/run/shear'
+#sourc1 = 3 * [ 1e-9 ]; source2 = 3 * [ 0.0 ];   rundir = '~/run/vol'
+period = 2e-6
 
 # material model
-_im = Image.open( 'data/granular1.png' )
-_im = numpy.array( _im.resize( (nn[0], nn[2]) ).convert( 'L' ), 'f' )
-_im = _im / _im.max()
-_vp = 1250.0 + 1000.0 * _im
-_vs = 0.0 + 500.0 * _im
-_vp.T.tofile( 'vp' )
-_vs.T.tofile( 'vs' )
+im_ = Image.open( 'data/granular1.png' )
+im_ = numpy.array( im_.resize( (nn[0], nn[2]) ).convert( 'L' ), 'f' )
+im_ = im_ / im_.max()
+vp_ = 1250.0 + 1000.0 * im_
+vs_ = 0.0 + 500.0 * im_
+vp_.T.tofile( 'vp' )
+vs_.T.tofile( 'vs' )
 fieldio = [
     ( '=',  'gam', [],    0.2 ),
     ( '=',  'rho', [], 1800.0 ),
@@ -54,7 +54,7 @@ fieldio += [
 ]
 
 # sensors
-for x, y, z, _name in [
+for x, y, z, name_ in [
     (  0.50*L[0], 0.0, 0.50*L[2], 'steel-1' ),
     (  0.25*L[0], 0.0, 0.50*L[2], 'steel-2' ),
     (  0.32*L[0], 0.0, 0.50*L[2], 'steel-3' ),
@@ -68,15 +68,15 @@ for x, y, z, _name in [
     k = int( y / dx[1] + 1.0000001 )
     l = int( z / dx[2] + 1.0000001 )
     fieldio += [
-        ( '=w', 'v1',  [j,k,l,()], _name+'v1'  ),
-        ( '=w', 'v2',  [j,k,l,()], _name+'v2'  ),
-        ( '=w', 'v3',  [j,k,l,()], _name+'v3'  ),
-        ( '=w', 'u1',  [j,k,l,()], _name+'u1'  ),
-        ( '=w', 'u2',  [j,k,l,()], _name+'u2'  ),
-        ( '=w', 'u3',  [j,k,l,()], _name+'u3'  ),
-        ( '=w', 'w11', [j,k,l,()], _name+'w11' ),
-        ( '=w', 'w22', [j,k,l,()], _name+'w22' ),
-        ( '=w', 'w33', [j,k,l,()], _name+'w33' ),
+        ( '=w', 'v1',  [j,k,l,()], name_+'v1'  ),
+        ( '=w', 'v2',  [j,k,l,()], name_+'v2'  ),
+        ( '=w', 'v3',  [j,k,l,()], name_+'v3'  ),
+        ( '=w', 'u1',  [j,k,l,()], name_+'u1'  ),
+        ( '=w', 'u2',  [j,k,l,()], name_+'u2'  ),
+        ( '=w', 'u3',  [j,k,l,()], name_+'u3'  ),
+        ( '=w', 'w11', [j,k,l,()], name_+'w11' ),
+        ( '=w', 'w22', [j,k,l,()], name_+'w22' ),
+        ( '=w', 'w33', [j,k,l,()], name_+'w33' ),
     ]
 
 sord.run( locals() )

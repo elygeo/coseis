@@ -1,6 +1,7 @@
 #!/bin/bash -e
 # This script installs statically-linked Python and Numpy
 # for Cray Compute Node Linux (CNS) on NICS Kraken.
+# Made possible by the instructions found at these sites:
 # https://wiki.fysik.dtu.dk/gpaw/install/Cray/louhi.html
 # http://yt.enzotools.org/wiki/CrayXT5Installation
 # http://code.google.com/p/pyprop/wiki/Installation_CrayXT4

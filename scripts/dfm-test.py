@@ -17,11 +17,11 @@ fixhypo = -1
 # source
 ihypo = 31, 31, 31
 ihypo = 31.5, 31.5, 31.5
-src_type = 'moment'
-src_w1 = 1e18, 1e18, 1e18
-src_w2 =  0.0,  0.0,  0.0
-src_function = 'brune'
-src_period = 0.1
+source = 'moment'
+source1 = 1e18, 1e18, 1e18
+source2 =  0.0,  0.0,  0.0
+timefunction = 'brune'
+period = 0.1
 
 # material
 hourglass = 1.0, 0.3
@@ -33,11 +33,11 @@ fieldio = [
 ]
 
 # output
-for _f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
+for f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
     fieldio += [
-        ( '=wx', _f, [], 'p1_'+_f, (   0., 3999., -1.) ),
-        ( '=wx', _f, [], 'p2_'+_f, (2999., 3999., -1.) ),
-        ( '=wx', _f, [], 'p3_'+_f, (3999., 3999., -1.) ),
+        ( '=wx', f, [], 'p1_'+f, (   0., 3999., -1.) ),
+        ( '=wx', f, [], 'p2_'+f, (2999., 3999., -1.) ),
+        ( '=wx', f, [], 'p3_'+f, (3999., 3999., -1.) ),
     ]
 
 sord.run( locals() )

@@ -6,11 +6,11 @@ import sys
 
 np3 = 1, 8, 1
 np3 = 1, 2, 1
-_vm = 'uhs'
-_vm = '1d'
-_vm = 'cvm'
-_topo = False
-T = 120.
+vm_ = 'uhs'
+vm_ = '1d'
+vm_ = 'cvm'
+topo_ = False
+T = 120.0
 L = 160000.0, 120000.0, -30000.0
 dx =  150.0,  150.0,  -150.0 ; npml = 10
 dx = 1500.0, 1500.0, -1500.0 ; npml = 5
@@ -25,10 +25,10 @@ nn = [
     int( L[1] / dx[1] + 1.00001 ),
     int( L[2] / dx[2] + 1.00001 ),
 ]
-src_n = 1
-src_type = 'moment'
+nsource = 1
+source = 'moment'
 infiles = [ '~/run/tmp/src_*' ]
-rundir = '~/run/chino-' + _vm
+rundir = '~/run/chino-' + vm_
 
 # mesh projection
 def projection( lon, lat, inverse=False ):
@@ -47,36 +47,36 @@ fieldio = [
 ]
 
 # topography mesh
-if _topo:
+if topo_:
     fieldio += [ ( '=r', 'x3',  [], '~/run/tmp/z3' ) ]
 
 # velocity model
-if _vm == 'uhs':
+if vm_ == 'uhs':
     fieldio += [
         ( '=',  'rho', [], 2500.0 ),
         ( '=',  'vp',  [], 6000.0 ),
         ( '=',  'vs',  [], 3500.0 ),
     ]
-elif _vm == 'cvm':
+elif vm_ == 'cvm':
     fieldio += [
         ( '=r', 'rho', [], '~/run/cvm4/rho' ),
         ( '=r', 'vp',  [], '~/run/cvm4/vp'  ),
         ( '=r', 'vs',  [], '~/run/cvm4/vs'  ),
     ]
-elif _vm == '1d':
-    _layers = [
+elif vm_ == '1d':
+    layers_ = [
         (  0.0, 5.5, 3.18, 2.4  ),
         (  5.5, 6.3, 3.64, 2.67 ),
         (  8.4, 6.3, 3.64, 2.67 ),
         ( 16.0, 6.7, 3.87, 2.8  ),
         ( 35.0, 7.8, 4.5,  3.0  ),
     ]
-    for _dep, _vp, _vs, _rho in _layers:
+    for dep_, vp_, vs_, rho_ in layers_:
         i = int( -_dep / dx[2] + 1.5 )
         fieldio += [
-            ( '=',  'rho', [(),(),(i,-1),()], 1000. * _rho ),
-            ( '=',  'vp',  [(),(),(i,-1),()], 1000. * _vp  ),
-            ( '=',  'vs',  [(),(),(i,-1),()], 1000. * _vs  ),
+            ( '=',  'rho', [(),(),(i,-1),()], 1000. * rho_ ),
+            ( '=',  'vp',  [(),(),(i,-1),()], 1000. * vp_  ),
+            ( '=',  'vs',  [(),(),(i,-1),()], 1000. * vs_  ),
         ]
 else:
     sys.exit( 'bad vm' )
@@ -84,26 +84,27 @@ else:
 # run SORD job
 if __name__ == '__main__':
     import numpy, sord
-    dtype = dict( names=( 'name', 'lat', 'lon' ), formats=( 'S8', 'f4', 'f4' ) )
-    sta = numpy.loadtxt( 'data/station-list', dtype, usecols=(0,1,2) )
+    dtype_ = dict( names=( 'name', 'lat', 'lon' ), formats=( 'S8', 'f4', 'f4' ) )
+    sta_ = numpy.loadtxt( 'data/station-list', dtype_, usecols=(0,1,2) )
     x, y = projection( sta['lon'], sta['lat'] )
-    _clip = 27020.0
-    prev = ''
+    clip_ = 27020.0
+    prev_ = ''
     n = 0
     for i in range( len( sta ) ):
         if n == 64:
             print 'Too many stations. Skipping the rest.'
             break
-        if sta[i]['name'] != prev and x[i] > _clip and x[i] < L[0]-_clip and y[i] > _clip and y[i] < L[1]-_clip:
+        if ( sta_[i]['name'] != prev_ and
+            x[i] > clip_ and x[i] < L[0]-clip_ and
+            y[i] > clip_ and y[i] < L[1]-clip_ ):
             n += 1
             j = int( x[i] / dx[0] + 1.5 )
             k = int( y[i] / dx[1] + 1.5 )
             for f in 'v1', 'v2', 'v3':
                 fieldio += [
-                    ( '=w', f, [j,k,1,()], sta[i]['name'] + f ),
+                    ( '=w', f, [j,k,1,()], sta_[i]['name'] + f ),
                 ]
-        prev = sta[i]['name']
-    del( dtype, sta, x, y, prev, n, i, j, k, f )
+        prev_ = sta_[i]['name']
 
     sord.run( locals() )
 

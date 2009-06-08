@@ -3,7 +3,6 @@
 Fault surface and topography conforming mesh
 """
 import os, sys, numpy, sim, sord, cvm
-reload( sim )
 
 writing = False
 writing = True
@@ -20,7 +19,7 @@ def plot( f, fig=None, title=None, cmap='jet' ):
 
 # CVM setup
 np = sim.np3[0] * sim.np3[1] * sim.np3[2]
-nn = ( sim.nn[0] - 1 ) * ( sim.nn[1] - 1 ) * ( sim.nn[2] - 1 )
+nn = (sim.nn[0] - 1) * (sim.nn[1] - 1) * (sim.nn[2] - 1)
 cfg = cvm.stage( dict( np=np, nn=nn ) )
 dir = cfg.rundir
 
@@ -35,11 +34,11 @@ ts.tofile( os.path.join( dir, 'ts' ) )
 dc.tofile( os.path.join( dir, 'dc' ) )
 
 # fault indices
-xf = sim._xf
-yf = sim._yf
-kf = sim._kf - 1
-lf = sim._lf[1] - 1
-jf = sim._jf[0] - 1, sim._jf[1]
+xf = sim.xf_
+yf = sim.yf_
+kf = sim.kf_ - 1
+lf = sim.lf_[1] - 1
+jf = sim.jf_[0] - 1, sim.jf_[1]
 n = jf[1] - jf[0], lf + 1
 if n != tn.shape:
     sys.exit( 'error in fault indices %s != %s' % (n, tn.shape) )
@@ -56,7 +55,7 @@ rf = numpy.r_[ 0.0, numpy.cumsum( df ) ]
 j  = [ jf[0] ] + [ jf[0] + 1 + int( r / sim.dx[0] ) for r in rf[1:-1] ] + [ jf[1] ]
 for i in range( len( j ) - 1 ):
     j1, j2 = j[i], j[i+1]
-    w = ( sim.dx[0] * ( numpy.arange( j1, j2 ) - jf[0] ) - rf[i] ) / ( rf[i+1] - rf[i] )
+    w = ( sim.dx[0] * ( numpy.arange( j1, j2 ) - jf[0] ) - rf[i] ) / (rf[i+1] - rf[i])
     xx[j1:j2,kf] = xf[i] + w * ( xf[i+1] - xf[i] )
     yy[j1:j2,kf] = yf[i] + w * ( yf[i+1] - yf[i] )
 
@@ -77,7 +76,7 @@ yy[:,kf+1:] = yy[:,kf:-1].copy()
 # blend fault to x-boundaries
 i1 = sim.npml
 i2 = jf[0]
-h = 1.0 / ( i2 - i1 )
+h = 1.0 / (i2 - i1)
 for i in xrange( i1+1, i2 ):
     xx[i,:] = xx[i1,:]*h*(i2-i) + xx[i2,:]*h*(i-i1)
     yy[i,:] = yy[i1,:]*h*(i2-i) + yy[i2,:]*h*(i-i1)
@@ -91,13 +90,13 @@ for i in xrange( i1+1, i2 ):
 # blend fault to y-boundaries
 i1 = sim.npml
 i2 = kf - 1
-h = 1.0 / ( i2 - i1 )
+h = 1.0 / (i2 - i1)
 for i in xrange( i1+1, i2 ):
     xx[:,i] = xx[:,i1]*h*(i2-i) + xx[:,i2]*h*(i-i1)
     yy[:,i] = yy[:,i1]*h*(i2-i) + yy[:,i2]*h*(i-i1)
 i1 = kf + 2
 i2 = y.size - sim.npml - 1
-h = 1.0 / ( i2 - i1 )
+h = 1.0 / (i2 - i1)
 for i in xrange( i1+1, i2 ):
     xx[:,i] = xx[:,i1]*h*(i2-i) + xx[:,i2]*h*(i-i1)
     yy[:,i] = yy[:,i1]*h*(i2-i) + yy[:,i2]*h*(i-i1)
@@ -148,7 +147,7 @@ for w in xx, yy, zz:
         w[:,-i]  = w[:,-i-1]
 
 # node elevation mesh
-if writing and sim._topo:
+if writing and sim.topo_:
     z0 = zz.mean()
     zz = zz - z0
     n = z.size - sim.npml - lf
@@ -172,7 +171,7 @@ if writing:
     for i in xrange( z.size ):
         xx.T.tofile( f1 )
         yy.T.tofile( f2 )
-    if sim._topo:
+    if sim.topo_:
         n = z.size - sim.npml - lf
         w = numpy.r_[ numpy.zeros(lf), 1.0/n*(0.5+numpy.arange(n)), numpy.ones(sim.npml) ]
         for i in xrange( z.size ):

@@ -4,7 +4,7 @@ Inspect SRF source
 """
 import numpy, pylab, sord, sim
 
-meta, data = sord.source.srfb_read( sim._srf )
+meta, data = sord.source.srfb_read( sim.srf_ )
 mu = 2670.0 * 3464.0 ** 2.0
 m0 = mu * meta.potency
 mw = ( numpy.log10( m0 ) - 9.05 ) / 1.5

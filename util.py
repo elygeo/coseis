@@ -10,43 +10,41 @@ class Object:
     """
     pass
 
-def dictify( o, ignore='(_.*)|(^.$)' ):
+def dictify( o, ignore='(_)|(^.$)' ):
     """
     Convert object attributes to dict.
 
     ignore: specifies a regular expression for ignoring names.
-    The default is names of length one or beginning with an underscore.
+    The default is names containing an underscore or of length one.
     """
     d = dict()
     grep = re.compile( ignore )
     for k in dir( o ):
         v = getattr( o, k )
-        if ( not grep.search( k ) and
-            type(v) not in [type(os), type(os.walk)] ):
+        if not grep.search(k) and type(v) not in [type(os), type(os.walk)]:
             d[k] = v
     return d
 
-def objectify( d, ignore='(_.*)|(^.$)' ):
+def objectify( d, ignore='(_)|(^.$)' ):
     """
     Convert dict to object attributes.
 
     ignore: specifies a regular expression for ignoring names.
-    The default is names of length one or beginning with an underscore.
+    The default is names containing an underscore or of length one.
     """
     o = Object()
     grep = re.compile( ignore )
     for k, v in d.iteritems():
-        if ( not grep.search( k ) and
-            type(v) not in [type(os), type(os.walk)] ):
+        if not grep.search(k) and type(v) not in [type(os), type(os.walk)]:
             setattr( o, k, v )
     return o
 
-def load( filename, d=None, ignore='(_.*)|(^.$)' ):
+def load( filename, d=None, ignore='(_)|(^.$)' ):
     """
     Load variables from a Python source file into a dict.
     
     ignore: specifies a regular expression for ignoring names.
-    The default is names of length one or beginning with an underscore.
+    The default is names containing an underscore or of length one.
     """
     if d is None:
         d = dict()
@@ -54,23 +52,22 @@ def load( filename, d=None, ignore='(_.*)|(^.$)' ):
     exec f in d
     grep = re.compile( ignore )
     for k in d.keys():
-        if ( grep.search( k ) or
-            type(d[k]) in [type(os), type(os.walk)] ):
+        if grep.search(k) or type(d[k]) in [type(os), type(os.walk)]:
             del( d[k] )
     return d
 
-def save( fd, d, expand=[], ignore='(_.*)|(^.$)' ):
+def save( fd, d, expand=[], ignore='(_)|(^.$)' ):
     """
     Write variables from a dict into a Python source file.
     
     ignore: specifies a regular expression for ignoring names.
-    The default is names of length one or beginning with an underscore.
+    The default is names containing an underscore or of length one.
     """
     if type( fd ) is not file:
         fd = open( os.path.expanduser( fd ), 'w' )
     grep = re.compile( ignore )
     for k in sorted( d ):
-        if ( not grep.search( k ) and
+        if ( not grep.search(k) and
             type(d[k]) not in [type(os), type(os.walk)] and
             k not in expand ):
             fd.write( '%s = %r\n' % ( k, d[k] ) )

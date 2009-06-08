@@ -8,9 +8,9 @@ import sord
 dx =  200.0; npml = 10
 dx = 20000.0; npml = 0
 dx = 4000.0; npml = 10
-_topo = False
-_topo = True
-_indir = '~/run/cvm4/'
+topo_ = False
+topo_ = True
+indir_ = '~/run/cvm4/'
 rundir = '~/run/saf'
 itstats = 10
 itio = 100
@@ -69,13 +69,13 @@ bc2 = 10, 10, 10
 
 # read mesh coordinates
 fieldio = [
-    ( '=R', 'x1', [(),(),1,()], _indir + 'x' ),
-    ( '=R', 'x2', [(),(),1,()], _indir + 'y' ),
+    ( '=R', 'x1', [(),(),1,()], indir_ + 'x' ),
+    ( '=R', 'x2', [(),(),1,()], indir_ + 'y' ),
 ]
 
 # read topography mesh
-if _topo:
-    fieldio += [ ( '=r', 'x3', [], _indir + 'z3' ) ]
+if topo_:
+    fieldio += [ ( '=r', 'x3', [], indir_ + 'z3' ) ]
 
 # material properties
 vp1 = 1500.0
@@ -84,9 +84,9 @@ gam2 = 0.8
 vdamp = 400.0
 hourglass = 1.0, 1.0
 fieldio += [
-    ( '=r', 'rho', [], _indir + 'rho' ),
-    ( '=r', 'vp',  [], _indir + 'vp'  ),
-    ( '=r', 'vs',  [], _indir + 'vs'  ),
+    ( '=r', 'rho', [], indir_ + 'rho' ),
+    ( '=r', 'vp',  [], indir_ + 'vp'  ),
+    ( '=r', 'vs',  [], indir_ + 'vs'  ),
 ]
 
 # surface output
@@ -103,7 +103,7 @@ fieldio += [
 faultnormal = 2
 slipvector = 1.0, 0.0, 0.0
 F = 199000.0, 0.0, -16000.0
-_segments = [
+segments_ = [
     -117.4982, 34.2895,
     -117.2382, 34.1547,
     -116.7748, 33.9878,
@@ -111,38 +111,38 @@ _segments = [
     -116.2463, 33.7882,
     -115.7119, 33.3501,
 ]
-_xf, _yf = projection( _segments[0::2], _segments[1::2] )
-_jf = int( 0.5 * ( _xf.min() + _xf.max() - F[0] ) / dx[0] + 1.5 )
-_kf = int( 0.5 * ( _yf.min() + _yf.max()         ) / dx[1] + 1.5 )
-_lf = int(                                 F[2]   / dx[2] + 1.00001 )
-_jf = _jf, _jf + int( F[0] / dx[0] + 0.01 )
-_lf =   1, _lf
-_nt2 = ( nt + 1 ) / 2
+xf_, yf_ = projection( segments_[0::2], segments_[1::2] )
+jf_ = int( 0.5 * ( xf_.min() + xf_.max() - F[0] ) / dx[0] + 1.5 )
+kf_ = int( 0.5 * ( yf_.min() + yf_.max()         ) / dx[1] + 1.5 )
+lf_ = int(                                 F[2]   / dx[2] + 1.00001 )
+jf_ = jf_, jf_ + int( F[0] / dx[0] + 0.01 )
+lf_ = 1, lf_
+n = (nt + 1) / 2
 fieldio += [
-    ( '=',  'tn',   [ (),_kf, (),()], -20e6           ),
-    ( '=',  'ts',   [ (),_kf, (),()],  0.0            ),
-    ( '=',  'dc',   [ (),_kf, (),()],  0.5            ),
-    ( '=',  'mud',  [ (),_kf, (),()],  0.5            ),
-    ( '=',  'mus',  [ (),_kf, (),()],  1e4            ),
-    ( '=',  'mus',  [_jf,_kf,_lf,()],  1.1            ),
-    ( '=r', 'tn',   [_jf,_kf,_lf,()], _indir + 'tn'   ),
-    ( '=r', 'ts',   [_jf,_kf,_lf,()], _indir + 'ts'   ),
-    ( '=r', 'dc',   [_jf,_kf,_lf,()], _indir + 'dc'   ),
-    ( '=w', 'tsm',  [_jf,_kf,_lf,(1,_nt2)],    'tsm'  ),
-    ( '=w', 'sv1',  [_jf,_kf,_lf,(1,_nt2)],    'sv1'  ),
-    ( '=w', 'sv2',  [_jf,_kf,_lf,(1,_nt2)],    'sv2'  ),
-    ( '=w', 'sv3',  [_jf,_kf,_lf,(1,_nt2)],    'sv3'  ),
+    ( '=',  'tn',   [(),  kf_, (),  ()], -20e6         ),
+    ( '=',  'ts',   [(),  kf_, (),  ()],  0.0          ),
+    ( '=',  'dc',   [(),  kf_, (),  ()],  0.5          ),
+    ( '=',  'mud',  [(),  kf_, (),  ()],  0.5          ),
+    ( '=',  'mus',  [(),  kf_, (),  ()],  1e4          ),
+    ( '=',  'mus',  [jf_, kf_, lf_, ()],  1.1          ),
+    ( '=r', 'tn',   [jf_, kf_, lf_, ()], indir_ + 'tn' ),
+    ( '=r', 'ts',   [jf_, kf_, lf_, ()], indir_ + 'ts' ),
+    ( '=r', 'dc',   [jf_, kf_, lf_, ()], indir_ + 'dc' ),
+    ( '=w', 'tsm',  [jf_, kf_, lf_, (1,n)],      'tsm' ),
+    ( '=w', 'sv1',  [jf_, kf_, lf_, (1,n)],      'sv1' ),
+    ( '=w', 'sv2',  [jf_, kf_, lf_, (1,n)],      'sv2' ),
+    ( '=w', 'sv3',  [jf_, kf_, lf_, (1,n)],      'sv3' ),
 ]
 
 # nucleation
-ihypo = _jf[1] - int( 9000 / dx[0] + 0.5 ), _kf, int( -5000 / dx[2] + 1.5 )
+ihypo = ( jf_[1] - int( 9000 / dx[0] + 0.5 ), kf_, int( -5000 / dx[2] + 1.5 )
 fixhypo = 1
 vrup = 2300.0
 trelax = 0.12
 rcrit = 3000.0
 
 # stations
-_stations = [
+stations_ = [
     -119.01778, 35.37333, 'Bakersfield',
     -119.69722, 34.42083, 'Santa-Barbara',
     -119.17611, 34.19750, 'Oxnard',
@@ -165,8 +165,8 @@ _stations = [
     -115.46730, 32.65498, 'Mexicali',
     -114.62361, 32.72528, 'Yuma',
 ]
-x, y = projection( _stations[0::3], _stations[1::3] )
-f = _stations[2::3]
+x, y = projection( stations_[0::3], stations_[1::3] )
+f = stations_[2::3]
 for i in range( len( f ) ):
     j = int( x[i] / dx[0] + 1.5 )
     k = int( y[i] / dx[1] + 1.5 )

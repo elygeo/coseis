@@ -49,7 +49,7 @@ for w in xx, yy, zz:
 
 # node elevation mesh
 dir = os.path.expanduser( '~/run/tmp' )
-if sim._topo:
+if sim.topo_:
     z0 = zz.mean()
     zz = zz - z0
     n = z.size - ntop - sim.npml
@@ -59,7 +59,7 @@ if sim._topo:
         ( z[i] + z0 + w[i] * zz ).T.tofile( f3 )
     f3.close()
 
-if sim._vm == 'cvm':
+if sim.vm_ == 'cvm':
 
     # CVM setup
     np = sim.np3[0] * sim.np3[1] * sim.np3[2]
@@ -80,7 +80,7 @@ if sim._vm == 'cvm':
     for i in xrange( z.size ):
         xx.T.tofile( f1 )
         yy.T.tofile( f2 )
-    if sim._topo:
+    if sim.topo_:
         n = z.size - ntop - sim.npml
         w = numpy.r_[ numpy.zeros(ntop), 1.0/n*(0.5+numpy.arange(n)), numpy.ones(sim.npml) ]
         for i in xrange( z.size ):

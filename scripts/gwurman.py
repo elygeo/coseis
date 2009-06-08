@@ -41,26 +41,26 @@ fieldio += [
 
 # output
 fieldio += [
-  ( '=w', 'x1',  [j,k,l,()], 'x1' ),
-  ( '=w', 'x2',  [j,k,l,()], 'x2' ),
-  ( '=w', 'su1', [j,k,l,-1], 'su1' ),
-  ( '=w', 'su2', [j,k,l,-1], 'su2' ),
-  ( '=w', 'sv1', [j,k,l,-1], 'sv1' ),
-  ( '=w', 'sv2', [j,k,l,-1], 'sv2' ),
-  ( '=w', 'su1', [j,k,l,250], 'su1-2s' ),
-  ( '=w', 'su2', [j,k,l,250], 'su2-2s' ),
-  ( '=w', 'ts1', [j,k,l,(1,-1,10)], 'ts1' ),
-  ( '=w', 'ts2', [j,k,l,(1,-1,10)], 'ts2' ),
+  ( '=w', 'x1',  [j, k, l, ()], 'x1' ),
+  ( '=w', 'x2',  [j, k, l, ()], 'x2' ),
+  ( '=w', 'su1', [j, k, l, -1], 'su1' ),
+  ( '=w', 'su2', [j, k, l, -1], 'su2' ),
+  ( '=w', 'sv1', [j, k, l, -1], 'sv1' ),
+  ( '=w', 'sv2', [j, k, l, -1], 'sv2' ),
+  ( '=w', 'su1', [j, k, l, 250], 'su1-2s' ),
+  ( '=w', 'su2', [j, k, l, 250], 'su2-2s' ),
+  ( '=w', 'ts1', [j, k, l, (1, -1, 10)], 'ts1' ),
+  ( '=w', 'ts2', [j, k, l, (1, -1, 10)], 'ts2' ),
 ]
 
-_home = os.path.expanduser('~')
+home_ = os.path.expanduser('~')
 i = 0
 while True:
     i += 1
-    f = _home + 'sord/stresses/initial.stressx.%02d' % i
+    f = home_ + 'sord/stresses/initial.stressx.%02d' % i
     print f
     if not os.path.isfile( f ): break
-    os.system( _home + 'sord/bin/asc2flt < %r > ts' % f )
-    rundir = _home + 'sord/run/%02d' % i
+    os.system( home_ + 'sord/bin/asc2flt < %r > ts' % f )
+    rundir = home_ + 'sord/run/%02d' % i
     sord.run( locals() )
 

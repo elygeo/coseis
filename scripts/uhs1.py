@@ -18,11 +18,11 @@ bc2 = 10, 10, 10
 fixhypo = -1
 ihypo = 0.5, 0.5,   40.5
 xhypo = 0.0, 0.0, 2000.0
-src_type = 'moment'
-src_function = 'brune'
-src_period = 0.1
-src_w1 = 0.0, 0.0, 0.0
-src_w2 = 0.0, 0.0, 1e18
+source = 'moment'
+timefunction = 'brune'
+period = 0.1
+source1 = 0.0, 0.0, 0.0
+source2 = 0.0, 0.0, 1e18
 
 # material
 hourglass = 1.0, 2.0

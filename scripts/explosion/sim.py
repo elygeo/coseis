@@ -17,12 +17,12 @@ nt =   int( T / dt + 1.0001 )
 fixhypo = -1 
 
 # material
-_rho, _vp, _vs = 2670.0, 6000.0, 3464.0
+rho_, vp_, vs_ = 2670.0, 6000.0, 3464.0
 fieldio = [
-    ( '=', 'rho', [], _rho ),
-    ( '=', 'vp',  [], _vp  ),
-    ( '=', 'vs',  [], _vs  ),
-    ( '=', 'gam', [],  0.0 ),
+    ( '=', 'rho', [], rho_ ),
+    ( '=', 'vp',  [], vp_  ),
+    ( '=', 'vs',  [], vs_  ),
+    ( '=', 'gam', [], 0.0  ),
 ]
 
 # output
@@ -37,51 +37,51 @@ for f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
     ]
 
 # source properties
-src_period = 0.1
+period = 0.1
 bc2 = 10, 10, 10
-src_w2 = 3 * [ 0.0 ]
+source2 = 3 * [ 0.0 ]
 
 # point source
 if 0:
-    src_n = 0
-    src_function = 'brune'
+    nsource = 0
+    timefunction = 'brune'
 
     rundir = 'tmp/1'
-    src_type = 'moment'
+    source = 'moment'
     bc1 = 2, 2, 2
     ihypo = 1.5, 1.5, 1.5
-    src_w1 = 3 * [ 3*_rho*_vp*_vp - 4*_rho*_vs*_vs ]
+    source1 = 3 * [ 3*rho_*vp_*vp_ - 4*rho_*vs_*vs_ ]
     sord.run( locals() )
 
     rundir = 'tmp/2'
-    src_type = 'potency'
+    source = 'potency'
     bc1 = 1, 1, 1
     ihypo = 1, 1, 1
-    src_w1 = 3 * [ 1.0 ]
+    source1 = 3 * [ 1.0 ]
     sord.run( locals() )
 
 # finite source
 if 1:
-    src_n = 1
-    src_function = 'none'
+    nsource = 1
+    timefunction = 'none'
     infiles = [ 'tmp/src_*' ]
-    _dt = dt * 0.9
-    t = _dt * numpy.arange( nt )
+    dt_ = dt * 0.9
+    t = dt_ * numpy.arange( nt )
     f = 1.0 - numpy.exp( -t / src_period ) / src_period * ( t + src_period )
 
     rundir = 'tmp/3'
-    src_type = 'moment'
+    source = 'moment'
     bc1 = 2, 2, 2
     ihypo = 1.5, 1.5, 1.5
-    src_w1 = 3 * [ 3*_rho*_vp*_vp - 4*_rho*_vs*_vs ]
-    source.write_src( f, nt, _dt, 0.0, ihypo, src_w1, src_w2, 'tmp' )
+    source1 = 3 * [ 3*rho_*vp_*vp_ - 4*rho_*vs_*vs_ ]
+    source.write_src( f, nt, dt_, 0.0, ihypo, source1, source2, 'tmp' )
     sord.run( locals() )
 
     rundir = 'tmp/4'
-    src_type = 'potency'
+    source = 'potency'
     bc1 = 1, 1, 1
     ihypo = 1, 1, 1
-    src_w1 = 3 * [ 1.0 ]
-    source.write_src( f, nt, _dt, 0.0, ihypo, src_w1, src_w2, 'tmp' )
+    source1 = 3 * [ 1.0 ]
+    source.write_src( f, nt, dt_, 0.0, ihypo, source1, source2, 'tmp' )
     sord.run( locals() )
 

@@ -9,7 +9,7 @@ so_dir = os.path.expanduser( '~/run/loh1/' )
 fk_dir = 'fk/'
 meta = sord.util.loadmeta( so_dir )
 sig = meta.dt * 22.5
-T = meta.src_period
+T = meta.period
 ts = 4 * sig
 
 # Setup plot

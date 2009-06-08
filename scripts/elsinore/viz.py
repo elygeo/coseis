@@ -23,7 +23,7 @@ topo = numpy.fromfile( 'data/socal-topo.f32', 'f' ).reshape( n[::-1] ).T
 
 # fault plane
 if 1:
-    meta, data = sord.source.srfb_read( sim._srf )
+    meta, data = sord.source.srfb_read( sim.srf_ )
     n = meta.nsource2[::-1]
     x = data.lon.reshape( n )
     y = data.lat.reshape( n )

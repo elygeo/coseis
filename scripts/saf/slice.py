@@ -6,7 +6,7 @@ slice = (), (), 1
 slice = (), sim.nn[1]/2, ()
 
 dir = sim.rundir
-dir = sim._indir
+dir = sim.indir_
 nn = sim.nn
 nc = [ n-1 for n in sim.nn ]
 vs = sord.util.ndread( os.path.join( dir, 'vs' ), nc, slice ).squeeze()

@@ -148,7 +148,7 @@ do i = 1, 3
 end do
 
 ! Add potency source to strain
-if ( src_type == 'potency' ) then
+if ( source == 'potency' ) then
     call finite_source
     call tensor_point_source
 end if
@@ -180,7 +180,7 @@ do i = 1, 3
 end do
 
 ! Add moment source to stress
-if ( src_type == 'moment' ) then
+if ( source == 'moment' ) then
     call finite_source
     call tensor_point_source
 end if
