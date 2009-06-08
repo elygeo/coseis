@@ -8,11 +8,11 @@ def configure( save=False, machine=None ):
     """Read configuration files"""
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    cfg = util.load( 'default-cfg.py' )
+    cfg = util.load( 'default-cfg.py', ignore='(^_)|(^.$)' )
     if not machine and os.path.isfile( 'machine' ):
         machine = open( 'machine', 'r' ).read().strip()
     if machine:
-        util.load( os.path.join( 'conf', machine, 'conf.py' ), cfg )
+        util.load( os.path.join( 'conf', machine, 'conf.py' ), cfg, ignore='(^_)|(^.$)' )
         cfg['machine'] = machine
         if save:
             open( 'machine', 'w' ).write( cfg['machine'] )

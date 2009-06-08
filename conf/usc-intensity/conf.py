@@ -5,7 +5,7 @@ USC Intensity
 8GB?
 """
 login = 'intensity.usc.edu'
-hosts = [ login ]
+hosts = login,
 maxnodes = 1
 maxcores = 8
 maxram = 7000

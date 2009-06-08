@@ -40,73 +40,73 @@ dtype = numpy.dtype( 'f' ).str
 
 # Serial Fortran compiler
 fortran_serial = None
-for _dir in os.environ['PATH'].split(':'):
+for d in os.environ['PATH'].split(':'):
     if fortran_serial:
         break
-    for _f in 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95':
-        if os.path.isfile( os.path.join( _dir, _f ) ):
-            fortran_serial = [_f]
+    for f in 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95':
+        if os.path.isfile( os.path.join( d, f ) ):
+            fortran_serial = f,
             break
 
 # MPI Fortran compiler
 fortran_mpi = None
-for _dir in os.environ['PATH'].split(':'):
+for d in os.environ['PATH'].split(':'):
     if fortran_mpi:
         break
-    for _f in 'mpxlf95_r', 'mpif90':
-        if os.path.isfile( os.path.join( _dir, _f ) ):
-            fortran_mpi = [ _f ]
+    for f in 'mpxlf95_r', 'mpif90':
+        if os.path.isfile( os.path.join( d, f ) ):
+            fortran_mpi = f,
             break
 
 # Fortran compiler flags
 if fortran_serial[0] == 'xlf95_r':
-    _ = ['-u', '-q64', '-qsuppress=cmpmsg', '-qlanglvl=2003pure', '-qsuffix=f=f90', '-o']
+    _ = '-u', '-q64', '-qsuppress=cmpmsg', '-qlanglvl=2003pure', '-qsuffix=f=f90', '-o'
     fortran_flags = {
-        'g': ['-C', '-qflttrap', '-qsigtrap', '-g'] + _,
-        't': ['-C', '-qflttrap', '-qsigtrap'] + _,
-        'p': ['-O', '-p'] + _,
-        'O': ['-O4'] + _,
+        'g': ('-C', '-qflttrap', '-qsigtrap', '-g') + _,
+        't': ('-C', '-qflttrap', '-qsigtrap') + _,
+        'p': ('-O', '-p') + _,
+        'O': ('-O4',) + _,
     }
 elif fortran_serial[0] == 'ifort':
-    _ = ['-u', '-std95', '-warn', '-o']
+    _ = '-u', '-std95', '-warn', '-o'
     fortran_flags = {
-        'g': ['-CB', '-traceback', '-g'] + _,
-        't': ['-CB', '-traceback'] + _,
-        'p': ['-O', '-pg'] + _,
-        'O': ['-O3'] + _,
+        'g': ('-CB', '-traceback', '-g') + _,
+        't': ('-CB', '-traceback') + _,
+        'p': ('-O', '-pg') + _,
+        'O': ('-O3',) + _,
     }
 elif fortran_serial[0] == 'pgf90':
-    _ = ['-Mdclchk', '-o']
+    _ = '-Mdclchk', '-o'
     fortran_flags = {
-        'g': ['-Ktrap=fp', '-Mbounds', '-g'] + _,
-        't': ['-Ktrap=fp', '-Mbounds'] + _,
-        'p': ['-O', '-Mprof=func'] + _,
-        'O': ['-fast'] + _,
+        'g': ('-Ktrap=fp', '-Mbounds', '-g') + _,
+        't': ('-Ktrap=fp', '-Mbounds') + _,
+        'p': ('-O', '-Mprof=func') + _,
+        'O': ('-fast',) + _,
     }
 elif fortran_serial[0] == 'pathf95':
-    _ = ['-o']
+    _ = '-o',
     fortran_flags = {
-        'g': ['-g'] + _,
-        't': [] + _,
-        'p': ['-O', '-p'] + _,
-        'O': ['-i8', '-O3', '-OPT:Ofast', '-fno-math-errno'] + _,
+        'g': ('-g',) + _,
+        't': _,
+        'p': ('-O', '-p') + _,
+        'O': ('-i8', '-O3', '-OPT:Ofast', '-fno-math-errno') + _,
     }
 elif fortran_serial[0] == 'gfortran':
-    _ = ['-fimplicit-none', '-Wall', '-std=f95', '-pedantic', '-o']
-    _ = ['-fimplicit-none', '-Wall', '-std=f95', '-o']
-    _ = ['-fimplicit-none', '-Wall', '-o']
+    _ = '-fimplicit-none', '-Wall', '-std=f95', '-pedantic', '-o'
+    _ = '-fimplicit-none', '-Wall', '-std=f95', '-o'
+    _ = '-fimplicit-none', '-Wall', '-o'
     fortran_flags = {
-        'g': ['-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g'] + _,
-        't': ['-fbounds-check', '-ffpe-trap=invalid,zero,overflow'] + _,
-        'p': ['-O', '-pg'] + _,
-        'O': ['-O3'] + _,
+        'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g') + _,
+        't': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow') + _,
+        'p': ('-O', '-pg') + _,
+        'O': ('-O3',) + _,
     }
 elif fortran_serial[0] == 'f95' and os.uname()[0] == 'SunOS':
-    _ = ['-u', '-o']
+    _ = '-u', '-o'
     fortran_flags = {
-        'g': ['-C', '-ftrap=common', '-w4', '-g'] + _,
-        't': ['-C', '-ftrap=common'] + _,
-        'p': ['-O', '-pg'] + _,
-        'O': ['-fast', '-fns'] + _,
+        'g': ('-C', '-ftrap=common', '-w4', '-g') + _,
+        't': ('-C', '-ftrap=common') + _,
+        'p': ('-O', '-pg') + _,
+        'O': ('-fast', '-fns') + _,
     }
 

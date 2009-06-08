@@ -21,7 +21,7 @@ if ( mpin /= 0 ) fh = file_null
 call rio1( fh, src_xi(:,1), 'r', 'in/src_xi1',     n, 0, mpin, verb )
 call rio1( fh, src_xi(:,2), 'r', 'in/src_xi2',     n, 0, mpin, verb )
 call rio1( fh, src_xi(:,3), 'r', 'in/src_xi3',     n, 0, mpin, verb )
-if ( src_type == 'force' ) then
+if ( source == 'force' ) then
     do i = 1, 3
         src_xi(:,i) = src_xi(:,i) - nnoff(i)
         if ( all( src_xi(:,i) < (-1.0 + i1node(i)) ) .or. &
@@ -31,7 +31,7 @@ if ( src_type == 'force' ) then
             return
         end if
     end do
-    allocate( src_nt(n), src_dt(n), src_t0(n), src_w1_(n,3) )
+    allocate( src_nt(n), src_dt(n), src_t0(n), src_w1(n,3) )
     call rio1( fh, src_w1(:,1), 'r', 'in/src_w11', n, 0, mpin, verb )
     call rio1( fh, src_w1(:,2), 'r', 'in/src_w12', n, 0, mpin, verb )
     call rio1( fh, src_w1(:,3), 'r', 'in/src_w13', n, 0, mpin, verb )
@@ -45,7 +45,7 @@ else
             return
         end if
     end do
-    allocate( src_nt(n), src_dt(n), src_t0(n), src_w1_(n,3), src_w2_(n,3) )
+    allocate( src_nt(n), src_dt(n), src_t0(n), src_w1(n,3), src_w2(n,3) )
     call rio1( fh, src_w1(:,1), 'r', 'in/src_w11', n, 0, mpin, verb )
     call rio1( fh, src_w1(:,2), 'r', 'in/src_w22', n, 0, mpin, verb )
     call rio1( fh, src_w1(:,3), 'r', 'in/src_w33', n, 0, mpin, verb )
@@ -53,10 +53,10 @@ else
     call rio1( fh, src_w2(:,2), 'r', 'in/src_w31', n, 0, mpin, verb )
     call rio1( fh, src_w2(:,3), 'r', 'in/src_w12', n, 0, mpin, verb )
 end if
-call rio1( fh, src_t0,       'r', 'in/src_t0',      n, 0, mpin, verb )
-call rio1( fh, src_dt,       'r', 'in/src_nt',      n, 0, mpin, verb )
+call rio1( fh, src_t0,       'r', 'in/src_t0',     n, 0, mpin, verb )
+call rio1( fh, src_dt,       'r', 'in/src_nt',     n, 0, mpin, verb )
 src_nt = int( src_dt + 0.5 )
-call rio1( fh, src_dt,       'r', 'in/src_dt',      n, 0, mpin, verb )
+call rio1( fh, src_dt,       'r', 'in/src_dt',     n, 0, mpin, verb )
 n = sum( src_nt )
 allocate( src_history(n) )
 call rio1( fh, src_history,  'r', 'in/src_history', n, 0, mpin, verb )
@@ -73,7 +73,7 @@ itoff = 0
 do isrc = 1, abs( nsource )
     i = floor( ( tm - src_t0(isrc) ) / src_dt(isrc) ) + 1
     xi = src_xi(isrc,:)
-    if ( src_type == 'force' ) then
+    if ( source == 'force' ) then
         i1 = max( i1node, int( xi )     )
         i2 = min( i2node, int( xi ) + 1 )
     else
@@ -89,7 +89,7 @@ do isrc = 1, abs( nsource )
         else
             h = ( 1.0 - h ) * src_history(itoff+i) + h * src_history(itoff+i+1)
         end if
-        if ( src_type == 'force' ) then
+        if ( source == 'force' ) then
             do l = i1(3), i2(3)
             do k = i1(2), i2(2)
             do j = i1(1), i2(1)

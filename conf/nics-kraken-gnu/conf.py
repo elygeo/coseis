@@ -24,7 +24,7 @@ collecting hardware performance data
 account: TG-MCA03S012
 """
 login = 'kraken-pwd.nics.utk.edu'
-hosts = [ 'kraken-pwd3' ]
+hosts = 'kraken-pwd3',
 queue = 'longsmall';  minnodes = 0;    maxnodes = 32;   maxtime = 60, 00
 queue = 'small';      minnodes = 0;    maxnodes = 64;   maxtime = 24, 00
 queue = 'medium';     minnodes = 65;   maxnodes = 1024; maxtime = 24, 00
@@ -37,13 +37,13 @@ maxram = 15000 # 4416 nodes #PBS -l feature=2gbpercore
 maxram =  7000 # 3840 nodes
 rate = 1e6 # just a guess
 mode = 'm'
-fortran_serial = [ 'ftn' ]
-fortran_mpi = [ 'ftn' ]
-_ = [ '-Mdclchk', '-o' ]
+fortran_serial = 'ftn',
+fortran_mpi = 'ftn',
+_ = '-Mdclchk', '-o'
 fortran_flags = {
-    'g': [ '-Ktrap=fp', '-Mbounds', '-Mchkptr', '-g' ] + _,
-    't': [ '-Ktrap=fp', '-Mbounds' ] + _,
-    'p': [ '-pg', '-Mprof=func' ] + _,
-    'O': [ '-fast' ] + _,
+    'g': ('-Ktrap=fp', '-Mbounds', '-Mchkptr', '-g') + _,
+    't': ('-Ktrap=fp', '-Mbounds') + _,
+    'p': ('-pg', '-Mprof=func') + _,
+    'O': ('-fast',) + _,
 }
 

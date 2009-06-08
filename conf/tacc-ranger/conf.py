@@ -20,7 +20,7 @@ module load mvapich2
 alias showme='showq -u'
 """
 login = 'tg-login.ranger.tacc.teragrid.org'
-hosts = [ 'login3.ranger.tacc.utexas.edu', 'login4.ranger.tacc.utexas.edu' ]
+hosts = 'login3.ranger.tacc.utexas.edu', 'login4.ranger.tacc.utexas.edu'
 queue = 'request';     maxnodes = 1024; maxtime = 24, 00
 queue = 'serial';      maxnodes = 1;    maxtime =  2, 00
 queue = 'development'; maxnodes = 16;   maxtime =  2, 00
@@ -31,13 +31,13 @@ maxcores = 16
 maxram = 30000
 rate = 2.1e6
 mode = 'm'
-fortran_serial = [ 'pgf95' ]
-fortran_mpi = [ 'mpif90' ]
-_ = [ '-Mdclchk', '-o' ]
+fortran_serial = 'pgf95',
+fortran_mpi = 'mpif90',
+_ = '-Mdclchk', '-o'
 fortran_flags = {
-    'g': [ '-Ktrap=fp', '-Mbounds', '-g' ] + _,
-    't': [ '-Ktrap=fp', '-Mbounds' ] + _,
-    'p': [ '-fast', '-tp', 'barcelona-64', '-Mprof=func' ] + _,
-    'O': [ '-fast', '-tp', 'barcelona-64' ] + _,
+    'g': ('-Ktrap=fp', '-Mbounds', '-g') + _,
+    't': ('-Ktrap=fp', '-Mbounds') + _,
+    'p': ('-fast', '-tp', 'barcelona-64', '-Mprof=func') + _,
+    'O': ('-fast', '-tp', 'barcelona-64') + _,
 }
 

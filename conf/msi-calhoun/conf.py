@@ -15,19 +15,19 @@ alias showme=qstat -u $USER'
 module load intel vmpi
 """
 login = 'calhoun.msi.umn.edu'
-hosts = [ 'login1' ]
+hosts = 'login1',
 maxnodes = 256
 maxcores = 8
 maxram = 15000
 maxtime = 24, 00
 mode = 'm'
-fortran_serial = [ 'ifort' ]
-fortran_mpi = [ 'mpif90' ]
-_ = [ '-u', '-std95', '-warn', '-o' ]
+fortran_serial = 'ifort',
+fortran_mpi = 'mpif90',
+_ = '-u', '-std95', '-warn', '-o',
 fortran_flags = {
-    'g': [ '-CB', '-traceback', '-g' ] + _,
-    't': [ '-CB', '-traceback' ] + _,
-    'p': [ '-O', '-pg' ] + _,
-    'O': [ '-O3' ] + _,
+    'g': ('-CB', '-traceback', '-g') + _,
+    't': ('-CB', '-traceback') + _,
+    'p': ('-O', '-pg') + _,
+    'O': ('-O3',) + _,
 }
 

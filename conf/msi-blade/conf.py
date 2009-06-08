@@ -18,19 +18,19 @@ ulimit -n 4096
 module load intelmpi
 """
 login = 'blade.msi.umn.edu'
-hosts = [ 'blade285', 'blade286', 'blade287', 'blade288' ]
+hosts = 'blade285', 'blade286', 'blade287', 'blade288'
 queue = 'devel'; maxnodes = 16;  maxtime = 1, 00
 queue = 'bc';    maxnodes = 268; maxtime = 48, 00
 maxcores = 4;
 maxram = 7000
 mode = 'm'
-fortran_mpi = [ 'mpif90' ]
-fortran_serial = [ 'ifort' ]
-_ = [ '-u', '-std95', '-warn', '-o' ]
+fortran_mpi = 'mpif90',
+fortran_serial = 'ifort',
+_ = '-u', '-std95', '-warn', '-o'
 fortran_flags = {
-    'g': [ '-CB', '-traceback', '-g' ] + _,
-    't': [ '-CB', '-traceback' ] + _,
-    'p': [ '-O', '-pg' ] + _,
-    'O': [ '-ipo', '-O3', '-no-prec-div' ] + _,
+    'g': ('-CB', '-traceback', '-g') + _,
+    't': ('-CB', '-traceback') + _,
+    'p': ('-O', '-pg') + _,
+    'O': ('-ipo', '-O3', '-no-prec-div') + _,
 }
 

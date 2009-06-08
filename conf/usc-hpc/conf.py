@@ -18,7 +18,7 @@ I/O to temporary space:
 alias showme='qstat -n | grep -E "Queue|-----|nbns"; qstat -n | grep scec'
 """
 login = 'hpc-login1.usc.edu'
-hosts = [ 'hpc-login1', 'hpc-login2' ]
+hosts = 'hpc-login1', 'hpc-login2'
 queue = 'largemem'; maxnodes = 5;   maxcores = 8; maxram = 63000; maxtime = 336, 00
 queue = 'large';    maxnodes = 256; maxcores = 8; maxram = 11000; maxtime = 24, 00
 queue = 'quick';    maxnodes = 4;   maxcores = 4; maxram = 3500;  maxtime = 1, 00

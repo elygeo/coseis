@@ -11,7 +11,7 @@ batch nodes:
   2GB (node8 has 1GB)
 """
 login = 'babieca.sdsu.edu'
-hosts = [ 'master' ]
+hosts = 'master',
 queue = 'workq'
 maxnodes = 32
 maxcores = 2

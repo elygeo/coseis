@@ -29,7 +29,7 @@ Useful commands:
   show_bf-all
 """
 login = 'tg-login2.sdsc.teragrid.org'
-hosts = [ 'tg-login1', 'tg-login2' ]
+hosts = 'tg-login1', 'tg-login2'
 queue = 'dque'
 maxnodes = 256
 maxcores = 2
@@ -37,13 +37,13 @@ maxram = 3000
 maxtime = 18,00
 rate = 2.2e6
 mode = 'm'
-fortran_serial = [ 'ifort' ]
-fortran_mpi = [ 'mpif90' ]
-_ = [ '-u', '-std95', '-warn', '-o' ]
+fortran_serial = 'ifort',
+fortran_mpi = 'mpif90',
+_ = '-u', '-std95', '-warn', '-o'
 fortran_flags = {
-    'g': [ '-CB', '-traceback', '-g' ] + _,
-    't': [ '-CB', '-traceback' ] + _,
-    'p': [ '-O', '-pg' ] + _,
-    'O': [ '-O3' ] + _,
+    'g': ('-CB', '-traceback', '-g') + _,
+    't': ('-CB', '-traceback') + _,
+    'p': ('-O', '-pg') + _,
+    'O': ('-O3',) + _,
 }
 
