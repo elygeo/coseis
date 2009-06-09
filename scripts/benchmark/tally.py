@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+Tally benchmarks
+"""
 import glob, numpy, sord
 
 normalize = 0

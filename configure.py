@@ -5,7 +5,9 @@ Read configuration files
 import os, sys, util
 
 def configure( save=False, machine=None ):
-    """Read configuration files"""
+    """
+    Read configuration files
+    """
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
     cfg = util.load( 'default-cfg.py', ignore='(^_)|(^.$)' )

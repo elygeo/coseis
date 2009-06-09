@@ -11,7 +11,9 @@ except:
     pass
 
 def stage( inputs ):
-    """Setup, and optionally launch, a SORD job."""
+    """
+    Setup, and optionally launch, a SORD job.
+    """
     import glob, time, getopt, shutil
     import setup
 
@@ -202,7 +204,9 @@ def stage( inputs ):
     return cfg
 
 def prepare_prm( prm, itbuff ):
-    """Prepare input paramers"""
+    """
+    Prepare input paramers
+    """
 
     # inervals
     prm.itio = max( 1, min(prm.itio, prm.nt) )
@@ -309,7 +313,9 @@ def prepare_prm( prm, itbuff ):
     return prm
 
 def launch( cfg ):
-    """Launch or queue job."""
+    """
+    Launch or queue job.
+    """
     cwd = os.getcwd()
     if cfg.run == 'q':
         os.chdir( cfg.rundir )
@@ -329,7 +335,9 @@ def launch( cfg ):
     return
 
 def run( inputs ):
-    """Combined stage and launch in one step."""
+    """
+    Combined stage and launch in one step.
+    """
     cfg = stage( inputs )
     launch( cfg )
     return cfg

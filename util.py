@@ -6,16 +6,13 @@ import os, sys, shutil, re
 
 class Object:
     """
-    Empty class for creating objects with addributes
+    Empty class for creating objects with addributes.
     """
     pass
 
 def dictify( o, ignore='(_)|(^.$)' ):
     """
     Convert object attributes to dict.
-
-    ignore: specifies a regular expression for ignoring names.
-    The default is names containing an underscore or of length one.
     """
     d = dict()
     grep = re.compile( ignore )
@@ -28,9 +25,6 @@ def dictify( o, ignore='(_)|(^.$)' ):
 def objectify( d, ignore='(_)|(^.$)' ):
     """
     Convert dict to object attributes.
-
-    ignore: specifies a regular expression for ignoring names.
-    The default is names containing an underscore or of length one.
     """
     o = Object()
     grep = re.compile( ignore )
@@ -42,9 +36,6 @@ def objectify( d, ignore='(_)|(^.$)' ):
 def load( filename, d=None, ignore='(_)|(^.$)' ):
     """
     Load variables from a Python source file into a dict.
-    
-    ignore: specifies a regular expression for ignoring names.
-    The default is names containing an underscore or of length one.
     """
     if d is None:
         d = dict()
@@ -59,9 +50,6 @@ def load( filename, d=None, ignore='(_)|(^.$)' ):
 def save( fd, d, expand=[], ignore='(_)|(^.$)' ):
     """
     Write variables from a dict into a Python source file.
-    
-    ignore: specifies a regular expression for ignoring names.
-    The default is names containing an underscore or of length one.
     """
     if type( fd ) is not file:
         fd = open( os.path.expanduser( fd ), 'w' )
@@ -95,7 +83,7 @@ def save( fd, d, expand=[], ignore='(_)|(^.$)' ):
 
 def loadmeta( dir='.' ):
     """
-    Load SORD metadata
+    Load SORD metadata.
     """
     dir = os.path.expanduser( dir )
     if os.path.isfile( os.path.join( dir, 'meta.py' ) ):
@@ -133,8 +121,6 @@ def loadmeta( dir='.' ):
 def expand_indices( indices, shape, base=1 ):
     """
     Fill in slice index notation.
-
-    FIXME: document
     """
     n = len( shape )
     off = int( base )
@@ -315,7 +301,7 @@ def uninstall_path():
 
 def install():
     """
-    Copy package to site-packages directory
+    Copy package to site-packages directory.
     """
     from distutils.sysconfig import get_python_lib
     src = os.path.dirname( os.path.realpath( __file__ ) )
@@ -335,7 +321,7 @@ def install():
 
 def uninstall():
     """
-    Remove package from site-packages directory
+    Remove package from site-packages directory.
     """
     from distutils.sysconfig import get_python_lib
     f   = os.path.basename( os.path.dirname( __file__ ) )

@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+Velocity plot
+"""
 import os, numpy, pylab, sord
 from sord.extras import viz
 

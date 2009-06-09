@@ -1,4 +1,7 @@
 #!/usr/bin/env ipython -pylab -wthread
+"""
+Mesh plot
+"""
 import numpy, pylab, sord, sim
 
 nn = sim.nn

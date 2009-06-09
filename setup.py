@@ -5,6 +5,9 @@ Build SORD binaries and documentation
 import os, sys, getopt, util, configure
 
 def build( mode=None, optimize=None ):
+    """
+    build SORD code.
+    """
     cfg = configure.configure()
     if not optimize:
         optimize = cfg['optimize']
@@ -84,7 +87,9 @@ img { border: 15px solid #fff; padding: 0px; }
 """
 
 def docs():
-    """Prepare documentation."""
+    """
+    Prepare documentation.
+    """
     out = '\nExamples\n'
     out += '--------\n'
     sources = [ 'loh1.py', 'tpv3.py', 'saf.py', ]
@@ -183,6 +188,7 @@ def docs():
     os.unlink( 'style.css' )
     return
 
+# Command line
 if __name__ == '__main__':
     opts, args = getopt.getopt( sys.argv[1:], 'smgtpO' )
     mode = None

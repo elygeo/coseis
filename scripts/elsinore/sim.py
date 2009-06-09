@@ -32,19 +32,12 @@ nn = [
     int( L[2] / dx[2] + 1.00001 ),
 ]
 source = 'potency'
-infiles = [ '~/run/tmp/src_*' ]
-rundir = '~/run/elsinore-' + vm_
+infiles = '~/run/tmp/src_*',
+rundir  = '~/run/elsinore-' + vm_
 
 # output
-i = 1, -1, d
-fieldio = [
-    ('=w', 'x1',  [i, i, 1, ()], 'x1'),
-    ('=w', 'x2',  [i, i, 1, ()], 'x2'),
-    ('=w', 'x3',  [i, i, 1, ()], 'x3'),
-    ('=w', 'v1',  [i, i, 1, ()], 'v1'),
-    ('=w', 'v2',  [i, i, 1, ()], 'v2'),
-    ('=w', 'v3',  [i, i, 1, ()], 'v3'),
-]
+for f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
+    fieldio += [ ( '=w', f, [(1, -1, d), (1, -1, d), 1, ()], f ) ]
 
 # topography mesh
 if topo_:
@@ -89,6 +82,6 @@ else:
 # run SORD job
 if __name__ == '__main__':
     data = sord.source.srfb_read( srf_ )[1]
-    nsource = sord.source.srf2potency( data, projection, (dx[0],dx[1],-dx[2]), '~/run/tmp' )
+    nsource = sord.source.srf2potency( data, projection, (dx[0], dx[1], -dx[2]), '~/run/tmp' )
     sord.run( locals() )
 

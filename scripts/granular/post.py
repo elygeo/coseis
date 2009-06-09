@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-setup WebSims repository
+Setup WebSims repository
 """
 import numpy, sord
 

@@ -1,4 +1,7 @@
 #!/usr/bin/env ipython -pylab -wthread
+"""
+Plot a slice through 3D VM.
+"""
 import os, numpy, pylab, sord, sim
 
 slice = sim.nn[0]/2, (), ()

@@ -8,7 +8,8 @@ ssh user@host.domain:dir
 import os
 
 def deploy( rsh, dest, command=[] ):
-    """Deploy code and execute remote commands
+    """
+    Deploy code and execute remote commands.
     """
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
@@ -26,7 +27,8 @@ def deploy( rsh, dest, command=[] ):
     return
 
 def publish( rsh, dest ):
-    """Publish web page and code repository
+    """
+    Publish web page and code repository.
     """
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
@@ -37,7 +39,8 @@ def publish( rsh, dest ):
     return
 
 def get( rsh, rdir, rfile ):
-    """Get remote files
+    """
+    Get remote files.
     """
     for f in rfile:
         src = rdir + '/' + f.rstrip('/')
@@ -46,6 +49,7 @@ def get( rsh, rdir, rfile ):
         os.system( rsync )
     return
 
+# Command line
 if __name__ == '__main__':
     import sys, getopt
     opts, args = getopt.getopt( sys.argv[1:], 'dpg' )
