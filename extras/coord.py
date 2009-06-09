@@ -242,6 +242,20 @@ def rotmat( x, origin=(0, 0, 0), upvector=(0, 0, 1) ):
     nv = nv / numpy.sqrt( (nv*nv).sum() )
     return numpy.array( [nr, nh, nv] )
 
+def compass( azimuth, radians=False ):
+    """
+    Get named direction from azimuth.
+    """
+    if radians:
+        azimuth *= 180.0 / numpy.pi
+    names = (
+        'N', 'NNE', 'NE', 'ENE',
+        'E', 'ESE', 'SE', 'SSE',
+        'S', 'SSW', 'SW', 'WSW',
+        'W', 'WNW', 'NW', 'NNW',
+    )
+    return names[ int( azimuth / 22.5 + 16.0 ) % 16 ]
+
 if __name__ == '__main__':
     import getopt
     opts, args = getopt.getopt( sys.argv[1:], 'i' )

@@ -5,12 +5,15 @@ Source utilities
 import os, sys, numpy, gzip, coord, sord
 
 class Object:
-    """Class for creating empty objects."""
+    """
+    Class for creating empty objects.
+    """
     pass
 
 def srf_read( filename, headeronly=False, mks=True ):
     """
     Reader for Graves Standard Rupture Format (SRF).
+
     SRF is documented at http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
     Returns separate meta and data objects.
     """
@@ -106,7 +109,13 @@ def srf_read( filename, headeronly=False, mks=True ):
         data.sv1   = 0.01   * data.sv1
         data.sv2   = 0.01   * data.sv2
         data.sv3   = 0.01   * data.sv3
-    meta.potency = ( data.area * numpy.sqrt( data.slip1**2 + data.slip2**2 + data.slip3**2 ) ).sum()
+    f = numpy.array( data.area, 'd' )
+    meta.potency = numpy.sqrt(
+        (f * data.slip1).sum()**2 +
+        (f * data.slip2).sum()**2 +
+        (f * data.slip3).sum()**2 )
+    meta.area = f.sum()
+    meta.slip = meta.potency / meta.area
     return meta, data
 
 def srfb_write( meta, data, path='' ):
