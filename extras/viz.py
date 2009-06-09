@@ -155,3 +155,54 @@ def colormap( name='w0', colorexp=1., output='mayavi', n=2001, nmod=0, modlim=0.
         cmap = numpy.array( [x1, r, g, b] )
     return cmap
 
+def digitize( img, xlim=(-1,1), ylim=(-1,1), color='r' ):
+    """
+    Digitize points on an image and rectify to a rectangular coordinate system.
+    """
+    import pylab, coord
+    pylab.clf()
+    pylab.axes( [0, 0, 1, 1] )
+    pylab.imshow( img )
+    pylab.axis( 'tight' )
+    pylab.axis( 'off' )
+    pylab.show()
+    pylab.hold( True )
+    xx, yy = [], []
+    for k in 0, 1:
+        for j in 0, 1:
+            print( 'Left-click %r' % [xlim[j], ylim[k]] )
+            x, y = pylab.ginput( 1, -1 )[0]
+            xx += [x]
+            yy += [y]
+            pylab.plot( [x], [y], '+' + color )
+            pylab.draw()
+
+    xx = xx[:2], xx[2:]
+    yy = yy[:2], yy[2:]
+    print("""
+    Left-click, space: add point
+    Right-click, delete: cancel last point
+    Enter: new line segment
+    Enter twice: finish
+    """)
+    x0 = 0.5 * ( xlim[1] + xlim[0] )
+    y0 = 0.5 * ( ylim[1] + ylim[0] )
+    dx = 0.5 * ( xlim[1] - xlim[0] )
+    dy = 0.5 * ( ylim[1] - ylim[0] )
+    xr, yr = [], []
+    while 1:
+        xy = pylab.ginput( -1, -1 ) 
+        if len( xy ) == 0:
+            break
+        x, y = zip( *xy )
+        pylab.plot( x, y, '+-'+color )
+        pylab.draw()
+        x, y = coord.ibilinear( xx, yy, x, y )
+        x = x0 + dx * x
+        y = y0 + dy * y
+        xr += [x]
+        yr += [y]
+        print x
+        print y
+    return xr, yr
+
