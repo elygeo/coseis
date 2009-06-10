@@ -168,8 +168,8 @@ def digitize( img, xlim=(-1,1), ylim=(-1,1), color='r' ):
     pylab.show()
     pylab.hold( True )
     xx, yy = [], []
-    for k in 0, 1:
-        for j in 0, 1:
+    for j in 0, 1:
+        for k in 0, 1:
             print( 'Left-click %r' % [xlim[j], ylim[k]] )
             x, y = pylab.ginput( 1, -1 )[0]
             xx += [x]
@@ -200,9 +200,9 @@ def digitize( img, xlim=(-1,1), ylim=(-1,1), color='r' ):
         x, y = coord.ibilinear( xx, yy, x, y )
         x = x0 + dx * x
         y = y0 + dy * y
-        xr += [x]
-        yr += [y]
         print x
         print y
+        xr += [x]
+        yr += [y]
     return xr, yr
 
