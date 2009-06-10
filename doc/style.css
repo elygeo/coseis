@@ -1,14 +1,85 @@
-body { margin: 0px; background-color: #fff; color: #000; font-family: 'Lucida Grande', Geneva, Verdana, sans-serif }
-div { margin: 0px; }
-div.line-block { margin: 20px; margin-top: 10px; margin-bottom: 10px; }
-div.footer { margin: 20px; margin-top: 40px; }
-p { margin: 20px; margin-top: 15px; margin-bottom: 15px; }
-dl { margin: 20px; margin-top: 35px; margin-bottom: 15px; }
-table { margin: 60px; margin-top: 0px; margin-bottom: 0px; border: none; }
-td { border: none; }
-pre { margin: 60px; margin-top: 15px; margin-bottom: 15px; }
-h1 { margin: 0px; padding: 20px; border-top: medium solid #700;; border-bottom: medium solid #300; font-weight: lighter; color: #fff; background-color: #600; text-shadow: #000 3px 3px 3px; }
-h2, h3 { padding: 5px; margin: 15px; margin-top: 20px; margin-bottom: 10px; background-color: #eee; }
-a { color: #00c; text-decoration: none; }
-a:hover, a:active { color: #66f; text-decoration: none; }
-img { border: 15px solid #fff; padding: 0px; }
+body {
+    margin: 0px;
+    color: #000;
+    background-color: #fff;
+    font-family: 'Lucida Grande', Geneva, Verdana, sans-serif;
+}
+
+div {
+    margin: 0px;
+}
+
+div.line-block {
+    margin: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+div.footer {
+    margin: 20px;
+    margin-top: 40px;
+}
+
+p {
+    margin: 20px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+dl {
+    margin: 20px;
+    margin-top: 35px;
+    margin-bottom: 15px;
+}
+
+table {
+    margin: 60px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border: none;
+}
+
+td {
+    border: none;
+}
+
+pre {
+    margin: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+h1 {
+    margin: 0px;
+    padding: 20px;
+    border-top: medium solid #700;
+    border-bottom: medium solid #300;
+    font-weight: lighter;
+    color: #fff;
+    background-color: #600;
+    text-shadow: #000 3px 3px 3px;
+}
+
+h2, h3 {
+    padding: 5px;
+    margin: 15px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    background-color: #eee;
+}
+
+a {
+    color: #00c;
+    text-decoration: none;
+}
+
+a:hover, a:active {
+    color: #66f;
+    text-decoration: none;
+}
+
+img {
+    border: 15px solid #fff;
+    padding: 0px;
+}
+

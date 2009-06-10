@@ -83,14 +83,16 @@ doi: 10.1111/j.1365-246X.2007.03633.x.
 
 .. class:: ref
 
-Ely, G. P., S. M. Day, and J.-B. Minster (2008),
+Ely, G. P., S. M. Day, and J.-B. Minster (2009),
 *A support-operator method for 3D rupture dynamics*,
-Geophys. J. Int., in revision.
-`[PDF] <http://earth.usc.edu/~gely/pub/ely-sord-20080426.pdf>`__
+Geophys. J. Int.,
+`177(3), 1140-1150 <http://www3.interscience.wiley.com/journal/122267744/abstract>`__,
+doi:10.1111/j.1365-246X.2009.04117.x.
+`[PDF] <http://earth.usc.edu/~gely/pub/ely-sord-20090504.pdf>`__
 
 .. class:: ref
 
-Ely, G. P., S. M. Day, and J.-B. Minster (2008),
+Ely, G. P., S. M. Day, and J.-B. Minster (2009),
 *Dynamic rupture models for the southern San Andreas fault*,
 BSSA, in revision.
 `[PDF] <http://earth.usc.edu/~gely/pub/ely-saf-20080426.pdf>`__
