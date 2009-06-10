@@ -5,7 +5,7 @@ Mesh and CVM extraction
 import os, numpy, cvm, sord, sim
 
 # parameters
-dir = 'tmp'
+path = 'tmp'
 ntop = int( -26000.0 / sim.dx[2] + 0.5 )
 
 # node locations
@@ -15,8 +15,8 @@ z = numpy.arange( sim.nn[2] ) * sim.dx[2]
 
 # node lon/lat mesh
 yy, xx = numpy.meshgrid( y, x )
-numpy.array( xx, 'f' ).T.tofile( os.path.join( dir, 'x' ) )
-numpy.array( yy, 'f' ).T.tofile( os.path.join( dir, 'y' ) )
+numpy.array( xx, 'f' ).T.tofile( os.path.join( path, 'x' ) )
+numpy.array( yy, 'f' ).T.tofile( os.path.join( path, 'y' ) )
 xx, yy = sim.projection( xx, yy, inverse=True )
 xx = numpy.array( xx, 'f' )
 yy = numpy.array( yy, 'f' )
@@ -31,7 +31,7 @@ lat0 =   30.5 + 0.5 * dll
 topo = numpy.fromfile( 'data/socal-topo.f32', 'f' ).reshape( n[::-1] ).T
 zz = sord.coord.interp2( lon0, lat0, dll, dll, topo, xx, yy )
 zz = numpy.array( zz, 'f' )
-zz.T.tofile( os.path.join( dir, 'z' ) )
+zz.T.tofile( os.path.join( path, 'z' ) )
 
 # fault trace
 meta, data = sord.source.srfb_read( sim._srf )
@@ -41,7 +41,7 @@ y = data.lat.reshape( n )[0]
 z = sord.coord.interp2( lon0, lat0, dll, dll, topo, x, y )
 x, y = sim.projection( x, y )
 xyz = 0.001 * numpy.array( [x,y,z] ).T
-numpy.savetxt( os.path.join( dir, 'trace.xyz' ), xyz, '%.3f' )
+numpy.savetxt( os.path.join( path, 'trace.xyz' ), xyz, '%.3f' )
 
 # map data
 for f in 'gmt-socal-coast', 'gmt-socal-borders', 'dlg-ca-roads':
@@ -49,7 +49,7 @@ for f in 'gmt-socal-coast', 'gmt-socal-borders', 'dlg-ca-roads':
     z = sord.coord.interp2( lon0, lat0, dll, dll, topo, x, y )
     x, y = sim.projection( x, y )
     xyz = 0.001 * numpy.array( [x,y,z] ).T
-    numpy.savetxt( os.path.join( dir, f + '.xyz' ), xyz, '%.3f' )
+    numpy.savetxt( os.path.join( path, f + '.xyz' ), xyz, '%.3f' )
 
 # PML regions are extruded
 for w in xx, yy, zz:
@@ -60,13 +60,13 @@ for w in xx, yy, zz:
         w[:,-i]  = w[:,-i-1]
 
 # node elevation mesh
-dir = os.path.expanduser( '~/run/tmp' )
+path = os.path.expanduser( '~/run/tmp' )
 if sim.topo_:
     z0 = zz.mean()
     zz = zz - z0
     n = z.size - ntop - sim.npml
     w = 1.0 - numpy.r_[ numpy.zeros(ntop), 1.0/(n-1)*numpy.arange(n), numpy.ones(sim.npml) ]
-    f3 = open( os.path.join( dir, 'z3' ), 'wb' )
+    f3 = open( os.path.join( path, 'z3' ), 'wb' )
     for i in xrange( z.size ):
         ( z[i] + z0 + w[i] * zz ).T.tofile( f3 )
     f3.close()
@@ -77,7 +77,7 @@ if sim.vm_ == 'cvm':
     np = sim.np3[0] * sim.np3[1] * sim.np3[2]
     nn = ( sim.nn[0] - 1 ) * ( sim.nn[1] - 1 ) * ( sim.nn[2] - 1 )
     cfg = cvm.stage( dict( np=np, nn=nn ) )
-    dir = cfg.rundir
+    path = cfg.rundir
 
     # cell center locations
     z  = -0.5 * ( z[:-1] + z[1:] )
@@ -86,9 +86,9 @@ if sim.vm_ == 'cvm':
     zz = 0.25 * ( zz[:-1,:-1] + zz[1:,:-1] + zz[:-1,1:] + zz[1:,1:] )
 
     # write lon/lat/depth mesh
-    f1 = open( os.path.join( dir, 'lon' ), 'wb' )
-    f2 = open( os.path.join( dir, 'lat' ), 'wb' )
-    f3 = open( os.path.join( dir, 'dep' ), 'wb' )
+    f1 = open( os.path.join( path, 'lon' ), 'wb' )
+    f2 = open( os.path.join( path, 'lat' ), 'wb' )
+    f3 = open( os.path.join( path, 'dep' ), 'wb' )
     for i in xrange( z.size ):
         xx.T.tofile( f1 )
         yy.T.tofile( f2 )

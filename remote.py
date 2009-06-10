@@ -3,7 +3,7 @@
 Remote operations: deploy, publish, get
 
 Reads 'destinations' file with entries like:
-ssh user@host.domain:dir
+ssh user@host.domain:path
 """
 import os
 
@@ -19,8 +19,8 @@ def deploy( rsh, dest, command=[] ):
     os.chdir( cwd )
     for cmd in command:
         host = dest.split(':')[0]
-        dir = dest.split(':')[1]
-        cmd = 'cd %s; %s' % ( dir, cmd )
+        path = dest.split(':')[1]
+        cmd = 'cd %s; %s' % ( path, cmd )
         cmd = '%s %s "bash --login -c %r"' % ( rsh, host, cmd )
         print( cmd )
         os.system( cmd )
@@ -38,12 +38,12 @@ def publish( rsh, dest ):
     os.chdir( cwd )
     return
 
-def get( rsh, rdir, rfile ):
+def get( rsh, path, files ):
     """
     Get remote files.
     """
-    for f in rfile:
-        src = rdir + '/' + f.rstrip('/')
+    for f in files:
+        src = path + '/' + f.rstrip('/')
         rsync = 'rsync -av --delete -e %r %r .' % ( rsh, src )
         print( rsync )
         os.system( rsync )
@@ -79,11 +79,11 @@ if __name__ == '__main__':
     for i in list:
         a = destinations[i-1].strip('#').split(' ')
         rsh = ' '.join( a[:-1] )
-        rdir = a[-1]
+        path = a[-1]
         if   mode == '-d':
-            deploy( rsh, rdir, args )
+            deploy( rsh, path, args )
         elif mode == '-p':
-            publish( rsh, rdir )
+            publish( rsh, path )
         elif mode == '-g':
-            get( rsh, rdir, args )
+            get( rsh, path, args )
 

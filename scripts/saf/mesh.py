@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Fault surface and topography conforming mesh
+Fault surface and topography conforming mesh.
 """
 import os, sys, numpy, sim, sord, cvm
 
@@ -10,7 +10,7 @@ writing = True
 # plotting function
 def plot( f, fig=None, title=None, cmap='jet' ):
     import pylab
-    pylab.figure(fig)
+    pylab.figure( fig )
     pylab.clf()
     pylab.imshow( f.T, interpolation='nearest', origin='lower', cmap=pylab.get_cmap(cmap) )
     pylab.colorbar( orientation='horizontal' )
@@ -21,7 +21,7 @@ def plot( f, fig=None, title=None, cmap='jet' ):
 np = sim.np3[0] * sim.np3[1] * sim.np3[2]
 nn = (sim.nn[0] - 1) * (sim.nn[1] - 1) * (sim.nn[2] - 1)
 cfg = cvm.stage( dict( np=np, nn=nn ) )
-dir = cfg.rundir
+path = cfg.rundir
 
 # fault parameters
 n = 1991, 161
@@ -29,9 +29,9 @@ d = int( sim.dx[0] / 100.0 + 0.0001 )
 tn = -numpy.fromfile( 'data/ts22-tn', 'f' ).reshape( n[::-1] )[::d,::d].T
 ts =  numpy.fromfile( 'data/ts22-ts', 'f' ).reshape( n[::-1] )[::d,::d].T
 dc =  numpy.fromfile( 'data/ts22-dc', 'f' ).reshape( n[::-1] )[::d,::d].T
-tn.tofile( os.path.join( dir, 'tn' ) )
-ts.tofile( os.path.join( dir, 'ts' ) )
-dc.tofile( os.path.join( dir, 'dc' ) )
+tn.tofile( os.path.join( path, 'tn' ) )
+ts.tofile( os.path.join( path, 'ts' ) )
+dc.tofile( os.path.join( path, 'dc' ) )
 
 # fault indices
 xf = sim.xf_
@@ -105,11 +105,11 @@ for i in xrange( i1+1, i2 ):
 xx = numpy.array( xx, 'f' )
 yy = numpy.array( yy, 'f' )
 if writing:
-    xx.T.tofile( os.path.join( dir, 'x' ) )
-    yy.T.tofile( os.path.join( dir, 'y' ) )
+    xx.T.tofile( os.path.join( path, 'x' ) )
+    yy.T.tofile( os.path.join( path, 'y' ) )
 else:
     import pylab
-    pylab.figure(1)
+    pylab.figure( 1 )
     pylab.clf()
     pylab.plot( xx, yy, 'k-' )
     pylab.hold( True )
@@ -134,7 +134,7 @@ topo = numpy.fromfile( 'data/socal-topo.f32', 'f' ).reshape( n[::-1] ).T
 zz = sord.coord.interp2( lon0, lat0, dll, dll, topo, xx, yy )
 zz = numpy.array( zz, 'f' )
 if writing:
-    zz.T.tofile( os.path.join( dir, 'z' ) )
+    zz.T.tofile( os.path.join( path, 'z' ) )
 else:
     plot( zz, 4, 'node z' )
 
@@ -152,7 +152,7 @@ if writing and sim.topo_:
     zz = zz - z0
     n = z.size - sim.npml - lf
     w = 1.0 - numpy.r_[ numpy.zeros(lf), 1.0/(n-1)*numpy.arange(n), numpy.ones(sim.npml) ]
-    f3 = open( os.path.join( dir, 'z3' ), 'wb' )
+    f3 = open( os.path.join( path, 'z3' ), 'wb' )
     for i in xrange( z.size ):
         ( z[i] + z0 + w[i] * zz ).T.tofile( f3 )
     f3.close()
@@ -165,9 +165,9 @@ zz = 0.25 * ( zz[:-1,:-1] + zz[1:,:-1] + zz[:-1,1:] + zz[1:,1:] )
 
 # write 3D lon/lat/depth cell mesh
 if writing:
-    f1 = open( os.path.join( dir, 'lon' ), 'wb' )
-    f2 = open( os.path.join( dir, 'lat' ), 'wb' )
-    f3 = open( os.path.join( dir, 'dep' ), 'wb' )
+    f1 = open( os.path.join( path, 'lon' ), 'wb' )
+    f2 = open( os.path.join( path, 'lat' ), 'wb' )
+    f3 = open( os.path.join( path, 'dep' ), 'wb' )
     for i in xrange( z.size ):
         xx.T.tofile( f1 )
         yy.T.tofile( f2 )

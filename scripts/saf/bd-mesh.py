@@ -25,16 +25,16 @@ print 'nn = %r' % list( nn )
 
 # CVM setup
 cfg = cvm.stage( dict( np=np, nn=n, name=version ) )
-dir = cfg.rundir
-numpy.savetxt( os.path.join( dir, 'nn' ), nn, '%i' )
-numpy.savetxt( os.path.join( dir, 'dz' ), [dz] )
+path = cfg.rundir
+numpy.savetxt( os.path.join( path, 'nn' ), nn, '%i' )
+numpy.savetxt( os.path.join( path, 'dz' ), [dz] )
 
 # Lon/lat
 xx, yy = coord.ll2xy( xx, yy, inverse=True )
 xx = numpy.array( xx, 'f4' )
 yy = numpy.array( yy, 'f4' )
-f1 = open( os.path.join( dir, 'lon' ), 'wb' )
-f2 = open( os.path.join( dir, 'lat' ), 'wb' )
+f1 = open( os.path.join( path, 'lon' ), 'wb' )
+f2 = open( os.path.join( path, 'lat' ), 'wb' )
 for i in xrange( z.size ):
     xx.tofile( f1 )
     yy.tofile( f2 )
@@ -42,7 +42,7 @@ f1.close()
 f2.close()
 
 # Depth
-f3 = open( os.path.join( dir, 'dep'), 'wb' )
+f3 = open( os.path.join( path, 'dep'), 'wb' )
 for i in xrange( z.size ):
     xx.fill( z[i] )
     xx.tofile( f3 )

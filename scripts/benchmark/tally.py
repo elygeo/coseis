@@ -8,10 +8,10 @@ normalize = 0
 np = []
 tt = []
 
-for dir in glob.glob( '[0-9]*' ):
-    prm = sord.util.load( dir + '/parameters.py' )
+for d in glob.glob( '[0-9]*' ):
+    prm = sord.util.load( d + '/parameters.py' )
     np += [ numpy.product( prm['np3'] ) ]
-    t = numpy.fromfile( dir + '/prof/8step', 'f' )
+    t = numpy.fromfile( d + '/prof/8step', 'f' )
     tt += [ numpy.sum( t[1:-1] ) / (len(t)-2) ]
 
 if normalize:
@@ -23,7 +23,7 @@ for n, t in zip( np, tt ):
 
 if 0:
     import pylab
-    cfg = sord.util.load( dir + '/conf.py' )
+    cfg = sord.util.load( d + '/conf.py' )
     n = len( tt )
     pylab.plot( tt, 'ko-' )
     pylab.hold( True )

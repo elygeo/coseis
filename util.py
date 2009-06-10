@@ -81,28 +81,28 @@ def save( fd, d, expand=[], ignore='(_)|(^.$)' ):
     fd.close()
     return
 
-def loadmeta( dir='.' ):
+def loadmeta( path='.' ):
     """
     Load SORD metadata.
     """
-    dir = os.path.expanduser( dir )
-    if os.path.isfile( os.path.join( dir, 'meta.py' ) ):
-        meta = load( os.path.join( dir, 'meta.py' ) )
+    path = os.path.expanduser( path )
+    if os.path.isfile( os.path.join( path, 'meta.py' ) ):
+        meta = load( os.path.join( path, 'meta.py' ) )
     else:
         meta = dict()
-        if os.path.isfile( os.path.join( dir, 'conf.py' ) ):
-            cfg = load( os.path.join( dir, 'conf.py' ) )
+        if os.path.isfile( os.path.join( path, 'conf.py' ) ):
+            cfg = load( os.path.join( path, 'conf.py' ) )
             for k in 'name', 'rundate', 'rundir', 'user', 'os_', 'dtype':
                 meta[k] = cfg[k]
-        if os.path.isfile( os.path.join( dir, 'parameters.py' ) ):
-            load( os.path.join( dir, 'parameters.py' ), meta )
+        if os.path.isfile( os.path.join( path, 'parameters.py' ) ):
+            load( os.path.join( path, 'parameters.py' ), meta )
             out = dict()
             for f in meta['fieldio']:
-                ii, field, filename = f[6:9]
+                ii, filename = f[6], f[8]
                 if filename is not '-':
                     out[filename] = ii
-            if os.path.isfile( os.path.join( dir, 'locations.py' ) ):
-                locs = load( os.path.join( dir, 'locations.py' ) )
+            if os.path.isfile( os.path.join( path, 'locations.py' ) ):
+                locs = load( os.path.join( path, 'locations.py' ) )
                 mm = meta['nn'] + ( meta['nt'], )
                 for ii, filename in locs['locations']:
                     if filename is not '-':
@@ -115,7 +115,7 @@ def loadmeta( dir='.' ):
                 nn = [ n for n in nn if n > 1 ]
                 shape[k] = nn
             meta['shape'] = shape
-        save( os.path.join( dir, 'meta.py' ), meta, [ 'shape', 'indices', 'fieldio' ] )
+        save( os.path.join( path, 'meta.py' ), meta, [ 'shape', 'indices', 'fieldio' ] )
     return objectify( meta )
 
 def expand_indices( indices, shape, base=1 ):
@@ -273,13 +273,13 @@ def install_path():
     Install path file in site-packages directory.
     """
     from distutils.sysconfig import get_python_lib
-    f   = os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
-    pth = os.path.join( get_python_lib(), f )
-    dir = os.path.dirname( os.path.dirname( os.path.realpath( __file__ ) ) )
-    print( 'Installing ' + pth )
-    print( 'for path ' + dir )
+    path = os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
+    path = os.path.join( get_python_lib(), path )
+    src = os.path.dirname( os.path.dirname( os.path.realpath( __file__ ) ) )
+    print( 'Installing ' + path )
+    print( 'for path ' + src )
     try:
-        open( pth, 'w' ).write( dir )
+        open( path, 'w' ).write( src )
     except:
         sys.exit( 'You do not have write permission for this Python install' )
     return
@@ -289,12 +289,12 @@ def uninstall_path():
     Remove path file from site-packages directory
     """
     from distutils.sysconfig import get_python_lib
-    f = os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
-    pth = os.path.join( get_python_lib(), f )
-    print( 'Removing ' + pth )
-    if os.path.isfile( pth ):
+    path = os.path.basename( os.path.dirname( __file__ ) ) + '.pth'
+    path = os.path.join( get_python_lib(), path )
+    print( 'Removing ' + path )
+    if os.path.isfile( path ):
         try:
-            os.unlink( pth )
+            os.unlink( path )
         except:
             sys.exit( 'You do not have write permission for this Python install' )
     return
@@ -305,10 +305,10 @@ def install():
     """
     from distutils.sysconfig import get_python_lib
     src = os.path.dirname( os.path.realpath( __file__ ) )
-    f   = os.path.basename( os.path.dirname( __file__ ) )
-    dst = os.path.join( get_python_lib(), f )
+    dst = os.path.basename( os.path.dirname( __file__ ) )
+    dst = os.path.join( get_python_lib(), dst )
     print( 'Installing ' + dst )
-    print( 'From ' + src )
+    print( 'from ' + src )
     try:
         shutil.rmtree( dst )
     except:
@@ -324,12 +324,12 @@ def uninstall():
     Remove package from site-packages directory.
     """
     from distutils.sysconfig import get_python_lib
-    f   = os.path.basename( os.path.dirname( __file__ ) )
-    dst = os.path.join( get_python_lib(), f )
-    print( 'Removing ' + dst )
-    if os.path.isdir( dst ):
+    path = os.path.basename( os.path.dirname( __file__ ) )
+    path = os.path.join( get_python_lib(), path )
+    print( 'Removing ' + path )
+    if os.path.isdir( path ):
         try:
-            shutil.rmtree( dst )
+            shutil.rmtree( path )
         except:
             sys.exit( 'You do not have write permission for this Python install' )
     return

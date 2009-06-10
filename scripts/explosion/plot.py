@@ -9,8 +9,8 @@ runs = 'tmp/1', 'tmp/3', 'tmp/2', 'tmp/4'
 stations = 'p5',
 stations = 'p1', 'p2', 'p3', 'p4', 'p5', 'p6'
 
-for rundir in runs:
-    prm = sord.util.loadmeta( rundir )
+for path in runs:
+    prm = sord.util.loadmeta( path )
     T = prm.period
     cutoff = 0
     cutoff = vp / ( 20 * prm.dx[0] )
@@ -19,12 +19,12 @@ for rundir in runs:
     else:
         m0 = prm.source1[0] * ( 3*rho*vp*vp - 4*rho*vs*vs )
     for sta in stations:
-        x1 = numpy.fromfile( rundir + '/out/' + sta + '_x1', 'f' )
-        x2 = numpy.fromfile( rundir + '/out/' + sta + '_x2', 'f' )
-        x3 = numpy.fromfile( rundir + '/out/' + sta + '_x3', 'f' )
-        v1 = numpy.fromfile( rundir + '/out/' + sta + '_v1', 'f' )
-        v2 = numpy.fromfile( rundir + '/out/' + sta + '_v2', 'f' )
-        v3 = numpy.fromfile( rundir + '/out/' + sta + '_v3', 'f' )
+        x1 = numpy.fromfile( path + '/out/' + sta + '_x1', 'f' )
+        x2 = numpy.fromfile( path + '/out/' + sta + '_x2', 'f' )
+        x3 = numpy.fromfile( path + '/out/' + sta + '_x3', 'f' )
+        v1 = numpy.fromfile( path + '/out/' + sta + '_v1', 'f' )
+        v2 = numpy.fromfile( path + '/out/' + sta + '_v2', 'f' )
+        v3 = numpy.fromfile( path + '/out/' + sta + '_v3', 'f' )
         x  = numpy.array([ x1, x2, x3 ]).squeeze()
         r  = numpy.sqrt( (x*x).sum() )
         t  = prm.dt * numpy.arange( prm.nt ) + 0.5 * prm.dt
@@ -39,7 +39,7 @@ for rundir in runs:
         pylab.clf()
         pylab.plot( t - prm.dt, v.T, '-', ta - prm.dt, va, 'k--' )
         pylab.xlim( 0.5, prm.dt * prm.nt )
-        pylab.title( rundir + '   %s, %s, %s' % tuple(x) )
+        pylab.title( path + '   %s, %s, %s' % tuple(x) )
         pylab.draw()
         pylab.ginput(1,0,False)
 

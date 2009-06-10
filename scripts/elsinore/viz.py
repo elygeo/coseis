@@ -5,10 +5,10 @@ Visualization
 import os, numpy, sord, sim
 from enthought.mayavi import mlab
 
-dir = '~/run/elsinore-uhs'
-dir = '~/run/elsinore-1d'
-dir = '~/run/elsinore-cvm'
-dir = os.path.expanduser( dir )
+path = '~/run/elsinore-uhs'
+path = '~/run/elsinore-1d'
+path = '~/run/elsinore-cvm'
+path = os.path.expanduser( path )
 extent = 0., 600000., 0., 300000., -80000., 4000.
 
 mlab.figure( name='Elsinore', size=(960,540) )
@@ -43,11 +43,11 @@ for f in 'gmt-socal-coast.ll', 'gmt-socal-borders.ll', 'ucla-fault-db-mod.ll':
 # surface
 caxis = -0.2, 0.2
 exag = 10000. / caxis[1]
-meta = sord.util.loadmeta( dir )
+meta = sord.util.loadmeta( path )
 n = meta.shape['x1']
-x = numpy.fromfile( dir + '/out/x1', 'f' ).reshape( n[::-1] ).T
-y = numpy.fromfile( dir + '/out/x2', 'f' ).reshape( n[::-1] ).T
-z = numpy.fromfile( dir + '/out/x3', 'f' ).reshape( n[::-1] ).T
+x = numpy.fromfile( path + '/out/x1', 'f' ).reshape( n[::-1] ).T
+y = numpy.fromfile( path + '/out/x2', 'f' ).reshape( n[::-1] ).T
+z = numpy.fromfile( path + '/out/x3', 'f' ).reshape( n[::-1] ).T
 hsurf = mlab.mesh( x, y, z, scalars=z/2000*caxis[1], opacity=1.0 )
 
 slm = hsurf.module_manager.scalar_lut_manager
@@ -75,9 +75,9 @@ ii = range( 100, 600, 5 )
 ii = []
 for i in ii:
     print i
-    v1 = sord.util.ndread( dir + '/out/v1', n, [(),(),i] ).squeeze()
-    v2 = sord.util.ndread( dir + '/out/v2', n, [(),(),i] ).squeeze()
-    v3 = sord.util.ndread( dir + '/out/v3', n, [(),(),i] ).squeeze()
+    v1 = sord.util.ndread( path + '/out/v1', n, [(),(),i] ).squeeze()
+    v2 = sord.util.ndread( path + '/out/v2', n, [(),(),i] ).squeeze()
+    v3 = sord.util.ndread( path + '/out/v3', n, [(),(),i] ).squeeze()
     v  = numpy.array([ v1, v2, v3 ])
     if comp:
         v = v[comp]
