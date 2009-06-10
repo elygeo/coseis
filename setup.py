@@ -6,7 +6,7 @@ import os, sys, getopt, util, configure
 
 def build( mode=None, optimize=None ):
     """
-    build SORD code.
+    Build SORD code.
     """
     cfg = configure.configure()
     if not optimize:
@@ -75,14 +75,12 @@ def docs():
     """
     import re
     from docutils.core import publish_string
-    out = '\nExamples\n'
-    out += '--------\n'
+    out = '\nExamples\n--------\n'
     sources = [ 'loh1.py', 'tpv3.py', 'saf.py', ]
     for f in sources:
         doc = open( 'examples/' + f, 'r' ).readlines()[2].strip()
         out += '| `%s <examples/%s>`_: %s\n' % ( f, f, doc )
-    out += '\nFortran source code\n'
-    out += '-------------------\n'
+    out += '\nFortran source code\n-------------------\n'
     sources = [
         'sord.f90',
         'globals.f90',
@@ -113,8 +111,7 @@ def docs():
     for f in sources:
         doc = open( 'src/' + f, 'r' ).readlines()[0].strip().replace( '! ', '' )
         out += '| `%s <src/%s>`_: %s\n' % ( f, f, doc )
-    out += '\nPython wrappers\n'
-    out += '---------------\n'
+    out += '\nPython wrappers\n---------------\n'
     sources = [
         '__init__.py',
         'default-cfg.py',
@@ -139,9 +136,9 @@ def docs():
         toc_backlinks = None,
         cloak_email_addresses = True,
         initial_header_level = 3,
-        stylesheet_path = 'style.css',
+        stylesheet_path = 'doc/style.css',
     )
-    rst = open( 'readme.rst', 'r' ).read()
+    rst = open( 'doc/readme.rst', 'r' ).read()
     html = publish_string( rst, writer_name='html4css1', settings_overrides=settings )
     html = re.sub( '<col.*>\n', '', html )
     html = re.sub( '</colgroup>', '', html )

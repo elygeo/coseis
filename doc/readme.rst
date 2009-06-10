@@ -2,7 +2,7 @@
 SORD
 ====
 
-.. image:: ely-saf-surface.jpg
+.. image:: doc/ely-saf-surface.jpg
    :align: right
    :target: http://earth.usc.edu/~gely/ely-saf-surface.mov
 
