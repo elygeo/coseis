@@ -69,33 +69,17 @@ def build( mode=None, optimize=None ):
     os.chdir( cwd )
     return
 
-css = """\
-body { margin: 0px; background-color: #fff; color: #000; font-family: 'Lucida Grande', Geneva, Verdana, sans-serif }
-div { margin: 0px; }
-div.line-block { margin: 20px; margin-top: 10px; margin-bottom: 10px; }
-div.footer { margin: 20px; margin-top: 40px; }
-p { margin: 20px; margin-top: 15px; margin-bottom: 15px; }
-dl { margin: 20px; margin-top: 35px; margin-bottom: 15px; }
-table { margin: 60px; margin-top: 0px; margin-bottom: 0px; border: none; }
-td { border: none; }
-pre { margin: 60px; margin-top: 15px; margin-bottom: 15px; }
-h1 { margin: 0px; padding: 20px; border-top: medium solid #700;; border-bottom: medium solid #300; font-weight: lighter; color: #fff; background-color: #600; text-shadow: #000 3px 3px 3px; }
-h2, h3 { padding: 5px; margin: 15px; margin-top: 20px; margin-bottom: 10px; background-color: #eee; }
-a { color: #00c; text-decoration: none; }
-a:hover, a:active { color: #66f; text-decoration: none; }
-img { border: 15px solid #fff; padding: 0px; }
-"""
-
 def docs():
     """
     Prepare documentation.
     """
+    import re
+    from docutils.core import publish_string
     out = '\nExamples\n'
     out += '--------\n'
     sources = [ 'loh1.py', 'tpv3.py', 'saf.py', ]
     for f in sources:
         doc = open( 'examples/' + f, 'r' ).readlines()[2].strip()
-        #out += '| %s: `%s <examples/%s>`_\n' % ( doc, f, f )
         out += '| `%s <examples/%s>`_: %s\n' % ( f, f, doc )
     out += '\nFortran source code\n'
     out += '-------------------\n'
@@ -128,7 +112,6 @@ def docs():
     ]
     for f in sources:
         doc = open( 'src/' + f, 'r' ).readlines()[0].strip().replace( '! ', '' )
-        #out += '| %s: `%s <src/%s>`_\n' % ( doc, f, f )
         out += '| `%s <src/%s>`_: %s\n' % ( f, f, doc )
     out += '\nPython wrappers\n'
     out += '---------------\n'
@@ -144,48 +127,27 @@ def docs():
     ]
     for f in sources:
         doc = open( f, 'r' ).readlines()[2].strip()
-        #out += '| %s: `%s <%s>`_\n' % ( doc, f, f )
         out += '| `%s <%s>`_: %s\n' % ( f, f, doc )
     download = ( "Latest source code version `%s <sord.tgz>`_"
              % open( 'version', 'r' ).read().strip() )
     open( 'download.txt', 'w' ).write( download )
     open( 'sources.txt', 'w' ).write( out )
-    open( 'style.css', 'w' ).write( css )
-    if 1:
-        import re
-        from docutils.core import publish_string
-        # see import docutils.core.OptionParser, docutils.writers.html4css1
-        settings = dict(
-            #title = "WebSims",
-            #template = 'template.txt',
-            datestamp = '%Y-%m-%d',
-            generator = True,
-            source_link = True, # does not work
-            strict = True,
-            toc_backlinks = None,
-            cloak_email_addresses = True,
-            initial_header_level = 3,
-            stylesheet_path = 'style.css',
-        )
-        rst = open( 'readme.txt', 'r' ).read()
-        html = publish_string( rst, writer_name='html4css1', settings_overrides=settings )
-        html = re.sub( '<col.*>\n', '', html )
-        html = re.sub( '</colgroup>', '', html )
-        open( 'index.html', 'w' ).write( html )
-    else:
-        os.system(' \
-            rst2html.py \
-            -g -d -s \
-            --strict \
-            --cloak-email-addresses \
-            --initial-header-level=3 \
-            --no-toc-backlinks \
-            --stylesheet-path=style.css \
-            readme.txt | sed "/\<col/d" > index.html \
-        ')
+    settings = dict(
+        datestamp = '%Y-%m-%d',
+        generator = True,
+        strict = True,
+        toc_backlinks = None,
+        cloak_email_addresses = True,
+        initial_header_level = 3,
+        stylesheet_path = 'style.css',
+    )
+    rst = open( 'readme.rst', 'r' ).read()
+    html = publish_string( rst, writer_name='html4css1', settings_overrides=settings )
+    html = re.sub( '<col.*>\n', '', html )
+    html = re.sub( '</colgroup>', '', html )
+    open( 'index.html', 'w' ).write( html )
     os.unlink( 'download.txt' )
     os.unlink( 'sources.txt' )
-    os.unlink( 'style.css' )
     return
 
 # Command line

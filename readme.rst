@@ -57,8 +57,9 @@ Author
 ------
 
 | `Geoffrey Ely <http://earth.usc.edu/~gely>`_
-| `Southern California Earthquake Center <http://www.scec.org/>`_
+| `Department of Earth Sciences <http://www.usc.edu/dept/earth/>`_
 | `University of Southern California <http://www.usc.edu/>`_
+| http://earth.usc.edu/~gely/
 | gely@usc.edu
 
 
