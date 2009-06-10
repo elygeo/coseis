@@ -165,6 +165,7 @@ def digitize( img, xlim=(-1,1), ylim=(-1,1), color='r' ):
     pylab.imshow( img )
     pylab.axis( 'tight' )
     pylab.axis( 'off' )
+    pylab.draw()
     pylab.show()
     pylab.hold( True )
     xx, yy = [], []
