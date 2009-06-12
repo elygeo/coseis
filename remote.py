@@ -49,50 +49,47 @@ def get( rsh, path, files ):
         os.system( rsync )
     return
 
-def destination_list():
+def pick_destinations( message=None, default=None, path=None, prompt='Destinations' ):
     """
-    Get user input to pick destinations from list.
+    Read destinations file and input user picks.
     """
-    path = os.path.join( os.path.dirname( __file__ ), 'destinations' )
+    if message:
+        print( '\n%s\n' % message.strip() )
+    if not path:
+        path = os.path.join( os.path.dirname( __file__ ), 'destinations' )
     destinations = [ a.strip() for a in open( path, 'r' ).readlines() ]
-    list = []
+    picks = []
     for i, a in enumerate( destinations ):
         print( '%3s  %s' % ( i+1, a.strip('#') ) )
         if a[0] is not '#':
-            list += [ i+1 ]
-    if   mode == '-p':
-        list = [ len( destinations ) ]
-    elif mode == '-g':
-        list = []
-    input = raw_input( '\nDestinations %r: ' % list ).split(',')
+            picks += [ i+1 ]
+    if default is not None:
+        picks = default
+    input = raw_input( '\n%s %r: ' % (prompt, picks) ).split( ',' )
     if input[0]:
-        list = [ int(i) for i in input ]
+        picks = [ int(i) for i in input ]
     out = []
-    for i in list:
-        a = destinations[i-1].strip('#').split(' ')
-        rsh = ' '.join( a[:-1] )
-        path = a[-1]
-        out += [ (rsh, path) ]
+    for i in picks:
+        if i < 0:
+            i = len( destinations ) + i + 1
+        a = destinations[i-1].strip( '#' ).split( ' ' )
+        out += [ ( ' '.join( a[:-1] ), a[-1] ) ]
     return out
 
 # Command line
 if __name__ == '__main__':
     import sys, getopt
     opts, args = getopt.getopt( sys.argv[1:], 'dpg' )
-    mode = '-d'
+    opt = '-d'
     if opts:
-        mode = opts[-1][0]
-    if mode == '-d':
-        print( deploy.__doc__ )
-    elif mode == '-p':
-        print( publish.__doc__ )
-    elif mode == '-g':
-        print( get.__doc__ )
-    for rsh, path in destination_list()
-        if mode == '-d':
+        opt = opts[-1][0]
+    if opt == '-d':
+        for rsh, path in pick_destinations( deploy.__doc__ ):
             deploy( rsh, path, args )
-        elif mode == '-p':
+    elif opt == '-p':
+        for rsh, path in pick_destinations( publish.__doc__, [-2,-1] ):
             publish( rsh, path )
-        elif mode == '-g':
+    elif opt == '-g':
+        for rsh, path in pick_destinations( get.__doc__, [] ):
             get( rsh, path, args )
 
