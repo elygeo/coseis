@@ -288,8 +288,8 @@ def prepare_prm( prm, itbuff ):
             base = 1.5
         else:
             base = 1
-        ii = ( util.expand_indices( ii[:3], prm.nn, base )
-             + util.expand_indices( ii[3:], [prm.nt], 1 ) )
+        ii = ( util.expand_indices( prm.nn, ii[:3], base )
+             + util.expand_indices( [prm.nt], ii[3:], 1 ) )
         if field in fieldnames.initial:
             ii[3] = 0, 0, 1
         if field in fieldnames.fault:

@@ -47,7 +47,7 @@ def load( path, d=None, ignore='(_)|(^.$)' ):
             del( d[k] )
     return d
 
-def save( fd, d, expand=[], ignore='(_)|(^.$)' ):
+def save( fd, d, expand=None, ignore='(_)|(^.$)' ):
     """
     Write variables from a dict into a Python source file.
     """
@@ -59,6 +59,8 @@ def save( fd, d, expand=[], ignore='(_)|(^.$)' ):
             type(d[k]) not in [type(os), type(os.walk)] and
             k not in expand ):
             fd.write( '%s = %r\n' % ( k, d[k] ) )
+    if expand is None:
+        expand = []
     for k in expand:
         if k in d:
             if type( d[k] ) == tuple:
@@ -106,7 +108,7 @@ def loadmeta( path='.' ):
                 mm = meta['nn'] + ( meta['nt'], )
                 for ii, filename in locs['locations']:
                     if filename is not '-':
-                        ii = expand_indices( ii, mm )
+                        ii = expand_indices( mm, ii )
                         out[filename] = ii
             meta['indices'] = out
             shape = dict()
@@ -115,16 +117,20 @@ def loadmeta( path='.' ):
                 nn = [ n for n in nn if n > 1 ]
                 shape[k] = nn
             meta['shape'] = shape
-        save( os.path.join( path, 'meta.py' ), meta, [ 'shape', 'indices', 'fieldio' ] )
+        path = os.path.join( path, 'meta.py' )
+        expand = 'shape', 'indices', 'fieldio'
+        save( path, meta, expand )
     return objectify( meta )
 
-def expand_indices( indices, shape, base=1 ):
+def expand_indices( shape, indices=None, base=1 ):
     """
     Fill in slice index notation.
     """
     n = len( shape )
     off = int( base )
-    if len( indices ) == 0:
+    if indices is None:
+        indices = n * [()]
+    elif len( indices ) == 0:
         indices = n * [()]
     elif len( indices ) != n:
         sys.exit( 'error in indices: %r' % indices )
@@ -133,17 +139,17 @@ def expand_indices( indices, shape, base=1 ):
     for i in range( n ):
         if type( indices[i] ) not in ( tuple, list ):
             if indices[i] == 0 and base > 0:
-                indices[i] = [ base, shape[i] - base + off, 1 ]
+                indices[i] = [base, shape[i] - base + off, 1]
             else:
-                indices[i] = [ indices[i], indices[i] + 1 - off, 1 ]
+                indices[i] = [indices[i], indices[i] + 1 - off, 1]
         elif len( indices[i] ) == 0:
-            indices[i] = [ base, shape[i] - base + off, 1 ]
+            indices[i] = [base, shape[i] - base + off, 1]
         elif len( indices[i] ) == 2:
-            indices[i] = list( indices[i] ) + [ 1 ]
+            indices[i] = list( indices[i] ) + [1]
         elif len( indices[i] ) == 3:
             indices[i] = list( indices[i] )
         elif len( indices[i] ) == 1:
-            indices[i] = [ indices[i][0], indices[i][0] + 1 - off, 1 ]
+            indices[i] = [indices[i][0], indices[i][0] + 1 - off, 1]
         else:
             sys.exit( 'error in indices: %r' % indices )
         if  indices[i][0] < 0:
@@ -153,7 +159,7 @@ def expand_indices( indices, shape, base=1 ):
         indices[i] = tuple([ int( j ) for j in indices[i] ])
     return indices
 
-def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
+def ndread( fd, shape=None, indices=None, dtype='f', order='F' ):
     """
     Read n-dimentional array subsection from binary file.
 
@@ -174,11 +180,11 @@ def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
     if not shape:
         return numpy.fromfile( fd, dtype )
     elif type( shape ) == int:
-        mm = [ shape ]
+        mm = [shape]
     else:
         mm = list( shape )
     ndim = len( mm )
-    ii = expand_indices( indices, mm )
+    ii = expand_indices( mm, indices )
     if order is 'F':
         ii = ii[::-1]
         mm = mm[::-1]
@@ -189,9 +195,10 @@ def ndread( fd, shape=None, indices=[], dtype='f', order='F' ):
     nn0 = nn[:]
     for i in range( ndim-1, 0, -1 ):
         if mm[i] == nn[i]:
-            i0[i-1] = i0[i-1] * mm[i]; del i0[i]
-            nn[i-1] = nn[i-1] * mm[i]; del nn[i]
-            mm[i-1] = mm[i-1] * mm[i]; del mm[i]
+            i0[i-1] = i0[i-1] * mm[i]
+            nn[i-1] = nn[i-1] * mm[i]
+            mm[i-1] = mm[i-1] * mm[i]
+            del i0[i], nn[i], mm[i]
     if len( mm ) > 4:
         sys.exit( 'To many slice dimentions' )
     i0 = ( [0, 0, 0] + i0 )[-4:]
@@ -228,9 +235,9 @@ def progress( i, n, t ):
         print('')
     return
 
-def compile( compiler, object_, source ):
+def make( compiler, object_, source ):
     """
-    An alternative to Make that uses state files.
+    An alternative Make that uses state files.
     """
     import glob, difflib
     object_ = os.path.expanduser( object_ )
@@ -243,7 +250,7 @@ def compile( compiler, object_, source ):
     state = [ ' '.join( command ) + '\n' ]
     for f in source:
         state += open( f, 'r' ).readlines()
-    compile = True
+    compile_ = True
     if os.path.isfile( object_ ):
         try:
             oldstate = open( statefile ).readlines()
@@ -251,13 +258,13 @@ def compile( compiler, object_, source ):
             if diff:
                 print( diff )
             else:
-                compile = False
-        except:
+                compile_ = False
+        except( IOError ):
             pass
-    if compile:
+    if compile_:
         try:
             os.unlink( statefile )
-        except:
+        except( OSError ):
             pass
         print( ' '.join( command ) )
         if os.system( ' '.join( command ) ):
@@ -266,7 +273,7 @@ def compile( compiler, object_, source ):
         for pat in '*.o', '*.mod', '*.ipo', '*.il', '*.stb':
             for f in glob.glob( pat ):
                 os.unlink( f )
-    return compile
+    return compile_
 
 def install_path():
     """
@@ -280,8 +287,8 @@ def install_path():
     print( 'for path ' + src )
     try:
         open( path, 'w' ).write( src )
-    except:
-        sys.exit( 'You do not have write permission for this Python install' )
+    except( IOError ):
+        sys.exit( 'No write permission for Python directory' )
     return
 
 def uninstall_path():
@@ -295,8 +302,8 @@ def uninstall_path():
     if os.path.isfile( path ):
         try:
             os.unlink( path )
-        except:
-            sys.exit( 'You do not have write permission for this Python install' )
+        except( IOError ):
+            sys.exit( 'No write permission for Python directory' )
     return
 
 def install():
@@ -311,12 +318,12 @@ def install():
     print( 'from ' + src )
     try:
         shutil.rmtree( dst )
-    except:
+    except( OSError ):
         pass
     try:
         shutil.copytree( src, dst )
-    except:
-        sys.exit( 'You do not have write permission for this Python install' )
+    except( OSError ):
+        sys.exit( 'No write permission for Python directory' )
     return
 
 def uninstall():
@@ -330,7 +337,7 @@ def uninstall():
     if os.path.isdir( path ):
         try:
             shutil.rmtree( path )
-        except:
-            sys.exit( 'You do not have write permission for this Python install' )
+        except( OSError ):
+            sys.exit( 'No write permission for Python directory' )
     return
 
