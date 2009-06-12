@@ -23,6 +23,9 @@ def pick_destinations( message=None, default=None, path=None, prompt='Destinatio
             picks += [ i+1 ]
     if default is not None:
         picks = default
+        for i in range( len( picks ) ):
+            if picks[i] < 0:
+                picks[i] += len( destinations ) + 1
     input_ = raw_input( '\n%s %r: ' % (prompt, picks) ).split( ',' )
     if input_[0]:
         picks = [ int(i) for i in input_ ]

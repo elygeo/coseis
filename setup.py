@@ -138,7 +138,7 @@ def docs():
         initial_header_level = 3,
         stylesheet_path = 'doc/style.css',
     )
-    rst = open( 'doc/readme.rst', 'r' ).read()
+    rst = open( 'readme.rst', 'r' ).read()
     html = publish_string( rst, writer_name='html4css1', settings_overrides=settings )
     html = re.sub( '<col.*>\n', '', html )
     html = re.sub( '</colgroup>', '', html )
