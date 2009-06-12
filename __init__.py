@@ -22,7 +22,8 @@ def stage( inputs ):
     print( 'SORD setup' )
 
     # Read defaults
-    prm = util.load( os.path.join( os.path.dirname( __file__ ), 'default-prm.py' ) )
+    prm = os.path.join( os.path.dirname( __file__ ), 'default-prm.py' )
+    prm = util.load( prm )
     if 'machine' in inputs:
         cfg = configure.configure( machine=inputs['machine'] )
     else:
@@ -143,9 +144,9 @@ def stage( inputs ):
     print( 'Run directory: ' + cfg.rundir )
     try:
         os.makedirs( cfg.rundir )
-    except:
-        sys.exit( 'Directory %r already exists or cannot be created. Use --force to overwrite.' % cfg.rundir )
-    for f in ( 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint' ):
+    except( OSError ):
+        sys.exit( '%r exists or cannot be created. Use --force to overwrite.' % cfg.rundir )
+    for f in 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint':
         os.mkdir( os.path.join( cfg.rundir, f ) )
 
     # Link input files
