@@ -33,14 +33,14 @@ def objectify( d, ignore='(_)|(^.$)' ):
             setattr( o, k, v )
     return o
 
-def load( filename, d=None, ignore='(_)|(^.$)' ):
+def load( path, d=None, ignore='(_)|(^.$)' ):
     """
     Load variables from a Python source file into a dict.
     """
     if d is None:
         d = dict()
-    f = open( os.path.expanduser( filename ) )
-    exec f in d
+    path = open( os.path.expanduser( path ) )
+    exec path in d
     grep = re.compile( ignore )
     for k in d.keys():
         if grep.search(k) or type(d[k]) in [type(os), type(os.walk)]:
