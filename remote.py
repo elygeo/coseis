@@ -15,7 +15,7 @@ def pick_destinations( message=None, default=None, path=None, prompt='Destinatio
         print( '\n%s\n' % message.strip() )
     if not path:
         path = os.path.join( os.path.dirname( __file__ ), 'destinations' )
-    destinations = [ a.strip() for a in open( path, 'r' ).readlines() ]
+    destinations = [ a.strip() for a in open( path ).readlines() ]
     picks = []
     for i, a in enumerate( destinations ):
         print( '%3s  %s' % ( i+1, a.strip('#') ) )

@@ -78,7 +78,7 @@ def docs():
     out = '\nExamples\n--------\n'
     sources = [ 'loh1.py', 'tpv3.py', 'saf.py', ]
     for f in sources:
-        doc = open( 'examples/' + f, 'r' ).readlines()[2].strip()
+        doc = open( 'examples/' + f ).readlines()[2].strip()
         out += '| `%s <examples/%s>`_: %s\n' % ( f, f, doc )
     out += '\nFortran source code\n-------------------\n'
     sources = [
@@ -109,7 +109,7 @@ def docs():
         'util.f90',
     ]
     for f in sources:
-        doc = open( 'src/' + f, 'r' ).readlines()[0].strip().replace( '! ', '' )
+        doc = open( 'src/' + f ).readlines()[0].strip().replace( '! ', '' )
         out += '| `%s <src/%s>`_: %s\n' % ( f, f, doc )
     out += '\nPython wrappers\n---------------\n'
     sources = [
@@ -123,10 +123,10 @@ def docs():
         'util.py',
     ]
     for f in sources:
-        doc = open( f, 'r' ).readlines()[2].strip()
+        doc = open( f ).readlines()[2].strip()
         out += '| `%s <%s>`_: %s\n' % ( f, f, doc )
     download = ( "Latest source code version `%s <sord.tgz>`_"
-             % open( 'version', 'r' ).read().strip() )
+             % open( 'version' ).read().strip() )
     open( 'download.txt', 'w' ).write( download )
     open( 'sources.txt', 'w' ).write( out )
     settings = dict(
@@ -138,7 +138,7 @@ def docs():
         initial_header_level = 3,
         stylesheet_path = 'doc/style.css',
     )
-    rst = open( 'readme.rst', 'r' ).read()
+    rst = open( 'readme.rst' ).read()
     html = publish_string( rst, writer_name='html4css1', settings_overrides=settings )
     html = re.sub( '<col.*>\n', '', html )
     html = re.sub( '</colgroup>', '', html )

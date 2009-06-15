@@ -4,34 +4,18 @@ Inspect SRF source
 """
 import numpy, pylab, sord, sim
 
-meta, data = sord.source.srfb_read( sim.srf_ )
+# metadata
+meta = {}
+path = os.path.join( sim.srf_, 'meta.py' )
+exec open( path ) in meta
+dtype = meta['dtype']
+potency = meta['potency']
+
 mu = 2670.0 * 3464.0 ** 2.0
-m0 = mu * meta.potency
-mw = ( numpy.log10( m0 ) - 9.05 ) / 1.5
+m0 = mu * potency
+mw = (numpy.log10( m0 ) - 9.05) / 1.5
 print 'm0 = ', m0
 print 'mw = ', mw
-for k, v in [
-    ( 'nt1   ', data.nt1   ),
-    ( 'nt2   ', data.nt2   ),
-    ( 'nt3   ', data.nt3   ),
-    ( 'dt    ', data.dt    ),
-    ( 't0    ', data.t0    ),
-    ( 'lon   ', data.lon   ),
-    ( 'lat   ', data.lat   ),
-    ( 'dep   ', data.dep   ),
-    ( 'strike', data.stk   ),
-    ( 'dip   ', data.dip   ),
-    ( 'rake  ', data.rake  ),
-    ( 'area  ', data.area  ),
-    ( 'slip1 ', data.slip1 ),
-    ( 'slip2 ', data.slip2 ),
-    ( 'slip3 ', data.slip3 ),
-    ( 'sv1   ', data.sv1   ),
-    ( 'sv2   ', data.sv2   ),
-    ( 'sv3   ', data.sv3   ),
-]:
-    if len( v ):
-        print '%6s %12g %12g %12g %12d' % ( k, v.min(), v.max(), v.mean(), v.size )
 
 normalize = 0
 normalize = 1
@@ -42,17 +26,21 @@ lowpass = 1.0,
 lowpass = 0.1,
 lowpass = 0.0,
 
-ns = data.nt1.size
-dt = data.dt.max()
-nt = data.nt1.max()
+nt_ = numpy.fromfile( path + 'nt1', 'i' )
+dt_ = numpy.fromfile( path + 'dt',  dtype )
+sv  = numpy.fromfile( path + 'sv1', dtype )
+
+ns = nt_.size
+nt = nt_.max()
+dt = dt_.max()
 nt = 251
 nf = 512
-v  = numpy.zeros((ns,nt))
+v  = numpy.zeros( (ns, nt) )
 k  = 0
 for j in xrange( ns ):
-    n = data.nt1[j]
+    n = nt_[j]
     if n:
-        v[j,:n] = data.sv1[k:k+n]
+        v[j,:n] = sv[k:k+n]
         k = k + n
 if normalize:
     m = v.max(1)
@@ -64,7 +52,7 @@ if lowpass[0] > 0:
 V = abs( numpy.fft.rfft( v, nf, -1 ) )
 
 t = numpy.arange( nt ) * dt
-f = numpy.arange( nf / 2 + 1 ) / ( dt * nf )
+f = numpy.arange( nf / 2 + 1 ) / (dt * nf)
 
 pylab.figure(1)
 pylab.clf()

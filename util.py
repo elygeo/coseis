@@ -10,57 +10,50 @@ class Object:
     """
     pass
 
-def dictify( o, ignore='(_)|(^.$)' ):
-    """
-    Convert object attributes to dict.
-    """
-    d = dict()
-    grep = re.compile( ignore )
-    for k in dir( o ):
-        v = getattr( o, k )
-        if not grep.search(k) and type(v) not in [type(os), type(os.walk)]:
-            d[k] = v
-    return d
-
-def objectify( d, ignore='(_)|(^.$)' ):
+def objectify( d ):
     """
     Convert dict to object attributes.
     """
     o = Object()
-    grep = re.compile( ignore )
     for k, v in d.iteritems():
-        if not grep.search(k) and type(v) not in [type(os), type(os.walk)]:
-            setattr( o, k, v )
+        setattr( o, k, v )
     return o
 
-def load( path, d=None, ignore='(_)|(^.$)' ):
+def dictify( o ):
     """
-    Load variables from a Python source file into a dict.
+    Convert object attributes to dict.
     """
-    if d is None:
-        d = dict()
-    path = open( os.path.expanduser( path ) )
-    exec path in d
-    grep = re.compile( ignore )
-    for k in d.keys():
-        if grep.search(k) or type(d[k]) in [type(os), type(os.walk)]:
-            del( d[k] )
+    d = {}
+    for k in dir( o ):
+        d[k] = getattr( o, k )
     return d
 
-def save( fd, d, expand=None, ignore='(_)|(^.$)' ):
+def prune( d, pattern='(_)|(^.$)', types=None ):
+    """
+    Delete dictionary keys with specified name pattern or types
+    Default types are: functions and modules.
+    """
+    if types is None:
+        types = type( re ), type( re.compile )
+    grep = re.compile( pattern )
+    for k in d.keys():
+        if grep.search( k ) or type( d[k] ) in types:
+            del( d[k] )
+
+def save( fd, d, expand=None, ignore='(_)|(^.$)', types=None ):
     """
     Write variables from a dict into a Python source file.
     """
     if type( fd ) is not file:
         fd = open( os.path.expanduser( fd ), 'w' )
-    grep = re.compile( ignore )
-    for k in sorted( d ):
-        if ( not grep.search(k) and
-            type(d[k]) not in [type(os), type(os.walk)] and
-            k not in expand ):
-            fd.write( '%s = %r\n' % ( k, d[k] ) )
     if expand is None:
         expand = []
+    if types is None:
+        types = type( re ), type( re.compile )
+    grep = re.compile( ignore )
+    for k in sorted( d ):
+        if not grep.search( k ) and type( d[k] ) not in types and k not in expand:
+            fd.write( '%s = %r\n' % ( k, d[k] ) )
     for k in expand:
         if k in d:
             if type( d[k] ) == tuple:
@@ -88,23 +81,29 @@ def loadmeta( path='.' ):
     Load SORD metadata.
     """
     path = os.path.expanduser( path )
-    if os.path.isfile( os.path.join( path, 'meta.py' ) ):
-        meta = load( os.path.join( path, 'meta.py' ) )
+    meta = {}
+    f = os.path.join( path, 'meta.py' )
+    if os.path.isfile( f ):
+        exec open( f ) in meta
     else:
-        meta = dict()
-        if os.path.isfile( os.path.join( path, 'conf.py' ) ):
-            cfg = load( os.path.join( path, 'conf.py' ) )
+        f = os.path.join( path, 'conf.py' )
+        if os.path.isfile( f ):
+            cfg = {}
+            exec open( f ) in cfg
             for k in 'name', 'rundate', 'rundir', 'user', 'os_', 'dtype':
                 meta[k] = cfg[k]
-        if os.path.isfile( os.path.join( path, 'parameters.py' ) ):
-            load( os.path.join( path, 'parameters.py' ), meta )
-            out = dict()
+        f = os.path.join( path, 'parameters.py' )
+        if os.path.isfile( f ):
+            exec open( f ) in meta
+            out = {}
             for f in meta['fieldio']:
                 ii, filename = f[6], f[8]
                 if filename is not '-':
                     out[filename] = ii
-            if os.path.isfile( os.path.join( path, 'locations.py' ) ):
-                locs = load( os.path.join( path, 'locations.py' ) )
+            f = os.path.join( path, 'locations.py' )
+            if os.path.isfile( f ):
+                locs = {}
+                exec open( f ) in locs
                 mm = meta['nn'] + ( meta['nt'], )
                 for ii, filename in locs['locations']:
                     if filename is not '-':
@@ -176,7 +175,7 @@ def ndread( fd, shape=None, indices=None, dtype='f', order='F' ):
     import numpy
     from numpy import array, fromfile
     if type( fd ) is not file:
-        fd = open( os.path.expanduser( fd ), 'rb' )
+        fd = open( os.path.expanduser( fd ) )
     if not shape:
         return numpy.fromfile( fd, dtype )
     elif type( shape ) == int:
@@ -249,7 +248,7 @@ def make( compiler, object_, source ):
     command = compiler + (object_,) + source
     state = [ ' '.join( command ) + '\n' ]
     for f in source:
-        state += open( f, 'r' ).readlines()
+        state += open( f ).readlines()
     compile_ = True
     if os.path.isfile( object_ ):
         try:

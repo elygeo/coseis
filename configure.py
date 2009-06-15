@@ -9,23 +9,28 @@ def configure( save=False, machine=None ):
     Read configuration files
     """
     cwd = os.getcwd()
-    os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    cfg = util.load( 'default-cfg.py', ignore='(^_)|(^.$)' )
+    path = os.path.realpath( os.path.dirname( __file__ ) )
+    os.chdir( path )
+    d = {}
+    exec open( 'default-cfg.py' ) in d
     if not machine and os.path.isfile( 'machine' ):
-        machine = open( 'machine', 'r' ).read().strip()
+        machine = open( 'machine' ).read().strip()
     if machine:
-        util.load( os.path.join( 'conf', machine, 'conf.py' ), cfg, ignore='(^_)|(^.$)' )
-        cfg['machine'] = machine
+        path = os.path.join( 'conf', machine, 'conf.py' )
+        exec open( path ) in d
+        d['machine'] = machine
         if save:
-            open( 'machine', 'w' ).write( cfg['machine'] )
+            open( 'machine', 'w' ).write( machine )
+    util.prune( d, '(^_)|(^.$)' )
     os.chdir( cwd )
-    return cfg
+    return d
 
-# Set configuration
+# Set configuration from command line.
+# Available configurations are in the 'conf' directory.
 if __name__ == '__main__':
     cfg = configure( True, *sys.argv[1:2] )
     print( cfg['notes'] )
     for k in sorted( cfg.keys() ):
         if k != 'notes':
-            print( '%s = %r' % ( k, cfg[k] ) )
+            print( '%s = %r' % (k, cfg[k]) )
 

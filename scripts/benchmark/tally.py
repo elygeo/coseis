@@ -2,14 +2,16 @@
 """
 Tally benchmarks
 """
-import glob, numpy, sord
+import os, glob, numpy, sord
 
 normalize = 0
 np = []
 tt = []
 
 for d in glob.glob( '[0-9]*' ):
-    prm = sord.util.load( d + '/parameters.py' )
+    prm = {}
+    path = os.path.join( d, 'parameters.py' )
+    exec open( path ) in prm
     np += [ numpy.product( prm['np3'] ) ]
     t = numpy.fromfile( d + '/prof/8step', 'f' )
     tt += [ numpy.sum( t[1:-1] ) / (len(t)-2) ]
@@ -23,7 +25,9 @@ for n, t in zip( np, tt ):
 
 if 0:
     import pylab
-    cfg = sord.util.load( d + '/conf.py' )
+    cfg = {}
+    path = os.path.join( d, 'conf.py' )
+    exec open( path ) in cfg
     n = len( tt )
     pylab.plot( tt, 'ko-' )
     pylab.hold( True )

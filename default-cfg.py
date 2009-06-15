@@ -2,7 +2,6 @@
 """
 Default configuration parameters
 """
-
 import os, pwd, numpy
 
 # Setup options (also accessible with command line options).
@@ -19,8 +18,8 @@ infiles = ()		# files to copy to the sord input directory
 # User info
 user = pwd.getpwuid( os.geteuid() )[0]
 try:
-    email = open( 'email', 'r' ).read().strip()
-except:
+    email = open( 'email' ).read().strip()
+except( IOError ):
     email = user
 
 # Machine specific
@@ -38,27 +37,16 @@ rate = 1.0e6
 queue = None
 dtype = numpy.dtype( 'f' ).str
 
-# Serial Fortran compiler
-fortran_serial = None
-for d in os.environ['PATH'].split(':'):
-    if fortran_serial:
-        break
-    for f in 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95':
-        if os.path.isfile( os.path.join( d, f ) ):
-            fortran_serial = f,
-            break
+# Search for file in PATH
+def find( *files ):
+    for d in os.environ['PATH'].split(':'):
+        for f in files:
+            if os.path.isfile( os.path.join( d, f ) ):
+                return f,
 
-# MPI Fortran compiler
-fortran_mpi = None
-for d in os.environ['PATH'].split(':'):
-    if fortran_mpi:
-        break
-    for f in 'mpxlf95_r', 'mpif90':
-        if os.path.isfile( os.path.join( d, f ) ):
-            fortran_mpi = f,
-            break
-
-# Fortran compiler flags
+# Fortran compilers
+fortran_serial = find( 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95' )
+fortran_mpi = find( 'mpxlf95_r', 'mpif90' )
 if fortran_serial[0] == 'gfortran':
     _ = '-fimplicit-none', '-Wall', '-std=f95', '-pedantic', '-o'
     _ = '-fimplicit-none', '-Wall', '-std=f95', '-o'
@@ -109,4 +97,6 @@ elif fortran_serial[0] == 'f95' and os.uname()[0] == 'SunOS':
         'p': ('-O', '-pg') + _,
         'O': ('-fast', '-fns') + _,
     }
+else:
+    sys.exit( 'Fortran compiler not found' )
 

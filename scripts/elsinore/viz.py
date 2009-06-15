@@ -5,10 +5,10 @@ Visualization
 import os, numpy, sord, sim
 from enthought.mayavi import mlab
 
-path = '~/run/elsinore-uhs'
-path = '~/run/elsinore-1d'
-path = '~/run/elsinore-cvm'
-path = os.path.expanduser( path )
+rundir = '~/run/elsinore-uhs'
+rundir = '~/run/elsinore-1d'
+rundir = '~/run/elsinore-cvm'
+rundir = os.path.expanduser( rundir )
 extent = 0., 600000., 0., 300000., -80000., 4000.
 
 mlab.figure( name='Elsinore', size=(960,540) )
@@ -23,32 +23,42 @@ topo = numpy.fromfile( 'data/socal-topo.f32', 'f' ).reshape( n[::-1] ).T
 
 # fault plane
 if 1:
-    meta, data = sord.source.srfb_read( sim.srf_ )
-    n = meta.nsource2[::-1]
-    x = data.lon.reshape( n )
-    y = data.lat.reshape( n )
-    z = -data.dep.reshape( n ) + sord.coord.interp2( lon0, lat0, dll, dll, topo, x, y )
+    path = sim.srf_ + os.sep
+    meta = {}
+    exec open( path + 'meta.py' ) in meta
+    nn, dtype = meta['nsource2'], meta['dtype']
+    x = numpy.fromfile( path + 'lon', dtype ).reshape( nn[::-1] ).T
+    y = numpy.fromfile( path + 'lat', dtype ).reshape( nn[::-1] ).T
+    z = numpy.fromfile( path + 'dep', dtype ).reshape( nn[::-1] ).T
+    z = sord.coord.interp2( lon0, lat0, dll, dll, topo, x, y ) - z
     x, y = sim.projection( x, y )
-    s = ( data.slip.reshape( n+(3,) )**2 ).sum(2)
-    t = data.t0.reshape( n )
-    hfault = mlab.mesh( x, y, z, scalars=s )
+    if 0:
+        s = numpy.fromfile( path + 't0',    dtype ).reshape( nn[::-1] ).T
+    else:
+        x = numpy.fromfile( path + 'slip1', dtype ).reshape( nn[::-1] ).T
+        y = numpy.fromfile( path + 'slip2', dtype ).reshape( nn[::-1] ).T
+        z = numpy.fromfile( path + 'slip3', dtype ).reshape( nn[::-1] ).T
+        s = numpy.sqrt( x**2 + y**2 + z**2 )
+    mlab.mesh( x, y, z, scalars=s )
 
 # map data
 for f in 'gmt-socal-coast.ll', 'gmt-socal-borders.ll', 'ucla-fault-db-mod.ll':
     x, y = numpy.loadtxt( 'data/' + f, usecols=(0,1), unpack=True )
     z = sord.coord.interp2( lon0, lat0, dll, dll, topo, x, y )
     x, y = sim.projection( x, y )
-    mlab.plot3d( x, y, z, color=(0.,0.,0.), tube_radius=None, line_width=0.5 )
+    mlab.plot3d( x, y, z, color=(0, 0, 0), tube_radius=None, line_width=0.5 )
 
 # surface
+path = os.path.join( rundir, 'out' ) + os.sep
 caxis = -0.2, 0.2
 exag = 10000. / caxis[1]
-meta = sord.util.loadmeta( path )
+meta = sord.util.loadmeta( rundir )
 n = meta.shape['x1']
-x = numpy.fromfile( path + '/out/x1', 'f' ).reshape( n[::-1] ).T
-y = numpy.fromfile( path + '/out/x2', 'f' ).reshape( n[::-1] ).T
-z = numpy.fromfile( path + '/out/x3', 'f' ).reshape( n[::-1] ).T
-hsurf = mlab.mesh( x, y, z, scalars=z/2000*caxis[1], opacity=1.0 )
+x = numpy.fromfile( path + 'x1', 'f' ).reshape( n[::-1] ).T
+y = numpy.fromfile( path + 'x2', 'f' ).reshape( n[::-1] ).T
+z = numpy.fromfile( path + 'x3', 'f' ).reshape( n[::-1] ).T
+s = z * 0.0005 * caxis[1]
+hsurf = mlab.mesh( x, y, z, scalars=s, opacity=1.0 )
 
 slm = hsurf.module_manager.scalar_lut_manager
 slm.use_default_range = False
@@ -59,11 +69,11 @@ slm.lut.table = sord.viz.colormap( 'w2' )
 scene = mlab.get_engine().scenes[0].scene
 mlab.outline( extent=extent )
 if 1:
-    mlab.view( -45, 45, 600000, ( 350000, 150000, 0 ) )
+    mlab.view( -45, 45, 600000, (350000, 150000, 0) )
 elif 1:
-    mlab.view( -45, 135, 600000, ( 350000, 150000, 0 ) )
+    mlab.view( -45, 135, 600000, (350000, 150000, 0) )
 else:
-    mlab.view( 0, 0, 600000, ( 300000, 150000, 0 ) )
+    mlab.view( 0, 0, 600000, (300000, 150000, 0) )
     scene.parallel_projection = True
     scene.camera.zoom(4.6)
 mlab.show()
@@ -75,10 +85,10 @@ ii = range( 100, 600, 5 )
 ii = []
 for i in ii:
     print i
-    v1 = sord.util.ndread( path + '/out/v1', n, [(),(),i] ).squeeze()
-    v2 = sord.util.ndread( path + '/out/v2', n, [(),(),i] ).squeeze()
-    v3 = sord.util.ndread( path + '/out/v3', n, [(),(),i] ).squeeze()
-    v  = numpy.array([ v1, v2, v3 ])
+    v1 = sord.util.ndread( path + 'v1', n, [(), (), i] ).squeeze()
+    v2 = sord.util.ndread( path + 'v2', n, [(), (), i] ).squeeze()
+    v3 = sord.util.ndread( path + 'v3', n, [(), (), i] ).squeeze()
+    v  = numpy.array( [v1, v2, v3] )
     if comp:
         v = v[comp]
     else:

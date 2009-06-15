@@ -2,7 +2,7 @@
 """
 Support Operator Rupture Dynamics
 """
-import os, sys
+import os, sys, re
 import util, configure, fieldnames
 from extras import coord, egmm, signal, source, viz
 try:
@@ -22,22 +22,25 @@ def stage( inputs ):
     print( 'SORD setup' )
 
     # Read defaults
-    prm = os.path.join( os.path.dirname( __file__ ), 'default-prm.py' )
-    prm = util.load( prm )
+    prm = {}
+    f = os.path.join( os.path.dirname( __file__ ), 'default-prm.py' )
+    exec open( f ) in prm
     if 'machine' in inputs:
         cfg = configure.configure( machine=inputs['machine'] )
     else:
         cfg = configure.configure()
 
     # Merge inputs
+    util.prune( inputs )
+    util.prune( prm )
+    util.prune( cfg )
     for k, v in inputs.iteritems():
-        if k[0] is not '_' and type(v) not in [type(os), type(os.walk)]:
-            if k in cfg:
-                cfg[k] = v
-            elif k in prm:
-                prm[k] = v
-            else:
-                sys.exit( 'Unknown parameter: %s = %r' % ( k, v ) )
+        if k in cfg:
+            cfg[k] = v
+        elif k in prm:
+            prm[k] = v
+        else:
+            sys.exit( 'Unknown parameter: %s = %r' % ( k, v ) )
     cfg = util.objectify( cfg )
     cfg.rundir = os.path.expanduser( cfg.rundir )
     prm = prepare_prm( util.objectify( prm ), cfg.itbuff )
@@ -73,10 +76,12 @@ def stage( inputs ):
         elif o in ('-f', '--force'):
             if os.path.isdir( cfg.rundir ): shutil.rmtree( cfg.rundir )
         else: sys.exit( 'Error: unknown option: ' + o )
-    if not cfg.prepare: cfg.run = False
+    if not cfg.prepare:
+        cfg.run = False
 
     # Partition for parallelization
-    prm.nn = tuple( [ int(i) for i in  prm.nn ] )
+    # nn, np3 = prm['nn'], prm['np3']
+    prm.nn = tuple( [ int(i) for i in prm.nn ] )
     maxtotalcores = cfg.maxnodes * cfg.maxcores
     if not cfg.mode and maxtotalcores == 1:
         cfg.mode = 's'
@@ -85,6 +90,7 @@ def stage( inputs ):
         np3 = [1, 1, 1]
     nl = [ (prm.nn[i] - 1) / np3[i] + 1 for i in range(3) ]
     i  = abs( prm.faultnormal ) - 1
+    #i  = abs( prm['faultnormal'] ) - 1
     if i >= 0:
         nl[i] = max( nl[i], 2 )
     np3 = [ (prm.nn[i] - 1) / nl[i] + 1 for i in range(3) ]
@@ -189,7 +195,7 @@ def stage( inputs ):
     for d in [ os.path.join( 'conf', 'common', 'templates' ), f ]:
         for f in glob.glob( os.path.join( d, '*' ) ):
             ff = os.path.join( cfg.rundir, os.path.basename( f ) )
-            out = open( f, 'r' ).read() % util.dictify( cfg )
+            out = open( f ).read() % util.dictify( cfg )
             open( ff, 'w' ).write( out )
             shutil.copymode( f, ff )
 
