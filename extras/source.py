@@ -348,7 +348,6 @@ def srf2coulomb( path, projection, dx ):
     x, y = 0.001 * projection( x, y )
     z = 0.001 * z
     delta = 0.0005 * meta['dx']
-    print delta
     dx = delta * numpy.sin( numpy.pi / 180.0 * (stk + rot) )
     dy = delta * numpy.cos( numpy.pi / 180.0 * (stk + rot) )
     dz = delta * numpy.sin( numpy.pi / 180.0 * dip )
@@ -357,7 +356,7 @@ def srf2coulomb( path, projection, dx ):
     z1, z2 = z - dz, z + dz
     c = numpy.array( [x1, y1, x2, y2, s1, s2, dip, z1, z2] ).T
 
-    fd = open( 'coulomb.inp', 'w' )
+    fd = open( path + 'coulomb.inp', 'w' )
     fd.write( coulomb_header % meta )
     fmt = '  1' + 4*' %10.4f' + ' 100' + 5*' %10.4f' + '    Fault 1'
     numpy.savetxt( fd, c, fmt )
