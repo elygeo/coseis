@@ -10,14 +10,18 @@ stations = 'p5',
 stations = 'p1', 'p2', 'p3', 'p4', 'p5', 'p6'
 
 for path in runs:
-    prm = sord.util.loadmeta( path )
-    T = prm.period
+    meta = sord.util.loadmeta( path )
+    nt = meta['nt']
+    dt = meta['dt']
+    period = meta['period']
+    source = meta['source']
+    source1 = meta['source1']
     cutoff = 0
-    cutoff = vp / ( 20 * prm.dx[0] )
-    if prm.source == 'moment':
-        m0 = prm.source1[0]
+    cutoff = vp / (20 * dx[0])
+    if source == 'moment':
+        m0 = source1[0]
     else:
-        m0 = prm.source1[0] * ( 3*rho*vp*vp - 4*rho*vs*vs )
+        m0 = source1[0] * (3*rho*vp*vp - 4*rho*vs*vs)
     for sta in stations:
         x1 = numpy.fromfile( path + '/out/' + sta + '_x1', 'f' )
         x2 = numpy.fromfile( path + '/out/' + sta + '_x2', 'f' )
@@ -27,22 +31,22 @@ for path in runs:
         v3 = numpy.fromfile( path + '/out/' + sta + '_v3', 'f' )
         x  = numpy.array([ x1, x2, x3 ]).squeeze()
         r  = numpy.sqrt( (x*x).sum() )
-        t  = prm.dt * numpy.arange( prm.nt ) + 0.5 * prm.dt
+        t  = dt * numpy.arange( nt ) + 0.5 * dt
         ta = t + r / vp
-        v  = numpy.array([ v1, v2, v3 ]).squeeze()
+        v  = numpy.array( [v1, v2, v3] ).squeeze()
         v  = sord.coord.matmul( sord.coord.rotmat( x ), v )
-        va = ( m0 * numpy.exp( -t / T ) * ( t * vp / r - t / T + 1.0 )
-             / ( 4.0 * numpy.pi * rho * vp**3.0 * T**2.0 * r ) )
+        va = ( m0 * numpy.exp( -t / period ) * (t * vp / r - t / period + 1.0)
+             / (4.0 * numpy.pi * rho * vp**3.0 * period**2.0 * r) )
         if cutoff:
-            v  = sord.lowpass( v,  prm.dt, cutoff, 2, 1 )
-            va = sord.lowpass( va, prm.dt, cutoff, 2, 1 )
+            v  = sord.lowpass( v,  dt, cutoff, 2, 1 )
+            va = sord.lowpass( va, dt, cutoff, 2, 1 )
         pylab.clf()
-        pylab.plot( t - prm.dt, v.T, '-', ta - prm.dt, va, 'k--' )
-        pylab.xlim( 0.5, prm.dt * prm.nt )
+        pylab.plot( t - dt, v.T, '-', ta - dt, va, 'k--' )
+        pylab.xlim( 0.5, dt * nt )
         pylab.title( path + '   %s, %s, %s' % tuple(x) )
         pylab.draw()
         pylab.ginput(1,0,False)
 
-pylab.xlim( 0.5, prm.dt * prm.nt )
+pylab.xlim( 0.5, dt * nt )
 pylab.draw()
 

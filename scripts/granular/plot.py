@@ -11,21 +11,22 @@ path = os.path.expanduser( os.path.join( '~', 'run', 'granular' ) )
 path = os.path.expanduser( os.path.join( '~', 'run', 'granular-shear' ) )
 path = os.path.expanduser( os.path.join( '~', 'run', 'granular-vol' ) )
 meta = sord.util.loadmeta( path )
+path = os.path.join( path, 'out' ) + os.sep
 
-nn = meta.shape['vs']
-n  = nn[0] * nn[1]
-v  = numpy.fromfile( os.path.join( path, 'out', 'vs' ), 'f' ).reshape( nn[::-1] ).T
+nn = meta['shape']['vs']
+n = nn[0] * nn[1]
+v = numpy.fromfile( path + 'vs', 'f' ).reshape( nn[::-1] ).T
 pylab.clf()
 pylab.imshow( v )
 pylab.ginput( 1, 0, 0 )
 
-nn = meta.shape['v1'][:-1]
-nt = meta.shape['v1'][-1]
+nn = meta['shape']['v1'][:-1]
+nt = meta['shape']['v1'][-1]
 n  = nn[0] * nn[1]
 
-f1 = open( os.path.join( path, 'out', 'v1' ), 'rb' )
-f2 = open( os.path.join( path, 'out', 'v2' ), 'rb' )
-f3 = open( os.path.join( path, 'out', 'v3' ), 'rb' )
+f1 = open( path + 'v1', 'rb' )
+f2 = open( path + 'v2', 'rb' )
+f3 = open( path + 'v3', 'rb' )
 
 for i in xrange( nt ):
     v1 = numpy.fromfile( f1, 'f', n ).reshape( nn[::-1] ).T

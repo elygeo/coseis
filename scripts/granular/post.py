@@ -6,7 +6,9 @@ import numpy, sord
 
 # write WebSims metadata
 meta = sord.util.loadmeta()
-shape = meta.shape['v1']
+shape = meta['shape']['v1']
+dt = meta['dt']
+dx = meta['dx']
 websims = dict(
     title = 'Gouge - Shear source',
     author = 'Ely & Goebel',
@@ -14,13 +16,13 @@ websims = dict(
     label = '',
     t_axes = ( 'Time', 'X', 'Z' ),
     t_shape = shape[-1:] + shape[:-1],
-    t_step = ( 1000000 * meta.dt, 100 * meta.dx[0] , 100 * meta.dx[2] ),
+    t_step = ( 1000000 * dt, 100 * dx[0] , 100 * dx[2] ),
     t_unit = ( 'us', 'cm', 'cm' ),
     t_panes = [],
     x_axes = ( 'X', 'Z', 'Time' ),
     x_decimate = 1,
-    x_shape = meta.shape['v1'],
-    x_step = ( 100 * meta.dx[0] , 100 * meta.dx[2], 1000000 * meta.dt ),
+    x_shape = shape,
+    x_step = ( 100 * dx[0] , 100 * dx[2], 1000000 * dt ),
     x_unit = ( 'cm', 'cm', 'us' ),
     x_initial_panes = [
         ( 'pv', 'Peak velocity (m/s)',   'w0', (0, 10.0), 3.0, 0 ),
@@ -34,11 +36,11 @@ websims = dict(
     x_plot = [],
 )
 fd = open( 'meta.py', 'a' )
-sord.util.save( fd, websims, [ 't_panes', 'x_initial_panes', 'x_panes', 'x_plot' ] )
+sord.util.save( fd, websims, ['t_panes', 'x_initial_panes', 'x_panes', 'x_plot'] )
 fd.close()
 
 # compute peak velocity and displacement
-dtype = meta.dtype
+dtype = meta['dtype']
 nn = shape[:-1]
 nt = shape[-1]
 n  = numpy.prod( nn )
@@ -54,9 +56,9 @@ for i in xrange( nt ):
     v1 = numpy.fromfile( f1, dtype, n ).reshape( nn[::-1] ).T
     v2 = numpy.fromfile( f2, dtype, n ).reshape( nn[::-1] ).T
     v3 = numpy.fromfile( f3, dtype, n ).reshape( nn[::-1] ).T
-    u1 = u1 + meta.dt * v1
-    u2 = u2 + meta.dt * v2
-    u3 = u3 + meta.dt * v3
+    u1 = u1 + dt * v1
+    u2 = u2 + dt * v2
+    u3 = u3 + dt * v3
     pv = numpy.maximum( pv, v1*v1 + v2*v2 + v3*v3 )
     pu = numpy.maximum( pu, u1*u1 + u2*u2 + u3*u3 )
 numpy.array( numpy.sqrt( pv ), dtype ).T.tofile( 'pv' )

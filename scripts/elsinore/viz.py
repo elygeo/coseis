@@ -26,7 +26,8 @@ if 1:
     path = sim.srf_ + os.sep
     meta = {}
     exec open( path + 'meta.py' ) in meta
-    nn, dtype = meta['nsource2'], meta['dtype']
+    nn = meta['nsource2']
+    dtype = meta['dtype']
     x = numpy.fromfile( path + 'lon', dtype ).reshape( nn[::-1] ).T
     y = numpy.fromfile( path + 'lat', dtype ).reshape( nn[::-1] ).T
     z = numpy.fromfile( path + 'dep', dtype ).reshape( nn[::-1] ).T
@@ -53,7 +54,7 @@ path = os.path.join( rundir, 'out' ) + os.sep
 caxis = -0.2, 0.2
 exag = 10000. / caxis[1]
 meta = sord.util.loadmeta( rundir )
-n = meta.shape['x1']
+n = meta['shape']['x1']
 x = numpy.fromfile( path + 'x1', 'f' ).reshape( n[::-1] ).T
 y = numpy.fromfile( path + 'x2', 'f' ).reshape( n[::-1] ).T
 z = numpy.fromfile( path + 'x3', 'f' ).reshape( n[::-1] ).T
@@ -78,7 +79,7 @@ else:
     scene.camera.zoom(4.6)
 mlab.show()
 
-n = meta.shape['v1']
+n = meta['shape']['v1']
 comp = 0
 ii = range( 1, n[2]+1, 2 )
 ii = range( 100, 600, 5 )

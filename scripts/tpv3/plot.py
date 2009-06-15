@@ -8,9 +8,11 @@ so_dir = './'; bi_dir = '../../bi/'
 so_dir = './run/500/'; bi_dir = 'bi/'
 so_dir = './run/150/'; bi_dir = 'bi/'
 meta = sord.util.loadmeta( so_dir )
+dt = meta['dt']
+nt = meta['nt']
 
 # Time histories
-t1 = meta.dt * numpy.arange( meta.nt )
+t1 = dt * numpy.arange( nt )
 t2 = numpy.fromfile( bi_dir + 'time', 'f' )
 for i, sta in enumerate( [ 'P1', 'P2' ] ):
     pylab.figure(i+1)
@@ -46,7 +48,7 @@ for i, sta in enumerate( [ 'P1', 'P2' ] ):
 
 # Rupture time contour
 v = 0.5 * numpy.arange( -20, 20 )
-n = meta.shape['flt-trup']
+n = meta['shape']['flt-trup']
 print n
 x1 = 0.001 * numpy.fromfile( so_dir + 'out/flt-x1', 'f' ).reshape( n[::-1] ).T
 x2 = 0.001 * numpy.fromfile( so_dir + 'out/flt-x2', 'f' ).reshape( n[::-1] ).T

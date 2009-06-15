@@ -34,10 +34,13 @@ zz = numpy.array( zz, 'f' )
 zz.T.tofile( os.path.join( path, 'z' ) )
 
 # fault trace
-meta, data = sord.source.srfb_read( sim._srf )
-n = meta.nsource2[::-1]
-x = data.lon.reshape( n )[0]
-y = data.lat.reshape( n )[0]
+path = sim.srf_ + os.sep
+meta = {}
+exec open( path + 'meta.py' ) in meta
+n = meta['nsource2']
+dtype = meta['dtype']
+x = numpy.fromfile( path + 'lon', dtype ).reshape( n[::-1] ).T
+y = numpy.fromfile( path + 'lat', dtype ).reshape( n[::-1] ).T
 z = sord.coord.interp2( lon0, lat0, dll, dll, topo, x, y )
 x, y = sim.projection( x, y )
 xyz = 0.001 * numpy.array( [x,y,z] ).T

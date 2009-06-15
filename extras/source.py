@@ -335,28 +335,31 @@ def srf2coulomb( path, projection, dx ):
 
     # Read data
     nn = meta['nsource2']
-    x   = numpy.fromfile( path + 'lon',   dtype ).reshape( nn[::-1] ).T
-    y   = numpy.fromfile( path + 'lat',   dtype ).reshape( nn[::-1] ).T
-    z   = numpy.fromfile( path + 'dep',   dtype ).reshape( nn[::-1] ).T
-    s1  = numpy.fromfile( path + 'slip1', dtype ).reshape( nn[::-1] ).T
-    s2  = numpy.fromfile( path + 'slip2', dtype ).reshape( nn[::-1] ).T
-    stk = numpy.fromfile( path + 'stk',   dtype ).reshape( nn[::-1] ).T
-    dip = numpy.fromfile( path + 'dip',   dtype ).reshape( nn[::-1] ).T
+    x   = numpy.fromfile( path + 'lon',   dtype )
+    y   = numpy.fromfile( path + 'lat',   dtype )
+    z   = numpy.fromfile( path + 'dep',   dtype )
+    s1  = numpy.fromfile( path + 'slip1', dtype )
+    s2  = numpy.fromfile( path + 'slip2', dtype )
+    stk = numpy.fromfile( path + 'stk',   dtype )
+    dip = numpy.fromfile( path + 'dip',   dtype )
 
     # Coordinates
     rot = coord.rotation( x, y, projection )[1]
     x, y = 0.001 * projection( x, y )
+    z = 0.001 * z
     delta = 0.0005 * meta['dx']
+    print delta
     dx = delta * numpy.sin( numpy.pi / 180.0 * (stk + rot) )
     dy = delta * numpy.cos( numpy.pi / 180.0 * (stk + rot) )
     dz = delta * numpy.sin( numpy.pi / 180.0 * dip )
     x1, x2 = x - dx, x + dx
     y1, y2 = y - dy, y + dy
     z1, z2 = z - dz, z + dz
-
-    fd = open( 'coulomb.inp' ).write( coulomb_header % meta )
-    fmt = '  1' + 4*' %10.4f' + ' 100' + 5*' %10.4f' + '    Fault 1'
     c = numpy.array( [x1, y1, x2, y2, s1, s2, dip, z1, z2] ).T
+
+    fd = open( 'coulomb.inp', 'w' )
+    fd.write( coulomb_header % meta )
+    fmt = '  1' + 4*' %10.4f' + ' 100' + 5*' %10.4f' + '    Fault 1'
     numpy.savetxt( fd, c, fmt )
 
     return

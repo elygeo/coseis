@@ -119,7 +119,7 @@ def loadmeta( path='.' ):
         path = os.path.join( path, 'meta.py' )
         expand = 'shape', 'indices', 'fieldio'
         save( path, meta, expand )
-    return objectify( meta )
+    return meta
 
 def expand_indices( shape, indices=None, base=1 ):
     """

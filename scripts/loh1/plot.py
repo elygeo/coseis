@@ -8,8 +8,11 @@ import os, numpy, pylab, scipy.signal, sord
 so_dir = os.path.expanduser( '~/run/loh1/' )
 fk_dir = 'fk/'
 meta = sord.util.loadmeta( so_dir )
-sig = meta.dt * 22.5
-T = meta.period
+dt = meta['dt']
+nt = meta['nt']
+T = meta['period']
+dtype = meta['dtype']
+sig = dt * 22.5
 ts = 4 * sig
 
 # Setup plot
@@ -18,16 +21,16 @@ ax = [ pylab.subplot( 3, 1, i ) for i in 1, 2, 3 ]
 
 # SORD results
 rotation = numpy.array([[3./5., 4./5., 0.], [-4./5., 3./5., 0.], [0., 0., 1.]])
-t = meta.dt * numpy.arange( meta.nt )
-x = numpy.fromfile( so_dir+'out/vx', meta.dtype )
-y = numpy.fromfile( so_dir+'out/vy', meta.dtype )
-z = numpy.fromfile( so_dir+'out/vz', meta.dtype )
-v = numpy.vstack((x,y,z))
+t = dt * numpy.arange( nt )
+x = numpy.fromfile( so_dir + 'out/vx', dtype )
+y = numpy.fromfile( so_dir + 'out/vy', dtype )
+z = numpy.fromfile( so_dir + 'out/vz', dtype )
+v = numpy.vstack( (x, y, z) )
 v = numpy.dot( rotation, v )
 tau = t - ts
 factor = 1. - 2.*T/sig**2.*tau - ( T/sig )**2. * ( 1. - ( tau/sig )**2. );
 b = ( 1. / numpy.sqrt( 2.*numpy.pi ) / sig ) * factor * numpy.exp( -0.5 * ( tau/sig ) ** 2. )
-v = meta.dt * scipy.signal.lfilter( b, 1., v )
+v = dt * scipy.signal.lfilter( b, 1., v )
 vm = numpy.sqrt( numpy.sum( v * v, 0 ) )
 peakv = numpy.max( vm )
 print peakv
