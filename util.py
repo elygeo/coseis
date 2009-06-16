@@ -34,7 +34,7 @@ def prune( d, pattern='(_)|(^.$)', types=None ):
     Default types are: functions and modules.
     """
     if types is None:
-        types = type( re ), type( re.compile )
+        types = type( re ), type( re.sub )
     grep = re.compile( pattern )
     for k in d.keys():
         if grep.search( k ) or type( d[k] ) in types:
