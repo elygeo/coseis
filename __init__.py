@@ -22,28 +22,28 @@ def stage( inputs ):
     print( 'SORD setup' )
 
     # Read defaults
-    prm = {}
-    f = os.path.join( os.path.dirname( __file__ ), 'default-prm.py' )
-    exec open( f ) in prm
+    pm = {}
+    f = os.path.join( os.path.dirname( __file__ ), 'parameters.py' )
+    exec open( f ) in pm
     if 'machine' in inputs:
-        cfg = configure.configure( machine=inputs['machine'] )
+        cf = configure.configure( machine=inputs['machine'] )
     else:
-        cfg = configure.configure()
+        cf = configure.configure()
 
     # Merge inputs
     util.prune( inputs )
-    util.prune( prm )
-    util.prune( cfg )
+    util.prune( pm )
+    util.prune( cf )
     for k, v in inputs.iteritems():
-        if k in cfg:
-            cfg[k] = v
-        elif k in prm:
-            prm[k] = v
+        if k in cf:
+            cf[k] = v
+        elif k in pm:
+            pm[k] = v
         else:
             sys.exit( 'Unknown parameter: %s = %r' % ( k, v ) )
-    cfg = util.objectify( cfg )
-    cfg.rundir = os.path.expanduser( cfg.rundir )
-    prm = prepare_prm( util.objectify( prm ), cfg.itbuff )
+    cf = util.namespace( cf )
+    cf.rundir = os.path.expanduser( cf.rundir )
+    pm = prepare_param( util.namespace( pm ), cf.itbuff )
 
     # Command line options
     opts = [
@@ -63,114 +63,112 @@ def stage( inputs ):
     long_options = opts[1::2]
     opts = getopt.getopt( sys.argv[1:], options, long_options )[0]
     for o, v in opts:
-        if   o in ('-n', '--dry-run'):     cfg.prepare = False
-        elif o in ('-s', '--serial'):      cfg.mode = 's'
-        elif o in ('-m', '--mpi'):         cfg.mode = 'm'
-        elif o in ('-i', '--interactive'): cfg.run = 'i'
-        elif o in ('-q', '--queue'):       cfg.run = 'q'
-        elif o in ('-d', '--debug'):       cfg.optimize = 'g'; cfg.run = 'g'
-        elif o in ('-g', '--debugging'):   cfg.optimize = 'g'
-        elif o in ('-t', '--testing'):     cfg.optimize = 't'
-        elif o in ('-p', '--profiling'):   cfg.optimize = 'p'
-        elif o in ('-O', '--optimized'):   cfg.optimize = 'O'
+        if   o in ('-n', '--dry-run'):     cf.prepare = False
+        elif o in ('-s', '--serial'):      cf.mode = 's'
+        elif o in ('-m', '--mpi'):         cf.mode = 'm'
+        elif o in ('-i', '--interactive'): cf.run = 'i'
+        elif o in ('-q', '--queue'):       cf.run = 'q'
+        elif o in ('-d', '--debug'):       cf.optimize = 'g'; cf.run = 'g'
+        elif o in ('-g', '--debugging'):   cf.optimize = 'g'
+        elif o in ('-t', '--testing'):     cf.optimize = 't'
+        elif o in ('-p', '--profiling'):   cf.optimize = 'p'
+        elif o in ('-O', '--optimized'):   cf.optimize = 'O'
         elif o in ('-f', '--force'):
-            if os.path.isdir( cfg.rundir ): shutil.rmtree( cfg.rundir )
+            if os.path.isdir( cf.rundir ): shutil.rmtree( cf.rundir )
         else: sys.exit( 'Error: unknown option: ' + o )
-    if not cfg.prepare:
-        cfg.run = False
+    if not cf.prepare:
+        cf.run = False
 
     # Partition for parallelization
-    # nn, np3 = prm['nn'], prm['np3']
-    prm.nn = tuple( [ int(i) for i in prm.nn ] )
-    maxtotalcores = cfg.maxnodes * cfg.maxcores
-    if not cfg.mode and maxtotalcores == 1:
-        cfg.mode = 's'
-    np3 = prm.np3[:]
-    if cfg.mode == 's':
+    pm.nn = tuple( int(i) for i in pm.nn )
+    maxtotalcores = cf.maxnodes * cf.maxcores
+    if not cf.mode and maxtotalcores == 1:
+        cf.mode = 's'
+    np3 = pm.np3[:]
+    if cf.mode == 's':
         np3 = [1, 1, 1]
-    nl = [ (prm.nn[i] - 1) / np3[i] + 1 for i in range(3) ]
-    i  = abs( prm.faultnormal ) - 1
-    #i  = abs( prm['faultnormal'] ) - 1
+    nl = [ (pm.nn[i] - 1) / np3[i] + 1 for i in range(3) ]
+    i  = abs( pm.faultnormal ) - 1
     if i >= 0:
         nl[i] = max( nl[i], 2 )
-    np3 = [ (prm.nn[i] - 1) / nl[i] + 1 for i in range(3) ]
-    prm.np3 = tuple( np3 )
-    cfg.np = np3[0] * np3[1] * np3[2]
-    if not cfg.mode:
-        cfg.mode = 's'
-        if cfg.np > 1:
-            cfg.mode = 'm'
+    pm.np3 = tuple( (pm.nn[i] - 1) / nl[i] + 1 for i in range(3) )
+    cf.np = pm.np3[0] * pm.np3[1] * pm.np3[2]
+    if not cf.mode:
+        cf.mode = 's'
+        if cf.np > 1:
+            cf.mode = 'm'
 
     # Resources
-    if cfg.maxcores:
-        cfg.nodes = min( cfg.maxnodes, (cfg.np - 1) / cfg.maxcores + 1 )
-        cfg.ppn = (cfg.np - 1) / cfg.nodes + 1
-        cfg.cores = min( cfg.maxcores, cfg.ppn )
-        cfg.totalcores = cfg.nodes * cfg.maxcores
+    if cf.maxcores:
+        cf.nodes = min( cf.maxnodes, (cf.np - 1) / cf.maxcores + 1 )
+        cf.ppn = (cf.np - 1) / cf.nodes + 1
+        cf.cores = min( cf.maxcores, cf.ppn )
+        cf.totalcores = cf.nodes * cf.maxcores
     else:
-        cfg.nodes = 1
-        cfg.ppn = cfg.np
-        cfg.cores = cfg.np
-        cfg.totalcores = cfg.np
+        cf.nodes = 1
+        cf.ppn = cf.np
+        cf.cores = cf.np
+        cf.totalcores = cf.np
 
     # RAM and Wall time usage
-    if prm.oplevel in (1, 2):
+    if pm.oplevel in (1, 2):
         nvars = 20
-    elif prm.oplevel in (3, 4, 5):
+    elif pm.oplevel in (3, 4, 5):
         nvars = 23
     else:
         nvars = 44
     nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
-    cfg.pmem = 32 + int(1.2 * nm * nvars * int( cfg.dtype[-1] ) / 1024 / 1024)
-    cfg.ram = cfg.pmem * cfg.ppn
-    sus = int( (prm.nt + 10) * cfg.ppn * nm / cfg.cores / cfg.rate / 3600 * cfg.totalcores + 1 )
-    mm  =      (prm.nt + 10) * cfg.ppn * nm / cfg.cores / cfg.rate / 60 * 3.0 + 10
-    if cfg.maxtime:
-        mm = min( 60*cfg.maxtime[0] + cfg.maxtime[1], mm )
+    cf.pmem = 32 + int(1.2 * nm * nvars * int( cf.dtype[-1] ) / 1024 / 1024)
+    cf.ram = cf.pmem * cf.ppn
+    ss  = (pm.nt + 10) * cf.ppn * nm / cf.cores / cf.rate
+    sus = int( ss / 3600 * cf.totalcores + 1 )
+    mm  =      ss / 60 * 3.0 + 10
+    if cf.maxtime:
+        mm = min( mm, 60*cf.maxtime[0] + cf.maxtime[1] )
     hh = mm / 60
     mm = mm % 60
-    cfg.walltime = '%d:%02d:00' % (hh, mm)
-    print( 'Machine: ' + cfg.machine )
-    print( 'Cores: %s of %s' % (cfg.np, maxtotalcores) )
-    print( 'Nodes: %s of %s' % (cfg.nodes, cfg.maxnodes) )
-    print( 'RAM: %sMb of %sMb per node' % (cfg.ram, cfg.maxram) )
-    print( 'Time limit: ' + cfg.walltime )
+    cf.walltime = '%d:%02d:00' % (hh, mm)
+    print( 'Machine: ' + cf.machine )
+    print( 'Cores: %s of %s' % (cf.np, maxtotalcores) )
+    print( 'Nodes: %s of %s' % (cf.nodes, cf.maxnodes) )
+    print( 'RAM: %sMb of %sMb per node' % (cf.ram, cf.maxram) )
+    print( 'Time limit: ' + cf.walltime )
     print( 'SUs: %s' % sus )
-    if cfg.maxcores and cfg.ppn > cfg.maxcores:
-        print( 'Warning: exceding available cores per node (%s)' % cfg.maxcores )
-    if cfg.ram and cfg.ram > cfg.maxram:
-        print( 'Warning: exceding available RAM per node (%sMb)' % cfg.maxram )
+    if cf.maxcores and cf.ppn > cf.maxcores:
+        print( 'Warning: exceding available cores per node (%s)' % cf.maxcores )
+    if cf.ram and cf.ram > cf.maxram:
+        print( 'Warning: exceding available RAM per node (%sMb)' % cf.maxram )
 
     # Compile code
-    if not cfg.prepare:
-        return cfg
-    setup.build( cfg.mode, cfg.optimize )
+    if not cf.prepare:
+        return cf
+    setup.build( cf.mode, cf.optimize )
 
     # Create run directory
-    print( 'Run directory: ' + cfg.rundir )
+    print( 'Run directory: ' + cf.rundir )
     try:
-        os.makedirs( cfg.rundir )
+        os.makedirs( cf.rundir )
     except( OSError ):
-        sys.exit( '%r exists or cannot be created. Use --force to overwrite.' % cfg.rundir )
+        sys.exit( '%r exists or cannot be created. Use --force to overwrite.' % cf.rundir )
     for f in 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint':
-        os.mkdir( os.path.join( cfg.rundir, f ) )
+        os.mkdir( os.path.join( cf.rundir, f ) )
 
     # Link input files
-    for i, line in enumerate( prm.fieldio ):
+    for i, line in enumerate( pm.fieldio ):
         if 'r' in line[0] or 'R' in line[0] and os.sep in line[8]:
             filename = os.path.expanduser( line[8] )
             f = os.path.basename( filename )
             line = line[:8] + (f,) + line[9:]
-            prm.fieldio[i] = line
-            f = os.path.join( cfg.rundir, 'in', f )
+            pm.fieldio[i] = line
+            f = os.path.join( cf.rundir, 'in', f )
             try:
                 os.link( filename, f )
             except:
                 os.symlink( filename, f )
-    for pat in cfg.infiles:
+    for pat in cf.infiles:
         for filename in glob.glob( os.path.expanduser( pat ) ):
             f = os.path.basename( filename )
-            f = os.path.join( cfg.rundir, 'in', f )
+            f = os.path.join( cf.rundir, 'in', f )
             try:
                 os.link( filename, f )
             except:
@@ -178,87 +176,87 @@ def stage( inputs ):
 
     # Copy files to run directory
     cwd = os.path.realpath( os.getcwd() )
-    cfg.rundate = time.asctime()
-    cfg.name = os.path.basename( cfg.rundir )
-    cfg.rundir = os.path.realpath( cfg.rundir )
+    cf.rundate = time.asctime()
+    cf.name = os.path.basename( cf.rundir )
+    cf.rundir = os.path.realpath( cf.rundir )
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    cfg.bin = os.path.join( '.', 'sord-' + cfg.mode + cfg.optimize )
-    shutil.copy( os.path.join( 'bin', 'sord-' + cfg.mode + cfg.optimize ), cfg.rundir )
+    cf.bin = os.path.join( '.', 'sord-' + cf.mode + cf.optimize )
+    shutil.copy( os.path.join( 'bin', 'sord-' + cf.mode + cf.optimize ), cf.rundir )
     if os.path.isfile( 'sord.tgz' ):
-        shutil.copy( 'sord.tgz', cfg.rundir )
-    if cfg.optimize == 'g':
+        shutil.copy( 'sord.tgz', cf.rundir )
+    if cf.optimize == 'g':
         for f in glob.glob( os.path.join( 'src', '*.f90' ) ):
-            shutil.copy( f, cfg.rundir )
-    f = os.path.join( 'conf', cfg.machine, 'templates' )
+            shutil.copy( f, cf.rundir )
+    f = os.path.join( 'conf', cf.machine, 'templates' )
     if not os.path.isdir( f ):
         f = os.path.join( 'conf', 'default', 'templates' )
     for d in [ os.path.join( 'conf', 'common', 'templates' ), f ]:
         for f in glob.glob( os.path.join( d, '*' ) ):
-            ff = os.path.join( cfg.rundir, os.path.basename( f ) )
-            out = open( f ).read() % util.dictify( cfg )
+            ff = os.path.join( cf.rundir, os.path.basename( f ) )
+            out = open( f ).read() % cf.__dict__
             open( ff, 'w' ).write( out )
             shutil.copymode( f, ff )
 
     # Write files
-    os.chdir( cfg.rundir )
+    os.chdir( cf.rundir )
     log = open( 'log', 'w' )
     log.write( starttime + ': setup started\n' )
-    util.save( 'parameters.py', util.dictify( prm ), [ 'fieldio' ] )
-    util.save( 'conf.py', util.dictify( cfg ) )
+    util.save( 'parameters.py', pm, ['fieldio'] )
+    util.save( 'conf.py', cf )
 
     # Return to initial directory
     os.chdir( cwd )
-    return cfg
+    return cf
 
-def prepare_prm( prm, itbuff ):
+def prepare_param( pm, itbuff ):
     """
     Prepare input paramers
     """
 
     # inervals
-    prm.itio = max( 1, min(prm.itio, prm.nt) )
-    if prm.itcheck % prm.itio != 0:
-        prm.itcheck = (prm.itcheck / prm.itio + 1) * prm.itio
+    pm.itio = max( 1, min(pm.itio, pm.nt) )
+    if pm.itcheck % pm.itio != 0:
+        pm.itcheck = (pm.itcheck / pm.itio + 1) * pm.itio
 
     # hypocenter coordinates
-    xi = list( prm.ihypo )
+    xi = list( pm.ihypo )
     for i in range( 3 ):
         xi[i] = 0.0 + xi[i]
         if xi[i] == 0.0:
-            xi[i] = 0.5 * (prm.nn[i] + 1)
+            xi[i] = 0.5 * (pm.nn[i] + 1)
         elif xi[i] <= -1.0:
-            xi[i] = xi[i] + prm.nn[i] + 1
-        if xi[i] < 1.0 or xi[i] > prm.nn[i]:
+            xi[i] = xi[i] + pm.nn[i] + 1
+        if xi[i] < 1.0 or xi[i] > pm.nn[i]:
             sys.exit( 'Error: ihypo %s out of bounds' % xi )
-    prm.ihypo = tuple( xi )
+    pm.ihypo = tuple( xi )
 
     # Rupture boundary conditions
-    i1 = list( prm.bc1 )
-    i2 = list( prm.bc2 )
-    i = abs(prm.faultnormal) - 1
+    i1 = list( pm.bc1 )
+    i2 = list( pm.bc2 )
+    i = abs(pm.faultnormal) - 1
     if i >= 0:
         irup = int( xi[i] )
-        if irup == 1:             i1[i] = -2
-        if irup == prm.nn[i] - 1: i2[i] = -2
-        if irup < 1 or irup > (prm.nn[i] - 1):
+        if irup == 1:            i1[i] = -2
+        if irup == pm.nn[i] - 1: i2[i] = -2
+        if irup < 1 or irup > (pm.nn[i] - 1):
             sys.exit( 'Error: ihypo %s out of bounds' % xi )
-    prm.bc1 = tuple( i1 )
-    prm.bc2 = tuple( i2 )
+    pm.bc1 = tuple( i1 )
+    pm.bc2 = tuple( i2 )
 
     # PML region
-    i1 = [ 0, 0, 0 ]
-    i2 = [ n+1 for n in prm.nn ]
-    if prm.npml > 0:
+    i1 = [0, 0, 0]
+    i2 = [n+1 for n in pm.nn]
+    if pm.npml > 0:
         for i in range( 3 ):
-            if prm.bc1[i] == 10: i1[i] = prm.npml
-            if prm.bc2[i] == 10: i2[i] = prm.nn[i] - prm.npml + 1
+            if pm.bc1[i] == 10: i1[i] = pm.npml
+            if pm.bc2[i] == 10: i2[i] = pm.nn[i] - pm.npml + 1
             if i1[i] > i2[i]: sys.exit( 'Error: model too small for PML' )
-    prm.i1pml = tuple( i1 )
-    prm.i2pml = tuple( i2 )
+    pm.i1pml = tuple( i1 )
+    pm.i2pml = tuple( i2 )
 
     # I/O sequence
     fieldio = []
-    for line in prm.fieldio:
+    for line in pm.fieldio:
         line = list( line )
         filename = '-'
         tfunc, val, period = 'const', 1.0, 1.0
@@ -267,16 +265,16 @@ def prepare_prm( prm, itbuff ):
         mode = line[0][1:]
         if op not in '=+': sys.exit( 'Error: unsupported operator: %r' % line )
         try:
-            if len(line) is 10:
-                tfunc, period, x1, x2, nb, ii, field, filename, val               = line[1:]
-            elif mode in [ '', 's']:        field, ii, val                        = line[1:]
-            elif mode in [ 'x', 'sx']:      field, ii, val, x1                    = line[1:]
-            elif mode in [ 'c' ]:           field, ii, val, x1, x2                = line[1:]
-            elif mode in [ 'f', 'fs' ]:     field, ii, val, tfunc, period         = line[1:]
-            elif mode in [ 'fx', 'fsx' ]:   field, ii, val, tfunc, period, x1     = line[1:]
-            elif mode in [ 'fc' ]:          field, ii, val, tfunc, period, x1, x2 = line[1:]
-            elif mode in [ 'r', 'R', 'w' ]: field, ii, filename                   = line[1:]
-            elif mode in [ 'rx', 'wx' ]:    field, ii, filename, x1               = line[1:]
+            if len( line ) is 10:
+                tfunc, period, x1, x2, nb, ii, field, filename, val             = line[1:]
+            elif mode in ['', 's']:       field, ii, val                        = line[1:]
+            elif mode in ['x', 'sx']:     field, ii, val, x1                    = line[1:]
+            elif mode in ['c']:           field, ii, val, x1, x2                = line[1:]
+            elif mode in ['f', 'fs']:     field, ii, val, tfunc, period         = line[1:]
+            elif mode in ['fx', 'fsx']:   field, ii, val, tfunc, period, x1     = line[1:]
+            elif mode in ['fc']:          field, ii, val, tfunc, period, x1, x2 = line[1:]
+            elif mode in ['r', 'R', 'w']: field, ii, filename                   = line[1:]
+            elif mode in ['rx', 'wx']:    field, ii, filename, x1               = line[1:]
             else: sys.exit( 'Error: bad i/o mode: %r' % line )
         except:
             sys.exit( 'Error: bad i/o spec: %r' % line )
@@ -284,30 +282,30 @@ def prepare_prm( prm, itbuff ):
         mode = mode.replace( 'f', '' )
         if field not in fieldnames.all:
             sys.exit( 'Error: unknown field: %r' % line )
-        if prm.faultnormal == 0 and field in fieldnames.fault:
+        if pm.faultnormal == 0 and field in fieldnames.fault:
             sys.exit( 'Error: field only for ruptures: %r' % line )
         if 'w' not in mode and field not in fieldnames.input:
             sys.exit( 'Error: field is ouput only: %r' % line )
-        nn = list( prm.nn ) + [prm.nt]
+        nn = list( pm.nn ) + [pm.nt]
         if field in fieldnames.cell:
             mode = mode.replace( 'x', 'X' )
             mode = mode.replace( 'c', 'C' )
             base = 1.5
         else:
             base = 1
-        ii = ( util.expand_indices( prm.nn, ii[:3], base )
-             + util.expand_indices( [prm.nt], ii[3:], 1 ) )
+        ii = ( util.expand_indices( pm.nn, ii[:3], base )
+             + util.expand_indices( [pm.nt], ii[3:], 1 ) )
         if field in fieldnames.initial:
             ii[3] = 0, 0, 1
         if field in fieldnames.fault:
-            i = prm.faultnormal - 1
+            i = pm.faultnormal - 1
             ii[i] = 2 * (irup,) + (1,)
         nn = [ (ii[i][1] - ii[i][0] + 1) / ii[i][2] for i in range(4) ]
-        nb = ( min( prm.itio, prm.nt ) - 1 ) / ii[3][2] + 1
+        nb = ( min( pm.itio, pm.nt ) - 1 ) / ii[3][2] + 1
         nb = max( 1, min( nb, nn[3] ) )
         if 'x' not in mode and 'X' not in mode:
             n = nn[0] * nn[1] * nn[2]
-            if n > ( prm.nn[0] + prm.nn[1] + prm.nn[2] ) ** 2:
+            if n > ( pm.nn[0] + pm.nn[1] + pm.nn[2] ) ** 2:
                 nb = 1
             elif n > 1:
                 nb = min( nb, itbuff )
@@ -316,27 +314,26 @@ def prepare_prm( prm, itbuff ):
     for i in range( len( f ) ):
         if f[i] in f[:i]:
             sys.exit( 'Error: duplicate filename: %r' % f[i] )
-    prm.fieldio = fieldio
-    return prm
+    pm.fieldio = fieldio
+    return pm
 
-def launch( cfg ):
+def launch( cf ):
     """
     Launch or queue job.
     """
     cwd = os.getcwd()
-    if cfg.run == 'q':
-        os.chdir( cfg.rundir )
+    os.chdir( cf.rundir )
+    if cf.run == 'q':
         print( 'queue.sh' )
-        if cfg.host not in cfg.hosts:
-            sys.exit( 'Error: hostname %r does not match configuration %r' % ( cfg.host, cfg.machine ) )
+        if cf.host not in cf.hosts:
+            sys.exit( 'hostname %r does not match configuration %r' % (cf.host, cf.machine) )
         if os.system( os.path.join( '.', 'queue.sh' ) ):
             sys.exit( 'Error queing job' )
-    elif cfg.run:
-        os.chdir( cfg.rundir )
-        print( 'run.sh -' + cfg.run )
-        if cfg.host not in cfg.hosts:
-            sys.exit( 'Error: hostname %r does not match configuration %r' % ( cfg.host, cfg.machine ) )
-        if os.system( os.path.join( '.', 'run.sh -' + cfg.run ) ):
+    elif cf.run:
+        print( 'run.sh -' + cf.run )
+        if cf.host not in cf.hosts:
+            sys.exit( 'hostname %r does not match configuration %r' % (cf.host, cf.machine) )
+        if os.system( os.path.join( '.', 'run.sh -' + cf.run ) ):
             sys.exit( 'Error running job' )
     os.chdir( cwd )
     return
@@ -345,7 +342,7 @@ def run( inputs ):
     """
     Combined stage and launch in one step.
     """
-    cfg = stage( inputs )
-    launch( cfg )
-    return cfg
+    cf = stage( inputs )
+    launch( cf )
+    return cf
 

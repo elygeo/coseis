@@ -13,15 +13,15 @@ path = os.path.expanduser( os.path.join( '~', 'run', 'granular-vol' ) )
 meta = sord.util.loadmeta( path )
 path = os.path.join( path, 'out' ) + os.sep
 
-nn = meta['shape']['vs']
+nn = meta.shape['vs']
 n = nn[0] * nn[1]
 v = numpy.fromfile( path + 'vs', 'f' ).reshape( nn[::-1] ).T
 pylab.clf()
 pylab.imshow( v )
 pylab.ginput( 1, 0, 0 )
 
-nn = meta['shape']['v1'][:-1]
-nt = meta['shape']['v1'][-1]
+nn = meta.shape['v1'][:-1]
+nt = meta.shape['v1'][-1]
 n  = nn[0] * nn[1]
 
 f1 = open( path + 'v1', 'rb' )

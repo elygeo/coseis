@@ -4,35 +4,20 @@ General utilities
 """
 import os, sys, shutil, re
 
-class Object:
+class namespace:
     """
-    Empty class for creating objects with addributes.
+    Create a namespace froma a dict.
     """
-    pass
+    def __init__( self, d ):
+        self.__dict__.update( d )
 
-def objectify( d ):
-    """
-    Convert dict to object attributes.
-    """
-    o = Object()
-    for k, v in d.iteritems():
-        setattr( o, k, v )
-    return o
-
-def dictify( o ):
-    """
-    Convert object attributes to dict.
-    """
-    d = {}
-    for k in dir( o ):
-        d[k] = getattr( o, k )
-    return d
-
-def prune( d, pattern='(_)|(^.$)', types=None ):
+def prune( d, pattern=None, types=None ):
     """
     Delete dictionary keys with specified name pattern or types
     Default types are: functions and modules.
     """
+    if pattern == None:
+        pattern = '(^_)|(_$)|(^.$)'
     if types is None:
         types = type( re ), type( re.sub )
     grep = re.compile( pattern )
@@ -40,20 +25,31 @@ def prune( d, pattern='(_)|(^.$)', types=None ):
         if grep.search( k ) or type( d[k] ) in types:
             del( d[k] )
 
-def save( fd, d, expand=None, ignore='(_)|(^.$)', types=None ):
+def load( fd, d=None, ignore_pattern=None, ignore_types=None ):
+    """
+    Load variables from Python source files.
+    """
+    if type( fd ) is not file:
+        fd = open( os.path.expanduser( fd ) )
+    if d == None:
+        d = {}
+    exec fd in d
+    prune( d )
+    return namespace( d )
+
+def save( fd, d, expand=None ):
     """
     Write variables from a dict into a Python source file.
     """
     if type( fd ) is not file:
         fd = open( os.path.expanduser( fd ), 'w' )
+    if type( d ) is not dict:
+        d = d.__dict__
     if expand is None:
         expand = []
-    if types is None:
-        types = type( re ), type( re.compile )
-    grep = re.compile( ignore )
+    prune( d )
     for k in sorted( d ):
-        if not grep.search( k ) and type( d[k] ) not in types and k not in expand:
-            fd.write( '%s = %r\n' % ( k, d[k] ) )
+        fd.write( '%s = %r\n' % (k, d[k]) )
     for k in expand:
         if k in d:
             if type( d[k] ) == tuple:
@@ -72,7 +68,7 @@ def save( fd, d, expand=None, ignore='(_)|(^.$)', types=None ):
                     fd.write( repr( item ) + ': ' + repr( d[k][item] ) + ',\n' )
                 fd.write( '}\n' )
             else:
-                sys.exit( 'Can expand %s type %s' % ( k, type( d[k] ) ) )
+                sys.exit( 'Cannot expand %s type %s' % ( k, type( d[k] ) ) )
     fd.close()
     return
 
@@ -88,10 +84,10 @@ def loadmeta( path='.' ):
     else:
         f = os.path.join( path, 'conf.py' )
         if os.path.isfile( f ):
-            cfg = {}
-            exec open( f ) in cfg
+            d = {}
+            exec open( f ) in d
             for k in 'name', 'rundate', 'rundir', 'user', 'os_', 'dtype':
-                meta[k] = cfg[k]
+                meta[k] = d[k]
         f = os.path.join( path, 'parameters.py' )
         if os.path.isfile( f ):
             exec open( f ) in meta
@@ -102,10 +98,10 @@ def loadmeta( path='.' ):
                     out[filename] = ii
             f = os.path.join( path, 'locations.py' )
             if os.path.isfile( f ):
-                locs = {}
-                exec open( f ) in locs
+                d = {}
+                exec open( f ) in d
                 mm = meta['nn'] + ( meta['nt'], )
-                for ii, filename in locs['locations']:
+                for ii, filename in d['locations']:
                     if filename is not '-':
                         ii = expand_indices( mm, ii )
                         out[filename] = ii
@@ -119,7 +115,7 @@ def loadmeta( path='.' ):
         path = os.path.join( path, 'meta.py' )
         expand = 'shape', 'indices', 'fieldio'
         save( path, meta, expand )
-    return meta
+    return namespace( meta )
 
 def expand_indices( shape, indices=None, base=1 ):
     """
@@ -155,7 +151,7 @@ def expand_indices( shape, indices=None, base=1 ):
             indices[i][0] = indices[i][0] + shape[i] + off
         if  indices[i][1] < 0:
             indices[i][1] = indices[i][1] + shape[i] + off
-        indices[i] = tuple([ int( j ) for j in indices[i] ])
+        indices[i] = tuple( int( j ) for j in indices[i] )
     return indices
 
 def ndread( fd, shape=None, indices=None, dtype='f', order='F' ):
@@ -223,12 +219,11 @@ def progress( i, n, t ):
     """
     Print progress and time remaining.
     """
-    percent =  100. * i / n
-    remain = int( t * (100. / percent - 1.) )
-    h = remain / 3600
-    m = remain / 60 % 60
-    s = remain % 60
-    sys.stdout.write( '\r%3d%%  %02d:%02d:%02d' % ( percent, h, m, s ) )
+    import datetime
+    percent =  100.0 * i / n
+    seconds = int( t * (100.0 / percent - 1.0) )
+    datetime.timedelta( seconds=seconds )
+    sys.stdout.write( '\r%3d%%  %s' % (percent, seconds) )
     sys.stdout.flush()
     if i == n:
         print('')
@@ -292,7 +287,7 @@ def install_path():
 
 def uninstall_path():
     """
-    Remove path file from site-packages directory
+    Remove path file from site-packages directory.
     """
     from distutils.sysconfig import get_python_lib
     path = os.path.basename( os.path.dirname( __file__ ) ) + '.pth'

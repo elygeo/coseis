@@ -11,12 +11,10 @@ infile = 'in/vs'
 outfile = 'out/z25'
 
 meta = sord.util.loadmeta()
-nn = meta['nn']
-dx = meta['dx']
-up = dx[2] > 0
-dx = abs( dx[2] )
-n1 = ( nn[0] - cell ) * ( nn[1] - cell )
-n2 = nn[2] - cell
+dx = abs( meta.dx[2] )
+up = meta.dx[2] > 0
+n1 = ( meta.nn[0] - cell ) * ( meta.nn[1] - cell )
+n2 = meta.nn[2] - cell
 
 fh = open( infile, 'rb' )
 v2 = numpy.fromfile( fh, 'f', n1 )
@@ -42,7 +40,7 @@ depth.tofile( outfile )
 
 if 0:
     import pylab
-    pylab.imshow( depth.reshape( nn[1::-1] ) ).T
+    pylab.imshow( depth.reshape( meta.nn[1::-1] ) ).T
     pylab.axis( 'image' )
     pylab.show()
 

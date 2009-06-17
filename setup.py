@@ -8,11 +8,11 @@ def build( mode=None, optimize=None ):
     """
     Build SORD code.
     """
-    cfg = configure.configure()
+    cf = util.namespace( configure.configure() )
     if not optimize:
-        optimize = cfg['optimize']
+        optimize = cf.optimize
     if not mode:
-        mode = cfg['mode']
+        mode = cf.mode
     if not mode:
         mode = 'sm'
     base = (
@@ -49,24 +49,26 @@ def build( mode=None, optimize=None ):
     new = False
     os.chdir( os.path.join( srcdir, 'src' ) )
     if 's' in mode:
-        source = base + ( 'serial.f90', ) + common
+        source = base + ('serial.f90',) + common
         for opt in optimize:
             object_ = os.path.join( '..', 'bin', 'sord-s' + opt )
-            compiler = cfg['fortran_serial'] + cfg['fortran_flags'][opt]
-            new |= util.compile( compiler, object_, source )
-    if 'm' in mode and cfg['fortran_mpi']:
-        source = base + ( 'mpi.f90', ) + common
+            compiler = cf.fortran_serial + cf.fortran_flags[opt]
+            new |= util.make( compiler, object_, source )
+    if 'm' in mode and cf.fortran_mpi:
+        source = base + ('mpi.f90',) + common
         for opt in optimize:
             object_ = os.path.join( '..', 'bin', 'sord-m' + opt )
-            compiler = cfg['fortran_mpi'] + cfg['fortran_flags'][opt]
-            new |= util.compile( compiler, object_, source )
+            compiler = cf.fortran_mpi + cf.fortran_flags[opt]
+            new |= util.make( compiler, object_, source )
     if new:
         try:
             os.link( '.ignore', '.bzrignore' )
             os.system( 'bzr export sord.tgz' )
         except:
             pass
-    os.chdir( cwd )
+    os.chdir( os.path.join( srcdir, 'extras' ) )
+    if not os.path.isfile( 'rspectra.so' ):
+        os.system( 'f2py -c -m rspectra rspectra.f90' )
     return
 
 def docs():
@@ -76,10 +78,11 @@ def docs():
     import re
     from docutils.core import publish_string
     out = '\nExamples\n--------\n'
-    sources = [ 'loh1.py', 'tpv3.py', 'saf.py', ]
+    sources = 'loh1.py', 'tpv3.py', 'saf.py'
     for f in sources:
-        doc = open( 'examples/' + f ).readlines()[2].strip()
-        out += '| `%s <examples/%s>`_: %s\n' % ( f, f, doc )
+        path = os.path.join( 'examples', f )
+        doc = open( path ).readlines()[2].strip()
+        out += '| `%s <examples/%s>`_: %s\n' % (f, f, doc)
     out += '\nFortran source code\n-------------------\n'
     sources = [
         'sord.f90',
@@ -114,8 +117,7 @@ def docs():
     out += '\nPython wrappers\n---------------\n'
     sources = [
         '__init__.py',
-        'default-cfg.py',
-        'default-prm.py',
+        'parameters.py',
         'fieldnames.py',
         'configure.py',
         'setup.py',
@@ -125,7 +127,7 @@ def docs():
     for f in sources:
         doc = open( f ).readlines()[2].strip()
         out += '| `%s <%s>`_: %s\n' % ( f, f, doc )
-    download = ( "Latest source code version `%s <sord.tgz>`_"
+    download = ( 'Latest source code version `%s <sord.tgz>`_'
              % open( 'version' ).read().strip() )
     open( 'download.txt', 'w' ).write( download )
     open( 'sources.txt', 'w' ).write( out )

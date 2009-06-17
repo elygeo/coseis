@@ -11,8 +11,8 @@ infile = 'in/vs'
 outfile = 'out/z25'
 
 meta = sord.util.loadmeta()
-nn = meta['nn']
-dx = meta['dx']
+nn = meta.nn
+dx = meta.dx
 up = dx[2] > 0
 dx = abs( dx[2] )
 n1 = ( nn[0] - cell ) * ( nn[1] - cell )

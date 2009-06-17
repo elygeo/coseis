@@ -24,7 +24,7 @@ except( IOError ):
 
 # Machine specific
 machine = ''
-notes = "Default machine"
+notes = 'Default machine'
 os_ = os.uname()
 host = os.uname()[1]
 hosts = host,

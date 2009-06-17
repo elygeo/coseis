@@ -1,6 +1,55 @@
 #!/usr/bin/env python
 """
 Default simulation parameters
+
+Spatial difference operator level:
+
+  0: Auto pick 2 or 6
+  1: Mesh with constant spacing dx
+  2: Rectangular mesh
+  3: Parallelepiped mesh
+  4: One-point quadrature
+  5: Exactly integrated elements
+  6: Saved operators, nearly as fast as 2, but doubles the memory usage
+
+Boundary conditions:
+
+  0: Vacuum free surface: zero cell stress
+  1: Mirror symmetry at the node
+  2: Mirror symmetry at the cell
+ -1: Anti-mirror symmetry at the node, useful for nodal planes
+ -2: Anti-mirror symmetry at the cell, useful for nodal planes and fault planes
+  3: Rigid boundary: zero node displacement
+  4: Continue
+ 10: PML absorbing
+
+Field I/O specification:
+
+  ( '=',   'f', [j,k,l,t], val ):                   Set to value
+  ( '=s',  'f', [j,k,l,t], val ):                   Set to random numbers between 0 and val
+  ( '=x',  'f', [j,k,l,t], val, x ):                Set to value at neartest node/cell to x 
+  ( '=sx', 'f', [j,k,l,t], val, x ):                Set to random number at nearest node/cell
+  ( '=c',  'f', [j,k,l,t], val, x1, x2 ):           Set to value inside Cartesian cube
+  ( '=f',  'f', [j,k,l,t], val, tfunc, T ):         Set to time function with period T
+  ( '=fs', 'f', [j,k,l,t], val, tfunc, T ):         Set to time function * random number
+  ( '=fx', 'f', [j,k,l,t], val, tfunc, T, x ):      Set to time function at nearest node/cell
+  ( '=fc', 'f', [j,k,l,t], val, tfunc, T, x1, x2 ): Set to time function inside Cartesian cube
+  ( '=r',  'f', [j,k,l,t], filename ):              Read from filename
+  ( '=w',  'f', [j,k,l,t], filename ):              Write to filename
+  ( '=rx', 'f', [j,k,l,t], filename, x ):           Read at nearest node/cell to x
+  ( '=wx', 'f', [j,k,l,t], filename, x ):           Write at nearest node/cell to x
+
+'f' is the field name. Options are listed in fieldnames.py.
+
+Input can be added to the existing value by specifying '+' instead of '='.
+
+[j,k,l,t] are 1-based (Fortran style) indices.
+Indices can be a single index, a range (start,end) or a strided range (start,end,step).
+Negative indices count backward from the end of the array.
+() is shorthand for (1,-1,1), i.e., the entire range, with stride 1.
+[] is shorthand for the entire array, more explicitly written as
+[(),(),(),()] or [(1,-1,1),(1,-1,1),(1,-1,1),(1,-1,1)].
+
 """
 
 # I/O and code execution parameters
@@ -68,56 +117,6 @@ source1 = 0.0, 0.0, 0.0		# normal components
 source2 = 0.0, 0.0, 0.0		# shear components
 timefunction = 'none'		# time function, see util.f90 for details.
 period = 10 * dt		# dominant period
-
-# Spatial difference operator level:
-#
-#   0: Auto pick 2 or 6
-#   1: Mesh with constant spacing dx
-#   2: Rectangular mesh
-#   3: Parallelepiped mesh
-#   4: One-point quadrature
-#   5: Exactly integrated elements
-#   6: Saved operators, nearly as fast as 2, but doubles the memory usage
-
-
-# Boundary conditions:
-#
-#   0: Vacuum free surface: zero cell stress
-#   1: Mirror symmetry at the node
-#   2: Mirror symmetry at the cell
-#  -1: Anti-mirror symmetry at the node, useful for nodal planes
-#  -2: Anti-mirror symmetry at the cell, useful for nodal planes and fault planes
-#   3: Rigid boundary: zero node displacement
-#   4: Continue
-#  10: PML absorbing
-
-
-# Field I/O specification:
-#
-#   ( '=',   'f', [j,k,l,t], val ):                   Set to value
-#   ( '=s',  'f', [j,k,l,t], val ):                   Set to random numbers between 0 and val
-#   ( '=x',  'f', [j,k,l,t], val, x ):                Set to value at neartest node/cell to x 
-#   ( '=sx', 'f', [j,k,l,t], val, x ):                Set to random number at nearest node/cell
-#   ( '=c',  'f', [j,k,l,t], val, x1, x2 ):           Set to value inside Cartesian cube
-#   ( '=f',  'f', [j,k,l,t], val, tfunc, T ):         Set to time function with period T
-#   ( '=fs', 'f', [j,k,l,t], val, tfunc, T ):         Set to time function * random number
-#   ( '=fx', 'f', [j,k,l,t], val, tfunc, T, x ):      Set to time function at nearest node/cell
-#   ( '=fc', 'f', [j,k,l,t], val, tfunc, T, x1, x2 ): Set to time function inside Cartesian cube
-#   ( '=r',  'f', [j,k,l,t], filename ):              Read from filename
-#   ( '=w',  'f', [j,k,l,t], filename ):              Write to filename
-#   ( '=rx', 'f', [j,k,l,t], filename, x ):           Read at nearest node/cell to x
-#   ( '=wx', 'f', [j,k,l,t], filename, x ):           Write at nearest node/cell to x
-#
-# 'f' is the field name. Options are listed in fieldnames.py.
-#
-# Input can be added to the existing value by specifying '+' instead of '='.
-#
-# [j,k,l,t] are 1-based (Fortran style) indices.
-# Indices can be a single index, a range (start,end) or a strided range (start,end,step).
-# Negative indices count backward from the end of the array.
-# () is shorthand for (1,-1,1), i.e., the entire range, with stride 1.
-# [] is shorthand for the entire array, more explicitly written as
-# [(),(),(),()] or [(1,-1,1),(1,-1,1),(1,-1,1),(1,-1,1)].
 
 # Placeholders
 i1pml = None

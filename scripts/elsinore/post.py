@@ -15,10 +15,10 @@ dit_t = 2
 
 # write WebSims metadata
 meta = sord.util.loadmeta()
-dtype = meta['dtype']
-dt = meta['dt']
-dx = meta['dx']
-shape = meta['shape']['v1']
+dtype = meta.dtype
+dt = meta.dt
+dx = meta.dx
+shape = meta.shape['v1']
 x_shape = (shape[0]-1)/dix_x+1, (shape[1]-1)/dix_x+1, (shape[2]-1)/dit_x+1
 t_shape = (shape[2]-1)/dit_t+1, (shape[0]-1)/dix_t+1, (shape[1]-1)/dix_t+1
 websims = dict(

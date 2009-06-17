@@ -38,7 +38,7 @@ News
   - New finite source module and Python utility to read Graves SRF format.  
   - ihypo is now a real number parameter for sub-cell positioning.
   - I/O testing and bug fixes.
-  - new parameters: source, nsource, source1, source2 (see default-prm.py)
+  - new parameters: source, nsource, source1, source2 (see parameters.py)
   - removed parameters: moment1, moment2, rsource, rfunc
 
 2008, Nov 11. New version finished introducing a revamped I/O scheme and Python
@@ -187,7 +187,7 @@ Basic usage
 
 SORD is run from Python by importing the ``sord`` module and passing a
 dictionary containing the input parameters to the ``sord.run()`` function.  The
-file `default-prm.py <default-prm.py>`__ contains a short description of each
+file `parameters.py <parameters.py>`__ contains a short description of each
 SORD input parameter and it's default value.  Annotated example scripts are
 located in the ``examples/`` directory.  To run the layer over halfspace
 example (LOH.1), do::
@@ -220,7 +220,7 @@ check that it is proceeding correctly.  The binary files can be examined with
 the UNIX command ``od -f``.
 
 The best place to go from here to learn more is to look at the example scripts
-and `default-prm.py <default-prm.py>`__.  Studying the Fortran source code in
+and `parameters.py <parameters.py>`__.  Studying the Fortran source code in
 the ``src/`` directory will be educational as well.  As much as possible, I
 have tried to keep it clean and readable.
 

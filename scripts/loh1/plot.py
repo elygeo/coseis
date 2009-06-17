@@ -8,10 +8,10 @@ import os, numpy, pylab, scipy.signal, sord
 so_dir = os.path.expanduser( '~/run/loh1/' )
 fk_dir = 'fk/'
 meta = sord.util.loadmeta( so_dir )
-dt = meta['dt']
-nt = meta['nt']
-T = meta['period']
-dtype = meta['dtype']
+dt = meta.dt
+nt = meta.nt
+T = meta.period
+dtype = meta.dtype
 sig = dt * 22.5
 ts = 4 * sig
 

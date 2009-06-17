@@ -6,9 +6,9 @@ import numpy, sord
 
 # write WebSims metadata
 meta = sord.util.loadmeta()
-shape = meta['shape']['v1']
-dt = meta['dt']
-dx = meta['dx']
+shape = meta.shape['v1']
+dt = meta.dt
+dx = meta.dx
 websims = dict(
     title = 'Gouge - Shear source',
     author = 'Ely & Goebel',
@@ -40,7 +40,7 @@ sord.util.save( fd, websims, ['t_panes', 'x_initial_panes', 'x_panes', 'x_plot']
 fd.close()
 
 # compute peak velocity and displacement
-dtype = meta['dtype']
+dtype = meta.dtype
 nn = shape[:-1]
 nt = shape[-1]
 n  = numpy.prod( nn )

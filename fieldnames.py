@@ -99,7 +99,7 @@ table = [
     ( 'tarr',  't_{arrest}',      'Arrest time',                    'f',   ),
 ]
 
-map     = dict( [ ( f[0], f[1:0] ) for f in table ] )
+map     = dict( (f[0], f[1:]) for f in table )
 all     = [ f[0] for f in table ]
 input   = [ f[0] for f in table if '<' in f[-1] ]
 initial = [ f[0] for f in table if '0' in f[-1] ]

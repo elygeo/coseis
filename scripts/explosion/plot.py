@@ -11,11 +11,11 @@ stations = 'p1', 'p2', 'p3', 'p4', 'p5', 'p6'
 
 for path in runs:
     meta = sord.util.loadmeta( path )
-    nt = meta['nt']
-    dt = meta['dt']
-    period = meta['period']
-    source = meta['source']
-    source1 = meta['source1']
+    nt = meta.nt
+    dt = meta.dt
+    period = meta.period
+    source = meta.source
+    source1 = meta.source1
     cutoff = 0
     cutoff = vp / (20 * dx[0])
     if source == 'moment':

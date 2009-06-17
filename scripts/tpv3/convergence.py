@@ -10,13 +10,16 @@ dirs = glob.glob( '[0-9]*' )
 dirs = glob.glob( '[0-9]*' )[3:]
 
 meta = sord.util.loadmeta( dirs[0] )
-n = meta['shape']['flt-trup']
-x0  = numpy.fromfile( dirs[0] + '/out/flt-x1', 'f'   ).reshape( n[::-1] ).T
-y0  = numpy.fromfile( dirs[0] + '/out/flt-x2', 'f'   ).reshape( n[::-1] ).T
-tt0 = numpy.fromfile( dirs[0] + '/out/flt-trup', 'f' ).reshape( n[::-1] ).T; tt_ = tt0.mean()
-sv0 = numpy.fromfile( dirs[0] + '/out/flt-psv', 'f'  ).reshape( n[::-1] ).T; sv_ = sv0.mean()
-sx0 = numpy.fromfile( dirs[0] + '/out/flt-su1', 'f'  ).reshape( n[::-1] ).T
-sy0 = numpy.fromfile( dirs[0] + '/out/flt-su2', 'f'  ).reshape( n[::-1] ).T
+path = os.path.join( dirs[0], 'out' ) + os.sep
+n = meta.shape['flt-trup']
+x0  = numpy.fromfile( path + 'flt-x1',   'f' ).reshape( n[::-1] ).T
+y0  = numpy.fromfile( path + 'flt-x2',   'f' ).reshape( n[::-1] ).T
+tt0 = numpy.fromfile( path + 'flt-trup', 'f' ).reshape( n[::-1] ).T
+sv0 = numpy.fromfile( path + 'flt-psv',  'f' ).reshape( n[::-1] ).T
+sx0 = numpy.fromfile( path + 'flt-su1',  'f' ).reshape( n[::-1] ).T
+sy0 = numpy.fromfile( path + 'flt-su2',  'f' ).reshape( n[::-1] ).T
+tt_ = tt0.mean()
+sv_ = sv0.mean()
 su_ = numpy.average( numpy.sqrt( sx0*sx0 + sy0*sy0 ) )
 dx = []
 ttres = []
@@ -26,8 +29,8 @@ svres = []
 for d in dirs[1:]:
     path = os.path.join( d, 'out' ) + os.sep
     meta = sord.util.loadmeta( d )
-    dx += [ int( meta['dx'][0] + 0.5 ) ]
-    n = meta['shape']['flt-trup']
+    dx += [ int( meta.dx[0] + 0.5 ) ]
+    n = meta.shape['flt-trup']
     x = numpy.fromfile( path + 'flt-x1',   'f' ).reshape( n[::-1] ).T
     y = numpy.fromfile( path + 'flt-x2',   'f' ).reshape( n[::-1] ).T
     f = numpy.fromfile( path + 'flt-trup', 'f' ).reshape( n[::-1] ).T
@@ -67,7 +70,7 @@ if 0:
     pylab.text( 0.8*dx[0], 0.8*ttres[0], 'Rupture time', ha='left', va='top' )
     pylab.text( dx[-1], 0.8*sures[-1], 'Slip', ha='center', va='top' )
     pylab.text( 0.8*dx[6], svres[6],  'Peak slip rate', ha='right' )
-    dx = [ x for x in dx if x not in [ 30, 100, 300 ] ]
+    dx = [ x for x in dx if x not in (30, 100, 300) ]
     pylab.xlim( 10, 750 )
     pylab.gca().set_xticks( dx )
     pylab.gca().set_xticklabels( dx )
