@@ -41,7 +41,7 @@ def deploy( rsh, dest, command=None ):
     """
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    rsync = ' '.join(
+    rsync = ' '.join( (
         'rsync',
         '-avR',
         '--delete',
@@ -53,7 +53,7 @@ def deploy( rsh, dest, command=None ):
         '--exclude-from=.ignore',
         '-e', rsh,
         '.', dest
-    )
+    ) )
     print( rsync )
     os.system( rsync )
     os.chdir( cwd )
@@ -73,7 +73,7 @@ def publish( rsh, dest ):
     """
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    rsync = ' '.join(
+    rsync = ' '.join( (
         'rsync',
         '-avR',
         '--delete',
@@ -83,7 +83,7 @@ def publish( rsh, dest ):
         '--exclude-from=.ignore',
         '-e', rsh,
         '.', dest
-    )
+    ) )
     print( rsync )
     os.system( rsync )
     os.chdir( cwd )
