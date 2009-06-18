@@ -307,6 +307,52 @@ def srf2momrate( path, projection, dx, dt, nt ):
 
     return dt.size
 
+def srf2coulomb( path, projection, dx, dest='coulomb.inp', noslip=False ):
+    """
+    Convert SRF to Coulomb input file.
+    """
+
+    # Read meta data
+    path = os.path.expanduser( path ) + os.sep
+    meta = {}
+    exec open( path + 'meta.py' ) in meta
+    dtype = meta['dtype']
+
+    # Read data
+    x   = numpy.fromfile( path + 'lon',   dtype )
+    y   = numpy.fromfile( path + 'lat',   dtype )
+    z   = numpy.fromfile( path + 'dep',   dtype )
+    stk = numpy.fromfile( path + 'stk',   dtype )
+    dip = numpy.fromfile( path + 'dip',   dtype )
+    if noslip:
+        s1 = numpy.zeros_like( x )
+        s2 = numpy.zeros_like( y )
+    else:
+        s1 = numpy.fromfile( path + 'slip1', dtype )
+        s2 = numpy.fromfile( path + 'slip2', dtype )
+
+    # Coordinates
+    rot = coord.rotation( x, y, projection )[1]
+    x, y = 0.001 * projection( x, y )
+    z = 0.001 * z
+    delta = 0.0005 * meta['dx']
+    dx = delta * numpy.sin( numpy.pi / 180.0 * (stk + rot) )
+    dy = delta * numpy.cos( numpy.pi / 180.0 * (stk + rot) )
+    dz = delta * numpy.sin( numpy.pi / 180.0 * dip )
+    x1, x2 = x - dx, x + dx
+    y1, y2 = y - dy, y + dy
+    z1, z2 = z - dz, z + dz
+    c = numpy.array( [x1, y1, x2, y2, s1, s2, dip, z1, z2] ).T
+
+    fd = open( path + dest, 'w' )
+    fd.write( coulomb_header % meta )
+    fmt = '  1' + 4*' %10.4f' + ' 100' + 5*' %10.4f' + '    Fault 1'
+    numpy.savetxt( fd, c, fmt )
+    fd.write( coulomb_footer )
+    fd.close()
+
+    return
+
 coulomb_header = """\
 header line 1
 header line 2
@@ -323,45 +369,35 @@ S3DR=        109.000 S3DP=         -0.010 S3IN=          0.000 S3GD=          0.
 xxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx
 """
 
-def srf2coulomb( path, projection, dx ):
-    """
-    Convert SRF to Coulomb input file.
-    """
-
-    # Read meta data
-    path = os.path.expanduser( path ) + os.sep
-    meta = {}
-    exec open( path + 'meta.py' ) in meta
-    dtype = meta['dtype']
-
-    # Read data
-    x   = numpy.fromfile( path + 'lon',   dtype )
-    y   = numpy.fromfile( path + 'lat',   dtype )
-    z   = numpy.fromfile( path + 'dep',   dtype )
-    s1  = numpy.fromfile( path + 'slip1', dtype )
-    s2  = numpy.fromfile( path + 'slip2', dtype )
-    stk = numpy.fromfile( path + 'stk',   dtype )
-    dip = numpy.fromfile( path + 'dip',   dtype )
-
-    # Coordinates
-    rot = coord.rotation( x, y, projection )[1]
-    x, y = 0.001 * projection( x, y )
-    z = 0.001 * z
-    delta = 0.0005 * meta['dx']
-    dx = delta * numpy.sin( numpy.pi / 180.0 * (stk + rot) )
-    dy = delta * numpy.cos( numpy.pi / 180.0 * (stk + rot) )
-    dz = delta * numpy.sin( numpy.pi / 180.0 * dip )
-    x1, x2 = x - dx, x + dx
-    y1, y2 = y - dy, y + dy
-    z1, z2 = z - dz, z + dz
-    c = numpy.array( [x1, y1, x2, y2, s1, s2, dip, z1, z2] ).T
-
-    fd = open( path + 'coulomb.inp', 'w' )
-    fd.write( coulomb_header % meta )
-    fmt = '  1' + 4*' %10.4f' + ' 100' + 5*' %10.4f' + '    Fault 1'
-    numpy.savetxt( fd, c, fmt )
-
-    return
+coulomb_footer = """
+   Grid Parameters
+  1  ----------------------------  Start-x =     -100.0
+  2  ----------------------------  Start-y =        0.0
+  3  --------------------------   Finish-x =      500.0
+  4  --------------------------   Finish-y =      400.0
+  5  ------------------------  x-increment =        5.0
+  6  ------------------------  y-increment =        5.0
+     Size Parameters
+  1  --------------------------  Plot size =        2.0
+  2  --------------  Shade/Color increment =        1.0
+  3  ------  Exaggeration for disp.& dist. =    10000.0
+  
+     Cross section default
+  1  ----------------------------  Start-x =     -126.4
+  2  ----------------------------  Start-y =     -124.6
+  3  --------------------------   Finish-x =       40.0
+  4  --------------------------   Finish-y =       40.0
+  5  ------------------  Distant-increment =        1.0
+  6  ----------------------------  Z-depth =       30.0
+  7  ------------------------  Z-increment =        1.0
+     Map info
+  1  ---------------------------- min. lon =     -128.0
+  2  ---------------------------- max. lon =     -123.0
+  3  ---------------------------- zero lon =     -125.0
+  4  ---------------------------- min. lat =       39.5
+  5  ---------------------------- max. lat =       42.5
+  6  ---------------------------- zero lat =       40.0
+"""
 
 def command_line():
     """
