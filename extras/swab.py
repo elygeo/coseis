@@ -1,12 +1,15 @@
 #!/usr/bin/env python
+"""
+Byte swapping
+"""
 import os, sys, numpy
 
-swab( src, dst, verbose=False, dtype='f', block=64*1024*1024 ):
+def swab( src, dst, verbose=False, dtype='f', block=64*1024*1024 ):
     """
     Swab byteorder. Default is 4 byte numbers.
     """
     nb = numpy.dtype( dtype ).itemsize
-    n = os.path.getsize( f )
+    n = os.path.getsize( src )
     if n == 0 or n % nb != 0:
         return
     n /= nb
@@ -19,14 +22,16 @@ swab( src, dst, verbose=False, dtype='f', block=64*1024*1024 ):
         r.byteswap( True ).tofile( f1 )
         i += b
         if verbose:
-            sys.stdout.write( '\r%s %3d%%' % ( filename, 100.0 * i / n ) )
+            sys.stdout.write( '\r%s %3d%%' % ( dst, 100.0 * i / n ) )
             sys.stdout.flush()
     if verbose:
         print( '' )
     return
 
-# Command line
-if __name__ =='__main__':
+def command_line():
+    """
+    Process command line options.
+    """
     files = []
     for a in sys.argv[1:]:
         if a[0] == '-':
@@ -38,5 +43,8 @@ if __name__ =='__main__':
     for f in files:
         if not os.path.isfile( f ):
             continue
-        swab( f, f + '.swab', True )
+        swab( f, f + '.swab', True, dtype )
+
+if __name__ == '__main__':
+    command_line()
 

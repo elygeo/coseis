@@ -334,7 +334,6 @@ def srf2coulomb( path, projection, dx ):
     dtype = meta['dtype']
 
     # Read data
-    nn = meta['nsource2']
     x   = numpy.fromfile( path + 'lon',   dtype )
     y   = numpy.fromfile( path + 'lat',   dtype )
     z   = numpy.fromfile( path + 'dep',   dtype )
@@ -363,10 +362,15 @@ def srf2coulomb( path, projection, dx ):
 
     return
 
-# Command line
-if __name__ == '__main__':
+def command_line():
+    """
+    Process command line options.
+    """
     import pprint
     for f in sys.argv[1:]:
         print( f )
         pprint.pprint( srf_read( f, True ) )
+    
+if __name__ == '__main__':
+    command_line()
  

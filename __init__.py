@@ -4,7 +4,7 @@ Support Operator Rupture Dynamics
 """
 import os, sys, re
 import util, configure, fieldnames, remote
-from extras import coord, egmm, signal, source, viz
+from extras import coord, egmm, signal, source, viz, swab
 try:
     from extras import rspectra
 except( ImportError ):
