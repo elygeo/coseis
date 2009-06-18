@@ -16,6 +16,7 @@ def configure( save=False, machine=None ):
     if not machine and os.path.isfile( 'machine' ):
         machine = open( 'machine' ).read().strip()
     if machine:
+        machine = os.path.basename( machine )
         path = os.path.join( 'conf', machine, 'conf.py' )
         exec open( path ) in conf
         conf['machine'] = machine
