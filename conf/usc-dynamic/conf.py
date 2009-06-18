@@ -14,5 +14,4 @@ queue = 'mpi'
 maxnodes = 12
 maxcores = 4
 maxram = 1800
-mode = 'm'
 

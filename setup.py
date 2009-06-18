@@ -44,12 +44,12 @@ def build( mode=None, optimize=None ):
         'sord.f90',
     )
     cwd = os.getcwd()
-    srcdir = os.path.realpath( os.path.dirname( __file__ ) )
-    path = os.path.join( srcdir, 'bin' )
-    if not os.path.isdir( path ):
-        os.mkdir( path )
+    path = os.path.realpath( os.path.dirname( __file__ ) )
+    f = os.path.join( path, 'bin' )
+    if not os.path.isdir( f ):
+        os.mkdir( f )
     new = False
-    os.chdir( os.path.join( srcdir, 'src' ) )
+    os.chdir( os.path.join( path, 'src' ) )
     if 's' in mode:
         source = base + ('serial.f90',) + common
         for opt in optimize:
@@ -65,7 +65,7 @@ def build( mode=None, optimize=None ):
     if new:
         os.link( '.ignore', '.bzrignore' )
         os.system( 'bzr export sord.tgz' )
-    os.chdir( os.path.join( srcdir, 'extras' ) )
+    os.chdir( os.path.join( path, 'extras' ) )
     if not os.path.isfile( 'rspectra.so' ):
         os.system( 'f2py -c -m rspectra rspectra.f90' )
     os.chdir( cwd )

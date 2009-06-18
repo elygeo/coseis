@@ -55,7 +55,8 @@ def deploy( rsh, dest, command=None ):
         '.', dest
     ) )
     print( rsync )
-    os.system( rsync )
+    if os.system( rsync ):
+        sys.exit()
     os.chdir( cwd )
     if command is not None:
         for cmd in command:
@@ -64,7 +65,8 @@ def deploy( rsh, dest, command=None ):
             cmd = 'cd %s; %s' % (path, cmd)
             cmd = '%s %s "bash --login -c %r"' % (rsh, host, cmd)
             print( cmd )
-            os.system( cmd )
+            if os.system( cmd ):
+                sys.exit()
     return
 
 def publish( rsh, dest ):
@@ -85,7 +87,8 @@ def publish( rsh, dest ):
         '.', dest
     ) )
     print( rsync )
-    os.system( rsync )
+    if os.system( rsync ):
+        sys.exit()
     os.chdir( cwd )
     return
 
@@ -97,7 +100,8 @@ def get( rsh, path, files ):
         src = path + '/' + f.rstrip('/')
         rsync = 'rsync -av --delete -e %r %r .' % (rsh, src)
         print( rsync )
-        os.system( rsync )
+        if os.system( rsync ):
+            sys.exit()
     return
 
 def command_line():

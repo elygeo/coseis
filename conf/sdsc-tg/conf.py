@@ -36,7 +36,6 @@ maxcores = 2
 maxram = 3000
 maxtime = 18,00
 rate = 2.2e6
-mode = 'm'
 fortran_serial = 'ifort',
 fortran_mpi = 'mpif90',
 _ = '-u', '-std95', '-warn', '-o'

@@ -35,7 +35,6 @@ maxcores = 8
 maxram = 15000 # 4416 nodes #PBS -l feature=2gbpercore
 maxram =  7000 # 3840 nodes
 rate = 1e6 # just a guess
-mode = 'm'
 fortran_serial = 'ftn',
 fortran_mpi = 'ftn',
 _ = '-Mdclchk', '-o'

@@ -30,7 +30,6 @@ queue = 'normal';      maxnodes = 256;  maxtime = 24, 00
 maxcores = 16
 maxram = 30000
 rate = 2.1e6
-mode = 'm'
 fortran_serial = 'pgf95',
 fortran_mpi = 'mpif90',
 _ = '-Mdclchk', '-o'
