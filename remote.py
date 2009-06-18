@@ -31,8 +31,6 @@ def pick_dest( message=None, default=None, path=None, prompt='Destinations' ):
         picks = [ int(i) for i in input_ ]
     out = []
     for i in picks:
-        if i < 0:
-            i = len( destinations ) + i + 1
         a = destinations[i-1].strip( '#' ).split( ' ' )
         out += [ ( ' '.join( a[:-1] ), a[-1] ) ]
     return out
@@ -49,8 +47,8 @@ def deploy( rsh, dest, command=None ):
         '--delete',
         '--include=destinations',
         '--include=email',
-        '--include=data',
         '--include=work',
+        '--include=data',
         '--include=sord.tgz',
         '--exclude-from=.ignore',
         '-e', rsh,
@@ -97,13 +95,7 @@ def get( rsh, path, files ):
     """
     for f in files:
         src = path + '/' + f.rstrip('/')
-        rsync = ' '.join(
-            'rsync',
-            '-av',
-            '--delete',
-            '-e', rsh,
-            '.', src
-        )
+        rsync = 'rsync -av --delete -e %r %r .' % (rsh, src)
         print( rsync )
         os.system( rsync )
     return
