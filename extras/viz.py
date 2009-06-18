@@ -57,7 +57,7 @@ def lengthscale( x, y, w=None, label='%s', style='k-', bg='w', **kwargs ):
             w = 0.01 / l * (y * dx + x * dy)
     try:
         label = label % l
-    except:
+    except( TypeError ):
         pass
     rot = (dx, -dy), (dy, dx)
     x = -l, l, numpy.nan, -l, -l, numpy.nan,  l, l
@@ -65,7 +65,8 @@ def lengthscale( x, y, w=None, label='%s', style='k-', bg='w', **kwargs ):
     x, y = 0.5 / l * numpy.dot( rot, [x, y] )
     theta = numpy.arctan2( dy, dx ) * 180.0 / numpy.pi
     h1 = pylab.plot( x0 + x, y0 + y, style, clip_on=False, **kwargs )
-    h2 = pylab.text( x0, y0, label, ha='center', va='center', backgroundcolor=bg, rotation=theta )
+    h2 = pylab.text( x0, y0, label, ha='center', va='center',
+        backgroundcolor=bg, rotation=theta )
     return h1, h2
 
 def colormap( name='w0', colorexp=1., output='mayavi', n=2001, nmod=0, modlim=0.5 ):
