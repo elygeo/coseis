@@ -53,14 +53,15 @@ if ( master ) write( 0, * ) 'Main loop:', nt, ' steps'
 loop: do while ( it < nt )
 it = it + 1
 jp = jp + 1
+mptimer = 0.0
 iotimer = 0.0
 prof(1,jp) = timer(5)
 call timestep                   ; if (sync) call barrier ; prof(1,jp) = timer(5)
 call stress                     ; if (sync) call barrier ; prof(2,jp) = timer(5)
 call acceleration               ; if (sync) call barrier ; prof(3,jp) = timer(5)
-call vector_swap_halo(w1,nhalo) ; if (sync) call barrier ; prof(4,jp) = timer(5)
 call stats()                    ; if (sync) call barrier ; prof(5,jp) = timer(5)
 call write_checkpoint           ; if (sync) call barrier ; prof(6,jp) = timer(5)
+prof(4,jp) = mptimer
 prof(7,jp) = iotimer
 prof(8,jp) = timer(6)
 if ( it == nt .or. modulo( it, itio ) == 0 ) then

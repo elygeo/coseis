@@ -243,16 +243,29 @@ case( '=r', '+r', '=R', '+R' )
             cycle loop
         end if
     end if
-    i = 0
     p%ib = p%ib + 1
-    do l = i1(3), i2(3), di(3)
-    do k = i1(2), i2(2), di(2)
-    do j = i1(1), i2(1), di(1)
-        i = i + 1
-        s1(j,k,l) = p%buff(i,p%ib)
-    end do
-    end do
-    end do
+    if ( p%mode == '=wi' .or. p%mode == '=wI' ) then
+        do l = i1(3), i2(3)
+        do k = i1(2), i2(2)
+        do j = i1(1), i2(1)
+            !w = (1.0-abs(xi(1)-j)) * (1.0-abs(xi(2)-k)) * (1.0-abs(xi(3)-l))
+            !do i = 1, 3
+            !    w1(j,k,l,i) = w1(j,k,l,i) + w * source1(i)
+            !end do
+        end do
+        end do
+        end do
+    else
+        i = 0
+        do l = i1(3), i2(3), di(3)
+        do k = i1(2), i2(2), di(2)
+        do j = i1(1), i2(1), di(1)
+            i = i + 1
+            s1(j,k,l) = p%buff(i,p%ib)
+        end do
+        end do
+        end do
+    end if
     if ( any( di > 1 ) ) then
         i1 = p%ii(1,1:3) - nnoff
         i2 = p%ii(2,1:3) - nnoff
@@ -296,7 +309,7 @@ case( '=r', '+r', '=R', '+R' )
         call pdelete
         cycle loop
     end if
-case( '=w' )
+case( '=w', '=wi', '=wI' )
     if ( p%ib < 0 ) then
         allocate( p%buff(n(1)*n(2)*n(3),p%nb) )
         p%ib = 0
@@ -365,6 +378,7 @@ if ( i > 0 .and. debug > 3 .and. it <= 8 ) then
 end if
 
 ! Timer
+if (sync) call barrier
 iotimer = iotimer + timer( 2 )
 
 end subroutine

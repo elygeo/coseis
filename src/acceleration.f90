@@ -13,7 +13,9 @@ use m_rupture
 use m_util
 use m_fieldio
 use m_stats
+use m_collective
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq
+real :: rr
 
 if ( verb ) write( 0, * ) 'Acceleration'
 call set_halo( s1, 0.0, i1node, i2node )
@@ -182,6 +184,12 @@ end do
 
 ! Spontaneous rupture
 call rupture
+
+! Multiprocessor communications
+rr = timer( 2 )
+call vector_swap_halo( w1, nhalo )
+if (sync) call barrier
+mptimer = mptimer + timer( 2 )
 
 ! Acceleration I/O
 call fieldio( '<>', 'a1', w1(:,:,:,1) )

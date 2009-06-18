@@ -108,6 +108,7 @@ if ( j > 0 .and. ( modulo( it, itio ) == 0 .or. it == nt ) ) then
 end if
 
 ! Timer
+if (sync) call barrier
 iotimer = iotimer + timer( 2 )
 
 end subroutine
