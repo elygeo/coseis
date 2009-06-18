@@ -2,7 +2,8 @@
 """
 Read configuration files
 """
-import os, sys, util
+import os, sys
+import util
 
 def configure( save=False, machine=None ):
     """

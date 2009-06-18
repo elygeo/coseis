@@ -2,6 +2,7 @@
 """
 Visualization utilities
 """
+import os, sys, numpy
 
 def savefig( fd=None, format=None, **kwargs ):
     """
@@ -11,7 +12,7 @@ def savefig( fd=None, format=None, **kwargs ):
     PDF is distilled using Ghostscript to produce smaller files.
     Takes the same argnuments as pylab.savefig.
     """
-    import os, pylab, cStringIO, subprocess
+    import pylab, cStringIO, subprocess
     if fd:
         if type( fd ) is not file:
             if not format:
@@ -40,7 +41,7 @@ def lengthscale( x, y, w=None, label='%s', style='k-', bg='w', **kwargs ):
     """
     Draw a length scale bar between the points (x[0], y[0]) and (x[1], y[1]).
     """
-    import numpy, pylab
+    import pylab
     x0 = 0.5 * (x[0] + x[1])
     y0 = 0.5 * (y[0] + y[1])
     dx = abs( x[1] - x[0] )
@@ -73,7 +74,6 @@ def colormap( name='w0', colorexp=1., output='mayavi', n=2001, nmod=0, modlim=0.
     """
     Colormap library
     """
-    import sys, numpy
     centered = False
     if type( name ) == str:
         if name == 'w000':
@@ -160,7 +160,8 @@ def digitize( img, xlim=(-1,1), ylim=(-1,1), color='r' ):
     """
     Digitize points on an image and rectify to a rectangular coordinate system.
     """
-    import pylab, coord
+    import pylab
+    import coord
     pylab.clf()
     pylab.axes( [0, 0, 1, 1] )
     pylab.imshow( img )
@@ -181,12 +182,12 @@ def digitize( img, xlim=(-1,1), ylim=(-1,1), color='r' ):
 
     xx = xx[:2], xx[2:]
     yy = yy[:2], yy[2:]
-    print("""
+    print( """
     Left-click, space: add point
     Right-click, delete: cancel last point
     Enter: new line segment
     Enter twice: finish
-    """)
+    """ )
     x0 = 0.5 * ( xlim[1] + xlim[0] )
     y0 = 0.5 * ( ylim[1] + ylim[0] )
     dx = 0.5 * ( xlim[1] - xlim[0] )

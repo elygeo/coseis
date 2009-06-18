@@ -2,7 +2,8 @@
 """
 Build SORD binaries and documentation
 """
-import os, sys, getopt, util, configure
+import os, sys, getopt
+import util, configure
 
 def build( mode=None, optimize=None ):
     """

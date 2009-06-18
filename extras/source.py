@@ -2,7 +2,8 @@
 """
 Source utilities
 """
-import os, sys, numpy, gzip, coord, sord
+import os, sys, numpy, gzip
+import coord
 
 def srf_read( filename, path=None, mks=True ):
     """
@@ -287,9 +288,9 @@ def srf2momrate( path, projection, dx, dt, nt ):
         sv1 = numpy.fromfile( fd1, dtype, nt1[i] )
         sv2 = numpy.fromfile( fd2, dtype, nt2[i] )
         sv3 = numpy.fromfile( fd3, dtype, nt3[i] )
-        sv1 = sord.coord.interp( t0[i], dt0[i], sv1, t )
-        sv2 = sord.coord.interp( t0[i], dt0[i], sv2, t )
-        sv3 = sord.coord.interp( t0[i], dt0[i], sv3, t )
+        sv1 = coord.interp( t0[i], dt0[i], sv1, t )
+        sv2 = coord.interp( t0[i], dt0[i], sv2, t )
+        sv3 = coord.interp( t0[i], dt0[i], sv3, t )
         numpy.array( [jj[i], kk[i], ll[i]], 'i' ).tofile( fd )
         numpy.array( [
             nrm[0,i] * sv3,
