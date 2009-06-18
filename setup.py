@@ -23,7 +23,8 @@ def build( mode=None, optimize=None ):
         'bc.f90',
         'surfnormals.f90',
         'util.f90',
-        'frio.f90', )
+        'frio.f90',
+    )
     common = (
         'arrays.f90',
         'fieldio.f90',
@@ -39,13 +40,13 @@ def build( mode=None, optimize=None ):
         'timestep.f90',
         'stress.f90',
         'acceleration.f90',
-        'sord.f90', )
+        'sord.f90',
+    )
     cwd = os.getcwd()
     srcdir = os.path.realpath( os.path.dirname( __file__ ) )
-    try:
-        os.mkdir( os.path.join( srcdir, 'bin' ) )
-    except:
-        pass
+    path = os.path.join( srcdir, 'bin' )
+    if not os.path.isdir( path ):
+        os.mkdir( path )
     new = False
     os.chdir( os.path.join( srcdir, 'src' ) )
     if 's' in mode:
@@ -61,14 +62,12 @@ def build( mode=None, optimize=None ):
             compiler = cf.fortran_mpi + cf.fortran_flags[opt]
             new |= util.make( compiler, object_, source )
     if new:
-        try:
-            os.link( '.ignore', '.bzrignore' )
-            os.system( 'bzr export sord.tgz' )
-        except:
-            pass
+        os.link( '.ignore', '.bzrignore' )
+        os.system( 'bzr export sord.tgz' )
     os.chdir( os.path.join( srcdir, 'extras' ) )
     if not os.path.isfile( 'rspectra.so' ):
         os.system( 'f2py -c -m rspectra rspectra.f90' )
+    os.chdir( cwd )
     return
 
 def docs():
@@ -84,7 +83,7 @@ def docs():
         doc = open( path ).readlines()[2].strip()
         out += '| `%s <examples/%s>`_: %s\n' % (f, f, doc)
     out += '\nFortran source code\n-------------------\n'
-    sources = [
+    sources = (
         'sord.f90',
         'globals.f90',
         'parameters.f90',
@@ -110,12 +109,12 @@ def docs():
         'mpi.f90',
         'frio.f90',
         'util.f90',
-    ]
+    )
     for f in sources:
         doc = open( 'src/' + f ).readlines()[0].strip().replace( '! ', '' )
         out += '| `%s <src/%s>`_: %s\n' % ( f, f, doc )
     out += '\nPython wrappers\n---------------\n'
-    sources = [
+    sources = (
         '__init__.py',
         'parameters.py',
         'fieldnames.py',
@@ -123,7 +122,7 @@ def docs():
         'setup.py',
         'remote.py',
         'util.py',
-    ]
+    )
     for f in sources:
         doc = open( f ).readlines()[2].strip()
         out += '| `%s <%s>`_: %s\n' % ( f, f, doc )
@@ -141,7 +140,8 @@ def docs():
         stylesheet_path = 'doc/style.css',
     )
     rst = open( 'readme.rst' ).read()
-    html = publish_string( rst, writer_name='html4css1', settings_overrides=settings )
+    html = publish_string( rst, writer_name='html4css1',
+        settings_overrides=settings )
     html = re.sub( '<col.*>\n', '', html )
     html = re.sub( '</colgroup>', '', html )
     open( 'index.html', 'w' ).write( html )
@@ -149,18 +149,19 @@ def docs():
     os.unlink( 'sources.txt' )
     return
 
-# Command line
-if __name__ == '__main__':
+def command_line():
+    """
+    Process command line options.
+    """
     opts, args = getopt.getopt( sys.argv[1:], 'smgtpO' )
     mode = None
     optimize = None
-    for o, v in opts:
-        if   o == '-s': mode = 's'
-        elif o == '-m': mode = 'm'
-        elif o == '-g': optimize = 'g'
-        elif o == '-t': optimize = 't'
-        elif o == '-p': optimize = 'p'
-        elif o == '-O': optimize = 'O'
+    for o in opts:
+        o = o[0][1:]
+        if o in 'sm':
+            mode = o
+        elif o in 'gtpO':
+            optimize = o
     if not args:
         build( mode, optimize )
     else:
@@ -176,4 +177,7 @@ if __name__ == '__main__':
             util.uninstall()
         else:
             sys.exit( 'Error: unknown option: %r' % sys.argv[1] )
+
+if __name__ == '__main__':
+    command_line()
 

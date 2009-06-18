@@ -25,25 +25,25 @@ Boundary conditions:
 
 Field I/O specification:
 
-  ( '=',   'f', [j,k,l,t], val ):                   Set to value
-  ( '=s',  'f', [j,k,l,t], val ):                   Set to random numbers between 0 and val
-  ( '=x',  'f', [j,k,l,t], val, x ):                Set to value at neartest node/cell to x 
-  ( '=sx', 'f', [j,k,l,t], val, x ):                Set to random number at nearest node/cell
-  ( '=c',  'f', [j,k,l,t], val, x1, x2 ):           Set to value inside Cartesian cube
-  ( '=f',  'f', [j,k,l,t], val, tfunc, T ):         Set to time function with period T
-  ( '=fs', 'f', [j,k,l,t], val, tfunc, T ):         Set to time function * random number
-  ( '=fx', 'f', [j,k,l,t], val, tfunc, T, x ):      Set to time function at nearest node/cell
-  ( '=fc', 'f', [j,k,l,t], val, tfunc, T, x1, x2 ): Set to time function inside Cartesian cube
-  ( '=r',  'f', [j,k,l,t], filename ):              Read from filename
-  ( '=w',  'f', [j,k,l,t], filename ):              Write to filename
-  ( '=rx', 'f', [j,k,l,t], filename, x ):           Read at nearest node/cell to x
-  ( '=wx', 'f', [j,k,l,t], filename, x ):           Write at nearest node/cell to x
+  ('=',   'f', [], val):                   Set to value
+  ('=s',  'f', [], val):                   Set to random numbers in (0, val)
+  ('=x',  'f', [], val, x):                Set to value at neartest node/cell to x 
+  ('=sx', 'f', [], val, x):                Set to random number at nearest node/cell
+  ('=c',  'f', [], val, x1, x2):           Set to value inside Cartesian cube
+  ('=f',  'f', [], val, tfunc, T):         Set to time function with period T
+  ('=fs', 'f', [], val, tfunc, T):         Set to time function * random number
+  ('=fx', 'f', [], val, tfunc, T, x):      Set to time function at nearest node/cell
+  ('=fc', 'f', [], val, tfunc, T, x1, x2): Set to time function inside Cartesian cube
+  ('=r',  'f', [], filename):              Read from filename
+  ('=w',  'f', [], filename):              Write to filename
+  ('=rx', 'f', [], filename, x):           Read at nearest node/cell to x
+  ('=wx', 'f', [], filename, x):           Write at nearest node/cell to x
 
 'f' is the field name. Options are listed in fieldnames.py.
 
 Input can be added to the existing value by specifying '+' instead of '='.
 
-[j,k,l,t] are 1-based (Fortran style) indices.
+[] or [j,k,l,t] are 1-based (Fortran style) indices.
 Indices can be a single index, a range (start,end) or a strided range (start,end,step).
 Negative indices count backward from the end of the array.
 () is shorthand for (1,-1,1), i.e., the entire range, with stride 1.

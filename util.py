@@ -34,7 +34,7 @@ def load( fd, d=None, ignore_pattern=None, ignore_types=None ):
     if d == None:
         d = {}
     exec fd in d
-    prune( d )
+    prune( d, ignore_pattern, ignore_types )
     return namespace( d )
 
 def save( fd, d, expand=None ):

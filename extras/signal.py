@@ -19,7 +19,8 @@ def lowpass( x, dt, cutoff, window='hann', repeat=0 ):
     if window == 'hann':
         n = 2 * int( 0.5 / (cutoff * dt) ) + 1
         if n > 0:
-            w = 0.5 - 0.5 * numpy.cos( 2.0 * numpy.pi * numpy.arange( n ) / (n - 1) )
+            w = 0.5 - 0.5 * numpy.cos(
+                2.0 * numpy.pi * numpy.arange( n ) / (n - 1) )
             w /= w.sum()
             x = numpy.convolve( x, w, 'same' )
             if repeat:
@@ -35,11 +36,12 @@ def lowpass( x, dt, cutoff, window='hann', repeat=0 ):
             x = scipy.signal.lfilter( b, a, x )
     return x
 
-def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum', axes=None ):
+def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=None ):
     """
     Plot a time signal and it's Fourier spectrum.
     """
     import pylab
+
     h = numpy.array( h )
     nt = h.shape[-1]
     if not nf:
@@ -106,7 +108,10 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Fourier spectrum', axes=No
 
     return axes
 
-if __name__ == '__main__':
+def test():
+    """
+    Test spectrum plot.
+    """
     import pylab
 
     dt = 0.01
@@ -129,10 +134,15 @@ if __name__ == '__main__':
     spectrum( y[::2], dt, legend=y[1::2] )
 
     y = [
-        ishift( lowpass( shift( x ), dt, cutoff, 2, -1 ) ),     'Butter-2x-2',
-        ishift( lowpass( shift( x ), dt, cutoff, 4, -1 ) ),     'Butter-4x-2',
-        ishift( lowpass( shift( x ), dt, cutoff ) ),            'Hann',
+        ishift( lowpass( shift( x ), dt, cutoff, 2, -1 ) ), 'Butter-2x-2',
+        ishift( lowpass( shift( x ), dt, cutoff, 4, -1 ) ), 'Butter-4x-2',
+        ishift( lowpass( shift( x ), dt, cutoff ) ),        'Hann',
     ]
     pylab.figure( 2 )
     spectrum( y[::2], dt, legend=y[1::2] )
+
+    return
+
+if __name__ == '__main__':
+    test()
 

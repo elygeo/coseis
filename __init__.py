@@ -3,11 +3,11 @@
 Support Operator Rupture Dynamics
 """
 import os, sys, re
-import util, configure, fieldnames
+import util, configure, fieldnames, remote
 from extras import coord, egmm, signal, source, viz
 try:
     from extras import rspectra
-except:
+except( ImportError ):
     pass
 
 def stage( inputs ):
@@ -63,19 +63,32 @@ def stage( inputs ):
     long_options = opts[1::2]
     opts = getopt.getopt( sys.argv[1:], options, long_options )[0]
     for o, v in opts:
-        if   o in ('-n', '--dry-run'):     cf.prepare = False
-        elif o in ('-s', '--serial'):      cf.mode = 's'
-        elif o in ('-m', '--mpi'):         cf.mode = 'm'
-        elif o in ('-i', '--interactive'): cf.run = 'i'
-        elif o in ('-q', '--queue'):       cf.run = 'q'
-        elif o in ('-d', '--debug'):       cf.optimize = 'g'; cf.run = 'g'
-        elif o in ('-g', '--debugging'):   cf.optimize = 'g'
-        elif o in ('-t', '--testing'):     cf.optimize = 't'
-        elif o in ('-p', '--profiling'):   cf.optimize = 'p'
-        elif o in ('-O', '--optimized'):   cf.optimize = 'O'
+        if   o in ('-n', '--dry-run'):
+            cf.prepare = False
+        elif o in ('-s', '--serial'):
+            cf.mode = 's'
+        elif o in ('-m', '--mpi'):
+            cf.mode = 'm'
+        elif o in ('-i', '--interactive'):
+            cf.run = 'i'
+        elif o in ('-q', '--queue'):
+            cf.run = 'q'
+        elif o in ('-d', '--debug'):
+            cf.optimize = 'g'
+            cf.run = 'g'
+        elif o in ('-g', '--debugging'):
+            cf.optimize = 'g'
+        elif o in ('-t', '--testing'):
+            cf.optimize = 't'
+        elif o in ('-p', '--profiling'):
+            cf.optimize = 'p'
+        elif o in ('-O', '--optimized'):
+            cf.optimize = 'O'
         elif o in ('-f', '--force'):
-            if os.path.isdir( cf.rundir ): shutil.rmtree( cf.rundir )
-        else: sys.exit( 'Error: unknown option: ' + o )
+            if os.path.isdir( cf.rundir ):
+                shutil.rmtree( cf.rundir )
+        else:
+            sys.exit( 'Error: unknown option: ' + o )
     if not cf.prepare:
         cf.run = False
 
@@ -149,7 +162,8 @@ def stage( inputs ):
     try:
         os.makedirs( cf.rundir )
     except( OSError ):
-        sys.exit( '%r exists or cannot be created. Use --force to overwrite.' % cf.rundir )
+        sys.exit( '%r exists or cannot be created. Use --force to overwrite.'
+            % cf.rundir )
     for f in 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint':
         os.mkdir( os.path.join( cf.rundir, f ) )
 
@@ -163,7 +177,7 @@ def stage( inputs ):
             f = os.path.join( cf.rundir, 'in', f )
             try:
                 os.link( filename, f )
-            except:
+            except( 'OSError' ):
                 os.symlink( filename, f )
     for pat in cf.infiles:
         for filename in glob.glob( os.path.expanduser( pat ) ):
@@ -171,7 +185,7 @@ def stage( inputs ):
             f = os.path.join( cf.rundir, 'in', f )
             try:
                 os.link( filename, f )
-            except:
+            except( 'OSError' ):
                 os.symlink( filename, f )
 
     # Copy files to run directory
@@ -181,7 +195,8 @@ def stage( inputs ):
     cf.rundir = os.path.realpath( cf.rundir )
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
     cf.bin = os.path.join( '.', 'sord-' + cf.mode + cf.optimize )
-    shutil.copy( os.path.join( 'bin', 'sord-' + cf.mode + cf.optimize ), cf.rundir )
+    path = os.path.join( 'bin', 'sord-' + cf.mode + cf.optimize )
+    shutil.copy( path, cf.rundir )
     if os.path.isfile( 'sord.tgz' ):
         shutil.copy( 'sord.tgz', cf.rundir )
     if cf.optimize == 'g':
@@ -190,7 +205,7 @@ def stage( inputs ):
     f = os.path.join( 'conf', cf.machine, 'templates' )
     if not os.path.isdir( f ):
         f = os.path.join( 'conf', 'default', 'templates' )
-    for d in [ os.path.join( 'conf', 'common', 'templates' ), f ]:
+    for d in os.path.join( 'conf', 'common', 'templates' ), f:
         for f in glob.glob( os.path.join( d, '*' ) ):
             ff = os.path.join( cf.rundir, os.path.basename( f ) )
             out = open( f ).read() % cf.__dict__
@@ -236,8 +251,10 @@ def prepare_param( pm, itbuff ):
     i = abs(pm.faultnormal) - 1
     if i >= 0:
         irup = int( xi[i] )
-        if irup == 1:            i1[i] = -2
-        if irup == pm.nn[i] - 1: i2[i] = -2
+        if irup == 1:
+            i1[i] = -2
+        if irup == pm.nn[i] - 1:
+            i2[i] = -2
         if irup < 1 or irup > (pm.nn[i] - 1):
             sys.exit( 'Error: ihypo %s out of bounds' % xi )
     pm.bc1 = tuple( i1 )
@@ -248,9 +265,12 @@ def prepare_param( pm, itbuff ):
     i2 = [n+1 for n in pm.nn]
     if pm.npml > 0:
         for i in range( 3 ):
-            if pm.bc1[i] == 10: i1[i] = pm.npml
-            if pm.bc2[i] == 10: i2[i] = pm.nn[i] - pm.npml + 1
-            if i1[i] > i2[i]: sys.exit( 'Error: model too small for PML' )
+            if pm.bc1[i] == 10:
+                i1[i] = pm.npml
+            if pm.bc2[i] == 10:
+                i2[i] = pm.nn[i] - pm.npml + 1
+            if i1[i] > i2[i]:
+                sys.exit( 'Error: model too small for PML' )
     pm.i1pml = tuple( i1 )
     pm.i2pml = tuple( i2 )
 
@@ -263,20 +283,30 @@ def prepare_param( pm, itbuff ):
         x1 = x2 = 0., 0., 0.
         op = line[0][0]
         mode = line[0][1:]
-        if op not in '=+': sys.exit( 'Error: unsupported operator: %r' % line )
+        if op not in '=+':
+            sys.exit( 'Error: unsupported operator: %r' % line )
         try:
             if len( line ) is 10:
-                tfunc, period, x1, x2, nb, ii, field, filename, val             = line[1:]
-            elif mode in ['', 's']:       field, ii, val                        = line[1:]
-            elif mode in ['x', 'sx']:     field, ii, val, x1                    = line[1:]
-            elif mode in ['c']:           field, ii, val, x1, x2                = line[1:]
-            elif mode in ['f', 'fs']:     field, ii, val, tfunc, period         = line[1:]
-            elif mode in ['fx', 'fsx']:   field, ii, val, tfunc, period, x1     = line[1:]
-            elif mode in ['fc']:          field, ii, val, tfunc, period, x1, x2 = line[1:]
-            elif mode in ['r', 'R', 'w']: field, ii, filename                   = line[1:]
-            elif mode in ['rx', 'wx']:    field, ii, filename, x1               = line[1:]
-            else: sys.exit( 'Error: bad i/o mode: %r' % line )
-        except:
+                tfunc, period, x1, x2, nb, ii, field, filename, val = line[1:]
+            elif mode in ['', 's']:
+                field, ii, val = line[1:]
+            elif mode in ['x', 'sx']:
+                field, ii, val, x1 = line[1:]
+            elif mode in ['c']:
+                field, ii, val, x1, x2 = line[1:]
+            elif mode in ['f', 'fs']:
+                field, ii, val, tfunc, period = line[1:]
+            elif mode in ['fx', 'fsx']:
+                field, ii, val, tfunc, period, x1 = line[1:]
+            elif mode in ['fc']:
+                field, ii, val, tfunc, period, x1, x2 = line[1:]
+            elif mode in ['r', 'R', 'w']:
+                field, ii, filename = line[1:]
+            elif mode in ['rx', 'wx']:
+                field, ii, filename, x1 = line[1:]
+            else:
+                sys.exit( 'Error: bad i/o mode: %r' % line )
+        except( ValueError ):
             sys.exit( 'Error: bad i/o spec: %r' % line )
         filename = os.path.expanduser( filename )
         mode = mode.replace( 'f', '' )
@@ -305,11 +335,13 @@ def prepare_param( pm, itbuff ):
         nb = max( 1, min( nb, nn[3] ) )
         if 'x' not in mode and 'X' not in mode:
             n = nn[0] * nn[1] * nn[2]
-            if n > ( pm.nn[0] + pm.nn[1] + pm.nn[2] ) ** 2:
+            if n > (pm.nn[0] + pm.nn[1] + pm.nn[2]) ** 2:
                 nb = 1
             elif n > 1:
                 nb = min( nb, itbuff )
-        fieldio += [( op+mode, tfunc, period, x1, x2, nb, ii, field, filename, val )]
+        fieldio += [
+            (op+mode, tfunc, period, x1, x2, nb, ii, field, filename, val)
+        ]
     f = [ line[8] for line in fieldio if line[8] != '-' ]
     for i in range( len( f ) ):
         if f[i] in f[:i]:
@@ -326,13 +358,15 @@ def launch( cf ):
     if cf.run == 'q':
         print( 'queue.sh' )
         if cf.host not in cf.hosts:
-            sys.exit( 'hostname %r does not match configuration %r' % (cf.host, cf.machine) )
+            sys.exit( 'Error: hostname %r does not match configuration %r'
+                % (cf.host, cf.machine) )
         if os.system( os.path.join( '.', 'queue.sh' ) ):
             sys.exit( 'Error queing job' )
     elif cf.run:
         print( 'run.sh -' + cf.run )
         if cf.host not in cf.hosts:
-            sys.exit( 'hostname %r does not match configuration %r' % (cf.host, cf.machine) )
+            sys.exit( 'Error: hostname %r does not match configuration %r'
+                % (cf.host, cf.machine) )
         if os.system( os.path.join( '.', 'run.sh -' + cf.run ) ):
             sys.exit( 'Error running job' )
     os.chdir( cwd )

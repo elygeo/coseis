@@ -3,6 +3,7 @@
 Coordinate conversions
 """
 import sys, numpy
+import getopt
 
 def matmul( A, B ):
     """
@@ -166,7 +167,7 @@ def ll2cmu( x, y, inverse=False ):
         y = (y + 1.0) * 150000.0
     return numpy.array( [x, y] )
 
-def ll2xy( x, y, inverse=False, projection=None, rot=40.0, lon0=-121.0, lat0=34.5,  ):
+def ll2xy( x, y, inverse=False, projection=None, rot=40.0, lon0=-121.0, lat0=34.5 ):
     """
     UTM TeraShake coordinate projection
     """
@@ -256,8 +257,10 @@ def compass( azimuth, radians=False ):
     )
     return names[ int( azimuth / 22.5 + 16.0 ) % 16 ]
 
-if __name__ == '__main__':
-    import getopt
+def command_line():
+    """
+    Process command line options.
+    """
     opts, args = getopt.getopt( sys.argv[1:], 'i' )
     for f in args:
         x, y = numpy.loadtxt( f, unpack=True )
@@ -268,3 +271,5 @@ if __name__ == '__main__':
         for xx, yy in zip( x, y ):
             print( xx, yy )
 
+if __name__ == '__main__':
+    command_line()

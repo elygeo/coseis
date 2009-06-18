@@ -7,7 +7,7 @@ ssh user@host.domain:path
 """
 import os, sys, getopt
 
-def pick_destinations( message=None, default=None, path=None, prompt='Destinations' ):
+def pick_dest( message=None, default=None, path=None, prompt='Destinations' ):
     """
     Read destinations file and get user input.
     """
@@ -43,7 +43,19 @@ def deploy( rsh, dest, command=None ):
     """
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    rsync = 'rsync -avR --delete --include=destinations --include=email --include=data --include=work --include=sord.tgz --exclude-from=.ignore -e %r . %r' % (rsh, dest)
+    rsync = ' '.join(
+        'rsync',
+        '-avR',
+        '--delete',
+        '--include=destinations',
+        '--include=email',
+        '--include=data',
+        '--include=work',
+        '--include=sord.tgz',
+        '--exclude-from=.ignore',
+        '-e', rsh,
+        '.', dest
+    )
     print( rsync )
     os.system( rsync )
     os.chdir( cwd )
@@ -63,7 +75,17 @@ def publish( rsh, dest ):
     """
     cwd = os.getcwd()
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    rsync = 'rsync -avR --delete --delete-excluded --include=sord.tgz --include=.bzr --exclude-from=.ignore -e %r . %r' % (rsh, dest)
+    rsync = ' '.join(
+        'rsync',
+        '-avR',
+        '--delete',
+        '--delete-excluded',
+        '--include=sord.tgz',
+        '--include=.bzr', 
+        '--exclude-from=.ignore',
+        '-e', rsh,
+        '.', dest
+    )
     print( rsync )
     os.system( rsync )
     os.chdir( cwd )
@@ -75,24 +97,34 @@ def get( rsh, path, files ):
     """
     for f in files:
         src = path + '/' + f.rstrip('/')
-        rsync = 'rsync -av --delete -e %r %r .' % (rsh, src)
+        rsync = ' '.join(
+            'rsync',
+            '-av',
+            '--delete',
+            '-e', rsh,
+            '.', src
+        )
         print( rsync )
         os.system( rsync )
     return
 
-# Command line
-if __name__ == '__main__':
+def command_line():
+    """
+    Process command line arguments.
+    """
     opts, args = getopt.getopt( sys.argv[1:], 'dpg' )
     opt = '-d'
     if opts:
         opt = opts[-1][0]
     if opt == '-d':
-        for rsh, path in pick_destinations( deploy.__doc__ ):
+        for rsh, path in pick_dest( deploy.__doc__ ):
             deploy( rsh, path, args )
     elif opt == '-p':
-        for rsh, path in pick_destinations( publish.__doc__, [-2, -1] ):
+        for rsh, path in pick_dest( publish.__doc__, [-2, -1] ):
             publish( rsh, path )
     elif opt == '-g':
-        for rsh, path in pick_destinations( get.__doc__, [] ):
+        for rsh, path in pick_dest( get.__doc__, [] ):
             get( rsh, path, args )
 
+if __name__ == '__main__':
+    command_line():
