@@ -119,4 +119,4 @@ def command_line():
             get( rsh, path, args )
 
 if __name__ == '__main__':
-    command_line():
+    command_line()
