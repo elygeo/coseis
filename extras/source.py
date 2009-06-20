@@ -307,7 +307,7 @@ def srf2momrate( path, projection, dx, dt, nt ):
 
     return dt.size
 
-def srf2coulomb( path, projection, dx, dest='coulomb.inp', noslip=False ):
+def srf2coulomb( path, projection, dx, dest='coulomb.inp', noslip=False, scut=0.001 ):
     """
     Convert SRF to Coulomb input file.
     """
@@ -330,6 +330,9 @@ def srf2coulomb( path, projection, dx, dest='coulomb.inp', noslip=False ):
     else:
         s1 = numpy.fromfile( path + 'slip1', dtype )
         s2 = numpy.fromfile( path + 'slip2', dtype )
+        i = ( s1**2 + s2**2 ) > ( numpy.sign( scut ) * scut**2 )
+        x, y, z = x[i], y[i], z[i]
+        s1, s2, stk, dip = s1[i], s2[i], stk[i], dip[i]
 
     # Coordinates
     rot = coord.rotation( x, y, projection )[1]

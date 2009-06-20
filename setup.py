@@ -62,13 +62,13 @@ def build( mode=None, optimize=None ):
             object_ = os.path.join( '..', 'bin', 'sord-m' + opt )
             compiler = cf.fortran_mpi + cf.fortran_flags[opt]
             new |= util.make( compiler, object_, source )
-    if new:
-        os.link( '.ignore', '.bzrignore' )
-        os.system( 'bzr export sord.tgz' )
     os.chdir( os.path.join( path, 'extras' ) )
     if not os.path.isfile( 'rspectra.so' ):
         os.system( 'f2py -c -m rspectra rspectra.f90' )
     os.chdir( cwd )
+    if new:
+        #os.link( '.ignore', '.bzrignore' )
+        os.system( 'bzr export sord.tgz' )
     return
 
 def docs():

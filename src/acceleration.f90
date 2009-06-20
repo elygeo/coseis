@@ -169,27 +169,32 @@ if ( source == 'force' ) then
     call vector_point_source
 end if
 
+! Nodal force input
+call fieldio( '<', 'f1', w1(:,:,:,1) )
+call fieldio( '<', 'f2', w1(:,:,:,2) )
+call fieldio( '<', 'f3', w1(:,:,:,3) )
+
 ! Boundary conditions
 call vector_bc( w1, bc1, bc2, i1bc, i2bc )
 
-! Nodal force I/O
-call fieldio( '<>', 'f1', w1(:,:,:,1) )
-call fieldio( '<>', 'f2', w1(:,:,:,2) )
-call fieldio( '<>', 'f3', w1(:,:,:,3) )
+! Spontaneous rupture
+call rupture
+
+! Swap halo
+rr = timer( 2 )
+call vector_swap_halo( w1, nhalo )
+if (sync) call barrier
+mptimer = mptimer + timer( 2 )
+
+! Nodal force output
+call fieldio( '>', 'f1', w1(:,:,:,1) )
+call fieldio( '>', 'f2', w1(:,:,:,2) )
+call fieldio( '>', 'f3', w1(:,:,:,3) )
 
 ! Newton's law: a_i = f_i / m
 do i = 1, 3
     w1(:,:,:,i) = w1(:,:,:,i) * mr
 end do
-
-! Spontaneous rupture
-call rupture
-
-! Multiprocessor communications
-rr = timer( 2 )
-call vector_swap_halo( w1, nhalo )
-if (sync) call barrier
-mptimer = mptimer + timer( 2 )
 
 ! Acceleration I/O
 call fieldio( '<>', 'a1', w1(:,:,:,1) )

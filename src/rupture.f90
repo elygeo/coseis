@@ -195,10 +195,12 @@ f1 = dt * dt * area * ( mr(j1:j2,k1:k2,l1:l2) + mr(j3:j4,k3:k4,l3:l4) )
 call invert( f1 )
 do i = 1, 3
     t1(:,:,:,i) = t0(:,:,:,i) + f1 * dt * &
-        ( ( vv(j3:j4,k3:k4,l3:l4,i) - vv(j1:j2,k1:k2,l1:l2,i) ) &
-        + ( w1(j3:j4,k3:k4,l3:l4,i) - w1(j1:j2,k1:k2,l1:l2,i) ) * dt )
+        ( vv(j3:j4,k3:k4,l3:l4,i) &
+        - vv(j1:j2,k1:k2,l1:l2,i) &
+        + w1(j3:j4,k3:k4,l3:l4,i) * mr(j3:j4,k3:k4,l3:l4) * dt &
+        - w1(j1:j2,k1:k2,l1:l2,i) * mr(j1:j2,k1:k2,l1:l2) * dt )
     t2(:,:,:,i) = t1(:,:,:,i) + f1 * &
-          ( uu(j3:j4,k3:k4,l3:l4,i) - uu(j1:j2,k1:k2,l1:l2,i) )
+        ( uu(j3:j4,k3:k4,l3:l4,i) - uu(j1:j2,k1:k2,l1:l2,i) )
 end do
 
 ! Shear and normal traction
@@ -223,14 +225,14 @@ if ( it > 1 ) then
 
     ! Slip-weakening friction law
     f1 = mud
-    where ( sl < dc ) f1 = f1 + ( 1.0 - sl / dc ) * ( mus - mud )
+    where ( sl < dc ) f1 = f1 + (1.0 - sl / dc) * (mus - mud)
     f1 = -min( 0.0, tn ) * f1 + co
 
     ! Nucleation
     if ( rcrit > 0.0 .and. vrup > 0.0 ) then
         f2 = 1.0
         if ( trelax > 0.0 ) f2 = min( ( tm - rhypo / vrup ) / trelax, 1.0 )
-        f2 = ( 1.0 - f2 ) * ts + f2 * ( -tn * mud + co )
+        f2 = (1.0 - f2) * ts + f2 * (-tn * mud + co)
         where ( rhypo < min( rcrit, tm * vrup ) .and. f2 < f1 ) f1 = f2
     end if
 
@@ -252,8 +254,8 @@ end if
 ! Update acceleration
 do i = 1, 3
     f2 = area * ( t1(:,:,:,i) - t0(:,:,:,i) )
-    w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f2 * mr(j1:j2,k1:k2,l1:l2)
-    w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f2 * mr(j3:j4,k3:k4,l3:l4)
+    w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f2
+    w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f2
 end do
 call vector_bc( w1, bc1, bc2, i1bc, i2bc )
 
@@ -290,7 +292,11 @@ call set_halo( f2, 0.0, i1core, i2core )
 moment = sum( f2 )
 
 ! Slip acceleration
-t2 = w1(j3:j4,k3:k4,l3:l4,:) - w1(j1:j2,k1:k2,l1:l2,:)
+do i = 1, 3
+    t2(:,:,:,i) = &
+        w1(j3:j4,k3:k4,l3:l4,i) * mr(j3:j4,k3:k4,l3:l4) - &
+        w1(j1:j2,k1:k2,l1:l2,i) * mr(j1:j2,k1:k2,l1:l2)
+end do
 f2 = sqrt( sum( t2 * t2, 4 ) )
 call fieldio( '>', 'sa1', t2(:,:,:,1) )
 call fieldio( '>', 'sa2', t2(:,:,:,2) )

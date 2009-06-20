@@ -14,16 +14,16 @@ ifn = abs( faultnormal )
 
 ! Partition for parallelization
 if ( np0 == 1 ) np3 = 1
-nl = ( nn - 1 ) / np3 + 1
+nl = (nn - 1) / np3 + 1
 nhalo = 1
 if ( ifn /= 0 ) nhalo(ifn) = 2
 nl = max( nl, nhalo )
-np3 = ( nn - 1 ) / nl + 1
+np3 = (nn - 1) / nl + 1
 call rank( ip3, ipid, np3 )
 nnoff = nl * ip3 - nhalo
 
 ! Master process
-ip3root = ( ihypo - 1.0 ) / nl
+ip3root = (ihypo - 1.0) / nl
 master = .false.
 if ( all( ip3 == ip3root ) ) master = .true.
 call setroot( ip3root )

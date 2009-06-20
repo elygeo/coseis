@@ -8,7 +8,7 @@ use m_globals
 use m_collective
 use m_util
 use m_fieldio
-real :: stats(8), gstats(8), r, rho_, vp_, vs_, gam_, courant
+real :: vstats(8), gvstats(8), r, rho_, vp_, vs_, gam_, courant
 integer :: i1(3), i2(3)
 
 if ( master ) write( 0, * ) 'Material model'
@@ -53,22 +53,22 @@ if ( gam1 > 0.0 ) gam = max( gam, gam1 )
 if ( gam2 > 0.0 ) gam = min( gam, gam2 )
 
 ! Averages
-stats = 0.0
+vstats = 0.0
 i1 = max( i1core, i1bc )
 i2 = min( i2core, i2bc - 1 )
 call set_halo( mr,  0.0, i1, i2 )
 call set_halo( s1,  0.0, i1, i2 )
 call set_halo( s2,  0.0, i1, i2 )
 call set_halo( gam, 0.0, i1, i2 )
-stats(1) = sum( mr  )
-stats(2) = sum( s1  )
-stats(3) = sum( s2  )
-stats(4) = sum( gam )
-call rreduce1( gstats, stats, 'sum', 0 )
-rho_ = gstats(1) / product( nn - 1 ) 
-vp_  = gstats(2) / product( nn - 1 ) 
-vs_  = gstats(3) / product( nn - 1 ) 
-gam_ = gstats(4) / product( nn - 1 ) 
+vstats(1) = sum( mr  )
+vstats(2) = sum( s1  )
+vstats(3) = sum( s2  )
+vstats(4) = sum( gam )
+call rreduce1( gvstats, vstats, 'sum', 0 )
+rho_ = gvstats(1) / product( nn - 1 ) 
+vp_  = gvstats(2) / product( nn - 1 ) 
+vs_  = gvstats(3) / product( nn - 1 ) 
+gam_ = gvstats(4) / product( nn - 1 ) 
 
 ! Fill halo
 call scalar_swap_halo( mr,  nhalo )
@@ -81,27 +81,27 @@ call set_halo( mr,  huge(r), i1cell, i2cell )
 call set_halo( s1,  huge(r), i1cell, i2cell )
 call set_halo( s2,  huge(r), i1cell, i2cell )
 call set_halo( gam, huge(r), i1cell, i2cell )
-stats(1) = -minval( mr  )
-stats(2) = -minval( s1  )
-stats(3) = -minval( s2  )
-stats(4) = -minval( gam )
+vstats(1) = -minval( mr  )
+vstats(2) = -minval( s1  )
+vstats(3) = -minval( s2  )
+vstats(4) = -minval( gam )
 call set_halo( mr,  0.0, i1cell, i2cell )
 call set_halo( s1,  0.0, i1cell, i2cell )
 call set_halo( s2,  0.0, i1cell, i2cell )
 call set_halo( gam, 0.0, i1cell, i2cell )
-stats(5) = maxval( mr  )
-stats(6) = maxval( s1  )
-stats(7) = maxval( s2  )
-stats(8) = maxval( gam )
-call rreduce1( gstats, stats, 'allmax', 0 )
-rho1 = -gstats(1)
-vp1  = -gstats(2)
-vs1  = -gstats(3)
-gam1 = -gstats(4)
-rho2 =  gstats(5)
-vp2  =  gstats(6)
-vs2  =  gstats(7)
-gam2 =  gstats(8)
+vstats(5) = maxval( mr  )
+vstats(6) = maxval( s1  )
+vstats(7) = maxval( s2  )
+vstats(8) = maxval( gam )
+call rreduce1( gvstats, vstats, 'allmax', 0 )
+rho1 = -gvstats(1)
+vp1  = -gvstats(2)
+vs1  = -gvstats(3)
+gam1 = -gvstats(4)
+rho2 =  gvstats(5)
+vp2  =  gvstats(6)
+vs2  =  gvstats(7)
+gam2 =  gvstats(8)
 
 ! Stats
 if ( master ) then
@@ -130,7 +130,7 @@ lam = mr * s1 * s1 - 2.0 * mu
 ! Hourglass constant
 yy = 12.0 * ( lam + 2.0 * mu )
 call invert( yy )
-yy = yy * sqrt( sum( dx * dx ) / 3.0 ) * mu * ( lam + mu )
+yy = yy * sqrt( sum( dx * dx ) / 3.0 ) * mu * (lam + mu)
 !yy = 0.3 / 16.0 * ( lam + 2.0 * mu ) * sqrt( sum( dx * dx ) / 3.0 ) ! like Ma & Liu, 2006
 
 ! Output
@@ -157,15 +157,15 @@ c1 =  8.0 / 15.0
 c2 = -3.0 / 100.0
 c3 =  1.0 / 1500.0
 tune = 3.5
-if ( vpml <- 0.0 ) vpml = 2.0 * vs1 * vs2 / ( vs1 + vs2 )
-damp = tune * vpml / sqrt( sum( dx * dx ) / 3.0 ) * ( c1 + ( c2 + c3 * npml ) * npml ) / npml ** ppml
+if ( vpml <- 0.0 ) vpml = 2.0 * vs1 * vs2 / (vs1 + vs2)
+damp = tune * vpml / sqrt( sum( dx * dx ) / 3.0 ) * (c1 + (c2 + c3 * npml) * npml) / npml ** ppml
 do i = 1, npml
-    dampn = damp *   i ** ppml
-    dampc = damp * ( i ** ppml + ( i - 1 ) ** ppml ) * 0.5
-    dn1(npml-i+1) = - 2.0 * dampn        / ( 2.0 + dt * dampn )
-    dc1(npml-i+1) = ( 2.0 - dt * dampc ) / ( 2.0 + dt * dampc )
-    dn2(npml-i+1) =   2.0                / ( 2.0 + dt * dampn )
-    dc2(npml-i+1) =   2.0 * dt           / ( 2.0 + dt * dampc )
+    dampn = damp *  i ** ppml
+    dampc = damp * (i ** ppml + (i - 1) ** ppml) * 0.5
+    dn1(npml-i+1) = -2.0 * dampn       / (2.0 + dt * dampn)
+    dc1(npml-i+1) = (2.0 - dt * dampc) / (2.0 + dt * dampc)
+    dn2(npml-i+1) =  2.0               / (2.0 + dt * dampn)
+    dc2(npml-i+1) =  2.0 * dt          / (2.0 + dt * dampc)
 end do
 
 end subroutine

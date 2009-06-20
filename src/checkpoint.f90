@@ -53,6 +53,7 @@ subroutine write_checkpoint
 use m_globals
 use m_stats
 use m_util
+use m_collective
 integer :: i
 real :: r
 r = timer( 2 )
@@ -81,6 +82,7 @@ write( str, '(a,i6.6)' ) 'checkpoint/it', ipid
 open( 1, file=str, status='replace' )
 write( 1, * ) it, itcheck
 close( 1 )
+if (sync) call barrier
 iotimer = iotimer + timer( 2 )
 end subroutine
 

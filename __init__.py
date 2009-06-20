@@ -288,19 +288,19 @@ def prepare_param( pm, itbuff ):
         try:
             if len( line ) is 10:
                 tfunc, period, x1, x2, nb, ii, field, filename, val = line[1:]
-            elif mode in ['', 's']:
+            elif mode in ['', 's', 'i']:
                 field, ii, val = line[1:]
             elif mode in ['x', 'sx']:
                 field, ii, val, x1 = line[1:]
             elif mode in ['c']:
                 field, ii, val, x1, x2 = line[1:]
-            elif mode in ['f', 'fs']:
+            elif mode in ['f', 'fs', 'fi']:
                 field, ii, val, tfunc, period = line[1:]
             elif mode in ['fx', 'fsx']:
                 field, ii, val, tfunc, period, x1 = line[1:]
             elif mode in ['fc']:
                 field, ii, val, tfunc, period, x1, x2 = line[1:]
-            elif mode in ['r', 'R', 'w']:
+            elif mode in ['r', 'R', 'w', 'wi']:
                 field, ii, filename = line[1:]
             elif mode in ['rx', 'wx']:
                 field, ii, filename, x1 = line[1:]
@@ -323,6 +323,8 @@ def prepare_param( pm, itbuff ):
             base = 1.5
         else:
             base = 1
+        if 'i' in mode:
+            x1 = tuple( i + 1 - base for i in ii )
         ii = ( util.expand_indices( pm.nn, ii[:3], base )
              + util.expand_indices( [pm.nt], ii[3:], 1 ) )
         if field in fieldnames.initial:

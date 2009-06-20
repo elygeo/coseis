@@ -75,32 +75,32 @@ if ( rexpand > 1.0 ) then
     do j = i3(1), min( i4(1), i1(1) )
         i = i1(1) - j
         w1(j,:,:,1) = w1(j,:,:,1) + &
-            dx(1) * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+            dx(1) * ( i + 1 - (rexpand ** (i + 1) - 1) / (rexpand - 1) )
     end do
     do j = max( i3(1), i2(1) ), i4(1)
         i = j - i2(1)
         w1(j,:,:,1) = w1(j,:,:,1) - &
-            dx(1) * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+            dx(1) * ( i + 1 - (rexpand ** (i + 1) - 1) / (rexpand - 1) )
     end do
     do k = i3(2), min( i4(2), i1(2) )
         i = i1(2) - k
         w1(:,k,:,2) = w1(:,k,:,2) + &
-            dx(2) * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+            dx(2) * ( i + 1 - (rexpand ** (i + 1) - 1) / (rexpand - 1) )
     end do
     do k = max( i3(2), i2(2) ), i4(2)
         i = k - i2(2)
         w1(:,k,:,2) = w1(:,k,:,2) - &
-            dx(2) * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+            dx(2) * ( i + 1 - (rexpand ** (i + 1) - 1) / (rexpand - 1) )
     end do
     do l = i3(3), min( i4(3), i1(3) )
         i = i1(3) - l
         w1(:,:,l,3) = w1(:,:,l,3) + &
-            dx(3) * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+            dx(3) * ( i + 1 - (rexpand ** (i + 1) - 1) / (rexpand - 1) )
     end do
     do l = max( i3(3), i2(3) ), i4(3)
         i = l - i2(3)
         w1(:,:,l,3) = w1(:,:,l,3) - &
-            dx(3) * ( i + 1 - ( rexpand ** ( i + 1 ) - 1 ) / ( rexpand - 1 ) )
+            dx(3) * ( i + 1 - (rexpand ** (i + 1) - 1) / (rexpand - 1) )
     end do
 end if
 

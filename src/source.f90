@@ -82,7 +82,7 @@ do isrc = 1, abs( nsource )
     end if
     if ( i >= 0 .and. all( i2 >= i1 ) ) then
         i = min( i, src_nt(isrc) - 1 )
-        t = src_t0(isrc) + src_dt(isrc) * ( i - 1 )
+        t = src_t0(isrc) + src_dt(isrc) * (i - 1)
         h = min( 1.0, ( tm - t ) / src_dt(isrc) )
         if ( i == 0 ) then
             h = h * src_history(itoff+1)

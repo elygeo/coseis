@@ -67,13 +67,13 @@ if ( ifn /= 0 ) then
     psv = max( psv, f1 )
     if ( svtol > 0.0 ) then
         where ( f1 >= svtol .and. trup > 1e8 )
-            trup = tm - dt * ( 0.5 + ( svtol - f1 ) / ( f2 - f1 ) )
+            trup = tm - dt * ( 0.5 + (svtol - f1) / (f2 - f1) )
         end where
         where ( f1 >= svtol )
             tarr = 1e9
         end where
         where ( f1 < svtol .and. f2 >= svtol )
-            tarr = tm - dt * ( 0.5 + ( svtol - f1 ) / ( f2 - f1 ) )
+            tarr = tm - dt * ( 0.5 + (svtol - f1) / (f2 - f1) )
         end where
     end if
     select case( ifn )

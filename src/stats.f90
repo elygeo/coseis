@@ -8,7 +8,7 @@ real :: &
 contains
 
 ! Write statistics
-subroutine stats()
+subroutine stats
 use m_globals
 use m_collective
 use m_util
@@ -20,7 +20,6 @@ real, save, allocatable, dimension(:,:) :: &
     vstats, fstats, estats, gvstats, gfstats, gestats
 
 ! Start timer
-rr = timer( 2 )
 if ( verb ) write( 0, * ) 'Statistics'
 
 ! Allocate buffers
@@ -68,11 +67,14 @@ end if
 
 ! Write stats
 if ( j > 0 .and. ( modulo( it, itio ) == 0 .or. it == nt ) ) then
+    rr = timer( 2 )
     call rreduce2( gvstats, vstats, 'max', 0 )
     if ( dofault ) then
         call rreduce2( gfstats, fstats, 'max', ifn )
         call rreduce2( gestats, estats, 'sum', ifn )
     end if
+    if (sync) call barrier
+    mptimer = mptimer + timer( 2 )
     if ( master ) then
         m = nt / itstats
         o = it / itstats - j
@@ -105,11 +107,9 @@ if ( j > 0 .and. ( modulo( it, itio ) == 0 .or. it == nt ) ) then
         end if
     end if
     j = 0
+    if (sync) call barrier
+    iotimer = iotimer + timer( 2 )
 end if
-
-! Timer
-if (sync) call barrier
-iotimer = iotimer + timer( 2 )
 
 end subroutine
 
