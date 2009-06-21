@@ -5,6 +5,31 @@ Source utilities
 import os, sys, numpy, gzip
 import coord
 
+def src_write( history, nt, dt, t0, xi, w1, w2=None, path='' ):
+    """
+    Write SORD input for moment or potency source.
+    """
+    path = os.path.join( os.path.expanduser( path ), 'src_' )
+    numpy.array( history, 'f' ).tofile( path + 'history' )
+    numpy.array( nt,      'f' ).tofile( path + 'nt'  )
+    numpy.array( dt,      'f' ).tofile( path + 'dt'  )
+    numpy.array( t0,      'f' ).tofile( path + 't0'  )
+    numpy.array( xi[0],   'f' ).tofile( path + 'xi1' )
+    numpy.array( xi[1],   'f' ).tofile( path + 'xi2' )
+    numpy.array( xi[2],   'f' ).tofile( path + 'xi3' )
+    if not w2:
+        numpy.array( w1[0], 'f' ).tofile( path + 'w11' )
+        numpy.array( w1[1], 'f' ).tofile( path + 'w12' )
+        numpy.array( w1[2], 'f' ).tofile( path + 'w13' )
+    else:
+        numpy.array( w1[0], 'f' ).tofile( path + 'w11' )
+        numpy.array( w1[1], 'f' ).tofile( path + 'w22' )
+        numpy.array( w1[2], 'f' ).tofile( path + 'w33' )
+        numpy.array( w2[0], 'f' ).tofile( path + 'w23' )
+        numpy.array( w2[1], 'f' ).tofile( path + 'w31' )
+        numpy.array( w2[2], 'f' ).tofile( path + 'w12' )
+    return
+
 def srf_read( filename, path=None, mks=True ):
     """
     Reader for Graves Standard Rupture Format (SRF).
@@ -136,31 +161,6 @@ def srf_read( filename, path=None, mks=True ):
     meta['dtype'] = numpy.dtype( 'f' ).str
     sord.util.save( path + 'meta.py', meta )
     return meta
-
-def src_write( history, nt, dt, t0, xi, w1, w2=None, path='' ):
-    """
-    Write SORD input for moment or potency source.
-    """
-    path = os.path.join( os.path.expanduser( path ), 'src_' )
-    numpy.array( history, 'f' ).tofile( path + 'history' )
-    numpy.array( nt,      'f' ).tofile( path + 'nt'  )
-    numpy.array( dt,      'f' ).tofile( path + 'dt'  )
-    numpy.array( t0,      'f' ).tofile( path + 't0'  )
-    numpy.array( xi[0],   'f' ).tofile( path + 'xi1' )
-    numpy.array( xi[1],   'f' ).tofile( path + 'xi2' )
-    numpy.array( xi[2],   'f' ).tofile( path + 'xi3' )
-    if not w2:
-        numpy.array( w1[0], 'f' ).tofile( path + 'w11' )
-        numpy.array( w1[1], 'f' ).tofile( path + 'w12' )
-        numpy.array( w1[2], 'f' ).tofile( path + 'w13' )
-    else:
-        numpy.array( w1[0], 'f' ).tofile( path + 'w11' )
-        numpy.array( w1[1], 'f' ).tofile( path + 'w22' )
-        numpy.array( w1[2], 'f' ).tofile( path + 'w33' )
-        numpy.array( w2[0], 'f' ).tofile( path + 'w23' )
-        numpy.array( w2[1], 'f' ).tofile( path + 'w31' )
-        numpy.array( w2[2], 'f' ).tofile( path + 'w12' )
-    return
 
 def srf2potency( path, projection, dx ):
     """
@@ -307,32 +307,47 @@ def srf2momrate( path, projection, dx, dt, nt ):
 
     return dt.size
 
-def srf2coulomb( path, projection, dx, dest='coulomb.inp', noslip=False, scut=0 ):
+def dsample( f, d ):
+    """
+    Downsample 2d array.
+    """
+    if not d:
+        return f
+    n = f.shape
+    n = n[0] / d, n[1] / d
+    g = numpy.zeros( n )
+    for j in range( d ):
+        for k in range( d ):
+            g = g + f[j,::d,k::d]
+    g = g / (d * d)
+    return g
+
+def srf2coulomb( path, projection, dx, dest='coulomb', scut=0 ):
     """
     Convert SRF to Coulomb input file.
     """
 
-    # Read meta data
+    # Meta data
     path = os.path.expanduser( path ) + os.sep
     meta = {}
     exec open( path + 'meta.py' ) in meta
     dtype = meta['dtype']
 
-    # Read data
-    x   = numpy.fromfile( path + 'lon',   dtype )
-    y   = numpy.fromfile( path + 'lat',   dtype )
-    z   = numpy.fromfile( path + 'dep',   dtype )
-    stk = numpy.fromfile( path + 'stk',   dtype )
-    dip = numpy.fromfile( path + 'dip',   dtype )
-    if noslip:
-        s1 = numpy.zeros_like( x )
-        s2 = numpy.zeros_like( y )
-    else:
-        s1 = numpy.fromfile( path + 'slip1', dtype )
-        s2 = numpy.fromfile( path + 'slip2', dtype )
-        i = ( s1**2 + s2**2 ) > ( numpy.sign( scut ) * scut**2 )
-        x, y, z = x[i], y[i], z[i]
-        s1, s2, stk, dip = s1[i], s2[i], stk[i], dip[i]
+    # Read files
+    x    = numpy.fromfile( path + 'lon',   dtype )
+    y    = numpy.fromfile( path + 'lat',   dtype )
+    z    = numpy.fromfile( path + 'dep',   dtype )
+    stk  = numpy.fromfile( path + 'stk',   dtype )
+    dip  = numpy.fromfile( path + 'dip',   dtype )
+    rake = numpy.fromfile( path + 'rake',  dtype )
+    s1   = numpy.fromfile( path + 'slip1', dtype )
+    s2   = numpy.fromfile( path + 'slip2', dtype )
+
+    # Slip components
+    s = numpy.sin( numpy.pi / 180.0 * rake )
+    c = numpy.cos( numpy.pi / 180.0 * rake )
+    r1 = -c * s1 + s * s2
+    r2 =  s * s1 + c * s2
 
     # Coordinates
     rot = coord.rotation( x, y, projection )[1]
@@ -345,16 +360,28 @@ def srf2coulomb( path, projection, dx, dest='coulomb.inp', noslip=False, scut=0 
     x1, x2 = x - dx, x + dx
     y1, y2 = y - dy, y + dy
     z1, z2 = z - dz, z + dz
-    c = numpy.array( [x1, y1, x2, y2, s1, s2, dip, z1, z2] ).T
 
-    fd = open( path + dest, 'w' )
+    # Source file
+    i = (s1**2 + s2**2) > (numpy.sign( scut ) * scut**2)
+    c = numpy.array( [x1[i], y1[i], x2[i], y2[i], r1[i], r2[i], dip[i], z1[i], z2[i]] ).T
+    fd = open( path + dest + '-source.inp', 'w' )
     fd.write( coulomb_header % meta )
-    fmt = '  1' + 4*' %10.4f' + ' 100' + 5*' %10.4f' + '    Fault 1'
-    numpy.savetxt( fd, c, fmt )
+    numpy.savetxt( fd, c, coulomb_fmt )
+    fd.write( coulomb_footer )
+    fd.close()
+
+    # Receiver file
+    s1.fill( 0.0 )
+    c = numpy.array( [x1, y1, x2, y2, s1, s1, dip, z1, z2] ).T
+    fd = open( path + dest + '-receiver.inp', 'w' )
+    fd.write( coulomb_header % meta )
+    numpy.savetxt( fd, c, coulomb_fmt )
     fd.write( coulomb_footer )
     fd.close()
 
     return
+
+coulomb_fmt = '  1' + 4*' %10.4f' + ' 100' + 5*' %10.4f' + '    Fault 1'
 
 coulomb_header = """\
 header line 1
