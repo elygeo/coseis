@@ -324,7 +324,7 @@ def prepare_param( pm, itbuff ):
         else:
             base = 1
         if 'i' in mode:
-            x1 = ii[:3]
+            x1 = tuple( ii[:3] )
             ii = [ int( i + 1 - base ) for i in ii[:3] ] + ii[3:]
         ii = ( util.expand_slice( pm.nn, ii[:3], base )
              + util.expand_slice( [pm.nt], ii[3:], 1 ) )
