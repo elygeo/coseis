@@ -62,9 +62,6 @@ def build( mode=None, optimize=None ):
             object_ = os.path.join( '..', 'bin', 'sord-m' + opt )
             compiler = cf.fortran_mpi + cf.fortran_flags[opt]
             new |= util.make( compiler, object_, source )
-    os.chdir( os.path.join( path, 'extras' ) )
-    if not os.path.isfile( 'rspectra.so' ):
-        os.system( 'f2py -c -m rspectra rspectra.f90' )
     os.chdir( cwd )
     if new:
         #os.link( '.ignore', '.bzrignore' )
@@ -150,6 +147,14 @@ def docs():
     os.unlink( 'sources.txt' )
     return
 
+def rspec():
+    cwd = os.getcwd()
+    path = os.path.realpath( os.path.dirname( __file__ ) )
+    os.chdir( os.path.join( path, 'extras' ) )
+    if not os.path.isfile( 'rspectra.so' ):
+        os.system( 'f2py -c -m rspectra rspectra.f90' )
+    os.chdir( cwd )
+
 def command_line():
     """
     Process command line options.
@@ -176,6 +181,8 @@ def command_line():
             util.install()
         elif args[0] == 'uninstall':
             util.uninstall()
+        elif args[0] == 'rspec':
+            rspec()
         else:
             sys.exit( 'Error: unknown option: %r' % sys.argv[1] )
 
