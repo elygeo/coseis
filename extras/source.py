@@ -307,7 +307,7 @@ def srf2momrate( path, projection, dx, dt, nt ):
 
     return dt.size
 
-def srf2coulomb( path, projection, dx, dest='coulomb.inp', noslip=False, scut=0.001 ):
+def srf2coulomb( path, projection, dx, dest='coulomb.inp', noslip=False, scut=0 ):
     """
     Convert SRF to Coulomb input file.
     """

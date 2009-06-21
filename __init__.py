@@ -324,9 +324,10 @@ def prepare_param( pm, itbuff ):
         else:
             base = 1
         if 'i' in mode:
-            x1 = tuple( i + 1 - base for i in ii )
-        ii = ( util.expand_indices( pm.nn, ii[:3], base )
-             + util.expand_indices( [pm.nt], ii[3:], 1 ) )
+            x1 = ii[:3]
+            ii = [ int( i + 1 - base ) for i in ii[:3] ] + ii[3:]
+        ii = ( util.expand_slice( pm.nn, ii[:3], base )
+             + util.expand_slice( [pm.nt], ii[3:], 1 ) )
         if field in fieldnames.initial:
             ii[3] = 0, 0, 1
         if field in fieldnames.fault:

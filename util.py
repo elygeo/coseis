@@ -15,6 +15,9 @@ def prune( d, pattern=None, types=None ):
     """
     Delete dictionary keys with specified name pattern or types
     Default types are: functions and modules.
+
+    >>> prune( {'a': 0, 'a_': 0, '_a': 0, 'a_a': 0, 'b': prune} )
+    {'a_a': 0}
     """
     if pattern == None:
         pattern = '(^_)|(_$)|(^.$)'
@@ -24,6 +27,7 @@ def prune( d, pattern=None, types=None ):
     for k in d.keys():
         if grep.search( k ) or type( d[k] ) in types:
             del( d[k] )
+    return d
 
 def load( fd, d=None, ignore_pattern=None, ignore_types=None ):
     """
@@ -117,12 +121,30 @@ def loadmeta( path='.' ):
         save( path, meta, expand )
     return namespace( meta )
 
-def expand_indices( shape, indices=None, base=1 ):
+def expand_slice( shape, indices=None, base=1, round=True ):
     """
     Fill in slice index notation.
+
+    >>> expand_slice( [8] )
+    [(1, 8, 1)]
+
+    >>> expand_slice( (8, 4), [], 0 )
+    [(0, 8, 1), (0, 4, 1)]
+
+    >>> expand_slice( (8, 8, 8, 8, 8), [(), 0, 1.4, 1.6, (-1.6, -1.4, 2)], 1 )
+    [(1, 8, 1), (1, 8, 1), (1, 1, 1), (2, 2, 1), (7, 8, 2)]
+
+    >>> expand_slice( (8, 8, 8, 8, 8), [(), 0, 1.9, 2.1, (-2.1, -1.9, 2)], 1.5 )
+    [(1, 7, 1), (1, 7, 1), (1, 1, 1), (2, 2, 1), (6, 7, 2)]
+
+    >>> expand_slice( (8, 8, 8, 8, 8), [(), 0, 0.4, 0.6, (-0.6, -0.4, 2)], 0 )
+    [(0, 8, 1), (0, 1, 1), (0, 1, 1), (1, 2, 1), (7, 8, 2)]
+
+    >>> expand_slice( (8, 8, 8, 8, 8), [(), 0, 0.9, 1.1, (-1.1, -0.9, 2)], 0.5 )
+    [(0, 7, 1), (0, 7, 1), (0, 1, 1), (1, 2, 1), (6, 7, 2)]
     """
     n = len( shape )
-    off = int( base )
+    offset = min( 1, int( base ) )
     if indices is None:
         indices = n * [()]
     elif len( indices ) == 0:
@@ -133,25 +155,28 @@ def expand_indices( shape, indices=None, base=1 ):
         indices = list( indices )
     for i in range( n ):
         if type( indices[i] ) not in ( tuple, list ):
-            if indices[i] == 0 and base > 0:
-                indices[i] = [base, shape[i] - base + off, 1]
-            else:
-                indices[i] = [indices[i], indices[i] + 1 - off, 1]
+            indices[i] = [indices[i]]
         elif len( indices[i] ) == 0:
-            indices[i] = [base, shape[i] - base + off, 1]
+            indices[i] = [base, shape[i] - base + offset, 1]
         elif len( indices[i] ) == 2:
             indices[i] = list( indices[i] ) + [1]
-        elif len( indices[i] ) == 3:
+        elif len( indices[i] ) in ( 1, 3 ):
             indices[i] = list( indices[i] )
-        elif len( indices[i] ) == 1:
-            indices[i] = [indices[i][0], indices[i][0] + 1 - off, 1]
         else:
             sys.exit( 'error in indices: %r' % indices )
         if  indices[i][0] < 0:
-            indices[i][0] = indices[i][0] + shape[i] + off
+            indices[i][0] = shape[i] + indices[i][0] + offset
+        if len( indices[i] ) == 1:
+            if indices[i][0] == 0 and base > 0:
+                indices[i] = [base, shape[i] - base + offset, 1]
+            else:
+                indices[i] = [indices[i][0], indices[i][0] + 1 - offset, 1]
         if  indices[i][1] < 0:
-            indices[i][1] = indices[i][1] + shape[i] + off
-        indices[i] = tuple( int( j ) for j in indices[i] )
+            indices[i][1] = shape[i] + indices[i][1] + offset
+        if round:
+            indices[i][0] = int( indices[i][0] + 0.5 - base + offset )
+            indices[i][1] = int( indices[i][1] + 0.5 - base + offset )
+        indices[i] = tuple( indices[i] )
     return indices
 
 def ndread( fd, shape=None, indices=None, dtype='f', order='F' ):
@@ -179,7 +204,7 @@ def ndread( fd, shape=None, indices=None, dtype='f', order='F' ):
     else:
         mm = list( shape )
     ndim = len( mm )
-    ii = expand_indices( mm, indices )
+    ii = expand_slice( mm, indices )
     if order is 'F':
         ii = ii[::-1]
         mm = mm[::-1]
@@ -334,4 +359,8 @@ def uninstall():
         except( OSError ):
             sys.exit( 'No write permission for Python directory' )
     return
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
 

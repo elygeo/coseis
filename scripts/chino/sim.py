@@ -95,8 +95,8 @@ if __name__ == '__main__':
             print 'Too many stations. Skipping the rest.'
             break
         if ( sta_[i]['name'] != prev_ and
-            x[i] > clip_ and x[i] < L[0]-clip_ and
-            y[i] > clip_ and y[i] < L[1]-clip_ ):
+            clip_ < x[i] < L[0]-clip_ and
+            clip_ < y[i] < L[1]-clip_ ):
             n += 1
             j = int( x[i] / dx[0] + 1.5 )
             k = int( y[i] / dx[1] + 1.5 )
