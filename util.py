@@ -53,7 +53,8 @@ def save( fd, d, expand=None ):
         expand = []
     prune( d )
     for k in sorted( d ):
-        fd.write( '%s = %r\n' % (k, d[k]) )
+        if k not in expand:
+            fd.write( '%s = %r\n' % (k, d[k]) )
     for k in expand:
         if k in d:
             if type( d[k] ) == tuple:

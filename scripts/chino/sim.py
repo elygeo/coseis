@@ -7,8 +7,8 @@ import sys
 np3 = 1, 8, 1
 np3 = 1, 2, 1
 vm_ = 'uhs'
-vm_ = '1d'
 vm_ = 'cvm'
+vm_ = '1d'
 topo_ = False
 T = 120.0
 L = 160000.0, 120000.0, -30000.0
@@ -27,7 +27,7 @@ nn = [
 ]
 nsource = 1
 source = 'moment'
-infiles = [ '~/run/tmp/src_*' ]
+infiles = ['~/run/tmp/src_*']
 rundir = '~/run/chino-' + vm_
 
 # mesh projection
@@ -41,9 +41,6 @@ def projection( lon, lat, inverse=False ):
 # viscosity and output
 fieldio = [
     ( '=',  'gam', [], 0.0 ),
-    ( '=w', 'v1',  [(),(),1,(1,-1,10)], 'v1' ),
-    ( '=w', 'v2',  [(),(),1,(1,-1,10)], 'v2' ),
-    ( '=w', 'v3',  [(),(),1,(1,-1,10)], 'v3' ),
 ]
 
 # topography mesh
@@ -72,7 +69,7 @@ elif vm_ == '1d':
         ( 35.0, 7.8, 4.5,  3.0  ),
     ]
     for dep_, vp_, vs_, rho_ in layers_:
-        i = int( -_dep / dx[2] + 1.5 )
+        i = int( -dep_ / dx[2] + 1.5 )
         fieldio += [
             ( '=',  'rho', [(),(),(i,-1),()], 1000. * rho_ ),
             ( '=',  'vp',  [(),(),(i,-1),()], 1000. * vp_  ),
@@ -86,11 +83,11 @@ if __name__ == '__main__':
     import numpy, sord
     dtype_ = dict( names=( 'name', 'lat', 'lon' ), formats=( 'S8', 'f4', 'f4' ) )
     sta_ = numpy.loadtxt( 'data/station-list', dtype_, usecols=(0,1,2) )
-    x, y = projection( sta['lon'], sta['lat'] )
+    x, y = projection( sta_['lon'], sta_['lat'] )
     clip_ = 27020.0
     prev_ = ''
     n = 0
-    for i in range( len( sta ) ):
+    for i in range( len( sta_ ) ):
         if n == 64:
             print 'Too many stations. Skipping the rest.'
             break
@@ -98,11 +95,11 @@ if __name__ == '__main__':
             clip_ < x[i] < L[0]-clip_ and
             clip_ < y[i] < L[1]-clip_ ):
             n += 1
-            j = int( x[i] / dx[0] + 1.5 )
-            k = int( y[i] / dx[1] + 1.5 )
+            j = x[i] / dx[0] + 1
+            k = y[i] / dx[1] + 1
             for f in 'v1', 'v2', 'v3':
                 fieldio += [
-                    ( '=w', f, [j,k,1,()], sta_[i]['name'] + f ),
+                    ( '=wi', f, [j,k,1,()], sta_[i]['name'] + f ),
                 ]
         prev_ = sta_[i]['name']
 
