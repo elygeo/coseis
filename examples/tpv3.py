@@ -56,10 +56,10 @@ fieldio += [
 ]
 
 # Write slip, slip velocity, and shear traction time history
-for _f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':
+for f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':
     fieldio += [
-        ( '=wx', _f, [], 'P1_'+_f, (-7499., -1., 0.) ), # mode II point
-        ( '=wx', _f, [], 'P2_'+_f, (-1., -5999., 0.) ), # mode III point
+        ( '=wx', f, [], 'P1_' + f, (-7499., -1., 0.) ), # mode II point
+        ( '=wx', f, [], 'P2_' + f, (-1., -5999., 0.) ), # mode III point
     ]
 
 sord.run( locals() )

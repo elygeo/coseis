@@ -3,7 +3,7 @@
 # For more bells and whistles, the Enthought Python Distribution is highly recommended
 
 version="2.6.2"
-prefix="${HOME}/local"
+prefix="${HOME}/local/python"
 
 echo -n "Installing Python-${version} and setuptools in ${prefix}. Are you sure? [y/N]: "
 read confirm

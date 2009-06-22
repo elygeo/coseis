@@ -41,8 +41,10 @@ News
   - new parameters: source, nsource, source1, source2 (see parameters.py)
   - removed parameters: moment1, moment2, rsource, rfunc
 
-2008, Nov 11. New version finished introducing a revamped I/O scheme and Python
-based configuration. Beware that it is not well tested yet.
+2008, Nov 11:
+
+   - Revamped I/O scheme with time buffering
+   - Python based configuration.
 
 
 License
