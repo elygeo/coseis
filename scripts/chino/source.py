@@ -38,5 +38,5 @@ rot[:2,:2] = sord.coord.rotation( lon, lat, sim.projection )[0]
 w1, w2 = sord.coord.rot_sym_tensor( w1, w2, rot )
 
 # Write SORD source input
-sord.source.write_src( history, nt, sim.dt, t0, ihypo, w1, w2, '~/run/tmp' )
+sord.source.src_write( history, nt, sim.dt, t0, ihypo, w1, w2, '~/run/tmp' )
 

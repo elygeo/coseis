@@ -116,7 +116,7 @@ def command_line():
         for rsh, path in pick_dest( deploy.__doc__ ):
             deploy( rsh, path, args )
     elif opt == '-p':
-        for rsh, path in pick_dest( publish.__doc__, [-2, -1] ):
+        for rsh, path in pick_dest( publish.__doc__, [-1] ):
             publish( rsh, path )
     elif opt == '-g':
         for rsh, path in pick_dest( get.__doc__, [] ):

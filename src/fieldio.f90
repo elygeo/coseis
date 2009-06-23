@@ -194,27 +194,31 @@ case( '+' )
     end do
     end do
 case( '=i' )
-    do l = i1(3), i1(3) + 1
-    do k = i1(2), i1(2) + 1
-    do j = i1(1), i1(1) + 1
-        f(j,k,l) = val * &
-            ( ( 1.0 - abs( p%x1(1) - j - nnoff(1) ) ) &
-            * ( 1.0 - abs( p%x1(2) - k - nnoff(2) ) ) &
-            * ( 1.0 - abs( p%x1(3) - l - nnoff(3) ) ) )
-    end do
-    end do
-    end do
+    if ( all( i1 == i2 ) ) then
+        do l = i1(3) - 1, i1(3)
+        do k = i1(2) - 1, i1(2)
+        do j = i1(1) - 1, i1(1)
+            f(j,k,l) = val * &
+                ( ( 1.0 - abs( p%x1(1) - j - nnoff(1) ) ) &
+                * ( 1.0 - abs( p%x1(2) - k - nnoff(2) ) ) &
+                * ( 1.0 - abs( p%x1(3) - l - nnoff(3) ) ) )
+        end do
+        end do
+        end do
+    end if
 case( '+i' )
-    do l = i1(3), i1(3) + 1
-    do k = i1(2), i1(2) + 1
-    do j = i1(1), i1(1) + 1
-        f(j,k,l) = f(j,k,l) + val * &
-            ( ( 1.0 - abs( p%x1(1) - j - nnoff(1) ) ) &
-            * ( 1.0 - abs( p%x1(2) - k - nnoff(2) ) ) &
-            * ( 1.0 - abs( p%x1(3) - l - nnoff(3) ) ) )
-    end do
-    end do
-    end do
+    if ( all( i1 == i2 ) ) then
+        do l = i1(3) - 1, i1(3)
+        do k = i1(2) - 1, i1(2)
+        do j = i1(1) - 1, i1(1)
+            f(j,k,l) = f(j,k,l) + val * &
+                ( ( 1.0 - abs( p%x1(1) - j - nnoff(1) ) ) &
+                * ( 1.0 - abs( p%x1(2) - k - nnoff(2) ) ) &
+                * ( 1.0 - abs( p%x1(3) - l - nnoff(3) ) ) )
+        end do
+        end do
+        end do
+    end if
 case( '=s' )
     call random_number( s1 )
     do l = i1(3), i2(3), di(3)
@@ -334,10 +338,10 @@ case( '=w', '=wi' )
         end select
     end if
     p%ib = p%ib + 1
-    if ( p%mode == '=wi' ) then
-        do l = i1(3), i1(3) + 1
-        do k = i1(2), i1(2) + 1
-        do j = i1(1), i1(1) + 1
+    if ( p%mode == '=wi' .and. all( i1 == i2 ) ) then
+        do l = i1(3) - 1, i2(3)
+        do k = i1(2) - 1, i2(2)
+        do j = i1(1) - 1, i2(1)
             p%buff(1,p%ib) = f(j,k,l) * &
                 ( ( 1.0 - abs( p%x1(1) - j - nnoff(1) ) ) &
                 * ( 1.0 - abs( p%x1(2) - k - nnoff(2) ) ) &

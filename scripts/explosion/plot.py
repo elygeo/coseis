@@ -23,13 +23,13 @@ for path in runs:
     else:
         m0 = source1[0] * (3*rho*vp*vp - 4*rho*vs*vs)
     for sta in stations:
-        x1 = numpy.fromfile( path + '/out/' + sta + '_x1', 'f' )
-        x2 = numpy.fromfile( path + '/out/' + sta + '_x2', 'f' )
-        x3 = numpy.fromfile( path + '/out/' + sta + '_x3', 'f' )
-        v1 = numpy.fromfile( path + '/out/' + sta + '_v1', 'f' )
-        v2 = numpy.fromfile( path + '/out/' + sta + '_v2', 'f' )
-        v3 = numpy.fromfile( path + '/out/' + sta + '_v3', 'f' )
-        x  = numpy.array([ x1, x2, x3 ]).squeeze()
+        v1 = numpy.fromfile( path + '/out/' + sta + '_v1',  'f' )
+        v2 = numpy.fromfile( path + '/out/' + sta + '_v2',  'f' )
+        v3 = numpy.fromfile( path + '/out/' + sta + '_v3',  'f' )
+        e1 = numpy.fromfile( path + '/out/' + sta + '_e11', 'f' )
+        e2 = numpy.fromfile( path + '/out/' + sta + '_e22', 'f' )
+        e3 = numpy.fromfile( path + '/out/' + sta + '_e33', 'f' )
+        x  = numpy.array( [x1, x2, x3] ).squeeze()
         r  = numpy.sqrt( (x*x).sum() )
         t  = dt * numpy.arange( nt ) + 0.5 * dt
         ta = t + r / vp
