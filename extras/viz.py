@@ -209,3 +209,30 @@ def digitize( img, xlim=(-1,1), ylim=(-1,1), color='r' ):
         yr += [y]
     return xr, yr
 
+def contours( *args, **kwargs ):
+    """
+    Extract contour polygons using matplotlib.
+    """
+    import pylab
+    concat = True
+    pp = []
+    pylab.figure()
+    if concat:
+        for cc in pylab.contour( *args, **kwargs ).collections:
+            p = []
+            for c in cc.get_paths():
+                p += c.to_polygons() + [[[numpy.nan, numpy.nan]]]
+            if p:
+                del p[-1]
+                pp += [ numpy.concatenate( p ).T ]
+            else:
+                pp += [ None ]
+    else:
+        for cc in pylab.contour( *args, **kwargs ).collections:
+            p = []
+            for c in cc.get_paths():
+                p += c.to_polygons()
+            pp += [p]
+    pylab.close()
+    return pp
+

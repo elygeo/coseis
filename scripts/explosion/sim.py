@@ -32,7 +32,6 @@ def io( ihypo, dx ):
     _4 = 4000.0 / dx + 1
     fieldio = []
     for f in 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
-   #for f in 'v1', 'v2', 'v3':
         fieldio += [
             ( '=wi', f, [ 1,  1, _4, ()], 'p1_' + f ),
             ( '=wi', f, [ 1, _3, _4, ()], 'p2_' + f ),
@@ -49,10 +48,10 @@ bc2 = 10, 10, 10
 source2 = 3 * [0.0]
 
 # point source
-if 1:
-    nsource = 0
-    timefunction = 'brune'
+nsource = 0
+timefunction = 'brune'
 
+if 0:
     rundir = 'tmp/1'
     source = 'moment'
     bc1 = 2, 2, 2
@@ -61,12 +60,12 @@ if 1:
     source1 = 3 * [3*rho_*vp_*vp_ - 4*rho_*vs_*vs_]
     sord.run( locals() )
 
-if 0:
+if 1:
     rundir = 'tmp/2'
     source = 'potency'
     bc1 = 1, 1, 1
     ihypo = 1, 1, 1
-    fieldio = mat_ + io( ihypo, dx )
+    fieldio = mat_ + io( ihypo, dx[0] )
     source1 = 3 * [1.0]
     sord.run( locals() )
 
