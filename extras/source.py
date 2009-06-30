@@ -10,16 +10,19 @@ def magarea( A ):
     Various earthquake magnitude area relations.
     """
     if type( A ) in (float, int):
-        A = [A]
-    A = numpy.array( A ) 
-    i = A > 537.0
-    Mw = 3.98 + numpy.log10( A )
-    Mw[i] = 3.08 + 4.0 / 3.0 * numpy.log10( A )
+        Mw = 3.98 + numpy.log10( A )
+        if A > 537.0:
+            Mw = 3.08 + 4.0 / 3.0 * numpy.log10( A )
+    else:
+        A = numpy.array( A ) 
+        i = A > 537.0
+        Mw = 3.98 + numpy.log10( A )
+        Mw[i] = 3.08 + 4.0 / 3.0 * numpy.log10( A )
     Mw = dict(
-        HanksBakun2007 = Mw,
+        Hanks2008 = Mw,
         EllsworthB2003 = 4.2 + numpy.log10( A ),
         Somerville2006 = 3.87 + 1.05 * numpy.log10( A ),
-        WellsCoppersmith1994 = 3.98 + 1.02 * numpy.log10( A ),
+        Wells1994 = 3.98 + 1.02 * numpy.log10( A ),
     )
     return Mw
 
