@@ -8,16 +8,11 @@ from sord.extras import source
 #debug = 4
 dx = 3 * [50.0]
 dx = 3 * [100.0]
+dx = 3 * [200.0]
 np3 = 1, 1, 2
 
-dt = dx[0] / 12500.0
-T = 3.0
-L = 6000.0
-nn = [ int( L / dx[0] + 1.0001 ) ] * 3
-nt =   int( T / dt + 1.0001 )
-fixhypo = -1 
-
 # material
+hourglass = 0, 0
 rho_, vp_, vs_ = 2670.0, 6000.0, 3464.0
 mat_ = [
     ( '=', 'rho', [], rho_ ),
@@ -25,6 +20,14 @@ mat_ = [
     ( '=', 'vs',  [], vs_  ),
     ( '=', 'gam', [], 0.0  ),
 ]
+
+#dt = dx[0] / 12500.0 * numpy.sqrt(3) * 1.2
+dt = dx[0] / vp_ * 0.99
+T = 4000.0
+L = 6000.0
+nn = [ int( L / dx[0] + 1.0001 ) ] * 3
+nt =   int( T / dt + 1.0001 )
+fixhypo = -1 
 
 # output
 def io( ihypo, dx ):
@@ -67,6 +70,8 @@ if 1:
     ihypo = 1, 1, 1
     fieldio = mat_ + io( ihypo, dx[0] )
     source1 = 3 * [1.0]
+    source2 = 3 * [1.0]
+    bc2 = 0, 0, 0
     sord.run( locals() )
 
 # finite source

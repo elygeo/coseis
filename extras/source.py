@@ -3,7 +3,6 @@
 Source utilities
 """
 import os, sys, numpy, gzip
-import coord
 
 def magarea( A ):
     """
@@ -63,7 +62,7 @@ def srf_read( filename, path=None, mks=True ):
         if fd.split('.')[-1] == 'gz':
             fd = gzip.open( os.path.expanduser( fd ), 'r' )
         else:
-            fd = open( os.path.expanduser( fd ), 'r' )
+            fd = open( os.path.expanduser( fd ) )
 
     # Header block
     meta = {}
@@ -187,6 +186,7 @@ def srf2potency( path, projection, dx ):
     """
     Convert SRF to potency tensor source and write SORD input files.
     """
+    import coord
 
     # Read meta data
     path = os.path.expanduser( path ) + os.sep
@@ -262,6 +262,7 @@ def srf2momrate( path, projection, dx, dt, nt ):
     """
     Convert SRF to moment rate and write Olsen AWM input file.
     """
+    import coord
 
     # Read meta data
     path = os.path.expanduser( path ) + os.sep
@@ -347,6 +348,7 @@ def srf2coulomb( path, projection, dx, dest='coulomb', scut=0 ):
     """
     Convert SRF to Coulomb input file.
     """
+    import coord
 
     # Meta data
     path = os.path.expanduser( path ) + os.sep
@@ -457,7 +459,7 @@ def command_line():
     import pprint
     for f in sys.argv[1:]:
         print( f )
-        pprint.pprint( srf_read( f, True ) )
+        pprint.pprint( srf_read( f, mks=True ) )
     
 if __name__ == '__main__':
     command_line()

@@ -180,7 +180,7 @@ def ll2xy( x, y, inverse=False, projection=None, rot=40.0, lon0=-121.0, lat0=34.
     x = numpy.array( x )
     y = numpy.array( y )
     if inverse:
-        x, y =  c*x + s*y, -s*x + c*y
+        x, y =  c * x + s * y,  -s * x + c * y
         x = x + x0
         y = y + y0
         x, y = projection( x, y, inverse=True )
@@ -188,7 +188,7 @@ def ll2xy( x, y, inverse=False, projection=None, rot=40.0, lon0=-121.0, lat0=34.
         x, y = projection( x, y )
         x = x - x0
         y = y - y0
-        x, y = c*x - s*y, s*x + c*y
+        x, y = c * x - s * y,  s * x + c * y
     return numpy.array( [x, y] )
 
 def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
@@ -205,8 +205,8 @@ def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
     x, y = projection( lon, lat )
     x = x[1] - x[0]
     y = y[1] - y[0]
-    s = 1.0 / numpy.sqrt( x*x + y*y )
-    mat = numpy.array( [s*x, s*y] )
+    s = 1.0 / numpy.sqrt( x * x + y * y )
+    mat = numpy.array( [s * x, s * y] )
     theta = 180.0 / numpy.pi * numpy.arctan2( mat[0], mat[1] )
     theta = 0.5 * theta.sum(0) - 45.0
     return mat, theta
@@ -220,11 +220,11 @@ def rot_sym_tensor( w1, w2, rot ):
     """
     rot = numpy.array( rot )
     mat = numpy.diag( w1 )
-    mat.flat[[5,6,1]] = w2
-    mat.flat[[7,2,3]] = w2
+    mat.flat[[5, 6, 1]] = w2
+    mat.flat[[7, 2, 3]] = w2
     mat = matmul( matmul( rot, mat ), rot.T )
     w1  = numpy.diag( mat )
-    w2  = mat.flat[[5,6,1]]
+    w2  = mat.flat[[5, 6, 1]]
     return w1, w2
 
 def rotmat( x, origin=(0, 0, 0), upvector=(0, 0, 1) ):
@@ -232,15 +232,15 @@ def rotmat( x, origin=(0, 0, 0), upvector=(0, 0, 1) ):
     Given a position vector x, find the rotation matrix to r,h,v coordinates.
     """
     x = numpy.array( x ) - numpy.array( origin )
-    nr = x / numpy.sqrt( (x*x).sum() )
+    nr = x / numpy.sqrt( (x * x).sum() )
     nh = numpy.cross( upvector, nr )
     if all( nh == 0.0 ):
         nh = numpy.cross( (1, 0, 0), nr )
     if all( nh == 0.0 ):
         nh = numpy.cross( (0, 1, 0), nr )
-    nh = nh / numpy.sqrt( (nh*nh).sum() )
+    nh = nh / numpy.sqrt( (nh * nh).sum() )
     nv = numpy.cross( nr, nh )
-    nv = nv / numpy.sqrt( (nv*nv).sum() )
+    nv = nv / numpy.sqrt( (nv * nv).sum() )
     return numpy.array( [nr, nh, nv] )
 
 def compass( azimuth, radians=False ):

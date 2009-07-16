@@ -13,8 +13,14 @@ x = numpy.arange( sim.nn[0] ) * sim.dx[0]
 y = numpy.arange( sim.nn[1] ) * sim.dx[1]
 z = numpy.arange( sim.nn[2] ) * sim.dx[2]
 
-# node lon/lat mesh
+# spherical geometry
+rearth = 6370000.0
+x0 = 0.5 * x[-1]
+y0 = 0.5 * y[-1]
 yy, xx = numpy.meshgrid( y, x )
+h = rearth - numpy.sqrt( rearth*2 - (xx - x0)**2 - (yy - y0)**2 )
+
+# node lon/lat mesh
 numpy.array( xx, 'f' ).T.tofile( os.path.join( path, 'x' ) )
 numpy.array( yy, 'f' ).T.tofile( os.path.join( path, 'y' ) )
 xx, yy = sim.projection( xx, yy, inverse=True )
@@ -27,7 +33,7 @@ dll = 0.5 / 60.0
 lon0 = -121.5 + 0.5 * dll
 lat0 =   30.5 + 0.5 * dll
 topo = numpy.fromfile( 'data/socal-topo.f32', 'f' ).reshape( n[::-1] ).T
-zz = sord.coord.interp2( lon0, lat0, dll, dll, topo, xx, yy )
+zz += sord.coord.interp2( lon0, lat0, dll, dll, topo, xx, yy )
 zz = numpy.array( zz, 'f' )
 zz.T.tofile( os.path.join( path, 'z' ) )
 

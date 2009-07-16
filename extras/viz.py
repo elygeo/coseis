@@ -152,6 +152,14 @@ def colormap( name='w0', colorexp=1., output='mayavi', n=2001, nmod=0, modlim=0.
             a  = numpy.ones_like( r )
             x1 = x2
         cmap = 255 * numpy.array( [r, g, b, a] ).T
+    elif output in ( 'gmt', 'cpt' ):
+        cmap = ''
+        fmt = '%-10r %3.0f %3.0f %3.0f     %-10r %3.0f %3.0f %3.0f\n'
+        for i in range( x1.size - 1 ):
+            cmap += fmt % (
+                x1[i],   255*r[i],   255*g[i],   255*b[i],
+                x1[i+1], 255*r[i+1], 255*g[i+1], 255*b[i+1],
+            )
     else:
         cmap = numpy.array( [x1, r, g, b] )
     return cmap
@@ -235,4 +243,28 @@ def contours( *args, **kwargs ):
             pp += [p]
     pylab.close()
     return pp
+
+def textpmb( xx, yy, ss, dx=None, dy=None, n=16, **kwargs ):
+    """
+    Poor man's bold text.
+    """
+    import pylab
+    aspect = pylab.gca().get_aspect()
+    if dx == None:
+        dx = dy
+        if aspect != 'equal' or dy == None:
+            l1, l2 = pylab.xlim()
+            dx = 0.001 * (l2 - l1)
+    if dy == None:
+        dy = dx
+        if aspect != 'equal' or dx == None:
+            l1, l2 = pylab.ylim()
+            dy = 0.001 * (l2 - l1)
+    h = []
+    for i in range( n ):
+        phi = 2.0 * numpy.pi * i / n
+        x = xx + dx * numpy.cos( phi )
+        y = yy + dy * numpy.sin( phi )
+        h += [ pylab.text( x, y, ss, **kwargs ) ]
+    return h
 
