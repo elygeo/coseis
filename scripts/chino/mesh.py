@@ -47,7 +47,7 @@ for f in 'gmt-socal-coast', 'gmt-socal-borders', 'dlg-ca-roads':
 
 # PML regions are extruded
 for w in xx, yy, zz:
-    for i in xrange( sim.npml, 0, -1 ):
+    for i in xrange( sim.npml+1, 0, -1 ):
         w[i-1,:] = w[i,:]
         w[-i,:]  = w[-i-1,:]
         w[:,i-1] = w[:,i]

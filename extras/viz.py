@@ -70,7 +70,7 @@ def lengthscale( x, y, w=None, label='%s', style='k-', bg='w', **kwargs ):
         backgroundcolor=bg, rotation=theta )
     return h1, h2
 
-def colormap( name='w0', colorexp=1., output='mayavi', n=2001, nmod=0, modlim=0.5 ):
+def colormap( name='w0', colorexp=1.0, output='mayavi', n=2001, nmod=0, modlim=0.5 ):
     """
     Colormap library
     """
@@ -157,14 +157,14 @@ def colormap( name='w0', colorexp=1., output='mayavi', n=2001, nmod=0, modlim=0.
         fmt = '%-10r %3.0f %3.0f %3.0f     %-10r %3.0f %3.0f %3.0f\n'
         for i in range( x1.size - 1 ):
             cmap += fmt % (
-                x1[i],   255*r[i],   255*g[i],   255*b[i],
-                x1[i+1], 255*r[i+1], 255*g[i+1], 255*b[i+1],
+                x1[i],   255 * r[i],   255 * g[i],   255 * b[i],
+                x1[i+1], 255 * r[i+1], 255 * g[i+1], 255 * b[i+1],
             )
     else:
         cmap = numpy.array( [x1, r, g, b] )
     return cmap
 
-def digitize( img, xlim=(-1,1), ylim=(-1,1), color='r' ):
+def digitize( img, xlim=(-1, 1), ylim=(-1, 1), color='r' ):
     """
     Digitize points on an image and rectify to a rectangular coordinate system.
     """
@@ -196,10 +196,10 @@ def digitize( img, xlim=(-1,1), ylim=(-1,1), color='r' ):
     Enter: new line segment
     Enter twice: finish
     """ )
-    x0 = 0.5 * ( xlim[1] + xlim[0] )
-    y0 = 0.5 * ( ylim[1] + ylim[0] )
-    dx = 0.5 * ( xlim[1] - xlim[0] )
-    dy = 0.5 * ( ylim[1] - ylim[0] )
+    x0 = 0.5 * (xlim[1] + xlim[0])
+    y0 = 0.5 * (ylim[1] + ylim[0])
+    dx = 0.5 * (xlim[1] - xlim[0])
+    dy = 0.5 * (ylim[1] - ylim[0])
     xr, yr = [], []
     while 1:
         xy = pylab.ginput( -1, -1 ) 
@@ -232,9 +232,9 @@ def contours( *args, **kwargs ):
                 p += c.to_polygons() + [[[numpy.nan, numpy.nan]]]
             if p:
                 del p[-1]
-                pp += [ numpy.concatenate( p ).T ]
+                pp += [numpy.concatenate( p ).T]
             else:
-                pp += [ None ]
+                pp += [None]
     else:
         for cc in pylab.contour( *args, **kwargs ).collections:
             p = []

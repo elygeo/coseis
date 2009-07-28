@@ -35,15 +35,18 @@ websims = dict(
     x_shape = x_shape,
     x_step = ( 0.001*dx[0]*dix_x, 0.001*dx[1]*dix_x, dt*dit_x),
     x_unit = ('km', 'km', 's'),
+    t_title = 'Velocity time history'
     t_panes = [
         (('v1_t',), 'X Velocity (m/s)'),
         (('v2_t',), 'Y Velocity (m/s)'),
         (('v3_t',), 'Z Velocity (m/s)'),
     ],
+    x_initial_title = 'Peak ground motion maps'
     x_initial_panes = [
         ('pgv', 'Peak velocity (m/s)',   'w00', (0, 4.0), 2.0),
         ('pgd', 'Peak displacement (m)', 'w00', (0, 8.0), 2.0),
     ],
+    x_title = 'Ground velocity snapshot'
     x_panes = [
         ('v1_x', 'X velocity (m/s)', 'w2', (-1, 1), 2.0),
         ('v2_x', 'Y velocity (m/s)', 'w2', (-1, 1), 2.0),
