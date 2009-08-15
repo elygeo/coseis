@@ -2,7 +2,7 @@
 """
 Source utilities
 """
-import os, sys, numpy, gzip
+import os, sys, numpy, gzip, sord
 
 def magarea( A ):
     """

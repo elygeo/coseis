@@ -23,8 +23,8 @@ ihypo = (
 tc = 2.0
 s = 0.5
 t = sim.dt * numpy.arange( sim.nt )
-history = ( numpy.exp( ( t - tc ) ** 2.0 / ( -2.0 * s ** 2.0 ) )
-          / ( s * numpy.sqrt( 2.0 * numpy.pi ) ) )
+history = ( numpy.exp( (t - tc) ** 2.0 / (-2.0 * s ** 2.0) )
+          / (s * numpy.sqrt( 2.0 * numpy.pi )) )
 history = numpy.cumsum( history )
 history = history / history[-1]
 nt = history.size

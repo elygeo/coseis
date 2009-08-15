@@ -12,35 +12,40 @@ ntop = int( -26000.0 / sim.dx[2] + 0.5 )
 x = numpy.arange( sim.nn[0] ) * sim.dx[0]
 y = numpy.arange( sim.nn[1] ) * sim.dx[1]
 z = numpy.arange( sim.nn[2] ) * sim.dx[2]
+yy, xx = numpy.meshgrid( y, x )
+numpy.array( xx, 'f' ).T.tofile( os.path.join( path, 'x' ) )
+numpy.array( yy, 'f' ).T.tofile( os.path.join( path, 'y' ) )
 
 # spherical geometry
 rearth = 6370000.0
 x0 = 0.5 * x[-1]
 y0 = 0.5 * y[-1]
-yy, xx = numpy.meshgrid( y, x )
 h = rearth - numpy.sqrt( rearth*2 - (xx - x0)**2 - (yy - y0)**2 )
 
 # node lon/lat mesh
-numpy.array( xx, 'f' ).T.tofile( os.path.join( path, 'x' ) )
-numpy.array( yy, 'f' ).T.tofile( os.path.join( path, 'y' ) )
 xx, yy = sim.projection( xx, yy, inverse=True )
 xx = numpy.array( xx, 'f' )
 yy = numpy.array( yy, 'f' )
 
 # topography
 n = 960, 780
-dll = 0.5 / 60.0
-lon0 = -121.5 + 0.5 * dll
-lat0 =   30.5 + 0.5 * dll
+topo_dll = 0.5 / 60.0
+topo_lon0 = -121.5 + 0.5 * dll
+topo_lat0 =   30.5 + 0.5 * dll
 topo = numpy.fromfile( 'data/socal-topo.f32', 'f' ).reshape( n[::-1] ).T
-zz += sord.coord.interp2( lon0, lat0, dll, dll, topo, xx, yy )
+FIXME!
+if 'sphere' in grid_:
+    x0 = 0.5 * x[-1]
+    y0 = 0.5 * y[-1]
+    zz_s = numpy.sqrt( re**2 - (xx - x0)**2 - (yy - y0)**2 ) - re
+zz += sord.coord.interp2( topo_lon0, topo_lat0, topo_dll, topo_dll, topo, xx, yy )
 zz = numpy.array( zz, 'f' )
 zz.T.tofile( os.path.join( path, 'z' ) )
 
 # map data
 for f in 'gmt-socal-coast', 'gmt-socal-borders', 'dlg-ca-roads':
     x, y = numpy.loadtxt( 'data/' + f + '.ll', usecols=(0,1), unpack=True )
-    z = sord.coord.interp2( lon0, lat0, dll, dll, topo, x, y )
+    z = sord.coord.interp2( topo_lon0, topo_lat0, topo_dll, topo_dll, topo, x, y )
     x, y = sim.projection( x, y )
     xyz = 0.001 * numpy.array( [x,y,z] ).T
     numpy.savetxt( os.path.join( path, f + '.xyz' ), xyz, '%.3f' )
@@ -55,7 +60,7 @@ for w in xx, yy, zz:
 
 # node elevation mesh
 path = os.path.expanduser( '~/run/tmp' )
-if sim.topo_:
+if 'topo' in sim.grid_:
     z0 = zz.mean()
     zz = zz - z0
     n = z.size - ntop - sim.npml

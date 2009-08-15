@@ -142,6 +142,28 @@ def ibilinear( xx, yy, xi, yi ):
         x  = x + dx
     return x
 
+def ll2ortho( x, y, z=None, lon0=-118.1, lat0=34.1, rearth = 6370000.0, inverse=False ):
+    """
+    Orthographic projection with optional sphirical z coordinate.
+    """
+    import pyproj
+    projection = pyproj.Proj( proj='ortho', lon_0=lon0, lat_0=lat0 )
+    if z == None:
+        x, y = projection( x, y, inverse=inverse )
+        return numpy.array( [x, y] )
+    else:
+        if inverse:
+            z -= numpy.sqrt( rearth ** 2 - x ** 2 - y ** 2 ) - rearth
+            y -= y * z / rearth
+            x -= x * z / rearth
+            x, y = projection( x, y, inverse=True )
+        else:
+            x, y = projection( x, y, inverse=False )
+            x += x * z / rearth
+            y += y * z / rearth
+            z += numpy.sqrt( rearth ** 2 - x ** 2 - y ** 2 ) - rearth
+        return numpy.array( [x, y, z] )
+
 def ll2cvmh( x, y, inverse=False ):
     """
     Harvard CVM5 projection.

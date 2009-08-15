@@ -9,7 +9,10 @@ np3 = 1, 2, 1
 vm_ = 'uhs'
 vm_ = 'cvm'
 vm_ = '1d'
-topo_ = False
+grid_ = ''
+grid_ = 'sphere'
+grid_ = 'topo'
+grid_ = 'topo-sphere'
 T = 120.0
 L = 160000.0, 120000.0, -30000.0
 dx =  150.0,  150.0,  -150.0 ; npml = 10
@@ -31,12 +34,21 @@ infiles = ['~/run/tmp/src_*']
 rundir = '~/run/chino-' + vm_
 
 # mesh projection
-def projection( lon, lat, inverse=False ):
-    import sord
-    lon0 = -118.8
-    lat0 = 33.6
-    rot = 0.0
-    return sord.coord.ll2xy( lon, lat, inverse, rot=rot, lon0=lon0, lat0=lat0 )
+def projection( x, y, z=None, inverse=False ):
+    import pyproj
+    rearth = 6370000.0
+    lon0 = -118.1
+    lat0 = 34.1
+    projection = pyproj.Proj( proj='ortho', lon_0=lon0, lat_0=lat0 )
+    x, y = projection( x, y, inverse=inverse )
+    #h = rearth - numpy.sqrt( rearth*2 - x**2 - y**2 )
+    if inverse:
+        x, y = projection( x, y, inverse=True )
+    else:
+        x, y = projection( x, y, inverse=False )
+        if z != None:
+            x = x * (z - rearth) / rearth 
+    return numpy.array( [x, y] )
 
 # viscosity and output
 fieldio = [
@@ -44,21 +56,21 @@ fieldio = [
 ]
 
 # topography mesh
-if topo_:
+if grid_:
     fieldio += [ ( '=r', 'x3',  [], '~/run/tmp/z3' ) ]
 
 # velocity model
-if vm_ == 'uhs':
-    fieldio += [
-        ( '=',  'rho', [], 2500.0 ),
-        ( '=',  'vp',  [], 6000.0 ),
-        ( '=',  'vs',  [], 3500.0 ),
-    ]
-elif vm_ == 'cvm':
+if vm_ == 'cvm':
     fieldio += [
         ( '=r', 'rho', [], '~/run/cvm4/rho' ),
         ( '=r', 'vp',  [], '~/run/cvm4/vp'  ),
         ( '=r', 'vs',  [], '~/run/cvm4/vs'  ),
+    ]
+elif vm_ == 'uhs':
+    fieldio += [
+        ( '=',  'rho', [], 2500.0 ),
+        ( '=',  'vp',  [], 6000.0 ),
+        ( '=',  'vs',  [], 3500.0 ),
     ]
 elif vm_ == '1d':
     layers_ = [
@@ -69,11 +81,11 @@ elif vm_ == '1d':
         ( 35.0, 7.8, 4.5,  3.0  ),
     ]
     for dep_, vp_, vs_, rho_ in layers_:
-        i = int( -dep_ / dx[2] + 1.5 )
+        i = int( -1000.0 * dep_ / dx[2] + 1.5 )
         fieldio += [
-            ( '=',  'rho', [(),(),(i,-1),()], 1000. * rho_ ),
-            ( '=',  'vp',  [(),(),(i,-1),()], 1000. * vp_  ),
-            ( '=',  'vs',  [(),(),(i,-1),()], 1000. * vs_  ),
+            ( '=',  'rho', [(),(),(i,-1),()], 1000.0 * rho_ ),
+            ( '=',  'vp',  [(),(),(i,-1),()], 1000.0 * vp_  ),
+            ( '=',  'vs',  [(),(),(i,-1),()], 1000.0 * vs_  ),
         ]
 else:
     sys.exit( 'bad vm' )

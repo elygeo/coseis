@@ -6,13 +6,6 @@ prefix="${HOME}/local"
 
 # Set version here:
 # rh3 seems to work for most linux distros. Fedora 6 = RHEL 5
-# version=epd_py25-4.2.30201-win32-x86.msi
-# version=epd_py25-4.2.30201-macosx-u.dmg
-version=epd_py25-4.2.30101-SunOS_5.10-x86.sh
-version=epd_py25-4.2.30201-rh5-x86.installer
-version=epd_py25-4.2.30201-rh3-x86.installer
-version=epd_py25-4.2.30201-rh5-amd64.installer
-version=epd_py25-4.2.30201-rh3-amd64.installer
 # version=epd_py25-4.3.0-win32-x86.msi
 # version=epd_py25-4.3.0-macosx.dmg
 version=epd_py25-4.3.0-SunOS_5.10-x86.sh
