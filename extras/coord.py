@@ -142,18 +142,28 @@ def ibilinear( xx, yy, xi, yi ):
         x  = x + dx
     return x
 
-def ll2ortho( x, y, z=None, lon0=-118.1, lat0=34.1, rearth = 6370000.0, inverse=False ):
+def ll2ortho( x, y, z=None, lon0=-118.1, lat0=34.1, rot=0.0, rearth=6370000.0, inverse=False ):
     """
     Orthographic projection with optional sphirical z coordinate.
     """
     import pyproj
     projection = pyproj.Proj( proj='ortho', lon_0=lon0, lat_0=lat0 )
+    c = numpy.cos( numpy.pi / 180.0 * rot )
+    s = numpy.sin( numpy.pi / 180.0 * rot )
+    x = numpy.array( x )
+    y = numpy.array( y )
     if z == None:
-        x, y = projection( x, y, inverse=inverse )
+        if inverse:
+            x, y = c * x + s * y,  -s * x + c * y
+            x, y = projection( x, y, inverse=True )
+        else:
+            x, y = projection( x, y, inverse=False )
+            x, y = c * x - s * y,  s * x + c * y
         return numpy.array( [x, y] )
     else:
         if inverse:
             z -= numpy.sqrt( rearth ** 2 - x ** 2 - y ** 2 ) - rearth
+            x, y = c * x + s * y, -s * x + c * y
             y -= y * z / rearth
             x -= x * z / rearth
             x, y = projection( x, y, inverse=True )
@@ -161,6 +171,7 @@ def ll2ortho( x, y, z=None, lon0=-118.1, lat0=34.1, rearth = 6370000.0, inverse=
             x, y = projection( x, y, inverse=False )
             x += x * z / rearth
             y += y * z / rearth
+            x, y = c * x - s * y,  s * x + c * y
             z += numpy.sqrt( rearth ** 2 - x ** 2 - y ** 2 ) - rearth
         return numpy.array( [x, y, z] )
 
@@ -202,7 +213,7 @@ def ll2xy( x, y, inverse=False, projection=None, rot=40.0, lon0=-121.0, lat0=34.
     x = numpy.array( x )
     y = numpy.array( y )
     if inverse:
-        x, y =  c * x + s * y,  -s * x + c * y
+        x, y = c * x + s * y,  -s * x + c * y
         x = x + x0
         y = y + y0
         x, y = projection( x, y, inverse=True )

@@ -68,7 +68,11 @@ if sim.topo_:
     z0 = zz.mean()
     zz = zz - z0
     n = z.size - ntop - sim.npml
-    w = 1.0 - numpy.r_[ numpy.zeros(ntop), 1.0/(n-1)*numpy.arange(n), numpy.ones(sim.npml) ]
+    w = 1.0 - numpy.r_[
+        numpy.zeros( ntop ),
+        1.0 / (n - 1) * numpy.arange( n ),
+        numpy.ones( sim.npml )
+    ]
     f3 = open( os.path.join( path, 'z3' ), 'wb' )
     for i in xrange( z.size ):
         ( z[i] + z0 + w[i] * zz ).T.tofile( f3 )
@@ -83,7 +87,7 @@ if sim.vm_ == 'cvm':
     path = cfg.rundir
 
     # cell center locations
-    z  = -0.5 * ( z[:-1] + z[1:] )
+    z  = 0.5 * ( z[:-1] + z[1:] )
     xx = 0.25 * ( xx[:-1,:-1] + xx[1:,:-1] + xx[:-1,1:] + xx[1:,1:] )
     yy = 0.25 * ( yy[:-1,:-1] + yy[1:,:-1] + yy[:-1,1:] + yy[1:,1:] )
     zz = 0.25 * ( zz[:-1,:-1] + zz[1:,:-1] + zz[:-1,1:] + zz[1:,1:] )
@@ -97,9 +101,13 @@ if sim.vm_ == 'cvm':
         yy.T.tofile( f2 )
     if sim.topo_:
         n = z.size - ntop - sim.npml
-        w = numpy.r_[ numpy.zeros(ntop), 1.0/n*(0.5+numpy.arange(n)), numpy.ones(sim.npml) ]
+        w = numpy.r_[
+            numpy.zeros( ntop ),
+            1.0 / n * (0.5 + numpy.arange( n )),
+            numpy.ones( sim.npml )
+        ]
         for i in xrange( z.size ):
-            ( z[i] + w[i] * zz ).T.tofile( f3 )
+            ( w[i] * zz - z[i] ).T.tofile( f3 )
     else:
         for i in xrange( z.size ):
             zz.fill( z[i] )

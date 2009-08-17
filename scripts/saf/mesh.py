@@ -151,7 +151,11 @@ if writing and sim.topo_:
     z0 = zz.mean()
     zz = zz - z0
     n = z.size - sim.npml - lf
-    w = 1.0 - numpy.r_[ numpy.zeros(lf), 1.0/(n-1)*numpy.arange(n), numpy.ones(sim.npml) ]
+    w = 1.0 - numpy.r_[
+        numpy.zeros( lf ),
+        1.0 / (n - 1) * numpy.arange( n ),
+        numpy.ones( sim.npml )
+    ]
     f3 = open( os.path.join( path, 'z3' ), 'wb' )
     for i in xrange( z.size ):
         ( z[i] + z0 + w[i] * zz ).T.tofile( f3 )
@@ -173,7 +177,11 @@ if writing:
         yy.T.tofile( f2 )
     if sim.topo_:
         n = z.size - sim.npml - lf
-        w = numpy.r_[ numpy.zeros(lf), 1.0/n*(0.5+numpy.arange(n)), numpy.ones(sim.npml) ]
+        w = numpy.r_[
+            numpy.zeros( lf ),
+            1.0 / n * (0.5 + numpy.arange( n )),
+            numpy.ones( sim.npml )
+        ]
         for i in xrange( z.size ):
             ( z[i] + w[i] * zz ).T.tofile( f3 )
     else:

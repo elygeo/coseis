@@ -34,21 +34,7 @@ infiles = ['~/run/tmp/src_*']
 rundir = '~/run/chino-' + vm_
 
 # mesh projection
-def projection( x, y, z=None, inverse=False ):
-    import pyproj
-    rearth = 6370000.0
-    lon0 = -118.1
-    lat0 = 34.1
-    projection = pyproj.Proj( proj='ortho', lon_0=lon0, lat_0=lat0 )
-    x, y = projection( x, y, inverse=inverse )
-    #h = rearth - numpy.sqrt( rearth*2 - x**2 - y**2 )
-    if inverse:
-        x, y = projection( x, y, inverse=True )
-    else:
-        x, y = projection( x, y, inverse=False )
-        if z != None:
-            x = x * (z - rearth) / rearth 
-    return numpy.array( [x, y] )
+projection = sord.coord.ll2ortho
 
 # viscosity and output
 fieldio = [
@@ -56,8 +42,8 @@ fieldio = [
 ]
 
 # topography mesh
-if grid_:
-    fieldio += [ ( '=r', 'x3',  [], '~/run/tmp/z3' ) ]
+if grid_ != 'flat':
+    fieldio += [ ( '=r', 'x3', [], '~/run/tmp/z3' ) ]
 
 # velocity model
 if vm_ == 'cvm':
@@ -93,8 +79,8 @@ else:
 # run SORD job
 if __name__ == '__main__':
     import numpy, sord
-    dtype_ = dict( names=( 'name', 'lat', 'lon' ), formats=( 'S8', 'f4', 'f4' ) )
-    sta_ = numpy.loadtxt( 'data/station-list', dtype_, usecols=(0,1,2) )
+    dtype_ = dict( names=('name', 'lat', 'lon'), formats=('S8', 'f4', 'f4') )
+    sta_ = numpy.loadtxt( 'data/station-list', dtype_, usecols=(0, 1, 2) )
     x, y = projection( sta_['lon'], sta_['lat'] )
     clip_ = 27020.0
     prev_ = ''
@@ -104,8 +90,8 @@ if __name__ == '__main__':
             print 'Too many stations. Skipping the rest.'
             break
         if ( sta_[i]['name'] != prev_ and
-            clip_ < x[i] < L[0]-clip_ and
-            clip_ < y[i] < L[1]-clip_ ):
+            clip_-L[0]/2 < x[i] < L[0]/2-clip_ and
+            clip_-L[1]/2 < y[i] < L[1]/2-clip_ ):
             n += 1
             j = x[i] / dx[0] + 1
             k = y[i] / dx[1] + 1
