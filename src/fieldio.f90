@@ -325,6 +325,7 @@ case( '=r', '+r', '=R', '+R' )
 case( '=w', '=wi' )
     if ( p%ib < 0 ) then
         allocate( p%buff(n(1)*n(2)*n(3),p%nb) )
+        p%buff = 0.0
         p%ib = 0
         p%fh = frio_file_null
         if ( mpout /= 0 ) p%fh = file_null
@@ -339,10 +340,17 @@ case( '=w', '=wi' )
     end if
     p%ib = p%ib + 1
     if ( p%mode == '=wi' .and. all( i1 == i2 ) ) then
+        print *, p%filename
+        print *, p%x1
+        print *, i1 + nnoff
         do l = i1(3) - 1, i2(3)
         do k = i1(2) - 1, i2(2)
         do j = i1(1) - 1, i2(1)
-            p%buff(1,p%ib) = f(j,k,l) * &
+            print *, j, k, l, &
+                ( ( 1.0 - abs( p%x1(1) - j - nnoff(1) ) ) &
+                * ( 1.0 - abs( p%x1(2) - k - nnoff(2) ) ) &
+                * ( 1.0 - abs( p%x1(3) - l - nnoff(3) ) ) )
+            p%buff(1,p%ib) = p%buff(1,p%ib) + f(j,k,l) * &
                 ( ( 1.0 - abs( p%x1(1) - j - nnoff(1) ) ) &
                 * ( 1.0 - abs( p%x1(2) - k - nnoff(2) ) ) &
                 * ( 1.0 - abs( p%x1(3) - l - nnoff(3) ) ) )
