@@ -23,7 +23,7 @@ def configure( save=False, machine=None ):
         conf['machine'] = machine
         if save:
             open( 'machine', 'w' ).write( machine )
-    util.prune( conf )
+    util.prune( conf, pattern='(^_)|(^.$)' )
     os.chdir( cwd )
     return conf
 

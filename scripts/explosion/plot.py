@@ -6,6 +6,7 @@ import numpy, pylab, sord
 
 rho, vp, vs = 2670.0, 6000.0, 3464.0
 runs = 'tmp/1', 'tmp/3', 'tmp/2', 'tmp/4'
+runs = 'tmp/2',
 stations = 'p5',
 stations = 'p1', 'p2', 'p3', 'p4', 'p5', 'p6'
 
@@ -13,6 +14,7 @@ for path in runs:
     meta = sord.util.loadmeta( path )
     nt = meta.nt
     dt = meta.dt
+    dx = meta.dx
     period = meta.period
     source = meta.source
     source1 = meta.source1

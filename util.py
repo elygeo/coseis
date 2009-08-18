@@ -29,7 +29,7 @@ def prune( d, pattern=None, types=None ):
             del( d[k] )
     return d
 
-def load( fd, d=None, ignore_pattern=None, ignore_types=None ):
+def load( fd, d=None, prune_pattern=None, prune_types=None ):
     """
     Load variables from Python source files.
     """
@@ -38,10 +38,10 @@ def load( fd, d=None, ignore_pattern=None, ignore_types=None ):
     if d == None:
         d = {}
     exec fd in d
-    prune( d, ignore_pattern, ignore_types )
+    prune( d, prune_pattern, prune_types )
     return namespace( d )
 
-def save( fd, d, expand=None ):
+def save( fd, d, expand=None, prune_pattern=None, prune_types=None ):
     """
     Write variables from a dict into a Python source file.
     """
@@ -51,7 +51,7 @@ def save( fd, d, expand=None ):
         d = d.__dict__
     if expand is None:
         expand = []
-    prune( d )
+    prune( d, prune_pattern, prune_types )
     for k in sorted( d ):
         if k not in expand:
             fd.write( '%s = %r\n' % (k, d[k]) )

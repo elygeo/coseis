@@ -33,7 +33,7 @@ def stage( inputs ):
     # Merge inputs
     util.prune( inputs )
     util.prune( pm )
-    util.prune( cf )
+    util.prune( cf, pattern='(^_)|(^.$)' )
     for k, v in inputs.iteritems():
         if k in cf:
             cf[k] = v
@@ -216,8 +216,8 @@ def stage( inputs ):
     os.chdir( cf.rundir )
     log = open( 'log', 'w' )
     log.write( starttime + ': setup started\n' )
-    util.save( 'parameters.py', pm, ['fieldio'] )
-    util.save( 'conf.py', cf )
+    util.save( 'parameters.py', pm, expand=['fieldio'] )
+    util.save( 'conf.py', cf, prune_pattern='(^_)|(^.$)' )
 
     # Return to initial directory
     os.chdir( cwd )
