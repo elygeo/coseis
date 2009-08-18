@@ -144,9 +144,120 @@ def ibilinear( xx, yy, xi, yi ):
         x  = x + dx
     return x
 
+def rotation( lon, lat, projection, eps=100.0 ):
+    """
+    mat, theta = rotation( lon, lat, projection )
+
+    Rotation matrix and clockwise rotation angle to transform components in the
+    geographic coordinate system to components in the local system.
+    local_components = matmul( mat, components )
+    local_strike = strike + theta
+    """
+    dlon = eps * 180.0 / (numpy.pi * rearth) * numpy.cos( numpy.pi / 180.0 * lat )
+    dlat = eps * 180.0 / (numpy.pi * rearth)
+    lon = numpy.array( [
+        [lon - dlon, lon ],
+        [lon + dlon, lon ],
+    ] )
+    lat = numpy.array( [
+        [lat, lat - dlat],
+        [lat, lat + dlat],
+    ])
+    x, y = projection( lon, lat )
+    x = x[1] - x[0]
+    y = y[1] - y[0]
+    s = 1.0 / numpy.sqrt( x * x + y * y )
+    mat = numpy.array( [s * x, s * y] )
+    theta = 180.0 / numpy.pi * numpy.arctan2( mat[0], mat[1] )
+    theta = 0.5 * theta.sum(0) - 45.0
+    return mat, theta
+
+def rotation3( lon, lat, dep, projection, eps=100.0 ):
+    """
+    mat = rotation( lon, lat, dep, projection )
+
+    Rotation matrix to transform components in the
+    geographic coordinate system to components in the local system.
+    local_components = matmul( mat, components )
+    """
+    dlon = eps * 180.0 / (numpy.pi * rearth) * numpy.cos( numpy.pi / 180.0 * lat )
+    dlat = eps * 180.0 / (numpy.pi * rearth)
+    lon = numpy.array( [
+        [lon - dlon, lon, lon],
+        [lon + dlon, lon, lon],
+    ] )
+    lat = numpy.array( [
+        [lat, lat - dlat, lat],
+        [lat, lat + dlat, lat],
+    ] )
+    dep = numpy.array( [
+        [dep, dep, dep - eps],
+        [dep, dep, dep + eps],
+    ] )
+    x, y, z = projection( lon, lat, dep )
+    x = x[1] - x[0]
+    y = y[1] - y[0]
+    z = z[1] - z[0]
+    s = 1.0 / numpy.sqrt( x * x + y * y + z * z )
+    mat = numpy.array( [s * x, s * y, s * z] )
+    return mat
+
+def rotmat( x, origin=(0, 0, 0), upvector=(0, 0, 1) ):
+    """
+    Given a position vector x, find the rotation matrix to r,h,v coordinates.
+    """
+    x = numpy.array( x ) - numpy.array( origin )
+    nr = x / numpy.sqrt( (x * x).sum() )
+    nh = numpy.cross( upvector, nr )
+    if all( nh == 0.0 ):
+        nh = numpy.cross( (1, 0, 0), nr )
+    if all( nh == 0.0 ):
+        nh = numpy.cross( (0, 1, 0), nr )
+    nh = nh / numpy.sqrt( (nh * nh).sum() )
+    nv = numpy.cross( nr, nh )
+    nv = nv / numpy.sqrt( (nv * nv).sum() )
+    return numpy.array( [nr, nh, nv] )
+
+def rot_sym_tensor( w1, w2, rot ):
+    """
+    Rotate symmetric 3x3 tensor stored as diagonal and off-diagonal vectors.
+    w1:  components w11, w22, w33
+    w2:  components w23, w31, w12
+    rot: rotation matrix
+    """
+    rot = numpy.array( rot )
+    mat = numpy.diag( w1 )
+    mat.flat[[5, 6, 1]] = w2
+    mat.flat[[7, 2, 3]] = w2
+    mat = matmul( matmul( rot, mat ), rot.T )
+    w1  = numpy.diag( mat )
+    w2  = mat.flat[[5, 6, 1]]
+    return w1, w2
+
+def compass( azimuth, radians=False ):
+    """
+    Get named direction from azimuth.
+    """
+    if radians:
+        azimuth *= 180.0 / numpy.pi
+    names = (
+        'N', 'NNE', 'NE', 'ENE',
+        'E', 'ESE', 'SE', 'SSE',
+        'S', 'SSW', 'SW', 'WSW',
+        'W', 'WNW', 'NW', 'NNW',
+    )
+    return names[ int( azimuth / 22.5 + 16.0 ) % 16 ]
+
 def ll2ortho( x, y, z=None, lon0=-118.0, lat0=34.0, rot=0.0, rearth=6370000.0, inverse=False ):
     """
-    Orthographic projection with optional sphirical z coordinate.
+    Orthographic projection. Optional z coordinate has spherical curvature.
+
+    Useful for cuboid subsection of a spherical Earth.
+    Pro: lateral and depth boundaries are normal to the Cartesian axes so
+         PML absorbing boundaries may be used.
+    Con: lateral boundaries and z grid lines are not purely vertical in the
+         geographic coordinate system. Deflection from vertical increases
+         with distance from the origin.
     """
     import pyproj
     projection = pyproj.Proj( proj='ortho', lon_0=lon0, lat_0=lat0 )
@@ -177,6 +288,30 @@ def ll2ortho( x, y, z=None, lon0=-118.0, lat0=34.0, rot=0.0, rearth=6370000.0, i
             z += numpy.sqrt( rearth ** 2 - x ** 2 - y ** 2 ) - rearth
         return numpy.array( [x, y, z] )
 
+def ll2xy( x, y, inverse=False, projection=None, rot=40.0, lon0=-121.0, lat0=34.5 ):
+    """
+    UTM TeraShake coordinate projection
+    """
+    import pyproj
+    if not projection:
+        projection = pyproj.Proj( proj='utm', zone=11, ellps='WGS84' )
+    x0, y0 = projection( lon0, lat0 )
+    c = numpy.cos( numpy.pi / 180.0 * rot )
+    s = numpy.sin( numpy.pi / 180.0 * rot )
+    x = numpy.array( x )
+    y = numpy.array( y )
+    if inverse:
+        x, y = c * x + s * y,  -s * x + c * y
+        x = x + x0
+        y = y + y0
+        x, y = projection( x, y, inverse=True )
+    else:
+        x, y = projection( x, y, inverse=False )
+        x = x - x0
+        y = y - y0
+        x, y = c * x - s * y,  s * x + c * y
+    return numpy.array( [x, y] )
+
 def ll2cvmh( x, y, inverse=False ):
     """
     Harvard CVM5 projection.
@@ -202,134 +337,6 @@ def ll2cmu( x, y, inverse=False ):
         y = (y + 1.0) * 150000.0
     return numpy.array( [x, y] )
 
-def ll2xy( x, y, inverse=False, projection=None, rot=40.0, lon0=-121.0, lat0=34.5 ):
-    """
-    UTM TeraShake coordinate projection
-    """
-    import pyproj
-    if not projection:
-        projection = pyproj.Proj( proj='utm', zone=11, ellps='WGS84' )
-    x0, y0 = projection( lon0, lat0 )
-    c = numpy.cos( numpy.pi / 180.0 * rot )
-    s = numpy.sin( numpy.pi / 180.0 * rot )
-    x = numpy.array( x )
-    y = numpy.array( y )
-    if inverse:
-        x, y = c * x + s * y,  -s * x + c * y
-        x = x + x0
-        y = y + y0
-        x, y = projection( x, y, inverse=True )
-    else:
-        x, y = projection( x, y )
-        x = x - x0
-        y = y - y0
-        x, y = c * x - s * y,  s * x + c * y
-    return numpy.array( [x, y] )
-
-def rotation( lon, lat, projection=ll2xy, eps=100.0 ):
-    """
-    mat, theta = rotation( lon, lat, projection )
-
-    Rotation matrix and clockwise rotation angle to transform components in the
-    geographic coordinate system to components in the local system.
-    local_components = matmul( mat, components )
-    local_strike = strike + theta
-    """
-    dlon = eps * 180.0 / (numpy.pi * rearth) * numpy.cos( numpy.pi / 180.0 * lat )
-    dlat = eps * 180.0 / (numpy.pi * rearth)
-    lon = numpy.array( [
-        [lon - dlon, lon ],
-        [lon + dlon, lon ],
-    ] )
-    lat = numpy.array( [
-        [lat, lat - dlat],
-        [lat, lat + dlat],
-    ])
-    x, y = projection( lon, lat )
-    x = x[1] - x[0]
-    y = y[1] - y[0]
-    s = 1.0 / numpy.sqrt( x * x + y * y )
-    mat = numpy.array( [s * x, s * y] )
-    theta = 180.0 / numpy.pi * numpy.arctan2( mat[0], mat[1] )
-    theta = 0.5 * theta.sum(0) - 45.0
-    return mat, theta
-
-def rotation3( lon, lat, dep, projection=ll2ortho, eps=100.0 ):
-    """
-    mat = rotation( lon, lat, dep, projection )
-
-    Rotation matrix to transform components in the
-    geographic coordinate system to components in the local system.
-    local_components = matmul( mat, components )
-    """
-    dlon = eps * 180.0 / (numpy.pi * rearth) * numpy.cos( numpy.pi / 180.0 * lat )
-    dlat = eps * 180.0 / (numpy.pi * rearth)
-    lon = numpy.array( [
-        [lon - dlon, lon, lon],
-        [lon + dlon, lon, lon],
-    ] )
-    lat = numpy.array( [
-        [lat, lat - dlat, lat],
-        [lat, lat + dlat, lat],
-    ] )
-    dep = numpy.array( [
-        [dep, dep, dep - eps],
-        [dep, dep, dep + eps],
-    ] )
-    x, y, z = projection( lon, lat, dep )
-    x = x[1] - x[0]
-    y = y[1] - y[0]
-    z = z[1] - z[0]
-    s = 1.0 / numpy.sqrt( x * x + y * y + z * z )
-    mat = numpy.array( [s * x, s * y, s * z] )
-    return mat
-
-def rot_sym_tensor( w1, w2, rot ):
-    """
-    Rotate symmetric 3x3 tensor stored as diagonal and off-diagonal vectors.
-    w1:  components w11, w22, w33
-    w2:  components w23, w31, w12
-    rot: rotation matrix
-    """
-    rot = numpy.array( rot )
-    mat = numpy.diag( w1 )
-    mat.flat[[5, 6, 1]] = w2
-    mat.flat[[7, 2, 3]] = w2
-    mat = matmul( matmul( rot, mat ), rot.T )
-    w1  = numpy.diag( mat )
-    w2  = mat.flat[[5, 6, 1]]
-    return w1, w2
-
-def rotmat( x, origin=(0, 0, 0), upvector=(0, 0, 1) ):
-    """
-    Given a position vector x, find the rotation matrix to r,h,v coordinates.
-    """
-    x = numpy.array( x ) - numpy.array( origin )
-    nr = x / numpy.sqrt( (x * x).sum() )
-    nh = numpy.cross( upvector, nr )
-    if all( nh == 0.0 ):
-        nh = numpy.cross( (1, 0, 0), nr )
-    if all( nh == 0.0 ):
-        nh = numpy.cross( (0, 1, 0), nr )
-    nh = nh / numpy.sqrt( (nh * nh).sum() )
-    nv = numpy.cross( nr, nh )
-    nv = nv / numpy.sqrt( (nv * nv).sum() )
-    return numpy.array( [nr, nh, nv] )
-
-def compass( azimuth, radians=False ):
-    """
-    Get named direction from azimuth.
-    """
-    if radians:
-        azimuth *= 180.0 / numpy.pi
-    names = (
-        'N', 'NNE', 'NE', 'ENE',
-        'E', 'ESE', 'SE', 'SSE',
-        'S', 'SSW', 'SW', 'WSW',
-        'W', 'WNW', 'NW', 'NNW',
-    )
-    return names[ int( azimuth / 22.5 + 16.0 ) % 16 ]
-
 def command_line():
     """
     Process command line options.
@@ -340,7 +347,7 @@ def command_line():
         if '-i' in opts[0]:
             x, y = ll2xy( x, y, inverse=True )
         else:
-            x, y = ll2xy( x, y )
+            x, y = ll2xy( x, y, inverse=False )
         for xx, yy in zip( x, y ):
             print( xx, yy )
 

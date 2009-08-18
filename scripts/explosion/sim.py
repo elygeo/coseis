@@ -56,7 +56,7 @@ source2 = 3 * [0.0]
 nsource = 0
 timefunction = 'brune'
 
-if 0:
+if 1:
     rundir = 'tmp/1'
     source = 'moment'
     bc1 = 2, 2, 2
@@ -65,7 +65,7 @@ if 0:
     source1 = 3 * [3*rho_*vp_*vp_ - 4*rho_*vs_*vs_]
     sord.run( locals() )
 
-if 1:
+if 0:
     rundir = 'tmp/2'
     source = 'potency'
     bc1 = 1, 1, 1

@@ -29,18 +29,6 @@ def prune( d, pattern=None, types=None ):
             del( d[k] )
     return d
 
-def load( fd, d=None, prune_pattern=None, prune_types=None ):
-    """
-    Load variables from Python source files.
-    """
-    if type( fd ) is not file:
-        fd = open( os.path.expanduser( fd ) )
-    if d == None:
-        d = {}
-    exec fd in d
-    prune( d, prune_pattern, prune_types )
-    return namespace( d )
-
 def save( fd, d, expand=None, prune_pattern=None, prune_types=None ):
     """
     Write variables from a dict into a Python source file.
@@ -77,6 +65,18 @@ def save( fd, d, expand=None, prune_pattern=None, prune_types=None ):
     fd.close()
     return
 
+def load( fd, d=None, prune_pattern=None, prune_types=None ):
+    """
+    Load variables from Python source files.
+    """
+    if type( fd ) is not file:
+        fd = open( os.path.expanduser( fd ) )
+    if d == None:
+        d = {}
+    exec fd in d
+    prune( d, prune_pattern, prune_types )
+    return namespace( d )
+
 def loadmeta( path='.' ):
     """
     Load SORD metadata.
@@ -96,29 +96,30 @@ def loadmeta( path='.' ):
         f = os.path.join( path, 'parameters.py' )
         if os.path.isfile( f ):
             exec open( f ) in meta
-            out = {}
+            meta['indices'] = {}
+            meta['xi'] = {}
             for f in meta['fieldio']:
-                ii, filename = f[6], f[8]
-                if filename is not '-':
-                    out[filename] = ii
+                op, filename = f[0], f[8]
+                if filename != '-':
+                    meta['indices'][filename] = f[6]
+                    if 'wi' in op:
+                        meta['xi'][filename] = f[3]
             f = os.path.join( path, 'locations.py' )
             if os.path.isfile( f ):
                 d = {}
                 exec open( f ) in d
                 mm = meta['nn'] + ( meta['nt'], )
                 for ii, filename in d['locations']:
-                    if filename is not '-':
-                        ii = expand_indices( mm, ii )
-                        out[filename] = ii
-            meta['indices'] = out
-            shape = dict()
-            for k in out:
-                nn = [ ( i[1] - i[0] ) / i[2] + 1 for i in out[k] ]
+                    if filename != '-':
+                        ii = expand_slice( mm, ii )
+                        meta['indices'][filename] = ii
+            meta['shape'] = {}
+            for k in meta['indices']:
+                nn = [ ( i[1] - i[0] ) / i[2] + 1 for i in meta['indices'][k] ]
                 nn = [ n for n in nn if n > 1 ]
-                shape[k] = nn
-            meta['shape'] = shape
+                meta['shape'][k] = nn
         path = os.path.join( path, 'meta.py' )
-        expand = 'shape', 'indices', 'fieldio'
+        expand = 'shape', 'xi', 'indices', 'fieldio'
         save( path, meta, expand )
     return namespace( meta )
 
