@@ -19,8 +19,8 @@ for path in runs:
     period = meta.period
     source = meta.source
     source1 = meta.source1
-    cutoff = 0
     cutoff = vp / (20 * dx[0])
+    cutoff = 0
     if source == 'moment':
         m0 = source1[0]
     else:
@@ -44,13 +44,16 @@ for path in runs:
         if cutoff:
             v  = sord.signal.lowpass( v,  dt, cutoff, 2, 1 )
             va = sord.signal.lowpass( va, dt, cutoff, 2, 1 )
-        pylab.clf()
-        pylab.plot( t - dt, v.T, '-', ta - dt, va, 'k--' )
-        pylab.xlim( 0.5, dt * nt )
-        pylab.title( path + '   %s, %s, %s' % tuple(x) )
+        fig = pylab.gcf()
+        fig.clf()
+        ax = fig.add_subplot( 111 )
+        ax.plot( t - dt, v.T, '-', ta - dt, va, 'k--' )
+        ax.legend( ('v_1', 'v_2', 'v_3', 'v_a') )
+        ax.set_xlim( 0.5, dt * nt )
+        ax.set_title( path + '   %s, %s, %s' % tuple(x) )
         pylab.draw()
-        pylab.ginput( 1, 0, False )
+        fig.ginput( 1, 0, False )
 
-pylab.xlim( 0.5, dt * nt )
+ax.set_xlim( 0.5, dt * nt )
 pylab.draw()
 

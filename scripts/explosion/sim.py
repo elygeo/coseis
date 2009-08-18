@@ -31,16 +31,15 @@ nt =   int( T / dt + 1.0001 )
 fixhypo = -1 
 
 # output
-def io( ihypo, dx ):
-    _3 = 3000.0 / dx + 1
-    _4 = 4000.0 / dx + 1
-    j, k, l = ihypo
+def io( xi, dx ):
+    _3 = 3000.0 / dx + xi
+    _4 = 4000.0 / dx + xi
     fieldio = []
     for f in 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
         fieldio += [
-            ( '=wi', f, [ j,  k, _4, ()], 'p1_' + f ),
-            ( '=wi', f, [ j, _3, _4, ()], 'p2_' + f ),
-            ( '=wi', f, [ j, _4, _4, ()], 'p3_' + f ),
+            ( '=wi', f, [xi, xi, _4, ()], 'p1_' + f ),
+            ( '=wi', f, [xi, _3, _4, ()], 'p2_' + f ),
+            ( '=wi', f, [xi, _4, _4, ()], 'p3_' + f ),
             ( '=wi', f, [_3, _3, _4, ()], 'p4_' + f ),
             ( '=wi', f, [_3, _4, _4, ()], 'p5_' + f ),
             ( '=wi', f, [_4, _4, _4, ()], 'p6_' + f ),
@@ -61,7 +60,7 @@ if 1:
     source = 'moment'
     bc1 = 2, 2, 2
     ihypo = 1.5, 1.5, 1.5
-    fieldio = mat_ + io( ihypo, dx[0] )
+    fieldio = mat_ + io( 1.5, dx[0] )
     source1 = 3 * [3*rho_*vp_*vp_ - 4*rho_*vs_*vs_]
     sord.run( locals() )
 
@@ -70,7 +69,7 @@ if 0:
     source = 'potency'
     bc1 = 1, 1, 1
     ihypo = 1, 1, 1
-    fieldio = mat_ + io( ihypo, dx[0] )
+    fieldio = mat_ + io( 1, dx[0] )
     source1 = 3 * [1.0]
     source2 = 3 * [1.0]
     bc2 = 0, 0, 0
