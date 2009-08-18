@@ -128,7 +128,7 @@ mu  = mr * s2 * s2
 lam = mr * s1 * s1 - 2.0 * mu
 
 ! Hourglass constant
-yy = 12.0 * ( lam + 2.0 * mu )
+yy = 12.0 * (lam + 2.0 * mu)
 call invert( yy )
 yy = yy * sqrt( sum( dx * dx ) / 3.0 ) * mu * (lam + mu)
 !yy = 0.3 / 16.0 * ( lam + 2.0 * mu ) * sqrt( sum( dx * dx ) / 3.0 ) ! like Ma & Liu, 2006
@@ -157,7 +157,7 @@ c1 =  8.0 / 15.0
 c2 = -3.0 / 100.0
 c3 =  1.0 / 1500.0
 tune = 3.5
-if ( vpml <- 0.0 ) vpml = 2.0 * vs1 * vs2 / (vs1 + vs2)
+if ( vpml <= 0.0 ) vpml = 2.0 * vs1 * vs2 / (vs1 + vs2)
 damp = tune * vpml / sqrt( sum( dx * dx ) / 3.0 ) * (c1 + (c2 + c3 * npml) * npml) / npml ** ppml
 do i = 1, npml
     dampn = damp *  i ** ppml

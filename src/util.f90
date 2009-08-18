@@ -128,8 +128,8 @@ real :: h1, h2
 n = (/ size(f,1), size(f,2), size(f,3) /)
 i1 = i3
 i2 = i4
-where( i1 < 1 ) i1 = i1 + ( -i1 / di + 1 ) * di
-where( i2 > n ) i2 = i1 + ( n - i1 ) / di * di
+where( i1 < 1 ) i1 = i1 + (-i1 / di + 1) * di
+where( i2 > n ) i2 = i1 + (n - i1) / di * di
 d = di(1)
 do i = 1, d - 1
     h1 = 1.0 / d * i
@@ -181,20 +181,20 @@ case( 'const'  )
 case( 'delta'  )
     if ( abs( tm ) < 0.25 * dt ) time_function = 1.0
 case( 'brune' )
-    time_function = -exp( -tm / period ) / period * ( tm + period ) + 1.0
+    time_function = -exp( -tm / period ) / period * (tm + period) + 1.0
 case( 'dbrune' )
     time_function =  exp( -tm / period ) / period ** 2.0 * tm
 case( 'ddbrune' )
-    time_function = -exp( -tm / period ) / period ** 3.0 * ( tm - period ) 
+    time_function = -exp( -tm / period ) / period ** 3.0 * (tm - period) 
 case( 'gaussian' )
     t = ( tm - 4.0 * period ) / period
     time_function = exp( -0.5 * t * t ) / ( period * sqrt( 2.0 * pi ) )
 case( 'dgaussian', 'ricker1' )
     t = tm - period
-    time_function = t * exp( -2.0 * ( pi * t / period ) ** 2.0 )
+    time_function = t * exp( -2.0 * (pi * t / period) ** 2.0 )
 case( 'ddgaussian', 'ricker2' )
-    t = ( pi * ( tm - period ) / period ) ** 2.0
-    time_function = ( 1.0 - 2.0 * t ) * exp( -t )
+    t = ( pi * (tm - period) / period ) ** 2.0
+    time_function = (1.0 - 2.0 * t) * exp( -t )
 case default
     write( 0, * ) 'invalid time func: ', trim( tfunc )
     stop

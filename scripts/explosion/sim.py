@@ -6,9 +6,9 @@ import numpy, sord
 from sord.extras import source
 
 #debug = 4
+dx = 3 * [200.0]
 dx = 3 * [50.0]
 dx = 3 * [100.0]
-dx = 3 * [200.0]
 np3 = 1, 1, 2
 
 # material
@@ -21,10 +21,8 @@ mat_ = [
     ( '=', 'gam', [], 0.0  ),
 ]
 
-#dt = dx[0] / 12500.0 * numpy.sqrt(3) * 1.2
-#dt = dx[0] / vp_ * 0.99
 dt = dx[0] / vp_ * 0.9
-T = 100 * dt
+T = 3.0
 L = 6000.0
 nn = [ int( L / dx[0] + 1.0001 ) ] * 3
 nt =   int( T / dt + 1.0001 )
@@ -35,14 +33,15 @@ def io( xi, dx ):
     _3 = 3000.0 / dx + xi
     _4 = 4000.0 / dx + xi
     fieldio = []
-    for f in 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
+    op = '=wi'
+    for f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
         fieldio += [
-            ( '=wi', f, [xi, xi, _4, ()], 'p1_' + f ),
-            ( '=wi', f, [xi, _3, _4, ()], 'p2_' + f ),
-            ( '=wi', f, [xi, _4, _4, ()], 'p3_' + f ),
-            ( '=wi', f, [_3, _3, _4, ()], 'p4_' + f ),
-            ( '=wi', f, [_3, _4, _4, ()], 'p5_' + f ),
-            ( '=wi', f, [_4, _4, _4, ()], 'p6_' + f ),
+            ( op, f, [xi, xi, _4, ()], 'p1_' + f ),
+            ( op, f, [xi, _3, _4, ()], 'p2_' + f ),
+            ( op, f, [xi, _4, _4, ()], 'p3_' + f ),
+            ( op, f, [_3, _3, _4, ()], 'p4_' + f ),
+            ( op, f, [_3, _4, _4, ()], 'p5_' + f ),
+            ( op, f, [_4, _4, _4, ()], 'p6_' + f ),
         ]
     return fieldio
 
@@ -56,6 +55,7 @@ nsource = 0
 timefunction = 'brune'
 
 if 1:
+    rundir = 'tmp/2'
     rundir = 'tmp/1'
     source = 'moment'
     bc1 = 2, 2, 2
@@ -63,16 +63,15 @@ if 1:
     fieldio = mat_ + io( 1.5, dx[0] )
     source1 = 3 * [3*rho_*vp_*vp_ - 4*rho_*vs_*vs_]
     sord.run( locals() )
-
-if 0:
+else:
     rundir = 'tmp/2'
+    rundir = 'tmp/1'
     source = 'potency'
     bc1 = 1, 1, 1
     ihypo = 1, 1, 1
     fieldio = mat_ + io( 1, dx[0] )
     source1 = 3 * [1.0]
     source2 = 3 * [1.0]
-    bc2 = 0, 0, 0
     sord.run( locals() )
 
 # finite source
