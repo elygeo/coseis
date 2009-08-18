@@ -5,6 +5,8 @@ Coordinate conversions
 import sys, numpy
 import getopt
 
+rearth = 6370000.0
+
 def matmul( A, B ):
     """
     Vectorized matrix multiplication. Not the same as numpy.dot()
@@ -101,8 +103,8 @@ def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=False ):
     z = numpy.array( z )
     xi = (numpy.array( xi ) - x0) / dx
     yi = (numpy.array( yi ) - y0) / dy
-    j = numpy.int32( xi )
-    k = numpy.int32( yi )
+    j = numpy.array( xi, 'i' )
+    k = numpy.array( yi, 'i' )
     n = z.shape
     if not extrapolate:
         i = (j < 0) | (j > n[-2]-2) | (k < 0) | (k > n[-1]-2)
@@ -142,7 +144,7 @@ def ibilinear( xx, yy, xi, yi ):
         x  = x + dx
     return x
 
-def ll2ortho( x, y, z=None, lon0=-118.1, lat0=34.1, rot=0.0, rearth=6370000.0, inverse=False ):
+def ll2ortho( x, y, z=None, lon0=-118.0, lat0=34.0, rot=0.0, rearth=6370000.0, inverse=False ):
     """
     Orthographic projection with optional sphirical z coordinate.
     """
@@ -224,17 +226,25 @@ def ll2xy( x, y, inverse=False, projection=None, rot=40.0, lon0=-121.0, lat0=34.
         x, y = c * x - s * y,  s * x + c * y
     return numpy.array( [x, y] )
 
-def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
+def rotation( lon, lat, projection=ll2xy, eps=100.0 ):
     """
-    mat, theta = rotation( lon, lat, proj )
+    mat, theta = rotation( lon, lat, projection )
 
     Rotation matrix and clockwise rotation angle to transform components in the
     geographic coordinate system to components in the local system.
     local_components = matmul( mat, components )
     local_strike = strike + theta
     """
-    lon = numpy.array( [[lon-eps, lon    ], [lon+eps, lon    ]] )
-    lat = numpy.array( [[lat,     lat-eps], [lat,     lat+eps]] )
+    dlon = eps * 180.0 / (numpy.pi * rearth) * numpy.cos( numpy.pi / 180.0 * lat )
+    dlat = eps * 180.0 / (numpy.pi * rearth)
+    lon = numpy.array( [
+        [lon - dlon, lon ],
+        [lon + dlon, lon ],
+    ] )
+    lat = numpy.array( [
+        [lat, lat - dlat],
+        [lat, lat + dlat],
+    ])
     x, y = projection( lon, lat )
     x = x[1] - x[0]
     y = y[1] - y[0]
@@ -243,6 +253,36 @@ def rotation( lon, lat, projection=ll2xy, eps=0.001 ):
     theta = 180.0 / numpy.pi * numpy.arctan2( mat[0], mat[1] )
     theta = 0.5 * theta.sum(0) - 45.0
     return mat, theta
+
+def rotation3( lon, lat, dep, projection=ll2ortho, eps=100.0 ):
+    """
+    mat = rotation( lon, lat, dep, projection )
+
+    Rotation matrix to transform components in the
+    geographic coordinate system to components in the local system.
+    local_components = matmul( mat, components )
+    """
+    dlon = eps * 180.0 / (numpy.pi * rearth) * numpy.cos( numpy.pi / 180.0 * lat )
+    dlat = eps * 180.0 / (numpy.pi * rearth)
+    lon = numpy.array( [
+        [lon - dlon, lon, lon],
+        [lon + dlon, lon, lon],
+    ] )
+    lat = numpy.array( [
+        [lat, lat - dlat, lat],
+        [lat, lat + dlat, lat],
+    ] )
+    dep = numpy.array( [
+        [dep, dep, dep - eps],
+        [dep, dep, dep + eps],
+    ] )
+    x, y, z = projection( lon, lat, dep )
+    x = x[1] - x[0]
+    y = y[1] - y[0]
+    z = z[1] - z[0]
+    s = 1.0 / numpy.sqrt( x * x + y * y + z * z )
+    mat = numpy.array( [s * x, s * y, s * z] )
+    return mat
 
 def rot_sym_tensor( w1, w2, rot ):
     """

@@ -2,7 +2,7 @@
 """
 Chino Hills test
 """
-import sys
+import sys, sord
 
 np3 = 1, 8, 1
 np3 = 1, 2, 1
@@ -13,6 +13,10 @@ grid_ = ''
 grid_ = 'sphere'
 grid_ = 'topo'
 grid_ = 'topo-sphere'
+lon0 = -118.1
+lat0 = 34.1
+rot = 0.0
+rearth = 6370000.0
 T = 120.0
 L = 160000.0, 120000.0, -30000.0
 dx =  150.0,  150.0,  -150.0 ; npml = 10
@@ -34,7 +38,8 @@ infiles = ['~/run/tmp/src_*']
 rundir = '~/run/chino-' + vm_
 
 # mesh projection
-projection = sord.coord.ll2ortho
+def projection( x, y, z=None, inverse=False ):
+    return sord.coord.ll2ortho( x, y, z, lon0, lat0, rot, rearth, inverse )
 
 # viscosity and output
 fieldio = [

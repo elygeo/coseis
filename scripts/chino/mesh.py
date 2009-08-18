@@ -5,7 +5,6 @@ Mesh and CVM extraction
 import os, numpy, cvm, sord, sim
 
 # parameters
-rearth = 6370000.0
 path = 'tmp'
 ntop = int( -26000.0 / sim.dx[2] + 0.5 )
 
@@ -36,7 +35,7 @@ if 'topo' in sim.grid_:
     lon, lat = sim.projection( xx, yy, inverse=True )
     zz += sord.coord.interp2( topo_lon0, topo_lat0, topo_dll, topo_dll, topo, lon, lat )
 if 'sphere' in sim.grid_:
-    zz += numpy.sqrt( rearth ** 2 - xx ** 2 - yy ** 2 ) - rearth
+    zz += numpy.sqrt( sim.rearth ** 2 - xx ** 2 - yy ** 2 ) - sim.rearth
 
 # PML regions are extruded
 for w in xx, yy, zz:
