@@ -15,7 +15,7 @@ np3 = 1, 1, 2
 hourglass = 0, 0
 rho_, vp_, vs_ = 2670.0, 6000.0, 3464.0
 mat_ = [
-    ( '=', 'rho', [], rho_ ),
+    ( '=', 'rho', [(1.5,-1.5),(),(),()], rho_ ),
     ( '=', 'vp',  [], vp_  ),
     ( '=', 'vs',  [], vs_  ),
     ( '=', 'gam', [], 0.0  ),
@@ -35,14 +35,15 @@ def io( xi, dx ):
     _4 = 4000.0 / dx + xi
     fieldio = []
     op = '=wi'
-    for f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
+    for f in 'x1', 'e11':
+    #for f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
         fieldio += [
             ( op, f, [xi, xi, _4, ()], 'p1_' + f ),
-            ( op, f, [xi, _3, _4, ()], 'p2_' + f ),
-            ( op, f, [xi, _4, _4, ()], 'p3_' + f ),
-            ( op, f, [_3, _3, _4, ()], 'p4_' + f ),
-            ( op, f, [_3, _4, _4, ()], 'p5_' + f ),
-            ( op, f, [_4, _4, _4, ()], 'p6_' + f ),
+           #( op, f, [xi, _3, _4, ()], 'p2_' + f ),
+           #( op, f, [xi, _4, _4, ()], 'p3_' + f ),
+           #( op, f, [_3, _3, _4, ()], 'p4_' + f ),
+           #( op, f, [_3, _4, _4, ()], 'p5_' + f ),
+           #( op, f, [_4, _4, _4, ()], 'p6_' + f ),
         ]
     return fieldio
 
@@ -61,7 +62,7 @@ if 1:
     source = 'moment'
     bc1 = 2, 2, 2
     ihypo = 1.5, 1.5, 1.5
-    fieldio = mat_ + io( 1.5, dx[0] )
+    fieldio = mat_ + io( 1.6, dx[0] )
     source1 = 3 * [3*rho_*vp_*vp_ - 4*rho_*vs_*vs_]
     sord.run( locals() )
 else:

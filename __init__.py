@@ -280,7 +280,7 @@ def prepare_param( pm, itbuff ):
         line = list( line )
         filename = '-'
         tfunc, val, period = 'const', 1.0, 1.0
-        x1 = x2 = 0., 0., 0.
+        x1 = x2 = 0.0, 0.0, 0.0
         op = line[0][0]
         mode = line[0][1:]
         if op not in '=+':
@@ -324,10 +324,14 @@ def prepare_param( pm, itbuff ):
         else:
             base = 1
         if 'i' in mode:
-            x1 = tuple( ii[:3] )
-            ii = [ int( math.ceil( i + 1 - base ) ) for i in ii[:3] ] + ii[3:]
-        ii = ( util.expand_slice( pm.nn, ii[:3], base )
-             + util.expand_slice( [pm.nt], ii[3:], 1 ) )
+            x1 = util.expand_slice( pm.nn, ii[:3], base, round=False )
+            x1 = tuple( i[0] + 1 - base for i in x1 )
+            i1 = tuple( math.ceil( i )  for i in x1 )
+            ii = ( util.expand_slice( pm.nn, i1, 1 )
+                 + util.expand_slice( [pm.nt], ii[3:], 1 ) )
+        else:
+            ii = ( util.expand_slice( pm.nn, ii[:3], base )
+                 + util.expand_slice( [pm.nt], ii[3:], 1 ) )
         if field in fieldnames.initial:
             ii[3] = 0, 0, 1
         if field in fieldnames.fault:
