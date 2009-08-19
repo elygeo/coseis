@@ -2,68 +2,63 @@
 """
 PML test problem
 """
-import sord
+import numpy, sord
 
+np3 = 1, 1, 2
 nt = 500
 dx = 100.0, 100.0, 100.0
 dt = 0.0075
 hourglass = 1.0, 1.0
 
-timefunction = 'brune'
-source = 'moment'
-source1 = 1e18, 1e18, 1e18
-source2 = 0, 0, 0
-fixhypo = -1
-
-l = 1 # FIXME
-np3 = 1, 1, 2
 fieldio = [
     ( '=', 'rho', [], 2670.0 ),      
     ( '=', 'vp',  [], 6000.0 ),      
     ( '=', 'vs',  [], 3464.0 ),      
     ( '=', 'gam', [],    0.0 ),      
 ]
-for f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
+
+timefunction = 'brune'
+source = 'moment'
+source1 = 1e18, 1e18, 1e18
+source2 = 0, 0, 0
+fixhypo = -1
+ihypo = 40.5, 40.5, 40.5
+bc1 = 10, 10, 10
+
+if 0:
+    nn = 41, 41, 41
+    bc2 = 2, 2, 2
+    affine = (1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0) # undeformed
+else:
+    nn = 81, 81, 81
+    bc2 = 10, 10, 10
+    affine = (1.0, 0.0, 0.0), (0.0, 1.0, 1.0), (0.0, 0.0, 1.0) # shear 1
+    affine = (1.0, 0.0, 1.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0) # shear 2
+    affine = (1.0, 1.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0) # shear 3
+    affine = (2.5, 0.0, 0.9), (0.0, 1.0, 0.0), (0.0, 0.0, 1.6) # 2D strain
+    affine = (4.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0) # 1D strain
+    affine = (2.0, 0.5, 0.5), (0.0, 1.5, 1.0 / 6), (0.0, 0.0, 4.0 / 3) # 3D strain
+
+a = numpy.array( affine ).T
+b = numpy.linalg.inv( a )
+
+nt = 1
+i = ihypo
+l = ihypo[2]
+d = 6000.0 / dx[0]
+#for f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
+for f in 'x1', 'e11':
+    i1_ = list( sord.coord.matmul( [[ i[0] + d, i[1],     i[2]     ]], b )[0] )
+    i2_ = list( sord.coord.matmul( [[ i[0] + d, i[1] + d, i[2]     ]], b )[0] )
+    i3_ = list( sord.coord.matmul( [[ i[0] + d, i[1] + d, i[2] + d ]], b )[0] )
     fieldio += [
-        ( '=w',  f, [(),(),_l,()], 'surf_'+f ),
-        ( '=wx', f, [], 'p1_'+f, (-6001.0,    -1.0,    -1.0) ),
-        ( '=wx', f, [], 'p2_'+f, (-6001.0, -6001.0,    -1.0) ),
-        ( '=wx', f, [], 'p3_'+f, (-6001.0, -6001.0, -6001.0) ),
+        ( '=w',  f, [(), (), l, ()], 'surf_' + f ),
+        ( '=wx', f, [], 'p1_' + f, (-6001.0,    -1.0,    -1.0) ),
+        ( '=wx', f, [], 'p2_' + f, (-6001.0, -6001.0,    -1.0) ),
+        ( '=wx', f, [], 'p3_' + f, (-6001.0, -6001.0, -6001.0) ),
+        ( '=wi', f, i1_, 'i1_' + f ),
+        ( '=wi', f, i2_, 'i2_' + f ),
+        ( '=wi', f, i3_, 'i3_' + f ),
     ]
 
-# Rect
-ihypo = 80.5, 80.5, 80.5
-nn  = 81, 81, 81
-bc1 = 10, 10, 10
-bc2 = 2, 2, 2
-bc2 = 0, 0, 0
-ihypo = 0, 0, 0
-
 sord.run( locals() )
-
-# Non-rect
-ihypo = 20.5, 20.5, 20.5 # check
-nn = 40, 40, 40
-affine = (1.,0.,0.), (0.,1.,1.), (0.,0.,1.) # shear, 1
-affine = (1.,0.,1.), (0.,1.,0.), (0.,0.,1.) # shear, 2
-affine = (1.,1.,0.), (0.,1.,0.), (0.,0.,1.) # shear, 3
-# affine = ( 25., 0., 9. ), ( 0., 10., 0. ), ( 0., 0., 16. ), 10. # 2D, strain, FIXME
-# affine = (  4., 0., 0. ), ( 0.,  1., 0. ), ( 0., 0.,  1. ),  1. # 1D, strain, FIXME
-# affine = ( 12., 3., 3. ), ( 0.,  9., 1. ), ( 0., 0.,  8. ),  6. # 3D, strain, FIXME
-bc1 = 10, 10, 10
-bc2 = 10, 10, 10
-bc1 = 0, 0, 0
-bc2 = 0, 0, 0
-
-# Junk
-ihypo = 25.5, 25.5, 25.5
-nn = 50, 50, 50
-bc1 = 10, 10, 10
-bc2 = 10, 10, 10
-
-# Mixed rect
-ihypo = 80.5, 80.5, 80.5
-nn = 160, 160, 160
-bc1 = 10, 10, 10
-bc2 = 0, 0, 0
-
