@@ -15,7 +15,7 @@ np3 = 1, 1, 2
 hourglass = 0, 0
 rho_, vp_, vs_ = 2670.0, 6000.0, 3464.0
 mat_ = [
-    ( '=', 'rho', [(1.5,-1.5),(),(),()], rho_ ),
+    ( '=', 'rho', [(1.5,-1.5), (), (), ()], rho_ ),
     ( '=', 'vp',  [], vp_  ),
     ( '=', 'vs',  [], vs_  ),
     ( '=', 'gam', [], 0.0  ),
@@ -25,8 +25,7 @@ dt = dx[0] / vp_ * 0.9
 T = 3.0
 L = 6000.0
 nn = [ int( L / dx[0] + 1.0001 ) ] * 3
-nt =   int( T / dt + 1.0001 )
-nt = 1
+nt = int( T / dt + 1.0001 )
 fixhypo = -1 
 
 # output
@@ -35,15 +34,14 @@ def io( xi, dx ):
     _4 = 4000.0 / dx + xi
     fieldio = []
     op = '=wi'
-    for f in 'x1', 'e11':
-    #for f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
+    for f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
         fieldio += [
             ( op, f, [xi, xi, _4, ()], 'p1_' + f ),
-           #( op, f, [xi, _3, _4, ()], 'p2_' + f ),
-           #( op, f, [xi, _4, _4, ()], 'p3_' + f ),
-           #( op, f, [_3, _3, _4, ()], 'p4_' + f ),
-           #( op, f, [_3, _4, _4, ()], 'p5_' + f ),
-           #( op, f, [_4, _4, _4, ()], 'p6_' + f ),
+            ( op, f, [xi, _3, _4, ()], 'p2_' + f ),
+            ( op, f, [xi, _4, _4, ()], 'p3_' + f ),
+            ( op, f, [_3, _3, _4, ()], 'p4_' + f ),
+            ( op, f, [_3, _4, _4, ()], 'p5_' + f ),
+            ( op, f, [_4, _4, _4, ()], 'p6_' + f ),
         ]
     return fieldio
 
@@ -56,24 +54,22 @@ source2 = 3 * [0.0]
 nsource = 0
 timefunction = 'brune'
 
-if 1:
-    rundir = 'tmp/2'
+if 0:
     rundir = 'tmp/1'
     source = 'moment'
     bc1 = 2, 2, 2
-    ihypo = 1.5, 1.5, 1.5
-    fieldio = mat_ + io( 1.6, dx[0] )
+    i = 1.5
+    ihypo = 3 * [i]
+    fieldio = mat_ + io( i, dx[0] )
     source1 = 3 * [3*rho_*vp_*vp_ - 4*rho_*vs_*vs_]
     sord.run( locals() )
 else:
-    rundir = 'tmp/2'
     rundir = 'tmp/1'
     source = 'potency'
     bc1 = 1, 1, 1
     ihypo = 1, 1, 1
     fieldio = mat_ + io( 1, dx[0] )
     source1 = 3 * [1.0]
-    source2 = 3 * [1.0]
     sord.run( locals() )
 
 # finite source
