@@ -325,7 +325,6 @@ case( '=r', '+r', '=R', '+R' )
 case( '=w', '=wi' )
     if ( p%ib < 0 ) then
         allocate( p%buff(n(1)*n(2)*n(3),p%nb) )
-        p%buff = 0.0
         p%ib = 0
         p%fh = frio_file_null
         if ( mpout /= 0 ) p%fh = file_null
@@ -340,6 +339,7 @@ case( '=w', '=wi' )
     end if
     p%ib = p%ib + 1
     if ( p%mode == '=wi' .and. all( i1 == i2 ) ) then
+        p%buff(1,p%ib) = 0.0
         do l = i1(3) - 1, i2(3)
         do k = i1(2) - 1, i2(2)
         do j = i1(1) - 1, i2(1)

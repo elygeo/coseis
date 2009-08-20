@@ -12,10 +12,10 @@ dx = 3 * [100.0]
 np3 = 1, 1, 2
 
 # material
-hourglass = 0, 0
+hourglass = 1.0, 1.0
 rho_, vp_, vs_ = 2670.0, 6000.0, 3464.0
 mat_ = [
-    ( '=', 'rho', [(1.5,-1.5), (), (), ()], rho_ ),
+    ( '=', 'rho', [], rho_ ),
     ( '=', 'vp',  [], vp_  ),
     ( '=', 'vs',  [], vs_  ),
     ( '=', 'gam', [], 0.0  ),
@@ -29,16 +29,21 @@ nt = int( T / dt + 1.0001 )
 fixhypo = -1 
 
 # output
-def io( xi, dx ):
-    _3 = 3000.0 / dx + xi
-    _4 = 4000.0 / dx + xi
-    fieldio = []
+def io( i, dx ):
+    _3 = 3000.0 / dx + i
+    _4 = 4000.0 / dx + i
+    op = '=w'
     op = '=wi'
+    fieldio = [
+        ( '=w', 'v1', [i, (), (), (1, -1, 10)], 'snap_v1' ),
+        ( '=w', 'v2', [i, (), (), (1, -1, 10)], 'snap_v2' ),
+        ( '=w', 'v3', [i, (), (), (1, -1, 10)], 'snap_v3' ),
+    ]
     for f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
         fieldio += [
-            ( op, f, [xi, xi, _4, ()], 'p1_' + f ),
-            ( op, f, [xi, _3, _4, ()], 'p2_' + f ),
-            ( op, f, [xi, _4, _4, ()], 'p3_' + f ),
+            ( op, f, [ i,  i, _4, ()], 'p1_' + f ),
+            ( op, f, [ i, _3, _4, ()], 'p2_' + f ),
+            ( op, f, [ i, _4, _4, ()], 'p3_' + f ),
             ( op, f, [_3, _3, _4, ()], 'p4_' + f ),
             ( op, f, [_3, _4, _4, ()], 'p5_' + f ),
             ( op, f, [_4, _4, _4, ()], 'p6_' + f ),
@@ -54,7 +59,7 @@ source2 = 3 * [0.0]
 nsource = 0
 timefunction = 'brune'
 
-if 0:
+if 1:
     rundir = 'tmp/1'
     source = 'moment'
     bc1 = 2, 2, 2
