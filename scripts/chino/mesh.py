@@ -6,13 +6,13 @@ import os, numpy, cvm, sord, sim
 
 # parameters
 path = 'tmp'
-ntop = int( -26000.0 / sim.dx[2] + 0.5 )
+ntop = int( -16000.0 / sim.dx[2] + 0.5 )
 
 # topography
 n = 960, 780
 topo_dll = 0.5 / 60.0
-topo_lon0 = -121.5 + 0.5 * dll
-topo_lat0 =   30.5 + 0.5 * dll
+topo_lon0 = -121.5 + 0.5 * topo_dll
+topo_lat0 =   30.5 + 0.5 * topo_dll
 topo = numpy.fromfile( 'data/socal-topo.f32', 'f' ).reshape( n[::-1] ).T
 
 # map data
@@ -25,7 +25,7 @@ for f in 'gmt-socal-coast', 'gmt-socal-borders', 'dlg-ca-roads':
 
 # node locations
 x = numpy.arange( sim.nn[0] ) * sim.dx[0] - 0.5 * sim.L[0]
-y = numpy.arange( sim.nn[1] ) * sim.dx[1] - 0.5 * sim.L[0]
+y = numpy.arange( sim.nn[1] ) * sim.dx[1] - 0.5 * sim.L[1]
 z = numpy.arange( sim.nn[2] ) * sim.dx[2]
 
 # node mesh
@@ -67,7 +67,7 @@ if sim.vm_ == 'cvm':
     np = sim.np3[0] * sim.np3[1] * sim.np3[2]
     nn = (sim.nn[0] - 1) * (sim.nn[1] - 1) * (sim.nn[2] - 1)
     cfg = cvm.stage( dict( np=np, nn=nn ) )
-    path = cfg.rundir
+    path = cfg['rundir']
 
     # cell center locations
     z  = 0.5 * (z[:-1] + z[1:])
@@ -87,9 +87,11 @@ if sim.vm_ == 'cvm':
     ]
     if 'sphere' in sim.grid_:
         for i in xrange( z.size ):
-            lon, lat, dep = sim.projection( xx, yy, z0 + w[i] * zz + z[i], inverse=True )
-            dep = sord.coord.interp2( topo_lon0, topo_lat0,
-                topo_dll, topo_dll, topo, lon, lat ) - dep
+            lon, lat, elev = sim.projection( xx, yy, z0 + w[i] * zz + z[i], inverse=True )
+            dep = -elev
+            if 'topoXXX' in sim.grid_:
+                dep += sord.coord.interp2( topo_lon0, topo_lat0,
+                    topo_dll, topo_dll, topo, lon, lat )
             numpy.array( lon, 'f' ).T.tofile( f1 )
             numpy.array( lat, 'f' ).T.tofile( f2 )
             numpy.array( dep, 'f' ).T.tofile( f3 )

@@ -125,6 +125,7 @@ def test():
     ishift = numpy.fft.ifftshift
 
     y = [
+        lowpass( x, dt, cutoff, 2 ),    'Butter-2',
         lowpass( x, dt, cutoff, 2, 1 ), 'Butter-2x2',
         lowpass( x, dt, cutoff, 4, 1 ), 'Butter-4x2',
         lowpass( x, dt, cutoff, 4 ),    'Butter-4',

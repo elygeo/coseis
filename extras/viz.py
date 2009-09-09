@@ -4,7 +4,7 @@ Visualization utilities
 """
 import os, sys, numpy
 
-def savefig( fd=None, format=None, **kwargs ):
+def savefig( fd=None, fig=None, format=None, **kwargs ):
     """
     Enhanced version of Matplotlib pylab.savefig command.
 
@@ -13,6 +13,8 @@ def savefig( fd=None, format=None, **kwargs ):
     Takes the same argnuments as pylab.savefig.
     """
     import pylab, cStringIO, subprocess
+    if fig == None:
+        fig = pylab.gcf()
     if fd:
         if type( fd ) is not file:
             if not format:
@@ -20,14 +22,14 @@ def savefig( fd=None, format=None, **kwargs ):
             fd = open( os.path.expanduser( fd ), 'wb' )
     out = cStringIO.StringIO()
     if format == 'pdf':
-        pylab.savefig( out, format='eps', **kwargs )
+        fig.savefig( out, format='eps', **kwargs )
         out.reset()
         out = out.read()
         cmd = 'ps2pdf', '-dEPSCrop', '-dPDFSETTINGS=/prepress', '-', '-'
         pid = subprocess.Popen( cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE )
         out = pid.communicate( out )[0]
     else:
-        pylab.savefig( out, format=format, **kwargs )
+        fig.savefig( out, format=format, **kwargs )
         out.reset()
         out = out.read()
     if fd:
@@ -37,22 +39,24 @@ def savefig( fd=None, format=None, **kwargs ):
     else:
         return out
 
-def lengthscale( x, y, w=None, label='%s', style='k-', bg='w', **kwargs ):
+def lengthscale( x, y, w=None, label='%s', style='k-', bg='w', ax=None, **kwargs ):
     """
     Draw a length scale bar between the points (x[0], y[0]) and (x[1], y[1]).
     """
     import pylab
+    if ax == None:
+        ax = pylab.gca()
     x0 = 0.5 * (x[0] + x[1])
     y0 = 0.5 * (y[0] + y[1])
     dx = abs( x[1] - x[0] )
     dy = abs( y[1] - y[0] )
     l = numpy.sqrt( dx*dx + dy*dy )
     if not w:
-        x = pylab.xlim()
-        y = pylab.ylim()
+        x = ax.get_xlim()
+        y = ax.get_ylim()
         x = abs( x[1] - x[0] )
         y = abs( y[1] - y[0] )
-        if pylab.gca().get_aspect() == 'equal':
+        if ax.get_aspect() == 'equal':
             w = 0.005 * (y + x)
         else:
             w = 0.01 / l * (y * dx + x * dy)
@@ -65,8 +69,8 @@ def lengthscale( x, y, w=None, label='%s', style='k-', bg='w', **kwargs ):
     y =  0, 0, numpy.nan, -w,  w, numpy.nan, -w, w
     x, y = 0.5 / l * numpy.dot( rot, [x, y] )
     theta = numpy.arctan2( dy, dx ) * 180.0 / numpy.pi
-    h1 = pylab.plot( x0 + x, y0 + y, style, clip_on=False, **kwargs )
-    h2 = pylab.text( x0, y0, label, ha='center', va='center',
+    h1 = ax.plot( x0 + x, y0 + y, style, clip_on=False, **kwargs )
+    h2 = ax.text( x0, y0, label, ha='center', va='center',
         backgroundcolor=bg, rotation=theta )
     return h1, h2
 
@@ -175,22 +179,23 @@ def digitize( img, xlim=(-1, 1), ylim=(-1, 1), color='r' ):
     """
     import pylab
     import coord
-    pylab.clf()
-    pylab.axes( [0, 0, 1, 1] )
-    pylab.imshow( img )
-    pylab.axis( 'tight' )
-    pylab.axis( 'off' )
+    fig = pylab.gcf()
+    fig.clf()
+    ax = fig.add_axes( [0, 0, 1, 1] )
+    ax.imshow( img )
+    ax.axis( 'tight' )
+    ax.axis( 'off' )
     pylab.draw()
     pylab.show()
-    pylab.hold( True )
+    ax.hold( True )
     xx, yy = [], []
     for j in 0, 1:
         for k in 0, 1:
             print( 'Left-click %r' % [xlim[j], ylim[k]] )
-            x, y = pylab.ginput( 1, -1 )[0]
+            x, y = fig.ginput( 1, -1 )[0]
             xx += [x]
             yy += [y]
-            pylab.plot( [x], [y], '+' + color )
+            ax.plot( [x], [y], '+' + color )
             pylab.draw()
 
     xx = xx[:2], xx[2:]
@@ -207,11 +212,11 @@ def digitize( img, xlim=(-1, 1), ylim=(-1, 1), color='r' ):
     dy = 0.5 * (ylim[1] - ylim[0])
     xr, yr = [], []
     while 1:
-        xy = pylab.ginput( -1, -1 ) 
+        xy = fig.ginput( -1, -1 ) 
         if len( xy ) == 0:
             break
         x, y = zip( *xy )
-        pylab.plot( x, y, '+-'+color )
+        ax.plot( x, y, '+-'+color )
         pylab.draw()
         x, y = coord.ibilinear( xx, yy, x, y )
         x = x0 + dx * x
@@ -229,9 +234,10 @@ def contours( *args, **kwargs ):
     import pylab
     concat = True
     pp = []
-    pylab.figure()
+    fig = pylab.figure()
+    ax = fig.add_subplot( 111 )
     if concat:
-        for cc in pylab.contour( *args, **kwargs ).collections:
+        for cc in ax.contour( *args, **kwargs ).collections:
             p = []
             for c in cc.get_paths():
                 p += c.to_polygons() + [[[numpy.nan, numpy.nan]]]
@@ -241,35 +247,37 @@ def contours( *args, **kwargs ):
             else:
                 pp += [None]
     else:
-        for cc in pylab.contour( *args, **kwargs ).collections:
+        for cc in ax.contour( *args, **kwargs ).collections:
             p = []
             for c in cc.get_paths():
                 p += c.to_polygons()
             pp += [p]
-    pylab.close()
+    pylab.close( fig )
     return pp
 
-def textpmb( xx, yy, ss, dx=None, dy=None, n=16, **kwargs ):
+def textpmb( xx, yy, ss, dx=None, dy=None, n=16, ax=None, **kwargs ):
     """
     Poor man's bold text.
     """
     import pylab
-    aspect = pylab.gca().get_aspect()
+    if ax == None:
+        ax = pylab.gca()
+    aspect = ax.get_aspect()
     if dx == None:
         dx = dy
         if aspect != 'equal' or dy == None:
-            l1, l2 = pylab.xlim()
+            l1, l2 = ax.get_xlim()
             dx = 0.001 * (l2 - l1)
     if dy == None:
         dy = dx
         if aspect != 'equal' or dx == None:
-            l1, l2 = pylab.ylim()
+            l1, l2 = ax.get_ylim()
             dy = 0.001 * (l2 - l1)
     h = []
     for i in range( n ):
         phi = 2.0 * numpy.pi * i / n
         x = xx + dx * numpy.cos( phi )
         y = yy + dy * numpy.sin( phi )
-        h += [ pylab.text( x, y, ss, **kwargs ) ]
+        h += [ ax.text( x, y, ss, **kwargs ) ]
     return h
 

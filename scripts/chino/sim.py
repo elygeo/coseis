@@ -7,18 +7,18 @@ import sys, sord
 np3 = 1, 8, 1
 np3 = 1, 2, 1
 vm_ = 'uhs'
-vm_ = 'cvm'
 vm_ = '1d'
+vm_ = 'cvm'
 grid_ = ''
-grid_ = 'sphere'
 grid_ = 'topo'
+grid_ = 'sphere'
 grid_ = 'topo-sphere'
 lon0 = -118.1
 lat0 = 34.1
 rot = 0.0
 rearth = 6370000.0
 T = 120.0
-L = 160000.0, 120000.0, -30000.0
+L = 160000.0, 120000.0, -40000.0
 dx =  150.0,  150.0,  -150.0 ; npml = 10
 dx = 1500.0, 1500.0, -1500.0 ; npml = 5
 dx =  500.0,  500.0,  -500.0 ; npml = 10
