@@ -34,6 +34,7 @@ nn = [
 source = 'potency'
 infiles = '~/run/tmp/src_*',
 rundir  = '~/run/elsinore-' + vm_
+fieldio = []
 
 # output
 for f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':

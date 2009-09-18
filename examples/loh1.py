@@ -4,6 +4,8 @@ PEER LOH.1 - Layer over a halfspace, buried double couple source
 """
 import sord
 
+debug = 2
+
 rundir = '~/run/loh1'		# simulation directory 
 np3 = 1, 16, 1			# number of processors in each dimension
 nn = 261, 301, 161		# number of mesh nodes, nx ny nz

@@ -56,6 +56,7 @@ websims = dict(
         ('trace.xyz', 'k-'),
         ('gmt-socal-coast.xyz', 'k-'),
         ('gmt-socal-boders.xyz', 'k-'),
+        ( 'dlg-ca-roads.xyz', 'k-' ),
     ],
 )
 fd = open( 'meta.py', 'a' )

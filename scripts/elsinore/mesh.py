@@ -33,6 +33,15 @@ zz = sord.coord.interp2( lon0, lat0, dll, dll, topo, xx, yy )
 zz = numpy.array( zz, 'f' )
 zz.T.tofile( os.path.join( path, 'z' ) )
 
+# map data
+for f in 'gmt-socal-coast', 'gmt-socal-borders', 'dlg-ca-roads':
+    x, y = numpy.loadtxt( 'data/' + f + '.ll', usecols=(0,1), unpack=True )
+    z = sord.coord.interp2( lon0, lat0, dll, dll, topo, x, y )
+    x, y = sim.projection( x, y )
+    xyz = 0.001 * numpy.array( [x,y,z] ).T
+    numpy.savetxt( os.path.join( path, f + '.xyz' ), xyz, '%.3f' )
+asdf
+
 # fault trace
 path = sim.srf_ + os.sep
 meta = {}
@@ -45,14 +54,6 @@ z = sord.coord.interp2( lon0, lat0, dll, dll, topo, x, y )
 x, y = sim.projection( x, y )
 xyz = 0.001 * numpy.array( [x,y,z] ).T
 numpy.savetxt( os.path.join( path, 'trace.xyz' ), xyz, '%.3f' )
-
-# map data
-for f in 'gmt-socal-coast', 'gmt-socal-borders', 'dlg-ca-roads':
-    x, y = numpy.loadtxt( 'data/' + f + '.ll', usecols=(0,1), unpack=True )
-    z = sord.coord.interp2( lon0, lat0, dll, dll, topo, x, y )
-    x, y = sim.projection( x, y )
-    xyz = 0.001 * numpy.array( [x,y,z] ).T
-    numpy.savetxt( os.path.join( path, f + '.xyz' ), xyz, '%.3f' )
 
 # PML regions are extruded
 for w in xx, yy, zz:

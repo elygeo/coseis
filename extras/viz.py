@@ -110,14 +110,18 @@ def colormap( name='w0', colorexp=1.0, output='mayavi', n=2001, nmod=0, modlim=0
             r = 8, 8, 8, 8
             g = 0, 4, 8, 8
             b = 0, 0, 0, 8
+        elif name == 'red':
+            r = 31.0 - numpy.arange( 32 )
+            g = numpy.zeros_like( r )
+            b = numpy.zeros_like( r ) 
         elif name == 'earth':
             r = numpy.array( [00, 00, 00, 10, 10, 15, 15, 25, 25, 25] ) / 80.0
             g = numpy.array( [10, 10, 10, 20, 20, 25, 30, 25, 25, 25] ) / 80.0
             b = numpy.array( [38, 38, 38, 40, 40, 25, 20, 17, 17, 17] ) / 80.0
         elif name == 'wk0':
-            r = 31 - numpy.arange( 32 )
-            g = 31 - numpy.arange( 32 )
-            b = 31 - numpy.arange( 32 )
+            r = 31.0 - numpy.arange( 32 )
+            g = 31.0 - numpy.arange( 32 )
+            b = 31.0 - numpy.arange( 32 )
         else:
             sys.exit( 'colormap %s not found' % name )
     else:
