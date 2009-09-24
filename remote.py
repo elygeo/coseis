@@ -51,7 +51,7 @@ def deploy( rsh, dest, command=None ):
         '--include=data',
         '--include=sord.tgz',
         '--exclude-from=.ignore',
-        '-e', rsh,
+        "-e '%s'" % rsh,
         '.', dest
     ) )
     print( rsync )
@@ -83,7 +83,7 @@ def publish( rsh, dest ):
         '--include=sord.tgz',
         '--include=.bzr', 
         '--exclude-from=.ignore',
-        '-e', rsh,
+        "-e '%s'" % rsh,
         '.', dest
     ) )
     print( rsync )

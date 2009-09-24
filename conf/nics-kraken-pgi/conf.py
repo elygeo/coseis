@@ -1,7 +1,7 @@
 notes = """
 NICS Kraken
 
-EPD version: rh3-amd64
+EPD version: rh3-x86_64
 Compute nodes require statically-compiled Python.
 See extras/intall/python-install-cnl.sh
 

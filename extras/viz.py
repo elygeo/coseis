@@ -23,15 +23,13 @@ def savefig( fd=None, fig=None, format=None, **kwargs ):
     out = cStringIO.StringIO()
     if format == 'pdf':
         fig.savefig( out, format='eps', **kwargs )
-        out.reset()
-        out = out.read()
+        out = out.getvalue()
         cmd = 'ps2pdf', '-dEPSCrop', '-dPDFSETTINGS=/prepress', '-', '-'
         pid = subprocess.Popen( cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE )
         out = pid.communicate( out )[0]
     else:
         fig.savefig( out, format=format, **kwargs )
-        out.reset()
-        out = out.read()
+        out = out.getvalue()
     if fd:
         fd.write( out )
         fd.close()

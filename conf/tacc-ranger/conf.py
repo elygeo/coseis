@@ -1,7 +1,7 @@
 notes = """
 TACC Ranger
 
-EPD version: rh3-amd64
+EPD version: rh3-x86_64
 
 gsiftp://gridftp.ranger.tacc.teragrid.org:2811/
 http://www.tacc.utexas.edu/services/userguides/ranger/

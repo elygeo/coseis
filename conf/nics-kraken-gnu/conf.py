@@ -3,7 +3,7 @@ NICS Kraken
 
 module swap PrgEnv-pgi PrgEnv-gnu
 
-EPD version: rh3-amd64
+EPD version: rh3-x86_64
 Compute nodes require statically-compiled Python.
 See extras/intall/python-install-cnl.sh
 
