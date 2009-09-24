@@ -27,9 +27,9 @@ read confirm
 mkdir -p "${prefix}"
 cd "${prefix}"
 
-echo wget "${link}"
-echo bash "${version}.sh"
-echo ln -s "${version}" epd
+wget "${link}"
+bash "${version}.sh"
+ln -s "${version}" epd
 
 echo 'Now add this to your .bashrc or .profile:'
 echo "export PATH=\"${prefix}/epd/bin:\${PATH}\""
