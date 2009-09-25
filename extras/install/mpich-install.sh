@@ -1,19 +1,27 @@
 #!/bin/bash -e
+# This script installs MPICH2
 
-echo -n "Installing MPICH2 in ${HOME}/local. Are you sure? [y/N]: "
+# Set loction here:
+prefix="/usr/local"
+prefix="${HOME}/local"
+
+version="1.1.1p1"
+link="http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/${version}/mpich2-${version}.tar.gz"
+
+echo -n "Installing MPICH2 ${version} in ${prefix}. Are you sure? [y/N]: "
 read confirm
 [ "$confirm" = "y" ]
 
-export PATH=${HOME}/local/bin:${PATH}
-mkdir -p ${HOME}/local
-cd ${HOME}/local
+mkdir -p "${prefix}"
+cd "${prefix}"
 
-wget http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/1.0.8/mpich2-1.0.8.tar.gz
-tar zxvf mpich2-1.0.8.tar.gz
-cd mpich2-1.0.8
-./configure -prefix=${HOME}/local --with-device=ch3:shm
+wget "${link}"
+tar zxvf "mpich2-${version}.tar.gz"
+cd "mpich2-${version}"
+./configure -prefix="${prefix}" --with-device=ch3:shm
 make
 make install
 
-echo "Don't forget to add \${HOME}/local/bin to your path"
-
+export PATH="${prefix}/bin:${PATH}"
+echo 'Now add this to your .bashrc or .profile:'
+echo "export PATH=\"${prefix}/bin:\${PATH}\""

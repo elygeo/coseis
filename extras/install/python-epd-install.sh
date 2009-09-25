@@ -29,8 +29,8 @@ cd "${prefix}"
 
 wget "${link}"
 bash "${version}.sh"
-ln -s "${version}" epd
+ln -s "${version}" python
 
 echo 'Now add this to your .bashrc or .profile:'
-echo "export PATH=\"${prefix}/epd/bin:\${PATH}\""
+echo "export PATH=\"${prefix}/python/bin:\${PATH}\""
 
