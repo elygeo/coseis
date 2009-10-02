@@ -108,6 +108,10 @@ def colormap( name='w0', colorexp=1.0, output='mayavi', n=2001, nmod=0, modlim=0
             r = 8, 8, 8, 8
             g = 0, 4, 8, 8
             b = 0, 0, 0, 8
+        elif name == 'warm':
+            g = numpy.arange( 32 ) / 31.0
+            r = numpy.ones_like( g )
+            b = numpy.zeros_like( g ) 
         elif name == 'red':
             r = 31.0 - numpy.arange( 32 )
             g = numpy.zeros_like( r )
@@ -282,4 +286,59 @@ def textpmb( xx, yy, ss, dx=None, dy=None, n=16, ax=None, **kwargs ):
         y = yy + dy * numpy.sin( phi )
         h += [ ax.text( x, y, ss, **kwargs ) ]
     return h
+
+def gshhs( path='gshhs/gshhs_%s.b', resolution='h', range=(0.0, 360.0, -90.0, 90.0), min_area=0.0, min_level=0, max_level=4 ):
+    """
+    Reader for the Global Self-consistent, Hierarchical, High-resolution Shoreline
+    database (GSHHS) by Wessel and Smith.
+
+    http://www.ngdc.noaa.gov/mgg/shorelines/gshhs.html
+    http://www.soest.hawaii.edu/wessel/gshhs/gshhs.html
+
+    Reference:
+    Wessel, P., and W. H. F. Smith, A Global Self-consistent, Hierarchical,
+    High-resolution Shoreline Database, J. Geophys. Res., 101, 8741-8743, 1996.
+    """
+
+    url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version1.10/gshhs_1.10.zip'
+    filename = os.path.basename( url )
+
+    if not os.path.exists( filename ):
+        print( 'Downloading %s' % url )
+        import urllib
+        urllib.urlretrieve( url )
+
+    import zipfile
+    data = numpy.fromstring( zipfile.ZipFile( filename ).read( path % resolution ), '>i' )
+
+    xx = []
+    yy = []
+    i = 0
+    nkeep = 0
+    ntotal = 0
+
+    while i < data.size:
+        ntotal += 1
+        id, n, flag, west, east, south, north, area = data[i:i+8]
+        level, version, greenwich, source = data[i+2:i+3].view( 'i1' )
+        i += 8
+        if (
+            (level <= max_level) &
+            (level >= min_level) &
+            (0.1  * area  >= min_area) &
+            (1e-6 * west  >= range[0]) & 
+            (1e-6 * east  <= range[1]) & 
+            (1e-6 * south >= range[2]) & 
+            (1e-6 * north <= range[3])
+        ):
+            nkeep += 1
+            x, y = 1e-6 * numpy.array( data[i:i+2*n].reshape(n, 2).T, 'f' )
+            xx += [ x, [numpy.nan] ]
+            yy += [ y, [numpy.nan] ]
+        i += 2 * n
+
+    print '%s kept %s of %s' % (resolution, nkeep, ntotal)
+    xx = numpy.concatenate( xx )
+    yy = numpy.concatenate( yy )
+    return numpy.array( [xx, yy], 'f' )
 

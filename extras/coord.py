@@ -7,6 +7,30 @@ import getopt
 
 rearth = 6370000.0
 
+def downsample_sphere( f, d ):
+    """
+    Down-sample node-registered spherical surface with averaging.
+
+    The indices of the 2D array f are, respectively, longitude and latitude.
+    d is the decimation interval which must be odd.
+    """
+    n = f.shape
+    ii = numpy.arange( d ) - (d - 1) / 2
+    jj = numpy.arange( 0, n[0], d )
+    kk = numpy.arange( 0, n[1], d )
+    nn = jj.size, kk.size
+    ff = numpy.zeros( nn, f.dtype )
+    jj, kk = numpy.ix_( jj, kk )
+    for dk in ii:
+        k = n[1] - 1 - abs( n[1] - 1 - abs( dk + kk ) )
+        for dj in ii:
+            j = (jj + dj) % n[0]
+            ff = ff + f[j,k]
+    ff[:,0] = ff[:,0].mean()
+    ff[:,-1] = ff[:,-1].mean()
+    ff *= 1.0 / (d * d)
+    return ff
+
 def matmul( A, B ):
     """
     Vectorized matrix multiplication. Not the same as numpy.dot()
@@ -247,6 +271,30 @@ def compass( azimuth, radians=False ):
         'W', 'WNW', 'NW', 'NNW',
     )
     return names[ int( azimuth / 22.5 + 16.0 ) % 16 ]
+
+def llr2xyz( lon, lat, r, inverse=False ):
+    """
+    Geographic to rectangular coordinate conversion.
+    """
+    lon = numpy.array( lon )
+    lat = numpy.array( lat )
+    r   = numpy.array( r   )
+    if inverse:
+        # FIXME
+        r = numpy.sqrt( x * x + y * y + z * z )
+        lon = numpy.arctan2( y, x )
+        lat = numpy.arcsin( z / r )
+        lon *= 180.0 / numpy.pi
+        lat *= 180.0 / numpy.pi
+        return numpy.array( [lon, lat, r] )
+    else:
+        lon *= numpy.pi / 180.0
+        lat *= numpy.pi / 180.0
+        z = numpy.cos( lat )
+        x = numpy.cos( lon ) * r * z
+        y = numpy.sin( lon ) * r * z
+        z = numpy.sin( lat ) * r
+        return numpy.array( [x, y, z] )
 
 def ll2ortho( x, y, z=None, lon0=-118.0, lat0=34.0, rot=0.0, rearth=6370000.0, inverse=False ):
     """
