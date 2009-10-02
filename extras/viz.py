@@ -287,10 +287,12 @@ def textpmb( xx, yy, ss, dx=None, dy=None, n=16, ax=None, **kwargs ):
         h += [ ax.text( x, y, ss, **kwargs ) ]
     return h
 
-def gshhs( path='gshhs/gshhs_%s.b', resolution='h', range=(0.0, 360.0, -90.0, 90.0), min_area=0.0, min_level=0, max_level=4 ):
+def gshhs( path='', resolution='h', min_area=0.0, min_level=1, max_level=4, range=None, member='gshhs/gshhs_%s.b', download=False ):
     """
     Reader for the Global Self-consistent, Hierarchical, High-resolution Shoreline
     database (GSHHS) by Wessel and Smith.
+
+    resolutions: 'c' crude, 'l' low, 'i' intermediate, 'h' high, 'f' full
 
     http://www.ngdc.noaa.gov/mgg/shorelines/gshhs.html
     http://www.soest.hawaii.edu/wessel/gshhs/gshhs.html
@@ -301,15 +303,15 @@ def gshhs( path='gshhs/gshhs_%s.b', resolution='h', range=(0.0, 360.0, -90.0, 90
     """
 
     url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version1.10/gshhs_1.10.zip'
-    filename = os.path.basename( url )
+    filename = os.path.join( path, os.path.basename( url ) )
 
-    if not os.path.exists( filename ):
+    if download and not os.path.exists( filename ):
         print( 'Downloading %s' % url )
         import urllib
-        urllib.urlretrieve( url )
+        urllib.urlretrieve( url, filename )
 
     import zipfile
-    data = numpy.fromstring( zipfile.ZipFile( filename ).read( path % resolution ), '>i' )
+    data = numpy.fromstring( zipfile.ZipFile( filename ).read( member % resolution ), '>i' )
 
     xx = []
     yy = []
@@ -319,25 +321,25 @@ def gshhs( path='gshhs/gshhs_%s.b', resolution='h', range=(0.0, 360.0, -90.0, 90
 
     while i < data.size:
         ntotal += 1
-        id, n, flag, west, east, south, north, area = data[i:i+8]
-        level, version, greenwich, source = data[i+2:i+3].view( 'i1' )
-        i += 8
-        if (
-            (level <= max_level) &
-            (level >= min_level) &
-            (0.1  * area  >= min_area) &
-            (1e-6 * west  >= range[0]) & 
-            (1e-6 * east  <= range[1]) & 
-            (1e-6 * south >= range[2]) & 
-            (1e-6 * north <= range[3])
-        ):
-            nkeep += 1
-            x, y = 1e-6 * numpy.array( data[i:i+2*n].reshape(n, 2).T, 'f' )
-            xx += [ x, [numpy.nan] ]
-            yy += [ y, [numpy.nan] ]
-        i += 2 * n
+        hdr = data[i:i+8]
+        n = hdr[1]
+        i += 8 + 2 * n
+        area = hdr[7] * 0.1
+        if area < min_area:
+            break
+        level = hdr[2:3].view( 'i1' )[3]
+        if level > max_level or level < min_level:
+            continue 
+        if range != None:
+            west, east, south, north = hdr[3:7] * 1e-6
+            if west < range[0] or east > range[1] or south < range[2] or north > range[3]:
+                continue
+        nkeep += 1
+        x, y = 1e-6 * numpy.array( data[i-2*n:i].reshape(n, 2).T, 'f' )
+        xx += [ x, [numpy.nan] ]
+        yy += [ y, [numpy.nan] ]
 
-    print '%s kept %s of %s' % (resolution, nkeep, ntotal)
+    print 'GSHHS resolution: %s, selected %s of %s' % (resolution, nkeep, ntotal)
     xx = numpy.concatenate( xx )
     yy = numpy.concatenate( yy )
     return numpy.array( [xx, yy], 'f' )
