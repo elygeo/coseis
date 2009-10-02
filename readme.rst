@@ -81,7 +81,6 @@ Geophys. J. Int., `172(1), 331-344
 <http://www.blackwell-synergy.com/doi/abs/10.1111/j.1365-246X.2007.03633.x>`_,
 doi: 10.1111/j.1365-246X.2007.03633.x.
 `[PDF] <http://earth.usc.edu/~gely/pub/ely-som-20080426.pdf>`__
-`[BibTex] <http://earth.usc.edu/~gely/pub/Ely2008a.bib>`__
 
 .. class:: ref
 
