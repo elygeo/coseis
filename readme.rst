@@ -94,10 +94,10 @@ doi:10.1111/j.1365-246X.2009.04117.x.
 
 .. class:: ref
 
-Ely, G. P., S. M. Day, and J.-B. Minster (2009),
+Ely, G. P., S. M. Day, and J.-B. Minster (2010),
 *Dynamic rupture models for the southern San Andreas fault*,
-BSSA, in revision.
-`[PDF] <http://earth.usc.edu/~gely/pub/ely-saf-20080426.pdf>`__
+BSSA, 100(1).
+`[PDF] <http://earth.usc.edu/~gely/pub/ely-saf-20090721.pdf>`__
 `[Electronic supplement] <http://earth.usc.edu/~gely/ely-saf-esupp.html>`__
 
 
