@@ -77,6 +77,7 @@ def colormap( name='w0', colorexp=1.0, output='mayavi', n=2001, nmod=0, modlim=0
     Colormap library
     """
     centered = False
+    a = None
     if type( name ) == str:
         if name == 'w000':
             r = 8, 8, 8, 0, 0, 0, 0, 8, 8, 8, 8
@@ -120,6 +121,11 @@ def colormap( name='w0', colorexp=1.0, output='mayavi', n=2001, nmod=0, modlim=0
             r = numpy.array( [00, 00, 00, 10, 10, 15, 15, 25, 25, 25] ) / 80.0
             g = numpy.array( [10, 10, 10, 20, 20, 25, 30, 25, 25, 25] ) / 80.0
             b = numpy.array( [38, 38, 38, 40, 40, 25, 20, 17, 17, 17] ) / 80.0
+        elif name == 'atmosphere':
+            r = 8, 8, 0
+            g = 8, 8, 0
+            b = 8, 8, 8
+            a = 0, 4, 0
         elif name == 'wk0':
             r = 31.0 - numpy.arange( 32 )
             g = 31.0 - numpy.arange( 32 )
@@ -134,6 +140,10 @@ def colormap( name='w0', colorexp=1.0, output='mayavi', n=2001, nmod=0, modlim=0
     r = m * numpy.array( r )
     g = m * numpy.array( g )
     b = m * numpy.array( b )
+    if a == None:
+        a = numpy.ones_like( r )
+    else:
+        a = m * numpy.array( a )
     if centered:
         x1 = 2.0 / (n2 - 1) * numpy.arange( n2 ) - 1
         x1 = numpy.sign( x1 ) * abs( x1 ) ** colorexp * 0.5 + 0.5
@@ -145,12 +155,14 @@ def colormap( name='w0', colorexp=1.0, output='mayavi', n=2001, nmod=0, modlim=0
         r  = numpy.interp( x2, x1, r )
         g  = numpy.interp( x2, x1, g )
         b  = numpy.interp( x2, x1, b )
+        a  = numpy.interp( x2, x1, a )
         w1 = modlim * numpy.cos( numpy.pi * 2. * nmod * x2 )
         w1 = 1.0 - numpy.maximum( w1, 0.0 )
         w2 = 1.0 + numpy.minimum( w1, 0.0 ) 
         r = ( 1.0 - w2 * (1.0 - w1 * r) )
         g = ( 1.0 - w2 * (1.0 - w1 * g) )
         b = ( 1.0 - w2 * (1.0 - w1 * b) )
+        a = ( 1.0 - w2 * (1.0 - w1 * a) )
         x1 = x2
     if output in ( 'matplotlib', 'pylab' ):
         import matplotlib
@@ -164,7 +176,7 @@ def colormap( name='w0', colorexp=1.0, output='mayavi', n=2001, nmod=0, modlim=0
             r  = numpy.interp( x2, x1, r )
             g  = numpy.interp( x2, x1, g )
             b  = numpy.interp( x2, x1, b )
-            a  = numpy.ones_like( r )
+            a  = numpy.interp( x2, x1, a )
             x1 = x2
         cmap = 255 * numpy.array( [r, g, b, a] ).T
     elif output in ( 'gmt', 'cpt' ):
