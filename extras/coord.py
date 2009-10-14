@@ -272,34 +272,35 @@ def compass( azimuth, radians=False ):
     )
     return names[ int( azimuth / 22.5 + 16.0 ) % 16 ]
 
-def llr2xyz( lon, lat, r, inverse=False ):
+def llr2xyz( x, y, z, inverse=False ):
     """
     Geographic to rectangular coordinate conversion.
+
+    x <-> lon, y <-> lat, z <-> r
     """
-    lon = numpy.array( lon )
-    lat = numpy.array( lat )
-    r   = numpy.array( r   )
+    x = numpy.array( x )
+    y = numpy.array( y )
+    z = numpy.array( z )
     if inverse:
-        # FIXME
         r = numpy.sqrt( x * x + y * y + z * z )
-        lon = numpy.arctan2( y, x )
-        lat = numpy.arcsin( z / r )
-        lon *= 180.0 / numpy.pi
-        lat *= 180.0 / numpy.pi
-        return numpy.array( [lon, lat, r] )
+        x = numpy.arctan2( y, x )
+        y = numpy.arcsin( z / r )
+        x *= 180.0 / numpy.pi
+        y *= 180.0 / numpy.pi
+        return numpy.array( [x, y, r] )
     else:
-        lon *= numpy.pi / 180.0
-        lat *= numpy.pi / 180.0
-        z = numpy.cos( lat )
-        x = numpy.cos( lon ) * r * z
-        y = numpy.sin( lon ) * r * z
-        z = numpy.sin( lat ) * r
-        return numpy.array( [x, y, z] )
+        x *= numpy.pi / 180.0
+        y *= numpy.pi / 180.0
+        x_ = numpy.cos( x ) * numpy.cos( y ) * z
+        y_ = numpy.sin( x ) * numpy.cos( y ) * z
+        z *= numpy.sin( y )
+        return numpy.array( [x_, y_, z] )
 
 def ll2ortho( x, y, z=None, lon0=-118.0, lat0=34.0, rot=0.0, rearth=6370000.0, inverse=False ):
     """
     Orthographic projection. Optional z coordinate has spherical curvature.
 
+    x <-> lon, y <-> lat, z <-> r
     Useful for cuboid subsection of a spherical Earth.
     Pro: lateral and depth boundaries are normal to the Cartesian axes so
          PML absorbing boundaries may be used.
@@ -339,6 +340,8 @@ def ll2ortho( x, y, z=None, lon0=-118.0, lat0=34.0, rot=0.0, rearth=6370000.0, i
 def ll2xy( x, y, inverse=False, projection=None, rot=40.0, lon0=-121.0, lat0=34.5 ):
     """
     UTM TeraShake coordinate projection
+
+    x <-> lon, y <-> lat, z <-> r
     """
     import pyproj
     if not projection:
@@ -363,6 +366,8 @@ def ll2xy( x, y, inverse=False, projection=None, rot=40.0, lon0=-121.0, lat0=34.
 def ll2cvmh( x, y, inverse=False ):
     """
     Harvard CVM5 projection.
+
+    x <-> lon, y <-> lat
     """
     import pyproj
     projection = pyproj.Proj( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
@@ -374,6 +379,8 @@ def ll2cvmh( x, y, inverse=False ):
 def ll2cmu( x, y, inverse=False ):
     """
     CMU TeraShake coordinates projection
+
+    x <-> lon, y <-> lat
     """
     xx = [-121.0, -118.951292], [-116.032285, -113.943965]
     yy = [  34.5,   36.621696], [  31.082920,   33.122341]

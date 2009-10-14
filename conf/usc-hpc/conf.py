@@ -1,6 +1,9 @@
 notes = """
 USC HPC
 
+Do not add to the front of your path on HPC
+Use /home instead of /auto
+
 EPD version: rh3-x86
 
 http://www.usc.edu/hpcc/

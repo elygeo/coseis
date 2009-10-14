@@ -2,8 +2,8 @@
 # This script installs MPICH2
 
 # Set loction here:
-prefix="/usr/local"
 prefix="${HOME}/local"
+prefix="/usr/local"
 
 version="1.1.1p1"
 link="http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/${version}/mpich2-${version}.tar.gz"

@@ -5,8 +5,9 @@ TPV3
 import numpy, pylab, sord
 
 so_dir = './'; bi_dir = '../../bi/'
-so_dir = './run/500/'; bi_dir = 'bi/'
 so_dir = './run/150/'; bi_dir = 'bi/'
+so_dir = './run/500/'; bi_dir = 'bi/'
+so_dir = './run/tpv3-300/'; bi_dir = 'bi/'
 meta = sord.util.loadmeta( so_dir )
 dt = meta.dt
 nt = meta.nt
@@ -20,15 +21,15 @@ for i, sta in enumerate( ('P1', 'P2') ):
 
     ax = fig.add_subplot( 2, 1, 1 )
     f1 = 1e-6 * numpy.fromfile( so_dir + 'out/' + sta + 'a-ts1', 'f' )
-    f2 = numpy.fromfile( bi_dir + sta + '-ts' )
+    f2 = numpy.fromfile( bi_dir + sta + '-ts', 'f' )
     ax.plot( t1, f1, 'k-', t2, f2, 'k--' )
     ax.axis([ 1., 11., 60., 85. ])
-    ax.title( sta, position=(0.05,0.83), ha='left', va='center' )
+    ax.set_title( sta, position=(0.05,0.83), ha='left', va='center' )
     ax.set_xticklabels( [] )
     ax.set_ylabel( 'Shear stress (MPa)' )
-    leg = fig.legend( ('SOM', 'BI'), loc=(.78, .6) )
+    #leg = fig.legend( ('SOM', 'BI'), loc=(.78, .6) )
 
-    ax = fig.add.subplot( 2, 1, 2 )
+    ax = fig.add_subplot( 2, 1, 2 )
     f1 = numpy.fromfile( so_dir + 'out/' + sta + 'a-sv1', 'f' )
     f2 = numpy.fromfile( bi_dir + sta + '-sv', 'f' )
     ax.plot( t1, f1, 'k-', t2, f2, 'k--' )
@@ -43,16 +44,15 @@ for i, sta in enumerate( ('P1', 'P2') ):
     ax.set_yticks( [0, 1, 2, 3] )
     ax.set_ylabel( 'Slip (m)' )
     ax.set_xlabel( 'Time (s)' )
-    ax.title( sta, position=(0.05,0.83), ha='left', va='center' )
+    ax.set_title( sta, position=(0.05,0.83), ha='left', va='center' )
     pylab.draw()
 
 # Rupture time contour
 v = 0.5 * numpy.arange( -20, 20 )
 n = meta.shape['flt-trup']
-print n
 x1 = 0.001 * numpy.fromfile( so_dir + 'out/flt-x1', 'f' ).reshape( n[::-1] ).T
 x2 = 0.001 * numpy.fromfile( so_dir + 'out/flt-x2', 'f' ).reshape( n[::-1] ).T
-f = numpy.fromfile( so_dir + 'out/flt-trup', n )
+f = numpy.fromfile( so_dir + 'out/flt-trup', 'f' ).reshape( n[::-1] ).T
 fig = pylab.figure( 3 )
 fig.clf()
 ax = fig.add_subplot(111)
@@ -65,11 +65,11 @@ x2 = dx * numpy.arange( n[1] )
 x1 = x1 - 0.5 * x1[-1]
 x2 = x2 - 0.5 * x2[-1]
 x2, x1 = numpy.meshgrid( x2, x1 )
-trup = numpy.fromfile( bi_dir + 'trup', n )
+trup = numpy.fromfile( bi_dir + 'trup', 'f' ).reshape( n[::-1] ).T
 ax.contour( x1, x2, -trup, v, colors='k' )
 ax.axis( 'image' )
-#ax.axis( (-15, 15, -7.5, 7.5) )
-ax.axis( (-15, 0, -7.5, 0) )
+ax.axis( (-15, 15, -7.5, 7.5) )
+#ax.axis( (-15, 0, -7.5, 0) )
 pylab.draw()
 pylab.show()
 

@@ -100,6 +100,11 @@ def colormap( name='w0', colorexp=1.0, output='mayavi', n=2001, nmod=0, modlim=0
             g = 8, 4, 0, 4, 8, 4, 0, 4, 8
             b = 8, 8, 8, 8, 8, 4, 0, 0, 0
             centered = True
+        elif name == 'redblue':
+            r = 0, 2, 4, 8, 8, 8, 8
+            g = 0, 2, 4, 8, 4, 2, 0
+            b = 8, 8, 8, 8, 4, 2, 0
+            centered = True
         elif name == 'coulomb':
             r = 0, 0, 0, 0, 8, 8, 8, 8, 4
             g = 0, 0, 4, 8, 8, 8, 4, 0, 0

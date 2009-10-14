@@ -2,14 +2,14 @@
 module m_fieldio
 implicit none
 type t_io
-    character(32) :: filename
-    character(4) :: field
-    character(8) :: tfunc
-    character(3) :: mode
-    integer :: ii(3,4), nb, ib, fh
+    character(32) :: filename      ! filename on disk for input or output
+    character(4) :: field          ! field variable, see fieldnames.py for possibilities
+    character(8) :: tfunc          ! see time_function in util.f90 for possibilities
+    character(3) :: mode           ! 'r' read, 'w' write
+    integer :: ii(3,4), nb, ib, fh ! nb: i/o buffer size, ib: current buffer index, fh: file handle
     real :: x1(3), x2(3), val, period
-    real, pointer :: buff(:,:)
-    type( t_io ), pointer :: next
+    real, pointer :: buff(:,:)     ! buffer for storing mutliple time steps
+    type( t_io ), pointer :: next  ! pointer to next member of the field i/o list 
 end type t_io
 type( t_io ), pointer :: pio0, p, pprev
 integer, private :: itdebug = -1, idebug
