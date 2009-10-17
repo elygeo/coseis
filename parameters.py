@@ -103,7 +103,7 @@ n2expand = 0, 0, 0		# number of grid expansion nodes - far side
 faultnormal = 0			# normal direction to fault plane (0=no fault)
 faultopening = 0		# 0=not allowed, 1=allowed
 slipvector = 1.0, 0.0, 0.0	# shear traction direction for ts1
-vrup = 3184.9			# nucleation rupture velocity
+vrup = -1.0			# nucleation rupture velocity, negative = no nucleation
 rcrit = 1000.0			# nucleation critical radius
 trelax = 0.07			# nucleation relaxation time
 svtol = 0.001			# slip velocity considered rupturing

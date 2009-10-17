@@ -19,7 +19,6 @@ bc2 = 10, 10, 10
 hourglass = 1.0, 2.0
 
 faultnormal = 3	
-vrup = -1.
 
 if version- == 6:
     rho_ = 2670.0, 2225.0

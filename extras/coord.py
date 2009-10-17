@@ -31,13 +31,31 @@ def downsample_sphere( f, d ):
     ff *= 1.0 / (d * d)
     return ff
 
-def matmul( A, B ):
+def dot2( A, B ):
     """
-    Vectorized matrix multiplication. Not the same as numpy.dot()
+    Vectorized 2d dot product (matrix multiplication).
+
+    The first two dimensions index the matrix rows and columns. The remaining
+    dimensions index multiple matrices for which dot products are computed
+    separately. This differs from numpy.dot, where the higher dimensions index
+    N-dimensional 'matrices.' Also, broadcasting is effectively reversed by using
+    the transpose, so that ones are appended to the shape if necessary, rather than
+    prepended.
+
+    This could be made more general with arbitrary maximum matrix dimension, but
+    that would like make the code less clear.
     """
-    A = numpy.array( A )
-    B = numpy.array( B )
-    return ( A[:,:,None,...] * B ).sum( axis=1 )
+    A = numpy.array( A ).T
+    B = numpy.array( B ).T
+    i = -min( A.ndim, 2 )
+    if A.shape[i] != B.shape[-1]:
+        sys.exit( 'Incompatible arrays for dot product' )
+    elif A.ndim == 1:
+        return ( A * B ).T.sum( axis=0 )
+    elif B.ndim == 1:
+        return ( A * B[...,None] ).T.sum( axis=1 )
+    else:
+        return ( A[...,None,:,:] * B[...,None] ).T.sum( axis=1 )
 
 def solve2( A, b ):
     """
@@ -72,7 +90,7 @@ def slipvectors( strike, dip, rake ):
     c = numpy.cos( strike )
     s = numpy.sin( strike )
     C = numpy.array( [[s, c, z], [-c, s, z], [z, z, u]] )
-    return matmul( matmul( A, B ), C )
+    return dot2( dot2( A, B ), C )
 
 def source_tensors( R ):
     """
@@ -174,7 +192,7 @@ def rotation( lon, lat, projection, eps=100.0 ):
 
     Rotation matrix and clockwise rotation angle to transform components in the
     geographic coordinate system to components in the local system.
-    local_components = matmul( mat, components )
+    local_components = dot2( mat, components )
     local_strike = strike + theta
     """
     dlon = eps * 180.0 / (numpy.pi * rearth) * numpy.cos( numpy.pi / 180.0 * lat )
@@ -202,7 +220,7 @@ def rotation3( lon, lat, dep, projection, eps=100.0 ):
 
     Rotation matrix to transform components in the
     geographic coordinate system to components in the local system.
-    local_components = matmul( mat, components )
+    local_components = dot2( mat, components )
     """
     dlon = eps * 180.0 / (numpy.pi * rearth) * numpy.cos( numpy.pi / 180.0 * lat )
     dlat = eps * 180.0 / (numpy.pi * rearth)
@@ -253,7 +271,7 @@ def rot_sym_tensor( w1, w2, rot ):
     mat = numpy.diag( w1 )
     mat.flat[[5, 6, 1]] = w2
     mat.flat[[7, 2, 3]] = w2
-    mat = matmul( matmul( rot, mat ), rot.T )
+    mat = dot2( dot2( rot, mat ), rot.T )
     w1  = numpy.diag( mat )
     w2  = mat.flat[[5, 6, 1]]
     return w1, w2
@@ -285,16 +303,33 @@ def llr2xyz( x, y, z, inverse=False ):
         r = numpy.sqrt( x * x + y * y + z * z )
         x = numpy.arctan2( y, x )
         y = numpy.arcsin( z / r )
-        x *= 180.0 / numpy.pi
-        y *= 180.0 / numpy.pi
+        x = 180.0 / numpy.pi * x
+        y = 180.0 / numpy.pi * y
         return numpy.array( [x, y, r] )
     else:
-        x *= numpy.pi / 180.0
-        y *= numpy.pi / 180.0
+        x  = numpy.pi / 180.0 * x
+        y  = numpy.pi / 180.0 * y
         x_ = numpy.cos( x ) * numpy.cos( y ) * z
         y_ = numpy.sin( x ) * numpy.cos( y ) * z
-        z *= numpy.sin( y )
+        z  = numpy.sin( y ) * z
         return numpy.array( [x_, y_, z] )
+
+def viewmatrix( azimuth, elevation, up=None ):
+    """
+    Compute transformation matrix from view azimuth and elevation.
+    """
+    if up == None:
+          if 5.0 < abs( elevation ) < 175.0:
+              up = 0, 0, 1
+          else:
+              up = 0, 1, 0
+    z = llr2xyz( [azimuth], [90.0 - elevation], [1] ).T[0]
+    x = numpy.cross( up, z )
+    y = numpy.cross( z, x )
+    x = x / numpy.sqrt( ( x * x ).sum() )
+    y = y / numpy.sqrt( ( y * y ).sum() )
+    z = z / numpy.sqrt( ( z * z ).sum() )
+    return numpy.array( [x, y, z] ).T
 
 def ll2ortho( x, y, z=None, lon0=-118.0, lat0=34.0, rot=0.0, rearth=6370000.0, inverse=False ):
     """

@@ -20,46 +20,51 @@ bc1 = 10, 10, 10
 # Mirror symmetry for the y boundary
 bc2 = -2, 2, -2
 
+# Define some mesh indices
+o = -1.5				# origin index
+j = o - 15000.0 / dx[0], -1 		# X fault extent
+k = o -  7500.0 / dx[1], -1		# Y fault extent
+l = o -  4000.0 / dx[2], -1		# Z low viscosity extent
+p = o -  1500.0 / dx[0], -1		# nucleation path extent
+
 # Material properties
 fieldio = [
-    ( '=',  'rho', [], 2670.0 ),	# density
-    ( '=',  'vp',  [], 6000.0 ),	# P-wave speed
-    ( '=',  'vs',  [], 3464.0 ),	# S-wave speed
-    ( '=',  'gam', [], 0.2    ),	# viscosity
-    ( '=c', 'gam', [], 0.02, (-15001., -7501., -4000.), (15001., 7501., 4000.) ),
+    ( '=', 'rho', [], 2670.0 ),		# density
+    ( '=', 'vp',  [], 6000.0 ),		# P-wave speed
+    ( '=', 'vs',  [], 3464.0 ),		# S-wave speed
+    ( '=', 'gam', [], 0.2    ),		# high viscosity
+    ( '=', 'gam', [j,k,l,0], 0.02 ),	# low viscosity zone near fault
 ]
 hourglass = 1.0, 2.0
 
 # Fault parameters
+ihypo = o, o, o				# hypocenter indices
 faultnormal = 3				# fault plane of constant z
-ihypo = -1.5, -1.5, -1.5		# hypocenter indices
-fixhypo = -1				# set origin at hypocenter
-vrup = -1.0				# disable circular nucleation
 fieldio += [
-    ( '=',  'dc',  [], 0.4    ),	# slip weakening distance
-    ( '=',  'mud', [], 0.525  ),	# coefficient of dynamic friction
-    ( '=',  'mus', [], 1e4    ),	# coefficient of static friction
-    ( '=c', 'mus', [], 0.677, (-15001., -7501., -1.), (15001., 7501., 1.) ),
-    ( '=',  'tn',  [], -120e6 ),	# normal traction
-    ( '=',  'ts',  [],   70e6 ),	# shear traction
-    ( '=c', 'ts',  [], 81.6e6, (-1501., -1501., -1.), (1501., 1501., 1.) ),
+    ( '=', 'dc',  [],            0.4   ),	# slip weakening distance
+    ( '=', 'mud', [],            0.525 ),	# dynamic friction
+    ( '=', 'mus', [],              1e4 ),	# static friction - locked section
+    ( '=', 'mus', [j, k, o, 0],  0.677 ),	# static friction - slipping section
+    ( '=', 'tn',  [],           -120e6 ),	# normal traction
+    ( '=', 'ts',  [],             70e6 ),	# shear traction
+    ( '=', 'ts',  [p, p, o, 0], 81.6e6 ),	# shear traction - nucleation patch
 ]
 
 # Write fault plane output
 fieldio += [
-    ( '=w', 'x1',   [(),(),-2,()], 'x1'   ),	# mesh coordinate X
-    ( '=w', 'x2',   [(),(),-2,()], 'x2'   ),	# mesh coordinate Y
-    ( '=w', 'su1',  [(),(),-2,-1], 'su1'  ),	# final horizontal slip
-    ( '=w', 'su2',  [(),(),-2,-1], 'su2'  ),	# final vertical slip
-    ( '=w', 'psv',  [(),(),-2,-1], 'psv'  ),	# peak slip velocity
-    ( '=w', 'trup', [(),(),-2,-1], 'trup' ),	# rupture time
+    ( '=w', 'x1',   [(), (), o, ()], 'x1'   ),	# mesh coordinate X
+    ( '=w', 'x2',   [(), (), o, ()], 'x2'   ),	# mesh coordinate Y
+    ( '=w', 'su1',  [(), (), o, -1], 'su1'  ),	# final horizontal slip
+    ( '=w', 'su2',  [(), (), o, -1], 'su2'  ),	# final vertical slip
+    ( '=w', 'psv',  [(), (), o, -1], 'psv'  ),	# peak slip velocity
+    ( '=w', 'trup', [(), (), o, -1], 'trup' ),	# rupture time
 ]
 
 # Write slip, slip velocity, and shear traction time history
 for f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':
     fieldio += [
-        ( '=wx', f, [], 'P1_' + f, (-7499., -1., 0.) ), # mode II point
-        ( '=wx', f, [], 'P2_' + f, (-1., -5999., 0.) ), # mode III point
+        ( '=w', f, [j, o, o, ()], 'P1_' + f ),	# mode II point
+        ( '=w', f, [o, k, o, ()], 'P2_' + f ),	# mode III point
     ]
 
 sord.run( locals() )

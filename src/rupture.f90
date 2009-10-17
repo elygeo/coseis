@@ -135,12 +135,12 @@ call invert( muf )
 j = nm(1) - 1
 k = nm(2) - 1
 l = nm(3) - 1
-if ( ifn /= 1 ) lamf(2:j,:,:) = .5 * ( lamf(2:j,:,:) + lamf(1:j-1,:,:) )
-if ( ifn /= 2 ) lamf(:,2:k,:) = .5 * ( lamf(:,2:k,:) + lamf(:,1:k-1,:) )
-if ( ifn /= 3 ) lamf(:,:,2:l) = .5 * ( lamf(:,:,2:l) + lamf(:,:,1:l-1) )
-if ( ifn /= 1 ) muf(2:j,:,:) = .5 * ( muf(2:j,:,:) + muf(1:j-1,:,:) )
-if ( ifn /= 2 ) muf(:,2:k,:) = .5 * ( muf(:,2:k,:) + muf(:,1:k-1,:) )
-if ( ifn /= 3 ) muf(:,:,2:l) = .5 * ( muf(:,:,2:l) + muf(:,:,1:l-1) )
+if ( ifn /= 1 ) lamf(2:j,:,:) = 0.5 * (lamf(2:j,:,:) + lamf(1:j-1,:,:))
+if ( ifn /= 2 ) lamf(:,2:k,:) = 0.5 * (lamf(:,2:k,:) + lamf(:,1:k-1,:))
+if ( ifn /= 3 ) lamf(:,:,2:l) = 0.5 * (lamf(:,:,2:l) + lamf(:,:,1:l-1))
+if ( ifn /= 1 ) muf(2:j,:,:) = 0.5 * (muf(2:j,:,:) + muf(1:j-1,:,:))
+if ( ifn /= 2 ) muf(:,2:k,:) = 0.5 * (muf(:,2:k,:) + muf(:,1:k-1,:))
+if ( ifn /= 3 ) muf(:,:,2:l) = 0.5 * (muf(:,:,2:l) + muf(:,:,1:l-1))
 call invert( muf )
 
 ! Initial state, can be overwritten by read_checkpoint
@@ -284,7 +284,7 @@ efric = efric + dt * sum( f2 )
 t2 = uu(j3:j4,k3:k4,l3:l4,:) - uu(j1:j2,k1:k2,l1:l2,:)
 f2 = sum( (t0 + t1) * t2, 4 ) * area
 call set_halo( f2, 0.0, i1core, i2core )
-estrain = .5 * sum( f2 )
+estrain = 0.5 * sum( f2 )
 
 ! Moment (negelcts opening lambda contribution)
 f2 = muf * area * sqrt( sum( t2 * t2, 4 ) )

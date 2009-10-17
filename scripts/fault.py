@@ -17,7 +17,6 @@ bc1 = -1,  1, -2
 bc2 =  0,  0,  0
 fixhypo = -1
 faultnormal = 3
-vrup = -1.0
 
 fieldio = [
     ( '=',  'rho', [],  2670.0 ),

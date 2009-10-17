@@ -43,9 +43,9 @@ a = numpy.array( affine ).T
 b = numpy.linalg.inv( a )
 i = numpy.array( ihypo )
 d = -6000.0 / dx[0]
-i1_ = list( i + sord.coord.matmul( [[d, 0, 0]], b )[0] )
-i2_ = list( i + sord.coord.matmul( [[d, d, 0]], b )[0] )
-i3_ = list( i + sord.coord.matmul( [[d, d, d]], b )[0] )
+i1_ = list( i + sord.coord.dot2( [d, 0, 0], b )[0] )
+i2_ = list( i + sord.coord.dot2( [d, d, 0], b )[0] )
+i3_ = list( i + sord.coord.dot2( [d, d, d], b )[0] )
 
 for f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
     fieldio += [

@@ -18,7 +18,7 @@ integer, allocatable :: seed(:)
 if ( master ) write( 0, * ) 'Grid generation'
 
 ! Create rectangular mesh with double nodes at the fault
-w1 = 0.
+w1 = 0.0
 i1 = i1core
 i2 = i2core
 do i = i1(1), i2(1); w1(i,:,:,1) = dx(1) * (i + nnoff(1) - 1); end do

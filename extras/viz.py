@@ -123,12 +123,15 @@ def colormap( name='w0', colorexp=1.0, output='mayavi', n=2001, nmod=0, modlim=0
             g = numpy.zeros_like( r )
             b = numpy.zeros_like( r ) 
         elif name == 'earth':
-            r = numpy.array( [00, 00, 00, 10, 10, 15, 15, 25, 25, 25] ) / 80.0
+            r = numpy.array( [ 0,  0,  0, 10, 10, 15, 15, 25, 25, 25] ) / 80.0
             g = numpy.array( [10, 10, 10, 20, 20, 25, 30, 25, 25, 25] ) / 80.0
             b = numpy.array( [38, 38, 38, 40, 40, 25, 20, 17, 17, 17] ) / 80.0
+            r = numpy.array( [10, 12, 15, 17, 20, 15, 15, 25, 25, 25] ) / 80.0
+            g = numpy.array( [15, 18, 21, 24, 27, 25, 30, 25, 25, 25] ) / 80.0
+            b = numpy.array( [30, 32, 35, 37, 40, 25, 20, 17, 17, 17] ) / 80.0
         elif name == 'atmosphere':
-            r = 8, 8, 0
-            g = 8, 8, 0
+            r = 0, 8, 0
+            g = 0, 8, 0
             b = 8, 8, 8
             a = 0, 4, 0
         elif name == 'wk0':
