@@ -70,9 +70,7 @@ case( 'i1pml' );        read( str, *, iostat=io ) key, op, i1pml
 case( 'i2pml' );        read( str, *, iostat=io ) key, op, i2pml
 case( 'ppml' );         read( str, *, iostat=io ) key, op, ppml
 case( 'vpml' );         read( str, *, iostat=io ) key, op, vpml
-case( 'xhypo' );        read( str, *, iostat=io ) key, op, xhypo
 case( 'ihypo' );        read( str, *, iostat=io ) key, op, ihypo
-case( 'fixhypo' );      read( str, *, iostat=io ) key, op, fixhypo
 case( 'source' );       read( str, *, iostat=io ) key, op, source
 case( 'timefunction' ); read( str, *, iostat=io ) key, op, timefunction
 case( 'period' );       read( str, *, iostat=io ) key, op, period
@@ -99,6 +97,10 @@ case default
     case( '=', '+' )
         call pappend
         p%ib = -1
+        !XXXread( str, *, iostat=io ) p%mode, p%nfield
+        !XXXallocate( p%fields(p%nfield) )
+        !XXXread( str, *, iostat=io ) p%mode, p%nfield, p%tfunc, p%period, p%x1, &
+        !XXX    p%x2, p%nb, p%ii, p%filename, p%val, p%fields
         read( str, *, iostat=io ) p%mode, p%tfunc, p%period, p%x1, p%x2, p%nb, &
             p%ii, p%field, p%filename, p%val
     case default; io = 1

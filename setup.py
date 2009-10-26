@@ -64,8 +64,13 @@ def build( mode=None, optimize=None ):
             new |= util.make( compiler, object_, source )
     os.chdir( cwd )
     if new:
-        #os.link( '.ignore', '.bzrignore' )
-        os.system( 'bzr export sord.tgz' )
+        try:
+            import bzrlib
+        except ImportError:
+            print( 'Warning: bzr not installed. Install bzr if you want to save a\
+                copy of the source code for posterity with each run.' )
+        else:
+            os.system( 'bzr export sord.tgz' )
     return
 
 def docs():

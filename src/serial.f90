@@ -35,9 +35,12 @@ i = ip3root(1)
 end subroutine
 
 ! Broadcast real 1d
-subroutine rbroadcast1( r )
+subroutine rbroadcast1( r, i2d )
 real, intent(inout) :: r(:)
+integer, intent(in) :: i2d
+integer :: i
 r = r
+i = i2d
 end subroutine
 
 ! Barrier

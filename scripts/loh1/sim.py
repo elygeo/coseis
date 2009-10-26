@@ -18,8 +18,6 @@ bc2 = 10, 10, 10
 
 # source
 ihypo = 1.5, 1.5,   41.5
-xhypo = 0.0, 0.0, 2000.0
-fixhypo = -1
 source = 'moment'
 timefunction = 'brune'
 period = 0.1
@@ -40,10 +38,13 @@ fieldio = [
 ]
 
 # output
+j = ihypo[0] + 5999.0 / dx[0]
+k = ihypo[1] + 7999.0 / dx[1]
+l = ihypo[2]
 fieldio += [
-    ( '=wx', 'v1',  [], 'vx', (5999., 7999., -1.) ),
-    ( '=wx', 'v2',  [], 'vy', (5999., 7999., -1.) ),
-    ( '=wx', 'v3',  [], 'vz', (5999., 7999., -1.) ),
+    ( '=w', 'v1', [j,k,l,()], 'vx' ),
+    ( '=w', 'v2', [j,k,l,()], 'vy' ),
+    ( '=w', 'v3', [j,k,l,()], 'vz' ),
 ]
 
 # run job

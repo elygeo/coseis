@@ -20,8 +20,7 @@ bc2 = 10, 10, 1
 hourglass = 1.0, 2.0
 
 faultnormal = 2	
-ihypo = 0.5*X/dx[0], 0.5*Y/dx[1], 0.5
-fixhypo = -1
+ihypo = 0.5 * X / dx[0] + 1,  0.5 * Y / dx[1] + 1,  1.5
 trelax = 0.1
 vrup = 0.5
 rcrit = 1.5

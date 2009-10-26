@@ -26,7 +26,6 @@ T = 3.0
 L = 6000.0
 nn = [ int( L / dx[0] + 1.0001 ) ] * 3
 nt = int( T / dt + 1.0001 )
-fixhypo = -1 
 
 # output
 def io( i, dx ):

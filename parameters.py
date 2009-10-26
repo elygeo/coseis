@@ -27,17 +27,10 @@ Field I/O specification:
 
   ('=',   'f', [], val):                   Set to value
   ('=s',  'f', [], val):                   Set to random numbers in (0, val)
-  ('=x',  'f', [], val, x):                Set to value at neartest node/cell to x 
-  ('=sx', 'f', [], val, x):                Set to random number at nearest node/cell
-  ('=c',  'f', [], val, x1, x2):           Set to value inside Cartesian cube
   ('=f',  'f', [], val, tfunc, T):         Set to time function with period T
   ('=fs', 'f', [], val, tfunc, T):         Set to time function * random number
-  ('=fx', 'f', [], val, tfunc, T, x):      Set to time function at nearest node/cell
-  ('=fc', 'f', [], val, tfunc, T, x1, x2): Set to time function inside Cartesian cube
   ('=r',  'f', [], filename):              Read from filename
   ('=w',  'f', [], filename):              Write to filename
-  ('=rx', 'f', [], filename, x):           Read at nearest node/cell to x
-  ('=wx', 'f', [], filename, x):           Write at nearest node/cell to x
 
 'f' is the field name. Options are listed in fieldnames.py.
 
@@ -92,9 +85,7 @@ ppml = 2			# PML exponend, 1-4. Generally 2 is best.
 vpml = -1.0			# PML damping velocity, <0 default to min, max V_s harmonic mean
 bc1 = 0, 0, 0			# boundary condition - near side (see below)
 bc2 = 0, 0, 0			# boundary condition - far side (see below)
-xhypo = 0.0, 0.0, 0.0		# hypocenter coordinates
 ihypo = 0, 0, 0			# hypocenter indices (with fractional values), 0 = center
-fixhypo = 1			# lock xhypo/ihypo: 1 shift xhypo, -1 shift mesh, 0 unlocked
 rexpand = 1.06			# grid expansion ratio
 n1expand = 0, 0, 0		# number of grid expansion nodes - near side
 n2expand = 0, 0, 0		# number of grid expansion nodes - far side

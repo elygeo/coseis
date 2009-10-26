@@ -128,48 +128,9 @@ call vector_bc( w1, bc, bc, i1, i2 )
 call average( w2(:,:,:,1), w1(:,:,:,1), i1cell, i2cell, 1 )
 call average( w2(:,:,:,2), w1(:,:,:,2), i1cell, i2cell, 1 )
 call average( w2(:,:,:,3), w1(:,:,:,3), i1cell, i2cell, 1 )
-
-! Hypocenter location
-if ( fixhypo /= 0 ) then
-    if ( master ) then
-        xi = ihypo - nnoff
-        i1 = int( xi )
-        x0 = 0.0
-        do l = i1(3), i1(3)+1
-        do k = i1(2), i1(2)+1
-        do j = i1(1), i1(1)+1
-            w = (1.0-abs(xi(1)-j)) * (1.0-abs(xi(2)-k)) * (1.0-abs(xi(3)-l))
-            do i = 1, 3
-                x0(i) = x0(i) + w * w1(j,k,l,i)
-            end do
-        end do
-        end do
-        end do
-    end if
-    call rbroadcast1( x0 )
-end if
-if ( fixhypo > 0 ) then
-    xhypo = x0
-elseif ( fixhypo < 0 ) then
-    do i = 1, 3
-    do l = 1, nm(3)
-    do k = 1, nm(2)
-    do j = 1, nm(1)
-        w1(j,k,l,i) = w1(j,k,l,i) - x0(i) + xhypo(i)
-        w2(j,k,l,i) = w2(j,k,l,i) - x0(i) + xhypo(i)
-    end do
-    end do
-    end do
-    end do
-end if
-
-! Zero external cells
 call set_halo( w2(:,:,:,1), 0.0, i1cell, i2cell )
 call set_halo( w2(:,:,:,2), 0.0, i1cell, i2cell )
 call set_halo( w2(:,:,:,3), 0.0, i1cell, i2cell )
-
-! Find indices for coordinate based i/o
-call fieldio_locs
 
 ! Output
 call fieldio( '>', 'x1', w1(:,:,:,1) )
@@ -178,6 +139,23 @@ call fieldio( '>', 'x3', w1(:,:,:,3) )
 call fieldio( '>', 'c1', w2(:,:,:,1) )
 call fieldio( '>', 'c2', w2(:,:,:,2) )
 call fieldio( '>', 'c3', w2(:,:,:,3) )
+
+! Hypocenter location
+if ( master ) then
+    xi = ihypo - nnoff
+    i1 = int( xi )
+    xhypo = 0.0
+    do l = i1(3), i1(3)+1
+    do k = i1(2), i1(2)+1
+    do j = i1(1), i1(1)+1
+        w = (1.0-abs(xi(1)-j)) * (1.0-abs(xi(2)-k)) * (1.0-abs(xi(3)-l))
+        do i = 1, 3
+            xhypo(i) = xhypo(i) + w * w1(j,k,l,i)
+        end do
+    end do
+    end do
+    end do
+end if
 
 ! Orthogonality test
 if ( oplevel == 0 ) then

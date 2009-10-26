@@ -1,18 +1,21 @@
 ! Field input and output
 module m_fieldio
 implicit none
+integer, private :: itdebug = -1, idebug
+integer, private, parameter :: maxfields = 32
 type t_io
     character(32) :: filename      ! filename on disk for input or output
     character(4) :: field          ! field variable, see fieldnames.py for possibilities
     character(8) :: tfunc          ! see time_function in util.f90 for possibilities
     character(3) :: mode           ! 'r' read, 'w' write
-    integer :: ii(3,4), nb, ib, fh ! nb: i/o buffer size, ib: current buffer index, fh: file handle
+    integer :: ii(3,4), nb, ib, fh, nfield
     real :: x1(3), x2(3), val, period
     real, pointer :: buff(:,:)     ! buffer for storing mutliple time steps
+    !XXX character(4), pointer :: fields(:) ! field variable, see fieldnames.py for possibilities
+    !XXX real, pointer :: buff(:,:,:)  ! buffer for storing mutliple time steps
     type( t_io ), pointer :: next  ! pointer to next member of the field i/o list 
 end type t_io
 type( t_io ), pointer :: pio0, p, pprev
-integer, private :: itdebug = -1, idebug
 contains
 
 ! Append linked list item
@@ -28,73 +31,6 @@ pprev%next => p%next
 deallocate( p )
 p => pprev
 end subroutine
-
-! Field I/O locations
-subroutine fieldio_locs
-use m_globals
-use m_util
-use m_collective
-real :: rr
-integer :: i1(3), i2(3), n(3), noff(3), i
-
-if ( verb ) write( 0, * ) 'Field I/O locations'
-
-! Store locations
-if ( master ) then
-    open( 1, file='locations.py', status='replace' )
-    write( 1, '(a)' ) 'locations = ['
-end if
-
-! Loop over output zones
-p => pio0
-loop: do while( p%next%field /= 'head' )
-pprev => p
-p => p%next
-
-! Locate nearest node/cell to given location
-i = scan( p%mode, 'xX' )
-if ( i > 0 ) then
-    s2 = huge( rr )
-    select case( p%mode(i:i) )
-    case( 'x' )
-        i1 = i1core
-        i2 = i2core
-        call radius( s2, w1, p%x1, i1, i2 )
-    case( 'X' )
-        i1 = max( i1core, i1cell )
-        i2 = min( i2core, i2cell )
-        call radius( s2, w2, p%x1, i1, i2 )
-    end select
-    p%mode(i:i) = ' '
-    n = nn + 2 * nhalo
-    noff = nnoff + nhalo
-    call reduceloc( rr, i1, s2, 'allmin', n, noff, 0 )
-    p%ii(1,1:3) = i1 + nnoff
-    p%ii(2,1:3) = i1 + nnoff
-    if ( rr < sum( dx * dx ) / 3.0 ) then
-        if ( master ) then
-            write(1, '( "( [ ", 4("(", i8, 2(", ", i8), "), "), "], ''", a, "'' )," )')&
-                p%ii, trim( p%filename )
-        end if
-    else
-        if ( master ) then
-            write(1, '( "#( [ ", 4("(", i8, 2(", ", i8), "), "), "], ''", a, "'' )," )')&
-                p%ii, trim( p%filename )
-        end if
-        call pdelete
-    end if
-end if
-
-end do loop
-
-if ( master ) then
-    write( 1, '(a)' ) ']'
-    close( 1 )
-end if
-
-end subroutine
-
-!------------------------------------------------------------------------------!
 
 ! Field I/O sequence
 subroutine fieldio( passes, field, f )
@@ -166,9 +102,11 @@ do i = 1, 3
 end do
 
 ! Pass test
-if ( field /= p%field ) cycle loop
 if ( pass == '<' .and. p%mode(2:2) == 'w' ) cycle loop
 if ( pass == '>' .and. p%mode(2:2) /= 'w' ) cycle loop
+
+!XXX loop over fields
+if ( field /= p%field ) cycle loop
 
 ! I/O
 val = p%val * time_function( p%tfunc, tm, dt, p%period )
@@ -249,6 +187,7 @@ case( '=r', '+r', '=R', '+R' )
         end do
     end if
     if ( p%ib < 0 ) then
+        !XXX allocate( p%buff(n(1)*n(2)*n(3),nfields,p%nb) )
         allocate( p%buff(n(1)*n(2)*n(3),p%nb) )
         p%ib = p%nb
         p%fh = frio_file_null
@@ -324,6 +263,7 @@ case( '=r', '+r', '=R', '+R' )
     end if
 case( '=w', '=wi' )
     if ( p%ib < 0 ) then
+        !XXX allocate( p%buff(n(1)*n(2)*n(3),nfield,p%nb) )
         allocate( p%buff(n(1)*n(2)*n(3),p%nb) )
         p%ib = 0
         p%fh = frio_file_null

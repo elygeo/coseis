@@ -15,14 +15,12 @@ bc1 = 10, 10, 10
 bc2 = 10, 10, 0
 
 # Source
-xhypo = 0.0, 0.0, -12e3
-ihypo = nn[0]/2-0.5, nn[1]/2-0.5, -xhypo[2]/dx[2]
+ihypo = nn[0]/2-0.5, nn[1]/2-0.5, 12e3/dx[2]
 source = 'moment'
 source1 = -5.79e20, 0.10e20, 5.69e20    #  Mpp,  Mtt,  Mrr
 source2 = -1.99e20, 5.61e20, 3.48e20    # -Mrt,  Mrp, -Mtp
 timefunction = 'brune'
 period = 0.1
-fixhypo = -1
 
 # Velocity model
 fieldio = [ ('=', 'gam', [], 0.2) ]
@@ -43,13 +41,16 @@ for depth_, vp_, vs_ in material_:
     ]
 
 # Output
-for f in 'v1', 'v2', 'v3':
-    fieldio += [
-        ( '=wx', f, [], 'Epicenter-' + f, ( 0.0,   0.0, 0.0), ),
-        ( '=wx', f, [], 'Wenchuan-'  + f, (30e3,  52e3, 0.0), ),
-        ( '=wx', f, [], 'Maoxian-'   + f, (60e3,  70e3, 0.0), ),
-        ( '=wx', f, [], 'Chengdu-'   + f, (84e3, -36e3, 0.0), ),
-    ]
+for sta, x, y in (
+        ( 'Epicenter-', 0.0,   0.0 ),
+        ( 'Wenchuan-', 30e3,  52e3 ),
+        ( 'Maoxian-',  60e3,  70e3 ),
+        ( 'Chengdu-',  84e3, -36e3 ),
+    ):
+    for f in 'v1', 'v2', 'v3':
+        j = ihypo[0] + x / dx[0]
+        k = ihypo[0] + y / dx[1]
+        fieldio += [ ( '=w', f, [j,k,1,()], sta + f ) ]
 
 sord.run( locals() )
 

@@ -12,11 +12,11 @@ dt = 0.008
 rexpand = 1.06
 n1expand = 20, 20, 20
 n2expand = 20, 20, 20
-fixhypo = -1
 
 # source
-ihypo = 31, 31, 31
-ihypo = 31.5, 31.5, 31.5
+o = 31
+o = 31.5
+ihypo = o, o, o
 source = 'moment'
 source1 = 1e18, 1e18, 1e18
 source2 =  0.0,  0.0,  0.0
@@ -33,11 +33,13 @@ fieldio = [
 ]
 
 # output
+j = o + 2999.0 / dx[0]
+k = o + 3999.0 / dx[1]
 for f in 'x1', 'x2', 'x3', 'v1', 'v2', 'v3':
     fieldio += [
-        ( '=wx', f, [], 'p1_'+f, (   0., 3999., -1.) ),
-        ( '=wx', f, [], 'p2_'+f, (2999., 3999., -1.) ),
-        ( '=wx', f, [], 'p3_'+f, (3999., 3999., -1.) ),
+        ( '=w', f, [o, k, o, ()], 'p1_' + f ),
+        ( '=w', f, [j, k, o, ()], 'p2_' + f ),
+        ( '=w', f, [k, k, o, ()], 'p3_' + f ),
     ]
 
 sord.run( locals() )

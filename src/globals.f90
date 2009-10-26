@@ -4,7 +4,7 @@ implicit none
 
 ! Input parameters, see default-prm.py for documentation
 integer, dimension(3) :: np3, nn, bc1, bc2, n1expand, n2expand
-integer :: nt, itstats, itio, itcheck, itstop, npml, ppml, oplevel, fixhypo, mpin, &
+integer :: nt, itstats, itio, itcheck, itstop, npml, ppml, oplevel, mpin, &
     mpout, debug, faultopening, irup, faultnormal, nsource
 real :: tm0, dt, dx(3), rho1, rho2, vp1, vp2, vs1, vs2, gam1, gam2, hourglass(2), &
     vdamp, rexpand, affine(9), gridnoise, xhypo(3), ihypo(3), vpml, slipvector(3)
@@ -14,6 +14,7 @@ character(16) :: source, timefunction
 ! Miscellaneous parameters
 real, parameter :: pi = 3.14159265
 real :: &
+    xhypo(3),       & ! hypocenter coordinates
     mptimer,        & ! MPI timing
     iotimer,        & ! I/O timing
     tm                ! time

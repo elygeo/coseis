@@ -75,12 +75,19 @@ end do
 end subroutine
 
 ! Broadcast real 1d
-subroutine rbroadcast1( r )
+subroutine rbroadcast1( r, i2d )
 use mpi
 real, intent(inout) :: r(:)
-integer :: i, e
+integer, intent(in) :: i2d
+integer :: comm, root, i, e
+comm = comm3d
+root = root3d
+if ( i2d /= 0 ) then
+    comm = comm2d(i2d)
+    root = root2d(i2d)
+end if
 i = size(r)
-call mpi_bcast( r, i, mpi_real, root3d, comm3d, e )
+call mpi_bcast( r, i, mpi_real, root, comm, e )
 end subroutine
 
 ! Barrier

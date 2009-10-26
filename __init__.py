@@ -288,22 +288,16 @@ def prepare_param( pm, itbuff ):
         try:
             if len( line ) is 10:
                 tfunc, period, x1, x2, nb, ii, field, filename, val = line[1:]
-            elif mode in ['', 's', 'i']:
-                field, ii, val = line[1:]
-            elif mode in ['x', 'sx']:
-                field, ii, val, x1 = line[1:]
-            elif mode in ['c']:
-                field, ii, val, x1, x2 = line[1:]
-            elif mode in ['f', 'fs', 'fi']:
-                field, ii, val, tfunc, period = line[1:]
-            elif mode in ['fx', 'fsx']:
-                field, ii, val, tfunc, period, x1 = line[1:]
-            elif mode in ['fc']:
-                field, ii, val, tfunc, period, x1, x2 = line[1:]
             elif mode in ['r', 'R', 'w', 'wi']:
                 field, ii, filename = line[1:]
-            elif mode in ['rx', 'wx']:
-                field, ii, filename, x1 = line[1:]
+            elif mode in ['', 's', 'i']:
+                field, ii, val = line[1:]
+            elif mode in ['f', 'fs', 'fi']:
+                field, ii, val, tfunc, period = line[1:]
+            elif mode in ['c']:
+                field, ii, val, x1, x2 = line[1:]
+            elif mode in ['fc']:
+                field, ii, val, tfunc, period, x1, x2 = line[1:]
             else:
                 sys.exit( 'Error: bad i/o mode: %r' % line )
         except( ValueError ):
@@ -318,7 +312,6 @@ def prepare_param( pm, itbuff ):
             sys.exit( 'Error: field is ouput only: %r' % line )
         nn = list( pm.nn ) + [pm.nt]
         if field in fieldnames.cell:
-            mode = mode.replace( 'x', 'X' )
             mode = mode.replace( 'c', 'C' )
             base = 1.5
         else:
@@ -340,14 +333,13 @@ def prepare_param( pm, itbuff ):
         nn = [ (ii[i][1] - ii[i][0] + 1) / ii[i][2] for i in range(4) ]
         nb = ( min( pm.itio, pm.nt ) - 1 ) / ii[3][2] + 1
         nb = max( 1, min( nb, nn[3] ) )
-        if 'x' not in mode and 'X' not in mode:
-            n = nn[0] * nn[1] * nn[2]
-            if n > (pm.nn[0] + pm.nn[1] + pm.nn[2]) ** 2:
-                nb = 1
-            elif n > 1:
-                nb = min( nb, itbuff )
+        n = nn[0] * nn[1] * nn[2]
+        if n > (pm.nn[0] + pm.nn[1] + pm.nn[2]) ** 2:
+            nb = 1
+        elif n > 1:
+            nb = min( nb, itbuff )
         fieldio += [
-            (op+mode, tfunc, period, x1, x2, nb, ii, field, filename, val)
+            (op + mode, tfunc, period, x1, x2, nb, ii, field, filename, val)
         ]
     f = [ line[8] for line in fieldio if line[8] != '-' ]
     for i in range( len( f ) ):

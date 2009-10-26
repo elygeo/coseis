@@ -104,15 +104,6 @@ def loadmeta( path='.' ):
                     meta['indices'][filename] = f[6]
                     if 'wi' in op:
                         meta['xi'][filename] = f[3]
-            f = os.path.join( path, 'locations.py' )
-            if os.path.isfile( f ):
-                d = {}
-                exec open( f ) in d
-                mm = meta['nn'] + ( meta['nt'], )
-                for ii, filename in d['locations']:
-                    if filename != '-':
-                        ii = expand_slice( mm, ii )
-                        meta['indices'][filename] = ii
             meta['shape'] = {}
             for k in meta['indices']:
                 nn = [ ( i[1] - i[0] ) / i[2] + 1 for i in meta['indices'][k] ]

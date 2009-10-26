@@ -115,6 +115,7 @@ do i = 1, 3
 end do
 
 ! Hypocentral radius
+call rbroadcast1( xhypo, ifn )
 do i = 1, 3
     select case( ifn )
     case ( 1 ); t2(1,:,:,i) = w1(irup,:,:,i) - xhypo(i)
