@@ -2,7 +2,7 @@
 
 cd $( dirname $0 )
 
-version="3.0.$(( $( bzr revno ) + 1 ))"
+version="3.1.$(( $( bzr revno ) + 1 ))"
 echo "$version" > version
 
 ./setup.py docs

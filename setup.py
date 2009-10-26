@@ -123,7 +123,6 @@ def docs():
         'fieldnames.py',
         'configure.py',
         'setup.py',
-        'remote.py',
         'util.py',
     )
     for f in sources:

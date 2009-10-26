@@ -104,17 +104,16 @@ img {
 <p class="topic-title first">Contents</p>
 <ul class="simple">
 <li><a class="reference internal" href="#summary" id="id3">Summary</a></li>
-<li><a class="reference internal" href="#news" id="id4">News</a></li>
-<li><a class="reference internal" href="#license" id="id5">License</a></li>
-<li><a class="reference internal" href="#author" id="id6">Author</a></li>
-<li><a class="reference internal" href="#publications" id="id7">Publications</a></li>
-<li><a class="reference internal" href="#download" id="id8">Download</a></li>
-<li><a class="reference internal" href="#installation-linux-or-mac-os-x" id="id9">Installation - Linux or Mac OS X</a></li>
-<li><a class="reference internal" href="#basic-usage" id="id10">Basic usage</a></li>
-<li><a class="reference internal" href="#examples" id="id11">Examples</a></li>
-<li><a class="reference internal" href="#fortran-source-code" id="id12">Fortran source code</a></li>
-<li><a class="reference internal" href="#python-wrappers" id="id13">Python wrappers</a></li>
-<li><a class="reference internal" href="#development" id="id14">Development</a></li>
+<li><a class="reference internal" href="#license" id="id4">License</a></li>
+<li><a class="reference internal" href="#author" id="id5">Author</a></li>
+<li><a class="reference internal" href="#publications" id="id6">Publications</a></li>
+<li><a class="reference internal" href="#download" id="id7">Download</a></li>
+<li><a class="reference internal" href="#installation-linux-or-mac-os-x" id="id8">Installation - Linux or Mac OS X</a></li>
+<li><a class="reference internal" href="#basic-usage" id="id9">Basic usage</a></li>
+<li><a class="reference internal" href="#examples" id="id10">Examples</a></li>
+<li><a class="reference internal" href="#fortran-source-code" id="id11">Fortran source code</a></li>
+<li><a class="reference internal" href="#python-wrappers" id="id12">Python wrappers</a></li>
+<li><a class="reference internal" href="#development" id="id13">Development</a></li>
 </ul>
 </div>
 <div class="section" id="summary">
@@ -134,26 +133,6 @@ computations are coded in Fortran 95 and parallelized for multi-processor
 execution using Message Passing Interface (MPI).  The code is portable and
 tested with a variety of Fortran 95 compilers, MPI implementations, operating
 systems (Linux, IBM AIX, Mac OS X, SUN Solaris).</p>
-</div>
-<div class="section" id="news">
-<h3>News</h3>
-<p>2009, Mar 30:</p>
-<blockquote>
-<ul class="simple">
-<li>New finite source module and Python utility to read Graves SRF format.</li>
-<li>ihypo is now a real number parameter for sub-cell positioning.</li>
-<li>I/O testing and bug fixes.</li>
-<li>new parameters: source, nsource, source1, source2 (see parameters.py)</li>
-<li>removed parameters: moment1, moment2, rsource, rfunc</li>
-</ul>
-</blockquote>
-<p>2008, Nov 11:</p>
-<blockquote>
-<ul class="simple">
-<li>Revamped I/O scheme with time buffering</li>
-<li>Python based configuration.</li>
-</ul>
-</blockquote>
 </div>
 <div class="section" id="license">
 <h3>License</h3>
@@ -195,7 +174,7 @@ BSSA, 100(1).
 </div>
 <div class="section" id="download">
 <h3>Download</h3>
-<p>Latest source code version <a class="reference external" href="sord.tgz">3.0.414</a></p>
+<p>Latest source code version <a class="reference external" href="sord.tgz">3.1.415</a></p>
 <p>Older versions can be extracted from the source code repository (see
 <a class="reference internal" href="#development">Development</a>).</p>
 </div>
@@ -357,7 +336,6 @@ have tried to keep it clean and readable.</p>
 <div class="line"><a class="reference external" href="fieldnames.py">fieldnames.py</a>: Field variable information</div>
 <div class="line"><a class="reference external" href="configure.py">configure.py</a>: Read configuration files</div>
 <div class="line"><a class="reference external" href="setup.py">setup.py</a>: Build SORD binaries and documentation</div>
-<div class="line"><a class="reference external" href="remote.py">remote.py</a>: Remote operations: deploy, publish, get</div>
 <div class="line"><a class="reference external" href="util.py">util.py</a>: General utilities</div>
 </div>
 </div>
@@ -368,7 +346,7 @@ documentation are greatly appreciated.  The latest development version can be
 obtained from the <a class="reference external" href="http://bazaar-vcs.org/">Bazaar</a> source code repository
 with:</p>
 <pre class="literal-block">
-bzr checkout http://earth.usc.edu/~gely/sord
+bzr get http://earth.usc.edu/~gely/sord
 </pre>
 <p>Why Bazaar?  Because Subversion is painful to use in my opinion.  Better,
 modern alternatives are available.  <a class="reference external" href="http://www.selenic.com/mercurial/wiki/">Mercurial</a>, another strong candidate, was also

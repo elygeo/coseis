@@ -30,23 +30,6 @@ tested with a variety of Fortran 95 compilers, MPI implementations, operating
 systems (Linux, IBM AIX, Mac OS X, SUN Solaris).
 
 
-News
-----
-
-2009, Mar 30:
-
-  - New finite source module and Python utility to read Graves SRF format.  
-  - ihypo is now a real number parameter for sub-cell positioning.
-  - I/O testing and bug fixes.
-  - new parameters: source, nsource, source1, source2 (see parameters.py)
-  - removed parameters: moment1, moment2, rsource, rfunc
-
-2008, Nov 11:
-
-   - Revamped I/O scheme with time buffering
-   - Python based configuration.
-
-
 License
 -------
 
@@ -236,7 +219,7 @@ documentation are greatly appreciated.  The latest development version can be
 obtained from the `Bazaar <http://bazaar-vcs.org/>`_ source code repository
 with::
 
-    bzr checkout http://earth.usc.edu/~gely/sord
+    bzr get http://earth.usc.edu/~gely/sord
 
 Why Bazaar?  Because Subversion is painful to use in my opinion.  Better,
 modern alternatives are available.  `Mercurial
