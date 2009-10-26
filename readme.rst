@@ -221,10 +221,7 @@ with::
 
     bzr get http://earth.usc.edu/~gely/sord
 
-Why Bazaar?  Because Subversion is painful to use in my opinion.  Better,
-modern alternatives are available.  `Mercurial
-<http://www.selenic.com/mercurial/wiki/>`_, another strong candidate, was also
-considered.  The simplest way to install Bazaar is to use Python `Easy Install
+The simplest way to install Bazaar is to use Python `Easy Install
 <http://pypi.python.org/pypi/setuptools>`_::
 
     easy_install bzr
