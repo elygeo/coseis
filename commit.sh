@@ -9,5 +9,5 @@ echo "$version" > version
 ./setup.py docs
 
 bzr commit -m "$*"
-bzr export "sord-$version.tgz"
+bzr export "sord.tgz"
 
