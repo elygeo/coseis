@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-import numpy, pylab, sord
+import os, numpy, pylab, sord
 
-so_dir = './run/tpv3-300/'; bi_dir = 'bi/'
+bi_dir = 'bi/'
+so_dir = os.path.expanduser( '~/run/tpv3-150/' )
 meta = sord.util.loadmeta( so_dir )
 dt = meta.dt
 nt = meta.nt

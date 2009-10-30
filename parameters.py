@@ -12,17 +12,6 @@ Spatial difference operator level:
   5: Exactly integrated elements
   6: Saved operators, nearly as fast as 2, but doubles the memory usage
 
-Boundary conditions:
-
-  0: Vacuum free surface: zero cell stress
-  1: Mirror symmetry at the node
-  2: Mirror symmetry at the cell
- -1: Anti-mirror symmetry at the node, useful for nodal planes
- -2: Anti-mirror symmetry at the cell, useful for nodal planes and fault planes
-  3: Rigid boundary: zero node displacement
-  4: Continue
- 10: PML absorbing
-
 Field I/O specification:
 
   ('=',   'f', [], val):                   Set to value

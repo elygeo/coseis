@@ -13,8 +13,7 @@ export PATH="${prefix}/bin:${PATH}"
 mkdir -p "${prefix}"
 cd "${prefix}"
 
-curl -O "http://www.python.org/ftp/python/${version}/Python-${version}.tgz"
-tar zxvf "Python-${version}.tgz"
+curl "http://www.python.org/ftp/python/${version}/Python-${version}.tgz" | tar zxv
 cd "Python-${version}"
 ./configure --prefix="${prefix}"
 make

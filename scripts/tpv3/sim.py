@@ -88,6 +88,8 @@ for dx, np3 in runs_:
 
     # Write fault plane output
     fieldio += [
+        ( '=w', 'x1',   [j,k,-2,0],  'x1'   ),	# X coordinates
+        ( '=w', 'x2',   [j,k,-2,0],  'x2'   ),	# Y coordinates
         ( '=w', 'su1',  [j,k,-2,-1], 'su1'  ),	# final horizontal slip
         ( '=w', 'su2',  [j,k,-2,-1], 'su2'  ),	# final vertical slip
         ( '=w', 'psv',  [j,k,-2,-1], 'psv'  ),	# peak slip velocity

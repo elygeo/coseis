@@ -79,9 +79,6 @@ def docs():
     """
     import re
     from docutils.core import publish_string
-    download = ( 'Latest source code version `%s <sord.tgz>`_'
-             % open( 'version' ).read().strip() )
-    open( 'download.txt', 'w' ).write( download )
     settings = dict(
         datestamp = '%Y-%m-%d',
         generator = True,
@@ -97,7 +94,12 @@ def docs():
     html = re.sub( '<col.*>\n', '', html )
     html = re.sub( '</colgroup>', '', html )
     open( 'index.html', 'w' ).write( html )
-    os.unlink( 'download.txt' )
+    rst = open( 'doc/notes.rst' ).read()
+    html = publish_string( rst, writer_name='html4css1',
+        settings_overrides=settings )
+    html = re.sub( '<col.*>\n', '', html )
+    html = re.sub( '</colgroup>', '', html )
+    open( 'doc/notes.html', 'w' ).write( html )
     return
 
 def rspec():

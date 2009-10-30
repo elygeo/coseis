@@ -12,7 +12,7 @@ use m_diffnc
 use m_fieldio
 integer :: i1(3), i2(3), i3(3), i4(3), bc(3), &
     i, j, k, l, j1, k1, l1, j2, k2, l2, b, c
-real :: x0(3), xi(3), m(9), tol, h, w
+real :: xi(3), m(9), tol, h, w
 integer, allocatable :: seed(:)
 
 if ( master ) write( 0, * ) 'Grid generation'

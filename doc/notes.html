@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<title>SORD Notes</title>
+<style type="text/css">
+
+body {
+    margin: 0px;
+    color: #000;
+    background-color: #fff;
+    font-family: 'Lucida Grande', Geneva, Verdana, sans-serif;
+}
+
+div {
+    margin: 0px;
+}
+
+div.line-block {
+    margin: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+div.footer {
+    margin: 20px;
+    margin-top: 40px;
+}
+
+p {
+    margin: 20px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+dl {
+    margin: 20px;
+    margin-top: 35px;
+    margin-bottom: 15px;
+}
+
+table {
+    margin: 60px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border: none;
+}
+
+td {
+    border: none;
+}
+
+pre {
+    margin: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+h1 {
+    margin: 0px;
+    padding: 20px;
+    border-top: medium solid #700;
+    border-bottom: medium solid #300;
+    font-weight: lighter;
+    color: #fff;
+    background-color: #600;
+    text-shadow: #000 3px 3px 3px;
+}
+
+h2, h3 {
+    padding: 5px;
+    margin: 15px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    background-color: #eee;
+}
+
+a {
+    color: #00c;
+    text-decoration: none;
+}
+
+a:hover, a:active {
+    color: #66f;
+    text-decoration: none;
+}
+
+img {
+    border: 15px solid #fff;
+    padding: 0px;
+}
+
+
+</style>
+</head>
+<body>
+<div class="document" id="sord-notes">
+<h1 class="title">SORD Notes</h1>
+
+<p>This is a collection of notes on SORD that will eventually be filled out into a
+user manual.</p>
+<div class="section" id="boundary-conditions">
+<h3>Boundary Conditions</h3>
+<p>Boundary conditions for the six faces of the model domain are specified by the
+parameters <tt class="docutils literal"><span class="pre">bc1</span></tt> (near-size, x, y, and z faces) and <tt class="docutils literal"><span class="pre">bc2</span></tt> (far-side, x, y,
+and x faces).  The symmetry boundary conditions can be use to reduce
+computations for problems where they are applicable.  These are not used for
+specifying internal slip boundaries. However, for problems with symmetry across
+a slip surface, the fault may be placed at the boundary and combined with an
+anti-mirror symmetry condition.  The following BC types are supported:</p>
+<p>0: Vacuum free surface. Stress is zero in cells outside the boundary.</p>
+<img alt="bc0.png" src="bc0.png" />
+<p>1: Mirror symmetry at the node. Normal displacement is zero at the boundary.
+Useful for a boundary corresponding to the plane orthogonal to the two nodal
+planes for double-couple point sources, or the plane normal to the mode-III
+axis for symmetric ruptures.</p>
+<img alt="bc1.png" src="bc1.png" />
+<p>2: Mirror symmetry at the cell. Same as type 1, but centered on the cell.</p>
+<img alt="bc2.png" src="bc2.png" />
+<p>-1: Anti-mirror symmetry at the node. Tangential displacement is zero at the
+boundary.  Useful for a boundary corresponding to the nodal planes of
+double-couple point sources, or the plane the plane normal to the mode-II axis
+for symmetric ruptures.</p>
+<img alt="bc-1.png" src="bc-1.png" />
+<p>-2: Anti-mirror symmetry at the cell. Same as type -1, but centered on the
+cell.  Can additionally be used when the boundary corresponds to the fault
+surface for symmetric ruptures.</p>
+<img alt="bc-2.png" src="bc-2.png" />
+<p>3: Rigid boundary. Displacement is zero at the boundary.</p>
+<img alt="bc3.png" src="bc3.png" />
+<p>10: Perfectly match layer (PML) absorbing boundary.</p>
+<p>Example: a problem with a free surface at Z=0, and PML aborbing
+boundaries on all other boundary faces:</p>
+<pre class="literal-block">
+bc1 = 10, 10, 0
+bc2 = 10, 10, 10
+</pre>
+</div>
+<div class="section" id="defining-the-fault-rupture-surface">
+<h3>Defining the fault rupture surface</h3>
+<p>Fault rupture always follows a surface of the (possibly non-planar) logical
+mesh.  The orientation of the fault plane is defined by the <tt class="docutils literal"><span class="pre">faultnormal</span></tt>
+parameter.  This can be either 1, 2, or 3 corresponding to surfaces normal to
+the j, k, or l logical mesh directions. Any other value (typically 0) disables
+rupture altogether. The location of the rupture plane with in the mesh is
+determined by the <tt class="docutils literal"><span class="pre">ihypo</span></tt> parameter, which has a dual purpose of also
+defining the nucleation point. So, the indices of the collocated fault double
+nodes are given by <tt class="docutils literal"><span class="pre">int(ihypo(faultnormal))</span></tt>, and <tt class="docutils literal"><span class="pre">int(ihypo(faultnormal))</span> <span class="pre">+</span>
+<span class="pre">1</span></tt>. For example, a 3D problem of dimensions 200.0 x 200.0 x 200.0, with a
+fault plane located at z = 100.0, and double nodes at l = (21, 22), may be set
+up as such:</p>
+<pre class="literal-block">
+dx = 5.0
+faultnormal = 3
+ihypo = 21, 21, 21.5
+nn  = 41, 41, 42
+bc1 = 0, 0, 0
+bc2 = 0, 0, 0
+</pre>
+<p>For problems with symmetry across the rupture surface (where mesh and material
+properties are mirror images), the symmetry may be exploited for computational
+savings by using an appropriate boundary condition and solving the elastic
+equations for only one side of the fault.  In this case, the fault double nodes
+must lie at the model boundary, and the and the cell-centered anti-mirror
+symmetry condition used.  For example, reducing the size of the previous
+example to put the rupture surface along the far z boundary:</p>
+<pre class="literal-block">
+nn = 41, 41, 22
+bc2 = 0, 0, -2
+</pre>
+<p>Alternatively, put the rupture surface along the near z boundary:</p>
+<pre class="literal-block">
+ihypo = 21, 21, 1.5
+nn = 41, 41, 22
+bc1 = 0, 0, -2
+bc2 = 0, 0, 0
+</pre>
+<p>Further symmetries may present. If our previous problem has slip only in the
+x direction, then we may also use node-centered mirror symmetry along the in-plane
+axis, and node-centered anti-mirror symmetry along the anti-plane axis, to reduce
+computations eight-fold:</p>
+<pre class="literal-block">
+ihypo = 21, 21, 21.5
+nn = 21, 21, 22
+bc1 = 0, 0, 0
+bc2 = -1, 1, -2
+</pre>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+Generated on: 2009-10-30.
+Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
+
+</div>
+</body>
+</html>

@@ -30,10 +30,8 @@ export OPT='-O'
 mkdir -p "${prefix}"
 cp python-cnl-*.patch "${prefix}"
 cd "${prefix}"
-curl -O "http://www.python.org/ftp/python/${ver_python}/Python-${ver_python}.tgz"
-curl -O "http://superb-west.dl.sourceforge.net/sourceforge/numpy/numpy-${ver_numpy}.tar.gz"
-tar zxvf "Python-${ver_python}.tgz"
-tar zxvf "numpy-${ver_numpy}.tar.gz"
+curl "http://www.python.org/ftp/python/${ver_python}/Python-${ver_python}.tgz" | tar zxv
+curl "http://superb-west.dl.sourceforge.net/sourceforge/numpy/numpy-${ver_numpy}.tar.gz" | tar zxv
 
 # Install Python
 cd "Python-${ver_python}"
