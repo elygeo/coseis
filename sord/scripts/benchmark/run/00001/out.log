@@ -1,0 +1,8 @@
+ SORD - Support Operator Rupture Dynamics
+ Grid generation
+ Material model
+ Resample material model
+ Main loop:          16  steps
+................    16
+ Finished!
+      113.24 real       108.25 user         1.29 sys

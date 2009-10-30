@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<title>SORD</title>
+<style type="text/css">
+
+body {
+    margin: 0px;
+    color: #000;
+    background-color: #fff;
+    font-family: 'Lucida Grande', Geneva, Verdana, sans-serif;
+}
+
+div {
+    margin: 0px;
+}
+
+div.line-block {
+    margin: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+div.footer {
+    margin: 20px;
+    margin-top: 40px;
+}
+
+p {
+    margin: 20px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+dl {
+    margin: 20px;
+    margin-top: 35px;
+    margin-bottom: 15px;
+}
+
+table {
+    margin: 60px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border: none;
+}
+
+td {
+    border: none;
+}
+
+pre {
+    margin: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+h1 {
+    margin: 0px;
+    padding: 20px;
+    border-top: medium solid #700;
+    border-bottom: medium solid #300;
+    font-weight: lighter;
+    color: #fff;
+    background-color: #600;
+    text-shadow: #000 3px 3px 3px;
+}
+
+h2, h3 {
+    padding: 5px;
+    margin: 15px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    background-color: #eee;
+}
+
+a {
+    color: #00c;
+    text-decoration: none;
+}
+
+a:hover, a:active {
+    color: #66f;
+    text-decoration: none;
+}
+
+img {
+    border: 15px solid #fff;
+    padding: 0px;
+}
+
+
+</style>
+</head>
+<body>
+<div class="document" id="sord">
+<h1 class="title">SORD</h1>
+
+<a class="reference external image-reference" href="http://earth.usc.edu/~gely/ely-saf-surface.mov"><img align="right" alt="doc/ely-saf-surface.jpg" class="align-right" src="doc/ely-saf-surface.jpg" /></a>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#summary" id="id2">Summary</a></li>
+<li><a class="reference internal" href="#license" id="id3">License</a></li>
+<li><a class="reference internal" href="#author" id="id4">Author</a></li>
+<li><a class="reference internal" href="#publications" id="id5">Publications</a></li>
+<li><a class="reference internal" href="#installation-linux-or-mac-os-x" id="id6">Installation - Linux or Mac OS X</a></li>
+<li><a class="reference internal" href="#basic-usage" id="id7">Basic usage</a></li>
+<li><a class="reference internal" href="#development" id="id8">Development</a></li>
+</ul>
+</div>
+<div class="section" id="summary">
+<h3>Summary</h3>
+<p>The Support Operator Rupture Dynamics (SORD) code simulates spontaneous rupture
+within a 3D isotropic viscoelastic solid.  Wave motions are computed on a
+logically rectangular hexahedral mesh, using the generalized finite difference
+method of support operators.  Stiffness and viscous hourglass corrections are
+employed to suppress suppress zero-energy grid oscillation modes.  The fault
+surface is modeled by coupled double nodes, where the strength of the coupling
+is determined by a linear slip-weakening friction law.  External boundaries may
+be reflective or absorbing, where absorbing boundaries are handled using the
+method of perfectly matched layers (PML).  The hexahedral mesh can accommodate
+non-planar ruptures and surface topography</p>
+<p>SORD is a Python module that allows for flexible scripting of jobs.  Underlying
+computations are coded in Fortran 95 and parallelized for multi-processor
+execution using Message Passing Interface (MPI).  The code is portable and
+tested with a variety of Fortran 95 compilers, MPI implementations, operating
+systems (Linux, IBM AIX, Mac OS X, SUN Solaris).</p>
+</div>
+<div class="section" id="license">
+<h3>License</h3>
+<p>SORD is open-source and released under the <a class="reference external" href="license.txt">GNU General Public License Version 3</a>.  You are free to use or redistribute the code, with the
+obligation that you contribute back any modification or derived works.</p>
+</div>
+<div class="section" id="author">
+<h3>Author</h3>
+<div class="line-block">
+<div class="line"><a class="reference external" href="http://earth.usc.edu/~gely">Geoffrey Ely</a></div>
+<div class="line"><a class="reference external" href="http://www.usc.edu/dept/earth/">Department of Earth Sciences</a></div>
+<div class="line"><a class="reference external" href="http://www.usc.edu/">University of Southern California</a></div>
+<div class="line"><a class="reference external" href="http://earth.usc.edu/~gely/">http://earth.usc.edu/~gely/</a></div>
+<div class="line"><a class="reference external" href="mailto:gely&#37;&#52;&#48;usc&#46;edu">gely<span>&#64;</span>usc<span>&#46;</span>edu</a></div>
+</div>
+</div>
+<div class="section" id="publications">
+<h3>Publications</h3>
+<p>The first two papers give (for wave propagation and spontaneous rupture,
+respectively) the formulation, numerical algorithm, and verification of the
+SORD method. The third paper presents an application to simulating earthquakes
+in southern California.</p>
+<p class="ref">Ely, G. P., S. M. Day, and J.-B. Minster (2008),
+<em>A support-operator method for visco-elastic wave modeling in 3D heterogeneous media</em>,
+Geophys. J. Int., <a class="reference external" href="http://www.blackwell-synergy.com/doi/abs/10.1111/j.1365-246X.2007.03633.x">172(1), 331-344</a>,
+doi: 10.1111/j.1365-246X.2007.03633.x.
+<a class="reference external" href="http://earth.usc.edu/~gely/pub/ely-som-20080426.pdf">[PDF]</a></p>
+<p class="ref">Ely, G. P., S. M. Day, and J.-B. Minster (2009),
+<em>A support-operator method for 3D rupture dynamics</em>,
+Geophys. J. Int.,
+<a class="reference external" href="http://www3.interscience.wiley.com/journal/122267744/abstract">177(3), 1140-1150</a>,
+doi:10.1111/j.1365-246X.2009.04117.x.
+<a class="reference external" href="http://earth.usc.edu/~gely/pub/ely-sord-20090504.pdf">[PDF]</a></p>
+<p class="ref">Ely, G. P., S. M. Day, and J.-B. Minster (2010),
+<em>Dynamic rupture models for the southern San Andreas fault</em>,
+BSSA, 100(1).
+<a class="reference external" href="http://earth.usc.edu/~gely/pub/ely-saf-20090721.pdf">[PDF]</a>
+<a class="reference external" href="http://earth.usc.edu/~gely/ely-saf-esupp.html">[Electronic supplement]</a></p>
+</div>
+<div class="section" id="installation-linux-or-mac-os-x">
+<h3>Installation - Linux or Mac OS X</h3>
+<ol class="arabic">
+<li><p class="first">A Fortran 95 compiler is required.  GNU Fortran is a good option if you do
+not already have one.  To install on Fedora or Red Hat Linux:</p>
+<pre class="literal-block">
+yum install gfortran
+</pre>
+<p>For Mac OS X, first install <a class="reference external" href="http://developer.apple.com/technology/xcode.html">Xcode</a> available from Apple
+Developer Connection (free <a class="reference external" href="http://connect.apple.com">membership</a> required).
+Either the iPhone or the Mac-only version will work.  Then install the GNU
+Fortran version available from the <a class="reference external" href="http://r.research.att.com/tools">R for Mac OS X Developer's Page</a> (versions from MacPorts and Fink seem to be
+problematic and are not recommended).</p>
+</li>
+<li><p class="first">MPI is required if you wish to use multiple cores or processors to speed-up
+computations.  The <a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a>
+implementation is recommended if you do not already have one.  The script
+<a class="reference external" href="extras/install-mpich.sh">install-mpich.sh</a> in the <tt class="docutils literal"><span class="pre">extras/</span></tt> directory can
+automate this for you.</p>
+</li>
+<li><p class="first">Most systems already have <a class="reference external" href="http://www.python.org/download/">Python</a>, but
+it is recommended that you install an updated version.  The <a class="reference external" href="http://www.enthought.com/products/epddownload.php">Enthought Python
+Distribution</a> includes
+packages such as <a class="reference external" href="http://matplotlib.sourceforge.net/">matplotlib</a>, <a class="reference external" href="http://www.scipy.org/">SciPy</a>, and <a class="reference external" href="http://code.enthought.com/projects/mayavi">Mayavi</a>, that will allow you to run
+of the plotting examples included with SORD.</p>
+</li>
+<li><p class="first">Download and unpack the source code</p>
+<pre class="literal-block">
+curl http://earth.usc.edu/~gely/sord/sord.tgz | tar zxv
+</pre>
+</li>
+<li><p class="first">For laptop and workstation installations, the default system configuration
+is usually be adequate.  To test the default configuration:</p>
+<pre class="literal-block">
+cd sord/
+./configure.py
+</pre>
+<p>Systems with batch schedulers (such as PBS or LoadLeveler) generally require
+custom configuration to specify system resources, compiler options, and
+scheduler scripts.  If SORD has already been configured for your system you can
+use one of the included configurations.  For example, for the TeraGrid Ranger
+system at TACC:</p>
+<pre class="literal-block">
+./configure.py tacc-ranger
+</pre>
+<p>To see the list of included configurations look in the <tt class="docutils literal"><span class="pre">conf/</span></tt> directory.
+Each custom configuration is located in a separate sub-directory.  To create a
+new custom configuration, make a new sub-directory following the example of
+the supplied configurations.</p>
+</li>
+<li><p class="first">Compile the code by running:</p>
+<pre class="literal-block">
+./setup.py
+</pre>
+</li>
+<li><p class="first">To enable Python to find the <tt class="docutils literal"><span class="pre">sord</span></tt> module, add the enclosing directory
+the Python path.  For example, if your installation location is
+<tt class="docutils literal"><span class="pre">~/packages/sord</span></tt>, in Bash shell do:</p>
+<pre class="literal-block">
+export PYTHONPATH=~/packages
+</pre>
+<p>Alternatively, if you are the administrator of your Python installation, you
+can do:</p>
+<pre class="literal-block">
+./setup.py path
+</pre>
+</li>
+</ol>
+</div>
+<div class="section" id="basic-usage">
+<h3>Basic usage</h3>
+<p>SORD is controlled by setting parameters in a Python script and passing the
+parameters in a dictionary to the <tt class="docutils literal"><span class="pre">sord</span></tt> module.  The
+file <a class="reference external" href="parameters.py">parameters.py</a> contains a short description of each
+SORD input parameter and it's default value.  Annotated example scripts are
+located in the <tt class="docutils literal"><span class="pre">scripts/</span></tt> directory.  To run the layer over halfspace
+example (LOH.1), do:</p>
+<pre class="literal-block">
+cd scripts/tpv3/
+./sim.py
+</pre>
+<p>Each time <tt class="docutils literal"><span class="pre">sord.run()</span></tt> is called, a run directory is created at the location
+set by the <tt class="docutils literal"><span class="pre">rundir</span></tt> parameter, which defaults to <tt class="docutils literal"><span class="pre">~/run/</span></tt> plus the script
+file name (<tt class="docutils literal"><span class="pre">run/tpv3</span></tt> in this case).  The directory contains the executable
+and scripts to run the code, and will contain all of the generated output and
+metadata.  From the run directory start the job interactively with the
+<tt class="docutils literal"><span class="pre">run.sh</span></tt> script:</p>
+<pre class="literal-block">
+cd ~/run/tpv3/
+./run.sh
+</pre>
+<p>Or, submit the job to the batch system with the <tt class="docutils literal"><span class="pre">queue.sh</span></tt> script</p>
+<pre class="literal-block">
+cd ~/run/tpv3/
+./queue.sh
+</pre>
+<p>Output (and large input, such as the material model) is stored in flat binary
+binary files.  Statistic, such as peak acceleration and peak velocity, are
+computed periodically during each run and stored in the <tt class="docutils literal"><span class="pre">stats/</span></tt> directory.
+Internal code timings, for benchmarking performance, are collected and saved to
+the <tt class="docutils literal"><span class="pre">prof/</span></tt> directory.  Inspecting these files during a run is a good way to
+check that it is proceeding correctly.  The binary files can be examined with
+the UNIX command <tt class="docutils literal"><span class="pre">od</span> <span class="pre">-f</span></tt>.</p>
+<p>The best place to go from here to learn more is to look at the example scripts
+and <a class="reference external" href="parameters.py">parameters.py</a>.  Studying the Fortran source code in
+the <tt class="docutils literal"><span class="pre">src/</span></tt> directory will be educational as well.  As much as possible, I
+have tried to keep it clean and readable.</p>
+</div>
+<div class="section" id="development">
+<h3>Development</h3>
+<p>Suggestions for improvements, and contributions to the SORD code and
+documentation are greatly appreciated.  We use <a class="reference external" href="http://bazaar-vcs.org/">Bazaar</a> for version control.  The simplest way to install
+Bazaar is to use Python <a class="reference external" href="http://pypi.python.org/pypi/setuptools">Easy Install</a>:</p>
+<pre class="literal-block">
+easy_install bzr
+</pre>
+<p>To retrieve the latest version of SORD</p>
+<pre class="literal-block">
+bzr get http://earth.usc.edu/~gely/sord
+</pre>
+<p>See code changes since the last commit</p>
+<pre class="literal-block">
+bzr diff
+</pre>
+<p>Undo changes</p>
+<pre class="literal-block">
+bzr revert
+</pre>
+<p>Commit changes</p>
+<pre class="literal-block">
+bzr commit -m &quot;Great new feature&quot;
+</pre>
+<p>Create a patch</p>
+<pre class="literal-block">
+bzr send -o great-new-feature.patch
+</pre>
+<p>Email your patch to <a class="reference external" href="mailto:gely&#37;&#52;&#48;usc&#46;edu">gely<span>&#64;</span>usc<span>&#46;</span>edu</a> and receive lots of good karma!  See the
+<a class="reference external" href="http://doc.bazaar-vcs.org/latest/en/tutorials/index.html">Bazaar tutorials</a>
+for more.</p>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+Generated on: 2009-10-30.
+Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
+
+</div>
+</body>
+</html>
