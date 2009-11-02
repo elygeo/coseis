@@ -193,7 +193,7 @@ determine the number of time steps::
 The ``T`` variable is not a valid SORD parameter; it is only sued for temporary
 storage.  Variables with single single character names or names ending with an
 underscore, are ignored by ``sord.run()``, so may be safely used for temporary
-storage.  More elaborate example scripts can be found in the `<scripts>`__
+storage.  More elaborate example scripts can be found in the ``scripts``
 directory.
 
 

@@ -10,12 +10,13 @@ fieldio = [                               # field variable input and output
     ( '=',  'vp',  [], 6000.0 ),          # material P-wave velocity
     ( '=',  'vs',  [], 3464.0 ),          # material S-wave velocity
     ( '=',  'gam', [], 0.3    ),          # material viscosity
-    ( '=w', 'v1',  [0,0,31,-1], 'vx' ),   # write X velocity output
-    ( '=w', 'v2',  [0,0,31,-1], 'vy' ),   # write Y velocity output
+    ( '=w', 'v1',  [0,0,31,-1], 'vx' ),   # write X velocity slice output
+    ( '=w', 'v2',  [0,0,31,-1], 'vy' ),   # write Y velocity slice output
 ]                                 
+ihypo = 31.0, 31.0, 31.0                  # source location
 source = 'potency'                        # source type
 source1 = 1e6, 1e6, 1e6                   # source normal components
 source2 = 0.0, 0.0, 0.0                   # source shear components
 timefunction = 'brune'                    # source time function
 period = 6 * dt                           # source dominant period
-sord.run( locals() )                      # launch SORD
+sord.run( locals() )                      # launch SORD job
