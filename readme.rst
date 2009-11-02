@@ -10,7 +10,7 @@ SORD
 
 
 Summary
--------
+=======
 
 The Support Operator Rupture Dynamics (SORD) code simulates spontaneous rupture
 within a 3D isotropic viscoelastic solid.  Wave motions are computed on a
@@ -23,11 +23,11 @@ be reflective or absorbing, where absorbing boundaries are handled using the
 method of perfectly matched layers (PML).  The hexahedral mesh can accommodate
 non-planar ruptures and surface topography
 
-SORD is a Python module that allows for flexible scripting of jobs.  Underlying
-computations are coded in Fortran 95 and parallelized for multi-processor
-execution using Message Passing Interface (MPI).  The code is portable and
-tested with a variety of Fortran 95 compilers, MPI implementations, operating
-systems (Linux, IBM AIX, Mac OS X, SUN Solaris).
+SORD simulations are configured with Python scripts.  Underlying computations
+are coded in Fortran 95 and parallelized for multi-processor execution using
+Message Passing Interface (MPI).  The code is portable and tested with a
+variety of Fortran 95 compilers, MPI implementations, and operating systems
+(Linux, Mac OS X, IBM AIX, SUN Solaris).
 
 
 License
@@ -49,7 +49,7 @@ Author
 
 
 Publications
-------------
+============
 
 The first two papers give (for wave propagation and spontaneous rupture,
 respectively) the formulation, numerical algorithm, and verification of the
@@ -84,20 +84,19 @@ BSSA, 100(1).
 
 
 Installation - Linux or Mac OS X
---------------------------------
+================================
 
 1.  A Fortran 95 compiler is required.  GNU Fortran is a good option if you do
     not already have one.  To install on Fedora or Red Hat Linux::
 
         yum install gfortran
 
-    For Mac OS X, first install `Xcode
+    For Mac OS X, first install either the iPhone or the Mac-only version of `Xcode
     <http://developer.apple.com/technology/xcode.html>`_ available from Apple
     Developer Connection (free `membership <http://connect.apple.com>`__ required).
-    Either the iPhone or the Mac-only version will work.  Then install the GNU
-    Fortran version available from the `R for Mac OS X Developer's Page
-    <http://r.research.att.com/tools>`_ (versions from MacPorts and Fink seem to be
-    problematic and are not recommended).
+    Then install the GNU Fortran version available from the `R for Mac OS X
+    Developer's Page <http://r.research.att.com/tools>`_ (versions from MacPorts
+    and Fink seem to be problematic and are not recommended).
 
 2.  MPI is required if you wish to use multiple cores or processors to speed-up
     computations.  The `MPICH2 <http://www.mcs.anl.gov/research/projects/mpich2/>`_
@@ -154,56 +153,240 @@ Installation - Linux or Mac OS X
         ./setup.py path
 
 
-Basic usage
------------
+User Guide
+==========
 
-SORD is controlled by setting parameters in a Python script and passing the
-parameters in a dictionary to the ``sord`` module.  The
-file `parameters.py <parameters.py>`__ contains a short description of each
-SORD input parameter and it's default value.  Annotated example scripts are
-located in the ``scripts/`` directory.  To run the layer over halfspace
-example (LOH.1), do::
 
-    cd scripts/tpv3/
-    ./sim.py
+Quick test
+----------
+
+Run a simple point source explosion test and plot a snapshot of particle
+velocity (plotting requires that Matplotlib is installed)::
+
+    cd scripts/example
+    ./sim.py -i
+    ./plot.py
+
+.. image:: doc/example.png
+
+
+Scripting with Python
+---------------------
+
+For a simple example consider the explosion test, `<scripts/example/sim.py>`__:
+
+.. include:: scripts/example/sim.py
+   :literal:
+
+Every script starts by importing the ``sord`` module.  SORD parameters are
+specified as local variables that are passed to the ``sord.run()`` function by
+the ``locals()`` built-in Python function.  A complete list of possible SORD
+parameters and default values are specified in `<parameters.py>`__.
+
+Python scripting enables great flexibilty for assigning parameters. 
+provides great flexibility.  For example, it may be desirable to specify the
+total run time, and use that to determine the number of time steps::
+
+    T = 100.0            # total time temporary variable
+    nt = int( T / dt )   # number of time steps
+
+The ``T`` variable is not a valid SORD parameter; it is only sued for temporary
+storage.  Variables with single single character names or names ending with an
+underscore, are ignored by SORD, so may be safely used for temporary storage.
+
+
+Running jobs
+------------
 
 Each time ``sord.run()`` is called, a run directory is created at the location
-set by the ``rundir`` parameter, which defaults to ``~/run/`` plus the script
-file name (``run/tpv3`` in this case).  The directory contains the executable
-and scripts to run the code, and will contain all of the generated output and
-metadata.  From the run directory start the job interactively with the
-``run.sh`` script::
+set by the ``rundir`` parameter (``tmp/`` in this case).  The directory
+contains the executable and scripts to run the code, and will contain all of
+the generated output and metadata.  From the run directory, start the job
+interactively with the ``run.sh`` script::
 
-    cd ~/run/tpv3/
-    ./run.sh
+    tmp/run.sh
 
 Or, submit the job to the batch system with the ``queue.sh`` script
 ::
 
-    cd ~/run/tpv3/
-    ./queue.sh
+    tmp/queue.sh
+
 
 Output (and large input, such as the material model) is stored in flat binary
 binary files.  Statistic, such as peak acceleration and peak velocity, are
 computed periodically during each run and stored in the ``stats/`` directory.
-Internal code timings, for benchmarking performance, are collected and saved to
-the ``prof/`` directory.  Inspecting these files during a run is a good way to
-check that it is proceeding correctly.  The binary files can be examined with
-the UNIX command ``od -f``.
 
-The best place to go from here to learn more is to look at the example scripts
-and `parameters.py <parameters.py>`__.  Studying the Fortran source code in
-the ``src/`` directory will be educational as well.  As much as possible, I
-have tried to keep it clean and readable.
+
+Boundary Conditions
+-------------------
+
+Boundary conditions for the six faces of the model domain are specified by the
+parameters ``bc1`` (near-size, x, y, and z faces) and ``bc2`` (far-side, x, y,
+and x faces).  The symmetry boundary conditions can be use to reduce
+computations for problems where they are applicable.  These are not used for
+specifying internal slip boundaries. However, for problems with symmetry across
+a slip surface, the fault may be placed at the boundary and combined with an
+anti-mirror symmetry condition.  The following BC types are supported:
+
+**Type 0:** vacuum free-surface.  Stress is zero in cells outside the boundary.
+
+.. image:: doc/bc0.png
+
+**Type 3:** rigid surface. Displacement is zero at the boundary.
+
+.. image:: doc/bc3.png
+
+**Type 1:** mirror symmetry at the node.  Normal displacement is zero at the
+boundary.  Useful for a boundary corresponding to the plane orthogonal to the
+two nodal planes for double-couple point sources, or the plane normal to the
+mode-III axis for symmetric ruptures.
+
+.. image:: doc/bc1.png
+
+**Type 2:** mirror symmetry at the cell. Same as type 1, but centered on the cell.
+
+.. image:: doc/bc2.png
+
+**Type -1:** anti-mirror symmetry at the node.  Tangential displacement is zero
+at the boundary.  Useful for a boundary corresponding to the nodal planes of
+double-couple point sources, or the plane the plane normal to the mode-II axis
+for symmetric ruptures.
+
+.. image:: doc/bc-1.png
+
+**Type -2:** anti-mirror symmetry at the cell.  Same as type -1, but centered
+on the cell.  Can additionally be used when the boundary corresponds to the
+slip surface for symmetric ruptures.
+
+.. image:: doc/bc-2.png
+
+**Type 10:** perfectly match layer (PML) absorbing boundary
+
+Example: a problem with a free surface at Z=0, and PML aborbing boundaries on
+all other boundary faces::
+
+    bc1 = 10, 10, 0
+    bc2 = 10, 10, 10
+
+
+Defining the fault rupture surface
+----------------------------------
+
+Fault rupture always follows a surface of the (possibly non-planar) logical
+mesh.  The orientation of the fault plane is defined by the ``faultnormal``
+parameter.  This can be either 1, 2, or 3 corresponding to surfaces normal to
+the j, k, or l logical mesh directions. Any other value (typically 0) disables
+rupture altogether. The location of the rupture plane with in the mesh is
+determined by the ``ihypo`` parameter, which has a dual purpose of also
+defining the nucleation point. So, the indices of the collocated fault double
+nodes are given by ``int(ihypo(faultnormal))``, and ``int(ihypo(faultnormal)) +
+1``. For example, a 3D problem of dimensions 200.0 x 200.0 x 200.0, with a
+fault plane located at z = 100.0, and double nodes at l = (21, 22), may be set
+up as such::
+
+    dx = 5.0
+    faultnormal = 3
+    ihypo = 21, 21, 21.5
+    nn  = 41, 41, 42
+    bc1 = 0, 0, 0
+    bc2 = 0, 0, 0
+
+For problems with symmetry across the rupture surface (where mesh and material
+properties are mirror images), the symmetry may be exploited for computational
+savings by using an appropriate boundary condition and solving the elastic
+equations for only one side of the fault.  In this case, the fault double nodes
+must lie at the model boundary, and the and the cell-centered anti-mirror
+symmetry condition used.  For example, reducing the size of the previous
+example to put the rupture surface along the far z boundary::
+
+    nn = 41, 41, 22
+    bc2 = 0, 0, -2
+
+Alternatively, put the rupture surface along the near z boundary::
+
+    ihypo = 21, 21, 1.5
+    nn = 41, 41, 22
+    bc1 = 0, 0, -2
+    bc2 = 0, 0, 0
+
+Further symmetries may present. If our previous problem has slip only in the
+x direction, then we may also use node-centered mirror symmetry along the in-plane 
+axis, and node-centered anti-mirror symmetry along the anti-plane axis, to reduce
+computations eight-fold::
+
+    ihypo = 21, 21, 21.5
+    nn = 21, 21, 22
+    bc1 = 0, 0, 0
+    bc2 = -1, 1, -2
 
 
 Development
------------
+===========
 
 Suggestions for improvements, and contributions to the SORD code and
-documentation are greatly appreciated.  We use `Bazaar
-<http://bazaar-vcs.org/>`_ for version control.  The simplest way to install
-Bazaar is to use Python `Easy Install
+documentation are greatly appreciated.
+
+
+Debugging
+---------
+
+The ``debug`` input parameter is useful for finding problems, and can take the
+following values:
+
+    **0**: Debugging off.
+
+    **1**: Verbose status output.
+
+    **2**: Synchronize multiple processors. This is useful for tracking down MPI
+    related bugs.
+
+    **3**: Dump field variable output in text files at every step. Only do this for
+    small tests or you will fill up your disk!
+
+Additionally, SORD can be compiled and run under a debugger using the ``-g`` or
+``--debugging`` option.
+
+
+Profiling
+---------
+
+Internal code timings, for benchmarking performance, are collected and saved to
+the ``prof/`` directory.  The file format is flat binary that can be examined
+with the UNIX command ``od -f``.  Eight categories are timed for every time
+iteration step, and save in the following files:
+
+    **1time**: Time integration subroutine.
+
+    **2stress**: Stress subroutine.
+
+    **3accel**: Acceleration subroutine, including multiprocessor halo swapping
+    communications.
+
+    **4stats**: Statistics subroutine, including multiprocessor min/max reductions.
+
+    **5ckpt**: Checkpoint subroutine.
+
+    **6mp**: Aggregate of all multiprocessor operations, including halo swap,
+    global reductions, and parallel I/O.
+
+    **7io**: Aggregate of all input and output operations, including checkpointing
+    and field I/O.
+
+    **8step**: Total for complete time iteration.
+
+Profiling can be very difficult to interpret for multiprocessor runs.  Timing
+is only saved for the master processor.  It can be helpful to synchronize the
+processors using ``debug = 2`` to give more accurate relative timing values.
+
+Additionally, SORD can be run with compiler generated code profiling using the
+``-p`` or ``--profiling`` option.
+
+
+Source control
+--------------
+
+We use `Bazaar <http://bazaar-vcs.org/>`_ for version control.  The simplest
+way to install Bazaar is to use Python `Easy Install
 <http://pypi.python.org/pypi/setuptools>`_::
 
     easy_install bzr
@@ -233,7 +416,7 @@ Create a patch
 
     bzr send -o great-new-feature.patch
 
-Email your patch to gely@usc.edu and receive lots of good karma!  See the
+See the
 `Bazaar tutorials <http://doc.bazaar-vcs.org/latest/en/tutorials/index.html>`__
 for more.
 

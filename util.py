@@ -106,8 +106,10 @@ def loadmeta( path='.' ):
                         meta['xi'][filename] = f[3]
             meta['shape'] = {}
             for k in meta['indices']:
-                nn = [ ( i[1] - i[0] ) / i[2] + 1 for i in meta['indices'][k] ]
+                nn = [ (i[1] - i[0]) / i[2] + 1 for i in meta['indices'][k] ]
                 nn = [ n for n in nn if n > 1 ]
+                if nn == []:
+                    nn = [1]
                 meta['shape'][k] = nn
         path = os.path.join( path, 'meta.py' )
         expand = 'shape', 'xi', 'indices', 'fieldio'

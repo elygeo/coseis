@@ -94,12 +94,6 @@ def docs():
     html = re.sub( '<col.*>\n', '', html )
     html = re.sub( '</colgroup>', '', html )
     open( 'index.html', 'w' ).write( html )
-    rst = open( 'doc/notes.rst' ).read()
-    html = publish_string( rst, writer_name='html4css1',
-        settings_overrides=settings )
-    html = re.sub( '<col.*>\n', '', html )
-    html = re.sub( '</colgroup>', '', html )
-    open( 'doc/notes.html', 'w' ).write( html )
     return
 
 def rspec():

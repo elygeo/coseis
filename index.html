@@ -69,7 +69,7 @@ h1 {
     text-shadow: #000 3px 3px 3px;
 }
 
-h2, h3 {
+h2, h3, h4 {
     padding: 5px;
     margin: 15px;
     margin-top: 20px;
@@ -103,13 +103,27 @@ img {
 <div class="contents topic" id="contents">
 <p class="topic-title first">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#summary" id="id2">Summary</a></li>
+<li><a class="reference internal" href="#summary" id="id2">Summary</a><ul>
 <li><a class="reference internal" href="#license" id="id3">License</a></li>
 <li><a class="reference internal" href="#author" id="id4">Author</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#publications" id="id5">Publications</a></li>
 <li><a class="reference internal" href="#installation-linux-or-mac-os-x" id="id6">Installation - Linux or Mac OS X</a></li>
-<li><a class="reference internal" href="#basic-usage" id="id7">Basic usage</a></li>
-<li><a class="reference internal" href="#development" id="id8">Development</a></li>
+<li><a class="reference internal" href="#user-guide" id="id7">User Guide</a><ul>
+<li><a class="reference internal" href="#quick-test" id="id8">Quick test</a></li>
+<li><a class="reference internal" href="#scripting-with-python" id="id9">Scripting with Python</a></li>
+<li><a class="reference internal" href="#running-jobs" id="id10">Running jobs</a></li>
+<li><a class="reference internal" href="#boundary-conditions" id="id11">Boundary Conditions</a></li>
+<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id12">Defining the fault rupture surface</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#development" id="id13">Development</a><ul>
+<li><a class="reference internal" href="#debugging" id="id14">Debugging</a></li>
+<li><a class="reference internal" href="#profiling" id="id15">Profiling</a></li>
+<li><a class="reference internal" href="#source-control" id="id16">Source control</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="section" id="summary">
@@ -124,25 +138,25 @@ is determined by a linear slip-weakening friction law.  External boundaries may
 be reflective or absorbing, where absorbing boundaries are handled using the
 method of perfectly matched layers (PML).  The hexahedral mesh can accommodate
 non-planar ruptures and surface topography</p>
-<p>SORD is a Python module that allows for flexible scripting of jobs.  Underlying
-computations are coded in Fortran 95 and parallelized for multi-processor
-execution using Message Passing Interface (MPI).  The code is portable and
-tested with a variety of Fortran 95 compilers, MPI implementations, operating
-systems (Linux, IBM AIX, Mac OS X, SUN Solaris).</p>
-</div>
+<p>SORD simulations are configured with Python scripts.  Underlying computations
+are coded in Fortran 95 and parallelized for multi-processor execution using
+Message Passing Interface (MPI).  The code is portable and tested with a
+variety of Fortran 95 compilers, MPI implementations, and operating systems
+(Linux, Mac OS X, IBM AIX, SUN Solaris).</p>
 <div class="section" id="license">
-<h3>License</h3>
+<h4>License</h4>
 <p>SORD is open-source and released under the <a class="reference external" href="license.txt">GNU General Public License Version 3</a>.  You are free to use or redistribute the code, with the
 obligation that you contribute back any modification or derived works.</p>
 </div>
 <div class="section" id="author">
-<h3>Author</h3>
+<h4>Author</h4>
 <div class="line-block">
 <div class="line"><a class="reference external" href="http://earth.usc.edu/~gely">Geoffrey Ely</a></div>
 <div class="line"><a class="reference external" href="http://www.usc.edu/dept/earth/">Department of Earth Sciences</a></div>
 <div class="line"><a class="reference external" href="http://www.usc.edu/">University of Southern California</a></div>
 <div class="line"><a class="reference external" href="http://earth.usc.edu/~gely/">http://earth.usc.edu/~gely/</a></div>
 <div class="line"><a class="reference external" href="mailto:gely&#37;&#52;&#48;usc&#46;edu">gely<span>&#64;</span>usc<span>&#46;</span>edu</a></div>
+</div>
 </div>
 </div>
 <div class="section" id="publications">
@@ -176,11 +190,11 @@ not already have one.  To install on Fedora or Red Hat Linux:</p>
 <pre class="literal-block">
 yum install gfortran
 </pre>
-<p>For Mac OS X, first install <a class="reference external" href="http://developer.apple.com/technology/xcode.html">Xcode</a> available from Apple
+<p>For Mac OS X, first install either the iPhone or the Mac-only version of <a class="reference external" href="http://developer.apple.com/technology/xcode.html">Xcode</a> available from Apple
 Developer Connection (free <a class="reference external" href="http://connect.apple.com">membership</a> required).
-Either the iPhone or the Mac-only version will work.  Then install the GNU
-Fortran version available from the <a class="reference external" href="http://r.research.att.com/tools">R for Mac OS X Developer's Page</a> (versions from MacPorts and Fink seem to be
-problematic and are not recommended).</p>
+Then install the GNU Fortran version available from the <a class="reference external" href="http://r.research.att.com/tools">R for Mac OS X
+Developer's Page</a> (versions from MacPorts
+and Fink seem to be problematic and are not recommended).</p>
 </li>
 <li><p class="first">MPI is required if you wish to use multiple cores or processors to speed-up
 computations.  The <a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a>
@@ -237,50 +251,215 @@ can do:</p>
 </li>
 </ol>
 </div>
-<div class="section" id="basic-usage">
-<h3>Basic usage</h3>
-<p>SORD is controlled by setting parameters in a Python script and passing the
-parameters in a dictionary to the <tt class="docutils literal"><span class="pre">sord</span></tt> module.  The
-file <a class="reference external" href="parameters.py">parameters.py</a> contains a short description of each
-SORD input parameter and it's default value.  Annotated example scripts are
-located in the <tt class="docutils literal"><span class="pre">scripts/</span></tt> directory.  To run the layer over halfspace
-example (LOH.1), do:</p>
+<div class="section" id="user-guide">
+<h3>User Guide</h3>
+<div class="section" id="quick-test">
+<h4>Quick test</h4>
+<p>Run a simple point source explosion test and plot a snapshot of particle
+velocity (plotting requires that Matplotlib is installed):</p>
 <pre class="literal-block">
-cd scripts/tpv3/
-./sim.py
+cd scripts/example
+./sim.py -i
+./plot.py
 </pre>
-<p>Each time <tt class="docutils literal"><span class="pre">sord.run()</span></tt> is called, a run directory is created at the location
-set by the <tt class="docutils literal"><span class="pre">rundir</span></tt> parameter, which defaults to <tt class="docutils literal"><span class="pre">~/run/</span></tt> plus the script
-file name (<tt class="docutils literal"><span class="pre">run/tpv3</span></tt> in this case).  The directory contains the executable
-and scripts to run the code, and will contain all of the generated output and
-metadata.  From the run directory start the job interactively with the
-<tt class="docutils literal"><span class="pre">run.sh</span></tt> script:</p>
+<img alt="doc/example.png" src="doc/example.png" />
+</div>
+<div class="section" id="scripting-with-python">
+<h4>Scripting with Python</h4>
+<p>For a simple example consider the explosion test, <a class="reference external" href="scripts/example/sim.py">scripts/example/sim.py</a>:</p>
 <pre class="literal-block">
-cd ~/run/tpv3/
-./run.sh
+#!/usr/bin/env python
+import sord                               # import the sord module
+rundir = 'tmp'                            # directory location for output
+dx = 100.0, 100.0, 100.0                  # spatial step length in x, y, and z
+dt = 0.0075                               # time step length
+nn = 61, 61, 61                           # number of mesh nodes in x, y, and z
+nt = 60                                   # number of time steps
+fieldio = [                               # field variable input and output
+    ( '=',  'rho', [], 2670.0 ),          # material density
+    ( '=',  'vp',  [], 6000.0 ),          # material P-wave velocity
+    ( '=',  'vs',  [], 3464.0 ),          # material S-wave velocity
+    ( '=',  'gam', [], 0.3    ),          # material viscosity
+    ( '=w', 'v1',  [0,0,31,-1], 'vx' ),   # write X velocity output
+    ( '=w', 'v2',  [0,0,31,-1], 'vy' ),   # write Y velocity output
+]                                 
+source = 'potency'                        # source type
+source1 = 1e6, 1e6, 1e6                   # source normal components
+source2 = 0.0, 0.0, 0.0                   # source shear components
+timefunction = 'brune'                    # source time function
+period = 6 * dt                           # source dominant period
+sord.run( locals() )                      # launch SORD
+
+</pre>
+<p>Every script starts by importing the <tt class="docutils literal"><span class="pre">sord</span></tt> module.  SORD parameters are
+specified as local variables that are passed to the <tt class="docutils literal"><span class="pre">sord.run()</span></tt> function by
+the <tt class="docutils literal"><span class="pre">locals()</span></tt> built-in Python function.  A complete list of possible SORD
+parameters and default values are specified in <a class="reference external" href="parameters.py">parameters.py</a>.</p>
+<p>Python scripting enables great flexibilty for assigning parameters.
+provides great flexibility.  For example, it may be desirable to specify the
+total run time, and use that to determine the number of time steps:</p>
+<pre class="literal-block">
+T = 100.0            # total time temporary variable
+nt = int( T / dt )   # number of time steps
+</pre>
+<p>The <tt class="docutils literal"><span class="pre">T</span></tt> variable is not a valid SORD parameter; it is only sued for temporary
+storage.  Variables with single single character names or names ending with an
+underscore, are ignored by SORD, so may be safely used for temporary storage.</p>
+</div>
+<div class="section" id="running-jobs">
+<h4>Running jobs</h4>
+<p>Each time <tt class="docutils literal"><span class="pre">sord.run()</span></tt> is called, a run directory is created at the location
+set by the <tt class="docutils literal"><span class="pre">rundir</span></tt> parameter (<tt class="docutils literal"><span class="pre">tmp/</span></tt> in this case).  The directory
+contains the executable and scripts to run the code, and will contain all of
+the generated output and metadata.  From the run directory, start the job
+interactively with the <tt class="docutils literal"><span class="pre">run.sh</span></tt> script:</p>
+<pre class="literal-block">
+tmp/run.sh
 </pre>
 <p>Or, submit the job to the batch system with the <tt class="docutils literal"><span class="pre">queue.sh</span></tt> script</p>
 <pre class="literal-block">
-cd ~/run/tpv3/
-./queue.sh
+tmp/queue.sh
 </pre>
 <p>Output (and large input, such as the material model) is stored in flat binary
 binary files.  Statistic, such as peak acceleration and peak velocity, are
-computed periodically during each run and stored in the <tt class="docutils literal"><span class="pre">stats/</span></tt> directory.
-Internal code timings, for benchmarking performance, are collected and saved to
-the <tt class="docutils literal"><span class="pre">prof/</span></tt> directory.  Inspecting these files during a run is a good way to
-check that it is proceeding correctly.  The binary files can be examined with
-the UNIX command <tt class="docutils literal"><span class="pre">od</span> <span class="pre">-f</span></tt>.</p>
-<p>The best place to go from here to learn more is to look at the example scripts
-and <a class="reference external" href="parameters.py">parameters.py</a>.  Studying the Fortran source code in
-the <tt class="docutils literal"><span class="pre">src/</span></tt> directory will be educational as well.  As much as possible, I
-have tried to keep it clean and readable.</p>
+computed periodically during each run and stored in the <tt class="docutils literal"><span class="pre">stats/</span></tt> directory.</p>
+</div>
+<div class="section" id="boundary-conditions">
+<h4>Boundary Conditions</h4>
+<p>Boundary conditions for the six faces of the model domain are specified by the
+parameters <tt class="docutils literal"><span class="pre">bc1</span></tt> (near-size, x, y, and z faces) and <tt class="docutils literal"><span class="pre">bc2</span></tt> (far-side, x, y,
+and x faces).  The symmetry boundary conditions can be use to reduce
+computations for problems where they are applicable.  These are not used for
+specifying internal slip boundaries. However, for problems with symmetry across
+a slip surface, the fault may be placed at the boundary and combined with an
+anti-mirror symmetry condition.  The following BC types are supported:</p>
+<p><strong>Type 0:</strong> vacuum free-surface.  Stress is zero in cells outside the boundary.</p>
+<img alt="doc/bc0.png" src="doc/bc0.png" />
+<p><strong>Type 3:</strong> rigid surface. Displacement is zero at the boundary.</p>
+<img alt="doc/bc3.png" src="doc/bc3.png" />
+<p><strong>Type 1:</strong> mirror symmetry at the node.  Normal displacement is zero at the
+boundary.  Useful for a boundary corresponding to the plane orthogonal to the
+two nodal planes for double-couple point sources, or the plane normal to the
+mode-III axis for symmetric ruptures.</p>
+<img alt="doc/bc1.png" src="doc/bc1.png" />
+<p><strong>Type 2:</strong> mirror symmetry at the cell. Same as type 1, but centered on the cell.</p>
+<img alt="doc/bc2.png" src="doc/bc2.png" />
+<p><strong>Type -1:</strong> anti-mirror symmetry at the node.  Tangential displacement is zero
+at the boundary.  Useful for a boundary corresponding to the nodal planes of
+double-couple point sources, or the plane the plane normal to the mode-II axis
+for symmetric ruptures.</p>
+<img alt="doc/bc-1.png" src="doc/bc-1.png" />
+<p><strong>Type -2:</strong> anti-mirror symmetry at the cell.  Same as type -1, but centered
+on the cell.  Can additionally be used when the boundary corresponds to the
+slip surface for symmetric ruptures.</p>
+<img alt="doc/bc-2.png" src="doc/bc-2.png" />
+<p><strong>Type 10:</strong> perfectly match layer (PML) absorbing boundary</p>
+<p>Example: a problem with a free surface at Z=0, and PML aborbing boundaries on
+all other boundary faces:</p>
+<pre class="literal-block">
+bc1 = 10, 10, 0
+bc2 = 10, 10, 10
+</pre>
+</div>
+<div class="section" id="defining-the-fault-rupture-surface">
+<h4>Defining the fault rupture surface</h4>
+<p>Fault rupture always follows a surface of the (possibly non-planar) logical
+mesh.  The orientation of the fault plane is defined by the <tt class="docutils literal"><span class="pre">faultnormal</span></tt>
+parameter.  This can be either 1, 2, or 3 corresponding to surfaces normal to
+the j, k, or l logical mesh directions. Any other value (typically 0) disables
+rupture altogether. The location of the rupture plane with in the mesh is
+determined by the <tt class="docutils literal"><span class="pre">ihypo</span></tt> parameter, which has a dual purpose of also
+defining the nucleation point. So, the indices of the collocated fault double
+nodes are given by <tt class="docutils literal"><span class="pre">int(ihypo(faultnormal))</span></tt>, and <tt class="docutils literal"><span class="pre">int(ihypo(faultnormal))</span> <span class="pre">+</span>
+<span class="pre">1</span></tt>. For example, a 3D problem of dimensions 200.0 x 200.0 x 200.0, with a
+fault plane located at z = 100.0, and double nodes at l = (21, 22), may be set
+up as such:</p>
+<pre class="literal-block">
+dx = 5.0
+faultnormal = 3
+ihypo = 21, 21, 21.5
+nn  = 41, 41, 42
+bc1 = 0, 0, 0
+bc2 = 0, 0, 0
+</pre>
+<p>For problems with symmetry across the rupture surface (where mesh and material
+properties are mirror images), the symmetry may be exploited for computational
+savings by using an appropriate boundary condition and solving the elastic
+equations for only one side of the fault.  In this case, the fault double nodes
+must lie at the model boundary, and the and the cell-centered anti-mirror
+symmetry condition used.  For example, reducing the size of the previous
+example to put the rupture surface along the far z boundary:</p>
+<pre class="literal-block">
+nn = 41, 41, 22
+bc2 = 0, 0, -2
+</pre>
+<p>Alternatively, put the rupture surface along the near z boundary:</p>
+<pre class="literal-block">
+ihypo = 21, 21, 1.5
+nn = 41, 41, 22
+bc1 = 0, 0, -2
+bc2 = 0, 0, 0
+</pre>
+<p>Further symmetries may present. If our previous problem has slip only in the
+x direction, then we may also use node-centered mirror symmetry along the in-plane
+axis, and node-centered anti-mirror symmetry along the anti-plane axis, to reduce
+computations eight-fold:</p>
+<pre class="literal-block">
+ihypo = 21, 21, 21.5
+nn = 21, 21, 22
+bc1 = 0, 0, 0
+bc2 = -1, 1, -2
+</pre>
+</div>
 </div>
 <div class="section" id="development">
 <h3>Development</h3>
 <p>Suggestions for improvements, and contributions to the SORD code and
-documentation are greatly appreciated.  We use <a class="reference external" href="http://bazaar-vcs.org/">Bazaar</a> for version control.  The simplest way to install
-Bazaar is to use Python <a class="reference external" href="http://pypi.python.org/pypi/setuptools">Easy Install</a>:</p>
+documentation are greatly appreciated.</p>
+<div class="section" id="debugging">
+<h4>Debugging</h4>
+<p>The <tt class="docutils literal"><span class="pre">debug</span></tt> input parameter is useful for finding problems, and can take the
+following values:</p>
+<blockquote>
+<p><strong>0</strong>: Debugging off.</p>
+<p><strong>1</strong>: Verbose status output.</p>
+<p><strong>2</strong>: Synchronize multiple processors. This is useful for tracking down MPI
+related bugs.</p>
+<p><strong>3</strong>: Dump field variable output in text files at every step. Only do this for
+small tests or you will fill up your disk!</p>
+</blockquote>
+<p>Additionally, SORD can be compiled and run under a debugger using the <tt class="docutils literal"><span class="pre">-g</span></tt> or
+<tt class="docutils literal"><span class="pre">--debugging</span></tt> option.</p>
+</div>
+<div class="section" id="profiling">
+<h4>Profiling</h4>
+<p>Internal code timings, for benchmarking performance, are collected and saved to
+the <tt class="docutils literal"><span class="pre">prof/</span></tt> directory.  The file format is flat binary that can be examined
+with the UNIX command <tt class="docutils literal"><span class="pre">od</span> <span class="pre">-f</span></tt>.  Eight categories are timed for every time
+iteration step, and save in the following files:</p>
+<blockquote>
+<p><strong>1time</strong>: Time integration subroutine.</p>
+<p><strong>2stress</strong>: Stress subroutine.</p>
+<p><strong>3accel</strong>: Acceleration subroutine, including multiprocessor halo swapping
+communications.</p>
+<p><strong>4stats</strong>: Statistics subroutine, including multiprocessor min/max reductions.</p>
+<p><strong>5ckpt</strong>: Checkpoint subroutine.</p>
+<p><strong>6mp</strong>: Aggregate of all multiprocessor operations, including halo swap,
+global reductions, and parallel I/O.</p>
+<p><strong>7io</strong>: Aggregate of all input and output operations, including checkpointing
+and field I/O.</p>
+<p><strong>8step</strong>: Total for complete time iteration.</p>
+</blockquote>
+<p>Profiling can be very difficult to interpret for multiprocessor runs.  Timing
+is only saved for the master processor.  It can be helpful to synchronize the
+processors using <tt class="docutils literal"><span class="pre">debug</span> <span class="pre">=</span> <span class="pre">2</span></tt> to give more accurate relative timing values.</p>
+<p>Additionally, SORD can be run with compiler generated code profiling using the
+<tt class="docutils literal"><span class="pre">-p</span></tt> or <tt class="docutils literal"><span class="pre">--profiling</span></tt> option.</p>
+</div>
+<div class="section" id="source-control">
+<h4>Source control</h4>
+<p>We use <a class="reference external" href="http://bazaar-vcs.org/">Bazaar</a> for version control.  The simplest
+way to install Bazaar is to use Python <a class="reference external" href="http://pypi.python.org/pypi/setuptools">Easy Install</a>:</p>
 <pre class="literal-block">
 easy_install bzr
 </pre>
@@ -304,14 +483,15 @@ bzr commit -m &quot;Great new feature&quot;
 <pre class="literal-block">
 bzr send -o great-new-feature.patch
 </pre>
-<p>Email your patch to <a class="reference external" href="mailto:gely&#37;&#52;&#48;usc&#46;edu">gely<span>&#64;</span>usc<span>&#46;</span>edu</a> and receive lots of good karma!  See the
+<p>See the
 <a class="reference external" href="http://doc.bazaar-vcs.org/latest/en/tutorials/index.html">Bazaar tutorials</a>
 for more.</p>
 </div>
 </div>
+</div>
 <div class="footer">
 <hr class="footer" />
-Generated on: 2009-10-30.
+Generated on: 2009-11-02.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>
