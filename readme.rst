@@ -173,7 +173,7 @@ velocity (plotting requires that Matplotlib is installed)::
 Scripting with Python
 ---------------------
 
-For a simple example consider the explosion test, `<scripts/example/sim.py>`__:
+For a simple example consider the above test, `<scripts/example/sim.py>`__:
 
 .. include:: scripts/example/sim.py
    :literal:
@@ -183,16 +183,18 @@ specified as local variables that are passed to the ``sord.run()`` function by
 the ``locals()`` built-in Python function.  A complete list of possible SORD
 parameters and default values are specified in `<parameters.py>`__.
 
-Python scripting enables great flexibilty for assigning parameters. 
-provides great flexibility.  For example, it may be desirable to specify the
-total run time, and use that to determine the number of time steps::
+The Python language gives a powerful way to construct SORD input.  For example,
+it may be desirable to specify the total simulation time, and use that to
+determine the number of time steps::
 
     T = 100.0            # total time temporary variable
     nt = int( T / dt )   # number of time steps
 
 The ``T`` variable is not a valid SORD parameter; it is only sued for temporary
 storage.  Variables with single single character names or names ending with an
-underscore, are ignored by SORD, so may be safely used for temporary storage.
+underscore, are ignored by ``sord.run()``, so may be safely used for temporary
+storage.  More elaborate example scripts can be found in the `<scripts>`__
+directory.
 
 
 Running jobs
