@@ -156,19 +156,19 @@ Installation - Linux or Mac OS X
 User Guide
 ==========
 
-
 Quick test
 ----------
 
-Run a simple point source explosion test and plot a snapshot of particle
-velocity (plotting requires that Matplotlib is installed)::
+Run a simple point source explosion test and plot a 2D slice of particle
+velocity::
 
     cd scripts/example
     ./sim.py -i
     ./plot.py
 
-.. image:: doc/example.png
+Plotting requires Matplotlib, and the result should look like this:
 
+    .. image:: doc/example.png
 
 Scripting with Python
 ---------------------
@@ -230,39 +230,39 @@ specifying internal slip boundaries. However, for problems with symmetry across
 a slip surface, the fault may be placed at the boundary and combined with an
 anti-mirror symmetry condition.  The following BC types are supported:
 
-**Type 0:** vacuum free-surface.  Stress is zero in cells outside the boundary.
+**Type 0**: vacuum free-surface.  Stress is zero in cells outside the boundary.
 
-.. image:: doc/bc0.png
+    .. image:: doc/bc0.png
 
-**Type 3:** rigid surface. Displacement is zero at the boundary.
+**Type 3**: rigid surface. Displacement is zero at the boundary.
 
-.. image:: doc/bc3.png
+    .. image:: doc/bc3.png
 
-**Type 1:** mirror symmetry at the node.  Normal displacement is zero at the
+**Type 1**: mirror symmetry at the node.  Normal displacement is zero at the
 boundary.  Useful for a boundary corresponding to the plane orthogonal to the
 two nodal planes for double-couple point sources, or the plane normal to the
 mode-III axis for symmetric ruptures.
 
-.. image:: doc/bc1.png
+    .. image:: doc/bc1.png
 
-**Type 2:** mirror symmetry at the cell. Same as type 1, but centered on the cell.
-
-.. image:: doc/bc2.png
-
-**Type -1:** anti-mirror symmetry at the node.  Tangential displacement is zero
+**Type -1**: anti-mirror symmetry at the node.  Tangential displacement is zero
 at the boundary.  Useful for a boundary corresponding to the nodal planes of
 double-couple point sources, or the plane the plane normal to the mode-II axis
 for symmetric ruptures.
 
-.. image:: doc/bc-1.png
+    .. image:: doc/bc-1.png
 
-**Type -2:** anti-mirror symmetry at the cell.  Same as type -1, but centered
+**Type 2**: mirror symmetry at the cell. Same as type 1, but centered on the cell.
+
+    .. image:: doc/bc2.png
+
+**Type -2**: anti-mirror symmetry at the cell.  Same as type -1, but centered
 on the cell.  Can additionally be used when the boundary corresponds to the
 slip surface for symmetric ruptures.
 
-.. image:: doc/bc-2.png
+    .. image:: doc/bc-2.png
 
-**Type 10:** perfectly match layer (PML) absorbing boundary
+**Type 10**: perfectly match layer (PML) absorbing boundary
 
 Example: a problem with a free surface at Z=0, and PML aborbing boundaries on
 all other boundary faces::
