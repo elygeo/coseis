@@ -259,7 +259,7 @@ symmetric rupture, or (c) the zero-width axis of a 2D antiplane strain problem.
 
 **Type -2**: Anti-mirror symmetry at the cell.  Same as type -1, but centered
 on the cell.  Can additionally be used when the boundary corresponds to the
-slip surface for symmetric ruptures.
+slip surface of a symmetric rupture.
 
     .. image:: doc/bc-2.png
 
