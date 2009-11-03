@@ -339,44 +339,53 @@ computations for problems where they are applicable.  These are not used for
 specifying internal slip boundaries. However, for problems with symmetry across
 a slip surface, the fault may be placed at the boundary and combined with an
 anti-mirror symmetry condition.  The following BC types are supported:</p>
-<p><strong>Type 0</strong>: vacuum free-surface.  Stress is zero in cells outside the boundary.</p>
+<p><strong>Type 0</strong>: Vacuum free-surface.  Stress is zero in cells outside the boundary.</p>
 <blockquote>
 <img alt="doc/bc0.png" src="doc/bc0.png" />
 </blockquote>
-<p><strong>Type 3</strong>: rigid surface. Displacement is zero at the boundary.</p>
+<p><strong>Type 3</strong>: Rigid surface. Displacement is zero at the boundary.</p>
 <blockquote>
 <img alt="doc/bc3.png" src="doc/bc3.png" />
 </blockquote>
-<p><strong>Type 1</strong>: mirror symmetry at the node.  Normal displacement is zero at the
-boundary.  Useful for a boundary corresponding to the plane orthogonal to the
-two nodal planes for double-couple point sources, or the plane normal to the
-mode-III axis for symmetric ruptures.</p>
+<p><strong>Type 1</strong>: Mirror symmetry at the node.  Normal displacement is zero at the
+boundary.  Useful for a boundary corresponding to (a) the plane orthogonal to
+the two nodal planes of a double-couple point source, (b) the plane normal to
+the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D
+plane strain problem.</p>
 <blockquote>
 <img alt="doc/bc1.png" src="doc/bc1.png" />
 </blockquote>
-<p><strong>Type -1</strong>: anti-mirror symmetry at the node.  Tangential displacement is zero
-at the boundary.  Useful for a boundary corresponding to the nodal planes of
-double-couple point sources, or the plane the plane normal to the mode-II axis
-for symmetric ruptures.</p>
+<p><strong>Type -1</strong>: Anti-mirror symmetry at the node.  Tangential displacement is zero
+at the boundary.  Useful for a boundary corresponding to (a) the nodal planes
+of a double-couple point source, (b) the plane normal to the mode-II axis of a
+symmetric rupture, or (c) the zero-width axis of a 2D antiplane strain problem.</p>
 <blockquote>
 <img alt="doc/bc-1.png" src="doc/bc-1.png" />
 </blockquote>
-<p><strong>Type 2</strong>: mirror symmetry at the cell. Same as type 1, but centered on the cell.</p>
+<p><strong>Type 2</strong>: Mirror symmetry at the cell. Same as type 1, but centered on the cell.</p>
 <blockquote>
 <img alt="doc/bc2.png" src="doc/bc2.png" />
 </blockquote>
-<p><strong>Type -2</strong>: anti-mirror symmetry at the cell.  Same as type -1, but centered
+<p><strong>Type -2</strong>: Anti-mirror symmetry at the cell.  Same as type -1, but centered
 on the cell.  Can additionally be used when the boundary corresponds to the
 slip surface for symmetric ruptures.</p>
 <blockquote>
 <img alt="doc/bc-2.png" src="doc/bc-2.png" />
 </blockquote>
-<p><strong>Type 10</strong>: perfectly match layer (PML) absorbing boundary</p>
-<p>Example: a problem with a free surface at Z=0, and PML aborbing boundaries on
-all other boundary faces:</p>
+<p><strong>Type 10</strong>: Perfectly match layer (PML) absorbing boundary.</p>
+<p>Example: a 3D problem with a free surface at Z=0, and PML absorbing boundaries
+on all other boundary faces:</p>
 <pre class="literal-block">
-bc1 = 10, 10, 0
+nn  = 50, 50, 50
+bc1 = 10, 10,  0
 bc2 = 10, 10, 10
+</pre>
+<p>Example: a 2D antiplane strain problem with PML absorbing boundaries.  The
+number of nodes is 2 for the zero-width axis:</p>
+<pre class="literal-block">
+nn  = 50, 50,  2
+bc1 = 10, 10, -1
+bc2 = 10, 10, -1
 </pre>
 </div>
 <div class="section" id="defining-the-fault-rupture-surface">
