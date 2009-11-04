@@ -2,16 +2,15 @@
 module m_fieldio
 implicit none
 integer, private :: itdebug = -1, idebug
-integer, private, parameter :: maxfields = 32
 type t_io
     character(32) :: filename      ! filename on disk for input or output
     character(4) :: field          ! field variable, see fieldnames.py for possibilities
     character(8) :: tfunc          ! see time_function in util.f90 for possibilities
     character(3) :: mode           ! 'r' read, 'w' write
-    integer :: ii(3,4), nb, ib, fh, nfield
+    integer :: ii(3,4), nc, nb, ib, fh
     real :: x1(3), x2(3), val, period
     real, pointer :: buff(:,:)     ! buffer for storing mutliple time steps
-    !XXX character(4), pointer :: fields(:) ! field variable, see fieldnames.py for possibilities
+    !XXX character(4) :: fields(32) ! field variable, see fieldnames.py for possibilities
     !XXX real, pointer :: buff(:,:,:)  ! buffer for storing mutliple time steps
     type( t_io ), pointer :: next  ! pointer to next member of the field i/o list 
 end type t_io
@@ -187,7 +186,7 @@ case( '=r', '+r', '=R', '+R' )
         end do
     end if
     if ( p%ib < 0 ) then
-        !XXX allocate( p%buff(n(1)*n(2)*n(3),nfields,p%nb) )
+        !XXX allocate( p%buff(p%nc,n(1)*n(2)*n(3),p%nb) )
         allocate( p%buff(n(1)*n(2)*n(3),p%nb) )
         p%ib = p%nb
         p%fh = frio_file_null
@@ -263,7 +262,7 @@ case( '=r', '+r', '=R', '+R' )
     end if
 case( '=w', '=wi' )
     if ( p%ib < 0 ) then
-        !XXX allocate( p%buff(n(1)*n(2)*n(3),nfield,p%nb) )
+        !XXX allocate( p%buff(p%nc,n(1)*n(2)*n(3),p%nb) )
         allocate( p%buff(n(1)*n(2)*n(3),p%nb) )
         p%ib = 0
         p%fh = frio_file_null

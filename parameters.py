@@ -11,27 +11,6 @@ Spatial difference operator level:
   4: One-point quadrature
   5: Exactly integrated elements
   6: Saved operators, nearly as fast as 2, but doubles the memory usage
-
-Field I/O specification:
-
-  ('=',   'f', [], val):                   Set to value
-  ('=s',  'f', [], val):                   Set to random numbers in (0, val)
-  ('=f',  'f', [], val, tfunc, T):         Set to time function with period T
-  ('=fs', 'f', [], val, tfunc, T):         Set to time function * random number
-  ('=r',  'f', [], filename):              Read from filename
-  ('=w',  'f', [], filename):              Write to filename
-
-'f' is the field name. Options are listed in fieldnames.py.
-
-Input can be added to the existing value by specifying '+' instead of '='.
-
-[] or [j,k,l,t] are 1-based (Fortran style) indices.
-Indices can be a single index, a range (start,end) or a strided range (start,end,step).
-Negative indices count backward from the end of the array.
-() is shorthand for (1,-1,1), i.e., the entire range, with stride 1.
-[] is shorthand for the entire array, more explicitly written as
-[(),(),(),()] or [(1,-1,1),(1,-1,1),(1,-1,1),(1,-1,1)].
-
 """
 
 # I/O and code execution parameters
@@ -52,10 +31,10 @@ dt = 0.0075			# time step length
 tm0 = 0.0			# initial time
 affine = (1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0) # grid transformation
 gridnoise = 0.0			# random noise added to mesh, assumes planar fault
-oplevel = 0			# spatial difference operator level (see below)
+oplevel = 0			# spatial difference operator level
 vdamp = -1.0			# Vs dependent damping
 hourglass = 1.0, 1.0		# hourglass stiffness (1) and viscosity (2)
-fieldio = [			# field I/O (see below)
+fieldio = [			# field I/O
     ('=', 'rho', [], 2670.0),	# density
     ('=', 'vp',  [], 6000.0),	# P-wave speed
     ('=', 'vs',  [], 3464.0),	# S-wave speed
@@ -72,8 +51,8 @@ gam2 = 0.8			# max viscosity
 npml = 10			# number of PML damping nodes
 ppml = 2			# PML exponend, 1-4. Generally 2 is best.
 vpml = -1.0			# PML damping velocity, <0 default to min, max V_s harmonic mean
-bc1 = 0, 0, 0			# boundary condition - near side (see below)
-bc2 = 0, 0, 0			# boundary condition - far side (see below)
+bc1 = 0, 0, 0			# boundary condition - near side
+bc2 = 0, 0, 0			# boundary condition - far side
 ihypo = 0, 0, 0			# hypocenter indices (with fractional values), 0 = center
 rexpand = 1.06			# grid expansion ratio
 n1expand = 0, 0, 0		# number of grid expansion nodes - near side

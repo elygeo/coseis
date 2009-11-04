@@ -114,14 +114,15 @@ img {
 <li><a class="reference internal" href="#quick-test" id="id8">Quick test</a></li>
 <li><a class="reference internal" href="#scripting-with-python" id="id9">Scripting with Python</a></li>
 <li><a class="reference internal" href="#running-jobs" id="id10">Running jobs</a></li>
-<li><a class="reference internal" href="#boundary-conditions" id="id11">Boundary Conditions</a></li>
-<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id12">Defining the fault rupture surface</a></li>
+<li><a class="reference internal" href="#field-i-o" id="id11">Field I/O</a></li>
+<li><a class="reference internal" href="#boundary-conditions" id="id12">Boundary Conditions</a></li>
+<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id13">Defining the fault rupture surface</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#development" id="id13">Development</a><ul>
-<li><a class="reference internal" href="#debugging" id="id14">Debugging</a></li>
-<li><a class="reference internal" href="#profiling" id="id15">Profiling</a></li>
-<li><a class="reference internal" href="#source-control" id="id16">Source control</a></li>
+<li><a class="reference internal" href="#development" id="id14">Development</a><ul>
+<li><a class="reference internal" href="#debugging" id="id15">Debugging</a></li>
+<li><a class="reference internal" href="#profiling" id="id16">Profiling</a></li>
+<li><a class="reference internal" href="#source-control" id="id17">Source control</a></li>
 </ul>
 </li>
 </ul>
@@ -330,6 +331,49 @@ tmp/queue.sh
 binary files.  Statistic, such as peak acceleration and peak velocity, are
 computed periodically during each run and stored in the <tt class="docutils literal"><span class="pre">stats/</span></tt> directory.</p>
 </div>
+<div class="section" id="field-i-o">
+<h4>Field I/O</h4>
+<p>Multidimensional field arrays can be accessed for input and output through the
+<tt class="docutils literal"><span class="pre">fieldio</span></tt> list.  The <a class="reference external" href="fieldnames.py">fieldnames.py</a> file specifies the list of available
+field variables, which are categorized in four ways: (1) static vs. dynamic,
+(2) settable vs. output only, (3) node vs. cell registration, and (4) volume
+vs. fault surface.  For example, density <tt class="docutils literal"><span class="pre">rho</span></tt> is a static, settable, cell,
+volume variable.  Slip path length <tt class="docutils literal"><span class="pre">sl</span></tt> is a dynamic, output, node, fault
+variable.  The <tt class="docutils literal"><span class="pre">fieldio</span></tt> list is order dependent, so that a field may be
+assigned to one value for the entire volume, followed by a different value for
+a sub-region of the volume.</p>
+<p>All field I/O operations require slice indices <tt class="docutils literal"><span class="pre">[j,k,l,t]</span></tt>, which specify a
+four-dimensional sub-volume of the array in space and time.  Array indexing
+starts at <tt class="docutils literal"><span class="pre">1</span></tt> for the first node, and <tt class="docutils literal"><span class="pre">1.5</span></tt> for the first cell.  Negative
+indices count inward from end of the array, e.g., <tt class="docutils literal"><span class="pre">-1</span></tt> for the last node, and
+<tt class="docutils literal"><span class="pre">-1.5</span></tt> for the last cell.  Indices can be a single index, a range <tt class="docutils literal"><span class="pre">(start,</span>
+<span class="pre">end)</span></tt>, or a strided range <tt class="docutils literal"><span class="pre">(start,</span> <span class="pre">end,</span> <span class="pre">step)</span></tt>.  Indices of <tt class="docutils literal"><span class="pre">0</span></tt> and <tt class="docutils literal"><span class="pre">()</span></tt>
+are shorthand for the entire range, i.e. <tt class="docutils literal"><span class="pre">(1,</span> <span class="pre">-1)</span></tt> for node variables, or
+<tt class="docutils literal"><span class="pre">(1.5,</span> <span class="pre">-1.5)</span></tt> for cell variables.  For example, a slice consisting of the l=1
+surface at every 10th time step can be specified as <tt class="docutils literal"><span class="pre">[(),(),1,(1,-1,10)]</span></tt>.
+Empty brackets <tt class="docutils literal"><span class="pre">[]</span></tt> are shorthand for the entire 4D volume.</p>
+<p>For the case of I/O at single point in space, sub-cell positioning via weighted
+averaging may be used.  In this case, the fractional part of the index
+determines the weights.  For example, an index of 3.2 to the 1D variable f
+would specify the weighted average: 0.8 * f(3) + 0.2 * f(4).</p>
+<p>Each member of the <tt class="docutils literal"><span class="pre">fieldio</span></tt> list contains a mode, a field name, and slice
+indices, followed by mode dependent parameters.  The following I/O modes are
+available, where 'f' is the field variable name (from the list
+<a class="reference external" href="fieldnames.py">fieldnames.py</a>), and [] are the slice indices:</p>
+<pre class="literal-block">
+('=',  'f', [], val),            # Set f to value
+('=s', 'f', [], val),            # Set f to random numbers in range (0, val)
+('=f', 'f', [], val, tfunc, T),  # Set f to time function with period T, scaled by val
+('=r', 'f', [], filename),       # Read from filename into f
+('=w', 'f', [], filename),       # Write f to filename
+</pre>
+<p>Input modes may use '+' instead of '=' to add to, rather than replace,
+preexisting values.  See the <tt class="docutils literal"><span class="pre">time_function</span></tt> subroutine in <a class="reference external" href="src/util.f90">src/util.f90</a>
+for available time functions.  The routine can be easily  modified to add new
+time functions.  Time functions can be offset in time with the <tt class="docutils literal"><span class="pre">tm0</span></tt> initial
+time parameter.  Reading and writing to disk uses flat binary files where <tt class="docutils literal"><span class="pre">j</span></tt>
+is the fastest changing index, and <tt class="docutils literal"><span class="pre">t</span></tt> is the slowest changing index.</p>
+</div>
 <div class="section" id="boundary-conditions">
 <h4>Boundary Conditions</h4>
 <p>Boundary conditions for the six faces of the model domain are specified by the
@@ -518,7 +562,7 @@ for more.</p>
 </div>
 <div class="footer">
 <hr class="footer" />
-Generated on: 2009-11-03.
+Generated on: 2009-11-04.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>

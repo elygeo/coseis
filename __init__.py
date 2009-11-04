@@ -287,29 +287,37 @@ def prepare_param( pm, itbuff ):
             sys.exit( 'Error: unsupported operator: %r' % line )
         try:
             if len( line ) is 10:
-                tfunc, period, x1, x2, nb, ii, field, filename, val = line[1:]
+                nc, tfunc, period, x1, x2, nb, ii, filename, val, fields = line[1:]
             elif mode in ['r', 'R', 'w', 'wi']:
-                field, ii, filename = line[1:]
+                fields, ii, filename = line[1:]
             elif mode in ['', 's', 'i']:
-                field, ii, val = line[1:]
+                fields, ii, val = line[1:]
             elif mode in ['f', 'fs', 'fi']:
-                field, ii, val, tfunc, period = line[1:]
+                fields, ii, val, tfunc, period = line[1:]
             elif mode in ['c']:
-                field, ii, val, x1, x2 = line[1:]
+                fields, ii, val, x1, x2 = line[1:]
             elif mode in ['fc']:
-                field, ii, val, tfunc, period, x1, x2 = line[1:]
+                fields, ii, val, tfunc, period, x1, x2 = line[1:]
             else:
                 sys.exit( 'Error: bad i/o mode: %r' % line )
         except( ValueError ):
             sys.exit( 'Error: bad i/o spec: %r' % line )
         filename = os.path.expanduser( filename )
         mode = mode.replace( 'f', '' )
-        if field not in fieldnames.all:
-            sys.exit( 'Error: unknown field: %r' % line )
-        if pm.faultnormal == 0 and field in fieldnames.fault:
-            sys.exit( 'Error: field only for ruptures: %r' % line )
-        if 'w' not in mode and field not in fieldnames.input:
-            sys.exit( 'Error: field is ouput only: %r' % line )
+        if type( fields ) == str:
+            fields = [fields]
+        for field in fields:
+            if field not in fieldnames.all:
+                sys.exit( 'Error: unknown field: %r' % line )
+            if field not in fieldnames.input and 'w' not in mode:
+                sys.exit( 'Error: field is ouput only: %r' % line )
+            if (field in fieldnames.cell) != (fields[0] in fieldnames.cell):
+                sys.exit( 'Error: cannot mix node and cell i/o: %r' % line )
+            if field in fieldnames.fault:
+                if fields[0] not in fieldnames.fault:
+                    sys.exit( 'Error: cannot mix fault and non-fault i/o: %r' % line )
+                if pm.faultnormal == 0:
+                    sys.exit( 'Error: field only for ruptures: %r' % line )
         nn = list( pm.nn ) + [pm.nt]
         if field in fieldnames.cell:
             mode = mode.replace( 'c', 'C' )
@@ -338,8 +346,9 @@ def prepare_param( pm, itbuff ):
             nb = 1
         elif n > 1:
             nb = min( nb, itbuff )
+        nc = len( fields )
         fieldio += [
-            (op + mode, tfunc, period, x1, x2, nb, ii, field, filename, val)
+            (op + mode, nc, tfunc, period, x1, x2, nb, ii, filename, val, fields)
         ]
     f = [ line[8] for line in fieldio if line[8] != '-' ]
     for i in range( len( f ) ):
