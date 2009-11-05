@@ -184,8 +184,8 @@ the ``locals()`` built-in Python function.  A complete list of possible SORD
 parameters and default values are specified in `<parameters.py>`__.
 
 The Python language gives a powerful way to construct SORD input.  For example,
-it may be desirable to specify the total simulation time, and use that to
-determine the number of time steps::
+it may be desirable to specify the total simulation time, and divide by ``dt``
+to determine the number of time steps::
 
     T = 100.0            # total time temporary variable
     nt = int( T / dt )   # number of time steps
@@ -399,11 +399,15 @@ following values:
     **2**: Synchronize multiple processors. This is useful for tracking down MPI
     related bugs.
 
-    **3**: Dump field variable output in text files at every step. Only do this for
-    small tests or you will fill up your disk!
+    **3**: Dump field variable output in text files at every step. Only do this
+    for small tests or you will fill up your disk!
 
-Additionally, SORD can be compiled and run under a debugger using the ``-g`` or
-``--debugging`` option.
+During testing, compiler checks, such as array overflow and floating-point
+exceptions, can be turned on with the ``-t`` or ``--testing`` option.
+Additionally, to compile and run under a debugger use the ``-g`` or
+``--debugging`` option.  Naturally, these options depend on the capabilities of
+the particular compiler.  The specific flags passed to the compiler can be
+configured by editing ``conf.py``.
 
 
 Profiling

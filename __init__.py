@@ -31,6 +31,7 @@ def stage( inputs ):
         cf = configure.configure()
 
     # Merge inputs
+    inputs = inputs.copy()
     util.prune( inputs )
     util.prune( pm )
     util.prune( cf, pattern='(^_)|(^.$)' )
