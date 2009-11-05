@@ -9,6 +9,7 @@
 .DS_Store
 .bzr
 tmp
+run
 sord.tgz
 bin/*
 download

@@ -5,8 +5,8 @@ PEER LOH.1 - Plot comparison of FK and SOM.
 import os, numpy, pylab, scipy.signal, sord
 
 # Parameters
-so_dir = os.path.expanduser( '~/run/loh1/' )
 fk_dir = 'fk/'
+so_dir = '~/run/loh1'
 meta = sord.util.loadmeta( so_dir )
 dt = meta.dt
 nt = meta.nt
@@ -20,7 +20,7 @@ pylab.clf()
 ax = [ pylab.subplot( 3, 1, i ) for i in 1, 2, 3 ]
 
 # SORD results
-rotation = numpy.array([[3./5., 4./5., 0.], [-4./5., 3./5., 0.], [0., 0., 1.]])
+rotation = numpy.array( [[3./5., 4./5., 0.], [-4./5., 3./5., 0.], [0., 0., 1.]] )
 t = dt * numpy.arange( nt )
 x = numpy.fromfile( so_dir + 'out/vx', dtype )
 y = numpy.fromfile( so_dir + 'out/vy', dtype )
@@ -28,8 +28,8 @@ z = numpy.fromfile( so_dir + 'out/vz', dtype )
 v = numpy.vstack( (x, y, z) )
 v = numpy.dot( rotation, v )
 tau = t - ts
-factor = 1. - 2.*T/sig**2.*tau - ( T/sig )**2. * ( 1. - ( tau/sig )**2. );
-b = ( 1. / numpy.sqrt( 2.*numpy.pi ) / sig ) * factor * numpy.exp( -0.5 * ( tau/sig ) ** 2. )
+factor = 1. - 2.*T/sig**2.*tau - (T / sig) ** 2. * (1. - (tau / sig) ** 2.);
+b = (1. / numpy.sqrt( 2. * numpy.pi ) / sig) * factor * numpy.exp( -0.5 * (tau / sig) ** 2. )
 v = dt * scipy.signal.lfilter( b, 1., v )
 vm = numpy.sqrt( numpy.sum( v * v, 0 ) )
 peakv = numpy.max( vm )
@@ -37,17 +37,17 @@ print peakv
 for i in 0, 1, 2:
     pylab.axes( ax[i] )
     pylab.plot( t, v[i], 'k' )
-    pylab.hold(True)
+    pylab.hold( True )
 
 # Prose F/K results
-tm = numpy.fromfile( fk_dir+'time', '<f' )
-v1 =  1e5 * numpy.fromfile( fk_dir+'v-radial', '<f' )
-v2 =  1e5 * numpy.fromfile( fk_dir+'v-transverse', '<f' )
-v3 = -1e5 * numpy.fromfile( fk_dir+'v-vertical', '<f' )
+tm = numpy.fromfile( fk_dir + 'time', '<f' )
+v1 =  1e5 * numpy.fromfile( fk_dir + 'v-radial', '<f' )
+v2 =  1e5 * numpy.fromfile( fk_dir + 'v-transverse', '<f' )
+v3 = -1e5 * numpy.fromfile( fk_dir + 'v-vertical', '<f' )
 v = numpy.vstack((v1,v2,v3))
 dt = tm[1] - tm[0]
 tau = tm - ts
-b = ( 1. / numpy.sqrt( 2.*numpy.pi ) / sig ) * numpy.exp( -0.5 * ( tau/sig ) ** 2. )
+b = (1. / numpy.sqrt( 2. * numpy.pi ) / sig) * numpy.exp( -0.5 * (tau / sig) ** 2. )
 v = dt * scipy.signal.lfilter( b, 1., v )
 vm = numpy.sqrt( numpy.sum( v * v, 0 ) )
 peakv = numpy.max( vm )

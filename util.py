@@ -101,7 +101,7 @@ def loadmeta( path='.' ):
             for f in meta['fieldio']:
                 op, filename = f[0], f[8]
                 if filename != '-':
-                    meta['indices'][filename] = f[6]
+                    meta['indices'][filename] = f[7]
                     if 'wi' in op:
                         meta['xi'][filename] = f[3]
             meta['shape'] = {}

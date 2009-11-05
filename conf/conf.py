@@ -5,15 +5,15 @@ Default configuration parameters
 import os, pwd, numpy
 
 # Setup options (also accessible with command line options).
-prepare = True		# True: compile code and setup run directory, False: dry run
-optimize = 'O'		# O: fully optimized, g: debugging, t: testing, p: profiling
-mode = None		# s: serial, m: MPI, None: guess from np3 
-run = False		# i: interactive, q: batch queue, g: debugger
-pre = ''		# pre-processing command
-post = ''		# post-processing command
-itbuff = 10		# max number of timesteps to buffer for 2D & 3D output
-rundir = os.path.join( '~', 'run', 'sord' )	# run directory
-infiles = ()		# files to copy to the sord input directory
+prepare = True	# True: compile code and setup run directory, False: dry run
+optimize = 'O'	# O: fully optimized, g: debugging, t: testing, p: profiling
+mode = None	# s: serial, m: MPI, None: guess from np3 
+run = False	# i: interactive, q: batch queue, g: debugger
+pre = ''	# pre-processing command
+post = ''	# post-processing command
+itbuff = 10	# max number of timesteps to buffer for 2D & 3D output
+rundir = 'run'	# run directory
+infiles = ()	# files to copy to the sord input directory
 
 # User info
 user = pwd.getpwuid( os.geteuid() )[0]
