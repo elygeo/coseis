@@ -364,3 +364,39 @@ def gshhs( path='', resolution='h', min_area=0.0, min_level=1, max_level=4, rang
     yy = numpy.concatenate( yy )
     return numpy.array( [xx, yy], 'f' )
 
+
+def engdahlcat( path='engdahl-centennial-cat.f32', fields=['lon', 'lat', 'depth', 'mag'] ):
+    """
+    Download Engdahl Centennial Earthquake Catalog to binary file.
+    http://earthquake.usgs.gov/research/data/centennial.php
+    """
+    import urllib
+    if not os.path.exists( path ):
+        fmt = [
+            6, ('icat',   'S6'),
+            1, ('asol',   'S1'),
+            5, ('isol',   'S5'),
+            4, ('year',   'i4'),
+            3, ('month',  'i4'),
+            3, ('day',    'i4'),
+            4, ('hour',   'i4'),
+            3, ('minute', 'i4'),
+            6, ('second', 'f4'),
+            9, ('lat',    'f4'),
+            8, ('lon',    'f4'),
+            6, ('depth',  'f4'),
+            4, ('greg',   'i4'),
+            4, ('ntel',   'i4'),
+            4, ('mag',    'f4'),
+            3, ('msc',    'S3'),
+            6, ('mdo',    'S6'),
+        ]
+        url = 'http://earthquake.usgs.gov/research/data/centennial.cat'
+        url = urllib.urlopen( url )
+        data = numpy.genfromtxt( url, dtype=fmt[1::2], delimiter=fmt[0::2] )
+        out = []
+        for f in fields:
+            out += [data[:][f]]
+        numpy.array( out, 'f' ).T.tofile( path )
+
+
