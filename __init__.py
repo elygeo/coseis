@@ -287,7 +287,7 @@ def prepare_param( pm, itbuff ):
         if op not in '=+':
             sys.exit( 'Error: unsupported operator: %r' % line )
         try:
-            if len( line ) is 10:
+            if len( line ) is 11:
                 nc, tfunc, period, x1, x2, nb, ii, filename, val, fields = line[1:]
             elif mode in ['r', 'R', 'w', 'wi']:
                 fields, ii, filename = line[1:]

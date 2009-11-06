@@ -227,15 +227,21 @@ case( '=r', '+r', '=R', '+R' )
     if ( p%mode(2:2) == 'R' ) then
         if ( m(1) == 1 ) then
             i2(1) = size( s1, 1 )
-            do i = 2, i2(1); s1(i,:,:) = s1(1,:,:); end do
+            do i = 2, i2(1)
+                s1(i,:,:) = s1(1,:,:)
+            end do
         end if
         if ( m(2) == 1 ) then
             i2(2) = size( s1, 2 )
-            do i = 2, i2(2); s1(:,i,:) = s1(:,1,:); end do
+            do i = 2, i2(2)
+                s1(:,i,:) = s1(:,1,:)
+            end do
         end if
         if ( m(3) == 1 ) then
             i2(3) = size( s1, 3 )
-            do i = 2, i2(3); s1(:,:,i) = s1(:,:,1); end do
+            do i = 2, i2(3)
+                s1(:,:,i) = s1(:,:,1)
+            end do
         end if
     end if
     if ( p%mode(1:1) == '=' ) then
