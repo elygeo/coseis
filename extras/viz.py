@@ -111,9 +111,9 @@ def colormap( name='w0', colorexp=1.0, output='mayavi', n=2001, nmod=0, modlim=0
             b = 4, 8, 8, 8, 8, 0, 0, 0, 0
             centered = True
         elif name == 'hot':
-            r = 8, 8, 8, 8
-            g = 0, 4, 8, 8
-            b = 0, 0, 0, 8
+            r = 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8
+            g = 0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 8
+            b = 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6, 8
         elif name == 'warm':
             g = numpy.arange( 32 ) / 31.0
             r = numpy.ones_like( g )
@@ -122,13 +122,16 @@ def colormap( name='w0', colorexp=1.0, output='mayavi', n=2001, nmod=0, modlim=0
             r = 31.0 - numpy.arange( 32 )
             g = numpy.zeros_like( r )
             b = numpy.zeros_like( r ) 
-        elif name == 'earth':
+        elif name == 'socal':
             r = numpy.array( [ 0,  0,  0, 10, 10, 15, 15, 25, 25, 25] ) / 80.0
             g = numpy.array( [10, 10, 10, 20, 20, 25, 30, 25, 25, 25] ) / 80.0
             b = numpy.array( [38, 38, 38, 40, 40, 25, 20, 17, 17, 17] ) / 80.0
+            centered = True
+        elif name == 'earth':
             r = numpy.array( [10, 12, 15, 17, 20, 15, 15, 25, 25, 25] ) / 80.0
             g = numpy.array( [15, 18, 21, 24, 27, 25, 30, 25, 25, 25] ) / 80.0
             b = numpy.array( [30, 32, 35, 37, 40, 25, 20, 17, 17, 17] ) / 80.0
+            centered = True
         elif name == 'atmosphere':
             r = 0, 8, 0
             g = 0, 8, 0
@@ -363,7 +366,6 @@ def gshhs( path='', resolution='h', min_area=0.0, min_level=1, max_level=4, rang
     xx = numpy.concatenate( xx )
     yy = numpy.concatenate( yy )
     return numpy.array( [xx, yy], 'f' )
-
 
 def engdahlcat( path='engdahl-centennial-cat.f32', fields=['lon', 'lat', 'depth', 'mag'] ):
     """

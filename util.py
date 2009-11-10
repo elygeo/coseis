@@ -77,13 +77,13 @@ def load( fd, d=None, prune_pattern=None, prune_types=None ):
     prune( d, prune_pattern, prune_types )
     return namespace( d )
 
-def loadmeta( path='.' ):
+def loadmeta( path='.', cache='meta.py' ):
     """
     Load SORD metadata.
     """
     path = os.path.expanduser( path )
     meta = {}
-    f = os.path.join( path, 'meta.py' )
+    f = os.path.join( path, cache )
     if os.path.isfile( f ):
         exec open( f ) in meta
     else:
@@ -111,7 +111,7 @@ def loadmeta( path='.' ):
                 if nn == []:
                     nn = [1]
                 meta['shape'][k] = nn
-        path = os.path.join( path, 'meta.py' )
+        path = os.path.join( path, cache )
         expand = 'shape', 'xi', 'indices', 'fieldio'
         save( path, meta, expand )
     return namespace( meta )

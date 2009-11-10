@@ -253,19 +253,26 @@ indices, followed by mode dependent parameters.  The following I/O modes are
 available, where 'f' is the field variable name (from the list
 `<fieldnames.py>`__), and [] are the slice indices::
 
-    ('=',  'f', [], val),            # Set f to value
-    ('=s', 'f', [], val),            # Set f to random numbers in range (0, val)
-    ('=f', 'f', [], val, tfunc, T),  # Set f to time function with period T, scaled by val
-    ('=r', 'f', [], filename),       # Read from filename into f
-    ('=w', 'f', [], filename),       # Write f to filename
+    ('=',   'f', [], val),             # Set f to value
+    ('+',   'f', [], val),             # Add value to f
+    ('=s',  'f', [], val),             # Set f to random numbers in range (0, val)
+    ('=f',  'f', [], val, tfunc, T),   # Set f to time function with period T, scaled by val
+    ('=r',  'f', [], filename),        # Read from filename into f
+    ('=R',  'f', [], filename),        # Read from filename into f with exrapolation.
+    ('=w',  'f', [], filename),        # Write f to filename
+    ('=wi', 'f', [], filename),        # Write weighted average of f to filename.
 
-Input modes may use '+' instead of '=' to add to, rather than replace,
-preexisting values.  See the ``time_function`` subroutine in `<src/util.f90>`__
-for available time functions.  The routine can be easily  modified to add new
-time functions.  Time functions can be offset in time with the ``tm0`` initial
-time parameter.  Reading and writing to disk uses flat binary files where ``j``
-is the fastest changing index, and ``t`` is the slowest changing index.
+Reading and writing to disk uses flat binary files where ``j`` is the fastest
+changing index, and ``t`` is the slowest changing index.  Mode 'R' extrapolates
+any singleton dimensions to fill the entire array.  This is useful for reading
+1D or 2D models into 3D simulations, so can obviate the need to store (possibly
+very large) 3D material and mesh coordinate files.
 
+All input modes may use '+' instead of '=' to add to, rather than replace,
+preexisting values.  For a list of available time functions, see the
+``time_function`` subroutine in `<src/util.f90>`__.  The routine can be easily
+modified to add new time functions.  Time functions can be offset in time with
+the ``tm0`` initial time parameter.
 
 Boundary Conditions
 -------------------

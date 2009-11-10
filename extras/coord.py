@@ -427,19 +427,3 @@ def ll2cmu( x, y, inverse=False ):
         y = (y + 1.0) * 150000.0
     return numpy.array( [x, y] )
 
-def command_line():
-    """
-    Process command line options.
-    """
-    opts, args = getopt.getopt( sys.argv[1:], 'i' )
-    for f in args:
-        x, y = numpy.loadtxt( f, unpack=True )
-        if '-i' in opts[0]:
-            x, y = ll2xy( x, y, inverse=True )
-        else:
-            x, y = ll2xy( x, y, inverse=False )
-        for xx, yy in zip( x, y ):
-            print( xx, yy )
-
-if __name__ == '__main__':
-    command_line()
