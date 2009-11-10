@@ -243,11 +243,6 @@ are shorthand for the entire range, i.e. ``(1, -1)`` for node variables, or
 surface at every 10th time step can be specified as ``[(),(),1,(1,-1,10)]``.
 Empty brackets ``[]`` are shorthand for the entire 4D volume. 
 
-For the case of I/O at single point in space, sub-cell positioning via weighted
-averaging may be used.  In this case, the fractional part of the index
-determines the weights.  For example, an index of 3.2 to the 1D variable f
-would specify the weighted average: 0.8 * f(3) + 0.2 * f(4).
-
 Each member of the ``fieldio`` list contains a mode, a field name, and slice
 indices, followed by mode dependent parameters.  The following I/O modes are
 available, where 'f' is the field variable name (from the list
@@ -261,6 +256,12 @@ available, where 'f' is the field variable name (from the list
     ('=R',  'f', [], filename),        # Read from filename into f with exrapolation.
     ('=w',  'f', [], filename),        # Write f to filename
     ('=wi', 'f', [], filename),        # Write weighted average of f to filename.
+
+For the case of I/O at single point in space, sub-cell positioning via weighted
+averaging may be used.  In this case, the fractional part of the index
+determines the weights.  For example, an index of 3.2 to the 1D variable f
+would specify the weighted average: 0.8 * f(3) + 0.2 * f(4).  Weighted
+averaging is indicated by a letter 'i' in the I/O mode.
 
 Reading and writing to disk uses flat binary files where ``j`` is the fastest
 changing index, and ``t`` is the slowest changing index.  Mode 'R' extrapolates

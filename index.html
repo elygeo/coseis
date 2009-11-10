@@ -352,10 +352,6 @@ are shorthand for the entire range, i.e. <tt class="docutils literal"><span clas
 <tt class="docutils literal"><span class="pre">(1.5,</span> <span class="pre">-1.5)</span></tt> for cell variables.  For example, a slice consisting of the l=1
 surface at every 10th time step can be specified as <tt class="docutils literal"><span class="pre">[(),(),1,(1,-1,10)]</span></tt>.
 Empty brackets <tt class="docutils literal"><span class="pre">[]</span></tt> are shorthand for the entire 4D volume.</p>
-<p>For the case of I/O at single point in space, sub-cell positioning via weighted
-averaging may be used.  In this case, the fractional part of the index
-determines the weights.  For example, an index of 3.2 to the 1D variable f
-would specify the weighted average: 0.8 * f(3) + 0.2 * f(4).</p>
 <p>Each member of the <tt class="docutils literal"><span class="pre">fieldio</span></tt> list contains a mode, a field name, and slice
 indices, followed by mode dependent parameters.  The following I/O modes are
 available, where 'f' is the field variable name (from the list
@@ -370,6 +366,11 @@ available, where 'f' is the field variable name (from the list
 ('=w',  'f', [], filename),        # Write f to filename
 ('=wi', 'f', [], filename),        # Write weighted average of f to filename.
 </pre>
+<p>For the case of I/O at single point in space, sub-cell positioning via weighted
+averaging may be used.  In this case, the fractional part of the index
+determines the weights.  For example, an index of 3.2 to the 1D variable f
+would specify the weighted average: 0.8 * f(3) + 0.2 * f(4).  Weighted
+averaging is indicated by a letter 'i' in the I/O mode.</p>
 <p>Reading and writing to disk uses flat binary files where <tt class="docutils literal"><span class="pre">j</span></tt> is the fastest
 changing index, and <tt class="docutils literal"><span class="pre">t</span></tt> is the slowest changing index.  Mode 'R' extrapolates
 any singleton dimensions to fill the entire array.  This is useful for reading
