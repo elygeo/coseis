@@ -346,9 +346,9 @@ volume.</p>
 <p>All field I/O operations require slice indices <tt class="docutils literal"><span class="pre">[j,k,l,t]</span></tt>, which specify a
 four-dimensional sub-volume of the array in space and time.  Array indexing
 starts at 1 for the first node, and 1.5 for the first cell.  Negative indices
-count inward from end of the array, starting from -1 for the last node, and
--1.5 for the last cell.  Indices can be either a single index, a range
-<tt class="docutils literal"><span class="pre">(start,</span> <span class="pre">end)</span></tt>, or a strided range <tt class="docutils literal"><span class="pre">(start,</span> <span class="pre">end,</span> <span class="pre">step)</span></tt>.  The range <tt class="docutils literal"><span class="pre">(1,</span>
+count inward from end of the array, starting at -1 for the last node, and -1.5
+for the last cell.  Indices can be either a single index, a range <tt class="docutils literal"><span class="pre">(start,</span>
+<span class="pre">end)</span></tt> of indices, or a strided range <tt class="docutils literal"><span class="pre">(start,</span> <span class="pre">end,</span> <span class="pre">step)</span></tt>.  The range <tt class="docutils literal"><span class="pre">(1,</span>
 <span class="pre">-1)</span></tt> specifies the full range of nodes, and the range <tt class="docutils literal"><span class="pre">(1.5,</span> <span class="pre">-1.5)</span></tt>
 specifies the full range of cells.  The index 0 and empty paretheses <tt class="docutils literal"><span class="pre">()</span></tt> are
 shorthand for a full range.  Empty brackets <tt class="docutils literal"><span class="pre">[]</span></tt> are shorthand for the entire

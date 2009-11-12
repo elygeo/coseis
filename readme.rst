@@ -236,9 +236,9 @@ volume.
 All field I/O operations require slice indices ``[j,k,l,t]``, which specify a
 four-dimensional sub-volume of the array in space and time.  Array indexing
 starts at 1 for the first node, and 1.5 for the first cell.  Negative indices
-count inward from end of the array, starting from -1 for the last node, and
--1.5 for the last cell.  Indices can be either a single index, a range
-``(start, end)``, or a strided range ``(start, end, step)``.  The range ``(1,
+count inward from end of the array, starting at -1 for the last node, and -1.5
+for the last cell.  Indices can be either a single index, a range ``(start,
+end)`` of indices, or a strided range ``(start, end, step)``.  The range ``(1,
 -1)`` specifies the full range of nodes, and the range ``(1.5, -1.5)``
 specifies the full range of cells.  The index 0 and empty paretheses ``()`` are
 shorthand for a full range.  Empty brackets ``[]`` are shorthand for the entire
