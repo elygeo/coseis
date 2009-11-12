@@ -238,14 +238,12 @@ four-dimensional sub-volume of the array in space and time.  Array indexing
 starts at 1 for the first node, and 1.5 for the first cell.  Negative indices
 count inward from end of the array, starting at -1 for the last node, and -1.5
 for the last cell.  Indices can be either a single index, a range ``(start,
-end)`` of indices, or a strided range ``(start, end, step)``.  The range ``(1,
--1)`` specifies the full range of nodes, and the range ``(1.5, -1.5)``
-specifies the full range of cells.  The index 0 and empty paretheses ``()`` are
+end)``, or a strided range ``(start, end, step)``.  Empty paretheses ``()`` are
 shorthand for a full range.  Empty brackets ``[]`` are shorthand for the entire
 4D volume.  Some examples of slice notation::
 
     [10.5, 20.5, 1.5, ()]     # Single cell, full time history
-    [(), (), 1, (1,-1,10)]    # l=1 node surface, every 10th time step
+    [(), (), 2, (1,-1,10)]    # l=2 node surface, every 10th time step
     [(), (), (), -1]          # Full 3D volume, last time step
     []                        # Entire 4D volume
 
