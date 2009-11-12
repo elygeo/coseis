@@ -228,25 +228,31 @@ field variables, which are categorized in four ways: (1) static vs. dynamic,
 (2) settable vs. output only, (3) node vs. cell registration, and (4) volume
 vs. fault surface.  For example, density ``rho`` is a static, settable, cell,
 volume variable.  Slip path length ``sl`` is a dynamic, output, node, fault
-variable.  The ``fieldio`` list is order dependent, so that a field may be
-assigned to one value for the entire volume, followed by a different value for
-a sub-region of the volume.
+variable.  The ``fieldio`` list is order dependent with subsequent inputs
+overwriting previous inputs.  For example, a field may be assigned to one value
+for the entire volume, followed by a different value for a sub-region of the
+volume.
 
 All field I/O operations require slice indices ``[j,k,l,t]``, which specify a
 four-dimensional sub-volume of the array in space and time.  Array indexing
-starts at ``1`` for the first node, and ``1.5`` for the first cell.  Negative
-indices count inward from end of the array, e.g., ``-1`` for the last node, and
-``-1.5`` for the last cell.  Indices can be a single index, a range ``(start,
-end)``, or a strided range ``(start, end, step)``.  Indices of ``0`` and ``()``
-are shorthand for the entire range, i.e. ``(1, -1)`` for node variables, or
-``(1.5, -1.5)`` for cell variables.  For example, a slice consisting of the l=1
-surface at every 10th time step can be specified as ``[(),(),1,(1,-1,10)]``.
-Empty brackets ``[]`` are shorthand for the entire 4D volume. 
+starts at 1 for the first node, and 1.5 for the first cell.  Negative indices
+count inward from end of the array, starting from -1 for the last node, and
+-1.5 for the last cell.  Indices can be either a single index, a range
+``(start, end)``, or a strided range ``(start, end, step)``.  The range ``(1,
+-1)`` specifies the full range of nodes, and the range ``(1.5, -1.5)``
+specifies the full range of cells.  The index 0 and empty paretheses ``()`` are
+shorthand for a full range.  Empty brackets ``[]`` are shorthand for the entire
+4D volume.  Some examples of slice notation::
+
+    [10.5, 20.5, 1.5, ()]     # Single cell, full time history
+    [(), (), 1, (1,-1,10)]    # l=1 node surface, every 10th time step
+    [(), (), (), -1]          # Full 3D volume, last time step
+    []                        # Entire 4D volume
 
 Each member of the ``fieldio`` list contains a mode, a field name, and slice
 indices, followed by mode dependent parameters.  The following I/O modes are
-available, where 'f' is the field variable name (from the list
-`<fieldnames.py>`__), and [] are the slice indices::
+available, where ``'f'`` is the field variable name (from the list
+`<fieldnames.py>`__), and ``[]`` are the slice indices::
 
     ('=',   'f', [], val),             # Set f to value
     ('+',   'f', [], val),             # Add value to f
@@ -257,17 +263,17 @@ available, where 'f' is the field variable name (from the list
     ('=w',  'f', [], filename),        # Write f to filename
     ('=wi', 'f', [], filename),        # Write weighted average of f to filename.
 
-For the case of I/O at single point in space, sub-cell positioning via weighted
-averaging may be used.  In this case, the fractional part of the index
+A letter ``'i'`` in the mode indicates sub-cell positioning via weighted
+averaging.  In this case the spatial indices are single logical coordinates
+that may vary contiguously over the range.  The fractional part of the index
 determines the weights.  For example, an index of 3.2 to the 1D variable f
-would specify the weighted average: 0.8 * f(3) + 0.2 * f(4).  Weighted
-averaging is indicated by a letter 'i' in the I/O mode.
+would specify the weighted average: 0.8 * f(3) + 0.2 * f(4).
 
-Reading and writing to disk uses flat binary files where ``j`` is the fastest
-changing index, and ``t`` is the slowest changing index.  Mode 'R' extrapolates
-any singleton dimensions to fill the entire array.  This is useful for reading
-1D or 2D models into 3D simulations, so can obviate the need to store (possibly
-very large) 3D material and mesh coordinate files.
+Reading and writing to disk uses flat binary files where j is the fastest
+changing index, and t is the slowest changing index.  Mode 'R' extrapolates any
+singleton dimensions to fill the entire array.  This is useful for reading 1D
+or 2D models into 3D simulations, obviating the need to store (possibly very
+large) 3D material and mesh coordinate files.
 
 All input modes may use '+' instead of '=' to add to, rather than replace,
 preexisting values.  For a list of available time functions, see the

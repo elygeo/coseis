@@ -284,7 +284,23 @@ def contours( *args, **kwargs ):
     pylab.close( fig )
     return pp
 
-def textpmb( xx, yy, ss, dx=None, dy=None, n=16, ax=None, **kwargs ):
+def pmb_mlab( x, y, z, s, dx, fg=(1,1,1), bg=(0,0,0), n=16, **kwargs ):
+    """
+    Poor man's bold text.
+    """
+    from enthought.mayavi import mlab
+    h = []
+    for i in range( n ):
+        phi = 2.0 * numpy.pi * i / n
+        x_ = x + dx * numpy.cos( phi )
+        y_ = y + dx * numpy.sin( phi )
+        h += [ mlab.text3d( x_, y_, z, s, color=bg, **kwargs ) ]
+        h[-1].actor.property.lighting = False
+    h += [ mlab.text3d( x_, y_, z, s, color=fg, **kwargs ) ]
+    h[-1].actor.property.lighting = False
+    return h
+
+def textpmb( x, y, s, dx=None, dy=None, fg='k', bg='w', n=16, ax=None, **kwargs ):
     """
     Poor man's bold text.
     """
@@ -305,9 +321,10 @@ def textpmb( xx, yy, ss, dx=None, dy=None, n=16, ax=None, **kwargs ):
     h = []
     for i in range( n ):
         phi = 2.0 * numpy.pi * i / n
-        x = xx + dx * numpy.cos( phi )
-        y = yy + dy * numpy.sin( phi )
-        h += [ ax.text( x, y, ss, **kwargs ) ]
+        x_ = x + dx * numpy.cos( phi )
+        y_ = y + dy * numpy.sin( phi )
+        h += [ ax.text( x_, y_, s, color=bg, **kwargs ) ]
+    h += [ ax.text( x, y, s, color=fg, **kwargs ) ]
     return h
 
 def gshhs( path='', resolution='h', min_area=0.0, min_level=1, max_level=4, range=None, member='gshhs/gshhs_%s.b', download=False ):
