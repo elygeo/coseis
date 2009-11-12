@@ -229,9 +229,9 @@ field variables, which are categorized in four ways: (1) static vs. dynamic,
 vs. fault surface.  For example, density ``rho`` is a static, settable, cell,
 volume variable.  Slip path length ``sl`` is a dynamic, output, node, fault
 variable.  The ``fieldio`` list is order dependent with subsequent inputs
-overwriting previous inputs.  For example, a field may be assigned to one value
-for the entire volume, followed by a different value for a sub-region of the
-volume.
+overwriting previous inputs.  So, for example, a field may be assigned to one
+value for the entire volume, followed by a different value for a sub-region of
+the volume.
 
 All field I/O operations require slice indices ``[j,k,l,t]``, which specify a
 four-dimensional sub-volume of the array in space and time.  Array indexing
@@ -242,8 +242,9 @@ end)``, or a strided range ``(start, end, step)``.  Empty paretheses ``()`` are
 shorthand for a full range.  Empty brackets ``[]`` are shorthand for the entire
 4D volume.  Some examples of slice notation::
 
+    [10, 20, 1, (1,-1)]       # Single node, full time history
     [10.5, 20.5, 1.5, ()]     # Single cell, full time history
-    [(), (), 2, (1,-1,10)]    # l=2 node surface, every 10th time step
+    [2, (), (), (1,-1,10)]    # j=2 node surface, every 10th time step
     [(), (), (), -1]          # Full 3D volume, last time step
     []                        # Entire 4D volume
 
