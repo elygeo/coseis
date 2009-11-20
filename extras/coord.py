@@ -7,30 +7,6 @@ import getopt
 
 rearth = 6370000.0
 
-def downsample_sphere( f, d ):
-    """
-    Down-sample node-registered spherical surface with averaging.
-
-    The indices of the 2D array f are, respectively, longitude and latitude.
-    d is the decimation interval which must be odd.
-    """
-    n = f.shape
-    ii = numpy.arange( d ) - (d - 1) / 2
-    jj = numpy.arange( 0, n[0], d )
-    kk = numpy.arange( 0, n[1], d )
-    nn = jj.size, kk.size
-    ff = numpy.zeros( nn, f.dtype )
-    jj, kk = numpy.ix_( jj, kk )
-    for dk in ii:
-        k = n[1] - 1 - abs( n[1] - 1 - abs( dk + kk ) )
-        for dj in ii:
-            j = (jj + dj) % n[0]
-            ff = ff + f[j,k]
-    ff[:,0] = ff[:,0].mean()
-    ff[:,-1] = ff[:,-1].mean()
-    ff *= 1.0 / (d * d)
-    return ff
-
 def dot2( A, B ):
     """
     Vectorized 2d dot product (matrix multiplication).
@@ -62,65 +38,10 @@ def solve2( A, b ):
     Vectorized 2x2 linear equation solver
     """
     A = numpy.array( A )
-    b = numpy.array( b ) / (A[0,0]*A[1,1] - A[0,1]*A[1,0])
-    return numpy.array( [b[0]*A[1,1] - b[1]*A[0,1],
-                         b[1]*A[0,0] - b[0]*A[1,0]] )
-
-def slipvectors( strike, dip, rake ):
-    """
-    For given strike, dip, and rake (degrees), using the Aki & Richards convention
-    of dip to the right of the strike vector, find the rotation matrix R from world
-    coordinates (east, north, up) to fault local coordinates (slip, rake, normal).
-    The transpose R^T performs the reverse rotation from fault local coordinates to
-    world coordinates.  Rows of R are axis unit vectors of the fault local space in
-    world coordinates.  Columns of R are axis unit vectors of the world space in
-    fault local coordinates.
-    """
-    strike = numpy.pi / 180.0 * numpy.array( strike )
-    dip    = numpy.pi / 180.0 * numpy.array( dip ) 
-    rake   = numpy.pi / 180.0 * numpy.array( rake )
-    u = numpy.ones( strike.shape )
-    z = numpy.zeros( strike.shape )
-    c = numpy.cos( rake )
-    s = numpy.sin( rake )
-    A = numpy.array( [[c, s, z], [-s, c, z], [z, z, u]] )
-    c = numpy.cos( dip )
-    s = numpy.sin( dip )
-    B = numpy.array( [[u, z, z], [z, c, s], [z, -s, c]] )
-    c = numpy.cos( strike )
-    s = numpy.sin( strike )
-    C = numpy.array( [[s, c, z], [-c, s, z], [z, z, u]] )
-    return dot2( dot2( A, B ), C )
-
-def source_tensors( R ):
-    """
-    Given a rotation matrix R from world coordinates (east, north, up) to fault
-    local coordinates (slip, rake, normal), find tensor components that may be
-    scaled by moment or potency to compute moment tensors or potency tensors,
-    respectively.  Rows of R are axis unit vectors of the fault local space in
-    world coordinates.  R can be computed from strike, dip and rake angles with the
-    'slipvectors' routine.  The return value is a 3x3 matrix T specifying
-    contributions to the tensor W:
-    column 1 is the (shear)  strike contribution to W23, W31, W12
-    column 2 is the (shear)  dip    contribution to W23, W31, W12
-    column 3 is the (volume) normal contribution to W11, W22, W33
-    The columns can unpacked conveniently by:
-    Tstrike, Tdip, Tnormal = coord.sliptensors( strike, dip, rake )
-    """
-    strike, dip, normal = slipvectors( R )
-    del( R )
-    strike = 0.5 * ([
-        strike[1] * normal[2] + normal[1] * strike[2],
-        strike[2] * normal[0] + normal[2] * strike[0],
-        strike[0] * normal[1] + normal[0] * strike[1],
-    ])
-    dip = 0.5 * ([
-        dip[1] * normal[2] + normal[1] * dip[2],
-        dip[2] * normal[0] + normal[2] * dip[0],
-        dip[0] * normal[1] + normal[0] * dip[1],
-    ])
-    normal = normal * normal
-    return numpy.array( [strike, dip, normal] )
+    b = numpy.array( b )
+    A /= (A[0,0] * A[1,1] - A[0,1] * A[1,0])
+    return numpy.array( [b[0] * A[1,1] - b[1] * A[0,1],
+                         b[1] * A[0,0] - b[0] * A[1,0]] )
 
 def interp( x0, dx, z, xi, extrapolate=False ):
     """
@@ -186,6 +107,62 @@ def ibilinear( xx, yy, xi, yi ):
         x  = x + dx
     return x
 
+def rot_sym_tensor( w1, w2, rot ):
+    """
+    Rotate symmetric 3x3 tensor stored as diagonal and off-diagonal vectors.
+    w1:  components w11, w22, w33
+    w2:  components w23, w31, w12
+    rot: rotation matrix
+    """
+    rot = numpy.array( rot )
+    mat = numpy.diag( w1 )
+    mat.flat[[5, 6, 1]] = w2
+    mat.flat[[7, 2, 3]] = w2
+    mat = dot2( dot2( rot, mat ), rot.T )
+    w1  = numpy.diag( mat )
+    w2  = mat.flat[[5, 6, 1]]
+    return w1, w2
+
+def rotmat( x, origin=(0, 0, 0), upvector=(0, 0, 1) ):
+    """
+    Given a position vector x, find the rotation matrix to r,h,v coordinates.
+    """
+    x = numpy.array( x ) - numpy.array( origin )
+    nr = x / numpy.sqrt( (x * x).sum() )
+    nh = numpy.cross( upvector, nr )
+    if all( nh == 0.0 ):
+        nh = numpy.cross( (1, 0, 0), nr )
+    if all( nh == 0.0 ):
+        nh = numpy.cross( (0, 1, 0), nr )
+    nh = nh / numpy.sqrt( (nh * nh).sum() )
+    nv = numpy.cross( nr, nh )
+    nv = nv / numpy.sqrt( (nv * nv).sum() )
+    return numpy.array( [nr, nh, nv] )
+
+def llr2xyz( x, y, z, inverse=False ):
+    """
+    Geographic to rectangular coordinate conversion.
+
+    x <-> lon, y <-> lat, z <-> r
+    """
+    x = numpy.array( x )
+    y = numpy.array( y )
+    z = numpy.array( z )
+    if inverse:
+        r = numpy.sqrt( x * x + y * y + z * z )
+        x = numpy.arctan2( y, x )
+        y = numpy.arcsin( z / r )
+        x = 180.0 / numpy.pi * x
+        y = 180.0 / numpy.pi * y
+        return numpy.array( [x, y, r] )
+    else:
+        x  = numpy.pi / 180.0 * x
+        y  = numpy.pi / 180.0 * y
+        x_ = numpy.cos( x ) * numpy.cos( y ) * z
+        y_ = numpy.sin( x ) * numpy.cos( y ) * z
+        z  = numpy.sin( y ) * z
+        return numpy.array( [x_, y_, z] )
+
 def rotation( lon, lat, projection, eps=100.0 ):
     """
     mat, theta = rotation( lon, lat, projection )
@@ -244,75 +221,131 @@ def rotation3( lon, lat, dep, projection, eps=100.0 ):
     mat = numpy.array( [s * x, s * y, s * z] )
     return mat
 
-def rotmat( x, origin=(0, 0, 0), upvector=(0, 0, 1) ):
+class Transform():
     """
-    Given a position vector x, find the rotation matrix to r,h,v coordinates.
-    """
-    x = numpy.array( x ) - numpy.array( origin )
-    nr = x / numpy.sqrt( (x * x).sum() )
-    nh = numpy.cross( upvector, nr )
-    if all( nh == 0.0 ):
-        nh = numpy.cross( (1, 0, 0), nr )
-    if all( nh == 0.0 ):
-        nh = numpy.cross( (0, 1, 0), nr )
-    nh = nh / numpy.sqrt( (nh * nh).sum() )
-    nv = numpy.cross( nr, nh )
-    nv = nv / numpy.sqrt( (nv * nv).sum() )
-    return numpy.array( [nr, nh, nv] )
+    Coordinate transform for scale, rotation, and origin translation.
 
-def rot_sym_tensor( w1, w2, rot ):
-    """
-    Rotate symmetric 3x3 tensor stored as diagonal and off-diagonal vectors.
-    w1:  components w11, w22, w33
-    w2:  components w23, w31, w12
-    rot: rotation matrix
-    """
-    rot = numpy.array( rot )
-    mat = numpy.diag( w1 )
-    mat.flat[[5, 6, 1]] = w2
-    mat.flat[[7, 2, 3]] = w2
-    mat = dot2( dot2( rot, mat ), rot.T )
-    w1  = numpy.diag( mat )
-    w2  = mat.flat[[5, 6, 1]]
-    return w1, w2
+    Optional Parameters
+    -------------------
+    proj : Map projection defined by Pyproj or similar.
+    scale : Scale factor.
+    rotation : Rotation angle in degrees.
+    origin : Untransformed coordinates of the new origin.  If two sets of points
+    are given, the origin is centered between them, and rotation is relative to the
+    connecting line. 
 
-def compass( azimuth, radians=False ):
+    Example: TeraShake SDSU/Okaya projection
+    >>> import pyproj, sord
+    >>> proj = pyproj.Proj( proj='utm', zone=11, ellps='WGS84' )
+    >>> proj = sord.coord.Transform( proj, rotation=40.0, origin=(-121.0, 34.5) )
+    >>> proj( -120.0, 35.0 )
+    array([  38031.1000251 ,  100171.63485189])
+    >>> proj( 0, 0, inverse=True )
+    array([-121. ,   34.5])
     """
-    Get named direction from azimuth.
-    """
-    if radians:
-        azimuth *= 180.0 / numpy.pi
-    names = (
-        'N', 'NNE', 'NE', 'ENE',
-        'E', 'ESE', 'SE', 'SSE',
-        'S', 'SSW', 'SW', 'WSW',
-        'W', 'WNW', 'NW', 'NNW',
-    )
-    return names[ int( azimuth / 22.5 + 16.0 ) % 16 ]
+    def __init__( self, proj=None, scale=1.0, rotation=0.0, origin=None ):
+        phi = numpy.pi / 180.0 * rotation
+        x, y = origin
+        if origin == None:
+            x, y = 0.0, 0.0
+        else:
+            if proj != None:
+                x, y = proj( x, y )
+            if type( x ) in (list, tuple):
+                phi += numpy.atan2( y[1] - y[0], x[1] - x[0] )
+                x, y = x[:2].mean(), y[:2].mean()
+        c = scale * numpy.cos( phi )
+        s = scale * numpy.sin( phi )
+        self.mat = numpy.array( [[c, -s], [s, c]] )
+        self.origin = x, y
+        self.proj = proj
+    def __call__( self, x, y, **kwarg ):
+        proj = self.proj
+        x = numpy.array( x )
+        y = numpy.array( y )
+        if kwarg.get( 'inverse' ) != True:
+            if proj != None:
+                x, y = proj( x, y, **kwarg )
+            x -= self.origin[0]
+            y -= self.origin[1]
+            x, y = dot2( self.mat, [x, y] )
+        else:
+            x, y = solve2( self.mat, [x, y] )
+            x += self.origin[0]
+            y += self.origin[1]
+            if proj != None:
+                x, y = proj( x, y, **kwarg )
+        return numpy.array( [x, y] )
 
-def llr2xyz( x, y, z, inverse=False ):
+def cmu( x, y, inverse=False ):
     """
-    Geographic to rectangular coordinate conversion.
-
-    x <-> lon, y <-> lat, z <-> r
+    CMU TeraShake coordinates projection
     """
-    x = numpy.array( x )
-    y = numpy.array( y )
-    z = numpy.array( z )
+    xx = [-121.0, -118.951292], [-116.032285, -113.943965]
+    yy = [  34.5,   36.621696], [  31.082920,   33.122341]
     if inverse:
-        r = numpy.sqrt( x * x + y * y + z * z )
-        x = numpy.arctan2( y, x )
-        y = numpy.arcsin( z / r )
-        x = 180.0 / numpy.pi * x
-        y = 180.0 / numpy.pi * y
-        return numpy.array( [x, y, r] )
+        x, y = interp2( 0.0, 0.0, 600000.0, 300000.0, [xx, yy], x, y, True )
     else:
-        x  = numpy.pi / 180.0 * x
-        y  = numpy.pi / 180.0 * y
-        x_ = numpy.cos( x ) * numpy.cos( y ) * z
-        y_ = numpy.sin( x ) * numpy.cos( y ) * z
-        z  = numpy.sin( y ) * z
-        return numpy.array( [x_, y_, z] )
+        x, y = ibilinear( xx, yy, x, y )
+        x = (x + 1.0) * 300000.0
+        y = (y + 1.0) * 150000.0
+    return numpy.array( [x, y] )
+
+def slipvectors( strike, dip, rake ):
+    """
+    For given strike, dip, and rake (degrees), using the Aki & Richards convention
+    of dip to the right of the strike vector, find the rotation matrix R from world
+    coordinates (east, north, up) to fault local coordinates (slip, rake, normal).
+    The transpose R^T performs the reverse rotation from fault local coordinates to
+    world coordinates.  Rows of R are axis unit vectors of the fault local space in
+    world coordinates.  Columns of R are axis unit vectors of the world space in
+    fault local coordinates.
+    """
+    strike = numpy.pi / 180.0 * numpy.array( strike )
+    dip    = numpy.pi / 180.0 * numpy.array( dip ) 
+    rake   = numpy.pi / 180.0 * numpy.array( rake )
+    u = numpy.ones( strike.shape )
+    z = numpy.zeros( strike.shape )
+    c = numpy.cos( rake )
+    s = numpy.sin( rake )
+    A = numpy.array( [[c, s, z], [-s, c, z], [z, z, u]] )
+    c = numpy.cos( dip )
+    s = numpy.sin( dip )
+    B = numpy.array( [[u, z, z], [z, c, s], [z, -s, c]] )
+    c = numpy.cos( strike )
+    s = numpy.sin( strike )
+    C = numpy.array( [[s, c, z], [-c, s, z], [z, z, u]] )
+    return dot2( dot2( A, B ), C )
+
+def source_tensors( R ):
+    """
+    Given a rotation matrix R from world coordinates (east, north, up) to fault
+    local coordinates (slip, rake, normal), find tensor components that may be
+    scaled by moment or potency to compute moment tensors or potency tensors,
+    respectively.  Rows of R are axis unit vectors of the fault local space in
+    world coordinates.  R can be computed from strike, dip and rake angles with the
+    'slipvectors' routine.  The return value is a 3x3 matrix T specifying
+    contributions to the tensor W:
+    column 1 is the (shear)  strike contribution to W23, W31, W12
+    column 2 is the (shear)  dip    contribution to W23, W31, W12
+    column 3 is the (volume) normal contribution to W11, W22, W33
+    The columns can unpacked conveniently by:
+    Tstrike, Tdip, Tnormal = coord.sliptensors( strike, dip, rake )
+    """
+    strike, dip, normal = slipvectors( R )
+    del( R )
+    strike = 0.5 * ([
+        strike[1] * normal[2] + normal[1] * strike[2],
+        strike[2] * normal[0] + normal[2] * strike[0],
+        strike[0] * normal[1] + normal[0] * strike[1],
+    ])
+    dip = 0.5 * ([
+        dip[1] * normal[2] + normal[1] * dip[2],
+        dip[2] * normal[0] + normal[2] * dip[0],
+        dip[0] * normal[1] + normal[0] * dip[1],
+    ])
+    normal = normal * normal
+    return numpy.array( [strike, dip, normal] )
 
 def viewmatrix( azimuth, elevation, up=None ):
     """
@@ -331,99 +364,45 @@ def viewmatrix( azimuth, elevation, up=None ):
     z = z / numpy.sqrt( ( z * z ).sum() )
     return numpy.array( [x, y, z] ).T
 
-def ll2ortho( x, y, z=None, lon0=-118.0, lat0=34.0, rot=0.0, rearth=6370000.0, inverse=False ):
+def downsample_sphere( f, d ):
     """
-    Orthographic projection. Optional z coordinate has spherical curvature.
+    Down-sample node-registered spherical surface with averaging.
 
-    x <-> lon, y <-> lat, z <-> r
-    Useful for cuboid subsection of a spherical Earth.
-    Pro: lateral and depth boundaries are normal to the Cartesian axes so
-         PML absorbing boundaries may be used.
-    Con: lateral boundaries and z grid lines are not purely vertical in the
-         geographic coordinate system. Deflection from vertical increases
-         with distance from the origin.
+    The indices of the 2D array f are, respectively, longitude and latitude.
+    d is the decimation interval which must be odd.
     """
-    import pyproj
-    projection = pyproj.Proj( proj='ortho', lon_0=lon0, lat_0=lat0 )
-    c = numpy.cos( numpy.pi / 180.0 * rot )
-    s = numpy.sin( numpy.pi / 180.0 * rot )
-    x = numpy.array( x )
-    y = numpy.array( y )
-    if z == None:
-        if inverse:
-            x, y = c * x + s * y,  -s * x + c * y
-            x, y = projection( x, y, inverse=True )
-        else:
-            x, y = projection( x, y, inverse=False )
-            x, y = c * x - s * y,  s * x + c * y
-        return numpy.array( [x, y] )
-    else:
-        if inverse:
-            z -= numpy.sqrt( rearth ** 2 - x ** 2 - y ** 2 ) - rearth
-            x, y = c * x + s * y, -s * x + c * y
-            y -= y * z / rearth
-            x -= x * z / rearth
-            x, y = projection( x, y, inverse=True )
-        else:
-            x, y = projection( x, y, inverse=False )
-            x += x * z / rearth
-            y += y * z / rearth
-            x, y = c * x - s * y,  s * x + c * y
-            z += numpy.sqrt( rearth ** 2 - x ** 2 - y ** 2 ) - rearth
-        return numpy.array( [x, y, z] )
+    n = f.shape
+    ii = numpy.arange( d ) - (d - 1) / 2
+    jj = numpy.arange( 0, n[0], d )
+    kk = numpy.arange( 0, n[1], d )
+    nn = jj.size, kk.size
+    ff = numpy.zeros( nn, f.dtype )
+    jj, kk = numpy.ix_( jj, kk )
+    for dk in ii:
+        k = n[1] - 1 - abs( n[1] - 1 - abs( dk + kk ) )
+        for dj in ii:
+            j = (jj + dj) % n[0]
+            ff = ff + f[j,k]
+    ff[:,0] = ff[:,0].mean()
+    ff[:,-1] = ff[:,-1].mean()
+    ff *= 1.0 / (d * d)
+    return ff
 
-def ll2xy( x, y, inverse=False, projection=None, rot=40.0, lon0=-121.0, lat0=34.5 ):
+def compass( azimuth, radians=False ):
     """
-    UTM TeraShake coordinate projection
+    Get named direction from azimuth.
+    """
+    if radians:
+        azimuth *= 180.0 / numpy.pi
+    names = (
+        'N', 'NNE', 'NE', 'ENE',
+        'E', 'ESE', 'SE', 'SSE',
+        'S', 'SSW', 'SW', 'WSW',
+        'W', 'WNW', 'NW', 'NNW',
+    )
+    return names[ int( azimuth / 22.5 + 16.0 ) % 16 ]
 
-    x <-> lon, y <-> lat, z <-> r
-    """
-    import pyproj
-    if not projection:
-        projection = pyproj.Proj( proj='utm', zone=11, ellps='WGS84' )
-    x0, y0 = projection( lon0, lat0 )
-    c = numpy.cos( numpy.pi / 180.0 * rot )
-    s = numpy.sin( numpy.pi / 180.0 * rot )
-    x = numpy.array( x )
-    y = numpy.array( y )
-    if inverse:
-        x, y = c * x + s * y,  -s * x + c * y
-        x = x + x0
-        y = y + y0
-        x, y = projection( x, y, inverse=True )
-    else:
-        x, y = projection( x, y, inverse=False )
-        x = x - x0
-        y = y - y0
-        x, y = c * x - s * y,  s * x + c * y
-    return numpy.array( [x, y] )
-
-def ll2cvmh( x, y, inverse=False ):
-    """
-    Harvard CVM5 projection.
-
-    x <-> lon, y <-> lat
-    """
-    import pyproj
-    projection = pyproj.Proj( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
-    x = numpy.array( x )
-    y = numpy.array( y )
-    x, y = projection( x, y, inverse=inverse )
-    return numpy.array( [x, y] )
-
-def ll2cmu( x, y, inverse=False ):
-    """
-    CMU TeraShake coordinates projection
-
-    x <-> lon, y <-> lat
-    """
-    xx = [-121.0, -118.951292], [-116.032285, -113.943965]
-    yy = [  34.5,   36.621696], [  31.082920,   33.122341]
-    if inverse:
-        x, y = interp2( 0.0, 0.0, 600000.0, 300000.0, [xx, yy], x, y, True )
-    else:
-        x, y = ibilinear( xx, yy, x, y )
-        x = (x + 1.0) * 300000.0
-        y = (y + 1.0) * 150000.0
-    return numpy.array( [x, y] )
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
 

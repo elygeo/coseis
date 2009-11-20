@@ -238,7 +238,7 @@ four-dimensional sub-volume of the array in space and time.  Array indexing
 starts at 1 for the first node, and 1.5 for the first cell.  Negative indices
 count inward from end of the array, starting at -1 for the last node, and -1.5
 for the last cell.  Indices can be either a single index, a range ``(start,
-end)``, or a strided range ``(start, end, step)``.  Empty paretheses ``()`` are
+end)``, or a strided range ``(start, end, step)``.  Empty parentheses ``()`` are
 shorthand for a full range.  Empty brackets ``[]`` are shorthand for the entire
 4D volume.  Some examples of slice notation::
 
@@ -264,7 +264,7 @@ available, where ``'f'`` is the field variable name (from the list
 
 A letter ``'i'`` in the mode indicates sub-cell positioning via weighted
 averaging.  In this case the spatial indices are single logical coordinates
-that may vary contiguously over the range.  The fractional part of the index
+that may vary continuously over the range.  The fractional part of the index
 determines the weights.  For example, an index of 3.2 to the 1D variable f
 would specify the weighted average: 0.8 * f(3) + 0.2 * f(4).
 

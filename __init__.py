@@ -6,7 +6,7 @@ import os, sys, re, math
 import util, configure, fieldnames
 from extras import coord, egmm, signal, source, viz, swab
 try:
-    from extras import rspectra
+    from extras import proj, rspectra
 except( ImportError ):
     pass
 

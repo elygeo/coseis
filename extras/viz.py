@@ -72,7 +72,7 @@ def lengthscale( x, y, w=None, label='%s', style='k-', bg='w', ax=None, **kwargs
         backgroundcolor=bg, rotation=theta )
     return h1, h2
 
-def colormap( name='w0', colorexp=1.0, output='mayavi', n=2001, nmod=0, modlim=0.5 ):
+def colormap( name='w0', colorexp=1.0, mode='mayavi', n=2001, nmod=0, modlim=0.5 ):
     """
     Colormap library
     """
@@ -175,13 +175,13 @@ def colormap( name='w0', colorexp=1.0, output='mayavi', n=2001, nmod=0, modlim=0
         b = ( 1.0 - w2 * (1.0 - w1 * b) )
         a = ( 1.0 - w2 * (1.0 - w1 * a) )
         x1 = x2
-    if output in ( 'matplotlib', 'pylab' ):
+    if mode in ( 'matplotlib', 'pylab' ):
         import matplotlib
         cmap = { 'red':numpy.c_[x1, r, r],
                'green':numpy.c_[x1, g, g],
                 'blue':numpy.c_[x1, b, b] }
         cmap = matplotlib.colors.LinearSegmentedColormap( name, cmap, n )
-    elif output in ( 'mayavi', 'tvtk', 'mlab' ):
+    elif mode in ( 'mayavi', 'tvtk', 'mlab' ):
         if nmod <= 0:
             x2 = numpy.arange( n ) / (n - 1.0)
             r  = numpy.interp( x2, x1, r )
@@ -190,7 +190,7 @@ def colormap( name='w0', colorexp=1.0, output='mayavi', n=2001, nmod=0, modlim=0
             a  = numpy.interp( x2, x1, a )
             x1 = x2
         cmap = 255 * numpy.array( [r, g, b, a] ).T
-    elif output in ( 'gmt', 'cpt' ):
+    elif mode in ( 'gmt', 'cpt' ):
         cmap = ''
         fmt = '%-10r %3.0f %3.0f %3.0f     %-10r %3.0f %3.0f %3.0f\n'
         for i in range( x1.size - 1 ):
