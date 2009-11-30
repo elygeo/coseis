@@ -229,7 +229,8 @@ class Transform():
     -------------------
     proj : Map projection defined by Pyproj or similar.
     scale : Scale factor.
-    rotation : Rotation angle in degrees.
+    rotate : Rotation angle in degrees.
+    translate : Translation amount.
     origin : Untransformed coordinates of the new origin.  If two sets of points
     are given, the origin is centered between them, and rotation is relative to the
     connecting line. 
@@ -243,21 +244,26 @@ class Transform():
     >>> proj( 0, 0, inverse=True )
     array([-121. ,   34.5])
     """
-    def __init__( self, proj=None, scale=1.0, rotation=0.0, origin=None ):
-        phi = numpy.pi / 180.0 * rotation
-        x, y = origin
+    def __init__( self, proj=None, origin=None, scale=1.0, rotate=0.0, translate=(0.0, 0.0) ):
+        phi = numpy.pi / 180.0 * rotate
         if origin == None:
             x, y = 0.0, 0.0
         else:
+            x, y = origin
             if proj != None:
                 x, y = proj( x, y )
             if type( x ) in (list, tuple):
                 phi += numpy.atan2( y[1] - y[0], x[1] - x[0] )
                 x, y = x[:2].mean(), y[:2].mean()
+        mat = [[1, 0, -x], [0, 1, -y], [0, 0, 1]]
+        if hasattr( proj, 'mat' ):
+            proj = proj.proj
+            mat = numpy.dot( mat, self.mat )
         c = scale * numpy.cos( phi )
         s = scale * numpy.sin( phi )
-        self.mat = numpy.array( [[c, -s], [s, c]] )
-        self.origin = x, y
+        x, y = translate
+        mat = numpy.dot( [[c, -s, x], [s, c, y], [0, 0, 1]], mat )
+        self.mat = mat
         self.proj = proj
     def __call__( self, x, y, **kwarg ):
         proj = self.proj
@@ -266,13 +272,13 @@ class Transform():
         if kwarg.get( 'inverse' ) != True:
             if proj != None:
                 x, y = proj( x, y, **kwarg )
-            x -= self.origin[0]
-            y -= self.origin[1]
-            x, y = dot2( self.mat, [x, y] )
+            x, y = dot2( self.mat[:2,:2], [x, y] )
+            x += self.mat[0,2]
+            y += self.mat[1,2]
         else:
-            x, y = solve2( self.mat, [x, y] )
-            x += self.origin[0]
-            y += self.origin[1]
+            x -= self.mat[0,2]
+            y -= self.mat[1,2]
+            x, y = solve2( self.mat[:2,:2], [x, y] )
             if proj != None:
                 x, y = proj( x, y, **kwarg )
         return numpy.array( [x, y] )
@@ -363,30 +369,6 @@ def viewmatrix( azimuth, elevation, up=None ):
     y = y / numpy.sqrt( ( y * y ).sum() )
     z = z / numpy.sqrt( ( z * z ).sum() )
     return numpy.array( [x, y, z] ).T
-
-def downsample_sphere( f, d ):
-    """
-    Down-sample node-registered spherical surface with averaging.
-
-    The indices of the 2D array f are, respectively, longitude and latitude.
-    d is the decimation interval which must be odd.
-    """
-    n = f.shape
-    ii = numpy.arange( d ) - (d - 1) / 2
-    jj = numpy.arange( 0, n[0], d )
-    kk = numpy.arange( 0, n[1], d )
-    nn = jj.size, kk.size
-    ff = numpy.zeros( nn, f.dtype )
-    jj, kk = numpy.ix_( jj, kk )
-    for dk in ii:
-        k = n[1] - 1 - abs( n[1] - 1 - abs( dk + kk ) )
-        for dj in ii:
-            j = (jj + dj) % n[0]
-            ff = ff + f[j,k]
-    ff[:,0] = ff[:,0].mean()
-    ff[:,-1] = ff[:,-1].mean()
-    ff *= 1.0 / (d * d)
-    return ff
 
 def compass( azimuth, radians=False ):
     """

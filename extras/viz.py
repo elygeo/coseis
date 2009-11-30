@@ -327,6 +327,81 @@ def textpmb( x, y, s, dx=None, dy=None, fg='k', bg='w', n=16, ax=None, **kwargs 
     h += [ ax.text( x, y, s, color=fg, **kwargs ) ]
     return h
 
+def etopo1( indices=None, path='', download=False ):
+    """
+    Download ETOPO1 Global Relief Model.
+    http://www.ngdc.noaa.gov/mgg/global/global.html
+    """
+    import urllib, zipfile, sord
+    filename = os.path.join( path, 'etopo01-ice.f32' )
+    if download and not os.path.exists( filename ):
+        url = 'ftp://ftp.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary_float/etopo1_ice_g.zip'
+        f = os.path.join( path, os.path.basename( url ) )
+        if not os.path.exists( f ):
+            print( 'Retrieving %s' % url )
+            urllib.urlretrieve( url, f )
+        open( filename, 'wb' ).write( zipfile.ZipFile( f, 'r' ).read( 'etopo1_ice_g.flt' ) )
+    if indices != None:
+        shape = 180 * 60 + 1, 360 * 60 + 1
+        return sord.util.ndread( filename, shape, indices, '<i2' )
+    else:
+        return
+
+def globe( indices=None, path='', download=False ):
+    """
+    Global Land One-km Base Elevation Digital Elevation Model.
+    http://www.ngdc.noaa.gov/mgg/topo/globe.html
+    """
+    import urllib, gzip, sord
+    filename = os.path.join( path, 'globe30.i16' )
+    if download and not os.path.exists( filename ):
+        print( 'Building %s' % filename )
+        n = 90 * 60 * 2
+        url = 'http://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/%s10g.gz'
+        tiles = 'abcd', 'efgh', 'ijkl', 'mnop'
+        fd = open( path, 'wb' ) 
+        for j in range( len( tiles ) ):
+            row = []
+            for k in range( len( tiles[j] ) ):
+                u = url % tiles[j][k]
+                f = os.path.join( path, os.path.basename( u ) )
+                if not os.path.exists( f ):
+                    print( 'Retrieving %s' % u )
+                    urllib.urlretrieve( u, f ) 
+                z = gzip.open( f, mode='rb' ).read()
+                z = numpy.fromstring( z, '<i2' ).reshape( [-1, n] )
+                row += [z]
+            row = numpy.hstack( row )
+            row.tofile( fd )
+        fd.close()
+        del( z, row )
+    if indices != None:
+        shape = 360 * 60 * 2, 180 * 60 * 2
+        return sord.util.ndread( filename, shape, indices, '<f4' )
+    else:
+        return
+
+def topo( indices, path='', download=False ):
+    """
+    Merge GLOBE and ETOPO1 digital elvation models.
+    """
+    j, k = indices
+    m = j[1] - j[0] + 1, k[1] - k[0] + 1
+    n = 2 * m[0] - 1, 2 * m[1] - 1
+    j = 2 * j[0] - 1, 2 * j[1] - 2
+    k = 2 * k[0] - 1, 2 * k[1] - 2
+    e = etopo1( indices, path, download )
+    z = numpy.empty( n, e.dtype )
+    z[0::2,0::2] = 9 * e[:-1,:-1] + 3 * e[:-1,1:] + 3 * e[1:,:-1] +     e[1:,1:]
+    z[0::2,1::2] = 3 * e[:-1,:-1] + 9 * e[:-1,1:] +     e[1:,:-1] + 3 * e[1:,1:]
+    z[1::2,0::2] = 3 * e[:-1,:-1] +     e[:-1,1:] + 9 * e[1:,:-1] + 3 * e[1:,1:]
+    z[1::2,1::2] =     e[:-1,:-1] + 3 * e[:-1,1:] + 3 * e[1:,:-1] + 9 * e[1:,1:]
+    z *= 0.0625
+    z1 = globe( [j, k], path, download )
+    i = z1 != -500
+    z[i] = z1[i]
+    return z
+
 def gshhs( path='', resolution='h', min_area=0.0, min_level=1, max_level=4, range=None, member='gshhs/gshhs_%s.b', download=False ):
     """
     Reader for the Global Self-consistent, Hierarchical, High-resolution Shoreline
@@ -418,4 +493,37 @@ def engdahlcat( path='engdahl-centennial-cat.f32', fields=['lon', 'lat', 'depth'
             out += [data[:][f]]
         numpy.array( out, 'f' ).T.tofile( path )
 
+def upsample( f ):
+    n = list( f.shape )
+    m[:2] = [ n[0] * 2 - 1, n[1] * 2 - 1 ]
+    g = numpy.empty( m, f.dtype )
+    g[0::2,0::2] = f
+    g[0::2,1::2] = 0.5 * (f[:,:-1] + f[:,1:])
+    g[1::2,0::2] = 0.5 * (f[:-1,:] + f[1:,:])
+    g[1::2,1::2] = 0.25 * (f[:-1,:-1] + f[1:,1:] + f[:-1,1:] + f[1:,:-1])
+    return g
+
+def downsample_sphere( f, d ):
+    """
+    Down-sample node-registered spherical surface with averaging.
+
+    The indices of the 2D array f are, respectively, longitude and latitude.
+    d is the decimation interval which must be odd.
+    """
+    n = f.shape
+    ii = numpy.arange( d ) - (d - 1) / 2
+    jj = numpy.arange( 0, n[0], d )
+    kk = numpy.arange( 0, n[1], d )
+    nn = jj.size, kk.size
+    ff = numpy.zeros( nn, f.dtype )
+    jj, kk = numpy.ix_( jj, kk )
+    for dk in ii:
+        k = n[1] - 1 - abs( n[1] - 1 - abs( dk + kk ) )
+        for dj in ii:
+            j = (jj + dj) % n[0]
+            ff = ff + f[j,k]
+    ff[:,0] = ff[:,0].mean()
+    ff[:,-1] = ff[:,-1].mean()
+    ff *= 1.0 / (d * d)
+    return ff
 
