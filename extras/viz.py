@@ -342,8 +342,8 @@ def etopo1( indices=None, path='', download=False ):
             urllib.urlretrieve( url, f )
         open( filename, 'wb' ).write( zipfile.ZipFile( f, 'r' ).read( 'etopo1_ice_g.flt' ) )
     if indices != None:
-        shape = 180 * 60 + 1, 360 * 60 + 1
-        return sord.util.ndread( filename, shape, indices, '<i2' )
+        shape = 21601, 10801
+        return sord.util.ndread( filename, shape, indices, '<f4' )
     else:
         return
 
@@ -376,31 +376,35 @@ def globe( indices=None, path='', download=False ):
         fd.close()
         del( z, row )
     if indices != None:
-        shape = 360 * 60 * 2, 180 * 60 * 2
-        return sord.util.ndread( filename, shape, indices, '<f4' )
+        shape = 43200, 21600
+        return sord.util.ndread( filename, shape, indices, '<i2' )
     else:
         return
 
-def topo( indices, path='', download=False ):
+def topo( lon, lat, path='', download=False ):
     """
-    Merge GLOBE and ETOPO1 digital elvation models.
+    Extrat merged GLOBE/ETOPO1 digital elvation model for given region.
     """
-    j, k = indices
-    m = j[1] - j[0] + 1, k[1] - k[0] + 1
-    n = 2 * m[0] - 1, 2 * m[1] - 1
+    o = 0.25
+    j = int( lon[0] * 60 + 10801 - o ), int( numpy.ceil( lon[1] * 60 + 10801 + o ) )
+    k = int( -lat[1] * 60 + 5401 - o ), int( numpy.ceil( -lat[0] * 60 + 5401 + o ) )
+    z = etopo1( [j, k], path, download )
     j = 2 * j[0] - 1, 2 * j[1] - 2
     k = 2 * k[0] - 1, 2 * k[1] - 2
-    e = etopo1( indices, path, download )
-    z = numpy.empty( n, e.dtype )
-    z[0::2,0::2] = 9 * e[:-1,:-1] + 3 * e[:-1,1:] + 3 * e[1:,:-1] +     e[1:,1:]
-    z[0::2,1::2] = 3 * e[:-1,:-1] + 9 * e[:-1,1:] +     e[1:,:-1] + 3 * e[1:,1:]
-    z[1::2,0::2] = 3 * e[:-1,:-1] +     e[:-1,1:] + 9 * e[1:,:-1] + 3 * e[1:,1:]
-    z[1::2,1::2] =     e[:-1,:-1] + 3 * e[:-1,1:] + 3 * e[1:,:-1] + 9 * e[1:,1:]
+    n = j[1] - j[0] + 1, k[1] - k[0] + 1
     z *= 0.0625
-    z1 = globe( [j, k], path, download )
-    i = z1 != -500
-    z[i] = z1[i]
-    return z
+    z1 = numpy.empty( n, z.dtype )
+    z1[0::2,0::2] = 9 * z[:-1,:-1] + 3 * z[:-1,1:] + 3 * z[1:,:-1] +     z[1:,1:]
+    z1[0::2,1::2] = 3 * z[:-1,:-1] + 9 * z[:-1,1:] +     z[1:,:-1] + 3 * z[1:,1:]
+    z1[1::2,0::2] = 3 * z[:-1,:-1] +     z[:-1,1:] + 9 * z[1:,:-1] + 3 * z[1:,1:]
+    z1[1::2,1::2] =     z[:-1,:-1] + 3 * z[:-1,1:] + 3 * z[1:,:-1] + 9 * z[1:,1:]
+    z = globe( [j, k], path, download )
+    i = z != -500
+    z1[i] = z[i]
+    z = z1
+    lon = (j[0] - 21600.5) / 120, (j[1] - 21600.5) / 120
+    lat = (10800.5 - k[1]) / 120, (10800.5 - k[0]) / 120
+    return z[:,::-1], lon, lat
 
 def gshhs( path='', resolution='h', min_area=0.0, min_level=1, max_level=4, range=None, member='gshhs/gshhs_%s.b', download=False ):
     """
@@ -508,7 +512,8 @@ def downsample_sphere( f, d ):
     Down-sample node-registered spherical surface with averaging.
 
     The indices of the 2D array f are, respectively, longitude and latitude.
-    d is the decimation interval which must be odd.
+    d is the decimation interval which should be odd to preserve nodal
+    registration.
     """
     n = f.shape
     ii = numpy.arange( d ) - (d - 1) / 2
