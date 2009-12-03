@@ -37,6 +37,35 @@ def savefig( fd=None, fig=None, format=None, **kwargs ):
     else:
         return out
 
+def pylab_screenshot( fig=None, dpi=None, **kwargs ):
+    import pylab, cStringIO
+    if fig == None:
+        fig = pylab.gcf()
+    if dpi == None:
+        dpi = fig.dpi
+    n = fig.get_size_inches()
+    n = n[1] * dpi, n[0] * dpi, 4
+    out = cStringIO.StringIO()
+    fig.savefig( out, format='raw', dpi=dpi, **kwargs )
+    out = out.getvalue()
+    out = numpy.fromstring( out, 'u1' ).reshape( n )
+    return( out )
+
+def pylab_screenshot_agg( fig ):
+    fig.canvas.draw()
+    b = fig.canvas.buffer_rgba(0, 0)
+    n = fig.canvas.get_width_height()[::-1] + (4,)
+    img = numpy.frombuffer( b, 'u1' ).reshape( n )
+    return( img )
+
+def pylab_screenshot_pil( fig ):
+    import PIL.Image
+    fig.canvas.draw()
+    b = fig.canvas.buffer_rgba(0, 0)
+    n = fig.canvas.get_width_height()
+    img = PIL.Image.frombuffer( 'RGBA', n, b, 'raw', 'RGBA', 0, 1 )
+    return( img )
+
 def lengthscale( x, y, w=None, label='%s', style='k-', bg='w', ax=None, **kwargs ):
     """
     Draw a length scale bar between the points (x[0], y[0]) and (x[1], y[1]).
@@ -117,11 +146,11 @@ def colormap( name='w0', colorexp=1.0, mode='mayavi', n=2001, nmod=0, modlim=0.5
         elif name == 'warm':
             g = numpy.arange( 32 ) / 31.0
             r = numpy.ones_like( g )
-            b = numpy.zeros_like( g ) 
+            b = numpy.zeros_like( g )
         elif name == 'red':
             r = 31.0 - numpy.arange( 32 )
             g = numpy.zeros_like( r )
-            b = numpy.zeros_like( r ) 
+            b = numpy.zeros_like( r )
         elif name == 'socal':
             r = numpy.array( [ 0,  0,  0, 10, 10, 15, 15, 25, 25, 25] ) / 80.0
             g = numpy.array( [10, 10, 10, 20, 20, 25, 30, 25, 25, 25] ) / 80.0
@@ -144,8 +173,15 @@ def colormap( name='w0', colorexp=1.0, mode='mayavi', n=2001, nmod=0, modlim=0.5
         else:
             sys.exit( 'colormap %s not found' % name )
     else:
-        r, g, b = name
         name = 'custom'
+        if len( a ) == 1:
+            r = g = b = name
+        elif len( a ) == 3:
+            r, g, b = name
+        elif len( a ) == 4:
+            r, g, b, a = name
+        else:
+            sys.exit( 'bad colormap' )
     n2 = len( r )
     m = 1.0 / max( 1., max(r), max(g), max(b) )
     r = m * numpy.array( r )
@@ -169,19 +205,19 @@ def colormap( name='w0', colorexp=1.0, mode='mayavi', n=2001, nmod=0, modlim=0.5
         a  = numpy.interp( x2, x1, a )
         w1 = modlim * numpy.cos( numpy.pi * 2. * nmod * x2 )
         w1 = 1.0 - numpy.maximum( w1, 0.0 )
-        w2 = 1.0 + numpy.minimum( w1, 0.0 ) 
+        w2 = 1.0 + numpy.minimum( w1, 0.0 )
         r = ( 1.0 - w2 * (1.0 - w1 * r) )
         g = ( 1.0 - w2 * (1.0 - w1 * g) )
         b = ( 1.0 - w2 * (1.0 - w1 * b) )
         a = ( 1.0 - w2 * (1.0 - w1 * a) )
         x1 = x2
-    if mode in ( 'matplotlib', 'pylab' ):
+    if mode in ('matplotlib', 'pylab'):
         import matplotlib
         cmap = { 'red':numpy.c_[x1, r, r],
                'green':numpy.c_[x1, g, g],
                 'blue':numpy.c_[x1, b, b] }
         cmap = matplotlib.colors.LinearSegmentedColormap( name, cmap, n )
-    elif mode in ( 'mayavi', 'tvtk', 'mlab' ):
+    elif mode in ('mayavi', 'tvtk', 'mlab'):
         if nmod <= 0:
             x2 = numpy.arange( n ) / (n - 1.0)
             r  = numpy.interp( x2, x1, r )
@@ -190,7 +226,7 @@ def colormap( name='w0', colorexp=1.0, mode='mayavi', n=2001, nmod=0, modlim=0.5
             a  = numpy.interp( x2, x1, a )
             x1 = x2
         cmap = 255 * numpy.array( [r, g, b, a] ).T
-    elif mode in ( 'gmt', 'cpt' ):
+    elif mode in ('gmt', 'cpt'):
         cmap = ''
         fmt = '%-10r %3.0f %3.0f %3.0f     %-10r %3.0f %3.0f %3.0f\n'
         for i in range( x1.size - 1 ):
@@ -199,7 +235,7 @@ def colormap( name='w0', colorexp=1.0, mode='mayavi', n=2001, nmod=0, modlim=0.5
                 x1[i+1], 255 * r[i+1], 255 * g[i+1], 255 * b[i+1],
             )
     else:
-        cmap = numpy.array( [x1, r, g, b] )
+        cmap = numpy.array( [x1, r, g, b, a] )
     return cmap
 
 def digitize( img, xlim=(-1, 1), ylim=(-1, 1), color='r' ):
@@ -241,7 +277,7 @@ def digitize( img, xlim=(-1, 1), ylim=(-1, 1), color='r' ):
     dy = 0.5 * (ylim[1] - ylim[0])
     xr, yr = [], []
     while 1:
-        xy = fig.ginput( -1, -1 ) 
+        xy = fig.ginput( -1, -1 )
         if len( xy ) == 0:
             break
         x, y = zip( *xy )
@@ -284,7 +320,23 @@ def contours( *args, **kwargs ):
     pylab.close( fig )
     return pp
 
-def pmb_mlab( x, y, z, s, dx, fg=(1,1,1), bg=(0,0,0), n=16, **kwargs ):
+def mlab_screenshot( fig, mag=None ):
+    from enthought.tvtk.api import tvtk
+    #fig.scene._lift()
+    x, y = size = tuple( fig.scene.get_size() )
+    if mag:
+        x, y = mag * x, mag * y
+        mfig.scene.set_size( (x, y) )
+    fig.scene.render()
+    img = tvtk.UnsignedCharArray()
+    fig.scene.render_window.get_pixel_data( 0, 0, x-1, y-1, 1, img )
+    img = img.to_array().reshape( (y, x, 3) )[::-1,:]
+    if mag:
+        fig.scene.set_size( size )
+        fig.scene.render()
+    return( img )
+
+def mlab_pmb( x, y, z, s, dx, fg=(1,1,1), bg=(0,0,0), n=16, **kwargs ):
     """
     Poor man's bold text.
     """
@@ -327,22 +379,25 @@ def textpmb( x, y, s, dx=None, dy=None, fg='k', bg='w', n=16, ax=None, **kwargs 
     h += [ ax.text( x, y, s, color=fg, **kwargs ) ]
     return h
 
-def etopo1( indices=None, path='', download=False ):
+def etopo1( indices=None, path='', downsample=1, download=False ):
     """
     Download ETOPO1 Global Relief Model.
     http://www.ngdc.noaa.gov/mgg/global/global.html
     """
     import urllib, zipfile, sord
-    filename = os.path.join( path, 'etopo01-ice.f32' )
+    filename = os.path.join( path, 'etopo%02d-ice.f32' % downsample )
     if download and not os.path.exists( filename ):
         url = 'ftp://ftp.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary_float/etopo1_ice_g.zip'
         f = os.path.join( path, os.path.basename( url ) )
         if not os.path.exists( f ):
             print( 'Retrieving %s' % url )
             urllib.urlretrieve( url, f )
-        open( filename, 'wb' ).write( zipfile.ZipFile( f, 'r' ).read( 'etopo1_ice_g.flt' ) )
+        z = zipfile.ZipFile( f, 'r' ).read( 'etopo1_ice_g.flt' )
+        if downsample > 1:
+            z = sord.coord.downsample_sphere( z, downsample )
+        open( filename, 'wb' ).write( z )
     if indices != None:
-        shape = 21601, 10801
+        shape = (21601 - 1) / downsample + 1, (10801 - 1) / downsample + 1
         return sord.util.ndread( filename, shape, indices, '<f4' )
     else:
         return
@@ -359,7 +414,7 @@ def globe( indices=None, path='', download=False ):
         n = 90 * 60 * 2
         url = 'http://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/%s10g.gz'
         tiles = 'abcd', 'efgh', 'ijkl', 'mnop'
-        fd = open( path, 'wb' ) 
+        fd = open( path, 'wb' )
         for j in range( len( tiles ) ):
             row = []
             for k in range( len( tiles[j] ) ):
@@ -367,7 +422,7 @@ def globe( indices=None, path='', download=False ):
                 f = os.path.join( path, os.path.basename( u ) )
                 if not os.path.exists( f ):
                     print( 'Retrieving %s' % u )
-                    urllib.urlretrieve( u, f ) 
+                    urllib.urlretrieve( u, f )
                 z = gzip.open( f, mode='rb' ).read()
                 z = numpy.fromstring( z, '<i2' ).reshape( [-1, n] )
                 row += [z]
@@ -448,7 +503,7 @@ def gshhs( path='', resolution='h', min_area=0.0, min_level=1, max_level=4, rang
             break
         level = hdr[2:3].view( 'i1' )[3]
         if level > max_level or level < min_level:
-            continue 
+            continue
         if range != None:
             west, east, south, north = hdr[3:7] * 1e-6
             if west < range[0] or east > range[1] or south < range[2] or north > range[3]:
@@ -465,7 +520,7 @@ def gshhs( path='', resolution='h', min_area=0.0, min_level=1, max_level=4, rang
 
 def engdahlcat( path='engdahl-centennial-cat.f32', fields=['lon', 'lat', 'depth', 'mag'] ):
     """
-    Download Engdahl Centennial Earthquake Catalog to binary file.
+    Engdahl Centennial Earthquake Catalog to binary file.
     http://earthquake.usgs.gov/research/data/centennial.php
     """
     import urllib
@@ -496,11 +551,14 @@ def engdahlcat( path='engdahl-centennial-cat.f32', fields=['lon', 'lat', 'depth'
         for f in fields:
             out += [data[:][f]]
         numpy.array( out, 'f' ).T.tofile( path )
+    else:
+        out = numpy.fromfile( path, 'f' ).reshape( (-1,4) ).T
+    return out
 
 def upsample( f ):
     n = list( f.shape )
-    m[:2] = [ n[0] * 2 - 1, n[1] * 2 - 1 ]
-    g = numpy.empty( m, f.dtype )
+    n[:2] = [ n[0] * 2 - 1, n[1] * 2 - 1 ]
+    g = numpy.empty( n, f.dtype )
     g[0::2,0::2] = f
     g[0::2,1::2] = 0.5 * (f[:,:-1] + f[:,1:])
     g[1::2,0::2] = 0.5 * (f[:-1,:] + f[1:,:])
