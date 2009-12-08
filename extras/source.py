@@ -344,11 +344,14 @@ def dsample( f, d ):
     g = g / (d * d)
     return g
 
-def srf2coulomb( path, projection, dx, dest='coulomb', scut=0 ):
+def srf2coulomb( path, projection, dx, dest=None, scut=0 ):
     """
     Convert SRF to Coulomb input file.
     """
     import coord
+
+    if dest == None:
+        dest = os.path.join( path, 'coulomb-' )
 
     # Meta data
     path = os.path.expanduser( path ) + os.sep
@@ -387,7 +390,7 @@ def srf2coulomb( path, projection, dx, dest='coulomb', scut=0 ):
     # Source file
     i = (s1**2 + s2**2) > (numpy.sign( scut ) * scut**2)
     c = numpy.array( [x1[i], y1[i], x2[i], y2[i], r1[i], r2[i], dip[i], z1[i], z2[i]] ).T
-    fd = open( path + dest + '-source.inp', 'w' )
+    fd = open( dest + 'source.inp', 'w' )
     fd.write( coulomb_header % meta )
     numpy.savetxt( fd, c, coulomb_fmt )
     fd.write( coulomb_footer )
@@ -396,7 +399,7 @@ def srf2coulomb( path, projection, dx, dest='coulomb', scut=0 ):
     # Receiver file
     s1.fill( 0.0 )
     c = numpy.array( [x1, y1, x2, y2, s1, s1, dip, z1, z2] ).T
-    fd = open( path + dest + '-receiver.inp', 'w' )
+    fd = open( dest + 'receiver.inp', 'w' )
     fd.write( coulomb_header % meta )
     numpy.savetxt( fd, c, coulomb_fmt )
     fd.write( coulomb_footer )

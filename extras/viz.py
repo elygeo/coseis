@@ -4,67 +4,133 @@ Visualization utilities
 """
 import os, sys, numpy
 
-def savefig( fd=None, fig=None, format=None, **kwargs ):
+def screenshot( fig=None, format=None, mag=None, aa_frames=8 ):
+    """
+    Mayavi screenshot.
+    """
+    from enthought.tvtk.api import tvtk
+    if fig == None:
+        from enthought.mayavi import mlab
+        fig = mlab.gcf()
+    #fig.scene._lift()
+    x, y = size = tuple( fig.scene.get_size() )
+    aa_frames0 = fig.scene.render_window.aa_frames
+    fig.scene.render_window.aa_frames = aa_frames
+    if mag:
+        x, y = mag * x, mag * y
+        mfig.scene.set_size( (x, y) )
+    fig.scene.render()
+    img = tvtk.UnsignedCharArray()
+    fig.scene.render_window.get_pixel_data( 0, 0, x-1, y-1, 1, img )
+    img = img.to_array().reshape( (y, x, 3) )[::-1,:]
+    fig.scene.render_window.aa_frames = aa_frames0
+    if mag:
+        fig.scene.set_size( size )
+        fig.scene.render()
+    return( img )
+
+def distill_eps( fd, mode=None ):
+    """
+    Distill EPS to PDF using Ghostscript.
+    """
+    import subprocess, cStringIO
+    if type( fd ) == str:
+        fd = cStringIO.StringIO( fd )
+    cmd = 'ps2pdf', '-dEPSCrop', '-dPDFSETTINGS=/prepress', '-', '-'
+    pid = subprocess.Popen( cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE )
+    fd = pid.communicate( fd.getvalue() )[0]
+    if mode != 'str':
+        fd = cStringIO.StringIO( fd )
+        fd.reset()
+    return( fd )
+
+def pdf2png( path, dpi=72, mode=None ):
+    """
+    Rasterize a PDF file using Ghostscript.
+    """
+    import subprocess, cStringIO
+    cmd = 'gs', '-q', '-r%s' % dpi, '-dNOPAUSE', '-dBATCH', '-sDEVICE=pngalpha', '-sOutputFile=-', path
+    pid = subprocess.Popen( cmd, stdout=subprocess.PIPE )
+    out = pid.communicate()[0]                             
+    if mode != 'str':
+        out = cStringIO.StringIO( out )
+        out.reset()
+    return( out )
+
+def img2pdf( img, mode=None ):
+    """
+    Convert image array to PDF using PIL and ImageMagick.
+    """
+    import subprocess, cStringIO, Image
+    fd = cStringIO.StringIO()
+    img = Image.fromarray( img )
+    img.save( fd, format='png' )                                           
+    cmd = 'convert', 'png:-', 'pdf:-'                                        
+    pid = subprocess.Popen( cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE )
+    fd = pid.communicate( fd.getvalue() )[0]                             
+    if mode != 'str':
+        fd = cStringIO.StringIO( fd )
+        fd.reset()
+    return( fd )
+
+def pdf_merge( layers ):
+    """
+    Overlay multiple single page PDF file descriptors.
+    """
+    import cStringIO, pyPdf
+    out = cStringIO.StringIO()
+    pdf = pyPdf.PdfFileWriter()
+    page = pyPdf.PdfFileReader( layers[0] )
+    page = page.getPage( 0 )
+    for i in layers[1:]:
+        i = pyPdf.PdfFileReader( i )
+        i = i.getPage( 0 ) 
+        page.mergePage( i ) 
+    pdf.addPage( page )
+    pdf.write( out )
+    out.reset()
+    return( out )
+
+def savefig( fd=None, fig=None, format=None, distill=True, **kwargs ):
     """
     Enhanced version of Matplotlib pylab.savefig command.
 
-    Returns output as a string and optionally saves to a file.
-    PDF is distilled using Ghostscript to produce smaller files.
-    Takes the same argnuments as pylab.savefig.
+    Takes the same argnuments as pylab.savefig.  Saves to disk if a filename is
+    given. Otherwise return a StringIO file descriptor, or a numpy array.  PDF is
+    distilled using Ghostscript to produce smaller files.
     """
-    import pylab, cStringIO, subprocess
+    import cStringIO, pylab
     if fig == None:
         fig = pylab.gcf()
-    if fd:
-        if type( fd ) is not file:
-            if not format:
-                format = fd.split( '.' )[-1]
-            fd = open( os.path.expanduser( fd ), 'wb' )
+    if type( fd ) == str:
+        fd = open( os.path.expanduser( fd ), 'wb' )
+        if format == None:
+            format = fd.split( '.' )[-1]
+    else:
+        if format == None:
+            format = 'array'
     out = cStringIO.StringIO()
-    if format == 'pdf':
+    if format == 'array':
+        if 'dpi' in kwargs:
+            dpi = kwargs['dpi']
+        else:
+            dpi = fig.dpi
+        n = fig.get_size_inches()
+        n = n[1] * dpi, n[0] * dpi, 4
+        fig.savefig( out, format='raw', **kwargs )
+        out = numpy.fromstring( out.getvalue(), 'u1' ).reshape( n )
+    elif distill and format == 'pdf':
         fig.savefig( out, format='eps', **kwargs )
-        out = out.getvalue()
-        cmd = 'ps2pdf', '-dEPSCrop', '-dPDFSETTINGS=/prepress', '-', '-'
-        pid = subprocess.Popen( cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE )
-        out = pid.communicate( out )[0]
+        out = distill_eps( out )
     else:
         fig.savefig( out, format=format, **kwargs )
-        out = out.getvalue()
-    if fd:
-        fd.write( out )
+        out.reset()
+    if fd == None:
+        return( out )
+    else:
+        fd.write( out.getvalue() )
         fd.close()
         return
-    else:
-        return out
-
-def pylab_screenshot( fig=None, dpi=None, **kwargs ):
-    import pylab, cStringIO
-    if fig == None:
-        fig = pylab.gcf()
-    if dpi == None:
-        dpi = fig.dpi
-    n = fig.get_size_inches()
-    n = n[1] * dpi, n[0] * dpi, 4
-    out = cStringIO.StringIO()
-    fig.savefig( out, format='raw', dpi=dpi, **kwargs )
-    out = out.getvalue()
-    out = numpy.fromstring( out, 'u1' ).reshape( n )
-    return( out )
-
-def pylab_screenshot_agg( fig ):
-    fig.canvas.draw()
-    b = fig.canvas.buffer_rgba(0, 0)
-    n = fig.canvas.get_width_height()[::-1] + (4,)
-    img = numpy.frombuffer( b, 'u1' ).reshape( n )
-    return( img )
-
-def pylab_screenshot_pil( fig ):
-    import PIL.Image
-    fig.canvas.draw()
-    b = fig.canvas.buffer_rgba(0, 0)
-    n = fig.canvas.get_width_height()
-    img = PIL.Image.frombuffer( 'RGBA', n, b, 'raw', 'RGBA', 0, 1 )
-    return( img )
 
 def lengthscale( x, y, w=None, label='%s', style='k-', bg='w', ax=None, **kwargs ):
     """
@@ -320,22 +386,6 @@ def contours( *args, **kwargs ):
     pylab.close( fig )
     return pp
 
-def mlab_screenshot( fig, mag=None ):
-    from enthought.tvtk.api import tvtk
-    #fig.scene._lift()
-    x, y = size = tuple( fig.scene.get_size() )
-    if mag:
-        x, y = mag * x, mag * y
-        mfig.scene.set_size( (x, y) )
-    fig.scene.render()
-    img = tvtk.UnsignedCharArray()
-    fig.scene.render_window.get_pixel_data( 0, 0, x-1, y-1, 1, img )
-    img = img.to_array().reshape( (y, x, 3) )[::-1,:]
-    if mag:
-        fig.scene.set_size( size )
-        fig.scene.render()
-    return( img )
-
 def mlab_pmb( x, y, z, s, dx, fg=(1,1,1), bg=(0,0,0), n=16, **kwargs ):
     """
     Poor man's bold text.
@@ -436,14 +486,17 @@ def globe( indices=None, path='', download=False ):
     else:
         return
 
-def topo( lon, lat, path='', download=False ):
+def topo( lon, lat, path='', cache='', download=False ):
     """
     Extrat merged GLOBE/ETOPO1 digital elvation model for given region.
     """
+    if cache and os.path.exists( cache + '.npz' ):
+        c = numpy.load( cache + '.npz' )
+        return c['z'], c['lon'], c['lat']
     o = 0.25
     j = int( lon[0] * 60 + 10801 - o ), int( numpy.ceil( lon[1] * 60 + 10801 + o ) )
     k = int( -lat[1] * 60 + 5401 - o ), int( numpy.ceil( -lat[0] * 60 + 5401 + o ) )
-    z = etopo1( [j, k], path, download )
+    z = etopo1( [j, k], path, 1, download )
     j = 2 * j[0] - 1, 2 * j[1] - 2
     k = 2 * k[0] - 1, 2 * k[1] - 2
     n = j[1] - j[0] + 1, k[1] - k[0] + 1
@@ -459,6 +512,8 @@ def topo( lon, lat, path='', download=False ):
     z = z1
     lon = (j[0] - 21600.5) / 120, (j[1] - 21600.5) / 120
     lat = (10800.5 - k[1]) / 120, (10800.5 - k[0]) / 120
+    if cache:
+        numpy.savez( cache + '.npz', z=z, lon=lon, lat=lat )
     return z[:,::-1], lon, lat
 
 def gshhs( path='', resolution='h', min_area=0.0, min_level=1, max_level=4, range=None, member='gshhs/gshhs_%s.b', download=False ):
