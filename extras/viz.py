@@ -103,9 +103,9 @@ def savefig( fd=None, fig=None, format=None, distill=True, **kwargs ):
     if fig == None:
         fig = pylab.gcf()
     if type( fd ) == str:
-        fd = open( os.path.expanduser( fd ), 'wb' )
         if format == None:
             format = fd.split( '.' )[-1]
+        fd = open( os.path.expanduser( fd ), 'wb' )
     else:
         if format == None:
             format = 'array'
