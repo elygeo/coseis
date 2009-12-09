@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# This script installs MPICH2
+# Install MPICH2
 
 # Set loction here:
 prefix="${HOME}/local"

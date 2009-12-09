@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# This script installs statically-linked Python and Numpy
+# Install statically-linked Python and Numpy
 # for Cray Compute Node Linux (CNS) on NICS Kraken.
 # Made possible by the instructions found at these sites:
 # https://wiki.fysik.dtu.dk/gpaw/install/Cray/louhi.html
@@ -7,6 +7,7 @@
 # http://code.google.com/p/pyprop/wiki/Installation_CrayXT4
 
 ver_python="2.6.2"
+ver_python="2.6.4"
 ver_numpy="1.2.1" # ver 1.3.0 fails for libnpymath
 prefix="/lustre/scratch/${USER}/local/python"
 

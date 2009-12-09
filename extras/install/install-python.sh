@@ -1,6 +1,5 @@
 #!/bin/bash -e
-# This script installs official Python.
-# For more bells and whistles, the Enthought Python Distribution is highly recommended
+# Install Python, setuptools, Numpy and Pyproj.
 
 version="2.6.4"
 prefix="${HOME}/local/python"

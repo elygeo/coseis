@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# This script installs Enthought Python under Linux/UNIX.
+# Install Enthought Python Distribution under Linux/UNIX.
 
 # Set version here:
 # rh3 seems to work for most linux distros. Fedora 6 = RHEL 5

@@ -467,8 +467,8 @@ way to install Bazaar is to use Python `Easy Install
 installation.  Shell scripts are provided to help install either vanilla Python
 or Enthought Python Distribution.  Use curl to download one or the other::
 
-    curl -O http://earth.usc.edu/~gely/sord/extras/install/python-install.sh
-    curl -O http://earth.usc.edu/~gely/sord/extras/install/python-epd-install.sh
+    curl -O http://earth.usc.edu/~gely/sord/extras/install/install-python.sh
+    curl -O http://earth.usc.edu/~gely/sord/extras/install/install-python-epd.sh
 
 Edit the script for the desired Python version and install location before
 running it.  Next install Bazaar using easy_install::
