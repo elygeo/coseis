@@ -2,7 +2,7 @@
 # This script installs official Python.
 # For more bells and whistles, the Enthought Python Distribution is highly recommended
 
-version="2.6.2"
+version="2.6.4"
 prefix="${HOME}/local/python"
 
 echo -n "Installing Python-${version} and setuptools in ${prefix}. Are you sure? [y/N]: "

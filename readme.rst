@@ -463,7 +463,15 @@ Source control
 
 We use `Bazaar <http://bazaar-vcs.org/>`_ for version control.  The simplest
 way to install Bazaar is to use Python `Easy Install
-<http://pypi.python.org/pypi/setuptools>`_::
+<http://pypi.python.org/pypi/setuptools>`_ with your own personal Python
+installation.  Shell scripts are provided to help install either vanilla Python
+or Enthought Python Distribution.  Use curl to download one or the other::
+
+    curl -O http://earth.usc.edu/~gely/sord/extras/install/python-install.sh
+    curl -O http://earth.usc.edu/~gely/sord/extras/install/python-epd-install.sh
+
+Edit the script for the desired Python version and install location before
+running it.  Next install Bazaar using easy_install::
 
     easy_install bzr
 
