@@ -6,9 +6,7 @@
 # http://download.enthought.com/epd/installs/epd-5.1.1-win32-x86.msi
 # http://download.enthought.com/epd/installs/epd-5.1.1-macosx-i386.dmg
 link="http://download.enthought.com/epd/installs/epd-5.1.1-SunOS_5.10-x86.sh"
-link="http://download.enthought.com/epd/installs/epd-5.1.1-rh5-x86_64.sh"
 link="http://download.enthought.com/epd/installs/epd-5.1.1-rh5-x86.sh"
-link="http://download.enthought.com/epd/installs/epd-5.1.1-rh3-x86_64.sh"
 link="http://download.enthought.com/epd/installs/epd-5.1.1-rh3-x86.sh"
 
 version=$( basename "$link" .sh )
@@ -29,7 +27,8 @@ cd "${prefix}"
 
 curl -O "${link}"
 bash "${version}.sh"
-ln -s "${version}" python
+ln -sf "${version}" python
+easy_install bzr
 
 echo 'Now add this to your .bashrc or .profile:'
 echo "export PATH=\"${prefix}/python/bin:\${PATH}\""

@@ -13,7 +13,7 @@ export PATH="${prefix}/bin:${PATH}"
 mkdir -p "${prefix}"
 cd "${prefix}"
 
-curl "http://www.python.org/ftp/python/${version}/Python-${version}.tgz" | tar zxv
+curl "http://www.python.org/ftp/python/${version}/Python-${version}.tgz" | tar zx
 cd "Python-${version}"
 ./configure --prefix="${prefix}"
 make
@@ -24,6 +24,7 @@ python ez_setup.py --prefix="${prefix}"
 
 easy_install numpy
 easy_install pyproj
+easy_install bzr
 
 echo "Don't forget to add \${prefix}/bin to your path"
 

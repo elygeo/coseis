@@ -3,7 +3,7 @@
 dest=$( cat 'publish-dest' )
 echo "Syncing to $dest"
 rsync \
-    -vrpln \
+    -vrpl \
     --delete \
     --delete-excluded \
     --include=.bzr \
