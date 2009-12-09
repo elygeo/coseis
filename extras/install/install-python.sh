@@ -1,9 +1,11 @@
 #!/bin/bash -e
 # Install Python, setuptools, Numpy and Pyproj.
 
+# Set version and location here:
 version="2.6.4"
-prefix="${HOME}/local/python"
+path="\${HOME}/local"
 
+prefix="$( eval echo ${path} )/python-${version}"
 echo -n "Installing Python-${version} and setuptools in ${prefix}. Are you sure? [y/N]: "
 read confirm
 [ "$confirm" = "y" ]
@@ -24,5 +26,9 @@ python ez_setup.py --prefix="${prefix}"
 easy_install numpy
 easy_install pyproj
 
-echo "Don't forget to add \${prefix}/bin to your path"
+eval cd "${path}"
+ln -s "$( basename ${prefix} )" python || :
+
+echo 'Now add this to your .bashrc or .profile:'
+echo "export PATH=\"${path}/python/bin:\${PATH}\""
 
