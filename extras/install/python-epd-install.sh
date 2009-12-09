@@ -28,7 +28,6 @@ cd "${prefix}"
 curl -O "${link}"
 bash "${version}.sh"
 ln -sf "${version}" python
-easy_install bzr
 
 echo 'Now add this to your .bashrc or .profile:'
 echo "export PATH=\"${prefix}/python/bin:\${PATH}\""

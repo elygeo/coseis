@@ -221,13 +221,13 @@ def ndread( fd, shape=None, indices=None, dtype='f', order='F' ):
     mm = ( [1, 1, 1] + mm )[-4:]
     f = numpy.empty( nn, dtype )
     itemsize = numpy.dtype( dtype ).itemsize
-    offset = numpy.array( i0, 'd' )
-    stride = numpy.cumprod( [1] + mm[:0:-1], dtype='d' )[::-1] * itemsize
+    offset = numpy.array( i0, 'i8' )
+    stride = numpy.cumprod( [1] + mm[:0:-1], dtype='i8' )[::-1] * itemsize
     for j in xrange( nn[0] ):
         for k in xrange( nn[1] ):
             for l in xrange( nn[2] ):
                 i = ( stride * ( offset + array( [j, k, l, 0] ) ) ).sum()
-                fd.seek( long(i), 0 )
+                fd.seek( i, 0 )
                 f[j,k,l,:] = fromfile( fd, dtype, nn[-1] )
     if order is 'F':
         f = f.reshape( nn0 ).T
