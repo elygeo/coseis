@@ -27,7 +27,7 @@ easy_install numpy
 easy_install pyproj
 
 eval cd "${path}"
-ln -s "$( basename ${prefix} )" python || :
+[ -e python ] || ln -s "$( basename ${prefix} )" python
 
 echo 'Now add this to your .bashrc or .profile:'
 echo "export PATH=\"${path}/python/bin:\${PATH}\""

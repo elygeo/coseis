@@ -27,7 +27,7 @@ cd "${prefix}"
 
 curl -O "${link}"
 bash "${version}.sh"
-ln -s "${version}" python || :
+[ -e python ] || ln -s "${version}" python
 
 echo 'Now add this to your .bashrc or .profile:'
 echo "export PATH=\"${path}/python/bin:\${PATH}\""
