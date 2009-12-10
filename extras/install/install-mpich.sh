@@ -1,13 +1,13 @@
 #!/bin/bash -e
 # Install MPICH2
 
-# Set loction here:
-prefix="${HOME}/local"
-prefix="/usr/local"
+# Set version and loction here:
+version="1.2.1"
+path="${HOME}/local"
 
-version="1.2"
 link="http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/${version}/mpich2-${version}.tar.gz"
 
+prefix="$( eval echo ${path} )"
 echo -n "Installing MPICH2 ${version} in ${prefix}. Are you sure? [y/N]: "
 read confirm
 [ "$confirm" = "y" ]
@@ -21,6 +21,6 @@ cd "mpich2-${version}"
 make
 make install
 
-export PATH="${prefix}/bin:${PATH}"
 echo 'Now add this to your .bashrc or .profile:'
-echo "export PATH=\"${prefix}/bin:\${PATH}\""
+echo "export PATH=\"${path}/bin:\${PATH}\""
+
