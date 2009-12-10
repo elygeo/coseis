@@ -13,7 +13,7 @@ read confirm
 mkdir -p "${prefix}"
 cd "${prefix}"
 
-curl ="http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/${version}/mpich2-${version}.tar.gz" | tar zxv
+curl "http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/${version}/mpich2-${version}.tar.gz" | tar zxv
 cd "mpich2-${version}"
 ./configure -prefix="${prefix}" --with-device=ch3:shm
 make
