@@ -12,7 +12,5 @@ tmp
 run
 sord.tgz
 bin/*
-download
 email
 machine
-publish-dest
