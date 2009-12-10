@@ -23,8 +23,11 @@ make install
 curl -O http://peak.telecommunity.com/dist/ez_setup.py
 python ez_setup.py --prefix="${prefix}"
 
+easy_install cython
 easy_install numpy
 easy_install pyproj
+easy_install scipy
+easy_install bzr
 
 eval cd "${path}"
 [ -e python ] || ln -s "$( basename ${prefix} )" python

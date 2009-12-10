@@ -328,12 +328,10 @@ def install():
     src = os.path.dirname( os.path.realpath( __file__ ) )
     dst = os.path.basename( os.path.dirname( __file__ ) )
     dst = os.path.join( get_python_lib(), dst )
+    if os.path.exists( dst ):
+        sys.exit( 'Error: %s exists' % dst )
     print( 'Installing ' + dst )
     print( 'from ' + src )
-    try:
-        shutil.rmtree( dst )
-    except( OSError ):
-        pass
     try:
         shutil.copytree( src, dst )
     except( OSError ):
@@ -347,12 +345,13 @@ def uninstall():
     from distutils.sysconfig import get_python_lib
     path = os.path.basename( os.path.dirname( __file__ ) )
     path = os.path.join( get_python_lib(), path )
+    if not os.path.exists( dst ):
+        sys.exit( 'Error: %s does not exist' % dst )
     print( 'Removing ' + path )
-    if os.path.isdir( path ):
-        try:
-            shutil.rmtree( path )
-        except( OSError ):
-            sys.exit( 'No write permission for Python directory' )
+    try:
+        shutil.rmtree( path )
+    except( OSError ):
+        sys.exit( 'No write permission for Python directory' )
     return
 
 if __name__ == '__main__':
