@@ -18,6 +18,9 @@ lfs quota -u $USER $SCRATCH
 module unload mvapich
 module load mvapich2
 alias showme='showq -u'
+
+# needed?
+module load gotoblas scalapack mkl
 """
 login = 'tg-login.ranger.tacc.teragrid.org'
 hosts = 'login3.ranger.tacc.utexas.edu', 'login4.ranger.tacc.utexas.edu'

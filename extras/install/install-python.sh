@@ -26,6 +26,8 @@ python ez_setup.py --prefix="${prefix}"
 easy_install cython
 easy_install numpy
 easy_install pyproj
+#easy_install wxpython
+easy_install matplotlib
 easy_install scipy
 easy_install bzr
 
