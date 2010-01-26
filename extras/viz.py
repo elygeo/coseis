@@ -51,23 +51,23 @@ def pdf2png( path, dpi=72, mode=None ):
     import subprocess, cStringIO
     cmd = 'gs', '-q', '-r%s' % dpi, '-dNOPAUSE', '-dBATCH', '-sDEVICE=pngalpha', '-sOutputFile=-', path
     pid = subprocess.Popen( cmd, stdout=subprocess.PIPE )
-    out = pid.communicate()[0]                             
+    out = pid.communicate()[0]
     if mode != 'str':
         out = cStringIO.StringIO( out )
         out.reset()
     return( out )
 
-def img2pdf( img, mode=None ):
+def img2pdf( img, dpi=150, mode=None ):
     """
     Convert image array to PDF using PIL and ImageMagick.
     """
     import subprocess, cStringIO, Image
     fd = cStringIO.StringIO()
     img = Image.fromarray( img )
-    img.save( fd, format='png' )                                           
-    cmd = 'convert', 'png:-', 'pdf:-'                                        
+    img.save( fd, format='png' )
+    cmd = 'convert', '-density', str( dpi ), 'png:-', 'pdf:-'
     pid = subprocess.Popen( cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE )
-    fd = pid.communicate( fd.getvalue() )[0]                             
+    fd = pid.communicate( fd.getvalue() )[0]
     if mode != 'str':
         fd = cStringIO.StringIO( fd )
         fd.reset()
@@ -84,14 +84,14 @@ def pdf_merge( layers ):
     page = page.getPage( 0 )
     for i in layers[1:]:
         i = pyPdf.PdfFileReader( i )
-        i = i.getPage( 0 ) 
-        page.mergePage( i ) 
+        i = i.getPage( 0 )
+        page.mergePage( i )
     pdf.addPage( page )
     pdf.write( out )
     out.reset()
     return( out )
 
-def savefig( fd=None, fig=None, format=None, distill=True, **kwargs ):
+def savefig( fd=None, fig=None, format=None, distill=False, **kwargs ):
     """
     Enhanced version of Matplotlib pylab.savefig command.
 
@@ -111,12 +111,11 @@ def savefig( fd=None, fig=None, format=None, distill=True, **kwargs ):
             format = 'array'
     out = cStringIO.StringIO()
     if format == 'array':
-        if 'dpi' in kwargs:
-            dpi = kwargs['dpi']
-        else:
-            dpi = fig.dpi
+        if 'dpi' not in kwargs:
+            kwargs['dpi'] = fig.dpi
+        dpi = kwargs['dpi']
         n = fig.get_size_inches()
-        n = n[1] * dpi, n[0] * dpi, 4
+        n = int( n[1] * dpi ), int( n[0] * dpi ), 4
         fig.savefig( out, format='raw', **kwargs )
         out = numpy.fromstring( out.getvalue(), 'u1' ).reshape( n )
     elif distill and format == 'pdf':
@@ -435,7 +434,6 @@ class digital_clock():
     Calling the digital clock object with an argument of minutes or seconds sets the time.
     """
     def __init__( self, x0=0, y0=0, z0=0, scale=1.0, color=(0,1,0), line_width=3 ):
-        import numpy
         from enthought.mayavi import mlab
         fig = mlab.gcf()
         render = fig.scene.disable_render
@@ -466,7 +464,7 @@ class digital_clock():
             h = []
             for x in -0.875, 0.125, 0.875:
                 h += [ mlab.plot3d(
-                    x + xx[i].flatten(), yy[i].flatten(), zz[i].flatten(),
+                    scale * x + xx[i].flatten(), yy[i].flatten(), zz[i].flatten(),
                     color=color,
                     tube_radius=None,
                     line_width=line_width,
@@ -474,28 +472,29 @@ class digital_clock():
             hh += [h]
         self.glyphs = hh
         x = x0 + scale / 200.0 * numpy.array( [-81, -79, numpy.nan, -71, -69] )
-        y = x0 + scale / 200.0 * numpy.array( [-60, -40, numpy.nan, 40, 60] )
+        y = y0 + scale / 200.0 * numpy.array( [-60, -40, numpy.nan, 40, 60] )
         z = z0 * numpy.ones_like( x )
-        self.colon = mlab.plot3d( x, y, z,
-                    color=color,
-                    tube_radius=None,
-                    line_width=line_width,
-                )
+        h = mlab.plot3d( x, y, z, color=color, tube_radius=None, line_width=line_width )
+        self.colon = h
         fig.scene.disable_render = render
         return
-    def __call__( self, time ):
+    def __call__( self, time=None ):
+        from enthought.mayavi import mlab
         fig = mlab.gcf()
         render = fig.scene.disable_render
         fig.scene.disable_render = True
+        self.colon.visible = False
         for hh in self.glyphs:
             for h in hh:
                 h.visible = False
-        m = time / 60
-        d = (time % 60) / 10
-        s = time % 10
-        self.glyphs[m][0].visible = True
-        self.glyphs[d][1].visible = True
-        self.glyphs[s][2].visible = True
+        if time != None:
+            self.colon.visible = True
+            m = int( time / 60 )
+            d = int( (time % 60) / 10 )
+            s = int( time % 10 )
+            self.glyphs[m][0].visible = True
+            self.glyphs[d][1].visible = True
+            self.glyphs[s][2].visible = True
         fig.scene.disable_render = render
         return
 

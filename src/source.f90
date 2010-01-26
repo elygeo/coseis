@@ -18,9 +18,9 @@ n = abs( nsource )
 allocate( src_xi(n,3) )
 fh = -1
 if ( mpin /= 0 ) fh = file_null
-call rio1( fh, src_xi(:,1), 'r', 'in/src_xi1',     n, 0, mpin, verb )
-call rio1( fh, src_xi(:,2), 'r', 'in/src_xi2',     n, 0, mpin, verb )
-call rio1( fh, src_xi(:,3), 'r', 'in/src_xi3',     n, 0, mpin, verb )
+call rio1( fh, src_xi(:,1), 'r', 'in/src_xi1', n, 0, mpin, verb )
+call rio1( fh, src_xi(:,2), 'r', 'in/src_xi2', n, 0, mpin, verb )
+call rio1( fh, src_xi(:,3), 'r', 'in/src_xi3', n, 0, mpin, verb )
 if ( source == 'force' ) then
     do i = 1, 3
         src_xi(:,i) = src_xi(:,i) - nnoff(i)
@@ -53,13 +53,13 @@ else
     call rio1( fh, src_w2(:,2), 'r', 'in/src_w31', n, 0, mpin, verb )
     call rio1( fh, src_w2(:,3), 'r', 'in/src_w12', n, 0, mpin, verb )
 end if
-call rio1( fh, src_t0,       'r', 'in/src_t0',     n, 0, mpin, verb )
-call rio1( fh, src_dt,       'r', 'in/src_nt',     n, 0, mpin, verb )
+call rio1( fh, src_t0, 'r', 'in/src_t0', n, 0, mpin, verb )
+call rio1( fh, src_dt, 'r', 'in/src_nt', n, 0, mpin, verb )
 src_nt = int( src_dt + 0.5 )
-call rio1( fh, src_dt,       'r', 'in/src_dt',     n, 0, mpin, verb )
+call rio1( fh, src_dt, 'r', 'in/src_dt', n, 0, mpin, verb )
 n = sum( src_nt )
 allocate( src_history(n) )
-call rio1( fh, src_history,  'r', 'in/src_history', n, 0, mpin, verb )
+call rio1( fh, src_history, 'r', 'in/src_history', n, 0, mpin, verb )
 end subroutine
 
 ! Add finite source to force vector or strain/stress tensor
@@ -74,10 +74,10 @@ do isrc = 1, abs( nsource )
     i = floor( ( tm - src_t0(isrc) ) / src_dt(isrc) ) + 1
     xi = src_xi(isrc,:)
     if ( source == 'force' ) then
-        i1 = max( i1node, int( xi )     )
+        i1 = max( i1node, int( xi ) )
         i2 = min( i2node, int( xi ) + 1 )
     else
-        i1 = max( i1cell, int( xi )     )
+        i1 = max( i1cell, int( xi ) )
         i2 = min( i2cell, int( xi ) + 1 )
     end if
     if ( i >= 0 .and. all( i2 >= i1 ) ) then
@@ -126,7 +126,7 @@ integer :: i1(3), i2(3), i, j, k, l
 real :: xi(3), f, w
 if ( timefunction == 'none' ) return
 xi = ihypo - nnoff
-i1 = max( i1node, int( xi )     )
+i1 = max( i1node, int( xi ) )
 i2 = min( i2node, int( xi ) + 1 )
 if ( any( i2 < i1 ) ) then
     timefunction = 'none'
@@ -154,7 +154,7 @@ integer :: i1(3), i2(3), i, j, k, l
 real :: xi(3), f, w
 if ( timefunction == 'none' ) return
 xi = ihypo - 0.5 - nnoff
-i1 = max( i1cell, int( xi )     )
+i1 = max( i1cell, int( xi ) )
 i2 = min( i2cell, int( xi ) + 1 )
 if ( any( i2 < i1 ) ) then
     timefunction = 'none'

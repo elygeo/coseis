@@ -253,8 +253,8 @@ class Transform():
             if proj != None:
                 x, y = proj( x, y )
             if type( x ) in (list, tuple):
-                phi += numpy.atan2( y[1] - y[0], x[1] - x[0] )
-                x, y = x[:2].mean(), y[:2].mean()
+                phi -= numpy.arctan2( y[1] - y[0], x[1] - x[0] )
+                x, y = 0.5 * (x[0] + x[1]), 0.5 * (y[0] + y[1])
         mat = [[1, 0, -x], [0, 1, -y], [0, 0, 1]]
         if hasattr( proj, 'mat' ):
             proj = proj.proj

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.6: http://docutils.sourceforge.net/" />
 <title>SORD</title>
 <style type="text/css">
 
@@ -200,7 +200,7 @@ and Fink seem to be problematic and are not recommended).</p>
 <li><p class="first">MPI is required if you wish to use multiple cores or processors to speed-up
 computations.  The <a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a>
 implementation is recommended if you do not already have one.  The script
-<a class="reference external" href="extras/install-mpich.sh">install-mpich.sh</a> in the <tt class="docutils literal"><span class="pre">extras/</span></tt> directory can
+<a class="reference external" href="extras/install-mpich.sh">install-mpich.sh</a> in the <tt class="docutils literal">extras/</tt> directory can
 automate this for you.</p>
 </li>
 <li><p class="first">Most systems already have <a class="reference external" href="http://www.python.org/download/">Python</a>, but
@@ -228,7 +228,7 @@ system at TACC:</p>
 <pre class="literal-block">
 ./configure.py tacc-ranger
 </pre>
-<p>To see the list of included configurations look in the <tt class="docutils literal"><span class="pre">conf/</span></tt> directory.
+<p>To see the list of included configurations look in the <tt class="docutils literal">conf/</tt> directory.
 Each custom configuration is located in a separate sub-directory.  To create a
 new custom configuration, make a new sub-directory following the example of
 the supplied configurations.</p>
@@ -238,9 +238,9 @@ the supplied configurations.</p>
 ./setup.py
 </pre>
 </li>
-<li><p class="first">To enable Python to find the <tt class="docutils literal"><span class="pre">sord</span></tt> module, add the enclosing directory
+<li><p class="first">To enable Python to find the <tt class="docutils literal">sord</tt> module, add the enclosing directory
 the Python path.  For example, if your installation location is
-<tt class="docutils literal"><span class="pre">~/packages/sord</span></tt>, in Bash shell do:</p>
+<tt class="docutils literal">~/packages/sord</tt>, in Bash shell do:</p>
 <pre class="literal-block">
 export PYTHONPATH=~/packages
 </pre>
@@ -296,60 +296,60 @@ period = 6 * dt                           # source dominant period
 sord.run( locals() )                      # launch SORD job
 
 </pre>
-<p>Every script starts by importing the <tt class="docutils literal"><span class="pre">sord</span></tt> module.  SORD parameters are
-specified as local variables that are passed to the <tt class="docutils literal"><span class="pre">sord.run()</span></tt> function by
-the <tt class="docutils literal"><span class="pre">locals()</span></tt> built-in Python function.  A complete list of possible SORD
+<p>Every script starts by importing the <tt class="docutils literal">sord</tt> module.  SORD parameters are
+specified as local variables that are passed to the <tt class="docutils literal">sord.run()</tt> function by
+the <tt class="docutils literal">locals()</tt> built-in Python function.  A complete list of possible SORD
 parameters and default values are specified in <a class="reference external" href="parameters.py">parameters.py</a>.</p>
 <p>The Python language gives a powerful way to construct SORD input.  For example,
-it may be desirable to specify the total simulation time, and divide by <tt class="docutils literal"><span class="pre">dt</span></tt>
+it may be desirable to specify the total simulation time, and divide by <tt class="docutils literal">dt</tt>
 to determine the number of time steps:</p>
 <pre class="literal-block">
 T = 100.0            # total time temporary variable
 nt = int( T / dt )   # number of time steps
 </pre>
-<p>The <tt class="docutils literal"><span class="pre">T</span></tt> variable is not a valid SORD parameter; it is only sued for temporary
+<p>The <tt class="docutils literal">T</tt> variable is not a valid SORD parameter; it is only sued for temporary
 storage.  Variables with single single character names or names ending with an
-underscore, are ignored by <tt class="docutils literal"><span class="pre">sord.run()</span></tt>, so may be safely used for temporary
-storage.  More elaborate example scripts can be found in the <tt class="docutils literal"><span class="pre">scripts</span></tt>
+underscore, are ignored by <tt class="docutils literal">sord.run()</tt>, so may be safely used for temporary
+storage.  More elaborate example scripts can be found in the <tt class="docutils literal">scripts</tt>
 directory.</p>
 </div>
 <div class="section" id="running-jobs">
 <h4>Running jobs</h4>
-<p>Each time <tt class="docutils literal"><span class="pre">sord.run()</span></tt> is called, a run directory is created at the location
-set by the <tt class="docutils literal"><span class="pre">rundir</span></tt> parameter (<tt class="docutils literal"><span class="pre">tmp/</span></tt> in this case).  The directory
+<p>Each time <tt class="docutils literal">sord.run()</tt> is called, a run directory is created at the location
+set by the <tt class="docutils literal">rundir</tt> parameter (<tt class="docutils literal">tmp/</tt> in this case).  The directory
 contains the executable and scripts to run the code, and will contain all of
 the generated output and metadata.  From the run directory, start the job
-interactively with the <tt class="docutils literal"><span class="pre">run.sh</span></tt> script:</p>
+interactively with the <tt class="docutils literal">run.sh</tt> script:</p>
 <pre class="literal-block">
 tmp/run.sh
 </pre>
-<p>Or, submit the job to the batch system with the <tt class="docutils literal"><span class="pre">queue.sh</span></tt> script</p>
+<p>Or, submit the job to the batch system with the <tt class="docutils literal">queue.sh</tt> script</p>
 <pre class="literal-block">
 tmp/queue.sh
 </pre>
 <p>Output (and large input, such as the material model) is stored in flat binary
 binary files.  Statistic, such as peak acceleration and peak velocity, are
-computed periodically during each run and stored in the <tt class="docutils literal"><span class="pre">stats/</span></tt> directory.</p>
+computed periodically during each run and stored in the <tt class="docutils literal">stats/</tt> directory.</p>
 </div>
 <div class="section" id="field-i-o">
 <h4>Field I/O</h4>
 <p>Multidimensional field arrays can be accessed for input and output through the
-<tt class="docutils literal"><span class="pre">fieldio</span></tt> list.  The <a class="reference external" href="fieldnames.py">fieldnames.py</a> file specifies the list of available
+<tt class="docutils literal">fieldio</tt> list.  The <a class="reference external" href="fieldnames.py">fieldnames.py</a> file specifies the list of available
 field variables, which are categorized in four ways: (1) static vs. dynamic,
 (2) settable vs. output only, (3) node vs. cell registration, and (4) volume
-vs. fault surface.  For example, density <tt class="docutils literal"><span class="pre">rho</span></tt> is a static, settable, cell,
-volume variable.  Slip path length <tt class="docutils literal"><span class="pre">sl</span></tt> is a dynamic, output, node, fault
-variable.  The <tt class="docutils literal"><span class="pre">fieldio</span></tt> list is order dependent with subsequent inputs
+vs. fault surface.  For example, density <tt class="docutils literal">rho</tt> is a static, settable, cell,
+volume variable.  Slip path length <tt class="docutils literal">sl</tt> is a dynamic, output, node, fault
+variable.  The <tt class="docutils literal">fieldio</tt> list is order dependent with subsequent inputs
 overwriting previous inputs.  So, for example, a field may be assigned to one
 value for the entire volume, followed by a different value for a sub-region of
 the volume.</p>
-<p>All field I/O operations require slice indices <tt class="docutils literal"><span class="pre">[j,k,l,t]</span></tt>, which specify a
+<p>All field I/O operations require slice indices <tt class="docutils literal">[j,k,l,t]</tt>, which specify a
 four-dimensional sub-volume of the array in space and time.  Array indexing
 starts at 1 for the first node, and 1.5 for the first cell.  Negative indices
 count inward from end of the array, starting at -1 for the last node, and -1.5
-for the last cell.  Indices can be either a single index, a range <tt class="docutils literal"><span class="pre">(start,</span>
-<span class="pre">end)</span></tt>, or a strided range <tt class="docutils literal"><span class="pre">(start,</span> <span class="pre">end,</span> <span class="pre">step)</span></tt>.  Empty parentheses <tt class="docutils literal"><span class="pre">()</span></tt> are
-shorthand for a full range.  Empty brackets <tt class="docutils literal"><span class="pre">[]</span></tt> are shorthand for the entire
+for the last cell.  Indices can be either a single index, a range <tt class="docutils literal">(start,
+end)</tt>, or a strided range <tt class="docutils literal">(start, end, step)</tt>.  Empty parentheses <tt class="docutils literal">()</tt> are
+shorthand for a full range.  Empty brackets <tt class="docutils literal">[]</tt> are shorthand for the entire
 4D volume.  Some examples of slice notation:</p>
 <pre class="literal-block">
 [10, 20, 1, (1,-1)]       # Single node, full time history
@@ -358,10 +358,10 @@ shorthand for a full range.  Empty brackets <tt class="docutils literal"><span c
 [(), (), (), -1]          # Full 3D volume, last time step
 []                        # Entire 4D volume
 </pre>
-<p>Each member of the <tt class="docutils literal"><span class="pre">fieldio</span></tt> list contains a mode, a field name, and slice
+<p>Each member of the <tt class="docutils literal">fieldio</tt> list contains a mode, a field name, and slice
 indices, followed by mode dependent parameters.  The following I/O modes are
-available, where <tt class="docutils literal"><span class="pre">'f'</span></tt> is the field variable name (from the list
-<a class="reference external" href="fieldnames.py">fieldnames.py</a>), and <tt class="docutils literal"><span class="pre">[]</span></tt> are the slice indices:</p>
+available, where <tt class="docutils literal">'f'</tt> is the field variable name (from the list
+<a class="reference external" href="fieldnames.py">fieldnames.py</a>), and <tt class="docutils literal">[]</tt> are the slice indices:</p>
 <pre class="literal-block">
 ('=',   'f', [], val),             # Set f to value
 ('+',   'f', [], val),             # Add value to f
@@ -372,7 +372,7 @@ available, where <tt class="docutils literal"><span class="pre">'f'</span></tt> 
 ('=w',  'f', [], filename),        # Write f to filename
 ('=wi', 'f', [], filename),        # Write weighted average of f to filename.
 </pre>
-<p>A letter <tt class="docutils literal"><span class="pre">'i'</span></tt> in the mode indicates sub-cell positioning via weighted
+<p>A letter <tt class="docutils literal">'i'</tt> in the mode indicates sub-cell positioning via weighted
 averaging.  In this case the spatial indices are single logical coordinates
 that may vary continuously over the range.  The fractional part of the index
 determines the weights.  For example, an index of 3.2 to the 1D variable f
@@ -384,14 +384,14 @@ or 2D models into 3D simulations, obviating the need to store (possibly very
 large) 3D material and mesh coordinate files.</p>
 <p>All input modes may use '+' instead of '=' to add to, rather than replace,
 preexisting values.  For a list of available time functions, see the
-<tt class="docutils literal"><span class="pre">time_function</span></tt> subroutine in <a class="reference external" href="src/util.f90">src/util.f90</a>.  The routine can be easily
+<tt class="docutils literal">time_function</tt> subroutine in <a class="reference external" href="src/util.f90">src/util.f90</a>.  The routine can be easily
 modified to add new time functions.  Time functions can be offset in time with
-the <tt class="docutils literal"><span class="pre">tm0</span></tt> initial time parameter.</p>
+the <tt class="docutils literal">tm0</tt> initial time parameter.</p>
 </div>
 <div class="section" id="boundary-conditions">
 <h4>Boundary Conditions</h4>
 <p>Boundary conditions for the six faces of the model domain are specified by the
-parameters <tt class="docutils literal"><span class="pre">bc1</span></tt> (near-size, x, y, and z faces) and <tt class="docutils literal"><span class="pre">bc2</span></tt> (far-side, x, y,
+parameters <tt class="docutils literal">bc1</tt> (near-size, x, y, and z faces) and <tt class="docutils literal">bc2</tt> (far-side, x, y,
 and x faces).  The symmetry boundary conditions can be use to reduce
 computations for problems where they are applicable.  These are not used for
 specifying internal slip boundaries. However, for problems with symmetry across
@@ -449,14 +449,14 @@ bc2 = 10, 10, -1
 <div class="section" id="defining-the-fault-rupture-surface">
 <h4>Defining the fault rupture surface</h4>
 <p>Fault rupture always follows a surface of the (possibly non-planar) logical
-mesh.  The orientation of the fault plane is defined by the <tt class="docutils literal"><span class="pre">faultnormal</span></tt>
+mesh.  The orientation of the fault plane is defined by the <tt class="docutils literal">faultnormal</tt>
 parameter.  This can be either 1, 2, or 3 corresponding to surfaces normal to
 the j, k, or l logical mesh directions. Any other value (typically 0) disables
 rupture altogether. The location of the rupture plane with in the mesh is
-determined by the <tt class="docutils literal"><span class="pre">ihypo</span></tt> parameter, which has a dual purpose of also
+determined by the <tt class="docutils literal">ihypo</tt> parameter, which has a dual purpose of also
 defining the nucleation point. So, the indices of the collocated fault double
-nodes are given by <tt class="docutils literal"><span class="pre">int(ihypo(faultnormal))</span></tt>, and <tt class="docutils literal"><span class="pre">int(ihypo(faultnormal))</span> <span class="pre">+</span>
-<span class="pre">1</span></tt>. For example, a 3D problem of dimensions 200.0 x 200.0 x 200.0, with a
+nodes are given by <tt class="docutils literal">int(ihypo(faultnormal))</tt>, and <tt class="docutils literal">int(ihypo(faultnormal)) +
+1</tt>. For example, a 3D problem of dimensions 200.0 x 200.0 x 200.0, with a
 fault plane located at z = 100.0, and double nodes at l = (21, 22), may be set
 up as such:</p>
 <pre class="literal-block">
@@ -503,7 +503,7 @@ bc2 = -1, 1, -2
 documentation are greatly appreciated.</p>
 <div class="section" id="debugging">
 <h4>Debugging</h4>
-<p>The <tt class="docutils literal"><span class="pre">debug</span></tt> input parameter is useful for finding problems, and can take the
+<p>The <tt class="docutils literal">debug</tt> input parameter is useful for finding problems, and can take the
 following values:</p>
 <blockquote>
 <p><strong>0</strong>: Debugging off.</p>
@@ -518,13 +518,13 @@ exceptions, can be turned on with the <tt class="docutils literal"><span class="
 Additionally, to compile and run under a debugger use the <tt class="docutils literal"><span class="pre">-g</span></tt> or
 <tt class="docutils literal"><span class="pre">--debugging</span></tt> option.  Naturally, these options depend on the capabilities of
 the particular compiler.  The specific flags passed to the compiler can be
-configured by editing <tt class="docutils literal"><span class="pre">conf.py</span></tt>.</p>
+configured by editing <tt class="docutils literal">conf.py</tt>.</p>
 </div>
 <div class="section" id="profiling">
 <h4>Profiling</h4>
 <p>Internal code timings, for benchmarking performance, are collected and saved to
-the <tt class="docutils literal"><span class="pre">prof/</span></tt> directory.  The file format is flat binary that can be examined
-with the UNIX command <tt class="docutils literal"><span class="pre">od</span> <span class="pre">-f</span></tt>.  Eight categories are timed for every time
+the <tt class="docutils literal">prof/</tt> directory.  The file format is flat binary that can be examined
+with the UNIX command <tt class="docutils literal">od <span class="pre">-f</span></tt>.  Eight categories are timed for every time
 iteration step, and save in the following files:</p>
 <blockquote>
 <p><strong>1time</strong>: Time integration subroutine.</p>
@@ -541,7 +541,7 @@ and field I/O.</p>
 </blockquote>
 <p>Profiling can be very difficult to interpret for multiprocessor runs.  Timing
 is only saved for the master processor.  It can be helpful to synchronize the
-processors using <tt class="docutils literal"><span class="pre">debug</span> <span class="pre">=</span> <span class="pre">2</span></tt> to give more accurate relative timing values.</p>
+processors using <tt class="docutils literal">debug = 2</tt> to give more accurate relative timing values.</p>
 <p>Additionally, SORD can be run with compiler generated code profiling using the
 <tt class="docutils literal"><span class="pre">-p</span></tt> or <tt class="docutils literal"><span class="pre">--profiling</span></tt> option.</p>
 </div>
@@ -588,7 +588,7 @@ for more.</p>
 </div>
 <div class="footer">
 <hr class="footer" />
-Generated on: 2009-12-14.
+Generated on: 2010-01-26.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>
