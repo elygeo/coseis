@@ -475,10 +475,15 @@ running it.  Next install Bazaar using easy_install::
 
     easy_install bzr
 
-To retrieve the latest version of SORD
+To retrieve SORD from the repository
 ::
 
     bzr get http://earth.usc.edu/~gely/sord
+
+Apply any recent updates from the repository
+::
+
+    bzr pull
 
 See code changes since the last commit
 ::
