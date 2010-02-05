@@ -82,37 +82,79 @@ BSSA, 100(1).
 `[PDF] <http://earth.usc.edu/~gely/pub/ely-saf-20090721.pdf>`__
 `[Electronic supplement] <http://earth.usc.edu/~gely/ely-saf-esupp.html>`__
 
+System requirements
+===================
 
-Installation - Linux or Mac OS X
-================================
+*   Fortran 95 compiler.
 
-1.  A Fortran 95 compiler is required.  GNU Fortran is a good option if you do
-    not already have one.  To install on Fedora or Red Hat Linux::
+*   `Python <http://www.python.org/download/>`_, and
+    `NumPy <http://http://numpy.scipy.org/>`_ (Numerical Python).
 
-        yum install gfortran
+*   (Optional) Message Passing Interface (MPI) library.  Required for
+    multi-core processing.
 
-    For Mac OS X, first install either the iPhone or the Mac-only version of `Xcode
-    <http://developer.apple.com/technology/xcode.html>`_ available from Apple
-    Developer Connection (free `membership <http://connect.apple.com>`__ required).
-    Then install the GNU Fortran version available from the `R for Mac OS X
-    Developer's Page <http://r.research.att.com/tools>`_ (versions from MacPorts
-    and Fink seem to be problematic and are not recommended).
+*   (Optional) `Matplotlib <http://matplotlib.sourceforge.net/>`_, `SciPy
+    <http://www.scipy.org/>`_, and Pyproj Python packages.  Required for
+    supplemental plotting, signal processing, and mesh generation utilities.
 
-2.  MPI is required if you wish to use multiple cores or processors to speed-up
-    computations.  The `MPICH2 <http://www.mcs.anl.gov/research/projects/mpich2/>`_
-    implementation is recommended if you do not already have one.  The script
-    `install-mpich.sh <extras/install-mpich.sh>`__ in the ``extras/`` directory can
-    automate this for you.
+*   (Optional) `Bazaar <http://bazaar.canonical.com/>`_ version control system.
+    Useful for SORD development and staying updated with the latest code version.
 
-3.  Most systems already have `Python <http://www.python.org/download/>`_, but
-    it is recommended that you install an updated version.  The `Enthought Python
-    Distribution <http://www.enthought.com/products/epddownload.php>`_ includes
-    packages such as `matplotlib <http://matplotlib.sourceforge.net/>`_, `SciPy
-    <http://www.scipy.org/>`_, and `Mayavi
-    <http://code.enthought.com/projects/mayavi>`_, that will allow you to run
-    of the plotting examples included with SORD.
 
-4.  Download and unpack the source code
+Installation
+============
+
+Fortran and MPI installation should only be necessary for laptops and
+workstations.  HPC systems generally supply specifically tuned Fortran
+compilers and MPI libraries. 
+
+1.  GNU Fortran is recommended if you don't already have a Fortran 95 compiler.
+
+    Fedora/Red Hat Linux:
+    ::
+
+        sudo yum install gfortran
+
+    Ubuntu Linux:
+    ::
+
+        sudo apt-get install gfortran
+
+    Mac OS X:
+
+        First install either the iPhone or the Mac-only version of `Xcode
+        <http://developer.apple.com/technology/xcode.html>`_ available from Apple
+        Developer Connection (free `membership <http://connect.apple.com>`__ required).
+        Then install the GNU Fortran version available from the `R for Mac OS X
+        Developer's Page <http://r.research.att.com/tools>`_ (versions from MacPorts
+        and Fink seem to be problematic and are not recommended).
+
+2.  `MPICH2 <http://www.mcs.anl.gov/research/projects/mpich2/>`_ is recommended
+    if you need MPI.  The following shell script downloads and installs MPICH2::
+
+        curl -O http://earth.usc.edu/~gely/sord/extras/install/install-mpich.sh
+        bash install-mpich.sh
+
+3.  It is recommended that you install a private copy of Python with
+    supplementary numeric and plotting packages, as is performed by the following
+    shell script::
+
+        curl -O http://earth.usc.edu/~gely/sord/extras/install/install-python.sh
+        bash install-python.sh
+
+    `Enthought Python Distribution
+    <http://www.enthought.com/products/epddownload.php>`_ is another option that
+    includes many more bells and whistles such as the `Mayavi
+    <http://code.enthought.com/projects/mayavi>`_ visualization package.
+
+4.  Download the SORD source code.  The best option is use Bazaar version
+    control, which facilitates applying code updates, and merging local
+    modifications (see `Source Control`_ section for examples)::
+
+        cd ~/local
+        bzr get http://earth.usc.edu/~gely/sord
+
+    Alternatively, download and unpack the source tar archive
     ::
 
         curl http://earth.usc.edu/~gely/sord/sord.tgz | tar zxv
@@ -121,7 +163,7 @@ Installation - Linux or Mac OS X
     is usually be adequate.  To test the default configuration::
 
         cd sord/
-        ./configure.py
+        python configure.py
 
     Systems with batch schedulers (such as PBS or LoadLeveler) generally require
     custom configuration to specify system resources, compiler options, and
@@ -129,7 +171,7 @@ Installation - Linux or Mac OS X
     use one of the included configurations.  For example, for the TeraGrid Ranger
     system at TACC::
 
-        ./configure.py tacc-ranger
+        python configure.py tacc-ranger
 
     To see the list of included configurations look in the ``conf/`` directory.
     Each custom configuration is located in a separate sub-directory.  To create a
@@ -139,18 +181,18 @@ Installation - Linux or Mac OS X
 6.  Compile the code by running:
     ::
 
-        ./setup.py
+        python setup.py
 
 7.  To enable Python to find the ``sord`` module, add the enclosing directory
     the Python path.  For example, if your installation location is
-    ``~/packages/sord``, in Bash shell do::
+    ``~/local/sord``, in Bash shell do::
 
-        export PYTHONPATH=~/packages
+        export PYTHONPATH=~/local
 
     Alternatively, if you are the administrator of your Python installation, you
     can do::
 
-        ./setup.py path
+        python setup.py path
 
 
 User Guide
@@ -163,8 +205,8 @@ Run a simple point source explosion test and plot a 2D slice of particle
 velocity::
 
     cd scripts/example
-    ./sim.py -i
-    ./plot.py
+    python sim.py -i
+    python plot.py
 
 Plotting requires Matplotlib, and the result should look like this:
 
@@ -461,24 +503,7 @@ Additionally, SORD can be run with compiler generated code profiling using the
 Source control
 --------------
 
-We use `Bazaar <http://bazaar-vcs.org/>`_ for version control.  The simplest
-way to install Bazaar is to use Python `Easy Install
-<http://pypi.python.org/pypi/setuptools>`_ with your own personal Python
-installation.  Shell scripts are provided to help install either vanilla Python
-or Enthought Python Distribution.  Use curl to download one or the other::
-
-    curl -O http://earth.usc.edu/~gely/sord/extras/install/install-python.sh
-    curl -O http://earth.usc.edu/~gely/sord/extras/install/install-python-epd.sh
-
-Edit the script for the desired Python version and install location before
-running it.  Next install Bazaar using easy_install::
-
-    easy_install bzr
-
-To retrieve SORD from the repository
-::
-
-    bzr get http://earth.usc.edu/~gely/sord
+We use Bazaar_ for version control. Some examples:
 
 Apply any recent updates from the repository
 ::

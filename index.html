@@ -109,20 +109,21 @@ img {
 </ul>
 </li>
 <li><a class="reference internal" href="#publications" id="id5">Publications</a></li>
-<li><a class="reference internal" href="#installation-linux-or-mac-os-x" id="id6">Installation - Linux or Mac OS X</a></li>
-<li><a class="reference internal" href="#user-guide" id="id7">User Guide</a><ul>
-<li><a class="reference internal" href="#quick-test" id="id8">Quick test</a></li>
-<li><a class="reference internal" href="#scripting-with-python" id="id9">Scripting with Python</a></li>
-<li><a class="reference internal" href="#running-jobs" id="id10">Running jobs</a></li>
-<li><a class="reference internal" href="#field-i-o" id="id11">Field I/O</a></li>
-<li><a class="reference internal" href="#boundary-conditions" id="id12">Boundary Conditions</a></li>
-<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id13">Defining the fault rupture surface</a></li>
+<li><a class="reference internal" href="#system-requirements" id="id6">System requirements</a></li>
+<li><a class="reference internal" href="#installation" id="id7">Installation</a></li>
+<li><a class="reference internal" href="#user-guide" id="id8">User Guide</a><ul>
+<li><a class="reference internal" href="#quick-test" id="id9">Quick test</a></li>
+<li><a class="reference internal" href="#scripting-with-python" id="id10">Scripting with Python</a></li>
+<li><a class="reference internal" href="#running-jobs" id="id11">Running jobs</a></li>
+<li><a class="reference internal" href="#field-i-o" id="id12">Field I/O</a></li>
+<li><a class="reference internal" href="#boundary-conditions" id="id13">Boundary Conditions</a></li>
+<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id14">Defining the fault rupture surface</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#development" id="id14">Development</a><ul>
-<li><a class="reference internal" href="#debugging" id="id15">Debugging</a></li>
-<li><a class="reference internal" href="#profiling" id="id16">Profiling</a></li>
-<li><a class="reference internal" href="#source-control" id="id17">Source control</a></li>
+<li><a class="reference internal" href="#development" id="id15">Development</a><ul>
+<li><a class="reference internal" href="#debugging" id="id16">Debugging</a></li>
+<li><a class="reference internal" href="#profiling" id="id17">Profiling</a></li>
+<li><a class="reference internal" href="#source-control" id="id18">Source control</a></li>
 </ul>
 </li>
 </ul>
@@ -183,33 +184,69 @@ BSSA, 100(1).
 <a class="reference external" href="http://earth.usc.edu/~gely/pub/ely-saf-20090721.pdf">[PDF]</a>
 <a class="reference external" href="http://earth.usc.edu/~gely/ely-saf-esupp.html">[Electronic supplement]</a></p>
 </div>
-<div class="section" id="installation-linux-or-mac-os-x">
-<h3>Installation - Linux or Mac OS X</h3>
+<div class="section" id="system-requirements">
+<h3>System requirements</h3>
+<ul class="simple">
+<li>Fortran 95 compiler.</li>
+<li><a class="reference external" href="http://www.python.org/download/">Python</a>, and
+<a class="reference external" href="http://http://numpy.scipy.org/">NumPy</a> (Numerical Python).</li>
+<li>(Optional) Message Passing Interface (MPI) library.  Required for
+multi-core processing.</li>
+<li>(Optional) <a class="reference external" href="http://matplotlib.sourceforge.net/">Matplotlib</a>, <a class="reference external" href="http://www.scipy.org/">SciPy</a>, and Pyproj Python packages.  Required for
+supplemental plotting, signal processing, and mesh generation utilities.</li>
+<li>(Optional) <a class="reference external" href="http://bazaar.canonical.com/">Bazaar</a> version control system.
+Useful for SORD development and staying updated with the latest code version.</li>
+</ul>
+</div>
+<div class="section" id="installation">
+<h3>Installation</h3>
+<p>Fortran and MPI installation should only be necessary for laptops and
+workstations.  HPC systems generally supply specifically tuned Fortran
+compilers and MPI libraries.</p>
 <ol class="arabic">
-<li><p class="first">A Fortran 95 compiler is required.  GNU Fortran is a good option if you do
-not already have one.  To install on Fedora or Red Hat Linux:</p>
+<li><p class="first">GNU Fortran is recommended if you don't already have a Fortran 95 compiler.</p>
+<p>Fedora/Red Hat Linux:</p>
 <pre class="literal-block">
-yum install gfortran
+sudo yum install gfortran
 </pre>
-<p>For Mac OS X, first install either the iPhone or the Mac-only version of <a class="reference external" href="http://developer.apple.com/technology/xcode.html">Xcode</a> available from Apple
+<p>Ubuntu Linux:</p>
+<pre class="literal-block">
+sudo apt-get install gfortran
+</pre>
+<p>Mac OS X:</p>
+<blockquote>
+<p>First install either the iPhone or the Mac-only version of <a class="reference external" href="http://developer.apple.com/technology/xcode.html">Xcode</a> available from Apple
 Developer Connection (free <a class="reference external" href="http://connect.apple.com">membership</a> required).
 Then install the GNU Fortran version available from the <a class="reference external" href="http://r.research.att.com/tools">R for Mac OS X
 Developer's Page</a> (versions from MacPorts
 and Fink seem to be problematic and are not recommended).</p>
+</blockquote>
 </li>
-<li><p class="first">MPI is required if you wish to use multiple cores or processors to speed-up
-computations.  The <a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a>
-implementation is recommended if you do not already have one.  The script
-<a class="reference external" href="extras/install-mpich.sh">install-mpich.sh</a> in the <tt class="docutils literal">extras/</tt> directory can
-automate this for you.</p>
+<li><p class="first"><a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a> is recommended
+if you need MPI.  The following shell script downloads and installs MPICH2:</p>
+<pre class="literal-block">
+curl -O http://earth.usc.edu/~gely/sord/extras/install/install-mpich.sh
+bash install-mpich.sh
+</pre>
 </li>
-<li><p class="first">Most systems already have <a class="reference external" href="http://www.python.org/download/">Python</a>, but
-it is recommended that you install an updated version.  The <a class="reference external" href="http://www.enthought.com/products/epddownload.php">Enthought Python
-Distribution</a> includes
-packages such as <a class="reference external" href="http://matplotlib.sourceforge.net/">matplotlib</a>, <a class="reference external" href="http://www.scipy.org/">SciPy</a>, and <a class="reference external" href="http://code.enthought.com/projects/mayavi">Mayavi</a>, that will allow you to run
-of the plotting examples included with SORD.</p>
+<li><p class="first">It is recommended that you install a private copy of Python with
+supplementary numeric and plotting packages, as is performed by the following
+shell script:</p>
+<pre class="literal-block">
+curl -O http://earth.usc.edu/~gely/sord/extras/install/install-python.sh
+bash install-python.sh
+</pre>
+<p><a class="reference external" href="http://www.enthought.com/products/epddownload.php">Enthought Python Distribution</a> is another option that
+includes many more bells and whistles such as the <a class="reference external" href="http://code.enthought.com/projects/mayavi">Mayavi</a> visualization package.</p>
 </li>
-<li><p class="first">Download and unpack the source code</p>
+<li><p class="first">Download the SORD source code.  The best option is use Bazaar version
+control, which facilitates applying code updates, and merging local
+modifications (see <a class="reference internal" href="#source-control">Source Control</a> section for examples):</p>
+<pre class="literal-block">
+cd ~/local
+bzr get http://earth.usc.edu/~gely/sord
+</pre>
+<p>Alternatively, download and unpack the source tar archive</p>
 <pre class="literal-block">
 curl http://earth.usc.edu/~gely/sord/sord.tgz | tar zxv
 </pre>
@@ -218,7 +255,7 @@ curl http://earth.usc.edu/~gely/sord/sord.tgz | tar zxv
 is usually be adequate.  To test the default configuration:</p>
 <pre class="literal-block">
 cd sord/
-./configure.py
+python configure.py
 </pre>
 <p>Systems with batch schedulers (such as PBS or LoadLeveler) generally require
 custom configuration to specify system resources, compiler options, and
@@ -226,7 +263,7 @@ scheduler scripts.  If SORD has already been configured for your system you can
 use one of the included configurations.  For example, for the TeraGrid Ranger
 system at TACC:</p>
 <pre class="literal-block">
-./configure.py tacc-ranger
+python configure.py tacc-ranger
 </pre>
 <p>To see the list of included configurations look in the <tt class="docutils literal">conf/</tt> directory.
 Each custom configuration is located in a separate sub-directory.  To create a
@@ -235,19 +272,19 @@ the supplied configurations.</p>
 </li>
 <li><p class="first">Compile the code by running:</p>
 <pre class="literal-block">
-./setup.py
+python setup.py
 </pre>
 </li>
 <li><p class="first">To enable Python to find the <tt class="docutils literal">sord</tt> module, add the enclosing directory
 the Python path.  For example, if your installation location is
-<tt class="docutils literal">~/packages/sord</tt>, in Bash shell do:</p>
+<tt class="docutils literal">~/local/sord</tt>, in Bash shell do:</p>
 <pre class="literal-block">
-export PYTHONPATH=~/packages
+export PYTHONPATH=~/local
 </pre>
 <p>Alternatively, if you are the administrator of your Python installation, you
 can do:</p>
 <pre class="literal-block">
-./setup.py path
+python setup.py path
 </pre>
 </li>
 </ol>
@@ -260,8 +297,8 @@ can do:</p>
 velocity:</p>
 <pre class="literal-block">
 cd scripts/example
-./sim.py -i
-./plot.py
+python sim.py -i
+python plot.py
 </pre>
 <p>Plotting requires Matplotlib, and the result should look like this:</p>
 <blockquote>
@@ -547,23 +584,7 @@ processors using <tt class="docutils literal">debug = 2</tt> to give more accura
 </div>
 <div class="section" id="source-control">
 <h4>Source control</h4>
-<p>We use <a class="reference external" href="http://bazaar-vcs.org/">Bazaar</a> for version control.  The simplest
-way to install Bazaar is to use Python <a class="reference external" href="http://pypi.python.org/pypi/setuptools">Easy Install</a> with your own personal Python
-installation.  Shell scripts are provided to help install either vanilla Python
-or Enthought Python Distribution.  Use curl to download one or the other:</p>
-<pre class="literal-block">
-curl -O http://earth.usc.edu/~gely/sord/extras/install/install-python.sh
-curl -O http://earth.usc.edu/~gely/sord/extras/install/install-python-epd.sh
-</pre>
-<p>Edit the script for the desired Python version and install location before
-running it.  Next install Bazaar using easy_install:</p>
-<pre class="literal-block">
-easy_install bzr
-</pre>
-<p>To retrieve SORD from the repository</p>
-<pre class="literal-block">
-bzr get http://earth.usc.edu/~gely/sord
-</pre>
+<p>We use <a class="reference external" href="http://bazaar.canonical.com/">Bazaar</a> for version control. Some examples:</p>
 <p>Apply any recent updates from the repository</p>
 <pre class="literal-block">
 bzr pull
@@ -592,7 +613,7 @@ for more.</p>
 </div>
 <div class="footer">
 <hr class="footer" />
-Generated on: 2010-02-01.
+Generated on: 2010-02-05.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>
