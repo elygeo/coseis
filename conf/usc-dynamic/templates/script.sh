@@ -2,7 +2,6 @@
 
 #PBS -N %(name)s
 #PBS -M %(email)s
-#PBS -q %(queue)s
 #PBS -l nodes=%(nodes)s:ppn=%(ppn)s
 #PBS -l walltime=%(walltime)s
 #PBS -e stderr
