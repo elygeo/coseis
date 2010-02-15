@@ -434,6 +434,37 @@ computations eight-fold::
     bc2 = -1, 1, -2
 
 
+Memory Usage and Scaling
+========================
+
+For rectilinear meshes, 23 single precision (four-byte) memory variables are
+required per mesh point.  Curvilinear meshes have two options with a trade-off
+in memory usage vs. floating-point operations.  Stored operators require 44
+variables per mesh point and give the best performance, while on-the-fly
+operators require 23 variables per mesh point at the cost of a factor of four
+increase in floating point operations.  As CPU improvement tends to out-pace
+memory bandwidth improvement, in the future, on-the-fly operators may become
+faster than stored operators.  The operator type is controlled by the
+``oplevel`` parameter, but can generally be left alone, as the default is to
+automatically detect rectilinear and curvilinear meshes and assign the proper
+operator type for fastest performance.
+
+On current hardware, computation time is on the order of the one second per
+time step per one million mesh points.  SORD scalability has been benchmarked
+up to 16 thousand processors at the TACC Ranger facility.  The following chart
+is the wall-time per step for 8 million mesh points per core (click for PDF): 
+
+.. image:: doc/sord-benchmark-ranger.png
+    :target: doc/sord-benchmark-ranger.pdf
+
+This benchmark tests computation only. For many applications, disk output is
+the primary bottleneck and will limit scalability.  When configuring domain
+decomposition, it is important to minimize the number of cores accessing a
+particular file.  For example, if output is required for the entire ground
+surface, maximizing the number of domain partitions in the vertical direction
+will minimize the number of cores participating in I/O.
+
+
 Development
 ===========
 
