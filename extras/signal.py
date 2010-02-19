@@ -1,4 +1,4 @@
-#!/usr/bin/env ipython -pylab -wthread
+#!/usr/bin/env ipython -wthread
 """
 Signal processing utilities
 """
@@ -40,7 +40,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=Non
     """
     Plot a time signal and it's Fourier spectrum.
     """
-    import pylab
+    import matplotlib.pyplot as plt
 
     h = numpy.array( h )
     nt = h.shape[-1]
@@ -55,56 +55,57 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=Non
         f = f[None].repeat( n, 0 )
     H = numpy.fft.rfft( h, nf )
     if axes == None:
-        pylab.clf()
-        pylab.gcf().canvas.set_window_title( title )
-        pylab.subplots_adjust( left=0.125, right=0.975,
+        plt.clf()
+        fig = plt.gcf()
+        fig.canvas.set_window_title( title )
+        fig.subplots_adjust( left=0.125, right=0.975,
             bottom=0.1, top=0.975, wspace=0.3, hspace=0.3 )
         axes = (
-            pylab.subplot( 221 ),
-            pylab.subplot( 222 ),
-            pylab.subplot( 223 ),
-            pylab.subplot( 224 ),
+            fig.add_subplot( 221 ),
+            fig.add_subplot( 222 ),
+            fig.add_subplot( 223 ),
+            fig.add_subplot( 224 ),
         )
 
-    pylab.axes( axes[0] )
-    pylab.plot( t.T, h.T, '-' )
-    pylab.plot( tlim, [0, 0], 'k--' )
-    pylab.xlabel( 'Time' )
-    pylab.ylabel( 'Amplitude' )
+    ax = axes[0]
+    ax.plot( t.T, h.T, '-' )
+    ax.plot( tlim, [0, 0], 'k--' )
+    ax.set_xlabel( 'Time' )
+    ax.set_ylabel( 'Amplitude' )
 
-    pylab.axes( axes[1] )
+    ax = axes[1]
     y = abs( H )
     y /= y.max()
-    pylab.semilogx( f.T, y.T, '-' )
-    pylab.axis( 'tight' )
-    pylab.ylim( -0.05, 1.05 )
-    pylab.xlabel( 'Frequency' )
-    pylab.ylabel( 'Amplitude' )
+    ax.semilogx( f.T, y.T, '-' )
+    ax.axis( 'tight' )
+    ax.set_ylim( -0.05, 1.05 )
+    ax.set_xlabel( 'Frequency' )
+    ax.set_ylabel( 'Amplitude' )
 
-    pylab.axes( axes[2] )
+    ax = axes[2]
     y = numpy.arctan2( H.imag, H.real )
-    pylab.semilogx( f.T, y.T, '.' )
-    pylab.axis( 'tight' )
+    ax.semilogx( f.T, y.T, '.' )
+    ax.axis( 'tight' )
     pi = numpy.pi
-    pylab.ylim( -pi*1.1, pi*1.1 )
-    pylab.yticks( [ -pi, 0, pi ] )
-    pylab.gca().set_yticklabels([ '$-\pi$', 0, '$\pi$' ])
-    pylab.xlabel( 'Frequency' )
-    pylab.ylabel( 'Phase' )
+    ax.set_ylim( -pi*1.1, pi*1.1 )
+    ax.set_yticks( [ -pi, 0, pi ] )
+    ax.set_yticklabels([ '$-\pi$', 0, '$\pi$' ])
+    ax.set_xlabel( 'Frequency' )
+    ax.set_ylabel( 'Phase' )
 
-    pylab.axes( axes[3] )
+    ax = axes[3]
     y = 20 * numpy.log10( abs( H ) )
     y -= y.max()
-    pylab.semilogx( f.T, -y.T, '-' )
-    pylab.axis( 'tight' )
-    pylab.ylim( 145, -5 )
-    pylab.xlabel( 'Frequency' )
-    pylab.ylabel( 'Amplitude (dB)' )
+    ax.semilogx( f.T, -y.T, '-' )
+    ax.axis( 'tight' )
+    ax.set_ylim( 145, -5 )
+    ax.set_xlabel( 'Frequency' )
+    ax.set_ylabel( 'Amplitude (dB)' )
     if legend:
-        pylab.legend( legend, loc='lower left' )
+        ax.legend( legend, loc='lower left' )
 
-    pylab.draw()
-    pylab.show()
+    plt.draw()
+    plt.show()
 
     return axes
 
@@ -112,7 +113,7 @@ def test():
     """
     Test spectrum plot.
     """
-    import pylab
+    import matplotlib.pyplot as plt
 
     dt = 0.01
     cutoff = 0.5
@@ -131,7 +132,7 @@ def test():
         lowpass( x, dt, cutoff, 4 ),    'Butter-4',
         lowpass( x, dt, cutoff, 8 ),    'Butter-8',
     ]
-    pylab.figure( 1 )
+    plt.figure( 1 )
     spectrum( y[::2], dt, legend=y[1::2] )
 
     y = [
@@ -139,7 +140,7 @@ def test():
         ishift( lowpass( shift( x ), dt, cutoff, 4, -1 ) ), 'Butter-4x-2',
         ishift( lowpass( shift( x ), dt, cutoff ) ),        'Hann',
     ]
-    pylab.figure( 2 )
+    plt.figure( 2 )
     spectrum( y[::2], dt, legend=y[1::2] )
 
     return

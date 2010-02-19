@@ -1,4 +1,4 @@
-#!/usr/bin/env ipython -pylab -wthread
+#!/usr/bin/env ipython -wthread
 """
 EGMM - Empirical Ground Motion Model
 """
@@ -143,7 +143,7 @@ def test():
     """
     CBNGA Test - For comparison with OpenSHA Attenuation Relationship Plotter
     """
-    import pylab
+    import matplotlib.pyplot as plt
 
     T = 10
     T = 1
@@ -164,29 +164,29 @@ def test():
 
     M = numpy.arange( 4.0, 8.501, 0.1 )
     Y, sigma = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
-    pylab.figure( 1 )
-    pylab.clf()
-    pylab.plot( M, Y )
-    pylab.xlabel( 'M' )
-    pylab.ylabel( T )
+    plt.figure( 1 )
+    plt.clf()
+    plt.plot( M, Y )
+    plt.xlabel( 'M' )
+    plt.ylabel( T )
     M = 5.5,
 
     V_S30 = numpy.arange( 180.0, 1500.1, 10.0 )
     Y, sigma = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
-    pylab.figure( 2 )
-    pylab.clf()
-    pylab.plot( V_S30, sigma )
-    pylab.xlabel( '$V_{S30}$' )
-    pylab.ylabel( T )
+    plt.figure( 2 )
+    plt.clf()
+    plt.plot( V_S30, sigma )
+    plt.xlabel( '$V_{S30}$' )
+    plt.ylabel( T )
     V_S30 = 760.0,
 
     Z_25 = numpy.arange( 0.0, 6.01, 0.1 )
     Y, sigma = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
-    pylab.figure( 3 )
-    pylab.clf()
-    pylab.plot( Z_25, Y )
-    pylab.xlabel( '$Z_{2.5}$' )
-    pylab.ylabel( T )
+    plt.figure( 3 )
+    plt.clf()
+    plt.plot( Z_25, Y )
+    plt.xlabel( '$Z_{2.5}$' )
+    plt.ylabel( T )
     Z_25 = 1.0,
 
     TT = ( 0.01, 0.02, 0.03, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3,
@@ -198,20 +198,20 @@ def test():
         Y += [ tmp[0][0] ]
         sigma += [ tmp[1][0] ]
 
-    pylab.figure( 4 )
-    pylab.clf()
-    pylab.loglog( TT, Y )
-    pylab.xlabel( 'T' )
-    pylab.ylabel( 'SA' )
+    plt.figure( 4 )
+    plt.clf()
+    plt.loglog( TT, Y )
+    plt.xlabel( 'T' )
+    plt.ylabel( 'SA' )
 
-    pylab.figure( 5 )
-    pylab.clf()
-    pylab.semilogx( TT, sigma )
-    pylab.xlabel( 'T' )
-    pylab.ylabel( '$\sigma$' )
+    plt.figure( 5 )
+    plt.clf()
+    plt.semilogx( TT, sigma )
+    plt.xlabel( 'T' )
+    plt.ylabel( '$\sigma$' )
 
-    pylab.draw()
-    pylab.show()
+    plt.draw()
+    plt.show()
 
     return
 
