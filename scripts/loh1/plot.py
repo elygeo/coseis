@@ -2,7 +2,9 @@
 """
 PEER LOH.1 - Plot comparison of FK and SOM.
 """
-import os, numpy, pylab, scipy.signal, sord
+import os, numpy, scipy.signal
+import matplotlib.pyplot as plt
+import sord
 
 # Parameters
 fk_dir = 'fk/'
@@ -16,8 +18,8 @@ sig = dt * 22.5
 ts = 4 * sig
 
 # Setup plot
-pylab.clf()
-ax = [ pylab.subplot( 3, 1, i ) for i in 1, 2, 3 ]
+fig = plt.figure()
+axes = [ fig.add_subplot( 3, 1, i ) for i in 1, 2, 3 ]
 
 # SORD results
 rotation = numpy.array( [[3./5., 4./5., 0.], [-4./5., 3./5., 0.], [0., 0., 1.]] )
@@ -34,10 +36,9 @@ v = dt * scipy.signal.lfilter( b, 1., v )
 vm = numpy.sqrt( numpy.sum( v * v, 0 ) )
 peakv = numpy.max( vm )
 print peakv
-for i in 0, 1, 2:
-    pylab.axes( ax[i] )
-    pylab.plot( t, v[i], 'k' )
-    pylab.hold( True )
+for ax in axes
+    ax.plot( t, v[i], 'k' )
+    ax.hold( True )
 
 # Prose F/K results
 tm = numpy.fromfile( fk_dir + 'time', '<f' )
@@ -52,23 +53,19 @@ v = dt * scipy.signal.lfilter( b, 1., v )
 vm = numpy.sqrt( numpy.sum( v * v, 0 ) )
 peakv = numpy.max( vm )
 print peakv
-for i in 0, 1, 2:
-    pylab.axes( ax[i] )
-    pylab.plot( tm, v[i], 'k--' )
+for ax in axes
+    ax.plot( tm, v[i], 'k--' )
 
 # Decorations
-pylab.axes( ax[0] )
-pylab.axis( [ 1.5, 8.5, -1., 1. ] )
-pylab.title( 'Radial',     position=(.98,.83), ha='right', va='center' )
-pylab.axes( ax[1] )
-pylab.axis( [ 1.5, 8.5, -1., 1. ] )
-pylab.title( 'Transverse', position=(.98,.83), ha='right', va='center' )
-pylab.ylabel( 'Velocity (m/s)' )
-pylab.axes( ax[2] )
-pylab.axis( [ 1.5, 8.5, -1., 1. ] )
-pylab.title( 'Vertical',   position=(.98,.83), ha='right', va='center' )
-pylab.xlabel( 'Time (/s)' )
-pylab.draw()
-pylab.savefig( 'loh.pdf', format='pdf' )
-pylab.show()
+axes[0].axis( [ 1.5, 8.5, -1., 1. ] )
+axes[0].set_title( 'Radial',     position=(.98,.83), ha='right', va='center' )
+axes[1].axis( [ 1.5, 8.5, -1., 1. ] )
+axes[1].set_title( 'Transverse', position=(.98,.83), ha='right', va='center' )
+axes[1].set_ylabel( 'Velocity (m/s)' )
+axes[2].axis( [ 1.5, 8.5, -1., 1. ] )
+axes[2].set_title( 'Vertical',   position=(.98,.83), ha='right', va='center' )
+axes[2].set_xlabel( 'Time (/s)' )
+fig.canvas.draw()
+fig.savefig( 'loh.pdf', format='pdf' )
+fig.show()
 

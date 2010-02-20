@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-import os, numpy, pylab, sord
+import os, numpy
+import matplotlib.pyplot as plt
+import sord
 
 bi_dir = 'bi/'
 so_dir = os.path.expanduser( '~/run/tpv3-150/' )
@@ -11,7 +13,7 @@ nt = meta.nt
 t1 = dt * numpy.arange( nt )
 t2 = numpy.fromfile( bi_dir + 'time', 'f' )
 for i, sta in enumerate( ('P1', 'P2') ):
-    fig = pylab.figure(i+1)
+    fig = plt.figure(i+1)
     fig.clf()
 
     ax = fig.add_subplot( 2, 1, 1 )
@@ -40,7 +42,7 @@ for i, sta in enumerate( ('P1', 'P2') ):
     ax.set_ylabel( 'Slip (m)' )
     ax.set_xlabel( 'Time (s)' )
     ax.set_title( sta, position=(0.05,0.83), ha='left', va='center' )
-    pylab.draw()
+    fig.canvas.draw()
 
 # Rupture time contour
 v = 0.5 * numpy.arange( -20, 20 )
@@ -48,7 +50,7 @@ n = meta.shape['trup']
 x1 = 0.001 * numpy.fromfile( so_dir + 'out/x1', 'f' ).reshape( n[::-1] ).T
 x2 = 0.001 * numpy.fromfile( so_dir + 'out/x2', 'f' ).reshape( n[::-1] ).T
 f = numpy.fromfile( so_dir + 'out/trup', 'f' ).reshape( n[::-1] ).T
-fig = pylab.figure( 3 )
+fig = plt.figure( 3 )
 fig.clf()
 ax = fig.add_subplot(111)
 ax.contour( x1, x2, f, v, colors='k' )
@@ -65,6 +67,6 @@ ax.contour( x1, x2, -trup, v, colors='k' )
 ax.axis( 'image' )
 ax.axis( (-15, 15, -7.5, 7.5) )
 #ax.axis( (-15, 0, -7.5, 0) )
-pylab.draw()
-pylab.show()
+fig.canvas.draw()
+fig.show()
 

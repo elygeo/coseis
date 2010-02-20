@@ -2,7 +2,7 @@
 """
 Tally benchmarks
 """
-import os, glob, numpy, sord
+import os, glob, numpy
 
 normalize = 0
 np = []
@@ -24,26 +24,22 @@ for n, t in zip( np, tt ):
     print '%4.2f %d' % (t, n)
 
 if 0:
-    import pylab
-    cfg = {}
-    path = os.path.join( d, 'conf.py' )
-    exec open( path ) in cfg
+    import matplotlib.pyplot as plt
     n = len( tt )
-    pylab.plot( tt, 'ko-' )
-    pylab.hold( True )
-    pylab.plot( [-1, n], [tt[0],tt[0]], 'k--' )
-    pylab.gca().set_xticks( range(n) )
-    pylab.gca().set_xticklabels( np )
-    #pylab.title( 'SORD weak scaling benchmark - ' + cfg['machine'] )
-    pylab.title( 'SORD weak scaling benchmark - TACC Ranger' )
-    pylab.xlabel( 'Cores' )
+    ax = plt.plot( tt, 'ko-' )[0].axes
+    ax.hold( True )
+    ax.plot( [-1, n], [tt[0],tt[0]], 'k--' )
+    ax.set_xticks( range(n) )
+    ax.set_xticklabels( np )
+    ax.set_title( 'SORD weak scaling benchmark - TACC Ranger' )
+    ax.set_xlabel( 'Cores' )
     if normalize:
-        pylab.ylabel( 'Normalized run time' )
-        pylab.axis([-1, n, 0, 4])
+        ax.set_ylabel( 'Normalized run time' )
+        ax.axis([-1, n, 0, 4])
     else:
-        pylab.ylabel( 'Time/step (s)' )
-        pylab.axis([-1, n, 0, 2*int(numpy.average(tt)+0.5) ])
-    pylab.draw()
-    pylab.savefig( 'bench.pdf', format='pdf' )
-    #pylab.show()
+        ax.set_ylabel( 'Time/step (s)' )
+        ax.axis([-1, n, 0, 2*int(numpy.average(tt)+0.5) ])
+    ax.figure.savefig( 'bench.pdf', format='pdf' )
+    plt.draw()
+    plt.show()
 
