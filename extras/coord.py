@@ -258,7 +258,7 @@ class Transform():
         mat = [[1, 0, -x], [0, 1, -y], [0, 0, 1]]
         if hasattr( proj, 'mat' ):
             proj = proj.proj
-            mat = numpy.dot( mat, self.mat )
+            mat = numpy.dot( mat, proj.mat )
         c = scale * numpy.cos( phi )
         s = scale * numpy.sin( phi )
         x, y = translate
