@@ -4,7 +4,7 @@ Matplotlib utilities
 """
 import os, numpy
 
-def text( ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=1.0, npmb=16, **kwargs ):
+def text( ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75, npmb=16, **kwargs ):
     """
     Matplotlib text command augmented with poor man's bold.
     """
@@ -23,10 +23,15 @@ def text( ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=1.0, npmb=16, **
         dy = edgewidth * (y2 - y1) / dy
         if aspect == 'equal':
             dx = dy
+        m = numpy.sqrt( 0.5 )
+        dx = dx / m
+        dy = dy / m
         for i in range( npmb ):
-            phi = 2.0 * numpy.pi * i / npmb
+            phi = 2.0 * numpy.pi * (i + 0.5) / npmb
             x_ = x + dx * numpy.cos( phi )
             y_ = y + dy * numpy.sin( phi )
+            #x_ = x + dx * numpy.maximum( -m, numpy.minimum( m, numpy.cos( phi ) ) )
+            #y_ = y + dy * numpy.maximum( -m, numpy.minimum( m, numpy.sin( phi ) ) )
             h += [ ax.text( x_, y_, s, **kwargs ) ]
     return h
 

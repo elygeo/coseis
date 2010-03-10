@@ -4,6 +4,44 @@ Mapping data utilities
 """
 import os, numpy
 
+def tsurf( path ):
+    """
+    Read GOCAD (http://www.gocad.org) trigulated surface "Tsurf" files.
+    """
+    fh = open( path )
+    tsurf = []
+    for line in fh.readlines():
+        f = line.split()
+        if f[0] in ('VRTX', 'PVRTX'):
+            vrtx += [[float(f[2]), float(f[3]), float(f[4])]]
+        elif f[0] in ('ATOM', 'PATOM'):
+            i = int( f[2] ) - 1
+            vrtx += [ vrtx[i] ]
+        elif f[0] == 'TRGL':
+            trgl += [[int(f[1]) - 1, int(f[2]) - 1, int(f[3]) - 1]]
+        elif f[0] == 'BORDER':
+            border += [[int(f[2]) - 1, int(f[3]) - 1]]
+        elif f[0] == 'BSTONE':
+            bstone += [int(f[1]) - 1]
+        elif f[0] == 'TFACE':
+            if trgl != []:
+                tface += [ numpy.array( trgl, 'i' ).T ]
+            trgl = []
+        elif f[0] == 'END':
+            vrtx   = numpy.array( vrtx, 'f' ).T
+            border = numpy.array( border, 'i' ).T
+            bstone = numpy.array( bstone, 'i' ).T
+            tface += [ numpy.array( trgl, 'i' ).T ]
+            tsurf += [[vrtx, tface, border, bstone, name, color]]
+        elif line.startswith( 'GOCAD TSurf' ):
+            tface, vrtx, trgl, border, bstone, name, color = [], [], [], [], [], None, None
+        elif line.startswith( 'name:' ):
+            name = line.split( ':', 1 )[1].strip()
+        elif line.startswith( '*solid*color:' ):
+            f = line.split( ':' )[1].split()
+            color = float(f[0]), float(f[1]), float(f[2])
+    return tsurf
+
 def etopo1( indices=None, path='', downsample=1, download=False ):
     """
     Download ETOPO1 Global Relief Model.
@@ -94,7 +132,7 @@ def topo( lon, lat, path='', cache='', download=False ):
 def mapdata( path='', kind='coastlines', resolution='high', range=None, min_area=0.0, min_level=0, max_level=4, clip=1, download=False ):
     """
     Reader for the Global Self-consistent, Hierarchical, High-resolution Shoreline
-    database (GSHHS) by Wessel and Smith.
+    database (GSHHS) by Wessel and Smith.  WGS-84 ellipsoid.
 
     kind: 'coastlines', 'rivers', 'boarders'
     resolution: 'crude', 'low', 'intermediate', 'high', 'full'
@@ -104,10 +142,11 @@ def mapdata( path='', kind='coastlines', resolution='high', range=None, min_area
     Wessel, P., and W. H. F. Smith, A Global Self-consistent, Hierarchical,
     High-resolution Shoreline Database, J. Geophys. Res., 101, 8741-8743, 1996.
     http://www.ngdc.noaa.gov/mgg/shorelines/gshhs.html
-    http://www.soest.hawaii.edu/wessel/gshhs/gshhs.html
+    http://www.soest.hawaii.edu/wessel/gshhs/index.html
     """
 
-    url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version1.10/gshhs_1.10.zip'
+    nh = 11
+    url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.0/gshhs_2.0.zip'
     filename = os.path.join( path, os.path.basename( url ) )
     kind = dict(c='gshhs', r='wdb_rivers', b='wdb_borders')[kind[0]]
     member = 'gshhs/%s_%s.b' % (kind, resolution[0])
@@ -117,6 +156,8 @@ def mapdata( path='', kind='coastlines', resolution='high', range=None, min_area
     if download and not os.path.exists( filename ):
         print( 'Downloading %s' % url )
         import urllib
+        if path != '' and not os.path.exists( path ):
+            os.makedirs( path )
         urllib.urlretrieve( url, filename )
 
     import zipfile
@@ -130,14 +171,16 @@ def mapdata( path='', kind='coastlines', resolution='high', range=None, min_area
 
     while ii < data.size:
         ntotal += 1
-        hdr = data[ii:ii+8]
+        hdr = data[ii:ii+nh]
         n = hdr[1]
-        ii += 8 + 2 * n
+        ii += nh + 2 * n
+        level = hdr[2:3].view( 'i1' )[3]
+        if level > max_level:
+            break
+        if level < min_level:
+            continue
         area = hdr[7] * 0.1
         if area < min_area:
-            continue
-        level = hdr[2:3].view( 'i1' )[3]
-        if level > max_level or level < min_level:
             continue
         if range != None:
             west, east, south, north = hdr[3:7] * 1e-6
@@ -160,8 +203,8 @@ def mapdata( path='', kind='coastlines', resolution='high', range=None, min_area
 
     print '%s, resolution: %s, selected %s of %s' % (member, resolution, nkeep, ntotal)
     if nkeep:
-        xx = numpy.concatenate( xx )
-        yy = numpy.concatenate( yy )
+        xx = numpy.concatenate( xx )[:-1]
+        yy = numpy.concatenate( yy )[:-1]
     return numpy.array( [xx, yy], 'f' )
 
 def engdahlcat( path='engdahl-centennial-cat.f32', fields=['lon', 'lat', 'depth', 'mag'] ):

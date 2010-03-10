@@ -33,6 +33,7 @@ easy_install pyproj
 easy_install matplotlib
 easy_install scipy
 easy_install bzr
+easy_install pypdf
 
 echo 'Now add this to your .bashrc or .profile:'
 echo "export PATH=\"${path}/python/bin:\${PATH}\""
