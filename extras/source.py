@@ -2,7 +2,49 @@
 """
 Source utilities
 """
-import os, sys, numpy, gzip, sord
+import os, sys, urllib, numpy, gzip, sord
+
+def scsn_mts( eventid ):
+    """
+    Retrieve Southern California Seismic Network Moment Tensor Solutions.
+    """
+    url = 'http://www.data.scec.org/MomentTensor/solutions/%s/' % eventid
+    text = urllib.urlopen( url )
+    event = {}
+    clvd = [[[], [], []], [[], [], []]]
+    dc   = [[[], [], []], [[], [], []]]
+    for line in text.readlines():
+        line = line.strip()
+        if ':' in line and line[0] != ' ':
+            f = line.split( ':', 1 )
+            k = f[0].strip()
+            if k in ('Origin Time', 'Stations', 'Quality Factor'):
+                event[k] = f[1].strip()
+            elif k in ('Event ID', 'Number of Stations used'):
+                event[k] = int( f[1] )
+            elif k in ('Magnitude', 'Depth (km)', 'Latitude', 'Longitude', 'Moment Magnitude'):
+                event[k] = float( f[1] )
+            elif k == 'Best Fitting Double Couple and CLVD Solution':
+                tensor = clvd
+            elif k == 'Best Fitting Double Couple Solution':
+                tensor = dc
+        elif line:
+            f = line.split()
+            if f[0] == 'Mxx':
+                tensor[0][0] = float( f[1] )
+            elif f[0] == 'Myy':
+                tensor[0][1] = float( f[1] )
+            elif f[0] == 'Mzz':
+                tensor[0][2] = float( f[1] )
+            elif f[0] == 'Myz':
+                tensor[1][0] = float( f[1] )
+            elif f[0] == 'Mxz':
+                tensor[1][1] = float( f[1] )
+            elif f[0] == 'Mxy':
+                tensor[1][2] = float( f[1] )
+    event['double-couple-clvd'] = numpy.array( clvd )
+    event['double-couple'] = numpy.array( dc )
+    return event
 
 def magarea( A ):
     """

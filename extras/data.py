@@ -12,7 +12,9 @@ def tsurf( path ):
     tsurf = []
     for line in fh.readlines():
         f = line.split()
-        if f[0] in ('VRTX', 'PVRTX'):
+        if line.startswith( 'GOCAD TSurf' ):
+            tface, vrtx, trgl, border, bstone, name, color = [], [], [], [], [], None, None
+        elif f[0] in ('VRTX', 'PVRTX'):
             vrtx += [[float(f[2]), float(f[3]), float(f[4])]]
         elif f[0] in ('ATOM', 'PATOM'):
             i = int( f[2] ) - 1
@@ -33,8 +35,6 @@ def tsurf( path ):
             bstone = numpy.array( bstone, 'i' ).T
             tface += [ numpy.array( trgl, 'i' ).T ]
             tsurf += [[vrtx, tface, border, bstone, name, color]]
-        elif line.startswith( 'GOCAD TSurf' ):
-            tface, vrtx, trgl, border, bstone, name, color = [], [], [], [], [], None, None
         elif line.startswith( 'name:' ):
             name = line.split( ':', 1 )[1].strip()
         elif line.startswith( '*solid*color:' ):
@@ -134,7 +134,7 @@ def mapdata( path='', kind='coastlines', resolution='high', range=None, min_area
     Reader for the Global Self-consistent, Hierarchical, High-resolution Shoreline
     database (GSHHS) by Wessel and Smith.  WGS-84 ellipsoid.
 
-    kind: 'coastlines', 'rivers', 'boarders'
+    kind: 'coastlines', 'rivers', 'borders'
     resolution: 'crude', 'low', 'intermediate', 'high', 'full'
     range: (min_lon, max_lon, min_lat, max_lat)
 
@@ -150,6 +150,10 @@ def mapdata( path='', kind='coastlines', resolution='high', range=None, min_area
     filename = os.path.join( path, os.path.basename( url ) )
     kind = dict(c='gshhs', r='wdb_rivers', b='wdb_borders')[kind[0]]
     member = 'gshhs/%s_%s.b' % (kind, resolution[0])
+
+    if kind != 'gshhs':
+        min_area = 0.0
+
     if range != None:
         range = range[0] % 360, range[1] % 360, range[2], range[3]
 
@@ -175,6 +179,7 @@ def mapdata( path='', kind='coastlines', resolution='high', range=None, min_area
         n = hdr[1]
         ii += nh + 2 * n
         level = hdr[2:3].view( 'i1' )[3]
+
         if level > max_level:
             break
         if level < min_level:
@@ -188,7 +193,7 @@ def mapdata( path='', kind='coastlines', resolution='high', range=None, min_area
                 continue
         nkeep += 1
         x, y = 1e-6 * numpy.array( data[ii-2*n:ii].reshape(n, 2).T, 'f' )
-        if clip:
+        if range != None and clip != 0:
             i = (x >= range[0]) & (x <= range[1]) & (y >= range[2]) & (y <= range[3])
             if clip > 0:
                 i[:-1] = i[:-1] | i[1:]

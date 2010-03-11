@@ -2,7 +2,7 @@
 """
 Matplotlib utilities
 """
-import os, numpy
+import os, numpy, viz
 
 def text( ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75, npmb=16, **kwargs ):
     """
@@ -39,15 +39,14 @@ def colorbar( fig, cmap, clim, title=None, rect=None, ticks=None, ticklabels=Non
     """
     Matplotlib enhanced colorbar.
     """
-    inches = fig.get_size_inches()
     if rect == None:
         rect = 0.25, 0.08, 0.5, 0.02
     axis = clim[0], clim[1], 0, 1
     ax = fig.add_axes( rect )
     x = axis[0], axis[0], axis[1], axis[1], axis[0]
     y = axis[2], axis[3], axis[3], axis[2], axis[2]
-    h = ax.plot( x, y, '-', c=boxcolor, lw=boxwidth*2, alpha=boxalpha, clip_on=False )
-    im = ax.imshow( [numpy.arange(1001)], cmap=cmap, extent=axis )
+    ax.plot( x, y, '-', c=boxcolor, lw=boxwidth*2, alpha=boxalpha, clip_on=False )
+    ax.imshow( [numpy.arange(1001)], cmap=cmap, extent=axis )
     ax.axis( 'off' )
     ax.axis( 'auto' )
     if title:
@@ -121,7 +120,7 @@ def savefig( fig, fd=None, format=None, distill=False, **kwargs ):
         out = numpy.fromstring( out.getvalue(), 'u1' ).reshape( n )
     elif distill and format == 'pdf':
         fig.savefig( out, format='eps', **kwargs )
-        out = distill_eps( out )
+        out = viz.distill_eps( out )
     else:
         fig.savefig( out, format=format, **kwargs )
         out.reset()

@@ -3,7 +3,6 @@
 Coordinate conversions
 """
 import sys, numpy
-import getopt
 
 rearth = 6370000.0
 
