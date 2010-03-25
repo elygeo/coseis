@@ -81,7 +81,7 @@ case( 2 )
     call diffnc( s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
     do k = i1(2), i2(2)
         i = k - i1(2) + 1
-        i = k + nnoff(2)
+        p = k + nnoff(2)
         do l = i1(3), i2(3)
         do j = i1(1), i2(1)
             s1(j,k,l) = dc2(p) * s1(j,k,l) + dc1(p) * g2(j,i,l,ic)
