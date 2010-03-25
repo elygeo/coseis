@@ -35,10 +35,8 @@ allocate(         &
     s2(j,k,l)     )
 
 ! PML
-i1 = 0
-i2 = 0
-where ( bc1 > 2 ) i1 = npml
-where ( bc2 > 2 ) i2 = npml
+i1 = min( i2node, i1pml ) - i1node + 1
+i2 = i2node - max( i1node, i2pml ) + 1
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
@@ -46,16 +44,16 @@ l1 = i1(3); l2 = i2(3)
 ! PML state
 allocate(         &
     p1(j1,k,l,3), &
-    g1(j1,k,l,3), &
     p2(j,k1,l,3), &
-    g2(j,k1,l,3), &
     p3(j,k,l1,3), &
-    g3(j,k,l1,3), &
     p4(j2,k,l,3), &
-    g4(j2,k,l,3), &
     p5(j,k2,l,3), &
-    g5(j,k2,l,3), &
     p6(j,k,l2,3), &
+    g1(j1,k,l,3), &
+    g2(j,k1,l,3), &
+    g3(j,k,l1,3), &
+    g4(j2,k,l,3), &
+    g5(j,k2,l,3), &
     g6(j,k,l2,3)  )
 
 ! PML damping

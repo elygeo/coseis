@@ -77,45 +77,6 @@ def load( fd, d=None, prune_pattern=None, prune_types=None ):
     prune( d, prune_pattern, prune_types )
     return namespace( d )
 
-def loadmeta( path='.', cache='meta.py' ):
-    """
-    Load SORD metadata.
-    """
-    path = os.path.expanduser( path )
-    meta = {}
-    f = os.path.join( path, cache )
-    if os.path.isfile( f ):
-        exec open( f ) in meta
-    else:
-        f = os.path.join( path, 'conf.py' )
-        if os.path.isfile( f ):
-            d = {}
-            exec open( f ) in d
-            for k in 'name', 'rundate', 'rundir', 'user', 'os_', 'dtype':
-                meta[k] = d[k]
-        f = os.path.join( path, 'parameters.py' )
-        if os.path.isfile( f ):
-            exec open( f ) in meta
-            meta['indices'] = {}
-            meta['xi'] = {}
-            for f in meta['fieldio']:
-                op, filename = f[0], f[8]
-                if filename != '-':
-                    meta['indices'][filename] = f[7]
-                    if 'wi' in op:
-                        meta['xi'][filename] = f[3]
-            meta['shape'] = {}
-            for k in meta['indices']:
-                nn = [ (i[1] - i[0]) / i[2] + 1 for i in meta['indices'][k] ]
-                nn = [ n for n in nn if n > 1 ]
-                if nn == []:
-                    nn = [1]
-                meta['shape'][k] = nn
-        path = os.path.join( path, cache )
-        expand = 'shape', 'xi', 'indices', 'fieldio'
-        save( path, meta, expand )
-    return namespace( meta )
-
 def expand_slice( shape, indices=None, base=1, round=True ):
     """
     Fill in slice index notation.
@@ -188,12 +149,12 @@ def ndread( fd, shape=None, indices=None, dtype='f', order='F' ):
               '>d' : big endian double precision
     order :   'F' first index varies fastest, or 'C' last index varies fastest.
     """
-    import numpy
+    import numpy as np
     from numpy import array, fromfile
     if type( fd ) is not file:
         fd = open( os.path.expanduser( fd ) )
     if not shape:
-        return numpy.fromfile( fd, dtype )
+        return np.fromfile( fd, dtype )
     elif type( shape ) == int:
         mm = [shape]
     else:
@@ -219,10 +180,10 @@ def ndread( fd, shape=None, indices=None, dtype='f', order='F' ):
     i0 = ( [0, 0, 0] + i0 )[-4:]
     nn = ( [1, 1, 1] + nn )[-4:]
     mm = ( [1, 1, 1] + mm )[-4:]
-    f = numpy.empty( nn, dtype )
-    itemsize = numpy.dtype( dtype ).itemsize
-    offset = numpy.array( i0, 'i8' )
-    stride = numpy.cumprod( [1] + mm[:0:-1], dtype='i8' )[::-1] * itemsize
+    f = np.empty( nn, dtype )
+    itemsize = np.dtype( dtype ).itemsize
+    offset = np.array( i0, 'i8' )
+    stride = np.cumprod( [1] + mm[:0:-1], dtype='i8' )[::-1] * itemsize
     for j in xrange( nn[0] ):
         for k in xrange( nn[1] ):
             for l in xrange( nn[2] ):
@@ -345,8 +306,8 @@ def uninstall():
     from distutils.sysconfig import get_python_lib
     path = os.path.basename( os.path.dirname( __file__ ) )
     path = os.path.join( get_python_lib(), path )
-    if not os.path.exists( dst ):
-        sys.exit( 'Error: %s does not exist' % dst )
+    if not os.path.exists( path ):
+        sys.exit( 'Error: %s does not exist' % path )
     print( 'Removing ' + path )
     try:
         shutil.rmtree( path )

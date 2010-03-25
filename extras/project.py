@@ -16,7 +16,8 @@
 
 lon0, lat0 = -123.15, 36.35
 
-import sys, numpy, pyproj
+import sys, pyproj
+import numpy as np
 
 try:
     import coord
@@ -36,7 +37,7 @@ origin = (lon0-0.1, lon0+0.1), (lat0, lat0)
 proj = pyproj.Proj( proj='utm', zone=11 )
 proj = coord.Transform( proj, origin=origin )
 
-data = numpy.loadtxt( infile, unpack=True )
+data = np.loadtxt( infile, unpack=True )
 data[:2] = proj( data[0], data[1], inverse=inverse )
-numpy.savetxt( outfile, data.T )
+np.savetxt( outfile, data.T )
 

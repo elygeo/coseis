@@ -10,6 +10,7 @@ use m_bc
 use m_util
 use m_diffnc
 use m_fieldio
+use m_surfnormals
 integer :: i1(3), i2(3), i3(3), i4(3), bc(3), &
     i, j, k, l, j1, k1, l1, j2, k2, l2, b, c
 real :: xi(3), m(9), tol, h, w
@@ -141,10 +142,10 @@ call fieldio( '>', 'c2', w2(:,:,:,2) )
 call fieldio( '>', 'c3', w2(:,:,:,3) )
 
 ! Hypocenter location
-if ( master ) then
-    xi = ihypo - nnoff
-    i1 = int( xi )
-    xhypo = 0.0
+xhypo = 0.0
+xi = ihypo - nnoff
+i1 = int( xi )
+if ( all( i1 >= 1 .and. i1 < nm ) ) then
     do l = i1(3), i1(3)+1
     do k = i1(2), i1(2)+1
     do j = i1(1), i1(1)+1
@@ -156,6 +157,47 @@ if ( master ) then
     end do
     end do
 end if
+
+! Boundary surface normals
+!j = nm(1)
+!k = nm(2)
+!l = nm(3)
+!if ( bc1(1) == 10 ) then
+!    allocate( pn1(1,k,l,3), gn1(1,k,l,3) )
+!    pn1 = 0.0
+!    gn1 = 0.0
+!    i1 = i1node
+!    i2 = i2node
+!    i2(1) = i1(1)
+!    call nodenormals( pn1, w1, dx, i1, i2, 1 )
+!    i1 = i1cell
+!    i2 = i2cell
+!    i2(1) = i1(1)
+!    call cellnormals( gn1, w1, dx, i1, i2, 1 )
+!    if ( nl3(1) < npml ) then
+!        root = (/0, -1, -1/)
+!        call rbroadcast4( pn1, root )
+!        call rbroadcast4( gn1, root )
+!    end if
+!end if
+!if ( bc2(1) == 10 ) then
+!    allocate( pn4(1,k,l,3), gn4(1,k,l,3) )
+!    pn4 = 0.0
+!    gn4 = 0.0
+!    i1 = i1node
+!    i2 = i2node
+!    i1(1) = i2(1)
+!    call nodenormals( pn4, w1, dx, i1, i2, 1 )
+!    i1 = i1cell
+!    i2 = i2cell
+!    i1(1) = i2(1)
+!    call cellnormals( gn4, w1, dx, i1, i2, 1 )
+!    if ( nl3(1) < npml ) then
+!        root = (/np3(1), -1, -1/)
+!        call rbroadcast4( pn4, root )
+!        call rbroadcast4( gn4, root )
+!    end if
+!end if
 
 ! Orthogonality test
 if ( oplevel == 0 ) then

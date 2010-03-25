@@ -6,12 +6,10 @@ integer, parameter :: file_null = frio_file_null
 contains
 
 ! Initialize
-subroutine initialize( np0, ip, master )
+subroutine initialize( np0, ip )
 integer, intent(out) :: np0, ip
-logical, intent(out) :: master
 np0 = 1
 ip = 0
-master = .true.
 end subroutine
 
 ! Finalize
@@ -19,97 +17,69 @@ subroutine finalize
 end subroutine
 
 ! Process rank
-subroutine rank( ip3, ipid, np3 )
+subroutine rank( ip3, ipid, np3in )
 integer, intent(out) :: ip3(3), ipid
-integer, intent(in) :: np3(3)
-ip3 = np3
+integer, intent(in) :: np3in(3)
+ip3 = np3in
 ip3 = 0
 ipid = 0
-end subroutine
-
-! Set root process
-subroutine setroot( ip3root )
-integer, intent(in) :: ip3root(3)
-integer :: i
-i = ip3root(1)
-end subroutine
-
-! Broadcast real 1d
-subroutine rbroadcast1( r, i2d )
-real, intent(inout) :: r(:)
-integer, intent(in) :: i2d
-integer :: i
-r = r
-i = i2d
 end subroutine
 
 ! Barrier
 subroutine barrier
 end subroutine
 
+! Broadcast real 1d
+subroutine rbroadcast1( r, coords )
+real, intent(inout) :: r(:)
+integer, intent(in) :: coords(3)
+integer :: i
+r = r
+i = coords(1)
+end subroutine
+
+! Broadcast real 4d
+subroutine rbroadcast4( r, coords )
+real, intent(inout) :: r(:,:,:,:)
+integer, intent(in) :: coords(3)
+integer :: i
+r = r
+i = coords(1)
+end subroutine
+
 ! Reduce integer
-subroutine ireduce( ii, i, op, i2d )
+subroutine ireduce( ii, i, op, coords )
 integer, intent(out) :: ii
-integer, intent(in) :: i, i2d
+integer, intent(in) :: i, coords(3)
 character(*), intent(in) :: op
 character :: a
 a = op(1:1)
-ii = i2d
+ii = coords(1)
 ii = i
 end subroutine
 
-! Reduce real
-subroutine rreduce( rr, r, op, i2d )
-real, intent(out) :: rr
-real, intent(in) :: r
-integer, intent(in) :: i2d
-character(*), intent(in) :: op
-character :: a
-a = op(1:1)
-rr = i2d
-rr = r
-end subroutine
-
 ! Reduce real 1d
-subroutine rreduce1( rr, r, op, i2d )
+subroutine rreduce1( rr, r, op, coords )
 real, intent(out) :: rr(:)
 real, intent(in) :: r(:)
-integer, intent(in) :: i2d
+integer, intent(in) :: coords(3)
 character(*), intent(in) :: op
 character :: a
 a = op(1:1)
-rr = i2d
+rr = coords(1)
 rr = r
 end subroutine
 
 ! Reduce real 2d
-subroutine rreduce2( rr, r, op, i2d )
+subroutine rreduce2( rr, r, op, coords )
 real, intent(out) :: rr(:,:)
 real, intent(in) :: r(:,:)
-integer, intent(in) :: i2d
+integer, intent(in) :: coords(3)
 character(*), intent(in) :: op
 character :: a
 a = op(1:1)
-rr = i2d
+rr = coords(1)
 rr = r
-end subroutine
-
-! Reduce extrema location, real 3d
-subroutine reduceloc( rr, ii, r, op, n, noff, i2d )
-real, intent(out) :: rr
-real, intent(in) :: r(:,:,:)
-integer, intent(out) :: ii(3)
-integer, intent(in) :: n(3), noff(3), i2d
-character(*), intent(in) :: op
-character :: a
-a = op(1:1)
-ii = n + noff + i2d
-select case( op )
-case( 'min', 'allmin' ); ii = minloc( r );
-case( 'max', 'allmax' ); ii = maxloc( r );
-case default; stop 'unknown op in reduceloc'
-end select
-rr = r(ii(1),ii(2),ii(3))
 end subroutine
 
 ! Scalar swap halo

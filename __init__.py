@@ -213,12 +213,33 @@ def stage( inputs ):
             open( ff, 'w' ).write( out )
             shutil.copymode( f, ff )
 
+    # Combine metadata
+    meta = util.namespace( pm.__dict__ )
+    for k in 'name', 'rundate', 'rundir', 'user', 'os_', 'dtype':
+        setattr( meta, getattr( cf, k ) )
+    meta.indices = {}
+    meta.xi = {}
+    for f in meta.fieldio:
+        op, filename = f[0], f[8]
+        if filename != '-':
+            meta.indices[filename] = f[7]
+            if 'wi' in op:
+                meta.xi[filename] = f[3]
+    meta.shape = {}
+    for k in meta.indices:
+        nn = [ (i[1] - i[0]) / i[2] + 1 for i in meta.indices[k] ]
+        nn = [ n for n in nn if n > 1 ]
+        if nn == []:
+            nn = [1]
+        meta.shape[k] = nn
+
     # Write files
     os.chdir( cf.rundir )
     log = open( 'log', 'w' )
     log.write( starttime + ': setup started\n' )
-    util.save( 'parameters.py', pm, expand=['fieldio'] )
     util.save( 'conf.py', cf, prune_pattern='(^_)|(^.$)' )
+    util.save( 'parameters.py', pm, expand=['fieldio'] )
+    util.save( 'meta.py', meta, expand=['shape', 'xi', 'indices', 'fieldio'] )
 
     # Return to initial directory
     os.chdir( cwd )

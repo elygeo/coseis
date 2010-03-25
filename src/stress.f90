@@ -10,7 +10,7 @@ use m_source
 use m_util
 use m_fieldio
 use m_stats
-integer :: i1(3), i2(3), i, j, k, l, ic, iid, id
+integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, p
 
 if ( verb ) write( 0, * ) 'Stress'
 
@@ -51,10 +51,11 @@ case( 1 )
     i2(1) = min( i2(1), i1pml(1) )
     call diffnc( s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
     do j = i1(1), i2(1)
-        i = j + nnoff(1)
+        i = j - i1(1) + 1
+        p = j + nnoff(1)
         do l = i1(3), i2(3)
         do k = i1(2), i2(2)
-            s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g1(i,k,l,ic)
+            s1(j,k,l) = dc2(p) * s1(j,k,l) + dc1(p) * g1(i,k,l,ic)
             g1(i,k,l,ic) = s1(j,k,l)
         end do
         end do
@@ -64,10 +65,11 @@ case( 1 )
     i1(1) = max( i1(1), i2pml(1) - 1 )
     call diffnc( s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
     do j = i1(1), i2(1)
-        i = nn(1) - j - nnoff(1)
+        i = i2(1) - j + 1
+        p = nn(1) - j - nnoff(1)
         do l = i1(3), i2(3)
         do k = i1(2), i2(2)
-            s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g4(i,k,l,ic)
+            s1(j,k,l) = dc2(p) * s1(j,k,l) + dc1(p) * g4(i,k,l,ic)
             g4(i,k,l,ic) = s1(j,k,l)
         end do
         end do
@@ -78,10 +80,11 @@ case( 2 )
     i2(2) = min( i2(2), i1pml(2) )
     call diffnc( s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
     do k = i1(2), i2(2)
+        i = k - i1(2) + 1
         i = k + nnoff(2)
         do l = i1(3), i2(3)
         do j = i1(1), i2(1)
-            s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g2(j,i,l,ic)
+            s1(j,k,l) = dc2(p) * s1(j,k,l) + dc1(p) * g2(j,i,l,ic)
             g2(j,i,l,ic) = s1(j,k,l)
         end do
         end do
@@ -91,10 +94,11 @@ case( 2 )
     i1(2) = max( i1(2), i2pml(2) - 1 )
     call diffnc( s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
     do k = i1(2), i2(2)
-        i = nn(2) - k - nnoff(2)
+        i = i2(2) - k + 1
+        p = nn(2) - k - nnoff(2)
         do l = i1(3), i2(3)
         do j = i1(1), i2(1)
-            s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g5(j,i,l,ic)
+            s1(j,k,l) = dc2(p) * s1(j,k,l) + dc1(p) * g5(j,i,l,ic)
             g5(j,i,l,ic) = s1(j,k,l)
         end do
         end do
@@ -105,10 +109,11 @@ case( 3 )
     i2(3) = min( i2(3), i1pml(3) )
     call diffnc( s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
     do l = i1(3), i2(3)
-        i = l + nnoff(3)
+        i = l - i1(3) + 1
+        p = l + nnoff(3)
         do k = i1(2), i2(2)
         do j = i1(1), i2(1)
-            s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g3(j,k,i,ic)
+            s1(j,k,l) = dc2(p) * s1(j,k,l) + dc1(p) * g3(j,k,i,ic)
             g3(j,k,i,ic) = s1(j,k,l)
         end do
         end do
@@ -118,10 +123,11 @@ case( 3 )
     i1(3) = max( i1(3), i2pml(3) - 1 )
     call diffnc( s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
     do l = i1(3), i2(3)
-        i = nn(3) - l - nnoff(3)
+        i = i2(3) - l + 1
+        p = nn(3) - l - nnoff(3)
         do k = i1(2), i2(2)
         do j = i1(1), i2(1)
-            s1(j,k,l) = dc2(i) * s1(j,k,l) + dc1(i) * g6(j,k,i,ic)
+            s1(j,k,l) = dc2(p) * s1(j,k,l) + dc1(p) * g6(j,k,i,ic)
             g6(j,k,i,ic) = s1(j,k,l)
         end do
         end do

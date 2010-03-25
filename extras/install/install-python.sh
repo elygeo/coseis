@@ -2,7 +2,7 @@
 # Install Python, setuptools, Numpy and Pyproj.
 
 # Set version and location here:
-version="2.6.4"
+version="2.6.5"
 path="\${HOME}/local"
 
 prefix="$( eval echo ${path} )/python-${version}"
@@ -20,8 +20,10 @@ make
 make install
 
 export PATH="${prefix}/bin:${PATH}"
-curl -O http://peak.telecommunity.com/dist/ez_setup.py
-python ez_setup.py --prefix="${prefix}"
+#curl -O http://peak.telecommunity.com/dist/ez_setup.py
+#python ez_setup.py --prefix="${prefix}"
+curl -O http://python-distribute.org/distribute_setup.py
+python distribute_setup.py --prefix="${prefix}"
 
 eval cd "${path}"
 [ -e python ] || ln -s "$( basename ${prefix} )" python

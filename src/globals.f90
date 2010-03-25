@@ -25,10 +25,12 @@ integer :: &
     ipid,           & ! processor ID
     np0               ! number of processes available
 integer, dimension(3) :: &
+    nl3,            & ! number of mesh nodes per process
     nm,             & ! size of local 3D arrays
     nhalo,          & ! number of ghost nodes
     ip3,            & ! 3D process rank
-    ip3root,        & ! 3D master process rank
+    ip3root,        & ! 3D root process rank
+    ip2root,        & ! 2D root process rank
     i1bc, i2bc,     & ! model boundary
     i1pml, i2pml,   & ! PML boundary
     i1core, i2core, & ! core region
@@ -52,6 +54,8 @@ real, allocatable, dimension(:) :: &
 
 ! PML state
 real, allocatable, dimension(:,:,:,:) :: &
+    n1, n2, n3,     & ! surface normal near boundary
+    n4, n5, n6,     & ! surface normal far boundary
     p1, p2, p3,     & ! pml momentum near side
     p4, p5, p6,     & ! pml momentum far side
     g1, g2, g3,     & ! pml gradient near side

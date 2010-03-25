@@ -65,7 +65,7 @@ i1 = i1core
 i2 = i2core
 i1(ifn) = irup
 i2(ifn) = irup
-call surfnormals( nhat, w1, dx, i1, i2, ifn )
+call nodenormals( nhat, w1, dx, i1, i2, ifn )
 area = sign( 1, faultnormal ) * sqrt( sum( nhat * nhat, 4 ) )
 f1 = area
 call invert( f1 )
@@ -115,7 +115,7 @@ do i = 1, 3
 end do
 
 ! Hypocentral radius
-call rbroadcast1( xhypo, ifn )
+call rbroadcast1( xhypo, ip2root )
 do i = 1, 3
     select case( ifn )
     case ( 1 ); t2(1,:,:,i) = w1(irup,:,:,i) - xhypo(i)

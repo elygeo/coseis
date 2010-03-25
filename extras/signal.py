@@ -2,7 +2,7 @@
 """
 Signal processing utilities
 """
-import numpy
+import numpy as np
 
 def lowpass( x, dt, cutoff, window='hann', repeat=0 ):
     """
@@ -19,12 +19,12 @@ def lowpass( x, dt, cutoff, window='hann', repeat=0 ):
     if window == 'hann':
         n = 2 * int( 0.5 / (cutoff * dt) ) + 1
         if n > 0:
-            w = 0.5 - 0.5 * numpy.cos(
-                2.0 * numpy.pi * numpy.arange( n ) / (n - 1) )
+            w = 0.5 - 0.5 * np.cos(
+                2.0 * np.pi * np.arange( n ) / (n - 1) )
             w /= w.sum()
-            x = numpy.convolve( x, w, 'same' )
+            x = np.convolve( x, w, 'same' )
             if repeat:
-                x = numpy.convolve( x, w, 'same' )
+                x = np.convolve( x, w, 'same' )
     else:
         import scipy.signal
         wn = cutoff * 2.0 * dt
@@ -42,18 +42,18 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=Non
     """
     import matplotlib.pyplot as plt
 
-    h = numpy.array( h )
+    h = np.array( h )
     nt = h.shape[-1]
     if not nf:
         nf = nt
-    t = numpy.arange( nt ) * dt
-    f = numpy.arange( nf / 2 + 1 ) / (dt * nf)
+    t = np.arange( nt ) * dt
+    f = np.arange( nf / 2 + 1 ) / (dt * nf)
     tlim = t[0], t[-1]
     if len( h.shape ) > 1:
         n = h.shape[0]
         t = t[None].repeat( n, 0 )
         f = f[None].repeat( n, 0 )
-    H = numpy.fft.rfft( h, nf )
+    H = np.fft.rfft( h, nf )
     if axes == None:
         plt.clf()
         fig = plt.gcf()
@@ -83,10 +83,10 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=Non
     ax.set_ylabel( 'Amplitude' )
 
     ax = axes[2]
-    y = numpy.arctan2( H.imag, H.real )
+    y = np.arctan2( H.imag, H.real )
     ax.semilogx( f.T, y.T, '.' )
     ax.axis( 'tight' )
-    pi = numpy.pi
+    pi = np.pi
     ax.set_ylim( -pi*1.1, pi*1.1 )
     ax.set_yticks( [ -pi, 0, pi ] )
     ax.set_yticklabels([ '$-\pi$', 0, '$\pi$' ])
@@ -94,7 +94,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=Non
     ax.set_ylabel( 'Phase' )
 
     ax = axes[3]
-    y = 20 * numpy.log10( abs( H ) )
+    y = 20 * np.log10( abs( H ) )
     y -= y.max()
     ax.semilogx( f.T, -y.T, '-' )
     ax.axis( 'tight' )
@@ -120,10 +120,10 @@ def test():
     cutoff = 8.0
     cutoff = 2.0
     n = 1000
-    x = numpy.zeros( n+1 )
+    x = np.zeros( n+1 )
     x[0] = 1
-    shift  = numpy.fft.fftshift
-    ishift = numpy.fft.ifftshift
+    shift  = np.fft.fftshift
+    ishift = np.fft.ifftshift
 
     y = [
         lowpass( x, dt, cutoff, 2 ),    'Butter-2',

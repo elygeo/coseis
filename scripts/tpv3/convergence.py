@@ -2,7 +2,8 @@
 """
 TPV3 convergence test
 """
-import os, glob, sord, numpy, scipy.interpolate
+import os, glob, sord, scipy.interpolate
+import numpy as np
 import matplotlib.pyplot as plt
 import scipy.interpolate.RectBivariateSpline as interp2d
 degree = 1
@@ -13,15 +14,15 @@ dirs = glob.glob( '[0-9]*' )[3:]
 meta = sord.util.loadmeta( dirs[0] )
 path = os.path.join( dirs[0], 'out' ) + os.sep
 n = meta.shape['trup']
-x0  = numpy.fromfile( path + 'x1',   'f' ).reshape( n[::-1] ).T
-y0  = numpy.fromfile( path + 'x2',   'f' ).reshape( n[::-1] ).T
-tt0 = numpy.fromfile( path + 'trup', 'f' ).reshape( n[::-1] ).T
-sv0 = numpy.fromfile( path + 'psv',  'f' ).reshape( n[::-1] ).T
-sx0 = numpy.fromfile( path + 'su1',  'f' ).reshape( n[::-1] ).T
-sy0 = numpy.fromfile( path + 'su2',  'f' ).reshape( n[::-1] ).T
+x0  = np.fromfile( path + 'x1',   'f' ).reshape( n[::-1] ).T
+y0  = np.fromfile( path + 'x2',   'f' ).reshape( n[::-1] ).T
+tt0 = np.fromfile( path + 'trup', 'f' ).reshape( n[::-1] ).T
+sv0 = np.fromfile( path + 'psv',  'f' ).reshape( n[::-1] ).T
+sx0 = np.fromfile( path + 'su1',  'f' ).reshape( n[::-1] ).T
+sy0 = np.fromfile( path + 'su2',  'f' ).reshape( n[::-1] ).T
 tt_ = tt0.mean()
 sv_ = sv0.mean()
-su_ = numpy.average( numpy.sqrt( sx0*sx0 + sy0*sy0 ) )
+su_ = np.average( np.sqrt( sx0*sx0 + sy0*sy0 ) )
 dx = []
 ttres = []
 sures = []
@@ -32,21 +33,21 @@ for d in dirs[1:]:
     meta = sord.util.loadmeta( d )
     dx += [ int( meta.dx[0] + 0.5 ) ]
     n = meta.shape['trup']
-    x = numpy.fromfile( path + 'x1',   'f' ).reshape( n[::-1] ).T
-    y = numpy.fromfile( path + 'x2',   'f' ).reshape( n[::-1] ).T
-    f = numpy.fromfile( path + 'trup', 'f' ).reshape( n[::-1] ).T
+    x = np.fromfile( path + 'x1',   'f' ).reshape( n[::-1] ).T
+    y = np.fromfile( path + 'x2',   'f' ).reshape( n[::-1] ).T
+    f = np.fromfile( path + 'trup', 'f' ).reshape( n[::-1] ).T
     f = tt0 - interp2d( x, y, f, kx=degree, ky=degree ).__call__( x0, y0 )
-    ttres += [ numpy.sqrt( numpy.average( f * f ) ) / tt_ * 100  ]
+    ttres += [ np.sqrt( np.average( f * f ) ) / tt_ * 100  ]
 
-    f = numpy.fromfile( path + 'psv', 'f' ).reshape( n[::-1] ).T
+    f = np.fromfile( path + 'psv', 'f' ).reshape( n[::-1] ).T
     f = sv0 - interp2d( x, y, f, kx=degree, ky=degree ).__call__( x0, y0 )
-    svres += [ numpy.sqrt( numpy.average( f * f ) ) / sv_ * 100 ]
+    svres += [ np.sqrt( np.average( f * f ) ) / sv_ * 100 ]
 
-    f = numpy.fromfile( path + 'su1', 'f' ).reshape( n[::-1] ).T
-    g = numpy.fromfile( path + 'su2', 'f' ).reshape( n[::-1] ).T
+    f = np.fromfile( path + 'su1', 'f' ).reshape( n[::-1] ).T
+    g = np.fromfile( path + 'su2', 'f' ).reshape( n[::-1] ).T
     f = sx0 - interp2d( x, y, f, kx=degree, ky=degree ).__call__( x0, y0 )
     g = sy0 - interp2d( x, y, g, kx=degree, ky=degree ).__call__( x0, y0 )
-    sures += [ numpy.sqrt( numpy.average( f * f + g * g ) ) / su_ * 100 ]
+    sures += [ np.sqrt( np.average( f * f + g * g ) ) / su_ * 100 ]
 
 for i in range( len( ttres ) ):
     print dirs[i+1], ttres[i], sures[i], svres[i]

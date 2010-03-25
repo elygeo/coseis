@@ -2,13 +2,16 @@
 """
 Source utilities
 """
-import os, sys, urllib, numpy, gzip, sord
+import os, sys, urllib, gzip, sord
+import numpy as np
 
 def scsn_mts( eventid ):
     """
     Retrieve Southern California Seismic Network Moment Tensor Solutions.
     """
+    url = 'http://www.data.scec.org/MomentTensor/solutions/web_%s/ci%s_MT.html' % (eventid, eventid)
     url = 'http://www.data.scec.org/MomentTensor/solutions/%s/' % eventid
+    url = 'http://www.data.scec.org/MomentTensor/showMT.php?evid=%s' % eventid
     text = urllib.urlopen( url )
     event = {}
     clvd = [[[], [], []], [[], [], []]]
@@ -42,8 +45,8 @@ def scsn_mts( eventid ):
                 tensor[1][1] = float( f[1] )
             elif f[0] == 'Mxy':
                 tensor[1][2] = float( f[1] )
-    event['double-couple-clvd'] = numpy.array( clvd )
-    event['double-couple'] = numpy.array( dc )
+    event['double-couple-clvd'] = np.array( clvd )
+    event['double-couple'] = np.array( dc )
     return event
 
 def magarea( A ):
@@ -51,19 +54,19 @@ def magarea( A ):
     Various earthquake magnitude area relations.
     """
     if type( A ) in (float, int):
-        Mw = 3.98 + numpy.log10( A )
+        Mw = 3.98 + np.log10( A )
         if A > 537.0:
-            Mw = 3.08 + 4.0 / 3.0 * numpy.log10( A )
+            Mw = 3.08 + 4.0 / 3.0 * np.log10( A )
     else:
-        A = numpy.array( A ) 
+        A = np.array( A ) 
         i = A > 537.0
-        Mw = 3.98 + numpy.log10( A )
-        Mw[i] = 3.08 + 4.0 / 3.0 * numpy.log10( A )
+        Mw = 3.98 + np.log10( A )
+        Mw[i] = 3.08 + 4.0 / 3.0 * np.log10( A )
     Mw = dict(
         Hanks2008 = Mw,
-        EllsworthB2003 = 4.2 + numpy.log10( A ),
-        Somerville2006 = 3.87 + 1.05 * numpy.log10( A ),
-        Wells1994 = 3.98 + 1.02 * numpy.log10( A ),
+        EllsworthB2003 = 4.2 + np.log10( A ),
+        Somerville2006 = 3.87 + 1.05 * np.log10( A ),
+        Wells1994 = 3.98 + 1.02 * np.log10( A ),
     )
     return Mw
 
@@ -72,24 +75,24 @@ def src_write( history, nt, dt, t0, xi, w1, w2=None, path='' ):
     Write SORD input for moment or potency source.
     """
     path = os.path.join( os.path.expanduser( path ), 'src_' )
-    numpy.array( history, 'f' ).tofile( path + 'history' )
-    numpy.array( nt,      'f' ).tofile( path + 'nt'  )
-    numpy.array( dt,      'f' ).tofile( path + 'dt'  )
-    numpy.array( t0,      'f' ).tofile( path + 't0'  )
-    numpy.array( xi[0],   'f' ).tofile( path + 'xi1' )
-    numpy.array( xi[1],   'f' ).tofile( path + 'xi2' )
-    numpy.array( xi[2],   'f' ).tofile( path + 'xi3' )
+    np.array( history, 'f' ).tofile( path + 'history' )
+    np.array( nt,      'f' ).tofile( path + 'nt'  )
+    np.array( dt,      'f' ).tofile( path + 'dt'  )
+    np.array( t0,      'f' ).tofile( path + 't0'  )
+    np.array( xi[0],   'f' ).tofile( path + 'xi1' )
+    np.array( xi[1],   'f' ).tofile( path + 'xi2' )
+    np.array( xi[2],   'f' ).tofile( path + 'xi3' )
     if not w2:
-        numpy.array( w1[0], 'f' ).tofile( path + 'w11' )
-        numpy.array( w1[1], 'f' ).tofile( path + 'w12' )
-        numpy.array( w1[2], 'f' ).tofile( path + 'w13' )
+        np.array( w1[0], 'f' ).tofile( path + 'w11' )
+        np.array( w1[1], 'f' ).tofile( path + 'w12' )
+        np.array( w1[2], 'f' ).tofile( path + 'w13' )
     else:
-        numpy.array( w1[0], 'f' ).tofile( path + 'w11' )
-        numpy.array( w1[1], 'f' ).tofile( path + 'w22' )
-        numpy.array( w1[2], 'f' ).tofile( path + 'w33' )
-        numpy.array( w2[0], 'f' ).tofile( path + 'w23' )
-        numpy.array( w2[1], 'f' ).tofile( path + 'w31' )
-        numpy.array( w2[2], 'f' ).tofile( path + 'w12' )
+        np.array( w1[0], 'f' ).tofile( path + 'w11' )
+        np.array( w1[1], 'f' ).tofile( path + 'w22' )
+        np.array( w1[2], 'f' ).tofile( path + 'w33' )
+        np.array( w2[0], 'f' ).tofile( path + 'w23' )
+        np.array( w2[1], 'f' ).tofile( path + 'w31' )
+        np.array( w2[2], 'f' ).tofile( path + 'w12' )
     return
 
 def srf_read( filename, path=None, mks=True ):
@@ -135,21 +138,21 @@ def srf_read( filename, path=None, mks=True ):
     if path not in '.' and not os.path.isdir( path ):
         os.makedirs( path )
     n = meta['nsource']
-    lon   = numpy.empty( n )
-    lat   = numpy.empty( n )
-    dep   = numpy.empty( n )
-    stk   = numpy.empty( n )
-    dip   = numpy.empty( n )
-    rake  = numpy.empty( n )
-    area  = numpy.empty( n )
-    t0    = numpy.empty( n )
-    dt    = numpy.empty( n )
-    slip1 = numpy.empty( n )
-    slip2 = numpy.empty( n )
-    slip3 = numpy.empty( n )
-    nt1   = numpy.empty( n, 'i' )
-    nt2   = numpy.empty( n, 'i' )
-    nt3   = numpy.empty( n, 'i' )
+    lon   = np.empty( n )
+    lat   = np.empty( n )
+    dep   = np.empty( n )
+    stk   = np.empty( n )
+    dip   = np.empty( n )
+    rake  = np.empty( n )
+    area  = np.empty( n )
+    t0    = np.empty( n )
+    dt    = np.empty( n )
+    slip1 = np.empty( n )
+    slip2 = np.empty( n )
+    slip3 = np.empty( n )
+    nt1   = np.empty( n, 'i' )
+    nt2   = np.empty( n, 'i' )
+    nt3   = np.empty( n, 'i' )
     fd1 = open( path + 'sv1', 'wb' )
     fd2 = open( path + 'sv2', 'wb' )
     fd3 = open( path + 'sv3', 'wb' )
@@ -173,21 +176,21 @@ def srf_read( filename, path=None, mks=True ):
         nt2[i]   = int( k[12] )
         nt3[i]   = int( k[14] )
         sv = []
-        n = numpy.cumsum([ nt1[i], nt2[i], nt3[i] ])
+        n = np.cumsum([ nt1[i], nt2[i], nt3[i] ])
         while len( sv ) < n[-1]:
             sv += fd.readline().split()
         if len( sv ) != n[-1]:
             sys.exit( 'error reading %s %s' % ( filename, i ) )
-        sv1 = numpy.array( [ float(f) for f in sv[:n[0]]     ] )
-        sv2 = numpy.array( [ float(f) for f in sv[n[0]:n[1]] ] )
-        sv3 = numpy.array( [ float(f) for f in sv[n[1]:]     ] )
+        sv1 = np.array( [ float(f) for f in sv[:n[0]]     ] )
+        sv2 = np.array( [ float(f) for f in sv[n[0]:n[1]] ] )
+        sv3 = np.array( [ float(f) for f in sv[n[1]:]     ] )
         if mks:
             sv1 = 0.01 * sv1
             sv2 = 0.01 * sv2
             sv3 = 0.01 * sv3
-        numpy.array( sv1, 'f' ).tofile( fd1 )
-        numpy.array( sv2, 'f' ).tofile( fd2 )
-        numpy.array( sv3, 'f' ).tofile( fd3 )
+        np.array( sv1, 'f' ).tofile( fd1 )
+        np.array( sv2, 'f' ).tofile( fd2 )
+        np.array( sv3, 'f' ).tofile( fd3 )
     fd1.close()
     fd2.close()
     fd3.close()
@@ -197,30 +200,30 @@ def srf_read( filename, path=None, mks=True ):
         slip1 = 0.01 * slip1
         slip2 = 0.01 * slip2
         slip3 = 0.01 * slip3
-    numpy.array( nt1,   'i' ).tofile( path + 'nt1'   )
-    numpy.array( nt2,   'i' ).tofile( path + 'nt2'   )
-    numpy.array( nt3,   'i' ).tofile( path + 'nt3'   )
-    numpy.array( dt,    'f' ).tofile( path + 'dt'    )
-    numpy.array( t0,    'f' ).tofile( path + 't0'    )
-    numpy.array( area,  'f' ).tofile( path + 'area'  )
-    numpy.array( lon,   'f' ).tofile( path + 'lon'   )
-    numpy.array( lat,   'f' ).tofile( path + 'lat'   )
-    numpy.array( dep,   'f' ).tofile( path + 'dep'   )
-    numpy.array( stk,   'f' ).tofile( path + 'stk'   )
-    numpy.array( dip,   'f' ).tofile( path + 'dip'   )
-    numpy.array( rake,  'f' ).tofile( path + 'rake'  )
-    numpy.array( slip1, 'f' ).tofile( path + 'slip1' )
-    numpy.array( slip2, 'f' ).tofile( path + 'slip2' )
-    numpy.array( slip3, 'f' ).tofile( path + 'slip3' )
+    np.array( nt1,   'i' ).tofile( path + 'nt1'   )
+    np.array( nt2,   'i' ).tofile( path + 'nt2'   )
+    np.array( nt3,   'i' ).tofile( path + 'nt3'   )
+    np.array( dt,    'f' ).tofile( path + 'dt'    )
+    np.array( t0,    'f' ).tofile( path + 't0'    )
+    np.array( area,  'f' ).tofile( path + 'area'  )
+    np.array( lon,   'f' ).tofile( path + 'lon'   )
+    np.array( lat,   'f' ).tofile( path + 'lat'   )
+    np.array( dep,   'f' ).tofile( path + 'dep'   )
+    np.array( stk,   'f' ).tofile( path + 'stk'   )
+    np.array( dip,   'f' ).tofile( path + 'dip'   )
+    np.array( rake,  'f' ).tofile( path + 'rake'  )
+    np.array( slip1, 'f' ).tofile( path + 'slip1' )
+    np.array( slip2, 'f' ).tofile( path + 'slip2' )
+    np.array( slip3, 'f' ).tofile( path + 'slip3' )
 
     # Write meta data
     meta['area'] = area.sum()
-    meta['potency'] = numpy.sqrt(
+    meta['potency'] = np.sqrt(
         ( area * slip1 ).sum() ** 2 +
         ( area * slip2 ).sum() ** 2 +
         ( area * slip3 ).sum() ** 2 )
     meta['slip'] = meta['potency'] / meta['area']
-    meta['dtype'] = numpy.dtype( 'f' ).str
+    meta['dtype'] = np.dtype( 'f' ).str
     sord.util.save( path + 'meta.py', meta )
     return meta
 
@@ -237,21 +240,21 @@ def srf2potency( path, projection, dx ):
     dtype = meta['dtype']
 
     # Read data
-    nt1  = numpy.fromfile( path + 'nt1',  'i' )
-    nt2  = numpy.fromfile( path + 'nt2',  'i' )
-    nt3  = numpy.fromfile( path + 'nt3',  'i' )
-    dt   = numpy.fromfile( path + 'dt',   dtype )
-    t0   = numpy.fromfile( path + 't0',   dtype )
-    x    = numpy.fromfile( path + 'lon',  dtype )
-    y    = numpy.fromfile( path + 'lat',  dtype )
-    z    = numpy.fromfile( path + 'dep',  dtype )
-    stk  = numpy.fromfile( path + 'stk',  dtype )
-    dip  = numpy.fromfile( path + 'dip',  dtype )
-    rake = numpy.fromfile( path + 'rake', dtype )
-    area = numpy.fromfile( path + 'area', dtype )
+    nt1  = np.fromfile( path + 'nt1',  'i' )
+    nt2  = np.fromfile( path + 'nt2',  'i' )
+    nt3  = np.fromfile( path + 'nt3',  'i' )
+    dt   = np.fromfile( path + 'dt',   dtype )
+    t0   = np.fromfile( path + 't0',   dtype )
+    x    = np.fromfile( path + 'lon',  dtype )
+    y    = np.fromfile( path + 'lat',  dtype )
+    z    = np.fromfile( path + 'dep',  dtype )
+    stk  = np.fromfile( path + 'stk',  dtype )
+    dip  = np.fromfile( path + 'dip',  dtype )
+    rake = np.fromfile( path + 'rake', dtype )
+    area = np.fromfile( path + 'area', dtype )
 
     # Time
-    nt = numpy.array( [nt1, nt2, nt3] )
+    nt = np.array( [nt1, nt2, nt3] )
     ii = nt > 0
     nsource = nt[ii].size
     nt[ii].tofile( path + 'src_nt' )
@@ -264,11 +267,11 @@ def srf2potency( path, projection, dx ):
     fd3 = open( path + 'sv3' )
     fd  = open( path + 'src_history', 'wb' )
     for i in range( dt.size ):
-        numpy.cumsum( dt[i] * numpy.fromfile(fd1, dtype, nt1[i]) ).tofile( fd )
+        np.cumsum( dt[i] * np.fromfile(fd1, dtype, nt1[i]) ).tofile( fd )
     for i in range( dt.size ):
-        numpy.cumsum( dt[i] * numpy.fromfile(fd2, dtype, nt2[i]) ).tofile( fd )
+        np.cumsum( dt[i] * np.fromfile(fd2, dtype, nt2[i]) ).tofile( fd )
     for i in range( dt.size ):
-        numpy.cumsum( dt[i] * numpy.fromfile(fd3, dtype, nt3[i]) ).tofile( fd )
+        np.cumsum( dt[i] * np.fromfile(fd3, dtype, nt3[i]) ).tofile( fd )
     fd1.close()
     fd2.close()
     fd3.close()
@@ -277,9 +280,9 @@ def srf2potency( path, projection, dx ):
     # Coordinates
     rot = coord.rotation( x, y, projection )[1]
     x, y = projection( x, y )
-    x = numpy.array( x / dx[0] + 1.0, dtype )
-    y = numpy.array( y / dx[1] + 1.0, dtype )
-    z = numpy.array( z / dx[2] + 1.0, dtype )
+    x = np.array( x / dx[0] + 1.0, dtype )
+    y = np.array( y / dx[1] + 1.0, dtype )
+    z = np.array( z / dx[2] + 1.0, dtype )
     x[None].repeat(3,0)[ii].tofile( path + 'src_xi1' )
     y[None].repeat(3,0)[ii].tofile( path + 'src_xi2' )
     z[None].repeat(3,0)[ii].tofile( path + 'src_xi3' )
@@ -288,12 +291,12 @@ def srf2potency( path, projection, dx ):
     R = area * coord.slipvectors( stk + rot, dip, rake )
 
     # Tensor components
-    stk, dip, nrm = numpy.array( coord.source_tensors( R ), dtype )
-    w = numpy.zeros_like( stk )
+    stk, dip, nrm = np.array( coord.source_tensors( R ), dtype )
+    w = np.zeros_like( stk )
     w[0] = stk[0]; w[1] = dip[0]; w[ii].tofile( path + 'src_w23' )
     w[0] = stk[1]; w[1] = dip[1]; w[ii].tofile( path + 'src_w31' )
     w[0] = stk[2]; w[1] = dip[2]; w[ii].tofile( path + 'src_w12' )
-    w = numpy.zeros_like( nrm )
+    w = np.zeros_like( nrm )
     w[2] = nrm[0]; w[ii].tofile( path + 'src_w11' )
     w[2] = nrm[1]; w[ii].tofile( path + 'src_w22' )
     w[2] = nrm[2]; w[ii].tofile( path + 'src_w33' )
@@ -313,20 +316,20 @@ def srf2momrate( path, projection, dx, dt, nt ):
     dtype = meta['dtype']
 
     # Read data
-    nt1  = numpy.fromfile( path + 'nt1',  'i' )
-    nt2  = numpy.fromfile( path + 'nt2',  'i' )
-    nt3  = numpy.fromfile( path + 'nt3',  'i' )
-    dt0  = numpy.fromfile( path + 'dt',   dtype )
-    t0   = numpy.fromfile( path + 't0',   dtype )
-    x    = numpy.fromfile( path + 'lon',  dtype )
-    y    = numpy.fromfile( path + 'lat',  dtype )
-    z    = numpy.fromfile( path + 'dep',  dtype )
-    stk  = numpy.fromfile( path + 'stk',  dtype )
-    dip  = numpy.fromfile( path + 'dip',  dtype )
-    rake = numpy.fromfile( path + 'rake', dtype )
-    area = numpy.fromfile( path + 'area', dtype )
-    mu   = numpy.fromfile( path + 'mu',   dtype )
-    lam  = numpy.fromfile( path + 'lam',  dtype )
+    nt1  = np.fromfile( path + 'nt1',  'i' )
+    nt2  = np.fromfile( path + 'nt2',  'i' )
+    nt3  = np.fromfile( path + 'nt3',  'i' )
+    dt0  = np.fromfile( path + 'dt',   dtype )
+    t0   = np.fromfile( path + 't0',   dtype )
+    x    = np.fromfile( path + 'lon',  dtype )
+    y    = np.fromfile( path + 'lat',  dtype )
+    z    = np.fromfile( path + 'dep',  dtype )
+    stk  = np.fromfile( path + 'stk',  dtype )
+    dip  = np.fromfile( path + 'dip',  dtype )
+    rake = np.fromfile( path + 'rake', dtype )
+    area = np.fromfile( path + 'area', dtype )
+    mu   = np.fromfile( path + 'mu',   dtype )
+    lam  = np.fromfile( path + 'lam',  dtype )
 
     # Coordinates
     rot = coord.rotation( x, y, projection )[1]
@@ -343,20 +346,20 @@ def srf2momrate( path, projection, dx, dt, nt ):
     nrm = nrm * lam
 
     # Time history
-    t = dt * numpy.arange( nt )
+    t = dt * np.arange( nt )
     fd1 = open( path + 'sv1' )
     fd2 = open( path + 'sv2' )
     fd3 = open( path + 'sv3' )
     fd  = open( path + 'momrate', 'wb' )
     for i in range( dt.size ):
-        sv1 = numpy.fromfile( fd1, dtype, nt1[i] )
-        sv2 = numpy.fromfile( fd2, dtype, nt2[i] )
-        sv3 = numpy.fromfile( fd3, dtype, nt3[i] )
+        sv1 = np.fromfile( fd1, dtype, nt1[i] )
+        sv2 = np.fromfile( fd2, dtype, nt2[i] )
+        sv3 = np.fromfile( fd3, dtype, nt3[i] )
         sv1 = coord.interp( t0[i], dt0[i], sv1, t )
         sv2 = coord.interp( t0[i], dt0[i], sv2, t )
         sv3 = coord.interp( t0[i], dt0[i], sv3, t )
-        numpy.array( [jj[i], kk[i], ll[i]], 'i' ).tofile( fd )
-        numpy.array( [
+        np.array( [jj[i], kk[i], ll[i]], 'i' ).tofile( fd )
+        np.array( [
             nrm[0,i] * sv3,
             nrm[1,i] * sv3,
             nrm[2,i] * sv3,
@@ -379,7 +382,7 @@ def dsample( f, d ):
         return f
     n = f.shape
     n = n[0] / d, n[1] / d
-    g = numpy.zeros( n )
+    g = np.zeros( n )
     for j in range( d ):
         for k in range( d ):
             g = g + f[j,::d,k::d]
@@ -402,18 +405,18 @@ def srf2coulomb( path, projection, dx, dest=None, scut=0 ):
     dtype = meta['dtype']
 
     # Read files
-    x    = numpy.fromfile( path + 'lon',   dtype )
-    y    = numpy.fromfile( path + 'lat',   dtype )
-    z    = numpy.fromfile( path + 'dep',   dtype )
-    stk  = numpy.fromfile( path + 'stk',   dtype )
-    dip  = numpy.fromfile( path + 'dip',   dtype )
-    rake = numpy.fromfile( path + 'rake',  dtype )
-    s1   = numpy.fromfile( path + 'slip1', dtype )
-    s2   = numpy.fromfile( path + 'slip2', dtype )
+    x    = np.fromfile( path + 'lon',   dtype )
+    y    = np.fromfile( path + 'lat',   dtype )
+    z    = np.fromfile( path + 'dep',   dtype )
+    stk  = np.fromfile( path + 'stk',   dtype )
+    dip  = np.fromfile( path + 'dip',   dtype )
+    rake = np.fromfile( path + 'rake',  dtype )
+    s1   = np.fromfile( path + 'slip1', dtype )
+    s2   = np.fromfile( path + 'slip2', dtype )
 
     # Slip components
-    s = numpy.sin( numpy.pi / 180.0 * rake )
-    c = numpy.cos( numpy.pi / 180.0 * rake )
+    s = np.sin( np.pi / 180.0 * rake )
+    c = np.cos( np.pi / 180.0 * rake )
     r1 = -c * s1 + s * s2
     r2 =  s * s1 + c * s2
 
@@ -422,28 +425,28 @@ def srf2coulomb( path, projection, dx, dest=None, scut=0 ):
     x, y = 0.001 * projection( x, y )
     z = 0.001 * z
     delta = 0.0005 * meta['dx']
-    dx = delta * numpy.sin( numpy.pi / 180.0 * (stk + rot) )
-    dy = delta * numpy.cos( numpy.pi / 180.0 * (stk + rot) )
-    dz = delta * numpy.sin( numpy.pi / 180.0 * dip )
+    dx = delta * np.sin( np.pi / 180.0 * (stk + rot) )
+    dy = delta * np.cos( np.pi / 180.0 * (stk + rot) )
+    dz = delta * np.sin( np.pi / 180.0 * dip )
     x1, x2 = x - dx, x + dx
     y1, y2 = y - dy, y + dy
     z1, z2 = z - dz, z + dz
 
     # Source file
-    i = (s1**2 + s2**2) > (numpy.sign( scut ) * scut**2)
-    c = numpy.array( [x1[i], y1[i], x2[i], y2[i], r1[i], r2[i], dip[i], z1[i], z2[i]] ).T
+    i = (s1**2 + s2**2) > (np.sign( scut ) * scut**2)
+    c = np.array( [x1[i], y1[i], x2[i], y2[i], r1[i], r2[i], dip[i], z1[i], z2[i]] ).T
     fd = open( dest + 'source.inp', 'w' )
     fd.write( coulomb_header % meta )
-    numpy.savetxt( fd, c, coulomb_fmt )
+    np.savetxt( fd, c, coulomb_fmt )
     fd.write( coulomb_footer )
     fd.close()
 
     # Receiver file
     s1.fill( 0.0 )
-    c = numpy.array( [x1, y1, x2, y2, s1, s1, dip, z1, z2] ).T
+    c = np.array( [x1, y1, x2, y2, s1, s1, dip, z1, z2] ).T
     fd = open( dest + 'receiver.inp', 'w' )
     fd.write( coulomb_header % meta )
-    numpy.savetxt( fd, c, coulomb_fmt )
+    np.savetxt( fd, c, coulomb_fmt )
     fd.write( coulomb_footer )
     fd.close()
 

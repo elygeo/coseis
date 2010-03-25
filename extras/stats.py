@@ -2,7 +2,8 @@
 """
 Print binary file statistics. Default is 4 byte floating point.
 """
-import os, sys, numpy
+import os, sys
+import numpy as np
 
 block = 64*1024*1024
 dtype = 'f'
@@ -12,7 +13,7 @@ for a in sys.argv[1:]:
         dtype = a[1:].replace( 'l', '<' ).replace( 'b', '>' )
     else:
         args += [a]
-nb = numpy.dtype( dtype ).itemsize
+nb = np.dtype( dtype ).itemsize
 
 print( '         Min          Max         Mean            N' )
 for filename in args:
@@ -23,16 +24,16 @@ for filename in args:
         continue
     n /= nb
     fh = open( filename, 'rb' )
-    rmin =  numpy.inf
-    rmax = -numpy.inf
+    rmin =  np.inf
+    rmax = -np.inf
     rsum = 0.
     i = 0
     while i < n:
         b = min( n-i, block )
-        r = numpy.fromfile( fh, dtype=dtype, count=b )
+        r = np.fromfile( fh, dtype=dtype, count=b )
         rmin = min( rmin, r.min() )
         rmax = max( rmax, r.max() )
-        rsum += numpy.float64( r ).sum()
+        rsum += np.float64( r ).sum()
         i += b
     print( '%12g %12g %12g %12d %s' % ( rmin, rmax, rsum/n, n, filename ) )
 

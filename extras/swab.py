@@ -2,13 +2,14 @@
 """
 Byte swapping
 """
-import os, sys, numpy
+import os, sys
+import numpy as np
 
 def swab( src, dst, verbose=False, dtype='f', block=64*1024*1024 ):
     """
     Swab byteorder. Default is 4 byte numbers.
     """
-    nb = numpy.dtype( dtype ).itemsize
+    nb = np.dtype( dtype ).itemsize
     n = os.path.getsize( src )
     if n == 0 or n % nb != 0:
         return
@@ -18,7 +19,7 @@ def swab( src, dst, verbose=False, dtype='f', block=64*1024*1024 ):
     i = 0
     while i < n:
         b = min( n-i, block )
-        r = numpy.fromfile( f0, dtype=dtype, count=b )
+        r = np.fromfile( f0, dtype=dtype, count=b )
         r.byteswap( True ).tofile( f1 )
         i += b
         if verbose:

@@ -2,7 +2,8 @@
 """
 Coordinate conversions
 """
-import sys, numpy
+import sys
+import numpy as np
 
 rearth = 6370000.0
 
@@ -12,7 +13,7 @@ def dot2( A, B ):
 
     The first two dimensions index the matrix rows and columns. The remaining
     dimensions index multiple matrices for which dot products are computed
-    separately. This differs from numpy.dot, where the higher dimensions index
+    separately. This differs from np.dot, where the higher dimensions index
     N-dimensional 'matrices.' Also, broadcasting is effectively reversed by using
     the transpose, so that ones are appended to the shape if necessary, rather than
     prepended.
@@ -20,8 +21,8 @@ def dot2( A, B ):
     This could be made more general with arbitrary maximum matrix dimension, at
     the cost of code clarity.
     """
-    A = numpy.array( A ).T
-    B = numpy.array( B ).T
+    A = np.array( A ).T
+    B = np.array( B ).T
     i = -min( A.ndim, 2 )
     if A.shape[i] != B.shape[-1]:
         sys.exit( 'Incompatible arrays for dot product' )
@@ -36,62 +37,62 @@ def solve2( A, b ):
     """
     Vectorized 2x2 linear equation solver
     """
-    A = numpy.array( A )
-    b = numpy.array( b )
+    A = np.array( A )
+    b = np.array( b )
     A /= (A[0,0] * A[1,1] - A[0,1] * A[1,0])
-    return numpy.array( [b[0] * A[1,1] - b[1] * A[0,1],
-                         b[1] * A[0,0] - b[0] * A[1,0]] )
+    return np.array( [b[0] * A[1,1] - b[1] * A[0,1],
+                      b[1] * A[0,0] - b[0] * A[1,0]] )
 
 def interp( x0, dx, z, xi, extrapolate=False ):
     """
     1D interpolation on a regular grid
     """
-    z = numpy.array( z )
-    xi = (numpy.array( xi ) - x0) / dx
-    j = numpy.int32( xi )
+    z = np.array( z )
+    xi = (np.array( xi ) - x0) / dx
+    j = np.int32( xi )
     n = z.shape[-1]
     if not extrapolate:
         i = (j < 0) | (j > n-2)
-    j = numpy.minimum( numpy.maximum( j, 0 ), n-2 )
+    j = np.minimum( np.maximum( j, 0 ), n-2 )
     zi = (1.0 - xi + j) * z[...,j] + (xi - j) * z[...,j+1]
     if not extrapolate:
-        zi[...,i] = numpy.nan
+        zi[...,i] = np.nan
     return zi
 
 def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=False ):
     """
     2D interpolation on a regular grid
     """
-    z = numpy.array( z )
-    xi = (numpy.array( xi ) - x0) / dx
-    yi = (numpy.array( yi ) - y0) / dy
-    j = numpy.array( xi, 'i' )
-    k = numpy.array( yi, 'i' )
+    z = np.array( z )
+    xi = (np.array( xi ) - x0) / dx
+    yi = (np.array( yi ) - y0) / dy
+    j = np.array( xi, 'i' )
+    k = np.array( yi, 'i' )
     n = z.shape
     if not extrapolate:
         i = (j < 0) | (j > n[-2]-2) | (k < 0) | (k > n[-1]-2)
-    j = numpy.minimum( numpy.maximum( j, 0 ), n[-2]-2 )
-    k = numpy.minimum( numpy.maximum( k, 0 ), n[-1]-2 )
+    j = np.minimum( np.maximum( j, 0 ), n[-2]-2 )
+    k = np.minimum( np.maximum( k, 0 ), n[-1]-2 )
     zi = ( ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * z[...,j,k]
          + ( 1.0 - xi + j ) * (       yi - k ) * z[...,j,k+1]
          + (       xi - j ) * ( 1.0 - yi + k ) * z[...,j+1,k]
          + (       xi - j ) * (       yi - k ) * z[...,j+1,k+1] )
     if not extrapolate:
-        zi[...,i] = numpy.nan
+        zi[...,i] = np.nan
     return zi
 
 def ibilinear( xx, yy, xi, yi ):
     """
     Vectorized inverse bilinear interpolation
     """
-    xx = numpy.array( xx )
-    yy = numpy.array( yy )
-    xi = numpy.array( xi ) - 0.25 * xx.sum(0).sum(0)
-    yi = numpy.array( yi ) - 0.25 * yy.sum(0).sum(0)
-    j1 = 0.25 * numpy.array([ [ xx[1,:] - xx[0,:], xx[:,1] - xx[:,0] ],
-                              [ yy[1,:] - yy[0,:], yy[:,1] - yy[:,0] ] ]).sum(2)
-    j2 = 0.25 * numpy.array([   xx[1,1] - xx[0,1] - xx[1,0] + xx[0,0],
-                                yy[1,1] - yy[0,1] - yy[1,0] + yy[0,0] ])
+    xx = np.array( xx )
+    yy = np.array( yy )
+    xi = np.array( xi ) - 0.25 * xx.sum(0).sum(0)
+    yi = np.array( yi ) - 0.25 * yy.sum(0).sum(0)
+    j1 = 0.25 * np.array([ [ xx[1,:] - xx[0,:], xx[:,1] - xx[:,0] ],
+                           [ yy[1,:] - yy[0,:], yy[:,1] - yy[:,0] ] ]).sum(2)
+    j2 = 0.25 * np.array([   xx[1,1] - xx[0,1] - xx[1,0] + xx[0,0],
+                             yy[1,1] - yy[0,1] - yy[1,0] + yy[0,0] ])
     x = dx = solve2( j1, [xi, yi] )
     i = 0
     while( abs( dx ).max() > 1e-6 ):
@@ -113,12 +114,12 @@ def rot_sym_tensor( w1, w2, rot ):
     w2:  components w23, w31, w12
     rot: rotation matrix
     """
-    rot = numpy.array( rot )
-    mat = numpy.diag( w1 )
+    rot = np.array( rot )
+    mat = np.diag( w1 )
     mat.flat[[5, 6, 1]] = w2
     mat.flat[[7, 2, 3]] = w2
     mat = dot2( dot2( rot, mat ), rot.T )
-    w1  = numpy.diag( mat )
+    w1  = np.diag( mat )
     w2  = mat.flat[[5, 6, 1]]
     return w1, w2
 
@@ -126,17 +127,17 @@ def rotmat( x, origin=(0, 0, 0), upvector=(0, 0, 1) ):
     """
     Given a position vector x, find the rotation matrix to r,h,v coordinates.
     """
-    x = numpy.array( x ) - numpy.array( origin )
-    nr = x / numpy.sqrt( (x * x).sum() )
-    nh = numpy.cross( upvector, nr )
+    x = np.array( x ) - np.array( origin )
+    nr = x / np.sqrt( (x * x).sum() )
+    nh = np.cross( upvector, nr )
     if all( nh == 0.0 ):
-        nh = numpy.cross( (1, 0, 0), nr )
+        nh = np.cross( (1, 0, 0), nr )
     if all( nh == 0.0 ):
-        nh = numpy.cross( (0, 1, 0), nr )
-    nh = nh / numpy.sqrt( (nh * nh).sum() )
-    nv = numpy.cross( nr, nh )
-    nv = nv / numpy.sqrt( (nv * nv).sum() )
-    return numpy.array( [nr, nh, nv] )
+        nh = np.cross( (0, 1, 0), nr )
+    nh = nh / np.sqrt( (nh * nh).sum() )
+    nv = np.cross( nr, nh )
+    nv = nv / np.sqrt( (nv * nv).sum() )
+    return np.array( [nr, nh, nv] )
 
 def llr2xyz( x, y, z, inverse=False ):
     """
@@ -144,23 +145,23 @@ def llr2xyz( x, y, z, inverse=False ):
 
     x <-> lon, y <-> lat, z <-> r
     """
-    x = numpy.array( x )
-    y = numpy.array( y )
-    z = numpy.array( z )
+    x = np.array( x )
+    y = np.array( y )
+    z = np.array( z )
     if inverse:
-        r = numpy.sqrt( x * x + y * y + z * z )
-        x = numpy.arctan2( y, x )
-        y = numpy.arcsin( z / r )
-        x = 180.0 / numpy.pi * x
-        y = 180.0 / numpy.pi * y
-        return numpy.array( [x, y, r] )
+        r = np.sqrt( x * x + y * y + z * z )
+        x = np.arctan2( y, x )
+        y = np.arcsin( z / r )
+        x = 180.0 / np.pi * x
+        y = 180.0 / np.pi * y
+        return np.array( [x, y, r] )
     else:
-        x  = numpy.pi / 180.0 * x
-        y  = numpy.pi / 180.0 * y
-        x_ = numpy.cos( x ) * numpy.cos( y ) * z
-        y_ = numpy.sin( x ) * numpy.cos( y ) * z
-        z  = numpy.sin( y ) * z
-        return numpy.array( [x_, y_, z] )
+        x  = np.pi / 180.0 * x
+        y  = np.pi / 180.0 * y
+        x_ = np.cos( x ) * np.cos( y ) * z
+        y_ = np.sin( x ) * np.cos( y ) * z
+        z  = np.sin( y ) * z
+        return np.array( [x_, y_, z] )
 
 def rotation( lon, lat, projection, eps=100.0 ):
     """
@@ -171,22 +172,22 @@ def rotation( lon, lat, projection, eps=100.0 ):
     local_components = dot2( mat, components )
     local_strike = strike + theta
     """
-    dlon = eps * 180.0 / (numpy.pi * rearth) * numpy.cos( numpy.pi / 180.0 * lat )
-    dlat = eps * 180.0 / (numpy.pi * rearth)
-    lon = numpy.array( [
+    dlon = eps * 180.0 / (np.pi * rearth) * np.cos( np.pi / 180.0 * lat )
+    dlat = eps * 180.0 / (np.pi * rearth)
+    lon = np.array( [
         [lon - dlon, lon ],
         [lon + dlon, lon ],
     ] )
-    lat = numpy.array( [
+    lat = np.array( [
         [lat, lat - dlat],
         [lat, lat + dlat],
     ])
     x, y = projection( lon, lat )
     x = x[1] - x[0]
     y = y[1] - y[0]
-    s = 1.0 / numpy.sqrt( x * x + y * y )
-    mat = numpy.array( [s * x, s * y] )
-    theta = 180.0 / numpy.pi * numpy.arctan2( mat[0], mat[1] )
+    s = 1.0 / np.sqrt( x * x + y * y )
+    mat = np.array( [s * x, s * y] )
+    theta = 180.0 / np.pi * np.arctan2( mat[0], mat[1] )
     theta = 0.5 * theta.sum(0) - 45.0
     return mat, theta
 
@@ -198,17 +199,17 @@ def rotation3( lon, lat, dep, projection, eps=100.0 ):
     geographic coordinate system to components in the local system.
     local_components = dot2( mat, components )
     """
-    dlon = eps * 180.0 / (numpy.pi * rearth) * numpy.cos( numpy.pi / 180.0 * lat )
-    dlat = eps * 180.0 / (numpy.pi * rearth)
-    lon = numpy.array( [
+    dlon = eps * 180.0 / (np.pi * rearth) * np.cos( np.pi / 180.0 * lat )
+    dlat = eps * 180.0 / (np.pi * rearth)
+    lon = np.array( [
         [lon - dlon, lon, lon],
         [lon + dlon, lon, lon],
     ] )
-    lat = numpy.array( [
+    lat = np.array( [
         [lat, lat - dlat, lat],
         [lat, lat + dlat, lat],
     ] )
-    dep = numpy.array( [
+    dep = np.array( [
         [dep, dep, dep - eps],
         [dep, dep, dep + eps],
     ] )
@@ -216,8 +217,8 @@ def rotation3( lon, lat, dep, projection, eps=100.0 ):
     x = x[1] - x[0]
     y = y[1] - y[0]
     z = z[1] - z[0]
-    s = 1.0 / numpy.sqrt( x * x + y * y + z * z )
-    mat = numpy.array( [s * x, s * y, s * z] )
+    s = 1.0 / np.sqrt( x * x + y * y + z * z )
+    mat = np.array( [s * x, s * y, s * z] )
     return mat
 
 class Transform():
@@ -243,8 +244,8 @@ class Transform():
     >>> proj( 0, 0, inverse=True )
     array([-121. ,   34.5])
     """
-    def __init__( self, proj=None, origin=None, scale=1.0, rotate=0.0, translate=(0.0, 0.0) ):
-        phi = numpy.pi / 180.0 * rotate
+    def __init__( self, proj=None, origin=None, scale=1.0, rotate=0.0, translate=(0.0, 0.0), matrix=((1,0,0),(0,1,0),(0,0,1)) ):
+        phi = np.pi / 180.0 * rotate
         if origin == None:
             x, y = 0.0, 0.0
         else:
@@ -252,22 +253,23 @@ class Transform():
             if proj != None:
                 x, y = proj( x, y )
             if type( x ) in (list, tuple):
-                phi -= numpy.arctan2( y[1] - y[0], x[1] - x[0] )
+                phi -= np.arctan2( y[1] - y[0], x[1] - x[0] )
                 x, y = 0.5 * (x[0] + x[1]), 0.5 * (y[0] + y[1])
         mat = [[1, 0, -x], [0, 1, -y], [0, 0, 1]]
         if hasattr( proj, 'mat' ):
-            mat = numpy.dot( mat, proj.mat )
+            mat = np.dot( mat, proj.mat )
             proj = proj.proj
-        c = scale * numpy.cos( phi )
-        s = scale * numpy.sin( phi )
+        c = scale * np.cos( phi )
+        s = scale * np.sin( phi )
         x, y = translate
-        mat = numpy.dot( [[c, -s, x], [s, c, y], [0, 0, 1]], mat )
+        mat = np.dot( [[c, -s, x], [s, c, y], [0, 0, 1]], mat )
+        mat = np.dot( matrix, mat )
         self.mat = mat
         self.proj = proj
     def __call__( self, x, y, **kwarg ):
         proj = self.proj
-        x = numpy.array( x )
-        y = numpy.array( y )
+        x = np.array( x )
+        y = np.array( y )
         if kwarg.get( 'inverse' ) != True:
             if proj != None:
                 x, y = proj( x, y, **kwarg )
@@ -280,7 +282,7 @@ class Transform():
             x, y = solve2( self.mat[:2,:2], [x, y] )
             if proj != None:
                 x, y = proj( x, y, **kwarg )
-        return numpy.array( [x, y] )
+        return np.array( [x, y] )
 
 def cmu( x, y, inverse=False ):
     """
@@ -294,7 +296,7 @@ def cmu( x, y, inverse=False ):
         x, y = ibilinear( xx, yy, x, y )
         x = (x + 1.0) * 300000.0
         y = (y + 1.0) * 150000.0
-    return numpy.array( [x, y] )
+    return np.array( [x, y] )
 
 def slipvectors( strike, dip, rake ):
     """
@@ -306,20 +308,20 @@ def slipvectors( strike, dip, rake ):
     world coordinates.  Columns of R are axis unit vectors of the world space in
     fault local coordinates.
     """
-    strike = numpy.pi / 180.0 * numpy.array( strike )
-    dip    = numpy.pi / 180.0 * numpy.array( dip ) 
-    rake   = numpy.pi / 180.0 * numpy.array( rake )
-    u = numpy.ones( strike.shape )
-    z = numpy.zeros( strike.shape )
-    c = numpy.cos( rake )
-    s = numpy.sin( rake )
-    A = numpy.array( [[c, s, z], [-s, c, z], [z, z, u]] )
-    c = numpy.cos( dip )
-    s = numpy.sin( dip )
-    B = numpy.array( [[u, z, z], [z, c, s], [z, -s, c]] )
-    c = numpy.cos( strike )
-    s = numpy.sin( strike )
-    C = numpy.array( [[s, c, z], [-c, s, z], [z, z, u]] )
+    strike = np.pi / 180.0 * np.array( strike )
+    dip    = np.pi / 180.0 * np.array( dip ) 
+    rake   = np.pi / 180.0 * np.array( rake )
+    u = np.ones( strike.shape )
+    z = np.zeros( strike.shape )
+    c = np.cos( rake )
+    s = np.sin( rake )
+    A = np.array( [[c, s, z], [-s, c, z], [z, z, u]] )
+    c = np.cos( dip )
+    s = np.sin( dip )
+    B = np.array( [[u, z, z], [z, c, s], [z, -s, c]] )
+    c = np.cos( strike )
+    s = np.sin( strike )
+    C = np.array( [[s, c, z], [-c, s, z], [z, z, u]] )
     return dot2( dot2( A, B ), C )
 
 def source_tensors( R ):
@@ -350,7 +352,7 @@ def source_tensors( R ):
         dip[0] * normal[1] + normal[0] * dip[1],
     ])
     normal = normal * normal
-    return numpy.array( [strike, dip, normal] )
+    return np.array( [strike, dip, normal] )
 
 def viewmatrix( azimuth, elevation, up=None ):
     """
@@ -362,19 +364,19 @@ def viewmatrix( azimuth, elevation, up=None ):
           else:
               up = 0, 1, 0
     z = llr2xyz( [azimuth], [90.0 - elevation], [1] ).T[0]
-    x = numpy.cross( up, z )
-    y = numpy.cross( z, x )
-    x = x / numpy.sqrt( ( x * x ).sum() )
-    y = y / numpy.sqrt( ( y * y ).sum() )
-    z = z / numpy.sqrt( ( z * z ).sum() )
-    return numpy.array( [x, y, z] ).T
+    x = np.cross( up, z )
+    y = np.cross( z, x )
+    x = x / np.sqrt( ( x * x ).sum() )
+    y = y / np.sqrt( ( y * y ).sum() )
+    z = z / np.sqrt( ( z * z ).sum() )
+    return np.array( [x, y, z] ).T
 
 def compass( azimuth, radians=False ):
     """
     Get named direction from azimuth.
     """
     if radians:
-        azimuth *= 180.0 / numpy.pi
+        azimuth *= 180.0 / np.pi
     names = (
         'N', 'NNE', 'NE', 'ENE',
         'E', 'ESE', 'SE', 'SSE',

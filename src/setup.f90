@@ -14,22 +14,20 @@ ifn = abs( faultnormal )
 
 ! Partition for parallelization
 if ( np0 == 1 ) np3 = 1
-nl = (nn - 1) / np3 + 1
+nl3 = (nn - 1) / np3 + 1
 nhalo = 1
 if ( ifn /= 0 ) nhalo(ifn) = 2
-nl = max( nl, nhalo )
+nl3 = max( nl3, nhalo )
 np3 = (nn - 1) / nl + 1
 call rank( ip3, ipid, np3 )
-nnoff = nl * ip3 - nhalo
+nnoff = nl3 * ip3 - nhalo
 
 ! Master process
 ip3root = (ihypo - 1.0) / nl
-master = .false.
-if ( all( ip3 == ip3root ) ) master = .true.
-call setroot( ip3root )
+master = all( ip3 == ip3root )
 
 ! Size of arrays
-nl = min( nl, nn - nnoff - nhalo )
+nl = min( nl3, nn - nnoff - nhalo )
 nm = nl + 2 * nhalo
 
 ! Boundary conditions
@@ -53,8 +51,10 @@ i1pml = i1pml - nnoff
 i2pml = i2pml - nnoff
 
 ! Map rupture index to local indices, and test if fault on this process
+ip2root = ip3root
 irup = 0
 if ( ifn /= 0 ) then
+    ip2root( ifn ) = -1
     irup = int( ihypo(ifn) + 0.000001 ) - nnoff(ifn)
     if ( irup + 1 < i1core(ifn) .or. irup > i2core(ifn) ) ifn = 0
 end if

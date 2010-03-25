@@ -3,20 +3,17 @@ module m_collective
 use mpi
 implicit none
 integer, parameter :: file_null = mpi_file_null
-integer, private :: np3(3), root3d, root2d(3), comm3d, comm2d(3), comm1d(3)
+integer, private :: np3(3), comm1d(3), comm2d(3), comm3d
 contains
 
 ! Initialize
-subroutine initialize( np0, ip, master )
+subroutine initialize( np0, ip )
 use mpi
 integer, intent(out) :: np0, ip
-logical, intent(out) :: master
 integer :: e
 call mpi_init( e )
 call mpi_comm_size( mpi_comm_world, np0, e  )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
-master = .false.
-if ( ip == 0 ) master = .true.
 end subroutine
 
 ! Finalize
@@ -31,8 +28,8 @@ subroutine rank( ip3, ipid, np3in )
 use mpi
 integer, intent(out) :: ip3(3), ipid
 integer, intent(in) :: np3in(3)
-integer :: ip, e
-logical :: period(3) = .false.
+integer :: ip, i, e
+logical :: hat(3), period(3) = .false.
 np3 = np3in
 call mpi_cart_create( mpi_comm_world, 3, np3, period, .true., comm3d, e )
 if ( comm3d == mpi_comm_null ) then
@@ -44,50 +41,48 @@ end if
 call mpi_comm_rank( comm3d, ip, e  )
 call mpi_cart_coords( comm3d, ip, 3, ip3, e )
 ipid = ip3(1) + np3(1) * ( ip3(2) + np3(2) * ip3(3) )
-end subroutine
-
-! Set root process and creat 2D communicators
-subroutine setroot( ip3root )
-use mpi
-integer, intent(in) :: ip3root(3)
-integer :: ip2root(2), e, i
-logical :: hat(3)
-call mpi_cart_rank( comm3d, ip3root, root3d, e )
-root2d = 0
 comm1d = mpi_comm_self
 comm2d = mpi_comm_self
 do i = 1, 3
-if ( np3(i) > 1 ) then
-    hat = .false.
-    hat(i) = .true.
-    call mpi_cart_sub( comm3d, hat, comm1d(i), e )
-end if
-end do
-do i = 1, 3
-if ( product( (/ np3(:i-1), np3(i+1:) /) ) > 1 ) then
-    hat = .true.
-    hat(i) = .false.
-    call mpi_cart_sub( comm3d, hat, comm2d(i), e )
-    ip2root = (/ ip3root(:i-1), ip3root(i+1:) /)
-    call mpi_cart_rank( comm2d(i), ip2root, root2d(i), e )
-end if
+    if ( np3(i) > 1 ) then
+        hat = .false.
+        hat(i) = .true.
+        call mpi_cart_sub( comm3d, hat, comm1d(i), e )
+    end if
+    if ( product( (/ np3(:i-1), np3(i+1:) /) ) > 1 ) then
+        hat = .true.
+        hat(i) = .false.
+        call mpi_cart_sub( comm3d, hat, comm2d(i), e )
+    end if
 end do
 end subroutine
 
-! Broadcast real 1d
-subroutine rbroadcast1( r, i2d )
+! Find communicator and rank from Cartesian coordinates.
+! Exclude dimensions with coordinate < 0.
+subroutine commrank( comm, rank, coords )
 use mpi
-real, intent(inout) :: r(:)
-integer, intent(in) :: i2d
-integer :: comm, root, i, e
-comm = comm3d
-root = root3d
-if ( i2d /= 0 ) then
-    comm = comm2d(i2d)
-    root = root2d(i2d)
+integer, intent(out) :: comm, rank
+integer, intent(in) :: coords(3)
+integer :: coords1(1), coords2(2), ii(1), i, n, e
+n = count( coords >= 0 )
+if ( n == 3 ) then
+    comm = comm3d
+    call mpi_cart_rank( comm, coords, rank, e )
+elseif ( n == 2 ) then
+    ii = minloc( coords )
+    i = ii(1)
+    comm = comm2d(i)
+    coords2 = (/ coords(:i-1), coords(i+1:) /)
+    call mpi_cart_rank( comm, coords2, rank, e )
+elseif ( n == 1 ) then
+    ii = maxloc( coords )
+    i = ii(1)
+    comm = comm1d(i)
+    coords1 = coords(i:i)
+    call mpi_cart_rank( comm, coords1, rank, e )
+else
+    stop( 'problem in commrank' )
 end if
-i = size(r)
-call mpi_bcast( r, i, mpi_real, root, comm, e )
 end subroutine
 
 ! Barrier
@@ -97,11 +92,33 @@ integer :: e
 call mpi_barrier( comm3d, e )
 end subroutine
 
+! Broadcast real 1d
+subroutine rbroadcast1( r, coords )
+use mpi
+real, intent(inout) :: r(:)
+integer, intent(in) :: coords(3)
+integer :: comm, root, i, e
+i = size(r)
+call commrank( comm, root, coords )
+call mpi_bcast( r(1), i, mpi_real, root, comm, e )
+end subroutine
+
+! Broadcast real 4d
+subroutine rbroadcast4( r, coords )
+use mpi
+real, intent(inout) :: r(:,:,:,:)
+integer, intent(in) :: coords(3)
+integer :: comm, root, i, e
+i = size(r)
+call commrank( comm, root, coords )
+call mpi_bcast( r(1,1,1,1), i, mpi_real, root, comm, e )
+end subroutine
+
 ! Reduce integer
-subroutine ireduce( ii, i, op, i2d )
+subroutine ireduce( ii, i, op, coords )
 use mpi
 integer, intent(out) :: ii
-integer, intent(in) :: i, i2d
+integer, intent(in) :: i, coords(3)
 character(*), intent(in) :: op
 integer :: iop, comm, root, e
 select case( op )
@@ -110,12 +127,7 @@ case( 'max', 'allmax' ); iop = mpi_max
 case( 'sum', 'allsum' ); iop = mpi_sum
 case default; stop
 end select
-comm = comm3d
-root = root3d
-if ( i2d /= 0 ) then
-    comm = comm2d(i2d)
-    root = root2d(i2d)
-end if
+call commrank( comm, root, coords )
 if ( op(1:3) == 'all' ) then
     call mpi_allreduce( i, ii, 1, mpi_integer, iop, comm, e )
 else
@@ -123,53 +135,21 @@ else
 end if
 end subroutine
 
-! Reduce real
-subroutine rreduce( rr, r, op, i2d )
-use mpi
-real, intent(out) :: rr
-real, intent(in) :: r
-integer, intent(in) :: i2d
-character(*), intent(in) :: op
-integer :: iop, comm, root, e
-select case( op )
-case( 'min', 'allmin' ); iop = mpi_min
-case( 'max', 'allmax' ); iop = mpi_max
-case( 'sum', 'allsum' ); iop = mpi_sum
-case default; stop
-end select
-comm = comm3d
-root = root3d
-if ( i2d /= 0 ) then
-    comm = comm2d(i2d)
-    root = root2d(i2d)
-end if
-if ( op(1:3) == 'all' ) then
-    call mpi_allreduce( r, rr, 1, mpi_real, iop, comm, e )
-else
-    call mpi_reduce( r, rr, 1, mpi_real, iop, root, comm, e )
-end if
-end subroutine
-
 ! Reduce real 1d
-subroutine rreduce1( rr, r, op, i2d )
+subroutine rreduce1( rr, r, op, coords )
 use mpi
 real, intent(out) :: rr(:)
 real, intent(in) :: r(:)
-integer, intent(in) :: i2d
+integer, intent(in) :: coords(3)
 character(*), intent(in) :: op
-integer :: iop, root, comm, e, i
+integer :: iop, comm, root, e, i
 select case( op )
 case( 'min', 'allmin' ); iop = mpi_min
 case( 'max', 'allmax' ); iop = mpi_max
 case( 'sum', 'allsum' ); iop = mpi_sum
 case default; stop
 end select
-comm = comm3d
-root = root3d
-if ( i2d /= 0 ) then
-    comm = comm2d(i2d)
-    root = root2d(i2d)
-end if
+call commrank( comm, root, coords )
 i = size(r)
 if ( op(1:3) == 'all' ) then
     call mpi_allreduce( r(1), rr(1), i, mpi_real, iop, comm, e )
@@ -179,11 +159,11 @@ end if
 end subroutine
 
 ! Reduce real 2d
-subroutine rreduce2( rr, r, op, i2d )
+subroutine rreduce2( rr, r, op, coords )
 use mpi
 real, intent(out) :: rr(:,:)
 real, intent(in) :: r(:,:)
-integer, intent(in) :: i2d
+integer, intent(in) :: coords(3)
 character(*), intent(in) :: op
 integer :: iop, comm, root, e, i
 select case( op )
@@ -192,59 +172,13 @@ case( 'max', 'allmax' ); iop = mpi_max
 case( 'sum', 'allsum' ); iop = mpi_sum
 case default; stop
 end select
-comm = comm3d
-root = root3d
-if ( i2d /= 0 ) then
-    comm = comm2d(i2d)
-    root = root2d(i2d)
-end if
+call commrank( comm, root, coords )
 i = size(r)
 if ( op(1:3) == 'all' ) then
     call mpi_allreduce( r(1,1), rr(1,1), i, mpi_real, iop, comm, e )
 else
     call mpi_reduce( r(1,1), rr(1,1), i, mpi_real, iop, root, comm, e )
 end if
-end subroutine
-
-! Reduce extrema location, real 3d
-subroutine reduceloc( rr, ii, r, op, n, noff, i2d )
-use mpi
-double precision :: local(2), global(2)
-real, intent(out) :: rr
-real, intent(in) :: r(:,:,:)
-integer, intent(out) :: ii(3)
-integer, intent(in) :: n(3), noff(3), i2d
-character(*), intent(in) :: op
-integer(8) :: nn(3), i
-integer :: iop, comm, root, e
-select case( op )
-case( 'min', 'allmin' ); ii = minloc( r ); iop = mpi_minloc
-case( 'max', 'allmax' ); ii = maxloc( r ); iop = mpi_maxloc
-case default; stop
-end select
-comm = comm3d
-root = root3d
-if ( i2d /= 0 ) then
-    comm = comm2d(i2d)
-    root = root2d(i2d)
-end if
-rr = r(ii(1),ii(2),ii(3))
-ii = ii - 1 + noff
-i = ii(1) + n(1) * ( ii(2) + n(2) * ii(3) )
-local(1) = rr
-local(2) = i
-if ( op(1:3) == 'all' ) then
-    call mpi_allreduce( local, global, 1, mpi_2double_precision, iop, comm, e )
-else
-    call mpi_reduce( local, global, 1, mpi_2double_precision, iop, root, comm, e )
-end if
-rr = global(1)
-i = global(2)
-nn = n
-ii(3) = i / ( n(1) * n(2) )
-ii(2) = modulo( i / nn(1), nn(2) )
-ii(1) = modulo( i, nn(1) )
-ii = ii + 1 - noff
 end subroutine
 
 ! Scalar swap halo

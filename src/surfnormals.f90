@@ -3,7 +3,7 @@ module m_surfnormals
 implicit none
 contains
 
-subroutine surfnormals( nhat, x, dx, i1, i2, ihat )
+subroutine nodenormals( nhat, x, dx, i1, i2, ihat )
 real, intent(out) :: nhat(:,:,:,:)
 real, intent(in) :: x(:,:,:,:), dx(3)
 integer, intent(in) :: i1(3), i2(3), ihat

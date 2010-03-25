@@ -2,7 +2,7 @@
 """
 EGMM - Empirical Ground Motion Model
 """
-import numpy
+import numpy as np
 
 def cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb ):
     """
@@ -30,14 +30,14 @@ def cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb ):
          ground motion parameters, Tech. Rep. PEER 2007/02, Pacific Earthquake
          Engineering Research Center.
     """
-    M     = numpy.array( M )
-    R_RUP = numpy.array( R_RUP )
-    R_JB  = numpy.array( R_JB )
-    Z_TOR = numpy.array( Z_TOR )
-    Z_25  = numpy.array( Z_25 )
-    V_S30 = numpy.array( V_S30 )
-    delta = numpy.array( delta )
-    lamb  = numpy.array( lamb )
+    M     = np.array( M )
+    R_RUP = np.array( R_RUP )
+    R_JB  = np.array( R_JB )
+    Z_TOR = np.array( Z_TOR )
+    Z_25  = np.array( Z_25 )
+    V_S30 = np.array( V_S30 )
+    delta = np.array( delta )
+    lamb  = np.array( lamb )
     params = {
     'T':   (  'c0', 'c1',  'c2', 'c3',  'c4','c5', 'c6','c7', 'c8','c9','c10','c11','c12',   'k1',  'k2','k3','slY','tlY','sT','rho'),
     0.010: ( -1715,  500,  -530, -262, -2118, 170, 5600, 280, -120, 490, 1058,  40,  610,  865000, -1186, 1839, 478, 219, 526, 1000),
@@ -66,7 +66,7 @@ def cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb ):
     'PGD': ( -5270, 1600,   -70,    0, -2000, 170, 4000,   0,    0,   0, -820, 300, 1000,  400000,     0, 2744, 667, 485, 825,  174),
     }
 
-    params = 0.001 * numpy.array( params[T] )
+    params = 0.001 * np.array( params[T] )
     n  = 1.18
     cc = 1.88
     c  = params[:13]
@@ -74,43 +74,43 @@ def cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb ):
     sigma_lnY, tau_lnY, sigmaT, rho = params[16:]
     sigma_lnAF  = 0.3
     sigma_lnGPA = 0.478 #FIXME
-    sigma_lnY_B = numpy.sqrt( sigma_lnY ** 2 - sigma_lnAF ** 2 )
-    sigma_lnA_B = numpy.sqrt( sigma_lnGPA ** 2 - sigma_lnAF ** 2 )
+    sigma_lnY_B = np.sqrt( sigma_lnY ** 2 - sigma_lnAF ** 2 )
+    sigma_lnA_B = np.sqrt( sigma_lnGPA ** 2 - sigma_lnAF ** 2 )
 
     f_mag = (
         c[0] +
         c[1] * M +
-        c[2] * numpy.maximum( 0.0, M - 5.5 ) +
-        c[3] * numpy.maximum( 0.0, M - 6.5 )
+        c[2] * np.maximum( 0.0, M - 5.5 ) +
+        c[3] * np.maximum( 0.0, M - 6.5 )
     )
-    f_dis = (c[4] + c[5] * M) * numpy.log( numpy.sqrt( R_RUP * R_RUP + c[6] * c[6] ) )
-    F_RV = numpy.zeros_like( lamb )
-    F_NM = numpy.zeros_like( lamb )
+    f_dis = (c[4] + c[5] * M) * np.log( np.sqrt( R_RUP * R_RUP + c[6] * c[6] ) )
+    F_RV = np.zeros_like( lamb )
+    F_NM = np.zeros_like( lamb )
     F_RV[ (  30 < lamb) & (lamb < 150) ] = 1.0
     F_NM[ (-150 < lamb) & (lamb < -30) ] = 1.0
     f_flt = c[7] * F_RV * min( 1.0, Z_TOR ) + c[8] * F_NM
     i = (R_JB > 0.0) & (Z_TOR >= 1.0)
-    f_hng = numpy.maximum( R_RUP, numpy.sqrt( R_JB * R_JB + 1.0 ) )
+    f_hng = np.maximum( R_RUP, np.sqrt( R_JB * R_JB + 1.0 ) )
     f_hng = (f_hng - R_JB) / f_hng
     f_hng[i] = (R_RUP[i] - R_JB[i]) / R_RUP[i]
     f_hng = ( c[9] * f_hng *
-        numpy.minimum( 1.0, numpy.maximum( 0.0, 2.0 * M - 12.0 ) ) *
-        numpy.maximum( 0.0, 1.0 - 0.05 * Z_TOR ) *
-        numpy.minimum( 1.0, 4.5 - 0.05 * delta )
+        np.minimum( 1.0, np.maximum( 0.0, 2.0 * M - 12.0 ) ) *
+        np.maximum( 0.0, 1.0 - 0.05 * Z_TOR ) *
+        np.minimum( 1.0, 4.5 - 0.05 * delta )
     )
-    f_site = (c[10] + k[1] * n) * numpy.log( numpy.minimum( 1100.0, V_S30 ) / k[0] )
+    f_site = (c[10] + k[1] * n) * np.log( np.minimum( 1100.0, V_S30 ) / k[0] )
     i = V_S30 < k[0]
-    lowvel = numpy.any( i )
+    lowvel = np.any( i )
 
     if lowvel:
-        sigmaT = sigmaT * numpy.ones_like( V_S30 )
-        V_1100 = 1100.0 * numpy.ones_like( V_S30 )
+        sigmaT = sigmaT * np.ones_like( V_S30 )
+        V_1100 = 1100.0 * np.ones_like( V_S30 )
         A_1100 = cbnga( 'PGA', M, R_RUP, R_JB, Z_TOR, Z_25, V_1100, delta, lamb )[0]
         f_site[i] = (
-            c[10] * numpy.log( V_S30[i] / k[0] ) +
+            c[10] * np.log( V_S30[i] / k[0] ) +
             k[1] * (
-                numpy.log( A_1100[i] + cc * (V_S30[i] / k[0]) ** n ) -
-                numpy.log( A_1100[i] + cc )
+                np.log( A_1100[i] + cc * (V_S30[i] / k[0]) ** n ) -
+                np.log( A_1100[i] + cc )
             )
         ).astype( f_site.dtype )
         alpha = k[1] * A_1100 * (
@@ -124,18 +124,18 @@ def cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb ):
             ( alpha * sigma_lnA_B ) ** 2 +
             2.0 * alpha * rho * sigma_lnY_B * sigma_lnA_B
         )
-        sigmaT[i] = numpy.sqrt( sigmaT2[i] ).astype( sigmaT.dtype )
+        sigmaT[i] = np.sqrt( sigmaT2[i] ).astype( sigmaT.dtype )
 
-    f_sed = numpy.zeros_like( Z_25 )
+    f_sed = np.zeros_like( Z_25 )
     i = Z_25 < 1
     f_sed[i] = c[11] * (Z_25[i] - 1.0)
     i = Z_25 > 3
-    f_sed[i] = c[12] * k[2] * numpy.exp( -0.75 ) * (
-        1 - numpy.exp( -0.25 * (Z_25[i] - 3.0) ) )
-    Y = numpy.exp( f_mag + f_dis + f_flt + f_hng + f_site + f_sed )
+    f_sed[i] = c[12] * k[2] * np.exp( -0.75 ) * (
+        1 - np.exp( -0.25 * (Z_25[i] - 3.0) ) )
+    Y = np.exp( f_mag + f_dis + f_flt + f_hng + f_site + f_sed )
 
     if not lowvel:
-        sigmaT = sigmaT * numpy.ones_like( Y )
+        sigmaT = sigmaT * np.ones_like( Y )
 
     return Y, sigmaT
 
@@ -162,7 +162,7 @@ def test():
     delta = 90.0,
     lamb = 0.0,
 
-    M = numpy.arange( 4.0, 8.501, 0.1 )
+    M = np.arange( 4.0, 8.501, 0.1 )
     Y, sigma = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
     plt.figure( 1 )
     plt.clf()
@@ -171,7 +171,7 @@ def test():
     plt.ylabel( T )
     M = 5.5,
 
-    V_S30 = numpy.arange( 180.0, 1500.1, 10.0 )
+    V_S30 = np.arange( 180.0, 1500.1, 10.0 )
     Y, sigma = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
     plt.figure( 2 )
     plt.clf()
@@ -180,7 +180,7 @@ def test():
     plt.ylabel( T )
     V_S30 = 760.0,
 
-    Z_25 = numpy.arange( 0.0, 6.01, 0.1 )
+    Z_25 = np.arange( 0.0, 6.01, 0.1 )
     Y, sigma = cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb )
     plt.figure( 3 )
     plt.clf()
@@ -218,3 +218,4 @@ def test():
 # command line
 if __name__ == '__main__':
     test()
+

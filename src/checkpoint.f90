@@ -20,7 +20,7 @@ if ( i == 0 ) then
 else
     it = 0
 end if
-call ireduce( i, it, 'allmin', 0 )
+call ireduce( i, it, 'allmin', (/0, 0, 0/) )
 it = i
 iotimer = iotimer + timer( 2 )
 end subroutine

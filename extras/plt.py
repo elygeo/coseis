@@ -2,7 +2,9 @@
 """
 Matplotlib utilities
 """
-import os, numpy, viz
+import os, viz
+import numpy as np
+from matplotlib.colors import LinearSegmentedColormap
 
 def text( ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75, npmb=16, **kwargs ):
     """
@@ -23,17 +25,29 @@ def text( ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75, npmb=16, *
         dy = edgewidth * (y2 - y1) / dy
         if aspect == 'equal':
             dx = dy
-        m = numpy.sqrt( 0.5 )
+        m = np.sqrt( 0.5 )
         dx = dx / m
         dy = dy / m
         for i in range( npmb ):
-            phi = 2.0 * numpy.pi * (i + 0.5) / npmb
-            x_ = x + dx * numpy.cos( phi )
-            y_ = y + dy * numpy.sin( phi )
-            #x_ = x + dx * numpy.maximum( -m, numpy.minimum( m, numpy.cos( phi ) ) )
-            #y_ = y + dy * numpy.maximum( -m, numpy.minimum( m, numpy.sin( phi ) ) )
+            phi = 2.0 * np.pi * (i + 0.5) / npmb
+            x_ = x + dx * np.cos( phi )
+            y_ = y + dy * np.sin( phi )
+            #x_ = x + dx * np.maximum( -m, np.minimum( m, np.cos( phi ) ) )
+            #y_ = y + dy * np.maximum( -m, np.minimum( m, np.sin( phi ) ) )
             h += [ ax.text( x_, y_, s, **kwargs ) ]
     return h
+
+def colormap( *args, **kwargs ):
+    """
+    Matplotlib colormap. See viz.colormap for details.
+    """
+    v, r, g, b, a = viz.colormap( *args, **kwargs )
+    n = 2001
+    cmap = { 'red':np.c_[v, r, r],
+           'green':np.c_[v, g, g],
+            'blue':np.c_[v, b, b] }
+    cmap = LinearSegmentedColormap( 'cmap', cmap, n )
+    return cmap
 
 def colorbar( fig, cmap, clim, title=None, rect=None, ticks=None, ticklabels=None, boxcolor='k', boxalpha=1.0, boxwidth=0.2, **kwargs ):
     """
@@ -46,9 +60,10 @@ def colorbar( fig, cmap, clim, title=None, rect=None, ticks=None, ticklabels=Non
     x = axis[0], axis[0], axis[1], axis[1], axis[0]
     y = axis[2], axis[3], axis[3], axis[2], axis[2]
     ax.plot( x, y, '-', c=boxcolor, lw=boxwidth*2, alpha=boxalpha, clip_on=False )
-    ax.imshow( [numpy.arange(1001)], cmap=cmap, extent=axis )
+    ax.imshow( [np.arange(1001)], cmap=cmap, extent=axis )
     ax.axis( 'off' )
-    ax.axis( 'auto' )
+    ax.axis( 'tight' )
+    ax.axis( axis )
     if title:
         x = 0.5 * (clim[0] + clim[1])
         text( ax, x, 2, title, ha='center', va='baseline', **kwargs )
@@ -69,7 +84,7 @@ def lengthscale( ax, x, y, w=None, label='%s', style='k-', bg='w', **kwargs ):
     y0 = 0.5 * (y[0] + y[1])
     dx = abs( x[1] - x[0] )
     dy = abs( y[1] - y[0] )
-    l = numpy.sqrt( dx*dx + dy*dy )
+    l = np.sqrt( dx*dx + dy*dy )
     if not w:
         x = ax.get_xlim()
         y = ax.get_ylim()
@@ -84,10 +99,10 @@ def lengthscale( ax, x, y, w=None, label='%s', style='k-', bg='w', **kwargs ):
     except( TypeError ):
         pass
     rot = (dx, -dy), (dy, dx)
-    x = -l, l, numpy.nan, -l, -l, numpy.nan,  l, l
-    y =  0, 0, numpy.nan, -w,  w, numpy.nan, -w, w
-    x, y = 0.5 / l * numpy.dot( rot, [x, y] )
-    theta = numpy.arctan2( dy, dx ) * 180.0 / numpy.pi
+    x = -l, l, np.nan, -l, -l, np.nan,  l, l
+    y =  0, 0, np.nan, -w,  w, np.nan, -w, w
+    x, y = 0.5 / l * np.dot( rot, [x, y] )
+    theta = np.arctan2( dy, dx ) * 180.0 / np.pi
     h1 = ax.plot( x0 + x, y0 + y, style, clip_on=False, **kwargs )
     h2 = ax.text( x0, y0, label, ha='center', va='center',
         backgroundcolor=bg, rotation=theta )
@@ -117,7 +132,7 @@ def savefig( fig, fd=None, format=None, distill=False, **kwargs ):
         n = fig.get_size_inches()
         n = int( n[1] * dpi ), int( n[0] * dpi ), 4
         fig.savefig( out, format='raw', **kwargs )
-        out = numpy.fromstring( out.getvalue(), 'u1' ).reshape( n )
+        out = np.fromstring( out.getvalue(), 'u1' ).reshape( n )
     elif distill and format == 'pdf':
         fig.savefig( out, format='eps', **kwargs )
         out = viz.distill_eps( out )
@@ -198,10 +213,10 @@ def contours( *args, **kwargs ):
         for cc in ax.contour( *args, **kwargs ).collections:
             p = []
             for c in cc.get_paths():
-                p += c.to_polygons() + [[[numpy.nan, numpy.nan]]]
+                p += c.to_polygons() + [[[np.nan, np.nan]]]
             if p:
                 del p[-1]
-                pp += [numpy.concatenate( p ).T]
+                pp += [np.concatenate( p ).T]
             else:
                 pp += [None]
     else:
@@ -212,4 +227,5 @@ def contours( *args, **kwargs ):
             pp += [p]
     plt.close( fig )
     return pp
+
 

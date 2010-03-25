@@ -68,10 +68,10 @@ end if
 ! Write stats
 if ( j > 0 .and. ( modulo( it, itio ) == 0 .or. it == nt ) ) then
     rr = timer( 2 )
-    call rreduce2( gvstats, vstats, 'max', 0 )
+    call rreduce2( gvstats, vstats, 'max', ip3root )
     if ( dofault ) then
-        call rreduce2( gfstats, fstats, 'max', ifn )
-        call rreduce2( gestats, estats, 'sum', ifn )
+        call rreduce2( gfstats, fstats, 'max', ip2root )
+        call rreduce2( gestats, estats, 'sum', ip2root )
     end if
     if (sync) call barrier
     mptimer = mptimer + timer( 2 )

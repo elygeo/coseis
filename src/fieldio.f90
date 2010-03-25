@@ -14,21 +14,21 @@ type t_io
     !XXX real, pointer :: buff(:,:,:)  ! buffer for storing mutliple time steps
     type( t_io ), pointer :: next  ! pointer to next member of the field i/o list 
 end type t_io
-type( t_io ), pointer :: pio0, p, pprev
+type( t_io ), pointer :: io0, io, ioprev
 contains
 
 ! Append linked list item
 subroutine pappend
-allocate( p%next )
-p => p%next
-p%next => pio0
+allocate( io%next )
+io => io%next
+io%next => io0
 end subroutine
 
 ! Remove linked list item
 subroutine pdelete
-pprev%next => p%next
-deallocate( p )
-p => pprev
+ioprev%next => io%next
+deallocate( io )
+io => ioprev
 end subroutine
 
 ! Field I/O sequence
@@ -51,20 +51,20 @@ val = timer( 2 )
 ! Pass loop
 do ipass = 1, len( passes )
 pass = passes(ipass:ipass)
-p => pio0
+io => io0
 
 ! I/O list loop
-loop: do while( p%next%field /= 'head' )
-pprev => p
-p => p%next
+loop: do while( io%next%field /= 'head' )
+ioprev => io
+io => io%next
 
 ! 4D slice
-i1 = p%ii(1,1:3) - nnoff
-i2 = p%ii(2,1:3) - nnoff
-di = p%ii(3,1:3)
-it1 = p%ii(1,4)
-it2 = p%ii(2,4)
-dit = p%ii(3,4)
+i1 = io%ii(1,1:3) - nnoff
+i2 = io%ii(2,1:3) - nnoff
+di = io%ii(3,1:3)
+it1 = io%ii(1,4)
+it2 = io%ii(2,4)
+dit = io%ii(3,4)
 
 ! Time indices
 if ( it > it2 ) then
@@ -101,19 +101,19 @@ do i = 1, 3
 end do
 
 ! Pass test
-if ( pass == '<' .and. p%mode(2:2) == 'w' ) cycle loop
-if ( pass == '>' .and. p%mode(2:2) /= 'w' ) cycle loop
+if ( pass == '<' .and. io%mode(2:2) == 'w' ) cycle loop
+if ( pass == '>' .and. io%mode(2:2) /= 'w' ) cycle loop
 
 !XXX loop over fields
-if ( field /= p%field ) cycle loop
+if ( field /= io%field ) cycle loop
 
 ! I/O
-val = p%val * time_function( p%tfunc, tm, dt, p%period )
-select case( p%mode )
+val = io%val * time_function( io%tfunc, tm, dt, io%period )
+select case( io%mode )
 case( '=c', '+c' )
-    call setcube( f, w1, i3, i4, di, p%x1, p%x2, val, p%mode )
+    call setcube( f, w1, i3, i4, di, io%x1, io%x2, val, io%mode )
 case( '=C', '+C' )
-    call setcube( f, w2, i3, i4, di, p%x1, p%x2, val, p%mode )
+    call setcube( f, w2, i3, i4, di, io%x1, io%x2, val, io%mode )
 case( '=' )
     do l = i1(3), i2(3), di(3)
     do k = i1(2), i2(2), di(2)
@@ -136,9 +136,9 @@ case( '=i' )
         do k = i1(2) - 1, i1(2)
         do j = i1(1) - 1, i1(1)
             f(j,k,l) = val * &
-                ( ( 1.0 - abs( p%x1(1) - j - nnoff(1) ) ) &
-                * ( 1.0 - abs( p%x1(2) - k - nnoff(2) ) ) &
-                * ( 1.0 - abs( p%x1(3) - l - nnoff(3) ) ) )
+                ( ( 1.0 - abs( io%x1(1) - j - nnoff(1) ) ) &
+                * ( 1.0 - abs( io%x1(2) - k - nnoff(2) ) ) &
+                * ( 1.0 - abs( io%x1(3) - l - nnoff(3) ) ) )
         end do
         end do
         end do
@@ -149,9 +149,9 @@ case( '+i' )
         do k = i1(2) - 1, i1(2)
         do j = i1(1) - 1, i1(1)
             f(j,k,l) = f(j,k,l) + val * &
-                ( ( 1.0 - abs( p%x1(1) - j - nnoff(1) ) ) &
-                * ( 1.0 - abs( p%x1(2) - k - nnoff(2) ) ) &
-                * ( 1.0 - abs( p%x1(3) - l - nnoff(3) ) ) )
+                ( ( 1.0 - abs( io%x1(1) - j - nnoff(1) ) ) &
+                * ( 1.0 - abs( io%x1(2) - k - nnoff(2) ) ) &
+                * ( 1.0 - abs( io%x1(3) - l - nnoff(3) ) ) )
         end do
         end do
         end do
@@ -175,7 +175,7 @@ case( '+s' )
     end do
     end do
 case( '=r', '+r', '=R', '+R' )
-    if ( p%mode(2:2) == 'R' ) then
+    if ( io%mode(2:2) == 'R' ) then
         do i = 1, 3
             if ( m(i) == 1 ) then
                 i1(i) = 1
@@ -185,46 +185,46 @@ case( '=r', '+r', '=R', '+R' )
             end if
         end do
     end if
-    if ( p%ib < 0 ) then
-        !XXX allocate( p%buff(p%nc,n(1)*n(2)*n(3),p%nb) )
-        allocate( p%buff(n(1)*n(2)*n(3),p%nb) )
-        p%ib = p%nb
-        p%fh = frio_file_null
-        if ( mpin /= 0 ) p%fh = file_null
+    if ( io%ib < 0 ) then
+        !XXX allocate( io%buff(io%nc,n(1)*n(2)*n(3),io%nb) )
+        allocate( io%buff(n(1)*n(2)*n(3),io%nb) )
+        io%ib = io%nb
+        io%fh = frio_file_null
+        if ( mpin /= 0 ) io%fh = file_null
     end if
-    if ( p%ib == p%nb ) then
-        n(4) = min( p%nb, (it2 - it) / dit + 1 )
+    if ( io%ib == io%nb ) then
+        n(4) = min( io%nb, (it2 - it) / dit + 1 )
         m(4) = (it2 - it1) / dit + 1
         o(4) = (it  - it1) / dit
-        str = 'in/' // p%filename
+        str = 'in/' // io%filename
         if ( any( n(1:3) /= m(1:3) ) .and. mpin == 0 ) &
             write( str, '(2a,i6.6)' ) trim( str ), '-', ipid
-        call rio2( p%fh, p%buff(:,:n(4)), 'r', str, m, n, o, mpin, verb )
-        p%ib = 0
+        call rio2( io%fh, io%buff(:,:n(4)), 'r', str, m, n, o, mpin, verb )
+        io%ib = 0
         if ( any( n < 1 ) ) then
-            deallocate( p%buff )
+            deallocate( io%buff )
             call pdelete
             cycle loop
         end if
     end if
-    p%ib = p%ib + 1
+    io%ib = io%ib + 1
     i = 0
     do l = i1(3), i2(3), di(3)
     do k = i1(2), i2(2), di(2)
     do j = i1(1), i2(1), di(1)
         i = i + 1
-        s1(j,k,l) = p%buff(i,p%ib)
+        s1(j,k,l) = io%buff(i,io%ib)
     end do
     end do
     end do
     if ( any( di > 1 ) ) then
-        i1 = p%ii(1,1:3) - nnoff
-        i2 = p%ii(2,1:3) - nnoff
+        i1 = io%ii(1,1:3) - nnoff
+        i2 = io%ii(2,1:3) - nnoff
         if ( any( di > nhalo .and. np3 > 1 ) ) stop 'di too large for nhalo'
         call scalar_swap_halo( s1, nhalo )
         call interpolate( s1, i1, i2, di )
     end if
-    if ( p%mode(2:2) == 'R' ) then
+    if ( io%mode(2:2) == 'R' ) then
         if ( m(1) == 1 ) then
             i2(1) = size( s1, 1 )
             do i = 2, i2(1)
@@ -244,7 +244,7 @@ case( '=r', '+r', '=R', '+R' )
             end do
         end if
     end if
-    if ( p%mode(1:1) == '=' ) then
+    if ( io%mode(1:1) == '=' ) then
         do l = i1(3), i2(3)
         do k = i1(2), i2(2)
         do j = i1(1), i2(1)
@@ -252,7 +252,7 @@ case( '=r', '+r', '=R', '+R' )
         end do
         end do
         end do
-    elseif ( p%mode(1:1) == '+' ) then
+    elseif ( io%mode(1:1) == '+' ) then
         do l = i1(3), i2(3)
         do k = i1(2), i2(2)
         do j = i1(1), i2(1)
@@ -262,36 +262,36 @@ case( '=r', '+r', '=R', '+R' )
         end do
     end if
     if ( it == it2 ) then
-        deallocate( p%buff )
+        deallocate( io%buff )
         call pdelete
         cycle loop
     end if
 case( '=w', '=wi' )
-    if ( p%ib < 0 ) then
-        !XXX allocate( p%buff(p%nc,n(1)*n(2)*n(3),p%nb) )
-        allocate( p%buff(n(1)*n(2)*n(3),p%nb) )
-        p%ib = 0
-        p%fh = frio_file_null
-        if ( mpout /= 0 ) p%fh = file_null
+    if ( io%ib < 0 ) then
+        !XXX allocate( io%buff(io%nc,n(1)*n(2)*n(3),io%nb) )
+        allocate( io%buff(n(1)*n(2)*n(3),io%nb) )
+        io%ib = 0
+        io%fh = frio_file_null
+        if ( mpout /= 0 ) io%fh = file_null
     end if
     if ( modulo( it, itstats ) /= 0 ) then
-        select case( p%field )
+        select case( io%field )
         case( 'vm2' ); call vector_norm( f, vv, i1, i2, di )
         case( 'um2' ); call vector_norm( f, uu, i1, i2, di )
         case( 'wm2' ); call tensor_norm( f, w1, w2, i1, i2, di )
         case( 'am2' ); call vector_norm( f, w1, i1, i2, di )
         end select
     end if
-    p%ib = p%ib + 1
-    if ( p%mode == '=wi' .and. all( i1 == i2 ) ) then
-        p%buff(1,p%ib) = 0.0
+    io%ib = io%ib + 1
+    if ( io%mode == '=wi' .and. all( i1 == i2 ) ) then
+        io%buff(1,io%ib) = 0.0
         do l = i1(3) - 1, i2(3)
         do k = i1(2) - 1, i2(2)
         do j = i1(1) - 1, i2(1)
-            p%buff(1,p%ib) = p%buff(1,p%ib) + f(j,k,l) * &
-                ( ( 1.0 - abs( p%x1(1) - j - nnoff(1) ) ) &
-                * ( 1.0 - abs( p%x1(2) - k - nnoff(2) ) ) &
-                * ( 1.0 - abs( p%x1(3) - l - nnoff(3) ) ) )
+            io%buff(1,io%ib) = io%buff(1,io%ib) + f(j,k,l) * &
+                ( ( 1.0 - abs( io%x1(1) - j - nnoff(1) ) ) &
+                * ( 1.0 - abs( io%x1(2) - k - nnoff(2) ) ) &
+                * ( 1.0 - abs( io%x1(3) - l - nnoff(3) ) ) )
         end do
         end do
         end do
@@ -301,28 +301,28 @@ case( '=w', '=wi' )
         do k = i1(2), i2(2), di(2)
         do j = i1(1), i2(1), di(1)
             i = i + 1
-            p%buff(i,p%ib) = f(j,k,l)
+            io%buff(i,io%ib) = f(j,k,l)
         end do
         end do
         end do
     end if
-    if ( p%ib == p%nb .or. it == it2 .or. modulo( it, itio ) == 0 ) then
-        n(4) = p%ib
+    if ( io%ib == io%nb .or. it == it2 .or. modulo( it, itio ) == 0 ) then
+        n(4) = io%ib
         m(4) = (it2 - it1) / dit + 1
         o(4) = (it  - it1) / dit + 1 - n(4)
-        str = 'out/' // p%filename
+        str = 'out/' // io%filename
         if ( any( n(1:3) /= m(1:3) ) .and. mpout == 0 ) &
             write( str, '(2a,i6.6)' ) trim( str ), '-', ipid
-        call rio2( p%fh, p%buff(:,:n(4)), 'w', str, m, n, o, mpout, verb )
-        p%ib = 0
+        call rio2( io%fh, io%buff(:,:n(4)), 'w', str, m, n, o, mpout, verb )
+        io%ib = 0
         if ( it == it2 .or. any( n < 1 ) ) then
-            deallocate( p%buff )
+            deallocate( io%buff )
             call pdelete
             cycle loop
         end if
     end if
 case default
-    write( 0, * ) "bad i/o mode '", trim( p%mode ), "' for ", trim( p%filename )
+    write( 0, * ) "bad i/o mode '", trim( io%mode ), "' for ", trim( io%filename )
     stop
 end select
 
