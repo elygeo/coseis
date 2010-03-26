@@ -168,27 +168,6 @@ def stage( inputs ):
     for f in 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint':
         os.mkdir( os.path.join( cf.rundir, f ) )
 
-    # Link input files
-    for i, line in enumerate( pm.fieldio ):
-        if 'r' in line[0] or 'R' in line[0] and os.sep in line[8]:
-            filename = os.path.expanduser( line[8] )
-            f = os.path.basename( filename )
-            line = line[:8] + (f,) + line[9:]
-            pm.fieldio[i] = line
-            f = os.path.join( cf.rundir, 'in', f )
-            try:
-                os.link( filename, f )
-            except( 'OSError' ):
-                os.symlink( filename, f )
-    for pat in cf.infiles:
-        for filename in glob.glob( os.path.expanduser( pat ) ):
-            f = os.path.basename( filename )
-            f = os.path.join( cf.rundir, 'in', f )
-            try:
-                os.link( filename, f )
-            except( 'OSError' ):
-                os.symlink( filename, f )
-
     # Copy files to run directory
     cwd = os.path.realpath( os.getcwd() )
     cf.rundate = time.asctime()

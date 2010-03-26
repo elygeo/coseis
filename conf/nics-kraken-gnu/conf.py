@@ -24,16 +24,15 @@ account: TG-MCA03S012
 """
 login = 'kraken-pwd.nics.utk.edu'
 hosts = 'kraken-pwd3',
-queue = 'longsmall';  minnodes = 0;    maxnodes = 32;   maxtime = 60, 00
-queue = 'small';      minnodes = 0;    maxnodes = 64;   maxtime = 24, 00
-queue = 'medium';     minnodes = 65;   maxnodes = 1024; maxtime = 24, 00
-queue = 'large';      minnodes = 1025; maxnodes = 4096; maxtime = 24, 00
-queue = 'capability'; minnodes = 4097; maxnodes = 8256; maxtime = 24, 00
+queue = 'longsmall';  minnodes = 0;    maxnodes = 21;   maxtime = 60, 00
+queue = 'small';      minnodes = 0;    maxnodes = 42;   maxtime = 24, 00
+queue = 'medium';     minnodes = 43;   maxnodes = 682;  maxtime = 24, 00
+queue = 'large';      minnodes = 683;  maxnodes = 2730; maxtime = 24, 00
+queue = 'capability'; minnodes = 2731; maxnodes = 8256; maxtime = 24, 00
 queue = 'batch';      minnodes = 0;    maxnodes = 4096; maxtime = 24, 00
 
-maxcores = 8
-maxram = 15000 # 4416 nodes #PBS -l feature=2gbpercore
-maxram =  7000 # 3840 nodes
+maxcores = 12
+maxram = 15000
 rate = 1e6 # just a guess
 fortran_serial = 'ftn',
 fortran_mpi = 'ftn',
