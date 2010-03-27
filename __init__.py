@@ -195,7 +195,7 @@ def stage( inputs ):
     # Combine metadata
     meta = util.namespace( pm.__dict__ )
     for k in 'name', 'rundate', 'rundir', 'user', 'os_', 'dtype':
-        setattr( meta, getattr( cf, k ) )
+        setattr( meta, k, getattr( cf, k ) )
     meta.indices = {}
     meta.xi = {}
     for f in meta.fieldio:

@@ -209,7 +209,7 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
     return np.array( [xx, yy], 'f' )
 
 def clipdata( x, y, extent, loose=True ):
-    xlim, ylim = extent
+    xlim, ylim = extent[:2]
     i = (x >= xlim[0]) & (x <= xlim[1]) & (y >= ylim[0]) & (y <= ylim[1])
     if loose:
         i[:-1] = i[:-1] | i[1:]

@@ -2,7 +2,8 @@
 """
 Default configuration parameters
 """
-import os, pwd, numpy
+import os, pwd
+import numpy as np
 
 # Setup options (also accessible with command line options).
 prepare = True	# True: compile code and setup run directory, False: dry run
@@ -35,7 +36,7 @@ maxram = 0
 maxtime = 0
 rate = 1.0e6
 queue = None
-dtype = numpy.dtype( 'f' ).str
+dtype = np.dtype( 'f' ).str
 
 # Search for file in PATH
 def find( *files ):
