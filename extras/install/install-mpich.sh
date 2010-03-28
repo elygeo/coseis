@@ -3,7 +3,7 @@
 
 # Set version and loction here:
 version="1.2.1p1"
-path="\${HOME}/local2"
+path="\${HOME}/local"
 
 prefix="$( eval echo ${path} )/mpich2-${version}"
 echo -n "Installing MPICH2 ${version} in ${prefix}. Are you sure? [y/N]: "
