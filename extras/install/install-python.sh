@@ -54,8 +54,9 @@ export LD_LIBRARY_PATH="${prefix}/lib/vtk-5.4"
 # PyPI packages
 easy_install cython
 easy_install numpy
+easy_install PIL
 easy_install pyproj
-#easy_install wxpython
+easy_install wxpython
 easy_install matplotlib
 easy_install configobj
 easy_install "Mayavi[app]"

@@ -59,8 +59,9 @@ def etopo1( indices=None, downsample=1, path=repo, download=True ):
         url = 'ftp://ftp.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
         f = os.path.join( path, os.path.basename( url ) )
         if not os.path.exists( f ):
-            print( 'Retrieving %s' % url, f )
+            print( 'Retrieving %s' % url )
             urllib.urlretrieve( url, f )
+        print( 'Creating %s' % filename )
         z = zipfile.ZipFile( f, 'r' ).read( 'etopo1_ice_g_i2.bin' )
         z = np.fromstring( z, '<i2' ).reshape( [21601, 10801] )
         z = np.array( z, 'f' )
