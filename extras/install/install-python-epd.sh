@@ -1,29 +1,27 @@
 #!/bin/bash -e
-# Install Enthought Python Distribution under Linux/UNIX.
+# Install Enthought Python Distribution
 
-# Set version here:
 # http://download.enthought.com/epd/installs/epd-6.1-1-macosx-i386.dmg
-link="http://download.enthought.com/epd/installs/epd-6.1-1-rh3-x86.sh"
-link="http://download.enthought.com/epd/installs/epd-6.1-1-rh5-x86.sh"
-version=$( basename "$link" .sh )
+url="http://download.enthought.com/epd/installs/epd-6.1-1-rh3-x86.sh"
+url="http://download.enthought.com/epd/installs/epd-6.1-1-rh5-x86.sh"
 
 # Set loction here:
 path="\${HOME}/local"
 
-uname -a
-getconf LONG_BIT
-
+# confirm
 prefix="$( eval echo ${path} )"
-echo -n "Installing Enthought Python ${version} in ${prefix}. Are you sure? [y/N]: "
+echo -n "Installing Python in ${prefix}. Are you sure? [y/N]: "
 read confirm
 [ "$confirm" = "y" ]
-
 mkdir -p "${prefix}"
-cd "${prefix}"
 
-curl -O "${link}"
+# install
+version=$( basename "$url" .sh )
+cd "${prefix}"
+curl -O "${url}"
 bash "${version}.sh"
-[ -e python ] || ln -s "${version}" python
+ln -s "${version}" python
+export PATH="${prefix}/python/bin:${PATH}"
 
 echo 'Now add this to your .bashrc or .profile:'
 echo "export PATH=\"${path}/python/bin:\${PATH}\""

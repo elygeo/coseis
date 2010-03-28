@@ -8,6 +8,7 @@
 
 ver_python="2.6.2"
 ver_python="2.6.4"
+ver_python="2.6.5"
 ver_numpy="1.2.1" # ver 1.3.0 fails for libnpymath
 prefix="/lustre/scratch/${USER}/local/python"
 
