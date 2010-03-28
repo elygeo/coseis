@@ -45,11 +45,11 @@ if [ ! -d VTK -a ! -d VTK-build ]; then
     curl "http://www.vtk.org/files/release/5.4/${version}.tar.gz" | tar zx
     mkdir VTK-build
     cd VTK-build
-    cmake ../VTK -DBUILD_SHARED_LIBS:BOOL=ON -DVTK_WRAP_PYTHON:BOOL=ON -DCMAKE_INSTALL_PREFIX:PATH="${prefix}"
+    cmake ../VTK -DBUILD_SHARED_LIBS:BOOL=ON -DVTK_WRAP_PYTHON:BOOL=ON -DVTK_USE_TK:BOOL=OFF -DCMAKE_INSTALL_PREFIX:PATH="${prefix}"
     make
     make install
 fi
-export LD_LIBRARY_PATH="${prefix}/lib/${version}"
+export LD_LIBRARY_PATH="${prefix}/lib/vtk-5.4"
 
 # PyPI packages
 easy_install cython
@@ -57,9 +57,9 @@ easy_install numpy
 easy_install pyproj
 #easy_install wxpython
 easy_install matplotlib
-easy_install scipy
 easy_install configobj
 easy_install "Mayavi[app]"
+easy_install scipy
 
 echo 'Now add this to your .bashrc or .profile:'
 echo "export PATH=\"${path}/python/bin:\${PATH}\""

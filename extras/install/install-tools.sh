@@ -12,8 +12,8 @@ read confirm
 mkdir -p "${prefix}"
 
 # PyPI packages
-easy_install bzr
 easy_install pypdf
+easy_install bzr
 
 # ObsPy
 cd "${prefix}"
