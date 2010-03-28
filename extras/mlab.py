@@ -51,7 +51,10 @@ def screenshot( fig, format=None, mag=None, aa_frames=8 ):
     if mag:
         x, y = mag * x, mag * y
         fig.scene.set_size( (x, y) )
+    drsave = fig.scene.disable_render
+    fig.scene.disable_render = False
     fig.scene.render()
+    fig.scene.disable_render = drsave
     img = tvtk.UnsignedCharArray()
     fig.scene.render_window.get_pixel_data( 0, 0, x-1, y-1, 1, img )
     img = img.to_array().reshape( (y, x, 3) )[::-1,:]

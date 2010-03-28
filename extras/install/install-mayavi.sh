@@ -24,8 +24,8 @@ export PATH="${prefix}/bin/cmake:${PATH}"
 version="vtk-5.4.2"
 cd "${prefix}"
 curl "http://www.vtk.org/files/release/5.4/${version}.tar.gz" | tar zxv
-mkdir "${version}"
-cd "${version}"
+mkdir VTK-build
+cd VTK-build
 cmake ../VTK -DBUILD_SHARED_LIBS:BOOL=ON -DVTK_WRAP_PYTHON:BOOL=ON -DCMAKE_INSTALL_PREFIX:PATH="${prefix}/python"
 make
 make install

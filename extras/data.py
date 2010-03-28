@@ -5,6 +5,8 @@ Mapping data utilities
 import os
 import numpy as np
 
+repo = '~/mapdata'
+
 def tsurf( path ):
     """
     Read GOCAD (http://www.gocad.org) trigulated surface "Tsurf" files.
@@ -43,12 +45,13 @@ def tsurf( path ):
             color = float(f[0]), float(f[1]), float(f[2])
     return tsurf
 
-def etopo1( indices=None, downsample=1, path='mapdata', download=True ):
+def etopo1( indices=None, downsample=1, path=repo, download=True ):
     """
     Download ETOPO1 Global Relief Model.
     http://www.ngdc.noaa.gov/mgg/global/global.html
     """
     import urllib, zipfile, sord
+    path = os.path.expanduser( path )
     filename = os.path.join( path, 'etopo%02d-ice.f32' % downsample )
     if download and not os.path.exists( filename ):
         if path != '' and not os.path.exists( path ):
@@ -70,12 +73,13 @@ def etopo1( indices=None, downsample=1, path='mapdata', download=True ):
     else:
         return
 
-def globe( indices=None, path='mapdata', download=True ):
+def globe( indices=None, path=repo, download=True ):
     """
     Global Land One-km Base Elevation Digital Elevation Model.
     http://www.ngdc.noaa.gov/mgg/topo/globe.html
     """
     import urllib, gzip, sord
+    path = os.path.expanduser( path )
     filename = os.path.join( path, 'globe30.i16' )
     if download and not os.path.exists( filename ):
         if path != '' and not os.path.exists( path ):
@@ -106,13 +110,14 @@ def globe( indices=None, path='mapdata', download=True ):
     else:
         return
 
-def topo( extent, scale=1.0, cache='', path='mapdata', download=True ):
+def topo( extent, scale=1.0, cache='', path=repo, download=True ):
     """
     Extrat merged GLOBE/ETOPO1 digital elvation model for given region.
     """
     if cache and os.path.exists( cache + '.npz' ):
         c = np.load( cache + '.npz' )
         return c['z'], c['lon'], c['lat']
+    path = os.path.expanduser( path )
     o = 0.25
     lon, lat = extent
     j = int( lon[0] * 60 + 10801 - o ), int( np.ceil( lon[1] * 60 + 10801 + o ) )
@@ -138,7 +143,7 @@ def topo( extent, scale=1.0, cache='', path='mapdata', download=True ):
         np.savez( cache + '.npz', z=z, lon=lon, lat=lat )
     return z[:,::-1], (lon, lat)
 
-def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, min_level=0, max_level=4, clip=1, path='mapdata', download=True ):
+def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, min_level=0, max_level=4, clip=1, path=repo, download=True ):
     """
     Reader for the Global Self-consistent, Hierarchical, High-resolution Shoreline
     database (GSHHS) by Wessel and Smith.  WGS-84 ellipsoid.
@@ -155,6 +160,7 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
     """
     nh = 11
     url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.0/gshhs_2.0.zip'
+    path = os.path.expanduser( path )
     filename = os.path.join( path, os.path.basename( url ) )
     kind = dict(c='gshhs', r='wdb_rivers', b='wdb_borders')[kind[0]]
     member = 'gshhs/%s_%s.b' % (kind, resolution[0])
