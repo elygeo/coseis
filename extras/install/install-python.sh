@@ -27,6 +27,8 @@ if [ ! -d "Python-${version}" ]; then
 fi
 export PATH="${prefix}/bin:${PATH}"
 
+#http://downloads.sourceforge.net/wxpython/wxPython-src-2.8.10.1.tar.bz2
+
 # CMake
 version="cmake-2.8.1"
 cd "${prefix}"
@@ -50,6 +52,14 @@ if [ ! -d VTK -a ! -d VTK-build ]; then
     make install
 fi
 export LD_LIBRARY_PATH="${prefix}/lib/vtk-5.4"
+
+# VTK for Snow Leopard (from Mayavi page, untested)
+#export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:/usr/local/lib/vtk-5.4
+#BUILD_SHARED_LIBS:BOOL=ON
+#CMAKE_OSX_ARCHITECTURES:STRING=x86_64
+#CMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.6
+#VTK_WRAP_PYTHON:BOOL=ON
+#VTK_PYTHON_SETUP_ARGS:STRING=
 
 # PyPI packages
 easy_install cython

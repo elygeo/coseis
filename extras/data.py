@@ -2,10 +2,11 @@
 """
 Mapping data utilities
 """
-import os
+import os, urllib, gzip, zipfile, sord
 import numpy as np
+from cStringIO import StringIO
 
-repo = '~/mapdata'
+repo = os.path.expanduser( '~/mapdata' )
 
 def tsurf( path ):
     """
@@ -45,19 +46,17 @@ def tsurf( path ):
             color = float(f[0]), float(f[1]), float(f[2])
     return tsurf
 
-def etopo1( indices=None, downsample=1, path=repo, download=True ):
+def etopo1( indices=None, downsample=1 ):
     """
     Download ETOPO1 Global Relief Model.
     http://www.ngdc.noaa.gov/mgg/global/global.html
     """
-    import urllib, zipfile, sord
-    path = os.path.expanduser( path )
-    filename = os.path.join( path, 'etopo%02d-ice.f32' % downsample )
-    if download and not os.path.exists( filename ):
-        if path != '' and not os.path.exists( path ):
-            os.makedirs( path )
+    filename = os.path.join( repo, 'etopo%02d-ice.f32' % downsample )
+    if not os.path.exists( filename ):
+        if not os.path.exists( repo ):
+            os.makedirs( repo )
         url = 'ftp://ftp.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
-        f = os.path.join( path, os.path.basename( url ) )
+        f = os.path.join( repo, os.path.basename( url ) )
         if not os.path.exists( f ):
             print( 'Retrieving %s' % url )
             urllib.urlretrieve( url, f )
@@ -74,27 +73,25 @@ def etopo1( indices=None, downsample=1, path=repo, download=True ):
     else:
         return
 
-def globe( indices=None, path=repo, download=True ):
+def globe( indices=None ):
     """
     Global Land One-km Base Elevation Digital Elevation Model.
     http://www.ngdc.noaa.gov/mgg/topo/globe.html
     """
-    import urllib, gzip, sord
-    path = os.path.expanduser( path )
-    filename = os.path.join( path, 'globe30.i16' )
-    if download and not os.path.exists( filename ):
-        if path != '' and not os.path.exists( path ):
-            os.makedirs( path )
+    filename = os.path.join( repo, 'globe30.i16' )
+    if not os.path.exists( filename ):
+        if not os.path.exists( repo ):
+            os.makedirs( repo )
         print( 'Building %s' % filename )
         n = 90 * 60 * 2
         url = 'http://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/%s10g.gz'
         tiles = 'abcd', 'efgh', 'ijkl', 'mnop'
-        fd = open( path, 'wb' )
+        fd = open( filename, 'wb' )
         for j in range( len( tiles ) ):
             row = []
             for k in range( len( tiles[j] ) ):
                 u = url % tiles[j][k]
-                f = os.path.join( path, os.path.basename( u ) )
+                f = os.path.join( repo, os.path.basename( u ) )
                 if not os.path.exists( f ):
                     print( 'Retrieving %s' % u )
                     urllib.urlretrieve( u, f )
@@ -111,19 +108,15 @@ def globe( indices=None, path=repo, download=True ):
     else:
         return
 
-def topo( extent, scale=1.0, cache='', path=repo, download=True ):
+def topo( extent, scale=1.0 ):
     """
     Extrat merged GLOBE/ETOPO1 digital elvation model for given region.
     """
-    if cache and os.path.exists( cache + '.npz' ):
-        c = np.load( cache + '.npz' )
-        return c['z'], c['lon'], c['lat']
-    path = os.path.expanduser( path )
     o = 0.25
     lon, lat = extent
     j = int( lon[0] * 60 + 10801 - o ), int( np.ceil( lon[1] * 60 + 10801 + o ) )
     k = int( -lat[1] * 60 + 5401 - o ), int( np.ceil( -lat[0] * 60 + 5401 + o ) )
-    z = etopo1( [j, k], 1, path, download )
+    z = etopo1( [j, k], 1 )
     j = 2 * j[0] - 1, 2 * j[1] - 2
     k = 2 * k[0] - 1, 2 * k[1] - 2
     n = j[1] - j[0] + 1, k[1] - k[0] + 1
@@ -133,18 +126,49 @@ def topo( extent, scale=1.0, cache='', path=repo, download=True ):
     z1[0::2,1::2] = 3 * z[:-1,:-1] + 9 * z[:-1,1:] +     z[1:,:-1] + 3 * z[1:,1:]
     z1[1::2,0::2] = 3 * z[:-1,:-1] +     z[:-1,1:] + 9 * z[1:,:-1] + 3 * z[1:,1:]
     z1[1::2,1::2] =     z[:-1,:-1] + 3 * z[:-1,1:] + 3 * z[1:,:-1] + 9 * z[1:,1:]
-    z = globe( [j, k], path, download )
+    z = globe( [j, k] )
     i = z != -500
     z1[i] = z[i]
     z = z1
     z *= scale
     lon = (j[0] - 21600.5) / 120, (j[1] - 21600.5) / 120
     lat = (10800.5 - k[1]) / 120, (10800.5 - k[0]) / 120
-    if cache:
-        np.savez( cache + '.npz', z=z, lon=lon, lat=lat )
     return z[:,::-1], (lon, lat)
 
-def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, min_level=0, max_level=4, clip=1, path=repo, download=True ):
+def us_place_names( kind=None, extent=None ):
+    """
+    USGS place name database.
+    """
+    url = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
+    filename = os.path.join( repo, os.path.basename( url ) )
+    if not os.path.exists( filename ):
+        if not os.path.exists( repo ):
+            os.makedirs( repo )
+        print( 'Downloading %s' % url )
+        urllib.urlretrieve( url, filename )
+    data = zipfile.ZipFile( filename ).read( 'US_CONCISE.txt' )
+    data = StringIO( data )
+    name = np.genfromtxt( data, delimiter='|', skip_header=1, usecols=(1,), dtype='S64' )
+    data.reset()
+    kind_ = np.genfromtxt( data, delimiter='|', skip_header=1, usecols=(2,), dtype='S64' )
+    data.reset()
+    lat, lon, elev = np.genfromtxt( data, delimiter='|', skip_header=1, usecols=(9,10,15) ).T
+    if kind != None:
+        i = kind == kind_
+        lon = lon[i]
+        lat = lat[i]
+        elev = elev[i]
+        name = name[i]
+    if extent != None:
+        x, y = extent
+        i = (lon >= x[0]) & (lon <= x[1]) & (lat >= y[0]) & (lat <= y[1])
+        lon = lon[i]
+        lat = lat[i]
+        elev = elev[i]
+        name = name[i]
+    return (lon, lat, elev, name)
+
+def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, min_level=0, max_level=4, clip=1 ):
     """
     Reader for the Global Self-consistent, Hierarchical, High-resolution Shoreline
     database (GSHHS) by Wessel and Smith.  WGS-84 ellipsoid.
@@ -161,8 +185,7 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
     """
     nh = 11
     url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.0/gshhs_2.0.zip'
-    path = os.path.expanduser( path )
-    filename = os.path.join( path, os.path.basename( url ) )
+    filename = os.path.join( repo, os.path.basename( url ) )
     kind = dict(c='gshhs', r='wdb_rivers', b='wdb_borders')[kind[0]]
     member = 'gshhs/%s_%s.b' % (kind, resolution[0])
     if kind != 'gshhs':
@@ -171,13 +194,11 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
         lon, lat = extent
         lon = lon[0] % 360, lon[1] % 360
         extent = lon, lat
-    if download and not os.path.exists( filename ):
+    if not os.path.exists( filename ):
+        if not os.path.exists( repo ):
+            os.makedirs( repo )
         print( 'Downloading %s' % url )
-        import urllib
-        if path != '' and not os.path.exists( path ):
-            os.makedirs( path )
         urllib.urlretrieve( url, filename )
-    import zipfile
     data = np.fromstring( zipfile.ZipFile( filename ).read( member ), '>i' )
     xx = []
     yy = []
@@ -215,7 +236,7 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
         yy = np.concatenate( yy )[:-1]
     return np.array( [xx, yy], 'f' )
 
-def clipdata( x, y, extent, loose=True ):
+def clipdata( x, y, extent, loose=True, lines=True ):
     xlim, ylim = extent[:2]
     i = (x >= xlim[0]) & (x <= xlim[1]) & (y >= ylim[0]) & (y <= ylim[1])
     if loose:
@@ -223,7 +244,8 @@ def clipdata( x, y, extent, loose=True ):
         i[1:] = i[:-1] | i[1:]
     x[~i] = np.nan
     y[~i] = np.nan
-    i[1:] = i[:-1] | i[1:]
+    if lines:
+        i[1:] = i[:-1] | i[1:]
     x = x[i]
     y = y[i]
     return x, y, i
@@ -233,7 +255,6 @@ def engdahlcat( path='engdahl-centennial-cat.f32', fields=['lon', 'lat', 'depth'
     Engdahl Centennial Earthquake Catalog to binary file.
     http://earthquake.usgs.gov/research/data/centennial.php
     """
-    import urllib
     if not os.path.exists( path ):
         fmt = [
             6, ('icat',   'S6'),

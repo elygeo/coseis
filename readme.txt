@@ -536,20 +536,17 @@ Source control
 
 We use Bazaar_ for version control. Some examples:
 
-Apply any recent updates from the repository
+Apply any recent updates from the repository, overwriting any local changes.
+This is a way to keep up-to-date with the latest code.
 ::
 
     bzr pull
+    bzr revert
 
 See code changes since the last commit
 ::
 
     bzr diff
-
-Undo changes
-::
-
-    bzr revert
 
 Commit changes
 ::
