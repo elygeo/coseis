@@ -1,17 +1,25 @@
 #!/bin/bash -e
-# Install simulation tools
 
 # set location here:
 path="\${HOME}/local"
+prefix="$( eval echo ${path} )"
 
 # confirm
-prefix="$( eval echo ${path} )"
-echo -n "Installing simulation tools in ${prefix}. Are you sure? [y/N]: "
+echo -n "Installing in ${prefix}. Are you sure? [y/N]: "
 read confirm
 [ "$confirm" = "y" ]
 mkdir -p "${prefix}"
 
 # PyPI packages
+easy_install numpy
+easy_install pyproj
+easy_install cython
+easy_install PIL
+easy_install wxpython
+easy_install matplotlib
+easy_install configobj
+easy_install 'Mayavi[app]'
+easy_install scipy
 easy_install pypdf
 easy_install bzr
 
@@ -23,12 +31,6 @@ if [ ! -d obspy ]; then
     bash develop.sh
 fi
 
-# SORD
-cd "${prefix}"
-if [ ! -d sord ]; then
-    bzr get http://earth.usc.edu/~gely/sord
-fi
-
 # SCEC CVM4
 if [ ! -d cvm ]; then
     bzr get http://earth.usc.edu/~gely/cvm
@@ -37,6 +39,9 @@ if [ ! -d cvm ]; then
     curl -O http://earth.usc.edu/~gely/cvm/cvm4-data.tgz
 fi
 
-echo 'Now add this to your .bashrc or .profile:'
-echo "export PATH=\"${path}/python/bin:\${PATH}\""
+# SORD
+cd "${prefix}"
+if [ ! -d sord ]; then
+    bzr get http://earth.usc.edu/~gely/sord
+fi
 

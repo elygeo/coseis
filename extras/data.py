@@ -168,7 +168,7 @@ def us_place_names( kind=None, extent=None ):
         name = name[i]
     return (lon, lat, elev, name)
 
-def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, min_level=0, max_level=4, clip=1 ):
+def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, min_level=0, max_level=4, delta=None, clip=1 ):
     """
     Reader for the Global Self-consistent, Hierarchical, High-resolution Shoreline
     database (GSHHS) by Wessel and Smith.  WGS-84 ellipsoid.
@@ -226,8 +226,12 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
         nkeep += 1
         x, y = 1e-6 * np.array( data[ii-2*n:ii].reshape(n, 2).T, 'f' )
         if extent != None and clip != 0:
-            loose = clip > 0
-            x, y = clipdata( x, y, extent, loose )[:2]
+            if delta:
+                x, y = clipdata( x, y, extent, 1 )[:2]
+                x, y = densify( x, y, delta )
+            x, y = clipdata( x, y, extent, clip )[:2]
+        elif delta:
+            x, y = densify( x, y, delta )
         xx += [ x, [np.nan] ]
         yy += [ y, [np.nan] ]
     print '%s, resolution: %s, selected %s of %s' % (member, resolution, nkeep, ntotal)
@@ -236,19 +240,49 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
         yy = np.concatenate( yy )[:-1]
     return np.array( [xx, yy], 'f' )
 
-def clipdata( x, y, extent, loose=True, lines=True ):
-    xlim, ylim = extent[:2]
-    i = (x >= xlim[0]) & (x <= xlim[1]) & (y >= ylim[0]) & (y <= ylim[1])
-    if loose:
-        i[:-1] = i[:-1] | i[1:]
-        i[1:] = i[:-1] | i[1:]
-    x[~i] = np.nan
-    y[~i] = np.nan
+def clipdata( x, y, extent, lines=1 ):
+    """
+    Clip data outside extent.
+    
+    extent : (xmin, xmax), (ymin, ymax)
+    lines : 0 = points, assume no connectivity.
+            1 = line segments, include one extra point past the boundary.
+           -1 = line segments, do not include extra point past the boundary.
+    lines : True = lines, False = points.
+    """
+    x, y = np.array( [x, y] )
+    x1, x2 = extent[0]
+    y1, y2 = extent[1]
+    i = (x >= x1) & (x <= x2) & (y >= y1) & (y <= y2)
     if lines:
+        if lines > 0:
+            i[:-1] = i[:-1] | i[1:]
+            i[1:] = i[:-1] | i[1:]
+        x[~i] = np.nan
+        y[~i] = np.nan
         i[1:] = i[:-1] | i[1:]
-    x = x[i]
-    y = y[i]
-    return x, y, i
+    return x[i], y[i], i
+
+def densify( x, y, delta ):
+    """
+    Piecewise up-sample line segments with spacing delta.
+    """
+    x, y = np.array( [x, y] )
+    dx = np.diff( x )
+    dy = np.diff( y )
+    r = np.sqrt( dx * dx + dy * dy )
+    xx = [[x[0]]]
+    yy = [[y[0]]]
+    for i in range( r.size ):
+        if r[i] > delta:
+            ri = np.arange( delta, r[i], delta )
+            xx += [np.interp( ri, [0.0, r[i]], x[i:i+2] )]
+            yy += [np.interp( ri, [0.0, r[i]], y[i:i+2] )]
+        xx += [[x[i+1]]]
+        yy += [[y[i+1]]]
+    xx = np.concatenate( xx )
+    yy = np.concatenate( yy )
+    return np.array( [xx, yy] )
 
 def engdahlcat( path='engdahl-centennial-cat.f32', fields=['lon', 'lat', 'depth', 'mag'] ):
     """
@@ -320,4 +354,8 @@ def downsample_sphere( f, d ):
     ff[:,-1] = ff[:,-1].mean()
     ff *= 1.0 / (d * d)
     return ff
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
 

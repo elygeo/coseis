@@ -1,18 +1,18 @@
 #!/bin/bash -e
-# Install MPICH2
 
-# Set version and loction here:
-version="1.2.1p1"
+# set location here:
 path="\${HOME}/local"
+prefix="$( eval echo ${path} )"
 
-prefix="$( eval echo ${path} )/mpich2-${version}"
-echo -n "Installing MPICH2 ${version} in ${prefix}. Are you sure? [y/N]: "
+# confirm
+echo -n "Installing in ${prefix}. Are you sure? [y/N]: "
 read confirm
 [ "$confirm" = "y" ]
-
 mkdir -p "${prefix}"
-cd "${prefix}"
 
+# MPICH2
+version="1.2.1p1"
+cd "${prefix}"
 curl "http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/${version}/mpich2-${version}.tar.gz" | tar zxv
 cd "mpich2-${version}"
 if [ "${MACHTYPE}" = 'x86_64-apple-darwin10.0' ]; then
@@ -22,10 +22,11 @@ else
 fi
 make
 make install
-
 eval cd "${path}"
 [ -e mpich2 ] || ln -s "$( basename ${prefix} )" mpich2
 
+# PATH
+export PATH="${prefix}/bin:${PATH}"
 echo 'Now add this to your .bashrc or .profile:'
-echo "export PATH=\"${path}/mpich2/bin:\${PATH}\""
+echo "export PATH=\"${path}/bin:\${PATH}\""
 
