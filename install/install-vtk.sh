@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
-prefix="${HOME}/local"
+# install location
+prefix="${1:-${HOME}/local}"
 
 # CMake
 url="http://www.cmake.org/files/v2.8/cmake-2.8.1.tar.gz"

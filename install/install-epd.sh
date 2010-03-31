@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
-prefix="${HOME}/local"
+# install location
+prefix="${1:-${HOME}/local}"
 
 # Enthought Python Distribution
 # http://download.enthought.com/epd/installs/epd-6.1-1-macosx-i386.dmg

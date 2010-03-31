@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
-prefix="${HOME}/local"
+# install location
+prefix="${1:-${HOME}/local}"
 
 # ObsPy
 cd "${prefix}"

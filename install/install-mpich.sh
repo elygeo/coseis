@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
-prefix="${HOME}/local"
+# install location
+prefix="${1:-${HOME}/local}"
 
 # MPICH2
 url="http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/1.2.1p1/mpich2-1.2.1p1.tar.gz"

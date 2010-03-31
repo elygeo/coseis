@@ -1,15 +1,17 @@
 #!/bin/bash -e
-# wxPython
 
-prefix="${HOME}/local"
+# install location
+prefix="${1:-${HOME}/local}"
+
+# wxPython
 url="http://downloads.sourceforge.net/wxpython/wxPython-src-2.8.10.1.tar.bz2"
 dir=$( basename "${url}" .tar.bz2 )
 
 cd "${prefix}"
-curl "$url" | tar jx
+curl "${url}" | tar jx
 cd "${dir}"
-mkdir build
-cd build
+mkdir bld
+cd bld
 
 ../configure \
     --prefix="${prefix}" \
@@ -25,7 +27,4 @@ python setup.py build_ext --inplace
 python setup.py install
 
 export LD_LIBRARY_PATH="${prefix}/lib"
-
-#lib=$( python -c 'from distutils import sysconfig; print sysconfig.get_python_lib()' )
-#echo "$( pwd )" > "${lib}/wxpython.pth"
 

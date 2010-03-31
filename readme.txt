@@ -132,22 +132,30 @@ compilers and MPI libraries.
 2.  `MPICH2 <http://www.mcs.anl.gov/research/projects/mpich2/>`_ is recommended
     if you need MPI.  The following shell script installs MPICH2:
 
-        http://earth.usc.edu/~gely/sord/install/install-mpich.sh
+        `install-mpich.sh <http://earth.usc.edu/~gely/sord/install/install-mpich.sh>`_
 
 3.  It is recommended that you install a private copy of Python for SORD.  The
-    following script installs both Python and SORD:
+    following script installs Python and NumPy:
 
-        http://earth.usc.edu/~gely/sord/install/install-sord.sh
+        `install-python.sh <http://earth.usc.edu/~gely/sord/install/install-python.sh>`_
 
     `Enthought Python Distribution
     <http://www.enthought.com/products/epddownload.php>`_ (EPD) is another
-    option that includes many more bells and whistles such as the `Mayavi
+    option that includes many bells and whistles such as the `Mayavi
     <http://code.enthought.com/projects/mayavi>`_ visualization package.
-    After installing EPD use the following script to install SORD:
 
-        http://earth.usc.edu/~gely/sord/install/install-epd-sord.sh
+4.  Download the SORD source code.  The best option is use Bazaar version
+    control, which facilitates applying code updates, and merging local
+    modifications (see `Source Control`_ section for examples). The following
+    script installs Bazaar, SORD, and `SCEC CVM4 <http://earth.usc.edu/~gely/cvm>`_.
 
-4.  For laptop and workstation installations, the default system configuration
+        `install-sord.sh <http://earth.usc.edu/~gely/sord/install/install-sord.sh>`_
+
+    Alternatively, download and unpack the source tar archive from here:
+
+        http://earth.usc.edu/~gely/sord/sord.tgz
+
+5.  For laptop and workstation installations, the default system configuration
     is usually be adequate.  To test the default configuration::
 
         cd sord/
@@ -166,7 +174,7 @@ compilers and MPI libraries.
     new custom configuration, make a new sub-directory following the example of
     the supplied configurations.
 
-5.  Compile the code by running:
+6.  Compile the code by running:
     ::
 
         python setup.py
