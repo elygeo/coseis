@@ -130,7 +130,7 @@ compilers and MPI libraries.
         and Fink seem to be problematic and are not recommended).
 
 2.  `MPICH2 <http://www.mcs.anl.gov/research/projects/mpich2/>`_ is recommended
-    if you need MPI.  The following shell script installs MPICH2::
+    if you need MPI.  The following shell script installs MPICH2:
 
         http://earth.usc.edu/~gely/sord/extras/install/install-mpich.sh
 
