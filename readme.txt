@@ -132,12 +132,12 @@ compilers and MPI libraries.
 2.  `MPICH2 <http://www.mcs.anl.gov/research/projects/mpich2/>`_ is recommended
     if you need MPI.  The following shell script installs MPICH2:
 
-        http://earth.usc.edu/~gely/sord/extras/install/install-mpich.sh
+        http://earth.usc.edu/~gely/sord/install/install-mpich.sh
 
 3.  It is recommended that you install a private copy of Python for SORD.  The
     following script installs both Python and SORD:
 
-        http://earth.usc.edu/~gely/sord/extras/install/install-sord.sh
+        http://earth.usc.edu/~gely/sord/extras/install-sord.sh
 
     `Enthought Python Distribution
     <http://www.enthought.com/products/epddownload.php>`_ (EPD) is another
@@ -145,7 +145,7 @@ compilers and MPI libraries.
     <http://code.enthought.com/projects/mayavi>`_ visualization package.
     After installing EPD use the following script to install SORD:
 
-        http://earth.usc.edu/~gely/sord/extras/install/install-epd-sord.sh
+        http://earth.usc.edu/~gely/sord/install/install-epd-sord.sh
 
 4.  For laptop and workstation installations, the default system configuration
     is usually be adequate.  To test the default configuration::
