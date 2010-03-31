@@ -132,8 +132,7 @@ compilers and MPI libraries.
 2.  `MPICH2 <http://www.mcs.anl.gov/research/projects/mpich2/>`_ is recommended
     if you need MPI.  The following shell script installs MPICH2::
 
-        curl -O http://earth.usc.edu/~gely/sord/extras/install/install-mpich.sh
-        bash install-mpich.sh
+        http://earth.usc.edu/~gely/sord/extras/install/install-mpich.sh
 
 3.  It is recommended that you install a private copy of Python for SORD.  The
     following script installs both Python and SORD:
