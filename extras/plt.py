@@ -4,7 +4,6 @@ Matplotlib utilities
 """
 import os, viz
 import numpy as np
-from matplotlib.colors import LinearSegmentedColormap
 
 def text( ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75, npmb=16, **kwargs ):
     """
@@ -41,6 +40,7 @@ def colormap( *args, **kwargs ):
     """
     Matplotlib colormap. See viz.colormap for details.
     """
+    from matplotlib.colors import LinearSegmentedColormap
     v, r, g, b, a = viz.colormap( *args, **kwargs )
     n = 2001
     cmap = { 'red':np.c_[v, r, r],
