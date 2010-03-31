@@ -130,36 +130,25 @@ compilers and MPI libraries.
         and Fink seem to be problematic and are not recommended).
 
 2.  `MPICH2 <http://www.mcs.anl.gov/research/projects/mpich2/>`_ is recommended
-    if you need MPI.  The following shell script downloads and installs MPICH2::
+    if you need MPI.  The following shell script installs MPICH2::
 
         curl -O http://earth.usc.edu/~gely/sord/extras/install/install-mpich.sh
         bash install-mpich.sh
 
-3.  It is recommended that you install a private copy of Python with
-    supplementary numeric and plotting packages, as is performed by the following
-    shell script::
+3.  It is recommended that you install a private copy of Python for SORD.  The
+    following script installs both Python and SORD:
 
-        curl -O http://earth.usc.edu/~gely/sord/extras/install/install-python.sh
-        bash install-python.sh
+        http://earth.usc.edu/~gely/sord/extras/install/install-sord.sh
 
     `Enthought Python Distribution
-    <http://www.enthought.com/products/epddownload.php>`_ is another option that
-    includes many more bells and whistles such as the `Mayavi
+    <http://www.enthought.com/products/epddownload.php>`_ (EPD) is another
+    option that includes many more bells and whistles such as the `Mayavi
     <http://code.enthought.com/projects/mayavi>`_ visualization package.
+    After installing EPD use the following script to install SORD:
 
-4.  Download the SORD source code.  The best option is use Bazaar version
-    control, which facilitates applying code updates, and merging local
-    modifications (see `Source Control`_ section for examples)::
+        http://earth.usc.edu/~gely/sord/extras/install/install-epd-sord.sh
 
-        cd ~/local
-        bzr get http://earth.usc.edu/~gely/sord
-
-    Alternatively, download and unpack the source tar archive
-    ::
-
-        curl http://earth.usc.edu/~gely/sord/sord.tgz | tar zxv
-
-5.  For laptop and workstation installations, the default system configuration
+4.  For laptop and workstation installations, the default system configuration
     is usually be adequate.  To test the default configuration::
 
         cd sord/
@@ -178,21 +167,10 @@ compilers and MPI libraries.
     new custom configuration, make a new sub-directory following the example of
     the supplied configurations.
 
-6.  Compile the code by running:
+5.  Compile the code by running:
     ::
 
         python setup.py
-
-7.  To enable Python to find the ``sord`` module, add the enclosing directory
-    the Python path.  For example, if your installation location is
-    ``~/local/sord``, in Bash shell do::
-
-        export PYTHONPATH=~/local
-
-    Alternatively, if you are the administrator of your Python installation, you
-    can do::
-
-        python setup.py path
 
 
 User Guide

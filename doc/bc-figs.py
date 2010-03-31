@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-import numpy, matplotlib
+import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 
 def mesh( x, y, u, v, xx, yy ):
-    yy, xx = numpy.meshgrid( yy, xx )
+    yy, xx = np.meshgrid( yy, xx )
     fig = plt.figure( None, (8, 2), 100, 'w' )
     fig.clf()
     ax = fig.add_axes( [0.01, 0.04, 0.49, 0.92] )
