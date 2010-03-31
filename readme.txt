@@ -137,7 +137,7 @@ compilers and MPI libraries.
 3.  It is recommended that you install a private copy of Python for SORD.  The
     following script installs both Python and SORD:
 
-        http://earth.usc.edu/~gely/sord/extras/install-sord.sh
+        http://earth.usc.edu/~gely/sord/install/install-sord.sh
 
     `Enthought Python Distribution
     <http://www.enthought.com/products/epddownload.php>`_ (EPD) is another
