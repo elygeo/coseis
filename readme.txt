@@ -174,10 +174,11 @@ compilers and MPI libraries.
     new custom configuration, make a new sub-directory following the example of
     the supplied configurations.
 
-6.  Compile the code by running:
+6.  Compile the code and setup the Python path by running:
     ::
 
         python setup.py
+        python setup.py path
 
 
 User Guide

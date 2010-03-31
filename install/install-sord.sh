@@ -9,8 +9,6 @@ easy_install bzr
 # SORD
 cd "${prefix}"
 bzr get http://earth.usc.edu/~gely/sord
-cd sord
-python setup.py path
 
 # SCEC CVM4
 cd "${prefix}"
