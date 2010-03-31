@@ -24,7 +24,7 @@ hosts = login,
 maxnodes = 12
 maxcores = 4
 maxram = 1800
-fortran_serial == 'ifort'
+fortran_serial = 'ifort'
 fortran_mpi = 'mpif90'
 _ = '-u', '-std95', '-warn', '-o'
 fortran_flags = {
