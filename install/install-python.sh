@@ -4,7 +4,7 @@
 prefix="${1:-${HOME}/local}"
 
 # Python
-url="http://www.python.org/ftp/python/2.6.5/Python-2.6.5.tgz"
+url='http://www.python.org/ftp/python/2.6.5/Python-2.6.5.tgz'
 dir=$( basename "$url" .tgz )
 cd "${prefix}"
 curl "${url}" | tar zx

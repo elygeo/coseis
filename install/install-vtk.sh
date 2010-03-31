@@ -17,9 +17,10 @@ make install
 url="http://www.vtk.org/files/release/5.4/vtk-5.4.2.tar.gz"
 cd "${prefix}"
 curl "${url}" | tar zx
-mkdir VTK-build
-cd VTK-build
-cmake ../VTK -DBUILD_SHARED_LIBS:BOOL=ON -DVTK_WRAP_PYTHON:BOOL=ON -DVTK_USE_TK:BOOL=OFF -DCMAKE_INSTALL_PREFIX:PATH="${prefix}"
+cd VTK
+mkdir build
+cd build
+cmake .. -DBUILD_SHARED_LIBS:BOOL=ON -DVTK_WRAP_PYTHON:BOOL=ON -DVTK_USE_TK:BOOL=OFF -DCMAKE_INSTALL_PREFIX:PATH="${prefix}"
 make
 make install
 export LD_LIBRARY_PATH="${prefix}/lib/vtk-5.4"
