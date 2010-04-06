@@ -244,11 +244,11 @@ def clipdata( x, y, extent, lines=1 ):
     """
     Clip data outside extent.
     
+    x, y : data coordinates
     extent : (xmin, xmax), (ymin, ymax)
     lines : 0 = points, assume no connectivity.
             1 = line segments, include one extra point past the boundary.
            -1 = line segments, do not include extra point past the boundary.
-    lines : True = lines, False = points.
     """
     x, y = np.array( [x, y] )
     x1, x2 = extent[0]
@@ -330,6 +330,16 @@ def upsample( f ):
     g[1::2,1::2] = 0.25 * (f[:-1,:-1] + f[1:,1:] + f[:-1,1:] + f[1:,:-1])
     return g
 
+def downsample( f, d ):
+    n = f.shape
+    n = (n[0] + 1) / d, (n[1] + 1) / d
+    g = np.zeros( n, f.dtype )
+    for k in range( d ):
+        for j in range( d ):
+            g += f[j::d,k::d]
+    g *= 1.0 / (d * d)
+    return g
+
 def downsample_sphere( f, d ):
     """
     Down-sample node-registered spherical surface with averaging.
@@ -339,21 +349,21 @@ def downsample_sphere( f, d ):
     registration.
     """
     n = f.shape
-    ii = np.arange( d ) - (d - 1) / 2
+    i = np.arange( d ) - (d - 1) / 2
     jj = np.arange( 0, n[0], d )
     kk = np.arange( 0, n[1], d )
     nn = jj.size, kk.size
-    ff = np.zeros( nn, f.dtype )
+    g = np.zeros( nn, f.dtype )
     jj, kk = np.ix_( jj, kk )
-    for dk in ii:
+    for dk in i:
         k = n[1] - 1 - abs( n[1] - 1 - abs( dk + kk ) )
-        for dj in ii:
+        for dj in i:
             j = (jj + dj) % n[0]
-            ff = ff + f[j,k]
-    ff[:,0] = ff[:,0].mean()
-    ff[:,-1] = ff[:,-1].mean()
-    ff *= 1.0 / (d * d)
-    return ff
+            g = g + f[j,k]
+    g[:,0] = g[:,0].mean()
+    g[:,-1] = g[:,-1].mean()
+    g *= 1.0 / (d * d)
+    return g
 
 if __name__ == '__main__':
     import doctest

@@ -3,6 +3,18 @@
 # install location
 prefix="${1:-${HOME}/local}"
 
+# Ipython
+easy_install ipython
+
+# zlib
+url="http://www.zlib.net/zlib-1.2.4.tar.gz"
+curl "${url}" | tar zx
+cd zlib-1.2.4
+./configure --prefix="${prefix}"
+make install
+./configure --prefix="${prefix}" --shared
+make install
+
 # Python Imaging Library
 easy_install PIL
 

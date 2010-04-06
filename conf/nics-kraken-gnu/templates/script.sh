@@ -3,12 +3,10 @@
 ##PBS -A TG-MCA03S012
 #PBS -N %(name)s
 #PBS -M %(email)s
-#PBS -q %(queue)s
 #PBS -l size=%(totalcores)s
 #PBS -l walltime=%(walltime)s
-##PBS -l feature=2gbpercore
-#PBS -e stderr
 #PBS -o stdout
+#PBS -e stderr
 #PBS -m abe
 #PBS -V
 

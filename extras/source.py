@@ -227,7 +227,7 @@ def srf_read( filename, path=None, mks=True ):
     sord.util.save( path + 'meta.py', meta )
     return meta
 
-def srf2potency( path, projection, dx ):
+def srf2potency( path, proj, dx ):
     """
     Convert SRF to potency tensor source and write SORD input files.
     """
@@ -278,8 +278,8 @@ def srf2potency( path, projection, dx ):
     fd.close()
 
     # Coordinates
-    rot = coord.rotation( x, y, projection )[1]
-    x, y = projection( x, y )
+    rot = coord.rotation( x, y, proj )[1]
+    x, y = proj( x, y )
     x = np.array( x / dx[0] + 1.0, dtype )
     y = np.array( y / dx[1] + 1.0, dtype )
     z = np.array( z / dx[2] + 1.0, dtype )
@@ -303,7 +303,7 @@ def srf2potency( path, projection, dx ):
 
     return nsource
 
-def srf2momrate( path, projection, dx, dt, nt ):
+def srf2momrate( path, proj, dx, dt, nt ):
     """
     Convert SRF to moment rate and write Olsen AWM input file.
     """
@@ -332,8 +332,8 @@ def srf2momrate( path, projection, dx, dt, nt ):
     lam  = np.fromfile( path + 'lam',  dtype )
 
     # Coordinates
-    rot = coord.rotation( x, y, projection )[1]
-    x, y = projection( x, y )
+    rot = coord.rotation( x, y, proj )[1]
+    x, y = proj( x, y )
     jj = int( x / dx[0] + 1.5 )
     kk = int( y / dx[1] + 1.5 )
     ll = int( z / dx[2] + 1.5 )
@@ -389,7 +389,7 @@ def dsample( f, d ):
     g = g / (d * d)
     return g
 
-def srf2coulomb( path, projection, dx, dest=None, scut=0 ):
+def srf2coulomb( path, proj, dx, dest=None, scut=0 ):
     """
     Convert SRF to Coulomb input file.
     """
@@ -421,9 +421,11 @@ def srf2coulomb( path, projection, dx, dest=None, scut=0 ):
     r2 =  s * s1 + c * s2
 
     # Coordinates
-    rot = coord.rotation( x, y, projection )[1]
-    x, y = 0.001 * projection( x, y )
-    z = 0.001 * z
+    rot = coord.rotation( x, y, proj )[1]
+    x, y = proj( x, y )
+    x *= 0.001
+    y *= 0.001
+    z *= 0.001
     delta = 0.0005 * meta['dx']
     dx = delta * np.sin( np.pi / 180.0 * (stk + rot) )
     dy = delta * np.cos( np.pi / 180.0 * (stk + rot) )

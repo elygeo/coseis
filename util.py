@@ -201,10 +201,10 @@ def progress( i, n, t ):
     """
     Print progress and time remaining.
     """
-    import datetime
+    #import datetime
     percent =  100.0 * i / n
     seconds = int( t * (100.0 / percent - 1.0) )
-    datetime.timedelta( seconds=seconds )
+    #datetime.timedelta( seconds=seconds )
     sys.stdout.write( '\r%3d%%  %s' % (percent, seconds) )
     sys.stdout.flush()
     if i == n:
