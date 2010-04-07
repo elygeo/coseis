@@ -18,7 +18,7 @@ nl3 = (nn - 1) / np3 + 1
 nhalo = 1
 if ( ifn /= 0 ) nhalo(ifn) = 2
 nl3 = max( nl3, nhalo )
-np3 = (nn - 1) / nl + 1
+np3 = (nn - 1) / nl3 + 1
 call rank( ip3, ipid, np3 )
 nnoff = nl3 * ip3 - nhalo
 

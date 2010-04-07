@@ -50,7 +50,6 @@ fortran_serial = find( 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95'
 fortran_mpi = find( 'mpxlf95_r', 'mpif90' )
 if fortran_serial[0] == 'gfortran':
     _ = '-fimplicit-none', '-Wall', '-std=f95', '-pedantic', '-o'
-    _ = '-fimplicit-none', '-Wall', '-std=f95', '-o'
     _ = '-fimplicit-none', '-Wall', '-o'
     fortran_flags = {
         'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g') + _,

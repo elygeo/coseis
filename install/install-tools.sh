@@ -3,6 +3,9 @@
 # install location
 prefix="${1:-${HOME}/local}"
 
+# Docutils
+easy_install docutils
+
 # Ipython
 easy_install ipython
 

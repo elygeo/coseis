@@ -21,7 +21,7 @@ qsub -l nodes=1,mem=20gb yourscript.pbs
 
 login = 'dynamic.usc.edu'
 hosts = login,
-maxnodes = 30
+maxnodes = 28
 maxcores = 2
 maxram = 1800
 fortran_serial = 'ifort',
