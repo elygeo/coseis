@@ -64,6 +64,7 @@ use mpi
 integer, intent(out) :: comm, rank
 integer, intent(in) :: coords(3)
 integer :: coords1(1), coords2(2), ii(1), i, n, e
+write (*,*) coords
 n = count( coords >= 0 )
 if ( n == 3 ) then
     comm = comm3d

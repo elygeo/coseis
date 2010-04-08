@@ -62,7 +62,7 @@ def build( mode=None, optimize=None ):
             object_ = os.path.join( '..', 'bin', 'sord-m' + opt )
             compiler = cf.fortran_mpi + cf.fortran_flags[opt]
             new |= util.make( compiler, object_, source )
-    os.chdir( cwd )
+    os.chdir( path )
     if new:
         try:
             import bzrlib
@@ -71,6 +71,7 @@ def build( mode=None, optimize=None ):
                 copy of the source code for posterity with each run.' )
         else:
             os.system( 'bzr export sord.tgz' )
+    os.chdir( cwd )
     return
 
 def docs():
