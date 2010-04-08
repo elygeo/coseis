@@ -203,7 +203,7 @@ def stage( inputs ):
         if filename != '-':
             meta.indices[filename] = f[7]
             if 'wi' in op:
-                meta.xi[filename] = f[3]
+                meta.xi[filename] = f[4]
     meta.shape = {}
     for k in meta.indices:
         nn = [ (i[1] - i[0]) / i[2] + 1 for i in meta.indices[k] ]
