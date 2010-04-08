@@ -34,7 +34,7 @@ np3 = np3in
 call mpi_cart_create( mpi_comm_world, 3, np3, period, .true., comm3d, e )
 if ( comm3d == mpi_comm_null ) then
     call mpi_comm_rank( mpi_comm_world, ip, e  )
-    write( 0, * ) 'Unused process:', ip
+    write( 0, * ) ip, ' unused process'
     call mpi_finalize( e )
     stop
 end if
@@ -64,7 +64,6 @@ use mpi
 integer, intent(out) :: comm, rank
 integer, intent(in) :: coords(3)
 integer :: coords1(1), coords2(2), ii(1), i, n, e
-write (*,*) coords
 n = count( coords >= 0 )
 if ( n == 3 ) then
     comm = comm3d
@@ -82,7 +81,8 @@ elseif ( n == 1 ) then
     coords1 = coords(i:i)
     call mpi_cart_rank( comm, coords1, rank, e )
 else
-    stop( 'problem in commrank' )
+    write ( 0, * ) 'Problem in commrank: ', coords
+    stop
 end if
 end subroutine
 
@@ -126,7 +126,8 @@ select case( op )
 case( 'min', 'allmin' ); iop = mpi_min
 case( 'max', 'allmax' ); iop = mpi_max
 case( 'sum', 'allsum' ); iop = mpi_sum
-case default; stop
+case default
+stop( 'Problem in ireduce' )
 end select
 call commrank( comm, root, coords )
 if ( op(1:3) == 'all' ) then
@@ -148,7 +149,8 @@ select case( op )
 case( 'min', 'allmin' ); iop = mpi_min
 case( 'max', 'allmax' ); iop = mpi_max
 case( 'sum', 'allsum' ); iop = mpi_sum
-case default; stop
+case default
+stop( 'problem in rreduce1' )
 end select
 call commrank( comm, root, coords )
 i = size(r)
@@ -171,7 +173,8 @@ select case( op )
 case( 'min', 'allmin' ); iop = mpi_min
 case( 'max', 'allmax' ); iop = mpi_max
 case( 'sum', 'allsum' ); iop = mpi_sum
-case default; stop
+case default
+stop( 'problem in rreduce2' )
 end select
 call commrank( comm, root, coords )
 i = size(r)

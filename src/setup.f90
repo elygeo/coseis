@@ -23,7 +23,7 @@ call rank( ip3, ipid, np3 )
 nnoff = nl3 * ip3 - nhalo
 
 ! Master process
-ip3root = (ihypo - 1.0) / nl
+ip3root = (ihypo - 1.0) / nl3
 master = all( ip3 == ip3root )
 
 ! Size of arrays

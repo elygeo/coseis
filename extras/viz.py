@@ -66,7 +66,7 @@ def pdf_merge( layers ):
     out.reset()
     return( out )
 
-def colormap( cmap, colorexp=1.0, nmod=0, modlim=0.5 ):
+def colormap( cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True ):
     """
     Color map creator.
 
@@ -75,6 +75,7 @@ def colormap( cmap, colorexp=1.0, nmod=0, modlim=0.5 ):
     colorexp: exponent applied to the values to shift the colormap.
     nmod: number of brightness modulations applied to the colormap.
     modlim: magnitude of brightness modulations.
+    upsample: increase the number of samples if non-linear map (colorexp != 1)
     """
     if type( cmap ) is str:
         cmap = colormap_library[cmap]
@@ -82,7 +83,7 @@ def colormap( cmap, colorexp=1.0, nmod=0, modlim=0.5 ):
     cmap[1:] /= max( 1.0, cmap[1:].max() )
     v, r, g, b, a = cmap
     v /= v[-1]
-    if colorexp != 1.0:
+    if upsample and colorexp != 1.0:
         n = 16
         x  = np.linspace( 0.0, 1.0, len(v) )
         xi = np.linspace( 0.0, 1.0, (len(v) - 1) * n + 1 )

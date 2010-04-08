@@ -76,14 +76,14 @@ def colorbar( fig, cmap, clim, title=None, rect=None, ticks=None, ticklabels=Non
         text( ax, x, -0.6, s, ha='center', va='top', **kwargs )
     return ax
 
-def lengthscale( ax, x, y, w=None, label='%s', style='k-', bg='w', **kwargs ):
+def lengthscale( ax, x, y, w=None, label='%s', style='k-', lw=0.5, **kwargs ):
     """
     Draw a length scale bar between the points (x[0], y[0]) and (x[1], y[1]).
     """
     x0 = 0.5 * (x[0] + x[1])
     y0 = 0.5 * (y[0] + y[1])
-    dx = abs( x[1] - x[0] )
-    dy = abs( y[1] - y[0] )
+    dx = x[1] - x[0]
+    dy = y[1] - y[0]
     l = np.sqrt( dx*dx + dy*dy )
     if not w:
         x = ax.get_xlim()
@@ -93,7 +93,7 @@ def lengthscale( ax, x, y, w=None, label='%s', style='k-', bg='w', **kwargs ):
         if ax.get_aspect() == 'equal':
             w = 0.005 * (y + x)
         else:
-            w = 0.01 / l * (y * dx + x * dy)
+            w = 0.01 / l * (y * abs( dx ) + x * abs( dy ))
     try:
         label = label % l
     except( TypeError ):
@@ -103,9 +103,8 @@ def lengthscale( ax, x, y, w=None, label='%s', style='k-', bg='w', **kwargs ):
     y =  0, 0, np.nan, -w,  w, np.nan, -w, w
     x, y = 0.5 / l * np.dot( rot, [x, y] )
     theta = np.arctan2( dy, dx ) * 180.0 / np.pi
-    h1 = ax.plot( x0 + x, y0 + y, style, clip_on=False, **kwargs )
-    h2 = ax.text( x0, y0, label, ha='center', va='center',
-        backgroundcolor=bg, rotation=theta )
+    h1 = ax.plot( x0 + x, y0 + y, style, lw=lw, clip_on=False )
+    h2 = text( ax, x0, y0, label, ha='center', va='center', rotation=theta, **kwargs )
     return h1, h2
 
 def savefig( fig, fd=None, format=None, distill=False, **kwargs ):
