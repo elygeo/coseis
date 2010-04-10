@@ -35,11 +35,12 @@ maxram = 30000
 rate = 2.1e6
 fortran_serial = 'pgf95',
 fortran_mpi = 'mpif90',
-_ = '-Mdclchk', '-o'
 fortran_flags = {
-    'g': ('-Ktrap=fp', '-Mbounds', '-g') + _,
-    't': ('-Ktrap=fp', '-Mbounds') + _,
-    'p': ('-fast', '-tp', 'barcelona-64', '-Mprof=func') + _,
-    'O': ('-fast', '-tp', 'barcelona-64') + _,
+    'f': ('-Mdclchk',),
+    'g': ('-Ktrap=fp', '-Mbounds', '-g'),
+    't': ('-Ktrap=fp', '-Mbounds'),
+    'p': ('-fast', '-tp', 'barcelona-64', '-Mprof=func'),
+    'O': ('-fast', '-tp', 'barcelona-64'),
+    '8': ('-Mr8',),
 }
 

@@ -5,7 +5,7 @@ Build SORD binaries and documentation
 import os, sys, getopt
 import util, configure
 
-def build( mode=None, optimize=None ):
+def build( mode=None, optimize=None, realsize='' ):
     """
     Build SORD code.
     """
@@ -16,6 +16,8 @@ def build( mode=None, optimize=None ):
         mode = cf.mode
     if not mode:
         mode = 'sm'
+    if not realsize:
+        realsize = cf.realsize
     base = (
         'globals.f90',
         'diffcn.f90',
@@ -53,14 +55,20 @@ def build( mode=None, optimize=None ):
     if 's' in mode:
         source = base + ('serial.f90',) + common
         for opt in optimize:
-            object_ = os.path.join( '..', 'bin', 'sord-s' + opt )
-            compiler = cf.fortran_serial + cf.fortran_flags[opt]
+            object_ = os.path.join( '..', 'bin', 'sord-s' + opt + realsize )
+            fflags = cf.fortran_flags['f'] + cf.fortran_flags[opt]
+            if realsize == '8':
+                fflags = fflags + cf.fortran_flags['8']
+            compiler = cf.fortran_serial + fflags + ('-o',)
             new |= util.make( compiler, object_, source )
     if 'm' in mode and cf.fortran_mpi:
         source = base + ('mpi.f90',) + common
         for opt in optimize:
-            object_ = os.path.join( '..', 'bin', 'sord-m' + opt )
-            compiler = cf.fortran_mpi + cf.fortran_flags[opt]
+            object_ = os.path.join( '..', 'bin', 'sord-m' + opt + realsize )
+            fflags = cf.fortran_flags['f'] + cf.fortran_flags[opt]
+            if realsize == '8':
+                fflags = fflags + cf.fortran_flags['8']
+            compiler = cf.fortran_mpi + fflags + ('-o',)
             new |= util.make( compiler, object_, source )
     os.chdir( path )
     if new:
@@ -109,17 +117,20 @@ def command_line():
     """
     Process command line options.
     """
-    opts, args = getopt.getopt( sys.argv[1:], 'smgtpO' )
+    opts, args = getopt.getopt( sys.argv[1:], 'smgtpO8' )
     mode = None
     optimize = None
+    realsize = ''
     for o in opts:
         o = o[0][1:]
         if o in 'sm':
             mode = o
         elif o in 'gtpO':
             optimize = o
+        elif o == '8':
+            realsize = '8'
     if not args:
-        build( mode, optimize )
+        build( mode, optimize, realsize )
     else:
         if args[0] == 'docs':
             docs()

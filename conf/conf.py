@@ -6,15 +6,16 @@ import os, pwd
 import numpy as np
 
 # Setup options (also accessible with command line options).
-prepare = True	# True: compile code and setup run directory, False: dry run
-optimize = 'O'	# O: fully optimized, g: debugging, t: testing, p: profiling
-mode = None	# s: serial, m: MPI, None: guess from np3 
-run = False	# i: interactive, q: batch queue, g: debugger
-pre = ''	# pre-processing command
-post = ''	# post-processing command
-itbuff = 10	# max number of timesteps to buffer for 2D & 3D output
-rundir = 'run'	# run directory
-infiles = ()	# files to copy to the sord input directory
+prepare = True    # True: compile code and setup run directory, False: dry run
+optimize = 'O'    # O: fully optimized, g: debugging, t: testing, p: profiling
+realsize = ''     # '': machine default, '8': force 64 bit (double precision)
+mode = None       # s: serial, m: MPI, None: guess from np3 
+run = False       # i: interactive, q: batch queue, g: debugger
+pre = ''          # pre-processing command
+post = ''         # post-processing command
+itbuff = 10       # max number of timesteps to buffer for 2D & 3D output
+rundir = 'run'    # run directory
+infiles = ()      # files to copy to the sord input directory
 
 # User info
 user = pwd.getpwuid( os.geteuid() )[0]
@@ -37,6 +38,8 @@ maxtime = 0
 rate = 1.0e6
 queue = None
 dtype = np.dtype( 'f' ).str
+if realsize:
+    dtype = dtype[:2] + realsize
 
 # Search for file in PATH
 def find( *files ):
@@ -45,58 +48,63 @@ def find( *files ):
             if os.path.isfile( os.path.join( d, f ) ):
                 return f,
 
-# Fortran compilers
+# Look for Fortran
 fortran_serial = find( 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95' )
 fortran_mpi = find( 'mpxlf95_r', 'mpif90' )
-if fortran_serial[0] == 'gfortran':
-    _ = '-fimplicit-none', '-Wall', '-std=f95', '-pedantic', '-o'
-    _ = '-fimplicit-none', '-Wall', '-o'
-    fortran_flags = {
-        'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g') + _,
-        't': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow') + _,
-        'p': ('-O', '-pg') + _,
-        'O': ('-O3',) + _,
+
+# Fortran compiler flags
+fortran_flags = None
+fortran_defaults = {
+    'gfortran': {
+        #'f': ('gfortran', '-fimplicit-none', '-Wall', '-std=f95', '-pedantic'),
+        'f': ('-fimplicit-none', '-Wall'),
+        'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g'),
+        't': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow'),
+        'p': ('-O', '-pg'),
+        'O': ('-O3',),
+        '8': ('-fdefault-real-8',),
+    },
+    'ifort': {
+        'f': ('-u', '-std95', '-warn'),
+        'g': ('-CB', '-traceback', '-g'),
+        't': ('-CB', '-traceback'),
+        'p': ('-O', '-pg'),
+        'O': ('-O3',),
+        '8': ('-r8',),
+    },
+    'pgf90': {
+        'f': ('-Mdclchk',),
+        'g': ('-Ktrap=fp', '-Mbounds', '-g'),
+        't': ('-Ktrap=fp', '-Mbounds'),
+        'p': ('-O', '-Mprof=func'),
+        'O': ('-fast',),
+        '8': ('-Mr8',),
+    },
+    'xlf95_r': {
+        'f': ('-u', '-q64', '-qsuppress=cmpmsg', '-qlanglvl=2003pure', '-qsuffix=f=f90'),
+        'g': ('-C', '-qflttrap', '-qsigtrap', '-g'),
+        't': ('-C', '-qflttrap', '-qsigtrap'),
+        'p': ('-O', '-p'),
+        'O': ('-O4',),
+        '8': ('-qrealsize=8',),
+    },
+    'pathf95': {
+        'f': (),
+        'g': ('-g',),
+        't': (),
+        'p': ('-O', '-p'),
+        'O': ('-i8', '-O3', '-OPT:Ofast', '-fno-math-errno'),
+        '8': ( 'FIXME', ),
     }
-elif fortran_serial[0] == 'ifort':
-    _ = '-u', '-std95', '-warn', '-o'
-    fortran_flags = {
-        'g': ('-CB', '-traceback', '-g') + _,
-        't': ('-CB', '-traceback') + _,
-        'p': ('-O', '-pg') + _,
-        'O': ('-O3',) + _,
-    }
-elif fortran_serial[0] == 'xlf95_r':
-    _ = '-u', '-q64', '-qsuppress=cmpmsg', '-qlanglvl=2003pure', '-qsuffix=f=f90', '-o'
-    fortran_flags = {
-        'g': ('-C', '-qflttrap', '-qsigtrap', '-g') + _,
-        't': ('-C', '-qflttrap', '-qsigtrap') + _,
-        'p': ('-O', '-p') + _,
-        'O': ('-O4',) + _,
-    }
-elif fortran_serial[0] == 'pgf90':
-    _ = '-Mdclchk', '-o'
-    fortran_flags = {
-        'g': ('-Ktrap=fp', '-Mbounds', '-g') + _,
-        't': ('-Ktrap=fp', '-Mbounds') + _,
-        'p': ('-O', '-Mprof=func') + _,
-        'O': ('-fast',) + _,
-    }
-elif fortran_serial[0] == 'pathf95':
-    _ = '-o',
-    fortran_flags = {
-        'g': ('-g',) + _,
-        't': _,
-        'p': ('-O', '-p') + _,
-        'O': ('-i8', '-O3', '-OPT:Ofast', '-fno-math-errno') + _,
-    }
-elif fortran_serial[0] == 'f95' and os.uname()[0] == 'SunOS':
-    _ = '-u', '-o'
-    fortran_flags = {
-        'g': ('-C', '-ftrap=common', '-w4', '-g') + _,
-        't': ('-C', '-ftrap=common') + _,
-        'p': ('-O', '-pg') + _,
-        'O': ('-fast', '-fns') + _,
-    }
-else:
-    sys.exit( 'Fortran compiler not found' )
+}
+
+if os.uname()[0] != 'SunOS':
+    fortran_defaults.update( { 'f95': {
+        'f': ('-u'),
+        'g': ('-C', '-ftrap=common', '-w4', '-g'),
+        't': ('-C', '-ftrap=common'),
+        'p': ('-O', '-pg'),
+        'O': ('-fast', '-fns'),
+        '8': ( 'FIXME', ),
+    } } )
 

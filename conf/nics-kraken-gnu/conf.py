@@ -32,11 +32,12 @@ maxtime = 24, 00
 rate = 1e6 # just a guess
 fortran_serial = 'ftn',
 fortran_mpi = 'ftn',
-_ = '-fimplicit-none', '-Wall', '-o'
 fortran_flags = {
-    'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g') + _,
-    't': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow') + _,
-    'p': ('-O', '-pg') + _,
-    'O': ('-O3',) + _,
+    'f': ('-fimplicit-none', '-Wall'),
+    'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g'),
+    't': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow'),
+    'p': ('-O', '-pg'),
+    'O': ('-O3',),
+    '8': ('-fdefault-real-8',),
 }
 

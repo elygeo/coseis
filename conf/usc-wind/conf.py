@@ -12,11 +12,4 @@ maxram = 800
 rate = 1.0e6
 mode = 's'
 fortran_serial = 'gfortran',
-_ = '-fimplicit-none', '-Wall', '-o'
-fortran_flags = {
-    'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g') + _,
-    't': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow') + _,
-    'p': ('-O', '-pg') + _,
-    'O': ('-O3',) + _,
-}
 

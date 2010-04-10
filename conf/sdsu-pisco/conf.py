@@ -15,11 +15,4 @@ maxram = 30000
 fortran_serial = 'ifort',
 fortran_serial = 'gfortran',
 fortran_mpi = 'mpif90',
-_ = '-fimplicit-none', '-Wall', '-o'
-fortran_flags = {
-    'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g') + _,
-    't': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow') + _,
-    'p': ('-O', '-pg') + _,
-    'O': ('-O3',) + _,
-}
 

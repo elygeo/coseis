@@ -26,11 +26,4 @@ maxcores = 2
 maxram = 1800
 fortran_serial = 'ifort',
 fortran_mpi = 'mpif90',
-_ = '-u', '-std95', '-warn', '-o'
-fortran_flags = {
-    'g': ('-CB', '-traceback', '-g') + _,
-    't': ('-CB', '-traceback') + _,
-    'p': ('-O', '-pg') + _,
-    'O': ('-O3',) + _,
-}
 

@@ -23,6 +23,12 @@ def configure( save=False, machine=None ):
         conf['machine'] = machine
         if save:
             open( 'machine', 'w' ).write( machine )
+    if conf['fortran_flags'] == None:
+        fc = conf['fortran_serial'][0]
+        conf['fortran_flags'] = conf['fortran_defaults'][fc]
+    del( conf['fortran_defaults'] )
+    if conf['realsize']:
+        conf['dtype'] = conf['dtype'][:2] + conf['realsize']
     util.prune( conf, pattern='(^_)|(^.$)' )
     os.chdir( cwd )
     return conf
