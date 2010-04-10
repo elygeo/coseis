@@ -41,11 +41,11 @@ bc2 = -1, 1, -2
 for dx, np3 in runs_:
 
     # Simulation directory
-    rundir = '~/run/tpv3-%03.0f' % dx
+    rundir = 'run/tpv3-%03.0f' % dx
 
     # Model dimentions
     dt = dx / 12500.0				# time step size
-    dx = 3 * [dx]				# spatial step size
+    dx = dx, dx, dx				# spatial step size
     nt = int( 12.0 / dt + 1.5 )			# number of time steps
     nn = ( 
         int( 16500.0 / dx[0] + 21.5 ),		# number of mesh nodes in x

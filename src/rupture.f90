@@ -11,7 +11,7 @@ use m_surfnormals
 use m_util
 use m_fieldio
 use m_stats
-real :: rr
+real :: rr, xhypo(3), xi(3), w
 integer :: i1(3), i2(3), i, j, k, l
 
 if ( ifn == 0 ) return
@@ -114,16 +114,33 @@ do i = 1, 3
     t3(:,:,:,3) * nhat(:,:,:,i)
 end do
 
-! Hypocentral radius
-call rbroadcast1( xhypo, ip2root )
-do i = 1, 3
-    select case( ifn )
-    case ( 1 ); t2(1,:,:,i) = w1(irup,:,:,i) - xhypo(i)
-    case ( 2 ); t2(:,1,:,i) = w1(:,irup,:,i) - xhypo(i)
-    case ( 3 ); t2(:,:,1,i) = w1(:,:,irup,i) - xhypo(i)
-    end select
-end do
-rhypo = sqrt( sum( t2 * t2, 4 ) )
+! Hypocentral radius needed if doing nucleation
+if ( rcrit > 0.0 .and. vrup > 0.0 ) then
+    xhypo = 0.0
+    xi = ihypo - nnoff
+    i1 = int( xi )
+    if ( all( i1 >= 1 .and. i1 < nm ) ) then
+        do l = i1(3), i1(3)+1
+        do k = i1(2), i1(2)+1
+        do j = i1(1), i1(1)+1
+            w = (1.0-abs(xi(1)-j)) * (1.0-abs(xi(2)-k)) * (1.0-abs(xi(3)-l))
+            do i = 1, 3
+                xhypo(i) = xhypo(i) + w * w1(j,k,l,i)
+            end do
+        end do
+        end do
+        end do
+    end if
+    call rbroadcast1( xhypo, ip2root )
+    do i = 1, 3
+        select case( ifn )
+        case ( 1 ); t2(1,:,:,i) = w1(irup,:,:,i) - xhypo(i)
+        case ( 2 ); t2(:,1,:,i) = w1(:,irup,:,i) - xhypo(i)
+        case ( 3 ); t2(:,:,1,i) = w1(:,:,irup,i) - xhypo(i)
+        end select
+    end do
+    rhypo = sqrt( sum( t2 * t2, 4 ) )
+end if
 
 ! Resample mu on to fault plane nodes for moment calculatioin
 select case( ifn )

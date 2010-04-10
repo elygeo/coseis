@@ -41,19 +41,13 @@ end if
 call mpi_comm_rank( comm3d, ip, e  )
 call mpi_cart_coords( comm3d, ip, 3, ip3, e )
 ipid = ip3(1) + np3(1) * ( ip3(2) + np3(2) * ip3(3) )
-comm1d = mpi_comm_self
-comm2d = mpi_comm_self
 do i = 1, 3
-    if ( np3(i) > 1 ) then
-        hat = .false.
-        hat(i) = .true.
-        call mpi_cart_sub( comm3d, hat, comm1d(i), e )
-    end if
-    if ( product( (/ np3(:i-1), np3(i+1:) /) ) > 1 ) then
-        hat = .true.
-        hat(i) = .false.
-        call mpi_cart_sub( comm3d, hat, comm2d(i), e )
-    end if
+    hat = .false.
+    hat(i) = .true.
+    call mpi_cart_sub( comm3d, hat, comm1d(i), e )
+    hat = .true.
+    hat(i) = .false.
+    call mpi_cart_sub( comm3d, hat, comm2d(i), e )
 end do
 end subroutine
 
@@ -127,7 +121,7 @@ case( 'min', 'allmin' ); iop = mpi_min
 case( 'max', 'allmax' ); iop = mpi_max
 case( 'sum', 'allsum' ); iop = mpi_sum
 case default
-stop( 'Problem in ireduce' )
+stop 'Problem in ireduce'
 end select
 call commrank( comm, root, coords )
 if ( op(1:3) == 'all' ) then
@@ -150,7 +144,7 @@ case( 'min', 'allmin' ); iop = mpi_min
 case( 'max', 'allmax' ); iop = mpi_max
 case( 'sum', 'allsum' ); iop = mpi_sum
 case default
-stop( 'problem in rreduce1' )
+stop 'problem in rreduce1'
 end select
 call commrank( comm, root, coords )
 i = size(r)
@@ -174,7 +168,7 @@ case( 'min', 'allmin' ); iop = mpi_min
 case( 'max', 'allmax' ); iop = mpi_max
 case( 'sum', 'allsum' ); iop = mpi_sum
 case default
-stop( 'problem in rreduce2' )
+stop 'problem in rreduce2'
 end select
 call commrank( comm, root, coords )
 i = size(r)

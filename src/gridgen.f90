@@ -13,7 +13,7 @@ use m_fieldio
 use m_surfnormals
 integer :: i1(3), i2(3), i3(3), i4(3), bc(3), &
     i, j, k, l, j1, k1, l1, j2, k2, l2, b, c
-real :: xi(3), m(9), tol, h, w
+real :: m(9), tol, h
 integer, allocatable :: seed(:)
 
 if ( master ) write( 0, * ) 'Grid generation'
@@ -140,23 +140,6 @@ call fieldio( '>', 'x3', w1(:,:,:,3) )
 call fieldio( '>', 'c1', w2(:,:,:,1) )
 call fieldio( '>', 'c2', w2(:,:,:,2) )
 call fieldio( '>', 'c3', w2(:,:,:,3) )
-
-! Hypocenter location
-xhypo = 0.0
-xi = ihypo - nnoff
-i1 = int( xi )
-if ( all( i1 >= 1 .and. i1 < nm ) ) then
-    do l = i1(3), i1(3)+1
-    do k = i1(2), i1(2)+1
-    do j = i1(1), i1(1)+1
-        w = (1.0-abs(xi(1)-j)) * (1.0-abs(xi(2)-k)) * (1.0-abs(xi(3)-l))
-        do i = 1, 3
-            xhypo(i) = xhypo(i) + w * w1(j,k,l,i)
-        end do
-    end do
-    end do
-    end do
-end if
 
 ! Boundary surface normals
 !j = nm(1)

@@ -14,7 +14,6 @@ character(16) :: source, timefunction
 ! Miscellaneous parameters
 real, parameter :: pi = 3.14159265
 real :: &
-    xhypo(3),       & ! hypocenter coordinates
     mptimer,        & ! MPI timing
     iotimer,        & ! I/O timing
     tm                ! time

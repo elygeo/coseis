@@ -1,8 +1,8 @@
 SCEC validation problem TPV3
 ----------------------------
 
-These scrips reproduce Figures 3, 4 and 5, comparing SORD to boundary integral solutions,
-and Figure 7, testing numerical convergence, from:
+These scrips reproduce Figures 3, 4 and 5, comparing SORD to boundary integral
+solutions, and Figure 7, testing numerical convergence, from:
 
 Ely, G. P., S. M. Day, and J.-B. Minster (2009),
 *A support-operator method for 3D rupture dynamics*,

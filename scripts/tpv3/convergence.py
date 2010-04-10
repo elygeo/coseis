@@ -11,8 +11,9 @@ degree = 1
 dirs = glob.glob( '[0-9]*' )
 dirs = glob.glob( '[0-9]*' )[3:]
 
-meta = sord.util.loadmeta( dirs[0] )
-path = os.path.join( dirs[0], 'out' ) + os.sep
+path = dirs[0] + os.sep
+meta = sord.util.load( path + 'meta.py' )
+path += 'out' + os.sep
 n = meta.shape['trup']
 x0  = np.fromfile( path + 'x1',   'f' ).reshape( n[::-1] ).T
 y0  = np.fromfile( path + 'x2',   'f' ).reshape( n[::-1] ).T
@@ -29,8 +30,9 @@ sures = []
 svres = []
 
 for d in dirs[1:]:
-    path = os.path.join( d, 'out' ) + os.sep
-    meta = sord.util.loadmeta( d )
+    path = d + os.sep
+    meta = sord.util.load( path + 'meta.py' )
+    path += 'out' + os.sep
     dx += [ int( meta.dx[0] + 0.5 ) ]
     n = meta.shape['trup']
     x = np.fromfile( path + 'x1',   'f' ).reshape( n[::-1] ).T
@@ -55,8 +57,7 @@ for i in range( len( ttres ) ):
 # Plotting
 if 0:
     plt.rcdefaults()
-    font = { 'size': 8 }
-    plt.rc( 'font', **font )
+    plt.rc( 'font', size=8 }
     plt.rc( 'axes', linewidth=0.5 )
     plt.rc( 'ytick.minor', size=1 )
     plt.rc( 'ytick.major', size=2 )

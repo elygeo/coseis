@@ -1,73 +1,89 @@
 #!/usr/bin/env python
-import os
+import os, sord
 import numpy as np
 import matplotlib.pyplot as plt
-import sord
 
-bi_dir = 'bi/'
-so_dir = os.path.expanduser( '~/run/tpv3-150/' )
-meta = sord.util.loadmeta( so_dir )
+# parameters
+bipath = 'bi/'
+path = 'run/tpv3-300/'
+path = 'run/150/'
+path = 'run/tpv3-150/'
+stations = 'P1a', 'P2a'
+stations = 'P1', 'P2'
+meta = sord.util.load( path + 'meta.py' )
+dx = meta.dx
 dt = meta.dt
 nt = meta.nt
+ihypo = meta.ihypo
 
 # Time histories
-t1 = dt * np.arange( nt )
-t2 = np.fromfile( bi_dir + 'time', 'f' )
-for i, sta in enumerate( ('P1', 'P2') ):
+t1 = np.arange( nt ) * dt
+t2 = np.fromfile( bipath + 'time', 'f' )
+for i, sta in enumerate( stations ):
     fig = plt.figure(i+1)
     fig.clf()
 
     ax = fig.add_subplot( 2, 1, 1 )
-    f1 = 1e-6 * np.fromfile( so_dir + 'out/' + sta + '-ts1', 'f' )
-    f2 = np.fromfile( bi_dir + sta + '-ts', 'f' )
+    f1 = np.fromfile( path + 'out/' + sta + '-ts1', 'f' ) * 1e-6
+    f2 = np.fromfile( bipath + sta[:2] + '-ts', 'f' )
     ax.plot( t1, f1, 'k-', t2, f2, 'k--' )
-    ax.axis([ 1., 11., 60., 85. ])
-    ax.set_title( sta, position=(0.05,0.83), ha='left', va='center' )
+    ax.axis( [1, 11, 60, 85] )
+    ax.set_title( sta, position=(0.05, 0.83), ha='left', va='center' )
     ax.set_xticklabels( [] )
     ax.set_ylabel( 'Shear stress (MPa)' )
-    #leg = fig.legend( ('SOM', 'BI'), loc=(.78, .6) )
+    #leg = fig.legend( ('SOM', 'BI'), loc=(0.78, 0.6) )
 
     ax = fig.add_subplot( 2, 1, 2 )
-    f1 = np.fromfile( so_dir + 'out/' + sta + '-sv1', 'f' )
-    f2 = np.fromfile( bi_dir + sta + '-sv', 'f' )
+    f1 = np.fromfile( path + 'out/' + sta + '-sv1', 'f' )
+    f2 = np.fromfile( bipath + sta[:2] + '-sv', 'f' )
     ax.plot( t1, f1, 'k-', t2, f2, 'k--' )
     ax.set_yticks( [0, 1, 2, 3] )
     ax.set_ylabel( 'Slip rate (m/s)' )
 
     ax.twinx()
-    f1 = np.fromfile( so_dir + 'out/' + sta + '-su1', 'f' )
-    f2 = np.fromfile( bi_dir + sta + '-su', 'f' )
+    f1 = np.fromfile( path + 'out/' + sta + '-su1', 'f' )
+    f2 = np.fromfile( bipath + sta[:2] + '-su', 'f' )
     ax.plot( t1, f1, 'k-', t2, f2, 'k--' )
-    ax.axis([ 1., 11., -0.5, 3.5 ])
+    ax.axis( [1, 11, -0.5, 3.5] )
     ax.set_yticks( [0, 1, 2, 3] )
     ax.set_ylabel( 'Slip (m)' )
     ax.set_xlabel( 'Time (s)' )
-    ax.set_title( sta, position=(0.05,0.83), ha='left', va='center' )
+    ax.set_title( sta, position=(0.05, 0.83), ha='left', va='center' )
     fig.canvas.draw()
+    f = path + sta + '.pdf'
+    print f
+    fig.savefig( f )
 
 # Rupture time contour
-v = 0.5 * np.arange( -20, 20 )
-n = meta.shape['trup']
-x1 = 0.001 * np.fromfile( so_dir + 'out/x1', 'f' ).reshape( n[::-1] ).T
-x2 = 0.001 * np.fromfile( so_dir + 'out/x2', 'f' ).reshape( n[::-1] ).T
-f = np.fromfile( so_dir + 'out/trup', 'f' ).reshape( n[::-1] ).T
 fig = plt.figure( 3 )
 fig.clf()
-ax = fig.add_subplot(111)
-ax.contour( x1, x2, f, v, colors='k' )
-ax.hold( True )
+ax = fig.add_subplot( 111 )
+v = np.arange( -20, 20 ) * 0.5
+n = meta.shape['trup']
+x = np.fromfile( path + 'out/x1', 'f' ).reshape( n[::-1] ).T
+y = np.fromfile( path + 'out/x2', 'f' ).reshape( n[::-1] ).T
+t = np.fromfile( path + 'out/trup', 'f' ).reshape( n[::-1] ).T
+if not hasattr( meta, 'fixhypo' ):
+    x = x - dx[0] * (ihypo[0] - 1)
+    y = y - dx[1] * (ihypo[1] - 1)
+x *= 0.001
+y *= 0.001
+ax.contour( x, y, t, v, colors='k' )
+#ax.hold( True )
 n = 300, 150
 dx = 0.1
-x1 = dx * np.arange( n[0] )
-x2 = dx * np.arange( n[1] )
-x1 = x1 - 0.5 * x1[-1]
-x2 = x2 - 0.5 * x2[-1]
-x2, x1 = np.meshgrid( x2, x1 )
-trup = np.fromfile( bi_dir + 'trup', 'f' ).reshape( n[::-1] ).T
-ax.contour( x1, x2, -trup, v, colors='k' )
+x = dx * np.arange( n[0] )
+y = dx * np.arange( n[1] )
+x -= 0.5 * x[-1]
+y -= 0.5 * y[-1]
+y, x = np.meshgrid( y, x )
+t = np.fromfile( bipath + 'trup', 'f' ).reshape( n[::-1] ).T
+ax.contour( x, y, -t, v, colors='k' )
 ax.axis( 'image' )
-ax.axis( (-15, 15, -7.5, 7.5) )
-#ax.axis( (-15, 0, -7.5, 0) )
+#ax.axis( [-15, 0, -7.5, 0] )
 fig.canvas.draw()
+f = path + 'trup.pdf'
+print f
+fig.savefig( f )
 fig.show()
 

@@ -107,6 +107,26 @@ def lengthscale( ax, x, y, w=None, label='%s', style='k-', lw=0.5, **kwargs ):
     h2 = text( ax, x0, y0, label, ha='center', va='center', rotation=theta, **kwargs )
     return h1, h2
 
+def compass_rose( ax, x, y, r, style='k-', lw=1.0, **kwargs ):
+    theta = 0.0
+    if 'rotation' in kwargs:
+        theta = kwargs['rotation']
+    kwargs.update( rotation_mode='anchor' )
+    c  = np.cos( theta / 180.0 * np.pi )
+    s  = np.sin( theta / 180.0 * np.pi )
+    x_ = x + r * np.array( [(c,  s), (-c, -s)] )
+    y_ = y + r * np.array( [(s, -c), (-s,  c)] )
+    h  = [ ax.plot( x_, y_, style, lw=lw, clip_on=False ) ]
+    x_ = x + r * np.array( [(c, -c), ( s, -s)] ) * 1.3
+    y_ = y + r * np.array( [(s, -s), (-c,  c)] ) * 1.3
+    h += [
+        text( ax, x_[0,0], y_[0,0], 'E', ha='left', va='center', **kwargs ),
+        text( ax, x_[0,1], y_[0,1], 'W', ha='right', va='center', **kwargs ),
+        text( ax, x_[1,0], y_[1,0], 'S', ha='center', va='top', **kwargs ),
+        text( ax, x_[1,1], y_[1,1], 'N', ha='center', va='bottom', **kwargs ),
+    ]
+    return h
+
 def savefig( fig, fd=None, format=None, distill=False, **kwargs ):
     """
     Enhanced version of Matplotlib savefig command.
