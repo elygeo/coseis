@@ -25,8 +25,8 @@ runs_ = [
     (  10.0, (4, 16, 16) ),
 ]
 runs_ = [ (  50.0, (1, 1, 2) ), ]
-runs_ = [ ( 300.0, (1, 1, 2) ), ]
 runs_ = [ ( 150.0, (1, 1, 2) ), ]
+runs_ = [ ( 300.0, (1, 1, 2) ), ]
 
 # Near side boundary conditions:
 # PML absorbing boundaries for the x, y and z boundaries

@@ -39,15 +39,6 @@ call fieldio( '<>', 'ts',  t3(:,:,:,1) )
 call fieldio( '<>', 'td',  t3(:,:,:,2) )
 call fieldio( '<>', 'tn',  t3(:,:,:,3) )
 
-! Test for endian problems
-if ( any( mus /= mus ) .or. maxval( mus ) > huge( rr ) ) stop 'NaN/Inf in mus'
-if ( any( mud /= mud ) .or. maxval( mud ) > huge( rr ) ) stop 'NaN/Inf in mud'
-if ( any( dc  /= dc  ) .or. maxval( dc  ) > huge( rr ) ) stop 'NaN/Inf in dc'
-if ( any( co  /= co  ) .or. maxval( co  ) > huge( rr ) ) stop 'NaN/Inf in co'
-if ( any( t1  /= t1  ) .or. maxval( t1  ) > huge( rr ) ) stop 'NaN/Inf in sigma'
-if ( any( t2  /= t2  ) .or. maxval( t2  ) > huge( rr ) ) stop 'NaN/Inf in sigma'
-if ( any( t3  /= t3  ) .or. maxval( t3  ) > huge( rr ) ) stop 'NaN/Inf in tau'
-
 ! Normal traction check
 i1 = maxloc( t3(:,:,:,3) )
 rr = t3(i1(1),i1(2),i1(3),3)

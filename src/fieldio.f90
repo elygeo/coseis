@@ -206,6 +206,11 @@ case( '=r', '+r', '=R', '+R' )
             call pdelete
             cycle loop
         end if
+        if ( any( io%buff(:,:n(4)) /= io%buff(:,:n(4)) ) .or. &
+            maxval( io%buff(:,:n(4)) ) > huge( val ) ) then
+            write( 0, * ) 'ERROR: NaN/Inf in ', io%filename
+            stop
+        end if
     end if
     io%ib = io%ib + 1
     i = 0

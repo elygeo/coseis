@@ -9,6 +9,10 @@ easy_install bzr
 # SORD
 cd "${prefix}"
 bzr get http://earth.usc.edu/~gely/sord
+mkdir -p bin
+cd bin
+ln -s ../sord/extras/swab.py .
+ln -s ../sord/extras/stats.py .
 
 # SCEC CVM4
 cd "${prefix}"
