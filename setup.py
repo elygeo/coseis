@@ -62,7 +62,10 @@ def build( mode=None, optimize=None, realsize='' ):
             compiler = cf.fortran_serial + fflags + ('-o',)
             new |= util.make( compiler, object_, source )
     if 'm' in mode and cf.fortran_mpi:
-        source = base + ('mpi.f90',) + common
+        if realsize == '8':
+            source = base + ('mpireal8.f90',) + ('mpi.f90',) + common
+        else:
+            source = base + ('mpireal.f90',) + ('mpi.f90',) + common
         for opt in optimize:
             object_ = os.path.join( '..', 'bin', 'sord-m' + opt + realsize )
             fflags = cf.fortran_flags['f'] + cf.fortran_flags[opt]
