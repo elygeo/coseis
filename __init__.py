@@ -3,6 +3,7 @@
 Support Operator Rupture Dynamics
 """
 import os, sys, re, math
+import numpy as np
 import util, configure, fieldnames
 from extras import coord, egmm, signal, source, data, viz, plt, mlab, swab
 try:
@@ -87,8 +88,7 @@ def stage( inputs ):
         elif o in ('-O', '--optimized'):
             cf.optimize = 'O'
         elif o in ('-8', '--realsize8'):
-            cf.realsize = '8'
-            cf.dtype = cf.dtype[:2] + '8'
+            cf.dtype = 'f8'
         elif o in ('-f', '--force'):
             if os.path.isdir( cf.rundir ):
                 shutil.rmtree( cf.rundir )
@@ -96,6 +96,8 @@ def stage( inputs ):
             sys.exit( 'Error: unknown option: ' + o )
     if not cf.prepare:
         cf.run = False
+    cf.dtype = np.dtype( cf.dtype ).str
+    pm.dtype = cf.dtype
 
     # Partition for parallelization
     pm.nn = tuple( int(i) for i in pm.nn )
@@ -160,7 +162,7 @@ def stage( inputs ):
     # Compile code
     if not cf.prepare:
         return cf
-    setup.build( cf.mode, cf.optimize, cf.realsize )
+    setup.build( cf.mode, cf.optimize, cf.dtype )
 
     # Create run directory
     print( 'Run directory: ' + cf.rundir )
@@ -178,8 +180,8 @@ def stage( inputs ):
     cf.name = os.path.basename( cf.rundir )
     cf.rundir = os.path.realpath( cf.rundir )
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    cf.bin = os.path.join( '.', 'sord-' + cf.mode + cf.optimize + cf.realsize )
-    path = os.path.join( 'bin', 'sord-' + cf.mode + cf.optimize + cf.realsize )
+    cf.bin = os.path.join( '.', 'sord-' + cf.mode + cf.optimize + cf.dtype[-1] )
+    path = os.path.join( 'bin', 'sord-' + cf.mode + cf.optimize + cf.dtype[-1] )
     shutil.copy( path, cf.rundir )
     if os.path.isfile( 'sord.tgz' ):
         shutil.copy( 'sord.tgz', cf.rundir )

@@ -1,10 +1,9 @@
 ! Collective routines - MPI version
 module m_collective
 use mpi
-use m_mpireal
 implicit none
 integer, parameter :: file_null = mpi_file_null
-integer, private :: np3(3), comm1d(3), comm2d(3), comm3d
+integer, private :: np3(3), comm1d(3), comm2d(3), comm3d, rtype
 contains
 
 ! Initialize
@@ -22,6 +21,18 @@ subroutine finalize
 use mpi
 integer :: e
 call mpi_finalize( e )
+end subroutine
+
+! Set real type
+subroutine setrealtype( dtype )
+use mpi
+character(3), intent(in) :: dtype
+rtype = mpi_real
+if ( dtype(3:3) == '4' ) then
+    rtype = mpi_real4
+elseif ( dtype(3:3) == '8' ) then
+    rtype = mpi_real8
+end if
 end subroutine
 
 ! Process rank

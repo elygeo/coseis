@@ -87,9 +87,9 @@ do i = 1, 3
     j = modulo( i , 3 ) + 1
     k = modulo( i + 1, 3 ) + 1
     t0(:,:,:,i) = &
-    t1(:,:,:,i) * nhat(:,:,:,i) + &
-    t2(:,:,:,j) * nhat(:,:,:,k) + &
-    t2(:,:,:,k) * nhat(:,:,:,j)
+        t1(:,:,:,i) * nhat(:,:,:,i) + &
+        t2(:,:,:,j) * nhat(:,:,:,k) + &
+        t2(:,:,:,k) * nhat(:,:,:,j)
 end do
 
 ! Ts2 vector
@@ -284,6 +284,7 @@ end do
 call vector_bc( w1, bc1, bc2, i1bc, i2bc )
 
 ! Output
+!call fieldio( '>', 'psi', psi         ) ! [ZS]
 call fieldio( '>', 't1',  t1(:,:,:,1) )
 call fieldio( '>', 't2',  t1(:,:,:,2) )
 call fieldio( '>', 't3',  t1(:,:,:,3) )

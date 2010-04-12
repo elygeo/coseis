@@ -8,7 +8,6 @@ import numpy as np
 # Setup options (also accessible with command line options).
 prepare = True    # True: compile code and setup run directory, False: dry run
 optimize = 'O'    # O: fully optimized, g: debugging, t: testing, p: profiling
-realsize = ''     # '': machine default, '8': force 64 bit (double precision)
 mode = None       # s: serial, m: MPI, None: guess from np3 
 run = False       # i: interactive, q: batch queue, g: debugger
 pre = ''          # pre-processing command
@@ -37,9 +36,8 @@ maxram = 0
 maxtime = 0
 rate = 1.0e6
 queue = None
-dtype = np.dtype( 'f' ).str
-if realsize:
-    dtype = dtype[:2] + realsize
+native_dtype = np.dtype( 'f' ).str
+dtype = native_dtype
 
 # Search for file in PATH
 def find( *files ):

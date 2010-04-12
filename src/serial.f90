@@ -8,12 +8,19 @@ contains
 ! Initialize
 subroutine initialize( np0, ip )
 integer, intent(out) :: np0, ip
-np0 = 1
 ip = 0
+np0 = 1
 end subroutine
 
 ! Finalize
 subroutine finalize
+end subroutine
+
+! Set real type
+subroutine setrealtype( dtype )
+character(3), intent(in) :: dtype
+integer :: i
+i = len( dtype )
 end subroutine
 
 ! Process rank

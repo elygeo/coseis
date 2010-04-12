@@ -3,9 +3,10 @@
 Build SORD binaries and documentation
 """
 import os, sys, getopt
+import numpy as np
 import util, configure
 
-def build( mode=None, optimize=None, realsize='' ):
+def build( mode=None, optimize=None, dtype=None ):
     """
     Build SORD code.
     """
@@ -16,8 +17,8 @@ def build( mode=None, optimize=None, realsize='' ):
         mode = cf.mode
     if not mode:
         mode = 'sm'
-    if not realsize:
-        realsize = cf.realsize
+    if not dtype:
+        dtype = cf.dtype
     base = (
         'globals.f90',
         'diffcn.f90',
@@ -52,25 +53,24 @@ def build( mode=None, optimize=None, realsize='' ):
         os.mkdir( f )
     new = False
     os.chdir( os.path.join( path, 'src' ) )
+    dtype = np.dtype( dtype ).str
+    realsize = dtype[-1]
     if 's' in mode:
         source = base + ('serial.f90',) + common
         for opt in optimize:
             object_ = os.path.join( '..', 'bin', 'sord-s' + opt + realsize )
             fflags = cf.fortran_flags['f'] + cf.fortran_flags[opt]
-            if realsize == '8':
-                fflags = fflags + cf.fortran_flags['8']
+            if dtype != cf.native_dtype:
+                fflags = fflags + cf.fortran_flags[realsize]
             compiler = cf.fortran_serial + fflags + ('-o',)
             new |= util.make( compiler, object_, source )
     if 'm' in mode and cf.fortran_mpi:
-        if realsize == '8':
-            source = base + ('mpireal8.f90',) + ('mpi.f90',) + common
-        else:
-            source = base + ('mpireal.f90',) + ('mpi.f90',) + common
+        source = base + ('mpi.f90',) + common
         for opt in optimize:
             object_ = os.path.join( '..', 'bin', 'sord-m' + opt + realsize )
             fflags = cf.fortran_flags['f'] + cf.fortran_flags[opt]
-            if realsize == '8':
-                fflags = fflags + cf.fortran_flags['8']
+            if dtype != cf.native_dtype:
+                fflags = fflags + cf.fortran_flags[realsize]
             compiler = cf.fortran_mpi + fflags + ('-o',)
             new |= util.make( compiler, object_, source )
     os.chdir( path )
@@ -123,17 +123,17 @@ def command_line():
     opts, args = getopt.getopt( sys.argv[1:], 'smgtpO8' )
     mode = None
     optimize = None
-    realsize = ''
+    dtype = None
     for o in opts:
         o = o[0][1:]
         if o in 'sm':
             mode = o
         elif o in 'gtpO':
             optimize = o
-        elif o == '8':
-            realsize = '8'
+        elif o in '8':
+            dtype = 'f' + o
     if not args:
-        build( mode, optimize, realsize )
+        build( mode, optimize, dtype )
     else:
         if args[0] == 'docs':
             docs()

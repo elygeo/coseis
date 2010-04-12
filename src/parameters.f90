@@ -92,6 +92,7 @@ case( 'itstop' );       read( str, *, iostat=ios ) key, op, itstop
 case( 'debug' );        read( str, *, iostat=ios ) key, op, debug
 case( 'mpin' );         read( str, *, iostat=ios ) key, op, mpin
 case( 'mpout' );        read( str, *, iostat=ios ) key, op, mpout
+case( 'dtype' );        read( str, *, iostat=ios ) key, op, dtype
 case default
     select case( key(1:1) )
     case( '=', '+' )
