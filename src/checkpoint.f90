@@ -37,14 +37,23 @@ if ( it == 0 ) return
 if ( master ) write( 0, * ) 'Checkpoint found, starting from ', it
 i = modulo( it / itcheck0, 2 )
 write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', i, '-', ipid
-inquire( iolength=i ) &
-    tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
-    psv, trup, tarr, efric
-open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
-read( 1, rec=1 ) &
-    tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
-    psv, trup, tarr, efric
-close( 1 )
+if ( ifn == 0 ) then
+    inquire( iolength=i ) &
+        tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
+    open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
+    read( 1, rec=1 ) &
+        tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
+    close( 1 )
+else
+    inquire( iolength=i ) &
+        tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
+        psv, trup, tarr, efric
+    open( 1, file=str, recl=i, form='unformatted', access='direct', status='old' )
+    read( 1, rec=1 ) &
+        tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
+        psv, trup, tarr, efric
+    close( 1 )
+end if
 iotimer = iotimer + timer( 2 )
 end subroutine
 
@@ -70,14 +79,23 @@ if ( itcheck <= 0 ) return
 if ( modulo( it, itcheck ) /= 0 ) return
 i = modulo( it / itcheck, 2 )
 write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', i, '-', ipid
-inquire( iolength=i ) &
-    tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
-    psv, trup, tarr, efric
-open( 1, file=str, recl=i, form='unformatted',access='direct',status='replace' )
-write( 1, rec=1 ) &
-    tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
-    psv, trup, tarr, efric
-close( 1 )
+if ( ifn == 0 ) then
+    inquire( iolength=i ) &
+        tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
+    open( 1, file=str, recl=i, form='unformatted',access='direct',status='replace' )
+    write( 1, rec=1 ) &
+        tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6
+    close( 1 )
+else
+    inquire( iolength=i ) &
+        tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
+        psv, trup, tarr, efric
+    open( 1, file=str, recl=i, form='unformatted',access='direct',status='replace' )
+    write( 1, rec=1 ) &
+        tm, vv, uu, w1, sl, p1, p2, p3, p4, p5, p6, g1, g2, g3, g4, g5, g6, &
+        psv, trup, tarr, efric
+    close( 1 )
+end if
 write( str, '(a,i6.6)' ) 'checkpoint/it', ipid
 open( 1, file=str, status='replace' )
 write( 1, * ) it, itcheck

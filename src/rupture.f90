@@ -25,6 +25,14 @@ co = 0.0
 t1 = 0.0
 t2 = 0.0
 t3 = 0.0
+!f0 = 0.0 ! [ZS]
+!v0 = 0.0 ! [ZS]
+!fw = 0.0 ! [ZS]
+!vw = 0.0 ! [ZS]
+!ll = 0.0 ! [ZS]
+!af = 0.0 ! [ZS]
+!bf = 0.0 ! [ZS]
+!psi = 0.0 ! [ZS]
 call fieldio( '<>', 'mus', mus         )
 call fieldio( '<>', 'mud', mud         )
 call fieldio( '<>', 'dc',  dc          )
@@ -38,6 +46,13 @@ call fieldio( '<>', 's12', t2(:,:,:,3) )
 call fieldio( '<>', 'ts',  t3(:,:,:,1) )
 call fieldio( '<>', 'td',  t3(:,:,:,2) )
 call fieldio( '<>', 'tn',  t3(:,:,:,3) )
+!call fieldio( '<>', 'f0',  f0          ) ! [ZS]
+!call fieldio( '<>', 'v0',  v0          ) ! [ZS]
+!call fieldio( '<>', 'fw',  fw          ) ! [ZS]
+!call fieldio( '<>', 'vw',  vw          ) ! [ZS]
+!call fieldio( '<>', 'll',  ll          ) ! [ZS]
+!call fieldio( '<>', 'af',  af          ) ! [ZS]
+!call fieldio( '<>', 'bf',  bf          ) ! [ZS]
 
 ! Normal traction check
 i1 = maxloc( t3(:,:,:,3) )
@@ -100,9 +115,9 @@ end do
 ! Total pretraction
 do i = 1, 3
     t0(:,:,:,i) = t0(:,:,:,i) + &
-    t3(:,:,:,1) * t1(:,:,:,i) + &
-    t3(:,:,:,2) * t2(:,:,:,i) + &
-    t3(:,:,:,3) * nhat(:,:,:,i)
+        t3(:,:,:,1) * t1(:,:,:,i) + &
+        t3(:,:,:,2) * t2(:,:,:,i) + &
+        t3(:,:,:,3) * nhat(:,:,:,i)
 end do
 
 ! Hypocentral radius needed if doing nucleation

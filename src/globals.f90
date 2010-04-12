@@ -8,7 +8,7 @@ integer :: nt, itstats, itio, itcheck, itstop, npml, ppml, oplevel, mpin, &
     mpout, debug, faultopening, irup, faultnormal, nsource
 real :: tm0, dt, dx(3), rho1, rho2, vp1, vp2, vs1, vs2, gam1, gam2, hourglass(2), &
     vdamp, rexpand, affine(9), gridnoise, ihypo(3), vpml, slipvector(3)
-real :: period, source1(3), source2(3), vrup, rcrit, trelax, svtol
+real :: period, source1(3), source2(3), vrup, rcrit, trelax, svtol !, tmnucl, delts
 character(16) :: source, timefunction
 
 ! Miscellaneous parameters
@@ -81,6 +81,18 @@ real, allocatable, target, dimension(:,:,:,:) :: &
 
 ! Fault surface fields
 real, allocatable, target, dimension(:,:,:) :: &
+    !f0,             & ! [ZS] steady state friction at V_0
+    !fw,             & ! [ZS] fully weakened fiction
+    !v0,             & ! [ZS] reference slip velocity
+    !vw,             & ! [ZS] weakening slip velocity
+    !ll,             & ! [ZS] state evolution distance
+    !af,             & ! [ZS] direct effect parameter
+    !bf,             & ! [ZS] evolution effect parameter
+    !psi,            & ! [ZS] state variable
+    !svtrl, svold,   & ! [ZS] trial and old slip velocities
+    !sv0,            & ! [ZS] initial tiny slip velocity
+    !f4, f4, f5,     & ! [ZS] temporary storage
+    !fun, dfun, delf, & ! [ZS] Newton's method vars
     mus, mud,       & ! coefs of static and dynamic friction
     dc,             & ! slip weakening distance
     co,             & ! cohesion
@@ -93,6 +105,7 @@ real, allocatable, target, dimension(:,:,:) :: &
     tarr,           & ! arrest time
     tn, ts, f1, f2    ! temporary storage
 real, allocatable, target, dimension(:,:,:,:) :: &
+    !tp, ts0,        & ! [ZS] stress perturbation for nucleation
     nhat,           & ! fault surface normals
     t0,             & ! initial traction
     t1, t2, t3        ! temporary storage

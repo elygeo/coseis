@@ -72,6 +72,8 @@ l = i1(3)
 
 ! Fault vectors
 allocate(          &
+    !ts0(j,k,l,3),  & ! [ZS]
+    !tp(j,k,l,3),   & ! [ZS]
     nhat(j,k,l,3), &
     t0(j,k,l,3),   &
     t1(j,k,l,3),   &
@@ -80,6 +82,17 @@ allocate(          &
 
 ! Fault scalars
 allocate(         &
+    !af(j,k,l),    & ! [ZS]
+    !bf(j,k,l),    & ! [ZS]
+    !v0(j,k,l),    & ! [ZS]
+    !f0(j,k,l),    & ! [ZS]
+    !ll(j,k,l),    & ! [ZS]
+    !fw(j,k,l),    & ! [ZS]
+    !vw(j,k,l),    & ! [ZS]
+    !psi(j,k,l),   & ! [ZS]
+    !svtrl(j,k,l), & ! [ZS]
+    !svold(j,k,l), & ! [ZS]
+    !sv0(j,k,l),   & ! [ZS]
     mus(j,k,l),   &
     mud(j,k,l),   &
     dc(j,k,l),    &

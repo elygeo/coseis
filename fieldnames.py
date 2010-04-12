@@ -56,6 +56,7 @@ table = [
     ( 'w31',   '\sigma_{zx}',     'Stress',                         '<c',  ),
     ( 'w12',   '\sigma_{xy}',     'Stress',                         '<c',  ),
     ( 'wm2',   '||\sigma||_F',    'Stress Frobenius norm',          'c',   ),
+    # slip weakening variables
     ( 'mus',   '\mu_s',           'Static friction coefficient',    '<f0', ),
     ( 'mud',   '\mu_d',           'Dynamic friction coefficient',   '<f0', ),
     ( 'dc',    'D_c',             'Slip weakening distance',        '<f0', ),
@@ -97,6 +98,15 @@ table = [
     ( 'sl',    '\ell',            'Slip path length',               'f',   ),
     ( 'trup',  't_{rupture}',     'Rupture time',                   'f',   ),
     ( 'tarr',  't_{arrest}',      'Arrest time',                    'f',   ),
+    # rate and state friction variables [ZS]
+    #( 'f0',    'f_0',             'Steady state friction at V_0',   '<f0', ),
+    #( 'fw',    'f_w',             'Fully weakened fiction',         '<f0', ),
+    #( 'v0',    'V_0',             'Reference slip velocity',        '<f0', ),
+    #( 'vw',    'V_w',             'Weakening slip velocity',        '<f0', ),
+    #( 'll',    'L',               'State evolution distance',       '<f0', ),
+    #( 'af',    'a',               'Direct effect parameter',        '<f0', ),
+    #( 'bf',    'b',               'Evolution effect parameter',     '<f0', ),
+    #( 'psi',   '\psi',            'State variable',                 'f',   ),
 ]
 
 map     = dict( (f[0], f[1:]) for f in table )
