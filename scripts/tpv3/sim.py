@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sord
 
-dtype = 'd'
 # List of runs:
 # Column 1 is dx, the spatial step size
 # Column 2 is np3, the number of processors in each dimension

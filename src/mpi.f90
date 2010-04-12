@@ -16,12 +16,7 @@ call mpi_init( e )
 call mpi_comm_size( mpi_comm_world, np0, e  )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
 call mpi_sizeof( r, n, e )
-rtype = mpi_real
-if ( n == 4 ) then
-    rtype = mpi_real4
-elseif ( n == 8 ) then
-    rtype = mpi_real8
-end if
+call mpi_type_match_size( mpi_typeclass_real, n, rtype, e )
 end subroutine
 
 ! Finalize

@@ -54,23 +54,23 @@ def build( mode=None, optimize=None, dtype=None ):
     new = False
     os.chdir( os.path.join( path, 'src' ) )
     dtype = np.dtype( dtype ).str
-    realsize = dtype[-1]
+    dsize = dtype[-1]
     if 's' in mode:
         source = base + ('serial.f90',) + common
         for opt in optimize:
-            object_ = os.path.join( '..', 'bin', 'sord-s' + opt + realsize )
+            object_ = os.path.join( '..', 'bin', 'sord-s' + opt + dsize )
             fflags = cf.fortran_flags['f'] + cf.fortran_flags[opt]
             if dtype != cf.native_dtype:
-                fflags = fflags + cf.fortran_flags[realsize]
+                fflags = fflags + cf.fortran_flags[dsize]
             compiler = cf.fortran_serial + fflags + ('-o',)
             new |= util.make( compiler, object_, source )
     if 'm' in mode and cf.fortran_mpi:
         source = base + ('mpi.f90',) + common
         for opt in optimize:
-            object_ = os.path.join( '..', 'bin', 'sord-m' + opt + realsize )
+            object_ = os.path.join( '..', 'bin', 'sord-m' + opt + dsize )
             fflags = cf.fortran_flags['f'] + cf.fortran_flags[opt]
             if dtype != cf.native_dtype:
-                fflags = fflags + cf.fortran_flags[realsize]
+                fflags = fflags + cf.fortran_flags[dsize]
             compiler = cf.fortran_mpi + fflags + ('-o',)
             new |= util.make( compiler, object_, source )
     os.chdir( path )
