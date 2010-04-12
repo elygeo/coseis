@@ -96,7 +96,7 @@ fortran_defaults = {
     }
 }
 
-if os.uname()[0] != 'SunOS':
+if os.uname()[0] == 'SunOS':
     fortran_defaults.update( { 'f95': {
         'f': ('-u'),
         'g': ('-C', '-ftrap=common', '-w4', '-g'),
