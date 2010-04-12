@@ -111,23 +111,23 @@ def stage( inputs ):
     if i >= 0:
         nl[i] = max( nl[i], 2 )
     pm.np3 = tuple( (pm.nn[i] - 1) / nl[i] + 1 for i in range(3) )
-    cf.np = pm.np3[0] * pm.np3[1] * pm.np3[2]
+    cf.nproc = pm.np3[0] * pm.np3[1] * pm.np3[2]
     if not cf.mode:
         cf.mode = 's'
-        if cf.np > 1:
+        if cf.nproc > 1:
             cf.mode = 'm'
 
     # Resources
     if cf.maxcores:
-        cf.nodes = min( cf.maxnodes, (cf.np - 1) / cf.maxcores + 1 )
-        cf.ppn = (cf.np - 1) / cf.nodes + 1
+        cf.nodes = min( cf.maxnodes, (cf.nproc - 1) / cf.maxcores + 1 )
+        cf.ppn = (cf.nproc - 1) / cf.nodes + 1
         cf.cores = min( cf.maxcores, cf.ppn )
         cf.totalcores = cf.nodes * cf.maxcores
     else:
         cf.nodes = 1
-        cf.ppn = cf.np
-        cf.cores = cf.np
-        cf.totalcores = cf.np
+        cf.ppn = cf.nproc
+        cf.cores = cf.nproc
+        cf.totalcores = cf.nproc
 
     # RAM and Wall time usage
     if pm.oplevel in (1, 2):
@@ -148,7 +148,7 @@ def stage( inputs ):
     mm = mm % 60
     cf.walltime = '%d:%02d:00' % (hh, mm)
     print( 'Machine: ' + cf.machine )
-    print( 'Cores: %s of %s' % (cf.np, maxtotalcores) )
+    print( 'Cores: %s of %s' % (cf.nproc, maxtotalcores) )
     print( 'Nodes: %s of %s' % (cf.nodes, cf.maxnodes) )
     print( 'RAM: %sMb of %sMb per node' % (cf.ram, cf.maxram) )
     print( 'Time limit: ' + cf.walltime )

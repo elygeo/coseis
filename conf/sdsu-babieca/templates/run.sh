@@ -10,8 +10,8 @@ case "$mode${1:--i}" in
     s-g)   gdb %(bin)s ;;
     s-pg)  pgdbg %(bin)s ;;
     s-ddd) ddd %(bin)s ;;
-    m-i)   mpirun -machinefile mf -np %(np)s %(bin)s ;;
-    m-g)   mpirun -machinefile mf -np %(np)s -dbg=gdb %(bin)s ;;
+    m-i)   mpirun -machinefile mf -np %(nproc)s %(bin)s ;;
+    m-g)   mpirun -machinefile mf -np %(nproc)s -dbg=gdb %(bin)s ;;
 esac
 %(post)s
 echo "$( date ): %(name)s finished" >> log

@@ -20,7 +20,7 @@ for file in %(bin)s parameters.py in out stats prof debug checkpoint; do
 done
 cd "$dir"
 %(pre)s
-mpiexec -np %(np)s %(bin)s
+mpiexec -np %(nproc)s %(bin)s
 %(post)s
 mv * %(rundir)r
 

@@ -10,7 +10,7 @@
 #$ -m abe
 #$ -V
 #$ -wd %(rundir)s
-export MY_NSLOTS=%(np)s
+export MY_NSLOTS=%(nproc)s
 
 cd %(rundir)r
 

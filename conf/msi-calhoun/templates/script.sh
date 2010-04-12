@@ -17,7 +17,7 @@ cp /cluster/mpi/tools/param.bigcluster .
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
-mpirun -np %(np)s -paramfile ./param.bigcluster -hostfile $PBS_NODEFILE %(bin)s
+mpirun -np %(nproc)s -paramfile ./param.bigcluster -hostfile $PBS_NODEFILE %(bin)s
 %(post)s
 echo "$( date ): %(name)s finished" >> log
 

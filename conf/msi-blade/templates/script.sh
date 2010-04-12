@@ -20,7 +20,7 @@ cd %(rundir)r
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
-mpirun -np %(np)s -hostfile $PBS_NODEFILE %(bin)s
+mpirun -np %(nproc)s -hostfile $PBS_NODEFILE %(bin)s
 %(post)s
 echo "$( date ): %(name)s finished" >> log
 

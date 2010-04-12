@@ -14,7 +14,7 @@ cd %(rundir)r
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
-mpiexec -n %(np)s %(bin)s
+mpiexec -n %(nproc)s %(bin)s
 %(post)s
 echo "$( date ): %(name)s finished" >> log
 
