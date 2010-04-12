@@ -10,10 +10,18 @@ contains
 subroutine initialize( np0, ip )
 use mpi
 integer, intent(out) :: np0, ip
-integer :: e
+integer :: n, e
+real :: r
 call mpi_init( e )
 call mpi_comm_size( mpi_comm_world, np0, e  )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
+call mpi_sizeof( r, n, e )
+rtype = mpi_real
+if ( n == 4 ) then
+    rtype = mpi_real4
+elseif ( n == 8 ) then
+    rtype = mpi_real8
+end if
 end subroutine
 
 ! Finalize
@@ -21,18 +29,6 @@ subroutine finalize
 use mpi
 integer :: e
 call mpi_finalize( e )
-end subroutine
-
-! Set real type
-subroutine setrealtype( dtype )
-use mpi
-character(3), intent(in) :: dtype
-rtype = mpi_real
-if ( dtype(3:3) == '4' ) then
-    rtype = mpi_real4
-elseif ( dtype(3:3) == '8' ) then
-    rtype = mpi_real8
-end if
 end subroutine
 
 ! Process rank

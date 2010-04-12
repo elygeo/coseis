@@ -97,7 +97,6 @@ def stage( inputs ):
     if not cf.prepare:
         cf.run = False
     cf.dtype = np.dtype( cf.dtype ).str
-    pm.dtype = cf.dtype
 
     # Partition for parallelization
     pm.nn = tuple( int(i) for i in pm.nn )

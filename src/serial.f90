@@ -16,13 +16,6 @@ end subroutine
 subroutine finalize
 end subroutine
 
-! Set real type
-subroutine setrealtype( dtype )
-character(3), intent(in) :: dtype
-integer :: i
-i = len( dtype )
-end subroutine
-
 ! Process rank
 subroutine rank( ip3, ipid, np3in )
 integer, intent(out) :: ip3(3), ipid

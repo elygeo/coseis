@@ -12,9 +12,6 @@ integer :: nl(3)
 nt = max( nt, 0 )
 ifn = abs( faultnormal )
 
-! Set MPI real type
-call setrealtype( dtype )
-
 ! Partition for parallelization
 if ( np0 == 1 ) np3 = 1
 nl3 = (nn - 1) / np3 + 1

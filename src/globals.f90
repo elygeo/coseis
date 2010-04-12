@@ -10,7 +10,6 @@ real :: tm0, dt, dx(3), rho1, rho2, vp1, vp2, vs1, vs2, gam1, gam2, hourglass(2)
     vdamp, rexpand, affine(9), gridnoise, ihypo(3), vpml, slipvector(3)
 real :: period, source1(3), source2(3), vrup, rcrit, trelax, svtol !, tmnucl, delts
 character(16) :: source, timefunction
-character(3) :: dtype
 
 ! Miscellaneous parameters
 real, parameter :: pi = 3.14159265
