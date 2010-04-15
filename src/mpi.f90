@@ -27,13 +27,13 @@ call mpi_finalize( e )
 end subroutine
 
 ! Process rank
-subroutine rank( ip3, ipid, np3in )
+subroutine rank( ip3, ipid, nproc3 )
 use mpi
 integer, intent(out) :: ip3(3), ipid
-integer, intent(in) :: np3in(3)
+integer, intent(in) :: nproc3(3)
 integer :: ip, i, e
 logical :: hat(3), period(3) = .false.
-np3 = np3in
+np3 = nproc3
 call mpi_cart_create( mpi_comm_world, 3, np3, period, .true., comm3d, e )
 if ( comm3d == mpi_comm_null ) then
     call mpi_comm_rank( mpi_comm_world, ip, e  )

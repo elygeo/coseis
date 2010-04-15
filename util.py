@@ -20,7 +20,7 @@ def prune( d, pattern=None, types=None ):
     {'a_a': 0}
     """
     if pattern == None:
-        pattern = '(^_)|(_$)|(^.$)'
+        pattern = '(^_)|(_$)|(^.$)|(^..$)'
     if types is None:
         types = type( re ), type( re.sub )
     grep = re.compile( pattern )
@@ -48,17 +48,17 @@ def save( fd, d, expand=None, prune_pattern=None, prune_types=None ):
             if type( d[k] ) == tuple:
                 fd.write( k + ' = (\n' )
                 for item in d[k]:
-                    fd.write( repr( item ) + ',\n' )
+                    fd.write( '    %r,\n' % (item,) )
                 fd.write( ')\n' )
             elif type( d[k] ) == list:
                 fd.write( k + ' = [\n' )
                 for item in d[k]:
-                    fd.write( repr( item ) + ',\n' )
+                    fd.write( '    %r,\n' % (item,) )
                 fd.write( ']\n' )
             elif type( d[k] ) == dict:
                 fd.write( k + ' = {\n' )
                 for item in sorted( d[k] ):
-                    fd.write( repr( item ) + ': ' + repr( d[k][item] ) + ',\n' )
+                    fd.write( '    %r: %r,\n' % (item, d[k][item]) )
                 fd.write( '}\n' )
             else:
                 sys.exit( 'Cannot expand %s type %s' % ( k, type( d[k] ) ) )
@@ -116,7 +116,7 @@ def expand_slice( shape, indices=None, base=1, round=True ):
             indices[i] = [base, shape[i] - base + offset, 1]
         elif len( indices[i] ) == 2:
             indices[i] = list( indices[i] ) + [1]
-        elif len( indices[i] ) in ( 1, 3 ):
+        elif len( indices[i] ) in (1, 3):
             indices[i] = list( indices[i] )
         else:
             sys.exit( 'error in indices: %r' % indices )
@@ -160,16 +160,16 @@ def ndread( fd, shape=None, indices=None, dtype='f', order='F', nheader=0 ):
         mm = [shape]
     else:
         mm = list( shape )
-    ndim = len( mm )
     ii = expand_slice( mm, indices )
     if order is 'F':
         ii = ii[::-1]
         mm = mm[::-1]
     elif order is not 'C':
         sys.exit( "Invalid order %s, must be 'C' or 'F'" % order )
-    i0 = [ ii[i][0] - 1             for i in range( ndim ) ]
-    nn = [ ii[i][1] - ii[i][0] + 1  for i in range( ndim ) ]
+    i0 = [ i[0] - 1        for i in ii ]
+    nn = [ i[1] - i[0] + 1 for i in ii ]
     nn0 = nn[:]
+    ndim = len( mm )
     for i in range( ndim-1, 0, -1 ):
         if mm[i] == nn[i]:
             i0[i-1] = i0[i-1] * mm[i]
@@ -197,15 +197,19 @@ def ndread( fd, shape=None, indices=None, dtype='f', order='F', nheader=0 ):
         f = f.reshape( nn0 )
     return f
 
-def progress( i, n, t ):
+def progress( t0=None, i=None, n=None, message='' ):
     """
     Print progress and time remaining.
     """
-    #import datetime
+    import time
+    if t0 == None:
+         return time.time()
+    if message:
+         message += ': '
+    t = time.time() - t0 
     percent =  100.0 * i / n
     seconds = int( t * (100.0 / percent - 1.0) )
-    #datetime.timedelta( seconds=seconds )
-    sys.stdout.write( '\r%3d%%  %s' % (percent, seconds) )
+    sys.stdout.write( '\r%s%3d%% done, %.0f s remaining' % (message, percent, seconds) )
     sys.stdout.flush()
     if i == n:
         print('')

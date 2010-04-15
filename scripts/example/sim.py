@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 import sord                               # import the sord module
+nt = 44
 rundir = 'tmp'                            # directory location for output
-dx = 100.0, 100.0, 100.0                  # spatial step length in x, y, and z
-dt = 0.0075                               # time step length
-nn = 61, 61, 61                           # number of mesh nodes in x, y, and z
-nt = 60                                   # number of time steps
+delta = 100.0, 100.0, 100.0, 0.0075       # step length in (x, y, z, t)
+shape = 61, 61, 61, 60                    # mesh size in (x, y, z, t)
 fieldio = [                               # field variable input and output
     ( '=',  'rho', [], 2670.0 ),          # material density
     ( '=',  'vp',  [], 6000.0 ),          # material P-wave velocity
@@ -18,5 +17,6 @@ source = 'potency'                        # source type
 source1 = 1e6, 1e6, 1e6                   # source normal components
 source2 = 0.0, 0.0, 0.0                   # source shear components
 timefunction = 'brune'                    # source time function
-period = 6 * dt                           # source dominant period
+period = 6 * delta[3]                     # source dominant period
 sord.run( locals() )                      # launch SORD job
+

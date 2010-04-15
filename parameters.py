@@ -14,7 +14,7 @@ Spatial difference operator level:
 """
 
 # I/O and code execution parameters
-np3 = 1, 1, 1			# number of processors in j k l
+nproc3 = 1, 1, 1		# number of processors in (j, k, l)
 mpin = 1			# input:  0=separate files, 1=MPI-IO, -1=non-collective MPI-IO
 mpout = 1			# output: 0=separate files, 1=MPI-IO, -1=non-collective MPI-IO
 itstats = 10			# interval for calculating statistics
@@ -24,10 +24,8 @@ itstop = 0			# for testing check-pointing, simulates code crash
 debug = 0			# >0 verbose, >1 sync, >2 mpi vars, >3 I/O
 
 # Wave model parameters
-nn = 41, 41, 42			# number of nodes in j, k, l (double nodes counted)
-nt = 41				# number of time steps
-dx = 100.0, 100.0, 100.0	# spatial step length
-dt = 0.0075			# time step length
+shape = 41, 41, 42, 41		# mesh size (nx, ny, nz, nt)
+delta = 100.0, 100.0, 100.0, 0.0075	# step length (dx, dy, dz, dt)
 tm0 = 0.0			# initial time
 affine = (1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0) # grid transformation
 gridnoise = 0.0			# random noise added to mesh, assumes planar fault
@@ -75,7 +73,7 @@ nsource = 0			# number of sub-faults
 source1 = 0.0, 0.0, 0.0		# normal components
 source2 = 0.0, 0.0, 0.0		# shear components
 timefunction = 'none'		# time function, see util.f90 for details.
-period = 10 * dt		# dominant period
+period = 10 * delta[3]		# dominant period
 
 # Placeholders
 i1pml = None

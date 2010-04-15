@@ -87,7 +87,7 @@ do isrc = 1, abs( nsource )
         if ( i == 0 ) then
             h = h * src_history(itoff+1)
         else
-            h = ( 1.0 - h ) * src_history(itoff+i) + h * src_history(itoff+i+1)
+            h = (1.0 - h) * src_history(itoff+i) + h * src_history(itoff+i+1)
         end if
         if ( source == 'force' ) then
             do l = i1(3), i2(3)

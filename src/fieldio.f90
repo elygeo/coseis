@@ -225,7 +225,7 @@ case( '=r', '+r', '=R', '+R' )
     if ( any( di > 1 ) ) then
         i1 = io%ii(1,1:3) - nnoff
         i2 = io%ii(2,1:3) - nnoff
-        if ( any( di > nhalo .and. np3 > 1 ) ) stop 'di too large for nhalo'
+        if ( any( di > nhalo .and. nproc3 > 1 ) ) stop 'di too large for nhalo'
         call scalar_swap_halo( s1, nhalo )
         call interpolate( s1, i1, i2, di )
     end if

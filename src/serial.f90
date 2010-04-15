@@ -17,10 +17,10 @@ subroutine finalize
 end subroutine
 
 ! Process rank
-subroutine rank( ip3, ipid, np3in )
+subroutine rank( ip3, ipid, nproc3 )
 integer, intent(out) :: ip3(3), ipid
-integer, intent(in) :: np3in(3)
-ip3 = np3in
+integer, intent(in) :: nproc3(3)
+ip3 = nproc3
 ip3 = 0
 ipid = 0
 end subroutine

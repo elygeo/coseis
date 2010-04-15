@@ -3,10 +3,10 @@ module m_globals
 implicit none
 
 ! Input parameters, see parameters.py for documentation
-integer, dimension(3) :: np3, nn, bc1, bc2, n1expand, n2expand
-integer :: nt, itstats, itio, itcheck, itstop, npml, ppml, oplevel, mpin, &
+integer, dimension(3) :: nproc3, bc1, bc2, n1expand, n2expand
+integer :: shape_(4), itstats, itio, itcheck, itstop, npml, ppml, oplevel, mpin, &
     mpout, debug, faultopening, irup, faultnormal, nsource
-real :: tm0, dt, dx(3), rho1, rho2, vp1, vp2, vs1, vs2, gam1, gam2, hourglass(2), &
+real :: delta(4), tm0, rho1, rho2, vp1, vp2, vs1, vs2, gam1, gam2, hourglass(2), &
     vdamp, rexpand, affine(9), gridnoise, ihypo(3), vpml, slipvector(3)
 real :: period, source1(3), source2(3), vrup, rcrit, trelax, svtol !, tmnucl, delts
 character(16) :: source, timefunction
@@ -16,16 +16,20 @@ real, parameter :: pi = 3.14159265
 real :: &
     mptimer,        & ! MPI timing
     iotimer,        & ! I/O timing
+    dt,             & ! time step length
+    dx(3),          & ! spatial step lengths
     tm                ! time
 integer :: &
+    nt,             & ! number of time steps
     it,             & ! current time step
     ifn,            & ! fault normal component=abs(faultnormal)
     ip,             & ! process rank
     ipid,           & ! processor ID
     np0               ! number of processes available
 integer, dimension(3) :: &
+    nn,             & ! shape of global mesh
+    nm,             & ! shape of local 3D arrays
     nl3,            & ! number of mesh nodes per process
-    nm,             & ! size of local 3D arrays
     nhalo,          & ! number of ghost nodes
     ip3,            & ! 3D process rank
     ip3root,        & ! 3D root process rank

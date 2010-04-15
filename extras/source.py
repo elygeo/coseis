@@ -114,18 +114,26 @@ def srf_read( filename, path=None, mks=True ):
     meta['version'] = fd.readline().split()[0]
     k = fd.readline().split()
     if k[0] == 'PLANE':
-        meta['nsegments'] = int( k[1] )
-        k = fd.readline().split() + fd.readline().split()
-        if len( k ) != 11:
-            sys.exit( 'error reading %s' % filename )
-        meta['nsource2']   = int(   k[2] ), int(   k[3]  )
-        meta['topcenter']  = float( k[0] ), float( k[1]  ), float( k[8] )
-        meta['plane']      = float( k[6] ), float( k[7]  )
-        meta['length']     = float( k[4] ), float( k[5]  )
-        meta['hypocenter'] = float( k[9] ), float( k[10] )
-        if mks:
-            meta['length']     = tuple( 1000 * x for x in meta['length'] )
-            meta['hypocenter'] = tuple( 1000 * x for x in meta['hypocenter'] )
+        plane = []
+        for i in range( int( k[1] ) ):
+            k = fd.readline().split() + fd.readline().split()
+            if len( k ) != 11:
+                sys.exit( 'error reading %s' % filename )
+            seg = {
+                'topcenter':  ( float( k[0] ), float( k[1]  ), float( k[8] ) ),
+                'shape':      ( int(   k[2] ), int(   k[3]  ) ),
+                'length':     ( float( k[4] ), float( k[5]  ) ),
+                'strike':       float( k[6] ),
+                'dip':          float( k[7] ),
+                'hypocenter': ( float( k[9] ), float( k[10] ) ),
+            }
+            if mks:
+                x, y = seg['length']
+                seg['length'] = 1000.0 * x, 1000.0 * y
+                x, y = seg['hypocenter']
+                seg['hypocenter'] = 1000.0 * x, 1000.0 * y
+            plane += [seg]
+        meta['plane'] = plane
         k = fd.readline().split()
     if k[0] != 'POINTS':
         sys.exit( 'error reading %s' % filename )
@@ -217,6 +225,9 @@ def srf_read( filename, path=None, mks=True ):
     np.array( slip3, 'f' ).tofile( path + 'slip3' )
 
     # Write meta data
+    i = np.argmin( t0 )
+    meta['hypocenter'] = lon.flat[i], lat.flat[i], dep.flat[i]
+    meta['nsource_nonzero'] = (nt1>0).sum() + (nt2>0).sum() + (nt3>0).sum()
     meta['area'] = area.sum()
     meta['potency'] = np.sqrt(
         ( area * slip1 ).sum() ** 2 +
@@ -224,34 +235,39 @@ def srf_read( filename, path=None, mks=True ):
         ( area * slip3 ).sum() ** 2 )
     meta['slip'] = meta['potency'] / meta['area']
     meta['dtype'] = np.dtype( 'f' ).str
-    sord.util.save( path + 'meta.py', meta )
+    sord.util.save( path + 'meta.py', meta, expand=['plane'] )
     return meta
 
-def srf2potency( path, proj, dx ):
+def srf2potency( src, path, proj, dx ):
     """
     Convert SRF to potency tensor source and write SORD input files.
     """
     import coord
 
     # Read meta data
+    src  = os.path.expanduser( src ) + os.sep
     path = os.path.expanduser( path ) + os.sep
     meta = {}
-    exec open( path + 'meta.py' ) in meta
+    exec open( src + 'meta.py' ) in meta
     dtype = meta['dtype']
 
     # Read data
-    nt1  = np.fromfile( path + 'nt1',  'i' )
-    nt2  = np.fromfile( path + 'nt2',  'i' )
-    nt3  = np.fromfile( path + 'nt3',  'i' )
-    dt   = np.fromfile( path + 'dt',   dtype )
-    t0   = np.fromfile( path + 't0',   dtype )
-    x    = np.fromfile( path + 'lon',  dtype )
-    y    = np.fromfile( path + 'lat',  dtype )
-    z    = np.fromfile( path + 'dep',  dtype )
-    stk  = np.fromfile( path + 'stk',  dtype )
-    dip  = np.fromfile( path + 'dip',  dtype )
-    rake = np.fromfile( path + 'rake', dtype )
-    area = np.fromfile( path + 'area', dtype )
+    nt1  = np.fromfile( src + 'nt1',  'i' )
+    nt2  = np.fromfile( src + 'nt2',  'i' )
+    nt3  = np.fromfile( src + 'nt3',  'i' )
+    dt   = np.fromfile( src + 'dt',   dtype )
+    t0   = np.fromfile( src + 't0',   dtype )
+    x    = np.fromfile( src + 'lon',  dtype )
+    y    = np.fromfile( src + 'lat',  dtype )
+    z    = np.fromfile( src + 'dep',  dtype )
+    stk  = np.fromfile( src + 'stk',  dtype )
+    dip  = np.fromfile( src + 'dip',  dtype )
+    rake = np.fromfile( src + 'rake', dtype )
+    area = np.fromfile( src + 'area', dtype )
+
+    # create destination directory
+    if path not in '.' and not os.path.isdir( path ):
+        os.makedirs( path )
 
     # Time
     nt = np.array( [nt1, nt2, nt3] )
@@ -262,9 +278,9 @@ def srf2potency( path, proj, dx ):
     t0[None].repeat(3,0)[ii].tofile( path + 'src_t0' )
 
     # Time history
-    fd1 = open( path + 'sv1' )
-    fd2 = open( path + 'sv2' )
-    fd3 = open( path + 'sv3' )
+    fd1 = open( src + 'sv1' )
+    fd2 = open( src + 'sv2' )
+    fd3 = open( src + 'sv3' )
     fd  = open( path + 'src_history', 'wb' )
     for i in range( dt.size ):
         np.cumsum( dt[i] * np.fromfile(fd1, dtype, nt1[i]) ).tofile( fd )

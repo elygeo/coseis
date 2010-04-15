@@ -11,9 +11,9 @@ path = 'run/tpv3-300/'
 stations = 'P1a', 'P2a'
 stations = 'P1', 'P2'
 meta = sord.util.load( path + 'meta.py' )
-dx = meta.dx
-dt = meta.dt
-nt = meta.nt
+dx = meta.delta[:2]
+dt = meta.delta[3]
+nt = meta.shape[3]
 ihypo = meta.ihypo
 dtype = meta.dtype
 
@@ -60,7 +60,7 @@ fig = plt.figure( 3 )
 fig.clf()
 ax = fig.add_subplot( 111 )
 v = np.arange( -20, 20 ) * 0.5
-n = meta.shape['trup']
+n = meta.shapes['trup']
 x = np.fromfile( path + 'out/x1', dtype ).reshape( n[::-1] ).T
 y = np.fromfile( path + 'out/x2', dtype ).reshape( n[::-1] ).T
 t = np.fromfile( path + 'out/trup', dtype ).reshape( n[::-1] ).T

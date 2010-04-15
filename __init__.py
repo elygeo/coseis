@@ -31,11 +31,22 @@ def stage( inputs ):
     else:
         cf = configure.configure()
 
+    # Test for depreciated variables
+    for k, msg in (
+        ('np3', "Parameter 'np3' is renamed to 'nproc3'."),
+        ('nn',  "Parameter 'nn' discontinued. Use: shape = nx, ny, nz, nt."),
+        ('nt',  "Parameter 'nn' discontinued. Use: shape = nx, ny, nz, nt."),
+        ('dx',  "Parameter 'dx' discontinued. Use: delta = dx, dy, dz, dt."),
+        ('dt',  "Parameter 'dt' discontinued. Use: delta = dx, dy, dz, dt."),
+    ):
+        if k in inputs:
+            sys.exit( msg )
+
     # Merge inputs
     inputs = inputs.copy()
     util.prune( inputs )
     util.prune( pm )
-    util.prune( cf, pattern='(^_)|(^.$)' )
+    util.prune( cf, pattern='(^_)|(^.$)|(^..$)' )
     for k, v in inputs.iteritems():
         if k in cf:
             cf[k] = v
@@ -99,19 +110,26 @@ def stage( inputs ):
     cf.dtype = np.dtype( cf.dtype ).str
 
     # Partition for parallelization
-    pm.nn = tuple( int(i) for i in pm.nn )
+    nx, ny, nz = pm.shape[:3]
     maxtotalcores = cf.maxnodes * cf.maxcores
     if not cf.mode and maxtotalcores == 1:
         cf.mode = 's'
-    np3 = pm.np3[:]
+    j, k, l = pm.nproc3
     if cf.mode == 's':
-        np3 = [1, 1, 1]
-    nl = [ (pm.nn[i] - 1) / np3[i] + 1 for i in range(3) ]
-    i  = abs( pm.faultnormal ) - 1
+        j, k, l = 1, 1, 1
+    nl = [
+        (nx - 1) / j + 1,
+        (ny - 1) / k + 1,
+        (nz - 1) / l + 1,
+    ]
+    i = abs( pm.faultnormal ) - 1
     if i >= 0:
         nl[i] = max( nl[i], 2 )
-    pm.np3 = tuple( (pm.nn[i] - 1) / nl[i] + 1 for i in range(3) )
-    cf.nproc = pm.np3[0] * pm.np3[1] * pm.np3[2]
+    j = (nx - 1) / nl[0] + 1
+    k = (ny - 1) / nl[1] + 1
+    l = (nz - 1) / nl[2] + 1
+    pm.nproc3 = j, k, l
+    cf.nproc = j * k * l
     if not cf.mode:
         cf.mode = 's'
         if cf.nproc > 1:
@@ -139,11 +157,11 @@ def stage( inputs ):
     nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
     cf.pmem = 32 + int(1.2 * nm * nvars * int( cf.dtype[-1] ) / 1024 / 1024)
     cf.ram = cf.pmem * cf.ppn
-    ss  = (pm.nt + 10) * cf.ppn * nm / cf.cores / cf.rate
+    ss = (pm.shape[3] + 10) * cf.ppn * nm / cf.cores / cf.rate
     sus = int( ss / 3600 * cf.totalcores + 1 )
-    mm  =      ss / 60 * 3.0 + 10
+    mm = ss / 60 * 3.0 + 10
     if cf.maxtime:
-        mm = min( mm, 60*cf.maxtime[0] + cf.maxtime[1] )
+        mm = min( mm, 60 * cf.maxtime[0] + cf.maxtime[1] )
     hh = mm / 60
     mm = mm % 60
     cf.walltime = '%d:%02d:00' % (hh, mm)
@@ -209,21 +227,23 @@ def stage( inputs ):
             meta.indices[filename] = f[7]
             if 'wi' in op:
                 meta.xi[filename] = f[4]
-    meta.shape = {}
+    meta.deltas = {}
+    meta.shapes = {}
     for k in meta.indices:
-        nn = [ (i[1] - i[0]) / i[2] + 1 for i in meta.indices[k] ]
+        ii = meta.indices[k]
+        nn = [ (i[1] - i[0]) / i[2] + 1 for i in ii ]
         nn = [ n for n in nn if n > 1 ]
         if nn == []:
             nn = [1]
-        meta.shape[k] = nn
+        meta.shapes[k] = nn
 
     # Write files
     os.chdir( cf.rundir )
     log = open( 'log', 'w' )
     log.write( starttime + ': setup started\n' )
-    util.save( 'conf.py', cf, prune_pattern='(^_)|(^.$)' )
+    util.save( 'conf.py', cf, prune_pattern='(^_)|(^.$)|(^..$)' )
     util.save( 'parameters.py', pm, expand=['fieldio'] )
-    util.save( 'meta.py', meta, expand=['shape', 'xi', 'indices', 'fieldio'] )
+    util.save( 'meta.py', meta, expand=['shapes', 'xi', 'indices', 'fieldio'] )
 
     # Return to initial directory
     os.chdir( cwd )
@@ -235,46 +255,50 @@ def prepare_param( pm, itbuff ):
     """
 
     # inervals
-    pm.itio = max( 1, min(pm.itio, pm.nt) )
+    nt = pm.shape[3]
+    pm.itio = max( 1, min(pm.itio, nt) )
     if pm.itcheck % pm.itio != 0:
         pm.itcheck = (pm.itcheck / pm.itio + 1) * pm.itio
 
     # hypocenter coordinates
+    nn = pm.shape[:3]
     xi = list( pm.ihypo )
     for i in range( 3 ):
         xi[i] = 0.0 + xi[i]
         if xi[i] == 0.0:
-            xi[i] = 0.5 * (pm.nn[i] + 1)
+            xi[i] = 0.5 * (nn[i] + 1)
         elif xi[i] <= -1.0:
-            xi[i] = xi[i] + pm.nn[i] + 1
-        if xi[i] < 1.0 or xi[i] > pm.nn[i]:
+            xi[i] = xi[i] + nn[i] + 1
+        if xi[i] < 1.0 or xi[i] > nn[i]:
             sys.exit( 'Error: ihypo %s out of bounds' % xi )
     pm.ihypo = tuple( xi )
 
     # Rupture boundary conditions
+    nn = pm.shape[:3]
     i1 = list( pm.bc1 )
     i2 = list( pm.bc2 )
-    i = abs(pm.faultnormal) - 1
+    i = abs( pm.faultnormal ) - 1
     if i >= 0:
         irup = int( xi[i] )
         if irup == 1:
             i1[i] = -2
-        if irup == pm.nn[i] - 1:
+        if irup == nn[i] - 1:
             i2[i] = -2
-        if irup < 1 or irup > (pm.nn[i] - 1):
+        if irup < 1 or irup > (nn[i] - 1):
             sys.exit( 'Error: ihypo %s out of bounds' % xi )
     pm.bc1 = tuple( i1 )
     pm.bc2 = tuple( i2 )
 
     # PML region
+    nn = pm.shape[:3]
     i1 = [0, 0, 0]
-    i2 = [n+1 for n in pm.nn]
+    i2 = [nn[0]+1, nn[1]+1, nn[2]+1]
     if pm.npml > 0:
         for i in range( 3 ):
             if pm.bc1[i] == 10:
                 i1[i] = pm.npml
             if pm.bc2[i] == 10:
-                i2[i] = pm.nn[i] - pm.npml + 1
+                i2[i] = nn[i] - pm.npml + 1
             if i1[i] > i2[i]:
                 sys.exit( 'Error: model too small for PML' )
     pm.i1pml = tuple( i1 )
@@ -324,31 +348,32 @@ def prepare_param( pm, itbuff ):
                     sys.exit( 'Error: cannot mix fault and non-fault i/o: %r' % line )
                 if pm.faultnormal == 0:
                     sys.exit( 'Error: field only for ruptures: %r' % line )
-        nn = list( pm.nn ) + [pm.nt]
         if field in fieldnames.cell:
             mode = mode.replace( 'c', 'C' )
             base = 1.5
         else:
             base = 1
+        nn = pm.shape[:3]
+        nt = pm.shape[3]
         if 'i' in mode:
-            x1 = util.expand_slice( pm.nn, ii[:3], base, round=False )
+            x1 = util.expand_slice( nn, ii[:3], base, round=False )
             x1 = tuple( i[0] + 1 - base for i in x1 )
-            i1 = tuple( math.ceil( i )  for i in x1 )
-            ii = ( util.expand_slice( pm.nn, i1, 1 )
-                 + util.expand_slice( [pm.nt], ii[3:], 1 ) )
+            i1 = tuple( math.ceil( i ) for i in x1 )
+            ii = ( util.expand_slice( nn, i1, 1 )
+                 + util.expand_slice( [nt], ii[3:], 1 ) )
         else:
-            ii = ( util.expand_slice( pm.nn, ii[:3], base )
-                 + util.expand_slice( [pm.nt], ii[3:], 1 ) )
+            ii = ( util.expand_slice( nn, ii[:3], base )
+                 + util.expand_slice( [nt], ii[3:], 1 ) )
         if field in fieldnames.initial:
             ii[3] = 0, 0, 1
         if field in fieldnames.fault:
-            i = pm.faultnormal - 1
+            i = abs( pm.faultnormal ) - 1
             ii[i] = 2 * (irup,) + (1,)
-        nn = [ (ii[i][1] - ii[i][0] + 1) / ii[i][2] for i in range(4) ]
-        nb = ( min( pm.itio, pm.nt ) - 1 ) / ii[3][2] + 1
-        nb = max( 1, min( nb, nn[3] ) )
-        n = nn[0] * nn[1] * nn[2]
-        if n > (pm.nn[0] + pm.nn[1] + pm.nn[2]) ** 2:
+        shape = [ (i[1] - i[0]) / i[2] + 1 for i in ii ]
+        nb = ( min( pm.itio, nt ) - 1 ) / ii[3][2] + 1
+        nb = max( 1, min( nb, shape[3] ) )
+        n = shape[0] * shape[1] * shape[2]
+        if n > (nn[0] + nn[1] + nn[2]) ** 2:
             nb = 1
         elif n > 1:
             nb = min( nb, itbuff )

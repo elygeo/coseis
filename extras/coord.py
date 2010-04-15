@@ -304,9 +304,10 @@ def slipvectors( strike, dip, rake ):
     of dip to the right of the strike vector, find the rotation matrix R from world
     coordinates (east, north, up) to fault local coordinates (slip, rake, normal).
     The transpose R^T performs the reverse rotation from fault local coordinates to
-    world coordinates.  Rows of R are axis unit vectors of the fault local space in
     world coordinates.  Columns of R are axis unit vectors of the world space in
-    fault local coordinates.
+    fault local coordinates.  Rows of R are axis unit vectors of the fault local
+    space in world coordinates, that can be unpacked by:  
+    n_slip, n_rake, n_normal = coord.slipvectors( strike, dip, rake )
     """
     strike = np.pi / 180.0 * np.array( strike )
     dip    = np.pi / 180.0 * np.array( dip ) 
@@ -333,24 +334,24 @@ def source_tensors( R ):
     world coordinates.  R can be computed from strike, dip and rake angles with the
     'slipvectors' routine.  The return value is a 3x3 matrix T specifying
     contributions to the tensor W:
-    column 1 is the (shear)  strike contribution to W23, W31, W12
-    column 2 is the (shear)  dip    contribution to W23, W31, W12
-    column 3 is the (volume) normal contribution to W11, W22, W33
-    The columns can unpacked conveniently by:
-    Tstrike, Tdip, Tnormal = coord.sliptensors( strike, dip, rake )
+    row 1 is the (shear)  strike contribution to W23, W31, W12
+    row 2 is the (shear)  dip    contribution to W23, W31, W12
+    row 3 is the (volume) normal contribution to W11, W22, W33
+    The rows can unpacked conveniently by:
+    T_strike, T_dip, T_normal = coord.slip_tensors( R )
     """
-    strike, dip, normal = slipvectors( R )
+    strike, dip, normal = R
     del( R )
-    strike = 0.5 * ([
+    strike = 0.5 * np.array( [
         strike[1] * normal[2] + normal[1] * strike[2],
         strike[2] * normal[0] + normal[2] * strike[0],
         strike[0] * normal[1] + normal[0] * strike[1],
-    ])
-    dip = 0.5 * ([
+    ] )
+    dip = 0.5 * np.array( [
         dip[1] * normal[2] + normal[1] * dip[2],
         dip[2] * normal[0] + normal[2] * dip[0],
         dip[0] * normal[1] + normal[0] * dip[1],
-    ])
+    ] )
     normal = normal * normal
     return np.array( [strike, dip, normal] )
 

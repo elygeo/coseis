@@ -9,17 +9,23 @@ use m_collective
 use m_util
 integer :: nl(3)
 
-nt = max( nt, 0 )
+! Dimensions
+dx = delta(1:3)
+dt = delta(4)
+nn = shape_(1:3)
+nt = max( shape_(4), 0 )
+
+! Fault normal
 ifn = abs( faultnormal )
 
 ! Partition for parallelization
-if ( np0 == 1 ) np3 = 1
-nl3 = (nn - 1) / np3 + 1
+if ( np0 == 1 ) nproc3 = 1
+nl3 = (nn - 1) / nproc3 + 1
 nhalo = 1
 if ( ifn /= 0 ) nhalo(ifn) = 2
 nl3 = max( nl3, nhalo )
-np3 = (nn - 1) / nl3 + 1
-call rank( ip3, ipid, np3 )
+nproc3 = (nn - 1) / nl3 + 1
+call rank( ip3, ipid, nproc3 )
 nnoff = nl3 * ip3 - nhalo
 
 ! Master process
@@ -69,7 +75,7 @@ if ( debug > 2 ) then
     write( 1, "( 'irup    = ', i8                                            )" ) irup
     write( 1, "( 'ip      = ', i8                                            )" ) ip
     write( 1, "( 'ipid    = ', i8                                            )" ) ipid
-    write( 1, "( 'np3     = ', i8, 2(',', i8)                                )" ) np3
+    write( 1, "( 'nproc3  = ', i8, 2(',', i8)                                )" ) nproc3
     write( 1, "( 'ip3     = ', i8, 2(',', i8)                                )" ) ip3
     write( 1, "( 'nn      = ', i8, 2(',', i8)                                )" ) nn
     write( 1, "( 'nm      = ', i8, 2(',', i8)                                )" ) nm

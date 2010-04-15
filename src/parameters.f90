@@ -42,10 +42,8 @@ read( str, *, iostat=ios ) key
 ! Select input key
 select case( key )
 case( 'fieldio', '' )
-case( 'nn' );           read( str, *, iostat=ios ) key, op, nn
-case( 'nt' );           read( str, *, iostat=ios ) key, op, nt
-case( 'dx' );           read( str, *, iostat=ios ) key, op, dx
-case( 'dt' );           read( str, *, iostat=ios ) key, op, dt
+case( 'shape' );        read( str, *, iostat=ios ) key, op, shape_
+case( 'delta' );        read( str, *, iostat=ios ) key, op, delta
 case( 'tm0' );          read( str, *, iostat=ios ) key, op, tm0
 case( 'affine' );       read( str, *, iostat=ios ) key, op, affine
 case( 'n1expand' );     read( str, *, iostat=ios ) key, op, n1expand
@@ -84,7 +82,7 @@ case( 'vrup' );         read( str, *, iostat=ios ) key, op, vrup
 case( 'rcrit' );        read( str, *, iostat=ios ) key, op, rcrit
 case( 'trelax' );       read( str, *, iostat=ios ) key, op, trelax
 case( 'svtol' );        read( str, *, iostat=ios ) key, op, svtol
-case( 'np3' );          read( str, *, iostat=ios ) key, op, np3
+case( 'nproc3' );       read( str, *, iostat=ios ) key, op, nproc3
 case( 'itstats' );      read( str, *, iostat=ios ) key, op, itstats
 case( 'itio' );         read( str, *, iostat=ios ) key, op, itio
 case( 'itcheck' );      read( str, *, iostat=ios ) key, op, itcheck

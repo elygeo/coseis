@@ -9,5 +9,7 @@ fig = plt.figure( figsize=(3, 3) )
 ax = fig.add_subplot( 111 )
 ax.imshow( vm, extent=(-3, 3, -3, 3), interpolation='nearest', vmax=1 )
 ax.axis( 'image' )
-fig.savefig( 'tmp/example.png', dpi=80 )
+f = 'tmp/example.png'
+print f
+fig.savefig( f, dpi=80 )
 

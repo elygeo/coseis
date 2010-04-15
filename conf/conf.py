@@ -46,7 +46,7 @@ def find( *files ):
             if os.path.isfile( os.path.join( d, f ) ):
                 return f,
 
-# Look for Fortran
+# Fortran compilers
 fortran_serial = find( 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95' )
 fortran_mpi = find( 'mpxlf95_r', 'mpif90' )
 
@@ -95,7 +95,6 @@ fortran_defaults = {
         '8': ( 'FIXME', ),
     }
 }
-
 if os.uname()[0] == 'SunOS':
     fortran_defaults.update( { 'f95': {
         'f': ('-u'),

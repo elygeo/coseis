@@ -39,8 +39,8 @@ fieldio = [
 ]
 
 for np3 in np3_:
-    nn = [ npp_ * n for n in np3 ]
-    n = np3[0] * np3[1] * np3[2]
+    nn = np3[0] * npp_, np3[1] * npp_, np3[2] * npp_
+    n  = np3[0] * np3[1] * np3[2]
     print '\nBenchmark: %s, %s, %s, %s' % ( np3, math.log(n,2), n/16, n )
     rundir = 'run/%05d' % n
     sord.run( locals() )
