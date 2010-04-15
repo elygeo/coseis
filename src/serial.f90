@@ -1,8 +1,8 @@
 ! Collective routines - serial version
 module m_collective
-use m_frio
+use m_fio
 implicit none
-integer, parameter :: file_null = frio_file_null
+integer, parameter :: file_null = fio_file_null
 contains
 
 ! Initialize
@@ -30,96 +30,79 @@ subroutine barrier
 end subroutine
 
 ! Broadcast real 1d
-subroutine rbroadcast1( r, coords )
-real, intent(inout) :: r(:)
+subroutine rbroadcast1( f1, coords )
+real, intent(inout) :: f1(:)
 integer, intent(in) :: coords(3)
 integer :: i
-r = r
+f1 = f1
 i = coords(1)
 end subroutine
 
 ! Broadcast real 4d
-subroutine rbroadcast4( r, coords )
-real, intent(inout) :: r(:,:,:,:)
+subroutine rbroadcast4( f4, coords )
+real, intent(inout) :: f4(:,:,:,:)
 integer, intent(in) :: coords(3)
 integer :: i
-r = r
+f4 = f4
 i = coords(1)
 end subroutine
 
 ! Reduce integer
-subroutine ireduce( ii, i, op, coords )
-integer, intent(out) :: ii
-integer, intent(in) :: i, coords(3)
+subroutine ireduce( i0out, i0, op, coords )
+integer, intent(out) :: i0out
+integer, intent(in) :: i0, coords(3)
 character(*), intent(in) :: op
 character :: a
 a = op(1:1)
-ii = coords(1)
-ii = i
+i0out = coords(1)
+i0out = i0
 end subroutine
 
 ! Reduce real 1d
-subroutine rreduce1( rr, r, op, coords )
-real, intent(out) :: rr(:)
-real, intent(in) :: r(:)
-integer, intent(in) :: coords(3)
+subroutine rreduce1( f1out, f1, op, coords )
+real, intent(out) :: f1out(:)
+real, intent(in) :: f1(:)
 character(*), intent(in) :: op
+integer, intent(in) :: coords(3)
 character :: a
 a = op(1:1)
-rr = coords(1)
-rr = r
+f1out = coords(1)
+f1out = f1
 end subroutine
 
 ! Reduce real 2d
-subroutine rreduce2( rr, r, op, coords )
-real, intent(out) :: rr(:,:)
-real, intent(in) :: r(:,:)
-integer, intent(in) :: coords(3)
+subroutine rreduce2( f2out, f2, op, coords )
+real, intent(out) :: f2out(:,:)
+real, intent(in) :: f2(:,:)
 character(*), intent(in) :: op
+integer, intent(in) :: coords(3)
 character :: a
 a = op(1:1)
-rr = coords(1)
-rr = r
+f2out = coords(1)
+f2out = f2
 end subroutine
 
 ! Scalar swap halo
-subroutine scalar_swap_halo( f, n )
-real, intent(inout) :: f(:,:,:)
+subroutine scalar_swap_halo( f3, n )
+real, intent(inout) :: f3(:,:,:)
 integer, intent(in) :: n(3)
 return
-f(1,1,1) = f(1,1,1) - n(1) + n(1)
+f3(1,1,1) = f3(1,1,1) - n(1) + n(1)
 end subroutine
 
 ! Vector swap halo
-subroutine vector_swap_halo( f, n )
-real, intent(inout) :: f(:,:,:,:)
+subroutine vector_swap_halo( f4, n )
+real, intent(inout) :: f4(:,:,:,:)
 integer, intent(in) :: n(3)
 return
-f(1,1,1,1) = f(1,1,1,1) - n(1) + n(1)
+f4(1,1,1,1) = f4(1,1,1,1) - n(1) + n(1)
 end subroutine
 
-! 1D input/output
-subroutine rio1( fh, f, mode, filename, m, o, mpio, verb )
-use m_frio
+! 2D real input/output
+subroutine rio2( fh, f2, mode, filename, mm, nn, oo, mpio, verb )
+use m_fio
 integer, intent(inout) :: fh
-real, intent(inout) :: f(:)
-character(1), intent(in) :: mode
-character(*), intent(in) :: filename
-integer, intent(in) :: m, o, mpio
-logical, intent(in) :: verb
-real :: ff(1,size(f))
-integer :: i
-if ( mode == 'w' ) ff(1,:) = f
-call frio2( fh, ff, mode, filename, m, o, verb )
-if ( mode == 'r' ) f = ff(1,:) 
-i = mpio
-end subroutine
-
-! 2D input/output
-subroutine rio2( fh, f, mode, filename, mm, nn, oo, mpio, verb )
-use m_frio
-integer, intent(inout) :: fh
-real, intent(inout) :: f(:,:)
+real, intent(inout) :: f2(:,:)
 character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(in) :: mm(:), nn(:), oo(:), mpio
@@ -127,8 +110,58 @@ logical, intent(in) :: verb
 integer :: i
 if ( any( nn < 1 ) ) return
 i = size( oo )
-call frio2( fh, f, mode, filename, mm(i), oo(i), verb )
+call frio2( fh, f2, mode, filename, mm(i), oo(i), verb )
 i = mpio + nn(1)
+end subroutine
+
+! 2D integer input/output
+subroutine iio2( fh, f2, mode, filename, mm, nn, oo, mpio, verb )
+use m_fio
+integer, intent(inout) :: fh
+integer, intent(inout) :: f2(:,:)
+character(1), intent(in) :: mode
+character(*), intent(in) :: filename
+integer, intent(in) :: mm(:), nn(:), oo(:), mpio
+logical, intent(in) :: verb
+integer :: i
+if ( any( nn < 1 ) ) return
+i = size( oo )
+call fiio2( fh, f2, mode, filename, mm(i), oo(i), verb )
+i = mpio + nn(1)
+end subroutine
+
+! 1D real input/output
+subroutine rio1( fh, f1, mode, filename, m, o, mpio, verb )
+use m_fio
+integer, intent(inout) :: fh
+real, intent(inout) :: f1(:)
+character(1), intent(in) :: mode
+character(*), intent(in) :: filename
+integer, intent(in) :: m, o, mpio
+logical, intent(in) :: verb
+real :: f2(1,size(f1))
+integer :: i
+if ( mode == 'w' ) f2(1,:) = f1
+call frio2( fh, f2, mode, filename, m, o, verb )
+if ( mode == 'r' ) f1 = f2(1,:) 
+i = mpio
+end subroutine
+
+! 1D integer input/output
+subroutine iio1( fh, f1, mode, filename, m, o, mpio, verb )
+use m_fio
+integer, intent(inout) :: fh
+integer, intent(inout) :: f1(:)
+character(1), intent(in) :: mode
+character(*), intent(in) :: filename
+integer, intent(in) :: m, o, mpio
+logical, intent(in) :: verb
+real :: f2(1,size(f1))
+integer :: i
+if ( mode == 'w' ) f2(1,:) = f1
+call fiio2( fh, f2, mode, filename, m, o, verb )
+if ( mode == 'r' ) f1 = f2(1,:) 
+i = mpio
 end subroutine
 
 end module

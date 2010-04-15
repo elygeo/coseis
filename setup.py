@@ -27,7 +27,7 @@ def build( mode=None, optimize=None, dtype=None ):
         'bc.f90',
         'surfnormals.f90',
         'util.f90',
-        'frio.f90',
+        'fio.f90',
     )
     common = (
         'arrays.f90',

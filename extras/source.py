@@ -238,9 +238,14 @@ def srf_read( filename, path=None, mks=True ):
     sord.util.save( path + 'meta.py', meta, expand=['plane'] )
     return meta
 
-def srf2potency( src, path, proj, dx ):
+def srf2potency( src, path, proj=None, castint=False ):
     """
     Convert SRF to potency tensor source and write SORD input files.
+
+    src : path to SRF source directory converted first with srf_read
+    path : path to destination directory for potency tensors
+    proj : function to project lon/lat to logical model coordinates
+    castint : cast integerts (nt) to floats (hack for SORD)
     """
     import coord
 
@@ -273,7 +278,10 @@ def srf2potency( src, path, proj, dx ):
     nt = np.array( [nt1, nt2, nt3] )
     ii = nt > 0
     nsource = nt[ii].size
-    nt[ii].tofile( path + 'src_nt' )
+    if castint:
+        np.array( nt, dtype )[ii].tofile( path + 'src_nt' )
+    else:
+        nt[ii].tofile( path + 'src_nt' )
     dt[None].repeat(3,0)[ii].tofile( path + 'src_dt' )
     t0[None].repeat(3,0)[ii].tofile( path + 'src_t0' )
 
@@ -295,13 +303,14 @@ def srf2potency( src, path, proj, dx ):
 
     # Coordinates
     rot = coord.rotation( x, y, proj )[1]
-    x, y = proj( x, y )
-    x = np.array( x / dx[0] + 1.0, dtype )
-    y = np.array( y / dx[1] + 1.0, dtype )
-    z = np.array( z / dx[2] + 1.0, dtype )
-    x[None].repeat(3,0)[ii].tofile( path + 'src_xi1' )
-    y[None].repeat(3,0)[ii].tofile( path + 'src_xi2' )
-    z[None].repeat(3,0)[ii].tofile( path + 'src_xi3' )
+    if proj != None:
+        x, y = proj( x, y )
+        x = np.array( x, dtype )
+        y = np.array( y, dtype )
+        z = np.array( z, dtype )
+        x[None].repeat(3,0)[ii].tofile( path + 'src_xi1' )
+        y[None].repeat(3,0)[ii].tofile( path + 'src_xi2' )
+        z[None].repeat(3,0)[ii].tofile( path + 'src_xi3' )
 
     # Strike, dip, and normal vectors
     R = area * coord.slipvectors( stk + rot, dip, rake )
@@ -319,7 +328,7 @@ def srf2potency( src, path, proj, dx ):
 
     return nsource
 
-def srf2momrate( path, proj, dx, dt, nt ):
+def srf2momrate( path, proj, delta, dt, nt ):
     """
     Convert SRF to moment rate and write Olsen AWM input file.
     """
@@ -350,9 +359,9 @@ def srf2momrate( path, proj, dx, dt, nt ):
     # Coordinates
     rot = coord.rotation( x, y, proj )[1]
     x, y = proj( x, y )
-    jj = int( x / dx[0] + 1.5 )
-    kk = int( y / dx[1] + 1.5 )
-    ll = int( z / dx[2] + 1.5 )
+    jj = int( x / delta[0] + 1.5 )
+    kk = int( y / delta[1] + 1.5 )
+    ll = int( z / delta[2] + 1.5 )
 
     # Moment tensor components
     R = area * coord.slipvectors( stk + rot, dip, rake )
@@ -405,7 +414,7 @@ def dsample( f, d ):
     g = g / (d * d)
     return g
 
-def srf2coulomb( path, proj, dx, dest=None, scut=0 ):
+def srf2coulomb( path, proj, delta, dest=None, scut=0 ):
     """
     Convert SRF to Coulomb input file.
     """
@@ -442,7 +451,7 @@ def srf2coulomb( path, proj, dx, dest=None, scut=0 ):
     x *= 0.001
     y *= 0.001
     z *= 0.001
-    delta = 0.0005 * meta['dx']
+    delta = 0.0005 * meta['delta']
     dx = delta * np.sin( np.pi / 180.0 * (stk + rot) )
     dy = delta * np.cos( np.pi / 180.0 * (stk + rot) )
     dz = delta * np.sin( np.pi / 180.0 * dip )

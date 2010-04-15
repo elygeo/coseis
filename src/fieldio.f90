@@ -36,7 +36,7 @@ subroutine fieldio( passes, field, f )
 use m_globals
 use m_util
 use m_collective
-use m_frio
+use m_fio
 character(*), intent(in) :: passes, field
 real, intent(inout) :: f(:,:,:)
 character(4) :: pass
@@ -189,7 +189,7 @@ case( '=r', '+r', '=R', '+R' )
         !XXX allocate( io%buff(io%nc,n(1)*n(2)*n(3),io%nb) )
         allocate( io%buff(n(1)*n(2)*n(3),io%nb) )
         io%ib = io%nb
-        io%fh = frio_file_null
+        io%fh = fio_file_null
         if ( mpin /= 0 ) io%fh = file_null
     end if
     if ( io%ib == io%nb ) then
@@ -276,7 +276,7 @@ case( '=w', '=wi' )
         !XXX allocate( io%buff(io%nc,n(1)*n(2)*n(3),io%nb) )
         allocate( io%buff(n(1)*n(2)*n(3),io%nb) )
         io%ib = 0
-        io%fh = frio_file_null
+        io%fh = fio_file_null
         if ( mpout /= 0 ) io%fh = file_null
     end if
     if ( modulo( it, itstats ) /= 0 ) then
