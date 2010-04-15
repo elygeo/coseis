@@ -375,7 +375,7 @@ character(*), intent(in) :: filename
 integer, intent(in) :: m, o, mpio
 logical, intent(in) :: verb
 integer :: mm(2), nn(2), oo(2)
-real :: f2(1,size(f1))
+integer :: f2(1,size(f1))
 if ( mode == 'w' ) f2(1,:) = f1
 mm = (/ 1, m /)
 nn = (/ 1, size(f1) /)
