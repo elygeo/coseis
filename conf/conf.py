@@ -36,8 +36,7 @@ maxram = 0
 maxtime = 0
 rate = 1.0e6
 queue = None
-native_dtype = np.dtype( 'f' ).str
-dtype = native_dtype
+dtype = dtype_f = np.dtype( 'f' ).str
 
 # Search for file in PATH
 def find( *files ):

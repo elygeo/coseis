@@ -60,7 +60,7 @@ def build( mode=None, optimize=None, dtype=None ):
         for opt in optimize:
             object_ = os.path.join( '..', 'bin', 'sord-s' + opt + dsize )
             fflags = cf.fortran_flags['f'] + cf.fortran_flags[opt]
-            if dtype != cf.native_dtype:
+            if dtype != cf.dtype_f:
                 fflags = fflags + cf.fortran_flags[dsize]
             compiler = cf.fortran_serial + fflags + ('-o',)
             new |= util.make( compiler, object_, source )
@@ -69,7 +69,7 @@ def build( mode=None, optimize=None, dtype=None ):
         for opt in optimize:
             object_ = os.path.join( '..', 'bin', 'sord-m' + opt + dsize )
             fflags = cf.fortran_flags['f'] + cf.fortran_flags[opt]
-            if dtype != cf.native_dtype:
+            if dtype != cf.dtype_f:
                 fflags = fflags + cf.fortran_flags[dsize]
             compiler = cf.fortran_mpi + fflags + ('-o',)
             new |= util.make( compiler, object_, source )

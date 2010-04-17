@@ -21,8 +21,8 @@ def dot2( A, B ):
     This could be made more general with arbitrary maximum matrix dimension, at
     the cost of code clarity.
     """
-    A = np.array( A ).T
-    B = np.array( B ).T
+    A = np.asarray( A ).T
+    B = np.asarray( B ).T
     i = -min( A.ndim, 2 )
     if A.shape[i] != B.shape[-1]:
         sys.exit( 'Incompatible arrays for dot product' )
@@ -37,8 +37,8 @@ def solve2( A, b ):
     """
     Vectorized 2x2 linear equation solver
     """
-    A = np.array( A )
-    b = np.array( b )
+    A = np.asarray( A )
+    b = np.asarray( b )
     A /= (A[0,0] * A[1,1] - A[0,1] * A[1,0])
     return np.array( [b[0] * A[1,1] - b[1] * A[0,1],
                       b[1] * A[0,0] - b[0] * A[1,0]] )
@@ -47,8 +47,8 @@ def interp( x0, dx, z, xi, extrapolate=False ):
     """
     1D interpolation on a regular grid
     """
-    z = np.array( z )
-    xi = (np.array( xi ) - x0) / dx
+    z = np.asarray( z )
+    xi = (np.asarray( xi ) - x0) / dx
     j = np.int32( xi )
     n = z.shape[-1]
     if not extrapolate:
@@ -63,9 +63,9 @@ def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=False ):
     """
     2D interpolation on a regular grid
     """
-    z = np.array( z )
-    xi = (np.array( xi ) - x0) / dx
-    yi = (np.array( yi ) - y0) / dy
+    z = np.asarray( z )
+    xi = (np.asarray( xi ) - x0) / dx
+    yi = (np.asarray( yi ) - y0) / dy
     j = np.array( xi, 'i' )
     k = np.array( yi, 'i' )
     n = z.shape
@@ -85,10 +85,10 @@ def ibilinear( xx, yy, xi, yi ):
     """
     Vectorized inverse bilinear interpolation
     """
-    xx = np.array( xx )
-    yy = np.array( yy )
-    xi = np.array( xi ) - 0.25 * xx.sum(0).sum(0)
-    yi = np.array( yi ) - 0.25 * yy.sum(0).sum(0)
+    xx = np.asarray( xx )
+    yy = np.asarray( yy )
+    xi = np.asarray( xi ) - 0.25 * xx.sum(0).sum(0)
+    yi = np.asarray( yi ) - 0.25 * yy.sum(0).sum(0)
     j1 = 0.25 * np.array([ [ xx[1,:] - xx[0,:], xx[:,1] - xx[:,0] ],
                            [ yy[1,:] - yy[0,:], yy[:,1] - yy[:,0] ] ]).sum(2)
     j2 = 0.25 * np.array([   xx[1,1] - xx[0,1] - xx[1,0] + xx[0,0],
@@ -114,7 +114,7 @@ def rot_sym_tensor( w1, w2, rot ):
     w2:  components w23, w31, w12
     rot: rotation matrix
     """
-    rot = np.array( rot )
+    rot = np.asarray( rot )
     mat = np.diag( w1 )
     mat.flat[[5, 6, 1]] = w2
     mat.flat[[7, 2, 3]] = w2
@@ -127,7 +127,7 @@ def rotmat( x, origin=(0, 0, 0), upvector=(0, 0, 1) ):
     """
     Given a position vector x, find the rotation matrix to r,h,v coordinates.
     """
-    x = np.array( x ) - np.array( origin )
+    x = np.asarray( x ) - np.asarray( origin )
     nr = x / np.sqrt( (x * x).sum() )
     nh = np.cross( upvector, nr )
     if all( nh == 0.0 ):
@@ -145,9 +145,9 @@ def llr2xyz( x, y, z, inverse=False ):
 
     x <-> lon, y <-> lat, z <-> r
     """
-    x = np.array( x )
-    y = np.array( y )
-    z = np.array( z )
+    x = np.asarray( x )
+    y = np.asarray( y )
+    z = np.asarray( z )
     if inverse:
         r = np.sqrt( x * x + y * y + z * z )
         x = np.arctan2( y, x )
@@ -268,8 +268,8 @@ class Transform():
         self.proj = proj
     def __call__( self, x, y, **kwarg ):
         proj = self.proj
-        x = np.array( x )
-        y = np.array( y )
+        x = np.asarray( x )
+        y = np.asarray( y )
         if kwarg.get( 'inverse' ) != True:
             if proj != None:
                 x, y = proj( x, y, **kwarg )
@@ -309,9 +309,9 @@ def slipvectors( strike, dip, rake ):
     space in world coordinates, that can be unpacked by:  
     n_slip, n_rake, n_normal = coord.slipvectors( strike, dip, rake )
     """
-    strike = np.pi / 180.0 * np.array( strike )
-    dip    = np.pi / 180.0 * np.array( dip ) 
-    rake   = np.pi / 180.0 * np.array( rake )
+    strike = np.pi / 180.0 * np.asarray( strike )
+    dip    = np.pi / 180.0 * np.asarray( dip ) 
+    rake   = np.pi / 180.0 * np.asarray( rake )
     u = np.ones( strike.shape )
     z = np.zeros( strike.shape )
     c = np.cos( rake )

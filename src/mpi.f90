@@ -15,10 +15,10 @@ real :: r
 call mpi_init( e )
 call mpi_comm_size( mpi_comm_world, np0, e  )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
-call mpi_sizeof( i, n, e )
-call mpi_type_match_size( mpi_typeclass_integer, n, itype, e )
 call mpi_sizeof( r, n, e )
 call mpi_type_match_size( mpi_typeclass_real, n, rtype, e )
+call mpi_sizeof( i, n, e )
+call mpi_type_match_size( mpi_typeclass_integer, n, itype, e )
 end subroutine
 
 ! Finalize

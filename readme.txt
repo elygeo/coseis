@@ -548,3 +548,5 @@ See the
 `Bazaar tutorials <http://doc.bazaar-vcs.org/latest/en/tutorials/index.html>`__
 for more.
 
+.. vim: filetype=rst
+
