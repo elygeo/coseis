@@ -215,13 +215,11 @@ def stage( inputs ):
             open( ff, 'w' ).write( out )
             shutil.copymode( f, ff )
 
-    # log file
+    # log, conf, parameter files
+    os.chdir( cf.rundir )
     log = open( 'log', 'w' )
     log.write( starttime + ': setup started\n' )
-
-    # parameters
-    os.chdir( cf.rundir )
-    util.save( 'conf.py', cf, header = '# machine configuration\n' )
+    util.save( 'conf.py', cf, header = '# configuration\n' )
     util.save( 'parameters.py', pm, expand=['fieldio'], header='# model parameters\n' )
 
     # metadata
