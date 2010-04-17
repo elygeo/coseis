@@ -4,7 +4,8 @@ Build SORD binaries and documentation
 """
 import os, sys, getopt
 import numpy as np
-import util, configure
+import configure
+from util import util
 
 def build( mode=None, optimize=None, dtype=None ):
     """
@@ -111,7 +112,7 @@ def docs():
 def rspec():
     cwd = os.getcwd()
     path = os.path.realpath( os.path.dirname( __file__ ) )
-    os.chdir( os.path.join( path, 'extras' ) )
+    os.chdir( os.path.join( path, 'util' ) )
     if not os.path.isfile( 'rspectra.so' ):
         os.system( 'f2py -c -m rspectra rspectra.f90' )
     os.chdir( cwd )

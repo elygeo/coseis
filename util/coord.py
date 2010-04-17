@@ -236,9 +236,9 @@ class Transform():
     connecting line. 
 
     Example: TeraShake SDSU/Okaya projection
-    >>> import pyproj, sord
+    >>> import pyproj
     >>> proj = pyproj.Proj( proj='utm', zone=11, ellps='WGS84' )
-    >>> proj = sord.coord.Transform( proj, rotation=40.0, origin=(-121.0, 34.5) )
+    >>> proj = Transform( proj, rotation=40.0, origin=(-121.0, 34.5) )
     >>> proj( -120.0, 35.0 )
     array([  38031.1000251 ,  100171.63485189])
     >>> proj( 0, 0, inverse=True )

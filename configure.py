@@ -3,7 +3,7 @@
 Read configuration files
 """
 import os, sys
-import util
+from util import util
 
 def configure( save=False, machine=None ):
     """

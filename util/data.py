@@ -2,9 +2,10 @@
 """
 Mapping data utilities
 """
-import os, urllib, gzip, zipfile, sord
+import os, urllib, gzip, zipfile
 import numpy as np
 from cStringIO import StringIO
+import coord, util
 
 repo = os.path.expanduser( '~/mapdata' )
 
@@ -65,11 +66,11 @@ def etopo1( indices=None, downsample=1 ):
         z = np.fromstring( z, '<i2' ).reshape( [21601, 10801] )
         z = np.array( z, 'f' )
         if downsample > 1:
-            z = sord.coord.downsample_sphere( z, downsample )
+            z = coord.downsample_sphere( z, downsample )
         open( filename, 'wb' ).write( z )
     if indices != None:
         shape = (21601 - 1) / downsample + 1, (10801 - 1) / downsample + 1
-        return sord.util.ndread( filename, shape, indices, 'f' )
+        return util.ndread( filename, shape, indices, 'f' )
     else:
         return
 
@@ -104,7 +105,7 @@ def globe( indices=None ):
         del( z, row )
     if indices != None:
         shape = 43200, 21600
-        return sord.util.ndread( filename, shape, indices, '<i2' )
+        return util.ndread( filename, shape, indices, '<i2' )
     else:
         return
 

@@ -4,10 +4,10 @@ Support Operator Rupture Dynamics
 """
 import os, sys, re, math
 import numpy as np
-import util, configure, fieldnames
-from extras import coord, egmm, signal, source, data, viz, plt, mlab, swab
+import configure, fieldnames
+from util import swab, util, coord, signal, source, data, viz, plt, mlab, egmm
 try:
-    from extras import rspectra
+    from util import rspectra
 except( ImportError ):
     pass
 
@@ -407,7 +407,7 @@ def launch( cf ):
             sys.exit( 'Error: hostname %r does not match configuration %r'
                 % (cf.host, cf.machine) )
         print( 'bash queue.sh' )
-        if os.system( 'bash queue.sh' ) ):
+        if os.system( 'bash queue.sh' ):
             sys.exit( 'Error queing job' )
     elif cf.run:
         if cf.host not in cf.hosts:
