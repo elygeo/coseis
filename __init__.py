@@ -193,7 +193,7 @@ def stage( inputs ):
 
     # copy files to run directory
     cwd = os.path.realpath( os.getcwd() )
-    cf.rundate = time.asctime()
+    cf.rundate = time.strftime( '%Y %b %d' )
     cf.name = os.path.basename( cf.rundir )
     cf.rundir = os.path.realpath( cf.rundir )
     os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
@@ -403,18 +403,18 @@ def launch( cf ):
     cwd = os.getcwd()
     os.chdir( cf.rundir )
     if cf.run == 'q':
-        print( 'queue.sh' )
         if cf.host not in cf.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r'
                 % (cf.host, cf.machine) )
-        if os.system( os.path.join( '.', 'queue.sh' ) ):
+        print( 'bash queue.sh' )
+        if os.system( 'bash queue.sh' ) ):
             sys.exit( 'Error queing job' )
     elif cf.run:
-        print( 'run.sh -' + cf.run )
         if cf.host not in cf.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r'
                 % (cf.host, cf.machine) )
-        if os.system( os.path.join( '.', 'run.sh -' + cf.run ) ):
+        print( 'bash run.sh -' + cf.run )
+        if os.system( 'bash run.sh -' + cf.run ):
             sys.exit( 'Error running job' )
     os.chdir( cwd )
     return
