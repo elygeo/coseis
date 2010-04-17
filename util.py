@@ -29,41 +29,43 @@ def prune( d, pattern=None, types=None ):
             del( d[k] )
     return d
 
-def save( fd, d, expand=None, prune_pattern=None, prune_types=None ):
+def save( fd, d, expand=None, keep=None, header='', prune_pattern=None, prune_types=None ):
     """
     Write variables from a dict into a Python source file.
     """
-    if type( fd ) is not file:
-        fd = open( os.path.expanduser( fd ), 'w' )
     if type( d ) is not dict:
         d = d.__dict__
     if expand is None:
         expand = []
     prune( d, prune_pattern, prune_types )
+    out = header
     for k in sorted( d ):
-        if k not in expand:
-            fd.write( '%s = %r\n' % (k, d[k]) )
+        if k not in expand and (keep == None or k in keep):
+            out += '%s = %r\n' % (k, d[k])
     for k in expand:
         if k in d:
             if type( d[k] ) == tuple:
-                fd.write( k + ' = (\n' )
+                out += k + ' = (\n'
                 for item in d[k]:
-                    fd.write( '    %r,\n' % (item,) )
-                fd.write( ')\n' )
+                    out += '    %r,\n' % (item,)
+                out += ')\n'
             elif type( d[k] ) == list:
-                fd.write( k + ' = [\n' )
+                out += k + ' = [\n'
                 for item in d[k]:
-                    fd.write( '    %r,\n' % (item,) )
-                fd.write( ']\n' )
+                    out += '    %r,\n' % (item,)
+                out += ']\n'
             elif type( d[k] ) == dict:
-                fd.write( k + ' = {\n' )
+                out += k + ' = {\n'
                 for item in sorted( d[k] ):
-                    fd.write( '    %r: %r,\n' % (item, d[k][item]) )
-                fd.write( '}\n' )
+                    out += '    %r: %r,\n' % (item, d[k][item])
+                out += '}\n'
             else:
                 sys.exit( 'Cannot expand %s type %s' % ( k, type( d[k] ) ) )
-    fd.close()
-    return
+    if fd != None: 
+        if type( fd ) is not file:
+            fd = open( os.path.expanduser( fd ), 'w' )
+        fd.write( out )
+    return out
 
 def load( fd, d=None, prune_pattern=None, prune_types=None ):
     """

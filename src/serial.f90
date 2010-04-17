@@ -1,22 +1,22 @@
-! Collective routines - serial version
+! collective routines - serial version
 module m_collective
 use m_fio
 implicit none
 integer, parameter :: file_null = fio_file_null
 contains
 
-! Initialize
+! initialize
 subroutine initialize( np0, ip )
 integer, intent(out) :: np0, ip
 ip = 0
 np0 = 1
 end subroutine
 
-! Finalize
+! finalize
 subroutine finalize
 end subroutine
 
-! Process rank
+! process rank
 subroutine rank( ip3, ipid, nproc3 )
 integer, intent(out) :: ip3(3), ipid
 integer, intent(in) :: nproc3(3)
@@ -25,11 +25,11 @@ ip3 = 0
 ipid = 0
 end subroutine
 
-! Barrier
+! barrier
 subroutine barrier
 end subroutine
 
-! Broadcast real 1d
+! broadcast real 1d
 subroutine rbroadcast1( f1, coords )
 real, intent(inout) :: f1(:)
 integer, intent(in) :: coords(3)
@@ -38,7 +38,7 @@ f1 = f1
 i = coords(1)
 end subroutine
 
-! Broadcast real 4d
+! broadcast real 4d
 subroutine rbroadcast4( f4, coords )
 real, intent(inout) :: f4(:,:,:,:)
 integer, intent(in) :: coords(3)
@@ -47,7 +47,7 @@ f4 = f4
 i = coords(1)
 end subroutine
 
-! Reduce integer
+! reduce integer
 subroutine ireduce( i0out, i0, op, coords )
 integer, intent(out) :: i0out
 integer, intent(in) :: i0, coords(3)
@@ -58,7 +58,7 @@ i0out = coords(1)
 i0out = i0
 end subroutine
 
-! Reduce real 1d
+! reduce real 1d
 subroutine rreduce1( f1out, f1, op, coords )
 real, intent(out) :: f1out(:)
 real, intent(in) :: f1(:)
@@ -70,7 +70,7 @@ f1out = coords(1)
 f1out = f1
 end subroutine
 
-! Reduce real 2d
+! reduce real 2d
 subroutine rreduce2( f2out, f2, op, coords )
 real, intent(out) :: f2out(:,:)
 real, intent(in) :: f2(:,:)
@@ -82,7 +82,7 @@ f2out = coords(1)
 f2out = f2
 end subroutine
 
-! Scalar swap halo
+! scalar swap halo
 subroutine scalar_swap_halo( f3, n )
 real, intent(inout) :: f3(:,:,:)
 integer, intent(in) :: n(3)
@@ -90,7 +90,7 @@ return
 f3(1,1,1) = f3(1,1,1) - n(1) + n(1)
 end subroutine
 
-! Vector swap halo
+! vector swap halo
 subroutine vector_swap_halo( f4, n )
 real, intent(inout) :: f4(:,:,:,:)
 integer, intent(in) :: n(3)
@@ -98,7 +98,7 @@ return
 f4(1,1,1,1) = f4(1,1,1,1) - n(1) + n(1)
 end subroutine
 
-! 2D real input/output
+! 2d real input/output
 subroutine rio2( fh, f2, mode, filename, mm, nn, oo, mpio, verb )
 use m_fio
 integer, intent(inout) :: fh
@@ -114,7 +114,7 @@ call frio2( fh, f2, mode, filename, mm(i), oo(i), verb )
 i = mpio + nn(1)
 end subroutine
 
-! 2D integer input/output
+! 2d integer input/output
 subroutine iio2( fh, f2, mode, filename, mm, nn, oo, mpio, verb )
 use m_fio
 integer, intent(inout) :: fh
@@ -130,7 +130,7 @@ call fiio2( fh, f2, mode, filename, mm(i), oo(i), verb )
 i = mpio + nn(1)
 end subroutine
 
-! 1D real input/output
+! 1d real input/output
 subroutine rio1( fh, f1, mode, filename, m, o, mpio, verb )
 use m_fio
 integer, intent(inout) :: fh
@@ -147,7 +147,7 @@ if ( mode == 'r' ) f1 = f2(1,:)
 i = mpio
 end subroutine
 
-! 1D integer input/output
+! 1d integer input/output
 subroutine iio1( fh, f1, mode, filename, m, o, mpio, verb )
 use m_fio
 integer, intent(inout) :: fh

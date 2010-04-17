@@ -1,10 +1,10 @@
-! Checkpoint restart
+! checkpoint restart
 module m_checkpoint
 implicit none
 integer, private :: itcheck0
 contains
 
-! Look for checkpoint
+! look for checkpoint
 subroutine look_for_checkpoint
 use m_globals
 use m_collective
@@ -25,7 +25,7 @@ it = i
 iotimer = iotimer + timer( 2 )
 end subroutine
 
-! Read checkpoint
+! read checkpoint
 subroutine read_checkpoint
 use m_globals
 use m_stats
@@ -57,7 +57,7 @@ end if
 iotimer = iotimer + timer( 2 )
 end subroutine
 
-! Write checkpoint
+! write checkpoint
 subroutine write_checkpoint
 use m_globals
 use m_stats

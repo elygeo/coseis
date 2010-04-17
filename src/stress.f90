@@ -1,4 +1,4 @@
-! Stress calculation
+! stress calculation
 module m_stress
 implicit none
 contains
@@ -14,22 +14,22 @@ integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, p
 
 if ( verb ) write( 0, * ) 'Stress'
 
-! Modified displacement
+! modified displacement
 do i = 1, 3
     w1(:,:,:,i) = uu(:,:,:,i) + gam * vv(:,:,:,i)
 end do
 call set_halo( s1, 0.0, i1cell, i2cell )
 
-! Loop over component and derivative direction
+! loop over component and derivative direction
 doic: do ic  = 1, 3
 doid: do iid = 1, 3; id = modulo( ic + iid - 1, 3 ) + 1
 
-! Elastic region: g_ij = (u_i + gamma*v_i),j
+! elastic region: g_ij = (u_i + gamma*v_i),j
 i1 = max( i1pml + 1, i1cell )
 i2 = min( i2pml - 2, i2cell )
 call diffnc( s1, w1, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
 
-! PML region, non-damped directions: g_ij = u_i,j
+! pml region, non-damped directions: g_ij = u_i,j
 do i = 1, 3
 if ( id /= i ) then
     i1 = i1cell
@@ -43,7 +43,7 @@ if ( id /= i ) then
 end if
 end do
 
-! PML region, damped direction: g'_ij = d_j*g_ij = v_i,j
+! pml region, damped direction: g'_ij = d_j*g_ij = v_i,j
 select case( id )
 case( 1 )
     i1 = i1cell
@@ -134,7 +134,7 @@ case( 3 )
     end do
 end select
 
-! Add contribution to potency
+! add contribution to potency
 i = 6 - ic - id
 if ( ic < id ) then
     w2(:,:,:,i) = 0.5 * s1
@@ -147,19 +147,19 @@ end if
 end do doid
 end do doic
 
-! Strain
+! strain
 do i = 1, 3
     w1(:,:,:,i) = w1(:,:,:,i) * vc
     w2(:,:,:,i) = w2(:,:,:,i) * vc
 end do
 
-! Add potency source to strain
+! add potency source to strain
 if ( source == 'potency' ) then
     call finite_source
     call tensor_point_source
 end if
 
-! Strain I/O
+! strain i/o
 call fieldio( '<>', 'e11', w1(:,:,:,1) )
 call fieldio( '<>', 'e22', w1(:,:,:,2) )
 call fieldio( '<>', 'e33', w1(:,:,:,3) )
@@ -167,7 +167,7 @@ call fieldio( '<>', 'e23', w2(:,:,:,1) )
 call fieldio( '<>', 'e31', w2(:,:,:,2) )
 call fieldio( '<>', 'e12', w2(:,:,:,3) )
 
-! Attenuation
+! attenuation
 !do j = 1, 2
 !do k = 1, 2
 !do l = 1, 2
@@ -178,20 +178,20 @@ call fieldio( '<>', 'e12', w2(:,:,:,3) )
 !end do
 !end do
 
-! Hook's Law: w_ij = lam*g_ij*delta_ij + mu*(g_ij + g_ji)
+! Hook's law: w_ij = lam*g_ij*delta_ij + mu*(g_ij + g_ji)
 s1 = lam * ( w1(:,:,:,1) + w1(:,:,:,2) + w1(:,:,:,3 ) )
 do i = 1, 3
     w1(:,:,:,i) = 2.0 * mu * w1(:,:,:,i) + s1
     w2(:,:,:,i) = 2.0 * mu * w2(:,:,:,i)
 end do
 
-! Add moment source to stress
+! add moment source to stress
 if ( source == 'moment' ) then
     call finite_source
     call tensor_point_source
 end if
 
-! Stress I/O
+! stress i/o
 call fieldio( '<>', 'w11', w1(:,:,:,1) )
 call fieldio( '<>', 'w22', w1(:,:,:,2) )
 call fieldio( '<>', 'w33', w1(:,:,:,3) )

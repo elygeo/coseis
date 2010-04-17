@@ -1,4 +1,4 @@
-! Fortran binary I/O
+! fortran binary i/o
 module m_fio
 integer, parameter :: fio_file_null = -1
 contains

@@ -1,4 +1,4 @@
-! Material model
+! material model
 module m_material
 implicit none
 contains
@@ -13,13 +13,13 @@ integer :: i1(3), i2(3)
 
 if ( master ) write( 0, * ) 'Material model'
 
-! Init
+! init
 mr = 0.0
 lam = 0.0
 mu = 0.0
 gam = 0.0
 
-! Inputs
+! inputs
 call fieldio( '<', 'rho', mr  )
 call fieldio( '<', 'vp',  lam  )
 call fieldio( '<', 'vs',  mu  )
@@ -27,7 +27,7 @@ call fieldio( '<', 'gam', gam )
 s1 = lam
 s2 = mu
 
-! Limits
+! limits
 if ( rho1 > 0.0 ) mr = max( mr, rho1 )
 if ( rho2 > 0.0 ) mr = min( mr, rho2 )
 if ( vp1  > 0.0 ) s1 = max( s1, vp1 )
@@ -35,18 +35,18 @@ if ( vp2  > 0.0 ) s1 = min( s1, vp2 )
 if ( vs1  > 0.0 ) s2 = max( s2, vs1 )
 if ( vs2  > 0.0 ) s2 = min( s2, vs2 )
 
-! Velocity dependent viscosity
+! velocity dependent viscosity
 if ( vdamp > 0.0 ) then
     gam = s2
     call invert( gam )
     gam = gam * vdamp
 end if
 
-! Limits
+! limits
 if ( gam1 > 0.0 ) gam = max( gam, gam1 )
 if ( gam2 > 0.0 ) gam = min( gam, gam2 )
 
-! Averages
+! averages
 vstats = 0.0
 i1 = max( i1core, i1bc )
 i2 = min( i2core, i2bc - 1 )
@@ -64,13 +64,13 @@ vp_  = gvstats(2) / product( nn - 1 )
 vs_  = gvstats(3) / product( nn - 1 ) 
 gam_ = gvstats(4) / product( nn - 1 ) 
 
-! Fill halo
+! fill halo
 call scalar_swap_halo( mr,  nhalo )
 call scalar_swap_halo( s1,  nhalo )
 call scalar_swap_halo( s2,  nhalo )
 call scalar_swap_halo( gam, nhalo )
 
-! Extrema
+! extrema
 call set_halo( mr,  huge(r), i1cell, i2cell )
 call set_halo( s1,  huge(r), i1cell, i2cell )
 call set_halo( s2,  huge(r), i1cell, i2cell )
@@ -97,7 +97,7 @@ vp2  =  gvstats(6)
 vs2  =  gvstats(7)
 gam2 =  gvstats(8)
 
-! Stats
+! stats
 if ( master ) then
     courant = dt * vp2 * 3.0 / sqrt( sum( dx * dx ) )
     open( 1, file='stats/material.py', status='replace' )
@@ -117,17 +117,17 @@ if ( master ) then
     close( 1 )
 end if
 
-! Lame' parameters
+! lame' parameters
 mu  = mr * s2 * s2
 lam = mr * s1 * s1 - 2.0 * mu
 
-! Hourglass constant
+! hourglass constant
 yy = 12.0 * (lam + 2.0 * mu)
 call invert( yy )
 yy = yy * sqrt( sum( dx * dx ) / 3.0 ) * mu * (lam + mu)
 !yy = 0.3 / 16.0 * ( lam + 2.0 * mu ) * sqrt( sum( dx * dx ) / 3.0 ) ! like Ma & Liu, 2006
 
-! Output
+! output
 call fieldio( '>', 'rho', mr  )
 call fieldio( '>', 'vp',  s1  )
 call fieldio( '>', 'vs',  s2  )
@@ -140,7 +140,7 @@ end subroutine
 
 !------------------------------------------------------------------------------!
 
-! Calculate PML damping parameters
+! calculate pml damping parameters
 subroutine pml
 use m_globals
 integer :: i

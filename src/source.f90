@@ -1,4 +1,4 @@
-! Kinematic source
+! kinematic source
 module m_source
 implicit none
 integer, private, allocatable :: src_nt(:)
@@ -6,7 +6,7 @@ real, private, allocatable :: src_xi(:,:), src_dt(:), src_t0(:), &
     src_w1(:,:), src_w2(:,:), src_history(:)
 contains
 
-! Initialize finite source
+! initialize finite source
 subroutine finite_source_init
 use m_globals
 use m_collective
@@ -61,7 +61,7 @@ allocate( src_history(n) )
 call rio1( fh, src_history, 'r', 'in/src_history', n, 0, mpin, verb )
 end subroutine
 
-! Add finite source to force vector or strain/stress tensor
+! add finite source to force vector or strain/stress tensor
 subroutine finite_source
 use m_globals
 integer :: i1(3), i2(3), i, j, k, l, isrc, itoff
@@ -117,7 +117,7 @@ do isrc = 1, abs( nsource )
 end do
 end subroutine
 
-! Add point source to vector
+! add point source to vector
 subroutine vector_point_source
 use m_globals
 use m_util
@@ -145,7 +145,7 @@ end do
 end do
 end subroutine
 
-! Add point source to strain/stress tensor
+! add point source to strain/stress tensor
 subroutine tensor_point_source
 use m_globals
 use m_util

@@ -1,4 +1,4 @@
-! Find surface normals
+! find surface normals
 module m_surfnormals
 implicit none
 contains

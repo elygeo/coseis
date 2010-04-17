@@ -1,4 +1,4 @@
-! Allocate arrays
+! allocate arrays
 module m_arrays
 implicit none
 contains
@@ -34,14 +34,14 @@ allocate(         &
     s1(j,k,l),    &
     s2(j,k,l)     )
 
-! PML
+! pml
 i1 = min( i2node, i1pml ) - i1node + 1
 i2 = i2node - max( i1node, i2pml ) + 1
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
-! PML state
+! pml state
 allocate(         &
     p1(j1,k,l,3), &
     p2(j,k1,l,3), &
@@ -56,10 +56,10 @@ allocate(         &
     g5(j,k2,l,3), &
     g6(j,k,l2,3)  )
 
-! PML damping
+! pml damping
 allocate( dn1(npml), dn2(npml), dc1(npml), dc2(npml) )
 
-! Fault
+! rupture
 if ( ifn /= 0 ) then
     i1 = nm
     i1(ifn) = 1
@@ -70,7 +70,7 @@ j = i1(1)
 k = i1(2)
 l = i1(3)
 
-! Fault vectors
+! rupture vectors
 allocate(          &
     !ts0(j,k,l,3),  & ! [ZS]
     !tp(j,k,l,3),   & ! [ZS]
@@ -80,7 +80,7 @@ allocate(          &
     t2(j,k,l,3),   &
     t3(j,k,l,3)    )
 
-! Fault scalars
+! rupture scalars
 allocate(         &
     !af(j,k,l),    & ! [ZS]
     !bf(j,k,l),    & ! [ZS]

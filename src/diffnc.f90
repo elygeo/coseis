@@ -1,4 +1,4 @@
-! Difference operator, node to cell
+! difference operator, node to cell
 module m_diffnc
 implicit none
 contains
@@ -15,7 +15,7 @@ if ( any( i1 > i2 ) ) return
 
 select case( oplevel )
 
-! Saved B matrix, flops: 8* 7+
+! saved b matrix, flops: 8* 7+
 case( 6 )
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
@@ -29,7 +29,7 @@ end do
 end do
 end do
 
-! Constant grid, flops: 1* 7+
+! constant grid, flops: 1* 7+
 case( 1 )
 select case( a )
 case( 1 )
@@ -73,7 +73,7 @@ case( 3 )
     end do
 end select
   
-! Rectangular grid, flops: 2* 7+
+! rectangular grid, flops: 2* 7+
 case( 2 )
 h = sign( 0.25, product( dx ) )
 select case( a )
@@ -115,7 +115,7 @@ case( 3 )
     end do
 end select
 
-! Parallelepiped grid, flops: 17* 27+
+! parallelepiped grid, flops: 17* 27+
 case( 3 )
 h = sign( 0.25, product( dx ) )
 b = modulo( a, 3 ) + 1
@@ -144,7 +144,7 @@ end do
 end do
 end do
 
-! General grid one-point quadrature, flops: 17* 63+
+! general grid one-point quadrature, flops: 17* 63+
 case( 4 )
 h = sign( 0.0625, product( dx ) )
 b = modulo( a, 3 ) + 1
@@ -173,7 +173,7 @@ end do
 end do
 end do
 
-! General grid exact, flops: 57* 119+
+! general grid exact, flops: 57* 119+
 case( 5 )
 h = sign( 1.0 / 12.0, product( dx ) )
 b = modulo( a, 3 ) + 1

@@ -1,7 +1,7 @@
 ! SORD main program
 program sord
 
-! Modules
+! modules
 use m_collective
 use m_globals
 use m_parameters
@@ -24,7 +24,7 @@ integer :: jp = 0, fh(9)
 real :: prof0(14) = 0.0
 real, allocatable :: prof(:,:)
 
-! Initialization
+! initialization
 iotimer = 0.0
 prof0(1) = timer(0)
 call initialize( np0, ip )     ; master = ip == 0 ; prof0(1)  = timer(6)
@@ -48,7 +48,7 @@ prof0(14) = timer(7)
 if ( master ) call rio1( fh(9), prof0, 'w', 'prof/main', 16, 0, mpout, verb )
 prof0(14) = timer(7)
 
-! Main loop
+! main loop
 if ( master ) write( 0, * ) 'Main loop:', nt, ' steps'
 loop: do while ( it < nt )
 it = it + 1
@@ -83,7 +83,7 @@ end if
 if ( master .and. it == itstop ) stop
 end do loop
 
-! Finish up
+! finish up
 if ( sync ) call barrier
 prof0(1) = timer(7)
 prof0(2) = timer(8)

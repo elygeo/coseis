@@ -1,4 +1,4 @@
-! Time integration
+! time integration
 module m_timestep
 implicit none
 contains
@@ -9,7 +9,7 @@ use m_util
 use m_fieldio
 use m_stats
 
-! Status
+! status
 if ( master ) then
     if ( verb ) then
         write( 0, * ) 'Time step', it
@@ -19,7 +19,7 @@ if ( master ) then
     end if
 end if
 
-! Save previous slip velocity
+! save previous slip velocity
 if ( ifn /= 0 ) then
     select case( ifn )
     case( 1 ); t2(1,:,:,:) = vv(irup+1,:,:,:) - vv(irup,:,:,:)
@@ -29,7 +29,7 @@ if ( ifn /= 0 ) then
     f2 = sqrt( sum( t2 * t2, 4 ) )
 end if
 
-! Velocity time integration
+! velocity time integration
 tm = tm0 + dt * ( it - 1 ) - dt * 0.5
 vv = vv + dt * w1
 call fieldio( '<>', 'v1', vv(:,:,:,1) )
@@ -42,7 +42,7 @@ if ( modulo( it, itstats ) == 0 ) then
 end if
 call fieldio( '>', 'vm2', s1  )
 
-! Displacement time integration
+! displacement time integration
 tm = tm0 + dt * ( it - 1 )
 uu = uu + dt * vv
 call fieldio( '<>', 'u1', uu(:,:,:,1) )
@@ -55,7 +55,7 @@ if ( modulo( it, itstats ) == 0 ) then
 end if
 call fieldio( '>', 'um2', s1  )
 
-! Fault time integration
+! rupture time integration
 if ( ifn /= 0 ) then
     select case( ifn )
     case( 1 ); t1(1,:,:,:) = vv(irup+1,:,:,:) - vv(irup,:,:,:)

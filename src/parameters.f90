@@ -1,4 +1,4 @@
-! Read model parameters
+! read model parameters
 module m_parameters
 implicit none
 contains
@@ -11,7 +11,7 @@ character(12) :: key
 character(1) :: op
 character(256) :: line
 
-! I/O pointers
+! i/o pointers
 allocate( io0 )
 io => io0
 io%next => io0
@@ -21,11 +21,11 @@ open( 1, file='parameters.py', status='old' )
 
 doline: do
 
-! Read line
+! read line
 read( 1, '(a)', iostat=ios ) line
 if ( ios /= 0 ) exit doline
 
-! Strip comments and punctuation
+! strip comments and punctuation
 str = line
 i = scan( str, '#' )
 if ( i > 0 ) str(i:) = ' '
@@ -35,11 +35,11 @@ do
     str(i:i) = ' '
 end do
 
-! Read key val pair
+! read key val pair
 if ( str == '' ) cycle doline
 read( str, *, iostat=ios ) key
 
-! Select input key
+! select input key
 select case( key )
 case( 'fieldio', '' )
 case( 'shape' );        read( str, *, iostat=ios ) key, op, shape_
@@ -103,7 +103,7 @@ case default
     end select
 end select
 
-! Error check
+! error check
 if ( ios /= 0 ) then
     if ( master ) write( 0, * ) 'bad input: ', trim( line )
     stop

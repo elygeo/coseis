@@ -1,4 +1,4 @@
-! Resample material arrays
+! resample material arrays
 module m_resample
 implicit none
 contains
@@ -12,17 +12,17 @@ integer :: i1(3), i2(3), bc(3)
 
 if ( master ) write( 0, * ) 'Resample material model'
 
-! Mass ratio
+! mass ratio
 s2 = mr * vc
 call average( mr, s2, i1node, i2node, -1 )
 call invert( mr )
 call scalar_swap_halo( mr, nhalo )
 call scalar_bc( mr, bc1, bc2, i1bc, i2bc )
 
-! Invert cell volume
+! invert cell volume
 call invert( vc )
 
-! Viscosity, bc=4 means copy into halo for resampling at the node
+! viscosity, bc=4 means copy into halo for resampling at the node
 bc = 4
 i1 = i1bc - 1
 i2 = i2bc
@@ -33,7 +33,7 @@ call set_halo( gam, 0.0, i1bc, i2bc )
 call scalar_swap_halo( gam, nhalo )
 call scalar_bc( gam, bc1, bc2, i1bc, i2bc )
 
-! Zero hourglass viscosity outside boundary, and at fault cell
+! zero hourglass viscosity outside boundary, and at fault cell
 i1 = i1bc
 i2 = i2bc - 1
 call set_halo( yy, 0.0, i1, i2 )
@@ -43,7 +43,7 @@ case( 2 ); yy(:,irup,:) = 0.0
 case( 3 ); yy(:,:,irup) = 0.0
 end select
 
-! Initial state
+! initial state
 tm = 0.0
 vv = 0.0
 uu = 0.0

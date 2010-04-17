@@ -1,4 +1,4 @@
-! Collective routines - MPI version
+! collective routines - MPI version
 module m_collective
 use mpi
 implicit none
@@ -6,7 +6,7 @@ integer, parameter :: file_null = mpi_file_null
 integer, private :: np3(3), comm1d(3), comm2d(3), comm3d, itype, rtype
 contains
 
-! Initialize
+! initialize
 subroutine initialize( np0, ip )
 use mpi
 integer, intent(out) :: np0, ip
@@ -21,14 +21,14 @@ call mpi_sizeof( i, n, e )
 call mpi_type_match_size( mpi_typeclass_integer, n, itype, e )
 end subroutine
 
-! Finalize
+! finalize
 subroutine finalize
 use mpi
 integer :: e
 call mpi_finalize( e )
 end subroutine
 
-! Process rank
+! process rank
 subroutine rank( ip3, ipid, nproc3 )
 use mpi
 integer, intent(out) :: ip3(3), ipid
@@ -56,8 +56,8 @@ do i = 1, 3
 end do
 end subroutine
 
-! Find communicator and rank from Cartesian coordinates.
-! Exclude dimensions with coordinate < 0.
+! find communicator and rank from Cartesian coordinates.
+! exclude dimensions with coordinate < 0.
 subroutine commrank( comm, rank, coords )
 use mpi
 integer, intent(out) :: comm, rank
@@ -85,14 +85,14 @@ else
 end if
 end subroutine
 
-! Barrier
+! barrier
 subroutine barrier
 use mpi
 integer :: e
 call mpi_barrier( comm3d, e )
 end subroutine
 
-! Broadcast real 1d
+! broadcast real 1d
 subroutine rbroadcast1( f1, coords )
 use mpi
 real, intent(inout) :: f1(:)
@@ -103,7 +103,7 @@ call commrank( comm, root, coords )
 call mpi_bcast( f1(1), i, rtype, root, comm, e )
 end subroutine
 
-! Broadcast real 4d
+! broadcast real 4d
 subroutine rbroadcast4( f4, coords )
 use mpi
 real, intent(inout) :: f4(:,:,:,:)
@@ -114,7 +114,7 @@ call commrank( comm, root, coords )
 call mpi_bcast( f4(1,1,1,1), i, rtype, root, comm, e )
 end subroutine
 
-! Reduce integer
+! reduce integer
 subroutine ireduce( i0out, i0, op, coords )
 use mpi
 integer, intent(out) :: i0out
@@ -136,7 +136,7 @@ else
 end if
 end subroutine
 
-! Reduce real 1d
+! reduce real 1d
 subroutine rreduce1( f1out, f1, op, coords )
 use mpi
 real, intent(out) :: f1out(:)
@@ -160,7 +160,7 @@ else
 end if
 end subroutine
 
-! Reduce real 2d
+! reduce real 2d
 subroutine rreduce2( f2out, f2, op, coords )
 use mpi
 real, intent(out) :: f2out(:,:)
@@ -184,7 +184,7 @@ else
 end if
 end subroutine
 
-! Scalar swap halo
+! scalar swap halo
 subroutine scalar_swap_halo( f3, nh )
 use mpi
 real, intent(inout) :: f3(:,:,:)
@@ -220,7 +220,7 @@ end if
 end do
 end subroutine
 
-! Vector swap halo
+! vector swap halo
 subroutine vector_swap_halo( f4, nh )
 use mpi
 real, intent(inout) :: f4(:,:,:,:)
@@ -256,7 +256,7 @@ end if
 end do
 end subroutine
 
-! 2D real input/output
+! 2d real input/output
 subroutine rio2( fh, f2, mode, filename, mm, nn, oo, mpio, verb )
 use m_fio
 use mpi
@@ -302,7 +302,7 @@ if ( oo(i) + nn(i) == mm(i) ) then
 end if
 end subroutine
 
-! 2D integer input/output
+! 2d integer input/output
 subroutine iio2( fh, f2, mode, filename, mm, nn, oo, mpio, verb )
 use m_fio
 use mpi
@@ -348,7 +348,7 @@ if ( oo(i) + nn(i) == mm(i) ) then
 end if
 end subroutine
 
-! 1D real input/output
+! 1d real input/output
 subroutine rio1( fh, f1, mode, filename, m, o, mpio, verb )
 integer, intent(inout) :: fh
 real, intent(inout) :: f1(:)
@@ -366,7 +366,7 @@ call rio2( fh, f2, mode, filename, mm, nn, oo, mpio, verb )
 if ( mode == 'r' ) f1 = f2(1,:)
 end subroutine
 
-! 1D real input/output
+! 1d real input/output
 subroutine iio1( fh, f1, mode, filename, m, o, mpio, verb )
 integer, intent(inout) :: fh
 integer, intent(inout) :: f1(:)
@@ -384,7 +384,7 @@ call iio2( fh, f2, mode, filename, mm, nn, oo, mpio, verb )
 if ( mode == 'r' ) f1 = f2(1,:)
 end subroutine
 
-! Open file with MPIIO
+! open file with MPIIO
 ! does not use mm(4) or nn(4)
 subroutine mpopen( fh, mode, filename, mm, nn, oo, verb )
 use mpi

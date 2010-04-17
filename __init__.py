@@ -18,11 +18,11 @@ def stage( inputs ):
     import glob, time, getopt, shutil
     import setup
 
-    # Save start time
+    # save start time
     starttime = time.asctime()
     print( 'SORD setup' )
 
-    # Read defaults
+    # read defaults
     pm = {}
     f = os.path.join( os.path.dirname( __file__ ), 'parameters.py' )
     exec open( f ) in pm
@@ -31,7 +31,7 @@ def stage( inputs ):
     else:
         cf = configure.configure()
 
-    # Test for depreciated variables
+    # test for depreciated variables
     for k, msg in (
         ('np3', "Parameter 'np3' is renamed to 'nproc3'."),
         ('nn',  "Parameter 'nn' discontinued. Use: shape = nx, ny, nz, nt."),
@@ -42,7 +42,7 @@ def stage( inputs ):
         if k in inputs:
             sys.exit( msg )
 
-    # Merge inputs
+    # merge inputs
     inputs = inputs.copy()
     util.prune( inputs )
     util.prune( pm )
@@ -58,7 +58,7 @@ def stage( inputs ):
     cf.rundir = os.path.expanduser( cf.rundir )
     pm = prepare_param( util.namespace( pm ), cf.itbuff )
 
-    # Command line options
+    # command line options
     opts = [
         'n', 'dryrun',
         's', 'serial',
@@ -109,7 +109,7 @@ def stage( inputs ):
         cf.run = False
     cf.dtype = np.dtype( cf.dtype ).str
 
-    # Partition for parallelization
+    # partition for parallelization
     nx, ny, nz = pm.shape[:3]
     maxtotalcores = cf.maxnodes * cf.maxcores
     if not cf.mode and maxtotalcores == 1:
@@ -135,7 +135,7 @@ def stage( inputs ):
         if cf.nproc > 1:
             cf.mode = 'm'
 
-    # Resources
+    # resources
     if cf.maxcores:
         cf.nodes = min( cf.maxnodes, (cf.nproc - 1) / cf.maxcores + 1 )
         cf.ppn = (cf.nproc - 1) / cf.nodes + 1
@@ -147,7 +147,7 @@ def stage( inputs ):
         cf.cores = cf.nproc
         cf.totalcores = cf.nproc
 
-    # RAM and Wall time usage
+    # ram and wall time usage
     if pm.oplevel in (1, 2):
         nvars = 20
     elif pm.oplevel in (3, 4, 5):
@@ -176,12 +176,12 @@ def stage( inputs ):
     if cf.ram and cf.ram > cf.maxram:
         print( 'Warning: exceding available RAM per node (%sMb)' % cf.maxram )
 
-    # Compile code
+    # compile code
     if not cf.prepare:
         return cf
     setup.build( cf.mode, cf.optimize, cf.dtype )
 
-    # Create run directory
+    # create run directory
     print( 'Run directory: ' + cf.rundir )
     try:
         os.makedirs( cf.rundir )
@@ -191,7 +191,7 @@ def stage( inputs ):
     for f in 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint':
         os.mkdir( os.path.join( cf.rundir, f ) )
 
-    # Copy files to run directory
+    # copy files to run directory
     cwd = os.path.realpath( os.getcwd() )
     cf.rundate = time.asctime()
     cf.name = os.path.basename( cf.rundir )
@@ -215,38 +215,46 @@ def stage( inputs ):
             open( ff, 'w' ).write( out )
             shutil.copymode( f, ff )
 
-    # Combine metadata
-    meta = util.namespace( pm.__dict__ )
-    for k in 'name', 'rundate', 'rundir', 'user', 'os_', 'dtype':
-        setattr( meta, k, getattr( cf, k ) )
-    meta.indices = {}
-    meta.xi = {}
-    for f in meta.fieldio:
+    # log file
+    log = open( 'log', 'w' )
+    log.write( starttime + ': setup started\n' )
+
+    # parameters
+    os.chdir( cf.rundir )
+    util.save( 'conf.py', cf, header = '# machine configuration\n' )
+    util.save( 'parameters.py', pm, expand=['fieldio'], header='# model parameters\n' )
+
+    # metadata
+    pm.indices = {}
+    pm.xi = {}
+    for f in pm.fieldio:
         op, filename = f[0], f[8]
         if filename != '-':
-            meta.indices[filename] = f[7]
+            pm.indices[filename] = f[7]
             if 'wi' in op:
-                meta.xi[filename] = f[4]
-    meta.deltas = {}
-    meta.shapes = {}
-    for k in meta.indices:
-        ii = meta.indices[k]
+                pm.xi[filename] = f[4]
+    pm.deltas = {}
+    pm.shapes = {}
+    for k in pm.indices:
+        ii = pm.indices[k]
         nn = [ (i[1] - i[0]) / i[2] + 1 for i in ii ]
         nn = [ n for n in nn if n > 1 ]
         if nn == []:
             nn = [1]
-        meta.shapes[k] = nn
+        pm.shapes[k] = nn
+    meta = util.save( None, cf,
+        header = '# machine configuration\n',
+        keep=['name', 'rundate', 'rundir', 'user', 'os_', 'dtype'],
+    )
+    meta += util.save( None, pm,
+        header = '\n# model parameters\n',
+        expand=['shapes', 'xi', 'indices', 'fieldio'],
+    )
+    open( 'meta.py', 'w' ).write( meta )
 
-    # Write files
-    os.chdir( cf.rundir )
-    log = open( 'log', 'w' )
-    log.write( starttime + ': setup started\n' )
-    util.save( 'conf.py', cf, prune_pattern='(^_)|(^.$)|(^..$)' )
-    util.save( 'parameters.py', pm, expand=['fieldio'] )
-    util.save( 'meta.py', meta, expand=['shapes', 'xi', 'indices', 'fieldio'] )
-
-    # Return to initial directory
+    # return to initial directory
     os.chdir( cwd )
+    cf.__dict__.update( pm.__dict__ )
     return cf
 
 def prepare_param( pm, itbuff ):
@@ -273,7 +281,7 @@ def prepare_param( pm, itbuff ):
             sys.exit( 'Error: ihypo %s out of bounds' % xi )
     pm.ihypo = tuple( xi )
 
-    # Rupture boundary conditions
+    # rupture boundary conditions
     nn = pm.shape[:3]
     i1 = list( pm.bc1 )
     i2 = list( pm.bc2 )
@@ -289,7 +297,7 @@ def prepare_param( pm, itbuff ):
     pm.bc1 = tuple( i1 )
     pm.bc2 = tuple( i2 )
 
-    # PML region
+    # pml region
     nn = pm.shape[:3]
     i1 = [0, 0, 0]
     i2 = [nn[0]+1, nn[1]+1, nn[2]+1]
@@ -304,7 +312,7 @@ def prepare_param( pm, itbuff ):
     pm.i1pml = tuple( i1 )
     pm.i2pml = tuple( i2 )
 
-    # I/O sequence
+    # i/o sequence
     fieldio = []
     for line in pm.fieldio:
         line = list( line )

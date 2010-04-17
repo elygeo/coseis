@@ -1,9 +1,9 @@
-! Miscellaneous utilities
+! miscellaneous utilities
 module m_util
 implicit none
 contains
 
-! Array reciprocal
+! array reciprocal
 subroutine invert( f )
 real, intent(inout) :: f(:,:,:)
 integer :: n(3), j, k, l
@@ -17,7 +17,7 @@ end do
 end do
 end subroutine
 
-! Squared distance to x0
+! squared distance to x0
 subroutine radius( r, x, x0, i1, i2 )
 real, intent(out) :: r(:,:,:)
 real, intent(in) :: x(:,:,:,:), x0(3)
@@ -37,7 +37,7 @@ end do
 end do
 end subroutine
 
-! Average of local eight values
+! average of local eight values
 subroutine average( f2, f1, i1, i2, d )
 real, intent(out) :: f2(:,:,:)
 real, intent(in) :: f1(:,:,:)
@@ -59,7 +59,7 @@ end do
 call set_halo( f2, 0.0, i1, i2 )
 end subroutine
 
-! Set array to real value outside specified region
+! set array to real value outside specified region
 subroutine set_halo( f, r, i1, i2 )
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
@@ -119,7 +119,7 @@ end do
 end do
 end subroutine
 
-! In-place linear interpolation 
+! in-place linear interpolation 
 subroutine interpolate( f, i3, i4, di )
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: i3(3), i4(3), di(3)
@@ -168,7 +168,7 @@ do i = 1, d - 1
 end do
 end subroutine
 
-! Time function
+! time function
 real function time_function( tfunc, tm, dt, period )
 character(*), intent(in) :: tfunc
 real, intent(in) :: tm, dt, period
@@ -201,7 +201,7 @@ case default
 end select
 end function
 
-! Timer
+! timer
 real function timer( i )
 integer, intent(in) :: i
 integer, save :: clock0, clockrate, clockmax

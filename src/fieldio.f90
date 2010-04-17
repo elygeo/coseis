@@ -1,4 +1,4 @@
-! Field input and output
+! field input and output
 module m_fieldio
 implicit none
 integer, private :: itdebug = -1, idebug
@@ -17,21 +17,21 @@ end type t_io
 type( t_io ), pointer :: io0, io, ioprev
 contains
 
-! Append linked list item
+! append linked list item
 subroutine pappend
 allocate( io%next )
 io => io%next
 io%next => io0
 end subroutine
 
-! Remove linked list item
+! remove linked list item
 subroutine pdelete
 ioprev%next => io%next
 deallocate( io )
 io => ioprev
 end subroutine
 
-! Field I/O sequence
+! field i/o sequence
 subroutine fieldio( passes, field, f )
 use m_globals
 use m_util
@@ -44,21 +44,21 @@ integer :: i1(3), i2(3), i3(3), i4(3), di(3), m(4), n(4), o(4), &
     it1, it2, dit, i, j, k, l, ipass
 real :: val
 
-! Start timer
+! atart timer
 val = timer( 2 )
 !if ( verb ) write( 0, * ) 'Field I/O ', passes, field
 
-! Pass loop
+! pass loop
 do ipass = 1, len( passes )
 pass = passes(ipass:ipass)
 io => io0
 
-! I/O list loop
+! i/o list loop
 loop: do while( io%next%field /= 'head' )
 ioprev => io
 io => io%next
 
-! 4D slice
+! 4d slice
 i1 = io%ii(1,1:3) - nnoff
 i2 = io%ii(2,1:3) - nnoff
 di = io%ii(3,1:3)
@@ -66,7 +66,7 @@ it1 = io%ii(1,4)
 it2 = io%ii(2,4)
 dit = io%ii(3,4)
 
-! Time indices
+! time indices
 if ( it > it2 ) then
     call pdelete
     cycle loop
@@ -74,7 +74,7 @@ end if
 if ( it < it1 ) cycle loop
 if ( modulo( it - it1, dit ) /= 0 ) cycle loop
 
-! Spatial indices
+! spatial indices
 i3 = i1
 i4 = i2
 where( i1 < i1core ) i1 = i1 + ( (i1core - i1 - 1) / di + 1 ) * di
@@ -83,7 +83,7 @@ m(1:3) = (i4 - i3) / di + 1
 n(1:3) = (i2 - i1) / di + 1
 o(1:3) = (i1 - i3) / di
 
-! Dimensionality
+! dimensionality
 i3 = i1
 i4 = i2
 do i = 1, 3
@@ -100,14 +100,14 @@ do i = 1, 3
     end if
 end do
 
-! Pass test
+! pass test
 if ( pass == '<' .and. io%mode(2:2) == 'w' ) cycle loop
 if ( pass == '>' .and. io%mode(2:2) /= 'w' ) cycle loop
 
 !XXX loop over fields
 if ( field /= io%field ) cycle loop
 
-! I/O
+! i/o
 val = io%val * time_function( io%tfunc, tm, dt, io%period )
 select case( io%mode )
 case( '=c', '+c' )
@@ -334,7 +334,7 @@ end select
 end do loop
 end do
 
-! Debug output
+! debug output
 i = scan( passes, '>' )
 if ( i > 0 .and. debug > 3 .and. it <= 8 ) then
     if ( itdebug /= it ) then
@@ -354,7 +354,7 @@ if ( i > 0 .and. debug > 3 .and. it <= 8 ) then
     close( 1 )
 end if
 
-! Timer
+! timer
 if (sync) call barrier
 iotimer = iotimer + timer( 2 )
 

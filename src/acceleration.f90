@@ -1,4 +1,4 @@
-! Acceleration calculation
+! acceleration calculation
 module m_acceleration
 implicit none
 contains
@@ -20,11 +20,11 @@ real :: rr
 if ( verb ) write( 0, * ) 'Acceleration'
 call set_halo( s1, 0.0, i1node, i2node )
 
-! Loop over component and derivative direction
+! loop over component and derivative direction
 doic: do ic  = 1, 3
 doid: do iid = 1, 3; id = modulo( ic + iid - 2, 3 ) + 1
 
-! Elastic region
+! elastic region
 ! f_i = w_ij,j
 i1 = i1node
 i2 = i2node
@@ -35,7 +35,7 @@ else
     call diffcn( s1, w2, i, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx )
 end if
 
-! PML region
+! pml region
 ! p'_ij + d_j*p_ij = w_ij,j (no summation convention)
 ! f_i = sum_j( p_ij' )
 select case( id )
@@ -104,7 +104,7 @@ case( 3 )
     end do
 end select
  
-! Add contribution to force vector
+! add contribution to force vector
 if ( ic == id ) then
     w1(:,:,:,ic) = s1
 else
@@ -114,7 +114,7 @@ end if
 end do doid
 end do doic
 
-! Hourglass control. Only viscous in PML
+! hourglass control. only viscous in pml
 if ( any( hourglass > 0.0 ) ) then
 call set_halo( s1, 0.0, i1cell, i2cell )
 call set_halo( s2, 0.0, i1node, i2node )
@@ -169,30 +169,30 @@ end do
 end do
 end if
 
-! Add source to force
+! add source to force
 if ( source == 'force' ) then
     call finite_source
     call vector_point_source
 end if
 
-! Nodal force input
+! nodal force input
 call fieldio( '<', 'f1', w1(:,:,:,1) )
 call fieldio( '<', 'f2', w1(:,:,:,2) )
 call fieldio( '<', 'f3', w1(:,:,:,3) )
 
-! Boundary conditions
+! boundary conditions
 call vector_bc( w1, bc1, bc2, i1bc, i2bc )
 
-! Spontaneous rupture
+! spontaneous rupture
 call rupture
 
-! Swap halo
+! swap halo
 rr = timer( 2 )
 call vector_swap_halo( w1, nhalo )
 if (sync) call barrier
 mptimer = mptimer + timer( 2 )
 
-! Nodal force output
+! nodal force output
 call fieldio( '>', 'f1', w1(:,:,:,1) )
 call fieldio( '>', 'f2', w1(:,:,:,2) )
 call fieldio( '>', 'f3', w1(:,:,:,3) )
@@ -202,7 +202,7 @@ do i = 1, 3
     w1(:,:,:,i) = w1(:,:,:,i) * mr
 end do
 
-! Acceleration I/O
+! acceleration I/O
 call fieldio( '<>', 'a1', w1(:,:,:,1) )
 call fieldio( '<>', 'a2', w1(:,:,:,2) )
 call fieldio( '<>', 'a3', w1(:,:,:,3) )

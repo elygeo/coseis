@@ -1,4 +1,4 @@
-! Grid generation
+! grid generation
 module m_grid_gen
 implicit none
 contains
@@ -18,7 +18,7 @@ integer, allocatable :: seed(:)
 
 if ( master ) write( 0, * ) 'Grid generation'
 
-! Create rectangular mesh with double nodes at the fault
+! create rectangular mesh with double nodes at the fault
 w1 = 0.0
 i1 = i1core
 i2 = i2core
@@ -34,12 +34,12 @@ if ( faultnormal /= 0 ) then
     end select
 end if
 
-! Read grid
+! read grid
 call fieldio( '<', 'x1', w1(:,:,:,1) )
 call fieldio( '<', 'x2', w1(:,:,:,2) )
 call fieldio( '<', 'x3', w1(:,:,:,3) )
 
-! Add random noise except at boundaries and in PML
+! add random noise except at boundaries and in pml
 if ( gridnoise > 0.0 ) then
     call random_seed( size=i )
     allocate( seed(i) )
@@ -67,7 +67,7 @@ if ( gridnoise > 0.0 ) then
     w1 = w1 + w2
 end if
 
-! Grid expansion
+! grid expansion
 if ( rexpand > 1.0 ) then
     i1 = n1expand - nnoff
     i2 = nn - n2expand + 1 - nnoff
@@ -105,7 +105,7 @@ if ( rexpand > 1.0 ) then
     end do
 end if
 
-! Affine grid transformation
+! affine grid transformation
 m = affine
 do l = 1, nm(3)
 do k = 1, nm(2)
@@ -118,14 +118,14 @@ end do
 end do
 w1 = w2
 
-! Fill halo, bc=4 means copy into halo, need this for nhat
+! fill halo, bc=4 means copy into halo, need this for nhat
 bc = 4
 i1 = i1bc - 1
 i2 = i2bc + 1
 call vector_swap_halo( w1, nhalo )
 call vector_bc( w1, bc, bc, i1, i2 )
 
-! Cell centers
+! cell centers
 call average( w2(:,:,:,1), w1(:,:,:,1), i1cell, i2cell, 1 )
 call average( w2(:,:,:,2), w1(:,:,:,2), i1cell, i2cell, 1 )
 call average( w2(:,:,:,3), w1(:,:,:,3), i1cell, i2cell, 1 )
@@ -133,7 +133,7 @@ call set_halo( w2(:,:,:,1), 0.0, i1cell, i2cell )
 call set_halo( w2(:,:,:,2), 0.0, i1cell, i2cell )
 call set_halo( w2(:,:,:,3), 0.0, i1cell, i2cell )
 
-! Output
+! output
 call fieldio( '>', 'x1', w1(:,:,:,1) )
 call fieldio( '>', 'x2', w1(:,:,:,2) )
 call fieldio( '>', 'x3', w1(:,:,:,3) )
@@ -141,7 +141,7 @@ call fieldio( '>', 'c1', w2(:,:,:,1) )
 call fieldio( '>', 'c2', w2(:,:,:,2) )
 call fieldio( '>', 'c3', w2(:,:,:,3) )
 
-! Boundary surface normals
+! boundary surface normals
 !j = nm(1)
 !k = nm(2)
 !l = nm(3)
@@ -182,7 +182,7 @@ call fieldio( '>', 'c3', w2(:,:,:,3) )
 !    end if
 !end if
 
-! Orthogonality test
+! orthogonality test
 if ( oplevel == 0 ) then
     oplevel = 6
     tol = 10.0 * epsilon( tol )
@@ -198,7 +198,7 @@ if ( oplevel == 0 ) then
     sum( abs( w1(:,:,l1+1:l2+1,2) - w1(:,:,l1:l2,2) ) ) < tol ) oplevel = 2
 end if
 
-! Operators
+! operators
 select case( oplevel )
 case( 1 )
 case( 2 )
@@ -257,7 +257,7 @@ case( 6 )
 case default; stop 'illegal operator'
 end select
 
-! Cell volume
+! cell volume
 call set_halo( vc, 0.0, i1cell, i2cell )
 do i = 1, 3
     call diffnc( vc, w1, i, i, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )

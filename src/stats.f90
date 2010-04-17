@@ -1,4 +1,4 @@
-! Collect statistics
+! collect statistics
 module m_stats
 real :: &
     amax, vmax, umax, wmax, &
@@ -7,7 +7,7 @@ real :: &
     efric, estrain, moment
 contains
 
-! Write statistics
+! write statistics
 subroutine stats
 use m_globals
 use m_collective
@@ -19,10 +19,10 @@ real :: rr
 real, save, allocatable, dimension(:,:) :: &
     vstats, fstats, estats, gvstats, gfstats, gestats
 
-! Start timer
+! start timer
 if ( verb ) write( 0, * ) 'Statistics'
 
-! Allocate buffers
+! allocate buffers
 if ( init ) then
     init = .false.
     if ( faultnormal /= 0 ) then
@@ -41,7 +41,7 @@ if ( init ) then
     if ( mpout /= 0 ) fh = file_null
 end if
 
-! Buffer stats
+! buffer stats
 if ( modulo( it, itstats ) == 0 ) then
     j = j + 1
     vstats(1,j) = amax
@@ -65,7 +65,7 @@ if ( modulo( it, itstats ) == 0 ) then
     end if
 end if
 
-! Write stats
+! write stats
 if ( j > 0 .and. ( modulo( it, itio ) == 0 .or. it == nt ) ) then
     rr = timer( 2 )
     call rreduce2( gvstats, vstats, 'max', ip3root )

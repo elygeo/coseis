@@ -1,4 +1,4 @@
-! Setup model dimensions
+! setup model dimensions
 module m_setup
 implicit none
 contains
@@ -9,16 +9,16 @@ use m_collective
 use m_util
 integer :: nl(3)
 
-! Dimensions
+! dimensions
 dx = delta(1:3)
 dt = delta(4)
 nn = shape_(1:3)
 nt = max( shape_(4), 0 )
 
-! Fault normal
+! fault normal
 ifn = abs( faultnormal )
 
-! Partition for parallelization
+! partition for parallelization
 if ( np0 == 1 ) nproc3 = 1
 nl3 = (nn - 1) / nproc3 + 1
 nhalo = 1
@@ -28,35 +28,35 @@ nproc3 = (nn - 1) / nl3 + 1
 call rank( ip3, ipid, nproc3 )
 nnoff = nl3 * ip3 - nhalo
 
-! Master process
+! master process
 ip3root = (ihypo - 1.0) / nl3
 master = all( ip3 == ip3root )
 
-! Size of arrays
+! size of arrays
 nl = min( nl3, nn - nnoff - nhalo )
 nm = nl + 2 * nhalo
 
-! Boundary conditions
+! boundary conditions
 i1bc = 1  - nnoff
 i2bc = nn - nnoff
 
-! Non-overlapping core region
+! non-overlapping core region
 i1core = 1  + nhalo
 i2core = nm - nhalo
 
-! Node region
+! node region
 i1node = max( i1bc, 2 )
 i2node = min( i2bc, nm - 1 )
 
-! Cell region
+! cell region
 i1cell = max( i1bc, 1 )
 i2cell = min( i2bc - 1, nm - 1 )
 
-! PML region
+! pml region
 i1pml = i1pml - nnoff
 i2pml = i2pml - nnoff
 
-! Map rupture index to local indices, and test if fault on this process
+! map rupture index to local indices, and test if fault on this process
 ip2root = ip3root
 irup = 0
 if ( ifn /= 0 ) then
@@ -65,7 +65,7 @@ if ( ifn /= 0 ) then
     if ( irup + 1 < i1core(ifn) .or. irup > i2core(ifn) ) ifn = 0
 end if
 
-! Debugging
+! debugging
 verb = master .and. debug > 0
 sync = debug > 1
 if ( debug > 2 ) then
