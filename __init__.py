@@ -223,30 +223,42 @@ def stage( inputs ):
     util.save( 'parameters.py', pm, expand=['fieldio'], header='# model parameters\n' )
 
     # metadata
-    pm.indices = {}
-    pm.xi = {}
+    xi = {}
+    indices = {}
+    shapes = {}
+    deltas = {}
     for f in pm.fieldio:
-        op, filename = f[0], f[8]
-        if filename != '-':
-            pm.indices[filename] = f[7]
+        op, k = f[0], f[8]
+        if k != '-':
             if 'wi' in op:
-                pm.xi[filename] = f[4]
-    pm.deltas = {}
-    pm.shapes = {}
-    for k in pm.indices:
-        ii = pm.indices[k]
-        nn = [ (i[1] - i[0]) / i[2] + 1 for i in ii ]
-        nn = [ n for n in nn if n > 1 ]
-        if nn == []:
-            nn = [1]
-        pm.shapes[k] = nn
-    meta = util.save( None, cf,
-        header = '# machine configuration\n',
+                pm.xi[k] = f[4]
+            indices[k] = f[7]
+            shapes[k] = []
+            deltas[k] = []
+            for i, ii in enumerate( indices[k] ):
+                n = (ii[1] - ii[0]) / ii[2] + 1
+                d = pm.delta[i] * ii[2]
+                if n > 1:
+                    shapes[k] += [n]
+                    deltas[k] += [d]
+            if shapes[k] == []:
+                shapes[k] = [1]
+
+    # save metadata
+    meta = util.save( None,
+        cf,
+        header = '# configuration\n',
         keep=['name', 'rundate', 'rundir', 'user', 'os_', 'dtype'],
     )
-    meta += util.save( None, pm,
+    meta += util.save( None,
+        pm,
         header = '\n# model parameters\n',
-        expand=['shapes', 'xi', 'indices', 'fieldio'],
+        expand=['fieldio'],
+    )
+    meta += util.save( None,
+        dict( shapes=shapes, deltas=deltas, xi=xi, indices=indices ),
+        header = '\n# file dimensions\n',
+        expand=['indices', 'shapes', 'deltas', 'xi'],
     )
     open( 'meta.py', 'w' ).write( meta )
 
