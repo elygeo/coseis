@@ -38,13 +38,13 @@ bc1 = 10, 10, 10
 bc2 = -1, 1, -2
 
 # Loop over multiple runs
-for dx, nproc3 in runs_:
+for dx_, nproc3 in runs_:
 
     # Simulation directory
-    rundir = 'run/tpv3-%03.0f' % dx
+    rundir = 'run/tpv3-%03.0f' % dx_
 
     # Model dimentions
-    delta = dx, dx, dx, dx / 12500.0		# step size
+    delta = dx_, dx_, dx_, dx_ / 12500.0	# step size
     shape = ( 
         int( 16500.0 / delta[0] + 21.5 ),	# number of mesh nodes in x
         int(  9000.0 / delta[1] + 21.5 ),	# number of mesh nodes in y
@@ -105,6 +105,5 @@ for dx, nproc3 in runs_:
         ]
 
     # Launch SORD code
-    del( dx )
     sord.run( locals() )
 

@@ -2,7 +2,7 @@
 """
 Semi-cylindrical canyon with vertically incident P-wave.
 """
-import sord, mesh
+import os, sord, mesh
 
 # model dimensions
 nproc2 = 2, 1, 1			# number of processes
@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
     # stage, save mesh to input directory, and launch
     cfg = sord.stage( locals() )
-    path = cfg.rundir + '/in/'
+    path = os.path.join( cfg.rundir, 'in' ) + os.sep
     mesh.x.T.tofile( path + 'x' )
     mesh.y.T.tofile( path + 'y' )
     sord.launch( cfg )
