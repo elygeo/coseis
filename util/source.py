@@ -310,10 +310,10 @@ def srf2potency( src, path, delta=(1,1,1), proj=None ):
     z[None].repeat(3,0)[ii].tofile( path + 'src_xi3' )
 
     # Strike, dip, and normal vectors
-    R = area * coord.slipvectors( stk + rot, dip, rake )
+    R = coord.slipvectors( stk + rot, dip, rake )
 
     # Tensor components
-    stk, dip, nrm = np.asarray( coord.source_tensors( R ), dtype_f )
+    stk, dip, nrm = np.asarray( area * coord.source_tensors( R ), dtype_f )
     w = np.zeros_like( stk )
     w[0] = stk[0]; w[1] = dip[0]; w[ii].tofile( path + 'src_w23' )
     w[0] = stk[1]; w[1] = dip[1]; w[ii].tofile( path + 'src_w31' )
@@ -325,7 +325,7 @@ def srf2potency( src, path, delta=(1,1,1), proj=None ):
 
     return nsource
 
-def srf2momrate( path, proj, delta, dt, nt ):
+def srf2momrate( path, proj, delta, dt, nt, embed_indices=False ):
     """
     Convert SRF to moment rate and write Olsen AWM input file.
     """
@@ -362,8 +362,8 @@ def srf2momrate( path, proj, delta, dt, nt ):
     ll = int( z / delta[2] + 1.5 )
 
     # Moment tensor components
-    R = area * coord.slipvectors( stk + rot, dip, rake )
-    stk, dip, nrm = coord.source_tensors( R )
+    R = coord.slipvectors( stk + rot, dip, rake )
+    stk, dip, nrm = area * coord.source_tensors( R )
     stk = stk * mu
     dip = dip * mu
     nrm = nrm * lam
@@ -381,7 +381,8 @@ def srf2momrate( path, proj, delta, dt, nt ):
         sv1 = coord.interp( t0[i], dt0[i], sv1, t )
         sv2 = coord.interp( t0[i], dt0[i], sv2, t )
         sv3 = coord.interp( t0[i], dt0[i], sv3, t )
-        np.array( [jj[i], kk[i], ll[i]], dtype_i ).tofile( fd )
+        if embed_indices:
+            np.array( [jj[i], kk[i], ll[i]], dtype_i ).tofile( fd )
         np.array( [
             nrm[0,i] * sv3,
             nrm[1,i] * sv3,

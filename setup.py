@@ -106,7 +106,7 @@ def docs():
         settings_overrides=settings )
     html = re.sub( '<col.*>\n', '', html )
     html = re.sub( '</colgroup>', '', html )
-    open( 'index.html', 'w' ).write( html )
+    open( 'readme.html', 'w' ).write( html )
     return
 
 def rspec():

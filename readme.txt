@@ -41,7 +41,7 @@ obligation that you contribute back any modification or derived works.
 Author
 ------
 
-| `Geoffrey Ely <http://earth.usc.edu/~gely>`_
+| `Geoffrey Ely <http://earth.usc.edu/~gely/>`_
 | `Department of Earth Sciences <http://www.usc.edu/dept/earth/>`_
 | `University of Southern California <http://www.usc.edu/>`_
 | http://earth.usc.edu/~gely/
@@ -132,12 +132,12 @@ compilers and MPI libraries.
 2.  `MPICH2 <http://www.mcs.anl.gov/research/projects/mpich2/>`_ is recommended
     if you need MPI.  The following shell script installs MPICH2:
 
-        `install-mpich.sh <http://earth.usc.edu/~gely/sord/install/install-mpich.sh>`_
+        `install-mpich.sh <install/install-mpich.sh>`_
 
 3.  It is recommended that you install a private copy of Python for SORD.  The
     following script installs Python and NumPy:
 
-        `install-python.sh <http://earth.usc.edu/~gely/sord/install/install-python.sh>`_
+        `install-python.sh <install/install-python.sh>`_
 
     `Enthought Python Distribution
     <http://www.enthought.com/products/epddownload.php>`_ (EPD) is another
@@ -147,9 +147,10 @@ compilers and MPI libraries.
 4.  Download the SORD source code.  The best option is use Bazaar version
     control, which facilitates applying code updates, and merging local
     modifications (see `Source Control`_ section for examples). The following
-    script installs Bazaar, SORD, and `SCEC CVM4 <http://earth.usc.edu/~gely/cvm>`_.
+    script installs Bazaar, SORD, and
+    `SCEC CVM4 <http://earth.usc.edu/~gely/cvm/readme.html>`_.
 
-        `install-sord.sh <http://earth.usc.edu/~gely/sord/install/install-sord.sh>`_
+        `install-sord.sh <install/install-sord.sh>`_
 
     Alternatively, download and unpack the source tar archive from here:
 
@@ -545,7 +546,7 @@ Create a patch
     bzr send -o great-new-feature.patch
 
 See the
-`Bazaar tutorials <http://doc.bazaar-vcs.org/latest/en/tutorials/index.html>`__
+`Bazaar tutorials <http://doc.bazaar-vcs.org/latest/en/tutorials/>`__
 for more.
 
 .. vim: filetype=rst
