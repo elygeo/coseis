@@ -11,8 +11,8 @@ cd "${prefix}"
 bzr get http://earth.usc.edu/~gely/sord
 mkdir -p bin
 cd bin
-ln -s ../sord/extras/swab.py .
-ln -s ../sord/extras/stats.py .
+ln -s ../sord/util/swab.py .
+ln -s ../sord/util/stats.py .
 
 # SCEC CVM4
 cd "${prefix}"

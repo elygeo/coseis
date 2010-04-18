@@ -256,7 +256,7 @@ def stage( inputs ):
         expand=['fieldio'],
     )
     meta += util.save( None,
-        dict( shapes=shapes, deltas=deltas, xi=xi, indices=indices ),
+        dict( shapes=shapes, deltas=deltas, xis=xis, indices=indices ),
         header = '\n# file dimensions\n',
         expand=['indices', 'shapes', 'deltas', 'xis'],
     )
