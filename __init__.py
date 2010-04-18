@@ -223,7 +223,7 @@ def stage( inputs ):
     util.save( 'parameters.py', pm, expand=['fieldio'], header='# model parameters\n' )
 
     # metadata
-    xi = {}
+    xis = {}
     indices = {}
     shapes = {}
     deltas = {}
@@ -231,7 +231,7 @@ def stage( inputs ):
         op, k = f[0], f[8]
         if k != '-':
             if 'wi' in op:
-                pm.xi[k] = f[4]
+                xis[k] = f[4]
             indices[k] = f[7]
             shapes[k] = []
             deltas[k] = []
@@ -258,7 +258,7 @@ def stage( inputs ):
     meta += util.save( None,
         dict( shapes=shapes, deltas=deltas, xi=xi, indices=indices ),
         header = '\n# file dimensions\n',
-        expand=['indices', 'shapes', 'deltas', 'xi'],
+        expand=['indices', 'shapes', 'deltas', 'xis'],
     )
     open( 'meta.py', 'w' ).write( meta )
 
