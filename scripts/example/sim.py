@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 import sord                               # import the sord module
-nt = 44
-rundir = 'tmp'                            # directory location for output
 delta = 100.0, 100.0, 100.0, 0.0075       # step length in (x, y, z, t)
 shape = 61, 61, 61, 60                    # mesh size in (x, y, z, t)
 fieldio = [                               # field variable input and output

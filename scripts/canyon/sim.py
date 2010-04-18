@@ -5,23 +5,21 @@ Semi-cylindrical canyon with vertically incident P-wave.
 import sord, mesh
 
 # model dimensions
-np3 = 2, 1, 1			# number of processes
-nn = 301, 321, 2		# number of mesh nodes
-nt = 6000			# number of time steps
-dt = 0.002			# time step length
-dx = 0.0075, 0.0075, 0.0075	# spatial step length
+nproc2 = 2, 1, 1			# number of processes
+shape = 301, 321, 2, 6000		# nx, ny, nz, nt
+delta = 0.0075, 0.0075, 0.0075, 0.002	# spatial step length
 
 # boundary conditions
-bc1 = 0,  0, 1			# free surface and mirror
-bc2 = 1, -1, 1			# mirror
+bc1 = 0,  0, 1				# free surface and mirror
+bc2 = 1, -1, 1				# mirror
 
 # material properties
-hourglass = 1.0, 2.0		# hourglass stiffness and viscosity
+hourglass = 1.0, 2.0			# hourglass stiffness and viscosity
 fieldio = [
-    ( '=', 'rho', [], 1.0 ),	# density
-    ( '=', 'vp',  [], 2.0 ),	# P-wave speed
-    ( '=', 'vs',  [], 1.0 ),	# S-wave speed
-    ( '=', 'gam', [], 0.0 ),	# viscosity
+    ( '=', 'rho', [], 1.0 ),		# density
+    ( '=', 'vp',  [], 2.0 ),		# P-wave speed
+    ( '=', 'vs',  [], 1.0 ),		# S-wave speed
+    ( '=', 'gam', [], 0.0 ),		# viscosity
 ]
 
 # Ricker wavelet source, 2 s period

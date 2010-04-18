@@ -7,8 +7,6 @@ rsync \
     -vrlpt \
     --delete \
     --delete-excluded \
-    --include=.bzr \
-    --include=sord.tgz \
     --exclude-from=.ignore \
     -e ssh \
     . "$dest"

@@ -1,50 +1,64 @@
 #!/usr/bin/env python
 """
-PEER LOH.1
+PEER LOH.1 - Layer over a halfspace, buried double couple source
 """
 import sord
 
-rundir = '~/run/loh1'
-np3 = 1, 16, 1
-np3 = 1, 2, 1
-dx = 50.0, 50.0, 50.0
-dt = 0.004
-L = 8000.0, 10000.0, 6000.0
-T = 9.0
-nn = [ int( x / dx[0] + 20.5 ) for x in L  ]
-nt =   int( T / dt +  1.5 )
-bc1 = -2, -2,  0
-bc2 = 10, 10, 10
+# number of processors in each dimension
+nproc3 = 1, 16, 1
 
-# source
-ihypo = 1.5, 1.5, 41.5
-source = 'moment'
-timefunction = 'brune'
-period = 0.1
-source1 = 0.0, 0.0, 0.0
-source2 = 0.0, 0.0, 1e18
+# dimensions
+delta = 50.0, 50.0, 50.0, 0.004	
+x, y, z, t = 8000.0, 10000.0, 6000.0, 9.0
+shape = (
+    int( x / delta[0] + 20.5 ),
+    int( y / delta[1] + 20.5 ),
+    int( z / delta[2] + 20.5 ),
+    int( t / delta[3] + 1.5 ),
+)
 
-# material
-hourglass = 1.0, 2.0
-l = 1.5, 1000.0 / dx[2] + 0.5
+# Material properties
+hourglass = 1.0, 2.0		# hourglass stiffness and viscosity
 fieldio = [
-    ( '=', 'rho', [], 2700.0 ),
-    ( '=', 'vp',  [], 6000.0 ),
-    ( '=', 'vs',  [], 3464.0 ),
-    ( '=', 'gam', [],    0.0 ),
-    ( '=', 'rho', [(),(),l,()], 2600.0 ),
-    ( '=', 'vp',  [(),(),l,()], 4000.0 ),
-    ( '=', 'vs',  [(),(),l,()], 2000.0 ),
+    ( '=', 'rho', [], 2700.0 ),	# density
+    ( '=', 'vp',  [], 6000.0 ),	# P-wave speed
+    ( '=', 'vs',  [], 3464.0 ),	# S-wave speed
+    ( '=', 'gam', [],    0.0 ),	# viscosity
 ]
 
-# output
-j = ihypo[0] + 5999.0 / dx[0]
-k = ihypo[1] + 7999.0 / dx[1]
+# Material properties of the layer
+fieldio += [
+    ( '=', 'rho', [(), (), (1.5, 20.5), ()], 2600.0 ),
+    ( '=', 'vp',  [(), (), (1.5, 20.5), ()], 4000.0 ),
+    ( '=', 'vs',  [(), (), (1.5, 20.5), ()], 2000.0 ),
+]
+
+# Near side boundary conditions:
+# Anti-mirror symmetry at the near x and y boundaries
+# Free surface at the near z boundary
+bc1 = -2, -2, 0	
+
+# Far side boundary conditions:
+# PML absorbing boundaries at x, y and z boundaries
+bc2 = 10, 10, 10
+
+# Source parameters
+ihypo = 1.5, 1.5, 41.5		# hypocenter indices
+source = 'moment'		# specify moment source
+timefunction = 'brune'		# time function: Brune pulse
+period = 0.1			# time function dominant period
+source1 = 0.0, 0.0, 0.0		# moment tensor M_xx, M_yy, M_zz
+source2 = 0.0, 0.0, 1e18	# moment tensor M_yz, M_zx, M_yz
+
+# Velocity time series output for surface station
+j = ihypo[0] + 6000.0 / delta[0]
+k = ihypo[1] + 8000.0 / delta[1]
 l = ihypo[2]
 fieldio += [
-    ( '=w', 'v1', [j,k,l,()], 'vx' ),
-    ( '=w', 'v2', [j,k,l,()], 'vy' ),
-    ( '=w', 'v3', [j,k,l,()], 'vz' ),
+    ( '=w', 'v1', [(), (), 1, (1, -1, 10)], 'velocity' ),
+    ( '=w', 'v1', [j, k, l, ()], 'vx' ),
+    ( '=w', 'v2', [j, k, l, ()], 'vy' ),
+    ( '=w', 'v3', [j, k, l, ()], 'vz' ),
 ]
 
 # run job

@@ -9,7 +9,7 @@ import sord
 
 # Parameters
 fk_dir = 'fk/'
-so_dir = '~/run/loh1'
+so_dir = 'run/'
 meta = sord.util.loadmeta( so_dir )
 dt = meta.dt
 nt = meta.nt

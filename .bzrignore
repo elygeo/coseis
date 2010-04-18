@@ -1,16 +1,1 @@
-*.pyc
-*.mod
-*.o
-*.so
-*.ipo
-*.il
-*.stb
-*.swp
-.DS_Store
-.bzr
-tmp
-run
-sord.tgz
-bin/*
-email
-machine
+*

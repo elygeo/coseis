@@ -7,10 +7,8 @@
 *.stb
 *.swp
 .DS_Store
-.bzr
+bin/*
 tmp
 run
-sord.tgz
-bin/*
 email
 machine
