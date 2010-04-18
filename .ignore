@@ -1,8 +1,8 @@
-.DS_Store
-*.pyc
-*.so
 machine
 email
 bin/*
+*.pyc
+*.so
+.DS_Store
 run
 tmp

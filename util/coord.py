@@ -233,7 +233,7 @@ class Transform():
     translate : Translation amount.
     origin : Untransformed coordinates of the new origin.  If two sets of points
     are given, the origin is centered between them, and rotation is relative to the
-    connecting line. 
+    connecting line.
 
     Example: TeraShake SDSU/Okaya projection
     >>> import pyproj
@@ -306,11 +306,11 @@ def slipvectors( strike, dip, rake ):
     The transpose R^T performs the reverse rotation from fault local coordinates to
     world coordinates.  Columns of R are axis unit vectors of the world space in
     fault local coordinates.  Rows of R are axis unit vectors of the fault local
-    space in world coordinates, that can be unpacked by:  
+    space in world coordinates, that can be unpacked by:
     n_slip, n_rake, n_normal = coord.slipvectors( strike, dip, rake )
     """
     strike = np.pi / 180.0 * np.asarray( strike )
-    dip    = np.pi / 180.0 * np.asarray( dip ) 
+    dip    = np.pi / 180.0 * np.asarray( dip )
     rake   = np.pi / 180.0 * np.asarray( rake )
     u = np.ones( strike.shape )
     z = np.zeros( strike.shape )

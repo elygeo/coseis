@@ -9,7 +9,7 @@ ppn must be one of (1, 2, 4, 8, 12, 15, 16)
 
 cat /share/sge/default/tacc/sge_esub_control
 module list
-qconf -sql 
+qconf -sql
 lfs quota -u $USER $HOME
 lfs quota -u $USER $WORK
 lfs quota -u $USER $SCRATCH

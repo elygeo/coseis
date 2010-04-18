@@ -1,8 +1,4 @@
-.DS_Store
-sord.tgz
 machine
 email
 bin/*
-run
-tmp
-*
+sord.tgz

@@ -8,7 +8,7 @@ import numpy as np
 # Setup options (also accessible with command line options).
 prepare = True    # True: compile code and setup run directory, False: dry run
 optimize = 'O'    # O: fully optimized, g: debugging, t: testing, p: profiling
-mode = None       # s: serial, m: MPI, None: guess from np3 
+mode = None       # s: serial, m: MPI, None: guess from np3
 run = False       # i: interactive, q: batch queue, g: debugger
 pre = ''          # pre-processing command
 post = ''         # post-processing command

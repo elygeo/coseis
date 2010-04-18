@@ -103,7 +103,7 @@ case( 3 )
         end do
     end do
 end select
- 
+
 ! add contribution to force vector
 if ( ic == id ) then
     w1(:,:,:,ic) = s1

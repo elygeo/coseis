@@ -507,7 +507,7 @@ coulomb_footer = """
   1  --------------------------  Plot size =        2.0
   2  --------------  Shade/Color increment =        1.0
   3  ------  Exaggeration for disp.& dist. =    10000.0
-  
+
      Cross section default
   1  ----------------------------  Start-x =     -126.4
   2  ----------------------------  Start-y =     -124.6
@@ -533,7 +533,7 @@ def command_line():
     for f in sys.argv[1:]:
         print( f )
         pprint.pprint( srf_read( f, mks=True ) )
-    
+
 if __name__ == '__main__':
     command_line()
- 
+

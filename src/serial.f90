@@ -143,7 +143,7 @@ real :: f2(1,size(f1))
 integer :: i
 if ( mode == 'w' ) f2(1,:) = f1
 call frio2( fh, f2, mode, filename, m, o, verb )
-if ( mode == 'r' ) f1 = f2(1,:) 
+if ( mode == 'r' ) f1 = f2(1,:)
 i = mpio
 end subroutine
 
@@ -160,7 +160,7 @@ integer :: f2(1,size(f1))
 integer :: i
 if ( mode == 'w' ) f2(1,:) = f1
 call fiio2( fh, f2, mode, filename, m, o, verb )
-if ( mode == 'r' ) f1 = f2(1,:) 
+if ( mode == 'r' ) f1 = f2(1,:)
 i = mpio
 end subroutine
 

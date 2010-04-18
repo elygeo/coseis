@@ -61,7 +61,7 @@ def save( fd, d, expand=None, keep=None, header='', prune_pattern=None, prune_ty
                 out += '}\n'
             else:
                 sys.exit( 'Cannot expand %s type %s' % ( k, type( d[k] ) ) )
-    if fd != None: 
+    if fd != None:
         if type( fd ) is not file:
             fd = open( os.path.expanduser( fd ), 'w' )
         fd.write( out )
@@ -199,24 +199,6 @@ def ndread( fd, shape=None, indices=None, dtype='f', order='F', nheader=0 ):
         f = f.reshape( nn0 )
     return f
 
-def progress( t0=None, i=None, n=None, message='' ):
-    """
-    Print progress and time remaining.
-    """
-    import time
-    if t0 == None:
-         return time.time()
-    if message:
-         message += ': '
-    t = time.time() - t0 
-    percent =  100.0 * i / n
-    seconds = int( t * (100.0 / percent - 1.0) )
-    sys.stdout.write( '\r%s%3d%% done, %.0f s remaining' % (message, percent, seconds) )
-    sys.stdout.flush()
-    if i == n:
-        print('')
-    return
-
 def make( compiler, object_, source ):
     """
     An alternative Make that uses state files.
@@ -320,6 +302,24 @@ def uninstall():
         shutil.rmtree( path )
     except( OSError ):
         sys.exit( 'No write permission for Python directory' )
+    return
+
+def progress( t0=None, i=None, n=None, message='' ):
+    """
+    Print progress and time remaining.
+    """
+    import time
+    if t0 == None:
+         return time.time()
+    if message:
+         message += ': '
+    t = time.time() - t0
+    percent =  100.0 * i / n
+    seconds = int( t * (100.0 / percent - 1.0) )
+    sys.stdout.write( '\r%s%3d%% done, %.0f s remaining' % (message, percent, seconds) )
+    sys.stdout.flush()
+    if i == n:
+        print('')
     return
 
 if __name__ == '__main__':

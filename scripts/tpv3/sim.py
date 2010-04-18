@@ -4,14 +4,14 @@ import sord
 # List of runs:
 # Column 1 is dx, the spatial step size
 # Column 2 is nproc3, the number of processors in each dimension
-runs_ = [ 
+runs_ = [
     ( 500.0, (1, 1, 2) ),
     ( 300.0, (1, 1, 2) ),
     ( 250.0, (1, 1, 2) ),
     ( 150.0, (1, 1, 2) ),
     ( 100.0, (1, 1, 2) ),
 ]
-runs_ = [ 
+runs_ = [
     ( 500.0, (1, 4, 4) ),
     ( 300.0, (1, 4, 4) ),
     ( 250.0, (1, 4, 4) ),
@@ -45,7 +45,7 @@ for dx_, nproc3 in runs_:
 
     # Model dimentions
     delta = dx_, dx_, dx_, dx_ / 12500.0	# step size
-    shape = ( 
+    shape = (
         int( 16500.0 / delta[0] + 21.5 ),	# number of mesh nodes in x
         int(  9000.0 / delta[1] + 21.5 ),	# number of mesh nodes in y
         int(  6000.0 / delta[2] + 20.5 ),	# number of mesh nodes in z
@@ -63,7 +63,7 @@ for dx_, nproc3 in runs_:
         ( '=', 'gam', [],        0.2  ),	# high viscosity
         ( '=', 'gam', [j,k,l,0], 0.02 ),	# low viscosity zone near fault
     ]
-    hourglass = 1.0, 2.0    
+    hourglass = 1.0, 2.0
 
     # Fault parameters
     faultnormal = 3				# fault plane of constant z

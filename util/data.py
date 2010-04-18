@@ -244,7 +244,7 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
 def clipdata( x, y, extent, lines=1 ):
     """
     Clip data outside extent.
-    
+
     x, y : data coordinates
     extent : (xmin, xmax), (ymin, ymax)
     lines : 0 = points, assume no connectivity.

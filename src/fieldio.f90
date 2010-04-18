@@ -12,7 +12,7 @@ type t_io
     real, pointer :: buff(:,:)     ! buffer for storing mutliple time steps
     !XXX character(4) :: fields(32) ! field variable, see fieldnames.py for possibilities
     !XXX real, pointer :: buff(:,:,:)  ! buffer for storing mutliple time steps
-    type( t_io ), pointer :: next  ! pointer to next member of the field i/o list 
+    type( t_io ), pointer :: next  ! pointer to next member of the field i/o list
 end type t_io
 type( t_io ), pointer :: io0, io, ioprev
 contains

@@ -72,7 +72,7 @@ case( 3 )
     end do
     end do
 end select
-  
+
 ! rectangular grid, flops: 2* 7+
 case( 2 )
 h = sign( 0.25, product( dx ) )

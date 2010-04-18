@@ -106,7 +106,7 @@ Installation
 
 Fortran and MPI installation should only be necessary for laptops and
 workstations.  HPC systems generally supply specifically tuned Fortran
-compilers and MPI libraries. 
+compilers and MPI libraries.
 
 1.  GNU Fortran is recommended if you don't already have a Fortran 95 compiler.
 
@@ -410,7 +410,7 @@ Alternatively, put the rupture surface along the near z boundary::
     bc2 = 0, 0, 0
 
 Further symmetries may present. If our previous problem has slip only in the
-x direction, then we may also use node-centered mirror symmetry along the in-plane 
+x direction, then we may also use node-centered mirror symmetry along the in-plane
 axis, and node-centered anti-mirror symmetry along the anti-plane axis, to reduce
 computations eight-fold::
 
@@ -438,7 +438,7 @@ operator type for fastest performance.
 On current hardware, computation time is on the order of the one second per
 time step per one million mesh points.  SORD scalability has been benchmarked
 up to 16 thousand processors at the TACC Ranger facility.  The following chart
-is the wall-time per step for 8 million mesh points per core (click for PDF): 
+is the wall-time per step for 8 million mesh points per core (click for PDF):
 
 .. image:: doc/sord-benchmark-ranger.png
     :target: doc/sord-benchmark-ranger.pdf

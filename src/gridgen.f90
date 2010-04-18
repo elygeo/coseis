@@ -261,7 +261,7 @@ end select
 call set_halo( vc, 0.0, i1cell, i2cell )
 do i = 1, 3
     call diffnc( vc, w1, i, i, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx )
-    select case( ifn ) 
+    select case( ifn )
     case( 1 ); vc(irup,:,:) = 0.0
     case( 2 ); vc(:,irup,:) = 0.0
     case( 3 ); vc(:,:,irup) = 0.0

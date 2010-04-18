@@ -57,7 +57,7 @@ case( 4 )
           f(j,k,l,i) - f(j+1,k+1,l+1,i) &
         + f(j,k+1,l+1,i) - f(j+1,k,l,i) &
         + f(j+1,k,l+1,i) - f(j,k+1,l,i) &
-        + f(j+1,k+1,l,i) - f(j,k,l+1,i) 
+        + f(j+1,k+1,l,i) - f(j,k,l+1,i)
     end do
     end do
     end do

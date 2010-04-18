@@ -119,7 +119,7 @@ end do
 end do
 end subroutine
 
-! in-place linear interpolation 
+! in-place linear interpolation
 subroutine interpolate( f, i3, i4, di )
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: i3(3), i4(3), di(3)
@@ -185,7 +185,7 @@ case( 'brune' )
 case( 'dbrune' )
     time_function =  exp( -tm / period ) / period ** 2.0 * tm
 case( 'ddbrune' )
-    time_function = -exp( -tm / period ) / period ** 3.0 * (tm - period) 
+    time_function = -exp( -tm / period ) / period ** 3.0 * (tm - period)
 case( 'gaussian' )
     t = ( tm - 4.0 * period ) / period
     time_function = exp( -0.5 * t * t ) / ( period * sqrt( 2.0 * pi ) )
