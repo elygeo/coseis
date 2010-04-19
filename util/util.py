@@ -316,7 +316,7 @@ def progress( t0=None, i=None, n=None, message='' ):
     t = time.time() - t0
     percent =  100.0 * i / n
     seconds = int( t * (100.0 / percent - 1.0) )
-    sys.stdout.write( '\r%s%3d%% done, %.0f s remaining' % (message, percent, seconds) )
+    sys.stdout.write( '\r%s%3d%% done, %.0f s remaining  ' % (message, percent, seconds) )
     sys.stdout.flush()
     if i == n:
         print('')

@@ -2,7 +2,7 @@
 """
 Source utilities
 """
-import os, sys, urllib, gzip, sord
+import os, sys, urllib, gzip, util
 import numpy as np
 
 def scsn_mts( eventid ):
@@ -89,6 +89,86 @@ def src_write( history, nt, dt, t0, xi, w1, w2=None, path='' ):
         np.asarray( w2[1], 'f' ).tofile( path + 'w31' )
         np.asarray( w2[2], 'f' ).tofile( path + 'w12' )
     return
+
+def cybershake( path, id_, name=None, id_format='%03d-%03d-%03d-%03d' ):
+    """
+    Download and prep CyberShake source files.
+
+    Must have account on intensity.usc.edu with auto SSH authentication.
+    path: destination directory
+    id_ : (source ID, rupture ID, slip variation ID, hypocenter ID)
+    name : optional name for the rupture
+    id_format : formatting for event_id
+    """
+
+    # format event ID
+    print 'ID', id_
+    if type( id_ ) == str:
+        id_ = tuple( int(i) for i in id_.split('-') )
+    else:
+        id_ = tuple( id_ )
+    event_id = id_format % id_
+    print 'ID', id_, event_id
+
+    # if already present just return metadata
+    if path:
+        path += os.sep
+    if os.path.exists( path + event_id ):
+        meta = util.load( path + event_id + os.sep + 'meta.py' )
+        return meta
+    print event_id, name
+    cwd = os.getcwd()
+
+    # get reports
+    get = 'scp intensity.usc.edu:/home/scec-00/cybershk/reports/'
+    for f in 'erf35_source_rups.txt', 'erf35_sources.txt':
+        if not os.path.exists( path + f ):
+            os.system( get + f + ' ' + path + f )
+    segments = dict( np.loadtxt( path + f, 'i,S64', delimiter='\t', skiprows=1 ) )
+
+    # get source files
+    path += event_id
+    os.mkdir( path )
+    os.chdir( path )
+    get = 'scp intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations/%d/%d/' % id_[:2]
+    mesh = '%d_%d.txt' % id_[:2]
+    head = '%d_%d.txt.variation.output' % id_[:2]
+    srf  = '%d_%d.txt.variation-s%04d-h%04d' % id_
+    os.system( get + head + ' head' )
+    os.system( get + mesh + ' mesh' )
+    os.system( get + srf  + ' srf'  )
+
+    # extract SRF file
+    srf_read( 'srf', '.' )
+
+    # update metadata
+    meta = util.load( 'meta.py' )
+    shape = meta.plane[0]['shape']
+    v = open( 'head' ).readline().split()
+    meta.nslip = int( v[6] )
+    meta.nhypo = int( v[8] )
+    fd = open( 'mesh', 'r' )
+    meta.probability = float( fd.readline().split()[-1] )
+    meta.magnitude   = float( fd.readline().split()[-1] )
+    fd.close()
+    meta.segment = segments[id_[0]].replace( ';', ' ' )
+    meta.event_id = event_id
+    meta.event = name
+    if not name:
+        meta.name = meta.segment
+    util.save( 'meta.py', meta, expand=['plane'], header='# source parameters\n' )
+
+    # extract trace
+    x = np.fromfile( 'lon', 'f' ).reshape( shape[::-1] ).T
+    y = np.fromfile( 'lat', 'f' ).reshape( shape[::-1] ).T
+    np.savetxt( 'trace.txt', np.array( [x[:,0], y[:,0]] ).T, '%f' )
+
+    # clean up
+    os.system( 'gzip srf' )
+    os.remove( 'mesh' )
+    os.remove( 'head' )
+    os.chdir( cwd )
+    return meta
 
 def srf_read( filename, path=None, mks=True ):
     """
@@ -234,7 +314,7 @@ def srf_read( filename, path=None, mks=True ):
     meta['slip'] = meta['potency'] / meta['area']
     meta['dtype_i'] = np.dtype( 'i' ).str
     meta['dtype_f'] = np.dtype( 'f' ).str
-    sord.util.save( path + 'meta.py', meta, expand=['plane'] )
+    util.save( path + 'meta.py', meta, expand=['plane'] )
     return meta
 
 def srf2potency( src, path, delta=(1,1,1), proj=None ):
