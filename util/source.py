@@ -102,13 +102,11 @@ def cybershake( path, id_, name=None, id_format='%03d-%03d-%03d-%03d' ):
     """
 
     # format event ID
-    print 'ID', id_
     if type( id_ ) == str:
         id_ = tuple( int(i) for i in id_.split('-') )
     else:
         id_ = tuple( id_ )
     event_id = id_format % id_
-    print 'ID', id_, event_id
 
     # if already present just return metadata
     if path:
