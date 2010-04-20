@@ -4,7 +4,8 @@ Support Operator Rupture Dynamics
 """
 import os, sys, re, math
 import numpy as np
-import configure, fieldnames
+import fieldnames
+import configure
 from util import swab, util, coord, signal, source, data, viz, plt, mlab, egmm
 try:
     from util import rspectra
@@ -136,16 +137,8 @@ def stage( inputs ):
             cf.mode = 'm'
 
     # resources
-    if cf.maxcores:
-        cf.nodes = min( cf.maxnodes, (cf.nproc - 1) / cf.maxcores + 1 )
-        cf.ppn = (cf.nproc - 1) / cf.nodes + 1
-        cf.cores = min( cf.maxcores, cf.ppn )
-        cf.totalcores = cf.nodes * cf.maxcores
-    else:
-        cf.nodes = 1
-        cf.ppn = cf.nproc
-        cf.cores = cf.nproc
-        cf.totalcores = cf.nproc
+    n = configure.parallel( cf.nproc, cf.maxcores, cf.maxnodes )
+    cf.nodes, cf.ppn, cf.cores, cf.totalcores = n
 
     # ram and wall time usage
     if pm.oplevel in (1, 2):
@@ -181,41 +174,30 @@ def stage( inputs ):
         return cf
     setup.build( cf.mode, cf.optimize, cf.dtype )
 
-    # create run directory
+    # config options
     print( 'Run directory: ' + cf.rundir )
+    cf.rundate = time.strftime( '%Y %b %d' )
+    cf.name = 'sord-' + os.path.basename( cf.rundir )
+    cf.rundir = os.path.realpath( cf.rundir )
+    cf.bin = os.path.join( '.', 'sord-' + cf.mode + cf.optimize + cf.dtype[-1] )
+
+    # create run directory
+    files = 'bin' + os.sep + cf.bin,
+    src = os.path.realpath( os.path.dirname( __file__ ) )
+    if os.path.isfile( src + 'sord.tgz' ):
+        files += 'sord.tgz',
+    if cf.optimize == 'g':
+        for f in glob.glob( os.path.join( 'src', '*.f90' ) ):
+            files += f,
+    directories = 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint'
     try:
-        os.makedirs( cf.rundir )
+        configure.skeleton( cf.__dict__, directories, files )
     except( OSError ):
         sys.exit( '%r exists or cannot be created. Use --force to overwrite.'
             % cf.rundir )
-    for f in 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint':
-        os.mkdir( os.path.join( cf.rundir, f ) )
-
-    # copy files to run directory
-    cwd = os.path.realpath( os.getcwd() )
-    cf.rundate = time.strftime( '%Y %b %d' )
-    cf.name = os.path.basename( cf.rundir )
-    cf.rundir = os.path.realpath( cf.rundir )
-    os.chdir( os.path.realpath( os.path.dirname( __file__ ) ) )
-    cf.bin = os.path.join( '.', 'sord-' + cf.mode + cf.optimize + cf.dtype[-1] )
-    path = os.path.join( 'bin', 'sord-' + cf.mode + cf.optimize + cf.dtype[-1] )
-    shutil.copy( path, cf.rundir )
-    if os.path.isfile( 'sord.tgz' ):
-        shutil.copy( 'sord.tgz', cf.rundir )
-    if cf.optimize == 'g':
-        for f in glob.glob( os.path.join( 'src', '*.f90' ) ):
-            shutil.copy( f, cf.rundir )
-    f = os.path.join( 'conf', cf.machine, 'templates' )
-    if not os.path.isdir( f ):
-        f = os.path.join( 'conf', 'default', 'templates' )
-    for d in os.path.join( 'conf', 'common', 'templates' ), f:
-        for f in glob.glob( os.path.join( d, '*' ) ):
-            ff = os.path.join( cf.rundir, os.path.basename( f ) )
-            out = open( f ).read() % cf.__dict__
-            open( ff, 'w' ).write( out )
-            shutil.copymode( f, ff )
 
     # log, conf, parameter files
+    cwd = os.path.realpath( os.getcwd() )
     os.chdir( cf.rundir )
     log = open( 'log', 'w' )
     log.write( starttime + ': setup started\n' )
