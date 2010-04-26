@@ -1,4 +1,5 @@
-machine
-email
-bin/*
-sord.tgz
+/bin/*
+/sord.tgz
+/conf/cvm
+/conf/machine
+/conf/email

@@ -23,14 +23,16 @@ queue = 'devel'; maxnodes = 16;  maxtime = 1, 00
 queue = 'bc';    maxnodes = 268; maxtime = 48, 00
 maxcores = 4;
 maxram = 7000
-fortran_mpi = 'mpif90',
 fortran_serial = 'ifort',
+fortran_mpi = 'mpif90',
 fortran_flags = {
-    'f': ('-u', '-std95', '-warn'),
-    'g': ('-CB', '-traceback', '-g'),
-    't': ('-CB', '-traceback'),
-    'p': ('-O', '-pg'),
-    'O': ('-ipo', '-O3', '-no-prec-div'),
-    '8': ('-r8',),
+    'sord': {
+        'f': ('-u', '-std95', '-warn'),
+        'g': ('-CB', '-traceback', '-g'),
+        't': ('-CB', '-traceback'),
+        'p': ('-O', '-pg'),
+        'O': ('-ipo', '-O3', '-no-prec-div'),
+        '8': ('-r8',),
+    }
 }
 

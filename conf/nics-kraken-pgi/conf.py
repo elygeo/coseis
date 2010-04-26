@@ -30,12 +30,17 @@ maxtime = 24, 00
 rate = 1e6 # just a guess
 fortran_serial = 'ftn',
 fortran_mpi = 'ftn',
-fortran_flags = {
-    'f': ('-Mdclchk',),
-    'g': ('-Ktrap=fp', '-Mbounds', '-Mchkptr', '-g'),
-    't': ('-Ktrap=fp', '-Mbounds'),
-    'p': ('-pg', '-Mprof=func'),
-    'O': ('-fast',),
-    '8': ('-Mr8',),
+fortran_flags = {    
+    'sord': {    
+        'f': ('-Mdclchk',),
+        'g': ('-Ktrap=fp', '-Mbounds', '-Mchkptr', '-g'),
+        't': ('-Ktrap=fp', '-Mbounds'),
+        'p': ('-pg', '-Mprof=func'),
+        'O': ('-fast',),
+        '8': ('-Mr8',),
+    'cvm': {
+        'g': ('-Ktrap=fp', '-Mbounds', '-Mchkptr', '-g'),
+        'O': ('-fast',),
+    }
 }
 

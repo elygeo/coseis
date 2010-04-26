@@ -42,15 +42,14 @@ def find( *files ):
     for d in os.environ['PATH'].split(':'):
         for f in files:
             if os.path.isfile( os.path.join( d, f ) ):
-                return f,
+                return f
 
-# Fortran compilers
-fortran_serial = find( 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95' )
-fortran_mpi = find( 'mpxlf95_r', 'mpif90' )
+# Fortran compiler
+fortran_serial = find( 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95' ),
+fortran_mpi = find( 'mpxlf95_r', 'mpif90' ),
 
 # Fortran compiler flags
-fortran_flags = None
-fortran_defaults = {
+fortran_flags_default = {
     'gfortran': {
         #'f': ('gfortran', '-fimplicit-none', '-Wall', '-std=f95', '-pedantic'),
         'f': ('-fimplicit-none', '-Wall'),
@@ -94,12 +93,14 @@ fortran_defaults = {
     }
 }
 if os.uname()[0] == 'SunOS':
-    fortran_defaults.update( { 'f95': {
-        'f': ('-u'),
-        'g': ('-C', '-ftrap=common', '-w4', '-g'),
-        't': ('-C', '-ftrap=common'),
-        'p': ('-O', '-pg'),
-        'O': ('-fast', '-fns'),
-        '8': ( 'FIXME', ),
-    } } )
+    fortran_flags_default.update( {
+        'f95': {
+            'f': ('-u'),
+            'g': ('-C', '-ftrap=common', '-w4', '-g'),
+            't': ('-C', '-ftrap=common'),
+            'p': ('-O', '-pg'),
+            'O': ('-fast', '-fns'),
+            '8': ( 'FIXME', ),
+        }
+    } )
 

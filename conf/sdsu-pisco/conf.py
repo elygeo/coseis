@@ -12,7 +12,6 @@ hosts = 'pisco.sdsu.edu',
 maxnodes = 1
 maxcores = 8
 maxram = 30000
-fortran_serial = 'ifort',
 fortran_serial = 'gfortran',
 fortran_mpi = 'mpif90',
 
