@@ -32,17 +32,17 @@ queue = 'large';       maxnodes = 1024; maxtime = 24, 00
 queue = 'normal';      maxnodes = 256;  maxtime = 24, 00
 maxcores = 16
 maxram = 30000
-rate = 2.1e6
 fortran_serial = 'pgf95',
 fortran_mpi = 'mpif90',
-fortran_flags = {    
-    'sord': {    
+sord = dict(
+    rate = 2.1e6,
+    fortran_flags = {
         'f': ('-Mdclchk',),
         'g': ('-Ktrap=fp', '-Mbounds', '-g'),
         't': ('-Ktrap=fp', '-Mbounds'),
         'p': ('-fast', '-tp', 'barcelona-64', '-Mprof=func'),
         'O': ('-fast', '-tp', 'barcelona-64'),
         '8': ('-Mr8',),
-    }
-}
+    },
+)
 

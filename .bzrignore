@@ -1,5 +1,5 @@
 /bin/*
 /sord.tgz
-/conf/cvm
 /conf/machine
 /conf/email
+/conf/cvm

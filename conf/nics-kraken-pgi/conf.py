@@ -27,20 +27,23 @@ maxram = 15000
 minnodes = 1
 maxnodes = 8256
 maxtime = 24, 00
-rate = 1e6 # just a guess
 fortran_serial = 'ftn',
 fortran_mpi = 'ftn',
-fortran_flags = {    
-    'sord': {    
+sord = dict(
+    rate = 1e6, # just a guess
+    fortran_flags = {
         'f': ('-Mdclchk',),
         'g': ('-Ktrap=fp', '-Mbounds', '-Mchkptr', '-g'),
         't': ('-Ktrap=fp', '-Mbounds'),
         'p': ('-pg', '-Mprof=func'),
         'O': ('-fast',),
         '8': ('-Mr8',),
-    'cvm': {
+    },
+)
+cvm = dict(
+    fortran_flags = {
         'g': ('-Ktrap=fp', '-Mbounds', '-Mchkptr', '-g'),
         'O': ('-fast',),
-    }
-}
+    },
+)
 

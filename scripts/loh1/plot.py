@@ -2,7 +2,7 @@
 """
 PEER LOH.1 - Plot comparison of FK and SOM.
 """
-import os, scipy.signal
+import scipy.signal
 import numpy as np
 import matplotlib.pyplot as plt
 import sord
@@ -37,7 +37,7 @@ v = dt * scipy.signal.lfilter( b, 1.0, v )
 vm = np.sqrt( np.sum( v * v, 0 ) )
 peakv = np.max( vm )
 print peakv
-for ax in axes
+for ax in axes:
     ax.plot( t, v[i], 'k' )
     ax.hold( True )
 
@@ -54,7 +54,7 @@ v = dt * scipy.signal.lfilter( b, 1.0, v )
 vm = np.sqrt( np.sum( v * v, 0 ) )
 peakv = np.max( vm )
 print peakv
-for ax in axes
+for ax in axes:
     ax.plot( tm, v[i], 'k--' )
 
 # Decorations

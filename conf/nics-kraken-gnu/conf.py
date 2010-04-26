@@ -29,20 +29,23 @@ maxcores = 12
 minnodes = 1
 maxnodes = 8256
 maxtime = 24, 00
-rate = 1e6 # just a guess
 fortran_serial = 'ftn',
 fortran_mpi = 'ftn',
-fortran_flags = {    
-    'sord': {    
+sord = dict(
+    rate = 1e6, # just a guess
+    fortran_flags = {
         'f': ('-fimplicit-none', '-Wall'),
         'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g'),
         't': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow'),
         'p': ('-O', '-pg'),
         'O': ('-O3',),
         '8': ('-fdefault-real-8',),
-    'cvm': {    
+    },
+)
+cvm = dict(
+    fortran_flags = {
         'g': ('-Wall', '-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g'),
         'O': ('-Wall', '-O3'),
-    }
-}
+    },
+)
 

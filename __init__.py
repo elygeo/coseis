@@ -5,7 +5,7 @@ Support Operator Rupture Dynamics
 import os, sys, re, math
 import numpy as np
 import fieldnames
-import configure
+import conf
 from util import swab, util, coord, signal, source, data, viz, plt, mlab, egmm
 try:
     from util import rspectra
@@ -28,9 +28,9 @@ def stage( inputs ):
     f = os.path.join( os.path.dirname( __file__ ), 'parameters.py' )
     exec open( f ) in pm
     if 'machine' in inputs:
-        cf = configure.configure( machine=inputs['machine'] )
+        cf = conf.configure( machine=inputs['machine'], module='sord' )
     else:
-        cf = configure.configure()
+        cf = conf.configure( module='sord' )
 
     # test for depreciated variables
     for k, msg in (
@@ -137,7 +137,7 @@ def stage( inputs ):
             cf.mode = 'm'
 
     # resources
-    n = configure.parallel( cf.nproc, cf.maxcores, cf.maxnodes )
+    n = conf.parallel( cf.nproc, cf.maxcores, cf.maxnodes )
     cf.nodes, cf.ppn, cf.cores, cf.totalcores = n
 
     # ram and wall time usage
@@ -191,7 +191,7 @@ def stage( inputs ):
             files += f,
     directories = 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint'
     try:
-        configure.skeleton( cf.__dict__, directories, files )
+        conf.skeleton( cf.__dict__, directories, files )
     except( OSError ):
         sys.exit( '%r exists or cannot be created. Use --force to overwrite.'
             % cf.rundir )

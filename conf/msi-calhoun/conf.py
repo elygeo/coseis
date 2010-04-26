@@ -22,14 +22,14 @@ maxram = 15000
 maxtime = 24, 00
 fortran_serial = 'ifort',
 fortran_mpi = 'mpif90',
-fortran_flags = {    
-    'sord': {    
+sord = dict(
+    fortran_flags = {
         'f': ('-u', '-std95', '-warn'),
         'g': ('-CB', '-traceback', '-g'),
         't': ('-CB', '-traceback'),
         'p': ('-O', '-pg'),
         'O': ('-O3',),
         '8': ('-r8',),
-    }
-}
+    },
+)
 

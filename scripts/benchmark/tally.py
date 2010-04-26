@@ -2,7 +2,7 @@
 """
 Tally benchmarks
 """
-import os, glob
+import os, glob, sord
 import numpy as np
 
 normalize = 0
@@ -38,7 +38,8 @@ if 0:
         ax.axis([-1, n, 0, 4])
     else:
         ax.set_ylabel( 'Time/step (s)' )
-        ax.axis( [ -1, n, 0, 2*int(numpy.average(tt)+0.5) ] )
+        h = 2 * int( np.average(tt) + 0.5 )
+        ax.axis( [-1, n, 0, h] )
     ax.figure.savefig( 'bench.pdf', format='pdf' )
     plt.draw()
     plt.show()

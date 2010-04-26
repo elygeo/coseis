@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os, sord
+import sord
 import numpy as np
 import matplotlib.pyplot as plt
 

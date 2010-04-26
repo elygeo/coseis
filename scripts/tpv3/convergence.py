@@ -2,7 +2,7 @@
 """
 TPV3 convergence test
 """
-import os, glob, sord, scipy.interpolate
+import os, glob, sord
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.interpolate.RectBivariateSpline as interp2d
@@ -57,7 +57,7 @@ for i in range( len( ttres ) ):
 # Plotting
 if 0:
     plt.rcdefaults()
-    plt.rc( 'font', size=8 }
+    plt.rc( 'font', size=8 )
     plt.rc( 'axes', linewidth=0.5 )
     plt.rc( 'ytick.minor', size=1 )
     plt.rc( 'ytick.major', size=2 )

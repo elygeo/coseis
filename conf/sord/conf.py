@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Default configuration parameters
+Default SORD configuration
 """
 import os, pwd
 import numpy as np
@@ -23,8 +23,8 @@ except( IOError ):
     email = user
 
 # Machine specific
+notes = 'Default SORD configuration'
 machine = ''
-notes = 'Default machine'
 os_ = os.uname()
 host = os.uname()[1]
 hosts = host,

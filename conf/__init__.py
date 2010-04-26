@@ -2,7 +2,7 @@
 """
 Machine configuration
 """
-import os, sys, shutil
+import os, shutil
 from sord import util
 
 def parallel( nproc, maxcores, maxnodes ):
@@ -64,7 +64,7 @@ def skeleton( conf, directories=(), files=(), new=True ):
             shutil.copymode( f, ff )
     return
 
-def configure( machine=None, module=None, save=False ):
+def configure( module=None, machine=None, save=False ):
     """
     Read configuration files
     """
@@ -72,22 +72,39 @@ def configure( machine=None, module=None, save=False ):
     conf = {}
     if module:
         f = os.path.join( path, module, 'conf.py' )
-        exec open( f ) in conf
+        if os.path.isfile( f ):
+            exec open( f ) in conf
     f = os.path.join( path, 'machine' )
     if not machine and os.path.isfile( f ):
         machine = open( f ).read().strip()
     if machine:
         machine = os.path.basename( os.path.normpath( machine ) )
         f = os.path.join( path, machine, 'conf.py' )
-        exec open( f ) in conf
+        if os.path.isfile( f ):
+            exec open( f ) in conf
         conf['machine'] = machine
         if save:
             f = os.path.join( path, 'machine' )
             open( f, 'w' ).write( machine )
-    if 'fortran_flags' not in conf:
-        k = conf['fortran_serial'][0]
-        conf['fortran_flags'] = conf['fortran_flags_default'][k]
-    del( conf['fortran_flags_default'] )
-    util.prune( conf, pattern='(^_)|(^.$)' )
+    if module in conf:
+        conf.update( conf[module] )
+    if 'fortran_flags_default' in conf:
+        if 'fortran_flags' not in conf:
+            k = conf['fortran_serial'][0]
+            conf['fortran_flags'] = conf['fortran_flags_default'][k]
+        #del( conf['fortran_flags_default'] )
+    util.prune( conf, pattern='(^_)|(^.$)|(^sord$)|(^cvm$)|(^fortran_flags_default$)' )
     return conf
+
+# Test all onfigurations if run from the command line
+if __name__ == '__main__':
+    import pprint
+    modules = None, 'sord', 'cvm'
+    for module in modules:
+        for machine in os.listdir('.'):
+            if os.path.isdir( machine ) and machine not in modules:
+                cf = configure( module, machine )
+                print 80 * '-'
+                print 'module: %s, machine: %s' % (module, machine)
+                pprint.pprint( cf )
 

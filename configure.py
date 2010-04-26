@@ -6,7 +6,7 @@ import sys, conf
 
 # Continue if not imported
 if __name__ == '__main__':
-    cf = conf.configure( *sys.argv[1:2], module='sord', save=True )
+    cf = conf.configure( 'sord', *sys.argv[1:2], save=True )
     print( cf['notes'] )
     for k in sorted( cf.keys() ):
         if k != 'notes':
