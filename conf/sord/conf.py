@@ -5,24 +5,21 @@ Default SORD configuration
 import os, pwd
 import numpy as np
 
-# Setup options (also accessible with command line options).
+# setup options (also accessible with command line options).
+itbuff = 10       # max number of timesteps to buffer for 2D & 3D output
 prepare = True    # True: compile code and setup run directory, False: dry run
-optimize = 'O'    # O: fully optimized, g: debugging, t: testing, p: profiling
-mode = None       # s: serial, m: MPI, None: guess from nproc3
+optimize = 'O'    # O: optimize, g: debug, t: test, p: profile
+mode = None       # s: serial, m: MPI, None: guess
 run = False       # i: interactive, q: batch queue, g: debugger
 pre = ''          # pre-processing command
 post = ''         # post-processing command
-itbuff = 10       # max number of timesteps to buffer for 2D & 3D output
 rundir = 'run'    # run directory
 
-# User info
+# user info
 user = pwd.getpwuid( os.geteuid() )[0]
-try:
-    email = open( 'email' ).read().strip()
-except( IOError ):
-    email = user
+email = user
 
-# Machine specific
+# machine specific
 notes = 'Default SORD configuration'
 machine = ''
 os_ = os.uname()
@@ -37,7 +34,7 @@ rate = 1.0e6
 queue = None
 dtype = dtype_f = np.dtype( 'f' ).str
 
-# Search for file in PATH
+# search for file in PATH
 def find( *files ):
     for d in os.environ['PATH'].split(':'):
         for f in files:

@@ -19,6 +19,7 @@ hosts = 'login1',
 maxnodes = 256
 maxcores = 8
 maxram = 15000
+pmem = 1024
 maxtime = 24, 00
 fortran_serial = 'ifort',
 fortran_mpi = 'mpif90',

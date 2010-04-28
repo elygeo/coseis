@@ -2,7 +2,7 @@
 
 #PBS -N %(name)s
 #PBS -M %(email)s
-#PBS -l nodes=%(nodes):ppn=%(ppn)
+#PBS -l nodes=%(nodes)s:ppn=%(ppn)s
 #PBS -e stderr
 #PBS -o stdout
 #PBS -m abe

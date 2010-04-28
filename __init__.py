@@ -177,21 +177,19 @@ def stage( inputs ):
     # config options
     print( 'Run directory: ' + cf.rundir )
     cf.rundate = time.strftime( '%Y %b %d' )
-    cf.name = 'sord-' + os.path.basename( cf.rundir )
     cf.rundir = os.path.realpath( cf.rundir )
     cf.bin = os.path.join( '.', 'sord-' + cf.mode + cf.optimize + cf.dtype[-1] )
 
     # create run directory
-    files = 'bin' + os.sep + cf.bin,
-    src = os.path.realpath( os.path.dirname( __file__ ) )
+    src = os.path.realpath( os.path.dirname( __file__ ) ) + os.sep
+    files = os.path.join( src, 'bin', cf.bin ),
     if os.path.isfile( src + 'sord.tgz' ):
-        files += 'sord.tgz',
+        files += src + 'sord.tgz',
     if cf.optimize == 'g':
         for f in glob.glob( os.path.join( 'src', '*.f90' ) ):
             files += f,
-    directories = 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint'
     try:
-        conf.skeleton( cf.__dict__, directories, files )
+        conf.skeleton( cf.__dict__, files )
     except( OSError ):
         sys.exit( '%r exists or cannot be created. Use --force to overwrite.'
             % cf.rundir )

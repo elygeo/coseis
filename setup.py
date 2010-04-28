@@ -4,14 +4,14 @@ Build SORD binaries and documentation
 """
 import os, sys, getopt
 import numpy as np
-import configure
+import conf
 from util import util
 
 def build( mode=None, optimize=None, dtype=None ):
     """
     Build SORD code.
     """
-    cf = util.namespace( configure.configure() )
+    cf = util.namespace( conf.configure( 'sord' ) )
     if not optimize:
         optimize = cf.optimize
     if not mode:
@@ -60,19 +60,19 @@ def build( mode=None, optimize=None, dtype=None ):
         source = base + ('serial.f90',) + common
         for opt in optimize:
             object_ = os.path.join( '..', 'bin', 'sord-s' + opt + dsize )
-            fflags = cf.fortran['flags']['f'] + cf.fortran['flags'][opt]
+            fflags = cf.fortran_flags['f'] + cf.fortran_flags[opt]
             if dtype != cf.dtype_f:
-                fflags = fflags + cf.fortran['flags'][dsize]
-            compiler = cf.fortran['serial'] + fflags + ('-o',)
+                fflags = fflags + cf.fortran_flags[dsize]
+            compiler = cf.fortran_serial + fflags + ('-o',)
             new |= util.make( compiler, object_, source )
-    if 'm' in mode and 'mpi' in cf.fortran:
+    if 'm' in mode and 'fortran_mpi' in cf:
         source = base + ('mpi.f90',) + common
         for opt in optimize:
             object_ = os.path.join( '..', 'bin', 'sord-m' + opt + dsize )
-            fflags = cf.fortran['flags']['f'] + cf.fortran['flags'][opt]
+            fflags = cf.fortran_flags['f'] + cf.fortran_flags[opt]
             if dtype != cf.dtype_f:
-                fflags = fflags + cf.fortran['flags'][dsize]
-            compiler = cf.fortran['mpi'] + fflags + ('-o',)
+                fflags = fflags + cf.fortran_flags[dsize]
+            compiler = cf.fortran_mpi + fflags + ('-o',)
             new |= util.make( compiler, object_, source )
     os.chdir( path )
     if new:

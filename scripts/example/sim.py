@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sord                               # import the sord module
 delta = 100.0, 100.0, 100.0, 0.0075       # step length in (x, y, z, t)
-shape = 61, 61, 61, 60                    # mesh size in (x, y, z, t)
+shape = 61, 61, 61, 360                    # mesh size in (x, y, z, t)
 fieldio = [                               # field variable input and output
     ( '=',  'rho', [], 2670.0 ),          # material density
     ( '=',  'vp',  [], 6000.0 ),          # material P-wave velocity
@@ -16,5 +16,5 @@ source1 = 1e6, 1e6, 1e6                   # source normal components
 source2 = 0.0, 0.0, 0.0                   # source shear components
 timefunction = 'brune'                    # source time function
 period = 6 * delta[3]                     # source dominant period
-sord.run( locals() )                      # launch SORD job
+sord.run( locals() )                    # launch SORD job
 

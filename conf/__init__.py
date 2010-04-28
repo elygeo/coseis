@@ -3,7 +3,7 @@
 Machine configuration
 """
 import os, shutil
-from sord import util
+from sord.util import util
 
 def parallel( nproc, maxcores, maxnodes ):
     """
@@ -13,6 +13,7 @@ def parallel( nproc, maxcores, maxnodes ):
         nproc : number of desired processes
         maxcores : physical number of cores per node
         maxnodes : physical number of compute nodes in the system
+
     OUTPUT
         nodes : number of compute nodes
         ppn : number of processes per node
@@ -31,12 +32,20 @@ def parallel( nproc, maxcores, maxnodes ):
         totalcores = nproc
     return (nodes, ppn, cores, totalcores)
 
-def skeleton( conf, directories=(), files=(), new=True ):
+def skeleton( conf, files=None, new=True ):
     """
-    Create run directory and process script templates
+    Create run directory skeleton from templates.
 
-    conf : dictionary of parameters
-    path : destination directory
+    INPUT
+        conf: dictionary of parameters
+        files: list of files to link or copy into directory
+        new: (True|False) create new directory, or use existing
+
+    Templates located in the configuration directory are processed with the given
+    dictionary conf.  Module and machine names must be specified as parameters in
+    conf.  Module specific templates are used if found, in addition to machine
+    specific templates.  If no machine specific templates are found, default
+    templates are used. 
     """
     path = os.path.realpath( os.path.dirname( __file__ ) )
     dest = conf['rundir'] + os.sep
@@ -45,66 +54,89 @@ def skeleton( conf, directories=(), files=(), new=True ):
             os.makedirs( dest )
         except( OSError ):
             raise
-    for f in directories:
-        os.makedirs( dest + f )
+    templates = ()
+    f = os.path.join( path, conf['module'], 'templates' )
+    if conf['module'] != 'default' and os.path.isdir( f ):
+        templates += f,
+    f = os.path.join( path, conf['machine'], 'templates' )
+    if not os.path.isdir( f ):
+        f = os.path.join( path, 'default', 'templates' )
+    templates += f,
+    for t in templates:
+        for root, dirs, files in os.walk( t ):
+            for f in dirs:
+                f = os.path.join( dest, root, f )
+                os.mkdir( f )
+            for f in files:
+                f  = os.path.join( path, root, f )
+                ff = os.path.join( dest, root, f )
+                out = open( f ).read() % conf
+                open( ff, 'w' ).write( out )
+                shutil.copymode( f, ff )
     for f in files:
         try:
             os.link( f, dest + f )
         except:
             shutil.copy2( f, dest )
-    f = os.path.join( path, conf['machine'], 'templates' )
-    if not os.path.isdir( f ):
-        f = os.path.join( path, 'default', 'templates' )
-    f = os.path.join( path, conf['module'], 'templates' ), f
-    for d in f:
-        for f in os.listdir( d ):
-            ff = os.path.join( path, os.path.basename( f ) )
-            out = open( f ).read() % conf
-            open( ff, 'w' ).write( out )
-            shutil.copymode( f, ff )
     return
 
-def configure( module=None, machine=None, save=False ):
+def configure( module='default', machine=None, save=False ):
     """
-    Read configuration files
+    Read configuration files.
+
+    INPUT:
+        module: package name
+        machine: machine name
+        save: remember machine name
+
+    OUTPUT:
+        conf: dictionary containing merged module and machine configuration
+
+    Module and machine names correspond to subdirectories of the conf folder
+    that contain configuration parameters in a file conf.py.
     """
     path = os.path.realpath( os.path.dirname( __file__ ) )
     conf = {}
-    if module:
-        f = os.path.join( path, module, 'conf.py' )
-        if os.path.isfile( f ):
-            exec open( f ) in conf
+    conf['module'] = module
+    f = os.path.join( path, module, 'conf.py' )
+    exec open( f ) in conf
     f = os.path.join( path, 'machine' )
     if not machine and os.path.isfile( f ):
         machine = open( f ).read().strip()
     if machine:
         machine = os.path.basename( os.path.normpath( machine ) )
+        conf['machine'] = machine
         f = os.path.join( path, machine, 'conf.py' )
         if os.path.isfile( f ):
             exec open( f ) in conf
-        conf['machine'] = machine
         if save:
             f = os.path.join( path, 'machine' )
             open( f, 'w' ).write( machine )
+    f = os.path.join( path, 'email' )
+    if os.path.isfile( f ):
+        conf['email'] = open( f ).read().strip()
     if module in conf:
         conf.update( conf[module] )
     if 'fortran_flags_default' in conf:
         if 'fortran_flags' not in conf:
             k = conf['fortran_serial'][0]
             conf['fortran_flags'] = conf['fortran_flags_default'][k]
-        #del( conf['fortran_flags_default'] )
     util.prune( conf, pattern='(^_)|(^.$)|(^sord$)|(^cvm$)|(^fortran_flags_default$)' )
     return conf
 
-# Test all onfigurations if run from the command line
+# Test all configurations if run from the command line
 if __name__ == '__main__':
     import pprint
-    modules = None, 'sord', 'cvm'
+    modules = 'default', 'sord', 'cvm'
+    machines = os.listdir('.')
     for module in modules:
-        for machine in os.listdir('.'):
+        for machine in machines:
             if os.path.isdir( machine ) and machine not in modules:
                 cf = configure( module, machine )
                 print 80 * '-'
-                print 'module: %s, machine: %s' % (module, machine)
                 pprint.pprint( cf )
+                if module == 'default':
+                    cf['rundir'] = 'tmp'
+                    skeleton( cf )
+                    shutil.rmtree( 'tmp' )
 
