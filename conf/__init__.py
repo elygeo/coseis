@@ -32,7 +32,7 @@ def parallel( nproc, maxcores, maxnodes ):
         totalcores = nproc
     return (nodes, ppn, cores, totalcores)
 
-def skeleton( conf, files=None, new=True ):
+def skeleton( conf, files=(), new=True ):
     """
     Create run directory skeleton from templates.
 
@@ -48,7 +48,7 @@ def skeleton( conf, files=None, new=True ):
     templates are used. 
     """
     path = os.path.realpath( os.path.dirname( __file__ ) )
-    dest = conf['rundir'] + os.sep
+    dest = os.path.realpath( os.path.expanduser( conf['rundir'] ) ) + os.sep
     if new:
         os.makedirs( dest )
     templates = ()
@@ -84,7 +84,7 @@ def configure( module='default', machine=None, save=False ):
     Read configuration files.
 
     INPUT:
-        module: package name
+        module: module name
         machine: machine name
         save: remember machine name
 

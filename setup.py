@@ -86,29 +86,6 @@ def build( mode=None, optimize=None, dtype=None ):
     os.chdir( cwd )
     return
 
-def docs():
-    """
-    Prepare documentation.
-    """
-    import re
-    from docutils.core import publish_string
-    settings = dict(
-        datestamp = '%Y-%m-%d',
-        generator = True,
-        strict = True,
-        toc_backlinks = None,
-        cloak_email_addresses = True,
-        initial_header_level = 3,
-        stylesheet_path = 'doc/style.css',
-    )
-    rst = open( 'readme.txt' ).read()
-    html = publish_string( rst, writer_name='html4css1',
-        settings_overrides=settings )
-    html = re.sub( '<col.*>\n', '', html )
-    html = re.sub( '</colgroup>', '', html )
-    open( 'readme.html', 'w' ).write( html )
-    return
-
 def rspec():
     cwd = os.getcwd()
     path = os.path.realpath( os.path.dirname( __file__ ) )
@@ -136,9 +113,7 @@ def command_line():
     if not args:
         build( mode, optimize, dtype )
     else:
-        if args[0] == 'docs':
-            docs()
-        elif args[0] == 'path':
+        if args[0] == 'path':
             util.install_path()
         elif args[0] == 'unpath':
             util.uninstall_path()
