@@ -300,7 +300,7 @@ python plot.py
 #!/usr/bin/env python
 import sord                               # import the sord module
 delta = 100.0, 100.0, 100.0, 0.0075       # step length in (x, y, z, t)
-shape = 61, 61, 61, 360                    # mesh size in (x, y, z, t)
+shape = 61, 61, 61, 60                    # mesh size in (x, y, z, t)
 fieldio = [                               # field variable input and output
     ( '=',  'rho', [], 2670.0 ),          # material density
     ( '=',  'vp',  [], 6000.0 ),          # material P-wave velocity
@@ -422,11 +422,11 @@ a slip surface, the fault may be placed at the boundary and combined with an
 anti-mirror symmetry condition.  The following BC types are supported:</p>
 <p><strong>Type 0</strong>: Vacuum free-surface.  Stress is zero in cells outside the boundary.</p>
 <blockquote>
-<img alt="doc/bc0.png" src="doc/bc0.png" />
+<img alt="bc0.png" src="bc0.png" />
 </blockquote>
 <p><strong>Type 3</strong>: Rigid surface. Displacement is zero at the boundary.</p>
 <blockquote>
-<img alt="doc/bc3.png" src="doc/bc3.png" />
+<img alt="bc3.png" src="bc3.png" />
 </blockquote>
 <p><strong>Type 1</strong>: Mirror symmetry at the node.  Normal displacement is zero at the
 boundary.  Useful for a boundary corresponding to (a) the plane orthogonal to
@@ -434,24 +434,24 @@ the two nodal planes of a double-couple point source, (b) the plane normal to
 the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D
 plane strain problem.</p>
 <blockquote>
-<img alt="doc/bc1.png" src="doc/bc1.png" />
+<img alt="bc1.png" src="bc1.png" />
 </blockquote>
 <p><strong>Type -1</strong>: Anti-mirror symmetry at the node.  Tangential displacement is zero
 at the boundary.  Useful for a boundary corresponding to (a) the nodal planes
 of a double-couple point source, (b) the plane normal to the mode-II axis of a
 symmetric rupture, or (c) the zero-width axis of a 2D antiplane strain problem.</p>
 <blockquote>
-<img alt="doc/bc-1.png" src="doc/bc-1.png" />
+<img alt="bc-1.png" src="bc-1.png" />
 </blockquote>
 <p><strong>Type 2</strong>: Mirror symmetry at the cell. Same as type 1, but centered on the cell.</p>
 <blockquote>
-<img alt="doc/bc2.png" src="doc/bc2.png" />
+<img alt="bc2.png" src="bc2.png" />
 </blockquote>
 <p><strong>Type -2</strong>: Anti-mirror symmetry at the cell.  Same as type -1, but centered
 on the cell.  Can additionally be used when the boundary corresponds to the
 slip surface of a symmetric rupture.</p>
 <blockquote>
-<img alt="doc/bc-2.png" src="doc/bc-2.png" />
+<img alt="bc-2.png" src="bc-2.png" />
 </blockquote>
 <p><strong>Type 10</strong>: Perfectly match layer (PML) absorbing boundary.</p>
 <p>Example: a 3D problem with a free surface at Z=0, and PML absorbing boundaries
