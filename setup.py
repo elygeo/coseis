@@ -114,13 +114,13 @@ def command_line():
         build( mode, optimize, dtype )
     else:
         if args[0] == 'path':
-            util.install_path()
+            util.install_path( __file__ )
         elif args[0] == 'unpath':
-            util.uninstall_path()
+            util.uninstall_path( __file__ )
         elif args[0] == 'install':
-            util.install()
+            util.install( __file__ )
         elif args[0] == 'uninstall':
-            util.uninstall()
+            util.uninstall( __file__ )
         elif args[0] == 'rspec':
             rspec()
         else:
