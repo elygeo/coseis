@@ -2,8 +2,25 @@
 """
 Machine configuration
 """
-import os, shutil
-from sord.util import util
+import os, re, shutil
+
+def prune( d, pattern=None, types=None ):
+    """
+    Delete dictionary keys with specified name pattern or types
+    Default types are: functions and modules.
+
+    >>> prune( {'a': 0, 'a_': 0, '_a': 0, 'a_a': 0, 'b': prune} )
+    {'a_a': 0}
+    """
+    if pattern == None:
+        pattern = '(^_)|(_$)|(^.$)|(^..$)'
+    if types is None:
+        types = type( re ), type( re.sub )
+    grep = re.compile( pattern )
+    for k in d.keys():
+        if grep.search( k ) or type( d[k] ) in types:
+            del( d[k] )
+    return d
 
 def parallel( nproc, maxcores, maxnodes ):
     """
@@ -120,7 +137,7 @@ def configure( module='default', machine=None, save=False ):
         if 'fortran_flags' not in conf:
             k = conf['fortran_serial'][0]
             conf['fortran_flags'] = conf['fortran_flags_default'][k]
-    util.prune( conf, pattern='(^_)|(^.$)|(^sord$)|(^cvm$)|(^fortran_flags_default$)' )
+    prune( conf, pattern='(^_)|(^.$)|(^sord$)|(^cvm$)|(^fortran_flags_default$)' )
     return conf
 
 # Test all configurations if run from the command line
