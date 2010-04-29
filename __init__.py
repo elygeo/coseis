@@ -188,11 +188,7 @@ def stage( inputs ):
     if cf.optimize == 'g':
         for f in glob.glob( os.path.join( 'src', '*.f90' ) ):
             files += f,
-    try:
-        conf.skeleton( cf.__dict__, files )
-    except( OSError ):
-        sys.exit( '%r exists or cannot be created. Use --force to overwrite.'
-            % cf.rundir )
+    conf.skeleton( cf.__dict__, files )
 
     # log, conf, parameter files
     cwd = os.path.realpath( os.getcwd() )

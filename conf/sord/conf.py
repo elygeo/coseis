@@ -6,21 +6,20 @@ import os, pwd
 import numpy as np
 
 # setup options (also accessible with command line options).
-itbuff = 10       # max number of timesteps to buffer for 2D & 3D output
-prepare = True    # True: compile code and setup run directory, False: dry run
-optimize = 'O'    # O: optimize, g: debug, t: test, p: profile
-mode = None       # s: serial, m: MPI, None: guess
-run = False       # i: interactive, q: batch queue, g: debugger
-pre = ''          # pre-processing command
-post = ''         # post-processing command
-rundir = 'run'    # run directory
+itbuff = 10      # max number of timesteps to buffer for 2D & 3D output
+prepare = True   # True: compile code and setup run directory, False: dry run
+optimize = 'O'   # O: optimize, g: debug, t: test, p: profile
+mode = None      # s: serial, m: MPI, None: guess
+run = False      # i: interactive, q: batch queue, g: debugger
+pre = post = ''  # pre-processing and post-processing commands
+rundir = 'run'   # run directory
 
 # user info
-user = pwd.getpwuid( os.geteuid() )[0]
-email = user
+email = user = pwd.getpwuid( os.geteuid() )[0]
 
 # machine specific
 notes = 'Default SORD configuration'
+name = 'sord'
 machine = ''
 os_ = os.uname()
 host = os.uname()[1]

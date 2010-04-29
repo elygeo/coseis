@@ -50,10 +50,7 @@ def skeleton( conf, files=None, new=True ):
     path = os.path.realpath( os.path.dirname( __file__ ) )
     dest = conf['rundir'] + os.sep
     if new:
-        try:
-            os.makedirs( dest )
-        except( OSError ):
-            raise
+        os.makedirs( dest )
     templates = ()
     f = os.path.join( path, conf['module'], 'templates' )
     if conf['module'] != 'default' and os.path.isdir( f ):
@@ -62,17 +59,19 @@ def skeleton( conf, files=None, new=True ):
     if not os.path.isdir( f ):
         f = os.path.join( path, 'default', 'templates' )
     templates += f,
+    cwd = os.getcwd()
     for t in templates:
-        for root, dirs, files in os.walk( t ):
+        os.chdir( t )
+        for root, dirs, temps in os.walk( '.' ):
             for f in dirs:
-                f = os.path.join( dest, root, f )
-                os.mkdir( f )
-            for f in files:
-                f  = os.path.join( path, root, f )
+                ff = os.path.join( dest, root, f )
+                os.mkdir( ff )
+            for f in temps:
                 ff = os.path.join( dest, root, f )
                 out = open( f ).read() % conf
                 open( ff, 'w' ).write( out )
                 shutil.copymode( f, ff )
+    os.chdir( cwd )
     for f in files:
         try:
             os.link( f, dest + f )
