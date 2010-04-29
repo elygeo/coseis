@@ -28,7 +28,7 @@ def stage( inputs ):
     f = os.path.join( os.path.dirname( __file__ ), 'parameters.py' )
     exec open( f ) in pm
     if 'machine' in inputs:
-        cf = conf.configure( machine=inputs['machine'], module='sord' )
+        cf = conf.configure( module='sord', machine=inputs['machine'] )
     else:
         cf = conf.configure( module='sord' )
 

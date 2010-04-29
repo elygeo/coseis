@@ -23,7 +23,6 @@ queue = 'devel'; maxnodes = 16;  maxtime = 1, 00
 queue = 'bc';    maxnodes = 268; maxtime = 48, 00
 maxcores = 4;
 maxram = 7000
-pmem = 1024
 fortran_serial = 'ifort',
 fortran_mpi = 'mpif90',
 sord = dict(
