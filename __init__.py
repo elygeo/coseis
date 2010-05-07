@@ -153,11 +153,12 @@ def stage( **kwargs ):
             files += f,
     if cf.force == True and os.path.isdir( cf.rundir ):
         shutil.rmtree( cf.rundir )
-    conf.skeleton( cf.__dict__, files )
+    cf = cf.__dict__
+    conf.skeleton( file, **cf )
 
     # log, conf, parameter files
     cwd = os.path.realpath( os.getcwd() )
-    os.chdir( cf.rundir )
+    os.chdir( cf['rundir'] )
     log = open( 'log', 'w' )
     log.write( starttime + ': setup started\n' )
     util.save( 'conf.py', cf, header = '# configuration\n' )
@@ -205,7 +206,7 @@ def stage( **kwargs ):
 
     # return to initial directory
     os.chdir( cwd )
-    cf.__dict__.update( pm.__dict__ )
+    cf.update( pm.__dict__ )
     return cf
 
 def prepare_param( pm, itbuff ):
@@ -351,6 +352,7 @@ def launch( **cf ):
     """
     Launch or queue job.
     """
+    cf = util.namespace( cf )
     cwd = os.getcwd()
     os.chdir( cf.rundir )
     if cf.run == 'q':
@@ -375,6 +377,6 @@ def run( **kwargs ):
     Combined stage and launch in one step.
     """
     cf = stage( **kwargs )
-    launch( cf )
+    launch( **cf )
     return cf
 

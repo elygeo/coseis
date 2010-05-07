@@ -85,12 +85,14 @@ def configure( module='default', machine=None, save=False, options=None, **kwarg
             k = conf['fortran_serial'][0]
             conf['fortran_flags'] = conf['fortran_flags_default'][k]
 
-    # misc
-    conf['dtype'] = np.dtype( conf['dtype'] ).str
-    conf['rundir'] = os.path.expanduser( conf['rundir'] )
-
     # prune unneeded variables
     prune( conf, pattern='(^_)|(^.$)|(^..$)|(^sord$)|(^cvm$)|(^fortran_flags_default$)' )
+
+    # misc
+    if 'dtype' in conf:
+        conf['dtype'] = np.dtype( conf['dtype'] ).str
+    if 'rundir' in conf:
+        conf['rundir'] = os.path.expanduser( conf['rundir'] )
 
     return conf, kwargs
 
@@ -200,7 +202,7 @@ if __name__ == '__main__':
     for module in modules:
         for machine in machines:
             if os.path.isdir( machine ) and machine not in modules:
-                cf = configure( module, machine )
+                cf = configure( module, machine )[0]
                 print 80 * '-'
                 pprint.pprint( cf )
                 if module == 'default':
