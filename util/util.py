@@ -141,16 +141,18 @@ def ndread( fd, shape=None, indices=None, dtype='f', order='F', nheader=0 ):
     """
     Read n-dimentional array subsection from binary file.
 
-    fd :      Source filename or file object.
-    indices : Specify array subsection.
-    shape :   Dimensions of the source array.
-    dtype :   Numpy style data-type. Default is 'f' (native float)
-              '<f' : little endian float
-              '>f' : big endian float
-              '<d' : little endian double precision
-              '>d' : big endian double precision
-    order :   'F' first index varies fastest, or 'C' last index varies fastest.
-    nheader : Number of bytes to skip at the start of the file.
+    Parameters
+    ----------
+        fd :      Source filename or file object.
+        indices : Specify array subsection.
+        shape :   Dimensions of the source array.
+        dtype :   Numpy style data-type. Default is 'f' (native float)
+                  '<f' : little endian float
+                  '>f' : big endian float
+                  '<d' : little endian double precision
+                  '>d' : big endian double precision
+        order :   'F' first index varies fastest, or 'C' last index varies fastest.
+        nheader : Number of bytes to skip at the start of the file.
     """
     import numpy as np
     from numpy import array, fromfile

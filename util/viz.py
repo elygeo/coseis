@@ -70,12 +70,14 @@ def colormap( cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True ):
     """
     Color map creator.
 
-    cmap: either a named colormap from viz.colormap_library or a 5 x N array,
-        with rows specifying: (value, red, green, blue, alpha) components.
-    colorexp: exponent applied to the values to shift the colormap.
-    nmod: number of brightness modulations applied to the colormap.
-    modlim: magnitude of brightness modulations.
-    upsample: increase the number of samples if non-linear map (colorexp != 1)
+    Parameters
+    ----------
+        cmap : either a named colormap from viz.colormap_library or a 5 x N array,
+            with rows specifying: (value, red, green, blue, alpha) components.
+        colorexp : exponent applied to the values to shift the colormap.
+        nmod : number of brightness modulations applied to the colormap.
+        modlim : magnitude of brightness modulations.
+        upsample : increase the number of samples if non-linear map (colorexp != 1)
     """
     if type( cmap ) is str:
         cmap = colormap_library[cmap]

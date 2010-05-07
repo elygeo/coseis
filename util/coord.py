@@ -43,43 +43,75 @@ def solve2( A, b ):
     return np.array( [b[0] * A[1,1] - b[1] * A[0,1],
                       b[1] * A[0,0] - b[0] * A[1,0]] )
 
-def interp( x0, dx, z, xi, extrapolate=False ):
+def interp( x0, dx, f, xi, extrapolate=False ):
     """
     1D interpolation on a regular grid
     """
-    z = np.asarray( z )
+    f = np.asarray( f )
     xi = (np.asarray( xi ) - x0) / dx
     j = np.int32( xi )
-    n = z.shape[-1]
+    n = f.shape[-1]
     if not extrapolate:
         i = (j < 0) | (j > n-2)
     j = np.minimum( np.maximum( j, 0 ), n-2 )
-    zi = (1.0 - xi + j) * z[...,j] + (xi - j) * z[...,j+1]
+    fi = (1.0 - xi + j) * f[...,j] + (xi - j) * f[...,j+1]
     if not extrapolate:
-        zi[...,i] = np.nan
-    return zi
+        fi[...,i] = np.nan
+    return fi
 
-def interp2( x0, y0, dx, dy, z, xi, yi, extrapolate=False ):
+def interp2( x0, y0, dx, dy, f, xi, yi, extrapolate=False ):
     """
     2D interpolation on a regular grid
     """
-    z = np.asarray( z )
+    f = np.asarray( f )
     xi = (np.asarray( xi ) - x0) / dx
     yi = (np.asarray( yi ) - y0) / dy
     j = np.array( xi, 'i' )
     k = np.array( yi, 'i' )
-    n = z.shape
+    n = f.shape
     if not extrapolate:
-        i = (j < 0) | (j > n[-2]-2) | (k < 0) | (k > n[-1]-2)
+        i = ( (j < 0) | (j > n[-2]-2)
+            | (k < 0) | (k > n[-1]-2) )
     j = np.minimum( np.maximum( j, 0 ), n[-2]-2 )
     k = np.minimum( np.maximum( k, 0 ), n[-1]-2 )
-    zi = ( ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * z[...,j,k]
-         + ( 1.0 - xi + j ) * (       yi - k ) * z[...,j,k+1]
-         + (       xi - j ) * ( 1.0 - yi + k ) * z[...,j+1,k]
-         + (       xi - j ) * (       yi - k ) * z[...,j+1,k+1] )
+    fi = ( ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * f[...,j,k]
+         + ( 1.0 - xi + j ) * (       yi - k ) * f[...,j,k+1]
+         + (       xi - j ) * ( 1.0 - yi + k ) * f[...,j+1,k]
+         + (       xi - j ) * (       yi - k ) * f[...,j+1,k+1] )
     if not extrapolate:
-        zi[...,i] = np.nan
-    return zi
+        fi[...,i] = np.nan
+    return fi
+
+def interp3( x0, y0, z0, dx, dy, dz, f, xi, yi, zi, extrapolate=False ):
+    """
+    2D interpolation on a regular grid
+    """
+    f = np.asarray( f )
+    xi = (np.asarray( xi ) - x0) / dx
+    yi = (np.asarray( yi ) - y0) / dy
+    zi = (np.asarray( yi ) - z0) / dz
+    j = np.array( xi, 'i' )
+    k = np.array( yi, 'i' )
+    l = np.array( zi, 'i' )
+    n = f.shape
+    if not extrapolate:
+        i = ( (j < 0) | (j > n[-3]-2)
+            | (k < 0) | (k > n[-2]-2)
+            | (l < 0) | (l > n[-1]-2) )
+    j = np.minimum( np.maximum( j, 0 ), n[-3]-2 )
+    k = np.minimum( np.maximum( k, 0 ), n[-2]-2 )
+    l = np.minimum( np.maximum( l, 0 ), n[-1]-2 )
+    fi = ( ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * ( 1.0 - zi + l ) * f[...,j,k,l]
+         + ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * (       zi - l ) * f[...,j,k,l+1]
+         + ( 1.0 - xi + j ) * (       yi - k ) * ( 1.0 - zi + l ) * f[...,j,k+1,l]
+         + ( 1.0 - xi + j ) * (       yi - k ) * (       zi - l ) * f[...,j,k+1,l+1]
+         + (       xi - j ) * ( 1.0 - yi + k ) * ( 1.0 - zi + l ) * f[...,j+1,k,l]
+         + (       xi - j ) * ( 1.0 - yi + k ) * (       zi - l ) * f[...,j+1,k,l+1]
+         + (       xi - j ) * (       yi - k ) * ( 1.0 - zi + l ) * f[...,j+1,k+1,l]
+         + (       xi - j ) * (       yi - k ) * (       zi - l ) * f[...,j+1,k+1,l+1] )
+    if not extrapolate:
+        fi[...,i] = np.nan
+    return fi
 
 def ibilinear( xx, yy, xi, yi ):
     """
@@ -110,17 +142,24 @@ def ibilinear( xx, yy, xi, yi ):
 def rot_sym_tensor( w1, w2, rot ):
     """
     Rotate symmetric 3x3 tensor stored as diagonal and off-diagonal vectors.
-    w1:  components w11, w22, w33
-    w2:  components w23, w31, w12
-    rot: rotation matrix
+
+    Parameters
+    ----------
+        w1 : volume components w11, w22, w33
+        w2 : shear components w23, w31, w12
+        rot : rotation matrix
+
+    Returns
+    -------
+        w1, w2 : rotated tensor components
     """
     rot = np.asarray( rot )
     mat = np.diag( w1 )
     mat.flat[[5, 6, 1]] = w2
     mat.flat[[7, 2, 3]] = w2
     mat = dot2( dot2( rot, mat ), rot.T )
-    w1  = np.diag( mat )
-    w2  = mat.flat[[5, 6, 1]]
+    w1 = np.diag( mat )
+    w2 = mat.flat[[5, 6, 1]]
     return w1, w2
 
 def rotmat( x, origin=(0, 0, 0), upvector=(0, 0, 1) ):
@@ -234,6 +273,10 @@ class Transform():
     origin : Untransformed coordinates of the new origin.  If two sets of points
     are given, the origin is centered between them, and rotation is relative to the
     connecting line.
+
+    Returns
+    -------
+    proj : Coordinate transformation function
 
     Example: TeraShake SDSU/Okaya projection
     >>> import pyproj
@@ -384,7 +427,7 @@ def compass( azimuth, radians=False ):
         'S', 'SSW', 'SW', 'WSW',
         'W', 'WNW', 'NW', 'NNW',
     )
-    return names[ int( azimuth / 22.5 + 16.0 ) % 16 ]
+    return names[ int( (azimuth / 22.5 + 0.5) % 16.0 ) ]
 
 if __name__ == '__main__':
     import doctest

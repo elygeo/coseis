@@ -1,6 +1,10 @@
 notes = """
 USC HPC
 
+WARNING: MPI-IO does not seem to work well on HPCC.  Also, it has an extermely
+cumbersome setup where I/O must occur from /scratch, which only exists while
+the job is running.  If you have any alternatives to HPCC, consider using them.
+
 Do not add to the front of your path on HPC
 Use /home instead of /auto
 

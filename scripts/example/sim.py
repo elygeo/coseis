@@ -16,5 +16,5 @@ source1 = 1e6, 1e6, 1e6                   # source normal components
 source2 = 0.0, 0.0, 0.0                   # source shear components
 timefunction = 'brune'                    # source time function
 period = 6 * delta[3]                     # source dominant period
-sord.run( locals() )                    # launch SORD job
+sord.run( **locals() )                    # launch SORD job
 

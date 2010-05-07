@@ -22,6 +22,7 @@ cd "$dir"
 %(pre)s
 mpiexec -np %(nproc)s %(bin)s
 %(post)s
+./clean.sh -f
 mv * %(rundir)r
 
 cd %(rundir)r

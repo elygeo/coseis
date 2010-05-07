@@ -8,23 +8,26 @@ def cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb ):
     """
     2008 Campbell-Bozorgnia NGA ground motion relation
 
-    Arguments
-        T:      Strong motion parameter ('PGA', 'PGV', 'PGD', SA period)
-        M:      Moment magnitude
-        R_RUP:  Closest distance to the coseismic rupture plane (km)
-        R_JB:   Closest distance to the surface projection of the coseismic rupture
-                plane (Joyner-Boore distance, km)
-        Z_TOR:  Depth to the top of the coseismic rupture plane (km)
-        Z_25:   Depth to the 2.5 km/s shear-wave velocity horizon (sediment depth, km)
-        V_S30:  Average shear-wave velocity in the top 30 m of the site profile (m/s)
-        delta:  Average fault dip (degrees)
-        lamb:   Average fault rake (degrees)
+    Parameters
+    ----------
+        T :      Strong motion parameter ('PGA', 'PGV', 'PGD', SA period)
+        M :      Moment magnitude
+        R_RUP :  Closest distance to the coseismic rupture plane (km)
+        R_JB :   Closest distance to the surface projection of the coseismic rupture
+                 plane (Joyner-Boore distance, km)
+        Z_TOR :  Depth to the top of the coseismic rupture plane (km)
+        Z_25 :   Depth to the 2.5 km/s shear-wave velocity horizon (sediment depth, km)
+        V_S30 :  Average shear-wave velocity in the top 30 m of the site profile (m/s)
+        delta :  Average fault dip (degrees)
+        lamb :   Average fault rake (degrees)
 
-    Output
-         Y:      Median ground motion estimate
-         sigmaT: Total standard deviation of ln(Y)
+    Returns
+    -------
+         Y :      Median ground motion estimate
+         sigmaT : Total standard deviation of ln(Y)
 
     Reference
+    ---------
          Campbell, K., and Y. Bozorgnia (2007), Campbell-Bozorgnia NGA ground motion
          relations for the geometric mean horizontal component of peak and spectral
          ground motion parameters, Tech. Rep. PEER 2007/02, Pacific Earthquake

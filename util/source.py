@@ -90,48 +90,47 @@ def src_write( history, nt, dt, t0, xi, w1, w2=None, path='' ):
         np.asarray( w2[2], 'f' ).tofile( path + 'w12' )
     return
 
-def cybershake( path, id_, name=None, id_format='%03d-%03d-%03d-%03d' ):
+def cybershake( isrc, irup, islip, ihypo, path='srf', name=None ):
     """
     Download and prep CyberShake source files.
 
     Must have account on intensity.usc.edu with auto SSH authentication.
-    path: destination directory
-    id_ : (source ID, rupture ID, slip variation ID, hypocenter ID)
-    name : optional name for the rupture
-    id_format : formatting for event_id
-    """
 
-    # format event ID
-    if type( id_ ) == str:
-        id_ = tuple( int(i) for i in id_.split('-') )
-    else:
-        id_ = tuple( id_ )
-    event_id = id_format % id_
+    Parameters
+    ----------
+        isrc : source ID
+        irup : rupture ID
+        islip : slip variation ID
+        ihypo : hypocenter ID
+        path : destination directory
+        name : optional name for the rupture
+    """
 
     # if already present just return metadata
     if path:
         path += os.sep
-    if os.path.exists( path + event_id ):
-        meta = util.load( path + event_id + os.sep + 'meta.py' )
+    if os.path.exists( path ):
+        meta = util.load( path + 'meta.py' )
         return meta
-    print event_id, name
     cwd = os.getcwd()
+    print isrc, irup, islip, ihypo, name
 
     # get reports
+    d = os.path.dirname( os.path.normpath( path ) )
     get = 'scp intensity.usc.edu:/home/scec-00/cybershk/reports/'
     for f in 'erf35_source_rups.txt', 'erf35_sources.txt':
-        if not os.path.exists( path + f ):
-            os.system( get + f + ' ' + path + f )
-    segments = dict( np.loadtxt( path + f, 'i,S64', delimiter='\t', skiprows=1 ) )
+        ff = os.path.join( d, f )
+        if not os.path.exists( ff ):
+            os.system( get + f + ' ' + ff )
+    segments = dict( np.loadtxt( ff, 'i,S64', delimiter='\t', skiprows=1 ) )
 
     # get source files
-    path += event_id
     os.mkdir( path )
     os.chdir( path )
-    get = 'scp intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations/%d/%d/' % id_[:2]
-    mesh = '%d_%d.txt' % id_[:2]
-    head = '%d_%d.txt.variation.output' % id_[:2]
-    srf  = '%d_%d.txt.variation-s%04d-h%04d' % id_
+    get = 'scp intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations/%d/%d/' % (isrc, irup)
+    mesh = '%d_%d.txt' % (isrc, irup)
+    head = '%d_%d.txt.variation.output' % (isrc, irup)
+    srf  = '%d_%d.txt.variation-s%04d-h%04d' % (isrc, irup, islip, ihypo)
     os.system( get + head + ' head' )
     os.system( get + mesh + ' mesh' )
     os.system( get + srf  + ' srf'  )
@@ -149,9 +148,12 @@ def cybershake( path, id_, name=None, id_format='%03d-%03d-%03d-%03d' ):
     meta.probability = float( fd.readline().split()[-1] )
     meta.magnitude   = float( fd.readline().split()[-1] )
     fd.close()
-    meta.segment = segments[id_[0]].replace( ';', ' ' )
-    meta.event_id = event_id
+    meta.segment = segments[isrc].replace( ';', ' ' )
     meta.event = name
+    meta.isrc = isrc
+    meta.irup = irup
+    meta.islip = islip
+    meta.ihypo = ihypo
     if not name:
         meta.name = meta.segment
     util.save( 'meta.py', meta, expand=['plane'], header='# source parameters\n' )
@@ -319,10 +321,12 @@ def srf2potency( src, path, delta=(1,1,1), proj=None ):
     """
     Convert SRF to potency tensor source and write SORD input files.
 
-    src : path to SRF source directory converted first with srf_read
-    path : path to destination directory for potency tensors
-    proj : function to project lon/lat to logical model coordinates
-    castint : cast integerts (nt) to floats (hack for SORD)
+    Parameters
+    ----------
+        src : path to SRF source directory converted first with srf_read
+        path : path to destination directory for potency tensors
+        proj : function to project lon/lat to logical model coordinates
+        castint : cast integerts (nt) to floats (hack for SORD)
     """
     import coord
 

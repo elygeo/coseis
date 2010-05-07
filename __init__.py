@@ -12,103 +12,66 @@ try:
 except( ImportError ):
     pass
 
-def stage( inputs ):
+def stage( **kwargs ):
     """
     Setup, and optionally launch, a SORD job.
     """
-    import glob, time, getopt, shutil
+    import glob, time, shutil
     import setup
 
     # save start time
     starttime = time.asctime()
     print( 'SORD setup' )
 
-    # read defaults
-    pm = {}
-    f = os.path.join( os.path.dirname( __file__ ), 'parameters.py' )
-    exec open( f ) in pm
-    if 'machine' in inputs:
-        cf = conf.configure( module='sord', machine=inputs['machine'] )
-    else:
-        cf = conf.configure( module='sord' )
-
     # test for depreciated variables
-    for k, msg in (
+    depreciated =
         ('np3', "Parameter 'np3' is renamed to 'nproc3'."),
         ('nn',  "Parameter 'nn' discontinued. Use: shape = nx, ny, nz, nt."),
         ('nt',  "Parameter 'nn' discontinued. Use: shape = nx, ny, nz, nt."),
         ('dx',  "Parameter 'dx' discontinued. Use: delta = dx, dy, dz, dt."),
         ('dt',  "Parameter 'dt' discontinued. Use: delta = dx, dy, dz, dt."),
     ):
-        if k in inputs:
+    for k, msg in depreciated:
+        if k in kwargs:
             sys.exit( msg )
 
-    # merge inputs
-    inputs = inputs.copy()
-    util.prune( inputs )
-    util.prune( pm )
-    util.prune( cf, pattern='(^_)|(^.$)|(^..$)' )
-    for k, v in inputs.iteritems():
-        if k in cf:
-            cf[k] = v
-        elif k in pm:
-            pm[k] = v
-        else:
-            sys.exit( 'Unknown parameter: %s = %r' % ( k, v ) )
-    cf = util.namespace( cf )
-    cf.rundir = os.path.expanduser( cf.rundir )
-    pm = prepare_param( util.namespace( pm ), cf.itbuff )
-
-    # command line options
-    opts = [
-        'n', 'dryrun',
-        's', 'serial',
-        'm', 'mpi',
-        'i', 'interactive',
-        'q', 'queue',
-        'd', 'debug',
-        'g', 'debugging',
-        't', 'testing',
-        'p', 'profiling',
-        'O', 'optimized',
-        '8', 'realsize8',
-        'f', 'force',
+    # configure with command line options
+    options = [
+        ( 'n', 'dryrun',      'prepare',  False ),
+        ( 'f', 'force',       'force',    True ),
+        ( 's', 'serial',      'mode',     's' ),
+        ( 'm', 'mpi',         'mode',     'm' ),
+        ( 'i', 'interactive', 'run',      'i' ),
+        ( 'q', 'queue',       'run',      'q' ),
+        ( 'd', 'debug',       'run',      'g' ),
+        ( 'g', 'debugging',   'optimize', 'g' ),
+        ( 't', 'testing',     'optimize', 't' ),
+        ( 'p', 'profiling',   'optimize', 'p' ),
+        ( 'O', 'optimized',   'optimize', 'O' ),
+        ( '8', 'realsize8',   'dtype',    'f8' ),
     ]
-    options = ''.join( opts[::2] )
-    long_options = opts[1::2]
-    opts = getopt.getopt( sys.argv[1:], options, long_options )[0]
-    for o, v in opts:
-        if   o in ('-n', '--dry-run'):
-            cf.prepare = False
-        elif o in ('-s', '--serial'):
-            cf.mode = 's'
-        elif o in ('-m', '--mpi'):
-            cf.mode = 'm'
-        elif o in ('-i', '--interactive'):
-            cf.run = 'i'
-        elif o in ('-q', '--queue'):
-            cf.run = 'q'
-        elif o in ('-d', '--debug'):
-            cf.optimize = 'g'
-            cf.run = 'g'
-        elif o in ('-g', '--debugging'):
-            cf.optimize = 'g'
-        elif o in ('-t', '--testing'):
-            cf.optimize = 't'
-        elif o in ('-p', '--profiling'):
-            cf.optimize = 'p'
-        elif o in ('-O', '--optimized'):
-            cf.optimize = 'O'
-        elif o in ('-8', '--realsize8'):
-            cf.dtype = 'f8'
-        elif o in ('-f', '--force'):
-            if os.path.isdir( cf.rundir ):
-                shutil.rmtree( cf.rundir )
-        else:
-            sys.exit( 'Error: unknown option: ' + o )
+    cf, kwargs = conf.configure( module='sord', options=options, **kwargs )
+    cf = util.namespace( cf )
+    cf.dtype = np.dtype( cf.dtype ).str
+    cf.rundir = os.path.expanduser( cf.rundir )
     if not cf.prepare:
         cf.run = False
-    cf.dtype = np.dtype( cf.dtype ).str
+    if cf.run == 'g':
+        cf.optimize = 'g'
+
+    # read parameters
+    pm = {}
+    f = os.path.join( os.path.dirname( __file__ ), 'parameters.py' )
+    exec open( f ) in pm
+    util.prune( pm )
+    for k, v in kwargs.iteritems():
+        if k in pm:
+            pm[k] = v
+            del( kwargs[k] )
+    if kwargs:
+        sys.exit( 'Unknown parameters: %s' % kwargs )
+    pm = util.namespace( pm )
+    pm = prepare_param( pm, cf.itbuff )
 
     # partition for parallelization
     nx, ny, nz = pm.shape[:3]
@@ -174,7 +137,7 @@ def stage( inputs ):
         return cf
     setup.build( cf.mode, cf.optimize, cf.dtype )
 
-    # config options
+    # configure options
     print( 'Run directory: ' + cf.rundir )
     cf.rundate = time.strftime( '%Y %b %d' )
     cf.rundir = os.path.realpath( cf.rundir )
@@ -188,6 +151,8 @@ def stage( inputs ):
     if cf.optimize == 'g':
         for f in glob.glob( os.path.join( 'src', '*.f90' ) ):
             files += f,
+    if cf.force == True and os.path.isdir( cf.rundir ):
+        shutil.rmtree( cf.rundir )
     conf.skeleton( cf.__dict__, files )
 
     # log, conf, parameter files
@@ -382,7 +347,7 @@ def prepare_param( pm, itbuff ):
     pm.fieldio = fieldio
     return pm
 
-def launch( cf ):
+def launch( **cf ):
     """
     Launch or queue job.
     """
@@ -405,11 +370,11 @@ def launch( cf ):
     os.chdir( cwd )
     return
 
-def run( inputs ):
+def run( **kwargs ):
     """
     Combined stage and launch in one step.
     """
-    cf = stage( inputs )
+    cf = stage( **kwargs )
     launch( cf )
     return cf
 

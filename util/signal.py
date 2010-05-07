@@ -8,11 +8,13 @@ def lowpass( x, dt, cutoff, window='hann', repeat=0 ):
     """
     Lowpass filter
 
-    x      : samples
-    dt     : sampling interval
-    cutoff : cutoff frequency
-    window : can be either 'hann' for zero-phase Hann window filter
-             or an integer n for an n-pole Butterworth filter.
+    Parameters
+    ----------
+        x : samples
+        dt : sampling interval
+        cutoff : cutoff frequency
+        window : can be either 'hann' for zero-phase Hann window filter
+                 or an integer n for an n-pole Butterworth filter.
     """
     if not cutoff:
         return x

@@ -1,6 +1,22 @@
 #!/usr/bin/env python
 """
 Mapping data utilities
+
+TODO
+Quaternary Fault Database
+ftp://hazards.cr.usgs.gov/maps/qfault/
+ReadmeFIRST.txt
+Areas.kmz
+AllFaultsKMZ.zip
+Historic.kmz
+Holocene_LatestPleistocene.kmz
+LateQuaternary.kmz
+MidToLateQuaternary.kmz
+Quaternary.kmz
+qfaultsshapefiles.zip
+fltline.htm
+fltline.txt
+fltline.xml
 """
 import os, urllib, gzip, zipfile
 import numpy as np
@@ -174,9 +190,15 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
     Reader for the Global Self-consistent, Hierarchical, High-resolution Shoreline
     database (GSHHS) by Wessel and Smith.  WGS-84 ellipsoid.
 
-    kind: 'coastlines', 'rivers', 'borders'
-    resolution: 'crude', 'low', 'intermediate', 'high', 'full'
-    extent: (min_lon, max_lon), (min_lat, max_lat)
+    Parameters
+    ----------
+        kind : { 'coastlines', 'rivers', 'borders' }
+        resolution : { 'crude', 'low', 'intermediate', 'high', 'full' }
+        extent : (min_lon, max_lon), (min_lat, max_lat)
+
+    Returns
+    -------
+        x, y : Arrays of coordinates.
 
     Reference:
     Wessel, P., and W. H. F. Smith, A Global Self-consistent, Hierarchical,
@@ -245,11 +267,13 @@ def clipdata( x, y, extent, lines=1 ):
     """
     Clip data outside extent.
 
-    x, y : data coordinates
-    extent : (xmin, xmax), (ymin, ymax)
-    lines : 0 = points, assume no connectivity.
-            1 = line segments, include one extra point past the boundary.
-           -1 = line segments, do not include extra point past the boundary.
+    Parameters
+    ----------
+        x, y : data coordinates
+        extent : (xmin, xmax), (ymin, ymax)
+        lines : 0 = points, assume no connectivity.
+                1 = line segments, include one extra point past the boundary.
+               -1 = line segments, do not include extra point past the boundary.
     """
     x, y = np.array( [x, y] )
     x1, x2 = extent[0]

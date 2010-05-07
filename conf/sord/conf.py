@@ -13,6 +13,7 @@ mode = None      # s: serial, m: MPI, None: guess
 run = False      # i: interactive, q: batch queue, g: debugger
 pre = post = ''  # pre-processing and post-processing commands
 rundir = 'run'   # run directory
+force = False    # overwrite previous run directory if present
 
 # user info
 email = user = pwd.getpwuid( os.geteuid() )[0]
