@@ -196,6 +196,15 @@ def stage( args=None, **kwargs ):
     # return to initial directory
     os.chdir( cwd )
     cf.__dict__.update( pm.__dict__ )
+    cf = util.prune( cf.__dict__ )
+    return cf
+
+def run( **kwargs ):
+    """
+    Combined stage and launch in one step.
+    """
+    cf = stage( **kwargs )
+    conf.launch( **cf )
     return cf
 
 def prepare_param( pm, itbuff ):
@@ -336,12 +345,4 @@ def prepare_param( pm, itbuff ):
             sys.exit( 'Error: duplicate filename: %r' % f[i] )
     pm.fieldio = fieldio
     return pm
-
-def run( **kwargs ):
-    """
-    Combined stage and launch in one step.
-    """
-    cf = stage( **kwargs )
-    conf.launch( **cf )
-    return cf
 

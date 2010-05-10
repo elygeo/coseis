@@ -16,7 +16,7 @@ def prune( d, pattern=None, types=None ):
     Delete dictionary keys with specified name pattern or types
     Default types are: functions and modules.
 
-    >>> prune( {'a': 0, 'a_': 0, '_a': 0, 'a_a': 0, 'b': prune} )
+    >>> prune( {'aa': 0, 'aa_': 0, '_aa': 0, 'a_a': 0, 'b_b': prune} )
     {'a_a': 0}
     """
     if pattern == None:
