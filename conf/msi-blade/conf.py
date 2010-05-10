@@ -25,7 +25,7 @@ maxcores = 4;
 maxram = 7000
 fortran_serial = 'ifort',
 fortran_mpi = 'mpif90',
-sord = dict(
+sord_ = dict(
     fortran_flags = {
         'f': ('-u', '-std95', '-warn'),
         'g': ('-CB', '-traceback', '-g'),

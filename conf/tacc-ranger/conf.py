@@ -34,7 +34,7 @@ maxcores = 16
 maxram = 30000
 fortran_serial = 'pgf95',
 fortran_mpi = 'mpif90',
-sord = dict(
+sord_ = dict(
     rate = 2.1e6,
     fortran_flags = {
         'f': ('-Mdclchk',),

@@ -6,7 +6,7 @@ import os, sys, shutil, re
 
 class namespace:
     """
-    Create a namespace froma a dict.
+    Namespace with object attributes initialized from a dict.
     """
     def __init__( self, d ):
         self.__dict__.update( d )
@@ -14,18 +14,26 @@ class namespace:
 def prune( d, pattern=None, types=None ):
     """
     Delete dictionary keys with specified name pattern or types
-    Default types are: functions and modules.
+
+    Parameters
+    ----------
+        d : dict of parameters
+        pattern : regular expression of parameter names to prune
+            default = '(^_)|(_$)|(^.$)|(^..$)'
+        types : list of parameters types to keep
+            default = [NoneType, bool, str, int, float, tuple, list, dict]
+            Functions, classes, and modules are pruned by default.
 
     >>> prune( {'aa': 0, 'aa_': 0, '_aa': 0, 'a_a': 0, 'b_b': prune} )
     {'a_a': 0}
     """
     if pattern == None:
         pattern = '(^_)|(_$)|(^.$)|(^..$)'
-    if types is None:
-        types = type( re ), type( re.sub )
+    if types == None:
+        types = type(None), bool, str, int, float, tuple, list, dict
     grep = re.compile( pattern )
     for k in d.keys():
-        if grep.search( k ) or type( d[k] ) in types:
+        if grep.search( k ) or type( d[k] ) not in types:
             del( d[k] )
     return d
 
@@ -181,7 +189,7 @@ def ndread( fd, shape=None, indices=None, dtype='f', order='F', nheader=0 ):
             mm[i-1] = mm[i-1] * mm[i]
             del i0[i], nn[i], mm[i]
     if len( mm ) > 4:
-        sys.exit( 'To many slice dimentions' )
+        sys.exit( 'To many slice dimensions' )
     i0 = ( [0, 0, 0] + i0 )[-4:]
     nn = ( [1, 1, 1] + nn )[-4:]
     mm = ( [1, 1, 1] + mm )[-4:]

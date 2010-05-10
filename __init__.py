@@ -59,7 +59,6 @@ def stage( args=None, **kwargs ):
         ( '8', 'realsize8',   'dtype',    'f8' ),
     ]
     cf, kwargs = conf.configure( module='sord', options=options, **kwargs )
-    cf = util.namespace( cf )
     cf.dtype = np.dtype( cf.dtype ).str
     cf.rundir = os.path.expanduser( cf.rundir )
     if not cf.prepare:
@@ -196,7 +195,6 @@ def stage( args=None, **kwargs ):
     # return to initial directory
     os.chdir( cwd )
     cf.__dict__.update( pm.__dict__ )
-    cf = util.prune( cf.__dict__ )
     return cf
 
 def run( **kwargs ):
@@ -204,7 +202,7 @@ def run( **kwargs ):
     Combined stage and launch in one step.
     """
     cf = stage( **kwargs )
-    conf.launch( **cf )
+    conf.launch( cf )
     return cf
 
 def prepare_param( pm, itbuff ):

@@ -5,23 +5,57 @@ Machine configuration
 import os, re, shutil, getopt, sys
 import numpy as np
 
+class namespace:
+    """
+    Namespace with object attributes initialized from a dict.
+    """
+    def __init__( self, d ):
+        self.__dict__.update( d )
+
+def prune( d, pattern=None, types=None ):
+    """
+    Delete dictionary keys with specified name pattern or types
+
+    Parameters
+    ----------
+    d : dict of parameters
+    pattern : regular expression of parameter names to prune
+        default = '(^_)|(_$)|(^.$)|(^..$)'
+    types : list of parameters types to keep
+        default = [NoneType, bool, str, int, float, tuple, list, dict]
+        Functions, classes, and modules are pruned by default.
+
+    >>> prune( {'aa': 0, 'aa_': 0, '_aa': 0, 'a_a': 0, 'b_b': prune} )
+    {'a_a': 0}
+    """
+    if pattern == None:
+        pattern = '(^_)|(_$)|(^.$)|(^..$)'
+    if types == None:
+        types = type(None), bool, str, int, float, tuple, list, dict
+    grep = re.compile( pattern )
+    for k in d.keys():
+        if grep.search( k ) or type( d[k] ) not in types:
+            del( d[k] )
+    return d
+
 def configure( module='default', machine=None, save=False, options=None, **kwargs ):
     """
     Merge module, machine, keyword, and command line parameters.
 
     Parameters
     ----------
-        module : module name
-        machine : machine name
-        save : remember machine name
-        options : list command line options consisting of:
-            (sort_form, long_form, parameter, value)
-        **kwargs : override parameters supplied as keyword arguments
+    module : module name
+    machine : machine name
+    save : remember machine name
+    options : list command line options consisting of:
+        (sort_form, long_form, parameter, value)
+    **kwargs : override parameters supplied as keyword arguments
 
     Returns
     -------
-        conf : dictionary containing merged module, kwarg, and machine configuration
-        kwarg : dictionary containing unmerged parameters
+    job : job configuration object containing merged module, kwarg, and machine
+        configuration parameters as object attributes
+    kwarg : dictionary containing unmatched parameters
 
     Module and machine names correspond to subdirectories of the conf folder
     that contain configuration parameters in a file conf.py.
@@ -29,41 +63,40 @@ def configure( module='default', machine=None, save=False, options=None, **kwarg
 
     # module parameters
     path = os.path.realpath( os.path.dirname( __file__ ) )
-    conf = {}
-    conf['module'] = module
+    job = {}
+    job['module'] = module
     f = os.path.join( path, module, 'conf.py' )
-    exec open( f ) in conf
+    exec open( f ) in job
 
     # machine parameters
     f = os.path.join( path, 'machine' )
-    if 'machine' in kwargs:
-        machine = kwargs['machine']
-    elif os.path.isfile( f ):
+    if not machine and os.path.isfile( f ):
         machine = open( f ).read().strip()
-    conf['machine'] = machine
     if machine:
         machine = os.path.basename( os.path.normpath( machine ) )
         f = os.path.join( path, machine, 'conf.py' )
         if os.path.isfile( f ):
-            exec open( f ) in conf
+            exec open( f ) in job
         if save:
             f = os.path.join( path, 'machine' )
             open( f, 'w' ).write( machine )
+    job['machine'] = machine
 
     # email address
     f = os.path.join( path, 'email' )
     if os.path.isfile( f ):
-        conf['email'] = open( f ).read().strip()
+        job['email'] = open( f ).read().strip()
 
     # per machine module specific parameters
-    if module in conf:
-        conf.update( conf[module] )
+    k = module + '_'
+    if k in job:
+        job.update( job[k] )
 
     # function parameters
     kwargs = kwargs.copy()
     for k, v in kwargs.copy().iteritems():
-        if k in conf:
-            conf[k] = v
+        if k in job:
+            job[k] = v
             del( kwargs[k] )
 
     # command line parameters
@@ -77,121 +110,117 @@ def configure( module='default', machine=None, save=False, options=None, **kwarg
             else:
                 i = short.index( key )
             key, val = options[i][2:]
-            conf[key] = val
+            job[key] = val
 
     # fortran flags
-    if 'fortran_flags_default' in conf:
-        if 'fortran_flags' not in conf:
-            k = conf['fortran_serial'][0]
-            conf['fortran_flags'] = conf['fortran_flags_default'][k]
+    if 'fortran_flags_default_' in job:
+        if 'fortran_flags' not in job:
+            k = job['fortran_serial'][0]
+            job['fortran_flags'] = job['fortran_flags_default_'][k]
 
     # prune unneeded variables
-    prune( conf, pattern='(^_)|(^.$)|(^..$)|(^sord$)|(^cvm$)|(^fortran_flags_default$)' )
-    prune( kwargs, pattern='(^_)|(^.$)|(^..$)|(^sord$)|(^cvm$)|(^fortran_flags_default$)|(_$)' )
+    prune( job )
+    prune( kwargs )
 
     # misc
-    if 'dtype' in conf:
-        conf['dtype'] = np.dtype( conf['dtype'] ).str
-    if 'rundir' in conf:
-        conf['rundir'] = os.path.expanduser( conf['rundir'] )
+    if 'dtype' in job:
+        job['dtype'] = np.dtype( job['dtype'] ).str
+    if 'rundir' in job:
+        job['rundir'] = os.path.expanduser( job['rundir'] )
 
-    return conf, kwargs
+    # configuration object
+    job = namespace( job )
 
-def prune( d, pattern=None, types=None ):
-    """
-    Delete dictionary keys with specified name pattern or types
-    Default types are: functions and modules.
+    return job, kwargs
 
-    >>> prune( {'a': 0, 'a_': 0, '_a': 0, 'a_a': 0, 'b': prune} )
-    {'a_a': 0}
-    """
-    if pattern == None:
-        pattern = '(^_)|(_$)|(^.$)|(^..$)'
-    if types is None:
-        types = type( re ), type( re.sub )
-    grep = re.compile( pattern )
-    for k in d.keys():
-        if grep.search( k ) or type( d[k] ) in types:
-            del( d[k] )
-    return d
-
-def resources( cf ):
+def resources( job ):
     """
     Compute and display resource usage
     """
 
     # parallelization
-    if cf.maxcores and cf.maxnodes:
-        cf.nodes = min( cf.maxnodes, (cf.nproc - 1) / cf.maxcores + 1 )
-        cf.ppn = (cf.nproc - 1) / cf.nodes + 1
-        cf.cores = min( cf.maxcores, cf.ppn )
-        cf.totalcores = cf.nodes * cf.maxcores
+    if job.maxcores and job.maxnodes:
+        job.nodes = min( job.maxnodes, (job.nproc - 1) / job.maxcores + 1 )
+        job.ppn = (job.nproc - 1) / job.nodes + 1
+        job.cores = min( job.maxcores, job.ppn )
+        job.totalcores = job.nodes * job.maxcores
     else:
-        cf.nodes = 1
-        cf.ppn = cf.nproc
-        cf.cores = cf.nproc
-        cf.totalcores = cf.nproc
-    print( 'Machine: ' + cf.machine )
-    print( 'Cores: %s of %s' % (cf.nproc, cf.maxnodes * cf.maxcores) )
-    print( 'Nodes: %s of %s' % (cf.nodes, cf.maxnodes) )
+        job.nodes = 1
+        job.ppn = job.nproc
+        job.cores = job.nproc
+        job.totalcores = job.nproc
+    print( 'Machine: ' + job.machine )
+    print( 'Cores: %s of %s' % (job.nproc, job.maxnodes * job.maxcores) )
+    print( 'Nodes: %s of %s' % (job.nodes, job.maxnodes) )
 
     # memory
-    if hasattr( cf, 'pmem' ):
-        cf.ram = cf.pmem * cf.ppn
-        print( 'RAM: %sMb of %sMb per node' % (cf.ram, cf.maxram) )
+    if hasattr( job, 'pmem' ):
+        job.ram = job.pmem * job.ppn
+        print( 'RAM: %sMb of %sMb per node' % (job.ram, job.maxram) )
 
     # SU estimate and generous wall time limit
-    if hasattr( cf, 'seconds' ):
-        ss = cf.seconds * cf.ppn / cf.cores
+    if hasattr( job, 'seconds' ):
+        ss = job.seconds * job.ppn / job.cores
         mm = ss / 60 * 2.0 + 10
-        if cf.maxtime:
-            mm = min( mm, 60 * cf.maxtime[0] + cf.maxtime[1] )
+        if job.maxtime:
+            mm = min( mm, 60 * job.maxtime[0] + job.maxtime[1] )
         hh = mm / 60
         mm = mm % 60
-        cf.walltime = '%d:%02d:00' % (hh, mm)
-        sus = int( ss / 3600 * cf.totalcores + 1 )
+        job.walltime = '%d:%02d:00' % (hh, mm)
+        sus = int( ss / 3600 * job.totalcores + 1 )
         print( 'SUs: %s' % sus )
-    print( 'Time limit: ' + cf.walltime )
+    print( 'Time limit: ' + job.walltime )
 
     # warnings
-    if cf.maxcores and cf.ppn > cf.maxcores:
-        print( 'Warning: exceding available cores per node (%s)' % cf.maxcores )
-    if cf.ram and cf.ram > cf.maxram:
-        print( 'Warning: exceding available RAM per node (%sMb)' % cf.maxram )
+    if job.maxcores and job.ppn > job.maxcores:
+        print( 'Warning: exceding available cores per node (%s)' % job.maxcores )
+    if job.ram and job.ram > job.maxram:
+        print( 'Warning: exceding available RAM per node (%sMb)' % job.maxram )
 
-    return cf
+    return job
 
-def skeleton( files=(), new=True, **kwargs ):
+def skeleton( job, files=(), new=True ):
     """
     Create run directory skeleton from templates.
 
     Parameters
     ----------
-        files : list of files to link or copy into directory
-        new : (True|False) create new directory, or use existing
-        **kwargs : keyword parameters
+    job : job configuration object
+    files : list of files to link or copy into directory
+    new : (True|False) create new directory, or use existing
 
     Templates located in the configuration directory are processed with the given
-    keyword parameters.  Module and machine names must be specified as parameters in
-    kwargs.  Module specific templates are used if found, in addition to machine
-    specific templates.  If no machine specific templates are found, default
-    templates are used. 
+    keyword parameters.  Module specific templates are used if found, in addition
+    to machine specific templates.  If no machine specific templates are found,
+    default templates are used. 
     """
-    rundir = kwargs['rundir']
-    module = kwargs['module']
-    machine = kwargs['machine']
+
+    # parameters
+    rundir = job.rundir
+    module = job.module
+    machine = job.machine
+
+    # locations
     path = os.path.realpath( os.path.dirname( __file__ ) )
     dest = os.path.realpath( os.path.expanduser( rundir ) ) + os.sep
+
+    # create destination directory
     if new:
         os.makedirs( dest )
+
+    # module templates
     templates = ()
     f = os.path.join( path, module, 'templates' )
     if module != 'default' and os.path.isdir( f ):
         templates += f,
+
+    # machine templates
     f = os.path.join( path, machine, 'templates' )
     if not os.path.isdir( f ):
         f = os.path.join( path, 'default', 'templates' )
     templates += f,
+
+    # process templates
     cwd = os.getcwd()
     for t in templates:
         os.chdir( t )
@@ -205,38 +234,59 @@ def skeleton( files=(), new=True, **kwargs ):
                 open( ff, 'w' ).write( out )
                 shutil.copymode( f, ff )
     os.chdir( cwd )
+
+    # link or copy files
     for f in files:
         try:
             os.link( f, dest + f )
         except:
             shutil.copy2( f, dest )
+
     return
 
-# launch job
-def launch( rundir='.', run=None, machine=None, host=None, hosts=[None], **kwargs ):
+def launch( job ):
     """
     Launch or queue job.
     """
     cwd = os.getcwd()
-    os.chdir( rundir )
-    if run == 'q':
-        if host not in hosts:
+    os.chdir( job.rundir )
+    if job.run == 'q':
+        if job.host not in job.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r'
-                % (host, machine) )
+                % (job.host, job.machine) )
         print( 'bash queue.sh' )
         if os.system( 'bash queue.sh' ):
             sys.exit( 'Error queing job' )
-    elif run:
-        if host not in hosts:
+    elif job.run:
+        if job.host not in job.hosts:
             sys.exit( 'Error: hostname %r does not match configuration %r'
-                % (host, machine) )
-        print( 'bash run.sh -' + run )
-        if os.system( 'bash run.sh -' + run ):
+                % (job.host, job.machine) )
+        print( 'bash run.sh -' + job.run )
+        if os.system( 'bash run.sh -' + job.run ):
             sys.exit( 'Error running job' )
     os.chdir( cwd )
     return
 
-# Test all configurations if run from the command line
+def stage( **kwargs ):
+    """
+    Configure and stage job
+    """
+    job = configure( **kwargs )
+    job = resources( job )
+    skeleton( job )
+    return job
+
+def run( **kwargs ):
+    """
+    Configure, stage, and launch job
+    """
+    job = configure( **kwargs )
+    job = resources( job )
+    skeleton( job )
+    launch( job )
+    return job
+
+# run tests if called from the command line
 if __name__ == '__main__':
     import pprint
     modules = 'default', 'sord', 'cvm'
@@ -244,11 +294,11 @@ if __name__ == '__main__':
     for module in modules:
         for machine in machines:
             if os.path.isdir( machine ) and machine not in modules:
-                cf = configure( module, machine )[0]
+                job = configure( module, machine )[0]
                 print 80 * '-'
-                pprint.pprint( cf )
+                pprint.pprint( job.__dict__ )
                 if module == 'default':
-                    cf['rundir'] = 'tmp'
-                    skeleton( **cf )
+                    job.rundir = 'tmp'
+                    skeleton( job )
                     shutil.rmtree( 'tmp' )
 

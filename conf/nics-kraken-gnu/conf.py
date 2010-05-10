@@ -26,12 +26,11 @@ login = 'kraken-pwd.nics.utk.edu'
 hosts = 'kraken-pwd3',
 maxram = 15000
 maxcores = 12
-minnodes = 1
 maxnodes = 8256
 maxtime = 24, 00
 fortran_serial = 'ftn',
 fortran_mpi = 'ftn',
-sord = dict(
+sord_ = dict(
     rate = 1e6, # just a guess
     fortran_flags = {
         'f': ('-fimplicit-none', '-Wall'),
@@ -42,7 +41,7 @@ sord = dict(
         '8': ('-fdefault-real-8',),
     },
 )
-cvm = dict(
+cvm_ = dict(
     fortran_flags = {
         'g': ('-Wall', '-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g'),
         'O': ('-Wall', '-O3'),

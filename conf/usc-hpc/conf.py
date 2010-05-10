@@ -34,5 +34,5 @@ queue = 'quick';    maxnodes = 4;   maxcores = 8; maxram = 11000; maxtime = 1, 0
 queue = 'main';     maxnodes = 382; maxcores = 8; maxram = 11000; maxtime = None
 queue = 'scec';     maxnodes = 100; maxcores = 2; maxram = 1500;  maxtime = 336, 00
 queue = 'nbns';     maxnodes =  48; maxcores = 8; maxram = 11000; maxtime = 336, 00
-sord = dict( rate = 1.1e6 )
+sord_ = dict( rate = 1.1e6 )
 

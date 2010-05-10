@@ -22,7 +22,7 @@ email = user = pwd.getpwuid( os.geteuid() )[0]
 notes = 'Default SORD configuration'
 name = 'sord'
 machine = ''
-os_ = os.uname()
+system = os.uname()
 host = os.uname()[1]
 hosts = host,
 login = host
@@ -46,7 +46,7 @@ fortran_serial = find( 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95'
 fortran_mpi = find( 'mpxlf95_r', 'mpif90' ),
 
 # Fortran compiler flags
-fortran_flags_default = {
+fortran_flags_default_ = {
     'gfortran': {
         #'f': ('gfortran', '-fimplicit-none', '-Wall', '-std=f95', '-pedantic'),
         'f': ('-fimplicit-none', '-Wall'),
@@ -90,7 +90,7 @@ fortran_flags_default = {
     }
 }
 if os.uname()[0] == 'SunOS':
-    fortran_flags_default.update( {
+    fortran_flags_default_.update( {
         'f95': {
             'f': ('-u'),
             'g': ('-C', '-ftrap=common', '-w4', '-g'),
