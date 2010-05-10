@@ -419,9 +419,11 @@ if ( verb .and. i == 0 ) write( 0, '(i8,a,i2,a,i8,2a)' ) &
 if ( mode == 'r' ) then
     i = mpi_mode_rdonly
 elseif ( oo(n) == 0 ) then
-    i = mpi_mode_wronly + mpi_mode_create + mpi_mode_excl
+    !i = mpi_mode_wronly + mpi_mode_create + mpi_mode_excl
+    i = mpi_mode_rdwr + mpi_mode_create ! workaround for USC HPCC
 else
-    i = mpi_mode_wronly
+    !i = mpi_mode_wronly
+    i = mpi_mode_rdwr ! workaround for USC HPCC
 end if
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
 call mpi_file_open( comm, filename, i, mpi_info_null, fh, e )

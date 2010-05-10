@@ -61,7 +61,7 @@ def configure( module='default', machine=None, save=False, options=None, **kwarg
 
     # function parameters
     kwargs = kwargs.copy()
-    for k, v in kwargs.iteritems():
+    for k, v in kwargs.copy().iteritems():
         if k in conf:
             conf[k] = v
             del( kwargs[k] )
@@ -87,6 +87,7 @@ def configure( module='default', machine=None, save=False, options=None, **kwarg
 
     # prune unneeded variables
     prune( conf, pattern='(^_)|(^.$)|(^..$)|(^sord$)|(^cvm$)|(^fortran_flags_default$)' )
+    prune( kwargs, pattern='(^_)|(^.$)|(^..$)|(^sord$)|(^cvm$)|(^fortran_flags_default$)|(_$)' )
 
     # misc
     if 'dtype' in conf:
@@ -114,34 +115,51 @@ def prune( d, pattern=None, types=None ):
             del( d[k] )
     return d
 
-def parallel( nproc, maxcores, maxnodes ):
+def resources( cf ):
     """
-    Find optimal parallelization for desired number of processes.
-
-    Parameters
-    ----------
-        nproc : number of desired processes
-        maxcores : physical number of cores per node
-        maxnodes : physical number of compute nodes in the system
-
-    Returns
-    -------
-        nodes : number of compute nodes
-        ppn : number of processes per node
-        cores : number of cores per node
-        totalcores : total number of cores
+    Compute and display resource usage
     """
-    if maxcores and maxnodes:
-        nodes = min( maxnodes, (nproc - 1) / maxcores + 1 )
-        ppn = (nproc - 1) / nodes + 1
-        cores = min( maxcores, ppn )
-        totalcores = nodes * maxcores
+
+    # parallelization
+    if cf.maxcores and cf.maxnodes:
+        cf.nodes = min( cf.maxnodes, (cf.nproc - 1) / cf.maxcores + 1 )
+        cf.ppn = (cf.nproc - 1) / cf.nodes + 1
+        cf.cores = min( cf.maxcores, cf.ppn )
+        cf.totalcores = cf.nodes * cf.maxcores
     else:
-        nodes = 1
-        ppn = nproc
-        cores = nproc
-        totalcores = nproc
-    return (nodes, ppn, cores, totalcores)
+        cf.nodes = 1
+        cf.ppn = cf.nproc
+        cf.cores = cf.nproc
+        cf.totalcores = cf.nproc
+    print( 'Machine: ' + cf.machine )
+    print( 'Cores: %s of %s' % (cf.nproc, cf.maxnodes * cf.maxcores) )
+    print( 'Nodes: %s of %s' % (cf.nodes, cf.maxnodes) )
+
+    # memory
+    if hasattr( cf, 'pmem' ):
+        cf.ram = cf.pmem * cf.ppn
+        print( 'RAM: %sMb of %sMb per node' % (cf.ram, cf.maxram) )
+
+    # SU estimate and generous wall time limit
+    if hasattr( cf, 'seconds' ):
+        ss = cf.seconds * cf.ppn / cf.cores
+        mm = ss / 60 * 2.0 + 10
+        if cf.maxtime:
+            mm = min( mm, 60 * cf.maxtime[0] + cf.maxtime[1] )
+        hh = mm / 60
+        mm = mm % 60
+        cf.walltime = '%d:%02d:00' % (hh, mm)
+        sus = int( ss / 3600 * cf.totalcores + 1 )
+        print( 'SUs: %s' % sus )
+    print( 'Time limit: ' + cf.walltime )
+
+    # warnings
+    if cf.maxcores and cf.ppn > cf.maxcores:
+        print( 'Warning: exceding available cores per node (%s)' % cf.maxcores )
+    if cf.ram and cf.ram > cf.maxram:
+        print( 'Warning: exceding available RAM per node (%sMb)' % cf.maxram )
+
+    return cf
 
 def skeleton( files=(), new=True, **kwargs ):
     """
@@ -192,6 +210,30 @@ def skeleton( files=(), new=True, **kwargs ):
             os.link( f, dest + f )
         except:
             shutil.copy2( f, dest )
+    return
+
+# launch job
+def launch( rundir='.', run=None, machine=None, host=None, hosts=[None], **kwargs ):
+    """
+    Launch or queue job.
+    """
+    cwd = os.getcwd()
+    os.chdir( rundir )
+    if run == 'q':
+        if host not in hosts:
+            sys.exit( 'Error: hostname %r does not match configuration %r'
+                % (host, machine) )
+        print( 'bash queue.sh' )
+        if os.system( 'bash queue.sh' ):
+            sys.exit( 'Error queing job' )
+    elif run:
+        if host not in hosts:
+            sys.exit( 'Error: hostname %r does not match configuration %r'
+                % (host, machine) )
+        print( 'bash run.sh -' + run )
+        if os.system( 'bash run.sh -' + run ):
+            sys.exit( 'Error running job' )
+    os.chdir( cwd )
     return
 
 # Test all configurations if run from the command line

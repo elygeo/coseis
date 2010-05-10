@@ -5,13 +5,6 @@ import sord
 # Column 1 is dx, the spatial step size
 # Column 2 is nproc3, the number of processors in each dimension
 runs_ = [
-    ( 500.0, (1, 1, 2) ),
-    ( 300.0, (1, 1, 2) ),
-    ( 250.0, (1, 1, 2) ),
-    ( 150.0, (1, 1, 2) ),
-    ( 100.0, (1, 1, 2) ),
-]
-runs_ = [
     ( 500.0, (1, 4, 4) ),
     ( 300.0, (1, 4, 4) ),
     ( 250.0, (1, 4, 4) ),
@@ -24,9 +17,16 @@ runs_ = [
     (  15.0, (1, 16, 16) ),
     (  10.0, (4, 16, 16) ),
 ]
-runs_ = [ (  50.0, (1, 1, 2) ), ]
-runs_ = [ ( 150.0, (1, 1, 2) ), ]
-runs_ = [ ( 300.0, (1, 1, 2) ), ]
+runs_ = [
+    ( 500.0, (1, 1, 2) ),
+    ( 300.0, (1, 1, 2) ),
+    ( 250.0, (1, 1, 2) ),
+    ( 150.0, (1, 1, 2) ),
+    ( 100.0, (1, 1, 2) ),
+]
+runs_ = [ (  50.0, (1, 1, 2) ) ]
+runs_ = [ ( 150.0, (1, 1, 2) ) ]
+runs_ = [ ( 300.0, (1, 1, 2) ) ]
 
 # Near side boundary conditions:
 # PML absorbing boundaries for the x, y and z boundaries
@@ -41,7 +41,7 @@ bc2 = -1, 1, -2
 for dx_, nproc3 in runs_:
 
     # Simulation directory
-    rundir = 'run/tpv3-%03.0f' % dx_
+    rundir = 'run/tpv3/%03.0f' % dx_
 
     # Model dimentions
     delta = dx_, dx_, dx_, dx_ / 12500.0	# step size
@@ -96,8 +96,9 @@ for dx_, nproc3 in runs_:
     ]
 
     # Write slip, slip velocity, and shear traction time histories
-    p1 = ihypo[0] - 7500.0 / delta[0], -1, -2, ()	# mode II point indices
-    p2 = -1, ihypo[1] - 6000.0 / delta[1], -2, ()	# mode III point indices
+    j, k, l = ihypo
+    p1 = j - 7500.0 / delta[0], -1, -2, ()	# mode II point indices
+    p2 = -1, k - 6000.0 / delta[1], -2, ()	# mode III point indices
     for f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':
         fieldio += [
             ( '=w', f, p1, 'P1-' + f ),	# mode II point

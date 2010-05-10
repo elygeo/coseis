@@ -47,6 +47,7 @@ Author
 | http://earth.usc.edu/~gely/
 | gely@usc.edu
 
+Contributions from: Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi
 
 Publications
 ============

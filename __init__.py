@@ -2,19 +2,19 @@
 """
 Support Operator Rupture Dynamics
 """
-import os, sys, re, math
+import os, sys, re, math, pprint
 import numpy as np
-import fieldnames
-import conf
+import conf, fieldnames
+from conf import launch
 from util import swab, util, coord, signal, source, data, viz, plt, mlab, egmm
 try:
     from util import rspectra
 except( ImportError ):
     pass
 
-def stage( **kwargs ):
+def stage( args=None, **kwargs ):
     """
-    Setup, and optionally launch, a SORD job.
+    Setup a SORD job.
     """
     import glob, time, shutil
     import setup
@@ -23,21 +23,29 @@ def stage( **kwargs ):
     starttime = time.asctime()
     print( 'SORD setup' )
 
-    # test for depreciated variables
-    depreciated =
+    # test for old style function call
+    if args != None:
+        sys.exit( 'sord.run( vars ) depreciated. Use sord.run( **vars ) instead.' )
+
+    # test for depreciated parameters
+    depreciated = [
         ('np3', "Parameter 'np3' is renamed to 'nproc3'."),
-        ('nn',  "Parameter 'nn' discontinued. Use: shape = nx, ny, nz, nt."),
-        ('nt',  "Parameter 'nn' discontinued. Use: shape = nx, ny, nz, nt."),
-        ('dx',  "Parameter 'dx' discontinued. Use: delta = dx, dy, dz, dt."),
-        ('dt',  "Parameter 'dt' discontinued. Use: delta = dx, dy, dz, dt."),
-    ):
+        ('nn',  "Parameter 'nn' depreciated. Use: shape = nx, ny, nz, nt."),
+        ('nt',  "Parameter 'nn' depreciated. Use: shape = nx, ny, nz, nt."),
+        ('dx',  "Parameter 'dx' depreciated. Use: delta = dx, dy, dz, dt."),
+        ('dt',  "Parameter 'dt' depreciated. Use: delta = dx, dy, dz, dt."),
+    ]
+    error = None
     for k, msg in depreciated:
         if k in kwargs:
-            sys.exit( msg )
+            print msg
+            error = True
+    if error:
+        sys.exit()
 
     # configure with command line options
     options = [
-        ( 'n', 'dryrun',      'prepare',  False ),
+        ( 'n', 'dry-run',     'prepare',  False ),
         ( 'f', 'force',       'force',    True ),
         ( 's', 'serial',      'mode',     's' ),
         ( 'm', 'mpi',         'mode',     'm' ),
@@ -64,19 +72,22 @@ def stage( **kwargs ):
     f = os.path.join( os.path.dirname( __file__ ), 'parameters.py' )
     exec open( f ) in pm
     util.prune( pm )
-    for k, v in kwargs.iteritems():
+    for k, v in kwargs.copy().iteritems():
         if k in pm:
             pm[k] = v
             del( kwargs[k] )
     if kwargs:
-        sys.exit( 'Unknown parameters: %s' % kwargs )
+        print( 'Unknown parameters:' )
+        pprint.pprint( kwargs )
+        sys.exit()
+        
     pm = util.namespace( pm )
     pm = prepare_param( pm, cf.itbuff )
 
     # partition for parallelization
     nx, ny, nz = pm.shape[:3]
-    maxtotalcores = cf.maxnodes * cf.maxcores
-    if not cf.mode and maxtotalcores == 1:
+    n = cf.maxnodes * cf.maxcores
+    if not cf.mode and n == 1:
         cf.mode = 's'
     j, k, l = pm.nproc3
     if cf.mode == 's':
@@ -100,10 +111,6 @@ def stage( **kwargs ):
             cf.mode = 'm'
 
     # resources
-    n = conf.parallel( cf.nproc, cf.maxcores, cf.maxnodes )
-    cf.nodes, cf.ppn, cf.cores, cf.totalcores = n
-
-    # ram and wall time usage
     if pm.oplevel in (1, 2):
         nvars = 20
     elif pm.oplevel in (3, 4, 5):
@@ -112,25 +119,8 @@ def stage( **kwargs ):
         nvars = 44
     nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
     cf.pmem = 32 + int(1.2 * nm * nvars * int( cf.dtype[-1] ) / 1024 / 1024)
-    cf.ram = cf.pmem * cf.ppn
-    ss = (pm.shape[3] + 10) * cf.ppn * nm / cf.cores / cf.rate
-    sus = int( ss / 3600 * cf.totalcores + 1 )
-    mm = ss / 60 * 3.0 + 10
-    if cf.maxtime:
-        mm = min( mm, 60 * cf.maxtime[0] + cf.maxtime[1] )
-    hh = mm / 60
-    mm = mm % 60
-    cf.walltime = '%d:%02d:00' % (hh, mm)
-    print( 'Machine: ' + cf.machine )
-    print( 'Cores: %s of %s' % (cf.nproc, maxtotalcores) )
-    print( 'Nodes: %s of %s' % (cf.nodes, cf.maxnodes) )
-    print( 'RAM: %sMb of %sMb per node' % (cf.ram, cf.maxram) )
-    print( 'Time limit: ' + cf.walltime )
-    print( 'SUs: %s' % sus )
-    if cf.maxcores and cf.ppn > cf.maxcores:
-        print( 'Warning: exceding available cores per node (%s)' % cf.maxcores )
-    if cf.ram and cf.ram > cf.maxram:
-        print( 'Warning: exceding available RAM per node (%sMb)' % cf.maxram )
+    cf.seconds = (pm.shape[3] + 10) * nm / cf.rate
+    cf = conf.resources( cf )
 
     # compile code
     if not cf.prepare:
@@ -153,12 +143,11 @@ def stage( **kwargs ):
             files += f,
     if cf.force == True and os.path.isdir( cf.rundir ):
         shutil.rmtree( cf.rundir )
-    cf = cf.__dict__
-    conf.skeleton( file, **cf )
+    conf.skeleton( files, **cf.__dict__ )
 
     # log, conf, parameter files
     cwd = os.path.realpath( os.getcwd() )
-    os.chdir( cf['rundir'] )
+    os.chdir( cf.rundir )
     log = open( 'log', 'w' )
     log.write( starttime + ': setup started\n' )
     util.save( 'conf.py', cf, header = '# configuration\n' )
@@ -206,7 +195,7 @@ def stage( **kwargs ):
 
     # return to initial directory
     os.chdir( cwd )
-    cf.update( pm.__dict__ )
+    cf.__dict__.update( pm.__dict__ )
     return cf
 
 def prepare_param( pm, itbuff ):
@@ -348,35 +337,11 @@ def prepare_param( pm, itbuff ):
     pm.fieldio = fieldio
     return pm
 
-def launch( **cf ):
-    """
-    Launch or queue job.
-    """
-    cf = util.namespace( cf )
-    cwd = os.getcwd()
-    os.chdir( cf.rundir )
-    if cf.run == 'q':
-        if cf.host not in cf.hosts:
-            sys.exit( 'Error: hostname %r does not match configuration %r'
-                % (cf.host, cf.machine) )
-        print( 'bash queue.sh' )
-        if os.system( 'bash queue.sh' ):
-            sys.exit( 'Error queing job' )
-    elif cf.run:
-        if cf.host not in cf.hosts:
-            sys.exit( 'Error: hostname %r does not match configuration %r'
-                % (cf.host, cf.machine) )
-        print( 'bash run.sh -' + cf.run )
-        if os.system( 'bash run.sh -' + cf.run ):
-            sys.exit( 'Error running job' )
-    os.chdir( cwd )
-    return
-
 def run( **kwargs ):
     """
     Combined stage and launch in one step.
     """
     cf = stage( **kwargs )
-    launch( **cf )
+    conf.launch( **cf )
     return cf
 
