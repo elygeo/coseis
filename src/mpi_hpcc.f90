@@ -1,4 +1,4 @@
-! collective routines - MPI version
+! collective routines - MPI version - USC HPCC workarounds, no double preceision!
 module m_collective
 use mpi
 implicit none
@@ -15,10 +15,13 @@ real :: r
 call mpi_init( e )
 call mpi_comm_size( mpi_comm_world, np0, e  )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
-call mpi_sizeof( r, nr, e )
-call mpi_sizeof( i, ni, e )
-call mpi_type_match_size( mpi_typeclass_real, nr, rtype, e )
-call mpi_type_match_size( mpi_typeclass_integer, ni, itype, e )
+! workaround for USC HPCC
+!call mpi_sizeof( r, nr, e )
+!call mpi_sizeof( i, ni, e )
+!call mpi_type_match_size( mpi_typeclass_real, nr, rtype, e )
+!call mpi_type_match_size( mpi_typeclass_integer, ni, itype, e )
+rtype = mpi_real
+itype = mpi_real
 end subroutine
 
 ! finalize
@@ -419,9 +422,11 @@ if ( verb .and. i == 0 ) write( 0, '(i8,a,i2,a,i8,2a)' ) &
 if ( mode == 'r' ) then
     i = mpi_mode_rdonly
 elseif ( oo(n) == 0 ) then
-    i = mpi_mode_wronly + mpi_mode_create + mpi_mode_excl
+    !i = mpi_mode_wronly + mpi_mode_create + mpi_mode_excl
+    i = mpi_mode_rdwr + mpi_mode_create ! workaround for USC HPCC
 else
-    i = mpi_mode_wronly
+    !i = mpi_mode_wronly
+    i = mpi_mode_rdwr ! workaround for USC HPCC
 end if
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
 call mpi_file_open( comm, filename, i, mpi_info_null, fh, e )
