@@ -198,7 +198,7 @@ velocity::
 
 Plotting requires Matplotlib, and the result should look like this:
 
-    .. image:: doc/example.png
+    .. image:: example.png
 
 Scripting with Python
 ---------------------
