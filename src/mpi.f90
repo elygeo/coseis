@@ -3,22 +3,35 @@ module m_collective
 use mpi
 implicit none
 integer, parameter :: file_null = mpi_file_null
-integer, private :: np3(3), comm1d(3), comm2d(3), comm3d, itype, rtype
+integer, private :: np3(3), comm1d(3), comm2d(3), comm3d, rtype, itype
 contains
 
 ! initialize
 subroutine initialize( np0, ip )
 use mpi
 integer, intent(out) :: np0, ip
-integer :: i, n, e
+integer :: i, nr, ni, e
 real :: r
 call mpi_init( e )
 call mpi_comm_size( mpi_comm_world, np0, e  )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
-call mpi_sizeof( r, n, e )
-call mpi_type_match_size( mpi_typeclass_real, n, rtype, e )
-call mpi_sizeof( i, n, e )
-call mpi_type_match_size( mpi_typeclass_integer, n, itype, e )
+call mpi_sizeof( r, nr, e )
+call mpi_sizeof( i, ni, e )
+! workaround anchient MPI missing typeclasses on USC HPCC
+!call mpi_type_match_size( mpi_typeclass_real, nr, rtype, e )
+!call mpi_type_match_size( mpi_typeclass_integer, ni, itype, e )
+rtype = mpi_real
+select case( nr )
+case( 4 );  rtype = mpi_real4
+case( 8 );  rtype = mpi_real8
+case( 16 ); rtype = mpi_real16
+end select
+itype = mpi_real
+select case( ni )
+case( 4 );  itype = mpi_integer4
+case( 8 );  itype = mpi_integer8
+case( 16 ); itype = mpi_integer16
+end select
 end subroutine
 
 ! finalize
