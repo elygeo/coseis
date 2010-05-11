@@ -47,9 +47,9 @@ for c in '12':
 if __name__ == '__main__':
 
     # stage, save mesh to input directory, and launch
-    job = sord.stage( **locals() )
-    path = os.path.join( job.rundir, 'in' ) + os.sep
-    mesh.x.T.tofile( path + 'x' )
-    mesh.y.T.tofile( path + 'y' )
-    sord.launch( job )
+    job = sord.stage( locals() )
+    path_ = os.path.join( job.rundir, 'in' ) + os.sep
+    mesh.x.T.tofile( path_ + 'x' )
+    mesh.y.T.tofile( path_ + 'y' )
+    sord.run( job )
 

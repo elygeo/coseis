@@ -42,5 +42,5 @@ for np3 in np3_:
     n  = np3[0] * np3[1] * np3[2]
     print '\nBenchmark: %s, %s, %s, %s' % ( np3, math.log(n,2), n/16, n )
     rundir = 'run/%05d' % n
-    sord.run( **locals() )
+    sord.run( locals() )
 

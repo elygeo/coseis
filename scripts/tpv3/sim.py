@@ -106,5 +106,5 @@ for dx_, nproc3 in runs_:
         ]
 
     # Launch SORD code
-    sord.run( **locals() )
+    sord.run( locals() )
 

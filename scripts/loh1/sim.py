@@ -63,5 +63,5 @@ fieldio += [
 
 # run job
 if __name__ == '__main__':
-    sord.run( **locals() )
+    sord.run( locals() )
 

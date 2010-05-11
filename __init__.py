@@ -5,16 +5,15 @@ Support Operator Rupture Dynamics
 import os, sys, re, math, pprint
 import numpy as np
 import conf, fieldnames
-from conf import launch
 from util import swab, util, coord, signal, source, data, viz, plt, mlab, egmm
 try:
     from util import rspectra
 except( ImportError ):
     pass
 
-def stage( args=None, **kwargs ):
+def stage( inputs={}, **kwargs ):
     """
-    Setup a SORD job.
+    Stage job
     """
     import glob, time, shutil
     import setup
@@ -23,9 +22,9 @@ def stage( args=None, **kwargs ):
     starttime = time.asctime()
     print( 'SORD setup' )
 
-    # test for old style function call
-    if args != None:
-        sys.exit( 'sord.run( vars ) depreciated. Use sord.run( **vars ) instead.' )
+    # update inputs
+    inputs = inputs.copy()
+    inputs.update( kwargs )
 
     # test for depreciated parameters
     depreciated = [
@@ -37,7 +36,7 @@ def stage( args=None, **kwargs ):
     ]
     error = None
     for k, msg in depreciated:
-        if k in kwargs:
+        if k in inputs:
             print msg
             error = True
     if error:
@@ -58,38 +57,38 @@ def stage( args=None, **kwargs ):
         ( 'O', 'optimized',   'optimize', 'O' ),
         ( '8', 'realsize8',   'dtype',    'f8' ),
     ]
-    cf, kwargs = conf.configure( module='sord', options=options, **kwargs )
-    cf.dtype = np.dtype( cf.dtype ).str
-    cf.rundir = os.path.expanduser( cf.rundir )
-    if not cf.prepare:
-        cf.run = False
-    if cf.run == 'g':
-        cf.optimize = 'g'
+    job, inputs = conf.configure( module='sord', options=options, **inputs )
+    job.dtype = np.dtype( job.dtype ).str
+    job.rundir = os.path.expanduser( job.rundir )
+    if not job.prepare:
+        job.run = False
+    if job.run == 'g':
+        job.optimize = 'g'
 
     # read parameters
     pm = {}
     f = os.path.join( os.path.dirname( __file__ ), 'parameters.py' )
     exec open( f ) in pm
     util.prune( pm )
-    for k, v in kwargs.copy().iteritems():
+    for k, v in inputs.copy().iteritems():
         if k in pm:
             pm[k] = v
-            del( kwargs[k] )
-    if kwargs:
+            del( inputs[k] )
+    if inputs:
         print( 'Unknown parameters:' )
-        pprint.pprint( kwargs )
+        pprint.pprint( inputs )
         sys.exit()
         
     pm = util.namespace( pm )
-    pm = prepare_param( pm, cf.itbuff )
+    pm = prepare_param( pm, job.itbuff )
 
     # partition for parallelization
     nx, ny, nz = pm.shape[:3]
-    n = cf.maxnodes * cf.maxcores
-    if not cf.mode and n == 1:
-        cf.mode = 's'
+    n = job.maxnodes * job.maxcores
+    if not job.mode and n == 1:
+        job.mode = 's'
     j, k, l = pm.nproc3
-    if cf.mode == 's':
+    if job.mode == 's':
         j, k, l = 1, 1, 1
     nl = [
         (nx - 1) / j + 1,
@@ -103,11 +102,11 @@ def stage( args=None, **kwargs ):
     k = (ny - 1) / nl[1] + 1
     l = (nz - 1) / nl[2] + 1
     pm.nproc3 = j, k, l
-    cf.nproc = j * k * l
-    if not cf.mode:
-        cf.mode = 's'
-        if cf.nproc > 1:
-            cf.mode = 'm'
+    job.nproc = j * k * l
+    if not job.mode:
+        job.mode = 's'
+        if job.nproc > 1:
+            job.mode = 'm'
 
     # resources
     if pm.oplevel in (1, 2):
@@ -117,9 +116,9 @@ def stage( args=None, **kwargs ):
     else:
         nvars = 44
     nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
-    cf.pmem = 32 + int(1.2 * nm * nvars * int( cf.dtype[-1] ) / 1024 / 1024)
-    cf.seconds = (pm.shape[3] + 10) * nm / cf.rate
-    job = conf.prepare( cf )
+    job.pmem = 32 + int(1.2 * nm * nvars * int( job.dtype[-1] ) / 1024 / 1024)
+    job.seconds = (pm.shape[3] + 10) * nm / job.rate
+    job = conf.prepare( job )
 
     # configure options
     print( 'Run directory: ' + job.rundir )
@@ -197,13 +196,20 @@ def stage( args=None, **kwargs ):
     job.__dict__.update( pm.__dict__ )
     return job
 
-def run( **kwargs ):
+def run( job=None, **kwargs ):
     """
-    Combined stage and launch in one step.
+    Stage (if necessary) and launch job
     """
-    job = stage( **kwargs )
+    if job == None:
+        job = stage( **kwargs )
+    elif type( job ) == dict:
+        job.update( kwargs )
+        job = stage( job )
     conf.launch( job )
     return job
+
+def launch():
+    sys.exit( 'Use sord.run() instead of sord.launch()' )
 
 def prepare_param( pm, itbuff ):
     """

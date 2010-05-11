@@ -38,7 +38,7 @@ def prune( d, pattern=None, types=None ):
             del( d[k] )
     return d
 
-def configure( module='default', machine=None, save=False, options=None, **kwargs ):
+def configure( module='default', machine=None, save_machine=False, options=None, **kwargs ):
     """
     Merge module, machine, keyword, and command line parameters.
 
@@ -46,14 +46,14 @@ def configure( module='default', machine=None, save=False, options=None, **kwarg
     ----------
     module : module name
     machine : machine name
-    save : remember machine name
+    save_machine : remember machine name
     options : list command line options consisting of:
         (sort_form, long_form, parameter, value)
     **kwargs : override parameters supplied as keyword arguments
 
     Returns
     -------
-    cf : job configuration object containing merged module, kwarg, and machine
+    job : job configuration object containing merged module, kwarg, and machine
         configuration parameters as object attributes
     kwarg : dictionary containing unmatched parameters
 
@@ -63,10 +63,10 @@ def configure( module='default', machine=None, save=False, options=None, **kwarg
 
     # module parameters
     path = os.path.realpath( os.path.dirname( __file__ ) )
-    cf = {}
-    cf['module'] = module
+    job = {}
+    job['module'] = module
     f = os.path.join( path, module, 'conf.py' )
-    exec open( f ) in cf
+    exec open( f ) in job
 
     # machine parameters
     f = os.path.join( path, 'machine' )
@@ -76,27 +76,27 @@ def configure( module='default', machine=None, save=False, options=None, **kwarg
         machine = os.path.basename( os.path.normpath( machine ) )
         f = os.path.join( path, machine, 'conf.py' )
         if os.path.isfile( f ):
-            exec open( f ) in cf
-        if save:
+            exec open( f ) in job
+        if save_machine:
             f = os.path.join( path, 'machine' )
             open( f, 'w' ).write( machine )
-    cf['machine'] = machine
+    job['machine'] = machine
 
     # email address
     f = os.path.join( path, 'email' )
     if os.path.isfile( f ):
-        cf['email'] = open( f ).read().strip()
+        job['email'] = open( f ).read().strip()
 
     # per machine module specific parameters
     k = module + '_'
-    if k in cf:
-        cf.update( cf[k] )
+    if k in job:
+        job.update( job[k] )
 
     # function parameters
     kwargs = kwargs.copy()
     for k, v in kwargs.copy().iteritems():
-        if k in cf:
-            cf[k] = v
+        if k in job:
+            job[k] = v
             del( kwargs[k] )
 
     # command line parameters
@@ -110,36 +110,40 @@ def configure( module='default', machine=None, save=False, options=None, **kwarg
             else:
                 i = short.index( key )
             key, val = options[i][2:]
-            cf[key] = val
+            job[key] = val
 
     # fortran flags
-    if 'fortran_flags_default_' in cf:
-        if 'fortran_flags' not in cf:
-            k = cf['fortran_serial'][0]
-            cf['fortran_flags'] = cf['fortran_flags_default_'][k]
+    if 'fortran_flags_default_' in job:
+        if 'fortran_flags' not in job:
+            k = job['fortran_serial'][0]
+            job['fortran_flags'] = job['fortran_flags_default_'][k]
 
     # prune unneeded variables
-    prune( cf )
+    prune( job )
     prune( kwargs )
 
     # misc
-    if 'dtype' in cf:
-        cf['dtype'] = np.dtype( cf['dtype'] ).str
-    if 'rundir' in cf:
-        cf['rundir'] = os.path.expanduser( cf['rundir'] )
+    if 'dtype' in job:
+        job['dtype'] = np.dtype( job['dtype'] ).str
+    if 'rundir' in job:
+        job['rundir'] = os.path.expanduser( job['rundir'] )
 
     # configuration object
-    cf = namespace( cf )
+    job = namespace( job )
 
-    return cf, kwargs
+    return job, kwargs
 
-def prepare( cf ):
+def prepare( job=None, **kwargs ):
     """
     Compute and display resource usage
     """
 
+    # configure job
+    if job == None:
+        job, kwargs = configure()
+    job.__dict__.update( kwargs )
+
     # parallelization
-    job = cf
     if not hasattr( job, 'nproc' ):
         job.nproc = 1
     if job.maxcores and job.maxnodes:
@@ -162,10 +166,10 @@ def prepare( cf ):
     job.ram = job.pmem * job.ppn
     print( 'RAM: %sMb of %sMb per node' % (job.ram, job.maxram) )
 
-    # SU estimate and generous wall time limit
+    # SU estimate and wall time limit with extra allowance
     if hasattr( job, 'seconds' ):
         ss = job.seconds * job.ppn / job.cores
-        mm = ss / 60 * 2.0 + 10
+        mm = 10 + ss / 40
     else:
         ss = 3600
         mm = 60
@@ -186,7 +190,7 @@ def prepare( cf ):
 
     return job
 
-def skeleton( job, files=(), new=True ):
+def skeleton( job=None, files=(), new=True, **kwargs ):
     """
     Create run directory tree from templates.
 
@@ -201,6 +205,12 @@ def skeleton( job, files=(), new=True ):
     to machine specific templates.  If no machine specific templates are found,
     default templates are used. 
     """
+
+    # prepare job
+    if job == None:
+        job = prepare( **kwargs )
+    else:
+        job.__dict__.update( kwargs )
 
     # parameters
     rundir = job.rundir
@@ -249,12 +259,20 @@ def skeleton( job, files=(), new=True ):
         except:
             shutil.copy2( f, dest )
 
-    return
+    return job
 
-def launch( job ):
+def launch( job=None, files=(), new=True, **kwargs ):
     """
     Launch or queue job.
     """
+
+    # create skeleton
+    if job == None:
+        job = skeleton( files=files, new=new, **kwargs )
+    else:
+        job.__dict__.update( kwargs )
+
+    # queue or run
     cwd = os.getcwd()
     os.chdir( job.rundir )
     if job.run == 'q':
@@ -272,7 +290,8 @@ def launch( job ):
         if os.system( 'bash run.sh -' + job.run ):
             sys.exit( 'Error running job' )
     os.chdir( cwd )
-    return
+
+    return job
 
 # run tests if called from the command line
 if __name__ == '__main__':
@@ -284,10 +303,8 @@ if __name__ == '__main__':
             if os.path.isdir( machine ) and machine not in modules:
                 #job = configure( module, machine )[0]
                 print 80 * '-'
-                cf = configure( module=module, machine=machine )[0]
-                job = prepare( cf )
-                job.rundir = 'tmp'
-                job.bin = 'date'
+                job = configure( module=module, machine=machine )[0]
+                job = prepare( job, rundir='tmp', bin='date' )
                 skeleton( job )
                 pprint.pprint( job.__dict__ )
                 shutil.rmtree( 'tmp' )
