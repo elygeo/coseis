@@ -10,21 +10,14 @@
 #PBS -m abe
 #PBS -V
 
-cd %(rundir)r
-echo "$( date ): %(name)s started" >> log
+tmp="/scratch/%(user)s/%(name)s"
+mv "%(rundir)r" "$tmp"
 
-dir="/scratch/%(user)s/%(name)s/"
-mkdir -p "$dir"
-for file in %(bin)s parameters.py in out stats prof debug checkpoint; do
-    mv "$file" "$dir"
-done
-cd "$dir"
+echo "$( date ): %(name)s started" >> log
 %(pre)s
 mpiexec -np %(nproc)s %(bin)s
 %(post)s
-./clean.sh -f
-mv * %(rundir)r
-
-cd %(rundir)r
 echo "$( date ): %(name)s finished" >> log
+
+mv "$tmp" "%(rundir)r"
 
