@@ -10,8 +10,7 @@
 #PBS -m abe
 #PBS -V
 
-tmp="/scratch/%(user)s/%(name)s"
-mv %(rundir)r "$tmp"
+mv "%(rundir)s" "/scratch/tmp"
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
@@ -19,5 +18,5 @@ mpiexec -np %(nproc)s %(bin)s
 %(post)s
 echo "$( date ): %(name)s finished" >> log
 
-mv "$tmp" %(rundir)r
+mv "/scratch/tmp" "%(rundir)s"
 
