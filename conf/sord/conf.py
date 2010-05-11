@@ -26,6 +26,7 @@ system = os.uname()
 host = os.uname()[1]
 hosts = host,
 login = host
+nproc = 1
 maxnodes = 1
 maxcores = 0
 maxram = 0	

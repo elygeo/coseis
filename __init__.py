@@ -119,37 +119,37 @@ def stage( args=None, **kwargs ):
     nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
     cf.pmem = 32 + int(1.2 * nm * nvars * int( cf.dtype[-1] ) / 1024 / 1024)
     cf.seconds = (pm.shape[3] + 10) * nm / cf.rate
-    cf = conf.resources( cf )
-
-    # compile code
-    if not cf.prepare:
-        return cf
-    setup.build( cf.mode, cf.optimize, cf.dtype )
+    job = conf.prepare( cf )
 
     # configure options
-    print( 'Run directory: ' + cf.rundir )
-    cf.rundate = time.strftime( '%Y %b %d' )
-    cf.rundir = os.path.realpath( cf.rundir )
-    cf.bin = os.path.join( '.', 'sord-' + cf.mode + cf.optimize + cf.dtype[-1] )
+    print( 'Run directory: ' + job.rundir )
+    job.rundate = time.strftime( '%Y %b %d' )
+    job.rundir = os.path.realpath( job.rundir )
+    job.bin = os.path.join( '.', 'sord-' + job.mode + job.optimize + job.dtype[-1] )
+
+    # compile code
+    if not job.prepare:
+        return job
+    setup.build( job.mode, job.optimize, job.dtype )
 
     # create run directory
     src = os.path.realpath( os.path.dirname( __file__ ) ) + os.sep
-    files = os.path.join( src, 'bin', cf.bin ),
+    files = os.path.join( src, 'bin', job.bin ),
     if os.path.isfile( src + 'sord.tgz' ):
         files += src + 'sord.tgz',
-    if cf.optimize == 'g':
+    if job.optimize == 'g':
         for f in glob.glob( os.path.join( 'src', '*.f90' ) ):
             files += f,
-    if cf.force == True and os.path.isdir( cf.rundir ):
-        shutil.rmtree( cf.rundir )
-    conf.skeleton( files, **cf.__dict__ )
+    if job.force == True and os.path.isdir( job.rundir ):
+        shutil.rmtree( job.rundir )
+    conf.skeleton( job, files )
 
     # log, conf, parameter files
     cwd = os.path.realpath( os.getcwd() )
-    os.chdir( cf.rundir )
+    os.chdir( job.rundir )
     log = open( 'log', 'w' )
     log.write( starttime + ': setup started\n' )
-    util.save( 'conf.py', cf, header = '# configuration\n' )
+    util.save( 'conf.py', job, header = '# configuration\n' )
     util.save( 'parameters.py', pm, expand=['fieldio'], header='# model parameters\n' )
 
     # metadata
@@ -176,7 +176,7 @@ def stage( args=None, **kwargs ):
 
     # save metadata
     meta = util.save( None,
-        cf,
+        job,
         header = '# configuration\n',
         keep=['name', 'rundate', 'rundir', 'user', 'os_', 'dtype'],
     )
@@ -194,16 +194,16 @@ def stage( args=None, **kwargs ):
 
     # return to initial directory
     os.chdir( cwd )
-    cf.__dict__.update( pm.__dict__ )
-    return cf
+    job.__dict__.update( pm.__dict__ )
+    return job
 
 def run( **kwargs ):
     """
     Combined stage and launch in one step.
     """
-    cf = stage( **kwargs )
-    conf.launch( cf )
-    return cf
+    job = stage( **kwargs )
+    conf.launch( job )
+    return job
 
 def prepare_param( pm, itbuff ):
     """

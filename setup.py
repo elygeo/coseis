@@ -11,7 +11,7 @@ def build( mode=None, optimize=None, dtype=None ):
     """
     Build SORD code.
     """
-    cf = util.namespace( conf.configure( 'sord' )[0] )
+    cf = conf.configure( 'sord' )[0]
     if not optimize:
         optimize = cf.optimize
     if not mode:
