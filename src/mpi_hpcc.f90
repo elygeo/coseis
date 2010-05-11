@@ -10,8 +10,9 @@ contains
 subroutine initialize( np0, ip )
 use mpi
 integer, intent(out) :: np0, ip
-integer :: i, nr, ni, e
-real :: r
+!integer :: i, nr, ni, e
+!real :: r
+integer :: e
 call mpi_init( e )
 call mpi_comm_size( mpi_comm_world, np0, e  )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
