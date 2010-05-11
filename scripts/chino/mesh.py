@@ -123,7 +123,7 @@ f3.close()
 
 # stage cvm
 n = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
-post = 'rm lon lat dep\nmv rho vp vs %s' % path
+post = 'rm lon lat dep\nmv rho vp vs %r' % path
 cfg = cvm.stage( nsample=n, nproc=nproc, post=post, workdir=workdir )
 rundir = cfg.rundir + os.sep
 
