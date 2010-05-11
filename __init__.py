@@ -186,7 +186,7 @@ def stage( inputs={}, **kwargs ):
     )
     meta += util.save( None,
         dict( shapes=shapes, deltas=deltas, xis=xis, indices=indices ),
-        header = '\n# file dimensions\n',
+        header = '\n# output dimensions\n',
         expand=['indices', 'shapes', 'deltas', 'xis'],
     )
     open( 'meta.py', 'w' ).write( meta )
