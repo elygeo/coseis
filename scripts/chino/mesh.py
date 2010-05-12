@@ -10,12 +10,12 @@ dx = 200.0;   nproc = 512
 dx = 100.0;   nproc = 4096
 dx = 10000.0; nproc = 2
 dx = 2000.0;  nproc = 2
-dx = 500.0;   nproc = 34
+dx = 500.0;   nproc = 32
 delta = dx, dx, -dx
 
 # projection
 origin = -117.761, 33.953, 14700.0
-bounds = (-160000.0, 160000.0), (-90000.0, 90000.0), (0.0, 60000.0)
+bounds = (-144000.0, 112000.0), (-72000.0, 72000.0), (0.0, 64000.0)
 projection = dict( proj='tmerc', lon_0=origin[0], lat_0=origin[1] )
 proj = pyproj.Proj( **projection )
 
