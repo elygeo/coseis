@@ -6,7 +6,7 @@ Add these to your .bashrc:
     source /usr/usc/globus/default/setup.sh
 
 pbsnodes -a | grep main | sort | uniq -c
-alias showme='qstat -n | grep -E "Queue|-----|nbns"; qstat -n | grep scec'
+alias showme='qstat -n | grep -E "Elap$|Queue|-----|$USER"'
 
 I/O to temporary space:
     /scratch

@@ -2,11 +2,12 @@
 """
 Step 4: Create WebSims files
 """
-import os, sys, glob, pyproj
+import os, sys, glob, shutil, pyproj
 import numpy as np
 import cvm
 
 # parameters
+nproc = 2
 template = 'wsconf-in.py'
 author = 'Geoffrey Ely'
 title = 'Chino Hills'
@@ -79,10 +80,14 @@ for path in glob.glob( sims ):
     j, k = x_shape[:2]
     n = j * k
     post = 'mv vs %s/vs0' % os.path.realpath( path )
-    job = cvm.stage( nsample=n, nproc=2, post=post, workdir='tmp' )
+    job = cvm.stage( nsample=n, nproc=nproc, post=post, workdir='tmp' )
     rundir = job.rundir + os.sep
-    os.link( path + 'lon', rundir + 'lon' )
-    os.link( path + 'lat', rundir + 'lat' )
+    try:
+        os.link( path + 'lon', rundir + 'lon' )
+        os.link( path + 'lat', rundir + 'lat' )
+    except:
+        shutil.copy2( path + 'lon', rundir + 'lon' )
+        shutil.copy2( path + 'lat', rundir + 'lat' )
     np.zeros( n, 'f' ).tofile( rundir + 'dep' )
     os.system( rundir + 'run.sh' )
 

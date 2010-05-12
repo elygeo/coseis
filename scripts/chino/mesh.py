@@ -26,6 +26,18 @@ workdir = os.path.join( 'tmp', 'mesh', mesh_id )
 path = os.path.realpath( path ) + os.sep
 os.makedirs( path )
 
+# job submission
+if '-q' in sys.argv[1:]:
+    job = cvm.conf.skeleton(
+        rundir = workdir,
+        files = [__file__],
+        new = False,
+        bin = 'python mesh.py',
+        nproc = nproc,
+        run = 'q',
+    )
+    #cvm.conf.launch( job )
+
 # uniform zone in PML and to deepest source depth
 npml = 10
 npml = min( npml, int( 8000.0 / delta[0] + 0.5 ) )
