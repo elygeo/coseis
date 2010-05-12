@@ -6,16 +6,16 @@ import os, pyproj, cvm
 import numpy as np
 
 # parameters
-dx = 200.0;   nproc = 512
-dx = 100.0;   nproc = 4096
-dx = 10000.0; nproc = 2
-dx = 2000.0;  nproc = 2
-dx = 500.0;   nproc = 32
+dx = 100.0;  nproc = 4096
+dx = 200.0;  nproc = 512
+dx = 500.0;  nproc = 32
+dx = 1000.0; nproc = 2
+dx = 8000.0; nproc = 1
 delta = dx, dx, -dx
 
 # projection
 origin = -117.761, 33.953, 14700.0
-bounds = (-144000.0, 112000.0), (-72000.0, 72000.0), (0.0, 64000.0)
+bounds = (-144000.0, 112000.0), (-72000.0, 72000.0), (0.0, 64000.0-dx)
 projection = dict( proj='tmerc', lon_0=origin[0], lat_0=origin[1] )
 proj = pyproj.Proj( **projection )
 

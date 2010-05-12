@@ -7,11 +7,11 @@ import os, sys, pyproj
 import sord
 
 # parameters
-dx_ = 500.0;   nproc3 = 1, 10, 81
-dx_ = 200.0;   nproc3 = 1, 20, 201
-dx_ = 10000.0; nproc3 = 1, 1, 2
-dx_ = 2000.0;  nproc3 = 1, 1, 2
-dx_ = 500.0;   nproc3 = 1, 2,  81
+dx_ = 100.0;  nproc3 = 1, 48, 320
+dx_ = 200.0;  nproc3 = 1, 12, 160
+dx_ = 500.0;  nproc3 = 1, 4, 64
+dx_ = 1000.0; nproc3 = 1, 1, 2
+dx_ = 8000.0; nproc3 = 1, 1, 1
 
 # path
 rundir = os.path.join( 'run', 'sim', '%04.f' % dx_ )
@@ -38,10 +38,11 @@ delta += (dt_,)
 shape += (nt_,)
 
 # hypocenter location at x/y center
-j, k = shape[:2]
-j = 0.5 * (j - 1.0) + 1.0
-k = 0.5 * (k - 1.0) + 1.0
-l = abs( hypo_[2] / delta[2] ) + 1.0
+x, y, z = hypo_
+x, y = proj( x, y )
+j = abs( x / delta[0] ) + 1.0
+k = abs( y / delta[1] ) + 1.0
+l = abs( z / delta[2] ) + 1.0
 ihypo = j, k, l
 
 # moment tensor source

@@ -203,7 +203,8 @@ Plotting requires Matplotlib, and the result should look like this:
 Scripting with Python
 ---------------------
 
-For a simple example consider the above test, `<../scripts/example/sim.py>`__:
+For a simple example consider the above test,
+`sim.py <../scripts/example/sim.py>`__:
 
 .. include:: ../scripts/example/sim.py
    :literal:

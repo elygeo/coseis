@@ -49,7 +49,6 @@ for path in glob.glob( sims ):
     meta.__dict__.update( locals() )
     wsconf = open( template ).read()
     open( path + 'wsconf.py', 'w' ).write( wsconf % meta.__dict__ )
-    asdf
 
     # topography
     topo, extent = cvm.data.topo( extent )
