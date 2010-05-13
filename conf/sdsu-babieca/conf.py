@@ -13,6 +13,7 @@ batch nodes:
 login = 'babieca.sdsu.edu'
 hosts = 'master',
 queue = 'workq'
+batch = 'pbs'
 maxnodes = 40
 maxcores = 2
 maxram = 1800

@@ -16,6 +16,7 @@ module load intel vmpi
 """
 login = 'calhoun.msi.umn.edu'
 hosts = 'login1',
+batch = 'pbs'
 maxnodes = 256
 maxcores = 8
 maxram = 15000

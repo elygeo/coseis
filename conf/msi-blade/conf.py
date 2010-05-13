@@ -21,6 +21,7 @@ login = 'blade.msi.umn.edu'
 hosts = 'blade285', 'blade286', 'blade287', 'blade288'
 queue = 'devel'; maxnodes = 16;  maxtime = 1, 00
 queue = 'bc';    maxnodes = 268; maxtime = 48, 00
+batch = 'pbs'
 maxcores = 4;
 maxram = 7000
 fortran_serial = 'ifort',

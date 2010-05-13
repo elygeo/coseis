@@ -26,6 +26,7 @@ system = os.uname()
 host = os.uname()[1]
 hosts = host,
 login = host
+batch = None
 nproc = 1
 maxnodes = 1
 maxcores = 0

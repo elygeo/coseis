@@ -21,6 +21,7 @@ qsub -l nodes=1,mem=20gb yourscript.pbs
 
 login = 'dynamic.usc.edu'
 hosts = login,
+batch = 'pbs'
 maxnodes = 28
 maxcores = 2
 maxram = 1800

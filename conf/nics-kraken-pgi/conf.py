@@ -22,6 +22,7 @@ account: TG-MCA03S012
 """
 login = 'kraken-pwd.nics.utk.edu'
 hosts = 'kraken-pwd3',
+batch = 'pbs'
 maxcores = 12
 maxram = 15000
 maxnodes = 8256
