@@ -6,5 +6,7 @@ if [ $( /bin/pwd | grep -v lustre ) ]; then
     exit
 fi
 
-echo "$( date ): %(name)s queued with ID: $( qsub script.sh )" >> log
+pid="$( qsub script.sh )"
+echo "$( date ): %(name)s queued with ID: $pid" >> log
+echo "$pid"
 

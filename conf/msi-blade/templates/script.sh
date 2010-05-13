@@ -6,8 +6,8 @@
 #PBS -l nodes=%(nodes)s:ppn=%(ppn)s
 #PBS -l walltime=%(walltime)s
 #PBS -l pmem=%(pmem)smb
-#PBS -e stderr
-#PBS -o stdout
+#PBS -e %(rundir)s/stderr
+#PBS -o %(rundir)s/stdout
 #PBS -m abe
 #PBS -V
 
@@ -16,7 +16,7 @@
 module load intel
 module load vmpi/intel
 
-cd %(rundir)r
+cd "%(rundir)s"
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s

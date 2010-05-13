@@ -54,8 +54,8 @@ else
     call rio1( fh, src_w2(:,3), 'r', 'in/src_w12', n, 0, mpin, verb )
 end if
 call rio1( fh, src_t0, 'r', 'in/src_t0', n, 0, mpin, verb )
-call iio1( fh, src_nt, 'r', 'in/src_nt', n, 0, mpin, verb )
 call rio1( fh, src_dt, 'r', 'in/src_dt', n, 0, mpin, verb )
+call iio1( fh, src_nt, 'r', 'in/src_nt', n, 0, mpin, verb )
 n = sum( src_nt )
 allocate( src_history(n) )
 call rio1( fh, src_history, 'r', 'in/src_history', n, 0, mpin, verb )

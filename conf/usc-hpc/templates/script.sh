@@ -5,8 +5,8 @@
 #PBS -q %(queue)s
 #PBS -l nodes=%(nodes)s:ppn=%(ppn)s:myri
 #PBS -l walltime=%(walltime)s
-#PBS -e stderr
-#PBS -o stdout
+#PBS -e %(rundir)s/stderr
+#PBS -o %(rundir)s/stdout
 #PBS -m abe
 #PBS -V
 

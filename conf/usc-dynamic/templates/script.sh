@@ -4,12 +4,12 @@
 #PBS -M %(email)s
 #PBS -l nodes=%(nodes)s:ppn=%(ppn)s
 #PBS -l walltime=%(walltime)s
-#PBS -e stderr
-#PBS -o stdout
+#PBS -e %(rundir)s/stderr
+#PBS -o %(rundir)s/stdout
 #PBS -m abe
 #PBS -V
 
-cd %(rundir)r
+cd "%(rundir)s"
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
