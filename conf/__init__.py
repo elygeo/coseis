@@ -140,7 +140,7 @@ def prepare( job=None, **kwargs ):
 
     # configure job
     if job == None:
-        job, kwargs = configure()
+        job, kwargs = configure( **kwargs )
     job.__dict__.update( kwargs )
 
     # parallelization
