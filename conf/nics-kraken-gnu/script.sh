@@ -1,20 +1,20 @@
 #!/bin/bash -e
 
+##PBS -A TG-MCA03S012
 #PBS -N %(name)s
 #PBS -M %(email)s
-#PBS -l nodes=%(nodes)s:ppn=%(ppn)s
-#PBS -e %(rundir)s/stderr
+#PBS -l size=%(totalcores)s
+#PBS -l walltime=%(walltime)s
 #PBS -o %(rundir)s/stdout
+#PBS -e %(rundir)s/stderr
 #PBS -m abe
 #PBS -V
-#PBS -r n
 
 cd "%(rundir)s"
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
-export -n PBS_ENVIRONMENT
-mpirun -hostfile $PBS_NODEFILE %(bin)s
+aprun -n %(nproc)s %(bin)s
 %(post)s
 echo "$( date ): %(name)s finished" >> log
 

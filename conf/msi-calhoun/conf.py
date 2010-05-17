@@ -16,7 +16,6 @@ module load intel vmpi
 """
 login = 'calhoun.msi.umn.edu'
 hosts = 'login1',
-batch = 'pbs'
 maxnodes = 256
 maxcores = 8
 maxram = 15000
@@ -33,4 +32,11 @@ sord_ = dict(
         '8': ('-r8',),
     },
 )
+launch = {
+    's_exec':  '%(bin)s', 
+    's_debug': 'gdb %(bin)s',
+    'm_exec':  'mpirun -np %(nproc)s -hostfile $PBS_NODEFILE %(bin)s',
+    'submit':  'qsub "%(name)s.sh"',
+    'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
+}
 

@@ -2,7 +2,7 @@
 """
 Machine configuration
 """
-import os, re, shutil, getopt, sys
+import os, sys, re, shutil, getopt, subprocess, shlex
 import numpy as np
 
 class namespace:
@@ -188,6 +188,22 @@ def prepare( job=None, **kwargs ):
     if job.ram and job.ram > job.maxram:
         print( 'Warning: exceding available RAM per node (%sMb)' % job.maxram )
 
+    # launch command
+    if job.run:
+        k = job.run
+        if job.run == 'submit':
+            if job.depend:
+                k += '2'
+        elif job.mode:
+            print job.mode
+            k = job.mode + '-' + k
+        if k in job.launch:
+            job.launch = job.launch[k] % job.__dict__
+        else:
+            sys.exit( 'Error: %s launch mode not supported.' % k )
+    else:
+        job.launch = None
+
     return job
 
 def skeleton( job=None, files=(), new=True, **kwargs ):
@@ -203,7 +219,7 @@ def skeleton( job=None, files=(), new=True, **kwargs ):
     Templates located in the configuration directory are processed with the given
     keyword parameters.  Module specific templates are used if found, in addition
     to machine specific templates.  If no machine specific templates are found,
-    default templates are used. 
+    default templates are used.
     """
 
     # prepare job
@@ -212,12 +228,8 @@ def skeleton( job=None, files=(), new=True, **kwargs ):
     else:
         job.__dict__.update( kwargs )
 
-    # parameters
-    rundir = job.rundir
-    module = job.module
-    machine = job.machine
-
     # locations
+    rundir = job.rundir
     path = os.path.realpath( os.path.dirname( __file__ ) )
     dest = os.path.realpath( os.path.expanduser( rundir ) ) + os.sep
 
@@ -225,32 +237,23 @@ def skeleton( job=None, files=(), new=True, **kwargs ):
     if new:
         os.makedirs( dest )
 
-    # module templates
-    templates = ()
-    f = os.path.join( path, module, 'templates' )
-    if module != 'default' and os.path.isdir( f ):
-        templates += f,
-
-    # machine templates
-    f = os.path.join( path, machine, 'templates' )
-    if not os.path.isdir( f ):
-        f = os.path.join( path, 'default', 'templates' )
-    templates += f,
-
     # process templates
-    cwd = os.getcwd()
-    for t in templates:
-        os.chdir( t )
-        for root, dirs, temps in os.walk( '.' ):
-            for f in dirs:
-                ff = os.path.join( dest, root, f )
-                os.mkdir( ff )
-            for f in temps:
-                ff = os.path.join( dest, root, f )
-                out = open( f ).read() % job.__dict__
-                open( ff, 'w' ).write( out )
-                shutil.copymode( f, ff )
-    os.chdir( cwd )
+    machine = job.machine
+    f = os.path.join( path, machine, 'script.sh' )
+    if os.path.isdir( f ):
+        templates = machine
+    else:
+        templates = 'default'
+    d = os.path.join( path, templates )
+    for base in os.listdir( d ):
+        if base != 'conf.py':
+            f = os.path.join( d, base )
+            if base == 'script.sh':
+                base = job.name + '.sh'
+            ff = os.path.join( dest, base )
+            out = open( f ).read() % job.__dict__
+            open( ff, 'w' ).write( out )
+            shutil.copymode( f, ff )
 
     # link or copy files
     for f in files:
@@ -263,7 +266,7 @@ def skeleton( job=None, files=(), new=True, **kwargs ):
 
 def launch( job=None, files=(), new=True, **kwargs ):
     """
-    Launch or queue job.
+    Launch or submit job.
     """
 
     # create skeleton
@@ -271,26 +274,33 @@ def launch( job=None, files=(), new=True, **kwargs ):
         job = skeleton( files=files, new=new, **kwargs )
     else:
         job.__dict__.update( kwargs )
+    if not job.launch:
+        return job
 
-    # queue or run
+    # check host
+    if job.host not in job.hosts:
+        sys.exit( 'Error: hostname %r does not match configuration %r'
+            % (job.host, job.machine) )
+
+    # run directory
     cwd = os.getcwd()
     os.chdir( job.rundir )
-    if job.run == 'q':
-        if job.host not in job.hosts:
-            sys.exit( 'Error: hostname %r does not match configuration %r'
-                % (job.host, job.machine) )
-        print( 'bash queue.sh' )
-        if os.system( 'bash queue.sh' ):
-            sys.exit( 'Error queing job' )
-    elif job.run:
-        if job.host not in job.hosts:
-            sys.exit( 'Error: hostname %r does not match configuration %r'
-                % (job.host, job.machine) )
-        print( 'bash run.sh -' + job.run )
-        if os.system( 'bash run.sh -' + job.run ):
-            sys.exit( 'Error running job' )
-    os.chdir( cwd )
 
+    # launch
+    print( job.launch )
+    cmd = shlex.split( job.launch )
+    if job.launch.startswith( 'submit' ):
+        p = subprocess.Popen( cmd, stdout=subprocess.PIPE )
+        stdout = p.communicate()[0]
+        print( stdout )
+        if p.returncode:
+            raise subprocess.CalledProcessError( p.returncode, job.launch )
+        d = re.search( job.submit_pattern, stdout ).groupdict()
+        job.__dict__.update( d )
+    else:
+        subprocess.check_call( cmd )
+
+    os.chdir( cwd )
     return job
 
 # run tests if called from the command line

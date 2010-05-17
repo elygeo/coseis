@@ -1,4 +1,5 @@
 #!/bin/bash -e
+# start mpich mpd daemon
 
 if mpich2version &> /dev/null && ! mpdtrace &> /dev/null; then
 if [ ! -e $HOME/.mpd.conf ]; then

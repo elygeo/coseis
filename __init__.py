@@ -46,11 +46,12 @@ def stage( inputs={}, **kwargs ):
     options = [
         ( 'n', 'dry-run',     'prepare',  False ),
         ( 'f', 'force',       'force',    True ),
+        ( 'i', 'interactive', 'run',      'exec' ),
+        ( 'd', 'debug',       'run',      'debug' ),
+        ( 'b', 'batch',       'run',      'submit' ),
+        ( 'q', 'queue',       'run',      'submit' ),
         ( 's', 'serial',      'mode',     's' ),
         ( 'm', 'mpi',         'mode',     'm' ),
-        ( 'i', 'interactive', 'run',      'i' ),
-        ( 'q', 'queue',       'run',      'q' ),
-        ( 'd', 'debug',       'run',      'g' ),
         ( 'g', 'debugging',   'optimize', 'g' ),
         ( 't', 'testing',     'optimize', 't' ),
         ( 'p', 'profiling',   'optimize', 'p' ),
@@ -146,6 +147,8 @@ def stage( inputs={}, **kwargs ):
     # log, conf, parameter files
     cwd = os.path.realpath( os.getcwd() )
     os.chdir( job.rundir )
+    for f in 'checkpoint', 'debug', 'in', 'out', 'prof', 'stats':
+        os.mkdir( f )
     log = open( 'log', 'w' )
     log.write( starttime + ': setup started\n' )
     util.save( 'conf.py', job, header = '# configuration\n' )

@@ -13,9 +13,16 @@ batch nodes:
 login = 'babieca.sdsu.edu'
 hosts = 'master',
 queue = 'workq'
-batch = 'pbs'
 maxnodes = 40
 maxcores = 2
 maxram = 1800
 rate = 0.5e6
+launch = {
+    's-exec':  '%(bin)s',
+    's-debug': 'gdb %(bin)s',
+    'm-exec':  'mpirun -machinefile mf -np %(nproc)s %(bin)s',
+    'm-debug': 'mpirun -machinefile mf -np %(nproc)s -dbg=gdb %(bin)s',
+    'submit':  'qsub "%(name)s.sh"',
+    'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
+}
 

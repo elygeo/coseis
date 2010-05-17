@@ -21,7 +21,6 @@ login = 'blade.msi.umn.edu'
 hosts = 'blade285', 'blade286', 'blade287', 'blade288'
 queue = 'devel'; maxnodes = 16;  maxtime = 1, 00
 queue = 'bc';    maxnodes = 268; maxtime = 48, 00
-batch = 'pbs'
 maxcores = 4;
 maxram = 7000
 fortran_serial = 'ifort',
@@ -36,4 +35,11 @@ sord_ = dict(
         '8': ('-r8',),
     },
 )
+launch = {
+    's-exec':  '%(bin)s',
+    's-debug': 'gdb %(bin)s',
+    'm-exec':  'mpirun -np %(nproc)s -hostfile mf %(bin)s',
+    'submit':  'qsub "%(name)s.sh"',
+    'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
+}
 

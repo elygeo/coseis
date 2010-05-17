@@ -11,6 +11,8 @@ character(12) :: key
 character(1) :: op
 character(256) :: line
 
+!inquire( file='parameters.py', size=n )
+
 ! i/o pointers
 allocate( io0 )
 io => io0

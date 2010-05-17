@@ -26,7 +26,6 @@ system = os.uname()
 host = os.uname()[1]
 hosts = host,
 login = host
-batch = None
 nproc = 1
 maxnodes = 1
 maxcores = 0
@@ -35,6 +34,14 @@ maxtime = 0
 rate = 1.0e6
 queue = None
 dtype = dtype_f = np.dtype( 'f' ).str
+depend = False
+submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
+launch = {
+    's-exec':  '%(bin)s',
+    's-debug': 'gdb %(bin)s',
+    'm-exec':  'mpiexec -np %(nproc)s %(bin)s',
+    'm-debug': 'mpiexec -np %(nproc)s -gdb %(bin)s',
+}
 
 # search for file in PATH
 def find( *files ):

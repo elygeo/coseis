@@ -203,6 +203,8 @@ Plotting requires Matplotlib, and the result should look like this:
 Scripting with Python
 ---------------------
 
+THIS SECTION IS OUTDATED AND AWAITING REVISION.
+
 For a simple example consider the above test,
 `sim.py <../scripts/example/sim.py>`__:
 
@@ -221,7 +223,7 @@ to determine the number of time steps::
     T = 100.0            # total time temporary variable
     nt = int( T / dt )   # number of time steps
 
-The ``T`` variable is not a valid SORD parameter; it is only sued for temporary
+The ``T`` variable is not a valid SORD parameter; it is only used for temporary
 storage.  Variables with single single character names or names ending with an
 underscore, are ignored by ``sord.run()``, so may be safely used for temporary
 storage.  More elaborate example scripts can be found in the ``scripts``
@@ -230,6 +232,8 @@ directory.
 
 Running jobs
 ------------
+
+THIS SECTION IS OUTDATED AND AWAITING REVISION.
 
 Each time ``sord.run()`` is called, a run directory is created at the location
 set by the ``rundir`` parameter (``tmp/`` in this case).  The directory

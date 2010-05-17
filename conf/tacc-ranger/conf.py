@@ -30,7 +30,6 @@ queue = 'development'; maxnodes = 16;   maxtime =  2, 00
 queue = 'long';        maxnodes = 256;  maxtime = 48, 00
 queue = 'large';       maxnodes = 1024; maxtime = 24, 00
 queue = 'normal';      maxnodes = 256;  maxtime = 24, 00
-batch = 'pbs'
 maxcores = 16
 maxram = 30000
 fortran_serial = 'pgf95',
@@ -46,4 +45,10 @@ sord_ = dict(
         '8': ('-Mr8',),
     },
 )
+launch = {
+    's-exec':  '%(bin)s',
+    's-debug': 'gdb %(bin)s',
+    'submit':  'qsub "%(name)s.sh"',
+    'submit2': 'qsub -hold_jid "%(depend)s" "%(name)s.sh"'
+}
 

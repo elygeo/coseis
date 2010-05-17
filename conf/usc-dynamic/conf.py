@@ -7,6 +7,8 @@ https://geosys.usc.edu/wiki/index.php/PBS
 8 x 2 Dual Intel Xeon 3.2GHz
 2GB
 
+For interative nodes:
+qsub -l nodes=1,walltime=24:00:00 -I -X
 
 Note from John Yu:
 
@@ -21,10 +23,16 @@ qsub -l nodes=1,mem=20gb yourscript.pbs
 
 login = 'dynamic.usc.edu'
 hosts = login,
-batch = 'pbs'
 maxnodes = 28
 maxcores = 2
 maxram = 1800
 fortran_serial = 'ifort',
 fortran_mpi = 'mpif90',
+launch = {
+    's-exec':  '%(bin)s',
+    's-debug': 'gdb %(bin)s',
+    'm-exec':  'qsub -I "%(name)s.sh"',
+    'submit':  'qsub "%(name)s.sh"',
+    'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
+}
 

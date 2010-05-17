@@ -22,7 +22,6 @@ account: TG-MCA03S012
 """
 login = 'kraken-pwd.nics.utk.edu'
 hosts = 'kraken-pwd3',
-batch = 'pbs'
 maxcores = 12
 maxram = 15000
 maxnodes = 8256
@@ -46,4 +45,10 @@ cvm_ = dict(
         'O': ('-fast',),
     },
 )
+launch = {
+    's-exec':  '%(bin)s',
+    's-debug': 'gdb %(bin)s',
+    'submit':  'qsub "%(name)s.sh"',
+    'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
+}
 

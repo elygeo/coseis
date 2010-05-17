@@ -22,11 +22,15 @@ EPD version: rh3-x86
 """
 login = 'hpc-login1.usc.edu'
 hosts = 'hpc-login1', 'hpc-login2'
-batch = 'pbs'
 queue = 'largemem'; maxnodes =   1; maxcores = 8; maxram = 63000; maxtime = 336, 00
 queue = 'nbns';     maxnodes =  48; maxcores = 8; maxram = 11000; maxtime = 336, 00
 queue = 'default';  maxnodes = 256; maxcores = 4; maxram =  3500; maxtime = 24, 00
 queue = 'default';  maxnodes = 256; maxcores = 8; maxram = 11000; maxtime = 24, 00
-
 sord_ = dict( rate = 1.1e6 )
+launch = {
+    's-exec':  '%(bin)s',
+    's-debug': 'gdb %(bin)s',
+    'submit':  'qsub "%(name)s.sh"',
+    'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
+}
 
