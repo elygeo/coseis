@@ -37,10 +37,10 @@ dtype = dtype_f = np.dtype( 'f' ).str
 depend = False
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
 launch = {
-    's-exec':  '%(bin)s',
-    's-debug': 'gdb %(bin)s',
-    'm-exec':  'mpiexec -np %(nproc)s %(bin)s',
-    'm-debug': 'mpiexec -np %(nproc)s -gdb %(bin)s',
+    's_exec':  '%(bin)s',
+    's_debug': 'gdb %(bin)s',
+    'm_exec':  'mpiexec -np %(nproc)s %(bin)s',
+    'm_debug': 'mpiexec -np %(nproc)s -gdb %(bin)s',
 }
 
 # search for file in PATH

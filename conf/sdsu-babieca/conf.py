@@ -18,10 +18,10 @@ maxcores = 2
 maxram = 1800
 rate = 0.5e6
 launch = {
-    's-exec':  '%(bin)s',
-    's-debug': 'gdb %(bin)s',
-    'm-exec':  'mpirun -machinefile mf -np %(nproc)s %(bin)s',
-    'm-debug': 'mpirun -machinefile mf -np %(nproc)s -dbg=gdb %(bin)s',
+    's_exec':  '%(bin)s',
+    's_debug': 'gdb %(bin)s',
+    'm_exec':  'mpirun -machinefile mf -np %(nproc)s %(bin)s',
+    'm_debug': 'mpirun -machinefile mf -np %(nproc)s -dbg=gdb %(bin)s',
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
 }

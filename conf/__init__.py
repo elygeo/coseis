@@ -196,7 +196,7 @@ def prepare( job=None, **kwargs ):
                 k += '2'
         elif job.mode:
             print job.mode
-            k = job.mode + '-' + k
+            k = job.mode + '_' + k
         if k in job.launch:
             job.launch = job.launch[k] % job.__dict__
         else:
@@ -311,10 +311,9 @@ if __name__ == '__main__':
     for module in modules:
         for machine in machines:
             if os.path.isdir( machine ) and machine not in modules:
-                #job = configure( module, machine )[0]
                 print 80 * '-'
                 job = configure( module=module, machine=machine )[0]
-                job = prepare( job, rundir='tmp', bin='date' )
+                job = prepare( job, rundir='tmp', bin='date', run='exec', mode='s' )
                 skeleton( job )
                 pprint.pprint( job.__dict__ )
                 shutil.rmtree( 'tmp' )

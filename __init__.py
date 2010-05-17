@@ -119,13 +119,13 @@ def stage( inputs={}, **kwargs ):
     nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
     job.pmem = 32 + int(1.2 * nm * nvars * int( job.dtype[-1] ) / 1024 / 1024)
     job.seconds = (pm.shape[3] + 10) * nm / job.rate
-    job = conf.prepare( job )
 
     # configure options
     print( 'Run directory: ' + job.rundir )
+    job.bin = os.path.join( '.', 'sord-' + job.mode + job.optimize + job.dtype[-1] )
     job.rundate = time.strftime( '%Y %b %d' )
     job.rundir = os.path.realpath( job.rundir )
-    job.bin = os.path.join( '.', 'sord-' + job.mode + job.optimize + job.dtype[-1] )
+    job = conf.prepare( job )
 
     # compile code
     if not job.prepare:

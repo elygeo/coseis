@@ -28,8 +28,8 @@ queue = 'default';  maxnodes = 256; maxcores = 4; maxram =  3500; maxtime = 24, 
 queue = 'default';  maxnodes = 256; maxcores = 8; maxram = 11000; maxtime = 24, 00
 sord_ = dict( rate = 1.1e6 )
 launch = {
-    's-exec':  '%(bin)s',
-    's-debug': 'gdb %(bin)s',
+    's_exec':  '%(bin)s',
+    's_debug': 'gdb %(bin)s',
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
 }

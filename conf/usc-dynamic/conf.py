@@ -29,9 +29,9 @@ maxram = 1800
 fortran_serial = 'ifort',
 fortran_mpi = 'mpif90',
 launch = {
-    's-exec':  '%(bin)s',
-    's-debug': 'gdb %(bin)s',
-    'm-exec':  'qsub -I "%(name)s.sh"',
+    's_exec':  '%(bin)s',
+    's_debug': 'gdb %(bin)s',
+    'm_exec':  'qsub -I "%(name)s.sh"',
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
 }
