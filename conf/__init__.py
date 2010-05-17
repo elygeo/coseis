@@ -195,7 +195,6 @@ def prepare( job=None, **kwargs ):
             if job.depend:
                 k += '2'
         elif job.mode:
-            print job.mode
             k = job.mode + '_' + k
         if k in job.launch:
             job.launch = job.launch[k] % job.__dict__
@@ -294,11 +293,12 @@ def launch( job=None, files=(), new=True, **kwargs ):
         stdout = p.communicate()[0]
         print( stdout )
         if p.returncode:
-            raise subprocess.CalledProcessError( p.returncode, job.launch )
+            sys.exit( 'Launch failed' )
         d = re.search( job.submit_pattern, stdout ).groupdict()
         job.__dict__.update( d )
     else:
-        subprocess.check_call( cmd )
+        if subprocess.call( cmd ):
+            sys.exit( 'Launch failed' )
 
     os.chdir( cwd )
     return job
