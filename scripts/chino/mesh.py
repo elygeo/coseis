@@ -106,6 +106,7 @@ np.array( z, 'f' ).T.tofile( rundir + 'topo' )
 
 # launch
 job0 = cvm.conf.launch(
+    name = 'prep',
     new = False,
     rundir = path,
     stagein = ['mesh_prep.py'],

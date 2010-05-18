@@ -141,9 +141,15 @@ path_ += 'in' + os.sep
 for f in 'z3', 'rho', 'vp', 'vs':
     os.link( mesh_ + f, path_ + f )
 
-# launch job
+# launch and cook job
 job = sord.run( job )
-
-# decimate output and compute PGV, PGD
-cvm.conf.launch( name='cook', bin='python sim_cook.py', files=['sim_cook.py'], depend=job.jobid )
+sord.conf.launch(
+    name = 'cook',
+    new = False,
+    rundir = rundir,
+    stagein = ['sim_cook.py'],
+    bin = 'python sim_cook.py',
+    run = job.run,
+    depend = job.jobid,
+)
 

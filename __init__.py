@@ -1,4 +1,4 @@
-u!/usr/bin/env python
+#!/usr/bin/env python
 """
 Support Operator Rupture Dynamics
 """
