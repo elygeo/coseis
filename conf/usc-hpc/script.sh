@@ -11,8 +11,10 @@
 #PBS -V
 
 cd "%(rundir)s"
-mv * /scratch/
-cd /scratch/
+rsync -rlpt . /scratch/job
+cd /scratch/job
+( while :; do sleep 600; rsync -rlpt . "%(rundir)s" ) &
+pid=$!
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
@@ -20,5 +22,6 @@ mpiexec -np %(nproc)s %(bin)s
 %(post)s
 echo "$( date ): %(name)s finished" >> log
 
-mv * "%(rundir)s"
+kill $pid
+rsync -rlpt . "%(rundir)s"
 
