@@ -13,7 +13,7 @@
 cd "%(rundir)s"
 rsync -rlpt --exclude '*~' . /scratch/job
 cd /scratch/job
-( while :; do sleep 600; rsync -rlpt . "%(rundir)s" ) &
+( while :; do sleep 600; rsync -rlpt . "%(rundir)s"; done ) &
 pid=$!
 
 echo "$( date ): %(name)s started" >> log
