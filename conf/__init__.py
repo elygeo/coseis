@@ -129,7 +129,7 @@ def configure( module='default', machine=None, save_machine=False, options=None,
     if 'dtype' in job:
         job['dtype'] = np.dtype( job['dtype'] ).str
     if 'rundir' in job:
-        job['rundir'] = os.path.expanduser( job['rundir'] )
+        job['rundir'] = os.path.realpath( os.path.expanduser( job['rundir'] ) )
 
     # configuration object
     job = namespace( job )
@@ -284,7 +284,7 @@ def launch( job=None, stagein=(), new=True, **kwargs ):
 
     # launch
     print( job.launch )
-    if job.launch.startswith( 'submit' ):
+    if job.run.startswith( 'submit' ):
         p = subprocess.Popen( shlex.split( job.launch ), stdout=subprocess.PIPE )
         stdout = p.communicate()[0]
         print( stdout )
