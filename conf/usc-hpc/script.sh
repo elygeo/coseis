@@ -11,7 +11,7 @@
 #PBS -V
 
 cd "%(rundir)s"
-rsync -rlpt . /scratch/job
+rsync -rlpt --exclude '*~' . /scratch/job
 cd /scratch/job
 ( while :; do sleep 600; rsync -rlpt . "%(rundir)s" ) &
 pid=$!
@@ -24,4 +24,5 @@ echo "$( date ): %(name)s finished" >> log
 
 kill $pid
 rsync -rlpt . "%(rundir)s"
+rsync -rlptb --delete . "%(rundir)s"
 
