@@ -218,7 +218,7 @@ def skeleton( job=None, stagein=(), new=True, **kwargs ):
     Parameters
     ----------
     job : job configuration object
-    stagein : list of files to link or copy into directory
+    stagein : list of files to copy into run directory
     new : (True|False) create new directory, or use existing
 
     Templates located in the configuration directory are processed with the given
@@ -256,10 +256,7 @@ def skeleton( job=None, stagein=(), new=True, **kwargs ):
 
     # link or copy files
     for f in stagein:
-        try:
-            os.link( f, dest + f )
-        except:
-            shutil.copy2( f, dest )
+        shutil.copy2( f, dest )
 
     return job
 

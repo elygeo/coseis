@@ -1,117 +1,68 @@
 #!/usr/bin/env python
 """
-Step 1: Mesh generation and CVM extraction
+Mesh generation
 """
-import os, pyproj, cvm
+import os, meta
 import numpy as np
 
-# parameters
-dx = 100.0;  nproc = 4096
-dx = 200.0;  nproc = 512
-dx = 500.0;  nproc = 32
-dx = 1000.0; nproc = 2
-dx = 8000.0; nproc = 1
-delta = dx, dx, -dx
+# location
+rundir = 'cvm4' + os.sep
 
-# path
-mesh_id = '%04.f' % delta[0]
-path = os.path.join( 'run', 'mesh', mesh_id )
+# metedata
+dtype = meta.dtype
+shape = meta.shape
+delta = meta.delta
+npml = meta.npml
+ntop = meta.ntop
 
-# projection
-rotate = None
-origin = -117.761, 33.953, 14700.0
-bounds = (-144000.0, 112000.0), (-72000.0, 72000.0), (0.0, 64000.0-dx)
-projection = dict( proj='tmerc', lon_0=origin[0], lat_0=origin[1] )
-proj = pyproj.Proj( **projection )
-transform = None
-#proj = cvm.coord.Transform( proj, **transform )
+# read data
+n = shape[:2]
+x = np.fromfile( 'lon', dtype ).reshape( n[::-1] )
+y = np.fromfile( 'lat', dtype ).reshape( n[::-1] )
+z = np.fromfile( 'topo', dtype ).reshape( n[::-1] )
 
-# uniform zone in PML and to deepest source depth
-npml = 10
-npml = min( npml, int( 8000.0 / delta[0] + 0.5 ) )
-ntop = int( 26000.0 / abs( delta[2] ) + 0.5 )
+# PML regions are extruded
+for w in x, y, z:
+    for i in xrange( npml, 0, -1 ):
+        w[i-1,:] = w[i,:]
+        w[-i,:]  = w[-i-1,:]
+        w[:,i-1] = w[:,i]
+        w[:,-i]  = w[:,-i-1]
 
-# dimensions
-x, y, z = bounds
-x, y, z = x[1] - x[0], y[1] - y[0], z[1] - z[0]
-shape = (
-    int( abs( x / delta[0] ) + 1.5 ),
-    int( abs( y / delta[1] ) + 1.5 ),
-    int( abs( z / delta[2] ) + 1.5 ),
-)
+# topography blending function for elevation
+n = shape[2] - ntop - npml
+w = 1.0 - np.r_[ np.zeros(ntop), 1.0 / (n - 1) * np.arange(n), np.ones(npml) ]
 
-# corners
-x, y, z = bounds
-x = x[0], x[1], x[1], x[0]
-y = y[0], y[0], y[1], y[1]
-x, y = proj( x, y, inverse=True )
-corners = tuple( x ), tuple( y )
+# demean topography
+z0 = z.mean()
+z -= z0
 
-# box
-x, y, z = bounds
-x = np.arange( shape[0] ) * delta[0] + x[0]
-y = np.arange( shape[1] ) * delta[1] + y[0]
-y, x = np.meshgrid( y, x )
-x = np.concatenate([ x[:,0], x[-1,1:], x[-2::-1,-1], x[0,-2::-1] ])
-y = np.concatenate([ y[:,0], y[-1,1:], y[-2::-1,-1], y[0,-2::-1] ])
-x, y = proj( x, y, inverse=True )
-box = x, y
-extent = (x.min(), x.max()), (y.min(), y.max())
+# node elevation mesh
+dep = np.arange( shape[2] ) * delta[2]
+f3 = open( 'z3', 'wb' )
+for i in range( dep.size ):
+    (dep[i] + z0 + w[i] * z).T.tofile( f3 )
+f3.close()
 
-# topography
-topo, ll = cvm.data.topo( extent )
-lon, lat = ll
-ddeg = 0.5 / 60.0
+# cell center locations
+dep = 0.5 * (dep[:-1] + dep[1:])
+x = 0.25 * (x[:-1,:-1] + x[1:,:-1] + x[:-1,1:] + x[1:,1:])
+y = 0.25 * (y[:-1,:-1] + y[1:,:-1] + y[:-1,1:] + y[1:,1:])
+z = 0.25 * (z[:-1,:-1] + z[1:,:-1] + z[:-1,1:] + z[1:,1:])
 
-# mesh
-x, y, z = bounds
-x = np.arange( shape[0] ) * delta[0] + x[0]
-y = np.arange( shape[1] ) * delta[1] + y[0]
-y, x = np.meshgrid( y, x )
-x, y = proj( x, y, inverse=True )
-z = cvm.coord.interp2( lon[0], lat[0], ddeg, ddeg, topo, x, y )
-x = np.array( x, 'f' )
-y = np.array( y, 'f' )
-z = np.array( z, 'f' )
+# topography blending function for depth
+n = shape[2] - ntop - npml
+w = np.r_[ np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml) ]
 
-# metadata
-meta = dict(
-    mesh_id = mesh_id,
-    delta = delta,
-    shape = shape,
-    ntop = ntop,
-    npml = npml,
-    bounds = bounds,
-    corners = corners,
-    extent = extent,
-    origin = origin,
-    projection = projection,
-    transform = transform,
-    rotate = rotate,
-    dtype = np.dtype( 'f' ).str,
-)
-
-# stage cvm extraction
-rundir = os.path.realpath( path ) + os.sep
-post = 'rm lon lat dep\nmv rho vp vs %r' % rundir
-n = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
-job = cvm.stage( workdir=path, nproc=nproc, nsample=n, post=post )
-
-# save data
-cvm.util.save( rundir + 'meta.py', meta, header='# mesh parameters\n' )
-np.savetxt( rundir + 'box.txt', np.array( box, 'f' ).T )
-np.array( x, 'f' ).T.tofile( rundir + 'lon' )
-np.array( y, 'f' ).T.tofile( rundir + 'lat' )
-np.array( z, 'f' ).T.tofile( rundir + 'topo' )
-
-# launch
-job0 = cvm.conf.launch(
-    name = 'prep',
-    new = False,
-    rundir = path,
-    stagein = ['mesh_prep.py'],
-    bin = 'python mesh_prep.py',
-    run = job.run,
-)
-cvm.conf.launch( job, depend=job0.jobid )
+# write lon/lat/depth mesh
+f1 = open( rundir + 'lon', 'wb' )
+f2 = open( rundir + 'lat', 'wb' )
+f3 = open( rundir + 'dep', 'wb' )
+for i in range( dep.size ):
+    x.T.tofile( f1 )
+    y.T.tofile( f2 )
+    np.array( w[i] * z - dep[i], 'f' ).T.tofile( f3 )
+f1.close()
+f2.close()
+f3.close()
 

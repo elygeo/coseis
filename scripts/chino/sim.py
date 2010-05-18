@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Step 2: SORD simulation
+SORD simulation
 """
 import numpy as np
 import os, sys, pyproj
@@ -117,7 +117,7 @@ fieldio += [
 ]
 
 # stage job
-job = sord.stage( locals(), post='bash clean.sh -f' )
+job = sord.stage( locals(), post='rm -r in/' )
 if not job.prepare:
     sys.exit()
 
@@ -142,13 +142,13 @@ for f in 'z3', 'rho', 'vp', 'vs':
     os.link( mesh_ + f, path_ + f )
 
 # launch and cook job
-job = sord.run( job )
-sord.conf.launch(
-    name = 'cook',
+job = sord.launch( job )
+sord.launch(
     new = False,
     rundir = rundir,
-    stagein = ['sim_cook.py'],
-    bin = 'python sim_cook.py',
+    name = 'cook',
+    stagein = ['cook.py'],
+    bin = 'python cook.py',
     run = job.run,
     depend = job.jobid,
 )

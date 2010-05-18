@@ -5,6 +5,7 @@ Support Operator Rupture Dynamics
 import os, sys, re, math, pprint
 import numpy as np
 import conf, fieldnames
+from conf import launch
 from util import swab, util, coord, signal, source, data, viz, plt, mlab, egmm
 try:
     from util import rspectra
@@ -210,9 +211,6 @@ def run( job=None, **kwargs ):
         job = stage( job )
     conf.launch( job )
     return job
-
-def launch():
-    sys.exit( 'Use sord.run() instead of sord.launch()' )
 
 def prepare_param( pm, itbuff ):
     """

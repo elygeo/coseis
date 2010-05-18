@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 """
-Step 3: Create WebSims files
+WebSims setup
 """
 import os, sys, glob, shutil, pyproj
 import numpy as np
 import cvm
 
 # parameters
-nproc = 2
-template = 'websims_conf.py'
+nproc = 1
+template = 'wsconf-in.py'
 author = 'Geoffrey Ely'
 title = 'Chino Hills'
 scale = 0.001
@@ -30,6 +30,8 @@ for path in glob.glob( sims ):
     extent = meta.extent
     bounds = meta.bounds
     proj = pyproj.Proj( **meta.projection )
+
+    # snapshot and time history dimensions
     x_shape = meta.shapes['snap']
     t_shape = meta.shapes['hist']
     x, y, z = meta.deltas['snap']; x_delta = scale * x, scale * y, scale * z
@@ -79,15 +81,11 @@ for path in glob.glob( sims ):
     # surface Vs
     j, k = x_shape[:2]
     n = j * k
-    post = 'mv vs %s/vs0' % os.path.realpath( path )
-    job = cvm.stage( nsample=n, nproc=nproc, post=post, workdir='tmp' )
+    post = 'rm lon lat dep rho vp\nmv vs %s/vs0' % os.path.realpath( path )
+    job = cvm.stage( nsample=n, nproc=nproc, post=post, workdir='run', run='exec' )
     rundir = job.rundir + os.sep
-    try:
-        os.link( path + 'lon', rundir + 'lon' )
-        os.link( path + 'lat', rundir + 'lat' )
-    except:
-        shutil.copy2( path + 'lon', rundir + 'lon' )
-        shutil.copy2( path + 'lat', rundir + 'lat' )
+    shutil.copy2( path + 'lon', rundir + 'lon' )
+    shutil.copy2( path + 'lat', rundir + 'lat' )
     np.zeros( n, 'f' ).tofile( rundir + 'dep' )
-    os.system( rundir + 'run.sh' )
+    cvm.launch( job )
 
