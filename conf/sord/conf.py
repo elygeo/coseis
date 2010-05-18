@@ -5,36 +5,53 @@ Default SORD configuration
 import os, pwd
 import numpy as np
 
-# setup options (also accessible with command line options).
-itbuff = 10      # max number of timesteps to buffer for 2D & 3D output
-prepare = True   # True: compile code and setup run directory, False: dry run
-optimize = 'O'   # O: optimize, g: debug, t: test, p: profile
-mode = None      # s: serial, m: MPI, None: guess
-run = False      # i: interactive, q: batch queue, g: debugger
-pre = post = ''  # pre-processing and post-processing commands
-rundir = 'run'   # run directory
-force = False    # overwrite previous run directory if present
+# command line options: (short, long, parameter, value)
+options = [
+    ( 'n', 'dry-run',     'prepare',  False ),
+    ( 'f', 'force',       'force',    True ),
+    ( 'i', 'interactive', 'run',      'exec' ),
+    ( 'd', 'debug',       'run',      'debug' ),
+    ( 'b', 'batch',       'run',      'submit' ),
+    ( 'q', 'queue',       'run',      'submit' ),
+    ( 's', 'serial',      'mode',     's' ),
+    ( 'm', 'mpi',         'mode',     'm' ),
+    ( 'g', 'debugging',   'optimize', 'g' ),
+    ( 't', 'testing',     'optimize', 't' ),
+    ( 'p', 'profiling',   'optimize', 'p' ),
+    ( 'O', 'optimized',   'optimize', 'O' ),
+    ( '8', 'realsize8',   'dtype',    'f8' ),
+]
 
-# user info
-email = user = pwd.getpwuid( os.geteuid() )[0]
+# default options
+prepare = True   # True: compile code and setup run directory, False: dry run
+force = False    # overwrite previous run directory if present
+run = False      # 'exec': interactive, 'debug': debugger, 'submit': batch queue
+mode = None      # 'm': serial, 'm': MPI, None: guess
+optimize = 'O'   # 'O': optimize, 'g': debug, 't': test, 'p': profile
+dtype = dtype_f = np.dtype( 'f' ).str # Numpy data type
+
+# other options
+name = 'sord'    # job name
+rundir = 'run'   # run directory
+nproc = 1        # number of processes
+depend = False   # wait for other job to finish. supply job ID to depend.
+pre = post = ''  # pre-processing and post-processing commands
+itbuff = 10      # max number of timesteps to buffer for 2D & 3D output
+email = user = pwd.getpwuid( os.geteuid() )[0] # email address
 
 # machine specific
 notes = 'Default SORD configuration'
-name = 'sord'
 machine = ''
 system = os.uname()
 host = os.uname()[1]
 hosts = host,
 login = host
-nproc = 1
 maxnodes = 1
 maxcores = 0
 maxram = 0	
 maxtime = 0
 rate = 1.0e6
 queue = None
-dtype = dtype_f = np.dtype( 'f' ).str
-depend = False
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
 launch = {
     's_exec':  '%(bin)s',

@@ -104,7 +104,7 @@ np.array( x, 'f' ).T.tofile( rundir + 'lon' )
 np.array( y, 'f' ).T.tofile( rundir + 'lat' )
 np.array( z, 'f' ).T.tofile( rundir + 'topo' )
 
-# launch prep and cvm jobs
+# launch prep job
 x, y, z = shape
 s = x * y * z / 10000000
 job0 = cvm.launch(
@@ -116,5 +116,7 @@ job0 = cvm.launch(
     run = job.run,
     seconds = s,
 )
+
+# launch cvm job
 cvm.launch( job, depend=job0.jobid )
 

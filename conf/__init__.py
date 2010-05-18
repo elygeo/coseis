@@ -2,8 +2,10 @@
 """
 Machine configuration
 """
-import os, sys, re, shutil, getopt, subprocess, shlex
+import os, sys, re, shutil, getopt, subprocess, shlex, time
 import numpy as np
+
+
 
 class namespace:
     """
@@ -11,6 +13,8 @@ class namespace:
     """
     def __init__( self, d ):
         self.__dict__.update( d )
+
+
 
 def prune( d, pattern=None, types=None ):
     """
@@ -38,7 +42,9 @@ def prune( d, pattern=None, types=None ):
             del( d[k] )
     return d
 
-def configure( module='default', machine=None, save_machine=False, options=None, **kwargs ):
+
+
+def configure( module='default', machine=None, save_machine=False, **kwargs ):
     """
     Merge module, machine, keyword, and command line parameters.
 
@@ -47,8 +53,6 @@ def configure( module='default', machine=None, save_machine=False, options=None,
     module : module name
     machine : machine name
     save_machine : remember machine name
-    options : list command line options consisting of:
-        (sort_form, long_form, parameter, value)
     **kwargs : override parameters supplied as keyword arguments
 
     Returns
@@ -103,17 +107,17 @@ def configure( module='default', machine=None, save_machine=False, options=None,
             del( kwargs[k] )
 
     # command line parameters
-    if options:
-        short, long = zip( *options )[:2]
-        opts = getopt.getopt( sys.argv[1:], ''.join( short ), long )[0]
-        for opt, val in opts:
-            key = opt.lstrip('-')
-            if opt.startswith( '--' ):
-                i = long.index( key )
-            else:
-                i = short.index( key )
-            key, val = options[i][2:]
-            job[key] = val
+    options = job.options
+    short, long = zip( *options )[:2]
+    opts = getopt.getopt( sys.argv[1:], ''.join( short ), long )[0]
+    for opt, val in opts:
+        key = opt.lstrip('-')
+        if opt.startswith( '--' ):
+            i = long.index( key )
+        else:
+            i = short.index( key )
+        key, val = options[i][2:]
+        job[key] = val
 
     # fortran flags
     if 'fortran_flags_default_' in job:
@@ -125,16 +129,12 @@ def configure( module='default', machine=None, save_machine=False, options=None,
     prune( job )
     prune( kwargs )
 
-    # misc
-    if 'dtype' in job:
-        job['dtype'] = np.dtype( job['dtype'] ).str
-    if 'rundir' in job:
-        job['rundir'] = os.path.realpath( os.path.expanduser( job['rundir'] ) )
-
     # configuration object
     job = namespace( job )
 
     return job, kwargs
+
+
 
 def prepare( job=None, **kwargs ):
     """
@@ -146,6 +146,11 @@ def prepare( job=None, **kwargs ):
         job, kwargs = configure( **kwargs )
     job.__dict__.update( kwargs )
     job.jobid = None
+
+    # misc
+    job.rundate = time.strftime( '%Y %b %d' )
+    if 'dtype' in job:
+        job['dtype'] = np.dtype( job['dtype'] ).str
 
     # parallelization
     if not hasattr( job, 'nproc' ):
@@ -192,24 +197,13 @@ def prepare( job=None, **kwargs ):
     if job.ram and job.ram > job.maxram:
         print( 'Warning: exceding available RAM per node (%sMb)' % job.maxram )
 
-    # launch command
-    if job.run:
-        k = job.run
-        if job.run == 'submit':
-            if job.depend:
-                k += '2'
-        elif job.mode:
-            k = job.mode + '_' + k
-        if k in job.launch:
-            job.launch = job.launch[k] % job.__dict__
-        else:
-            sys.exit( 'Error: %s launch mode not supported.' % k )
-    else:
-        job.launch = None
-    job.pre = job.pre % job.__dict__
-    job.post = job.post % job.__dict__
+    # run directory
+    print( 'Run directory: ' + job.rundir )
+    job.rundir = os.path.realpath( os.path.expanduser( job.rundir ) )
 
     return job
+
+
 
 def skeleton( job=None, stagein=(), new=True, **kwargs ):
     """
@@ -260,6 +254,8 @@ def skeleton( job=None, stagein=(), new=True, **kwargs ):
 
     return job
 
+
+
 def launch( job=None, stagein=(), new=True, **kwargs ):
     """
     Launch or submit job.
@@ -270,8 +266,21 @@ def launch( job=None, stagein=(), new=True, **kwargs ):
         job = skeleton( stagein=stagein, new=new, **kwargs )
     else:
         job.__dict__.update( kwargs )
-    if not job.launch:
+
+    # launch command
+    if not job.run:
         return job
+    k = job.run
+    if job.run == 'submit':
+        if job.depend:
+            k += '2'
+    elif job.mode:
+        k = job.mode + '_' + k
+    if k in job.launch:
+        cmd = job.launch[k] % job.__dict__
+    else:
+        sys.exit( 'Error: %s launch mode not supported.' % k )
+    print( cmd )
 
     # check host
     if job.host not in job.hosts:
@@ -283,9 +292,8 @@ def launch( job=None, stagein=(), new=True, **kwargs ):
     os.chdir( job.rundir )
 
     # launch
-    print( job.launch )
     if job.run.startswith( 'submit' ):
-        p = subprocess.Popen( shlex.split( job.launch ), stdout=subprocess.PIPE )
+        p = subprocess.Popen( shlex.split( cmd ), stdout=subprocess.PIPE )
         stdout = p.communicate()[0]
         print( stdout )
         if p.returncode:
@@ -295,12 +303,14 @@ def launch( job=None, stagein=(), new=True, **kwargs ):
     else:
         if job.pre:
             subprocess.check_call( job.pre, shell=True )
-        subprocess.check_call( shlex.split( job.launch ) )
+        subprocess.check_call( shlex.split( cdm ) )
         if job.post:
             subprocess.check_call( job.post, shell=True )
 
     os.chdir( cwd )
     return job
+
+
 
 # run tests if called from the command line
 if __name__ == '__main__':

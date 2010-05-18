@@ -20,7 +20,6 @@ def stage( inputs={}, **kwargs ):
     import setup
 
     # save start time
-    starttime = time.asctime()
     print( 'SORD setup' )
 
     # update inputs
@@ -43,25 +42,9 @@ def stage( inputs={}, **kwargs ):
     if error:
         sys.exit()
 
-    # configure with command line options
-    options = [
-        ( 'n', 'dry-run',     'prepare',  False ),
-        ( 'f', 'force',       'force',    True ),
-        ( 'i', 'interactive', 'run',      'exec' ),
-        ( 'd', 'debug',       'run',      'debug' ),
-        ( 'b', 'batch',       'run',      'submit' ),
-        ( 'q', 'queue',       'run',      'submit' ),
-        ( 's', 'serial',      'mode',     's' ),
-        ( 'm', 'mpi',         'mode',     'm' ),
-        ( 'g', 'debugging',   'optimize', 'g' ),
-        ( 't', 'testing',     'optimize', 't' ),
-        ( 'p', 'profiling',   'optimize', 'p' ),
-        ( 'O', 'optimized',   'optimize', 'O' ),
-        ( '8', 'realsize8',   'dtype',    'f8' ),
-    ]
-    job, inputs = conf.configure( module='sord', options=options, **inputs )
+    # configure
+    job, inputs = conf.configure( module='sord', **inputs )
     job.dtype = np.dtype( job.dtype ).str
-    job.rundir = os.path.expanduser( job.rundir )
     if not job.prepare:
         job.run = False
     if job.run == 'g':
@@ -122,10 +105,7 @@ def stage( inputs={}, **kwargs ):
     job.seconds = (pm.shape[3] + 10) * nm / job.rate
 
     # configure options
-    print( 'Run directory: ' + job.rundir )
     job.bin = os.path.join( '.', 'sord-' + job.mode + job.optimize + job.dtype[-1] )
-    job.rundate = time.strftime( '%Y %b %d' )
-    job.rundir = os.path.realpath( job.rundir )
     job = conf.prepare( job )
 
     # compile code
@@ -145,13 +125,11 @@ def stage( inputs={}, **kwargs ):
         shutil.rmtree( job.rundir )
     conf.skeleton( job, files )
 
-    # log, conf, parameter files
+    # conf, parameter files
     cwd = os.path.realpath( os.getcwd() )
     os.chdir( job.rundir )
     for f in 'checkpoint', 'debug', 'in', 'out', 'prof', 'stats':
         os.mkdir( f )
-    log = open( 'log', 'w' )
-    log.write( starttime + ': setup started\n' )
     util.save( 'conf.py', job, header = '# configuration\n' )
     util.save( 'parameters.py', pm, expand=['fieldio'], header='# model parameters\n' )
 
