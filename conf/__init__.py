@@ -6,14 +6,12 @@ import os, sys, re, shutil, getopt, subprocess, shlex, time
 import numpy as np
 
 
-
 class namespace:
     """
     Namespace with object attributes initialized from a dict.
     """
     def __init__( self, d ):
         self.__dict__.update( d )
-
 
 
 def prune( d, pattern=None, types=None ):
@@ -41,7 +39,6 @@ def prune( d, pattern=None, types=None ):
         if grep.search( k ) or type( d[k] ) not in types:
             del( d[k] )
     return d
-
 
 
 def configure( module='default', machine=None, save_machine=False, **kwargs ):
@@ -106,8 +103,8 @@ def configure( module='default', machine=None, save_machine=False, **kwargs ):
             job[k] = v
             del( kwargs[k] )
 
-    # command line parameters
-    options = job.options
+    # command line options
+    options = job['options']
     short, long = zip( *options )[:2]
     opts = getopt.getopt( sys.argv[1:], ''.join( short ), long )[0]
     for opt, val in opts:
@@ -135,7 +132,6 @@ def configure( module='default', machine=None, save_machine=False, **kwargs ):
     return job, kwargs
 
 
-
 def prepare( job=None, **kwargs ):
     """
     Compute and display resource usage
@@ -149,8 +145,8 @@ def prepare( job=None, **kwargs ):
 
     # misc
     job.rundate = time.strftime( '%Y %b %d' )
-    if 'dtype' in job:
-        job['dtype'] = np.dtype( job['dtype'] ).str
+    if hasattr( job, 'dtype' ):
+        job.dtype = np.dtype( job.dtype ).str
 
     # parallelization
     if not hasattr( job, 'nproc' ):
@@ -309,7 +305,6 @@ def launch( job=None, stagein=(), new=True, **kwargs ):
 
     os.chdir( cwd )
     return job
-
 
 
 # run tests if called from the command line
