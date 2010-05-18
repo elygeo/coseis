@@ -6,7 +6,6 @@ import os, meta
 import numpy as np
 
 # parameters
-nproc = 4
 decimate = 4
 tstep = 0.125
 

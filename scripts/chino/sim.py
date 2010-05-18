@@ -33,7 +33,7 @@ proj = sord.coord.Transform( proj, translate=(-x[0], -y[0]) )
 
 # dimensions
 dt_ = dx_ / 16000.0
-dt_ = dx_ / 10000.0
+dt_ = dx_ / 20000.0
 nt_ = int( 120.0 / dt_ + 1.00001 )
 delta += (dt_,)
 shape += (nt_,)
@@ -62,7 +62,7 @@ hourglass = 1.0, 1.0
 vp1 = 1500.0
 vs1 = 500.0
 vdamp = 400.0
-gam2 = 0.8 
+gam2 = 0.8
 fieldio = [
     ( '=r', 'x3',  [], 'z3'  ),
     ( '=r', 'rho', [], 'rho' ),
@@ -141,8 +141,14 @@ path_ += 'in' + os.sep
 for f in 'z3', 'rho', 'vp', 'vs':
     os.link( mesh_ + f, path_ + f )
 
-# launch and cook job
+# launch job
 job = sord.launch( job )
+
+# cook results
+path_ = job.rundir + os.sep
+meta = sord.util.load( path_ + 'meta.py' )
+x, y, t = meta.shapes['full-v1']
+s = x * y * t / 1000000
 sord.launch(
     new = False,
     rundir = rundir,
@@ -150,6 +156,7 @@ sord.launch(
     stagein = ['cook.py'],
     bin = 'python cook.py',
     run = job.run,
+    seconds = s,
     depend = job.jobid,
 )
 

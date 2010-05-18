@@ -105,6 +105,8 @@ np.array( y, 'f' ).T.tofile( rundir + 'lat' )
 np.array( z, 'f' ).T.tofile( rundir + 'topo' )
 
 # launch prep and cvm jobs
+x, y, z = shape
+s = x * y * z / 10000000
 job0 = cvm.launch(
     new = False,
     rundir = path,
@@ -112,6 +114,7 @@ job0 = cvm.launch(
     stagein = ['mesh.py'],
     bin = 'python mesh.py',
     run = job.run,
+    seconds = s,
 )
 cvm.launch( job, depend=job0.jobid )
 
