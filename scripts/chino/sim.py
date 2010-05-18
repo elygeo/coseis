@@ -2,8 +2,8 @@
 """
 SORD simulation
 """
-import numpy as np
 import os, sys, pyproj
+import numpy as np
 import sord
 
 # parameters

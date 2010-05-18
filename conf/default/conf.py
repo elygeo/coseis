@@ -5,16 +5,8 @@ Default configuration
 import os, pwd
 import numpy as np
 
-# command line options
-options = [
-    ( 'i', 'interactive', 'run',      'exec' ),
-    ( 'b', 'batch',       'run',      'submit' ),
-    ( 'q', 'queue',       'run',      'submit' ),
-    ( 's', 'serial',      'mode',     's' ),
-    ( 'm', 'mpi',         'mode',     'm' ),
-]
-
-# default options
+# options
+options = None
 run = False
 mode = 's'
 name = 'job'

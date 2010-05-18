@@ -105,16 +105,17 @@ def configure( module='default', machine=None, save_machine=False, **kwargs ):
 
     # command line options
     options = job['options']
-    short, long = zip( *options )[:2]
-    opts = getopt.getopt( sys.argv[1:], ''.join( short ), long )[0]
-    for opt, val in opts:
-        key = opt.lstrip('-')
-        if opt.startswith( '--' ):
-            i = long.index( key )
-        else:
-            i = short.index( key )
-        key, val = options[i][2:]
-        job[key] = val
+    if options:
+        short, long = zip( *options )[:2]
+        opts = getopt.getopt( sys.argv[1:], ''.join( short ), long )[0]
+        for opt, val in opts:
+            key = opt.lstrip('-')
+            if opt.startswith( '--' ):
+                i = long.index( key )
+            else:
+                i = short.index( key )
+            key, val = options[i][2:]
+            job[key] = val
 
     # fortran flags
     if 'fortran_flags_default_' in job:
@@ -299,7 +300,7 @@ def launch( job=None, stagein=(), new=True, **kwargs ):
     else:
         if job.pre:
             subprocess.check_call( job.pre, shell=True )
-        subprocess.check_call( shlex.split( cdm ) )
+        subprocess.check_call( shlex.split( cmd ) )
         if job.post:
             subprocess.check_call( job.post, shell=True )
 

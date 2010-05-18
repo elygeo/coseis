@@ -2,8 +2,9 @@
 """
 Material model extraction from CVM
 """
-import os, pyproj, cvm
+import os, pyproj
 import numpy as np
+import cvm
 
 # parameters
 dx = 100.0;  nproc = 4096
