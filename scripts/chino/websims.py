@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Step 4: Create WebSims files
+Step 3: Create WebSims files
 """
 import os, sys, glob, shutil, pyproj
 import numpy as np
@@ -8,7 +8,7 @@ import cvm
 
 # parameters
 nproc = 2
-template = 'wsconf-in.py'
+template = 'websims_conf.py'
 author = 'Geoffrey Ely'
 title = 'Chino Hills'
 scale = 0.001

@@ -51,7 +51,7 @@ def find( *files ):
                 return f
 
 # Fortran compiler
-fortran_serial = find( 'xlf95_r', 'ifort', 'pathf95', 'pgf90', 'gfortran', 'f95' ),
+fortran_serial = find( 'xlf95_r', 'ifort', 'gfortran', 'pathf95', 'pgf90', 'f95' ),
 fortran_mpi = find( 'mpxlf95_r', 'mpif90' ),
 
 # Fortran compiler flags

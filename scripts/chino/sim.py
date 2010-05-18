@@ -33,6 +33,7 @@ proj = sord.coord.Transform( proj, translate=(-x[0], -y[0]) )
 
 # dimensions
 dt_ = dx_ / 16000.0
+dt_ = dx_ / 10000.0
 nt_ = int( 120.0 / dt_ + 1.00001 )
 delta += (dt_,)
 shape += (nt_,)
@@ -141,5 +142,8 @@ for f in 'z3', 'rho', 'vp', 'vs':
     os.link( mesh_ + f, path_ + f )
 
 # launch job
-sord.run( job )
+job = sord.run( job )
+
+# decimate output and compute PGV, PGD
+cvm.conf.launch( name='cook', bin='python sim_cook.py', files=['sim_cook.py'], depend=job.jobid )
 

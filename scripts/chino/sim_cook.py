@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Step 3: Decimate surface output and compute PGV, PGD
+Decimate surface output and compute PGV, PGD
 """
 import os, sys, glob, sord
 import numpy as np

@@ -74,6 +74,9 @@ def configure( module='default', machine=None, save_machine=False, options=None,
         machine = open( f ).read().strip()
     if machine:
         machine = os.path.basename( os.path.normpath( machine ) )
+        f = os.path.join( path, machine )
+        if not os.path.isdir( f ):
+            sys.exit( 'Error: configuration %s not found.' % machine )
         f = os.path.join( path, machine, 'conf.py' )
         if os.path.isfile( f ):
             exec open( f ) in job
@@ -142,6 +145,7 @@ def prepare( job=None, **kwargs ):
     if job == None:
         job, kwargs = configure( **kwargs )
     job.__dict__.update( kwargs )
+    job.jobid = None
 
     # parallelization
     if not hasattr( job, 'nproc' ):
@@ -202,23 +206,24 @@ def prepare( job=None, **kwargs ):
             sys.exit( 'Error: %s launch mode not supported.' % k )
     else:
         job.launch = None
+    job.pre = job.pre % job.__dict__
+    job.post = job.post % job.__dict__
 
     return job
 
-def skeleton( job=None, files=(), new=True, **kwargs ):
+def skeleton( job=None, stagein=(), new=True, **kwargs ):
     """
     Create run directory tree from templates.
 
     Parameters
     ----------
     job : job configuration object
-    files : list of files to link or copy into directory
+    stagein : list of files to link or copy into directory
     new : (True|False) create new directory, or use existing
 
     Templates located in the configuration directory are processed with the given
     keyword parameters.  Module specific templates are used if found, in addition
-    to machine specific templates.  If no machine specific templates are found,
-    default templates are used.
+    to machine specific templates.
     """
 
     # prepare job
@@ -237,25 +242,20 @@ def skeleton( job=None, files=(), new=True, **kwargs ):
         os.makedirs( dest )
 
     # process templates
-    machine = job.machine
-    f = os.path.join( path, machine, 'script.sh' )
-    if os.path.isdir( f ):
-        templates = machine
-    else:
-        templates = 'default'
-    d = os.path.join( path, templates )
-    for base in os.listdir( d ):
-        if base != 'conf.py':
-            f = os.path.join( d, base )
-            if base == 'script.sh':
-                base = job.name + '.sh'
-            ff = os.path.join( dest, base )
-            out = open( f ).read() % job.__dict__
-            open( ff, 'w' ).write( out )
-            shutil.copymode( f, ff )
+    for m in job.module, job.machine:
+        d = os.path.join( path, m )
+        for base in os.listdir( d ):
+            if base != 'conf.py':
+                f = os.path.join( d, base )
+                if base == 'script.sh':
+                    base = job.name + '.sh'
+                ff = os.path.join( dest, base )
+                out = open( f ).read() % job.__dict__
+                open( ff, 'w' ).write( out )
+                shutil.copymode( f, ff )
 
     # link or copy files
-    for f in files:
+    for f in stagein:
         try:
             os.link( f, dest + f )
         except:
@@ -263,14 +263,14 @@ def skeleton( job=None, files=(), new=True, **kwargs ):
 
     return job
 
-def launch( job=None, files=(), new=True, **kwargs ):
+def launch( job=None, stagein=(), new=True, **kwargs ):
     """
     Launch or submit job.
     """
 
     # create skeleton
     if job == None:
-        job = skeleton( files=files, new=new, **kwargs )
+        job = skeleton( stagein=stagein, new=new, **kwargs )
     else:
         job.__dict__.update( kwargs )
     if not job.launch:
@@ -287,18 +287,20 @@ def launch( job=None, files=(), new=True, **kwargs ):
 
     # launch
     print( job.launch )
-    cmd = shlex.split( job.launch )
     if job.launch.startswith( 'submit' ):
-        p = subprocess.Popen( cmd, stdout=subprocess.PIPE )
+        p = subprocess.Popen( shlex.split( job.launch ), stdout=subprocess.PIPE )
         stdout = p.communicate()[0]
         print( stdout )
         if p.returncode:
-            sys.exit( 'Launch failed' )
+            sys.exit( 'Submit failed' )
         d = re.search( job.submit_pattern, stdout ).groupdict()
         job.__dict__.update( d )
     else:
-        if subprocess.call( cmd ):
-            sys.exit( 'Launch failed' )
+        if job.pre:
+            subprocess.check_call( job.pre, shell=True )
+        subprocess.check_call( shlex.split( job.launch ) )
+        if job.post:
+            subprocess.check_call( job.post, shell=True )
 
     os.chdir( cwd )
     return job

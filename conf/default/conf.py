@@ -12,7 +12,7 @@ pre = post = ''
 email = user = pwd.getpwuid( os.geteuid() )[0]
 nproc = 1
 
-name = 'default'
+name = 'job'
 machine = ''
 system = os.uname()
 host = os.uname()[1]
