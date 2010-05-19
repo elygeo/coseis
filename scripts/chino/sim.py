@@ -125,6 +125,8 @@ fieldio += [
 ]
 
 # stage job
+if conf.configure().machine == 'usc-hpc':
+    mpout = -1
 job = sord.stage( locals(), post='rm -r in/' )
 if not job.prepare:
     sys.exit()
