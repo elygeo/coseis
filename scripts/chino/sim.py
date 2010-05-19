@@ -12,9 +12,12 @@ dx_ = 200.0;  nproc3 = 1, 12, 160
 dx_ = 500.0;  nproc3 = 1, 4, 64
 dx_ = 1000.0; nproc3 = 1, 1, 2
 dx_ = 8000.0; nproc3 = 1, 1, 1
+dx_ = 1000.0; nproc3 = 1, 1, 32
 
 # path
-rundir = os.path.join( 'run', 'sim', '%04.f' % dx_ )
+id_ = 'topo-%04.f' % dx_
+id_ = 'flat-%04.f' % dx_
+rundir = os.path.join( 'run', 'sim', id_ )
 
 # mesh metadata
 mesh_ = '%04.0f' % dx_
@@ -64,11 +67,16 @@ vs1 = 500.0
 vdamp = 400.0
 gam2 = 0.8
 fieldio = [
-    ( '=r', 'x3',  [], 'z3'  ),
     ( '=r', 'rho', [], 'rho' ),
     ( '=r', 'vp',  [], 'vp'  ),
     ( '=r', 'vs',  [], 'vs'  ),
 ]
+
+# topography
+if id_.startswith( 'topo' ):
+    fieldio += [
+        ( '=r', 'x3',  [], 'z3'  )
+    ]
 
 # sites
 for x, y, s in [
