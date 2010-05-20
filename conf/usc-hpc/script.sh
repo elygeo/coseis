@@ -14,7 +14,7 @@ cd "%(rundir)s"
 set > env
 cat > sync.sh << END
 #!/bin/bash -e
-ssh $HOST 'rsync -rlpt /scratch/job/ "%(rundir)s"'
+ssh $HOST 'rsync -rlptv /scratch/job/ "%(rundir)s"'
 END
 chmod u+x sync.sh
 
