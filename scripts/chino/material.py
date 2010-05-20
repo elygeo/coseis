@@ -107,7 +107,7 @@ np.array( z, 'f' ).T.tofile( rundir + 'topo' )
 
 # launch prep job
 x, y, z = shape
-s = x * y * z / 1000000
+s = x * y * z / 2000000
 job0 = cvm.launch(
     new = False,
     rundir = path,
