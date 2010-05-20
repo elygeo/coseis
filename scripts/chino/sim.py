@@ -163,7 +163,7 @@ sord.launch(
     rundir = rundir,
     name = 'cook',
     stagein = ['cook.py'],
-    bin = 'python cook.py',
+    command = 'python cook.py',
     run = job.run,
     seconds = s,
     depend = job.jobid,

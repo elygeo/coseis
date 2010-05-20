@@ -318,7 +318,7 @@ if __name__ == '__main__':
             if os.path.isdir( machine ) and machine not in modules:
                 print 80 * '-'
                 job = configure( module=module, machine=machine )[0]
-                job = prepare( job, rundir='tmp', bin='date', run='exec', mode='s' )
+                job = prepare( job, rundir='tmp', command='date', run='exec', mode='s' )
                 skeleton( job )
                 pprint.pprint( job.__dict__ )
                 shutil.rmtree( 'tmp' )

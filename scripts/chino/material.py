@@ -113,7 +113,7 @@ job0 = cvm.launch(
     rundir = path,
     name = 'mesh',
     stagein = ['mesh.py'],
-    bin = 'python mesh.py',
+    command = 'python mesh.py',
     run = job.run,
     seconds = s,
 )
