@@ -46,8 +46,8 @@ cvm_ = dict(
     },
 )
 launch = {
-    's_exec':  '%(bin)s',
-    's_debug': 'gdb %(bin)s',
+    's_exec':  '%(command)s',
+    's_debug': 'gdb %(command)s',
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
 }

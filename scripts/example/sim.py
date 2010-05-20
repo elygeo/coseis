@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sord                               # import the sord module
+nproc = 1, 1, 6
 delta = 100.0, 100.0, 100.0, 0.0075       # step length in (x, y, z, t)
 shape = 61, 61, 61, 60                    # mesh size in (x, y, z, t)
 fieldio = [                               # field variable input and output

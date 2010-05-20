@@ -8,13 +8,14 @@
 #PBS -m abe
 #PBS -V
 #PBS -r n
-export -n PBS_ENVIRONMENT
 
+export -n PBS_ENVIRONMENT
+set > env
 cd "%(rundir)s"
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
-mpirun -hostfile $PBS_NODEFILE %(bin)s
+mpirun -hostfile $PBS_NODEFILE %(command)s
 %(post)s
 echo "$( date ): %(name)s finished" >> log
 

@@ -10,16 +10,17 @@
 #PBS -o %(rundir)s/stdout
 #PBS -m abe
 #PBS -V
+
 #module load pathmpi
 #module load intelmpi
 module load intel
 module load vmpi/intel
-
 cd "%(rundir)s"
+set > env
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
-mpirun -np %(nproc)s -hostfile $PBS_NODEFILE %(bin)s
+mpirun -np %(nproc)s -hostfile $PBS_NODEFILE %(command)s
 %(post)s
 echo "$( date ): %(name)s finished" >> log
 

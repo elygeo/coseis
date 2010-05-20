@@ -9,14 +9,15 @@
 #PBS -o %(rundir)s/stdout
 #PBS -m abe
 #PBS -V
-module load intel vmpi
 
+module load intel vmpi
 cd "%(rundir)s"
+set > env
 cp /cluster/mpi/tools/param.bigcluster .
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
-mpirun -np %(nproc)s -paramfile ./param.bigcluster -hostfile $PBS_NODEFILE %(bin)s
+mpirun -np %(nproc)s -paramfile ./param.bigcluster -hostfile $PBS_NODEFILE %(command)s
 %(post)s
 echo "$( date ): %(name)s finished" >> log
 

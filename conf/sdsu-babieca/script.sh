@@ -11,10 +11,11 @@
 #PBS -V
 
 cd "%(rundir)s"
+set > env
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
-mpiexec -n %(nproc)s %(bin)s
+mpiexec -n %(nproc)s %(command)s
 %(post)s
 echo "$( date ): %(name)s finished" >> log
 

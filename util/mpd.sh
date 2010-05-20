@@ -7,7 +7,7 @@ if mpich2version &> /dev/null && ! mpdtrace &> /dev/null; then
             A B C D E F G H I J K L M N O P Q R S T U V W X Y Z \
             0 1 2 3 4 5 6 7 8 9 ! @ \# $ ^ \& )
         n=${#c[@]}
-        for (( i=1; i<=16; i++ )); do pw="$pw${c[$RANDOM%%n]}"; done
+        for (( i=1; i<=16; i++ )); do pw="$pw${c[$RANDOM%n]}"; done
         echo "secretword=$pw" > $HOME/.mpd.conf
         chmod 600 $HOME/.mpd.conf
     fi

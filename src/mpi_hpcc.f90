@@ -1,4 +1,4 @@
-! collective routines - MPI version - USC HPCC workarounds, no double preceision!
+! collective routines - MPI version - USC HPCC workarounds, no double precision!
 module m_collective
 use mpi
 implicit none

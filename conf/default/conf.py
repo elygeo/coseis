@@ -29,9 +29,9 @@ maxram = 0
 maxtime = 0
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
 launch = {
-    's_exec':  '%(bin)s',
-    's_debug': 'gdb %(bin)s',
-    'm_exec':  'mpiexec -np %(nproc)s %(bin)s',
-    'm_debug': 'mpiexec -np %(nproc)s -gdb %(bin)s',
+    's_exec':  '%(command)s',
+    's_debug': 'gdb %(command)s',
+    'm_exec':  'mpiexec -np %(nproc)s %(command)s',
+    'm_debug': 'mpiexec -np %(nproc)s -gdb %(command)s',
 }
 

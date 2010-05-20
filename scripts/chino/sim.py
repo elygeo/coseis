@@ -12,7 +12,6 @@ dx_ = 200.0;  nproc3 = 1, 12, 160
 dx_ = 500.0;  nproc3 = 1, 4, 64
 dx_ = 1000.0; nproc3 = 1, 1, 2
 dx_ = 8000.0; nproc3 = 1, 1, 1
-dx_ = 1000.0; nproc3 = 1, 1, 32
 
 # path
 id_ = 'topo-%04.f' % dx_
@@ -125,8 +124,8 @@ fieldio += [
 ]
 
 # stage job
-if conf.configure().machine == 'usc-hpc':
-    mpout = -1
+if sord.conf.configure()[0].machine == 'usc-hpc':
+    mpout = 0
 job = sord.stage( locals(), post='rm -r in/' )
 if not job.prepare:
     sys.exit()

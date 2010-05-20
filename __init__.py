@@ -105,7 +105,7 @@ def stage( inputs={}, **kwargs ):
     job.seconds = (pm.shape[3] + 10) * nm / job.rate
 
     # configure options
-    job.bin = os.path.join( '.', 'sord-' + job.mode + job.optimize + job.dtype[-1] )
+    job.command = os.path.join( '.', 'sord-' + job.mode + job.optimize + job.dtype[-1] )
     job = conf.prepare( job )
 
     # compile code
@@ -115,7 +115,7 @@ def stage( inputs={}, **kwargs ):
 
     # create run directory
     src = os.path.realpath( os.path.dirname( __file__ ) ) + os.sep
-    files = os.path.join( src, 'bin', job.bin ),
+    files = os.path.join( src, 'bin', job.command ),
     if os.path.isfile( src + 'sord.tgz' ):
         files += src + 'sord.tgz',
     if job.optimize == 'g':

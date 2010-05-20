@@ -10,16 +10,17 @@
 #$ -m abe
 #$ -V
 #$ -wd %(rundir)s
-export MY_NSLOTS=%(nproc)s
 
+export MY_NSLOTS=%(nproc)s
 cd "%(rundir)s"
+set > env
 if [ %(nproc)s -gt 4000 ]; then
-    cache_binary $PWD %(bin)s
+    cache_binary $PWD %(command)s
 fi
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
-ibrun %(bin)s
+ibrun %(command)s
 %(post)s
 echo "$( date ): %(name)s finished" >> log
 

@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 #PBS -N %(name)s
 #PBS -M %(email)s
@@ -11,18 +11,21 @@
 #PBS -V
 
 cd "%(rundir)s"
-rsync -rlpt --exclude '*~' . /scratch/job
-cd /scratch/job
-( while :; do sleep 600; rsync -rlpt . "%(rundir)s"; done ) &
-pid=$!
+set > env
+cat > sync.sh << END
+#!/bin/bash -e
+ssh $HOST 'rsync -rlpt /scratch/job "%(rundir)s"'
+END
+chmod u+x sync.sh
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
-mpiexec -np %(nproc)s %(bin)s
+rsync -rlpt . /scratch/job
+cd /scratch/job
+mpiexec --mca mtl mx --mca pml cm %(command)s
+#mpiexec -np %(nproc)s %(command)s
+cd "%(rundir)s"
+rsync -rlpt /scratch/job/ .
 %(post)s
 echo "$( date ): %(name)s finished" >> log
-
-kill $pid
-rsync -rlpt . "%(rundir)s"
-rsync -rlptb --delete . "%(rundir)s"
 

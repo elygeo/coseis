@@ -33,9 +33,9 @@ sord_ = dict(
     },
 )
 launch = {
-    's_exec':  '%(bin)s', 
-    's_debug': 'gdb %(bin)s',
-    'm_exec':  'mpirun -np %(nproc)s -hostfile $PBS_NODEFILE %(bin)s',
+    's_exec':  '%(command)s', 
+    's_debug': 'gdb %(command)s',
+    'm_exec':  'mpirun -np %(nproc)s -hostfile $PBS_NODEFILE %(command)s',
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
 }
