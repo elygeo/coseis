@@ -66,10 +66,6 @@ def build( mode=None, optimize=None, dtype=None ):
             compiler = cf.fortran_serial + fflags + ('-o',)
             new |= util.make( compiler, object_, source )
     if 'm' in mode and cf.fortran_mpi[0]:
-        #if cf.machine == 'usc-hpc':
-        #    source = base + ('mpi_hpcc.f90',) + common
-        #else:
-        #    source = base + ('mpi.f90',) + common
         source = base + ('mpi.f90',) + common
         for opt in optimize:
             object_ = os.path.join( '..', 'bin', 'sord-m' + opt + dsize )
