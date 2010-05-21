@@ -10,8 +10,8 @@ import sord
 dx_ = 100.0;  nproc3 = 1, 48, 320
 dx_ = 200.0;  nproc3 = 1, 12, 160
 dx_ = 500.0;  nproc3 = 1, 4, 64
-dx_ = 1000.0; nproc3 = 1, 1, 2
 dx_ = 8000.0; nproc3 = 1, 1, 1
+dx_ = 1000.0; nproc3 = 1, 1, 2
 
 # path
 id_ = 'topo-cvm-%04.f' % dx_
@@ -123,20 +123,20 @@ for x, y, s in [
     ]
 
 # surface output
-i = max( 1, max( shape[:3] ) / 1024 )
-j = 4 * i
-m = max( 1, int( 0.025 / dt_ + 0.5 ) )
-n = max( 1, int( 0.125 / (dt_ * m) + 0.5 ) )
+ns = max( 1, max( shape[:3] ) / 1024 )
+nh = 4 * ns
+mh = max( 1, int( 0.025 / dt_ + 0.5 ) )
+ms = max( 1, int( 0.125 / (dt_ * mh) + 0.5 ) )
 fieldio += [
-    ( '=w', 'v1',  [(1,-1,i), (1,-1,i), 1, (1,-1,m)], 'full-v1' ),
-    ( '=w', 'v2',  [(1,-1,i), (1,-1,i), 1, (1,-1,m)], 'full-v2' ),
-    ( '=w', 'v3',  [(1,-1,i), (1,-1,i), 1, (1,-1,m)], 'full-v3' ),
-    ( '#w', 'v1',  [(1,-1,i), (1,-1,i), 1, (1,-1,n)], 'snap-v1' ),
-    ( '#w', 'v2',  [(1,-1,i), (1,-1,i), 1, (1,-1,n)], 'snap-v2' ),
-    ( '#w', 'v3',  [(1,-1,i), (1,-1,i), 1, (1,-1,n)], 'snap-v3' ),
-    ( '#w', 'v1',  [(1,-1,j), (1,-1,j), 1, (1,-1,m)], 'hist-v1' ),
-    ( '#w', 'v2',  [(1,-1,j), (1,-1,j), 1, (1,-1,m)], 'hist-v2' ),
-    ( '#w', 'v3',  [(1,-1,j), (1,-1,j), 1, (1,-1,m)], 'hist-v3' ),
+    ( '=w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'full-v1' ),
+    ( '=w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'full-v2' ),
+    ( '=w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'full-v3' ),
+    ( '#w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'snap-v1' ),
+    ( '#w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'snap-v2' ),
+    ( '#w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'snap-v3' ),
+    ( '#w', 'v1',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hist-v1' ),
+    ( '#w', 'v2',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hist-v2' ),
+    ( '#w', 'v3',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hist-v3' ),
 ]
 
 # stage job
@@ -156,10 +156,10 @@ open( path_ + 'meta.py', 'w' ).write( s )
 os.link( mesh_ + 'box.txt', path_ + 'box.txt' )
 
 # save decimated mesh
-nn = shape[:2]
+n = shape[:2]
 for f in 'lon', 'lat', 'topo':
-    s = np.fromfile( mesh_ + f, dtype ).reshape( nn[::-1] )
-    s[::n,::n].tofile( path_ + f )
+    s = np.fromfile( mesh_ + f, dtype ).reshape( n[::-1] )
+    s[::ns,::ns].tofile( path_ + f )
 
 # copy input files
 path_ += 'in' + os.sep

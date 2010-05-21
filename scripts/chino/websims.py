@@ -26,16 +26,15 @@ for path in glob.glob( sims ):
 
     # meta data
     meta = cvm.util.load( path + 'meta.py' )
-    name = meta.name
     extent = meta.extent
     bounds = meta.bounds
     proj = pyproj.Proj( **meta.projection )
 
     # snapshot and time history dimensions
-    nsnap = meta.shapes['snap-v1']
-    dsnap = meta.deltas['snap-v1']
+    x, y, t = meta.shapes['snap-v1']; nsnap = x, y, t
     x, y, t = meta.shapes['hist-v1']; nhist = t, x, y
-    x, y, t = meta.deltas['hist-v1']; dhist = t, x, y
+    x, y, t = meta.deltas['snap-v1']; dsnap = scale * x, scale * y, t
+    x, y, t = meta.deltas['hist-v1']; dhist = t, scale * x, scale * y
 
     # adjust bounds for WebSims (should fix WebSims instead)
     x, y = bounds[:2]
