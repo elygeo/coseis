@@ -13,8 +13,8 @@ downloadable = True
 notes = ''
 
 # shapshots
-x_shape = %(x_shape)r
-x_delta = %(x_delta)r
+x_shape = %(nsnap)r
+x_delta = %(dsnap)r
 x_unit = 'km', 'km', 's'
 x_axes = 'X', 'Y', 'Time'
 x_decimate = 1
@@ -37,8 +37,8 @@ x_plot  = [
 ]
 
 # time histories
-t_shape = %(t_shape)r
-t_delta = %(t_delta)r
+t_shape = %(nhist)r
+t_delta = %(dhist)r
 t_unit = 's', 'km', 'km'
 t_axes = 'Time', 'X', 'Y'
 t_title = 'Velocity time history'

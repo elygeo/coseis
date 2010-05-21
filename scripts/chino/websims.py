@@ -32,10 +32,10 @@ for path in glob.glob( sims ):
     proj = pyproj.Proj( **meta.projection )
 
     # snapshot and time history dimensions
-    x_shape = meta.shapes['snap-v1']
-    x_delta = meta.deltas['snap-v1']
-    x, y, t = meta.shapes['hist-v1']; t_shape = t, x, y
-    x, y, t = meta.deltas['hist-v1']; t_delta = t, x, y
+    nsnap = meta.shapes['snap-v1']
+    dsnap = meta.deltas['snap-v1']
+    x, y, t = meta.shapes['hist-v1']; nhist = t, x, y
+    x, y, t = meta.deltas['hist-v1']; dhist = t, x, y
 
     # adjust bounds for WebSims (should fix WebSims instead)
     x, y = bounds[:2]
@@ -79,7 +79,7 @@ for path in glob.glob( sims ):
     f2.close()
 
     # surface Vs
-    j, k = x_shape[:2]
+    j, k = nsnap[:2]
     n = j * k
     post = 'rm lon lat dep rho vp\nmv vs %s/vs0' % os.path.realpath( path )
     job = cvm.stage( nsample=n, nproc=nproc, post=post, workdir='run', run='exec' )
