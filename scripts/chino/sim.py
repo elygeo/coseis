@@ -10,12 +10,12 @@ import sord
 dx_ = 100.0;  nproc3 = 1, 48, 320
 dx_ = 200.0;  nproc3 = 1, 12, 160
 dx_ = 500.0;  nproc3 = 1, 4, 64
-dx_ = 8000.0; nproc3 = 1, 1, 1
 dx_ = 1000.0; nproc3 = 1, 1, 2
+dx_ = 8000.0; nproc3 = 1, 1, 1
 
 # path
-id_ = 'flat-%04.f' % dx_
 id_ = 'topo-cvm-%04.f' % dx_
+id_ = 'flat-%04.f' % dx_
 rundir = os.path.join( 'run', 'sim', id_ )
 
 # mesh metadata
@@ -123,12 +123,20 @@ for x, y, s in [
     ]
 
 # surface output
-n = max( 1, max( shape[:3] ) / 1024 )
+i = max( 1, max( shape[:3] ) / 1024 )
+j = 4 * i
 m = max( 1, int( 0.025 / dt_ + 0.5 ) )
+n = max( 1, int( 0.125 / (dt_ * m) + 0.5 ) )
 fieldio += [
-    ( '=w', 'v1',  [(1,-1,n), (1,-1,n), 1, (1,-1,m)], 'full-v1' ),
-    ( '=w', 'v2',  [(1,-1,n), (1,-1,n), 1, (1,-1,m)], 'full-v2' ),
-    ( '=w', 'v3',  [(1,-1,n), (1,-1,n), 1, (1,-1,m)], 'full-v3' ),
+    ( '=w', 'v1',  [(1,-1,i), (1,-1,i), 1, (1,-1,m)], 'full-v1' ),
+    ( '=w', 'v2',  [(1,-1,i), (1,-1,i), 1, (1,-1,m)], 'full-v2' ),
+    ( '=w', 'v3',  [(1,-1,i), (1,-1,i), 1, (1,-1,m)], 'full-v3' ),
+    ( '#w', 'v1',  [(1,-1,i), (1,-1,i), 1, (1,-1,n)], 'snap-v1' ),
+    ( '#w', 'v2',  [(1,-1,i), (1,-1,i), 1, (1,-1,n)], 'snap-v2' ),
+    ( '#w', 'v3',  [(1,-1,i), (1,-1,i), 1, (1,-1,n)], 'snap-v3' ),
+    ( '#w', 'v1',  [(1,-1,j), (1,-1,j), 1, (1,-1,m)], 'hist-v1' ),
+    ( '#w', 'v2',  [(1,-1,j), (1,-1,j), 1, (1,-1,m)], 'hist-v2' ),
+    ( '#w', 'v3',  [(1,-1,j), (1,-1,j), 1, (1,-1,m)], 'hist-v3' ),
 ]
 
 # stage job
@@ -161,7 +169,7 @@ for f in 'z3', 'rho', 'vp', 'vs':
 # launch job
 job = sord.launch( job )
 
-# cook results
+# post-process to compute pgv, pga
 path_ = job.rundir + os.sep
 meta = sord.util.load( path_ + 'meta.py' )
 x, y, t = meta.shapes['full-v1']

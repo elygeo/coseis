@@ -254,7 +254,7 @@ def prepare_param( pm, itbuff ):
         x1 = x2 = 0.0, 0.0, 0.0
         op = line[0][0]
         mode = line[0][1:]
-        if op not in '=+':
+        if op not in '=+#':
             sys.exit( 'Error: unsupported operator: %r' % line )
         try:
             if len( line ) is 11:

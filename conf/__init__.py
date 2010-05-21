@@ -24,7 +24,7 @@ def prune( d, pattern=None, types=None ):
     pattern : regular expression of parameter names to prune
         default = '(^_)|(_$)|(^.$)|(^..$)'
     types : list of parameters types to keep
-        default = [NoneType, bool, str, int, float, tuple, list, dict]
+        default = Numpy types + [NoneType, bool, str, int, lone, float, tuple, list, dict]
         Functions, classes, and modules are pruned by default.
 
     >>> prune( {'aa': 0, 'aa_': 0, '_aa': 0, 'a_a': 0, 'b_b': prune} )
@@ -33,7 +33,10 @@ def prune( d, pattern=None, types=None ):
     if pattern == None:
         pattern = '(^_)|(_$)|(^.$)|(^..$)'
     if types == None:
-        types = type(None), bool, str, int, float, tuple, list, dict
+        types = set(
+            np.typeDict.values() +
+            [type(None), bool, str, int, long, float, tuple, list, dict]
+        )
     grep = re.compile( pattern )
     for k in d.keys():
         if grep.search( k ) or type( d[k] ) not in types:

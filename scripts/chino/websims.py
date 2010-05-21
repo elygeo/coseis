@@ -32,10 +32,10 @@ for path in glob.glob( sims ):
     proj = pyproj.Proj( **meta.projection )
 
     # snapshot and time history dimensions
-    x_shape = meta.shapes['snap']
-    t_shape = meta.shapes['hist']
-    x, y, z = meta.deltas['snap']; x_delta = scale * x, scale * y, scale * z
-    x, y, z = meta.deltas['hist']; t_delta = scale * x, scale * y, scale * z
+    x_shape = meta.shapes['snap-v1']
+    x_delta = meta.deltas['snap-v1']
+    x, y, t = meta.shapes['hist-v1']; t_shape = t, x, y
+    x, y, t = meta.deltas['hist-v1']; t_delta = t, x, y
 
     # adjust bounds for WebSims (should fix WebSims instead)
     x, y = bounds[:2]
