@@ -23,9 +23,10 @@ echo "$( date ): %(name)s started" >> log
 rsync -rlpt . /scratch/job
 cd /scratch/job
 mpiexec --mca mtl mx --mca pml cm %(command)s
-#mpiexec -np %(nproc)s %(command)s
 cd "%(rundir)s"
-rsync -rlpt /scratch/job/ .
+rsync -rlpt --delete /scratch/job/ .
 %(post)s
 echo "$( date ): %(name)s finished" >> log
+
+rm sync.sh
 
