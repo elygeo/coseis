@@ -17,9 +17,9 @@ ntop = meta.ntop
 
 # read data
 n = shape[:2]
-x = np.fromfile( 'lon', dtype ).reshape( n[::-1] )
-y = np.fromfile( 'lat', dtype ).reshape( n[::-1] )
-z = np.fromfile( 'topo', dtype ).reshape( n[::-1] )
+x = np.fromfile( 'lon', dtype ).reshape( n[::-1] ).T
+y = np.fromfile( 'lat', dtype ).reshape( n[::-1] ).T
+z = np.fromfile( 'topo', dtype ).reshape( n[::-1] ).T
 
 # PML regions are extruded
 for w in x, y, z:

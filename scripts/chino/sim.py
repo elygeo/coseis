@@ -10,11 +10,11 @@ import sord
 dx_ = 100.0;  nproc3 = 1, 48, 320
 dx_ = 200.0;  nproc3 = 1, 12, 160
 dx_ = 500.0;  nproc3 = 1, 4, 64
-dx_ = 1000.0; nproc3 = 1, 1, 2
 dx_ = 8000.0; nproc3 = 1, 1, 1
+dx_ = 1000.0; nproc3 = 1, 1, 2
 
 # path
-id_ = 'topo-%04.f' % dx_
+id_ = 'cvm-topo-%04.f' % dx_
 id_ = 'flat-%04.f' % dx_
 rundir = os.path.join( 'run', 'sim', id_ )
 
@@ -61,18 +61,26 @@ bc2 = 10, 10, 10
 
 # material
 hourglass = 1.0, 1.0
-vp1 = 1500.0
-vs1 = 500.0
-vdamp = 400.0
-gam2 = 0.8
-fieldio = [
-    ( '=r', 'rho', [], 'rho' ),
-    ( '=r', 'vp',  [], 'vp'  ),
-    ( '=r', 'vs',  [], 'vs'  ),
-]
+if 'cvm' in id_:
+    vp1 = 1500.0
+    vs1 = 500.0
+    vdamp = 400.0
+    gam2 = 0.8
+    fieldio = [
+        ( '=r', 'rho', [], 'rho' ),
+        ( '=r', 'vp',  [], 'vp'  ),
+        ( '=r', 'vs',  [], 'vs'  ),
+    ]
+else:
+    fieldio = [
+        ( '=',  'rho', [], 2670.0 ),
+        ( '=',  'vp',  [], 6000.0 ),
+        ( '=',  'vs',  [], 3464.0 ),
+        ( '=',  'gam', [], 0.3    ),
+    ]
 
 # topography
-if id_.startswith( 'topo' ):
+if 'topo' in id_:
     fieldio += [
         ( '=r', 'x3',  [], 'z3'  )
     ]
