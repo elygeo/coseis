@@ -68,7 +68,7 @@ for path in glob.glob( sims ):
     f2 = open( path + 'mapdata-xyz.txt', 'w' )
     for kind in 'coastlines', 'borders':
         x, y = cvm.data.mapdata( kind, 'high', extent, 10.0 )
-        z = cvm.coord.interp2( lon[0]+360.0, lat[0], ddeg, ddeg, topo, x, y )
+        z = cvm.coord.interp2( (lon[0]+360.0, lat[0]), (ddeg, ddeg), topo, (x, y) )
         np.savetxt( f1, np.array( [x,y,z] ).T )
         x, y = proj( x, y )
         x, y, i = cvm.data.clipdata( x, y, bounds )

@@ -9,14 +9,26 @@ import coord, gocad
 # projection
 proj = pyproj.Proj( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
 
-def voxet( name, property_id=None ):
+# lookup tables
+voxet3d = { 'mantle': 'CVM_CM', 'lowres': 'CVM_LR', 'hires': 'CVM_HR' }
+prop3d = { 'rho': '1', 'vp': '1', 'vs': '3', 'tag': '2' }
+prop2d = { 'topo': '1', 'basement': '2', 'moho': '3' }
+
+def read_voxet( property, voxet=None ):
     """
     Download and read SCEC CVM-H voxet.
 
-    Should not be used directly. Use Extraction() instead.
-    name: 'CVM_CM', 'CVM_LR', 'CVM_HR', or 'interfaces'.
-    property_id: '1', '2', or '3'.
+    2d options
+    ----------
+        property: 'topo', 'basement', 'moho'
+
+    3d options
+    ----------
+        property: 'rho', 'vp', 'vs', or 'tag'
+        voxet: 'mantle', 'lores', 'hires'
     """
+
+    # download if not found
     repo = os.path.expanduser( '~/mapdata' )
     url = 'http://structure.harvard.edu/cvm-h/download/vx62.tar.bz2'
     version = os.path.basename( url ).split( '.' )[0]
@@ -29,65 +41,90 @@ def voxet( name, property_id=None ):
         urllib.urlretrieve( url, f )
         if os.system( 'tar jxv -C %r -f %r' % (repo, f) ):
             sys.exit( 'Error extraction tar file' )
-    f = os.path.join( path, name + '.vo' )
-    vox = gocad.voxet( f, property_id )['1']
-    if property_id == None:
-        return vox
+
+    # lookup property
+    if property in prop2d:
+        prop = prop2d[property] 
+        vox = 'interfaces'
     else:
-        origin  = vox['AXIS']['O']
-        j, k, l = vox['AXIS']['N']
-        u, v, w = vox['AXIS']['U'][0], vox['AXIS']['V'][1], vox['AXIS']['W'][2]
+        prop = prop3d[property] 
+        vox = voxet3d[voxet] 
+
+    # load voxet
+    f = os.path.join( path, vox + '.vo' )
+    vox = gocad.voxet( f, prop )['1']
+
+    # axes origin and step size
+    j, k, l = vox['AXIS']['N']
+    u, v, w = vox['AXIS']['U'][0], vox['AXIS']['V'][1], vox['AXIS']['W'][2]
+    if property in prop2d:
+        origin = vox['AXIS']['O'][:2]
+        delta = u / (j - 1), v / (k - 1)
+    else:
+        origin = vox['AXIS']['O']
         delta = u / (j - 1), v / (k - 1), w / (l - 1)
-        data = vox['PROP'][property_id]['DATA']
-        return origin, delta, data
+
+    # data
+    data = vox['PROP'][prop]['DATA']
+    if property in prop2d:
+        data = data.reshape( (j, k) )
+    if property == 'rho':
+        data *= 0.001
+        data = 1000.0 * (data * (1.6612 + data * (-0.4721 + data * (0.0671 +
+            f * (-0.0043 + data * 0.000106)))))
+        data = np.maximum( data, 1000.0 )
+
+    return origin, delta, data
 
 class Extraction():
     """
     SCEC CVM-H extraction.
 
-    Initialize with property: 'rho', 'vp', 'vs', or 'tag'.
-    Call with extaction coordinates: x, y, and z.
+    Initialization with property: 'topo', 'basement', 'moho', 'rho', 'vp', 'vs', or 'tag'
+    Call with extraction coordinates: x, y, z
     """
     def __init__( self, property ):
         self.property = property
-        if property in ('dem', 'topo'):
-            self.voxet = [ voxet( 'interfaces', '1' ) ]
+        if property in prop2d:
+            self.voxet = [ read_voxet( property ) ]
         else:
-            id_ = {'rho': '1', 'vp': '1', 'vs': '3', 'tag': '2'}[property]
             self.voxet = []
-            for name in 'CVM_CM', 'CVM_LR', 'CVM_HR':
-                origin, delta, f = voxet( name, id_ )
-                if property == 'rho':
-                    f *= 0.001
-                    f = 1000.0 * (f * (1.6612 + f * (-0.4721 + f * (0.0671 +
-                        f * (-0.0043 + f * 0.000106)))))
-                    f = np.maximum( f, 1000.0 )
-                self.voxet += [ (origin, delta, f) ]
+            for vox in 'mantle', 'lowres', 'hires':
+                self.voxet += [ read_voxet( property, vox ) ]
         return
-    def __call__( self, x, y, z ):
-        ff = np.empty_like( x )
-        ff.fill( np.nan )
+    def __call__( self, x, y, z=None ):
+        f = np.empty_like( x )
+        f.fill( np.nan )
         for origin, delta, data in self.voxet:
-            x0, y0, z0 = origin
-            dx, dy, dz = delta
-            f, i = coord.interp3( x0, y0, z0, dx, dy, dz, data, x, y, z )
-            ff[...,i] = f[...,i]
+            if self.property in prop2d:
+                coord.interp2( origin, delta, data, (x, y), f )
+            else:
+                coord.interp3( origin, delta, data, (x, y, z), f )
         return f
 
-# continue if run from the command line
+# continue with test if run from the command line
 if __name__ == '__main__':
-    import pprint
     import matplotlib.pyplot as plt
 
-    vox = voxet( 'interfaces' )
-    pprint.pprint( vox )
-    o, d, v = voxet( 'interfaces', '1' )
+    topo = Extraction( 'topo' )
+    vp = Extraction( 'vp' )
 
-    fig = plt.gcf()
-    fig.clf()
+    x = np.arange( -118, -116, 0.01)
+    y = np.arange( 33, 35, 0.01)
+    y, x = np.meshgrid( y, x )
+    x, y = proj( x, y )
+    z = topo( x, y ) - 300.0
+    f = vp( x, y, z )
+
+    fig = plt.figure()
     ax = plt.gca()
-    ax.imshow( v.squeeze().T, origin='lower', interpolation='nearest' )
+    ax.imshow( z.T, origin='lower', interpolation='nearest' )
     ax.axis( 'image' )
-    fig.canvas.draw()
-    fig.show()
+
+    fig = plt.figure()
+    ax = plt.gca()
+    ax.imshow( f.T, origin='lower', interpolation='nearest' )
+    ax.axis( 'image' )
+
+    plt.show()
 
