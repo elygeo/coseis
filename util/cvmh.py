@@ -5,27 +5,32 @@ SCEC Community Velocity Model (CVM-H) extraction tool
 import os, sys, urllib, pyproj
 import numpy as np
 import coord, gocad
+reload( coord )
+reload( gocad )
 
 # projection
 proj = pyproj.Proj( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
 
 # lookup tables
-voxet3d = { 'mantle': 'CVM_CM', 'lowres': 'CVM_LR', 'hires': 'CVM_HR' }
-prop3d = { 'rho': '1', 'vp': '1', 'vs': '3', 'tag': '2' }
-prop2d = { 'topo': '1', 'basement': '2', 'moho': '3' }
+prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
+prop3d = {'rho': '1', 'vp': '1', 'vs': '3', 'tag': '2'}
+voxet3d = {'mantle': 'CVM_CM', 'crust': 'CVM_LR', 'lab': 'CVM_HR'}
 
 def read_voxet( property, voxet=None ):
     """
     Download and read SCEC CVM-H voxet.
 
-    2d options
+    Parameters
     ----------
-        property: 'topo', 'basement', 'moho'
+        2d property: 'topo', 'base', or 'moho'
+        3d property: 'rho', 'vp', 'vs', or 'tag'
+        3d voxet: 'mantle', 'crust', 'lab'
 
-    3d options
-    ----------
-        property: 'rho', 'vp', 'vs', or 'tag'
-        voxet: 'mantle', 'lores', 'hires'
+    Returns
+    -------
+        origin: (x0, y0, z0)
+        delta: (dx, dy, dz)
+        data: property voxet array
     """
 
     # download if not found
@@ -81,48 +86,68 @@ class Extraction():
     """
     SCEC CVM-H extraction.
 
-    Initialization with property: 'topo', 'basement', 'moho', 'rho', 'vp', 'vs', or 'tag'
-    Call with extraction coordinates: x, y, z
+    Init parameters
+    ---------------
+        2d property: 'topo', 'base', or 'moho'
+        3d property: 'rho', 'vp', 'vs', or 'tag'
+        3d voxet list: ['mantle', 'crust', 'lab']
+
+    Call parameters
+    ---------------
+        x, y, z: sample coordinate arrays.
+        out (optional): output array, same shape as x, y, and z.
+ 
+    Returns
+    -------
+        f: property samples at coordinates (x, y, z)
     """
-    def __init__( self, property ):
+    def __init__( self, property, voxet=['mantle', 'crust', 'lab'] ):
         self.property = property
         if property in prop2d:
             self.voxet = [ read_voxet( property ) ]
         else:
             self.voxet = []
-            for vox in 'mantle', 'lowres', 'hires':
+            for vox in voxet:
                 self.voxet += [ read_voxet( property, vox ) ]
         return
-    def __call__( self, x, y, z=None ):
-        f = np.empty_like( x )
-        f.fill( np.nan )
+    def __call__( self, x, y, z=None, out=None ):
+        if out == None:
+            out = np.empty_like( x )
+            out.fill( np.nan )
         for origin, delta, data in self.voxet:
             if self.property in prop2d:
-                coord.interp2( origin, delta, data, (x, y), f )
+                coord.interp2( origin, delta, data, (x, y), out )
             else:
-                coord.interp3( origin, delta, data, (x, y, z), f )
-        return f
+                coord.interp3( origin, delta, data, (x, y, z), out )
+        return out
 
 # continue with test if run from the command line
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    topo = Extraction( 'topo' )
-    vp = Extraction( 'vp' )
-
-    x = np.arange( -119.5, -116.5, 0.01)
-    y = np.arange( 33, 35, 0.01)
-    y, x = np.meshgrid( y, x )
-    x, y = proj( x, y )
-    z = topo( x, y ) - 300.0
-    f = vp( x, y, z )
-
-    fig = plt.figure()
+    o, d, f = read_voxet( 'topo' )
+    fig = plt.figure(1)
+    fig.clf()
     ax = plt.gca()
-    ax.imshow( z.T, origin='lower', interpolation='nearest' )
+    ax.imshow( f.T, origin='lower', interpolation='nearest' )
     ax.axis( 'image' )
 
-    fig = plt.figure()
+    topo = Extraction( 'topo' )
+    vp = Extraction( 'vp', ['crust'] )
+
+    x = np.arange( -120.0, -114.5, 0.02 )
+    y = np.arange( 32.0, 35.6, 0.02 )
+
+    x = np.arange( -121.2, -113.3, 0.02 )
+    y = np.arange( 30.9, 36.7, 0.02 )
+
+    y, x = np.meshgrid( y, x )
+    x, y = proj( x, y )
+    z = topo( x, y ) - 400.0
+    f = vp( x, y, z )
+
+    fig = plt.figure(3)
+    fig.clf()
     ax = plt.gca()
     ax.imshow( f.T, origin='lower', interpolation='nearest' )
     ax.axis( 'image' )

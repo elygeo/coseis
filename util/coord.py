@@ -43,7 +43,7 @@ def solve2( A, b ):
     return np.array( [b[0] * A[1,1] - b[1] * A[0,1],
                       b[1] * A[0,0] - b[0] * A[1,0]] )
 
-def interp( origin, delta, f, coords, fi=None, extrapolate=False ):
+def interp( origin, delta, f, coords, out=None, extrapolate=False ):
     """
     1D interpolation on a regular grid
     """
@@ -53,18 +53,18 @@ def interp( origin, delta, f, coords, fi=None, extrapolate=False ):
     j = np.int32( xi )
     n = f.shape[-1]
     if not extrapolate:
-        i = (j >= 0) | (j <= n-2)
+        i = (j >= 0) & (j <= n-2)
     j = np.minimum( np.maximum( j, 0 ), n-2 )
     f = (1.0 - xi + j) * f[...,j] + (xi - j) * f[...,j+1]
     if not extrapolate:
         f[...,~i] = np.nan
-        if fi != None:
-            fi[...,i] = f[...,i]
-    elif fi != None:
-        fi[...] = f[...]
+        if out != None:
+            out[...,i] = f[...,i]
+    elif out != None:
+        out[...] = f[...]
     return f
 
-def interp2( origin, delta, f, coords, fi=None, extrapolate=False ):
+def interp2( origin, delta, f, coords, out=None, extrapolate=False ):
     """
     2D interpolation on a regular grid
     """
@@ -76,8 +76,8 @@ def interp2( origin, delta, f, coords, fi=None, extrapolate=False ):
     k = np.array( yi, 'i' )
     n = f.shape
     if not extrapolate:
-        i = ( (j >= 0) | (j <= n[-2]-2)
-            | (k >= 0) | (k <= n[-1]-2) )
+        i = ( (j >= 0) & (j <= n[-2]-2)
+            & (k >= 0) & (k <= n[-1]-2) )
     j = np.minimum( np.maximum( j, 0 ), n[-2]-2 )
     k = np.minimum( np.maximum( k, 0 ), n[-1]-2 )
     f = ( ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * f[...,j,k]
@@ -86,13 +86,13 @@ def interp2( origin, delta, f, coords, fi=None, extrapolate=False ):
         + (       xi - j ) * (       yi - k ) * f[...,j+1,k+1] )
     if not extrapolate:
         f[...,~i] = np.nan
-        if fi != None:
-            fi[...,i] = f[...,i]
-    elif fi != None:
-        fi[...] = f[...]
+        if out != None:
+            out[...,i] = f[...,i]
+    elif out != None:
+        out[...] = f[...]
     return f
 
-def interp3( origin, delta, f, coords, fi=None, extrapolate=False ):
+def interp3( origin, delta, f, coords, out=None, extrapolate=False ):
     """
     3D interpolation on a regular grid
     """
@@ -106,9 +106,9 @@ def interp3( origin, delta, f, coords, fi=None, extrapolate=False ):
     l = np.array( zi, 'i' )
     n = f.shape
     if not extrapolate:
-        i = ( (j >= 0) | (j <= n[-3]-2)
-            | (k >= 0) | (k <= n[-2]-2)
-            | (l >= 0) | (l <= n[-1]-2) )
+        i = ( (j >= 0) & (j <= n[-3]-2)
+            & (k >= 0) & (k <= n[-2]-2)
+            & (l >= 0) & (l <= n[-1]-2) )
     j = np.minimum( np.maximum( j, 0 ), n[-3]-2 )
     k = np.minimum( np.maximum( k, 0 ), n[-2]-2 )
     l = np.minimum( np.maximum( l, 0 ), n[-1]-2 )
@@ -122,10 +122,10 @@ def interp3( origin, delta, f, coords, fi=None, extrapolate=False ):
         + (       xi - j ) * (       yi - k ) * (       zi - l ) * f[...,j+1,k+1,l+1] )
     if not extrapolate:
         f[...,~i] = np.nan
-        if fi != None:
-            fi[...,i] = f[...,i]
-    elif fi != None:
-        fi[...] = f[...]
+        if out != None:
+            out[...,i] = f[...,i]
+    elif out != None:
+        out[...] = f[...]
     return f
 
 def ibilinear( xx, yy, xi, yi ):
