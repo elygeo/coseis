@@ -6,7 +6,7 @@ import os, sys, re, math, pprint
 import numpy as np
 import conf, fieldnames
 from conf import launch
-from util import swab, util, coord, signal, source, data, viz, plt, mlab, egmm
+from util import swab, util, coord, signal, source, data, viz, plt, mlab, egmm, cvmh
 try:
     from util import rspectra
 except( ImportError ):

@@ -25,44 +25,6 @@ import coord, util
 
 repo = os.path.expanduser( '~/mapdata' )
 
-def tsurf( path ):
-    """
-    Read GOCAD (http://www.gocad.org) trigulated surface "Tsurf" files.
-    """
-    fh = open( path )
-    tsurf = []
-    for line in fh.readlines():
-        f = line.split()
-        if line.startswith( 'GOCAD TSurf' ):
-            tface, vrtx, trgl, border, bstone, name, color = [], [], [], [], [], None, None
-        elif f[0] in ('VRTX', 'PVRTX'):
-            vrtx += [[float(f[2]), float(f[3]), float(f[4])]]
-        elif f[0] in ('ATOM', 'PATOM'):
-            i = int( f[2] ) - 1
-            vrtx += [ vrtx[i] ]
-        elif f[0] == 'TRGL':
-            trgl += [[int(f[1]) - 1, int(f[2]) - 1, int(f[3]) - 1]]
-        elif f[0] == 'BORDER':
-            border += [[int(f[2]) - 1, int(f[3]) - 1]]
-        elif f[0] == 'BSTONE':
-            bstone += [int(f[1]) - 1]
-        elif f[0] == 'TFACE':
-            if trgl != []:
-                tface += [ np.array( trgl, 'i' ).T ]
-            trgl = []
-        elif f[0] == 'END':
-            vrtx   = np.array( vrtx, 'f' ).T
-            border = np.array( border, 'i' ).T
-            bstone = np.array( bstone, 'i' ).T
-            tface += [ np.array( trgl, 'i' ).T ]
-            tsurf += [[vrtx, tface, border, bstone, name, color]]
-        elif line.startswith( 'name:' ):
-            name = line.split( ':', 1 )[1].strip()
-        elif line.startswith( '*solid*color:' ):
-            f = line.split( ':' )[1].split()
-            color = float(f[0]), float(f[1]), float(f[2])
-    return tsurf
-
 def etopo1( indices=None, downsample=1 ):
     """
     Download ETOPO1 Global Relief Model.
