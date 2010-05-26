@@ -37,8 +37,9 @@ def read_voxet( property, voxet=None ):
         if not os.path.exists( repo ):
             os.makedirs( repo )
         f = os.path.join( repo, os.path.basename( url ) )
-        print( 'Downloading %s' % url )
-        urllib.urlretrieve( url, f )
+        if not os.path.exists( f ):
+            print( 'Downloading %s' % url )
+            urllib.urlretrieve( url, f )
         if os.system( 'tar jxv -C %r -f %r' % (repo, f) ):
             sys.exit( 'Error extraction tar file' )
 
@@ -109,7 +110,7 @@ if __name__ == '__main__':
     topo = Extraction( 'topo' )
     vp = Extraction( 'vp' )
 
-    x = np.arange( -118, -116, 0.01)
+    x = np.arange( -119.5, -116.5, 0.01)
     y = np.arange( 33, 35, 0.01)
     y, x = np.meshgrid( y, x )
     x, y = proj( x, y )
