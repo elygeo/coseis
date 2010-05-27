@@ -15,7 +15,7 @@ property2d = {'topo': '1', 'base': '2', 'moho': '3'}
 property3d = {'rho': '1', 'vp': '1', 'vs': '3', 'tag': '2'}
 voxet3d = {'mantle': 'CVM_CM', 'crust': 'CVM_LR', 'lab': 'CVM_HR'}
 
-def read_voxet( property=None, voxet=None ):
+def read_voxet( property=None, voxet=None, no_data_value='nan' ):
     """
     Download and read SCEC CVM-H voxet.
 
@@ -58,7 +58,7 @@ def read_voxet( property=None, voxet=None ):
 
     # load voxet
     f = os.path.join( path, voxet + '.vo' )
-    voxet = gocad.voxet( f, property )['1']
+    voxet = gocad.voxet( f, property, no_data_value )['1']
 
     # extent
     x, y, z = voxet['AXIS']['O']
@@ -97,14 +97,14 @@ class Extraction():
     -------
         f: property samples at coordinates (x, y, z)
     """
-    def __init__( self, property, voxet=['mantle', 'crust', 'lab'] ):
+    def __init__( self, property, voxet=['mantle', 'crust', 'lab'], no_data_value='nan' ):
         self.property = property
         if property in property2d:
             self.voxet = [ read_voxet( property ) ]
         else:
             self.voxet = []
             for vox in voxet:
-                self.voxet += [ read_voxet( property, vox ) ]
+                self.voxet += [ read_voxet( property, vox, no_data_value ) ]
         return
     def __call__( self, x, y, z=None, out=None, interpolation='linear' ):
         if out == None:
@@ -118,7 +118,7 @@ class Extraction():
                 coord.interp3( extent, data, (x, y, z), out, method=interpolation )
         return out
 
-def dplane( lim, delta=500.0, property='vp', interpolation='linear' ):
+def dplane( extract, lim, delta=500.0, interpolation='linear' ):
     """
     Depth plane plot.
     """
@@ -135,15 +135,18 @@ def dplane( lim, delta=500.0, property='vp', interpolation='linear' ):
     fig = plt.figure()
     fig.clf()
     ax = plt.gca()
-    m = Extraction( 'topo' )
-    z = m( x, y, interpolation='linear' ) - z0
-    m = Extraction( property )
-    f = m( x, y, z, interpolation=interpolation )
-    ax.imshow( f.T, extent=ex, vmin=v1, vmax=v2, origin='lower', interpolation='nearest' )
-    ax.set_title( '%s %s' % (interpolation, property) )
+    topo = Extraction( 'topo' )
+    z = topo( x, y, interpolation='linear' ) - z0
+    f = extract( x, y, z, interpolation=interpolation )
+    im = ax.imshow( f.T, extent=ex, vmin=v1, vmax=v2, origin='lower', interpolation='nearest' )
+    fig.colorbar( im )
+    x, y = mapdata
+    ax.plot( scale * x, scale * y, '-k' )
+    ax.set_title( extract.property )
+    ax.axis( ex )
     return fig
 
-def xsection( lim, delta=(500.0, 50.0), property='vp', interpolation='linear' ):
+def xsection( extract, interfaces, lim, delta=(500.0, 50.0), interpolation='linear' ):
     """
     Cross section plot.
     """
@@ -165,35 +168,45 @@ def xsection( lim, delta=(500.0, 50.0), property='vp', interpolation='linear' ):
     fig = plt.figure()
     fig.clf()
     ax = plt.gca()
-    m = Extraction( 'topo' )
-    f = m( xx, yy, interpolation='linear' )
-    ax.plot( scale*r, scale*f, 'k-' )
-    m = Extraction( 'base' )
-    f = m( xx, yy, interpolation='linear' )
-    ax.plot( scale*r, scale*f, 'k-' )
-    m = Extraction( 'moho' )
-    f = m( xx, yy, interpolation='linear' )
-    ax.plot( scale*r, scale*f, 'k-' )
-    m = Extraction( property )
-    f = m( xx, yy, zz, interpolation=interpolation )
-    ax.imshow( f.T, extent=ex, vmin=v1, vmax=v2, origin='lower', interpolation='nearest' )
+    f = extract( xx, yy, zz, interpolation=interpolation )
+    im = ax.imshow( f.T, extent=ex, vmin=v1, vmax=v2, origin='lower', interpolation='nearest' )
+    fig.colorbar( im, orientation='horizontal' )
+    ax.set_title( extract.property )
+    for m in interfaces:
+        f = m( x, y, interpolation='linear' )
+        ax.plot( scale * r, scale * f, 'k-' )
     ax.axis( 'auto' )
     ax.axis( ex )
-    ax.set_title( '%s %s' % (interpolation, property) )
     return fig
 
 # continue if run from the command line
 if __name__ == '__main__':
 
+    # extraction function
+    vp = Extraction( 'vp', ['crust'] )
+
     # cross sections
-    delta = 100.0, 10.0
-    lim = (400000.0, 400000.0), (3740000.0, 3860000.0), (-2000.0, 2000.0), (1000.0, 6000.0)
-    xsection( lim, delta, 'vp', 'nearest' ).show()
-    xsection( lim, delta, 'vp', 'linear' ).show()
+    if 1:
+        interfaces = Extraction( 'topo' ), Extraction( 'base' )
+        delta = 100.0, 10.0
+        lim = (400000.0, 400000.0), (3740000.0, 3860000.0), (-2000.0, 2000.0), (1000.0, 6000.0)
+        xsection( vp, interfaces, lim, delta, 'nearest' ).show()
+        xsection( vp, interfaces, lim, delta, 'linear' ).show()
 
     # depth planes
-    delta = 500.0
-    lim = extent[0], extent[1], 200.0, (1000.0, 6000.0)
-    dplane( lim, delta, 'vp', 'nearest' ).show()
-    dplane( lim, delta, 'vp', 'linear' ).show()
+    if 1:
+        if 1:
+            import data
+            ll = (-121.3, -113.3), (30.9, 36.8)
+            x, y = data.mapdata( 'coast', 'high', ll, 20.0, 1, 1 )
+            u, v = data.mapdata( 'border', 'high', ll, delta=0.1 )
+            x = np.r_[ x, np.nan, u ]
+            y = np.r_[ y, np.nan, v ]
+            mapdata = proj( x, y )
+        else:
+            mapdata = None
+        delta = 500.0
+        lim = extent[0], extent[1], 200.0, (1000.0, 6000.0)
+        dplane( vp, mapdata, lim, delta, 'nearest' ).show()
+        dplane( vp, mapdata, lim, delta, 'linear' ).show()
 

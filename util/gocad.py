@@ -38,7 +38,7 @@ def header( lines, counter=0, casters=None ):
     sys.exit( 'Error in header' )
     return
 
-def voxet( path, property=None ):
+def voxet( path, property=None, no_data_value='nan' ):
     """
     GOCAD voxet reader
     """
@@ -83,7 +83,10 @@ def voxet( path, property=None ):
                 f = os.path.join( os.path.dirname( path ), p['FILE'] )
                 dtype = '>f%s' % p['ESIZE']
                 data = np.fromfile( f, dtype )
-                data[data==p['NO_DATA_VALUE']] = np.nan
+                if no_data_value == 'nan':
+                    data[data==p['NO_DATA_VALUE']] = np.nan
+                elif no_data_value != None:
+                    data[data==p['NO_DATA_VALUE']] = no_data_value
                 p['DATA'] = data.reshape( n[::-1] ).T
             voxet[id_] = {'HEADER': hdr, 'AXIS': axis, 'PROP': prop}
     return voxet
