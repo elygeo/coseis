@@ -8,13 +8,14 @@ import coord, gocad
 
 # projection
 proj = pyproj.Proj( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
+extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
 
 # lookup tables
-prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
-prop3d = {'rho': '1', 'vp': '1', 'vs': '3', 'tag': '2'}
+property2d = {'topo': '1', 'base': '2', 'moho': '3'}
+property3d = {'rho': '1', 'vp': '1', 'vs': '3', 'tag': '2'}
 voxet3d = {'mantle': 'CVM_CM', 'crust': 'CVM_LR', 'lab': 'CVM_HR'}
 
-def read_voxet( property, voxet=None ):
+def read_voxet( property=None, voxet=None ):
     """
     Download and read SCEC CVM-H voxet.
 
@@ -46,32 +47,35 @@ def read_voxet( property, voxet=None ):
         if os.system( 'tar jxv -C %r -f %r' % (repo, f) ):
             sys.exit( 'Error extraction tar file' )
 
-    # lookup property
-    if property in prop2d:
-        prop = prop2d[property] 
-        vox = 'interfaces'
-    else:
-        prop = prop3d[property] 
-        vox = voxet3d[voxet] 
+    # lookup property and voxet
+    if property in property2d:
+        property = property2d[property]
+        voxet = 'interfaces'
+    if property in property3d:
+        property = property3d[property]
+    if voxet in voxet3d:
+        voxet = voxet3d[voxet]
 
     # load voxet
-    f = os.path.join( path, vox + '.vo' )
-    vox = gocad.voxet( f, prop )['1']
-
-    # data
-    data = vox['PROP'][prop]['DATA']
-    if property == 'rho':
-        data *= 0.001
-        data = 1000.0 * (data * (1.6612 + data * (-0.4721 + data * (0.0671 +
-            f * (-0.0043 + data * 0.000106)))))
-        data = np.maximum( data, 1000.0 )
+    f = os.path.join( path, voxet + '.vo' )
+    voxet = gocad.voxet( f, property )['1']
 
     # extent
-    x, y, z = vox['AXIS']['O']
-    u, v, w = vox['AXIS']['U'][0], vox['AXIS']['V'][1], vox['AXIS']['W'][2]
+    x, y, z = voxet['AXIS']['O']
+    u, v, w = voxet['AXIS']['U'][0], voxet['AXIS']['V'][1], voxet['AXIS']['W'][2]
     extent = (x, x + u), (y, y + v), (z, z + w)
 
-    return data, extent
+    # data
+    if property == None:
+        return voxet, extent
+    else:
+        data = voxet['PROP'][property]['DATA']
+        if property == 'rho':
+            data *= 0.001
+            data = 1000.0 * (data * (1.6612 + data * (-0.4721 + data * (0.0671 +
+                f * (-0.0043 + data * 0.000106)))))
+            data = np.maximum( data, 1000.0 )
+        return data, extent
 
 class Extraction():
     """
@@ -88,14 +92,14 @@ class Extraction():
         x, y, z: sample coordinate arrays.
         out (optional): output array, same shape as x, y, and z.
         interpolation: 'nearest', 'linear'
- 
+
     Returns
     -------
         f: property samples at coordinates (x, y, z)
     """
     def __init__( self, property, voxet=['mantle', 'crust', 'lab'] ):
         self.property = property
-        if property in prop2d:
+        if property in property2d:
             self.voxet = [ read_voxet( property ) ]
         else:
             self.voxet = []
@@ -107,7 +111,7 @@ class Extraction():
             out = np.empty_like( x )
             out.fill( np.nan )
         for data, extent in self.voxet:
-            if self.property in prop2d:
+            if self.property in property2d:
                 data = data.reshape( data.shape[:2] )
                 coord.interp2( extent[:2], data, (x, y), out, method=interpolation )
             else:
@@ -121,10 +125,8 @@ if __name__ == '__main__':
     topo = Extraction( 'topo' )
     vp = Extraction( 'vp' )
 
-    d = 0.002; extent = (-121.2, -113.3), (30.9, 36.7)
-    d = 250.0; extent = (131000.0, 828000.0), (3431000.0, 4058000.0)
-
-    x, y = extent
+    d = 250.0
+    x, y = extent[:2]
     x = np.arange( x[0], x[1] + d, 2 * d )
     y = np.arange( y[0], y[1] + d, 2 * d )
     y, x = np.meshgrid( y, x )
