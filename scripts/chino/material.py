@@ -60,9 +60,7 @@ box = x, y
 extent = (x.min(), x.max()), (y.min(), y.max())
 
 # topography
-topo, ll = cvm.data.topo( extent )
-lon, lat = ll
-ddeg = 0.5 / 60.0
+topo, topo_extent = cvm.data.topo( extent )
 
 # mesh
 x, y, z = bounds
@@ -70,7 +68,7 @@ x = np.arange( shape[0] ) * delta[0] + x[0]
 y = np.arange( shape[1] ) * delta[1] + y[0]
 y, x = np.meshgrid( y, x )
 x, y = proj( x, y, inverse=True )
-z = cvm.coord.interp2( (lon[0], lat[0]), (ddeg, ddeg), topo, (x, y) )
+z = cvm.coord.interp2( topo_extent, topo, (x, y) )
 x = np.array( x, 'f' )
 y = np.array( y, 'f' )
 z = np.array( z, 'f' )

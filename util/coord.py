@@ -43,12 +43,14 @@ def solve2( A, b ):
     return np.array( [b[0] * A[1,1] - b[1] * A[0,1],
                       b[1] * A[0,0] - b[0] * A[1,0]] )
 
-def interp( origin, delta, f, coords, out=None, extrapolate=False ):
+def interp( extent, f, coords, out=None, extrapolate=False ):
     """
     1D interpolation on a regular grid
     """
     f = np.asarray( f )
-    xi = (np.asarray( coords ) - origin) / delta
+    x0, x1 = extent
+    delta = (x1 - x0) / (f.shape[-1] - 1)
+    xi = (np.asarray( coords ) - x0) / delta
     del( coords )
     j = np.int32( xi )
     n = f.shape[-1]
@@ -64,26 +66,38 @@ def interp( origin, delta, f, coords, out=None, extrapolate=False ):
         out[...] = f[...]
     return f
 
-def interp2( origin, delta, f, coords, out=None, extrapolate=False ):
+def interp2( extent, f, coords, out=None, method='linear', extrapolate=False ):
     """
     2D interpolation on a regular grid
     """
     f = np.asarray( f )
-    xi = (np.asarray( coords[0] ) - origin[0]) / delta[0]
-    yi = (np.asarray( coords[1] ) - origin[1]) / delta[1]
+    x0, x1 = np.array( extent ).T
+    delta = (x1 - x0) / (np.array( f.shape[-2:] ) - 1)
+    xi = (np.asarray( coords[0] ) - x0[0]) / delta[0]
+    yi = (np.asarray( coords[1] ) - x0[1]) / delta[1]
     del( coords )
-    j = np.array( xi, 'i' )
-    k = np.array( yi, 'i' )
     n = f.shape
-    if not extrapolate:
-        i = ( (j >= 0) & (j <= n[-2]-2)
-            & (k >= 0) & (k <= n[-1]-2) )
-    j = np.minimum( np.maximum( j, 0 ), n[-2]-2 )
-    k = np.minimum( np.maximum( k, 0 ), n[-1]-2 )
-    f = ( ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * f[...,j,k]
-        + ( 1.0 - xi + j ) * (       yi - k ) * f[...,j,k+1]
-        + (       xi - j ) * ( 1.0 - yi + k ) * f[...,j+1,k]
-        + (       xi - j ) * (       yi - k ) * f[...,j+1,k+1] )
+    if method == 'nearest':
+        j = np.array( xi + 0.5, 'i' )
+        k = np.array( yi + 0.5, 'i' )
+        if not extrapolate:
+            i = ( (j >= 0) & (j <= n[-2]-1)
+                & (k >= 0) & (k <= n[-1]-1) )
+        j = np.minimum( np.maximum( j, 0 ), n[-2]-1 )
+        k = np.minimum( np.maximum( k, 0 ), n[-1]-1 )
+        f = f[...,j,k]
+    elif method == 'linear':
+        j = np.array( xi, 'i' )
+        k = np.array( yi, 'i' )
+        if not extrapolate:
+            i = ( (j >= 0) & (j <= n[-2]-2)
+                & (k >= 0) & (k <= n[-1]-2) )
+        j = np.minimum( np.maximum( j, 0 ), n[-2]-2 )
+        k = np.minimum( np.maximum( k, 0 ), n[-1]-2 )
+        f = ( ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * f[...,j,k]
+            + ( 1.0 - xi + j ) * (       yi - k ) * f[...,j,k+1]
+            + (       xi - j ) * ( 1.0 - yi + k ) * f[...,j+1,k]
+            + (       xi - j ) * (       yi - k ) * f[...,j+1,k+1] )
     if not extrapolate:
         f[...,~i] = np.nan
         if out != None:
@@ -92,34 +106,51 @@ def interp2( origin, delta, f, coords, out=None, extrapolate=False ):
         out[...] = f[...]
     return f
 
-def interp3( origin, delta, f, coords, out=None, extrapolate=False ):
+def interp3( extent, f, coords, out=None, method='linear', extrapolate=False ):
     """
     3D interpolation on a regular grid
     """
+    x0, x1 = np.array( extent ).T
+    delta = (x1 - x0) / (np.array( f.shape[-3:] ) - 1)
     f = np.asarray( f )
-    xi = (np.asarray( coords[0] ) - origin[0]) / delta[0]
-    yi = (np.asarray( coords[1] ) - origin[1]) / delta[1]
-    zi = (np.asarray( coords[2] ) - origin[2]) / delta[2]
+    xi = (np.asarray( coords[0] ) - x0[0]) / delta[0]
+    yi = (np.asarray( coords[1] ) - x0[1]) / delta[1]
+    zi = (np.asarray( coords[2] ) - x0[2]) / delta[2]
     del( coords )
-    j = np.array( xi, 'i' )
-    k = np.array( yi, 'i' )
-    l = np.array( zi, 'i' )
     n = f.shape
-    if not extrapolate:
-        i = ( (j >= 0) & (j <= n[-3]-2)
-            & (k >= 0) & (k <= n[-2]-2)
-            & (l >= 0) & (l <= n[-1]-2) )
-    j = np.minimum( np.maximum( j, 0 ), n[-3]-2 )
-    k = np.minimum( np.maximum( k, 0 ), n[-2]-2 )
-    l = np.minimum( np.maximum( l, 0 ), n[-1]-2 )
-    f = ( ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * ( 1.0 - zi + l ) * f[...,j,k,l]
-        + ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * (       zi - l ) * f[...,j,k,l+1]
-        + ( 1.0 - xi + j ) * (       yi - k ) * ( 1.0 - zi + l ) * f[...,j,k+1,l]
-        + ( 1.0 - xi + j ) * (       yi - k ) * (       zi - l ) * f[...,j,k+1,l+1]
-        + (       xi - j ) * ( 1.0 - yi + k ) * ( 1.0 - zi + l ) * f[...,j+1,k,l]
-        + (       xi - j ) * ( 1.0 - yi + k ) * (       zi - l ) * f[...,j+1,k,l+1]
-        + (       xi - j ) * (       yi - k ) * ( 1.0 - zi + l ) * f[...,j+1,k+1,l]
-        + (       xi - j ) * (       yi - k ) * (       zi - l ) * f[...,j+1,k+1,l+1] )
+    if method == 'nearest':
+        j = np.array( xi + 0.5, 'i' )
+        k = np.array( yi + 0.5, 'i' )
+        l = np.array( zi + 0.5, 'i' )
+        if not extrapolate:
+            i = ( (j >= 0) & (j <= n[-3]-1)
+                & (k >= 0) & (k <= n[-2]-1)
+                & (l >= 0) & (l <= n[-1]-1) )
+        j = np.minimum( np.maximum( j, 0 ), n[-3]-1 )
+        k = np.minimum( np.maximum( k, 0 ), n[-2]-1 )
+        l = np.minimum( np.maximum( l, 0 ), n[-1]-1 )
+        f = f[...,j,k,l]
+    elif method == 'linear':
+        j = np.array( xi, 'i' )
+        k = np.array( yi, 'i' )
+        l = np.array( zi, 'i' )
+        if not extrapolate:
+            i = ( (j >= 0) & (j <= n[-3]-2)
+                & (k >= 0) & (k <= n[-2]-2)
+                & (l >= 0) & (l <= n[-1]-2) )
+        j = np.minimum( np.maximum( j, 0 ), n[-3]-2 )
+        k = np.minimum( np.maximum( k, 0 ), n[-2]-2 )
+        l = np.minimum( np.maximum( l, 0 ), n[-1]-2 )
+        f = ( ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * ( 1.0 - zi + l ) * f[...,j,k,l]
+            + ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * (       zi - l ) * f[...,j,k,l+1]
+            + ( 1.0 - xi + j ) * (       yi - k ) * ( 1.0 - zi + l ) * f[...,j,k+1,l]
+            + ( 1.0 - xi + j ) * (       yi - k ) * (       zi - l ) * f[...,j,k+1,l+1]
+            + (       xi - j ) * ( 1.0 - yi + k ) * ( 1.0 - zi + l ) * f[...,j+1,k,l]
+            + (       xi - j ) * ( 1.0 - yi + k ) * (       zi - l ) * f[...,j+1,k,l+1]
+            + (       xi - j ) * (       yi - k ) * ( 1.0 - zi + l ) * f[...,j+1,k+1,l]
+            + (       xi - j ) * (       yi - k ) * (       zi - l ) * f[...,j+1,k+1,l+1] )
+    else:
+        sys.exit( 'Unknon interpolation method: %s' % method )
     if not extrapolate:
         f[...,~i] = np.nan
         if out != None:
@@ -296,7 +327,7 @@ class Transform():
     Example: TeraShake SDSU/Okaya projection
     >>> import pyproj
     >>> proj = pyproj.Proj( proj='utm', zone=11, ellps='WGS84' )
-    >>> proj = Transform( proj, rotation=40.0, origin=(-121.0, 34.5) )
+    >>> proj = Transform( proj, rotate=40.0, origin=(-121.0, 34.5) )
     >>> proj( -120.0, 35.0 )
     array([  38031.1000251 ,  100171.63485189])
     >>> proj( 0, 0, inverse=True )
@@ -349,7 +380,8 @@ def cmu( x, y, inverse=False ):
     xx = [-121.0, -118.951292], [-116.032285, -113.943965]
     yy = [  34.5,   36.621696], [  31.082920,   33.122341]
     if inverse:
-        x, y = interp2( (0.0, 0.0), (600000.0, 300000.0), (xx, yy), (x, y), extrapolate=True )
+        extent = (0.0, 600000.0), (0.0, 300000.0)
+        x, y = interp2( extent, (xx, yy), (x, y), extrapolate=True )
     else:
         x, y = ibilinear( xx, yy, x, y )
         x = (x + 1.0) * 300000.0

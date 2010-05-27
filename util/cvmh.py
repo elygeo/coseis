@@ -5,8 +5,6 @@ SCEC Community Velocity Model (CVM-H) extraction tool
 import os, sys, urllib, pyproj
 import numpy as np
 import coord, gocad
-reload( coord )
-reload( gocad )
 
 # projection
 proj = pyproj.Proj( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
@@ -28,8 +26,8 @@ def read_voxet( property, voxet=None ):
 
     Returns
     -------
-        origin: (x0, y0, z0)
-        delta: (dx, dy, dz)
+        extent: (x0, x1), (y0, y1), (z0, z1)
+        delta: dx, dy, dz
         data: property voxet array
     """
 
@@ -60,27 +58,20 @@ def read_voxet( property, voxet=None ):
     f = os.path.join( path, vox + '.vo' )
     vox = gocad.voxet( f, prop )['1']
 
-    # axes origin and step size
-    j, k, l = vox['AXIS']['N']
-    u, v, w = vox['AXIS']['U'][0], vox['AXIS']['V'][1], vox['AXIS']['W'][2]
-    if property in prop2d:
-        origin = vox['AXIS']['O'][:2]
-        delta = u / (j - 1), v / (k - 1)
-    else:
-        origin = vox['AXIS']['O']
-        delta = u / (j - 1), v / (k - 1), w / (l - 1)
-
     # data
     data = vox['PROP'][prop]['DATA']
-    if property in prop2d:
-        data = data.reshape( (j, k) )
     if property == 'rho':
         data *= 0.001
         data = 1000.0 * (data * (1.6612 + data * (-0.4721 + data * (0.0671 +
             f * (-0.0043 + data * 0.000106)))))
         data = np.maximum( data, 1000.0 )
 
-    return origin, delta, data
+    # extent
+    x, y, z = vox['AXIS']['O']
+    u, v, w = vox['AXIS']['U'][0], vox['AXIS']['V'][1], vox['AXIS']['W'][2]
+    extent = (x, x + u), (y, y + v), (z, z + w)
+
+    return data, extent
 
 class Extraction():
     """
@@ -96,6 +87,7 @@ class Extraction():
     ---------------
         x, y, z: sample coordinate arrays.
         out (optional): output array, same shape as x, y, and z.
+        interpolation: 'nearest', 'linear'
  
     Returns
     -------
@@ -110,46 +102,46 @@ class Extraction():
             for vox in voxet:
                 self.voxet += [ read_voxet( property, vox ) ]
         return
-    def __call__( self, x, y, z=None, out=None ):
+    def __call__( self, x, y, z=None, out=None, interpolation='linear' ):
         if out == None:
             out = np.empty_like( x )
             out.fill( np.nan )
-        for origin, delta, data in self.voxet:
+        for data, extent in self.voxet:
             if self.property in prop2d:
-                coord.interp2( origin, delta, data, (x, y), out )
+                data = data.reshape( data.shape[:2] )
+                coord.interp2( extent[:2], data, (x, y), out, method=interpolation )
             else:
-                coord.interp3( origin, delta, data, (x, y, z), out )
+                coord.interp3( extent, data, (x, y, z), out, method=interpolation )
         return out
 
 # continue with test if run from the command line
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    o, d, f = read_voxet( 'topo' )
-    fig = plt.figure(1)
+    topo = Extraction( 'topo' )
+    vp = Extraction( 'vp' )
+
+    d = 0.002; extent = (-121.2, -113.3), (30.9, 36.7)
+    d = 250.0; extent = (131000.0, 828000.0), (3431000.0, 4058000.0)
+
+    x, y = extent
+    x = np.arange( x[0], x[1] + d, 2 * d )
+    y = np.arange( y[0], y[1] + d, 2 * d )
+    y, x = np.meshgrid( y, x )
+    z = topo( x, y ) - 100.0
+
+    f = vp( x, y, z, interpolation='nearest' )
+    fig = plt.figure()
     fig.clf()
     ax = plt.gca()
-    ax.imshow( f.T, origin='lower', interpolation='nearest' )
+    ax.imshow( f.T, vmin=0.0, vmax=8000.0, origin='lower', interpolation='nearest' )
     ax.axis( 'image' )
 
-    topo = Extraction( 'topo' )
-    vp = Extraction( 'vp', ['crust'] )
-
-    x = np.arange( -120.0, -114.5, 0.02 )
-    y = np.arange( 32.0, 35.6, 0.02 )
-
-    x = np.arange( -121.2, -113.3, 0.02 )
-    y = np.arange( 30.9, 36.7, 0.02 )
-
-    y, x = np.meshgrid( y, x )
-    x, y = proj( x, y )
-    z = topo( x, y ) - 400.0
-    f = vp( x, y, z )
-
-    fig = plt.figure(3)
+    f = vp( x, y, z, interpolation='linear' )
+    fig = plt.figure()
     fig.clf()
     ax = plt.gca()
-    ax.imshow( f.T, origin='lower', interpolation='nearest' )
+    ax.imshow( f.T, vmin=0.0, vmax=8000.0, origin='lower', interpolation='nearest' )
     ax.axis( 'image' )
 
     plt.show()
