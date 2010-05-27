@@ -118,33 +118,82 @@ class Extraction():
                 coord.interp3( extent, data, (x, y, z), out, method=interpolation )
         return out
 
-# continue with test if run from the command line
-if __name__ == '__main__':
+def dplane( lim, delta=500.0, property='vp', interpolation='linear' ):
+    """
+    Depth plane plot.
+    """
     import matplotlib.pyplot as plt
-
-    topo = Extraction( 'topo' )
-    vp = Extraction( 'vp' )
-
-    d = 250.0
-    x, y = extent[:2]
-    x = np.arange( x[0], x[1] + d, 2 * d )
-    y = np.arange( y[0], y[1] + d, 2 * d )
+    scale = 0.001
+    x1, x2 = lim[0]
+    y1, y2 = lim[1]
+    z0 = lim[2]
+    v1, v2 = lim[3]
+    ex = [ scale * r for r in [x1, x2, y1, y2] ]
+    x = np.arange( x1, x2 + 0.5 * delta, delta )
+    y = np.arange( y1, y2 + 0.5 * delta, delta )
     y, x = np.meshgrid( y, x )
-    z = topo( x, y ) - 100.0
-
-    f = vp( x, y, z, interpolation='nearest' )
     fig = plt.figure()
     fig.clf()
     ax = plt.gca()
-    ax.imshow( f.T, vmin=0.0, vmax=8000.0, origin='lower', interpolation='nearest' )
-    ax.axis( 'image' )
+    m = Extraction( 'topo' )
+    z = m( x, y, interpolation='linear' ) - z0
+    m = Extraction( property )
+    f = m( x, y, z, interpolation=interpolation )
+    ax.imshow( f.T, extent=ex, vmin=v1, vmax=v2, origin='lower', interpolation='nearest' )
+    ax.set_title( '%s %s' % (interpolation, property) )
+    return fig
 
-    f = vp( x, y, z, interpolation='linear' )
+def xsection( lim, delta=(500.0, 50.0), property='vp', interpolation='linear' ):
+    """
+    Cross section plot.
+    """
+    import matplotlib.pyplot as plt
+    scale = 0.001
+    x1, x2 = lim[0]
+    y1, y2 = lim[1]
+    z1, z2 = lim[2]
+    v1, v2 = lim[3]
+    dx, dy = x2 - x1, y2 - y1
+    L = np.sqrt( dx * dx + dy * dy )
+    ex = [ scale * r for r in [0, L, z1, z2] ]
+    r = np.arange( 0, L + 0.5 * delta[0], delta[0] )
+    x = x1 + dx / L * r
+    y = y1 + dy / L * r
+    z = np.arange( z1, z2 + 0.5 * delta[1], delta[1] )
+    zz, xx = np.meshgrid( z, x )
+    zz, yy = np.meshgrid( z, y )
     fig = plt.figure()
     fig.clf()
     ax = plt.gca()
-    ax.imshow( f.T, vmin=0.0, vmax=8000.0, origin='lower', interpolation='nearest' )
-    ax.axis( 'image' )
+    m = Extraction( 'topo' )
+    f = m( xx, yy, interpolation='linear' )
+    ax.plot( scale*r, scale*f, 'k-' )
+    m = Extraction( 'base' )
+    f = m( xx, yy, interpolation='linear' )
+    ax.plot( scale*r, scale*f, 'k-' )
+    m = Extraction( 'moho' )
+    f = m( xx, yy, interpolation='linear' )
+    ax.plot( scale*r, scale*f, 'k-' )
+    m = Extraction( property )
+    f = m( xx, yy, zz, interpolation=interpolation )
+    ax.imshow( f.T, extent=ex, vmin=v1, vmax=v2, origin='lower', interpolation='nearest' )
+    ax.axis( 'auto' )
+    ax.axis( ex )
+    ax.set_title( '%s %s' % (interpolation, property) )
+    return fig
 
-    plt.show()
+# continue if run from the command line
+if __name__ == '__main__':
+
+    # cross sections
+    delta = 100.0, 10.0
+    lim = (400000.0, 400000.0), (3740000.0, 3860000.0), (-2000.0, 2000.0), (1000.0, 6000.0)
+    xsection( lim, delta, 'vp', 'nearest' ).show()
+    xsection( lim, delta, 'vp', 'linear' ).show()
+
+    # depth planes
+    delta = 500.0
+    lim = extent[0], extent[1], 200.0, (1000.0, 6000.0)
+    dplane( lim, delta, 'vp', 'nearest' ).show()
+    dplane( lim, delta, 'vp', 'linear' ).show()
 
