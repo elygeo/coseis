@@ -11,25 +11,27 @@ proj = pyproj.Proj( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
 
 # lookup tables
-property2d = {'topo': '1', 'base': '2', 'moho': '3'}
-property3d = {'rho': '1', 'vp': '1', 'vs': '3', 'tag': '2'}
+prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
+prop3d = {'rho': '1', 'vp': '1', 'vs': '3', 'tag': '2'}
 voxet3d = {'mantle': 'CVM_CM', 'crust': 'CVM_LR', 'lab': 'CVM_HR'}
 
-def read_voxet( property=None, voxet=None, no_data_value='nan' ):
+def read_voxet( prop=None, voxet=None, no_data_value='nan' ):
     """
     Download and read SCEC CVM-H voxet.
 
     Parameters
     ----------
-        2d property: 'topo', 'base', or 'moho'
-        3d property: 'rho', 'vp', 'vs', or 'tag'
-        3d voxet: 'mantle', 'crust', 'lab'
+        prop:
+            2d property: 'topo', 'base', or 'moho'
+            3d property: 'rho', 'vp', 'vs', or 'tag'
+        voxet:
+            3d voxet: 'mantle', 'crust', 'lab'
 
     Returns
     -------
         extent: (x0, x1), (y0, y1), (z0, z1)
-        delta: dx, dy, dz
-        data: property voxet array
+        surface: array of properties for 2d data or model top for 3d data.
+        volume: array of properties for 3d data or None for 2d data.
     """
 
     # download if not found
@@ -48,34 +50,58 @@ def read_voxet( property=None, voxet=None, no_data_value='nan' ):
             sys.exit( 'Error extraction tar file' )
 
     # lookup property and voxet
-    if property in property2d:
-        property = property2d[property]
-        voxet = 'interfaces'
-    if property in property3d:
-        property = property3d[property]
+    if prop in prop2d:
+        pid = prop2d[prop]
+        vid = 'interfaces'
+    else:
+        pid = prop3d[prop]
     if voxet in voxet3d:
-        voxet = voxet3d[voxet]
+        vid = voxet3d[voxet]
 
     # load voxet
-    f = os.path.join( path, voxet + '.vo' )
-    voxet = gocad.voxet( f, property, no_data_value )['1']
+    f = os.path.join( path, vid + '.vo' )
+    voxet = gocad.voxet( f, pid, no_data_value )['1']
 
     # extent
     x, y, z = voxet['AXIS']['O']
     u, v, w = voxet['AXIS']['U'][0], voxet['AXIS']['V'][1], voxet['AXIS']['W'][2]
     extent = (x, x + u), (y, y + v), (z, z + w)
 
-    # data
-    if property == None:
-        return voxet, extent
+    # poperty data and model top
+    if prop == None:
+        return extent, voxet
     else:
-        data = voxet['PROP'][property]['DATA']
-        if property == 'rho':
+        data = voxet['PROP'][pid]['DATA']
+        if prop == 'rho':
             data *= 0.001
             data = 1000.0 * (data * (1.6612 + data * (-0.4721 + data * (0.0671 +
                 f * (-0.0043 + data * 0.000106)))))
             data = np.maximum( data, 1000.0 )
-        return data, extent
+        nx, ny, nz = data.shape
+        if nz == 1:
+            return extent, data.squeeze(), None
+        else:
+            topfile = os.path.join( path, vid + '_TOP@@' )
+            if os.path.exists( topfile ):
+                top = np.fromfile( topfile, 'f' ).reshape( [ny, nx] ).T
+            else:
+                z0, z1 = extent[-1]
+                dz = (z1 - z0) / (nz - 1)
+                top = np.empty_like( data[:,:,0] )
+                top.fill( np.nan )
+                for j in range( nz ):
+                    if dz < 0.0:
+                        j = nz - 1 - j
+                    f = data[:,:,j].copy()
+                    f[1:,:]  = f[1:,:]  + f[:-1,:]
+                    f[:-1,:] = f[:-1,:] + f[1:,:]
+                    f[:,1:]  = f[:,1:]  + f[:,:-1]
+                    f[:,:-1] = f[:,:-1] + f[:,1:]
+                    i = ~np.isnan( f )
+                    z = z0 + j * dz
+                    top[i] = z
+                top.T.tofile( topfile )
+            return extent, top, data
 
 class Extraction():
     """
@@ -83,9 +109,11 @@ class Extraction():
 
     Init parameters
     ---------------
-        2d property: 'topo', 'base', or 'moho'
-        3d property: 'rho', 'vp', 'vs', or 'tag'
-        3d voxet list: ['mantle', 'crust', 'lab']
+        prop:
+            2d property: 'topo', 'base', or 'moho'
+            3d property: 'rho', 'vp', 'vs', or 'tag'
+        voxet:
+            3d voxet list: ['mantle', 'crust', 'lab']
 
     Call parameters
     ---------------
@@ -97,28 +125,27 @@ class Extraction():
     -------
         f: property samples at coordinates (x, y, z)
     """
-    def __init__( self, property, voxet=['mantle', 'crust', 'lab'], no_data_value='nan' ):
-        self.property = property
-        if property in property2d:
-            self.voxet = [ read_voxet( property ) ]
+    def __init__( self, prop, voxet=['mantle', 'crust', 'lab'], no_data_value='nan' ):
+        self.prop = prop
+        if prop in prop2d:
+            self.voxet = [ read_voxet( prop ) ]
         else:
             self.voxet = []
             for vox in voxet:
-                self.voxet += [ read_voxet( property, vox, no_data_value ) ]
+                self.voxet += [ read_voxet( prop, vox, no_data_value ) ]
         return
     def __call__( self, x, y, z=None, out=None, interpolation='linear' ):
         if out == None:
             out = np.empty_like( x )
             out.fill( np.nan )
-        for data, extent in self.voxet:
-            if self.property in property2d:
-                data = data.reshape( data.shape[:2] )
-                coord.interp2( extent[:2], data, (x, y), out, method=interpolation )
+        for extent, surface, volume in self.voxet:
+            if z == None:
+                coord.interp2( extent[:2], surface, (x, y), out, method=interpolation )
             else:
-                coord.interp3( extent, data, (x, y, z), out, method=interpolation )
+                coord.interp3( extent, volume, (x, y, z), out, method=interpolation )
         return out
 
-def dplane( extract, lim, delta=500.0, interpolation='linear' ):
+def dplane( extract, mapdata, lim, delta=500.0, interpolation='linear' ):
     """
     Depth plane plot.
     """
@@ -142,7 +169,7 @@ def dplane( extract, lim, delta=500.0, interpolation='linear' ):
     fig.colorbar( im )
     x, y = mapdata
     ax.plot( scale * x, scale * y, '-k' )
-    ax.set_title( extract.property )
+    ax.set_title( extract.prop )
     ax.axis( ex )
     return fig
 
@@ -171,7 +198,9 @@ def xsection( extract, interfaces, lim, delta=(500.0, 50.0), interpolation='line
     f = extract( xx, yy, zz, interpolation=interpolation )
     im = ax.imshow( f.T, extent=ex, vmin=v1, vmax=v2, origin='lower', interpolation='nearest' )
     fig.colorbar( im, orientation='horizontal' )
-    ax.set_title( extract.property )
+    ax.set_title( extract.prop )
+    ax.set_xlabel( 'X (km)' )
+    ax.set_ylabel( 'Z (km)' )
     for m in interfaces:
         f = m( x, y, interpolation='linear' )
         ax.plot( scale * r, scale * f, 'k-' )
@@ -190,11 +219,11 @@ if __name__ == '__main__':
         interfaces = Extraction( 'topo' ), Extraction( 'base' )
         delta = 100.0, 10.0
         lim = (400000.0, 400000.0), (3740000.0, 3860000.0), (-2000.0, 2000.0), (1000.0, 6000.0)
-        xsection( vp, interfaces, lim, delta, 'nearest' ).show()
-        xsection( vp, interfaces, lim, delta, 'linear' ).show()
+        xsection( vp, interfaces, lim, delta, 'nearest' ).savefig( 'cvmh-nearest.png', dpi=150 )
+        xsection( vp, interfaces, lim, delta, 'linear' ).savefig( 'cvmh-linear.png', dpi=150 )
 
     # depth planes
-    if 1:
+    if 0:
         if 1:
             import data
             ll = (-121.3, -113.3), (30.9, 36.8)
