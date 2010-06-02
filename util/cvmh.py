@@ -2,36 +2,39 @@
 """
 SCEC Community Velocity Model (CVM-H) extraction tool
 """
-import os, sys, urllib, gzip, pyproj
+import os, sys
 import numpy as np
 import coord, gocad
 
-# data storage location
+# parameters
 repo = os.path.expanduser( '~/mapdata' )
-
-# projection
-proj = pyproj.Proj( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
+projection = dict( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
+prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
+prop3d = {'rho': '1', 'vp': '1', 'vs': '3', 'tag': '2'}
+voxet3d = {'mantle': 'CVM_CM', 'crust': 'CVM_LR', 'lab': 'CVM_HR'}
 
 def read_vs30():
     """
     Download and read USGS, Wald, et al. Vs30 map.
     """
-    from scipy.io.netcdf import netcdf_file
-    url = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
-    f = os.path.join( repo, os.path.basename( url ) )
-    if not os.path.exists( f ):
-        print( 'Downloading %s' % url )
-        urllib.urlretrieve( url, f )
-    data = netcdf_file( gzip.open( f ) ).variables['z'].data.T
     d = 0.25 / 60
     extent = (-125.0 + d, -106.0 - d), (30.0 + d, 50.0 - d)
+    url = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
+    f0 = os.path.join( repo, os.path.basename( url ) )
+    f1 = f0.split( '.' )[0] + '.grd'
+    f2 = f0.split( '.' )[0] + '.npy'
+    if os.path.exists( f2 ):
+        data = np.load( f2 )
+    else:
+        import urllib, gzip
+        from scipy.io.netcdf import netcdf_file
+        print( 'Downloading %s' % url )
+        urllib.urlretrieve( url, f0 )
+        open( f1, 'wb' ).write( gzip.open( f0 ).read() )
+        data = netcdf_file( f1 ).variables['z'].data.T
+        np.save( f2, data )
     return extent, data, None
-
-# CVMH lookup tables
-prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
-prop3d = {'rho': '1', 'vp': '1', 'vs': '3', 'tag': '2'}
-voxet3d = {'mantle': 'CVM_CM', 'crust': 'CVM_LR', 'lab': 'CVM_HR'}
 
 def read_voxet( prop=None, voxet=None, no_data_value='nan' ):
     """
@@ -61,6 +64,7 @@ def read_voxet( prop=None, voxet=None, no_data_value='nan' ):
             os.makedirs( repo )
         f = os.path.join( repo, os.path.basename( url ) )
         if not os.path.exists( f ):
+            import urllib
             print( 'Downloading %s' % url )
             urllib.urlretrieve( url, f )
         if os.system( 'tar jxv -C %r -f %r' % (repo, f) ):
@@ -100,7 +104,7 @@ def read_voxet( prop=None, voxet=None, no_data_value='nan' ):
         else:
             topfile = os.path.join( path, vid + '_TOP@@' )
             if os.path.exists( topfile ):
-                top = np.fromfile( topfile, 'f' ).reshape( [ny, nx] ).T
+                top = np.fromfile( topfile, data.dtype ).reshape( [ny, nx] ).T
             else:
                 z0, z1 = extent[-1]
                 dz = (z1 - z0) / (nz - 1)
@@ -120,9 +124,9 @@ def read_voxet( prop=None, voxet=None, no_data_value='nan' ):
                 top.T.tofile( topfile )
             return extent, top, data
 
-class Extraction():
+class Model():
     """
-    SCEC CVM-H extraction.
+    SCEC CVM-H model.
 
     Init parameters
     ---------------
@@ -135,17 +139,17 @@ class Extraction():
     Call parameters
     ---------------
         x, y, z: sample coordinate arrays.
-        out (optional): output array, same shape as x, y, and z.
+        out: output array, same shape as x, y, and z.
         interpolation: 'nearest', 'linear'
 
     Returns
     -------
-        f: property samples at coordinates (x, y, z)
+        out: property samples at coordinates (x, y, z)
     """
     def __init__( self, prop, voxet=['mantle', 'crust', 'lab'], no_data_value='nan' ):
         self.prop = prop
         if prop == 'vs30':
-            self.voxet = [ read_vs30( prop ) ]
+            self.voxet = [ read_vs30() ]
         elif prop in prop2d:
             self.voxet = [ read_voxet( prop ) ]
         else:
@@ -164,39 +168,68 @@ class Extraction():
                 coord.interp3( extent, volume, (x, y, z), out, method=interpolation )
         return out
 
-def dplane( extract, mapdata, lim, delta=500.0, interpolation='linear' ):
+class Extraction():
     """
-    Depth plane plot.
-    """
-    import matplotlib.pyplot as plt
-    scale = 0.001
-    x1, x2 = lim[0]
-    y1, y2 = lim[1]
-    z0 = lim[2]
-    v1, v2 = lim[3]
-    ex = [ scale * r for r in [x1, x2, y1, y2] ]
-    x = np.arange( x1, x2 + 0.5 * delta, delta )
-    y = np.arange( y1, y2 + 0.5 * delta, delta )
-    y, x = np.meshgrid( y, x )
-    fig = plt.figure()
-    fig.clf()
-    ax = plt.gca()
-    topo = Extraction( 'topo' )
-    z = topo( x, y, interpolation='linear' ) - z0
-    f = extract( x, y, z, interpolation=interpolation )
-    im = ax.imshow( f.T, extent=ex, vmin=v1, vmax=v2, origin='lower', interpolation='nearest' )
-    fig.colorbar( im )
-    x, y = mapdata
-    ax.plot( scale * x, scale * y, '-k' )
-    ax.set_title( extract.prop )
-    ax.axis( ex )
-    return fig
+    Model extraction with geotechnical layer (GTL)
 
-def xsection( extract, interfaces, lim, delta=(500.0, 50.0), interpolation='linear' ):
+    Init parameters
+    ---------------
+        vm: velocity model
+        x, y: Cartesian coordinates
+        topo: topography model
+        vs30: Vs30 model
+        lon, lat: geographic coordinates
+        zgrl: GTL interpolation depth
+        interpolation: 'nearest', 'linear'
+
+    Call parameters
+    ---------------
+        z: elevation (or depth) coordinate
+        out: output array, same shape as z
+        by_depth: z coordinate type, True=depth, False=elevation
+
+    Returns
+    -------
+        out: property samples at coordinates (x, y, z)
+    """
+    def __init__( self, vm, x, y, topo, vs30=None, lon=None, lat=None, zgtl=100.0, interpolation='linear' ):
+        z1 = topo( x, y )
+        z2 = vm( x, y )
+        z2 = np.minimum( z1 - zgtl, z2 - 1.0 )
+        if vs30 == None:
+            self.gtl = None
+        else:
+            v1 = vs30( lon, lat )
+            v2 = vm( x, y, z2, interpolation=interpolation )
+            self.gtl = v1, v2
+        self.data = vm, x, y, z1, z2, interpolation
+        return
+    def __call__( self, z, out=None, by_depth=True ):
+        vm, x, y, z1, z2, interpolation = self.data
+        if out == None:
+            out = np.empty_like( z )
+            out.fill( np.nan )
+        if by_depth:
+            vm( x, y, z1 - z, out, interpolation )
+            w = z / (z1 - z2)
+        else:
+            vm( x, y, z, out, interpolation )
+            w = (z1 - z) / (z1 - z2)
+        if self.gtl != None:
+            v1, v2 = self.gtl
+            i = w < 0.0
+            out[i] = np.nan
+            i = (w >= 0.0) & (w <= 1.0)
+            out[i] = (1.0 - w[i]) * v1[i] + w[i] * v2[i]
+        return out
+
+def xsection( vm, topo, vs30, base, lim, delta=(500.0, 50.0), interpolation='linear' ):
     """
     Cross section plot.
     """
+    import pyproj
     import matplotlib.pyplot as plt
+    zgtl = 200.0
     scale = 0.001
     x1, x2 = lim[0]
     y1, y2 = lim[1]
@@ -211,40 +244,83 @@ def xsection( extract, interfaces, lim, delta=(500.0, 50.0), interpolation='line
     z = np.arange( z1, z2 + 0.5 * delta[1], delta[1] )
     zz, xx = np.meshgrid( z, x )
     zz, yy = np.meshgrid( z, y )
+    proj = pyproj.Proj( **projection )
+    lon, lat = proj( xx, yy, inverse=True )
+    extract = Extraction( vm, xx, yy, topo, vs30, lon, lat, zgtl, interpolation )
+    f = extract( zz, by_depth=False )
     fig = plt.figure()
     fig.clf()
     ax = plt.gca()
-    f = extract( xx, yy, zz, interpolation=interpolation )
     im = ax.imshow( f.T, extent=ex, vmin=v1, vmax=v2, origin='lower', interpolation='nearest' )
     fig.colorbar( im, orientation='horizontal' )
-    ax.set_title( extract.prop )
+    ax.set_title( vm.prop )
     ax.set_xlabel( 'X (km)' )
     ax.set_ylabel( 'Z (km)' )
-    for m in interfaces:
-        f = m( x, y, interpolation='linear' )
-        ax.plot( scale * r, scale * f, 'k-' )
+    for surf in topo, base:
+        if surf:
+            f = surf( x, y, interpolation='linear' )
+            ax.plot( scale * r, scale * f, 'k-' )
     ax.axis( 'auto' )
+    ax.axis( ex )
+    return fig
+
+def zplane( vm, topo, vs30, mapdata, lim, delta=500.0, interpolation='linear' ):
+    """
+    Depth plane plot.
+    """
+    import pyproj
+    import matplotlib.pyplot as plt
+    zgtl = 100.0
+    scale = 0.001
+    x1, x2 = lim[0]
+    y1, y2 = lim[1]
+    z0 = lim[2]
+    v1, v2 = lim[3]
+    ex = [ scale * r for r in [x1, x2, y1, y2] ]
+    x = np.arange( x1, x2 + 0.5 * delta, delta )
+    y = np.arange( y1, y2 + 0.5 * delta, delta )
+    y, x = np.meshgrid( y, x )
+    z = np.empty_like( x )
+    z.fill( z0 )
+    proj = pyproj.Proj( **projection )
+    lon, lat = proj( x, y, inverse=True )
+    extract = Extraction( vm, x, y, topo, vs30, lon, lat, zgtl, interpolation )
+    f = extract( z )
+    fig = plt.figure()
+    fig.clf()
+    ax = plt.gca()
+    im = ax.imshow( f.T, extent=ex, vmin=v1, vmax=v2, origin='lower', interpolation='nearest' )
+    fig.colorbar( im )
+    if mapdata:
+        x, y = mapdata
+        ax.plot( scale * x, scale * y, '-k' )
+    ax.set_title( vm.prop )
     ax.axis( ex )
     return fig
 
 # continue if run from the command line
 if __name__ == '__main__':
 
-    # extraction function
-    vp = Extraction( 'vp', ['crust'] )
+    # models
+    vm = Model( 'vs', ['crust'] )
+    vs30 = Model( 'vs30' )
+    topo = Model( 'topo' )
+    base = Model( 'base' )
 
     # cross sections
     if 1:
-        interfaces = Extraction( 'topo' ), Extraction( 'base' )
+        surf = topo, base
         delta = 100.0, 10.0
-        lim = (400000.0, 400000.0), (3740000.0, 3860000.0), (-2000.0, 2000.0), (1000.0, 6000.0)
-        xsection( vp, interfaces, lim, delta, 'nearest' ).savefig( 'cvmh-nearest.png', dpi=150 )
-        xsection( vp, interfaces, lim, delta, 'linear' ).savefig( 'cvmh-linear.png', dpi=150 )
+        lim = (400000.0, 400000.0), (3750000.0, 3850000.0), (-3000.0, 2000.0), (150.0, 3200.0)
+        xsection( vm, topo, None, base, lim, delta, 'nearest' ).show()
+        xsection( vm, topo, vs30, base, lim, delta, 'linear' ).show()
 
     # depth planes
     if 0:
-        if 1:
+        if 0:
             import data
+            import pyproj
+            proj = pyproj.Proj( **projection )
             ll = (-121.3, -113.3), (30.9, 36.8)
             x, y = data.mapdata( 'coast', 'high', ll, 20.0, 1, 1 )
             u, v = data.mapdata( 'border', 'high', ll, delta=0.1 )
@@ -254,7 +330,7 @@ if __name__ == '__main__':
         else:
             mapdata = None
         delta = 500.0
-        lim = extent[0], extent[1], 200.0, (1000.0, 6000.0)
-        dplane( vp, mapdata, lim, delta, 'nearest' ).show()
-        dplane( vp, mapdata, lim, delta, 'linear' ).show()
+        lim = extent[0], extent[1], 200.0, (150.0, 3200.0)
+        zplane( vm, mapdata, lim, delta, 'nearest' ).show()
+        zplane( vm, mapdata, lim, delta, 'linear' ).show()
 
