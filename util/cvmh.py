@@ -177,7 +177,7 @@ class Extraction():
         vm: velocity model
         x, y: Cartesian coordinates
         topo: topography model
-        vs30: Vs30 model
+        vs30: Vs30 model, None=omit GTL
         lon, lat: geographic coordinates
         zgrl: GTL interpolation depth
         interpolation: 'nearest', 'linear'
@@ -285,7 +285,7 @@ def zplane( vm, topo, vs30, mapdata, lim, delta=500.0, interpolation='linear' ):
     proj = pyproj.Proj( **projection )
     lon, lat = proj( x, y, inverse=True )
     extract = Extraction( vm, x, y, topo, vs30, lon, lat, zgtl, interpolation )
-    f = extract( z )
+    f = extract( z, by_depth=True )
     fig = plt.figure()
     fig.clf()
     ax = plt.gca()
@@ -311,9 +311,9 @@ if __name__ == '__main__':
     if 1:
         surf = topo, base
         delta = 100.0, 10.0
-        lim = (400000.0, 400000.0), (3750000.0, 3850000.0), (-3000.0, 2000.0), (150.0, 3200.0)
-        xsection( vm, topo, None, base, lim, delta, 'nearest' ).show()
-        xsection( vm, topo, vs30, base, lim, delta, 'linear' ).show()
+        lim = (400000.0, 400000.0), (3650000.0, 3850000.0), (-3000.0, 2000.0), (150.0, 3200.0)
+        xsection( vm, topo, None, vm, lim, delta, 'nearest' ).show()
+        #xsection( vm, topo, vs30, base, lim, delta, 'linear' ).show()
 
     # depth planes
     if 0:
@@ -330,7 +330,12 @@ if __name__ == '__main__':
         else:
             mapdata = None
         delta = 500.0
-        lim = extent[0], extent[1], 200.0, (150.0, 3200.0)
-        zplane( vm, mapdata, lim, delta, 'nearest' ).show()
-        zplane( vm, mapdata, lim, delta, 'linear' ).show()
+        x, y, z = extent
+        x = x[0] + delta, x[1] - delta
+        y = y[0] + delta, y[1] - delta
+        z = 50.0
+        v = 150.0, 3200.0
+        lim = x, y, z, v
+        #zplane( vm, topo, None, mapdata, lim, delta, 'nearest' ).show()
+        zplane( vm, topo, vs30, mapdata, lim, delta, 'linear' ).show()
 
