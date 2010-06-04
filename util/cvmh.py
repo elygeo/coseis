@@ -14,29 +14,60 @@ prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
 prop3d = {'rho': '1', 'vp': '1', 'vs': '3', 'tag': '2'}
 voxet3d = {'mantle': 'CVM_CM', 'crust': 'CVM_LR', 'lab': 'CVM_HR'}
 
-def read_vs30():
+def nafe_drake( data ):
     """
-    Download and read USGS, Wald, et al. Vs30 map.
+    Derive density from Vp
     """
-    d = 0.25 / 60
-    extent = (-125.0 + d, -106.0 - d), (30.0 + d, 50.0 - d)
+    data *= 0.001
+    data = 1000.0 * (data * (1.6612 + data * (-0.4721
+        + data * (0.0671 + data * (-0.0043 + data * 0.000106)))))
+    return data
+
+def wald_vs30():
+    """
+    Download and read Wald, et al. Vs30 map.
+    """
     url = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
     f0 = os.path.join( repo, os.path.basename( url ) )
-    f1 = f0.split( '.' )[0] + '.grd'
-    f2 = f0.split( '.' )[0] + '.npy'
-    if os.path.exists( f2 ):
-        data = np.load( f2 )
-    else:
+    f = f0.split( '.' )[0]
+    if not os.path.exists( f ):
         import urllib, gzip
-        from scipy.io.netcdf import netcdf_file
+        if not os.path.exists( repo ):
+            os.makedirs( repo )
         print( 'Downloading %s' % url )
         urllib.urlretrieve( url, f0 )
-        open( f1, 'wb' ).write( gzip.open( f0 ).read() )
-        data = netcdf_file( f1 ).variables['z'].data.T
-        np.save( f2, data )
+        fh = gzip.open( f0 )
+        fh.seek( 19512 )
+        open( f, 'wb' ).write( fh.read() )
+    shape = 2280, 2400
+    delta = 0.25 / 60
+    x = -125.0 + delta, -106.0 - delta
+    y =   30.0 + delta,   50.0 - delta
+    extent = x, y
+    data = np.fromfile( f, '>f' ).reshape( shape[::-1] ).T
     return extent, data, None
 
-def read_voxet( prop=None, voxet=None, no_data_value='nan' ):
+def wills_v30():
+    """
+    Download and read Wills Vs30 map.
+    """
+    url = 'opensha.usc.edu:/export/opensha/data/siteData/wills2006.bin'
+    f = os.path.join( repo, os.path.basename( url ) )
+    if not os.path.exists( f ):
+        if not os.path.exists( repo ):
+            os.makedirs( repo )
+        print( 'Downloading %s' % url )
+        os.system( 'ssh %s .' % url )
+    shape = 49867, 44016
+    delta = 0.00021967246502752
+    x, y = -124.52997177169, 32.441345502265
+    x = x, x + (shape[0] - 1) * delta
+    y = y + (shape[1] - 1) * delta, y
+    extent = x, y
+    data = np.fromfile( f, '<i' ).reshape( shape ).T
+    return extent, data, None
+
+def cvmh_voxet( prop=None, voxet=None, no_data_value='nan' ):
     """
     Download and read SCEC CVM-H voxet.
 
@@ -60,69 +91,74 @@ def read_voxet( prop=None, voxet=None, no_data_value='nan' ):
     version = os.path.basename( url ).split( '.' )[0]
     path = os.path.join( repo, version, 'bin' )
     if not os.path.exists( path ):
+        import urllib
         if not os.path.exists( repo ):
             os.makedirs( repo )
         f = os.path.join( repo, os.path.basename( url ) )
         if not os.path.exists( f ):
-            import urllib
             print( 'Downloading %s' % url )
             urllib.urlretrieve( url, f )
         if os.system( 'tar jxv -C %r -f %r' % (repo, f) ):
             sys.exit( 'Error extraction tar file' )
 
-    # lookup property and voxet
-    if prop in prop2d:
-        pid = prop2d[prop]
-        vid = 'interfaces'
-    else:
-        pid = prop3d[prop]
+    # voxet ID
     if voxet in voxet3d:
         vid = voxet3d[voxet]
+    else:
+        vid = 'interfaces'
+    voxfile = os.path.join( path, vid + '.vo' )
+    topfile = os.path.join( path, vid + '_TOP@@' )
+
+    # compute model top from Vs if not found
+    if not os.path.exists( topfile ) and prop in prop3d:
+        p = prop3d['vs']
+        voxet = gocad.voxet( voxfile, p )['1']
+        data = voxet['PROP'][p]['DATA']
+        z0 = voxet['AXIS']['O']
+        z1 = voxet['AXIS']['W'][2] + z0
+        nz = data.shape[2]
+        dz = (z1 - z0) / (nz - 1)
+        top = np.empty_like( data[:,:,0] )
+        top.fill( np.nan )
+        for j in range( nz ):
+            if dz < 0.0:
+                j = nz - 1 - j
+            f = data[:,:,j].copy()
+            f[1:,:]  = f[1:,:]  + f[:-1,:]
+            f[:-1,:] = f[:-1,:] + f[1:,:]
+            f[:,1:]  = f[:,1:]  + f[:,:-1]
+            f[:,:-1] = f[:,:-1] + f[:,1:]
+            i = ~np.isnan( f )
+            z = z0 + j * dz
+            top[i] = z
+        top.T.tofile( topfile )
 
     # load voxet
-    f = os.path.join( path, vid + '.vo' )
-    voxet = gocad.voxet( f, pid, no_data_value )['1']
+    if prop == None:
+        return gocad.voxet( voxfile )
+    elif prop in prop2d:
+        pid = prop2d[prop]
+    else:
+        pid = prop3d[prop]
+    voxet = gocad.voxet( voxfile, pid, no_data_value )['1']
 
     # extent
     x, y, z = voxet['AXIS']['O']
     u, v, w = voxet['AXIS']['U'][0], voxet['AXIS']['V'][1], voxet['AXIS']['W'][2]
     extent = (x, x + u), (y, y + v), (z, z + w)
 
-    # poperty data and model top
-    if prop == None:
-        return extent, voxet
+    # property data
+    data = voxet['PROP'][pid]['DATA']
+    if prop == 'rho':
+        data = nafe_drake( data )
+        data = np.maximum( data, 1000.0 )
+    nx, ny, nz = data.shape
+    if nz == 1:
+        return extent, data.squeeze(), None
     else:
-        data = voxet['PROP'][pid]['DATA']
-        if prop == 'rho':
-            data *= 0.001
-            data = 1000.0 * (data * (1.6612 + data * (-0.4721 + data * (0.0671 +
-                f * (-0.0043 + data * 0.000106)))))
-            data = np.maximum( data, 1000.0 )
-        nx, ny, nz = data.shape
-        if nz == 1:
-            return extent, data.squeeze(), None
-        else:
-            topfile = os.path.join( path, vid + '_TOP@@' )
-            if os.path.exists( topfile ):
-                top = np.fromfile( topfile, data.dtype ).reshape( [ny, nx] ).T
-            else:
-                z0, z1 = extent[-1]
-                dz = (z1 - z0) / (nz - 1)
-                top = np.empty_like( data[:,:,0] )
-                top.fill( np.nan )
-                for j in range( nz ):
-                    if dz < 0.0:
-                        j = nz - 1 - j
-                    f = data[:,:,j].copy()
-                    f[1:,:]  = f[1:,:]  + f[:-1,:]
-                    f[:-1,:] = f[:-1,:] + f[1:,:]
-                    f[:,1:]  = f[:,1:]  + f[:,:-1]
-                    f[:,:-1] = f[:,:-1] + f[:,1:]
-                    i = ~np.isnan( f )
-                    z = z0 + j * dz
-                    top[i] = z
-                top.T.tofile( topfile )
-            return extent, top, data
+        dtype = data.dtype
+        top = np.fromfile( topfile, dtype ).reshape( [ny, nx] ).T
+        return extent, top, data
 
 class Model():
     """
@@ -149,13 +185,14 @@ class Model():
     def __init__( self, prop, voxet=['mantle', 'crust', 'lab'], no_data_value='nan' ):
         self.prop = prop
         if prop == 'vs30':
-            self.voxet = [ read_vs30() ]
+            #self.voxet = [ wald_vs30(), wills_vs30 ]
+            self.voxet = [ wald_vs30() ]
         elif prop in prop2d:
-            self.voxet = [ read_voxet( prop ) ]
+            self.voxet = [ cvmh_voxet( prop ) ]
         else:
             self.voxet = []
             for vox in voxet:
-                self.voxet += [ read_voxet( prop, vox, no_data_value ) ]
+                self.voxet += [ cvmh_voxet( prop, vox, no_data_value ) ]
         return
     def __call__( self, x, y, z=None, out=None, interpolation='linear' ):
         if out == None:
@@ -312,11 +349,11 @@ if __name__ == '__main__':
         surf = topo, base
         delta = 100.0, 10.0
         lim = (400000.0, 400000.0), (3650000.0, 3850000.0), (-3000.0, 2000.0), (150.0, 3200.0)
-        xsection( vm, topo, None, vm, lim, delta, 'nearest' ).show()
-        #xsection( vm, topo, vs30, base, lim, delta, 'linear' ).show()
+        xsection( vm, topo, None, base, lim, delta, 'nearest' ).show()
+        xsection( vm, topo, vs30, base, lim, delta, 'linear' ).show()
 
     # depth planes
-    if 0:
+    if 1:
         if 0:
             import data
             import pyproj
@@ -333,9 +370,8 @@ if __name__ == '__main__':
         x, y, z = extent
         x = x[0] + delta, x[1] - delta
         y = y[0] + delta, y[1] - delta
-        z = 50.0
-        v = 150.0, 3200.0
-        lim = x, y, z, v
-        #zplane( vm, topo, None, mapdata, lim, delta, 'nearest' ).show()
-        zplane( vm, topo, vs30, mapdata, lim, delta, 'linear' ).show()
+        z = 20.0
+        v = 150.0, 1500.0
+        zplane( vm, topo, None, mapdata, (x, y, z, v), delta, 'nearest' ).show()
+        zplane( vm, topo, vs30, mapdata, (x, y, z, v), delta, 'linear' ).show()
 
