@@ -14,15 +14,6 @@ prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
 prop3d = {'rho': '1', 'vp': '1', 'vs': '3', 'tag': '2'}
 voxet3d = {'mantle': 'CVM_CM', 'crust': 'CVM_LR', 'lab': 'CVM_HR'}
 
-def nafe_drake( data ):
-    """
-    Derive density from Vp
-    """
-    data *= 0.001
-    data = 1000.0 * (data * (1.6612 + data * (-0.4721
-        + data * (0.0671 + data * (-0.0043 + data * 0.000106)))))
-    return data
-
 def wald_vs30():
     """
     Download and read Wald, et al. Vs30 map.
@@ -68,6 +59,24 @@ def wills_vs30():
     data = np.fromfile( f, '<i2' ).reshape( shape ).T
     #i = data == -9999
     return extent, data, None
+
+def brocher_vp( f ):
+    """
+    Vp from Vs via Brocher (2005) eqn 9.
+    """
+    f *= 0.001
+    f = 0.9409 + f * (2.0947 - f * (0.8206 - f * (0.2683 - f * 0.0251)))
+    f *= 1000.0
+    return f
+
+def nafe_drake( f ):
+    """
+    Density from Vp via Nafe-Drake cure (Ludwid et al., 1970, Brocher, 2005, eqn 1)
+    """
+    f *= 0.001
+    f = f * (1.6612 - f * (0.4721 - f * (0.0671 - f * (0.0043 - f * 0.000106))))
+    f *= 1000.0
+    return f
 
 def cvmh_voxet( prop=None, voxet=None, no_data_value='nan' ):
     """
@@ -231,79 +240,85 @@ class Extraction():
     -------
         out: property samples at coordinates (x, y, z)
     """
-    def __init__( self, x, y, vm, topo, lon=None, lat=None, vs30=None, zgtl=100.0, interpolation='linear' ):
+    def __init__( self, x, y, vm, topo, lon=None, lat=None, vs30=None, gtl_depth=100.0, interpolation='linear' ):
+        x = np.asarray( x )
+        y = np.asarray( y )
         z0 = topo( x, y )
         if vs30 == None:
-            self.gtl = None
+            gtl_depth = 0.0
         else:
-            slope_factor = 0.03
-            d0 = 15.0
-            v0 = vs30( lon, lat )
             z1 = vm( x, y )
-            z1 = np.minimum( z0 - zgtl, z1 - 1.0 )
-            v1 = vm( x, y, z1, interpolation=interpolation )
-            w = z0 - z1
-            b = v0 * slope_factor
-            a = v1 / ((w - d0) * ((w - d0) + b) + v0)
-            self.gtl = d0, v0, w, b, a
-        self.data = x, y, z0, vm, interpolation
+            z1 = np.minimum( z0 - gtl_depth, z1 - 1.0 )
+            d0 = 30.0
+            d1 = z0 - z1
+            v_ = vs30( lon, lat )
+            v0 = v_ * 0.55
+            v1 = v_ * 1.45
+            v2 = vm( x, y, z1, interpolation=interpolation )
+            b0 = (v1 - v0) / d0
+            b1 = (v2 - v1) / (d1 - d0)
+            c0 = v0
+            c1 = v1 - b1 * d0
+            self.gtl = b0, b1, c0, c1, d0, d1
+            gtl_depth = max( gtl_depth, d1.max() )
+        self.data = x, y, z0, vm, interpolation, gtl_depth
         return
-    def __call__( self, z, out=None, by_depth=True ):
-        x, y, z0, vm, interpolation = self.data
+    def __call__( self, z, out=None, min_depth=None, by_depth=True ):
+        x, y, z0, vm, interpolation, gtl_depth = self.data
+        z = np.asarray( z )
         if out == None:
             out = np.empty_like( z )
             out.fill( np.nan )
-        if by_depth:
-            vm( x, y, z0 - z, out, interpolation )
-            d = z
-        else:
+        if by_depth == False:
             vm( x, y, z, out, interpolation )
             d = z0 - z
-        if self.gtl != None:
-            d0, v0, w, b, a = self.gtl
-            i = d < 0.0
-            out[i] = np.nan
-            i = (d >= 0.0) & (d < d0)
-            out[i] = v0[i] + (d[i] - d0) * b[i]
-            i = (d >= d0) & (d < w)
-            out[i] = v0[i] + (d[i] - d0) * (b[i] + a[i] * (d[i] - d0))
+        else:
+            vm( x, y, z0 - z, out, interpolation )
+            d = z
+        if gtl_depth > 0.0:
+            if min_depth == None:
+                min_depth = d.min()
+            if min_depth < gtl_depth:
+                b0, b1, c0, c1, d0, d1 = self.gtl
+                i = d < 0.0
+                out[i] = np.nan
+                i = (d >= 0.0) & (d < d0)
+                out[i] = c0[i] + b0[i] * d[i]
+                i = (d >= d0) & (d < d1)
+                out[i] = c1[i] + b1[i] * d[i]
         return out
 
-def zprofile( lim, vm, topo, vs30, nsample=200, interpolation='linear' ):
+def zprofile( ax, x, y, z, vm, topo, vs30, nsample=300, interpolation='linear', **kwargs ):
     """
     Depth profile plot.
     """
     import pyproj
-    import matplotlib.pyplot as plt
     zgtl = 100.0
-    x = lim[0]
-    y = lim[1]
-    z0, z1 = lim[2]
+    z0, z1 = z
     z = np.linspace( z0, z1, nsample )
+    x = np.ones_like( z ) * x
+    y = np.ones_like( z ) * y
     proj = pyproj.Proj( **projection )
     lon, lat = proj( x, y, inverse=True )
     extract = Extraction( x, y, vm, topo, lon, lat, vs30, zgtl, interpolation )
     f = extract( z, by_depth=True )
-    fig = plt.figure()
-    fig.clf()
-    ax = plt.gca()
-    ax.plot( f, z )
+    ax.plot( f, z, **kwargs )
     ax.set_title( vm.prop )
+    ax.set_ylim( z1, z0 )
     ax.set_ylabel( 'Z (km)' )
-    return fig
+    return ax.figure
 
-def xsection( lim, vm, topo, vs30, base, delta=(500.0, 50.0), interpolation='linear' ):
+def xsection( fig, x, y, z, v, vm, topo, vs30, base, delta=(500.0, 50.0), interpolation='linear' ):
     """
     Cross section plot.
     """
     import pyproj
-    import matplotlib.pyplot as plt
     zgtl = 100.0
     scale = 0.001
-    x0, x1 = lim[0]
-    y0, y1 = lim[1]
-    z0, z1 = lim[2]
-    v0, v1 = lim[3]
+    x0, x1 = x
+    y0, y1 = y
+    z0, z1 = z
+    v0, v1 = v
     dx, dy = x1 - x0, y1 - y0
     L = np.sqrt( dx * dx + dy * dy )
     ex = [ scale * r for r in [0, L, z0, z1] ]
@@ -317,9 +332,8 @@ def xsection( lim, vm, topo, vs30, base, delta=(500.0, 50.0), interpolation='lin
     lon, lat = proj( xx, yy, inverse=True )
     extract = Extraction( xx, yy, vm, topo, lon, lat, vs30, zgtl, interpolation )
     f = extract( zz, by_depth=False )
-    fig = plt.figure()
     fig.clf()
-    ax = plt.gca()
+    ax = fig.add_subplot( 111 )
     im = ax.imshow( f.T, extent=ex, vmin=v0, vmax=v1, origin='lower', interpolation='nearest' )
     fig.colorbar( im, orientation='horizontal' )
     ax.set_title( vm.prop )
@@ -333,18 +347,17 @@ def xsection( lim, vm, topo, vs30, base, delta=(500.0, 50.0), interpolation='lin
     ax.axis( ex )
     return fig
 
-def zplane( lim, vm, topo, vs30, mapdata, delta=500.0, interpolation='linear' ):
+def zplane( fig, x, y, z, v, vm, topo, vs30, mapdata, delta=500.0, interpolation='linear' ):
     """
     Depth plane plot.
     """
     import pyproj
-    import matplotlib.pyplot as plt
     zgtl = 100.0
     scale = 0.001
-    x0, x1 = lim[0]
-    y0, y1 = lim[1]
-    z0 = lim[2]
-    v0, v1 = lim[3]
+    x0, x1 = x
+    y0, y1 = y
+    z0 = z
+    v0, v1 = v
     ex = [ scale * r for r in [x0, x1, y0, y1] ]
     x = np.arange( x0, x1 + 0.5 * delta, delta )
     y = np.arange( y0, y1 + 0.5 * delta, delta )
@@ -355,9 +368,8 @@ def zplane( lim, vm, topo, vs30, mapdata, delta=500.0, interpolation='linear' ):
     lon, lat = proj( x, y, inverse=True )
     extract = Extraction( x, y, vm, topo, lon, lat, vs30, zgtl, interpolation )
     f = extract( z, by_depth=True )
-    fig = plt.figure()
     fig.clf()
-    ax = plt.gca()
+    ax = fig.add_subplot( 111 )
     im = ax.imshow( f.T, extent=ex, vmin=v0, vmax=v1, origin='lower', interpolation='nearest' )
     fig.colorbar( im )
     if mapdata:
@@ -369,6 +381,7 @@ def zplane( lim, vm, topo, vs30, mapdata, delta=500.0, interpolation='linear' ):
 
 # continue if run from the command line
 if __name__ == '__main__':
+    import matplotlib.pyplot as plt
 
     # models
     vm = Model( 'vs', ['crust'] )
@@ -378,15 +391,25 @@ if __name__ == '__main__':
 
     # profiles
     if 1:
-        lim = 400000.0, 3750000.0, (150.0, 3200.0)
-        zprofile( lim, vm, topo, vs30 ).show()
+        x = 400000.0
+        y = 3750000.0
+        z = 0.0, 1000.0
+        fig = plt.figure( 0 )
+        fig.clf()
+        ax = fig.add_subplot( 111 )
+        zprofile( ax, x, y, z, vm, topo, None, 200, 'nearest' )
+        zprofile( ax, x, y, z, vm, topo, vs30, 200, 'linear' )
 
     # cross sections
-    if 0:
+    if 1:
+        x = 400000.0, 400000.0
+        y = 3750000.0, 3850000.0
+        z = -4000.0, 2000.0
+        v = 150.0, 3200.0
         delta = 100.0, 10.0
-        lim = (400000.0, 400000.0), (3650000.0, 3850000.0), (-3000.0, 2000.0), (150.0, 3200.0)
-        xsection( lim, vm, topo, None, base, delta, 'nearest' ).show()
-        xsection( lim, vm, topo, vs30, base, delta, 'linear' ).show()
+        f, g = plt.figure( 1 ), plt.figure( 2 )
+        xsection( f, x, y, z, v, vm, topo, None, base, delta, 'nearest' )
+        xsection( g, x, y, z, v, vm, topo, vs30, base, delta, 'linear' )
 
     # depth planes
     if 0:
@@ -402,12 +425,14 @@ if __name__ == '__main__':
             mapdata = proj( x, y )
         else:
             mapdata = None
-        delta = 500.0
         x, y, z = extent
         x = x[0] + delta, x[1] - delta
         y = y[0] + delta, y[1] - delta
         z = 20.0
         v = 150.0, 1500.0
-        zplane( (x, y, z, v), vm, topo, None, mapdata, delta, 'nearest' ).show()
-        zplane( (x, y, z, v), vm, topo, vs30, mapdata, delta, 'linear' ).show()
+        delta = 500.0
+        f, g = plt.figure( 3 ), plt.figure( 4 )
+        zplane( f, x, y, z, v, vm, topo, None, mapdata, delta, 'nearest' )
+        zplane( g, x, y, z, v, vm, topo, vs30, mapdata, delta, 'linear' )
 
+    plt.show()
