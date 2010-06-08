@@ -78,7 +78,7 @@ def brocher_vp( f ):
     f *= 1000.0
     return f
 
-def cvmh_voxet( prop=None, voxet=None, no_data_value='nan' ):
+def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
     """
     Download and read SCEC CVM-H voxet.
 
@@ -98,19 +98,17 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan' ):
     """
 
     # download if not found
-    url = 'http://structure.harvard.edu/cvm-h/download/vx62.tar.bz2'
-    version = os.path.basename( url ).split( '.' )[0]
     path = os.path.join( repo, version, 'bin' )
     if not os.path.exists( path ):
-        import urllib
+        import urllib, tarfile
         if not os.path.exists( repo ):
             os.makedirs( repo )
-        f = os.path.join( repo, os.path.basename( url ) )
+        f = os.path.join( repo, '%s.tar.bz2' % version )
         if not os.path.exists( f ):
+            url = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2' % version
             print( 'Downloading %s' % url )
             urllib.urlretrieve( url, f )
-        if os.system( 'tar jxv -C %r -f %r' % (repo, f) ):
-            sys.exit( 'Error extraction tar file' )
+        tarfile.open( f, 'r:bz2' ).extractall( repo )
 
     # voxet ID
     if voxet in voxet3d:
