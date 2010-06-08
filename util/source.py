@@ -325,8 +325,8 @@ def srf2potency( src, path, delta=(1,1,1), proj=None ):
     ----------
         src : path to SRF source directory converted first with srf_read
         path : path to destination directory for potency tensors
+        delta : grid step size (dx, dy, dz)
         proj : function to project lon/lat to logical model coordinates
-        castint : cast integerts (nt) to floats (hack for SORD)
     """
     import coord
 

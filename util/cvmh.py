@@ -7,11 +7,11 @@ import numpy as np
 import coord, gocad
 
 # parameters
-repo = os.path.expanduser( '~/mapdata' )
+repo = os.path.expanduser( '~/data-repo' )
 projection = dict( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
 prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
-prop3d = {'rho': '1', 'vp': '1', 'vs': '3', 'tag': '2'}
+prop3d = {'vp': '1', 'vs': '3', 'tag': '2'}
 voxet3d = {'mantle': 'CVM_CM', 'crust': 'CVM_LR', 'lab': 'CVM_HR'}
 
 def wald_vs30():
@@ -60,21 +60,21 @@ def wills_vs30():
     #i = data == -9999
     return extent, data, None
 
-def brocher_vp( f ):
-    """
-    Vp from Vs via Brocher (2005) eqn 9.
-    """
-    f *= 0.001
-    f = 0.9409 + f * (2.0947 - f * (0.8206 - f * (0.2683 - f * 0.0251)))
-    f *= 1000.0
-    return f
-
 def nafe_drake( f ):
     """
-    Density from Vp via Nafe-Drake cure (Ludwid et al., 1970, Brocher, 2005, eqn 1)
+    Density derived from V_p via Nafe-Drake curve, Brocher (2005) eqn 1.
     """
-    f *= 0.001
+    f = np.asarray( f ) * 0.001
     f = f * (1.6612 - f * (0.4721 - f * (0.0671 - f * (0.0043 - f * 0.000106))))
+    f = np.maximum( f, 1.0 ) * 1000.0
+    return f
+
+def brocher_vp( f ):
+    """
+    V_p derived from V_s via Brocher (2005) eqn 9.
+    """
+    f = np.asarray( f ) * 0.001
+    f = 0.9409 + f * (2.0947 - f * (0.8206 - f * (0.2683 - f * 0.0251)))
     f *= 1000.0
     return f
 
@@ -86,7 +86,7 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan' ):
     ----------
         prop:
             2d property: 'topo', 'base', or 'moho'
-            3d property: 'rho', 'vp', 'vs', or 'tag'
+            3d property: 'vp', 'vs', or 'tag'
         voxet:
             3d voxet: 'mantle', 'crust', 'lab'
 
@@ -160,9 +160,6 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan' ):
 
     # property data
     data = voxet['PROP'][pid]['DATA']
-    if prop == 'rho':
-        data = nafe_drake( data )
-        data = np.maximum( data, 1000.0 )
     nx, ny, nz = data.shape
     if nz == 1:
         return extent, data.squeeze(), None
@@ -179,7 +176,7 @@ class Model():
     ---------------
         prop:
             2d property: 'topo', 'base', or 'moho'
-            3d property: 'rho', 'vp', 'vs', or 'tag'
+            3d property: 'vp', 'vs', or 'tag'
         voxet:
             3d voxet list: ['mantle', 'crust', 'lab']
 
@@ -256,6 +253,8 @@ class Extraction():
             v1 = v_ * 1.45
             v2 = vm( x, y, z1, interpolation=interpolation )
             b0 = (v1 - v0) / d0
+            if vm.prop == 'vp':
+                v1 = brocher_vp( v1 )
             b1 = (v2 - v1) / (d1 - d0)
             c0 = v0
             c1 = v1 - b1 * d0
@@ -283,156 +282,11 @@ class Extraction():
                 i = d < 0.0
                 out[i] = np.nan
                 i = (d >= 0.0) & (d < d0)
-                out[i] = c0[i] + b0[i] * d[i]
+                if vm.prop == 'vp':
+                    out[i] = brocher_vp( c0[i] + b0[i] * d[i] )
+                else:
+                    out[i] = c0[i] + b0[i] * d[i]
                 i = (d >= d0) & (d < d1)
                 out[i] = c1[i] + b1[i] * d[i]
         return out
 
-def zprofile( ax, x, y, z, vm, topo, vs30, nsample=300, interpolation='linear', **kwargs ):
-    """
-    Depth profile plot.
-    """
-    import pyproj
-    zgtl = 100.0
-    z0, z1 = z
-    z = np.linspace( z0, z1, nsample )
-    x = np.ones_like( z ) * x
-    y = np.ones_like( z ) * y
-    proj = pyproj.Proj( **projection )
-    lon, lat = proj( x, y, inverse=True )
-    extract = Extraction( x, y, vm, topo, lon, lat, vs30, zgtl, interpolation )
-    f = extract( z, by_depth=True )
-    ax.plot( f, z, **kwargs )
-    ax.set_title( vm.prop )
-    ax.set_ylim( z1, z0 )
-    ax.set_ylabel( 'Z (km)' )
-    return ax.figure
-
-def xsection( fig, x, y, z, v, vm, topo, vs30, base, delta=(500.0, 50.0), interpolation='linear' ):
-    """
-    Cross section plot.
-    """
-    import pyproj
-    zgtl = 100.0
-    scale = 0.001
-    x0, x1 = x
-    y0, y1 = y
-    z0, z1 = z
-    v0, v1 = v
-    dx, dy = x1 - x0, y1 - y0
-    L = np.sqrt( dx * dx + dy * dy )
-    ex = [ scale * r for r in [0, L, z0, z1] ]
-    r = np.arange( 0, L + 0.5 * delta[0], delta[0] )
-    x = x0 + dx / L * r
-    y = y0 + dy / L * r
-    z = np.arange( z0, z1 + 0.5 * delta[1], delta[1] )
-    zz, xx = np.meshgrid( z, x )
-    zz, yy = np.meshgrid( z, y )
-    proj = pyproj.Proj( **projection )
-    lon, lat = proj( xx, yy, inverse=True )
-    extract = Extraction( xx, yy, vm, topo, lon, lat, vs30, zgtl, interpolation )
-    f = extract( zz, by_depth=False )
-    fig.clf()
-    ax = fig.add_subplot( 111 )
-    im = ax.imshow( f.T, extent=ex, vmin=v0, vmax=v1, origin='lower', interpolation='nearest' )
-    fig.colorbar( im, orientation='horizontal' )
-    ax.set_title( vm.prop )
-    ax.set_xlabel( 'X (km)' )
-    ax.set_ylabel( 'Z (km)' )
-    for surf in topo, base:
-        if surf:
-            f = surf( x, y, interpolation='linear' )
-            ax.plot( scale * r, scale * f, 'k-' )
-    ax.axis( 'auto' )
-    ax.axis( ex )
-    return fig
-
-def zplane( fig, x, y, z, v, vm, topo, vs30, mapdata, delta=500.0, interpolation='linear' ):
-    """
-    Depth plane plot.
-    """
-    import pyproj
-    zgtl = 100.0
-    scale = 0.001
-    x0, x1 = x
-    y0, y1 = y
-    z0 = z
-    v0, v1 = v
-    ex = [ scale * r for r in [x0, x1, y0, y1] ]
-    x = np.arange( x0, x1 + 0.5 * delta, delta )
-    y = np.arange( y0, y1 + 0.5 * delta, delta )
-    y, x = np.meshgrid( y, x )
-    z = np.empty_like( x )
-    z.fill( z0 )
-    proj = pyproj.Proj( **projection )
-    lon, lat = proj( x, y, inverse=True )
-    extract = Extraction( x, y, vm, topo, lon, lat, vs30, zgtl, interpolation )
-    f = extract( z, by_depth=True )
-    fig.clf()
-    ax = fig.add_subplot( 111 )
-    im = ax.imshow( f.T, extent=ex, vmin=v0, vmax=v1, origin='lower', interpolation='nearest' )
-    fig.colorbar( im )
-    if mapdata:
-        x, y = mapdata
-        ax.plot( scale * x, scale * y, '-k' )
-    ax.set_title( vm.prop )
-    ax.axis( ex )
-    return fig
-
-# continue if run from the command line
-if __name__ == '__main__':
-    import matplotlib.pyplot as plt
-
-    # models
-    vm = Model( 'vs', ['crust'] )
-    topo = Model( 'topo' )
-    base = Model( 'base' )
-    vs30 = Model( 'vs30' )
-
-    # profiles
-    if 1:
-        x = 400000.0
-        y = 3750000.0
-        z = 0.0, 1000.0
-        fig = plt.figure( 0 )
-        fig.clf()
-        ax = fig.add_subplot( 111 )
-        zprofile( ax, x, y, z, vm, topo, None, 200, 'nearest' )
-        zprofile( ax, x, y, z, vm, topo, vs30, 200, 'linear' )
-
-    # cross sections
-    if 1:
-        x = 400000.0, 400000.0
-        y = 3750000.0, 3850000.0
-        z = -4000.0, 2000.0
-        v = 150.0, 3200.0
-        delta = 100.0, 10.0
-        f, g = plt.figure( 1 ), plt.figure( 2 )
-        xsection( f, x, y, z, v, vm, topo, None, base, delta, 'nearest' )
-        xsection( g, x, y, z, v, vm, topo, vs30, base, delta, 'linear' )
-
-    # depth planes
-    if 0:
-        if 0:
-            import data
-            import pyproj
-            proj = pyproj.Proj( **projection )
-            ll = (-121.3, -113.3), (30.9, 36.8)
-            x, y = data.mapdata( 'coast', 'high', ll, 20.0, 1, 1 )
-            u, v = data.mapdata( 'border', 'high', ll, delta=0.1 )
-            x = np.r_[ x, np.nan, u ]
-            y = np.r_[ y, np.nan, v ]
-            mapdata = proj( x, y )
-        else:
-            mapdata = None
-        x, y, z = extent
-        x = x[0] + delta, x[1] - delta
-        y = y[0] + delta, y[1] - delta
-        z = 20.0
-        v = 150.0, 1500.0
-        delta = 500.0
-        f, g = plt.figure( 3 ), plt.figure( 4 )
-        zplane( f, x, y, z, v, vm, topo, None, mapdata, delta, 'nearest' )
-        zplane( g, x, y, z, v, vm, topo, vs30, mapdata, delta, 'linear' )
-
-    plt.show()

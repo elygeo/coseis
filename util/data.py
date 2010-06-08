@@ -23,7 +23,7 @@ import numpy as np
 from cStringIO import StringIO
 import coord, util
 
-repo = os.path.expanduser( '~/mapdata' )
+repo = os.path.expanduser( '~/data-repo' )
 
 def etopo1( indices=None, downsample=1 ):
     """
