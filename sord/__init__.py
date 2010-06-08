@@ -4,13 +4,9 @@ Support Operator Rupture Dynamics
 """
 import os, sys, re, math, pprint
 import numpy as np
-import conf, fieldnames
-from conf import launch
-from util import swab, util, coord, signal, source, data, viz, plt, mlab, egmm, gocad, cvmh
-try:
-    from util import rspectra
-except( ImportError ):
-    pass
+from coseis import conf, util
+from coseis.conf import launch
+import fieldnames
 
 def stage( inputs={}, **kwargs ):
     """

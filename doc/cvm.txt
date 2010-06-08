@@ -1,0 +1,102 @@
+=========
+SCEC CVM4
+=========
+
+SCEC Community Velocity Model for Southern California by Harold Magistrale with
+bug fixes, parallel binary I/O, and Python wrapper by Geoffrey Ely.
+
+.. contents::
+
+
+Usage
+=====
+
+The basic steps to running the CVM using the Python wrapper are:
+
+1.  Import the ``cvm`` module.
+
+2.  Call the ``cvm.stage()`` routine giving the number of mesh points and the
+    number of processing cores
+
+3.  Write longitude, latitude, and depth files into the staged directory.
+
+4.  Launch either an interactive job using the ``run.sh`` script or a batch job
+    using the ``queue.sh`` script.
+
+
+Examples
+========
+
+Depth slice
+-----------
+
+.. image:: fig/cvm4-vs500.png
+
+Extract S-wave velocity at 500 m depth. Plot using Matplotlib::
+
+    cd scripts/cvm-example
+    python mesh.py
+
+Source code:
+`mesh.py <../scripts/cvm-example/mesh.py>`__
+
+.. include:: ../scripts/cvm-example/mesh.py
+    :literal:
+
+Fence diagram
+-------------
+
+.. image:: fig/cvm4-fence.png
+
+Build a fence diagram similar to Magistrale (2000) figure 10. Plot using
+Mayavi::
+
+    cd scripts/fence
+    python mesh.py
+    python plot.py
+
+Source code:
+`mesh.py <../scripts/fence/mesh.py>`__
+`plot.py <../scripts/fence/plot.py>`__
+
+Basin depth
+-----------
+
+.. image:: fig/cvm4-z25.png
+
+Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s.
+Plot over topography using Mayavi::
+
+    cd scripts/basindepth
+    python mesh.py
+    python search.py
+    python viz.py
+
+Source code:
+`mesh.py <../scripts/basindepth/mesh.py>`__
+`search.py <../scripts/basindepth/search.py>`__
+`viz.py <../scripts/basindepth/viz.py>`__
+
+
+Documentation
+=============
+
+.. class:: ref
+
+Magistrale, H., et al. (1996) *A geology-based 3D velocity model of the Los
+Angeles basin sediments*, BSSA
+`86(4):1161–1166 <http://www.bssaonline.org/cgi/content/abstract/86/4/1161>`__
+
+.. class:: ref
+
+Magistrale, H., et al. (2000), *The SCEC southern California reference
+three-dimensional seismic velocity model version 2*, BSSA,
+`90(6B):S65–76 <http://www.bssaonline.org/cgi/content/abstract/90/6B/S65>`__,
+doi: 10.1785/0120000510. 
+`[PDF] <Magistrale2000.pdf>`__
+
+| `readme-v3 <readme-v3.txt>`_
+| `readme-v4 <readme-v4.txt>`_
+
+.. vim: filetype=rst
+

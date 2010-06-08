@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.6: http://docutils.sourceforge.net/" />
+<title>Coseis: Computational Seismology Tools</title>
+<style type="text/css">
+
+body {
+    margin: 0px;
+    color: #000;
+    background-color: #fff;
+    font-family: 'Lucida Grande', Geneva, Verdana, sans-serif;
+}
+
+div {
+    margin: 0px;
+}
+
+div.line-block {
+    margin: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+div.footer {
+    margin: 20px;
+    margin-top: 40px;
+}
+
+p {
+    margin: 20px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+dl {
+    margin: 20px;
+    margin-top: 35px;
+    margin-bottom: 15px;
+}
+
+table {
+    margin: 60px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border: none;
+}
+
+td {
+    border: none;
+}
+
+pre {
+    margin: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+h1 {
+    margin: 0px;
+    padding: 20px;
+    border-top: medium solid #700;
+    border-bottom: medium solid #300;
+    font-weight: lighter;
+    color: #fff;
+    background-color: #600;
+    text-shadow: #000 3px 3px 3px;
+}
+
+h2, h3, h4 {
+    padding: 5px;
+    margin: 15px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    background-color: #eee;
+}
+
+a {
+    color: #00c;
+    text-decoration: none;
+}
+
+a:hover, a:active {
+    color: #66f;
+    text-decoration: none;
+}
+
+img {
+    border: 15px solid #fff;
+    padding: 0px;
+}
+
+
+</style>
+</head>
+<body>
+<div class="document" id="coseis-computational-seismology-tools">
+<h1 class="title">Coseis: Computational Seismology Tools</h1>
+
+<a class="reference external image-reference" href="http://earth.usc.edu/~gely/ely-saf-surface.mov"><img align="right" alt="fig/ely-saf-surface.jpg" class="align-right" src="fig/ely-saf-surface.jpg" /></a>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#components" id="id1">Components</a></li>
+<li><a class="reference internal" href="#system-requirements" id="id2">System requirements</a></li>
+<li><a class="reference internal" href="#installation" id="id3">Installation</a></li>
+<li><a class="reference internal" href="#source-control" id="id4">Source control</a></li>
+</ul>
+</div>
+<div class="section" id="components">
+<h3>Components</h3>
+<ul class="simple">
+<li><a class="reference external" href="sord.html">SORD</a>: Support Operator Rupture Dynamics code for spontaneous
+rupture and 3D wave propagation simulation.</li>
+<li><a class="reference external" href="cvm.html">CVM4</a>: Parallelization and Python wrapper for SCEC Community
+Velocity Model ver. 4.</li>
+<li>CVMH: extraction tool for SCEC Community Velocity Model, <a class="reference external" href="http://structure.harvard.edu/cvm-h/">Harvard version</a> with alternate geotechnical layer
+implementation.</li>
+<li><a class="reference external" href="http://scec.usc.edu/websims">WebSims</a>: catalog, explore, compare and
+disseminate large numerical simulations results.</li>
+<li>Mesh generation, source preparation, and visualization utilities.</li>
+</ul>
+</div>
+<div class="section" id="system-requirements">
+<h3>System requirements</h3>
+<ul class="simple">
+<li><a class="reference external" href="http://www.python.org/download/">Python</a>, and
+<a class="reference external" href="http://http://numpy.scipy.org/">NumPy</a> (Numerical Python).</li>
+<li>(Optional) Fortran 95 compiler. Required for SORD and CVM4.</li>
+<li>(Optional) Message Passing Interface (MPI) library.  Required for
+SORD and CVM4 multi-core processing.</li>
+<li>(Optional) <a class="reference external" href="http://matplotlib.sourceforge.net/">Matplotlib</a>, <a class="reference external" href="http://www.scipy.org/">SciPy</a>, and Pyproj Python packages.  Required for
+supplemental plotting, signal processing, and mesh generation utilities.</li>
+<li>(Optional) <a class="reference external" href="http://bazaar.canonical.com/">Bazaar</a> version control system.
+Useful for development and staying updated with the latest code version.</li>
+</ul>
+</div>
+<div class="section" id="installation">
+<h3>Installation</h3>
+<p>Fortran and MPI installation should only be necessary for laptops and
+workstations.  HPC systems generally supply specifically tuned Fortran
+compilers and MPI libraries.</p>
+<ol class="arabic">
+<li><p class="first">GNU Fortran is recommended if you don't already have a Fortran 95 compiler.</p>
+<p>Fedora/Red Hat Linux:</p>
+<pre class="literal-block">
+sudo yum install gfortran
+</pre>
+<p>Ubuntu Linux:</p>
+<pre class="literal-block">
+sudo apt-get install gfortran
+</pre>
+<p>Mac OS X:</p>
+<blockquote>
+<p>First install either the iPhone or the Mac-only version of <a class="reference external" href="http://developer.apple.com/technology/xcode.html">Xcode</a> available from Apple
+Developer Connection (free <a class="reference external" href="http://connect.apple.com">membership</a> required).
+Then install the GNU Fortran version available from the <a class="reference external" href="http://r.research.att.com/tools">R for Mac OS X
+Developer's Page</a> (versions from MacPorts
+and Fink seem to be problematic and are not recommended).</p>
+</blockquote>
+</li>
+<li><p class="first"><a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a> is recommended
+if you need MPI.  The following shell script installs MPICH2:</p>
+<blockquote>
+<p><a class="reference external" href="../install/install-mpich.sh">install-mpich.sh</a></p>
+</blockquote>
+</li>
+<li><p class="first">It is recommended that you install a private copy of Python for Coseis.  The
+following script installs Python and NumPy:</p>
+<blockquote>
+<p><a class="reference external" href="../install/install-python.sh">install-python.sh</a></p>
+</blockquote>
+<p><a class="reference external" href="http://www.enthought.com/products/epddownload.php">Enthought Python Distribution</a> (EPD) is another
+option that includes many bells and whistles such as the <a class="reference external" href="http://code.enthought.com/projects/mayavi">Mayavi</a> visualization package.</p>
+</li>
+<li><p class="first">Download the source code.  The best option is use Bazaar version
+control, which facilitates applying code updates, and merging local
+modifications (see <a class="reference internal" href="#source-control">Source Control</a> section for examples). The following
+script installs Bazaar and Coseis:</p>
+<blockquote>
+<p><a class="reference external" href="../install/install-coseis.sh">install-coseis.sh</a></p>
+</blockquote>
+<p>Alternatively, download and unpack the source tar archive from here:</p>
+<blockquote>
+<p><a class="reference external" href="http://earth.usc.edu/~gely/coseis/coseis.tgz">http://earth.usc.edu/~gely/coseis/coseis.tgz</a></p>
+</blockquote>
+</li>
+<li><p class="first">For laptop and workstation installations, the default system configuration
+is usually be adequate.  To test the default configuration:</p>
+<pre class="literal-block">
+cd coseis/
+python configure.py
+</pre>
+<p>Systems with batch schedulers (such as PBS or LoadLeveler) generally require
+custom configuration to specify system resources, compiler options, and
+scheduler scripts.  If Coseis has already been configured for your system you
+can use one of the included configurations.  For example, for the TeraGrid
+Ranger system at TACC:</p>
+<pre class="literal-block">
+python configure.py tacc-ranger
+</pre>
+<p>To see the list of included configurations look in the <tt class="docutils literal">conf/</tt> directory.
+Each custom configuration is located in a separate sub-directory.  To create a
+new custom configuration, make a new sub-directory following the example of
+the supplied configurations.</p>
+</li>
+<li><p class="first">Configure the Python path:</p>
+<pre class="literal-block">
+python setup.py path
+</pre>
+</li>
+</ol>
+<ol class="arabic" start="6">
+<li><p class="first">Compile component codes:</p>
+<pre class="literal-block">
+cd sord
+python setup.py
+cd ../cvm
+python setup.py
+</pre>
+</li>
+</ol>
+</div>
+<div class="section" id="source-control">
+<h3>Source control</h3>
+<p>We use <a class="reference external" href="http://bazaar.canonical.com/">Bazaar</a> for version control. Some examples:</p>
+<p>Apply any recent updates from the repository, overwriting any local changes.
+This is a way to keep up-to-date with the latest code.</p>
+<pre class="literal-block">
+bzr pull
+bzr revert
+</pre>
+<p>See code changes since the last commit</p>
+<pre class="literal-block">
+bzr diff
+</pre>
+<p>Commit changes</p>
+<pre class="literal-block">
+bzr commit -m &quot;Great new feature&quot;
+</pre>
+<p>Create a patch</p>
+<pre class="literal-block">
+bzr send -o great-new-feature.patch
+</pre>
+<p>See the
+<a class="reference external" href="http://doc.bazaar-vcs.org/latest/en/tutorials/">Bazaar tutorials</a>
+for more.</p>
+<!-- vim: filetype=rst -->
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+Generated on: 2010-06-08.
+Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
+
+</div>
+</body>
+</html>

@@ -2,7 +2,7 @@
 SORD
 ====
 
-.. image:: ely-saf-surface.jpg
+.. image:: fig/ely-saf-surface.jpg
    :align: right
    :target: http://earth.usc.edu/~gely/ely-saf-surface.mov
 
@@ -49,6 +49,7 @@ Author
 
 Contributions from: Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi
 
+
 Publications
 ============
 
@@ -83,105 +84,6 @@ BSSA, 100(1).
 `[PDF] <http://earth.usc.edu/~gely/pub/ely-saf-20091030.pdf>`__
 `[Electronic supplement] <http://earth.usc.edu/~gely/ely-saf-esupp.html>`__
 
-System requirements
-===================
-
-*   Fortran 95 compiler.
-
-*   `Python <http://www.python.org/download/>`_, and
-    `NumPy <http://http://numpy.scipy.org/>`_ (Numerical Python).
-
-*   (Optional) Message Passing Interface (MPI) library.  Required for
-    multi-core processing.
-
-*   (Optional) `Matplotlib <http://matplotlib.sourceforge.net/>`_, `SciPy
-    <http://www.scipy.org/>`_, and Pyproj Python packages.  Required for
-    supplemental plotting, signal processing, and mesh generation utilities.
-
-*   (Optional) `Bazaar <http://bazaar.canonical.com/>`_ version control system.
-    Useful for SORD development and staying updated with the latest code version.
-
-
-Installation
-============
-
-Fortran and MPI installation should only be necessary for laptops and
-workstations.  HPC systems generally supply specifically tuned Fortran
-compilers and MPI libraries.
-
-1.  GNU Fortran is recommended if you don't already have a Fortran 95 compiler.
-
-    Fedora/Red Hat Linux:
-    ::
-
-        sudo yum install gfortran
-
-    Ubuntu Linux:
-    ::
-
-        sudo apt-get install gfortran
-
-    Mac OS X:
-
-        First install either the iPhone or the Mac-only version of `Xcode
-        <http://developer.apple.com/technology/xcode.html>`_ available from Apple
-        Developer Connection (free `membership <http://connect.apple.com>`__ required).
-        Then install the GNU Fortran version available from the `R for Mac OS X
-        Developer's Page <http://r.research.att.com/tools>`_ (versions from MacPorts
-        and Fink seem to be problematic and are not recommended).
-
-2.  `MPICH2 <http://www.mcs.anl.gov/research/projects/mpich2/>`_ is recommended
-    if you need MPI.  The following shell script installs MPICH2:
-
-        `install-mpich.sh <../install/install-mpich.sh>`_
-
-3.  It is recommended that you install a private copy of Python for SORD.  The
-    following script installs Python and NumPy:
-
-        `install-python.sh <../install/install-python.sh>`_
-
-    `Enthought Python Distribution
-    <http://www.enthought.com/products/epddownload.php>`_ (EPD) is another
-    option that includes many bells and whistles such as the `Mayavi
-    <http://code.enthought.com/projects/mayavi>`_ visualization package.
-
-4.  Download the SORD source code.  The best option is use Bazaar version
-    control, which facilitates applying code updates, and merging local
-    modifications (see `Source Control`_ section for examples). The following
-    script installs Bazaar, SORD, and
-    `SCEC CVM4 <http://earth.usc.edu/~gely/cvm/readme.html>`_.
-
-        `install-sord.sh <../install/install-sord.sh>`_
-
-    Alternatively, download and unpack the source tar archive from here:
-
-        http://earth.usc.edu/~gely/sord/sord.tgz
-
-5.  For laptop and workstation installations, the default system configuration
-    is usually be adequate.  To test the default configuration::
-
-        cd sord/
-        python configure.py
-
-    Systems with batch schedulers (such as PBS or LoadLeveler) generally require
-    custom configuration to specify system resources, compiler options, and
-    scheduler scripts.  If SORD has already been configured for your system you can
-    use one of the included configurations.  For example, for the TeraGrid Ranger
-    system at TACC::
-
-        python configure.py tacc-ranger
-
-    To see the list of included configurations look in the ``conf/`` directory.
-    Each custom configuration is located in a separate sub-directory.  To create a
-    new custom configuration, make a new sub-directory following the example of
-    the supplied configurations.
-
-6.  Compile the code and setup the Python path by running:
-    ::
-
-        python setup.py
-        python setup.py path
-
 
 User Guide
 ==========
@@ -198,7 +100,7 @@ velocity::
 
 Plotting requires Matplotlib, and the result should look like this:
 
-    .. image:: example.png
+    .. image:: fig/example.png
 
 Scripting with Python
 ---------------------
@@ -315,6 +217,7 @@ preexisting values.  For a list of available time functions, see the
 modified to add new time functions.  Time functions can be offset in time with
 the ``tm0`` initial time parameter.
 
+
 Boundary Conditions
 -------------------
 
@@ -328,11 +231,11 @@ anti-mirror symmetry condition.  The following BC types are supported:
 
 **Type 0**: Vacuum free-surface.  Stress is zero in cells outside the boundary.
 
-    .. image:: bc0.png
+    .. image:: fig/bc0.png
 
 **Type 3**: Rigid surface. Displacement is zero at the boundary.
 
-    .. image:: bc3.png
+    .. image:: fig/bc3.png
 
 **Type 1**: Mirror symmetry at the node.  Normal displacement is zero at the
 boundary.  Useful for a boundary corresponding to (a) the plane orthogonal to
@@ -340,24 +243,24 @@ the two nodal planes of a double-couple point source, (b) the plane normal to
 the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D
 plane strain problem.
 
-    .. image:: bc1.png
+    .. image:: fig/bc1.png
 
 **Type -1**: Anti-mirror symmetry at the node.  Tangential displacement is zero
 at the boundary.  Useful for a boundary corresponding to (a) the nodal planes
 of a double-couple point source, (b) the plane normal to the mode-II axis of a
 symmetric rupture, or (c) the zero-width axis of a 2D antiplane strain problem.
 
-    .. image:: bc-1.png
+    .. image:: fig/bc-1.png
 
 **Type 2**: Mirror symmetry at the cell. Same as type 1, but centered on the cell.
 
-    .. image:: bc2.png
+    .. image:: fig/bc2.png
 
 **Type -2**: Anti-mirror symmetry at the cell.  Same as type -1, but centered
 on the cell.  Can additionally be used when the boundary corresponds to the
 slip surface of a symmetric rupture.
 
-    .. image:: bc-2.png
+    .. image:: fig/bc-2.png
 
 **Type 10**: Perfectly match layer (PML) absorbing boundary.
 
@@ -447,8 +350,8 @@ time step per one million mesh points.  SORD scalability has been benchmarked
 up to 16 thousand processors at the TACC Ranger facility.  The following chart
 is the wall-time per step for 8 million mesh points per core (click for PDF):
 
-.. image:: sord-benchmark-ranger.png
-    :target: sord-benchmark-ranger.pdf
+.. image:: fig/sord-benchmark-ranger.png
+    :target: fig/sord-benchmark-ranger.pdf
 
 This benchmark tests computation only. For many applications, disk output is
 the primary bottleneck and will limit scalability.  When configuring domain
@@ -523,37 +426,6 @@ processors using ``debug = 2`` to give more accurate relative timing values.
 Additionally, SORD can be run with compiler generated code profiling using the
 ``-p`` or ``--profiling`` option.
 
-
-Source control
---------------
-
-We use Bazaar_ for version control. Some examples:
-
-Apply any recent updates from the repository, overwriting any local changes.
-This is a way to keep up-to-date with the latest code.
-::
-
-    bzr pull
-    bzr revert
-
-See code changes since the last commit
-::
-
-    bzr diff
-
-Commit changes
-::
-
-    bzr commit -m "Great new feature"
-
-Create a patch
-::
-
-    bzr send -o great-new-feature.patch
-
-See the
-`Bazaar tutorials <http://doc.bazaar-vcs.org/latest/en/tutorials/>`__
-for more.
 
 .. vim: filetype=rst
 

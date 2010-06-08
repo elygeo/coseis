@@ -99,7 +99,7 @@ img {
 <div class="document" id="sord">
 <h1 class="title">SORD</h1>
 
-<a class="reference external image-reference" href="http://earth.usc.edu/~gely/ely-saf-surface.mov"><img align="right" alt="ely-saf-surface.jpg" class="align-right" src="ely-saf-surface.jpg" /></a>
+<a class="reference external image-reference" href="http://earth.usc.edu/~gely/ely-saf-surface.mov"><img align="right" alt="fig/ely-saf-surface.jpg" class="align-right" src="fig/ely-saf-surface.jpg" /></a>
 <div class="contents topic" id="contents">
 <p class="topic-title first">Contents</p>
 <ul class="simple">
@@ -109,22 +109,19 @@ img {
 </ul>
 </li>
 <li><a class="reference internal" href="#publications" id="id5">Publications</a></li>
-<li><a class="reference internal" href="#system-requirements" id="id6">System requirements</a></li>
-<li><a class="reference internal" href="#installation" id="id7">Installation</a></li>
-<li><a class="reference internal" href="#user-guide" id="id8">User Guide</a><ul>
-<li><a class="reference internal" href="#quick-test" id="id9">Quick test</a></li>
-<li><a class="reference internal" href="#scripting-with-python" id="id10">Scripting with Python</a></li>
-<li><a class="reference internal" href="#running-jobs" id="id11">Running jobs</a></li>
-<li><a class="reference internal" href="#field-i-o" id="id12">Field I/O</a></li>
-<li><a class="reference internal" href="#boundary-conditions" id="id13">Boundary Conditions</a></li>
-<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id14">Defining the fault rupture surface</a></li>
+<li><a class="reference internal" href="#user-guide" id="id6">User Guide</a><ul>
+<li><a class="reference internal" href="#quick-test" id="id7">Quick test</a></li>
+<li><a class="reference internal" href="#scripting-with-python" id="id8">Scripting with Python</a></li>
+<li><a class="reference internal" href="#running-jobs" id="id9">Running jobs</a></li>
+<li><a class="reference internal" href="#field-i-o" id="id10">Field I/O</a></li>
+<li><a class="reference internal" href="#boundary-conditions" id="id11">Boundary Conditions</a></li>
+<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id12">Defining the fault rupture surface</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#memory-usage-and-scaling" id="id15">Memory Usage and Scaling</a></li>
-<li><a class="reference internal" href="#development" id="id16">Development</a><ul>
-<li><a class="reference internal" href="#debugging" id="id17">Debugging</a></li>
-<li><a class="reference internal" href="#profiling" id="id18">Profiling</a></li>
-<li><a class="reference internal" href="#source-control" id="id19">Source control</a></li>
+<li><a class="reference internal" href="#memory-usage-and-scaling" id="id13">Memory Usage and Scaling</a></li>
+<li><a class="reference internal" href="#development" id="id14">Development</a><ul>
+<li><a class="reference internal" href="#debugging" id="id15">Debugging</a></li>
+<li><a class="reference internal" href="#profiling" id="id16">Profiling</a></li>
 </ul>
 </li>
 </ul>
@@ -186,98 +183,6 @@ BSSA, 100(1).
 <a class="reference external" href="http://earth.usc.edu/~gely/pub/ely-saf-20091030.pdf">[PDF]</a>
 <a class="reference external" href="http://earth.usc.edu/~gely/ely-saf-esupp.html">[Electronic supplement]</a></p>
 </div>
-<div class="section" id="system-requirements">
-<h3>System requirements</h3>
-<ul class="simple">
-<li>Fortran 95 compiler.</li>
-<li><a class="reference external" href="http://www.python.org/download/">Python</a>, and
-<a class="reference external" href="http://http://numpy.scipy.org/">NumPy</a> (Numerical Python).</li>
-<li>(Optional) Message Passing Interface (MPI) library.  Required for
-multi-core processing.</li>
-<li>(Optional) <a class="reference external" href="http://matplotlib.sourceforge.net/">Matplotlib</a>, <a class="reference external" href="http://www.scipy.org/">SciPy</a>, and Pyproj Python packages.  Required for
-supplemental plotting, signal processing, and mesh generation utilities.</li>
-<li>(Optional) <a class="reference external" href="http://bazaar.canonical.com/">Bazaar</a> version control system.
-Useful for SORD development and staying updated with the latest code version.</li>
-</ul>
-</div>
-<div class="section" id="installation">
-<h3>Installation</h3>
-<p>Fortran and MPI installation should only be necessary for laptops and
-workstations.  HPC systems generally supply specifically tuned Fortran
-compilers and MPI libraries.</p>
-<ol class="arabic">
-<li><p class="first">GNU Fortran is recommended if you don't already have a Fortran 95 compiler.</p>
-<p>Fedora/Red Hat Linux:</p>
-<pre class="literal-block">
-sudo yum install gfortran
-</pre>
-<p>Ubuntu Linux:</p>
-<pre class="literal-block">
-sudo apt-get install gfortran
-</pre>
-<p>Mac OS X:</p>
-<blockquote>
-<p>First install either the iPhone or the Mac-only version of <a class="reference external" href="http://developer.apple.com/technology/xcode.html">Xcode</a> available from Apple
-Developer Connection (free <a class="reference external" href="http://connect.apple.com">membership</a> required).
-Then install the GNU Fortran version available from the <a class="reference external" href="http://r.research.att.com/tools">R for Mac OS X
-Developer's Page</a> (versions from MacPorts
-and Fink seem to be problematic and are not recommended).</p>
-</blockquote>
-</li>
-<li><p class="first"><a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a> is recommended
-if you need MPI.  The following shell script installs MPICH2:</p>
-<blockquote>
-<p><a class="reference external" href="../install/install-mpich.sh">install-mpich.sh</a></p>
-</blockquote>
-</li>
-<li><p class="first">It is recommended that you install a private copy of Python for SORD.  The
-following script installs Python and NumPy:</p>
-<blockquote>
-<p><a class="reference external" href="../install/install-python.sh">install-python.sh</a></p>
-</blockquote>
-<p><a class="reference external" href="http://www.enthought.com/products/epddownload.php">Enthought Python Distribution</a> (EPD) is another
-option that includes many bells and whistles such as the <a class="reference external" href="http://code.enthought.com/projects/mayavi">Mayavi</a> visualization package.</p>
-</li>
-<li><p class="first">Download the SORD source code.  The best option is use Bazaar version
-control, which facilitates applying code updates, and merging local
-modifications (see <a class="reference internal" href="#source-control">Source Control</a> section for examples). The following
-script installs Bazaar, SORD, and
-<a class="reference external" href="http://earth.usc.edu/~gely/cvm/readme.html">SCEC CVM4</a>.</p>
-<blockquote>
-<p><a class="reference external" href="../install/install-sord.sh">install-sord.sh</a></p>
-</blockquote>
-<p>Alternatively, download and unpack the source tar archive from here:</p>
-<blockquote>
-<p><a class="reference external" href="http://earth.usc.edu/~gely/sord/sord.tgz">http://earth.usc.edu/~gely/sord/sord.tgz</a></p>
-</blockquote>
-</li>
-<li><p class="first">For laptop and workstation installations, the default system configuration
-is usually be adequate.  To test the default configuration:</p>
-<pre class="literal-block">
-cd sord/
-python configure.py
-</pre>
-<p>Systems with batch schedulers (such as PBS or LoadLeveler) generally require
-custom configuration to specify system resources, compiler options, and
-scheduler scripts.  If SORD has already been configured for your system you can
-use one of the included configurations.  For example, for the TeraGrid Ranger
-system at TACC:</p>
-<pre class="literal-block">
-python configure.py tacc-ranger
-</pre>
-<p>To see the list of included configurations look in the <tt class="docutils literal">conf/</tt> directory.
-Each custom configuration is located in a separate sub-directory.  To create a
-new custom configuration, make a new sub-directory following the example of
-the supplied configurations.</p>
-</li>
-<li><p class="first">Compile the code and setup the Python path by running:</p>
-<pre class="literal-block">
-python setup.py
-python setup.py path
-</pre>
-</li>
-</ol>
-</div>
 <div class="section" id="user-guide">
 <h3>User Guide</h3>
 <div class="section" id="quick-test">
@@ -291,7 +196,7 @@ python plot.py
 </pre>
 <p>Plotting requires Matplotlib, and the result should look like this:</p>
 <blockquote>
-<img alt="example.png" src="example.png" />
+<img alt="fig/example.png" src="fig/example.png" />
 </blockquote>
 </div>
 <div class="section" id="scripting-with-python">
@@ -302,6 +207,7 @@ python plot.py
 <pre class="literal-block">
 #!/usr/bin/env python
 import sord                               # import the sord module
+nproc = 1, 1, 6
 delta = 100.0, 100.0, 100.0, 0.0075       # step length in (x, y, z, t)
 shape = 61, 61, 61, 60                    # mesh size in (x, y, z, t)
 fieldio = [                               # field variable input and output
@@ -426,11 +332,11 @@ a slip surface, the fault may be placed at the boundary and combined with an
 anti-mirror symmetry condition.  The following BC types are supported:</p>
 <p><strong>Type 0</strong>: Vacuum free-surface.  Stress is zero in cells outside the boundary.</p>
 <blockquote>
-<img alt="bc0.png" src="bc0.png" />
+<img alt="fig/bc0.png" src="fig/bc0.png" />
 </blockquote>
 <p><strong>Type 3</strong>: Rigid surface. Displacement is zero at the boundary.</p>
 <blockquote>
-<img alt="bc3.png" src="bc3.png" />
+<img alt="fig/bc3.png" src="fig/bc3.png" />
 </blockquote>
 <p><strong>Type 1</strong>: Mirror symmetry at the node.  Normal displacement is zero at the
 boundary.  Useful for a boundary corresponding to (a) the plane orthogonal to
@@ -438,24 +344,24 @@ the two nodal planes of a double-couple point source, (b) the plane normal to
 the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D
 plane strain problem.</p>
 <blockquote>
-<img alt="bc1.png" src="bc1.png" />
+<img alt="fig/bc1.png" src="fig/bc1.png" />
 </blockquote>
 <p><strong>Type -1</strong>: Anti-mirror symmetry at the node.  Tangential displacement is zero
 at the boundary.  Useful for a boundary corresponding to (a) the nodal planes
 of a double-couple point source, (b) the plane normal to the mode-II axis of a
 symmetric rupture, or (c) the zero-width axis of a 2D antiplane strain problem.</p>
 <blockquote>
-<img alt="bc-1.png" src="bc-1.png" />
+<img alt="fig/bc-1.png" src="fig/bc-1.png" />
 </blockquote>
 <p><strong>Type 2</strong>: Mirror symmetry at the cell. Same as type 1, but centered on the cell.</p>
 <blockquote>
-<img alt="bc2.png" src="bc2.png" />
+<img alt="fig/bc2.png" src="fig/bc2.png" />
 </blockquote>
 <p><strong>Type -2</strong>: Anti-mirror symmetry at the cell.  Same as type -1, but centered
 on the cell.  Can additionally be used when the boundary corresponds to the
 slip surface of a symmetric rupture.</p>
 <blockquote>
-<img alt="bc-2.png" src="bc-2.png" />
+<img alt="fig/bc-2.png" src="fig/bc-2.png" />
 </blockquote>
 <p><strong>Type 10</strong>: Perfectly match layer (PML) absorbing boundary.</p>
 <p>Example: a 3D problem with a free surface at Z=0, and PML absorbing boundaries
@@ -541,7 +447,7 @@ operator type for fastest performance.</p>
 time step per one million mesh points.  SORD scalability has been benchmarked
 up to 16 thousand processors at the TACC Ranger facility.  The following chart
 is the wall-time per step for 8 million mesh points per core (click for PDF):</p>
-<a class="reference external image-reference" href="sord-benchmark-ranger.pdf"><img alt="sord-benchmark-ranger.png" src="sord-benchmark-ranger.png" /></a>
+<a class="reference external image-reference" href="fig/sord-benchmark-ranger.pdf"><img alt="fig/sord-benchmark-ranger.png" src="fig/sord-benchmark-ranger.png" /></a>
 <p>This benchmark tests computation only. For many applications, disk output is
 the primary bottleneck and will limit scalability.  When configuring domain
 decomposition, it is important to minimize the number of cores accessing a
@@ -596,38 +502,13 @@ is only saved for the master processor.  It can be helpful to synchronize the
 processors using <tt class="docutils literal">debug = 2</tt> to give more accurate relative timing values.</p>
 <p>Additionally, SORD can be run with compiler generated code profiling using the
 <tt class="docutils literal"><span class="pre">-p</span></tt> or <tt class="docutils literal"><span class="pre">--profiling</span></tt> option.</p>
-</div>
-<div class="section" id="source-control">
-<h4>Source control</h4>
-<p>We use <a class="reference external" href="http://bazaar.canonical.com/">Bazaar</a> for version control. Some examples:</p>
-<p>Apply any recent updates from the repository, overwriting any local changes.
-This is a way to keep up-to-date with the latest code.</p>
-<pre class="literal-block">
-bzr pull
-bzr revert
-</pre>
-<p>See code changes since the last commit</p>
-<pre class="literal-block">
-bzr diff
-</pre>
-<p>Commit changes</p>
-<pre class="literal-block">
-bzr commit -m &quot;Great new feature&quot;
-</pre>
-<p>Create a patch</p>
-<pre class="literal-block">
-bzr send -o great-new-feature.patch
-</pre>
-<p>See the
-<a class="reference external" href="http://doc.bazaar-vcs.org/latest/en/tutorials/">Bazaar tutorials</a>
-for more.</p>
 <!-- vim: filetype=rst -->
 </div>
 </div>
 </div>
 <div class="footer">
 <hr class="footer" />
-Generated on: 2010-05-15.
+Generated on: 2010-06-08.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>

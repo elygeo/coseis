@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 """
-Build SORD binaries and documentation
+Build SORD binaries
 """
 import os, sys, getopt
 import numpy as np
-import conf
-from util import util
+#from coseismic import conf
+#from coseismic.util import util
+from .. import conf
+from ..util import util
 
 def build( mode=None, optimize=None, dtype=None ):
     """
@@ -86,14 +88,6 @@ def build( mode=None, optimize=None, dtype=None ):
     os.chdir( cwd )
     return
 
-def rspec():
-    cwd = os.getcwd()
-    path = os.path.realpath( os.path.dirname( __file__ ) )
-    os.chdir( os.path.join( path, 'util' ) )
-    if not os.path.isfile( 'rspectra.so' ):
-        os.system( 'f2py -c -m rspectra rspectra.f90' )
-    os.chdir( cwd )
-
 def command_line():
     """
     Process command line options.
@@ -110,21 +104,7 @@ def command_line():
             optimize = o
         elif o in '8':
             dtype = 'f' + o
-    if not args:
-        build( mode, optimize, dtype )
-    else:
-        if args[0] == 'path':
-            util.install_path( __file__ )
-        elif args[0] == 'unpath':
-            util.uninstall_path( __file__ )
-        elif args[0] == 'install':
-            util.install( __file__ )
-        elif args[0] == 'uninstall':
-            util.uninstall( __file__ )
-        elif args[0] == 'rspec':
-            rspec()
-        else:
-            sys.exit( 'Error: unknown option: %r' % sys.argv[1] )
+    build( mode, optimize, dtype )
 
 if __name__ == '__main__':
     command_line()

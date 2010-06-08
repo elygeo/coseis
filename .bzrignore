@@ -1,5 +1,6 @@
-/bin/*
-/sord.tgz
+/*/bin/*
+/coseismic.tgz
 /conf/machine
 /conf/email
-/conf/cvm
+/data
+/doc/Magistrale2000.pdf

@@ -2,9 +2,9 @@
 
 cd $( dirname $0 )
 
-version="3.1.$(( $( bzr revno ) + 1 ))"
+version="3.2.$(( $( bzr revno ) + 1 ))"
 echo "$version" > version
 
 bzr commit -m "$*"
-bzr export "sord.tgz"
+bzr export "coseismic.tgz"
 
