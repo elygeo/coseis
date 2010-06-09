@@ -4,10 +4,7 @@ Build SORD binaries
 """
 import os, sys, getopt
 import numpy as np
-#from coseismic import conf
-#from coseismic.util import util
-from .. import conf
-from ..util import util
+from coseis import conf, util
 
 def build( mode=None, optimize=None, dtype=None ):
     """

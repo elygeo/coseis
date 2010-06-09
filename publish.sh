@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-dest="earth.usc.edu:public_html/coseismic"
+dest="earth.usc.edu:public_html/coseis"
 
 echo "Syncing to $dest"
 rsync \
