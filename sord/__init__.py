@@ -2,18 +2,16 @@
 """
 Support Operator Rupture Dynamics
 """
-import os, sys, re, math, pprint
+import os, sys, shutil, glob, math, pprint
 import numpy as np
-from coseis import conf, util
-from coseis.conf import launch
-import fieldnames
+import conf, setup, fieldnames
+from conf import launch
+from tools import util
 
 def stage( inputs={}, **kwargs ):
     """
     Stage job
     """
-    import glob, time, shutil
-    import setup
 
     # save start time
     print( 'SORD setup' )

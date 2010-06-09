@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-Coseis: Computational Seismology Tools
+Computational Seismology Tools
 """
-import sord, cvm4, tools
+import conf, tools, sord, cvm4
 from tools import *
 

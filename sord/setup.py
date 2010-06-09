@@ -4,7 +4,8 @@ Build SORD binaries
 """
 import os, sys, getopt
 import numpy as np
-from coseis import conf, util
+import conf
+from tools import util
 
 def build( mode=None, optimize=None, dtype=None ):
     """

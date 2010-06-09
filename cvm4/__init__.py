@@ -5,7 +5,7 @@ SCEC Community Velocity Model
 import os, sys, re, glob, shutil
 import conf
 from conf import launch
-from util import util, coord, data, plt, mlab, viz, swab
+from tools import util
 
 def stage( inputs={}, **kwargs ):
     """

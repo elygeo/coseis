@@ -1,5 +1,6 @@
+#!/usr/bin/env python
 """
-Coseis tools
+Computational Seismology Tools
 """
 import util, coord, signal, swab
 import cvmh, gocad, data, source, egmm, boore
