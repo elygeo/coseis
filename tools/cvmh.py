@@ -4,7 +4,7 @@ SCEC Community Velocity Model (CVM-H) extraction tool
 """
 import os, sys
 import numpy as np
-from util import coord, gocad
+import coord, gocad
 
 # parameters
 repo = os.path.expanduser( '~/data-repo' )
