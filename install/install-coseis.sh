@@ -8,9 +8,11 @@ easy_install bzr
 
 # Coseismic
 cd "${prefix}"
-bzr get http://earth.usc.edu/~gely/coseismic
+bzr get http://earth.usc.edu/~gely/coseis
+cd coseis
+python setup.py all
 mkdir -p bin
 cd bin
-ln -s ../sord/util/swab.py .
-ln -s ../sord/util/stats.py .
+ln -s ../tools/swab.py .
+ln -s ../tools/stats.py .
 

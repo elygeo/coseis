@@ -2,8 +2,9 @@
 """
 Source utilities
 """
-import os, sys, urllib, gzip, util
+import os, sys, urllib, gzip
 import numpy as np
+import util
 
 def scsn_mts( eventid ):
     """

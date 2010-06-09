@@ -1,11 +1,73 @@
 #!/usr/bin/env python
 """
 SCEC Community Velocity Model
+
+http://www.data.scec.org/3Dvelocity/Version4.tar.gz
 """
-import os, sys, re, glob, shutil
+import os, sys, re, glob, shutil, tarfile
 import conf
 from conf import launch
 from tools import util
+
+path = os.path.realpath( os.path.dirname( __file__ ) )
+repo = os.path.expanduser( '~/data-repo' )
+repo = os.path.join( path, 'data' )
+
+def build( mode=None, optimize=None ):
+    """
+    Build CVM code.
+    """
+    cf = conf.configure( 'cvm' )[0]
+    if not optimize:
+        optimize = cf.optimize
+    if not mode:
+        mode = cf.mode
+    if not mode:
+        mode = 'asm'
+
+    # unpack data
+    f = os.path.join( path, 'bin' )
+    g = os.path.join( path, 'bin', 'cvm4' )
+    h = os.path.join( repo, 'cvm4.tgz' )
+    if not os.path.exists( f ):
+        os.mkdir( f )
+    if not os.path.exists( g ):
+        tarfile.open( h, 'r:gz' ).extractall( f )
+
+    # find hard-coded array sizes, save it for later
+    f = os.path.join( path, 'src', 'newin.h' )
+    g = os.path.join( path, 'bin', 'cvm4', 'ibig' )
+    for line in file( f, 'r' ).readlines():
+        if line[0] != ' ':
+            continue
+        pat = re.compile( 'ibig *= *([0-9]*)' ).search( line )
+        if pat:
+            ibig = pat.groups()[0]
+    open( g, 'w' ).write( str( ibig ) )
+
+    # compile ascii, binary, and MPI versions
+    cwd = os.getcwd()
+    os.chdir( os.path.join( path, vm ) )
+    if 'a' in mode:
+        source = 'iotxt.f', 'cvm4.f'
+        for opt in optimize:
+            object_ = os.path.join( path, 'bin', 'cvm4', 'cvm4-a' + opt )
+            compiler = cf.fortran_serial + cf.fortran_flags[opt] + ('-o',)
+            util.make( compiler, object_, source )
+    if 's' in mode:
+        source = 'iobin.f', 'cvm4.f'
+        for opt in optimize:
+            object_ = os.path.join( path, 'bin', 'cvm4', 'cvm4-s' + opt )
+            compiler = cf.fortran_serial + cf.fortran_flags[opt] + ('-o',)
+            util.make( compiler, object_, source )
+    if 'm' in mode and cf.fortran_mpi:
+        source = 'iompi.f', 'cvm4.f'
+        for opt in optimize:
+            object_ = os.path.join( path, 'bin', 'cvm4', 'cvm4-m' + opt )
+            compiler = cf.fortran_mpi + cf.fortran_flags[opt] + ('-o',)
+            util.make( compiler, object_, source )
+    os.chdir( cwd )
+    return
 
 def stage( inputs={}, **kwargs ):
     """
