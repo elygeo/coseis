@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-import os, glob, sord
+import os, glob
 import numpy as np
 import matplotlib.pyplot as plt
+import coseis as cst
 
 # parameters
 stations = 'P1a', 'P2a'
@@ -15,7 +16,7 @@ for path in glob.glob( runs ):
 
     # metadata
     path += os.sep
-    meta = sord.util.load( path + 'meta.py' )
+    meta = cst.util.load( path + 'meta.py' )
     shape = meta.shape
     delta = meta.delta
     ihypo = meta.ihypo

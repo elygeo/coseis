@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sord
+import coseis as cst
 
 # List of runs:
 # Column 1 is dx, the spatial step size
@@ -106,5 +106,5 @@ for dx_, nproc3 in runs_:
         ]
 
     # Launch SORD code
-    sord.run( locals() )
+    cst.sord.run( locals() )
 

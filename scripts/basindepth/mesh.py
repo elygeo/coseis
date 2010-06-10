@@ -2,8 +2,9 @@
 """
 Simple SoCal mesh generation and CVM extraction.
 """
-import os, cvm
+import os
 import numpy as np
+import coseis as cst
 
 # parameters
 workdir = 'run'
@@ -35,14 +36,14 @@ if __name__ == '__main__':
 
     # save data
     path = 'data' + os.sep
-    cvm.util.save( path + 'meta.py', meta )
+    cst.util.save( path + 'meta.py', meta )
     x.tofile( path + 'lon' )
     y.tofile( path + 'lat' )
 
     # CVM setup
     print 'shape = %s' % (shape,)
     n = shape[0] * shape[1] * shape[2]
-    job = cvm.stage( nsample=n, nproc=nproc, workdir=workdir )
+    job = cst.cvm.stage( nsample=n, nproc=nproc, workdir=workdir )
     path = job.rundir + os.sep
 
     # write CVM input files
@@ -60,5 +61,5 @@ if __name__ == '__main__':
     f3.close()
 
     # launch
-    cvm.launch( job )
+    cst.cvm.launch( job )
 

@@ -2,7 +2,7 @@
 """
 General utilities
 """
-import os, sys, shutil, re
+import os, sys, re
 import numpy as np
 
 class namespace:
@@ -11,6 +11,7 @@ class namespace:
     """
     def __init__( self, d ):
         self.__dict__.update( d )
+
 
 def prune( d, pattern=None, types=None ):
     """
@@ -41,6 +42,7 @@ def prune( d, pattern=None, types=None ):
         if grep.search( k ) or type( d[k] ) not in types:
             del( d[k] )
     return d
+
 
 def save( fd, d, expand=None, keep=None, header='', prune_pattern=None, prune_types=None ):
     """
@@ -80,6 +82,7 @@ def save( fd, d, expand=None, keep=None, header='', prune_pattern=None, prune_ty
         fd.write( out )
     return out
 
+
 def load( fd, d=None, prune_pattern=None, prune_types=None ):
     """
     Load variables from Python source files.
@@ -91,6 +94,7 @@ def load( fd, d=None, prune_pattern=None, prune_types=None ):
     exec fd in d
     prune( d, prune_pattern, prune_types )
     return namespace( d )
+
 
 def expand_slice( shape, indices=None, base=1, round=True ):
     """
@@ -149,6 +153,7 @@ def expand_slice( shape, indices=None, base=1, round=True ):
             indices[i][1] = int( indices[i][1] + 0.5 - base + offset )
         indices[i] = tuple( indices[i] )
     return indices
+
 
 def ndread( fd, shape=None, indices=None, dtype='f', order='F', nheader=0 ):
     """
@@ -214,114 +219,6 @@ def ndread( fd, shape=None, indices=None, dtype='f', order='F', nheader=0 ):
         f = f.reshape( nn0 )
     return f
 
-def make( compiler, object_, source ):
-    """
-    An alternative Make that uses state files.
-    """
-    import glob, difflib
-    object_ = os.path.expanduser( object_ )
-    source = tuple( os.path.expanduser( f ) for f in source if f )
-    statedir = os.path.join( os.path.dirname( object_ ), '.state' )
-    if not os.path.isdir( statedir ):
-        os.mkdir( statedir )
-    statefile = os.path.join( statedir, os.path.basename( object_ ) )
-    command = compiler + (object_,) + source
-    state = [ ' '.join( command ) + '\n' ]
-    for f in source:
-        state += open( f ).readlines()
-    compile_ = True
-    if os.path.isfile( object_ ):
-        try:
-            oldstate = open( statefile ).readlines()
-            diff = ''.join( difflib.unified_diff( oldstate, state, n=0 ) )
-            if diff:
-                print( diff )
-            else:
-                compile_ = False
-        except( IOError ):
-            pass
-    if compile_:
-        try:
-            os.unlink( statefile )
-        except( OSError ):
-            pass
-        print( ' '.join( command ) )
-        if os.system( ' '.join( command ) ):
-            sys.exit( 'Compile error' )
-        open( statefile, 'w' ).writelines( state )
-        for pat in '*.o', '*.mod', '*.ipo', '*.il', '*.stb':
-            for f in glob.glob( pat ):
-                os.unlink( f )
-    return compile_
-
-def install_path( path ):
-    """
-    Install path file in site-packages directory.
-    """
-    from distutils.sysconfig import get_python_lib
-    path = os.path.realpath( os.path.expanduser( path ) )
-    src = os.path.dirname( os.path.dirname( path ) )
-    dst = os.path.join( get_python_lib(), os.path.basename( src ) + '.pth' )
-    if os.path.exists( dst ):
-        sys.exit( 'Error: %s exists\n%s' % (dst, open( dst ).read()) )
-    print( 'Installing ' + dst )
-    print( 'for path ' + src )
-    try:
-        open( dst, 'w' ).write( src )
-    except( IOError ):
-        sys.exit( 'No write permission for Python directory' )
-    return
-
-def uninstall_path( path ):
-    """
-    Remove path file from site-packages directory.
-    """
-    from distutils.sysconfig import get_python_lib
-    path = os.path.realpath( os.path.expanduser( path ) )
-    src = os.path.dirname( os.path.dirname( path ) )
-    dst = os.path.join( get_python_lib(), os.path.basename( src ) + '.pth' )
-    print( 'Removing ' + dst )
-    if os.path.isfile( dst ):
-        try:
-            os.unlink( dst )
-        except( IOError ):
-            sys.exit( 'No write permission for Python directory' )
-    return
-
-def install( path ):
-    """
-    Copy package to site-packages directory.
-    """
-    from distutils.sysconfig import get_python_lib
-    path = os.path.realpath( os.path.expanduser( path ) )
-    src = os.path.dirname( path )
-    dst = os.path.join( get_python_lib(), os.path.basename( src ) )
-    if os.path.exists( dst ):
-        sys.exit( 'Error: %s exists' % dst )
-    print( 'Installing ' + dst )
-    print( 'from ' + src )
-    try:
-        shutil.copytree( src, dst )
-    except( OSError ):
-        sys.exit( 'No write permission for Python directory' )
-    return
-
-def uninstall( path ):
-    """
-    Remove package from site-packages directory.
-    """
-    from distutils.sysconfig import get_python_lib
-    path = os.path.realpath( os.path.expanduser( path ) )
-    src = os.path.dirname( path )
-    dst = os.path.join( get_python_lib(), os.path.basename( src ) )
-    if not os.path.exists( dst ):
-        sys.exit( 'Error: %s does not exist' % dst )
-    print( 'Removing ' + dst )
-    try:
-        shutil.rmtree( dst )
-    except( OSError ):
-        sys.exit( 'No write permission for Python directory' )
-    return
 
 def progress( t0=None, i=None, n=None, message='' ):
     """

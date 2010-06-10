@@ -4,12 +4,12 @@ Snapshot plots
 """
 import numpy as np
 import matplotlib.pyplot as plt
-import sord
+import coseis as cst
 
 exp = 0.5
 clim = 0.0, 0.000001
 path = 'run/'
-meta = sord.util.load( path + 'meta.py' )
+meta = cst.util.load( path + 'meta.py' )
 dtype = meta.dtype
 shape = meta.shapes['snap-v1']
 delta = meta.deltas['snap-v1']

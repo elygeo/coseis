@@ -105,18 +105,21 @@ Plotting requires Matplotlib, and the result should look like this:
 Scripting with Python
 ---------------------
 
-THIS SECTION IS OUTDATED AND AWAITING REVISION.
-
 For a simple example consider the above test,
 `sim.py <../scripts/example/sim.py>`__:
 
 .. include:: ../scripts/example/sim.py
    :literal:
 
-Every script starts by importing the ``sord`` module.  SORD parameters are
-specified as local variables that are passed to the ``sord.run()`` function by
-the ``locals()`` built-in Python function.  A complete list of possible SORD
-parameters and default values are specified in `<parameters.py>`__.
+Every script starts by importing the ``coseis`` module.  SORD parameters are
+specified as a dictionary and/or keyword arguments passed to the
+``coseis.sord.run()`` function. The ``locals()`` built-in Python function is a
+convenient way to create the parameter dictionary from the local scope.  Any
+dictionary parameters 
+
+A
+complete list of possible SORD parameters and default values are specified in
+`<../sord/parameters.py>`__.
 
 The Python language gives a powerful way to construct SORD input.  For example,
 it may be desirable to specify the total simulation time, and divide by ``dt``
@@ -127,30 +130,32 @@ to determine the number of time steps::
 
 The ``T`` variable is not a valid SORD parameter; it is only used for temporary
 storage.  Variables with single single character names or names ending with an
-underscore, are ignored by ``sord.run()``, so may be safely used for temporary
-storage.  More elaborate example scripts can be found in the ``scripts``
-directory.
+underscore, are ignored by SORD, so may be safely used for temporary storage.
+More example scripts can be found in the ``scripts`` directory.
 
 
 Running jobs
 ------------
 
-Each time ``sord.run()`` is called, a run directory is staged at the location
-set by the ``rundir`` parameter (``tmp/`` in this case).  The directory
-contains the executable and scripts to run the code, and will contain all of
-the generated output and metadata.  You may examine the run directory and
-manually launch the executable.  Or you can 
-interactively with the ``run.sh`` script::
+The ``coseis.sord.run()`` function does four tasks: (1) configure job
+parameters (2) compile the source code if necessary (3) create a new run
+directory populated with executable code and input files, and (4) launch the
+job interactively or through a batch processing system.  Step (2) only occurs
+as needed for a fresh install or when the source code has been modified.  By
+default, step (4) is skipped, giving the user an opportunity to inspect the
+run directory prior to launching the job.
+
+has been done beforehand, so is skipped.  
+cop
+and
+called, a run directory is staged at the
+location set by the ``rundir`` parameter (``tmp/`` in this case).  The
+directory contains the executable and scripts to run the code, and will contain
+all of the generated output and metadata.  You may examine the run directory
+and manually launch the executable from there.  The job can be run automatically 
 
 Or, submit the job to the batch system with the ``queue.sh`` script
 ::
-
-    tmp/queue.sh
-
-
-Output (and large input, such as the material model) is stored in flat binary
-binary files.  Statistic, such as peak acceleration and peak velocity, are
-computed periodically during each run and stored in the ``stats/`` directory.
 
 
 Field I/O

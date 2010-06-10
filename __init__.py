@@ -2,5 +2,8 @@
 """
 Computational Seismology Tools
 """
-__all__ = ['conf', 'tools', 'sord', 'cvm4']
+from tools import *
+import conf
+import cvm
+import sord
 

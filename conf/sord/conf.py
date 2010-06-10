@@ -7,8 +7,8 @@ import numpy as np
 
 # command line options: (short, long, parameter, value)
 options = [
-    ( 'n', 'dry-run',     'prepare',  False ),
     ( 'f', 'force',       'force',    True ),
+    ( 'n', 'dry-run',     'prepare',  False ),
     ( 'i', 'interactive', 'run',      'exec' ),
     ( 'd', 'debug',       'run',      'debug' ),
     ( 'b', 'batch',       'run',      'submit' ),

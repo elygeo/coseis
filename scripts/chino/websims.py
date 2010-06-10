@@ -2,9 +2,10 @@
 """
 WebSims setup
 """
-import os, sys, glob, shutil, pyproj
+import os, sys, glob, shutil
+import pyproj
 import numpy as np
-import cvm
+import coseis as cst
 
 # parameters
 nproc = 1
@@ -25,7 +26,7 @@ for path in glob.glob( sims ):
     print path
 
     # meta data
-    meta = cvm.util.load( path + 'meta.py' )
+    meta = cst.util.load( path + 'meta.py' )
     extent = meta.extent
     bounds = meta.bounds
     proj = pyproj.Proj( **meta.projection )
@@ -38,7 +39,7 @@ for path in glob.glob( sims ):
 
     # adjust bounds for WebSims (should fix WebSims instead)
     x, y = bounds[:2]
-    proj = cvm.coord.Transform( proj, translate=(-x[0], -y[0]) )
+    proj = cst.coord.Transform( proj, translate=(-x[0], -y[0]) )
     x = 0.0, (x[1] - x[0])
     y = 0.0, (y[1] - y[0])
     bounds = x, y
@@ -53,7 +54,7 @@ for path in glob.glob( sims ):
     open( path + 'wsconf.py', 'w' ).write( wsconf % meta.__dict__ )
 
     # topography
-    topo, extent = cvm.data.topo( extent )
+    topo, extent = cst.data.topo( extent )
     lon, lat = extent
     topo_extent = (lon[0] + 360.0, lon[1] + 360.0), lat
 
@@ -67,11 +68,11 @@ for path in glob.glob( sims ):
     f1 = open( path + 'mapdata.txt', 'w' )
     f2 = open( path + 'mapdata-xyz.txt', 'w' )
     for kind in 'coastlines', 'borders':
-        x, y = cvm.data.mapdata( kind, 'high', extent, 10.0 )
-        z = cvm.coord.interp2( topo_extent, topo, (x, y) )
+        x, y = cst.data.mapdata( kind, 'high', extent, 10.0 )
+        z = cst.coord.interp2( topo_extent, topo, (x, y) )
         np.savetxt( f1, np.array( [x,y,z] ).T )
         x, y = proj( x, y )
-        x, y, i = cvm.data.clipdata( x, y, bounds )
+        x, y, i = cst.data.clipdata( x, y, bounds )
         z = z[i]
         np.savetxt( f2, scale * np.array( [x,y,z] ).T )
     f1.close()
@@ -81,10 +82,10 @@ for path in glob.glob( sims ):
     j, k = nsnap[:2]
     n = j * k
     post = 'rm lon lat dep rho vp\nmv vs %s/vs0' % os.path.realpath( path )
-    job = cvm.stage( nsample=n, nproc=nproc, post=post, workdir='run', run='exec' )
+    job = cst.cvm.stage( nsample=n, nproc=nproc, post=post, workdir='run', run='exec' )
     rundir = job.rundir + os.sep
     shutil.copy2( path + 'lon', rundir + 'lon' )
     shutil.copy2( path + 'lat', rundir + 'lat' )
     np.zeros( n, 'f' ).tofile( rundir + 'dep' )
-    cvm.launch( job )
+    cst.cvm.launch( job )
 

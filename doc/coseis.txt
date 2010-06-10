@@ -14,7 +14,7 @@ Components
 *   `SORD <sord.html>`_: Support Operator Rupture Dynamics code for spontaneous
     rupture and 3D wave propagation simulation.
 
-*   CVM4: updates, MPI parallelization and Python wrapper for the SCEC
+*   CVM: updates, MPI parallelization and Python wrapper for the SCEC
     Community Velocity Model,
     `version 4 <http://www.data.scec.org/3Dvelocity/Version4.tar.gz>`__.
 
@@ -136,7 +136,7 @@ compilers and MPI libraries.
 Source control
 ==============
 
-We use Bazaar_ for version control. Some examples:
+Bazaar_ is used for version control. Some examples:
 
 Apply any recent updates from the repository, overwriting any local changes.
 This is a way to keep up-to-date with the latest code.

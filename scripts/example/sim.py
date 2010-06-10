@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sord                               # import the sord module
+import coseis as cst                      # import the sord module
 nproc = 1, 1, 6
 delta = 100.0, 100.0, 100.0, 0.0075       # step length in (x, y, z, t)
 shape = 61, 61, 61, 60                    # mesh size in (x, y, z, t)
@@ -17,5 +17,5 @@ source1 = 1e6, 1e6, 1e6                   # source normal components
 source2 = 0.0, 0.0, 0.0                   # source shear components
 timefunction = 'brune'                    # source time function
 period = 6 * delta[3]                     # source dominant period
-sord.run( locals() )                      # launch SORD job
+cst.sord.run( locals() )                  # launch SORD job
 

@@ -4,7 +4,7 @@ Material model extraction from CVM
 """
 import os, pyproj
 import numpy as np
-import cvm
+import cosies as cst
 
 # parameters
 dx = 100.0;  nproc = 4096
@@ -25,7 +25,7 @@ bounds = (-144000.0, 112000.0), (-72000.0, 72000.0), (0.0, 64000.0-dx)
 projection = dict( proj='tmerc', lon_0=origin[0], lat_0=origin[1] )
 proj = pyproj.Proj( **projection )
 transform = None
-#proj = cvm.coord.Transform( proj, **transform )
+#proj = cst.coord.Transform( proj, **transform )
 
 # uniform zone in PML and to deepest source depth
 npml = 10
@@ -60,7 +60,7 @@ box = x, y
 extent = (x.min(), x.max()), (y.min(), y.max())
 
 # topography
-topo, topo_extent = cvm.data.topo( extent )
+topo, topo_extent = cst.data.topo( extent )
 
 # mesh
 x, y, z = bounds
@@ -68,7 +68,7 @@ x = np.arange( shape[0] ) * delta[0] + x[0]
 y = np.arange( shape[1] ) * delta[1] + y[0]
 y, x = np.meshgrid( y, x )
 x, y = proj( x, y, inverse=True )
-z = cvm.coord.interp2( topo_extent, topo, (x, y) )
+z = cst.coord.interp2( topo_extent, topo, (x, y) )
 x = np.array( x, 'f' )
 y = np.array( y, 'f' )
 z = np.array( z, 'f' )
@@ -94,10 +94,10 @@ meta = dict(
 rundir = os.path.realpath( path ) + os.sep
 post = 'rm lon lat dep\nmv rho vp vs %r' % rundir
 n = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
-job = cvm.stage( workdir=path, nproc=nproc, nsample=n, post=post )
+job = cst.cvm.stage( workdir=path, nproc=nproc, nsample=n, post=post )
 
 # save data
-cvm.util.save( rundir + 'meta.py', meta, header='# mesh parameters\n' )
+cst.util.save( rundir + 'meta.py', meta, header='# mesh parameters\n' )
 np.savetxt( rundir + 'box.txt', np.array( box, 'f' ).T )
 np.array( x, 'f' ).T.tofile( rundir + 'lon' )
 np.array( y, 'f' ).T.tofile( rundir + 'lat' )
@@ -106,7 +106,7 @@ np.array( z, 'f' ).T.tofile( rundir + 'topo' )
 # launch prep job
 x, y, z = shape
 s = x * y * z / 2000000
-job0 = cvm.launch(
+job0 = cst.conf.launch(
     new = False,
     rundir = path,
     name = 'mesh',
@@ -117,5 +117,5 @@ job0 = cvm.launch(
 )
 
 # launch cvm job
-cvm.launch( job, depend=job0.jobid )
+cst.cvm.launch( job, depend=job0.jobid )
 

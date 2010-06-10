@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 """
-Machine configuration
+Configure, build, and launch utilities.
 """
 import os, sys, re, shutil, getopt, subprocess, shlex, time
 import numpy as np
-
 
 class namespace:
     """
@@ -136,6 +135,116 @@ def configure( module='default', machine=None, save_machine=False, **kwargs ):
     return job, kwargs
 
 
+def make( compiler, object_, source ):
+    """
+    An alternative Make that uses state files.
+    """
+    import glob, difflib
+    object_ = os.path.expanduser( object_ )
+    source = tuple( os.path.expanduser( f ) for f in source if f )
+    statedir = os.path.join( os.path.dirname( object_ ), '.state' )
+    if not os.path.isdir( statedir ):
+        os.mkdir( statedir )
+    statefile = os.path.join( statedir, os.path.basename( object_ ) )
+    command = compiler + (object_,) + source
+    state = [ ' '.join( command ) + '\n' ]
+    for f in source:
+        state += open( f ).readlines()
+    compile_ = True
+    if os.path.isfile( object_ ):
+        try:
+            oldstate = open( statefile ).readlines()
+            diff = ''.join( difflib.unified_diff( oldstate, state, n=0 ) )
+            if diff:
+                print( diff )
+            else:
+                compile_ = False
+        except( IOError ):
+            pass
+    if compile_:
+        try:
+            os.unlink( statefile )
+        except( OSError ):
+            pass
+        print( ' '.join( command ) )
+        if os.system( ' '.join( command ) ):
+            sys.exit( 'Compile error' )
+        open( statefile, 'w' ).writelines( state )
+        for pat in '*.o', '*.mod', '*.ipo', '*.il', '*.stb':
+            for f in glob.glob( pat ):
+                os.unlink( f )
+    return compile_
+
+
+def install_path( path ):
+    """
+    Install path file in site-packages directory.
+    """
+    from distutils.sysconfig import get_python_lib
+    src = os.path.realpath( os.path.expanduser( path ) )
+    dst = os.path.join( get_python_lib(), os.path.basename( src ) + '.pth' )
+    if os.path.exists( dst ):
+        sys.exit( 'Error: %s exists\n%s' % (dst, open( dst ).read()) )
+    print( 'Installing ' + dst )
+    print( 'for path ' + src )
+    try:
+        open( dst, 'w' ).write( src )
+    except( IOError ):
+        sys.exit( 'No write permission for Python directory' )
+    return
+
+
+def uninstall_path( path ):
+    """
+    Remove path file from site-packages directory.
+    """
+    from distutils.sysconfig import get_python_lib
+    src = os.path.realpath( os.path.expanduser( path ) )
+    dst = os.path.join( get_python_lib(), os.path.basename( src ) + '.pth' )
+    print( 'Removing ' + dst )
+    if os.path.isfile( dst ):
+        try:
+            os.unlink( dst )
+        except( IOError ):
+            sys.exit( 'No write permission for Python directory' )
+    return
+
+
+def install( path ):
+    """
+    Copy package to site-packages directory.
+    """
+    from distutils.sysconfig import get_python_lib
+    src = os.path.realpath( os.path.expanduser( path ) )
+    dst = os.path.join( get_python_lib(), os.path.basename( src ) )
+    if os.path.exists( dst ):
+        sys.exit( 'Error: %s exists' % dst )
+    print( 'Installing ' + dst )
+    print( 'from ' + src )
+    try:
+        shutil.copytree( src, dst )
+    except( OSError ):
+        sys.exit( 'No write permission for Python directory' )
+    return
+
+
+def uninstall( path ):
+    """
+    Remove package from site-packages directory.
+    """
+    from distutils.sysconfig import get_python_lib
+    src = os.path.realpath( os.path.expanduser( path ) )
+    dst = os.path.join( get_python_lib(), os.path.basename( src ) )
+    if not os.path.exists( dst ):
+        sys.exit( 'Error: %s does not exist' % dst )
+    print( 'Removing ' + dst )
+    try:
+        shutil.rmtree( dst )
+    except( OSError ):
+        sys.exit( 'No write permission for Python directory' )
+    return
+
+
 def prepare( job=None, **kwargs ):
     """
     Compute and display resource usage
@@ -204,7 +313,6 @@ def prepare( job=None, **kwargs ):
     return job
 
 
-
 def skeleton( job=None, stagein=(), new=True, **kwargs ):
     """
     Create run directory tree from templates.
@@ -253,7 +361,6 @@ def skeleton( job=None, stagein=(), new=True, **kwargs ):
         shutil.copy2( f, dest )
 
     return job
-
 
 
 def launch( job=None, stagein=(), new=True, **kwargs ):

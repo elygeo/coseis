@@ -1,10 +1,11 @@
 #!/usr/bin/env python
+import os
 import numpy as np
 import matplotlib.pyplot as plt
-import cvm
+import coseis as cst
 
-path = 'data/'
-meta = cvm.util.load( path + 'meta.py' )
+path = 'data' + os.sep
+meta = cst.util.load( path + 'meta.py' )
 shape = meta.shape
 extent = meta.extent
 lon, lat = extent[:2]

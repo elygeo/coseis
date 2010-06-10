@@ -2,15 +2,15 @@
 """
 PEER LOH.1 - Plot comparison of FK and SOM.
 """
-import scipy.signal
 import numpy as np
+import scipy.signal
 import matplotlib.pyplot as plt
-import sord
+import coseis as cst
 
 # Parameters
 fk_dir = 'fk/'
 so_dir = 'run/'
-meta = sord.util.loadmeta( so_dir )
+meta = cst.util.load( so_dir + 'meta.py' )
 dt = meta.dt
 nt = meta.nt
 T = meta.period

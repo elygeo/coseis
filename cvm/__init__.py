@@ -2,10 +2,10 @@
 """
 SCEC Community Velocity Model
 """
-import os, sys, re, glob, shutil, urllib, tarfile
-import conf
-from conf import launch
-from tools import util
+import os, sys, re, shutil, urllib, tarfile
+from .. import conf
+from ..conf import launch
+from ..tools import util
 
 url = 'http://www.data.scec.org/3Dvelocity/Version4.tar.gz'
 url = 'http://earth.usc.edu/~gely/coseis/download/cvm4.tgz'
@@ -40,6 +40,7 @@ for surf in [
 ]:
     datafiles += [ surf + '_sur2', surf + '_edge' ]
 
+
 def build( mode=None, optimize=None ):
     """
     Build CVM code.
@@ -70,7 +71,7 @@ def build( mode=None, optimize=None ):
         members = [ fh.getmember( s ) for s in srcfiles ]
         fh.extractall( 'build', members )
         if os.system( 'patch -p0 < cvm4.patch' ):
-            sys.exit( 'Error patching CVM4' )
+            sys.exit( 'Error patching CVM' )
     os.chdir( 'build' )
 
     # find array sizes, save it for later

@@ -2,8 +2,9 @@
 """
 Tally benchmarks
 """
-import os, glob, sord
+import os, glob
 import numpy as np
+import coseis as cst
 
 normalize = 0
 nproc = []
@@ -11,7 +12,7 @@ tt = []
 
 for path in glob.glob( '[0-9]*' ):
     path += os.sep
-    meta = sord.load( path + 'meta.py' )
+    meta = cst.util.load( path + 'meta.py' )
     nproc += [ np.product( meta.nproc3 ) ]
     t = np.fromfile( path + 'prof/8step', 'f' )
     tt += [ np.sum( t[1:-1] ) / (len(t)-2) ]

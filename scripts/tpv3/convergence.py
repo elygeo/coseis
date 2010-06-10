@@ -2,10 +2,11 @@
 """
 TPV3 convergence test
 """
-import os, glob, sord
+import os, glob
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.interpolate.RectBivariateSpline as interp2d
+import coseis as cst
 
 # paramters
 degree = 1
@@ -14,7 +15,7 @@ dirs = glob.glob( 'run/tpv3/[0-9]*' )[3:]
 
 # reference solution
 path = dirs[0] + os.sep
-meta = sord.util.load( path + 'meta.py' )
+meta = cst.util.load( path + 'meta.py' )
 path += 'out' + os.sep
 n = meta.shapes['trup']
 x0  = np.fromfile( path + 'x1',   'f' ).reshape( n[::-1] ).T
@@ -36,7 +37,7 @@ svres = []
 # loop over solutions
 for d in dirs[1:]:
     path = d + os.sep
-    meta = sord.util.load( path + 'meta.py' )
+    meta = cst.util.load( path + 'meta.py' )
     path += 'out' + os.sep
     dx += [ int( meta.delta[0] + 0.5 ) ]
     n = meta.shapes['trup']

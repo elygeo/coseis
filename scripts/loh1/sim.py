@@ -2,7 +2,7 @@
 """
 PEER LOH.1 - Layer over a halfspace, buried double couple source
 """
-import sord
+import coseis as cst
 
 # number of processors in each dimension
 nproc3 = 1, 16, 1
@@ -63,5 +63,5 @@ fieldio += [
 
 # run job
 if __name__ == '__main__':
-    sord.run( locals() )
+    cst.sord.run( locals() )
 

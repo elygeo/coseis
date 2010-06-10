@@ -2,8 +2,9 @@
 """
 Locate the shallowest 2D isosurface in a volume.
 """
-import os, mesh
+import os
 import numpy as np
+import mesh
 
 # parameters
 val = 2500.0

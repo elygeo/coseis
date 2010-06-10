@@ -2,8 +2,9 @@
 """
 Mesh generation
 """
-import os, meta
+import os
 import numpy as np
+import meta
 
 # location
 rundir = 'cvm4' + os.sep

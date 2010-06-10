@@ -2,9 +2,10 @@
 """
 SORD simulation
 """
-import os, sys, pyproj
+import os, sys
+import pyproj
 import numpy as np
-import sord
+import coseis as cst
 
 # parameters
 dx_ = 100.0;  nproc3 = 1, 48, 320
@@ -21,7 +22,7 @@ rundir = os.path.join( 'run', 'sim', id_ )
 # mesh metadata
 mesh_ = '%04.0f' % dx_
 mesh_ = os.path.join( 'run', 'mesh', mesh_ ) + os.sep
-meta = sord.util.load( mesh_ + 'meta.py' )
+meta = cst.util.load( mesh_ + 'meta.py' )
 dtype = meta.dtype
 delta = meta.delta
 shape = meta.shape
@@ -31,7 +32,7 @@ npml = meta.npml
 # translate projection to lower left origin
 x, y = meta.bounds[:2]
 proj = pyproj.Proj( **meta.projection )
-proj = sord.coord.Transform( proj, translate=(-x[0], -y[0]) )
+proj = cst.coord.Transform( proj, translate=(-x[0], -y[0]) )
 
 # dimensions
 dt_ = dx_ / 16000.0
@@ -140,9 +141,9 @@ fieldio += [
 ]
 
 # stage job
-if sord.conf.configure()[0].machine == 'usc-hpc':
+if cst.conf.configure()[0].machine == 'usc-hpc':
     mpout = 0
-job = sord.stage( locals(), post='rm -r in/' )
+job = cst.sord.stage( locals(), post='rm -r in/' )
 if not job.prepare:
     sys.exit()
 
@@ -167,14 +168,14 @@ for f in 'z3', 'rho', 'vp', 'vs':
     os.link( mesh_ + f, path_ + f )
 
 # launch job
-job = sord.launch( job )
+job = cst.sord.launch( job )
 
 # post-process to compute pgv, pga
 path_ = job.rundir + os.sep
-meta = sord.util.load( path_ + 'meta.py' )
+meta = cst.util.load( path_ + 'meta.py' )
 x, y, t = meta.shapes['full-v1']
 s = x * y * t / 1000000
-sord.launch(
+cst.conf.launch(
     new = False,
     rundir = rundir,
     name = 'cook',

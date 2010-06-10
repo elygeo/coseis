@@ -1,31 +1,33 @@
 #!/usr/bin/env python
-import sys
-from coseis import tools, sord, cvm4
+import os, sys
+import coseis as cst
 
-def command_line():
-    target = sys.argv[-1]
+def build( target, path ):
+    path = os.path.realpath( os.path.expanduser( path ) )
     if target == 'all':
-        tools.build()
-        sord.build()
-        cvm4.build()
-        util.install_path( __file__ )
+        cst.tools.build()
+        cst.sord.build()
+        cst.cvm.build()
+        cst.conf.install_path( os.path.dirname( path ) )
     elif target == 'tools':
-        tools.build()
+        cst.tools.build()
     elif target == 'sord':
-        sord.build()
-    elif target == 'cvm4':
-        cvm4.build()
+        cst.sord.build()
+    elif target == 'cvm':
+        cst.cvm.build()
     elif target == 'path':
-        util.install_path( __file__ )
+        cst.conf.install_path( os.path.dirname( path ) )
     elif target == 'unpath':
-        util.uninstall_path( __file__ )
+        cst.conf.uninstall_path( os.path.dirname( path ) )
     elif target == 'install':
-        util.install( __file__ )
+        cst.conf.install( path )
     elif target == 'uninstall':
-        util.uninstall( __file__ )
+        cst.conf.uninstall( path )
     else:
         sys.exit( 'Unknown target' )
 
 if __name__ == '__main__':
-    command_line()
+    target = sys.argv[-1]
+    path = os.path.dirname( __file__ ) 
+    build( target, path )
 

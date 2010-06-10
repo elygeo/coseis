@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-import os, cvm
+import os
 import numpy as np
 import matplotlib.pyplot as plt
+import coseis as cst
 
 # parameters
 lon, lat = (-120.0, -114.5), (32.5, 35.0)
@@ -14,7 +15,7 @@ x, y = np.meshgrid( x, y )
 z = 500.0 * np.ones_like( x )
 
 # CVM setup
-job = cvm.stage( nsample=x.size )
+job = cst.cvm.stage( nsample=x.size )
 path = job.rundir + os.sep
 
 # write CVM input files
@@ -23,14 +24,14 @@ np.array( y, 'f' ).tofile( path + 'lat' )
 np.array( z, 'f' ).tofile( path + 'dep' )
 
 # run CVM job and read Vs
-cvm.launch( job )
+cst.cvm.launch( job )
 v = np.fromfile( path + 'vs', 'f' ).reshape( x.shape )
 
 # plot
 fig = plt.figure( figsize=(6.4, 3.6) )
 ax = plt.gca()
 im = ax.imshow( v, extent=lon+lat, origin='lower', interpolation='nearest' )
-x, y = cvm.data.mapdata( 'coastlines', 'high', (lon, lat), 100.0 )
+x, y = cst.data.mapdata( 'coastlines', 'high', (lon, lat), 100.0 )
 ax.plot( x-360.0, y, 'k-' )
 ax.set_aspect( 1.0 / np.cos( 33.75 / 180.0 * np.pi ) )
 ax.axis( lon+lat )

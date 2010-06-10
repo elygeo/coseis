@@ -2,10 +2,12 @@
 """
 Visualization using Mayavi and Matplotlib
 """
-import pyproj, Image, cvm
+import os
+import pyproj, Image
 import numpy as np
 import matplotlib.pyplot as plt
 from enthought.mayavi import mlab
+import coseis as cst
 
 # parameters
 format = 'png'; dpi = 150.0
@@ -13,7 +15,7 @@ format = 'pdf'; dpi = 300.0
 draft = False
 draft = True
 field = 'z25'
-path = 'data/'
+path = 'data' + os.sep
 proj = pyproj.Proj( proj='tmerc', lon_0=-117.25, lat_0=33.75, k=0.001 )
 title = 'SCEC Community\nVelocity Model'
 legend = 'Depth to Vs = 2.5 km/s'
@@ -36,7 +38,7 @@ axis = -xlim, xlim, -ylim, ylim
 pixels = int( dpi * inches[0] ), int( dpi * inches[1] )
 point = dpi / 72.0
 ppi = 100
-meta = cvm.util.load( path + 'meta.py' )
+meta = cst.util.load( path + 'meta.py' )
 shape = meta.shape
 
 
@@ -58,7 +60,7 @@ ax.axis( axis )
 
 # basemap
 for kind in 'coastlines', 'borders':
-    x, y = cvm.data.mapdata( kind, 'high', extent, 10.0 )
+    x, y = cst.data.mapdata( kind, 'high', extent, 10.0 )
     x, y = proj( x, y )
     ax.plot( x, y, 'k-', lw=0.5 )
 
@@ -86,27 +88,27 @@ ha = sites[3::5]
 s  = sites[4::5]
 dy = {'top': -5, 'baseline': 5}
 for i in range( len( s ) ):
-    cvm.plt.text( ax, x[i], y[i]+dy[va[i]], s[i], ha=ha[i], va=va[i], size=7,
+    cst.plt.text( ax, x[i], y[i]+dy[va[i]], s[i], ha=ha[i], va=va[i], size=7,
         weight='bold', color='w', edgecolor='k' )
 
 # legend
 w = 50.0 / (axis[1] - axis[0])
 rect = 0.142 - w, 0.08, 2 * w, 0.02
-cmap = cvm.plt.colormap( colormap, colorexp )
-cvm.plt.colorbar( fig0, cmap, colorlim, legend, rect, ticks, ticklabels, size=7,
+cmap = cst.plt.colormap( colormap, colorexp )
+cst.plt.colorbar( fig0, cmap, colorlim, legend, rect, ticks, ticklabels, size=7,
      weight='bold', color='w', edgecolor='k' )
 leg = fig0.add_axes( [0, 0, 1, 1] )
 leg.set_axis_off()
-cvm.plt.text( leg, 0.87, 0.95, title, ha='center', va='top', size=10,
+cst.plt.text( leg, 0.87, 0.95, title, ha='center', va='top', size=10,
      weight='bold', color='w', edgecolor='k' )
 
 # create overlay
 if format == 'pdf':
-    over = cvm.plt.savefig( fig0, format='pdf', transparent=True, distill=False )
+    over = cst.plt.savefig( fig0, format='pdf', transparent=True, distill=False )
 else:
     aa = 3
-    mask = cvm.plt.savefig( fig0, dpi=aa*dpi, transparent=True )
-    over = cvm.plt.savefig( fig0, dpi=aa*dpi, background='k' )
+    mask = cst.plt.savefig( fig0, dpi=aa*dpi, transparent=True )
+    over = cst.plt.savefig( fig0, dpi=aa*dpi, background='k' )
     over[:,:,3] = mask[:,:,3]
     over = Image.fromarray( over, 'RGBA' )
     over = over.resize( pixels, Image.ANTIALIAS )
@@ -134,7 +136,7 @@ cmap = [
     (80, 80, 80, 80, 80, 80, 80, 80), # alpha
 ]
 ddeg = 0.5 / 60.0
-z, extent = cvm.data.topo( extent, scale=0.001 )
+z, extent = cst.data.topo( extent, scale=0.001 )
 x, y = extent
 n = z.shape
 if draft:
@@ -143,13 +145,13 @@ if draft:
 else:
     x = x[0] + 0.5 * ddeg * np.arange( n[0] * 2 - 1 )
     y = y[0] + 0.5 * ddeg * np.arange( n[1] * 2 - 1 )
-    z = cvm.data.upsample( z )
+    z = cst.data.upsample( z )
 y, x = np.meshgrid( y, x )
 s = np.maximum( 0.01, z )
 i = (x + y) < -84.0
 s[i] = z[i]
 x, y = proj( x, y )
-cmap = cvm.mlab.colormap( cmap, 2.5 )
+cmap = cst.mlab.colormap( cmap, 2.5 )
 surf = mlab.mesh( x, y, z, scalars=s, vmin=-4, vmax=4, figure=fig )
 surf.module_manager.scalar_lut_manager.lut.table = cmap
 surf.actor.property.ambient = 0.0
@@ -176,7 +178,7 @@ if draft:
     x = x[::2]
     y = y[::2]
     z = z[::2]
-cmap = cvm.mlab.colormap( colormap, colorexp )
+cmap = cst.mlab.colormap( colormap, colorexp )
 surf = mlab.mesh( x, y, 10 - z, scalars=z, figure=fig )
 surf.module_manager.scalar_lut_manager.lut.table = cmap
 surf.module_manager.scalar_lut_manager.use_default_range = False
@@ -196,10 +198,10 @@ fig.scene.camera.parallel_scale = axis[3]
 # combine overlay and save image
 f = path + field + '.' + format
 print f
-out = cvm.mlab.screenshot( fig )
+out = cst.mlab.screenshot( fig )
 if format == 'pdf':
-    out = cvm.viz.img2pdf( out, dpi=dpi )
-    out = cvm.viz.pdf_merge( (out, over) )
+    out = cst.viz.img2pdf( out, dpi=dpi )
+    out = cst.viz.pdf_merge( (out, over) )
     open( f, 'wb' ).write( out.getvalue() )
 else:
     out = Image.fromarray( out, 'RGB' )

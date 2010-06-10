@@ -2,7 +2,9 @@
 """
 Semi-cylindrical canyon with vertically incident P-wave.
 """
-import os, sord, mesh
+import os
+import coseis as cst
+import mesh
 
 # model dimensions
 nproc2 = 2, 1, 1			# number of processes
@@ -47,9 +49,9 @@ for c in '12':
 if __name__ == '__main__':
 
     # stage, save mesh to input directory, and launch
-    job = sord.stage( locals() )
+    job = cst.sord.stage( locals() )
     path_ = os.path.join( job.rundir, 'in' ) + os.sep
     mesh.x.T.tofile( path_ + 'x' )
     mesh.y.T.tofile( path_ + 'y' )
-    sord.run( job )
+    cst.sord.run( job )
 

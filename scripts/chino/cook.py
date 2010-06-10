@@ -2,8 +2,9 @@
 """
 Decimate surface output and compute PGV, PGD
 """
-import os, meta
+import os
 import numpy as np
+import meta
 
 # metatdata
 dt = meta.deltas['full-v1'][-1]

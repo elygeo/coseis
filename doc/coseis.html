@@ -107,6 +107,12 @@ img {
 <li><a class="reference internal" href="#system-requirements" id="id2">System requirements</a></li>
 <li><a class="reference internal" href="#installation" id="id3">Installation</a></li>
 <li><a class="reference internal" href="#source-control" id="id4">Source control</a></li>
+<li><a class="reference internal" href="#examples" id="id5">Examples</a><ul>
+<li><a class="reference internal" href="#cvm4-depth-slice" id="id6">CVM4 depth slice</a></li>
+<li><a class="reference internal" href="#cvm4-fence-diagram" id="id7">CVM4 fence diagram</a></li>
+<li><a class="reference internal" href="#cvm4-basin-depth" id="id8">CVM4 Basin depth</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="section" id="components">
@@ -114,11 +120,13 @@ img {
 <ul class="simple">
 <li><a class="reference external" href="sord.html">SORD</a>: Support Operator Rupture Dynamics code for spontaneous
 rupture and 3D wave propagation simulation.</li>
-<li><a class="reference external" href="cvm.html">CVM4</a>: Parallelization and Python wrapper for SCEC Community
-Velocity Model ver. 4.</li>
-<li>CVMH: extraction tool for SCEC Community Velocity Model, <a class="reference external" href="http://structure.harvard.edu/cvm-h/">Harvard version</a> with alternate geotechnical layer
-implementation.</li>
-<li><a class="reference external" href="http://scec.usc.edu/websims">WebSims</a>: catalog, explore, compare and
+<li>CVM4: updates, MPI parallelization and Python wrapper for the SCEC
+Community Velocity Model,
+<a class="reference external" href="http://www.data.scec.org/3Dvelocity/Version4.tar.gz">version 4</a>.</li>
+<li>CVMH: aternative extraction tool and geotechnical layer implementation for
+the SCEC Community Velocity Model,
+<a class="reference external" href="http://structure.harvard.edu/cvm-h/">Harvard version</a>.</li>
+<li><a class="reference external" href="http://scec.usc.edu/websims">WebSims</a>: catalog, explore, compare, and
 disseminate large numerical simulations results.</li>
 <li>Mesh generation, source preparation, and visualization utilities.</li>
 </ul>
@@ -211,14 +219,11 @@ the supplied configurations.</p>
 python setup.py path
 </pre>
 </li>
-</ol>
-<ol class="arabic" start="6">
-<li><p class="first">Compile component codes:</p>
+<li><p class="first">Compile component codes as needed:</p>
 <pre class="literal-block">
-cd sord
-python setup.py
-cd ../cvm
-python setup.py
+python setup.py sord
+python setup.py cvm4
+python setup.py tools
 </pre>
 </li>
 </ol>
@@ -247,12 +252,99 @@ bzr send -o great-new-feature.patch
 <p>See the
 <a class="reference external" href="http://doc.bazaar-vcs.org/latest/en/tutorials/">Bazaar tutorials</a>
 for more.</p>
+</div>
+<div class="section" id="examples">
+<h3>Examples</h3>
+<div class="section" id="cvm4-depth-slice">
+<h4>CVM4 depth slice</h4>
+<img alt="fig/cvm4-vs500.png" src="fig/cvm4-vs500.png" />
+<p>Extract S-wave velocity at 500 m depth. Plot using Matplotlib:</p>
+<pre class="literal-block">
+cd scripts/cvm-example
+python mesh.py
+</pre>
+<p>Source code:
+<a class="reference external" href="../scripts/cvm-example/mesh.py">mesh.py</a></p>
+<pre class="literal-block">
+#!/usr/bin/env python
+import os, cvm
+import numpy as np
+import matplotlib.pyplot as plt
+
+# parameters
+lon, lat = (-120.0, -114.5), (32.5, 35.0)
+delta = 0.5 / 60.0
+
+# create mesh
+x = np.arange( lon[0], lon[1] + delta/2, delta )
+y = np.arange( lat[0], lat[1] + delta/2, delta )
+x, y = np.meshgrid( x, y )
+z = 500.0 * np.ones_like( x )
+
+# CVM setup
+job = cvm.stage( nsample=x.size )
+path = job.rundir + os.sep
+
+# write CVM input files
+np.array( x, 'f' ).tofile( path + 'lon' )
+np.array( y, 'f' ).tofile( path + 'lat' )
+np.array( z, 'f' ).tofile( path + 'dep' )
+
+# run CVM job and read Vs
+cvm.launch( job )
+v = np.fromfile( path + 'vs', 'f' ).reshape( x.shape )
+
+# plot
+fig = plt.figure( figsize=(6.4, 3.6) )
+ax = plt.gca()
+im = ax.imshow( v, extent=lon+lat, origin='lower', interpolation='nearest' )
+x, y = cvm.data.mapdata( 'coastlines', 'high', (lon, lat), 100.0 )
+ax.plot( x-360.0, y, 'k-' )
+ax.set_aspect( 1.0 / np.cos( 33.75 / 180.0 * np.pi ) )
+ax.axis( lon+lat )
+f = path + 'cvm4-vs500.png'
+print f
+fig.savefig( f )
+
+
+</pre>
+</div>
+<div class="section" id="cvm4-fence-diagram">
+<h4>CVM4 fence diagram</h4>
+<img alt="fig/cvm4-fence.png" src="fig/cvm4-fence.png" />
+<p>Build a fence diagram similar to Magistrale (2000) figure 10. Plot using
+Mayavi:</p>
+<pre class="literal-block">
+cd scripts/fence
+python mesh.py
+python plot.py
+</pre>
+<p>Source code:
+<a class="reference external" href="../scripts/fence/mesh.py">mesh.py</a>
+<a class="reference external" href="../scripts/fence/plot.py">plot.py</a></p>
+</div>
+<div class="section" id="cvm4-basin-depth">
+<h4>CVM4 Basin depth</h4>
+<img alt="fig/cvm4-z25.png" src="fig/cvm4-z25.png" />
+<p>Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s.
+Plot over topography using Mayavi:</p>
+<pre class="literal-block">
+cd scripts/basindepth
+python mesh.py
+python search.py
+python viz.py
+</pre>
+<p>Source code:
+<a class="reference external" href="../scripts/basindepth/mesh.py">mesh.py</a>
+<a class="reference external" href="../scripts/basindepth/search.py">search.py</a>
+<a class="reference external" href="../scripts/basindepth/viz.py">viz.py</a></p>
 <!-- vim: filetype=rst -->
+</div>
 </div>
 </div>
 <div class="footer">
 <hr class="footer" />
-Generated on: 2010-06-08.
+Generated on: 2010-06-10.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>

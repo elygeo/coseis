@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-from enthought.mayavi import mlab
+import os
 import numpy as np
-import os, cvm, mesh
+from enthought.mayavi import mlab
+import cosies as cst
+import mesh
 
 path = os.path.join( 'run', mesh.version ) + os.sep
 pixels = 640, 360
@@ -14,7 +16,7 @@ fig.scene.disable_render = True
 fig.scene.set_size( pixels )
 
 # read configuration
-cfg = cvm.util.load( path + 'conf.py' )
+cfg = cst.util.load( path + 'conf.py' )
 dtype = cfg.dtype
 proj = mesh.proj
 
@@ -33,7 +35,7 @@ for n in mesh.nn:
     z = zz[i:i+n]
     s = ss[i:i+n]
     h = mlab.mesh( x, y, z, scalars=s, vmin=1500, vmax=6500 )
-    lut = cvm.mlab.colormap( 'bgr' )[::-1]
+    lut = cst.mlab.colormap( 'bgr' )[::-1]
     h.module_manager.scalar_lut_manager.lut.table = lut
     i += n
     if 1:
@@ -44,7 +46,7 @@ for n in mesh.nn:
 
 # plot coastline
 extent = (-120.0, -117.0), (33.0, 35.0)
-x, y = cvm.data.mapdata( 'coastlines', 'high', extent, 10.0 )
+x, y = cst.data.mapdata( 'coastlines', 'high', extent, 10.0 )
 x, y = proj( x, y )
 z = np.zeros_like( x )
 mlab.plot3d( x, y, z, color=(0,0,0), line_width=0.5, tube_radius=None )

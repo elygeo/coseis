@@ -2,12 +2,12 @@
 """
 Reproduce Magistrale (2000) Fig. 10 fence diagram.
 """
-import os, sys, pyproj
+import os
+import pyproj
 import numpy as np
-import cvm
+import cosies as cst
 
 # parameters
-version = 'cvm4'
 nproc = 2
 transpose = True
 transpose = False
@@ -71,7 +71,7 @@ if transpose:
 if __name__ == '__main__':
 
     # CVM setup
-    job = cvm.stage( nsample=xx.size, nproc=nproc, name=version )
+    job = cst.cvm.stage( nsample=xx.size, nproc=nproc )
     path = job.rundir + os.sep
 
     # write CMV input files
@@ -80,5 +80,5 @@ if __name__ == '__main__':
     np.array( zz, 'f' ).tofile( path + 'dep' )
 
     # launch job
-    cvm.launch( job )
+    cst.cvm.launch( job )
 

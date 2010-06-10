@@ -4,8 +4,8 @@ Computational Seismology Tools
 """
 import os
 import util, coord, signal, swab
-import data, gocad, cvmh
-import source, egmm, boore
+import data, vm1d, gocad, cvmh
+import source, egmm
 import viz, plt, mlab
 try:
     import rspectra

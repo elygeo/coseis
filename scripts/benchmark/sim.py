@@ -2,7 +2,8 @@
 """
 Benchmarks
 """
-import sord, math
+import math
+import coseis as cst
 
 np3_ = (1,1,1),
 np3_ = (1,1,1), (1,2,2), (1,4,4)
@@ -42,5 +43,5 @@ for np3 in np3_:
     n  = np3[0] * np3[1] * np3[2]
     print '\nBenchmark: %s, %s, %s, %s' % ( np3, math.log(n,2), n/16, n )
     rundir = 'run/%05d' % n
-    sord.run( locals() )
+    cst.sord.run( locals() )
 
