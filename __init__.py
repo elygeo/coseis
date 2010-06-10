@@ -2,5 +2,5 @@
 """
 Computational Seismology Tools
 """
-#__all__ = ['conf', 'tools', 'sord', 'cvm4']
+__all__ = ['conf', 'tools', 'sord', 'cvm4']
 

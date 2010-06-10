@@ -1,6 +1,8 @@
 machine
 email
-bin/*
+*/bin/*
+data
+cvm4/build
 *.pyc
 *.so
 .DS_Store

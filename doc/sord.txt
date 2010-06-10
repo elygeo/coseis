@@ -135,15 +135,12 @@ directory.
 Running jobs
 ------------
 
-THIS SECTION IS OUTDATED AND AWAITING REVISION.
-
-Each time ``sord.run()`` is called, a run directory is created at the location
+Each time ``sord.run()`` is called, a run directory is staged at the location
 set by the ``rundir`` parameter (``tmp/`` in this case).  The directory
 contains the executable and scripts to run the code, and will contain all of
-the generated output and metadata.  From the run directory, start the job
+the generated output and metadata.  You may examine the run directory and
+manually launch the executable.  Or you can 
 interactively with the ``run.sh`` script::
-
-    tmp/run.sh
 
 Or, submit the job to the batch system with the ``queue.sh`` script
 ::

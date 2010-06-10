@@ -14,7 +14,7 @@ settings = dict(
     stylesheet_path = 'style.css',
 )
 
-for f in 'coseis', 'sord', 'cvm':
+for f in 'coseis', 'sord':
     print f
     rst = open( f + '.txt' ).read()
     html = publish_string( rst, writer_name='html4css1',

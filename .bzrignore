@@ -1,6 +1,8 @@
 /*/bin/*
-/coseis.tgz
+/data
+/download
+/cvm4/build
 /conf/machine
 /conf/email
-/data
 /doc/Magistrale2000.pdf
+coseis.tgz

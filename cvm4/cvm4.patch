@@ -1,0 +1,564 @@
+diff -ruN src/in.h build/in.h
+--- src/in.h	2005-02-18 17:21:25.000000000 -0800
++++ build/in.h	2010-06-09 14:17:46.000000000 -0700
+@@ -1,4 +1,8 @@
+-c  in.h   contains i-o stuff
+-         parameter(ibig=750000, rdepmin=0.0)
+-         common /oi/nn,rlat(ibig),rlon(ibig),rdep(ibig),
+-     1   alpha(ibig),beta(ibig),rho(ibig),inout(ibig)
++! memory usage is ibig*38*4 bytes
++!     integer, parameter :: ibig = 4194304
++      integer, parameter :: ibig = 4507502
++      real, parameter :: rdepmin = 0.
++      common /oi/ rlat, rlon, rdep, alpha, beta, rho, inout, nn, nnl
++      real :: rlat(ibig), rlon(ibig), rdep(ibig), alpha(ibig), 
++     $  beta(ibig), rho(ibig)
++      integer :: inout(ibig), nn, nnl
+diff -ruN src/iobin.f build/iobin.f
+--- src/iobin.f	1969-12-31 16:00:00.000000000 -0800
++++ build/iobin.f	2010-06-09 14:16:50.000000000 -0700
+@@ -0,0 +1,80 @@
++! Binary I/O for SCEC CVM
++
++      subroutine readpts( kerr )
++      implicit none
++      include 'in.h'
++      integer :: kerr, nio, i
++      character(160) :: lon_file, lat_file, dep_file
++      write( 0, '(a)' ) 'SCEC Community Velocity Model'
++      open( 1, file='cvm-input', status='old' )
++      read( 1, * ) nn
++      read( 1, * ) lon_file
++      read( 1, * ) lat_file
++      read( 1, * ) dep_file
++      close( 1 )
++      if ( nn > ibig ) then
++         print *, 'Error: nn greater than ibig', nn , ibig
++         stop
++      end if
++      inquire( iolength=nio ) rlon(1:nn)
++      write( 0, '(a)' ) 'Reading input'
++      open( 1, file=lon_file, recl=nio, form='unformatted',
++     $  access='direct', status='old' )
++      open( 2, file=lat_file, recl=nio, form='unformatted',
++     $  access='direct', status='old' )
++      open( 3, file=dep_file, recl=nio, form='unformatted',
++     $  access='direct', status='old' )
++      read( 1, rec=1 ) rlon(1:nn)
++      read( 2, rec=1 ) rlat(1:nn)
++      read( 3, rec=1 ) rdep(1:nn)
++      close( 1 )
++      close( 2 )
++      close( 3 )
++      write( 0, '(a)' ) 'Sampling velocity model'
++      do i = 1, nn
++        if( rdep(i) .lt. 0 ) write( 0, * )
++     $    'Error: degative depth', i, rlon(i), rlat(i), rdep(i)
++        if(rlon(i)/=rlon(i).or.rlat(i)/=rlat(i).or.rdep(i)/=rdep(i))
++     $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
++        rdep(i) = rdep(i) * 3.2808399
++        if( rdep(i) .lt. rdepmin ) rdep(i) = rdepmin
++      end do
++      kerr = 0
++      end
++
++      subroutine writepts( kerr )
++      implicit none
++      include 'in.h'
++      integer :: kerr, nio, i
++      character(160) :: rho_file, alpha_file, beta_file
++      inquire( iolength=nio ) rho(1:nn)
++      open( 1, file='cvm-input', status='old' )
++      read( 1, * ) rho_file
++      read( 1, * ) rho_file
++      read( 1, * ) rho_file
++      read( 1, * ) rho_file
++      read( 1, * ) rho_file
++      read( 1, * ) alpha_file
++      read( 1, * ) beta_file
++      close( 1 )
++      write( 0, '(a)' ) 'Writing output'
++      open( 1, file=rho_file, recl=nio, form='unformatted',
++     $  access='direct', status='replace' )
++      open( 2, file=alpha_file, recl=nio, form='unformatted',
++     $  access='direct', status='replace' )
++      open( 3, file=beta_file,recl=nio, form='unformatted',
++     $  access='direct', status='replace' )
++      write( 1, rec=1 ) rho(1:nn)
++      write( 2, rec=1 ) alpha(1:nn)
++      write( 3, rec=1 ) beta(1:nn)
++      close( 1 )
++      close( 2 )
++      close( 3 )
++      do i = 1, nn
++        if(rho(i)/=rho(i).or.alpha(i)/=alpha(i).or.beta(i)/=beta(i))
++     $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
++      end do
++      write( 0, '(a)' ) 'Finished'
++      kerr = 0
++      end
++
+diff -ruN src/iompi.f build/iompi.f
+--- src/iompi.f	1969-12-31 16:00:00.000000000 -0800
++++ build/iompi.f	2010-06-09 14:16:59.000000000 -0700
+@@ -0,0 +1,106 @@
++! MPI I/O for SCEC CVM
++
++      subroutine readpts( kerr )
++      implicit none
++      include 'in.h'
++      include 'mpif.h'
++      integer(kind=mpi_offset_kind) :: offset, nn8, np8, nnl8
++      integer :: kerr, ip, np, ifh, ierr, i
++      character(160) :: lon_file, lat_file, dep_file
++      call mpi_init( ierr )
++      open( 1, file='cvm-input', status='old' )
++      read( 1, * ) nn8
++      read( 1, * ) lon_file
++      read( 1, * ) lat_file
++      read( 1, * ) dep_file
++      close( 1 )
++      call mpi_comm_rank( mpi_comm_world, ip, ierr )
++      call mpi_comm_size( mpi_comm_world, np, ierr )
++      call mpi_file_set_errhandler( mpi_file_null,
++     $  MPI_ERRORS_ARE_FATAL, ierr )
++      if ( ip == 0 ) write( 0, '(a)' ) 'SCEC Community Velocity Model'
++      nnl = nn8 / np
++      np8 = np
++      if ( modulo( nn8, np8 ) /= 0 ) nnl = nnl + 1
++      nnl8 = nnl
++      nn = min( nnl8, nn8 - nnl8 * ip )
++      if ( nn > ibig ) then
++         print *, 'Error: nn greater than ibig', nn, ibig
++         stop
++      end if
++      call mpi_type_size( mpi_real, i, ierr )
++      offset = i
++      offset = offset * nnl * ip
++      if ( ip == 0 ) write( 0, '(a)' ) 'Reading input'
++      call mpi_file_open( mpi_comm_world, lon_file, mpi_mode_rdonly,
++     $  mpi_info_null, ifh, ierr )
++      call mpi_file_read_at( ifh, offset, rlon, nn, mpi_real,
++     $  mpi_status_ignore, ierr )
++      call mpi_file_close( ifh, ierr )
++      call mpi_file_open( mpi_comm_world, lat_file, mpi_mode_rdonly,
++     $  mpi_info_null, ifh, ierr )
++      call mpi_file_read_at( ifh, offset, rlat, nn, mpi_real,
++     $  mpi_status_ignore, ierr )
++      call mpi_file_close( ifh, ierr )
++      call mpi_file_open( mpi_comm_world, dep_file, mpi_mode_rdonly,
++     $  mpi_info_null, ifh, ierr )
++      call mpi_file_read_at( ifh, offset, rdep, nn, mpi_real,
++     $  mpi_status_ignore, ierr )
++      call mpi_file_close( ifh, ierr )
++      if ( ip == 0 ) write( 0, '(a)' ) 'Sampling velocity model'
++      do i = 1, nn
++        if(rdep(i).lt.0) write( 0, * ) 
++     $    'Error: degative depth', i, rlon(i), rlat(i), rdep(i)
++        if(rlon(i)/=rlon(i).or.rlat(i)/=rlat(i).or.rdep(i)/=rdep(i))
++     $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
++        rdep(i) = rdep(i) * 3.2808399
++        if( rdep(i) .lt. rdepmin ) rdep(i) = rdepmin
++      end do
++      kerr = 0
++      end
++
++      subroutine writepts( kerr )
++      implicit none
++      include 'in.h'
++      include 'mpif.h'
++      integer(kind=mpi_offset_kind) :: offset
++      integer :: kerr, ip, ifh, ierr, i
++      character(160) :: rho_file, alpha_file, beta_file
++      open( 1, file='cvm-input', status='old' )
++      read( 1, * ) rho_file
++      read( 1, * ) rho_file
++      read( 1, * ) rho_file
++      read( 1, * ) rho_file
++      read( 1, * ) rho_file
++      read( 1, * ) alpha_file
++      read( 1, * ) beta_file
++      close( 1 )
++      call mpi_comm_rank( mpi_comm_world, ip, ierr )
++      call mpi_type_size( mpi_real, i, ierr )
++      offset = i
++      offset = offset * nnl * ip
++      if ( ip == 0 ) write( 0, '(a)' ) 'Writing output'
++      call mpi_file_open( mpi_comm_world, rho_file,
++     $  mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr )
++      call mpi_file_write_at( ifh, offset, rho, nn, mpi_real,
++     $  mpi_status_ignore, ierr )
++      call mpi_file_close( ifh, ierr )
++      call mpi_file_open( mpi_comm_world, alpha_file,
++     $  mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr )
++      call mpi_file_write_at( ifh, offset, alpha, nn, mpi_real,
++     $  mpi_status_ignore, ierr )
++      call mpi_file_close( ifh, ierr )
++      call mpi_file_open( mpi_comm_world, beta_file,
++     $  mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr )
++      call mpi_file_write_at( ifh, offset, beta, nn, mpi_real,
++     $  mpi_status_ignore, ierr )
++      call mpi_file_close( ifh, ierr )
++      kerr = 0
++      do i = 1, nn
++        if(rho(i)/=rho(i).or.alpha(i)/=alpha(i).or.beta(i)/=beta(i))
++     $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
++      end do
++      if ( ip == 0 ) write( 0, '(a)' ) 'Finished'
++      call mpi_finalize( ierr )
++      end
++
+diff -ruN src/iotxt.f build/iotxt.f
+--- src/iotxt.f	1969-12-31 16:00:00.000000000 -0800
++++ build/iotxt.f	2010-06-09 14:17:06.000000000 -0700
+@@ -0,0 +1,38 @@
++! ASCII I/O for SCEC CVM
++
++      subroutine readpts( kerr )
++      implicit none
++      include 'in.h'
++      integer :: kerr, i
++      write( 0, '(a)' ) 'SCEC Community Velocity Model'
++      read( *, * ) nn
++      if ( nn > ibig ) then
++         print *, 'Error: nn greater than ibig', nn, ibig
++         stop
++      end if
++      do i = 1, nn
++        read( *, * ) rlat(i), rlon(i), rdep(i)
++        if( rdep(i) .lt. 0 ) write( 0, * )
++     $    'Error: degative depth', i, rlon(i), rlat(i), rdep(i)
++        if(rlon(i)/=rlon(i).or.rlat(i)/=rlat(i).or.rdep(i)/=rdep(i))
++     $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
++        rdep(i) = rdep(i) * 3.2808399
++        if( rdep(i) .lt. rdepmin ) rdep(i) = rdepmin
++      end do
++      kerr = 0
++      end
++
++      subroutine writepts( kerr )
++      implicit none
++      include 'in.h'
++      integer :: kerr, i
++      do i = 1, nn
++        rdep(i) = rdep(i) / 3.2808399
++        if(rho(i)/=rho(i).or.alpha(i)/=alpha(i).or.beta(i)/=beta(i))
++     $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
++        write( *, '(f8.5,1x,f10.5,1x,f9.2,1x,f8.1,1x,f8.1,1x,f8.1)' )
++     $    rlat(i), rlon(i), rdep(i), alpha(i), beta(i), rho(i)
++      end do
++      kerr = 0
++      end
++
+diff -ruN src/version4.0.f build/version4.0.f
+--- src/version4.0.f	2006-02-27 11:57:37.000000000 -0800
++++ build/version4.0.f	2010-06-09 14:13:56.000000000 -0700
+@@ -23,6 +23,8 @@
+ c
+ c version 3.0  8-01   install upper mantle tomography
+ c version 4.0  6-05   new Vp-density, new San Berdo, new Imperial Valley
++c 
++c Bug fixes and modifications for binary and MPI I/O. Geoffrey Ely 6/8/06
+ c                   
+ c
+          include 'in.h'
+@@ -37,6 +39,37 @@
+          include 'surfaced.h'
+          include 'genpro.h'
+          include 'genprod.h'
++
++c initialize to zero, add by Ely
++      inct = 0
++      incto = 0
++      iupm = 0
++      idnm = 0
++      rshcor = 0.
++      do i = 1,isurmx
++        iiiold(i) = 0
++        inorold(i) = 0
++        rsuqold(i) = 0.
++      end do
++      rtemp01 = 0.
++      rtemp05 = 0.
++      rtemp07 = 0.
++      rtemp22 = 0.
++      rtemp36 = 0.
++      rtemp47 = 0.
++      rtemp50 = 0.
++      rtemp55 = 0.
++      rtemp56 = 0.
++      rtemp57 = 0.
++      rtemp62 = 0.
++      rtemp63 = 0.
++      rtemp64 = 0.
++      rtemp65 = 0.
++      rtemp68 = 0.
++      rtemp69 = 0.
++      rtemp70 = 0.
++      rtemp73 = 0.
++
+ c some constants
+          rd2rad=3.141593/180.
+          rckval=5000000.
+@@ -540,7 +573,7 @@
+ c diag      write(*,*)l0,iup,idn
+             go to 1177
+             endif
+-1188       iup=idn
++           iup=idn
+            iupm=idnm
+            ishal=idn
+            goto 1177
+@@ -885,7 +918,7 @@
+ c-----reads strat surface edges---------------
+ c---reads x-y pairs--------------------------
+          include 'surface.h'
+-         character*9 aname2, asuf2*5
++         character(9) aname2, asuf2*5
+          include 'names.h'
+          asuf2='_edge'
+          kerr=0
+@@ -908,7 +941,7 @@
+ c-----read model edge file, kept separate from surface edge-----
+ c-------to simplify index counts--------------------------------
+           include 'surface.h'
+-          character*9 aname3
++          character(9) aname3
+           kerr=0
+ c---file name assignment-------
+           aname3='bmod_edge'
+@@ -927,13 +960,13 @@
+          subroutine readgeo(k2err)
+ c reads geologic contours
+          include 'sgeo.h'
+-         character*16 fileii,a1*10
++         character(16) fileii,a1*10
+          include 'sgeod.h'
+ c---file name assignment-------
+          fileii='lab_geo2_geology'
+          k2err=0
+ c read file
+-           open(12,file=fileii,type='old',err=977)
++           open(12,file=fileii,status='old',err=977)
+            do 300 k=1,ngeo
+            read(12,*)np(k)
+             do 310 k1=1,np(k)
+@@ -998,8 +1031,8 @@
+ c---reads stratigraphic surfaces-------------------------
+ c---reads spyglass ascii output--------------------------
+          include 'surface.h'
+-         character*8 aname, asuf*4
+-         character*9 aname2, a18*1
++         character(8) aname, asuf*4
++         character(9) aname2, a18*1
+          include 'names.h'
+          asuf='_sur'
+          a18='2'
+@@ -1038,7 +1071,7 @@
+ c-reads uplift file for LAB--------------------
+ c-----just like readsur-------------
+         include 'labup.h'
+-        character*9 filei4
++        character(9) filei4
+ c file name assignment
+         filei4='laup_sur2'
+ c
+@@ -1050,6 +1083,8 @@
+ c          read(16,11440) rlaup(i),rloup(j),rzupl(i,j) 
+ c11440     format(f9.5,1x,f10.5,1x,f10.2)
+ c convert thousands of feet to feet---------------
++           rlaup(i) = 0.
++           rloup(i) = 0.
+           rzupl(i,j)=rzupl(i,j)*1000. 
+ 440       continue 
+ 400      continue  
+@@ -1063,7 +1098,7 @@
+ c--gets uplift for LAB---------------
+ c find uplift amount at current lat long
+         include 'labup.h'
+-877        do 817 l7=1,nlaup-1
++           do 817 l7=1,nlaup-1
+            if(rlatl0.le.rlaup(l7).and.rlatl0.gt.rlaup(l7+1))then
+             do 828 l8=1,nloup-1 
+             if(rlonl0.gt.rloup(l8).and.rlonl0.le.rloup(l8+1))then
+@@ -1167,40 +1202,6 @@
+          return
+          end
+ 
+-         subroutine readpts(kerr)
+-c-----read points of interest-----------------
+-         include 'in.h'
+-         kerr=0
+-         open(15,file='btestin',status='old',err=1099) 
+-c        nn=51456
+-         read(15,*)nn 
+-         do 150 i=1,nn 
+-         read(15,*)rlat(i),rlon(i),rdep(i) 
+-c now read in meters
+-         rdep(i)=rdep(i)*3.2808399
+-         if(rdep(i).lt.rdepmin)rdep(i)=rdepmin 
+-150      continue 
+-         close(15)
+-         go to 1088
+-1099     kerr=1
+-1088     return
+-         end
+- 
+-         subroutine writepts(kerr)
+-c----write points of interest-----------------
+-         include 'in.h'
+-         kerr=0
+-         open(17,file='btestout',status='new')
+-         do 155 i=1,nn
+-          rdep(i)=rdep(i)/3.2808399
+-          write(17,77)rlat(i),rlon(i),rdep(i),alpha(i)
+-     1    ,beta(i),rho(i)
+-77       format(f8.5,1x,f10.5,1x,f9.2,1x,f8.1,1x,f8.1,1x,f8.1)
+-155      continue
+-         close(17)
+-         return
+-         end
+-
+          subroutine readivsurf(kerr)
+ c-----read Imperial Valley surfaces--------------
+          include 'in.h'
+@@ -1288,7 +1289,13 @@
+ c---find appropriate surface depths-------------------
+ c        do 6009 i9=1,numsiv
+ c---find valid surfaces-------------------
++      rd2rad=3.141593/180.
++      do i = 1, numsiv
++        rsuqiv(i) = 0.
++      end do
+          i9=1
++
++         
+          do 8139 l3=1,nlasiv(i9)-1
+       if(rla.le.rlasiv(i9,l3).and.rla.gt.rlasiv(i9,l3+1))then
+          do 8249 l4=1,nlosiv(i9)-1
+@@ -1341,7 +1348,7 @@
+ c
+ 1181      betm=alp/(sqrt(2.))
+ c -- all done
+-1182      return
++          return
+           end
+ 
+           subroutine makereg(rla,rlo,rde,alp,bet,iregfl)
+@@ -1349,6 +1356,10 @@
+          include 'regional.h'
+          include 'regionald.h'
+          dimension vervep(4),verves(4)
++         rscal = 0.
++         iinum = 0
++         alp = 0.
++         bet = 0.
+          rd2rad=3.141593/180.
+ c -- find which box point is in--
+          do 1927 n=1,nregll-ninrow
+@@ -1526,15 +1537,15 @@
+       return
+       end
+ 
+-         subroutine readbore(kerr) 
++         subroutine readbore(k2err) 
+ c--read geotech borehole data-------------- 
+          include 'borehole.h'
+-         character*9 fileib
++         character(9) fileib
+ c---file name assignment-------
+          fileib='boreholes'
+          k2err=0
+ c read file
+-         open(15,file=fileib,type='old',err=2978)
++         open(15,file=fileib,status='old',err=2978)
+          iprono=0
+          ibhct=0
+          ieach=0
+@@ -1565,15 +1576,15 @@
+ 2915      return
+            end
+ 
+-         subroutine readgene(kerr)
++         subroutine readgene(k2err)
+ c--read generic borehole profiles--------------
+          include 'genpro.h'
+-         character*12 fileig,ag1*50
++         character(12) fileig,ag1*50
+ c---file name assignment-------
+          fileig='soil_generic'
+          k2err=0
+ c read file
+-         open(12,file=fileig,type='old',err=2977)
++         open(12,file=fileig,status='old',err=2977)
+          do 2300 k=1,numgen
+           read(12,*)irt2
+           numptge2(k)=irt2
+@@ -1648,6 +1659,7 @@
+         dimension inindex(inct)
+         dimension rdelz(nx,ny)
+         rdmi2=40.
++        iteisb = 0
+ c
+         icolnm=abs(int((rlonmax-rlonl0)/rdelx))
+         irownm=int((rlatmax-rlatl0)/rdely)
+@@ -1762,12 +1774,13 @@
+          return
+         end
+ 
+-        subroutine readsoil(kerr)
++        subroutine readsoil(k2err)
+ c--reads soil type info---------------------------------
+ c Reads a modified .pgm ascii file
+         include 'soil1.h'
+-        character*50 filesb
++        character(50) filesb
+ c here's input file name-----------------------------------
++        k2err=0
+         filesb='soil.pgm'
+         open(16,file=filesb,status='old',err=5977)
+         read(16,*)rlonmax,rlonmin,rlatmax,rlatmin
+@@ -1799,12 +1812,17 @@
+          include 'genpro.h'
+          include 'wtbh1.h'
+          include 'wtbh2.h'
++         roff = 0.
++         rvte3 = 0.
++         rvte8 = 0.
+          ihtfg=0
+          rtvelges=0.
+          rdep=rdep2
+          do 7013 n=1,nrad
+          iradcts(n)=0
+          radvs(n)=0.
++         rtvels(n)=0.
++         rtewts(n)=0.
+ 7013     continue
+ c--check ifs flag--
+          if(ifs.eq.0)then
+@@ -1928,6 +1946,7 @@
+          include 'wtbh1.h'
+          include 'wtbh3.h'
+          rtvelges=0.
++      rva = 0.
+          do 97013 n=1,nrad
+          iradctp(n)=0
+          radvp(n)=0.
+@@ -2009,7 +2028,7 @@
+         subroutine readmoho(k2err)
+ c--reads the moho surface file--------------------------
+         include 'moho1.h'
+-        character*50 filemo
++        character(50) filemo
+ c here's input file name-----------------------------------
+         filemo='moho_sur'
+         open(16,file=filemo,status='old',err=3233)
+@@ -2094,7 +2113,7 @@
+ c Using Monica Kohler's so cal model at xx km horizontal
+ c  spacing, 10 km vertical spacing
+          include 'mantle.h'
+-         character*1 atra
++         character(1) atra
+          kerr=0
+          open(29,file='3D.out',status='old',err=2998)
+          do 1129 j=1,nmanll
