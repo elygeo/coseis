@@ -3,14 +3,14 @@
 SCEC Community Velocity Model
 """
 import os, sys, re, shutil, urllib, tarfile
-from .. import conf
-from ..conf import launch
-from ..tools import util
+import cst.util
+import cst.conf
+from cst.conf import launch
 
 url = 'http://www.data.scec.org/3Dvelocity/Version4.tar.gz'
-url = 'http://earth.usc.edu/~gely/coseis/cvm4.tgz'
-path = os.path.realpath( os.path.dirname( __file__ ) )
-repo = os.path.realpath( os.path.join( path, '..', 'data' ) )
+url = 'http://earth.usc.edu/~gely/coseis/repo/cvm4.tgz'
+path = os.path.realpath( __file__ )
+repo = os.path.join( path, '..', '..', 'data' )
 tarball = os.path.join( repo, os.path.basename( url ) )
 srcfiles = [
     'version4.0.f', 'in.h',
@@ -41,13 +41,13 @@ for surf in [
     datafiles += [ surf + '_sur2', surf + '_edge' ]
 
 
-def build( mode=None, optimize=None ):
+def _build( mode=None, optimize=None ):
     """
     Build CVM code.
     """
 
     # configure
-    cf = conf.configure( 'cvm' )[0]
+    cf = cst.conf.configure( 'cvm' )[0]
     if not optimize:
         optimize = cf.optimize
     if not mode:
@@ -89,19 +89,19 @@ def build( mode=None, optimize=None ):
         for opt in optimize:
             compiler = cf.fortran_serial + cf.fortran_flags[opt] + ('-o',)
             object_ = 'cvm4-a' + opt
-            util.make( compiler, object_, source )
+            cst.conf.make( compiler, object_, source )
     if 's' in mode:
         source = 'iobin.f', 'version4.0.f'
         for opt in optimize:
             compiler = cf.fortran_serial + cf.fortran_flags[opt] + ('-o',)
             object_ = 'cvm4-s' + opt
-            util.make( compiler, object_, source )
+            cst.conf.make( compiler, object_, source )
     if 'm' in mode and cf.fortran_mpi:
         source = 'iompi.f', 'version4.0.f'
         for opt in optimize:
             object_ = 'cvm4-m' + opt
             compiler = cf.fortran_mpi + cf.fortran_flags[opt] + ('-o',)
-            util.make( compiler, object_, source )
+            cst.conf.make( compiler, object_, source )
     os.chdir( cwd )
     return
 
@@ -117,7 +117,7 @@ def stage( inputs={}, **kwargs ):
     inputs.update( kwargs )
 
     # configure
-    job, inputs = conf.configure( module='cvm', **inputs )
+    job, inputs = cst.conf.configure( module='cvm', **inputs )
     if inputs:
         sys.exit( 'Unknown parameter: %s' % inputs )
     if not job.mode:
@@ -126,7 +126,7 @@ def stage( inputs={}, **kwargs ):
             job.mode = 'm'
     job.rundir = os.path.join( job.workdir, 'cvm4' )
     job.command = os.path.join( '.', 'cvm4' + '-' + job.mode + job.optimize )
-    job = conf.prepare( job )
+    job = cst.conf.prepare( job )
 
     # check minimum processors needed for compiled memory size
     f = os.path.join( path, 'build', 'ibig' )
@@ -142,7 +142,7 @@ def stage( inputs={}, **kwargs ):
         shutil.rmtree( job.rundir )
     if not job.reuse or not os.path.exists( job.rundir ):
         files = os.path.join( path, 'build', job.command ),
-        conf.skeleton( job, files )
+        cst.conf.skeleton( job, files )
         fh = tarfile.open( tarball, 'r:gz' )
         members = [ fh.getmember( s ) for s in datafiles ]
         fh.extractall( 'build', members )
@@ -157,7 +157,7 @@ def stage( inputs={}, **kwargs ):
 
     # save configuration
     f = os.path.join( job.rundir, 'conf.py' )
-    util.save( f, job.__dict__ )
+    cst.util.save( f, job.__dict__ )
 
     return job
 

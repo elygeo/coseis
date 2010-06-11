@@ -1,33 +1,32 @@
 #!/usr/bin/env python
+"""
+Setup Coseis
+"""
 import os, sys
-import coseis as cst
+if __name__ != '__main__':
+    sys.exit( 'Error, trying to import non-module: %s' % __file__ )
 
-def build( target, path ):
+def build( targets, path ):
     path = os.path.realpath( os.path.expanduser( path ) )
-    if target == 'all':
-        cst.tools.build()
-        cst.sord.build()
-        cst.cvm.build()
-        cst.conf.install_path( os.path.dirname( path ) )
-    elif target == 'tools':
-        cst.tools.build()
-    elif target == 'sord':
-        cst.sord.build()
-    elif target == 'cvm':
-        cst.cvm.build()
-    elif target == 'path':
-        cst.conf.install_path( os.path.dirname( path ) )
-    elif target == 'unpath':
-        cst.conf.uninstall_path( os.path.dirname( path ) )
-    elif target == 'install':
-        cst.conf.install( path )
-    elif target == 'uninstall':
-        cst.conf.uninstall( path )
-    else:
-        sys.exit( 'Unknown target' )
+    for targ in targets:
+        if targ == 'build':
+            tools._build()
+            sord._build()
+            cvm._build()
+        elif targ == 'path':
+            conf.install_path( os.path.dirname( path ) )
+        elif targ == 'unpath':
+            conf.uninstall_path( os.path.dirname( path ) )
+        elif targ == 'install':
+            conf.install( path )
+        elif targ == 'uninstall':
+            conf.uninstall( path )
+        else:
+            sys.exit( 'Unknown target' )
+    return
 
-if __name__ == '__main__':
-    target = sys.argv[-1]
-    path = os.path.dirname( __file__ ) 
+import cst
+path = os.path.dirname( __file__ )
+for target in sys.argv[1:]:
     build( target, path )
 

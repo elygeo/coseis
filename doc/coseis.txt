@@ -99,7 +99,7 @@ compilers and MPI libraries.
 
     Alternatively, download and unpack the source tar archive from here:
 
-        http://earth.usc.edu/~gely/coseis/coseis.tgz
+        http://earth.usc.edu/~gely/coseis/repo/coseis.tgz
 
 5.  For laptop and workstation installations, the default system configuration
     is usually be adequate.  To test the default configuration::
@@ -115,22 +115,20 @@ compilers and MPI libraries.
 
         python configure.py tacc-ranger
 
-    To see the list of included configurations look in the ``conf/`` directory.
+    To see the list of included configurations look in the ``cst/conf/`` directory.
     Each custom configuration is located in a separate sub-directory.  To create a
     new custom configuration, make a new sub-directory following the example of
     the supplied configurations.
 
-6.  Configure the Python path:
+6.  Compile component codes:
+    ::
+
+        python setup.py build
+
+7.  Configure the Python path:
     ::
 
         python setup.py path
-
-7.  Compile component codes as needed:
-    ::
-
-        python setup.py sord
-        python setup.py cvm4
-        python setup.py tools
 
 
 Source control

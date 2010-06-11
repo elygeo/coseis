@@ -4,16 +4,16 @@ Support Operator Rupture Dynamics
 """
 import os, sys, math, glob, shutil, pprint
 import numpy as np
-from .. import conf
-from ..conf import launch
-from ..tools import util
+import cst.util
+import cst.conf
+from cst.conf import launch
 import fieldnames
 
-def build( mode=None, optimize=None, dtype=None ):
+def _build( mode=None, optimize=None, dtype=None ):
     """
     Build SORD code.
     """
-    cf = conf.configure( 'sord' )[0]
+    cf = cst.conf.configure( 'sord' )[0]
     if not optimize:
         optimize = cf.optimize
     if not mode:
@@ -66,7 +66,7 @@ def build( mode=None, optimize=None, dtype=None ):
             if dtype != cf.dtype_f:
                 fflags = fflags + cf.fortran_flags[dsize]
             compiler = cf.fortran_serial + fflags + ('-o',)
-            new |= util.make( compiler, object_, source )
+            new |= cst.conf.make( compiler, object_, source )
     if 'm' in mode and cf.fortran_mpi[0]:
         source = base + ('mpi.f90',) + common
         for opt in optimize:
@@ -75,7 +75,7 @@ def build( mode=None, optimize=None, dtype=None ):
             if dtype != cf.dtype_f:
                 fflags = fflags + cf.fortran_flags[dsize]
             compiler = cf.fortran_mpi + fflags + ('-o',)
-            new |= util.make( compiler, object_, source )
+            new |= cst.conf.make( compiler, object_, source )
     if new:
         try:
             import bzrlib
@@ -116,7 +116,7 @@ def stage( inputs={}, **kwargs ):
         sys.exit()
 
     # configure
-    job, inputs = conf.configure( module='sord', **inputs )
+    job, inputs = cst.conf.configure( module='sord', **inputs )
     job.dtype = np.dtype( job.dtype ).str
     if not job.prepare:
         job.run = False
@@ -127,7 +127,7 @@ def stage( inputs={}, **kwargs ):
     pm = {}
     f = os.path.join( os.path.dirname( __file__ ), 'parameters.py' )
     exec open( f ) in pm
-    util.prune( pm )
+    cst.util.prune( pm )
     for k, v in inputs.copy().iteritems():
         if k in pm:
             pm[k] = v
@@ -137,7 +137,7 @@ def stage( inputs={}, **kwargs ):
         pprint.pprint( inputs )
         sys.exit()
         
-    pm = util.namespace( pm )
+    pm = cst.util.namespace( pm )
     pm = prepare_param( pm, job.itbuff )
 
     # partition for parallelization
@@ -179,12 +179,12 @@ def stage( inputs={}, **kwargs ):
 
     # configure options
     job.command = os.path.join( '.', 'sord-' + job.mode + job.optimize + job.dtype[-1] )
-    job = conf.prepare( job )
+    job = cst.conf.prepare( job )
 
     # compile code
     if not job.prepare:
         return job
-    build( job.mode, job.optimize, job.dtype )
+    _build( job.mode, job.optimize, job.dtype )
 
     # create run directory
     src = os.path.realpath( os.path.dirname( __file__ ) ) + os.sep
@@ -197,15 +197,15 @@ def stage( inputs={}, **kwargs ):
             files += f,
     if job.force == True and os.path.isdir( job.rundir ):
         shutil.rmtree( job.rundir )
-    conf.skeleton( job, files )
+    cst.conf.skeleton( job, files )
 
     # conf, parameter files
     cwd = os.path.realpath( os.getcwd() )
     os.chdir( job.rundir )
     for f in 'checkpoint', 'debug', 'in', 'out', 'prof', 'stats':
         os.mkdir( f )
-    util.save( 'conf.py', job, header = '# configuration\n' )
-    util.save( 'parameters.py', pm, expand=['fieldio'], header='# model parameters\n' )
+    cst.util.save( 'conf.py', job, header = '# configuration\n' )
+    cst.util.save( 'parameters.py', pm, expand=['fieldio'], header='# model parameters\n' )
 
     # metadata
     xis = {}
@@ -230,17 +230,17 @@ def stage( inputs={}, **kwargs ):
                 shapes[k] = [1]
 
     # save metadata
-    meta = util.save( None,
+    meta = cst.util.save( None,
         job,
         header = '# configuration\n',
         keep=['name', 'rundate', 'rundir', 'user', 'os_', 'dtype'],
     )
-    meta += util.save( None,
+    meta += cst.util.save( None,
         pm,
         header = '\n# model parameters\n',
         expand=['fieldio'],
     )
-    meta += util.save( None,
+    meta += cst.util.save( None,
         dict( shapes=shapes, deltas=deltas, xis=xis, indices=indices ),
         header = '\n# output dimensions\n',
         expand=['indices', 'shapes', 'deltas', 'xis'],
@@ -261,7 +261,7 @@ def run( job=None, **kwargs ):
     elif type( job ) == dict:
         job.update( kwargs )
         job = stage( job )
-    conf.launch( job )
+    cst.conf.launch( job )
     return job
 
 def prepare_param( pm, itbuff ):
@@ -371,14 +371,14 @@ def prepare_param( pm, itbuff ):
         nn = pm.shape[:3]
         nt = pm.shape[3]
         if 'i' in mode:
-            x1 = util.expand_slice( nn, ii[:3], base, round=False )
+            x1 = cst.util.expand_slice( nn, ii[:3], base, round=False )
             x1 = tuple( i[0] + 1 - base for i in x1 )
             i1 = tuple( math.ceil( i ) for i in x1 )
-            ii = ( util.expand_slice( nn, i1, 1 )
-                 + util.expand_slice( [nt], ii[3:], 1 ) )
+            ii = ( cst.util.expand_slice( nn, i1, 1 )
+                 + cst.util.expand_slice( [nt], ii[3:], 1 ) )
         else:
-            ii = ( util.expand_slice( nn, ii[:3], base )
-                 + util.expand_slice( [nt], ii[3:], 1 ) )
+            ii = ( cst.util.expand_slice( nn, ii[:3], base )
+                 + cst.util.expand_slice( [nt], ii[3:], 1 ) )
         if field in fieldnames.initial:
             ii[3] = 0, 0, 1
         if field in fieldnames.fault:

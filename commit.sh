@@ -6,5 +6,5 @@ version="3.2.$(( $( bzr revno ) + 1 ))"
 echo "$version" > version
 
 bzr commit -m "$*"
-bzr export "coseis.tgz"
+bzr export "repo/coseis.tgz"
 

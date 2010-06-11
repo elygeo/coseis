@@ -2,17 +2,18 @@
 """
 Computational Seismology Tools
 """
-import os
 import util, coord, signal, swab
 import data, vm1d, gocad, cvmh
 import source, egmm
 import viz, plt, mlab
+import sord, cvm
 try:
     import rspectra
 except( ImportError ):
     pass
 
-def build():
+def _build():
+    import os
     path = os.path.realpath( os.path.dirname( __file__ ) )
     cwd = os.getcwd()
     os.chdir( path )

@@ -1,6 +1,7 @@
 *.tgz
-*/build
+build
+/repo
 /data
-/conf/machine
-/conf/email
+/cst/conf/machine
+/cst/conf/email
 /doc/Magistrale2000.pdf

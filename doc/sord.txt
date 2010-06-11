@@ -111,15 +111,16 @@ For a simple example consider the above test,
 .. include:: ../scripts/example/sim.py
    :literal:
 
-Every script starts by importing the ``coseis`` module.  SORD parameters are
+Every script starts by importing the ``cst`` module.  SORD parameters are
 specified as a dictionary and/or keyword arguments passed to the
-``coseis.sord.run()`` function. The ``locals()`` built-in Python function is a
+``cst.sord.run()`` function. The ``locals()`` built-in Python function is a
 convenient way to create the parameter dictionary from the local scope.  Any
 dictionary parameters 
 
-A
-complete list of possible SORD parameters and default values are specified in
-`<../sord/parameters.py>`__.
+A complete list of possible SORD parameters and default values are specified in
+`<../cst//sord/parameters.py>`__.
+
+FIXME: OUTDATED.
 
 The Python language gives a powerful way to construct SORD input.  For example,
 it may be desirable to specify the total simulation time, and divide by ``dt``
@@ -137,13 +138,15 @@ More example scripts can be found in the ``scripts`` directory.
 Running jobs
 ------------
 
-The ``coseis.sord.run()`` function does four tasks: (1) configure job
+The ``cst.sord.run()`` function does four tasks: (1) configure job
 parameters (2) compile the source code if necessary (3) create a new run
 directory populated with executable code and input files, and (4) launch the
 job interactively or through a batch processing system.  Step (2) only occurs
 as needed for a fresh install or when the source code has been modified.  By
 default, step (4) is skipped, giving the user an opportunity to inspect the
 run directory prior to launching the job.
+
+FIXME: UNFINISHED SECTION.
 
 has been done beforehand, so is skipped.  
 cop
@@ -154,7 +157,7 @@ directory contains the executable and scripts to run the code, and will contain
 all of the generated output and metadata.  You may examine the run directory
 and manually launch the executable from there.  The job can be run automatically 
 
-Or, submit the job to the batch system with the ``queue.sh`` script
+Or, submit the job to the batch system
 ::
 
 

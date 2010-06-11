@@ -10,7 +10,7 @@ easy_install bzr
 cd "${prefix}"
 bzr get http://earth.usc.edu/~gely/coseis
 cd coseis
-python setup.py all
+python setup.py path build
 mkdir -p bin
 cd bin
 ln -s ../tools/swab.py .
