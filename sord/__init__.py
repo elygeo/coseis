@@ -51,7 +51,7 @@ def build( mode=None, optimize=None, dtype=None ):
     )
     cwd = os.getcwd()
     path = os.path.realpath( os.path.dirname( __file__ ) )
-    f = os.path.join( path, 'bin' )
+    f = os.path.join( path, 'build' )
     if not os.path.isdir( f ):
         os.mkdir( f )
     new = False
@@ -61,7 +61,7 @@ def build( mode=None, optimize=None, dtype=None ):
     if 's' in mode:
         source = base + ('serial.f90',) + common
         for opt in optimize:
-            object_ = os.path.join( '..', 'bin', 'sord-s' + opt + dsize )
+            object_ = os.path.join( '..', 'build', 'sord-s' + opt + dsize )
             fflags = cf.fortran_flags['f'] + cf.fortran_flags[opt]
             if dtype != cf.dtype_f:
                 fflags = fflags + cf.fortran_flags[dsize]
@@ -70,13 +70,12 @@ def build( mode=None, optimize=None, dtype=None ):
     if 'm' in mode and cf.fortran_mpi[0]:
         source = base + ('mpi.f90',) + common
         for opt in optimize:
-            object_ = os.path.join( '..', 'bin', 'sord-m' + opt + dsize )
+            object_ = os.path.join( '..', 'build', 'sord-m' + opt + dsize )
             fflags = cf.fortran_flags['f'] + cf.fortran_flags[opt]
             if dtype != cf.dtype_f:
                 fflags = fflags + cf.fortran_flags[dsize]
             compiler = cf.fortran_mpi + fflags + ('-o',)
             new |= util.make( compiler, object_, source )
-    os.chdir( path )
     if new:
         try:
             import bzrlib
@@ -84,7 +83,7 @@ def build( mode=None, optimize=None, dtype=None ):
             print( 'Warning: bzr not installed. Install bzr if you want to save a\
                 copy of the source code for posterity with each run.' )
         else:
-            os.system( 'bzr export coseis.tgz' )
+            os.system( 'bzr export ../build/coseis.tgz' )
     os.chdir( cwd )
     return
 
@@ -189,9 +188,10 @@ def stage( inputs={}, **kwargs ):
 
     # create run directory
     src = os.path.realpath( os.path.dirname( __file__ ) ) + os.sep
-    files = os.path.join( src, 'bin', job.command ),
-    if os.path.isfile( src + 'coseis.tgz' ):
-        files += src + 'coseis.tgz',
+    files = os.path.join( src, 'build', job.command ),
+    f = os.path.join( src, 'build', 'coseis.tgz' ),
+    if os.path.isfile( f ):
+        files += f,
     if job.optimize == 'g':
         for f in glob.glob( os.path.join( 'src', '*.f90' ) ):
             files += f,

@@ -8,7 +8,7 @@ from ..conf import launch
 from ..tools import util
 
 url = 'http://www.data.scec.org/3Dvelocity/Version4.tar.gz'
-url = 'http://earth.usc.edu/~gely/coseis/download/cvm4.tgz'
+url = 'http://earth.usc.edu/~gely/coseis/cvm4.tgz'
 path = os.path.realpath( os.path.dirname( __file__ ) )
 repo = os.path.realpath( os.path.join( path, '..', 'data' ) )
 tarball = os.path.join( repo, os.path.basename( url ) )
