@@ -26,7 +26,7 @@ options = [
 prepare = True   # True: compile code and setup run directory, False: dry run
 force = False    # overwrite previous run directory if present
 run = False      # 'exec': interactive, 'debug': debugger, 'submit': batch queue
-mode = None      # 'm': serial, 'm': MPI, None: guess
+mode = None      # 's': serial, 'm': MPI, None: guess
 optimize = 'O'   # 'O': optimize, 'g': debug, 't': test, 'p': profile
 dtype = dtype_f = np.dtype( 'f' ).str # Numpy data type
 

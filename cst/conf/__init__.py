@@ -111,13 +111,16 @@ def configure( module='default', machine=None, save_machine=False, **kwargs ):
         short, long = zip( *options )[:2]
         opts = getopt.getopt( sys.argv[1:], ''.join( short ), long )[0]
         for opt, val in opts:
-            key = opt.lstrip('-')
-            if opt.startswith( '--' ):
-                i = long.index( key )
-            else:
-                i = short.index( key )
-            key, val = options[i][2:]
-            job[key] = val
+            if opt[-1] in ':=':
+                job[opt] = val
+            else
+                key = opt.lstrip('-')
+                if opt.startswith( '--' ):
+                    i = long.index( key )
+                else:
+                    i = short.index( key )
+                key, val = options[i][2:]
+                job[key] = val
 
     # fortran flags
     if 'fortran_flags_default_' in job:

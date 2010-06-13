@@ -18,7 +18,7 @@ Components
     Community Velocity Model,
     `version 4 <http://www.data.scec.org/3Dvelocity/Version4.tar.gz>`__.
 
-*   CVMH: aternative extraction tool and geotechnical layer implementation for
+*   CVM-H: aternative extraction tool and geotechnical layer implementation for
     the SCEC Community Velocity Model,
     `Harvard version <http://structure.harvard.edu/cvm-h/>`__.
 
@@ -34,7 +34,7 @@ System requirements
 *   `Python <http://www.python.org/download/>`_, and
     `NumPy <http://http://numpy.scipy.org/>`_ (Numerical Python).
 
-*   (Optional) Fortran 95 compiler. Required for SORD and CVM4.
+*   (Optional) Fortran 95 compiler. Required for SORD and CVM.
 
 *   (Optional) Message Passing Interface (MPI) library.  Required for
     SORD and CVM4 multi-core processing.
@@ -50,9 +50,9 @@ System requirements
 Installation
 ============
 
-Fortran and MPI installation should only be necessary for laptops and
-workstations.  HPC systems generally supply specifically tuned Fortran
-compilers and MPI libraries.
+Fortran and MPI installation should only be necessary for personal computers.
+HPC systems generally supply specifically tuned Fortran compilers and MPI
+libraries.
 
 1.  GNU Fortran is recommended if you don't already have a Fortran 95 compiler.
 

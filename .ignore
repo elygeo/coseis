@@ -1,10 +1,10 @@
-machine
-email
-*/bin/*
-data
-cvm4/build
 *.pyc
 *.so
 .DS_Store
+build
 run
 tmp
+data
+dev
+machine
+email

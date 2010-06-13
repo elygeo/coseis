@@ -6,7 +6,10 @@ import os, pwd
 import numpy as np
 
 # options
-options = None
+options = [
+    ( 'm:', 'machine=', 'machine', True ),
+]
+
 run = False
 mode = 's'
 name = 'job'

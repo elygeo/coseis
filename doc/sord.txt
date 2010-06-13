@@ -118,7 +118,7 @@ convenient way to create the parameter dictionary from the local scope.  Any
 dictionary parameters 
 
 A complete list of possible SORD parameters and default values are specified in
-`<../cst//sord/parameters.py>`__.
+`parameters.py <../cst/sord/parameters.py>`__.
 
 FIXME: OUTDATED.
 
