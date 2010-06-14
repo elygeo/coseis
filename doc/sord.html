@@ -201,12 +201,11 @@ python plot.py
 </div>
 <div class="section" id="scripting-with-python">
 <h4>Scripting with Python</h4>
-<p>THIS SECTION IS OUTDATED AND AWAITING REVISION.</p>
 <p>For a simple example consider the above test,
 <a class="reference external" href="../scripts/example/sim.py">sim.py</a>:</p>
 <pre class="literal-block">
 #!/usr/bin/env python
-import sord                               # import the sord module
+import coseis as cst                      # import the sord module
 nproc = 1, 1, 6
 delta = 100.0, 100.0, 100.0, 0.0075       # step length in (x, y, z, t)
 shape = 61, 61, 61, 60                    # mesh size in (x, y, z, t)
@@ -224,14 +223,18 @@ source1 = 1e6, 1e6, 1e6                   # source normal components
 source2 = 0.0, 0.0, 0.0                   # source shear components
 timefunction = 'brune'                    # source time function
 period = 6 * delta[3]                     # source dominant period
-sord.run( locals() )                      # launch SORD job
+cst.sord.run( locals() )                  # launch SORD job
 
 
 </pre>
-<p>Every script starts by importing the <tt class="docutils literal">sord</tt> module.  SORD parameters are
-specified as local variables that are passed to the <tt class="docutils literal">sord.run()</tt> function by
-the <tt class="docutils literal">locals()</tt> built-in Python function.  A complete list of possible SORD
-parameters and default values are specified in <a class="reference external" href="parameters.py">parameters.py</a>.</p>
+<p>Every script starts by importing the <tt class="docutils literal">cst</tt> module.  SORD parameters are
+specified as a dictionary and/or keyword arguments passed to the
+<tt class="docutils literal">cst.sord.run()</tt> function. The <tt class="docutils literal">locals()</tt> built-in Python function is a
+convenient way to create the parameter dictionary from the local scope.  Any
+dictionary parameters</p>
+<p>A complete list of possible SORD parameters and default values are specified in
+<a class="reference external" href="../cst/sord/parameters.py">parameters.py</a>.</p>
+<p>FIXME: OUTDATED.</p>
 <p>The Python language gives a powerful way to construct SORD input.  For example,
 it may be desirable to specify the total simulation time, and divide by <tt class="docutils literal">dt</tt>
 to determine the number of time steps:</p>
@@ -241,28 +244,28 @@ nt = int( T / dt )   # number of time steps
 </pre>
 <p>The <tt class="docutils literal">T</tt> variable is not a valid SORD parameter; it is only used for temporary
 storage.  Variables with single single character names or names ending with an
-underscore, are ignored by <tt class="docutils literal">sord.run()</tt>, so may be safely used for temporary
-storage.  More elaborate example scripts can be found in the <tt class="docutils literal">scripts</tt>
-directory.</p>
+underscore, are ignored by SORD, so may be safely used for temporary storage.
+More example scripts can be found in the <tt class="docutils literal">scripts</tt> directory.</p>
 </div>
 <div class="section" id="running-jobs">
 <h4>Running jobs</h4>
-<p>Each time <tt class="docutils literal">sord.run()</tt> is called, a run directory is staged at the location
-set by the <tt class="docutils literal">rundir</tt> parameter (<tt class="docutils literal">tmp/</tt> in this case).  The directory
-contains the executable and scripts to run the code, and will contain all of
-the generated output and metadata.  You may examine the run directory and
-manually launch the executable.  Or you can
-interactively with the <tt class="docutils literal">run.sh</tt> script:</p>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">&lt;string&gt;</tt>, line 145)</p>
-Literal block expected; none found.</div>
-<p>Or, submit the job to the batch system with the <tt class="docutils literal">queue.sh</tt> script</p>
-<pre class="literal-block">
-tmp/queue.sh
-</pre>
-<p>Output (and large input, such as the material model) is stored in flat binary
-binary files.  Statistic, such as peak acceleration and peak velocity, are
-computed periodically during each run and stored in the <tt class="docutils literal">stats/</tt> directory.</p>
+<p>The <tt class="docutils literal">cst.sord.run()</tt> function does four tasks: (1) configure job
+parameters (2) compile the source code if necessary (3) create a new run
+directory populated with executable code and input files, and (4) launch the
+job interactively or through a batch processing system.  Step (2) only occurs
+as needed for a fresh install or when the source code has been modified.  By
+default, step (4) is skipped, giving the user an opportunity to inspect the
+run directory prior to launching the job.</p>
+<p>FIXME: UNFINISHED SECTION.</p>
+<p>has been done beforehand, so is skipped.
+cop
+and
+called, a run directory is staged at the
+location set by the <tt class="docutils literal">rundir</tt> parameter (<tt class="docutils literal">tmp/</tt> in this case).  The
+directory contains the executable and scripts to run the code, and will contain
+all of the generated output and metadata.  You may examine the run directory
+and manually launch the executable from there.  The job can be run automatically</p>
+<p>Or, submit the job to the batch system</p>
 </div>
 <div class="section" id="field-i-o">
 <h4>Field I/O</h4>
@@ -508,7 +511,7 @@ processors using <tt class="docutils literal">debug = 2</tt> to give more accura
 </div>
 <div class="footer">
 <hr class="footer" />
-Generated on: 2010-06-10.
+Generated on: 2010-06-14.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>

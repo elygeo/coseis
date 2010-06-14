@@ -158,7 +158,6 @@ all of the generated output and metadata.  You may examine the run directory
 and manually launch the executable from there.  The job can be run automatically 
 
 Or, submit the job to the batch system
-::
 
 
 Field I/O
