@@ -105,7 +105,7 @@ libraries.
     is usually be adequate.  To test the default configuration::
 
         cd coseis/
-        python configure.py
+        python setup.py
 
     Systems with batch schedulers (such as PBS or LoadLeveler) generally require
     custom configuration to specify system resources, compiler options, and
@@ -113,7 +113,7 @@ libraries.
     can use one of the included configurations.  For example, for the TeraGrid
     Ranger system at TACC::
 
-        python configure.py tacc-ranger
+        python setup.py --machine=tacc-ranger
 
     To see the list of included configurations look in the ``cst/conf/`` directory.
     Each custom configuration is located in a separate sub-directory.  To create a
@@ -129,6 +129,16 @@ libraries.
     ::
 
         python setup.py path
+
+8.  Configure your email address for batch notifications (optional):
+    ::
+
+        python setup.py --email=email@example.com
+
+    Steps 5 through 8 can be combined as:
+    ::
+
+        python setup.py --machine=tacc-ranger --email=email@example.com build path
 
 
 Source control

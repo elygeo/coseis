@@ -7,7 +7,7 @@ import numpy as np
 
 # options
 options = [
-    ( 'm:', 'machine=', 'machine', True ),
+    ( '', 'machine=', 'machine', str ),
 ]
 
 run = False

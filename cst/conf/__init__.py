@@ -43,15 +43,14 @@ def prune( d, pattern=None, types=None ):
     return d
 
 
-def configure( module='default', machine=None, save_machine=False, **kwargs ):
+def configure( module='default', save_site=False, **kwargs ):
     """
     Merge module, machine, keyword, and command line parameters.
 
     Parameters
     ----------
     module : module name
-    machine : machine name
-    save_machine : remember machine name
+    save_site : save site specific parameters (machine, email, repo)
     **kwargs : override parameters supplied as keyword arguments
 
     Returns
@@ -64,16 +63,22 @@ def configure( module='default', machine=None, save_machine=False, **kwargs ):
     that contain configuration parameters in a file conf.py.
     """
 
-    # module parameters
     path = os.path.realpath( os.path.dirname( __file__ ) )
-    job = {}
-    job['module'] = module
+    email = user = pwd.getpwuid( os.geteuid() )[0]
+
+    # module parameters
+    job = { 'module': module }
     f = os.path.join( path, module, 'conf.py' )
     exec open( f ) in job
 
+    # site parameters
+    site = os.path.join( path, 'site.py' )
+    if os.path.isfile( site ):
+        exec open( site ) in job
+
     # machine parameters
-    f = os.path.join( path, 'machine' )
-    if not machine and os.path.isfile( f ):
+    f = os.path.join( path, job['machine'] )
+    if not os.path.isfile( f ):
         machine = open( f ).read().strip()
     if machine:
         machine = os.path.basename( os.path.normpath( machine ) )
@@ -87,11 +92,6 @@ def configure( module='default', machine=None, save_machine=False, **kwargs ):
             f = os.path.join( path, 'machine' )
             open( f, 'w' ).write( machine )
     job['machine'] = machine
-
-    # email address
-    f = os.path.join( path, 'email' )
-    if os.path.isfile( f ):
-        job['email'] = open( f ).read().strip()
 
     # per machine module specific parameters
     k = module + '_'
@@ -111,16 +111,16 @@ def configure( module='default', machine=None, save_machine=False, **kwargs ):
         short, long = zip( *options )[:2]
         opts = getopt.getopt( sys.argv[1:], ''.join( short ), long )[0]
         for opt, val in opts:
+            key = opt.lstrip('-')
+            if opt.startswith( '--' ):
+                i = long.index( key )
+            else:
+                i = short.index( key )
+            key, cast = options[i][2:]
             if opt[-1] in ':=':
-                job[opt] = val
+                job[key] = cast( val )
             else
-                key = opt.lstrip('-')
-                if opt.startswith( '--' ):
-                    i = long.index( key )
-                else:
-                    i = short.index( key )
-                key, val = options[i][2:]
-                job[key] = val
+                job[key] = cast
 
     # fortran flags
     if 'fortran_flags_default_' in job:
