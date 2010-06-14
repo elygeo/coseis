@@ -2,8 +2,8 @@
 build
 run
 tmp
+/x
 /data
-/dev
 /download
 /cst/conf/site.py
 /cst/conf/machine
