@@ -42,12 +42,12 @@ def prune( d, pattern=None, types=None ):
             del( d[k] )
     return d
 
-_site_template = """
+_site_template = """\
 # Site specific configuration
-machine = %(machine)s
-email = %(email)s
-repo = %(repo)s
-rundir = %(rundir)s
+machine = %(machine)r
+email = %(email)r
+repo = %(repo)r
+rundir = %(rundir)r
 """
 
 def configure( module=None, machine=None, save_site=False, **kwargs ):
@@ -86,6 +86,8 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
     f = os.path.join( path, 'site.py' )
     if os.path.isfile( f ):
         exec open( f ) in job
+    else:
+        job['repo'] = os.path.join( os.path.dirname( path ), job['repo'] )
 
     # machine parameters
     if machine:
@@ -113,13 +115,15 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
     if options:
         short, long = zip( *options )[:2]
         opts = getopt.getopt( sys.argv[1:], ''.join( short ), long )[0]
+        short = [ s.rstrip( ':' ) for s in short ]
+        long = [ l.rstrip( '=' ) for l in long ]
         for opt, val in opts:
             key = opt.lstrip('-')
             if opt.startswith( '--' ):
                 i = long.index( key )
             else:
                 i = short.index( key )
-            key, cast = options[i][2:]
+            opt, key, cast = options[i][1:]
             if opt[-1] in ':=':
                 job[key] = cast( val )
             else:

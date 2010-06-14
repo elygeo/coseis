@@ -8,7 +8,7 @@ import numpy as np
 # site specific
 machine = None
 email = pwd.getpwuid( os.geteuid() )[0]
-repo = os.path.join( __file__, '..', '..', '..', 'data' )
+repo = 'data'
 rundir = 'run'
 
 # job parameters
