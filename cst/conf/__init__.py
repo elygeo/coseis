@@ -42,8 +42,15 @@ def prune( d, pattern=None, types=None ):
             del( d[k] )
     return d
 
+_site_template = """
+# Site specific configuration
+machine = %(machine)s
+email = %(email)s
+repo = %(repo)s
+rundir = %(rundir)s
+"""
 
-def configure( module='default', save_site=False, **kwargs ):
+def configure( module=None, machine=None, save_site=False, **kwargs ):
     """
     Merge module, machine, keyword, and command line parameters.
 
@@ -63,35 +70,31 @@ def configure( module='default', save_site=False, **kwargs ):
     that contain configuration parameters in a file conf.py.
     """
 
-    path = os.path.realpath( os.path.dirname( __file__ ) )
-    email = user = pwd.getpwuid( os.geteuid() )[0]
+    path = os.path.dirname( __file__ )
+    job = {}
 
-    # module parameters
-    job = { 'module': module }
-    f = os.path.join( path, module, 'conf.py' )
+    # default parameters
+    f = os.path.join( path, 'default', 'conf.py' )
     exec open( f ) in job
 
+    # module parameters
+    if module:
+        f = os.path.join( path, module, 'conf.py' )
+        exec open( f ) in job
+
     # site parameters
-    site = os.path.join( path, 'site.py' )
-    if os.path.isfile( site ):
-        exec open( site ) in job
+    f = os.path.join( path, 'site.py' )
+    if os.path.isfile( f ):
+        exec open( f ) in job
 
     # machine parameters
-    f = os.path.join( path, job['machine'] )
-    if not os.path.isfile( f ):
-        machine = open( f ).read().strip()
     if machine:
-        machine = os.path.basename( os.path.normpath( machine ) )
-        f = os.path.join( path, machine )
-        if not os.path.isdir( f ):
-            sys.exit( 'Error: configuration %s not found.' % machine )
+        job['machine'] = machine
+    else:
+        machine = job['machine']
+    if machine:
         f = os.path.join( path, machine, 'conf.py' )
-        if os.path.isfile( f ):
-            exec open( f ) in job
-        if save_machine:
-            f = os.path.join( path, 'machine' )
-            open( f, 'w' ).write( machine )
-    job['machine'] = machine
+        exec open( f ) in job
 
     # per machine module specific parameters
     k = module + '_'
@@ -105,7 +108,7 @@ def configure( module='default', save_site=False, **kwargs ):
             job[k] = v
             del( kwargs[k] )
 
-    # command line options
+    # command line parameters
     options = job['options']
     if options:
         short, long = zip( *options )[:2]
@@ -119,7 +122,7 @@ def configure( module='default', save_site=False, **kwargs ):
             key, cast = options[i][2:]
             if opt[-1] in ':=':
                 job[key] = cast( val )
-            else
+            else:
                 job[key] = cast
 
     # fortran flags
@@ -127,6 +130,11 @@ def configure( module='default', save_site=False, **kwargs ):
         if 'fortran_flags' not in job:
             k = job['fortran_serial'][0]
             job['fortran_flags'] = job['fortran_flags_default_'][k]
+
+    # save site configuration
+    if save_site:
+        f = os.path.join( path, 'site.py' )
+        open( f, 'w' ).write( _site_template % job )
 
     # prune unneeded variables
     prune( job )
@@ -424,7 +432,7 @@ def launch( job=None, stagein=(), new=True, **kwargs ):
 # run tests if called from the command line
 if __name__ == '__main__':
     import pprint
-    modules = 'default', 'sord', 'cvm'
+    modules = None, 'sord', 'cvm'
     machines = os.listdir('.')
     for module in modules:
         for machine in machines:
