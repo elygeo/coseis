@@ -1,4 +1,4 @@
-notes = """
+"""
 USC Wind
 
 Intel(R) Pentium(R) 4 CPU 3.20GHz

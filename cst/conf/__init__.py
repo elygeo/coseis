@@ -42,13 +42,15 @@ def prune( d, pattern=None, types=None ):
             del( d[k] )
     return d
 
-_site_template = """\
-# Site specific configuration
+_site_template = '''\
+"""
+Site specific configuration
+"""
 machine = %(machine)r
 email = %(email)r
 repo = %(repo)r
 rundir = %(rundir)r
-"""
+'''
 
 def configure( module=None, machine=None, save_site=False, **kwargs ):
     """
@@ -57,6 +59,7 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
     Parameters
     ----------
     module : module name
+    machine : machine name
     save_site : save site specific parameters (machine, email, repo)
     **kwargs : override parameters supplied as keyword arguments
 
@@ -71,10 +74,10 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
     """
 
     path = os.path.dirname( __file__ )
-    job = {}
+    job = { 'module': module }
 
     # default parameters
-    f = os.path.join( path, 'default', 'conf.py' )
+    f = os.path.join( path, 'conf.py' )
     exec open( f ) in job
 
     # module parameters
@@ -83,7 +86,7 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
         exec open( f ) in job
 
     # site parameters
-    f = os.path.join( path, 'site.py' )
+    f = os.path.join( path, 'conf-site.py' )
     if os.path.isfile( f ):
         exec open( f ) in job
     else:
@@ -99,9 +102,10 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
         exec open( f ) in job
 
     # per machine module specific parameters
-    k = module + '_'
-    if k in job:
-        job.update( job[k] )
+    if module:
+        k = module + '_'
+        if k in job:
+            job.update( job[k] )
 
     # function parameters
     kwargs = kwargs.copy()
@@ -137,15 +141,15 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
 
     # save site configuration
     if save_site:
-        f = os.path.join( path, 'site.py' )
+        f = os.path.join( path, 'conf-site.py' )
         open( f, 'w' ).write( _site_template % job )
 
-    # prune unneeded variables
-    prune( job )
+    # prune unneeded variables and create configuration object
+    doc = job['__doc__']
     prune( kwargs )
-
-    # configuration object
+    prune( job )
     job = namespace( job )
+    job.__doc__ = doc
 
     return job, kwargs
 
@@ -289,7 +293,7 @@ def prepare( job=None, **kwargs ):
         job.ppn = job.nproc
         job.cores = job.nproc
         job.totalcores = job.nproc
-    print( 'Machine: ' + job.machine )
+    print( 'Machine: %s' % job.machine )
     print( 'Cores: %s of %s' % (job.nproc, job.maxnodes * job.maxcores) )
     print( 'Nodes: %s of %s' % (job.nodes, job.maxnodes) )
 
@@ -359,17 +363,18 @@ def skeleton( job=None, stagein=(), new=True, **kwargs ):
         os.makedirs( dest )
 
     # process templates
-    for m in job.module, job.machine:
-        d = os.path.join( path, m )
-        for base in os.listdir( d ):
-            if base != 'conf.py':
-                f = os.path.join( d, base )
-                if base == 'script.sh':
-                    base = job.name + '.sh'
-                ff = os.path.join( dest, base )
-                out = open( f ).read() % job.__dict__
-                open( ff, 'w' ).write( out )
-                shutil.copymode( f, ff )
+    if job.module:
+        for m in job.module, job.machine:
+            d = os.path.join( path, m )
+            for base in os.listdir( d ):
+                if base != 'conf.py':
+                    f = os.path.join( d, base )
+                    if base == 'script.sh':
+                        base = job.name + '.sh'
+                    ff = os.path.join( dest, base )
+                    out = open( f ).read() % job.__dict__
+                    open( ff, 'w' ).write( out )
+                    shutil.copymode( f, ff )
 
     # link or copy files
     for f in stagein:
@@ -445,6 +450,7 @@ if __name__ == '__main__':
                 job = configure( module=module, machine=machine )[0]
                 job = prepare( job, rundir='tmp', command='date', run='exec', mode='s' )
                 skeleton( job )
+                print( job.__doc__ )
                 pprint.pprint( job.__dict__ )
                 shutil.rmtree( 'tmp' )
 

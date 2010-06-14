@@ -1,4 +1,4 @@
-notes = """
+"""
 USC Wide
 
 MacBook Pro

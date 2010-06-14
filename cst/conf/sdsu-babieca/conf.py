@@ -1,4 +1,4 @@
-notes = """
+"""
 SDSU CSRC Babieca cluster
 
 http://www.csrc.sdsu.edu/csrc/

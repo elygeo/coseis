@@ -1,4 +1,4 @@
-notes = """
+"""
 Z Shi
 
 MacBook Pro

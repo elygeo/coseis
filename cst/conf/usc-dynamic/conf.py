@@ -1,4 +1,4 @@
-notes = """
+"""
 USC Dynamic Compute Nodes
 
 https://geosys.usc.edu/wiki/index.php/Specifications

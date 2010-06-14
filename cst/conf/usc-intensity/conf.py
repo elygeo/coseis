@@ -1,4 +1,4 @@
-notes = """
+"""
 USC Intensity
 
 source /usr/scec/intel/fce/9.0/bin/ifortvars.sh

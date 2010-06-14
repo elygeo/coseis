@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Coseis configuration
 """
@@ -12,7 +11,6 @@ repo = 'data'
 rundir = 'run'
 
 # job parameters
-notes = 'Coseis configuration'
 name = 'job'
 run = False      # 'exec': interactive, 'debug': debugger, 'submit': batch queue
 force = False    # overwrite previous run directory if present

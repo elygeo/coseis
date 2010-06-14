@@ -1,5 +1,6 @@
-#!/usr/bin/env python
-notes = 'CVM configuration'
+"""
+CVM configuration
+"""
 name = 'cvm4'
 reuse = True
 seconds = 400

@@ -1,4 +1,4 @@
-notes = """
+"""
 SDSU Pisco
 
 ssh -fNL localhost:8022:pisco.sdsu.edu:22 sciences.sdsu.edu

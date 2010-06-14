@@ -1,4 +1,4 @@
-notes = """
+"""
 SDSU Altai
 
 Sun-Fire-880

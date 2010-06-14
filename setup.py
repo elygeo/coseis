@@ -2,7 +2,7 @@
 """
 Setup Coseis
 """
-import os, sys, getopt
+import os, sys, getopt, pprint
 if __name__ != '__main__':
     sys.exit( 'Error, not a module: %s' % __file__ )
 import cst
@@ -14,12 +14,11 @@ if opts:
 else:
     machine = None
 
-cf = cst.conf.configure( 'default', machine, save_site=True )[0]
-print( cf.notes )
+cf = cst.conf.configure( None, machine, save_site=True )[0]
+print( cf.__doc__ )
 cf = cf.__dict__
-for k in sorted( cf.keys() ):
-    if k != 'notes':
-        print( '%s = %r' % (k, cf[k]) )
+del cf['__doc__']
+pprint.pprint( cf )
 
 path = os.path.dirname( os.path.realpath( __file__ ) )
 

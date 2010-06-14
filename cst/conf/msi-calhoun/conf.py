@@ -1,4 +1,4 @@
-notes = """
+"""
 UMN/MSI Calhoun
 
 http://www.msi.umn.edu/hardware/calhoun/
@@ -20,23 +20,21 @@ maxnodes = 256
 maxcores = 8
 maxram = 15000
 maxtime = 24, 00
-fortran_serial = 'ifort',
-fortran_mpi = 'mpif90',
-sord_ = dict(
-    fortran_flags = {
-        'f': ('-u', '-std95', '-warn'),
-        'g': ('-CB', '-traceback', '-g'),
-        't': ('-CB', '-traceback'),
-        'p': ('-O', '-pg'),
-        'O': ('-O3',),
-        '8': ('-r8',),
-    },
-)
 launch = {
     's_exec':  '%(command)s', 
     's_debug': 'gdb %(command)s',
     'm_exec':  'mpirun -np %(nproc)s -hostfile $PBS_NODEFILE %(command)s',
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
+}
+fortran_serial = 'ifort',
+fortran_mpi = 'mpif90',
+fortran_flags = {
+    'f': ('-u', '-std95', '-warn'),
+    'g': ('-CB', '-traceback', '-g'),
+    't': ('-CB', '-traceback'),
+    'p': ('-O', '-pg'),
+    'O': ('-O3',),
+    '8': ('-r8',),
 }
 

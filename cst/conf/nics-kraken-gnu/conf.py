@@ -1,4 +1,4 @@
-notes = """
+"""
 NICS Kraken
 
 module swap PrgEnv-pgi PrgEnv-gnu
@@ -28,29 +28,27 @@ maxram = 15000
 maxcores = 12
 maxnodes = 8256
 maxtime = 24, 00
-fortran_serial = 'ftn',
-fortran_mpi = 'ftn',
-sord_ = dict(
-    rate = 1e6, # just a guess
-    fortran_flags = {
-        'f': ('-fimplicit-none', '-Wall'),
-        'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g'),
-        't': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow'),
-        'p': ('-O', '-pg'),
-        'O': ('-O3',),
-        '8': ('-fdefault-real-8',),
-    },
-)
-cvm_ = dict(
-    fortran_flags = {
-        'g': ('-Wall', '-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g'),
-        'O': ('-Wall', '-O3'),
-    },
-)
+rate = 1e6
 launch = {
     's_exec':  '%(command)s',
     's_debug': 'gdb %(command)s',
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
 }
+fortran_serial = 'ftn',
+fortran_mpi = 'ftn',
+fortran_flags = {
+    'f': ('-fimplicit-none', '-Wall'),
+    'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g'),
+    't': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow'),
+    'p': ('-O', '-pg'),
+    'O': ('-O3',),
+    '8': ('-fdefault-real-8',),
+}
+cvm_ = dict(
+    fortran_flags = {
+        'g': ('-Wall', '-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g'),
+        'O': ('-Wall', '-O3'),
+    },
+)
 

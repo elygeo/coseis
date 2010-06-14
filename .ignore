@@ -5,7 +5,6 @@ build
 run
 tmp
 data
-dev
-machine
-email
-site.py
+conf-site.py
+w
+

@@ -1,4 +1,4 @@
-notes = """
+"""
 USC Phim
 
 Intel Xeon CPU 3GHz
@@ -9,6 +9,6 @@ hosts = login,
 maxnodes = 1
 maxcores = 1
 maxram = 2800
-rate = 1.2e6
 mode = 's'
+rate = 1.2e6
 

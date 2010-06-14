@@ -1,4 +1,4 @@
-notes = """
+"""
 UCB Baribu cluster
 """
 login = 'baribu.geo.berkeley.edu'
