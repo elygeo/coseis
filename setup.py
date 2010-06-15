@@ -11,14 +11,13 @@ opts, args = getopt.getopt( sys.argv[1:], '', 'machine=' )
 
 if opts:
     machine = os.path.basename( opts[0][1] )
+    cf = cst.conf.configure( None, machine, save_site=True )[0]
+    print( cf.__doc__ )
+    cf = cf.__dict__
+    del cf['__doc__']
+    pprint.pprint( cf )
 else:
-    machine = None
-
-cf = cst.conf.configure( None, machine, save_site=True )[0]
-print( cf.__doc__ )
-cf = cf.__dict__
-del cf['__doc__']
-pprint.pprint( cf )
+    cf = cst.conf.configure( None, None, save_site=True )[0]
 
 path = os.path.dirname( os.path.realpath( __file__ ) )
 

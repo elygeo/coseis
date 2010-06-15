@@ -189,7 +189,7 @@ def stage( inputs={}, **kwargs ):
     # create run directory
     src = os.path.realpath( os.path.dirname( __file__ ) ) + os.sep
     files = os.path.join( src, 'build', job.command ),
-    f = os.path.join( src, 'build', 'coseis.tgz' ),
+    f = os.path.join( src, 'build', 'coseis.tgz' )
     if os.path.isfile( f ):
         files += f,
     if job.optimize == 'g':

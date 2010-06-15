@@ -7,37 +7,9 @@ import cst.util
 import cst.conf
 from cst.conf import launch
 
+path = os.path.dirname( os.path.realpath( __file__ ) )
 url = 'http://www.data.scec.org/3Dvelocity/Version4.tar.gz'
 url = 'http://earth.usc.edu/~gely/coseis/download/cvm4.tgz'
-path = os.path.dirname( os.path.realpath( __file__ ) )
-srcfiles = [
-    'version4.0.f', 'in.h',
-    'borehole.h', 'dim2.h', 'dim8.h', 'genpro.h',
-    'genprod.h', 'innum.h', 'ivsurface.h', 'ivsurfaced.h',
-    'labup.h', 'mantle.h', 'mantled.h', 'moho1.h',
-    'names.h', 'regional.h', 'regionald.h', 'sgeo.h',
-    'sgeod.h', 'soil1.h', 'surface.h', 'surfaced.h',
-    'wtbh1.h', 'wtbh1d.h', 'wtbh2.h', 'wtbh3.h',
-]
-datafiles = [
-    '3D.out', 'bmod_edge', 'boreholes', 'eh.modPS',
-    'impva.edge', 'ivmod.edge', 'lab_geo2_geology', 'moho_sur',
-    'salton_base.sur', 'smb1_edge', 'soil.pgm', 'soil_generic',
-] 
-for surf in [
-    'b1__', 'b2__', 'b3__', 'b4__', 'b5__', 'ku1_', 'ku2_', 'ku3_', 
-    'ku4_', 'ku5_', 'ku8_', 'laba', 'lamo', 'lare', 'laup', 'nsbb',
-    'pu1_', 'pu2A', 'pu2B', 'pu3_', 'pu9_', 'q12b', 'q12x', 'q12y',
-    'q12z', 'qps1', 'qps2', 'qps5', 'qps6', 'sbb2', 'sbb_', 'sbmi',
-    'sbmo', 'sgba', 'sgmo', 'sgre', 'sku2', 'smb2', 'smb3', 'smb9',
-    'smm1', 'smm2', 'smr1', 'smr2', 'sp9b', 'spu1', 'spu9', 'st4b',
-    'st4s', 'ste2', 'te1_', 'te2_', 'te3_', 'te4_', 'te5_', 'te6A',
-    'te6B', 'te7_', 'te8_', 'tj1_', 'tj2_', 'tj3_', 'tj4_', 'tj5_',
-    'tsq1', 'tsq2', 'tsq3', 'tsq4', 'tsq5', 'tsq7', 'tsq9', 'tv1_',
-    'tv2_', 'tv3_', 'tv5_', 'tv9_',
-]:
-    datafiles += [ surf + '_sur2', surf + '_edge' ]
-
 
 def _build( mode=None, optimize=None ):
     """
@@ -67,8 +39,7 @@ def _build( mode=None, optimize=None ):
     if not os.path.exists( 'build' ):
         os.makedirs( 'build' )
         fh = tarfile.open( tarball, 'r:gz' )
-        members = [ fh.getmember( s ) for s in srcfiles ]
-        fh.extractall( 'build', members )
+        fh.extractall( 'build' )
         if os.system( 'patch -p0 < cvm4.patch' ):
             sys.exit( 'Error patching CVM' )
     os.chdir( 'build' )
@@ -139,11 +110,8 @@ def stage( inputs={}, **kwargs ):
     if job.force == True and os.path.isdir( job.rundir ):
         shutil.rmtree( job.rundir )
     if not job.reuse or not os.path.exists( job.rundir ):
-        files = os.path.join( path, 'build', job.command ),
-        cst.conf.skeleton( job, files )
-        fh = tarfile.open( tarball, 'r:gz' )
-        members = [ fh.getmember( s ) for s in datafiles ]
-        fh.extractall( 'build', members )
+        f = os.path.join( path, 'build' )
+        shutil.copytree( f, job.rundir )
     else:
         for f in (
             job.lon_file, job.lat_file, job.dep_file,
