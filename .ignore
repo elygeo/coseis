@@ -5,6 +5,6 @@ build
 run
 tmp
 data
-conf-site.py
+conf/site.py
 w
 

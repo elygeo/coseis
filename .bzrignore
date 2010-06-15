@@ -2,7 +2,7 @@
 build
 run
 tmp
-/cst/conf/conf-site.py
+/cst/conf/site.py
 /download
 /data
 /w

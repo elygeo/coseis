@@ -142,7 +142,7 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
 
     # save site configuration
     if save_site:
-        f = os.path.join( path, 'conf-site.py' )
+        f = os.path.join( path, 'site.py' )
         open( f, 'w' ).write( _site_template % job )
 
     # prune unneeded variables and create configuration object
