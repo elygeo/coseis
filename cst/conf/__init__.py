@@ -82,6 +82,7 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
 
     # module parameters
     if module:
+        job['name'] = module
         f = os.path.join( path, module + '.py' )
         exec open( f ) in job
 
@@ -441,7 +442,7 @@ def launch( job=None, stagein=(), new=True, **kwargs ):
 # run tests if called from the command line
 if __name__ == '__main__':
     import pprint
-    modules = None, 'sord', 'cvm'
+    modules = None, 'cvm'
     machines = [None] + os.listdir('.')
     for module in modules:
         for machine in machines:

@@ -1,8 +1,6 @@
 """
 CVM configuration
 """
-name = 'cvm'
-reuse = True
 seconds = 400
 nsample = None
 lon_file = 'lon'
@@ -15,6 +13,7 @@ vs_file = 'vs'
 # command line options: (short, long, parameter, value)
 options = [
     ( '',  'machine=',    'machine',  str ),
+    ( 'n', 'dry-run',     'prepare',  False ),
     ( 'f', 'force',       'force',    True ),
     ( 'i', 'interactive', 'run',      'exec' ),
     ( 'd', 'debug',       'run',      'debug' ),

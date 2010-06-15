@@ -21,6 +21,7 @@ itstats = 10			# interval for calculating statistics
 itio = 50			# interval for writing i/o buffers
 itcheck = 0			# interval for check-pointing (0=off)
 itstop = 0			# for testing check-pointing, simulates code crash
+itbuff = 10
 debug = 0			# >0 verbose, >1 sync, >2 mpi vars, >3 I/O
 
 # Wave model parameters

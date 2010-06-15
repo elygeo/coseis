@@ -13,7 +13,7 @@ def _build( mode=None, optimize=None, dtype=None ):
     """
     Build SORD code.
     """
-    cf = cst.conf.configure( 'sord' )[0]
+    cf = cst.conf.configure()[0]
     if not optimize:
         optimize = cf.optimize
     if not mode:
@@ -116,7 +116,7 @@ def stage( inputs={}, **kwargs ):
         sys.exit()
 
     # configure
-    job, inputs = cst.conf.configure( module='sord', **inputs )
+    job, inputs = cst.conf.configure( **inputs )
     job.dtype = np.dtype( job.dtype ).str
     if not job.prepare:
         job.run = False
@@ -138,7 +138,7 @@ def stage( inputs={}, **kwargs ):
         sys.exit()
         
     pm = cst.util.namespace( pm )
-    pm = prepare_param( pm, job.itbuff )
+    pm = prepare_param( pm )
 
     # partition for parallelization
     nx, ny, nz = pm.shape[:3]
@@ -204,8 +204,9 @@ def stage( inputs={}, **kwargs ):
     os.chdir( job.rundir )
     for f in 'checkpoint', 'debug', 'in', 'out', 'prof', 'stats':
         os.mkdir( f )
-    cst.util.save( 'conf.py', job, header = '# configuration\n' )
+    delattr( pm, 'itbuff' )
     cst.util.save( 'parameters.py', pm, expand=['fieldio'], header='# model parameters\n' )
+    cst.util.save( 'conf.py', job, header = '# configuration\n' )
 
     # metadata
     xis = {}
@@ -264,7 +265,7 @@ def run( job=None, **kwargs ):
     cst.conf.launch( job )
     return job
 
-def prepare_param( pm, itbuff ):
+def prepare_param( pm ):
     """
     Prepare input paramers
     """
@@ -391,7 +392,7 @@ def prepare_param( pm, itbuff ):
         if n > (nn[0] + nn[1] + nn[2]) ** 2:
             nb = 1
         elif n > 1:
-            nb = min( nb, itbuff )
+            nb = min( nb, pm.itbuff )
         nc = len( fields )
         fieldio += [
             (op + mode, nc, tfunc, period, x1, x2, nb, ii, filename, val, fields)

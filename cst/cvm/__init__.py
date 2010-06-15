@@ -8,8 +8,6 @@ import cst.conf
 from cst.conf import launch
 
 path = os.path.dirname( os.path.realpath( __file__ ) )
-url = 'http://www.data.scec.org/3Dvelocity/Version4.tar.gz'
-url = 'http://earth.usc.edu/~gely/coseis/download/cvm4.tgz'
 
 input_template = """\
 %(nsample)s
@@ -35,7 +33,9 @@ def _build( mode=None, optimize=None ):
     if not mode:
         mode = 'asm'
 
-    # download model
+    # download source code
+    url = 'http://www.data.scec.org/3Dvelocity/Version4.tar.gz'
+    url = 'http://earth.usc.edu/~gely/coseis/download/cvm4.tgz'
     tarball = os.path.join( cf.repo, os.path.basename( url ) )
     if not os.path.exists( tarball ):
         if not os.path.exists( cf.repo ):
@@ -98,14 +98,16 @@ def stage( inputs={}, **kwargs ):
     job.command = os.path.join( '.', 'cvm4' + '-' + job.mode + job.optimize )
     job = cst.conf.prepare( job )
 
-    # compile code
+    # build
     if not job.prepare:
         return job
     _build( job.mode, job.optimize )
 
     # check minimum processors needed for compiled memory size
-    s = open( os.path.join( path, 'build', 'in.h' ) ).read()
-    n = re.search( 'ibig *= *([0-9]*)', s ).groups()[0]
+    file = os.path.join( path, 'build', 'in.h' )
+    string = open( file ).read()
+    pattern = 'ibig *= *([0-9]*)'
+    n = int( re.search( pattern, string ).groups()[0] )
     minproc = int( job.nsample / n )
     if job.nsample % n != 0:
         minproc += 1

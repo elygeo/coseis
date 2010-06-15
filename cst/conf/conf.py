@@ -31,6 +31,7 @@ maxnodes = 1
 maxcores = 0
 maxram = 0
 maxtime = 0
+rate = 1.0e6
 queue = None
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
 launch = {
