@@ -25,7 +25,7 @@ from cStringIO import StringIO
 import coord, util
 import cst
 
-repo = cst.conf.site.repo
+repo = cst.site.repo
 
 def etopo1( indices=None, downsample=1 ):
     """
