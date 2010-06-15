@@ -9,9 +9,7 @@ from cst.conf import launch
 
 url = 'http://www.data.scec.org/3Dvelocity/Version4.tar.gz'
 url = 'http://earth.usc.edu/~gely/coseis/repo/cvm4.tgz'
-path = os.path.realpath( __file__ )
-repo = os.path.join( path, '..', '..', 'data' )
-tarball = os.path.join( repo, os.path.basename( url ) )
+path = os.path.dirname( os.path.realpath( __file__ ) )
 srcfiles = [
     'version4.0.f', 'in.h',
     'borehole.h', 'dim2.h', 'dim8.h', 'genpro.h',
@@ -56,9 +54,10 @@ def _build( mode=None, optimize=None ):
         mode = 'asm'
 
     # download model
+    tarball = os.path.join( cf.repo, os.path.basename( url ) )
     if not os.path.exists( tarball ):
-        if not os.path.exists( repo ):
-            os.makedirs( repo )
+        if not os.path.exists( cf.repo ):
+            os.makedirs( cf.repo )
         print( 'Downloading %s' % url )
         urllib.urlretrieve( url, tarball )
 
@@ -124,7 +123,6 @@ def stage( inputs={}, **kwargs ):
         job.mode = 's'
         if job.nproc > 1:
             job.mode = 'm'
-    job.rundir = os.path.join( job.workdir, 'cvm4' )
     job.command = os.path.join( '.', 'cvm4' + '-' + job.mode + job.optimize )
     job = cst.conf.prepare( job )
 

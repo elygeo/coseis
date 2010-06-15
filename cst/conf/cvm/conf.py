@@ -1,7 +1,7 @@
 """
 CVM configuration
 """
-name = 'cvm4'
+name = 'cvm'
 reuse = True
 seconds = 400
 nsample = None

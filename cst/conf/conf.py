@@ -8,11 +8,11 @@ import numpy as np
 machine = None
 email = pwd.getpwuid( os.geteuid() )[0]
 repo = 'data'
-rundir = 'run'
 
 # job parameters
-name = 'job'
+name = 'cst'
 run = False      # 'exec': interactive, 'debug': debugger, 'submit': batch queue
+rundir = 'run'
 force = False    # overwrite previous run directory if present
 prepare = True   # True: compile code and setup run directory, False: dry run
 optimize = 'O'   # 'O': optimize, 'g': debug, 't': test, 'p': profile

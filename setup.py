@@ -24,7 +24,7 @@ path = os.path.dirname( os.path.realpath( __file__ ) )
 
 for target in args:
     if target == 'build':
-        cst.tools._build()
+        cst._build()
         cst.sord._build()
         cst.cvm._build()
     elif target == 'path':
