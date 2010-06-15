@@ -5,7 +5,7 @@ TeraShake mesh generation and CVM extraction.
 import os
 import numpy as np
 import pyproj
-import coseis as cst
+import cst
 
 # parameters
 nproc = 512

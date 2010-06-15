@@ -2,7 +2,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import coseis as cst
+import cst
 
 # parameters
 lon, lat = (-120.0, -114.5), (32.5, 35.0)

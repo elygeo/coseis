@@ -4,7 +4,7 @@ Tally benchmarks
 """
 import os, glob
 import numpy as np
-import coseis as cst
+import cst
 
 normalize = 0
 nproc = []

@@ -5,7 +5,7 @@ Reproduce Magistrale (2000) Fig. 10 fence diagram.
 import os
 import pyproj
 import numpy as np
-import cosies as cst
+import cst
 
 # parameters
 nproc = 2

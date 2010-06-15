@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import coseis as cst
+import cst
 
 # List of runs:
 # Column 1 is dx, the spatial step size

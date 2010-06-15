@@ -4,7 +4,7 @@ Snapshot plots
 """
 import numpy as np
 import matplotlib.pyplot as plt
-import coseis as cst
+import cst
 
 exp = 0.5
 clim = 0.0, 0.000001

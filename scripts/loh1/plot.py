@@ -5,7 +5,7 @@ PEER LOH.1 - Plot comparison of FK and SOM.
 import numpy as np
 import scipy.signal
 import matplotlib.pyplot as plt
-import coseis as cst
+import cst
 
 # Parameters
 fk_dir = 'fk/'

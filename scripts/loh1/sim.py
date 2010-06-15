@@ -2,7 +2,7 @@
 """
 PEER LOH.1 - Layer over a halfspace, buried double couple source
 """
-import coseis as cst
+import cst
 
 # number of processors in each dimension
 nproc3 = 1, 16, 1

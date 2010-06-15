@@ -2,7 +2,7 @@
 import os, glob
 import numpy as np
 import matplotlib.pyplot as plt
-import coseis as cst
+import cst
 
 # parameters
 stations = 'P1a', 'P2a'

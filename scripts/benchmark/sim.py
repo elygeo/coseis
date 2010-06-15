@@ -3,7 +3,7 @@
 Benchmarks
 """
 import math
-import coseis as cst
+import cst
 
 np3_ = (1,1,1),
 np3_ = (1,1,1), (1,2,2), (1,4,4)

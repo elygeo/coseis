@@ -2,7 +2,7 @@
 import os
 import numpy as np
 from enthought.mayavi import mlab
-import cosies as cst
+import cst
 import mesh
 
 path = os.path.join( 'run', mesh.version ) + os.sep

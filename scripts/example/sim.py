@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import coseis as cst                      # import the sord module
+import cst                                # import the Coseis module
 nproc = 1, 1, 6
 delta = 100.0, 100.0, 100.0, 0.0075       # step length in (x, y, z, t)
 shape = 61, 61, 61, 60                    # mesh size in (x, y, z, t)

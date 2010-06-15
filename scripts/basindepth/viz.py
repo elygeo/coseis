@@ -7,7 +7,7 @@ import pyproj, Image
 import numpy as np
 import matplotlib.pyplot as plt
 from enthought.mayavi import mlab
-import coseis as cst
+import cst
 
 # parameters
 format = 'png'; dpi = 150.0

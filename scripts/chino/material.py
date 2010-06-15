@@ -4,7 +4,7 @@ Material model extraction from CVM
 """
 import os, pyproj
 import numpy as np
-import cosies as cst
+import cst
 
 # parameters
 dx = 100.0;  nproc = 4096

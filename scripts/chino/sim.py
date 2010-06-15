@@ -5,7 +5,7 @@ SORD simulation
 import os, sys
 import pyproj
 import numpy as np
-import coseis as cst
+import cst
 
 # parameters
 dx_ = 100.0;  nproc3 = 1, 48, 320

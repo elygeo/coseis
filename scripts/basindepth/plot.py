@@ -2,7 +2,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import coseis as cst
+import cst
 
 path = 'data' + os.sep
 meta = cst.util.load( path + 'meta.py' )

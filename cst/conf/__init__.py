@@ -90,7 +90,8 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
     if os.path.isfile( f ):
         exec open( f ) in job
     else:
-        job['repo'] = os.path.join( os.path.dirname( path ), job['repo'] )
+        d = os.path.dirname( os.path.dirname( path ) )
+        job['repo'] = os.path.join( d, job['repo'] )
 
     # machine parameters
     if machine:
@@ -185,7 +186,7 @@ def make( compiler, object_, source ):
             os.unlink( statefile )
         except( OSError ):
             pass
-        print( ' '.join( command ) )
+        print( '\n' + ' '.join( command ) )
         if os.system( ' '.join( command ) ):
             sys.exit( 'Compile error' )
         open( statefile, 'w' ).writelines( state )

@@ -4,7 +4,7 @@ Simple SoCal mesh generation and CVM extraction.
 """
 import os
 import numpy as np
-import coseis as cst
+import cst
 
 # parameters
 workdir = 'run'

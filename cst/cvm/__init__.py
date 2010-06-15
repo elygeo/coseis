@@ -8,7 +8,7 @@ import cst.conf
 from cst.conf import launch
 
 url = 'http://www.data.scec.org/3Dvelocity/Version4.tar.gz'
-url = 'http://earth.usc.edu/~gely/coseis/repo/cvm4.tgz'
+url = 'http://earth.usc.edu/~gely/coseis/download/cvm4.tgz'
 path = os.path.dirname( os.path.realpath( __file__ ) )
 srcfiles = [
     'version4.0.f', 'in.h',

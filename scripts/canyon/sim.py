@@ -3,7 +3,7 @@
 Semi-cylindrical canyon with vertically incident P-wave.
 """
 import os
-import coseis as cst
+import cst
 import mesh
 
 # model dimensions

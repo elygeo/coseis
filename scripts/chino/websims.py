@@ -5,7 +5,7 @@ WebSims setup
 import os, sys, glob, shutil
 import pyproj
 import numpy as np
-import coseis as cst
+import cst
 
 # parameters
 nproc = 1
