@@ -167,6 +167,7 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
     """
     nh = 11
     url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.0/gshhs_2.0.zip'
+    repo = cst.site.repo
     filename = os.path.join( repo, os.path.basename( url ) )
     kind = dict(c='gshhs', r='wdb_rivers', b='wdb_borders')[kind[0]]
     member = 'gshhs/%s_%s.b' % (kind, resolution[0])
