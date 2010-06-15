@@ -5,9 +5,10 @@ SCEC Community Velocity Model (CVM-H) extraction tool
 import os, sys
 import numpy as np
 import coord, gocad
+import cst
 
 # parameters
-repo = os.path.expanduser( '~/data-repo' )
+repo = cst.conf.site.repo
 projection = dict( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
 prop2d = {'topo': '1', 'base': '2', 'moho': '3'}

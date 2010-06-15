@@ -23,8 +23,9 @@ import os, urllib, gzip, zipfile
 import numpy as np
 from cStringIO import StringIO
 import coord, util
+import cst
 
-repo = os.path.expanduser( '~/data-repo' )
+repo = cst.conf.site.repo
 
 def etopo1( indices=None, downsample=1 ):
     """

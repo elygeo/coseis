@@ -88,7 +88,7 @@ def stage( inputs={}, **kwargs ):
     inputs.update( kwargs )
 
     # configure
-    job, inputs = cst.conf.configure( module='cvm', **inputs )
+    job, inputs = cst.conf.configure( 'cvm', **inputs )
     if inputs:
         sys.exit( 'Unknown parameter: %s' % inputs )
     if not job.mode:
@@ -129,7 +129,9 @@ def stage( inputs={}, **kwargs ):
             if os.path.exists( ff ):
                 os.remove( ff )
 
-    # save configuration
+    # save input file and configuration
+    f = os.path.join( job.rundir, 'cvm-input' )
+    open( f, 'w' ).write( input_template % job.__dict__ )
     f = os.path.join( job.rundir, 'conf.py' )
     cst.util.save( f, job.__dict__ )
 
