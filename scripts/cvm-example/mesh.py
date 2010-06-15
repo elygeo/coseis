@@ -24,7 +24,7 @@ np.array( y, 'f' ).tofile( path + 'lat' )
 np.array( z, 'f' ).tofile( path + 'dep' )
 
 # run CVM job and read Vs
-cst.cvm.launch( job )
+cst.cvm.launch( job, run='exec' )
 v = np.fromfile( path + 'vs', 'f' ).reshape( x.shape )
 
 # plot

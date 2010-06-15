@@ -82,11 +82,11 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
 
     # module parameters
     if module:
-        f = os.path.join( path, module, 'conf.py' )
+        f = os.path.join( path, module + '.py' )
         exec open( f ) in job
 
     # site parameters
-    f = os.path.join( path, 'conf-site.py' )
+    f = os.path.join( path, 'site.py' )
     if os.path.isfile( f ):
         exec open( f ) in job
     else:
@@ -363,19 +363,18 @@ def skeleton( job=None, stagein=(), new=True, **kwargs ):
     if new:
         os.makedirs( dest )
 
-    # process templates
-    if job.module:
-        for m in job.module, job.machine:
-            d = os.path.join( path, m )
-            for base in os.listdir( d ):
-                if base != 'conf.py':
-                    f = os.path.join( d, base )
-                    if base == 'script.sh':
-                        base = job.name + '.sh'
-                    ff = os.path.join( dest, base )
-                    out = open( f ).read() % job.__dict__
-                    open( ff, 'w' ).write( out )
-                    shutil.copymode( f, ff )
+    # process machine templates
+    if job.machine:
+        d = os.path.join( path, job.machine )
+        for base in os.listdir( d ):
+            if base != 'conf.py':
+                f = os.path.join( d, base )
+                if base == 'script.sh':
+                    base = job.name + '.sh'
+                ff = os.path.join( dest, base )
+                out = open( f ).read() % job.__dict__
+                open( ff, 'w' ).write( out )
+                shutil.copymode( f, ff )
 
     # link or copy files
     for f in stagein:
@@ -443,15 +442,16 @@ def launch( job=None, stagein=(), new=True, **kwargs ):
 if __name__ == '__main__':
     import pprint
     modules = None, 'sord', 'cvm'
-    machines = os.listdir('.')
+    machines = [None] + os.listdir('.')
     for module in modules:
         for machine in machines:
-            if os.path.isdir( machine ) and machine not in modules:
+            if machine == None or os.path.isdir( machine ):
                 print 80 * '-'
                 job = configure( module=module, machine=machine )[0]
                 job = prepare( job, rundir='tmp', command='date', run='exec', mode='s' )
                 skeleton( job )
                 print( job.__doc__ )
+                del( job.__dict__['__doc__'] )
                 pprint.pprint( job.__dict__ )
                 shutil.rmtree( 'tmp' )
 

@@ -11,6 +11,16 @@ path = os.path.dirname( os.path.realpath( __file__ ) )
 url = 'http://www.data.scec.org/3Dvelocity/Version4.tar.gz'
 url = 'http://earth.usc.edu/~gely/coseis/download/cvm4.tgz'
 
+input_template = """\
+%(nsample)s
+%(lon_file)s
+%(lat_file)s
+%(dep_file)s
+%(rho_file)s
+%(vp_file)s
+%(vs_file)s
+"""
+
 def _build( mode=None, optimize=None ):
     """
     Build CVM code.
@@ -43,15 +53,6 @@ def _build( mode=None, optimize=None ):
         if os.system( 'patch -p0 < cvm4.patch' ):
             sys.exit( 'Error patching CVM' )
     os.chdir( 'build' )
-
-    # find array sizes, save it for later
-    for line in file( 'in.h', 'r' ).readlines():
-        if line[0] != ' ':
-            continue
-        pat = re.compile( 'ibig *= *([0-9]*)' ).search( line )
-        if pat:
-            ibig = pat.groups()[0]
-    open( 'ibig', 'w' ).write( str( ibig ) )
 
     # compile ascii, binary, and MPI versions
     if 'a' in mode:
@@ -97,11 +98,16 @@ def stage( inputs={}, **kwargs ):
     job.command = os.path.join( '.', 'cvm4' + '-' + job.mode + job.optimize )
     job = cst.conf.prepare( job )
 
+    # compile code
+    if not job.prepare:
+        return job
+    _build( job.mode, job.optimize )
+
     # check minimum processors needed for compiled memory size
-    f = os.path.join( path, 'build', 'ibig' )
-    ibig = int( open( f, 'r' ).read() )
-    minproc = int( job.nsample / ibig )
-    if job.nsample % ibig != 0:
+    s = open( os.path.join( path, 'build', 'in.h' ) ).read()
+    n = re.search( 'ibig *= *([0-9]*)', s ).groups()[0]
+    minproc = int( job.nsample / n )
+    if job.nsample % n != 0:
         minproc += 1
     if minproc > job.nproc:
         sys.exit( 'Need at lease %s processors for this mesh size' % minproc )
@@ -109,7 +115,7 @@ def stage( inputs={}, **kwargs ):
     # create run directory
     if job.force == True and os.path.isdir( job.rundir ):
         shutil.rmtree( job.rundir )
-    if not job.reuse or not os.path.exists( job.rundir ):
+    if not os.path.exists( job.rundir ):
         f = os.path.join( path, 'build' )
         shutil.copytree( f, job.rundir )
     else:
