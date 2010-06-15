@@ -25,17 +25,14 @@ from cStringIO import StringIO
 import coord, util
 import cst
 
-repo = cst.site.repo
-
 def etopo1( indices=None, downsample=1 ):
     """
     Download ETOPO1 Global Relief Model.
     http://www.ngdc.noaa.gov/mgg/global/global.html
     """
+    repo = cst.site.repo
     filename = os.path.join( repo, 'etopo%02d-ice.f32' % downsample )
     if not os.path.exists( filename ):
-        if not os.path.exists( repo ):
-            os.makedirs( repo )
         url = 'ftp://ftp.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
         f = os.path.join( repo, os.path.basename( url ) )
         if not os.path.exists( f ):
@@ -59,10 +56,9 @@ def globe( indices=None ):
     Global Land One-km Base Elevation Digital Elevation Model.
     http://www.ngdc.noaa.gov/mgg/topo/globe.html
     """
+    repo = cst.site.repo
     filename = os.path.join( repo, 'globe30.i16' )
     if not os.path.exists( filename ):
-        if not os.path.exists( repo ):
-            os.makedirs( repo )
         print( 'Building %s' % filename )
         n = 90 * 60 * 2
         url = 'http://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/%s10g.gz'
@@ -121,10 +117,9 @@ def us_place_names( kind=None, extent=None ):
     USGS place name database.
     """
     url = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
+    repo = cst.site.repo
     filename = os.path.join( repo, os.path.basename( url ) )
     if not os.path.exists( filename ):
-        if not os.path.exists( repo ):
-            os.makedirs( repo )
         print( 'Downloading %s' % url )
         urllib.urlretrieve( url, filename )
     data = zipfile.ZipFile( filename ).read( 'US_CONCISE.txt' )
@@ -182,8 +177,6 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
         lon = lon[0] % 360, lon[1] % 360
         extent = lon, lat
     if not os.path.exists( filename ):
-        if not os.path.exists( repo ):
-            os.makedirs( repo )
         print( 'Downloading %s' % url )
         urllib.urlretrieve( url, filename )
     data = np.fromstring( zipfile.ZipFile( filename ).read( member ), '>i' )

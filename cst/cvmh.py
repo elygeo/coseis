@@ -8,7 +8,6 @@ import coord, gocad
 import cst
 
 # parameters
-repo = cst.site.repo
 projection = dict( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
 prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
@@ -19,13 +18,12 @@ def wald_vs30():
     """
     Download and read Wald, et al. Vs30 map.
     """
+    repo = cst.site.repo
     url = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
     f0 = os.path.join( repo, os.path.basename( url ) )
     f = f0.split( '.' )[0]
     if not os.path.exists( f ):
         import urllib, gzip
-        if not os.path.exists( repo ):
-            os.makedirs( repo )
         print( 'Downloading %s' % url )
         urllib.urlretrieve( url, f0 )
         fh = gzip.open( f0 )
@@ -43,11 +41,10 @@ def wills_vs30():
     """
     Download and read Wills Vs30 map.
     """
+    repo = cst.site.repo
     url = 'opensha.usc.edu:/export/opensha/data/siteData/wills2006.bin'
     f = os.path.join( repo, os.path.basename( url ) )
     if not os.path.exists( f ):
-        if not os.path.exists( repo ):
-            os.makedirs( repo )
         print( 'Downloading %s' % url )
         if os.system( 'scp %s %s' % (url, f) ):
             sys.exit()
@@ -99,11 +96,10 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
     """
 
     # download if not found
+    repo = cst.site.repo
     path = os.path.join( repo, version, 'bin' )
     if not os.path.exists( path ):
         import urllib, tarfile
-        if not os.path.exists( repo ):
-            os.makedirs( repo )
         f = os.path.join( repo, '%s.tar.bz2' % version )
         if not os.path.exists( f ):
             url = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2' % version

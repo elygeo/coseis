@@ -4,5 +4,5 @@ run
 tmp
 /cst/conf/site.py
 /download
-/data
+/data/*
 /w
