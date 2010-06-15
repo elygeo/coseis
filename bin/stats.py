@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Print binary file statistics. Default is 4 byte floating point.
+Print binary file statistics. Default data type is 4 byte floating point.
 """
 import os, sys
 import numpy as np

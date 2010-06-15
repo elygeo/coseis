@@ -4,7 +4,7 @@ Computational Seismology Tools
 import os
 path = os.path.dirname( __file__ )
 import util, conf
-import coord, signal, swab
+import coord, signal
 import data, vm1d, gocad, cvmh
 import source, egmm
 import viz, plt, mlab

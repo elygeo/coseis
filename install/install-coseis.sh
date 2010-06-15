@@ -11,8 +11,4 @@ cd "${prefix}"
 bzr get http://earth.usc.edu/~gely/coseis
 cd coseis
 python setup.py path build
-mkdir -p bin
-cd bin
-ln -s ../tools/swab.py .
-ln -s ../tools/stats.py .
 
