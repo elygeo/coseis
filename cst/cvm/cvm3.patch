@@ -1,12 +1,12 @@
 diff -ruN src/in.h build/in.h
---- src/in.h	2005-02-18 17:21:25.000000000 -0800
-+++ build/in.h	2010-06-16 14:55:16.000000000 -0700
+--- src/in.h	2010-06-16 14:29:08.000000000 -0700
++++ build/in.h	2010-06-16 14:36:10.000000000 -0700
 @@ -1,4 +1,8 @@
 -c  in.h   contains i-o stuff
 -         parameter(ibig=750000, rdepmin=0.0)
 -         common /oi/nn,rlat(ibig),rlon(ibig),rdep(ibig),
 -     1   alpha(ibig),beta(ibig),rho(ibig),inout(ibig)
-+! in.h - memory usage is ibig*38*4 bytes
++! in.h - memory usage is ibig*37*4 bytes
 +!     integer, parameter :: ibig = 4194304
 +      integer, parameter :: ibig = 4507502
 +      real, parameter :: rdepmin = 0.
@@ -16,7 +16,7 @@ diff -ruN src/in.h build/in.h
 +      integer :: inout(ibig), nn, nnl
 diff -ruN src/iobin.f build/iobin.f
 --- src/iobin.f	1969-12-31 16:00:00.000000000 -0800
-+++ build/iobin.f	2010-06-16 14:55:16.000000000 -0700
++++ build/iobin.f	2010-06-16 14:35:47.000000000 -0700
 @@ -0,0 +1,80 @@
 +! Binary I/O for SCEC CVM
 +
@@ -100,7 +100,7 @@ diff -ruN src/iobin.f build/iobin.f
 +
 diff -ruN src/iompi.f build/iompi.f
 --- src/iompi.f	1969-12-31 16:00:00.000000000 -0800
-+++ build/iompi.f	2010-06-16 14:55:16.000000000 -0700
++++ build/iompi.f	2010-06-16 14:35:54.000000000 -0700
 @@ -0,0 +1,106 @@
 +! MPI I/O for SCEC CVM
 +
@@ -210,7 +210,7 @@ diff -ruN src/iompi.f build/iompi.f
 +
 diff -ruN src/iotxt.f build/iotxt.f
 --- src/iotxt.f	1969-12-31 16:00:00.000000000 -0800
-+++ build/iotxt.f	2010-06-16 14:55:16.000000000 -0700
++++ build/iotxt.f	2010-06-16 14:36:00.000000000 -0700
 @@ -0,0 +1,38 @@
 +! ASCII I/O for SCEC CVM
 +
@@ -250,19 +250,18 @@ diff -ruN src/iotxt.f build/iotxt.f
 +      kerr = 0
 +      end
 +
-diff -ruN src/version4.0.f build/version4.0.f
---- src/version4.0.f	2006-02-27 11:57:37.000000000 -0800
-+++ build/version4.0.f	2010-06-16 14:58:18.000000000 -0700
-@@ -23,6 +23,8 @@
+diff -ruN src/version3.0.f build/version3.0.f
+--- src/version3.0.f	2010-06-16 14:29:08.000000000 -0700
++++ build/version3.0.f	2010-06-16 14:31:40.000000000 -0700
+@@ -22,6 +22,7 @@
+ c scum v2j     0-00   various glitch fixes
  c
  c version 3.0  8-01   install upper mantle tomography
- c version 4.0  6-05   new Vp-density, new San Berdo, new Imperial Valley
-+c 
 +c Bug fixes and modifications for binary and MPI I/O. Geoffrey Ely 2007/9/1
  c                   
  c
           include 'in.h'
-@@ -37,6 +39,37 @@
+@@ -36,6 +37,37 @@
           include 'surfaced.h'
           include 'genpro.h'
           include 'genprod.h'
@@ -300,7 +299,7 @@ diff -ruN src/version4.0.f build/version4.0.f
  c some constants
           rd2rad=3.141593/180.
           rckval=5000000.
-@@ -540,7 +573,7 @@
+@@ -538,7 +570,7 @@
  c diag      write(*,*)l0,iup,idn
              go to 1177
              endif
@@ -309,7 +308,7 @@ diff -ruN src/version4.0.f build/version4.0.f
             iupm=idnm
             ishal=idn
             goto 1177
-@@ -885,7 +918,7 @@
+@@ -879,7 +911,7 @@
  c-----reads strat surface edges---------------
  c---reads x-y pairs--------------------------
           include 'surface.h'
@@ -318,7 +317,7 @@ diff -ruN src/version4.0.f build/version4.0.f
           include 'names.h'
           asuf2='_edge'
           kerr=0
-@@ -908,7 +941,7 @@
+@@ -902,7 +934,7 @@
  c-----read model edge file, kept separate from surface edge-----
  c-------to simplify index counts--------------------------------
            include 'surface.h'
@@ -327,7 +326,7 @@ diff -ruN src/version4.0.f build/version4.0.f
            kerr=0
  c---file name assignment-------
            aname3='bmod_edge'
-@@ -927,13 +960,13 @@
+@@ -921,13 +953,13 @@
           subroutine readgeo(k2err)
  c reads geologic contours
           include 'sgeo.h'
@@ -343,7 +342,7 @@ diff -ruN src/version4.0.f build/version4.0.f
             do 300 k=1,ngeo
             read(12,*)np(k)
              do 310 k1=1,np(k)
-@@ -998,8 +1031,8 @@
+@@ -992,8 +1024,8 @@
  c---reads stratigraphic surfaces-------------------------
  c---reads spyglass ascii output--------------------------
           include 'surface.h'
@@ -354,7 +353,7 @@ diff -ruN src/version4.0.f build/version4.0.f
           include 'names.h'
           asuf='_sur'
           a18='2'
-@@ -1038,7 +1071,7 @@
+@@ -1032,7 +1064,7 @@
  c-reads uplift file for LAB--------------------
  c-----just like readsur-------------
          include 'labup.h'
@@ -363,7 +362,7 @@ diff -ruN src/version4.0.f build/version4.0.f
  c file name assignment
          filei4='laup_sur2'
  c
-@@ -1046,6 +1079,8 @@
+@@ -1040,6 +1072,8 @@
  c
           do 400 i=1,nlaup 
            do 440 j=1,nloup
@@ -372,7 +371,7 @@ diff -ruN src/version4.0.f build/version4.0.f
  c temp turned off for historical reason
  c          read(16,11440) rlaup(i),rloup(j),rzupl(i,j) 
  c11440     format(f9.5,1x,f10.5,1x,f10.2)
-@@ -1063,7 +1098,7 @@
+@@ -1057,7 +1091,7 @@
  c--gets uplift for LAB---------------
  c find uplift amount at current lat long
          include 'labup.h'
@@ -381,7 +380,7 @@ diff -ruN src/version4.0.f build/version4.0.f
             if(rlatl0.le.rlaup(l7).and.rlatl0.gt.rlaup(l7+1))then
              do 828 l8=1,nloup-1 
              if(rlonl0.gt.rloup(l8).and.rlonl0.le.rloup(l8+1))then
-@@ -1167,40 +1202,6 @@
+@@ -1161,46 +1195,12 @@
           return
           end
  
@@ -422,30 +421,26 @@ diff -ruN src/version4.0.f build/version4.0.f
           subroutine readivsurf(kerr)
  c-----read Imperial Valley surfaces--------------
           include 'in.h'
-@@ -1288,7 +1289,13 @@
- c---find appropriate surface depths-------------------
- c        do 6009 i9=1,numsiv
- c---find valid surfaces-------------------
+          include 'ivsurface.h'
+-         character*8 aname4, asuf4*6,asrnam(numsiv)*2
+-         character*9 aname42, a418*1
++         character(8) aname4, asuf4*6,asrnam(numsiv)*2
++         character(9) aname42, a418*1
+          data (asrnam(i),i=1,numsiv)/'25','55','60','65',
+      1    '70','Mo'/
+          asuf4='.ascii'
+@@ -1286,6 +1286,10 @@
+          include 'ivsurfaced.h'
+          include 'generic_loc.h'
+ c---see if in constrained or generic Imperial Valley
 +         rd2rad = 3.141593 / 180.0
 +         do i = 1, numsiv
 +           rsuqiv(i) = 0.0
 +         end do
-          i9=1
-+
-+         
-          do 8139 l3=1,nlasiv(i9)-1
-       if(rla.le.rlasiv(i9,l3).and.rla.gt.rlasiv(i9,l3+1))then
-          do 8249 l4=1,nlosiv(i9)-1
-@@ -1341,7 +1348,7 @@
- c
- 1181      betm=alp/(sqrt(2.))
- c -- all done
--1182      return
-+          return
-           end
- 
-           subroutine makereg(rla,rlo,rde,alp,bet,iregfl)
-@@ -1349,6 +1356,10 @@
+          xref=rmoivx(ivi3)
+          yref=rmoivy(ivi3)
+          reflat=yref*rd2rad
+@@ -1386,6 +1390,10 @@
           include 'regional.h'
           include 'regionald.h'
           dimension vervep(4),verves(4)
@@ -456,7 +451,7 @@ diff -ruN src/version4.0.f build/version4.0.f
           rd2rad=3.141593/180.
  c -- find which box point is in--
           do 1927 n=1,nregll-ninrow
-@@ -1526,15 +1537,15 @@
+@@ -1563,15 +1571,15 @@
        return
        end
  
@@ -475,7 +470,7 @@ diff -ruN src/version4.0.f build/version4.0.f
           iprono=0
           ibhct=0
           ieach=0
-@@ -1565,15 +1576,15 @@
+@@ -1602,15 +1610,15 @@
  2915      return
             end
  
@@ -494,7 +489,7 @@ diff -ruN src/version4.0.f build/version4.0.f
           do 2300 k=1,numgen
            read(12,*)irt2
            numptge2(k)=irt2
-@@ -1648,6 +1659,7 @@
+@@ -1685,6 +1693,7 @@
          dimension inindex(inct)
          dimension rdelz(nx,ny)
          rdmi2=40.
@@ -502,7 +497,7 @@ diff -ruN src/version4.0.f build/version4.0.f
  c
          icolnm=abs(int((rlonmax-rlonl0)/rdelx))
          irownm=int((rlatmax-rlatl0)/rdely)
-@@ -1762,12 +1774,13 @@
+@@ -1799,12 +1808,13 @@
           return
          end
  
@@ -518,7 +513,7 @@ diff -ruN src/version4.0.f build/version4.0.f
          filesb='soil.pgm'
          open(16,file=filesb,status='old',err=5977)
          read(16,*)rlonmax,rlonmin,rlatmax,rlatmin
-@@ -1799,12 +1812,17 @@
+@@ -1836,12 +1846,17 @@
           include 'genpro.h'
           include 'wtbh1.h'
           include 'wtbh2.h'
@@ -536,7 +531,7 @@ diff -ruN src/version4.0.f build/version4.0.f
  7013     continue
  c--check ifs flag--
           if(ifs.eq.0)then
-@@ -1928,6 +1946,7 @@
+@@ -1965,6 +1980,7 @@
           include 'wtbh1.h'
           include 'wtbh3.h'
           rtvelges=0.
@@ -544,7 +539,7 @@ diff -ruN src/version4.0.f build/version4.0.f
           do 97013 n=1,nrad
           iradctp(n)=0
           radvp(n)=0.
-@@ -2009,7 +2028,7 @@
+@@ -2046,7 +2062,7 @@
          subroutine readmoho(k2err)
  c--reads the moho surface file--------------------------
          include 'moho1.h'
@@ -553,7 +548,7 @@ diff -ruN src/version4.0.f build/version4.0.f
  c here's input file name-----------------------------------
          filemo='moho_sur'
          open(16,file=filemo,status='old',err=3233)
-@@ -2094,7 +2113,7 @@
+@@ -2089,7 +2105,7 @@
  c Using Monica Kohler's so cal model at xx km horizontal
  c  spacing, 10 km vertical spacing
           include 'mantle.h'

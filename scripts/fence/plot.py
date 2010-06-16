@@ -5,7 +5,7 @@ from enthought.mayavi import mlab
 import cst
 import mesh
 
-path = os.path.join( 'run', mesh.version ) + os.sep
+path = 'run' + os.sep
 pixels = 640, 360
 
 # setup figure
