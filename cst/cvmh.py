@@ -285,3 +285,17 @@ class Extraction():
                 out[i] = c1[i] + b1[i] * d[i]
         return out
 
+def extract( prop, lon, lat, dep, **kwarg ):
+    """
+    Simple extraction
+    """
+    import pyproj
+    proj = pyproj.Proj( **cst.cvmh.projection )
+    x, y = proj( lon, lat )
+    topo = Model( 'topo' )
+    vs30 = Model( 'vs30' )
+    m = Model( prop )
+    ex = Extraction( x, y, m, topo, lon, lat, vs30, **kwarg )
+    f = ex( z, by_depth=True )
+    return f
+

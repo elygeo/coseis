@@ -3,8 +3,8 @@
 SCEC Community Velocity Model
 """
 import os, sys, re, shutil, urllib, tarfile
-import cst.util
-import cst.conf
+import numpy as np
+import cst
 from cst.conf import launch
 
 path = os.path.dirname( os.path.realpath( __file__ ) )
@@ -134,6 +134,23 @@ def stage( inputs={}, **kwargs ):
     open( f, 'w' ).write( input_template % job.__dict__ )
     f = os.path.join( job.rundir, 'conf.py' )
     cst.util.save( f, job.__dict__ )
-
     return job
+
+def extract( lon, lat, dep, **kwargs ):
+    """
+    Simple extraction
+    """
+    lon = np.asarray( lon, 'f' )
+    lat = np.asarray( lat, 'f' )
+    dep = np.asarray( dep, 'f' )
+    job = stage( nsample=dep.size, **kwargs )
+    path = job.rundir + os.sep
+    lon.tofile( path + 'lon' )
+    lat.tofile( path + 'lat' )
+    dep.tofile( path + 'dep' )
+    launch( job, run='exec' )
+    rho = np.fromfile( path + job.rho_file, 'f' ).reshape( dep.shape )
+    vp =  np.fromfile( path + job.vp_file,  'f' ).reshape( dep.shape )
+    vs =  np.fromfile( path + job.vs_file,  'f' ).reshape( dep.shape )
+    return rho, vp, vs
 
