@@ -120,7 +120,7 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
         p = prop3d['vs']
         voxet = gocad.voxet( voxfile, p )['1']
         data = voxet['PROP'][p]['DATA']
-        z0 = voxet['AXIS']['O']
+        z0 = voxet['AXIS']['O'][2]
         z1 = voxet['AXIS']['W'][2] + z0
         nz = data.shape[2]
         dz = (z1 - z0) / (nz - 1)
@@ -185,7 +185,7 @@ class Model():
     -------
         out: property samples at coordinates (x, y, z)
     """
-    def __init__( self, prop, voxet=['mantle', 'crust', 'lab'], no_data_value='nan' ):
+    def __init__( self, prop, voxet=['mantle', 'crust'], no_data_value='nan' ):
         self.prop = prop
         if prop == 'vs30':
             #self.voxet = [ wills_vs30 ]
@@ -219,7 +219,7 @@ class Extraction():
         topo: topography model
         vs30: Vs30 model, None=omit GTL
         lon, lat: geographic coordinates
-        zgrl: GTL interpolation depth
+        zgtl: GTL interpolation depth
         interpolation: 'nearest', 'linear'
 
     Call parameters
@@ -287,7 +287,18 @@ class Extraction():
 
 def extract( prop, lon, lat, dep, **kwarg ):
     """
-    Simple extraction
+    Simple CVM-H extraction
+
+    Parameters
+    ----------
+        prop: Material property 'rho', 'vp', 'vs', or 'tag'
+        lon, lat, dep: Coordinate arrays
+        interpolation: 'nearest', or 'linear'
+        zgtl: GTL interpolation depth
+
+    Returns
+    -------
+        f: Material array
     """
     import pyproj
     proj = pyproj.Proj( **cst.cvmh.projection )
@@ -296,6 +307,6 @@ def extract( prop, lon, lat, dep, **kwarg ):
     vs30 = Model( 'vs30' )
     m = Model( prop )
     ex = Extraction( x, y, m, topo, lon, lat, vs30, **kwarg )
-    f = ex( z, by_depth=True )
+    f = ex( dep, by_depth=True )
     return f
 

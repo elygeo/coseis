@@ -131,7 +131,7 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
                 i = short.index( key )
             opt, key, cast = options[i][1:]
             if opt[-1] in ':=':
-                job[key] = cast( val )
+                job[key] = type( cast )( val )
             else:
                 job[key] = cast
 

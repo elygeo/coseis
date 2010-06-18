@@ -12,7 +12,7 @@ vs_file = 'vs'
 
 # command line options: (short, long, parameter, value)
 options = [
-    ( '',  'machine=',    'machine',  str ),
+    ( '',  'machine=',    'machine',  '' ),
     ( 'n', 'dry-run',     'prepare',  False ),
     ( 'f', 'force',       'force',    True ),
     ( 'i', 'interactive', 'run',      'exec' ),

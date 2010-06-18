@@ -5,35 +5,29 @@
 import numpy as np
 import coord
 
-def hadley_smoothed( prop, depth ):
+def dreger( prop, depth ):
     """
-    A smoothed version of the Hadley and Kanamori (1977) velocity model for
-    southern California used in the SCEC Community Velocity Model, version 4.
-    FIXME: this is horribly broken!!!
+    SoCal model of Dreger and Helmberger (1991)
+
+    Parameters
+    ----------
+        prop: 'rho', 'vp', or 'vs'
+        depth: array of depth values in meters
     """
     depth = np.asarray( depth )
-    z, f = 1000.0 * np.array( [
-       (  1.0, 5.0  ),
-       (  5.0, 5.5  ),
-       (  6.0, 6.3  ),
-       ( 10.0, 6.3  ),
-       ( 15.5, 6.4  ),
-       ( 16.5, 6.7  ),
-       ( 22.0, 6.75 ),
-       ( 31.0, 6.8  ),
-       ( 33.0, 7.8  ),
-    ] ).T
-    if prop == 'rho':
-       f = 1865.0 + 0.1579 * f
-    v = np.intperp( depth, z, f )
-    if prop == 'vs':
-        z, f = zip( [
-           (  2060.0, 0.40 ),
-           (  2500.0, 0.25 ),
-        ] )
-        nu = np.interp( rho, z, f )
-        vs = vp * sqrt( (0.5 - nu) / (1.0 - nu) )
-    return out
+    f = np.empty_like( depth )
+    f.fill( np.nan )
+    z, rho, vp, vs = zip( [
+        (  5.5, 2.4,  5.5, 3.18 ),
+        (  5.5, 2.67, 6.3, 3.64 ),
+        ( 16.0, 2.67, 6.3, 3.64 ),
+        ( 16.0, 2.8,  6.7, 3.87 ),
+        ( 35.0, 2.8,  6.7, 3.87 ),
+        ( 35.0, 3.0,  7.8, 4.5  ),
+    ] )
+    f = {'rho': rho, 'vp': vp, 'vs': vs}[prop]
+    f = np.interp( depth, z, f )
+    return f
 
 def boore_rock( z ):
     """
@@ -74,4 +68,34 @@ def boore_hard_rock( z ):
         vs[i] = (v * 0.001 ** e) * z[i] ** e
         z0 = z1
     return vs
+
+def hadley_smoothed( prop, depth ):
+    """
+    A smoothed version of the Hadley and Kanamori (1977) velocity model for
+    southern California used in the SCEC Community Velocity Model, version 4.
+    FIXME: this is horribly broken!!!
+    """
+    depth = np.asarray( depth )
+    z, f = 1000.0 * np.array( [
+       (  1.0, 5.0  ),
+       (  5.0, 5.5  ),
+       (  6.0, 6.3  ),
+       ( 10.0, 6.3  ),
+       ( 15.5, 6.4  ),
+       ( 16.5, 6.7  ),
+       ( 22.0, 6.75 ),
+       ( 31.0, 6.8  ),
+       ( 33.0, 7.8  ),
+    ] ).T
+    if prop == 'rho':
+       f = 1865.0 + 0.1579 * f
+    v = np.intperp( depth, z, f )
+    if prop == 'vs':
+        z, f = zip( [
+           (  2060.0, 0.40 ),
+           (  2500.0, 0.25 ),
+        ] )
+        nu = np.interp( rho, z, f )
+        vs = vp * sqrt( (0.5 - nu) / (1.0 - nu) )
+    return out
 

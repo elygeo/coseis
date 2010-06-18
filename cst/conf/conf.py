@@ -43,7 +43,7 @@ launch = {
 
 # command line options
 options = [
-    ( '',  'machine=',    'machine',  str ),
+    ( '',  'machine=',    'machine',  '' ),
     ( 'f', 'force',       'force',    True ),
     ( 'n', 'dry-run',     'prepare',  False ),
     ( 'i', 'interactive', 'run',      'exec' ),

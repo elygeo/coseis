@@ -138,19 +138,31 @@ def stage( inputs={}, **kwargs ):
 
 def extract( lon, lat, dep, **kwargs ):
     """
-    Simple extraction
+    Simple CVM extraction
+
+    Parameters
+    ----------
+        lon, lat, dep : Coordinate arrays
+        nproc : Optional, number of processes
+        rundir : Optional, job staging directory
+
+    Returns
+    -------
+        rho, vp, vs: Material arrays
     """
     lon = np.asarray( lon, 'f' )
     lat = np.asarray( lat, 'f' )
     dep = np.asarray( dep, 'f' )
+    shape = dep.shape
     job = stage( nsample=dep.size, **kwargs )
     path = job.rundir + os.sep
     lon.tofile( path + 'lon' )
     lat.tofile( path + 'lat' )
     dep.tofile( path + 'dep' )
+    del( lon, lat, dep )
     launch( job, run='exec' )
-    rho = np.fromfile( path + job.rho_file, 'f' ).reshape( dep.shape )
-    vp =  np.fromfile( path + job.vp_file,  'f' ).reshape( dep.shape )
-    vs =  np.fromfile( path + job.vs_file,  'f' ).reshape( dep.shape )
+    rho = np.fromfile( path + job.rho_file, 'f' ).reshape( shape )
+    vp =  np.fromfile( path + job.vp_file,  'f' ).reshape( shape )
+    vs =  np.fromfile( path + job.vs_file,  'f' ).reshape( shape )
     return rho, vp, vs
 

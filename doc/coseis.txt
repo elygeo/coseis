@@ -201,8 +201,7 @@ Build a fence diagram similar to Magistrale (2000) figure 10. Plot using
 Mayavi::
 
     cd scripts/fence
-    python mesh.py
-    python plot.py
+    python fence.py
 
 Source code:
 `mesh.py <../scripts/fence/mesh.py>`__
