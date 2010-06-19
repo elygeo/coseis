@@ -43,7 +43,7 @@ def solve2( A, b ):
     return np.array( [b[0] * A[1,1] - b[1] * A[0,1],
                       b[1] * A[0,0] - b[0] * A[1,0]] )
 
-def interp( extent, f, coords, out=None, extrapolate=False ):
+def interp( extent, f, coords, out=None, bound=None, extrapolate=False ):
     """
     1D interpolation on a regular grid
     """
@@ -54,11 +54,15 @@ def interp( extent, f, coords, out=None, extrapolate=False ):
     del( coords )
     j = np.int32( xi )
     n = f.shape[-1]
-    if not extrapolate:
-        i = (j >= 0) & (j <= n-2)
+    i = True
+    if bound != None:
+        if bound[0]: i = i & (j >= 0)
+        if bound[1]: i = i & (j <= n-2)
     j = np.minimum( np.maximum( j, 0 ), n-2 )
-    f = (1.0 - xi + j) * f[...,j] + (xi - j) * f[...,j+1]
     if not extrapolate:
+        xi = np.minimum( np.maximum( xi, 0 ), n-1 )
+    f = (1.0 - xi + j) * f[...,j] + (xi - j) * f[...,j+1]
+    if bound != None:
         f[...,~i] = np.nan
         if out != None:
             out[...,i] = f[...,i]
@@ -66,7 +70,7 @@ def interp( extent, f, coords, out=None, extrapolate=False ):
         out[...] = f[...]
     return f
 
-def interp2( extent, f, coords, out=None, method='linear', extrapolate=False ):
+def interp2( extent, f, coords, out=None, method='linear', bound=None, extrapolate=False ):
     """
     2D interpolation on a regular grid
     """
@@ -77,28 +81,36 @@ def interp2( extent, f, coords, out=None, method='linear', extrapolate=False ):
     yi = (np.asarray( coords[1] ) - x0[1]) / delta[1]
     del( coords )
     n = f.shape
+    i = True
     if method == 'nearest':
         j = np.array( xi + 0.5, 'i' )
         k = np.array( yi + 0.5, 'i' )
-        if not extrapolate:
-            i = ( (j >= 0) & (j <= n[-2]-1)
-                & (k >= 0) & (k <= n[-1]-1) )
+        if bound != None:
+            if bound[0][0]: i = i & (j >= 0)
+            if bound[1][0]: i = i & (k >= 0)
+            if bound[0][1]: i = i & (j <= n[-2]-1)
+            if bound[1][1]: i = i & (k <= n[-1]-1)
         j = np.minimum( np.maximum( j, 0 ), n[-2]-1 )
         k = np.minimum( np.maximum( k, 0 ), n[-1]-1 )
         f = f[...,j,k]
     elif method == 'linear':
         j = np.array( xi, 'i' )
         k = np.array( yi, 'i' )
-        if not extrapolate:
-            i = ( (j >= 0) & (j <= n[-2]-2)
-                & (k >= 0) & (k <= n[-1]-2) )
+        if bound != None:
+            if bound[0][0]: i = i & (j >= 0)
+            if bound[1][0]: i = i & (k >= 0)
+            if bound[0][1]: i = i & (j <= n[-2]-2)
+            if bound[1][1]: i = i & (k <= n[-1]-2)
         j = np.minimum( np.maximum( j, 0 ), n[-2]-2 )
         k = np.minimum( np.maximum( k, 0 ), n[-1]-2 )
+        if not extrapolate:
+            xi = np.minimum( np.maximum( xi, 0 ), n[-2]-1 )
+            yi = np.minimum( np.maximum( yi, 0 ), n[-1]-1 )
         f = ( ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * f[...,j,k]
             + ( 1.0 - xi + j ) * (       yi - k ) * f[...,j,k+1]
             + (       xi - j ) * ( 1.0 - yi + k ) * f[...,j+1,k]
             + (       xi - j ) * (       yi - k ) * f[...,j+1,k+1] )
-    if not extrapolate:
+    if bound != None:
         f[...,~i] = np.nan
         if out != None:
             out[...,i] = f[...,i]
@@ -106,7 +118,7 @@ def interp2( extent, f, coords, out=None, method='linear', extrapolate=False ):
         out[...] = f[...]
     return f
 
-def interp3( extent, f, coords, out=None, method='linear', extrapolate=False ):
+def interp3( extent, f, coords, out=None, method='linear', bound=None, extrapolate=False ):
     """
     3D interpolation on a regular grid
     """
@@ -118,14 +130,18 @@ def interp3( extent, f, coords, out=None, method='linear', extrapolate=False ):
     zi = (np.asarray( coords[2] ) - x0[2]) / delta[2]
     del( coords )
     n = f.shape
+    i = True
     if method == 'nearest':
         j = np.array( xi + 0.5, 'i' )
         k = np.array( yi + 0.5, 'i' )
         l = np.array( zi + 0.5, 'i' )
-        if not extrapolate:
-            i = ( (j >= 0) & (j <= n[-3]-1)
-                & (k >= 0) & (k <= n[-2]-1)
-                & (l >= 0) & (l <= n[-1]-1) )
+        if bound != None:
+            if bound[0][0]: i = i & (j >= 0)
+            if bound[1][0]: i = i & (k >= 0)
+            if bound[2][0]: i = i & (l >= 0)
+            if bound[0][1]: i = i & (j <= n[-3]-1)
+            if bound[1][1]: i = i & (k <= n[-2]-1)
+            if bound[2][1]: i = i & (l <= n[-1]-1)
         j = np.minimum( np.maximum( j, 0 ), n[-3]-1 )
         k = np.minimum( np.maximum( k, 0 ), n[-2]-1 )
         l = np.minimum( np.maximum( l, 0 ), n[-1]-1 )
@@ -134,13 +150,20 @@ def interp3( extent, f, coords, out=None, method='linear', extrapolate=False ):
         j = np.array( xi, 'i' )
         k = np.array( yi, 'i' )
         l = np.array( zi, 'i' )
-        if not extrapolate:
-            i = ( (j >= 0) & (j <= n[-3]-2)
-                & (k >= 0) & (k <= n[-2]-2)
-                & (l >= 0) & (l <= n[-1]-2) )
+        if bound != None:
+            if bound[0][0]: i = i & (j >= 0)
+            if bound[1][0]: i = i & (k >= 0)
+            if bound[2][0]: i = i & (l >= 0)
+            if bound[0][1]: i = i & (j <= n[-3]-2)
+            if bound[1][1]: i = i & (k <= n[-2]-2)
+            if bound[2][1]: i = i & (l <= n[-1]-2)
         j = np.minimum( np.maximum( j, 0 ), n[-3]-2 )
         k = np.minimum( np.maximum( k, 0 ), n[-2]-2 )
         l = np.minimum( np.maximum( l, 0 ), n[-1]-2 )
+        if not extrapolate:
+            xi = np.minimum( np.maximum( xi, 0 ), n[-3]-1 )
+            yi = np.minimum( np.maximum( yi, 0 ), n[-2]-1 )
+            zi = np.minimum( np.maximum( zi, 0 ), n[-1]-1 )
         f = ( ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * ( 1.0 - zi + l ) * f[...,j,k,l]
             + ( 1.0 - xi + j ) * ( 1.0 - yi + k ) * (       zi - l ) * f[...,j,k,l+1]
             + ( 1.0 - xi + j ) * (       yi - k ) * ( 1.0 - zi + l ) * f[...,j,k+1,l]
@@ -151,7 +174,7 @@ def interp3( extent, f, coords, out=None, method='linear', extrapolate=False ):
             + (       xi - j ) * (       yi - k ) * (       zi - l ) * f[...,j+1,k+1,l+1] )
     else:
         sys.exit( 'Unknon interpolation method: %s' % method )
-    if not extrapolate:
+    if bound != None:
         f[...,~i] = np.nan
         if out != None:
             out[...,i] = f[...,i]

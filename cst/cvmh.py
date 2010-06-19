@@ -12,7 +12,11 @@ projection = dict( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
 prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
 prop3d = {'vp': '1', 'vs': '3', 'tag': '2'}
-voxet3d = {'mantle': 'CVM_CM', 'crust': 'CVM_LR', 'lab': 'CVM_HR'}
+voxet3d = {
+    'mantle': ( 'CVM_CM', None ),
+    'crust':  ( 'CVM_LR', [(0, 0), (0, 0), (1, 0)] ),
+    'lab':    ( 'CVM_HR', [(1, 1), (1, 1), (1, 1)] ),
+}
 
 def wald_vs30():
     """
@@ -35,7 +39,7 @@ def wald_vs30():
     y =   30.0 + delta,   50.0 - delta
     extent = x, y
     data = np.fromfile( f, '>f' ).reshape( shape[::-1] ).T
-    return extent, data, None
+    return extent, None, data, None
 
 def wills_vs30():
     """
@@ -56,7 +60,7 @@ def wills_vs30():
     extent = x, y
     data = np.fromfile( f, '<i2' ).reshape( shape ).T
     #i = data == -9999
-    return extent, data, None
+    return extent, None, data, None
 
 def nafe_drake( f ):
     """
@@ -109,9 +113,9 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
 
     # voxet ID
     if voxet in voxet3d:
-        vid = voxet3d[voxet]
+        vid, bound = voxet3d[voxet]
     else:
-        vid = 'interfaces'
+        vid, bound = 'interfaces', None
     voxfile = os.path.join( path, vid + '.vo' )
     topfile = os.path.join( path, vid + '_TOP@@' )
 
@@ -157,11 +161,11 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
     data = voxet['PROP'][pid]['DATA']
     nx, ny, nz = data.shape
     if nz == 1:
-        return extent, data.squeeze(), None
+        return extent, bound, data.squeeze(), None
     else:
         dtype = data.dtype
         top = np.fromfile( topfile, dtype ).reshape( [ny, nx] ).T
-        return extent, top, data
+        return extent, bound, top, data
 
 class Model():
     """
@@ -201,11 +205,11 @@ class Model():
         if out == None:
             out = np.empty_like( x )
             out.fill( np.nan )
-        for extent, surface, volume in self.voxet:
+        for extent, bound, surface, volume in self.voxet:
             if z == None:
-                coord.interp2( extent[:2], surface, (x, y), out, method=interpolation )
+                coord.interp2( extent[:2], surface, (x, y), out, interpolation, bound )
             else:
-                coord.interp3( extent, volume, (x, y, z), out, method=interpolation )
+                coord.interp3( extent, volume, (x, y, z), out, interpolation, bound )
         return out
 
 class Extraction():

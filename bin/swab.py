@@ -33,13 +33,14 @@ def command_line():
     """
     Process command line options.
     """
+    dtype = 'f'
     files = []
     for a in sys.argv[1:]:
-        if a[0] == '-':
+        if a.startswith( '-' ):
             dtype = a[1:].replace( 'l', '<' ).replace( 'b', '>' )
         else:
             files += [a]
-    if len( files ) == 1:
+    if len( files ) == 0:
         print( sys.byteorder )
     for f in files:
         if not os.path.isfile( f ):
