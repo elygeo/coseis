@@ -6,7 +6,6 @@ import os, sys, math, glob, shutil, pprint
 import numpy as np
 import cst.util
 import cst.conf
-from cst.conf import launch
 import fieldnames
 
 def _build( mode=None, optimize=None, dtype=None ):
@@ -253,6 +252,7 @@ def stage( inputs={}, **kwargs ):
     job.__dict__.update( pm.__dict__ )
     return job
 
+launch = cst.conf.launch
 def run( job=None, **kwargs ):
     """
     Stage (if necessary) and launch job
@@ -262,7 +262,7 @@ def run( job=None, **kwargs ):
     elif type( job ) == dict:
         job.update( kwargs )
         job = stage( job )
-    cst.conf.launch( job )
+    launch( job )
     return job
 
 def prepare_param( pm ):

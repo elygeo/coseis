@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """
 SCEC Community Velocity Model (CVM-H) extraction tool
+
+TODO: merge Wills and Wald Vs30 maps into CVMH projection
 """
 import os, sys
 import numpy as np
@@ -10,6 +12,7 @@ import cst
 # parameters
 projection = dict( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
+extent_gtl = (-31000.0, 849000.0), (3410000.0, 4274000.0)
 prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
 prop3d = {'vp': '1', 'vs': '3', 'tag': '2'}
 voxet3d = {
@@ -18,49 +21,101 @@ voxet3d = {
     'lab':    ( 'CVM_HR', [(1, 1), (1, 1), (1, 1)] ),
 }
 
-def wald_vs30():
-    """
-    Download and read Wald, et al. Vs30 map.
-    """
-    repo = cst.site.repo
-    url = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
-    f0 = os.path.join( repo, os.path.basename( url ) )
-    f = f0.split( '.' )[0]
-    if not os.path.exists( f ):
-        import urllib, gzip
-        print( 'Downloading %s' % url )
-        urllib.urlretrieve( url, f0 )
-        fh = gzip.open( f0 )
-        fh.seek( 19512 )
-        open( f, 'wb' ).write( fh.read() )
-    shape = 2280, 2400
-    delta = 0.25 / 60
-    x = -125.0 + delta, -106.0 - delta
-    y =   30.0 + delta,   50.0 - delta
-    extent = x, y
-    data = np.fromfile( f, '>f' ).reshape( shape[::-1] ).T
-    return extent, None, data, None
 
-def wills_vs30():
+def gtl_coords( delta_gtl=250.0 ):
     """
-    Download and read Wills Vs30 map.
+    Create GTL lon/lat mesh coordinates.
+    """
+    import pyproj
+    proj = pyproj.Proj( **projection )
+    d = 0.5 * delta_gtl
+    x, y = extent_gtl
+    x = np.arange( x[0], x[1] + d, delta_gtl )
+    y = np.arange( y[0], y[1] + d, delta_gtl )
+    y, x = np.meshgrid( y, x )
+    x, y = proj( x, y, inverse=True )
+    return x, y
+
+
+def vs30_wald():
+    """
+    Download and prepare Wald, et al. Vs30 map.
     """
     repo = cst.site.repo
-    url = 'opensha.usc.edu:/export/opensha/data/siteData/wills2006.bin'
-    f = os.path.join( repo, os.path.basename( url ) )
-    if not os.path.exists( f ):
-        print( 'Downloading %s' % url )
-        if os.system( 'scp %s %s' % (url, f) ):
-            sys.exit()
-    shape = 49867, 44016
-    delta = 0.00021967246502752
-    x, y = -124.52997177169, 32.441345502265
-    x = x, x + (shape[0] - 1) * delta
-    y = y + (shape[1] - 1) * delta, y
-    extent = x, y
-    data = np.fromfile( f, '<i2' ).reshape( shape ).T
-    #i = data == -9999
-    return extent, None, data, None
+    f = os.path.join( repo, 'cvm_vs30_wald.npy' )
+    if os.path.exists( f ):
+        data = np.load( f )
+    else:
+        import urllib, gzip
+        url = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
+        f0 = os.path.join( repo, os.path.basename( url ) )
+        if not os.path.exists( f0 ):
+            print( 'Downloading %s' % url )
+            urllib.urlretrieve( url, f0 )
+        fh = gzip.open( f0 )
+        print( 'Resampling Wald Vs30' )
+        dtype = '>f'
+        nx, ny = 2280, 2400
+        fh.seek( 19512 )
+        data = fh.read()
+        data = np.fromstring( data, dtype ).reshape( (ny, nx) ).T
+        delta = 0.25 / 60
+        x = -125.0 + delta, -106.0 - delta
+        y =   30.0 + delta,   50.0 - delta
+        extent = x, y
+        x, y = gtl_coords()
+        data = coord.interp2( extent, data, (x, y), method='linear' )
+        np.save( f, data )
+    return extent_gtl, None, data, None
+
+
+def vs30_wills():
+    """
+    Download and prepare Wills Vs30 map.
+    """
+    repo = cst.site.repo
+    f = os.path.join( repo, 'cvm_vs30_wills.npy' )
+    if os.path.exists( f ):
+        data = np.load( f )
+    else:
+        data = vs30_wald()[2]
+        x, y = gtl_coords()
+        url = 'opensha.usc.edu:/export/opensha/data/siteData/wills2006.bin'
+        f0 = os.path.join( repo, os.path.basename( url ) )
+        if not os.path.exists( f0 ):
+            print( 'Downloading %s' % url )
+            if os.system( 'scp %s %s' % (url, f0) ):
+                sys.exit()
+        fh = open( f0, 'rb' )
+        print( 'Resampling Wills Vs30 ----------------------->|' )
+        delta = 0.00021967246502752
+        x0, y0 = -124.52997177169, 32.441345502265
+        nx, ny, nz = 44016, 1061, 47
+        x1 = x0 + (nx - 1) * delta
+        dtype = '<i2'
+        bytes = np.dtype( dtype ).itemsize
+
+        import time
+        t0 = time.time()
+
+        for i in range( nz ):
+            sys.stdout.write( '.' )
+            sys.stdout.flush()
+            y1 = y0 + ((nz - i) * ny - 1) * delta
+            y2 = y0 + ((nz - i) * ny - ny) * delta
+            extent = (x0, x1), (y1, y2)
+            v = fh.read( nx * ny * bytes )
+            v = np.fromstring( v, dtype ).astype( 'f' ).reshape( (ny, nx) ).T
+            v[v==-9999] = np.nan
+            coord.interp2( extent, v, (x, y), data, 'nearest', mask_nan=True )
+        print('')
+        np.save( f, data )
+
+        t1 = time.time()
+        print 222222, t1 - t0
+
+    return extent_gtl, None, data, None
+
 
 def nafe_drake( f ):
     """
@@ -71,6 +126,7 @@ def nafe_drake( f ):
     f = np.maximum( f, 1.0 ) * 1000.0
     return f
 
+
 def brocher_vp( f ):
     """
     V_p derived from V_s via Brocher (2005) eqn 9.
@@ -79,6 +135,7 @@ def brocher_vp( f ):
     f = 0.9409 + f * (2.0947 - f * (0.8206 - f * (0.2683 - f * 0.0251)))
     f *= 1000.0
     return f
+
 
 def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
     """
@@ -168,6 +225,7 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
         top = np.fromfile( topfile, data.dtype ).reshape( [ny, nx] ).T
         return extent, bound, top, data
 
+
 class Model():
     """
     SCEC CVM-H model.
@@ -175,7 +233,7 @@ class Model():
     Init parameters
     ---------------
         prop:
-            2d property: 'topo', 'base', or 'moho'
+            2d property: 'topo', 'base', 'moho', 'wald', or 'wills'
             3d property: 'vp', 'vs', or 'tag'
         voxet:
             3d voxet list: ['mantle', 'crust', 'lab']
@@ -192,9 +250,10 @@ class Model():
     """
     def __init__( self, prop, voxet=['mantle', 'crust'], no_data_value='nan' ):
         self.prop = prop
-        if prop == 'vs30':
-            #self.voxet = [ wills_vs30 ]
-            self.voxet = [ wald_vs30() ]
+        if prop == 'wald':
+            self.voxet = [ vs30_wald() ]
+        elif prop == 'wills':
+            self.voxet = [ vs30_wills() ]
         elif prop in prop2d:
             self.voxet = [ cvmh_voxet( prop ) ]
         else:
@@ -213,6 +272,7 @@ class Model():
                 coord.interp3( extent, volume, (x, y, z), out, interpolation, bound )
         return out
 
+
 class Extraction():
     """
     Model extraction with geotechnical layer (GTL)
@@ -223,7 +283,6 @@ class Extraction():
         x, y: Cartesian coordinates
         topo: topography model
         vs30: Vs30 model, None=omit GTL
-        lon, lat: geographic coordinates
         zgtl: GTL interpolation depth
         interpolation: 'nearest', 'linear'
 
@@ -237,7 +296,7 @@ class Extraction():
     -------
         out: property samples at coordinates (x, y, z)
     """
-    def __init__( self, x, y, vm, topo, lon=None, lat=None, vs30=None, gtl_depth=100.0, interpolation='linear' ):
+    def __init__( self, x, y, vm, topo, vs30=None, gtl_depth=100.0, interpolation='linear' ):
         x = np.asarray( x )
         y = np.asarray( y )
         z0 = topo( x, y )
@@ -248,7 +307,7 @@ class Extraction():
             z1 = np.minimum( z0 - gtl_depth, z1 - 1.0 )
             d0 = 30.0
             d1 = z0 - z1
-            v_ = vs30( lon, lat )
+            v_ = vs30( x, y )
             v0 = v_ * 0.55
             v1 = v_ * 1.45
             v2 = vm( x, y, z1, interpolation=interpolation )
@@ -290,28 +349,34 @@ class Extraction():
                 out[i] = c1[i] + b1[i] * d[i]
         return out
 
-def extract( prop, lon, lat, dep, **kwarg ):
+
+def extract( prop, lon, lat, z, by_depth=True, gtl_depth=100.0, vs30='wald', method='linear' ):
     """
     Simple CVM-H extraction
 
     Parameters
     ----------
-        prop: Material property 'rho', 'vp', 'vs', or 'tag'
-        lon, lat, dep: Coordinate arrays
-        interpolation: 'nearest', or 'linear'
-        zgtl: GTL interpolation depth
+        prop: Material property, 'rho', 'vp', 'vs', or 'tag'.
+        lon, lat, z: Coordinate arrays.
+        by_depth: Z coordinate, True=depth, False=elevation.
+        gtl_depth: GTL interpolation depth, 0 = no GTL.
+        vs30: Vs30 map, 'wills', or 'wald'.
+        method: Interpolation method, 'linear', or 'nearest'.
 
     Returns
     -------
         f: Material array
     """
     import pyproj
-    proj = pyproj.Proj( **cst.cvmh.projection )
+    proj = pyproj.Proj( **projection )
     x, y = proj( lon, lat )
     topo = Model( 'topo' )
-    vs30 = Model( 'vs30' )
-    m = Model( prop )
-    ex = Extraction( x, y, m, topo, lon, lat, vs30, **kwarg )
-    f = ex( dep, by_depth=True )
+    vm = Model( prop )
+    if gtl_depth:
+        vs30 = Model( vs30 )
+        ex = Extraction( x, y, vm, topo, vs30, gtl_depth, method )
+    else:
+        ex = Extraction( x, y, vm, topo, None, gtl_depth, method )
+    f = ex( z, by_depth=by_depth )
     return f
 

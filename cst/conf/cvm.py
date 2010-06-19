@@ -1,6 +1,8 @@
 """
 CVM configuration
 """
+import os
+
 seconds = 400
 nsample = None
 lon_file = 'lon'

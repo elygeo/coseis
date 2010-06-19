@@ -7,8 +7,8 @@ import cst
 # parameters
 model = 'cvm4'
 model = 'cvmh'
-depth = 0.0; vmin, vmax = 200, 2000
 depth = 2000.0; vmin, vmax = 300, 3000
+depth = 0.0; vmin, vmax = 200, 2000
 delta = 0.5 / 60.0
 lon, lat = (-120.0, -114.5), (32.5, 35.0)
 path = 'run' + os.sep
@@ -22,7 +22,7 @@ z.fill( depth )
 
 # CVM extraction
 if model == 'cvmh':
-    vs = cst.cvmh.extract( 'vs', x, y, z )
+    vs = cst.cvmh.extract( 'vs', x, y, z, vs30='wald' )
 else:
     vs = cst.cvm.extract( x, y, z, rundir=path )[2]
 

@@ -33,6 +33,7 @@ def dot2( A, B ):
     else:
         return ( A[...,None,:,:] * B[...,None] ).T.sum( axis=1 )
 
+
 def solve2( A, b ):
     """
     Vectorized 2x2 linear equation solver
@@ -43,7 +44,8 @@ def solve2( A, b ):
     return np.array( [b[0] * A[1,1] - b[1] * A[0,1],
                       b[1] * A[0,0] - b[0] * A[1,0]] )
 
-def interp( extent, f, coords, out=None, bound=None, extrapolate=False ):
+
+def interp( extent, f, coords, out=None, bound=None, mask_nan=False, extrapolate=False ):
     """
     1D interpolation on a regular grid
     """
@@ -62,15 +64,21 @@ def interp( extent, f, coords, out=None, bound=None, extrapolate=False ):
     if not extrapolate:
         xi = np.minimum( np.maximum( xi, 0 ), n-1 )
     f = (1.0 - xi + j) * f[...,j] + (xi - j) * f[...,j+1]
-    if i is not True:
-        f[...,~i] = np.nan
-        if out != None:
+    if out is None:
+        if i is not True:
+            f[...,~i] = np.nan
+        return f
+    else:
+        if mask_nan:
+            i = i & ~np.isnan( f )
+        if i is True:
+            out[...] = f[...]
+        else:
             out[...,i] = f[...,i]
-    elif out != None:
-        out[...] = f[...]
-    return f
+        return
 
-def interp2( extent, f, coords, out=None, method='linear', bound=None, extrapolate=False ):
+
+def interp2( extent, f, coords, out=None, method='linear', bound=None, mask_nan=False, extrapolate=False ):
     """
     2D interpolation on a regular grid
     """
@@ -110,15 +118,23 @@ def interp2( extent, f, coords, out=None, method='linear', bound=None, extrapola
             + ( 1.0 - xi + j ) * (       yi - k ) * f[...,j,k+1]
             + (       xi - j ) * ( 1.0 - yi + k ) * f[...,j+1,k]
             + (       xi - j ) * (       yi - k ) * f[...,j+1,k+1] )
-    if i is not True:
-        f[...,~i] = np.nan
-        if out != None:
+    else:
+        sys.exit( 'Unknon interpolation method: %s' % method )
+    if out is None:
+        if i is not True:
+            f[...,~i] = np.nan
+        return f
+    else:
+        if mask_nan:
+            i = i & ~np.isnan( f )
+        if i is True:
+            out[...] = f[...]
+        else:
             out[...,i] = f[...,i]
-    elif out is not None:
-        out[...] = f[...]
-    return f
+        return
 
-def interp3( extent, f, coords, out=None, method='linear', bound=None, extrapolate=False ):
+
+def interp3( extent, f, coords, out=None, method='linear', bound=None, mask_nan=False, extrapolate=False ):
     """
     3D interpolation on a regular grid
     """
@@ -174,13 +190,19 @@ def interp3( extent, f, coords, out=None, method='linear', bound=None, extrapola
             + (       xi - j ) * (       yi - k ) * (       zi - l ) * f[...,j+1,k+1,l+1] )
     else:
         sys.exit( 'Unknon interpolation method: %s' % method )
-    if i is not True:
-        f[...,~i] = np.nan
-        if out != None:
+    if out is None:
+        if i is not True:
+            f[...,~i] = np.nan
+        return f
+    else:
+        if mask_nan:
+            i = i & ~np.isnan( f )
+        if i is True:
+            out[...] = f[...]
+        else:
             out[...,i] = f[...,i]
-    elif out is not None:
-        out[...] = f[...]
-    return f
+        return
+
 
 def ibilinear( xx, yy, xi, yi ):
     """
@@ -208,6 +230,7 @@ def ibilinear( xx, yy, xi, yi ):
         x  = x + dx
     return x
 
+
 def rot_sym_tensor( w1, w2, rot ):
     """
     Rotate symmetric 3x3 tensor stored as diagonal and off-diagonal vectors.
@@ -231,6 +254,7 @@ def rot_sym_tensor( w1, w2, rot ):
     w2 = mat.flat[[5, 6, 1]]
     return w1, w2
 
+
 def rotmat( x, origin=(0, 0, 0), upvector=(0, 0, 1) ):
     """
     Given a position vector x, find the rotation matrix to r,h,v coordinates.
@@ -246,6 +270,7 @@ def rotmat( x, origin=(0, 0, 0), upvector=(0, 0, 1) ):
     nv = np.cross( nr, nh )
     nv = nv / np.sqrt( (nv * nv).sum() )
     return np.array( [nr, nh, nv] )
+
 
 def llr2xyz( x, y, z, inverse=False ):
     """
@@ -270,6 +295,7 @@ def llr2xyz( x, y, z, inverse=False ):
         y_ = np.sin( x ) * np.cos( y ) * z
         z  = np.sin( y ) * z
         return np.array( [x_, y_, z] )
+
 
 def rotation( lon, lat, projection, eps=100.0 ):
     """
@@ -298,6 +324,7 @@ def rotation( lon, lat, projection, eps=100.0 ):
     theta = 180.0 / np.pi * np.arctan2( mat[0], mat[1] )
     theta = 0.5 * theta.sum(0) - 45.0
     return mat, theta
+
 
 def rotation3( lon, lat, dep, projection, eps=100.0 ):
     """
@@ -328,6 +355,7 @@ def rotation3( lon, lat, dep, projection, eps=100.0 ):
     s = 1.0 / np.sqrt( x * x + y * y + z * z )
     mat = np.array( [s * x, s * y, s * z] )
     return mat
+
 
 class Transform():
     """
@@ -396,6 +424,7 @@ class Transform():
                 x, y = proj( x, y, **kwarg )
         return np.array( [x, y] )
 
+
 def cmu( x, y, inverse=False ):
     """
     CMU TeraShake coordinates projection
@@ -410,6 +439,7 @@ def cmu( x, y, inverse=False ):
         x = (x + 1.0) * 300000.0
         y = (y + 1.0) * 150000.0
     return np.array( [x, y] )
+
 
 def slipvectors( strike, dip, rake ):
     """
@@ -437,6 +467,7 @@ def slipvectors( strike, dip, rake ):
     s = np.sin( strike )
     C = np.array( [[s, c, z], [-c, s, z], [z, z, u]] )
     return dot2( dot2( A, B ), C )
+
 
 def source_tensors( R ):
     """
@@ -468,6 +499,7 @@ def source_tensors( R ):
     normal = normal * normal
     return np.array( [strike, dip, normal] )
 
+
 def viewmatrix( azimuth, elevation, up=None ):
     """
     Compute transformation matrix from view azimuth and elevation.
@@ -485,6 +517,7 @@ def viewmatrix( azimuth, elevation, up=None ):
     z = z / np.sqrt( ( z * z ).sum() )
     return np.array( [x, y, z] ).T
 
+
 def compass( azimuth, radians=False ):
     """
     Get named direction from azimuth.
@@ -498,6 +531,7 @@ def compass( azimuth, radians=False ):
         'W', 'WNW', 'NW', 'NNW',
     )
     return names[ int( (azimuth / 22.5 + 0.5) % 16.0 ) ]
+
 
 if __name__ == '__main__':
     import doctest
