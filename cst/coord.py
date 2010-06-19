@@ -55,14 +55,14 @@ def interp( extent, f, coords, out=None, bound=None, extrapolate=False ):
     j = np.int32( xi )
     n = f.shape[-1]
     i = True
-    if bound != None:
+    if bound is not None:
         if bound[0]: i = i & (j >= 0)
         if bound[1]: i = i & (j <= n-2)
     j = np.minimum( np.maximum( j, 0 ), n-2 )
     if not extrapolate:
         xi = np.minimum( np.maximum( xi, 0 ), n-1 )
     f = (1.0 - xi + j) * f[...,j] + (xi - j) * f[...,j+1]
-    if bound != None:
+    if i is not True:
         f[...,~i] = np.nan
         if out != None:
             out[...,i] = f[...,i]
@@ -85,7 +85,7 @@ def interp2( extent, f, coords, out=None, method='linear', bound=None, extrapola
     if method == 'nearest':
         j = np.array( xi + 0.5, 'i' )
         k = np.array( yi + 0.5, 'i' )
-        if bound != None:
+        if bound is not None:
             if bound[0][0]: i = i & (j >= 0)
             if bound[1][0]: i = i & (k >= 0)
             if bound[0][1]: i = i & (j <= n[-2]-1)
@@ -110,11 +110,11 @@ def interp2( extent, f, coords, out=None, method='linear', bound=None, extrapola
             + ( 1.0 - xi + j ) * (       yi - k ) * f[...,j,k+1]
             + (       xi - j ) * ( 1.0 - yi + k ) * f[...,j+1,k]
             + (       xi - j ) * (       yi - k ) * f[...,j+1,k+1] )
-    if bound != None:
+    if i is not True:
         f[...,~i] = np.nan
         if out != None:
             out[...,i] = f[...,i]
-    elif out != None:
+    elif out is not None:
         out[...] = f[...]
     return f
 
@@ -135,7 +135,7 @@ def interp3( extent, f, coords, out=None, method='linear', bound=None, extrapola
         j = np.array( xi + 0.5, 'i' )
         k = np.array( yi + 0.5, 'i' )
         l = np.array( zi + 0.5, 'i' )
-        if bound != None:
+        if bound is not None:
             if bound[0][0]: i = i & (j >= 0)
             if bound[1][0]: i = i & (k >= 0)
             if bound[2][0]: i = i & (l >= 0)
@@ -174,11 +174,11 @@ def interp3( extent, f, coords, out=None, method='linear', bound=None, extrapola
             + (       xi - j ) * (       yi - k ) * (       zi - l ) * f[...,j+1,k+1,l+1] )
     else:
         sys.exit( 'Unknon interpolation method: %s' % method )
-    if bound != None:
+    if i is not True:
         f[...,~i] = np.nan
         if out != None:
             out[...,i] = f[...,i]
-    elif out != None:
+    elif out is not None:
         out[...] = f[...]
     return f
 
@@ -382,7 +382,7 @@ class Transform():
         proj = self.proj
         x = np.asarray( x )
         y = np.asarray( y )
-        if kwarg.get( 'inverse' ) != True:
+        if kwarg.get( 'inverse' ) is not True:
             if proj != None:
                 x, y = proj( x, y, **kwarg )
             x, y = dot2( self.mat[:2,:2], [x, y] )
@@ -472,7 +472,7 @@ def viewmatrix( azimuth, elevation, up=None ):
     """
     Compute transformation matrix from view azimuth and elevation.
     """
-    if up == None:
+    if up is None:
           if 5.0 < abs( elevation ) < 175.0:
               up = 0, 0, 1
           else:

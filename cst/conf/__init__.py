@@ -29,9 +29,9 @@ def prune( d, pattern=None, types=None ):
     >>> prune( {'aa': 0, 'aa_': 0, '_aa': 0, 'a_a': 0, 'b_b': prune} )
     {'a_a': 0}
     """
-    if pattern == None:
+    if pattern is None:
         pattern = '(^_)|(_$)|(^.$)|(^..$)'
-    if types == None:
+    if types is None:
         types = set(
             np.typeDict.values() +
             [type(None), bool, str, int, long, float, tuple, list, dict]
@@ -272,7 +272,7 @@ def prepare( job=None, **kwargs ):
     """
 
     # configure job
-    if job == None:
+    if job is None:
         job, kwargs = configure( **kwargs )
     job.__dict__.update( kwargs )
     job.jobid = None
@@ -350,7 +350,7 @@ def skeleton( job=None, stagein=(), new=True, **kwargs ):
     """
 
     # prepare job
-    if job == None:
+    if job is None:
         job = prepare( **kwargs )
     else:
         job.__dict__.update( kwargs )
@@ -390,7 +390,7 @@ def launch( job=None, stagein=(), new=True, **kwargs ):
     """
 
     # create skeleton
-    if job == None:
+    if job is None:
         job = skeleton( stagein=stagein, new=new, **kwargs )
     else:
         job.__dict__.update( kwargs )
@@ -446,7 +446,7 @@ if __name__ == '__main__':
     machines = [None] + os.listdir('.')
     for module in modules:
         for machine in machines:
-            if machine == None or os.path.isdir( machine ):
+            if machine is None or os.path.isdir( machine ):
                 print 80 * '-'
                 job = configure( module=module, machine=machine )[0]
                 job = prepare( job, rundir='tmp', command='date', run='exec', mode='s' )

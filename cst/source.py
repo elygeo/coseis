@@ -383,7 +383,7 @@ def srf2potency( src, path, delta=(1,1,1), proj=None ):
 
     # Coordinates
     rot = coord.rotation( x, y, proj )[1]
-    if proj != None:
+    if proj is not None:
         x, y = proj( x, y )
     x = np.asarray( 1.0 + x / delta[0], dtype_f )
     y = np.asarray( 1.0 + y / delta[1], dtype_f )
@@ -502,7 +502,7 @@ def srf2coulomb( path, proj, dest=None, scut=0 ):
     """
     import coord
 
-    if dest == None:
+    if dest is None:
         dest = os.path.join( path, 'coulomb-' )
 
     # Meta data

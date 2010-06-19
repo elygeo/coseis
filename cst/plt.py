@@ -12,7 +12,7 @@ def text( ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75, npmb=16, *
     """
     h = [ ax.text( x, y, s, **kwargs ) ]
     h[0].zorder += 1
-    if edgecolor != None:
+    if edgecolor is not None:
         if 'bbox' in kwargs:
             del( kwargs['bbox'] )
         kwargs['color'] = edgecolor
@@ -54,7 +54,7 @@ def colorbar( fig, cmap, clim, title=None, rect=None, ticks=None, ticklabels=Non
     """
     Matplotlib enhanced colorbar.
     """
-    if rect == None:
+    if rect is None:
         rect = 0.25, 0.08, 0.5, 0.02
     axis = clim[0], clim[1], 0, 1
     ax = fig.add_axes( rect )
@@ -68,9 +68,9 @@ def colorbar( fig, cmap, clim, title=None, rect=None, ticks=None, ticklabels=Non
     if title:
         x = 0.5 * (clim[0] + clim[1])
         text( ax, x, 2, title, ha='center', va='baseline', **kwargs )
-    if ticks == None:
+    if ticks is None:
         ticks = clim[0], 0.5 * (clim[0] + clim[1]), clim[1]
-    if ticklabels == None:
+    if ticklabels is None:
         ticklabels = ticks
     for i, x in enumerate( ticks ):
         s = '%s' % ticklabels[i]
@@ -137,12 +137,12 @@ def savefig( fig, fd=None, format=None, distill=False, **kwargs ):
     distilled using Ghostscript to produce smaller files.
     """
     import cStringIO
-    if type( fd ) == str:
-        if format == None:
+    if type( fd ) is str:
+        if format is None:
             format = fd.split( '.' )[-1]
         fd = open( os.path.expanduser( fd ), 'wb' )
     else:
-        if format == None:
+        if format is None:
             format = 'array'
     out = cStringIO.StringIO()
     if format == 'array':
@@ -159,7 +159,7 @@ def savefig( fig, fd=None, format=None, distill=False, **kwargs ):
     else:
         fig.savefig( out, format=format, **kwargs )
         out.reset()
-    if fd == None:
+    if fd is None:
         return( out )
     else:
         fd.write( out.getvalue() )

@@ -95,6 +95,7 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
     Returns
     -------
         extent: (x0, x1), (y0, y1), (z0, z1)
+        bound: (x0, x1), (y0, y1), (z0, z1)
         surface: array of properties for 2d data or model top for 3d data.
         volume: array of properties for 3d data or None for 2d data.
     """
@@ -121,6 +122,7 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
 
     # compute model top from Vs if not found
     if not os.path.exists( topfile ) and prop in prop3d:
+        print 'Searching for model top'
         p = prop3d['vs']
         voxet = gocad.voxet( voxfile, p )['1']
         data = voxet['PROP'][p]['DATA']
@@ -144,7 +146,7 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
         top.T.tofile( topfile )
 
     # load voxet
-    if prop == None:
+    if prop is None:
         return gocad.voxet( voxfile )
     elif prop in prop2d:
         pid = prop2d[prop]
@@ -163,8 +165,7 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
     if nz == 1:
         return extent, bound, data.squeeze(), None
     else:
-        dtype = data.dtype
-        top = np.fromfile( topfile, dtype ).reshape( [ny, nx] ).T
+        top = np.fromfile( topfile, data.dtype ).reshape( [ny, nx] ).T
         return extent, bound, top, data
 
 class Model():
@@ -202,11 +203,11 @@ class Model():
                 self.voxet += [ cvmh_voxet( prop, vox, no_data_value ) ]
         return
     def __call__( self, x, y, z=None, out=None, interpolation='linear' ):
-        if out == None:
+        if out is None:
             out = np.empty_like( x )
             out.fill( np.nan )
         for extent, bound, surface, volume in self.voxet:
-            if z == None:
+            if z is None:
                 coord.interp2( extent[:2], surface, (x, y), out, interpolation, bound )
             else:
                 coord.interp3( extent, volume, (x, y, z), out, interpolation, bound )
@@ -240,7 +241,7 @@ class Extraction():
         x = np.asarray( x )
         y = np.asarray( y )
         z0 = topo( x, y )
-        if vs30 == None:
+        if vs30 is None:
             gtl_depth = 0.0
         else:
             z1 = vm( x, y )
@@ -264,17 +265,17 @@ class Extraction():
     def __call__( self, z, out=None, min_depth=None, by_depth=True ):
         x, y, z0, vm, interpolation, gtl_depth = self.data
         z = np.asarray( z )
-        if out == None:
+        if out is None:
             out = np.empty_like( z )
             out.fill( np.nan )
-        if by_depth == False:
+        if by_depth is False:
             vm( x, y, z, out, interpolation )
             d = z0 - z
         else:
             vm( x, y, z0 - z, out, interpolation )
             d = z
         if gtl_depth > 0.0:
-            if min_depth == None:
+            if min_depth is None:
                 min_depth = d.min()
             if min_depth < gtl_depth:
                 b0, b1, c0, c1, d0, d1 = self.gtl

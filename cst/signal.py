@@ -56,7 +56,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=Non
         t = t[None].repeat( n, 0 )
         f = f[None].repeat( n, 0 )
     H = np.fft.rfft( h, nf )
-    if axes == None:
+    if axes is None:
         plt.clf()
         fig = plt.gcf()
         fig.canvas.set_window_title( title )

@@ -26,7 +26,7 @@ def text3d( x, y, z, s, bcolor=None, bwidth=0.5, bn=16, **kwargs ):
     """
     from enthought.mayavi import mlab
     h = []
-    if bcolor != None:
+    if bcolor is not None:
         args = kwargs.copy()
         args['color'] = bcolor
         for i in range( bn ):
@@ -124,7 +124,7 @@ class digital_clock():
         for hh in self.glyphs:
             for h in hh:
                 h.visible = False
-        if time != None:
+        if time is not None:
             self.colon.visible = True
             m = int( time / 60 )
             d = int( (time % 60) / 10 )

@@ -29,10 +29,10 @@ def prune( d, pattern=None, types=None ):
     >>> prune( {'aa': 0, 'aa_': 0, '_aa': 0, 'a_a': 0, 'b_b': prune} )
     {'a_a': 0}
     """
-    if pattern == None:
+    if pattern is None:
         pattern = '(^_)|(_$)|(^.$)|(^..$)'
 
-    if types == None:
+    if types is None:
         types = set(
             np.typeDict.values() +
             [type(None), bool, str, int, long, float, tuple, list, dict]
@@ -55,28 +55,28 @@ def save( fd, d, expand=None, keep=None, header='', prune_pattern=None, prune_ty
     prune( d, prune_pattern, prune_types )
     out = header
     for k in sorted( d ):
-        if k not in expand and (keep == None or k in keep):
+        if k not in expand and (keep is None or k in keep):
             out += '%s = %r\n' % (k, d[k])
     for k in expand:
         if k in d:
-            if type( d[k] ) == tuple:
+            if type( d[k] ) is tuple:
                 out += k + ' = (\n'
                 for item in d[k]:
                     out += '    %r,\n' % (item,)
                 out += ')\n'
-            elif type( d[k] ) == list:
+            elif type( d[k] ) is list:
                 out += k + ' = [\n'
                 for item in d[k]:
                     out += '    %r,\n' % (item,)
                 out += ']\n'
-            elif type( d[k] ) == dict:
+            elif type( d[k] ) is dict:
                 out += k + ' = {\n'
                 for item in sorted( d[k] ):
                     out += '    %r: %r,\n' % (item, d[k][item])
                 out += '}\n'
             else:
                 sys.exit( 'Cannot expand %s type %s' % ( k, type( d[k] ) ) )
-    if fd != None:
+    if fd is not None:
         if type( fd ) is not file:
             fd = open( os.path.expanduser( fd ), 'w' )
         fd.write( out )
@@ -89,7 +89,7 @@ def load( fd, d=None, prune_pattern=None, prune_types=None ):
     """
     if type( fd ) is not file:
         fd = open( os.path.expanduser( fd ) )
-    if d == None:
+    if d is None:
         d = {}
     exec fd in d
     prune( d, prune_pattern, prune_types )
@@ -225,7 +225,7 @@ def progress( t0=None, i=None, n=None, message='' ):
     Print progress and time remaining.
     """
     import time
-    if t0 == None:
+    if t0 is None:
          return time.time()
     if message:
          message += ': '

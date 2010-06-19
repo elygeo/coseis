@@ -257,7 +257,7 @@ def run( job=None, **kwargs ):
     """
     Stage (if necessary) and launch job
     """
-    if job == None:
+    if job is None:
         job = stage( **kwargs )
     elif type( job ) == dict:
         job.update( kwargs )

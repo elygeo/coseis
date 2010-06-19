@@ -9,7 +9,7 @@ def header( lines, counter=0, casters=None ):
     """
     GOCAD header reader
     """
-    if casters == None:
+    if casters is None:
         casters = {
             int: ('pclip', 'field'),
             bool: ('imap', 'ivolmap', 'parts', 'transparency'),
@@ -77,7 +77,7 @@ def voxet( path, load_prop=None, no_data_value='nan' ):
                 else:
                     prop[f[1]][k[1]] = cast[k[1]]( f[2] )
         elif f[0] == 'END':
-            if load_prop != None:
+            if load_prop is not None:
                 n = axis['N']
                 p = prop[load_prop]
                 f = os.path.join( os.path.dirname( path ), p['FILE'] )
@@ -85,7 +85,7 @@ def voxet( path, load_prop=None, no_data_value='nan' ):
                 data = np.fromfile( f, dtype )
                 if no_data_value == 'nan':
                     data[data==p['NO_DATA_VALUE']] = np.nan
-                elif no_data_value != None:
+                elif no_data_value is not None:
                     data[data==p['NO_DATA_VALUE']] = no_data_value
                 p['DATA'] = data.reshape( n[::-1] ).T
             voxet[id_] = {'HEADER': hdr, 'AXIS': axis, 'PROP': prop}

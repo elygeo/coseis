@@ -45,7 +45,7 @@ def etopo1( indices=None, downsample=1 ):
         if downsample > 1:
             z = coord.downsample_sphere( z, downsample )
         open( filename, 'wb' ).write( z )
-    if indices != None:
+    if indices is not None:
         shape = (21601 - 1) / downsample + 1, (10801 - 1) / downsample + 1
         return util.ndread( filename, shape, indices, 'f' )
     else:
@@ -79,7 +79,7 @@ def globe( indices=None ):
             row.tofile( fd )
         fd.close()
         del( z, row )
-    if indices != None:
+    if indices is not None:
         shape = 43200, 21600
         return util.ndread( filename, shape, indices, '<i2' )
     else:
@@ -129,13 +129,13 @@ def us_place_names( kind=None, extent=None ):
     kind_ = np.genfromtxt( data, delimiter='|', skip_header=1, usecols=(2,), dtype='S64' )
     data.reset()
     lat, lon, elev = np.genfromtxt( data, delimiter='|', skip_header=1, usecols=(9,10,15) ).T
-    if kind != None:
+    if kind is not None:
         i = kind == kind_
         lon = lon[i]
         lat = lat[i]
         elev = elev[i]
         name = name[i]
-    if extent != None:
+    if extent is not None:
         x, y = extent
         i = (lon >= x[0]) & (lon <= x[1]) & (lat >= y[0]) & (lat <= y[1])
         lon = lon[i]
@@ -173,7 +173,7 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
     member = 'gshhs/%s_%s.b' % (kind, resolution[0])
     if kind != 'gshhs':
         min_area = 0.0
-    if extent != None:
+    if extent is not None:
         lon, lat = extent
         lon = lon[0] % 360, lon[1] % 360
         extent = lon, lat
@@ -199,14 +199,14 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
         area = hdr[7] * 0.1
         if area < min_area:
             continue
-        if extent != None:
+        if extent is not None:
             west, east, south, north = hdr[3:7] * 1e-6
             west, east, south, north = hdr[3:7] * 1e-6
             if east < lon[0] or west > lon[1] or north < lat[0] or south > lat[1]:
                 continue
         nkeep += 1
         x, y = 1e-6 * np.array( data[ii-2*n:ii].reshape(n, 2).T, 'f' )
-        if extent != None and clip != 0:
+        if extent is not None and clip != 0:
             if delta:
                 x, y = clipdata( x, y, extent, 1 )[:2]
                 x, y = densify( x, y, delta )
