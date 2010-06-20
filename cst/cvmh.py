@@ -90,17 +90,12 @@ def vs30_wills():
         dtype = '<i2'
         bytes = np.dtype( dtype ).itemsize
         delta = 0.00021967246502752
-        shape = 49867, 44016
-        nx, ny, nz = 49867, 1048, 42
-        nx, ny, nz = 49867, 1834, 24
-        nx, ny, nz = 49867, 2751, 16
+        nx, ny, nz = 49867, 1048, 42 # slowest, least memory
+        nx, ny, nz = 49867, 1834, 24 # medium
+        nx, ny, nz = 49867, 2751, 16 # fastest, most memory
         x0, y0 = -124.52997177169, 32.441345502265
         x1 = x0 + (nx - 1) * delta
-
-        import time
-        t0 = time.time()
-
-        print( 'Resampling Wills Vs30' )
+        print( 'Resampling Wills Vs30 (will take about 5 min)' )
         for i in range( nz ):
             sys.stdout.write( '.' )
             sys.stdout.flush()
@@ -113,10 +108,6 @@ def vs30_wills():
             coord.interp2( extent, v, (x, y), data, 'nearest', mask_nan=True )
         print('')
         np.save( f, data )
-
-        t1 = time.time()
-        print 222222, t1 - t0
-
     return extent_gtl, None, data, None
 
 
