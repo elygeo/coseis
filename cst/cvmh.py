@@ -64,7 +64,7 @@ def vs30_wald():
         y =   30.0 + delta,   50.0 - delta
         extent = x, y
         x, y = gtl_coords()
-        data = coord.interp2( extent, data, (x, y), method='linear' )
+        data = coord.interp2( extent, data, (x, y), method='linear' ).astype( 'f' )
         np.save( f, data )
     return extent_gtl, None, data, None
 
@@ -87,17 +87,20 @@ def vs30_wills():
             if os.system( 'scp %s %s' % (url, f0) ):
                 sys.exit()
         fh = open( f0, 'rb' )
-        print( 'Resampling Wills Vs30 ----------------------->|' )
-        delta = 0.00021967246502752
-        x0, y0 = -124.52997177169, 32.441345502265
-        nx, ny, nz = 44016, 1061, 47
-        x1 = x0 + (nx - 1) * delta
         dtype = '<i2'
         bytes = np.dtype( dtype ).itemsize
+        delta = 0.00021967246502752
+        shape = 49867, 44016
+        nx, ny, nz = 49867, 1048, 42
+        nx, ny, nz = 49867, 1834, 24
+        nx, ny, nz = 49867, 2751, 16
+        x0, y0 = -124.52997177169, 32.441345502265
+        x1 = x0 + (nx - 1) * delta
 
         import time
         t0 = time.time()
 
+        print( 'Resampling Wills Vs30' )
         for i in range( nz ):
             sys.stdout.write( '.' )
             sys.stdout.flush()
