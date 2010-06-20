@@ -105,8 +105,7 @@ def vs30_wills():
             extent = (x0, x1), (y1, y2)
             v = fh.read( nx * ny * bytes )
             v = np.fromstring( v, dtype ).astype( 'f' ).reshape( (ny, nx) ).T
-            i = v == -9999 | v == 0
-            v[i] = np.nan
+            v[v<=0] = np.nan
             coord.interp2( extent, v, (x, y), data, 'nearest', bound, mask_nan=True )
         print('')
         np.save( f, data )
