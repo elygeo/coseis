@@ -95,17 +95,19 @@ def vs30_wills():
         nx, ny, nz = 49867, 2751, 16 # fastest, most memory
         x0, y0 = -124.52997177169, 32.441345502265
         x1 = x0 + (nx - 1) * delta
-        print( 'Resampling Wills Vs30 (will take about 5 min)' )
-        for i in range( nz ):
+        bound = (True, True), (True, True)
+        print( 'Resampling Wills Vs30 (takes about 5 min)' )
+        for k in range( nz ):
             sys.stdout.write( '.' )
             sys.stdout.flush()
-            y1 = y0 + ((nz - i) * ny - 1) * delta
-            y2 = y0 + ((nz - i) * ny - ny) * delta
+            y1 = y0 + ((nz - k) * ny - 1) * delta
+            y2 = y0 + ((nz - k) * ny - ny) * delta
             extent = (x0, x1), (y1, y2)
             v = fh.read( nx * ny * bytes )
             v = np.fromstring( v, dtype ).astype( 'f' ).reshape( (ny, nx) ).T
-            v[v==-9999] = np.nan
-            coord.interp2( extent, v, (x, y), data, 'nearest', mask_nan=True )
+            i = v == -9999 | v == 0
+            v[i] = np.nan
+            coord.interp2( extent, v, (x, y), data, 'nearest', bound, mask_nan=True )
         print('')
         np.save( f, data )
     return extent_gtl, None, data, None
