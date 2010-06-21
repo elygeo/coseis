@@ -345,7 +345,7 @@ class Extraction():
         return out
 
 
-def extract( prop, x, y, z, geographic=True, by_depth=True, gtl_depth=100.0, vs30='wald', method='linear' ):
+def extract( prop, x, y, z, geographic=True, by_depth=True, gtl_depth=100.0, vs30='wills', method='linear' ):
     """
     Simple CVM-H extraction
 

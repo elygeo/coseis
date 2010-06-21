@@ -176,39 +176,39 @@ for more.
 Examples
 ========
 
-CVM4 depth slice
+CVM depth slices
 ----------------
 
 .. image:: fig/cvm4-vs500.png
+.. image:: fig/cvmh-vs500.png
 
 Extract S-wave velocity at 500 m depth. Plot using Matplotlib::
 
-    cd scripts/cvm-example
-    python mesh.py
+    cd scripts/cvm
+    python test.py
 
 Source code:
-`mesh.py <../scripts/cvm-example/mesh.py>`__
+`test.py <../scripts/cvm/test.py>`__
 
-.. include:: ../scripts/cvm-example/mesh.py
+.. include:: ../scripts/cvm/test.py
     :literal:
 
-CVM4 fence diagram
-------------------
+CVM fence diagram
+-----------------
 
 .. image:: fig/cvm4-fence.png
 
 Build a fence diagram similar to Magistrale (2000) figure 10. Plot using
 Mayavi::
 
-    cd scripts/fence
+    cd scripts/cvm
     python fence.py
 
 Source code:
-`mesh.py <../scripts/fence/mesh.py>`__
-`plot.py <../scripts/fence/plot.py>`__
+`fence.py <../scripts/cvm/fence.py>`__
 
-CVM4 Basin depth
-----------------
+CVM-4 Basin depth
+-----------------
 
 .. image:: fig/cvm4-z25.png
 

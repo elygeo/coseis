@@ -94,7 +94,7 @@ Quick test
 Run a simple point source explosion test and plot a 2D slice of particle
 velocity::
 
-    cd scripts/example
+    cd scripts/sord
     python sim.py -i
     python plot.py
 
@@ -108,7 +108,7 @@ Scripting with Python
 For a simple example consider the above test,
 `sim.py <../scripts/example/sim.py>`__:
 
-.. include:: ../scripts/example/sim.py
+.. include:: ../scripts/sord/sim.py
    :literal:
 
 Every script starts by importing the ``cst`` module.  SORD parameters are
