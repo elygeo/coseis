@@ -9,6 +9,7 @@ from enthought.mayavi import mlab
 import cst
 
 # parameters
+prop = 'vs'
 model = 'cvm4'
 model = 'cvmh'
 dx = 200.0; dz = 50.0; nz = 201
@@ -69,13 +70,14 @@ zz, xx = np.meshgrid( z, xx )
 zz, yy = np.meshgrid( z, yy )
 
 # do extraction
+if transpose:
+    xx, yy, zz = xx.T, yy.T, zz.T
 if model == 'cvmh':
-    ss = cst.cvmh.extract( 'vs', xx, yy, zz )
+    ss = cst.cvmh.extract( xx, yy, zz, prop )
 else:
-    if transpose:
-        ss = cst.cvm.extract( xx.T, yy.T, zz.T, rundir=path )[1].T
-    else:
-        ss = cst.cvm.extract( xx, yy, zz, rundir=path )[1]
+    ss = cst.cvm.extract( xx, yy, zz, prop )
+if transpose:
+    xx, yy, zz, ss = xx.T, yy.T, zz.T, ss.T
 xx, yy = proj( xx, yy )
 zz *= -3.0
 

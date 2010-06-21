@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 """
 SCEC Community Velocity Model (CVM-H) extraction tool
-
-TODO: merge Wills and Wald Vs30 maps into CVMH projection
 """
 import os, sys
 import numpy as np
@@ -345,14 +343,14 @@ class Extraction():
         return out
 
 
-def extract( prop, x, y, z, geographic=True, by_depth=True, gtl_depth=100.0, vs30='wills', method='linear' ):
+def extract( x, y, z, prop, geographic=True, by_depth=True, gtl_depth=100.0, vs30='wills', method='linear' ):
     """
     Simple CVM-H extraction
 
     Parameters
     ----------
-        prop: Material property, 'rho', 'vp', 'vs', or 'tag'.
         x, y, z: Coordinate arrays.
+        prop: Material property, 'rho', 'vp', 'vs', or 'tag'.
         geographic: X, Y coordinates, True=geographic, False=UTM.
         by_depth: Z coordinate, True=depth, False=elevation.
         gtl_depth: GTL interpolation depth, 0 = no GTL.

@@ -136,15 +136,16 @@ def stage( inputs={}, **kwargs ):
     cst.util.save( f, job.__dict__ )
     return job
 
-def extract( lon, lat, dep, **kwargs ):
+def extract( lon, lat, dep, prop=None, **kwargs ):
     """
     Simple CVM extraction
 
     Parameters
     ----------
-        lon, lat, dep : Coordinate arrays
-        nproc : Optional, number of processes
-        rundir : Optional, job staging directory
+        lon, lat, dep: Coordinate arrays
+        prop: 'rho', 'vp', or 'vs'. None=all
+        nproc: Optional, number of processes
+        rundir: Optional, job staging directory
 
     Returns
     -------
@@ -161,8 +162,13 @@ def extract( lon, lat, dep, **kwargs ):
     dep.tofile( path + 'dep' )
     del( lon, lat, dep )
     launch( job, run='exec' )
-    rho = np.fromfile( path + job.rho_file, 'f' ).reshape( shape )
-    vp =  np.fromfile( path + job.vp_file,  'f' ).reshape( shape )
-    vs =  np.fromfile( path + job.vs_file,  'f' ).reshape( shape )
-    return rho, vp, vs
+    if prop is not None:
+        f = {'rho': job.rho_file, 'vp': job.vp_file, 'vs': job.vs_file}
+        f = np.fromfile( path + f[prop], 'f' ).reshape( shape )
+        return f
+    else:
+        rho = np.fromfile( path + job.rho_file, 'f' ).reshape( shape )
+        vp =  np.fromfile( path + job.vp_file,  'f' ).reshape( shape )
+        vs =  np.fromfile( path + job.vs_file,  'f' ).reshape( shape )
+        return rho, vp, vs
 
