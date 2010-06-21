@@ -360,6 +360,10 @@ def extract( x, y, z, prop, geographic=True, by_depth=True, gtl_depth=100.0, vs3
     Returns
     -------
         f: Material array
+
+    Note: Do not use this routine to assemble large meshes piece-by-piece, as
+    the model will be read from disk each time.  Instead, break up model reading
+    and extraction into separate steps.
     """
     vm = Model( prop )
     topo = Model( 'topo' )
