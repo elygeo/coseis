@@ -7,7 +7,6 @@ import numpy as np
 import cst
 
 # parameters
-workdir = 'run'
 delta = 0.25 / 60.0, 0.25 / 60.0, 20.0;   nproc = 512
 delta = 1.0  / 60.0, 1.0  / 60.0, 1000.0; nproc = 1
 extent = (-120.5, -112.5), (31.0, 36.0), (0.0, 11000.0)
@@ -43,7 +42,7 @@ if __name__ == '__main__':
     # CVM setup
     print 'shape = %s' % (shape,)
     n = shape[0] * shape[1] * shape[2]
-    job = cst.cvm.stage( nsample=n, nproc=nproc, workdir=workdir )
+    job = cst.cvm.stage( nsample=n, nproc=nproc )
     path = job.rundir + os.sep
 
     # write CVM input files

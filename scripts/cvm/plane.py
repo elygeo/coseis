@@ -12,7 +12,6 @@ vmin, vmax = 300, 3200
 delta = 0.5 / 60.0
 lon, lat = (-120.0, -114.5), (32.5, 35.0)
 cmap = cst.plt.colormap( 'rgb' )
-path = 'run' + os.sep
 
 # create mesh
 x = np.arange( lon[0], lon[1] + delta/2, delta )
@@ -39,7 +38,7 @@ for vs, tag in (vs4, '4'), (vsh, 'H'):
     ax.set_aspect( 1.0 / np.cos( 33.75 / 180.0 * np.pi ) )
     ax.set_title( 'CVM-%s %.0f m depth' % (tag, depth) )
     ax.axis( lon+lat )
-    f = path + 'cvm%s-%s%.0f.png' % (tag.lower(), prop, depth)
+    f = 'cvm%s-%s%.0f.png' % (tag.lower(), prop, depth)
     print f
     fig.savefig( f )
 

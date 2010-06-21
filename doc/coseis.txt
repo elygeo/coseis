@@ -2,7 +2,7 @@
 Coseis: Computational Seismology Tools
 ======================================
 
-.. image:: fig/ely-saf-surface.jpg
+.. image:: ely-saf-surface.jpg
    :align: right
    :target: http://earth.usc.edu/~gely/ely-saf-surface.mov
 
@@ -176,27 +176,27 @@ for more.
 Examples
 ========
 
-CVM depth slices
+CVM depth planes
 ----------------
 
-.. image:: fig/cvm4-vs500.png
-.. image:: fig/cvmh-vs500.png
+.. image:: ../scripts/cvm/cvm4-vs500.png
+.. image:: ../scripts/cvm/cvmh-vs500.png
 
-Extract S-wave velocity at 500 m depth. Plot using Matplotlib::
+Extract S-wave velocity at 500 meters depth. Plot using Matplotlib::
 
     cd scripts/cvm
-    python test.py
+    python plane.py
 
 Source code:
-`test.py <../scripts/cvm/test.py>`__
+`plane.py <../scripts/cvm/plane.py>`__
 
-.. include:: ../scripts/cvm/test.py
+.. include:: ../scripts/cvm/plane.py
     :literal:
 
 CVM fence diagram
 -----------------
 
-.. image:: fig/cvm4-fence.png
+.. image:: ../scripts/cvm/cvm4-vp-fence.png
 
 Build a fence diagram similar to Magistrale (2000) figure 10. Plot using
 Mayavi::
@@ -210,7 +210,7 @@ Source code:
 CVM-4 Basin depth
 -----------------
 
-.. image:: fig/cvm4-z25.png
+.. image:: ../scripts/basindepth/cvm4-z25.png
 
 Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s.
 Plot over topography using Mayavi::

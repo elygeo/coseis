@@ -2,7 +2,7 @@
 SORD
 ====
 
-.. image:: fig/ely-saf-surface.jpg
+.. image:: ely-saf-surface.jpg
    :align: right
    :target: http://earth.usc.edu/~gely/ely-saf-surface.mov
 
@@ -100,13 +100,13 @@ velocity::
 
 Plotting requires Matplotlib, and the result should look like this:
 
-    .. image:: fig/example.png
+    .. image:: ../scripts/sord/example.png
 
 Scripting with Python
 ---------------------
 
 For a simple example consider the above test,
-`sim.py <../scripts/example/sim.py>`__:
+`sim.py <../scripts/sord/sim.py>`__:
 
 .. include:: ../scripts/sord/sim.py
    :literal:
@@ -217,9 +217,9 @@ large) 3D material and mesh coordinate files.
 
 All input modes may use '+' instead of '=' to add to, rather than replace,
 preexisting values.  For a list of available time functions, see the
-``time_function`` subroutine in `<src/util.f90>`__.  The routine can be easily
-modified to add new time functions.  Time functions can be offset in time with
-the ``tm0`` initial time parameter.
+``time_function`` subroutine in `<../cst/sord/src/util.f90>`__.  The routine
+can be easily modified to add new time functions.  Time functions can be offset
+in time with the ``tm0`` initial time parameter.
 
 
 Boundary Conditions
@@ -235,11 +235,11 @@ anti-mirror symmetry condition.  The following BC types are supported:
 
 **Type 0**: Vacuum free-surface.  Stress is zero in cells outside the boundary.
 
-    .. image:: fig/bc0.png
+    .. image:: bc/bc0.png
 
 **Type 3**: Rigid surface. Displacement is zero at the boundary.
 
-    .. image:: fig/bc3.png
+    .. image:: bc/bc3.png
 
 **Type 1**: Mirror symmetry at the node.  Normal displacement is zero at the
 boundary.  Useful for a boundary corresponding to (a) the plane orthogonal to
@@ -247,24 +247,24 @@ the two nodal planes of a double-couple point source, (b) the plane normal to
 the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D
 plane strain problem.
 
-    .. image:: fig/bc1.png
+    .. image:: bc/bc1.png
 
 **Type -1**: Anti-mirror symmetry at the node.  Tangential displacement is zero
 at the boundary.  Useful for a boundary corresponding to (a) the nodal planes
 of a double-couple point source, (b) the plane normal to the mode-II axis of a
 symmetric rupture, or (c) the zero-width axis of a 2D antiplane strain problem.
 
-    .. image:: fig/bc-1.png
+    .. image:: bc/bc-1.png
 
 **Type 2**: Mirror symmetry at the cell. Same as type 1, but centered on the cell.
 
-    .. image:: fig/bc2.png
+    .. image:: bc/bc2.png
 
 **Type -2**: Anti-mirror symmetry at the cell.  Same as type -1, but centered
 on the cell.  Can additionally be used when the boundary corresponds to the
 slip surface of a symmetric rupture.
 
-    .. image:: fig/bc-2.png
+    .. image:: bc/bc-2.png
 
 **Type 10**: Perfectly match layer (PML) absorbing boundary.
 
@@ -354,8 +354,8 @@ time step per one million mesh points.  SORD scalability has been benchmarked
 up to 16 thousand processors at the TACC Ranger facility.  The following chart
 is the wall-time per step for 8 million mesh points per core (click for PDF):
 
-.. image:: fig/sord-benchmark-ranger.png
-    :target: fig/sord-benchmark-ranger.pdf
+.. image:: ../scripts/benchmark/sord-benchmark-ranger.png
+    :target: ../scripts/benchmark/sord-benchmark-ranger.pdf
 
 This benchmark tests computation only. For many applications, disk output is
 the primary bottleneck and will limit scalability.  When configuring domain

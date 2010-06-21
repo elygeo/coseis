@@ -196,7 +196,7 @@ fig.scene.parallel_projection = True
 fig.scene.camera.parallel_scale = axis[3]
 
 # combine overlay and save image
-f = path + field + '.' + format
+f = field + '.' + format
 print f
 out = cst.mlab.screenshot( fig )
 if format == 'pdf':

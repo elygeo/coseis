@@ -107,7 +107,7 @@ img {
 <div class="document" id="sord">
 <h1 class="title">SORD</h1>
 
-<a class="reference external image-reference" href="http://earth.usc.edu/~gely/ely-saf-surface.mov"><img align="right" alt="fig/ely-saf-surface.jpg" class="align-right" src="fig/ely-saf-surface.jpg" /></a>
+<a class="reference external image-reference" href="http://earth.usc.edu/~gely/ely-saf-surface.mov"><img align="right" alt="ely-saf-surface.jpg" class="align-right" src="ely-saf-surface.jpg" /></a>
 <div class="contents topic" id="contents">
 <p class="topic-title first">Contents</p>
 <ul class="simple">
@@ -204,13 +204,13 @@ python plot.py
 </pre>
 <p>Plotting requires Matplotlib, and the result should look like this:</p>
 <blockquote>
-<img alt="fig/example.png" src="fig/example.png" />
+<img alt="../scripts/sord/example.png" src="../scripts/sord/example.png" />
 </blockquote>
 </div>
 <div class="section" id="scripting-with-python">
 <h4>Scripting with Python</h4>
 <p>For a simple example consider the above test,
-<a class="reference external" href="../scripts/example/sim.py">sim.py</a>:</p>
+<a class="reference external" href="../scripts/sord/sim.py">sim.py</a>:</p>
 <pre class="literal-block">
 #!/usr/bin/env python
 import cst                                # import the Coseis module
@@ -328,9 +328,9 @@ or 2D models into 3D simulations, obviating the need to store (possibly very
 large) 3D material and mesh coordinate files.</p>
 <p>All input modes may use '+' instead of '=' to add to, rather than replace,
 preexisting values.  For a list of available time functions, see the
-<tt class="docutils literal">time_function</tt> subroutine in <a class="reference external" href="src/util.f90">src/util.f90</a>.  The routine can be easily
-modified to add new time functions.  Time functions can be offset in time with
-the <tt class="docutils literal">tm0</tt> initial time parameter.</p>
+<tt class="docutils literal">time_function</tt> subroutine in <a class="reference external" href="../cst/sord/src/util.f90">../cst/sord/src/util.f90</a>.  The routine
+can be easily modified to add new time functions.  Time functions can be offset
+in time with the <tt class="docutils literal">tm0</tt> initial time parameter.</p>
 </div>
 <div class="section" id="boundary-conditions">
 <h4>Boundary Conditions</h4>
@@ -343,11 +343,11 @@ a slip surface, the fault may be placed at the boundary and combined with an
 anti-mirror symmetry condition.  The following BC types are supported:</p>
 <p><strong>Type 0</strong>: Vacuum free-surface.  Stress is zero in cells outside the boundary.</p>
 <blockquote>
-<img alt="fig/bc0.png" src="fig/bc0.png" />
+<img alt="bc/bc0.png" src="bc/bc0.png" />
 </blockquote>
 <p><strong>Type 3</strong>: Rigid surface. Displacement is zero at the boundary.</p>
 <blockquote>
-<img alt="fig/bc3.png" src="fig/bc3.png" />
+<img alt="bc/bc3.png" src="bc/bc3.png" />
 </blockquote>
 <p><strong>Type 1</strong>: Mirror symmetry at the node.  Normal displacement is zero at the
 boundary.  Useful for a boundary corresponding to (a) the plane orthogonal to
@@ -355,24 +355,24 @@ the two nodal planes of a double-couple point source, (b) the plane normal to
 the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D
 plane strain problem.</p>
 <blockquote>
-<img alt="fig/bc1.png" src="fig/bc1.png" />
+<img alt="bc/bc1.png" src="bc/bc1.png" />
 </blockquote>
 <p><strong>Type -1</strong>: Anti-mirror symmetry at the node.  Tangential displacement is zero
 at the boundary.  Useful for a boundary corresponding to (a) the nodal planes
 of a double-couple point source, (b) the plane normal to the mode-II axis of a
 symmetric rupture, or (c) the zero-width axis of a 2D antiplane strain problem.</p>
 <blockquote>
-<img alt="fig/bc-1.png" src="fig/bc-1.png" />
+<img alt="bc/bc-1.png" src="bc/bc-1.png" />
 </blockquote>
 <p><strong>Type 2</strong>: Mirror symmetry at the cell. Same as type 1, but centered on the cell.</p>
 <blockquote>
-<img alt="fig/bc2.png" src="fig/bc2.png" />
+<img alt="bc/bc2.png" src="bc/bc2.png" />
 </blockquote>
 <p><strong>Type -2</strong>: Anti-mirror symmetry at the cell.  Same as type -1, but centered
 on the cell.  Can additionally be used when the boundary corresponds to the
 slip surface of a symmetric rupture.</p>
 <blockquote>
-<img alt="fig/bc-2.png" src="fig/bc-2.png" />
+<img alt="bc/bc-2.png" src="bc/bc-2.png" />
 </blockquote>
 <p><strong>Type 10</strong>: Perfectly match layer (PML) absorbing boundary.</p>
 <p>Example: a 3D problem with a free surface at Z=0, and PML absorbing boundaries
@@ -458,7 +458,7 @@ operator type for fastest performance.</p>
 time step per one million mesh points.  SORD scalability has been benchmarked
 up to 16 thousand processors at the TACC Ranger facility.  The following chart
 is the wall-time per step for 8 million mesh points per core (click for PDF):</p>
-<a class="reference external image-reference" href="fig/sord-benchmark-ranger.pdf"><img alt="fig/sord-benchmark-ranger.png" src="fig/sord-benchmark-ranger.png" /></a>
+<a class="reference external image-reference" href="../scripts/benchmark/sord-benchmark-ranger.pdf"><img alt="../scripts/benchmark/sord-benchmark-ranger.png" src="../scripts/benchmark/sord-benchmark-ranger.png" /></a>
 <p>This benchmark tests computation only. For many applications, disk output is
 the primary bottleneck and will limit scalability.  When configuring domain
 decomposition, it is important to minimize the number of cores accessing a

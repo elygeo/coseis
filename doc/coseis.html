@@ -107,7 +107,7 @@ img {
 <div class="document" id="coseis-computational-seismology-tools">
 <h1 class="title">Coseis: Computational Seismology Tools</h1>
 
-<a class="reference external image-reference" href="http://earth.usc.edu/~gely/ely-saf-surface.mov"><img align="right" alt="fig/ely-saf-surface.jpg" class="align-right" src="fig/ely-saf-surface.jpg" /></a>
+<a class="reference external image-reference" href="http://earth.usc.edu/~gely/ely-saf-surface.mov"><img align="right" alt="ely-saf-surface.jpg" class="align-right" src="ely-saf-surface.jpg" /></a>
 <div class="contents topic" id="contents">
 <p class="topic-title first">Contents</p>
 <ul class="simple">
@@ -116,7 +116,7 @@ img {
 <li><a class="reference internal" href="#installation" id="id3">Installation</a></li>
 <li><a class="reference internal" href="#source-control" id="id4">Source control</a></li>
 <li><a class="reference internal" href="#examples" id="id5">Examples</a><ul>
-<li><a class="reference internal" href="#cvm-depth-slices" id="id6">CVM depth slices</a></li>
+<li><a class="reference internal" href="#cvm-depth-planes" id="id6">CVM depth planes</a></li>
 <li><a class="reference internal" href="#cvm-fence-diagram" id="id7">CVM fence diagram</a></li>
 <li><a class="reference internal" href="#cvm-4-basin-depth" id="id8">CVM-4 Basin depth</a></li>
 </ul>
@@ -270,17 +270,17 @@ for more.</p>
 </div>
 <div class="section" id="examples">
 <h3>Examples</h3>
-<div class="section" id="cvm-depth-slices">
-<h4>CVM depth slices</h4>
-<img alt="fig/cvm4-vs500.png" src="fig/cvm4-vs500.png" />
-<img alt="fig/cvmh-vs500.png" src="fig/cvmh-vs500.png" />
-<p>Extract S-wave velocity at 500 m depth. Plot using Matplotlib:</p>
+<div class="section" id="cvm-depth-planes">
+<h4>CVM depth planes</h4>
+<img alt="../scripts/cvm/cvm4-vs500.png" src="../scripts/cvm/cvm4-vs500.png" />
+<img alt="../scripts/cvm/cvmh-vs500.png" src="../scripts/cvm/cvmh-vs500.png" />
+<p>Extract S-wave velocity at 500 meters depth. Plot using Matplotlib:</p>
 <pre class="literal-block">
 cd scripts/cvm
-python test.py
+python plane.py
 </pre>
 <p>Source code:
-<a class="reference external" href="../scripts/cvm/test.py">test.py</a></p>
+<a class="reference external" href="../scripts/cvm/plane.py">plane.py</a></p>
 <pre class="literal-block">
 #!/usr/bin/env python
 import os
@@ -296,7 +296,6 @@ vmin, vmax = 300, 3200
 delta = 0.5 / 60.0
 lon, lat = (-120.0, -114.5), (32.5, 35.0)
 cmap = cst.plt.colormap( 'rgb' )
-path = 'run' + os.sep
 
 # create mesh
 x = np.arange( lon[0], lon[1] + delta/2, delta )
@@ -323,7 +322,7 @@ for vs, tag in (vs4, '4'), (vsh, 'H'):
     ax.set_aspect( 1.0 / np.cos( 33.75 / 180.0 * np.pi ) )
     ax.set_title( 'CVM-%s %.0f m depth' % (tag, depth) )
     ax.axis( lon+lat )
-    f = path + 'cvm%s-%s%.0f.png' % (tag.lower(), prop, depth)
+    f = 'cvm%s-%s%.0f.png' % (tag.lower(), prop, depth)
     print f
     fig.savefig( f )
 
@@ -332,7 +331,7 @@ for vs, tag in (vs4, '4'), (vsh, 'H'):
 </div>
 <div class="section" id="cvm-fence-diagram">
 <h4>CVM fence diagram</h4>
-<img alt="fig/cvm4-fence.png" src="fig/cvm4-fence.png" />
+<img alt="../scripts/cvm/cvm4-vp-fence.png" src="../scripts/cvm/cvm4-vp-fence.png" />
 <p>Build a fence diagram similar to Magistrale (2000) figure 10. Plot using
 Mayavi:</p>
 <pre class="literal-block">
@@ -344,7 +343,7 @@ python fence.py
 </div>
 <div class="section" id="cvm-4-basin-depth">
 <h4>CVM-4 Basin depth</h4>
-<img alt="fig/cvm4-z25.png" src="fig/cvm4-z25.png" />
+<img alt="../scripts/basindepth/cvm4-z25.png" src="../scripts/basindepth/cvm4-z25.png" />
 <p>Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s.
 Plot over topography using Mayavi:</p>
 <pre class="literal-block">

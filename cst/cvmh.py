@@ -343,7 +343,8 @@ class Extraction():
         return out
 
 
-def extract( x, y, z, prop, geographic=True, by_depth=True, gtl_depth=100.0, vs30='wills', method='linear' ):
+def extract( x, y, z, prop, geographic=True, by_depth=True, gtl_depth=100.0,
+    vs30='wills', interpolation='linear' ):
     """
     Simple CVM-H extraction
 
@@ -373,9 +374,9 @@ def extract( x, y, z, prop, geographic=True, by_depth=True, gtl_depth=100.0, vs3
         x, y = proj( x, y )
     if gtl_depth:
         vs30 = Model( vs30 )
-        ex = Extraction( x, y, vm, topo, vs30, gtl_depth, method )
+        ex = Extraction( x, y, vm, topo, vs30, gtl_depth, interpolation )
     else:
-        ex = Extraction( x, y, vm, topo, None, gtl_depth, method )
+        ex = Extraction( x, y, vm, topo, None, gtl_depth, interpolation )
     f = ex( z, by_depth=by_depth )
     return f
 

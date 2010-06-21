@@ -9,14 +9,13 @@ from enthought.mayavi import mlab
 import cst
 
 # parameters
-prop = 'vs'
-model = 'cvm4'
 model = 'cvmh'
+model = 'cvm4'
+prop, vmin, vmax = 'vs', 500, 4000
+prop, vmin, vmax = 'vp', 1600, 6400
 dx = 200.0; dz = 50.0; nz = 201
 dx = 400.0; dz = 100.0; nz = 101
 nproc = 2
-path = 'run' + os.sep
-transpose = True
 transpose = False
 
 # projection
@@ -69,7 +68,7 @@ z = dz * np.arange( nz )
 zz, xx = np.meshgrid( z, xx )
 zz, yy = np.meshgrid( z, yy )
 
-# do extraction
+# cvm extraction
 if transpose:
     xx, yy, zz = xx.T, yy.T, zz.T
 if model == 'cvmh':
@@ -96,7 +95,7 @@ for n in nn:
     y = yy[i:i+n]
     z = zz[i:i+n]
     s = ss[i:i+n]
-    h = mlab.mesh( x, y, z, scalars=s, vmin=1500, vmax=6500 )
+    h = mlab.mesh( x, y, z, scalars=s, vmin=vmin, vmax=vmax )
     lut = cst.mlab.colormap( 'bgr' )[::-1]
     h.module_manager.scalar_lut_manager.lut.table = lut
     i += n
@@ -118,8 +117,7 @@ mlab.view( -90, 45, 2e6, (0, 0, -2e4) )
 fig.scene.camera.view_angle = 3.3
 fig.scene.light_manager.lights[3].activate = True
 fig.scene.disable_render = False
-f = path + '%s-fence.png' % model
+f = '%s-%s-fence.png' % (model, prop)
 print f
 mlab.savefig( f, magnification=1 )
-mlab.show()
 
