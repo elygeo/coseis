@@ -345,14 +345,15 @@ class Extraction():
         return out
 
 
-def extract( prop, lon, lat, z, by_depth=True, gtl_depth=100.0, vs30='wald', method='linear' ):
+def extract( prop, x, y, z, geographic=True, by_depth=True, gtl_depth=100.0, vs30='wald', method='linear' ):
     """
     Simple CVM-H extraction
 
     Parameters
     ----------
         prop: Material property, 'rho', 'vp', 'vs', or 'tag'.
-        lon, lat, z: Coordinate arrays.
+        x, y, z: Coordinate arrays.
+        geographic: X, Y coordinates, True=geographic, False=UTM.
         by_depth: Z coordinate, True=depth, False=elevation.
         gtl_depth: GTL interpolation depth, 0 = no GTL.
         vs30: Vs30 map, 'wills', or 'wald'.
@@ -362,11 +363,12 @@ def extract( prop, lon, lat, z, by_depth=True, gtl_depth=100.0, vs30='wald', met
     -------
         f: Material array
     """
-    import pyproj
-    proj = pyproj.Proj( **projection )
-    x, y = proj( lon, lat )
-    topo = Model( 'topo' )
     vm = Model( prop )
+    topo = Model( 'topo' )
+    if geographic:
+        import pyproj
+        proj = pyproj.Proj( **projection )
+        x, y = proj( x, y )
     if gtl_depth:
         vs30 = Model( vs30 )
         ex = Extraction( x, y, vm, topo, vs30, gtl_depth, method )

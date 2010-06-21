@@ -88,6 +88,16 @@ def globe( indices=None ):
 def topo( extent, scale=1.0 ):
     """
     Extrat merged GLOBE/ETOPO1 digital elvation model for given region.
+
+    Parameters
+    ----------
+        extent: (lon_min, lon_max), (lat_min, lat_max)
+        scale: Scaling factor for elevation data
+
+    Returns
+    -------
+        z: Elevation array
+        extent: Extent of z array possible larger than requested extent.
     """
     o = 0.25
     lon, lat = extent
