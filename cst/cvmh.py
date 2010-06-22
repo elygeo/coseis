@@ -273,9 +273,9 @@ class Extraction():
     Init parameters
     ---------------
         x, y: Coordinates arrays
-        vm: 'vp', 'vs', 'tag', or prop3d model object.
-        vs30: 'wills', 'wald', None, or vs30 model object.
-        topo: 'topo' or topography model object.
+        vm: 'vp', 'vs', 'tag', or Model object.
+        vs30: 'wills', 'wald', None, or Model object.
+        topo: 'topo' or Model object.
         gtl_depth: GTL interpolation depth.
         interpolation: 'nearest', or 'linear'.
 
@@ -353,12 +353,12 @@ class Extraction():
 
 def extract( x, y, z, vm, geographic=True, by_depth=True, **kwargs ):
     """
-    Simple CVM-H extraction. See Extraction() for parameter documentation.
+    Simple CVM-H extraction.
 
     Parameters
     ----------
         x, y, z: Coordinates arrays
-        vm: 'vp', 'vs', 'tag', or prop3d model object.
+        vm: 'vp', 'vs', 'tag', or Model object.
         geographic: X Y coordinate type, True for geographic, False for UTM.
         by_depth: Z coordinate type, True for depth, False for elevation.
         **kwargs: Keyword arguments passed to Extraction()

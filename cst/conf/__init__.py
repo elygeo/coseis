@@ -395,6 +395,12 @@ def launch( job=None, stagein=(), new=True, **kwargs ):
     else:
         job.__dict__.update( kwargs )
 
+    # serial or mpi mode
+    if not job.mode:
+        job.mode = 's'
+        if job.nproc > 1:
+            job.mode = 'm'
+
     # launch command
     if not job.run:
         return job
@@ -402,7 +408,7 @@ def launch( job=None, stagein=(), new=True, **kwargs ):
     if job.run == 'submit':
         if job.depend:
             k += '2'
-    elif job.mode:
+    else:
         k = job.mode + '_' + k
     if k in job.launch:
         cmd = job.launch[k] % job.__dict__
