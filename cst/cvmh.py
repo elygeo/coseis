@@ -146,8 +146,8 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
     -------
         extent: (x0, x1), (y0, y1), (z0, z1)
         bound: (x0, x1), (y0, y1), (z0, z1)
-        surface: array of properties for 2d data or model top for 3d data.
-        volume: array of properties for 3d data or None for 2d data.
+        surface: Array of properties for 2d data or model top for 3d data.
+        volume: Array of properties for 3d data or None for 2d data.
     """
 
     # download if not found
@@ -233,13 +233,13 @@ class Model():
 
     Call parameters
     ---------------
-        x, y, z: sample coordinate arrays.
-        out: output array, same shape as x, y, and z.
-        interpolation: 'nearest', 'linear'
+        x, y, z: Sample coordinate arrays.
+        out: Optional output array with same shape as coordinate arrays.
+        interpolation: 'nearest', or 'linear'
 
     Returns
     -------
-        out: property samples at coordinates (x, y, z)
+        out: Property samples at coordinates (x, y, z)
     """
     def __init__( self, prop, voxet=['mantle', 'crust'], no_data_value='nan' ):
         self.prop = prop
@@ -268,30 +268,38 @@ class Model():
 
 class Extraction():
     """
-    Model extraction with geotechnical layer (GTL)
+    CVM-H extraction with geotechnical layer (GTL)
 
     Init parameters
     ---------------
-        vm: velocity model
-        x, y: Cartesian coordinates
-        topo: topography model
-        vs30: Vs30 model, None=omit GTL
-        zgtl: GTL interpolation depth
-        interpolation: 'nearest', 'linear'
+        x, y: Coordinates arrays
+        vm: 'vp', 'vs', 'tag', or prop3d model object.
+        vs30: 'wills', 'wald', None, or vs30 model object.
+        topo: 'topo' or topography model object.
+        gtl_depth: GTL interpolation depth.
+        interpolation: 'nearest', or 'linear'.
 
     Call parameters
     ---------------
-        z: elevation (or depth) coordinate
-        out: output array, same shape as z
-        by_depth: z coordinate type, True=depth, False=elevation
+        z: Vertical coordinate array.
+        out: Optional output array, same shape as coordinate arrays.
+        min_depth: Minimum depth in Z array, optional but provides speed-up.
+        by_depth: Z coordinate type, True for depth, False for elevation.
 
     Returns
     -------
-        out: property samples at coordinates (x, y, z)
+        out: Property samples at coordinates (x, y, z)
     """
-    def __init__( self, x, y, vm, topo, vs30=None, gtl_depth=100.0, interpolation='linear' ):
+    def __init__( self, x, y, vm, vs30='wills', topo='topo', gtl_depth=100.0,
+        interpolation='linear' ):
         x = np.asarray( x )
         y = np.asarray( y )
+        if type( vm ) is str:
+            vm = Model( vm )
+        if type( vs30 ) is str:
+            vs30 = Model( vs30 )
+        if type( topo ) is str:
+            topo = Model( topo )
         z0 = topo( x, y )
         if vs30 is None:
             gtl_depth = 0.0
@@ -343,40 +351,27 @@ class Extraction():
         return out
 
 
-def extract( x, y, z, prop, geographic=True, by_depth=True, gtl_depth=100.0,
-    vs30='wills', interpolation='linear' ):
+def extract( x, y, z, vm, geographic=True, by_depth=True, **kwargs ):
     """
-    Simple CVM-H extraction
+    Simple CVM-H extraction. See Extraction() for parameter documentation.
 
     Parameters
     ----------
-        x, y, z: Coordinate arrays.
-        prop: Material property, 'rho', 'vp', 'vs', or 'tag'.
-        geographic: X, Y coordinates, True=geographic, False=UTM.
-        by_depth: Z coordinate, True=depth, False=elevation.
-        gtl_depth: GTL interpolation depth, 0 = no GTL.
-        vs30: Vs30 map, 'wills', or 'wald'.
-        method: Interpolation method, 'linear', or 'nearest'.
+        x, y, z: Coordinates arrays
+        vm: 'vp', 'vs', 'tag', or prop3d model object.
+        geographic: X Y coordinate type, True for geographic, False for UTM.
+        by_depth: Z coordinate type, True for depth, False for elevation.
+        **kwargs: Keyword arguments passed to Extraction()
 
     Returns
     -------
-        f: Material array
-
-    Note: Do not use this routine to assemble large meshes piece-by-piece, as
-    the model will be read from disk each time.  Instead, break up model reading
-    and extraction into separate steps.
+        out: Property samples at coordinates (x, y, z)
     """
-    vm = Model( prop )
-    topo = Model( 'topo' )
     if geographic:
         import pyproj
         proj = pyproj.Proj( **projection )
         x, y = proj( x, y )
-    if gtl_depth:
-        vs30 = Model( vs30 )
-        ex = Extraction( x, y, vm, topo, vs30, gtl_depth, interpolation )
-    else:
-        ex = Extraction( x, y, vm, topo, None, gtl_depth, interpolation )
-    f = ex( z, by_depth=by_depth )
-    return f
+    f = Extraction( x, y, vm, **kwargs )
+    out = f( z, by_depth=by_depth )
+    return out
 
