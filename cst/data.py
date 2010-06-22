@@ -2,23 +2,9 @@
 """
 Mapping data utilities
 """
-"""
-TODO
-Quaternary Fault Database
-ftp://hazards.cr.usgs.gov/maps/qfault/
-ReadmeFIRST.txt
-Areas.kmz
-AllFaultsKMZ.zip
-Historic.kmz
-Holocene_LatestPleistocene.kmz
-LateQuaternary.kmz
-MidToLateQuaternary.kmz
-Quaternary.kmz
-qfaultsshapefiles.zip
-fltline.htm
-fltline.txt
-fltline.xml
-"""
+# TODO
+# Quaternary Fault Database
+# ftp://hazards.cr.usgs.gov/maps/qfault/
 import os, urllib, gzip, zipfile
 import numpy as np
 from cStringIO import StringIO
@@ -87,7 +73,7 @@ def globe( indices=None ):
 
 def topo( extent, scale=1.0 ):
     """
-    Extrat merged GLOBE/ETOPO1 digital elvation model for given region.
+    Extract merged GLOBE/ETOPO1 digital elevation model for given region.
 
     Parameters
     ----------

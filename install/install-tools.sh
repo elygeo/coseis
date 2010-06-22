@@ -10,9 +10,9 @@ easy_install docutils
 easy_install ipython
 
 # zlib
-url="http://www.zlib.net/zlib-1.2.4.tar.gz"
+url="http://www.zlib.net/zlib-1.2.5.tar.gz"
 curl "${url}" | tar zx
-cd zlib-1.2.4
+cd zlib-1.2.5
 ./configure --prefix="${prefix}"
 make install
 ./configure --prefix="${prefix}" --shared

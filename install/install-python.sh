@@ -14,13 +14,13 @@ make
 make install
 export PATH="${prefix}/bin:${PATH}"
 
-# setuptools
-curl -O http://peak.telecommunity.com/dist/ez_setup.py
-python ez_setup.py --prefix="${prefix}"
+# setuptools deprecated
+#curl -O http://peak.telecommunity.com/dist/ez_setup.py
+#python ez_setup.py --prefix="${prefix}"
 
-# distribute may eventually replace setuptools
-#curl -O http://python-distribute.org/distribute_setup.py
-#python distribute_setup.py --prefix="${prefix}"
+# distribute
+curl -O http://python-distribute.org/distribute_setup.py
+python distribute_setup.py --prefix="${prefix}"
 
 # PyPI packages
 easy_install cython
