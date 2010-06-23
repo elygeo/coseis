@@ -2,7 +2,7 @@
 """
 SCEC Community Velocity Model (CVM-H) extraction tool
 """
-import os, sys
+import os, sys, urllib
 import numpy as np
 import coord, gocad
 import cst
@@ -37,14 +37,14 @@ def gtl_coords( delta_gtl=250.0 ):
 
 def vs30_wald():
     """
-    Download and prepare Wald, et al. Vs30 map.
+    Wald, et al. Vs30 map.
     """
     repo = cst.site.repo
     f = os.path.join( repo, 'cvm_vs30_wald.npy' )
     if os.path.exists( f ):
         data = np.load( f )
     else:
-        import urllib, gzip
+        import gzip
         url = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
         f0 = os.path.join( repo, os.path.basename( url ) )
         if not os.path.exists( f0 ):
@@ -67,13 +67,17 @@ def vs30_wald():
     return extent_gtl, None, data, None
 
 
-def vs30_wills():
+def vs30_wills( rebuild=False ):
     """
-    Download and prepare Wills Vs30 map.
+    Wills and Clahan Vs30 map.
     """
     repo = cst.site.repo
-    f = os.path.join( repo, 'cvm_vs30_wills.npy' )
-    if os.path.exists( f ):
+    url = 'http://earth.usc.edu/~gely/coseis/download/cvm_vs30_wills.npy'
+    f = os.path.join( repo, os.path.basename( url ) )
+    if not rebuild:
+        if not os.path.exists( f ):
+            print( 'Downloading %s' % url )
+            urllib.urlretrieve( url, f )
         data = np.load( f )
     else:
         data = vs30_wald()[2]
@@ -154,7 +158,7 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
     repo = cst.site.repo
     path = os.path.join( repo, version, 'bin' )
     if not os.path.exists( path ):
-        import urllib, tarfile
+        import tarfile
         f = os.path.join( repo, '%s.tar.bz2' % version )
         if not os.path.exists( f ):
             url = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2' % version

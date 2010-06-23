@@ -24,6 +24,13 @@ python distribute_setup.py --prefix="${prefix}"
 
 # PyPI packages
 easy_install cython
-easy_install numpy
 easy_install pyproj
+
+# NumPy
+url='http://downloads.sourceforge.net/project/numpy/NumPy/1.4.1/numpy-1.4.1.tar.gz'
+dir=$( basename "$url" .tar.gz )
+cd "${prefix}"
+curl "${url}" | tar zx
+cd "${dir}"
+python setup install --prefix="${prefix}"
 
