@@ -35,22 +35,22 @@ def gtl_coords( delta_gtl=250.0 ):
     return x, y
 
 
-def vs30_wald():
+def vs30_wald( rebuild=False ):
     """
     Wald, et al. Vs30 map.
     """
     repo = cst.site.repo
-    f = os.path.join( repo, 'cvm_vs30_wald.npy' )
-    if os.path.exists( f ):
-        data = np.load( f )
+    filename = os.path.join( repo, 'cvm_vs30_wald.npy' )
+    if not rebuild and os.path.exists( filename ):
+        data = np.load( filename )
     else:
         import gzip
         url = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
-        f0 = os.path.join( repo, os.path.basename( url ) )
-        if not os.path.exists( f0 ):
+        f = os.path.join( repo, os.path.basename( url ) )
+        if not os.path.exists( f ):
             print( 'Downloading %s' % url )
-            urllib.urlretrieve( url, f0 )
-        fh = gzip.open( f0 )
+            urllib.urlretrieve( url, f )
+        fh = gzip.open( f )
         print( 'Resampling Wald Vs30' )
         dtype = '>f'
         nx, ny = 2280, 2400
@@ -63,7 +63,7 @@ def vs30_wald():
         extent = x, y
         x, y = gtl_coords()
         data = coord.interp2( extent, data, (x, y), method='linear' ).astype( 'f' )
-        np.save( f, data )
+        np.save( filename, data )
     return extent_gtl, None, data, None
 
 
@@ -73,22 +73,22 @@ def vs30_wills( rebuild=False ):
     """
     repo = cst.site.repo
     url = 'http://earth.usc.edu/~gely/coseis/download/cvm_vs30_wills.npy'
-    f = os.path.join( repo, os.path.basename( url ) )
+    filename = os.path.join( repo, os.path.basename( url ) )
     if not rebuild:
-        if not os.path.exists( f ):
+        if not os.path.exists( filename ):
             print( 'Downloading %s' % url )
-            urllib.urlretrieve( url, f )
-        data = np.load( f )
+            urllib.urlretrieve( url, filename )
+        data = np.load( filename )
     else:
         data = vs30_wald()[2]
         x, y = gtl_coords()
         url = 'opensha.usc.edu:/export/opensha/data/siteData/wills2006.bin'
-        f0 = os.path.join( repo, os.path.basename( url ) )
-        if not os.path.exists( f0 ):
+        f = os.path.join( repo, os.path.basename( url ) )
+        if not os.path.exists( f ):
             print( 'Downloading %s' % url )
-            if os.system( 'scp %s %s' % (url, f0) ):
+            if os.system( 'scp %s %s' % (url, f) ):
                 sys.exit()
-        fh = open( f0, 'rb' )
+        fh = open( f, 'rb' )
         dtype = '<i2'
         bytes = np.dtype( dtype ).itemsize
         delta = 0.00021967246502752
@@ -110,7 +110,7 @@ def vs30_wills( rebuild=False ):
             v[v<=0] = np.nan
             coord.interp2( extent, v, (x, y), data, 'nearest', bound, mask_nan=True )
         print('')
-        np.save( f, data )
+        np.save( filename, data )
     return extent_gtl, None, data, None
 
 

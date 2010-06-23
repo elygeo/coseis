@@ -7,7 +7,6 @@ Mapping data utilities
 # ftp://hazards.cr.usgs.gov/maps/qfault/
 import os, urllib, gzip, zipfile
 import numpy as np
-from cStringIO import StringIO
 import coord, util
 import cst
 
@@ -17,22 +16,24 @@ def etopo1( indices=None, downsample=1 ):
     http://www.ngdc.noaa.gov/mgg/global/global.html
     """
     repo = cst.site.repo
+    shape = 21601, 10801
     filename = os.path.join( repo, 'etopo%02d-ice.f32' % downsample )
     if not os.path.exists( filename ):
-        url = 'ftp://ftp.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
-        f = os.path.join( repo, os.path.basename( url ) )
-        if not os.path.exists( f ):
+        f1 = os.path.join( repo, 'etopo1_ice_g_i2.bin' )
+        if not os.path.exists( f1 ):
+            url = 'ftp://ftp.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
             print( 'Retrieving %s' % url )
+            f = os.path.join( repo, os.path.basename( url ) )
             urllib.urlretrieve( url, f )
+            zipfile.extractall( f )
         print( 'Creating %s' % filename )
-        z = zipfile.ZipFile( f, 'r' ).read( 'etopo1_ice_g_i2.bin' )
-        z = np.fromstring( z, '<i2' ).reshape( [21601, 10801] )
-        z = np.array( z, 'f' )
+        z = np.fromfile( f1, '<i2' ).astype( 'f' ).reshape( shape )
         if downsample > 1:
             z = coord.downsample_sphere( z, downsample )
         open( filename, 'wb' ).write( z )
     if indices is not None:
-        shape = (21601 - 1) / downsample + 1, (10801 - 1) / downsample + 1
+        x, y = shape
+        shape = (x - 1) / downsample + 1, (y - 1) / downsample + 1
         return util.ndread( filename, shape, indices, 'f' )
     else:
         return
@@ -112,14 +113,15 @@ def us_place_names( kind=None, extent=None ):
     """
     USGS place name database.
     """
-    url = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
     repo = cst.site.repo
-    filename = os.path.join( repo, os.path.basename( url ) )
+    filename = os.path.join( repo, 'US_CONCISE.txt' )
     if not os.path.exists( filename ):
+        url = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
         print( 'Downloading %s' % url )
-        urllib.urlretrieve( url, filename )
-    data = zipfile.ZipFile( filename ).read( 'US_CONCISE.txt' )
-    data = StringIO( data )
+        f = os.path.join( repo, os.path.basename( url ) )
+        urllib.urlretrieve( url, f )
+        zipfile.extractall( f )
+    data = open( filename ).read()
     name = np.genfromtxt( data, delimiter='|', skip_header=1, usecols=(1,), dtype='S64' )
     data.reset()
     kind_ = np.genfromtxt( data, delimiter='|', skip_header=1, usecols=(2,), dtype='S64' )
@@ -140,6 +142,7 @@ def us_place_names( kind=None, extent=None ):
         name = name[i]
     return (lon, lat, elev, name)
 
+
 def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, min_level=0, max_level=4, delta=None, clip=1 ):
     """
     Reader for the Global Self-consistent, Hierarchical, High-resolution Shoreline
@@ -147,13 +150,13 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
 
     Parameters
     ----------
-        kind : { 'coastlines', 'rivers', 'borders' }
-        resolution : { 'crude', 'low', 'intermediate', 'high', 'full' }
-        extent : (min_lon, max_lon), (min_lat, max_lat)
+        kind: 'coastlines', 'rivers', or 'borders'
+        resolution: 'crude', 'low', 'intermediate', 'high', or 'full'
+        extent: (min_lon, max_lon), (min_lat, max_lat)
 
     Returns
     -------
-        x, y : Arrays of coordinates.
+        x, y: Coordinates arrays.
 
     Reference:
     Wessel, P., and W. H. F. Smith, A Global Self-consistent, Hierarchical,
@@ -162,21 +165,22 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
     http://www.soest.hawaii.edu/wessel/gshhs/index.html
     """
     nh = 11
-    url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.0/gshhs_2.0.zip'
     repo = cst.site.repo
-    filename = os.path.join( repo, os.path.basename( url ) )
-    kind = dict(c='gshhs', r='wdb_rivers', b='wdb_borders')[kind[0]]
-    member = 'gshhs/%s_%s.b' % (kind, resolution[0])
+    kind = {'c': 'gshhs', 'r': 'wdb_rivers', 'b': 'wdb_borders'}[kind[0]]
     if kind != 'gshhs':
         min_area = 0.0
     if extent is not None:
         lon, lat = extent
         lon = lon[0] % 360, lon[1] % 360
         extent = lon, lat
+    filename = os.path.join( repo, 'gshhs/%s_%s.b' % (kind, resolution[0]) )
     if not os.path.exists( filename ):
+        url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.0/gshhs_2.0.zip'
         print( 'Downloading %s' % url )
-        urllib.urlretrieve( url, filename )
-    data = np.fromstring( zipfile.ZipFile( filename ).read( member ), '>i' )
+        f = os.path.join( repo, os.path.basename( url ) )
+        urllib.urlretrieve( url, f )
+        zipfile.extractall( f )
+    data = np.fromfile( filename, '>i' )
     xx = []
     yy = []
     ii = 0
@@ -211,11 +215,12 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
             x, y = densify( x, y, delta )
         xx += [ x, [np.nan] ]
         yy += [ y, [np.nan] ]
-    print '%s, resolution: %s, selected %s of %s' % (member, resolution, nkeep, ntotal)
+    print '%s: selected %s of %s' % (filename, nkeep, ntotal)
     if nkeep:
         xx = np.concatenate( xx )[:-1]
         yy = np.concatenate( yy )[:-1]
     return np.array( [xx, yy], 'f' )
+
 
 def clipdata( x, y, extent, lines=1 ):
     """
@@ -242,6 +247,7 @@ def clipdata( x, y, extent, lines=1 ):
         i[1:] = i[:-1] | i[1:]
     return x[i], y[i], i
 
+
 def densify( x, y, delta ):
     """
     Piecewise up-sample line segments with spacing delta.
@@ -262,6 +268,7 @@ def densify( x, y, delta ):
     xx = np.concatenate( xx )
     yy = np.concatenate( yy )
     return np.array( [xx, yy] )
+
 
 def engdahlcat( path='engdahl-centennial-cat.f32', fields=['lon', 'lat', 'depth', 'mag'] ):
     """
@@ -299,6 +306,7 @@ def engdahlcat( path='engdahl-centennial-cat.f32', fields=['lon', 'lat', 'depth'
         out = np.fromfile( path, 'f' ).reshape( (-1,4) ).T
     return out
 
+
 def upsample( f ):
     n = list( f.shape )
     n[:2] = [ n[0] * 2 - 1, n[1] * 2 - 1 ]
@@ -318,6 +326,7 @@ def downsample( f, d ):
             g += f[j::d,k::d]
     g *= 1.0 / (d * d)
     return g
+
 
 def downsample_sphere( f, d ):
     """
@@ -343,6 +352,7 @@ def downsample_sphere( f, d ):
     g[:,-1] = g[:,-1].mean()
     g *= 1.0 / (d * d)
     return g
+
 
 if __name__ == '__main__':
     import doctest
