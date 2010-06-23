@@ -33,6 +33,7 @@ launch = {
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
 }
+python = '/lustre/scratch/proj/yt_common/trunk/bin/python'
 fortran_serial = 'ftn',
 fortran_mpi = 'ftn',
 fortran_flags = {

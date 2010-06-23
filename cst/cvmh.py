@@ -44,13 +44,15 @@ def vs30_wald( rebuild=False ):
     if not rebuild and os.path.exists( filename ):
         data = np.load( filename )
     else:
-        import gzip
-        url = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
-        f = os.path.join( repo, os.path.basename( url ) )
-        if not os.path.exists( f ):
+        f1 = os.path.join( repo, 'Western_US.grd' )
+        if not os.path.exists( f1 ):
+            import gzip
+            url = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
             print( 'Downloading %s' % url )
+            f = os.path.join( repo, os.path.basename( url ) )
             urllib.urlretrieve( url, f )
-        fh = gzip.open( f )
+            open( f1, 'wb' ).write( gzip.open( f ).read() )
+        fh = open( f1 )
         print( 'Resampling Wald Vs30' )
         dtype = '>f'
         nx, ny = 2280, 2400

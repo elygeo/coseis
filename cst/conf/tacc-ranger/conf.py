@@ -16,6 +16,7 @@ lfs quota -u $USER $SCRATCH
 
 .profile
 module unload mvapich
+#module swap pgi gcc"
 module load mvapich2
 alias showme='showq -u'
 
