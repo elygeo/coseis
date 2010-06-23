@@ -160,13 +160,12 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
     repo = cst.site.repo
     path = os.path.join( repo, version, 'bin' )
     if not os.path.exists( path ):
-        import tarfile
-        f = os.path.join( repo, '%s.tar.bz2' % version )
-        if not os.path.exists( f ):
-            url = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2' % version
-            print( 'Downloading %s' % url )
-            urllib.urlretrieve( url, f )
-        tarfile.open( f, 'r:bz2' ).extractall( repo )
+        url = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2' % version
+        print( 'Downloading %s' % url )
+        f = os.path.join( repo, os.path.basename( url ) )
+        urllib.urlretrieve( url, f )
+        if os.system( 'tar jxf %s' % f ):
+            sys.exit()
 
     # voxet ID
     if voxet in voxet3d:
