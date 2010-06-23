@@ -23,7 +23,7 @@ collecting hardware performance data
 account: TG-MCA03S012
 """
 login = 'kraken-pwd.nics.utk.edu'
-hosts = 'kraken-pwd3',
+hosts = 'kraken-pwd3', 'kraken-pwd4'
 maxram = 15000
 maxcores = 12
 maxnodes = 8256
