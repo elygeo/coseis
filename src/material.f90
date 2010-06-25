@@ -27,12 +27,6 @@ call fieldio( '<', 'gam', gam )
 s1 = lam
 s2 = mu
 
-! Test for endian problems
-if ( any( mr  /= mr  ) .or. maxval( mr  ) > huge( r ) ) stop 'NaN/Inf in rho'
-if ( any( s1  /= s1  ) .or. maxval( s1  ) > huge( r ) ) stop 'NaN/Inf in vp'
-if ( any( s2  /= s2  ) .or. maxval( s2  ) > huge( r ) ) stop 'NaN/Inf in vs'
-if ( any( gam /= gam ) .or. maxval( gam ) > huge( r ) ) stop 'NaN/Inf in gam'
-
 ! Limits
 if ( rho1 > 0.0 ) mr = max( mr, rho1 )
 if ( rho2 > 0.0 ) mr = min( mr, rho2 )

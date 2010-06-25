@@ -67,6 +67,11 @@ rcrit = 1000.0			# nucleation critical radius
 trelax = 0.07			# nucleation relaxation time
 svtol = 0.001			# slip velocity considered rupturing
 
+# nucleation by gradually overstressing
+rnucl = 3000.0
+tmnucl = 1.0
+delts = 1.125
+
 # Finite source parameters
 source = 'potency'		# 'moment', 'potency', 'force', or 'none'
 nsource = 0			# number of sub-faults

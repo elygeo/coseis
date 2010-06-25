@@ -35,6 +35,7 @@ def build( mode=None, optimize=None ):
         'gridgen.f90',
         'material.f90',
         'source.f90',
+        'inivolstress.f90',
         'rupture.f90',
         'resample.f90',
         'checkpoint.f90',

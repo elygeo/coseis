@@ -14,6 +14,8 @@ l = nm(3)
 
 ! 3d vectors
 allocate(         &
+    si1(j,k,l,3), &
+    si2(j,k,l,3), &
     vv(j,k,l,3),  &
     uu(j,k,l,3),  &
 !   z1(j,k,l,3),  &
@@ -74,6 +76,8 @@ l = i1(3)
 allocate(          &
     nhat(j,k,l,3), &
     t0(j,k,l,3),   &
+    ts0(j,k,l,3),  &
+    tp(j,k,l,3),   &
     t1(j,k,l,3),   &
     t2(j,k,l,3),   &
     t3(j,k,l,3)    )

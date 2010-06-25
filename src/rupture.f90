@@ -8,10 +8,11 @@ subroutine rupture_init
 use m_globals
 use m_collective
 use m_surfnormals
+use m_inivolstress
 use m_util
 use m_fieldio
 use m_stats
-real :: rr
+real :: xhypo(3), xi(3), w !, rr
 integer :: i1(3), i2(3), i, j, k, l
 
 if ( ifn == 0 ) return
@@ -39,21 +40,12 @@ call fieldio( '<>', 'ts',  t3(:,:,:,1) )
 call fieldio( '<>', 'td',  t3(:,:,:,2) )
 call fieldio( '<>', 'tn',  t3(:,:,:,3) )
 
-! Test for endian problems
-if ( any( mus /= mus ) .or. maxval( mus ) > huge( rr ) ) stop 'NaN/Inf in mus'
-if ( any( mud /= mud ) .or. maxval( mud ) > huge( rr ) ) stop 'NaN/Inf in mud'
-if ( any( dc  /= dc  ) .or. maxval( dc  ) > huge( rr ) ) stop 'NaN/Inf in dc'
-if ( any( co  /= co  ) .or. maxval( co  ) > huge( rr ) ) stop 'NaN/Inf in co'
-if ( any( t1  /= t1  ) .or. maxval( t1  ) > huge( rr ) ) stop 'NaN/Inf in sigma'
-if ( any( t2  /= t2  ) .or. maxval( t2  ) > huge( rr ) ) stop 'NaN/Inf in sigma'
-if ( any( t3  /= t3  ) .or. maxval( t3  ) > huge( rr ) ) stop 'NaN/Inf in tau'
-
-! Normal traction check
-i1 = maxloc( t3(:,:,:,3) )
-rr = t3(i1(1),i1(2),i1(3),3)
-i1(ifn) = irup
-i1 = i1 + nnoff
-if ( rr > 0.0 ) write( 0, * ) 'warning: positive normal traction: ', rr, i1
+!! Normal traction check
+!i1 = maxloc( t3(:,:,:,3) )
+!rr = t3(i1(1),i1(2),i1(3),3)
+!i1(ifn) = irup
+!i1 = i1 + nnoff
+!if ( rr > 0.0 ) write( 0, * ) 'warning: positive normal traction: ', rr, i1
 
 ! Lock fault in PML region
 i1 = i1pml + 1
@@ -76,11 +68,13 @@ call fieldio( '>', 'nhat1', nhat(:,:,:,1) )
 call fieldio( '>', 'nhat2', nhat(:,:,:,2) )
 call fieldio( '>', 'nhat3', nhat(:,:,:,3) )
 
+call inivolstress
+
 ! Resolve prestress onto fault
 do i = 1, 3
     j = modulo( i , 3 ) + 1
     k = modulo( i + 1, 3 ) + 1
-    t0(:,:,:,i) = &
+    t0(:,:,:,i) = t0(:,:,:,i )  + &
     t1(:,:,:,i) * nhat(:,:,:,i) + &
     t2(:,:,:,j) * nhat(:,:,:,k) + &
     t2(:,:,:,k) * nhat(:,:,:,j)
@@ -114,16 +108,39 @@ do i = 1, 3
     t3(:,:,:,3) * nhat(:,:,:,i)
 end do
 
-! Hypocentral radius
-call rbroadcast1( xhypo, ip2root )
+! Total initial traction in the shear direction [ZS]
+f1 = sum( t0 * nhat, 4 )
 do i = 1, 3
-    select case( ifn )
-    case ( 1 ); t2(1,:,:,i) = w1(irup,:,:,i) - xhypo(i)
-    case ( 2 ); t2(:,1,:,i) = w1(:,irup,:,i) - xhypo(i)
-    case ( 3 ); t2(:,:,1,i) = w1(:,:,irup,i) - xhypo(i)
-    end select
+    ts0(:,:,:,i) = t0(:,:,:,i) - f1 * nhat(:,:,:,i)
 end do
-rhypo = sqrt( sum( t2 * t2, 4 ) )
+
+! Hypocentral radius needed if doing nucleation
+if ( ( rcrit > 0.0 .and. vrup > 0.0 ) .or. ( rnucl > 0.0 ) ) then
+    xhypo = 0.0
+    xi = ihypo - nnoff
+    i1 = int( xi )
+    if ( all( i1 >= 1 .and. i1 < nm ) ) then
+        do l = i1(3), i1(3)+1
+        do k = i1(2), i1(2)+1
+        do j = i1(1), i1(1)+1
+            w = (1.0-abs(xi(1)-j)) * (1.0-abs(xi(2)-k)) * (1.0-abs(xi(3)-l))
+            do i = 1, 3
+                xhypo(i) = xhypo(i) + w * w1(j,k,l,i)
+            end do
+        end do
+        end do
+        end do
+    end if
+    call rbroadcast1( xhypo, ip2root )
+    do i = 1, 3
+        select case( ifn )
+        case ( 1 ); t2(1,:,:,i) = w1(irup,:,:,i) - xhypo(i)
+        case ( 2 ); t2(:,1,:,i) = w1(:,irup,:,i) - xhypo(i)
+        case ( 3 ); t2(:,:,1,i) = w1(:,:,irup,i) - xhypo(i)
+        end select
+    end do
+    rhypo = sqrt( sum( t2 * t2, 4 ) )
+end if
 
 ! Resample mu on to fault plane nodes for moment calculatioin
 select case( ifn )
@@ -191,11 +208,30 @@ j3 = i1(1); j4 = i2(1)
 k3 = i1(2); k4 = i2(2)
 l3 = i1(3); l4 = i2(3)
 
+!==== Nucleation ====================================================
+if ( it == 1 ) then
+    tp = 0.
+else
+    if ( tm < tmnucl ) then
+        f2 = exp( (tm - tmnucl)**2/(tm*(tm -2*tmnucl)) )
+    else
+        f2 = 1.
+    end if
+
+    f1 = 0.
+    where( rhypo < rnucl ) f1 = exp( rhypo**2/(rhypo**2-rnucl**2) ) * f2 * delts
+
+    do i = 1, 3
+        tp(:,:,:,i) = ts0(:,:,:,i) * f1
+    end do
+end if
+!====================================================================
+
 ! Trial traction for zero velocity and zero displacement
 f1 = dt * dt * area * ( mr(j1:j2,k1:k2,l1:l2) + mr(j3:j4,k3:k4,l3:l4) )
 call invert( f1 )
 do i = 1, 3
-    t1(:,:,:,i) = t0(:,:,:,i) + f1 * dt * &
+    t1(:,:,:,i) = t0(:,:,:,i) + tp(:,:,:,i) + f1 * dt * &
         ( vv(j3:j4,k3:k4,l3:l4,i) &
         - vv(j1:j2,k1:k2,l1:l2,i) &
         + w1(j3:j4,k3:k4,l3:l4,i) * mr(j3:j4,k3:k4,l3:l4) * dt &
@@ -254,7 +290,7 @@ end if
 
 ! Update acceleration
 do i = 1, 3
-    f2 = area * ( t1(:,:,:,i) - t0(:,:,:,i) )
+    f2 = area * ( t1(:,:,:,i) - t0(:,:,:,i) - tp(:,:,:,i) )
     w1(j1:j2,k1:k2,l1:l2,i) = w1(j1:j2,k1:k2,l1:l2,i) + f2
     w1(j3:j4,k3:k4,l3:l4,i) = w1(j3:j4,k3:k4,l3:l4,i) - f2
 end do

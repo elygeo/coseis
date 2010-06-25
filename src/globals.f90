@@ -8,13 +8,12 @@ integer :: nt, itstats, itio, itcheck, itstop, npml, ppml, oplevel, mpin, &
     mpout, debug, faultopening, irup, faultnormal, nsource
 real :: tm0, dt, dx(3), rho1, rho2, vp1, vp2, vs1, vs2, gam1, gam2, hourglass(2), &
     vdamp, rexpand, affine(9), gridnoise, ihypo(3), vpml, slipvector(3)
-real :: period, source1(3), source2(3), vrup, rcrit, trelax, svtol
+real :: period, source1(3), source2(3), vrup, rcrit, trelax, svtol, rnucl, tmnucl, delts
 character(16) :: source, timefunction
 
 ! Miscellaneous parameters
 real, parameter :: pi = 3.14159265
 real :: &
-    xhypo(3),       & ! hypocenter coordinates
     mptimer,        & ! MPI timing
     iotimer,        & ! I/O timing
     tm                ! time
@@ -77,6 +76,7 @@ real, allocatable, target, dimension(:,:,:,:) :: &
     xx,             & ! node locations
     vv,             & ! velocity
     uu,             & ! displacement
+    si1, si2,       & ! initial volume stresses
     z1, z2,         & ! anelastic memory variables
     w1, w2            ! temporary storage
 
@@ -95,7 +95,8 @@ real, allocatable, target, dimension(:,:,:) :: &
     tn, ts, f1, f2    ! temporary storage
 real, allocatable, target, dimension(:,:,:,:) :: &
     nhat,           & ! fault surface normals
-    t0,             & ! initial traction
+    t0, ts0,        & ! initial traction
+    tp,             & ! stress perturbation for nucleation
     t1, t2, t3        ! temporary storage
 
 end module
