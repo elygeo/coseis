@@ -164,7 +164,7 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
         print( 'Downloading %s' % url )
         f = os.path.join( repo, os.path.basename( url ) )
         urllib.urlretrieve( url, f )
-        if os.system( 'tar jxf %s' % f ):
+        if os.system( 'tar -C %s -jxf %s' % (repo, f) ):
             sys.exit()
 
     # voxet ID
