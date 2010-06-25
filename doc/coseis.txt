@@ -99,7 +99,7 @@ libraries.
 
     Alternatively, download and unpack the source tar archive from here:
 
-        http://earth.usc.edu/~gely/coseis/repo/coseis.tgz
+        http://earth.usc.edu/~gely/coseis/download/coseis.tgz
 
 5.  For laptop and workstation installations, the default system configuration
     is usually be adequate.  To test the default configuration::

@@ -12,9 +12,8 @@ prefix="${1:-${HOME}/local}"
 url='http://bitbucket.org/ianb/virtualenv/get/tip.gz#egg=virtualenv-tip'
 cd "${prefix}"
 curl "${url}" | tar zx
-/lustre/scratch/proj/yt_common/trunk/bin/python virtualenv/virtualenv.py .
-
-# set your path
-export PATH=/lustre/scratch/proj/yt_common/trunk/bin:$PATH
-export PATH=${HOME}/bin:${HOME}/coseis/bin:${HOME}/local/bin:$PATH
+/lustre/scratch/proj/yt_common/trunk/bin/python virtualenv/virtualenv.py yt
+. yt/bin/activate
+cd ${HOME}/coseis
+python setup.py path
 

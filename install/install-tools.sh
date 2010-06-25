@@ -3,6 +3,12 @@
 # install location
 prefix="${1:-${HOME}/local}"
 
+# Virtualenv
+easy_install virtualenv
+
+# PIP
+easy_install pip
+
 # Docutils
 easy_install docutils
 
