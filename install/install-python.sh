@@ -14,14 +14,6 @@ make
 make install
 export PATH="${prefix}/bin:${PATH}"
 
-# setuptools deprecated
-#curl -O http://peak.telecommunity.com/dist/ez_setup.py
-#python ez_setup.py --prefix="${prefix}"
-
-# Distribute
-curl -O http://python-distribute.org/distribute_setup.py
-python distribute_setup.py --prefix="${prefix}"
-
 # NumPy
 url='http://downloads.sourceforge.net/project/numpy/NumPy/1.4.1/numpy-1.4.1.tar.gz'
 dir=$( basename "$url" .tar.gz )
@@ -31,6 +23,8 @@ cd "${dir}"
 python setup install --prefix="${prefix}"
 
 # PyPI packages
+curl -O http://python-distribute.org/distribute_setup.py
+python distribute_setup.py --prefix="${prefix}"
 easy_install pip
 pip install virtualenv
 pip install nose
