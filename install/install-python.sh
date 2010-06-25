@@ -32,7 +32,12 @@ python distribute_setup.py --prefix="${prefix}"
 
 # PyPI packages
 easy_install pip
+pip install ipython
+pip install docutils
 pip install numpy
-pip install cython
 pip install pyproj
+pip install cython
+pip install scipy
+pip install virtualenv
+pip install bzr
 

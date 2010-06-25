@@ -193,15 +193,14 @@ option that includes many bells and whistles such as the <a class="reference ext
 </li>
 <li><p class="first">Download the source code.  The best option is use Bazaar version
 control, which facilitates applying code updates, and merging local
-modifications (see <a class="reference internal" href="#source-control">Source Control</a> section for examples). The following
-script installs Bazaar and Coseis:</p>
-<blockquote>
-<p><a class="reference external" href="../install/install-coseis.sh">install-coseis.sh</a></p>
-</blockquote>
-<p>Alternatively, download and unpack the source tar archive from here:</p>
-<blockquote>
-<p><a class="reference external" href="http://earth.usc.edu/~gely/coseis/download/coseis.tgz">http://earth.usc.edu/~gely/coseis/download/coseis.tgz</a></p>
-</blockquote>
+modifications (see <a class="reference internal" href="#source-control">Source Control</a> section for examples):</p>
+<pre class="literal-block">
+bzr get http://earth.usc.edu/~gely/coseis
+</pre>
+<p>Alternatively, download and unpack the source tar archive:</p>
+<pre class="literal-block">
+curl http://earth.usc.edu/~gely/coseis/download/coseis.tgz | tar zx
+</pre>
 </li>
 <li><p class="first">For laptop and workstation installations, the default system configuration
 is usually be adequate.  To test the default configuration:</p>

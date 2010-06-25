@@ -92,14 +92,14 @@ libraries.
 
 4.  Download the source code.  The best option is use Bazaar version
     control, which facilitates applying code updates, and merging local
-    modifications (see `Source Control`_ section for examples). The following
-    script installs Bazaar and Coseis:
+    modifications (see `Source Control`_ section for examples)::
 
-        `install-coseis.sh <../install/install-coseis.sh>`_
+        bzr get http://earth.usc.edu/~gely/coseis
 
-    Alternatively, download and unpack the source tar archive from here:
+    Alternatively, download and unpack the source tar archive:
+    ::
 
-        http://earth.usc.edu/~gely/coseis/download/coseis.tgz
+        curl http://earth.usc.edu/~gely/coseis/download/coseis.tgz | tar zx
 
 5.  For laptop and workstation installations, the default system configuration
     is usually be adequate.  To test the default configuration::
