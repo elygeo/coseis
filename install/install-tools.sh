@@ -3,19 +3,15 @@
 # install location
 prefix="${1:-${HOME}/local}"
 
-# Virtualenv
-easy_install virtualenv
-
-# PIP
+# Misc tools
 easy_install pip
+pip install bzr
+pip install virtualenv
+pip install docutils
+pip install ipython
+pip install pypdf
 
-# Docutils
-easy_install docutils
-
-# Ipython
-easy_install ipython
-
-# zlib
+# zlib and Python Imaging Library
 url="http://www.zlib.net/zlib-1.2.5.tar.gz"
 curl "${url}" | tar zx
 cd zlib-1.2.5
@@ -23,12 +19,7 @@ cd zlib-1.2.5
 make install
 ./configure --prefix="${prefix}" --shared
 make install
-
-# Python Imaging Library
-easy_install PIL
-
-# PyPDF
-easy_install pypdf
+pip install PIL
 
 # Visualization Toolkit
 . install-vtk.sh "${prefix}"
@@ -37,14 +28,14 @@ easy_install pypdf
 . install-wxpython.sh "${prefix}"
 
 # Matplotlib, dependencies: wxPython
-easy_install matplotlib
+pip install matplotlib
 
 # SciPy
-easy_install scipy
+pip install scipy
 
 # Mayavi, dependencies: vtk, wxpython, configobj
-easy_install configobj
-easy_install 'Mayavi[app]'r
+pip install configobj
+pip install 'Mayavi[app]'r
 
 # ObsPy, dependencies: matplotlib
 . install-obspy.sh "${prefix}"

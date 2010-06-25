@@ -9,7 +9,7 @@ ver="$( basename "${url}" .tar.bz2 )"
 
 # dowload
 cd "${prefix}"
-#curl "${url}" | tar jx
+#curl -O "${url}" | tar jx
 wget "${url}"
 tar jxf "${ver}.tar.bz2"
 

@@ -18,19 +18,21 @@ export PATH="${prefix}/bin:${PATH}"
 #curl -O http://peak.telecommunity.com/dist/ez_setup.py
 #python ez_setup.py --prefix="${prefix}"
 
-# distribute
+# Distribute
 curl -O http://python-distribute.org/distribute_setup.py
 python distribute_setup.py --prefix="${prefix}"
 
-# PyPI packages
-easy_install cython
-easy_install pyproj
-
 # NumPy
-url='http://downloads.sourceforge.net/project/numpy/NumPy/1.4.1/numpy-1.4.1.tar.gz'
-dir=$( basename "$url" .tar.gz )
-cd "${prefix}"
-curl "${url}" | tar zx
-cd "${dir}"
-python setup install --prefix="${prefix}"
+#url='http://downloads.sourceforge.net/project/numpy/NumPy/1.4.1/numpy-1.4.1.tar.gz'
+#dir=$( basename "$url" .tar.gz )
+#cd "${prefix}"
+#curl "${url}" | tar zx
+#cd "${dir}"
+#python setup install --prefix="${prefix}"
+
+# PyPI packages
+easy_install pip
+pip install numpy
+pip install cython
+pip install pyproj
 

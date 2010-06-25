@@ -4,7 +4,8 @@
 prefix="${1:-${HOME}/local}"
 
 # Bazaar version control
-easy_install bzr
+easy_install pip
+pip install bzr
 
 # Coseismic
 cd "${prefix}"
