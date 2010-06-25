@@ -5,7 +5,8 @@ if "${OSTYPE}" = 'darwin10.0'; then
 
 rul="http://download.enthought.com/epd/installs/epd-6.2-2-macosx-i386.dmg"
 ver=$( basename "$url" )
-open "${ver}"
+hdid "${ver}"
+installer -pkg '/Volumes/EPD-6.2/EPD.mpkg' -target '/'
 
 else
 

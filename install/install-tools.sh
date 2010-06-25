@@ -21,4 +21,5 @@ pip install matplotlib			# dep: wxpython
 .   install-vtk.sh "${prefix}"
 pip install configobj
 pip install 'Mayavi[app]'r		# dep: wxpython, configobj, vtk
+easy_install scipy
 
