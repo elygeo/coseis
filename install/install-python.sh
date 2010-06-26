@@ -25,7 +25,7 @@ tag=$( basename "$url" .tar.gz )
 cd "${prefix}"
 curl -L "${url}" | tar zx
 cd "${tag}"
-python setup install --prefix="${prefix}"
+python setup.py install --prefix="${prefix}"
 
 # PyPI packages
 pip install virtualenv
