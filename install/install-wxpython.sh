@@ -5,16 +5,14 @@ prefix="${1:-${HOME}/local}"
 
 # wxPython
 url="http://downloads.sourceforge.net/wxpython/wxPython-src-2.8.10.1.tar.bz2"
-ver="$( basename "${url}" .tar.bz2 )"
+tag="$( basename "${url}" .tar.bz2 )"
 
 # dowload
 cd "${prefix}"
-#curl -O "${url}" | tar jx
-wget "${url}"
-tar jxf "${ver}.tar.bz2"
+curl -L "${url}" | tar jx
 
 # wxWidgets
-cd "${ver}"
+cd "${tag}"
 mkdir bld
 cd bld
 ../configure \

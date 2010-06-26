@@ -5,10 +5,10 @@ prefix="${1:-${HOME}/local}"
 
 # CMake
 url="http://www.cmake.org/files/v2.8/cmake-2.8.1.tar.gz"
-dir=$( basename "$url" .tar.gz )
+tag=$( basename "$url" .tar.gz )
 cd "${prefix}"
 curl "${url}" | tar zx
-cd "${dir}"
+cd "${tag}"
 bash bootstrap --prefix="${prefix}"
 make
 make install
