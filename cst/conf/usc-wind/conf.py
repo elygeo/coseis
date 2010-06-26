@@ -4,8 +4,7 @@ USC Wind
 Intel(R) Pentium(R) 4 CPU 3.20GHz
 1GB
 """
-login = 'wind.usc.edu'
-hosts = login,
+login = hostname = 'wind.usc.edu'
 maxnodes = 1
 maxcores = 2
 maxram = 800

@@ -417,9 +417,9 @@ def launch( job=None, stagein=(), new=True, **kwargs ):
     print( cmd )
 
     # check host
-    if job.host not in job.hosts:
-        sys.exit( 'Error: hostname %r does not match configuration %r'
-            % (job.host, job.machine) )
+    if re.match( job.hostname, job.host ) is None:
+        s = job.host, job.machine
+        sys.exit( 'Error: hostname %r does not match configuration %r' % s )
 
     # run directory
     cwd = os.getcwd()

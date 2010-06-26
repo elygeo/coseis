@@ -1,8 +1,7 @@
 """
 UCB Baribu cluster
 """
-login = 'baribu.geo.berkeley.edu'
-hosts = login,
+login = hostname = 'baribu.geo.berkeley.edu'
 maxnodes = 7
 maxcores = 8
 maxram = 30000

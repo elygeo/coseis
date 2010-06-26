@@ -23,10 +23,8 @@ pre = post = ''  # pre-processing and post-processing commands
 dtype = dtype_f = np.dtype( 'f' ).str # Numpy data type
 
 # machine specific
+host = hostname = os.uname()[1]
 system = os.uname()
-host = os.uname()[1]
-hosts = host,
-login = host
 maxnodes = 1
 maxcores = 0
 maxram = 0

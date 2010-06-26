@@ -95,8 +95,7 @@ Run a simple point source explosion test and plot a 2D slice of particle
 velocity::
 
     cd scripts/sord
-    python sim.py -i
-    python plot.py
+    python example.py -i
 
 Plotting requires Matplotlib, and the result should look like this:
 
@@ -106,9 +105,9 @@ Scripting with Python
 ---------------------
 
 For a simple example consider the above test,
-`sim.py <../scripts/sord/sim.py>`__:
+`sim.py <../scripts/sord/example.py>`__:
 
-.. include:: ../scripts/sord/sim.py
+.. include:: ../scripts/sord/example.py
    :literal:
 
 Every script starts by importing the ``cst`` module.  SORD parameters are

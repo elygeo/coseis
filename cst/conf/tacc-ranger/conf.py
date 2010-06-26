@@ -24,7 +24,7 @@ alias showme='showq -u'
 module load gotoblas scalapack mkl
 """
 login = 'tg-login.ranger.tacc.teragrid.org'
-hosts = 'login3.ranger.tacc.utexas.edu', 'login4.ranger.tacc.utexas.edu'
+hostname = 'login[34].ranger.tacc.utexas.edu'
 queue = 'request';     maxnodes = 1024; maxtime = 24, 00
 queue = 'serial';      maxnodes = 1;    maxtime =  2, 00
 queue = 'development'; maxnodes = 16;   maxtime =  2, 00

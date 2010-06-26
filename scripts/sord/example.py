@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import cst                                # import the Coseis module
-nproc = 1, 1, 6
 delta = 100.0, 100.0, 100.0, 0.0075       # step length in (x, y, z, t)
 shape = 61, 61, 61, 60                    # mesh size in (x, y, z, t)
 fieldio = [                               # field variable input and output
@@ -18,4 +17,17 @@ source2 = 0.0, 0.0, 0.0                   # source shear components
 timefunction = 'brune'                    # source time function
 period = 6 * delta[3]                     # source dominant period
 cst.sord.run( locals() )                  # launch SORD job
+
+# plotting
+import numpy as np
+import matplotlib.pyplot as plt
+n  = shape[1], shape[0]
+vx = np.fromfile( 'run/out/vx', 'f' ).reshape( n )
+vy = np.fromfile( 'run/out/vy', 'f' ).reshape( n )
+vm = np.sqrt( vx * vx + vy * vy )
+fig = plt.figure( figsize=(3,3) )
+ax = plt.gca()
+ax.imshow( vm, extent=(-3,3,-3,3), interpolation='nearest', vmax=1 )
+ax.axis( 'image' )
+fig.savefig( 'example.png', dpi=80 )
 

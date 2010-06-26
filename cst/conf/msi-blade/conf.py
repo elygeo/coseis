@@ -18,7 +18,7 @@ ulimit -n 4096
 module load intelmpi
 """
 login = 'blade.msi.umn.edu'
-hosts = 'blade285', 'blade286', 'blade287', 'blade288'
+hostname = 'blade28[5678]'
 queue = 'devel'; maxnodes = 16;  maxtime = 1, 00
 queue = 'bc';    maxnodes = 268; maxtime = 48, 00
 maxcores = 4;

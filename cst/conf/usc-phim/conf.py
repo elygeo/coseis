@@ -4,8 +4,7 @@ USC Phim
 Intel Xeon CPU 3GHz
 3GB
 """
-login = 'phim.usc.edu'
-hosts = login,
+login = hostname = 'phim.usc.edu'
 maxnodes = 1
 maxcores = 1
 maxram = 2800

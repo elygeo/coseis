@@ -18,7 +18,7 @@ Do not add to the front of your path on HPC
 Use /home instead of /auto
 """
 login = 'hpc-login1.usc.edu'
-hosts = 'hpc-login1', 'hpc-login2'
+hostname = 'hpc-login[12]'
 queue = 'largemem'; maxnodes =   1; maxcores = 8; maxram = 63000; maxtime = 336, 00
 queue = 'nbns';     maxnodes =  48; maxcores = 8; maxram = 11000; maxtime = 336, 00
 queue = 'default';  maxnodes = 256; maxcores = 4; maxram =  3500; maxtime = 24, 00

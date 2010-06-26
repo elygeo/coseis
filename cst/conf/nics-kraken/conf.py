@@ -16,7 +16,7 @@ CrayPAT (Cray Performance Analysis Tools) is useful for profiling and
 collecting hardware performance data
 """
 login = 'kraken-pwd.nics.utk.edu'
-hosts = 'kraken-pwd3', 'kraken-pwd4'
+hostname = 'kraken-pwd[1234]'
 maxram = 15000
 maxcores = 12
 maxnodes = 8256

@@ -7,8 +7,7 @@ EPD version: rh5-x86
 4 Dual core Intel Xeon 2.8GHz
 8GB?
 """
-login = 'intensity.usc.edu'
-hosts = login,
+login = hostname = 'intensity.usc.edu'
 maxnodes = 1
 maxcores = 8
 maxram = 7000

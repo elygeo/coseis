@@ -7,8 +7,7 @@ ssh -p 8022 localhost
 Use MPICH instead of OpenMPI:
 export PATH="/opt/mpich2/gnu/bin:${PATH}"
 """
-login = 'pisco.sdsu.edu'
-hosts = 'pisco.sdsu.edu',
+login = hostname = 'pisco.sdsu.edu'
 maxnodes = 1
 maxcores = 8
 maxram = 30000

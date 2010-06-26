@@ -1,9 +1,6 @@
 #!/bin/bash -e
-# Install Python for NICS Kraken
+# Install statically linked Python for Compute Node Linux on NICS Kraken
 # http://yt.enzotools.org/wiki/KrakenCommunityInstallation
-# http://yt.enzotools.org/wiki/CrayXT5Installation
-# https://wiki.fysik.dtu.dk/gpaw/install/Cray/louhi.html
-# http://code.google.com/p/pyprop/wiki/Installation_CrayXT4
 
 # install location
 prefix="${1:-${HOME}/local}"
