@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 ##PBS -A TG-MCA03S012
 #PBS -N %(name)s
