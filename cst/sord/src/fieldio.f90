@@ -1,17 +1,17 @@
 ! field input and output
 module m_fieldio
 implicit none
-integer, private :: itdebug = -1, idebug
+integer, private :: itdebug = -1, idebug, npts
 type t_io
     character(32) :: filename      ! filename on disk for input or output
     character(4) :: field          ! field variable, see fieldnames.py for possibilities
     character(8) :: tfunc          ! see time_function in util.f90 for possibilities
     character(3) :: mode           ! 'r' read, 'w' write
-    integer :: ii(3,4), nc, nb, ib, fh
+    integer :: ii(3,4), nc, nb, ib, fh, w_flag
     real :: x1(3), x2(3), val, period
+    integer, pointer :: prec(:,:)
+    real, pointer :: buff_w(:)
     real, pointer :: buff(:,:)     ! buffer for storing mutliple time steps
-    !XXX character(4) :: fields(32) ! field variable, see fieldnames.py for possibilities
-    !XXX real, pointer :: buff(:,:,:)  ! buffer for storing mutliple time steps
     type( t_io ), pointer :: next  ! pointer to next member of the field i/o list
 end type t_io
 type( t_io ), pointer :: io0, io, ioprev
@@ -41,7 +41,8 @@ character(*), intent(in) :: passes, field
 real, intent(inout) :: f(:,:,:)
 character(4) :: pass
 integer :: i1(3), i2(3), i3(3), i4(3), di(3), m(4), n(4), o(4), &
-    it1, it2, dit, i, j, k, l, ipass
+    it1, it2, dit, i, j, k, l, n_i, ipass
+integer :: point(3), shape_w(3), nwx(3), nwy(3), nwz(3)
 real :: val
 
 ! atart timer
@@ -72,7 +73,7 @@ if ( it > it2 ) then
     cycle loop
 end if
 if ( it < it1 ) cycle loop
-if ( modulo( it - it1, dit ) /= 0 ) cycle loop
+if ( modulo( it - it1 + 1, dit ) /= 0 ) cycle loop
 
 ! spatial indices
 i3 = i1
@@ -271,9 +272,8 @@ case( '=r', '+r', '=R', '+R' )
         call pdelete
         cycle loop
     end if
-case( '=w', '=wi' )
+case( '=wi' )
     if ( io%ib < 0 ) then
-        !XXX allocate( io%buff(io%nc,n(1)*n(2)*n(3),io%nb) )
         allocate( io%buff(n(1)*n(2)*n(3),io%nb) )
         io%ib = 0
         io%fh = fio_file_null
@@ -288,7 +288,7 @@ case( '=w', '=wi' )
         end select
     end if
     io%ib = io%ib + 1
-    if ( io%mode == '=wi' .and. all( i1 == i2 ) ) then
+    if ( all( i1 == i2 ) ) then
         io%buff(1,io%ib) = 0.0
         do l = i1(3) - 1, i2(3)
         do k = i1(2) - 1, i2(2)
@@ -297,16 +297,6 @@ case( '=w', '=wi' )
                 ( ( 1.0 - abs( io%x1(1) - j - nnoff(1) ) ) &
                 * ( 1.0 - abs( io%x1(2) - k - nnoff(2) ) ) &
                 * ( 1.0 - abs( io%x1(3) - l - nnoff(3) ) ) )
-        end do
-        end do
-        end do
-    else
-        i = 0
-        do l = i1(3), i2(3), di(3)
-        do k = i1(2), i2(2), di(2)
-        do j = i1(1), i2(1), di(1)
-            i = i + 1
-            io%buff(i,io%ib) = f(j,k,l)
         end do
         end do
         end do
@@ -325,6 +315,45 @@ case( '=w', '=wi' )
             call pdelete
             cycle loop
         end if
+    end if
+case( '=w' )
+    if ( io%ib < 0 ) then
+        point   = nnoff + 2 
+        shape_w = nm - 2
+     
+        call set_write_range( point, shape_w, io%ii(1:3,1), io%ii(1:3,2), io%ii(1:3,3), nwx, nwy, nwz, io%w_flag ) 
+        io%ib   = 0
+        call set_write_comm ( io%w_flag )
+        if( io%w_flag == 1 ) then
+          npts = (int((nwx(2)-nwx(1))/nwx(3)) + 1)*(int((nwy(2)-nwy(1))/nwy(3)) + 1)*(int((nwz(2)-nwz(1))/nwz(3)) + 1)
+          allocate( io%buff_w(npts*io%nb) )
+          allocate( io%prec(npts, 3))
+          call set_write_filetype( io%prec, io%ii(1:3,1), io%ii(1:3,2), io%ii(1:3,3), nwx, nwy, nwz, io%nb, ip)
+        end if
+    end if
+    if( io%w_flag == 0 ) cycle loop
+    do n_i=1,npts
+        j = io%prec(n_i,1) - nnoff(1)
+        k = io%prec(n_i,2) - nnoff(2)
+        l = io%prec(n_i,3) - nnoff(3)
+        io%buff_w(npts*io%ib+n_i) = f(j,k,l)
+        if(ip == 6 .and. it == 400) then
+          write(*,*) 'x=',j, 'y=',k, 'l=',l, 'v=', f(j,k,l) 
+        end if
+    end do
+    io%ib = io%ib + 1
+    if ( io%ib == io%nb .or. it == it2 ) then
+      str = 'out/' // io%filename
+      write( str, '(a,i7.7,a)' ) trim( str ), it, '.bin'
+      io%fh = file_null
+      call open_write_file(io%fh, 1, str)
+      call write_to_file(io%fh, io%buff_w, npts, io%nb )
+      call open_write_file(io%fh, 0, str)
+      io%ib = 0
+      if ( it == it2 ) then
+        deallocate(io%buff_w)
+        deallocate(io%prec)
+      end if
     end if
 case default
     write( 0, * ) "bad i/o mode '", trim( io%mode ), "' for ", trim( io%filename )

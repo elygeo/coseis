@@ -3,7 +3,7 @@ module m_collective
 use mpi
 implicit none
 integer, parameter :: file_null = mpi_file_null
-integer, private :: np3(3), comm1d(3), comm2d(3), comm3d, rtype, itype
+integer, private :: np3(3), comm1d(3), comm2d(3), comm3d, commw2f, rtype, itype, wfiletype
 contains
 
 ! initialize
@@ -256,8 +256,160 @@ end if
 end do
 end subroutine
 
+subroutine set_write_range( point, shape_w, xxx, yyy, zzz, nwx, nwy, nwz, w_flag )
+use m_globals
+use mpi
+integer, intent(in) :: point(3), shape_w(3)
+integer, intent(in) :: xxx(3), yyy(3), zzz(3)
+integer, intent(out) :: nwx(3), nwy(3), nwz(3)
+integer, intent(out) :: w_flag
+integer :: i,j,k,npts
+
+if(point(1)>xxx(1)) then
+    nwx(1) = point(1)
+else
+    nwx(1) = xxx(1)
+end if
+
+! caculate x range:
+npts = int((nwx(1)-xxx(1))/xxx(3))*xxx(3) + xxx(1)
+if (nwx(1) > npts) nwx(1) = npts + xxx(3)
+
+if(point(1)+shape_w(1)-1<xxx(2)) then
+    nwx(2) = point(1)+shape_w(1) - 1
+else
+    nwx(2) = xxx(2)
+end if
+
+npts = int((nwx(2)-xxx(1))/xxx(3))*xxx(3) + xxx(1)
+if (nwx(2) > npts) nwx(2) = npts 
+
+if ( nwx(2)<nwx(1) ) then
+  w_flag = 0
+  return
+end if
+
+nwx(3) = xxx(3)
+
+! caculate y range:
+if(point(2)>yyy(1)) then
+    nwy(1) = point(2)
+else
+    nwy(1) = yyy(1)
+end if
+
+npts = int((nwy(1)-yyy(1))/yyy(3))*yyy(3) + yyy(1)
+if (nwy(1) > npts) nwy(1) = npts + yyy(3) 
+
+if(point(2)+shape_w(2)-1<yyy(2)) then
+    nwy(2) = point(2) + shape_w(2) - 1
+else
+    nwy(2) = yyy(2)
+end if
+
+npts = int((nwy(2)-yyy(1))/yyy(3))*yyy(3) + yyy(1)
+if (nwy(2) > npts) nwy(2) = npts - yyy(3) 
+
+nwy(3) = yyy(3)
+
+if ( nwy(2)<nwy(1) ) then
+  w_flag = 0
+  return
+end if
+
+! caculate z range:
+if(point(3)>zzz(1)) then
+    nwz(1) = point(3)
+else
+    nwz(1) = zzz(1)
+end if
+
+npts = int((nwz(1)-zzz(1))/zzz(3))*zzz(3) + zzz(1)
+if (nwz(1) > npts) nwz(1) = npts + zzz(3) 
+
+if(point(3)+shape_w(3)-1<zzz(2)) then
+    nwz(2) = point(3) + shape_w(3) - 1
+else
+    nwz(2) = zzz(2)
+end if
+
+npts = int((nwz(2)-zzz(1))/zzz(3))*zzz(3) + zzz(1)
+if (nwz(2) < npts) nwz(2) = npts - zzz(3) 
+
+if ( nwz(2)<nwz(1) ) then
+  w_flag = 0
+  return
+end if
+
+nwz(3) = zzz(3)
+
+w_flag = 1
+end subroutine
+
+subroutine set_write_filetype( prec, xxx, yyy, zzz, nwx, nwy, nwz, wstep, ip )
+use m_globals
+use mpi
+integer, intent(inout) :: prec(:,:)
+integer, intent(in) :: xxx(3), yyy(3), zzz(3)
+integer, intent(in) :: nwx(3), nwy(3), nwz(3)
+integer, intent(in) :: wstep, ip
+integer :: i,j,k,npts,nr,e
+integer*8 :: r, Li, Lj, Lk, nrec
+integer :: l, nprec
+integer(kind=MPI_ADDRESS_KIND), dimension (:), allocatable :: tpmap, pmap
+integer,dimension(:), allocatable :: block
+real :: r_f
+
+l = 1
+r = -1
+
+Li = int((xxx(2)-xxx(1))/xxx(3)) + 1
+Lj = int((yyy(2)-yyy(1))/yyy(3)) + 1
+Lk = int((zzz(2)-zzz(1))/zzz(3)) + 1
+
+npts = (int((nwx(2)-nwx(1))/nwx(3)) + 1)*(int((nwy(2)-nwy(1))/nwy(3)) + 1)*(int((nwz(2)-nwz(1))/nwz(3)) + 1)
+nrec = Li*Lj*Lk
+ 
+allocate(pmap(npts))
+pmap = 0
+do k=nwz(1),nwz(2),nwz(3)
+   do j=nwy(1),nwy(2),nwy(3)
+      do i=nwx(1),nwx(2),nwx(3)
+         prec(l,1) = i
+         prec(l,2) = j
+         prec(l,3) = k 
+         r = Li*Lj*int((k-zzz(1))/zzz(3)) + Li*int((j-yyy(1))/yyy(3)) + int((i-xxx(1))/xxx(3))
+         pmap(l) = r
+         l = l+1  
+      enddo
+   enddo
+enddo   
+
+allocate(tpmap(npts*wstep))
+tpmap = 0
+do i = 1, wstep
+   do j = 1, npts
+      tpmap((i-1)*npts+j) = pmap(j)+int((i-1)*nrec,MPI_ADDRESS_KIND)
+   end do
+end do
+deallocate(pmap)
+allocate(block(npts*wstep))
+block = 1
+
+call mpi_sizeof( r_f, nr, e )
+tpmap=tpmap*nr 
+
+call MPI_TYPE_CREATE_HINDEXED(npts*wstep, block, tpmap, rtype, wfiletype,e)
+call MPI_TYPE_COMMIT(wfiletype,e)
+
+deallocate(tpmap)
+deallocate(block)
+   
+end subroutine
+
 ! 2d real input/output
 subroutine rio2( fh, f2, mode, filename, mm, nn, oo, mpio, verb )
+
 use m_fio
 use mpi
 integer, intent(inout) :: fh
@@ -382,6 +534,43 @@ nn = (/ 1, size(f1) /)
 oo = (/ 0, o /)
 call iio2( fh, f2, mode, filename, mm, nn, oo, mpio, verb )
 if ( mode == 'r' ) f1 = f2(1,:)
+end subroutine
+
+subroutine set_write_comm( write_flag )
+use mpi
+integer, intent(in) :: write_flag
+integer :: e
+call mpi_comm_split( comm3d, write_flag, 0, commw2f, e )
+end subroutine
+
+subroutine write_to_file( fh, buf, npts, wstep )
+use mpi
+integer, intent(inout) :: fh
+integer, intent(in)  :: npts, wstep
+real, intent(in)  :: buf(:)
+integer(kind=mpi_offset_kind) :: offset
+integer :: e
+offset = 0
+call mpi_file_write_at_all( fh, offset, buf(1), npts*wstep, rtype, mpi_status_ignore, e )
+end subroutine
+
+subroutine open_write_file( fh, mode, filename )
+use mpi
+integer, intent(out) :: fh
+integer, intent(in)  :: mode
+character(*), intent(in) :: filename
+integer :: i, e
+integer(kind=mpi_offset_kind) :: offset = 0
+
+if (mode == 1) then
+    offset = 0
+    i = mpi_mode_wronly + mpi_mode_create + mpi_mode_excl
+    call mpi_file_open( commw2f, filename, i, mpi_info_null, fh, e )
+    call mpi_file_set_view( fh, offset, rtype, wfiletype, 'native', mpi_info_null, e )
+else
+    call mpi_file_close( fh, e )
+    fh = mpi_file_null
+end if 
 end subroutine
 
 ! open file with MPIIO
