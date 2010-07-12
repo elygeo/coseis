@@ -1,16 +1,22 @@
 #!/bin/bash -e
+prefix="${1:-${HOME}/local}"
+pwd="${PWD}"
 
 # Enthought Python Distribution
-if "${OSTYPE}" = 'darwin10.0'; then
+if [ "${OSTYPE}" = 'darwin10.0' ]; then
 
-rul="http://download.enthought.com/epd/installs/epd-6.2-2-macosx-i386.dmg"
+# Mac OS X
+url="http://download.enthought.com/epd/installs/epd-6.2-2-macosx-i386.dmg"
 tag=$( basename "$url" )
+cd "${prefix}"
+#curl -O "${url}"
 hdid "${tag}"
-installer -pkg '/Volumes/EPD-6.2/EPD.mpkg' -target '/'
+sudo installer -pkg '/Volumes/EPD-6.2/EPD.mpkg' -target '/'
+export PATH="/Library/Frameworks/Python.framework/Versions/Current/bin:${PATH}"
 
 else
 
-prefix="${1:-${HOME}/local}"
+# Linux
 url="http://download.enthought.com/epd/installs/epd-6.2-2-rh5-x86.sh"
 tag=$( basename "$url" .sh )
 cd "${prefix}"
@@ -27,4 +33,6 @@ pip install virtualenv
 pip install bzr
 pip install pypdf
 . install-obspy.sh "${prefix}"
+
+cd "${pwd}"
 

@@ -1,6 +1,8 @@
 """
 NICS Kraken
 
+Install under /lustre/scratch/
+
 Use GNU compilers:
 module swap PrgEnv-pgi PrgEnv-gnu
 
@@ -28,20 +30,20 @@ launch = {
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
 }
-fortran_serial = 'ftn',
-fortran_mpi = 'ftn',
+fortran_serial = 'ftn'
+fortran_mpi = 'ftn'
 fortran_flags = {
-    'f': ('-fimplicit-none', '-Wall'),
-    'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g'),
-    't': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow'),
-    'p': ('-O', '-pg'),
-    'O': ('-O3',),
-    '8': ('-fdefault-real-8',),
+    'f': '-fimplicit-none -Wall',
+    'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
+    't': '-fbounds-check -ffpe-trap=invalid,zero,overflow',
+    'p': '-O -pg',
+    'O': '-O3',
+    '8': '-fdefault-real-8',
 }
 cvm_ = dict(
     fortran_flags = {
-        'g': ('-Wall', '-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g'),
-        'O': ('-Wall', '-O3'),
+        'g': '-Wall -fbounds-check -ffpe-trap=invalid,zero,overflow -g',
+        'O': '-Wall -O3',
     },
 )
 

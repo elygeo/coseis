@@ -8,9 +8,8 @@ Use MPICH instead of OpenMPI:
 export PATH="/opt/mpich2/gnu/bin:${PATH}"
 """
 login = hostname = 'pisco.sdsu.edu'
-maxnodes = 1
 maxcores = 8
 maxram = 30000
-fortran_serial = 'gfortran',
-fortran_mpi = 'mpif90',
+fortran_serial = 'gfortran'
+fortran_mpi = 'mpif90'
 

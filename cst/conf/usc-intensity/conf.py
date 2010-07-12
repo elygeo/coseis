@@ -8,7 +8,6 @@ EPD version: rh5-x86
 8GB?
 """
 login = hostname = 'intensity.usc.edu'
-maxnodes = 1
 maxcores = 8
 maxram = 7000
 rate = 1.7e6

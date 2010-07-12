@@ -138,7 +138,7 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
     # fortran flags
     if 'fortran_flags_default_' in job:
         if 'fortran_flags' not in job:
-            k = job['fortran_serial'][0]
+            k = job['fortran_serial']
             job['fortran_flags'] = job['fortran_flags_default_'][k]
 
     # save site configuration
@@ -160,13 +160,15 @@ def make( compiler, object_, source ):
     """
     An alternative Make that uses state files.
     """
-    import glob, difflib
+    import glob, difflib, shlex
     object_ = os.path.expanduser( object_ )
     source = tuple( os.path.expanduser( f ) for f in source if f )
     statedir = os.path.join( os.path.dirname( object_ ), '.state' )
     if not os.path.isdir( statedir ):
         os.mkdir( statedir )
     statefile = os.path.join( statedir, os.path.basename( object_ ) )
+    if type( compiler ) is str:
+        compiler = shlex.split( compiler )
     command = compiler + (object_,) + source
     state = [ ' '.join( command ) + '\n' ]
     for f in source:

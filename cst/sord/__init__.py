@@ -61,19 +61,19 @@ def _build( mode=None, optimize=None, dtype=None ):
         source = base + ('serial.f90',) + common
         for opt in optimize:
             object_ = os.path.join( '..', 'build', 'sord-s' + opt + dsize )
-            fflags = cf.fortran_flags['f'] + cf.fortran_flags[opt]
+            fflags = cf.fortran_flags['f'], cf.fortran_flags[opt]
             if dtype != cf.dtype_f:
-                fflags = fflags + cf.fortran_flags[dsize]
-            compiler = cf.fortran_serial + fflags + ('-o',)
+                fflags = fflags + (cf.fortran_flags[dsize],)
+            compiler = (cf.fortran_serial,) + fflags + ('-o',)
             new |= cst.conf.make( compiler, object_, source )
     if 'm' in mode and cf.fortran_mpi[0]:
         source = base + ('mpi.f90',) + common
         for opt in optimize:
             object_ = os.path.join( '..', 'build', 'sord-m' + opt + dsize )
-            fflags = cf.fortran_flags['f'] + cf.fortran_flags[opt]
+            fflags = cf.fortran_flags['f'], cf.fortran_flags[opt]
             if dtype != cf.dtype_f:
-                fflags = fflags + cf.fortran_flags[dsize]
-            compiler = cf.fortran_mpi + fflags + ('-o',)
+                fflags = fflags + (cf.fortran_flags[dsize],)
+            compiler = (cf.fortran_mpi,) + fflags + ('-o',)
             new |= cst.conf.make( compiler, object_, source )
     if new:
         try:

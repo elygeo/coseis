@@ -58,20 +58,20 @@ def _build( mode=None, optimize=None ):
     if 'a' in mode:
         source = 'iotxt.f', 'version4.0.f'
         for opt in optimize:
-            compiler = cf.fortran_serial + cf.fortran_flags[opt] + ('-o',)
+            compiler = cf.fortran_serial, cf.fortran_flags[opt], '-o'
             object_ = 'cvm4-a' + opt
             cst.conf.make( compiler, object_, source )
     if 's' in mode:
         source = 'iobin.f', 'version4.0.f'
         for opt in optimize:
-            compiler = cf.fortran_serial + cf.fortran_flags[opt] + ('-o',)
+            compiler = cf.fortran_serial, cf.fortran_flags[opt], '-o'
             object_ = 'cvm4-s' + opt
             cst.conf.make( compiler, object_, source )
     if 'm' in mode and cf.fortran_mpi:
         source = 'iompi.f', 'version4.0.f'
         for opt in optimize:
             object_ = 'cvm4-m' + opt
-            compiler = cf.fortran_mpi + cf.fortran_flags[opt] + ('-o',)
+            compiler = cf.fortran_mpi, cf.fortran_flags[opt], '-o'
             cst.conf.make( compiler, object_, source )
     os.chdir( cwd )
     return

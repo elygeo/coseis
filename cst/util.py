@@ -44,6 +44,21 @@ def prune( d, pattern=None, types=None ):
     return d
 
 
+def open_excl( filename, *args ):
+    """
+    Thread-safe exclusive file open. Silent return if exists.
+    """
+    if os.path.exists( filename ):
+        return
+    try:
+        os.mkdir( filename + '.lock' )
+    except:
+        return
+    fh = open( filename, *args )
+    os.rmdir( filename + '.lock' )
+    return fh
+
+
 def save( fd, d, expand=None, keep=None, header='', prune_pattern=None, prune_types=None ):
     """
     Write variables from a dict into a Python source file.

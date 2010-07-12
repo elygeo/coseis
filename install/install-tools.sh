@@ -1,25 +1,27 @@
 #!/bin/bash -e
-
-# install location
 prefix="${1:-${HOME}/local}"
 
-# zlib
-url="http://www.zlib.net/zlib-1.2.5.tar.gz"
-curl "${url}" | tar zx
-cd zlib-1.2.5
-./configure --prefix="${prefix}"
-make install
-./configure --prefix="${prefix}" --shared
-make install
-
-pip install PIL				# dep: zlib
-pip install pypdf
-pip install scipy
-.   install-wxpython.sh "${prefix}"
-pip install matplotlib			# dep: wxpython
-.   install-obspy.sh "${prefix}"	# dep: matplotlib
+# Python tools
+.   install-python.sh "${prefix}"
+.   install-zlib.sh "${prefix}"
+.   install-numpy.sh "${prefix}"
 .   install-vtk.sh "${prefix}"
+.   install-wxpython.sh "${prefix}"
+pip install virtualenv
+pip install docutils
+pip install ipython
+pip install cython
+pip install bzr
+pip install nose
 pip install configobj
-pip install 'Mayavi[app]'r		# dep: wxpython, configobj, vtk
-pip install scipy
+pip install pypdf
+pip install PIL				# dep: zlib
+pip install pyproj			# dep: numpy
+pip install matplotlib			# dep: numpy, wxpython, configobj
+pip install 'Mayavi[app]'r		# dep: numpy, wxpython, configobj, vtk
+.   install-obspy.sh "${prefix}"	# dep: matplotlib
+
+#pip install scipy			# dep: numpy
+#http://downloads.sourceforge.net/project/scipy/scipy/0.8.0rc1/scipy-0.8.0rc1-py2.6-python.org.dmg
+pip install http://downloads.sourceforge.net/project/scipy/scipy/0.8.0rc1/scipy-0.8.0rc1.tar.gz
 

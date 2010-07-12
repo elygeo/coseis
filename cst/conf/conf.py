@@ -65,62 +65,62 @@ def find( *files ):
                 return f
 
 # Fortran compiler
-fortran_serial = find( 'xlf95_r', 'ifort', 'gfortran', 'pathf95', 'pgf90', 'f95' ),
-fortran_mpi = find( 'mpxlf95_r', 'mpif90' ),
+fortran_serial = find( 'xlf95_r', 'ifort', 'gfortran', 'pathf95', 'pgf90', 'f95' )
+fortran_mpi = find( 'mpxlf95_r', 'mpif90' )
 
 # Fortran compiler flags
 fortran_flags_default_ = {
     'gfortran': {
-        #'f': ('gfortran', '-fimplicit-none', '-Wall', '-std=f95', '-pedantic'),
-        'f': ('-fimplicit-none', '-Wall'),
-        'g': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow', '-g'),
-        't': ('-fbounds-check', '-ffpe-trap=invalid,zero,overflow'),
-        'p': ('-O', '-pg'),
-        'O': ('-O3',),
-        '8': ('-fdefault-real-8',),
+        #'f': 'gfortran -fimplicit-none -Wall -std=f95 -pedantic',
+        'f': '-fimplicit-none -Wall',
+        'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
+        't': '-fbounds-check -ffpe-trap=invalid,zero,overflow',
+        'p': '-O -pg',
+        'O': '-O3',
+        '8': '-fdefault-real-8',
     },
     'ifort': {
-        'f': ('-u', '-std95', '-warn'),
-        'g': ('-CB', '-traceback', '-g'),
-        't': ('-CB', '-traceback'),
-        'p': ('-O', '-pg'),
-        'O': ('-O3',),
-        '8': ('-r8',),
+        'f': '-u -std95 -warn',
+        'g': '-CB -traceback -g',
+        't': '-CB -traceback',
+        'p': '-O -pg',
+        'O': '-O3',
+        '8': '-r8',
     },
     'pgf90': {
-        'f': ('-Mdclchk',),
-        'g': ('-Ktrap=fp', '-Mbounds', '-g'),
-        't': ('-Ktrap=fp', '-Mbounds'),
-        'p': ('-O', '-Mprof=func'),
-        'O': ('-fast',),
-        '8': ('-Mr8',),
+        'f': '-Mdclchk',
+        'g': '-Ktrap=fp -Mbounds -g',
+        't': '-Ktrap=fp -Mbounds',
+        'p': '-O -Mprof=func',
+        'O': '-fast',
+        '8': '-Mr8',
     },
     'xlf95_r': {
-        'f': ('-u', '-q64', '-qsuppress=cmpmsg', '-qlanglvl=2003pure', '-qsuffix=f=f90'),
-        'g': ('-C', '-qflttrap', '-qsigtrap', '-g'),
-        't': ('-C', '-qflttrap', '-qsigtrap'),
-        'p': ('-O', '-p'),
-        'O': ('-O4',),
-        '8': ('-qrealsize=8',),
+        'f': '-u -q64 -qsuppress=cmpmsg -qlanglvl=2003pure -qsuffix=f=f90',
+        'g': '-C -qflttrap -qsigtrap -g',
+        't': '-C -qflttrap -qsigtrap',
+        'p': '-O -p',
+        'O': '-O4',
+        '8': '-qrealsize=8',
     },
     'pathf95': {
-        'f': (),
-        'g': ('-g',),
-        't': (),
-        'p': ('-O', '-p'),
-        'O': ('-i8', '-O3', '-OPT:Ofast', '-fno-math-errno'),
-        '8': ( 'FIXME', ),
+        'f': '',
+        'g': '-g',
+        't': '',
+        'p': '-O -p',
+        'O': '-i8 -O3 -OPT:Ofast -fno-math-errno',
+        '8':  'FIXME',
     }
 }
 if os.uname()[0] == 'SunOS':
     fortran_flags_default_.update( {
         'f95': {
-            'f': ('-u'),
-            'g': ('-C', '-ftrap=common', '-w4', '-g'),
-            't': ('-C', '-ftrap=common'),
-            'p': ('-O', '-pg'),
-            'O': ('-fast', '-fns'),
-            '8': ( 'FIXME', ),
+            'f': '-u',
+            'g': '-C -ftrap=common -w4 -g',
+            't': '-C -ftrap=common',
+            'p': '-O -pg',
+            'O': '-fast -fns',
+            '8':  'FIXME',
         }
     } )
 

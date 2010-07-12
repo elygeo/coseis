@@ -7,7 +7,6 @@ Intel Core 2 Duo 2.6GHz
 """
 login = 'wide.usc.edu'
 hostname = 'wide'
-maxnodes = 1
 maxcores = 2
 maxram = 3800
 rate = 1.4e6

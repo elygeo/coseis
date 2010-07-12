@@ -43,11 +43,11 @@ launch = {
 fortran_serial = 'pgf95',
 fortran_mpi = 'mpif90',
 fortran_flags = {
-    'f': ('-Mdclchk',),
-    'g': ('-Ktrap=fp', '-Mbounds', '-g'),
-    't': ('-Ktrap=fp', '-Mbounds'),
-    'p': ('-fast', '-tp', 'barcelona-64', '-Mprof=func'),
-    'O': ('-fast', '-tp', 'barcelona-64'),
-    '8': ('-Mr8',),
+    'f': '-Mdclchk',
+    'g': '-Ktrap=fp -Mbounds -g',
+    't': '-Ktrap=fp -Mbounds',
+    'p': '-fast -tp barcelona-64 -Mprof=func',
+    'O': '-fast -tp barcelona-64',
+    '8': '-Mr8',
 }
 

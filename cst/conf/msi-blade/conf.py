@@ -30,14 +30,14 @@ launch = {
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
 }
-fortran_serial = 'ifort',
-fortran_mpi = 'mpif90',
+fortran_serial = 'ifort'
+fortran_mpi = 'mpif90'
 fortran_flags = {
-    'f': ('-u', '-std95', '-warn'),
-    'g': ('-CB', '-traceback', '-g'),
-    't': ('-CB', '-traceback'),
-    'p': ('-O', '-pg'),
-    'O': ('-ipo', '-O3', '-no-prec-div'),
-    '8': ('-r8',),
+    'f': '-u -std95 -warn',
+    'g': '-CB -traceback -g',
+    't': '-CB -traceback',
+    'p': '-O -pg',
+    'O': '-ipo -O3 -no-prec-div',
+    '8': '-r8',
 }
 

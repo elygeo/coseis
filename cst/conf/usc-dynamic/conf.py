@@ -25,8 +25,8 @@ login = hostname = 'dynamic.usc.edu'
 maxnodes = 28
 maxcores = 2
 maxram = 1800
-fortran_serial = 'ifort',
-fortran_mpi = 'mpif90',
+fortran_serial = 'ifort'
+fortran_mpi = 'mpif90'
 launch = {
     's_exec':  '%(command)s',
     's_debug': 'gdb %(command)s',
