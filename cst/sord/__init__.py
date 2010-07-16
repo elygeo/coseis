@@ -86,7 +86,7 @@ def _build( mode=None, optimize=None, dtype=None ):
     os.chdir( cwd )
     return
 
-def stage( inputs={}, **kwargs ):
+def stage( dictargs={}, **kwargs ):
     """
     Stage job
     """
@@ -95,7 +95,8 @@ def stage( inputs={}, **kwargs ):
     print( 'SORD setup' )
 
     # update inputs
-    inputs = inputs.copy()
+    inputs = {'name': 'sord'}
+    inputs.update( dictargs )
     inputs.update( kwargs )
 
     # test for depreciated parameters

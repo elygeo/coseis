@@ -91,8 +91,7 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
     if os.path.isfile( f ):
         exec open( f ) in job
     else:
-        d = os.path.dirname( os.path.dirname( path ) )
-        job['repo'] = os.path.join( d, job['repo'] )
+        job['repo'] = os.path.expanduser( job['repo'] )
 
     # machine parameters
     if machine:

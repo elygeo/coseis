@@ -6,6 +6,9 @@ Coseis: Computational Seismology Tools
    :align: right
    :target: http://earth.usc.edu/~gely/ely-saf-surface.mov
 
+Codes for earthquake simulation, rupture dynamics, wave propagation, velocity
+model extraction, and visualization.
+
 .. contents::
 
 Components
