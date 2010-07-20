@@ -4,9 +4,16 @@ Coseis configuration
 import os, pwd
 import numpy as np
 
+# email address
+try:
+    import bzrlib.config
+    c = bzrlib.config.GlobalConfig()
+    email = bzrlib.config.extract_email_address( c.username() )
+except:
+    email = pwd.getpwuid( os.geteuid() )[0]
+
 # site specific
 machine = None
-email = pwd.getpwuid( os.geteuid() )[0]
 repo = 'data'
 
 # job parameters

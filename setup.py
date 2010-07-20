@@ -27,15 +27,9 @@ for target in args:
         cst.sord._build()
         cst.cvm._build()
     elif target == 'path':
-        cst.conf.install_path( path )
+        cst.conf.install_path( path, 'coseis' )
     elif target == 'unpath':
-        cst.conf.uninstall_path( path )
-    elif target == 'install':
-        path = os.path.join( path, 'cst' )
-        cst.conf.install( path )
-    elif target == 'uninstall':
-        path = os.path.join( path, 'cst' )
-        cst.conf.uninstall( path )
+        cst.conf.uninstall_path( path, 'coseis' )
     else:
         sys.exit( 'Unknown target' )
 

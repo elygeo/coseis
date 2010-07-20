@@ -47,9 +47,7 @@ _site_template = '''\
 Site specific configuration
 """
 machine = %(machine)r
-email = %(email)r
 repo = %(repo)r
-rundir = %(rundir)r
 '''
 
 def configure( module=None, machine=None, save_site=False, **kwargs ):
@@ -198,13 +196,15 @@ def make( compiler, object_, source ):
     return compile_
 
 
-def install_path( path ):
+def install_path( path, name=None ):
     """
     Install path file in site-packages directory.
     """
     from distutils.sysconfig import get_python_lib
     src = os.path.realpath( os.path.expanduser( path ) )
-    dst = os.path.join( get_python_lib(), os.path.basename( src ) + '.pth' )
+    if name is None:
+        name = os.path.basename( src )
+    dst = os.path.join( get_python_lib(), name + '.pth' )
     if os.path.exists( dst ):
         sys.exit( 'Error: %s exists\n%s' % (dst, open( dst ).read()) )
     print( 'Installing ' + dst )
@@ -216,54 +216,21 @@ def install_path( path ):
     return
 
 
-def uninstall_path( path ):
+def uninstall_path( path, name=None ):
     """
     Remove path file from site-packages directory.
     """
     from distutils.sysconfig import get_python_lib
     src = os.path.realpath( os.path.expanduser( path ) )
-    dst = os.path.join( get_python_lib(), os.path.basename( src ) + '.pth' )
+    if name is None:
+        name = os.path.basename( src )
+    dst = os.path.join( get_python_lib(), name + '.pth' )
     print( 'Removing ' + dst )
     if os.path.isfile( dst ):
         try:
             os.unlink( dst )
         except( IOError ):
             sys.exit( 'No write permission for Python directory' )
-    return
-
-
-def install( path ):
-    """
-    Copy package to site-packages directory.
-    """
-    from distutils.sysconfig import get_python_lib
-    src = os.path.realpath( os.path.expanduser( path ) )
-    dst = os.path.join( get_python_lib(), os.path.basename( src ) )
-    if os.path.exists( dst ):
-        sys.exit( 'Error: %s exists' % dst )
-    print( 'Installing ' + dst )
-    print( 'from ' + src )
-    try:
-        shutil.copytree( src, dst )
-    except( OSError ):
-        sys.exit( 'No write permission for Python directory' )
-    return
-
-
-def uninstall( path ):
-    """
-    Remove package from site-packages directory.
-    """
-    from distutils.sysconfig import get_python_lib
-    src = os.path.realpath( os.path.expanduser( path ) )
-    dst = os.path.join( get_python_lib(), os.path.basename( src ) )
-    if not os.path.exists( dst ):
-        sys.exit( 'Error: %s does not exist' % dst )
-    print( 'Removing ' + dst )
-    try:
-        shutil.rmtree( dst )
-    except( OSError ):
-        sys.exit( 'No write permission for Python directory' )
     return
 
 
