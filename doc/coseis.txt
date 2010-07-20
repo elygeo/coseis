@@ -97,7 +97,7 @@ libraries.
     control, which facilitates applying code updates, and merging local
     modifications (see `Source Control`_ section for examples)::
 
-        bzr get http://earth.usc.edu/~gely/coseis
+        bzr branch http://earth.usc.edu/~gely/coseis
 
     Alternatively, download and unpack the source tar archive:
     ::
