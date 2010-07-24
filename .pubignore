@@ -3,8 +3,8 @@
 .DS_Store
 *.pyc
 *.so
-build
 run
 tmp
-cst/conf/site.py
-data
+build
+/data
+/cst/conf/site.py

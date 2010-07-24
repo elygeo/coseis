@@ -2,8 +2,12 @@
 
 dest="earth.usc.edu:public_html/coseis"
 
+if [ "$( basename $PWD )" != "release" ]; then
+    echo "Must run from coseis/release directory"
+    exit
+fi
+
 echo "Syncing to $dest"
-cd "$( dirname $( dirname $0 ) )"
 
 rsync \
     -vrlpt \

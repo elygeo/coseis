@@ -3,11 +3,11 @@
 .DS_Store
 *.pyc
 *.so
-changelog
-build
 run
 tmp
-/cst/conf/site.py
+build
 /data
+/cst/conf/site.py
+/changelog
 /download
 *.tgz
