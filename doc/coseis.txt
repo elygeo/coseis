@@ -1,6 +1,9 @@
-======================================
-Coseis: Computational Seismology Tools
-======================================
+======
+Coseis
+======
+------------------------------
+Computational Seismology Tools
+------------------------------
 
 .. image:: ely-saf-surface.jpg
    :align: right
@@ -9,7 +12,9 @@ Coseis: Computational Seismology Tools
 Codes for earthquake simulation, rupture dynamics, wave propagation, velocity
 model extraction, and visualization.
 
+
 .. contents::
+
 
 Components
 ==========
@@ -29,6 +34,26 @@ Components
     disseminate large numerical simulations results.
 
 *   Mesh generation, source preparation, and visualization utilities.
+
+
+License
+=======
+
+Coseis is open-source and released under the `GNU General Public License Version 3
+<license.txt>`_.  You are free to use or redistribute the code, with the
+obligation that you contribute back any modification or derived works.
+
+
+Author
+=======
+
+| `Geoffrey Ely <http://earth.usc.edu/~gely/>`_
+| `Department of Earth Sciences <http://www.usc.edu/dept/earth/>`_
+| `University of Southern California <http://www.usc.edu/>`_
+| http://earth.usc.edu/~gely/
+| gely@usc.edu
+
+Contributions from: Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi
 
 
 System requirements
