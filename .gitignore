@@ -3,6 +3,7 @@
 .DS_Store
 *.pyc
 *.so
+changelog
 build
 run
 tmp
