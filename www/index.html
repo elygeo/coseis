@@ -119,11 +119,10 @@ model extraction, and visualization.</p>
 <li><a class="reference internal" href="#author" id="id3">Author</a></li>
 <li><a class="reference internal" href="#system-requirements" id="id4">System requirements</a></li>
 <li><a class="reference internal" href="#installation" id="id5">Installation</a></li>
-<li><a class="reference internal" href="#development" id="id6">Development</a></li>
-<li><a class="reference internal" href="#examples" id="id7">Examples</a><ul>
-<li><a class="reference internal" href="#cvm-depth-planes" id="id8">CVM depth planes</a></li>
-<li><a class="reference internal" href="#cvm-fence-diagram" id="id9">CVM fence diagram</a></li>
-<li><a class="reference internal" href="#cvm-4-basin-depth" id="id10">CVM-4 Basin depth</a></li>
+<li><a class="reference internal" href="#examples" id="id6">Examples</a><ul>
+<li><a class="reference internal" href="#cvm-depth-planes" id="id7">CVM depth planes</a></li>
+<li><a class="reference internal" href="#cvm-fence-diagram" id="id8">CVM fence diagram</a></li>
+<li><a class="reference internal" href="#cvm-4-basin-depth" id="id9">CVM-4 Basin depth</a></li>
 </ul>
 </li>
 </ul>
@@ -212,11 +211,15 @@ following script installs Python and NumPy:</p>
 <p><a class="reference external" href="http://www.enthought.com/products/epddownload.php">Enthought Python Distribution</a> (EPD) is another
 option that includes many bells and whistles such as the <a class="reference external" href="http://code.enthought.com/projects/mayavi">Mayavi</a> visualization package.</p>
 </li>
-<li><p class="first">Download the source code.  The best option is to use Git version control,
-which facilitates applying code updates, and merging local modifications (see
-<a class="reference internal" href="#development">Development</a> section for examples):</p>
+<li><p class="first">Download the source code.  The best option is to use the <a class="reference external" href="http://github.com/gely/coseis">Coseis GitHub
+repository</a> with <a class="reference external" href="http://git-scm.com/">Git</a> version control, which
+facilitates applying code updates, and merging local modifications:</p>
+<blockquote>
+<p>git clone git://github.com/gely/coseis.git</p>
+</blockquote>
+<p>Update to the latest changes anytime with:</p>
 <pre class="literal-block">
-git clone git://github.com/gely/coseis.git
+git pull
 </pre>
 <p>Alternatively, download and unpack the source tar archive:</p>
 <pre class="literal-block">
@@ -258,31 +261,6 @@ python setup.py --machine=tacc-ranger build path
 </pre>
 </li>
 </ol>
-</div>
-<div class="section" id="development">
-<h3>Development</h3>
-<p>The source code is hosted by GitHub at &lt;<a class="reference external" href="http://github.com/gely/coseis">http://github.com/gely/coseis</a>&gt;, and
-<a class="reference external" href="http://git-scm.com/">Git</a> is used for version control. Some examples:</p>
-<p>Retrieve Coseis development branch from GitHub repository</p>
-<pre class="literal-block">
-git clone git://github.com/gely/coseis.git
-</pre>
-<p>Update from the repository, discarding any local changes</p>
-<pre class="literal-block">
-git fetch
-</pre>
-<p>Merge from the repository, integrating local changes</p>
-<pre class="literal-block">
-git pull
-</pre>
-<p>Commit changes</p>
-<pre class="literal-block">
-git add .
-git commit -am &quot;Great new feature&quot;
-</pre>
-<p>See the
-<a class="reference external" href="http://gitref.org/">Git Reference</a>
-for more.</p>
 </div>
 <div class="section" id="examples">
 <h3>Examples</h3>

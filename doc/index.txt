@@ -118,11 +118,16 @@ libraries.
     option that includes many bells and whistles such as the `Mayavi
     <http://code.enthought.com/projects/mayavi>`_ visualization package.
 
-4.  Download the source code.  The best option is to use Git version control,
-    which facilitates applying code updates, and merging local modifications (see
-    `Development`_ section for examples)::
+4.  Download the source code.  The best option is to use the `Coseis GitHub
+    repository <http://github.com/gely/coseis>`__ with Git_ version control, which
+    facilitates applying code updates, and merging local modifications:
 
         git clone git://github.com/gely/coseis.git
+
+    Update to the latest changes anytime with:
+    ::
+
+        git pull
 
     Alternatively, download and unpack the source tar archive:
     ::
@@ -162,38 +167,6 @@ libraries.
     ::
 
         python setup.py --machine=tacc-ranger build path
-
-
-Development
-===========
-
-The source code is hosted by GitHub at <http://github.com/gely/coseis>, and
-Git_ is used for version control. Some examples:
-
-Retrieve Coseis development branch from GitHub repository
-::
-
-    git clone git://github.com/gely/coseis.git
-
-Update from the repository, discarding any local changes
-::
-
-    git fetch
-
-Merge from the repository, integrating local changes
-::
-
-    git pull
-
-Commit changes
-::
-
-    git add .
-    git commit -am "Great new feature"
-
-See the
-`Git Reference <http://gitref.org/>`__
-for more.
 
 
 Examples
