@@ -269,15 +269,15 @@ and manually launch the executable from there.  The job can be run automatically
 <div class="section" id="field-i-o">
 <h4>Field I/O</h4>
 <p>Multidimensional field arrays can be accessed for input and output through the
-<tt class="docutils literal">fieldio</tt> list.  The <a class="reference external" href="fieldnames.py">fieldnames.py</a> file specifies the list of available
-field variables, which are categorized in four ways: (1) static vs. dynamic,
-(2) settable vs. output only, (3) node vs. cell registration, and (4) volume
-vs. fault surface.  For example, density <tt class="docutils literal">rho</tt> is a static, settable, cell,
-volume variable.  Slip path length <tt class="docutils literal">sl</tt> is a dynamic, output, node, fault
-variable.  The <tt class="docutils literal">fieldio</tt> list is order dependent with subsequent inputs
-overwriting previous inputs.  So, for example, a field may be assigned to one
-value for the entire volume, followed by a different value for a sub-region of
-the volume.</p>
+<tt class="docutils literal">fieldio</tt> list.  The <a class="reference external" href="../cst/sord/fieldnames.py">fieldnames.py</a> file
+specifies the list of available field variables, which are categorized in four
+ways: (1) static vs. dynamic, (2) settable vs. output only, (3) node vs. cell
+registration, and (4) volume vs. fault surface.  For example, density <tt class="docutils literal">rho</tt>
+is a static, settable, cell, volume variable.  Slip path length <tt class="docutils literal">sl</tt> is a
+dynamic, output, node, fault variable.  The <tt class="docutils literal">fieldio</tt> list is order dependent
+with subsequent inputs overwriting previous inputs.  So, for example, a field
+may be assigned to one value for the entire volume, followed by a different
+value for a sub-region of the volume.</p>
 <p>All field I/O operations require slice indices <tt class="docutils literal">[j,k,l,t]</tt>, which specify a
 four-dimensional sub-volume of the array in space and time.  Array indexing
 starts at 1 for the first node, and 1.5 for the first cell.  Negative indices
@@ -296,7 +296,7 @@ shorthand for a full range.  Empty brackets <tt class="docutils literal">[]</tt>
 <p>Each member of the <tt class="docutils literal">fieldio</tt> list contains a mode, a field name, and slice
 indices, followed by mode dependent parameters.  The following I/O modes are
 available, where <tt class="docutils literal">'f'</tt> is the field variable name (from the list
-<a class="reference external" href="fieldnames.py">fieldnames.py</a>), and <tt class="docutils literal">[]</tt> are the slice indices:</p>
+<a class="reference external" href="../cst/sord/fieldnames.py">fieldnames.py</a>), and <tt class="docutils literal">[]</tt> are the slice indices:</p>
 <pre class="literal-block">
 ('=',   'f', [], val),             # Set f to value
 ('+',   'f', [], val),             # Add value to f
@@ -319,9 +319,9 @@ or 2D models into 3D simulations, obviating the need to store (possibly very
 large) 3D material and mesh coordinate files.</p>
 <p>All input modes may use '+' instead of '=' to add to, rather than replace,
 preexisting values.  For a list of available time functions, see the
-<tt class="docutils literal">time_function</tt> subroutine in <a class="reference external" href="../cst/sord/src/util.f90">../cst/sord/src/util.f90</a>.  The routine
-can be easily modified to add new time functions.  Time functions can be offset
-in time with the <tt class="docutils literal">tm0</tt> initial time parameter.</p>
+<tt class="docutils literal">time_function</tt> subroutine in <a class="reference external" href="../cst/sord/src/util.f90">util.f90</a>.  The
+routine can be easily modified to add new time functions.  Time functions can
+be offset in time with the <tt class="docutils literal">tm0</tt> initial time parameter.</p>
 </div>
 <div class="section" id="boundary-conditions">
 <h4>Boundary Conditions</h4>
@@ -334,11 +334,11 @@ a slip surface, the fault may be placed at the boundary and combined with an
 anti-mirror symmetry condition.  The following BC types are supported:</p>
 <p><strong>Type 0</strong>: Vacuum free-surface.  Stress is zero in cells outside the boundary.</p>
 <blockquote>
-<img alt="bc/bc0.png" src="bc/bc0.png" />
+<img alt="bc0.png" src="bc0.png" />
 </blockquote>
 <p><strong>Type 3</strong>: Rigid surface. Displacement is zero at the boundary.</p>
 <blockquote>
-<img alt="bc/bc3.png" src="bc/bc3.png" />
+<img alt="bc3.png" src="bc3.png" />
 </blockquote>
 <p><strong>Type 1</strong>: Mirror symmetry at the node.  Normal displacement is zero at the
 boundary.  Useful for a boundary corresponding to (a) the plane orthogonal to
@@ -346,24 +346,24 @@ the two nodal planes of a double-couple point source, (b) the plane normal to
 the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D
 plane strain problem.</p>
 <blockquote>
-<img alt="bc/bc1.png" src="bc/bc1.png" />
+<img alt="bc1.png" src="bc1.png" />
 </blockquote>
 <p><strong>Type -1</strong>: Anti-mirror symmetry at the node.  Tangential displacement is zero
 at the boundary.  Useful for a boundary corresponding to (a) the nodal planes
 of a double-couple point source, (b) the plane normal to the mode-II axis of a
 symmetric rupture, or (c) the zero-width axis of a 2D antiplane strain problem.</p>
 <blockquote>
-<img alt="bc/bc-1.png" src="bc/bc-1.png" />
+<img alt="bc-1.png" src="bc-1.png" />
 </blockquote>
 <p><strong>Type 2</strong>: Mirror symmetry at the cell. Same as type 1, but centered on the cell.</p>
 <blockquote>
-<img alt="bc/bc2.png" src="bc/bc2.png" />
+<img alt="bc2.png" src="bc2.png" />
 </blockquote>
 <p><strong>Type -2</strong>: Anti-mirror symmetry at the cell.  Same as type -1, but centered
 on the cell.  Can additionally be used when the boundary corresponds to the
 slip surface of a symmetric rupture.</p>
 <blockquote>
-<img alt="bc/bc-2.png" src="bc/bc-2.png" />
+<img alt="bc-2.png" src="bc-2.png" />
 </blockquote>
 <p><strong>Type 10</strong>: Perfectly match layer (PML) absorbing boundary.</p>
 <p>Example: a 3D problem with a free surface at Z=0, and PML absorbing boundaries

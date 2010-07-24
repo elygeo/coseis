@@ -71,7 +71,7 @@ System requirements
     <http://www.scipy.org/>`_, and Pyproj Python packages.  Required for
     supplemental plotting, signal processing, and mesh generation utilities.
 
-*   (Optional) `Bazaar <http://bazaar.canonical.com/>`_ version control system.
+*   (Optional) `Git <http://git-scm.com/>`_ version control system.
     Useful for development and staying updated with the latest code version.
 
 
@@ -106,23 +106,23 @@ libraries.
 2.  `MPICH2 <http://www.mcs.anl.gov/research/projects/mpich2/>`_ is recommended
     if you need MPI.  The following shell script installs MPICH2:
 
-        `install-mpich.sh <../install/install-mpich.sh>`_
+        `install-mpich.sh <../sbin/install-mpich.sh>`_
 
 3.  It is recommended that you install a private copy of Python for Coseis.  The
     following script installs Python and NumPy:
 
-        `install-python.sh <../install/install-python.sh>`_
+        `install-python.sh <../sbin/install-python.sh>`_
 
     `Enthought Python Distribution
     <http://www.enthought.com/products/epddownload.php>`_ (EPD) is another
     option that includes many bells and whistles such as the `Mayavi
     <http://code.enthought.com/projects/mayavi>`_ visualization package.
 
-4.  Download the source code.  The best option is to use Bazaar version
-    control, which facilitates applying code updates, and merging local
-    modifications (see `Development`_ section for examples)::
+4.  Download the source code.  The best option is to use Git version control,
+    which facilitates applying code updates, and merging local modifications (see
+    `Development`_ section for examples)::
 
-        bzr branch lp:coseis
+        git clone git://github.com/gely/coseis.git
 
     Alternatively, download and unpack the source tar archive:
     ::
@@ -158,56 +158,41 @@ libraries.
 
         python setup.py path
 
-8.  Configure your email address for batch notifications (optional):
+8.  Steps 5 through 7 can be combined as:
     ::
 
-        python setup.py --email=email@example.com
-
-    Steps 5 through 8 can be combined as:
-    ::
-
-        python setup.py --machine=tacc-ranger --email=email@example.com build path
+        python setup.py --machine=tacc-ranger build path
 
 
 Development
 ===========
 
-The source code is hosted by Launchpad at <https://launchpad.net/coseis>, and
-Bazaar_ is used for version control. Some examples:
+The source code is hosted by GitHub at <http://github.com/gely/coseis>, and
+Git_ is used for version control. Some examples:
 
-Retrieve Coseis development branch from Launchpad repository
+Retrieve Coseis development branch from GitHub repository
 ::
 
-    bzr branch lp:coseis
+    git clone git://github.com/gely/coseis.git
 
 Update from the repository, discarding any local changes
 ::
 
-    bzr pull
-    bzr revert
+    git fetch
 
 Merge from the repository, integrating local changes
 ::
 
-    bzr merge
-
-See code changes since the last commit
-::
-
-    bzr diff
+    git pull
 
 Commit changes
 ::
 
-    bzr commit -m "Great new feature"
-
-Publish your branch to `Launchpad <launchpad.net>`_ (registration required)
-::
-
-    bzr push lp:~userid/coseis/great-new-feature
+    git add .
+    git commit -am "Great new feature"
 
 See the
-`Bazaar tutorials <http://doc.bazaar-vcs.org/latest/en/tutorials/>`__
+`Git Reference <http://gitref.org/>`__
 for more.
 
 

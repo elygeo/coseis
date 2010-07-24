@@ -95,7 +95,7 @@ convenient way to create the parameter dictionary from the local scope.  Any
 dictionary parameters 
 
 A complete list of possible SORD parameters and default values are specified in
-`parameters.py <../cst/sord/parameters.py>`__.
+`parameters.py <../cst/sord/parameters.py>`_.
 
 FIXME: OUTDATED.
 
@@ -141,15 +141,15 @@ Field I/O
 ---------
 
 Multidimensional field arrays can be accessed for input and output through the
-``fieldio`` list.  The `<fieldnames.py>`__ file specifies the list of available
-field variables, which are categorized in four ways: (1) static vs. dynamic,
-(2) settable vs. output only, (3) node vs. cell registration, and (4) volume
-vs. fault surface.  For example, density ``rho`` is a static, settable, cell,
-volume variable.  Slip path length ``sl`` is a dynamic, output, node, fault
-variable.  The ``fieldio`` list is order dependent with subsequent inputs
-overwriting previous inputs.  So, for example, a field may be assigned to one
-value for the entire volume, followed by a different value for a sub-region of
-the volume.
+``fieldio`` list.  The `fieldnames.py <../cst/sord/fieldnames.py>`_ file
+specifies the list of available field variables, which are categorized in four
+ways: (1) static vs. dynamic, (2) settable vs. output only, (3) node vs. cell
+registration, and (4) volume vs. fault surface.  For example, density ``rho``
+is a static, settable, cell, volume variable.  Slip path length ``sl`` is a
+dynamic, output, node, fault variable.  The ``fieldio`` list is order dependent
+with subsequent inputs overwriting previous inputs.  So, for example, a field
+may be assigned to one value for the entire volume, followed by a different
+value for a sub-region of the volume.
 
 All field I/O operations require slice indices ``[j,k,l,t]``, which specify a
 four-dimensional sub-volume of the array in space and time.  Array indexing
@@ -169,7 +169,7 @@ shorthand for a full range.  Empty brackets ``[]`` are shorthand for the entire
 Each member of the ``fieldio`` list contains a mode, a field name, and slice
 indices, followed by mode dependent parameters.  The following I/O modes are
 available, where ``'f'`` is the field variable name (from the list
-`<fieldnames.py>`__), and ``[]`` are the slice indices::
+fieldnames.py_), and ``[]`` are the slice indices::
 
     ('=',   'f', [], val),             # Set f to value
     ('+',   'f', [], val),             # Add value to f
@@ -194,9 +194,9 @@ large) 3D material and mesh coordinate files.
 
 All input modes may use '+' instead of '=' to add to, rather than replace,
 preexisting values.  For a list of available time functions, see the
-``time_function`` subroutine in `<../cst/sord/src/util.f90>`__.  The routine
-can be easily modified to add new time functions.  Time functions can be offset
-in time with the ``tm0`` initial time parameter.
+``time_function`` subroutine in `util.f90 <../cst/sord/src/util.f90>`__.  The
+routine can be easily modified to add new time functions.  Time functions can
+be offset in time with the ``tm0`` initial time parameter.
 
 
 Boundary Conditions
@@ -212,11 +212,11 @@ anti-mirror symmetry condition.  The following BC types are supported:
 
 **Type 0**: Vacuum free-surface.  Stress is zero in cells outside the boundary.
 
-    .. image:: bc/bc0.png
+    .. image:: bc0.png
 
 **Type 3**: Rigid surface. Displacement is zero at the boundary.
 
-    .. image:: bc/bc3.png
+    .. image:: bc3.png
 
 **Type 1**: Mirror symmetry at the node.  Normal displacement is zero at the
 boundary.  Useful for a boundary corresponding to (a) the plane orthogonal to
@@ -224,24 +224,24 @@ the two nodal planes of a double-couple point source, (b) the plane normal to
 the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D
 plane strain problem.
 
-    .. image:: bc/bc1.png
+    .. image:: bc1.png
 
 **Type -1**: Anti-mirror symmetry at the node.  Tangential displacement is zero
 at the boundary.  Useful for a boundary corresponding to (a) the nodal planes
 of a double-couple point source, (b) the plane normal to the mode-II axis of a
 symmetric rupture, or (c) the zero-width axis of a 2D antiplane strain problem.
 
-    .. image:: bc/bc-1.png
+    .. image:: bc-1.png
 
 **Type 2**: Mirror symmetry at the cell. Same as type 1, but centered on the cell.
 
-    .. image:: bc/bc2.png
+    .. image:: bc2.png
 
 **Type -2**: Anti-mirror symmetry at the cell.  Same as type -1, but centered
 on the cell.  Can additionally be used when the boundary corresponds to the
 slip surface of a symmetric rupture.
 
-    .. image:: bc/bc-2.png
+    .. image:: bc-2.png
 
 **Type 10**: Perfectly match layer (PML) absorbing boundary.
 

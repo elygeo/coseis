@@ -1,9 +1,0 @@
-.bzr
-.git
-*.tgz
-build
-run
-tmp
-/cst/conf/site.py
-/download
-/data

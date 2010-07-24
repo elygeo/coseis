@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-cd "$( dirname $0 )/download"
+cd "$( dirname $( dirname $0 ) )/download"
 bzr export coseis.tar
 mkdir coseis
 bzr version-info > coseis/version

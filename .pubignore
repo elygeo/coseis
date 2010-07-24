@@ -6,7 +6,5 @@
 build
 run
 tmp
-/cst/conf/site.py
-/data
-/download
-*.tgz
+cst/conf/site.py
+data

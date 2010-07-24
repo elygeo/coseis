@@ -2,8 +2,12 @@
 """
 Prepare documentation.
 """
-import re
+import os, re
 from docutils.core import publish_string
+
+cwd = os.getcwd()
+os.chdir( os.path.join( '..', 'www' ) )
+
 settings = dict(
     datestamp = '%Y-%m-%d',
     generator = True,
@@ -11,12 +15,13 @@ settings = dict(
     toc_backlinks = None,
     cloak_email_addresses = True,
     initial_header_level = 3,
-    stylesheet_path = 'style.css',
+    stylesheet_path = os.path.join( cwd, 'style.css' ),
 )
 
-for f in 'coseis', 'sord':
+for f in 'index', 'sord':
     print f
-    rst = open( f + '.txt' ).read()
+    path = os.path.join( cwd, f ) + '.txt'
+    rst = open( path ).read()
     html = publish_string( rst, writer_name='html4css1',
         settings_overrides=settings )
     html = re.sub( '<col.*>\n', '', html )

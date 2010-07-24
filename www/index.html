@@ -170,7 +170,7 @@ obligation that you contribute back any modification or derived works.</p>
 SORD and CVM4 multi-core processing.</li>
 <li>(Optional) <a class="reference external" href="http://matplotlib.sourceforge.net/">Matplotlib</a>, <a class="reference external" href="http://www.scipy.org/">SciPy</a>, and Pyproj Python packages.  Required for
 supplemental plotting, signal processing, and mesh generation utilities.</li>
-<li>(Optional) <a class="reference external" href="http://bazaar.canonical.com/">Bazaar</a> version control system.
+<li>(Optional) <a class="reference external" href="http://git-scm.com/">Git</a> version control system.
 Useful for development and staying updated with the latest code version.</li>
 </ul>
 </div>
@@ -201,22 +201,22 @@ and Fink seem to be problematic and are not recommended).</p>
 <li><p class="first"><a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a> is recommended
 if you need MPI.  The following shell script installs MPICH2:</p>
 <blockquote>
-<p><a class="reference external" href="../install/install-mpich.sh">install-mpich.sh</a></p>
+<p><a class="reference external" href="../sbin/install-mpich.sh">install-mpich.sh</a></p>
 </blockquote>
 </li>
 <li><p class="first">It is recommended that you install a private copy of Python for Coseis.  The
 following script installs Python and NumPy:</p>
 <blockquote>
-<p><a class="reference external" href="../install/install-python.sh">install-python.sh</a></p>
+<p><a class="reference external" href="../sbin/install-python.sh">install-python.sh</a></p>
 </blockquote>
 <p><a class="reference external" href="http://www.enthought.com/products/epddownload.php">Enthought Python Distribution</a> (EPD) is another
 option that includes many bells and whistles such as the <a class="reference external" href="http://code.enthought.com/projects/mayavi">Mayavi</a> visualization package.</p>
 </li>
-<li><p class="first">Download the source code.  The best option is to use Bazaar version
-control, which facilitates applying code updates, and merging local
-modifications (see <a class="reference internal" href="#development">Development</a> section for examples):</p>
+<li><p class="first">Download the source code.  The best option is to use Git version control,
+which facilitates applying code updates, and merging local modifications (see
+<a class="reference internal" href="#development">Development</a> section for examples):</p>
 <pre class="literal-block">
-bzr branch lp:coseis
+git clone git://github.com/gely/coseis.git
 </pre>
 <p>Alternatively, download and unpack the source tar archive:</p>
 <pre class="literal-block">
@@ -252,48 +252,36 @@ python setup.py build
 python setup.py path
 </pre>
 </li>
-<li><p class="first">Configure your email address for batch notifications (optional):</p>
+<li><p class="first">Steps 5 through 7 can be combined as:</p>
 <pre class="literal-block">
-python setup.py --email=email&#64;example.com
-</pre>
-<p>Steps 5 through 8 can be combined as:</p>
-<pre class="literal-block">
-python setup.py --machine=tacc-ranger --email=email&#64;example.com build path
+python setup.py --machine=tacc-ranger build path
 </pre>
 </li>
 </ol>
 </div>
 <div class="section" id="development">
 <h3>Development</h3>
-<p>The source code is hosted by Launchpad at &lt;<a class="reference external" href="https://launchpad.net/coseis">https://launchpad.net/coseis</a>&gt;, and
-<a class="reference external" href="http://bazaar.canonical.com/">Bazaar</a> is used for version control. Some examples:</p>
-<p>Retrieve Coseis development branch from Launchpad repository</p>
+<p>The source code is hosted by GitHub at &lt;<a class="reference external" href="http://github.com/gely/coseis">http://github.com/gely/coseis</a>&gt;, and
+<a class="reference external" href="http://git-scm.com/">Git</a> is used for version control. Some examples:</p>
+<p>Retrieve Coseis development branch from GitHub repository</p>
 <pre class="literal-block">
-bzr branch lp:coseis
+git clone git://github.com/gely/coseis.git
 </pre>
 <p>Update from the repository, discarding any local changes</p>
 <pre class="literal-block">
-bzr pull
-bzr revert
+git fetch
 </pre>
 <p>Merge from the repository, integrating local changes</p>
 <pre class="literal-block">
-bzr merge
-</pre>
-<p>See code changes since the last commit</p>
-<pre class="literal-block">
-bzr diff
+git pull
 </pre>
 <p>Commit changes</p>
 <pre class="literal-block">
-bzr commit -m &quot;Great new feature&quot;
-</pre>
-<p>Publish your branch to <a class="reference external" href="launchpad.net">Launchpad</a> (registration required)</p>
-<pre class="literal-block">
-bzr push lp:~userid/coseis/great-new-feature
+git add .
+git commit -am &quot;Great new feature&quot;
 </pre>
 <p>See the
-<a class="reference external" href="http://doc.bazaar-vcs.org/latest/en/tutorials/">Bazaar tutorials</a>
+<a class="reference external" href="http://gitref.org/">Git Reference</a>
 for more.</p>
 </div>
 <div class="section" id="examples">
