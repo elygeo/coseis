@@ -106,30 +106,26 @@ img {
 <body>
 <div class="document" id="sord">
 <h1 class="title">SORD</h1>
+<h2 class="subtitle" id="support-operator-rupture-dynamics">Support Operator Rupture Dynamics</h2>
 
-<a class="reference external image-reference" href="http://earth.usc.edu/~gely/ely-saf-surface.mov"><img align="right" alt="ely-saf-surface.jpg" class="align-right" src="ely-saf-surface.jpg" /></a>
 <div class="contents topic" id="contents">
 <p class="topic-title first">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#summary" id="id2">Summary</a><ul>
-<li><a class="reference internal" href="#license" id="id3">License</a></li>
-<li><a class="reference internal" href="#author" id="id4">Author</a></li>
+<li><a class="reference internal" href="#summary" id="id2">Summary</a></li>
+<li><a class="reference internal" href="#publications" id="id3">Publications</a></li>
+<li><a class="reference internal" href="#user-guide" id="id4">User Guide</a><ul>
+<li><a class="reference internal" href="#quick-test" id="id5">Quick test</a></li>
+<li><a class="reference internal" href="#scripting-with-python" id="id6">Scripting with Python</a></li>
+<li><a class="reference internal" href="#running-jobs" id="id7">Running jobs</a></li>
+<li><a class="reference internal" href="#field-i-o" id="id8">Field I/O</a></li>
+<li><a class="reference internal" href="#boundary-conditions" id="id9">Boundary Conditions</a></li>
+<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id10">Defining the fault rupture surface</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#publications" id="id5">Publications</a></li>
-<li><a class="reference internal" href="#user-guide" id="id6">User Guide</a><ul>
-<li><a class="reference internal" href="#quick-test" id="id7">Quick test</a></li>
-<li><a class="reference internal" href="#scripting-with-python" id="id8">Scripting with Python</a></li>
-<li><a class="reference internal" href="#running-jobs" id="id9">Running jobs</a></li>
-<li><a class="reference internal" href="#field-i-o" id="id10">Field I/O</a></li>
-<li><a class="reference internal" href="#boundary-conditions" id="id11">Boundary Conditions</a></li>
-<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id12">Defining the fault rupture surface</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#memory-usage-and-scaling" id="id13">Memory Usage and Scaling</a></li>
-<li><a class="reference internal" href="#development" id="id14">Development</a><ul>
-<li><a class="reference internal" href="#debugging" id="id15">Debugging</a></li>
-<li><a class="reference internal" href="#profiling" id="id16">Profiling</a></li>
+<li><a class="reference internal" href="#memory-usage-and-scaling" id="id11">Memory Usage and Scaling</a></li>
+<li><a class="reference internal" href="#development" id="id12">Development</a><ul>
+<li><a class="reference internal" href="#debugging" id="id13">Debugging</a></li>
+<li><a class="reference internal" href="#profiling" id="id14">Profiling</a></li>
 </ul>
 </li>
 </ul>
@@ -151,22 +147,6 @@ are coded in Fortran 95 and parallelized for multi-processor execution using
 Message Passing Interface (MPI).  The code is portable and tested with a
 variety of Fortran 95 compilers, MPI implementations, and operating systems
 (Linux, Mac OS X, IBM AIX, SUN Solaris).</p>
-<div class="section" id="license">
-<h4>License</h4>
-<p>SORD is open-source and released under the <a class="reference external" href="license.txt">GNU General Public License Version 3</a>.  You are free to use or redistribute the code, with the
-obligation that you contribute back any modification or derived works.</p>
-</div>
-<div class="section" id="author">
-<h4>Author</h4>
-<div class="line-block">
-<div class="line"><a class="reference external" href="http://earth.usc.edu/~gely/">Geoffrey Ely</a></div>
-<div class="line"><a class="reference external" href="http://www.usc.edu/dept/earth/">Department of Earth Sciences</a></div>
-<div class="line"><a class="reference external" href="http://www.usc.edu/">University of Southern California</a></div>
-<div class="line"><a class="reference external" href="http://earth.usc.edu/~gely/">http://earth.usc.edu/~gely/</a></div>
-<div class="line"><a class="reference external" href="mailto:gely&#37;&#52;&#48;usc&#46;edu">gely<span>&#64;</span>usc<span>&#46;</span>edu</a></div>
-</div>
-<p>Contributions from: Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi</p>
-</div>
 </div>
 <div class="section" id="publications">
 <h3>Publications</h3>

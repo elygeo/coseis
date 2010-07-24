@@ -1,13 +1,11 @@
 ====
 SORD
 ====
-
-.. image:: ely-saf-surface.jpg
-   :align: right
-   :target: http://earth.usc.edu/~gely/ely-saf-surface.mov
+---------------------------------
+Support Operator Rupture Dynamics
+---------------------------------
 
 .. contents::
-
 
 Summary
 =======
@@ -28,26 +26,6 @@ are coded in Fortran 95 and parallelized for multi-processor execution using
 Message Passing Interface (MPI).  The code is portable and tested with a
 variety of Fortran 95 compilers, MPI implementations, and operating systems
 (Linux, Mac OS X, IBM AIX, SUN Solaris).
-
-
-License
--------
-
-SORD is open-source and released under the `GNU General Public License Version 3
-<license.txt>`_.  You are free to use or redistribute the code, with the
-obligation that you contribute back any modification or derived works.
-
-
-Author
-------
-
-| `Geoffrey Ely <http://earth.usc.edu/~gely/>`_
-| `Department of Earth Sciences <http://www.usc.edu/dept/earth/>`_
-| `University of Southern California <http://www.usc.edu/>`_
-| http://earth.usc.edu/~gely/
-| gely@usc.edu
-
-Contributions from: Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi
 
 
 Publications
