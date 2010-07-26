@@ -1,93 +1,68 @@
+/* CSS stylesheet */
+
 body {
-    margin: 0px;
-    color: #000;
+    margin: 30px;
     background-color: #fff;
+    color: #000;
     font-family: 'Lucida Grande', Geneva, Verdana, sans-serif;
 }
 
-div {
+h2, h3, p.topic-title {
+    font-weight: bold;
+    font-size: large;
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 2px solid #ddd;
+}
+
+h1.title {
     margin: 0px;
+    color: #800;
 }
 
-div.line-block {
-    margin: 20px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-div.footer {
-    margin: 20px;
-    margin-top: 40px;
-}
-
-p {
-    margin: 20px;
-    margin-top: 15px;
-    margin-bottom: 15px;
-}
-
-dl {
-    margin: 20px;
-    margin-top: 35px;
-    margin-bottom: 15px;
-}
-
-table {
-    margin: 60px;
-    margin-top: 0px;
-    margin-bottom: 0px;
+h2.subtitle {
+    margin: 0px;
+    padding: 0px;
+    padding-bottom: 10px;
     border: none;
-}
-
-td {
-    border: none;
-}
-
-ul {
-    margin-top: 10px;
-}
-
-li {
-    margin-bottom: 10px;
 }
 
 pre {
-    margin: 60px;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    padding: 10px;
+    border: thin solid #ddd;
+    background-color: #f4f4f4;
 }
 
-h1 {
-    margin: 0px;
-    padding: 20px;
-    border-top: medium solid #700;
-    border-bottom: medium solid #300;
-    font-weight: lighter;
-    color: #fff;
-    background-color: #600;
-    text-shadow: #000 3px 3px 3px;
-}
-
-h2, h3, h4 {
-    padding: 5px;
-    margin: 15px;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    background-color: #eee;
+img.align-right {
+    padding-top: 50px;
+    clear: right;
+    float: right;
 }
 
 a {
-    color: #00c;
+    color: #48c;
     text-decoration: none;
 }
 
 a:hover, a:active {
-    color: #66f;
-    text-decoration: none;
+    text-decoration: underline;
 }
 
-img {
-    border: 15px solid #fff;
-    padding: 0px;
+hr {
+    border: 0;
+    border-top: 2px solid #ddd;
+}
+
+table {
+  border-style: none;
+  border-collapse: collapse;
+}
+
+td {
+    background-color: #f4f4f4;
+    border-color: #ddd;
+    border-width: 1px;
+    border-style: solid;
+    padding: 4px 10px;
 }
 

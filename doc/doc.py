@@ -2,9 +2,9 @@
 """
 Prepare documentation.
 """
+
 import os, re
 from docutils.core import publish_string
-
 cwd = os.getcwd()
 os.chdir( os.path.join( '..', 'www' ) )
 

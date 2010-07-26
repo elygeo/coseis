@@ -3,101 +3,76 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.6: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
 <title>Coseis</title>
 <style type="text/css">
 
+/* CSS stylesheet */
+
 body {
-    margin: 0px;
-    color: #000;
+    margin: 30px;
     background-color: #fff;
+    color: #000;
     font-family: 'Lucida Grande', Geneva, Verdana, sans-serif;
 }
 
-div {
+h2, h3, p.topic-title {
+    font-weight: bold;
+    font-size: large;
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 2px solid #ddd;
+}
+
+h1.title {
     margin: 0px;
+    color: #800;
 }
 
-div.line-block {
-    margin: 20px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-div.footer {
-    margin: 20px;
-    margin-top: 40px;
-}
-
-p {
-    margin: 20px;
-    margin-top: 15px;
-    margin-bottom: 15px;
-}
-
-dl {
-    margin: 20px;
-    margin-top: 35px;
-    margin-bottom: 15px;
-}
-
-table {
-    margin: 60px;
-    margin-top: 0px;
-    margin-bottom: 0px;
+h2.subtitle {
+    margin: 0px;
+    padding: 0px;
+    padding-bottom: 10px;
     border: none;
-}
-
-td {
-    border: none;
-}
-
-ul {
-    margin-top: 10px;
-}
-
-li {
-    margin-bottom: 10px;
 }
 
 pre {
-    margin: 60px;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    padding: 10px;
+    border: thin solid #ddd;
+    background-color: #f4f4f4;
 }
 
-h1 {
-    margin: 0px;
-    padding: 20px;
-    border-top: medium solid #700;
-    border-bottom: medium solid #300;
-    font-weight: lighter;
-    color: #fff;
-    background-color: #600;
-    text-shadow: #000 3px 3px 3px;
-}
-
-h2, h3, h4 {
-    padding: 5px;
-    margin: 15px;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    background-color: #eee;
+img.align-right {
+    padding-top: 50px;
+    clear: right;
+    float: right;
 }
 
 a {
-    color: #00c;
+    color: #48c;
     text-decoration: none;
 }
 
 a:hover, a:active {
-    color: #66f;
-    text-decoration: none;
+    text-decoration: underline;
 }
 
-img {
-    border: 15px solid #fff;
-    padding: 0px;
+hr {
+    border: 0;
+    border-top: 2px solid #ddd;
+}
+
+table {
+  border-style: none;
+  border-collapse: collapse;
+}
+
+td {
+    background-color: #f4f4f4;
+    border-color: #ddd;
+    border-width: 1px;
+    border-style: solid;
+    padding: 4px 10px;
 }
 
 
@@ -108,48 +83,36 @@ img {
 <h1 class="title">Coseis</h1>
 <h2 class="subtitle" id="computational-seismology-tools">Computational Seismology Tools</h2>
 
-<a class="reference external image-reference" href="http://earth.usc.edu/~gely/ely-saf-surface.mov"><img align="right" alt="ely-saf-surface.jpg" class="align-right" src="ely-saf-surface.jpg" /></a>
-<p>Codes for earthquake simulation, rupture dynamics, wave propagation, velocity
-model extraction, and visualization.</p>
-<div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#components" id="id1">Components</a></li>
-<li><a class="reference internal" href="#license" id="id2">License</a></li>
-<li><a class="reference internal" href="#author" id="id3">Author</a></li>
-<li><a class="reference internal" href="#system-requirements" id="id4">System requirements</a></li>
-<li><a class="reference internal" href="#installation" id="id5">Installation</a></li>
-<li><a class="reference internal" href="#examples" id="id6">Examples</a><ul>
-<li><a class="reference internal" href="#cvm-depth-planes" id="id7">CVM depth planes</a></li>
-<li><a class="reference internal" href="#cvm-fence-diagram" id="id8">CVM fence diagram</a></li>
-<li><a class="reference internal" href="#cvm-4-basin-depth" id="id9">CVM-4 Basin depth</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="section" id="components">
-<h3>Components</h3>
+<table border="1" class="docutils">
+
+<tbody valign="top">
+<tr><td><a class="reference internal" href="#install">Install</a></td>
+<td><a class="reference internal" href="#examples">Examples</a></td>
+<td><a class="reference external" href="sord.html">SORD</a></td>
+<td><a class="reference external" href="http://scec.usc.edu/websims">WebSims</a></td>
+<td><a class="reference external" href="http://github.com/gely/coseis/">Source Code</a></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="summary">
+<h3>Summary</h3>
+<p>Coseis is a collection of tools for earthquake simulation, rupture dynamics,
+wave propagation, velocity model extraction, and visualization:</p>
 <ul class="simple">
 <li><a class="reference external" href="sord.html">SORD</a>: Support Operator Rupture Dynamics code for spontaneous
 rupture and 3D wave propagation simulation.</li>
 <li>CVM: updates, MPI parallelization and Python wrapper for the SCEC
-Community Velocity Model,
-<a class="reference external" href="http://www.data.scec.org/3Dvelocity/Version4.tar.gz">version 4</a>.</li>
-<li>CVM-H: aternative extraction tool and geotechnical layer implementation for
-the SCEC Community Velocity Model,
-<a class="reference external" href="http://structure.harvard.edu/cvm-h/">Harvard version</a>.</li>
-<li><a class="reference external" href="http://scec.usc.edu/websims">WebSims</a>: catalog, explore, compare, and
-disseminate large numerical simulations results.</li>
+Community Velocity Model, <a class="reference external" href="http://www.data.scec.org/3Dvelocity/">version 4</a>.</li>
+<li>CVM-H: aternative extraction tool and <a class="reference external" href="http://earth.usc.edu/~gely/cvmh/">geotechnical layer implementation</a>
+for the SCEC Community Velocity Model, <a class="reference external" href="http://structure.harvard.edu/cvm-h/">Harvard version</a>.</li>
+<li><a class="reference external" href="http://scec.usc.edu/websims">WebSims</a>: catalog, explore, compare, and disseminate large numerical
+simulations results.</li>
 <li>Mesh generation, source preparation, and visualization utilities.</li>
 </ul>
-</div>
-<div class="section" id="license">
-<h3>License</h3>
 <p>Coseis is open-source and released under the <a class="reference external" href="license.txt">GNU General Public License Version 3</a>.  You are free to use or redistribute the code, with the
-obligation that you contribute back any modification or derived works.</p>
-</div>
+obligation that you contribute back any modifications or derived works.</p>
 <div class="section" id="author">
-<h3>Author</h3>
+<h4>Author</h4>
 <div class="line-block">
 <div class="line"><a class="reference external" href="http://earth.usc.edu/~gely/">Geoffrey Ely</a></div>
 <div class="line"><a class="reference external" href="http://www.usc.edu/dept/earth/">Department of Earth Sciences</a></div>
@@ -157,24 +120,24 @@ obligation that you contribute back any modification or derived works.</p>
 <div class="line"><a class="reference external" href="http://earth.usc.edu/~gely/">http://earth.usc.edu/~gely/</a></div>
 <div class="line"><a class="reference external" href="mailto:gely&#37;&#52;&#48;usc&#46;edu">gely<span>&#64;</span>usc<span>&#46;</span>edu</a></div>
 </div>
-<p>Contributions from: Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi</p>
+<p>Contributions from: Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.</p>
+</div>
 </div>
 <div class="section" id="system-requirements">
 <h3>System requirements</h3>
 <ul class="simple">
-<li><a class="reference external" href="http://www.python.org/download/">Python</a>, and
-<a class="reference external" href="http://http://numpy.scipy.org/">NumPy</a> (Numerical Python).</li>
+<li><a class="reference external" href="http://www.python.org/">Python</a>, and <a class="reference external" href="http://numpy.scipy.org/">NumPy</a> (Numerical Python).</li>
 <li>(Optional) Fortran 95 compiler. Required for SORD and CVM.</li>
 <li>(Optional) Message Passing Interface (MPI) library.  Required for
-SORD and CVM4 multi-core processing.</li>
+SORD and CVM4 multi-processing.</li>
 <li>(Optional) <a class="reference external" href="http://matplotlib.sourceforge.net/">Matplotlib</a>, <a class="reference external" href="http://www.scipy.org/">SciPy</a>, and Pyproj Python packages.  Required for
 supplemental plotting, signal processing, and mesh generation utilities.</li>
-<li>(Optional) <a class="reference external" href="http://git-scm.com/">Git</a> version control system.
-Useful for development and staying updated with the latest code version.</li>
+<li>(Optional) <a class="reference external" href="http://git-scm.com/">Git</a> version control system.  Useful for development and staying
+updated with the latest code version.</li>
 </ul>
 </div>
-<div class="section" id="installation">
-<h3>Installation</h3>
+<div class="section" id="install">
+<h3>Install</h3>
 <p>Fortran and MPI installation should only be necessary for personal computers.
 HPC systems generally supply specifically tuned Fortran compilers and MPI
 libraries.</p>
@@ -190,33 +153,27 @@ sudo apt-get install gfortran
 </pre>
 <p>Mac OS X:</p>
 <blockquote>
-<p>First install either the iPhone or the Mac-only version of <a class="reference external" href="http://developer.apple.com/technology/xcode.html">Xcode</a> available from Apple
-Developer Connection (free <a class="reference external" href="http://connect.apple.com">membership</a> required).
-Then install the GNU Fortran version available from the <a class="reference external" href="http://r.research.att.com/tools">R for Mac OS X
-Developer's Page</a> (versions from MacPorts
-and Fink seem to be problematic and are not recommended).</p>
+<p>First install either the iPhone or the Mac-only version of <a class="reference external" href="http://developer.apple.com/technology/xcode.html">Xcode</a> available
+from <a class="reference external" href="http://connect.apple.com/">Apple Developer Connection</a> (free membership required).  Then install
+the GNU Fortran version available from the <a class="reference external" href="http://r.research.att.com/tools/">R for Mac OS X Developer's Page</a>
+(versions from MacPorts and Fink seem to be problematic and are not
+recommended).</p>
 </blockquote>
 </li>
-<li><p class="first"><a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a> is recommended
-if you need MPI.  The following shell script installs MPICH2:</p>
-<blockquote>
-<p><a class="reference external" href="../sbin/install-mpich.sh">install-mpich.sh</a></p>
-</blockquote>
+<li><p class="first"><a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a> is recommended if you need MPI.  The included script
+<a class="reference external" href="../util/install-mpich.sh">install-mpich.sh</a> can install MPICH2 for you.</p>
 </li>
-<li><p class="first">It is recommended that you install a private copy of Python for Coseis.  The
-following script installs Python and NumPy:</p>
-<blockquote>
-<p><a class="reference external" href="../sbin/install-python.sh">install-python.sh</a></p>
-</blockquote>
-<p><a class="reference external" href="http://www.enthought.com/products/epddownload.php">Enthought Python Distribution</a> (EPD) is another
-option that includes many bells and whistles such as the <a class="reference external" href="http://code.enthought.com/projects/mayavi">Mayavi</a> visualization package.</p>
+<li><p class="first">It is recommended that you install a private copy of Python for Coseis.
+The included script <a class="reference external" href="../util/install-python.sh">install-python.sh</a> can install Python and NumPy for you.
+<a class="reference external" href="http://www.enthought.com/products/epddownload.php">Enthought Python Distribution</a> (EPD) is another option that includes many
+bells and whistles such as the <a class="reference external" href="http://code.enthought.com/projects/mayavi/">Mayavi</a> visualization package.</p>
 </li>
 <li><p class="first">Download the source code.  The best option is to use the <a class="reference external" href="http://github.com/gely/coseis">Coseis GitHub
 repository</a> with <a class="reference external" href="http://git-scm.com/">Git</a> version control, which
 facilitates applying code updates, and merging local modifications:</p>
-<blockquote>
-<p>git clone git://github.com/gely/coseis.git</p>
-</blockquote>
+<pre class="literal-block">
+git clone git://github.com/gely/coseis.git
+</pre>
 <p>Update to the latest changes anytime with:</p>
 <pre class="literal-block">
 git pull
@@ -268,60 +225,13 @@ python setup.py --machine=tacc-ranger build path
 <h4>CVM depth planes</h4>
 <img alt="../scripts/cvm/cvm4-vs500.png" src="../scripts/cvm/cvm4-vs500.png" />
 <img alt="../scripts/cvm/cvmh-vs500.png" src="../scripts/cvm/cvmh-vs500.png" />
-<p>Extract S-wave velocity at 500 meters depth. Plot using Matplotlib:</p>
+<p>Extract S-wave velocity at 500 meters depth. Plot using Matplotlib</p>
 <pre class="literal-block">
 cd scripts/cvm
 python plane.py
 </pre>
 <p>Source code:
 <a class="reference external" href="../scripts/cvm/plane.py">plane.py</a></p>
-<pre class="literal-block">
-#!/usr/bin/env python
-import os
-import numpy as np
-import matplotlib.pyplot as plt
-import cst
-
-# parameters
-prop = 'vs'
-label = 'S-wave velocity (m/s)'
-depth = 500.0
-vmin, vmax = 300, 3200
-delta = 0.5 / 60.0
-lon, lat = (-120.0, -114.5), (32.5, 35.0)
-cmap = cst.plt.colormap( 'rgb' )
-
-# create mesh
-x = np.arange( lon[0], lon[1] + delta/2, delta )
-y = np.arange( lat[0], lat[1] + delta/2, delta )
-x, y = np.meshgrid( x, y )
-z = np.empty_like( x )
-z.fill( depth )
-
-# CVM extractions
-vs4 = cst.cvm.extract( x, y, z, prop )
-vsh = cst.cvmh.extract( x, y, z, prop )
-
-# map data
-x, y = cst.data.mapdata( 'coastlines', 'high', (lon, lat), 100.0 )
-
-# plot
-for vs, tag in (vs4, '4'), (vsh, 'H'):
-    fig = plt.figure( figsize=(6.4, 4.8) )
-    ax = plt.gca()
-    im = ax.imshow( vs, extent=lon+lat, cmap=cmap, vmin=vmin, vmax=vmax,
-        origin='lower', interpolation='nearest' )
-    fig.colorbar( im, orientation='horizontal' ).set_label( label )
-    ax.plot( x-360.0, y, 'k-' )
-    ax.set_aspect( 1.0 / np.cos( 33.75 / 180.0 * np.pi ) )
-    ax.set_title( 'CVM-%s %.0f m depth' % (tag, depth) )
-    ax.axis( lon+lat )
-    f = 'cvm%s-%s%.0f.png' % (tag.lower(), prop, depth)
-    print f
-    fig.savefig( f )
-
-
-</pre>
 </div>
 <div class="section" id="cvm-fence-diagram">
 <h4>CVM fence diagram</h4>
@@ -356,7 +266,7 @@ python viz.py
 </div>
 <div class="footer">
 <hr class="footer" />
-Generated on: 2010-07-24.
+Generated on: 2010-07-26.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>

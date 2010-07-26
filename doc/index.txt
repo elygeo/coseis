@@ -1,82 +1,80 @@
 ======
 Coseis
 ======
-------------------------------
 Computational Seismology Tools
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: ely-saf-surface.jpg
-   :align: right
-   :target: http://earth.usc.edu/~gely/ely-saf-surface.mov
+======== ========= ===== ======== ===============
+Install_ Examples_ SORD_ WebSims_ `Source Code`__
+======== ========= ===== ======== ===============
 
-Codes for earthquake simulation, rupture dynamics, wave propagation, velocity
-model extraction, and visualization.
+.. _SORD: sord.html
+.. _WebSims: http://scec.usc.edu/websims
+__ http://github.com/gely/coseis/
 
+Summary
+=======
 
-.. contents::
+Coseis is a collection of tools for earthquake simulation, rupture dynamics,
+wave propagation, velocity model extraction, and visualization:
 
-
-Components
-==========
-
-*   `SORD <sord.html>`_: Support Operator Rupture Dynamics code for spontaneous
+*   SORD_: Support Operator Rupture Dynamics code for spontaneous
     rupture and 3D wave propagation simulation.
 
 *   CVM: updates, MPI parallelization and Python wrapper for the SCEC
-    Community Velocity Model,
-    `version 4 <http://www.data.scec.org/3Dvelocity/Version4.tar.gz>`__.
+    Community Velocity Model, `version 4`__.
 
-*   CVM-H: aternative extraction tool and geotechnical layer implementation for
-    the SCEC Community Velocity Model,
-    `Harvard version <http://structure.harvard.edu/cvm-h/>`__.
+*   CVM-H: aternative extraction tool and `geotechnical layer implementation`__
+    for the SCEC Community Velocity Model, `Harvard version`__.
 
-*   `WebSims <http://scec.usc.edu/websims>`_: catalog, explore, compare, and
-    disseminate large numerical simulations results.
+*   WebSims_: catalog, explore, compare, and disseminate large numerical
+    simulations results.
 
 *   Mesh generation, source preparation, and visualization utilities.
 
-
-License
-=======
+__ http://www.data.scec.org/3Dvelocity/
+__ http://earth.usc.edu/~gely/cvmh/
+__ http://structure.harvard.edu/cvm-h/
 
 Coseis is open-source and released under the `GNU General Public License Version 3
 <license.txt>`_.  You are free to use or redistribute the code, with the
-obligation that you contribute back any modification or derived works.
-
+obligation that you contribute back any modifications or derived works.
 
 Author
-=======
+------
 
-| `Geoffrey Ely <http://earth.usc.edu/~gely/>`_
-| `Department of Earth Sciences <http://www.usc.edu/dept/earth/>`_
-| `University of Southern California <http://www.usc.edu/>`_
+| `Geoffrey Ely`__
+| `Department of Earth Sciences`__
+| `University of Southern California`__
 | http://earth.usc.edu/~gely/
 | gely@usc.edu
 
-Contributions from: Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi
+__ http://earth.usc.edu/~gely/
+__ http://www.usc.edu/dept/earth/
+__ http://www.usc.edu/
+
+Contributions from: Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.
 
 
 System requirements
 ===================
 
-*   `Python <http://www.python.org/download/>`_, and
-    `NumPy <http://http://numpy.scipy.org/>`_ (Numerical Python).
+*   Python_, and NumPy_ (Numerical Python).
 
 *   (Optional) Fortran 95 compiler. Required for SORD and CVM.
 
 *   (Optional) Message Passing Interface (MPI) library.  Required for
-    SORD and CVM4 multi-core processing.
+    SORD and CVM4 multi-processing.
 
-*   (Optional) `Matplotlib <http://matplotlib.sourceforge.net/>`_, `SciPy
-    <http://www.scipy.org/>`_, and Pyproj Python packages.  Required for
+*   (Optional) Matplotlib_, SciPy_, and Pyproj Python packages.  Required for
     supplemental plotting, signal processing, and mesh generation utilities.
 
-*   (Optional) `Git <http://git-scm.com/>`_ version control system.
-    Useful for development and staying updated with the latest code version.
+*   (Optional) Git_ version control system.  Useful for development and staying
+    updated with the latest code version.
 
 
-Installation
-============
+Install
+=======
 
 Fortran and MPI installation should only be necessary for personal computers.
 HPC systems generally supply specifically tuned Fortran compilers and MPI
@@ -96,31 +94,23 @@ libraries.
 
     Mac OS X:
 
-        First install either the iPhone or the Mac-only version of `Xcode
-        <http://developer.apple.com/technology/xcode.html>`_ available from Apple
-        Developer Connection (free `membership <http://connect.apple.com>`__ required).
-        Then install the GNU Fortran version available from the `R for Mac OS X
-        Developer's Page <http://r.research.att.com/tools>`_ (versions from MacPorts
-        and Fink seem to be problematic and are not recommended).
+        First install either the iPhone or the Mac-only version of Xcode_ available
+        from `Apple Developer Connection`_ (free membership required).  Then install
+        the GNU Fortran version available from the `R for Mac OS X Developer's Page`_
+        (versions from MacPorts and Fink seem to be problematic and are not
+        recommended).
 
-2.  `MPICH2 <http://www.mcs.anl.gov/research/projects/mpich2/>`_ is recommended
-    if you need MPI.  The following shell script installs MPICH2:
+2.  MPICH2_ is recommended if you need MPI.  The included script
+    install-mpich.sh_ can install MPICH2 for you.
 
-        `install-mpich.sh <../sbin/install-mpich.sh>`_
-
-3.  It is recommended that you install a private copy of Python for Coseis.  The
-    following script installs Python and NumPy:
-
-        `install-python.sh <../sbin/install-python.sh>`_
-
-    `Enthought Python Distribution
-    <http://www.enthought.com/products/epddownload.php>`_ (EPD) is another
-    option that includes many bells and whistles such as the `Mayavi
-    <http://code.enthought.com/projects/mayavi>`_ visualization package.
+3.  It is recommended that you install a private copy of Python for Coseis.
+    The included script install-python.sh_ can install Python and NumPy for you.
+    `Enthought Python Distribution`_ (EPD) is another option that includes many
+    bells and whistles such as the Mayavi_ visualization package.
 
 4.  Download the source code.  The best option is to use the `Coseis GitHub
     repository <http://github.com/gely/coseis>`__ with Git_ version control, which
-    facilitates applying code updates, and merging local modifications:
+    facilitates applying code updates, and merging local modifications::
 
         git clone git://github.com/gely/coseis.git
 
@@ -168,6 +158,20 @@ libraries.
 
         python setup.py --machine=tacc-ranger build path
 
+.. _install-python.sh: ../util/install-python.sh
+.. _install-mpich.sh: ../util/install-mpich.sh
+.. _Git: http://git-scm.com/
+.. _MPICH2: http://www.mcs.anl.gov/research/projects/mpich2/
+.. _Xcode: http://developer.apple.com/technology/xcode.html
+.. _Apple Developer Connection: http://connect.apple.com/
+.. _R for Mac OS X Developer's Page: http://r.research.att.com/tools/
+.. _Enthought Python Distribution: http://www.enthought.com/products/epddownload.php
+.. _Python: http://www.python.org/
+.. _NumPy: http://numpy.scipy.org/
+.. _SciPy: http://www.scipy.org/
+.. _Mayavi: http://code.enthought.com/projects/mayavi/
+.. _Matplotlib: http://matplotlib.sourceforge.net/
+
 
 Examples
 ========
@@ -178,16 +182,14 @@ CVM depth planes
 .. image:: ../scripts/cvm/cvm4-vs500.png
 .. image:: ../scripts/cvm/cvmh-vs500.png
 
-Extract S-wave velocity at 500 meters depth. Plot using Matplotlib::
+Extract S-wave velocity at 500 meters depth. Plot using Matplotlib
+::
 
     cd scripts/cvm
     python plane.py
 
 Source code:
 `plane.py <../scripts/cvm/plane.py>`__
-
-.. include:: ../scripts/cvm/plane.py
-    :literal:
 
 CVM fence diagram
 -----------------
@@ -220,7 +222,6 @@ Source code:
 `mesh.py <../scripts/basindepth/mesh.py>`__
 `search.py <../scripts/basindepth/search.py>`__
 `viz.py <../scripts/basindepth/viz.py>`__
-
 
 .. vim: filetype=rst
 

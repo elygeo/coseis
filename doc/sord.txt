@@ -1,9 +1,12 @@
 ====
 SORD
 ====
----------------------------------
 Support Operator Rupture Dynamics
----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. image:: ely-saf-surface.jpg
+   :align: right
+   :target: http://earth.usc.edu/~gely/ely-saf-surface.mov
 
 .. contents::
 
@@ -41,7 +44,7 @@ in southern California.
 Ely, G. P., S. M. Day, and J.-B. Minster (2008),
 *A support-operator method for visco-elastic wave modeling in 3D heterogeneous media*,
 Geophys. J. Int., `172(1), 331-344
-<http://www.blackwell-synergy.com/doi/abs/10.1111/j.1365-246X.2007.03633.x>`_,
+<http://www.blackwell-synergy.com/doi/abs/10.1111/j.1365-246X.2007.03633.x>`__,
 doi: 10.1111/j.1365-246X.2007.03633.x.
 `[PDF] <http://earth.usc.edu/~gely/pub/ely-som-20080426.pdf>`__
 
@@ -194,7 +197,7 @@ large) 3D material and mesh coordinate files.
 
 All input modes may use '+' instead of '=' to add to, rather than replace,
 preexisting values.  For a list of available time functions, see the
-``time_function`` subroutine in `util.f90 <../cst/sord/src/util.f90>`__.  The
+``time_function`` subroutine in `util.f90 <../cst/sord/src/util.f90>`_.  The
 routine can be easily modified to add new time functions.  Time functions can
 be offset in time with the ``tm0`` initial time parameter.
 
@@ -293,7 +296,8 @@ example to put the rupture surface along the far z boundary::
     nn = 41, 41, 22
     bc2 = 0, 0, -2
 
-Alternatively, put the rupture surface along the near z boundary::
+Alternatively, put the rupture surface along the near z boundary
+::
 
     ihypo = 21, 21, 1.5
     nn = 41, 41, 22

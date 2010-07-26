@@ -3,101 +3,76 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.6: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
 <title>SORD</title>
 <style type="text/css">
 
+/* CSS stylesheet */
+
 body {
-    margin: 0px;
-    color: #000;
+    margin: 30px;
     background-color: #fff;
+    color: #000;
     font-family: 'Lucida Grande', Geneva, Verdana, sans-serif;
 }
 
-div {
+h2, h3, p.topic-title {
+    font-weight: bold;
+    font-size: large;
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 2px solid #ddd;
+}
+
+h1.title {
     margin: 0px;
+    color: #800;
 }
 
-div.line-block {
-    margin: 20px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-div.footer {
-    margin: 20px;
-    margin-top: 40px;
-}
-
-p {
-    margin: 20px;
-    margin-top: 15px;
-    margin-bottom: 15px;
-}
-
-dl {
-    margin: 20px;
-    margin-top: 35px;
-    margin-bottom: 15px;
-}
-
-table {
-    margin: 60px;
-    margin-top: 0px;
-    margin-bottom: 0px;
+h2.subtitle {
+    margin: 0px;
+    padding: 0px;
+    padding-bottom: 10px;
     border: none;
-}
-
-td {
-    border: none;
-}
-
-ul {
-    margin-top: 10px;
-}
-
-li {
-    margin-bottom: 10px;
 }
 
 pre {
-    margin: 60px;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    padding: 10px;
+    border: thin solid #ddd;
+    background-color: #f4f4f4;
 }
 
-h1 {
-    margin: 0px;
-    padding: 20px;
-    border-top: medium solid #700;
-    border-bottom: medium solid #300;
-    font-weight: lighter;
-    color: #fff;
-    background-color: #600;
-    text-shadow: #000 3px 3px 3px;
-}
-
-h2, h3, h4 {
-    padding: 5px;
-    margin: 15px;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    background-color: #eee;
+img.align-right {
+    padding-top: 50px;
+    clear: right;
+    float: right;
 }
 
 a {
-    color: #00c;
+    color: #48c;
     text-decoration: none;
 }
 
 a:hover, a:active {
-    color: #66f;
-    text-decoration: none;
+    text-decoration: underline;
 }
 
-img {
-    border: 15px solid #fff;
-    padding: 0px;
+hr {
+    border: 0;
+    border-top: 2px solid #ddd;
+}
+
+table {
+  border-style: none;
+  border-collapse: collapse;
+}
+
+td {
+    background-color: #f4f4f4;
+    border-color: #ddd;
+    border-width: 1px;
+    border-style: solid;
+    padding: 4px 10px;
 }
 
 
@@ -108,24 +83,25 @@ img {
 <h1 class="title">SORD</h1>
 <h2 class="subtitle" id="support-operator-rupture-dynamics">Support Operator Rupture Dynamics</h2>
 
+<a class="reference external image-reference" href="http://earth.usc.edu/~gely/ely-saf-surface.mov"><img alt="ely-saf-surface.jpg" class="align-right" src="ely-saf-surface.jpg" /></a>
 <div class="contents topic" id="contents">
 <p class="topic-title first">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#summary" id="id2">Summary</a></li>
-<li><a class="reference internal" href="#publications" id="id3">Publications</a></li>
-<li><a class="reference internal" href="#user-guide" id="id4">User Guide</a><ul>
-<li><a class="reference internal" href="#quick-test" id="id5">Quick test</a></li>
-<li><a class="reference internal" href="#scripting-with-python" id="id6">Scripting with Python</a></li>
-<li><a class="reference internal" href="#running-jobs" id="id7">Running jobs</a></li>
-<li><a class="reference internal" href="#field-i-o" id="id8">Field I/O</a></li>
-<li><a class="reference internal" href="#boundary-conditions" id="id9">Boundary Conditions</a></li>
-<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id10">Defining the fault rupture surface</a></li>
+<li><a class="reference internal" href="#summary" id="id1">Summary</a></li>
+<li><a class="reference internal" href="#publications" id="id2">Publications</a></li>
+<li><a class="reference internal" href="#user-guide" id="id3">User Guide</a><ul>
+<li><a class="reference internal" href="#quick-test" id="id4">Quick test</a></li>
+<li><a class="reference internal" href="#scripting-with-python" id="id5">Scripting with Python</a></li>
+<li><a class="reference internal" href="#running-jobs" id="id6">Running jobs</a></li>
+<li><a class="reference internal" href="#field-i-o" id="id7">Field I/O</a></li>
+<li><a class="reference internal" href="#boundary-conditions" id="id8">Boundary Conditions</a></li>
+<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id9">Defining the fault rupture surface</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#memory-usage-and-scaling" id="id11">Memory Usage and Scaling</a></li>
-<li><a class="reference internal" href="#development" id="id12">Development</a><ul>
-<li><a class="reference internal" href="#debugging" id="id13">Debugging</a></li>
-<li><a class="reference internal" href="#profiling" id="id14">Profiling</a></li>
+<li><a class="reference internal" href="#memory-usage-and-scaling" id="id10">Memory Usage and Scaling</a></li>
+<li><a class="reference internal" href="#development" id="id11">Development</a><ul>
+<li><a class="reference internal" href="#debugging" id="id12">Debugging</a></li>
+<li><a class="reference internal" href="#profiling" id="id13">Profiling</a></li>
 </ul>
 </li>
 </ul>
@@ -413,7 +389,7 @@ example to put the rupture surface along the far z boundary:</p>
 nn = 41, 41, 22
 bc2 = 0, 0, -2
 </pre>
-<p>Alternatively, put the rupture surface along the near z boundary:</p>
+<p>Alternatively, put the rupture surface along the near z boundary</p>
 <pre class="literal-block">
 ihypo = 21, 21, 1.5
 nn = 41, 41, 22
@@ -510,7 +486,7 @@ processors using <tt class="docutils literal">debug = 2</tt> to give more accura
 </div>
 <div class="footer">
 <hr class="footer" />
-Generated on: 2010-07-24.
+Generated on: 2010-07-26.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>
