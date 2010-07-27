@@ -29,12 +29,16 @@ h2.subtitle {
 
 pre {
     padding: 10px;
-    border: thin solid #ddd;
+    border: 1px solid #ddd;
     background-color: #f4f4f4;
 }
 
+img {
+    border: none;
+}
+
 img.align-right {
-    padding-top: 50px;
+    margin-top: 50px;
     clear: right;
     float: right;
 }
@@ -54,15 +58,13 @@ hr {
 }
 
 table {
-  border-style: none;
-  border-collapse: collapse;
+    border-style: none;
+    border-collapse: collapse;
 }
 
 td {
-    background-color: #f4f4f4;
-    border-color: #ddd;
-    border-width: 1px;
-    border-style: solid;
     padding: 4px 10px;
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
 }
 
