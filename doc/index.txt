@@ -8,6 +8,11 @@ Computational Seismology Tools
 Install_ Examples_ SORD_ WebSims_ `Source Code`_
 ======== ========= ===== ======== ==============
 
+.. _SORD:         sord.html
+.. _WebSims:      http://scec.usc.edu/websims
+.. _Source Code:  http://github.com/gely/coseis/
+
+
 Summary
 =======
 
@@ -25,20 +30,17 @@ Coseis is an open-source toolkit for earthquake simulation featuring:
 
 *   Utilities for mesh generation, coordinate projection, and visualization.
 
-The primary interface is though a Python module which (for high-performance
-components) wraps Fortran parallelized with MPI.
-
-Coseis is written by `Geoffrey Ely`_ with contributions from Steven Day,
-Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
-the GPLv3_.
-
 __ http://www.data.scec.org/3Dvelocity/
 __ http://earth.usc.edu/~gely/cvmh/
 __ http://structure.harvard.edu/cvm-h/
 
-.. _SORD:         sord.html
-.. _WebSims:      http://scec.usc.edu/websims
-.. _Source Code:  http://github.com/gely/coseis/
+The primary interface is through a Python module which (for high-performance
+components) wraps Fortran parallelized with MPI.
+
+Coseis is written by `Geoffrey Ely`_ with contributions from Steven Day,
+Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
+GPLv3_.
+
 .. _Geoffrey Ely: http://earth.usc.edu/~gely/
 .. _GPLv3:        http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -81,18 +83,18 @@ libraries.
 
     Mac OS X:
 
-        First install either the iPhone or the Mac-only version of Xcode_ available
-        from `Apple Developer Connection`_ (free membership required).  Then install
-        the GNU Fortran version available from the `R for Mac OS X Developer's Page`_
-        (versions from MacPorts and Fink seem to be problematic and are not
-        recommended).
+        First install either the iPhone or the Mac-only version of Xcode_
+        available from `Apple Developer`_ Connection (free membership required).  Then
+        install the GNU Fortran version available from the `R for Mac OS X`_
+        Developer's Page (versions from MacPorts and Fink seem to be problematic and
+        are not recommended).
 
 2.  MPICH2_ is recommended if you need MPI.  The included script
     install-mpich.sh_ can install MPICH2 for you.
 
 3.  It is recommended that you install a private copy of Python for Coseis.
     The included script install-python.sh_ can install Python and NumPy for you.
-    `Enthought Python Distribution`_ (EPD) is another option that includes many
+    Enthought Python Distribution (EPD_) is another option that includes many
     bells and whistles such as the Mayavi_ visualization package.
 
 4.  Download the source code.  The best option is to use the `Coseis GitHub
@@ -146,18 +148,18 @@ libraries.
         python setup.py --machine=tacc-ranger build path
 
 .. _install-python.sh: ../util/install-python.sh
-.. _install-mpich.sh: ../util/install-mpich.sh
-.. _Git: http://git-scm.com/
-.. _MPICH2: http://www.mcs.anl.gov/research/projects/mpich2/
-.. _Xcode: http://developer.apple.com/technology/xcode.html
-.. _Apple Developer Connection: http://connect.apple.com/
-.. _R for Mac OS X Developer's Page: http://r.research.att.com/tools/
-.. _Enthought Python Distribution: http://www.enthought.com/products/epddownload.php
-.. _Python: http://www.python.org/
-.. _NumPy: http://numpy.scipy.org/
-.. _SciPy: http://www.scipy.org/
-.. _Mayavi: http://code.enthought.com/projects/mayavi/
-.. _Matplotlib: http://matplotlib.sourceforge.net/
+.. _install-mpich.sh:  ../util/install-mpich.sh
+.. _Git:               http://git-scm.com/
+.. _MPICH2:            http://www.mcs.anl.gov/research/projects/mpich2/
+.. _Xcode:             http://developer.apple.com/technology/xcode.html
+.. _Apple Developer:   http://connect.apple.com/
+.. _R for Mac OS X:    http://r.research.att.com/tools/
+.. _EPD:               http://www.enthought.com/products/epddownload.php
+.. _Python:            http://www.python.org/
+.. _NumPy:             http://numpy.scipy.org/
+.. _SciPy:             http://www.scipy.org/
+.. _Mayavi:            http://code.enthought.com/projects/mayavi/
+.. _Matplotlib:        http://matplotlib.sourceforge.net/
 
 
 Examples
