@@ -4,56 +4,43 @@ Coseis
 Computational Seismology Tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-======== ========= ===== ======== ===============
-Install_ Examples_ SORD_ WebSims_ `Source Code`__
-======== ========= ===== ======== ===============
-
-.. _SORD: sord.html
-.. _WebSims: http://scec.usc.edu/websims
-__ http://github.com/gely/coseis/
+======== ========= ===== ======== ==============
+Install_ Examples_ SORD_ WebSims_ `Source Code`_
+======== ========= ===== ======== ==============
 
 Summary
 =======
 
-Coseis is a collection of tools for earthquake simulation, rupture dynamics,
-wave propagation, velocity model extraction, and visualization:
+Coseis is an open-source toolkit for earthquake simulation featuring:
 
-*   SORD_: Support Operator Rupture Dynamics code for spontaneous
-    rupture and 3D wave propagation simulation.
+*   The Support Operator Rupture Dynamics (SORD_) code for modeling spontaneous
+    rupture and 3D wave propagation.
 
-*   CVM: updates, MPI parallelization and Python wrapper for the SCEC
-    Community Velocity Model, `version 4`__.
+*   SCEC Community Velocity Models (CVM) codes, with MPI parallelization for
+    `version 4`__, and new `geotechnical layer implementation`__ for the
+    `Harvard version`__.
 
-*   CVM-H: aternative extraction tool and `geotechnical layer implementation`__
-    for the SCEC Community Velocity Model, `Harvard version`__.
+*   WebSims_ web application for cataloging, exploring, and disseminating large
+    numerical simulations data sets.
 
-*   WebSims_: catalog, explore, compare, and disseminate large numerical
-    simulations results.
+*   Utilities for mesh generation, coordinate projection, and visualization.
 
-*   Mesh generation, source preparation, and visualization utilities.
+The primary interface is though a Python module which (for high-performance
+components) wraps Fortran parallelized with MPI.
+
+Coseis is written by `Geoffrey Ely`_ with contributions from Steven Day,
+Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
+the GPLv3_.
 
 __ http://www.data.scec.org/3Dvelocity/
 __ http://earth.usc.edu/~gely/cvmh/
 __ http://structure.harvard.edu/cvm-h/
 
-Coseis is open-source and released under the `GNU General Public License Version 3
-<license.txt>`_.  You are free to use or redistribute the code, with the
-obligation that you contribute back any modifications or derived works.
-
-Author
-------
-
-| `Geoffrey Ely`__
-| `Department of Earth Sciences`__
-| `University of Southern California`__
-| http://earth.usc.edu/~gely/
-| gely@usc.edu
-
-__ http://earth.usc.edu/~gely/
-__ http://www.usc.edu/dept/earth/
-__ http://www.usc.edu/
-
-Contributions from: Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.
+.. _SORD:         sord.html
+.. _WebSims:      http://scec.usc.edu/websims
+.. _Source Code:  http://github.com/gely/coseis/
+.. _Geoffrey Ely: http://earth.usc.edu/~gely/
+.. _GPLv3:        http://www.gnu.org/licenses/gpl-3.0.html
 
 
 System requirements
@@ -61,16 +48,16 @@ System requirements
 
 *   Python_, and NumPy_ (Numerical Python).
 
-*   (Optional) Fortran 95 compiler. Required for SORD and CVM.
+*   Fortran 95 compiler. Required for SORD and CVM codes.
 
-*   (Optional) Message Passing Interface (MPI) library.  Required for
-    SORD and CVM4 multi-processing.
+*   Message Passing Interface (MPI) library.  Required for SORD and CVM4
+    multi-processing.
 
-*   (Optional) Matplotlib_, SciPy_, and Pyproj Python packages.  Required for
-    supplemental plotting, signal processing, and mesh generation utilities.
+*   Matplotlib_, SciPy_, and Pyproj Python packages.  Required for supplemental
+    plotting, signal processing, and mesh generation utilities.
 
-*   (Optional) Git_ version control system.  Useful for development and staying
-    updated with the latest code version.
+*   Git_ version control system.  Useful for development and staying updated
+    with the latest code version.
 
 
 Install

@@ -16,24 +16,25 @@ body {
     font-family: 'Lucida Grande', Geneva, Verdana, sans-serif;
 }
 
-h2, h3, p.topic-title {
-    font-weight: bold;
+h1 {
+    color: #900;
+    margin: 0px;
+}
+
+h2 {
     font-size: large;
+    margin: 0px;
+}
+
+h3 {
     margin-top: 30px;
     padding-top: 10px;
     border-top: 2px solid #ddd;
 }
 
-h1.title {
-    margin: 0px;
-    color: #800;
-}
-
-h2.subtitle {
-    margin: 0px;
-    padding: 0px;
-    padding-bottom: 10px;
-    border: none;
+p.topic-title {
+    font-size: large;
+    font-weight: bold;
 }
 
 pre {
@@ -47,13 +48,14 @@ img {
 }
 
 img.align-right {
-    margin-top: 50px;
-    clear: right;
+    border: 10px solid #fff;
+    border-right: 0px;
     float: right;
+    float: top;
 }
 
 a {
-    color: #48c;
+    color: #06a;
     text-decoration: none;
 }
 
@@ -67,6 +69,8 @@ hr {
 }
 
 table {
+    margin-top: 10px;
+    margin-bottom: 30px;
     border-style: none;
     border-collapse: collapse;
 }
@@ -75,6 +79,10 @@ td {
     padding: 4px 10px;
     background-color: #f4f4f4;
     border: 1px solid #ddd;
+}
+
+.section li {
+    padding: 5px;
 }
 
 
@@ -98,44 +106,34 @@ td {
 </table>
 <div class="section" id="summary">
 <h3>Summary</h3>
-<p>Coseis is a collection of tools for earthquake simulation, rupture dynamics,
-wave propagation, velocity model extraction, and visualization:</p>
+<p>Coseis is an open-source toolkit for earthquake simulation featuring:</p>
 <ul class="simple">
-<li><a class="reference external" href="sord.html">SORD</a>: Support Operator Rupture Dynamics code for spontaneous
-rupture and 3D wave propagation simulation.</li>
-<li>CVM: updates, MPI parallelization and Python wrapper for the SCEC
-Community Velocity Model, <a class="reference external" href="http://www.data.scec.org/3Dvelocity/">version 4</a>.</li>
-<li>CVM-H: aternative extraction tool and <a class="reference external" href="http://earth.usc.edu/~gely/cvmh/">geotechnical layer implementation</a>
-for the SCEC Community Velocity Model, <a class="reference external" href="http://structure.harvard.edu/cvm-h/">Harvard version</a>.</li>
-<li><a class="reference external" href="http://scec.usc.edu/websims">WebSims</a>: catalog, explore, compare, and disseminate large numerical
-simulations results.</li>
-<li>Mesh generation, source preparation, and visualization utilities.</li>
+<li>The Support Operator Rupture Dynamics (<a class="reference external" href="sord.html">SORD</a>) code for modeling spontaneous
+rupture and 3D wave propagation.</li>
+<li>SCEC Community Velocity Models (CVM) codes, with MPI parallelization for
+<a class="reference external" href="http://www.data.scec.org/3Dvelocity/">version 4</a>, and new <a class="reference external" href="http://earth.usc.edu/~gely/cvmh/">geotechnical layer implementation</a> for the
+<a class="reference external" href="http://structure.harvard.edu/cvm-h/">Harvard version</a>.</li>
+<li><a class="reference external" href="http://scec.usc.edu/websims">WebSims</a> web application for cataloging, exploring, and disseminating large
+numerical simulations data sets.</li>
+<li>Utilities for mesh generation, coordinate projection, and visualization.</li>
 </ul>
-<p>Coseis is open-source and released under the <a class="reference external" href="license.txt">GNU General Public License Version 3</a>.  You are free to use or redistribute the code, with the
-obligation that you contribute back any modifications or derived works.</p>
-<div class="section" id="author">
-<h4>Author</h4>
-<div class="line-block">
-<div class="line"><a class="reference external" href="http://earth.usc.edu/~gely/">Geoffrey Ely</a></div>
-<div class="line"><a class="reference external" href="http://www.usc.edu/dept/earth/">Department of Earth Sciences</a></div>
-<div class="line"><a class="reference external" href="http://www.usc.edu/">University of Southern California</a></div>
-<div class="line"><a class="reference external" href="http://earth.usc.edu/~gely/">http://earth.usc.edu/~gely/</a></div>
-<div class="line"><a class="reference external" href="mailto:gely&#37;&#52;&#48;usc&#46;edu">gely<span>&#64;</span>usc<span>&#46;</span>edu</a></div>
-</div>
-<p>Contributions from: Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.</p>
-</div>
+<p>The primary interface is though a Python module which (for high-performance
+components) wraps Fortran parallelized with MPI.</p>
+<p>Coseis is written by <a class="reference external" href="http://earth.usc.edu/~gely/">Geoffrey Ely</a> with contributions from Steven Day,
+Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
+the <a class="reference external" href="http://www.gnu.org/licenses/gpl-3.0.html">GPLv3</a>.</p>
 </div>
 <div class="section" id="system-requirements">
 <h3>System requirements</h3>
 <ul class="simple">
 <li><a class="reference external" href="http://www.python.org/">Python</a>, and <a class="reference external" href="http://numpy.scipy.org/">NumPy</a> (Numerical Python).</li>
-<li>(Optional) Fortran 95 compiler. Required for SORD and CVM.</li>
-<li>(Optional) Message Passing Interface (MPI) library.  Required for
-SORD and CVM4 multi-processing.</li>
-<li>(Optional) <a class="reference external" href="http://matplotlib.sourceforge.net/">Matplotlib</a>, <a class="reference external" href="http://www.scipy.org/">SciPy</a>, and Pyproj Python packages.  Required for
-supplemental plotting, signal processing, and mesh generation utilities.</li>
-<li>(Optional) <a class="reference external" href="http://git-scm.com/">Git</a> version control system.  Useful for development and staying
-updated with the latest code version.</li>
+<li>Fortran 95 compiler. Required for SORD and CVM codes.</li>
+<li>Message Passing Interface (MPI) library.  Required for SORD and CVM4
+multi-processing.</li>
+<li><a class="reference external" href="http://matplotlib.sourceforge.net/">Matplotlib</a>, <a class="reference external" href="http://www.scipy.org/">SciPy</a>, and Pyproj Python packages.  Required for supplemental
+plotting, signal processing, and mesh generation utilities.</li>
+<li><a class="reference external" href="http://git-scm.com/">Git</a> version control system.  Useful for development and staying updated
+with the latest code version.</li>
 </ul>
 </div>
 <div class="section" id="install">

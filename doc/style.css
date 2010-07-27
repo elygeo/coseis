@@ -7,24 +7,25 @@ body {
     font-family: 'Lucida Grande', Geneva, Verdana, sans-serif;
 }
 
-h2, h3, p.topic-title {
-    font-weight: bold;
+h1 {
+    color: #900;
+    margin: 0px;
+}
+
+h2 {
     font-size: large;
+    margin: 0px;
+}
+
+h3 {
     margin-top: 30px;
     padding-top: 10px;
     border-top: 2px solid #ddd;
 }
 
-h1.title {
-    margin: 0px;
-    color: #800;
-}
-
-h2.subtitle {
-    margin: 0px;
-    padding: 0px;
-    padding-bottom: 10px;
-    border: none;
+p.topic-title {
+    font-size: large;
+    font-weight: bold;
 }
 
 pre {
@@ -38,13 +39,14 @@ img {
 }
 
 img.align-right {
-    margin-top: 50px;
-    clear: right;
+    border: 10px solid #fff;
+    border-right: 0px;
     float: right;
+    float: top;
 }
 
 a {
-    color: #48c;
+    color: #06a;
     text-decoration: none;
 }
 
@@ -58,6 +60,8 @@ hr {
 }
 
 table {
+    margin-top: 10px;
+    margin-bottom: 30px;
     border-style: none;
     border-collapse: collapse;
 }
@@ -66,5 +70,9 @@ td {
     padding: 4px 10px;
     background-color: #f4f4f4;
     border: 1px solid #ddd;
+}
+
+.section li {
+    padding: 5px;
 }
 
