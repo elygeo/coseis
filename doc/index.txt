@@ -4,9 +4,13 @@ Coseis
 Computational Seismology Tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-======== ========= ===== ======== ==============
-Install_ Examples_ SORD_ WebSims_ `Source Code`_
-======== ========= ===== ======== ==============
+.. class:: navbar
+
++ Install_
++ Examples_
++ SORD_
++ WebSims_
++ `Source Code`_
 
 .. _SORD:         sord.html
 .. _WebSims:      http://scec.usc.edu/websims
@@ -44,22 +48,26 @@ GPLv3_.
 .. _Geoffrey Ely: http://earth.usc.edu/~gely/
 .. _GPLv3:        http://www.gnu.org/licenses/gpl-3.0.html
 
+WARNING: Coseis is under active development. Changes and breakage are frequent.
+
 
 System requirements
 ===================
 
 *   Python_, and NumPy_ (Numerical Python).
 
-*   Fortran 95 compiler. Required for SORD and CVM codes.
+*   (+) Fortran 95 compiler.  Required only for SORD and CVM4 modules.
 
-*   Message Passing Interface (MPI) library.  Required for SORD and CVM4
-    multi-processing.
+*   (+) Message Passing Interface (MPI) library.  Required only for
+    multiprocessing with SORD and CVM4.
 
-*   Matplotlib_, SciPy_, and Pyproj Python packages.  Required for supplemental
-    plotting, signal processing, and mesh generation utilities.
+*   (+) Matplotlib_, SciPy_, and Pyproj Python packages.  Required only for
+    supplemental plotting, signal processing, and mesh generation utilities.
 
-*   Git_ version control system.  Useful for development and staying updated
+*   (+) Git_ version control system.  Useful for development and staying updated
     with the latest code version.
+
+(+) Optional
 
 
 Install
