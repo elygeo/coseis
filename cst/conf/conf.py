@@ -6,15 +6,15 @@ import numpy as np
 
 # email address
 try:
-    import bzrlib.config
-    c = bzrlib.config.GlobalConfig()
-    email = bzrlib.config.extract_email_address( c.username() )
+    import configobj
+    f = os.path.join( os.path.expanduser( '~' ), '.gitconfig' )
+    email = configobj.ConfigObj( f )['user']['email']
 except:
     email = pwd.getpwuid( os.geteuid() )[0]
 
 # site specific
 machine = None
-repo = 'data'
+repo = '~/coseis/data'
 
 # job parameters
 name = 'cst'

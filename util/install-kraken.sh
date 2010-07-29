@@ -18,7 +18,6 @@ cd "${HOME}/coseis"
 python setup.py path
 
 pip install pyproj
-pip install bzr
 
 cd "${pwd}"
 

@@ -11,7 +11,6 @@ pip install virtualenv
 pip install docutils
 pip install ipython
 pip install cython
-pip install bzr
 pip install nose
 pip install configobj
 pip install pypdf

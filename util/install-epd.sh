@@ -30,7 +30,6 @@ fi
 # Packages
 easy_install pip
 pip install virtualenv
-pip install bzr
 pip install pypdf
 . install-obspy.sh "${prefix}"
 
