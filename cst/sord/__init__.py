@@ -60,7 +60,7 @@ def _build( mode=None, optimize=None, dtype=None ):
     if 's' in mode:
         source = base + ('serial.f90',) + common
         for opt in optimize:
-            object_ = os.path.join( '..', 'build', 'sord-s' + opt + dsize )
+            object_ = os.path.join( path, 'build', 'sord-s' + opt + dsize )
             fflags = cf.fortran_flags['f'], cf.fortran_flags[opt]
             if dtype != cf.dtype_f:
                 fflags = fflags + (cf.fortran_flags[dsize],)
@@ -69,20 +69,30 @@ def _build( mode=None, optimize=None, dtype=None ):
     if 'm' in mode and cf.fortran_mpi[0]:
         source = base + ('mpi.f90',) + common
         for opt in optimize:
-            object_ = os.path.join( '..', 'build', 'sord-m' + opt + dsize )
+            object_ = os.path.join( path, 'build', 'sord-m' + opt + dsize )
             fflags = cf.fortran_flags['f'], cf.fortran_flags[opt]
             if dtype != cf.dtype_f:
                 fflags = fflags + (cf.fortran_flags[dsize],)
             compiler = (cf.fortran_mpi,) + fflags + ('-o',)
             new |= cst.conf.make( compiler, object_, source )
     if new:
-        try:
-            import bzrlib
-        except ImportError:
-            print( 'Warning: bzr not installed. Install bzr if you want to save a\
-                copy of the source code for posterity with each run.' )
-        else:
-            os.system( 'bzr export ../build/coseis.tgz' )
+       try:
+            import git, tarfile, gzip
+            repo = git.Repo( cst.path )
+       except:
+            print( 'Warning: Source code not archived. To enable, use' )
+            print( 'Git versioned source code and install GitPython.' )
+       finally:
+            f = os.path.join( path, 'build', 'coseis.tgz' )
+            repo.archive( open( 'tmp.tar', 'w' ), prefix='coseis/' )
+            tar = tarfile.open( 'tmp.tar', 'a' )
+            open( 'tmp.log', 'w' ).write( repo.git.log() )
+            tar.add( 'tmp.log', 'coseis/changelog' )
+            tar.close()
+            tar = open( 'tmp.tar', 'rb' ).read()
+            os.remove( 'tmp.tar' )
+            os.remove( 'tmp.log' )
+            gzip.open( f, 'wb' ).write( tar )
     os.chdir( cwd )
     return
 
