@@ -20,7 +20,7 @@ settings = dict(
 
 for f in 'index', 'sord':
     print f
-    path = os.path.join( cwd, f ) + '.txt'
+    path = os.path.join( cwd, f ) + '.rst'
     rst = open( path ).read()
     html = publish_string( rst, writer_name='html4css1',
         settings_overrides=settings )

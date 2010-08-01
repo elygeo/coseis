@@ -48,7 +48,10 @@ GPLv3_.
 .. _Geoffrey Ely: http://earth.usc.edu/~gely/
 .. _GPLv3:        http://www.gnu.org/licenses/gpl-3.0.html
 
-WARNING: Coseis is under active development. Changes and breakage are frequent.
+.. class:: warning
+
+    **WARNING**: Coseis is a research code under active development.  Changes
+    are frequent and it has known bugs!
 
 
 System requirements
