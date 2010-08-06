@@ -66,7 +66,7 @@ def vs30_wald( rebuild=False ):
         x, y = gtl_coords()
         data = coord.interp2( extent, data, (x, y), method='linear' ).astype( 'f' )
         np.save( filename, data )
-    return extent_gtl, None, data, None
+    return extent_gtl, None, data
 
 
 def vs30_wills( rebuild=False ):
@@ -113,7 +113,7 @@ def vs30_wills( rebuild=False ):
             coord.interp2( extent, v, (x, y), data, 'nearest', bound, mask_nan=True )
         print('')
         np.save( filename, data )
-    return extent_gtl, None, data, None
+    return extent_gtl, None, data
 
 
 def nafe_drake( f ):
@@ -152,8 +152,7 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
     -------
         extent: (x0, x1), (y0, y1), (z0, z1)
         bound: (x0, x1), (y0, y1), (z0, z1)
-        surface: Array of properties for 2d data or model top for 3d data.
-        volume: Array of properties for 3d data or None for 2d data.
+        data: Array of properties
     """
 
     # download if not found
@@ -173,32 +172,6 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
     else:
         vid, bound = 'interfaces', None
     voxfile = os.path.join( path, vid + '.vo' )
-    topfile = os.path.join( path, vid + '_TOP@@' )
-
-    # compute model top from Vs if not found
-    if not os.path.exists( topfile ) and prop in prop3d:
-        print 'Searching for model top'
-        p = prop3d['vs']
-        voxet = gocad.voxet( voxfile, p )['1']
-        data = voxet['PROP'][p]['DATA']
-        z0 = voxet['AXIS']['O'][2]
-        z1 = voxet['AXIS']['W'][2] + z0
-        nz = data.shape[2]
-        dz = (z1 - z0) / (nz - 1)
-        top = np.empty_like( data[:,:,0] )
-        top.fill( np.nan )
-        for j in range( nz ):
-            if dz < 0.0:
-                j = nz - 1 - j
-            f = data[:,:,j].copy()
-            f[1:,:]  = f[1:,:]  + f[:-1,:]
-            f[:-1,:] = f[:-1,:] + f[1:,:]
-            f[:,1:]  = f[:,1:]  + f[:,:-1]
-            f[:,:-1] = f[:,:-1] + f[:,1:]
-            i = ~np.isnan( f )
-            z = z0 + j * dz
-            top[i] = z
-        top.T.tofile( topfile )
 
     # load voxet
     if prop is None:
@@ -216,12 +189,7 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
 
     # property data
     data = voxet['PROP'][pid]['DATA']
-    nx, ny, nz = data.shape
-    if nz == 1:
-        return extent, bound, data.squeeze(), None
-    else:
-        top = np.fromfile( topfile, data.dtype ).reshape( [ny, nx] ).T
-        return extent, bound, top, data
+    return extent, bound, data
 
 
 class Model():
@@ -259,15 +227,16 @@ class Model():
             for vox in voxet:
                 self.voxet += [ cvmh_voxet( prop, vox, no_data_value ) ]
         return
-    def __call__( self, x, y, z=None, out=None, interpolation='linear' ):
+    def __call__( self, x, y, z=None, out=None, interpolation='nearest' ):
         if out is None:
             out = np.empty_like( x )
             out.fill( np.nan )
-        for extent, bound, surface, volume in self.voxet:
+        for extent, bound, data in self.voxet:
             if z is None:
-                coord.interp2( extent[:2], surface, (x, y), out, interpolation, bound )
+                data = data.reshape( data.shape[:2] )
+                coord.interp2( extent[:2], data, (x, y), out, interpolation, bound )
             else:
-                coord.interp3( extent, volume, (x, y, z), out, interpolation, bound )
+                coord.interp3( extent, data, (x, y, z), out, interpolation, bound )
         return out
 
 
@@ -281,7 +250,6 @@ class Extraction():
         vm: 'vp', 'vs', 'tag', or Model object.
         vs30: 'wills', 'wald', None, or Model object.
         topo: 'topo' or Model object.
-        gtl_depth: GTL interpolation depth.
         interpolation: 'nearest', or 'linear'.
 
     Call parameters
@@ -295,8 +263,7 @@ class Extraction():
     -------
         out: Property samples at coordinates (x, y, z)
     """
-    def __init__( self, x, y, vm, vs30='wills', topo='topo', gtl_depth=100.0,
-        interpolation='linear' ):
+    def __init__( self, x, y, vm, vs30='wills', topo='topo', interpolation='nearest' ):
         x = np.asarray( x )
         y = np.asarray( y )
         if type( vm ) is str:
@@ -305,54 +272,58 @@ class Extraction():
             vs30 = Model( vs30 )
         if type( topo ) is str:
             topo = Model( topo )
-        z0 = topo( x, y )
+        z0 = topo( x, y, interpolation='linear' )
         if vs30 is None:
-            gtl_depth = 0.0
+            z1, z2 = None, None
         else:
-            z1 = vm( x, y )
-            z1 = np.minimum( z0 - gtl_depth, z1 - 1.0 )
-            d0 = 30.0
-            d1 = z0 - z1
-            v_ = vs30( x, y )
-            v0 = v_ * 0.55
-            v1 = v_ * 1.45
-            v2 = vm( x, y, z1, interpolation=interpolation )
-            b0 = (v1 - v0) / d0
-            if vm.prop == 'vp':
-                v1 = brocher_vp( v1 )
-            b1 = (v2 - v1) / (d1 - d0)
-            c0 = v0
-            c1 = v1 - b1 * d0
-            self.gtl = b0, b1, c0, c1, d0, d1
-            gtl_depth = max( gtl_depth, d1.max() )
-        self.data = x, y, z0, vm, interpolation, gtl_depth
+            z1, z2 = 30.0, 350.0
+            vs30 = vs30( x, y, interpolation='linear' )
+            vt = vm( x, y, z0 - z2, interpolation=interpolation )
+            self.gtl = vs30, vt
+        self.data = x, y, z0, z1, z2, vm, interpolation
         return
     def __call__( self, z, out=None, min_depth=None, by_depth=True ):
-        x, y, z0, vm, interpolation, gtl_depth = self.data
+        x, y, z0, z1, z2, vm, interpolation = self.data
         z = np.asarray( z )
         if out is None:
             out = np.empty_like( z )
             out.fill( np.nan )
         if by_depth is False:
             vm( x, y, z, out, interpolation )
-            d = z0 - z
+            z = z0 - z
         else:
             vm( x, y, z0 - z, out, interpolation )
-            d = z
-        if gtl_depth > 0.0:
+        if z1:
             if min_depth is None:
-                min_depth = d.min()
-            if min_depth < gtl_depth:
-                b0, b1, c0, c1, d0, d1 = self.gtl
-                i = d < 0.0
-                out[i] = np.nan
-                i = (d >= 0.0) & (d < d0)
+                min_depth = z.min()
+            if min_depth < z2:
+                vs30, vt = self.gtl
+                c = 4.0 / 3.0
+                a1 = (c + c - 2.0) / z1
+                a0 = 2.0 - c
+                b3 =  0.000000025
+                b2 = -0.000025
+                b1 = (z1 * z1 * (b3 * z1 + b2) - z2 * z2 * (b3 * z2 + b2) + 1.0) / (z2 - z1)
+                b0 = -((b3 * z1 + b2) * z1 + b1) * z1
+                b01 = b0 - 1.0
                 if vm.prop == 'vp':
-                    out[i] = brocher_vp( c0[i] + b0[i] * d[i] )
+                    i = z < z2
+                    out[i] = (
+                        (((b3 * z + b2) * z + b1) * z + b0) * vt -
+                        (((b3 * z + b2) * z + b1) * z + b01) * brocher_vp( c * vs30 )
+                    )[i]
+                    i = z < z1
+                    out[i] = brocher_vp( (a1 * z[i] + a0) * vs30[i] )
                 else:
-                    out[i] = c0[i] + b0[i] * d[i]
-                i = (d >= d0) & (d < d1)
-                out[i] = c1[i] + b1[i] * d[i]
+                    i = z < z2
+                    out[i] = (
+                        (((b3 * z + b2) * z + b1) * z + b0) * vt -
+                        (((b3 * z + b2) * z + b1) * z + b01) * c * vs30
+                    )[i]
+                    i = z < z1
+                    out[i] = ((a1 * z + a0) * vs30)[i]
+                i = z < 0.0
+                out[i] = np.nan
         return out
 
 
