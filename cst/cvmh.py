@@ -274,16 +274,18 @@ class Extraction():
             topo = Model( topo )
         z0 = topo( x, y, interpolation='linear' )
         if vs30 is None:
-            z1, z2 = None, None
+            zt = None
         else:
-            z1, z2 = 30.0, 350.0
-            vs30 = vs30( x, y, interpolation='linear' )
-            vt = vm( x, y, z0 - z2, interpolation=interpolation )
-            self.gtl = vs30, vt
-        self.data = x, y, z0, z1, z2, vm, interpolation
+            zt = 350.0
+            v0 = vs30( x, y, interpolation='linear' )
+            if vm.prop == 'vp':
+                v0 = brocher_vp( v0 )
+            vt = vm( x, y, z0 - zt, interpolation=interpolation )
+            self.gtl = v0, vt
+        self.data = x, y, z0, zt, vm, interpolation
         return
     def __call__( self, z, out=None, min_depth=None, by_depth=True ):
-        x, y, z0, z1, z2, vm, interpolation = self.data
+        x, y, z0, zt, vm, interpolation = self.data
         z = np.asarray( z )
         if out is None:
             out = np.empty_like( z )
@@ -293,37 +295,19 @@ class Extraction():
             z = z0 - z
         else:
             vm( x, y, z0 - z, out, interpolation )
-        if z1:
+        if zt:
             if min_depth is None:
                 min_depth = z.min()
-            if min_depth < z2:
-                vs30, vt = self.gtl
-                c = 4.0 / 3.0
-                a1 = (c + c - 2.0) / z1
-                a0 = 2.0 - c
-                b3 =  0.000000025
-                b2 = -0.000025
-                b1 = (z1 * z1 * (b3 * z1 + b2) - z2 * z2 * (b3 * z2 + b2) + 1.0) / (z2 - z1)
-                b0 = -((b3 * z1 + b2) * z1 + b1) * z1
-                b01 = b0 - 1.0
-                if vm.prop == 'vp':
-                    i = z < z2
-                    out[i] = (
-                        (((b3 * z + b2) * z + b1) * z + b0) * vt -
-                        (((b3 * z + b2) * z + b1) * z + b01) * brocher_vp( c * vs30 )
-                    )[i]
-                    i = z < z1
-                    out[i] = brocher_vp( (a1 * z[i] + a0) * vs30[i] )
-                else:
-                    i = z < z2
-                    out[i] = (
-                        (((b3 * z + b2) * z + b1) * z + b0) * vt -
-                        (((b3 * z + b2) * z + b1) * z + b01) * c * vs30
-                    )[i]
-                    i = z < z1
-                    out[i] = ((a1 * z + a0) * vs30)[i]
-                i = z < 0.0
-                out[i] = np.nan
+            if min_depth < zt:
+                v0, vt = self.gtl
+                a = 0.5
+                b = 2.0 / 3.0
+                c = 1.5
+                z = z / zt
+                f = z + b * (z - z * z)
+                g = a - (a + 3.0 * c) * z + c * z * z + 2.0 * c * np.sqrt( z )
+                i = z < 1.0
+                out[i] = (f * vt + g * v0)[i]
         return out
 
 
