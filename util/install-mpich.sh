@@ -8,11 +8,12 @@ tag=$( basename "$url" .tar.gz )
 cd "${prefix}"
 curl -L "${url}" | tar zx
 cd "${tag}"
-if [ "${MACHTYPE}" = 'x86_64-apple-darwin10.0' ]; then
-    ./configure -prefix="${prefix}" --with-device=ch3:shm --enable-f90 CFLAGS='-arch x86_64' CXXFLAGS='-arch x86_64' FFLAGS='-arch x86_64' F90FLAGS='-arch x86_64'
-else
-    ./configure -prefix="${prefix}" --with-device=ch3:shm --enable-f90
-fi
+#if [ "${MACHTYPE}" = 'x86_64-apple-darwin10.0' ]; then
+#    ./configure -prefix="${prefix}" --with-device=ch3:shm CFLAGS='-arch x86_64' CXXFLAGS='-arch x86_64' FFLAGS='-arch x86_64' F90FLAGS='-arch x86_64'
+#else
+#    ./configure -prefix="${prefix}" --with-device=ch3:shm
+#fi
+./configure -prefix="${prefix}" --with-device=ch3:shm
 make
 make install
 export PATH="${prefix}/bin:${PATH}"
