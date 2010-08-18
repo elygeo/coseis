@@ -25,7 +25,7 @@ def etopo1( indices=None, downsample=1 ):
             print( 'Retrieving %s' % url )
             f = os.path.join( repo, os.path.basename( url ) )
             urllib.urlretrieve( url, f )
-            zipfile.extractall( f )
+            zipfile.ZipFile( f ).extractall( repo )
         print( 'Creating %s' % filename )
         z = np.fromfile( f1, '<i2' ).astype( 'f' ).reshape( shape )
         if downsample > 1:
@@ -122,7 +122,7 @@ def us_place_names( kind=None, extent=None ):
         print( 'Downloading %s' % url )
         f = os.path.join( repo, os.path.basename( url ) )
         urllib.urlretrieve( url, f )
-        zipfile.extractall( f )
+        zipfile.ZipFile( f ).extractall( repo )
     data = open( filename ).read()
     name = np.genfromtxt( data, delimiter='|', skip_header=1, usecols=(1,), dtype='S64' )
     data.reset()
@@ -182,7 +182,7 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
         print( 'Downloading %s' % url )
         f = os.path.join( repo, os.path.basename( url ) )
         urllib.urlretrieve( url, f )
-        zipfile.extractall( f )
+        zipfile.ZipFile( f ).extractall( repo )
     data = np.fromfile( filename, '>i' )
     xx = []
     yy = []
