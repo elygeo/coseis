@@ -4,9 +4,10 @@ Support Operator Rupture Dynamics
 """
 import os, sys, math, glob, shutil, pprint
 import numpy as np
-import cst.util
-import cst.conf
+import cst.util, cst.conf
 import fieldnames
+
+path = os.path.realpath( os.path.dirname( __file__ ) )
 
 def _build( mode=None, optimize=None, dtype=None ):
     """
@@ -48,19 +49,19 @@ def _build( mode=None, optimize=None, dtype=None ):
         'acceleration.f90',
         'sord.f90',
     )
-    cwd = os.getcwd()
-    path = os.path.realpath( os.path.dirname( __file__ ) )
-    f = os.path.join( path, 'build' )
-    if not os.path.isdir( f ):
-        os.mkdir( f )
-    new = False
-    os.chdir( os.path.join( path, 'src' ) )
     dtype = np.dtype( dtype ).str
     dsize = dtype[-1]
+    new = False
+    cwd = os.getcwd()
+    src = os.path.join( path, 'src' )
+    bld = os.path.join( cst.path, 'build' ) + os.sep
+    os.chdir( src )
+    if not os.path.isdir( bld ):
+        os.mkdir( bld )
     if 's' in mode:
         source = base + ('serial.f90',) + common
         for opt in optimize:
-            object_ = os.path.join( path, 'build', 'sord-s' + opt + dsize )
+            object_ = bld + 'sord-s' + opt + dsize
             fflags = cf.fortran_flags['f'], cf.fortran_flags[opt]
             if dtype != cf.dtype_f:
                 fflags = fflags + (cf.fortran_flags[dsize],)
@@ -69,7 +70,7 @@ def _build( mode=None, optimize=None, dtype=None ):
     if 'm' in mode and cf.fortran_mpi[0]:
         source = base + ('mpi.f90',) + common
         for opt in optimize:
-            object_ = os.path.join( path, 'build', 'sord-m' + opt + dsize )
+            object_ = bld + 'sord-m' + opt + dsize
             fflags = cf.fortran_flags['f'], cf.fortran_flags[opt]
             if dtype != cf.dtype_f:
                 fflags = fflags + (cf.fortran_flags[dsize],)
@@ -83,7 +84,7 @@ def _build( mode=None, optimize=None, dtype=None ):
             print( 'Warning: Source code not archived. To enable, use' )
             print( 'Git versioned source code and install GitPython.' )
        finally:
-            f = os.path.join( path, 'build', 'coseis.tgz' )
+            f = os.path.join( bld, 'coseis.tgz' )
             repo.archive( open( 'tmp.tar', 'w' ), prefix='coseis/' )
             tar = tarfile.open( 'tmp.tar', 'a' )
             open( 'tmp.log', 'w' ).write( repo.git.log() )
@@ -197,13 +198,12 @@ def stage( dictargs={}, **kwargs ):
     _build( job.mode, job.optimize, job.dtype )
 
     # create run directory
-    src = os.path.realpath( os.path.dirname( __file__ ) ) + os.sep
-    files = os.path.join( src, 'build', job.command ),
-    f = os.path.join( src, 'build', 'coseis.tgz' )
+    files = os.path.join( cst.path, 'build', job.command ),
+    f = os.path.join( cst.path, 'build', 'coseis.tgz' )
     if os.path.isfile( f ):
         files += f,
     if job.optimize == 'g':
-        for f in glob.glob( os.path.join( 'src', '*.f90' ) ):
+        for f in glob.glob( path + '/src/*.f90' ):
             files += f,
     if job.force == True and os.path.isdir( job.rundir ):
         shutil.rmtree( job.rundir )
