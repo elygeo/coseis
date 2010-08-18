@@ -11,4 +11,5 @@ login = hostname = 'intensity.usc.edu'
 maxcores = 8
 maxram = 7000
 rate = 1.7e6
+fortran_serial = 'gfortran'
 

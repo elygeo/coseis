@@ -2,20 +2,19 @@
 prefix="${1:-${HOME}/local}"
 
 # Tools
+.   install-python.sh "${prefix}"
+.   install-git.sh "${prefix}"
+.   install-numpy.sh "${prefix}"
 .   install-zlib.sh "${prefix}"
 .   install-jpeg.sh "${prefix}"
-.   install-mpich.sh
-.   install-git.sh
-
-# Python tools
-.   install-python.sh "${prefix}"
-.   install-numpy.sh "${prefix}"
-.   install-vtk.sh "${prefix}"
-.   install-wxpython.sh "${prefix}"
+.   install-mpich.sh "${prefix}"	# dep: python?
+.   install-vtk.sh "${prefix}"		# dep: python < 2.7
+.   install-wxpython.sh "${prefix}"	# dep: vtk
 pip install virtualenv
 pip install docutils
 pip install ipython
 pip install cython
+pip install GitPython
 pip install nose
 pip install configobj
 pip install pypdf
