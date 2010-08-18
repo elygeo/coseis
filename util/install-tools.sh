@@ -1,9 +1,14 @@
 #!/bin/bash -e
 prefix="${1:-${HOME}/local}"
 
+# Tools
+.   install-mpich.sh
+.   install-git.sh
+
 # Python tools
 .   install-python.sh "${prefix}"
 .   install-zlib.sh "${prefix}"
+.   install-jpeg.sh "${prefix}"
 .   install-numpy.sh "${prefix}"
 .   install-vtk.sh "${prefix}"
 .   install-wxpython.sh "${prefix}"
@@ -21,6 +26,5 @@ pip install 'Mayavi[app]'r		# dep: numpy, wxpython, configobj, vtk
 .   install-obspy.sh "${prefix}"	# dep: matplotlib
 
 #pip install scipy			# dep: numpy
-#http://downloads.sourceforge.net/project/scipy/scipy/0.8.0rc1/scipy-0.8.0rc1-py2.6-python.org.dmg
-pip install http://downloads.sourceforge.net/project/scipy/scipy/0.8.0rc1/scipy-0.8.0rc1.tar.gz
+#pip install http://downloads.sourceforge.net/project/scipy/scipy/0.8.0/scipy-0.8.0.tar.gz
 

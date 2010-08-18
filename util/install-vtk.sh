@@ -3,7 +3,6 @@ prefix="${1:-${HOME}/local}"
 pwd="${PWD}"
 
 # CMake
-url="http://www.cmake.org/files/v2.8/cmake-2.8.1.tar.gz"
 url="http://www.cmake.org/files/v2.8/cmake-2.8.2.tar.gz"
 tag=$( basename "$url" .tar.gz )
 cd "${prefix}"
@@ -14,7 +13,6 @@ make
 make install
 
 # VTK
-url="http://www.vtk.org/files/release/5.4/vtk-5.4.2.tar.gz"
 url="http://www.vtk.org/files/release/5.6/vtk-5.6.0.tar.gz"
 cd "${prefix}"
 curl "${url}" | tar zx
