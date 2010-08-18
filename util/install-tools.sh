@@ -2,13 +2,13 @@
 prefix="${1:-${HOME}/local}"
 
 # Tools
+.   install-zlib.sh "${prefix}"
+.   install-jpeg.sh "${prefix}"
 .   install-mpich.sh
 .   install-git.sh
 
 # Python tools
 .   install-python.sh "${prefix}"
-.   install-zlib.sh "${prefix}"
-.   install-jpeg.sh "${prefix}"
 .   install-numpy.sh "${prefix}"
 .   install-vtk.sh "${prefix}"
 .   install-wxpython.sh "${prefix}"
