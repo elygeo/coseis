@@ -2,7 +2,6 @@
 """
 Reproduce Magistrale (2000) Fig. 10 fence diagram.
 """
-import os
 import pyproj
 import numpy as np
 from enthought.mayavi import mlab

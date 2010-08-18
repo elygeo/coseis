@@ -33,7 +33,7 @@ fortran_flags = {
     'f': '-Mdclchk',
     'g': '-Ktrap=fp -Mbounds -Mchkptr -g',
     't': '-Ktrap=fp -Mbounds',
-    'p': '-pg', '-Mprof=func',
+    'p': '-pg -Mprof=func',
     'O': '-fast',
     '8': '-Mr8',
 }

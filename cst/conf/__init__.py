@@ -157,7 +157,7 @@ def make( compiler, object_, source ):
     """
     An alternative Make that uses state files.
     """
-    import glob, difflib, shlex
+    import glob, difflib
     object_ = os.path.expanduser( object_ )
     source = tuple( os.path.expanduser( f ) for f in source if f )
     statedir = os.path.join( os.path.dirname( object_ ), '.state' )

@@ -2,10 +2,10 @@
 """
 Support Operator Rupture Dynamics
 """
+from __future__ import division, absolute_import, print_function #unicode_literals
 import os, sys, math, glob, shutil, pprint
 import numpy as np
-import cst.util, cst.conf
-import fieldnames
+from ..conf import launch
 
 path = os.path.realpath( os.path.dirname( __file__ ) )
 
@@ -13,6 +13,7 @@ def _build( mode=None, optimize=None, dtype=None ):
     """
     Build SORD code.
     """
+    import cst
     cf = cst.conf.configure()[0]
     if not optimize:
         optimize = cf.optimize
@@ -54,7 +55,7 @@ def _build( mode=None, optimize=None, dtype=None ):
     new = False
     cwd = os.getcwd()
     src = os.path.join( path, 'src' )
-    bld = os.path.join( cst.path, 'build' ) + os.sep
+    bld = os.path.join( os.path.dirname( path ), 'build' ) + os.sep
     os.chdir( src )
     if not os.path.isdir( bld ):
         os.mkdir( bld )
@@ -77,23 +78,7 @@ def _build( mode=None, optimize=None, dtype=None ):
             compiler = (cf.fortran_mpi,) + fflags + ('-o',)
             new |= cst.conf.make( compiler, object_, source )
     if new:
-       try:
-            import git, tarfile, gzip
-            repo = git.Repo( cst.path )
-       except:
-            print( 'Warning: Source code not archived. To enable, use' )
-            print( 'Git versioned source code and install GitPython.' )
-       finally:
-            f = os.path.join( bld, 'coseis.tgz' )
-            repo.archive( open( 'tmp.tar', 'w' ), prefix='coseis/' )
-            tar = tarfile.open( 'tmp.tar', 'a' )
-            open( 'tmp.log', 'w' ).write( repo.git.log() )
-            tar.add( 'tmp.log', 'coseis/changelog' )
-            tar.close()
-            tar = open( 'tmp.tar', 'rb' ).read()
-            os.remove( 'tmp.tar' )
-            os.remove( 'tmp.log' )
-            gzip.open( f, 'wb' ).write( tar )
+        cst._archive()
     os.chdir( cwd )
     return
 
@@ -101,6 +86,7 @@ def stage( dictargs={}, **kwargs ):
     """
     Stage job
     """
+    import cst
 
     # save start time
     print( 'SORD setup' )
@@ -121,7 +107,7 @@ def stage( dictargs={}, **kwargs ):
     error = None
     for k, msg in depreciated:
         if k in inputs:
-            print msg
+            print( msg )
             error = True
     if error:
         sys.exit()
@@ -160,16 +146,16 @@ def stage( dictargs={}, **kwargs ):
     if job.mode == 's':
         j, k, l = 1, 1, 1
     nl = [
-        (nx - 1) / j + 1,
-        (ny - 1) / k + 1,
-        (nz - 1) / l + 1,
+        (nx - 1) // j + 1,
+        (ny - 1) // k + 1,
+        (nz - 1) // l + 1,
     ]
     i = abs( pm.faultnormal ) - 1
     if i >= 0:
         nl[i] = max( nl[i], 2 )
-    j = (nx - 1) / nl[0] + 1
-    k = (ny - 1) / nl[1] + 1
-    l = (nz - 1) / nl[2] + 1
+    j = (nx - 1) // nl[0] + 1
+    k = (ny - 1) // nl[1] + 1
+    l = (nz - 1) // nl[2] + 1
     pm.nproc3 = j, k, l
     job.nproc = j * k * l
     if not job.mode:
@@ -232,7 +218,7 @@ def stage( dictargs={}, **kwargs ):
             shapes[k] = []
             deltas[k] = []
             for i, ii in enumerate( indices[k] ):
-                n = (ii[1] - ii[0]) / ii[2] + 1
+                n = (ii[1] - ii[0]) // ii[2] + 1
                 d = pm.delta[i] * ii[2]
                 if n > 1:
                     shapes[k] += [n]
@@ -263,7 +249,6 @@ def stage( dictargs={}, **kwargs ):
     job.__dict__.update( pm.__dict__ )
     return job
 
-launch = cst.conf.launch
 def run( job=None, **kwargs ):
     """
     Stage (if necessary) and launch job
@@ -280,12 +265,14 @@ def prepare_param( pm ):
     """
     Prepare input paramers
     """
+    import cst
+    from . import fieldnames
 
     # inervals
     nt = pm.shape[3]
     pm.itio = max( 1, min(pm.itio, nt) )
     if pm.itcheck % pm.itio != 0:
-        pm.itcheck = (pm.itcheck / pm.itio + 1) * pm.itio
+        pm.itcheck = (pm.itcheck // pm.itio + 1) * pm.itio
 
     # hypocenter coordinates
     nn = pm.shape[:3]
@@ -396,8 +383,8 @@ def prepare_param( pm ):
         if field in fieldnames.fault:
             i = abs( pm.faultnormal ) - 1
             ii[i] = 2 * (irup,) + (1,)
-        shape = [ (i[1] - i[0]) / i[2] + 1 for i in ii ]
-        nb = ( min( pm.itio, nt ) - 1 ) / ii[3][2] + 1
+        shape = [ (i[1] - i[0]) // i[2] + 1 for i in ii ]
+        nb = ( min( pm.itio, nt ) - 1 ) // ii[3][2] + 1
         nb = max( 1, min( nb, shape[3] ) )
         n = shape[0] * shape[1] * shape[2]
         if n > (nn[0] + nn[1] + nn[2]) ** 2:

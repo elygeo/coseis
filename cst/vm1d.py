@@ -3,7 +3,7 @@
 1D velocity models
 """
 import numpy as np
-import coord
+from . import coord
 
 def dreger( prop, depth ):
     """

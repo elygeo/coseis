@@ -1,22 +1,23 @@
 """
 Computational Seismology Tools
 """
+#from __future__ import division, absolute_import, print_function, unicode_literals
 import os
 path = os.path.dirname( __file__ )
-import util, conf
-import coord, signal
-import data, vm1d, gocad, cvmh
-import source, egmm
-import viz, plt, mlab
-import sord, cvm
+from . import util, conf
+from . import coord, signal
+from . import data, vm1d, gocad, cvmh
+from . import source, egmm
+from . import viz, plt, mlab
+from . import sord, cvm
 
 try:
-    from conf import site
+    from .conf import site
 except( ImportError ):
     pass
 
 try:
-    import rspectra
+    from . import rspectra
 except( ImportError ):
     pass
 
@@ -27,4 +28,23 @@ def _build():
         print( '\nBuilding rspectra' )
         os.system( 'f2py -c -m rspectra rspectra.f90' )
     os.chdir( cwd )
+
+def _archive():
+   try:
+        import git, tarfile, gzip
+        repo = git.Repo( path )
+   except:
+        print( 'Warning: Source code not archived. To enable, use' )
+        print( 'Git versioned source code and install GitPython.' )
+   finally:
+        f = os.path.join( path, 'build', 'coseis.tgz' )
+        repo.archive( open( 'tmp.tar', 'w' ), prefix='coseis/' )
+        tar = tarfile.open( 'tmp.tar', 'a' )
+        open( 'tmp.log', 'w' ).write( repo.git.log() )
+        tar.add( 'tmp.log', 'coseis/changelog' )
+        tar.close()
+        tar = open( 'tmp.tar', 'rb' ).read()
+        os.remove( 'tmp.tar' )
+        os.remove( 'tmp.log' )
+        gzip.open( f, 'wb' ).write( tar )
 

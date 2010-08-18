@@ -7,14 +7,14 @@ Mapping data utilities
 # ftp://hazards.cr.usgs.gov/maps/qfault/
 import os, urllib, gzip, zipfile
 import numpy as np
-import coord, util
-import cst
+from . import coord, util
 
 def etopo1( indices=None, downsample=1 ):
     """
     Download ETOPO1 Global Relief Model.
     http://www.ngdc.noaa.gov/mgg/global/global.html
     """
+    import cst
     repo = cst.site.repo
     shape = 21601, 10801
     filename = os.path.join( repo, 'etopo%02d-ice.f32' % downsample )
@@ -43,6 +43,7 @@ def globe( indices=None ):
     Global Land One-km Base Elevation Digital Elevation Model.
     http://www.ngdc.noaa.gov/mgg/topo/globe.html
     """
+    import cst
     repo = cst.site.repo
     filename = os.path.join( repo, 'globe30.i16' )
     if not os.path.exists( filename ):
@@ -113,6 +114,7 @@ def us_place_names( kind=None, extent=None ):
     """
     USGS place name database.
     """
+    import cst
     repo = cst.site.repo
     filename = os.path.join( repo, 'US_CONCISE.txt' )
     if not os.path.exists( filename ):
@@ -164,8 +166,9 @@ def mapdata( kind='coastlines', resolution='high', extent=None, min_area=0.0, mi
     http://www.ngdc.noaa.gov/mgg/shorelines/gshhs.html
     http://www.soest.hawaii.edu/wessel/gshhs/index.html
     """
-    nh = 11
+    import cst
     repo = cst.site.repo
+    nh = 11
     kind = {'c': 'gshhs', 'r': 'wdb_rivers', 'b': 'wdb_borders'}[kind[0]]
     if kind != 'gshhs':
         min_area = 0.0

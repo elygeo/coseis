@@ -2,10 +2,9 @@
 """
 SCEC Community Velocity Model (CVM-H) extraction tool
 """
-import os, sys, urllib
+import os, sys, urllib, gzip
 import numpy as np
-import coord, gocad
-import cst
+from . import coord, gocad
 
 # parameters
 projection = dict( proj='utm', zone=11, datum='NAD27', ellps='clrk66' )
@@ -39,6 +38,7 @@ def vs30_wald( rebuild=False ):
     """
     Wald, et al. Vs30 map.
     """
+    import cst
     repo = cst.site.repo
     filename = os.path.join( repo, 'cvm_vs30_wald.npy' )
     if not rebuild and os.path.exists( filename ):
@@ -46,7 +46,6 @@ def vs30_wald( rebuild=False ):
     else:
         f1 = os.path.join( repo, 'Western_US.grd' )
         if not os.path.exists( f1 ):
-            import gzip
             url = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
             print( 'Downloading %s' % url )
             f = os.path.join( repo, os.path.basename( url ) )
@@ -73,6 +72,7 @@ def vs30_wills( rebuild=False ):
     """
     Wills and Clahan Vs30 map.
     """
+    import cst
     repo = cst.site.repo
     url = 'http://earth.usc.edu/~gely/coseis/download/cvm_vs30_wills.npy'
     filename = os.path.join( repo, os.path.basename( url ) )
@@ -154,9 +154,10 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
         bound: (x0, x1), (y0, y1), (z0, z1)
         data: Array of properties
     """
+    import cst
+    repo = cst.site.repo
 
     # download if not found
-    repo = cst.site.repo
     path = os.path.join( repo, version, 'bin' )
     if not os.path.exists( path ):
         url = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2' % version

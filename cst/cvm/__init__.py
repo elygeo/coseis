@@ -4,8 +4,7 @@ SCEC Community Velocity Model
 """
 import os, sys, re, shutil, urllib, tarfile
 import numpy as np
-import cst
-from cst.conf import launch
+from ..conf import launch
 
 path = os.path.dirname( os.path.realpath( __file__ ) )
 
@@ -23,6 +22,7 @@ def _build( mode=None, optimize=None ):
     """
     Build CVM code.
     """
+    import cst
 
     # configure
     cf = cst.conf.configure( 'cvm' )[0]
@@ -55,24 +55,25 @@ def _build( mode=None, optimize=None ):
     os.chdir( 'build' )
 
     # compile ascii, binary, and MPI versions
+    new = False
     if 'a' in mode:
         source = 'iotxt.f', 'version4.0.f'
         for opt in optimize:
             compiler = cf.fortran_serial, cf.fortran_flags[opt], '-o'
             object_ = 'cvm4-a' + opt
-            cst.conf.make( compiler, object_, source )
+            new |= cst.conf.make( compiler, object_, source )
     if 's' in mode:
         source = 'iobin.f', 'version4.0.f'
         for opt in optimize:
             compiler = cf.fortran_serial, cf.fortran_flags[opt], '-o'
             object_ = 'cvm4-s' + opt
-            cst.conf.make( compiler, object_, source )
+            new |= cst.conf.make( compiler, object_, source )
     if 'm' in mode and cf.fortran_mpi:
         source = 'iompi.f', 'version4.0.f'
         for opt in optimize:
             object_ = 'cvm4-m' + opt
             compiler = cf.fortran_mpi, cf.fortran_flags[opt], '-o'
-            cst.conf.make( compiler, object_, source )
+            new |= cst.conf.make( compiler, object_, source )
     os.chdir( cwd )
     return
 
@@ -80,6 +81,7 @@ def stage( inputs={}, **kwargs ):
     """
     Stage job
     """
+    import cst
 
     print( 'CVM setup' )
 

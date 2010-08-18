@@ -37,7 +37,7 @@ if 1:
     ax.set_xlabel( 'Cores' )
     if normalize:
         ax.set_ylabel( 'Normalized run time' )
-        ax.axis([0, n-1, 0, h])
+        ax.axis([0, n-1, 0, 2])
     else:
         ax.set_ylabel( 'Time/step (s)' )
         h = 2 * int( np.average(tt) + 0.5 )

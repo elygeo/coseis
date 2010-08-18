@@ -2,9 +2,9 @@
 """
 Source utilities
 """
-import os, sys, urllib, gzip
+import os, sys, urllib, gzip, pprint
 import numpy as np
-import util
+from . import util, coord
 
 def scsn_mts( eventid ):
     """
@@ -329,7 +329,6 @@ def srf2potency( src, path, delta=(1,1,1), proj=None ):
         delta : grid step size (dx, dy, dz)
         proj : function to project lon/lat to logical model coordinates
     """
-    import coord
 
     # Read meta data
     src  = os.path.expanduser( src ) + os.sep
@@ -412,7 +411,6 @@ def srf2momrate( path, proj, delta, dt, nt, embed_indices=False ):
     """
     Convert SRF to moment rate and write Olsen AWM input file.
     """
-    import coord
 
     # Read meta data
     path = os.path.expanduser( path ) + os.sep
@@ -500,7 +498,6 @@ def srf2coulomb( path, proj, dest=None, scut=0 ):
     """
     Convert SRF to Coulomb input file.
     """
-    import coord
 
     if dest is None:
         dest = os.path.join( path, 'coulomb-' )
@@ -613,7 +610,6 @@ def command_line():
     """
     Process command line options.
     """
-    import pprint
     for f in sys.argv[1:]:
         print( f )
         pprint.pprint( srf_read( f, mks=True ) )

@@ -49,7 +49,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=Non
     if not nf:
         nf = nt
     t = np.arange( nt ) * dt
-    f = np.arange( nf / 2 + 1 ) / (dt * nf)
+    f = np.arange( nf // 2 + 1 ) / (dt * nf)
     tlim = t[0], t[-1]
     if len( h.shape ) > 1:
         n = h.shape[0]
