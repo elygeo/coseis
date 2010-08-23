@@ -2,12 +2,9 @@
 """
 WebSims configuration
 """
-import os
-
+#port = 8081
 baseurl = '/websims'
 cfgfile = 'wsconf.py'
-repodir = (
-    os.path.join( 'websims', 'static', 'repo'   ),
-    os.path.join( 'websims', 'static', 'repo-1' ),
-)
+repodir = '.', '../repo-1'
+cache_max_age = 86400
 

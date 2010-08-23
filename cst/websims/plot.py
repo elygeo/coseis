@@ -6,7 +6,7 @@ import os, sys, cStringIO, matplotlib
 matplotlib.use( 'Agg' )
 import matplotlib.pyplot as plt
 import numpy as np
-import conf, util, viz
+from . import conf, util, viz
 
 cfgfile = conf.cfgfile
 repodir = conf.repodir
@@ -17,10 +17,10 @@ def plot2d( id_, filename, time, decimate ):
     2d image plot
     """
     static = time == ''
-    fullfilename = os.path.join( repodir[0], id_, filename )
+    fullfilename = os.path.join( id_, filename )
     if cache and static and os.path.exists( fullfilename ):
         return open( fullfilename, 'rb' ).read()
-    path = os.path.join( repodir[0], id_, cfgfile )
+    path = os.path.join( id_, cfgfile )
     m = util.load( path )
     ndim = len( m.x_shape )
     it = list( m.x_axes ).index( 'Time' )
@@ -109,7 +109,7 @@ def plot2d( id_, filename, time, decimate ):
         interpolation='nearest' )
     ax.hold( True )
     for plot in m.x_plot:
-        path = os.path.join( repodir[0], id_, plot[0] )
+        path = os.path.join( id_, plot[0] )
         x, y = np.loadtxt( path, usecols=(0,1) ).T
         if rotate:
             x, y = y, x
@@ -165,7 +165,7 @@ def plot1d( ids, filename, x, lowpass ):
     """
     ext = os.path.splitext( filename )[1]
     x = [ float(x) for x in x.split( ',' ) ]
-    path = os.path.join( repodir[0], ids[0], cfgfile )
+    path = os.path.join( ids[0], cfgfile )
     m = util.load( path )
     npane = len( m.t_panes )
     leg = npane * [[]]
@@ -184,7 +184,7 @@ def plot1d( ids, filename, x, lowpass ):
         ax.set_color_cycle( ['b', 'r', 'g', 'm', 'y', 'c', 'k'] )
         axs += [ax]
     for id_ in ids:
-        f = os.path.join( repodir[0], id_, cfgfile )
+        f = os.path.join( id_, cfgfile )
         m = util.load( f )
         ndim = len( m.t_shape )
         it = list( m.t_axes ).index( 'Time' )
@@ -274,9 +274,7 @@ def lowpass_filter( x, dt, cutoff, window=2, repeat=-1 ):
             w = 0.5 - 0.5 * np.cos(
                 2.0 * np.pi * np.arange( n ) / (n - 1) )
             w /= w.sum()
-            print x.size, w.size
             x = np.convolve( x, w, 'same' )
-            print x.size
             if repeat:
                 x = np.convolve( x, w, 'same' )
     else:

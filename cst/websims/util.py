@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-General utilities
+Utilities
 """
 import os, sys, re
 
@@ -16,8 +16,9 @@ def findmembers( top='.', member='.member', group='.group', ignore='.ignore' ):
     if grouping:
         group = False
     sims = []
-    for name in os.listdir( top ):
-        path = os.path.join( top, name )
+    for path in os.listdir( top ):
+        if top is not '.':
+            path = os.path.join( top, path )
         if os.path.isdir( path ):
              sims += findmembers( path, member, group, ignore )
     if grouping:

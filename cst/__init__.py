@@ -9,7 +9,7 @@ from . import coord, signal
 from . import data, vm1d, gocad, cvmh
 from . import source, egmm
 from . import viz, plt, mlab
-from . import sord, cvm
+from . import sord, cvm, websims
 
 try:
     from .conf import site

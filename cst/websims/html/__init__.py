@@ -1,1 +1,1 @@
-import main, index, show
+import main, index, show, static
