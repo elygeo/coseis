@@ -36,5 +36,6 @@ export LD_LIBRARY_PATH="${prefix}/lib/vtk-5.6"
 #CMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.6
 #DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:/usr/local/lib/vtk-5.4
 
+echo "Now set your LD_LIBRARY_PATH!"
 cd "${pwd}"
 

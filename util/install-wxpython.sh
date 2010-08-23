@@ -41,12 +41,12 @@ cd bld
     --with-zlib=builtin \
     --enable-optimize \
     --enable-debug_flag \
-#   --with-mac
     --with-gtk \
     --with-gnomeprint \
     --enable-rpath="${prefix}/lib"
+#   --with-mac \
 
-    export LD_LIBRARY_PATH="${prefix}/lib"
+export LD_LIBRARY_PATH="${prefix}/lib"
 
 make
 make -C contrib/src/gizmos
@@ -62,6 +62,8 @@ python setup.py build_ext --inplace
 python setup.py install
 
 fi
+
+echo "Now set your LD_LIBRARY_PATH!"
 
 cd "${pwd}"
 

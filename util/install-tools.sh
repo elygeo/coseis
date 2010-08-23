@@ -18,12 +18,12 @@ pip install GitPython
 pip install nose
 pip install configobj
 pip install pypdf
+pip install web.py
 pip install PIL				# dep: zlib
 pip install pyproj			# dep: numpy
-pip install matplotlib			# dep: numpy, wxpython, configobj
+pip install scipy			# dep: numpy
 pip install 'Mayavi[app]'r		# dep: numpy, wxpython, configobj, vtk
+#pip install matplotlib			# dep: numpy, wxpython, configobj
+pip install "http://downloads.sourceforge.net/project/matplotlib/matplotlib/matplotlib-1.0/matplotlib-1.0.0.tar.gz"
 .   install-obspy.sh "${prefix}"	# dep: matplotlib
-
-#pip install scipy			# dep: numpy
-#pip install http://downloads.sourceforge.net/project/scipy/scipy/0.8.0/scipy-0.8.0.tar.gz
 
