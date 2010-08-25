@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Websims plotting routines
 """

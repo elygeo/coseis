@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 WebSims: Web-based Earthquake Simulation Data Management
 --------------------------------------------------------
@@ -25,27 +24,77 @@ Computational Siesmology Tools (Coseis_).
 .. _web.py:     http://webpy.org/
 .. _Coseis:     http://earth.usc.edu/~gely/coseis/www/
 """
-import os, re, gzip, cStringIO, mimetypes
+import os, sys, signal, re, gzip, time, cStringIO, urllib, mimetypes
 import numpy as np
 import web
 from docutils.core import publish_parts
 from . import conf, util, html, plot
 
-baseurl = conf.baseurl
-urls = (
-    baseurl,			'main',
-    baseurl + '/list',		'list_',
-    baseurl + '/about',		'about',
-    baseurl + '/image/(.+)',	'image',
-    baseurl + '/download/(.+)',	'download',
-    baseurl + '/click1d/(.+)',	'click1d',
-    baseurl + '/click2d/(.+)',	'click2d',
-    baseurl + '(/static/)(.*)',	'staticfile',
-    baseurl + '(/repo/)(.*)',	'staticfile',
-    baseurl + '/static/(.*)',	'staticfile',
-    baseurl + '/repo/(.*)',	'staticfile',
-    '(.*)',			'notfound',
-)
+baseurl = '/websims'
+cache_max_age = 86400
+port = '8081'
+
+
+def start( repo='.', daemon=False, debug=True, logfile='websims.log' ):
+    """
+    Start server
+    """
+    os.chdir( repo )
+    if daemon:
+        if os.fork():
+            sys.exit()
+        os.setsid()
+        if os.fork():
+            sys.exit()
+        fd = open( logfile, 'a' )
+        sys.stdout.flush()
+        sys.stderr.flush()
+        os.dup2( fd.fileno(), sys.stdout.fileno() )
+        os.dup2( fd.fileno(), sys.stderr.fileno() )
+    print '%s: Starting WebSims with PID: %s' % (time.ctime(), os.getpid())
+    urls = (
+        baseurl,			'main',
+        baseurl + '/pid',		'pid',
+        baseurl + '/list',		'list_',
+        baseurl + '/about',		'about',
+        baseurl + '/image/(.+)',	'image',
+        baseurl + '/download/(.+)',	'download',
+        baseurl + '/click1d/(.+)',	'click1d',
+        baseurl + '/click2d/(.+)',	'click2d',
+        baseurl + '(/static/)(.*)',	'staticfile',
+        baseurl + '(/repo/)(.*)',	'staticfile',
+        baseurl + '/static/(.*)',	'staticfile',
+        baseurl + '/repo/(.*)',		'staticfile',
+        '(.*)',				'notfound',
+    )
+    sys.argv = [sys.argv[0], port]
+    web.config.debug = debug
+    app = web.application( urls, globals() )
+    app.run()
+    return app
+
+
+def stop():
+    """
+    Stop server
+    """
+    url = 'http://localhost:%s%s/pid' % (port, baseurl)
+    try:
+        pid = int( urllib.urlopen( url ).read() )
+    except( IOError ):
+        return
+    print '%s: Stopping WebSims with PID: %s' % (time.ctime(), pid)
+    os.kill( pid, signal.SIGTERM )
+    return
+
+
+class pid:
+    """
+    Process ID
+    """
+    def GET( self ):
+        web.header( 'Content-Type', 'text/plain' )
+        return str( os.getpid() )
 
 
 class main:
@@ -64,12 +113,11 @@ class main:
             web.header( 'Cache-Control', 'max-age=%s' % 60 )
             return index( w )
         elif w.x != '':
-            web.header( 'Cache-Control', 'max-age=%s' % conf.cache_max_age )
+            web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
             return show1d( w )
         else:
-            web.header( 'Cache-Control', 'max-age=%s' % conf.cache_max_age )
+            web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
             return show2d( w )
-
 
 class image:
     """
@@ -80,7 +128,7 @@ class image:
         ids = ','.join( w.ids ).split(',')
         #web.header( 'Content-Type', 'image/svg+xml' )
         web.header( 'Content-Type', 'image/png' )
-        web.header( 'Cache-Control', 'max-age=%s' % conf.cache_max_age )
+        web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
         if w.x != '':
             return plot.plot1d( ids, filename, w.x, w.lowpass )
         else:
@@ -177,7 +225,7 @@ class download:
         if not found:
             print( 'File not found: ' + root )
             web.header( 'Content-Type', 'text/html' )
-            web.header( 'Cache-Control', 'max-age=%s' % conf.cache_max_age )
+            web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
             out = (
                 html.main.head +
                 '<h2>Error</h2>\n' +
@@ -186,7 +234,7 @@ class download:
             )
             return out % dict( title='WebSims', baseurl=baseurl, search='' )
         v = util.ndread( f, shape, indices, dtype=m.dtype )
-        web.header( 'Cache-Control', 'max-age=%s' % conf.cache_max_age )
+        web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
         if ext == '.txt':
             out = cStringIO.StringIO()
             np.savetxt( out, v )
@@ -205,7 +253,7 @@ class download:
         else:
             print( 'Unknown file type: ' + filename )
             web.header( 'Content-Type', 'text/html' )
-            web.header( 'Cache-Control', 'max-age=%s' % conf.cache_max_age )
+            web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
             out = (
                 html.main.head +
                 '<h2>Error</h2>\n' +
@@ -279,7 +327,7 @@ class staticfile:
         if os.path.isfile( path ):
             web.header( 'Content-Type', mimetypes.guess_type( path )[0] )
             web.header( 'Content-Length', os.path.getsize( path ) )
-            web.header( 'Cache-Control', 'max-age=%s' % conf.cache_max_age )
+            web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
             return open( path, 'rb' ).read()
         else:
             notfound( baseurl + root + path )
@@ -350,7 +398,7 @@ def show2d( w ):
                html.main.foot
             )
             web.header( 'Content-Type', 'text/html' )
-            web.header( 'Cache-Control', 'max-age=%s' % conf.cache_max_age )
+            web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
             return out % dict( title='Error', baseurl=baseurl, search='' )
     f = os.path.join( ids[0], conf.cfgfile )
     m = util.load( f )
@@ -481,13 +529,7 @@ def show1d( w ):
         out += html.show.download_head + download + html.show.download_foot
     out += html.show.foot + html.main.foot
     web.header( 'Content-Type', 'text/html' )
-    web.header( 'Cache-Control', 'max-age=%s' % conf.cache_max_age )
+    web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
     return out % dict( w )
 
-
-web.config.debug = False
-web.config.debug = True
-app = web.application( urls, globals() )
-run = app.run
-#sys.argv.append( conf.port )
 
