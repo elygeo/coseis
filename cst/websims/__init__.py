@@ -63,8 +63,6 @@ def start( repo='.', daemon=False, debug=True, logfile='websims.log' ):
         baseurl + '/click2d/(.+)',	'click2d',
         baseurl + '(/static/)(.*)',	'staticfile',
         baseurl + '(/repo/)(.*)',	'staticfile',
-        baseurl + '/static/(.*)',	'staticfile',
-        baseurl + '/repo/(.*)',		'staticfile',
         '(.*)',				'notfound',
     )
     sys.argv = [sys.argv[0], port]
@@ -306,31 +304,36 @@ class staticfile:
         title = 'Directory listing for %s' % path
         d = dict( title=title, baseurl=baseurl, search='' )
         for f in os.listdir( path ):
-            if os.path.isdir( f ):
+            ff = os.path.join( path, f )
+            #size = ''
+            if os.path.isdir( ff ):
                 f += '/'
-            elif os.path.islink( f ):
+            elif os.path.islink( ff ):
                 f += '@'
-            d.update( path = f )
+            #else
+            #    size = os.path.getsize( ff )
+            #date = os.path.getmtime( ff )
+            d.update( path=path, file=f )
             out += html.static.item % d
         out += html.static.foot + html.main.foot
         web.header( 'Content-Type', 'text/html' )
         return out % d
     def GET( self, root, path ):
         if '..' in path:
-            notfound( baseurl + root + path )
+            notfound().GET( baseurl + root + path )
         if 'static' in root:
             path = os.path.join( os.path.dirname( __file__ ), 'static', path )
         elif os.path.isdir( path ):
             if not path.endswith( '/' ):
                 raise web.seeother( baseurl + root + path + '/' )
-            return self.listdir( baseurl + root + path )
+            return self.listdir( root, path )
         if os.path.isfile( path ):
             web.header( 'Content-Type', mimetypes.guess_type( path )[0] )
             web.header( 'Content-Length', os.path.getsize( path ) )
             web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
             return open( path, 'rb' ).read()
         else:
-            notfound( baseurl + root + path )
+            notfound().GET( baseurl + root + path )
 
 
 def index( w ):

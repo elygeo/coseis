@@ -1,15 +1,13 @@
 head = """\
-<h2>"%(title)s</h2>
-<hr>
+<h2>%(title)s</h2>
 <ul>
 """
 
 item = """\
-<li><a href="%(baseurl)s/repo%(path)s">%(path)s</a></li>
+<li><a href="%(baseurl)s/repo/%(path)s%(file)s">%(file)s</a></li>
 """
 
 foot = """\
 </ul>
-</hr>
 """
 
