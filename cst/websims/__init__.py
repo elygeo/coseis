@@ -54,6 +54,7 @@ def start( repo='.', daemon=False, debug=True, logfile='websims.log' ):
     print '%s: Starting WebSims with PID: %s' % (time.ctime(), os.getpid())
     urls = (
         baseurl,			'main',
+        baseurl + '/',			'redirect_main',
         baseurl + '/pid',		'pid',
         baseurl + '/list',		'list_',
         baseurl + '/about',		'about',
@@ -61,15 +62,25 @@ def start( repo='.', daemon=False, debug=True, logfile='websims.log' ):
         baseurl + '/download/(.+)',	'download',
         baseurl + '/click1d/(.+)',	'click1d',
         baseurl + '/click2d/(.+)',	'click2d',
+        baseurl + '/static(/repo/.*)',	'redirect_repo',
         baseurl + '(/static/)(.*)',	'staticfile',
         baseurl + '(/repo/)(.*)',	'staticfile',
-        '(.*)',				'notfound',
     )
     sys.argv = [sys.argv[0], port]
     web.config.debug = debug
     app = web.application( urls, globals() )
     app.run()
     return app
+
+
+class redirect_main():
+    def GET( self ):
+        raise web.redirect( baseurl )
+
+
+class redirect_repo():
+    def GET( self, url ):
+        raise web.redirect( baseurl + url )
 
 
 def stop():
@@ -167,7 +178,7 @@ class click2d:
                     j = nn[i] - j + 1
                 x[i] = str( (j - 1) * abs( dx[i] ) )
             x = ','.join( x )
-        raise web.redirect( '%s?ids=%s&x=%s' % (baseurl, id_, x) )
+        raise web.seeother( '%s?ids=%s&x=%s' % (baseurl, id_, x) )
 
 
 class click1d:
@@ -190,7 +201,7 @@ class click1d:
             j  = (j - j0) * (nt - 1) // (j1 - j0) + 1
             j  = max( 1, min( nt, j ) )
             t  = str( (j - 1) * dt )
-        raise web.redirect( '%s?ids=%s&t=%s' % (baseurl, id_, t) )
+        raise web.seeother( '%s?ids=%s&t=%s' % (baseurl, id_, t) )
 
 
 class download:
@@ -221,16 +232,7 @@ class download:
         else:
             found = False
         if not found:
-            print( 'File not found: ' + root )
-            web.header( 'Content-Type', 'text/html' )
-            web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
-            out = (
-                html.main.head +
-                '<h2>Error</h2>\n' +
-                '<div>File not found: %s</div>\n' % root +
-                html.main.foot
-            )
-            return out % dict( title='WebSims', baseurl=baseurl, search='' )
+            raise web.notfound()
         v = util.ndread( f, shape, indices, dtype=m.dtype )
         web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
         if ext == '.txt':
@@ -284,15 +286,12 @@ class about:
         return out
 
 
-class notfound:
-    """
-    Error page
-    """
-    def GET( self, url ):
-        out = (
-            html.main.head + '<h2>Not found: %s</h2>\n' % url + html.main.foot
-        ) % dict( title='Not found', baseurl=baseurl, search='' )
-        raise web.notfound( out )
+def sizeof_fmt( num ):
+    for x in 'B','KB','MB','GB','TB':
+        if num < 1024.0:
+            break
+        num /= 1024.0
+    return '%.0f%s' % (num, x)
 
 
 class staticfile:
@@ -300,40 +299,59 @@ class staticfile:
     Serve static files and directories.
     """
     def listdir( self, root, path ):
-        out = html.main.head + html.static.head
-        title = 'Directory listing for %s' % path
+        f = os.path.join( '.', path )
+        try:
+            files = os.listdir( f )
+        except os.error:
+            raise web.notfound()
+        title = 'Directory listing for %s' % root + path
         d = dict( title=title, baseurl=baseurl, search='' )
-        for f in os.listdir( path ):
-            ff = os.path.join( path, f )
-            #size = ''
+        out = html.main.head + html.static.head
+        if path:
+            url = os.path.dirname( os.path.normpath( baseurl + root + path ) ) + '/'
+            d.update( url=url, link='..', mtime='', size='' )
+            out += html.static.item % d
+        for f in sorted( files ):
+            ff = path + f
+            link = url = f
             if os.path.isdir( ff ):
-                f += '/'
+                url = f + '/'
+                link = f + '/'
+                mtime = time.strftime( '%Y-%m-%d',
+                    time.localtime( os.path.getmtime( ff ) ) )
+                size = ''
             elif os.path.islink( ff ):
-                f += '@'
-            #else
-            #    size = os.path.getsize( ff )
-            #date = os.path.getmtime( ff )
-            d.update( path=path, file=f )
+                link = f + '@'
+                mtime = ''
+                size = ''
+            else:
+                mtime = time.strftime( '%Y-%m-%d',
+                    time.localtime( os.path.getmtime( ff ) ) )
+                size = sizeof_fmt( os.path.getsize( ff ) )
+            d.update( url=url, link=link, mtime=mtime, size=size )
             out += html.static.item % d
         out += html.static.foot + html.main.foot
         web.header( 'Content-Type', 'text/html' )
         return out % d
     def GET( self, root, path ):
         if '..' in path:
-            notfound().GET( baseurl + root + path )
+            raise web.notfound()
+        f = path
         if 'static' in root:
-            path = os.path.join( os.path.dirname( __file__ ), 'static', path )
-        elif os.path.isdir( path ):
-            if not path.endswith( '/' ):
-                raise web.seeother( baseurl + root + path + '/' )
+            f = os.path.join( os.path.dirname( __file__ ), 'static', path )
+        elif not path:
             return self.listdir( root, path )
-        if os.path.isfile( path ):
-            web.header( 'Content-Type', mimetypes.guess_type( path )[0] )
-            web.header( 'Content-Length', os.path.getsize( path ) )
+        elif os.path.isdir( f ):
+            if not path.endswith( '/' ):
+                raise web.redirect( baseurl + root + path + '/' )
+            return self.listdir( root, path )
+        if os.path.isfile( f ):
+            web.header( 'Content-Type', mimetypes.guess_type( f )[0] )
+            web.header( 'Content-Length', os.path.getsize( f ) )
             web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
-            return open( path, 'rb' ).read()
+            return open( f, 'rb' ).read()
         else:
-            notfound().GET( baseurl + root + path )
+            raise web.notfound()
 
 
 def index( w ):

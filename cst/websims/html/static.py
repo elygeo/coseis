@@ -1,13 +1,13 @@
 head = """\
 <h2>%(title)s</h2>
-<ul>
+<pre>
 """
 
 item = """\
-<li><a href="%(baseurl)s/repo/%(path)s%(file)s">%(file)s</a></li>
+    <a href="%(url)s">%(link)-32s</a>    %(mtime)s    %(size)6s
 """
 
 foot = """\
-</ul>
+</pre>
 """
 
