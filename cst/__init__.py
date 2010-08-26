@@ -13,12 +13,12 @@ from . import sord, cvm, websims
 
 try:
     from .conf import site
-except( ImportError ):
+except ImportError:
     pass
 
 try:
     from . import rspectra
-except( ImportError ):
+except ImportError:
     pass
 
 def _build():

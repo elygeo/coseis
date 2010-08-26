@@ -97,7 +97,7 @@ def lengthscale( ax, x, y, w=None, label='%s', style='k-', lw=0.5, **kwargs ):
             w = 0.01 / l * (y * abs( dx ) + x * abs( dy ))
     try:
         label = label % l
-    except( TypeError ):
+    except TypeError:
         pass
     rot = (dx, -dy), (dy, dx)
     x = -l, l, np.nan, -l, -l, np.nan,  l, l

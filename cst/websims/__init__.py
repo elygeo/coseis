@@ -30,9 +30,9 @@ import web
 from docutils.core import publish_parts
 from . import conf, util, html, plot
 
+port = '8081'
 baseurl = '/websims'
 cache_max_age = 86400
-port = '8081'
 
 
 def start( repo='.', daemon=False, debug=True, logfile='websims.log' ):
@@ -90,7 +90,7 @@ def stop():
     url = 'http://localhost:%s%s/pid' % (port, baseurl)
     try:
         pid = int( urllib.urlopen( url ).read() )
-    except( IOError ):
+    except IOError:
         return
     print '%s: Stopping WebSims with PID: %s' % (time.ctime(), pid)
     os.kill( pid, signal.SIGTERM )
@@ -299,11 +299,12 @@ class staticfile:
     Serve static files and directories.
     """
     def listdir( self, root, path ):
+        web.header( 'Content-Type', 'text/html' )
         f = os.path.join( '.', path )
         try:
             files = os.listdir( f )
-        except os.error:
-            raise web.notfound()
+        except OSError:
+            raise web.forbidden()
         title = 'Directory listing for %s' % root + path
         d = dict( title=title, baseurl=baseurl, search='' )
         out = html.main.head + html.static.head
@@ -334,8 +335,9 @@ class staticfile:
         web.header( 'Content-Type', 'text/html' )
         return out % d
     def GET( self, root, path ):
+        web.header( 'Content-Type', 'text/html' )
         if '..' in path:
-            raise web.notfound()
+            raise web.forbidden()
         f = path
         if 'static' in root:
             f = os.path.join( os.path.dirname( __file__ ), 'static', path )
@@ -346,10 +348,14 @@ class staticfile:
                 raise web.redirect( baseurl + root + path + '/' )
             return self.listdir( root, path )
         if os.path.isfile( f ):
+            try:
+                fd = open( f, 'rb' )
+            except IOError:
+                raise web.forbidden()
             web.header( 'Content-Type', mimetypes.guess_type( f )[0] )
             web.header( 'Content-Length', os.path.getsize( f ) )
             web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
-            return open( f, 'rb' ).read()
+            return fd.read()
         else:
             raise web.notfound()
 
