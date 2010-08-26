@@ -128,7 +128,8 @@ def cybershake( isrc, irup, islip, ihypo, path='srf', name=None ):
     # get source files
     os.mkdir( path )
     os.chdir( path )
-    get = 'scp intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations/%d/%d/' % (isrc, irup)
+    get = 'scp intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V3_2/%d/%d/' % (isrc, irup)
+    get = 'scp intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V2_3/%d/%d/' % (isrc, irup)
     mesh = '%d_%d.txt' % (isrc, irup)
     head = '%d_%d.txt.variation.output' % (isrc, irup)
     srf  = '%d_%d.txt.variation-s%04d-h%04d' % (isrc, irup, islip, ihypo)
