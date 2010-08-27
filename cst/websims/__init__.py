@@ -223,6 +223,7 @@ class download:
         else:
             found = False
         if not found:
+            web.header( 'Content-Type', 'text/html' )
             raise web.notfound()
         v = util.ndread( f, shape, indices, dtype=m.dtype )
         web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
@@ -290,11 +291,11 @@ class staticfile:
     Serve static files and directories.
     """
     def listdir( self, root, path ):
-        web.header( 'Content-Type', 'text/html' )
         f = os.path.join( '.', path )
         try:
             files = os.listdir( f )
         except OSError:
+            web.header( 'Content-Type', 'text/html' )
             raise web.forbidden()
         title = 'Directory listing for %s' % root + path
         d = dict( title=title, baseurl=baseurl, search='' )
@@ -326,8 +327,8 @@ class staticfile:
         web.header( 'Content-Type', 'text/html' )
         return out % d
     def GET( self, root, path ):
-        web.header( 'Content-Type', 'text/html' )
         if '..' in path:
+            web.header( 'Content-Type', 'text/html' )
             raise web.forbidden()
         f = path
         if 'static' in root:
@@ -342,12 +343,14 @@ class staticfile:
             try:
                 fd = open( f, 'rb' )
             except IOError:
+                web.header( 'Content-Type', 'text/html' )
                 raise web.forbidden()
             web.header( 'Content-Type', mimetypes.guess_type( f )[0] )
             web.header( 'Content-Length', os.path.getsize( f ) )
             web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
             return fd.read()
         else:
+            web.header( 'Content-Type', 'text/html' )
             raise web.notfound()
 
 
