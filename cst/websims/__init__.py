@@ -35,23 +35,28 @@ baseurl = '/websims'
 cache_max_age = 86400
 
 
-def start( repo='.', daemon=False, debug=True, logfile='websims.log' ):
+def stop():
     """
-    Start server
+    Stop server.
     """
+    url = 'http://localhost:%s%s/pid' % (port, baseurl)
+    try:
+        pid = int( urllib.urlopen( url ).read() )
+    except IOError:
+        return
+    print time.strftime( '%Y-%m-%d %H:%M:%S: WebSims stopped', time.localtime() )
+    os.kill( pid, signal.SIGTERM )
+    return
+
+
+def start( repo='.', debug=True, restart=True ):
+    """
+    Start server.
+    """
+    if restart:
+        stop()
     os.chdir( repo )
-    if daemon:
-        if os.fork():
-            sys.exit()
-        os.setsid()
-        if os.fork():
-            sys.exit()
-        fd = open( logfile, 'a' )
-        sys.stdout.flush()
-        sys.stderr.flush()
-        os.dup2( fd.fileno(), sys.stdout.fileno() )
-        os.dup2( fd.fileno(), sys.stderr.fileno() )
-    print '%s: Starting WebSims with PID: %s' % (time.ctime(), os.getpid())
+    print time.strftime( '%Y-%m-%d %H:%M:%S: WebSims started', time.localtime() )
     urls = (
         baseurl,			'main',
         baseurl + '/',			'redirect_main',
@@ -81,20 +86,6 @@ class redirect_main():
 class redirect_repo():
     def GET( self, url ):
         raise web.redirect( baseurl + url )
-
-
-def stop():
-    """
-    Stop server
-    """
-    url = 'http://localhost:%s%s/pid' % (port, baseurl)
-    try:
-        pid = int( urllib.urlopen( url ).read() )
-    except IOError:
-        return
-    print '%s: Stopping WebSims with PID: %s' % (time.ctime(), pid)
-    os.kill( pid, signal.SIGTERM )
-    return
 
 
 class pid:
@@ -558,5 +549,4 @@ def show1d( w ):
     web.header( 'Content-Type', 'text/html' )
     web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
     return out % dict( w )
-
 

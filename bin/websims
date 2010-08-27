@@ -1,17 +1,7 @@
 #!/usr/bin/env python
 """
-WebSims server control.
-
-Options:
-    -k  Kill previous server only. Do not start new server.
-    -d  Daemon mode. Run server in background.
+Start WebSims server.
 """
-import sys, getopt
 import cst
-opts = dict( getopt.getopt( sys.argv[1:], 'kd' )[0] )
-start = '-k' not in opts
-daemon = '-d' in opts
-cst.websims.stop()
-if start:
-    cst.websims.start( daemon=daemon ) 
+cst.websims.start()
 
