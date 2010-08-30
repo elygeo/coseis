@@ -9,8 +9,6 @@ head = """\
     <link rel="stylesheet" href="%(baseurl)s/static/style.css" type="text/css">
 </head>
 <body>
-<div class="header"></div>
-<div class="document" id="websims">
 <h1 class="title"><a href="%(baseurl)s">WebSims</a></h1>
 <ul class="navbar">
     <li><a href="%(baseurl)s">Catalog</a></li>
@@ -24,7 +22,6 @@ head = """\
 """
 
 foot = """\
-</div>
 </body>
 </html>
 """

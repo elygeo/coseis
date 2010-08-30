@@ -8,9 +8,9 @@ form1d = """\
     <fieldset>
     <legend>Time history</legend>
     <input type="hidden" name="ids" value="%(ids)s">
-    <label for="x">%(axes)s (%(xlim)s) =</label>
+    <label for="x">%(axes)s (%(xlim)s):</label>
     <input id="x" type="text" size="12" name="x" value="%(x)s"><br>
-    <label for="t">Lowpass frequency (%(flim)s) =</label>
+    <label for="t">Lowpass frequency (%(flim)s):</label>
     <input id="t" type="text" size="12" name="lowpass" value="%(lowpass)s"><br>
     <input type="submit" value="Plot">
     </fieldset>
@@ -22,9 +22,9 @@ form2d = """\
     <fieldset>
     <legend>Snapshot</legend>
     <input type="hidden" name="ids" value="%(ids)s">
-    <label for="t">Time (%(tlim)s) =</label>
+    <label for="t">Time (%(tlim)s):</label>
     <input id="t" type="text" size="12" name="t" value="%(t)s"><br>
-    <label for="x">Decimation interval =</label>
+    <label for="x">Decimation interval:</label>
     <input id="x" type="text" size="12" name="decimate" value="%(decimate)s"><br>
     <input type="submit" value="Plot">
     </fieldset>

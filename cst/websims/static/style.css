@@ -1,15 +1,12 @@
 /* CSS stylesheet */
 
 body {
-    margin: 0px;
+    width: 800px;
+    margin: 0px 100px 100px 100px;
     color: #000;
+    background-color: #fff;
     font-family: 'Lucida Grande', Geneva, Verdana, sans-serif;
     line-height: 130%;
-}
-
-div.document {
-    margin: -60px auto 30px auto;
-    width: 800px;
     position: relative;
 }
 
@@ -21,7 +18,7 @@ img.plot {
     margin: 0px -100px;
 }
 
-img.align-right {
+.align-right {
     float: right;
 }
 
@@ -45,25 +42,22 @@ a:hover, a:active {
     text-decoration: underline;
 }
 
-.section li {
+li {
     padding: 5px;
 }
 
-div.header {
-    height: 60px;
+h1 {
+    padding: 20px;
+    margin: 0px;
+    margin-bottom: 40px;
     background-color: #eee;
-    border-bottom: 1px solid #ccc;
+    border: 1px solid #ccc;
 }
 
 h1, h1 a, h1 a:hover, h1 a:active {
     color: #900;
     text-decoration: none;
     font-weight: bold;
-    margin-bottom: 50px;
-}
-
-fieldset {
-    border: 1px solid #ccc;
 }
 
 form.x {
@@ -80,12 +74,20 @@ form.t {
 
 fieldset {
     border: 1px solid #ccc;
-    background-color: #eee;
 }
 
 legend {
     font-weight: bold;
     text-align: left;
+}
+
+ul.navbar {
+    list-style-type: none;
+    position: absolute;
+    top: 20px;
+    right: 120px;
+    padding: 0px;
+    margin: 0px;
 }
 
 form.navbar {
@@ -94,23 +96,15 @@ form.navbar {
     float: none;
 }
 
-ul.navbar {
-    list-style-type: none;
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    padding: 0px;
-    margin: 0px;
-}
-
 .navbar li {
     display: inline;
+    padding: 0px;
 }
 
 .navbar a {
     background-color: #fff;
     border: 1px solid #ccc;
-    padding: 4px 10px;
+    padding: 3px 10px;
     text-decoration: none;
 }
 
