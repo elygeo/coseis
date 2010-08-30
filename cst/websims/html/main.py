@@ -4,25 +4,33 @@ head = """\
 <head>
     <title>%(title)s</title>
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <meta name="robots" content="noindex">
     <link rel="icon" href="%(baseurl)s/static/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="%(baseurl)s/static/style.css" type="text/css">
 </head>
 <body>
-<h1><a class="h1" href="%(baseurl)s">WebSims</a></h1>
-<form action="%(baseurl)s">
-<div class="search">
-    <a class="h1" href="%(baseurl)s/about">Version 2.0</a>&nbsp;&nbsp;&nbsp;
-    <input type="text" size="30" name="search" value="%(search)s">
-    <input type="submit" value="Catalog search">
-</div>
-</form>
+<div class="header"></div>
+<div class="document" id="websims">
+<h1 class="title"><a href="%(baseurl)s">WebSims</a></h1>
+<ul class="navbar">
+    <li><a href="%(baseurl)s">Catalog</a></li>
+    <li><a href="%(baseurl)s/repo/">Files</a></li>
+    <li><a href="%(baseurl)s/about">About</a></li>
+    <li><form class="navbar" action="%(baseurl)s">
+        <input type="text" size="30" name="search" value="%(search)s">
+        <input type="submit" value="Search">
+    </form></li>
+</ul>
 """
 
 foot = """\
-<h3>
-    <a class="h3" href="%(baseurl)s/about">About WebSims</a>
-</h3>
+</div>
 </body>
 </html>
+"""
+
+section = """\
+<h3>%(title)s</h3>
+%(content)s
 """
 

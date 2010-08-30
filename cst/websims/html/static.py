@@ -1,13 +1,19 @@
 head = """\
-<h2>%(title)s</h2>
-<pre>
+<table>
+    <tr>
+        <th colspan="3">%(title)s</th>
+    </tr>
 """
 
 item = """\
-    <a href="%(url)s">%(link)-32s</a>    %(mtime)s    %(size)6s
+    <tr>
+        <td><a href="%(url)s">%(link)-32s</a></td>
+        <td>%(mtime)s</td>
+        <td>%(size)6s</td>
+    </tr>
 """
 
 foot = """\
-</pre>
+</table>
 """
 

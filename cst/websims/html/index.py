@@ -1,6 +1,5 @@
 head = """\
-<h2>Catalog</h2>
-<form action="%(baseurl)s">
+<form class="index" action="%(baseurl)s">
 <table>
 <tr>
     <th></th>
@@ -12,7 +11,6 @@ head = """\
 """
 
 item_solo = """\
-<tr><td colspan="5"></td></tr>
 <tr>
     <td></td>
     <td><a href="?ids=%(id)s">%(title)s</a></td>
@@ -20,10 +18,6 @@ item_solo = """\
     <td>%(rundate)s</td>
     <td><a href="%(meta)s">%(label)s</a></td>
 </tr>
-"""
-
-group_start = """\
-<tr><td colspan="5"></td></tr>
 """
 
 item_grouped = """\

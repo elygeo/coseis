@@ -2,20 +2,19 @@
 WebSims: Web-based Earthquake Simulation Data Management
 --------------------------------------------------------
 
-WebSims is a Python web application for cataloging, exploring, comparing and
-disseminating four-dimensional results of large numerical simulations.  Users
-may extract time histories or two-dimensional slices via a clickable interface
-or by specifying coordinates.  Extractions are plotted to the screen and may be
-downloaded to local disk.  Time histories can be low-pass filtered, and
-multiple simulations can be overlayed for comparison.  Metadata is stored with
-each simulation in the form of a Python module.  A well defined URL scheme for
-specifying extractions allows the web interface to be bypassed, allowing for
-batch scripting of both plotting and downloading tasks.  This version of
-WebSims replaces a previous PHP implementation.  It is written in Python_ using
-the NumPy_, SciPy_, and Matplotlib_ modules for processing and visualization.
-The web pages are served by web.py_, a simple web application framework.
-WebSims is license under under the GPLv3 and is available as part of the
-Computational Siesmology Tools (Coseis_).
+WebSims is a web application for cataloging, exploring, comparing and
+disseminating four-dimensional results of large numerical simulations.  Time
+histories and two-dimensional slices can be plotted or extracted and downloaded
+via a clickable interface or by specifying exact coordinates.  Time histories
+may be low-pass filtered, and multiple simulations may be overlayed for
+comparison.  A well defined URL scheme for specifying extractions allows the
+web interface to be bypassed, allowing for batch scripting of jobs.  This
+version of WebSims replaces a previous PHP implementation.  It is written in
+Python_ using the NumPy_, SciPy_, and Matplotlib_ modules for processing and
+visualization.  Metadata is stored with each simulation in the form of a Python
+module.  The web pages are served by web.py_, a minimalist web application
+framework.  WebSims is license under under the GPLv3 and is available as part
+of the Computational Siesmology Tools (Coseis_).
 
 .. _Python:     http://www.python.org/
 .. _NumPy:      http://numpy.scipy.org/
@@ -269,11 +268,12 @@ class about:
     About WebSims
     """
     def GET( self ):
+        content = publish_parts( __doc__, writer_name='html4css1' )['body']
         out = (
-            html.main.head + '<br>' +
-            publish_parts( __doc__, writer_name='html4css1' )['body'] +
+            html.main.head % dict( title='About WebSims', baseurl=baseurl, search='' ) +
+            html.main.section % dict( title='About WebSims', content=content ) +
             html.main.foot
-        ) % dict( title='WebSims', baseurl=baseurl, search='' )
+        )
         web.header( 'Content-Type', 'text/html' )
         return out
 
@@ -297,7 +297,7 @@ class staticfile:
         except OSError:
             web.header( 'Content-Type', 'text/html' )
             raise web.forbidden()
-        title = 'Directory listing for %s' % root + path
+        title = 'Directory listing for %s' % baseurl + root + path
         d = dict( title=title, baseurl=baseurl, search='' )
         out = html.main.head + html.static.head
         if path:
@@ -394,7 +394,7 @@ def index( w ):
                     d.update( meta=f, baseurl=baseurl, id=id_, label=label )
                     group += html.index.item_grouped % d
             if group:
-                out += html.index.group_start + group + html.index.group_end
+                out += group + html.index.group_end
     out += html.index.foot + html.main.foot
     return out % dict( baseurl=baseurl, search=w.search, title='WebSims' )
 
@@ -425,11 +425,12 @@ def show2d( w ):
     m = util.load( f )
     plot = ''
     download = ''
+    w.title = m.title
     if static:
-        w.title = m.title + ' - ' + m.x_static_title
+        w.subtitle = m.x_static_title
         panes = m.x_static_panes
     else:
-        w.title = m.title + ' - ' + m.x_title
+        w.subtitle = m.x_title
         panes = m.x_panes
     if hasattr( m, 'notes' ):
         w.notes = publish_parts( m.notes, writer_name='html4css1' )['body']
@@ -458,20 +459,20 @@ def show2d( w ):
             w.j = ','.join( [ str( i ) for i in indices ] )
             w.n = ','.join( [ str( m.x_shape[i] ) for i in ix[:2] ] )
             if m.t_panes:
-                plot += html.show.click2d % dict( w )
+                plot += html.plot.click2d % dict( w )
             else:
-                plot += html.show.plot2d % dict( w )
+                plot += html.plot.plot2d % dict( w )
             if m.downloadable:
-                download += html.show.download_item % dict( w )
-    out = html.main.head + html.show.head
-    if m.t_panes:
-        out += html.show.form1d
+                download += html.download.item % dict( w )
+    out = html.main.head + html.form.head
     if m.x_panes:
-        out += html.show.form2d
-    out += plot
+        out += html.form.form2d
+    if m.t_panes:
+        out += html.form.form1d
+    out += html.form.foot + html.plot.head + plot + html.plot.foot
     if m.downloadable:
-        out += html.show.download_head + download + html.show.download_foot
-    out += html.show.foot + html.main.foot
+        out += html.download.head + download + html.download.foot
+    out += html.main.foot
     w.tlim = '0-%s%s' % (m.x_delta[it] * m.x_shape[it], m.x_unit[it])
     it = list( m.t_axes ).index( 'Time' )
     ix = [ i for i in range(ndim) if i != it and m.t_shape[i] > 1 ]
@@ -527,12 +528,13 @@ def show1d( w ):
                     for filename in pane[0]:
                         w.path = filename
                         w.root = os.path.basename( filename )
-                        download += html.show.download_item % dict( w )
+                        download += html.download.item % dict( w )
     if hasattr( m, 'notes' ):
         w.notes = publish_parts( m.notes, writer_name='html4css1' )['body']
     else:
         w.notes = ''
-    w.title = m.title + ' - ' + m.t_title
+    w.title = m.title
+    w.subtitle = m.t_title
     w.axes = ','.join( [ m.t_axes[i] for i in ix ] )
     w.flim = '0-%s%s' % (0.5 / m.t_delta[it], 'Hz')
     w.xlim = ', '.join(
@@ -541,14 +543,14 @@ def show1d( w ):
     it = list( m.x_axes ).index( 'Time' )
     ix = [ i for i in range(ndim) if i != it and m.x_shape[i] > 1 ]
     w.tlim = '0-%s%s' % (m.x_delta[it] * m.x_shape[it], m.x_unit[it])
-    out = html.main.head + html.show.head + html.show.form1d
+    out = html.main.head + html.form.head
     if m.x_panes:
-        out += html.show.form2d + html.show.click1d
+        out += html.form.form2d + html.form.form1d + html.form.foot + html.plot.click1d
     else:
-        out += html.show.plot1d
+        out += html.form.form1d + html.form.foot + html.plot.plot1d
     if m.downloadable:
-        out += html.show.download_head + download + html.show.download_foot
-    out += html.show.foot + html.main.foot
+        out += html.download.head + download + html.download.foot
+    out += html.main.foot
     web.header( 'Content-Type', 'text/html' )
     web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
     return out % dict( w )

@@ -2,6 +2,11 @@
 """
 Start WebSims server.
 """
-import cst
-cst.websims.start()
+import sys, getopt, cst
+opts = dict( getopt.getopt( sys.argv[1:], 'k' )[0] )
+
+if '-k' in opts:
+    cst.websims.stop()
+else:
+    cst.websims.start()
 
