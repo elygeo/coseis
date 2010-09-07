@@ -345,7 +345,7 @@ def skeleton( job=None, stagein=(), new=True, **kwargs ):
                 open( ff, 'w' ).write( out )
                 shutil.copymode( f, ff )
 
-    # link or copy files
+    # copy files
     for f in stagein:
         shutil.copy2( f, dest )
 

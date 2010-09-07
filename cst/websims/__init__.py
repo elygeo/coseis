@@ -23,89 +23,79 @@ of the Computational Siesmology Tools (Coseis_).
 .. _web.py:     http://webpy.org/
 .. _Coseis:     http://earth.usc.edu/~gely/coseis/www/
 """
-import os, sys, signal, re, gzip, time, cStringIO, urllib, mimetypes
+import os, sys, signal, re, gzip, time, cStringIO, mimetypes, shutil
 import numpy as np
 import web
 from docutils.core import publish_parts
-from . import conf, util, html, plot
+from . import conf, html, plot
+from .. import util
 
 port = '8081'
 baseurl = '/websims'
 cache_max_age = 86400
+urls = (
+    baseurl + '/app',			'main',
+    baseurl + '/app/image/(.+)',	'image',
+    baseurl + '/app/download/(.+)',	'download',
+    baseurl + '/app/click1d/(.+)',	'click1d',
+    baseurl + '/app/click2d/(.+)',	'click2d',
+    baseurl + '(.*)',			'serve_static',
+)
+
+
+class wtf():
+    def GET( self, url ):
+        return url
+
+
+class serve_static():
+    def GET( self, url ):
+        raise web.seeother( '/static' + url )
 
 
 def stop():
-    """
-    Stop server.
-    """
-    url = 'http://localhost:%s%s/pid' % (port, baseurl)
     try:
-        pid = int( urllib.urlopen( url ).read() )
-    except IOError:
+        pid = int( open( 'pid' ).read() ) 
+    except:
+        return
+    try:
+        os.kill( pid, signal.SIGTERM )
+    except OSError:
         return
     print time.strftime( '%Y-%m-%d %H:%M:%S: WebSims stopped', time.localtime() )
-    os.kill( pid, signal.SIGTERM )
     return
 
 
-def start( repo='.', debug=True, restart=True ):
-    """
-    Start server.
-    """
+def start( debug=True, restart=True ):
     if restart:
         stop()
-    os.chdir( repo )
     print time.strftime( '%Y-%m-%d %H:%M:%S: WebSims started', time.localtime() )
-    urls = (
-        baseurl,			'main',
-        baseurl + '/',			'redirect_main',
-        baseurl + '/pid',		'pid',
-        baseurl + '/list',		'list_',
-        baseurl + '/about',		'about',
-        baseurl + '/image/(.+)',	'image',
-        baseurl + '/download/(.+)',	'download',
-        baseurl + '/click1d/(.+)',	'click1d',
-        baseurl + '/click2d/(.+)',	'click2d',
-        baseurl + '/static(/repo/.*)',	'redirect_repo',
-        baseurl + '(/static/)(.*)',	'staticfile',
-        baseurl + '(/repo/)(.*)',	'staticfile',
-    )
     sys.argv = [sys.argv[0], port]
     web.config.debug = debug
-    app = web.application( urls, globals() )
+    d = os.path.dirname( __file__ )
+    for f in os.listdir( os.path.join( d, 'static' ) ):
+        f1 = os.path.join( d, 'static', f )
+        f2 = os.path.join( 'static', f )
+        shutil.copy2( f1, f2 )
+    about = publish_parts( __doc__, writer_name='html4css1' )['body']
+    about = (
+        html.main.head % dict( title='About WebSims', baseurl=baseurl, search='', style=html.style ) +
+        html.main.section % dict( title='About WebSims', content=about ) +
+        html.main.foot
+    )
+    open( os.path.join( 'static', 'about.html' ), 'w' ).write( about )
+    open( 'pid', 'w' ).write( str( os.getpid() ) )
+    index()
     app.run()
-    return app
-
-
-class redirect_main():
-    def GET( self ):
-        raise web.redirect( baseurl )
-
-
-class redirect_repo():
-    def GET( self, url ):
-        raise web.redirect( baseurl + url )
-
-
-class pid:
-    """
-    Process ID
-    """
-    def GET( self ):
-        web.header( 'Content-Type', 'text/plain' )
-        return str( os.getpid() )
+    return
 
 
 class main:
-    """
-    Main page.
-    """
     def GET( self ):
         w = web.input( ids=[], t='', decimate='', x='', lowpass='', search='' )
         w.ids = ','.join( w.ids )
         w.title = 'WebSims'
         w.baseurl = baseurl
-        #w.ext = '.svg'
         w.ext = '.png'
         web.header( 'Content-Type', 'text/html' )
         if w.ids == '':
@@ -118,14 +108,11 @@ class main:
             web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
             return show2d( w )
 
+
 class image:
-    """
-    Plot image
-    """
     def GET( self, filename ):
         w = web.input( ids=[], t='', decimate='', x='', lowpass='' )
         ids = ','.join( w.ids ).split(',')
-        #web.header( 'Content-Type', 'image/svg+xml' )
         web.header( 'Content-Type', 'image/png' )
         web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
         if w.x != '':
@@ -143,7 +130,7 @@ class click2d:
         x = '0.0'
         if len( w ) > 0:
             ids = id_.split(',')
-            f  = os.path.join( ids[0], conf.cfgfile )
+            f  = os.path.join( conf.repo[0], ids[0], conf.meta )
             m  = util.load( f )
             jj = w.keys()[0].split(',')
             ndim = len( m.x_shape )
@@ -168,7 +155,7 @@ class click2d:
                     j = nn[i] - j + 1
                 x[i] = str( (j - 1) * abs( dx[i] ) )
             x = ','.join( x )
-        raise web.seeother( '%s?ids=%s&x=%s' % (baseurl, id_, x) )
+        raise web.seeother( '%s/app?ids=%s&x=%s' % (baseurl, id_, x) )
 
 
 class click1d:
@@ -180,7 +167,7 @@ class click1d:
         t = '0.0'
         if len( w ) > 0:
             ids = id_.split(',')
-            f  = os.path.join( ids[0], conf.cfgfile )
+            f  = os.path.join( conf.repo[0], ids[0], conf.meta )
             m  = util.load( f )
             j  = int( w.keys()[0].split(',')[0] )
             it = list( m.x_axes ).index( 'Time' )
@@ -191,16 +178,13 @@ class click1d:
             j  = (j - j0) * (nt - 1) // (j1 - j0) + 1
             j  = max( 1, min( nt, j ) )
             t  = str( (j - 1) * dt )
-        raise web.seeother( '%s?ids=%s&t=%s' % (baseurl, id_, t) )
+        raise web.seeother( '%s/app?ids=%s&t=%s' % (baseurl, id_, t) )
 
 
 class download:
-    """
-    Download data
-    """
     def GET( self, filename ):
         w = web.input()
-        f = os.path.join( w.ids, conf.cfgfile )
+        f = os.path.join( conf.repo[0], w.ids, conf.meta )
         m = util.load( f )
         indices = [ int(i) for i in w.j.split( ',' ) ]
         root, ext = os.path.splitext( filename )
@@ -215,7 +199,7 @@ class download:
             shape[it] = 1
         else:
             found = False
-        for d in conf.repodir:
+        for d in conf.repo:
             f = os.path.join( d, w.ids, root )
             if os.path.exists( f ):
                 break
@@ -251,110 +235,31 @@ class download:
                 '<div>Unknown file type: %s</div>\n' % filename +
                 html.main.foot
             )
-            return out % dict( title='WebSims', baseurl=baseurl, search='' )
+            return out % dict( title='WebSims', baseurl=baseurl, search='', style=html.style )
 
 
-class list_:
+def findmembers( top='.', path='', member='.member', group='.group', ignore='.ignore' ):
     """
-    Simulation list. Useful for remote machine processing.
+    Walk thourgh directory tree looking for members and groups
     """
-    def GET( self ):
-        web.header( 'Content-Type', 'text/plain' )
-        return sorted( util.findmembers( '.', conf.cfgfile, '.wsgroup', '.wsignore' ) )
+    if os.path.exists( os.path.join( top, path, ignore ) ):
+        return []
+    if os.path.exists( os.path.join( top, path, member ) ):
+        return [path]
+    grouping = group and os.path.exists( os.path.join( top, path, group ) )
+    if grouping:
+        group = False
+    list_ = []
+    for f in os.listdir( os.path.join( top, path ) ):
+        f = os.path.join( path, f )
+        if os.path.isdir( os.path.join( top, f ) ):
+            list_ += findmembers( top, f, member, group, ignore )
+    if grouping:
+        list_ = [ sorted( list_ ) ]
+    return sorted( list_ )
 
 
-class about:
-    """
-    About WebSims
-    """
-    def GET( self ):
-        content = publish_parts( __doc__, writer_name='html4css1' )['body']
-        out = (
-            html.main.head % dict( title='About WebSims', baseurl=baseurl, search='' ) +
-            html.main.section % dict( title='About WebSims', content=content ) +
-            html.main.foot
-        )
-        web.header( 'Content-Type', 'text/html' )
-        return out
-
-
-def sizeof_fmt( num ):
-    for x in 'B','KB','MB','GB','TB':
-        if num < 1024.0:
-            break
-        num /= 1024.0
-    return '%.0f%s' % (num, x)
-
-
-class staticfile:
-    """
-    Serve static files and directories.
-    """
-    def listdir( self, root, path ):
-        f = os.path.join( '.', path )
-        try:
-            files = os.listdir( f )
-        except OSError:
-            web.header( 'Content-Type', 'text/html' )
-            raise web.forbidden()
-        title = 'Directory listing for %s' % baseurl + root + path
-        d = dict( title=title, baseurl=baseurl, search='' )
-        out = html.main.head + html.static.head
-        if path:
-            url = os.path.dirname( os.path.normpath( baseurl + root + path ) ) + '/'
-            d.update( url=url, link='..', mtime='', size='' )
-            out += html.static.item % d
-        for f in sorted( files ):
-            ff = path + f
-            link = url = f
-            if os.path.isdir( ff ):
-                url = f + '/'
-                link = f + '/'
-                mtime = time.strftime( '%Y-%m-%d',
-                    time.localtime( os.path.getmtime( ff ) ) )
-                size = ''
-            elif os.path.islink( ff ):
-                link = f + '@'
-                mtime = ''
-                size = ''
-            else:
-                mtime = time.strftime( '%Y-%m-%d',
-                    time.localtime( os.path.getmtime( ff ) ) )
-                size = sizeof_fmt( os.path.getsize( ff ) )
-            d.update( url=url, link=link, mtime=mtime, size=size )
-            out += html.static.item % d
-        out += html.static.foot + html.main.foot
-        web.header( 'Content-Type', 'text/html' )
-        return out % d
-    def GET( self, root, path ):
-        if '..' in path:
-            web.header( 'Content-Type', 'text/html' )
-            raise web.forbidden()
-        f = path
-        if 'static' in root:
-            f = os.path.join( os.path.dirname( __file__ ), 'static', path )
-        elif not path:
-            return self.listdir( root, path )
-        elif os.path.isdir( f ):
-            if not path.endswith( '/' ):
-                raise web.redirect( baseurl + root + path + '/' )
-            return self.listdir( root, path )
-        if os.path.isfile( f ):
-            try:
-                fd = open( f, 'rb' )
-            except IOError:
-                web.header( 'Content-Type', 'text/html' )
-                raise web.forbidden()
-            web.header( 'Content-Type', mimetypes.guess_type( f )[0] )
-            web.header( 'Content-Length', os.path.getsize( f ) )
-            web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
-            return fd.read()
-        else:
-            web.header( 'Content-Type', 'text/html' )
-            raise web.notfound()
-
-
-def index( w ):
+def index( w=web.storage( search='' ) ):
     """
     Build list of simulations.
     """
@@ -362,9 +267,10 @@ def index( w ):
     include = True
     if w.search:
         grep = re.compile( w.search, re.IGNORECASE )
-    for ids in sorted( util.findmembers( '.', conf.cfgfile, '.wsgroup', '.wsignore' ) ):
+    list_ = findmembers( conf.repo[0], '', conf.meta, '.wsgroup', '.wsignore' )
+    for ids in list_:
         if type( ids ) == str:
-            f = os.path.join( ids, conf.cfgfile )
+            f = os.path.join( conf.repo[0], ids, conf.meta )
             if w.search:
                 include = grep.search( open( f, 'r' ).read() )
             if include:
@@ -373,15 +279,17 @@ def index( w ):
                     exec open( f ) in d
                 except:
                     d.update( title='ERROR', author='', rundate='' )
-                label = ids.split( '/' )[0]
-                f = os.path.join( baseurl, 'repo', f )
-                d.update( meta=f, baseurl=baseurl, id=ids, label=label )
+                d.update( baseurl=baseurl, id=ids, index=conf.index, meta=conf.meta )
                 out += html.index.item_solo % d
+                if not w.search:
+                    d = web.storage( ids=ids, t='', decimate='', x='', lowpass='',
+                        search='', baseurl=baseurl, ext='.png', disk=True )
+                    show2d( d )
         else:
             group = ''
             for id_ in sorted( ids ):
-                f = os.path.join( id_, conf.cfgfile )
-                if w.search:
+                f = os.path.join( conf.repo[0], id_, conf.meta )
+                if w['search']:
                     include = grep.search( open( f, 'r' ).read() )
                 if include:
                     d = dict()
@@ -389,14 +297,19 @@ def index( w ):
                         exec open( f ) in d
                     except:
                         d.update( title='ERROR', author='', rundate='' )
-                    label = id_.split( '/' )[0]
-                    f = os.path.join( baseurl, 'repo', f )
-                    d.update( meta=f, baseurl=baseurl, id=id_, label=label )
+                    d.update( baseurl=baseurl, id=id_, index=conf.index, meta=conf.meta )
                     group += html.index.item_grouped % d
+                    if not w.search:
+                        d = web.storage( ids=id_, t='', decimate='', x='', lowpass='',
+                            search='', baseurl=baseurl, ext='.png', disk=True )
+                        show2d( d )
             if group:
                 out += group + html.index.group_end
     out += html.index.foot + html.main.foot
-    return out % dict( baseurl=baseurl, search=w.search, title='WebSims' )
+    out = out % dict( baseurl=baseurl, search=w.search, title='WebSims', style=html.style )
+    if not w.search:
+        open( os.path.join( 'static', 'index.html' ), 'w' ).write( out )
+    return out
 
 
 def show2d( w ):
@@ -420,11 +333,12 @@ def show2d( w ):
             )
             web.header( 'Content-Type', 'text/html' )
             web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
-            return out % dict( title='Error', baseurl=baseurl, search='' )
-    f = os.path.join( ids[0], conf.cfgfile )
+            return out % dict( title='Error', baseurl=baseurl, search='', style=html.style )
+    f = os.path.join( conf.repo[0], ids[0], conf.meta )
     m = util.load( f )
-    plot = ''
-    download = ''
+    outp = ''
+    outd = ''
+    w.style = html.style
     w.title = m.title
     if static:
         w.subtitle = m.x_static_title
@@ -438,7 +352,7 @@ def show2d( w ):
         w.notes = ''
     for ipane in range( len( panes ) ):
         for id_ in ids:
-            f = os.path.join( id_, conf.cfgfile )
+            f = os.path.join( conf.repo[0], id_, conf.meta )
             m = util.load( f )
             ndim = len( m.x_shape )
             it = list( m.x_axes ).index( 'Time' )
@@ -458,20 +372,27 @@ def show2d( w ):
             w.name = m.label + panes[ipane][1]
             w.j = ','.join( [ str( i ) for i in indices ] )
             w.n = ','.join( [ str( m.x_shape[i] ) for i in ix[:2] ] )
-            if m.t_panes:
-                plot += html.plot.click2d % dict( w )
+            if static:
+                plot.plot2d( id_, w.path )
+                if m.t_panes:
+                    outp += html.plot.click2d_static % dict( w )
+                else:
+                    outp += html.plot.plot2d_static % dict( w )
             else:
-                plot += html.plot.plot2d % dict( w )
+                if m.t_panes:
+                    outp += html.plot.click2d % dict( w )
+                else:
+                    outp += html.plot.plot2d % dict( w )
             if m.downloadable:
-                download += html.download.item % dict( w )
+                outd += html.download.item % dict( w )
     out = html.main.head + html.form.head
     if m.x_panes:
         out += html.form.form2d
     if m.t_panes:
         out += html.form.form1d
-    out += html.form.foot + html.plot.head + plot + html.plot.foot
+    out += html.form.foot + html.plot.head + outp + html.plot.foot
     if m.downloadable:
-        out += html.download.head + download + html.download.foot
+        out += html.download.head + outd + html.download.foot
     out += html.main.foot
     w.tlim = '0-%s%s' % (m.x_delta[it] * m.x_shape[it], m.x_unit[it])
     it = list( m.t_axes ).index( 'Time' )
@@ -484,7 +405,11 @@ def show2d( w ):
     w.x = ''
     if w.decimate == '':
         w.decimate = m.x_decimate
-    return out % dict( w )
+    out = out % dict( w )
+    if static and len( ids ) == 1:
+        f = os.path.join( conf.repo[0], ids[0], conf.index )
+        open( f, 'w' ).write( out )
+    return out
 
 
 def show1d( w ):
@@ -496,7 +421,7 @@ def show1d( w ):
     download = ''
     for id_ in ids:
         w.id = id_
-        f = os.path.join( id_, conf.cfgfile )
+        f = os.path.join( conf.repo[0], id_, conf.meta )
         m = util.load( f )
         ndim = len( m.t_shape )
         it = list( m.t_axes ).index( 'Time' )
@@ -533,6 +458,7 @@ def show1d( w ):
         w.notes = publish_parts( m.notes, writer_name='html4css1' )['body']
     else:
         w.notes = ''
+    w.style = html.style
     w.title = m.title
     w.subtitle = m.t_title
     w.axes = ','.join( [ m.t_axes[i] for i in ix ] )
@@ -553,5 +479,9 @@ def show1d( w ):
     out += html.main.foot
     web.header( 'Content-Type', 'text/html' )
     web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
-    return out % dict( w )
+    out = out % dict( w )
+    return out
+
+
+app = web.application( urls, globals() )
 

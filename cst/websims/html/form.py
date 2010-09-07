@@ -1,10 +1,10 @@
 head = """\
-<h3><a href="%(baseurl)s?ids=%(ids)s">%(title)s</a> / %(subtitle)s</h3>
+<h3><a href="%(baseurl)s/app?ids=%(ids)s">%(title)s</a> / %(subtitle)s</h3>
 %(notes)s
 """
 
 form1d = """\
-<form class="t" action="%(baseurl)s">
+<form class="t" action="%(baseurl)s/app">
     <fieldset>
     <legend>Time history</legend>
     <input type="hidden" name="ids" value="%(ids)s">
@@ -18,7 +18,7 @@ form1d = """\
 """
 
 form2d = """\
-<form class="x" action="%(baseurl)s">
+<form class="x" action="%(baseurl)s/app">
     <fieldset>
     <legend>Snapshot</legend>
     <input type="hidden" name="ids" value="%(ids)s">

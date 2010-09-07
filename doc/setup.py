@@ -9,8 +9,6 @@ cwd = os.getcwd()
 os.chdir( os.path.join( '..', 'www' ) )
 
 settings = dict(
-    datestamp = '%Y-%m-%d',
-    generator = True,
     strict = True,
     toc_backlinks = None,
     cloak_email_addresses = True,

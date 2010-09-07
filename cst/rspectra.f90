@@ -19,7 +19,7 @@
 ! dt : time step length
 ! w  : angular frequency = 2 pi / T
 ! d  : damping ratio
-! n  : number of samples
+! n  : number of samples (automatically determined)
 subroutine rspectra( z, u, dt, w, d, n )
 implicit none
 real, intent(out) :: z(3)

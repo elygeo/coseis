@@ -3,62 +3,66 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.6: http://docutils.sourceforge.net/" />
 <title>Coseis</title>
 <style type="text/css">
 
 /* CSS stylesheet */
 
 body {
-    margin: 30px;
-    background-color: #fff;
+    max-width: 760px;
+    padding: 0px;
+    margin: 0px auto;
+    background-color: #eee;
     color: #000;
     font-family: 'Lucida Grande', Geneva, Verdana, sans-serif;
+    position: relative;
+    line-height: 140%;
 }
 
-h1 {
-    color: #900;
-    margin: 0px;
-    font-weight: bold;
-}
-
-h2 {
-    font-size: large;
-    margin: 0px;
-}
-
-h3 {
-    margin-top: 30px;
-    padding-top: 10px;
-    border-top: 2px solid #ddd;
-}
-
-p.topic-title {
-    font-size: large;
-    font-weight: bold;
-}
-
-pre {
-    padding: 10px;
-    border: 1px solid #ddd;
-    background-color: #f4f4f4;
-}
-
-p.warning {
-    padding: 10px;
-    border: 1px solid #ddd;
-    background-color: #ffd;
+div.document {
+    background-color: #fff;
+    padding: 0px 60px;
+    border: 1px solid #ccc;
 }
 
 img {
     border: none;
+    margin: 10px 0px;
 }
 
-img.align-right {
-    border: 10px solid #fff;
-    border-right: 0px;
+img.plot {
+    margin: 0px -30px;
+}
+
+img.align-left, .figure.align-left {
+    clear: left;
+    float: left;
+    margin-right: 1em
+}
+
+img.align-right, .figure.align-right {
+    clear: right;
     float: right;
-    float: top;
+    margin-left: 1em
+}
+
+img.align-center, .figure.align-center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+hr {
+    border: none;
+    border-top: 2px solid #ccc;
+}
+
+pre {
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #eee;
+    line-height: 100%;
 }
 
 a {
@@ -70,39 +74,98 @@ a:hover, a:active {
     text-decoration: underline;
 }
 
-hr {
-    border: 0;
-    border-top: 2px solid #ddd;
-}
-
 .section li {
     padding: 5px;
 }
 
-ul.navbar
-{
-    list-style-type: none;
-    overflow: hidden;
-    padding: 0;
-    margin: 0;
-    margin-top: 10px;
+h1, h1 a, h1 a:hover, h1 a:active {
+    color: #900;
+    text-decoration: none;
+    font-weight: bold;
+    margin-bottom: 5px;
 }
 
-.navbar li
-{
-    float: left;
-    border: 1px solid #ddd;
+h2.subtitle {
+    font-size: large;
+    font-weight: normal;
+    margin-top: 5px;
+}
+
+h3 {
+    border-top: 2px solid #ccc;
+    padding-top: 10px;
+}
+
+form.search {
+    margin-left: 30px;
+}
+
+ul.navbar {
+    list-style-type: none;
+    padding: 0px;
+}
+
+.navbar li {
+    display: inline;
 }
 
 .navbar a {
-    display: block;
-    padding: 4px 10px;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
     text-decoration: none;
-    background-color: #f4f4f4;
 }
 
 .navbar a:hover, a:active {
-    background-color: #ddd;
+    background-color: #ccc;
+}
+
+div.box {
+    border: 1px solid #aaa;
+    margin: 30px 0px;
+}
+
+div.box form, div.box p, div.box ul, div.box h4 {
+    margin: 15px 30px;
+}
+
+div.box h3 {
+    background-color: #ccc;
+    padding: 4px 30px;
+    margin: 0px;
+    margin-bottom: 15px;
+    font-size: medium;
+}
+
+p.topic-title {
+    font-size: large;
+    font-weight: bold;
+}
+
+p.warning {
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #ffd;
+}
+
+table {
+    width:100%;
+    border-collapse: collapse;
+    border: 1px solid #aaa;
+    margin: 30px 0px;
+}
+
+th {
+    padding: 4px 30px;
+    background-color: #ccc;
+    border: none;
+    text-align: left;
+}
+
+td {
+    padding: 4px 30px;
+    border: none;
+    border-top: 1px solid #eee;
 }
 
 
@@ -172,11 +235,11 @@ sudo apt-get install gfortran
 </pre>
 <p>Mac OS X:</p>
 <blockquote>
-<p>First install either the iPhone or the Mac-only version of <a class="reference external" href="http://developer.apple.com/technology/xcode.html">Xcode</a>
-available from <a class="reference external" href="http://connect.apple.com/">Apple Developer</a> Connection (free membership required).  Then
-install the GNU Fortran version available from the <a class="reference external" href="http://r.research.att.com/tools/">R for Mac OS X</a>
-Developer's Page (versions from MacPorts and Fink seem to be problematic and
-are not recommended).</p>
+<p>First, download the latest gfortran package in the <em>Apple Xcode gcc-42 add-ons</em>
+section of the <a class="reference external" href="http://r.research.att.com/tools/">R for Mac OS X</a> Developer's Page (versions from MacPorts and
+Fink are not recommended).  Then, download the corresponding version of <a class="reference external" href="http://developer.apple.com/technology/xcode.html">Xcode</a>
+(either iPhone or Mac-only) available from <a class="reference external" href="http://connect.apple.com/">Apple Developer</a> Connection (free
+membership required).</p>
 </blockquote>
 </li>
 <li><p class="first"><a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a> is recommended if you need MPI.  The included script
@@ -279,15 +342,8 @@ python viz.py
 <a class="reference external" href="../scripts/basindepth/mesh.py">mesh.py</a>
 <a class="reference external" href="../scripts/basindepth/search.py">search.py</a>
 <a class="reference external" href="../scripts/basindepth/viz.py">viz.py</a></p>
-<!-- vim: filetype=rst -->
 </div>
 </div>
-</div>
-<div class="footer">
-<hr class="footer" />
-Generated on: 2010-08-01.
-Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
-
 </div>
 </body>
 </html>

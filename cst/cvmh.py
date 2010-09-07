@@ -136,7 +136,7 @@ def brocher_vp( f ):
     return f
 
 
-def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx62' ):
+def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx63' ):
     """
     Download and read SCEC CVM-H voxet.
 
@@ -215,18 +215,18 @@ class Model():
     -------
         out: Property samples at coordinates (x, y, z)
     """
-    def __init__( self, prop, voxet=['mantle', 'crust'], no_data_value='nan' ):
+    def __init__( self, prop, voxet=['mantle', 'crust'], no_data_value='nan', version='vx63' ):
         self.prop = prop
         if prop == 'wald':
             self.voxet = [ vs30_wald() ]
         elif prop == 'wills':
             self.voxet = [ vs30_wills() ]
         elif prop in prop2d:
-            self.voxet = [ cvmh_voxet( prop ) ]
+            self.voxet = [ cvmh_voxet( prop, version=version ) ]
         else:
             self.voxet = []
             for vox in voxet:
-                self.voxet += [ cvmh_voxet( prop, vox, no_data_value ) ]
+                self.voxet += [ cvmh_voxet( prop, vox, no_data_value, version ) ]
         return
     def __call__( self, x, y, z=None, out=None, interpolation='nearest' ):
         if out is None:
@@ -252,6 +252,7 @@ class Extraction():
         vs30: 'wills', 'wald', None, or Model object.
         topo: 'topo' or Model object.
         interpolation: 'nearest', or 'linear'.
+        version: 'vx62', or 'vx63'
 
     Call parameters
     ---------------
@@ -264,15 +265,16 @@ class Extraction():
     -------
         out: Property samples at coordinates (x, y, z)
     """
-    def __init__( self, x, y, vm, vs30='wills', topo='topo', interpolation='nearest' ):
+    def __init__( self, x, y, vm, vs30='wills', topo='topo', interpolation='nearest',
+        version='vx63' ):
         x = np.asarray( x )
         y = np.asarray( y )
         if type( vm ) is str:
-            vm = Model( vm )
+            vm = Model( vm, version=version )
         if type( vs30 ) is str:
-            vs30 = Model( vs30 )
+            vs30 = Model( vs30, version=version )
         if type( topo ) is str:
-            topo = Model( topo )
+            topo = Model( topo, version=version )
         z0 = topo( x, y, interpolation='linear' )
         if vs30 is None:
             zt = None

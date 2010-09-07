@@ -5,21 +5,19 @@ import os, sys, cStringIO, matplotlib
 matplotlib.use( 'Agg' )
 import matplotlib.pyplot as plt
 import numpy as np
-from . import conf, util, viz
+from . import conf, viz
+from .. import util
 
-cfgfile = conf.cfgfile
-repodir = conf.repodir
-cache = True
-    
-def plot2d( id_, filename, time, decimate ):
+
+def plot2d( id_, filename, time='', decimate='' ):
     """
     2d image plot
     """
     static = time == ''
-    fullfilename = os.path.join( id_, filename )
-    if cache and static and os.path.exists( fullfilename ):
-        return open( fullfilename, 'rb' ).read()
-    path = os.path.join( id_, cfgfile )
+    fullfilename = os.path.join( conf.repo[0], id_, filename )
+    if conf.cache and static and os.path.exists( fullfilename ):
+        return
+    path = os.path.join( conf.repo[0], id_, conf.meta )
     m = util.load( path )
     ndim = len( m.x_shape )
     it = list( m.x_axes ).index( 'Time' )
@@ -71,7 +69,7 @@ def plot2d( id_, filename, time, decimate ):
     found = False
     for ipane, pane in enumerate( panes ):
         if pane[0] == root:
-            for d in repodir:
+            for d in conf.repo:
                 path = os.path.join( d, id_, root )
                 if os.path.exists( path ):
                     found = True
@@ -108,7 +106,7 @@ def plot2d( id_, filename, time, decimate ):
         interpolation='nearest' )
     ax.hold( True )
     for plot in m.x_plot:
-        path = os.path.join( id_, plot[0] )
+        path = os.path.join( conf.repo[0], id_, plot[0] )
         x, y = np.loadtxt( path, usecols=(0,1) ).T
         if rotate:
             x, y = y, x
@@ -156,6 +154,7 @@ def plot2d( id_, filename, time, decimate ):
     img = img.getvalue()
     if static:
         open( fullfilename, 'wb' ).write( img )
+        return
     return img
 
 def plot1d( ids, filename, x, lowpass ):
@@ -164,7 +163,7 @@ def plot1d( ids, filename, x, lowpass ):
     """
     ext = os.path.splitext( filename )[1]
     x = [ float(x) for x in x.split( ',' ) ]
-    path = os.path.join( ids[0], cfgfile )
+    path = os.path.join( conf.repo[0], ids[0], conf.meta )
     m = util.load( path )
     npane = len( m.t_panes )
     leg = npane * [[]]
@@ -183,7 +182,7 @@ def plot1d( ids, filename, x, lowpass ):
         ax.set_color_cycle( ['b', 'r', 'g', 'm', 'y', 'c', 'k'] )
         axs += [ax]
     for id_ in ids:
-        f = os.path.join( id_, cfgfile )
+        f = os.path.join( conf.repo[0], id_, conf.meta )
         m = util.load( f )
         ndim = len( m.t_shape )
         it = list( m.t_axes ).index( 'Time' )
@@ -201,7 +200,7 @@ def plot1d( ids, filename, x, lowpass ):
             if len( pane ) > 2:
                 process = pane[2]
             for filename in pane[0]:
-                for d in repodir:
+                for d in conf.repo:
                     path = os.path.join( d, id_, filename )
                     if os.path.exists( path ):
                         f = util.ndread( path, m.t_shape, indices, m.dtype ).squeeze()

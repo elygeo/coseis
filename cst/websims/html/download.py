@@ -6,9 +6,9 @@ head = """\
 item = """\
 <li>
 %(name)s, n=%(n)s:
-<a href="%(baseurl)s/download/%(path)s.f32?ids=%(id)s&amp;j=%(j)s">%(root)s.f32</a>,
-<a href="%(baseurl)s/download/%(path)s.txt?ids=%(id)s&amp;j=%(j)s">%(root)s.txt</a>,
-<a href="%(baseurl)s/download/%(path)s.gz?ids=%(id)s&amp;j=%(j)s">%(root)s.gz</a>
+<a href="%(baseurl)s/app/download/%(path)s.f32?ids=%(id)s&amp;j=%(j)s">%(root)s.f32</a>,
+<a href="%(baseurl)s/app/download/%(path)s.txt?ids=%(id)s&amp;j=%(j)s">%(root)s.txt</a>,
+<a href="%(baseurl)s/app/download/%(path)s.gz?ids=%(id)s&amp;j=%(j)s">%(root)s.gz</a>
 </li>
 """
 

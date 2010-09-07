@@ -16,7 +16,6 @@ Computational Seismology Tools
 .. _WebSims:      http://scec.usc.edu/websims
 .. _Source Code:  http://github.com/gely/coseis/
 
-
 Summary
 =======
 
@@ -94,11 +93,11 @@ libraries.
 
     Mac OS X:
 
-        First install either the iPhone or the Mac-only version of Xcode_
-        available from `Apple Developer`_ Connection (free membership required).  Then
-        install the GNU Fortran version available from the `R for Mac OS X`_
-        Developer's Page (versions from MacPorts and Fink seem to be problematic and
-        are not recommended).
+GNU Fortran versions from MacPorts and Fink are not recommended.  Instead,
+download the latest gfortran package in the *Apple Xcode gcc-42 add-ons*
+section of the `R for Mac OS X`_ Developer's Page along with and the
+corresponding version of Xcode_ (either iPhone or Mac-only) available from
+`Apple Developer`_ Connection (free membership required).  Install Xcode fir
 
 2.  MPICH2_ is recommended if you need MPI.  The included script
     install-mpich.sh_ can install MPICH2 for you.
@@ -222,6 +221,4 @@ Source code:
 `mesh.py <../scripts/basindepth/mesh.py>`__
 `search.py <../scripts/basindepth/search.py>`__
 `viz.py <../scripts/basindepth/viz.py>`__
-
-.. vim: filetype=rst
 

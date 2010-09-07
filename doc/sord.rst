@@ -4,10 +4,7 @@ SORD
 Support Operator Rupture Dynamics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
----------------------------------
-
 .. image:: ely-saf-surface.jpg
-   :align: right
    :target: http://earth.usc.edu/~gely/ely-saf-surface.mov
 
 .. contents::
