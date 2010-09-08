@@ -38,7 +38,7 @@ item_grouped = """\
 
 group_end = """\
 <tr>
-    <td colspan="5"><input type="submit" value="Compare"></td>
+    <td colspan="7"><input type="submit" value="Compare"></td>
 </tr>
 """
 

@@ -17,6 +17,7 @@ pip install cython
 pip install GitPython			# not in EPD
 pip install nose
 pip install configobj
+pip install flup
 pip install pypdf			# not in EPD
 pip install web.py			# not in EPD
 pip install PIL				# dep: zlib
