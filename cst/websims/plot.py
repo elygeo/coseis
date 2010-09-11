@@ -1,12 +1,14 @@
 """
 Websims plotting routines
 """
-import os, sys, cStringIO, matplotlib
+import os, sys, cStringIO
+import matplotlib
 matplotlib.use( 'Agg' )
 import matplotlib.pyplot as plt
 import numpy as np
-from . import conf, viz
+from . import conf
 from .. import util
+from .. import plt as cst_plt
 
 
 def plot2d( id_, filename, time='', decimate='' ):
@@ -97,7 +99,7 @@ def plot2d( id_, filename, time='', decimate='' ):
         ax.text( x, y, 'File not found: ' + root,
             color='w', backgroundcolor='r', ha='center', va='center' )
         print( 'File not found: ' + root )
-    cmap = viz.colormap( cmap, colorexp=colorexp, nmod=nmod )
+    cmap = cst_plt.colormap( cmap, colorexp=colorexp, nmod=nmod )
     if rotate:
         ff = ff.T
     if root == 'trup':

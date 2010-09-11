@@ -2,13 +2,13 @@
 """
 Visualization utilities
 """
+import subprocess, cStringIO
 import numpy as np
 
 def distill_eps( fd, mode=None ):
     """
     Distill EPS to PDF using Ghostscript.
     """
-    import subprocess, cStringIO
     if type( fd ) == str:
         fd = cStringIO.StringIO( fd )
     cmd = 'ps2pdf', '-dEPSCrop', '-dPDFSETTINGS=/prepress', '-', '-'
@@ -23,7 +23,6 @@ def pdf2png( path, dpi=72, mode=None ):
     """
     Rasterize a PDF file using Ghostscript.
     """
-    import subprocess, cStringIO
     cmd = 'gs', '-q', '-r%s' % dpi, '-dNOPAUSE', '-dBATCH', '-sDEVICE=pngalpha', '-sOutputFile=-', path
     pid = subprocess.Popen( cmd, stdout=subprocess.PIPE )
     out = pid.communicate()[0]
@@ -36,7 +35,7 @@ def img2pdf( img, dpi=150, mode=None ):
     """
     Convert image array to PDF using PIL and ImageMagick.
     """
-    import subprocess, cStringIO, Image
+    import Image
     fd = cStringIO.StringIO()
     img = Image.fromarray( img )
     img.save( fd, format='png' )
@@ -52,7 +51,7 @@ def pdf_merge( layers ):
     """
     Overlay multiple single page PDF file descriptors.
     """
-    import cStringIO, pyPdf
+    import pyPdf
     out = cStringIO.StringIO()
     pdf = pyPdf.PdfFileWriter()
     page = pyPdf.PdfFileReader( layers[0] )
@@ -131,6 +130,27 @@ def cpt( *args, **kwargs ):
     return cmap
 
 colormap_library = {
+    'wwwwbgr': [
+        (0, 4, 5, 7, 8, 9, 11, 12),
+        (2, 2, 0, 0, 0, 2, 2, 2),
+        (2, 2, 1, 2, 2, 2, 1, 0),
+        (2, 2, 2, 2, 0, 0, 0, 0),
+        (2, 2, 2, 2, 2, 2, 2, 2),
+    ],
+    'wwwbgr': [
+        (0, 2, 3, 5, 6, 7, 9, 10),
+        (2, 2, 0, 0, 0, 2, 2, 2),
+        (2, 2, 1, 2, 2, 2, 1, 0),
+        (2, 2, 2, 2, 0, 0, 0, 0),
+        (2, 2, 2, 2, 2, 2, 2, 2),
+    ],
+    'wwbgr': [
+        (0, 1, 2, 4, 5, 6, 8, 9),
+        (2, 2, 0, 0, 0, 2, 2, 2),
+        (2, 2, 1, 2, 2, 2, 1, 0),
+        (2, 2, 2, 2, 0, 0, 0, 0),
+        (2, 2, 2, 2, 2, 2, 2, 2),
+    ],
     'wbgr': [
         (0,  1,  3,  4,  5,  7,  8),
         (2,  0,  0,  0,  2,  2,  2),

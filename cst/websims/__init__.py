@@ -23,7 +23,7 @@ of the Computational Siesmology Tools (Coseis_).
 .. _web.py:     http://webpy.org/
 .. _Coseis:     http://earth.usc.edu/~gely/coseis/www/
 """
-import os, sys, signal, re, gzip, time, cStringIO, mimetypes, shutil
+import os, sys, signal, re, gzip, time, cStringIO, shutil
 import numpy as np
 import web
 from docutils.core import publish_parts
