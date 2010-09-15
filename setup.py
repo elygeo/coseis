@@ -25,6 +25,7 @@ for target in args:
     if target == 'build':
         cst._build()
         cst.sord._build()
+        cst.fkernel._build()
         cst.cvm._build()
     elif target == 'path':
         cst.conf.install_path( path, 'coseis' )

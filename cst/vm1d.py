@@ -5,6 +5,16 @@
 import numpy as np
 from . import coord
 
+def vs30gtl( vs30, vt, z, zt=350.0, a=0.5, b=2.0/3.0, c=1.5 ):
+    """
+    Vs30 derived GTL
+    """
+    z = z / zt
+    f = z + b * (z - z * z)
+    g = a - (a + 3.0 * c) * z + c * z * z + 2.0 * c * np.sqrt( z )
+    v = f * vt + g * vs30
+    return v
+
 def dreger( prop, depth ):
     """
     SoCal model of Dreger and Helmberger (1991)
