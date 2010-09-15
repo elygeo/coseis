@@ -414,6 +414,7 @@ do ipz = 0,npz-1
                 print*,'rank= ',rank,' finish reading ewf file of processor ', trim(procid)
                 call MPI_BARRIER(MPI_COMM_WORLD,err)
                 
+                ! update by geoff
                 allocate(h_ijm(nlgrd,nt,6))
                 inquire(iolength=ehsize)h_ijm(:,:,1)
 
