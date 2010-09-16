@@ -191,10 +191,13 @@ td {
 <li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id9">Defining the fault rupture surface</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#memory-usage-and-scaling" id="id10">Memory Usage and Scaling</a></li>
-<li><a class="reference internal" href="#development" id="id11">Development</a><ul>
-<li><a class="reference internal" href="#debugging" id="id12">Debugging</a></li>
-<li><a class="reference internal" href="#profiling" id="id13">Profiling</a></li>
+<li><a class="reference internal" href="#memory-usage-and-scaling" id="id10">Memory Usage and Scaling</a><ul>
+<li><a class="reference internal" href="#achieving-i-o-performance" id="id11">Achieving I/O Performance</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#development" id="id12">Development</a><ul>
+<li><a class="reference internal" href="#debugging" id="id13">Debugging</a></li>
+<li><a class="reference internal" href="#profiling" id="id14">Profiling</a></li>
 </ul>
 </li>
 </ul>
@@ -520,11 +523,72 @@ up to 16 thousand processors at the TACC Ranger facility.  The following chart
 is the wall-time per step for 8 million mesh points per core (click for PDF):</p>
 <a class="reference external image-reference" href="../scripts/benchmark/sord-benchmark-ranger.pdf"><img alt="../scripts/benchmark/sord-benchmark-ranger.png" src="../scripts/benchmark/sord-benchmark-ranger.png" /></a>
 <p>This benchmark tests computation only. For many applications, disk output is
-the primary bottleneck and will limit scalability.  When configuring domain
-decomposition, it is important to minimize the number of cores accessing a
-particular file.  For example, if output is required for the entire ground
-surface, maximizing the number of domain partitions in the vertical direction
-will minimize the number of cores participating in I/O.</p>
+the primary bottleneck and will limit scalability.</p>
+<div class="section" id="achieving-i-o-performance">
+<h4>Achieving I/O Performance</h4>
+<p>For computations with significant disk input and output, on large numbers of
+cores, domain decomposition layout is critical to performance.  The most
+important principle is to minimize partitioning of I/O amongst processes.  A
+best-case scenario is that a file is accessed by only a single processes.  The
+following example is used to illustrate.  Using 4096 cores, compute spontaneous
+rupture, outputting slip-velocity on the fault plane as well as vertical
+ground-motions at selected sites:</p>
+<pre class="literal-block">
+nproc3 = 1, 1024, 4                        # number of processes in j, k, l
+nn = 6000, 4000, 800                       # number of mesh nodes
+faultnormal = 2                            # fault normal to y-axis
+ihypo = 2000, 2000, 100                    # hypocenter indices
+i = (2000,4000), 2000, (1,160), (1,-1, 10) # fault output 4d region
+fieldio = [
+    ( '=w', 'sv1', i, 'slip-velocity-x' ),
+    ( '=w', 'sv2', i, 'slip-velocity-y' ),
+    ( '=w', 'sv3', i, 'slip-velocity-z' ),
+    ( '=w', 'v3', [2000, 1000, -1, ()], 'vz-station-1' ),
+    ( '=w', 'v3', [2000, 1500, -1, ()], 'vz-station-2' ),
+    ( '=w', 'v3', [2000, 2500, -1, ()], 'vz-station-3' ),
+    ( '=w', 'v3', [2000, 3000, -1, ()], 'vz-station-4' ),
+]
+</pre>
+<p>Here the problem has been partitioned (using nproc3) such that the entire fault
+output surface lies on a single process by making many thin slices parallel to
+the fault-plane, and placing the first vertical domain boundary below the depth
+of the fault output region.  The surface stations are located at a single node
+point, so they always naturally occur on a single process.  With this
+configuration no coordination is required amongst the processes, and all I/O
+occurs independently.</p>
+<p>To scale this problem to higher numbers of processes, we eventually must start
+partitioning the fault-plane I/O.  In that case, the second most important
+principle for designing domain decomposition is to minimize I/O striping.
+Striping is an alternating or cyclical pattern of access to file from multiple
+processes.  A best-case scenario is for each processes to accesses a contiguous
+section of a file, rather than many small segments.  The important thing to
+know about SORD is that I/O occurs in Fortran-contiguous order, where the first
+index changes fastest.  To scale up our example to 32,768 cores, we prevent
+striping by keeping the number of processes along the x-axis equal to one:</p>
+<pre class="literal-block">
+nproc3 = 1, 1024, 32
+</pre>
+<p>Some I/O layouts are not amenable to minimizing partitioning and striping.  An
+example is two orthogonal output planes, such as the fault surface in addition
+to the entire ground surface.  One solution to that situation is to run
+multiple computations for each of the desired outputs, with each optimally
+partitioned for the output.</p>
+<p>In cases where minimizing partitioning and striping does not achieve acceptable
+performance, depending on the system architecture, it may be useful to test
+non-collective MPI-IO by setting the parameter:</p>
+<pre class="literal-block">
+mpout = -1
+</pre>
+<p>When all else fails, another option is to turn off MPI-IO altogether with:</p>
+<pre class="literal-block">
+mpout = 0
+</pre>
+<p>In that case, each process writes a separate output file.  If you have been
+careful to minimize I/O striping, assembling the separate output files may be
+as simple as concatenating them together with the UNIX <tt class="docutils literal">cat</tt> utility.  This
+approach is limited by the capability of the file system to handle large
+numbers files.</p>
+</div>
 </div>
 <div class="section" id="development">
 <h3>Development</h3>
