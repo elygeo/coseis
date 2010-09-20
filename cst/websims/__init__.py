@@ -53,22 +53,7 @@ class serve_static():
         raise web.seeother( '/static' + url )
 
 
-def stop():
-    try:
-        pid = int( open( 'pid' ).read() ) 
-    except:
-        return
-    try:
-        os.kill( pid, signal.SIGTERM )
-    except OSError:
-        return
-    print time.strftime( '%Y-%m-%d %H:%M:%S: WebSims stopped', time.localtime() )
-    return
-
-
-def start( debug=True, restart=True ):
-    if restart:
-        stop()
+def start( debug=True ):
     print time.strftime( '%Y-%m-%d %H:%M:%S: WebSims started', time.localtime() )
     sys.argv = [sys.argv[0], port]
     web.config.debug = debug
@@ -84,7 +69,6 @@ def start( debug=True, restart=True ):
         html.main.foot
     )
     open( os.path.join( 'static', 'about.html' ), 'w' ).write( about )
-    open( 'pid', 'w' ).write( str( os.getpid() ) )
     index()
     app.run()
     return
@@ -358,7 +342,7 @@ def show2d( w ):
             it = list( m.x_axes ).index( 'Time' )
             ix = [ i for i in range(ndim) if i != it and m.x_shape[i] > 1 ]
             dt = m.x_delta[it]
-            indices = ndim * [1]                                                     
+            indices = ndim * [1]
             for i in ix[:2]:
                 indices[i] = 0
             if static:

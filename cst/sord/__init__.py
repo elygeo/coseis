@@ -198,7 +198,7 @@ def stage( dictargs={}, **kwargs ):
     # conf, parameter files
     cwd = os.path.realpath( os.getcwd() )
     os.chdir( job.rundir )
-    for f in 'checkpoint', 'debug', 'in', 'out', 'prof', 'stats':
+    for f in 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint':
         os.mkdir( f )
     delattr( pm, 'itbuff' )
     cst.util.save( 'parameters.py', pm, expand=['fieldio'], header='# model parameters\n' )
