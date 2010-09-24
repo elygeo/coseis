@@ -6,7 +6,7 @@ pwd="${PWD}"
 # http://yt.enzotools.org/wiki/KrakenCommunityInstallation
 
 # yt python vertion
-url='http://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.4.9.tar.gz'
+url='http://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.5.1.tar.gz'
 url='http://bitbucket.org/ianb/virtualenv/get/tip.gz#egg=virtualenv-tip'
 cd "${prefix}"
 curl -L "${url}" | tar zx
@@ -17,7 +17,7 @@ curl -L "${url}" | tar zx
 cd "${HOME}/coseis"
 python setup.py path
 
-pip install pyproj
+#pip install pyproj
 
 cd "${pwd}"
 

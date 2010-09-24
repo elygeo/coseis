@@ -131,6 +131,9 @@ def stage( inputs={}, **kwargs ):
             if os.path.exists( ff ):
                 os.remove( ff )
 
+    # process machine templates
+    cst.conf.skeleton( job, new=False )
+
     # save input file and configuration
     f = os.path.join( job.rundir, 'cvm-input' )
     open( f, 'w' ).write( input_template % job.__dict__ )
