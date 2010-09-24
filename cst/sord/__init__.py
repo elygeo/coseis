@@ -133,7 +133,7 @@ def stage( dictargs={}, **kwargs ):
         print( 'Unknown parameters:' )
         pprint.pprint( inputs )
         sys.exit()
-        
+
     pm = cst.util.namespace( pm )
     pm = prepare_param( pm )
 

@@ -3,8 +3,7 @@
 Mesh generation
 """
 import numpy as np
-import cst
-import meta
+import cst, meta
 
 # metedata
 dtype = meta.dtype
@@ -16,8 +15,8 @@ ntop = meta.ntop
 # read data
 dep = np.arange( shape[2] ) * delta[2]
 n = shape[:2]
-x = np.fromfile( 'lon', dtype ).reshape( n[::-1] ).T
-y = np.fromfile( 'lat', dtype ).reshape( n[::-1] ).T
+x = np.fromfile( 'x', dtype ).reshape( n[::-1] ).T
+y = np.fromfile( 'y', dtype ).reshape( n[::-1] ).T
 z = np.fromfile( 'topo', dtype ).reshape( n[::-1] ).T
 
 # demean topography
@@ -53,25 +52,30 @@ z = 0.25 * (z[:-1,:-1] + z[1:,:-1] + z[:-1,1:] + z[1:,1:])
 n = shape[2] - ntop - npml
 w = np.r_[ np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml) ]
 
-# write dep file
-d = 'cvm/'
-fh = cst.util.open_excl( d + 'dep', 'wb' )
+# rho extraction
+fh = cst.util.open_excl( 'rho', 'wb' )
 if fh:
+    vm = cst.cvmh.Extraction( x, y, 'vp', interpolation='nearest' )
     for i in range( dep.size ):
-        (w[i] * z - dep[i]).astype( 'f' ).T.tofile( fh )
+        zz = w[i] * z - dep[i]
+        cst.cvmh.nafe_drake( vm( zz ) ).T.tofile( fh )
     fh.close()
 
-# write lon file
-fh = cst.util.open_excl( d + 'lon', 'wb' )
+# vp extraction
+fh = cst.util.open_excl( 'vp', 'wb' )
 if fh:
+    vm = cst.cvmh.Extraction( x, y, 'vp', interpolation='nearest' )
     for i in range( dep.size ):
-        x.T.tofile( fh )
+        zz = w[i] * z - dep[i]
+        vm( zz ).T.tofile( fh )
     fh.close()
 
-# write lat file
-fh = cst.util.open_excl( d + 'lat', 'wb' )
+# vs extraction
+fh = cst.util.open_excl( 'vs', 'wb' )
 if fh:
+    vm = cst.cvmh.Extraction( x, y, 'vs', interpolation='nearest' )
     for i in range( dep.size ):
-        y.T.tofile( fh )
+        zz = w[i] * z - dep[i]
+        vm( zz ).T.tofile( fh )
     fh.close()
 
