@@ -252,7 +252,7 @@ class Extraction():
         vs30: 'wills', 'wald', None, or Model object.
         topo: 'topo' or Model object.
         interpolation: 'nearest', or 'linear'.
-        version: 'vx62', or 'vx63'
+        **kwargs: Keyword arguments passed to Model()
 
     Call parameters
     ---------------
@@ -266,16 +266,20 @@ class Extraction():
         out: Property samples at coordinates (x, y, z)
     """
     def __init__( self, x, y, vm, vs30='wills', topo='topo', interpolation='nearest',
-        version='vx63' ):
+        **kwargs ):
         x = np.asarray( x )
         y = np.asarray( y )
         if type( vm ) is str:
-            vm = Model( vm, version=version )
-        if type( vs30 ) is str:
-            vs30 = Model( vs30, version=version )
+            vm = Model( vm, **kwargs )
+        if vm.prop in prop2d:
+            sys.exit( 'Cannot extract 2D model' )
+        elif vm.prop == 'tag':
+            vs30 = None
         if type( topo ) is str:
-            topo = Model( topo, version=version )
+            topo = Model( topo, **kwargs )
         z0 = topo( x, y, interpolation='linear' )
+        if type( vs30 ) is str:
+            vs30 = Model( vs30, **kwargs )
         if vs30 is None:
             zt = None
         else:
