@@ -174,13 +174,14 @@ def make( compiler, object_, source ):
     if os.path.isfile( object_ ):
         try:
             oldstate = open( statefile ).readlines()
+        except( IOError ):
+            pass
+        else:
             diff = ''.join( difflib.unified_diff( oldstate, state, n=0 ) )
             if diff:
                 print( diff )
             else:
                 compile_ = False
-        except( IOError ):
-            pass
     if compile_:
         try:
             os.unlink( statefile )

@@ -36,7 +36,7 @@ def _archive():
    except:
         print( 'Warning: Source code not archived. To enable, use' )
         print( 'Git versioned source code and install GitPython.' )
-   finally:
+   else:
         f = os.path.join( path, 'build', 'coseis.tgz' )
         repo.archive( open( 'tmp.tar', 'w' ), prefix='coseis/' )
         tar = tarfile.open( 'tmp.tar', 'a' )
