@@ -23,7 +23,7 @@ of the Computational Siesmology Tools (Coseis_).
 .. _web.py:     http://webpy.org/
 .. _Coseis:     http://earth.usc.edu/~gely/coseis/www/
 """
-import os, sys, signal, re, gzip, time, cStringIO, shutil
+import os, sys, re, gzip, time, cStringIO, shutil
 import numpy as np
 import web
 from docutils.core import publish_parts
@@ -118,11 +118,9 @@ class click2d:
             m  = util.load( f )
             jj = w.keys()[0].split(',')
             ndim = len( m.x_shape )
-            it = list( m.x_axes ).index( 'Time' )
-            ix = [ i for i in range(ndim) if i != it and m.x_shape[i] > 1 ]
-            nn = [ m.x_shape[i] for i in ix ]
-            dx = [ m.x_delta[i] for i in ix ]
-            aspect = abs( dx[1] / dx[0] ) * nn[1] / nn[0]
+            shape = m.x_shape[:-1]
+            delta = m.x_delta[:-1]
+            aspect = abs( delta[1] / delta[0] ) * shape[1] / shape[0]
             if aspect < 1.:
                 j0 = 100, 50 + int( aspect * 800 )
                 j1 = 900, 50
@@ -130,14 +128,14 @@ class click2d:
                 jj = jj[::-1]
                 j0 = 50 + int( 1.0 / aspect * 800 ), 100
                 j1 = 50, 900
-            x = len(ix) * ['1']
+            x = (ndim - 1) * ['1']
             for i in 0, 1:
                 j = int( jj[i] ) % (j0[i] + j1[i])
-                j = (int( jj[i] ) - j0[i]) * (nn[i] - 1) // (j1[i] - j0[i]) + 1
-                j = max( 1, min( nn[i], j ) )
-                if dx[i] < 0.0:
-                    j = nn[i] - j + 1
-                x[i] = str( (j - 1) * abs( dx[i] ) )
+                j = (int( jj[i] ) - j0[i]) * (shape[i] - 1) // (j1[i] - j0[i]) + 1
+                j = max( 1, min( shape[i], j ) )
+                if delta[i] < 0.0:
+                    j = shape[i] - j + 1
+                x[i] = str( (j - 1) * abs( delta[i] ) )
             x = ','.join( x )
         raise web.seeother( '%s/app?ids=%s&x=%s' % (baseurl, id_, x) )
 
@@ -154,9 +152,8 @@ class click1d:
             f  = os.path.join( conf.repo[0], ids[0], conf.meta )
             m  = util.load( f )
             j  = int( w.keys()[0].split(',')[0] )
-            it = list( m.x_axes ).index( 'Time' )
-            nt = m.x_shape[it]
-            dt = m.x_delta[it]
+            nt = m.x_shape[-1]
+            dt = m.x_delta[-1]
             j0 = 100
             j1 = 900
             j  = (j - j0) * (nt - 1) // (j1 - j0) + 1
@@ -178,9 +175,7 @@ class download:
         elif root in [ pane[0] for pane in m.x_panes ]:
             shape = m.x_shape
         elif root in [ pane[0] for pane in m.x_static_panes ]:
-            shape = list( m.x_shape )
-            it = list( m.x_axes ).index( 'Time' )
-            shape[it] = 1
+            shape = list( m.x_shape[:-1] ) + [1]
         else:
             found = False
         for d in conf.repo:
@@ -338,24 +333,20 @@ def show2d( w ):
         for id_ in ids:
             f = os.path.join( conf.repo[0], id_, conf.meta )
             m = util.load( f )
+            dt = m.x_delta[-1]
             ndim = len( m.x_shape )
-            it = list( m.x_axes ).index( 'Time' )
-            ix = [ i for i in range(ndim) if i != it and m.x_shape[i] > 1 ]
-            dt = m.x_delta[it]
-            indices = ndim * [1]
-            for i in ix[:2]:
-                indices[i] = 0
+            indices = [0, 0] + [1] * (ndim - 2)
             if static:
                 panes = m.x_static_panes
             else:
-                indices[it] = int( float( time ) / dt + 1.5 )
+                indices[-1] = int( float( time ) / dt + 1.5 )
                 panes = m.x_panes
             w.id = id_
             w.path = panes[ipane][0]
             w.root = os.path.basename( w.path )
             w.name = m.label + panes[ipane][1]
             w.j = ','.join( [ str( i ) for i in indices ] )
-            w.n = ','.join( [ str( m.x_shape[i] ) for i in ix[:2] ] )
+            w.n = ','.join( [ str( i ) for i in m.x_shape[:2] ] )
             if static:
                 plot.plot2d( id_, w.path )
                 if m.t_panes:
@@ -378,15 +369,12 @@ def show2d( w ):
     if m.downloadable:
         out += html.download.head + outd + html.download.foot
     out += html.main.foot
-    w.tlim = '0-%s%s' % (m.x_delta[it] * m.x_shape[it], m.x_unit[it])
-    it = list( m.t_axes ).index( 'Time' )
-    ix = [ i for i in range(ndim) if i != it and m.t_shape[i] > 1 ]
-    w.flim = '0-%s%s' % (0.5 / m.t_delta[it], 'Hz')
-    w.axes = ','.join( [ m.t_axes[i] for i in ix ] )
-    w.xlim = ', '.join(
-        [ '0-%s%s' % ( abs( m.t_delta[i] * m.t_shape[i] ), m.t_unit[i] ) for i in ix ]
-    )
     w.x = ''
+    w.axes = ','.join( m.t_axes[1:] )
+    xlim = [ abs(n * d) for n, d in zip( m.t_shape[1:], m.t_delta[1:] ) ]
+    w.xlim = ', '.join( [ '0-%s%s' % (l, u) for l, u in zip( xlim, m.t_unit[1:] ) ] )
+    w.flim = '0-%s%s' % (0.5 / m.t_delta[0], 'Hz')
+    w.tlim = '0-%s%s' % (m.x_delta[-1] * m.x_shape[-1], m.x_unit[-1])
     if w.decimate == '':
         w.decimate = m.x_decimate
     out = out % dict( w )
@@ -401,22 +389,20 @@ def show1d( w ):
     Time history page
     """
     ids = w.ids.split( ',' )
-    x = w.x.split( ',' )
+    xx = w.x.split( ',' )
     download = ''
     for id_ in ids:
         w.id = id_
         f = os.path.join( conf.repo[0], id_, conf.meta )
-        m = util.load( f )
-        ndim = len( m.t_shape )
-        it = list( m.t_axes ).index( 'Time' )
-        ix = [ i for i in range(ndim) if i != it and m.t_shape[i] > 1 ]
-        if m.downloadable:
-            nn = [ m.t_shape[i] for i in ix ]
-            dx = [ m.t_delta[i]  for i in ix ]
-            ii = [ int( float( x[i] ) / abs( dx[i] ) + 1.5 )
-                for i in range( len( x ) ) ]
-            for i in range( len( ii ) ):
-                if ii[i] < 1 or ii[i] > nn[i]:
+        meta = util.load( f )
+        if meta.downloadable:
+            shape = meta.t_shape[1:]
+            delta = meta.t_delta[1:]
+            indices = ['0']
+            for x, dx, n in zip( xx, delta, shape ):
+                i = int( float( x ) / abs( dx ) + 1.5 )
+                indices += [str(i)]
+                if i < 1 or i > n:
                     web.header( 'Content-Type', 'text/html' )
                     out = (
                         html.main.head +
@@ -424,41 +410,34 @@ def show1d( w ):
                         html.main.foot
                     )
                     return out % dict( w )
-            indices = ndim * [1]
-            indices[it] = 0
-            for i in range( len( ix ) ):
-                indices[ix[i]] = ii[i]
-            w.j = ','.join( [ str(i) for i in indices ] )
-            w.n = m.t_shape[it]
-            for pane in m.t_panes:
+            w.j = ','.join( indices )
+            w.n = meta.t_shape[0]
+            for pane in meta.t_panes:
                 if len( pane ) <= 2 or pane[2] == None:
-                    w.name = m.label + pane[1]
+                    w.name = meta.label + pane[1]
                     w.baseurl = baseurl
                     for filename in pane[0]:
                         w.path = filename
                         w.root = os.path.basename( filename )
                         download += html.download.item % dict( w )
-    if hasattr( m, 'notes' ):
-        w.notes = publish_parts( m.notes, writer_name='html4css1' )['body']
+    if hasattr( meta, 'notes' ):
+        w.notes = publish_parts( meta.notes, writer_name='html4css1' )['body']
     else:
         w.notes = ''
     w.style = html.style
-    w.title = m.title
-    w.subtitle = m.t_title
-    w.axes = ','.join( [ m.t_axes[i] for i in ix ] )
-    w.flim = '0-%s%s' % (0.5 / m.t_delta[it], 'Hz')
-    w.xlim = ', '.join(
-        [ '0-%s%s' % ( abs( m.t_delta[i] * m.t_shape[i] ), m.t_unit[i] ) for i in ix ]
-    )
-    it = list( m.x_axes ).index( 'Time' )
-    ix = [ i for i in range(ndim) if i != it and m.x_shape[i] > 1 ]
-    w.tlim = '0-%s%s' % (m.x_delta[it] * m.x_shape[it], m.x_unit[it])
+    w.title = meta.title
+    w.subtitle = meta.t_title
+    w.axes = ','.join( meta.t_axes[1:] )
+    xlim = [ abs(n * d) for n, d in zip( meta.t_shape[1:], meta.t_delta[1:] ) ]
+    w.xlim = ', '.join( [ '0-%s%s' % (l, u) for l, u in zip( xlim, meta.t_unit[1:] ) ] )
+    w.flim = '0-%s%s' % (0.5 / meta.t_delta[0], 'Hz')
+    w.tlim = '0-%s%s' % (meta.x_delta[-1] * meta.x_shape[-1], meta.x_unit[-1])
     out = html.main.head + html.form.head
-    if m.x_panes:
+    if meta.x_panes:
         out += html.form.form2d + html.form.form1d + html.form.foot + html.plot.click1d
     else:
         out += html.form.form1d + html.form.foot + html.plot.plot1d
-    if m.downloadable:
+    if meta.downloadable:
         out += html.download.head + download + html.download.foot
     out += html.main.foot
     web.header( 'Content-Type', 'text/html' )

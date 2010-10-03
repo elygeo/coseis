@@ -19,49 +19,41 @@ def plot2d( id_, filename, time='', decimate='' ):
     fullfilename = os.path.join( conf.repo[0], id_, filename )
     if conf.cache and static and os.path.exists( fullfilename ):
         return
-    path = os.path.join( conf.repo[0], id_, conf.meta )
-    m = util.load( path )
-    ndim = len( m.x_shape )
-    it = list( m.x_axes ).index( 'Time' )
-    ix = [ i for i in range(ndim) if i != it and m.x_shape[i] > 1 ][:2]
-    dt = m.x_delta[it]
-    dx = [ m.x_delta[i] for i in ix ]
-    nn = [ m.x_shape[i] for i in ix ]
-    axes = [ m.x_axes[i] for i in ix ]
-    unit = [ m.x_unit[i] for i in ix ]
-    shape = list( m.x_shape )
-    indices = ndim * [1]
-    for i in ix:
-        indices[i] = 0
+    path  = os.path.join( conf.repo[0], id_, conf.meta )
+    meta  = util.load( path )
+    delta = meta.x_delta
+    shape = meta.x_shape
+    axes  = meta.x_axes
+    unit  = meta.x_unit
+    indices = [0, 0] + [1] * (len( shape ) - 2)
     if static:
-        panes = m.x_static_panes
-        shape[it] = 1
+        panes = meta.x_static_panes
+        shape[-1] = 1
     else:
-        panes = m.x_panes
-        indices[it] = int( float( time ) / dt + 1.5 )
+        panes = meta.x_panes
+        indices[-1] = int( float( time ) / delta[-1] + 1.5 )
     if decimate:
         decimate = int( decimate )
     else:
-        decimate = m.x_decimate
-    aspect = abs( dx[1] / dx[0] ) * nn[1] / nn[0]
+        decimate = meta.x_decimate
+    aspect = abs( delta[1] / delta[0] ) * shape[1] / shape[0]
     rotate = aspect > 1.0
     if rotate:
         aspect = 1.0 / aspect
-        nn = nn[::-1]
-        dx = dx[::-1]
-        dx[0] = -dx[0]
-        axes = axes[::-1]
-        unit = unit[::-1]
+        shape =  (shape[1], shape[0]) + shape[2:]
+        delta = (-delta[1], delta[0]) + delta[2:]
+        axes  =   (axes[1],  axes[0]) +  axes[2:]
+        unit  =   (unit[1],  unit[0]) +  unit[2:]
     height = 8.0 * aspect + 1.0
     axis = ( 
-        max( 0, -dx[0] * (nn[0] - 1) ),
-        max( 0,  dx[0] * (nn[0] - 1) ),
-        max( 0, -dx[1] * (nn[1] - 1) ),
-        max( 0,  dx[1] * (nn[1] - 1) ),
+        max( 0, -delta[0] * (shape[0] - 1) ),
+        max( 0,  delta[0] * (shape[0] - 1) ),
+        max( 0, -delta[1] * (shape[1] - 1) ),
+        max( 0,  delta[1] * (shape[1] - 1) ),
     )
     extent = ( 
-        0, abs( dx[0] * (nn[0] - 1) ),
-        0, abs( dx[1] * (nn[1] - 1) ),
+        0, abs( delta[0] * (shape[0] - 1) ),
+        0, abs( delta[1] * (shape[1] - 1) ),
     )
     inches = 10, height
     fig = plt.figure( None, inches )
@@ -91,7 +83,7 @@ def plot2d( id_, filename, time='', decimate='' ):
                         if len( pane ) > 6:
                             nmod = pane[6]
     if found:
-        ff = util.ndread( path, shape, indices, m.dtype ).squeeze()[::decimate,::decimate]
+        ff = util.ndread( path, meta.x_shape, indices, meta.dtype ).squeeze()[::decimate,::decimate]
         ff *= scale
     else:
         ff = np.array( [[0]] )
@@ -107,9 +99,9 @@ def plot2d( id_, filename, time='', decimate='' ):
     im = ax.imshow( ff.T, cmap=cmap, extent=extent, origin='lower',
         interpolation='nearest' )
     ax.hold( True )
-    for plot in m.x_plot:
+    for plot in meta.x_plot:
         path = os.path.join( conf.repo[0], id_, plot[0] )
-        x, y = np.loadtxt( path, usecols=(0,1) ).T
+        x, y = np.loadtxt( path, usecols=(0, 1) ).T
         if rotate:
             x, y = y, x
         if len( plot ) > 1:
@@ -118,16 +110,16 @@ def plot2d( id_, filename, time='', decimate='' ):
             ax.plot( x, y, '-k', linewidth=0.5 )
     if rotate:
         ax.invert_xaxis()
-    if dx[0] < 0.0:
+    if delta[0] < 0.0:
         ax.invert_xaxis()
-    if dx[1] < 0.0:
+    if delta[1] < 0.0:
         ax.invert_yaxis()
     ax.axis( 'image' )
     ax.axis( axis )
     if aspect < 0.2:
         a, b = ax.get_ylim()
         ax.set_yticks( (a, 0.5 * (a + b), b) )
-    ax.set_title( m.label + title )
+    ax.set_title( meta.label + title )
     if ipane == len( panes ) - 1:
         ax.set_xlabel( axes[0] + ' (%s)' % unit[0] )
     ax.set_ylabel( axes[1] + ' (%s)' % unit[1] )
@@ -159,15 +151,15 @@ def plot2d( id_, filename, time='', decimate='' ):
         return
     return img
 
-def plot1d( ids, filename, x, lowpass ):
+def plot1d( ids, filename, xx, lowpass ):
     """
     Time series plot
     """
     ext = os.path.splitext( filename )[1]
-    x = [ float(x) for x in x.split( ',' ) ]
+    xx = [ float(x) for x in xx.split( ',' ) ]
     path = os.path.join( conf.repo[0], ids[0], conf.meta )
-    m = util.load( path )
-    npane = len( m.t_panes )
+    meta = util.load( path )
+    npane = len( meta.t_panes )
     leg = npane * [[]]
     inches = 10, 3 * npane
     fig = plt.figure( None, inches )
@@ -185,18 +177,11 @@ def plot1d( ids, filename, x, lowpass ):
         axs += [ax]
     for id_ in ids:
         f = os.path.join( conf.repo[0], id_, conf.meta )
-        m = util.load( f )
-        ndim = len( m.t_shape )
-        it = list( m.t_axes ).index( 'Time' )
-        ix = [ i for i in range(ndim) if i != it and m.t_shape[i] > 1 ]
-        dt = m.t_delta[it]
-        dx = [ m.t_delta[i] for i in ix ]
-        unit = m.t_unit[it]
-        indices = ndim * [1]
-        indices[it] = 0
-        for i in range( len( ix ) ):
-            indices[ix[i]] = int( float( x[i] ) / abs( dx[i] ) + 1.5 )
-        for ipane, pane in enumerate( m.t_panes ):
+        meta = util.load( f )
+        delta = meta.t_delta
+        unit  = meta.t_unit
+        indices = [0] + [ int( float(x) / abs(d) + 1.5 ) for x, d in zip( xx, delta[1:] ) ]
+        for ipane, pane in enumerate( meta.t_panes ):
             ax = axs[ipane]
             process = None
             if len( pane ) > 2:
@@ -205,8 +190,8 @@ def plot1d( ids, filename, x, lowpass ):
                 for d in conf.repo:
                     path = os.path.join( d, id_, filename )
                     if os.path.exists( path ):
-                        f = util.ndread( path, m.t_shape, indices, m.dtype ).squeeze()
-                        f, t = process_timeseries( f, dt, process, lowpass )
+                        f = util.ndread( path, meta.t_shape, indices, meta.dtype ).squeeze()
+                        f, t = process_timeseries( f, delta[-1], process, lowpass )
                         ax.plot( t, f )
                         break
                 else:
@@ -222,9 +207,9 @@ def plot1d( ids, filename, x, lowpass ):
             if pane[1]:
                 ax.set_ylabel( pane[1] )
             if len( pane ) > 3:
-                leg[ipane] += [ m.label + s for s in pane[3] ]
+                leg[ipane] += [ meta.label + s for s in pane[3] ]
                 ax.legend( leg[ipane], loc='upper right' )
-    ax.set_xlabel( 'Time (%s)' % unit )
+    ax.set_xlabel( 'Time (%s)' % unit[0] )
     img = cStringIO.StringIO()
     fig.savefig( img, format=ext[1:], dpi=100 )
     plt.close( fig )
