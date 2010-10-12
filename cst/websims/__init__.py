@@ -195,6 +195,7 @@ def show2d( query ):
         if snapshot:
             panes = meta.x_panes
             indices[-1] = int( float( query.t ) / delta[-1] + 1.5 )
+        indices = ','.join( [ str(i) for i in indices ] )
         if meta.x_panes:
             x_ids += [id_]
         if meta.t_panes:
@@ -203,10 +204,10 @@ def show2d( query ):
         downloads += [[]]
 
         # loop over panes
-        for ipane in range( len( panes ) ):
+        for pane in panes:
 
             # plots
-            path = panes[ipane][0]
+            path = pane[0]
             if cache_img:
                 plot.plot2d( id_, path + ext )
                 url = 'repo/' + id_ + '/' + path + ext
@@ -220,9 +221,9 @@ def show2d( query ):
             # downloads
             if meta.downloadable:
                 downloads[-1] += [ dict(
-                    label = '%s%s, shape=%s' % (meta.label, panes[ipane][1], shape[:2]),
+                    label = '%s%s, shape=%s' % (meta.label, pane[1], shape[:2]),
                     url = '/websims/app/download/' + path,
-                    query = 'ids=%s&j=%s' % (id_, ','.join( [ str(i) for i in indices ] ) ),
+                    query = 'ids=%s&j=%s' % (id_, indices),
                     root = os.path.basename( path ),
                 ) ]
 
@@ -287,33 +288,41 @@ def show1d( query ):
     plots = []
     downloads = []
 
-    # downloads
+    # loop over ids
     for id_ in ids:
+
+        # metadata
         meta = os.path.join( conf.repo[0], id_, conf.meta )
         meta = util.load( meta )
         if meta.x_panes:
             x_ids += [id_]
         if meta.t_panes:
             t_ids += [id_]
-        if 0:
+
+        # downloads
+        if meta.downloadable:
+            downloads += [[]]
             shape = meta.t_shape[1:]
             delta = meta.t_delta[1:]
             indices = ['0']
-            for x, dx, n in zip( xx, delta, shape ):
-                i = int( float( x ) / abs( dx ) + 1.5 )
+            for x, d, n in zip( xx, delta, shape ):
+                i = int( float( x ) / abs( d ) + 1.5 )
                 indices += [str(i)]
                 if i < 1 or i > n:
                     return error( 'Location (%(x)s) out of range' % query.x )
-            meta.j = ','.join( indices )
-            meta.n = meta.t_shape[0]
+            indices = ','.join( [ str(i) for i in indices ] )
             for pane in meta.t_panes:
                 if len( pane ) <= 2 or pane[2] == None:
-                    meta.name = meta.label + pane[1]
-                    for filename in pane[0]:
-                        query.path = filename
-                        query.root = os.path.basename( filename )
+                    for path in pane[0]:
+                        downloads[-1] += [ dict(
+                            label = '%s%s' % (meta.label, pane[1]),
+                            url = '/websims/app/download/' + path,
+                            query = 'ids=%s&j=%s' % (id_, indices),
+                            root = os.path.basename( path ),
+                        ) ]
 
     # metadata
+    downloads = list( itertools.chain( *itertools.izip_longest( *downloads ) ) )
     title = meta.title
     subtitle = meta.t_title
     x_ids = ','.join( x_ids )
@@ -344,8 +353,8 @@ def show1d( query ):
     html = jinja_env.get_template( 'show.html' )
     html = html.render(
         home=home, title=title, subtitle=subtitle, notes=notes,
-        axes=axes, xlim=xlim, flim=flim, tlim=tlim,
-        x_ids=x_ids, t_ids=t_ids, plots=plots, click=click, **query
+        axes=axes, xlim=xlim, flim=flim, tlim=tlim, x_ids=x_ids, t_ids=t_ids,
+        click=click, plots=plots, downloads=downloads, **query
     )
 
     return html
@@ -464,7 +473,7 @@ class download:
         if not found:
             web.header( 'Content-Type', 'text/html' )
             raise web.notfound()
-        v = util.ndread( f, shape, indices, dtype=meta.dtype )
+        v = util.ndread( path, shape, indices, dtype=meta.dtype )
         web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
         if ext == '.txt':
             out = cStringIO.StringIO()
