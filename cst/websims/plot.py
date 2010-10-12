@@ -28,7 +28,7 @@ def plot2d( id_, filename, time='', decimate='' ):
     indices = [0, 0] + [1] * (len( shape ) - 2)
     if static:
         panes = meta.x_static_panes
-        shape[-1] = 1
+        shape = shape[:-1] + (1,)
     else:
         panes = meta.x_panes
         indices[-1] = int( float( time ) / delta[-1] + 1.5 )
@@ -83,8 +83,8 @@ def plot2d( id_, filename, time='', decimate='' ):
                         if len( pane ) > 6:
                             nmod = pane[6]
     if found:
-        ff = util.ndread( path, meta.x_shape, indices, meta.dtype ).squeeze()[::decimate,::decimate]
-        ff *= scale
+        ff = util.ndread( path, meta.x_shape, indices, meta.dtype )
+        ff = scale * ff.squeeze()[::decimate,::decimate]
     else:
         ff = np.array( [[0]] )
         x, y = 0.5 * extent[1], 0.5 * extent[3]
@@ -151,11 +151,12 @@ def plot2d( id_, filename, time='', decimate='' ):
         return
     return img
 
-def plot1d( ids, filename, xx, lowpass ):
+
+def plot1d( ids, xx, lowpass, format='png' ):
     """
     Time series plot
     """
-    ext = os.path.splitext( filename )[1]
+    ids = ids.split(',')
     xx = [ float(x) for x in xx.split( ',' ) ]
     path = os.path.join( conf.repo[0], ids[0], conf.meta )
     meta = util.load( path )
@@ -191,7 +192,7 @@ def plot1d( ids, filename, xx, lowpass ):
                     path = os.path.join( d, id_, filename )
                     if os.path.exists( path ):
                         f = util.ndread( path, meta.t_shape, indices, meta.dtype ).squeeze()
-                        f, t = process_timeseries( f, delta[-1], process, lowpass )
+                        f, t = process_timeseries( f, delta[0], process, lowpass )
                         ax.plot( t, f )
                         break
                 else:
@@ -211,9 +212,10 @@ def plot1d( ids, filename, xx, lowpass ):
                 ax.legend( leg[ipane], loc='upper right' )
     ax.set_xlabel( 'Time (%s)' % unit[0] )
     img = cStringIO.StringIO()
-    fig.savefig( img, format=ext[1:], dpi=100 )
+    fig.savefig( img, format=format, dpi=100 )
     plt.close( fig )
     return img.getvalue()
+
 
 def process_timeseries( f, dt, process='', lowpass='' ):
     """
@@ -242,6 +244,7 @@ def process_timeseries( f, dt, process='', lowpass='' ):
         if cutoff > 0.0 and cutoff < (0.5 / dt):
             f = lowpass_filter( f, dt, cutoff )
     return f, t
+
 
 def lowpass_filter( x, dt, cutoff, window=2, repeat=-1 ):
     """

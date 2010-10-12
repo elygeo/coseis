@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+
+{# title bar -#}
+<h3><a href="{{ home }}">{{ title }}</a> / {{ subtitle }}</h3>
+{{ notes }}
+
+{#- time history form #}
+{%- if t_ids %}
+<form class="t" action="/websims/app">
+<fieldset>
+<legend>Time history</legend>
+<input type="hidden" name="ids" value="{{ t_ids }}">
+<label for="x">{{ axes }} ({{ xlim }}):</label>
+<input id="x" type="text" size="12" name="x" value="{{ x }}"><br>
+<label for="t">Lowpass frequency ({{ flim }}s):</label>
+<input id="t" type="text" size="12" name="lowpass" value="{{ lowpass }}"><br>
+<input type="submit" value="Plot">
+</fieldset>
+</form>
+{% endif %}
+
+{#- snapshot form #}
+{%- if x_ids %}
+<form class="x" action="/websims/app">
+<fieldset>
+<legend>Snapshot</legend>
+<input type="hidden" name="ids" value="{{ x_ids }}">
+<label for="t">Time ({{ tlim }}):</label>
+<input id="t" type="text" size="12" name="t" value="{{ t }}"><br>
+<label for="x">Decimation interval:</label>
+<input id="x" type="text" size="12" name="decimate" value="{{ decimate }}"><br>
+<input type="submit" value="Plot">
+</fieldset>
+</form>
+{% endif %}
+
+{#- clear floats #}
+<div style="clear: both"></div>
+
+{#- plots #}
+{% if click %}
+{%- for item in plots %}
+<a href="{{ click }}"><img class="plot" src="{{ item|e }}" alt="plot" ismap></a><br>
+{%- endfor %}
+{%- else %}
+{%- for item in plots %}
+<img class="plot" src="{{ item|e }}" alt="plot"><br>
+{%- endfor %}
+{%- endif %}
+
+{#- downloads #}
+{% if downloads %}
+<h3>Download source data</h3>
+<ul>
+{%- for item in downloads %}
+<li>
+{{ item.label }}:
+<a href="{{ item.url|e }}.f32?{{ item.query|e }}">{{ item.root }}.f32</a>,
+<a href="{{ item.url|e }}.txt?{{ item.query|e }}">{{ item.root }}.txt</a>,
+<a href="{{ item.url|e }}.gz?{{  item.query|e }}">{{ item.root }}.gz</a>.
+</li>
+{%- endfor %}
+</ul>
+<h4>File types</h4>
+<ul>
+<li>f32: 32-bit little-endian floating-point binary.</li>
+<li>txt: ASCII text.</li>
+<li>gz: Gzipped ASCII text.</li>
+</ul>
+{%- endif %}
+
+{% endblock content %}

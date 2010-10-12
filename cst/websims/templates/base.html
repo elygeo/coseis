@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+
+<title>{{ title }}</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8"/>
+<meta name="robots" content="noindex"/>
+<base href="{{ base }}"/>
+<link rel="icon" href="favicon.ico" type="image/x-icon"/>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+
+</head>
+<body>
+
+<h1 class="title"><a href="index.html">WebSims</a></h1>
+
+<ul class="navbar">
+<li><a href="index.html">Catalog</a></li>
+<li><a href="about.html">About</a></li>
+<li>
+<form class="navbar" action="/websims/app">
+<input type="text" size="30" name="search" value="{{ search }}">
+<input type="submit" value="Search">
+</form>
+</li>
+</ul>
+{%- block content %}{{ content }}{% endblock -%}
+
+</body>
+</html>

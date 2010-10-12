@@ -23,203 +23,60 @@ of the Computational Siesmology Tools (Coseis_).
 .. _web.py:     http://webpy.org/
 .. _Coseis:     http://earth.usc.edu/~gely/coseis/www/
 """
-import os, sys, re, gzip, time, cStringIO, shutil
+import os, sys, re, gzip, time, cStringIO, shutil, itertools
 import numpy as np
-import web
-from docutils.core import publish_parts
-from . import conf, html, plot
+import web, jinja2, docutils.core
+from . import conf, plot
 from .. import util
 
 port = '8081'
-baseurl = '/websims'
 cache_max_age = 86400
+cache_max_age = 0
 urls = (
-    baseurl + '/app',			'main',
-    baseurl + '/app/image/(.+)',	'image',
-    baseurl + '/app/download/(.+)',	'download',
-    baseurl + '/app/click1d/(.+)',	'click1d',
-    baseurl + '/app/click2d/(.+)',	'click2d',
-    baseurl + '(.*)',			'serve_static',
+    '/websims/app',			'main',
+    '/websims/app/image/(.+)',		'image',
+    '/websims/app/download/(.+)',	'download',
+    '/websims/app/click1d/(.+)',	'click1d',
+    '/websims/app/click2d/(.+)',	'click2d',
+    '/websims/(.*)',			'serve_static',
 )
 
-
-class wtf():
-    def GET( self, url ):
-        return url
+templates = os.path.join( os.path.dirname( __file__ ), 'templates' )
+loader = jinja2.FileSystemLoader( templates )
+jinja_env = jinja2.Environment( loader=loader )
 
 
 class serve_static():
+    """
+    Serve static files with built-in CherryPy server.
+    """
     def GET( self, url ):
-        raise web.seeother( '/static' + url )
+        raise web.seeother( '/static/' + url )
 
 
 def start( debug=True ):
+    """
+    Prepare static files and start server.
+    """
     print time.strftime( '%Y-%m-%d %H:%M:%S: WebSims started', time.localtime() )
     sys.argv = [sys.argv[0], port]
     web.config.debug = debug
     d = os.path.dirname( __file__ )
     for f in os.listdir( os.path.join( d, 'static' ) ):
         f1 = os.path.join( d, 'static', f )
-        f2 = os.path.join( 'static', f )
-        shutil.copy2( f1, f2 )
-    about = publish_parts( __doc__, writer_name='html4css1' )['body']
-    about = (
-        html.main.head % dict( title='About WebSims', baseurl=baseurl, search='', style=html.style ) +
-        html.main.section % dict( title='About WebSims', content=about ) +
-        html.main.foot
-    )
-    open( os.path.join( 'static', 'about.html' ), 'w' ).write( about )
+        shutil.copy2( f1, f )
+    content = docutils.core.publish_parts( __doc__, writer_name='html4css1' )['body']
+    html = jinja_env.get_template( 'base.html' )
+    html = html.render( title='About WebSims', content=content )
+    open( os.path.join( 'about.html' ), 'w' ).write( html )
     index()
     app.run()
     return
 
 
-class main:
-    def GET( self ):
-        w = web.input( ids=[], t='', decimate='', x='', lowpass='', search='' )
-        w.ids = ','.join( w.ids )
-        w.title = 'WebSims'
-        w.baseurl = baseurl
-        w.ext = '.png'
-        web.header( 'Content-Type', 'text/html' )
-        if w.ids == '':
-            web.header( 'Cache-Control', 'max-age=%s' % 60 )
-            return index( w )
-        elif w.x != '':
-            web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
-            return show1d( w )
-        else:
-            web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
-            return show2d( w )
-
-
-class image:
-    def GET( self, filename ):
-        w = web.input( ids=[], t='', decimate='', x='', lowpass='' )
-        ids = ','.join( w.ids ).split(',')
-        web.header( 'Content-Type', 'image/png' )
-        web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
-        if w.x != '':
-            return plot.plot1d( ids, filename, w.x, w.lowpass )
-        else:
-            return plot.plot2d( ids[0], filename, w.t, w.decimate )
-
-
-class click2d:
-    """
-    Click 2d axes and load 1d plot.
-    """
-    def GET( self, id_ ):
-        w = web.input()
-        x = '0.0'
-        if len( w ) > 0:
-            ids = id_.split(',')
-            f  = os.path.join( conf.repo[0], ids[0], conf.meta )
-            m  = util.load( f )
-            jj = w.keys()[0].split(',')
-            ndim = len( m.x_shape )
-            shape = m.x_shape[:-1]
-            delta = m.x_delta[:-1]
-            aspect = abs( delta[1] / delta[0] ) * shape[1] / shape[0]
-            if aspect < 1.:
-                j0 = 100, 50 + int( aspect * 800 )
-                j1 = 900, 50
-            else:
-                jj = jj[::-1]
-                j0 = 50 + int( 1.0 / aspect * 800 ), 100
-                j1 = 50, 900
-            x = (ndim - 1) * ['1']
-            for i in 0, 1:
-                j = int( jj[i] ) % (j0[i] + j1[i])
-                j = (int( jj[i] ) - j0[i]) * (shape[i] - 1) // (j1[i] - j0[i]) + 1
-                j = max( 1, min( shape[i], j ) )
-                if delta[i] < 0.0:
-                    j = shape[i] - j + 1
-                x[i] = str( (j - 1) * abs( delta[i] ) )
-            x = ','.join( x )
-        raise web.seeother( '%s/app?ids=%s&x=%s' % (baseurl, id_, x) )
-
-
-class click1d:
-    """
-    Click plot time axis and load time slice.
-    """
-    def GET( self, id_ ):
-        w = web.input()
-        t = '0.0'
-        if len( w ) > 0:
-            ids = id_.split(',')
-            f  = os.path.join( conf.repo[0], ids[0], conf.meta )
-            m  = util.load( f )
-            j  = int( w.keys()[0].split(',')[0] )
-            nt = m.x_shape[-1]
-            dt = m.x_delta[-1]
-            j0 = 100
-            j1 = 900
-            j  = (j - j0) * (nt - 1) // (j1 - j0) + 1
-            j  = max( 1, min( nt, j ) )
-            t  = str( (j - 1) * dt )
-        raise web.seeother( '%s/app?ids=%s&t=%s' % (baseurl, id_, t) )
-
-
-class download:
-    def GET( self, filename ):
-        w = web.input()
-        f = os.path.join( conf.repo[0], w.ids, conf.meta )
-        m = util.load( f )
-        indices = [ int(i) for i in w.j.split( ',' ) ]
-        root, ext = os.path.splitext( filename )
-        found = True
-        if root in [ f for pane in m.t_panes for f in pane[0] ]:
-            shape = m.t_shape
-        elif root in [ pane[0] for pane in m.x_panes ]:
-            shape = m.x_shape
-        elif root in [ pane[0] for pane in m.x_static_panes ]:
-            shape = list( m.x_shape[:-1] ) + [1]
-        else:
-            found = False
-        for d in conf.repo:
-            f = os.path.join( d, w.ids, root )
-            if os.path.exists( f ):
-                break
-        else:
-            found = False
-        if not found:
-            web.header( 'Content-Type', 'text/html' )
-            raise web.notfound()
-        v = util.ndread( f, shape, indices, dtype=m.dtype )
-        web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
-        if ext == '.txt':
-            out = cStringIO.StringIO()
-            np.savetxt( out, v )
-            web.header( 'Content-Type', 'text/plain' )
-            return out.getvalue()
-        elif ext == '.gz':
-            out = cStringIO.StringIO()
-            gz = gzip.GzipFile( root, 'wb', 9, out )
-            np.savetxt( gz, v )
-            gz.close()
-            web.header( 'Content-Type', 'application/x-gzip' )
-            return out.getvalue()
-        elif ext == '.f32':
-            web.header( 'Content-Type', 'application/octet-stream' )
-            return v.tostring()
-        else:
-            print( 'Unknown file type: ' + filename )
-            web.header( 'Content-Type', 'text/html' )
-            web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
-            out = (
-                html.main.head +
-                '<h2>Error</h2>\n' +
-                '<div>Unknown file type: %s</div>\n' % filename +
-                html.main.foot
-            )
-            return out % dict( title='WebSims', baseurl=baseurl, search='', style=html.style )
-
-
 def findmembers( top='.', path='', member='.member', group='.group', ignore='.ignore' ):
     """
-    Walk thourgh directory tree looking for members and groups
+    Walk thourgh directory tree looking for members and groups.
     """
     if os.path.exists( os.path.join( top, path, ignore ) ):
         return []
@@ -238,164 +95,207 @@ def findmembers( top='.', path='', member='.member', group='.group', ignore='.ig
     return sorted( list_ )
 
 
-def index( w=web.storage( search='' ) ):
+def index( query={} ):
     """
     Build list of simulations.
     """
-    out = html.main.head + html.index.head
+    if 'search' in query:
+        grep = re.compile( query.search, re.IGNORECASE )
+    items = []
     include = True
-    if w.search:
-        grep = re.compile( w.search, re.IGNORECASE )
-    list_ = findmembers( conf.repo[0], '', conf.meta, '.wsgroup', '.wsignore' )
-    for ids in list_:
+    for ids in findmembers( conf.repo[0], '', conf.meta, '.wsgroup', '.wsignore' ):
+        grouped = False
         if type( ids ) == str:
-            f = os.path.join( conf.repo[0], ids, conf.meta )
-            if w.search:
-                include = grep.search( open( f, 'r' ).read() )
+            ids = [ids]
+        elif len( ids ) > 1:
+            grouped = True
+        for id_ in sorted( ids ):
+            path = os.path.join( conf.repo[0], id_, conf.meta )
+            code = open( path, 'r' ).read()
+            if 'search' in query:
+                include = grep.search( code )
             if include:
-                d = dict()
+                meta = dict()
                 try:
-                    exec open( f ) in d
+                    exec code in meta
                 except:
-                    d.update( title='ERROR', author='', rundate='' )
-                d.update( baseurl=baseurl, id=ids, index=conf.index, meta=conf.meta )
-                out += html.index.item_solo % d
-                if not w.search:
-                    d = web.storage( ids=ids, t='', decimate='', x='', lowpass='',
-                        search='', baseurl=baseurl, ext='.png', disk=True )
-                    show2d( d )
-        else:
-            group = ''
-            for id_ in sorted( ids ):
-                f = os.path.join( conf.repo[0], id_, conf.meta )
-                if w['search']:
-                    include = grep.search( open( f, 'r' ).read() )
-                if include:
-                    d = dict()
-                    try:
-                        exec open( f ) in d
-                    except:
-                        d.update( title='ERROR', author='', rundate='' )
-                    d.update( baseurl=baseurl, id=id_, index=conf.index, meta=conf.meta )
-                    group += html.index.item_grouped % d
-                    if not w.search:
-                        d = web.storage( ids=id_, t='', decimate='', x='', lowpass='',
-                            search='', baseurl=baseurl, ext='.png', disk=True )
-                        show2d( d )
-            if group:
-                out += group + html.index.group_end
-    out += html.index.foot + html.main.foot
-    out = out % dict( baseurl=baseurl, search=w.search, title='WebSims', style=html.style )
-    if not w.search:
-        open( os.path.join( 'static', 'index.html' ), 'w' ).write( out )
-    return out
+                    meta = dict( title='ERROR', author='', rundate='' )
+                meta.update(
+                    id = id_,
+                    grouped = grouped,
+                    meta  = 'repo/' + id_ + '/' + conf.meta,
+                    index = 'repo/' + id_ + '/' + conf.index,
+                    files = 'repo/' + id_ + '/',
+                )
+                items += [meta]
+
+                # cache to disk if not static
+                if 'search' not in query:
+                    show2d( web.storage( ids=id_ ) )
+
+        # mark last member of a group for submit button
+        if len( items ) and items[-1]['grouped']:
+            items[-1].update( endgroup=True )
+
+    # process template
+    html = jinja_env.get_template( 'index.html' )
+    html = html.render( title='WebSims', items=items, **query )
+
+    # cache to disk if not static
+    if 'search' not in query:
+        open( os.path.join( 'index.html' ), 'w' ).write( html )
+
+    return html
 
 
-def show2d( w ):
+def error( message ):
+    """
+    Error page.
+    """
+    content = '<h2>Error</h2>\n<div>%s</div>\n' % message
+    html = jinja_env.get_template( 'base.html' )
+    html = html.render( title='Error', base='/websims/', content=content )
+    web.header( 'Content-Type', 'text/html' )
+    web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
+    return html
+
+
+def show2d( query ):
     """
     2D slice page.
     """
-    time = w.t
-    ids = w.ids.split( ',' )
-    group = ids[0].split( '/' )[0]
-    static = time == ''
-    for id_ in ids[1:]:
-        group0 = group
-        group = id_.split( '/' )[0]
-        if group != group0:
-            out = (
-               html.main.head +
-               '<h2>Error</h2>\n' +
-               '<div>Incompatible comparison pair: %s, %s</div>\n' %
-               (group0, group) +
-               html.main.foot
-            )
-            web.header( 'Content-Type', 'text/html' )
-            web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
-            return out % dict( title='Error', baseurl=baseurl, search='', style=html.style )
-    f = os.path.join( conf.repo[0], ids[0], conf.meta )
-    m = util.load( f )
-    outp = ''
-    outd = ''
-    w.style = html.style
-    w.title = m.title
-    if static:
-        w.subtitle = m.x_static_title
-        panes = m.x_static_panes
-    else:
-        w.subtitle = m.x_title
-        panes = m.x_panes
-    if hasattr( m, 'notes' ):
-        w.notes = publish_parts( m.notes, writer_name='html4css1' )['body']
-    else:
-        w.notes = ''
-    for ipane in range( len( panes ) ):
-        for id_ in ids:
-            f = os.path.join( conf.repo[0], id_, conf.meta )
-            m = util.load( f )
-            dt = m.x_delta[-1]
-            ndim = len( m.x_shape )
-            indices = [0, 0] + [1] * (ndim - 2)
-            if static:
-                panes = m.x_static_panes
+
+    # parameters
+    ext = '.png'
+    ids = query.ids.split( ',' )
+    compare = len( ids ) > 1
+    snapshot = 't' in query
+    cache_img = not snapshot and 'decimate' not in query
+    cache_html = not snapshot and 'decimate' not in query and not compare
+    groups = set( i.split( '/' )[0] for i in ids )
+    if len( groups ) > 1:
+        return error( 'Incompatible comparison: %s' % list( groups ) )
+
+    # lists
+    x_ids = []
+    t_ids = []
+    plots = []
+    downloads = []
+
+    # loop over ids
+    for id_ in ids:
+
+        # metadata
+        meta = os.path.join( conf.repo[0], id_, conf.meta )
+        meta = util.load( meta )
+        delta = meta.x_delta
+        shape = meta.x_shape
+        panes = meta.x_static_panes
+        indices = [0, 0] + [1] * (len( shape ) - 2)
+        if snapshot:
+            panes = meta.x_panes
+            indices[-1] = int( float( query.t ) / delta[-1] + 1.5 )
+        if meta.x_panes:
+            x_ids += [id_]
+        if meta.t_panes:
+            t_ids += [id_]
+        plots += [[]]
+        downloads += [[]]
+
+        # loop over panes
+        for ipane in range( len( panes ) ):
+
+            # plots
+            path = panes[ipane][0]
+            if cache_img:
+                plot.plot2d( id_, path + ext )
+                url = 'repo/' + id_ + '/' + path + ext
             else:
-                indices[-1] = int( float( time ) / dt + 1.5 )
-                panes = m.x_panes
-            w.id = id_
-            w.path = panes[ipane][0]
-            w.root = os.path.basename( w.path )
-            w.name = m.label + panes[ipane][1]
-            w.j = ','.join( [ str( i ) for i in indices ] )
-            w.n = ','.join( [ str( i ) for i in m.x_shape[:2] ] )
-            if static:
-                plot.plot2d( id_, w.path )
-                if m.t_panes:
-                    outp += html.plot.click2d_static % dict( w )
-                else:
-                    outp += html.plot.plot2d_static % dict( w )
-            else:
-                if m.t_panes:
-                    outp += html.plot.click2d % dict( w )
-                else:
-                    outp += html.plot.plot2d % dict( w )
-            if m.downloadable:
-                outd += html.download.item % dict( w )
-    out = html.main.head + html.form.head
-    if m.x_panes:
-        out += html.form.form2d
-    if m.t_panes:
-        out += html.form.form1d
-    out += html.form.foot + html.plot.head + outp + html.plot.foot
-    if m.downloadable:
-        out += html.download.head + outd + html.download.foot
-    out += html.main.foot
-    w.x = ''
-    w.axes = ','.join( m.t_axes[1:] )
-    xlim = [ abs(n * d) for n, d in zip( m.t_shape[1:], m.t_delta[1:] ) ]
-    w.xlim = ', '.join( [ '0-%s%s' % (l, u) for l, u in zip( xlim, m.t_unit[1:] ) ] )
-    w.flim = '0-%s%s' % (0.5 / m.t_delta[0], 'Hz')
-    w.tlim = '0-%s%s' % (m.x_delta[-1] * m.x_shape[-1], m.x_unit[-1])
-    if w.decimate == '':
-        w.decimate = m.x_decimate
-    out = out % dict( w )
-    if static and len( ids ) == 1:
+                url = '/websims/app/image/' + path + ext + '?'
+                for k in 'ids', 't', 'decimate':
+                    if k in query:
+                        url += '&%s=%s' % (k, query[k])
+            plots[-1] += [url]
+
+            # downloads
+            if meta.downloadable:
+                downloads[-1] += [ dict(
+                    label = '%s%s, shape=%s' % (meta.label, panes[ipane][1], shape[:2]),
+                    url = '/websims/app/download/' + path,
+                    query = 'ids=%s&j=%s' % (id_, ','.join( [ str(i) for i in indices ] ) ),
+                    root = os.path.basename( path ),
+                ) ]
+
+    # metadata
+    plots = list( itertools.chain( *itertools.izip_longest( *plots ) ) )
+    downloads = list( itertools.chain( *itertools.izip_longest( *downloads ) ) )
+    x_ids = ','.join( x_ids )
+    t_ids = ','.join( t_ids )
+    click = '/websims/app/click2d/' + t_ids
+    axes = ','.join( meta.t_axes[1:] )
+    xlim = [ abs(n * d) for n, d in zip( meta.t_shape[1:], meta.t_delta[1:] ) ]
+    xlim = ', '.join( [ '0-%s%s' % (l, u) for l, u in zip( xlim, meta.t_unit[1:] ) ] )
+    flim = '0-%s%s' % (0.5 / meta.t_delta[0], 'Hz')
+    tlim = '0-%s%s' % (meta.x_delta[-1] * meta.x_shape[-1], meta.x_unit[-1])
+    title = meta.title
+    notes = ''
+    if cache_html:
+        base = '/'.join( ['..'] * (len( id_.split( '/' ) ) + 1) )
+    else:
+        base = ''
+    if snapshot:
+        subtitle = meta.x_title
+    else:
+        subtitle = meta.x_static_title
+    if compare:
+        home = '/websims/app?ids=' + query.ids
+    else:
+        home = 'repo/' + query.ids + '/' + conf.index
+    if hasattr( meta, 'notes' ):
+        notes = docutils.core.publish_parts( meta.notes, writer_name='html4css1' )['body']
+
+    # process template
+    html = jinja_env.get_template( 'show.html' )
+    html = html.render(
+        base=base, home=home, title=title, subtitle=subtitle, notes=notes,
+        axes=axes, xlim=xlim, flim=flim, tlim=tlim, x_ids=x_ids, t_ids=t_ids,
+        click=click, plots=plots, downloads=downloads, **query
+    )
+
+    # cache to disk if static
+    if cache_html:
         f = os.path.join( conf.repo[0], ids[0], conf.index )
-        open( f, 'w' ).write( out )
-    return out
+        open( f, 'w' ).write( html )
+
+    return html
 
 
-def show1d( w ):
+def show1d( query ):
     """
     Time history page
     """
-    ids = w.ids.split( ',' )
-    xx = w.x.split( ',' )
-    download = ''
+
+    # parameters
+    ext = '.png'
+    xx = query.x.split( ',' )
+    ids = query.ids.split( ',' )
+    compare = len( ids ) > 1
+
+    # lists
+    x_ids = []
+    t_ids = []
+    plots = []
+    downloads = []
+
+    # downloads
     for id_ in ids:
-        w.id = id_
-        f = os.path.join( conf.repo[0], id_, conf.meta )
-        meta = util.load( f )
-        if meta.downloadable:
+        meta = os.path.join( conf.repo[0], id_, conf.meta )
+        meta = util.load( meta )
+        if meta.x_panes:
+            x_ids += [id_]
+        if meta.t_panes:
+            t_ids += [id_]
+        if 0:
             shape = meta.t_shape[1:]
             delta = meta.t_delta[1:]
             indices = ['0']
@@ -403,47 +303,186 @@ def show1d( w ):
                 i = int( float( x ) / abs( dx ) + 1.5 )
                 indices += [str(i)]
                 if i < 1 or i > n:
-                    web.header( 'Content-Type', 'text/html' )
-                    out = (
-                        html.main.head +
-                        'Location (%(x)s) out of range' +
-                        html.main.foot
-                    )
-                    return out % dict( w )
-            w.j = ','.join( indices )
-            w.n = meta.t_shape[0]
+                    return error( 'Location (%(x)s) out of range' % query.x )
+            meta.j = ','.join( indices )
+            meta.n = meta.t_shape[0]
             for pane in meta.t_panes:
                 if len( pane ) <= 2 or pane[2] == None:
-                    w.name = meta.label + pane[1]
-                    w.baseurl = baseurl
+                    meta.name = meta.label + pane[1]
                     for filename in pane[0]:
-                        w.path = filename
-                        w.root = os.path.basename( filename )
-                        download += html.download.item % dict( w )
-    if hasattr( meta, 'notes' ):
-        w.notes = publish_parts( meta.notes, writer_name='html4css1' )['body']
-    else:
-        w.notes = ''
-    w.style = html.style
-    w.title = meta.title
-    w.subtitle = meta.t_title
-    w.axes = ','.join( meta.t_axes[1:] )
+                        query.path = filename
+                        query.root = os.path.basename( filename )
+
+    # metadata
+    title = meta.title
+    subtitle = meta.t_title
+    x_ids = ','.join( x_ids )
+    t_ids = ','.join( t_ids )
+    axes = ','.join( meta.t_axes[1:] )
     xlim = [ abs(n * d) for n, d in zip( meta.t_shape[1:], meta.t_delta[1:] ) ]
-    w.xlim = ', '.join( [ '0-%s%s' % (l, u) for l, u in zip( xlim, meta.t_unit[1:] ) ] )
-    w.flim = '0-%s%s' % (0.5 / meta.t_delta[0], 'Hz')
-    w.tlim = '0-%s%s' % (meta.x_delta[-1] * meta.x_shape[-1], meta.x_unit[-1])
-    out = html.main.head + html.form.head
-    if meta.x_panes:
-        out += html.form.form2d + html.form.form1d + html.form.foot + html.plot.click1d
+    xlim = ', '.join( [ '0-%s%s' % (l, u) for l, u in zip( xlim, meta.t_unit[1:] ) ] )
+    flim = '0-%s%s' % (0.5 / meta.t_delta[0], 'Hz')
+    tlim = '0-%s%s' % (meta.x_delta[-1] * meta.x_shape[-1], meta.x_unit[-1])
+    if compare:
+        home = '/websims/app?ids=' + query.ids
     else:
-        out += html.form.form1d + html.form.foot + html.plot.plot1d
-    if meta.downloadable:
-        out += html.download.head + download + html.download.foot
-    out += html.main.foot
-    web.header( 'Content-Type', 'text/html' )
-    web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
-    out = out % dict( w )
-    return out
+        home = 'repo/' + query.ids + '/' + conf.index
+    if hasattr( meta, 'notes' ):
+        notes = docutils.core.publish_parts( meta.notes, writer_name='html4css1' )['body']
+    else:
+        notes = ''
+
+    # urls
+    click = '/websims/app/click1d/' + x_ids
+    img = '/websims/app/image/plot' + ext + '?'
+    for k in 'ids', 'x', 'lowpass':
+        if k in query:
+            img += '&%s=%s' % (k, query[k])
+    plots = [img]
+
+    # process template
+    html = jinja_env.get_template( 'show.html' )
+    html = html.render(
+        home=home, title=title, subtitle=subtitle, notes=notes,
+        axes=axes, xlim=xlim, flim=flim, tlim=tlim,
+        x_ids=x_ids, t_ids=t_ids, plots=plots, click=click, **query
+    )
+
+    return html
+
+
+class main:
+    """
+    Main dispatch page.
+    """
+    def GET( self ):
+        web.header( 'Content-Type', 'text/html' )
+        query = web.input( ids=[] )
+        query.ids = ','.join( query.ids )
+        if not query.ids:
+            web.header( 'Cache-Control', 'max-age=%s' % 60 )
+            return index( query )
+        elif 'x' in query:
+            web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
+            return show1d( query )
+        else:
+            web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
+            return show2d( query )
+
+
+class image:
+    def GET( self, filename ):
+        web.header( 'Content-Type', 'image/png' )
+        web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
+        query = web.input( ids=[], decimate='', lowpass='' )
+        query.ids = ','.join( query.ids )
+        if 'x' in query:
+            return plot.plot1d( query.ids, query.x, query.lowpass )
+        else:
+            return plot.plot2d( query.ids, filename, query.t, query.decimate )
+
+
+class click2d:
+    """
+    Click 2d axes and load 1d plot.
+    """
+    def GET( self, id_ ):
+        query = web.input()
+        x = '0.0'
+        if len( query ) > 0:
+            ids = id_.split(',')
+            path = os.path.join( conf.repo[0], ids[0], conf.meta )
+            meta = util.load( path )
+            jj = query.keys()[0].split(',')
+            ndim = len( meta.x_shape )
+            shape = meta.x_shape[:-1]
+            delta = meta.x_delta[:-1]
+            aspect = abs( delta[1] / delta[0] ) * shape[1] / shape[0]
+            if aspect < 1.:
+                j0 = 100, 50 + int( aspect * 800 )
+                j1 = 900, 50
+            else:
+                jj = jj[::-1]
+                j0 = 50 + int( 1.0 / aspect * 800 ), 100
+                j1 = 50, 900
+            x = (ndim - 1) * ['1']
+            for i in 0, 1:
+                j = int( jj[i] ) % (j0[i] + j1[i])
+                j = (int( jj[i] ) - j0[i]) * (shape[i] - 1) // (j1[i] - j0[i]) + 1
+                j = max( 1, min( shape[i], j ) )
+                if delta[i] < 0.0:
+                    j = shape[i] - j + 1
+                x[i] = str( (j - 1) * abs( delta[i] ) )
+            x = ','.join( x )
+        raise web.seeother( '/websims/app?ids=%s&x=%s' % (id_, x) )
+
+
+class click1d:
+    """
+    Click plot time axis and load time slice.
+    """
+    def GET( self, id_ ):
+        query = web.input()
+        t = '0.0'
+        if len( query ) > 0:
+            ids = id_.split(',')
+            path = os.path.join( conf.repo[0], ids[0], conf.meta )
+            meta = util.load( path )
+            j  = int( query.keys()[0].split(',')[0] )
+            nt = meta.x_shape[-1]
+            dt = meta.x_delta[-1]
+            j0 = 100
+            j1 = 900
+            j  = (j - j0) * (nt - 1) // (j1 - j0) + 1
+            j  = max( 1, min( nt, j ) )
+            t  = str( (j - 1) * dt )
+        raise web.seeother( '/websims/app?ids=%s&t=%s' % (id_, t) )
+
+
+class download:
+    def GET( self, filename ):
+        query = web.input()
+        path = os.path.join( conf.repo[0], query.ids, conf.meta )
+        meta = util.load( path )
+        indices = [ int(i) for i in query.j.split( ',' ) ]
+        root, ext = os.path.splitext( filename )
+        found = True
+        if root in [ f for pane in meta.t_panes for f in pane[0] ]:
+            shape = meta.t_shape
+        elif root in [ pane[0] for pane in meta.x_panes ]:
+            shape = meta.x_shape
+        elif root in [ pane[0] for pane in meta.x_static_panes ]:
+            shape = list( meta.x_shape[:-1] ) + [1]
+        else:
+            found = False
+        for d in conf.repo:
+            path = os.path.join( d, query.ids, root )
+            if os.path.exists( path ):
+                break
+        else:
+            found = False
+        if not found:
+            web.header( 'Content-Type', 'text/html' )
+            raise web.notfound()
+        v = util.ndread( f, shape, indices, dtype=meta.dtype )
+        web.header( 'Cache-Control', 'max-age=%s' % cache_max_age )
+        if ext == '.txt':
+            out = cStringIO.StringIO()
+            np.savetxt( out, v )
+            web.header( 'Content-Type', 'text/plain' )
+            return out.getvalue()
+        elif ext == '.gz':
+            out = cStringIO.StringIO()
+            gz = gzip.GzipFile( root, 'wb', 9, out )
+            np.savetxt( gz, v )
+            gz.close()
+            web.header( 'Content-Type', 'application/x-gzip' )
+            return out.getvalue()
+        elif ext == '.f32':
+            web.header( 'Content-Type', 'application/octet-stream' )
+            return v.tostring()
+        else:
+            return error( 'Unknown file type: ' + filename )
 
 
 app = web.application( urls, globals() )
