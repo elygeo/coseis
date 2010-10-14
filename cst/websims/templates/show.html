@@ -39,6 +39,7 @@
 <div style="clear: both"></div>
 
 {#- plots #}
+<div>
 {% if click %}
 {%- for item in plots %}
 <a href="{{ click }}"><img class="plot" src="{{ item|e }}" alt="plot" ismap></a><br>
@@ -48,6 +49,7 @@
 <img class="plot" src="{{ item|e }}" alt="plot"><br>
 {%- endfor %}
 {%- endif %}
+</div>
 
 {#- downloads #}
 {% if downloads %}

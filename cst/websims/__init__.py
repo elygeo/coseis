@@ -46,21 +46,10 @@ loader = jinja2.FileSystemLoader( templates )
 jinja_env = jinja2.Environment( loader=loader )
 
 
-class serve_static():
+def prep():
     """
-    Serve static files with built-in CherryPy server.
+    Prepare static files.
     """
-    def GET( self, url ):
-        raise web.seeother( '/static/' + url )
-
-
-def start( debug=True ):
-    """
-    Prepare static files and start server.
-    """
-    print time.strftime( '%Y-%m-%d %H:%M:%S: WebSims started', time.localtime() )
-    sys.argv = [sys.argv[0], port]
-    web.config.debug = debug
     d = os.path.dirname( __file__ )
     for f in os.listdir( os.path.join( d, 'static' ) ):
         f1 = os.path.join( d, 'static', f )
@@ -70,8 +59,26 @@ def start( debug=True ):
     html = html.render( title='About WebSims', content=content )
     open( os.path.join( 'about.html' ), 'w' ).write( html )
     index()
+    return
+
+
+def start( debug=True ):
+    """
+    Start server.
+    """
+    print time.strftime( '%Y-%m-%d %H:%M:%S: WebSims started', time.localtime() )
+    sys.argv = [sys.argv[0], port]
+    web.config.debug = debug
     app.run()
     return
+
+
+class serve_static():
+    """
+    Serve static files with built-in CherryPy server.
+    """
+    def GET( self, url ):
+        raise web.seeother( '/static/' + url )
 
 
 def findmembers( top='.', path='', member='.member', group='.group', ignore='.ignore' ):
@@ -176,12 +183,6 @@ def show2d( query ):
     if len( groups ) > 1:
         return error( 'Incompatible comparison: %s' % list( groups ) )
 
-    # base url
-    if cache_html:
-        base = '../' * (len( ids[0].split( '/' ) ) + 1)
-    else:
-        base = ''
-
     # lists
     x_ids = []
     t_ids = []
@@ -216,7 +217,10 @@ def show2d( query ):
             path = pane[0]
             if cache_img:
                 plot.plot2d( id_, path + ext )
-                url = base + 'repo/' + id_ + '/' + path + ext
+                if cache_html:
+                    url = path + ext
+                else:
+                    url = 'repo/' + id_ + '/' + path + ext
             else:
                 url = '/websims/app/image/' + path + ext + '?'
                 for k in 'ids', 't', 'decimate':
@@ -245,17 +249,23 @@ def show2d( query ):
     flim = '0-%g%s' % (0.5 / meta.t_delta[0], 'Hz')
     tlim = '0-%g%s' % (meta.x_delta[-1] * meta.x_shape[-1], meta.x_unit[-1])
     title = meta.title
-    notes = ''
     if snapshot:
         subtitle = meta.x_title
     else:
         subtitle = meta.x_static_title
-    if compare:
+    if cache_html:
+        home = conf.index
+        base = '../' * (len( ids[0].split( '/' ) ) + 1)
+    elif compare:
         home = '/websims/app?ids=' + query.ids
+        base = ''
     else:
-        home = base + 'repo/' + query.ids + '/' + conf.index
+        home = 'repo/' + query.ids + '/' + conf.index
+        base = ''
     if hasattr( meta, 'notes' ):
         notes = docutils.core.publish_parts( meta.notes, writer_name='html4css1' )['body']
+    else:
+        notes = ''
 
     # process template
     html = jinja_env.get_template( 'show.html' )
