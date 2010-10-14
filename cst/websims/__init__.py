@@ -176,6 +176,12 @@ def show2d( query ):
     if len( groups ) > 1:
         return error( 'Incompatible comparison: %s' % list( groups ) )
 
+    # base url
+    if cache_html:
+        base = '../' * (len( ids[0].split( '/' ) ) + 1)
+    else:
+        base = ''
+
     # lists
     x_ids = []
     t_ids = []
@@ -210,7 +216,7 @@ def show2d( query ):
             path = pane[0]
             if cache_img:
                 plot.plot2d( id_, path + ext )
-                url = 'repo/' + id_ + '/' + path + ext
+                url = base + 'repo/' + id_ + '/' + path + ext
             else:
                 url = '/websims/app/image/' + path + ext + '?'
                 for k in 'ids', 't', 'decimate':
@@ -235,15 +241,11 @@ def show2d( query ):
     click = '/websims/app/click2d/' + t_ids
     axes = ','.join( meta.t_axes[1:] )
     xlim = [ abs(n * d) for n, d in zip( meta.t_shape[1:], meta.t_delta[1:] ) ]
-    xlim = ', '.join( [ '0-%s%s' % (l, u) for l, u in zip( xlim, meta.t_unit[1:] ) ] )
-    flim = '0-%s%s' % (0.5 / meta.t_delta[0], 'Hz')
-    tlim = '0-%s%s' % (meta.x_delta[-1] * meta.x_shape[-1], meta.x_unit[-1])
+    xlim = ', '.join( [ '0-%g%s' % (l, u) for l, u in zip( xlim, meta.t_unit[1:] ) ] )
+    flim = '0-%g%s' % (0.5 / meta.t_delta[0], 'Hz')
+    tlim = '0-%g%s' % (meta.x_delta[-1] * meta.x_shape[-1], meta.x_unit[-1])
     title = meta.title
     notes = ''
-    if cache_html:
-        base = '/'.join( ['..'] * (len( id_.split( '/' ) ) + 1) )
-    else:
-        base = ''
     if snapshot:
         subtitle = meta.x_title
     else:
@@ -251,7 +253,7 @@ def show2d( query ):
     if compare:
         home = '/websims/app?ids=' + query.ids
     else:
-        home = 'repo/' + query.ids + '/' + conf.index
+        home = base + 'repo/' + query.ids + '/' + conf.index
     if hasattr( meta, 'notes' ):
         notes = docutils.core.publish_parts( meta.notes, writer_name='html4css1' )['body']
 
@@ -329,9 +331,9 @@ def show1d( query ):
     t_ids = ','.join( t_ids )
     axes = ','.join( meta.t_axes[1:] )
     xlim = [ abs(n * d) for n, d in zip( meta.t_shape[1:], meta.t_delta[1:] ) ]
-    xlim = ', '.join( [ '0-%s%s' % (l, u) for l, u in zip( xlim, meta.t_unit[1:] ) ] )
-    flim = '0-%s%s' % (0.5 / meta.t_delta[0], 'Hz')
-    tlim = '0-%s%s' % (meta.x_delta[-1] * meta.x_shape[-1], meta.x_unit[-1])
+    xlim = ', '.join( [ '0-%g%s' % (l, u) for l, u in zip( xlim, meta.t_unit[1:] ) ] )
+    flim = '0-%g%s' % (0.5 / meta.t_delta[0], 'Hz')
+    tlim = '0-%g%s' % (meta.x_delta[-1] * meta.x_shape[-1], meta.x_unit[-1])
     if compare:
         home = '/websims/app?ids=' + query.ids
     else:
