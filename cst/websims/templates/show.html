@@ -13,8 +13,8 @@
 <input type="hidden" name="ids" value="{{ t_ids }}">
 <label for="x">{{ axes }} ({{ xlim }}):</label>
 <input id="x" type="text" size="12" name="x" value="{{ x }}"><br>
-<label for="t">Lowpass frequency ({{ flim }}s):</label>
-<input id="t" type="text" size="12" name="lowpass" value="{{ lowpass }}"><br>
+<label for="lowpass">Lowpass frequency ({{ flim }}s):</label>
+<input id="lowpass" type="text" size="12" name="lowpass" value="{{ lowpass }}"><br>
 <input type="submit" value="Plot">
 </fieldset>
 </form>
@@ -28,8 +28,8 @@
 <input type="hidden" name="ids" value="{{ x_ids }}">
 <label for="t">Time ({{ tlim }}):</label>
 <input id="t" type="text" size="12" name="t" value="{{ t }}"><br>
-<label for="x">Decimation interval:</label>
-<input id="x" type="text" size="12" name="decimate" value="{{ decimate }}"><br>
+<label for="decimate">Decimation interval:</label>
+<input id="decimate" type="text" size="12" name="decimate" value="{{ decimate }}"><br>
 <input type="submit" value="Plot">
 </fieldset>
 </form>
