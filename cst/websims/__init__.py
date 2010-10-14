@@ -218,12 +218,12 @@ def show2d( query ):
             if cache_img:
                 plot.plot2d( id_, path + ext )
                 if cache_html:
-                    url = path + ext
+                    url = '%s%s' % (path, ext)
                 else:
-                    url = 'repo/' + id_ + '/' + path + ext
+                    url = 'repo/%s/%s%s' % (id_, path, ext)
             else:
-                url = '/websims/app/image/' + path + ext + '?'
-                for k in 'ids', 't', 'decimate':
+                url = '/websims/app/image/%s%s?ids=%s' % (path, ext, id_)
+                for k in 't', 'decimate':
                     if k in query:
                         url += '&%s=%s' % (k, query[k])
             plots[-1] += [url]
@@ -355,8 +355,8 @@ def show1d( query ):
 
     # urls
     click = '/websims/app/click1d/' + x_ids
-    img = '/websims/app/image/plot' + ext + '?'
-    for k in 'ids', 'x', 'lowpass':
+    img = '/websims/app/image/plot' + ext + '?ids=' + query.ids
+    for k in 'x', 'lowpass':
         if k in query:
             img += '&%s=%s' % (k, query[k])
     plots = [img]
