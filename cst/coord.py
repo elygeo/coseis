@@ -417,8 +417,8 @@ class Transform():
             x += self.mat[0,2]
             y += self.mat[1,2]
         else:
-            x -= self.mat[0,2]
-            y -= self.mat[1,2]
+            x = x - self.mat[0,2]
+            y = y - self.mat[1,2]
             x, y = solve2( self.mat[:2,:2], [x, y] )
             if proj != None:
                 x, y = proj( x, y, **kwarg )
