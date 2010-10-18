@@ -266,13 +266,14 @@ def show2d( query ):
         notes = docutils.core.publish_parts( meta.notes, writer_name='html4css1' )['body']
     else:
         notes = ''
+    tooltip = 'Click axes location for time history plot.'
 
     # process template
     html = jinja_env.get_template( 'show.html' )
     html = html.render(
         base=base, home=home, title=title, subtitle=subtitle, notes=notes,
         axes=axes, xlim=xlim, flim=flim, tlim=tlim, x_ids=x_ids, t_ids=t_ids,
-        click=click, plots=plots, downloads=downloads, **query
+        tooltip=tooltip, click=click, plots=plots, downloads=downloads, **query
     )
 
     # cache to disk if static
@@ -352,6 +353,7 @@ def show1d( query ):
         notes = docutils.core.publish_parts( meta.notes, writer_name='html4css1' )['body']
     else:
         notes = ''
+    tooltip = 'Click time axis for snapshot plot.'
 
     # urls
     click = '/websims/app/click1d/' + x_ids
@@ -366,7 +368,7 @@ def show1d( query ):
     html = html.render(
         home=home, title=title, subtitle=subtitle, notes=notes,
         axes=axes, xlim=xlim, flim=flim, tlim=tlim, x_ids=x_ids, t_ids=t_ids,
-        click=click, plots=plots, downloads=downloads, **query
+        tooltip=tooltip, click=click, plots=plots, downloads=downloads, **query
     )
 
     return html

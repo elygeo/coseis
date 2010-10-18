@@ -42,7 +42,7 @@
 <div>
 {% if click %}
 {%- for item in plots %}
-<a href="{{ click }}"><img class="plot" src="{{ item|e }}" alt="plot" ismap></a><br>
+<a title="{{ tooltip }}" href="{{ click }}"><img class="plot" src="{{ item|e }}" alt="plot" ismap></a><br>
 {%- endfor %}
 {%- else %}
 {%- for item in plots %}
