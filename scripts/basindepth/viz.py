@@ -170,9 +170,9 @@ fig.scene.light_manager.lights[2].activate = False
 
 # surface plot
 n = shape[:2]
-x = np.fromfile( path + 'lon', 'f' ).reshape( n[::-1] ).T
-y = np.fromfile( path + 'lat', 'f' ).reshape( n[::-1] ).T
-z = np.fromfile( path + field, 'f' ).reshape( n[::-1] ).T * 0.001
+x = np.fromfile( path + 'lon.f32', 'f' ).reshape( n[::-1] ).T
+y = np.fromfile( path + 'lat.f32', 'f' ).reshape( n[::-1] ).T
+z = np.fromfile( path + field + '.f32', 'f' ).reshape( n[::-1] ).T * 0.001
 x, y = proj( x, y )
 if draft:
     x = x[::2]

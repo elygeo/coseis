@@ -5,12 +5,12 @@ import os
 
 seconds = 400
 nsample = None
-lon_file = 'lon'
-lat_file = 'lat'
-dep_file = 'dep'
-rho_file = 'rho'
-vp_file = 'vp'
-vs_file = 'vs'
+lon_file = 'lon.f32'
+lat_file = 'lat.f32'
+dep_file = 'dep.f32'
+rho_file = 'rho.f32'
+vp_file = 'vp.f32'
+vs_file = 'vs.f32'
 
 # command line options: (short, long, parameter, value)
 options = [

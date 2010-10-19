@@ -36,9 +36,9 @@ cfg = cst.cvm.stage( nsample=n, nproc=nproc )
 path = cfg.rundir
 
 # write CVM input files
-f1 = open( os.path.join( path, 'lon' ), 'wb' )
-f2 = open( os.path.join( path, 'lat' ), 'wb' )
-f3 = open( os.path.join( path, 'dep' ), 'wb' )
+f1 = open( os.path.join( path, 'lon.f32' ), 'wb' )
+f2 = open( os.path.join( path, 'lat.f32' ), 'wb' )
+f3 = open( os.path.join( path, 'dep.f32' ), 'wb' )
 for z in z:
     xx.tofile( f1 )
     yy.tofile( f2 )

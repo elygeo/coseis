@@ -58,17 +58,13 @@
 {%- for item in downloads %}
 <li>
 {{ item.label }}:
-<a href="{{ item.url|e }}.f32?{{ item.query|e }}">{{ item.root }}.f32</a>,
-<a href="{{ item.url|e }}.txt?{{ item.query|e }}">{{ item.root }}.txt</a>,
-<a href="{{ item.url|e }}.gz?{{  item.query|e }}">{{ item.root }}.gz</a>.
+<a href="{{ item.url|e }}.f32?{{ item.query|e }}">{{ item.root }}.f32</a>
 </li>
 {%- endfor %}
 </ul>
-<h4>File types</h4>
+<h4>File type</h4>
 <ul>
 <li>f32: 32-bit little-endian floating-point binary.</li>
-<li>txt: ASCII text.</li>
-<li>gz: Gzipped ASCII text.</li>
 </ul>
 {%- endif %}
 

@@ -79,23 +79,23 @@ if ( j > 0 .and. ( modulo( it, itio ) == 0 .or. it == nt ) ) then
         m = nt / itstats
         o = it / itstats - j
         gvstats = sqrt( gvstats )
-        call rio1( fh(1), gvstats(1,:j), 'w', 'stats/amax', m, o, mpout, verb )
-        call rio1( fh(2), gvstats(2,:j), 'w', 'stats/vmax', m, o, mpout, verb )
-        call rio1( fh(3), gvstats(3,:j), 'w', 'stats/umax', m, o, mpout, verb )
-        call rio1( fh(4), gvstats(4,:j), 'w', 'stats/wmax', m, o, mpout, verb )
+        call rio1( fh(1), gvstats(1,:j), 'w', 'stats/amax.bin', m, o, mpout, verb )
+        call rio1( fh(2), gvstats(2,:j), 'w', 'stats/vmax.bin', m, o, mpout, verb )
+        call rio1( fh(3), gvstats(3,:j), 'w', 'stats/umax.bin', m, o, mpout, verb )
+        call rio1( fh(4), gvstats(4,:j), 'w', 'stats/wmax.bin', m, o, mpout, verb )
         if ( dofault ) then
             gfstats(6,:j) = -gfstats(6,:j)
-            call rio1( fh(5),  gfstats(1,:j), 'w', 'stats/samax',   m, o, mpout, verb )
-            call rio1( fh(6),  gfstats(2,:j), 'w', 'stats/svmax',   m, o, mpout, verb )
-            call rio1( fh(7),  gfstats(3,:j), 'w', 'stats/sumax',   m, o, mpout, verb )
-            call rio1( fh(8),  gfstats(4,:j), 'w', 'stats/slmax',   m, o, mpout, verb )
-            call rio1( fh(9),  gfstats(5,:j), 'w', 'stats/tsmax',   m, o, mpout, verb )
-            call rio1( fh(10), gfstats(6,:j), 'w', 'stats/tnmin',   m, o, mpout, verb )
-            call rio1( fh(11), gfstats(7,:j), 'w', 'stats/tnmax',   m, o, mpout, verb )
-            call rio1( fh(12), gfstats(8,:j), 'w', 'stats/tarrmax', m, o, mpout, verb )
-            call rio1( fh(13), gestats(1,:j), 'w', 'stats/efric',   m, o, mpout, verb )
-            call rio1( fh(14), gestats(2,:j), 'w', 'stats/estrain', m, o, mpout, verb )
-            call rio1( fh(15), gestats(3,:j), 'w', 'stats/moment',  m, o, mpout, verb )
+            call rio1( fh(5),  gfstats(1,:j), 'w', 'stats/samax.bin',   m, o, mpout, verb )
+            call rio1( fh(6),  gfstats(2,:j), 'w', 'stats/svmax.bin',   m, o, mpout, verb )
+            call rio1( fh(7),  gfstats(3,:j), 'w', 'stats/sumax.bin',   m, o, mpout, verb )
+            call rio1( fh(8),  gfstats(4,:j), 'w', 'stats/slmax.bin',   m, o, mpout, verb )
+            call rio1( fh(9),  gfstats(5,:j), 'w', 'stats/tsmax.bin',   m, o, mpout, verb )
+            call rio1( fh(10), gfstats(6,:j), 'w', 'stats/tnmin.bin',   m, o, mpout, verb )
+            call rio1( fh(11), gfstats(7,:j), 'w', 'stats/tnmax.bin',   m, o, mpout, verb )
+            call rio1( fh(12), gfstats(8,:j), 'w', 'stats/tarrmax.bin', m, o, mpout, verb )
+            call rio1( fh(13), gestats(1,:j), 'w', 'stats/efric.bin',   m, o, mpout, verb )
+            call rio1( fh(14), gestats(2,:j), 'w', 'stats/estrain.bin', m, o, mpout, verb )
+            call rio1( fh(15), gestats(3,:j), 'w', 'stats/moment.bin',  m, o, mpout, verb )
             do i = 1, j
                 if ( gestats(3,i) > 0.0 ) then
                     gestats(3,i) = ( log10( gestats(3,i) ) - 9.05 ) / 1.5
@@ -103,7 +103,7 @@ if ( j > 0 .and. ( modulo( it, itio ) == 0 .or. it == nt ) ) then
                     gestats(3,i) = -999
                 end if
             end do
-            call rio1( fh(16), gestats(3,:j), 'w', 'stats/mw',      m, o, mpout, verb )
+            call rio1( fh(16), gestats(3,:j), 'w', 'stats/mw.bin',      m, o, mpout, verb )
         end if
     end if
     j = 0
