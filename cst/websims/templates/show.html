@@ -42,7 +42,7 @@
 <div>
 {% if click %}
 {%- for item in plots %}
-<a title="{{ tooltip }}" href="{{ click }}"><img class="plot" src="{{ item|e }}" alt="plot" ismap></a><br>
+<a title="{{ tooltip }}" href="{{ click }}"><img class="plot" src="{{ item|e }}" alt="plot" ismap></a>
 {%- endfor %}
 {%- else %}
 {%- for item in plots %}
@@ -58,13 +58,9 @@
 {%- for item in downloads %}
 <li>
 {{ item.label }}:
-<a href="{{ item.url|e }}.f32?{{ item.query|e }}">{{ item.root }}.f32</a>
+<a href="{{ item.url|e }}">{{ item.root }}</a>
 </li>
 {%- endfor %}
-</ul>
-<h4>File type</h4>
-<ul>
-<li>f32: 32-bit little-endian floating-point binary.</li>
 </ul>
 {%- endif %}
 

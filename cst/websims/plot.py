@@ -11,14 +11,18 @@ from .. import util
 from .. import plt as cst_plt
 
 
-def plot2d( id_, filename, time='', decimate='' ):
+def plot2d( id_, img_file, time='', decimate='' ):
     """
     2d image plot
     """
+
+    # if static search for cached image
     static = time == ''
-    fullfilename = os.path.join( conf.repo[0], id_, filename )
-    if conf.cache and static and os.path.exists( fullfilename ):
+    img_path = os.path.join( conf.repo[0], id_, img_file )
+    if conf.cache and static and os.path.exists( img_path ):
         return
+
+    # metadata
     path  = os.path.join( conf.repo[0], id_, conf.meta )
     meta  = util.load( path )
     delta = meta.x_delta
@@ -55,20 +59,37 @@ def plot2d( id_, filename, time='', decimate='' ):
         0, abs( delta[0] * (shape[0] - 1) ),
         0, abs( delta[1] * (shape[1] - 1) ),
     )
+
+    # setup figure
     inches = 10, height
     fig = plt.figure( None, inches )
     fig.clf()
     ax = fig.add_axes( [0.1, 0.5 / height, 0.835, 1.0 - 1.0 / height] )
-    root, ext = os.path.splitext( filename )
+
+    # search for pane
+    root, img_ext = os.path.splitext( img_file )
+    pane = None
+    ext = ''
+    p = dict( (p[0], p) for p in panes )
+    if root in p:
+        pane = p[root]
+    else:
+        d = np.dtype( meta.dtype )
+        e = '.%s%s' % (d.kind, 8 * d.itemsize)
+        if root + e in p:
+            pane = p[root + e]
+            ext = e
+
+    # search for file
     found = False
-    for ipane, pane in enumerate( panes ):
-        if pane[0] == root:
-            for d in conf.repo:
-                path = os.path.join( d, id_, root )
-                if os.path.exists( path ):
-                    found = True
-                    break
-            break
+    if pane != None:
+        for d in conf.repo:
+            path = os.path.join( d, id_, root + ext )
+            if os.path.exists( path ):
+                found = True
+                break
+
+    # pane properties
     title, cmap, scale, ticks, colorexp, nmod = '', 'w1', 1, None, 1, 0
     if len( pane ) > 1:
         title = pane[1]
@@ -82,6 +103,8 @@ def plot2d( id_, filename, time='', decimate='' ):
                         colorexp = pane[5]
                         if len( pane ) > 6:
                             nmod = pane[6]
+
+    # read data or return "file not found"
     if found:
         ff = util.ndread( path, meta.x_shape, indices, meta.dtype )
         ff = scale * ff.squeeze()[::decimate,::decimate]
@@ -91,6 +114,8 @@ def plot2d( id_, filename, time='', decimate='' ):
         ax.text( x, y, 'File not found: ' + root,
             color='w', backgroundcolor='r', ha='center', va='center' )
         print( 'File not found: ' + root )
+
+    # image plot
     cmap = cst_plt.colormap( cmap, colorexp=colorexp, nmod=nmod )
     if rotate:
         ff = ff.T
@@ -99,6 +124,8 @@ def plot2d( id_, filename, time='', decimate='' ):
     im = ax.imshow( ff.T, cmap=cmap, extent=extent, origin='lower',
         interpolation='nearest' )
     ax.hold( True )
+
+    # line plots
     for plot in meta.x_plot:
         path = os.path.join( conf.repo[0], id_, plot[0] )
         x, y = np.loadtxt( path, usecols=(0, 1) ).T
@@ -108,6 +135,8 @@ def plot2d( id_, filename, time='', decimate='' ):
             ax.plot( x, y, plot[1], linewidth=0.5 )
         else:
             ax.plot( x, y, '-k', linewidth=0.5 )
+
+    # axes
     if rotate:
         ax.invert_xaxis()
     if delta[0] < 0.0:
@@ -119,9 +148,10 @@ def plot2d( id_, filename, time='', decimate='' ):
     if aspect < 0.2:
         a, b = ax.get_ylim()
         ax.set_yticks( (a, 0.5 * (a + b), b) )
+
+    # annotations
     ax.set_title( meta.label + title )
-    if ipane == len( panes ) - 1:
-        ax.set_xlabel( axes[0] + ' (%s)' % unit[0] )
+    #ax.set_xlabel( axes[0] + ' (%s)' % unit[0] )
     ax.set_ylabel( axes[1] + ' (%s)' % unit[1] )
     if ticks:
         c0, c1 = ticks[0], ticks[-1]
@@ -142,12 +172,14 @@ def plot2d( id_, filename, time='', decimate='' ):
         top = 1.0 - 0.5 / height,
         bottom = 0.5/ height,
     )
+
+    # save image and cache if static
     img = cStringIO.StringIO()
-    fig.savefig( img, format=ext[1:], dpi=100 )
+    fig.savefig( img, format=img_ext[1:], dpi=100 )
     plt.close( fig )
     img = img.getvalue()
     if static:
-        open( fullfilename, 'wb' ).write( img )
+        open( img_path, 'wb' ).write( img )
         return
     return img
 
@@ -158,9 +190,16 @@ def plot1d( ids, xx, lowpass, format='png' ):
     """
     ids = ids.split(',')
     xx = [ float(x) for x in xx.split( ',' ) ]
-    path = os.path.join( conf.repo[0], ids[0], conf.meta )
-    meta = util.load( path )
-    npane = len( meta.t_panes )
+
+    # metadata
+    dmeta = {}
+    npane = 0
+    for id_ in ids:
+        path = os.path.join( conf.repo[0], ids[0], conf.meta )
+        dmeta[id_] = meta = util.load( path )
+        npane = max( npane, len( meta.t_panes ) )
+
+    # setup figure
     leg = npane * [[]]
     inches = 10, 3 * npane
     fig = plt.figure( None, inches )
@@ -171,17 +210,22 @@ def plot1d( ids, xx, lowpass, format='png' ):
         bottom = 0.06,
         hspace = 0.15,
     )
+
+    # create axes
     axs = []
     for i in range( npane ):
         ax = fig.add_subplot( npane, 1, i+1 )
         ax.set_color_cycle( ['b', 'r', 'g', 'm', 'y', 'c', 'k'] )
         axs += [ax]
+
+    # loop of sims
     for id_ in ids:
-        f = os.path.join( conf.repo[0], id_, conf.meta )
-        meta = util.load( f )
+        meta = dmeta[id_]
         delta = meta.t_delta
         unit  = meta.t_unit
         indices = [0] + [ int( float(x) / abs(d) + 1.5 ) for x, d in zip( xx, delta[1:] ) ]
+
+        # loop over panes
         for ipane, pane in enumerate( meta.t_panes ):
             ax = axs[ipane]
             process = None
@@ -210,7 +254,11 @@ def plot1d( ids, xx, lowpass, format='png' ):
             if len( pane ) > 3:
                 leg[ipane] += [ meta.label + s for s in pane[3] ]
                 ax.legend( leg[ipane], loc='upper right' )
+
+    # time label for bottom pane
     ax.set_xlabel( 'Time (%s)' % unit[0] )
+
+    # save image
     img = cStringIO.StringIO()
     fig.savefig( img, format=format, dpi=100 )
     plt.close( fig )

@@ -173,11 +173,11 @@ def show2d( query ):
     """
 
     # parameters
-    ext = '.png'
+    img_ext = '.png'
     ids = query.ids.split( ',' )
     compare = len( ids ) > 1
     snapshot = 't' in query
-    cache_img = not snapshot and 'decimate' not in query
+    cache = not snapshot and 'decimate' not in query
     cache_html = not snapshot and 'decimate' not in query and not compare
     groups = set( i.split( '/' )[0] for i in ids )
     if len( groups ) > 1:
@@ -198,6 +198,8 @@ def show2d( query ):
         delta = meta.x_delta
         shape = meta.x_shape
         panes = meta.x_static_panes
+        dtype = np.dtype( meta.dtype )
+        ext = '.%s%s' % (dtype.kind, 8 * dtype.itemsize)
         indices = [0, 0] + [1] * (len( shape ) - 2)
         if snapshot:
             panes = meta.x_panes
@@ -214,28 +216,36 @@ def show2d( query ):
         for pane in panes:
 
             # plots
-            path = pane[0]
-            if cache_img:
-                plot.plot2d( id_, path + ext )
+            path = root = pane[0]
+            if path.endswith( ext ):
+                root = os.path.splitext( path )[0]
+            img_path = root + img_ext
+            if cache:
+                plot.plot2d( id_, img_path )
                 if cache_html:
-                    url = '%s%s' % (path, ext)
+                    url = img_path
                 else:
-                    url = 'repo/%s/%s%s' % (id_, path, ext)
+                    url = 'repo/%s/%s' % (id_, img_path)
             else:
-                url = '/websims/app/image/%s%s?ids=%s' % (path, ext, id_)
+                url = '/websims/app/image/%s?ids=%s' % (img_path, id_)
                 for k in 't', 'decimate':
                     if k in query:
                         url += '&%s=%s' % (k, query[k])
             plots[-1] += [url]
 
             # downloads
-            if meta.downloadable:
-                downloads[-1] += [ dict(
-                    label = '%s%s, shape=%s' % (meta.label, pane[1], shape[:2]),
-                    url = '/websims/app/download/' + path,
-                    query = 'ids=%s&j=%s' % (id_, indices),
-                    root = os.path.basename( path ),
-                ) ]
+            if cache:
+                if cache_html:
+                    url = path
+                else:
+                    url = 'repo/%s/%s' % (id_, path)
+            else:
+                url = '/websims/app/download/%s?ids=%s&j=%s' % (path, id_, indices)
+            downloads[-1] += [ dict(
+                label = '%s%s, shape=%s' % (meta.label, pane[1], shape[:2]),
+                root = os.path.basename( path ),
+                url = url,
+            ) ]
 
     # metadata
     plots = list( itertools.chain( *itertools.izip_longest( *plots ) ) )
@@ -290,7 +300,7 @@ def show1d( query ):
     """
 
     # parameters
-    ext = '.png'
+    img_ext = '.png'
     xx = query.x.split( ',' )
     ids = query.ids.split( ',' )
     compare = len( ids ) > 1
@@ -327,11 +337,11 @@ def show1d( query ):
             for pane in meta.t_panes:
                 if len( pane ) <= 2 or pane[2] == None:
                     for path in pane[0]:
+                        url = '/websims/app/download/%s?ids=%s&j=%s' % (path, id_, indices)
                         downloads[-1] += [ dict(
-                            label = '%s%s' % (meta.label, pane[1]),
-                            url = '/websims/app/download/' + path,
-                            query = 'ids=%s&j=%s' % (id_, indices),
+                            url = url,
                             root = os.path.basename( path ),
+                            label = '%s%s' % (meta.label, pane[1]),
                         ) ]
 
     # metadata
@@ -357,7 +367,7 @@ def show1d( query ):
 
     # urls
     click = '/websims/app/click1d/' + x_ids
-    img = '/websims/app/image/plot' + ext + '?ids=' + query.ids
+    img = '/websims/app/image/plot' + img_ext + '?ids=' + query.ids
     for k in 'x', 'lowpass':
         if k in query:
             img += '&%s=%s' % (k, query[k])
