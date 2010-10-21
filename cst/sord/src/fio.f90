@@ -67,21 +67,21 @@ if ( fh == fio_file_null ) then
     if ( verb ) write( 0, * ) 'Opening file: ', trim( filename ) // ext
     inquire( iolength=i ) f2(:,1)
     if ( mode == 'r' .or. o > 0 ) then
-        open( fh, file=filename//ext, recl=i, form='unformatted', access='direct', &
-        status='old' )
+        open( fh, file=trim(filename)//ext, recl=i, form='unformatted', &
+        access='direct', status='old' )
     else
-        open( fh, file=filename//ext, recl=i, form='unformatted', access='direct', &
-        status='new' )
+        open( fh, file=trim(filename)//ext, recl=i, form='unformatted', &
+        access='direct', status='new' )
     end if
 end if
 n = size( f2, 2 )
 if ( mode == 'r' ) then
-    if ( verb ) write( 0, * ) 'Reading file: ', trim( filename )
+    if ( verb ) write( 0, * ) 'Reading file: ', trim( filename ) // ext
     do i = 1, n
         read( fh, rec=o+i ) f2(:,i)
     end do
 else
-    if ( verb ) write( 0, * ) 'Writing file: ', trim( filename )
+    if ( verb ) write( 0, * ) 'Writing file: ', trim( filename ) // ext
     do i = 1, n
         write( fh, rec=o+i ) f2(:,i)
     end do

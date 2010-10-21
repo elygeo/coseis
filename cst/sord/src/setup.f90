@@ -61,7 +61,7 @@ ip2root = ip3root
 irup = 0
 if ( ifn /= 0 ) then
     ip2root( ifn ) = -1
-    irup = int( ihypo(ifn) + 0.000001 ) - nnoff(ifn)
+    irup = floor( ihypo(ifn) + 0.000001 ) - nnoff(ifn)
     if ( irup + 1 < i1core(ifn) .or. irup > i2core(ifn) ) ifn = 0
 end if
 

@@ -6,6 +6,7 @@ from __future__ import division, absolute_import, print_function #unicode_litera
 import os, sys, math, glob, shutil, pprint
 import numpy as np
 from ..conf import launch
+from . import fieldnames
 
 path = os.path.realpath( os.path.dirname( __file__ ) )
 
@@ -266,7 +267,6 @@ def prepare_param( pm ):
     Prepare input paramers
     """
     import cst
-    from . import fieldnames
 
     # inervals
     nt = pm.shape[3]

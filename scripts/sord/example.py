@@ -22,8 +22,8 @@ cst.sord.run( locals() )                  # launch SORD job
 import numpy as np
 import matplotlib.pyplot as plt
 n  = shape[1], shape[0]
-vx = np.fromfile( 'run/out/vx', 'f' ).reshape( n )
-vy = np.fromfile( 'run/out/vy', 'f' ).reshape( n )
+vx = np.fromfile( 'run/out/vx.f32', 'f' ).reshape( n )
+vy = np.fromfile( 'run/out/vy.f32', 'f' ).reshape( n )
 vm = np.sqrt( vx * vx + vy * vy )
 fig = plt.figure( figsize=(3,3) )
 ax = plt.gca()

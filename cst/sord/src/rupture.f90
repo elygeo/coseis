@@ -124,7 +124,7 @@ end do
 if ( rcrit > 0.0 .and. vrup > 0.0 ) then
     xhypo = 0.0
     xi = ihypo - nnoff
-    i1 = int( xi )
+    i1 = floor( xi )
     if ( all( i1 >= 1 .and. i1 < nm ) ) then
         do l = i1(3), i1(3)+1
         do k = i1(2), i1(2)+1

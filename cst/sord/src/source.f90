@@ -73,11 +73,11 @@ do isrc = 1, abs( nsource )
     i = floor( ( tm - src_t0(isrc) ) / src_dt(isrc) ) + 1
     xi = src_xi(isrc,:)
     if ( source == 'force' ) then
-        i1 = max( i1node, int( xi ) )
-        i2 = min( i2node, int( xi ) + 1 )
+        i1 = max( i1node, floor( xi ) )
+        i2 = min( i2node, floor( xi ) + 1 )
     else
-        i1 = max( i1cell, int( xi ) )
-        i2 = min( i2cell, int( xi ) + 1 )
+        i1 = max( i1cell, floor( xi ) )
+        i2 = min( i2cell, floor( xi ) + 1 )
     end if
     if ( i >= 0 .and. all( i2 >= i1 ) ) then
         i = min( i, src_nt(isrc) - 1 )
@@ -125,8 +125,8 @@ integer :: i1(3), i2(3), i, j, k, l
 real :: xi(3), f, w
 if ( timefunction == 'none' ) return
 xi = ihypo - nnoff
-i1 = max( i1node, int( xi ) )
-i2 = min( i2node, int( xi ) + 1 )
+i1 = max( i1node, floor( xi ) )
+i2 = min( i2node, floor( xi ) + 1 )
 if ( any( i2 < i1 ) ) then
     timefunction = 'none'
     return
@@ -153,8 +153,8 @@ integer :: i1(3), i2(3), i, j, k, l
 real :: xi(3), f, w
 if ( timefunction == 'none' ) return
 xi = ihypo - 0.5 - nnoff
-i1 = max( i1cell, int( xi ) )
-i2 = min( i2cell, int( xi ) + 1 )
+i1 = max( i1cell, floor( xi ) )
+i2 = min( i2cell, floor( xi ) + 1 )
 if ( any( i2 < i1 ) ) then
     timefunction = 'none'
     return
