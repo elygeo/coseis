@@ -162,9 +162,9 @@ def extract( lon, lat, dep, prop=None, **kwargs ):
     shape = dep.shape
     job = stage( nsample=dep.size, **kwargs )
     path = job.rundir + os.sep
-    lon.tofile( path + 'lon.f32' )
-    lat.tofile( path + 'lat.f32' )
-    dep.tofile( path + 'dep.f32' )
+    lon.tofile( path + 'lon.bin' )
+    lat.tofile( path + 'lat.bin' )
+    dep.tofile( path + 'dep.bin' )
     del( lon, lat, dep )
     launch( job, run='exec' )
     if prop is not None:

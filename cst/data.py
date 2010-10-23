@@ -357,7 +357,3 @@ def downsample_sphere( f, d ):
     return g
 
 
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
-

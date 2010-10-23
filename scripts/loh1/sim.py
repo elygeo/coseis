@@ -17,7 +17,7 @@ shape = (
     int( t / delta[3] + 1.5 ),
 )
 
-# Material properties
+# material properties
 hourglass = 1.0, 2.0		# hourglass stiffness and viscosity
 fieldio = [
     ( '=', 'rho', [], 2700.0 ),	# density
@@ -26,23 +26,23 @@ fieldio = [
     ( '=', 'gam', [],    0.0 ),	# viscosity
 ]
 
-# Material properties of the layer
+# material properties of the layer
 fieldio += [
     ( '=', 'rho', [(), (), (1.5, 20.5), ()], 2600.0 ),
     ( '=', 'vp',  [(), (), (1.5, 20.5), ()], 4000.0 ),
     ( '=', 'vs',  [(), (), (1.5, 20.5), ()], 2000.0 ),
 ]
 
-# Near side boundary conditions:
-# Anti-mirror symmetry at the near x and y boundaries
-# Free surface at the near z boundary
+# near side boundary conditions:
+# anti-mirror symmetry at the near x and y boundaries
+# free surface at the near z boundary
 bc1 = -2, -2, 0	
 
-# Far side boundary conditions:
+# far side boundary conditions:
 # PML absorbing boundaries at x, y and z boundaries
 bc2 = 10, 10, 10
 
-# Source parameters
+# source parameters
 ihypo = 1.5, 1.5, 41.5		# hypocenter indices
 source = 'moment'		# specify moment source
 timefunction = 'brune'		# time function: Brune pulse
@@ -50,18 +50,17 @@ period = 0.1			# time function dominant period
 source1 = 0.0, 0.0, 0.0		# moment tensor M_xx, M_yy, M_zz
 source2 = 0.0, 0.0, 1e18	# moment tensor M_yz, M_zx, M_yz
 
-# Velocity time series output for surface station
+# velocity time series output for surface station
 j = ihypo[0] + 6000.0 / delta[0]
 k = ihypo[1] + 8000.0 / delta[1]
 l = ihypo[2]
 fieldio += [
-    ( '=w', 'v1', [(), (), 1, (1, -1, 10)], 'velocity' ),
-    ( '=w', 'v1', [j, k, l, ()], 'vx' ),
-    ( '=w', 'v2', [j, k, l, ()], 'vy' ),
-    ( '=w', 'v3', [j, k, l, ()], 'vz' ),
+    ( '=w', 'v1', [(), (), 1, (1, -1, 10)], 'velocity.bin' ),
+    ( '=w', 'v1', [j, k, l, ()], 'vx.bin' ),
+    ( '=w', 'v2', [j, k, l, ()], 'vy.bin' ),
+    ( '=w', 'v3', [j, k, l, ()], 'vz.bin' ),
 ]
 
 # run job
-if __name__ == '__main__':
-    cst.sord.run( locals() )
+cst.sord.run( locals() )
 

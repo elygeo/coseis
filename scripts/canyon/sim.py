@@ -31,18 +31,18 @@ fieldio += [
 
 # read mesh from disk
 fieldio += [
-    ( '=R', 'x1', [0,0,1,0], 'x' ),
-    ( '=R', 'x2', [0,0,1,0], 'y' ),
+    ( '=R', 'x1', [0,0,1,0], 'x.bin' ),
+    ( '=R', 'x2', [0,0,1,0], 'y.bin' ),
 ]
 
 # specify output
 for c in '12':
     fieldio += [
-        ( '=w', 'u'+c, [-1,-1,1,0], 'source-u'+c ),
-        ( '=w', 'u'+c, [1,0,1,0], 'canyon-u'+c ),
-        ( '=w', 'u'+c, [(2,158),1,1,0], 'flank-u'+c ),
-        ( '=w', 'v'+c, [0,0,1,(1,-1,10)], 'snap-v'+c ),
-        ( '=w', 'u'+c, [0,0,1,(1,-1,10)], 'snap-u'+c ),
+        ( '=w', 'u'+c, [-1,-1,1,0], 'source-u%s.bin' % cc ),
+        ( '=w', 'u'+c, [1,0,1,0], 'canyon-u%s.bin' % cc ),
+        ( '=w', 'u'+c, [(2,158),1,1,0], 'flank-u%s.bin' % cc ),
+        ( '=w', 'v'+c, [0,0,1,(1,-1,10)], 'snap-v%s.bin' % cc ),
+        ( '=w', 'u'+c, [0,0,1,(1,-1,10)], 'snap-u%s.bin' % cc ),
     ]
 
 # continue if not imported
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     # stage, save mesh to input directory, and launch
     job = cst.sord.stage( locals() )
     path_ = os.path.join( job.rundir, 'in' ) + os.sep
-    mesh.x.T.tofile( path_ + 'x' )
-    mesh.y.T.tofile( path_ + 'y' )
+    mesh.x.T.tofile( path_ + 'x.bin' )
+    mesh.y.T.tofile( path_ + 'y.bin' )
     cst.sord.run( job )
 

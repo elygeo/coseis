@@ -7,7 +7,7 @@ import scipy.signal
 import matplotlib.pyplot as plt
 import cst
 
-# Parameters
+# parameters
 fk_dir = 'fk/'
 so_dir = 'run/'
 meta = cst.util.load( so_dir + 'meta.py' )
@@ -18,16 +18,16 @@ dtype = meta.dtype
 sig = dt * 22.5
 ts = 4 * sig
 
-# Setup plot
+# setup plot
 fig = plt.figure()
 axes = [ fig.add_subplot( 3, 1, i ) for i in 1, 2, 3 ]
 
 # SORD results
 rotation = np.array( [[3.0/5.0, 4.0/5.0, 0.0], [-4.0/5.0, 3.0/5.0, 0.0], [0.0, 0.0, 1.0]] )
 t = dt * np.arange( nt )
-x = np.fromfile( so_dir + 'out/vx', dtype )
-y = np.fromfile( so_dir + 'out/vy', dtype )
-z = np.fromfile( so_dir + 'out/vz', dtype )
+x = np.fromfile( so_dir + 'out/vx.bin', dtype )
+y = np.fromfile( so_dir + 'out/vy.bin', dtype )
+z = np.fromfile( so_dir + 'out/vz.bin', dtype )
 v = np.vstack( (x, y, z) )
 v = np.dot( rotation, v )
 tau = t - ts
@@ -42,7 +42,7 @@ for ax in axes:
     ax.hold( True )
 
 # Prose F/K results
-tm = np.fromfile( fk_dir + 'time', '<f' )
+tm = np.fromfile( fk_dir + 'time.bin', '<f' )
 v1 =  1e5 * np.fromfile( fk_dir + 'v-radial', '<f' )
 v2 =  1e5 * np.fromfile( fk_dir + 'v-transverse', '<f' )
 v3 = -1e5 * np.fromfile( fk_dir + 'v-vertical', '<f' )
@@ -57,7 +57,7 @@ print peakv
 for ax in axes:
     ax.plot( tm, v[i], 'k--' )
 
-# Decorations
+# decorations
 axes[0].axis( [1.5, 8.5, -1.0, 1.0] )
 axes[0].set_title( 'Radial',     position=(0.98,0.83), ha='right', va='center' )
 axes[1].axis( [ 1.5, 8.5, -1., 1. ] )

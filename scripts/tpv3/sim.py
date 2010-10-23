@@ -86,13 +86,15 @@ for dx_, nproc3 in runs_:
     ]
 
     # Write fault plane output
+    i0 = j, k, -2, 0
+    i1 = j, k, -2, -1
     fieldio += [
-        ( '=w', 'x1',   [j,k,-2,0],  'x1'   ),	# X coordinates
-        ( '=w', 'x2',   [j,k,-2,0],  'x2'   ),	# Y coordinates
-        ( '=w', 'su1',  [j,k,-2,-1], 'su1'  ),	# final horizontal slip
-        ( '=w', 'su2',  [j,k,-2,-1], 'su2'  ),	# final vertical slip
-        ( '=w', 'psv',  [j,k,-2,-1], 'psv'  ),	# peak slip velocity
-        ( '=w', 'trup', [j,k,-2,-1], 'trup' ),	# rupture time
+        ( '=w', 'x1',   i0, 'x1.bin'   ),	# X coordinates
+        ( '=w', 'x2',   i0, 'x2.bin'   ),	# Y coordinates
+        ( '=w', 'su1',  i1, 'su1.bin'  ),	# final horizontal slip
+        ( '=w', 'su2',  i1, 'su2.bin'  ),	# final vertical slip
+        ( '=w', 'psv',  i1, 'psv.bin'  ),	# peak slip velocity
+        ( '=w', 'trup', i1, 'trup.bin' ),	# rupture time
     ]
 
     # Write slip, slip velocity, and shear traction time histories
@@ -101,8 +103,8 @@ for dx_, nproc3 in runs_:
     p2 = -1, k - 6000.0 / delta[1], -2, ()	# mode III point indices
     for f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':
         fieldio += [
-            ( '=w', f, p1, 'P1-' + f ),	# mode II point
-            ( '=w', f, p2, 'P2-' + f ),	# mode III point
+            ( '=w', f, p1, 'P1-%s.bin' % f ),	# mode II point
+            ( '=w', f, p2, 'P2-%s.bin' % f ),	# mode III point
         ]
 
     # Launch SORD code

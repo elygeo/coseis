@@ -18,12 +18,12 @@ path = dirs[0] + os.sep
 meta = cst.util.load( path + 'meta.py' )
 path += 'out' + os.sep
 n = meta.shapes['trup']
-x0  = np.fromfile( path + 'x1',   'f' ).reshape( n[::-1] ).T
-y0  = np.fromfile( path + 'x2',   'f' ).reshape( n[::-1] ).T
-tt0 = np.fromfile( path + 'trup', 'f' ).reshape( n[::-1] ).T
-sv0 = np.fromfile( path + 'psv',  'f' ).reshape( n[::-1] ).T
-sx0 = np.fromfile( path + 'su1',  'f' ).reshape( n[::-1] ).T
-sy0 = np.fromfile( path + 'su2',  'f' ).reshape( n[::-1] ).T
+x0  = np.fromfile( path + 'x1.bin',   'f' ).reshape( n[::-1] ).T
+y0  = np.fromfile( path + 'x2.bin',   'f' ).reshape( n[::-1] ).T
+tt0 = np.fromfile( path + 'trup.bin', 'f' ).reshape( n[::-1] ).T
+sv0 = np.fromfile( path + 'psv.bin',  'f' ).reshape( n[::-1] ).T
+sx0 = np.fromfile( path + 'su1.bin',  'f' ).reshape( n[::-1] ).T
+sy0 = np.fromfile( path + 'su2.bin',  'f' ).reshape( n[::-1] ).T
 tt_ = tt0.mean()
 sv_ = sv0.mean()
 su_ = np.average( np.sqrt( sx0 * sx0 + sy0 * sy0 ) )
@@ -43,22 +43,22 @@ for d in dirs[1:]:
     n = meta.shapes['trup']
 
     # mesh
-    x = np.fromfile( path + 'x1',   'f' ).reshape( n[::-1] ).T
-    y = np.fromfile( path + 'x2',   'f' ).reshape( n[::-1] ).T
+    x = np.fromfile( path + 'x1.bin',   'f' ).reshape( n[::-1] ).T
+    y = np.fromfile( path + 'x2.bin',   'f' ).reshape( n[::-1] ).T
 
     # rupture time
-    f = np.fromfile( path + 'trup', 'f' ).reshape( n[::-1] ).T
+    f = np.fromfile( path + 'trup.bin', 'f' ).reshape( n[::-1] ).T
     f = tt0 - interp2d( x, y, f, kx=degree, ky=degree ).__call__( x0, y0 )
     ttres += [ np.sqrt( np.average( f * f ) ) / tt_ * 100  ]
 
     # peak slip rate
-    f = np.fromfile( path + 'psv', 'f' ).reshape( n[::-1] ).T
+    f = np.fromfile( path + 'psv.bin', 'f' ).reshape( n[::-1] ).T
     f = sv0 - interp2d( x, y, f, kx=degree, ky=degree ).__call__( x0, y0 )
     svres += [ np.sqrt( np.average( f * f ) ) / sv_ * 100 ]
 
     # slip
-    f = np.fromfile( path + 'su1', 'f' ).reshape( n[::-1] ).T
-    g = np.fromfile( path + 'su2', 'f' ).reshape( n[::-1] ).T
+    f = np.fromfile( path + 'su1.bin', 'f' ).reshape( n[::-1] ).T
+    g = np.fromfile( path + 'su2.bin', 'f' ).reshape( n[::-1] ).T
     f = sx0 - interp2d( x, y, f, kx=degree, ky=degree ).__call__( x0, y0 )
     g = sy0 - interp2d( x, y, g, kx=degree, ky=degree ).__call__( x0, y0 )
     sures += [ np.sqrt( np.average( f * f + g * g ) ) / su_ * 100 ]

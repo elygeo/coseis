@@ -97,9 +97,9 @@ if 1:
     # save data
     cst.util.save( path + 'meta.py', meta, header='# mesh parameters\n' )
     np.savetxt( path + 'box.txt', np.array( box, 'f' ).T )
-    x.astype( 'f' ).T.tofile( path + 'lon' )
-    y.astype( 'f' ).T.tofile( path + 'lat' )
-    z.astype( 'f' ).T.tofile( path + 'topo' )
+    x.astype( 'f' ).T.tofile( path + 'lon.bin' )
+    y.astype( 'f' ).T.tofile( path + 'lat.bin' )
+    z.astype( 'f' ).T.tofile( path + 'topo.bin' )
 
     # python executable
     python = 'python'
@@ -111,8 +111,8 @@ if 1:
         # stage cvm
         cvm_proj = pyproj.Proj( **cst.cvmh.projection )
         x, y = cvm_proj( x, y )
-        x.astype( 'f' ).T.tofile( path + 'x' )
-        y.astype( 'f' ).T.tofile( path + 'y' )
+        x.astype( 'f' ).T.tofile( path + 'x.bin' )
+        y.astype( 'f' ).T.tofile( path + 'y.bin' )
 
         # launch mesher
         x, y, z = shape
@@ -133,7 +133,7 @@ if 1:
 
         # stage cvm
         rundir = path + 'cvm' + os.sep
-        post = 'rm lon lat dep\nmv rho vp vs %r' % path
+        post = 'rm lon.bin lat.bin dep.bin\nmv rho.bin vp.bin vs.bin %r' % path
         n = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
         job = cst.cvm.stage( rundir=rundir, nproc=nproc, nsample=n, post=post )
 

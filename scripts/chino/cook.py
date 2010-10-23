@@ -7,12 +7,12 @@ import numpy as np
 import meta
 
 # metatdata
-dt = meta.deltas['full-v1'][-1]
-nfull = meta.shapes['full-v1']
-nhist = meta.shapes['hist-v1']
-ifull = meta.indices['full-v1']
-ihist = meta.indices['hist-v1']
-isnap = meta.indices['snap-v1']
+dt = meta.deltas['full-v1.bin'][-1]
+nfull = meta.shapes['full-v1.bin']
+nhist = meta.shapes['hist-v1.bin']
+ifull = meta.indices['full-v1.bin']
+ihist = meta.indices['hist-v1.bin']
+isnap = meta.indices['snap-v1.bin']
 dtype = meta.dtype
 out = 'out' + os.sep
 
@@ -21,19 +21,19 @@ xdec = ihist[0][2] / ifull[0][2]
 tdec = isnap[2][2] / ifull[2][2]
 
 # open full resolution files for reading
-f1 = open( out + 'full-v1', 'rb' )
-f2 = open( out + 'full-v2', 'rb' )
-f3 = open( out + 'full-v3', 'rb' )
+f1 = open( out + 'full-v1.bin', 'rb' )
+f2 = open( out + 'full-v2.bin', 'rb' )
+f3 = open( out + 'full-v3.bin', 'rb' )
 
 # open snapshot files for writing
-s1 = open( out + 'snap-v1', 'wb' )
-s2 = open( out + 'snap-v2', 'wb' )
-s3 = open( out + 'snap-v3', 'wb' )
+s1 = open( out + 'snap-v1.bin', 'wb' )
+s2 = open( out + 'snap-v2.bin', 'wb' )
+s3 = open( out + 'snap-v3.bin', 'wb' )
 
 # open time history files for writing
-h1 = open( out + 'hist-v1', 'wb' )
-h2 = open( out + 'hist-v2', 'wb' )
-h3 = open( out + 'hist-v3', 'wb' )
+h1 = open( out + 'hist-v1.bin', 'wb' )
+h2 = open( out + 'hist-v2.bin', 'wb' )
+h3 = open( out + 'hist-v3.bin', 'wb' )
 
 # initialize displacement, pgv, pgd arrays
 nn = nfull[:2]
@@ -90,10 +90,10 @@ h2.close()
 h3.close()
 
 # save pgv, pgd
-np.asarray( np.sqrt( pgv ), dtype ).T.tofile( 'pgv' )
-np.asarray( np.sqrt( pgd ), dtype ).T.tofile( 'pgd' )
-np.asarray( np.sqrt( pgvh ), dtype ).T.tofile( 'pgvh' )
-np.asarray( np.sqrt( pgdh ), dtype ).T.tofile( 'pgdh' )
+np.asarray( np.sqrt( pgv ), dtype ).T.tofile( 'pgv.bin' )
+np.asarray( np.sqrt( pgd ), dtype ).T.tofile( 'pgd.bin' )
+np.asarray( np.sqrt( pgvh ), dtype ).T.tofile( 'pgvh.bin' )
+np.asarray( np.sqrt( pgdh ), dtype ).T.tofile( 'pgdh.bin' )
 
 # free memory
 del( v1, v2, v3, u1, u2, u3, pgv, pgd, pgvh, pgdh )
@@ -101,12 +101,12 @@ del( v1, v2, v3, u1, u2, u3, pgv, pgd, pgvh, pgdh )
 # transpose time history arrays
 x, y, t = nhist
 n = t, x * y
-np.fromfile( out + 'hist-v1', dtype ).reshape( n ).T.tofile( out + 'hist-v1' )
-np.fromfile( out + 'hist-v2', dtype ).reshape( n ).T.tofile( out + 'hist-v2' )
-np.fromfile( out + 'hist-v3', dtype ).reshape( n ).T.tofile( out + 'hist-v3' )
+np.fromfile( out + 'hist-v1.bin', dtype ).reshape( n ).T.tofile( out + 'hist-v1.bin' )
+np.fromfile( out + 'hist-v2.bin', dtype ).reshape( n ).T.tofile( out + 'hist-v2.bin' )
+np.fromfile( out + 'hist-v3.bin', dtype ).reshape( n ).T.tofile( out + 'hist-v3.bin' )
 
 # remove full resolution files and lock file
-os.unlink( out + 'full-v1' )
-os.unlink( out + 'full-v2' )
-os.unlink( out + 'full-v3' )
+os.unlink( out + 'full-v1.bin' )
+os.unlink( out + 'full-v2.bin' )
+os.unlink( out + 'full-v3.bin' )
 

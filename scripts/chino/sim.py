@@ -68,9 +68,9 @@ if 'cvm' in id_:
     vdamp = 400.0
     gam2 = 0.8
     fieldio = [
-        ( '=r', 'rho', [], 'rho' ),
-        ( '=r', 'vp',  [], 'vp'  ),
-        ( '=r', 'vs',  [], 'vs'  ),
+        ( '=r', 'rho', [], 'rho.bin' ),
+        ( '=r', 'vp',  [], 'vp.bin'  ),
+        ( '=r', 'vs',  [], 'vs.bin'  ),
     ]
 else:
     fieldio = [
@@ -83,7 +83,7 @@ else:
 # topography
 if 'topo' in id_:
     fieldio += [
-        ( '=r', 'x3',  [], 'z3'  )
+        ( '=r', 'x3',  [], 'z3.bin'  )
     ]
 
 # sites
@@ -118,9 +118,9 @@ for x, y, s in [
     j = x / delta[0] + 1.0
     k = y / delta[1] + 1.0
     fieldio += [
-        ('=wi', 'v1', [j,k,1,()], s + '-v1'),
-        ('=wi', 'v2', [j,k,1,()], s + '-v2'),
-        ('=wi', 'v3', [j,k,1,()], s + '-v3'),
+        ('=wi', 'v1', [j,k,1,()], s + '-v1.bin'),
+        ('=wi', 'v2', [j,k,1,()], s + '-v2.bin'),
+        ('=wi', 'v3', [j,k,1,()], s + '-v3.bin'),
     ]
 
 # surface output
@@ -129,15 +129,15 @@ nh = 4 * ns
 mh = max( 1, int( 0.025 / dt_ + 0.5 ) )
 ms = max( 1, int( 0.125 / (dt_ * mh) + 0.5 ) )
 fieldio += [
-    ( '=w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'full-v1' ),
-    ( '=w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'full-v2' ),
-    ( '=w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'full-v3' ),
-    ( '#w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'snap-v1' ),
-    ( '#w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'snap-v2' ),
-    ( '#w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'snap-v3' ),
-    ( '#w', 'v1',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hist-v1' ),
-    ( '#w', 'v2',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hist-v2' ),
-    ( '#w', 'v3',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hist-v3' ),
+    ( '=w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'full-v1.bin' ),
+    ( '=w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'full-v2.bin' ),
+    ( '=w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'full-v3.bin' ),
+    ( '#w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'snap-v1.bin' ),
+    ( '#w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'snap-v2.bin' ),
+    ( '#w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'snap-v3.bin' ),
+    ( '#w', 'v1',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hist-v1.bin' ),
+    ( '#w', 'v2',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hist-v2.bin' ),
+    ( '#w', 'v3',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hist-v3.bin' ),
 ]
 
 # stage job
@@ -158,13 +158,13 @@ os.link( mesh_ + 'box.txt', path_ + 'box.txt' )
 
 # save decimated mesh
 n = shape[:2]
-for f in 'lon', 'lat', 'topo':
+for f in 'lon.bin', 'lat.bin', 'topo.bin':
     s = np.fromfile( mesh_ + f, dtype ).reshape( n[::-1] )
     s[::ns,::ns].tofile( path_ + f )
 
 # copy input files
 path_ += 'in' + os.sep
-for f in 'z3', 'rho', 'vp', 'vs':
+for f in 'z3.bin', 'rho.bin', 'vp.bin', 'vs.bin':
     os.link( mesh_ + f, path_ + f )
 
 # launch job
@@ -173,7 +173,7 @@ job = cst.sord.launch( job )
 # post-process to compute pgv, pga
 path_ = job.rundir + os.sep
 meta = cst.util.load( path_ + 'meta.py' )
-x, y, t = meta.shapes['full-v1']
+x, y, t = meta.shapes['full-v1.bin']
 s = x * y * t / 1000000
 cst.conf.launch(
     new = False,

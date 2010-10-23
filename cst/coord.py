@@ -532,8 +532,3 @@ def compass( azimuth, radians=False ):
     )
     return names[ int( (azimuth / 22.5 + 0.5) % 16.0 ) ]
 
-
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
-

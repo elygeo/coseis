@@ -395,10 +395,6 @@ integer, intent(in) :: mm(:), nn(:), oo(:)
 logical, intent(in) :: verb
 integer :: mmm(size(mm)), nnn(size(nn)), ooo(size(oo)), ndims, i, n, ip, ftype, comm0, comm, e
 integer(kind=mpi_offset_kind) :: offset = 0
-real :: r
-character(4) :: ext
-inquire( iolength=i ) r
-write( ext, '(a,i2)' ) '.f', i * 8
 n = size( mm )
 ndims = count( mm(1:n-1) > 1 )
 do i = 1, n-1
@@ -418,8 +414,8 @@ call mpi_comm_split( comm0, 1, 0, comm, e )
 call mpi_comm_size( comm, n, e  )
 call mpi_comm_rank( comm, i, e  )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
-if ( verb .and. i == 0 ) write( 0, '(i8,a,i2,a,i8,3a)' ) &
-    ip, ' Opening', ndims, 'D', n, 'P file: ', trim( filename ), ext
+if ( verb .and. i == 0 ) write( 0, '(i8,a,i2,a,i8,2a)' ) &
+    ip, ' Opening', ndims, 'D', n, 'P file: ', trim( filename )
 if ( mode == 'r' ) then
     i = mpi_mode_rdonly
 elseif ( oo(n) == 0 ) then
@@ -428,7 +424,7 @@ else
     i = mpi_mode_wronly
 end if
 call mpi_file_set_errhandler( mpi_file_null, mpi_errors_are_fatal, e )
-call mpi_file_open( comm, trim( filename ) // ext, i, mpi_info_null, fh, e )
+call mpi_file_open( comm, filename, i, mpi_info_null, fh, e )
 ftype = rtype
 if ( ndims > 0 ) then
     mmm = pack( mm, mm > 1, mm )

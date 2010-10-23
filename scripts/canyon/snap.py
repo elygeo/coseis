@@ -11,15 +11,15 @@ clim = 0.0, 0.000001
 path = 'run/'
 meta = cst.util.load( path + 'meta.py' )
 dtype = meta.dtype
-shape = meta.shapes['snap-v1']
-delta = meta.deltas['snap-v1']
+shape = meta.shapes['snap-v1.bin']
+delta = meta.deltas['snap-v1.bin']
 nn = shape[:2]
 n = shape[0] * shape[1]
 fig = plt.figure()
-x = np.fromfile( path + 'in/x', dtype ).reshape( nn[::-1] ).T
-y = np.fromfile( path + 'in/y', dtype ).reshape( nn[::-1] ).T
-f1 = open( path + 'out/snap-v1' )
-f2 = open( path + 'out/snap-v2' )
+x = np.fromfile( path + 'in/x.bin', dtype ).reshape( nn[::-1] ).T
+y = np.fromfile( path + 'in/y.bin', dtype ).reshape( nn[::-1] ).T
+f1 = open( path + 'out/snap-v1.bin' )
+f2 = open( path + 'out/snap-v2.bin' )
 
 for it in range( shape[-1] ):
     vx = np.fromfile( f1, dtype, n ).reshape( nn[::-1] ).T

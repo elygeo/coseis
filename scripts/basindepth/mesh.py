@@ -36,8 +36,8 @@ if __name__ == '__main__':
     # save data
     path = 'data' + os.sep
     cst.util.save( path + 'meta.py', meta )
-    x.tofile( path + 'lon.f32' )
-    y.tofile( path + 'lat.f32' )
+    x.tofile( path + 'lon.bin' )
+    y.tofile( path + 'lat.bin' )
 
     # CVM setup
     print 'shape = %s' % (shape,)
@@ -46,9 +46,9 @@ if __name__ == '__main__':
     path = job.rundir + os.sep
 
     # write CVM input files
-    f1 = open( path + 'lon.f32', 'wb' )
-    f2 = open( path + 'lat.f32', 'wb' )
-    f3 = open( path + 'dep.f32', 'wb' )
+    f1 = open( path + 'lon.bin', 'wb' )
+    f2 = open( path + 'lat.bin', 'wb' )
+    f3 = open( path + 'dep.bin', 'wb' )
     for i in range( z.size ):
         x.tofile( f1 )
         y.tofile( f2 )

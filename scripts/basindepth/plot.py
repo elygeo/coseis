@@ -11,7 +11,7 @@ extent = meta.extent
 lon, lat = extent[:2]
 aspect = 1.0 / np.cos( np.mean(lat) / 180.0 * np.pi )
 n = shape[:2]
-z = np.fromfile( path + 'z25.f32', 'f' ).reshape( n[::-1] )
+z = np.fromfile( path + 'z25.bin', 'f' ).reshape( n[::-1] )
 
 fig = plt.figure()
 ax = fig.add_subplot( 111 )

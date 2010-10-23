@@ -253,7 +253,3 @@ def progress( t0=None, i=None, n=None, message='' ):
         print('')
     return
 
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
-

@@ -20,7 +20,7 @@ n1 = shape[0] * shape[1]
 n2 = shape[2]
 
 # iterate over depth planes looking for vertical isosurface crossings
-fh = open( path + 'vs.f32', 'rb' )
+fh = open( path + 'vs.bin', 'rb' )
 v2 = np.fromfile( fh, 'f', n1 )
 if up:
     z = 1e9 * np.ones_like( v2 )
@@ -40,5 +40,5 @@ else:
         z[i] = ( (val - v1[i]) / (v2[i] - v1[i]) + j - 1 + 0.5 * cell ) * dz
 
 # write output
-z.tofile( 'data/z25.f32' )
+z.tofile( 'data/z25.bin' )
 
