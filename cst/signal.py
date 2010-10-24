@@ -147,6 +147,10 @@ def test():
 
     return
 
+# prevent nose test
+test.__test__ = False
+
+# continue if command line
 if __name__ == '__main__':
     test()
 

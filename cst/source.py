@@ -1,7 +1,7 @@
 """
 Source utilities
 """
-import os, sys, urllib, gzip, pprint
+import os, sys, urllib, gzip
 import numpy as np
 from . import util, coord
 
