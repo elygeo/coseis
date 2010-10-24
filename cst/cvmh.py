@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 SCEC Community Velocity Model (CVM-H) extraction tool
 """

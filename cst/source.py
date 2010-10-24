@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Source utilities
 """
@@ -71,24 +70,24 @@ def src_write( history, nt, dt, t0, xi, w1, w2=None, path='' ):
     Write SORD input for moment or potency source.
     """
     path = os.path.join( os.path.expanduser( path ), 'src_' )
-    np.asarray( history, 'f' ).tofile( path + 'history' )
-    np.asarray( nt,      'f' ).tofile( path + 'nt'  )
-    np.asarray( dt,      'f' ).tofile( path + 'dt'  )
-    np.asarray( t0,      'f' ).tofile( path + 't0'  )
-    np.asarray( xi[0],   'f' ).tofile( path + 'xi1' )
-    np.asarray( xi[1],   'f' ).tofile( path + 'xi2' )
-    np.asarray( xi[2],   'f' ).tofile( path + 'xi3' )
+    np.asarray( history, 'f' ).tofile( path + 'history.bin' )
+    np.asarray( nt,      'f' ).tofile( path + 'nt.bin'  )
+    np.asarray( dt,      'f' ).tofile( path + 'dt.bin'  )
+    np.asarray( t0,      'f' ).tofile( path + 't0.bin'  )
+    np.asarray( xi[0],   'f' ).tofile( path + 'xi1.bin' )
+    np.asarray( xi[1],   'f' ).tofile( path + 'xi2.bin' )
+    np.asarray( xi[2],   'f' ).tofile( path + 'xi3.bin' )
     if not w2:
-        np.asarray( w1[0], 'f' ).tofile( path + 'w11' )
-        np.asarray( w1[1], 'f' ).tofile( path + 'w12' )
-        np.asarray( w1[2], 'f' ).tofile( path + 'w13' )
+        np.asarray( w1[0], 'f' ).tofile( path + 'w11.bin' )
+        np.asarray( w1[1], 'f' ).tofile( path + 'w12.bin' )
+        np.asarray( w1[2], 'f' ).tofile( path + 'w13.bin' )
     else:
-        np.asarray( w1[0], 'f' ).tofile( path + 'w11' )
-        np.asarray( w1[1], 'f' ).tofile( path + 'w22' )
-        np.asarray( w1[2], 'f' ).tofile( path + 'w33' )
-        np.asarray( w2[0], 'f' ).tofile( path + 'w23' )
-        np.asarray( w2[1], 'f' ).tofile( path + 'w31' )
-        np.asarray( w2[2], 'f' ).tofile( path + 'w12' )
+        np.asarray( w1[0], 'f' ).tofile( path + 'w11.bin' )
+        np.asarray( w1[1], 'f' ).tofile( path + 'w22.bin' )
+        np.asarray( w1[2], 'f' ).tofile( path + 'w33.bin' )
+        np.asarray( w2[0], 'f' ).tofile( path + 'w23.bin' )
+        np.asarray( w2[1], 'f' ).tofile( path + 'w31.bin' )
+        np.asarray( w2[2], 'f' ).tofile( path + 'w12.bin' )
     return
 
 def cybershake( isrc, irup, islip, ihypo, path='srf', name=None ):
@@ -241,9 +240,9 @@ def srf_read( filename, path=None, mks=True ):
     nt1   = np.empty( n, 'i' )
     nt2   = np.empty( n, 'i' )
     nt3   = np.empty( n, 'i' )
-    fd1 = open( path + 'sv1', 'wb' )
-    fd2 = open( path + 'sv2', 'wb' )
-    fd3 = open( path + 'sv3', 'wb' )
+    fd1 = open( path + 'sv1.bin', 'wb' )
+    fd2 = open( path + 'sv2.bin', 'wb' )
+    fd3 = open( path + 'sv3.bin', 'wb' )
     for i in range( n ):
         k = fd.readline().split() + fd.readline().split()
         if len( k ) != 15:
@@ -288,21 +287,21 @@ def srf_read( filename, path=None, mks=True ):
         slip1 = 0.01 * slip1
         slip2 = 0.01 * slip2
         slip3 = 0.01 * slip3
-    np.array( nt1,   'i' ).tofile( path + 'nt1'   )
-    np.array( nt2,   'i' ).tofile( path + 'nt2'   )
-    np.array( nt3,   'i' ).tofile( path + 'nt3'   )
-    np.array( dt,    'f' ).tofile( path + 'dt'    )
-    np.array( t0,    'f' ).tofile( path + 't0'    )
-    np.array( area,  'f' ).tofile( path + 'area'  )
-    np.array( lon,   'f' ).tofile( path + 'lon'   )
-    np.array( lat,   'f' ).tofile( path + 'lat'   )
-    np.array( dep,   'f' ).tofile( path + 'dep'   )
-    np.array( stk,   'f' ).tofile( path + 'stk'   )
-    np.array( dip,   'f' ).tofile( path + 'dip'   )
-    np.array( rake,  'f' ).tofile( path + 'rake'  )
-    np.array( slip1, 'f' ).tofile( path + 'slip1' )
-    np.array( slip2, 'f' ).tofile( path + 'slip2' )
-    np.array( slip3, 'f' ).tofile( path + 'slip3' )
+    np.array( nt1,   'i' ).tofile( path + 'nt1.bin'   )
+    np.array( nt2,   'i' ).tofile( path + 'nt2.bin'   )
+    np.array( nt3,   'i' ).tofile( path + 'nt3.bin'   )
+    np.array( dt,    'f' ).tofile( path + 'dt.bin'    )
+    np.array( t0,    'f' ).tofile( path + 't0.bin'    )
+    np.array( area,  'f' ).tofile( path + 'area.bin'  )
+    np.array( lon,   'f' ).tofile( path + 'lon.bin'   )
+    np.array( lat,   'f' ).tofile( path + 'lat.bin'   )
+    np.array( dep,   'f' ).tofile( path + 'dep.bin'   )
+    np.array( stk,   'f' ).tofile( path + 'stk.bin'   )
+    np.array( dip,   'f' ).tofile( path + 'dip.bin'   )
+    np.array( rake,  'f' ).tofile( path + 'rake.bin'  )
+    np.array( slip1, 'f' ).tofile( path + 'slip1.bin' )
+    np.array( slip2, 'f' ).tofile( path + 'slip2.bin' )
+    np.array( slip3, 'f' ).tofile( path + 'slip3.bin' )
 
     # Write meta data
     i = np.argmin( t0 )
@@ -361,15 +360,15 @@ def srf2potency( src, path, delta=(1,1,1), proj=None ):
     nt = np.array( [nt1, nt2, nt3] )
     ii = nt > 0
     nsource = nt[ii].size
-    nt[ii].tofile( path + 'src_nt' )
-    dt[None].repeat(3,0)[ii].tofile( path + 'src_dt' )
-    t0[None].repeat(3,0)[ii].tofile( path + 'src_t0' )
+    nt[ii].tofile( path + 'src_nt.bin' )
+    dt[None].repeat(3,0)[ii].tofile( path + 'src_dt.bin' )
+    t0[None].repeat(3,0)[ii].tofile( path + 'src_t0.bin' )
 
     # Time history
-    fd1 = open( src + 'sv1' )
-    fd2 = open( src + 'sv2' )
-    fd3 = open( src + 'sv3' )
-    fd  = open( path + 'src_history', 'wb' )
+    fd1 = open( src + 'sv1.bin' )
+    fd2 = open( src + 'sv2.bin' )
+    fd3 = open( src + 'sv3.bin' )
+    fd  = open( path + 'src_history.bin', 'wb' )
     for i in range( dt.size ):
         np.cumsum( dt[i] * np.fromfile(fd1, dtype_f, nt1[i]) ).tofile( fd )
     for i in range( dt.size ):
@@ -388,9 +387,9 @@ def srf2potency( src, path, delta=(1,1,1), proj=None ):
     x = np.asarray( 1.0 + x / delta[0], dtype_f )
     y = np.asarray( 1.0 + y / delta[1], dtype_f )
     z = np.asarray( 1.0 + z / delta[2], dtype_f )
-    x[None].repeat(3,0)[ii].tofile( path + 'src_xi1' )
-    y[None].repeat(3,0)[ii].tofile( path + 'src_xi2' )
-    z[None].repeat(3,0)[ii].tofile( path + 'src_xi3' )
+    x[None].repeat(3,0)[ii].tofile( path + 'src_xi1.bin' )
+    y[None].repeat(3,0)[ii].tofile( path + 'src_xi2.bin' )
+    z[None].repeat(3,0)[ii].tofile( path + 'src_xi3.bin' )
 
     # Strike, dip, and normal vectors
     R = coord.slipvectors( stk + rot, dip, rake )
@@ -398,13 +397,13 @@ def srf2potency( src, path, delta=(1,1,1), proj=None ):
     # Tensor components
     stk, dip, nrm = np.asarray( area * coord.source_tensors( R ), dtype_f )
     w = np.zeros_like( stk )
-    w[0] = stk[0]; w[1] = dip[0]; w[ii].tofile( path + 'src_w23' )
-    w[0] = stk[1]; w[1] = dip[1]; w[ii].tofile( path + 'src_w31' )
-    w[0] = stk[2]; w[1] = dip[2]; w[ii].tofile( path + 'src_w12' )
+    w[0] = stk[0]; w[1] = dip[0]; w[ii].tofile( path + 'src_w23.bin' )
+    w[0] = stk[1]; w[1] = dip[1]; w[ii].tofile( path + 'src_w31.bin' )
+    w[0] = stk[2]; w[1] = dip[2]; w[ii].tofile( path + 'src_w12.bin' )
     w = np.zeros_like( nrm )
-    w[2] = nrm[0]; w[ii].tofile( path + 'src_w11' )
-    w[2] = nrm[1]; w[ii].tofile( path + 'src_w22' )
-    w[2] = nrm[2]; w[ii].tofile( path + 'src_w33' )
+    w[2] = nrm[0]; w[ii].tofile( path + 'src_w11.bin' )
+    w[2] = nrm[1]; w[ii].tofile( path + 'src_w22.bin' )
+    w[2] = nrm[2]; w[ii].tofile( path + 'src_w33.bin' )
 
     return nsource
 
@@ -421,20 +420,20 @@ def srf2momrate( path, proj, delta, dt, nt, embed_indices=False ):
     dtype_i = meta['dtype_i']
 
     # Read data
-    nt1  = np.fromfile( path + 'nt1',  dtype_i )
-    nt2  = np.fromfile( path + 'nt2',  dtype_i )
-    nt3  = np.fromfile( path + 'nt3',  dtype_i )
-    dt0  = np.fromfile( path + 'dt',   dtype_f )
-    t0   = np.fromfile( path + 't0',   dtype_f )
-    x    = np.fromfile( path + 'lon',  dtype_f )
-    y    = np.fromfile( path + 'lat',  dtype_f )
-    z    = np.fromfile( path + 'dep',  dtype_f )
-    stk  = np.fromfile( path + 'stk',  dtype_f )
-    dip  = np.fromfile( path + 'dip',  dtype_f )
-    rake = np.fromfile( path + 'rake', dtype_f )
-    area = np.fromfile( path + 'area', dtype_f )
-    mu   = np.fromfile( path + 'mu',   dtype_f )
-    lam  = np.fromfile( path + 'lam',  dtype_f )
+    nt1  = np.fromfile( path + 'nt1.bin',  dtype_i )
+    nt2  = np.fromfile( path + 'nt2.bin',  dtype_i )
+    nt3  = np.fromfile( path + 'nt3.bin',  dtype_i )
+    dt0  = np.fromfile( path + 'dt.bin',   dtype_f )
+    t0   = np.fromfile( path + 't0.bin',   dtype_f )
+    x    = np.fromfile( path + 'lon.bin',  dtype_f )
+    y    = np.fromfile( path + 'lat.bin',  dtype_f )
+    z    = np.fromfile( path + 'dep.bin',  dtype_f )
+    stk  = np.fromfile( path + 'stk.bin',  dtype_f )
+    dip  = np.fromfile( path + 'dip.bin',  dtype_f )
+    rake = np.fromfile( path + 'rake.bin', dtype_f )
+    area = np.fromfile( path + 'area.bin', dtype_f )
+    mu   = np.fromfile( path + 'mu.bin',   dtype_f )
+    lam  = np.fromfile( path + 'lam.bin',  dtype_f )
 
     # Coordinates
     rot = coord.rotation( x, y, proj )[1]
@@ -452,10 +451,10 @@ def srf2momrate( path, proj, delta, dt, nt, embed_indices=False ):
 
     # Time history
     t = dt * np.arange( nt )
-    fd1 = open( path + 'sv1' )
-    fd2 = open( path + 'sv2' )
-    fd3 = open( path + 'sv3' )
-    fd  = open( path + 'momrate', 'wb' )
+    fd1 = open( path + 'sv1.bin' )
+    fd2 = open( path + 'sv2.bin' )
+    fd3 = open( path + 'sv3.bin' )
+    fd  = open( path + 'momrate.bin', 'wb' )
     for i in range( dt.size ):
         sv1 = np.fromfile( fd1, dtype_f, nt1[i] )
         sv2 = np.fromfile( fd2, dtype_f, nt2[i] )
@@ -510,14 +509,14 @@ def srf2coulomb( path, proj, dest=None, scut=0 ):
     dtype_f = meta['dtype_f']
 
     # Read files
-    x    = np.fromfile( path + 'lon',   dtype_f )
-    y    = np.fromfile( path + 'lat',   dtype_f )
-    z    = np.fromfile( path + 'dep',   dtype_f )
-    stk  = np.fromfile( path + 'stk',   dtype_f )
-    dip  = np.fromfile( path + 'dip',   dtype_f )
-    rake = np.fromfile( path + 'rake',  dtype_f )
-    s1   = np.fromfile( path + 'slip1', dtype_f )
-    s2   = np.fromfile( path + 'slip2', dtype_f )
+    x    = np.fromfile( path + 'lon.bin',   dtype_f )
+    y    = np.fromfile( path + 'lat.bin',   dtype_f )
+    z    = np.fromfile( path + 'dep.bin',   dtype_f )
+    stk  = np.fromfile( path + 'stk.bin',   dtype_f )
+    dip  = np.fromfile( path + 'dip.bin',   dtype_f )
+    rake = np.fromfile( path + 'rake.bin',  dtype_f )
+    s1   = np.fromfile( path + 'slip1.bin', dtype_f )
+    s2   = np.fromfile( path + 'slip2.bin', dtype_f )
 
     # Slip components
     s = np.sin( np.pi / 180.0 * rake )
@@ -606,15 +605,4 @@ coulomb_footer = """
   5  ---------------------------- max. lat =       42.5
   6  ---------------------------- zero lat =       40.0
 """
-
-def command_line():
-    """
-    Process command line options.
-    """
-    for f in sys.argv[1:]:
-        print( f )
-        pprint.pprint( srf_read( f, mks=True ) )
-
-if __name__ == '__main__':
-    command_line()
 

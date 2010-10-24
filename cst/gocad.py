@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 GOCAD (http://www.gocad.org) utilities
 """

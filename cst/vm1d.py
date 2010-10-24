@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 1D velocity models
 """

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Frechet kernel computation
 """

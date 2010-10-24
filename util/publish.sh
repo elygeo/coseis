@@ -13,7 +13,15 @@ rsync \
     -vrlpt \
     --delete \
     --delete-excluded \
-    --exclude-from=.pubignore \
+    --exclude='.git' \
+    --exclude='.DS_Store' \
+    --exclude='*.pyc' \
+    --exclude='*.so' \
+    --exclude='run' \
+    --exclude='tmp' \
+    --exclude='build' \
+    --exclude='/data' \
+    --exclude='/cst/conf/site.py' \
     -e ssh \
     . "$dest"
 

@@ -413,9 +413,8 @@ def launch( job=None, stagein=(), new=True, **kwargs ):
     os.chdir( cwd )
     return job
 
-
-# run tests if called from the command line
-if __name__ == '__main__':
+# test
+def test():
     import pprint
     modules = None, 'cvm'
     machines = [None] + os.listdir('.')
@@ -430,4 +429,8 @@ if __name__ == '__main__':
                 del( job.__dict__['__doc__'] )
                 pprint.pprint( job.__dict__ )
                 shutil.rmtree( 'tmp' )
+
+# command line
+if __name__ == '__main__':
+    test()
 
