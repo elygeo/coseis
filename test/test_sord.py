@@ -7,7 +7,7 @@ import cst
 
 def test():
     """
-    Miniature point source test
+    Test SORD mini point source
     """
 
     # parameters

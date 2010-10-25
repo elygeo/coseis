@@ -113,7 +113,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=Non
 
 def test():
     """
-    Demonstration spectrum plot
+    Test spectrum plot
     """
     import matplotlib.pyplot as plt
 
@@ -132,7 +132,6 @@ def test():
         lowpass( x, dt, cutoff, 2, 1 ), 'Butter-2x2',
         lowpass( x, dt, cutoff, 4, 1 ), 'Butter-4x2',
         lowpass( x, dt, cutoff, 4 ),    'Butter-4',
-        lowpass( x, dt, cutoff, 8 ),    'Butter-8',
     ]
     plt.figure( 1 )
     spectrum( y[::2], dt, legend=y[1::2] )

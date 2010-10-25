@@ -5,6 +5,8 @@ Configure, build, and launch utilities.
 import os, sys, re, shutil, getopt, subprocess, shlex, time
 import numpy as np
 
+path = os.path.realpath( os.path.dirname( __file__ ) )
+
 class namespace:
     """
     Namespace with object attributes initialized from a dict.
@@ -421,9 +423,14 @@ def launch( job=None, stagein=(), new=True, **kwargs ):
 
 # test
 def test():
+    """
+    Test configuration modules and machines
+    """
     import pprint
     modules = None, 'cvm'
     machines = [None] + os.listdir('.')
+    cwd = os.getcwd()
+    os.chdir( path )
     for module in modules:
         for machine in machines:
             if machine is None or os.path.isdir( machine ):
@@ -435,6 +442,7 @@ def test():
                 del( job.__dict__['__doc__'] )
                 pprint.pprint( job.__dict__ )
                 shutil.rmtree( 'tmp' )
+    os.chdir( cwd )
 
 # command line
 if __name__ == '__main__':

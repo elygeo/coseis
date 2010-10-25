@@ -144,7 +144,7 @@ def cbnga( T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb ):
 
 def test():
     """
-    Compare CBNGA with OpenSHA Attenuation Relationship Plotter.
+    Test CBNGA for comparison with OpenSHA Attenuation Relationship Plotter
     """
     import matplotlib.pyplot as plt
 
