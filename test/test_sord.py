@@ -12,6 +12,7 @@ def test():
 
     # parameters
     run = 'exec'
+    argv = []
     force = True
     debug = 0
     itstats = 1

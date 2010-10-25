@@ -113,7 +113,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=Non
 
 def test():
     """
-    Test spectrum plot.
+    Demonstration spectrum plot
     """
     import matplotlib.pyplot as plt
 
@@ -146,9 +146,6 @@ def test():
     spectrum( y[::2], dt, legend=y[1::2] )
 
     return
-
-# prevent nose test
-test.__test__ = False
 
 # continue if command line
 if __name__ == '__main__':

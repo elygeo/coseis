@@ -72,7 +72,7 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
     """
 
     path = os.path.dirname( __file__ )
-    job = { 'module': module }
+    job = {'module': module}
 
     # default parameters
     f = os.path.join( path, 'conf.py' )
@@ -117,20 +117,26 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
     options = job['options']
     if options:
         short, long = zip( *options )[:2]
-        opts = getopt.getopt( sys.argv[1:], ''.join( short ), long )[0]
-        short = [ s.rstrip( ':' ) for s in short ]
-        long = [ l.rstrip( '=' ) for l in long ]
-        for opt, val in opts:
-            key = opt.lstrip('-')
-            if opt.startswith( '--' ):
-                i = long.index( key )
-            else:
-                i = short.index( key )
-            opt, key, cast = options[i][1:]
-            if opt[-1] in ':=':
-                job[key] = type( cast )( val )
-            else:
-                job[key] = cast
+    else:
+        short, long = [], []
+    if 'argv' in job:
+        argv = job['argv']
+    else:
+        argv = sys.argv[1:]
+    opts = getopt.getopt( argv, ''.join( short ), long )[0]
+    short = [ s.rstrip( ':' ) for s in short ]
+    long = [ l.rstrip( '=' ) for l in long ]
+    for opt, val in opts:
+        key = opt.lstrip('-')
+        if opt.startswith( '--' ):
+            i = long.index( key )
+        else:
+            i = short.index( key )
+        opt, key, cast = options[i][1:]
+        if opt[-1] in ':=':
+            job[key] = type( cast )( val )
+        else:
+            job[key] = cast
 
     # fortran flags
     if 'fortran_flags_default_' in job:

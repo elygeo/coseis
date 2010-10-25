@@ -29,7 +29,8 @@ for target in args:
         cst.cvm._build()
     elif target == 'test':
         import nose
-        nose.main( argv=['--with-doctest'])
+        argv = ['', '--verbose', '--with-doctest', '--all-modules', '--exe']
+        nose.run( argv=argv )
     elif target == 'path':
         cst.conf.install_path( path, 'coseis' )
     elif target == 'unpath':

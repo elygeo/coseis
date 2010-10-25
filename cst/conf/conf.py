@@ -47,6 +47,7 @@ launch = {
 }
 
 # command line options
+argv = []
 options = [
     ( '',  'machine=',    'machine',  '' ),
     ( 'f', 'force',       'force',    True ),

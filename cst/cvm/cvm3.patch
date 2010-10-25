@@ -1,6 +1,6 @@
-diff -ruN src/in.h build/in.h
---- src/in.h	2010-06-16 14:29:08.000000000 -0700
-+++ build/in.h	2010-06-16 14:36:10.000000000 -0700
+diff -ruN a/in.h b/in.h
+--- a/in.h	2010-06-16 14:29:08.000000000 -0700
++++ b/in.h	2010-06-16 14:36:10.000000000 -0700
 @@ -1,4 +1,8 @@
 -c  in.h   contains i-o stuff
 -         parameter(ibig=750000, rdepmin=0.0)
@@ -14,9 +14,9 @@ diff -ruN src/in.h build/in.h
 +      real :: rlat(ibig), rlon(ibig), rdep(ibig), alpha(ibig), 
 +     $  beta(ibig), rho(ibig)
 +      integer :: inout(ibig), nn, nnl
-diff -ruN src/iobin.f build/iobin.f
---- src/iobin.f	1969-12-31 16:00:00.000000000 -0800
-+++ build/iobin.f	2010-06-16 14:35:47.000000000 -0700
+diff -ruN a/iobin.f b/iobin.f
+--- a/iobin.f	1969-12-31 16:00:00.000000000 -0800
++++ b/iobin.f	2010-06-16 14:35:47.000000000 -0700
 @@ -0,0 +1,80 @@
 +! Binary I/O for SCEC CVM
 +
@@ -98,9 +98,9 @@ diff -ruN src/iobin.f build/iobin.f
 +      kerr = 0
 +      end
 +
-diff -ruN src/iompi.f build/iompi.f
---- src/iompi.f	1969-12-31 16:00:00.000000000 -0800
-+++ build/iompi.f	2010-06-16 14:35:54.000000000 -0700
+diff -ruN a/iompi.f b/iompi.f
+--- a/iompi.f	1969-12-31 16:00:00.000000000 -0800
++++ b/iompi.f	2010-06-16 14:35:54.000000000 -0700
 @@ -0,0 +1,106 @@
 +! MPI I/O for SCEC CVM
 +
@@ -208,9 +208,9 @@ diff -ruN src/iompi.f build/iompi.f
 +      call mpi_finalize( ierr )
 +      end
 +
-diff -ruN src/iotxt.f build/iotxt.f
---- src/iotxt.f	1969-12-31 16:00:00.000000000 -0800
-+++ build/iotxt.f	2010-06-16 14:36:00.000000000 -0700
+diff -ruN a/iotxt.f b/iotxt.f
+--- a/iotxt.f	1969-12-31 16:00:00.000000000 -0800
++++ b/iotxt.f	2010-06-16 14:36:00.000000000 -0700
 @@ -0,0 +1,38 @@
 +! ASCII I/O for SCEC CVM
 +
@@ -250,9 +250,9 @@ diff -ruN src/iotxt.f build/iotxt.f
 +      kerr = 0
 +      end
 +
-diff -ruN src/version3.0.f build/version3.0.f
---- src/version3.0.f	2010-06-16 14:29:08.000000000 -0700
-+++ build/version3.0.f	2010-06-16 14:31:40.000000000 -0700
+diff -ruN a/version3.0.f b/version3.0.f
+--- a/version3.0.f	2010-06-16 14:29:08.000000000 -0700
++++ b/version3.0.f	2010-06-16 14:31:40.000000000 -0700
 @@ -22,6 +22,7 @@
  c scum v2j     0-00   various glitch fixes
  c
