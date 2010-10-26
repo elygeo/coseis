@@ -73,6 +73,12 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
     that contain configuration parameters in a file conf.py.
     """
 
+    # command line arguments
+    if 'argv' in kwargs:
+        argv = kwargs['argv']
+    else:
+        argv = sys.argv[1:]
+
     path = os.path.dirname( __file__ )
     job = {'module': module}
 
@@ -121,10 +127,6 @@ def configure( module=None, machine=None, save_site=False, **kwargs ):
         short, long = zip( *options )[:2]
     else:
         short, long = [], []
-    if 'argv' in job:
-        argv = job['argv']
-    else:
-        argv = sys.argv[1:]
     opts = getopt.getopt( argv, ''.join( short ), long )[0]
     short = [ s.rstrip( ':' ) for s in short ]
     long = [ l.rstrip( '=' ) for l in long ]

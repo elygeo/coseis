@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Automated tests to be run by `nosetests`.
+Code tests
 """
 import os, compiler
 
@@ -12,7 +12,7 @@ def test_imports():
 
 def test_syntax( path='.' ):
     """
-    Test code syntax.
+    Test code syntax
     """
     exclude = 'ws-meta-in.py'
     cwd = os.getcwd()
@@ -22,19 +22,17 @@ def test_syntax( path='.' ):
         for filename in filenames:
             if filename.endswith( '.py' ) and filename not in exclude:
                 filename = os.path.join( dirpath, filename )
-                print filename
                 code = open( filename, 'U' ).read()
                 compile( code, filename, 'exec' )
     os.chdir( cwd )
     return
 
-def test_pyflakes( path='cst' ):
+def test_with_pyflakes( path='.' ):
     """
-    Test for Pyflakes warnings.
+    Test code with Pyflakes
     """
-    import sys
     import pyflakes.checker
-    exclude = 'ws-meta-in.py'
+    exclude = 'ws-meta-in.py', 'test_sord.py', 'test_code.py'
     cwd = os.getcwd()
     top = os.path.join( os.path.dirname( __file__ ), '..' )
     os.chdir( top )
@@ -55,4 +53,10 @@ def test_pyflakes( path='cst' ):
     os.chdir( cwd )
     assert messages == []
     return
+
+# continue if command line
+if __name__ == '__main__':
+    test_imports()
+    test_syntax()
+    test_with_pyflakes()
 

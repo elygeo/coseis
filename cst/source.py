@@ -71,7 +71,7 @@ def src_write( history, nt, dt, t0, xi, w1, w2=None, path='' ):
     """
     path = os.path.join( os.path.expanduser( path ), 'src_' )
     np.asarray( history, 'f' ).tofile( path + 'history.bin' )
-    np.asarray( nt,      'f' ).tofile( path + 'nt.bin'  )
+    np.asarray( nt,      'i' ).tofile( path + 'nt.bin'  )
     np.asarray( dt,      'f' ).tofile( path + 'dt.bin'  )
     np.asarray( t0,      'f' ).tofile( path + 't0.bin'  )
     np.asarray( xi[0],   'f' ).tofile( path + 'xi1.bin' )

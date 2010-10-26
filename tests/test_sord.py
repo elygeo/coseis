@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Automated tests to be run by `nosetests`.
+SORD tests
 """
 import subprocess, shutil
 import cst
