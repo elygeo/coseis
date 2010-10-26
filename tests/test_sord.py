@@ -5,9 +5,9 @@ Automated tests to be run by `nosetests`.
 import subprocess, shutil
 import cst
 
-def test():
+def test_sord_parallel():
     """
-    Test SORD mini point source
+    Test SORD parallelization with point source
     """
 
     # parameters
@@ -69,7 +69,7 @@ def test():
     shutil.rmtree( 'tmp' )
     assert out == ''
 
-# command line only
+# continue if command line
 if __name__ == '__main__':
-    test()
+    test_sord_parallel()
 

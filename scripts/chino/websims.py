@@ -9,7 +9,7 @@ import cst
 
 # parameters
 nproc = 1
-template = 'wsconf-in.py'
+template = 'ws-meta-in.py'
 author = 'Geoffrey Ely'
 title = 'Chino Hills'
 scale = 0.001
@@ -21,7 +21,7 @@ for path in glob.glob( sims ):
 
     # skip if already exists
     path += os.sep
-    if not force and os.path.exists( path + 'wsconf.py' ):
+    if not force and os.path.exists( path + 'ws-meta.py' ):
         continue
     print path
 
@@ -50,8 +50,8 @@ for path in glob.glob( sims ):
     vticks = 0, vscale, 2 * vscale
     uticks = 0, uscale, 2 * uscale
     meta.__dict__.update( locals() )
-    wsconf = open( template ).read()
-    open( path + 'wsconf.py', 'w' ).write( wsconf % meta.__dict__ )
+    wsmeta = open( template ).read()
+    open( path + 'ws-meta.py', 'w' ).write( wsmeta % meta.__dict__ )
 
     # topography
     topo, extent = cst.data.topo( extent )
