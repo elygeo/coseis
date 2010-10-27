@@ -15,7 +15,7 @@ real :: rr, xhypo(3), xi(3), w
 integer :: i1(3), i2(3), i, j, k, l
 
 if ( ifn == 0 ) return
-if ( master ) write( 0, * ) 'Rupture initialization'
+if ( master ) write( *, '(a)' ) 'Rupture initialization'
 
 ! i/o
 mus = 0.0
@@ -59,7 +59,7 @@ i1 = maxloc( t3(:,:,:,3) )
 rr = t3(i1(1),i1(2),i1(3),3)
 i1(ifn) = irup
 i1 = i1 + nnoff
-if ( rr > 0.0 ) write( 0, * ) 'warning: positive normal traction: ', rr, i1
+if ( rr > 0.0 ) write( 0, * ) 'Warning: positive normal traction: ', rr, i1
 
 ! lock fault in pml region
 i1 = i1pml + 1
@@ -198,7 +198,7 @@ use m_stats
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
 if ( ifn == 0 ) return
-if ( verb ) write( 0, * ) 'Rupture'
+if ( verb ) write( *, '(a)' ) 'Rupture'
 
 ! indices
 i1 = 1

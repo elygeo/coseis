@@ -11,7 +11,7 @@ use m_fieldio
 real :: vstats(8), gvstats(8), r, rho_, vp_, vs_, gam_, courant
 integer :: i1(3), i2(3)
 
-if ( master ) write( 0, * ) 'Material model'
+if ( master ) write( *, '(a)' ) 'Material model'
 
 ! init
 mr = 0.0

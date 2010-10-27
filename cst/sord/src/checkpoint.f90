@@ -34,7 +34,7 @@ integer :: i
 real :: r
 r = timer( 2 )
 if ( it == 0 ) return
-if ( master ) write( 0, * ) 'Checkpoint found, starting from ', it
+if ( master ) write( *, '(a,i6)' ) 'Checkpoint found, starting from ', it
 i = modulo( it / itcheck0, 2 )
 write( str, '(a,i6.6,a,i6.6)' ) 'checkpoint/cp', i, '-', ipid
 if ( ifn == 0 ) then
@@ -66,7 +66,7 @@ use m_collective
 integer :: i
 real :: r
 r = timer( 2 )
-if ( verb ) write( 0, * ) 'Checkpoint'
+if ( verb ) write( *, '(a)' ) 'Checkpoint'
 if ( itcheck >= 0 .and. ( it == nt .or. modulo( it, itio ) == 0 ) ) then
     open( 1, file='itcheck', status='old', iostat=i )
     if ( i == 0 ) then

@@ -13,7 +13,7 @@ use m_collective
 use m_util
 integer :: n, i, fh
 if ( nsource == 0 ) return
-if ( master ) write( 0, * ) 'Finite source initialize'
+if ( master ) write( *, '(a)' ) 'Finite source initialize'
 n = abs( nsource )
 allocate( src_xi(n,3) )
 fh = -1
@@ -67,7 +67,7 @@ use m_globals
 integer :: i1(3), i2(3), i, j, k, l, isrc, itoff
 real :: xi(3), t, h, w
 if ( nsource == 0 ) return
-if ( verb ) write( 0, * ) 'Finite source'
+if ( verb ) write( *, '(a)' ) 'Finite source'
 itoff = 0
 do isrc = 1, abs( nsource )
     i = floor( ( tm - src_t0(isrc) ) / src_dt(isrc) ) + 1
@@ -131,7 +131,7 @@ if ( any( i2 < i1 ) ) then
     timefunction = 'none'
     return
 end if
-if ( verb ) write( 0, * ) 'Point source'
+if ( verb ) write( *, '(a)' ) 'Point source'
 f = time_function( timefunction, tm, dt, period )
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
@@ -159,7 +159,7 @@ if ( any( i2 < i1 ) ) then
     timefunction = 'none'
     return
 end if
-if ( verb ) write( 0, * ) 'Point source'
+if ( verb ) write( *, '(a)' ) 'Point source'
 f = time_function( timefunction, tm, dt, period )
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)

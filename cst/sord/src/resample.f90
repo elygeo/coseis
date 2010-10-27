@@ -10,7 +10,7 @@ use m_bc
 use m_util
 integer :: i1(3), i2(3), bc(3)
 
-if ( master ) write( 0, * ) 'Resample material model'
+if ( master ) write( *, '(a)' ) 'Resample material model'
 
 ! mass ratio
 s2 = mr * vc

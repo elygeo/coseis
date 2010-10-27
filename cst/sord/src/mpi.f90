@@ -39,7 +39,7 @@ np3 = nproc3
 call mpi_cart_create( mpi_comm_world, 3, np3, period, .true., comm3d, e )
 if ( comm3d == mpi_comm_null ) then
     call mpi_comm_rank( mpi_comm_world, ip, e  )
-    write( 0, * ) ip, ' unused process'
+    write( *, * ) ip, ' unused process'
     call mpi_finalize( e )
     stop
 end if
@@ -80,7 +80,7 @@ elseif ( n == 1 ) then
     coords1 = coords(i:i)
     call mpi_cart_rank( comm, coords1, rank, e )
 else
-    write ( 0, * ) 'Problem in commrank: ', coords
+    write ( 0, * ) 'problem in commrank: ', coords
     stop
 end if
 end subroutine
@@ -126,7 +126,7 @@ case( 'min', 'allmin' ); iop = mpi_min
 case( 'max', 'allmax' ); iop = mpi_max
 case( 'sum', 'allsum' ); iop = mpi_sum
 case default
-stop 'Problem in ireduce'
+stop 'problem in ireduce'
 end select
 call commrank( comm, root, coords )
 if ( op(1:3) == 'all' ) then
@@ -414,7 +414,7 @@ call mpi_comm_split( comm0, 1, 0, comm, e )
 call mpi_comm_size( comm, n, e  )
 call mpi_comm_rank( comm, i, e  )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
-if ( verb .and. i == 0 ) write( 0, '(i8,a,i2,a,i8,2a)' ) &
+if ( verb .and. i == 0 ) write( *, '(i8,a,i2,a,i8,2a)' ) &
     ip, ' Opening', ndims, 'D', n, 'P file: ', trim( filename )
 if ( mode == 'r' ) then
     i = mpi_mode_rdonly

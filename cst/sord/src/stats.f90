@@ -20,7 +20,7 @@ real, save, allocatable, dimension(:,:) :: &
     vstats, fstats, estats, gvstats, gfstats, gestats
 
 ! start timer
-if ( verb ) write( 0, * ) 'Statistics'
+if ( verb ) write( *, '(a)' ) 'Statistics'
 
 ! allocate buffers
 if ( init ) then

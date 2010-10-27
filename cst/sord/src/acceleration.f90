@@ -17,7 +17,7 @@ use m_collective
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq, p
 real :: rr
 
-if ( verb ) write( 0, * ) 'Acceleration'
+if ( verb ) write( *, '(a)' ) 'Acceleration'
 call set_halo( s1, 0.0, i1node, i2node )
 
 ! loop over component and derivative direction

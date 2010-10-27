@@ -48,7 +48,7 @@ for c in '12':
 if __name__ == '__main__':
 
     # stage job, copy mesh files, and run job
-    rundir = od.path.join( 'run', 'sim' )
+    rundir = os.path.join( 'run', 'sim' )
     job = cst.sord.stage( locals() )
     for f in 'x.bin', 'y.bin':
         a = os.path.join( 'run', 'mesh', f )

@@ -12,10 +12,10 @@ use m_stats
 ! status
 if ( master ) then
     if ( verb ) then
-        write( 0, * ) 'Time step', it
+        write( *, '(a,i6)' ) 'Time step', it
     else
-        write( 0, '(a)', advance='no' ) '.'
-        if ( modulo( it, 50 ) == 0 .or. it == nt ) write( 0, '(i6)' ) it
+        write( *, '(a)', advance='no' ) '.'
+        if ( modulo( it, 50 ) == 0 .or. it == nt ) write( *, '(i6)' ) it
     end if
 end if
 

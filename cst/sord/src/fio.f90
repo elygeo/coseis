@@ -16,7 +16,7 @@ integer :: i, n
 if ( fh == fio_file_null ) then
     filehandle = filehandle + 1
     fh = filehandle
-    if ( verb ) write( 0, * ) 'Opening file: ', trim( filename )
+    if ( verb ) write( *, '(2a)' ) 'Opening file: ', trim( filename )
     inquire( iolength=i ) f2(:,1)
     if ( mode == 'r' .or. o > 0 ) then
         open( fh, file=filename, recl=i, form='unformatted', access='direct', &
@@ -28,12 +28,12 @@ if ( fh == fio_file_null ) then
 end if
 n = size( f2, 2 )
 if ( mode == 'r' ) then
-    if ( verb ) write( 0, * ) 'Reading file: ', trim( filename )
+    if ( verb ) write( *, '(2a)' ) 'Reading file: ', trim( filename )
     do i = 1, n
         read( fh, rec=o+i ) f2(:,i)
     end do
 else
-    if ( verb ) write( 0, * ) 'Writing file: ', trim( filename )
+    if ( verb ) write( *, '(2a)' ) 'Writing file: ', trim( filename )
     do i = 1, n
         write( fh, rec=o+i ) f2(:,i)
     end do
@@ -58,7 +58,7 @@ integer :: i, n
 if ( fh == fio_file_null ) then
     filehandle = filehandle + 1
     fh = filehandle
-    if ( verb ) write( 0, * ) 'Opening file: ', trim( filename )
+    if ( verb ) write( *, '(2a)' ) 'Opening file: ', trim( filename )
     inquire( iolength=i ) f2(:,1)
     if ( mode == 'r' .or. o > 0 ) then
         open( fh, file=filename, recl=i, form='unformatted', access='direct', &
@@ -70,12 +70,12 @@ if ( fh == fio_file_null ) then
 end if
 n = size( f2, 2 )
 if ( mode == 'r' ) then
-    if ( verb ) write( 0, * ) 'Reading file: ', trim( filename )
+    if ( verb ) write( *, '(2a)' ) 'Reading file: ', trim( filename )
     do i = 1, n
         read( fh, rec=o+i ) f2(:,i)
     end do
 else
-    if ( verb ) write( 0, * ) 'Writing file: ', trim( filename )
+    if ( verb ) write( *, '(2a)' ) 'Writing file: ', trim( filename )
     do i = 1, n
         write( fh, rec=o+i ) f2(:,i)
     end do

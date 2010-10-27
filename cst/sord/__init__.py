@@ -89,7 +89,7 @@ def stage( dictargs={}, **kwargs ):
     import cst
 
     # save start time
-    print( 'SORD setup' )
+    print( '\nSORD setup' )
 
     # update inputs
     inputs = {'name': 'sord'}

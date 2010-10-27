@@ -30,6 +30,7 @@ for target in args:
     elif target == 'test':
         import nose
         argv = ['', '--verbose', '--with-doctest', '--all-modules', '--exe']
+        argv = ['', '--with-doctest', '--all-modules', '--exe']
         nose.run( argv=argv )
     elif target == 'path':
         cst.conf.install_path( path, 'coseis' )

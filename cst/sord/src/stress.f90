@@ -12,7 +12,7 @@ use m_fieldio
 use m_stats
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, p
 
-if ( verb ) write( 0, * ) 'Stress'
+if ( verb ) write( *, '(a)' ) 'Stress'
 
 ! modified displacement
 do i = 1, 3

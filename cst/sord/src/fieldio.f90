@@ -46,7 +46,7 @@ real :: val
 
 ! atart timer
 val = timer( 2 )
-!if ( verb ) write( 0, * ) 'Field I/O ', passes, field
+!if ( verb ) write( *, '(3a)' ) 'Field I/O ', passes, field
 
 ! pass loop
 do ipass = 1, len( passes )
@@ -208,7 +208,7 @@ case( '=r', '+r', '=R', '+R' )
         end if
         if ( any( io%buff(:,:n(4)) /= io%buff(:,:n(4)) ) .or. &
             maxval( io%buff(:,:n(4)) ) > huge( val ) ) then
-            write( 0, * ) 'ERROR: NaN/Inf in ', io%filename
+            write( 0, * ) 'NaN/Inf in ', io%filename
             stop
         end if
     end if
@@ -343,7 +343,7 @@ if ( i > 0 .and. debug > 3 .and. it <= 8 ) then
     end if
     idebug = idebug + 1
     write( str, "(a,3(i4.4,'-'),a)" ) 'debug/f', it, ipid, idebug, field
-    write( 0, * ) 'Opening file: ', trim( str )
+    write( *, '(2a)' ) 'Opening file: ', trim( str )
     open( 1, file=str, status='replace' )
     do l = 1, size( f, 3 )
         write( 1, * ) it, l, field

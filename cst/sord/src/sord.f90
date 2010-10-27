@@ -30,7 +30,7 @@ prof0(1) = timer(0)
 call initialize( np0, ip )     ; master = ip == 0 ; prof0(1)  = timer(6)
 call read_parameters                              ; prof0(2)  = timer(6)
 call setup               ; if (sync) call barrier ; prof0(3)  = timer(6)
-if ( master ) write( 0, * ) 'SORD - Support Operator Rupture Dynamics'
+if ( master ) write( *, '(a)' ) 'SORD - Support Operator Rupture Dynamics'
 call look_for_checkpoint ; if (sync) call barrier ; prof0(4)  = timer(6)
 call arrays              ; if (sync) call barrier ; prof0(5)  = timer(6)
 call grid_gen            ; if (sync) call barrier ; prof0(6)  = timer(6)
@@ -49,7 +49,7 @@ if ( master ) call rio1( fh(9), prof0, 'w', 'prof/main.bin', 16, 0, mpout, verb 
 prof0(14) = timer(7)
 
 ! main loop
-if ( master ) write( 0, * ) 'Main loop:', nt, ' steps'
+if ( master ) write( *, '(a,i6,a)' ) 'Main loop:', nt, ' steps'
 loop: do while ( it < nt )
 it = it + 1
 jp = jp + 1
@@ -75,7 +75,7 @@ if ( it == nt .or. modulo( it, itio ) == 0 ) then
         call rio1( fh(7), prof(7,:jp), 'w', 'prof/7io.bin',     nt, it-jp, mpout, verb )
         call rio1( fh(8), prof(8,:jp), 'w', 'prof/8step.bin',   nt, it-jp, mpout, verb )
         open( 1, file='currentstep', status='replace' )
-        write( 1, * ) it
+        write( 1, '(i6)' ) it
         close( 1 )
     end if
     jp = 0
@@ -89,7 +89,7 @@ prof0(1) = timer(7)
 prof0(2) = timer(8)
 if ( master ) then
     call rio1( fh(9), prof0(:2), 'w', 'prof/main.bin', 16, 14, mpout, verb )
-    write( 0, * ) 'Finished!'
+    write( *, '(a)' ) 'Finished!'
 end if
 call finalize
 

@@ -16,7 +16,7 @@ integer :: i1(3), i2(3), i3(3), i4(3), bc(3), &
 real :: m(9), tol, h
 integer, allocatable :: seed(:)
 
-if ( master ) write( 0, * ) 'Grid generation'
+if ( master ) write( *, '(a)' ) 'Grid generation'
 
 ! create rectangular mesh with double nodes at the fault
 w1 = 0.0
