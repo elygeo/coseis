@@ -8,7 +8,7 @@ import cst
 nproc3 = 1, 16, 1
 
 # dimensions
-delta = 50.0, 50.0, 50.0, 0.004	
+delta = 50.0, 50.0, 50.0, 0.004
 x, y, z, t = 8000.0, 10000.0, 6000.0, 9.0
 shape = (
     int( x / delta[0] + 20.5 ),
@@ -36,7 +36,7 @@ fieldio += [
 # near side boundary conditions:
 # anti-mirror symmetry at the near x and y boundaries
 # free surface at the near z boundary
-bc1 = -2, -2, 0	
+bc1 = -2, -2, 0
 
 # far side boundary conditions:
 # PML absorbing boundaries at x, y and z boundaries

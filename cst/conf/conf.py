@@ -20,6 +20,7 @@ repo = '~/coseis/data'
 name = 'cst'
 run = False      # 'exec': interactive, 'debug': debugger, 'submit': batch queue
 rundir = 'run'
+stagein = []     # files to copy into rundir
 force = False    # overwrite previous run directory if present
 prepare = True   # True: compile code and setup run directory, False: dry run
 optimize = 'O'   # 'O': optimize, 'g': debug, 't': test, 'p': profile

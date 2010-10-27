@@ -184,21 +184,22 @@ def stage( dictargs={}, **kwargs ):
     _build( job.mode, job.optimize, job.dtype )
 
     # create run directory
-    files = os.path.join( cst.path, 'build', job.command ),
+    stagein = os.path.join( cst.path, 'build', job.command ),
     f = os.path.join( cst.path, 'build', 'coseis.tgz' )
     if os.path.isfile( f ):
-        files += f,
+        stagein += f,
     if job.optimize == 'g':
         for f in glob.glob( path + '/src/*.f90' ):
-            files += f,
+            stagein += f,
+    stagein += tuple( job.stagein )
     if job.force == True and os.path.isdir( job.rundir ):
         shutil.rmtree( job.rundir )
-    cst.conf.skeleton( job, files )
+    cst.conf.skeleton( job, stagein )
 
     # conf, parameter files
     cwd = os.path.realpath( os.getcwd() )
     os.chdir( job.rundir )
-    for f in 'in', 'out', 'prof', 'stats', 'debug', 'checkpoint':
+    for f in 'prof', 'stats', 'debug', 'checkpoint':
         os.mkdir( f )
     delattr( pm, 'itbuff' )
     cst.util.save( 'parameters.py', pm, expand=['fieldio'], header='# model parameters\n' )
@@ -266,6 +267,10 @@ def prepare_param( pm ):
     Prepare input paramers
     """
     import cst
+
+    # checks
+    if pm.source not in ('potency', 'moment', 'force', 'none'):
+        sys.exit( 'Error: unknown source type %r' % pm.source )
 
     # inervals
     nt = pm.shape[3]

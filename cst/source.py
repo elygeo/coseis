@@ -65,11 +65,12 @@ def magarea( A ):
     )
     return Mw
 
-def src_write( history, nt, dt, t0, xi, w1, w2=None, path='' ):
+def write( history, nt, dt, t0, xi, w1, w2=None, path='source' ):
     """
-    Write SORD input for moment or potency source.
+    Write SORD input for finite source.
     """
-    path = os.path.join( os.path.expanduser( path ), 'src_' )
+    path = os.path.expanduser( path ) + os.sep
+    os.mkdir( path )
     np.asarray( history, 'f' ).tofile( path + 'history.bin' )
     np.asarray( nt,      'i' ).tofile( path + 'nt.bin'  )
     np.asarray( dt,      'f' ).tofile( path + 'dt.bin'  )
@@ -185,7 +186,7 @@ def srf_read( filename, path=None, mks=True ):
         else:
             fd = open( os.path.expanduser( fd ) )
 
-    # Header block
+    # header block
     meta = {}
     meta['version'] = fd.readline().split()[0]
     k = fd.readline().split()
@@ -220,7 +221,7 @@ def srf_read( filename, path=None, mks=True ):
     if not path:
         return meta
 
-    # Data block
+    # data block
     path = os.path.expanduser( path ) + os.sep
     if path not in '.' and not os.path.isdir( path ):
         os.makedirs( path )
@@ -303,7 +304,7 @@ def srf_read( filename, path=None, mks=True ):
     np.array( slip2, 'f' ).tofile( path + 'slip2.bin' )
     np.array( slip3, 'f' ).tofile( path + 'slip3.bin' )
 
-    # Write meta data
+    # write meta data
     i = np.argmin( t0 )
     meta['hypocenter'] = lon.flat[i], lat.flat[i], dep.flat[i]
     meta['nsource_nonzero'] = (nt1>0).sum() + (nt2>0).sum() + (nt3>0).sum()
@@ -318,7 +319,7 @@ def srf_read( filename, path=None, mks=True ):
     util.save( path + 'meta.py', meta, expand=['plane'] )
     return meta
 
-def srf2potency( src, path, delta=(1,1,1), proj=None ):
+def srf2potency( src, path='source', delta=(1,1,1), proj=None ):
     """
     Convert SRF to potency tensor source and write SORD input files.
 
@@ -330,45 +331,46 @@ def srf2potency( src, path, delta=(1,1,1), proj=None ):
         proj : function to project lon/lat to logical model coordinates
     """
 
-    # Read meta data
+    # read meta data
     src  = os.path.expanduser( src ) + os.sep
     path = os.path.expanduser( path ) + os.sep
+    os.mkdir( path )
     meta = {}
     exec open( src + 'meta.py' ) in meta
     dtype_f = meta['dtype_f']
     dtype_i = meta['dtype_i']
 
-    # Read data
-    nt1  = np.fromfile( src + 'nt1',  dtype_i )
-    nt2  = np.fromfile( src + 'nt2',  dtype_i )
-    nt3  = np.fromfile( src + 'nt3',  dtype_i )
-    dt   = np.fromfile( src + 'dt',   dtype_f )
-    t0   = np.fromfile( src + 't0',   dtype_f )
-    x    = np.fromfile( src + 'lon',  dtype_f )
-    y    = np.fromfile( src + 'lat',  dtype_f )
-    z    = np.fromfile( src + 'dep',  dtype_f )
-    stk  = np.fromfile( src + 'stk',  dtype_f )
-    dip  = np.fromfile( src + 'dip',  dtype_f )
-    rake = np.fromfile( src + 'rake', dtype_f )
-    area = np.fromfile( src + 'area', dtype_f )
+    # read data
+    nt1  = np.fromfile( src + 'nt1.bin',  dtype_i )
+    nt2  = np.fromfile( src + 'nt2.bin',  dtype_i )
+    nt3  = np.fromfile( src + 'nt3.bin',  dtype_i )
+    dt   = np.fromfile( src + 'dt.bin',   dtype_f )
+    t0   = np.fromfile( src + 't0.bin',   dtype_f )
+    x    = np.fromfile( src + 'lon.bin',  dtype_f )
+    y    = np.fromfile( src + 'lat.bin',  dtype_f )
+    z    = np.fromfile( src + 'dep.bin',  dtype_f )
+    stk  = np.fromfile( src + 'stk.bin',  dtype_f )
+    dip  = np.fromfile( src + 'dip.bin',  dtype_f )
+    rake = np.fromfile( src + 'rake.bin', dtype_f )
+    area = np.fromfile( src + 'area.bin', dtype_f )
 
     # create destination directory
     if path not in '.' and not os.path.isdir( path ):
         os.makedirs( path )
 
-    # Time
+    # time
     nt = np.array( [nt1, nt2, nt3] )
     ii = nt > 0
     nsource = nt[ii].size
-    nt[ii].tofile( path + 'src_nt.bin' )
-    dt[None].repeat(3,0)[ii].tofile( path + 'src_dt.bin' )
-    t0[None].repeat(3,0)[ii].tofile( path + 'src_t0.bin' )
+    nt[ii].tofile( path + 'nt.bin' )
+    dt[None].repeat(3,0)[ii].tofile( path + 'dt.bin' )
+    t0[None].repeat(3,0)[ii].tofile( path + 't0.bin' )
 
-    # Time history
+    # time history
     fd1 = open( src + 'sv1.bin' )
     fd2 = open( src + 'sv2.bin' )
     fd3 = open( src + 'sv3.bin' )
-    fd  = open( path + 'src_history.bin', 'wb' )
+    fd  = open( path + 'history.bin', 'wb' )
     for i in range( dt.size ):
         np.cumsum( dt[i] * np.fromfile(fd1, dtype_f, nt1[i]) ).tofile( fd )
     for i in range( dt.size ):
@@ -380,30 +382,30 @@ def srf2potency( src, path, delta=(1,1,1), proj=None ):
     fd3.close()
     fd.close()
 
-    # Coordinates
+    # coordinates
     rot = coord.rotation( x, y, proj )[1]
     if proj is not None:
         x, y = proj( x, y )
     x = np.asarray( 1.0 + x / delta[0], dtype_f )
     y = np.asarray( 1.0 + y / delta[1], dtype_f )
     z = np.asarray( 1.0 + z / delta[2], dtype_f )
-    x[None].repeat(3,0)[ii].tofile( path + 'src_xi1.bin' )
-    y[None].repeat(3,0)[ii].tofile( path + 'src_xi2.bin' )
-    z[None].repeat(3,0)[ii].tofile( path + 'src_xi3.bin' )
+    x[None].repeat(3,0)[ii].tofile( path + 'xi1.bin' )
+    y[None].repeat(3,0)[ii].tofile( path + 'xi2.bin' )
+    z[None].repeat(3,0)[ii].tofile( path + 'xi3.bin' )
 
-    # Strike, dip, and normal vectors
+    # strike, dip, and normal vectors
     R = coord.slipvectors( stk + rot, dip, rake )
 
-    # Tensor components
+    # tensor components
     stk, dip, nrm = np.asarray( area * coord.source_tensors( R ), dtype_f )
     w = np.zeros_like( stk )
-    w[0] = stk[0]; w[1] = dip[0]; w[ii].tofile( path + 'src_w23.bin' )
-    w[0] = stk[1]; w[1] = dip[1]; w[ii].tofile( path + 'src_w31.bin' )
-    w[0] = stk[2]; w[1] = dip[2]; w[ii].tofile( path + 'src_w12.bin' )
+    w[0] = stk[0]; w[1] = dip[0]; w[ii].tofile( path + 'w23.bin' )
+    w[0] = stk[1]; w[1] = dip[1]; w[ii].tofile( path + 'w31.bin' )
+    w[0] = stk[2]; w[1] = dip[2]; w[ii].tofile( path + 'w12.bin' )
     w = np.zeros_like( nrm )
-    w[2] = nrm[0]; w[ii].tofile( path + 'src_w11.bin' )
-    w[2] = nrm[1]; w[ii].tofile( path + 'src_w22.bin' )
-    w[2] = nrm[2]; w[ii].tofile( path + 'src_w33.bin' )
+    w[2] = nrm[0]; w[ii].tofile( path + 'w11.bin' )
+    w[2] = nrm[1]; w[ii].tofile( path + 'w22.bin' )
+    w[2] = nrm[2]; w[ii].tofile( path + 'w33.bin' )
 
     return nsource
 
@@ -412,14 +414,14 @@ def srf2momrate( path, proj, delta, dt, nt, embed_indices=False ):
     Convert SRF to moment rate and write Olsen AWM input file.
     """
 
-    # Read meta data
+    # read meta data
     path = os.path.expanduser( path ) + os.sep
     meta = {}
     exec open( path + 'meta.py' ) in meta
     dtype_f = meta['dtype_f']
     dtype_i = meta['dtype_i']
 
-    # Read data
+    # read data
     nt1  = np.fromfile( path + 'nt1.bin',  dtype_i )
     nt2  = np.fromfile( path + 'nt2.bin',  dtype_i )
     nt3  = np.fromfile( path + 'nt3.bin',  dtype_i )
@@ -435,21 +437,21 @@ def srf2momrate( path, proj, delta, dt, nt, embed_indices=False ):
     mu   = np.fromfile( path + 'mu.bin',   dtype_f )
     lam  = np.fromfile( path + 'lam.bin',  dtype_f )
 
-    # Coordinates
+    # coordinates
     rot = coord.rotation( x, y, proj )[1]
     x, y = proj( x, y )
     jj = int( x / delta[0] + 1.5 )
     kk = int( y / delta[1] + 1.5 )
     ll = int( z / delta[2] + 1.5 )
 
-    # Moment tensor components
+    # moment tensor components
     R = coord.slipvectors( stk + rot, dip, rake )
     stk, dip, nrm = area * coord.source_tensors( R )
     stk = stk * mu
     dip = dip * mu
     nrm = nrm * lam
 
-    # Time history
+    # time history
     t = dt * np.arange( nt )
     fd1 = open( path + 'sv1.bin' )
     fd2 = open( path + 'sv2.bin' )
@@ -502,13 +504,13 @@ def srf2coulomb( path, proj, dest=None, scut=0 ):
     if dest is None:
         dest = os.path.join( path, 'coulomb-' )
 
-    # Meta data
+    # metadata
     path = os.path.expanduser( path ) + os.sep
     meta = {}
     exec open( path + 'meta.py' ) in meta
     dtype_f = meta['dtype_f']
 
-    # Read files
+    # read files
     x    = np.fromfile( path + 'lon.bin',   dtype_f )
     y    = np.fromfile( path + 'lat.bin',   dtype_f )
     z    = np.fromfile( path + 'dep.bin',   dtype_f )
@@ -518,13 +520,13 @@ def srf2coulomb( path, proj, dest=None, scut=0 ):
     s1   = np.fromfile( path + 'slip1.bin', dtype_f )
     s2   = np.fromfile( path + 'slip2.bin', dtype_f )
 
-    # Slip components
+    # slip components
     s = np.sin( np.pi / 180.0 * rake )
     c = np.cos( np.pi / 180.0 * rake )
     r1 = -c * s1 + s * s2
     r2 =  s * s1 + c * s2
 
-    # Coordinates
+    # coordinates
     rot = coord.rotation( x, y, proj )[1]
     x, y = proj( x, y )
     x *= 0.001
@@ -538,7 +540,7 @@ def srf2coulomb( path, proj, dest=None, scut=0 ):
     y1, y2 = y - dy, y + dy
     z1, z2 = z - dz, z + dz
 
-    # Source file
+    # source file
     i = (s1**2 + s2**2) > (np.sign( scut ) * scut**2)
     c = np.array( [x1[i], y1[i], x2[i], y2[i], r1[i], r2[i], dip[i], z1[i], z2[i]] ).T
     fd = open( dest + 'source.inp', 'w' )
@@ -547,7 +549,7 @@ def srf2coulomb( path, proj, dest=None, scut=0 ):
     fd.write( coulomb_footer )
     fd.close()
 
-    # Receiver file
+    # receiver file
     s1.fill( 0.0 )
     c = np.array( [x1, y1, x2, y2, s1, s1, dip, z1, z2] ).T
     fd = open( dest + 'receiver.inp', 'w' )

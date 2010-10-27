@@ -33,7 +33,7 @@ for path in glob.glob( runs ):
 
         # shear stress
         ax = fig.add_subplot( 2, 1, 1 )
-        f1 = np.fromfile( path + 'out/' + sta + '-ts1.bin', dtype ) * 1e-6
+        f1 = np.fromfile( path + sta + '-ts1.bin', dtype ) * 1e-6
         f2 = np.fromfile( bipath + sta[:2] + '-ts.bin', '<f4' )
         ax.plot( t1, f1, 'k-', t2, f2, 'k--' )
         ax.axis( [1, 11, 60, 85] )
@@ -44,7 +44,7 @@ for path in glob.glob( runs ):
 
         # slip rate
         ax = fig.add_subplot( 2, 1, 2 )
-        f1 = np.fromfile( path + 'out/' + sta + '-sv1.bin', dtype )
+        f1 = np.fromfile( path + sta + '-sv1.bin', dtype )
         f2 = np.fromfile( bipath + sta[:2] + '-sv.bin', '<f4' )
         ax.plot( t1, f1, 'k-', t2, f2, 'k--' )
         ax.set_yticks( [0, 1, 2, 3] )
@@ -52,7 +52,7 @@ for path in glob.glob( runs ):
 
         # slip
         ax.twinx()
-        f1 = np.fromfile( path + 'out/' + sta + '-su1.bin', dtype )
+        f1 = np.fromfile( path + sta + '-su1.bin', dtype )
         f2 = np.fromfile( bipath + sta[:2] + '-su.bin', '<f4' )
         ax.plot( t1, f1, 'k-', t2, f2, 'k--' )
         ax.axis( [1, 11, -0.5, 3.5] )
@@ -76,9 +76,9 @@ for path in glob.glob( runs ):
 
     # SOM
     n = meta.shapes['trup']
-    x = np.fromfile( path + 'out/x1.bin', dtype ).reshape( n[::-1] ).T
-    y = np.fromfile( path + 'out/x2.bin', dtype ).reshape( n[::-1] ).T
-    t = np.fromfile( path + 'out/trup.bin', dtype ).reshape( n[::-1] ).T
+    x = np.fromfile( path + 'x1.bin', dtype ).reshape( n[::-1] ).T
+    y = np.fromfile( path + 'x2.bin', dtype ).reshape( n[::-1] ).T
+    t = np.fromfile( path + 'trup.bin', dtype ).reshape( n[::-1] ).T
     if not hasattr( meta, 'fixhypo' ):
         x = x - delta[0] * (ihypo[0] - 1)
         y = y - delta[1] * (ihypo[1] - 1)

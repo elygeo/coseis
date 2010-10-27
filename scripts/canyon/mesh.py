@@ -1,7 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env ipython -wthread
 """
 2d Semicircular canyon mesh
 """
+import os
 import numpy as np
 
 # parameters
@@ -34,11 +35,14 @@ for i in range( 1, n1-1 ):
     x[i,:] = (1.0 - w[i-1]) * x[0,:] + w[i-1] * x[-1,:]
     y[i,:] = (1.0 - w[i-1]) * y[0,:] + w[i-1] * y[-1,:]
 
-# singel precision
-x = np.array( x, 'f' )
-y = np.array( y, 'f' )
+# write files
+path = 'run/mesh/'
+if not os.path.exists( path ):
+    os.makedirs( path )
+x.T.astype( 'f' ).tofile( path + 'x.bin' )
+y.T.astype( 'f' ).tofile( path + 'y.bin' )
 
-# continue if not imported
+# continue if command line
 if __name__ == '__main__':
 
     # print mesh properties

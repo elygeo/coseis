@@ -66,7 +66,7 @@ trelax = 0.07			# nucleation relaxation time
 svtol = 0.001			# slip velocity considered rupturing
 
 # Finite source parameters
-source = 'potency'		# 'moment', 'potency', 'force', or 'none'
+source = 'potency'		# 'potency', 'moment', 'force', or 'none'
 nsource = 0			# number of sub-faults
 
 # Point source parameters

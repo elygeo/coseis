@@ -22,11 +22,12 @@ def test_sord_parallel():
     bc2 = 0, 0, 0
 
     # source
+    source = 'potency'
     ihypo = 1.5, 1.5, 1.5
     ihypo = 3.0, 1.5, 1.5
-    source1 = 1e16, 1e16, 1e16
+    source1 = 1e10, 1e10, 1e10
     source2 =  0.0,  0.0,  0.0
-    timefunction = 'brune'
+    timefunction = 'delta'
 
     # material
     hourglass = 1.0, 1.0
@@ -66,7 +67,7 @@ def test_sord_parallel():
     print out
 
     # cleanup and test for empty diff
-    shutil.rmtree( 'tmp' )
+    #shutil.rmtree( 'tmp' )
     assert out == ''
 
 # continue if command line

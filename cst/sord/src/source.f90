@@ -18,9 +18,9 @@ n = abs( nsource )
 allocate( src_xi(n,3) )
 fh = -1
 if ( mpin /= 0 ) fh = file_null
-call rio1( fh, src_xi(:,1), 'r', 'in/src_xi1.bin', n, 0, mpin, verb )
-call rio1( fh, src_xi(:,2), 'r', 'in/src_xi2.bin', n, 0, mpin, verb )
-call rio1( fh, src_xi(:,3), 'r', 'in/src_xi3.bin', n, 0, mpin, verb )
+call rio1( fh, src_xi(:,1), 'r', 'source/xi1.bin', n, 0, mpin, verb )
+call rio1( fh, src_xi(:,2), 'r', 'source/xi2.bin', n, 0, mpin, verb )
+call rio1( fh, src_xi(:,3), 'r', 'source/xi3.bin', n, 0, mpin, verb )
 if ( source == 'force' ) then
     do i = 1, 3
         src_xi(:,i) = src_xi(:,i) - nnoff(i)
@@ -32,9 +32,9 @@ if ( source == 'force' ) then
         end if
     end do
     allocate( src_nt(n), src_dt(n), src_t0(n), src_w1(n,3) )
-    call rio1( fh, src_w1(:,1), 'r', 'in/src_w11.bin', n, 0, mpin, verb )
-    call rio1( fh, src_w1(:,2), 'r', 'in/src_w12.bin', n, 0, mpin, verb )
-    call rio1( fh, src_w1(:,3), 'r', 'in/src_w13.bin', n, 0, mpin, verb )
+    call rio1( fh, src_w1(:,1), 'r', 'source/w11.bin', n, 0, mpin, verb )
+    call rio1( fh, src_w1(:,2), 'r', 'source/w12.bin', n, 0, mpin, verb )
+    call rio1( fh, src_w1(:,3), 'r', 'source/w13.bin', n, 0, mpin, verb )
 else
     do i = 1, 3
         src_xi(:,i) = src_xi(:,i) - 0.5 - nnoff(i)
@@ -46,19 +46,19 @@ else
         end if
     end do
     allocate( src_nt(n), src_dt(n), src_t0(n), src_w1(n,3), src_w2(n,3) )
-    call rio1( fh, src_w1(:,1), 'r', 'in/src_w11.bin', n, 0, mpin, verb )
-    call rio1( fh, src_w1(:,2), 'r', 'in/src_w22.bin', n, 0, mpin, verb )
-    call rio1( fh, src_w1(:,3), 'r', 'in/src_w33.bin', n, 0, mpin, verb )
-    call rio1( fh, src_w2(:,1), 'r', 'in/src_w23.bin', n, 0, mpin, verb )
-    call rio1( fh, src_w2(:,2), 'r', 'in/src_w31.bin', n, 0, mpin, verb )
-    call rio1( fh, src_w2(:,3), 'r', 'in/src_w12.bin', n, 0, mpin, verb )
+    call rio1( fh, src_w1(:,1), 'r', 'source/w11.bin', n, 0, mpin, verb )
+    call rio1( fh, src_w1(:,2), 'r', 'source/w22.bin', n, 0, mpin, verb )
+    call rio1( fh, src_w1(:,3), 'r', 'source/w33.bin', n, 0, mpin, verb )
+    call rio1( fh, src_w2(:,1), 'r', 'source/w23.bin', n, 0, mpin, verb )
+    call rio1( fh, src_w2(:,2), 'r', 'source/w31.bin', n, 0, mpin, verb )
+    call rio1( fh, src_w2(:,3), 'r', 'source/w12.bin', n, 0, mpin, verb )
 end if
-call rio1( fh, src_t0, 'r', 'in/src_t0.bin', n, 0, mpin, verb )
-call rio1( fh, src_dt, 'r', 'in/src_dt.bin', n, 0, mpin, verb )
-call iio1( fh, src_nt, 'r', 'in/src_nt.bin', n, 0, mpin, verb )
+call rio1( fh, src_t0, 'r', 'source/t0.bin', n, 0, mpin, verb )
+call rio1( fh, src_dt, 'r', 'source/dt.bin', n, 0, mpin, verb )
+call iio1( fh, src_nt, 'r', 'source/nt.bin', n, 0, mpin, verb )
 n = sum( src_nt )
 allocate( src_history(n) )
-call rio1( fh, src_history, 'r', 'in/src_history.bin', n, 0, mpin, verb )
+call rio1( fh, src_history, 'r', 'source/history.bin', n, 0, mpin, verb )
 end subroutine
 
 ! add finite source to force vector or strain/stress tensor

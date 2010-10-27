@@ -16,7 +16,6 @@ dirs = glob.glob( 'run/tpv3/[0-9]*' )[3:]
 # reference solution
 path = dirs[0] + os.sep
 meta = cst.util.load( path + 'meta.py' )
-path += 'out' + os.sep
 n = meta.shapes['trup']
 x0  = np.fromfile( path + 'x1.bin',   'f' ).reshape( n[::-1] ).T
 y0  = np.fromfile( path + 'x2.bin',   'f' ).reshape( n[::-1] ).T

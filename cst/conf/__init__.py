@@ -356,9 +356,14 @@ def skeleton( job=None, stagein=(), new=True, **kwargs ):
                 open( ff, 'w' ).write( out )
                 shutil.copymode( f, ff )
 
-    # copy files
+    # stage directories and files
     for f in stagein:
-        shutil.copy2( f, dest )
+        if f.endswith( os.sep ):
+            if f.startswith( os.sep ) or '..' in f:
+                sys.exit( 'Error: cannot stage %s outside rundir.' % f )
+            os.makedirs( os.path.join( rundir, f ) )
+        else:
+            shutil.copy2( f, dest )
 
     return job
 

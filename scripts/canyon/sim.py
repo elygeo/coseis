@@ -4,7 +4,6 @@ Semi-cylindrical canyon with vertically incident P-wave.
 """
 import os
 import cst
-import mesh
 
 # model dimensions
 nproc2 = 2, 1, 1			# number of processes
@@ -38,20 +37,22 @@ fieldio += [
 # specify output
 for c in '12':
     fieldio += [
-        ( '=w', 'u'+c, [-1,-1,1,0], 'source-u%s.bin' % c ),
-        ( '=w', 'u'+c, [1,0,1,0], 'canyon-u%s.bin' % c ),
-        ( '=w', 'u'+c, [(2,158),1,1,0], 'flank-u%s.bin' % c ),
-        ( '=w', 'v'+c, [0,0,1,(1,-1,10)], 'snap-v%s.bin' % c ),
-        ( '=w', 'u'+c, [0,0,1,(1,-1,10)], 'snap-u%s.bin' % c ),
+        ( '=w', 'u' + c, [-1,-1,1,0], 'source-u%s.bin' % c ),
+        ( '=w', 'u' + c, [1,0,1,0], 'canyon-u%s.bin' % c ),
+        ( '=w', 'u' + c, [(2,158),1,1,0], 'flank-u%s.bin' % c ),
+        ( '=w', 'v' + c, [0,0,1,(1,-1,10)], 'snap-v%s.bin' % c ),
+        ( '=w', 'u' + c, [0,0,1,(1,-1,10)], 'snap-u%s.bin' % c ),
     ]
 
-# continue if not imported
+# continue if command line
 if __name__ == '__main__':
 
-    # stage, save mesh to input directory, and launch
+    # stage job, copy mesh files, and run job
+    rundir = od.path.join( 'run', 'sim' )
     job = cst.sord.stage( locals() )
-    path_ = os.path.join( job.rundir, 'in' ) + os.sep
-    mesh.x.T.tofile( path_ + 'x.bin' )
-    mesh.y.T.tofile( path_ + 'y.bin' )
+    for f in 'x.bin', 'y.bin':
+        a = os.path.join( 'run', 'mesh', f )
+        b = os.path.join( 'run', 'sim', f )
+        os.link( a, b )
     cst.sord.run( job )
 
