@@ -40,7 +40,7 @@ def test_sord_parallel():
 
     # output
     for f in cst.sord.fieldnames.volume:
-        fieldio += [ ( '=w', f, [], f ) ]
+        fieldio += [ ('=w', f, [], f) ]
 
     # run
     d = []

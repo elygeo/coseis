@@ -2,7 +2,8 @@
 """
 Material model extraction from CVM
 """
-import os, pyproj
+import os
+import pyproj
 import numpy as np
 import cst
 

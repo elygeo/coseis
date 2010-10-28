@@ -45,7 +45,7 @@ if ( comm3d == mpi_comm_null ) then
 end if
 call mpi_comm_rank( comm3d, ip, e  )
 call mpi_cart_coords( comm3d, ip, 3, ip3, e )
-ipid = ip3(1) + np3(1) * ( ip3(2) + np3(2) * ip3(3) )
+ipid = ip3(1) + np3(1) * (ip3(2) + np3(2) * ip3(3))
 do i = 1, 3
     hat = .false.
     hat(i) = .true.

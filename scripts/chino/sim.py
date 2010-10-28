@@ -143,7 +143,7 @@ fieldio += [
 # stage job
 if cst.conf.configure()[0].machine == 'usc-hpc':
     mpout = 0
-job = cst.sord.stage( locals(), post='rm -r in/' )
+job = cst.sord.stage( locals(), post='rm z3.bin rho.bin vp.bin vs.bin' )
 if not job.prepare:
     sys.exit()
 
@@ -163,7 +163,6 @@ for f in 'lon.bin', 'lat.bin', 'topo.bin':
     s[::ns,::ns].tofile( path_ + f )
 
 # copy input files
-path_ += 'in' + os.sep
 for f in 'z3.bin', 'rho.bin', 'vp.bin', 'vs.bin':
     os.link( mesh_ + f, path_ + f )
 

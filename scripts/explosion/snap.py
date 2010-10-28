@@ -20,9 +20,9 @@ indices = meta.indices['snap_v1.bin']
 dtype = meta.dtype
 
 # open snapshot files
-f1 = open( path + 'out/snap_v1.bin' )
-f2 = open( path + 'out/snap_v2.bin' )
-f3 = open( path + 'out/snap_v3.bin' )
+f1 = open( path + 'snap_v1.bin' )
+f2 = open( path + 'snap_v2.bin' )
+f3 = open( path + 'snap_v3.bin' )
 
 # setup figure
 fig = plt.figure()

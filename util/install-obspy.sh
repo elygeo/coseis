@@ -5,7 +5,7 @@ pwd="${PWD}"
 # ObsPy
 cd "${prefix}"
 svn checkout https://svn.geophysik.uni-muenchen.de/svn/obspy obspy
-cd obspy/obspy/branches/scripts
+cd obspy/misc/scripts
 bash develop.sh
 
 cd "${pwd}"

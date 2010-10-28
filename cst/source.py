@@ -13,40 +13,43 @@ def scsn_mts( eventid ):
     url = 'http://www.data.scec.org/MomentTensor/solutions/%s/' % eventid
     url = 'http://www.data.scec.org/MomentTensor/showMT.php?evid=%s' % eventid
     text = urllib.urlopen( url )
-    event = {}
+    event = dict( url=url )
     clvd = [[[], [], []], [[], [], []]]
     dc   = [[[], [], []], [[], [], []]]
     for line in text.readlines():
         line = line.strip()
         if ':' in line and line[0] != ' ':
             f = line.split( ':', 1 )
-            k = f[0].strip()
-            if k in ('Origin Time', 'Stations', 'Quality Factor'):
+            k = f[0].strip().lower().replace( ' ', '_' )
+            if k in ('origin_time', 'stations', 'quality_factor'):
                 event[k] = f[1].strip()
-            elif k in ('Event ID', 'Number of Stations used'):
+            elif k == 'moment_tensor':
+                scale = 10 ** (int( f[1].split( '**' )[1].split()[0] ) - 7)
+            elif k in ('event_id', 'number_of_stations_used'):
                 event[k] = int( f[1] )
-            elif k in ('Magnitude', 'Depth (km)', 'Latitude', 'Longitude', 'Moment Magnitude'):
+            elif k in ('magnitude', 'depth_(km)', 'latitude', 'longitude', 'moment_magnitude'):
+                k = k.replace( '_(km)', '' )
                 event[k] = float( f[1] )
-            elif k == 'Best Fitting Double Couple and CLVD Solution':
+            elif k == 'best_fitting_double_couple_and_clvd_solution':
                 tensor = clvd
-            elif k == 'Best Fitting Double Couple Solution':
+            elif k == 'best_fitting_double_couple_solution':
                 tensor = dc
         elif line:
             f = line.split()
             if f[0] == 'Mxx':
-                tensor[0][0] = float( f[1] )
+                tensor[0][0] = scale * float( f[1] )
             elif f[0] == 'Myy':
-                tensor[0][1] = float( f[1] )
+                tensor[0][1] = scale * float( f[1] )
             elif f[0] == 'Mzz':
-                tensor[0][2] = float( f[1] )
+                tensor[0][2] = scale * float( f[1] )
             elif f[0] == 'Myz':
-                tensor[1][0] = float( f[1] )
+                tensor[1][0] = scale * float( f[1] )
             elif f[0] == 'Mxz':
-                tensor[1][1] = float( f[1] )
+                tensor[1][1] = scale * float( f[1] )
             elif f[0] == 'Mxy':
-                tensor[1][2] = float( f[1] )
-    event['double-couple-clvd'] = np.array( clvd )
-    event['double-couple'] = np.array( dc )
+                tensor[1][2] = scale * float( f[1] )
+    event['double_couple_clvd'] = clvd
+    event['double_couple'] = dc
     return event
 
 def magarea( A ):
