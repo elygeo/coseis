@@ -14,40 +14,52 @@ def scsn_mts( eventid ):
     url = 'http://www.data.scec.org/MomentTensor/showMT.php?evid=%s' % eventid
     text = urllib.urlopen( url )
     event = dict( url=url )
-    clvd = [[[], [], []], [[], [], []]]
-    dc   = [[[], [], []], [[], [], []]]
+    clvd = {}
+    dc   = {}
     for line in text.readlines():
         line = line.strip()
-        if ':' in line and line[0] != ' ':
+        if not line:
+            continue
+        elif ':' in line:
             f = line.split( ':', 1 )
-            k = f[0].strip().lower().replace( ' ', '_' )
-            if k in ('origin_time', 'stations', 'quality_factor'):
-                event[k] = f[1].strip()
-            elif k == 'moment_tensor':
-                scale = 10 ** (int( f[1].split( '**' )[1].split()[0] ) - 7)
-            elif k in ('event_id', 'number_of_stations_used'):
-                event[k] = int( f[1] )
-            elif k in ('magnitude', 'depth_(km)', 'latitude', 'longitude', 'moment_magnitude'):
-                k = k.replace( '_(km)', '' )
-                event[k] = float( f[1] )
-            elif k == 'best_fitting_double_couple_and_clvd_solution':
-                tensor = clvd
-            elif k == 'best_fitting_double_couple_solution':
-                tensor = dc
-        elif line:
+        elif '=' in line:
+            f = line.split( '=' )
+        else:
             f = line.split()
-            if f[0] == 'Mxx':
-                tensor[0][0] = scale * float( f[1] )
-            elif f[0] == 'Myy':
-                tensor[0][1] = scale * float( f[1] )
-            elif f[0] == 'Mzz':
-                tensor[0][2] = scale * float( f[1] )
-            elif f[0] == 'Myz':
-                tensor[1][0] = scale * float( f[1] )
-            elif f[0] == 'Mxz':
-                tensor[1][1] = scale * float( f[1] )
-            elif f[0] == 'Mxy':
-                tensor[1][2] = scale * float( f[1] )
+        k = f[0].strip().lower().replace( ' ', '_' )
+        print f
+        if k == 'event_id':
+            event[k] = int( f[1] )
+        elif k in ('magnitude', 'depth_(km)', 'latitude', 'longitude'):
+            k = k.replace( '_(km)', '' )
+            event[k] = float( f[1] )
+        elif k == 'origin_time':
+            event[k] = f[1].strip()
+        elif k == 'best_fitting_double_couple_and_clvd_solution':
+            tensor = clvd
+        elif k == 'best_fitting_double_couple_solution':
+            tensor = dc
+        elif k == 'moment_tensor':
+            scale = 10 ** (int( f[1].split( '**' )[1].split()[0] ) - 7)
+        elif k in ('mxx', 'myy', 'mzz', 'myz', 'mxz', 'mxy'):
+            tensor[k] = scale * float( f[1] )
+        elif k in ('t', 'n', 'p'):
+            event[k+'-axis'] = dict(
+                value = float( f[1] ),
+                plunge = float( f[2] ),
+                azimuth = float( f[3] ),
+            )
+        elif k == 'mo':
+            event[k] = float( f[1].split()[0] )
+        elif k in ('np1', 'np2'):
+            event[k] = dict(
+                strike = float( f[1] ),
+                rake = float( f[2] ),
+                dip = float( f[3] ),
+            )
+        elif k == 'moment_magnitude' and '=' in line:
+            event[k] = float( f[1] )
+            break
     event['double_couple_clvd'] = clvd
     event['double_couple'] = dc
     return event
