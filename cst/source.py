@@ -7,7 +7,20 @@ from . import util, coord
 
 def scsn_mts( eventid ):
     """
-    Retrieve Southern California Seismic Network Moment Tensor Solutions.
+    Retrieve Southern California Seismic Network (SCSN) Moment Tensor Solution (MTS)
+    from the Southern California Earthquake Data Center.
+
+    Parameters
+    ----------
+        eventid : Event identification number
+
+    Returns
+    -------
+        mts : Dictionary of MTS parameters
+
+    Coordinate system: (x, y, z) = (north, east, down).  For lower hemisphere
+    moment tensor projection with obspy.imaging.beachball, rotate coordinates to
+    (up, south, east) by taking components (mzz, mxx, myy, mxz, -myz, -mxy).
     """
     url = 'http://www.data.scec.org/MomentTensor/solutions/web_%s/ci%s_MT.html' % (eventid, eventid)
     url = 'http://www.data.scec.org/MomentTensor/solutions/%s/' % eventid
@@ -27,7 +40,6 @@ def scsn_mts( eventid ):
         else:
             f = line.split()
         k = f[0].strip().lower().replace( ' ', '_' )
-        print f
         if k == 'event_id':
             event[k] = int( f[1] )
         elif k in ('magnitude', 'depth_(km)', 'latitude', 'longitude'):
@@ -44,13 +56,13 @@ def scsn_mts( eventid ):
         elif k in ('mxx', 'myy', 'mzz', 'myz', 'mxz', 'mxy'):
             tensor[k] = scale * float( f[1] )
         elif k in ('t', 'n', 'p'):
-            event[k+'-axis'] = dict(
+            event[k+'_axis'] = dict(
                 value = float( f[1] ),
                 plunge = float( f[2] ),
                 azimuth = float( f[3] ),
             )
         elif k == 'mo':
-            event[k] = float( f[1].split()[0] )
+            event['moment'] = float( f[1].split()[0] )
         elif k in ('np1', 'np2'):
             event[k] = dict(
                 strike = float( f[1] ),
