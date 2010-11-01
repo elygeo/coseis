@@ -20,7 +20,7 @@ print source1
 print source2
 
 # seismograms
-if not os.path.exists( 'tmp' ):
+if not os.path.exists( 'run/data' ):
     Popen( 'stp', stdin=PIPE ).communicate( """
         mseed
         gain on
@@ -29,7 +29,7 @@ if not os.path.exists( 'tmp' ):
         sta -l -net ci -chan bh_ %s
         output off
     """ % (eventid, date) )
-    os.rename( str( eventid ), 'tmp' )
+    os.rename( str( eventid ), 'run/data' )
 
 # stations
 stations = set( '.'.join( s.split( '.' )[1:3] ) for s in glob.glob( 'tmp/*mseed' ) )

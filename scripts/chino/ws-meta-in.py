@@ -46,8 +46,5 @@ t_panes = [
     ( ('hist-v1.bin',), 'X Velocity (m/s)' ),
     ( ('hist-v2.bin',), 'Y Velocity (m/s)', None, (' ') ),
     ( ('hist-v3.bin',), 'Z Velocity (m/s)' ),
-    #( ('hist-v1.bin',), 'X Displacement (m)', 'int' ),
-    #( ('hist-v2.bin',), 'Y Displacement (m)', 'int' ),
-    #( ('hist-v3.bin',), 'Z Displacement (m)', 'int' ),
 ]
 
