@@ -5,10 +5,10 @@ import os, sys, urllib, gzip
 import numpy as np
 from . import util, coord
 
-def scsn_mts( eventid ):
+def scsn_mts( eventid, path='scsn-mts-%s.py' ):
     """
     Retrieve Southern California Seismic Network (SCSN) Moment Tensor Solution (MTS)
-    from the Southern California Earthquake Data Center.
+    from the Southern California Earthquake Data Center (SCEDC).
 
     Parameters
     ----------
@@ -18,15 +18,33 @@ def scsn_mts( eventid ):
     -------
         mts : Dictionary of MTS parameters
 
-    Coordinate system: (x, y, z) = (north, east, down).  For lower hemisphere
-    moment tensor projection with obspy.imaging.beachball, rotate coordinates to
-    (up, south, east) by taking components (mzz, mxx, myy, mxz, -myz, -mxy).
+    MTS coordinate system: (x, y, z) = (north, east, down)
+
+    For lower hemisphere moment tensor projection with obspy.imaging.beachball,
+    use (up, south, east) coordinates with:
+    fm = m['mzz'], m['mxx'], m['myy'], m['mxz'], -m['myz'], -m['mxy']
+
+    For SORD point source in (east, north, up) coordinates:
+    source1 =  m['myy'],  m['mxx'],  m['mzz']
+    source2 = -m['mxz'], -m['myz'],  m['mxy']
     """
-    url = 'http://www.data.scec.org/MomentTensor/solutions/web_%s/ci%s_MT.html' % (eventid, eventid)
     url = 'http://www.data.scec.org/MomentTensor/solutions/%s/' % eventid
     url = 'http://www.data.scec.org/MomentTensor/showMT.php?evid=%s' % eventid
+    try:
+        path = path % eventid
+    except:
+        pass
+    if os.path.exists( path ):
+        mts = {}
+        exec( open( path ).read() ) in mts
+        return mts
+    print( 'Retrieving %s' % url )
     text = urllib.urlopen( url )
-    event = dict( url=url )
+    mts = dict(
+        url=url,
+        units = 'Newton-meters',
+        coordinate_system ='(x, y, z) = (north, east, down)',
+    )
     clvd = {}
     dc   = {}
     for line in text.readlines():
@@ -41,12 +59,12 @@ def scsn_mts( eventid ):
             f = line.split()
         k = f[0].strip().lower().replace( ' ', '_' )
         if k == 'event_id':
-            event[k] = int( f[1] )
+            mts[k] = int( f[1] )
         elif k in ('magnitude', 'depth_(km)', 'latitude', 'longitude'):
             k = k.replace( '_(km)', '' )
-            event[k] = float( f[1] )
+            mts[k] = float( f[1] )
         elif k == 'origin_time':
-            event[k] = f[1].strip()
+            mts[k] = f[1].strip()
         elif k == 'best_fitting_double_couple_and_clvd_solution':
             tensor = clvd
         elif k == 'best_fitting_double_couple_solution':
@@ -56,25 +74,26 @@ def scsn_mts( eventid ):
         elif k in ('mxx', 'myy', 'mzz', 'myz', 'mxz', 'mxy'):
             tensor[k] = scale * float( f[1] )
         elif k in ('t', 'n', 'p'):
-            event[k+'_axis'] = dict(
+            mts[k+'_axis'] = dict(
                 value = float( f[1] ),
                 plunge = float( f[2] ),
                 azimuth = float( f[3] ),
             )
         elif k == 'mo':
-            event['moment'] = float( f[1].split()[0] )
+            mts['moment'] = float( f[1].split()[0] )
         elif k in ('np1', 'np2'):
-            event[k] = dict(
+            mts[k] = dict(
                 strike = float( f[1] ),
                 rake = float( f[2] ),
                 dip = float( f[3] ),
             )
         elif k == 'moment_magnitude' and '=' in line:
-            event[k] = float( f[1] )
+            mts[k] = float( f[1] )
             break
-    event['double_couple_clvd'] = clvd
-    event['double_couple'] = dc
-    return event
+    mts['double_couple_clvd'] = clvd
+    mts['double_couple'] = dc
+    util.save( path, mts )
+    return mts
 
 def magarea( A ):
     """

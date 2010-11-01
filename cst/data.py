@@ -272,7 +272,7 @@ def densify( x, y, delta ):
     return np.array( [xx, yy] )
 
 
-def engdahlcat( path='engdahl-centennial-cat.f32', fields=['lon', 'lat', 'depth', 'mag'] ):
+def engdahlcat( path='engdahl-centennial-cat.bin', fields=['lon', 'lat', 'depth', 'mag'] ):
     """
     Engdahl Centennial Earthquake Catalog to binary file.
     http://earthquake.usgs.gov/research/data/centennial.php
@@ -305,7 +305,7 @@ def engdahlcat( path='engdahl-centennial-cat.f32', fields=['lon', 'lat', 'depth'
             out += [data[:][f]]
         np.array( out, 'f' ).T.tofile( path )
     else:
-        out = np.fromfile( path, 'f' ).reshape( (-1,4) ).T
+        out = np.fromfile( path, 'f' ).reshape( (-1,len(fields)) ).T
     return out
 
 

@@ -53,8 +53,10 @@ ihypo = j, k, l
 source = 'moment'
 timefunction = 'brune'
 period = 0.1
-source1 = -1417e14,  585e14, 832e14
-source1 =  -739e14, -190e14, 490e14
+m = cst.source.scsn_mts( eventid=14383980 )
+m = m['double_couple_clvd']
+source1 =  m['myy'],  m['mxx'],  m['mzz']
+source2 = -m['mxz'], -m['myz'],  m['mxy']
 
 # boundary conditions
 bc1 = 10, 10, 0
@@ -87,34 +89,9 @@ if 'topo' in id_:
     ]
 
 # sites
-for x, y, s in [
-    (-115.6517,  32.4681,  'Mexicali'),
-    (-115.5125,  32.6694,  'Calexico'),
-    (-117.04,    34.91,    'Barstow'),
-    (-117.29,    34.53,    'Victorville'),
-    (-118.13,    34.71,    'Lancaster'),
-    (-119.8,     36.7333,  'Fresno'),
-    (-119.3,     35.4167,  'Bakersfield'),
-    (-120.4124,  35.8666,  'Parkfield'),
-    (-120.69,    35.63,    'Paso Robles'),
-    (-120.7167,  35.3333,  'San Luis Obispo'),
-    (-120.45,    34.9,     'Santa Maria'),
-    (-119.8333,  34.4333,  'Santa Barbara'),
-    (-119.1833,  34.2,     'Oxnard'),
-    (-118.55829, 34.22869, 'Northridge'),
-    (-118.308,   34.185,   'Burbank'),
-    (-118.315,   34.062,   'Los Angeles'),
-    (-118.17113, 34.14844, 'Pasadena'),
-    (-118.1668,  33.9235,  'Downey'),
-    (-118.0844,  33.7568,  'Seal Beach'),
-    (-117.91,    33.64,    'Newport Beach'),
-    (-117.81,    33.68,    'Irvine'),
-    (-117.16,    32.718,   'San Diego'),
-    (-117.2284,  34.1065,  'San Bernardino'),
-    (-117.6,     34.05,    'Ontario'),
-]:
-    s = s.replace( ' ', '-' )
-    x, y = proj( x, y )
+for s in open( 'station-list.txt' ).readines():
+    s, y, x = s.split()[:3]
+    x, y = proj( float(x), float(y) )
     j = x / delta[0] + 1.0
     k = y / delta[1] + 1.0
     fieldio += [
@@ -132,12 +109,6 @@ fieldio += [
     ( '=w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'full-v1.bin' ),
     ( '=w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'full-v2.bin' ),
     ( '=w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'full-v3.bin' ),
-    ( '#w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'snap-v1.bin' ),
-    ( '#w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'snap-v2.bin' ),
-    ( '#w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'snap-v3.bin' ),
-    ( '#w', 'v1',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hist-v1.bin' ),
-    ( '#w', 'v2',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hist-v2.bin' ),
-    ( '#w', 'v3',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hist-v3.bin' ),
 ]
 
 # stage job
