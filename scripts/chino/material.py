@@ -17,8 +17,11 @@ dx = 1000.0; nproc = 2
 dx = 8000.0; nproc = 1
 delta = dx, dx, -dx
 
+eventid = 14383980
+mts = cst.source.scsn_mts( eventid )
+origin = mts['longitude'], mts['latitude']
+#origin = -117.761, 33.953, 14700.0
 rotate = None
-origin = -117.761, 33.953, 14700.0
 bounds = (-144000.0, 112000.0), (-72000.0, 72000.0), (0.0, 64000.0-dx)
 
 if 1:

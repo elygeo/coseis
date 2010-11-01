@@ -9,7 +9,7 @@ import cst
 
 # parameters
 dx_ = 100.0;  nproc3 = 1, 48, 320
-dx_ = 200.0;  nproc3 = 1, 12, 160
+dx_ = 200.0;  nproc3 = 1, 12, 160 # cutoff 0.5 Hz 4 pole butter
 dx_ = 500.0;  nproc3 = 1, 4, 64
 dx_ = 8000.0; nproc3 = 1, 1, 1
 dx_ = 1000.0; nproc3 = 1, 1, 2

@@ -67,14 +67,14 @@ for source, s in sources_:
     source2 = 0.0, 0.0, 0.0
 
     # point source
-    if 1:
+    if 0:
         nsource = 0
         rundir = os.path.join( 'run', 'point-' + source )
         timefunction = 'brune'
         cst.sord.run( locals() )
 
     # finite source
-    if 0:
+    if 1:
         nsource = 1
         rundir = os.path.join( 'run', 'finite-' + source )
         timefunction = 'none'
