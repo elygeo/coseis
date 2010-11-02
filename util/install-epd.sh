@@ -3,21 +3,24 @@ prefix="${1:-${HOME}/local}"
 pwd="${PWD}"
 
 # Enthought Python Distribution
+# License required (free for academic use).
+# See http://enthought.com/products/getepd.php
 if [ "${OSTYPE}" = 'darwin10.0' ]; then
 
 # Mac OS X
-url="http://download.enthought.com/epd/installs/epd-6.2-2-macosx-i386.dmg"
+url="http://download.enthought.com/epd/installs/epd-6.3-1-macosx-i386.dmg"
 tag=$( basename "$url" )
 cd "${prefix}"
 #curl -O "${url}"
 hdid "${tag}"
-sudo installer -pkg '/Volumes/EPD-6.2/EPD.mpkg' -target '/'
+sudo installer -pkg '/Volumes/EPD-6.3/EPD.mpkg' -target '/'
 export PATH="/Library/Frameworks/Python.framework/Versions/Current/bin:${PATH}"
 
 else
 
 # Linux
-url="http://download.enthought.com/epd/installs/epd-6.2-2-rh5-x86.sh"
+url="http://download.enthought.com/epd/installs/epd-6.3-1-rh5-x86.sh"
+url="http://www.enthought.com/repo/.hide_epd_installers/epd-6.3-1-rh5-x86_64.sh"
 tag=$( basename "$url" .sh )
 cd "${prefix}"
 curl -O "${url}"
@@ -31,6 +34,8 @@ fi
 easy_install pip
 pip install virtualenv
 pip install pypdf
+pip install GitPython
+pip install web.py
 . install-obspy.sh "${prefix}"
 
 cd "${pwd}"

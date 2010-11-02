@@ -34,6 +34,7 @@ x_panes = [
 x_plot  = [
     ( 'mapdata-xyz.txt', 'k-' ),
     ( 'source-xyz.txt', 'k+' ),
+    ( 'station-list-xyz.txt', 'k^' ),
 ]
 
 # time histories

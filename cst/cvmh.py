@@ -333,10 +333,15 @@ def extract( x, y, z, vm, geographic=True, by_depth=True, **kwargs ):
     -------
         out: Property samples at coordinates (x, y, z)
     """
+    x = np.asarray( x )
+    y = np.asarray( y )
     if geographic:
         import pyproj
         proj = pyproj.Proj( **projection )
+        dtype = x.dtype
         x, y = proj( x, y )
+        x = x.astype( dtype )
+        y = y.astype( dtype )
     f = Extraction( x, y, vm, **kwargs )
     out = f( z, by_depth=by_depth )
     return out

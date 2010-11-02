@@ -2,7 +2,7 @@
 """
 WebSims setup
 """
-import os, sys, glob, shutil
+import os, sys, glob
 import pyproj
 import numpy as np
 import cst
@@ -64,6 +64,12 @@ for path in glob.glob( sims ):
     f = path + 'source-xyz.txt'
     np.savetxt( f, scale * np.array( [[x,y,z]] ) )
 
+    # station list
+    y, x, z = np.loadtxt( 'station-list.txt', usecols=(1,2,3) ).T
+    x, y = proj( x, y )
+    f = path + 'station-list-xyz.txt'
+    np.savetxt( f, scale * np.array( [x,y,z] ).T )
+
     # map data
     f1 = open( path + 'mapdata.txt', 'w' )
     f2 = open( path + 'mapdata-xyz.txt', 'w' )
@@ -79,13 +85,19 @@ for path in glob.glob( sims ):
     f2.close()
 
     # surface Vs
-    j, k = nsnap[:2]
-    n = j * k
-    post = 'rm lon.bin lat.bin dep.bin rho.bin vp.bin\nmv vs.bin %s/vs0.bin' % os.path.realpath( path )
-    job = cst.cvm.stage( nsample=n, nproc=nproc, post=post, workdir='run', run='exec' )
-    rundir = job.rundir + os.sep
-    shutil.copy2( path + 'lon', rundir + 'lon.bin' )
-    shutil.copy2( path + 'lat', rundir + 'lat.bin' )
-    np.zeros( n, 'f' ).tofile( rundir + 'dep.bin' )
-    cst.cvm.launch( job )
+    x = np.fromfile( path + 'lon.bin', meta.dtype )
+    y = np.fromfile( path + 'lat.bin', meta.dtype )
+    z = np.zeros_like( x )
+    if meta.cvm == 'h':
+        v = cst.cvmh.extract( x, y, z, 'vs' )
+        v.tofile( path + 'vs0.bin' )
+        v = cst.cvmh.extract( x, y, z, 'vp' )
+        v.tofile( path + 'vp0.bin' )
+        v = cst.cvmh.nafe_drake( v )
+        v.tofile( path + 'rho0.bin' )
+    else:
+        rho, vp, vs = cst.cvm.extract( x, y, z, rundir='run/cvm' )
+        rho.tofile( path + 'rho0.bin' )
+        vp.tofile(  path + 'vp0.bin' )
+        vs.tofile(  path + 'vs0.bin' )
 

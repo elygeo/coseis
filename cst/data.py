@@ -16,7 +16,7 @@ def etopo1( indices=None, downsample=1 ):
     import cst
     repo = cst.site.repo
     shape = 21601, 10801
-    filename = os.path.join( repo, 'etopo%02d-ice.f32' % downsample )
+    filename = os.path.join( repo, 'etopo%02d-ice.bin' % downsample )
     if not os.path.exists( filename ):
         f1 = os.path.join( repo, 'etopo1_ice_g_i2.bin' )
         if not os.path.exists( f1 ):
@@ -44,7 +44,7 @@ def globe( indices=None ):
     """
     import cst
     repo = cst.site.repo
-    filename = os.path.join( repo, 'globe30.i16' )
+    filename = os.path.join( repo, 'globe30.bin' )
     if not os.path.exists( filename ):
         print( 'Building %s' % filename )
         n = 90 * 60 * 2

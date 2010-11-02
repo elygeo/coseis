@@ -11,8 +11,8 @@ import cst
 dx_ = 100.0;  nproc3 = 1, 48, 320
 dx_ = 200.0;  nproc3 = 1, 12, 160 # cutoff 0.5 Hz 4 pole butter
 dx_ = 500.0;  nproc3 = 1, 4, 64
-dx_ = 8000.0; nproc3 = 1, 1, 1
 dx_ = 1000.0; nproc3 = 1, 1, 2
+dx_ = 8000.0; nproc3 = 1, 1, 1
 
 # path
 id_ = 'topo-cvm-%04.f' % dx_
@@ -89,7 +89,7 @@ if 'topo' in id_:
     ]
 
 # sites
-for s in open( 'station-list.txt' ).readines():
+for s in open( 'station-list.txt' ).readlines():
     s, y, x = s.split()[:3]
     x, y = proj( float(x), float(y) )
     j = x / delta[0] + 1.0
@@ -109,6 +109,12 @@ fieldio += [
     ( '=w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'full-v1.bin' ),
     ( '=w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'full-v2.bin' ),
     ( '=w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'full-v3.bin' ),
+    ( '#w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'snap-v1.bin' ),
+    ( '#w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'snap-v2.bin' ),
+    ( '#w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'snap-v3.bin' ),
+    ( '#w', 'v1',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hist-v1.bin' ),
+    ( '#w', 'v2',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hist-v2.bin' ),
+    ( '#w', 'v3',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hist-v3.bin' ),
 ]
 
 # stage job

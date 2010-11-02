@@ -25,7 +25,7 @@ mts = cst.source.scsn_mts( eventid )
 rotate = None
 transform = None
 bounds = (-144000.0, 112000.0), (-72000.0, 72000.0), (0.0, 64000.0-dx)
-origin = mts['longitude'], mts['latitude']
+origin = mts['longitude'], mts['latitude'], mts['depth']
 projection = dict( proj='tmerc', lon_0=origin[0], lat_0=origin[1] )
 proj = pyproj.Proj( **projection )
 
@@ -80,6 +80,7 @@ z = cst.coord.interp2( topo_extent, topo, (x, y) )
 
 # metadata
 meta = dict(
+    cvm = cvm,
     mesh_id = mesh_id,
     delta = delta,
     shape = shape,
