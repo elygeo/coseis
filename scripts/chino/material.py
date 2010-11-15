@@ -13,8 +13,8 @@ cvm = 's'
 dx = 100.0;  nproc = 4096
 dx = 200.0;  nproc = 512
 dx = 500.0;  nproc = 32
-dx = 1000.0; nproc = 2
 dx = 8000.0; nproc = 1
+dx = 1000.0; nproc = 2
 delta = dx, dx, -dx
 
 # moment tensor source

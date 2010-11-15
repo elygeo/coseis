@@ -14,6 +14,7 @@ author = 'Geoffrey Ely'
 title = 'Chino Hills'
 scale = 0.001
 sims = 'run/sim/*'
+sims = 'run/sim/flat-8000'
 force = '-f' in sys.argv[1:]
 
 # loop over sims

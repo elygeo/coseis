@@ -42,8 +42,8 @@ def scsn_mts( eventid, path='scsn-mts-%s.py' ):
     text = urllib.urlopen( url )
     mts = dict(
         url=url,
-        units = 'Newton-meters',
-        coordinate_system ='(x, y, z) = (north, east, down)',
+        mts_units = 'Newton-meters',
+        mts_coordinates ='(x, y, z) = (north, east, down)',
     )
     clvd = {}
     dc   = {}
@@ -64,7 +64,10 @@ def scsn_mts( eventid, path='scsn-mts-%s.py' ):
             k = k.replace( '_(km)', '' )
             mts[k] = float( f[1] )
         elif k == 'origin_time':
-            mts[k] = f[1].strip()
+            f = f[1].split()
+            d = f[0].split( '/' )
+            t = f[1].split( ':' )
+            mts[k] = '%s-%s-%sT%s:%s:%s.%s' % (d[2], d[0], d[1], t[0], t[1], t[2], t[3])
         elif k == 'best_fitting_double_couple_and_clvd_solution':
             tensor = clvd
         elif k == 'best_fitting_double_couple_solution':
@@ -80,7 +83,7 @@ def scsn_mts( eventid, path='scsn-mts-%s.py' ):
                 azimuth = float( f[3] ),
             )
         elif k == 'mo':
-            mts['moment'] = float( f[1].split()[0] )
+            mts['moment'] = 1e-7 * float( f[1].split()[0] )
         elif k in ('np1', 'np2'):
             mts[k] = dict(
                 strike = float( f[1] ),
@@ -92,7 +95,7 @@ def scsn_mts( eventid, path='scsn-mts-%s.py' ):
             break
     mts['double_couple_clvd'] = clvd
     mts['double_couple'] = dc
-    util.save( path, mts )
+    util.save( path, mts, header='# SCSN moment tensor solution\n' )
     return mts
 
 def magarea( A ):
@@ -432,9 +435,9 @@ def srf2potency( src, path='source', delta=(1,1,1), proj=None ):
     rot = coord.rotation( x, y, proj )[1]
     if proj is not None:
         x, y = proj( x, y )
-    x = np.asarray( 1.0 + x / delta[0], dtype_f )
-    y = np.asarray( 1.0 + y / delta[1], dtype_f )
-    z = np.asarray( 1.0 + z / delta[2], dtype_f )
+    x = ( 1.0 + x / delta[0] ).astype( dtype_f )
+    y = ( 1.0 + y / delta[1] ).astype( dtype_f )
+    z = ( 1.0 + z / delta[2] ).astype( dtype_f )
     x[None].repeat(3,0)[ii].tofile( path + 'xi1.bin' )
     y[None].repeat(3,0)[ii].tofile( path + 'xi2.bin' )
     z[None].repeat(3,0)[ii].tofile( path + 'xi3.bin' )
@@ -443,7 +446,7 @@ def srf2potency( src, path='source', delta=(1,1,1), proj=None ):
     R = coord.slipvectors( stk + rot, dip, rake )
 
     # tensor components
-    stk, dip, nrm = np.asarray( area * coord.source_tensors( R ), dtype_f )
+    stk, dip, nrm = (area * coord.source_tensors( R )).astype( dtype_f )
     w = np.zeros_like( stk )
     w[0] = stk[0]; w[1] = dip[0]; w[ii].tofile( path + 'w23.bin' )
     w[0] = stk[1]; w[1] = dip[1]; w[ii].tofile( path + 'w31.bin' )

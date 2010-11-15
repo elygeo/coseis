@@ -28,3 +28,5 @@ pip install 'Mayavi[app]'r		# dep: numpy, wxpython, configobj, vtk
 pip install "http://downloads.sourceforge.net/project/matplotlib/matplotlib/matplotlib-1.0/matplotlib-1.0.0.tar.gz"
 .   install-obspy.sh "${prefix}"	# dep: matplotlib, not in EPD
 
+# http://www.data.scec.org/ftp/programs/stp/stp1.6.tar
+# http://www.iris.edu/pub/programs/rdseedv5.0.tar.gz

@@ -272,12 +272,13 @@ def densify( x, y, delta ):
     return np.array( [xx, yy] )
 
 
-def engdahlcat( path='engdahl-centennial-cat.bin', fields=['lon', 'lat', 'depth', 'mag'] ):
+def engdahlcat( path='engdahl-centennial-cat.npy' ):
     """
-    Engdahl Centennial Earthquake Catalog to binary file.
+    Engdahl Centennial Earthquake Catalog.
     http://earthquake.usgs.gov/research/data/centennial.php
     """
-    if not os.path.exists( path ):
+    f = os.path.join( repo, path )
+    if not os.path.exists( f ):
         fmt = [
             6, ('icat',   'S6'),
             1, ('asol',   'S1'),
@@ -298,15 +299,13 @@ def engdahlcat( path='engdahl-centennial-cat.bin', fields=['lon', 'lat', 'depth'
             6, ('mdo',    'S6'),
         ]
         url = 'http://earthquake.usgs.gov/research/data/centennial.cat'
+        print( 'Retrieving %s' % url )
         url = urllib.urlopen( url )
         data = np.genfromtxt( url, dtype=fmt[1::2], delimiter=fmt[0::2] )
-        out = []
-        for f in fields:
-            out += [data[:][f]]
-        np.array( out, 'f' ).T.tofile( path )
+        np.save( f, data )
     else:
-        out = np.fromfile( path, 'f' ).reshape( (-1,len(fields)) ).T
-    return out
+        data = np.load( f )
+    return data
 
 
 def upsample( f ):

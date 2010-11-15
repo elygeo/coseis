@@ -11,8 +11,8 @@ import cst
 dx_ = 100.0;  nproc3 = 1, 48, 320
 dx_ = 200.0;  nproc3 = 1, 12, 160 # cutoff 0.5 Hz 4 pole butter
 dx_ = 500.0;  nproc3 = 1, 4, 64
-dx_ = 1000.0; nproc3 = 1, 1, 2
 dx_ = 8000.0; nproc3 = 1, 1, 1
+dx_ = 1000.0; nproc3 = 1, 1, 2
 
 # path
 id_ = 'topo-cvm-%04.f' % dx_
@@ -50,11 +50,11 @@ l = abs( z / delta[2] ) + 1.0
 ihypo = j, k, l
 
 # moment tensor source
+mts_ = 'scsn-mts-14383980.py'
 source = 'moment'
 timefunction = 'brune'
 period = 0.1
-m = cst.source.scsn_mts( eventid=14383980 )
-m = m['double_couple_clvd']
+m = cst.util.load( mts_ ).double_couple_clvd
 source1 =  m['myy'],  m['mxx'],  m['mzz']
 source2 = -m['mxz'], -m['myz'],  m['mxy']
 
@@ -127,6 +127,7 @@ if not job.prepare:
 # save metadata
 path_ = job.rundir + os.sep
 s = '\n'.join( (
+    open( mts_ ).read(),
     open( mesh_ + 'meta.py' ).read(),
     open( path_ + 'meta.py' ).read(),
 ) )
