@@ -21,6 +21,7 @@ else
 # Linux
 url="http://download.enthought.com/epd/installs/epd-6.3-1-rh5-x86.sh"
 url="http://www.enthought.com/repo/.hide_epd_installers/epd-6.3-1-rh5-x86_64.sh"
+url="http://download.enthought.com/epd63/epd-6.3-1-rh5-x86_64.sh"
 tag=$( basename "$url" .sh )
 cd "${prefix}"
 curl -O "${url}"

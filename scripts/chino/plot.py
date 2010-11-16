@@ -2,8 +2,11 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import obspy.core
+import obspy.core, obspy.signal, obspy.xseed
 import cst
+
+dl = obspy.xseed.Parser( 'run/stations/dataless.CI.CHN' )
+asd
 
 # parameters
 chan = 'HN'
@@ -12,10 +15,11 @@ fcut = 0.25
 fcut = 1.00
 duration = 50.0
 lowpass = None
-lowpass = fcut, 2, 1
 lowpass = fcut, 'hann'
-voff = -5
+lowpass = fcut, 2, 1
+voff = -4
 scale = 100.0
+gain = 1.0 / 4147.691
 
 # metadata
 sim = os.path.join( 'run', 'sim', 'flat-1000' ) + os.sep
@@ -62,18 +66,21 @@ for ista, sta in enumerate( open( 'station-list.txt' ).readlines() ):
         # data
         f = '.'.join( [str( meta.event_id ), sta, chan + 'ENZ'[i], 'sac'] )
         f = os.path.join( 'run', 'data', f )
-        tr = obspy.core.read( f )[0]
+        st = obspy.core.read( f )
+        tr = st[0]
         dt = tr.stats.delta
-        v_ = tr.data.mean()
-        tr.trim( t0, t0 + duration )
-        v = dt * np.cumsum( tr.data - v_ ) * scale * 0.01
+        tr.data *= gain
+        tr.data -= tr.data.mean()
+        tr.data = dt * np.cumsum( tr.data )
+        obspy.signal.detrend( tr.data )
         if lowpass:
-            v = cst.signal.lowpass( v, dt, *lowpass )
-        vmax = np.abs( v ).max()
-        t = dt * np.arange( v.size )
+            tr.data = cst.signal.lowpass( tr.data, dt, *lowpass )
+        vmax = np.abs( tr.data ).max()
+        tr.trim( t0, t0 + duration )
+        t = dt * np.arange( tr.data.size )
         x = i * (duration + tick)
         y = voff * ista
-        ax.plot( x + t, y + v, 'k-' )
+        ax.plot( x + t, y + tr.data, 'k-' )
         if i == 0:
             a = '%s %.1f' % (sta.split('.')[1], vmax)
         else:
