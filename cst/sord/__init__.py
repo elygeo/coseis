@@ -68,7 +68,7 @@ def _build( mode=None, optimize=None, dtype=None ):
                 fflags = fflags + (cf.fortran_flags[dsize],)
             compiler = (cf.fortran_serial,) + fflags + ('-o',)
             new |= cst.conf.make( compiler, object_, source )
-    if 'm' in mode and cf.fortran_mpi[0]:
+    if 'm' in mode and cf.fortran_mpi:
         source = base + ('mpi.f90',) + common
         for opt in optimize:
             object_ = bld + 'sord-m' + opt + dsize

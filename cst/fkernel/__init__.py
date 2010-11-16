@@ -24,7 +24,7 @@ def _build( optimize=None ):
     os.chdir( path )
     if not os.path.isdir( bld ):
         os.mkdir( bld )
-    if 'm' in mode and cf.fortran_mpi[0]:
+    if 'm' in mode and cf.fortran_mpi:
         for opt in optimize:
             object_ = bld + 'cpt_ker-m' + opt
             fflags = cf.fortran_flags['f'], cf.fortran_flags[opt]
