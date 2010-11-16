@@ -7,20 +7,29 @@ if __name__ != '__main__':
     sys.exit( 'Error, not a module: %s' % __file__ )
 import cst
 
-opts, args = getopt.getopt( sys.argv[1:], '', 'machine=' )
+# command line arguments
+opts, args = getopt.getopt( sys.argv[1:], 'v', ['verbose', 'machine='] )
 
-if opts:
-    machine = os.path.basename( opts[0][1] )
-    cf = cst.conf.configure( None, machine, save_site=True )[0]
+# machine presets
+machine = None
+for k, v in opts:
+    if k == '--machine':
+        machine = os.path.basename( opts[0][1] )
+
+# configure
+cf = cst.conf.configure( None, machine, save_site=True )[0]
+
+# verbose
+if cf.verbose:
     print( cf.__doc__ )
     cf = cf.__dict__
     del cf['__doc__']
     pprint.pprint( cf )
-else:
-    cf = cst.conf.configure( None, None, save_site=True )[0]
 
+# store package path
 path = os.path.dirname( os.path.realpath( __file__ ) )
 
+# setup target
 for target in args:
     if target == 'build':
         cst._build()

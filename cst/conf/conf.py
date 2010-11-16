@@ -29,6 +29,7 @@ depend = False   # wait for other job to finish. supply job ID to depend.
 nproc = 1
 pre = post = ''  # pre-processing and post-processing commands
 dtype = dtype_f = np.dtype( 'f' ).str # Numpy data type
+verbose = False
 
 # machine specific
 host = hostname = os.uname()[1]
@@ -51,6 +52,7 @@ launch = {
 argv = []
 options = [
     ( '',  'machine=',    'machine',  '' ),
+    ( 'v', 'verbose',     'verbose',  True ),
     ( 'f', 'force',       'force',    True ),
     ( 'n', 'dry-run',     'prepare',  False ),
     ( 'i', 'interactive', 'run',      'exec' ),

@@ -37,7 +37,7 @@ pip install virtualenv
 pip install pypdf
 pip install GitPython
 pip install web.py
-. install-obspy.sh "${prefix}"
 
 cd "${pwd}"
+. install-obspy.sh "${prefix}"
 
