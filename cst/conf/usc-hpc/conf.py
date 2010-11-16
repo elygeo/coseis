@@ -4,6 +4,8 @@ USC HPC - http://www.usc.edu/hpcc/
 Add these to your .bashrc:
     source /usr/usc/openmpi/default/setup.sh
     source /usr/usc/globus/default/setup.sh
+    export F77=gfortran
+    export F90=gfortran
 
 MPICH install is very old, so don't use:
     source /usr/usc/mpich/default/setup.sh
@@ -17,7 +19,7 @@ I/O to temporary space: /scratch
 Do not add to the front of your path on HPC
 Use /home instead of /auto
 """
-login = 'hpc-login1.usc.edu'
+login = 'hpc-login2.usc.edu'
 hostname = 'hpc-login[12]'
 queue = 'largemem'; maxnodes =   1; maxcores = 8; maxram = 63000; maxtime = 336, 00
 queue = 'nbns';     maxnodes =  48; maxcores = 8; maxram = 11000; maxtime = 336, 00
