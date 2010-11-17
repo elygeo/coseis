@@ -2,7 +2,7 @@
 Support Operator Rupture Dynamics
 """
 from __future__ import division, absolute_import, print_function #unicode_literals
-import os, sys, math, glob, shutil, pprint
+import os, sys, math, glob, shutil, shlex, pprint
 import numpy as np
 from ..conf import launch
 from . import fieldnames
@@ -23,7 +23,7 @@ def _build( mode=None, optimize=None, dtype=None ):
         mode = 'sm'
     if not dtype:
         dtype = cf.dtype
-    base = (
+    base = [
         'globals.f90',
         'diffcn.f90',
         'diffnc.f90',
@@ -32,8 +32,8 @@ def _build( mode=None, optimize=None, dtype=None ):
         'surfnormals.f90',
         'util.f90',
         'fio.f90',
-    )
-    common = (
+    ]
+    common = [
         'arrays.f90',
         'fieldio.f90',
         'stats.f90',
@@ -49,7 +49,7 @@ def _build( mode=None, optimize=None, dtype=None ):
         'stress.f90',
         'acceleration.f90',
         'sord.f90',
-    )
+    ]
     dtype = np.dtype( dtype ).str
     dsize = dtype[-1]
     new = False
@@ -60,23 +60,29 @@ def _build( mode=None, optimize=None, dtype=None ):
     if not os.path.isdir( bld ):
         os.mkdir( bld )
     if 's' in mode:
-        source = base + ('serial.f90',) + common
+        source = base + ['serial.f90'] + common
         for opt in optimize:
             object_ = bld + 'sord-s' + opt + dsize
-            fflags = cf.fortran_flags['f'], cf.fortran_flags[opt]
+            cmd = (
+                [cf.fortran_serial] +
+                shlex.split( cf.fortran_flags['f'] ) +
+                shlex.split( cf.fortran_flags[opt] )
+            )
             if dtype != cf.dtype_f:
-                fflags = fflags + (cf.fortran_flags[dsize],)
-            compiler = (cf.fortran_serial,) + fflags + ('-o',)
-            new |= cst.conf.make( compiler, object_, source )
+                cmd += shlex.split( cf.fortran_flags[dsize] )
+            new |= cst.conf.make( cmd + ['-o'], object_, source )
     if 'm' in mode and cf.fortran_mpi:
-        source = base + ('mpi.f90',) + common
+        source = base + ['mpi.f90'] + common
         for opt in optimize:
             object_ = bld + 'sord-m' + opt + dsize
-            fflags = cf.fortran_flags['f'], cf.fortran_flags[opt]
+            cmd = (
+                [cf.fortran_mpi] +
+                shlex.split( cf.fortran_flags['f'] ) +
+                shlex.split( cf.fortran_flags[opt] )
+            )
             if dtype != cf.dtype_f:
-                fflags = fflags + (cf.fortran_flags[dsize],)
-            compiler = (cf.fortran_mpi,) + fflags + ('-o',)
-            new |= cst.conf.make( compiler, object_, source )
+                cmd += shlex.split( cf.fortran_flags[dsize] )
+            new |= cst.conf.make( cmd + ['-o'], object_, source )
     if new:
         cst._archive()
     os.chdir( cwd )

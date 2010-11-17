@@ -3,6 +3,9 @@ TACC Ranger
 
 EPD version: rh3-x86_64
 
+export F77=pgf95
+export F90=pgf95
+
 gsiftp://gridftp.ranger.tacc.teragrid.org:2811/
 http://www.tacc.utexas.edu/services/userguides/ranger/
 ppn must be one of (1, 2, 4, 8, 12, 15, 16)

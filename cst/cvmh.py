@@ -1,7 +1,7 @@
 """
 SCEC Community Velocity Model (CVM-H) extraction tool
 """
-import os, sys, urllib, gzip
+import os, sys, urllib, gzip, subprocess
 import numpy as np
 from . import coord, gocad
 
@@ -87,8 +87,7 @@ def vs30_wills( rebuild=False ):
         f = os.path.join( repo, os.path.basename( url ) )
         if not os.path.exists( f ):
             print( 'Downloading %s' % url )
-            if os.system( 'scp %s %s' % (url, f) ):
-                sys.exit()
+            subprocess.check_call( ['scp', url, f] )
         fh = open( f, 'rb' )
         dtype = '<i2'
         bytes = np.dtype( dtype ).itemsize
@@ -163,8 +162,7 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx63' ):
         print( 'Downloading %s' % url )
         f = os.path.join( repo, os.path.basename( url ) )
         urllib.urlretrieve( url, f )
-        if os.system( 'tar -C %s -jxf %s' % (repo, f) ):
-            sys.exit()
+        subprocess.check_call( ['tar', '-C', repo, '-jxf', f] )
 
     # voxet ID
     if voxet in voxet3d:

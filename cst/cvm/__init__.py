@@ -1,7 +1,7 @@
 """
 SCEC Community Velocity Model
 """
-import os, sys, re, shutil, urllib, tarfile
+import os, sys, re, shutil, urllib, tarfile, subprocess, shlex
 import numpy as np
 from ..conf import launch
 
@@ -50,8 +50,8 @@ def _build( mode=None, optimize=None ):
         os.chdir( bld )
         fh = tarfile.open( tarball, 'r:gz' )
         fh.extractall( bld )
-        if os.system( 'patch -p1 < %s' % os.path.join( path, 'cvm4.patch' ) ):
-            sys.exit( 'Error patching CVM' )
+        f = os.path.join( path, 'cvm4.patch' )
+        subprocess.check_call( ['patch', '-p1', '-i', f] )
     os.chdir( bld )
 
     # compile ascii, binary, and MPI versions
@@ -59,20 +59,20 @@ def _build( mode=None, optimize=None ):
     if 'a' in mode:
         source = 'iotxt.f', 'version4.0.f'
         for opt in optimize:
-            compiler = cf.fortran_serial, cf.fortran_flags[opt], '-o'
+            compiler = [cf.fortran_serial] + shlex.split( cf.fortran_flags[opt] ) + ['-o']
             object_ = 'cvm4-a' + opt
             new |= cst.conf.make( compiler, object_, source )
     if 's' in mode:
         source = 'iobin.f', 'version4.0.f'
         for opt in optimize:
-            compiler = cf.fortran_serial, cf.fortran_flags[opt], '-o'
+            compiler = [cf.fortran_serial] + shlex.split( cf.fortran_flags[opt] ) + ['-o']
             object_ = 'cvm4-s' + opt
             new |= cst.conf.make( compiler, object_, source )
     if 'm' in mode and cf.fortran_mpi:
         source = 'iompi.f', 'version4.0.f'
         for opt in optimize:
+            compiler = [cf.fortran_mpi] + shlex.split( cf.fortran_flags[opt] ) + ['-o']
             object_ = 'cvm4-m' + opt
-            compiler = cf.fortran_mpi, cf.fortran_flags[opt], '-o'
             new |= cst.conf.make( compiler, object_, source )
     os.chdir( cwd )
     return

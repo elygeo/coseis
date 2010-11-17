@@ -1,7 +1,7 @@
 """
 Source utilities
 """
-import os, sys, urllib, gzip
+import os, sys, urllib, gzip, subprocess
 import numpy as np
 from . import util, coord
 
@@ -167,24 +167,24 @@ def cybershake( isrc, irup, islip, ihypo, path='srf', name=None ):
 
     # get reports
     d = os.path.dirname( os.path.normpath( path ) )
-    get = 'scp intensity.usc.edu:/home/scec-00/cybershk/reports/'
+    url = 'intensity.usc.edu:/home/scec-00/cybershk/reports/'
     for f in 'erf35_source_rups.txt', 'erf35_sources.txt':
         ff = os.path.join( d, f )
         if not os.path.exists( ff ):
-            os.system( get + f + ' ' + ff )
+            subprocess.check_call( ['scp', url + f, ff] )
     segments = dict( np.loadtxt( ff, 'i,S64', delimiter='\t', skiprows=1 ) )
 
     # get source files
     os.mkdir( path )
     os.chdir( path )
-    get = 'scp intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V3_2/%d/%d/' % (isrc, irup)
-    get = 'scp intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V2_3/%d/%d/' % (isrc, irup)
-    mesh = '%d_%d.txt' % (isrc, irup)
-    head = '%d_%d.txt.variation.output' % (isrc, irup)
-    srf  = '%d_%d.txt.variation-s%04d-h%04d' % (isrc, irup, islip, ihypo)
-    os.system( get + head + ' head' )
-    os.system( get + mesh + ' mesh' )
-    os.system( get + srf  + ' srf'  )
+    url = 'intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V3_2/'
+    url = 'intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V2_3/'
+    mesh = '%s%d/%d/%d_%d.txt' % (url, isrc, irup, isrc, irup)
+    head = '%s%d/%d/%d_%d.txt.variation.output' % (url, isrc, irup, isrc, irup)
+    srf  = '%s%d/%d/%d_%d.txt.variation-s%04d-h%04d' % (url, isrc, irup, isrc, irup, islip, ihypo)
+    subprocess.check_call( ['scp', head, 'head'] )
+    subprocess.check_call( ['scp', mesh, 'mesh'] )
+    subprocess.check_call( ['scp', srf, 'srf']  )
 
     # extract SRF file
     srf_read( 'srf', '.' )
@@ -215,7 +215,7 @@ def cybershake( isrc, irup, islip, ihypo, path='srf', name=None ):
     np.savetxt( 'trace.txt', np.array( [x[:,0], y[:,0]] ).T, '%f' )
 
     # clean up
-    os.system( 'gzip srf' )
+    subprocess.check_call( ['gzip', 'srf'] )
     os.remove( 'mesh' )
     os.remove( 'head' )
     os.chdir( cwd )

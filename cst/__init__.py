@@ -2,7 +2,7 @@
 Computational Seismology Tools
 """
 #from __future__ import division, absolute_import, print_function, unicode_literals
-import os
+import os, subprocess
 path = os.path.dirname( __file__ )
 from . import util, conf
 from . import coord, signal
@@ -26,7 +26,8 @@ def _build():
     os.chdir( path )
     if not os.path.isfile( 'rspectra.so' ):
         print( '\nBuilding rspectra' )
-        os.system( 'f2py -c -m rspectra rspectra.f90' )
+        cmd = 'f2py', '-c', '-m', 'rspectra', 'rspectra.f90'
+        subprocess.check_call( cmd )
     os.chdir( cwd )
 
 def _archive():

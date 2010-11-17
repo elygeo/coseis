@@ -1,7 +1,7 @@
 """
 Frechet kernel computation
 """
-import os, sys, shutil
+import os, sys, shutil, shlex
 from ..conf import launch
 
 path = os.path.dirname( os.path.realpath( __file__ ) )
@@ -27,8 +27,12 @@ def _build( optimize=None ):
     if 'm' in mode and cf.fortran_mpi:
         for opt in optimize:
             object_ = bld + 'cpt_ker-m' + opt
-            fflags = cf.fortran_flags['f'], cf.fortran_flags[opt]
-            compiler = (cf.fortran_mpi,) + fflags + ('-o',)
+            compiler = (
+                [cf.fortran_mpi] +
+                shlex.split( cf.fortran_flags['f'] ) +
+                shlex.split( cf.fortran_flags[opt] ) +
+                ['-o']
+            )
             new |= cst.conf.make( compiler, object_, source )
     if new:
         cst._archive()

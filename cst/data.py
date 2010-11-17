@@ -277,6 +277,8 @@ def engdahlcat( path='engdahl-centennial-cat.npy' ):
     Engdahl Centennial Earthquake Catalog.
     http://earthquake.usgs.gov/research/data/centennial.php
     """
+    import cst
+    repo = cst.site.repo
     f = os.path.join( repo, path )
     if not os.path.exists( f ):
         fmt = [

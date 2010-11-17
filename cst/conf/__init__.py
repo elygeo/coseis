@@ -169,15 +169,17 @@ def make( compiler, object_, source ):
     """
     import glob, difflib
     object_ = os.path.expanduser( object_ )
-    source = tuple( os.path.expanduser( f ) for f in source if f )
+    source = [ os.path.expanduser( f ) for f in source if f ]
     statedir = os.path.join( os.path.dirname( object_ ), '.state' )
     if not os.path.isdir( statedir ):
         os.mkdir( statedir )
     statefile = os.path.join( statedir, os.path.basename( object_ ) )
     if type( compiler ) is str:
         compiler = shlex.split( compiler )
-    command = compiler + (object_,) + source
-    state = [ ' '.join( command ) + '\n' ]
+    else:
+        compiler = list( compiler )
+    command = compiler + [object_] + source
+    state = [' '.join( command ) + '\n']
     for f in source:
         state += open( f ).readlines()
     compile_ = True
@@ -198,8 +200,7 @@ def make( compiler, object_, source ):
         except( OSError ):
             pass
         print( '\n' + ' '.join( command ) )
-        if os.system( ' '.join( command ) ):
-            sys.exit( 'Compile error' )
+        subprocess.check_call( command )
         open( statefile, 'w' ).writelines( state )
         for pat in '*.o', '*.mod', '*.ipo', '*.il', '*.stb':
             for f in glob.glob( pat ):
