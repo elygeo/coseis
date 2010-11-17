@@ -43,8 +43,8 @@ launch = {
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -hold_jid "%(depend)s" "%(name)s.sh"',
 }
-fortran_serial = 'pgf95',
-fortran_mpi = 'mpif90',
+fortran_serial = 'pgf95'
+fortran_mpi = 'mpif90'
 fortran_flags = {
     'f': '-Mdclchk',
     'g': '-Ktrap=fp -Mbounds -g',
