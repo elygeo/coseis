@@ -39,5 +39,4 @@ pip install GitPython
 pip install web.py
 
 cd "${pwd}"
-. install-obspy.sh "${prefix}"
 
