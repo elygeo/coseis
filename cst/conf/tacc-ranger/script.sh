@@ -5,8 +5,8 @@
 #$ -q %(queue)s
 #$ -pe %(maxcores)sway %(totalcores)s
 #$ -l h_rt=%(walltime)s
-#$ -e %(rundir)s/stderr
-#$ -o %(rundir)s/stdout
+#$ -e %(rundir)s/%(name)-stderr
+#$ -o %(rundir)s/%(name)-stdout
 #$ -m abe
 #$ -V
 #$ -wd %(rundir)s
