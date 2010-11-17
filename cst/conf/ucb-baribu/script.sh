@@ -3,8 +3,8 @@
 #PBS -N %(name)s
 #PBS -M %(email)s
 #PBS -l nodes=%(nodes)s:ppn=%(ppn)s
-#PBS -e %(rundir)s/%(name)s-stderr
-#PBS -o %(rundir)s/%(name)s-stdout
+#PBS -e %(rundir)s/%(name)s-err
+#PBS -o %(rundir)s/%(name)s-out
 #PBS -m abe
 #PBS -V
 #PBS -r n
