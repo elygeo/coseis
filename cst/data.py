@@ -20,7 +20,7 @@ def etopo1( indices=None, downsample=1 ):
     if not os.path.exists( filename ):
         f1 = os.path.join( repo, 'etopo1_ice_g_i2.bin' )
         if not os.path.exists( f1 ):
-            url = 'ftp://ftp.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
+            url = 'http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
             print( 'Retrieving %s' % url )
             f = os.path.join( repo, os.path.basename( url ) )
             urllib.urlretrieve( url, f )
