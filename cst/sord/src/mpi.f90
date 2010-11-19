@@ -414,8 +414,9 @@ call mpi_comm_split( comm0, 1, 0, comm, e )
 call mpi_comm_size( comm, n, e  )
 call mpi_comm_rank( comm, i, e  )
 call mpi_comm_rank( mpi_comm_world, ip, e  )
-if ( verb .and. i == 0 ) write( *, '(i8,a,i2,a,i8,2a)' ) &
-    ip, ' Opening', ndims, 'D', n, 'P file: ', trim( filename )
+if ( verb .and. i == 0 ) write( *, '(i8,3a,i8,a,i2,2a)' ) &
+    ip, ' Opening (', mode, ')', n, 'P', ndims, 'D file: ', trim( filename )
+n = size( oo )
 if ( mode == 'r' ) then
     i = mpi_mode_rdonly
 elseif ( oo(n) == 0 ) then

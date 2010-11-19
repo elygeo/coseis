@@ -8,7 +8,7 @@ tag=$( basename "$url" .tar.gz )
 cd "${prefix}"
 curl -L "${url}" | tar zx
 cd "${tag}"
-./configure -prefix="${prefix}" --with-device=ch3:shm
+./configure -prefix="${prefix}"
 make
 make install
 export PATH="${prefix}/bin:${PATH}"
