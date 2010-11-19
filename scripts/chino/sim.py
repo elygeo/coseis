@@ -17,6 +17,7 @@ dx_ = 8000.0; nproc3 = 1, 1, 1
 # path
 id_ = 'topo-cvm-%04.f' % dx_
 id_ = 'flat-%04.f' % dx_
+id_ = 'flat-cvm-%04.f' % dx_
 rundir = os.path.join( 'run', 'sim', id_ )
 
 # mesh metadata
