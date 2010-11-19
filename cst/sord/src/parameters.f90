@@ -99,7 +99,7 @@ case default
         do
             i = scan( str, '/' )
             if ( i == 0 ) exit
-            str(i:i) = '\'
+            str(i:i) = '\\'
         end do
         io%ib = -1
         !XXXread( str, *, iostat=ios ) io%mode, io%nc
@@ -107,7 +107,7 @@ case default
             io%period, io%x1, io%x2, io%nb, io%ii, io%filename, &
             io%val, io%field
         do
-            i = scan( io%filename, '\' )
+            i = scan( io%filename, '\\' )
             if ( i == 0 ) exit
             io%filename(i:i) = '/'
         end do
