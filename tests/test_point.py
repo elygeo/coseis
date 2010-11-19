@@ -5,7 +5,7 @@ SORD tests
 import subprocess, shutil
 import cst
 
-def test_sord_parallel():
+def test_point():
     """
     Test SORD parallelization with point source
     """
@@ -16,7 +16,7 @@ def test_sord_parallel():
     force = True
     debug = 0
     itstats = 1
-    shape = 5, 2, 2, 2
+    shape = 5, 4, 2, 2
     delta = 100.0, 100.0, 100.0, 0.0075
     bc1 = 0, 0, 0
     bc2 = 0, 0, 0
@@ -42,35 +42,35 @@ def test_sord_parallel():
     for f in cst.sord.fieldnames.volume:
         fieldio += [ ('=w', f, [], f) ]
 
-    # run
-    d = []
-    for i in 1, 3:
-        nproc3 = i, 1, 1
+    # single process
+    rundir = 'tmp/s'
+    cst.sord.run( locals() )
+
+    # multiple processes
+    for i, nproc3 in enumerate( [(3, 1, 1), (2, 2, 1)] ):
         rundir = 'tmp/%s' % i
-        d += [rundir]
         cst.sord.run( locals() )
+        cmd_ = (
+            'diff',
+            '--brief',
+            '--recursive',
+            '--exclude=prof',
+            '--exclude=conf.py',
+            '--exclude=meta.py',
+            '--exclude=parameters.py',
+            '--exclude=sord-sO4',
+            '--exclude=sord-mO4',
+            'tmp/s', rundir,
+        )
+        pid_ = subprocess.Popen( cmd_, stdout=subprocess.PIPE )
+        out_ = pid_.communicate()[0]
+        print out_
+        assert out_ == ''
 
-    # diff
-    cmd = (
-        'diff',
-        '--recursive',
-        '--exclude=prof',
-        '--exclude=conf.py',
-        '--exclude=meta.py',
-        '--exclude=parameters.py',
-        '--exclude=sord-sO4',
-        '--exclude=sord-mO4',
-        d[0], d[1],
-    )
-    pid = subprocess.Popen( cmd, stdout=subprocess.PIPE )
-    out = pid.communicate()[0]
-    print out
-
-    # cleanup and test for empty diff
-    #shutil.rmtree( 'tmp' )
-    assert out == ''
+    # cleanup
+    shutil.rmtree( 'tmp' )
 
 # continue if command line
 if __name__ == '__main__':
-    test_sord_parallel()
+    test_point()
 

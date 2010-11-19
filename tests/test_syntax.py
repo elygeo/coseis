@@ -32,7 +32,7 @@ def test_with_pyflakes( path='.' ):
     Test code with Pyflakes
     """
     import pyflakes.checker
-    exclude = 'ws-meta-in.py', 'test_sord.py', 'test_code.py'
+    exclude = 'ws-meta-in.py', 'test_syntax.py', 'test_point.py', 'test_pml.py'
     cwd = os.getcwd()
     top = os.path.join( os.path.dirname( __file__ ), '..' )
     os.chdir( top )

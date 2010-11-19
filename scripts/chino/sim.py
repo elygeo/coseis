@@ -89,15 +89,16 @@ if 'topo' in id_:
     ]
 
 # sites
+stagein = 'out/',
 for s in open( 'station-list.txt' ).readlines():
     s, y, x = s.split()[:3]
     x, y = proj( float(x), float(y) )
     j = x / delta[0] + 1.0
     k = y / delta[1] + 1.0
     fieldio += [
-        ('=wi', 'v1', [j,k,1,()], s + '-v1.bin'),
-        ('=wi', 'v2', [j,k,1,()], s + '-v2.bin'),
-        ('=wi', 'v3', [j,k,1,()], s + '-v3.bin'),
+        ('=wi', 'v1', [j,k,1,()], 'out/' + s + '-v1.bin'),
+        ('=wi', 'v2', [j,k,1,()], 'out/' + s + '-v2.bin'),
+        ('=wi', 'v3', [j,k,1,()], 'out/' + s + '-v3.bin'),
     ]
 
 # surface output

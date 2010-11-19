@@ -8,8 +8,8 @@ import numpy as np
 import cst
 
 # parameters
-cvm = 'h'
 cvm = 's'
+cvm = 'h'
 dx = 100.0;  nproc = 4096
 dx = 200.0;  nproc = 512
 dx = 500.0;  nproc = 32

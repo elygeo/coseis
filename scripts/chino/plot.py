@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 import obspy.core, obspy.signal, obspy.xseed
 import cst
 
-dl = obspy.xseed.Parser( 'run/stations/dataless.CI.CHN' )
-asd
+#dl = obspy.xseed.Parser( 'run/stations/dataless.CI.CHN' )
 
 # parameters
 chan = 'HN'
