@@ -7,8 +7,6 @@ import pyproj
 import numpy as np
 import cst
 
-debug = 2
-
 # parameters
 dx_ = 100.0;  nproc3 = 1, 48, 320
 dx_ = 200.0;  nproc3 = 1, 12, 160 # cutoff 0.5 Hz 4 pole butter

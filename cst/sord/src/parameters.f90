@@ -32,7 +32,7 @@ str = line
 i = scan( str, '#' )
 if ( i > 0 ) str(i:) = ' '
 do
-    i = scan( str, "()[]{}'," )
+    i = scan( str, "()[]{}'" )
     if ( i == 0 ) exit
     str(i:i) = ' '
 end do
@@ -96,11 +96,21 @@ case default
     select case( key(1:1) )
     case( '=', '+' )
         call pappend
+        do
+            i = scan( str, '/' )
+            if ( i == 0 ) exit
+            str(i:i) = '\'
+        end do
         io%ib = -1
         !XXXread( str, *, iostat=ios ) io%mode, io%nc
         read( str, *, iostat=ios ) io%mode, io%nc, io%tfunc, &
             io%period, io%x1, io%x2, io%nb, io%ii, io%filename, &
             io%val, io%field
+        do
+            i = scan( io%filename, '\' )
+            if ( i == 0 ) exit
+            io%filename(i:i) = '/'
+        end do
     case default; ios = 1
     end select
 end select
