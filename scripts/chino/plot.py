@@ -21,7 +21,7 @@ scale = 100.0
 gain = 1.0 / 4147.691
 
 # metadata
-sim = os.path.join( 'run', 'sim', 'flat-1000' ) + os.sep
+sim = os.path.join( 'run', 'sim', 'flat-cvm-8000' ) + os.sep
 meta = cst.util.load( sim + 'meta.py' )
 t0 = obspy.core.utcdatetime.UTCDateTime( meta.origin_time )
 tick = 15.0
@@ -88,7 +88,7 @@ for ista, sta in enumerate( open( 'station-list.txt' ).readlines() ):
 
         # synthetics
         n = int( duration / meta.delta[-1] )
-        f = os.path.join( sim, sta + '-v%s.bin' % (i + 1) )
+        f = os.path.join( sim, 'out', sta + '-v%s.bin' % (i + 1) )
         v = np.fromfile( f, meta.dtype, n ) * scale
         dt = meta.delta[-1]
         t = dt * np.arange( n )
