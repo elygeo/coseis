@@ -3,7 +3,7 @@ Tools for working with waveform data
 """
 import numpy as np
 
-def csmip_v2( filename ):
+def csmip_vol2( filename, max_year=2050 ):
     """
     Read strong motion record in CSMIP Volume 2 format.
 
@@ -16,11 +16,16 @@ def csmip_v2( filename ):
     j = 0
 
     # text header
-    data = dict(
-        date = ss[j+4][49:57] + ss[j+4][59:69],
-        lon = float( ss[j+5][29:36] ),
-        lat = float( ss[j+5][20:26] ),
-    )
+    t = ss[j+4][59:69]
+    m = int( ss[j+4][49:51] )
+    d = int( ss[j+4][52:54] )
+    y = int( ss[j+4][55:57] ) + 2000
+    if y > max_year:
+        y -= 100
+    time = '%04d/%02d/%02dT%s' % (y, m, d, t)
+    lon = ss[j+5][29:36]
+    lat = ss[j+5][20:26]
+    data = dict( time=time, lon=lon, lat=lat )
 
     # loop over channels
     while j < len( ss ):
@@ -30,29 +35,28 @@ def csmip_v2( filename ):
         ihdr = []
         n = 5
         while len( ihdr ) < 100:
+            ihdr += [ int( ss[j][i:i+n] ) for i in range( 0, len( ss[j] ) - 2, n ) ]
             j += 1
-            ihdr += [ int( ss[j][i:i+n] ) for i in range( 0, len( ss[j] ) - 1, n ) ]
         orient = ihdr[26]
 
         # real-value header
         rhdr = []
         n = 10
         while len( rhdr ) < 100:
+            rhdr += [ float( ss[j][i:i+n] ) for i in range( 0, len( ss[j] ) - 2, n ) ]
             j += 1
-            rhdr += [ float( ss[j][i:i+n] ) for i in range( 0, len( ss[j] ) - 1, n ) ]
         data['dt'] = rhdr[52]
 
         # data
         n = 10
-        data = []
-        for w in 'avu':
+        for w in 'avd':
+            m = int( ss[j][:6] )
             v = []
             j += 1
-            m = int( ss[j][:8] )
             while len( v ) < m:
+                v += [ float( ss[j][i:i+n] ) for i in range( 0, len( ss[j] ) - 2, n ) ]
                 j += 1
-                v += [ float( ss[j][i:i+n] ) for i in range( 0, len( ss[j] ) - 1, n ) ]
-            k = w + str( orient )
+            k = '%s%03d' % (w, orient)
             data[k] = np.array( v )
 
         # trailer
