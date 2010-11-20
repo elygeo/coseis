@@ -3,6 +3,7 @@ CVM configuration
 """
 import os
 
+version = '4.0'
 seconds = 400
 nsample = None
 lon_file = 'lon.bin'

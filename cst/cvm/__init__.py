@@ -1,5 +1,7 @@
 """
 SCEC Community Velocity Model
+
+http://www.data.scec.org/3Dvelocity/
 """
 import os, sys, re, shutil, urllib, tarfile, subprocess, shlex
 import numpy as np
@@ -31,10 +33,10 @@ def _build( mode=None, optimize=None ):
         mode = cf.mode
     if not mode:
         mode = 'asm'
+    ver = 'cvm' + cf.version.replace('.', '')
 
     # download source code
-    url = 'http://www.data.scec.org/3Dvelocity/Version4.tar.gz'
-    url = 'http://earth.usc.edu/~gely/coseis/download/cvm4.tgz'
+    url = 'http://earth.usc.edu/~gely/coseis/download/%s.tgz' % ver
     tarball = os.path.join( cf.repo, os.path.basename( url ) )
     if not os.path.exists( tarball ):
         if not os.path.exists( cf.repo ):
@@ -44,35 +46,35 @@ def _build( mode=None, optimize=None ):
 
     # build directory
     cwd = os.getcwd()
-    bld = os.path.join( os.path.dirname( path ), 'build', 'cvm4' ) + os.sep
+    bld = os.path.join( os.path.dirname( path ), 'build', ver ) + os.sep
     if not os.path.isdir( bld ):
         os.makedirs( bld )
         os.chdir( bld )
         fh = tarfile.open( tarball, 'r:gz' )
         fh.extractall( bld )
-        f = os.path.join( path, 'cvm4.patch' )
+        f = os.path.join( path, ver + '.patch' )
         subprocess.check_call( ['patch', '-p1', '-i', f] )
     os.chdir( bld )
 
     # compile ascii, binary, and MPI versions
     new = False
     if 'a' in mode:
-        source = 'iotxt.f', 'version4.0.f'
+        source = 'iotxt.f', 'version%s.f' % cf.version
         for opt in optimize:
             compiler = [cf.fortran_serial] + shlex.split( cf.fortran_flags[opt] ) + ['-o']
-            object_ = 'cvm4-a' + opt
+            object_ = 'cvm-a' + opt
             new |= cst.conf.make( compiler, object_, source )
     if 's' in mode:
-        source = 'iobin.f', 'version4.0.f'
+        source = 'iobin.f', 'version%s.f' % cf.version
         for opt in optimize:
             compiler = [cf.fortran_serial] + shlex.split( cf.fortran_flags[opt] ) + ['-o']
-            object_ = 'cvm4-s' + opt
+            object_ = 'cvm-s' + opt
             new |= cst.conf.make( compiler, object_, source )
     if 'm' in mode and cf.fortran_mpi:
-        source = 'iompi.f', 'version4.0.f'
+        source = 'iompi.f', 'version%s.f' % cf.version
         for opt in optimize:
             compiler = [cf.fortran_mpi] + shlex.split( cf.fortran_flags[opt] ) + ['-o']
-            object_ = 'cvm4-m' + opt
+            object_ = 'cvm-m' + opt
             new |= cst.conf.make( compiler, object_, source )
     os.chdir( cwd )
     return
@@ -97,8 +99,9 @@ def stage( inputs={}, **kwargs ):
         job.mode = 's'
         if job.nproc > 1:
             job.mode = 'm'
-    job.command = os.path.join( '.', 'cvm4' + '-' + job.mode + job.optimize )
+    job.command = os.path.join( '.', 'cvm-' + job.mode + job.optimize )
     job = cst.conf.prepare( job )
+    ver = 'cvm' + job.version.replace('.', '')
 
     # build
     if not job.prepare:
@@ -106,7 +109,7 @@ def stage( inputs={}, **kwargs ):
     _build( job.mode, job.optimize )
 
     # check minimum processors needed for compiled memory size
-    file = os.path.join( cst.path, 'build', 'cvm4', 'in.h' )
+    file = os.path.join( cst.path, 'build', ver, 'in.h' )
     string = open( file ).read()
     pattern = 'ibig *= *([0-9]*)'
     n = int( re.search( pattern, string ).groups()[0] )
@@ -120,7 +123,7 @@ def stage( inputs={}, **kwargs ):
     if job.force == True and os.path.isdir( job.rundir ):
         shutil.rmtree( job.rundir )
     if not os.path.exists( job.rundir ):
-        f = os.path.join( cst.path, 'build', 'cvm4' )
+        f = os.path.join( cst.path, 'build', ver )
         shutil.copytree( f, job.rundir )
     else:
         for f in (
