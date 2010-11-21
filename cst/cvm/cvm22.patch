@@ -1,4 +1,3 @@
-Binary files a/a.out and b/a.out differ
 diff -ruN a/in.h b/in.h
 --- a/in.h	2000-06-20 17:07:33.000000000 -0700
 +++ b/in.h	2010-11-20 22:03:35.000000000 -0800
@@ -251,9 +250,19 @@ diff -ruN a/iotxt.f b/iotxt.f
 +      kerr = 0
 +      end
 +
+diff -ruN a/names.h b/names.h
+--- a/names.h	2000-06-20 17:07:33.000000000 -0700
++++ b/names.h	2010-11-20 22:36:57.000000000 -0800
+@@ -1,5 +1,5 @@
+ c names.h   name roots for edges and surfaces
+-         character*4 aedname(numsur)
++         character(4) aedname(numsur)
+          data (aedname(i),i=1,numsur)/'b1__','b2__','b3__','b4__',
+      1    'b5__','ku1_','ku2_',
+      2    'ku3_','ku4_','ku5_','ku8_','pu1_','pu2A','pu2B','pu3_',
 diff -ruN a/version2.2.f b/version2.2.f
 --- a/version2.2.f	2000-09-07 19:18:11.000000000 -0700
-+++ b/version2.2.f	2010-11-20 22:22:22.000000000 -0800
++++ b/version2.2.f	2010-11-20 23:54:12.000000000 -0800
 @@ -19,6 +19,7 @@
  c scum v2f,g   6-00   modified geotech stuff. HM
  c scum v2h     6-00   modified geotech , separate P and S. HM
@@ -262,45 +271,44 @@ diff -ruN a/version2.2.f b/version2.2.f
  c                   
  c
           include 'in.h'
-@@ -33,6 +34,37 @@
+@@ -33,6 +34,36 @@
           include 'surfaced.h'
           include 'genpro.h'
           include 'genprod.h'
 +
 +c initialize to zero, add by Ely
 +c     inct = 0
-+c     incto = 0
-+c     iupm = 0
-+c     idnm = 0
-+c     rshcor = 0.0
-+c     do i = 1,isurmx
-+c       iiiold(i) = 0
-+c       inorold(i) = 0
-+c       rsuqold(i) = 0.0
-+c     end do
-+c     rtemp01 = 0.0
-+c     rtemp05 = 0.0
-+c     rtemp07 = 0.0
-+c     rtemp22 = 0.0
-+c     rtemp36 = 0.0
-+c     rtemp47 = 0.0
-+c     rtemp50 = 0.0
-+c     rtemp55 = 0.0
-+c     rtemp56 = 0.0
-+c     rtemp57 = 0.0
-+c     rtemp62 = 0.0
-+c     rtemp63 = 0.0
-+c     rtemp64 = 0.0
-+c     rtemp65 = 0.0
-+c     rtemp68 = 0.0
-+c     rtemp69 = 0.0
-+c     rtemp70 = 0.0
-+c     rtemp73 = 0.0
++      incto = 0
++      iupm = 0
++      idnm = 0
++      rshcor = 0.0
++      do i = 1,isurmx
++        iiiold(i) = 0
++        inorold(i) = 0
++        rsuqold(i) = 0.0
++      end do
++      rtemp01 = 0.0
++      rtemp05 = 0.0
++      rtemp07 = 0.0
++      rtemp22 = 0.0
++      rtemp36 = 0.0
++      rtemp47 = 0.0
++      rtemp50 = 0.0
++      rtemp55 = 0.0
++      rtemp56 = 0.0
++      rtemp57 = 0.0
++      rtemp62 = 0.0
++      rtemp63 = 0.0
++      rtemp64 = 0.0
++      rtemp65 = 0.0
++      rtemp68 = 0.0
++      rtemp69 = 0.0
++      rtemp70 = 0.0
 +
  c some constants
           rd2rad=3.141593/180.
           rckval=500000.
-@@ -511,7 +543,7 @@
+@@ -511,7 +542,7 @@
  c--diag-----write(*,*)l0,iup,idn
              go to 1177
              endif
@@ -309,7 +317,7 @@ diff -ruN a/version2.2.f b/version2.2.f
             iupm=idnm
             ishal=idn
             goto 1177
-@@ -848,7 +880,7 @@
+@@ -848,7 +879,7 @@
  c-----reads strat surface edges---------------
  c---reads x-y pairs--------------------------
           include 'surface.h'
@@ -318,7 +326,7 @@ diff -ruN a/version2.2.f b/version2.2.f
           include 'names.h'
           asuf2='_edge'
           kerr=0
-@@ -871,7 +903,7 @@
+@@ -871,7 +902,7 @@
  c-----read model edge file, kept separate from surface edge-----
  c-------to simplify index counts--------------------------------
            include 'surface.h'
@@ -327,7 +335,7 @@ diff -ruN a/version2.2.f b/version2.2.f
            kerr=0
  c---file name assignment-------
            aname3='bmod_edge'
-@@ -890,13 +922,13 @@
+@@ -890,13 +921,13 @@
           subroutine readgeo(k2err)
  c reads geologic contours
           include 'sgeo.h'
@@ -343,7 +351,7 @@ diff -ruN a/version2.2.f b/version2.2.f
             do 300 k=1,ngeo
             read(12,*)np(k)
              do 310 k1=1,np(k)
-@@ -963,7 +995,7 @@
+@@ -963,7 +994,7 @@
  c---reads stratigraphic surfaces-------------------------
  c---reads spyglass ascii output--------------------------
           include 'surface.h'
@@ -352,7 +360,7 @@ diff -ruN a/version2.2.f b/version2.2.f
           include 'names.h'
           asuf='_sur'
           kerr=0
-@@ -1004,7 +1036,7 @@
+@@ -1004,7 +1035,7 @@
  c-reads uplift file for LAB--------------------
  c-----just like readsur-------------
          include 'labup.h'
@@ -361,7 +369,16 @@ diff -ruN a/version2.2.f b/version2.2.f
  c file name assignment
          filei4='laup_sur'
  c
-@@ -1027,7 +1059,7 @@
+@@ -1013,6 +1044,8 @@
+          do 400 i=1,nlaup 
+           read(16,*) rlaup(i),(rzupl(i,j),j=1,nloup) 
+           do 440 j=1,nloup
++c rloup is not set anywhere, at least initialize it to zero
++          rloup(j) = 0.0
+ c convert thousands of feet to feet---------------
+           rzupl(i,j)=rzupl(i,j)*1000. 
+ 440       continue 
+@@ -1027,7 +1060,7 @@
  c--gets uplift for LAB---------------
  c find uplift amount at current lat long
          include 'labup.h'
@@ -370,7 +387,7 @@ diff -ruN a/version2.2.f b/version2.2.f
             if(rlatl0.le.rlaup(l7).and.rlatl0.gt.rlaup(l7+1))then
              do 828 l8=1,nloup-1 
              if(rlonl0.gt.rloup(l8).and.rlonl0.le.rloup(l8+1))then
-@@ -1131,45 +1163,11 @@
+@@ -1131,45 +1164,11 @@
           return
           end
  
@@ -417,7 +434,24 @@ diff -ruN a/version2.2.f b/version2.2.f
           data (asrnam(i),i=1,numsiv)/'25','55','60','65',
       1    '70','Mo'/
           asuf4='.ascii'
-@@ -1533,15 +1531,15 @@
+@@ -1253,6 +1252,7 @@
+          include 'ivsurfaced.h'
+          include 'generic_loc.h'
+ c---see if in constrained or generic Imperial Valley
++         rd2rad = 3.141593 / 180.0
+          xref=rmoivx(ivi3)
+          yref=rmoivy(ivi3)
+          reflat=yref*rd2rad
+@@ -1352,6 +1352,8 @@
+          include 'regional.h'
+          include 'regionald.h'
+          dimension vervep(4),verves(4)
++         rscal = 0.0
++         iinum = 0
+          rd2rad=3.141593/180.
+ c -- find which box point is in--
+          do 1927 n=1,nregll-ninrow
+@@ -1533,15 +1535,15 @@
        return
        end
  
@@ -436,7 +470,7 @@ diff -ruN a/version2.2.f b/version2.2.f
           iprono=0
           ibhct=0
           ieach=0
-@@ -1572,15 +1570,15 @@
+@@ -1572,15 +1574,15 @@
  2915      return
             end
  
@@ -455,7 +489,7 @@ diff -ruN a/version2.2.f b/version2.2.f
           do 2300 k=1,numgen
            read(12,*)irt2
            numptge2(k)=irt2
-@@ -1749,11 +1747,11 @@
+@@ -1749,12 +1751,13 @@
           return
          end
  
@@ -467,9 +501,37 @@ diff -ruN a/version2.2.f b/version2.2.f
 -        character*50 filesb
 +        character(50) filesb
  c here's input file name-----------------------------------
++        k2err = 0
          filesb='soil2.pgm'
          open(16,file=filesb,status='old',err=5977)
-@@ -1993,10 +1991,10 @@
+         read(16,*)rlonmax,rlonmin,rlatmax,rlatmin
+@@ -1786,12 +1789,17 @@
+          include 'genpro.h'
+          include 'wtbh1.h'
+          include 'wtbh2.h'
++         roff = 0.0
++         rvte3 = 0.0
++         rvte8 = 0.0
+          ihtfg=0
+          rtvelges=0.
+          rdep=rdep2
+          do 7013 n=1,nrad
+          iradcts(n)=0
+          radvs(n)=0.
++         rtvels(n) = 0.0
++         rtewts(n) = 0.0
+ 7013     continue
+ c--check ifs flag--
+          if(ifs.eq.0)then
+@@ -1915,6 +1923,7 @@
+          include 'wtbh1.h'
+          include 'wtbh3.h'
+          rtvelges=0.
++         rva = 0.0
+          do 97013 n=1,nrad
+          iradctp(n)=0
+          radvp(n)=0.
+@@ -1993,10 +2002,10 @@
           return
           end
  

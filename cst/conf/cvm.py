@@ -33,8 +33,8 @@ fortran_flags_default_ = {
         'O': '-Wall -O3',
     },
     'ifort': {
-        'g': '-u -std95 -warn -CB -traceback -g',
-        'O': '-u -std95 -warn -O3',
+        'g': '-std95 -warn -CB -traceback -g',
+        'O': '-std95 -warn -O3',
     },
     'xlf95_r': {
         'g': '-q64 -qsuppress=cmpmsg -qfixed -C -qflttrap -qsigtrap -g',
