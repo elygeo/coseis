@@ -12,7 +12,7 @@ cell = 0
 up = 0
 delta = mesh.delta
 shape = mesh.shape
-path = os.path.join( mesh.workdir, 'cvm4' ) + os.sep
+path = mesh.rundir + os.sep
 
 # setup
 dz = delta[2]

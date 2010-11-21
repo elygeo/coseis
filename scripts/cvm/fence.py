@@ -9,7 +9,7 @@ import cst
 
 # parameters
 model = 'cvmh'
-model = 'cvm4'
+model = 'cvm'
 prop, vmin, vmax = 'vs', 500, 4000
 prop, vmin, vmax = 'vp', 1600, 6400
 dx = 200.0; dz = 50.0; nz = 201

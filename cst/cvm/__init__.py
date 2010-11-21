@@ -19,7 +19,7 @@ input_template = """\
 %(vs_file)s
 """
 
-def _build( mode=None, optimize=None ):
+def _build( mode=None, optimize=None, version=None ):
     """
     Build CVM code.
     """
@@ -27,13 +27,15 @@ def _build( mode=None, optimize=None ):
 
     # configure
     cf = cst.conf.configure( 'cvm' )[0]
-    if not optimize:
-        optimize = cf.optimize
     if not mode:
         mode = cf.mode
     if not mode:
         mode = 'asm'
-    ver = 'cvm' + cf.version.replace('.', '')
+    if not optimize:
+        optimize = cf.optimize
+    if not version:
+        version = cf.version
+    ver = 'cvm' + version.replace('.', '')
 
     # download source code
     url = 'http://earth.usc.edu/~gely/coseis/download/%s.tgz' % ver
@@ -59,19 +61,19 @@ def _build( mode=None, optimize=None ):
     # compile ascii, binary, and MPI versions
     new = False
     if 'a' in mode:
-        source = 'iotxt.f', 'version%s.f' % cf.version
+        source = 'iotxt.f', 'version%s.f' % version
         for opt in optimize:
             compiler = [cf.fortran_serial] + shlex.split( cf.fortran_flags[opt] ) + ['-o']
             object_ = 'cvm-a' + opt
             new |= cst.conf.make( compiler, object_, source )
     if 's' in mode:
-        source = 'iobin.f', 'version%s.f' % cf.version
+        source = 'iobin.f', 'version%s.f' % version
         for opt in optimize:
             compiler = [cf.fortran_serial] + shlex.split( cf.fortran_flags[opt] ) + ['-o']
             object_ = 'cvm-s' + opt
             new |= cst.conf.make( compiler, object_, source )
     if 'm' in mode and cf.fortran_mpi:
-        source = 'iompi.f', 'version%s.f' % cf.version
+        source = 'iompi.f', 'version%s.f' % version
         for opt in optimize:
             compiler = [cf.fortran_mpi] + shlex.split( cf.fortran_flags[opt] ) + ['-o']
             object_ = 'cvm-m' + opt
@@ -106,7 +108,7 @@ def stage( inputs={}, **kwargs ):
     # build
     if not job.prepare:
         return job
-    _build( job.mode, job.optimize )
+    _build( job.mode, job.optimize, job.version )
 
     # check minimum processors needed for compiled memory size
     file = os.path.join( cst.path, 'build', ver, 'in.h' )
