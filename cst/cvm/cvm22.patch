@@ -1,6 +1,7 @@
+Binary files a/a.out and b/a.out differ
 diff -ruN a/in.h b/in.h
---- a/in.h	2010-06-16 14:29:08.000000000 -0700
-+++ b/in.h	2010-06-16 14:36:10.000000000 -0700
+--- a/in.h	2000-06-20 17:07:33.000000000 -0700
++++ b/in.h	2010-11-20 22:03:35.000000000 -0800
 @@ -1,4 +1,8 @@
 -c  in.h   contains i-o stuff
 -         parameter(ibig=750000, rdepmin=0.0)
@@ -16,7 +17,7 @@ diff -ruN a/in.h b/in.h
 +      integer :: inout(ibig), nn, nnl
 diff -ruN a/iobin.f b/iobin.f
 --- a/iobin.f	1969-12-31 16:00:00.000000000 -0800
-+++ b/iobin.f	2010-06-16 14:35:47.000000000 -0700
++++ b/iobin.f	2010-11-20 21:56:58.000000000 -0800
 @@ -0,0 +1,80 @@
 +! Binary I/O for SCEC CVM
 +
@@ -100,7 +101,7 @@ diff -ruN a/iobin.f b/iobin.f
 +
 diff -ruN a/iompi.f b/iompi.f
 --- a/iompi.f	1969-12-31 16:00:00.000000000 -0800
-+++ b/iompi.f	2010-06-16 14:35:54.000000000 -0700
++++ b/iompi.f	2010-11-20 21:56:58.000000000 -0800
 @@ -0,0 +1,106 @@
 +! MPI I/O for SCEC CVM
 +
@@ -210,7 +211,7 @@ diff -ruN a/iompi.f b/iompi.f
 +
 diff -ruN a/iotxt.f b/iotxt.f
 --- a/iotxt.f	1969-12-31 16:00:00.000000000 -0800
-+++ b/iotxt.f	2010-06-16 14:36:00.000000000 -0700
++++ b/iotxt.f	2010-11-20 21:56:58.000000000 -0800
 @@ -0,0 +1,38 @@
 +! ASCII I/O for SCEC CVM
 +
@@ -250,57 +251,57 @@ diff -ruN a/iotxt.f b/iotxt.f
 +      kerr = 0
 +      end
 +
-diff -ruN a/version3.0.f b/version3.0.f
---- a/version3.0.f	2010-06-16 14:29:08.000000000 -0700
-+++ b/version3.0.f	2010-06-16 14:31:40.000000000 -0700
-@@ -22,6 +22,7 @@
- c scum v2j     0-00   various glitch fixes
- c
- c version 3.0  8-01   install upper mantle tomography
+diff -ruN a/version2.2.f b/version2.2.f
+--- a/version2.2.f	2000-09-07 19:18:11.000000000 -0700
++++ b/version2.2.f	2010-11-20 22:22:22.000000000 -0800
+@@ -19,6 +19,7 @@
+ c scum v2f,g   6-00   modified geotech stuff. HM
+ c scum v2h     6-00   modified geotech , separate P and S. HM
+ c scum v2i     8-00   new tomo interpolator, vent glitch fixes HM
 +c Bug fixes and modifications for binary and MPI I/O. Geoffrey Ely 2007/9/1
  c                   
  c
           include 'in.h'
-@@ -36,6 +37,37 @@
+@@ -33,6 +34,37 @@
           include 'surfaced.h'
           include 'genpro.h'
           include 'genprod.h'
 +
 +c initialize to zero, add by Ely
-+      inct = 0
-+      incto = 0
-+      iupm = 0
-+      idnm = 0
-+      rshcor = 0.0
-+      do i = 1,isurmx
-+        iiiold(i) = 0
-+        inorold(i) = 0
-+        rsuqold(i) = 0.0
-+      end do
-+      rtemp01 = 0.0
-+      rtemp05 = 0.0
-+      rtemp07 = 0.0
-+      rtemp22 = 0.0
-+      rtemp36 = 0.0
-+      rtemp47 = 0.0
-+      rtemp50 = 0.0
-+      rtemp55 = 0.0
-+      rtemp56 = 0.0
-+      rtemp57 = 0.0
-+      rtemp62 = 0.0
-+      rtemp63 = 0.0
-+      rtemp64 = 0.0
-+      rtemp65 = 0.0
-+      rtemp68 = 0.0
-+      rtemp69 = 0.0
-+      rtemp70 = 0.0
-+      rtemp73 = 0.0
++c     inct = 0
++c     incto = 0
++c     iupm = 0
++c     idnm = 0
++c     rshcor = 0.0
++c     do i = 1,isurmx
++c       iiiold(i) = 0
++c       inorold(i) = 0
++c       rsuqold(i) = 0.0
++c     end do
++c     rtemp01 = 0.0
++c     rtemp05 = 0.0
++c     rtemp07 = 0.0
++c     rtemp22 = 0.0
++c     rtemp36 = 0.0
++c     rtemp47 = 0.0
++c     rtemp50 = 0.0
++c     rtemp55 = 0.0
++c     rtemp56 = 0.0
++c     rtemp57 = 0.0
++c     rtemp62 = 0.0
++c     rtemp63 = 0.0
++c     rtemp64 = 0.0
++c     rtemp65 = 0.0
++c     rtemp68 = 0.0
++c     rtemp69 = 0.0
++c     rtemp70 = 0.0
++c     rtemp73 = 0.0
 +
  c some constants
           rd2rad=3.141593/180.
-          rckval=5000000.
-@@ -538,7 +570,7 @@
- c diag      write(*,*)l0,iup,idn
+          rckval=500000.
+@@ -511,7 +543,7 @@
+ c--diag-----write(*,*)l0,iup,idn
              go to 1177
              endif
 -1188       iup=idn
@@ -308,7 +309,7 @@ diff -ruN a/version3.0.f b/version3.0.f
             iupm=idnm
             ishal=idn
             goto 1177
-@@ -879,7 +911,7 @@
+@@ -848,7 +880,7 @@
  c-----reads strat surface edges---------------
  c---reads x-y pairs--------------------------
           include 'surface.h'
@@ -317,7 +318,7 @@ diff -ruN a/version3.0.f b/version3.0.f
           include 'names.h'
           asuf2='_edge'
           kerr=0
-@@ -902,7 +934,7 @@
+@@ -871,7 +903,7 @@
  c-----read model edge file, kept separate from surface edge-----
  c-------to simplify index counts--------------------------------
            include 'surface.h'
@@ -326,7 +327,7 @@ diff -ruN a/version3.0.f b/version3.0.f
            kerr=0
  c---file name assignment-------
            aname3='bmod_edge'
-@@ -921,13 +953,13 @@
+@@ -890,13 +922,13 @@
           subroutine readgeo(k2err)
  c reads geologic contours
           include 'sgeo.h'
@@ -342,36 +343,25 @@ diff -ruN a/version3.0.f b/version3.0.f
             do 300 k=1,ngeo
             read(12,*)np(k)
              do 310 k1=1,np(k)
-@@ -992,8 +1024,8 @@
+@@ -963,7 +995,7 @@
  c---reads stratigraphic surfaces-------------------------
  c---reads spyglass ascii output--------------------------
           include 'surface.h'
 -         character*8 aname, asuf*4
--         character*9 aname2, a18*1
 +         character(8) aname, asuf*4
-+         character(9) aname2, a18*1
           include 'names.h'
           asuf='_sur'
-          a18='2'
-@@ -1032,7 +1064,7 @@
+          kerr=0
+@@ -1004,7 +1036,7 @@
  c-reads uplift file for LAB--------------------
  c-----just like readsur-------------
          include 'labup.h'
--        character*9 filei4
-+        character(9) filei4
+-        character*8 filei4
++        character(8) filei4
  c file name assignment
-         filei4='laup_sur2'
+         filei4='laup_sur'
  c
-@@ -1040,6 +1072,8 @@
- c
-          do 400 i=1,nlaup 
-           do 440 j=1,nloup
-+           rlaup(i) = 0.0
-+           rloup(i) = 0.0
- c temp turned off for historical reason
- c          read(16,11440) rlaup(i),rloup(j),rzupl(i,j) 
- c11440     format(f9.5,1x,f10.5,1x,f10.2)
-@@ -1057,7 +1091,7 @@
+@@ -1027,7 +1059,7 @@
  c--gets uplift for LAB---------------
  c find uplift amount at current lat long
          include 'labup.h'
@@ -380,7 +370,7 @@ diff -ruN a/version3.0.f b/version3.0.f
             if(rlatl0.le.rlaup(l7).and.rlatl0.gt.rlaup(l7+1))then
              do 828 l8=1,nloup-1 
              if(rlonl0.gt.rloup(l8).and.rlonl0.le.rloup(l8+1))then
-@@ -1161,46 +1195,12 @@
+@@ -1131,45 +1163,11 @@
           return
           end
  
@@ -423,40 +413,16 @@ diff -ruN a/version3.0.f b/version3.0.f
           include 'in.h'
           include 'ivsurface.h'
 -         character*8 aname4, asuf4*6,asrnam(numsiv)*2
--         character*9 aname42, a418*1
 +         character(8) aname4, asuf4*6,asrnam(numsiv)*2
-+         character(9) aname42, a418*1
           data (asrnam(i),i=1,numsiv)/'25','55','60','65',
       1    '70','Mo'/
           asuf4='.ascii'
-@@ -1286,6 +1286,10 @@
-          include 'ivsurfaced.h'
-          include 'generic_loc.h'
- c---see if in constrained or generic Imperial Valley
-+         rd2rad = 3.141593 / 180.0
-+         do i = 1, numsiv
-+           rsuqiv(i) = 0.0
-+         end do
-          xref=rmoivx(ivi3)
-          yref=rmoivy(ivi3)
-          reflat=yref*rd2rad
-@@ -1386,6 +1390,10 @@
-          include 'regional.h'
-          include 'regionald.h'
-          dimension vervep(4),verves(4)
-+         alp = 0.0
-+         bet = 0.0
-+         rscal = 0.0
-+         iinum = 0
-          rd2rad=3.141593/180.
- c -- find which box point is in--
-          do 1927 n=1,nregll-ninrow
-@@ -1563,15 +1571,15 @@
+@@ -1533,15 +1531,15 @@
        return
        end
  
 -         subroutine readbore(kerr) 
-+         subroutine readbore(k2err) 
++         subroutine readbore(k2err)
  c--read geotech borehole data-------------- 
           include 'borehole.h'
 -         character*9 fileib
@@ -470,7 +436,7 @@ diff -ruN a/version3.0.f b/version3.0.f
           iprono=0
           ibhct=0
           ieach=0
-@@ -1602,15 +1610,15 @@
+@@ -1572,15 +1570,15 @@
  2915      return
             end
  
@@ -489,15 +455,7 @@ diff -ruN a/version3.0.f b/version3.0.f
           do 2300 k=1,numgen
            read(12,*)irt2
            numptge2(k)=irt2
-@@ -1685,6 +1693,7 @@
-         dimension inindex(inct)
-         dimension rdelz(nx,ny)
-         rdmi2=40.
-+        iteisb = 0
- c
-         icolnm=abs(int((rlonmax-rlonl0)/rdelx))
-         irownm=int((rlatmax-rlatl0)/rdely)
-@@ -1799,12 +1808,13 @@
+@@ -1749,11 +1747,11 @@
           return
          end
  
@@ -509,38 +467,14 @@ diff -ruN a/version3.0.f b/version3.0.f
 -        character*50 filesb
 +        character(50) filesb
  c here's input file name-----------------------------------
-+        k2err = 0
-         filesb='soil.pgm'
+         filesb='soil2.pgm'
          open(16,file=filesb,status='old',err=5977)
-         read(16,*)rlonmax,rlonmin,rlatmax,rlatmin
-@@ -1836,12 +1846,17 @@
-          include 'genpro.h'
-          include 'wtbh1.h'
-          include 'wtbh2.h'
-+         roff = 0.0
-+         rvte3 = 0.0
-+         rvte8 = 0.0
-          ihtfg=0
-          rtvelges=0.
-          rdep=rdep2
-          do 7013 n=1,nrad
-          iradcts(n)=0
-          radvs(n)=0.
-+         rtvels(n) = 0.0
-+         rtewts(n) = 0.0
- 7013     continue
- c--check ifs flag--
-          if(ifs.eq.0)then
-@@ -1965,6 +1980,7 @@
-          include 'wtbh1.h'
-          include 'wtbh3.h'
-          rtvelges=0.
-+         rva = 0.0
-          do 97013 n=1,nrad
-          iradctp(n)=0
-          radvp(n)=0.
-@@ -2046,7 +2062,7 @@
-         subroutine readmoho(k2err)
+@@ -1993,10 +1991,10 @@
+          return
+          end
+ 
+-        subroutine readmoho(kerr)
++        subroutine readmoho(k2err)
  c--reads the moho surface file--------------------------
          include 'moho1.h'
 -        character*50 filemo
@@ -548,12 +482,3 @@ diff -ruN a/version3.0.f b/version3.0.f
  c here's input file name-----------------------------------
          filemo='moho_sur'
          open(16,file=filemo,status='old',err=3233)
-@@ -2089,7 +2105,7 @@
- c Using Monica Kohler's so cal model at xx km horizontal
- c  spacing, 10 km vertical spacing
-          include 'mantle.h'
--         character*1 atra
-+         character(1) atra
-          kerr=0
-          open(29,file='3D.out',status='old',err=2998)
-          do 1129 j=1,nmanll
