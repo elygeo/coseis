@@ -2,6 +2,7 @@
 """
 Reproduce Magistrale (2000) Fig. 10 fence diagram.
 """
+import os
 import pyproj
 import numpy as np
 from enthought.mayavi import mlab
@@ -73,7 +74,7 @@ if transpose:
 if model == 'cvmh':
     ss = cst.cvmh.extract( xx, yy, zz, prop )
 else:
-    ss = cst.cvm.extract( xx, yy, zz, prop )
+    ss = cst.cvm.extract( xx, yy, zz, prop, version='2.2' )
 if transpose:
     xx, yy, zz, ss = xx.T, yy.T, zz.T, ss.T
 xx, yy = proj( xx, yy )
@@ -116,7 +117,9 @@ mlab.view( -90, 45, 2e6, (0, 0, -2e4) )
 fig.scene.camera.view_angle = 3.3
 fig.scene.light_manager.lights[3].activate = True
 fig.scene.disable_render = False
-f = '%s-%s-fence.png' % (model, prop)
+if not os.path.exists( 'run' ):
+    os.mkdir( 'run' )
+f = os.path.join( 'run', '%s-%s-fence.png' % (model, prop) )
 print f
 mlab.savefig( f, magnification=1 )
 

@@ -20,17 +20,17 @@ shape = (
 # material properties
 hourglass = 1.0, 2.0		# hourglass stiffness and viscosity
 fieldio = [
-    ( '=', 'rho', [], 2700.0 ),	# density
-    ( '=', 'vp',  [], 6000.0 ),	# P-wave speed
-    ( '=', 'vs',  [], 3464.0 ),	# S-wave speed
-    ( '=', 'gam', [],    0.0 ),	# viscosity
+    ('=', 'rho', [], 2700.0),	# density
+    ('=', 'vp',  [], 6000.0),	# P-wave speed
+    ('=', 'vs',  [], 3464.0),	# S-wave speed
+    ('=', 'gam', [],    0.0),	# viscosity
 ]
 
 # material properties of the layer
 fieldio += [
-    ( '=', 'rho', [(), (), (1.5, 20.5), ()], 2600.0 ),
-    ( '=', 'vp',  [(), (), (1.5, 20.5), ()], 4000.0 ),
-    ( '=', 'vs',  [(), (), (1.5, 20.5), ()], 2000.0 ),
+    ('=', 'rho', [(), (), (1.5, 20.5), ()], 2600.0),
+    ('=', 'vp',  [(), (), (1.5, 20.5), ()], 4000.0),
+    ('=', 'vs',  [(), (), (1.5, 20.5), ()], 2000.0),
 ]
 
 # near side boundary conditions:

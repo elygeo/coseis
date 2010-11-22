@@ -2,70 +2,88 @@
 """
 PEER LOH.1 - Plot comparison of FK and SOM.
 """
+import os
 import numpy as np
 import scipy.signal
 import matplotlib.pyplot as plt
 import cst
 
 # parameters
-fk_dir = 'fk/'
-so_dir = 'run/'
-meta = cst.util.load( so_dir + 'meta.py' )
-dt = meta.dt
-nt = meta.nt
+path = 'run' + os.sep
+meta = os.path.join( path, 'meta.py' )
+meta = cst.util.load( 'meta.py' )
+dt = meta.delta[-1]
+nt = meta.shape[-1]
 T = meta.period
 dtype = meta.dtype
-sig = dt * 22.5
-ts = 4 * sig
+sigma = dt * 22.5
 
-# setup plot
+# setup figure
 fig = plt.figure()
-axes = [ fig.add_subplot( 3, 1, i ) for i in 1, 2, 3 ]
+ax = [fig.add_subplot( 3, 1, i ) for i in 1, 2, 3]
+ax[2].set_xlabel( 'Time (/s)' )
+ax[1].set_ylabel( 'Velocity (m/s)' )
+ax[0].set_title( 'Radial',     position=(0.98, 0.83), ha='right', va='center' )
+ax[1].set_title( 'Transverse', position=(0.98, 0.83), ha='right', va='center' )
+ax[2].set_title( 'Vertical',   position=(0.98, 0.83), ha='right', va='center' )
 
-# SORD results
-rotation = np.array( [[3.0/5.0, 4.0/5.0, 0.0], [-4.0/5.0, 3.0/5.0, 0.0], [0.0, 0.0, 1.0]] )
+# read SORD results
+x = np.fromfile( path + 'vx.bin', dtype )
+y = np.fromfile( path + 'vy.bin', dtype )
+z = np.fromfile( path + 'vz.bin', dtype )
+v = np.array( [x, y, z] ) # XXX transpose?
 t = dt * np.arange( nt )
-x = np.fromfile( so_dir + 'vx.bin', dtype )
-y = np.fromfile( so_dir + 'vy.bin', dtype )
-z = np.fromfile( so_dir + 'vz.bin', dtype )
-v = np.vstack( (x, y, z) )
+
+# rotate to radial coordinates
+rotation = np.array( [
+    (3.0 / 5.0, 4.0 / 5.0, 0.0),
+    (-4.0 / 5.0, 3.0 / 5.0, 0.0),
+    (0.0, 0.0, 1.0),
+] )
 v = np.dot( rotation, v )
-tau = t - ts
-factor = 1.0 - 2.0*T/sig**2.*tau - (T / sig) ** 2. * (1. - (tau / sig) ** 2.0);
-b = (1.0 / np.sqrt( 2.0 * np.pi ) / sig) * factor * np.exp( -0.5 * (tau / sig) ** 2.0 )
-v = dt * scipy.signal.lfilter( b, 1.0, v )
-vm = np.sqrt( np.sum( v * v, 0 ) )
-peakv = np.max( vm )
-print peakv
-for ax in axes:
-    ax.plot( t, v[i], 'k' )
-    ax.hold( True )
 
-# Prose F/K results
-tm = np.fromfile( fk_dir + 'time.bin', '<f' )
-v1 =  1e5 * np.fromfile( fk_dir + 'v-radial.bin', '<f' )
-v2 =  1e5 * np.fromfile( fk_dir + 'v-transverse.bin', '<f' )
-v3 = -1e5 * np.fromfile( fk_dir + 'v-vertical.bin', '<f' )
-v = np.vstack((v1,v2,v3))
-dt = tm[1] - tm[0]
-tau = tm - ts
-b = (1.0 / np.sqrt( 2.0 * np.pi ) / sig) * np.exp( -0.5 * (tau / sig) ** 2.0 )
+# replace Brune source with Gaussian source
+tau = t - 4.0 * sigma
+factor = ( 1.0 - 2.0 * T / sigma ** 2.0 * tau
+    - (T / sigma) ** 2.0 * (1.0 - (tau / sigma) ** 2.0) )
+b = ( (1.0 / np.sqrt( 2.0 * np.pi ) / sigma) * factor
+    * np.exp( -0.5 * (tau / sigma) ** 2.0 ) )
 v = dt * scipy.signal.lfilter( b, 1.0, v )
-vm = np.sqrt( np.sum( v * v, 0 ) )
-peakv = np.max( vm )
-print peakv
-for ax in axes:
-    ax.plot( tm, v[i], 'k--' )
+print np.sqrt( np.sum( v * v, 0 ).max() )
 
-# decorations
-axes[0].axis( [1.5, 8.5, -1.0, 1.0] )
-axes[0].set_title( 'Radial',     position=(0.98,0.83), ha='right', va='center' )
-axes[1].axis( [ 1.5, 8.5, -1., 1. ] )
-axes[1].set_title( 'Transverse', position=(0.98,0.83), ha='right', va='center' )
-axes[1].set_ylabel( 'Velocity (m/s)' )
-axes[2].axis( [ 1.5, 8.5, -1., 1. ] )
-axes[2].set_title( 'Vertical',   position=(0.98,0.83), ha='right', va='center' )
-axes[2].set_xlabel( 'Time (/s)' )
+# plot waveforms
+ax[0].plot( t, v[0], 'k' )
+ax[1].plot( t, v[1], 'k' )
+ax[2].plot( t, v[2], 'k' )
+
+# read Prose F/K results
+p = 'fk' + os.sep
+t = np.fromfile( p + 'time.bin', '<f' )
+v1 =  1e5 * np.fromfile( p + 'v-radial.bin', '<f' )
+v2 =  1e5 * np.fromfile( p + 'v-transverse.bin', '<f' )
+v3 = -1e5 * np.fromfile( p + 'v-vertical.bin', '<f' )
+v = np.array( [v1, v2, v3] ) # XXX transpose?
+
+# convolve with Gaussian source
+dt = t[1] - t[0]
+tau = t - 4.0 * sigma
+b = ( (1.0 / np.sqrt( 2.0 * np.pi ) / sigma)
+    * np.exp( -0.5 * (tau / sigma) ** 2.0 ) )
+v = dt * scipy.signal.lfilter( b, 1.0, v )
+print np.sqrt( np.sum( v * v, 0 ).max() )
+
+# plot waveforms
+ax[0].plot( t, v[0], 'k--' )
+ax[1].plot( t, v[1], 'k--' )
+ax[2].plot( t, v[2], 'k--' )
+
+# axes limits
+axis = 1.5, 8.5, -1.0, 1.0
+ax[0].axis( axis )
+ax[1].axis( axis )
+ax[2].axis( axis )
+
+# finish up
 fig.canvas.draw()
 fig.savefig( 'loh.pdf', format='pdf' )
 fig.show()
