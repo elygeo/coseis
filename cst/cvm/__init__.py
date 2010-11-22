@@ -35,7 +35,7 @@ def _build( mode=None, optimize=None, version=None ):
         optimize = cf.optimize
     if not version:
         version = cf.version
-    ver = 'cvm' + version.replace('.', '')
+    ver = 'cvm-' + version
 
     # download source code
     url = 'http://earth.usc.edu/~gely/coseis/download/%s.tgz' % ver
@@ -103,7 +103,7 @@ def stage( inputs={}, **kwargs ):
             job.mode = 'm'
     job.command = os.path.join( '.', 'cvm-' + job.mode + job.optimize )
     job = cst.conf.prepare( job )
-    ver = 'cvm' + job.version.replace('.', '')
+    ver = 'cvm-' + job.version
 
     # build
     if not job.prepare:

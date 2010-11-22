@@ -169,7 +169,7 @@ def make( compiler, object_, source ):
     import glob, difflib
     object_ = os.path.expanduser( object_ )
     source = [ os.path.expanduser( f ) for f in source if f ]
-    statedir = os.path.join( os.path.dirname( object_ ), '.state' )
+    statedir = os.path.join( os.path.dirname( object_ ), 'build-state' )
     if not os.path.isdir( statedir ):
         os.mkdir( statedir )
     statefile = os.path.join( statedir, os.path.basename( object_ ) )

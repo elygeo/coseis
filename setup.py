@@ -36,6 +36,10 @@ for target in args:
         cst.cvm._build()
         cst.fkernel._build()
         cst._build()
+    elif target == 'cvm':
+        cst.cvm._build( version='2.2' )
+        cst.cvm._build( version='3.0' )
+        cst.cvm._build( version='4.0' )
     elif target == 'test':
         import nose
         argv = ['', '--verbose', '--with-doctest', '--all-modules', '--exe']
