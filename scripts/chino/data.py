@@ -35,7 +35,7 @@ if not os.path.exists( 'run/data' ):
         os.mkdir( 'run' )
     os.rename( str( event_id ), 'run/data' )
 
-# stations
+# stations coordinates
 records = glob.glob( 'run/data/*.sac' )
 stations = set( '.'.join( r.split( '.' )[1:3] ) for r in records )
 locations = []
@@ -49,7 +49,7 @@ if not locations:
     sys.exit( 'no stations found' )
 open( 'station-list.txt', 'w' ).writelines( locations )
 
-# download station metadata
+# station metadata
 if not os.path.exists( 'run/stations' ):
     os.mkdir( 'run/stations' )
     os.chdir( 'run/stations' )
