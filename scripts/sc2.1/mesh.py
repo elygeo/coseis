@@ -16,8 +16,8 @@ npml = meta.npml
 # read data
 dep = np.arange( shape[2] ) * delta[2]
 n = shape[:2]
-x = np.fromfile( 'lon.bin', dtype ).reshape( n[::-1] ).T
-y = np.fromfile( 'lat.bin', dtype ).reshape( n[::-1] ).T
+x = np.fromfile( 'lat.bin', dtype ).reshape( n[::-1] ).T
+y = np.fromfile( 'lon.bin', dtype ).reshape( n[::-1] ).T
 
 # PML regions are extruded
 for w in x, y:
