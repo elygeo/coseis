@@ -164,7 +164,7 @@ def plot2d( id_, img_file, time='', decimate='' ):
         left = 0.1,
         right = 0.9,
         top = 1.0 - 0.5 / height,
-        bottom = 0.5/ height,
+        bottom = 0.5 / height,
     )
 
     # save image and cache if static

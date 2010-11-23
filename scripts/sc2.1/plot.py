@@ -31,8 +31,8 @@ t = dt * np.arange( nt )
 # rotate to radial coordinates
 rotation = np.array( [
     (-3.0 / 5.0, 4.0 / 5.0, 0.0),
-    (4.0 / 5.0, 3.0 / 5.0, 0.0),
-    (0.0, 0.0, -1.0),
+    (-4.0 / 5.0, -3.0 / 5.0, 0.0),
+    (0.0, 0.0, 1.0),
 ] )
 v = np.dot( rotation, v )
 
@@ -55,9 +55,9 @@ ax[1].set_title( 'Transverse', position=(0.98, 0.83), ha='right', va='center' )
 ax[2].set_title( 'Vertical',   position=(0.98, 0.83), ha='right', va='center' )
 
 # plot waveforms
-ax[0].plot( t, v[0], 'k--' )
-ax[1].plot( t, v[1], 'k--' )
-ax[2].plot( t, v[2], 'k--' )
+ax[0].plot( t[:v[0].size], v[0], 'k' )
+ax[1].plot( t[:v[1].size], v[1], 'k' )
+ax[2].plot( t[:v[2].size], v[2], 'k' )
 
 # axes limits
 if 0:

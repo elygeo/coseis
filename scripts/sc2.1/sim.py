@@ -2,6 +2,8 @@
 """
 PEER Lifelines program task 1A02, Problem SC2.1
 
+SCEC Community Velocity Model, version 2.2 with double-couple point source.
+http://peer.berkeley.edu/lifelines/lifelines_pre_2006/lifelines_princ_invest_y-7.html#day
 http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A02.pdf
 """
 import os
@@ -30,9 +32,9 @@ delta += (dt_,)
 shape += (nt_,)
 
 # moment tensor source
-x = 56000.0 / dx_
-y = 40000.0 / dx_
-z = 14000.0 / dx_
+x = 56000.0 / dx_ + 1
+y = 40000.0 / dx_ + 1
+z = 14000.0 / dx_ + 1
 ihypo = x, y, z
 source = 'moment'
 timefunction = 'brune'
@@ -56,8 +58,8 @@ fieldio = [
 
 # sites
 for i in range( 8 ):
-    j = (74.0 - 6 * i) / delta[0]
-    k = (16.0 + 8 * i) / delta[1]
+    j = (74.0 - 6 * i) / delta[0] * 1000.0 + 1
+    k = (16.0 + 8 * i) / delta[1] * 1000.0 + 1
     fieldio += [
         ('=wi', 'v1', [j,k,1,()], 'p%s-v1.bin' % (i + 1)),
         ('=wi', 'v2', [j,k,1,()], 'p%s-v2.bin' % (i + 1)),

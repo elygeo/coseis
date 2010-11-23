@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 """
-PEER LOH.1 - Layer over a halfspace, buried double couple source
+PEER Lifelines program task 1A01, Problem LOH.1
+
+Layer over a halfspace model with buried double-couple source.
+http://peer.berkeley.edu/lifelines/lifelines_pre_2006/lifelines_princ_invest_y-7.html#day
+http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A01.pdf
 """
 import cst
 
@@ -53,12 +57,10 @@ source2 = 0.0, 0.0, 1e18	# moment tensor M_yz, M_zx, M_yz
 # velocity time series output for surface station
 j = ihypo[0] + 6000.0 / delta[0]
 k = ihypo[1] + 8000.0 / delta[1]
-l = ihypo[2]
 fieldio += [
-    ( '=w', 'v1', [(), (), 1, (1, -1, 10)], 'velocity.bin' ),
-    ( '=w', 'v1', [j, k, l, ()], 'vx.bin' ),
-    ( '=w', 'v2', [j, k, l, ()], 'vy.bin' ),
-    ( '=w', 'v3', [j, k, l, ()], 'vz.bin' ),
+    ( '=w', 'v1', [j, k, 1, ()], 'v1.bin' ),
+    ( '=w', 'v2', [j, k, 1, ()], 'v2.bin' ),
+    ( '=w', 'v3', [j, k, 1, ()], 'v3.bin' ),
 ]
 
 # run job
