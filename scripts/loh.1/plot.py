@@ -58,7 +58,7 @@ rotation = np.array( [
 v = np.dot( rotation, v )
 
 # replace Brune source with Gaussian source
-if 0:
+if 1:
     tau = t - 4.0 * sigma
     G = ( 1.0 - 2.0 * T / sigma ** 2.0 * tau
         - (T / sigma) ** 2.0 * (1.0 - (tau / sigma) ** 2.0) )
