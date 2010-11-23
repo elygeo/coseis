@@ -10,7 +10,8 @@ import cst
 
 # parameters
 model = 'cvmh'
-model = 'cvm'
+model = 'cvm'; version = '4.0'
+model = 'cvm'; version = '2.2'
 prop, vmin, vmax = 'vs', 500, 4000
 prop, vmin, vmax = 'vp', 1600, 6400
 dx = 200.0; dz = 50.0; nz = 201
@@ -74,7 +75,7 @@ if transpose:
 if model == 'cvmh':
     ss = cst.cvmh.extract( xx, yy, zz, prop )
 else:
-    ss = cst.cvm.extract( xx, yy, zz, prop, version='2.2' )
+    ss = cst.cvm.extract( xx, yy, zz, prop, version=version )
 if transpose:
     xx, yy, zz, ss = xx.T, yy.T, zz.T, ss.T
 xx, yy = proj( xx, yy )

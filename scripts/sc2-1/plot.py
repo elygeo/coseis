@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-PEER Linelines program task 1A02, Problem SC2.1
+PEER Lifelines program task 1A02, Problem SC2.1
 """
 import os
 import numpy as np
@@ -9,7 +9,10 @@ import matplotlib.pyplot as plt
 import cst
 
 # parameters
-path = 'run' + os.sep
+path = os.path.join( 'run', 'sim', '100' ) + os.sep
+path = os.path.join( 'run', 'sim', '200' ) + os.sep
+path = os.path.join( 'run', 'sim', '2000' ) + os.sep
+path = os.path.join( 'run', 'sim', '500' ) + os.sep
 meta = os.path.join( path, 'meta.py' )
 meta = cst.util.load( meta )
 dt = meta.delta[-1]
@@ -22,14 +25,14 @@ sigma = 0.5
 x = np.fromfile( path + 'p5-v1.bin', dtype )
 y = np.fromfile( path + 'p5-v2.bin', dtype )
 z = np.fromfile( path + 'p5-v3.bin', dtype )
-v = np.array( [x, y, z] ) # XXX transpose?
+v = np.array( [x, y, z] )
 t = dt * np.arange( nt )
 
 # rotate to radial coordinates
 rotation = np.array( [
-    (3.0 / 5.0, 4.0 / 5.0, 0.0),
-    (-4.0 / 5.0, 3.0 / 5.0, 0.0),
-    (0.0, 0.0, 1.0),
+    (-3.0 / 5.0, 4.0 / 5.0, 0.0),
+    (4.0 / 5.0, 3.0 / 5.0, 0.0),
+    (0.0, 0.0, -1.0),
 ] )
 v = np.dot( rotation, v )
 
@@ -57,13 +60,14 @@ ax[1].plot( t, v[1], 'k--' )
 ax[2].plot( t, v[2], 'k--' )
 
 # axes limits
-axis = 1.5, 8.5, -1.0, 1.0
-ax[0].axis( axis )
-ax[1].axis( axis )
-ax[2].axis( axis )
+if 0:
+    axis = 0, 50, -0.1, 0.1
+    ax[0].axis( axis )
+    ax[1].axis( axis )
+    ax[2].axis( axis )
 
 # finish up
 fig.canvas.draw()
-fig.savefig( 'sc2-1.pdf', format='pdf' )
+fig.savefig( 'run/sc2-1.pdf', format='pdf' )
 fig.show()
 

@@ -7,10 +7,10 @@ import numpy as np
 import cst
 
 # parameters
-dx = 200.0;  nproc = 256
+dx = 100.0;  nproc = 240
+dx = 200.0;  nproc = 60
+dx = 2000.0; nproc = 1
 dx = 500.0;  nproc = 2
-dx = 4000.0; nproc = 1
-dx = 100.0;  nproc = 1024
 delta = dx, dx, dx
 
 # projection
@@ -49,8 +49,8 @@ os.makedirs( path )
 
 # save data
 cst.util.save( path + 'meta.py', meta )
-x.astype( 'f' ).T.tofile( path + 'lon.bin' )
-y.astype( 'f' ).T.tofile( path + 'lat.bin' )
+x.astype( 'f' ).T.tofile( path + 'lat.bin' )
+y.astype( 'f' ).T.tofile( path + 'lon.bin' )
 
 # stage cvm
 rundir = os.path.join( path, 'cvm' )

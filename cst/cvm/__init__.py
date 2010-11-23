@@ -35,6 +35,7 @@ def _build( mode=None, optimize=None, version=None ):
         optimize = cf.optimize
     if not version:
         version = cf.version
+    assert version in ('2.2', '3.0', '4.0')
     ver = 'cvm-' + version
 
     # download source code

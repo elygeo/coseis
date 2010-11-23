@@ -31,7 +31,7 @@ ax[2].set_title( 'Vertical',   position=(0.98, 0.83), ha='right', va='center' )
 x = np.fromfile( path + 'vx.bin', dtype )
 y = np.fromfile( path + 'vy.bin', dtype )
 z = np.fromfile( path + 'vz.bin', dtype )
-v = np.array( [x, y, z] ) # XXX transpose?
+v = np.array( [x, y, z] )
 t = dt * np.arange( nt )
 
 # rotate to radial coordinates

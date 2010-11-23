@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 """
-PEER Linelines program task 1A02, Problem SC2.1
+PEER Lifelines program task 1A02, Problem SC2.1
+
+http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A02.pdf
 """
 import os
 import cst
 
 # parameters
-dx_ = 200.0;  nproc3 = 1, 3, 160
-dx_ = 500.0;  nproc3 = 1, 1, 64
-dx_ = 1000.0; nproc3 = 1, 1, 1
-dx_ = 100.0;  nproc3 = 1, 20, 100
+dx_ = 100.0;  nproc3 = 1, 4, 60
+dx_ = 200.0;  nproc3 = 1, 2, 30
+dx_ = 2000.0; nproc3 = 1, 1, 1
+dx_ = 500.0;  nproc3 = 1, 1, 2
 
 # path
 rundir = os.path.join( 'run', 'sim', '%.0f' % dx_ )
