@@ -22,9 +22,9 @@ dtype = meta.dtype
 sigma = 0.5
 
 # read time history
-x = np.fromfile( path + 'p5-v1.bin', dtype )
-y = np.fromfile( path + 'p5-v2.bin', dtype )
-z = np.fromfile( path + 'p5-v3.bin', dtype )
+x = np.fromfile( path + 'p4-v1.bin', dtype )
+y = np.fromfile( path + 'p4-v2.bin', dtype )
+z = np.fromfile( path + 'p4-v3.bin', dtype )
 v = np.array( [x, y, z] )
 t = dt * np.arange( nt )
 
@@ -68,6 +68,6 @@ if 0:
 
 # finish up
 fig.canvas.draw()
-fig.savefig( 'run/sc2-1.pdf', format='pdf' )
+fig.savefig( path + 'sc2-1.pdf', format='pdf' )
 fig.show()
 

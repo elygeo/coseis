@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-PEER LOH.1 - Plot comparison of FK and SOM.
+LOH.1 - Plot FK/SOM comparison.
 """
 import os
 import numpy as np
@@ -43,9 +43,9 @@ for i in 0, 1, 2:
     ax[i].set_yticklabels( [-1, '', 0, '', 1] )
 
 # read SORD results
-x = np.fromfile( path + 'v1.bin', dtype )
-y = np.fromfile( path + 'v2.bin', dtype )
-z = np.fromfile( path + 'v3.bin', dtype )
+x = np.fromfile( path + 'p9-v1.bin', dtype )
+y = np.fromfile( path + 'p9-v2.bin', dtype )
+z = np.fromfile( path + 'p9-v3.bin', dtype )
 v = np.array( [x, y, z] )
 t = dt * np.arange( nt )
 

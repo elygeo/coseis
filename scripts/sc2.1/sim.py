@@ -31,7 +31,22 @@ nt_ = int( 50.0 / dt_ + 1.00001 )
 delta += (dt_,)
 shape += (nt_,)
 
-# moment tensor source
+# boundary conditions
+bc1 = 10, 10, 0
+bc2 = 10, 10, 10
+
+# material
+hourglass = 1.0, 1.0
+vs1 = 200.0
+vp1 = 600.0
+fieldio = [
+    ('=r', 'rho', [], 'rho.bin'),
+    ('=r', 'vp',  [], 'vp.bin'),
+    ('=r', 'vs',  [], 'vs.bin'),
+    ('=',  'gam', [],  0.0),
+]
+
+# source
 x = 56000.0 / dx_ + 1
 y = 40000.0 / dx_ + 1
 z = 14000.0 / dx_ + 1
@@ -42,36 +57,14 @@ period = 0.2
 source1 = 0.0, 0.0, 0.0
 source2 = 0.0, 0.0, 1e18
 
-# boundary conditions
-bc1 = 10, 10, 0
-bc2 = 10, 10, 10
-
-# material
-hourglass = 1.0, 1.0
-vp1 = 600.0
-vs1 = 200.0
-fieldio = [
-    ( '=r', 'rho', [], 'rho.bin' ),
-    ( '=r', 'vp',  [], 'vp.bin'  ),
-    ( '=r', 'vs',  [], 'vs.bin'  ),
-]
-
-# sites
+# receivers
 for i in range( 8 ):
-    j = (74.0 - 6 * i) / delta[0] * 1000.0 + 1
-    k = (16.0 + 8 * i) / delta[1] * 1000.0 + 1
+    j = (74000.0 - 6000.0 * i) / delta[0] + 1
+    k = (16000.0 + 8000.0 * i) / delta[1] + 1
     fieldio += [
-        ('=wi', 'v1', [j,k,1,()], 'p%s-v1.bin' % (i + 1)),
-        ('=wi', 'v2', [j,k,1,()], 'p%s-v2.bin' % (i + 1)),
-        ('=wi', 'v3', [j,k,1,()], 'p%s-v3.bin' % (i + 1)),
-    ]
-
-# surface output
-if 0:
-    fieldio += [
-        ( '=w', 'v1',  [(1,-1,1), (1,-1,1), 1, (1,-1,20)], 'snap-v1.bin' ),
-        ( '=w', 'v2',  [(1,-1,1), (1,-1,1), 1, (1,-1,20)], 'snap-v2.bin' ),
-        ( '=w', 'v3',  [(1,-1,1), (1,-1,1), 1, (1,-1,20)], 'snap-v3.bin' ),
+        ('=wi', 'v1', [j, k, 1, ()], 'p%s-v1.bin' % i),
+        ('=wi', 'v2', [j, k, 1, ()], 'p%s-v2.bin' % i),
+        ('=wi', 'v3', [j, k, 1, ()], 'p%s-v3.bin' % i),
     ]
 
 # run job

@@ -46,7 +46,7 @@ bc1 = -2, -2, 0
 # PML absorbing boundaries at x, y and z boundaries
 bc2 = 10, 10, 10
 
-# source parameters
+# source
 ihypo = 1.5, 1.5, 41.5		# hypocenter indices
 source = 'moment'		# specify moment source
 timefunction = 'brune'		# time function: Brune pulse
@@ -54,14 +54,15 @@ period = 0.1			# time function dominant period
 source1 = 0.0, 0.0, 0.0		# moment tensor M_xx, M_yy, M_zz
 source2 = 0.0, 0.0, 1e18	# moment tensor M_yz, M_zx, M_yz
 
-# velocity time series output for surface station
-j = ihypo[0] + 6000.0 / delta[0]
-k = ihypo[1] + 8000.0 / delta[1]
-fieldio += [
-    ( '=w', 'v1', [j, k, 1, ()], 'v1.bin' ),
-    ( '=w', 'v2', [j, k, 1, ()], 'v2.bin' ),
-    ( '=w', 'v3', [j, k, 1, ()], 'v3.bin' ),
-]
+# receivers
+for i in range( 10 ):
+    j = ihypo[0] + 600.0 * i / delta[0]
+    k = ihypo[1] + 800.0 * i / delta[1]
+    fieldio += [
+        ( '=w', 'v1', [j, k, 1, ()], 'p%s-v1.bin' % i ),
+        ( '=w', 'v2', [j, k, 1, ()], 'p%s-v2.bin' % i ),
+        ( '=w', 'v3', [j, k, 1, ()], 'p%s-v3.bin' % i ),
+    ]
 
 # run job
 cst.sord.run( locals() )
