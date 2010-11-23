@@ -29,12 +29,9 @@ v = np.array( [x, y, z] )
 t = dt * np.arange( nt )
 
 # rotate to radial coordinates
-rotation = np.array( [
-    (-3.0 / 5.0, 4.0 / 5.0, 0.0),
-    (-4.0 / 5.0, -3.0 / 5.0, 0.0),
-    (0.0, 0.0, 1.0),
-] )
-v = np.dot( rotation, v )
+m = (-3, 4, 0), (-4, -3, 0), (0, 0, 5)
+m = np.array( m ) * 0.2
+v = np.dot( m, v )
 
 # replace Brune source with Gaussian source
 tau = t - 4.0 * sigma
@@ -68,6 +65,6 @@ if 0:
 
 # finish up
 fig.canvas.draw()
-fig.savefig( path + 'sc2-1.pdf', format='pdf' )
+fig.savefig( path + 'sc2.1.pdf', format='pdf' )
 fig.show()
 

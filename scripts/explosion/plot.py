@@ -77,7 +77,7 @@ for path in glob.glob( runs ):
         ax = fig.add_subplot( 111 )
         ax.plot( t - dt, v.T, '-', ta - dt, va, 'k--' )
         ax.set_xlim( 0.5, dt * n )
-        ax.legend( ('v_r', 'v_t1', 'v_t2', 'v_a') )
+        ax.legend( ['v_r', 'v_t1', 'v_t2', 'v_a'] )
         name = os.path.split( path )[-1]
         ax.set_title( name + ' (%s, %s, %s)' % tuple(x) )
         if sta in save_plot:

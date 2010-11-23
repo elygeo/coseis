@@ -25,6 +25,8 @@ plt.rc( 'axes', linewidth=0.5, titlesize=7 )
 plt.rc( 'lines', linewidth=0.5 )
 plt.rc( 'ytick.major', size=2 )
 plt.rc( 'xtick.major', size=2 )
+plt.rc( 'legend', fontsize='medium', handletextpad=0.2 )
+
 fig = plt.figure( None, figsize=(3.2, 3.2), dpi=200 )
 fig.subplots_adjust( left=0.12, right=0.92, top=0.92, bottom=0.12 )
 ax = [fig.add_subplot( 3, 1, i ) for i in 1, 2, 3]
@@ -50,12 +52,9 @@ v = np.array( [x, y, z] )
 t = dt * np.arange( nt )
 
 # rotate to radial coordinates
-rotation = np.array( [
-    (3.0 / 5.0, 4.0 / 5.0, 0.0),
-    (-4.0 / 5.0, 3.0 / 5.0, 0.0),
-    (0.0, 0.0, 1.0),
-] )
-v = np.dot( rotation, v )
+m = (3, 4, 0), (-4, 3, 0), (0, 0, 5)
+m = np.array( m ) * 0.2
+v = np.dot( m, v )
 
 # replace Brune source with Gaussian source
 if 1:
@@ -94,6 +93,7 @@ ax[1].plot( t, v[1], 'k--' )[0].set_dashes( (2,0.5) )
 ax[2].plot( t, v[2], 'k--' )[0].set_dashes( (2,0.5) )
 
 # finish up
+ax[1].legend( ['SOM', 'FK'], loc='lower left', frameon=False )
 fig.canvas.draw()
 fig.savefig( path + 'loh.1.pdf', format='pdf' )
 fig.show()
