@@ -44,9 +44,9 @@ v = np.dot( rotation, v )
 
 # replace Brune source with Gaussian source
 tau = t - 4.0 * sigma
-factor = ( 1.0 - 2.0 * T / sigma ** 2.0 * tau
+G = ( 1.0 - 2.0 * T / sigma ** 2.0 * tau
     - (T / sigma) ** 2.0 * (1.0 - (tau / sigma) ** 2.0) )
-b = ( (1.0 / np.sqrt( 2.0 * np.pi ) / sigma) * factor
+b = ( (1.0 / np.sqrt( 2.0 * np.pi ) / sigma) * G
     * np.exp( -0.5 * (tau / sigma) ** 2.0 ) )
 v = dt * scipy.signal.lfilter( b, 1.0, v )
 print np.sqrt( np.sum( v * v, 0 ).max() )

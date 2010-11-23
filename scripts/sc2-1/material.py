@@ -7,14 +7,14 @@ import numpy as np
 import cst
 
 # parameters
-dx = 100.0;  nproc = 1024
 dx = 200.0;  nproc = 256
 dx = 500.0;  nproc = 2
 dx = 4000.0; nproc = 1
+dx = 100.0;  nproc = 1024
 delta = dx, dx, dx
 
 # projection
-bounds = (0.0, 80000.0), (0.0, 80000.0), (0.0, 30000.0)
+bounds = (0.0, 80000.0), (0.0, 80000.0), (0.0, 30000.0 - dx)
 extent = (33.7275238, 34.44875336), (-118.90798187, -118.04201508)
 
 # dimensions
@@ -43,7 +43,7 @@ meta = dict(
 )
 
 # path
-path = os.path.join( 'run', 'mesh' )
+path = os.path.join( 'run', 'mesh', '%.0f' % dx )
 path = os.path.realpath( path ) + os.sep
 os.makedirs( path )
 
@@ -53,9 +53,8 @@ x.astype( 'f' ).T.tofile( path + 'lon.bin' )
 y.astype( 'f' ).T.tofile( path + 'lat.bin' )
 
 # stage cvm
-rundir = os.path.join( 'run', 'cvm' )
-#post = 'rm lon.bin lat.bin dep.bin\nmv rho.bin vp.bin vs.bin %r' % path
-post = ''
+rundir = os.path.join( path, 'cvm' )
+post = 'rm lon.bin lat.bin dep.bin\nmv rho.bin vp.bin vs.bin %r' % path
 n = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
 job = cst.cvm.stage(
     rundir = rundir,

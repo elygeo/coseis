@@ -6,17 +6,17 @@ import os
 import cst
 
 # parameters
-dx_ = 100.0;  nproc3 = 1, 48, 320
 dx_ = 200.0;  nproc3 = 1, 3, 160
 dx_ = 500.0;  nproc3 = 1, 1, 64
 dx_ = 1000.0; nproc3 = 1, 1, 1
+dx_ = 100.0;  nproc3 = 1, 20, 100
 
 # path
-rundir = os.path.join( 'run', 'sim' )
+rundir = os.path.join( 'run', 'sim', '%.0f' % dx_ )
 
 # mesh metadata
-meta = os.path.join( 'run', 'mesh', 'meta.py' )
-meta = cst.util.load( meta )
+mesh_ = os.path.join( 'run', 'mesh', '%.0f' % dx_ ) + os.sep
+meta = cst.util.load( mesh_ + 'meta.py' )
 delta = meta.delta
 shape = meta.shape
 
@@ -28,7 +28,10 @@ delta += (dt_,)
 shape += (nt_,)
 
 # moment tensor source
-ihypo = 56000.0, 40000.0, 14000.0
+x = 56000.0 / dx_
+y = 40000.0 / dx_
+z = 14000.0 / dx_
+ihypo = x, y, z
 source = 'moment'
 timefunction = 'brune'
 period = 0.2
@@ -68,7 +71,7 @@ if 0:
     ]
 
 # run job
-stagein = 'run/mesh/rho.bin', 'run/mesh/vp.bin', 'run/mesh/vs.bin'
+stagein = [mesh_ + v + '.bin' for v in 'rho', 'vp', 'vs']
 post = 'rm rho.bin vp.bin vs.bin'
 job = cst.sord.run( locals() )
 
