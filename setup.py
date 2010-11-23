@@ -2,7 +2,7 @@
 """
 Setup Coseis
 """
-import os, sys, getopt, pprint
+import os, sys, getopt, pprint, shutil
 if __name__ != '__main__':
     sys.exit( 'Error, not a module: %s' % __file__ )
 import cst
@@ -40,6 +40,13 @@ for target in args:
         cst.cvm._build( version='2.2' )
         cst.cvm._build( version='3.0' )
         cst.cvm._build( version='4.0' )
+    elif target == 'clean':
+        f = os.path.join( path, 'cst', 'build' )
+        if os.path.exists( f ):
+            shutil.rmtree( f )
+        f = os.path.join( path, 'cst', 'rspectra.so' )
+        if os.path.exists( f ):
+            os.unlink( f )
     elif target == 'test':
         import nose
         argv = ['', '--verbose', '--with-doctest', '--all-modules', '--exe']
