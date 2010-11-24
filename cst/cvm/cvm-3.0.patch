@@ -269,14 +269,14 @@ index 3fbaa93..f098902 100644
       1    'b5__','ku1_','ku2_',
       2    'ku3_','ku4_','ku5_','ku8_','pu1_','pu2A','pu2B','pu3_',
 diff --git a/version3.0.f b/version3.0.f
-index 2b9e506..1ab20d4 100644
+index 2b9e506..34826ea 100644
 --- a/version3.0.f
 +++ b/version3.0.f
 @@ -22,6 +22,7 @@ c scum v2i     8-00   new tomo interpolator, vent glitch fixes HM
  c scum v2j     0-00   various glitch fixes
  c
  c version 3.0  8-01   install upper mantle tomography
-+c Bug fixes and modifications for binary and MPI I/O. Geoffrey Ely 2007/9/1
++c Bug fixes and modifications for binary and MPI I/O. Ely 2007/9/1
  c                   
  c
           include 'in.h'
@@ -285,7 +285,7 @@ index 2b9e506..1ab20d4 100644
           include 'genpro.h'
           include 'genprod.h'
 +
-+c initialize to zero, add by Ely
++c initialize to zero. Ely
 +      inct = 0
 +      incto = 0
 +      iupm = 0

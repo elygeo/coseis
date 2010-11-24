@@ -269,7 +269,7 @@ index cf91258..97242f5 100644
       1    'b5__','ku1_','ku2_',
       2    'ku3_','ku4_','ku5_','ku8_','pu1_','pu2A','pu2B','pu3_',
 diff --git a/version4.0.f b/version4.0.f
-index bf5139d..e3e17ce 100644
+index bf5139d..5e0054e 100644
 --- a/version4.0.f
 +++ b/version4.0.f
 @@ -23,6 +23,8 @@ c scum v2j     0-00   various glitch fixes
@@ -277,7 +277,7 @@ index bf5139d..e3e17ce 100644
  c version 3.0  8-01   install upper mantle tomography
  c version 4.0  6-05   new Vp-density, new San Berdo, new Imperial Valley
 +c 
-+c Bug fixes and modifications for binary and MPI I/O. Geoffrey Ely 2007/9/1
++c Bug fixes and modifications for binary and MPI I/O. Ely 2007/9/1
  c                   
  c
           include 'in.h'
@@ -286,7 +286,7 @@ index bf5139d..e3e17ce 100644
           include 'genpro.h'
           include 'genprod.h'
 +
-+c initialize to zero, add by Ely
++c initialize to zero. Ely
 +      inct = 0
 +      incto = 0
 +      iupm = 0
