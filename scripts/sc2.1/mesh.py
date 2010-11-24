@@ -42,14 +42,14 @@ if fh:
     fh.close()
 
 # write lon file
-fh = cst.util.open_excl( p + 'lon.bin', 'wb' )
+fh = cst.util.open_excl( p + 'lat.bin', 'wb' )
 if fh:
     for i in range( dep.size ):
         x.T.tofile( fh )
     fh.close()
 
 # write lat file
-fh = cst.util.open_excl( p + 'lat.bin', 'wb' )
+fh = cst.util.open_excl( p + 'lon.bin', 'wb' )
 if fh:
     for i in range( dep.size ):
         y.T.tofile( fh )
