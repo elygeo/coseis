@@ -7,10 +7,10 @@ import numpy as np
 import cst
 
 # parameters
-dx = 100.0;  nproc = 240
-dx = 200.0;  nproc = 60
 dx = 2000.0; nproc = 1
 dx = 500.0;  nproc = 2
+dx = 200.0;  nproc = 60
+dx = 100.0;  nproc = 240
 delta = dx, dx, dx
 
 # projection
@@ -52,6 +52,11 @@ cst.util.save( path + 'meta.py', meta )
 x.astype( 'f' ).T.tofile( path + 'lat.bin' )
 y.astype( 'f' ).T.tofile( path + 'lon.bin' )
 
+# python executable
+python = 'python'
+if cst.site.machine == 'nics-kraken':
+    python = '/lustre/scratch/gely/local/bin/python'
+
 # stage cvm
 rundir = os.path.join( path, 'cvm' )
 post = 'rm lon.bin lat.bin dep.bin\nmv rho.bin vp.bin vs.bin %r' % path
@@ -72,7 +77,7 @@ job0 = cst.conf.launch(
     new = False,
     rundir = path,
     stagein = ['mesh.py'],
-    command = 'python mesh.py',
+    command = '%s mesh.py' % python,
     seconds = s,
     nproc = min( 3, nproc ),
 )
