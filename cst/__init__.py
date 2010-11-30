@@ -6,7 +6,7 @@ import os, subprocess, shlex
 path = os.path.dirname( __file__ )
 from . import util, conf
 from . import coord, signal
-from . import data, vm1d, gocad, cvmh
+from . import data, scedc, vm1d, gocad, cvmh
 from . import source, egmm, waveform
 from . import viz, plt, mlab
 from . import sord, cvm, fkernel

@@ -4,21 +4,22 @@ Signal processing utilities
 """
 import numpy as np
 
-def lowpass( x, dt, cutoff, window='hann', repeat=0 ):
+def filter( x, dt, cutoff, btype='lowpass', order=2, repeat=-1 ):
     """
-    Lowpass filter
+    Butterworth or Hann window filter.
 
     Parameters
     ----------
         x : samples
         dt : sampling interval
-        cutoff : cutoff frequency
-        window : can be either 'hann' for zero-phase Hann window filter
-                 or an integer n for an n-pole Butterworth filter.
+        cutoff : cutoff frequency(ies)
+        btype : 'lowpass', 'highpass', 'bandpass', 'bandstop', 'hann'
+        order : number of poles
+        repeat : 0 = single pass, 1 = two pass, -1 = two pass, zero-phase
     """
     if not cutoff:
         return x
-    if window == 'hann':
+    if btype == 'hann':
         n = 2 * int( 0.5 / (cutoff * dt) ) + 1
         if n > 0:
             w = 0.5 - 0.5 * np.cos(
@@ -29,8 +30,11 @@ def lowpass( x, dt, cutoff, window='hann', repeat=0 ):
                 x = np.convolve( x, w, 'same' )
     else:
         import scipy.signal
-        wn = cutoff * 2.0 * dt
-        b, a = scipy.signal.butter( window, wn )
+        if type( cutoff ) in [list, tuple]:
+            wn = cutoff[0] * 2.0 * dt, cutoff[1] * 2.0 * dt
+        else:
+            wn = cutoff * 2.0 * dt
+        b, a = scipy.signal.butter( order, wn, btype )
         x = scipy.signal.lfilter( b, a, x )
         if repeat < 0:
             x = scipy.signal.lfilter( b, a, x[...,::-1] )[...,::-1]
@@ -62,12 +66,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=Non
         fig.canvas.set_window_title( title )
         fig.subplots_adjust( left=0.125, right=0.975,
             bottom=0.1, top=0.975, wspace=0.3, hspace=0.3 )
-        axes = (
-            fig.add_subplot( 221 ),
-            fig.add_subplot( 222 ),
-            fig.add_subplot( 223 ),
-            fig.add_subplot( 224 ),
-        )
+        axes = [fig.add_subplot( i ) for i in 221, 222, 223, 224]
 
     ax = axes[0]
     ax.plot( t.T, h.T, '-' )
@@ -118,8 +117,6 @@ def test():
     import matplotlib.pyplot as plt
 
     dt = 0.01
-    cutoff = 0.5
-    cutoff = 8.0
     cutoff = 2.0
     n = 1000
     x = np.zeros( n+1 )
@@ -128,20 +125,30 @@ def test():
     ishift = np.fft.ifftshift
 
     y = [
-        lowpass( x, dt, cutoff, 2 ),    'Butter-2',
-        lowpass( x, dt, cutoff, 2, 1 ), 'Butter-2x2',
-        lowpass( x, dt, cutoff, 4, 1 ), 'Butter-4x2',
-        lowpass( x, dt, cutoff, 4 ),    'Butter-4',
+        ishift( filter( shift( x ), dt, cutoff, 'lowpass', 2, -1 ) ), 'Butter-2x-2',
+        ishift( filter( shift( x ), dt, cutoff, 'lowpass', 4, -1 ) ), 'Butter-4x-2',
+        ishift( filter( shift( x ), dt, cutoff, 'hann' ) ), 'Hann',
     ]
     plt.figure( 1 )
     spectrum( y[::2], dt, legend=y[1::2] )
 
     y = [
-        ishift( lowpass( shift( x ), dt, cutoff, 2, -1 ) ), 'Butter-2x-2',
-        ishift( lowpass( shift( x ), dt, cutoff, 4, -1 ) ), 'Butter-4x-2',
-        ishift( lowpass( shift( x ), dt, cutoff ) ),        'Hann',
+        filter( x, dt, cutoff, 'lowpass', 2, 0 ), 'Butter-2',
+        filter( x, dt, cutoff, 'lowpass', 2, 1 ), 'Butter-2x2',
+        filter( x, dt, cutoff, 'lowpass', 4, 1 ), 'Butter-4x2',
+        filter( x, dt, cutoff, 'lowpass', 4, 0 ), 'Butter-4',
     ]
     plt.figure( 2 )
+    spectrum( y[::2], dt, legend=y[1::2] )
+
+    cutoff = 1.0, 5.0
+    y = [
+        filter( x, dt, cutoff, 'bandpass', 2, 0 ), 'Butter-2',
+        filter( x, dt, cutoff, 'bandpass', 2, 1 ), 'Butter-2x2',
+        filter( x, dt, cutoff, 'bandpass', 4, 1 ), 'Butter-4x2',
+        filter( x, dt, cutoff, 'bandpass', 4, 0 ), 'Butter-4',
+    ]
+    plt.figure( 3 )
     spectrum( y[::2], dt, legend=y[1::2] )
 
     return
