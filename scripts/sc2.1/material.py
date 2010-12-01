@@ -8,9 +8,9 @@ import cst
 
 # parameters
 dx = 2000.0; nproc = 1
-dx = 500.0;  nproc = 2
 dx = 200.0;  nproc = 60
 dx = 100.0;  nproc = 240
+dx = 500.0;  nproc = 2
 delta = dx, dx, dx
 
 # projection

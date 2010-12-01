@@ -11,9 +11,9 @@ import cst
 
 # parameters
 dx_ = 2000.0; nproc3 = 1, 1, 1
-dx_ = 500.0;  nproc3 = 1, 1, 2
 dx_ = 200.0;  nproc3 = 1, 2, 30
 dx_ = 100.0;  nproc3 = 1, 4, 60
+dx_ = 500.0;  nproc3 = 1, 1, 2
 
 # path
 rundir = os.path.join( 'run', 'sim', '%.0f' % dx_ )

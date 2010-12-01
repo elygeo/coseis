@@ -8,8 +8,12 @@ Steps:
 
         python data.py
 
+2.  Run ``map.py`` to generate the stations map
+    ::
 
-2.  Edit ``material.py`` to set the mesh resolution and CVM version.  Run the
+        python map.py
+
+3.  Edit ``material.py`` to set the mesh resolution and CVM version.  Run the
     script to generate the mesh and extract the velocity model.  For low resolution
     test, run interactively::
 
@@ -20,8 +24,7 @@ Steps:
 
         python material.py -q
 
-
-3.  Run low resolution simulation test
+4.  Run low resolution simulation test
     ::
 
         python sim.py -i
@@ -31,8 +34,7 @@ Steps:
 
         python sim.py -q
 
-
-4.  Generate metadata for viewing in WebSims
+5.  Generate metadata for viewing in WebSims
     ::
 
         python websims.py

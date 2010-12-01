@@ -9,25 +9,29 @@ import pyproj
 from obspy.imaging import beachball
 import cst
 
-path = os.path.join( 'run', 'mesh', '1000' )
-meta = os.path.join( path, 'meta.py' )
-meta = cst.util.load( meta )
-proj = pyproj.Proj( **meta.projection )
-extent = meta.extent
-bounds = meta.bounds
+# parameters
+eventid = 14383980
+bounds = (-72000.0, 40000.0), (-50000.0, 46000.0)
+mts = os.path.join( 'run', 'data', '%s.mts.py' % eventid )
+mts = cst.util.load( mts )
+origin = mts.longitude, mts.latitude, mts.depth
+proj = pyproj.Proj( proj='tmerc', lon_0=origin[0], lat_0=origin[1] )
 
-#extent = (-118.75, -117.25), (33.5, 34.4)
+# extent
+x, y = bounds
+x = x[0], x[1], x[1], x[0]
+y = y[0], y[0], y[1], y[1]
+x, y = np.array( proj( x, y, inverse=True ) )
+extent = (x.min(), x.max()), (y.min(), y.max())
 
 # setup plot
-inches = 6.4, 3.7
-lat = np.mean( extent[1] )
-aspect = 1.0 / np.cos( lat / 180.0 * np.pi )
+inches = 6.4, 6.4
 plt.rc( 'font', size=8 )
 plt.rc( 'axes', linewidth=0.5 )
 plt.rc( 'lines', lw=1.5, solid_joinstyle='round', solid_capstyle='round' )
 fig = plt.figure( None, inches, 100, None )
 fig.clf()
-ax = fig.add_axes( [0.01, 0.02, 0.98, 0.96] )
+ax = fig.add_axes( [0.01, 0.01, 0.98, 0.98] )
 
 # topography
 ddeg = 0.5 / 60.0
@@ -48,8 +52,6 @@ x, y = proj( x, y )
 ax.plot( x-360.0, y, 'k-', lw=0.5 )
 
 # source
-mts = 'scsn-mts-14383980.py'
-mts = cst.util.load( mts )
 x = mts.longitude
 y = mts.latitude
 x, y = proj( x, y )
@@ -58,11 +60,12 @@ if 0:
 else:
     m = mts.double_couple_clvd
     m = m['mzz'], m['mxx'], m['myy'], m['mxz'], -m['myz'], -m['mxy']
-    b = beachball.Beach( m, xy=(x,y), width=8000, linewidth=0.5, facecolor='k' )
+    b = beachball.Beach( m, xy=(x,y), width=4000, linewidth=0.5, facecolor='k' )
     ax.add_collection( b )
 
 # stations
-sta = np.loadtxt( 'station-list.txt', 'S8, f, f, f' )
+sta = os.path.join( 'run', 'data', 'station-list.txt' )
+sta = np.loadtxt( sta, 'S8, f, f, f' )
 x, y = proj( sta['f2'], sta['f1'] )
 ax.plot( x, y, 'k^', markersize=5 )
 for s, y, x, z in sta:
@@ -71,12 +74,11 @@ for s, y, x, z in sta:
 
 # finish up
 axis = bounds[0] + bounds[1]
-#ax.set_aspect( aspect )
 ax.set_xticks( [] )
 ax.set_yticks( [] )
 ax.axis( 'image' )
 ax.axis( axis )
 fig.canvas.draw()
-fig.savefig( 'map.pdf' )
+fig.savefig( 'run/map.pdf' )
 fig.show()
 

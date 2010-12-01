@@ -9,7 +9,7 @@ import cst
 
 # parameters
 dx_ = 100.0;  nproc3 = 1, 48, 320
-dx_ = 200.0;  nproc3 = 1, 12, 160 # cutoff 0.5 Hz 4 pole butter
+dx_ = 200.0;  nproc3 = 1, 12, 160
 dx_ = 500.0;  nproc3 = 1, 4, 64
 dx_ = 1000.0; nproc3 = 1, 1, 2
 dx_ = 8000.0; nproc3 = 1, 1, 1
@@ -51,7 +51,7 @@ l = abs( z / delta[2] ) + 1.0
 ihypo = j, k, l
 
 # moment tensor source
-mts_ = 'scsn-mts-14383980.py'
+mts_ = os.path.join( 'run', 'data', '14383980.mts.py' )
 source = 'moment'
 timefunction = 'brune'
 period = 0.1
@@ -91,7 +91,8 @@ if 'topo' in id_:
 
 # sites
 stagein = 'out/',
-for s in open( 'station-list.txt' ).readlines():
+f = os.path.join( 'run', 'data', 'station-list.txt' )
+for s in open( f ).readlines():
     s, y, x = s.split()[:3]
     x, y = proj( float(x), float(y) )
     j = x / delta[0] + 1.0

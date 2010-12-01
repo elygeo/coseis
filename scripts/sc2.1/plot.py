@@ -9,10 +9,10 @@ import matplotlib.pyplot as plt
 import cst
 
 # parameters
-path = os.path.join( 'run', 'sim', '100' ) + os.sep
 path = os.path.join( 'run', 'sim', '200' ) + os.sep
 path = os.path.join( 'run', 'sim', '2000' ) + os.sep
 path = os.path.join( 'run', 'sim', '500' ) + os.sep
+path = os.path.join( 'run', 'sim', '100' ) + os.sep
 meta = os.path.join( path, 'meta.py' )
 meta = cst.util.load( meta )
 dt = meta.delta[-1]
@@ -43,6 +43,14 @@ v = dt * scipy.signal.lfilter( b, 1.0, v )
 print np.sqrt( np.sum( v * v, 0 ).max() )
 
 # setup figure
+if 0:
+    plt.rc( 'font', size=7 )
+    plt.rc( 'axes', linewidth=0.5, titlesize=7 )
+    plt.rc( 'lines', linewidth=0.5 )
+    plt.rc( 'ytick.major', size=2 )
+    plt.rc( 'xtick.major', size=2 )
+    plt.rc( 'legend', fontsize='medium', handletextpad=0.2 )
+fig = plt.figure( None, figsize=(6.4, 6.4), dpi=100 )
 fig = plt.figure()
 ax = [fig.add_subplot( 3, 1, i ) for i in 1, 2, 3]
 ax[2].set_xlabel( 'Time (/s)' )
@@ -50,6 +58,8 @@ ax[1].set_ylabel( 'Velocity (m/s)' )
 ax[0].set_title( 'Radial',     position=(0.98, 0.83), ha='right', va='center' )
 ax[1].set_title( 'Transverse', position=(0.98, 0.83), ha='right', va='center' )
 ax[2].set_title( 'Vertical',   position=(0.98, 0.83), ha='right', va='center' )
+ax[0].set_xticklabels( [] )
+ax[1].set_xticklabels( [] )
 
 # plot waveforms
 ax[0].plot( t[:v[0].size], v[0], 'k' )

@@ -3,8 +3,141 @@ Utilities for accessing the Southern California Earthquake Data Center (SCEDC).
 
 http://www.data.scec.org/
 """
-import os, sys, time, urllib, struct, socket
+import os, sys, time, struct, socket, urllib
 from . import util
+
+
+class stp():
+    """
+    Seismogram Transfer Program (STP) client.
+
+    Init parameters
+    ---------------
+        waveserver :
+            'scedc' or 'ncedc' for N. or S. CA Earthquake Data Centers,
+            or list of (host, port, password) triplets.
+
+    Call parameters:
+    ----------------
+        cmd : STP command or list of commands.
+        path : directory for saved files, default specified by server.
+        verbose : diagnostic output.
+
+    See STP Manual for command reference:
+        http://www.data.scec.org/STP/STP_Manual_v1.01.pdf
+
+    Excluded STP commands:
+        ! (shell escape), SET, VERBOSE, INPUT, OUTPUT, EXIT
+
+    Example, download waveforms in SAC format and save station list:
+        import cst
+        stp = cst.scedc.stp( 'scedc' )
+        stp( 'status' )
+        stp( ['sac', 'gain on'] )
+        stp( 'trig -net ci -chan _n_ -radius 20 14383980' )
+        out = stp( 'sta -l -net ci -chan _n_' )
+        open( 'station-list.txt', 'w' ).write( out[0] )
+        stp.close()
+    """
+    presets = {
+        'scedc': [
+            ('stp.gps.caltech.edu',  9999, 'stpisgreat'),
+            ('stp2.gps.caltech.edu', 9999, 'stpisgreat'),
+            ('stp3.gps.caltech.edu', 9999, 'stpisgreat'),
+        ],
+        'ncedc': [
+            ('stp.geo.berkeley.edu',  9999, 'hastalavista'),
+            ('stp2.geo.berkeley.edu', 9999, 'hastalavista'),
+            ('stp3.geo.berkeley.edu', 9999, 'hastalavista'),
+        ],
+    }
+
+    def __init__( self, waveserver='scedc', retry=60 ):
+        if type( waveserver ) is str:
+            waveserver = self.presets[waveserver]
+        self.sock = socket.socket()
+        self.send = self.sock.send
+        self.close = self.sock.close
+        for i in range( retry ):
+            for host, port, password in waveserver:
+                print( 'STP: Connecting to ' + host )
+                self.sock.connect( (host, port) )
+                self.sock.send( 'STP %s 1.6 stpc\n' % password )
+                line = self.sock.recv( 16 )
+                conn = line == 'CONNECTED\n'
+                if conn:
+                    break
+                self.sock.close()
+                time.sleep( 1 )
+            if conn:
+                break
+        if not conn:
+            sys.exit( 'STP connection error' )
+        two = struct.pack( 'i', 2 )
+        self.send( two )
+        self.receive()
+        return
+
+    def __call__( self, cmd, path=None, verbose=False ):
+        if type( cmd ) in [tuple, list]:
+            cmd = '\n'.join( cmd )
+        out = []
+        for cmd in cmd.split( '\n' ):
+            print( cmd )
+            self.send( cmd + '\n' )
+            out += self.receive( path, verbose )
+        if out:
+            return out
+        else:
+            return
+
+    def receive( self, path=None, verbose=False ):
+        dirname = path
+        out = []
+        buff = self.sock.recv( 4096 )
+        while( buff != '' ):
+            if len( buff ) < 4096 and not buff.endswith( 'OVER\n' ):
+                buff += self.sock.recv( 4096 )
+            line, buff = buff.split( '\n', 1 )
+            key = line.split()
+            if verbose:
+                print( line )
+            if key == []:
+                pass
+            elif key[0] == 'OVER':
+                sys.stdout.write( 'STP> ' )
+            elif key[0] == 'MESS':
+                i = buff.find( 'ENDmess\n' )
+                while i < 0:
+                    buff += self.sock.recv( 4096 )
+                    i = buff.find( 'ENDmess\n' )
+                mess, buff = buff[:i], buff[i:]
+                out += [mess]
+                print( mess )
+                line, buff = buff.split( '\n', 1 )
+            elif key[0] == 'FILE':
+                filename = key[1]
+            elif key[0] == 'DIR':
+                if path == None:
+                    dirname = key[1]
+                if not os.path.exists( dirname ):
+                    os.makedirs( dirname )
+            elif key[0] == 'DATA':
+                f = os.path.join( dirname, filename )
+                print( f )
+                i = int( key[1] )
+                while( len( buff ) < i ):
+                    buff += self.sock.recv( 4096 )
+                open( f, 'wb' ).write( buff[:i] )
+                buff = buff[i:]
+                if buff.find( 'ENDdata\n' ) < 0:
+                    buff += self.sock.recv( 4096 )
+                line, buff = buff.split( '\n', 1 )
+            elif key[0] == 'ERR':
+                print( 'ERROR: ' + line[4:] )
+            else:
+                print( 'ERROR: ' + repr( line ) )
+        return out
 
 
 def mts( eventid, path='scsn-mts-%s.py' ):
@@ -98,76 +231,4 @@ def mts( eventid, path='scsn-mts-%s.py' ):
     mts['double_couple'] = dc
     util.save( path, mts, header='# SCSN moment tensor solution\n' )
     return mts
-
-
-class stp():
-    """
-    Seismogram Transfer Program (STP) client.
-
-    See STP Manual for command reference:
-    http://www.data.scec.org/STP/STP_Manual_v1.01.pdf
-    """
-
-    def __init__( self, waveserver='scedc' ):
-        domain, password = {
-            'scedc': ('gps.caltech.edu', 'stpisgreat'),
-            'ncedc': ('geo.berkeley.edu', 'hastalavista'),
-        }[waveserver]
-        host = 'stp', 'stp2', 'stp3'
-        port = 9999
-        addr = '%s.%s' % (host[0], domain), port
-        self.sock = socket.socket()
-        self.close = self.sock.close
-        self.sock.connect( addr )
-        self.sock.send( 'STP %s 1.6 stpc\n' % password )
-        line = self.sock.recv( 16 )
-        if line != 'CONNECTED\n':
-            sys.exit( 'STP error' )
-        two = struct.pack( 'i', 2 )
-        self.__call__( [two], raw=True )
-        return
-
-    def __call__( self, cmd, raw=False ):
-        if not raw:
-            if type( cmd ) in [tuple, list]:
-                cmd = '\n'.join( cmd )
-            cmd = [s + '\n' for s in cmd.split( '\n' )]
-        for cmd in cmd:
-            self.sock.send( cmd )
-            data = ''
-            while( not data.endswith( 'OVER\n' ) ):
-                data += self.sock.recv( 4096 )
-            mess = None
-            while( len( data ) > 0 ):
-                i = data.index( '\n' ) + 1
-                line, data = data[:i], data[i:]
-                print( line )
-                f = line.split()
-                if f == []:
-                    pass
-                elif f[0] == 'OVER':
-                    pass
-                elif f[0] == 'ERR':
-                    mess = line[4:]
-                    print( mess )
-                elif f[0] == 'FILE':
-                    filename = f[1]
-                elif f[0] == 'DIR':
-                    dirname = f[1]
-                    if not os.path.exists( dirname ):
-                        os.makedirs( dirname )
-                elif f[0] == 'DATA':
-                    f = os.path.join( dirname, filename )
-                    i = int( f[1] )
-                    open( f, 'wb' ).write( data[:i] )
-                    data = data[i:]
-                elif f[0] == 'MESS':
-                    i = data.index( 'ENDmess' )
-                    mess, data = data[:i], data[i:]
-                    print( mess )
-                    i = data.index( '\n' )
-                    data = data[i:]
-                else:
-                    sys.exit( 'Error: %s' % line )
-            return
 

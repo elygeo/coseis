@@ -66,8 +66,8 @@ for path in glob.glob( runs ):
              / (4.0 * np.pi * rho * vp**3.0 * period**2.0 * r) )
 
         # lowpass filter
-        cutoff = vp / (20.0 * delta[0])
         cutoff = 0.0
+        cutoff = vp / (20.0 * delta[0])
         if cutoff:
             v  = cst.signal.lowpass( v,  dt, cutoff, 2, 1 )
             va = cst.signal.lowpass( va, dt, cutoff, 2, 1 )

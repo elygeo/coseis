@@ -8,8 +8,8 @@ import numpy as np
 import cst
 
 # parameters
-cvm = 'h'
 cvm = 's'
+cvm = 'h'
 dx = 100.0;  nproc = 4096
 dx = 200.0;  nproc = 512
 dx = 500.0;  nproc = 32
@@ -23,8 +23,8 @@ mts = cst.source.scsn_mts( eventid )
 
 # projection
 rotate = None
-transform = None
-bounds = (-144000.0, 112000.0), (-72000.0, 72000.0), (0.0, 64000.0-dx)
+s, d = 1000.0, 0.5 * dx
+bounds = (-144 * s + d, 112 * s - d), (-72 * s + d, 72 * s - d), (0.0, 64 * s - dx)
 origin = mts['longitude'], mts['latitude'], mts['depth']
 projection = dict( proj='tmerc', lon_0=origin[0], lat_0=origin[1] )
 proj = pyproj.Proj( **projection )
@@ -38,7 +38,7 @@ os.makedirs( path )
 # uniform zone in PML and to deepest source depth
 npml = 10
 npml = min( npml, int( 8000.0 / delta[0] + 0.5 ) )
-ntop = int( 26000.0 / abs( delta[2] ) + 0.5 )
+ntop = int( origin[2] / abs( delta[2] ) + 2.5 )
 
 # dimensions
 x, y, z = bounds
@@ -91,7 +91,6 @@ meta = dict(
     extent = extent,
     origin = origin,
     projection = projection,
-    transform = transform,
     rotate = rotate,
     dtype = np.dtype( 'f' ).str,
 )
