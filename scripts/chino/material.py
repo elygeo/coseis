@@ -10,22 +10,24 @@ import cst
 # parameters
 cvm = 's'
 cvm = 'h'
-dx = 100.0;  nproc = 4096
-dx = 200.0;  nproc = 512
-dx = 500.0;  nproc = 32
-dx = 1000.0; nproc = 2
+dx = 50.0;   nproc = 2048
+dx = 100.0;  nproc = 256
+dx = 500.0;  nproc = 2
+dx = 1000.0; nproc = 1
 dx = 8000.0; nproc = 1
+dx = 200.0;  nproc = 32
 delta = dx, dx, -dx
 
 # moment tensor source
 eventid = 14383980
-mts = cst.source.scsn_mts( eventid )
+mts = os.path.join( 'run', 'data', '%s.mts.py' % eventid )
+mts = cst.util.load( mts )
 
 # projection
 rotate = None
 s, d = 1000.0, 0.5 * dx
-bounds = (-144 * s + d, 112 * s - d), (-72 * s + d, 72 * s - d), (0.0, 64 * s - dx)
-origin = mts['longitude'], mts['latitude'], mts['depth']
+bounds = (-80 * s + d, 48 * s - d), (-58 * s + d, 54 * s - d), (0.0, 48 * s - dx)
+origin = mts.longitude, mts.latitude, mts.depth
 projection = dict( proj='tmerc', lon_0=origin[0], lat_0=origin[1] )
 proj = pyproj.Proj( **projection )
 

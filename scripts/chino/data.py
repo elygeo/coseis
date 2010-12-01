@@ -26,8 +26,6 @@ m = mts['double_couple_clvd']
 source1 =  m['myy'],  m['mxx'],  m['mzz']
 source2 = -m['mxz'], -m['myz'],  m['mxy']
 
-asdf
-
 # open STP connection
 stp = cst.scedc.stp( 'scedc' )
 

@@ -8,11 +8,12 @@ import numpy as np
 import cst
 
 # parameters
+dx_ = 50.0;   nproc3 = 1, 48, 320
 dx_ = 100.0;  nproc3 = 1, 48, 320
-dx_ = 200.0;  nproc3 = 1, 12, 160
-dx_ = 500.0;  nproc3 = 1, 4, 64
+dx_ = 500.0;  nproc3 = 1, 1, 2
 dx_ = 1000.0; nproc3 = 1, 1, 2
 dx_ = 8000.0; nproc3 = 1, 1, 1
+dx_ = 200.0;  nproc3 = 1, 12, 160
 
 # path
 id_ = 'topo-cvm-%04.f' % dx_
@@ -98,9 +99,9 @@ for s in open( f ).readlines():
     j = x / delta[0] + 1.0
     k = y / delta[1] + 1.0
     fieldio += [
-        ('=wi', 'v1', [j,k,1,()], 'out/' + s + '-v1.bin'),
-        ('=wi', 'v2', [j,k,1,()], 'out/' + s + '-v2.bin'),
-        ('=wi', 'v3', [j,k,1,()], 'out/' + s + '-v3.bin'),
+        ('=w', 'v1', [j,k,1,()], 'out/' + s + '-v1.bin'),
+        ('=w', 'v2', [j,k,1,()], 'out/' + s + '-v2.bin'),
+        ('=w', 'v3', [j,k,1,()], 'out/' + s + '-v3.bin'),
     ]
 
 # surface output

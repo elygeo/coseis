@@ -10,8 +10,10 @@ from obspy.imaging import beachball
 import cst
 
 # parameters
+cvm = 'cvm'
+cvm = 'cvmh'
 eventid = 14383980
-bounds = (-72000.0, 40000.0), (-50000.0, 46000.0)
+bounds = (-80000.0, 48000.0), (-58000.0, 54000.0)
 mts = os.path.join( 'run', 'data', '%s.mts.py' % eventid )
 mts = cst.util.load( mts )
 origin = mts.longitude, mts.latitude, mts.depth
@@ -25,7 +27,7 @@ x, y = np.array( proj( x, y, inverse=True ) )
 extent = (x.min(), x.max()), (y.min(), y.max())
 
 # setup plot
-inches = 6.4, 6.4
+inches = 6.4, 5.6
 plt.rc( 'font', size=8 )
 plt.rc( 'axes', linewidth=0.5 )
 plt.rc( 'lines', lw=1.5, solid_joinstyle='round', solid_capstyle='round' )
@@ -42,9 +44,25 @@ x = x[0] + ddeg * np.arange( n[0] )
 y = y[0] + ddeg * np.arange( n[1] )
 y, x = np.meshgrid( y, x )
 x, y = proj( x, y )
-v = 250, 1000
 v = 1000,
-ax.contour( x, y, z, v, colors='k', linewidths=0.25 )
+x, y = cst.plt.contour( x, y, z, v )[0]
+ax.plot( x, y, '-k', linewidth=0.25 )
+
+# basins
+x, y = extent
+x = x[0] + ddeg * np.arange( n[0] )
+y = y[0] + ddeg * np.arange( n[1] )
+y, x = np.meshgrid( y, x )
+z = np.empty_like( x )
+z.fill( 1000.0 )
+if cvm == 'cvmh':
+    z = cst.cvmh.extract( x, y, z, 'vs' )
+else:
+    z = cst.cvm.extract( x, y, z, 'vs', rundir='run/cvm' )
+x, y = proj( x, y )
+v = 2500,
+x, y = cst.plt.contour( x, y, z, v )[0]
+ax.plot( x, y, '--k', linewidth=0.25 )[0].set_dashes((2,1))
 
 # coastlines and boarders
 x, y = cst.data.mapdata( 'coastlines', 'high', extent, 10.0 )
@@ -60,25 +78,40 @@ if 0:
 else:
     m = mts.double_couple_clvd
     m = m['mzz'], m['mxx'], m['myy'], m['mxz'], -m['myz'], -m['mxy']
-    b = beachball.Beach( m, xy=(x,y), width=4000, linewidth=0.5, facecolor='k' )
+    b = beachball.Beach( m, xy=(x,y), width=5000, linewidth=0.5, facecolor='k' )
     ax.add_collection( b )
 
 # stations
 sta = os.path.join( 'run', 'data', 'station-list.txt' )
 sta = np.loadtxt( sta, 'S8, f, f, f' )
 x, y = proj( sta['f2'], sta['f1'] )
+print x.min(), x.max()
+print y.min(), y.max()
 ax.plot( x, y, 'k^', markersize=5 )
 for s, y, x, z in sta:
     x, y = proj( x, y )
-    ax.text( x, y-1800, s.split('.')[-1], ha='center', va='top' )
+    ax.text( x, y-1300, s.split('.')[-1], ha='center', va='top' )
 
-# finish up
+# axes
 axis = bounds[0] + bounds[1]
-ax.set_xticks( [] )
-ax.set_yticks( [] )
 ax.axis( 'image' )
 ax.axis( axis )
+ax.set_xticks( [] )
+ax.set_yticks( [] )
+
+# legend
+x, y = bounds
+x = x[1] - 50000.0, x[1] - 30000.0
+y = y[1] - 3000.0, y[1] - 3000.0
+cst.plt.lengthscale( ax, x, y, label='20 km', backgroundcolor='w' )
+x, y = bounds
+x = x[1] - 20000.0
+y = y[1] - 6000.0
+cst.plt.compass_rose( ax, x, y, 2000.0, lw=0.5 )
+
+# finish up
 fig.canvas.draw()
-fig.savefig( 'run/map.pdf' )
+f = os.path.join( 'run', 'map-%s.pdf' % cvm )
+fig.savefig( f, transparent=True )
 fig.show()
 

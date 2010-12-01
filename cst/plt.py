@@ -219,7 +219,7 @@ def digitize( img, xlim=(-1, 1), ylim=(-1, 1), color='r' ):
         yr += [y]
     return xr, yr
 
-def contours( *args, **kwargs ):
+def contour( *args, **kwargs ):
     """
     Extract contour polygons using matplotlib.
     """

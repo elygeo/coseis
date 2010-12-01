@@ -4,6 +4,7 @@ Mapping data utilities
 # TODO
 # Quaternary Fault Database
 # ftp://hazards.cr.usgs.gov/maps/qfault/
+# http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
 import os, urllib, gzip, zipfile
 import numpy as np
 from . import coord, util
