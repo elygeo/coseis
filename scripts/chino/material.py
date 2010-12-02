@@ -8,14 +8,15 @@ import numpy as np
 import cst
 
 # parameters
-cvm = 's'
-cvm = 'h'
+name = 'chino'
+cvm = 'cvmh'
+cvm = 'cvm'
 dx = 50.0;   nproc = 2048
 dx = 100.0;  nproc = 256
-dx = 500.0;  nproc = 2
-dx = 1000.0; nproc = 1
-dx = 8000.0; nproc = 1
 dx = 200.0;  nproc = 32
+dx = 500.0;  nproc = 2
+dx = 8000.0; nproc = 1
+dx = 1000.0; nproc = 1
 delta = dx, dx, -dx
 
 # moment tensor source
@@ -32,7 +33,7 @@ projection = dict( proj='tmerc', lon_0=origin[0], lat_0=origin[1] )
 proj = pyproj.Proj( **projection )
 
 # path
-mesh_id = '%04.f' % delta[0]
+mesh_id = '%s-%s-%04.f' % (name, cvm, delta[0])
 path = os.path.join( 'run', 'mesh', mesh_id )
 path = os.path.realpath( path ) + os.sep
 os.makedirs( path )
@@ -109,7 +110,7 @@ python = 'python'
 if cst.site.machine == 'nics-kraken':
     python = '/lustre/scratch/gely/local/bin/python'
 
-if cvm == 'h':
+if cvm == 'cvmh':
 
     # stage cvm
     cvm_proj = pyproj.Proj( **cst.cvmh.projection )
@@ -132,7 +133,7 @@ if cvm == 'h':
         nproc = min( 4, nproc ),
     )
 
-if cvm == 's':
+elif cvm == 'cvm':
 
     # stage cvm
     rundir = path + 'cvm' + os.sep

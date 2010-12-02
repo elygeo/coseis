@@ -14,7 +14,7 @@ author = 'Geoffrey Ely'
 title = 'Chino Hills'
 scale = 0.001
 sims = 'run/sim/*'
-sims = 'run/sim/flat-8000'
+sims = 'run/sim/chino-cvm-1000-flat'
 force = '-f' in sys.argv[1:]
 
 # loop over sims
@@ -46,8 +46,8 @@ for path in glob.glob( sims ):
     bounds = x, y
 
     # WebSims configuration
-    vscale = 0.002
-    uscale = 0.002
+    vscale = 0.2
+    uscale = 0.05
     vticks = 0, vscale, 2 * vscale
     uticks = 0, uscale, 2 * uscale
     meta.__dict__.update( locals() )
@@ -66,7 +66,8 @@ for path in glob.glob( sims ):
     np.savetxt( f, scale * np.array( [[x,y,z]] ) )
 
     # station list
-    y, x, z = np.loadtxt( 'station-list.txt', usecols=(1,2,3) ).T
+    f = os.path.join( 'run', 'data', 'station-list.txt' )
+    y, x, z = np.loadtxt( f, usecols=(1,2,3) ).T
     x, y = proj( x, y )
     f = path + 'station-list-xyz.txt'
     np.savetxt( f, scale * np.array( [x,y,z] ).T )

@@ -1,4 +1,4 @@
-#!/usr/bin/env ipython -wthread
+#!/usr/bin/env python
 import os
 import numpy as np
 import pyproj
@@ -11,15 +11,17 @@ chan = 'HN'
 nsta = 8
 duration = 50.0
 lfilter = None
-lfilter = (0.1, 1.0), 'bandpass'
-gain = 100.0
-xoff = 4.0
-yoff = -5
+yoff = -5; lfilter = (0.1, 1.0), 'bandpass'
+yoff = -5; lfilter = (0.1, 0.5), 'bandpass'
 ysep = 0.35
+xoff = 4.0
+vscale = 100.0
 
 # metadata
-sim = os.path.join( 'run', 'sim', 'flat-cvm-8000' ) + os.sep
-meta = cst.util.load( sim + 'meta.py' )
+id_ = 'chino-cvmh-1000-flat'
+id_ = 'chino-cvm-1000-flat'
+path = os.path.join( 'run', 'sim', id_ ) + os.sep
+meta = cst.util.load( path + 'meta.py' )
 proj = pyproj.Proj( **meta.projection )
 t0 = obspy.core.utcdatetime.UTCDateTime( meta.origin_time )
 
@@ -55,11 +57,6 @@ plt.rc( 'font', size=8 )
 plt.rc( 'legend', fontsize=8 )
 plt.rc( 'axes', lw=0.5 )
 plt.rc( 'lines', lw=0.5, solid_joinstyle='round' )
-
-# plot directory
-f = os.path.join( 'run', 'plot' )
-if not os.path.exists( f ):
-    os.makedirs( f )
 
 # loop over station groups
 for igroup, group in enumerate( station_groups ):
@@ -111,8 +108,8 @@ for igroup, group in enumerate( station_groups ):
 
             # synthetics
             n = int( duration / meta.delta[-1] )
-            f = os.path.join( sim, 'out', sta + '-v%s.bin' % (i + 1) )
-            v = np.fromfile( f, meta.dtype, n ) * gain
+            f = os.path.join( path, 'out', sta + '-v%s.bin' % (i + 1) )
+            v = np.fromfile( f, meta.dtype, n ) * vscale
             dt = meta.delta[-1]
             t = dt * np.arange( n )
             if lfilter:
@@ -125,7 +122,7 @@ for igroup, group in enumerate( station_groups ):
 
     # finish figure
     fig.canvas.draw()
-    f = os.path.join( 'run', 'plot', 'chino%s.pdf' % igroup )
+    f = os.path.join( path, '%s-%s.pdf' % (id_, igroup) )
     fig.savefig( f, transparent=True )
     fig.show()
 

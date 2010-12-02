@@ -10,8 +10,8 @@ from obspy.imaging import beachball
 import cst
 
 # parameters
-cvm = 'cvm'
 cvm = 'cvmh'
+cvm = 'cvm'
 eventid = 14383980
 bounds = (-80000.0, 48000.0), (-58000.0, 54000.0)
 mts = os.path.join( 'run', 'data', '%s.mts.py' % eventid )
