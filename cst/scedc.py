@@ -96,6 +96,8 @@ class stp():
         out = []
         buff = self.sock.recv( 4096 )
         while( buff != '' ):
+            if len( buff ) < 4096 and not buff.endswith( 'OVER\n' ):
+                buff += self.sock.recv( 4096 )
             line, buff = buff.split( '\n', 1 )
             key = line.split()
             if verbose:
@@ -135,8 +137,6 @@ class stp():
                 print( 'ERROR: ' + line[4:] )
             else:
                 print( 'ERROR: ' + repr( line ) )
-            if len( buff ) < 4096 and not buff.endswith( 'OVER\n' ):
-                buff += self.sock.recv( 4096 )
         return out
 
 
