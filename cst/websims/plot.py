@@ -10,6 +10,14 @@ from . import conf
 from .. import util
 from .. import plt as cst_plt
 
+plt.rc( 'lines',
+    markersize = 3.5,
+    linewidth = 0.5,
+    solid_joinstyle = 'round',
+    solid_capstyle = 'round',
+    dash_joinstyle = 'round',
+    dash_capstyle = 'round',
+)
 
 def plot2d( id_, img_file, time='', decimate='' ):
     """
@@ -49,15 +57,15 @@ def plot2d( id_, img_file, time='', decimate='' ):
         axes  =   (axes[1],  axes[0]) +  axes[2:]
         unit  =   (unit[1],  unit[0]) +  unit[2:]
     height = 8.0 * aspect + 1.0
-    axis = ( 
+    axis = (
         max( 0, -delta[0] * (shape[0] - 1) ),
         max( 0,  delta[0] * (shape[0] - 1) ),
         max( 0, -delta[1] * (shape[1] - 1) ),
         max( 0,  delta[1] * (shape[1] - 1) ),
     )
-    extent = ( 
-        0, abs( delta[0] * (shape[0] - 1) ),
-        0, abs( delta[1] * (shape[1] - 1) ),
+    extent = (
+        -abs( delta[0] * 0.5 ), abs( delta[0] * (shape[0] - 0.5) ),
+        -abs( delta[1] * 0.5 ), abs( delta[1] * (shape[1] - 0.5) ),
     )
 
     # setup figure
@@ -125,10 +133,19 @@ def plot2d( id_, img_file, time='', decimate='' ):
         x, y = np.loadtxt( path, usecols=(0, 1) ).T
         if rotate:
             x, y = y, x
+        style = '-k'
         if len( plot ) > 1:
-            ax.plot( x, y, plot[1], linewidth=0.5 )
+            style = plot[1]
+        if '--' in style:
+            ax.plot( x, y, style )[0].set_dashes( (4,2) )
+        elif '*' in style:
+            ax.plot( x, y, style,
+                markersize = 10,
+                markerfacecolor = 'none',
+                markeredgecolor = 'k',
+            )
         else:
-            ax.plot( x, y, '-k', linewidth=0.5 )
+            ax.plot( x, y, style )
 
     # axes
     if rotate:

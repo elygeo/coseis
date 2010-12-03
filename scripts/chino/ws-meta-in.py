@@ -20,8 +20,8 @@ x_axes = 'X', 'Y', 'Time'
 x_decimate = 1
 x_static_title = 'Surface maps'
 x_static_panes = [
-    ( 'pgv.bin', 'Peak ground velocity (m/s)',   'wwbgr', %(vticks)s, 1, 1.2 ),
-    ( 'pgd.bin', 'Peak ground displacement (m)', 'wwbgr', %(uticks)s, 1, 1.2 ),
+    ( 'pgv.bin', 'Peak ground velocity (m/s)',   'wwbgr', %(vticks)s, 1, 2 ),
+    ( 'pgd.bin', 'Peak ground displacement (m)', 'wwbgr', %(uticks)s, 1, 2 ),
     ( 'vs0.bin', 'Surface S-wave velocity (km/s)', 'bgr', (250, 1000, 2000, 3000, 4000) ),
     ( 'topo.bin', 'Topographic elevation (km)',    'bgr', (-1, 0, 1, 2, 3), 0.001 ),
 ]
@@ -33,8 +33,10 @@ x_panes = [
 ]
 x_plot  = [
     ( 'mapdata-xyz.txt', 'k-' ),
-    ( 'source-xyz.txt', 'k+' ),
-    ( 'station-list-xyz.txt', 'k^' ),
+    ( 'mountains-xyz.txt', 'k-' ),
+    ( 'basins-xyz.txt', 'k--' ),
+    ( 'receivers-xyz.txt', 'k^' ),
+    ( 'hypocenter-xyz.txt', 'k*' ),
 ]
 
 # time histories

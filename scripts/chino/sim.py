@@ -16,6 +16,7 @@ dx_ = 8000.0; nproc3 = 1, 1, 1
 dx_ = 1000.0; nproc3 = 1, 1, 2
 
 # mesh type
+register_ = True
 mesh_ = 'chino-cvmh-%04.0f' % dx_
 mesh_ = 'chino-cvm-%04.0f' % dx_
 id_ = mesh_ + '-topo'
