@@ -93,9 +93,10 @@ class stp():
 
     def receive( self, path=None, verbose=False ):
         dirname = path
-        out = []
         buff = self.sock.recv( 4096 )
-        while( buff != '' ):
+        line = ''
+        out = []
+        while( line != 'OVER' ):
             if len( buff ) < 4096 and not buff.endswith( 'OVER\n' ):
                 buff += self.sock.recv( 4096 )
             line, buff = buff.split( '\n', 1 )
