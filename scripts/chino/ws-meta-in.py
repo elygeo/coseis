@@ -27,9 +27,9 @@ x_static_panes = [
 ]
 x_title = 'Ground velocity snapshot'
 x_panes = [
-    ( 'snap-v1.bin', 'X velocity (m/s)', 'cwy', (-1, 0, 1), 1, 2 ),
-    ( 'snap-v2.bin', 'Y velocity (m/s)', 'cwy', (-1, 0, 1), 1, 2 ),
-    ( 'snap-v3.bin', 'Z velocity (m/s)', 'cwy', (-1, 0, 1), 1, 2 ),
+    ( 'hold/snap-v1.bin', 'X velocity (m/s)', 'cwy', (-1, 0, 1), 1, 2 ),
+    ( 'hold/snap-v2.bin', 'Y velocity (m/s)', 'cwy', (-1, 0, 1), 1, 2 ),
+    ( 'hold/snap-v3.bin', 'Z velocity (m/s)', 'cwy', (-1, 0, 1), 1, 2 ),
 ]
 x_plot  = [
     ( 'mapdata-xyz.txt', 'k-' ),
@@ -46,8 +46,8 @@ t_unit = 's', 'km', 'km'
 t_axes = 'Time', 'X', 'Y'
 t_title = 'Velocity time history'
 t_panes = [
-    ( ('hist-v1.bin',), 'X Velocity (m/s)' ),
-    ( ('hist-v2.bin',), 'Y Velocity (m/s)', None, (' ') ),
-    ( ('hist-v3.bin',), 'Z Velocity (m/s)' ),
+    ( ('hold/hist-v1.bin',), 'X Velocity (m/s)' ),
+    ( ('hold/hist-v2.bin',), 'Y Velocity (m/s)', None, (' ') ),
+    ( ('hold/hist-v3.bin',), 'Z Velocity (m/s)' ),
 ]
 

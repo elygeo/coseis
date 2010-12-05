@@ -15,6 +15,7 @@ title = 'Chino Hills'
 scale = 0.001
 sims = 'run/sim/*'
 sims = 'run/sim/chino-cvm-1000-flat'
+sims = 'run/sim/chino-cvm-0200-flat'
 force = '-f' in sys.argv[1:]
 
 # loop over sims
@@ -35,10 +36,10 @@ for path in glob.glob( sims ):
     proj = pyproj.Proj( **meta.projection )
 
     # snapshot and time history dimensions
-    x, y, t = meta.shapes['snap-v1.bin']; nsnap = x, y, t
-    x, y, t = meta.shapes['hist-v1.bin']; nhist = t, x, y
-    x, y, t = meta.deltas['snap-v1.bin']; dsnap = scale * x, scale * y, t
-    x, y, t = meta.deltas['hist-v1.bin']; dhist = t, scale * x, scale * y
+    x, y, t = meta.shapes['hold/snap-v1.bin']; nsnap = x, y, t
+    x, y, t = meta.shapes['hold/hist-v1.bin']; nhist = t, x, y
+    x, y, t = meta.deltas['hold/snap-v1.bin']; dsnap = scale * x, scale * y, t
+    x, y, t = meta.deltas['hold/hist-v1.bin']; dhist = t, scale * x, scale * y
 
     # adjust bounds for WebSims (should fix WebSims instead)
     x, y = bounds[:2]

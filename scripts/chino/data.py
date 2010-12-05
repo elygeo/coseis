@@ -2,7 +2,7 @@
 """
 Get event data
 """
-import os, sys, glob, time, subprocess
+import os
 import cst
 
 # parameters

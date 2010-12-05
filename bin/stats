@@ -26,7 +26,7 @@ for filename in args:
     fh = open( filename, 'rb' )
     rmin =  np.inf
     rmax = -np.inf
-    rsum = 0.
+    rsum = 0.0
     i = 0
     while i < n:
         b = min( n-i, block )

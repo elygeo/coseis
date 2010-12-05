@@ -10,8 +10,8 @@ type t_io
     integer :: ii(3,4), nc, nb, ib, fh
     real :: x1(3), x2(3), val, period
     real, pointer :: buff(:,:)     ! buffer for storing mutliple time steps
-    !XXX character(4) :: fields(32) ! field variable, see fieldnames.py for possibilities
-    !XXX real, pointer :: buff(:,:,:)  ! buffer for storing mutliple time steps
+    !XXX character(4) :: fields(32)
+    !XXX real, pointer :: buff(:,:,:) 
     type( t_io ), pointer :: next  ! pointer to next member of the field i/o list
 end type t_io
 type( t_io ), pointer :: io0, io, ioprev

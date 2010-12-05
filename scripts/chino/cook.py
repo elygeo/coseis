@@ -7,12 +7,13 @@ import numpy as np
 import meta
 
 # metatdata
-dt = meta.deltas['full-v1.bin'][-1]
-nfull = meta.shapes['full-v1.bin']
-nhist = meta.shapes['hist-v1.bin']
-ifull = meta.indices['full-v1.bin']
-ihist = meta.indices['hist-v1.bin']
-isnap = meta.indices['snap-v1.bin']
+path = 'hold/'
+dt = meta.deltas[path + 'full-v1.bin'][-1]
+nfull = meta.shapes[path + 'full-v1.bin']
+nhist = meta.shapes[path + 'hist-v1.bin']
+ifull = meta.indices[path + 'full-v1.bin']
+ihist = meta.indices[path + 'hist-v1.bin']
+isnap = meta.indices[path + 'snap-v1.bin']
 dtype = meta.dtype
 
 # decimation intervals
@@ -20,19 +21,19 @@ xdec = ihist[0][2] / ifull[0][2]
 tdec = isnap[2][2] / ifull[2][2]
 
 # open full resolution files for reading
-f1 = open( 'full-v1.bin', 'rb' )
-f2 = open( 'full-v2.bin', 'rb' )
-f3 = open( 'full-v3.bin', 'rb' )
+f1 = open( path + 'full-v1.bin', 'rb' )
+f2 = open( path + 'full-v2.bin', 'rb' )
+f3 = open( path + 'full-v3.bin', 'rb' )
 
 # open snapshot files for writing
-s1 = open( 'snap-v1.bin', 'wb' )
-s2 = open( 'snap-v2.bin', 'wb' )
-s3 = open( 'snap-v3.bin', 'wb' )
+s1 = open( path + 'snap-v1.bin', 'wb' )
+s2 = open( path + 'snap-v2.bin', 'wb' )
+s3 = open( path + 'snap-v3.bin', 'wb' )
 
 # open time history files for writing
-h1 = open( 'hist-v1.bin', 'wb' )
-h2 = open( 'hist-v2.bin', 'wb' )
-h3 = open( 'hist-v3.bin', 'wb' )
+h1 = open( path + 'hist-v1.bin', 'wb' )
+h2 = open( path + 'hist-v2.bin', 'wb' )
+h3 = open( path + 'hist-v3.bin', 'wb' )
 
 # initialize displacement, pgv, pgd arrays
 nn = nfull[:2]
@@ -98,14 +99,16 @@ np.asarray( np.sqrt( pgdh ), dtype ).T.tofile( 'pgdh.bin' )
 del( v1, v2, v3, u1, u2, u3, pgv, pgd, pgvh, pgdh )
 
 # transpose time history arrays
+p = path + 'hist-v%s.bin'
 x, y, t = nhist
 n = t, x * y
-np.fromfile( 'hist-v1.bin', dtype ).reshape( n ).T.tofile( 'hist-v1.bin' )
-np.fromfile( 'hist-v2.bin', dtype ).reshape( n ).T.tofile( 'hist-v2.bin' )
-np.fromfile( 'hist-v3.bin', dtype ).reshape( n ).T.tofile( 'hist-v3.bin' )
+np.fromfile( p % 1, dtype ).reshape( n ).T.tofile( p % 1 )
+np.fromfile( p % 2, dtype ).reshape( n ).T.tofile( p % 2 )
+np.fromfile( p % 3, dtype ).reshape( n ).T.tofile( p % 3 )
 
 # remove full resolution files and lock file
-os.unlink( 'full-v1.bin' )
-os.unlink( 'full-v2.bin' )
-os.unlink( 'full-v3.bin' )
+p = path + 'full-v%s.bin'
+os.unlink( p % 1 )
+os.unlink( p % 2 )
+os.unlink( p % 3 )
 
