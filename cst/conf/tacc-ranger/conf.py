@@ -36,7 +36,8 @@ queue = 'large';       maxnodes = 1024; maxtime = 24, 00
 queue = 'normal';      maxnodes = 256;  maxtime = 24, 00
 maxcores = 16
 maxram = 30000
-rate = 2.1e6
+#rate = 21e5
+rate = 15e5
 launch = {
     's_exec':  '%(command)s',
     's_debug': 'gdb %(command)s',
@@ -57,7 +58,7 @@ fortran_flags = {
 # find pgf77 compiler
 import os
 for d in os.environ['PATH'].split(':'):
-    f = os.path.join( d, 'pgf77' ) 
+    f = os.path.join( d, 'pgf77' )
     if os.path.isfile( f ):
         f2py_flags = '--f77exec=' + f
         break

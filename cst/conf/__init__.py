@@ -287,7 +287,7 @@ def prepare( job=None, **kwargs ):
     # SU estimate and wall time limit with extra allowance
     if hasattr( job, 'seconds' ):
         ss = job.seconds * job.ppn / job.cores
-        mm = 10 + ss / 40
+        mm = 10 + ss / 30
     else:
         ss = 3600
         mm = 60

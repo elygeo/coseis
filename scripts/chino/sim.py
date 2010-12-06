@@ -11,15 +11,14 @@ import cst
 dx_ = 50.0;   nproc3 = 1, 32, 480
 dx_ = 100.0;  nproc3 = 1, 4, 240
 dx_ = 500.0;  nproc3 = 1, 1, 2
+dx_ = 200.0;  nproc3 = 1, 1, 120
 dx_ = 1000.0; nproc3 = 1, 1, 2
 dx_ = 8000.0; nproc3 = 1, 1, 1
-dx_ = 200.0;  nproc3 = 1, 1, 120
 
 # mesh type
 surf_out_ = False
 register_ = True
 mesh_ = 'chino-cvmh-%04.0f' % dx_
-mesh_ = 'chino-uhs-%04.0f' % dx_
 mesh_ = 'chino-cvm-%04.0f' % dx_
 id_ = mesh_ + '-topo'
 id_ = mesh_ + '-flat'
@@ -38,6 +37,7 @@ npml = meta.npml
 
 # translate projection to lower left origin
 x, y = meta.bounds[:2]
+print 111, x, y
 proj = pyproj.Proj( **meta.projection )
 proj = cst.coord.Transform( proj, translate=(-x[0], -y[0]) )
 
@@ -45,12 +45,15 @@ proj = cst.coord.Transform( proj, translate=(-x[0], -y[0]) )
 dt_ = dx_ / 16000.0
 dt_ = dx_ / 20000.0
 nt_ = int( 90.0 / dt_ + 1.00001 )
+nt_ = int( 30.0 / dt_ + 1.00001 ) # XXX
+nt_ = 10
 delta += (dt_,)
 shape += (nt_,)
 
 # hypocenter location at x/y center
 x, y, z = hypo_
 x, y = proj( x, y )
+print 222, x, y
 j = abs( x / delta[0] ) + 1.0
 k = abs( y / delta[1] ) + 1.0
 l = abs( z / delta[2] ) + 1.0
@@ -64,7 +67,7 @@ vp1 = 1500.0
 vs1 = 500.0
 vdamp = 400.0
 gam2 = 0.8
-if 'cvm' in id_:
+if 0:
     fieldio = [
         ( '=r', 'rho', [], 'rho.bin' ),
         ( '=r', 'vp',  [], 'vp.bin'  ),
@@ -96,6 +99,12 @@ m = cst.util.load( mts_ ).double_couple_clvd
 source1 =  m['myy'],  m['mxx'],  m['mzz']
 source2 = -m['mxz'], -m['myz'],  m['mxy']
 
+# XXX
+period = 4.0
+m = cst.util.load( mts_ ).moment
+source1 = m, m, m
+source2 = 0.0, 0.0, 0.0
+
 # sites
 stagein = 'out/', 'hold/'
 f = os.path.join( 'run', 'data', 'station-list.txt' )
@@ -116,6 +125,14 @@ for s in open( f ).readlines():
             ('=wi', 'v2', [j,k,1,()], 'out/' + s + '-v2.bin'),
             ('=wi', 'v3', [j,k,1,()], 'out/' + s + '-v3.bin'),
         ]
+
+# cross section output
+j, k, l = ihypo
+for f in 'v1', 'v2', 'v3', 'rho', 'vp', 'vs', 'gam':
+    fieldio += [
+        ( '=w', f,  [j, (), (), (1,-1,1)], 'hold/xsec-ns-%s.bin' % f ),
+        ( '=w', f,  [(), k, (), (1,-1,1)], 'hold/xsec-ew-%s.bin' % f ),
+    ]
 
 # surface output
 if surf_out_:

@@ -32,17 +32,17 @@ for path in glob.glob( runs ):
 
         # read time histories
         p = os.path.join( path, sta )
-        v1 = np.fromfile( p + '_v1.bin', dtype )
-        v2 = np.fromfile( p + '_v2.bin', dtype )
-        v3 = np.fromfile( p + '_v3.bin', dtype )
-        e1 = np.fromfile( p + '_e11.bin', dtype )
-        e2 = np.fromfile( p + '_e22.bin', dtype )
-        e3 = np.fromfile( p + '_e33.bin', dtype )
+        v1 = np.fromfile( p + '-v1.bin', dtype )
+        v2 = np.fromfile( p + '-v2.bin', dtype )
+        v3 = np.fromfile( p + '-v3.bin', dtype )
+        e1 = np.fromfile( p + '-e11.bin', dtype )
+        e2 = np.fromfile( p + '-e22.bin', dtype )
+        e3 = np.fromfile( p + '-e33.bin', dtype )
         v = np.array( [v1, v2, v3] ).squeeze()
         e = np.array( [e1, e2, e3] ).squeeze()
 
         # source receiver radius
-        xi = meta.xis[sta + '_v1.bin']
+        xi = meta.xis[sta + '-v1.bin']
         x = (
             (xi[0] - ihypo[0]) * delta[0],
             (xi[1] - ihypo[1]) * delta[1],

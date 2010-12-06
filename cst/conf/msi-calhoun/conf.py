@@ -20,7 +20,7 @@ maxcores = 8
 maxram = 15000
 maxtime = 24, 00
 launch = {
-    's_exec':  '%(command)s', 
+    's_exec':  '%(command)s',
     's_debug': 'gdb %(command)s',
     'm_exec':  'mpirun -np %(nproc)s -hostfile $PBS_NODEFILE %(command)s',
     'submit':  'qsub "%(name)s.sh"',

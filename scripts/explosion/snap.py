@@ -14,15 +14,14 @@ path = os.path.join( 'run', 'point-potency' ) + os.sep
 
 # metadata
 meta = cst.util.load( path + 'meta.py' )
-shape = meta.shapes['snap_v1.bin']
-delta = meta.deltas['snap_v1.bin']
-indices = meta.indices['snap_v1.bin']
+shape = meta.shapes['snap-v1.bin']
+delta = meta.deltas['snap-v1.bin']
 dtype = meta.dtype
 
 # open snapshot files
-f1 = open( path + 'snap_v1.bin' )
-f2 = open( path + 'snap_v2.bin' )
-f3 = open( path + 'snap_v3.bin' )
+f1 = open( path + 'snap-v1.bin' )
+f2 = open( path + 'snap-v2.bin' )
+f3 = open( path + 'snap-v3.bin' )
 
 # setup figure
 fig = plt.figure()
