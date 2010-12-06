@@ -15,8 +15,8 @@ dx = 50.0;   nproc = 2048
 dx = 100.0;  nproc = 256
 dx = 500.0;  nproc = 2
 dx = 1000.0; nproc = 1
-dx = 200.0;  nproc = 32
 dx = 8000.0; nproc = 1
+dx = 200.0;  nproc = 32
 delta = dx, dx, -dx
 
 # moment tensor source
@@ -28,7 +28,6 @@ mts = cst.util.load( mts )
 rotate = None
 s, d = 1000.0, 0.5 * dx
 bounds = (-80 * s + d, 48 * s - d), (-58 * s + d, 54 * s - d), (0.0, 48 * s - dx)
-bounds = (-80 * s + d, 48 * s - d), (-56 * s + d, 56 * s - d), (0.0, 48 * s - dx) # XXX
 origin = mts.longitude, mts.latitude, mts.depth
 projection = dict( proj='tmerc', lon_0=origin[0], lat_0=origin[1] )
 proj = pyproj.Proj( **projection )

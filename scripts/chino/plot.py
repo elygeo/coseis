@@ -12,17 +12,15 @@ nsta = 8
 duration = 50.0
 lfilter = None
 yoff = -5; lfilter = (0.1, 1.0), 'bandpass'
-yoff = -1; lfilter = (0.1, 0.25), 'bandpass'
 yoff = -2; lfilter = (0.1, 0.5), 'bandpass'
+yoff = -1; lfilter = (0.1, 0.25), 'bandpass'
 ysep = 0.35
 xoff = 4.0
-vscale = 100.0
+vscale = 100000.0
 
 # metadata
 id_ = 'chino-cvm-1000-flat'
-id_ = 'chino-cvmh-0200-flat'
 id_ = 'chino-cvm-0200-flat'
-id_ = 'chino-cvm-0200-flat-4'
 path = os.path.join( 'run', 'sim', id_ ) + os.sep
 meta = cst.util.load( path + 'meta.py' )
 proj = pyproj.Proj( **meta.projection )
