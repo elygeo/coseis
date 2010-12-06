@@ -11,15 +11,17 @@ chan = 'HN'
 nsta = 8
 duration = 50.0
 lfilter = None
-yoff = -5; lfilter = (0.1, 1.0), 'bandpass'
-yoff = -2; lfilter = (0.1, 0.5), 'bandpass'
-yoff = -1; lfilter = (0.1, 0.25), 'bandpass'
+yoff = -5; lfilter = (0.1, 1.0), 'bandpass', 2, 1
+yoff = -2; lfilter = (0.1, 0.5), 'bandpass', 2, 1
+yoff = -0.5; lfilter = (0.1, 0.25), 'bandpass', 2, 1
+yoff = -0.5; lfilter = (0.1, 0.3), 'bandpass', 2, 1
 ysep = 0.35
 xoff = 4.0
-vscale = 100000.0
+vscale = 1000.0
 
 # metadata
 id_ = 'chino-cvm-1000-flat'
+id_ = 'chino-cvm-0500-flat'
 id_ = 'chino-cvm-0200-flat'
 path = os.path.join( 'run', 'sim', id_ ) + os.sep
 meta = cst.util.load( path + 'meta.py' )
@@ -123,7 +125,7 @@ for igroup, group in enumerate( station_groups ):
 
     # finish figure
     fig.canvas.draw()
-    f = os.path.join( path, '%s-%s.pdf' % (id_, igroup) )
+    f = os.path.join( path, 'waveform-%s.pdf' % igroup )
     fig.savefig( f, transparent=True )
     fig.show()
 

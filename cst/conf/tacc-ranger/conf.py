@@ -28,16 +28,18 @@ module load gotoblas scalapack mkl
 """
 login = 'tg-login.ranger.tacc.teragrid.org'
 hostname = 'login[34].ranger.tacc.utexas.edu'
-queue = 'request';     maxnodes = 1024; maxtime = 24, 00
-queue = 'serial';      maxnodes = 1;    maxtime =  2, 00
-queue = 'development'; maxnodes = 16;   maxtime =  2, 00
-queue = 'long';        maxnodes = 256;  maxtime = 48, 00
-queue = 'large';       maxnodes = 1024; maxtime = 24, 00
-queue = 'normal';      maxnodes = 256;  maxtime = 24, 00
 maxcores = 16
 maxram = 30000
 #rate = 21e5
 rate = 15e5
+queue_opts = [
+    {'queue': 'development', 'maxnodes': 16,   'maxtime':  (2, 00)},
+    {'queue': 'normal',      'maxnodes': 256,  'maxtime': (24, 00)},
+    {'queue': 'large',       'maxnodes': 1024, 'maxtime': (24, 00)},
+    {'queue': 'long',        'maxnodes': 256,  'maxtime': (48, 00)},
+    {'queue': 'serial',      'maxnodes': 1,    'maxtime':  (2, 00)},
+    {'queue': 'request',     'maxnodes': 1024, 'maxtime': (24, 00)},
+]
 launch = {
     's_exec':  '%(command)s',
     's_debug': 'gdb %(command)s',

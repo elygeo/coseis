@@ -34,12 +34,13 @@ verbose = False
 # machine specific
 host = hostname = os.uname()[1]
 system = os.uname()
+queue = None
+queue_opts = [{}]
 maxnodes = 1
 maxcores = 0
 maxram = 0
 maxtime = 0
 rate = 1.0e6
-queue = None
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
 launch = {
     's_exec':  '%(command)s',
@@ -51,21 +52,21 @@ launch = {
 # command line options
 argv = []
 options = [
-    ( '',  'machine=',    'machine',  '' ),
-    ( 'v', 'verbose',     'verbose',  True ),
-    ( 'f', 'force',       'force',    True ),
-    ( 'n', 'dry-run',     'prepare',  False ),
-    ( 'i', 'interactive', 'run',      'exec' ),
-    ( 'd', 'debug',       'run',      'debug' ),
-    ( 'b', 'batch',       'run',      'submit' ),
-    ( 'q', 'queue',       'run',      'submit' ),
-    ( 's', 'serial',      'mode',     's' ),
-    ( 'm', 'mpi',         'mode',     'm' ),
-    ( 'g', 'debugging',   'optimize', 'g' ),
-    ( 't', 'testing',     'optimize', 't' ),
-    ( 'p', 'profiling',   'optimize', 'p' ),
-    ( 'O', 'optimized',   'optimize', 'O' ),
-    ( '8', 'realsize8',   'dtype',    'f8' ),
+    ('',  'machine=',    'machine',  ''),
+    ('v', 'verbose',     'verbose',  True),
+    ('f', 'force',       'force',    True),
+    ('n', 'dry-run',     'prepare',  False),
+    ('i', 'interactive', 'run',      'exec'),
+    ('d', 'debug',       'run',      'debug'),
+    ('b', 'batch',       'run',      'submit'),
+    ('q', 'queue',       'run',      'submit'),
+    ('s', 'serial',      'mode',     's'),
+    ('m', 'mpi',         'mode',     'm'),
+    ('g', 'debugging',   'optimize', 'g'),
+    ('t', 'testing',     'optimize', 't'),
+    ('p', 'profiling',   'optimize', 'p'),
+    ('O', 'optimized',   'optimize', 'O'),
+    ('8', 'realsize8',   'dtype',    'f8'),
 ]
 
 # search for file in PATH

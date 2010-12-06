@@ -261,50 +261,70 @@ def prepare( job=None, **kwargs ):
     if hasattr( job, 'dtype' ):
         job.dtype = np.dtype( job.dtype ).str
 
-    # parallelization
+    # number of processes
     if not hasattr( job, 'nproc' ):
         job.nproc = 1
-    if job.maxcores and job.maxnodes:
-        job.nodes = min( job.maxnodes, (job.nproc - 1) / job.maxcores + 1 )
-        job.ppn = (job.nproc - 1) / job.nodes + 1
-        job.cores = min( job.maxcores, job.ppn )
-        job.totalcores = job.nodes * job.maxcores
-    else:
-        job.nodes = 1
-        job.ppn = job.nproc
-        job.cores = job.nproc
-        job.totalcores = job.nproc
+
+    # queue options
+    opts = job.queue_opts
+    if job.queue is not None and opts[0] is not {}:
+        opts = [d for d in job.queue_opts if d['queue'] == job.queue]
+        if len( opts ) == 0:
+            sys.error( 'Error: unknown queue: %s' % job.queue )
+
+    # loop over queue configurations
+    for d in opts:
+        job.__dict__.update( d )
+
+        # parallelization
+        if job.maxcores and job.maxnodes:
+            job.nodes = min( job.maxnodes, (job.nproc - 1) / job.maxcores + 1 )
+            job.ppn = (job.nproc - 1) / job.nodes + 1
+            job.cores = min( job.maxcores, job.ppn )
+            job.totalcores = job.nodes * job.maxcores
+        else:
+            job.nodes = 1
+            job.ppn = job.nproc
+            job.cores = job.nproc
+            job.totalcores = job.nproc
+
+        # memory
+        if not hasattr( job, 'pmem' ):
+            job.pmem = job.maxram / job.ppn
+        job.ram = job.pmem * job.ppn
+
+        # SU estimate and wall time limit with extra allowance
+        if hasattr( job, 'seconds' ):
+            seconds = job.seconds * job.ppn / job.cores
+            minutes = 10 + seconds / 30
+        else:
+            seconds = 3600
+            minutes = 60
+        if job.maxtime:
+            maxminutes = 60 * job.maxtime[0] + job.maxtime[1]
+            minutes = min( minutes, maxminutes )
+        job.walltime = '%d:%02d:00' % (minutes // 60, minutes % 60)
+        sus = int( seconds / 3600 * job.totalcores + 1 )
+
+        # break loop queue is large enough
+        if job.maxcores and job.ppn <= job.maxcores:
+            break
+
+    # messages
     print( 'Machine: %s' % job.machine )
     print( 'Cores: %s of %s' % (job.nproc, job.maxnodes * job.maxcores) )
     print( 'Nodes: %s of %s' % (job.nodes, job.maxnodes) )
-
-    # memory
-    if not hasattr( job, 'pmem' ):
-        job.pmem = job.maxram / job.ppn
-    job.ram = job.pmem * job.ppn
     print( 'RAM: %sMb of %sMb per node' % (job.ram, job.maxram) )
-
-    # SU estimate and wall time limit with extra allowance
-    if hasattr( job, 'seconds' ):
-        ss = job.seconds * job.ppn / job.cores
-        mm = 10 + ss / 30
-    else:
-        ss = 3600
-        mm = 60
-    if job.maxtime:
-        mm = min( mm, 60 * job.maxtime[0] + job.maxtime[1] )
-    hh = mm / 60
-    mm = mm % 60
-    job.walltime = '%d:%02d:00' % (hh, mm)
-    sus = int( ss / 3600 * job.totalcores + 1 )
     print( 'SUs: %s' % sus )
     print( 'Time limit: ' + job.walltime )
 
     # warnings
     if job.maxcores and job.ppn > job.maxcores:
-        print( 'Warning: exceding available cores per node (%s)' % job.maxcores )
+        print( 'Warning: exceeding available cores per node (%s)' % job.maxcores )
     if job.ram and job.ram > job.maxram:
-        print( 'Warning: exceding available RAM per node (%sMb)' % job.maxram )
+        print( 'Warning: exceeding available RAM per node (%sMb)' % job.maxram )
+    if job.maxtime and minutes > maxminutes:
+        print( 'Warning: exceeding maximum time limit (%s:%02d:00)' % job.maxtime )
 
     # run directory
     print( 'Run directory: ' + job.rundir )
