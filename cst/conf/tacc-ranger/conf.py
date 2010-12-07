@@ -38,7 +38,8 @@ queue_opts = [
     {'queue': 'large',       'maxnodes': 1024, 'maxtime': (24, 00)},
     {'queue': 'long',        'maxnodes': 256,  'maxtime': (48, 00)},
     {'queue': 'serial',      'maxnodes': 1,    'maxtime':  (2, 00)},
-    {'queue': 'request',     'maxnodes': 1024, 'maxtime': (24, 00)},
+    {'queue': 'vis',         'maxnodes': 2,    'maxtime': (24, 00)},
+    {'queue': 'request'},
 ]
 launch = {
     's_exec':  '%(command)s',

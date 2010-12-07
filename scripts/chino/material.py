@@ -13,10 +13,10 @@ cvm = 'cvmh'
 cvm = 'cvm'
 dx = 50.0;   nproc = 2048
 dx = 100.0;  nproc = 256
+dx = 200.0;  nproc = 32
 dx = 500.0;  nproc = 2
 dx = 1000.0; nproc = 1
 dx = 8000.0; nproc = 1
-dx = 200.0;  nproc = 32
 delta = dx, dx, -dx
 
 # moment tensor source

@@ -270,7 +270,7 @@ def prepare( job=None, **kwargs ):
     if job.queue is not None and opts[0] is not {}:
         opts = [d for d in job.queue_opts if d['queue'] == job.queue]
         if len( opts ) == 0:
-            sys.error( 'Error: unknown queue: %s' % job.queue )
+            sys.exit( 'Error: unknown queue: %s' % job.queue )
 
     # loop over queue configurations
     for d in opts:
@@ -306,9 +306,12 @@ def prepare( job=None, **kwargs ):
         job.walltime = '%d:%02d:00' % (minutes // 60, minutes % 60)
         sus = int( seconds / 3600 * job.totalcores + 1 )
 
-        # break loop queue is large enough
-        if job.maxcores and job.ppn <= job.maxcores:
-            break
+        # if resources exceeded, try another queue
+        if job.maxcores and job.ppn > job.maxcores:
+            continue
+        if job.maxtime and minutes == maxminutes:
+            continue
+        break
 
     # messages
     print( 'Machine: %s' % job.machine )
@@ -323,7 +326,7 @@ def prepare( job=None, **kwargs ):
         print( 'Warning: exceeding available cores per node (%s)' % job.maxcores )
     if job.ram and job.ram > job.maxram:
         print( 'Warning: exceeding available RAM per node (%sMb)' % job.maxram )
-    if job.maxtime and minutes > maxminutes:
+    if job.maxtime and minutes == maxminutes:
         print( 'Warning: exceeding maximum time limit (%s:%02d:00)' % job.maxtime )
 
     # run directory
