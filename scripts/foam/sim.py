@@ -64,16 +64,16 @@ fieldio += [
 
 # weak zone
 if weakzone_:
-    i = (weakzone_ / delta[0] + 1.0), (), (), 0
-    [
+    i = (1, weakzone_ / delta[0] + 1.0), (), (), 0
+    fieldio += [
         ('=', 'ts',  i, -66.0),
         ('=', 'mus', i,  0.6),
         ('=', 'mud', i,  0.6),
     ]
 
 # sensors
-z = 0.03 # actual position
-z = 0.02 # position used in Day and Ely (2002)
+z = 0.03
+z = 0.04
 for s, x, g in [
    (1, 0.92, 0.020074),
    (2, 0.72, 0.019926),
@@ -81,7 +81,7 @@ for s, x, g in [
    (4, 0.22, 0.020166),
   (15, 0.02, 0.020773),
 ]:
-    i = x / delta[0] + 1.0, 1, z / delta[2] + 1.0, ()
+    i = x / delta[0] + 1.0, 1, z / delta[2] + 2.0, ()
     fieldio += [
         ('=w', 'a2', i, 'sensor%02d.bin' % s),
     ]
@@ -92,11 +92,11 @@ fieldio += [
 # surface output
 k = ihypo[1]
 l = 2, 0.8 / delta[2] + 1.0
-surf_ = 1, k, l, ()
-snap_ = (), k, l, (1, -1, 10)
+offf_ = 1, k, l, ()
+xsec_ = (), k, l, (1, -1, 10)
 fieldio += [
-    ('=w', 'u2', surf_, 'surf.bin'),
-    #('=w', 'v2', snap_, 'snap.bin'),
+    ('=w', 'u2', offf_, 'off-fault.bin'),
+    #('=w', 'v2', xsec_, 'xsec.bin'),
 ]
 
 # launch SORD code

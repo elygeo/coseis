@@ -1,4 +1,4 @@
-#!/usr/bin/env ipython -wthread
+#!/usr/bin/env python
 """
 2d Semicircular canyon mesh
 """

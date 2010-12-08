@@ -285,6 +285,8 @@ class Extraction():
             if vm.prop == 'vp':
                 v0 = brocher_vp( v0 )
             vt = vm( x, y, z0 - zt, interpolation=interpolation )
+            if np.isnan( vt ).any():
+                print( 'WARNING: NaNs in GTL' )
             self.gtl = v0, vt
         self.data = x, y, z0, zt, vm, interpolation
         return

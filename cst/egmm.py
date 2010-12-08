@@ -1,4 +1,4 @@
-#!/usr/bin/env ipython -wthread
+#!/usr/bin/env python
 """
 EGMM - Empirical Ground Motion Model
 """
