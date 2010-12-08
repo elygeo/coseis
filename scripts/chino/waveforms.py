@@ -14,9 +14,9 @@ lfilter = None
 ysep = 0.35
 xoff = 4.0
 vscale = 100.0
-yoff = -1.0; lfilter = (0.1, 0.25), 'bandpass', 2, 1
+yoff = -10; lfilter = (0.1, 1.0), 'bandpass', 2, 1
 yoff = -2; lfilter = (0.1, 0.5), 'bandpass', 2, 1
-yoff = -5; lfilter = (0.1, 1.0), 'bandpass', 2, 1
+yoff = -1.0; lfilter = (0.1, 0.2), 'bandpass', 2, 1
 
 # metadata
 id_ = 'chino-cvm-0200-flat'
@@ -77,6 +77,10 @@ for igroup, group in enumerate( station_groups ):
     y = nsta * yoff
     cst.plt.lengthscale( ax, [x - 25, x + 25], 2 * [y], label='%s s', backgroundcolor='w' )
 
+    # setup figure 1
+    fig1 = plt.figure( None, (6.4, 8.0), 100, 'w' )
+    ax1 = fig1.add_axes( [0.1, 0.1, 0.8, 0.8] )
+
     # loop over stations
     for ista, sta in enumerate( group ):
         sta = sta['f0']
@@ -97,15 +101,22 @@ for igroup, group in enumerate( station_groups ):
                 tr.data = cst.signal.filter( tr.data, dt, *lfilter )
             vmax = np.abs( tr.data ).max()
             tr.trim( t0, t0 + duration )
-            t = dt * np.arange( tr.data.size )
+            v = tr.data
+            n = v.size
+            t = dt * np.arange( n )
             x = i * (duration + xoff)
             y = yoff * (ista % nsta)
-            ax.plot( x + t, y + tr.data, 'k-' )
+            ax.plot( x + t, y + v, 'k-' )
             if i == 0:
                 a = '%s %.1f' % (sta.split('.')[1], vmax)
             else:
                 a = '%.1f' % vmax
             ax.text( x + duration, y - 0.1 * yoff, a, va='baseline', ha='right' )
+
+            # Forier spectrum
+            f = np.arange( n // 2 + 1 ) / (dt * n)
+            v = np.fft.rfft( v )
+            ax1.semilogx( f, v, 'r-' )
 
             # synthetics
             n = int( duration / meta.delta[-1] )
@@ -121,9 +132,15 @@ for igroup, group in enumerate( station_groups ):
             ax.plot( x + t, y + v, 'r-' )
             ax.text( x + duration, y - 0.1 * yoff, '%.1f' % vmax, va='baseline', ha='right' )
 
+            # Forier spectrum
+            f = np.arange( n // 2 + 1 ) / (dt * n)
+            v = np.fft.rfft( v )
+            ax1.semilogx( f, v, 'r-' )
+
     # finish figure
     fig.canvas.draw()
-    f = os.path.join( path, 'waveform-%s.pdf' % igroup )
+    f = os.path.join( path, 'waveform-%.0f-%s.pdf' % (1.0 / lfilter[0][1], igroup) )
+    #f = os.path.join( path, 'waveform-%s.pdf' % igroup )
     fig.savefig( f, transparent=True )
     fig.show()
 

@@ -50,7 +50,6 @@ shape += (nt_,)
 # hypocenter location at x/y center
 x, y, z = hypo_
 x, y = proj( x, y )
-z *= 1000.0
 j = abs( x / delta[0] ) + 1.0
 k = abs( y / delta[1] ) + 1.0
 l = abs( z / delta[2] ) + 1.0

@@ -1,24 +1,24 @@
 #!/bin/bash -e
 
-f="chino-cvm-0200-flat"
-f="chino-cvm-0050-flat"
-d="run/sim/$f"
+f = "chino-cvm-0200-flat"
+f = "chino-cvm-0050-flat"
+d = "run/sim/$f"
 
 cp report.rst "$d/$f.rst"
 cd "$d"
 
-cat << EOF > style.tex
+stylesheet = """
 \usepackage[margin=1in]{geometry}
 \usepackage[margin=0.5in]{caption}
 \pagestyle{empty}
-EOF
+"""
 
-rst2latex.py \
-    --documentoptions='12pt' \
-    --stylesheet='style.tex' \
-    --embed-stylesheet \
-    --latex-preamble= \
-    --no-doc-title \
+rst2latex.py
+    --documentoptions='12pt'
+    --stylesheet='style.tex'
+    --embed-stylesheet
+    --latex-preamble=
+    --no-doc-title
     "$f.rst" > "$f.tex"
 
 pdflatex "$f"

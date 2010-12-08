@@ -230,6 +230,7 @@ def mts( eventid, path='scsn-mts-%s.py' ):
             break
     mts['double_couple_clvd'] = clvd
     mts['double_couple'] = dc
+    mts['depth'] *= 1000.0
     util.save( path, mts, header='# SCSN moment tensor solution\n' )
     return mts
 
