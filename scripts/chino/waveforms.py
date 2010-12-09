@@ -20,7 +20,9 @@ yoff = -1.0; lfilter = (0.1, 0.2), 'bandpass', 2, 1
 
 # metadata
 id_ = 'chino-cvm-0200-flat'
+id_ = 'chino-cvmh-0200-flat'
 id_ = 'chino-cvm-0050-flat'
+id_ = 'chino-cvmh-0050-flat'
 path = os.path.join( 'run', 'sim', id_ ) + os.sep
 meta = cst.util.load( path + 'meta.py' )
 proj = pyproj.Proj( **meta.projection )

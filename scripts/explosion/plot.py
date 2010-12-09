@@ -69,8 +69,8 @@ for path in glob.glob( runs ):
         cutoff = 0.0
         cutoff = vp / (20.0 * delta[0])
         if cutoff:
-            v  = cst.signal.lowpass( v,  dt, cutoff, 2, 1 )
-            va = cst.signal.lowpass( va, dt, cutoff, 2, 1 )
+            v  = cst.signal.filter( v,  dt, cutoff, 'lowpass', 2, 1 )
+            va = cst.signal.filter( va, dt, cutoff, 'lowpass', 2, 1 )
 
         # plot figure
         fig = plt.figure()
@@ -83,6 +83,7 @@ for path in glob.glob( runs ):
         if sta in save_plot:
             name = 'Explosion point source'
             ax.set_title( name + ' (%s, %s, %s)' % tuple(x) )
-            fig.savefig( 'explosion.png' )
+            f = os.path.join( path, 'explosion.png' )
+            fig.savefig( f )
         fig.show()
 

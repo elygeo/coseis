@@ -12,14 +12,14 @@ dx_ = 100.0;  nproc3 = 1, 4, 240
 dx_ = 200.0;  nproc3 = 1, 1, 120
 dx_ = 500.0;  nproc3 = 1, 1, 2
 dx_ = 1000.0; nproc3 = 1, 1, 2
-dx_ = 8000.0; nproc3 = 1, 1, 1
+dx_ = 4000.0; nproc3 = 1, 1, 1
 dx_ = 50.0;   nproc3 = 1, 32, 480
 
 # mesh type
 surf_out_ = False
 register_ = True
-mesh_ = 'chino-cvmh-%04.0f' % dx_
 mesh_ = 'chino-cvm-%04.0f' % dx_
+mesh_ = 'chino-cvmh-%04.0f' % dx_
 id_ = mesh_ + '-topo'
 id_ = mesh_ + '-flat'
 

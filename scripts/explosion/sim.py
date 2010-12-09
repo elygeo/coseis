@@ -78,12 +78,12 @@ for source, s in sources_:
         nsource = 1
         rundir = os.path.join( 'run', 'finite-' + source )
         timefunction = 'none'
-        dt = delta[-1]
+        d = delta[-1]
         n = shape[-1]
-        t = dt * np.arange( n )
+        t = d * np.arange( n )
         f = 1.0 - np.exp(-t / period) / period * (t + period)
         job = cst.sord.stage( locals() )
-        d = os.path.join( rundir, 'source' )
-        cst.source.write( f, n, dt, 0.0, ihypo, source1, source2, d )
+        p = os.path.join( rundir, 'source' )
+        cst.source.write( f, n, d, 0.0, ihypo, source1, source2, p )
         cst.sord.run( job )
 

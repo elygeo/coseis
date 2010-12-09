@@ -82,6 +82,7 @@ where( i2 > i2core ) i2 = i1 + (  i2core - i1    ) / di       * di
 m(1:3) = (i4 - i3) / di + 1
 n(1:3) = (i2 - i1) / di + 1
 o(1:3) = (i1 - i3) / di
+n = max( n, 0 )
 
 ! dimensionality
 i3 = i1

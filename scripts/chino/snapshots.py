@@ -16,7 +16,7 @@ file = 'hold/xsec-ew-v3.bin'
 clim = 0.0, 0.000001
 clim = None
 path = os.path.join( 'run', 'sim', 'chino-cvm-1000-flat' ) + os.sep
-path = os.path.join( 'run', 'sim', 'chino-cvm-8000-flat' ) + os.sep
+path = os.path.join( 'run', 'sim', 'chino-cvm-4000-flat' ) + os.sep
 
 # metadata
 meta = cst.util.load( path + 'meta.py' )
