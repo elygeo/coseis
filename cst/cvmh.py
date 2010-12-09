@@ -280,7 +280,7 @@ class Extraction():
         if vs30 is None:
             zt = None
         else:
-            zt = 350.0
+            zt = 365.0
             v0 = vs30( x, y, interpolation='linear' )
             if vm.prop == 'vp':
                 v0 = brocher_vp( v0 )
