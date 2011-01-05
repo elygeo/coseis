@@ -85,6 +85,7 @@ tau = t - 4.0 * sigma
 b = ( (1.0 / np.sqrt( 2.0 * np.pi ) / sigma)
     * np.exp( -0.5 * (tau / sigma) ** 2.0 ) )
 v = dt * scipy.signal.lfilter( b, 1.0, v )
+#v = dt * np.convolve( v, b, 'same' )
 print np.sqrt( np.sum( v * v, 0 ).max() )
 
 # plot waveforms

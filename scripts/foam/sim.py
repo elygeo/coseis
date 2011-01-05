@@ -91,7 +91,7 @@ fieldio += [
 
 # surface output
 k = ihypo[1]
-l = 2, 0.8 / delta[2] + 1.0
+l = 2, 0.8 / delta[2] + 2.0
 offf_ = 1, k, l, ()
 xsec_ = (), k, l, (1, -1, 10)
 fieldio += [

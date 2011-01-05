@@ -97,7 +97,7 @@ for path in glob.glob( sims ):
     # map data
     f1 = open( path + 'mapdata.txt', 'w' )
     f2 = open( path + 'mapdata-xyz.txt', 'w' )
-    for kind in 'coastlines', 'borders':
+    for kind in 'coastlines',:
         x, y = cst.data.mapdata( kind, 'high', extent, 10.0 )
         z = cst.coord.interp2( topo_extent, topo, (x, y) )
         np.savetxt( f1, np.array( [x,y,z] ).T )

@@ -8,23 +8,43 @@ import cst
 
 # parameters
 chan = 'HN'
-nsta = 8
+nsta = 11
 duration = 50.0
 lfilter = None
-ysep = 0.35
 xoff = 4.0
 vscale = 100.0
-yoff = -10; lfilter = (0.1, 1.0), 'bandpass', 2, 1
-yoff = -2; lfilter = (0.1, 0.5), 'bandpass', 2, 1
-yoff = -1.0; lfilter = (0.1, 0.2), 'bandpass', 2, 1
+ysep = 0.35
+ysep = 0.25
+yoff = -20; lfilter = None,
+yoff = -1; lfilter = (0.1, 0.25), 'bandpass', 2, -1
+yoff = -2; lfilter = (0.1, 0.5), 'bandpass', 2, -1
+yoff = -5; lfilter = (0.1, 1.0), 'bandpass', 2, -1
+
+# filter
+def filt( x, dt ):
+    x = cst.signal.filter( x, dt, *lfilter )
+    return x
+
+# replace Brune source with Gaussian source
+def replace( x, dt ):
+    return x
+    import scipy.signal
+    T = meta.period
+    sigma = 0.5
+    t = dt * np.arange( 8 * sigma // dt )
+    tau = t - 4.0 * sigma
+    G = ( 1.0 - 2.0 * T / sigma ** 2.0 * tau
+        - (T / sigma) ** 2.0 * (1.0 - (tau / sigma) ** 2.0) )
+    b = ( (1.0 / np.sqrt( 2.0 * np.pi ) / sigma) * G
+        * np.exp( -0.5 * (tau / sigma) ** 2.0 ) )
+    x = dt * scipy.signal.lfilter( b, 1.0, x )
+    return x
 
 # metadata
-id_ = 'chino-cvm-0200-flat'
-id_ = 'chino-cvmh-0200-flat'
-id_ = 'chino-cvm-0050-flat'
-id_ = 'chino-cvmh-0050-flat'
-path = os.path.join( 'run', 'sim', id_ ) + os.sep
-meta = cst.util.load( path + 'meta.py' )
+sims = 'chino-cvm-0200-flat', 'chino-cvmh-0200-flat'
+sims = 'chino-cvm-0050-flat', 'chino-cvmh-0050-flat'
+meta = os.path.join( 'run', 'sim', sims[0], 'meta.py' )
+meta = cst.util.load( meta )
 proj = pyproj.Proj( **meta.projection )
 t0 = obspy.core.utcdatetime.UTCDateTime( meta.origin_time )
 
@@ -47,25 +67,28 @@ a = (a - a[i]) % (2.0 * np.pi)
 i = a.argsort()
 s = s[i]
 r = r[i]
+n = nsta
 station_groups = []
-for i in range( 0, len( s ), nsta ):
-    s_ = s[i:i+nsta]
-    r_ = r[i:i+nsta]
+for i in range( 0, len( s ), n ):
+    s_ = s[i:i+n]
+    r_ = r[i:i+n]
     j = r_.argsort()
     station_groups.append( s_[j] )
 
-# setup figure
+# figure defaults
 plt.rcdefaults()
 plt.rc( 'font', size=8 )
 plt.rc( 'legend', fontsize=8 )
-plt.rc( 'axes', lw=0.5 )
+plt.rc( 'axes', lw=0.5, color_cycle=['k', 'r', 'b'] )
 plt.rc( 'lines', lw=0.5, solid_joinstyle='round' )
+fig1 = plt.figure( None, (11, 8.5), 100, 'w' )
 
 # loop over station groups
 for igroup, group in enumerate( station_groups ):
 
     # setup figure
-    fig = plt.figure( None, (6.4, 8.0), 100, 'w' )
+    #fig = plt.figure( None, (6.4, 8), 100, 'w' )
+    fig = plt.figure( None, (6.4, 9.75), 100, 'w' )
     ax = fig.add_axes( [0.0, 0.0, 1.0, 1.0] )
     ax.axis( 'tight' )
     ax.axis( 'off' )
@@ -76,73 +99,96 @@ for igroup, group in enumerate( station_groups ):
     ax.text( x - duration - xoff, y, 'East-West',   ha='center', va='center' )
     ax.text( x,                   y, 'North-South', ha='center', va='center' )
     ax.text( x + duration + xoff, y, 'Vertical',    ha='center', va='center' )
-    y = nsta * yoff
+    y = len( group ) * yoff
     cst.plt.lengthscale( ax, [x - 25, x + 25], 2 * [y], label='%s s', backgroundcolor='w' )
-
-    # setup figure 1
-    fig1 = plt.figure( None, (6.4, 8.0), 100, 'w' )
-    ax1 = fig1.add_axes( [0.1, 0.1, 0.8, 0.8] )
 
     # loop over stations
     for ista, sta in enumerate( group ):
-        sta = sta['f0']
+        name, x, y, z = sta['f0'], sta['f2'], sta['f1'], sta['f3']
+        x, y = proj( x, y )
+        z -= meta.depth
+        spread = 0.00002 * (x * x + y * y + z * z) ** 0.5
+        spread = 0.004 * (x * x + y * y) ** 0.25
+        print( name )
+
+        # separates
+        fig1.clf()
 
         # loop over channels
-        for i in range( 3 ):
+        for ichan in range( 3 ):
 
             # data
-            f = '.'.join( [str( meta.event_id ), sta, chan + 'ENZ'[i], 'sac'] )
+            f = '.'.join( [str( meta.event_id ), name, chan + 'ENZ'[ichan], 'sac'] )
             f = os.path.join( 'run', 'data', f )
             st = obspy.core.read( f )
             tr = st[0]
             dt = tr.stats.delta
             tr.data -= tr.data.mean()
+            tr.data = filt( tr.data, dt )
             tr.data = dt * np.cumsum( tr.data )
-            obspy.signal.detrend( tr.data )
-            if lfilter:
-                tr.data = cst.signal.filter( tr.data, dt, *lfilter )
-            vmax = np.abs( tr.data ).max()
             tr.trim( t0, t0 + duration )
+            vmax = np.abs( tr.data ).max()
             v = tr.data
             n = v.size
             t = dt * np.arange( n )
-            x = i * (duration + xoff)
+
+            # plot
+            x = ichan * (duration + xoff)
             y = yoff * (ista % nsta)
-            ax.plot( x + t, y + v, 'k-' )
-            if i == 0:
-                a = '%s %.1f' % (sta.split('.')[1], vmax)
+            ax.plot( x + t, y + v * spread )
+            if ichan == 0:
+                a = '%s\n%.1f' % (name.split('.')[1], vmax)
             else:
                 a = '%.1f' % vmax
-            ax.text( x + duration, y - 0.1 * yoff, a, va='baseline', ha='right' )
+            ax.text( x, y - 0.05 * yoff, a, va='baseline', ha='center' )
 
-            # Forier spectrum
-            f = np.arange( n // 2 + 1 ) / (dt * n)
-            v = np.fft.rfft( v )
-            ax1.semilogx( f, v, 'r-' )
+            # separates FIXME should fft before trim and window
+            if fig1:
+                ax1 = fig1.add_subplot( 321 + 2 * ichan )
+                ax2 = fig1.add_subplot( 322 + 2 * ichan )
+                ax1.set_title( name + '-' + 'ENZ'[ichan] )
+                ax2.set_title( name + '-' + 'ENZ'[ichan] )
+                ax1.plot( t, v )
+                f = np.arange( n // 2 + 1 ) / (dt * n)
+                v = abs( np.fft.rfft( v ) ) * 2 / v.size
+                ax2.loglog( f, v )
 
             # synthetics
-            n = int( duration / meta.delta[-1] )
-            f = os.path.join( path, 'out', sta + '-v%s.bin' % (i + 1) )
-            v = np.fromfile( f, meta.dtype, n ) * vscale
-            dt = meta.delta[-1]
-            t = dt * np.arange( n )
-            if lfilter:
-                v = cst.signal.filter( v, dt, *lfilter )
-            vmax = np.abs( v ).max()
-            x = i * (duration + xoff)
-            y = yoff * ((ista % nsta) + ysep)
-            ax.plot( x + t, y + v, 'r-' )
-            ax.text( x + duration, y - 0.1 * yoff, '%.1f' % vmax, va='baseline', ha='right' )
+            for isim, id_ in enumerate( sims ):
+                dt = meta.delta[-1]
+                f = os.path.join( 'run', 'sim', id_, 'out', name + '-v%s.bin' % (ichan + 1) )
+                v = np.fromfile( f, meta.dtype ) * vscale
+                v = replace( v, dt )
+                v = filt( v, dt )
+                n = int( duration / meta.delta[-1] )
+                v = v[:n]
+                t = dt * np.arange( n )
+                vmax = np.abs( v ).max()
 
-            # Forier spectrum
-            f = np.arange( n // 2 + 1 ) / (dt * n)
-            v = np.fft.rfft( v )
-            ax1.semilogx( f, v, 'r-' )
+                # plot
+                x = ichan * (duration + xoff)
+                y = yoff * ((ista % nsta) + (isim + 1) * ysep)
+                ax.plot( x + t, y + v * spread )
+                ax.text( x, y - 0.05 * yoff, '%.1f' % vmax, va='baseline', ha='center' )
+
+                # separates FIXME should fft before trim
+                if fig1:
+                    ax1.plot( t, v )
+                    f = np.arange( n // 2 + 1 ) / (dt * n)
+                    v = abs( np.fft.rfft( v ) ) * 2 / v.size
+                    ax2.loglog( f, v )
+
+        # finish separate
+        f = os.path.join( 'run', 'plot', name + '.pdf' )
+        fig1.savefig( f, transparate=True )
 
     # finish figure
     fig.canvas.draw()
-    f = os.path.join( path, 'waveform-%.0f-%s.pdf' % (1.0 / lfilter[0][1], igroup) )
-    #f = os.path.join( path, 'waveform-%s.pdf' % igroup )
-    fig.savefig( f, transparent=True )
+    if lfilter[0]:
+        f = os.path.join( 'run', 'plot', 'waveform-%.0f-%s' % (1.0 / lfilter[0][1], igroup) )
+    else:
+        f = os.path.join( 'run', 'plot', 'waveform-raw-%s' % igroup )
+    fig.savefig( f + '.pdf', transparent=True )
+    fig.savefig( f + '.png', dpi=300 )
     fig.show()
 

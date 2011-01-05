@@ -176,24 +176,52 @@ real, parameter :: pi = 3.14159265
 real :: t
 time_function = 0.0
 select case( tfunc )
-case( 'const'  )
+case( 'const' )
     time_function = 1.0
-case( 'delta'  )
+case( 'delta' )
     if ( abs( tm ) < 0.25 * dt ) time_function = 1.0
+case( 'step', 'heaviside', 'integral_delta' )
+    if ( abs( tm ) < 0.25 * dt ) then
+        time_function = 0.5
+    elseif
+        ( tm >= 0.25 * dt ) time_function = 1.0
+    endif
 case( 'brune' )
-    time_function = -exp( -tm / period ) / period * (tm + period) + 1.0
-case( 'dbrune' )
     time_function =  exp( -tm / period ) / period ** 2.0 * tm
-case( 'ddbrune' )
-    time_function = -exp( -tm / period ) / period ** 3.0 * (tm - period)
-case( 'gaussian' )
-    t = ( tm - 4.0 * period ) / period
-    time_function = exp( -0.5 * t * t ) / ( period * sqrt( 2.0 * pi ) )
-case( 'dgaussian', 'ricker1' )
+case( 'integral_brune' )
+    time_function = -exp( -tm / period ) / period * (tm + period) + 1.0
+case( 'hann' )
+    if ( tm < 2.0 * period ) then
+        time_function = 0.5 / period * (1.0 - cos( pi * tm / period ))
+    end if
+case( 'integral_hann' )
+    time_function = 1.0
+    if ( tm < 2.0 * period ) then
+        time_function = 0.5 * tm / period - 0.5 / pi * sin( pi * tm / period )
+    end if
+case( 'triangle' )
+    t = tm / period
+    if ( tm < period ) then
+        time_function = t / period
+    elseif ( tm < 2.0 * period ) then
+        time_function = (2.0 - t) / period
+    end if
+case( 'integral_triangle' )
+    time_function = 1.0
+    t = tm / period
+    if ( tm < period ) then
+        time_function = 0.5 * t * t
+    elseif ( tm < 2.0 * period ) then
+        time_function = (2.0 - 0.5 * t) * t - 1.0
+    end if
+case( 'gaussian', 'normal', 'integral_ricker1' )
+    t = (tm - 4.0 * period) / period
+    time_function = exp( -0.5 * t * t ) / (period * sqrt( 2.0 * pi ))
+case( 'ricker1', 'integral_ricker2' )
     t = tm - period
     time_function = t * exp( -2.0 * (pi * t / period) ** 2.0 )
-case( 'ddgaussian', 'ricker2' )
-    t = ( pi * (tm - period) / period ) ** 2.0
+case( 'ricker2' )
+    t = (pi * (tm - period) / period) ** 2.0
     time_function = (1.0 - 2.0 * t) * exp( -t )
 case default
     write( 0, * ) 'invalid time func: ', trim( tfunc )

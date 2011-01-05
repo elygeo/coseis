@@ -42,7 +42,7 @@ def filter( x, dt, cutoff, btype='lowpass', order=2, repeat=-1 ):
             x = scipy.signal.lfilter( b, a, x )
     return x
 
-def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=None ):
+def spectrum( h, dt=1.0, nf=None, shift=False, tzoom=4.0, db=None, legend=None, title='Forier spectrum', axes=None ):
     """
     Plot a time signal and it's Fourier spectrum.
     """
@@ -53,13 +53,17 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=Non
     if not nf:
         nf = nt
     t = np.arange( nt ) * dt
+    if shift:
+        t -= (nt // 2) * dt
+    tlim = t[0] / tzoom, t[-1] / tzoom
     f = np.arange( nf // 2 + 1 ) / (dt * nf)
-    tlim = t[0], t[-1]
     if len( h.shape ) > 1:
         n = h.shape[0]
         t = t[None].repeat( n, 0 )
         f = f[None].repeat( n, 0 )
-    H = np.fft.rfft( h, nf )
+    H = np.fft.rfft( h, nf ) * 2 / nf
+    if shift:
+        h = np.fft.fftshift( h )
     if axes is None:
         plt.clf()
         fig = plt.gcf()
@@ -71,15 +75,14 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=Non
     ax = axes[0]
     ax.plot( t.T, h.T, '-' )
     ax.plot( tlim, [0, 0], 'k--' )
+    ax.set_xlim( tlim )
     ax.set_xlabel( 'Time' )
     ax.set_ylabel( 'Amplitude' )
 
     ax = axes[1]
     y = abs( H )
-    y /= y.max()
     ax.semilogx( f.T, y.T, '-' )
     ax.axis( 'tight' )
-    ax.set_ylim( -0.05, 1.05 )
     ax.set_xlabel( 'Frequency' )
     ax.set_ylabel( 'Amplitude' )
 
@@ -89,7 +92,7 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=Non
     ax.axis( 'tight' )
     pi = np.pi
     ax.set_ylim( -pi*1.1, pi*1.1 )
-    ax.set_yticks( [ -pi, 0, pi ] )
+    ax.set_yticks( [-pi, 0, pi] )
     ax.set_yticklabels([ '$-\pi$', 0, '$\pi$' ])
     ax.set_xlabel( 'Frequency' )
     ax.set_ylabel( 'Phase' )
@@ -97,9 +100,10 @@ def spectrum( h, dt=1.0, nf=None, legend=None, title='Forier spectrum', axes=Non
     ax = axes[3]
     y = 20 * np.log10( abs( H ) )
     y -= y.max()
-    ax.semilogx( f.T, -y.T, '-' )
+    ax.semilogx( f.T, y.T, '-' )
     ax.axis( 'tight' )
-    ax.set_ylim( 145, -5 )
+    if db:
+        ax.set_ylim( db[0], db[1] )
     ax.set_xlabel( 'Frequency' )
     ax.set_ylabel( 'Amplitude (dB)' )
     if legend:
@@ -118,35 +122,36 @@ def test():
 
     dt = 0.01
     cutoff = 2.0
-    n = 1000
+    n = 1600
     x = np.zeros( n+1 )
     x[0] = 1
     shift  = np.fft.fftshift
     ishift = np.fft.ifftshift
+    s = 0.5 * n
 
     y = [
-        ishift( filter( shift( x ), dt, cutoff, 'lowpass', 2, -1 ) ), 'Butter-2x-2',
-        ishift( filter( shift( x ), dt, cutoff, 'lowpass', 4, -1 ) ), 'Butter-4x-2',
-        ishift( filter( shift( x ), dt, cutoff, 'hann' ) ), 'Hann',
+        s * ishift( filter( shift( x ), dt, cutoff, 'lowpass', 2, -1 ) ), 'Butter 2x-2',
+        s * ishift( filter( shift( x ), dt, cutoff, 'lowpass', 4, -1 ) ), 'Butter 4x-2',
+        s * ishift( filter( shift( x ), dt, cutoff, 'hann' ) ), 'Hann',
     ]
     plt.figure( 1 )
-    spectrum( y[::2], dt, legend=y[1::2] )
+    spectrum( y[::2], dt, shift=True, legend=y[1::2] )
 
     y = [
-        filter( x, dt, cutoff, 'lowpass', 2, 0 ), 'Butter-2',
-        filter( x, dt, cutoff, 'lowpass', 2, 1 ), 'Butter-2x2',
-        filter( x, dt, cutoff, 'lowpass', 4, 1 ), 'Butter-4x2',
-        filter( x, dt, cutoff, 'lowpass', 4, 0 ), 'Butter-4',
+        s * filter( x, dt, cutoff, 'lowpass', 2, 0 ), 'Butter 2',
+        s * filter( x, dt, cutoff, 'lowpass', 2, 1 ), 'Butter 2x2',
+        s * filter( x, dt, cutoff, 'lowpass', 4, 1 ), 'Butter 4x2',
+        s * filter( x, dt, cutoff, 'lowpass', 4, 0 ), 'Butter 4',
     ]
     plt.figure( 2 )
     spectrum( y[::2], dt, legend=y[1::2] )
 
     cutoff = 1.0, 5.0
     y = [
-        filter( x, dt, cutoff, 'bandpass', 2, 0 ), 'Butter-2',
-        filter( x, dt, cutoff, 'bandpass', 2, 1 ), 'Butter-2x2',
-        filter( x, dt, cutoff, 'bandpass', 4, 1 ), 'Butter-4x2',
-        filter( x, dt, cutoff, 'bandpass', 4, 0 ), 'Butter-4',
+        s * filter( x, dt, cutoff, 'bandpass', 2, 0 ), 'Butter 2',
+        s * filter( x, dt, cutoff, 'bandpass', 2, 1 ), 'Butter 2x2',
+        s * filter( x, dt, cutoff, 'bandpass', 4, 1 ), 'Butter 4x2',
+        s * filter( x, dt, cutoff, 'bandpass', 4, 0 ), 'Butter 4',
     ]
     plt.figure( 3 )
     spectrum( y[::2], dt, legend=y[1::2] )

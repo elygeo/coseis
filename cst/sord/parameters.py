@@ -73,7 +73,7 @@ nsource = 0			# number of sub-faults
 source1 = 0.0, 0.0, 0.0		# normal components
 source2 = 0.0, 0.0, 0.0		# shear components
 timefunction = 'none'		# time function, see util.f90 for details.
-period = 10 * delta[3]		# dominant period
+period = 4 * delta[3]		# 1/2 pulse width ~= 1/4 critical period
 
 # Placeholders
 i1pml = None
