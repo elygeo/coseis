@@ -14,6 +14,7 @@ use m_surfnormals
 integer :: i1(3), i2(3), i3(3), i4(3), bc(3), &
     i, j, k, l, j1, k1, l1, j2, k2, l2, b, c
 real :: m(9), tol, h
+logical :: err
 integer, allocatable :: seed(:)
 
 if ( master ) write( *, '(a)' ) 'Grid generation'
@@ -266,9 +267,13 @@ do i = 1, 3
     case( 2 ); vc(:,irup,:) = 0.0
     case( 3 ); vc(:,:,irup) = 0.0
     end select
-    if ( minval( vc ) < 0.0 ) stop 'negative cell volume, wrong sign in dx?'
+    err = minval( vc ) < 0.0
 end do
 call fieldio( '>', 'vc', vc  )
+if ( err ) then
+    write( 0, * ) 'ERROR: negative cell volume. Wrong sign in dx or problem with mesh.'
+    stop
+end if
 
 end subroutine
 

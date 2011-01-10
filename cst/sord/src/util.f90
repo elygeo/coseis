@@ -183,8 +183,8 @@ case( 'delta' )
 case( 'step', 'heaviside', 'integral_delta' )
     if ( abs( tm ) < 0.25 * dt ) then
         time_function = 0.5
-    elseif
-        ( tm >= 0.25 * dt ) time_function = 1.0
+    elseif ( tm >= 0.25 * dt ) then
+        time_function = 1.0
     endif
 case( 'brune' )
     time_function =  exp( -tm / period ) / period ** 2.0 * tm

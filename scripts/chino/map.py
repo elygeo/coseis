@@ -26,13 +26,17 @@ fig = plt.figure( None, inches, 100, None )
 fig.clf()
 ax = fig.add_axes( [0.01, 0.01, 0.98, 0.98] )
 
-# source
-f = os.path.join( 'run', 'data', 'beachball.txt' )
-x, y = np.loadtxt( f ).T
-i = np.isnan( x ).nonzero()[0]
-ax.fill( x[:i[0]-1], y[:i[0]-1], 'w' )
-ax.fill( x[i[0]+1:i[1]-1], y[i[0]+1:i[1]-1], 'k' )
-ax.fill( x[i[1]+1:], y[i[1]+1:], 'k' )
+# CVM basins
+f = os.path.join( 'run', 'data', 'basins-cvm.txt' )
+x, y = proj( *np.loadtxt( f ).T )
+h = ax.plot( x, y, '-r', linewidth=0.25 )
+h[0].set_dashes((2,1))
+
+# CVM-H basins
+f = os.path.join( 'run', 'data', 'basins-cvmh.txt' )
+x, y = proj( *np.loadtxt( f ).T )
+h = ax.plot( x, y, '-b', linewidth=0.25 )
+h[0].set_dashes((2,1))
 
 # topography
 f = os.path.join( 'run', 'data', 'mountains.txt' )
@@ -43,6 +47,17 @@ ax.plot( x, y, '-k', linewidth=0.25 )
 f = os.path.join( 'run', 'data', 'coastlines.txt' )
 x, y = proj( *np.loadtxt( f ).T )
 ax.plot( x, y, 'k-' )
+
+# source
+x0, y0 = proj( mts.longitude, mts.latitude )
+f = os.path.join( 'run', 'data', 'beachball.txt' )
+x, y = np.loadtxt( f ).T * 5000.0
+x += x0
+y += y0
+i = np.isnan( x ).nonzero()[0]
+ax.fill( x[:i[0]-1], y[:i[0]-1], 'w' )
+ax.fill( x[i[0]+1:i[1]-1], y[i[0]+1:i[1]-1], 'k' )
+ax.fill( x[i[1]+1:], y[i[1]+1:], 'k' )
 
 # stations
 sta = os.path.join( 'run', 'data', 'station-list.txt' )
@@ -69,18 +84,6 @@ x, y = bounds
 x = x[1] - 20000.0
 y = y[1] - 6000.0
 cst.plt.compass_rose( ax, x, y, 2000.0 )
-
-# CVM basins
-f = os.path.join( 'run', 'data', 'basins-cvm.txt' )
-x, y = proj( *np.loadtxt( f ).T )
-h = ax.plot( x, y, '-r', linewidth=0.25 )
-h[0].set_dashes((2,1))
-
-# CVM-H basins
-f = os.path.join( 'run', 'data', 'basins-cvmh.txt' )
-x, y = proj( *np.loadtxt( f ).T )
-h = ax.plot( x, y, '-b', linewidth=0.25 )
-h[0].set_dashes((2,1))
 
 # save figure
 fig.canvas.draw()
