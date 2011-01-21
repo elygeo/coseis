@@ -123,16 +123,16 @@ use m_globals
 use m_util
 integer :: i1(3), i2(3), i, j, k, l
 real :: xi(3), f, w
-if ( timefunction == 'none' ) return
+if ( pulse == 'none' ) return
 xi = ihypo - nnoff
 i1 = max( i1node, floor( xi ) )
 i2 = min( i2node, floor( xi ) + 1 )
 if ( any( i2 < i1 ) ) then
-    timefunction = 'none'
+    pulse = 'none'
     return
 end if
 if ( verb ) write( *, '(a)' ) 'Point source'
-f = time_function( timefunction, tm, dt, period )
+f = time_function( pulse, tm, dt, fcorner )
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
@@ -151,16 +151,16 @@ use m_globals
 use m_util
 integer :: i1(3), i2(3), i, j, k, l
 real :: xi(3), f, w
-if ( timefunction == 'none' ) return
+if ( pulse == 'none' ) return
 xi = ihypo - 0.5 - nnoff
 i1 = max( i1cell, floor( xi ) )
 i2 = min( i2cell, floor( xi ) + 1 )
 if ( any( i2 < i1 ) ) then
-    timefunction = 'none'
+    pulse = 'none'
     return
 end if
 if ( verb ) write( *, '(a)' ) 'Point source'
-f = time_function( timefunction, tm, dt, period )
+f = time_function( pulse, tm, dt, fcorner )
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)

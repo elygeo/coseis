@@ -5,10 +5,10 @@ integer, private :: itdebug = -1, idebug
 type t_io
     character(32) :: filename      ! filename on disk for input or output
     character(4) :: field          ! field variable, see fieldnames.py for possibilities
-    character(8) :: tfunc          ! see time_function in util.f90 for possibilities
+    character(8) :: pulse          ! see time_function in util.f90 for possibilities
     character(3) :: mode           ! 'r' read, 'w' write
     integer :: ii(3,4), nc, nb, ib, fh
-    real :: x1(3), x2(3), val, period
+    real :: x1(3), x2(3), val, fcorner
     real, pointer :: buff(:,:)     ! buffer for storing mutliple time steps
     !XXX character(4) :: fields(32)
     !XXX real, pointer :: buff(:,:,:) 
@@ -109,7 +109,7 @@ if ( pass == '>' .and. io%mode(2:2) /= 'w' ) cycle loop
 if ( field /= io%field ) cycle loop
 
 ! i/o
-val = io%val * time_function( io%tfunc, tm, dt, io%period )
+val = io%val * time_function( io%pulse, tm, dt, io%fcorner )
 select case( io%mode )
 case( '=c', '+c' )
     call setcube( f, w1, i3, i4, di, io%x1, io%x2, val, io%mode )

@@ -168,65 +168,65 @@ do i = 1, d - 1
 end do
 end subroutine
 
-! time function
-real function time_function( tfunc, tm, dt, period )
-character(*), intent(in) :: tfunc
-real, intent(in) :: tm, dt, period
+! pulse time function
+real function time_function( pulse, t, dt, fcorner )
+character(*), intent(in) :: pulse
+real, intent(in) :: t, dt, fcorner
 real, parameter :: pi = 3.14159265
-real :: t
-time_function = 0.0
-select case( tfunc )
+real :: f, a, b
+f = 0.0
+select case( pulse )
 case( 'const' )
-    time_function = 1.0
+    f = 1.0
 case( 'delta' )
-    if ( abs( tm ) < 0.25 * dt ) time_function = 1.0
-case( 'step', 'heaviside', 'integral_delta' )
-    if ( abs( tm ) < 0.25 * dt ) then
-        time_function = 0.5
-    elseif ( tm >= 0.25 * dt ) then
-        time_function = 1.0
+    if ( abs( t ) < 0.25 * dt ) f = 1.0 / dt
+case( 'step', 'integral_delta' )
+    if ( abs( t ) < 0.25 * dt ) then
+        f = 0.5
+    elseif ( t >= 0.25 * dt ) then
+        f = 1.0
     endif
 case( 'brune' )
-    time_function =  exp( -tm / period ) / period ** 2.0 * tm
+    if ( 0.0 < t ) then
+        a = 2.0 * pi * fcorner
+        f = exp( -a * t ) * a * a * t
+    endif
 case( 'integral_brune' )
-    time_function = -exp( -tm / period ) / period * (tm + period) + 1.0
+    if ( 0.0 < t ) then
+        a = 2.0 * pi * fcorner
+        f = 1.0 - exp( -a * t ) * (a * t + 1.0)
+    endif
 case( 'hann' )
-    if ( tm < 2.0 * period ) then
-        time_function = 0.5 / period * (1.0 - cos( pi * tm / period ))
+    b = 0.5 / fcorner
+    if ( -b < t .and. t < b ) then
+        a = 2.0 * pi * fcorner
+        f = fcorner + fcorner * cos( a * t )
     end if
 case( 'integral_hann' )
-    time_function = 1.0
-    if ( tm < 2.0 * period ) then
-        time_function = 0.5 * tm / period - 0.5 / pi * sin( pi * tm / period )
-    end if
-case( 'triangle' )
-    t = tm / period
-    if ( tm < period ) then
-        time_function = t / period
-    elseif ( tm < 2.0 * period ) then
-        time_function = (2.0 - t) / period
-    end if
-case( 'integral_triangle' )
-    time_function = 1.0
-    t = tm / period
-    if ( tm < period ) then
-        time_function = 0.5 * t * t
-    elseif ( tm < 2.0 * period ) then
-        time_function = (2.0 - 0.5 * t) * t - 1.0
-    end if
-case( 'gaussian', 'normal', 'integral_ricker1' )
-    t = (tm - 4.0 * period) / period
-    time_function = exp( -0.5 * t * t ) / (period * sqrt( 2.0 * pi ))
+    b = 0.5 / fcorner
+    if (-b < t .and. t < b) then
+        a = 2.0 * pi * fcorner
+        f = 0.5 + fcorner * t + sin( a * t ) * 0.5 / pi
+    elseif ( 0.0 < t ) then
+        f = 1.0
+    endif
+case( 'gaussian', 'integral_ricker1' )
+    a = pi * pi / log( 2.0 ) * fcorner * fcorner
+    b = sqrt( a / pi )
+    f = exp( -a * t * t ) * b
 case( 'ricker1', 'integral_ricker2' )
-    t = tm - period
-    time_function = t * exp( -2.0 * (pi * t / period) ** 2.0 )
+    a = pi * pi / log( 2.0 ) * fcorner * fcorner
+    b = sqrt( a / pi ) * 2.0 * a
+    f = exp( -a * t * t ) * b * -t
 case( 'ricker2' )
-    t = (pi * (tm - period) / period) ** 2.0
-    time_function = (1.0 - 2.0 * t) * exp( -t )
+    a = pi * pi / log( 2.0 ) * fcorner * fcorner
+    b = sqrt( a / pi ) * 4.0 * a
+    f = exp( -a * t * t ) * b * (a * t * t - 0.5)
 case default
-    write( 0, * ) 'invalid time func: ', trim( tfunc )
+    write( 0, * ) 'invalid time func: ', trim( pulse )
     stop
 end select
+time_function = f
 end function
 
 ! timer
