@@ -49,8 +49,8 @@ bc2 = 10, 10, 10
 # source
 ihypo = 1.5, 1.5, 41.5		# hypocenter indices
 source = 'moment'		# specify moment source
-timefunction = 'brune'		# time function: Brune pulse
-period = 0.1			# time function dominant period
+pulse = 'brune'			# Brune pulse source time function
+fcorner = 1.6			# source corner frequency
 source1 = 0.0, 0.0, 0.0		# moment tensor M_xx, M_yy, M_zz
 source2 = 0.0, 0.0, 1e18	# moment tensor M_yz, M_zx, M_yz
 

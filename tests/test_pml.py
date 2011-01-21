@@ -26,7 +26,7 @@ def test_pml():
     ihypo = 11, 11, 11
     source1 = 1e10, 1e10, 1e10
     source2 =  0.0,  0.0,  0.0
-    timefunction = 'delta'
+    pulse = 'delta'
 
     # material
     hourglass = 1.0, 1.0

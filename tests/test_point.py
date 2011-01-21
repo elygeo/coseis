@@ -27,7 +27,7 @@ def test_point():
     ihypo = 3.0, 1.5, 1.5
     source1 = 1e10, 1e10, 1e10
     source2 =  0.0,  0.0,  0.0
-    timefunction = 'delta'
+    pulse = 'delta'
 
     # material
     hourglass = 1.0, 1.0

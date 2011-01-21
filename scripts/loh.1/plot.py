@@ -15,6 +15,8 @@ meta = cst.util.load( meta )
 dt = meta.delta[-1]
 nt = meta.shape[-1]
 T = meta.period
+fcorner = 0.5 / (np.pi * meta.period)
+#T = 0.5 / (np.pi * meta.fcorner)
 dtype = meta.dtype
 sigma = dt * 22.5
 
@@ -58,11 +60,14 @@ v = np.dot( m, v )
 
 # replace Brune source with Gaussian source
 if 1:
+    v = cst.signal.brune2gaussian( v, dt, fcorner, sigma )
+else:
     tau = t - 4.0 * sigma
     G = ( 1.0 - 2.0 * T / sigma ** 2.0 * tau
         - (T / sigma) ** 2.0 * (1.0 - (tau / sigma) ** 2.0) )
     b = ( (1.0 / np.sqrt( 2.0 * np.pi ) / sigma) * G
         * np.exp( -0.5 * (tau / sigma) ** 2.0 ) )
+    #v = dt * np.convolve( v, b, 'same' )
     v = dt * scipy.signal.lfilter( b, 1.0, v )
 print np.sqrt( np.sum( v * v, 0 ).max() )
 

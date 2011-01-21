@@ -18,15 +18,6 @@ def time_function( pulse, t, fcorner=1.0 ):
     Returns
     -------
         f : array of function samples.
-
-    Amplitude spectra of the Brune and Gaussian functions fall to one half (-3 db)
-    at the corner frequency. To specify a specific Gaussian spread (sigma) use:
-
-        fcorner = sqrt(log(2) / 2) / (pi * sigma).
-
-    To specify Brune pulse characteristic time (T) use:
-
-        fcorner = 1 / (2 * pi * T).
     """
     t = np.asarray( t )
     f = np.zeros_like( t )
@@ -51,64 +42,59 @@ def time_function( pulse, t, fcorner=1.0 ):
         f[i] = 1.0 - np.exp( -a * t[i] ) * (a * t[i] + 1.0)
     elif pulse == 'hann':
         a = 2.0 * np.pi * fcorner
-        b = 0.5 / fcorner
+        b = np.pi / a
         i = (-b < t) & (t < b)
-        f[i] = fcorner + fcorner * np.cos( a * t[i] )
+        f[i] = 0.5 / np.pi * a * (1.0 + np.cos( a * t[i] ))
     elif pulse == 'integral_hann':
         a = 2.0 * np.pi * fcorner
-        b = 0.5 / fcorner
+        b = np.pi / a
         i = 0.0 < t
         f[i] = 1.0
         i = (-b < t) & (t < b)
-        f[i] = 0.5 + fcorner * t[i] + np.sin( a * t[i] ) * 0.5 / np.pi
+        f[i] = 0.5 + 0.5 / np.pi * (a * t[i] + np.sin( a * t[i] ))
     elif pulse in ('gaussian', 'integral_ricker1'):
-        #a = 2.0 * np.pi * np.pi * fcorner * fcorner
-        a = np.pi * np.pi / np.log( 2.0 ) * fcorner * fcorner
+        a = 2.0 * np.pi * np.pi * fcorner * fcorner
         b = np.sqrt( a / np.pi )
         f = np.exp( -a * t * t ) * b
     elif pulse in ('ricker1', 'integral_ricker2' ):
-        a = np.pi * np.pi / np.log( 2.0 ) * fcorner * fcorner
+        a = 2.0 * np.pi * np.pi * fcorner * fcorner
         b = np.sqrt( a / np.pi ) * 2.0 * a
         f = np.exp( -a * t * t ) * b * -t
     elif pulse == 'ricker2':
-        a = np.pi * np.pi / np.log( 2.0 ) * fcorner * fcorner
+        a = 2.0 * np.pi * np.pi * fcorner * fcorner
         b = np.sqrt( a / np.pi ) * 4.0 * a
         f = np.exp( -a * t * t ) * b * (a * t * t - 0.5)
     else:
-        sys.exit( 'invalid time func: ' + name )
+        sys.exit( 'invalid time func: ' + pulse )
     return f
 
 
-def brune2gaussian( y, dt, fcorner, sigma=None, convolve='same' ):
+def brune2gauss( x, dt, T, sigma=None, mode='same' ):
     """
-    Replace Brune pulse with Gaussian in a time series.
-
-    WARNING: In progress and untested
+    Deconvolve Brune pulse from time series and replace with Gaussian.
 
     Parameters
     ----------
-        y : time series.
+        x : array of time series samples.
         dt : time step length.
-        fcorner : corner frequency of the Brune pulse, 1 / (2 * pi * T).
-        sigma : Gaussian spread, defaults gives one-half amplitude at fcorner,
-            sqrt(log(2) / 2) / (pi * fcorner).
+        T : Brune pulse characteristic time.
+        sigma : Gaussian spread.
+        mode : 'same' or 'full' (see numpy.convolve).
     """
-    y = np.array( y )
-    n = y.shape[-1]
-    w = 2.0 * np.pi * fcorner
-    T = 1.0 / w
+    x = np.array( x )
     if sigma == None:
-        sigma = np.sqrt( 2.0 * np.log( 2 ) ) / w
+        sigma = np.sqrt( 2.0 ) * T
     s = 1.0 / (sigma * sigma)
-    t = np.arange( y.size ) * dt - 4.0 * sigma
+    n = int( 6.0 * sigma / dt )
+    t = np.arange( -n, n+1 ) * dt
     G = 1.0 - 2.0 * s * T * t - s * T * T * (1.0 - s * t * t)
-    b = G * np.sqrt( 0.5 / np.pi * s ) * np.exp( -0.5 * s * t * t )
-    y = dt * np.convolve( y, b, convolve )
-    return y
+    b = dt * G * np.sqrt( 0.5 / np.pi * s ) * np.exp( -0.5 * s * t * t )
+    x = np.apply_along_axis( np.convolve, -1, x, b, mode )
+    return x
 
-def filter( x, dt, fcorner, btype='lowpass', order=2, repeat=0 ):
+def filter( x, dt, fcorner, btype='lowpass', order=2, repeat=0, mode='same' ):
     """
-    Butterworth or Hann window filter.
+    Apply Butterworth or Hann window filter along the last axis.
 
     Parameters
     ----------
@@ -118,6 +104,7 @@ def filter( x, dt, fcorner, btype='lowpass', order=2, repeat=0 ):
         btype : 'lowpass', 'highpass', 'bandpass', 'bandstop', 'hann'.
         order : number of poles.
         repeat : 0 = single pass, 1 = two pass, -1 = two pass, zero-phase.
+        mode : 'full' or 'same', see np.convolve
 
     Returns
     -------
@@ -129,10 +116,10 @@ def filter( x, dt, fcorner, btype='lowpass', order=2, repeat=0 ):
         n = int( 0.5 / (fcorner * dt) )
         if n > 0:
             w = 2.0 * np.pi * dt * fcorner
-            f = (1.0 + np.cos( np.arange( -n, n+1 ) * w )) * dt * fcorner
-            x = np.convolve( x, f, 'same' )
+            b = (1.0 + np.cos( np.arange( -n, n+1 ) * w )) * dt * fcorner
+            x = np.apply_along_axis( np.convolve, -1, x, b, mode )
             if repeat:
-                x = np.convolve( x, f, 'same' )
+                x = np.apply_along_axis( np.convolve, -1, x, b, mode )
     else:
         import scipy.signal
         if type( fcorner ) in [list, tuple]:
@@ -222,7 +209,6 @@ def test():
     Test spectrum plot
     """
     import matplotlib.pyplot as plt
-    shift = np.fft.fftshift
 
     # parameters
     n = 3200
@@ -230,6 +216,21 @@ def test():
     flp = 3.0
     fbp = 2.0, 8.0
     s = n // 2 * dt
+
+    # Brune deconvolution to Gaussian filter
+    T = 0.5 / (np.pi * flp)
+    t = np.arange( n ) * dt - n // 2 * dt
+    x = time_function( 'delta', t )
+    leg, y = zip(
+        (r'$T$',              brune2gauss( x, dt, T, T )),
+        (r'$\sqrt{2\ln 2}T$', brune2gauss( x, dt, T, T * np.sqrt(2.0*np.log(2.0)))),
+        (r'$\sqrt{2}T$',      brune2gauss( x, dt, T, T * np.sqrt(2.0) )),
+        (r'$2T$',             brune2gauss( x, dt, T, T * 2.0 )),
+    )
+    y = np.array( y ) * s
+    y = np.fft.ifftshift( y, axes=[-1] )
+    plt.figure( 0 )
+    spectrum( y, dt, shift=True, legend=leg, title='Deconvolution filters' )
 
     # causal filters and pulses
     t = np.arange( n ) * dt
@@ -240,8 +241,7 @@ def test():
         ('Butter 4',   filter( x, dt, flp, 'lowpass', 4, 0 )),
         ('Butter 2',   filter( x, dt, flp, 'lowpass', 2, 0 )),
         ('Brune',      time_function( 'brune', t, flp )),
-        #('B2G',        brune2gaussian( t, dt, flp )),
-        #('Brune',  pulse( 'integral_brune', t + 0.5 * dt, flp )),
+        #('Brune',      time_function( 'integral_brune', t + 0.5 * dt, flp )),
     )
     y = np.array( y ) * s
     #y[-1,1:] = np.diff( y[-1] ) / dt
@@ -252,20 +252,22 @@ def test():
     t = np.arange( n ) * dt - n // 2 * dt
     x = time_function( 'delta', t )
     leg, y = zip(
-        ('Butter 4x-2', filter( x, dt, flp, 'lowpass', 4, -1 )),
-        ('Butter 2x-2', filter( x, dt, flp, 'lowpass', 2, -1 )),
-        #('Hann filter', filter( x, dt, flp, 'hann', 0, 0 )),
-        ('Hann',        time_function( 'hann', t, flp )),
-        ('Gaussian',    time_function( 'gaussian', t, flp )),
-        ('Ricker1',     time_function( 'ricker1', t - 0.5 * dt, flp ).cumsum() * dt),
-        ('Ricker2',     time_function( 'ricker2', t - dt, flp ).cumsum().cumsum() * dt * dt),
+        ('Butter 4x-2',         filter( x, dt, flp, 'lowpass', 4, -1 )),
+        ('Butter 2x-2',         filter( x, dt, flp, 'lowpass', 2, -1 )),
+        #('Hann filter',         filter( x, dt, flp, 'hann', 0, 0 )),
+        ('Hann',                time_function( 'hann', t, flp )),
+        ('Ga',                  time_function( 'gaussian', t, flp )),
+        (r'Ga $\sqrt{2\ln 2}$', time_function( 'gaussian', t, flp*np.sqrt(0.5/np.log(2.0)) )),
+        (r'Ga $\sqrt{2}$',      time_function( 'gaussian', t, flp*np.sqrt(0.5) )),
+        #('Ricker1',     time_function( 'ricker1', t - 0.5 * dt, flp ).cumsum() * dt),
+        #('Ricker2',     time_function( 'ricker2', t - dt, flp ).cumsum().cumsum() * dt * dt),
         #('Int Hann',    time_function( 'integral_hann', t + 0.5 * dt, flp )),
     )
     y = np.array( y ) * s
     #y[-1,1:] = np.diff( y[-1] ) / dt
     y = np.fft.ifftshift( y, axes=[-1] )
     plt.figure( 1 )
-    spectrum( y, dt, shift=True, tzoom=1, legend=leg, title='Zero phase' )
+    spectrum( y, dt, shift=True, legend=leg, title='Zero phase' )
 
     # bandpass filters
     t = np.arange( n ) * dt
