@@ -72,8 +72,8 @@ nsource = 0			# number of sub-faults
 # Point source parameters
 source1 = 0.0, 0.0, 0.0		# normal components
 source2 = 0.0, 0.0, 0.0		# shear components
-pulse = 'none'			# time pulse function, see cst.signal.time_function
-fcorner = 0.05 / delta[3]	# time pulse corner frequency
+pulse = 'none'			# source pulse shape, see cst.signal.time_function
+tau = 4 * delta[3]		# source characteristic time
 
 # Placeholders
 i1pml = None

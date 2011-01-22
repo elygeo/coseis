@@ -5,7 +5,7 @@ Signal processing utilities
 import sys
 import numpy as np
 
-def time_function( pulse, t, fcorner=1.0 ):
+def time_function( pulse, t, tau=1.0 ):
     """
     Pulse time function with specified bandwidth.
 
@@ -13,7 +13,7 @@ def time_function( pulse, t, fcorner=1.0 ):
     ----------
         pulse : function name (see source code below for available types).
         t : array of time samples.
-        fcorner : corner frequency.
+        tau : characteristic time.
 
     Returns
     -------
@@ -33,35 +33,35 @@ def time_function( pulse, t, fcorner=1.0 ):
         if t[i] == 0.0:
             f[i] = 0.5
     elif pulse == 'brune':
-        a = 2.0 * np.pi * fcorner
+        a = 1.0 / tau
         i = 0.0 < t
         f[i] = np.exp( -a * t[i] ) * a * a * t[i]
     elif pulse == 'integral_brune':
-        a = 2.0 * np.pi * fcorner
+        a = 1.0 / tau
         i = 0.0 < t
         f[i] = 1.0 - np.exp( -a * t[i] ) * (a * t[i] + 1.0)
     elif pulse == 'hann':
-        a = 2.0 * np.pi * fcorner
-        b = np.pi / a
+        a = 1.0 / tau
+        b = np.pi * tau
         i = (-b < t) & (t < b)
         f[i] = 0.5 / np.pi * a * (1.0 + np.cos( a * t[i] ))
     elif pulse == 'integral_hann':
-        a = 2.0 * np.pi * fcorner
-        b = np.pi / a
+        a = 1.0 / tau
+        b = np.pi * tau
         i = 0.0 < t
         f[i] = 1.0
         i = (-b < t) & (t < b)
         f[i] = 0.5 + 0.5 / np.pi * (a * t[i] + np.sin( a * t[i] ))
     elif pulse in ('gaussian', 'integral_ricker1'):
-        a = 2.0 * np.pi * np.pi * fcorner * fcorner
+        a = 0.5 / (tau * tau)
         b = np.sqrt( a / np.pi )
         f = np.exp( -a * t * t ) * b
     elif pulse in ('ricker1', 'integral_ricker2' ):
-        a = 2.0 * np.pi * np.pi * fcorner * fcorner
+        a = 0.5 / (tau * tau)
         b = np.sqrt( a / np.pi ) * 2.0 * a
         f = np.exp( -a * t * t ) * b * -t
     elif pulse == 'ricker2':
-        a = 2.0 * np.pi * np.pi * fcorner * fcorner
+        a = 0.5 / (tau * tau)
         b = np.sqrt( a / np.pi ) * 4.0 * a
         f = np.exp( -a * t * t ) * b * (a * t * t - 0.5)
     else:
@@ -69,7 +69,7 @@ def time_function( pulse, t, fcorner=1.0 ):
     return f
 
 
-def brune2gauss( x, dt, T, sigma=None, mode='same' ):
+def brune2gauss( x, dt, tau, sigma=None, mode='same' ):
     """
     Deconvolve Brune pulse from time series and replace with Gaussian.
 
@@ -77,24 +77,24 @@ def brune2gauss( x, dt, T, sigma=None, mode='same' ):
     ----------
         x : array of time series samples.
         dt : time step length.
-        T : Brune pulse characteristic time.
+        tau : Brune pulse characteristic time.
         sigma : Gaussian spread.
         mode : 'same' or 'full' (see numpy.convolve).
     """
     x = np.array( x )
     if sigma == None:
-        sigma = np.sqrt( 2.0 ) * T
+        sigma = np.sqrt( 2.0 ) * tau
     s = 1.0 / (sigma * sigma)
     n = int( 6.0 * sigma / dt )
     t = np.arange( -n, n+1 ) * dt
-    G = 1.0 - 2.0 * s * T * t - s * T * T * (1.0 - s * t * t)
+    G = 1.0 - 2.0 * s * tau * t - s * tau * tau * (1.0 - s * t * t)
     b = dt * G * np.sqrt( 0.5 / np.pi * s ) * np.exp( -0.5 * s * t * t )
     x = np.apply_along_axis( np.convolve, -1, x, b, mode )
     return x
 
 def filter( x, dt, fcorner, btype='lowpass', order=2, repeat=0, mode='same' ):
     """
-    Apply Butterworth or Hann window filter along the last axis.
+    Apply Butterworth or Hann window filter to time series.
 
     Parameters
     ----------
@@ -213,21 +213,21 @@ def test():
     # parameters
     n = 3200
     dt = 0.002
-    flp = 3.0
     fbp = 2.0, 8.0
-    s = n // 2 * dt
+    flp = 3.0
+    tau = 0.5 / (np.pi * flp)
+    scale = n // 2 * dt
 
     # Brune deconvolution to Gaussian filter
-    T = 0.5 / (np.pi * flp)
     t = np.arange( n ) * dt - n // 2 * dt
     x = time_function( 'delta', t )
     leg, y = zip(
-        (r'$T$',              brune2gauss( x, dt, T, T )),
-        (r'$\sqrt{2\ln 2}T$', brune2gauss( x, dt, T, T * np.sqrt(2.0*np.log(2.0)))),
-        (r'$\sqrt{2}T$',      brune2gauss( x, dt, T, T * np.sqrt(2.0) )),
-        (r'$2T$',             brune2gauss( x, dt, T, T * 2.0 )),
+        (r'$\tau$',              brune2gauss( x, dt, tau, tau )),
+        (r'$\sqrt{2\ln 2}\tau$', brune2gauss( x, dt, tau, tau*np.sqrt(2*np.log(2)))),
+        (r'$\sqrt{2}\tau$',      brune2gauss( x, dt, tau, tau*np.sqrt(2) )),
+        (r'$2\tau$',             brune2gauss( x, dt, tau, tau*2 )),
     )
-    y = np.array( y ) * s
+    y = np.array( y ) * scale
     y = np.fft.ifftshift( y, axes=[-1] )
     plt.figure( 0 )
     spectrum( y, dt, shift=True, legend=leg, title='Deconvolution filters' )
@@ -240,10 +240,10 @@ def test():
         ('Butter 2x2', filter( x, dt, flp, 'lowpass', 2, 1 )),
         ('Butter 4',   filter( x, dt, flp, 'lowpass', 4, 0 )),
         ('Butter 2',   filter( x, dt, flp, 'lowpass', 2, 0 )),
-        ('Brune',      time_function( 'brune', t, flp )),
-        #('Brune',      time_function( 'integral_brune', t + 0.5 * dt, flp )),
+        ('Brune',      time_function( 'brune', t, tau )),
+        #('Brune',      time_function( 'integral_brune', t + 0.5 * dt, tau )),
     )
-    y = np.array( y ) * s
+    y = np.array( y ) * scale
     #y[-1,1:] = np.diff( y[-1] ) / dt
     plt.figure( 2 )
     spectrum( y, dt, legend=leg, title='Causal' )
@@ -255,15 +255,15 @@ def test():
         ('Butter 4x-2',         filter( x, dt, flp, 'lowpass', 4, -1 )),
         ('Butter 2x-2',         filter( x, dt, flp, 'lowpass', 2, -1 )),
         #('Hann filter',         filter( x, dt, flp, 'hann', 0, 0 )),
-        ('Hann',                time_function( 'hann', t, flp )),
-        ('Ga',                  time_function( 'gaussian', t, flp )),
-        (r'Ga $\sqrt{2\ln 2}$', time_function( 'gaussian', t, flp*np.sqrt(0.5/np.log(2.0)) )),
-        (r'Ga $\sqrt{2}$',      time_function( 'gaussian', t, flp*np.sqrt(0.5) )),
-        #('Ricker1',     time_function( 'ricker1', t - 0.5 * dt, flp ).cumsum() * dt),
-        #('Ricker2',     time_function( 'ricker2', t - dt, flp ).cumsum().cumsum() * dt * dt),
-        #('Int Hann',    time_function( 'integral_hann', t + 0.5 * dt, flp )),
+        ('Hann',                    time_function( 'hann', t, tau )),
+        (r'Ga $\tau$',              time_function( 'gaussian', t, tau )),
+        (r'Ga $\sqrt{2\ln 2}\tau$', time_function( 'gaussian', t, tau*np.sqrt(2*np.log(2)) )),
+        (r'Ga $\sqrt{2}\tau$',      time_function( 'gaussian', t, tau*np.sqrt(2) )),
+        #('Ricker1',     time_function( 'ricker1', t - 0.5 * dt, tau ).cumsum() * dt),
+        #('Ricker2',     time_function( 'ricker2', t - dt, tau ).cumsum().cumsum() * dt * dt),
+        #('Int Hann',    time_function( 'integral_hann', t + 0.5 * dt, tau )),
     )
-    y = np.array( y ) * s
+    y = np.array( y ) * scale
     #y[-1,1:] = np.diff( y[-1] ) / dt
     y = np.fft.ifftshift( y, axes=[-1] )
     plt.figure( 1 )
@@ -278,7 +278,7 @@ def test():
         ('Butter 4',    filter( x, dt, fbp, 'bandpass', 4, 0 )),
         ('Butter 2',    filter( x, dt, fbp, 'bandpass', 2, 0 )),
     )
-    y = np.array( y ) * s
+    y = np.array( y ) * scale
     plt.figure( 3 )
     spectrum( y, dt, legend=leg, title='Bandpass' )
 

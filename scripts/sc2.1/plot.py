@@ -4,7 +4,6 @@ PEER Lifelines program task 1A02, Problem SC2.1
 """
 import os
 import numpy as np
-import scipy.signal
 import matplotlib.pyplot as plt
 import cst
 
@@ -17,7 +16,7 @@ meta = os.path.join( path, 'meta.py' )
 meta = cst.util.load( meta )
 dt = meta.delta[-1]
 nt = meta.shape[-1]
-T = meta.period
+tau = meta.tau
 dtype = meta.dtype
 sigma = 0.5
 
@@ -33,13 +32,8 @@ m = (-3, 4, 0), (-4, -3, 0), (0, 0, 5)
 m = np.array( m ) * 0.2
 v = np.dot( m, v )
 
-# replace Brune source with Gaussian source
-tau = t - 4.0 * sigma
-G = ( 1.0 - 2.0 * T / sigma ** 2.0 * tau
-    - (T / sigma) ** 2.0 * (1.0 - (tau / sigma) ** 2.0) )
-b = ( (1.0 / np.sqrt( 2.0 * np.pi ) / sigma) * G
-    * np.exp( -0.5 * (tau / sigma) ** 2.0 ) )
-v = dt * scipy.signal.lfilter( b, 1.0, v )
+# deconvolve Brune pulse and replace with Gaussian
+v = cst.signal.brune2gauss( v, dt, tau, sigma )
 print np.sqrt( np.sum( v * v, 0 ).max() )
 
 # setup figure

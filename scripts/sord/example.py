@@ -14,8 +14,8 @@ ihypo = 31.0, 31.0, 31.0                    # source location
 source = 'potency'                          # source type
 source1 = 1e6, 1e6, 1e6                     # source normal components
 source2 = 0.0, 0.0, 0.0                     # source shear components
-timefunction = 'brune'                      # source time function
-period = 6 * delta[3]                       # source dominant period
+pulse = 'integral_brune'                    # source time function
+tau = 6 * delta[3]                          # source characteristic time
 cst.sord.run( locals() )                    # launch SORD job
 
 # plotting
@@ -29,5 +29,5 @@ fig = plt.figure( figsize=(3,3) )
 ax = plt.gca()
 ax.imshow( vm, extent=(-3,3,-3,3), interpolation='nearest', vmax=1 )
 ax.axis( 'image' )
-fig.savefig( 'example.png', dpi=80 )
+fig.savefig( 'run/example.png', dpi=80 )
 

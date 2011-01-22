@@ -169,9 +169,9 @@ end do
 end subroutine
 
 ! pulse time function
-real function time_function( pulse, t, dt, fcorner )
+real function time_function( pulse, t, dt, tau )
 character(*), intent(in) :: pulse
-real, intent(in) :: t, dt, fcorner
+real, intent(in) :: t, dt, tau
 real, parameter :: pi = 3.14159265
 real :: f, a, b
 f = 0.0
@@ -188,38 +188,38 @@ case( 'step', 'integral_delta' )
     endif
 case( 'brune' )
     if ( 0.0 < t ) then
-        a = 2.0 * pi * fcorner
+        a = 1.0 / tau
         f = exp( -a * t ) * a * a * t
     endif
 case( 'integral_brune' )
     if ( 0.0 < t ) then
-        a = 2.0 * pi * fcorner
+        a = 1.0 / tau
         f = 1.0 - exp( -a * t ) * (a * t + 1.0)
     endif
 case( 'hann' )
-    b = 0.5 / fcorner
+    b = pi * tau
     if ( -b < t .and. t < b ) then
-        a = 2.0 * pi * fcorner
-        f = fcorner + fcorner * cos( a * t )
+        a = 1.0 / tau
+        f = 0.5 / pi * a * (1.0 + cos( a * t ))
     end if
 case( 'integral_hann' )
-    b = 0.5 / fcorner
-    if (-b < t .and. t < b) then
-        a = 2.0 * pi * fcorner
-        f = 0.5 + fcorner * t + sin( a * t ) * 0.5 / pi
+    b = pi * tau
+    if ( -b < t .and. t < b ) then
+        a = 1.0 / tau
+        f = 0.5 + 0.5 / pi * (a * t + sin( a * t ))
     elseif ( 0.0 < t ) then
         f = 1.0
     endif
 case( 'gaussian', 'integral_ricker1' )
-    a = pi * pi / log( 2.0 ) * fcorner * fcorner
+    a = 0.5 / (tau * tau)
     b = sqrt( a / pi )
     f = exp( -a * t * t ) * b
 case( 'ricker1', 'integral_ricker2' )
-    a = pi * pi / log( 2.0 ) * fcorner * fcorner
+    a = 0.5 / (tau * tau)
     b = sqrt( a / pi ) * 2.0 * a
     f = exp( -a * t * t ) * b * -t
 case( 'ricker2' )
-    a = pi * pi / log( 2.0 ) * fcorner * fcorner
+    a = 0.5 / (tau * tau)
     b = sqrt( a / pi ) * 4.0 * a
     f = exp( -a * t * t ) * b * (a * t * t - 0.5)
 case default

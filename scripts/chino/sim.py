@@ -89,8 +89,8 @@ bc2 = 10, 10, 10
 # moment tensor source
 mts_ = os.path.join( 'run', 'data', '14383980.mts.py' )
 source = 'moment'
-timefunction = 'brune'
-period = max( 1.0, 10.0 * dx_ / vs1 )
+pulse = 'brune'
+tau = max( 1.0, 10.0 * dx_ / vs1 )
 m = cst.util.load( mts_ ).double_couple_clvd
 source1 =  m['myy'],  m['mxx'],  m['mzz']
 source2 = -m['mxz'], -m['myz'],  m['mxy']

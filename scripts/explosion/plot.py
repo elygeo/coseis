@@ -23,7 +23,7 @@ for path in glob.glob( runs ):
     shape = meta.shape
     delta = meta.delta
     ihypo = meta.ihypo
-    period = meta.period
+    tau = meta.tau
     source = meta.source
     source1 = meta.source1
 
@@ -62,8 +62,8 @@ for path in glob.glob( runs ):
             m0 = source1[0] * (3.0 * rho * vp * vp - 4.0 * rho * vs * vs)
         t = np.arange( 0.5, n ) * dt
         ta = t + r / vp
-        va = ( m0 * np.exp( -t / period ) * (t * vp / r - t / period + 1.0)
-             / (4.0 * np.pi * rho * vp**3.0 * period**2.0 * r) )
+        va = ( m0 * np.exp( -t / tau ) * (t * vp / r - t / tau + 1.0)
+             / (4.0 * np.pi * rho * vp * vp * vp * tau * tau * r) )
 
         # lowpass filter
         cutoff = 0.0

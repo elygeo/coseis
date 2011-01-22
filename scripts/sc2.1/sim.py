@@ -52,8 +52,8 @@ y = 40000.0 / dx_ + 1
 z = 14000.0 / dx_ + 1
 ihypo = x, y, z
 source = 'moment'
-timefunction = 'brune'
-period = 0.2
+pulse = 'integral_brune'
+tau = 0.2
 source1 = 0.0, 0.0, 0.0
 source2 = 0.0, 0.0, 1e18
 

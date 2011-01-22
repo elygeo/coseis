@@ -62,26 +62,26 @@ fieldio += [
 for source, s in sources_:
 
     # source properties
-    period = 0.1
+    tau = 0.1
     source1 = s, s, s
     source2 = 0.0, 0.0, 0.0
 
     # point source
-    if 0:
+    if 1:
         nsource = 0
         rundir = os.path.join( 'run', 'point-' + source )
-        timefunction = 'brune'
+        pulse = 'integral_brune'
         cst.sord.run( locals() )
 
     # finite source
-    if 1:
+    if 0:
         nsource = 1
         rundir = os.path.join( 'run', 'finite-' + source )
-        timefunction = 'none'
+        pulse = 'none'
         d = delta[-1]
         n = shape[-1]
         t = d * np.arange( n )
-        f = 1.0 - np.exp(-t / period) / period * (t + period)
+        f = 1.0 - np.exp(-t / tau) / tau * (t + tau)
         job = cst.sord.stage( locals() )
         p = os.path.join( rundir, 'source' )
         cst.source.write( f, n, d, 0.0, ihypo, source1, source2, p )

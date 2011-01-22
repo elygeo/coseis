@@ -109,6 +109,8 @@ def stage( dictargs={}, **kwargs ):
         ('nt',  "Parameter 'nn' depreciated. Use: shape = nx, ny, nz, nt."),
         ('dx',  "Parameter 'dx' depreciated. Use: delta = dx, dy, dz, dt."),
         ('dt',  "Parameter 'dt' depreciated. Use: delta = dx, dy, dz, dt."),
+        ('period', "Parameter 'period' renamed to 'tau'."),
+        ('timefunction', "Parameter 'timefunction' renamed to 'pulse'."),
     ]
     error = None
     for k, msg in depreciated:
@@ -333,7 +335,7 @@ def prepare_param( pm ):
     for line in pm.fieldio:
         line = list( line )
         filename = '-'
-        pulse, val, fcorner = 'const', 1.0, 1.0
+        pulse, val, tau = 'const', 1.0, 1.0
         x1 = x2 = 0.0, 0.0, 0.0
         op = line[0][0]
         mode = line[0][1:]
@@ -341,17 +343,17 @@ def prepare_param( pm ):
             sys.exit( 'Error: unsupported operator: %r' % line )
         try:
             if len( line ) is 11:
-                nc, pulse, fcorner, x1, x2, nb, ii, filename, val, fields = line[1:]
+                nc, pulse, tau, x1, x2, nb, ii, filename, val, fields = line[1:]
             elif mode in ['r', 'R', 'w', 'wi']:
                 fields, ii, filename = line[1:]
             elif mode in ['', 's', 'i']:
                 fields, ii, val = line[1:]
             elif mode in ['f', 'fs', 'fi']:
-                fields, ii, val, pulse, fcorner = line[1:]
+                fields, ii, val, pulse, tau = line[1:]
             elif mode in ['c']:
                 fields, ii, val, x1, x2 = line[1:]
             elif mode in ['fc']:
-                fields, ii, val, pulse, fcorner, x1, x2 = line[1:]
+                fields, ii, val, pulse, tau, x1, x2 = line[1:]
             else:
                 sys.exit( 'Error: bad i/o mode: %r' % line )
         except( ValueError ):
@@ -403,7 +405,7 @@ def prepare_param( pm ):
             nb = min( nb, pm.itbuff )
         nc = len( fields )
         fieldio += [
-            (op + mode, nc, pulse, fcorner, x1, x2, nb, ii, filename, val, fields)
+            (op + mode, nc, pulse, tau, x1, x2, nb, ii, filename, val, fields)
         ]
     f = [ line[8] for line in fieldio if line[8] != '-' ]
     for i in range( len( f ) ):

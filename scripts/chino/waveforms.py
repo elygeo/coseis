@@ -25,21 +25,6 @@ def filt( x, dt ):
     x = cst.signal.filter( x, dt, *lfilter )
     return x
 
-# replace Brune source with Gaussian source
-def replace( x, dt ):
-    return x
-    import scipy.signal
-    T = meta.period
-    sigma = 0.5
-    t = dt * np.arange( 8 * sigma // dt )
-    tau = t - 4.0 * sigma
-    G = ( 1.0 - 2.0 * T / sigma ** 2.0 * tau
-        - (T / sigma) ** 2.0 * (1.0 - (tau / sigma) ** 2.0) )
-    b = ( (1.0 / np.sqrt( 2.0 * np.pi ) / sigma) * G
-        * np.exp( -0.5 * (tau / sigma) ** 2.0 ) )
-    x = dt * scipy.signal.lfilter( b, 1.0, x )
-    return x
-
 # metadata
 sims = 'chino-cvm-0200-flat', 'chino-cvmh-0200-flat'
 sims = 'chino-cvm-0050-flat', 'chino-cvmh-0050-flat'
@@ -158,7 +143,7 @@ for igroup, group in enumerate( station_groups ):
                 dt = meta.delta[-1]
                 f = os.path.join( 'run', 'sim', id_, 'out', name + '-v%s.bin' % (ichan + 1) )
                 v = np.fromfile( f, meta.dtype ) * vscale
-                v = replace( v, dt )
+                #v = replace( v, dt )
                 v = filt( v, dt )
                 n = int( duration / meta.delta[-1] )
                 v = v[:n]

@@ -73,7 +73,7 @@ case( 'vpml' );         read( str, *, iostat=ios ) key, op, vpml
 case( 'ihypo' );        read( str, *, iostat=ios ) key, op, ihypo
 case( 'source' );       read( str, *, iostat=ios ) key, op, source
 case( 'pulse' );        read( str, *, iostat=ios ) key, op, pulse
-case( 'fcorner' );      read( str, *, iostat=ios ) key, op, fcorner
+case( 'tau' );          read( str, *, iostat=ios ) key, op, tau
 case( 'source1' );      read( str, *, iostat=ios ) key, op, source1
 case( 'source2' );      read( str, *, iostat=ios ) key, op, source2
 case( 'nsource' );      read( str, *, iostat=ios ) key, op, nsource
@@ -104,7 +104,7 @@ case default
         io%ib = -1
         !XXXread( str, *, iostat=ios ) io%mode, io%nc
         read( str, *, iostat=ios ) io%mode, io%nc, io%pulse, &
-            io%fcorner, io%x1, io%x2, io%nb, io%ii, io%filename, &
+            io%tau, io%x1, io%x2, io%nb, io%ii, io%filename, &
             io%val, io%field
         do
             i = scan( io%filename, '\\' )

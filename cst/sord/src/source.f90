@@ -132,7 +132,7 @@ if ( any( i2 < i1 ) ) then
     return
 end if
 if ( verb ) write( *, '(a)' ) 'Point source'
-f = time_function( pulse, tm, dt, fcorner )
+f = time_function( pulse, tm, dt, tau )
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
@@ -160,7 +160,7 @@ if ( any( i2 < i1 ) ) then
     return
 end if
 if ( verb ) write( *, '(a)' ) 'Point source'
-f = time_function( pulse, tm, dt, fcorner )
+f = time_function( pulse, tm, dt, tau )
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)

@@ -8,7 +8,7 @@ integer :: shape_(4), itstats, itio, itcheck, itstop, npml, ppml, oplevel, mpin,
     mpout, debug, faultopening, irup, faultnormal, nsource
 real :: delta(4), tm0, rho1, rho2, vp1, vp2, vs1, vs2, gam1, gam2, hourglass(2), &
     vdamp, rexpand, affine(9), gridnoise, ihypo(3), vpml, slipvector(3)
-real :: fcorner, source1(3), source2(3), vrup, rcrit, trelax, svtol !, tmnucl, delts
+real :: tau, source1(3), source2(3), vrup, rcrit, trelax, svtol !, tmnucl, delts
 character(16) :: source, pulse
 
 ! miscellaneous parameters
