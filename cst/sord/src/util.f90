@@ -217,7 +217,7 @@ case( 'gaussian', 'integral_ricker1' )
 case( 'ricker1', 'integral_ricker2' )
     a = 0.5 / (tau * tau)
     b = sqrt( a / pi ) * 2.0 * a
-    f = exp( -a * t * t ) * b * -t
+    f = -exp( -a * t * t ) * b * t
 case( 'ricker2' )
     a = 0.5 / (tau * tau)
     b = sqrt( a / pi ) * 4.0 * a
