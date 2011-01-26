@@ -24,7 +24,7 @@ for path in glob.glob( runs ):
 
     # time histories
     t1 = np.arange( shape[-1] ) * delta[-1]
-    t2 = np.fromfile( bipath + 'time', '<f4' )
+    t2 = np.fromfile( bipath + 'time.bin', '<f4' )
 
     # loop over stations
     for i, sta in enumerate( stations ):
@@ -75,7 +75,7 @@ for path in glob.glob( runs ):
     v = np.arange( -20, 20 ) * 0.5
 
     # SOM
-    n = meta.shapes['trup']
+    n = meta.shapes['trup.bin']
     x = np.fromfile( path + 'x1.bin', dtype ).reshape( n[::-1] ).T
     y = np.fromfile( path + 'x2.bin', dtype ).reshape( n[::-1] ).T
     t = np.fromfile( path + 'trup.bin', dtype ).reshape( n[::-1] ).T

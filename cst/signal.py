@@ -218,6 +218,35 @@ def test():
     tau = 0.5 / (np.pi * flp)
     scale = n // 2 * dt
 
+    # zero phase filters and pulses
+    t = np.arange( n ) * dt - n // 2 * dt
+    x = time_function( 'delta', t )
+    leg, y = zip(
+        ('Brune',      time_function( 'brune', t, tau )),
+        (r'$\sqrt{2}\tau$',      brune2gauss( x, dt, tau, tau*np.sqrt(2) )),
+        #('Butter 4x-2',         filter( x, dt, flp, 'lowpass', 4, -1 )),
+        #('Butter 2x-2',         filter( x, dt, flp, 'lowpass', 2, -1 )),
+        #('Butter 2x2', filter( x, dt, flp, 'lowpass', 2, 1 )),
+        #('Butter 4',   filter( x, dt, flp, 'lowpass', 4, 0 )),
+        ('Butter 1',   filter( x, dt, flp, 'lowpass', 1, 0 )),
+        ('Butter 2',   filter( x, dt, flp, 'lowpass', 2, 0 )),
+        #('Hann filter',         filter( x, dt, flp, 'hann', 0, 0 )),
+        #('Hann',                    time_function( 'hann', t, tau )),
+        #(r'Ga $\tau$',              time_function( 'gaussian', t, tau )),
+        (r'Ga $\sqrt{2\ln 2}\tau$', time_function( 'gaussian', t, tau*np.sqrt(2*np.log(2)) )),
+        #(r'Ga $\sqrt{2}\tau$',      time_function( 'gaussian', t, tau*np.sqrt(2) )),
+        #('Ricker1',     time_function( 'ricker1', t - 0.5 * dt, tau ).cumsum() * dt),
+        #('Ricker2',     time_function( 'ricker2', t - dt, tau ).cumsum().cumsum() * dt * dt),
+        #('Int Hann',    time_function( 'integral_hann', t + 0.5 * dt, tau )),
+    )
+    y = np.array( y ) * scale
+    #y[-1,1:] = np.diff( y[-1] ) / dt
+    y = np.fft.ifftshift( y, axes=[-1] )
+    plt.figure( 1 )
+    spectrum( y, dt, shift=True, tzoom=5, legend=leg, title='Zero phase' )
+
+    return
+
     # Brune deconvolution to Gaussian filter
     t = np.arange( n ) * dt - n // 2 * dt
     x = time_function( 'delta', t )
@@ -247,27 +276,6 @@ def test():
     #y[-1,1:] = np.diff( y[-1] ) / dt
     plt.figure( 2 )
     spectrum( y, dt, legend=leg, title='Causal' )
-
-    # zero phase filters and pulses
-    t = np.arange( n ) * dt - n // 2 * dt
-    x = time_function( 'delta', t )
-    leg, y = zip(
-        ('Butter 4x-2',         filter( x, dt, flp, 'lowpass', 4, -1 )),
-        ('Butter 2x-2',         filter( x, dt, flp, 'lowpass', 2, -1 )),
-        #('Hann filter',         filter( x, dt, flp, 'hann', 0, 0 )),
-        ('Hann',                    time_function( 'hann', t, tau )),
-        (r'Ga $\tau$',              time_function( 'gaussian', t, tau )),
-        (r'Ga $\sqrt{2\ln 2}\tau$', time_function( 'gaussian', t, tau*np.sqrt(2*np.log(2)) )),
-        (r'Ga $\sqrt{2}\tau$',      time_function( 'gaussian', t, tau*np.sqrt(2) )),
-        #('Ricker1',     time_function( 'ricker1', t - 0.5 * dt, tau ).cumsum() * dt),
-        #('Ricker2',     time_function( 'ricker2', t - dt, tau ).cumsum().cumsum() * dt * dt),
-        #('Int Hann',    time_function( 'integral_hann', t + 0.5 * dt, tau )),
-    )
-    y = np.array( y ) * scale
-    #y[-1,1:] = np.diff( y[-1] ) / dt
-    y = np.fft.ifftshift( y, axes=[-1] )
-    plt.figure( 1 )
-    spectrum( y, dt, shift=True, legend=leg, title='Zero phase' )
 
     # bandpass filters
     t = np.arange( n ) * dt
