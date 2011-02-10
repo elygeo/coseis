@@ -29,24 +29,24 @@ ax = fig.add_axes( [0.01, 0.01, 0.98, 0.98] )
 # CVM basins
 f = os.path.join( 'run', 'data', 'basins-cvm.txt' )
 x, y = proj( *np.loadtxt( f ).T )
-h = ax.plot( x, y, '-r', linewidth=0.25 )
+h = ax.plot( x, y, '-r' )
 h[0].set_dashes((2,1))
 
 # CVM-H basins
 f = os.path.join( 'run', 'data', 'basins-cvmh.txt' )
 x, y = proj( *np.loadtxt( f ).T )
-h = ax.plot( x, y, '-b', linewidth=0.25 )
+h = ax.plot( x, y, '-b' )
 h[0].set_dashes((2,1))
 
 # topography
 f = os.path.join( 'run', 'data', 'mountains.txt' )
 x, y = proj( *np.loadtxt( f ).T )
-ax.plot( x, y, '-k', linewidth=0.25 )
+ax.plot( x, y, '-k' )
 
 # coastlines and boarders
 f = os.path.join( 'run', 'data', 'coastlines.txt' )
 x, y = proj( *np.loadtxt( f ).T )
-ax.plot( x, y, 'k-' )
+ax.plot( x, y, 'k-', lw=1.0 )
 
 # source
 x0, y0 = proj( mts.longitude, mts.latitude )
@@ -92,5 +92,7 @@ if not os.path.exists( f ):
     os.makedirs( f )
 f = os.path.join( 'run', 'plot', 'map.pdf' )
 fig.savefig( f, transparent=True )
+f = os.path.join( 'run', 'plot', 'map.png' )
+fig.savefig( f )
 fig.show()
 

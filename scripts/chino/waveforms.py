@@ -3,7 +3,8 @@ import os
 import numpy as np
 import pyproj
 import matplotlib.pyplot as plt
-import obspy.core, obspy.signal, obspy.xseed
+import obspy.core
+#import obspy.signal, obspy.xseed
 import cst
 
 # parameters
@@ -15,10 +16,10 @@ xoff = 4.0
 vscale = 100.0
 ysep = 0.35
 ysep = 0.25
-yoff = -20; lfilter = None,
 yoff = -1; lfilter = (0.1, 0.25), 'bandpass', 2, -1
 yoff = -2; lfilter = (0.1, 0.5), 'bandpass', 2, -1
 yoff = -5; lfilter = (0.1, 1.0), 'bandpass', 2, -1
+yoff = -20; lfilter = None,
 
 # filter
 def filt( x, dt ):
@@ -39,12 +40,6 @@ s = np.loadtxt( f, 'S9,f,f,f' )
 x, y = proj( s['f2'], s['f1'] )
 
 # sort by azimuth into groups, then by radius within group
-sta = [
-    'CHN', 'MLS', 'PDU', 'FON', 'BFS', 'RVR',
-    'PSR', 'RIO', 'KIK', 'GSA', 'HLL', 'DEC', 'CHF', 'LFP',
-    'FUL', 'SRN', 'PLS', 'OGC', 'BRE', 'LLS', 'SAN', 'STG', 'SDD',
-    'OLI', 'RUS', 'DLA', 'LTP', 'STS', 'LAF', 'WTT', 'USC', 'SMS',
-]
 i = 19
 r = x * x + y * y
 a = np.arctan2( y, x )
@@ -66,6 +61,7 @@ plt.rc( 'font', size=8 )
 plt.rc( 'legend', fontsize=8 )
 plt.rc( 'axes', lw=0.5, color_cycle=['k', 'r', 'b'] )
 plt.rc( 'lines', lw=0.5, solid_joinstyle='round' )
+#fig1 = False
 fig1 = plt.figure( None, (11, 8.5), 100, 'w' )
 
 # loop over station groups
@@ -97,7 +93,8 @@ for igroup, group in enumerate( station_groups ):
         print( name )
 
         # separates
-        fig1.clf()
+        if fig1:
+            fig1.clf()
 
         # loop over channels
         for ichan in range( 3 ):
@@ -164,8 +161,9 @@ for igroup, group in enumerate( station_groups ):
                     ax2.loglog( f, v )
 
         # finish separate
-        f = os.path.join( 'run', 'plot', name + '.pdf' )
-        fig1.savefig( f, transparate=True )
+        if fig1:
+            f = os.path.join( 'run', 'plot', name + '.pdf' )
+            fig1.savefig( f, transparate=True )
 
     # finish figure
     fig.canvas.draw()
@@ -174,6 +172,6 @@ for igroup, group in enumerate( station_groups ):
     else:
         f = os.path.join( 'run', 'plot', 'waveform-raw-%s' % igroup )
     fig.savefig( f + '.pdf', transparent=True )
-    fig.savefig( f + '.png', dpi=300 )
+    fig.savefig( f + '.png', dpi=100 )
     fig.show()
 

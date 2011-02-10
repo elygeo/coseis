@@ -76,7 +76,7 @@ def colorbar( fig, cmap, clim, title=None, rect=None, ticks=None, ticklabels=Non
         text( ax, x, -0.6, s, ha='center', va='top', **kwargs )
     return ax
 
-def lengthscale( ax, x, y, w=None, label='%s', style='k-', lw=0.5, **kwargs ):
+def lengthscale( ax, x, y, w=None, label='%s', style='k-', **kwargs ):
     """
     Draw a length scale bar between the points (x[0], y[0]) and (x[1], y[1]).
     """
@@ -103,11 +103,11 @@ def lengthscale( ax, x, y, w=None, label='%s', style='k-', lw=0.5, **kwargs ):
     y =  0, 0, np.nan, -w,  w, np.nan, -w, w
     x, y = 0.5 / l * np.dot( rot, [x, y] )
     theta = np.arctan2( dy, dx ) * 180.0 / np.pi
-    h1 = ax.plot( x0 + x, y0 + y, style, lw=lw, clip_on=False )
+    h1 = ax.plot( x0 + x, y0 + y, style, clip_on=False )
     h2 = text( ax, x0, y0, label, ha='center', va='center', rotation=theta, **kwargs )
     return h1, h2
 
-def compass_rose( ax, x, y, r, style='k-', lw=1.0, **kwargs ):
+def compass_rose( ax, x, y, r, style='k-', **kwargs ):
     theta = 0.0
     if 'rotation' in kwargs:
         theta = kwargs['rotation']
@@ -116,7 +116,7 @@ def compass_rose( ax, x, y, r, style='k-', lw=1.0, **kwargs ):
     s  = np.sin( theta / 180.0 * np.pi )
     x_ = x + r * np.array( [(c,  s), (-c, -s)] )
     y_ = y + r * np.array( [(s, -c), (-s,  c)] )
-    h  = [ ax.plot( x_, y_, style, lw=lw, clip_on=False ) ]
+    h  = [ ax.plot( x_, y_, style, clip_on=False ) ]
     x_ = x + r * np.array( [(c, -c), ( s, -s)] ) * 1.3
     y_ = y + r * np.array( [(s, -s), (-c,  c)] ) * 1.3
     h += [

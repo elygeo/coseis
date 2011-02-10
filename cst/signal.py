@@ -218,34 +218,56 @@ def test():
     tau = 0.5 / (np.pi * flp)
     scale = n // 2 * dt
 
-    # zero phase filters and pulses
+    # filter comparison
     t = np.arange( n ) * dt - n // 2 * dt
     x = time_function( 'delta', t )
     leg, y = zip(
-        ('Brune',      time_function( 'brune', t, tau )),
-        (r'$\sqrt{2}\tau$',      brune2gauss( x, dt, tau, tau*np.sqrt(2) )),
-        #('Butter 4x-2',         filter( x, dt, flp, 'lowpass', 4, -1 )),
-        #('Butter 2x-2',         filter( x, dt, flp, 'lowpass', 2, -1 )),
-        #('Butter 2x2', filter( x, dt, flp, 'lowpass', 2, 1 )),
-        #('Butter 4',   filter( x, dt, flp, 'lowpass', 4, 0 )),
-        ('Butter 1',   filter( x, dt, flp, 'lowpass', 1, 0 )),
-        ('Butter 2',   filter( x, dt, flp, 'lowpass', 2, 0 )),
-        #('Hann filter',         filter( x, dt, flp, 'hann', 0, 0 )),
+        ('Butter 1x2',              filter( x, dt, flp, 'lowpass', 1, 1 )),
+        ('Butter 2x2',              filter( x, dt, flp, 'lowpass', 2, 1 )),
+        ('Butter 2x-2',             filter( x, dt, flp, 'lowpass', 2, -1 )),
+        ('Hann filter',             filter( x, dt, flp, 'hann', 0, 0 )),
         #('Hann',                    time_function( 'hann', t, tau )),
-        #(r'Ga $\tau$',              time_function( 'gaussian', t, tau )),
+        ('Brune',                   time_function( 'brune', t, tau )),
         (r'Ga $\sqrt{2\ln 2}\tau$', time_function( 'gaussian', t, tau*np.sqrt(2*np.log(2)) )),
-        #(r'Ga $\sqrt{2}\tau$',      time_function( 'gaussian', t, tau*np.sqrt(2) )),
-        #('Ricker1',     time_function( 'ricker1', t - 0.5 * dt, tau ).cumsum() * dt),
-        #('Ricker2',     time_function( 'ricker2', t - dt, tau ).cumsum().cumsum() * dt * dt),
-        #('Int Hann',    time_function( 'integral_hann', t + 0.5 * dt, tau )),
+        (r'Decon $\sqrt{2}\tau$',   brune2gauss( x, dt, tau, tau*np.sqrt(2) )),
+        #('Ricker1', time_function( 'ricker1', t - 0.5 * dt, tau ).cumsum() * dt),
+        #('Ricker2', time_function( 'ricker2', t - dt, tau ).cumsum().cumsum() * dt * dt),
     )
     y = np.array( y ) * scale
-    #y[-1,1:] = np.diff( y[-1] ) / dt
     y = np.fft.ifftshift( y, axes=[-1] )
-    plt.figure( 1 )
-    spectrum( y, dt, shift=True, tzoom=5, legend=leg, title='Zero phase' )
+    plt.figure( 0 )
+    spectrum( y, dt, shift=True, tzoom=5, legend=leg,
+        title='fc = %.1f, T = 0.5 / (pi * fc)' % flp )
 
-    return
+    # Butterworth lowpass
+    t = np.arange( n ) * dt - n // 2 * dt
+    x = time_function( 'delta', t )
+    leg, y = zip(
+        ('2 pole ',    filter( x, dt, flp, 'lowpass', 2, 0 )),
+        ('4 pole ',    filter( x, dt, flp, 'lowpass', 4, 0 )),
+        ('1 pole x2',  filter( x, dt, flp, 'lowpass', 1, 1 )),
+        ('2 pole x2',  filter( x, dt, flp, 'lowpass', 2, 1 )),
+        ('2 pole x-2', filter( x, dt, flp, 'lowpass', 2, -1 )),
+    )
+    y = np.array( y ) * scale
+    y = np.fft.ifftshift( y, axes=[-1] )
+    plt.figure( 2 )
+    spectrum( y, dt, shift=True, tzoom=5, legend=leg,
+        title='Butterworth lowpass, fc = %.1f' % flp )
+
+    # Butterworth bandpass
+    t = np.arange( n ) * dt
+    x = time_function( 'delta', t )
+    leg, y = zip(
+        ('2 pole ',    filter( x, dt, fbp, 'bandpass', 2, 0 )),
+        ('4 pole ',    filter( x, dt, fbp, 'bandpass', 4, 0 )),
+        ('1 pole x2 ', filter( x, dt, fbp, 'bandpass', 1, 1 )),
+        ('2 pole x2',  filter( x, dt, fbp, 'bandpass', 2, 1 )),
+    )
+    y = np.array( y ) * scale
+    plt.figure( 3 )
+    spectrum( y, dt, legend=leg,
+        title='Butterworth bandpass, fc = %.1f, %.1f' % fbp )
 
     # Brune deconvolution to Gaussian filter
     t = np.arange( n ) * dt - n // 2 * dt
@@ -258,37 +280,9 @@ def test():
     )
     y = np.array( y ) * scale
     y = np.fft.ifftshift( y, axes=[-1] )
-    plt.figure( 0 )
-    spectrum( y, dt, shift=True, legend=leg, title='Deconvolution filters' )
-
-    # causal filters and pulses
-    t = np.arange( n ) * dt
-    x = time_function( 'delta', t )
-    leg, y = zip(
-        ('Butter 4x2', filter( x, dt, flp, 'lowpass', 4, 1 )),
-        ('Butter 2x2', filter( x, dt, flp, 'lowpass', 2, 1 )),
-        ('Butter 4',   filter( x, dt, flp, 'lowpass', 4, 0 )),
-        ('Butter 2',   filter( x, dt, flp, 'lowpass', 2, 0 )),
-        ('Brune',      time_function( 'brune', t, tau )),
-        #('Brune',      time_function( 'integral_brune', t + 0.5 * dt, tau )),
-    )
-    y = np.array( y ) * scale
-    #y[-1,1:] = np.diff( y[-1] ) / dt
-    plt.figure( 2 )
-    spectrum( y, dt, legend=leg, title='Causal' )
-
-    # bandpass filters
-    t = np.arange( n ) * dt
-    x = time_function( 'delta', t )
-    leg, y = zip(
-        ('Butter 4x2',  filter( x, dt, fbp, 'bandpass', 4, 1 )),
-        ('Butter 2x2',  filter( x, dt, fbp, 'bandpass', 2, 1 )),
-        ('Butter 4',    filter( x, dt, fbp, 'bandpass', 4, 0 )),
-        ('Butter 2',    filter( x, dt, fbp, 'bandpass', 2, 0 )),
-    )
-    y = np.array( y ) * scale
-    plt.figure( 3 )
-    spectrum( y, dt, legend=leg, title='Bandpass' )
+    plt.figure( 4 )
+    spectrum( y, dt, shift=True, legend=leg,
+        title='Deconvolution, fc = %.1f, T = 0.5 / (pi * fc)' % flp )
 
     return
 

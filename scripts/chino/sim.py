@@ -90,10 +90,13 @@ bc2 = 10, 10, 10
 mts_ = os.path.join( 'run', 'data', '14383980.mts.py' )
 source = 'moment'
 pulse = 'brune'
-tau = max( 1.0, 10.0 * dx_ / vs1 )
 m = cst.util.load( mts_ ).double_couple_clvd
 source1 =  m['myy'],  m['mxx'],  m['mzz']
 source2 = -m['mxz'], -m['myz'],  m['mxy']
+
+# scaling law: fcorner = (dsigma / moment) ^ 1/3 * 0.42 * Vs,
+# dsigma = 4 MPa, Vs = 3900 m/s, tau = 0.5 / (pi * fcorner)
+tau = 6e-7 * m['monent'] ** (1.0 / 3.0) # ~0.32, fcorner = 0.5Hz
 
 # sites
 stagein = 'out/', 'hold/'
