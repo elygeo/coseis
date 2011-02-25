@@ -34,7 +34,7 @@ Coseis is an open-source toolkit for earthquake simulation featuring:
 *   Utilities for mesh generation, coordinate projection, and visualization.
 
 __ http://www.data.scec.org/3Dvelocity/
-__ http://earth.usc.edu/~gely/cvmh/
+__ http://earth.usc.edu/~gely/vs30gtl/
 __ http://structure.harvard.edu/cvm-h/
 
 The primary interface is through a Python module which (for high-performance

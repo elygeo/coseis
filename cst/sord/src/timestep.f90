@@ -30,7 +30,7 @@ if ( ifn /= 0 ) then
 end if
 
 ! velocity time integration
-tm = tm0 + dt * ( it - 1 ) - dt * 0.5
+tm = tm0 + dt * (it - 1) - dt * 0.5
 vv = vv + dt * w1
 call fieldio( '<>', 'v1', vv(:,:,:,1) )
 call fieldio( '<>', 'v2', vv(:,:,:,2) )
@@ -43,7 +43,7 @@ end if
 call fieldio( '>', 'vm2', s1  )
 
 ! displacement time integration
-tm = tm0 + dt * ( it - 1 )
+tm = tm0 + dt * (it - 1)
 uu = uu + dt * vv
 call fieldio( '<>', 'u1', uu(:,:,:,1) )
 call fieldio( '<>', 'u2', uu(:,:,:,2) )
