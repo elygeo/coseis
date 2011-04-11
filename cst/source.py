@@ -84,8 +84,8 @@ def cybershake( isrc, irup, islip, ihypo, path='srf', name=None ):
     # get source files
     os.mkdir( path )
     os.chdir( path )
-    url = 'intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V3_2/'
     url = 'intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V2_3/'
+    url = 'intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V3_2/'
     mesh = '%s%d/%d/%d_%d.txt' % (url, isrc, irup, isrc, irup)
     head = '%s%d/%d/%d_%d.txt.variation.output' % (url, isrc, irup, isrc, irup)
     srf  = '%s%d/%d/%d_%d.txt.variation-s%04d-h%04d' % (url, isrc, irup, isrc, irup, islip, ihypo)
@@ -117,8 +117,8 @@ def cybershake( isrc, irup, islip, ihypo, path='srf', name=None ):
     util.save( 'meta.py', meta, expand=['plane'], header='# source parameters\n' )
 
     # extract trace
-    x = np.fromfile( 'lon', 'f' ).reshape( shape[::-1] ).T
-    y = np.fromfile( 'lat', 'f' ).reshape( shape[::-1] ).T
+    x = np.fromfile( 'lon.bin', 'f' ).reshape( shape[::-1] ).T
+    y = np.fromfile( 'lat.bin', 'f' ).reshape( shape[::-1] ).T
     np.savetxt( 'trace.txt', np.array( [x[:,0], y[:,0]] ).T, '%f' )
 
     # clean up

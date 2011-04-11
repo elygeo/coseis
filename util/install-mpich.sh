@@ -3,7 +3,7 @@ prefix="${1:-${HOME}/local}"
 pwd="${PWD}"
 
 # MPICH2
-url="http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/1.3.2/mpich2-1.3.2.tar.gz"
+url="http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/1.3.2/mpich2-1.3.2p1.tar.gz"
 tag=$( basename "$url" .tar.gz )
 cd "${prefix}"
 curl -L "${url}" | tar zx
