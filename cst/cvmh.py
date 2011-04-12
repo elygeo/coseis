@@ -134,7 +134,7 @@ def brocher_vp( f ):
     return f
 
 
-def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx63' ):
+def cvmh_voxet( prop=None, voxet=None, no_data_value=None, version='vx62' ):
     """
     Download and read SCEC CVM-H voxet.
 
@@ -145,6 +145,8 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx63' ):
             3d property: 'vp', 'vs', or 'tag'
         voxet:
             3d voxet: 'mantle', 'crust', 'lab'
+        no_data_value: None, 'nan', or float value. None = filled from below.
+        version: 'vx62', or 'vx63'
 
     Returns
     -------
@@ -178,15 +180,36 @@ def cvmh_voxet( prop=None, voxet=None, no_data_value='nan', version='vx63' ):
         pid = prop2d[prop]
     else:
         pid = prop3d[prop]
-    voxet = gocad.voxet( voxfile, pid, no_data_value )['1']
+    if no_data_value == None and prop in prop3d:
+        vox = gocad.voxet( voxfile, pid, '-filled', None )['1']
+        if 'DATA' not in vox['PROP'][pid]:
+            print( 'Filling voxet %s %s %s' % (version, voxet, prop) )
+            vox = gocad.voxet( voxfile, pid, '', None )['1']
+            w = vox['AXIS']['W'][2]
+            v = vox['PROP'][pid]['NO_DATA_VALUE']
+            d = vox['PROP'][pid]['DATA']
+            n = d.shape[2]
+            if w > 0.0:
+                for i in range( 1, n ):
+                    ii = d[:,:,i] == v
+                    d[:,:,i][ii] = d[:,:,i-1][ii]
+            else:
+                for i in range( n, 0, -1 ):
+                    ii = d[:,:,i-1] == v
+                    d[:,:,i-1][ii] = d[:,:,i][ii]
+            vox['PROP'][pid]['DATA'] = d
+            f = os.path.join( path, vox['PROP'][pid]['FILE'] + '-filled' )
+            d.T.tofile( f )
+    else:
+        vox = gocad.voxet( voxfile, pid, '', no_data_value )['1']
 
     # extent
-    x, y, z = voxet['AXIS']['O']
-    u, v, w = voxet['AXIS']['U'][0], voxet['AXIS']['V'][1], voxet['AXIS']['W'][2]
+    x, y, z = vox['AXIS']['O']
+    u, v, w = vox['AXIS']['U'][0], vox['AXIS']['V'][1], vox['AXIS']['W'][2]
     extent = (x, x + u), (y, y + v), (z, z + w)
 
     # property data
-    data = voxet['PROP'][pid]['DATA']
+    data = vox['PROP'][pid]['DATA']
     return extent, bound, data
 
 
@@ -201,6 +224,8 @@ class Model():
             3d property: 'vp', 'vs', or 'tag'
         voxet:
             3d voxet list: ['mantle', 'crust', 'lab']
+        no_data_value: None, 'nan', or float value. None = filled from below.
+        version: 'vx62', or 'vx63'
 
     Call parameters
     ---------------
@@ -212,7 +237,7 @@ class Model():
     -------
         out: Property samples at coordinates (x, y, z)
     """
-    def __init__( self, prop, voxet=['mantle', 'crust'], no_data_value='nan', version='vx63' ):
+    def __init__( self, prop, voxet=['mantle', 'crust'], no_data_value=None, version='vx63' ):
         self.prop = prop
         if prop == 'wald':
             self.voxet = [ vs30_wald() ]
@@ -280,7 +305,7 @@ class Extraction():
         if vs30 is None:
             zt = None
         else:
-            zt = 365.0
+            zt = 350.0
             v0 = vs30( x, y, interpolation='linear' )
             if vm.prop == 'vp':
                 v0 = brocher_vp( v0 )

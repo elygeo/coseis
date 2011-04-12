@@ -37,7 +37,7 @@ def header( lines, counter=0, casters=None ):
     sys.exit( 'Error in header' )
     return
 
-def voxet( path, load_prop=None, no_data_value='nan' ):
+def voxet( path, load_prop=None, alternate='', no_data_value=None ):
     """
     GOCAD voxet reader
     """
@@ -79,14 +79,15 @@ def voxet( path, load_prop=None, no_data_value='nan' ):
             if load_prop is not None:
                 n = axis['N']
                 p = prop[load_prop]
-                f = os.path.join( os.path.dirname( path ), p['FILE'] )
-                dtype = '>f%s' % p['ESIZE']
-                data = np.fromfile( f, dtype )
-                if no_data_value == 'nan':
-                    data[data==p['NO_DATA_VALUE']] = np.nan
-                elif no_data_value is not None:
-                    data[data==p['NO_DATA_VALUE']] = no_data_value
-                p['DATA'] = data.reshape( n[::-1] ).T
+                f = os.path.join( os.path.dirname( path ), p['FILE'] + alternate )
+                if os.path.exists( f ):
+                    dtype = '>f%s' % p['ESIZE']
+                    data = np.fromfile( f, dtype )
+                    if no_data_value in ('nan', 'NaN', 'NAN'):
+                        data[data==p['NO_DATA_VALUE']] = np.nan
+                    elif no_data_value is not None:
+                        data[data==p['NO_DATA_VALUE']] = no_data_value
+                    p['DATA'] = data.reshape( n[::-1] ).T
             voxet[id_] = {'HEADER': hdr, 'AXIS': axis, 'PROP': prop}
     return voxet
 
@@ -111,7 +112,7 @@ def tsurf( path ):
             vrtx += [[float(f[2]), float(f[3]), float(f[4])]]
         elif f[0] in ('ATOM', 'PATOM'):
             i = int( f[2] ) - 1
-            vrtx += [ vrtx[i] ]
+            vrtx += [vrtx[i]]
         elif f[0] == 'TRGL':
             trgl += [[int(f[1]) - 1, int(f[2]) - 1, int(f[3]) - 1]]
         elif f[0] == 'BORDER':
@@ -120,13 +121,13 @@ def tsurf( path ):
             bstone += [int(f[1]) - 1]
         elif f[0] == 'TFACE':
             if trgl != []:
-                tface += [ np.array( trgl, 'i' ).T ]
+                tface += [np.array( trgl, 'i' ).T]
             trgl = []
         elif f[0] == 'END':
             vrtx   = np.array( vrtx, 'f' ).T
             border = np.array( border, 'i' ).T
             bstone = np.array( bstone, 'i' ).T
-            tface += [ np.array( trgl, 'i' ).T ]
+            tface += [np.array( trgl, 'i' ).T]
             tsurf += [[hdr, phdr, vrtx, tface, border, bstone]]
         elif f[0] == 'PROPERTY_CLASS_HEADER':
             phdr[f[1]] = header( lines, counter )
