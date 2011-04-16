@@ -42,7 +42,7 @@ fortran_flags = {
     'O': '-O3',
     '8': '-fdefault-real-8',
 }
-cvm_ = dict(
+cvms_ = dict(
     fortran_flags = {
         'g': '-Wall -fbounds-check -ffpe-trap=invalid,zero,overflow -g',
         'O': '-Wall -O3',

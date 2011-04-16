@@ -25,8 +25,8 @@ Coseis is an open-source toolkit for earthquake simulation featuring:
     rupture and 3D wave propagation.
 
 *   SCEC Community Velocity Models (CVM) codes, with MPI parallelization for
-    `Magistrale version`__, and new `geotechnical layer implementation`__ for the
-    `Harvard version`__.
+    `Magistrale version`__ (CVM-S), and new `geotechnical layer
+    implementation`__ for the `Harvard version`__ (CVM-H).
 
 *   WebSims_ web application for cataloging, exploring, and disseminating large
     numerical simulations data sets.
@@ -58,10 +58,10 @@ System requirements
 
 *   Python_, and NumPy_ (Numerical Python).
 
-*   (+) Fortran 95 compiler.  Required only for SORD and CVM modules.
+*   (+) Fortran 95 compiler.  Required only for SORD and CVM-S modules.
 
 *   (+) Message Passing Interface (MPI) library.  Required only for
-    multiprocessing with SORD and CVM.
+    multiprocessing with SORD and CVM-S.
 
 *   (+) Matplotlib_, SciPy_, and Pyproj Python packages.  Required only for
     supplemental plotting, signal processing, and mesh generation utilities.
@@ -178,7 +178,7 @@ Examples
 CVM depth planes
 ----------------
 
-.. image:: ../scripts/cvm/cvm-vs500.png
+.. image:: ../scripts/cvm/cvms-vs500.png
 .. image:: ../scripts/cvm/cvmh-vs500.png
 
 Extract S-wave velocity at 500 meters depth. Plot using Matplotlib
@@ -190,10 +190,10 @@ Extract S-wave velocity at 500 meters depth. Plot using Matplotlib
 Source code:
 `plane.py <../scripts/cvm/plane.py>`__
 
-CVM fence diagram
------------------
+CVM-S fence diagram
+-------------------
 
-.. image:: ../scripts/cvm/cvm-vp-fence.png
+.. image:: ../scripts/cvm/cvms-vp-fence.png
 
 Build a fence diagram similar to Magistrale (2000) figure 10. Plot using
 Mayavi::
@@ -204,8 +204,8 @@ Mayavi::
 Source code:
 `fence.py <../scripts/cvm/fence.py>`__
 
-CVM Basin depth
----------------
+CVM-S Basin depth
+-----------------
 
 .. image:: ../scripts/basindepth/cvm-z25.png
 

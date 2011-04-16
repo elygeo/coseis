@@ -31,12 +31,12 @@ class stp():
 
     Example, download waveforms in SAC format and save station list:
         import cst
-        stp = cst.scedc.stp( 'scedc' )
-        stp( 'status' )
-        stp( ['sac', 'gain on'] )
-        stp( 'trig -net ci -chan _n_ -radius 20 14383980' )
-        out = stp( 'sta -l -net ci -chan _n_' )
-        open( 'station-list.txt', 'w' ).write( out[0] )
+        stp = cst.scedc.stp('scedc')
+        stp('status')
+        stp(['sac', 'gain on'])
+        stp('trig -net ci -chan _n_ -radius 20 14383980')
+        out = stp('sta -l -net ci -chan _n_')
+        open('station-list.txt', 'w').write(out[0])
         stp.close()
     """
     presets = {
@@ -52,96 +52,96 @@ class stp():
         ],
     }
 
-    def __init__( self, waveserver='scedc', retry=60 ):
-        if type( waveserver ) is str:
+    def __init__(self, waveserver='scedc', retry=60):
+        if type(waveserver) is str:
             waveserver = self.presets[waveserver]
         self.sock = socket.socket()
         self.send = self.sock.send
         self.close = self.sock.close
-        for i in range( retry ):
+        for i in range(retry):
             for host, port, password in waveserver:
-                print( 'STP: Connecting to ' + host )
-                self.sock.connect( (host, port) )
-                self.sock.send( 'STP %s 1.6 stpc\n' % password )
-                line = self.sock.recv( 16 )
+                print('STP: Connecting to ' + host)
+                self.sock.connect((host, port))
+                self.sock.send('STP %s 1.6 stpc\n' % password)
+                line = self.sock.recv(16)
                 conn = line == 'CONNECTED\n'
                 if conn:
                     break
                 self.sock.close()
-                time.sleep( 1 )
+                time.sleep(1)
             if conn:
                 break
         if not conn:
-            sys.exit( 'STP connection error' )
-        two = struct.pack( 'i', 2 )
-        self.send( two )
+            sys.exit('STP connection error')
+        two = struct.pack('i', 2)
+        self.send(two)
         self.receive()
         return
 
-    def __call__( self, cmd, path=None, verbose=False ):
-        if type( cmd ) in [tuple, list]:
-            cmd = '\n'.join( cmd )
+    def __call__(self, cmd, path=None, verbose=False):
+        if type(cmd) in [tuple, list]:
+            cmd = '\n'.join(cmd)
         out = []
-        for cmd in cmd.split( '\n' ):
-            print( cmd )
-            self.send( cmd + '\n' )
-            out += self.receive( path, verbose )
+        for cmd in cmd.split('\n'):
+            print(cmd)
+            self.send(cmd + '\n')
+            out += self.receive(path, verbose)
         if out:
             return out
         else:
             return
 
-    def receive( self, path=None, verbose=False ):
+    def receive(self, path=None, verbose=False):
         dirname = path
-        buff = self.sock.recv( 4096 )
+        buff = self.sock.recv(4096)
         line = ''
         out = []
-        while( line != 'OVER' ):
-            if len( buff ) < 4096 and not buff.endswith( 'OVER\n' ):
-                buff += self.sock.recv( 4096 )
-            line, buff = buff.split( '\n', 1 )
+        while(line != 'OVER'):
+            if len(buff) < 4096 and not buff.endswith('OVER\n'):
+                buff += self.sock.recv(4096)
+            line, buff = buff.split('\n', 1)
             key = line.split()
             if verbose:
-                print( line )
+                print(line)
             if key == []:
                 pass
             elif key[0] == 'OVER':
-                sys.stdout.write( 'STP> ' )
+                sys.stdout.write('STP> ')
             elif key[0] == 'MESS':
-                i = buff.find( 'ENDmess\n' )
+                i = buff.find('ENDmess\n')
                 while i < 0:
-                    buff += self.sock.recv( 4096 )
-                    i = buff.find( 'ENDmess\n' )
+                    buff += self.sock.recv(4096)
+                    i = buff.find('ENDmess\n')
                 mess, buff = buff[:i], buff[i:]
                 out += [mess]
-                print( mess )
-                line, buff = buff.split( '\n', 1 )
+                print(mess)
+                line, buff = buff.split('\n', 1)
             elif key[0] == 'FILE':
                 filename = key[1]
             elif key[0] == 'DIR':
                 if path == None:
                     dirname = key[1]
-                if not os.path.exists( dirname ):
-                    os.makedirs( dirname )
+                if not os.path.exists(dirname):
+                    os.makedirs(dirname)
             elif key[0] == 'DATA':
-                f = os.path.join( dirname, filename )
-                print( f )
-                i = int( key[1] )
-                while( len( buff ) < i ):
-                    buff += self.sock.recv( 4096 )
-                open( f, 'wb' ).write( buff[:i] )
+                f = os.path.join(dirname, filename)
+                print(f)
+                i = int(key[1])
+                while(len(buff) < i):
+                    buff += self.sock.recv(4096)
+                open(f, 'wb').write(buff[:i])
                 buff = buff[i:]
-                if buff.find( 'ENDdata\n' ) < 0:
-                    buff += self.sock.recv( 4096 )
-                line, buff = buff.split( '\n', 1 )
+                if buff.find('ENDdata\n') < 0:
+                    buff += self.sock.recv(4096)
+                line, buff = buff.split('\n', 1)
             elif key[0] == 'ERR':
-                print( 'ERROR: ' + line[4:] )
+                print('ERROR: ' + line[4:])
             else:
-                print( 'ERROR: ' + repr( line ) )
+                print('ERROR: ' + repr(line))
         return out
 
 
-def mts( eventid, path='scsn-mts-%s.py' ):
+def mts(eventid, path='scsn-mts-%s.py'):
     """
     Retrieve Moment Tensor Solution (MTS)
 
@@ -169,12 +169,12 @@ def mts( eventid, path='scsn-mts-%s.py' ):
         path = path % eventid
     except:
         pass
-    if os.path.exists( path ):
+    if os.path.exists(path):
         mts = {}
-        exec( open( path ).read() ) in mts
+        exec(open(path).read()) in mts
         return mts
-    print( 'Retrieving %s' % url )
-    text = urllib.urlopen( url )
+    print('Retrieving %s' % url)
+    text = urllib.urlopen(url)
     mts = dict(
         url=url,
         mts_units = 'Newton-meters',
@@ -187,50 +187,50 @@ def mts( eventid, path='scsn-mts-%s.py' ):
         if not line:
             continue
         elif ':' in line:
-            f = line.split( ':', 1 )
+            f = line.split(':', 1)
         elif '=' in line:
-            f = line.split( '=' )
+            f = line.split('=')
         else:
             f = line.split()
-        k = f[0].strip().lower().replace( ' ', '_' )
+        k = f[0].strip().lower().replace(' ', '_')
         if k == 'event_id':
-            mts[k] = int( f[1] )
+            mts[k] = int(f[1])
         elif k in ('magnitude', 'depth_(km)', 'latitude', 'longitude'):
-            k = k.replace( '_(km)', '' )
-            mts[k] = float( f[1] )
+            k = k.replace('_(km)', '')
+            mts[k] = float(f[1])
         elif k == 'origin_time':
             f = f[1].split()
-            d = f[0].split( '/' )
-            t = f[1].split( ':' )
+            d = f[0].split('/')
+            t = f[1].split(':')
             mts[k] = '%s-%s-%sT%s:%s:%s.%s' % (d[2], d[0], d[1], t[0], t[1], t[2], t[3])
         elif k == 'best_fitting_double_couple_and_clvd_solution':
             tensor = clvd
         elif k == 'best_fitting_double_couple_solution':
             tensor = dc
         elif k == 'moment_tensor':
-            scale = 10 ** (int( f[1].split( '**' )[1].split()[0] ) - 7)
+            scale = 10 ** (int(f[1].split('**')[1].split()[0]) - 7)
         elif k in ('mxx', 'myy', 'mzz', 'myz', 'mxz', 'mxy'):
-            tensor[k] = scale * float( f[1] )
+            tensor[k] = scale * float(f[1])
         elif k in ('t', 'n', 'p'):
             mts[k+'_axis'] = dict(
-                value = float( f[1] ),
-                plunge = float( f[2] ),
-                azimuth = float( f[3] ),
+                value = float(f[1]),
+                plunge = float(f[2]),
+                azimuth = float(f[3]),
             )
         elif k == 'mo':
-            mts['moment'] = 1e-7 * float( f[1].split()[0] )
+            mts['moment'] = 1e-7 * float(f[1].split()[0] )
         elif k in ('np1', 'np2'):
             mts[k] = dict(
-                strike = float( f[1] ),
-                rake = float( f[2] ),
-                dip = float( f[3] ),
+                strike = float(f[1] ),
+                rake = float(f[2] ),
+                dip = float(f[3] ),
             )
         elif k == 'moment_magnitude' and '=' in line:
-            mts[k] = float( f[1] )
+            mts[k] = float(f[1] )
             break
     mts['double_couple_clvd'] = clvd
     mts['double_couple'] = dc
     mts['depth'] *= 1000.0
-    util.save( path, mts, header='# SCSN moment tensor solution\n' )
+    util.save(path, mts, header='# SCSN moment tensor solution\n' )
     return mts
 

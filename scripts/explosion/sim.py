@@ -21,10 +21,10 @@ sources_ = [
 
 # dimensions
 shape = [
-    int( 6000.0 / delta[0] + 1.0001 ),
-    int( 6000.0 / delta[1] + 1.0001 ),
-    int( 6000.0 / delta[2] + 1.0001 ),
-    int(    3.0 / delta[3] + 1.0001 ),
+    int(6000.0 / delta[0] + 1.0001),
+    int(6000.0 / delta[1] + 1.0001),
+    int(6000.0 / delta[2] + 1.0001),
+    int(   3.0 / delta[3] + 1.0001),
 ]
 
 # material
@@ -69,21 +69,21 @@ for source, s in sources_:
     # point source
     if 1:
         nsource = 0
-        rundir = os.path.join( 'run', 'point-' + source )
+        rundir = os.path.join('run', 'point-' + source)
         pulse = 'integral_brune'
-        cst.sord.run( locals() )
+        cst.sord.run(locals())
 
     # finite source
     if 0:
         nsource = 1
-        rundir = os.path.join( 'run', 'finite-' + source )
+        rundir = os.path.join('run', 'finite-' + source)
         pulse = 'none'
         d = delta[-1]
         n = shape[-1]
-        t = d * np.arange( n )
+        t = d * np.arange(n)
         f = 1.0 - np.exp(-t / tau) / tau * (t + tau)
-        job = cst.sord.stage( locals() )
-        p = os.path.join( rundir, 'source' )
-        cst.source.write( f, n, d, 0.0, ihypo, source1, source2, p )
-        cst.sord.run( job )
+        job = cst.sord.stage(locals())
+        p = os.path.join(rundir, 'source')
+        cst.source.write(f, n, d, 0.0, ihypo, source1, source2, p)
+        cst.sord.run(job)
 

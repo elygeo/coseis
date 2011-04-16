@@ -10,7 +10,7 @@ import cst
 # parameters
 name = 'chino'
 cvm = 'cvmh'
-cvm = 'cvm'
+cvm = 'cvms'
 dx = 100.0;  nproc = 256
 dx = 200.0;  nproc = 32
 dx = 500.0;  nproc = 2
@@ -21,65 +21,65 @@ delta = dx, dx, -dx
 
 # moment tensor source
 eventid = 14383980
-mts = os.path.join( 'run', 'data', '%s.mts.py' % eventid )
-mts = cst.util.load( mts )
+mts = os.path.join('run', 'data', '%s.mts.py' % eventid)
+mts = cst.util.load(mts)
 
 # projection
 rotate = None
 s, d = 1000.0, 0.5 * dx
 bounds = (-80 * s + d, 48 * s - d), (-58 * s + d, 54 * s - d), (0.0, 48 * s - dx)
 origin = mts.longitude, mts.latitude, mts.depth
-projection = dict( proj='tmerc', lon_0=origin[0], lat_0=origin[1] )
-proj = pyproj.Proj( **projection )
+projection = dict(proj='tmerc', lon_0=origin[0], lat_0=origin[1])
+proj = pyproj.Proj(**projection)
 
 # path
 mesh_id = '%s-%s-%04.f' % (name, cvm, delta[0])
-path = os.path.join( 'run', 'mesh', mesh_id )
-path = os.path.realpath( path ) + os.sep
-os.makedirs( path )
+path = os.path.join('run', 'mesh', mesh_id)
+path = os.path.realpath(path) + os.sep
+os.makedirs(path)
 
 # uniform zone in PML and to deepest source depth
 npml = 10
-npml = min( npml, int( 8000.0 / delta[0] + 0.5 ) )
-ntop = int( origin[2] / abs( delta[2] ) + 2.5 )
+npml = min(npml, int(8000.0 / delta[0] + 0.5))
+ntop = int(origin[2] / abs(delta[2]) + 2.5)
 
 # dimensions
 x, y, z = bounds
 x, y, z = x[1] - x[0], y[1] - y[0], z[1] - z[0]
 shape = (
-    int( abs( x / delta[0] ) + 1.5 ),
-    int( abs( y / delta[1] ) + 1.5 ),
-    int( abs( z / delta[2] ) + 1.5 ),
+    int(abs(x / delta[0]) + 1.5),
+    int(abs(y / delta[1]) + 1.5),
+    int(abs(z / delta[2]) + 1.5),
 )
 
 # corners
 x, y, z = bounds
 x = x[0], x[1], x[1], x[0]
 y = y[0], y[0], y[1], y[1]
-x, y = proj( x, y, inverse=True )
-corners = tuple( x ), tuple( y )
+x, y = proj(x, y, inverse=True)
+corners = tuple(x), tuple(y)
 
 # box
 x, y, z = bounds
-x = np.arange( shape[0] ) * delta[0] + x[0]
-y = np.arange( shape[1] ) * delta[1] + y[0]
-y, x = np.meshgrid( y, x )
-x = np.concatenate([ x[:,0], x[-1,1:], x[-2::-1,-1], x[0,-2::-1] ])
-y = np.concatenate([ y[:,0], y[-1,1:], y[-2::-1,-1], y[0,-2::-1] ])
-x, y = proj( x, y, inverse=True )
+x = np.arange(shape[0]) * delta[0] + x[0]
+y = np.arange(shape[1]) * delta[1] + y[0]
+y, x = np.meshgrid(y, x)
+x = np.concatenate([x[:,0], x[-1,1:], x[-2::-1,-1], x[0,-2::-1]])
+y = np.concatenate([y[:,0], y[-1,1:], y[-2::-1,-1], y[0,-2::-1]])
+x, y = proj(x, y, inverse=True)
 box = x, y
 extent = (x.min(), x.max()), (y.min(), y.max())
 
 # topography
-topo, topo_extent = cst.data.topo( extent )
+topo, topo_extent = cst.data.topo(extent)
 
 # mesh
 x, y, z = bounds
-x = np.arange( shape[0] ) * delta[0] + x[0]
-y = np.arange( shape[1] ) * delta[1] + y[0]
-y, x = np.meshgrid( y, x )
-x, y = proj( x, y, inverse=True )
-z = cst.coord.interp2( topo_extent, topo, (x, y) )
+x = np.arange(shape[0]) * delta[0] + x[0]
+y = np.arange(shape[1]) * delta[1] + y[0]
+y, x = np.meshgrid(y, x)
+x, y = proj(x, y, inverse=True)
+z = cst.coord.interp2(topo_extent, topo, (x, y))
 
 # metadata
 meta = dict(
@@ -95,15 +95,15 @@ meta = dict(
     origin = origin,
     projection = projection,
     rotate = rotate,
-    dtype = np.dtype( 'f' ).str,
+    dtype = np.dtype('f').str,
 )
 
 # save data
-cst.util.save( path + 'meta.py', meta, header='# mesh parameters\n' )
-np.savetxt( path + 'box.txt', np.array( box, 'f' ).T )
-x.astype( 'f' ).T.tofile( path + 'lon.bin' )
-y.astype( 'f' ).T.tofile( path + 'lat.bin' )
-z.astype( 'f' ).T.tofile( path + 'topo.bin' )
+cst.util.save(path + 'meta.py', meta, header='# mesh parameters\n')
+np.savetxt(path + 'box.txt', np.array(box, 'f').T)
+x.astype('f').T.tofile(path + 'lon.bin')
+y.astype('f').T.tofile(path + 'lat.bin')
+z.astype('f').T.tofile(path + 'topo.bin')
 
 # python executable
 python = 'python'
@@ -113,10 +113,10 @@ if cst.site.machine == 'nics-kraken':
 if cvm == 'cvmh':
 
     # stage cvm
-    cvm_proj = pyproj.Proj( **cst.cvmh.projection )
-    x, y = cvm_proj( x, y )
-    x.astype( 'f' ).T.tofile( path + 'x.bin' )
-    y.astype( 'f' ).T.tofile( path + 'y.bin' )
+    cvm_proj = pyproj.Proj(**cst.cvmh.projection)
+    x, y = cvm_proj(x, y)
+    x.astype('f').T.tofile(path + 'x.bin')
+    y.astype('f').T.tofile(path + 'y.bin')
 
     # launch mesher
     x, y, z = shape
@@ -130,16 +130,16 @@ if cvm == 'cvmh':
         stagein = ['cvmh.py'],
         command = '%s cvmh.py' % python,
         seconds = s,
-        nproc = min( 4, nproc ),
+        nproc = min(4, nproc),
     )
 
-elif cvm == 'cvm':
+elif cvm == 'cvms':
 
     # stage cvm
-    rundir = path + 'cvm' + os.sep
+    rundir = path + 'cvms' + os.sep
     post = 'rm lon.bin lat.bin dep.bin\nmv rho.bin vp.bin vs.bin %r' % path
     n = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
-    job = cst.cvm.stage( rundir=rundir, nproc=nproc, nsample=n, post=post )
+    job = cst.cvms.stage(rundir=rundir, nproc=nproc, nsample=n, post=post)
 
     # launch mesher
     x, y, z = shape
@@ -151,9 +151,9 @@ elif cvm == 'cvm':
         stagein = ['mesh.py'],
         command = '%s mesh.py' % python,
         seconds = s,
-        nproc = min( 4, nproc ),
+        nproc = min(4, nproc),
     )
 
     # launch cvm, wait for mesher
-    cst.cvm.launch( job, depend=job0.jobid )
+    cst.cvm.launch(job, depend=job0.jobid)
 

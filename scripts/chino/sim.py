@@ -24,11 +24,11 @@ id_ = mesh_ + '-topo'
 id_ = mesh_ + '-flat'
 
 # run directory
-rundir = os.path.join( 'run', 'sim', id_ )
+rundir = os.path.join('run', 'sim', id_)
 
 # mesh metadata
-mesh_ = os.path.join( 'run', 'mesh', mesh_ ) + os.sep
-meta = cst.util.load( mesh_ + 'meta.py' )
+mesh_ = os.path.join('run', 'mesh', mesh_) + os.sep
+meta = cst.util.load(mesh_ + 'meta.py')
 dtype = meta.dtype
 delta = meta.delta
 shape = meta.shape
@@ -37,24 +37,24 @@ npml = meta.npml
 
 # translate projection to lower left origin
 x, y = meta.bounds[:2]
-proj = pyproj.Proj( **meta.projection )
-proj = cst.coord.Transform( proj, translate=(-x[0], -y[0]) )
+proj = pyproj.Proj(**meta.projection)
+proj = cst.coord.Transform(proj, translate=(-x[0], -y[0]))
 
 # dimensions
 dt_ = dx_ / 16000.0
 dt_ = dx_ / 20000.0
-nt_ = int( 90.0 / dt_ + 1.00001 )
+nt_ = int(90.0 / dt_ + 1.00001)
 delta += (dt_,)
 shape += (nt_,)
 
 # hypocenter location at x/y center
 x, y, z = hypo_
-x, y = proj( x, y )
-j = abs( x / delta[0] ) + 1.0
-k = abs( y / delta[1] ) + 1.0
-l = abs( z / delta[2] ) + 1.0
+x, y = proj(x, y)
+j = abs(x / delta[0]) + 1.0
+k = abs(y / delta[1]) + 1.0
+l = abs(z / delta[2]) + 1.0
 if register_:
-    l = int( l ) + 0.5
+    l = int(l) + 0.5
 ihypo = j, k, l
 
 # material
@@ -65,21 +65,21 @@ vdamp = 400.0
 gam2 = 0.8
 if 1:
     fieldio = [
-        ( '=r', 'rho', [], 'rho.bin' ),
-        ( '=r', 'vp',  [], 'vp.bin'  ),
-        ( '=r', 'vs',  [], 'vs.bin'  ),
+        ('=r', 'rho', [], 'rho.bin'),
+        ('=r', 'vp',  [], 'vp.bin'),
+        ('=r', 'vs',  [], 'vs.bin'),
     ]
 else:
     fieldio = [
-        ( '=',  'rho', [], 2670.0 ),
-        ( '=',  'vp',  [], 6000.0 ),
-        ( '=',  'vs',  [], 3464.0 ),
+        ('=',  'rho', [], 2670.0),
+        ('=',  'vp',  [], 6000.0),
+        ('=',  'vs',  [], 3464.0),
     ]
 
 # topography
 if 'topo' in id_:
     fieldio += [
-        ( '=r', 'x3',  [], 'z3.bin'  )
+        ('=r', 'x3',  [], 'z3.bin')
     ]
 
 # boundary conditions
@@ -87,10 +87,10 @@ bc1 = 10, 10, 0
 bc2 = 10, 10, 10
 
 # moment tensor source
-mts_ = os.path.join( 'run', 'data', '14383980.mts.py' )
+mts_ = os.path.join('run', 'data', '14383980.mts.py')
 source = 'moment'
 pulse = 'brune'
-m = cst.util.load( mts_ ).double_couple_clvd
+m = cst.util.load(mts_).double_couple_clvd
 source1 =  m['myy'],  m['mxx'],  m['mzz']
 source2 = -m['mxz'], -m['myz'],  m['mxy']
 
@@ -100,10 +100,10 @@ tau = 6e-7 * m['monent'] ** (1.0 / 3.0) # ~0.32, fcorner = 0.5Hz
 
 # sites
 stagein = 'out/', 'hold/'
-f = os.path.join( 'run', 'data', 'station-list.txt' )
-for s in open( f ).readlines():
+f = os.path.join('run', 'data', 'station-list.txt')
+for s in open(f).readlines():
     s, y, x = s.split()[:3]
-    x, y = proj( float(x), float(y) )
+    x, y = proj(float(x), float(y))
     j = x / delta[0] + 1.0
     k = y / delta[1] + 1.0
     if register_:
@@ -124,63 +124,63 @@ if 0:
     j, k, l = ihypo
     for f in 'v1', 'v2', 'v3', 'rho', 'vp', 'vs', 'gam':
         fieldio += [
-            ( '=w', f,  [j, (), (), (1,-1,10)], 'hold/xsec-ns-%s.bin' % f ),
-            ( '=w', f,  [(), k, (), (1,-1,10)], 'hold/xsec-ew-%s.bin' % f ),
+            ('=w', f,  [j, (), (), (1,-1,10)], 'hold/xsec-ns-%s.bin' % f),
+            ('=w', f,  [(), k, (), (1,-1,10)], 'hold/xsec-ew-%s.bin' % f),
         ]
 
 # surface output
 if surf_out_:
-    ns = max( 1, max( shape[:3] ) / 1024 )
+    ns = max(1, max(shape[:3]) / 1024)
     nh = 4 * ns
-    mh = max( 1, int( 0.025 / dt_ + 0.5 ) )
-    ms = max( 1, int( 0.125 / (dt_ * mh) + 0.5 ) )
+    mh = max(1, int(0.025 / dt_ + 0.5))
+    ms = max(1, int(0.125 / (dt_ * mh) + 0.5))
     fieldio += [
-        ( '=w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'hold/full-v1.bin' ),
-        ( '=w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'hold/full-v2.bin' ),
-        ( '=w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'hold/full-v3.bin' ),
-        ( '#w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'hold/snap-v1.bin' ),
-        ( '#w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'hold/snap-v2.bin' ),
-        ( '#w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'hold/snap-v3.bin' ),
-        ( '#w', 'v1',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hold/hist-v1.bin' ),
-        ( '#w', 'v2',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hold/hist-v2.bin' ),
-        ( '#w', 'v3',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hold/hist-v3.bin' ),
+        ('=w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'hold/full-v1.bin'),
+        ('=w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'hold/full-v2.bin'),
+        ('=w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'hold/full-v3.bin'),
+        ('#w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'hold/snap-v1.bin'),
+        ('#w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'hold/snap-v2.bin'),
+        ('#w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'hold/snap-v3.bin'),
+        ('#w', 'v1',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hold/hist-v1.bin'),
+        ('#w', 'v2',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hold/hist-v2.bin'),
+        ('#w', 'v3',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hold/hist-v3.bin'),
     ]
 
 # stage job
 if cst.conf.configure()[0].machine == 'usc-hpc':
     mpout = 0
-job = cst.sord.stage( locals(), post='rm z3.bin rho.bin vp.bin vs.bin' )
+job = cst.sord.stage(locals(), post='rm z3.bin rho.bin vp.bin vs.bin')
 if not job.prepare:
     sys.exit()
 
 # save metadata
 path_ = job.rundir + os.sep
-s = '\n'.join( (
-    open( mts_ ).read(),
-    open( mesh_ + 'meta.py' ).read(),
-    open( path_ + 'meta.py' ).read(),
-) )
-open( path_ + 'meta.py', 'w' ).write( s )
-os.link( mesh_ + 'box.txt', path_ + 'box.txt' )
+s = '\n'.join((
+    open(mts_).read(),
+    open(mesh_ + 'meta.py').read(),
+    open(path_ + 'meta.py').read(),
+))
+open(path_ + 'meta.py', 'w').write(s)
+os.link(mesh_ + 'box.txt', path_ + 'box.txt')
 
 # save decimated mesh
 if surf_out_:
     n = shape[:2]
     for f in 'lon.bin', 'lat.bin', 'topo.bin':
-        s = np.fromfile( mesh_ + f, dtype ).reshape( n[::-1] )
-        s[::ns,::ns].tofile( path_ + f )
+        s = np.fromfile(mesh_ + f, dtype).reshape(n[::-1])
+        s[::ns,::ns].tofile(path_ + f)
 
 # copy input files
 for f in 'z3.bin', 'rho.bin', 'vp.bin', 'vs.bin':
-    os.link( mesh_ + f, path_ + f )
+    os.link(mesh_ + f, path_ + f)
 
 # launch job
-job = cst.sord.launch( job )
+job = cst.sord.launch(job)
 
 # post-process to compute pgv, pga
 if surf_out_:
     path_ = job.rundir + os.sep
-    meta = cst.util.load( path_ + 'meta.py' )
+    meta = cst.util.load(path_ + 'meta.py')
     x, y, t = meta.shapes['full-v1.bin']
     s = x * y * t / 1000000
     cst.conf.launch(

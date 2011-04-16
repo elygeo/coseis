@@ -23,10 +23,10 @@ delta = 0.01, 0.01, 0.01, 0.000075
 delta = 0.02, 0.02, 0.02, 0.00015
 x, y, z, t = 2.8, 2.2, 2.2, 0.15
 shape = (
-    int( x / delta[0] + 1.5 ),
-    int( y / delta[1] + 1.5 ),
-    int( z / delta[2] + 1.5 ),
-    int( t / delta[3] + 1.5 ),
+    int(x / delta[0] + 1.5),
+    int(y / delta[1] + 1.5),
+    int(z / delta[2] + 1.5),
+    int(t / delta[3] + 1.5),
 )
 
 # material
@@ -100,6 +100,6 @@ fieldio += [
 ]
 
 # launch SORD code
-rundir = os.path.join( 'run', '%02.0f' % (weakzone_ * 100) )
-cst.sord.run( locals() )
+rundir = os.path.join('run', '%02.0f' % (weakzone_ * 100))
+cst.sord.run(locals())
 

@@ -32,10 +32,10 @@ def test_point():
     # material
     hourglass = 1.0, 1.0
     fieldio = [
-        ( '=', 'rho', [], 2670.0 ),
-        ( '=', 'vp',  [], 6000.0 ),
-        ( '=', 'vs',  [], 3464.0 ),
-        ( '=', 'gam', [], 0.3 ),
+        ('=', 'rho', [], 2670.0),
+        ('=', 'vp',  [], 6000.0),
+        ('=', 'vs',  [], 3464.0),
+        ('=', 'gam', [], 0.3),
     ]
 
     # output
@@ -44,12 +44,12 @@ def test_point():
 
     # single process
     rundir = 'tmp/s'
-    cst.sord.run( locals() )
+    cst.sord.run(locals())
 
     # multiple processes
-    for i, nproc3 in enumerate( [(3, 1, 1), (2, 2, 1)] ):
+    for i, nproc3 in enumerate([(3, 1, 1), (2, 2, 1)]):
         rundir = 'tmp/%s' % i
-        cst.sord.run( locals() )
+        cst.sord.run(locals())
         cmd_ = (
             'diff',
             '--brief',
@@ -62,13 +62,13 @@ def test_point():
             '--exclude=sord-mO4',
             'tmp/s', rundir,
         )
-        pid_ = subprocess.Popen( cmd_, stdout=subprocess.PIPE )
+        pid_ = subprocess.Popen(cmd_, stdout=subprocess.PIPE)
         out_ = pid_.communicate()[0]
         print out_
         assert out_ == ''
 
     # cleanup
-    shutil.rmtree( 'tmp' )
+    shutil.rmtree('tmp')
 
 # continue if command line
 if __name__ == '__main__':

@@ -16,18 +16,18 @@ dx_ = 100.0;  nproc3 = 1, 4, 60
 dx_ = 500.0;  nproc3 = 1, 1, 2
 
 # path
-rundir = os.path.join( 'run', 'sim', '%.0f' % dx_ )
+rundir = os.path.join('run', 'sim', '%.0f' % dx_)
 
 # mesh metadata
-mesh_ = os.path.join( 'run', 'mesh', '%.0f' % dx_ ) + os.sep
-meta = cst.util.load( mesh_ + 'meta.py' )
+mesh_ = os.path.join('run', 'mesh', '%.0f' % dx_) + os.sep
+meta = cst.util.load(mesh_ + 'meta.py')
 delta = meta.delta
 shape = meta.shape
 
 # dimensions
 dt_ = dx_ / 16000.0
 dt_ = dx_ / 20000.0
-nt_ = int( 50.0 / dt_ + 1.00001 )
+nt_ = int(50.0 / dt_ + 1.00001)
 delta += (dt_,)
 shape += (nt_,)
 
@@ -58,7 +58,7 @@ source1 = 0.0, 0.0, 0.0
 source2 = 0.0, 0.0, 1e18
 
 # receivers
-for i in range( 8 ):
+for i in range(8):
     j = (74000.0 - 6000.0 * i) / delta[0] + 1
     k = (16000.0 + 8000.0 * i) / delta[1] + 1
     fieldio += [
@@ -70,5 +70,5 @@ for i in range( 8 ):
 # run job
 stagein = [mesh_ + v + '.bin' for v in 'rho', 'vp', 'vs']
 post = 'rm rho.bin vp.bin vs.bin'
-job = cst.sord.run( locals() )
+job = cst.sord.run(locals())
 

@@ -61,8 +61,8 @@ fortran_flags = {
 # find pgf77 compiler
 import os
 for d in os.environ['PATH'].split(':'):
-    f = os.path.join( d, 'pgf77' )
-    if os.path.isfile( f ):
+    f = os.path.join(d, 'pgf77')
+    if os.path.isfile(f):
         f2py_flags = '--f77exec=' + f
         break
 

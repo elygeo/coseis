@@ -7,10 +7,10 @@ import numpy as np
 # email address
 try:
     import configobj
-    f = os.path.join( os.path.expanduser( '~' ), '.gitconfig' )
-    email = configobj.ConfigObj( f )['user']['email']
+    f = os.path.join(os.path.expanduser('~'), '.gitconfig')
+    email = configobj.ConfigObj(f)['user']['email']
 except:
-    email = pwd.getpwuid( os.geteuid() )[0]
+    email = pwd.getpwuid(os.geteuid())[0]
 
 # site specific
 machine = None
@@ -28,7 +28,7 @@ mode = None      # 's': serial, 'm': MPI, None: guess
 depend = False   # wait for other job to finish. supply job ID to depend.
 nproc = 1
 pre = post = ''  # pre-processing and post-processing commands
-dtype = dtype_f = np.dtype( 'f' ).str # Numpy data type
+dtype = dtype_f = np.dtype('f').str # Numpy data type
 verbose = False
 
 # machine specific
@@ -70,15 +70,15 @@ options = [
 ]
 
 # search for file in PATH
-def find( *files ):
+def find(*files):
     for d in os.environ['PATH'].split(':'):
         for f in files:
-            if os.path.isfile( os.path.join( d, f ) ):
+            if os.path.isfile(os.path.join(d, f)):
                 return f
 
 # Fortran compiler
-fortran_serial = find( 'xlf95_r', 'ifort', 'gfortran', 'pathf95', 'pgf90', 'f95' )
-fortran_mpi = find( 'mpxlf95_r', 'mpif90' )
+fortran_serial = find('xlf95_r', 'ifort', 'gfortran', 'pathf95', 'pgf90', 'f95')
+fortran_mpi = find('mpxlf95_r', 'mpif90')
 f2py_flags = ''
 
 # Fortran compiler flags
@@ -126,7 +126,7 @@ fortran_flags_default_ = {
     }
 }
 if os.uname()[0] == 'SunOS':
-    fortran_flags_default_.update( {
+    fortran_flags_default_.update({
         'f95': {
             'f': '-u',
             'g': '-C -ftrap=common -w4 -g',
@@ -135,5 +135,5 @@ if os.uname()[0] == 'SunOS':
             'O': '-fast -fns',
             '8':  'FIXME',
         }
-    } )
+    })
 

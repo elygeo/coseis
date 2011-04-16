@@ -14,14 +14,14 @@ delta = meta.delta
 npml = meta.npml
 
 # read data
-dep = np.arange( shape[2] ) * delta[2]
+dep = np.arange(shape[2]) * delta[2]
 n = shape[:2]
-x = np.fromfile( 'lat.bin', dtype ).reshape( n[::-1] ).T
-y = np.fromfile( 'lon.bin', dtype ).reshape( n[::-1] ).T
+x = np.fromfile('lat.bin', dtype).reshape(n[::-1]).T
+y = np.fromfile('lon.bin', dtype).reshape(n[::-1]).T
 
 # PML regions are extruded
 for w in x, y:
-    for i in xrange( npml, 0, -1 ):
+    for i in xrange(npml, 0, -1):
         w[i-1,:] = w[i,:]
         w[-i,:]  = w[-i-1,:]
         w[:,i-1] = w[:,i]
@@ -31,27 +31,27 @@ for w in x, y:
 dep = 0.5 * (dep[:-1] + dep[1:])
 x = 0.25 * (x[:-1,:-1] + x[1:,:-1] + x[:-1,1:] + x[1:,1:])
 y = 0.25 * (y[:-1,:-1] + y[1:,:-1] + y[:-1,1:] + y[1:,1:])
-z = np.zeros_like( x )
+z = np.zeros_like(x)
 
 # write dep file
 p = 'cvm' + os.sep
-fh = cst.util.open_excl( p + 'dep.bin', 'wb' )
+fh = cst.util.open_excl(p + 'dep.bin', 'wb')
 if fh:
-    for i in range( dep.size ):
-        (z + dep[i]).astype( 'f' ).T.tofile( fh )
+    for i in range(dep.size):
+        (z + dep[i]).astype('f').T.tofile(fh)
     fh.close()
 
 # write lon file
-fh = cst.util.open_excl( p + 'lat.bin', 'wb' )
+fh = cst.util.open_excl(p + 'lat.bin', 'wb')
 if fh:
-    for i in range( dep.size ):
-        x.T.tofile( fh )
+    for i in range(dep.size):
+        x.T.tofile(fh)
     fh.close()
 
 # write lat file
-fh = cst.util.open_excl( p + 'lon.bin', 'wb' )
+fh = cst.util.open_excl(p + 'lon.bin', 'wb')
 if fh:
-    for i in range( dep.size ):
-        y.T.tofile( fh )
+    for i in range(dep.size):
+        y.T.tofile(fh)
     fh.close()
 

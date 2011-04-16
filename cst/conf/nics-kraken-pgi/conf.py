@@ -41,7 +41,7 @@ fortran_flags = {
     'O': '-fast',
     '8': '-Mr8',
 }
-cvm_ = dict(
+cvms_ = dict(
     fortran_flags = {
         'g': '-Ktrap=fp -Mbounds -Mchkptr -g',
         'O': '-fast',

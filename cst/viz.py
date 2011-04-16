@@ -4,67 +4,67 @@ Visualization utilities
 import subprocess, cStringIO
 import numpy as np
 
-def distill_eps( fd, mode=None ):
+def distill_eps(fd, mode=None):
     """
     Distill EPS to PDF using Ghostscript.
     """
-    if type( fd ) == str:
-        fd = cStringIO.StringIO( fd )
+    if type(fd) == str:
+        fd = cStringIO.StringIO(fd)
     cmd = 'ps2pdf', '-dEPSCrop', '-dPDFSETTINGS=/prepress', '-', '-'
-    pid = subprocess.Popen( cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE )
-    fd = pid.communicate( fd.getvalue() )[0]
+    pid = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    fd = pid.communicate(fd.getvalue())[0]
     if mode != 'str':
-        fd = cStringIO.StringIO( fd )
+        fd = cStringIO.StringIO(fd)
         fd.reset()
-    return( fd )
+    return(fd)
 
-def pdf2png( path, dpi=72, mode=None ):
+def pdf2png(path, dpi=72, mode=None):
     """
     Rasterize a PDF file using Ghostscript.
     """
     cmd = 'gs', '-q', '-r%s' % dpi, '-dNOPAUSE', '-dBATCH', '-sDEVICE=pngalpha', '-sOutputFile=-', path
-    pid = subprocess.Popen( cmd, stdout=subprocess.PIPE )
+    pid = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     out = pid.communicate()[0]
     if mode != 'str':
-        out = cStringIO.StringIO( out )
+        out = cStringIO.StringIO(out)
         out.reset()
-    return( out )
+    return(out)
 
-def img2pdf( img, dpi=150, mode=None ):
+def img2pdf(img, dpi=150, mode=None):
     """
     Convert image array to PDF using PIL and ImageMagick.
     """
     import Image
     fd = cStringIO.StringIO()
-    img = Image.fromarray( img )
-    img.save( fd, format='png' )
-    cmd = 'convert', '-density', str( dpi ), 'png:-', 'pdf:-'
-    pid = subprocess.Popen( cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE )
-    fd = pid.communicate( fd.getvalue() )[0]
+    img = Image.fromarray(img)
+    img.save(fd, format='png')
+    cmd = 'convert', '-density', str(dpi), 'png:-', 'pdf:-'
+    pid = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    fd = pid.communicate(fd.getvalue())[0]
     if mode != 'str':
-        fd = cStringIO.StringIO( fd )
+        fd = cStringIO.StringIO(fd)
         fd.reset()
-    return( fd )
+    return(fd)
 
-def pdf_merge( layers ):
+def pdf_merge(layers):
     """
     Overlay multiple single page PDF file descriptors.
     """
     import pyPdf
     out = cStringIO.StringIO()
     pdf = pyPdf.PdfFileWriter()
-    page = pyPdf.PdfFileReader( layers[0] )
-    page = page.getPage( 0 )
+    page = pyPdf.PdfFileReader(layers[0])
+    page = page.getPage(0)
     for i in layers[1:]:
-        i = pyPdf.PdfFileReader( i )
-        i = i.getPage( 0 )
-        page.mergePage( i )
-    pdf.addPage( page )
-    pdf.write( out )
+        i = pyPdf.PdfFileReader(i)
+        i = i.getPage(0)
+        page.mergePage(i)
+    pdf.addPage(page)
+    pdf.write(out)
     out.reset()
-    return( out )
+    return(out)
 
-def colormap( cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True, invert=False ):
+def colormap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True, invert=False):
     """
     Color map creator.
 
@@ -78,50 +78,50 @@ def colormap( cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True, invert=Fals
         upsample: Increase the number of samples if non-linear map (colorexp != 1)
         invert: Intert the order of colors.
     """
-    if type( cmap ) is str:
+    if type(cmap) is str:
         cmap = colormap_library[cmap]
-    cmap = np.array( cmap, 'f' )
+    cmap = np.array(cmap, 'f')
     if invert:
         cmap = cmap[:,::-1]
-    cmap[1:] /= max( 1.0, cmap[1:].max() )
+    cmap[1:] /= max(1.0, cmap[1:].max())
     v, r, g, b, a = cmap
     v /= v[-1]
     if upsample and colorexp != 1.0:
         n = 16
-        x  = np.linspace( 0.0, 1.0, len(v) )
-        xi = np.linspace( 0.0, 1.0, (len(v) - 1) * n + 1 )
-        r = np.interp( xi, x, r )
-        g = np.interp( xi, x, g )
-        b = np.interp( xi, x, b )
-        a = np.interp( xi, x, a )
-        v = np.interp( xi, x, v )
-        v = np.sign( v ) * abs( v ) ** colorexp
+        x  = np.linspace(0.0, 1.0, len(v))
+        xi = np.linspace(0.0, 1.0, (len(v) - 1) * n + 1)
+        r = np.interp(xi, x, r)
+        g = np.interp(xi, x, g)
+        b = np.interp(xi, x, b)
+        a = np.interp(xi, x, a)
+        v = np.interp(xi, x, v)
+        v = np.sign(v) * abs(v) ** colorexp
     v = (v - v[0]) / (v[-1] - v[0])
     if nmod > 0:
-        if len( v ) < 6 * nmod:
-            vi = np.linspace( v[0], v[-1], 8 * nmod + 1 )
-            r = np.interp( vi, v, r )
-            g = np.interp( vi, v, g )
-            b = np.interp( vi, v, b )
-            a = np.interp( vi, v, a )
+        if len(v) < 6 * nmod:
+            vi = np.linspace(v[0], v[-1], 8 * nmod + 1)
+            r = np.interp(vi, v, r)
+            g = np.interp(vi, v, g)
+            b = np.interp(vi, v, b)
+            a = np.interp(vi, v, a)
             v = vi
-        w1 = np.cos( np.pi * 2.0 * nmod * v ) * modlim
-        w1 = 1.0 - np.maximum( w1, 0.0 )
-        w2 = 1.0 + np.minimum( w1, 0.0 )
-        r = ( 1.0 - w2 * (1.0 - w1 * r) )
-        g = ( 1.0 - w2 * (1.0 - w1 * g) )
-        b = ( 1.0 - w2 * (1.0 - w1 * b) )
-        a = ( 1.0 - w2 * (1.0 - w1 * a) )
-    return np.array( [v, r, g, b, a] )
+        w1 = np.cos(np.pi * 2.0 * nmod * v) * modlim
+        w1 = 1.0 - np.maximum(w1, 0.0)
+        w2 = 1.0 + np.minimum(w1, 0.0)
+        r = (1.0 - w2 * (1.0 - w1 * r))
+        g = (1.0 - w2 * (1.0 - w1 * g))
+        b = (1.0 - w2 * (1.0 - w1 * b))
+        a = (1.0 - w2 * (1.0 - w1 * a))
+    return np.array([v, r, g, b, a])
 
-def cpt( *args, **kwargs ):
+def cpt(*args, **kwargs):
     """
     GMT style colormap. See viz.colormap for details.
     """
-    v, r, g, b, a = colormap( *args, **kwargs )
+    v, r, g, b, a = colormap(*args, **kwargs)
     cmap = ''
     fmt = '%-10r %3.0f %3.0f %3.0f     %-10r %3.0f %3.0f %3.0f\n'
-    for i in range( len( v ) - 1 ):
+    for i in range(len(v) - 1):
         cmap += fmt % (
             v[i],   255 * r[i],   255 * g[i],   255 * b[i],
             v[i+1], 255 * r[i+1], 255 * g[i+1], 255 * b[i+1],

@@ -15,15 +15,15 @@ vs_file = 'vs.bin'
 
 # command line options: (short, long, parameter, value)
 options = [
-    ( '',  'machine=',    'machine',  '' ),
-    ( 'n', 'dry-run',     'prepare',  False ),
-    ( 'f', 'force',       'force',    True ),
-    ( 'i', 'interactive', 'run',      'exec' ),
-    ( 'd', 'debug',       'run',      'debug' ),
-    ( 'b', 'batch',       'run',      'submit' ),
-    ( 'q', 'queue',       'run',      'submit' ),
-    ( 's', 'serial',      'mode',     's' ),
-    ( 'm', 'mpi',         'mode',     'm' ),
+    ('',  'machine=',    'machine',  ''),
+    ('n', 'dry-run',     'prepare',  False),
+    ('f', 'force',       'force',    True),
+    ('i', 'interactive', 'run',      'exec'),
+    ('d', 'debug',       'run',      'debug'),
+    ('b', 'batch',       'run',      'submit'),
+    ('q', 'queue',       'run',      'submit'),
+    ('s', 'serial',      'mode',     's'),
+    ('m', 'mpi',         'mode',     'm'),
 ]
 
 # Fortran compiler flags
@@ -54,10 +54,10 @@ fortran_flags_default_ = {
     },
 }
 if os.uname()[0] == 'SunOS':
-    fortran_flags_default_.update( {
+    fortran_flags_default_.update({
         'f95': {
             'g': '-u -C -ftrap=common -w4 -g',
             'O': '-u -O2 -w1', # anything higher than -O2 breaks it
         }
-    } )
+    })
 

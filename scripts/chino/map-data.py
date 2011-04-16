@@ -12,16 +12,16 @@ import cst
 # parameters
 eventid = 14383980
 bounds = (-80000.0, 48000.0), (-58000.0, 54000.0)
-mts = os.path.join( 'run', 'data', '%s.mts.py' % eventid )
-mts = cst.util.load( mts )
+mts = os.path.join('run', 'data', '%s.mts.py' % eventid)
+mts = cst.util.load(mts)
 origin = mts.longitude, mts.latitude, mts.depth
-proj = pyproj.Proj( proj='tmerc', lon_0=origin[0], lat_0=origin[1] )
+proj = pyproj.Proj(proj='tmerc', lon_0=origin[0], lat_0=origin[1])
 
 # extent
 x, y = bounds
 x = x[0], x[1], x[1], x[0]
 y = y[0], y[0], y[1], y[1]
-x, y = np.array( proj( x, y, inverse=True ) )
+x, y = np.array(proj(x, y, inverse=True))
 extent = (x.min(), x.max()), (y.min(), y.max())
 
 # setup plot
@@ -32,49 +32,49 @@ ax = fig.add_axes()
 # source
 m = mts.double_couple_clvd
 m = m['mzz'], m['mxx'], m['myy'], m['mxz'], -m['myz'], -m['mxy']
-b = beachball.Beach( m, width=200 )
+b = beachball.Beach(m, width=200)
 p = []
 for c in b.get_paths():
     p += c.to_polygons() + [[[np.nan, np.nan]]]
 del p[-1]
-b = np.concatenate( p ) * 0.005
-f = os.path.join( 'run', 'data', 'beachball.txt' )
-np.savetxt( f, b )
+b = np.concatenate(p) * 0.005
+f = os.path.join('run', 'data', 'beachball.txt')
+np.savetxt(f, b)
 
 # topography
 ddeg = 0.5 / 60.0
-z, extent = cst.data.topo( extent )
+z, extent = cst.data.topo(extent)
 x, y = extent
 n = z.shape
-x = x[0] + ddeg * np.arange( n[0] )
-y = y[0] + ddeg * np.arange( n[1] )
-y, x = np.meshgrid( y, x )
+x = x[0] + ddeg * np.arange(n[0])
+y = y[0] + ddeg * np.arange(n[1])
+y, x = np.meshgrid(y, x)
 v = 1000,
-x, y = cst.plt.contour( x, y, z, v )[0]
-f = os.path.join( 'run', 'data', 'mountains.txt' )
-np.savetxt( f, np.array( [x, y] ).T )
+x, y = cst.plt.contour(x, y, z, v)[0]
+f = os.path.join('run', 'data', 'mountains.txt')
+np.savetxt(f, np.array([x, y]).T)
 
 # coastlines and boarders
-x, y = cst.data.mapdata( 'coastlines', 'high', extent, 10.0 )
+x, y = cst.data.mapdata('coastlines', 'high', extent, 10.0)
 x -= 360.0
-f = os.path.join( 'run', 'data', 'coastlines.txt' )
-np.savetxt( f, np.array( [x, y] ).T )
+f = os.path.join('run', 'data', 'coastlines.txt')
+np.savetxt(f, np.array([x, y]).T)
 
 # mesh
 x, y = extent
-x = x[0] + ddeg * np.arange( n[0] )
-y = y[0] + ddeg * np.arange( n[1] )
-yy, xx = np.meshgrid( y, x )
-zz = np.empty_like( xx )
-zz.fill( 1000.0 )
+x = x[0] + ddeg * np.arange(n[0])
+y = y[0] + ddeg * np.arange(n[1])
+yy, xx = np.meshgrid(y, x)
+zz = np.empty_like(xx)
+zz.fill(1000.0)
 
 # CVM basins
 for cvm, vv in [
-    ('cvmh', cst.cvmh.extract( xx, yy, zz, 'vs' )),
-    ('cvm', cst.cvm.extract( xx, yy, zz, 'vs', rundir='run/cvm' )),
+    ('cvmh', cst.cvmh.extract(xx, yy, zz, 'vs')),
+    ('cvms', cst.cvms.extract(xx, yy, zz, 'vs', rundir='run/cvms')),
 ]:
     v = 2500,
-    x, y = cst.plt.contour( xx, yy, vv, v )[0]
-    f = os.path.join( 'run', 'data', 'basins-%s.txt' % cvm )
-    np.savetxt( f, np.array( [x, y] ).T )
+    x, y = cst.plt.contour(xx, yy, vv, v)[0]
+    f = os.path.join('run', 'data', 'basins-%s.txt' % cvm)
+    np.savetxt(f, np.array([x, y]).T)
 

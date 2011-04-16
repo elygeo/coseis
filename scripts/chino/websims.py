@@ -19,21 +19,21 @@ sims = 'run/sim/chino-cvm-0200-flat'
 force = '-f' in sys.argv[1:]
 
 # loop over sims
-for path in glob.glob( sims ):
+for path in glob.glob(sims):
 
     # skip if already exists
     path += os.sep
-    if not force and os.path.exists( path + 'ws-meta.py' ):
+    if not force and os.path.exists(path + 'ws-meta.py'):
         continue
     print path
 
     # meta data
-    meta = cst.util.load( path + 'meta.py' )
+    meta = cst.util.load(path + 'meta.py')
     shape = meta.shape
     delta = meta.delta
     extent = meta.extent
     bounds = meta.bounds
-    proj = pyproj.Proj( **meta.projection )
+    proj = pyproj.Proj(**meta.projection)
 
     # snapshot and time history dimensions
     x, y, t = meta.shapes['hold/snap-v1.bin']; nsnap = x, y, t
@@ -43,7 +43,7 @@ for path in glob.glob( sims ):
 
     # adjust bounds for WebSims (should fix WebSims instead)
     x, y = bounds[:2]
-    proj = cst.coord.Transform( proj, translate=(-x[0], -y[0]) )
+    proj = cst.coord.Transform(proj, translate=(-x[0], -y[0]))
     x = 0.0, (x[1] - x[0])
     y = 0.0, (y[1] - y[0])
     bounds = x, y
@@ -51,12 +51,12 @@ for path in glob.glob( sims ):
     # WebSims configuration
     vticks = 0, 0.05, 0.1, 0.15, 0.2
     uticks = 0, 0.01, 0.02, 0.03, 0.04, 0.05
-    meta.__dict__.update( locals() )
-    wsmeta = open( template ).read()
-    open( path + 'ws-meta.py', 'w' ).write( wsmeta % meta.__dict__ )
+    meta.__dict__.update(locals())
+    wsmeta = open(template).read()
+    open(path + 'ws-meta.py', 'w').write(wsmeta % meta.__dict__)
 
     # topography
-    topo, extent = cst.data.topo( extent )
+    topo, extent = cst.data.topo(extent)
     x, y = extent
     topo_extent = (x[0] + 360.0, x[1] + 360.0), y
 
@@ -64,15 +64,15 @@ for path in glob.glob( sims ):
     x, y = topo_extent
     n = topo.shape
     ddeg = 0.5 / 60.0
-    x = x[0] + ddeg * np.arange( n[0] )
-    y = y[0] + ddeg * np.arange( n[1] )
-    y, x = np.meshgrid( y, x )
-    x, y = proj( x, y )
+    x = x[0] + ddeg * np.arange(n[0])
+    y = y[0] + ddeg * np.arange(n[1])
+    y, x = np.meshgrid(y, x)
+    x, y = proj(x, y)
     v = 1000,
-    x, y = cst.plt.contour( x, y, topo, v )[0]
-    z = np.empty_like( x )
-    z.fill( 1000.0 )
-    np.savetxt( path + 'mountains-xyz.txt', scale * np.array( [x,y,z] ).T )
+    x, y = cst.plt.contour(x, y, topo, v)[0]
+    z = np.empty_like(x)
+    z.fill(1000.0)
+    np.savetxt(path + 'mountains-xyz.txt', scale * np.array([x,y,z]).T)
 
     # hypocenter
     x, y, z = meta.ihypo
@@ -80,55 +80,55 @@ for path in glob.glob( sims ):
     y = (y - 1) * delta[1]
     z = (z - 1) * delta[2]
     f = path + 'hypocenter-xyz.txt'
-    np.savetxt( f, scale * np.array( [[x,y,z]] ) )
+    np.savetxt(f, scale * np.array([[x,y,z]]))
 
     # receivers
     xyz = set()
     for k in meta.shapes:
-        if len( meta.shapes[k] ) == 1:
-            x, y, z, t = zip( *meta.indices[k] )[0]
+        if len(meta.shapes[k]) == 1:
+            x, y, z, t = zip(*meta.indices[k])[0]
             x = (x - 1) * delta[0]
             y = (y - 1) * delta[1]
             z = (z - 1) * delta[2]
-            xyz.add( (x, y, z) )
+            xyz.add((x, y, z))
     f = path + 'receivers-xyz.txt'
-    np.savetxt( f, scale * np.array( list( xyz ) ) )
+    np.savetxt(f, scale * np.array(list(xyz)))
 
     # map data
-    f1 = open( path + 'mapdata.txt', 'w' )
-    f2 = open( path + 'mapdata-xyz.txt', 'w' )
+    f1 = open(path + 'mapdata.txt', 'w')
+    f2 = open(path + 'mapdata-xyz.txt', 'w')
     for kind in 'coastlines',:
-        x, y = cst.data.mapdata( kind, 'high', extent, 10.0 )
-        z = cst.coord.interp2( topo_extent, topo, (x, y) )
-        np.savetxt( f1, np.array( [x,y,z] ).T )
-        x, y = proj( x, y )
-        x, y, i = cst.data.clipdata( x, y, bounds )
+        x, y = cst.data.mapdata(kind, 'high', extent, 10.0)
+        z = cst.coord.interp2(topo_extent, topo, (x, y))
+        np.savetxt(f1, np.array([x,y,z]).T)
+        x, y = proj(x, y)
+        x, y, i = cst.data.clipdata(x, y, bounds)
         z = z[i]
-        np.savetxt( f2, scale * np.array( [x,y,z] ).T )
+        np.savetxt(f2, scale * np.array([x,y,z]).T)
     f1.close()
     f2.close()
 
     # surface Vs
     n = shape[1], shape[0]
-    x = np.fromfile( path + 'lon.bin', meta.dtype ).reshape( n )
-    y = np.fromfile( path + 'lat.bin', meta.dtype ).reshape( n )
-    z = np.zeros_like( x )
+    x = np.fromfile(path + 'lon.bin', meta.dtype).reshape(n)
+    y = np.fromfile(path + 'lat.bin', meta.dtype).reshape(n)
+    z = np.zeros_like(x)
     if meta.cvm == 'cvmh':
-        z = cst.cvmh.extract( x, y, z, 'vs' )
+        z = cst.cvmh.extract(x, y, z, 'vs')
     else:
-        z = cst.cvm.extract( x, y, z, 'vs', rundir='run/cvm' )
-    z.tofile( path + 'vs0.bin' )
+        z = cst.cvms.extract(x, y, z, 'vs', rundir='run/cvm')
+    z.tofile(path + 'vs0.bin')
 
     # basins
-    z.fill( 1000.0 )
+    z.fill(1000.0)
     if meta.cvm == 'cvmh':
-        z = cst.cvmh.extract( x, y, z, 'vs' )
+        z = cst.cvmh.extract(x, y, z, 'vs')
     else:
-        z = cst.cvm.extract( x, y, z, 'vs', rundir='run/cvm' )
-    x, y = proj( x, y )
+        z = cst.cvms.extract(x, y, z, 'vs', rundir='run/cvm')
+    x, y = proj(x, y)
     v = 2500,
-    x, y = cst.plt.contour( x, y, z, v )[0]
-    z = np.empty_like( x )
-    z.fill( -1000.0 )
-    np.savetxt( path + 'basins-xyz.txt', scale * np.array( [x,y,z] ).T )
+    x, y = cst.plt.contour(x, y, z, v)[0]
+    z = np.empty_like(x)
+    z.fill(-1000.0)
+    np.savetxt(path + 'basins-xyz.txt', scale * np.array([x,y,z]).T)
 

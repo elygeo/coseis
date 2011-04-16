@@ -42,5 +42,5 @@ for nproc3 in np3_:
     n = nproc3[0] * nproc3[1] * nproc3[2]
     print '\nBenchmark: %s, %s, %s, %s' % (nproc3, math.log(n,2), n / 16, n)
     rundir = 'run/%05d' % n
-    cst.sord.run( locals() )
+    cst.sord.run(locals())
 

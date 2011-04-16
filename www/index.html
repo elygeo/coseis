@@ -188,8 +188,8 @@ td {
 <li>The Support Operator Rupture Dynamics (<a class="reference external" href="sord.html">SORD</a>) code for modeling spontaneous
 rupture and 3D wave propagation.</li>
 <li>SCEC Community Velocity Models (CVM) codes, with MPI parallelization for
-<a class="reference external" href="http://www.data.scec.org/3Dvelocity/">Magistrale version</a>, and new <a class="reference external" href="http://earth.usc.edu/~gely/vs30gtl/">geotechnical layer implementation</a> for the
-<a class="reference external" href="http://structure.harvard.edu/cvm-h/">Harvard version</a>.</li>
+<a class="reference external" href="http://www.data.scec.org/3Dvelocity/">Magistrale version</a> (CVM-S), and new <a class="reference external" href="http://earth.usc.edu/~gely/vs30gtl/">geotechnical layer
+implementation</a> for the <a class="reference external" href="http://structure.harvard.edu/cvm-h/">Harvard version</a> (CVM-H).</li>
 <li><a class="reference external" href="http://scec.usc.edu/websims">WebSims</a> web application for cataloging, exploring, and disseminating large
 numerical simulations data sets.</li>
 <li>Utilities for mesh generation, coordinate projection, and visualization.</li>
@@ -206,9 +206,9 @@ are frequent and it has known bugs!</p>
 <h3>System requirements</h3>
 <ul class="simple">
 <li><a class="reference external" href="http://www.python.org/">Python</a>, and <a class="reference external" href="http://numpy.scipy.org/">NumPy</a> (Numerical Python).</li>
-<li>(+) Fortran 95 compiler.  Required only for SORD and CVM modules.</li>
+<li>(+) Fortran 95 compiler.  Required only for SORD and CVM-S modules.</li>
 <li>(+) Message Passing Interface (MPI) library.  Required only for
-multiprocessing with SORD and CVM.</li>
+multiprocessing with SORD and CVM-S.</li>
 <li>(+) <a class="reference external" href="http://matplotlib.sourceforge.net/">Matplotlib</a>, <a class="reference external" href="http://www.scipy.org/">SciPy</a>, and Pyproj Python packages.  Required only for
 supplemental plotting, signal processing, and mesh generation utilities.</li>
 <li>(+) <a class="reference external" href="http://git-scm.com/">Git</a> version control system.  Useful for development and staying updated
@@ -303,7 +303,7 @@ python setup.py --machine=tacc-ranger build path
 <h3>Examples</h3>
 <div class="section" id="cvm-depth-planes">
 <h4>CVM depth planes</h4>
-<img alt="../scripts/cvm/cvm-vs500.png" src="../scripts/cvm/cvm-vs500.png" />
+<img alt="../scripts/cvm/cvms-vs500.png" src="../scripts/cvm/cvms-vs500.png" />
 <img alt="../scripts/cvm/cvmh-vs500.png" src="../scripts/cvm/cvmh-vs500.png" />
 <p>Extract S-wave velocity at 500 meters depth. Plot using Matplotlib</p>
 <pre class="literal-block">
@@ -313,9 +313,9 @@ python plane.py
 <p>Source code:
 <a class="reference external" href="../scripts/cvm/plane.py">plane.py</a></p>
 </div>
-<div class="section" id="cvm-fence-diagram">
-<h4>CVM fence diagram</h4>
-<img alt="../scripts/cvm/cvm-vp-fence.png" src="../scripts/cvm/cvm-vp-fence.png" />
+<div class="section" id="cvm-s-fence-diagram">
+<h4>CVM-S fence diagram</h4>
+<img alt="../scripts/cvm/cvms-vp-fence.png" src="../scripts/cvm/cvms-vp-fence.png" />
 <p>Build a fence diagram similar to Magistrale (2000) figure 10. Plot using
 Mayavi:</p>
 <pre class="literal-block">
@@ -325,8 +325,8 @@ python fence.py
 <p>Source code:
 <a class="reference external" href="../scripts/cvm/fence.py">fence.py</a></p>
 </div>
-<div class="section" id="cvm-basin-depth">
-<h4>CVM Basin depth</h4>
+<div class="section" id="cvm-s-basin-depth">
+<h4>CVM-S Basin depth</h4>
 <img alt="../scripts/basindepth/cvm-z25.png" src="../scripts/basindepth/cvm-z25.png" />
 <p>Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s.
 Plot over topography using Mayavi:</p>

@@ -15,36 +15,36 @@ stations = [
 ]
 
 # data directory
-path = os.path.join( 'run', 'data' )
-if not os.path.exists( path ):
-    os.makedirs( path )
+path = os.path.join('run', 'data')
+if not os.path.exists(path):
+    os.makedirs(path)
 
 # moment tensor
-f = os.path.join( path, '%s.mts.py' )
-mts = cst.scedc.mts( event_id, f )
+f = os.path.join(path, '%s.mts.py')
+mts = cst.scedc.mts(event_id, f)
 m = mts['double_couple_clvd']
 source1 =  m['myy'],  m['mxx'],  m['mzz']
 source2 = -m['mxz'], -m['myz'],  m['mxy']
 
 # open STP connection
-stp = cst.scedc.stp( 'scedc' )
+stp = cst.scedc.stp('scedc')
 
 # stations coordinates
-date = mts['origin_time'].split( 'T' )[0].replace('-', '/')
-loc = stp( 'sta -l -net ci -chan hn_ %s' % date )
-loc = loc[0].split( '\n' )[1:-1]
+date = mts['origin_time'].split('T')[0].replace('-', '/')
+loc = stp('sta -l -net ci -chan hn_ %s' % date)
+loc = loc[0].split('\n')[1:-1]
 locations = []
 for sta in loc:
-    s = sta.split()[0].split( '.' )[1]
+    s = sta.split()[0].split('.')[1]
     if s in stations:
         locations += [sta]
-f = os.path.join( path, 'station-list.txt' )
-open( f, 'w' ).writelines( s + '\n' for s in locations )
+f = os.path.join(path, 'station-list.txt')
+open(f, 'w').writelines(s + '\n' for s in locations)
 
 # download waveforms
-stp( ['sac', 'gain on'] )
+stp(['sac', 'gain on'])
 for sta in stations:
-    stp( 'trig -net ci -chan _n_ -sta %s %s' % (sta, event_id), path )
+    stp('trig -net ci -chan _n_ -sta %s %s' % (sta, event_id), path)
 
 # close STP connection
 stp.close()

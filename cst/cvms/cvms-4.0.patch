@@ -29,7 +29,7 @@ index 0000000..d2ddc6f
 +      integer :: kerr, nio, i
 +      character(160) :: lon_file, lat_file, dep_file
 +      write( 0, '(a)' ) 'SCEC Community Velocity Model'
-+      open( 1, file='cvm-input', status='old' )
++      open( 1, file='cvms-input', status='old' )
 +      read( 1, * ) nn
 +      read( 1, * ) lon_file
 +      read( 1, * ) lat_file
@@ -71,7 +71,7 @@ index 0000000..d2ddc6f
 +      integer :: kerr, nio, i
 +      character(160) :: rho_file, alpha_file, beta_file
 +      inquire( iolength=nio ) rho(1:nn)
-+      open( 1, file='cvm-input', status='old' )
++      open( 1, file='cvms-input', status='old' )
 +      read( 1, * ) rho_file
 +      read( 1, * ) rho_file
 +      read( 1, * ) rho_file
@@ -117,7 +117,7 @@ index 0000000..e1bf9a7
 +      integer :: kerr, ip, np, ifh, ierr, i
 +      character(160) :: lon_file, lat_file, dep_file
 +      call mpi_init( ierr )
-+      open( 1, file='cvm-input', status='old' )
++      open( 1, file='cvms-input', status='old' )
 +      read( 1, * ) nn8
 +      read( 1, * ) lon_file
 +      read( 1, * ) lat_file
@@ -175,7 +175,7 @@ index 0000000..e1bf9a7
 +      integer(kind=mpi_offset_kind) :: offset
 +      integer :: kerr, ip, ifh, ierr, i
 +      character(160) :: rho_file, alpha_file, beta_file
-+      open( 1, file='cvm-input', status='old' )
++      open( 1, file='cvms-input', status='old' )
 +      read( 1, * ) rho_file
 +      read( 1, * ) rho_file
 +      read( 1, * ) rho_file

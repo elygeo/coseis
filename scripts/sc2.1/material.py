@@ -21,16 +21,16 @@ extent = (33.7275238, 34.44875336), (-118.90798187, -118.04201508)
 x, y, z = bounds
 x, y, z = x[1] - x[0], y[1] - y[0], z[1] - z[0]
 shape = (
-    int( abs( x / delta[0] ) + 1.5 ),
-    int( abs( y / delta[1] ) + 1.5 ),
-    int( abs( z / delta[2] ) + 1.5 ),
+    int(abs(x / delta[0]) + 1.5),
+    int(abs(y / delta[1]) + 1.5),
+    int(abs(z / delta[2]) + 1.5),
 )
 
 # mesh
 x, y = extent
-x = np.linspace( x[0], x[1], shape[0] )
-y = np.linspace( y[0], y[1], shape[1] )
-y, x = np.meshgrid( y, x )
+x = np.linspace(x[0], x[1], shape[0])
+y = np.linspace(y[0], y[1], shape[1])
+y, x = np.meshgrid(y, x)
 
 # metadata
 meta = dict(
@@ -39,29 +39,29 @@ meta = dict(
     bounds = bounds,
     extent = extent,
     npml = 10,
-    dtype = np.dtype( 'f' ).str,
+    dtype = np.dtype('f').str,
 )
 
 # path
-path = os.path.join( 'run', 'mesh', '%.0f' % dx )
-path = os.path.realpath( path ) + os.sep
-os.makedirs( path )
+path = os.path.join('run', 'mesh', '%.0f' % dx)
+path = os.path.realpath(path) + os.sep
+os.makedirs(path)
 
 # save data
-cst.util.save( path + 'meta.py', meta )
-x.astype( 'f' ).T.tofile( path + 'lat.bin' )
-y.astype( 'f' ).T.tofile( path + 'lon.bin' )
+cst.util.save(path + 'meta.py', meta)
+x.astype('f').T.tofile(path + 'lat.bin')
+y.astype('f').T.tofile(path + 'lon.bin')
 
 # python executable
 python = 'python'
 if cst.site.machine == 'nics-kraken':
     python = '/lustre/scratch/gely/local/bin/python'
 
-# stage cvm
-rundir = os.path.join( path, 'cvm' )
+# stage cvms
+rundir = os.path.join(path, 'cvms')
 post = 'rm lon.bin lat.bin dep.bin\nmv rho.bin vp.bin vs.bin %r' % path
 n = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
-job = cst.cvm.stage(
+job = cst.cvms.stage(
     rundir = rundir,
     nproc = nproc,
     nsample = n,
@@ -79,9 +79,9 @@ job0 = cst.conf.launch(
     stagein = ['mesh.py'],
     command = '%s mesh.py' % python,
     seconds = s,
-    nproc = min( 3, nproc ),
+    nproc = min(3, nproc),
 )
 
-# launch cvm, wait for mesher
-cst.cvm.launch( job, depend=job0.jobid )
+# launch cvms, wait for mesher
+cst.cvms.launch(job, depend=job0.jobid)
 

@@ -105,8 +105,8 @@ The Python language gives a powerful way to construct SORD input.  For example,
 it may be desirable to specify the total simulation time, and divide by ``dt``
 to determine the number of time steps::
 
-    T = 100.0            # total time temporary variable
-    nt = int( T / dt )   # number of time steps
+    T = 100.0          # total time temporary variable
+    nt = int(T / dt)   # number of time steps
 
 The ``T`` variable is not a valid SORD parameter; it is only used for temporary
 storage.  Variables with single single character names or names ending with an
@@ -357,13 +357,13 @@ ground-motions at selected sites::
     ihypo = 2000, 2000, 100                    # hypocenter indices
     i = (2000,4000), 2000, (1,160), (1,-1, 10) # fault output 4d region
     fieldio = [
-        ( '=w', 'sv1', i, 'slip-velocity-x' ),
-        ( '=w', 'sv2', i, 'slip-velocity-y' ),
-        ( '=w', 'sv3', i, 'slip-velocity-z' ),
-        ( '=w', 'v3', [2000, 1000, -1, ()], 'vz-station-1' ),
-        ( '=w', 'v3', [2000, 1500, -1, ()], 'vz-station-2' ),
-        ( '=w', 'v3', [2000, 2500, -1, ()], 'vz-station-3' ),
-        ( '=w', 'v3', [2000, 3000, -1, ()], 'vz-station-4' ),
+        ('=w', 'sv1', i, 'slip-velocity-x'),
+        ('=w', 'sv2', i, 'slip-velocity-y'),
+        ('=w', 'sv3', i, 'slip-velocity-z'),
+        ('=w', 'v3', [2000, 1000, -1, ()], 'vz-station-1'),
+        ('=w', 'v3', [2000, 1500, -1, ()], 'vz-station-2'),
+        ('=w', 'v3', [2000, 2500, -1, ()], 'vz-station-3'),
+        ('=w', 'v3', [2000, 3000, -1, ()], 'vz-station-4'),
     ]
 
 Here the problem has been partitioned (using nproc3) such that the entire fault
@@ -474,7 +474,4 @@ processors using ``debug = 2`` to give more accurate relative timing values.
 
 Additionally, SORD can be run with compiler generated code profiling using the
 ``-p`` or ``--profiling`` option.
-
-
-.. vim: filetype=rst
 

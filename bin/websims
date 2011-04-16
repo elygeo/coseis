@@ -4,7 +4,7 @@ Start WebSims server.
 """
 import sys, getopt
 import cst.websims
-opts = dict( getopt.getopt( sys.argv[1:], 'k' )[0] )
+opts = dict(getopt.getopt(sys.argv[1:], 'k')[0])
 
 if '-k' in opts:
     cst.websims.stop()

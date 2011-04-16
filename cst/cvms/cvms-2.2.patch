@@ -29,7 +29,7 @@ index 0000000..d2ddc6f
 +      integer :: kerr, nio, i
 +      character(160) :: lon_file, lat_file, dep_file
 +      write( 0, '(a)' ) 'SCEC Community Velocity Model'
-+      open( 1, file='cvm-input', status='old' )
++      open( 1, file='cvms-input', status='old' )
 +      read( 1, * ) nn
 +      read( 1, * ) lon_file
 +      read( 1, * ) lat_file
@@ -71,7 +71,7 @@ index 0000000..d2ddc6f
 +      integer :: kerr, nio, i
 +      character(160) :: rho_file, alpha_file, beta_file
 +      inquire( iolength=nio ) rho(1:nn)
-+      open( 1, file='cvm-input', status='old' )
++      open( 1, file='cvms-input', status='old' )
 +      read( 1, * ) rho_file
 +      read( 1, * ) rho_file
 +      read( 1, * ) rho_file
@@ -117,7 +117,7 @@ index 0000000..e1bf9a7
 +      integer :: kerr, ip, np, ifh, ierr, i
 +      character(160) :: lon_file, lat_file, dep_file
 +      call mpi_init( ierr )
-+      open( 1, file='cvm-input', status='old' )
++      open( 1, file='cvms-input', status='old' )
 +      read( 1, * ) nn8
 +      read( 1, * ) lon_file
 +      read( 1, * ) lat_file
@@ -175,7 +175,7 @@ index 0000000..e1bf9a7
 +      integer(kind=mpi_offset_kind) :: offset
 +      integer :: kerr, ip, ifh, ierr, i
 +      character(160) :: rho_file, alpha_file, beta_file
-+      open( 1, file='cvm-input', status='old' )
++      open( 1, file='cvms-input', status='old' )
 +      read( 1, * ) rho_file
 +      read( 1, * ) rho_file
 +      read( 1, * ) rho_file
@@ -268,19 +268,19 @@ index 3fbaa93..f098902 100644
           data (aedname(i),i=1,numsur)/'b1__','b2__','b3__','b4__',
       1    'b5__','ku1_','ku2_',
       2    'ku3_','ku4_','ku5_','ku8_','pu1_','pu2A','pu2B','pu3_',
-diff --git a/version3.0.f b/version3.0.f
-index 2b9e506..34826ea 100644
---- a/version3.0.f
-+++ b/version3.0.f
-@@ -22,6 +22,7 @@ c scum v2i     8-00   new tomo interpolator, vent glitch fixes HM
- c scum v2j     0-00   various glitch fixes
- c
- c version 3.0  8-01   install upper mantle tomography
-+c Bug fixes and modifications for binary and MPI I/O. Ely 2007/9/1
+diff --git a/version2.2.f b/version2.2.f
+index 0e004f6..5c3bb27 100644
+--- a/version2.2.f
++++ b/version2.2.f
+@@ -19,6 +19,7 @@ c scum v2e     4-00   added variable Moho. HM.
+ c scum v2f,g   6-00   modified geotech stuff. HM
+ c scum v2h     6-00   modified geotech , separate P and S. HM
+ c scum v2i     8-00   new tomo interpolator, vent glitch fixes HM
++c Bug fixes and modifications for binary and MPI I/O. Ely 2010/11/23
  c                   
  c
           include 'in.h'
-@@ -36,6 +37,37 @@ c
+@@ -33,6 +34,36 @@ c
           include 'surfaced.h'
           include 'genpro.h'
           include 'genprod.h'
@@ -313,13 +313,12 @@ index 2b9e506..34826ea 100644
 +      rtemp68 = 0.0
 +      rtemp69 = 0.0
 +      rtemp70 = 0.0
-+      rtemp73 = 0.0
 +
  c some constants
           rd2rad=3.141593/180.
-          rckval=5000000.
-@@ -538,7 +570,7 @@ c check for LAB and SMM and SAN BERDO ---99 is a flag---
- c diag      write(*,*)l0,iup,idn
+          rckval=500000.
+@@ -511,7 +542,7 @@ c check for LAB and SMM and SAN BERDO ---99 is a flag---
+ c--diag-----write(*,*)l0,iup,idn
              go to 1177
              endif
 -1188       iup=idn
@@ -327,7 +326,7 @@ index 2b9e506..34826ea 100644
             iupm=idnm
             ishal=idn
             goto 1177
-@@ -879,7 +911,7 @@ c------------- write out points and values---------------
+@@ -848,7 +879,7 @@ c------------- write out points and values---------------
  c-----reads strat surface edges---------------
  c---reads x-y pairs--------------------------
           include 'surface.h'
@@ -336,7 +335,7 @@ index 2b9e506..34826ea 100644
           include 'names.h'
           asuf2='_edge'
           kerr=0
-@@ -902,7 +934,7 @@ c-------------------------------
+@@ -871,7 +902,7 @@ c-------------------------------
  c-----read model edge file, kept separate from surface edge-----
  c-------to simplify index counts--------------------------------
            include 'surface.h'
@@ -345,7 +344,7 @@ index 2b9e506..34826ea 100644
            kerr=0
  c---file name assignment-------
            aname3='bmod_edge'
-@@ -921,13 +953,13 @@ c        read(18,*)i3   !i3 now set at top
+@@ -890,13 +921,13 @@ c        read(18,*)i3   !i3 now set at top
           subroutine readgeo(k2err)
  c reads geologic contours
           include 'sgeo.h'
@@ -361,36 +360,34 @@ index 2b9e506..34826ea 100644
             do 300 k=1,ngeo
             read(12,*)np(k)
              do 310 k1=1,np(k)
-@@ -992,8 +1024,8 @@ c
+@@ -963,7 +994,7 @@ c
  c---reads stratigraphic surfaces-------------------------
  c---reads spyglass ascii output--------------------------
           include 'surface.h'
 -         character*8 aname, asuf*4
--         character*9 aname2, a18*1
 +         character(8) aname, asuf*4
-+         character(9) aname2, a18*1
           include 'names.h'
           asuf='_sur'
-          a18='2'
-@@ -1032,7 +1064,7 @@ cc---For SGV (i=72,73,74) convert depth thousands of feet to feet---
+          kerr=0
+@@ -1004,7 +1035,7 @@ c---For SGV (i=72,73,74) convert depth thousands of feet to feet---
  c-reads uplift file for LAB--------------------
  c-----just like readsur-------------
          include 'labup.h'
--        character*9 filei4
-+        character(9) filei4
+-        character*8 filei4
++        character(8) filei4
  c file name assignment
-         filei4='laup_sur2'
+         filei4='laup_sur'
  c
-@@ -1040,6 +1072,8 @@ c
- c
+@@ -1013,6 +1044,8 @@ c
           do 400 i=1,nlaup 
+           read(16,*) rlaup(i),(rzupl(i,j),j=1,nloup) 
            do 440 j=1,nloup
-+           rlaup(i) = 0.0
-+           rloup(i) = 0.0
- c temp turned off for historical reason
- c          read(16,11440) rlaup(i),rloup(j),rzupl(i,j) 
- c11440     format(f9.5,1x,f10.5,1x,f10.2)
-@@ -1057,7 +1091,7 @@ c convert thousands of feet to feet---------------
++c rloup is not set anywhere, at least initialize it to zero
++          rloup(j) = 0.0
+ c convert thousands of feet to feet---------------
+           rzupl(i,j)=rzupl(i,j)*1000. 
+ 440       continue 
+@@ -1027,7 +1060,7 @@ c convert thousands of feet to feet---------------
  c--gets uplift for LAB---------------
  c find uplift amount at current lat long
          include 'labup.h'
@@ -399,7 +396,7 @@ index 2b9e506..34826ea 100644
             if(rlatl0.le.rlaup(l7).and.rlatl0.gt.rlaup(l7+1))then
              do 828 l8=1,nloup-1 
              if(rlonl0.gt.rloup(l8).and.rlonl0.le.rloup(l8+1))then
-@@ -1161,46 +1195,12 @@ c
+@@ -1131,45 +1164,11 @@ c
           return
           end
  
@@ -442,29 +439,22 @@ index 2b9e506..34826ea 100644
           include 'in.h'
           include 'ivsurface.h'
 -         character*8 aname4, asuf4*6,asrnam(numsiv)*2
--         character*9 aname42, a418*1
 +         character(8) aname4, asuf4*6,asrnam(numsiv)*2
-+         character(9) aname42, a418*1
           data (asrnam(i),i=1,numsiv)/'25','55','60','65',
       1    '70','Mo'/
           asuf4='.ascii'
-@@ -1286,6 +1286,10 @@ c note betm returned is temporary dummy valus unless it is from mantle
+@@ -1253,6 +1252,7 @@ c--Calculates the Imperial Valley model velocities--
           include 'ivsurfaced.h'
           include 'generic_loc.h'
  c---see if in constrained or generic Imperial Valley
 +         rd2rad = 3.141593 / 180.0
-+         do i = 1, numsiv
-+           rsuqiv(i) = 0.0
-+         end do
           xref=rmoivx(ivi3)
           yref=rmoivy(ivi3)
           reflat=yref*rd2rad
-@@ -1386,9 +1390,16 @@ c -- define the regional tomo velocities -----------------------
+@@ -1352,9 +1352,14 @@ c -- define the regional tomo velocities -----------------------
           include 'regional.h'
           include 'regionald.h'
           dimension vervep(4),verves(4)
-+         alp = 0.0
-+         bet = 0.0
 +         rscal = 0.0
 +         iinum = 0
           rd2rad=3.141593/180.
@@ -476,7 +466,7 @@ index 2b9e506..34826ea 100644
           rckbox=mod(n,ninrow)
  c -- avoid trying to make box off row ends
           if(rckbox.eq.0.)go to 1927
-@@ -1411,9 +1422,6 @@ c -- prepare for inside
+@@ -1377,9 +1382,6 @@ c -- prepare for inside
            x22(i) = (rboxlo(i) - xref)*111.1*cos(reflat)
  8179     continue
  c -- see if inside this box
@@ -486,12 +476,12 @@ index 2b9e506..34826ea 100644
            yp=(rla-yref)*111.1
            xp=(rlo-xref)*111.1*cos(reflat)
            call inside(xp,yp,x22,y22,nbox,ins)
-@@ -1563,15 +1571,15 @@ c Do the interpolation
+@@ -1533,15 +1535,15 @@ c Do the interpolation
        return
        end
  
 -         subroutine readbore(kerr) 
-+         subroutine readbore(k2err) 
++         subroutine readbore(k2err)
  c--read geotech borehole data-------------- 
           include 'borehole.h'
 -         character*9 fileib
@@ -505,7 +495,7 @@ index 2b9e506..34826ea 100644
           iprono=0
           ibhct=0
           ieach=0
-@@ -1602,15 +1610,15 @@ c read file
+@@ -1572,15 +1574,15 @@ c read file
  2915      return
             end
  
@@ -524,15 +514,7 @@ index 2b9e506..34826ea 100644
           do 2300 k=1,numgen
            read(12,*)irt2
            numptge2(k)=irt2
-@@ -1685,6 +1693,7 @@ c--looks up soil type---------------------------
-         dimension inindex(inct)
-         dimension rdelz(nx,ny)
-         rdmi2=40.
-+        iteisb = 0
- c
-         icolnm=abs(int((rlonmax-rlonl0)/rdelx))
-         irownm=int((rlatmax-rlatl0)/rdely)
-@@ -1799,12 +1808,13 @@ c chino - berdo need to split this!
+@@ -1749,11 +1751,12 @@ c chino - berdo need to split this!
           return
          end
  
@@ -543,12 +525,11 @@ index 2b9e506..34826ea 100644
          include 'soil1.h'
 -        character*50 filesb
 +        character(50) filesb
- c here's input file name-----------------------------------
 +        k2err = 0
-         filesb='soil.pgm'
+ c here's input file name-----------------------------------
+         filesb='soil2.pgm'
          open(16,file=filesb,status='old',err=5977)
-         read(16,*)rlonmax,rlonmin,rlatmax,rlatmin
-@@ -1836,12 +1846,17 @@ c iradcts=number of nearby boreholes with data
+@@ -1786,12 +1789,17 @@ c iradcts=number of nearby boreholes with data
           include 'genpro.h'
           include 'wtbh1.h'
           include 'wtbh2.h'
@@ -566,7 +547,7 @@ index 2b9e506..34826ea 100644
  7013     continue
  c--check ifs flag--
           if(ifs.eq.0)then
-@@ -1965,9 +1980,12 @@ c iradctp=number of nearby boreholes with data
+@@ -1915,9 +1923,12 @@ c iradctp=number of nearby boreholes with data
           include 'wtbh1.h'
           include 'wtbh3.h'
           rtvelges=0.
@@ -579,8 +560,12 @@ index 2b9e506..34826ea 100644
  97013     continue
            do 97011 l=2,nrad
             do 97012 i=1,iradct(l)
-@@ -2046,7 +2064,8 @@ c remember a better number to interpolate from rather than hard generic
-         subroutine readmoho(k2err)
+@@ -1993,10 +2004,11 @@ c remember a better number to interpolate from rather than hard generic
+          return
+          end
+ 
+-        subroutine readmoho(kerr)
++        subroutine readmoho(k2err)
  c--reads the moho surface file--------------------------
          include 'moho1.h'
 -        character*50 filemo
@@ -589,32 +574,3 @@ index 2b9e506..34826ea 100644
  c here's input file name-----------------------------------
          filemo='moho_sur'
          open(16,file=filemo,status='old',err=3233)
-@@ -2089,7 +2108,7 @@ c -- read upper mantle model info---------------------------
- c Using Monica Kohler's so cal model at xx km horizontal
- c  spacing, 10 km vertical spacing
-          include 'mantle.h'
--         character*1 atra
-+         character(1) atra
-          kerr=0
-          open(29,file='3D.out',status='old',err=2998)
-          do 1129 j=1,nmanll
-@@ -2128,6 +2147,9 @@ c -- define the upper mantle velocities -----------------------
-          rd2rad=3.141593/180.
- c -- find which box point is in--
-          do 1227 n=1,nmanll-mancol
-+          do 8182 j=1,4
-+          nearm(j)=0
-+8182      continue
-          rmkbox=mod(n,mancol)
- c -- avoid trying to make box off column ends
-          if(rmkbox.eq.0.)go to 1227
-@@ -2150,9 +2172,6 @@ c -- prepare for inside
-           xm2(i) = (rmoxlo(i) - xrem)*111.1*cos(remlat)
- 8129     continue
- c -- see if inside this box
--          do 8182 j=1,4
--          nearm(j)=0
--8182      continue
-           ypm=(rla-yrem)*111.1
-           xpm=(rlo-xrem)*111.1*cos(remlat)
-           call inside(xpm,ypm,xm2,ym2,mbox,ins)
