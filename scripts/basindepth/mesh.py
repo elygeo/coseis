@@ -30,35 +30,34 @@ meta = dict(
     dtype = np.dtype('f').str,
 )
 
-# continue if run from the command line
-if __name__ == '__main__':
+# save data
+path = os.path.join('run', 'mesh') + os.sep
+if not os.path.exists(path):
+    os.mkdir(path)
+cst.util.save(path + 'meta.py', meta)
+x.tofile(path + 'lon.bin')
+y.tofile(path + 'lat.bin')
 
-    # save data
-    path = 'data' + os.sep
-    cst.util.save(path + 'meta.py', meta)
-    x.tofile(path + 'lon.bin')
-    y.tofile(path + 'lat.bin')
+# CVM-S setup
+path = os.path.join('run', 'cvms') + os.sep
+print 'shape = %s' % (shape,)
+n = shape[0] * shape[1] * shape[2]
+job = cst.cvms.stage(nsample=n, nproc=nproc, rundir=path)
 
-    # CVM-S setup
-    print 'shape = %s' % (shape,)
-    n = shape[0] * shape[1] * shape[2]
-    job = cst.cvms.stage(nsample=n, nproc=nproc)
-    path = job.rundir + os.sep
+# write CVM-S input files
+f1 = open(path + 'lon.bin', 'wb')
+f2 = open(path + 'lat.bin', 'wb')
+f3 = open(path + 'dep.bin', 'wb')
+for i in range(z.size):
+    x.tofile(f1)
+    y.tofile(f2)
+for i in range(z.size):
+    x.fill(z[i])
+    x.tofile(f3)
+f1.close()
+f2.close()
+f3.close()
 
-    # write CVM-S input files
-    f1 = open(path + 'lon.bin', 'wb')
-    f2 = open(path + 'lat.bin', 'wb')
-    f3 = open(path + 'dep.bin', 'wb')
-    for i in range(z.size):
-        x.tofile(f1)
-        y.tofile(f2)
-    for i in range(z.size):
-        x.fill(z[i])
-        x.tofile(f3)
-    f1.close()
-    f2.close()
-    f3.close()
-
-    # launch
-    cst.cvms.launch(job)
+# launch
+cst.cvms.launch(job)
 

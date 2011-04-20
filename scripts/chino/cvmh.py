@@ -55,7 +55,7 @@ w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 # rho extraction
 fh = cst.util.open_excl('rho.bin', 'wb')
 if fh:
-    vm = cst.cvmh.Extraction(x, y, 'vp', interpolation='nearest')
+    vm = cst.cvmh.Extraction(x, y, 'vp')
     for i in range(dep.size):
         zz = w[i] * z - dep[i]
         cst.cvmh.nafe_drake(vm(zz)).T.tofile(fh)
@@ -64,7 +64,7 @@ if fh:
 # vp extraction
 fh = cst.util.open_excl('vp.bin', 'wb')
 if fh:
-    vm = cst.cvmh.Extraction(x, y, 'vp', interpolation='nearest')
+    vm = cst.cvmh.Extraction(x, y, 'vp')
     for i in range(dep.size):
         zz = w[i] * z - dep[i]
         vm(zz).T.tofile(fh)
@@ -73,7 +73,7 @@ if fh:
 # vs extraction
 fh = cst.util.open_excl('vs.bin', 'wb')
 if fh:
-    vm = cst.cvmh.Extraction(x, y, 'vs', interpolation='nearest')
+    vm = cst.cvmh.Extraction(x, y, 'vs')
     for i in range(dep.size):
         zz = w[i] * z - dep[i]
         vm(zz).T.tofile(fh)

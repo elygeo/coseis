@@ -27,7 +27,7 @@ cd "${prefix}"
 [ -e "${tag}.sh" ] || curl -O "${url}"
 bash "${tag}.sh"
 ln -s "${tag}" python
-export PATH="${prefix}/python/bin:${PATH}"
+export PATH="${prefix}/${tag}/bin:${PATH}"
 
 fi
 

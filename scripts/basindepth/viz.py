@@ -15,7 +15,7 @@ format = 'pdf'; dpi = 300.0
 draft = False
 draft = True
 field = 'z25'
-path = 'data' + os.sep
+path = os.path.join('run', 'mesh') + os.sep
 proj = pyproj.Proj(proj='tmerc', lon_0=-117.25, lat_0=33.75, k=0.001)
 title = 'SCEC Community\nVelocity Model'
 legend = 'Depth to Vs = 2.5 km/s'

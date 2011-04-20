@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cst
 
-path = 'data' + os.sep
+path = os.path.join('run', 'mesh') + os.sep
 meta = cst.util.load(path + 'meta.py')
 shape = meta.shape
 extent = meta.extent
