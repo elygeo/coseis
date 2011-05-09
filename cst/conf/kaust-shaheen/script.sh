@@ -18,7 +18,7 @@ set > env
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
-mpirun -mode VN -np %(nproc) -cwd $PWD -exe %(command)s
+mpirun -mode VN -np %(nproc)s -cwd $PWD -exe %(command)s
 %(post)s
 echo "$( date ): %(name)s finished" >> log
 

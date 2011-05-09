@@ -2,6 +2,7 @@
 """
 Print binary file statistics. Default data type is 4 byte floating point.
 """
+from __future__ import division, absolute_import, print_function, unicode_literals
 import os, sys
 import numpy as np
 
@@ -22,7 +23,7 @@ for filename in args:
     n = os.path.getsize(filename)
     if n == 0 or n % nb != 0:
         continue
-    n /= nb
+    n //= nb
     fh = open(filename, 'rb')
     rmin =  np.inf
     rmax = -np.inf

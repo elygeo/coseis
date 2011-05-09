@@ -2,6 +2,7 @@
 """
 Byte swapping
 """
+from __future__ import division, absolute_import, print_function, unicode_literals
 import os, sys
 import numpy as np
 

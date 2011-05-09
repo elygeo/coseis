@@ -12,8 +12,8 @@ dx_ = 100.0;  nproc3 = 1, 4, 240
 dx_ = 200.0;  nproc3 = 1, 1, 120
 dx_ = 500.0;  nproc3 = 1, 1, 2
 dx_ = 1000.0; nproc3 = 1, 1, 2
-dx_ = 4000.0; nproc3 = 1, 1, 1
 dx_ = 50.0;   nproc3 = 1, 32, 480
+dx_ = 4000.0; nproc3 = 1, 1, 1
 
 # mesh type
 surf_out_ = False
@@ -90,13 +90,19 @@ bc2 = 10, 10, 10
 mts_ = os.path.join('run', 'data', '14383980.mts.py')
 source = 'moment'
 pulse = 'brune'
-m = cst.util.load(mts_).double_couple_clvd
-source1 =  m['myy'],  m['mxx'],  m['mzz']
-source2 = -m['mxz'], -m['myz'],  m['mxy']
+m = cst.util.load(mts_)
+d = m.double_couple_clvd
+source1 =  d['myy'],  d['mxx'],  d['mzz']
+source2 = -d['mxz'], -d['myz'],  d['mxy']
 
 # scaling law: fcorner = (dsigma / moment) ^ 1/3 * 0.42 * Vs,
 # dsigma = 4 MPa, Vs = 3900 m/s, tau = 0.5 / (pi * fcorner)
-tau = 6e-7 * m['monent'] ** (1.0 / 3.0) # ~0.32, fcorner = 0.5Hz
+print m
+print dir(m)
+
+tau = 6e-7 * m.moment ** (1.0 / 3.0) # ~0.32, fcorner = 0.5Hz
+print tau
+asdf
 
 # sites
 stagein = 'out/', 'hold/'
