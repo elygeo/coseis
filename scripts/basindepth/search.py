@@ -4,6 +4,7 @@ Locate the shallowest 2D isosurface in a volume.
 """
 import os
 import numpy as np
+import cst
 
 # parameters
 val = 2500.0
@@ -22,7 +23,7 @@ n2 = shape[2]
 # iterate over depth planes looking for vertical isosurface crossings
 f = os.path.join('run', 'cvms', 'vs.bin')
 f = open(f, 'rb')
-v2 = np.fromfile(fh, 'f', n1)
+v2 = np.fromfile(f, 'f', n1)
 if up:
     z = 1e9 * np.ones_like(v2)
     for j in xrange(1, n2):

@@ -97,12 +97,7 @@ source2 = -d['mxz'], -d['myz'],  d['mxy']
 
 # scaling law: fcorner = (dsigma / moment) ^ 1/3 * 0.42 * Vs,
 # dsigma = 4 MPa, Vs = 3900 m/s, tau = 0.5 / (pi * fcorner)
-print m
-print dir(m)
-
 tau = 6e-7 * m.moment ** (1.0 / 3.0) # ~0.32, fcorner = 0.5Hz
-print tau
-asdf
 
 # sites
 stagein = 'out/', 'hold/'
