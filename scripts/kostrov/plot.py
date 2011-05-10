@@ -42,7 +42,7 @@ for n in 20, 40:
 # finish figure
 ax.set_xlim(0.0, t[-1])
 ax.set_xlabel('Time (s)')
-ax.set_ylabel('Slip (m)')
+ax.set_ylabel('Slip velocity (m/s)')
 f = os.path.join('run', 'kostrov.pdf')
 fig.savefig(f)
 
