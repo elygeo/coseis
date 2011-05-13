@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-import numpy as np
 """
 Analytical solution for a circular crack expanding at a uniform rupture
 velocity.
 
 See ../scritps/kostrov/ for example usage.
 """
+import numpy as np
 
 def cee_integrand(x, a2, b2):
     return (
@@ -30,7 +30,7 @@ def cee(a, b):
     d = f(a2, b2) + 0.25 * b2 * (b + np.arccos(b) / np.sqrt(1.0 - b2))
     return b * b2 / d
 
-def slip_rate(rho, vp, vs, vrup, dtau, r, t):
+def slip_rate(rho, vp, vs, vrup, dtau, r, t, C=None):
     """
     Parameters
     ----------
@@ -41,9 +41,12 @@ def slip_rate(rho, vp, vs, vrup, dtau, r, t):
         dtau : stress drop
         r : hypocenter distance
         t : array of reduced-time samples (t=0 is rupture arrival time).
+        C : optional C parameter from Dahlen (1974) Eqn (44).
+            If not supplied, C is computed from vrup, vp and vs.
     """
     t0 = r / vrup
-    C = cee(vrup / vp, vrup / vs)
+    if C == None:
+        C = cee(vrup / vp, vrup / vs)
     v = C * dtau / (rho * vs) * (t + t0) / np.sqrt(t * (t + 2.0 * t0))
     return v
 

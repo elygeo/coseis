@@ -1,6 +1,7 @@
 """
 General utilities
 """
+from __future__ import division, print_function
 import os, sys, re
 import numpy as np
 
@@ -34,7 +35,7 @@ def prune(d, pattern=None, types=None):
     if types is None:
         types = set(
             np.typeDict.values() +
-            [type(None), bool, str, int, long, float, tuple, list, dict]
+            [type(None), bool, str, unicode, int, long, float, tuple, list, dict]
         )
     grep = re.compile(pattern)
     for k in d.keys():

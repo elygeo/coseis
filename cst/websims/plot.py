@@ -1,6 +1,7 @@
 """
 Websims plotting routines
 """
+from __future__ import print_function
 import os, sys, cStringIO
 import matplotlib
 matplotlib.use('Agg')

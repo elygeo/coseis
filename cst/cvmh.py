@@ -1,6 +1,7 @@
 """
 SCEC Community Velocity Model (CVM-H) extraction tool
 """
+from __future__ import division, print_function
 import os, sys, urllib, gzip, subprocess
 import numpy as np
 from . import coord, gocad

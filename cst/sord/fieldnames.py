@@ -13,6 +13,7 @@ magnitude squared because square roots are computationally expensive.  Also,
 stress magnitude (wm2) is the square of the Frobenius Norm, as finding the true
 stress tensor magnitude requires computing eigenvalues at every location.
 """
+from __future__ import print_function
 
 table = [
     ('x1',    'x',               'Node coordinate',                '<0'),

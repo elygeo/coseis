@@ -1,6 +1,7 @@
 """
 Matplotlib utilities
 """
+from __future__ import division, print_function
 import os
 import numpy as np
 import viz
@@ -213,8 +214,8 @@ def digitize(img, xlim=(-1, 1), ylim=(-1, 1), color='r'):
         x, y = coord.ibilinear(xx, yy, x, y)
         x = x0 + dx * x
         y = y0 + dy * y
-        print x
-        print y
+        print(x)
+        print(y)
         xr += [x]
         yr += [y]
     return xr, yr

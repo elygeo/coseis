@@ -5,6 +5,7 @@ Mapping data utilities
 # Quaternary Fault Database
 # ftp://hazards.cr.usgs.gov/maps/qfault/
 # http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
+from __future__ import division, print_function
 import os, urllib, gzip, zipfile
 import numpy as np
 from . import coord, util
@@ -218,7 +219,7 @@ def mapdata(kind='coastlines', resolution='high', extent=None, min_area=0.0, min
             x, y = densify(x, y, delta)
         xx += [x, [np.nan]]
         yy += [y, [np.nan]]
-    print '%s: selected %s of %s' % (filename, nkeep, ntotal)
+    print('%s: selected %s of %s' % (filename, nkeep, ntotal))
     if nkeep:
         xx = np.concatenate(xx)[:-1]
         yy = np.concatenate(yy)[:-1]

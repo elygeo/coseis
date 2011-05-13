@@ -23,6 +23,7 @@ of the Computational Siesmology Tools (Coseis_).
 .. _web.py:     http://webpy.org/
 .. _Coseis:     http://earth.usc.edu/~gely/coseis/www/
 """
+from __future__ import print_function
 import os, sys, re, gzip, time, cStringIO, shutil, itertools
 import numpy as np
 import web, jinja2, docutils.core
@@ -66,7 +67,7 @@ def start(debug=True):
     """
     Start server.
     """
-    print time.strftime('%Y-%m-%d %H:%M:%S: WebSims started', time.localtime())
+    print(time.strftime('%Y-%m-%d %H:%M:%S: WebSims started', time.localtime()))
     sys.argv = [sys.argv[0], port]
     web.config.debug = debug
     app.run()

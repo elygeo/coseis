@@ -70,7 +70,6 @@ def cybershake(isrc, irup, islip, ihypo, path='srf', name=None):
         meta = util.load(path + 'meta.py')
         return meta
     cwd = os.getcwd()
-    print isrc, irup, islip, ihypo, name
 
     # get reports
     d = os.path.dirname(os.path.normpath(path))

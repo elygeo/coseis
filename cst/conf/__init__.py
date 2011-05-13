@@ -2,6 +2,7 @@
 """
 Configure, build, and launch utilities.
 """
+from __future__ import division, print_function
 import os, sys, re, shutil, getopt, subprocess, shlex, time
 import numpy as np
 
@@ -36,7 +37,7 @@ def prune(d, pattern=None, types=None):
     if types is None:
         types = set(
             np.typeDict.values() +
-            [type(None), bool, str, int, long, float, tuple, list, dict]
+            [type(None), bool, str, unicode, int, long, float, tuple, list, dict]
         )
     grep = re.compile(pattern)
     for k in d.keys():
@@ -464,7 +465,7 @@ def test():
     for module in modules:
         for machine in machines:
             if machine is None or os.path.isdir(machine):
-                print 80 * '-'
+                print(80 * '-')
                 job = configure(module=module, machine=machine)[0]
                 job = prepare(job, rundir='tmp', command='date', run='exec', mode='s')
                 skeleton(job)
