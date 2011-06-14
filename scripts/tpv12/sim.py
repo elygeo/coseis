@@ -78,7 +78,8 @@ fieldio += [
     ('=', 'mus',  [(1, j+i),   (k-i,   k+i),   l, ()], 0.54),
 ]
 
-# write slip, slip velocity, and shear traction time histories
+# slip, slip velocity, and shear traction time histories
+l = ihypo[2]
 for x, y in [
     (0, 0),
     (45, 0),
@@ -93,11 +94,11 @@ for x, y in [
 ]:
     j = x * 100.0 / delta[0] + 1
     k = y * 100.0 / delta[1] + 1
-    l = ihypo[2]
     for f in 'su1', 'su2', 'su3', 'sv1', 'sv2', 'sv3', 'ts1', 'ts2', 'ts3':
-        fieldio += [('=w', f, [j,k,l,()], 'faultst%sdp%s%s.bin' % (x, y, f))]
+        p = 'faultst%03ddp%03d%s.bin' % (x, y, f)
+        fieldio += [('=w', f, [j,k,l,()], p)]
 
-# write displacement and velocity time histories
+# displacement and velocity time histories
 for x, y, z in [
     (0, 0, -30),
     (0, 0, -20),
@@ -112,11 +113,12 @@ for x, y, z in [
     (120, 0, -30),
     (120, 0, 30),
 ]:
-    j = x * 100.0 / delta[0]
-    k = y * 100.0 / delta[1] / alpha_
-    l = z * 100.0 / delta[1] + ihypo[2]
+    j = x * 100.0 / delta[0] + 1
+    k = y * 100.0 / delta[1] / alpha_ + 1
+    l = z * 100.0 / delta[2] + ihypo[2]
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
-        fieldio += [('=w', f, [j,k,l,()], 'body%sst%sdp%s%s.bin' % (z, x, y, f))]
+        p = 'body%03dst%03ddp%03d%s.bin' % (z, x, y, f)
+        fieldio += [('=w', f, [j,k,l,()], p)]
 
 # stage job
 job = cst.sord.stage(locals())
@@ -124,9 +126,9 @@ dir = job.rundir
 
 # pre-stress
 d = np.arange(shape[1]) * alpha_ * delta[1]
-x = d * 9.8 * 1147.16
-y = d * 9.8 * 1700.0
-z = d * 9.8 * 594.32
+x = d * 9.8 * -1147.16
+y = d * 9.8 * -1700.0
+z = d * 9.8 * -594.32
 k = int(13800.0 / delta[1] + 1.5)
 x[k:] = y[k:]
 z[k:] = y[k:]

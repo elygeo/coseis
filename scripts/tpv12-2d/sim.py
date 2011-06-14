@@ -7,7 +7,7 @@ import numpy as np
 import cst
 
 # number of processes
-nproc3 = 1, 1, 2
+nproc3 = 1, 1, 1
 
 # model dimensions
 delta = 100.0, 100.0, 100.0, 100.0 / 12500.0
@@ -73,39 +73,33 @@ fieldio += [
     ('=', 'mus',  [(), (k-i,   k+i),   l, ()], 0.54),
 ]
 
-# write slip, slip velocity, and shear traction time histories
-for x, y in [
-    (0, 0),
-    (0, 15),
-    (0, 30),
-    (0, 45),
-    (0, 75),
-    (0, 120),
-]:
-    j = x * 100.0 / delta[0] + 1
+# slip, slip velocity, and shear traction time histories
+x, j, l = 0, 1, ihypo[2]
+for y in 0, 15, 30, 45, 75, 120:
     k = y * 100.0 / delta[1] + 1
-    l = ihypo[2]
     for f in 'su1', 'su2', 'su3', 'sv1', 'sv2', 'sv3', 'ts1', 'ts2', 'ts3':
-        fieldio += [('=w', f, [j,k,l,()], 'faultst%sdp%s%s.bin' % (x, y, f))]
+        p = 'faultst%03ddp%03d%s.bin' % (x, y, f)
+        fieldio += [('=w', f, [j,k,l,()], p)]
 
-# write displacement and velocity time histories
-for x, y, z in [
-    (0, 0, -30),
-    (0, 0, -20),
-    (0, 0, -10),
-    (0, 0, 10),
-    (0, 0, 20),
-    (0, 0, 30),
-    (0, 3, -10),
-    (0, 3, -5),
-    (0, 3, 5),
-    (0, 3, 10),
+# displacement and velocity time histories
+x, j = 0, 1
+for y, z in [
+    (0, -30),
+    (0, -20),
+    (0, -10),
+    (0,  10),
+    (0,  20),
+    (0,  30),
+    (3, -10),
+    (3,  -5),
+    (3,   5),
+    (3,  10),
 ]:
-    j = x * 100.0 / delta[0]
-    k = y * 100.0 / delta[1] / alpha_
+    k = y * 100.0 / delta[1] / alpha_ + 1
     l = z * 100.0 / delta[1] + ihypo[2]
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
-        fieldio += [('=w', f, [j,k,l,()], 'body%sst%sdp%s%s.bin' % (z, x, y, f))]
+        p = 'body%03dst%03ddp%03d%s.bin' % (z, x, y, f)
+        fieldio += [('=w', f, [j,k,l,()], p)]
 
 # stage job
 job = cst.sord.stage(locals())
@@ -113,9 +107,9 @@ dir = job.rundir
 
 # pre-stress
 d = np.arange(shape[1]) * alpha_ * delta[1]
-x = d * 9.8 * 1147.16
-y = d * 9.8 * 1700.0
-z = d * 9.8 * 594.32
+x = d * 9.8 * -1147.16
+y = d * 9.8 * -1700.0
+z = d * 9.8 * -594.32
 k = int(13800.0 / delta[1] + 1.5)
 x[k:] = y[k:]
 z[k:] = y[k:]
