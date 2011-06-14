@@ -8,7 +8,6 @@ import cst
 
 # number of processes
 nproc3 = 1, 1, 2
-nproc3 = 1, 1, 1
 
 # model dimensions
 delta = 100.0, 100.0, 100.0, 100.0 / 12500.0
@@ -94,8 +93,9 @@ for x, y in [
 ]:
     j = x * 100.0 / delta[0] + 1
     k = y * 100.0 / delta[1] + 1
-    for f in 'su1', 'su2', 'su3', 'sv1', 'sv2', 'sv3', 'ts1', 'ts2', 'ts3':
-        p = 'faultst%03ddp%03d%s.bin' % (x, y, f)
+    for f in 'su1', 'su2', 'su3', 'sv1', 'sv2', 'sv3', 'ts1', 'ts2', 'ts3', 'tnm':
+        p = 'faultst%03ddp%03d-%s.bin' % (x, y, f)
+        p = p.replace('fault-', 'fault-0')
         fieldio += [('=w', f, [j,k,l,()], p)]
 
 # displacement and velocity time histories
@@ -117,7 +117,8 @@ for x, y, z in [
     k = y * 100.0 / delta[1] / alpha_ + 1
     l = z * 100.0 / delta[2] + ihypo[2]
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
-        p = 'body%03dst%03ddp%03d%s.bin' % (z, x, y, f)
+        p = 'body%03dst%03ddp%03d-%s.bin' % (z, x, y, f)
+        p = p.replace('body-', 'body-0')
         fieldio += [('=w', f, [j,k,l,()], p)]
 
 # stage job

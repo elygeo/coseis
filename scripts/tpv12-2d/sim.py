@@ -97,7 +97,7 @@ for y, z in [
     (3,  10),
 ]:
     k = y * 100.0 / delta[1] / alpha_ + 1
-    l = z * 100.0 / delta[1] + ihypo[2]
+    l = z * 100.0 / delta[2] + ihypo[2]
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
         p = 'body%03dst%03ddp%03d-%s.bin' % (z, x, y, f)
         p = p.replace('body-', 'body-0')

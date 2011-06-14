@@ -2,6 +2,7 @@
 """
 Prepare output for uploading to the SCEC Code Validation Workshop website.
 """
+import os
 import numpy as np
 import cst
 
@@ -14,7 +15,15 @@ meta.nt = meta.shape[3]
 dtype = meta.dtype
 t = np.arange(meta.nt) * meta.dt
 
-# output header
+# output directory
+if not os.path.exists(path + 'cvws'):
+    os.mkdir(path + 'cvws')
+
+# formats
+fmt1 = '%20.12f' + 7 * ' %14.6f'
+fmt2 = '%20.12f' + 6 * ' %14.6f'
+
+# headers
 header="""\
 # problem=TPV12-2D
 # author=Geoffrey Ely
@@ -25,8 +34,6 @@ header="""\
 # num_time_steps=%(nt)s
 # location=%(sta)s
 """
-
-# fault stations
 header1 = """\
 # Column #1 = Time (s)
 # Column #2 = horizontal slip (m)
@@ -38,7 +45,18 @@ header1 = """\
 # Column #8 = normal stress (MPa)
 t h-slip h-slip-rate h-shear-stress v-slip v-slip-rate v-shear-stress n-stress
 """
-fmt = '%20.12f' + 7 * ' %14.6f'
+header2="""\
+# Column #1 = Time (s)
+# Column #2 = horizontal displacement (m)
+# Column #3 = horizontal velocity (m/s)
+# Column #4 = vertical displacement (m)
+# Column #5 = vertical velocity (m/s)
+# Column #6 = normal displacement (m)
+# Column #7 = normal velocity (m/s)
+t h-disp h-vel v-disp v-vel n-disp n-vel
+"""
+
+# fault stations
 for sta in meta.deltas:
     if sta.startswith('fault') and sta.endswith('su1.bin'):
         sta = sta[:-8]
@@ -52,30 +70,19 @@ for sta in meta.deltas:
         y   = np.fromfile(f % 'sv2', dtype)
         z   = np.fromfile(f % 'sv3', dtype)
         svv = np.sqrt(y * y + z * z)
-        ts1 = np.fromfile(f % 'ts1', dtype)
+        ts1 = np.fromfile(f % 'ts1', dtype) * 1e-6
         y   = np.fromfile(f % 'ts2', dtype)
         z   = np.fromfile(f % 'ts3', dtype)
-        tsv = np.sqrt(y * y + z * z)
-        tnm = np.fromfile(f % 'tnm', dtype)
+        tsv = np.sqrt(y * y + z * z) * 1e-6
+        tnm = np.fromfile(f % 'tnm', dtype) * 1e-6
         c   = np.array([t, su1, sv1, ts1, suv, svv, tsv, tnm]).T
-        fd = open(path + sta + '.asc', 'w')
+        fd = open(path + 'cvws/' + sta + '.asc', 'w')
         fd.write(header % meta.__dict__)
         fd.write(header1)
-        np.savetxt(fd, c, fmt)
+        np.savetxt(fd, c, fmt1)
         fd.close()
 
 # body stations
-header1="""\
-# Column #1 = Time (s)
-# Column #2 = horizontal displacement (m)
-# Column #3 = horizontal velocity (m/s)
-# Column #4 = vertical displacement (m)
-# Column #5 = vertical velocity (m/s)
-# Column #6 = normal displacement (m)
-# Column #7 = normal velocity (m/s)
-t h-disp h-vel v-disp v-vel n-disp n-vel
-"""
-fmt = '%20.12f' + 6 * ' %14.6f'
 for sta in meta.deltas:
     if sta.startswith('body') and sta.endswith('u1.bin'):
         sta = sta[:-7]
@@ -88,9 +95,9 @@ for sta in meta.deltas:
         v2 = np.fromfile(f % 'v2', dtype)
         v3 = np.fromfile(f % 'v3', dtype)
         c   = np.array([t, u1, v1, u2, v2, u3, v3]).T
-        fd = open(path + sta + '.asc', 'w')
+        fd = open(path + 'cvws/' + sta + '.asc', 'w')
         fd.write(header % meta.__dict__)
-        fd.write(header1)
-        np.savetxt(fd, c, fmt)
+        fd.write(header2)
+        np.savetxt(fd, c, fmt2)
         fd.close()
 
