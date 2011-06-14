@@ -14,7 +14,7 @@ def test_syntax(path='.'):
     """
     Test code syntax
     """
-    exclude = 'ws-meta-in.py'
+    exclude = 'ws-meta-in.py',
     cwd = os.getcwd()
     top = os.path.join(os.path.dirname(__file__), '..')
     os.chdir(top)
