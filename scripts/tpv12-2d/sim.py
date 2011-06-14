@@ -77,8 +77,9 @@ fieldio += [
 x, j, l = 0, 1, ihypo[2]
 for y in 0, 15, 30, 45, 75, 120:
     k = y * 100.0 / delta[1] + 1
-    for f in 'su1', 'su2', 'su3', 'sv1', 'sv2', 'sv3', 'ts1', 'ts2', 'ts3':
+    for f in 'su1', 'su2', 'su3', 'sv1', 'sv2', 'sv3', 'ts1', 'ts2', 'ts3', 'tn':
         p = 'faultst%03ddp%03d%s.bin' % (x, y, f)
+        p = p.replace('-', '-0')
         fieldio += [('=w', f, [j,k,l,()], p)]
 
 # displacement and velocity time histories
@@ -99,6 +100,7 @@ for y, z in [
     l = z * 100.0 / delta[1] + ihypo[2]
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
         p = 'body%03dst%03ddp%03d%s.bin' % (z, x, y, f)
+        p = p.replace('-', '-0')
         fieldio += [('=w', f, [j,k,l,()], p)]
 
 # stage job
