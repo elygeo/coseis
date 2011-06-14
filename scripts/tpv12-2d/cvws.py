@@ -73,7 +73,7 @@ header1="""\
 # Column #5 = vertical velocity (m/s)
 # Column #6 = normal displacement (m)
 # Column #7 = normal velocity (m/s)
-t h-disp h-vel v-disp v-vel n-disp n-vel #
+t h-disp h-vel v-disp v-vel n-disp n-vel
 """
 fmt = '%20.12f' + 6 * ' %14.6f'
 for sta in meta.deltas:
