@@ -7,7 +7,7 @@ import numpy as np
 import cst
 
 # number of processes
-nproc3 = 1, 1, 1
+nproc3 = 1, 1, 2
 
 # model dimensions
 delta = 100.0, 100.0, 100.0, 100.0 / 12500.0
@@ -73,16 +73,16 @@ fieldio += [
     ('=', 'mus',  [(), (k-i,   k+i),   l, ()], 0.54),
 ]
 
-# slip, slip velocity, and shear traction time histories
+# fault time histories
 x, j, l = 0, 1, ihypo[2]
 for y in 0, 15, 30, 45, 75, 120:
     k = y * 100.0 / delta[1] + 1
-    for f in 'su1', 'su2', 'su3', 'sv1', 'sv2', 'sv3', 'ts1', 'ts2', 'ts3', 'tn':
-        p = 'faultst%03ddp%03d%s.bin' % (x, y, f)
-        p = p.replace('-', '-0')
+    for f in 'su1', 'su2', 'su3', 'sv1', 'sv2', 'sv3', 'ts1', 'ts2', 'ts3', 'tnm':
+        p = 'faultst%03ddp%03d-%s.bin' % (x, y, f)
+        p = p.replace('fault-', 'fault-0')
         fieldio += [('=w', f, [j,k,l,()], p)]
 
-# displacement and velocity time histories
+# body time histories
 x, j = 0, 1
 for y, z in [
     (0, -30),
@@ -99,8 +99,8 @@ for y, z in [
     k = y * 100.0 / delta[1] / alpha_ + 1
     l = z * 100.0 / delta[1] + ihypo[2]
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
-        p = 'body%03dst%03ddp%03d%s.bin' % (z, x, y, f)
-        p = p.replace('-', '-0')
+        p = 'body%03dst%03ddp%03d-%s.bin' % (z, x, y, f)
+        p = p.replace('body-', 'body-0')
         fieldio += [('=w', f, [j,k,l,()], p)]
 
 # stage job

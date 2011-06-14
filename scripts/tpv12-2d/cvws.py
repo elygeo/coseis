@@ -14,9 +14,8 @@ meta.nt = meta.shape[3]
 dtype = meta.dtype
 t = np.arange(meta.nt) * meta.dt
 
-# output format
-fmt = '%20.12f' + 7 * ' %14.6f'
-header="""
+# output header
+header="""\
 # problem=TPV12-2D
 # author=Geoffrey Ely
 # date=%(rundate)s
@@ -28,7 +27,7 @@ header="""
 """
 
 # fault stations
-header1 = """
+header1 = """\
 # Column #1 = Time (s)
 # Column #2 = horizontal slip (m)
 # Column #3 = horizontal slip rate (m/s)
@@ -39,6 +38,7 @@ header1 = """
 # Column #8 = normal stress (MPa)
 t h-slip h-slip-rate h-shear-stress v-slip v-slip-rate v-shear-stress n-stress
 """
+fmt = '%20.12f' + 7 * ' %14.6f'
 for sta in meta.deltas:
     if sta.startswith('fault') and sta.endswith('su1.bin'):
         sta = sta[:-8]
@@ -56,16 +56,16 @@ for sta in meta.deltas:
         y   = np.fromfile(f % 'ts2', dtype)
         z   = np.fromfile(f % 'ts3', dtype)
         tsv = np.sqrt(y * y + z * z)
-        tn  = np.fromfile(f % 'tn', dtype)
-        c   = np.array([t, su1, sv1, ts1, suv, svv, tsv, tn]).T
+        tnm = np.fromfile(f % 'tnm', dtype)
+        c   = np.array([t, su1, sv1, ts1, suv, svv, tsv, tnm]).T
         fd = open(path + sta + '.asc', 'w')
-        fd.write(header % meta)
+        fd.write(header % meta.__dict__)
         fd.write(header1)
         np.savetxt(fd, c, fmt)
         fd.close()
 
 # body stations
-header1="""
+header1="""\
 # Column #1 = Time (s)
 # Column #2 = horizontal displacement (m)
 # Column #3 = horizontal velocity (m/s)
@@ -75,6 +75,7 @@ header1="""
 # Column #7 = normal velocity (m/s)
 t h-disp h-vel v-disp v-vel n-disp n-vel #
 """
+fmt = '%20.12f' + 6 * ' %14.6f'
 for sta in meta.deltas:
     if sta.startswith('body') and sta.endswith('u1.bin'):
         sta = sta[:-7]
@@ -88,7 +89,7 @@ for sta in meta.deltas:
         v3 = np.fromfile(f % 'v3', dtype)
         c   = np.array([t, u1, v1, u2, v2, u3, v3]).T
         fd = open(path + sta + '.asc', 'w')
-        fd.write(header % meta)
+        fd.write(header % meta.__dict__)
         fd.write(header1)
         np.savetxt(fd, c, fmt)
         fd.close()
