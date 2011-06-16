@@ -1,8 +1,8 @@
 #!/bin/bash -e
 # FIXME
 
-f = "chino-cvm-0200-flat"
-f = "chino-cvm-0050-flat"
+f = "chino-cvms-0200-flat"
+f = "chino-cvms-0050-flat"
 d = "run/sim/$f"
 
 #cp report.rst "$d/$f.rst"

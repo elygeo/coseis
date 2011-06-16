@@ -12,6 +12,12 @@ delta = meta.delta
 npml = meta.npml
 ntop = meta.ntop
 
+# GTL
+if meta.cvm == 'cvmh':
+    vs30 = 'wills'
+else:
+    vs30 = None
+
 # read data
 dep = np.arange(shape[2]) * delta[2]
 n = shape[:2]
@@ -55,7 +61,7 @@ w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 # rho extraction
 fh = cst.util.open_excl('rho.bin', 'wb')
 if fh:
-    vm = cst.cvmh.Extraction(x, y, 'vp')
+    vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
     for i in range(dep.size):
         zz = w[i] * z - dep[i]
         cst.cvmh.nafe_drake(vm(zz)).T.tofile(fh)
@@ -64,7 +70,7 @@ if fh:
 # vp extraction
 fh = cst.util.open_excl('vp.bin', 'wb')
 if fh:
-    vm = cst.cvmh.Extraction(x, y, 'vp')
+    vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
     for i in range(dep.size):
         zz = w[i] * z - dep[i]
         vm(zz).T.tofile(fh)
@@ -73,7 +79,7 @@ if fh:
 # vs extraction
 fh = cst.util.open_excl('vs.bin', 'wb')
 if fh:
-    vm = cst.cvmh.Extraction(x, y, 'vs')
+    vm = cst.cvmh.Extraction(x, y, 'vs', vs30)
     for i in range(dep.size):
         zz = w[i] * z - dep[i]
         vm(zz).T.tofile(fh)

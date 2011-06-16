@@ -26,8 +26,8 @@ fig = plt.figure(None, inches, 100, None)
 fig.clf()
 ax = fig.add_axes([0.01, 0.01, 0.98, 0.98])
 
-# CVM basins
-f = os.path.join('run', 'data', 'basins-cvm.txt')
+# CVM-S basins
+f = os.path.join('run', 'data', 'basins-cvms.txt')
 x, y = proj(*np.loadtxt(f).T)
 h = ax.plot(x, y, '-r')
 h[0].set_dashes((2,1))

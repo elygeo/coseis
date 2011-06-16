@@ -70,7 +70,7 @@ zz.fill(1000.0)
 
 # CVM basins
 for cvm, vv in [
-    ('cvmh', cst.cvmh.extract(xx, yy, zz, 'vs')),
+    ('cvmh', cst.cvmh.extract(xx, yy, zz, 'vs', vs30=None)),
     ('cvms', cst.cvms.extract(xx, yy, zz, 'vs', rundir='run/cvms')),
 ]:
     v = 2500,

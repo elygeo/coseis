@@ -27,8 +27,8 @@ def filt(x, dt):
     return x
 
 # metadata
-sims = 'chino-cvm-0200-flat', 'chino-cvmh-0200-flat'
-sims = 'chino-cvm-0050-flat', 'chino-cvmh-0050-flat'
+sims = 'chino-cvms-0200-flat', 'chino-cvmh-0200-flat', 'chino-cvmg-0200-flat'
+sims = 'chino-cvms-0050-flat', 'chino-cvmh-0050-flat', 'chino-cvmg-0050-flat'
 meta = os.path.join('run', 'sim', sims[0], 'meta.py')
 meta = cst.util.load(meta)
 proj = pyproj.Proj(**meta.projection)

@@ -203,7 +203,7 @@ if (modulo(it, itstats) == 0) then
     call set_halo(s1, -1.0, i1core, i2core)
     wmax = maxval(s1)
 end if
-call fieldio('>', 'wm2', s1 )
+call fieldio('>', 'wm2', s1)
 
 end subroutine
 

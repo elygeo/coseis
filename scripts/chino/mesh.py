@@ -54,7 +54,7 @@ n = shape[2] - ntop - npml
 w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 
 # write dep file
-d = 'cvm/'
+d = 'cvms/'
 fh = cst.util.open_excl(d + 'dep.bin', 'wb')
 if fh:
     for i in range(dep.size):

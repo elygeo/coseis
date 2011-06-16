@@ -11,7 +11,7 @@ type t_io
     real :: x1(3), x2(3), val, tau
     real, pointer :: buff(:,:)     ! buffer for storing mutliple time steps
     !XXX character(4) :: fields(32)
-    !XXX real, pointer :: buff(:,:,:) 
+    !XXX real, pointer :: buff(:,:,:)
     type (t_io), pointer :: next  ! pointer to next member of the field i/o list
 end type t_io
 type (t_io), pointer :: io0, io, ioprev

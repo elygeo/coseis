@@ -14,8 +14,8 @@ author = 'Geoffrey Ely'
 title = 'Chino Hills'
 scale = 0.001
 sims = 'run/sim/*'
-sims = 'run/sim/chino-cvm-1000-flat'
-sims = 'run/sim/chino-cvm-0200-flat'
+sims = 'run/sim/chino-cvms-1000-flat'
+sims = 'run/sim/chino-cvms-0200-flat'
 force = '-f' in sys.argv[1:]
 
 # loop over sims
@@ -116,7 +116,7 @@ for path in glob.glob(sims):
     if meta.cvm == 'cvmh':
         z = cst.cvmh.extract(x, y, z, 'vs')
     else:
-        z = cst.cvms.extract(x, y, z, 'vs', rundir='run/cvm')
+        z = cst.cvms.extract(x, y, z, 'vs', rundir='run/cvms')
     z.tofile(path + 'vs0.bin')
 
     # basins
@@ -124,7 +124,7 @@ for path in glob.glob(sims):
     if meta.cvm == 'cvmh':
         z = cst.cvmh.extract(x, y, z, 'vs')
     else:
-        z = cst.cvms.extract(x, y, z, 'vs', rundir='run/cvm')
+        z = cst.cvms.extract(x, y, z, 'vs', rundir='run/cvms')
     x, y = proj(x, y)
     v = 2500,
     x, y = cst.plt.contour(x, y, z, v)[0]

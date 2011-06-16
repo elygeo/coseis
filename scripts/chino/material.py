@@ -9,8 +9,9 @@ import cst
 
 # parameters
 name = 'chino'
-cvm = 'cvms'
+cvm = 'cvmg'
 cvm = 'cvmh'
+cvm = 'cvms'
 dx = 100.0;  nproc = 256
 dx = 200.0;  nproc = 32
 dx = 500.0;  nproc = 2
@@ -110,32 +111,10 @@ python = 'python'
 if cst.site.machine == 'nics-kraken':
     python = '/lustre/scratch/gely/local/bin/python'
 
-if cvm == 'cvmh':
+# cvm-s
+if cvm == 'cvms':
 
-    # stage cvm
-    cvm_proj = pyproj.Proj(**cst.cvmh.projection)
-    x, y = cvm_proj(x, y)
-    x.astype('f').T.tofile(path + 'x.bin')
-    y.astype('f').T.tofile(path + 'y.bin')
-
-    # launch mesher
-    x, y, z = shape
-    s = x * y * z / 600000 # linear
-    s = x * y * z / 2000000 # nearest
-    print 'CVM-H wall time estimate: %s' % s
-    cst.conf.launch(
-        name = 'cvmh',
-        new = False,
-        rundir = path,
-        stagein = ['cvmh.py'],
-        command = '%s cvmh.py' % python,
-        seconds = s,
-        nproc = min(4, nproc),
-    )
-
-elif cvm == 'cvms':
-
-    # stage cvm
+    # stage cvms
     rundir = path + 'cvms' + os.sep
     post = 'rm lon.bin lat.bin dep.bin\nmv rho.bin vp.bin vs.bin %r' % path
     n = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
@@ -154,6 +133,30 @@ elif cvm == 'cvms':
         nproc = min(4, nproc),
     )
 
-    # launch cvm, wait for mesher
-    cst.cvm.launch(job, depend=job0.jobid)
+    # launch cvms, wait for mesher
+    cst.cvms.launch(job, depend=job0.jobid)
+
+# cvm-h
+else:
+
+    # stage cvmh
+    cvm_proj = pyproj.Proj(**cst.cvmh.projection)
+    x, y = cvm_proj(x, y)
+    x.astype('f').T.tofile(path + 'x.bin')
+    y.astype('f').T.tofile(path + 'y.bin')
+
+    # launch mesher
+    x, y, z = shape
+    s = x * y * z / 600000 # linear
+    s = x * y * z / 2000000 # nearest
+    print 'CVM-H wall time estimate: %s' % s
+    cst.conf.launch(
+        name = cvm,
+        new = False,
+        rundir = path,
+        stagein = ['cvmh.py'],
+        command = '%s cvmh.py' % python,
+        seconds = s,
+        nproc = min(4, nproc),
+    )
 

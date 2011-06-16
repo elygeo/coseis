@@ -7,7 +7,7 @@
 
 .. figure:: ../../map-cvm.pdf
 
-    Station map with CVM 4.0 basins delineated by dashed contour of `$V_s$` =
+    Station map with CVM-S 4.0 basins delineated by dashed contour of `$V_s$` =
     2.5 km/s, at 1 km depth.
 
 .. |caption| replace:: Recorded (top) and simulated (bottom) 0.1 - 0.25 Hz
