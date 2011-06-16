@@ -279,8 +279,8 @@ def prepare(job=None, **kwargs):
 
         # parallelization
         if job.maxcores and job.maxnodes:
-            job.nodes = min(job.maxnodes, (job.nproc - 1) / job.maxcores + 1)
-            job.ppn = (job.nproc - 1) / job.nodes + 1
+            job.nodes = min(job.maxnodes, (job.nproc - 1) // job.maxcores + 1)
+            job.ppn = (job.nproc - 1) // job.nodes + 1
             job.cores = min(job.maxcores, job.ppn)
             job.totalcores = job.nodes * job.maxcores
         else:
@@ -296,8 +296,8 @@ def prepare(job=None, **kwargs):
 
         # SU estimate and wall time limit with extra allowance
         if hasattr(job, 'seconds'):
-            seconds = job.seconds * job.ppn / job.cores
-            minutes = 10 + seconds / 30
+            seconds = job.seconds * job.ppn // job.cores
+            minutes = 10 + seconds // 30
         else:
             seconds = 3600
             minutes = 60
@@ -305,7 +305,7 @@ def prepare(job=None, **kwargs):
             maxminutes = 60 * job.maxtime[0] + job.maxtime[1]
             minutes = min(minutes, maxminutes)
         job.walltime = '%d:%02d:00' % (minutes // 60, minutes % 60)
-        sus = int(seconds / 3600 * job.totalcores + 1)
+        sus = seconds // 3600 * job.totalcores + 1
 
         # if resources exceeded, try another queue
         if job.maxcores and job.ppn > job.maxcores:

@@ -18,9 +18,9 @@ dx_ = 4000.0; nproc3 = 1, 1, 1
 # mesh type
 surf_out_ = False
 register_ = True
-mesh_ = 'chino-cvms-%04.0f' % dx_
-mesh_ = 'chino-cvmg-%04.0f' % dx_
 mesh_ = 'chino-cvmh-%04.0f' % dx_
+mesh_ = 'chino-cvmg-%04.0f' % dx_
+mesh_ = 'chino-cvms-%04.0f' % dx_
 id_ = mesh_ + '-topo'
 id_ = mesh_ + '-flat'
 
