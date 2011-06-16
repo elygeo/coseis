@@ -13,7 +13,7 @@ npml = meta.npml
 ntop = meta.ntop
 
 # GTL
-if meta.cvm == 'cvmh':
+if meta.cvm == 'cvmg':
     vs30 = 'wills'
 else:
     vs30 = None
