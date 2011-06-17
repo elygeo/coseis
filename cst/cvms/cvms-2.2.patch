@@ -17,242 +17,242 @@ index 2b33361..3e46f6c 100644
 +      integer :: inout(ibig), nn, nnl
 diff --git a/iobin.f b/iobin.f
 new file mode 100644
-index 0000000..d2ddc6f
+index 0000000..830566e
 --- /dev/null
 +++ b/iobin.f
 @@ -0,0 +1,80 @@
 +! Binary I/O for SCEC CVM
 +
-+      subroutine readpts( kerr )
++      subroutine readpts(kerr)
 +      implicit none
 +      include 'in.h'
 +      integer :: kerr, nio, i
 +      character(160) :: lon_file, lat_file, dep_file
-+      write( 0, '(a)' ) 'SCEC Community Velocity Model'
-+      open( 1, file='cvms-input', status='old' )
-+      read( 1, * ) nn
-+      read( 1, * ) lon_file
-+      read( 1, * ) lat_file
-+      read( 1, * ) dep_file
-+      close( 1 )
-+      if ( nn > ibig ) then
++      write (0, '(a)') 'SCEC Community Velocity Model'
++      open (1, file='cvms-input', status='old')
++      read (1, *) nn
++      read (1, *) lon_file
++      read (1, *) lat_file
++      read (1, *) dep_file
++      close (1)
++      if (nn > ibig) then
 +         print *, 'Error: nn greater than ibig', nn , ibig
 +         stop
 +      end if
-+      inquire( iolength=nio ) rlon(1:nn)
-+      write( 0, '(a)' ) 'Reading input'
-+      open( 1, file=lon_file, recl=nio, form='unformatted',
-+     $  access='direct', status='old' )
-+      open( 2, file=lat_file, recl=nio, form='unformatted',
-+     $  access='direct', status='old' )
-+      open( 3, file=dep_file, recl=nio, form='unformatted',
-+     $  access='direct', status='old' )
-+      read( 1, rec=1 ) rlon(1:nn)
-+      read( 2, rec=1 ) rlat(1:nn)
-+      read( 3, rec=1 ) rdep(1:nn)
-+      close( 1 )
-+      close( 2 )
-+      close( 3 )
-+      write( 0, '(a)' ) 'Sampling velocity model'
++      inquire (iolength=nio) rlon(1:nn)
++      write (0, '(a)') 'Reading input'
++      open (1, file=lon_file, recl=nio, form='unformatted',
++     $    access='direct', status='old')
++      open (2, file=lat_file, recl=nio, form='unformatted',
++     $    access='direct', status='old')
++      open (3, file=dep_file, recl=nio, form='unformatted',
++     $    access='direct', status='old')
++      read (1, rec=1) rlon(1:nn)
++      read (2, rec=1) rlat(1:nn)
++      read (3, rec=1) rdep(1:nn)
++      close (1)
++      close (2)
++      close (3)
++      write (0, '(a)') 'Sampling velocity model'
 +      do i = 1, nn
-+        if( rdep(i) .lt. 0 ) write( 0, * )
-+     $    'Error: degative depth', i, rlon(i), rlat(i), rdep(i)
-+        if(rlon(i)/=rlon(i).or.rlat(i)/=rlat(i).or.rdep(i)/=rdep(i))
-+     $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
-+        rdep(i) = rdep(i) * 3.2808399
-+        if( rdep(i) .lt. rdepmin ) rdep(i) = rdepmin
++          if (rdep(i) .lt. 0) write (0, *)
++     $        'Error: degative depth', i, rlon(i), rlat(i), rdep(i)
++          if (rlon(i)/=rlon(i).or.rlat(i)/=rlat(i).or.rdep(i)/=rdep(i))
++     $        write (0, *) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
++          rdep(i) = rdep(i) * 3.2808399
++          if (rdep(i) .lt. rdepmin) rdep(i) = rdepmin
 +      end do
 +      kerr = 0
 +      end
 +
-+      subroutine writepts( kerr )
++      subroutine writepts(kerr)
 +      implicit none
 +      include 'in.h'
 +      integer :: kerr, nio, i
-+      character(160) :: rho_file, alpha_file, beta_file
-+      inquire( iolength=nio ) rho(1:nn)
-+      open( 1, file='cvms-input', status='old' )
-+      read( 1, * ) rho_file
-+      read( 1, * ) rho_file
-+      read( 1, * ) rho_file
-+      read( 1, * ) rho_file
-+      read( 1, * ) rho_file
-+      read( 1, * ) alpha_file
-+      read( 1, * ) beta_file
-+      close( 1 )
-+      write( 0, '(a)' ) 'Writing output'
-+      open( 1, file=rho_file, recl=nio, form='unformatted',
-+     $  access='direct', status='replace' )
-+      open( 2, file=alpha_file, recl=nio, form='unformatted',
-+     $  access='direct', status='replace' )
-+      open( 3, file=beta_file,recl=nio, form='unformatted',
-+     $  access='direct', status='replace' )
-+      write( 1, rec=1 ) rho(1:nn)
-+      write( 2, rec=1 ) alpha(1:nn)
-+      write( 3, rec=1 ) beta(1:nn)
-+      close( 1 )
-+      close( 2 )
-+      close( 3 )
++      character (160) :: rho_file, alpha_file, beta_file
++      inquire (iolength=nio) rho(1:nn)
++      open (1, file='cvms-input', status='old')
++      read (1, *) rho_file
++      read (1, *) rho_file
++      read (1, *) rho_file
++      read (1, *) rho_file
++      read (1, *) rho_file
++      read (1, *) alpha_file
++      read (1, *) beta_file
++      close (1)
++      write (0, '(a)') 'Writing output'
++      open (1, file=rho_file, recl=nio, form='unformatted',
++     $  access='direct', status='replace')
++      open (2, file=alpha_file, recl=nio, form='unformatted',
++     $  access='direct', status='replace')
++      open (3, file=beta_file,recl=nio, form='unformatted',
++     $  access='direct', status='replace')
++      write (1, rec=1) rho(1:nn)
++      write (2, rec=1) alpha(1:nn)
++      write (3, rec=1) beta(1:nn)
++      close (1)
++      close (2)
++      close (3)
 +      do i = 1, nn
-+        if(rho(i)/=rho(i).or.alpha(i)/=alpha(i).or.beta(i)/=beta(i))
-+     $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
++          if (rho(i)/=rho(i).or.alpha(i)/=alpha(i).or.beta(i)/=beta(i))
++     $        write (0, *) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
 +      end do
-+      write( 0, '(a)' ) 'Finished'
++      write (0, '(a)') 'Finished'
 +      kerr = 0
 +      end
 +
 diff --git a/iompi.f b/iompi.f
 new file mode 100644
-index 0000000..e1bf9a7
+index 0000000..ca63215
 --- /dev/null
 +++ b/iompi.f
 @@ -0,0 +1,106 @@
 +! MPI I/O for SCEC CVM
 +
-+      subroutine readpts( kerr )
++      subroutine readpts (kerr)
 +      implicit none
 +      include 'in.h'
 +      include 'mpif.h'
-+      integer(kind=mpi_offset_kind) :: offset, nn8, np8, nnl8
++      integer (kind=mpi_offset_kind) :: offset, nn8, np8, nnl8
 +      integer :: kerr, ip, np, ifh, ierr, i
-+      character(160) :: lon_file, lat_file, dep_file
-+      call mpi_init( ierr )
-+      open( 1, file='cvms-input', status='old' )
-+      read( 1, * ) nn8
-+      read( 1, * ) lon_file
-+      read( 1, * ) lat_file
-+      read( 1, * ) dep_file
-+      close( 1 )
-+      call mpi_comm_rank( mpi_comm_world, ip, ierr )
-+      call mpi_comm_size( mpi_comm_world, np, ierr )
-+      call mpi_file_set_errhandler( mpi_file_null,
-+     $  MPI_ERRORS_ARE_FATAL, ierr )
-+      if ( ip == 0 ) write( 0, '(a)' ) 'SCEC Community Velocity Model'
++      character (160) :: lon_file, lat_file, dep_file
++      call mpi_init(ierr)
++      open (1, file='cvms-input', status='old')
++      read (1, *) nn8
++      read (1, *) lon_file
++      read (1, *) lat_file
++      read (1, *) dep_file
++      close (1)
++      call mpi_comm_rank(mpi_comm_world, ip, ierr)
++      call mpi_comm_size(mpi_comm_world, np, ierr)
++      call mpi_file_set_errhandler(mpi_file_null,
++     $    mpi_errors_are_fatal, ierr)
++      if (ip == 0) write (0, '(a)') 'SCEC Community Velocity Model'
 +      nnl = nn8 / np
 +      np8 = np
-+      if ( modulo( nn8, np8 ) /= 0 ) nnl = nnl + 1
++      if (modulo(nn8, np8) /= 0) nnl = nnl + 1
 +      nnl8 = nnl
-+      nn = min( nnl8, nn8 - nnl8 * ip )
-+      if ( nn > ibig ) then
-+         print *, 'Error: nn greater than ibig', nn, ibig
-+         stop
++      nn = min(nnl8, nn8 - nnl8 * ip)
++      if (nn > ibig) then
++          print *, 'Error: nn greater than ibig', nn, ibig
++          stop
 +      end if
-+      call mpi_type_size( mpi_real, i, ierr )
++      call mpi_type_size(mpi_real, i, ierr)
 +      offset = i
 +      offset = offset * nnl * ip
-+      if ( ip == 0 ) write( 0, '(a)' ) 'Reading input'
-+      call mpi_file_open( mpi_comm_world, lon_file, mpi_mode_rdonly,
-+     $  mpi_info_null, ifh, ierr )
-+      call mpi_file_read_at( ifh, offset, rlon, nn, mpi_real,
-+     $  mpi_status_ignore, ierr )
-+      call mpi_file_close( ifh, ierr )
-+      call mpi_file_open( mpi_comm_world, lat_file, mpi_mode_rdonly,
-+     $  mpi_info_null, ifh, ierr )
-+      call mpi_file_read_at( ifh, offset, rlat, nn, mpi_real,
-+     $  mpi_status_ignore, ierr )
-+      call mpi_file_close( ifh, ierr )
-+      call mpi_file_open( mpi_comm_world, dep_file, mpi_mode_rdonly,
-+     $  mpi_info_null, ifh, ierr )
-+      call mpi_file_read_at( ifh, offset, rdep, nn, mpi_real,
-+     $  mpi_status_ignore, ierr )
-+      call mpi_file_close( ifh, ierr )
-+      if ( ip == 0 ) write( 0, '(a)' ) 'Sampling velocity model'
++      if (ip == 0) write (0, '(a)') 'Reading input'
++      call mpi_file_open(mpi_comm_world, lon_file, mpi_mode_rdonly,
++     $    mpi_info_null, ifh, ierr)
++      call mpi_file_read_at_all(ifh, offset, rlon, nn, mpi_real,
++     $    mpi_status_ignore, ierr)
++      call mpi_file_close(ifh, ierr)
++      call mpi_file_open(mpi_comm_world, lat_file, mpi_mode_rdonly,
++     $    mpi_info_null, ifh, ierr)
++      call mpi_file_read_at_all(ifh, offset, rlat, nn, mpi_real,
++     $    mpi_status_ignore, ierr)
++      call mpi_file_close(ifh, ierr)
++      call mpi_file_open(mpi_comm_world, dep_file, mpi_mode_rdonly,
++     $    mpi_info_null, ifh, ierr)
++      call mpi_file_read_at_all(ifh, offset, rdep, nn, mpi_real,
++     $    mpi_status_ignore, ierr)
++      call mpi_file_close(ifh, ierr)
++      if (ip == 0) write (0, '(a)') 'Sampling velocity model'
 +      do i = 1, nn
-+        if(rdep(i).lt.0) write( 0, * ) 
-+     $    'Error: degative depth', i, rlon(i), rlat(i), rdep(i)
-+        if(rlon(i)/=rlon(i).or.rlat(i)/=rlat(i).or.rdep(i)/=rdep(i))
-+     $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
-+        rdep(i) = rdep(i) * 3.2808399
-+        if( rdep(i) .lt. rdepmin ) rdep(i) = rdepmin
++          if (rdep(i).lt.0) write(0, *)
++     $        'Error: negative depth', i, rlon(i), rlat(i), rdep(i)
++          if (rlon(i)/=rlon(i).or.rlat(i)/=rlat(i).or.rdep(i)/=rdep(i))
++     $        write (0, *) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
++          rdep(i) = rdep(i) * 3.2808399
++          if (rdep(i) .lt. rdepmin) rdep(i) = rdepmin
 +      end do
 +      kerr = 0
 +      end
 +
-+      subroutine writepts( kerr )
++      subroutine writepts(kerr)
 +      implicit none
 +      include 'in.h'
 +      include 'mpif.h'
-+      integer(kind=mpi_offset_kind) :: offset
++      integer (kind=mpi_offset_kind) :: offset
 +      integer :: kerr, ip, ifh, ierr, i
-+      character(160) :: rho_file, alpha_file, beta_file
-+      open( 1, file='cvms-input', status='old' )
-+      read( 1, * ) rho_file
-+      read( 1, * ) rho_file
-+      read( 1, * ) rho_file
-+      read( 1, * ) rho_file
-+      read( 1, * ) rho_file
-+      read( 1, * ) alpha_file
-+      read( 1, * ) beta_file
-+      close( 1 )
-+      call mpi_comm_rank( mpi_comm_world, ip, ierr )
-+      call mpi_type_size( mpi_real, i, ierr )
++      character (160) :: rho_file, alpha_file, beta_file
++      open (1, file='cvms-input', status='old')
++      read (1, *) rho_file
++      read (1, *) rho_file
++      read (1, *) rho_file
++      read (1, *) rho_file
++      read (1, *) rho_file
++      read (1, *) alpha_file
++      read (1, *) beta_file
++      close (1)
++      call mpi_comm_rank(mpi_comm_world, ip, ierr)
++      call mpi_type_size(mpi_real, i, ierr)
 +      offset = i
 +      offset = offset * nnl * ip
-+      if ( ip == 0 ) write( 0, '(a)' ) 'Writing output'
-+      call mpi_file_open( mpi_comm_world, rho_file,
-+     $  mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr )
-+      call mpi_file_write_at( ifh, offset, rho, nn, mpi_real,
-+     $  mpi_status_ignore, ierr )
-+      call mpi_file_close( ifh, ierr )
-+      call mpi_file_open( mpi_comm_world, alpha_file,
-+     $  mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr )
-+      call mpi_file_write_at( ifh, offset, alpha, nn, mpi_real,
-+     $  mpi_status_ignore, ierr )
-+      call mpi_file_close( ifh, ierr )
-+      call mpi_file_open( mpi_comm_world, beta_file,
-+     $  mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr )
-+      call mpi_file_write_at( ifh, offset, beta, nn, mpi_real,
-+     $  mpi_status_ignore, ierr )
-+      call mpi_file_close( ifh, ierr )
++      if (ip == 0) write (0, '(a)') 'Writing output'
++      call mpi_file_open(mpi_comm_world, rho_file,
++     $    mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr)
++      call mpi_file_write_at_all(ifh, offset, rho, nn, mpi_real,
++     $    mpi_status_ignore, ierr)
++      call mpi_file_close(ifh, ierr)
++      call mpi_file_open(mpi_comm_world, alpha_file,
++     $    mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr)
++      call mpi_file_write_at_all(ifh, offset, alpha, nn, mpi_real,
++     $    mpi_status_ignore, ierr)
++      call mpi_file_close(ifh, ierr)
++      call mpi_file_open(mpi_comm_world, beta_file,
++     $    mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr)
++      call mpi_file_write_at_all(ifh, offset, beta, nn, mpi_real,
++     $    mpi_status_ignore, ierr)
++      call mpi_file_close(ifh, ierr)
 +      kerr = 0
 +      do i = 1, nn
-+        if(rho(i)/=rho(i).or.alpha(i)/=alpha(i).or.beta(i)/=beta(i))
-+     $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
++          if (rho(i)/=rho(i).or.alpha(i)/=alpha(i).or.beta(i)/=beta(i))
++     $        write (0, *) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
 +      end do
-+      if ( ip == 0 ) write( 0, '(a)' ) 'Finished'
-+      call mpi_finalize( ierr )
++      if (ip == 0) write (0, '(a)') 'Finished'
++      call mpi_finalize(ierr)
 +      end
 +
 diff --git a/iotxt.f b/iotxt.f
 new file mode 100644
-index 0000000..b4d3180
+index 0000000..2c00fd2
 --- /dev/null
 +++ b/iotxt.f
 @@ -0,0 +1,38 @@
 +! ASCII I/O for SCEC CVM
 +
-+      subroutine readpts( kerr )
++      subroutine readpts(kerr)
 +      implicit none
 +      include 'in.h'
 +      integer :: kerr, i
-+      write( 0, '(a)' ) 'SCEC Community Velocity Model'
-+      read( *, * ) nn
-+      if ( nn > ibig ) then
-+         print *, 'Error: nn greater than ibig', nn, ibig
-+         stop
++      write (0, '(a)') 'SCEC Community Velocity Model'
++      read (*, *) nn
++      if (nn > ibig) then
++          print *, 'Error: nn greater than ibig', nn, ibig
++          stop
 +      end if
 +      do i = 1, nn
-+        read( *, * ) rlat(i), rlon(i), rdep(i)
-+        if( rdep(i) .lt. 0 ) write( 0, * )
-+     $    'Error: degative depth', i, rlon(i), rlat(i), rdep(i)
-+        if(rlon(i)/=rlon(i).or.rlat(i)/=rlat(i).or.rdep(i)/=rdep(i))
-+     $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
-+        rdep(i) = rdep(i) * 3.2808399
-+        if( rdep(i) .lt. rdepmin ) rdep(i) = rdepmin
++          read (*, *) rlat(i), rlon(i), rdep(i)
++          if (rdep(i) .lt. 0) write (0, *)
++     $        'Error: degative depth', i, rlon(i), rlat(i), rdep(i)
++          if (rlon(i)/=rlon(i).or.rlat(i)/=rlat(i).or.rdep(i)/=rdep(i))
++     $        write (0, *) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
++          rdep(i) = rdep(i) * 3.2808399
++          if (rdep(i) .lt. rdepmin) rdep(i) = rdepmin
 +      end do
 +      kerr = 0
 +      end
 +
-+      subroutine writepts( kerr )
++      subroutine writepts(kerr)
 +      implicit none
 +      include 'in.h'
 +      integer :: kerr, i
 +      do i = 1, nn
-+        rdep(i) = rdep(i) / 3.2808399
-+        if(rho(i)/=rho(i).or.alpha(i)/=alpha(i).or.beta(i)/=beta(i))
-+     $    write( 0, * ) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
-+        write( *, '(f8.5,1x,f10.5,1x,f9.2,1x,f8.1,1x,f8.1,1x,f8.1)' )
-+     $    rlat(i), rlon(i), rdep(i), alpha(i), beta(i), rho(i)
++          rdep(i) = rdep(i) / 3.2808399
++          if (rho(i)/=rho(i).or.alpha(i)/=alpha(i).or.beta(i)/=beta(i))
++     $        write (0, *) 'Error: NaN', i, rlon(i), rlat(i), rdep(i)
++          write (*, '(f8.5,1x,f10.5,1x,f9.2,1x,f8.1,1x,f8.1,1x,f8.1)')
++     $        rlat(i), rlon(i), rdep(i), alpha(i), beta(i), rho(i)
 +      end do
 +      kerr = 0
 +      end
