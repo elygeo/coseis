@@ -138,7 +138,7 @@ def stage(inputs={}, **kwargs):
                 os.remove(ff)
 
     # process machine templates
-    cst.conf.skeleton(job, new=False)
+    cst.conf.skeleton(job, stagein=job.stagein, new=False)
 
     # save input file and configuration
     f = os.path.join(job.rundir, 'cvms-input')
@@ -168,9 +168,9 @@ def extract(lon, lat, dep, prop=None, **kwargs):
     shape = dep.shape
     job = stage(nsample=dep.size, **kwargs)
     path = job.rundir + os.sep
-    lon.tofile(path + 'lon.bin')
-    lat.tofile(path + 'lat.bin')
-    dep.tofile(path + 'dep.bin')
+    lon.tofile(path + job.lon_file)
+    lat.tofile(path + job.lat_file)
+    dep.tofile(path + job.dep_file)
     del(lon, lat, dep)
     launch(job, run='exec')
     if prop is not None:

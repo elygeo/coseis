@@ -8,14 +8,15 @@ import numpy as np
 import cst
 
 # parameters
+dx_ = 50.0;   nproc3 = 1, 32, 480
 dx_ = 100.0;  nproc3 = 1, 4, 240
 dx_ = 200.0;  nproc3 = 1, 1, 120
 dx_ = 500.0;  nproc3 = 1, 1, 2
 dx_ = 1000.0; nproc3 = 1, 1, 2
-dx_ = 50.0;   nproc3 = 1, 32, 480
 dx_ = 4000.0; nproc3 = 1, 1, 1
 
 # mesh type
+surf_out_ = True
 surf_out_ = False
 register_ = True
 mesh_ = 'chino-cvmh-%04.0f' % dx_
@@ -66,9 +67,9 @@ vdamp = 400.0
 gam2 = 0.8
 if 1:
     fieldio = [
-        ('=r', 'rho', [], 'rho.bin'),
-        ('=r', 'vp',  [], 'vp.bin'),
-        ('=r', 'vs',  [], 'vs.bin'),
+        ('=r', 'rho', [], 'hold/rho.bin'),
+        ('=r', 'vp',  [], 'hold/vp.bin'),
+        ('=r', 'vs',  [], 'hold/vs.bin'),
     ]
 else:
     fieldio = [
@@ -80,7 +81,7 @@ else:
 # topography
 if 'topo' in id_:
     fieldio += [
-        ('=r', 'x3',  [], 'z3.bin')
+        ('=r', 'x3',  [], 'hold/z3.bin')
     ]
 
 # boundary conditions
@@ -151,7 +152,7 @@ if surf_out_:
 # stage job
 if cst.conf.configure()[0].machine == 'usc-hpc':
     mpout = 0
-job = cst.sord.stage(locals(), post='rm z3.bin rho.bin vp.bin vs.bin')
+job = cst.sord.stage(locals(), post='rm hold/z3.bin hold/rho.bin hold/vp.bin hold/vs.bin')
 if not job.prepare:
     sys.exit()
 
@@ -174,7 +175,7 @@ if surf_out_:
 
 # copy input files
 for f in 'z3.bin', 'rho.bin', 'vp.bin', 'vs.bin':
-    os.link(mesh_ + f, path_ + f)
+    os.link(mesh_ + f, path_ + 'hold/' + f)
 
 # launch job
 job = cst.sord.launch(job)
@@ -183,7 +184,7 @@ job = cst.sord.launch(job)
 if surf_out_:
     path_ = job.rundir + os.sep
     meta = cst.util.load(path_ + 'meta.py')
-    x, y, t = meta.shapes['full-v1.bin']
+    x, y, t = meta.shapes['hold/full-v1.bin']
     s = x * y * t / 1000000
     cst.conf.launch(
         new = False,

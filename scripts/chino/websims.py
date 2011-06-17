@@ -13,9 +13,9 @@ template = 'ws-meta-in.py'
 author = 'Geoffrey Ely'
 title = 'Chino Hills'
 scale = 0.001
-sims = 'run/sim/*'
 sims = 'run/sim/chino-cvms-1000-flat'
 sims = 'run/sim/chino-cvms-0200-flat'
+sims = 'run/sim/*'
 force = '-f' in sys.argv[1:]
 
 # loop over sims

@@ -9,14 +9,14 @@ import cst
 
 # parameters
 name = 'chino'
-cvm = 'cvmg'
 cvm = 'cvmh'
+cvm = 'cvmg'
 cvm = 'cvms'
+dx = 50.0;   nproc = 2048
 dx = 100.0;  nproc = 256
 dx = 200.0;  nproc = 32
 dx = 500.0;  nproc = 2
 dx = 1000.0; nproc = 1
-dx = 50.0;   nproc = 2048
 dx = 4000.0; nproc = 1
 delta = dx, dx, -dx
 
@@ -116,7 +116,10 @@ if cvm == 'cvms':
 
     # stage cvms
     rundir = path + 'cvms' + os.sep
-    post = 'rm lon.bin lat.bin dep.bin\nmv rho.bin vp.bin vs.bin %r' % path
+    post = (
+        'mv hold/rho.bin hold/vp.bin hold/vs.bin %r\n' % path +
+        'rm hold/lon.bin hold/lat.bin hold/dep.bin'
+    )
     n = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
     job = cst.cvms.stage(rundir=rundir, nproc=nproc, nsample=n, post=post)
 

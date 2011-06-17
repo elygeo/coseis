@@ -17,7 +17,7 @@ index 2b33361..3e46f6c 100644
 +      integer :: inout(ibig), nn, nnl
 diff --git a/iobin.f b/iobin.f
 new file mode 100644
-index 0000000..830566e
+index 0000000..ba2f673
 --- /dev/null
 +++ b/iobin.f
 @@ -0,0 +1,80 @@
@@ -31,13 +31,13 @@ index 0000000..830566e
 +      write (0, '(a)') 'SCEC Community Velocity Model'
 +      open (1, file='cvms-input', status='old')
 +      read (1, *) nn
-+      read (1, *) lon_file
-+      read (1, *) lat_file
-+      read (1, *) dep_file
++      read (1, '(a)') lon_file
++      read (1, '(a)') lat_file
++      read (1, '(a)') dep_file
 +      close (1)
 +      if (nn > ibig) then
-+         print *, 'Error: nn greater than ibig', nn , ibig
-+         stop
++          write (0, *) 'Error: nn greater than ibig', nn , ibig
++          stop
 +      end if
 +      inquire (iolength=nio) rlon(1:nn)
 +      write (0, '(a)') 'Reading input'
@@ -72,21 +72,21 @@ index 0000000..830566e
 +      character (160) :: rho_file, alpha_file, beta_file
 +      inquire (iolength=nio) rho(1:nn)
 +      open (1, file='cvms-input', status='old')
-+      read (1, *) rho_file
-+      read (1, *) rho_file
-+      read (1, *) rho_file
-+      read (1, *) rho_file
-+      read (1, *) rho_file
-+      read (1, *) alpha_file
-+      read (1, *) beta_file
++      read (1, '(a)') rho_file
++      read (1, '(a)') rho_file
++      read (1, '(a)') rho_file
++      read (1, '(a)') rho_file
++      read (1, '(a)') rho_file
++      read (1, '(a)') alpha_file
++      read (1, '(a)') beta_file
 +      close (1)
 +      write (0, '(a)') 'Writing output'
 +      open (1, file=rho_file, recl=nio, form='unformatted',
-+     $  access='direct', status='replace')
++     $    access='direct', status='replace')
 +      open (2, file=alpha_file, recl=nio, form='unformatted',
-+     $  access='direct', status='replace')
++     $    access='direct', status='replace')
 +      open (3, file=beta_file,recl=nio, form='unformatted',
-+     $  access='direct', status='replace')
++     $    access='direct', status='replace')
 +      write (1, rec=1) rho(1:nn)
 +      write (2, rec=1) alpha(1:nn)
 +      write (3, rec=1) beta(1:nn)
@@ -103,7 +103,7 @@ index 0000000..830566e
 +
 diff --git a/iompi.f b/iompi.f
 new file mode 100644
-index 0000000..ca63215
+index 0000000..4e5e78f
 --- /dev/null
 +++ b/iompi.f
 @@ -0,0 +1,106 @@
@@ -119,9 +119,9 @@ index 0000000..ca63215
 +      call mpi_init(ierr)
 +      open (1, file='cvms-input', status='old')
 +      read (1, *) nn8
-+      read (1, *) lon_file
-+      read (1, *) lat_file
-+      read (1, *) dep_file
++      read (1, '(a)') lon_file
++      read (1, '(a)') lat_file
++      read (1, '(a)') dep_file
 +      close (1)
 +      call mpi_comm_rank(mpi_comm_world, ip, ierr)
 +      call mpi_comm_size(mpi_comm_world, np, ierr)
@@ -134,7 +134,7 @@ index 0000000..ca63215
 +      nnl8 = nnl
 +      nn = min(nnl8, nn8 - nnl8 * ip)
 +      if (nn > ibig) then
-+          print *, 'Error: nn greater than ibig', nn, ibig
++          write (0, *) 'Error: nn greater than ibig', nn, ibig
 +          stop
 +      end if
 +      call mpi_type_size(mpi_real, i, ierr)
@@ -176,13 +176,13 @@ index 0000000..ca63215
 +      integer :: kerr, ip, ifh, ierr, i
 +      character (160) :: rho_file, alpha_file, beta_file
 +      open (1, file='cvms-input', status='old')
-+      read (1, *) rho_file
-+      read (1, *) rho_file
-+      read (1, *) rho_file
-+      read (1, *) rho_file
-+      read (1, *) rho_file
-+      read (1, *) alpha_file
-+      read (1, *) beta_file
++      read (1, '(a)') rho_file
++      read (1, '(a)') rho_file
++      read (1, '(a)') rho_file
++      read (1, '(a)') rho_file
++      read (1, '(a)') rho_file
++      read (1, '(a)') alpha_file
++      read (1, '(a)') beta_file
 +      close (1)
 +      call mpi_comm_rank(mpi_comm_world, ip, ierr)
 +      call mpi_type_size(mpi_real, i, ierr)

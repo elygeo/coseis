@@ -5,13 +5,14 @@ pwd="${PWD}"
 
 # virtualenv
 cd
-url="http://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.5.1.tar.gz"
+url="http://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.6.1.tar.gz"
 tag=$( basename "$url" .tar.gz )
 curl -L "${url}" | tar zx
 
 # yt python version
 cd "${SCRATCHDIR}"
-"$HOME/$tag/virtualenv.py" --python=/lustre/scratch/proj/yt_common/trunk/bin/python local
+module load yt
+python "$HOME/$tag/virtualenv.py" local
 . local/bin/activate
 pip install pyproj
 pip install GitPython

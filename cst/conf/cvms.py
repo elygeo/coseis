@@ -6,12 +6,13 @@ import os
 version = '4.0'
 seconds = 800
 nsample = None
-lon_file = 'lon.bin'
-lat_file = 'lat.bin'
-dep_file = 'dep.bin'
-rho_file = 'rho.bin'
-vp_file = 'vp.bin'
-vs_file = 'vs.bin'
+lon_file = 'hold/lon.bin'
+lat_file = 'hold/lat.bin'
+dep_file = 'hold/dep.bin'
+rho_file = 'hold/rho.bin'
+vp_file = 'hold/vp.bin'
+vs_file = 'hold/vs.bin'
+stagein = 'hold/',
 
 # command line options: (short, long, parameter, value)
 options = [
