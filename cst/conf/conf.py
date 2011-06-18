@@ -41,6 +41,7 @@ maxcores = 0
 maxram = 0
 maxtime = 0
 rate = 1.0e6
+nstripe = -2
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
 launch = {
     's_exec':  '%(command)s',

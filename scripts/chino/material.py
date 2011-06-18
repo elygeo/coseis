@@ -12,12 +12,12 @@ name = 'chino'
 cvm = 'cvmh'
 cvm = 'cvmg'
 cvm = 'cvms'
-dx = 50.0;   nproc = 2048
-dx = 100.0;  nproc = 256
-dx = 200.0;  nproc = 32
-dx = 500.0;  nproc = 2
-dx = 1000.0; nproc = 1
-dx = 4000.0; nproc = 1
+dx = 50.0;   nproc = 2048; nstripe = 32
+dx = 100.0;  nproc = 256;  nstripe = 16
+dx = 200.0;  nproc = 32;   nstripe = 8
+dx = 500.0;  nproc = 2;    nstripe = 2
+dx = 1000.0; nproc = 2;    nstripe = 1
+dx = 4000.0; nproc = 1;    nstripe = 1
 delta = dx, dx, -dx
 
 # moment tensor source
@@ -117,7 +117,7 @@ if cvm == 'cvms':
     # stage cvms
     rundir = path + 'cvms' + os.sep
     post = (
-        'mv hold/rho.bin hold/vp.bin hold/vs.bin %r\n' % path +
+        'mv hold/rho.bin hold/vp.bin hold/vs.bin %rhold/\n' % path +
         'rm hold/lon.bin hold/lat.bin hold/dep.bin'
     )
     n = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
@@ -130,7 +130,7 @@ if cvm == 'cvms':
         name = 'mesh',
         new = False,
         rundir = path,
-        stagein = ['mesh.py'],
+        stagein = ['mesh.py', 'hold/'],
         command = '%s mesh.py' % python,
         seconds = s,
         nproc = min(4, nproc),
@@ -157,7 +157,7 @@ else:
         name = cvm,
         new = False,
         rundir = path,
-        stagein = ['cvmh.py'],
+        stagein = ['cvmh.py', 'hold/'],
         command = '%s cvmh.py' % python,
         seconds = s,
         nproc = min(4, nproc),

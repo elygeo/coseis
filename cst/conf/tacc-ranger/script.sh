@@ -14,7 +14,8 @@
 export MY_NSLOTS=%(nproc)s
 cd "%(rundir)s"
 set > env
-[ -d hold ] && lfs setstripe -c $(( %(nodes)s < 32 ? %(nodes)s : 32 )) hold
+lfs setstripe -c 1 .
+[ %(nstripe)s -ge -1 -a -d hold ] && lfs setstripe -c %(nstripe)s hold
 [ %(nproc)s -gt 4000 ] && cache_binary $PWD %(command)s
 
 echo "$( date ): %(name)s started" >> log

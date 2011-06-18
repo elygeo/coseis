@@ -12,6 +12,8 @@
 
 cd "%(rundir)s"
 set > env
+lfs setstripe -c 1 .
+[ %(nstripe)s -ge -1 -a -d hold ] && lfs setstripe -c %(nstripe)s hold
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s

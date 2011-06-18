@@ -8,20 +8,20 @@ import numpy as np
 import cst
 
 # parameters
-dx_ = 50.0;   nproc3 = 1, 32, 480
-dx_ = 100.0;  nproc3 = 1, 4, 240
-dx_ = 200.0;  nproc3 = 1, 1, 120
-dx_ = 500.0;  nproc3 = 1, 1, 2
-dx_ = 1000.0; nproc3 = 1, 1, 2
-dx_ = 4000.0; nproc3 = 1, 1, 1
+dx_ = 50.0;   nproc3 = 1, 32, 480; nstripe = 32
+dx_ = 100.0;  nproc3 = 1, 4, 240;  nstripe = 16
+dx_ = 200.0;  nproc3 = 1, 1, 120;  nstripe = 8
+dx_ = 500.0;  nproc3 = 1, 1, 2;    nstripe = 2
+dx_ = 1000.0; nproc3 = 1, 1, 2;    nstripe = 1
+dx_ = 4000.0; nproc3 = 1, 1, 1;    nstripe = 1
 
 # mesh type
 surf_out_ = True
 surf_out_ = False
 register_ = True
 mesh_ = 'chino-cvmh-%04.0f' % dx_
-mesh_ = 'chino-cvmg-%04.0f' % dx_
 mesh_ = 'chino-cvms-%04.0f' % dx_
+mesh_ = 'chino-cvmg-%04.0f' % dx_
 id_ = mesh_ + '-topo'
 id_ = mesh_ + '-flat'
 
@@ -175,7 +175,7 @@ if surf_out_:
 
 # copy input files
 for f in 'z3.bin', 'rho.bin', 'vp.bin', 'vs.bin':
-    os.link(mesh_ + f, path_ + 'hold/' + f)
+    os.link(mesh_ + 'hold/' + f, path_ + 'hold/' + f)
 
 # launch job
 job = cst.sord.launch(job)

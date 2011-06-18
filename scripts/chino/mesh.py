@@ -37,7 +37,8 @@ n = shape[2] - ntop - npml
 w = 1.0 - np.r_[np.zeros(ntop), 1.0 / (n - 1) * np.arange(n), np.ones(npml)]
 
 # node elevation mesh
-fh = cst.util.open_excl('z3.bin', 'wb')
+d = 'hold/'
+fh = cst.util.open_excl(d + 'z3.bin', 'wb')
 if fh:
     for i in range(dep.size):
         (dep[i] + z0 + w[i] * z).T.tofile(fh)
