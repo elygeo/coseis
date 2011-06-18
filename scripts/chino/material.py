@@ -121,7 +121,13 @@ if cvm == 'cvms':
         'rm hold/lon.bin hold/lat.bin hold/dep.bin'
     )
     n = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
-    job = cst.cvms.stage(rundir=rundir, nproc=nproc, nsample=n, post=post)
+    job = cst.cvms.stage(
+        rundir = rundir,
+        nsample = n,
+        post = post,
+        nproc = nproc,
+        nstripe = nstripe,
+    )
 
     # launch mesher
     x, y, z = shape
@@ -134,6 +140,7 @@ if cvm == 'cvms':
         command = '%s mesh.py' % python,
         seconds = s,
         nproc = min(4, nproc),
+        nstripe = nstripe,
     )
 
     # launch cvms, wait for mesher
@@ -161,5 +168,6 @@ else:
         command = '%s cvmh.py' % python,
         seconds = s,
         nproc = min(4, nproc),
+        nstripe = nstripe,
     )
 
