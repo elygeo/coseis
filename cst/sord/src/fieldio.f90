@@ -44,7 +44,7 @@ integer :: i1(3), i2(3), i3(3), i4(3), di(3), m(4), n(4), o(4), &
     it1, it2, dit, i, j, k, l, ipass
 real :: val
 
-! atart timer
+! start timer
 val = timer(2)
 !if (verb) write (*, '(3a)') 'Field I/O ', passes, field
 
