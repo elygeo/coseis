@@ -37,7 +37,8 @@ proj = pyproj.Proj(**projection)
 mesh_id = '%s-%s-%04.f' % (name, cvm, delta[0])
 path = os.path.join('run', 'mesh', mesh_id)
 path = os.path.realpath(path) + os.sep
-os.makedirs(path)
+hold = path + 'hold' + os.sep
+os.makedirs(hold)
 
 # uniform zone in PML and to deepest source depth
 npml = 10
@@ -115,18 +116,17 @@ if cst.site.machine == 'nics-kraken':
 if cvm == 'cvms':
 
     # stage cvms
-    rundir = path + 'cvms' + os.sep
-    post = (
-        'mv hold/rho.bin hold/vp.bin hold/vs.bin %rhold/\n' % path +
-        'rm hold/lon.bin hold/lat.bin hold/dep.bin'
-    )
-    n = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
     job = cst.cvms.stage(
-        rundir = rundir,
-        nsample = n,
-        post = post,
+        rundir = path + 'cvms',
+        nsample = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1),
+        post = 'cd %r\nrm lon.bin lat.bin dep.bin' % hold,
         nproc = nproc,
-        nstripe = nstripe,
+        file_lon = hold + 'lon.bin',
+        file_lat = hold + 'lat.bin',
+        file_dep = hold + 'dep.bin',
+        file_rho = hold + 'rho.bin',
+        file_vp = hold + 'vp.bin',
+        file_vs = hold + 'vs.bin',
     )
 
     # launch mesher
@@ -136,7 +136,7 @@ if cvm == 'cvms':
         name = 'mesh',
         new = False,
         rundir = path,
-        stagein = ['mesh.py', 'hold/'],
+        stagein = ['mesh.py'],
         command = '%s mesh.py' % python,
         seconds = s,
         nproc = min(4, nproc),
@@ -164,7 +164,7 @@ else:
         name = cvm,
         new = False,
         rundir = path,
-        stagein = ['cvmh.py', 'hold/'],
+        stagein = ['cvmh.py'],
         command = '%s cvmh.py' % python,
         seconds = s,
         nproc = min(4, nproc),

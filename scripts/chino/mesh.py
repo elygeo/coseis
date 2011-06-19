@@ -2,6 +2,7 @@
 """
 Mesh generation
 """
+import os
 import numpy as np
 import cst
 import meta
@@ -12,6 +13,7 @@ shape = meta.shape
 delta = meta.delta
 npml = meta.npml
 ntop = meta.ntop
+hold = 'hold' + os.sep
 
 # read data
 dep = np.arange(shape[2]) * delta[2]
@@ -37,8 +39,7 @@ n = shape[2] - ntop - npml
 w = 1.0 - np.r_[np.zeros(ntop), 1.0 / (n - 1) * np.arange(n), np.ones(npml)]
 
 # node elevation mesh
-d = 'hold/'
-fh = cst.util.open_excl(d + 'z3.bin', 'wb')
+fh = cst.util.open_excl(hold + 'z3.bin', 'wb')
 if fh:
     for i in range(dep.size):
         (dep[i] + z0 + w[i] * z).T.tofile(fh)
@@ -55,22 +56,21 @@ n = shape[2] - ntop - npml
 w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 
 # write dep file
-d = 'cvms/hold/'
-fh = cst.util.open_excl(d + 'dep.bin', 'wb')
+fh = cst.util.open_excl(hold + 'dep.bin', 'wb')
 if fh:
     for i in range(dep.size):
         (w[i] * z - dep[i]).astype('f').T.tofile(fh)
     fh.close()
 
 # write lon file
-fh = cst.util.open_excl(d + 'lon.bin', 'wb')
+fh = cst.util.open_excl(hold + 'lon.bin', 'wb')
 if fh:
     for i in range(dep.size):
         x.T.tofile(fh)
     fh.close()
 
 # write lat file
-fh = cst.util.open_excl(d + 'lat.bin', 'wb')
+fh = cst.util.open_excl(hold + 'lat.bin', 'wb')
 if fh:
     for i in range(dep.size):
         y.T.tofile(fh)

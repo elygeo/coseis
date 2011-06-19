@@ -11,12 +11,12 @@ path = os.path.dirname(os.path.realpath(__file__))
 
 input_template = """\
 %(nsample)s
-%(lon_file)s
-%(lat_file)s
-%(dep_file)s
-%(rho_file)s
-%(vp_file)s
-%(vs_file)s
+%(file_lon)s
+%(file_lat)s
+%(file_dep)s
+%(file_rho)s
+%(file_vp)s
+%(file_vs)s
 """
 
 def _build(mode=None, optimize=None, version=None):

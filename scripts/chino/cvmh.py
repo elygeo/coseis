@@ -2,6 +2,7 @@
 """
 Mesh generation
 """
+import os
 import numpy as np
 import cst, meta
 
@@ -11,6 +12,7 @@ shape = meta.shape
 delta = meta.delta
 npml = meta.npml
 ntop = meta.ntop
+hold = 'hold' + os.sep
 
 # GTL
 if meta.cvm == 'cvmg':
@@ -42,8 +44,7 @@ n = shape[2] - ntop - npml
 w = 1.0 - np.r_[np.zeros(ntop), 1.0 / (n - 1) * np.arange(n), np.ones(npml)]
 
 # node elevation mesh
-d = 'hold/'
-fh = cst.util.open_excl(d + 'z3.bin', 'wb')
+fh = cst.util.open_excl(hold + 'z3.bin', 'wb')
 if fh:
     for i in range(dep.size):
         (dep[i] + z0 + w[i] * z).T.tofile(fh)
@@ -60,7 +61,7 @@ n = shape[2] - ntop - npml
 w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 
 # rho extraction
-fh = cst.util.open_excl(d + 'rho.bin', 'wb')
+fh = cst.util.open_excl(hold + 'rho.bin', 'wb')
 if fh:
     vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
     for i in range(dep.size):
@@ -69,7 +70,7 @@ if fh:
     fh.close()
 
 # vp extraction
-fh = cst.util.open_excl(d + 'vp.bin', 'wb')
+fh = cst.util.open_excl(hold + 'vp.bin', 'wb')
 if fh:
     vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
     for i in range(dep.size):
@@ -78,7 +79,7 @@ if fh:
     fh.close()
 
 # vs extraction
-fh = cst.util.open_excl(d + 'vs.bin', 'wb')
+fh = cst.util.open_excl(hold + 'vs.bin', 'wb')
 if fh:
     vm = cst.cvmh.Extraction(x, y, 'vs', vs30)
     for i in range(dep.size):
