@@ -119,7 +119,7 @@ if cvm == 'cvms':
     job = cst.cvms.stage(
         rundir = path + 'cvms',
         nsample = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1),
-        post = 'cd %r\nrm lon.bin lat.bin dep.bin' % hold,
+        post = 'rm %slon.bin\nrm %slat.bin\nrm %sdep.bin' % (hold, hold, hold),
         nproc = nproc,
         file_lon = hold + 'lon.bin',
         file_lat = hold + 'lat.bin',
