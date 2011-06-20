@@ -2,13 +2,14 @@
 USC HPC - http://www.usc.edu/hpcc/
 
 Add these to your .bashrc:
-    source /usr/usc/openmpi/default/setup.sh
     source /usr/usc/globus/default/setup.sh
     export F77=gfortran
     export F90=gfortran
 
-MPICH install is very old, so don't use:
-    source /usr/usc/mpich/default/setup.sh
+MPICH versions:
+    source /usr/usc/mpich/default/setup.sh   # old, no good
+    source /usr/usc/openmpi/default/setup.sh # old, better
+    source /usr/usc/mpich2/default/setup.sh  # ???
 
 pbsnodes -a | grep main | sort | uniq -c
 alias showme='qstat -u $USER"'

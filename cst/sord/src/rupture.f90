@@ -84,7 +84,7 @@ call fieldio('>', 'nhat3', nhat(:,:,:,3))
 
 ! resolve prestress onto fault
 do i = 1, 3
-    j = modulo(i , 3) + 1
+    j = modulo(i, 3) + 1
     k = modulo(i + 1, 3) + 1
     t0(:,:,:,i) = &
         t1(:,:,:,i) * nhat(:,:,:,i) + &

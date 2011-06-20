@@ -27,19 +27,19 @@ real, allocatable :: prof(:,:)
 ! initialization
 iotimer = 0.0
 prof0(1) = timer(0)
-call initialize(np0, ip)     ; master = ip == 0 ; prof0(1)  = timer(6)
-call read_parameters                              ; prof0(2)  = timer(6)
-call setup               ; if (sync) call barrier ; prof0(3)  = timer(6)
+call initialize(np0, ip);        master = ip == 0; prof0(1)  = timer(6)
+call read_parameters;                              prof0(2)  = timer(6)
+call setup;                if (sync) call barrier; prof0(3)  = timer(6)
 if (master) write (*, '(a)') 'SORD - Support Operator Rupture Dynamics'
-call look_for_checkpoint ; if (sync) call barrier ; prof0(4)  = timer(6)
-call arrays              ; if (sync) call barrier ; prof0(5)  = timer(6)
-call grid_gen            ; if (sync) call barrier ; prof0(6)  = timer(6)
-call material            ; if (sync) call barrier ; prof0(7)  = timer(6)
-call pml                 ; if (sync) call barrier ; prof0(8)  = timer(6)
-call finite_source_init  ; if (sync) call barrier ; prof0(9)  = timer(6)
-call rupture_init        ; if (sync) call barrier ; prof0(10) = timer(6)
-call resample            ; if (sync) call barrier ; prof0(11) = timer(6)
-call read_checkpoint     ; if (sync) call barrier ; prof0(12) = timer(6)
+call look_for_checkpoint;  if (sync) call barrier; prof0(4)  = timer(6)
+call arrays;               if (sync) call barrier; prof0(5)  = timer(6)
+call grid_gen;             if (sync) call barrier; prof0(6)  = timer(6)
+call material;             if (sync) call barrier; prof0(7)  = timer(6)
+call pml;                  if (sync) call barrier; prof0(8)  = timer(6)
+call finite_source_init;   if (sync) call barrier; prof0(9)  = timer(6)
+call rupture_init;         if (sync) call barrier; prof0(10) = timer(6)
+call resample;             if (sync) call barrier; prof0(11) = timer(6)
+call read_checkpoint;      if (sync) call barrier; prof0(12) = timer(6)
 fh = -1
 if (mpout /= 0) fh = file_null
 allocate (prof(8,itio))
@@ -56,11 +56,11 @@ jp = jp + 1
 mptimer = 0.0
 iotimer = 0.0
 prof(1,jp) = timer(5)
-call timestep            ; if (sync) call barrier ; prof(1,jp) = timer(5)
-call stress              ; if (sync) call barrier ; prof(2,jp) = timer(5)
-call acceleration        ; if (sync) call barrier ; prof(3,jp) = timer(5)
-call stats               ; if (sync) call barrier ; prof(4,jp) = timer(5)
-call write_checkpoint    ; if (sync) call barrier ; prof(5,jp) = timer(5)
+call timestep;            if (sync) call barrier; prof(1,jp) = timer(5)
+call stress;              if (sync) call barrier; prof(2,jp) = timer(5)
+call acceleration;        if (sync) call barrier; prof(3,jp) = timer(5)
+call stats;               if (sync) call barrier; prof(4,jp) = timer(5)
+call write_checkpoint;    if (sync) call barrier; prof(5,jp) = timer(5)
 prof(6,jp) = mptimer
 prof(7,jp) = iotimer
 prof(8,jp) = timer(6)

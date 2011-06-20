@@ -40,8 +40,8 @@ def solve2(A, b):
     A = np.asarray(A)
     b = np.asarray(b)
     A /= (A[0,0] * A[1,1] - A[0,1] * A[1,0])
-    return np.array([b[0] * A[1,1] - b[1] * A[0,1],
-                     b[1] * A[0,0] - b[0] * A[1,0]])
+    return np.array([ b[0] * A[1,1] - b[1] * A[0,1],
+                      b[1] * A[0,0] - b[0] * A[1,0] ])
 
 
 def interp(extent, f, coords, out=None, bound=None, mask_nan=False, extrapolate=False):
@@ -113,10 +113,10 @@ def interp2(extent, f, coords, out=None, method='linear', bound=None, mask_nan=F
         if not extrapolate:
             xi = np.minimum(np.maximum(xi, 0), n[-2]-1)
             yi = np.minimum(np.maximum(yi, 0), n[-1]-1)
-        f = ((1.0 - xi + j) * (1.0 - yi + k) * f[...,j,k]
-            + (1.0 - xi + j) * (yi - k) * f[...,j,k+1]
-            + (xi - j) * (1.0 - yi + k) * f[...,j+1,k]
-            + (xi - j) * (yi - k) * f[...,j+1,k+1])
+        f = ( (1.0 - xi + j) * (1.0 - yi + k) * f[...,j,k]
+            + (1.0 - xi + j) * (yi - k)       * f[...,j,k+1]
+            + (xi - j)       * (1.0 - yi + k) * f[...,j+1,k]
+            + (xi - j)       * (yi - k)       * f[...,j+1,k+1] )
     else:
         sys.exit('Unknon interpolation method: %s' % method)
     if out is None:
@@ -179,14 +179,14 @@ def interp3(extent, f, coords, out=None, method='linear', bound=None, mask_nan=F
             xi = np.minimum(np.maximum(xi, 0), n[-3]-1)
             yi = np.minimum(np.maximum(yi, 0), n[-2]-1)
             zi = np.minimum(np.maximum(zi, 0), n[-1]-1)
-        f = ((1.0 - xi + j) * (1.0 - yi + k) * (1.0 - zi + l) * f[...,j,k,l]
-            + (1.0 - xi + j) * (1.0 - yi + k) * (zi - l) * f[...,j,k,l+1]
-            + (1.0 - xi + j) * (yi - k) * (1.0 - zi + l) * f[...,j,k+1,l]
-            + (1.0 - xi + j) * (yi - k) * (zi - l) * f[...,j,k+1,l+1]
-            + (xi - j) * (1.0 - yi + k) * (1.0 - zi + l) * f[...,j+1,k,l]
-            + (xi - j) * (1.0 - yi + k) * (zi - l) * f[...,j+1,k,l+1]
-            + (xi - j) * (yi - k) * (1.0 - zi + l) * f[...,j+1,k+1,l]
-            + (xi - j) * (yi - k) * (zi - l) * f[...,j+1,k+1,l+1])
+        f = ( (1.0 - xi + j) * (1.0 - yi + k) * (1.0 - zi + l) * f[...,j,k,l]
+            + (1.0 - xi + j) * (1.0 - yi + k) * (zi - l)       * f[...,j,k,l+1]
+            + (1.0 - xi + j) * (yi - k)       * (1.0 - zi + l) * f[...,j,k+1,l]
+            + (1.0 - xi + j) * (yi - k)       * (zi - l)       * f[...,j,k+1,l+1]
+            + (xi - j)       * (1.0 - yi + k) * (1.0 - zi + l) * f[...,j+1,k,l]
+            + (xi - j)       * (1.0 - yi + k) * (zi - l)       * f[...,j+1,k,l+1]
+            + (xi - j)       * (yi - k)       * (1.0 - zi + l) * f[...,j+1,k+1,l]
+            + (xi - j)       * (yi - k)       * (zi - l)       * f[...,j+1,k+1,l+1] )
     else:
         sys.exit('Unknon interpolation method: %s' % method)
     if out is None:
@@ -221,10 +221,10 @@ def ibilinear(xx, yy, xi, yi):
         i += 1
         if i > 10:
             sys.exit('inverse bilinear interpolation did not converge')
-        j = [[j1[0,0] + j2[0]*x[1], j1[0,1] + j2[0]*x[0]],
-             [j1[1,0] + j2[1]*x[1], j1[1,1] + j2[1]*x[0]]]
-        b = [xi - j1[0,0]*x[0] - j1[0,1]*x[1] - j2[0]*x[0]*x[1],
-             yi - j1[1,0]*x[0] - j1[1,1]*x[1] - j2[1]*x[0]*x[1]]
+        j = [ [j1[0,0] + j2[0]*x[1], j1[0,1] + j2[0]*x[0]],
+              [j1[1,0] + j2[1]*x[1], j1[1,1] + j2[1]*x[0]] ]
+        b = [ xi - j1[0,0]*x[0] - j1[0,1]*x[1] - j2[0]*x[0]*x[1],
+              yi - j1[1,0]*x[0] - j1[1,1]*x[1] - j2[1]*x[0]*x[1] ]
         dx = solve2(j, b)
         x  = x + dx
     return x
