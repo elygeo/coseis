@@ -14,10 +14,12 @@ npml = meta.npml
 ntop = meta.ntop
 hold = 'hold' + os.sep
 
-# GTL
+# variant
 if meta.cvm == 'cvmg':
+    version = 'vx63'
     vs30 = 'wills'
 else:
+    version = 'vx62'
     vs30 = None
 
 # read data
@@ -63,7 +65,7 @@ w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 # rho extraction
 fh = cst.util.open_excl(hold + 'rho.bin', 'wb')
 if fh:
-    vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
+    vm = cst.cvmh.Extraction(x, y, 'vp', vs30, version=version)
     for i in range(dep.size):
         zz = w[i] * z - dep[i]
         cst.cvmh.nafe_drake(vm(zz)).T.tofile(fh)
@@ -72,7 +74,7 @@ if fh:
 # vp extraction
 fh = cst.util.open_excl(hold + 'vp.bin', 'wb')
 if fh:
-    vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
+    vm = cst.cvmh.Extraction(x, y, 'vp', vs30, version=version)
     for i in range(dep.size):
         zz = w[i] * z - dep[i]
         vm(zz).T.tofile(fh)
@@ -81,7 +83,7 @@ if fh:
 # vs extraction
 fh = cst.util.open_excl(hold + 'vs.bin', 'wb')
 if fh:
-    vm = cst.cvmh.Extraction(x, y, 'vs', vs30)
+    vm = cst.cvmh.Extraction(x, y, 'vs', vs30, version=version)
     for i in range(dep.size):
         zz = w[i] * z - dep[i]
         vm(zz).T.tofile(fh)

@@ -135,7 +135,7 @@ def brocher_vp(f):
     return f
 
 
-def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='vx62'):
+def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='vx63'):
     """
     Download and read SCEC CVM-H voxet.
 
@@ -145,7 +145,7 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='vx62'):
             2d property: 'topo', 'base', or 'moho'
             3d property: 'vp', 'vs', or 'tag'
         voxet:
-            3d voxet: 'mantle', 'crust', 'lab'
+            3d voxet: 'mantle', 'crust', or 'lab'
         no_data_value: None, 'nan', or float value. None = filled from below.
         version: 'vx62', or 'vx63'
 
