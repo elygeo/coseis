@@ -22,9 +22,7 @@ echo "$( date ): %(name)s started" >> log
 %(pre)s
 rsync -rlpt . /scratch/job
 cd /scratch/job
-# OpenMPI
-#mpiexec --mca mtl mx --mca pml cm %(command)s
-# MPICH2
+# mpiexec --mca mtl mx --mca pml cm %(command)s # OpenMPI
 mpiexec %(command)s
 cd "%(rundir)s"
 rsync -rlpt --delete /scratch/job/ .

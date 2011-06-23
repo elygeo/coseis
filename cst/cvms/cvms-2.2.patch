@@ -103,10 +103,10 @@ index 0000000..ba2f673
 +
 diff --git a/iompi.f b/iompi.f
 new file mode 100644
-index 0000000..4e5e78f
+index 0000000..da12500
 --- /dev/null
 +++ b/iompi.f
-@@ -0,0 +1,106 @@
+@@ -0,0 +1,110 @@
 +! MPI I/O for SCEC CVM
 +
 +      subroutine readpts (kerr)
@@ -114,14 +114,14 @@ index 0000000..4e5e78f
 +      include 'in.h'
 +      include 'mpif.h'
 +      integer (kind=mpi_offset_kind) :: offset, nn8, np8, nnl8
-+      integer :: kerr, ip, np, ifh, ierr, i
-+      character (160) :: lon_file, lat_file, dep_file
++      integer :: kerr, ip, np, ifh, info, ierr, i
++      character (160) :: file_lon, file_lat, file_dep
 +      call mpi_init(ierr)
 +      open (1, file='cvms-input', status='old')
 +      read (1, *) nn8
-+      read (1, '(a)') lon_file
-+      read (1, '(a)') lat_file
-+      read (1, '(a)') dep_file
++      read (1, '(a)') file_lon
++      read (1, '(a)') file_lat
++      read (1, '(a)') file_dep
 +      close (1)
 +      call mpi_comm_rank(mpi_comm_world, ip, ierr)
 +      call mpi_comm_size(mpi_comm_world, np, ierr)
@@ -141,21 +141,23 @@ index 0000000..4e5e78f
 +      offset = i
 +      offset = offset * nnl * ip
 +      if (ip == 0) write (0, '(a)') 'Reading input'
-+      call mpi_file_open(mpi_comm_world, lon_file, mpi_mode_rdonly,
-+     $    mpi_info_null, ifh, ierr)
++      i =  mpi_mode_rdonly
++      call mpi_info_create(info, ierr)
++      call mpi_info_set(info, 'romio_cb_read', 'enable', ierr)
++      call mpi_info_set(info, 'romio_cb_write', 'enable', ierr)
++      call mpi_file_open(mpi_comm_world, file_lon, i, info, ifh, ierr)
 +      call mpi_file_read_at_all(ifh, offset, rlon, nn, mpi_real,
 +     $    mpi_status_ignore, ierr)
 +      call mpi_file_close(ifh, ierr)
-+      call mpi_file_open(mpi_comm_world, lat_file, mpi_mode_rdonly,
-+     $    mpi_info_null, ifh, ierr)
++      call mpi_file_open(mpi_comm_world, file_lat, i, info, ifh, ierr)
 +      call mpi_file_read_at_all(ifh, offset, rlat, nn, mpi_real,
 +     $    mpi_status_ignore, ierr)
 +      call mpi_file_close(ifh, ierr)
-+      call mpi_file_open(mpi_comm_world, dep_file, mpi_mode_rdonly,
-+     $    mpi_info_null, ifh, ierr)
++      call mpi_file_open(mpi_comm_world, file_dep, i, info, ifh, ierr)
 +      call mpi_file_read_at_all(ifh, offset, rdep, nn, mpi_real,
 +     $    mpi_status_ignore, ierr)
 +      call mpi_file_close(ifh, ierr)
++      call mpi_info_free(info, ierr)
 +      if (ip == 0) write (0, '(a)') 'Sampling velocity model'
 +      do i = 1, nn
 +          if (rdep(i).lt.0) write(0, *)
@@ -174,36 +176,38 @@ index 0000000..4e5e78f
 +      include 'mpif.h'
 +      integer (kind=mpi_offset_kind) :: offset
 +      integer :: kerr, ip, ifh, ierr, i
-+      character (160) :: rho_file, alpha_file, beta_file
++      character (160) :: file_rho, file_alpha, file_beta
 +      open (1, file='cvms-input', status='old')
-+      read (1, '(a)') rho_file
-+      read (1, '(a)') rho_file
-+      read (1, '(a)') rho_file
-+      read (1, '(a)') rho_file
-+      read (1, '(a)') rho_file
-+      read (1, '(a)') alpha_file
-+      read (1, '(a)') beta_file
++      read (1, '(a)') file_rho
++      read (1, '(a)') file_rho
++      read (1, '(a)') file_rho
++      read (1, '(a)') file_rho
++      read (1, '(a)') file_rho
++      read (1, '(a)') file_alpha
++      read (1, '(a)') file_beta
 +      close (1)
 +      call mpi_comm_rank(mpi_comm_world, ip, ierr)
 +      call mpi_type_size(mpi_real, i, ierr)
 +      offset = i
 +      offset = offset * nnl * ip
 +      if (ip == 0) write (0, '(a)') 'Writing output'
-+      call mpi_file_open(mpi_comm_world, rho_file,
-+     $    mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr)
++      i = mpi_mode_create + mpi_mode_wronly
++      call mpi_info_create(info, ierr)
++      call mpi_info_set(info, 'romio_cb_read', 'enable', ierr)
++      call mpi_info_set(info, 'romio_cb_write', 'enable', ierr)
++      call mpi_file_open(mpi_comm_world, file_rho, i, info, ifh, ierr)
 +      call mpi_file_write_at_all(ifh, offset, rho, nn, mpi_real,
 +     $    mpi_status_ignore, ierr)
 +      call mpi_file_close(ifh, ierr)
-+      call mpi_file_open(mpi_comm_world, alpha_file,
-+     $    mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr)
++      call mpi_file_open(mpi_comm_world, file_alpha, i, info, ifh, ierr)
 +      call mpi_file_write_at_all(ifh, offset, alpha, nn, mpi_real,
 +     $    mpi_status_ignore, ierr)
 +      call mpi_file_close(ifh, ierr)
-+      call mpi_file_open(mpi_comm_world, beta_file,
-+     $    mpi_mode_create + mpi_mode_wronly, mpi_info_null, ifh, ierr)
++      call mpi_file_open(mpi_comm_world, file_beta, i, info, ifh, ierr)
 +      call mpi_file_write_at_all(ifh, offset, beta, nn, mpi_real,
 +     $    mpi_status_ignore, ierr)
 +      call mpi_file_close(ifh, ierr)
++      call mpi_info_free(info, ierr)
 +      kerr = 0
 +      do i = 1, nn
 +          if (rho(i)/=rho(i).or.alpha(i)/=alpha(i).or.beta(i)/=beta(i))

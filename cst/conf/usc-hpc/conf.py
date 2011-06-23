@@ -7,9 +7,9 @@ Add these to your .bashrc:
     export F90=gfortran
 
 MPICH versions:
-    source /usr/usc/mpich/default/setup.sh   # old, no good
-    source /usr/usc/openmpi/default/setup.sh # old, better
-    source /usr/usc/mpich2/default/setup.sh  # ???
+    source /usr/usc/mpich/default/setup.sh     # bad
+    source /usr/usc/openmpi/default/setup.sh   # better
+    source /usr/usc/mpich2/1.3.1..10/setup.sh  # best
 
 pbsnodes -a | grep main | sort | uniq -c
 alias showme='qstat -u $USER"'
