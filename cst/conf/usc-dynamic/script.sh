@@ -14,7 +14,7 @@ set > env
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
-mpiexec -np %(nproc)s -machinefile $PBS_NODEFILE %(command)s
+mpiexec -n %(nproc)s -machinefile $PBS_NODEFILE %(command)s
 %(post)s
 echo "$( date ): %(name)s finished" >> log
 

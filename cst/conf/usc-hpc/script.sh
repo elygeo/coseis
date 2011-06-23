@@ -30,7 +30,7 @@ echo "$( date ): %(name)s started" >> log
 rsync -rlpt . /scratch/job
 cd /scratch/job
 # mpiexec --mca mtl mx --mca pml cm %(command)s # OpenMPI
-mpiexec %(command)s
+mpiexec -n %(nproc)s %(command)s
 cd "%(rundir)s"
 rsync -rlpt --delete /scratch/job/ .
 %(post)s
