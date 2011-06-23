@@ -31,7 +31,7 @@ hostname = 'login[34].ranger.tacc.utexas.edu'
 maxcores = 16
 maxram = 30000
 #rate = 21e5
-rate = 15e5
+rate = 12e5
 queue_opts = [
     {'queue': 'development', 'maxnodes': 16,   'maxtime':  (2, 00)},
     {'queue': 'normal',      'maxnodes': 256,  'maxtime': (24, 00)},

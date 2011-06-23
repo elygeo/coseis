@@ -11,12 +11,19 @@
 #PBS -V
 
 cd "%(rundir)s"
-set > env
+export ROMIO_HINTS="%(rundir)sromio-hints"
+cat > romio-hints << END
+romio_cb_read enable
+romio_cb_write enable
+romio_ds_read disable
+romio_ds_write disable
+END
 cat > sync.sh << END
 #!/bin/bash -e
 ssh $HOST 'rsync -rlptv /scratch/job/ "%(rundir)s"'
 END
 chmod u+x sync.sh
+set > env
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
