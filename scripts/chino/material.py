@@ -9,9 +9,9 @@ import cst
 
 # parameters
 name = 'chino'
-cvm = 'cvmh'
-cvm = 'cvmg'
 cvm = 'cvms'
+cvm = 'cvmg'
+cvm = 'cvmh'
 dx = 50.0;   nproc = 2048; nstripe = 32
 dx = 100.0;  nproc = 256;  nstripe = 16
 dx = 200.0;  nproc = 32;   nstripe = 8
