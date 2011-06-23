@@ -11,7 +11,7 @@
 #PBS -V
 
 cd "%(rundir)s"
-export ROMIO_HINTS="%(rundir)sromio-hints"
+export ROMIO_HINTS="%(rundir)s/romio-hints"
 cat > romio-hints << END
 romio_cb_read enable
 romio_cb_write enable
