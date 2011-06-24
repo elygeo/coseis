@@ -15,6 +15,8 @@ def _build(mode=None, optimize=None, dtype=None):
     """
     import cst
     cf = cst.conf.configure()[0]
+
+    # arguments
     if not optimize:
         optimize = cf.optimize
     if not mode:
@@ -23,6 +25,20 @@ def _build(mode=None, optimize=None, dtype=None):
         mode = 'sm'
     if not dtype:
         dtype = cf.dtype
+
+    dtype = np.dtype(dtype).str
+    dsize = dtype[-1]
+    new = False
+
+    # setup build directory
+    cwd = os.getcwd()
+    src = os.path.join(path, 'src')
+    bld = os.path.join(os.path.dirname(path), 'build') + os.sep
+    os.chdir(src)
+    if not os.path.isdir(bld):
+        os.mkdir(bld)
+
+    # source files
     base = [
         'globals.f90',
         'diffcn.f90',
@@ -50,15 +66,8 @@ def _build(mode=None, optimize=None, dtype=None):
         'acceleration.f90',
         'sord.f90',
     ]
-    dtype = np.dtype(dtype).str
-    dsize = dtype[-1]
-    new = False
-    cwd = os.getcwd()
-    src = os.path.join(path, 'src')
-    bld = os.path.join(os.path.dirname(path), 'build') + os.sep
-    os.chdir(src)
-    if not os.path.isdir(bld):
-        os.mkdir(bld)
+
+    # serial compile
     if 's' in mode:
         source = base + ['serial.f90'] + common
         for opt in optimize:
@@ -71,6 +80,8 @@ def _build(mode=None, optimize=None, dtype=None):
             if dtype != cf.dtype_f:
                 cmd += shlex.split(cf.fortran_flags[dsize])
             new |= cst.conf.make(cmd + ['-o'], object_, source)
+
+    # mpi compile
     if 'm' in mode and cf.fortran_mpi:
         source = base + ['mpi.f90'] + common
         for opt in optimize:
@@ -83,8 +94,12 @@ def _build(mode=None, optimize=None, dtype=None):
             if dtype != cf.dtype_f:
                 cmd += shlex.split(cf.fortran_flags[dsize])
             new |= cst.conf.make(cmd + ['-o'], object_, source)
+
+    # archive source code
     if new:
         cst._archive()
+
+    # finished
     os.chdir(cwd)
     return
 
@@ -280,7 +295,7 @@ def prepare_param(pm):
     if pm.source not in ('potency', 'moment', 'force', 'none'):
         sys.exit('Error: unknown source type %r' % pm.source)
 
-    # inervals
+    # intervals
     nt = pm.shape[3]
     pm.itio = max(1, min(pm.itio, nt))
     if pm.itcheck % pm.itio != 0:
@@ -337,6 +352,8 @@ def prepare_param(pm):
         filename = '-'
         pulse, val, tau = 'const', 1.0, 1.0
         x1 = x2 = 0.0, 0.0, 0.0
+
+        # parse line
         op = line[0][0]
         mode = line[0][1:]
         if op not in '=+#':
@@ -358,10 +375,13 @@ def prepare_param(pm):
                 sys.exit('Error: bad i/o mode: %r' % line)
         except(ValueError):
             sys.exit('Error: bad i/o spec: %r' % line)
+
         filename = os.path.expanduser(filename)
         mode = mode.replace('f', '')
         if type(fields) == str:
             fields = [fields]
+
+        # error check
         for field in fields:
             if field not in fieldnames.all:
                 sys.exit('Error: unknown field: %r' % line)
@@ -374,11 +394,15 @@ def prepare_param(pm):
                     sys.exit('Error: cannot mix fault and non-fault i/o: %r' % line)
                 if pm.faultnormal == 0:
                     sys.exit('Error: field only for ruptures: %r' % line)
+
+        # cell or node registration
         if field in fieldnames.cell:
             mode = mode.replace('c', 'C')
             base = 1.5
         else:
             base = 1
+
+        # indices
         nn = pm.shape[:3]
         nt = pm.shape[3]
         if 'i' in mode:
@@ -395,6 +419,8 @@ def prepare_param(pm):
         if field in fieldnames.fault:
             i = abs(pm.faultnormal) - 1
             ii[i] = 2 * (irup,) + (1,)
+
+        # buffer size
         shape = [(i[1] - i[0]) // i[2] + 1 for i in ii]
         nb = (min(pm.itio, nt) - 1) // ii[3][2] + 1
         nb = max(1, min(nb, shape[3]))
@@ -404,13 +430,19 @@ def prepare_param(pm):
         elif n > 1:
             nb = min(nb, pm.itbuff)
         nc = len(fields)
+
+        # append to list
         fieldio += [
             (op + mode, nc, pulse, tau, x1, x2, nb, ii, filename, val, fields)
         ]
+
+    # check for duplicate filename
     f = [line[8] for line in fieldio if line[8] != '-']
     for i in range(len(f)):
         if f[i] in f[:i]:
             sys.exit('Error: duplicate filename: %r' % f[i])
+
+    # done
     pm.fieldio = fieldio
     return pm
 
