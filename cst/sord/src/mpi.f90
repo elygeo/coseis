@@ -57,7 +57,7 @@ end do
 end subroutine
 
 ! find communicator and rank from Cartesian coordinates.
-! exclude dimensions with coordinate < 0.
+! exclude dimensions with coordinate < 0.0
 subroutine commrank(comm, rank, coords)
 use mpi
 integer, intent(out) :: comm, rank

@@ -237,7 +237,7 @@ integer(8), save :: timers(8)
 integer :: clock1
 if (i == 0) then
     call system_clock(clock0, clockrate, clockmax)
-    timer = 0
+    timer = 0.0
     timers = 0
 else
     call system_clock(clock1)
