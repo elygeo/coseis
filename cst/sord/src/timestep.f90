@@ -38,7 +38,8 @@ call fieldio('<>', 'v3', vv(:,:,:,3))
 if (modulo(it, itstats) == 0) then
     call vector_norm(s1, vv, i1core, i2core, (/ 1, 1, 1 /))
     call set_halo(s1, -1.0, i1core, i2core)
-    vmax = maxval(s1)
+    vmaxloc = maxloc(s1)
+    vmax = s1(vmaxloc(1),vmaxloc(2),vmaxloc(3))
 end if
 call fieldio('>', 'vm2', s1)
 
@@ -51,7 +52,8 @@ call fieldio('<>', 'u3', uu(:,:,:,3))
 if (modulo(it, itstats) == 0) then
     call vector_norm(s1, uu, i1core, i2core, (/ 1, 1, 1 /))
     call set_halo(s1, -1.0, i1core, i2core)
-    umax = maxval(s1)
+    umaxloc = maxloc(s1)
+    umax = s1(umaxloc(1),umaxloc(2),umaxloc(3))
 end if
 call fieldio('>', 'um2', s1)
 

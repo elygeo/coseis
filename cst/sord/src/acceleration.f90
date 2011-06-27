@@ -209,7 +209,8 @@ call fieldio('<>', 'a3', w1(:,:,:,3))
 if (modulo(it, itstats) == 0) then
     call vector_norm(s1, w1, i1core, i2core, (/ 1, 1, 1 /))
     call set_halo(s1, -1.0, i1core, i2core)
-    amax = maxval(s1)
+    amaxloc = maxloc(s1)
+    amax = s1(amaxloc(1),amaxloc(2),amaxloc(3))
 end if
 call fieldio('>', 'am2', s1)
 

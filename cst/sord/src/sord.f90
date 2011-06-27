@@ -80,7 +80,7 @@ if (it == nt .or. modulo(it, itio) == 0) then
     end if
     jp = 0
 end if
-if (master .and. it == itstop) stop
+if (it == itstop) stop
 end do loop
 
 ! finish up

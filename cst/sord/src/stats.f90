@@ -1,5 +1,7 @@
 ! collect statistics
 module m_stats
+integer, dimension(3) :: &
+    amaxloc, vmaxloc, umaxloc, wmaxloc
 real :: &
     amax, vmax, umax, wmax, &
     samax, svmax, sumax, slmax, &
@@ -49,7 +51,14 @@ if (modulo(it, itstats) == 0) then
     vstats(3,j) = umax
     vstats(4,j) = wmax
     rr = maxval(vstats)
-    if (rr /= rr .or. rr > huge(rr)) stop 'NaN/Inf!'
+    if (rr /= rr .or. rr > huge(rr)) then
+        write (0, *) ip, 'NaN/Inf!'
+        write (0, *) ip, 'amax:', amaxloc + nnoff, amax
+        write (0, *) ip, 'vmax:', vmaxloc + nnoff, vmax
+        write (0, *) ip, 'umax:', umaxloc + nnoff, umax
+        write (0, *) ip, 'wmax:', wmaxloc + nnoff, wmax
+        stop
+    end if
     if (dofault) then
         fstats(1,j) = samax
         fstats(2,j) = svmax
@@ -69,6 +78,9 @@ end if
 if (j > 0 .and. (modulo(it, itio) == 0 .or. it == nt)) then
     rr = timer(2)
     call rreduce2(gvstats, vstats, 'max', ip3root)
+    !call rreduce2(gvstats, vstats, 'allmax', ip3root)
+    !rr = maxval(gvstats)
+    !if (rr /= rr .or. rr > huge(rr)) it = nt
     if (dofault) then
         call rreduce2(gfstats, fstats, 'max', ip2root)
         call rreduce2(gestats, estats, 'sum', ip2root)
