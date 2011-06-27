@@ -206,7 +206,7 @@ Boundary Conditions
 
 Boundary conditions for the six faces of the model domain are specified by the
 parameters ``bc1`` (near-size, x, y, and z faces) and ``bc2`` (far-side, x, y,
-and x faces).  The symmetry boundary conditions can be use to reduce
+and x faces).  The symmetry boundary conditions can be used to reduce
 computations for problems where they are applicable.  These are not used for
 specifying internal slip boundaries. However, for problems with symmetry across
 a slip surface, the fault may be placed at the boundary and combined with an
