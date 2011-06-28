@@ -120,6 +120,12 @@ end if
 ! lame' parameters
 mu  = mr * s2 * s2
 lam = mr * s1 * s1 - 2.0 * mu
+i1 = minloc(lam)
+r = lam(i1(1),i1(2),i1(3))
+if (r < 0.0) then
+    write (0, *) 'Negative Lame modulus!', i1 + nnoff, r
+    stop
+end if
 
 ! hourglass constant
 yy = 12.0 * (lam + 2.0 * mu)

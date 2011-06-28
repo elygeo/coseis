@@ -52,11 +52,11 @@ if (modulo(it, itstats) == 0) then
     vstats(4,j) = wmax
     rr = maxval(vstats)
     if (rr /= rr .or. rr > huge(rr)) then
-        write (0, *) ip, 'NaN/Inf!'
-        write (0, *) ip, 'amax:', amaxloc + nnoff, amax
-        write (0, *) ip, 'vmax:', vmaxloc + nnoff, vmax
-        write (0, *) ip, 'umax:', umaxloc + nnoff, umax
-        write (0, *) ip, 'wmax:', wmaxloc + nnoff, wmax
+        write (0, *) 'NaN/Inf!'
+        write (0, *) 'amax:', amaxloc + nnoff, amax
+        write (0, *) 'vmax:', vmaxloc + nnoff, vmax
+        write (0, *) 'umax:', umaxloc + nnoff, umax
+        write (0, *) 'wmax:', wmaxloc + nnoff, wmax
         stop
     end if
     if (dofault) then
