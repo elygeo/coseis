@@ -62,42 +62,30 @@ z = 0.25 * (z[:-1,:-1] + z[1:,:-1] + z[:-1,1:] + z[1:,1:])
 n = shape[2] - ntop - npml
 w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 
-# material extraction
-fr = cst.util.open_excl(hold + 'rho.bin', 'wb')
-if fr:
-    fp = open(hold + 'vp.bin', 'wb')
-    fs = open(hold + 'vs.bin', 'wb')
-    vp = cst.cvmh.Extraction(x, y, 'vp', vs30, version=version)
-    vs = cst.cvmh.Extraction(x, y, 'vs', vs30, version=version)
-    sumr, minr, maxr = 0.0, np.inf, -np.inf
-    sump, minp, maxp = 0.0, np.inf, -np.inf
-    sums, mins, maxs = 0.0, np.inf, -np.inf
-    sumn, minn, maxn = 0.0, np.inf, -np.inf
+# rho extraction
+fh = cst.util.open_excl(hold + 'rho.bin', 'wb')
+if fh:
+    vm = cst.cvmh.Extraction(x, y, 'vp', vs30, version=version)
     for i in range(dep.size):
         zz = w[i] * z - dep[i]
-        f = vp(zz)
-        g = vs(zz)
-        f.T.tofile(fp)
-        g.T.tofile(fs)
-        sump += f.astype('d').sum()
-        sums += g.astype('d').sum()
-        minp, maxp = min(minp, f.min()), max(maxp, f.max())
-        mins, maxs = min(mins, g.min()), max(maxs, g.max())
-        g = (0.5 * f * f - g * g) / (f * f - g * g)
-        f = cst.cvmh.nafe_drake(f)
-        f.T.tofile(fr)
-        sumr += f.astype('d').sum()
-        sumn += g.astype('d').sum()
-        minr, maxr = min(minr, f.min()), max(maxr, f.max())
-        minn, maxn = min(minn, g.min()), max(maxn, g.max())
-    fr.close()
-    fp.close()
-    fs.close()
-    n = f.size * dep.size
-    print('         Min          Max         Mean')
-    print('%12g %12g %12g rho' % (minr, maxr, sumr / n))
-    print('%12g %12g %12g vp'  % (minp, maxp, sump / n))
-    print('%12g %12g %12g vs'  % (mins, maxs, sums / n))
-    print('%12g %12g %12g nu'  % (minn, maxn, sumn / n))
+        cst.cvmh.nafe_drake(vm(zz)).T.tofile(fh)
+    fh.close()
 
+# vp extraction
+fh = cst.util.open_excl(hold + 'vp.bin', 'wb')
+if fh:
+    vm = cst.cvmh.Extraction(x, y, 'vp', vs30, version=version)
+    for i in range(dep.size):
+        zz = w[i] * z - dep[i]
+        vm(zz).T.tofile(fh)
+    fh.close()
+
+# vs extraction
+fh = cst.util.open_excl(hold + 'vs.bin', 'wb')
+if fh:
+    vm = cst.cvmh.Extraction(x, y, 'vs', vs30, version=version)
+    for i in range(dep.size):
+        zz = w[i] * z - dep[i]
+        vm(zz).T.tofile(fh)
+    fh.close()
 

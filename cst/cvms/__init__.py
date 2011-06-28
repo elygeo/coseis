@@ -130,8 +130,8 @@ def stage(inputs={}, **kwargs):
         shutil.copytree(f, job.rundir)
     else:
         for f in (
-            job.lon_file, job.lat_file, job.dep_file,
-            job.rho_file, job.vp_file, job.vs_file
+            job.file_lon, job.file_lat, job.file_dep,
+            job.file_rho, job.file_vp, job.file_vs,
         ):
             ff = os.path.join(job.rundir, f)
             if os.path.exists(ff):

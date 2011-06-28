@@ -185,12 +185,18 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='vx63'):
             n = d1.shape[2]
             if w > 0.0:
                 for i in range(1, n):
+                    ii = (d1[:,:,i] == v1) != (d2[:,:,i] == v2)
+                    if ii.any():
+                        print(11111111111111, i)
                     ii = (d1[:,:,i] == v1) | (d2[:,:,i] == v2)
                     d1[:,:,i][ii] = d1[:,:,i-1][ii]
                     d2[:,:,i][ii] = d2[:,:,i-1][ii]
                     d3[:,:,i][ii] = d3[:,:,i-1][ii]
             else:
                 for i in range(n-1, 0, -1):
+                    ii = (d1[:,:,i-1] == v1) != (d2[:,:,i-1] == v2)
+                    if ii.any():
+                        print(222222222222222, i)
                     ii = (d1[:,:,i-1] == v1) | (d2[:,:,i-1] == v2)
                     d1[:,:,i-1][ii] = d1[:,:,i][ii]
                     d2[:,:,i-1][ii] = d2[:,:,i][ii]

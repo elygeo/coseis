@@ -34,7 +34,7 @@ for filename in args:
         r = np.fromfile(fh, dtype=dtype, count=b)
         rmin = min(rmin, r.min())
         rmax = max(rmax, r.max())
-        rsum += np.float64(r).sum()
+        rsum += r.astype('d').sum()
         i += b
     print('%12g %12g %12g %12d %s' % (rmin, rmax, rsum/n, n, filename))
 
