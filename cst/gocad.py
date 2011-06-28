@@ -37,7 +37,7 @@ def header(lines, counter=0, casters=None):
     sys.exit('Error in header')
     return
 
-def voxet(path, load_prop=None, alternate='', no_data_value=None):
+def voxet(path, load_props=[], alternate='', no_data_value=None):
     """
     GOCAD voxet reader
     """
@@ -76,9 +76,9 @@ def voxet(path, load_prop=None, alternate='', no_data_value=None):
                 else:
                     prop[f[1]][k[1]] = cast[k[1]](f[2])
         elif f[0] == 'END':
-            if load_prop is not None:
+            for p in load_props:
+                p = prop[p]
                 n = axis['N']
-                p = prop[load_prop]
                 f = os.path.join(os.path.dirname(path), p['FILE'] + alternate)
                 if os.path.exists(f):
                     dtype = '>f%s' % p['ESIZE']

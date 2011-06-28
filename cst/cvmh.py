@@ -167,6 +167,42 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='vx63'):
         urllib.urlretrieve(url, f)
         subprocess.check_call(['tar', '-C', repo, '-jxf', f])
 
+    # fill 3d voxets
+    turd = os.path.join(path, '.filled')
+    if not os.path.exists(turd):
+        for vox in voxet3d:
+            print('Filling voxet %s %s' % (version, vox))
+            vp, vs, tag = prop3d['vp'], prop3d['vs'], prop3d['tag']
+            vid = voxet3d[vox][0]
+            voxfile = os.path.join(path, vid + '.vo')
+            vox = gocad.voxet(voxfile, [vp, vs, tag])['1']
+            w = vox['AXIS']['W'][2]
+            d1 = vox['PROP'][vp]['DATA']
+            d2 = vox['PROP'][vs]['DATA']
+            d3 = vox['PROP'][tag]['DATA']
+            v1 = vox['PROP'][vp]['NO_DATA_VALUE']
+            v2 = vox['PROP'][vs]['NO_DATA_VALUE']
+            n = d1.shape[2]
+            if w > 0.0:
+                for i in range(1, n):
+                    ii = (d1[:,:,i] == v1) | (d2[:,:,i] == v2)
+                    d1[:,:,i][ii] = d1[:,:,i-1][ii]
+                    d2[:,:,i][ii] = d2[:,:,i-1][ii]
+                    d3[:,:,i][ii] = d3[:,:,i-1][ii]
+            else:
+                for i in range(n-1, 0, -1):
+                    ii = (d1[:,:,i-1] == v1) | (d2[:,:,i-1] == v2)
+                    d1[:,:,i-1][ii] = d1[:,:,i][ii]
+                    d2[:,:,i-1][ii] = d2[:,:,i][ii]
+                    d3[:,:,i-1][ii] = d3[:,:,i][ii]
+            f1 = os.path.join(path, vox['PROP'][vp]['FILE'] + '-filled')
+            f2 = os.path.join(path, vox['PROP'][vs]['FILE'] + '-filled')
+            f3 = os.path.join(path, vox['PROP'][tag]['FILE'] + '-filled')
+            d1.T.tofile(f1)
+            d2.T.tofile(f2)
+            d3.T.tofile(f3)
+            open(turd, 'w').close()
+
     # voxet ID
     if voxet in voxet3d:
         vid, bound = voxet3d[voxet]
@@ -182,27 +218,9 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='vx63'):
     else:
         pid = prop3d[prop]
     if no_data_value == None and prop in prop3d:
-        vox = gocad.voxet(voxfile, pid, '-filled', None)['1']
-        if 'DATA' not in vox['PROP'][pid]:
-            print('Filling voxet %s %s %s' % (version, voxet, prop))
-            vox = gocad.voxet(voxfile, pid, '', None)['1']
-            w = vox['AXIS']['W'][2]
-            v = vox['PROP'][pid]['NO_DATA_VALUE']
-            d = vox['PROP'][pid]['DATA']
-            n = d.shape[2]
-            if w > 0.0:
-                for i in range(1, n):
-                    ii = d[:,:,i] == v
-                    d[:,:,i][ii] = d[:,:,i-1][ii]
-            else:
-                for i in range(n, 0, -1):
-                    ii = d[:,:,i-1] == v
-                    d[:,:,i-1][ii] = d[:,:,i][ii]
-            vox['PROP'][pid]['DATA'] = d
-            f = os.path.join(path, vox['PROP'][pid]['FILE'] + '-filled')
-            d.T.tofile(f)
+        vox = gocad.voxet(voxfile, [pid], alternate='-filled')['1']
     else:
-        vox = gocad.voxet(voxfile, pid, '', no_data_value)['1']
+        vox = gocad.voxet(voxfile, [pid], no_data_value=no_data_value)['1']
 
     # extent
     x, y, z = vox['AXIS']['O']
