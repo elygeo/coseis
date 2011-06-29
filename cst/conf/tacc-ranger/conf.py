@@ -22,6 +22,7 @@ module unload mvapich
 #module swap pgi gcc"
 module load mvapich2
 alias showme='showq -u'
+alias qinteract='qsh -V -q development -pe 16way 16 -l h_rt=1:00:00'
 
 # needed?
 module load gotoblas scalapack mkl

@@ -14,6 +14,7 @@ showbf
 showusage
 qsub -l debugging
 alias showme='qstat -u $USER'
+alias qinteract='qsub -I -l size=12,walltime=1:00:00'
 
 Home directories have a 2 GB quota.
 CrayPAT (Cray Performance Analysis Tools) is useful for profiling and
@@ -29,6 +30,8 @@ rate = 1e6
 launch = {
     's_exec':  '%(command)s',
     's_debug': 'gdb %(command)s',
+    'm_exec':  'aprun -n %(nproc)s %(command)s',
+    'm_debug': 'totalview aprun -n %(nproc)s %(command)s'
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
 }
