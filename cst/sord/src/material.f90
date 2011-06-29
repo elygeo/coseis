@@ -8,24 +8,22 @@ use m_globals
 use m_collective
 use m_util
 use m_fieldio
-real :: vstats(8), gvstats(8), r, rho_, vp_, vs_, gam_, courant
-integer :: i1(3), i2(3)
+real :: max_l(14), max_g(14), vmin, vmax, cfl1, cfl2
+integer :: i1(3), i2(3), j1, k1, l1, j2, k2, l2
 
 if (master) write (*, '(a)') 'Material model'
 
 ! init
 mr = 0.0
-lam = 0.0
-mu = 0.0
+s1 = 0.0
+s2 = 0.0
 gam = 0.0
 
 ! inputs
 call fieldio('<', 'rho', mr)
-call fieldio('<', 'vp',  lam)
-call fieldio('<', 'vs',  mu)
+call fieldio('<', 'vp',  s1)
+call fieldio('<', 'vs',  s2)
 call fieldio('<', 'gam', gam)
-s1 = lam
-s2 = mu
 
 ! limits
 if (rho1 > 0.0) mr = max(mr, rho1)
@@ -46,92 +44,49 @@ end if
 if (gam1 > 0.0) gam = max(gam, gam1)
 if (gam2 > 0.0) gam = min(gam, gam2)
 
-! averages
-vstats = 0.0
-i1 = max(i1core, i1bc)
-i2 = min(i2core, i2bc - 1)
-call set_halo(mr,  0.0, i1, i2)
-call set_halo(s1,  0.0, i1, i2)
-call set_halo(s2,  0.0, i1, i2)
-call set_halo(gam, 0.0, i1, i2)
-vstats(1) = sum(mr)
-vstats(2) = sum(s1)
-vstats(3) = sum(s2)
-vstats(4) = sum(gam)
-call rreduce1(gvstats, vstats, 'sum', ip3root)
-rho_ = gvstats(1) / product(nn - 1)
-vp_  = gvstats(2) / product(nn - 1)
-vs_  = gvstats(3) / product(nn - 1)
-gam_ = gvstats(4) / product(nn - 1)
-
-! fill halo
+! halos
 call scalar_swap_halo(mr,  nhalo)
 call scalar_swap_halo(s1,  nhalo)
 call scalar_swap_halo(s2,  nhalo)
 call scalar_swap_halo(gam, nhalo)
-
-! extrema
-call set_halo(mr,  huge(r), i1cell, i2cell)
-call set_halo(s1,  huge(r), i1cell, i2cell)
-call set_halo(s2,  huge(r), i1cell, i2cell)
-call set_halo(gam, huge(r), i1cell, i2cell)
-vstats(1) = -minval(mr)
-vstats(2) = -minval(s1)
-vstats(3) = -minval(s2)
-vstats(4) = -minval(gam)
 call set_halo(mr,  0.0, i1cell, i2cell)
 call set_halo(s1,  0.0, i1cell, i2cell)
 call set_halo(s2,  0.0, i1cell, i2cell)
 call set_halo(gam, 0.0, i1cell, i2cell)
-vstats(5) = maxval(mr)
-vstats(6) = maxval(s1)
-vstats(7) = maxval(s2)
-vstats(8) = maxval(gam)
-call rreduce1(gvstats, vstats, 'allmax', (/0, 0, 0/))
-rho1 = -gvstats(1)
-vp1  = -gvstats(2)
-vs1  = -gvstats(3)
-gam1 = -gvstats(4)
-rho2 =  gvstats(5)
-vp2  =  gvstats(6)
-vs2  =  gvstats(7)
-gam2 =  gvstats(8)
 
-! stats
-if (master) then
-    courant = dt * vp2 * 3.0 / sqrt(sum(dx * dx))
-    open (1, file='stats/material.py', status='replace')
-    write (1, "('courant = ',g15.7)") courant
-    write (1, "('rho_    = ',g15.7)") rho_
-    write (1, "('rho1    = ',g15.7)") rho1
-    write (1, "('rho2    = ',g15.7)") rho2
-    write (1, "('vp_     = ',g15.7)") vp_
-    write (1, "('vp1     = ',g15.7)") vp1
-    write (1, "('vp2     = ',g15.7)") vp2
-    write (1, "('vs_     = ',g15.7)") vs_
-    write (1, "('vs1     = ',g15.7)") vs1
-    write (1, "('vs2     = ',g15.7)") vs2
-    write (1, "('gam_    = ',g15.7)") gam_
-    write (1, "('gam1    = ',g15.7)") gam1
-    write (1, "('gam2    = ',g15.7)") gam2
-    close (1)
-end if
-
-! lame' parameters
+! elastic moduli
 mu  = mr * s2 * s2
 lam = mr * s1 * s1 - 2.0 * mu
-i1 = minloc(lam)
-r = lam(i1(1),i1(2),i1(3))
-if (r < 0.0) then
-    write (0, *) 'Negative Lame modulus!', i1 + nnoff, r
-    stop
-end if
 
-! hourglass constant
-yy = 12.0 * (lam + 2.0 * mu)
+! Poisson ratio
+yy = lam + mu
 call invert(yy)
-yy = yy * sqrt(sum(dx * dx) / 3.0) * mu * (lam + mu)
-!yy = 0.3 / 16.0 * (lam + 2.0 * mu) * sqrt(sum(dx * dx) / 3.0) ! like Ma & Liu, 2006
+yy = 0.5 * lam * yy
+
+! non-overlapping cell indices
+i1 = max(i1core, i1bc)
+i2 = min(i2core, i2bc - 1)
+j1 = i1(1); j2 = i2(1)
+k1 = i1(2); k2 = i2(2)
+l1 = i1(3); l2 = i2(3)
+
+! minima
+max_l(1) = -minval(mr(j1:j2,k1:k2,l1:l2))
+max_l(2) = -minval(s1(j1:j2,k1:k2,l1:l2))
+max_l(3) = -minval(s2(j1:j2,k1:k2,l1:l2))
+max_l(4) = -minval(gam(j1:j2,k1:k2,l1:l2))
+max_l(5) = -minval(mu(j1:j2,k1:k2,l1:l2))
+max_l(6) = -minval(lam(j1:j2,k1:k2,l1:l2))
+max_l(7) = -minval(yy(j1:j2,k1:k2,l1:l2))
+
+! maxima
+max_l(8)  = maxval(mr(j1:j2,k1:k2,l1:l2))
+max_l(9)  = maxval(s1(j1:j2,k1:k2,l1:l2))
+max_l(10) = maxval(s2(j1:j2,k1:k2,l1:l2))
+max_l(11) = maxval(gam(j1:j2,k1:k2,l1:l2))
+max_l(12) = maxval(mu(j1:j2,k1:k2,l1:l2))
+max_l(13) = maxval(lam(j1:j2,k1:k2,l1:l2))
+max_l(14) = maxval(yy(j1:j2,k1:k2,l1:l2))
 
 ! output
 call fieldio('>', 'rho', mr)
@@ -140,7 +95,44 @@ call fieldio('>', 'vs',  s2)
 call fieldio('>', 'gam', gam)
 call fieldio('>', 'mu',  mu)
 call fieldio('>', 'lam', lam)
-call fieldio('>', 'yy',  yy)
+call fieldio('>', 'nu',  yy)
+
+! hourglass constant
+yy = 12.0 * (lam + 2.0 * mu)
+call invert(yy)
+yy = yy * sqrt(sum(dx * dx) / 3.0) * mu * (lam + mu)
+!yy = 0.3 / 16.0 * (lam + 2.0 * mu) * sqrt(sum(dx * dx) / 3.0) ! like Ma & Liu, 2006
+
+! global maxima
+call rreduce1(max_g, max_l, 'allmax', (/0, 0, 0/))
+
+! vs harmonic mean for pml
+if (vpml <= 0.0) then
+    vmin = -max_g(3)
+    vmax =  max_g(9)
+    vpml = 2.0 * vmin * vmax / (vmin + vmax)
+end if
+
+! Courant condition
+vmax = max_g(9)
+cfl1 = dt * vmax * sqrt(3.0 / sum(dx * dx))
+cfl2 = dt * vmax * 3.0 / sqrt(sum(dx * dx))
+
+! output statistics
+if (master) then
+    open (1, file='stats/material.txt', status='replace')
+    write (1, "(2g15.7,'  cfl')") cfl1, cfl2
+    write (1, "(2g15.7,'  rho')") -max_g(1), max_g(8)
+    write (1, "(2g15.7,'  vp')")  -max_g(2), max_g(9)
+    write (1, "(2g15.7,'  vs')")  -max_g(3), max_g(10)
+    write (1, "(2g15.7,'  gam')") -max_g(4), max_g(11)
+    write (1, "(2g15.7,'  mu')")  -max_g(5), max_g(12)
+    write (1, "(2g15.7,'  lam')") -max_g(6), max_g(13)
+    write (1, "(2g15.7,'  nu')")  -max_g(7), max_g(14)
+    close (1)
+    if (any(max_g(1:7) > 0.0)) stop 'Negative material properties!'
+    if (cfl2 > 1.0) stop 'Courant condition not satisfied!'
+end if
 
 end subroutine
 
@@ -157,7 +149,6 @@ c1 =  8.0 / 15.0
 c2 = -3.0 / 100.0
 c3 =  1.0 / 1500.0
 tune = 3.5
-if (vpml <= 0.0) vpml = 2.0 * vs1 * vs2 / (vs1 + vs2)
 damp = tune * vpml / sqrt(sum(dx * dx) / 3.0) * (c1 + (c2 + c3 * npml) * npml) / npml ** ppml
 do i = 1, npml
     dampn = damp *  i ** ppml

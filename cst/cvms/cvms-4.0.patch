@@ -17,7 +17,7 @@ index 2b33361..5288661 100644
 +      integer :: inout(ibig), nn, nnl
 diff --git a/iobin.f b/iobin.f
 new file mode 100644
-index 0000000..ba2f673
+index 0000000..70f9e64
 --- /dev/null
 +++ b/iobin.f
 @@ -0,0 +1,80 @@
@@ -27,13 +27,13 @@ index 0000000..ba2f673
 +      implicit none
 +      include 'in.h'
 +      integer :: kerr, nio, i
-+      character(160) :: lon_file, lat_file, dep_file
++      character(160) :: file_lon, file_lat, file_dep
 +      write (0, '(a)') 'SCEC Community Velocity Model'
 +      open (1, file='cvms-input', status='old')
 +      read (1, *) nn
-+      read (1, '(a)') lon_file
-+      read (1, '(a)') lat_file
-+      read (1, '(a)') dep_file
++      read (1, '(a)') file_lon
++      read (1, '(a)') file_lat
++      read (1, '(a)') file_dep
 +      close (1)
 +      if (nn > ibig) then
 +          write (0, *) 'Error: nn greater than ibig', nn , ibig
@@ -41,11 +41,11 @@ index 0000000..ba2f673
 +      end if
 +      inquire (iolength=nio) rlon(1:nn)
 +      write (0, '(a)') 'Reading input'
-+      open (1, file=lon_file, recl=nio, form='unformatted',
++      open (1, file=file_lon, recl=nio, form='unformatted',
 +     $    access='direct', status='old')
-+      open (2, file=lat_file, recl=nio, form='unformatted',
++      open (2, file=file_lat, recl=nio, form='unformatted',
 +     $    access='direct', status='old')
-+      open (3, file=dep_file, recl=nio, form='unformatted',
++      open (3, file=file_dep, recl=nio, form='unformatted',
 +     $    access='direct', status='old')
 +      read (1, rec=1) rlon(1:nn)
 +      read (2, rec=1) rlat(1:nn)
@@ -69,23 +69,23 @@ index 0000000..ba2f673
 +      implicit none
 +      include 'in.h'
 +      integer :: kerr, nio, i
-+      character (160) :: rho_file, alpha_file, beta_file
++      character (160) :: file_rho, file_alpha, file_beta
 +      inquire (iolength=nio) rho(1:nn)
 +      open (1, file='cvms-input', status='old')
-+      read (1, '(a)') rho_file
-+      read (1, '(a)') rho_file
-+      read (1, '(a)') rho_file
-+      read (1, '(a)') rho_file
-+      read (1, '(a)') rho_file
-+      read (1, '(a)') alpha_file
-+      read (1, '(a)') beta_file
++      read (1, '(a)') file_rho
++      read (1, '(a)') file_rho
++      read (1, '(a)') file_rho
++      read (1, '(a)') file_rho
++      read (1, '(a)') file_rho
++      read (1, '(a)') file_alpha
++      read (1, '(a)') file_beta
 +      close (1)
 +      write (0, '(a)') 'Writing output'
-+      open (1, file=rho_file, recl=nio, form='unformatted',
++      open (1, file=file_rho, recl=nio, form='unformatted',
 +     $    access='direct', status='replace')
-+      open (2, file=alpha_file, recl=nio, form='unformatted',
++      open (2, file=file_alpha, recl=nio, form='unformatted',
 +     $    access='direct', status='replace')
-+      open (3, file=beta_file,recl=nio, form='unformatted',
++      open (3, file=file_beta, recl=nio, form='unformatted',
 +     $    access='direct', status='replace')
 +      write (1, rec=1) rho(1:nn)
 +      write (2, rec=1) alpha(1:nn)

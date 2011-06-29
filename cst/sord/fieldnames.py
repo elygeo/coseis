@@ -29,6 +29,7 @@ table = [
     ('vc',    'V^C',             'Cell volume',                    'c0'),
     ('mu',    '\mu',             'Elastic modulus',                'c0'),
     ('lam',   '\lambda',         'Elastic modulus',                'c0'),
+    ('nu',    '\nu',             'Poisson ratio',                  'c0'),
     ('f1',    'f_x',             'Force',                          '<'),
     ('f2',    'f_y',             'Force',                          '<'),
     ('f3',    'f_z',             'Force',                          '<'),

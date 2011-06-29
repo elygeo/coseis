@@ -132,9 +132,11 @@ def stage(inputs={}, **kwargs):
         for f in (
             job.file_lon, job.file_lat, job.file_dep,
             job.file_rho, job.file_vp, job.file_vs,
-        ):
+        ) + job.stagein:
             ff = os.path.join(job.rundir, f)
-            if os.path.exists(ff):
+            if os.path.isdir(ff):
+                shutil.rmtree(ff)
+            elif os.path.exists(ff):
                 os.remove(ff)
 
     # process machine templates
@@ -168,18 +170,18 @@ def extract(lon, lat, dep, prop=None, **kwargs):
     shape = dep.shape
     job = stage(nsample=dep.size, **kwargs)
     path = job.rundir + os.sep
-    lon.tofile(path + job.lon_file)
-    lat.tofile(path + job.lat_file)
-    dep.tofile(path + job.dep_file)
+    lon.tofile(path + job.file_lon)
+    lat.tofile(path + job.file_lat)
+    dep.tofile(path + job.file_dep)
     del(lon, lat, dep)
     launch(job, run='exec')
     if prop is not None:
-        f = {'rho': job.rho_file, 'vp': job.vp_file, 'vs': job.vs_file}
+        f = {'rho': job.file_rho, 'vp': job.file_vp, 'vs': job.file_vs}
         f = np.fromfile(path + f[prop], 'f').reshape(shape)
         return f
     else:
-        rho = np.fromfile(path + job.rho_file, 'f').reshape(shape)
-        vp =  np.fromfile(path + job.vp_file,  'f').reshape(shape)
-        vs =  np.fromfile(path + job.vs_file,  'f').reshape(shape)
+        rho = np.fromfile(path + job.file_rho, 'f').reshape(shape)
+        vp =  np.fromfile(path + job.file_vp,  'f').reshape(shape)
+        vs =  np.fromfile(path + job.file_vs,  'f').reshape(shape)
         return rho, vp, vs
 

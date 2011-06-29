@@ -15,8 +15,6 @@ Options
 from __future__ import division, absolute_import, print_function, unicode_literals
 import os, sys, getopt
 import numpy as np
-#import matplotlib
-#matplotlib.rcParams['interactive'] = True
 import matplotlib.pyplot as plt
 import cst
 
@@ -140,9 +138,5 @@ def plot(*argv):
 
 # continue if command line
 if __name__ == '__main__':
-    from IPython.Shell import IPShellEmbed
     plot(*sys.argv[1:])
-    #os.environ['PYTHONINSPECT'] = 'enable'
-    #ipshell = IPShellEmbed()
-    #ipshell()
 
