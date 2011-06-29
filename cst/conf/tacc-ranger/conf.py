@@ -45,6 +45,8 @@ queue_opts = [
 launch = {
     's_exec':  '%(command)s',
     's_debug': 'gdb %(command)s',
+    'm_exec':  'qsh "%(name)s.sh"',
+    'm_debug': 'ddt -start -once -n %(nproc)s -- %(command)s',
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -hold_jid "%(depend)s" "%(name)s.sh"',
 }

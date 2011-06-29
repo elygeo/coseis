@@ -15,7 +15,7 @@ dx_ = 500.0;  nproc3 = 1, 1, 2;    nstripe = 2
 dx_ = 1000.0; nproc3 = 1, 1, 2;    nstripe = 1
 dx_ = 4000.0; nproc3 = 1, 1, 1;    nstripe = 1
 itio = nstripe * 100
-itstats = 1
+itstats = 10
 
 # mesh type
 surf_out_ = True

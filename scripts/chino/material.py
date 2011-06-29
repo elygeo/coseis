@@ -10,13 +10,13 @@ import cst
 # parameters
 name = 'chino'
 cvm = 'cvms'
-cvm = 'cvmh'
 cvm = 'cvmg'
+cvm = 'cvmh'
 dx = 50.0;   nproc = 2048; nstripe = 32
 dx = 100.0;  nproc = 256;  nstripe = 16
-dx = 1000.0; nproc = 2;    nstripe = 1
 dx = 200.0;  nproc = 32;   nstripe = 8
 dx = 500.0;  nproc = 2;    nstripe = 2
+dx = 1000.0; nproc = 2;    nstripe = 1
 dx = 4000.0; nproc = 1;    nstripe = 1
 delta = dx, dx, -dx
 
@@ -29,7 +29,6 @@ mts = cst.util.load(mts)
 rotate = None
 s, d = 1000.0, 0.5 * dx
 bounds = (-80 * s + d, 48 * s - d), (-58 * s + d, 54 * s - d), (0.0, 48 * s - dx)
-bounds = (-80 * s + d, 48 * s - d), (-58 * s + d, 54 * s - d), (0.0, 8 * s - dx)
 origin = mts.longitude, mts.latitude, mts.depth
 projection = dict(proj='tmerc', lon_0=origin[0], lat_0=origin[1])
 proj = pyproj.Proj(**projection)

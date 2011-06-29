@@ -15,15 +15,17 @@ if (master) write (*, '(a)') 'Material model'
 
 ! init
 mr = 0.0
-s1 = 0.0
-s2 = 0.0
+lam = 0.0
+mu = 0.0
 gam = 0.0
 
 ! inputs
 call fieldio('<', 'rho', mr)
-call fieldio('<', 'vp',  s1)
-call fieldio('<', 'vs',  s2)
+call fieldio('<', 'vp',  lam)
+call fieldio('<', 'vs',  mu)
 call fieldio('<', 'gam', gam)
+s1 = lam
+s2 = mu
 
 ! limits
 if (rho1 > 0.0) mr = max(mr, rho1)
@@ -75,8 +77,8 @@ max_l(1) = -minval(mr(j1:j2,k1:k2,l1:l2))
 max_l(2) = -minval(s1(j1:j2,k1:k2,l1:l2))
 max_l(3) = -minval(s2(j1:j2,k1:k2,l1:l2))
 max_l(4) = -minval(gam(j1:j2,k1:k2,l1:l2))
-max_l(5) = -minval(mu(j1:j2,k1:k2,l1:l2))
-max_l(6) = -minval(lam(j1:j2,k1:k2,l1:l2))
+max_l(5) = -minval(lam(j1:j2,k1:k2,l1:l2))
+max_l(6) = -minval(mu(j1:j2,k1:k2,l1:l2))
 max_l(7) = -minval(yy(j1:j2,k1:k2,l1:l2))
 
 ! maxima
@@ -84,8 +86,8 @@ max_l(8)  = maxval(mr(j1:j2,k1:k2,l1:l2))
 max_l(9)  = maxval(s1(j1:j2,k1:k2,l1:l2))
 max_l(10) = maxval(s2(j1:j2,k1:k2,l1:l2))
 max_l(11) = maxval(gam(j1:j2,k1:k2,l1:l2))
-max_l(12) = maxval(mu(j1:j2,k1:k2,l1:l2))
-max_l(13) = maxval(lam(j1:j2,k1:k2,l1:l2))
+max_l(12) = maxval(lam(j1:j2,k1:k2,l1:l2))
+max_l(13) = maxval(mu(j1:j2,k1:k2,l1:l2))
 max_l(14) = maxval(yy(j1:j2,k1:k2,l1:l2))
 
 ! output
@@ -93,8 +95,8 @@ call fieldio('>', 'rho', mr)
 call fieldio('>', 'vp',  s1)
 call fieldio('>', 'vs',  s2)
 call fieldio('>', 'gam', gam)
-call fieldio('>', 'mu',  mu)
 call fieldio('>', 'lam', lam)
+call fieldio('>', 'mu',  mu)
 call fieldio('>', 'nu',  yy)
 
 ! hourglass constant
@@ -126,8 +128,8 @@ if (master) then
     write (1, "(2g15.7,'  vp')")  -max_g(2), max_g(9)
     write (1, "(2g15.7,'  vs')")  -max_g(3), max_g(10)
     write (1, "(2g15.7,'  gam')") -max_g(4), max_g(11)
-    write (1, "(2g15.7,'  mu')")  -max_g(5), max_g(12)
-    write (1, "(2g15.7,'  lam')") -max_g(6), max_g(13)
+    write (1, "(2g15.7,'  lam')") -max_g(5), max_g(12)
+    write (1, "(2g15.7,'  mu')")  -max_g(6), max_g(13)
     write (1, "(2g15.7,'  nu')")  -max_g(7), max_g(14)
     close (1)
     if (any(max_g(1:7) > 0.0)) stop 'Negative material properties!'
