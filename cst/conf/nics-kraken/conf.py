@@ -31,7 +31,7 @@ launch = {
     's_exec':  '%(command)s',
     's_debug': 'gdb %(command)s',
     'm_exec':  'aprun -n %(nproc)s %(command)s',
-    'm_debug': 'totalview aprun -n %(nproc)s %(command)s'
+    'm_debug': 'totalview aprun -n %(nproc)s %(command)s',
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
 }
