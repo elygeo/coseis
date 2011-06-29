@@ -60,6 +60,7 @@ def test_point():
             '--exclude=parameters.py',
             '--exclude=sord-sO4',
             '--exclude=sord-mO4',
+            '--exclude=sord.sh',
             'tmp/s', rundir,
         )
         pid_ = subprocess.Popen(cmd_, stdout=subprocess.PIPE)
