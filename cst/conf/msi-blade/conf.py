@@ -7,7 +7,7 @@ IBM Bladecenter Linux cluster
 8 GB
 /scratch1
 /scratch2
-alias showme='qstat -u $USER'
+alias qme='qstat -u $USER'
 
 .bashrc
 ulimit -s unlimited

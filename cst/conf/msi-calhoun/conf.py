@@ -9,7 +9,7 @@ SGI Altix XE 1300 cluster
 ulimit -s unlimited
 ulimit -n 4096
 vi ~/.modulerc
-alias showme='qstat -u $USER'
+alias qme='qstat -u $USER'
 #%Module1.0
 module load intel vmpi
 """

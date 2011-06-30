@@ -12,8 +12,8 @@ showq
 showbf
 showusage
 qsub -l debugging
-alias showme='qstat -u $USER'
-alias qinteract='qsub -I -l size=12,walltime=1:00:00'
+alias qme='qstat -u $USER'
+alias qdev='qsub -I -l size=12,walltime=1:00:00'
 
 Home directories have a 2 GB quota.
 CrayPAT (Cray Performance Analysis Tools) is useful for profiling and

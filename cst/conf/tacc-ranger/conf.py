@@ -21,8 +21,8 @@ lfs quota -u $USER $SCRATCH
 module unload mvapich
 #module swap pgi gcc"
 module load mvapich2
-alias showme='showq -u'
-alias qinteract='qsh -V -q development -pe 16way 16 -l h_rt=1:00:00'
+alias qme='showq -u'
+alias qdev='idev'
 
 # needed?
 module load gotoblas scalapack mkl
@@ -45,7 +45,7 @@ queue_opts = [
 launch = {
     's_exec':  '%(command)s',
     's_debug': 'gdb %(command)s',
-    'm_exec':  'qsh "%(name)s.sh"',
+    'm_exec':  'ibrun %(command)s',
     'm_debug': 'ddt -start -once -n %(nproc)s -- %(command)s',
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -hold_jid "%(depend)s" "%(name)s.sh"',
