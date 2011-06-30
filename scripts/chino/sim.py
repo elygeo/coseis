@@ -105,7 +105,7 @@ source2 = -d['mxz'], -d['myz'],  d['mxy']
 tau = 6e-7 * m.moment ** (1.0 / 3.0) # ~0.32, fcorner = 0.5Hz
 
 # sites
-stagein = 'out/', 'hold/'
+stagein = 'hold/',
 f = os.path.join('run', 'data', 'station-list.txt')
 for s in open(f).readlines():
     s, y, x = s.split()[:3]
