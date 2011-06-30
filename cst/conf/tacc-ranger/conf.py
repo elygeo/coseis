@@ -11,16 +11,14 @@ http://www.tacc.utexas.edu/services/userguides/ranger/
 ppn must be one of (1, 2, 4, 8, 12, 15, 16)
 
 cat /share/sge/default/tacc/sge_esub_control
-module list
 qconf -sql
 lfs quota -u $USER $HOME
 lfs quota -u $USER $WORK
 lfs quota -u $USER $SCRATCH
 
 .profile
-module unload mvapich
-#module swap pgi gcc"
-module load mvapich2
+module load git
+module swap mvapich mvapich2
 alias qme='showq -u'
 alias qdev='idev'
 

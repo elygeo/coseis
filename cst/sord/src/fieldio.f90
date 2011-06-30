@@ -343,13 +343,13 @@ if (i > 0 .and. debug > 3 .and. it <= 8) then
         idebug = 0
     end if
     idebug = idebug + 1
-    write (str, "(a,3(i4.4,'-'),a)") 'debug/f', it, ipid, idebug, field
+    write (str, "(a,3(i4.4,'-'),a)") 'debug/f', it, idebug, ipid, field
     write (*, '(2a)') 'Opening file: ', trim(str)
     open (1, file=str, status='replace')
     do l = 1, size(f, 3)
-        write (1, *) it, l, field
+        write (1, '(i4.4,x,i4.4,x,a)') it, l, field
         do k = 1, size(f, 2)
-            write (1, *) f(:,k,l)
+            write (1, '(16g15.7)') f(:,k,l)
         end do
     end do
     close (1)
