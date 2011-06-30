@@ -20,7 +20,7 @@ Very inconvenient. I ignore this (at my peril).
 Use /home instead of /auto
 """
 login = 'hpc-login2.usc.edu'
-hostname = 'hpc-login[12]'
+hostname = 'hpc.*'
 rate = 1.1e6
 queue = 'default'
 queue_opts = [
