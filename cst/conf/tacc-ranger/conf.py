@@ -28,7 +28,7 @@ alias qdev='idev'
 module load gotoblas scalapack mkl
 """
 login = 'tg-login.ranger.tacc.teragrid.org'
-hostname = 'login[34].ranger.tacc.utexas.edu'
+hostname = '.*.ranger.tacc.utexas.edu'
 maxcores = 16
 maxram = 30000
 #rate = 21e5
