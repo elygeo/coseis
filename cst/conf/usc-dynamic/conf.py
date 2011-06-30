@@ -7,7 +7,7 @@ https://geosys.usc.edu/wiki/index.php/PBS
 8 x 2 Dual Intel Xeon 3.2GHz
 2GB
 
-alias qme='qsub -I -l nodes=1,walltime=24:00:00'
+alias qdev='qsub -I -l nodes=1,walltime=2:00:00'
 
 Note from John Yu:
 

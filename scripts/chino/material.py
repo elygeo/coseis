@@ -111,6 +111,8 @@ z.astype('f').T.tofile(path + 'topo.bin')
 python = 'python'
 if cst.site.machine == 'nics-kraken':
     python = '/lustre/scratch/gely/local/bin/python'
+elif cst.site.machine == 'usc-hpc':
+    python = '/home/rcf-11/gely/local/python/bin/python'
 
 # cvm-s
 if cvm == 'cvms':

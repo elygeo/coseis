@@ -20,7 +20,7 @@ lfs quota -u $USER $SCRATCH
 module load git
 module swap mvapich mvapich2
 alias qme='showq -u'
-alias qdev='idev'
+alias qdev='idev -minutes 120'
 
 # needed?
 module load gotoblas scalapack mkl
