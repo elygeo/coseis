@@ -4,7 +4,7 @@ NICS Kraken
 Install under /lustre/scratch/
 
 Use Git, Vim, and GNU compilers:
-module load git vim
+module load git vim yt
 module swap PrgEnv-pgi PrgEnv-gnu
 
 See install/install-python-kraken.sh for statically linked Python

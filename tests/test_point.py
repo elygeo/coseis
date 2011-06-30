@@ -40,7 +40,7 @@ def test_point():
 
     # output
     for f in cst.sord.fieldnames.volume:
-        fieldio += [('=w', f, [], f)]
+        fieldio += [('=w', f, [], 'out/' + f + '.bin')]
 
     # single process
     rundir = 'tmp/s'

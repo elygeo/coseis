@@ -10,8 +10,8 @@ tag=$( basename "$url" .tar.gz )
 curl -L "${url}" | tar zx
 
 # yt python version
-cd "${SCRATCHDIR}"
 module load yt
+cd "${SCRATCHDIR}"
 python "$HOME/$tag/virtualenv.py" local
 . local/bin/activate
 pip install pyproj

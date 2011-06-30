@@ -214,6 +214,11 @@ def stage(dictargs={}, **kwargs):
     if job.optimize == 'g':
         for f in glob.glob(path + '/src/*.f90'):
             stagein += f,
+    if pm.debug > 2:
+        stagein += 'debug/',
+    if pm.itcheck != 0:
+        stagein += 'checkpoint/',
+    stagein += 'out/', 'prof/', 'stats/'
     stagein += tuple(job.stagein)
     if job.force == True and os.path.isdir(job.rundir):
         shutil.rmtree(job.rundir)
@@ -222,8 +227,6 @@ def stage(dictargs={}, **kwargs):
     # conf, parameter files
     cwd = os.path.realpath(os.getcwd())
     os.chdir(job.rundir)
-    for f in 'prof', 'stats', 'debug', 'checkpoint':
-        os.mkdir(f)
     delattr(pm, 'itbuff')
     cst.util.save('parameters.py', pm, expand=['fieldio'], header='# model parameters\n')
     cst.util.save('conf.py', job, header = '# configuration\n')
