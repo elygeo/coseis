@@ -1,5 +1,6 @@
 #!/bin/bash -e
 
+#$ -A %(account)s
 #$ -N %(name)s
 #$ -M %(email)s
 #$ -q %(queue)s
