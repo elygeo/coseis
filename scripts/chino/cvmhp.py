@@ -66,26 +66,41 @@ w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 fh = cst.util.open_excl(hold + 'rho.bin', 'wb')
 if fh:
     vm = cst.cvmh.Extraction(x, y, 'vp', vs30, version=version)
+    vmin, vmax = np.inf, -np.inf
     for i in range(dep.size):
         zz = w[i] * z - dep[i]
-        cst.cvmh.nafe_drake(vm(zz)).T.tofile(fh)
+        v = cst.cvmh.nafe_drake(vm(zz))
+        vmin = min(vmin, v.min())
+        vmax = max(vmax, v.max())
+        v.T.tofile(fh)
     fh.close()
+    print('%12g %12g rho' % (vmin, vmax))
 
 # vp extraction
 fh = cst.util.open_excl(hold + 'vp.bin', 'wb')
 if fh:
     vm = cst.cvmh.Extraction(x, y, 'vp', vs30, version=version)
+    vmin, vmax = np.inf, -np.inf
     for i in range(dep.size):
         zz = w[i] * z - dep[i]
-        vm(zz).T.tofile(fh)
+        v = vm(zz)
+        vmin = min(vmin, v.min())
+        vmax = max(vmax, v.max())
+        v.T.tofile(fh)
     fh.close()
+    print('%12g %12g vp' % (vmin, vmax))
 
 # vs extraction
 fh = cst.util.open_excl(hold + 'vs.bin', 'wb')
 if fh:
     vm = cst.cvmh.Extraction(x, y, 'vs', vs30, version=version)
+    vmin, vmax = np.inf, -np.inf
     for i in range(dep.size):
         zz = w[i] * z - dep[i]
-        vm(zz).T.tofile(fh)
+        v = vm(zz)
+        vmin = min(vmin, v.min())
+        vmax = max(vmax, v.max())
+        v.T.tofile(fh)
     fh.close()
+    print('%12g %12g vs' % (vmin, vmax))
 
