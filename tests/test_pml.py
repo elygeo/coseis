@@ -47,10 +47,11 @@ def test_pml():
     cst.sord.run(locals())
 
     # multiple processes
+    max_err_all_ = 0.0
     for i, nproc3 in enumerate([(4, 1, 1), (1, 2, 3)]):
         rundir = 'tmp/%s' % i
         cst.sord.run(locals())
-        maxerr_ = 0.0
+        max_err_ = 0.0
         for f in cst.sord.fieldnames.volume:
             f1 = 'tmp/s/out/%s.bin' % f
             f2 = 'tmp/%s/out/%s.bin' % (i, f)
@@ -60,9 +61,11 @@ def test_pml():
             e = np.abs(dv).max()
             if e:
                 e /= np.abs(v1).max()
-                maxerr_ = max(maxerr_, e)
-                print('%s %s' % (f, e))
-        assert maxerr_ < 1e-6
+                maxerr_ = max(max_err_, e)
+                print('%s error: %s' % (f, e))
+        print('max error: ', max_err_)
+        max_err_all_ = max(max_err_all_, max_err_)
+    assert max_err_all_ == 0.0
 
     # cleanup
     shutil.rmtree('tmp')

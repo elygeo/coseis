@@ -48,10 +48,11 @@ def test_point():
     cst.sord.run(locals())
 
     # multiple processes
+    max_err_all_ = 0.0
     for i, nproc3 in enumerate([(3, 1, 1), (2, 2, 1)]):
         rundir = 'tmp/%s' % i
         cst.sord.run(locals())
-        maxerr_ = 0.0
+        max_err_ = 0.0
         for f in cst.sord.fieldnames.volume:
             f1 = 'tmp/s/out/%s.bin' % f
             f2 = 'tmp/%s/out/%s.bin' % (i, f)
@@ -61,9 +62,11 @@ def test_point():
             e = np.abs(dv).max()
             if e:
                 e /= np.abs(v1).max()
-                maxerr_ = max(maxerr_, e)
-                print('%s %s' % (f, e))
-        assert maxerr_ < 1e-7
+                print('%s error: %s' % (f, e))
+                max_err_ = max(max_err_, e)
+        print('max error: ', max_err_)
+        max_err_all_ = max(max_err_all_, max_err_)
+    assert max_err_all_ == 0.0
 
     # cleanup
     shutil.rmtree('tmp')
