@@ -169,7 +169,7 @@ else:
         stagein = ['cvmhp.py'],
         command = '%s cvmhp.py' % python,
         seconds = s,
-        nproc = min(2, nproc),
+        nproc = min(4, nproc),
         nstripe = nstripe,
     )
 

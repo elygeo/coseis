@@ -28,8 +28,12 @@ def _build():
     os.chdir(path)
     if not os.path.isfile('rspectra.so'):
         print('\nBuilding rspectra')
-        cmd = ['f2py'] + shlex.split(cf.f2py_flags) + ['-c', '-m', 'rspectra', 'rspectra.f90']
-        subprocess.check_call(cmd)
+        cmd1 = ['f2py'] + shlex.split(cf.f2py_flags) + ['-c', '-m', 'rspectra', 'rspectra.f90']
+        cmd2 = ['f2py'] + shlex.split(cf.f2py_flags) + ['-c', '--fcompiler=gnu95', '-m', 'rspectra', 'rspectra.f90']
+        try:
+            subprocess.check_call(cmd1)
+        except:
+            subprocess.check_call(cmd2)
     os.chdir(cwd)
 
 def _archive():
