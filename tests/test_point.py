@@ -17,7 +17,7 @@ def test_point():
     force = True
     debug = 0
     itstats = 1
-    shape = 5, 4, 2, 8
+    shape = 5, 4, 2, 2
     delta = 100.0, 100.0, 100.0, 0.0075
     bc1 = 0, 0, 0
     bc2 = 0, 0, 0
@@ -63,7 +63,7 @@ def test_point():
                 e /= np.abs(v1).max()
                 maxerr_ = max(maxerr_, e)
                 print('%s %s' % (f, e))
-        assert maxerr_ < 1e-7
+        assert maxerr_ < 1e-6
 
     # cleanup
     shutil.rmtree('tmp')
