@@ -61,8 +61,8 @@ def test_pml():
             e = np.abs(dv).max()
             if e:
                 e /= np.abs(v1).max()
-                maxerr_ = max(max_err_, e)
                 print('%s error: %s' % (f, e))
+                max_err_ = max(max_err_, e)
         print('max error: ', max_err_)
         max_err_all_ = max(max_err_all_, max_err_)
     assert max_err_all_ == 0.0
