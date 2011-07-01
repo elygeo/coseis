@@ -10,8 +10,8 @@ import cst
 # parameters
 name = 'chino'
 cvm = 'cvms'
-cvm = 'cvmg'
 cvm = 'cvmh'
+cvm = 'cvmg'
 dx = 50.0;   nproc = 2048; nstripe = 32
 dx = 100.0;  nproc = 256;  nstripe = 16
 dx = 200.0;  nproc = 32;   nstripe = 8
@@ -166,8 +166,8 @@ else:
         name = cvm,
         new = False,
         rundir = path,
-        stagein = ['cvmh.py'],
-        command = '%s cvmh.py' % python,
+        stagein = ['cvmhp.py'],
+        command = '%s cvmhp.py' % python,
         seconds = s,
         nproc = min(2, nproc),
         nstripe = nstripe,

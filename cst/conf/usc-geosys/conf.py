@@ -1,7 +1,7 @@
 """
 USC Earth Science compute cluster
 
-alias qdev='qsub -I'
+alias qdev='qsub -I -q mpi'
 alias qme='qstat -u ${USER}'
 """
 
