@@ -17,7 +17,7 @@ def test_point():
     force = True
     debug = 0
     itstats = 1
-    shape = 5, 4, 2, 2
+    shape = 5, 4, 2, 8
     delta = 100.0, 100.0, 100.0, 0.0075
     bc1 = 0, 0, 0
     bc2 = 0, 0, 0
