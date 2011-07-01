@@ -19,7 +19,7 @@ if meta.cvm == 'cvmg':
     version = 'vx63'
     vs30 = 'wills'
 else:
-    version = 'vx62'
+    version = 'vx63'
     vs30 = None
 
 # read data

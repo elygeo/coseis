@@ -114,12 +114,14 @@ for s in open(f).readlines():
     k = y / delta[1] + 1.0
     if register_:
         fieldio += [
+            ('=w', 'vs', [j,k,1,()], 'out/' + s + '-vs.bin'),
             ('=w', 'v1', [j,k,1,()], 'out/' + s + '-v1.bin'),
             ('=w', 'v2', [j,k,1,()], 'out/' + s + '-v2.bin'),
             ('=w', 'v3', [j,k,1,()], 'out/' + s + '-v3.bin'),
         ]
     else:
         fieldio += [
+            ('=wi', 'vs', [j,k,1,()], 'out/' + s + '-vs.bin'),
             ('=wi', 'v1', [j,k,1,()], 'out/' + s + '-v1.bin'),
             ('=wi', 'v2', [j,k,1,()], 'out/' + s + '-v2.bin'),
             ('=wi', 'v3', [j,k,1,()], 'out/' + s + '-v3.bin'),
