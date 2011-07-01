@@ -3,6 +3,7 @@
 SORD tests
 """
 import subprocess, shutil
+import numpy as np
 import cst
 
 def test_point():
@@ -50,23 +51,19 @@ def test_point():
     for i, nproc3 in enumerate([(3, 1, 1), (2, 2, 1)]):
         rundir = 'tmp/%s' % i
         cst.sord.run(locals())
-        cmd_ = (
-            'diff',
-            '--brief',
-            '--recursive',
-            '--exclude=prof',
-            '--exclude=conf.py',
-            '--exclude=meta.py',
-            '--exclude=parameters.py',
-            '--exclude=sord-sO4',
-            '--exclude=sord-mO4',
-            '--exclude=sord.sh',
-            'tmp/s', rundir,
-        )
-        pid_ = subprocess.Popen(cmd_, stdout=subprocess.PIPE)
-        out_ = pid_.communicate()[0]
-        print out_
-        assert out_ == ''
+        maxerr_ = 0.0
+        for f in cst.sord.fieldnames.volume:
+            f1 = 'tmp/s/out/%s.bin' % f
+            f2 = 'tmp/%s/out/%s.bin' % (i, f)
+            v1 = np.fromfile(f1, 'f')
+            v2 = np.fromfile(f2, 'f')
+            dv = v1 - v2
+            e = (dv * dv).max()
+            if e:
+                e /= (v1 * v1).max()
+                maxerr_ = max(maxerr_, e)
+                print('%s %s' % (f, e))
+        assert maxerr_ < 1e-7
 
     # cleanup
     shutil.rmtree('tmp')
