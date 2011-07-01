@@ -57,9 +57,9 @@ def test_pml():
             v1 = np.fromfile(f1, 'f')
             v2 = np.fromfile(f2, 'f')
             dv = v1 - v2
-            e = (dv * dv).max()
+            e = np.abs(dv).max()
             if e:
-                e /= (v1 * v1).max()
+                e /= np.abs(v1).max()
                 maxerr_ = max(maxerr_, e)
                 print('%s %s' % (f, e))
         assert maxerr_ < 1e-7
