@@ -63,7 +63,7 @@ def test_point():
                 e /= np.abs(v1).max()
                 maxerr_ = max(maxerr_, e)
                 print('%s %s' % (f, e))
-        assert maxerr_ < 1e-6
+        assert maxerr_ < 1e-7
 
     # cleanup
     shutil.rmtree('tmp')

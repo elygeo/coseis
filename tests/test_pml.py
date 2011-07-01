@@ -17,7 +17,7 @@ def test_pml():
     force = True
     debug = 0
     itstats = 1
-    shape = 21, 21, 21, 6
+    shape = 21, 21, 21, 11
     delta = 100.0, 100.0, 100.0, 0.0075
     bc1 = 10, 10, 10
     bc2 = 10, 10, 10
