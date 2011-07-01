@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-##PBS -A TG-MCA03S012
+#PBS -A %(account)s
 #PBS -N %(name)s
 #PBS -M %(email)s
 #PBS -l size=%(totalcores)s
