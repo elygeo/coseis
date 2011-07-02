@@ -36,9 +36,9 @@ while i < n:
     minr, maxr = min(minr, f.min()), max(maxr, f.max())
     minn, maxn = min(minn, g.min()), max(maxn, g.max())
     i += b
+    print('         Min          Max         Mean %12d' % i)
+    print('%12g %12g %12g rho' % (minr, maxr, sumr / i))
+    print('%12g %12g %12g vp'  % (minp, maxp, sump / i))
+    print('%12g %12g %12g vs'  % (mins, maxs, sums / i))
+    print('%12g %12g %12g nu'  % (minn, maxn, sumn / i))
 
-print('         Min          Max         Mean')
-print('%12g %12g %12g rho' % (minr, maxr, sumr / n))
-print('%12g %12g %12g vp'  % (minp, maxp, sump / n))
-print('%12g %12g %12g vs'  % (mins, maxs, sums / n))
-print('%12g %12g %12g nu'  % (minn, maxn, sumn / n))
