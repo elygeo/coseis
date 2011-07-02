@@ -50,6 +50,7 @@ _site_template = '''\
 Site specific configuration
 """
 machine = %(machine)r
+account = %(account)r
 repo = %(repo)r
 '''
 
@@ -61,7 +62,7 @@ def configure(module=None, machine=None, save_site=False, **kwargs):
     ----------
     module : module name
     machine : machine name
-    save_site : save site specific parameters (machine, email, repo)
+    save_site : save site specific parameters (machine, account, repo)
     **kwargs : override parameters supplied as keyword arguments
 
     Returns
