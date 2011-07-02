@@ -3,8 +3,7 @@ NICS Kraken
 
 Install under /lustre/scratch/
 
-Use Git and Vim:
-module load git vim
+module load git vim yt
 
 See install/install-python-kraken.sh for statically linked Python
 
@@ -13,7 +12,7 @@ showbf
 showusage
 qsub -l debugging
 alias qme='qstat -u $USER'
-alias qdev='qsub -I -l size=12,walltime=2:00:00'
+alias qdev='qsub -I -A account_string -l size=12,walltime=2:00:00'
 
 Home directories have a 2 GB quota.
 CrayPAT (Cray Performance Analysis Tools) is useful for profiling and
