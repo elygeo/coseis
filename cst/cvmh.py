@@ -332,10 +332,12 @@ class Extraction():
             if np.isnan(vt).any():
                 print('WARNING: NaNs in GTL')
             self.gtl = v0, vt
-        self.data = x, y, z0, zt, vm, interpolation
+        self.x, self.y, self.z0, self.zt = x, y, z0, zt
+        self.vm, self.interpolation = vm, interpolation
         return
     def __call__(self, z, out=None, min_depth=None, by_depth=True):
-        x, y, z0, zt, vm, interpolation = self.data
+        x, y, z0, zt = self.x, self.y, self.z0, self.zt
+        vm, interpolation = self.vm, self.interpolation
         z = np.asarray(z)
         if out is None:
             out = np.empty_like(z)
@@ -361,14 +363,14 @@ class Extraction():
         return out
 
 
-def extract(x, y, z, vm, geographic=True, by_depth=True, **kwargs):
+def extract(x, y, z, vm=['rho', 'vp', 'vs'], geographic=True, by_depth=True, **kwargs):
     """
     Simple CVM-H extraction.
 
     Parameters
     ----------
         x, y, z: Coordinates arrays
-        vm: 'vp', 'vs', 'tag', or Model object.
+        vm: 'rho', 'vp', 'vs', 'tag', or Model object.
         geographic: X Y coordinate type, True for geographic, False for UTM.
         by_depth: Z coordinate type, True for depth, False for elevation.
         **kwargs: Keyword arguments passed to Extraction()
@@ -379,6 +381,8 @@ def extract(x, y, z, vm, geographic=True, by_depth=True, **kwargs):
     """
     x = np.asarray(x)
     y = np.asarray(y)
+    if type(vm) not in [list, tuple]:
+        vm = [vm]
     if geographic:
         import pyproj
         proj = pyproj.Proj(**projection)
@@ -386,7 +390,17 @@ def extract(x, y, z, vm, geographic=True, by_depth=True, **kwargs):
         x, y = proj(x, y)
         x = x.astype(dtype)
         y = y.astype(dtype)
-    f = Extraction(x, y, vm, **kwargs)
-    out = f(z, by_depth=by_depth)
-    return out
+    out = []
+    f = None
+    for v in vm:
+        prop = v
+        if v == 'rho':
+            prop = 'vp'
+        if not out or prop != f.vm.prop:
+            f = Extraction(x, y, prop, **kwargs)
+        if v == 'rho':
+            out += [nafe_drake(f(z, by_depth=by_depth))]
+        else:
+            out += [f(z, by_depth=by_depth)]
+    return np.array(out)
 

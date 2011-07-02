@@ -32,7 +32,7 @@ zz = np.empty_like(xx)
 
 # CVM setup
 n = nn[0] * nn[1] * nn[2]
-cfg = cst.cvm.stage(nsample=n, nproc=nproc)
+cfg = cst.cvms.stage(nsample=n, nproc=nproc)
 path = cfg.rundir
 
 # write CVM input files

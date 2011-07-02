@@ -149,14 +149,14 @@ def stage(inputs={}, **kwargs):
     cst.util.save(f, job.__dict__)
     return job
 
-def extract(lon, lat, dep, prop=None, **kwargs):
+def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
     """
     Simple CVM-S extraction
 
     Parameters
     ----------
         lon, lat, dep: Coordinate arrays
-        prop: 'rho', 'vp', or 'vs'. None=all
+        prop: 'rho', 'vp', or 'vs'
         nproc: Optional, number of processes
         rundir: Optional, job staging directory
 
@@ -175,13 +175,11 @@ def extract(lon, lat, dep, prop=None, **kwargs):
     dep.tofile(path + job.file_dep)
     del(lon, lat, dep)
     launch(job, run='exec')
-    if prop is not None:
-        f = {'rho': job.file_rho, 'vp': job.file_vp, 'vs': job.file_vs}
-        f = np.fromfile(path + f[prop], 'f').reshape(shape)
-        return f
-    else:
-        rho = np.fromfile(path + job.file_rho, 'f').reshape(shape)
-        vp =  np.fromfile(path + job.file_vp,  'f').reshape(shape)
-        vs =  np.fromfile(path + job.file_vs,  'f').reshape(shape)
-        return rho, vp, vs
+    out = []
+    if type(prop) not in [list, tuple]:
+        prop = [prop]
+    for v in prop:
+        f = {'rho': job.file_rho, 'vp': job.file_vp, 'vs': job.file_vs}[v]
+        out += [np.fromfile(path + f, 'f').reshape(shape)]
+    return np.array(out)
 

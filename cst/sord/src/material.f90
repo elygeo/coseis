@@ -132,7 +132,7 @@ if (master) then
     write (1, "(2g15.7,'  mu')")  -max_g(6), max_g(13)
     write (1, "(2g15.7,'  nu')")  -max_g(7), max_g(14)
     close (1)
-    if (any(max_g(1:7) > 0.0)) stop 'Negative material properties!'
+    if (any(max_g(1:7) > 0.0)) write (0, '(a)') 'Warning: negative moduli'
     if (cfl2 > 1.0) stop 'Courant condition not satisfied!'
 end if
 

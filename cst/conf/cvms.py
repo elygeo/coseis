@@ -4,7 +4,7 @@ CVM configuration
 import os
 
 version = '4.0'
-seconds = 800
+seconds = 1200
 nsample = None
 file_lon = 'hold/lon.bin'
 file_lat = 'hold/lat.bin'
