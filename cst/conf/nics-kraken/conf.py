@@ -2,22 +2,19 @@
 NICS Kraken
 
 Install under /lustre/scratch/
+See install/install-python-kraken.sh for statically linked Python.
+Home directories have a 2 GB quota.
+CrayPAT is useful for profiling and collecting hardware performance data.
 
+.bashrc
 module unload PrgEnv-pgi
 module load PrgEnv-gnu git vim yt
-
-See install/install-python-kraken.sh for statically linked Python
+alias qme='qstat -u $USER'
+alias qdev='qsub -I -A account_string -l size=12,walltime=2:00:00'
 
 showq
 showbf
 showusage
-qsub -l debugging
-alias qme='qstat -u $USER'
-alias qdev='qsub -I -A account_string -l size=12,walltime=2:00:00'
-
-Home directories have a 2 GB quota.
-CrayPAT (Cray Performance Analysis Tools) is useful for profiling and
-collecting hardware performance data
 """
 login = 'kraken-pwd.nics.utk.edu'
 hostname = 'kraken-pwd[1234]'

@@ -30,4 +30,5 @@ launch = {
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
 }
+f2py_flags = '--fcompiler=gnu95'
 

@@ -4,8 +4,8 @@ TACC Ranger
 EPD version: rh3-x86_64
 
 .profile_user
-module unload mvapich pgi
-module load intel mvapich2 git
+module unload mvapich
+module load mvapich2 git
 #mvapich2 supports MPI2, but not recommended for more than 2048 tasks.
 
 .bashrc
@@ -24,8 +24,8 @@ lfs quota -u $USER $SCRATCH
 
 # needed?
 module load gotoblas scalapack mkl
-export F77=ifort
-export F90=ifort
+export F77=pgf95
+export F90=pgf95
 """
 login = 'tg-login.ranger.tacc.teragrid.org'
 hostname = '.*.ranger.tacc.utexas.edu'
@@ -50,21 +50,21 @@ launch = {
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -hold_jid "%(depend)s" "%(name)s.sh"',
 }
-fortran_serial = 'ifort'
+fortran_serial = 'pgf95'
 fortran_mpi = 'mpif90'
 fortran_flags = {
-    'f': '-u -std95 -warn',
-    'g': '-CB -traceback -g',
-    't': '-CB -traceback',
-    'p': '-O -pg',
-    'O': '-O3 -xW',
-    '8': '-r8',
+    'f': '-Mdclchk',
+    'g': '-Ktrap=fp -Mbounds -g',
+    't': '-Ktrap=fp -Mbounds',
+    'p': '-fast -tp barcelona-64 -Mprof=func',
+    'O': '-fast -tp barcelona-64',
+    '8': '-Mr8',
 }
 
-# find ifort compiler
+# find pgf77 compiler
 #import os
 #for d in os.environ['PATH'].split(':'):
-#    f = os.path.join(d, 'ifort')
+#    f = os.path.join(d, 'pgf77')
 #    if os.path.isfile(f):
 #        f2py_flags = '--f77exec=' + f
 #        break
