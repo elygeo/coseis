@@ -7,34 +7,36 @@ import pyproj
 import numpy as np
 import cst
 
-# parameters
+# cvm version
+cvm_ = 'cvms'
+cvm_ = 'cvmh'
+cvm_ = 'cvmg'
+
+# resolution and parallelization
 dx_ = 50.0;   nproc3 = 1, 32, 480; nstripe = 32
 dx_ = 100.0;  nproc3 = 1, 4, 240;  nstripe = 16
 dx_ = 200.0;  nproc3 = 1, 1, 120;  nstripe = 8
 dx_ = 500.0;  nproc3 = 1, 1, 2;    nstripe = 2
 dx_ = 1000.0; nproc3 = 1, 1, 2;    nstripe = 1
 dx_ = 4000.0; nproc3 = 1, 1, 1;    nstripe = 1
-itio = nstripe * 100
-itstats = 10
 
-# mesh type
+# I/O
+itstats = 10
+itio = nstripe * 100
 surf_out_ = True
 surf_out_ = False
+
+# surface topography
+surf_ = 'topo'
+surf_ = 'flat'
+
+# align source and receivers to mesh nodes
 register_ = True
 register_ = False
-cvm_ = 'cvms'
-cvm_ = 'cvmh'
-cvm_ = 'cvmg'
-mesh_ = 'chino-cvms-%04.0f' % dx_
-mesh_ = 'chino-cvmh-%04.0f' % dx_
-mesh_ = 'chino-cvmg-%04.0f' % dx_
-mesh_ = 'ch%04.0f%s' % (dx_, cvm_[-1])
-mesh_ = 'ch%04.0f%s' % (dx_, cvm_[-1])
-mesh_ = 'ch%04.0f%s' % (dx_, cvm_[-1])
-name = mesh_ + '-topo'
-name = mesh_ + '-flat'
 
-# run directory
+# run name
+mesh_ = 'ch%04.0f%s' % (dx_, cvm_[-1])
+name = mesh_ + '-' + surf_
 rundir = os.path.join('run', 'sim', name)
 
 # mesh metadata

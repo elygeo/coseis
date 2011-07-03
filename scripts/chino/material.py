@@ -7,12 +7,12 @@ import pyproj
 import numpy as np
 import cst
 
-# model
+# cvm version
 cvm = 'cvms'
 cvm = 'cvmh'
 cvm = 'cvmg'
 
-# resolution
+# resolution and parallelization
 dx = 50.0;   nproc = 2048; nstripe = 32
 dx = 100.0;  nproc = 256;  nstripe = 16
 dx = 200.0;  nproc = 32;   nstripe = 8
