@@ -7,17 +7,20 @@ import pyproj
 import numpy as np
 import cst
 
-# parameters
-name = 'chino'
+# model
 cvm = 'cvms'
 cvm = 'cvmh'
 cvm = 'cvmg'
+
+# resolution
 dx = 50.0;   nproc = 2048; nstripe = 32
 dx = 100.0;  nproc = 256;  nstripe = 16
 dx = 200.0;  nproc = 32;   nstripe = 8
 dx = 500.0;  nproc = 2;    nstripe = 2
 dx = 1000.0; nproc = 2;    nstripe = 1
 dx = 4000.0; nproc = 1;    nstripe = 1
+
+# coordinate system
 delta = dx, dx, -dx
 
 # moment tensor source
@@ -34,7 +37,7 @@ projection = dict(proj='tmerc', lon_0=origin[0], lat_0=origin[1])
 proj = pyproj.Proj(**projection)
 
 # path
-mesh_id = '%s-%s-%04.f' % (name, cvm, delta[0])
+mesh_id = 'ch%04.f%s' % (dx, cvm[-1])
 path = os.path.join('run', 'mesh', mesh_id)
 path = os.path.realpath(path) + os.sep
 hold = path + 'hold' + os.sep
@@ -119,6 +122,7 @@ if cvm == 'cvms':
 
     # stage cvms
     job = cst.cvms.stage(
+        name = mesh_id + '-cvms',
         rundir = path + 'cvms',
         nsample = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1),
         post = 'rm %slon.bin\nrm %slat.bin\nrm %sdep.bin' % (hold, hold, hold),
@@ -135,7 +139,7 @@ if cvm == 'cvms':
     x, y, z = shape
     s = x * y * z / 2000000
     job0 = cst.conf.launch(
-        name = 'mesh',
+        name = mesh_id + '-mesh',
         new = False,
         rundir = path,
         stagein = ['mesh.py'],
@@ -163,7 +167,7 @@ else:
     s = x * y * z / 2000000 # nearest
     print 'CVM-H wall time estimate: %s' % s
     cst.conf.launch(
-        name = cvm,
+        name = mesh_id + '-cvmh',
         new = False,
         rundir = path,
         stagein = ['mesh-cvmh.py'],

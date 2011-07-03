@@ -22,14 +22,20 @@ surf_out_ = True
 surf_out_ = False
 register_ = True
 register_ = False
+cvm_ = 'cvms'
+cvm_ = 'cvmh'
+cvm_ = 'cvmg'
 mesh_ = 'chino-cvms-%04.0f' % dx_
 mesh_ = 'chino-cvmh-%04.0f' % dx_
 mesh_ = 'chino-cvmg-%04.0f' % dx_
-id_ = mesh_ + '-topo'
-id_ = mesh_ + '-flat'
+mesh_ = 'ch%04.0f%s' % (dx_, cvm_[-1])
+mesh_ = 'ch%04.0f%s' % (dx_, cvm_[-1])
+mesh_ = 'ch%04.0f%s' % (dx_, cvm_[-1])
+name = mesh_ + '-topo'
+name = mesh_ + '-flat'
 
 # run directory
-rundir = os.path.join('run', 'sim', id_)
+rundir = os.path.join('run', 'sim', name)
 
 # mesh metadata
 mesh_ = os.path.join('run', 'mesh', mesh_) + os.sep
@@ -82,7 +88,7 @@ else:
     ]
 
 # topography
-if 'topo' in id_:
+if 'topo' in name:
     fieldio += [
         ('=r', 'x3',  [], 'hold/z3.bin')
     ]

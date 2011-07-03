@@ -13,10 +13,10 @@ delta = meta.delta
 npml = meta.npml
 ntop = meta.ntop
 hold = 'hold' + os.sep
+version = 'vx63'
 
 # variant
 if meta.cvm == 'cvmg':
-    version = 'vx63'
     vs30 = 'wills'
 else:
     version = 'vx63'
