@@ -1,8 +1,7 @@
 """
 USC Earth Science compute cluster
 
-Add to .tcshrc:
-
+.tcshrc
 if ( ${?LD_LIBRARY_PATH} ) then
     setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/usr/lib64/mpich2/lib
 else
