@@ -12,7 +12,7 @@ def test_point():
     """
 
     # parameters
-    dtype = 'd'
+    dtype = 'f'
     run = 'exec'
     argv = []
     force = True
