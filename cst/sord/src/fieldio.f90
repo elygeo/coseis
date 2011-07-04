@@ -347,7 +347,7 @@ if (i > 0 .and. debug > 3 .and. it <= 8) then
     write (*, '(2a)') 'Opening file: ', trim(str)
     open (1, file=str, status='replace')
     do l = 1, size(f, 3)
-        write (1, '(i4,x,i4,x,a)') it, l, field
+        write (1, '(i4,1x,i4,1x,a)') it, l, field
         do k = 1, size(f, 2)
             write (1, '(16g15.7)') f(:,k,l)
         end do

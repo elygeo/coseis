@@ -232,9 +232,9 @@ end function
 ! timer
 real function timer(i)
 integer, intent(in) :: i
-integer(8), save :: clock0, clockrate, clockmax
 integer(8), save :: timers(8)
-integer(8) :: clock1
+integer, save :: clock0, clockrate, clockmax
+integer :: clock1
 if (i == 0) then
     call system_clock(clock0, clockrate, clockmax)
     timer = 0.0
@@ -242,8 +242,6 @@ if (i == 0) then
 else
     call system_clock(clock1)
     timers = timers + clock1 - clock0
-    !if (clock1 < clock0) timers = timers + clockmax
-    !if (clock1 < 0) timers = timers + clockmax ! PGI bug workaround
     clock0 = clock1
     timer = real(timers(i)) / real(clockrate)
     timers(:i) = 0

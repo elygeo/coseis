@@ -60,8 +60,8 @@ fortran_flags = {
     'O': '-fast -tp barcelona-64',
     '8': '-Mr8',
 }
+f2py_flags = '--fcompiler=pg'
 
-# find pgf77 compiler
 #import os
 #for d in os.environ['PATH'].split(':'):
 #    f = os.path.join(d, 'pgf77')

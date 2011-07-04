@@ -60,8 +60,8 @@ fortran_flags = {
     'O': '-O3 -xW',
     '8': '-r8',
 }
+f2py_flags = '--fcompiler=intelem'
 
-# find ifort compiler
 #import os
 #for d in os.environ['PATH'].split(':'):
 #    f = os.path.join(d, 'ifort')
