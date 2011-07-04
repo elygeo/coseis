@@ -2,11 +2,11 @@
 TACC Ranger
 
 EPD version: rh3-x86_64
+mvapich2 supports MPI2, but not recommended for more than 2048 tasks.
 
 .profile_user
-module unload mvapich pgi
-module load intel mvapich2 git
-#mvapich2 supports MPI2, but not recommended for more than 2048 tasks.
+module unload pgi
+module load intel git
 
 .bashrc
 alias qme='showq -u'
@@ -57,15 +57,7 @@ fortran_flags = {
     'g': '-CB -traceback -g',
     't': '-CB -traceback',
     'p': '-O -pg',
-    'O': '-O3 -xW',
+    'O': '-O2 -xW',
     '8': '-r8',
 }
 f2py_flags = '--fcompiler=intelem'
-
-#import os
-#for d in os.environ['PATH'].split(':'):
-#    f = os.path.join(d, 'ifort')
-#    if os.path.isfile(f):
-#        f2py_flags = '--f77exec=' + f
-#        break
-

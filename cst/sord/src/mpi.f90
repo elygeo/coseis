@@ -3,22 +3,33 @@ module m_collective
 use mpi
 implicit none
 integer, parameter :: file_null = mpi_file_null
-integer, private :: np3(3), comm1d(3), comm2d(3), comm3d, rtype, itype
+integer, private :: np3(3), comm1d(3), comm2d(3), comm3d, itype, rtype
 contains
 
 ! initialize
 subroutine initialize(np0, ip)
 use mpi
 integer, intent(out) :: np0, ip
-integer :: i, nr, ni, e
+integer :: i, m, n, e
+integer(4) :: i4
 real :: r
+real(4) :: r4
 call mpi_init(e)
 call mpi_comm_size(mpi_comm_world, np0, e)
 call mpi_comm_rank(mpi_comm_world, ip, e)
-call mpi_sizeof(r, nr, e)
-call mpi_sizeof(i, ni, e)
-call mpi_type_match_size(mpi_typeclass_real, nr, rtype, e)
-call mpi_type_match_size(mpi_typeclass_integer, ni, itype, e)
+itype = mpi_integer
+rtype = mpi_real
+inquire (iolength=m) i
+inquire (iolength=n) i4
+if (m > n) itype = mpi_integer8
+inquire (iolength=m) r
+inquire (iolength=n) r4
+if (m > n) rtype = mpi_real8
+!following not supported by MPICH1
+!call mpi_sizeof(i, ni, e)
+!call mpi_sizeof(r, nr, e)
+!call mpi_type_match_size(mpi_typeclass_integer, ni, itype, e)
+!call mpi_type_match_size(mpi_typeclass_real, nr, rtype, e)
 end subroutine
 
 ! finalize

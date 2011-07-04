@@ -86,7 +86,7 @@ f2py_flags = ''
 # Fortran compiler flags
 fortran_flags_default_ = {
     'gfortran': {
-        #'f': 'gfortran -fimplicit-none -Wall -std=f95 -pedantic',
+        #'f': '-fimplicit-none -Wall -std=f95 -pedantic',
         'f': '-fimplicit-none -Wall',
         'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
         't': '-fbounds-check -ffpe-trap=invalid,zero,overflow',

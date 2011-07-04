@@ -12,6 +12,7 @@ def test_point():
     """
 
     # parameters
+    dtype = 'd'
     run = 'exec'
     argv = []
     force = True
@@ -56,8 +57,8 @@ def test_point():
         for f in cst.sord.fieldnames.volume:
             f1 = 'tmp/s/out/%s.bin' % f
             f2 = 'tmp/%s/out/%s.bin' % (i, f)
-            v1 = np.fromfile(f1, 'f')
-            v2 = np.fromfile(f2, 'f')
+            v1 = np.fromfile(f1, dtype)
+            v2 = np.fromfile(f2, dtype)
             dv = v1 - v2
             e = np.abs(dv).max()
             if e:

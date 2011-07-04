@@ -13,6 +13,7 @@ def test_kostrov():
     """
 
     # parameters
+    dtype = 'f'
     run = 'exec'
     argv = []
     force = True
@@ -71,10 +72,10 @@ def test_kostrov():
     except:
         v = cst.kostrov.slip_rate(rho_, vp_, vs_, vrup, dtau_, r, t, 0.82)
     for p in 'abcd':
-        dv = v - np.fromfile(rundir + '/out/p20%s.bin' % p, 'f')[-1]
+        dv = v - np.fromfile(rundir + '/out/p20%s.bin' % p, dtype)[-1]
         err = dv / v
         print(v, err)
-        assert err < 0.01
+        assert abs(err) < 0.015
 
     # cleanup
     shutil.rmtree('tmp')
