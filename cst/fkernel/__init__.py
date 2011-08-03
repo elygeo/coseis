@@ -1,7 +1,6 @@
 """
 Frechet kernel computation
 """
-from __future__ import print_function
 import os, sys, shutil, shlex
 from ..conf import launch
 

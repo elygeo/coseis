@@ -1,7 +1,6 @@
 """
 Support Operator Rupture Dynamics
 """
-from __future__ import division, print_function
 import os, sys, math, glob, shutil, shlex, pprint
 import numpy as np
 from ..conf import launch

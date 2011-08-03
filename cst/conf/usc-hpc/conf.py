@@ -3,8 +3,8 @@ USC HPC - http://www.usc.edu/hpcc/
 
 .login
 source /usr/usc/globus/default/setup.csh
-source /usr/usc/mpich/default/setup.csh
-#source /usr/usc/mpich2/1.3.1..10/setup.csh
+#source /usr/usc/mpich/default/setup.csh
+source /usr/usc/mpich2/1.3.1..10/setup.csh
 setenv F77 gfortran
 setenv F90 gfortran
 
@@ -32,7 +32,8 @@ queue_opts = [
 launch = {
     's_exec':  '%(command)s',
     's_debug': 'gdb %(command)s',
-    'm_exec':  'mpirun -n %(nproc)s %(command)s',
+    #'m_exec':  'mpirun -n %(nproc)s %(command)s',
+    'm_exec':  'mpiexec -n %(nproc)s %(command)s',
     'submit':  'qsub "%(name)s.sh"',
     'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
 }

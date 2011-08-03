@@ -2,7 +2,6 @@
 """
 Configure, build, and launch utilities.
 """
-from __future__ import division, print_function
 import os, sys, re, shutil, getopt, subprocess, shlex, time
 import numpy as np
 
@@ -264,7 +263,7 @@ def prepare(job=None, **kwargs):
         job.dtype = np.dtype(job.dtype).str
 
     # number of processes
-    if not hasattr(job, 'nproc'):
+    if not hasattr(job, 'nproc') or job.mode == 's':
         job.nproc = 1
 
     # queue options

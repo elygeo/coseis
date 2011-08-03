@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-WebSims configuration template
+WebSims configuration
 """
 
 # info

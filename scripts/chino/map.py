@@ -9,6 +9,10 @@ import pyproj
 import cst
 
 # parameters
+surface = ''
+surface = '-cvmh'
+surface = '-cvms'
+surface = '-cvmg'
 eventid = 14383980
 bounds = (-80000.0, 48000.0), (-58000.0, 54000.0)
 mts = os.path.join('run', 'data', '%s.mts.py' % eventid)
@@ -25,27 +29,49 @@ plt.rc('patch', lw=0.5)
 fig = plt.figure(None, inches, 100, None)
 fig.clf()
 ax = fig.add_axes([0.01, 0.01, 0.98, 0.98])
+axis = bounds[0] + bounds[1]
 
-# CVM-S basins
-f = os.path.join('run', 'data', 'basins-cvms.txt')
-x, y = proj(*np.loadtxt(f).T)
-h = ax.plot(x, y, '-r')
-h[0].set_dashes((2,1))
+if surface:
 
-# CVM-H basins
-f = os.path.join('run', 'data', 'basins-cvmh.txt')
-x, y = proj(*np.loadtxt(f).T)
-h = ax.plot(x, y, '-b')
-h[0].set_dashes((2,1))
+    # Surface Vs image
+    vlim = 75, 3200
+    cmap = cst.plt.colormap('rgb', colorexp=2.0)
+    f = os.path.join('run', 'data', 'surface-vs%s.npy' % surface)
+    f = np.load(f)
+    print(f.min(), f.max())
+    im = ax.imshow(f.T, extent=axis, cmap=cmap, vmin=75, vmax=3200,
+        origin='lower', interpolation='nearest')
+
+else:
+
+    # CVM-S basins
+    f = os.path.join('run', 'data', 'basins-cvms.txt')
+    x, y = proj(*np.loadtxt(f).T)
+    i = x == 1e30
+    x[i], y[i] = np.nan, np.nan
+    h = ax.plot(x, y, '-r')
+    h[0].set_dashes((2,1))
+
+    # CVM-H basins
+    f = os.path.join('run', 'data', 'basins-cvmh.txt')
+    x, y = proj(*np.loadtxt(f).T)
+    i = x == 1e30
+    x[i], y[i] = np.nan, np.nan
+    h = ax.plot(x, y, '-b')
+    h[0].set_dashes((2,1))
 
 # topography
 f = os.path.join('run', 'data', 'mountains.txt')
 x, y = proj(*np.loadtxt(f).T)
+i = x == 1e30
+x[i], y[i] = np.nan, np.nan
 ax.plot(x, y, '-k')
 
 # coastlines and boarders
 f = os.path.join('run', 'data', 'coastlines.txt')
 x, y = proj(*np.loadtxt(f).T)
+i = x == 1e30
+x[i], y[i] = np.nan, np.nan
 ax.plot(x, y, 'k-', lw=1.0)
 
 # source
@@ -69,7 +95,6 @@ for s, y, x, z in sta:
     ax.text(x, y-1300, s.split('.')[-1], ha='center', va='top')
 
 # axes
-axis = bounds[0] + bounds[1]
 ax.axis('image')
 ax.axis(axis)
 ax.set_xticks([])
@@ -90,9 +115,9 @@ fig.canvas.draw()
 f = os.path.join('run', 'plot')
 if not os.path.exists(f):
     os.makedirs(f)
-f = os.path.join('run', 'plot', 'map.pdf')
+f = os.path.join('run', 'plot', 'map%s.pdf' % surface)
 fig.savefig(f, transparent=True)
-f = os.path.join('run', 'plot', 'map.png')
+f = os.path.join('run', 'plot', 'map%s.png' % surface)
 fig.savefig(f)
 fig.show()
 

@@ -1,7 +1,6 @@
 """
 Computational Seismology Tools
 """
-from __future__ import division, print_function
 import os, subprocess, shlex
 path = os.path.dirname(__file__)
 from . import util, conf

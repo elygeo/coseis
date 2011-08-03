@@ -2,7 +2,6 @@
 """
 SORD tests
 """
-from __future__ import division, print_function
 import shutil
 import numpy as np
 import cst

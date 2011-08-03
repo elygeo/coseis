@@ -1,5 +1,5 @@
 #!/bin/sh
-# @ account_no = k99
+# @ account_no = k33
 # @ class = %(queue)s
 # @ job_name = %(name)s
 # @ bg_size = %(nodes)s
@@ -18,7 +18,7 @@ set > env
 
 echo "$( date ): %(name)s started" >> log
 %(pre)s
-mpirun -mode VN -np %(nproc)s -cwd $PWD -exe %(command)s
+mpirun -mode VN -np %(nproc)s -exe %(command)s
 %(post)s
 echo "$( date ): %(name)s finished" >> log
 

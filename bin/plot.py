@@ -12,7 +12,6 @@ Options
 -c <clim>   Set upper color scale limit to constant value.
 -s          For image series, step through with mouse clicks.
 """
-from __future__ import division, absolute_import, print_function, unicode_literals
 import os, sys, getopt
 import numpy as np
 import matplotlib.pyplot as plt

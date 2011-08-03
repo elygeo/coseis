@@ -3,7 +3,6 @@ Utilities for accessing the Southern California Earthquake Data Center (SCEDC).
 
 http://www.data.scec.org/
 """
-from __future__ import division, print_function
 import os, sys, time, struct, socket, urllib
 from . import util
 

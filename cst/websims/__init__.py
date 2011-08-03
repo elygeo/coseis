@@ -23,7 +23,6 @@ of the Computational Siesmology Tools (Coseis_).
 .. _web.py:     http://webpy.org/
 .. _Coseis:     http://earth.usc.edu/~gely/coseis/www/
 """
-from __future__ import print_function
 import os, sys, re, gzip, time, cStringIO, shutil, itertools
 import numpy as np
 import web, jinja2, docutils.core

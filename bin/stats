@@ -20,21 +20,29 @@ print('         Min          Max         Mean            N')
 for filename in args:
     if not os.path.isfile(filename):
         continue
-    n = os.path.getsize(filename)
-    if n == 0 or n % nb != 0:
-        continue
-    n //= nb
-    fh = open(filename, 'rb')
-    rmin =  np.inf
-    rmax = -np.inf
-    rsum = 0.0
-    i = 0
-    while i < n:
-        b = min(n-i, block)
-        r = np.fromfile(fh, dtype=dtype, count=b)
-        rmin = min(rmin, r.min())
-        rmax = max(rmax, r.max())
-        rsum += r.astype('d').sum()
-        i += b
-    print('%12g %12g %12g %12d %s' % (rmin, rmax, rsum/n, n, filename))
+    if filename.endswith('npy'):
+        r = np.load(filename)
+        n = r.size
+        rmin = r.min()
+        rmax = r.max()
+        rmean = r.mean()
+    else:
+        n = os.path.getsize(filename)
+        if n == 0 or n % nb != 0:
+            continue
+        n //= nb
+        fh = open(filename, 'rb')
+        rmin =  np.inf
+        rmax = -np.inf
+        rsum = 0.0
+        i = 0
+        while i < n:
+            b = min(n-i, block)
+            r = np.fromfile(fh, dtype=dtype, count=b)
+            rmin = min(rmin, r.min())
+            rmax = max(rmax, r.max())
+            rsum += r.astype('d').sum()
+            i += b
+        rmean = rsum / n
+    print('%12g %12g %12g %12d %s' % (rmin, rmax, rmean, n, filename))
 

@@ -90,18 +90,18 @@ h2.close()
 h3.close()
 
 # save pgv, pgd
-np.asarray(np.sqrt(pgv), dtype).T.tofile('pgv.bin')
-np.asarray(np.sqrt(pgd), dtype).T.tofile('pgd.bin')
-np.asarray(np.sqrt(pgvh), dtype).T.tofile('pgvh.bin')
-np.asarray(np.sqrt(pgdh), dtype).T.tofile('pgdh.bin')
+np.sqrt(pgv).astype(dtype).T.tofile('pgv.bin')
+np.sqrt(pgd).astype(dtype).T.tofile('pgd.bin')
+np.sqrt(pgvh).astype(dtype).T.tofile('pgvh.bin')
+np.sqrt(pgdh).astype(dtype).T.tofile('pgdh.bin')
 
 # free memory
 del(v1, v2, v3, u1, u2, u3, pgv, pgd, pgvh, pgdh)
 
 # transpose time history arrays
-p = path + 'hist-v%s.bin'
 x, y, t = nhist
 n = t, x * y
+p = path + 'hist-v%s.bin'
 np.fromfile(p % 1, dtype).reshape(n).T.tofile(p % 1)
 np.fromfile(p % 2, dtype).reshape(n).T.tofile(p % 2)
 np.fromfile(p % 3, dtype).reshape(n).T.tofile(p % 3)

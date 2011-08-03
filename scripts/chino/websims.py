@@ -3,18 +3,16 @@
 WebSims setup
 """
 import os, sys, glob
-import pyproj
 import numpy as np
+import pyproj
 import cst
 
 # parameters
-nproc = 1
+nproc = 2
 template = 'ws-meta-in.py'
 author = 'Geoffrey Ely'
 title = 'Chino Hills'
 scale = 0.001
-sims = 'run/sim/chino-cvms-1000-flat'
-sims = 'run/sim/chino-cvms-0200-flat'
 sims = 'run/sim/*'
 force = '-f' in sys.argv[1:]
 
@@ -113,18 +111,18 @@ for path in glob.glob(sims):
     x = np.fromfile(path + 'lon.bin', meta.dtype).reshape(n)
     y = np.fromfile(path + 'lat.bin', meta.dtype).reshape(n)
     z = np.zeros_like(x)
-    if meta.cvm == 'cvmh':
-        z = cst.cvmh.extract(x, y, z, 'vs')
-    else:
+    if meta.cvm == 'cvms':
         z = cst.cvms.extract(x, y, z, 'vs', rundir='run/cvms')
+    else:
+        z = cst.cvmh.extract(x, y, z, 'vs')
     z.tofile(path + 'vs0.bin')
 
     # basins
     z.fill(1000.0)
-    if meta.cvm == 'cvmh':
-        z = cst.cvmh.extract(x, y, z, 'vs')
-    else:
+    if meta.cvm == 'cvms':
         z = cst.cvms.extract(x, y, z, 'vs', rundir='run/cvms')
+    else:
+        z = cst.cvmh.extract(x, y, z, 'vs')
     x, y = proj(x, y)
     v = 2500,
     x, y = cst.plt.contour(x, y, z, v)[0]

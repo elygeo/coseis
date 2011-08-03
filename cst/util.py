@@ -1,7 +1,6 @@
 """
 General utilities
 """
-from __future__ import division, print_function
 import os, sys, re
 import numpy as np
 

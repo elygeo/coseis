@@ -61,20 +61,31 @@ f = os.path.join('run', 'data', 'coastlines.txt')
 np.savetxt(f, np.array([x, y]).T)
 
 # mesh
+ddeg = 0.5 / 60.0
 x, y = extent
 x = x[0] + ddeg * np.arange(n[0])
 y = y[0] + ddeg * np.arange(n[1])
 yy, xx = np.meshgrid(y, x)
 zz = np.empty_like(xx)
-zz.fill(1000.0)
 
-# CVM basins
+# surface
+zz.fill(0.0)
+for cvm, vv in [
+    ('cvmg', cst.cvmh.extract(xx, yy, zz, 'vs')),
+    ('cvmh', cst.cvmh.extract(xx, yy, zz, 'vs', vs30=None)),
+    ('cvms', cst.cvms.extract(xx, yy, zz, 'vs', rundir='run/cvms')),
+]:
+    f = os.path.join('run', 'data', 'surface-vs-%s.npy' % cvm)
+    np.save(f, vv[0].astype('f'))
+
+# cvm basins
+zz.fill(1000.0)
 for cvm, vv in [
     ('cvmh', cst.cvmh.extract(xx, yy, zz, 'vs', vs30=None)),
     ('cvms', cst.cvms.extract(xx, yy, zz, 'vs', rundir='run/cvms')),
 ]:
     v = 2500,
-    x, y = cst.plt.contour(xx, yy, vv, v)[0]
+    x, y = cst.plt.contour(xx, yy, vv[0], v)[0]
     f = os.path.join('run', 'data', 'basins-%s.txt' % cvm)
     np.savetxt(f, np.array([x, y]).T)
 
