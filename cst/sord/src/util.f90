@@ -29,9 +29,9 @@ do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
     r(j,k,l) = &
-    (x(j,k,l,1) - x0(1)) * (x(j,k,l,1) - x0(1)) + &
-    (x(j,k,l,2) - x0(2)) * (x(j,k,l,2) - x0(2)) + &
-    (x(j,k,l,3) - x0(3)) * (x(j,k,l,3) - x0(3))
+    ( (x(j,k,l,1) - x0(1)) * (x(j,k,l,1) - x0(1)) &
+    + (x(j,k,l,2) - x0(2)) * (x(j,k,l,2) - x0(2)) &
+    + (x(j,k,l,3) - x0(3)) * (x(j,k,l,3) - x0(3)) )
 end do
 end do
 end do
@@ -88,9 +88,9 @@ do l = i1(3), i2(3), di(3)
 do k = i1(2), i2(2), di(2)
 do j = i1(1), i2(1), di(1)
     f(j,k,l) = &
-    w(j,k,l,1) * w(j,k,l,1) + &
-    w(j,k,l,2) * w(j,k,l,2) + &
-    w(j,k,l,3) * w(j,k,l,3)
+    ( w(j,k,l,1) * w(j,k,l,1) &
+    + w(j,k,l,2) * w(j,k,l,2) &
+    + w(j,k,l,3) * w(j,k,l,3) )
 end do
 end do
 end do
@@ -108,12 +108,13 @@ do l = i1(3), i2(3), di(3)
 do k = i1(2), i2(2), di(2)
 do j = i1(1), i2(1), di(1)
     f(j,k,l) = &
-    w1(j,k,l,1) * w1(j,k,l,1) + &
-    w1(j,k,l,2) * w1(j,k,l,2) + &
-    w1(j,k,l,3) * w1(j,k,l,3) + &
+    ( w1(j,k,l,1) * w1(j,k,l,1) &
+    + w1(j,k,l,2) * w1(j,k,l,2) &
+    + w1(j,k,l,3) * w1(j,k,l,3) ) &
+    + 2.0 * &
     ( w2(j,k,l,1) * w2(j,k,l,1) &
     + w2(j,k,l,2) * w2(j,k,l,2) &
-    + w2(j,k,l,3) * w2(j,k,l,3) ) * 2.0
+    + w2(j,k,l,3) * w2(j,k,l,3) )
 end do
 end do
 end do
