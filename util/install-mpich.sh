@@ -2,6 +2,9 @@
 pwd="${PWD}"
 cd "${1:-.}"
 prefix="${PWD}"
+echo -n "Install MPICH2 in ${prefix}? [y/N]: "
+read confirm
+[ "$confirm" = "y" ]
 
 # MPICH2
 url="http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/1.4/mpich2-1.4.tar.gz"

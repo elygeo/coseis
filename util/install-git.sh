@@ -2,6 +2,9 @@
 pwd="${PWD}"
 cd "${1:-.}"
 prefix="${PWD}"
+echo -en "Install Git in ${prefix}? [y/N]: "
+read confirm
+[ "$confirm" = "y" ]
 
 # Git
 url='http://kernel.org/pub/software/scm/git/git-1.7.6.tar.gz'

@@ -2,6 +2,9 @@
 pwd="${PWD}"
 cd "${1:-.}"
 prefix="${PWD}"
+echo -n "Install wxPython in ${prefix}? [y/N]: "
+read confirm
+[ "$confirm" = "y" ]
 
 # wxPython
 if [ "${OSTYPE}" = 'darwin10.0' ]; then

@@ -2,6 +2,9 @@
 pwd="${PWD}"
 cd "${1:-.}"
 prefix="${PWD}"
+echo -n "Install Python in ${prefix}? [y/N]: "
+read confirm
+[ "$confirm" = "y" ]
 
 # Python
 if [ "${OSTYPE}" = 'darwin10.0' ]; then

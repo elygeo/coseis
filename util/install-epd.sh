@@ -2,6 +2,9 @@
 pwd="${PWD}"
 cd "${1:-.}"
 prefix="${PWD}"
+echo -en "Install Enthought Python Distribution in ${prefix}? [y/N]: "
+read confirm
+[ "$confirm" = "y" ]
 
 # Enthought Python Distribution
 # License required (free for academic use).

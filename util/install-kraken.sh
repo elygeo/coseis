@@ -1,9 +1,12 @@
 #!/bin/bash -e
-# Install statically linked Python for Compute Node Linux on NICS Kraken
-# http://yt.enzotools.org/wiki/KrakenCommunityInstallation
 pwd="${PWD}"
 cd "${1:-.}"
 prefix="${PWD}"
+echo "Statically linked Python for Compute Node Linux on NICS Kraken"
+echo "See: http://yt.enzotools.org/wiki/KrakenCommunityInstallation"
+echo -n "Install in ${prefix}? [y/N]: "
+read confirm
+[ "$confirm" = "y" ]
 
 # virtualenv
 url="http://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.6.1.tar.gz"
