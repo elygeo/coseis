@@ -2,6 +2,7 @@
 Mapping data utilities
 """
 # TODO
+# Use npy format with load(file, mmap_mode='r'), instead of flat binary.
 # Quaternary Fault Database
 # ftp://hazards.cr.usgs.gov/maps/qfault/
 # http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip

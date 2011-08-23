@@ -26,7 +26,7 @@ f = open(f, 'rb')
 v2 = np.fromfile(f, 'f', n1)
 if up:
     z = 1e9 * np.ones_like(v2)
-    for j in xrange(1, n2):
+    for j in range(1, n2):
         v1 = v2
         v2 = np.fromfile(f, 'f', n1)
         i = (v2 < val) & (v1 >= val)
@@ -35,7 +35,7 @@ if up:
 else:
     z = np.zeros_like(v2)
     z[v2 < val] = 1e9
-    for j in xrange(1, n2):
+    for j in range(1, n2):
         v1 = v2
         v2 = np.fromfile(f, 'f', n1)
         i = (z > 1e8) & (v1 < val) & (v2 >= val)

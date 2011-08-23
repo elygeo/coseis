@@ -221,9 +221,9 @@ def ndread(fd, shape=None, indices=None, dtype='f', order='F', nheader=0):
     itemsize = np.dtype(dtype).itemsize
     offset = np.array(i0, 'i8')
     stride = np.cumprod([1] + mm[:0:-1], dtype='i8')[::-1] * itemsize
-    for j in xrange(nn[0]):
-        for k in xrange(nn[1]):
-            for l in xrange(nn[2]):
+    for j in range(nn[0]):
+        for k in range(nn[1]):
+            for l in range(nn[2]):
                 i = nheader + (stride * (offset + array([j, k, l, 0]))).sum()
                 fd.seek(i, 0)
                 f[j,k,l,:] = fromfile(fd, dtype, nn[-1])

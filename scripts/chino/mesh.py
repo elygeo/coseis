@@ -28,7 +28,7 @@ z -= z0
 
 # PML regions are extruded
 for w in x, y, z:
-    for i in xrange(npml, 0, -1):
+    for i in range(npml, 0, -1):
         w[i-1,:] = w[i,:]
         w[-i,:]  = w[-i-1,:]
         w[:,i-1] = w[:,i]

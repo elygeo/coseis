@@ -21,7 +21,7 @@ y = np.fromfile('lon.bin', dtype).reshape(n[::-1]).T
 
 # PML regions are extruded
 for w in x, y:
-    for i in xrange(npml, 0, -1):
+    for i in range(npml, 0, -1):
         w[i-1,:] = w[i,:]
         w[-i,:]  = w[-i-1,:]
         w[:,i-1] = w[:,i]
