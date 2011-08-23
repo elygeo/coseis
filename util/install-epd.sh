@@ -1,6 +1,7 @@
 #!/bin/bash -e
-prefix="${1:-${HOME}/local}"
 pwd="${PWD}"
+cd "${1:-.}"
+prefix="${PWD}"
 
 # Enthought Python Distribution
 # License required (free for academic use).

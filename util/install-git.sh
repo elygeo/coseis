@@ -1,6 +1,7 @@
 #!/bin/bash -e
-prefix="${1:-${HOME}/local}"
 pwd="${PWD}"
+cd "${1:-.}"
+prefix="${PWD}"
 
 # Git
 url='http://kernel.org/pub/software/scm/git/git-1.7.6.tar.gz'

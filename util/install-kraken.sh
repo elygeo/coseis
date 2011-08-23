@@ -1,8 +1,9 @@
 #!/bin/bash -e
 # Install statically linked Python for Compute Node Linux on NICS Kraken
 # http://yt.enzotools.org/wiki/KrakenCommunityInstallation
-prefix="${1:-${HOME}/local}"
 pwd="${PWD}"
+cd "${1:-.}"
+prefix="${PWD}"
 
 # virtualenv
 url="http://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.6.1.tar.gz"

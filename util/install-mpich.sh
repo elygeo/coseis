@@ -1,6 +1,7 @@
 #!/bin/bash -e
-prefix="${1:-${HOME}/local}"
 pwd="${PWD}"
+cd "${1:-.}"
+prefix="${PWD}"
 
 # MPICH2
 url="http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/1.4/mpich2-1.4.tar.gz"
