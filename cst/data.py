@@ -8,17 +8,16 @@ Mapping data utilities
 # http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
 import os, urllib, gzip, zipfile
 import numpy as np
-from . import coord, util
+from . import coord
 
-def etopo1(indices=None, downsample=1):
+def etopo1(downsample=1):
     """
-    Download ETOPO1 Global Relief Model.
+    ETOPO1 Global Relief Model.
     http://www.ngdc.noaa.gov/mgg/global/global.html
     """
     import cst
     repo = cst.site.repo
-    shape = 21601, 10801
-    filename = os.path.join(repo, 'etopo%02d-ice.bin' % downsample)
+    filename = os.path.join(repo, 'etopo%02d-ice.npy' % downsample)
     if not os.path.exists(filename):
         f1 = os.path.join(repo, 'etopo1_ice_g_i2.bin')
         if not os.path.exists(f1):
@@ -28,18 +27,16 @@ def etopo1(indices=None, downsample=1):
             urllib.urlretrieve(url, f)
             zipfile.ZipFile(f).extractall(repo)
         print('Creating %s' % filename)
+        shape = 21601, 10801
         z = np.fromfile(f1, '<i2').astype('f').reshape(shape)
         if downsample > 1:
             z = coord.downsample_sphere(z, downsample)
-        open(filename, 'wb').write(z)
-    if indices is not None:
-        x, y = shape
-        shape = (x - 1) / downsample + 1, (y - 1) / downsample + 1
-        return util.ndread(filename, shape, indices, 'f')
+        np.save(filename, z)
     else:
-        return
+        z = np.load(filename, mmap_mode='c')
+    return z
 
-def globe(indices=None):
+def globe():
     """
     Global Land One-km Base Elevation Digital Elevation Model.
     http://www.ngdc.noaa.gov/mgg/topo/globe.html
@@ -68,11 +65,9 @@ def globe(indices=None):
             row.tofile(fd)
         fd.close()
         del(z, row)
-    if indices is not None:
-        shape = 43200, 21600
-        return util.ndread(filename, shape, indices, '<i2')
-    else:
-        return
+    shape = 43200, 21600
+    z = np.memmap(filename, shape=shape, dtype='<i2', mode='c', order='F')
+    return z
 
 def topo(extent, scale=1.0):
     """
@@ -92,7 +87,7 @@ def topo(extent, scale=1.0):
     lon, lat = extent
     j = int(lon[0] * 60 + 10801 - o), int(np.ceil(lon[1] * 60 + 10801 + o))
     k = int(-lat[1] * 60 + 5401 - o), int(np.ceil(-lat[0] * 60 + 5401 + o))
-    z = etopo1([j, k], 1)
+    z = etopo1()[j[0]-1:j[1],k[0]-1:k[1]]
     j = 2 * j[0] - 1, 2 * j[1] - 2
     k = 2 * k[0] - 1, 2 * k[1] - 2
     n = j[1] - j[0] + 1, k[1] - k[0] + 1
@@ -102,7 +97,7 @@ def topo(extent, scale=1.0):
     z1[0::2,1::2] = 3 * z[:-1,:-1] + 9 * z[:-1,1:] +     z[1:,:-1] + 3 * z[1:,1:]
     z1[1::2,0::2] = 3 * z[:-1,:-1] +     z[:-1,1:] + 9 * z[1:,:-1] + 3 * z[1:,1:]
     z1[1::2,1::2] =     z[:-1,:-1] + 3 * z[:-1,1:] + 3 * z[1:,:-1] + 9 * z[1:,1:]
-    z = globe([j, k])
+    z = globe()[j[0]-1:j[1],k[0]-1:k[1]]
     i = z != -500
     z1[i] = z[i]
     z = z1

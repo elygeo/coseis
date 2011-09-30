@@ -169,7 +169,7 @@ def expand_slice(shape, indices=None, base=1, round=True):
     return indices
 
 
-def ndread(fd, shape=None, indices=None, dtype='f', order='F', nheader=0):
+def ndread(fd, shape=None, indices=None, dtype='f', order='F', nheader=0, base=1):
     """
     Read n-dimentional array subsection from binary file.
 
@@ -185,6 +185,7 @@ def ndread(fd, shape=None, indices=None, dtype='f', order='F', nheader=0):
                   '>d' : big endian double precision
         order :   'F' first index varies fastest, or 'C' last index varies fastest.
         nheader : Number of bytes to skip at the start of the file.
+        base :    0 for Python style indices, 1 for Fortran.
     """
     import numpy as np
     from numpy import array, fromfile
@@ -196,7 +197,7 @@ def ndread(fd, shape=None, indices=None, dtype='f', order='F', nheader=0):
         mm = [shape]
     else:
         mm = list(shape)
-    ii = expand_slice(mm, indices)
+    ii = expand_slice(mm, indices, base)
     if order is 'F':
         ii = ii[::-1]
         mm = mm[::-1]

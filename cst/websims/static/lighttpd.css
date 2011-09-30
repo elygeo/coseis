@@ -1,8 +1,0 @@
-body { width: 800px; margin: 0px 100px 100px 100px; color: #000; background-color: #fff; font-family: 'Lucida Grande', Geneva, Verdana, sans-serif; line-height: 130%; position: relative; }
-hr { border: none; border-top: 2px solid #ccc; }
-a { color: #06a; text-decoration: none; }
-a:hover, a:active { text-decoration: underline; }
-table { width:100%; margin: 10px 0px; border-collapse: collapse; border: 1px solid #ccc; }
-th { text-align: left; padding: 4px 10px; border: none; background-color: #eee; }
-td { text-align: left; padding: 4px 10px; border: none; border-top: 1px solid #eee; }
-h2, div.foot { padding: 4px 10px; }
