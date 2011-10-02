@@ -287,6 +287,64 @@ def run(job=None, **kwargs):
     launch(job)
     return job
 
+def expand_slice(shape, indices=None, base=1, round=True):
+    """
+    Fill in slice index notation.
+
+    >>> expand_slice([8])
+    [(1, 8, 1)]
+
+    >>> expand_slice((8, 4), [], 0)
+    [(0, 8, 1), (0, 4, 1)]
+
+    >>> expand_slice((8, 8, 8, 8, 8), [(), 0, 1.4, 1.6, (-1.6, -1.4, 2)], 1)
+    [(1, 8, 1), (1, 8, 1), (1, 1, 1), (2, 2, 1), (7, 8, 2)]
+
+    >>> expand_slice((8, 8, 8, 8, 8), [(), 0, 1.9, 2.1, (-2.1, -1.9, 2)], 1.5)
+    [(1, 7, 1), (1, 7, 1), (1, 1, 1), (2, 2, 1), (6, 7, 2)]
+
+    >>> expand_slice((8, 8, 8, 8, 8), [(), 0, 0.4, 0.6, (-0.6, -0.4, 2)], 0)
+    [(0, 8, 1), (0, 1, 1), (0, 1, 1), (1, 2, 1), (7, 8, 2)]
+
+    >>> expand_slice((8, 8, 8, 8, 8), [(), 0, 0.9, 1.1, (-1.1, -0.9, 2)], 0.5)
+    [(0, 7, 1), (0, 7, 1), (0, 1, 1), (1, 2, 1), (6, 7, 2)]
+    """
+    n = len(shape)
+    offset = min(1, int(base))
+    if indices is None:
+        indices = n * [()]
+    elif len(indices) == 0:
+        indices = n * [()]
+    elif len(indices) != n:
+        sys.exit('error in indices: %r' % indices)
+    else:
+        indices = list(indices)
+    for i in range(n):
+        if type(indices[i]) not in (tuple, list):
+            indices[i] = [indices[i]]
+        elif len(indices[i]) == 0:
+            indices[i] = [base, shape[i] - base + offset, 1]
+        elif len(indices[i]) == 2:
+            indices[i] = list(indices[i]) + [1]
+        elif len(indices[i]) in (1, 3):
+            indices[i] = list(indices[i])
+        else:
+            sys.exit('error in indices: %r' % indices)
+        if  indices[i][0] < 0:
+            indices[i][0] = shape[i] + indices[i][0] + offset
+        if len(indices[i]) == 1:
+            if indices[i][0] == 0 and base > 0:
+                indices[i] = [base, shape[i] - base + offset, 1]
+            else:
+                indices[i] = [indices[i][0], indices[i][0] + 1 - offset, 1]
+        if  indices[i][1] < 0:
+            indices[i][1] = shape[i] + indices[i][1] + offset
+        if round:
+            indices[i][0] = int(indices[i][0] + 0.5 - base + offset)
+            indices[i][1] = int(indices[i][1] + 0.5 - base + offset)
+        indices[i] = tuple(indices[i])
+    return indices
+
 def prepare_param(pm):
     """
     Prepare input paramers
@@ -408,14 +466,14 @@ def prepare_param(pm):
         nn = pm.shape[:3]
         nt = pm.shape[3]
         if 'i' in mode:
-            x1 = cst.util.expand_slice(nn, ii[:3], base, round=False)
+            x1 = expand_slice(nn, ii[:3], base, round=False)
             x1 = tuple(i[0] + 1 - base for i in x1)
             i1 = tuple(math.ceil(i) for i in x1)
-            ii = (cst.util.expand_slice(nn, i1, 1)
-                 + cst.util.expand_slice([nt], ii[3:], 1))
+            ii = (expand_slice(nn, i1, 1)
+                 + expand_slice([nt], ii[3:], 1))
         else:
-            ii = (cst.util.expand_slice(nn, ii[:3], base)
-                 + cst.util.expand_slice([nt], ii[3:], 1))
+            ii = (expand_slice(nn, ii[:3], base)
+                 + expand_slice([nt], ii[3:], 1))
         if field in fieldnames.initial:
             ii[3] = 0, 0, 1
         if field in fieldnames.fault:

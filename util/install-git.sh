@@ -7,7 +7,7 @@ read confirm
 [ "$confirm" = "y" ]
 
 # Git
-url='http://kernel.org/pub/software/scm/git/git-1.7.6.1.tar.gz'
+url='http://kernel.org/pub/software/scm/git/git-1.7.6.4.tar.gz'
 tag=$( basename "$url" .tar.gz )
 cd "${prefix}"
 curl -L "${url}" | tar zx

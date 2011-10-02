@@ -8,7 +8,7 @@ def test_imports():
     """
     Test imports
     """
-    import cst, cst.websims, cst.rspectra
+    import cst, cst.rspectra
 
 def test_syntax(path='.'):
     """
