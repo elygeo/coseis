@@ -27,8 +27,8 @@ def etopo1(downsample=1):
             urllib.urlretrieve(url, f)
             zipfile.ZipFile(f).extractall(repo)
         print('Creating %s' % filename)
-        shape = 21601, 10801
-        z = np.fromfile(f1, '<i2').astype('f').reshape(shape)
+        n = 10801, 21601
+        z = np.fromfile(f1, '<i2').reshape(n).T[:,::-1]
         if downsample > 1:
             z = coord.downsample_sphere(z, downsample)
         np.save(filename, z)
@@ -36,42 +36,55 @@ def etopo1(downsample=1):
         z = np.load(filename, mmap_mode='c')
     return z
 
-def globe():
+def globe30(tile=(0, 1), fill=True):
     """
     Global Land One-km Base Elevation Digital Elevation Model.
+    Missing bathymetry is optionally filled with ETOPO1.
     http://www.ngdc.noaa.gov/mgg/topo/globe.html
     """
     import cst
     repo = cst.site.repo
-    filename = os.path.join(repo, 'globe30.bin')
+    filename = os.path.join(repo, 'topo%s%s.npy' % tile)
     if not os.path.exists(filename):
-        print('Building %s' % filename)
-        n = 90 * 60 * 2
-        url = 'http://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/%s10g.gz'
-        tiles = 'abcd', 'efgh', 'ijkl', 'mnop'
-        fd = open(filename, 'wb')
-        for j in range(len(tiles)):
-            row = []
-            for k in range(len(tiles[j])):
-                u = url % tiles[j][k]
-                f = os.path.join(repo, os.path.basename(u))
-                if not os.path.exists(f):
-                    print('Retrieving %s' % u)
-                    urllib.urlretrieve(u, f)
-                z = gzip.open(f, mode='rb').read()
-                z = np.fromstring(z, '<i2').reshape([-1, n])
-                row += [z]
-            row = np.hstack(row)
-            row.tofile(fd)
-        fd.close()
-        del(z, row)
-    shape = 43200, 21600
-    z = np.memmap(filename, shape=shape, dtype='<i2', mode='c', order='F')
+        print('Creating %s' % filename)
+        tiles = ('im', 'jn', 'ko', 'lp'), ('ae', 'bf', 'cg', 'dh')
+        shape = 10800, 10800
+        z = ''
+        j, k = tile
+        for i in 0, 1:
+            t = tiles[k][j][i]
+            u = 'http://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/%s10g.gz' % t
+            f = os.path.join(repo, 'globe30%s.bin.gz' % t)
+            if not os.path.exists(f):
+                print('Retrieving %s' % u)
+                urllib.urlretrieve(u, f)
+            z += gzip.open(f, mode='rb').read()
+        z = np.fromstring(z, '<i2').reshape(shape).T[:,::-1]
+        if fill:
+            n = shape[1] / 2
+            m = shape[0] / 2
+            j = slice(tile[0] * n, tile[0] * n + n + 1)
+            k = slice(tile[1] * m, tile[1] * m + m + 1)
+            x = 0.0625 * etopo1()[j,k]
+            y = np.empty_like(z)
+            i0 = slice(None, -1)
+            i1 = slice(1, None)
+            y[0::2,0::2] = 9 * x[i0,i0] + x[i1,i1] + 3 * (x[i0,i1] + x[i1,i0]) + 0.5
+            y[0::2,1::2] = 9 * x[i0,i1] + x[i1,i0] + 3 * (x[i0,i0] + x[i1,i1]) + 0.5
+            y[1::2,0::2] = 9 * x[i1,i0] + x[i0,i1] + 3 * (x[i1,i1] + x[i0,i0]) + 0.5
+            y[1::2,1::2] = 9 * x[i1,i1] + x[i0,i0] + 3 * (x[i1,i0] + x[i0,i1]) + 0.5
+            del(x)
+            i = z == -500
+            z[i] = y[i]
+            del(y, i)
+        np.save(filename, z)
+    else:
+        z = np.load(filename, mmap_mode='c')
     return z
 
-def topo(extent, scale=1.0):
+def topo(extent, scale=1.0, downsample=0):
     """
-    Extract merged GLOBE/ETOPO1 digital elevation model for given region.
+    Extract digital elevation model for given region.
 
     Parameters
     ----------
@@ -81,30 +94,34 @@ def topo(extent, scale=1.0):
     Returns
     -------
         z: Elevation array
-        extent: Extent of z array possible larger than requested extent.
+        extent: Extent of z array possibly larger than requested extent.
     """
-    o = 0.25
-    lon, lat = extent
-    j = int(lon[0] * 60 + 10801 - o), int(np.ceil(lon[1] * 60 + 10801 + o))
-    k = int(-lat[1] * 60 + 5401 - o), int(np.ceil(-lat[0] * 60 + 5401 + o))
-    z = etopo1()[j[0]-1:j[1],k[0]-1:k[1]]
-    j = 2 * j[0] - 1, 2 * j[1] - 2
-    k = 2 * k[0] - 1, 2 * k[1] - 2
-    n = j[1] - j[0] + 1, k[1] - k[0] + 1
-    z *= 0.0625
-    z1 = np.empty(n, z.dtype)
-    z1[0::2,0::2] = 9 * z[:-1,:-1] + 3 * z[:-1,1:] + 3 * z[1:,:-1] +     z[1:,1:]
-    z1[0::2,1::2] = 3 * z[:-1,:-1] + 9 * z[:-1,1:] +     z[1:,:-1] + 3 * z[1:,1:]
-    z1[1::2,0::2] = 3 * z[:-1,:-1] +     z[:-1,1:] + 9 * z[1:,:-1] + 3 * z[1:,1:]
-    z1[1::2,1::2] =     z[:-1,:-1] + 3 * z[:-1,1:] + 3 * z[1:,:-1] + 9 * z[1:,1:]
-    z = globe()[j[0]-1:j[1],k[0]-1:k[1]]
-    i = z != -500
-    z1[i] = z[i]
-    z = z1
-    z *= scale
-    lon = (j[0] - 21600.5) / 120, (j[1] - 21600.5) / 120
-    lat = (10800.5 - k[1]) / 120, (10800.5 - k[0]) / 120
-    return z[:,::-1], (lon, lat)
+    import math
+    x, y = extent
+    if downsample:
+        d = 60 / downsample
+        x0, y0 = -180, -90
+    else:
+        d = 120
+        x0, y0 = -179.75, -89.75
+    j0 = int(math.floor((x[0] - x0) % 360 * d))
+    j1 = int(math.ceil((x[1] - x0) % 360 * d))
+    k0 = int(math.floor((y[0] - y0) * d))
+    k1 = int(math.ceil((y[1] - y0) * d))
+    x = j0 / d + x0, j1 / d + x0
+    y = k0 / d + y0, k1 / d + y0
+    if downsample:
+        z = etopo1(downsample)[j0:j1,k0:k1]
+    else:
+        n = 10800
+        tile0 = j0 // n, k0 // n
+        tile1 = j1 // n, k1 // n
+        if tile0 != tile1:
+            sys.exit('Multiple tiles not implemented. Try downsample=1')
+        j0, j1 = j0 % n, j1 % n
+        k0, k1 = k0 % n, k1 % n
+        z = globe30(tile0)[j0:j1,k0:k1]
+    return scale * z, (x, y)
 
 def us_place_names(kind=None, extent=None):
     """
@@ -141,14 +158,14 @@ def us_place_names(kind=None, extent=None):
     return (lon, lat, elev, name)
 
 
-def mapdata(kind='coastlines', resolution='high', extent=None, min_area=0.0, min_level=0, max_level=4, delta=None, clip=1):
+def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0, max_level=4, delta=None, clip=1):
     """
     Reader for the Global Self-consistent, Hierarchical, High-resolution Shoreline
     database (GSHHS) by Wessel and Smith.  WGS-84 ellipsoid.
 
     Parameters
     ----------
-        kind: 'coastlines', 'rivers', or 'borders'
+        kind: 'coastlines', 'rivers', 'borders', or None
         resolution: 'crude', 'low', 'intermediate', 'high', or 'full'
         extent: (min_lon, max_lon), (min_lat, max_lat)
 
@@ -164,25 +181,28 @@ def mapdata(kind='coastlines', resolution='high', extent=None, min_area=0.0, min
     """
     import cst
     repo = cst.site.repo
-    nh = 11
-    kind = {'c': 'gshhs', 'r': 'wdb_rivers', 'b': 'wdb_borders'}[kind[0]]
-    if kind != 'gshhs':
-        min_area = 0.0
-    if extent is not None:
-        lon, lat = extent
-        lon = lon[0] % 360, lon[1] % 360
-        extent = lon, lat
-    filename = os.path.join(repo, 'gshhs/%s_%s.b' % (kind, resolution[0]))
+    filename = os.path.join(repo, 'gshhs')
     if not os.path.exists(filename):
         url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.0/gshhs_2.0.zip'
         print('Downloading %s' % url)
         f = os.path.join(repo, os.path.basename(url))
         urllib.urlretrieve(url, f)
         zipfile.ZipFile(f).extractall(repo)
+    if not kind:
+        return
+    kind = {'c': 'gshhs', 'r': 'wdb_rivers', 'b': 'wdb_borders'}[kind[0]]
+    filename = os.path.join(repo, 'gshhs/%s_%s.b' % (kind, resolution[0]))
     data = np.fromfile(filename, '>i')
+    if kind != 'gshhs':
+        min_area = 0.0
+    if extent is not None:
+        lon, lat = extent
+        lon = lon[0] % 360, lon[1] % 360
+        extent = lon, lat
     xx = []
     yy = []
     ii = 0
+    nh = 11 # number of header values
     nkeep = 0
     ntotal = 0
     while ii < data.size:

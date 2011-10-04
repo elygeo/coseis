@@ -47,6 +47,10 @@ for target in args:
         f = os.path.join(path, 'cst', 'rspectra.so')
         if os.path.exists(f):
             os.unlink(f)
+    elif target == 'data':
+        cst.data.mapdata()
+        cst.data.etopo1()
+        cst.data.globe30()
     elif target == 'test':
         import nose
         argv = ['', '--verbose', '--with-doctest', '--all-modules', '--exe']
