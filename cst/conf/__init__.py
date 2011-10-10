@@ -21,10 +21,10 @@ def prune(d, pattern=None, types=None):
 
     Parameters
     ----------
-    d : dict of parameters
-    pattern : regular expression of parameter names to prune
+    d: dict of parameters
+    pattern: regular expression of parameter names to prune
         default = '(^_)|(_$)|(^.$)|(^..$)'
-    types : list of parameters types to keep
+    types: list of parameters types to keep
         default = Numpy types + [NoneType, bool, str, int, lone, float, tuple, list, dict]
         Functions, classes, and modules are pruned by default.
 
@@ -59,16 +59,16 @@ def configure(module=None, machine=None, save_site=False, **kwargs):
 
     Parameters
     ----------
-    module : module name
-    machine : machine name
-    save_site : save site specific parameters (machine, account, repo)
-    **kwargs : override parameters supplied as keyword arguments
+    module: module name
+    machine: machine name
+    save_site: save site specific parameters (machine, account, repo)
+    **kwargs: override parameters supplied as keyword arguments
 
     Returns
     -------
-    job : job configuration object containing merged module, kwarg, and machine
+    job: job configuration object containing merged module, kwarg, and machine
         configuration parameters as object attributes
-    kwarg : dictionary containing unmatched parameters
+    kwarg: dictionary containing unmatched parameters
 
     Module and machine names correspond to subdirectories of the conf folder
     that contain configuration parameters in a file conf.py.
@@ -345,9 +345,9 @@ def skeleton(job=None, stagein=(), new=True, **kwargs):
 
     Parameters
     ----------
-    job : job configuration object
-    stagein : list of files to copy into run directory
-    new : (True|False) create new directory, or use existing
+    job: job configuration object
+    stagein: list of files to copy into run directory
+    new: (True|False) create new directory, or use existing
 
     Templates located in the configuration directory are processed with the given
     keyword parameters.  Module specific templates are used if found, in addition

@@ -13,30 +13,31 @@ class stp():
 
     Init parameters
     ---------------
-        waveserver :
-            'scedc' or 'ncedc' for N. or S. CA Earthquake Data Centers,
-            or list of (host, port, password) triplets.
+    waveserver: 'scedc' or 'ncedc' for N. or S. CA Earthquake Data Centers, or
+        list of (host, port, password) triplets.
 
     Call parameters:
     ----------------
-        cmd : STP command or list of commands.
-        path : directory for saved files, default specified by server.
-        verbose : diagnostic output.
+    cmd: STP command or list of commands.
+    path: directory for saved files, default specified by server.
+    verbose: diagnostic output.
 
     See STP Manual for command reference:
         http://www.data.scec.org/STP/STP_Manual_v1.01.pdf
 
     Excluded STP commands:
-        ! (shell escape), SET, VERBOSE, INPUT, OUTPUT, EXIT
+    ! (shell escape), SET, VERBOSE, INPUT, OUTPUT, EXIT
 
-    Example, download waveforms in SAC format and save station list:
-        import cst
-        with cst.scedc.stp('scedc') as stp:
-            stp('status')
-            stp(['sac', 'gain on'])
-            stp('trig -net ci -chan _n_ -radius 20 14383980')
-            out = stp('sta -l -net ci -chan _n_')
-            open('station-list.txt', 'w').write(out[0])
+    Example
+    -------
+    # download waveforms in SAC format and save station list:
+    import cst
+    with cst.scedc.stp('scedc') as stp:
+        stp('status')
+        stp(['sac', 'gain on'])
+        stp('trig -net ci -chan _n_ -radius 20 14383980')
+        out = stp('sta -l -net ci -chan _n_')
+        open('station-list.txt', 'w').write(out[0])
     """
     presets = {
         'scedc': [
@@ -154,11 +155,11 @@ def mts(eventid, path='scsn-mts-%s.py'):
 
     Parameters
     ----------
-        eventid : Event identification number
+    eventid: Event identification number
 
     Returns
     -------
-        mts : Dictionary of MTS parameters
+    mts: Dictionary of MTS parameters
 
     MTS coordinate system: (x, y, z) = (north, east, down)
 

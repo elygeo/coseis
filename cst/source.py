@@ -217,10 +217,10 @@ class srf():
 
         Parameters
         ----------
-        path : location on disk
-        delta : grid step size (dx, dy, dz)
-        proj : function to project lon/lat to logical model coordinates
-        dbytes : 4 or 8
+        path: location on disk
+        delta: grid step size (dx, dy, dz)
+        proj: function to project lon/lat to logical model coordinates
+        dbytes: 4 or 8
         """
 
         # data types
@@ -296,12 +296,11 @@ class srf():
 
         Parameters
         ----------
-        filename : location on disk
-        delta : grid step size (dx, dy, dz)
-        dt : time step length of the AWP simulation
-        nt : number of time steps in the AWP simulation
-        proj : Function to project lon/lat to logical model coordinates
-        binary : If true, write AWP binary format, otherwise text format.
+        delta: grid step size (dx, dy, dz)
+        dt: time step length of the AWP simulation
+        nt: number of time steps in the AWP simulation
+        proj: Function to project lon/lat to logical model coordinates
+        binary: If true, write AWP binary format, otherwise text format.
         """
         # coordinates
         x = self.lon

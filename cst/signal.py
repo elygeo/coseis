@@ -10,13 +10,13 @@ def time_function(pulse, t, tau=1.0):
 
     Parameters
     ----------
-        pulse : function name (see source code below for available types).
-        t : array of time samples.
-        tau : characteristic time.
+    pulse: function name (see source code below for available types).
+    t: array of time samples.
+    tau: characteristic time.
 
     Returns
     -------
-        f : array of function samples.
+    f: array of function samples.
     """
     t = np.asarray(t)
     f = np.zeros_like(t)
@@ -74,11 +74,11 @@ def brune2gauss(x, dt, tau, sigma=None, mode='same'):
 
     Parameters
     ----------
-        x : array of time series samples.
-        dt : time step length.
-        tau : Brune pulse characteristic time.
-        sigma : Gaussian spread.
-        mode : 'same' or 'full' (see numpy.convolve).
+    x: array of time series samples.
+    dt: time step length.
+    tau: Brune pulse characteristic time.
+    sigma: Gaussian spread.
+    mode: 'same' or 'full' (see numpy.convolve).
     """
     x = np.asarray(x)
     if sigma == None:
@@ -97,17 +97,17 @@ def filter(x, dt, fcorner, btype='lowpass', order=2, repeat=0, mode='same'):
 
     Parameters
     ----------
-        x : array of samples.
-        dt : sampling interval.
-        fcorner : corner frequency(ies).
-        btype : 'lowpass', 'highpass', 'bandpass', 'bandstop', 'hann'.
-        order : number of poles.
-        repeat : 0 = single pass, 1 = two pass, -1 = two pass, zero-phase.
-        mode : 'full' or 'same', see np.convolve
+    x: array of samples.
+    dt: sampling interval.
+    fcorner: corner frequency(ies).
+    btype: 'lowpass', 'highpass', 'bandpass', 'bandstop', 'hann'.
+    order: number of poles.
+    repeat: 0 = single pass, 1 = two pass, -1 = two pass, zero-phase.
+    mode: 'full' or 'same', see np.convolve
 
     Returns
     -------
-        x : array of filtered samples.
+    x: array of filtered samples.
     """
     if not fcorner:
         return x

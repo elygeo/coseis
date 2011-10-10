@@ -155,14 +155,14 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
 
     Parameters
     ----------
-        lon, lat, dep: Coordinate arrays
-        prop: 'rho', 'vp', or 'vs'
-        nproc: Optional, number of processes
-        rundir: Optional, job staging directory
+    lon, lat, dep: Coordinate arrays
+    prop: 'rho', 'vp', or 'vs'
+    nproc: Optional, number of processes
+    rundir: Optional, job staging directory
 
     Returns
     -------
-        rho, vp, vs: Material arrays
+    rho, vp, vs: Material arrays
     """
     lon = np.asarray(lon, 'f')
     lat = np.asarray(lat, 'f')

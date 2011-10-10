@@ -38,11 +38,11 @@ def clipdata(x, y, extent, lines=1):
 
     Parameters
     ----------
-        x, y : data coordinates
-        extent : (xmin, xmax), (ymin, ymax)
-        lines : 0 = points, assume no connectivity.
-                1 = line segments, include one extra point past the boundary.
-               -1 = line segments, do not include extra point past the boundary.
+    x, y: data coordinates
+    extent: (xmin, xmax), (ymin, ymax)
+    lines: 0 = points, assume no connectivity.
+           1 = line segments, include one extra point past the boundary.
+           -1 = line segments, do not include extra point past the boundary.
     """
     x, y = np.array([x, y])
     x1, x2 = extent[0]
@@ -186,13 +186,13 @@ def topo(extent, scale=1.0, downsample=0):
 
     Parameters
     ----------
-        extent: (lon_min, lon_max), (lat_min, lat_max)
-        scale: Scaling factor for elevation data
+    extent: (lon_min, lon_max), (lat_min, lat_max)
+    scale: Scaling factor for elevation data
 
     Returns
     -------
-        z: Elevation array
-        extent: Extent of z array possibly larger than requested extent.
+    z: Elevation array
+    extent: Extent of z array possibly larger than requested extent.
     """
     import math
     x, y = extent
@@ -229,15 +229,16 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
 
     Parameters
     ----------
-        kind: 'coastlines', 'rivers', 'borders', or None
-        resolution: 'crude', 'low', 'intermediate', 'high', or 'full'
-        extent: (min_lon, max_lon), (min_lat, max_lat)
+    kind: 'coastlines', 'rivers', 'borders', or None
+    resolution: 'crude', 'low', 'intermediate', 'high', or 'full'
+    extent: (min_lon, max_lon), (min_lat, max_lat)
 
     Returns
     -------
-        x, y: Coordinates arrays.
+    x, y: Coordinates arrays.
 
-    Reference:
+    Reference
+    ---------
     Wessel, P., and W. H. F. Smith, A Global Self-consistent, Hierarchical,
     High-resolution Shoreline Database, J. Geophys. Res., 101, 8741-8743, 1996.
     http://www.ngdc.noaa.gov/mgg/shorelines/gshhs.html
@@ -386,11 +387,11 @@ def cybershake(isrc, irup, islip, ihypo, name=None):
 
     Parameters
     ----------
-        isrc : source ID
-        irup : rupture ID
-        islip : slip variation ID
-        ihypo : hypocenter ID
-        name : optional name for the rupture
+    isrc: source ID
+    irup: rupture ID
+    islip: slip variation ID
+    ihypo: hypocenter ID
+    name: optional name for the rupture
     """
 
     # get reports

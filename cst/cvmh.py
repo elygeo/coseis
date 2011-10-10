@@ -139,19 +139,19 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='vx63'):
 
     Parameters
     ----------
-        prop:
-            2d property: 'topo', 'base', or 'moho'
-            3d property: 'vp', 'vs', or 'tag'
-        voxet:
-            3d voxet: 'mantle', 'crust', or 'lab'
-        no_data_value: None, 'nan', or float value. None = filled from below.
-        version: 'vx62', or 'vx63'
+    prop:
+        2d property: 'topo', 'base', or 'moho'
+        3d property: 'vp', 'vs', or 'tag'
+    voxet:
+        3d voxet: 'mantle', 'crust', or 'lab'
+    no_data_value: None, 'nan', or float value. None = filled from below.
+    version: 'vx62', or 'vx63'
 
     Returns
     -------
-        extent: (x0, x1), (y0, y1), (z0, z1)
-        bound: (x0, x1), (y0, y1), (z0, z1)
-        data: Array of properties
+    extent: (x0, x1), (y0, y1), (z0, z1)
+    bound: (x0, x1), (y0, y1), (z0, z1)
+    data: Array of properties
     """
     import cst
     repo = cst.site.repo
@@ -236,23 +236,23 @@ class Model():
 
     Init parameters
     ---------------
-        prop:
-            2d property: 'topo', 'base', 'moho', 'wald', or 'wills'
-            3d property: 'vp', 'vs', or 'tag'
-        voxet:
-            3d voxet list: ['mantle', 'crust', 'lab']
-        no_data_value: None, 'nan', or float value. None = filled from below.
-        version: 'vx62', or 'vx63'
+    prop:
+        2d property: 'topo', 'base', 'moho', 'wald', or 'wills'
+        3d property: 'vp', 'vs', or 'tag'
+    voxet:
+        3d voxet list: ['mantle', 'crust', 'lab']
+    no_data_value: None, 'nan', or float value. None = filled from below.
+    version: 'vx62', or 'vx63'
 
     Call parameters
     ---------------
-        x, y, z: Sample coordinate arrays.
-        out: Optional output array with same shape as coordinate arrays.
-        interpolation: 'nearest', or 'linear'
+    x, y, z: Sample coordinate arrays.
+    out: Optional output array with same shape as coordinate arrays.
+    interpolation: 'nearest', or 'linear'
 
     Returns
     -------
-        out: Property samples at coordinates (x, y, z)
+    out: Property samples at coordinates (x, y, z)
     """
     def __init__(self, prop, voxet=['mantle', 'crust'], no_data_value=None, version='vx63'):
         self.prop = prop

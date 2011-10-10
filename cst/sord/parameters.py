@@ -3,13 +3,13 @@ Default simulation parameters
 
 Spatial difference operator level:
 
-  0: Auto pick 2 or 6
-  1: Mesh with constant spacing dx
-  2: Rectangular mesh
-  3: Parallelepiped mesh
-  4: One-point quadrature
-  5: Exactly integrated elements
-  6: Saved operators, nearly as fast as 2, but doubles the memory usage
+    0: Auto pick 2 or 6
+    1: Mesh with constant spacing dx
+    2: Rectangular mesh
+    3: Parallelepiped mesh
+    4: One-point quadrature
+    5: Exactly integrated elements
+    6: Saved operators, nearly as fast as 2, but doubles the memory usage
 """
 
 # I/O and code execution parameters

@@ -18,12 +18,12 @@ def prune(d, pattern=None, types=None):
 
     Parameters
     ----------
-        d : dict of parameters
-        pattern : regular expression of parameter names to prune
-            default = '(^_)|(_$)|(^.$)|(^..$)'
-        types : list of parameters types to keep
-            default = Numpy types + [NoneType, bool, str, int, lone, float, tuple, list, dict]
-            Functions, classes, and modules are pruned by default.
+    d: dict of parameters
+    pattern: regular expression of parameter names to prune
+        default = '(^_)|(_$)|(^.$)|(^..$)'
+    types: list of parameters types to keep
+        default = Numpy types + [NoneType, bool, str, int, lone, float, tuple, list, dict]
+        Functions, classes, and modules are pruned by default.
 
     >>> prune({'aa': 0, 'aa_': 0, '_aa': 0, 'a_a': 0, 'b_b': prune})
     {'a_a': 0}

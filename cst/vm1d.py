@@ -20,12 +20,12 @@ def dreger(prop, depth):
 
     Parameters
     ----------
-        prop: 'rho', 'vp', or 'vs'
-        depth: Array of depth values in meters
+    prop: 'rho', 'vp', or 'vs'
+    depth: Array of depth values in meters
 
     Returns
     -------
-        f: Array of properties (kg/m^3 for rho, m/s for Vp and Vs)
+    f: Array of properties (kg/m^3 for rho, m/s for Vp and Vs)
     """
     depth = np.asarray(depth)
     f = np.empty_like(depth)
@@ -48,11 +48,11 @@ def boore_rock(depth):
 
     Parameters
     ----------
-        depth: Array of depth values in meters
+    depth: Array of depth values in meters
 
     Returns
     -------
-        vs: Array of S-wave velocities in m/s
+    vs: Array of S-wave velocities in m/s
     """
     depth = np.asarray(depth)
     vs = np.empty_like(depth)
@@ -77,11 +77,11 @@ def boore_hard_rock(depth):
 
     Parameters
     ----------
-        depth: Array of depth values in meters
+    depth: Array of depth values in meters
 
     Returns
     -------
-        vs: Array of S-wave velocities in m/s
+    vs: Array of S-wave velocities in m/s
     """
     depth = np.asarray(depth)
     v = [

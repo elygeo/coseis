@@ -50,26 +50,18 @@ def interp(x, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
 
     Parameters
     ----------
-    x: tuple
-        Range (x_min, x_max) of coordinate space covered by the data in `f`.
-    f: array_like
-        Regular grid of data values to be interpolated.
-    xi: array_like
-        Coordinates of the interpolation points, same shape as returned in `fi`.
-    fi: array_like, optional
-        Output storage for interpolated values, same shape as `xi`.
-    method: {'nearest', 'linear'}, optional
-        Interpolation method.
-    bound: {boolean, tuple}, optional
-        If True, do not extrapolation values outside the coordinate range. A tuple
-        species the left and right boundaries independently.
-    mask_nan: boolean, optional
-        If True and output array `fi` is given, NaNs are masked from output.
+    x: Range (x_min, x_max) of coordinate space covered by `f`.
+    f: Array of regularly spaced data values to be interpolated.
+    xi: Array of coordinates for the interpolation points, same shape as `fi`.
+    fi: Output array for the interpolated values, same shape as `xi`.
+    method: Interpolation method, 'nearest' or 'linear'.
+    bound: If true, do not extrapolation values outside the coordinate range. A
+        tuple species the left and right boundaries independently.
+    mask_nan: If true and `fi` is passed, NaNs are masked from output.
 
     Returns
     -------
-    fi: array_like
-        Interpolated values, same shape as `xi`.
+    fi: Array of interpolated values, same shape as `xi`.
     """
     # prepare arrays
     f = np.asarray(f)
@@ -302,13 +294,13 @@ def rot_sym_tensor(w1, w2, rot):
 
     Parameters
     ----------
-        w1 : volume components w11, w22, w33
-        w2 : shear components w23, w31, w12
-        rot : rotation matrix
+    w1: volume components w11, w22, w33
+    w2: shear components w23, w31, w12
+    rot: rotation matrix
 
     Returns
     -------
-        w1, w2 : rotated tensor components
+    w1, w2: rotated tensor components
     """
     rot = np.asarray(rot)
     mat = np.diag(w1)
@@ -428,17 +420,17 @@ class Transform():
 
     Optional Parameters
     -------------------
-    proj : Map projection defined by Pyproj or similar.
-    scale : Scale factor.
-    rotate : Rotation angle in degrees.
-    translate : Translation amount.
-    origin : Untransformed coordinates of the new origin.  If two sets of points
-    are given, the origin is centered between them, and rotation is relative to the
-    connecting line.
+    proj: Map projection defined by Pyproj or similar.
+    scale: Scale factor.
+    rotate: Rotation angle in degrees.
+    translate: Translation amount.
+    origin: Untransformed coordinates of the new origin.  If two sets of points
+        are given, the origin is centered between them, and rotation is relative to the
+        connecting line.
 
     Returns
     -------
-    proj : Coordinate transformation function
+    proj: Coordinate transformation function
 
     Example: TeraShake SDSU/Okaya projection
     >>> import pyproj

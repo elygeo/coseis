@@ -21,8 +21,8 @@ def cee(a, b):
     """
     Parameters
     ----------
-        a : Ratio of rupture to P-wave velocity, vrup / vp.
-        b : Ratio of rupture to S-wave velocity, vrup / vs.
+    a: Ratio of rupture to P-wave velocity, vrup / vp.
+    b: Ratio of rupture to S-wave velocity, vrup / vs.
     """
     a2 = a * a
     b2 = b * b
@@ -34,15 +34,15 @@ def slip_rate(rho, vp, vs, vrup, dtau, r, t, C=None):
     """
     Parameters
     ----------
-        rho : density
-        vp : P-wave speed
-        vs : S-wave speed
-        vrup : rupture velocity
-        dtau : stress drop
-        r : hypocenter distance
-        t : array of reduced-time samples (t=0 is rupture arrival time).
-        C : optional C parameter from Dahlen (1974) Eqn (44).
-            If not supplied, C is computed from vrup, vp and vs.
+    rho: density
+    vp: P-wave speed
+    vs: S-wave speed
+    vrup: rupture velocity
+    dtau: stress drop
+    r: hypocenter distance
+    t: array of reduced-time samples (t=0 is rupture arrival time).
+    C: optional C parameter from Dahlen (1974) Eqn (44).
+       If not supplied, C is computed from vrup, vp and vs.
     """
     t0 = r / vrup
     if C == None:
