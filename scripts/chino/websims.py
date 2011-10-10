@@ -95,16 +95,15 @@ for path in glob.glob(sims):
     # map data
     f1 = open(path + 'mapdata.txt', 'w')
     f2 = open(path + 'mapdata-xyz.txt', 'w')
-    for kind in 'coastlines',:
-        x, y = cst.data.mapdata(kind, 'high', extent, 10.0)
-        z = cst.coord.interp2(topo_extent, topo, (x, y))
-        np.savetxt(f1, np.array([x,y,z]).T)
-        x, y = proj(x, y)
-        x, y, i = cst.data.clipdata(x, y, bounds)
-        z = z[i]
-        np.savetxt(f2, scale * np.array([x,y,z]).T)
-    f1.close()
-    f2.close()
+    with f1, f2:
+        for kind in 'coastlines',:
+            x, y = cst.data.mapdata(kind, 'high', extent, 10.0)
+            z = cst.coord.interp2(topo_extent, topo, (x, y))
+            np.savetxt(f1, np.array([x,y,z]).T)
+            x, y = proj(x, y)
+            x, y, i = cst.data.clipdata(x, y, bounds)
+            z = z[i]
+            np.savetxt(f2, scale * np.array([x,y,z]).T)
 
     # surface Vs
     n = shape[1], shape[0]

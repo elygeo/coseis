@@ -4,19 +4,19 @@ Visualization utilities
 import subprocess, cStringIO
 import numpy as np
 
-def distill_eps(fd, mode=None):
+def distill_eps(fh, mode=None):
     """
     Distill EPS to PDF using Ghostscript.
     """
-    if type(fd) == str:
-        fd = cStringIO.StringIO(fd)
+    if type(fh) == str:
+        fh = cStringIO.StringIO(fh)
     cmd = 'ps2pdf', '-dEPSCrop', '-dPDFSETTINGS=/prepress', '-', '-'
     pid = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    fd = pid.communicate(fd.getvalue())[0]
+    fh = pid.communicate(fh.getvalue())[0]
     if mode != 'str':
-        fd = cStringIO.StringIO(fd)
-        fd.reset()
-    return(fd)
+        fh = cStringIO.StringIO(fh)
+        fh.reset()
+    return(fh)
 
 def pdf2png(path, dpi=72, mode=None):
     """
@@ -35,16 +35,16 @@ def img2pdf(img, dpi=150, mode=None):
     Convert image array to PDF using PIL and ImageMagick.
     """
     import Image
-    fd = cStringIO.StringIO()
+    fh = cStringIO.StringIO()
     img = Image.fromarray(img)
-    img.save(fd, format='png')
+    img.save(fh, format='png')
     cmd = 'convert', '-density', str(dpi), 'png:-', 'pdf:-'
     pid = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    fd = pid.communicate(fd.getvalue())[0]
+    fh = pid.communicate(fh.getvalue())[0]
     if mode != 'str':
-        fd = cStringIO.StringIO(fd)
-        fd.reset()
-    return(fd)
+        fh = cStringIO.StringIO(fh)
+        fh.reset()
+    return(fh)
 
 def pdf_merge(layers):
     """

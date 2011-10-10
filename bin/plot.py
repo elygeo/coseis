@@ -1,4 +1,4 @@
-#!/usr/bin/env ipython -wthread
+#!/usr/bin/env ipython
 """
 Quick multi-purpose plotting.
 
@@ -78,11 +78,14 @@ def plot(*argv):
                 tail = os.sep.join(f[i:])
                 meta = os.path.join(path, 'meta.py')
                 if os.path.exists(meta):
-                    meta = cst.util.load(meta)
-                    shape = meta.shapes[tail]
-                    delta = meta.deltas[tail]
-                    dtype = meta.dtype
-                    break
+                    try:
+                        meta = cst.util.load(meta)
+                        shape = meta.shapes[tail]
+                        delta = meta.deltas[tail]
+                        dtype = meta.dtype
+                        break
+                    except:
+                        pass
             if len(shape) == 1:
                 data = np.fromfile(file, dtype)
             elif len(shape) == 2:
@@ -112,6 +115,7 @@ def plot(*argv):
                     im.set_clim(*clim)
             ax.set_title(title)
             fig.show()
+            fig.ginput(1, 0, False)
 
         # 3D series of images
         else:
@@ -137,5 +141,6 @@ def plot(*argv):
 
 # continue if command line
 if __name__ == '__main__':
-    plot(*sys.argv[1:])
+    print sys.argv
+    plot(*sys.argv[2:])
 

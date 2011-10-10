@@ -1,7 +1,7 @@
 """
 Support Operator Rupture Dynamics
 """
-import os, sys, math, glob, shutil, shlex, pprint
+import os, math, glob, shutil, shlex, pprint
 import numpy as np
 from ..conf import launch
 from . import fieldnames
@@ -132,7 +132,7 @@ def stage(dictargs={}, **kwargs):
             print(msg)
             error = True
     if error:
-        sys.exit()
+        raise Exception()
 
     # configure
     job, inputs = cst.conf.configure(**inputs)
@@ -154,7 +154,7 @@ def stage(dictargs={}, **kwargs):
     if inputs:
         print('Unknown parameters:')
         pprint.pprint(inputs)
-        sys.exit()
+        raise Exception()
 
     pm = cst.util.namespace(pm)
     pm = prepare_param(pm)
@@ -316,7 +316,7 @@ def expand_slice(shape, indices=None, base=1, round=True):
     elif len(indices) == 0:
         indices = n * [()]
     elif len(indices) != n:
-        sys.exit('error in indices: %r' % indices)
+        raise Exception('error in indices: %r' % indices)
     else:
         indices = list(indices)
     for i in range(n):
@@ -329,7 +329,7 @@ def expand_slice(shape, indices=None, base=1, round=True):
         elif len(indices[i]) in (1, 3):
             indices[i] = list(indices[i])
         else:
-            sys.exit('error in indices: %r' % indices)
+            raise Exception('error in indices: %r' % indices)
         if  indices[i][0] < 0:
             indices[i][0] = shape[i] + indices[i][0] + offset
         if len(indices[i]) == 1:
@@ -349,11 +349,10 @@ def prepare_param(pm):
     """
     Prepare input paramers
     """
-    import cst
 
     # checks
     if pm.source not in ('potency', 'moment', 'force', 'none'):
-        sys.exit('Error: unknown source type %r' % pm.source)
+        raise Exception('Error: unknown source type %r' % pm.source)
 
     # intervals
     nt = pm.shape[3]
@@ -371,7 +370,7 @@ def prepare_param(pm):
         elif xi[i] <= -1.0:
             xi[i] = xi[i] + nn[i] + 1
         if xi[i] < 1.0 or xi[i] > nn[i]:
-            sys.exit('Error: ihypo %s out of bounds' % xi)
+            raise Exception('Error: ihypo %s out of bounds' % xi)
     pm.ihypo = tuple(xi)
 
     # rupture boundary conditions
@@ -386,7 +385,7 @@ def prepare_param(pm):
         if irup == nn[i] - 1:
             i2[i] = -2
         if irup < 1 or irup > (nn[i] - 1):
-            sys.exit('Error: ihypo %s out of bounds' % xi)
+            raise Exception('Error: ihypo %s out of bounds' % xi)
     pm.bc1 = tuple(i1)
     pm.bc2 = tuple(i2)
 
@@ -401,7 +400,7 @@ def prepare_param(pm):
             if pm.bc2[i] == 10:
                 i2[i] = nn[i] - pm.npml + 1
             if i1[i] > i2[i]:
-                sys.exit('Error: model too small for PML')
+                raise Exception('Error: model too small for PML')
     pm.i1pml = tuple(i1)
     pm.i2pml = tuple(i2)
 
@@ -417,7 +416,7 @@ def prepare_param(pm):
         op = line[0][0]
         mode = line[0][1:]
         if op not in '=+#':
-            sys.exit('Error: unsupported operator: %r' % line)
+            raise Exception('Error: unsupported operator: %r' % line)
         try:
             if len(line) is 11:
                 nc, pulse, tau, x1, x2, nb, ii, filename, val, fields = line[1:]
@@ -432,9 +431,10 @@ def prepare_param(pm):
             elif mode in ['fc']:
                 fields, ii, val, pulse, tau, x1, x2 = line[1:]
             else:
-                sys.exit('Error: bad i/o mode: %r' % line)
+                raise Exception('Error: bad i/o mode: %r' % line)
         except(ValueError):
-            sys.exit('Error: bad i/o spec: %r' % line)
+            print('Error: bad i/o spec: %r' % line)
+            raise
 
         filename = os.path.expanduser(filename)
         mode = mode.replace('f', '')
@@ -444,16 +444,16 @@ def prepare_param(pm):
         # error check
         for field in fields:
             if field not in fieldnames.all:
-                sys.exit('Error: unknown field: %r' % line)
+                raise Exception('Error: unknown field: %r' % line)
             if field not in fieldnames.input and 'w' not in mode:
-                sys.exit('Error: field is ouput only: %r' % line)
+                raise Exception('Error: field is ouput only: %r' % line)
             if (field in fieldnames.cell) != (fields[0] in fieldnames.cell):
-                sys.exit('Error: cannot mix node and cell i/o: %r' % line)
+                raise Exception('Error: cannot mix node and cell i/o: %r' % line)
             if field in fieldnames.fault:
                 if fields[0] not in fieldnames.fault:
-                    sys.exit('Error: cannot mix fault and non-fault i/o: %r' % line)
+                    raise Exception('Error: cannot mix fault and non-fault i/o: %r' % line)
                 if pm.faultnormal == 0:
-                    sys.exit('Error: field only for ruptures: %r' % line)
+                    raise Exception('Error: field only for ruptures: %r' % line)
 
         # cell or node registration
         if field in fieldnames.cell:
@@ -500,7 +500,7 @@ def prepare_param(pm):
     f = [line[8] for line in fieldio if line[8] != '-']
     for i in range(len(f)):
         if f[i] in f[:i]:
-            sys.exit('Error: duplicate filename: %r' % f[i])
+            raise Exception('Error: duplicate filename: %r' % f[i])
 
     # done
     pm.fieldio = fieldio

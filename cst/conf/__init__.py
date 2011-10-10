@@ -218,13 +218,14 @@ def install_path(path, name=None):
         name = os.path.basename(src)
     dst = os.path.join(get_python_lib(), name + '.pth')
     if os.path.exists(dst):
-        sys.exit('Error: %s exists\n%s' % (dst, open(dst).read()))
+        raise Exception('Error: %s exists\n%s' % (dst, open(dst).read()))
     print('Installing ' + dst)
     print('for path ' + src)
     try:
         open(dst, 'w').write(src)
     except(IOError):
-        sys.exit('No write permission for Python directory')
+        print('No write permission for Python directory')
+        raise
     return
 
 
@@ -242,7 +243,8 @@ def uninstall_path(path, name=None):
         try:
             os.unlink(dst)
         except(IOError):
-            sys.exit('No write permission for Python directory')
+            print('No write permission for Python directory')
+            raise
     return
 
 
@@ -271,7 +273,7 @@ def prepare(job=None, **kwargs):
     if job.queue is not None and opts[0] is not {}:
         opts = [d for d in job.queue_opts if d['queue'] == job.queue]
         if len(opts) == 0:
-            sys.exit('Error: unknown queue: %s' % job.queue)
+            raise Exception('Error: unknown queue: %s' % job.queue)
 
     # loop over queue configurations
     for d in opts:
@@ -384,7 +386,7 @@ def skeleton(job=None, stagein=(), new=True, **kwargs):
     for f in stagein:
         if f.endswith(os.sep):
             if f.startswith(os.sep) or '..' in f:
-                sys.exit('Error: cannot stage %s outside rundir.' % f)
+                raise Exception('Error: cannot stage %s outside rundir.' % f)
             os.makedirs(os.path.join(rundir, f))
         else:
             shutil.copy2(f, dest)
@@ -421,13 +423,13 @@ def launch(job=None, stagein=(), new=True, **kwargs):
     if k in job.launch:
         cmd = job.launch[k] % job.__dict__
     else:
-        sys.exit('Error: %s launch mode not supported.' % k)
+        raise Exception('Error: %s launch mode not supported.' % k)
     print(cmd)
 
     # check host
     if re.match(job.hostname, job.host) is None:
         s = job.host, job.machine
-        sys.exit('Error: hostname %r does not match configuration %r' % s)
+        raise Exception('Error: hostname %r does not match configuration %r' % s)
 
     # run directory
     cwd = os.getcwd()
@@ -439,7 +441,7 @@ def launch(job=None, stagein=(), new=True, **kwargs):
         stdout = p.communicate()[0]
         print(stdout)
         if p.returncode:
-            sys.exit('Submit failed')
+            raise Exception('Submit failed')
         d = re.search(job.submit_pattern, stdout).groupdict()
         job.__dict__.update(d)
     else:

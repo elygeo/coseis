@@ -20,6 +20,16 @@ dtype = meta.dtype
 xdec = ihist[0][2] / ifull[0][2]
 tdec = isnap[2][2] / ifull[2][2]
 
+# initialize displacement, pgv, pgd arrays
+nn = nfull[:2]
+u1 = np.zeros(nn)
+u2 = np.zeros(nn)
+u3 = np.zeros(nn)
+pgv = np.zeros(nn)
+pgd = np.zeros(nn)
+pgvh = np.zeros(nn)
+pgdh = np.zeros(nn)
+
 # open full resolution files for reading
 f1 = open(path + 'full-v1.bin', 'rb')
 f2 = open(path + 'full-v2.bin', 'rb')
@@ -35,59 +45,39 @@ h1 = open(path + 'hist-v1.bin', 'wb')
 h2 = open(path + 'hist-v2.bin', 'wb')
 h3 = open(path + 'hist-v3.bin', 'wb')
 
-# initialize displacement, pgv, pgd arrays
-nn = nfull[:2]
-u1 = np.zeros(nn)
-u2 = np.zeros(nn)
-u3 = np.zeros(nn)
-pgv = np.zeros(nn)
-pgd = np.zeros(nn)
-pgvh = np.zeros(nn)
-pgdh = np.zeros(nn)
-
 # loop over time steps
-for it in range(nfull[-1]):
+with f1, f2, f3, s1, s2, s3, h1, h2, h3:
+    for it in range(nfull[-1]):
 
-    # read velocity
-    n = nfull[0] * nfull[1]
-    v1 = np.fromfile(f1, dtype, n).reshape(nn[::-1]).T
-    v2 = np.fromfile(f2, dtype, n).reshape(nn[::-1]).T
-    v3 = np.fromfile(f3, dtype, n).reshape(nn[::-1]).T
+        # read velocity
+        n = nfull[0] * nfull[1]
+        v1 = np.fromfile(f1, dtype, n).reshape(nn[::-1]).T
+        v2 = np.fromfile(f2, dtype, n).reshape(nn[::-1]).T
+        v3 = np.fromfile(f3, dtype, n).reshape(nn[::-1]).T
 
-    # integrate to displacement
-    u1 = u1 + dt * v1
-    u2 = u2 + dt * v2
-    u3 = u3 + dt * v3
+        # integrate to displacement
+        u1 = u1 + dt * v1
+        u2 = u2 + dt * v2
+        u3 = u3 + dt * v3
 
-    # peak ground motions
-    pgv = np.maximum(pgv, v1*v1 + v2*v2 + v3*v3)
-    pgd = np.maximum(pgd, u1*u1 + u2*u2 + u3*u3)
+        # peak ground motions
+        pgv = np.maximum(pgv, v1*v1 + v2*v2 + v3*v3)
+        pgd = np.maximum(pgd, u1*u1 + u2*u2 + u3*u3)
 
-    # peak horizontal ground motions
-    pgvh = np.maximum(pgvh, v1*v1 + v2*v2)
-    pgdh = np.maximum(pgdh, u1*u1 + u2*u2)
+        # peak horizontal ground motions
+        pgvh = np.maximum(pgvh, v1*v1 + v2*v2)
+        pgdh = np.maximum(pgdh, u1*u1 + u2*u2)
 
-    # time histories decimates in space
-    v1[::xdec,::xdec].T.tofile(h1)
-    v2[::xdec,::xdec].T.tofile(h2)
-    v3[::xdec,::xdec].T.tofile(h3)
+        # time histories decimates in space
+        v1[::xdec,::xdec].T.tofile(h1)
+        v2[::xdec,::xdec].T.tofile(h2)
+        v3[::xdec,::xdec].T.tofile(h3)
 
-    # snapshots decimated in time
-    if np.mod(it, tdec) == 0:
-        v1.T.tofile(s1)
-        v2.T.tofile(s2)
-        v3.T.tofile(s3)
-
-# close files
-f1.close()
-f2.close()
-f3.close()
-s1.close()
-s2.close()
-s3.close()
-h1.close()
-h2.close()
-h3.close()
+        # snapshots decimated in time
+        if np.mod(it, tdec) == 0:
+            v1.T.tofile(s1)
+            v2.T.tofile(s2)
+            v3.T.tofile(s3)
 
 # save pgv, pgd
 np.sqrt(pgv).astype(dtype).T.tofile('pgv.bin')

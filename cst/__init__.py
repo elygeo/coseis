@@ -39,14 +39,12 @@ def _archive():
         print('Warning: Source code not archived. To enable, use')
         print('Git versioned source code and install GitPython.')
    else:
-        f = os.path.join(path, 'build', 'coseis.tgz')
-        repo.archive(open('tmp.tar', 'w'), prefix='coseis/')
-        tar = tarfile.open('tmp.tar', 'a')
         open('tmp.log', 'w').write(repo.git.log())
-        tar.add('tmp.log', 'coseis/changelog')
-        tar.close()
+        repo.archive(open('tmp.tar', 'w'), prefix='coseis/')
+        tarfile.open('tmp.tar', 'a').add('tmp.log', 'coseis/changelog')
         tar = open('tmp.tar', 'rb').read()
         os.remove('tmp.tar')
         os.remove('tmp.log')
+        f = os.path.join(path, 'build', 'coseis.tgz')
         gzip.open(f, 'wb').write(tar)
 

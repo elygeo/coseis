@@ -46,9 +46,9 @@ w = 1.0 - np.r_[np.zeros(ntop), 1.0 / (n - 1) * np.arange(n), np.ones(npml)]
 # node elevation mesh
 fh = cst.util.open_excl(hold + 'z3.bin', 'wb')
 if fh:
-    for i in range(dep.size):
-        (dep[i] + z0 + w[i] * z).T.tofile(fh)
-    fh.close()
+    with fh:
+        for i in range(dep.size):
+            (dep[i] + z0 + w[i] * z).T.tofile(fh)
 
 # cell center locations
 dep = 0.5 * (dep[:-1] + dep[1:])
@@ -63,42 +63,42 @@ w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 # rho extraction
 fh = cst.util.open_excl(hold + 'rho.bin', 'wb')
 if fh:
-    vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
-    vmin, vmax = np.inf, -np.inf
-    for i in range(dep.size):
-        zz = w[i] * z - dep[i]
-        v = cst.cvmh.nafe_drake(vm(zz))
-        vmin = min(vmin, v.min())
-        vmax = max(vmax, v.max())
-        v.T.tofile(fh)
-    fh.close()
+    with fh:
+        vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
+        vmin, vmax = np.inf, -np.inf
+        for i in range(dep.size):
+            zz = w[i] * z - dep[i]
+            v = cst.cvmh.nafe_drake(vm(zz))
+            vmin = min(vmin, v.min())
+            vmax = max(vmax, v.max())
+            v.T.tofile(fh)
     print('%12g %12g rho' % (vmin, vmax))
 
 # vp extraction
 fh = cst.util.open_excl(hold + 'vp.bin', 'wb')
 if fh:
-    vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
-    vmin, vmax = np.inf, -np.inf
-    for i in range(dep.size):
-        zz = w[i] * z - dep[i]
-        v = vm(zz)
-        vmin = min(vmin, v.min())
-        vmax = max(vmax, v.max())
-        v.T.tofile(fh)
-    fh.close()
+    with fh:
+        vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
+        vmin, vmax = np.inf, -np.inf
+        for i in range(dep.size):
+            zz = w[i] * z - dep[i]
+            v = vm(zz)
+            vmin = min(vmin, v.min())
+            vmax = max(vmax, v.max())
+            v.T.tofile(fh)
     print('%12g %12g vp' % (vmin, vmax))
 
 # vs extraction
 fh = cst.util.open_excl(hold + 'vs.bin', 'wb')
 if fh:
-    vm = cst.cvmh.Extraction(x, y, 'vs', vs30)
-    vmin, vmax = np.inf, -np.inf
-    for i in range(dep.size):
-        zz = w[i] * z - dep[i]
-        v = vm(zz)
-        vmin = min(vmin, v.min())
-        vmax = max(vmax, v.max())
-        v.T.tofile(fh)
-    fh.close()
+    with fh:
+        vm = cst.cvmh.Extraction(x, y, 'vs', vs30)
+        vmin, vmax = np.inf, -np.inf
+        for i in range(dep.size):
+            zz = w[i] * z - dep[i]
+            v = vm(zz)
+            vmin = min(vmin, v.min())
+            vmax = max(vmax, v.max())
+            v.T.tofile(fh)
     print('%12g %12g vs' % (vmin, vmax))
 

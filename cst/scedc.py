@@ -31,13 +31,12 @@ class stp():
 
     Example, download waveforms in SAC format and save station list:
         import cst
-        stp = cst.scedc.stp('scedc')
-        stp('status')
-        stp(['sac', 'gain on'])
-        stp('trig -net ci -chan _n_ -radius 20 14383980')
-        out = stp('sta -l -net ci -chan _n_')
-        open('station-list.txt', 'w').write(out[0])
-        stp.close()
+        with cst.scedc.stp('scedc') as stp:
+            stp('status')
+            stp(['sac', 'gain on'])
+            stp('trig -net ci -chan _n_ -radius 20 14383980')
+            out = stp('sta -l -net ci -chan _n_')
+            open('station-list.txt', 'w').write(out[0])
     """
     presets = {
         'scedc': [
@@ -53,11 +52,12 @@ class stp():
     }
 
     def __init__(self, waveserver='scedc', retry=60):
-        if type(waveserver) is str:
-            waveserver = self.presets[waveserver]
+        print 'init'
         self.sock = socket.socket()
         self.send = self.sock.send
         self.close = self.sock.close
+        if isinstance(waveserver, basestring):
+            waveserver = self.presets[waveserver]
         for i in range(retry):
             for host, port, password in waveserver:
                 print('STP: Connecting to ' + host)
@@ -72,10 +72,17 @@ class stp():
             if conn:
                 break
         if not conn:
-            sys.exit('STP connection error')
+            raise Exception('STP connection error')
         two = struct.pack('i', 2)
         self.send(two)
         self.receive()
+        return
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.sock.close()
         return
 
     def __call__(self, cmd, path=None, verbose=False):

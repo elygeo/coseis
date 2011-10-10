@@ -48,15 +48,14 @@ job = cst.cvms.stage(nsample=n, nproc=nproc, rundir=path)
 f1 = open(path + 'lon.bin', 'wb')
 f2 = open(path + 'lat.bin', 'wb')
 f3 = open(path + 'dep.bin', 'wb')
-for i in range(z.size):
-    x.tofile(f1)
-    y.tofile(f2)
-for i in range(z.size):
-    x.fill(z[i])
-    x.tofile(f3)
-f1.close()
-f2.close()
-f3.close()
+with f1, f2:
+    for i in range(z.size):
+        x.tofile(f1)
+        y.tofile(f2)
+with f3:
+    for i in range(z.size):
+        x.fill(z[i])
+        x.tofile(f3)
 
 # launch
 cst.cvms.launch(job)

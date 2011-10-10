@@ -1,14 +1,110 @@
 """
-Mapping data utilities
+Data utilities and sources
 """
 # TODO
-# Use npy format with load(file, mmap_mode='r'), instead of flat binary.
 # Quaternary Fault Database
 # ftp://hazards.cr.usgs.gov/maps/qfault/
 # http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
-import os, urllib, gzip, zipfile
+import os, urllib, gzip, zipfile, subprocess
 import numpy as np
-from . import coord
+from . import coord, source
+
+
+def upsample(f):
+    n = list(f.shape)
+    n[:2] = [n[0] * 2 - 1, n[1] * 2 - 1]
+    g = np.empty(n, f.dtype)
+    g[0::2,0::2] = f
+    g[0::2,1::2] = 0.5 * (f[:,:-1] + f[:,1:])
+    g[1::2,0::2] = 0.5 * (f[:-1,:] + f[1:,:])
+    g[1::2,1::2] = 0.25 * (f[:-1,:-1] + f[1:,1:] + f[:-1,1:] + f[1:,:-1])
+    return g
+
+
+def downsample(f, d):
+    n = f.shape
+    n = (n[0] + 1) / d, (n[1] + 1) / d
+    g = np.zeros(n, f.dtype)
+    for k in range(d):
+        for j in range(d):
+            g += f[j::d,k::d]
+    g *= 1.0 / (d * d)
+    return g
+
+
+def clipdata(x, y, extent, lines=1):
+    """
+    Clip data outside extent.
+
+    Parameters
+    ----------
+        x, y : data coordinates
+        extent : (xmin, xmax), (ymin, ymax)
+        lines : 0 = points, assume no connectivity.
+                1 = line segments, include one extra point past the boundary.
+               -1 = line segments, do not include extra point past the boundary.
+    """
+    x, y = np.array([x, y])
+    x1, x2 = extent[0]
+    y1, y2 = extent[1]
+    i = (x >= x1) & (x <= x2) & (y >= y1) & (y <= y2)
+    if lines:
+        if lines > 0:
+            i[:-1] = i[:-1] | i[1:]
+            i[1:] = i[:-1] | i[1:]
+        x[~i] = np.nan
+        y[~i] = np.nan
+        i[1:] = i[:-1] | i[1:]
+    return x[i], y[i], i
+
+
+def densify(x, y, delta):
+    """
+    Piecewise up-sample line segments with spacing delta.
+    """
+    x, y = np.array([x, y])
+    dx = np.diff(x)
+    dy = np.diff(y)
+    r = np.sqrt(dx * dx + dy * dy)
+    xx = [[x[0]]]
+    yy = [[y[0]]]
+    for i in range(r.size):
+        if r[i] > delta:
+            ri = np.arange(delta, r[i], delta)
+            xx += [np.interp(ri, [0.0, r[i]], x[i:i+2])]
+            yy += [np.interp(ri, [0.0, r[i]], y[i:i+2])]
+        xx += [[x[i+1]]]
+        yy += [[y[i+1]]]
+    xx = np.concatenate(xx)
+    yy = np.concatenate(yy)
+    return np.array([xx, yy])
+
+
+def downsample_sphere(f, d):
+    """
+    Down-sample node-registered spherical surface with averaging.
+
+    The indices of the 2D array f are, respectively, longitude and latitude.
+    d is the decimation interval which should be odd to preserve nodal
+    registration.
+    """
+    n = f.shape
+    i = np.arange(d) - (d - 1) / 2
+    jj = np.arange(0, n[0], d)
+    kk = np.arange(0, n[1], d)
+    nn = jj.size, kk.size
+    g = np.zeros(nn, f.dtype)
+    jj, kk = np.ix_(jj, kk)
+    for dk in i:
+        k = n[1] - 1 - abs(n[1] - 1 - abs(dk + kk))
+        for dj in i:
+            j = (jj + dj) % n[0]
+            g = g + f[j,k]
+    g[:,0] = g[:,0].mean()
+    g[:,-1] = g[:,-1].mean()
+    g *= 1.0 / (d * d)
+    return g
+
 
 def etopo1(downsample=1):
     """
@@ -35,6 +131,7 @@ def etopo1(downsample=1):
     else:
         z = np.load(filename, mmap_mode='c')
     return z
+
 
 def globe30(tile=(0, 1), fill=True):
     """
@@ -82,6 +179,7 @@ def globe30(tile=(0, 1), fill=True):
         z = np.load(filename, mmap_mode='c')
     return z
 
+
 def topo(extent, scale=1.0, downsample=0):
     """
     Extract digital elevation model for given region.
@@ -117,45 +215,11 @@ def topo(extent, scale=1.0, downsample=0):
         tile0 = j0 // n, k0 // n
         tile1 = j1 // n, k1 // n
         if tile0 != tile1:
-            sys.exit('Multiple tiles not implemented. Try downsample=1')
+            print('Multiple tiles not implemented. Try downsample=1')
         j0, j1 = j0 % n, j1 % n
         k0, k1 = k0 % n, k1 % n
         z = globe30(tile0)[j0:j1,k0:k1]
     return scale * z, (x, y)
-
-def us_place_names(kind=None, extent=None):
-    """
-    USGS place name database.
-    """
-    import cst
-    repo = cst.site.repo
-    filename = os.path.join(repo, 'US_CONCISE.txt')
-    if not os.path.exists(filename):
-        url = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
-        print('Downloading %s' % url)
-        f = os.path.join(repo, os.path.basename(url))
-        urllib.urlretrieve(url, f)
-        zipfile.ZipFile(f).extractall(repo)
-    data = open(filename).read()
-    name = np.genfromtxt(data, delimiter='|', skip_header=1, usecols=(1,), dtype='S64')
-    data.reset()
-    kind_ = np.genfromtxt(data, delimiter='|', skip_header=1, usecols=(2,), dtype='S64')
-    data.reset()
-    lat, lon, elev = np.genfromtxt(data, delimiter='|', skip_header=1, usecols=(9,10,15)).T
-    if kind is not None:
-        i = kind == kind_
-        lon = lon[i]
-        lat = lat[i]
-        elev = elev[i]
-        name = name[i]
-    if extent is not None:
-        x, y = extent
-        i = (lon >= x[0]) & (lon <= x[1]) & (lat >= y[0]) & (lat <= y[1])
-        lon = lon[i]
-        lat = lat[i]
-        elev = elev[i]
-        name = name[i]
-    return (lon, lat, elev, name)
 
 
 def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0, max_level=4, delta=None, clip=1):
@@ -241,52 +305,39 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
     return np.array([xx, yy], 'f')
 
 
-def clipdata(x, y, extent, lines=1):
+def us_place_names(kind=None, extent=None):
     """
-    Clip data outside extent.
-
-    Parameters
-    ----------
-        x, y : data coordinates
-        extent : (xmin, xmax), (ymin, ymax)
-        lines : 0 = points, assume no connectivity.
-                1 = line segments, include one extra point past the boundary.
-               -1 = line segments, do not include extra point past the boundary.
+    USGS place name database.
     """
-    x, y = np.array([x, y])
-    x1, x2 = extent[0]
-    y1, y2 = extent[1]
-    i = (x >= x1) & (x <= x2) & (y >= y1) & (y <= y2)
-    if lines:
-        if lines > 0:
-            i[:-1] = i[:-1] | i[1:]
-            i[1:] = i[:-1] | i[1:]
-        x[~i] = np.nan
-        y[~i] = np.nan
-        i[1:] = i[:-1] | i[1:]
-    return x[i], y[i], i
-
-
-def densify(x, y, delta):
-    """
-    Piecewise up-sample line segments with spacing delta.
-    """
-    x, y = np.array([x, y])
-    dx = np.diff(x)
-    dy = np.diff(y)
-    r = np.sqrt(dx * dx + dy * dy)
-    xx = [[x[0]]]
-    yy = [[y[0]]]
-    for i in range(r.size):
-        if r[i] > delta:
-            ri = np.arange(delta, r[i], delta)
-            xx += [np.interp(ri, [0.0, r[i]], x[i:i+2])]
-            yy += [np.interp(ri, [0.0, r[i]], y[i:i+2])]
-        xx += [[x[i+1]]]
-        yy += [[y[i+1]]]
-    xx = np.concatenate(xx)
-    yy = np.concatenate(yy)
-    return np.array([xx, yy])
+    import cst
+    repo = cst.site.repo
+    filename = os.path.join(repo, 'US_CONCISE.txt')
+    if not os.path.exists(filename):
+        url = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
+        print('Downloading %s' % url)
+        f = os.path.join(repo, os.path.basename(url))
+        urllib.urlretrieve(url, f)
+        zipfile.ZipFile(f).extractall(repo)
+    data = open(filename).read()
+    name = np.genfromtxt(data, delimiter='|', skip_header=1, usecols=(1,), dtype='S64')
+    data.reset()
+    kind_ = np.genfromtxt(data, delimiter='|', skip_header=1, usecols=(2,), dtype='S64')
+    data.reset()
+    lat, lon, elev = np.genfromtxt(data, delimiter='|', skip_header=1, usecols=(9,10,15)).T
+    if kind is not None:
+        i = kind == kind_
+        lon = lon[i]
+        lat = lat[i]
+        elev = elev[i]
+        name = name[i]
+    if extent is not None:
+        x, y = extent
+        i = (lon >= x[0]) & (lon <= x[1]) & (lat >= y[0]) & (lat <= y[1])
+        lon = lon[i]
+        lat = lat[i]
+        elev = elev[i]
+        name = name[i]
+    return (lon, lat, elev, name)
 
 
 def engdahlcat(path='engdahl-centennial-cat.npy'):
@@ -327,50 +378,67 @@ def engdahlcat(path='engdahl-centennial-cat.npy'):
     return data
 
 
-def upsample(f):
-    n = list(f.shape)
-    n[:2] = [n[0] * 2 - 1, n[1] * 2 - 1]
-    g = np.empty(n, f.dtype)
-    g[0::2,0::2] = f
-    g[0::2,1::2] = 0.5 * (f[:,:-1] + f[:,1:])
-    g[1::2,0::2] = 0.5 * (f[:-1,:] + f[1:,:])
-    g[1::2,1::2] = 0.25 * (f[:-1,:-1] + f[1:,1:] + f[:-1,1:] + f[1:,:-1])
-    return g
-
-def downsample(f, d):
-    n = f.shape
-    n = (n[0] + 1) / d, (n[1] + 1) / d
-    g = np.zeros(n, f.dtype)
-    for k in range(d):
-        for j in range(d):
-            g += f[j::d,k::d]
-    g *= 1.0 / (d * d)
-    return g
-
-
-def downsample_sphere(f, d):
+def cybershake(isrc, irup, islip, ihypo, name=None):
     """
-    Down-sample node-registered spherical surface with averaging.
+    CyberShake sources.
 
-    The indices of the 2D array f are, respectively, longitude and latitude.
-    d is the decimation interval which should be odd to preserve nodal
-    registration.
+    Must have account on intensity.usc.edu with auto SSH authentication.
+
+    Parameters
+    ----------
+        isrc : source ID
+        irup : rupture ID
+        islip : slip variation ID
+        ihypo : hypocenter ID
+        name : optional name for the rupture
     """
-    n = f.shape
-    i = np.arange(d) - (d - 1) / 2
-    jj = np.arange(0, n[0], d)
-    kk = np.arange(0, n[1], d)
-    nn = jj.size, kk.size
-    g = np.zeros(nn, f.dtype)
-    jj, kk = np.ix_(jj, kk)
-    for dk in i:
-        k = n[1] - 1 - abs(n[1] - 1 - abs(dk + kk))
-        for dj in i:
-            j = (jj + dj) % n[0]
-            g = g + f[j,k]
-    g[:,0] = g[:,0].mean()
-    g[:,-1] = g[:,-1].mean()
-    g *= 1.0 / (d * d)
-    return g
+
+    # get reports
+    url = 'intensity.usc.edu:/home/scec-00/cybershk/reports/'
+    for f in 'erf35_source_rups.txt', 'erf35_sources.txt':
+        if not os.path.exists(f):
+            subprocess.check_call(['scp', url + f, f])
+    segments = dict(np.loadtxt(f, 'i,S64', delimiter='\t', skiprows=1))
+
+    # get source files
+    url = 'intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V2_3/'
+    url = 'intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V3_2/'
+    mesh = '%s%d/%d/%d_%d.txt' % (url, isrc, irup, isrc, irup)
+    head = '%s%d/%d/%d_%d.txt.variation.output' % (url, isrc, irup, isrc, irup)
+    srf  = '%s%d/%d/%d_%d.txt.variation-s%04d-h%04d' % (url, isrc, irup, isrc, irup, islip, ihypo)
+    subprocess.check_call(['scp', head, 'head'])
+    subprocess.check_call(['scp', mesh, 'mesh'])
+    subprocess.check_call(['scp', srf, 'srf'])
+
+    # extract SRF file
+    src = source.srf('srf')
+
+    # update metadata
+    shape = src.plane[0]['shape']
+    v = open('head').next().split()
+    src.nslip = int(v[6])
+    src.nhypo = int(v[8])
+    with open('mesh', 'r') as fh:
+        src.probability = float(fh.next().split()[-1])
+        src.magnitude = float(fh.next().split()[-1])
+    src.segment = segments[isrc].replace(';', ' ')
+    src.event = name
+    src.isrc = isrc
+    src.irup = irup
+    src.islip = islip
+    src.ihypo = ihypo
+    if not name:
+        src.name = src.segment
+
+    # extract trace
+    x = src.lon.reshape(shape[::-1]).T
+    y = src.lat.reshape(shape[::-1]).T
+    src.trace = np.array([x[:,0], y[:,0]])
+
+    # clean up
+    subprocess.check_call(['gzip', 'srf'])
+    os.remove('mesh')
+    os.remove('head')
+    return src
 
 

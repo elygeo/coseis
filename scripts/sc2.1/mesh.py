@@ -37,21 +37,21 @@ z = np.zeros_like(x)
 p = 'cvm' + os.sep
 fh = cst.util.open_excl(p + 'dep.bin', 'wb')
 if fh:
-    for i in range(dep.size):
-        (z + dep[i]).astype('f').T.tofile(fh)
-    fh.close()
+    with fh:
+        for i in range(dep.size):
+            (z + dep[i]).astype('f').T.tofile(fh)
 
 # write lon file
 fh = cst.util.open_excl(p + 'lat.bin', 'wb')
 if fh:
-    for i in range(dep.size):
-        x.T.tofile(fh)
-    fh.close()
+    with fh:
+        for i in range(dep.size):
+            x.T.tofile(fh)
 
 # write lat file
 fh = cst.util.open_excl(p + 'lon.bin', 'wb')
 if fh:
-    for i in range(dep.size):
-        y.T.tofile(fh)
-    fh.close()
+    with fh:
+        for i in range(dep.size):
+            y.T.tofile(fh)
 

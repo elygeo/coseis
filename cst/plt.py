@@ -127,7 +127,7 @@ def compass_rose(ax, x, y, r, style='k-', **kwargs):
     ]
     return h
 
-def savefig(fig, fd=None, format=None, distill=False, **kwargs):
+def savefig(fig, fh=None, format=None, distill=False, **kwargs):
     """
     Enhanced version of Matplotlib savefig command.
 
@@ -136,10 +136,10 @@ def savefig(fig, fd=None, format=None, distill=False, **kwargs):
     distilled using Ghostscript to produce smaller files.
     """
     import cStringIO
-    if type(fd) is str:
+    if isinstance(fh, basestring):
         if format is None:
-            format = fd.split('.')[-1]
-        fd = open(os.path.expanduser(fd), 'wb')
+            format = fh.split('.')[-1]
+        fh = open(os.path.expanduser(fh), 'wb')
     else:
         if format is None:
             format = 'array'
@@ -158,11 +158,11 @@ def savefig(fig, fd=None, format=None, distill=False, **kwargs):
     else:
         fig.savefig(out, format=format, **kwargs)
         out.reset()
-    if fd is None:
+    if fh is None:
         return(out)
     else:
-        fd.write(out.getvalue())
-        fd.close()
+        with fh:
+            fh.write(out.getvalue())
         return
 
 def digitize(img, xlim=(-1, 1), ylim=(-1, 1), color='r'):

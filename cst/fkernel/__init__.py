@@ -1,7 +1,7 @@
 """
 Frechet kernel computation
 """
-import os, sys, shutil, shlex
+import os, shutil, shlex
 from ..conf import launch
 
 path = os.path.dirname(os.path.realpath(__file__))
@@ -54,11 +54,11 @@ def stage(inputs={}, **kwargs):
     # configure
     job, inputs = cst.conf.configure(**inputs)
     if inputs:
-        sys.exit('Unknown parameter: %s' % inputs)
+        raise Exception('Unknown parameter: %s' % inputs)
     if not job.mode:
         job.mode = 'm'
     if job.mode != 'm':
-        sys.exit('Must be MPI')
+        raise Exception('Must be MPI')
     job.command = os.path.join('.', 'cpt_ker-' + job.mode + job.optimize + ' in/input_files')
     job = cst.conf.prepare(job)
 

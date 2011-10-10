@@ -2,7 +2,7 @@
 """
 SORD tests
 """
-import subprocess, shutil
+import shutil
 import numpy as np
 import cst
 

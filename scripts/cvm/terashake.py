@@ -39,12 +39,10 @@ path = cfg.rundir
 f1 = open(os.path.join(path, 'lon.bin'), 'wb')
 f2 = open(os.path.join(path, 'lat.bin'), 'wb')
 f3 = open(os.path.join(path, 'dep.bin'), 'wb')
-for z in z:
-    xx.tofile(f1)
-    yy.tofile(f2)
-    zz.fill(z)
-    zz.tofile(f3)
-f1.close()
-f2.close()
-f3.close()
+with f1, f2, f3:
+    for z in z:
+        xx.tofile(f1)
+        yy.tofile(f2)
+        zz.fill(z)
+        zz.tofile(f3)
 

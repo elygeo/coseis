@@ -2,7 +2,6 @@
 """
 Signal processing utilities
 """
-import sys
 import numpy as np
 
 def time_function(pulse, t, tau=1.0):
@@ -65,7 +64,7 @@ def time_function(pulse, t, tau=1.0):
         b = np.sqrt(a / np.pi) * 4.0 * a
         f = np.exp(-a * t * t) * b * (a * t * t - 0.5)
     else:
-        sys.exit('invalid time func: ' + pulse)
+        raise Exception('invalid time func: ' + pulse)
     return f
 
 
@@ -81,7 +80,7 @@ def brune2gauss(x, dt, tau, sigma=None, mode='same'):
         sigma : Gaussian spread.
         mode : 'same' or 'full' (see numpy.convolve).
     """
-    x = np.array(x)
+    x = np.asarray(x)
     if sigma == None:
         sigma = np.sqrt(2.0) * tau
     s = 1.0 / (sigma * sigma)
@@ -140,7 +139,7 @@ def spectrum(h, dt=1.0, shift=False, tzoom=10.0, db=None, legend=None, title='Fo
     """
     import matplotlib.pyplot as plt
 
-    h = np.array(h)
+    h = np.asarray(h)
     n = h.shape[-1]
     H = np.fft.rfft(h) * 2 / n
     if shift:
@@ -233,7 +232,7 @@ def test():
         #('Ricker1', time_function('ricker1', t - 0.5 * dt, tau).cumsum() * dt),
         #('Ricker2', time_function('ricker2', t - dt, tau).cumsum().cumsum() * dt * dt),
     )
-    y = np.array(y) * scale
+    y = np.asarray(y) * scale
     y = np.fft.ifftshift(y, axes=[-1])
     plt.figure(0)
     spectrum(y, dt, shift=True, tzoom=5, legend=leg,
@@ -249,7 +248,7 @@ def test():
         ('2 pole x2',  filter(x, dt, flp, 'lowpass', 2, 1)),
         ('2 pole x-2', filter(x, dt, flp, 'lowpass', 2, -1)),
     )
-    y = np.array(y) * scale
+    y = np.asarray(y) * scale
     y = np.fft.ifftshift(y, axes=[-1])
     plt.figure(2)
     spectrum(y, dt, shift=True, tzoom=5, legend=leg,
@@ -264,7 +263,7 @@ def test():
         ('1 pole x2 ', filter(x, dt, fbp, 'bandpass', 1, 1)),
         ('2 pole x2',  filter(x, dt, fbp, 'bandpass', 2, 1)),
     )
-    y = np.array(y) * scale
+    y = np.asarray(y) * scale
     plt.figure(3)
     spectrum(y, dt, legend=leg,
         title='Butterworth bandpass, fc = %.1f, %.1f' % fbp)
@@ -278,12 +277,11 @@ def test():
         (r'$\sqrt{2}\tau$',      brune2gauss(x, dt, tau, tau*np.sqrt(2))),
         (r'$2\tau$',             brune2gauss(x, dt, tau, tau*2)),
     )
-    y = np.array(y) * scale
+    y = np.asarray(y) * scale
     y = np.fft.ifftshift(y, axes=[-1])
     plt.figure(4)
     spectrum(y, dt, shift=True, legend=leg,
         title='Deconvolution, fc = %.1f, T = 0.5 / (pi * fc)' % flp)
-
     return
 
 # continue if command line

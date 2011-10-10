@@ -49,6 +49,7 @@ for target in args:
             os.unlink(f)
     elif target == 'data':
         cst.data.mapdata()
+        raise Exception('asdf')
         cst.data.etopo1()
         cst.data.globe30()
     elif target == 'test':

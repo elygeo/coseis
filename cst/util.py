@@ -1,7 +1,7 @@
 """
 General utilities
 """
-import os, sys, re
+import os, re
 import numpy as np
 
 class namespace:
@@ -34,7 +34,7 @@ def prune(d, pattern=None, types=None):
     if types is None:
         types = set(
             np.typeDict.values() +
-            [type(None), bool, str, unicode, int, long, float, tuple, list, dict]
+            [np.ndarray, type(None), bool, str, unicode, int, long, float, tuple, list, dict]
         )
     grep = re.compile(pattern)
     for k in d.keys():
@@ -58,7 +58,8 @@ def open_excl(filename, *args):
     return fh
 
 
-def save(fd, d, expand=None, keep=None, header='', prune_pattern=None, prune_types=None):
+def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
+    prune_types=None, ext_threshold=None, ext_raw=False):
     """
     Write variables from a dict into a Python source file.
     """
@@ -67,10 +68,25 @@ def save(fd, d, expand=None, keep=None, header='', prune_pattern=None, prune_typ
     if expand is None:
         expand = []
     prune(d, prune_pattern, prune_types)
-    out = header
+    out = header + 'from numpy import array, load, float32\n'
+    n = ext_threshold
+    if n == None:
+        n = np.get_printoptions()['threshold']
     for k in sorted(d):
         if k not in expand and (keep is None or k in keep):
-            out += '%s = %r\n' % (k, d[k])
+            if type(d[k]) == np.ndarray and d[k].size > n:
+                f = os.path.dirname(fh.name)
+                if ext_raw:
+                    f = os.path.join(f, k + '.bin')
+                    d[k].tofile(f)
+                    m = k, k, d[k].dtype, d[k].shape
+                    out += "%s = memmap('%s.bin', %s, mode='c', shape=%s)\n" % m
+                else:
+                    f = os.path.join(f, k + '.npy')
+                    np.save(f, d[k])
+                    out += "%s = load('%s.npy', mmap_mode='c')\n" % (k, k)
+            else:
+                out += '%s = %r\n' % (k, d[k])
     for k in expand:
         if k in d:
             if type(d[k]) is tuple:
@@ -89,23 +105,23 @@ def save(fd, d, expand=None, keep=None, header='', prune_pattern=None, prune_typ
                     out += '    %r: %r,\n' % (item, d[k][item])
                 out += '}\n'
             else:
-                sys.exit('Cannot expand %s type %s' % (k, type(d[k])))
-    if fd is not None:
-        if type(fd) is not file:
-            fd = open(os.path.expanduser(fd), 'w')
-        fd.write(out)
+                raise Exception('Cannot expand %s type %s' % (k, type(d[k])))
+    if fh is not None:
+        if isinstance(fh, basestring):
+            fh = open(os.path.expanduser(fh), 'w')
+        fh.write(out)
     return out
 
 
-def load(fd, d=None, prune_pattern=None, prune_types=None):
+def load(fh, d=None, prune_pattern=None, prune_types=None):
     """
     Load variables from Python source files.
     """
-    if type(fd) is not file:
-        fd = open(os.path.expanduser(fd))
+    if isinstance(fh, basestring):
+        fh = open(os.path.expanduser(fh))
     if d is None:
         d = {}
-    exec fd in d
+    exec fh in d
     prune(d, prune_pattern, prune_types)
     return namespace(d)
 

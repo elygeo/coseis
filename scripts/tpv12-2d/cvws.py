@@ -76,11 +76,10 @@ for sta in meta.deltas:
         tsv = np.sqrt(y * y + z * z) * 1e-6
         tnm = np.fromfile(f % 'tnm', dtype) * 1e-6
         c   = np.array([t, su1, sv1, ts1, suv, svv, tsv, tnm]).T
-        fd = open(path + 'cvws/' + sta + '.asc', 'w')
-        fd.write(header % meta.__dict__)
-        fd.write(header1)
-        np.savetxt(fd, c, fmt1)
-        fd.close()
+        with open(path + 'cvws/' + sta + '.asc', 'w') as fh:
+            fh.write(header % meta.__dict__)
+            fh.write(header1)
+            np.savetxt(fh, c, fmt1)
 
 # body stations
 for sta in meta.deltas:
@@ -95,9 +94,8 @@ for sta in meta.deltas:
         v2 = np.fromfile(f % 'v2', dtype)
         v3 = np.fromfile(f % 'v3', dtype)
         c   = np.array([t, u1, v1, u2, v2, u3, v3]).T
-        fd = open(path + 'cvws/' + sta + '.asc', 'w')
-        fd.write(header % meta.__dict__)
-        fd.write(header2)
-        np.savetxt(fd, c, fmt2)
-        fd.close()
+        with open(path + 'cvws/' + sta + '.asc', 'w') as fh:
+            fh.write(header % meta.__dict__)
+            fh.write(header2)
+            np.savetxt(fh, c, fmt2)
 

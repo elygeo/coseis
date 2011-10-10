@@ -12,9 +12,9 @@ extent_gtl = (-31000.0, 849000.0), (3410000.0, 4274000.0)
 prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
 prop3d = {'vp': '1', 'vs': '3', 'tag': '2'}
 voxet3d = {
-    'mantle': ('CVM_CM', None),
-    'crust':  ('CVM_LR', [(0, 0), (0, 0), (1, 0)]),
-    'lab':    ('CVM_HR', [(1, 1), (1, 1), (1, 1)]),
+    'mantle': ('CVM_CM', False),
+    'crust':  ('CVM_LR', [(False, False), (False, False), (True, False)]),
+    'lab':    ('CVM_HR', True),
 }
 
 
@@ -97,7 +97,6 @@ def vs30_wills(rebuild=False):
         nx, ny, nz = 49867, 2751, 16 # fastest, most memory
         x0, y0 = -124.52997177169, 32.441345502265
         x1 = x0 + (nx - 1) * delta
-        bound = (True, True), (True, True)
         print('Resampling Wills Vs30 (takes about 5 min)')
         for k in range(nz):
             sys.stdout.write('.')
@@ -108,7 +107,7 @@ def vs30_wills(rebuild=False):
             v = fh.read(nx * ny * bytes)
             v = np.fromstring(v, dtype).astype('f').reshape((ny, nx)).T
             v[v<=0] = np.nan
-            coord.interp2(extent, v, (x, y), data, 'nearest', bound, mask_nan=True)
+            coord.interp2(extent, v, (x, y), data, bound=True, mask_nan=True)
         print('')
         np.save(filename, data)
     return extent_gtl, None, data
@@ -200,7 +199,7 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='vx63'):
             d1.T.tofile(f1)
             d2.T.tofile(f2)
             d3.T.tofile(f3)
-            open(turd, 'w').close()
+            open(turd, 'w')
 
     # voxet ID
     if voxet in voxet3d:
@@ -287,23 +286,23 @@ class Extraction():
 
     Init parameters
     ---------------
-        x, y: Coordinates arrays
-        vm: 'vp', 'vs', 'tag', or Model object.
-        vs30: 'wills', 'wald', None, or Model object.
-        topo: 'topo' or Model object.
-        interpolation: 'nearest', or 'linear'.
-        **kwargs: Keyword arguments passed to Model()
+    x, y: Coordinates arrays
+    vm: 'vp', 'vs', 'tag', or Model object.
+    vs30: 'wills', 'wald', None, or Model object.
+    topo: 'topo' or Model object.
+    interpolation: 'nearest', or 'linear'.
+    **kwargs: Keyword arguments passed to Model()
 
     Call parameters
     ---------------
-        z: Vertical coordinate array.
-        out: Optional output array, same shape as coordinate arrays.
-        min_depth: Minimum depth in Z array, optional but provides speed-up.
-        by_depth: Z coordinate type, True for depth, False for elevation.
+    z: Vertical coordinate array.
+    out: Optional output array, same shape as coordinate arrays.
+    min_depth: Minimum depth in Z array, optional but provides speed-up.
+    by_depth: Z coordinate type, True for depth, False for elevation.
 
     Returns
     -------
-        out: Property samples at coordinates (x, y, z)
+    out: Property samples at coordinates (x, y, z)
     """
     def __init__(self, x, y, vm, vs30='wills', topo='topo', interpolation='nearest',
         **kwargs):
@@ -312,7 +311,7 @@ class Extraction():
         if type(vm) is str:
             vm = Model(vm, **kwargs)
         if vm.prop in prop2d:
-            sys.exit('Cannot extract 2D model')
+            raise Exception('Cannot extract 2D model')
         elif vm.prop == 'tag':
             vs30 = None
         if type(topo) is str:
@@ -368,15 +367,15 @@ def extract(x, y, z, vm=['rho', 'vp', 'vs'], geographic=True, by_depth=True, **k
 
     Parameters
     ----------
-        x, y, z: Coordinates arrays
-        vm: 'rho', 'vp', 'vs', 'tag', or Model object.
-        geographic: X Y coordinate type, True for geographic, False for UTM.
-        by_depth: Z coordinate type, True for depth, False for elevation.
-        **kwargs: Keyword arguments passed to Extraction()
+    x, y, z: Coordinates arrays
+    vm: 'rho', 'vp', 'vs', 'tag', or Model object.
+    geographic: X Y coordinate type, True for geographic, False for UTM.
+    by_depth: Z coordinate type, True for depth, False for elevation.
+    **kwargs: Keyword arguments passed to Extraction()
 
     Returns
     -------
-        out: Property samples at coordinates (x, y, z)
+    out: Property samples at coordinates (x, y, z)
     """
     x = np.asarray(x)
     y = np.asarray(y)

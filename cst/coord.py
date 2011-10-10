@@ -1,7 +1,6 @@
 """
 Coordinate conversions
 """
-import sys
 import numpy as np
 
 rearth = 6370000.0
@@ -24,13 +23,14 @@ def dot2(A, B):
     B = np.asarray(B).T
     i = -min(A.ndim, 2)
     if A.shape[i] != B.shape[-1]:
-        sys.exit('Incompatible arrays for dot product')
+        raise Exception('Incompatible arrays for dot product')
     elif A.ndim == 1:
-        return (A * B).T.sum(axis=0)
+        C = (A * B).T.sum(axis=0)
     elif B.ndim == 1:
-        return (A * B[...,None]).T.sum(axis=1)
+        C = (A * B[...,None]).T.sum(axis=1)
     else:
-        return (A[...,None,:,:] * B[...,None]).T.sum(axis=1)
+        C = (A[...,None,:,:] * B[...,None]).T.sum(axis=1)
+    return C
 
 
 def solve2(A, b):
@@ -44,163 +44,229 @@ def solve2(A, b):
                       b[1] * A[0,0] - b[0] * A[1,0] ])
 
 
-def interp(extent, f, coords, out=None, bound=None, mask_nan=False, extrapolate=False):
+def interp(x, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     """
-    1D interpolation on a regular grid
+    1D piecewise interpolation of function values specified on regular grid.
+
+    Parameters
+    ----------
+    x: tuple
+        Range (x_min, x_max) of coordinate space covered by the data in `f`.
+    f: array_like
+        Regular grid of data values to be interpolated.
+    xi: array_like
+        Coordinates of the interpolation points, same shape as returned in `fi`.
+    fi: array_like, optional
+        Output storage for interpolated values, same shape as `xi`.
+    method: {'nearest', 'linear'}, optional
+        Interpolation method.
+    bound: {boolean, tuple}, optional
+        If True, do not extrapolation values outside the coordinate range. A tuple
+        species the left and right boundaries independently.
+    mask_nan: boolean, optional
+        If True and output array `fi` is given, NaNs are masked from output.
+
+    Returns
+    -------
+    fi: array_like
+        Interpolated values, same shape as `xi`.
     """
+    # prepare arrays
     f = np.asarray(f)
-    x0, x1 = extent
-    delta = (x1 - x0) / (f.shape[-1] - 1)
-    xi = (np.asarray(coords) - x0) / delta
-    del(coords)
-    j = np.int32(xi)
-    n = f.shape[-1]
-    i = True
-    if bound is not None:
-        if bound[0]: i = i & (j >= 0)
-        if bound[1]: i = i & (j <= n-2)
-    j = np.minimum(np.maximum(j, 0), n-2)
-    if not extrapolate:
-        xi = np.minimum(np.maximum(xi, 0), n-1)
-    f = (1.0 - xi + j) * f[...,j] + (xi - j) * f[...,j+1]
-    if out is None:
-        if i is not True:
-            f[...,~i] = np.nan
-        return f
+    xi = np.asarray(xi)
+
+   # test for empty data
+    if f.size == 0:
+        if fi is None:
+            fi = np.empty_like(xi)
+            fi.fill(np.nan)
+        return fi
+
+    # logical coordinates
+    nx = f.shape[-1]
+    x_ = x
+    x = xi
+    del(xi)
+    x = (x - x_[0]) / (x_[1] - x_[0]) * (nx - 1)
+    x = np.minimum(np.maximum(x, 0), nx - 1)
+
+    # compute mask
+    mask = False
+    if type(bound) not in (tuple, list):
+        bound = bound, bound
+    if bound[0]: mask = mask | (x < 0)
+    if bound[1]: mask = mask | (x > nx - 1)
+
+    # interpolation
+    if method == 'nearest':
+        j = (x + 0.5).astype('i')
+        f = f[...,j]
+    elif method == 'linear':
+        j = np.minimum(x.astype('i'), nx - 2)
+        f = (1.0 - x + j) * f[...,j] + (x - j) * f[...,j+1]
+    else:
+        raise Exception('Unknown interpolation method: %s' % method)
+    del(j, x)
+
+    # apply mask
+    if fi is None:
+        fi = f
+        if mask is not False:
+            fi[...,mask] = np.nan
     else:
         if mask_nan:
-            i = i & ~np.isnan(f)
-        if i is True:
-            out[...] = f[...]
+            mask = mask | np.isnan(f)
+        if mask is False:
+            fi[...] = f[...]
         else:
-            out[...,i] = f[...,i]
-        return
+            fi[...,~mask] = f[...,~mask]
+    return fi
 
 
-def interp2(extent, f, coords, out=None, method='linear', bound=None, mask_nan=False, extrapolate=False):
+def interp2(x, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     """
-    2D interpolation on a regular grid
+    2D piecewise interpolation of function values specified on regular grid.
+
+    See 1D interp for documentation.
     """
+    # prepare arrays
     f = np.asarray(f)
-    x0, x1 = np.array(extent).T
-    delta = (x1 - x0) / (np.array(f.shape[-2:]) - 1)
-    xi = (np.asarray(coords[0]) - x0[0]) / delta[0]
-    yi = (np.asarray(coords[1]) - x0[1]) / delta[1]
-    del(coords)
-    n = f.shape
-    i = True
+    xi = np.asarray(xi)
+
+    # test for empty data
+    if f.size == 0:
+        if fi is None:
+            fi = np.empty_like(xi)
+            fi.fill(np.nan)
+        return fi
+
+    # logical coordinates
+    nx, ny = f.shape[-2:]
+    x_, y_ = x
+    x, y = xi
+    del(xi)
+    x = (x - x_[0]) / (x_[1] - x_[0]) * (nx - 1)
+    y = (y - y_[0]) / (y_[1] - y_[0]) * (ny - 1)
+    x = np.minimum(np.maximum(x, 0), nx - 1)
+    y = np.minimum(np.maximum(y, 0), ny - 1)
+
+    # compute mask
+    mask = False
+    if type(bound) not in (tuple, list):
+        bound = [(bound, bound)] * 2
+    bx, by = bound
+    if bx[0]: mask = mask | (x < 0)
+    if by[0]: mask = mask | (y < 0)
+    if bx[1]: mask = mask | (x > nx - 1)
+    if by[1]: mask = mask | (y > ny - 1)
+
+    # interpolation
     if method == 'nearest':
-        j = np.array(xi + 0.5, 'i')
-        k = np.array(yi + 0.5, 'i')
-        if bound is not None:
-            if bound[0][0]: i = i & (j >= 0)
-            if bound[1][0]: i = i & (k >= 0)
-            if bound[0][1]: i = i & (j <= n[-2]-1)
-            if bound[1][1]: i = i & (k <= n[-1]-1)
-        j = np.minimum(np.maximum(j, 0), n[-2]-1)
-        k = np.minimum(np.maximum(k, 0), n[-1]-1)
+        j = (x + 0.5).astype('i')
+        k = (y + 0.5).astype('i')
         f = f[...,j,k]
     elif method == 'linear':
-        j = np.array(xi, 'i')
-        k = np.array(yi, 'i')
-        if bound != None:
-            if bound[0][0]: i = i & (j >= 0)
-            if bound[1][0]: i = i & (k >= 0)
-            if bound[0][1]: i = i & (j <= n[-2]-2)
-            if bound[1][1]: i = i & (k <= n[-1]-2)
-        j = np.minimum(np.maximum(j, 0), n[-2]-2)
-        k = np.minimum(np.maximum(k, 0), n[-1]-2)
-        if not extrapolate:
-            xi = np.minimum(np.maximum(xi, 0), n[-2]-1)
-            yi = np.minimum(np.maximum(yi, 0), n[-1]-1)
-        f = ( (1.0 - xi + j) * (1.0 - yi + k) * f[...,j,k]
-            + (1.0 - xi + j) * (yi - k)       * f[...,j,k+1]
-            + (xi - j)       * (1.0 - yi + k) * f[...,j+1,k]
-            + (xi - j)       * (yi - k)       * f[...,j+1,k+1] )
+        j = np.minimum(x.astype('i'), nx - 2)
+        k = np.minimum(y.astype('i'), ny - 2)
+        f = ( (1.0 - x + j) * (1.0 - y + k) * f[...,j,k]
+            + (1.0 - x + j) * (y - k)       * f[...,j,k+1]
+            + (x - j)       * (1.0 - y + k) * f[...,j+1,k]
+            + (x - j)       * (y - k)       * f[...,j+1,k+1] )
     else:
-        sys.exit('Unknon interpolation method: %s' % method)
-    if out is None:
-        if i is not True:
-            f[...,~i] = np.nan
-        return f
+        raise Exception('Unknown interpolation method: %s' % method)
+    del(j, k, x, y)
+
+    # apply mask
+    if fi is None:
+        fi = f
+        if mask is not False:
+            fi[...,mask] = np.nan
     else:
         if mask_nan:
-            i = i & ~np.isnan(f)
-        if i is True:
-            out[...] = f[...]
+            mask = mask | np.isnan(f)
+        if mask is False:
+            fi[...] = f[...]
         else:
-            out[...,i] = f[...,i]
-        return
+            fi[...,~mask] = f[...,~mask]
+    return fi
 
 
-def interp3(extent, f, coords, out=None, method='linear', bound=None, mask_nan=False, extrapolate=False):
+def interp3(x, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     """
-    3D interpolation on a regular grid
+    3D piecewise interpolation of function values specified on regular grid.
+
+    See 1D interp for documentation.
     """
-    x0, x1 = np.array(extent).T
-    delta = (x1 - x0) / (np.array(f.shape[-3:]) - 1)
+    # prepare arrays
     f = np.asarray(f)
-    xi = (np.asarray(coords[0]) - x0[0]) / delta[0]
-    yi = (np.asarray(coords[1]) - x0[1]) / delta[1]
-    zi = (np.asarray(coords[2]) - x0[2]) / delta[2]
-    del(coords)
-    n = f.shape
-    i = True
+    xi = np.asarray(xi)
+
+    # test for empty data
+    if f.size == 0:
+        if fi is None:
+            fi = np.empty_like(xi)
+            fi.fill(np.nan)
+        return fi
+
+    # logical coordinates
+    nx, ny, nz = f.shape[-3:]
+    x_, y_, z_ = x
+    x, y, z = xi
+    del(xi)
+    x = (x - x_[0]) / (x_[1] - x_[0]) * (nx - 1)
+    y = (y - y_[0]) / (y_[1] - y_[0]) * (ny - 1)
+    z = (z - z_[0]) / (z_[1] - z_[0]) * (nz - 1)
+    x = np.minimum(np.maximum(x, 0), nx - 1)
+    y = np.minimum(np.maximum(y, 0), ny - 1)
+    z = np.minimum(np.maximum(z, 0), nz - 1)
+
+    # compute mask
+    mask = False
+    if type(bound) not in (tuple, list):
+        bound = [(bound, bound)] * 3
+    bx, by, bz = bound
+    if bx[0]: mask = mask | (x < 0)
+    if by[0]: mask = mask | (y < 0)
+    if bz[0]: mask = mask | (z < 0)
+    if bx[1]: mask = mask | (x > nx - 1)
+    if by[1]: mask = mask | (y > ny - 1)
+    if bz[1]: mask = mask | (z > nz - 1)
+
+    # interpolation
     if method == 'nearest':
-        j = np.array(xi + 0.5, 'i')
-        k = np.array(yi + 0.5, 'i')
-        l = np.array(zi + 0.5, 'i')
-        if bound is not None:
-            if bound[0][0]: i = i & (j >= 0)
-            if bound[1][0]: i = i & (k >= 0)
-            if bound[2][0]: i = i & (l >= 0)
-            if bound[0][1]: i = i & (j <= n[-3]-1)
-            if bound[1][1]: i = i & (k <= n[-2]-1)
-            if bound[2][1]: i = i & (l <= n[-1]-1)
-        j = np.minimum(np.maximum(j, 0), n[-3]-1)
-        k = np.minimum(np.maximum(k, 0), n[-2]-1)
-        l = np.minimum(np.maximum(l, 0), n[-1]-1)
+        j = (x + 0.5).astype('i')
+        k = (y + 0.5).astype('i')
+        l = (z + 0.5).astype('i')
         f = f[...,j,k,l]
     elif method == 'linear':
-        j = np.array(xi, 'i')
-        k = np.array(yi, 'i')
-        l = np.array(zi, 'i')
-        if bound != None:
-            if bound[0][0]: i = i & (j >= 0)
-            if bound[1][0]: i = i & (k >= 0)
-            if bound[2][0]: i = i & (l >= 0)
-            if bound[0][1]: i = i & (j <= n[-3]-2)
-            if bound[1][1]: i = i & (k <= n[-2]-2)
-            if bound[2][1]: i = i & (l <= n[-1]-2)
-        j = np.minimum(np.maximum(j, 0), n[-3]-2)
-        k = np.minimum(np.maximum(k, 0), n[-2]-2)
-        l = np.minimum(np.maximum(l, 0), n[-1]-2)
-        if not extrapolate:
-            xi = np.minimum(np.maximum(xi, 0), n[-3]-1)
-            yi = np.minimum(np.maximum(yi, 0), n[-2]-1)
-            zi = np.minimum(np.maximum(zi, 0), n[-1]-1)
-        f = ( (1.0 - xi + j) * (1.0 - yi + k) * (1.0 - zi + l) * f[...,j,k,l]
-            + (1.0 - xi + j) * (1.0 - yi + k) * (zi - l)       * f[...,j,k,l+1]
-            + (1.0 - xi + j) * (yi - k)       * (1.0 - zi + l) * f[...,j,k+1,l]
-            + (1.0 - xi + j) * (yi - k)       * (zi - l)       * f[...,j,k+1,l+1]
-            + (xi - j)       * (1.0 - yi + k) * (1.0 - zi + l) * f[...,j+1,k,l]
-            + (xi - j)       * (1.0 - yi + k) * (zi - l)       * f[...,j+1,k,l+1]
-            + (xi - j)       * (yi - k)       * (1.0 - zi + l) * f[...,j+1,k+1,l]
-            + (xi - j)       * (yi - k)       * (zi - l)       * f[...,j+1,k+1,l+1] )
+        j = np.minimum(x.astype('i'), nx - 2)
+        k = np.minimum(y.astype('i'), ny - 2)
+        l = np.minimum(z.astype('i'), nz - 2)
+        f = ( (1.0 - x + j) * (1.0 - y + k) * (1.0 - z + l) * f[...,j,k,l]
+            + (1.0 - x + j) * (1.0 - y + k) * (z - l)       * f[...,j,k,l+1]
+            + (1.0 - x + j) * (y - k)       * (1.0 - z + l) * f[...,j,k+1,l]
+            + (1.0 - x + j) * (y - k)       * (z - l)       * f[...,j,k+1,l+1]
+            + (x - j)       * (1.0 - y + k) * (1.0 - z + l) * f[...,j+1,k,l]
+            + (x - j)       * (1.0 - y + k) * (z - l)       * f[...,j+1,k,l+1]
+            + (x - j)       * (y - k)       * (1.0 - z + l) * f[...,j+1,k+1,l]
+            + (x - j)       * (y - k)       * (z - l)       * f[...,j+1,k+1,l+1] )
     else:
-        sys.exit('Unknon interpolation method: %s' % method)
-    if out is None:
-        if i is not True:
-            f[...,~i] = np.nan
-        return f
+        raise Exception('Unknown interpolation method: %s' % method)
+    del(j, k, l, x, y, z)
+
+    # apply mask
+    if fi is None:
+        fi = f
+        if mask is not False:
+            fi[...,mask] = np.nan
     else:
         if mask_nan:
-            i = i & ~np.isnan(f)
-        if i is True:
-            out[...] = f[...]
+            mask = mask | np.isnan(f)
+        if mask is False:
+            fi[...] = f[...]
         else:
-            out[...,i] = f[...,i]
-        return
+            fi[...,~mask] = f[...,~mask]
+    return fi
 
 
 def ibilinear(xx, yy, xi, yi):
@@ -211,16 +277,16 @@ def ibilinear(xx, yy, xi, yi):
     yy = np.asarray(yy)
     xi = np.asarray(xi) - 0.25 * xx.sum(0).sum(0)
     yi = np.asarray(yi) - 0.25 * yy.sum(0).sum(0)
-    j1 = 0.25 * np.array([[xx[1,:] - xx[0,:], xx[:,1] - xx[:,0]],
-                           [yy[1,:] - yy[0,:], yy[:,1] - yy[:,0]]]).sum(2)
-    j2 = 0.25 * np.array([xx[1,1] - xx[0,1] - xx[1,0] + xx[0,0],
-                             yy[1,1] - yy[0,1] - yy[1,0] + yy[0,0]])
+    j1 = 0.25 * np.array([ [xx[1,:] - xx[0,:], xx[:,1] - xx[:,0]],
+                           [yy[1,:] - yy[0,:], yy[:,1] - yy[:,0]] ]).sum(2)
+    j2 = 0.25 * np.array([ xx[1,1] - xx[0,1] - xx[1,0] + xx[0,0],
+                           yy[1,1] - yy[0,1] - yy[1,0] + yy[0,0] ])
     x = dx = solve2(j1, [xi, yi])
     i = 0
     while(abs(dx).max() > 1e-6):
         i += 1
         if i > 10:
-            sys.exit('inverse bilinear interpolation did not converge')
+            raise Exception('inverse bilinear interpolation did not converge')
         j = [ [j1[0,0] + j2[0]*x[1], j1[0,1] + j2[0]*x[0]],
               [j1[1,0] + j2[1]*x[1], j1[1,1] + j2[1]*x[0]] ]
         b = [ xi - j1[0,0]*x[0] - j1[0,1]*x[1] - j2[0]*x[0]*x[1],
@@ -383,7 +449,8 @@ class Transform():
     >>> proj(0, 0, inverse=True)
     array([-121. ,   34.5])
     """
-    def __init__(self, proj=None, origin=None, scale=1.0, rotate=0.0, translate=(0.0, 0.0), matrix=((1,0,0),(0,1,0),(0,0,1))):
+    def __init__(self, proj=None, origin=None, scale=1.0, rotate=0.0,
+        translate=(0.0, 0.0), matrix=((1,0,0),(0,1,0),(0,0,1))):
         phi = np.pi / 180.0 * rotate
         if origin == None:
             x, y = 0.0, 0.0
@@ -440,7 +507,7 @@ def cmu(x, y, inverse=False):
     return np.array([x, y])
 
 
-def slipvectors(strike, dip, rake):
+def slipvectors(strike, dip, rake, dtype=None):
     """
     For given strike, dip, and rake (degrees), using the Aki & Richards convention
     of dip to the right of the strike vector, find the rotation matrix R from world
@@ -451,19 +518,16 @@ def slipvectors(strike, dip, rake):
     space in world coordinates, that can be unpacked by:
     n_slip, n_rake, n_normal = coord.slipvectors(strike, dip, rake)
     """
-    strike = np.pi / 180.0 * np.asarray(strike)
-    dip    = np.pi / 180.0 * np.asarray(dip)
-    rake   = np.pi / 180.0 * np.asarray(rake)
-    u = np.ones(strike.shape)
-    z = np.zeros(strike.shape)
-    c = np.cos(rake)
-    s = np.sin(rake)
+
+    A = np.pi / 180.0 * np.asarray(rake)
+    B = np.pi / 180.0 * np.asarray(dip)
+    C = np.pi / 180.0 * np.asarray(strike)
+    u, z = np.ones_like(A), np.zeros_like(A)
+    c, s = np.cos(A), np.sin(A)
     A = np.array([[c, s, z], [-s, c, z], [z, z, u]])
-    c = np.cos(dip)
-    s = np.sin(dip)
+    c, s = np.cos(B), np.sin(B)
     B = np.array([[u, z, z], [z, c, s], [z, -s, c]])
-    c = np.cos(strike)
-    s = np.sin(strike)
+    c, s = np.cos(C), np.sin(C)
     C = np.array([[s, c, z], [-c, s, z], [z, z, u]])
     return dot2(dot2(A, B), C)
 
@@ -483,20 +547,20 @@ def source_tensors(R):
     The rows can unpacked conveniently by:
     T_strike, T_dip, T_normal = coord.slip_tensors(R)
     """
-    strike, dip, normal = R
+    stk, dip, nrm = R
     del(R)
-    strike = 0.5 * np.array([
-        strike[1] * normal[2] + normal[1] * strike[2],
-        strike[2] * normal[0] + normal[2] * strike[0],
-        strike[0] * normal[1] + normal[0] * strike[1],
+    stk = 0.5 * np.array([
+        stk[1] * nrm[2] + nrm[1] * stk[2],
+        stk[2] * nrm[0] + nrm[2] * stk[0],
+        stk[0] * nrm[1] + nrm[0] * stk[1],
     ])
     dip = 0.5 * np.array([
-        dip[1] * normal[2] + normal[1] * dip[2],
-        dip[2] * normal[0] + normal[2] * dip[0],
-        dip[0] * normal[1] + normal[0] * dip[1],
+        dip[1] * nrm[2] + nrm[1] * dip[2],
+        dip[2] * nrm[0] + nrm[2] * dip[0],
+        dip[0] * nrm[1] + nrm[0] * dip[1],
     ])
-    normal = normal * normal
-    return np.array([strike, dip, normal])
+    nrm = nrm * nrm
+    return np.array([stk, dip, nrm])
 
 
 def viewmatrix(azimuth, elevation, up=None):

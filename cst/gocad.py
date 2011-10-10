@@ -1,7 +1,7 @@
 """
 GOCAD (http://www.gocad.org) utilities
 """
-import os, sys
+import os
 import numpy as np
 
 def header(lines, counter=0, casters=None):
@@ -34,7 +34,7 @@ def header(lines, counter=0, casters=None):
                 header[k] = tuple(cast[k](x) for x in f)
             else:
                 header[k] = cast[k](v)
-    sys.exit('Error in header')
+    raise Exception('Error in header')
     return
 
 def voxet(path, load_props=[], alternate='', no_data_value=None):
