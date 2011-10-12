@@ -99,9 +99,9 @@ class srf():
             self.nt1 = np.empty(n, 'i')
             self.nt2 = np.empty(n, 'i')
             self.nt3 = np.empty(n, 'i')
-            self.sv1 = []
-            self.sv2 = []
-            self.sv3 = []
+            sv1 = []
+            sv2 = []
+            sv3 = []
             for i in range(n):
                 k = fh.next().split() + fh.next().split()
                 if len(k) != 15:
@@ -127,12 +127,12 @@ class srf():
                     sv += fh.next().split()
                 if len(sv) != n[-1]:
                     raise Exception('error reading %s %s' % (filename, i))
-                self.sv1 += [float(f) * u_cm for f in sv[:n[0]]]
-                self.sv2 += [float(f) * u_cm for f in sv[n[0]:n[1]]]
-                self.sv3 += [float(f) * u_cm for f in sv[n[1]:]]
-            self.sv1 = np.array(self.sv1, 'f')
-            self.sv2 = np.array(self.sv2, 'f')
-            self.sv3 = np.array(self.sv3, 'f')
+                sv1 += [float(f) * u_cm for f in sv[:n[0]]]
+                sv2 += [float(f) * u_cm for f in sv[n[0]:n[1]]]
+                sv3 += [float(f) * u_cm for f in sv[n[1]:]]
+            self.sv1 = sv1 = np.array(sv1, 'f')
+            self.sv2 = sv2 = np.array(sv2, 'f')
+            self.sv3 = sv3 = np.array(sv3, 'f')
 
         # useful meta data
         i = np.argmin(self.t0)
@@ -223,22 +223,72 @@ class srf():
         dbytes: 4 or 8
         """
 
-        # data types
+        # setup
         i_ = 'i%s' % dbytes
         f_ = 'f%s' % dbytes
-
-        # setup path
         path = os.path.expanduser(path) + os.sep
         os.mkdir(path)
 
         # time
-        t0 = self.t0.astype(f_)
-        dt = self.dt.astype(f_)
-        nt = np.array([self.nt1, self.nt2, self.nt3]).astype(i_)
-        ii = nt > 0
-        nt[ii].tofile(path + 'nt.bin')
-        dt[None].repeat(3,0)[ii].tofile(path + 'dt.bin')
-        t0[None].repeat(3,0)[ii].tofile(path + 't0.bin')
+        i1 = self.nt1 > 0
+        i2 = self.nt2 > 0
+        i3 = self.nt3 > 0
+        f1 = open(path + 'nt.bin', 'wb')
+        f2 = open(path + 'dt.bin', 'wb')
+        f3 = open(path + 't0.bin', 'wb')
+        with f1, f2, f3:
+            self.nt1[i1].astype(i_).tofile(f1)
+            self.nt2[i2].astype(i_).tofile(f1)
+            self.nt3[i3].astype(i_).tofile(f1)
+            for i in i1, i2, i3:
+                self.dt[i].astype(f_).tofile(f2)
+                self.t0[i].astype(f_).tofile(f3)
+
+        # coordinates
+        x = self.lon
+        y = self.lat
+        z = self.dep
+        if proj:
+            rot = coord.rotation(x, y, proj)[1]
+            x, y = proj(x, y)
+        else:
+            rot = 0.0
+        x = 1.0 + x / delta[0]
+        y = 1.0 + y / delta[1]
+        z = 1.0 + z / delta[2]
+        f1 = open(path + 'xi1.bin', 'wb')
+        f2 = open(path + 'xi2.bin', 'wb')
+        f3 = open(path + 'xi3.bin', 'wb')
+        with f1, f2, f3:
+            for i in i1, i2, i3:
+                x[i].astype(f_).tofile(f1)
+                y[i].astype(f_).tofile(f2)
+                z[i].astype(f_).tofile(f3)
+        del(x, y, z)
+
+        # fault local coordinate system
+        s1, s2, n = coord.slip_vectors(self.stk + rot, self.dip, self.rake)
+        p1 = self.area * coord.potency_tensor(n, s1)
+        p2 = self.area * coord.potency_tensor(n, s2)
+        p3 = self.area * coord.potency_tensor(n, n)
+        del(s1, s2, n)
+
+        # tensor components
+        f11 = open(path + 'w11.bin', 'wb')
+        f22 = open(path + 'w23.bin', 'wb')
+        f33 = open(path + 'w33.bin', 'wb')
+        f23 = open(path + 'w23.bin', 'wb')
+        f31 = open(path + 'w31.bin', 'wb')
+        f12 = open(path + 'w12.bin', 'wb')
+        with f11, f22, f33, f23, f31, f12:
+            for p, i in (p1, i1), (p2, i2), (p3, i3):
+                p[0,0,i].astype(f_).tofile(f11)
+                p[0,1,i].astype(f_).tofile(f22)
+                p[0,2,i].astype(f_).tofile(f33)
+                p[1,0,i].astype(f_).tofile(f23)
+                p[1,1,i].astype(f_).tofile(f31)
+                p[1,2,i].astype(f_).tofile(f12)
+        del(p1, p2, p3)
 
         # time history
         with open(path + 'history.bin', 'wb') as fh:
@@ -254,41 +304,10 @@ class srf():
             for n, d in zip(self.nt3, self.dt):
                 (self.sv3[i:i+n].cumsum() * d).astype(f_).tofile(fh)
                 i += n
-
-        # coordinates
-        x = self.lon
-        y = self.lat
-        z = self.dep
-        if proj:
-            rot = coord.rotation(x, y, proj)[1]
-            x, y = proj(x, y)
-        else:
-            rot = 0.0
-        x = (1.0 + x / delta[0]).astype(f_)
-        y = (1.0 + y / delta[1]).astype(f_)
-        z = (1.0 + z / delta[2]).astype(f_)
-        x[None].repeat(3,0)[ii].tofile(path + 'xi1.bin')
-        y[None].repeat(3,0)[ii].tofile(path + 'xi2.bin')
-        z[None].repeat(3,0)[ii].tofile(path + 'xi3.bin')
-
-        # strike, dip, and normal vectors
-        R = coord.slipvectors(self.stk + rot, self.dip, self.rake)
-
-        # tensor components
-        R = coord.source_tensors(R) * self.area
-        stk, dip, nrm = R.astype(f_)
-        w = np.zeros_like(stk)
-        w[0] = stk[0]; w[1] = dip[0]; w[ii].tofile(path + 'w23.bin')
-        w[0] = stk[1]; w[1] = dip[1]; w[ii].tofile(path + 'w31.bin')
-        w[0] = stk[2]; w[1] = dip[2]; w[ii].tofile(path + 'w12.bin')
-        w = np.zeros_like(nrm)
-        w[2] = nrm[0]; w[ii].tofile(path + 'w11.bin')
-        w[2] = nrm[1]; w[ii].tofile(path + 'w22.bin')
-        w[2] = nrm[2]; w[ii].tofile(path + 'w33.bin')
         return
 
 
-    def write_awp(self, filename, delta, dt, nt, proj=None, binary=True):
+    def write_awp(self, filename, delta, t, proj=None, binary=True):
         """
         Convert SRF to moment rate and write Olsen AWM input file.
 
@@ -297,8 +316,7 @@ class srf():
         Parameters
         ----------
         delta: grid step size (dx, dy, dz)
-        dt: time step length of the AWP simulation
-        nt: number of time steps in the AWP simulation
+        t: array of time 
         proj: Function to project lon/lat to logical model coordinates
         binary: If true, write AWP binary format, otherwise text format.
         """
@@ -314,17 +332,14 @@ class srf():
         jj = (x / delta[0] + 1.5).astype('i')
         kk = (y / delta[1] + 1.5).astype('i')
         ll = (z / delta[2] + 1.5).astype('i')
+        del(x, y, z)
 
         # moment tensor components
-        R = coord.slipvectors(self.stk + rot, self.dip, self.rake)
-        stk, dip, nrm = coord.source_tensors(R) * self.area
-        stk *= self.mu
-        dip *= self.mu
-        nrm *= self.lam
-
-        # time
-        t0 = self.t0
-        tt = dt * np.arange(nt)
+        s1, s2, n = coord.slip_vectors(self.stk + rot, self.dip, self.rake)
+        m1 = self.mu * self.area * coord.potency_tensor(n, s1)
+        m2 = self.mu * self.area * coord.potency_tensor(n, s2)
+        m3 = self.lam * self.area * coord.potency_tensor(n, n)
+        del(s1, s2, n)
 
         # write file
         i1 = 0
@@ -342,23 +357,23 @@ class srf():
                 t1 = self.t0[i], self.t0[i] + self.dt[i] * (n1 - 1)
                 t2 = self.t0[i], self.t0[i] + self.dt[i] * (n2 - 1)
                 t3 = self.t0[i], self.t0[i] + self.dt[i] * (n3 - 1)
-                s1 = coord.interp(t1, s1, tt, s(tt), bound=True)
-                s2 = coord.interp(t2, s2, tt, s(tt), bound=True)
-                s3 = coord.interp(t3, s3, tt, s(tt), bound=True)
+                s1 = coord.interp(t1, s1, t, s(t), bound=True)
+                s2 = coord.interp(t2, s2, t, s(t), bound=True)
+                s3 = coord.interp(t3, s3, t, s(t), bound=True)
                 ii = np.array([[jj[i], kk[i], ll[i]]], 'i')
-                sv = np.array([
-                    nrm[0,i] * s3,
-                    nrm[1,i] * s3,
-                    nrm[2,i] * s3,
-                    stk[0,i] * s1 + dip[0,i] * s2,
-                    stk[1,i] * s1 + dip[1,i] * s2,
-                    stk[2,i] * s1 + dip[2,i] * s2,
-                ], 'f')
+                mm = np.array([
+                    m1[0,0,i] * s1 + m2[0,0,i] * s2 + m3[0,0,i] * s3,
+                    m1[0,1,i] * s1 + m2[0,1,i] * s2 + m3[0,1,i] * s3,
+                    m1[0,2,i] * s1 + m2[0,2,i] * s2 + m3[0,2,i] * s3,
+                    m1[1,1,i] * s1 + m2[1,1,i] * s2 + m3[1,1,i] * s3,
+                    m1[1,0,i] * s1 + m2[1,0,i] * s2 + m3[1,0,i] * s3,
+                    m1[1,2,i] * s1 + m2[1,2,i] * s2 + m3[1,2,i] * s3,
+                ])
                 if binary:
-                    sv.tofile(fh)
+                    mm.astype('f').tofile(fh)
                 else:
                     np.savetxt(fh, ii, '%d')
-                    np.savetxt(fh, sv.T, '%14.6e')
+                    np.savetxt(fh, mm.T, '%14.6e')
                 i1 += n1
                 i2 += n2
                 i3 += n3

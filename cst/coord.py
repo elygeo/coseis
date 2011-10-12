@@ -499,16 +499,16 @@ def cmu(x, y, inverse=False):
     return np.array([x, y])
 
 
-def slipvectors(strike, dip, rake, dtype=None):
+def slip_vectors(strike, dip, rake, dtype=None):
     """
     For given strike, dip, and rake (degrees), using the Aki & Richards convention
     of dip to the right of the strike vector, find the rotation matrix R from world
-    coordinates (east, north, up) to fault local coordinates (slip, rake, normal).
+    coordinates (east, north, up) to fault local coordinates (slip1, slip2, normal).
     The transpose R^T performs the reverse rotation from fault local coordinates to
     world coordinates.  Columns of R are axis unit vectors of the world space in
     fault local coordinates.  Rows of R are axis unit vectors of the fault local
     space in world coordinates, that can be unpacked by:
-    n_slip, n_rake, n_normal = coord.slipvectors(strike, dip, rake)
+    n_slip1, n_slip2, n_normal = coord.slipvectors(strike, dip, rake)
     """
 
     A = np.pi / 180.0 * np.asarray(rake)
@@ -524,35 +524,17 @@ def slipvectors(strike, dip, rake, dtype=None):
     return dot2(dot2(A, B), C)
 
 
-def source_tensors(R):
+def potency_tensor(normal, slip):
     """
-    Given a rotation matrix R from world coordinates (east, north, up) to fault
-    local coordinates (slip, rake, normal), find tensor components that may be
-    scaled by moment or potency to compute moment tensors or potency tensors,
-    respectively.  Rows of R are axis unit vectors of the fault local space in
-    world coordinates.  R can be computed from strike, dip and rake angles with the
-    'slipvectors' routine.  The return value is a 3x3 matrix T specifying
-    contributions to the tensor W:
-    row 1 is the (shear)  strike contribution to W23, W31, W12
-    row 2 is the (shear)  dip    contribution to W23, W31, W12
-    row 3 is the (volume) normal contribution to W11, W22, W33
-    The rows can unpacked conveniently by:
-    T_strike, T_dip, T_normal = coord.slip_tensors(R)
+    Given a fault unit normal and a slip vector, return a symmetric potency tensor as
+    volume components (W11, W22, W33), and shear components (W23, W31, W12).
     """
-    stk, dip, nrm = R
-    del(R)
-    stk = 0.5 * np.array([
-        stk[1] * nrm[2] + nrm[1] * stk[2],
-        stk[2] * nrm[0] + nrm[2] * stk[0],
-        stk[0] * nrm[1] + nrm[0] * stk[1],
-    ])
-    dip = 0.5 * np.array([
-        dip[1] * nrm[2] + nrm[1] * dip[2],
-        dip[2] * nrm[0] + nrm[2] * dip[0],
-        dip[0] * nrm[1] + nrm[0] * dip[1],
-    ])
-    nrm = nrm * nrm
-    return np.array([stk, dip, nrm])
+    p = np.array([ normal * slip, [
+        0.5 * (normal[1] * slip[2] + slip[1] * normal[2]),
+        0.5 * (normal[2] * slip[0] + slip[2] * normal[0]),
+        0.5 * (normal[0] * slip[1] + slip[0] * normal[1]),
+    ]])
+    return p
 
 
 def viewmatrix(azimuth, elevation, up=None):
