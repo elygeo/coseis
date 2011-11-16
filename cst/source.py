@@ -237,7 +237,7 @@ class srf():
         util.save(path, self,
             expand=['plane'],
             prune_pattern='(^_)|(_$)',
-            header='# source parameters\n',
+            header='# source parameters\nfrom numpy import array, load, float32\n',
         )
         return
 

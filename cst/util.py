@@ -68,25 +68,32 @@ def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
     if expand is None:
         expand = []
     prune(d, prune_pattern, prune_types)
-    out = header + 'from numpy import array, load, float32\n'
     n = ext_threshold
     if n == None:
         n = np.get_printoptions()['threshold']
+    out = ''
+    has_array = False
     for k in sorted(d):
         if k not in expand and (keep is None or k in keep):
-            if type(d[k]) == np.ndarray and d[k].size > n:
-                f = os.path.dirname(fh.name)
-                if ext_raw:
-                    f = os.path.join(f, k + '.bin')
-                    d[k].tofile(f)
-                    m = k, k, d[k].dtype, d[k].shape
-                    out += "%s = memmap('%s.bin', %s, mode='c', shape=%s)\n" % m
-                else:
-                    f = os.path.join(f, k + '.npy')
-                    np.save(f, d[k])
-                    out += "%s = load('%s.npy', mmap_mode='c')\n" % (k, k)
+            if type(d[k]) == np.ndarray:
+                has_array = True
+                if d[k].size > n:
+                    f = os.path.dirname(fh.name)
+                    if ext_raw:
+                        f = os.path.join(f, k + '.bin')
+                        d[k].tofile(f)
+                        m = k, k, d[k].dtype, d[k].shape
+                        out += "%s = memmap('%s.bin', %s, mode='c', shape=%s)\n" % m
+                    else:
+                        f = os.path.join(f, k + '.npy')
+                        np.save(f, d[k])
+                        out += "%s = load('%s.npy', mmap_mode='c')\n" % (k, k)
             else:
                 out += '%s = %r\n' % (k, d[k])
+    if has_array:
+        out = header + 'from numpy import array, load, float32, memmap\n' + out
+    else:
+        out = header + out
     for k in expand:
         if k in d:
             if type(d[k]) is tuple:

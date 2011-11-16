@@ -227,7 +227,7 @@ def stage(dictargs={}, **kwargs):
     cwd = os.path.realpath(os.getcwd())
     os.chdir(job.rundir)
     delattr(pm, 'itbuff')
-    cst.util.save('parameters.py', pm, expand=['fieldio'], header='# model parameters\n')
+    cst.util.save('parameters.py', pm, expand=['fieldio'], header='# modelXX parameters\n')
     cst.util.save('conf.py', job, header = '# configuration\n')
 
     # metadata
