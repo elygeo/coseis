@@ -91,7 +91,7 @@ fortran_flags_default_ = {
         'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
         't': '-fbounds-check -ffpe-trap=invalid,zero,overflow',
         'p': '-O -pg',
-        'O': '-O3',
+        'O': '-O3 -fopenmp',
         '8': '-fdefault-real-8',
     },
     'ifort': {

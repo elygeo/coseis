@@ -14,6 +14,7 @@ if (any(i1 > i2)) return
 
 select case (iq)
 case (1)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -25,7 +26,9 @@ case (1)
     end do
     end do
     end do
+    !$omp end parallel do
 case (2)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -37,7 +40,9 @@ case (2)
     end do
     end do
     end do
+    !$omp end parallel do
 case (3)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -49,7 +54,9 @@ case (3)
     end do
     end do
     end do
+    !$omp end parallel do
 case (4)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -61,6 +68,7 @@ case (4)
     end do
     end do
     end do
+    !$omp end parallel do
 end select
 
 end subroutine
@@ -78,6 +86,7 @@ if (any(i1 > i2)) return
 
 select case (iq)
 case (1)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -89,7 +98,9 @@ case (1)
     end do
     end do
     end do
+    !$omp end parallel do
 case (2)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -101,7 +112,9 @@ case (2)
     end do
     end do
     end do
+    !$omp end parallel do
 case (3)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -113,7 +126,9 @@ case (3)
     end do
     end do
     end do
+    !$omp end parallel do
 case (4)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -125,6 +140,7 @@ case (4)
     end do
     end do
     end do
+    !$omp end parallel do
 end select
 
 end subroutine

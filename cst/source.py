@@ -23,6 +23,17 @@ def magarea(A):
     return Mw
 
 
+def mw(moment, units='mks'):
+    """
+    Moment magnitude
+    """
+    if units=='mks':
+        m = (np.log10(moment) - 9.05) / 1.5
+    else:
+        m = (np.log10(moment) - 16.05) / 1.5
+    return m
+
+
 def _open(fh, mode='r'):
     """
     Open a regular or compressed file if not already opened.
@@ -75,6 +86,7 @@ class srf():
                     }
                     x, y = seg['length']
                     j, k = seg['shape']
+                    seg['area'] = x * y
                     seg['delta'] = x / j, y / k
                     self.plane += [seg]
                 k = fh.next().split()
@@ -135,14 +147,18 @@ class srf():
             self.sv3 = sv3 = np.array(sv3, 'f')
 
         # useful meta data
+        i1 = (self.nt1 > 0).sum()
+        i2 = (self.nt2 > 0).sum()
+        i3 = (self.nt3 > 0).sum()
+        self.nsource_nonzero = i1 + i2 + i3
         i = np.argmin(self.t0)
         self.hypocenter = self.lon.flat[i], self.lat.flat[i], self.dep.flat[i]
-        self.nsource_nonzero = (self.nt1>0).sum() + (self.nt2>0).sum() + (self.nt3>0).sum()
+        self.area_total = self.area.sum()
         self.potency = np.sqrt(
             (self.area * self.slip1).sum() ** 2 +
             (self.area * self.slip2).sum() ** 2 +
             (self.area * self.slip3).sum() ** 2)
-        self.slip = self.potency / self.area.sum()
+        self.displacement = self.potency / self.area_total
         return
 
 
@@ -177,6 +193,9 @@ class srf():
 
             # data block
             fh.write(('POINTS %s\n' % self.nsource))
+            i1 = 0
+            i2 = 0
+            i3 = 0
             for i in range(self.nsource):
                 fh.write('%s %s %s %s %s %s %s %s\n%s %s %s %s %s %s %s\n' % (
                     self.lon[i],
@@ -195,7 +214,19 @@ class srf():
                     self.slip3[i] * u_cm,
                     self.nt3[i],
                 ))
-            fh.write('XXX FIXME: not implemented')
+                n1 = self.nt1[i]
+                n2 = self.nt2[i]
+                n3 = self.nt3[i]
+                s1 = self.sv1[i1:i1+n1] * u_cm
+                s2 = self.sv2[i2:i2+n2] * u_cm
+                s3 = self.sv3[i3:i3+n3] * u_cm
+                s = np.concatenate([s1, s2, s3])
+                i = s.size // 6 * 6
+                np.savetxt(fh, s[:i].reshape([-1,6]), '%13.5e', '')
+                np.savetxt(fh, s[i:].reshape([1,-1]), '%13.5e', '')
+                i1 += n1
+                i2 += n2
+                i3 += n3
         return
 
 
@@ -291,35 +322,45 @@ class srf():
         del(p1, p2, p3)
 
         # time history
-        with open(path + 'history.bin', 'wb') as fh:
-            i = 0
-            for n, d in zip(self.nt1, self.dt):
-                (self.sv1[i:i+n].cumsum() * d).astype(f_).tofile(fh)
-                i += n
-            i = 0
-            for n, d in zip(self.nt2, self.dt):
-                (self.sv2[i:i+n].cumsum() * d).astype(f_).tofile(fh)
-                i += n
-            i = 0
-            for n, d in zip(self.nt3, self.dt):
-                (self.sv3[i:i+n].cumsum() * d).astype(f_).tofile(fh)
-                i += n
+        i1 = 0
+        i2 = 0
+        i3 = 0
+        fh = open(path + 'history.bin', 'wb')
+        with fh:
+            for i in range(self.nsource):
+                n = self.nt1[i]
+                s = self.sv1[i1:i1+n].cumsum() * self.dt[i]
+                s.astype(f_).tofile(fh)
+                i1 += n
+            for i in range(self.nsource):
+                n = self.nt2[i]
+                s = self.sv2[i2:i2+n].cumsum() * self.dt[i]
+                s.astype(f_).tofile(fh)
+                i2 += n
+            for i in range(self.nsource):
+                n = self.nt3[i]
+                s = self.sv3[i3:i3+n].cumsum() * self.dt[i]
+                s.astype(f_).tofile(fh)
+                i3 += n
         return
 
 
-    def write_awp(self, filename, delta, t, proj=None, binary=True):
+    def write_awp(self, filename, t, mu, lam=0.0, delta=1.0, proj=None,
+        binary=True, interp='linear'):
         """
-        Convert SRF to moment rate and write Olsen AWM input file.
-
-        Note: must provide elastic moduli mu and lam as attributes of the srf object.
+        Write ODC-AWP moment rate input file.
 
         Parameters
         ----------
         delta: grid step size (dx, dy, dz)
-        t: array of time 
+        t: array of time
+        mu, lam: elastic moduli
         proj: Function to project lon/lat to logical model coordinates
         binary: If true, write AWP binary format, otherwise text format.
         """
+        if type(delta) not in (tuple, list):
+            delta = delta, delta, delta
+
         # coordinates
         x = self.lon
         y = self.lat
@@ -336,9 +377,9 @@ class srf():
 
         # moment tensor components
         s1, s2, n = coord.slip_vectors(self.stk + rot, self.dip, self.rake)
-        m1 = self.mu * self.area * coord.potency_tensor(n, s1)
-        m2 = self.mu * self.area * coord.potency_tensor(n, s2)
-        m3 = self.lam * self.area * coord.potency_tensor(n, n)
+        m1 = mu * self.area * coord.potency_tensor(n, s1) * 2.0
+        m2 = mu * self.area * coord.potency_tensor(n, s2) * 2.0
+        m3 = lam * self.area * coord.potency_tensor(n, n) * 2.0
         del(s1, s2, n)
 
         # write file
@@ -357,9 +398,9 @@ class srf():
                 t1 = self.t0[i], self.t0[i] + self.dt[i] * (n1 - 1)
                 t2 = self.t0[i], self.t0[i] + self.dt[i] * (n2 - 1)
                 t3 = self.t0[i], self.t0[i] + self.dt[i] * (n3 - 1)
-                s1 = coord.interp(t1, s1, t, s(t), bound=True)
-                s2 = coord.interp(t2, s2, t, s(t), bound=True)
-                s3 = coord.interp(t3, s3, t, s(t), bound=True)
+                s1 = coord.interp(t1, s1, t, s(t), interp, bound=True)
+                s2 = coord.interp(t2, s2, t, s(t), interp, bound=True)
+                s3 = coord.interp(t3, s3, t, s(t), interp, bound=True)
                 ii = np.array([[jj[i], kk[i], ll[i]]], 'i')
                 mm = np.array([
                     m1[0,0,i] * s1 + m2[0,0,i] * s2 + m3[0,0,i] * s3,

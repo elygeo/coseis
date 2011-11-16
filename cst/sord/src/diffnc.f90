@@ -17,6 +17,7 @@ select case (oplevel)
 
 ! saved b matrix, flops: 8* 7+
 case (6)
+!$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
@@ -28,12 +29,14 @@ do j = i1(1), i2(1)
 end do
 end do
 end do
+!$omp end parallel do
 
 ! constant grid, flops: 1* 7+
 case (1)
 select case (a)
 case (1)
     h = sign(0.25 * dx(2) * dx(3), dx(1))
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -45,8 +48,10 @@ case (1)
     end do
     end do
     end do
+    !$omp end parallel do
 case (2)
     h = sign(0.25 * dx(3) * dx(1), dx(2))
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -58,8 +63,10 @@ case (2)
     end do
     end do
     end do
+    !$omp end parallel do
 case (3)
     h = sign(0.25 * dx(1) * dx(2), dx(3))
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -71,6 +78,7 @@ case (3)
     end do
     end do
     end do
+    !$omp end parallel do
 end select
 
 ! rectangular grid, flops: 2* 7+
@@ -78,6 +86,7 @@ case (2)
 h = sign(0.25, product(dx))
 select case (a)
 case (1)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -89,7 +98,9 @@ case (1)
     end do
     end do
     end do
+    !$omp end parallel do
 case (2)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -101,7 +112,9 @@ case (2)
     end do
     end do
     end do
+    !$omp end parallel do
 case (3)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -113,6 +126,7 @@ case (3)
     end do
     end do
     end do
+    !$omp end parallel do
 end select
 
 ! parallelepiped grid, flops: 17* 27+
@@ -120,6 +134,7 @@ case (3)
 h = sign(0.25, product(dx))
 b = modulo(a, 3) + 1
 c = modulo(a + 1, 3) + 1
+!$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
@@ -147,12 +162,14 @@ do j = i1(1), i2(1)
 end do
 end do
 end do
+!$omp end parallel do
 
 ! general grid one-point quadrature, flops: 17* 63+
 case (4)
 h = sign(0.0625, product(dx))
 b = modulo(a, 3) + 1
 c = modulo(a + 1, 3) + 1
+!$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
@@ -180,47 +197,49 @@ df(j,k,l) = h * &
 end do
 end do
 end do
+!$omp end parallel do
 
 ! general grid exact, flops: 57* 119+
 case (5)
 h = sign(1.0 / 12.0, product(dx))
 b = modulo(a, 3) + 1
 c = modulo(a + 1, 3) + 1
+!$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
 b1 = &
-( (x(j+1,k,l,b)-x(j,k+1,l+1,b))*(x(j+1,k+1,l,c)-x(j+1,k,l+1,c))+x(j,k+1,l+1,b)*(x(j,k,l+1,c)-x(j,k+1,l,c)) &
-+ (x(j,k+1,l,b)-x(j+1,k,l+1,b))*(x(j,k+1,l+1,c)-x(j+1,k+1,l,c))+x(j+1,k,l+1,b)*(x(j+1,k,l,c)-x(j,k,l+1,c)) &
-+ (x(j,k,l+1,b)-x(j+1,k+1,l,b))*(x(j+1,k,l+1,c)-x(j,k+1,l+1,c))+x(j+1,k+1,l,b)*(x(j,k+1,l,c)-x(j+1,k,l,c)) )
+( (x(j+1,k,l,b) - x(j,k+1,l+1,b)) * (x(j+1,k+1,l,c) - x(j+1,k,l+1,c)) + x(j,k+1,l+1,b) * (x(j,k,l+1,c) - x(j,k+1,l,c)) &
++ (x(j,k+1,l,b) - x(j+1,k,l+1,b)) * (x(j,k+1,l+1,c) - x(j+1,k+1,l,c)) + x(j+1,k,l+1,b) * (x(j+1,k,l,c) - x(j,k,l+1,c)) &
++ (x(j,k,l+1,b) - x(j+1,k+1,l,b)) * (x(j+1,k,l+1,c) - x(j,k+1,l+1,c)) + x(j+1,k+1,l,b) * (x(j,k+1,l,c) - x(j+1,k,l,c)) )
 b2 = &
-( (x(j+1,k+1,l+1,b)-x(j,k,l,b))*(x(j+1,k,l+1,c)-x(j+1,k+1,l,c))+x(j,k,l,b)*(x(j,k+1,l,c)-x(j,k,l+1,c)) &
-+ (x(j,k+1,l,b)-x(j+1,k,l+1,b))*(x(j+1,k+1,l,c)-x(j,k,l,c))+x(j+1,k,l+1,b)*(x(j,k,l+1,c)-x(j+1,k+1,l+1,c)) &
-+ (x(j,k,l+1,b)-x(j+1,k+1,l,b))*(x(j,k,l,c)-x(j+1,k,l+1,c))+x(j+1,k+1,l,b)*(x(j+1,k+1,l+1,c)-x(j,k+1,l,c)) )
+( (x(j+1,k+1,l+1,b) - x(j,k,l,b)) * (x(j+1,k,l+1,c) - x(j+1,k+1,l,c))+x(j,k,l,b) * (x(j,k+1,l,c) - x(j,k,l+1,c)) &
++ (x(j,k+1,l,b) - x(j+1,k,l+1,b)) * (x(j+1,k+1,l,c) - x(j,k,l,c)) + x(j+1,k,l+1,b) * (x(j,k,l+1,c) - x(j+1,k+1,l+1,c)) &
++ (x(j,k,l+1,b) - x(j+1,k+1,l,b)) * (x(j,k,l,c) - x(j+1,k,l+1,c)) + x(j+1,k+1,l,b) * (x(j+1,k+1,l+1,c) - x(j,k+1,l,c)) )
 b3 = &
-( (x(j+1,k+1,l+1,b)-x(j,k,l,b))*(x(j+1,k+1,l,c)-x(j,k+1,l+1,c))+x(j,k,l,b)*(x(j,k,l+1,c)-x(j+1,k,l,c)) &
-+ (x(j+1,k,l,b)-x(j,k+1,l+1,b))*(x(j,k,l,c)-x(j+1,k+1,l,c))+x(j,k+1,l+1,b)*(x(j+1,k+1,l+1,c)-x(j,k,l+1,c)) &
-+ (x(j,k,l+1,b)-x(j+1,k+1,l,b))*(x(j,k+1,l+1,c)-x(j,k,l,c))+x(j+1,k+1,l,b)*(x(j+1,k,l,c)-x(j+1,k+1,l+1,c)) )
+( (x(j+1,k+1,l+1,b) - x(j,k,l,b)) * (x(j+1,k+1,l,c) - x(j,k+1,l+1,c))+x(j,k,l,b) * (x(j,k,l+1,c) - x(j+1,k,l,c)) &
++ (x(j+1,k,l,b) - x(j,k+1,l+1,b)) * (x(j,k,l,c) - x(j+1,k+1,l,c)) + x(j,k+1,l+1,b) * (x(j+1,k+1,l+1,c) - x(j,k,l+1,c)) &
++ (x(j,k,l+1,b) - x(j+1,k+1,l,b)) * (x(j,k+1,l+1,c) - x(j,k,l,c)) + x(j+1,k+1,l,b) * (x(j+1,k,l,c) - x(j+1,k+1,l+1,c)) )
 b4 = &
-( (x(j+1,k+1,l+1,b)-x(j,k,l,b))*(x(j,k+1,l+1,c)-x(j+1,k,l+1,c))+x(j,k,l,b)*(x(j+1,k,l,c)-x(j,k+1,l,c)) &
-+ (x(j+1,k,l,b)-x(j,k+1,l+1,b))*(x(j+1,k,l+1,c)-x(j,k,l,c))+x(j,k+1,l+1,b)*(x(j,k+1,l,c)-x(j+1,k+1,l+1,c)) &
-+ (x(j,k+1,l,b)-x(j+1,k,l+1,b))*(x(j,k,l,c)-x(j,k+1,l+1,c))+x(j+1,k,l+1,b)*(x(j+1,k+1,l+1,c)-x(j+1,k,l,c)) )
+( (x(j+1,k+1,l+1,b) - x(j,k,l,b)) * (x(j,k+1,l+1,c) - x(j+1,k,l+1,c)) + x(j,k,l,b) * (x(j+1,k,l,c) - x(j,k+1,l,c)) &
++ (x(j+1,k,l,b) - x(j,k+1,l+1,b)) * (x(j+1,k,l+1,c) - x(j,k,l,c)) + x(j,k+1,l+1,b) * (x(j,k+1,l,c) - x(j+1,k+1,l+1,c)) &
++ (x(j,k+1,l,b) - x(j+1,k,l+1,b)) * (x(j,k,l,c) - x(j,k+1,l+1,c)) + x(j+1,k,l+1,b) * (x(j+1,k+1,l+1,c) - x(j+1,k,l,c)) )
 b5 = &
-( (x(j,k+1,l+1,b)-x(j+1,k,l,b))*(x(j,k+1,l,c)-x(j,k,l+1,c))+x(j+1,k,l,b)*(x(j+1,k,l+1,c)-x(j+1,k+1,l,c)) &
-+ (x(j+1,k,l+1,b)-x(j,k+1,l,b))*(x(j,k,l+1,c)-x(j+1,k,l,c))+x(j,k+1,l,b)*(x(j+1,k+1,l,c)-x(j,k+1,l+1,c)) &
-+ (x(j+1,k+1,l,b)-x(j,k,l+1,b))*(x(j+1,k,l,c)-x(j,k+1,l,c))+x(j,k,l+1,b)*(x(j,k+1,l+1,c)-x(j+1,k,l+1,c)) )
+( (x(j,k+1,l+1,b) - x(j+1,k,l,b)) * (x(j,k+1,l,c) - x(j,k,l+1,c)) + x(j+1,k,l,b) * (x(j+1,k,l+1,c) - x(j+1,k+1,l,c)) &
++ (x(j+1,k,l+1,b) - x(j,k+1,l,b)) * (x(j,k,l+1,c) - x(j+1,k,l,c)) + x(j,k+1,l,b) * (x(j+1,k+1,l,c) - x(j,k+1,l+1,c)) &
++ (x(j+1,k+1,l,b) - x(j,k,l+1,b)) * (x(j+1,k,l,c) - x(j,k+1,l,c)) + x(j,k,l+1,b) * (x(j,k+1,l+1,c) - x(j+1,k,l+1,c)) )
 b6 = &
-( (x(j,k,l,b)-x(j+1,k+1,l+1,b))*(x(j,k,l+1,c)-x(j,k+1,l,c))+x(j+1,k+1,l+1,b)*(x(j+1,k+1,l,c)-x(j+1,k,l+1,c)) &
-+ (x(j+1,k,l+1,b)-x(j,k+1,l,b))*(x(j+1,k+1,l+1,c)-x(j,k,l+1,c))+x(j,k+1,l,b)*(x(j,k,l,c)-x(j+1,k+1,l,c)) &
-+ (x(j+1,k+1,l,b)-x(j,k,l+1,b))*(x(j,k+1,l,c)-x(j+1,k+1,l+1,c))+x(j,k,l+1,b)*(x(j+1,k,l+1,c)-x(j,k,l,c)) )
+( (x(j,k,l,b) - x(j+1,k+1,l+1,b)) * (x(j,k,l+1,c) - x(j,k+1,l,c)) + x(j+1,k+1,l+1,b) * (x(j+1,k+1,l,c) - x(j+1,k,l+1,c)) &
++ (x(j+1,k,l+1,b) - x(j,k+1,l,b)) * (x(j+1,k+1,l+1,c) - x(j,k,l+1,c)) + x(j,k+1,l,b) * (x(j,k,l,c) - x(j+1,k+1,l,c)) &
++ (x(j+1,k+1,l,b) - x(j,k,l+1,b)) * (x(j,k+1,l,c) - x(j+1,k+1,l+1,c)) + x(j,k,l+1,b) * (x(j+1,k,l+1,c) - x(j,k,l,c)) )
 b7 = &
-( (x(j,k,l,b)-x(j+1,k+1,l+1,b))*(x(j+1,k,l,c)-x(j,k,l+1,c))+x(j+1,k+1,l+1,b)*(x(j,k+1,l+1,c)-x(j+1,k+1,l,c)) &
-+ (x(j,k+1,l+1,b)-x(j+1,k,l,b))*(x(j,k,l+1,c)-x(j+1,k+1,l+1,c))+x(j+1,k,l,b)*(x(j+1,k+1,l,c)-x(j,k,l,c)) &
-+ (x(j+1,k+1,l,b)-x(j,k,l+1,b))*(x(j+1,k+1,l+1,c)-x(j+1,k,l,c))+x(j,k,l+1,b)*(x(j,k,l,c)-x(j,k+1,l+1,c)) )
+( (x(j,k,l,b) - x(j+1,k+1,l+1,b)) * (x(j+1,k,l,c) - x(j,k,l+1,c)) + x(j+1,k+1,l+1,b) * (x(j,k+1,l+1,c) - x(j+1,k+1,l,c)) &
++ (x(j,k+1,l+1,b) - x(j+1,k,l,b)) * (x(j,k,l+1,c) - x(j+1,k+1,l+1,c)) + x(j+1,k,l,b) * (x(j+1,k+1,l,c) - x(j,k,l,c)) &
++ (x(j+1,k+1,l,b) - x(j,k,l+1,b)) * (x(j+1,k+1,l+1,c) - x(j+1,k,l,c)) + x(j,k,l+1,b) * (x(j,k,l,c) - x(j,k+1,l+1,c)) )
 b8 = &
-( (x(j,k,l,b)-x(j+1,k+1,l+1,b))*(x(j,k+1,l,c)-x(j+1,k,l,c))+x(j+1,k+1,l+1,b)*(x(j+1,k,l+1,c)-x(j,k+1,l+1,c)) &
-+ (x(j,k+1,l+1,b)-x(j+1,k,l,b))*(x(j+1,k+1,l+1,c)-x(j,k+1,l,c))+x(j+1,k,l,b)*(x(j,k,l,c)-x(j+1,k,l+1,c)) &
-+ (x(j+1,k,l+1,b)-x(j,k+1,l,b))*(x(j+1,k,l,c)-x(j+1,k+1,l+1,c))+x(j,k+1,l,b)*(x(j,k+1,l+1,c)-x(j,k,l,c)) )
+( (x(j,k,l,b) - x(j+1,k+1,l+1,b)) * (x(j,k+1,l,c) - x(j+1,k,l,c)) + x(j+1,k+1,l+1,b) * (x(j+1,k,l+1,c) - x(j,k+1,l+1,c)) &
++ (x(j,k+1,l+1,b) - x(j+1,k,l,b)) * (x(j+1,k+1,l+1,c) - x(j,k+1,l,c)) + x(j+1,k,l,b) * (x(j,k,l,c) - x(j+1,k,l+1,c)) &
++ (x(j+1,k,l+1,b) - x(j,k+1,l,b)) * (x(j+1,k,l,c) - x(j+1,k+1,l+1,c)) + x(j,k+1,l,b) * (x(j,k+1,l+1,c) - x(j,k,l,c)) )
 df(j,k,l) = h * &
 ( b1 * f(j+1,k+1,l+1,i) + f(j,k,l,i) * b5 &
 + b2 * f(j+1,k,l,i) + f(j,k+1,l+1,i) * b6 &
@@ -229,6 +248,7 @@ df(j,k,l) = h * &
 end do
 end do
 end do
+!$omp end parallel do
 
 case default; stop 'illegal operator'
 

@@ -220,37 +220,37 @@ case (6)
     do k = 1, nm(2)-1
     do j = 1, nm(1)-1
     bb(j,k,l,1,i) = h * &
-        ((w1(j+1,k,l,b)-w1(j,k+1,l+1,b))*(w1(j+1,k+1,l,c)-w1(j+1,k,l+1,c))+w1(j,k+1,l+1,b)*(w1(j,k,l+1,c)-w1(j,k+1,l,c)) &
-        +(w1(j,k+1,l,b)-w1(j+1,k,l+1,b))*(w1(j,k+1,l+1,c)-w1(j+1,k+1,l,c))+w1(j+1,k,l+1,b)*(w1(j+1,k,l,c)-w1(j,k,l+1,c)) &
-        +(w1(j,k,l+1,b)-w1(j+1,k+1,l,b))*(w1(j+1,k,l+1,c)-w1(j,k+1,l+1,c))+w1(j+1,k+1,l,b)*(w1(j,k+1,l,c)-w1(j+1,k,l,c)))
+    ( (w1(j+1,k,l,b) - w1(j,k+1,l+1,b)) * (w1(j+1,k+1,l,c) - w1(j+1,k,l+1,c)) + w1(j,k+1,l+1,b) * (w1(j,k,l+1,c) - w1(j,k+1,l,c)) &
+    + (w1(j,k+1,l,b) - w1(j+1,k,l+1,b)) * (w1(j,k+1,l+1,c) - w1(j+1,k+1,l,c)) + w1(j+1,k,l+1,b) * (w1(j+1,k,l,c) - w1(j,k,l+1,c)) &
+    + (w1(j,k,l+1,b) - w1(j+1,k+1,l,b)) * (w1(j+1,k,l+1,c) - w1(j,k+1,l+1,c)) + w1(j+1,k+1,l,b) * (w1(j,k+1,l,c) - w1(j+1,k,l,c)) )
     bb(j,k,l,2,i) = h * &
-        ((w1(j+1,k+1,l+1,b)-w1(j,k,l,b))*(w1(j+1,k,l+1,c)-w1(j+1,k+1,l,c))+w1(j,k,l,b)*(w1(j,k+1,l,c)-w1(j,k,l+1,c)) &
-        +(w1(j,k+1,l,b)-w1(j+1,k,l+1,b))*(w1(j+1,k+1,l,c)-w1(j,k,l,c))+w1(j+1,k,l+1,b)*(w1(j,k,l+1,c)-w1(j+1,k+1,l+1,c)) &
-        +(w1(j,k,l+1,b)-w1(j+1,k+1,l,b))*(w1(j,k,l,c)-w1(j+1,k,l+1,c))+w1(j+1,k+1,l,b)*(w1(j+1,k+1,l+1,c)-w1(j,k+1,l,c)))
+    ( (w1(j+1,k+1,l+1,b) - w1(j,k,l,b)) * (w1(j+1,k,l+1,c) - w1(j+1,k+1,l,c)) + w1(j,k,l,b) * (w1(j,k+1,l,c) - w1(j,k,l+1,c)) &
+    + (w1(j,k+1,l,b) - w1(j+1,k,l+1,b)) * (w1(j+1,k+1,l,c) - w1(j,k,l,c)) + w1(j+1,k,l+1,b) * (w1(j,k,l+1,c) - w1(j+1,k+1,l+1,c)) &
+    + (w1(j,k,l+1,b) - w1(j+1,k+1,l,b)) * (w1(j,k,l,c) - w1(j+1,k,l+1,c)) + w1(j+1,k+1,l,b) * (w1(j+1,k+1,l+1,c) - w1(j,k+1,l,c)) )
     bb(j,k,l,3,i) = h * &
-        ((w1(j+1,k+1,l+1,b)-w1(j,k,l,b))*(w1(j+1,k+1,l,c)-w1(j,k+1,l+1,c))+w1(j,k,l,b)*(w1(j,k,l+1,c)-w1(j+1,k,l,c)) &
-        +(w1(j+1,k,l,b)-w1(j,k+1,l+1,b))*(w1(j,k,l,c)-w1(j+1,k+1,l,c))+w1(j,k+1,l+1,b)*(w1(j+1,k+1,l+1,c)-w1(j,k,l+1,c)) &
-        +(w1(j,k,l+1,b)-w1(j+1,k+1,l,b))*(w1(j,k+1,l+1,c)-w1(j,k,l,c))+w1(j+1,k+1,l,b)*(w1(j+1,k,l,c)-w1(j+1,k+1,l+1,c)))
+    ( (w1(j+1,k+1,l+1,b) - w1(j,k,l,b)) * (w1(j+1,k+1,l,c) - w1(j,k+1,l+1,c)) + w1(j,k,l,b) * (w1(j,k,l+1,c) - w1(j+1,k,l,c)) &
+    + (w1(j+1,k,l,b) - w1(j,k+1,l+1,b)) * (w1(j,k,l,c) - w1(j+1,k+1,l,c)) + w1(j,k+1,l+1,b) * (w1(j+1,k+1,l+1,c) - w1(j,k,l+1,c)) &
+    + (w1(j,k,l+1,b) - w1(j+1,k+1,l,b)) * (w1(j,k+1,l+1,c) - w1(j,k,l,c)) + w1(j+1,k+1,l,b) * (w1(j+1,k,l,c) - w1(j+1,k+1,l+1,c)) )
     bb(j,k,l,4,i) = h * &
-        ((w1(j+1,k+1,l+1,b)-w1(j,k,l,b))*(w1(j,k+1,l+1,c)-w1(j+1,k,l+1,c))+w1(j,k,l,b)*(w1(j+1,k,l,c)-w1(j,k+1,l,c)) &
-        +(w1(j+1,k,l,b)-w1(j,k+1,l+1,b))*(w1(j+1,k,l+1,c)-w1(j,k,l,c))+w1(j,k+1,l+1,b)*(w1(j,k+1,l,c)-w1(j+1,k+1,l+1,c)) &
-        +(w1(j,k+1,l,b)-w1(j+1,k,l+1,b))*(w1(j,k,l,c)-w1(j,k+1,l+1,c))+w1(j+1,k,l+1,b)*(w1(j+1,k+1,l+1,c)-w1(j+1,k,l,c)))
+    ( (w1(j+1,k+1,l+1,b) - w1(j,k,l,b)) * (w1(j,k+1,l+1,c) - w1(j+1,k,l+1,c)) + w1(j,k,l,b) * (w1(j+1,k,l,c) - w1(j,k+1,l,c)) &
+    + (w1(j+1,k,l,b) - w1(j,k+1,l+1,b)) * (w1(j+1,k,l+1,c) - w1(j,k,l,c)) + w1(j,k+1,l+1,b) * (w1(j,k+1,l,c) - w1(j+1,k+1,l+1,c)) &
+    + (w1(j,k+1,l,b) - w1(j+1,k,l+1,b)) * (w1(j,k,l,c) - w1(j,k+1,l+1,c)) + w1(j+1,k,l+1,b) * (w1(j+1,k+1,l+1,c) - w1(j+1,k,l,c)) )
     bb(j,k,l,5,i) = h * &
-        ((w1(j,k+1,l+1,b)-w1(j+1,k,l,b))*(w1(j,k+1,l,c)-w1(j,k,l+1,c))+w1(j+1,k,l,b)*(w1(j+1,k,l+1,c)-w1(j+1,k+1,l,c)) &
-        +(w1(j+1,k,l+1,b)-w1(j,k+1,l,b))*(w1(j,k,l+1,c)-w1(j+1,k,l,c))+w1(j,k+1,l,b)*(w1(j+1,k+1,l,c)-w1(j,k+1,l+1,c)) &
-        +(w1(j+1,k+1,l,b)-w1(j,k,l+1,b))*(w1(j+1,k,l,c)-w1(j,k+1,l,c))+w1(j,k,l+1,b)*(w1(j,k+1,l+1,c)-w1(j+1,k,l+1,c)))
+    ( (w1(j,k+1,l+1,b) - w1(j+1,k,l,b)) * (w1(j,k+1,l,c) - w1(j,k,l+1,c)) + w1(j+1,k,l,b) * (w1(j+1,k,l+1,c) - w1(j+1,k+1,l,c)) &
+    + (w1(j+1,k,l+1,b) - w1(j,k+1,l,b)) * (w1(j,k,l+1,c) - w1(j+1,k,l,c)) + w1(j,k+1,l,b) * (w1(j+1,k+1,l,c) - w1(j,k+1,l+1,c)) &
+    + (w1(j+1,k+1,l,b) - w1(j,k,l+1,b)) * (w1(j+1,k,l,c) - w1(j,k+1,l,c)) + w1(j,k,l+1,b) * (w1(j,k+1,l+1,c) - w1(j+1,k,l+1,c)) )
     bb(j,k,l,6,i) = h * &
-        ((w1(j,k,l,b)-w1(j+1,k+1,l+1,b))*(w1(j,k,l+1,c)-w1(j,k+1,l,c))+w1(j+1,k+1,l+1,b)*(w1(j+1,k+1,l,c)-w1(j+1,k,l+1,c)) &
-        +(w1(j+1,k,l+1,b)-w1(j,k+1,l,b))*(w1(j+1,k+1,l+1,c)-w1(j,k,l+1,c))+w1(j,k+1,l,b)*(w1(j,k,l,c)-w1(j+1,k+1,l,c)) &
-        +(w1(j+1,k+1,l,b)-w1(j,k,l+1,b))*(w1(j,k+1,l,c)-w1(j+1,k+1,l+1,c))+w1(j,k,l+1,b)*(w1(j+1,k,l+1,c)-w1(j,k,l,c)))
+    ( (w1(j,k,l,b) - w1(j+1,k+1,l+1,b)) * (w1(j,k,l+1,c) - w1(j,k+1,l,c)) + w1(j+1,k+1,l+1,b) * (w1(j+1,k+1,l,c) - w1(j+1,k,l+1,c))&
+    + (w1(j+1,k,l+1,b) - w1(j,k+1,l,b)) * (w1(j+1,k+1,l+1,c) - w1(j,k,l+1,c)) + w1(j,k+1,l,b) * (w1(j,k,l,c) - w1(j+1,k+1,l,c)) &
+    + (w1(j+1,k+1,l,b) - w1(j,k,l+1,b)) * (w1(j,k+1,l,c) - w1(j+1,k+1,l+1,c)) + w1(j,k,l+1,b) * (w1(j+1,k,l+1,c) - w1(j,k,l,c)) )
     bb(j,k,l,7,i) = h * &
-        ((w1(j,k,l,b)-w1(j+1,k+1,l+1,b))*(w1(j+1,k,l,c)-w1(j,k,l+1,c))+w1(j+1,k+1,l+1,b)*(w1(j,k+1,l+1,c)-w1(j+1,k+1,l,c)) &
-        +(w1(j,k+1,l+1,b)-w1(j+1,k,l,b))*(w1(j,k,l+1,c)-w1(j+1,k+1,l+1,c))+w1(j+1,k,l,b)*(w1(j+1,k+1,l,c)-w1(j,k,l,c)) &
-        +(w1(j+1,k+1,l,b)-w1(j,k,l+1,b))*(w1(j+1,k+1,l+1,c)-w1(j+1,k,l,c))+w1(j,k,l+1,b)*(w1(j,k,l,c)-w1(j,k+1,l+1,c)))
+    ( (w1(j,k,l,b) - w1(j+1,k+1,l+1,b)) * (w1(j+1,k,l,c) - w1(j,k,l+1,c)) + w1(j+1,k+1,l+1,b) * (w1(j,k+1,l+1,c) - w1(j+1,k+1,l,c))&
+    + (w1(j,k+1,l+1,b) - w1(j+1,k,l,b)) * (w1(j,k,l+1,c) - w1(j+1,k+1,l+1,c)) + w1(j+1,k,l,b) * (w1(j+1,k+1,l,c) - w1(j,k,l,c)) &
+    + (w1(j+1,k+1,l,b) - w1(j,k,l+1,b)) * (w1(j+1,k+1,l+1,c) - w1(j+1,k,l,c)) + w1(j,k,l+1,b) * (w1(j,k,l,c) - w1(j,k+1,l+1,c)) )
     bb(j,k,l,8,i) = h * &
-        ((w1(j,k,l,b)-w1(j+1,k+1,l+1,b))*(w1(j,k+1,l,c)-w1(j+1,k,l,c))+w1(j+1,k+1,l+1,b)*(w1(j+1,k,l+1,c)-w1(j,k+1,l+1,c)) &
-        +(w1(j,k+1,l+1,b)-w1(j+1,k,l,b))*(w1(j+1,k+1,l+1,c)-w1(j,k+1,l,c))+w1(j+1,k,l,b)*(w1(j,k,l,c)-w1(j+1,k,l+1,c)) &
-        +(w1(j+1,k,l+1,b)-w1(j,k+1,l,b))*(w1(j+1,k,l,c)-w1(j+1,k+1,l+1,c))+w1(j,k+1,l,b)*(w1(j,k+1,l+1,c)-w1(j,k,l,c)))
+    ( (w1(j,k,l,b) - w1(j+1,k+1,l+1,b)) * (w1(j,k+1,l,c) - w1(j+1,k,l,c)) + w1(j+1,k+1,l+1,b) * (w1(j+1,k,l+1,c) - w1(j,k+1,l+1,c))&
+    + (w1(j,k+1,l+1,b) - w1(j+1,k,l,b)) * (w1(j+1,k+1,l+1,c) - w1(j,k+1,l,c)) + w1(j+1,k,l,b) * (w1(j,k,l,c) - w1(j+1,k,l+1,c)) &
+    + (w1(j+1,k,l+1,b) - w1(j,k+1,l,b)) * (w1(j+1,k,l,c) - w1(j+1,k+1,l+1,c)) + w1(j,k+1,l,b) * (w1(j,k+1,l+1,c) - w1(j,k,l,c)) )
     end do
     end do
     end do

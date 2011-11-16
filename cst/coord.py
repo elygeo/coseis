@@ -44,13 +44,13 @@ def solve2(A, b):
                       b[1] * A[0,0] - b[0] * A[1,0] ])
 
 
-def interp(x, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
+def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     """
     1D piecewise interpolation of function values specified on regular grid.
 
     Parameters
     ----------
-    x: Range (x_min, x_max) of coordinate space covered by `f`.
+    xlim: Range (x_min, x_max) of coordinate space covered by `f`.
     f: Array of regularly spaced data values to be interpolated.
     xi: Array of coordinates for the interpolation points, same shape as `fi`.
     fi: Output array for the interpolated values, same shape as `xi`.
@@ -76,11 +76,10 @@ def interp(x, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
 
     # logical coordinates
     nx = f.shape[-1]
-    x_ = x
+    x_ = xlim
     x = xi
     del(xi)
     x = (x - x_[0]) / (x_[1] - x_[0]) * (nx - 1)
-    x = np.minimum(np.maximum(x, 0), nx - 1)
 
     # compute mask
     mask = False
@@ -88,6 +87,7 @@ def interp(x, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
         bound = bound, bound
     if bound[0]: mask = mask | (x < 0)
     if bound[1]: mask = mask | (x > nx - 1)
+    x = np.minimum(np.maximum(x, 0), nx - 1)
 
     # interpolation
     if method == 'nearest':
@@ -115,7 +115,7 @@ def interp(x, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     return fi
 
 
-def interp2(x, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
+def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     """
     2D piecewise interpolation of function values specified on regular grid.
 
@@ -134,13 +134,11 @@ def interp2(x, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
 
     # logical coordinates
     nx, ny = f.shape[-2:]
-    x_, y_ = x
+    x_, y_ = xlim
     x, y = xi
     del(xi)
     x = (x - x_[0]) / (x_[1] - x_[0]) * (nx - 1)
     y = (y - y_[0]) / (y_[1] - y_[0]) * (ny - 1)
-    x = np.minimum(np.maximum(x, 0), nx - 1)
-    y = np.minimum(np.maximum(y, 0), ny - 1)
 
     # compute mask
     mask = False
@@ -151,6 +149,8 @@ def interp2(x, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     if by[0]: mask = mask | (y < 0)
     if bx[1]: mask = mask | (x > nx - 1)
     if by[1]: mask = mask | (y > ny - 1)
+    x = np.minimum(np.maximum(x, 0), nx - 1)
+    y = np.minimum(np.maximum(y, 0), ny - 1)
 
     # interpolation
     if method == 'nearest':
@@ -183,7 +183,7 @@ def interp2(x, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     return fi
 
 
-def interp3(x, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
+def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     """
     3D piecewise interpolation of function values specified on regular grid.
 
@@ -202,15 +202,12 @@ def interp3(x, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
 
     # logical coordinates
     nx, ny, nz = f.shape[-3:]
-    x_, y_, z_ = x
+    x_, y_, z_ = xlim
     x, y, z = xi
     del(xi)
     x = (x - x_[0]) / (x_[1] - x_[0]) * (nx - 1)
     y = (y - y_[0]) / (y_[1] - y_[0]) * (ny - 1)
     z = (z - z_[0]) / (z_[1] - z_[0]) * (nz - 1)
-    x = np.minimum(np.maximum(x, 0), nx - 1)
-    y = np.minimum(np.maximum(y, 0), ny - 1)
-    z = np.minimum(np.maximum(z, 0), nz - 1)
 
     # compute mask
     mask = False
@@ -223,6 +220,9 @@ def interp3(x, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     if bx[1]: mask = mask | (x > nx - 1)
     if by[1]: mask = mask | (y > ny - 1)
     if bz[1]: mask = mask | (z > nz - 1)
+    x = np.minimum(np.maximum(x, 0), nx - 1)
+    y = np.minimum(np.maximum(y, 0), ny - 1)
+    z = np.minimum(np.maximum(z, 0), nz - 1)
 
     # interpolation
     if method == 'nearest':
@@ -294,8 +294,8 @@ def rot_sym_tensor(w1, w2, rot):
 
     Parameters
     ----------
-    w1: volume components w11, w22, w33
-    w2: shear components w23, w31, w12
+    w1: diagonal components w11, w22, w33
+    w2: off-diagonal components w23, w31, w12
     rot: rotation matrix
 
     Returns
@@ -303,13 +303,33 @@ def rot_sym_tensor(w1, w2, rot):
     w1, w2: rotated tensor components
     """
     rot = np.asarray(rot)
-    mat = np.diag(w1)
-    mat.flat[[5, 6, 1]] = w2
-    mat.flat[[7, 2, 3]] = w2
-    mat = dot2(dot2(rot, mat), rot.T)
-    w1 = np.diag(mat)
-    w2 = mat.flat[[5, 6, 1]]
+    m = np.diag(w1)
+    m.flat[[5, 6, 1]] = w2
+    m.flat[[7, 2, 3]] = w2
+    m = dot2(dot2(rot, m), rot.T)
+    w1 = np.diag(m)
+    w2 = m.flat[[5, 6, 1]]
     return w1, w2
+
+
+def eigvals_sym_tensor(w1, w2):
+    """
+    Eigenvalues of a symmetric 3x3 tensor stored as diagonal and off-diagonal vectors.
+
+    Parameters
+    ----------
+    w1: diagonal components w11, w22, w33
+    w2: off-diagonal components w23, w31, w12
+
+    Returns
+    -------
+    w: eigenvalues
+    """
+    m = np.diag(w1)
+    m.flat[[5, 6, 1]] = w2
+    m.flat[[7, 2, 3]] = w2
+    w = np.linalg.eigvalsh(m)
+    return w
 
 
 def rotmat(x, origin=(0, 0, 0), upvector=(0, 0, 1)):

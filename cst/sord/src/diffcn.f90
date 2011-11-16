@@ -16,6 +16,7 @@ if (any(i1 > i2)) return
 select case (oplevel)
 
 ! saved b matrix, flops: 8* 7+
+!$omp parallel do schedule(static) private(j, k, l)
 case (6)
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
@@ -28,12 +29,14 @@ do j = i1(1), i2(1)
 end do
 end do
 end do
+!$omp end parallel do
 
 ! constant grid, flops: 1* 7+
 case (1)
 select case (a)
 case (1)
     h = sign(0.25 * dx(2) * dx(3), dx(1))
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -45,8 +48,10 @@ case (1)
     end do
     end do
     end do
+    !$omp end parallel do
 case (2)
     h = sign(0.25 * dx(3) * dx(1), dx(2))
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -58,8 +63,10 @@ case (2)
     end do
     end do
     end do
+    !$omp end parallel do
 case (3)
     h = sign(0.25 * dx(1) * dx(2), dx(3))
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -71,6 +78,7 @@ case (3)
     end do
     end do
     end do
+    !$omp end parallel do
 end select
 
 ! rectangular grid, flops: 6* 7+
@@ -78,6 +86,7 @@ case (2)
 h = sign(0.25, product(dx))
 select case (a)
 case (1)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -87,7 +96,9 @@ case (1)
     end do
     end do
     end do
+    !$omp end parallel do
 case (2)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -97,7 +108,9 @@ case (2)
     end do
     end do
     end do
+    !$omp end parallel do
 case (3)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3)
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)
@@ -107,6 +120,7 @@ case (3)
     end do
     end do
     end do
+    !$omp end parallel do
 end select
 
 ! parallelepiped grid, flops: 33* 47+
@@ -114,6 +128,7 @@ case (3)
 h = sign(0.25, product(dx))
 b = modulo(a, 3) + 1
 c = modulo(a + 1, 3) + 1
+!$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
@@ -157,6 +172,7 @@ do j = i1(1), i2(1)
 end do
 end do
 end do
+!$omp end parallel do
 
 ! general grid one-point quadrature, flops: 33* 119+
 case (4)
@@ -206,6 +222,7 @@ df(j,k,l) = h * &
 end do
 end do
 end do
+!$omp end parallel do
 
 ! general grid exact, flops: 57* 119+
 case (5)
@@ -255,6 +272,7 @@ df(j,k,l) = h * &
 end do
 end do
 end do
+!$omp end parallel do
 
 case default; stop 'illegal operator'
 
