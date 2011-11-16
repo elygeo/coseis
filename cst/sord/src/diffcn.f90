@@ -16,8 +16,8 @@ if (any(i1 > i2)) return
 select case (oplevel)
 
 ! saved b matrix, flops: 8* 7+
-!$omp parallel do schedule(static) private(j, k, l)
 case (6)
+!$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
@@ -179,6 +179,7 @@ case (4)
 h = sign(0.0625, product(dx))
 b = modulo(a, 3) + 1
 c = modulo(a + 1, 3) + 1
+!$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
@@ -229,6 +230,7 @@ case (5)
 h = sign(1.0 / 12.0, product(dx))
 b = modulo(a, 3) + 1
 c = modulo(a + 1, 3) + 1
+!$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
