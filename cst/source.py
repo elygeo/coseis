@@ -473,7 +473,7 @@ coulomb_fmt = '  1' + 4*' %10.4f' + ' 100' + 5*' %10.4f' + '    Fault 1'
 coulomb_header = """\
 header line 1
 header line 2
-#reg1=  0  #reg2=  0  #fixed=  %(nsource)s  sym=  1
+#reg1=  0  #reg2=  0  #fixed=  {nsource}  sym=  1
  PR1=       0.250     PR2=       0.250   DEPTH=      12.209
   E1=     8.000e+005   E2=     8.000e+005
 XSYM=       .000     YSYM=       .000

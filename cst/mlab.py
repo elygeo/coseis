@@ -98,13 +98,12 @@ class digital_clock():
             i = np.array([i for i in range(7) if i not in g])
             h = []
             for x in -0.875, 0.125, 0.875:
-                h += [mlab.plot3d(
+                h += [ mlab.plot3d(
                     scale * x + xx[i].flatten(), yy[i].flatten(), zz[i].flatten(),
                     color=color,
                     tube_radius=None,
                     line_width=line_width,
-                    **kwargs
-                )]
+                    **kwargs ) ]
             hh += [h]
         self.glyphs = hh
         x = x0 + scale / 200.0 * np.array([-81, -79, np.nan, -71, -69])

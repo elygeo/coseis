@@ -31,6 +31,7 @@ nproc = 1
 pre = post = ''  # pre-processing and post-processing commands
 dtype = dtype_f = np.dtype('f').str # Numpy data type
 verbose = False
+base_index = 1   # 0=C/Python, 1=Fortran style array indexing
 
 # machine specific
 host = hostname = os.uname()[1]
@@ -45,10 +46,10 @@ rate = 1.0e6
 nstripe = -2
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
 launch = {
-    's_exec':  '%(command)s',
-    's_debug': 'gdb %(command)s',
-    'm_exec':  'mpiexec -np %(nproc)s %(command)s',
-    'm_debug': 'mpiexec -np %(nproc)s -gdb %(command)s',
+    's_exec':  '{command}',
+    's_debug': 'gdb {command}',
+    'm_exec':  'mpiexec -np {nproc} {command}',
+    'm_debug': 'mpiexec -np {nproc} -gdb {command}',
 }
 
 # command line options

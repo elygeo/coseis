@@ -1,27 +1,27 @@
 #!/bin/bash -e
 
-#$ -A %(account)s
-#$ -N %(name)s
-#$ -M %(email)s
-#$ -q %(queue)s
-#$ -pe %(maxcores)sway %(totalcores)s
-#$ -l h_rt=%(walltime)s
-#$ -e %(rundir)s/%(name)s-err
-#$ -o %(rundir)s/%(name)s-out
+#$ -A {account}
+#$ -N {name}
+#$ -M {email}
+#$ -q {queue}
+#$ -pe {maxcores}way {totalcores}
+#$ -l h_rt={walltime}
+#$ -e {rundir}/{name}-err
+#$ -o {rundir}/{name}-out
 #$ -m abe
 #$ -V
-#$ -wd %(rundir)s
+#$ -wd {rundir}
 
-export MY_NSLOTS=%(nproc)s
-cd "%(rundir)s"
+export MY_NSLOTS={nproc}
+cd "{rundir}"
 set > env
 lfs setstripe -c 1 .
-[ %(nstripe)s -ge -1 -a -d hold ] && lfs setstripe -c %(nstripe)s hold
-[ %(nproc)s -gt 4000 ] && cache_binary $PWD %(command)s
+[ {nstripe} -ge -1 -a -d hold ] && lfs setstripe -c {nstripe} hold
+[ {nproc} -gt 4000 ] && cache_binary $PWD {command}
 
-echo "$( date ): %(name)s started" >> log
-%(pre)s
-ibrun %(command)s
-%(post)s
-echo "$( date ): %(name)s finished" >> log
+echo "$( date ): {name} started" >> log
+{pre}
+ibrun {command}
+{post}
+echo "$( date ): {name} finished" >> log
 

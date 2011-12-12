@@ -26,11 +26,11 @@ queue_opts = [
     {'queue': 'bc',    'maxnodes': 268, 'maxtime': (48, 00)},
 ]
 launch = {
-    's_exec':  '%(command)s',
-    's_debug': 'gdb %(command)s',
-    'm_exec':  'mpirun -np %(nproc)s -hostfile mf %(command)s',
-    'submit':  'qsub "%(name)s.sh"',
-    'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
+    's_exec':  '{command}',
+    's_debug': 'gdb {command}',
+    'm_exec':  'mpirun -np {nproc} -hostfile mf {command}',
+    'submit':  'qsub "{name}.sh"',
+    'submit2': 'qsub -W depend="afterok:{depend}" "{name}.sh"',
 }
 fortran_serial = 'ifort'
 fortran_mpi = 'mpif90'

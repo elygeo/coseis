@@ -25,7 +25,7 @@ def prune(d, pattern=None, types=None):
     pattern: regular expression of parameter names to prune
         default = '(^_)|(_$)|(^.$)|(^..$)'
     types: list of parameters types to keep
-        default = Numpy types + [NoneType, bool, str, int, lone, float, tuple, list, dict]
+        default = Numpy types + [NoneType, bool, str, unicode, int, lone, float, tuple, list, dict]
         Functions, classes, and modules are pruned by default.
 
     >>> prune({'aa': 0, 'aa_': 0, '_aa': 0, 'a_a': 0, 'b_b': prune})
@@ -48,9 +48,9 @@ _site_template = '''\
 """
 Site specific configuration
 """
-machine = %(machine)r
-account = %(account)r
-repo = %(repo)r
+machine = {machine!r}
+account = {account!r}
+repo = {repo!r}
 '''
 
 def configure(module=None, machine=None, save_site=False, **kwargs):
@@ -151,7 +151,7 @@ def configure(module=None, machine=None, save_site=False, **kwargs):
     # save site configuration
     if save_site:
         f = os.path.join(path, 'site.py')
-        open(f, 'w').write(_site_template % job)
+        open(f, 'w').write(_site_template.format(**job) )
 
     # prune unneeded variables and create configuration object
     doc = job['__doc__']
@@ -174,7 +174,7 @@ def make(compiler, object_, source):
     if not os.path.isdir(statedir):
         os.mkdir(statedir)
     statefile = os.path.join(statedir, os.path.basename(object_))
-    if type(compiler) is str:
+    if isinstance(compiler, basestring):
         compiler = shlex.split(compiler)
     else:
         compiler = list(compiler)
@@ -378,7 +378,7 @@ def skeleton(job=None, stagein=(), new=True, **kwargs):
                 if base == 'script.sh':
                     base = job.name + '.sh'
                 ff = os.path.join(dest, base)
-                out = open(f).read() % job.__dict__
+                out = open(f).read().format(**job.__dict__)
                 open(ff, 'w').write(out)
                 shutil.copymode(f, ff)
 
@@ -421,7 +421,7 @@ def launch(job=None, stagein=(), new=True, **kwargs):
     else:
         k = job.mode + '_' + k
     if k in job.launch:
-        cmd = job.launch[k] % job.__dict__
+        cmd = job.launch[k].format(**job.__dict__)
     else:
         raise Exception('Error: %s launch mode not supported.' % k)
     print(cmd)

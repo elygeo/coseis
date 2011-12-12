@@ -27,12 +27,12 @@ fmt2 = '%20.12f' + 6 * ' %14.6f'
 header="""\
 # problem=TPV12-2D
 # author=Geoffrey Ely
-# date=%(rundate)s
+# date={rundate}
 # code=SORD
-# element_size=%(dx)s
-# time_step=%(dt)s
-# num_time_steps=%(nt)s
-# location=%(sta)s
+# element_size={dx}
+# time_step={dt}
+# num_time_steps={nt}
+# location={sta}
 """
 header1 = """\
 # Column #1 = Time (s)

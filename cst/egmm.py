@@ -214,11 +214,12 @@ def test():
     plt.ylabel('$\sigma$')
 
     plt.draw()
-    plt.show()
 
     return
 
 # command line
 if __name__ == '__main__':
+    import matplotlib.pyplot as plt
     test()
+    plt.show()
 

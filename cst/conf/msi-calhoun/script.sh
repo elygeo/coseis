@@ -1,23 +1,23 @@
 #!/bin/bash -e
 
-#PBS -N %(name)s
-#PBS -M %(email)s
-#PBS -l nodes=%(nodes)s:ppn=%(ppn)s
-#PBS -l walltime=%(walltime)s
-#PBS -l pmem=%(pmem)smb
-#PBS -e %(rundir)s/%(name)s-err
-#PBS -o %(rundir)s/%(name)s-out
+#PBS -N {name}
+#PBS -M {email}
+#PBS -l nodes={nodes}:ppn={ppn}
+#PBS -l walltime={walltime}
+#PBS -l pmem={pmem}mb
+#PBS -e {rundir}/{name}-err
+#PBS -o {rundir}/{name}-out
 #PBS -m abe
 #PBS -V
 
 module load intel vmpi
-cd "%(rundir)s"
+cd "{rundir}"
 set > env
 cp /cluster/mpi/tools/param.bigcluster .
 
-echo "$( date ): %(name)s started" >> log
-%(pre)s
-mpirun -np %(nproc)s -paramfile ./param.bigcluster -hostfile $PBS_NODEFILE %(command)s
-%(post)s
-echo "$( date ): %(name)s finished" >> log
+echo "$( date ): {name} started" >> log
+{pre}
+mpirun -np {nproc} -paramfile ./param.bigcluster -hostfile $PBS_NODEFILE {command}
+{post}
+echo "$( date ): {name} finished" >> log
 

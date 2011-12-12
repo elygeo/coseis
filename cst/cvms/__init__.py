@@ -10,13 +10,13 @@ from ..conf import launch
 path = os.path.dirname(os.path.realpath(__file__))
 
 input_template = """\
-%(nsample)s
-%(file_lon)s
-%(file_lat)s
-%(file_dep)s
-%(file_rho)s
-%(file_vp)s
-%(file_vs)s
+{nsample}
+{file_lon}
+{file_lat}
+{file_dep}
+{file_rho}
+{file_vp}
+{file_vs}
 """
 
 def _build(mode=None, optimize=None, version=None):
@@ -144,7 +144,7 @@ def stage(inputs={}, **kwargs):
 
     # save input file and configuration
     f = os.path.join(job.rundir, 'cvms-input')
-    open(f, 'w').write(input_template % job.__dict__)
+    open(f, 'w').write(input_template.format(**job.__dict__))
     f = os.path.join(job.rundir, 'conf.py')
     cst.util.save(f, job.__dict__)
     return job

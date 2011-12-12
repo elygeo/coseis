@@ -18,8 +18,8 @@ queue_opts = [
     {'queue': 'default',     'maxnodes': 16384, 'maxtime': (24, 00)},
 ]
 launch = {
-    's_exec':  '%(command)s',
-    's_debug': 'gdb %(command)s',
-    'submit':  'llsubmit "%(name)s.sh"',
+    's_exec':  '{command}',
+    's_debug': 'gdb {command}',
+    'submit':  'llsubmit "{name}.sh"',
 }
 

@@ -4,24 +4,24 @@ WebSims configuration
 """
 
 # info
-title = '%(title)s'
-label = '%(title)s: '
-author = '%(author)s'
-rundate = '%(rundate)s'
-dtype = '%(dtype)s'
+title = '{title}'
+label = '{title}: '
+author = '{author}'
+rundate = '{rundate}'
+dtype = '{dtype}'
 downloadable = True
 notes = ''
 
 # shapshots
-x_shape = %(nsnap)r
-x_delta = %(dsnap)r
+x_shape = {nsnap}
+x_delta = {dsnap}
 x_unit = 'km', 'km', 's'
 x_axes = 'X', 'Y', 'Time'
 x_decimate = 1
 x_static_title = 'Surface maps'
 x_static_panes = [
-    ('pgv.bin', 'Peak ground velocity (m/s)',   'wwbgr', %(vticks)s, 1, 2),
-    ('pgd.bin', 'Peak ground displacement (m)', 'wwbgr', %(uticks)s, 1, 2),
+    ('pgv.bin', 'Peak ground velocity (m/s)',   'wwbgr', {vticks}, 1, 2),
+    ('pgd.bin', 'Peak ground displacement (m)', 'wwbgr', {uticks}, 1, 2),
     ('vs0.bin', 'Surface S-wave velocity (km/s)', 'bgr', (250, 1000, 2000, 3000, 4000)),
     ('topo.bin', 'Topographic elevation (km)',    'bgr', (-1, 0, 1, 2, 3), 0.001),
 ]
@@ -40,8 +40,8 @@ x_plot  = [
 ]
 
 # time histories
-t_shape = %(nhist)r
-t_delta = %(dhist)r
+t_shape = {nhist}
+t_delta = {dhist}
 t_unit = 's', 'km', 'km'
 t_axes = 'Time', 'X', 'Y'
 t_title = 'Velocity time history'

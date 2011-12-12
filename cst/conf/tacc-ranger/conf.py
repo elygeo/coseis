@@ -43,12 +43,12 @@ queue_opts = [
     {'queue': 'request'},
 ]
 launch = {
-    's_exec':  '%(command)s',
-    's_debug': 'gdb %(command)s',
-    'm_exec':  'ibrun -n %(nproc)s -o 0 %(command)s',
-    'm_debug': 'ddt -start -once -n %(nproc)s -- %(command)s',
-    'submit':  'qsub "%(name)s.sh"',
-    'submit2': 'qsub -hold_jid "%(depend)s" "%(name)s.sh"',
+    's_exec':  '{command}',
+    's_debug': 'gdb {command}',
+    'm_exec':  'ibrun -n {nproc} -o 0 {command}',
+    'm_debug': 'ddt -start -once -n {nproc} -- {command}',
+    'submit':  'qsub "{name}.sh"',
+    'submit2': 'qsub -hold_jid "{depend}" "{name}.sh"',
 }
 fortran_serial = 'ifort'
 fortran_mpi = 'mpif90'

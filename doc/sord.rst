@@ -45,7 +45,7 @@ Ely, G. P., S. M. Day, and J.-B. Minster (2008),
 Geophys. J. Int., `172(1), 331-344
 <http://www.blackwell-synergy.com/doi/abs/10.1111/j.1365-246X.2007.03633.x>`__,
 doi: 10.1111/j.1365-246X.2007.03633.x.
-`[PDF] <http://earth.usc.edu/~gely/pub/ely-som-20080426.pdf>`__
+`[PDF] <http://earth.usc.edu/~gely/pub/Ely2008-GJI.pdf>`__
 
 .. class:: ref
 
@@ -54,14 +54,14 @@ Ely, G. P., S. M. Day, and J.-B. Minster (2009),
 Geophys. J. Int.,
 `177(3), 1140-1150 <http://www3.interscience.wiley.com/journal/122267744/abstract>`__,
 doi:10.1111/j.1365-246X.2009.04117.x.
-`[PDF] <http://earth.usc.edu/~gely/pub/ely-sord-20090504.pdf>`__
+`[PDF] <http://earth.usc.edu/~gely/pub/Ely2009-GJI.pdf>`__
 
 .. class:: ref
 
 Ely, G. P., S. M. Day, and J.-B. Minster (2010),
 *Dynamic rupture models for the southern San Andreas fault*,
 BSSA, 100(1).
-`[PDF] <http://earth.usc.edu/~gely/pub/ely-saf-20091030.pdf>`__
+`[PDF] <http://earth.usc.edu/~gely/pub/Ely2010-BSSA.pdf>`__
 `[Electronic supplement] <http://earth.usc.edu/~gely/ely-saf-esupp.html>`__
 
 

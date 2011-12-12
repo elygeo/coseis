@@ -199,7 +199,6 @@ def spectrum(h, dt=1.0, shift=False, tzoom=10.0, db=None, legend=None, title='Fo
         ax.legend(legend, loc='lower left')
 
     plt.draw()
-    plt.show()
 
     return axes
 
@@ -286,5 +285,7 @@ def test():
 
 # continue if command line
 if __name__ == '__main__':
+    import matplotlib.pyplot as plt
     test()
+    plt.show()
 

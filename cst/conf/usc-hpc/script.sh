@@ -1,17 +1,17 @@
 #!/bin/bash
 
-#PBS -N %(name)s
-#PBS -M %(email)s
-#PBS -q %(queue)s
-#PBS -l nodes=%(nodes)s:ppn=%(ppn)s:myri
-#PBS -l walltime=%(walltime)s
-#PBS -e %(rundir)s/%(name)s-err
-#PBS -o %(rundir)s/%(name)s-out
+#PBS -N {name}
+#PBS -M {email}
+#PBS -q {queue}
+#PBS -l nodes={nodes}:ppn={ppn}:myri
+#PBS -l walltime={walltime}
+#PBS -e {rundir}/{name}-err
+#PBS -o {rundir}/{name}-out
 #PBS -m abe
 #PBS -V
 
-cd "%(rundir)s"
-export ROMIO_HINTS="%(rundir)s/romio-hints"
+cd "{rundir}"
+export ROMIO_HINTS="{rundir}/romio-hints"
 cat > romio-hints << END
 romio_cb_read enable
 romio_cb_write enable
@@ -20,22 +20,22 @@ romio_ds_write disable
 END
 cat > sync.sh << END
 #!/bin/bash -e
-ssh $HOST 'rsync -rlptv /scratch/job/ "%(rundir)s"'
+ssh $HOST 'rsync -rlptv /scratch/job/ "{rundir}"'
 END
 chmod u+x sync.sh
 set > env
 
-echo "$( date ): %(name)s started" >> log
-%(pre)s
+echo "$( date ): {name} started" >> log
+{pre}
 rsync -rlpt . /scratch/job
 cd /scratch/job
-#mpirun -n %(nproc)s %(command)s
-mpiexec -n %(nproc)s %(command)s
-# mpiexec --mca mtl mx --mca pml cm %(command)s # OpenMPI
-cd "%(rundir)s"
+#mpirun -n {nproc} {command}
+mpiexec -n {nproc} {command}
+# mpiexec --mca mtl mx --mca pml cm {command} # OpenMPI
+cd "{rundir}"
 rsync -rlpt --delete /scratch/job/ .
-%(post)s
-echo "$( date ): %(name)s finished" >> log
+{post}
+echo "$( date ): {name} finished" >> log
 
 rm sync.sh
 

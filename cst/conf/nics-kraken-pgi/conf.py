@@ -23,12 +23,12 @@ maxnodes = 8256
 maxtime = 24, 00
 rate = 1e6
 launch = {
-    's_exec':  '%(command)s',
-    's_debug': 'gdb %(command)s',
-    'm_exec':  'aprun -n %(nproc)s %(command)s',
-    'm_debug': 'totalview aprun -n %(nproc)s %(command)s',
-    'submit':  'qsub "%(name)s.sh"',
-    'submit2': 'qsub -W depend="afterok:%(depend)s" "%(name)s.sh"',
+    's_exec':  '{command}',
+    's_debug': 'gdb {command}',
+    'm_exec':  'aprun -n {nproc} {command}',
+    'm_debug': 'totalview aprun -n {nproc} {command}',
+    'submit':  'qsub "{name}.sh"',
+    'submit2': 'qsub -W depend="afterok:{depend}" "{name}.sh"',
 }
 fortran_serial = 'ftn'
 fortran_mpi = 'ftn'

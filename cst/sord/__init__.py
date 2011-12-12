@@ -287,15 +287,23 @@ def run(job=None, **kwargs):
     launch(job)
     return job
 
-def expand_slice(shape, indices=None, base=1, round=True):
+def expand_slice(shape, indices=None, base_in=0, base_out=0, round=True):
     """
     Fill in slice index notation.
 
-    >>> expand_slice([8])
-    [(1, 8, 1)]
+    >>> import numpy as np
 
-    >>> expand_slice((8, 4), [], 0)
-    [(0, 8, 1), (0, 4, 1)]
+    >>> expand_slice([8])
+    [(0, 8, 1)]
+
+    >>> expand_slice((8, 4), [], 1)
+    [(1, 8, 1), (1, 4, 1)]
+
+    >>> expand_slice((8, 8, 8, 8, 8), [(), 0, 0.4, 0.6, (-0.6, -0.4, 2)], 0)
+    [(0, 8, 1), (0, 1, 1), (0, 1, 1), (1, 2, 1), (7, 8, 2)]
+
+    >>> expand_slice((8, 8, 8, 8, 8), [(), 0, 0.9, 1.1, (-1.1, -0.9, 2)], 0.5)
+    [(0, 7, 1), (0, 7, 1), (0, 1, 1), (1, 2, 1), (6, 7, 2)]
 
     >>> expand_slice((8, 8, 8, 8, 8), [(), 0, 1.4, 1.6, (-1.6, -1.4, 2)], 1)
     [(1, 8, 1), (1, 8, 1), (1, 1, 1), (2, 2, 1), (7, 8, 2)]
@@ -303,14 +311,11 @@ def expand_slice(shape, indices=None, base=1, round=True):
     >>> expand_slice((8, 8, 8, 8, 8), [(), 0, 1.9, 2.1, (-2.1, -1.9, 2)], 1.5)
     [(1, 7, 1), (1, 7, 1), (1, 1, 1), (2, 2, 1), (6, 7, 2)]
 
-    >>> expand_slice((8, 8, 8, 8, 8), [(), 0, 0.4, 0.6, (-0.6, -0.4, 2)], 0)
-    [(0, 8, 1), (0, 1, 1), (0, 1, 1), (1, 2, 1), (7, 8, 2)]
-
-    >>> expand_slice((8, 8, 8, 8, 8), [(), 0, 0.9, 1.1, (-1.1, -0.9, 2)], 0.5)
-    [(0, 7, 1), (0, 7, 1), (0, 1, 1), (1, 2, 1), (6, 7, 2)]
+    #>>> expand_slice((8, 4), np.s_[:,:-1])
+    #[(0, 8, 1), (1, 3, 1)]
     """
     n = len(shape)
-    offset = min(1, int(base))
+    offset = min(1, int(base_in))
     if indices is None:
         indices = n * [()]
     elif len(indices) == 0:
@@ -320,10 +325,12 @@ def expand_slice(shape, indices=None, base=1, round=True):
     else:
         indices = list(indices)
     for i in range(n):
-        if type(indices[i]) not in (tuple, list):
+        if type(indices[i]) == slice:
+            indices[i] = [indices[i].start, indices[i].stop, indices[i].step]
+        elif type(indices[i]) not in (tuple, list):
             indices[i] = [indices[i]]
         elif len(indices[i]) == 0:
-            indices[i] = [base, shape[i] - base + offset, 1]
+            indices[i] = [base_in, shape[i] - base_in + offset, 1]
         elif len(indices[i]) == 2:
             indices[i] = list(indices[i]) + [1]
         elif len(indices[i]) in (1, 3):
@@ -333,15 +340,15 @@ def expand_slice(shape, indices=None, base=1, round=True):
         if  indices[i][0] < 0:
             indices[i][0] = shape[i] + indices[i][0] + offset
         if len(indices[i]) == 1:
-            if indices[i][0] == 0 and base > 0:
-                indices[i] = [base, shape[i] - base + offset, 1]
+            if indices[i][0] == 0 and base_in > 0:
+                indices[i] = [base_in, shape[i] - base_in + offset, 1]
             else:
                 indices[i] = [indices[i][0], indices[i][0] + 1 - offset, 1]
         if  indices[i][1] < 0:
             indices[i][1] = shape[i] + indices[i][1] + offset
         if round:
-            indices[i][0] = int(indices[i][0] + 0.5 - base + offset)
-            indices[i][1] = int(indices[i][1] + 0.5 - base + offset)
+            indices[i][0] = int(indices[i][0] + 0.5 - base_in + offset)
+            indices[i][1] = int(indices[i][1] + 0.5 - base_in + offset)
         indices[i] = tuple(indices[i])
     return indices
 
@@ -438,7 +445,7 @@ def prepare_param(pm):
 
         filename = os.path.expanduser(filename)
         mode = mode.replace('f', '')
-        if type(fields) == str:
+        if isinstance(fields, basestring):
             fields = [fields]
 
         # error check
@@ -505,4 +512,9 @@ def prepare_param(pm):
     # done
     pm.fieldio = fieldio
     return pm
+
+# testing
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
 

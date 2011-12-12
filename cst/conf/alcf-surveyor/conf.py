@@ -29,10 +29,10 @@ fortran_flags = {
     '8': '-qrealsize=8',
 }
 launch = {
-    's_exec':  '%(command)s',
-    's_debug': 'gdb %(command)s',
-    'm_exec':  'cobalt-mpirun -np %(nproc)s %(command)s',
-    'submit':  'qsub -q %(queue)s -n %(nproc)s -t %(minutes)s %(name)s.sh',
-    'submit2': 'qsub -q %(queue)s -n %(nproc)s -t %(minutes)s --dependenices %(depend)s "%(name)s.sh"',
+    's_exec':  '{command}',
+    's_debug': 'gdb {command}',
+    'm_exec':  'cobalt-mpirun -np {nproc} {command}',
+    'submit':  'qsub -q {queue} -n {nproc} -t {minutes} {name}.sh',
+    'submit2': 'qsub -q {queue} -n {nproc} -t {minutes} --dependenices {depend} "{name}.sh"',
 }
 
