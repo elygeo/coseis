@@ -53,10 +53,10 @@ def test_kostrov():
 
     # recievers
     fieldio += [
-        ('=w', 'svm', [ -1, -21, -1, -1], 'out/p20a.bin'),
-        ('=w', 'svm', [-13, -17, -1, -1], 'out/p20b.bin'),
-        ('=w', 'svm', [-17, -13, -1, -1], 'out/p20c.bin'),
-        ('=w', 'svm', [-21,  -1, -1, -1], 'out/p20d.bin'),
+        ('=w', 'svm', [ -1,-21,-1,-1], 'out/p20a.bin'),
+        ('=w', 'svm', [-13,-17,-1,-1], 'out/p20b.bin'),
+        ('=w', 'svm', [-17,-13,-1,-1], 'out/p20c.bin'),
+        ('=w', 'svm', [-21, -1,-1,-1], 'out/p20d.bin'),
     ]
 
     # run SORD

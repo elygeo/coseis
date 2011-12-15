@@ -5,6 +5,7 @@ Explosion test problem
 import os
 import numpy as np
 import cst
+s_ = cst.sor.s_
 
 # parameters
 nproc3 = 1, 1, 2
@@ -45,17 +46,17 @@ op = '=w'
 op = '=wi'
 for f in 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
     fieldio += [
-        (op, f, [ i,  i, _4, ()], 'p1-%s.bin' % f),
-        (op, f, [ i, _3, _4, ()], 'p2-%s.bin' % f),
-        (op, f, [ i, _4, _4, ()], 'p3-%s.bin' % f),
-        (op, f, [_3, _3, _4, ()], 'p4-%s.bin' % f),
-        (op, f, [_3, _4, _4, ()], 'p5-%s.bin' % f),
-        (op, f, [_4, _4, _4, ()], 'p6-%s.bin' % f),
+        (op, f, s_[ i, i,_4,:], 'p1-%s.bin' % f),
+        (op, f, s_[ i,_3,_4,:], 'p2-%s.bin' % f),
+        (op, f, s_[ i,_4,_4,:], 'p3-%s.bin' % f),
+        (op, f, s_[_3,_3,_4,:], 'p4-%s.bin' % f),
+        (op, f, s_[_3,_4,_4,:], 'p5-%s.bin' % f),
+        (op, f, s_[_4,_4,_4,:], 'p6-%s.bin' % f),
     ]
 fieldio += [
-    ('=w', 'v1', [i, (), (), (1, -1, 10)], 'snap-v1.bin'),
-    ('=w', 'v2', [i, (), (), (1, -1, 10)], 'snap-v2.bin'),
-    ('=w', 'v3', [i, (), (), (1, -1, 10)], 'snap-v3.bin'),
+    ('=w', 'v1', s_[i,:,:,::10], 'snap-v1.bin'),
+    ('=w', 'v2', s_[i,:,:,::10], 'snap-v2.bin'),
+    ('=w', 'v3', s_[i,:,:,::10], 'snap-v3.bin'),
 ]
 
 # loop over sources

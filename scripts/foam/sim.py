@@ -10,6 +10,7 @@ doi:10.1785/0120010273.
 """
 import os
 import cst
+s_ = cst.sord.s_
 
 # weak zone thickness
 weakzone_ = 0.2
@@ -51,24 +52,24 @@ trelax = 10.0 * delta[-1]
 # rupture
 faultnormal = 3
 slipvector = 0.0, 1.0, 0.0
-i = (1, ihypo[0]), (), (), 0
+j = ihypo[0]
 fieldio += [
     ('=', 'ts',  [], -730.0),
     ('=', 'tn',  [], -330.0),
     ('=', 'mus', [],  1e5),
     ('=', 'mud', [],  1e5),
     ('=', 'dc',  [],  0.001),
-    ('=', 'mus', i,   2.4),
-    ('=', 'mud', i,   1.85),
+    ('=', 'mus', s_[:j,:,:,0], 2.4),
+    ('=', 'mud', s_[:j,:,:,0], 1.85),
 ]
 
 # weak zone
 if weakzone_:
-    i = (1, weakzone_ / delta[0] + 1.0), (), (), 0
+    j = weakzone_ / delta[0] + 1.0
     fieldio += [
-        ('=', 'ts',  i, -66.0),
-        ('=', 'mus', i,  0.6),
-        ('=', 'mud', i,  0.6),
+        ('=', 'ts',  s_[:j,:,:,0], -66.0),
+        ('=', 'mus', s_[:j,:,:,0],  0.6),
+        ('=', 'mud', s_[:j,:,:,0],  0.6),
     ]
 
 # sensors
@@ -81,22 +82,21 @@ for s, x, g in [
    (4, 0.22, 0.020166),
   (15, 0.02, 0.020773),
 ]:
-    i = x / delta[0] + 1.0, 1, z / delta[2] + 2.0, ()
+    j = x / delta[0] + 1.0
+    l = z / delta[2] + 2.0
     fieldio += [
-        ('=w', 'a2', i, 'sensor%02d.bin' % s),
+        ('=w', 'a2', s_[j,1,l,:], 'sensor%02d.bin' % s),
     ]
 fieldio += [
-    ('=w', 'u2', [1, 1, 1, ()], 'sensor16.bin'),
+    ('=w', 'u2', s_[1,1,1,:], 'sensor16.bin'),
 ]
 
 # surface output
 k = ihypo[1]
-l = 2, 0.8 / delta[2] + 2.0
-offf_ = 1, k, l, ()
-xsec_ = (), k, l, (1, -1, 10)
+l = 0.8 / delta[2] + 2.0
 fieldio += [
-    ('=w', 'u2', offf_, 'off-fault.bin'),
-    #('=w', 'v2', xsec_, 'xsec.bin'),
+    ('=w', 'u2', s_[1,k,2:l,:], 'off-fault.bin'),
+    #('=w', 'v2', s_[:,k,2:l.::10], 'xsec.bin'),
 ]
 
 # launch SORD code

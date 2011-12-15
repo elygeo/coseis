@@ -6,6 +6,7 @@ import os, sys
 import numpy as np
 import pyproj
 import cst
+s_ = cst.sord.s_
 
 # resolution and parallelization
 dx_ = 50.0;   nproc3 = 1, 32, 480; nstripe = 32
@@ -116,10 +117,10 @@ for cvm_ in 'cvms', 'cvmh', 'cvmg':
         j = x / delta[0] + 1.0
         k = y / delta[1] + 1.0
         fieldio += [
-            (m, 'vs', [j,k,1,()], 'out/' + s + '-vs.bin'),
-            (m, 'v1', [j,k,1,()], 'out/' + s + '-v1.bin'),
-            (m, 'v2', [j,k,1,()], 'out/' + s + '-v2.bin'),
-            (m, 'v3', [j,k,1,()], 'out/' + s + '-v3.bin'),
+            (m, 'vs', s_[j,k,1,:], 'out/' + s + '-vs.bin'),
+            (m, 'v1', s_[j,k,1,:], 'out/' + s + '-v1.bin'),
+            (m, 'v2', s_[j,k,1,:], 'out/' + s + '-v2.bin'),
+            (m, 'v3', s_[j,k,1,:], 'out/' + s + '-v3.bin'),
         ]
 
     # surface output
@@ -129,15 +130,15 @@ for cvm_ in 'cvms', 'cvmh', 'cvmg':
         mh = max(1, int(0.025 / dt_ + 0.5))
         ms = max(1, int(0.125 / (dt_ * mh) + 0.5))
         fieldio += [
-            ('=w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'hold/full-v1.bin'),
-            ('=w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'hold/full-v2.bin'),
-            ('=w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,mh)], 'hold/full-v3.bin'),
-            ('#w', 'v1',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'hold/snap-v1.bin'),
-            ('#w', 'v2',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'hold/snap-v2.bin'),
-            ('#w', 'v3',  [(1,-1,ns), (1,-1,ns), 1, (1,-1,ms)], 'hold/snap-v3.bin'),
-            ('#w', 'v1',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hold/hist-v1.bin'),
-            ('#w', 'v2',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hold/hist-v2.bin'),
-            ('#w', 'v3',  [(1,-1,nh), (1,-1,nh), 1, (1,-1,mh)], 'hold/hist-v3.bin'),
+            ('=w', 'v1', s_[::ns,::ns,1,::mh], 'hold/full-v1.bin'),
+            ('=w', 'v2', s_[::ns,::ns,1,::mh], 'hold/full-v2.bin'),
+            ('=w', 'v3', s_[::ns,::ns,1,::mh], 'hold/full-v3.bin'),
+            ('#w', 'v1', s_[::ns,::ns,1,::ms], 'hold/snap-v1.bin'),
+            ('#w', 'v2', s_[::ns,::ns,1,::ms], 'hold/snap-v2.bin'),
+            ('#w', 'v3', s_[::ns,::ns,1,::ms], 'hold/snap-v3.bin'),
+            ('#w', 'v1', s_[::nh,::nh,1,::mh], 'hold/hist-v1.bin'),
+            ('#w', 'v2', s_[::nh,::nh,1,::mh], 'hold/hist-v2.bin'),
+            ('#w', 'v3', s_[::nh,::nh,1,::mh], 'hold/hist-v3.bin'),
         ]
 
     # cross section output
@@ -145,8 +146,8 @@ for cvm_ in 'cvms', 'cvmh', 'cvmg':
         j, k, l = ihypo
         for f in 'v1', 'v2', 'v3', 'rho', 'vp', 'vs', 'gam':
             fieldio += [
-                ('=w', f,  [j, (), (), (1,-1,10)], 'hold/xsec-ns-%s.bin' % f),
-                ('=w', f,  [(), k, (), (1,-1,10)], 'hold/xsec-ew-%s.bin' % f),
+                ('=w', f, s_[j,:,:,::10], 'hold/xsec-ns-%s.bin' % f),
+                ('=w', f, s_[:,k,:,::10], 'hold/xsec-ew-%s.bin' % f),
             ]
 
     # stage job

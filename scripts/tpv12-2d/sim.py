@@ -5,6 +5,7 @@ FIXME: prestress not correct
 """
 import numpy as np
 import cst
+s_ = cst.sord.s_
 
 # number of processes
 nproc3 = 1, 1, 2
@@ -55,22 +56,22 @@ faultnormal = 3
 k = 1, 15000.0 / delta[1]
 l = ihypo[2]
 fieldio += [
-    ('=',  'co',   [], 2e5),
-    ('=',  'dc',   [], 0.5),
-    ('=',  'mud',  [], 0.1),
-    ('=',  'mus',  [], 1e4),
-    ('=',  'mus',  [(),k,l,()], 0.7),
-    ('=R', 's11',  [1,(),l,0], 's11.bin'),
-    ('=R', 's22',  [1,(),l,0], 's22.bin'),
-    ('=R', 's33',  [1,(),l,0], 's33.bin'),
+    ('=',  'co',  [], 2e5),
+    ('=',  'dc',  [], 0.5),
+    ('=',  'mud', [], 0.1),
+    ('=',  'mus', [], 1e4),
+    ('=',  'mus', s_[:,k,l,:], 0.7),
+    ('=R', 's11', s_[1,:,l,0], 's11.bin'),
+    ('=R', 's22', s_[1,:,l,0], 's22.bin'),
+    ('=R', 's33', s_[1,:,l,0], 's33.bin'),
 ]
 
 # nucleation
 i = 1500.0 / delta[0]
 j, k, l = ihypo
 fieldio += [
-    ('=', 'mus',  [(), (k-i-1, k+i+1), l, ()], 0.62),
-    ('=', 'mus',  [(), (k-i,   k+i),   l, ()], 0.54),
+    ('=', 'mus', s_[:,k-i-1:k+i+1,l,:], 0.62),
+    ('=', 'mus', s_[:,k-i:  k+i,  l,:], 0.54),
 ]
 
 # fault time histories
@@ -80,7 +81,7 @@ for y in 0, 15, 30, 45, 75, 120:
     for f in 'su1', 'su2', 'su3', 'sv1', 'sv2', 'sv3', 'ts1', 'ts2', 'ts3', 'tnm':
         p = 'faultst%03ddp%03d-%s.bin' % (x, y, f)
         p = p.replace('fault-', 'fault-0')
-        fieldio += [('=w', f, [j,k,l,()], p)]
+        fieldio += [('=w', f, s_[j,k,l,:], p)]
 
 # body time histories
 x, j = 0, 1
@@ -101,7 +102,7 @@ for y, z in [
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
         p = 'body%03dst%03ddp%03d-%s.bin' % (z, x, y, f)
         p = p.replace('body-', 'body-0')
-        fieldio += [('=w', f, [j,k,l,()], p)]
+        fieldio += [('=w', f, s_[j,k,l,:], p)]
 
 # stage job
 job = cst.sord.stage(locals())

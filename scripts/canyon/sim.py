@@ -4,6 +4,7 @@ Semi-cylindrical canyon with vertically incident P-wave.
 """
 import os
 import cst
+s_ = cst.sord.s_
 
 # model dimensions
 nproc2 = 2, 1, 1
@@ -25,23 +26,23 @@ fieldio = [
 
 # Ricker wavelet source, 2 second period
 fieldio += [
-    ('=f', 'v2', [-1, (161,-1), 0, 0], 1.0, 'ricker1', 2.0),
+    ('=f', 'v2', s_[-1,161:-1,:,:], 1.0, 'ricker1', 2.0),
 ]
 
 # mesh input files
 fieldio += [
-    ('=R', 'x1', [0, 0, 1, 0], 'x.bin'),
-    ('=R', 'x2', [0, 0, 1, 0], 'y.bin'),
+    ('=R', 'x1', s_[:,:,1,0], 'x.bin'),
+    ('=R', 'x2', s_[:,:,1,0], 'y.bin'),
 ]
 
 # output
 for c in '12':
     fieldio += [
-        ('=w', 'u' + c, [-1, -1, 1, 0], 'source-u%s.bin' % c),
-        ('=w', 'u' + c, [1, 0, 1, 0], 'canyon-u%s.bin' % c),
-        ('=w', 'u' + c, [(2,158), 1, 1, 0], 'flank-u%s.bin' % c),
-        ('=w', 'v' + c, [0, 0, 1, (1,-1,10)], 'snap-v%s.bin' % c),
-        ('=w', 'u' + c, [0, 0, 1, (1,-1,10)], 'snap-u%s.bin' % c),
+        ('=w', 'u' + c, s_[-1,-1,1,0], 'source-u%s.bin' % c),
+        ('=w', 'u' + c, s_[1,:,1,0], 'canyon-u%s.bin' % c),
+        ('=w', 'u' + c, s_[2:158,1,1,0], 'flank-u%s.bin' % c),
+        ('=w', 'v' + c, s_[:,:,1,1:-1:10], 'snap-v%s.bin' % c),
+        ('=w', 'u' + c, s_[:,:,1,1:-1:10], 'snap-u%s.bin' % c),
     ]
 
 # stage job, copy mesh files, and run job

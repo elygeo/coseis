@@ -7,6 +7,7 @@ http://peer.berkeley.edu/lifelines/lifelines_pre_2006/lifelines_princ_invest_y-7
 http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A01.pdf
 """
 import cst
+s_ = cst.sord.s_
 
 # number of processors in each dimension
 nproc3 = 1, 16, 1
@@ -32,9 +33,9 @@ fieldio = [
 
 # material properties of the layer
 fieldio += [
-    ('=', 'rho', [(), (), (1.5, 20.5), ()], 2600.0),
-    ('=', 'vp',  [(), (), (1.5, 20.5), ()], 4000.0),
-    ('=', 'vs',  [(), (), (1.5, 20.5), ()], 2000.0),
+    ('=', 'rho', s_[:,:,:20.5,:], 2600.0),
+    ('=', 'vp',  s_[:,:,:20.5,:], 4000.0),
+    ('=', 'vs',  s_[:,:,:20.5,:], 2000.0),
 ]
 
 # near side boundary conditions:
@@ -59,9 +60,9 @@ for i in range(10):
     j = ihypo[0] + 600.0 * (i + 1) / delta[0]
     k = ihypo[1] + 800.0 * (i + 1) / delta[1]
     fieldio += [
-        ('=w', 'v1', [j, k, 1, ()], 'p%s-v1.bin' % i),
-        ('=w', 'v2', [j, k, 1, ()], 'p%s-v2.bin' % i),
-        ('=w', 'v3', [j, k, 1, ()], 'p%s-v3.bin' % i),
+        ('=w', 'v1', s_[j,k,1,:], 'p%s-v1.bin' % i),
+        ('=w', 'v2', s_[j,k,1,:], 'p%s-v2.bin' % i),
+        ('=w', 'v3', s_[j,k,1,:], 'p%s-v3.bin' % i),
     ]
 
 # run job

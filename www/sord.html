@@ -263,6 +263,7 @@ python example.py -i
 <pre class="literal-block">
 #!/usr/bin/env python
 import cst                                  # import the Coseis module
+s_ = cst.sord.s_                            # for specifying slices
 delta = 100.0, 100.0, 100.0, 0.0075         # step length in (x, y, z, t)
 shape = 61, 61, 61, 60                      # mesh size in (x, y, z, t)
 fieldio = [                                 # field variable input and output
@@ -270,8 +271,8 @@ fieldio = [                                 # field variable input and output
     ('=',  'vp',  [], 6000.0),              # material P-wave velocity
     ('=',  'vs',  [], 3464.0),              # material S-wave velocity
     ('=',  'gam', [], 0.3),                 # material viscosity
-    ('=w', 'v1',  [0,0,31,-1], 'vx.bin'),   # write X velocity slice output
-    ('=w', 'v2',  [0,0,31,-1], 'vy.bin'),   # write Y velocity slice output
+    ('=w', 'v1', s_[:,:,31,-1], 'vx.bin'),  # write X velocity slice output
+    ('=w', 'v2', s_[:,:,31,-1], 'vy.bin'),  # write Y velocity slice output
 ]
 ihypo = 31.0, 31.0, 31.0                    # source location
 source = 'potency'                          # source type
@@ -348,20 +349,21 @@ dynamic, output, node, fault variable.  The <tt class="docutils literal">fieldio
 with subsequent inputs overwriting previous inputs.  So, for example, a field
 may be assigned to one value for the entire volume, followed by a different
 value for a sub-region of the volume.</p>
-<p>All field I/O operations require slice indices <tt class="docutils literal">[j,k,l,t]</tt>, which specify a
-four-dimensional sub-volume of the array in space and time.  Array indexing
-starts at 1 for the first node, and 1.5 for the first cell.  Negative indices
-count inward from end of the array, starting at -1 for the last node, and -1.5
-for the last cell.  Indices can be either a single index, a range <tt class="docutils literal">(start,
-end)</tt>, or a strided range <tt class="docutils literal">(start, end, step)</tt>.  Empty parentheses <tt class="docutils literal">()</tt> are
-shorthand for a full range.  Empty brackets <tt class="docutils literal">[]</tt> are shorthand for the entire
+<p>The four-dimensional sub-volume of the array in space and time is specified
+using Python slicing notation and a helper function <tt class="docutils literal">s_</tt> (similar to NumPy
+index expressions).  The notation is extended here to use integers for node
+indices and integers + 0.5 for cell indices (1.5, 2.5, 3.5, ...).  Array
+indexing starts at 1 for the first node, and 1.5 for the first cell.  Negative
+indices count inward from end of the array, starting at -1 for the last node,
+and -1.5 for the last cell.  Empty brackets <tt class="docutils literal">[]</tt> are shorthand for the entire
 4D volume.  Some examples of slice notation:</p>
 <pre class="literal-block">
-[10, 20, 1, (1,-1)]       # Single node, full time history
-[10.5, 20.5, 1.5, ()]     # Single cell, full time history
-[2, (), (), (1,-1,10)]    # j=2 node surface, every 10th time step
-[(), (), (), -1]          # Full 3D volume, last time step
-[]                        # Entire 4D volume
+s_ = cst.sord.s_    # Helper function for specifying slices
+s_[10,20,1,:]       # Single node, full time history
+s_[10.5,20.5,1.5,:] # Single cell, full time history
+s_[2,:,:,::10]      # j=2 node surface, every 10th time step
+s_[:,:,:,-1]        # Full 3D volume, last time step
+[]                  # Entire 4D volume
 </pre>
 <p>Each member of the <tt class="docutils literal">fieldio</tt> list contains a mode, a field name, and slice
 indices, followed by mode dependent parameters.  The following I/O modes are

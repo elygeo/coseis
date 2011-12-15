@@ -11,7 +11,6 @@ class namespace:
     def __init__(self, d):
         self.__dict__.update(d)
 
-
 def prune(d, pattern=None, types=None):
     """
     Delete dictionary keys with specified name pattern or types

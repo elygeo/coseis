@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import cst                                  # import the Coseis module
+s_ = cst.sord.s_                            # for specifying slices
 delta = 100.0, 100.0, 100.0, 0.0075         # step length in (x, y, z, t)
 shape = 61, 61, 61, 60                      # mesh size in (x, y, z, t)
 fieldio = [                                 # field variable input and output
@@ -7,8 +8,8 @@ fieldio = [                                 # field variable input and output
     ('=',  'vp',  [], 6000.0),              # material P-wave velocity
     ('=',  'vs',  [], 3464.0),              # material S-wave velocity
     ('=',  'gam', [], 0.3),                 # material viscosity
-    ('=w', 'v1',  [0,0,31,-1], 'vx.bin'),   # write X velocity slice output
-    ('=w', 'v2',  [0,0,31,-1], 'vy.bin'),   # write Y velocity slice output
+    ('=w', 'v1', s_[:,:,31,-1], 'vx.bin'),  # write X velocity slice output
+    ('=w', 'v2', s_[:,:,31,-1], 'vy.bin'),  # write Y velocity slice output
 ]
 ihypo = 31.0, 31.0, 31.0                    # source location
 source = 'potency'                          # source type

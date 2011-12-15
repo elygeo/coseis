@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import cst
+s_ = cst.sord.s_
 
 # list of runs:
 # column 1 is dx, the spatial step size
@@ -73,16 +74,16 @@ for dx_, nproc3 in runs_:
     o =  -1500.0 / delta[0] - 1, -1             # nucleation patch outer extent
     i =  -1500.0 / delta[0], -1                 # nucleation patch inner extent
     fieldio += [
-        ('=', 'dc',  [],           0.4),        # slip weakening distance
-        ('=', 'mud', [],           0.525),      # dynamic friction
-        ('=', 'mus', [],             1e4),      # static friction - locked section
-        ('=', 'mus', [j,k,-2,()],  0.677),      # static friction - slipping section
-        ('=', 'tn',  [],          -120e6),      # normal traction
-        ('=', 'ts',  [],            70e6),      # shear traction
-        ('=', 'ts',  [o,o,-2,()], 72.9e6),      # shear traction - nucleation patch
-        ('=', 'ts',  [i,o,-2,()], 75.8e6),      # shear traction - nucleation patch
-        ('=', 'ts',  [o,i,-2,()], 75.8e6),      # shear traction - nucleation patch
-        ('=', 'ts',  [i,i,-2,()], 81.6e6),      # shear traction - nucleation patch
+        ('=', 'dc',  [],            0.4),       # slip weakening distance
+        ('=', 'mud', [],            0.525),     # dynamic friction
+        ('=', 'mus', [],              1e4),     # static friction - locked section
+        ('=', 'mus', s_[j,k,-2,:],  0.677),     # static friction - slipping section
+        ('=', 'tn',  [],           -120e6),     # normal traction
+        ('=', 'ts',  [],             70e6),     # shear traction
+        ('=', 'ts',  s_[o,o,-2,:], 72.9e6),     # shear traction - nucleation patch
+        ('=', 'ts',  s_[i,o,-2,:], 75.8e6),     # shear traction - nucleation patch
+        ('=', 'ts',  s_[o,i,-2,:], 75.8e6),     # shear traction - nucleation patch
+        ('=', 'ts',  s_[i,i,-2,:], 81.6e6),     # shear traction - nucleation patch
     ]
 
     # write fault plane output
@@ -99,12 +100,12 @@ for dx_, nproc3 in runs_:
 
     # write slip, slip velocity, and shear traction time histories
     j, k, l = ihypo
-    p1 = j - 7500.0 / delta[0], -1, -2, ()      # mode II point indices
-    p2 = -1, k - 6000.0 / delta[1], -2, ()      # mode III point indices
+    j -= 7500.0 / delta[0]
+    k -= 6000.0 / delta[1]
     for f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':
         fieldio += [
-            ('=w', f, p1, 'P1-%s.bin' % f),     # mode II point
-            ('=w', f, p2, 'P2-%s.bin' % f),     # mode III point
+            ('=w', f, s_[j,-1,-2,:], 'P1-%s.bin' % f),     # mode II point
+            ('=w', f, s_[-1,k,-2,:], 'P2-%s.bin' % f),     # mode III point
         ]
 
     # launch SORD code

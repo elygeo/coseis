@@ -48,3 +48,8 @@ def _archive():
         f = os.path.join(path, 'build', 'coseis.tgz')
         gzip.open(f, 'wb').write(tar)
 
+class s_(object):
+    def __getitem__(self, item):
+        return item
+
+

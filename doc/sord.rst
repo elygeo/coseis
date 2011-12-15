@@ -153,20 +153,21 @@ with subsequent inputs overwriting previous inputs.  So, for example, a field
 may be assigned to one value for the entire volume, followed by a different
 value for a sub-region of the volume.
 
-All field I/O operations require slice indices ``[j,k,l,t]``, which specify a
-four-dimensional sub-volume of the array in space and time.  Array indexing
-starts at 1 for the first node, and 1.5 for the first cell.  Negative indices
-count inward from end of the array, starting at -1 for the last node, and -1.5
-for the last cell.  Indices can be either a single index, a range ``(start,
-end)``, or a strided range ``(start, end, step)``.  Empty parentheses ``()`` are
-shorthand for a full range.  Empty brackets ``[]`` are shorthand for the entire
+The four-dimensional sub-volume of the array in space and time is specified
+using Python slicing notation and a helper function ``s_`` (similar to NumPy
+index expressions).  The notation is extended here to use integers for node
+indices and integers + 0.5 for cell indices (1.5, 2.5, 3.5, ...).  Array
+indexing starts at 1 for the first node, and 1.5 for the first cell.  Negative
+indices count inward from end of the array, starting at -1 for the last node,
+and -1.5 for the last cell.  Empty brackets ``[]`` are shorthand for the entire
 4D volume.  Some examples of slice notation::
 
-    [10, 20, 1, (1,-1)]       # Single node, full time history
-    [10.5, 20.5, 1.5, ()]     # Single cell, full time history
-    [2, (), (), (1,-1,10)]    # j=2 node surface, every 10th time step
-    [(), (), (), -1]          # Full 3D volume, last time step
-    []                        # Entire 4D volume
+    s_ = cst.sord.s_    # Helper function for specifying slices
+    s_[10,20,1,:]       # Single node, full time history
+    s_[10.5,20.5,1.5,:] # Single cell, full time history
+    s_[2,:,:,::10]      # j=2 node surface, every 10th time step
+    s_[:,:,:,-1]        # Full 3D volume, last time step
+    []                  # Entire 4D volume
 
 Each member of the ``fieldio`` list contains a mode, a field name, and slice
 indices, followed by mode dependent parameters.  The following I/O modes are
