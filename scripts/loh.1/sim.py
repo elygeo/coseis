@@ -60,9 +60,9 @@ for i in range(10):
     j = ihypo[0] + 600.0 * (i + 1) / delta[0]
     k = ihypo[1] + 800.0 * (i + 1) / delta[1]
     fieldio += [
-        ('=w', 'v1', s_[j,k,1,:], 'p%s-v1.bin' % i),
-        ('=w', 'v2', s_[j,k,1,:], 'p%s-v2.bin' % i),
-        ('=w', 'v3', s_[j,k,1,:], 'p%s-v3.bin' % i),
+        ('=w', 'v1', [j,k,1,()], 'p%s-v1.bin' % i),
+        ('=w', 'v2', [j,k,1,()], 'p%s-v2.bin' % i),
+        ('=w', 'v3', [j,k,1,()], 'p%s-v3.bin' % i),
     ]
 
 # run job

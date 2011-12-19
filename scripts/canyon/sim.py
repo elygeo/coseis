@@ -41,8 +41,8 @@ for c in '12':
         ('=w', 'u' + c, s_[-1,-1,1,0], 'source-u%s.bin' % c),
         ('=w', 'u' + c, s_[1,:,1,0], 'canyon-u%s.bin' % c),
         ('=w', 'u' + c, s_[2:158,1,1,0], 'flank-u%s.bin' % c),
-        ('=w', 'v' + c, s_[:,:,1,1:-1:10], 'snap-v%s.bin' % c),
-        ('=w', 'u' + c, s_[:,:,1,1:-1:10], 'snap-u%s.bin' % c),
+        ('=w', 'v' + c, s_[:,:,1,::10], 'snap-v%s.bin' % c),
+        ('=w', 'u' + c, s_[:,:,1,::10], 'snap-u%s.bin' % c),
     ]
 
 # stage job, copy mesh files, and run job

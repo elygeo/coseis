@@ -61,21 +61,21 @@ fieldio += [
     ('=',  'dc',   [], 0.5),
     ('=',  'mud',  [], 0.1),
     ('=',  'mus',  [], 1e4),
-    ('=',  'mus',  s_[j,k,l,:], 0.7),
-    ('=R', 's11',  s_[1,:,l,0], 's11.bin'),
-    ('=R', 's22',  s_[1,:,l,0], 's22.bin'),
-    ('=R', 's33',  s_[1,:,l,0], 's33.bin'),
-    ('=w', 'trup', s_[j,k,l,:], 'trup.bin'),
+    ('=',  'mus',  [j,k,l,()], 0.7),
+    ('=R', 's11',  [1,(),l,0], 's11.bin'),
+    ('=R', 's22',  [1,(),l,0], 's22.bin'),
+    ('=R', 's33',  [1,(),l,0], 's33.bin'),
+    ('=w', 'trup', [j,k,l,()], 'trup.bin'),
 ]
 
 # nucleation
 i = 1500.0 / delta[0]
 j, k, l = ihypo
 fieldio += [
-    ('=', 'mus',  s_[1:j+i+1,k-i-1:k+i+1,l,:], 0.66),
-    ('=', 'mus',  s_[1:j+i,  k-i-1:k+i+1,l,:], 0.62),
-    ('=', 'mus',  s_[1:j+i+1,k-i:  k+i,  l,:], 0.62),
-    ('=', 'mus',  s_[1:j+i,  k-i:  k+i,  l,:], 0.54),
+    ('=', 'mus', s_[:j+i+1,k-i-1:k+i+1,l,:], 0.66),
+    ('=', 'mus', s_[:j+i,  k-i-1:k+i+1,l,:], 0.62),
+    ('=', 'mus', s_[:j+i+1,k-i:  k+i,  l,:], 0.62),
+    ('=', 'mus', s_[:j+i,  k-i:  k+i,  l,:], 0.54),
 ]
 
 # slip, slip velocity, and shear traction time histories
@@ -97,7 +97,7 @@ for x, y in [
     for f in 'su1', 'su2', 'su3', 'sv1', 'sv2', 'sv3', 'ts1', 'ts2', 'ts3', 'tnm':
         p = 'faultst%03ddp%03d-%s.bin' % (x, y, f)
         p = p.replace('fault-', 'fault-0')
-        fieldio += [('=w', f, s_[j,k,l,:], p)]
+        fieldio += [('=w', f, [j,k,l,()], p)]
 
 # displacement and velocity time histories
 for x, y, z in [
@@ -120,7 +120,7 @@ for x, y, z in [
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
         p = 'body%03dst%03ddp%03d-%s.bin' % (z, x, y, f)
         p = p.replace('body-', 'body-0')
-        fieldio += [('=w', f, s_[j,k,l,:], p)]
+        fieldio += [('=w', f, [j,k,l,()], p)]
 
 # stage job
 job = cst.sord.stage(locals())

@@ -117,10 +117,10 @@ for cvm_ in 'cvms', 'cvmh', 'cvmg':
         j = x / delta[0] + 1.0
         k = y / delta[1] + 1.0
         fieldio += [
-            (m, 'vs', s_[j,k,1,:], 'out/' + s + '-vs.bin'),
-            (m, 'v1', s_[j,k,1,:], 'out/' + s + '-v1.bin'),
-            (m, 'v2', s_[j,k,1,:], 'out/' + s + '-v2.bin'),
-            (m, 'v3', s_[j,k,1,:], 'out/' + s + '-v3.bin'),
+            (m, 'vs', [j,k,1,()], 'out/' + s + '-vs.bin'),
+            (m, 'v1', [j,k,1,()], 'out/' + s + '-v1.bin'),
+            (m, 'v2', [j,k,1,()], 'out/' + s + '-v2.bin'),
+            (m, 'v3', [j,k,1,()], 'out/' + s + '-v3.bin'),
         ]
 
     # surface output

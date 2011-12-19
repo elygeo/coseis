@@ -8,7 +8,6 @@ http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A02.pdf
 """
 import os
 import cst
-s_ = cst.sord.s_
 
 # parameters
 dx_ = 2000.0; nproc3 = 1, 1, 1
@@ -63,9 +62,9 @@ for i in range(8):
     j = (74000.0 - 6000.0 * i) / delta[0] + 1
     k = (16000.0 + 8000.0 * i) / delta[1] + 1
     fieldio += [
-        ('=wi', 'v1', s_[j,k,1,:], 'p%s-v1.bin' % i),
-        ('=wi', 'v2', s_[j,k,1,:], 'p%s-v2.bin' % i),
-        ('=wi', 'v3', s_[j,k,1,:], 'p%s-v3.bin' % i),
+        ('=wi', 'v1', [j,k,1,()], 'p%s-v1.bin' % i),
+        ('=wi', 'v2', [j,k,1,()], 'p%s-v2.bin' % i),
+        ('=wi', 'v3', [j,k,1,()], 'p%s-v3.bin' % i),
     ]
 
 # run job

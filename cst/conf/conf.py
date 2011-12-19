@@ -31,7 +31,6 @@ nproc = 1
 pre = post = ''  # pre-processing and post-processing commands
 dtype = dtype_f = np.dtype('f').str # Numpy data type
 verbose = False
-base_index = 1   # 0=C/Python, 1=Fortran style array indexing
 
 # machine specific
 host = hostname = os.uname()[1]

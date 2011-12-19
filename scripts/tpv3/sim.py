@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import cst
-s_ = cst.sord.s_
 
 # list of runs:
 # column 1 is dx, the spatial step size
@@ -58,11 +57,11 @@ for dx_, nproc3 in runs_:
     k =  -7500.0 / delta[1] - 0.5, -1.5         # Y fault extent
     l =  -3000.0 / delta[2] - 0.5, -1.5         # Z low viscosity extent
     fieldio = [
-        ('=', 'rho', [],     2670.0),           # density
-        ('=', 'vp',  [],     6000.0),           # P-wave speed
-        ('=', 'vs',  [],     3464.0),           # S-wave speed
-        ('=', 'gam', [],        0.2),           # high viscosity
-        ('=', 'gam', [j,k,l,0], 0.02),          # low viscosity zone near fault
+        ('=', 'rho', [],      2670.0),          # density
+        ('=', 'vp',  [],      6000.0),          # P-wave speed
+        ('=', 'vs',  [],      3464.0),          # S-wave speed
+        ('=', 'gam', [],         0.2),          # high viscosity
+        ('=', 'gam', [j,k,l,()], 0.02),         # low viscosity zone near fault
     ]
     hourglass = 1.0, 2.0
 
@@ -75,15 +74,15 @@ for dx_, nproc3 in runs_:
     i =  -1500.0 / delta[0], -1                 # nucleation patch inner extent
     fieldio += [
         ('=', 'dc',  [],            0.4),       # slip weakening distance
-        ('=', 'mud', [],            0.525),     # dynamic friction
-        ('=', 'mus', [],              1e4),     # static friction - locked section
-        ('=', 'mus', s_[j,k,-2,:],  0.677),     # static friction - slipping section
-        ('=', 'tn',  [],           -120e6),     # normal traction
-        ('=', 'ts',  [],             70e6),     # shear traction
-        ('=', 'ts',  s_[o,o,-2,:], 72.9e6),     # shear traction - nucleation patch
-        ('=', 'ts',  s_[i,o,-2,:], 75.8e6),     # shear traction - nucleation patch
-        ('=', 'ts',  s_[o,i,-2,:], 75.8e6),     # shear traction - nucleation patch
-        ('=', 'ts',  s_[i,i,-2,:], 81.6e6),     # shear traction - nucleation patch
+        ('=', 'mud', [],          0.525),       # dynamic friction
+        ('=', 'mus', [],            1e4),       # static friction - locked section
+        ('=', 'mus', [j,k,-2,()],  0.677),       # static friction - slipping section
+        ('=', 'tn',  [],         -120e6),       # normal traction
+        ('=', 'ts',  [],           70e6),       # shear traction
+        ('=', 'ts',  [o,o,-2,()], 72.9e6),       # shear traction - nucleation patch
+        ('=', 'ts',  [i,o,-2,()], 75.8e6),       # shear traction - nucleation patch
+        ('=', 'ts',  [o,i,-2,()], 75.8e6),       # shear traction - nucleation patch
+        ('=', 'ts',  [i,i,-2,()], 81.6e6),       # shear traction - nucleation patch
     ]
 
     # write fault plane output
@@ -104,8 +103,8 @@ for dx_, nproc3 in runs_:
     k -= 6000.0 / delta[1]
     for f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':
         fieldio += [
-            ('=w', f, s_[j,-1,-2,:], 'P1-%s.bin' % f),     # mode II point
-            ('=w', f, s_[-1,k,-2,:], 'P2-%s.bin' % f),     # mode III point
+            ('=w', f, [j,-1,-2,()], 'P1-%s.bin' % f),     # mode II point
+            ('=w', f, [-1,k,-2,()], 'P2-%s.bin' % f),     # mode III point
         ]
 
     # launch SORD code

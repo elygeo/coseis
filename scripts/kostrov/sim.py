@@ -3,7 +3,6 @@
 Kostrov circular crack test.
 """
 import cst
-s_ = cst.sord.s_
 
 # parameters
 nproc3 = 1, 1, 2
@@ -43,14 +42,14 @@ fieldio += [
 
 # receivers
 fieldio += [
-    ('=w', 'svm', s_[ -1,-21,-1,:], 'p20a.bin'),
-    ('=w', 'svm', s_[-13,-17,-1,:], 'p20b.bin'),
-    ('=w', 'svm', s_[-17,-13,-1,:], 'p20c.bin'),
-    ('=w', 'svm', s_[-21, -1,-1,:], 'p20d.bin'),
-    ('=w', 'svm', s_[ -1,-41,-1,:], 'p40a.bin'),
-    ('=w', 'svm', s_[-25,-33,-1,:], 'p40b.bin'),
-    ('=w', 'svm', s_[-33,-25,-1,:], 'p40c.bin'),
-    ('=w', 'svm', s_[-41, -1,-1,:], 'p40d.bin'),
+    ('=w', 'svm', [ -1,-21,-1,()], 'p20a.bin'),
+    ('=w', 'svm', [-13,-17,-1,()], 'p20b.bin'),
+    ('=w', 'svm', [-17,-13,-1,()], 'p20c.bin'),
+    ('=w', 'svm', [-21, -1,-1,()], 'p20d.bin'),
+    ('=w', 'svm', [ -1,-41,-1,()], 'p40a.bin'),
+    ('=w', 'svm', [-25,-33,-1,()], 'p40b.bin'),
+    ('=w', 'svm', [-33,-25,-1,()], 'p40c.bin'),
+    ('=w', 'svm', [-41, -1,-1,()], 'p40d.bin'),
 ]
 
 # launch SORD

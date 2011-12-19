@@ -8,8 +8,8 @@ fieldio = [                                 # field variable input and output
     ('=',  'vp',  [], 6000.0),              # material P-wave velocity
     ('=',  'vs',  [], 3464.0),              # material S-wave velocity
     ('=',  'gam', [], 0.3),                 # material viscosity
-    ('=w', 'v1', s_[:,:,31,-1], 'vx.bin'),  # write X velocity slice output
-    ('=w', 'v2', s_[:,:,31,-1], 'vy.bin'),  # write Y velocity slice output
+    ('=w', 'v1',  s_[:,:,31,-1], 'vx.bin'), # write X velocity slice output
+    ('=w', 'v2',  s_[:,:,31,-1], 'vy.bin'), # write Y velocity slice output
 ]
 ihypo = 31.0, 31.0, 31.0                    # source location
 source = 'potency'                          # source type

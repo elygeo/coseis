@@ -116,18 +116,18 @@ def stage(dictargs={}, **kwargs):
     inputs.update(dictargs)
     inputs.update(kwargs)
 
-    # test for depreciated parameters
-    depreciated = [
+    # test for deprecated parameters
+    deprecated = [
         ('np3', "Parameter 'np3' is renamed to 'nproc3'."),
-        ('nn',  "Parameter 'nn' depreciated. Use: shape = nx, ny, nz, nt."),
-        ('nt',  "Parameter 'nn' depreciated. Use: shape = nx, ny, nz, nt."),
-        ('dx',  "Parameter 'dx' depreciated. Use: delta = dx, dy, dz, dt."),
-        ('dt',  "Parameter 'dt' depreciated. Use: delta = dx, dy, dz, dt."),
+        ('nn',  "Parameter 'nn' deprecated. Use: shape = nx, ny, nz, nt."),
+        ('nt',  "Parameter 'nn' deprecated. Use: shape = nx, ny, nz, nt."),
+        ('dx',  "Parameter 'dx' deprecated. Use: delta = dx, dy, dz, dt."),
+        ('dt',  "Parameter 'dt' deprecated. Use: delta = dx, dy, dz, dt."),
         ('period', "Parameter 'period' renamed to 'tau'."),
         ('timefunction', "Parameter 'timefunction' renamed to 'pulse'."),
     ]
     error = None
-    for k, msg in depreciated:
+    for k, msg in deprecated:
         if k in inputs:
             print(msg)
             error = True
@@ -299,23 +299,26 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
     """
     >>> shape = 8, 8, 8, 8
 
-    >>> expand_slices(shape)
+    >>> expand_slices(shape, [])
     [(0, 8, 1), (0, 8, 1), (0, 8, 1), (0, 8, 1)]
 
     >>> expand_slices(shape, [0.4, 0.6, -0.6, -0.4])
     [(0, 1, 1), (1, 2, 1), (7, 8, 1), (8, 9, 1)]
 
-    >>> expand_slices(shape, s_[:, 0.4, 0.6, -0.6:-0.4:2], 0)
-    [(0, 8, 1), (0, 1, 1), (1, 2, 1), (7, 8, 2)]
+    >>> expand_slices(shape, s_[0.4, 0.6, -0.6:-0.4:2, :])
+    [(0, 1, 1), (1, 2, 1), (7, 8, 2), (0, 8, 1)]
 
-    >>> expand_slices(shape, s_[:, 0.9, 1.1, -1.1:-0.9:2], 0.5)
-    [(0, 7, 1), (0, 1, 1), (1, 2, 1), (6, 7, 2)]
+    >>> expand_slices(shape, s_[0.9, 1.1, -1.1:-0.9:2, :], base=0.5)
+    [(0, 1, 1), (1, 2, 1), (6, 7, 2), (0, 7, 1)]
 
-    >>> expand_slices(shape, s_[:, 1.4, 1.6, -1.6:-1.4:2], 1)
-    [(1, 8, 1), (1, 1, 1), (2, 2, 1), (7, 8, 2)]
+    >>> expand_slices(shape, s_[1.4, 1.6, -1.6:-1.4:2, :], base=1)
+    [(1, 1, 1), (2, 2, 1), (7, 8, 2), (1, 8, 1)]
 
-    >>> expand_slices(shape, s_[:, 1.9, 2.1, -2.1:-1.9:2], 1.5)
-    [(1, 7, 1), (1, 1, 1), (2, 2, 1), (6, 7, 2)]
+    >>> expand_slices(shape, s_[1.9, 2.1, -2.1:-1.9:2, :], base=1.5)
+    [(1, 1, 1), (2, 2, 1), (6, 7, 2), (1, 7, 1)]
+
+    >>> expand_slices(shape, [0, 1, 2, ()], base=0, new_base=1)
+    [(1, 1, 1), (2, 2, 1), (3, 3, 1), (1, 8, 1)]
     """
 
     # normalize type
@@ -325,6 +328,10 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
         slices = n * [()]
     elif len(slices) != n:
         raise Exception('error in indices: %r' % (slices,))
+
+    # default no base conversion
+    if new_base is None:
+        new_base = base
 
     # loop over slices
     for i, s in enumerate(slices):
@@ -365,15 +372,14 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
             stop += wraparound
 
         # convert base
-        if new_base is not None:
+        if new_base != base:
             r = new_base - base
-            base = new_base
             start += r
             stop += r - int(r)
 
         # round and finish
         if round:
-            r = base - int(base)
+            r = new_base - int(new_base)
             start = int(start - r + 0.5)
             stop  = int(stop  - r + 0.5)
         slices[i] = start, stop, step
