@@ -26,14 +26,19 @@ def header(lines, counter=0, casters=None):
             return header, counter
         k, v = line.split(':')
         k = k.split('*')[-1]
-        if k not in cast:
-            header[k] = v
-        else:
+        header[k] = v
+        if k in cast:
             f = v.split()
             if len(f) > 1:
-                header[k] = tuple(cast[k](x) for x in f)
+                try:
+                    header[k] = tuple(cast[k](x) for x in f)
+                except(ValueError):
+                    print('Warning: could not cast %s %s to %s' % (k, v, cast[k]))
             else:
-                header[k] = cast[k](v)
+                try:
+                    header[k] = cast[k](v)
+                except(ValueError):
+                    print('Warning: could not cast %s %s to %s' % (k, v, cast[k]))
     raise Exception('Error in header')
     return
 

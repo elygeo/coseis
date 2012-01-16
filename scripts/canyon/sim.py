@@ -26,7 +26,7 @@ fieldio = [
 
 # Ricker wavelet source, 2 second period
 fieldio += [
-    ('=f', 'v2', s_[-1,161:-1,:,:], 1.0, 'ricker1', 2.0),
+    ('=f', 'v2', s_[-1,161:,:,:], 1.0, 'ricker1', 2.0),
 ]
 
 # mesh input files
