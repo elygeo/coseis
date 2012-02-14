@@ -1,4 +1,4 @@
-#!/usr/bin/env ipython
+#!/usr/bin/env ipython --gui=qt
 """
 Quick multi-purpose plotting.
 
@@ -110,6 +110,7 @@ def plot(*argv):
                 stats(data, title)
                 ax = fig.add_subplot(111)
                 im = ax.imshow(data, interpolation='nearest')
+                ax.set_aspect('auto')
                 plt.colorbar(im)
                 if clim:
                     im.set_clim(*clim)
@@ -141,6 +142,5 @@ def plot(*argv):
 
 # continue if command line
 if __name__ == '__main__':
-    print sys.argv
-    plot(*sys.argv[2:])
+    plot(*sys.argv[1:])
 

@@ -379,6 +379,68 @@ def engdahlcat(path='engdahl-centennial-cat.npy'):
     return data
 
 
+def scec_cfm(segments, subsegments=None, extent=None, geo=True):
+    """
+    SCEC Community Fault Model reader
+
+    Parameters
+    ----------
+
+    segments: segment names (may contain wildcards).
+    subsegments: list of subsegment indices (None = all).
+    extent: include within range (xmin, xmax), (ymin, ymax).
+    geo: convert X/Y coordinates to Lon/Lat.
+
+    Returns
+    -------
+
+    segs: list of segements. Each segment is a list of tsurfs.
+    """
+    import glob
+    import pyproj
+    import cst
+    repo = cst.site.repo
+
+    # download if not found
+    path = os.path.join(repo, 'scec-cfm4')
+    if not os.path.exists(path):
+        url = 'http://structure.harvard.edu/cfm/download/CFM_40.tar.gz'
+        print('Downloading %s' % url)
+        f = os.path.join(repo, os.path.basename(url))
+        urllib.urlretrieve(url, f)
+        os.mkdir(path)
+        subprocess.check_call(['tar', '-C', path, '-jxf', f])
+
+    # projection: UTM zone 11, NAD 1927 datum (implies Clark 1866 geoid)
+    proj = pyproj.Proj(proj='utm', zone=11, datum='NAD27')
+
+    # loop through segments
+    segs = []
+    path = os.path.join(path, 'v40', 'ts')
+    for path in glob.glob(path + segments + '.ts'):
+        seg = []
+        for i, t in enumerate(cst.gocad.tsurf(path)):
+            if subsegments is not None:
+                if i not in subsegments:
+                    continue 
+            x, y, z = t[2]
+            if geo:
+                x, y = proj(x, y, inverse=True)
+                t[2] = [x, y, z]
+            if extent:
+                xlim, ylim = extent
+                if (
+                    x.max() < xlim[0] or
+                    x.min() > xlim[1] or
+                    y.max() < ylim[0] or
+                    y.min() > ylim[1]
+                ):
+                    continue
+            seg += [t]
+        segs += [seg]
+    return segs
+
+
 def cybershake(isrc, irup, islip, ihypo, name=None):
     """
     CyberShake sources.
