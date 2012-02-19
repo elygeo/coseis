@@ -135,8 +135,8 @@ def tsurf(path):
             tface += [np.array(trgl, 'i').T]
             tsurf += [[hdr, phdr, vrtx, tface, border, bstone]]
         elif f[0] == 'PROPERTY_CLASS_HEADER':
-            phdr[f[1]] = header(lines, counter)
+            phdr[f[1]], counter = header(lines, counter)
         elif f[0] == 'HEADER':
-            hdr = header(lines, counter)
+            hdr, counter = header(lines, counter)
     return tsurf
 

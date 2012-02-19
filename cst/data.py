@@ -7,7 +7,7 @@ Data utilities and sources
 # http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
 import os, urllib, gzip, zipfile, subprocess
 import numpy as np
-from . import coord, source
+from . import coord, source, gocad
 
 
 def upsample(f):
@@ -379,66 +379,85 @@ def engdahlcat(path='engdahl-centennial-cat.npy'):
     return data
 
 
-def scec_cfm(segments, subsegments=None, extent=None, geo=True):
+class scec_cfm():
     """
-    SCEC Community Fault Model reader
+    SCEC Community Fault Model (CFM) reader.
 
-    Parameters
-    ----------
+    Call Parameters
+    ---------------
 
-    segments: segment names (may contain wildcards).
-    subsegments: list of subsegment indices (None = all).
-    extent: include within range (xmin, xmax), (ymin, ymax).
-    geo: convert X/Y coordinates to Lon/Lat.
+    fault: Name of fault to read.
+    segments: List of segment indices (defatul None = all).
+    extent: Return None if outside range (xmin, xmax), (ymin, ymax).
+    geographic: Convert X/Y coordinates to Lon/Lat, default = True.
 
     Returns
     -------
 
-    segs: list of segements. Each segment is a list of tsurfs.
+    header: dict of metadata.
+    property_header: dict of metadata.
+    vertices: M x 3 array of vertex coordinates.
+    triangles: List of N x 3 arrays of vertex indices.
+    border: 1d array of border vertex indices.
+    extrema: 1d array of border extremity vertex indices. 
     """
-    import glob
-    import pyproj
-    import cst
-    repo = cst.site.repo
 
-    # download if not found
-    path = os.path.join(repo, 'scec-cfm4')
-    if not os.path.exists(path):
-        url = 'http://structure.harvard.edu/cfm/download/CFM_40.tar.gz'
-        print('Downloading %s' % url)
-        f = os.path.join(repo, os.path.basename(url))
-        urllib.urlretrieve(url, f)
-        os.mkdir(path)
-        subprocess.check_call(['tar', '-C', path, '-jxf', f])
+    def __init__(self):
 
-    # projection: UTM zone 11, NAD 1927 datum (implies Clark 1866 geoid)
-    proj = pyproj.Proj(proj='utm', zone=11, datum='NAD27')
+        # projection: UTM zone 11, NAD 1927 datum (implies Clark 1866 geoid)
+        self.projection = dict(proj='utm', zone=11, datum='NAD27')
 
-    # loop through segments
-    segs = []
-    path = os.path.join(path, 'v40', 'ts')
-    for path in glob.glob(path + segments + '.ts'):
-        seg = []
-        for i, t in enumerate(cst.gocad.tsurf(path)):
-            if subsegments is not None:
-                if i not in subsegments:
-                    continue 
-            x, y, z = t[2]
-            if geo:
-                x, y = proj(x, y, inverse=True)
-                t[2] = [x, y, z]
-            if extent:
-                xlim, ylim = extent
-                if (
-                    x.max() < xlim[0] or
-                    x.min() > xlim[1] or
-                    y.max() < ylim[0] or
-                    y.min() > ylim[1]
-                ):
-                    continue
-            seg += [t]
-        segs += [seg]
-    return segs
+        # paths
+        import cst
+        repo = cst.site.repo
+        path = os.path.join(repo, 'scec-cfm4')
+        self.path = os.path.join(path, 'v40', 'ts')
+
+        # download if not found
+        if not os.path.exists(path):
+            url = 'http://structure.harvard.edu/cfm/download/CFM_40.tar.gz'
+            print('Downloading %s' % url)
+            f = os.path.join(repo, os.path.basename(url))
+            urllib.urlretrieve(url, f)
+            os.mkdir(path)
+            subprocess.check_call(['tar', '-C', path, '-zxf', f])
+
+        # fault list
+        self.faults = [s[:-3] for s in os.listdir(self.path)]
+
+        return
+
+    def __call__(self, fault, segments=None, extent=None, geographic=True):
+
+        # read GOCAD TSurf file
+        f = os.path.join(self.path, fault + '.ts')
+        tsurf = gocad.tsurf(f)[0]
+
+        # select segments
+        if segments is not None:
+            tsurf[3] = [tsurf[3][i] for i in segments]
+
+        # project to geographic coordinates
+        if geographic:
+            import pyproj
+            proj = pyproj.Proj(**self.projection)
+            x, y, z = tsurf[2]
+            x, y = proj(x, y, inverse=True)
+            tsurf[2] = np.array([x, y, z], z.dtype)
+
+        # exclude if outside range
+        if extent:
+            xlim, ylim = extent
+            x, y, z = tsurf[2]
+            if (
+                x.max() < xlim[0] or
+                x.min() > xlim[1] or
+                y.max() < ylim[0] or
+                y.min() > ylim[1]
+            ):
+                return None
+
+        return tsurf
 
 
 def cybershake(isrc, irup, islip, ihypo, name=None):
