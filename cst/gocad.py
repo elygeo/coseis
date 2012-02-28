@@ -12,7 +12,7 @@ def header(lines, counter=0, casters=None):
         casters = {
             int: ('pclip', 'field'),
             bool: ('imap', 'ivolmap', 'parts', 'transparency'),
-            float: ('color', 'contrast', 'low_clip', 'high_clip', 'transparency_min'),
+            float: ('contrast', 'low_clip', 'high_clip', 'transparency_min'),
         }
     cast = {}
     for c in casters:
