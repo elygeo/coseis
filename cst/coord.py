@@ -89,6 +89,10 @@ def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     if bound[1]: mask = mask | (x > nx - 1)
     x = np.minimum(np.maximum(x, 0), nx - 1)
 
+    # NaNs
+    nans = np.isnan(x)
+    x[nans] = 0.0
+
     # interpolation
     if method == 'nearest':
         j = (x + 0.5).astype('i')
@@ -102,12 +106,14 @@ def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
 
     # apply mask
     if fi is None:
+        nans = nans | mask
+        f[...,nans] = np.nan
         fi = f
-        if mask is not False:
-            fi[...,mask] = np.nan
     else:
         if mask_nan:
-            mask = mask | np.isnan(f)
+            mask = mask | nans | np.isnan(f)
+        else:
+            f[...,nans] = np.nan
         if mask is False:
             fi[...] = f[...]
         else:
@@ -152,6 +158,11 @@ def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
     x = np.minimum(np.maximum(x, 0), nx - 1)
     y = np.minimum(np.maximum(y, 0), ny - 1)
 
+    # NaNs
+    nans = np.isnan(x) | np.isnan(y)
+    x[nans] = 0.0
+    y[nans] = 0.0
+
     # interpolation
     if method == 'nearest':
         j = (x + 0.5).astype('i')
@@ -170,12 +181,14 @@ def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
 
     # apply mask
     if fi is None:
+        nans = nans | mask
+        f[...,nans] = np.nan
         fi = f
-        if mask is not False:
-            fi[...,mask] = np.nan
     else:
         if mask_nan:
-            mask = mask | np.isnan(f)
+            mask = mask | nans | np.isnan(f)
+        else:
+            f[...,nans] = np.nan
         if mask is False:
             fi[...] = f[...]
         else:
@@ -224,6 +237,12 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
     y = np.minimum(np.maximum(y, 0), ny - 1)
     z = np.minimum(np.maximum(z, 0), nz - 1)
 
+    # NaNs
+    nans = np.isnan(x) | np.isnan(y) | np.isnan(z)
+    x[nans] = 0.0
+    y[nans] = 0.0
+    z[nans] = 0.0
+
     # interpolation
     if method == 'nearest':
         j = (x + 0.5).astype('i')
@@ -248,12 +267,14 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
 
     # apply mask
     if fi is None:
+        nans = nans | mask
+        f[...,nans] = np.nan
         fi = f
-        if mask is not False:
-            fi[...,mask] = np.nan
     else:
         if mask_nan:
-            mask = mask | np.isnan(f)
+            mask = mask | nans | np.isnan(f)
+        else:
+            f[...,nans] = np.nan
         if mask is False:
             fi[...] = f[...]
         else:

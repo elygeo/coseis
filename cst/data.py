@@ -5,7 +5,7 @@ Data utilities and sources
 # Quaternary Fault Database
 # ftp://hazards.cr.usgs.gov/maps/qfault/
 # http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
-import os, urllib, gzip, zipfile, subprocess
+import os, sys, urllib, gzip, zipfile, subprocess
 import numpy as np
 from . import coord, source, gocad
 
@@ -23,7 +23,7 @@ def upsample(f):
 
 def downsample(f, d):
     n = f.shape
-    n = (n[0] + 1) / d, (n[1] + 1) / d
+    n = (n[0] + 1) // d, (n[1] + 1) // d
     g = np.zeros(n, f.dtype)
     for k in range(d):
         for j in range(d):
@@ -138,6 +138,19 @@ def globe30(tile=(0, 1), fill=True):
     Global Land One-km Base Elevation Digital Elevation Model.
     Missing bathymetry is optionally filled with ETOPO1.
     http://www.ngdc.noaa.gov/mgg/topo/globe.html
+
+    Parameters
+    ----------
+    tile: 90 x 90 deg tile indices:
+        (0, 0): W Antarctica, S Pacific
+        (1, 0): W Antarctica, S America, S Atlantic
+        (2, 0): E Antarctica, S Africa, Indian Ocean
+        (3, 0): E Antarctica, Australia
+        (0, 1): W N America, N Pacific
+        (1, 1): E N America, W Africa, W Europe, N Atlantic
+        (2, 1): W Asia, Africa, E Europe
+        (3, 1): E Asia, W Pacific
+    fill: Fill missing data (ocean basins) with ETOPO1 bathymetry.
     """
     import cst
     repo = cst.site.repo
@@ -158,8 +171,8 @@ def globe30(tile=(0, 1), fill=True):
             z += gzip.open(f, mode='rb').read()
         z = np.fromstring(z, '<i2').reshape(shape).T[:,::-1]
         if fill:
-            n = shape[1] / 2
-            m = shape[0] / 2
+            n = shape[1] // 2
+            m = shape[0] // 2
             j = slice(tile[0] * n, tile[0] * n + n + 1)
             k = slice(tile[1] * m, tile[1] * m + m + 1)
             x = 0.0625 * etopo1()[j,k]
@@ -188,6 +201,10 @@ def topo(extent, scale=1.0, downsample=0):
     ----------
     extent: (lon_min, lon_max), (lat_min, lat_max)
     scale: Scaling factor for elevation data
+    downsample:
+        0: GLOBE 30 sec, with missing data filled by ETOPO1
+        1: ETOPO1 60 sec
+        >1: Down-sample factor for ETOPO1
 
     Returns
     -------
@@ -197,7 +214,7 @@ def topo(extent, scale=1.0, downsample=0):
     import math
     x, y = extent
     if downsample:
-        d = 60 / downsample
+        d = 60 // downsample
         x0, y0 = -180, -90
     else:
         d = 120
@@ -206,8 +223,9 @@ def topo(extent, scale=1.0, downsample=0):
     j1 = int(math.ceil((x[1] - x0) % 360 * d))
     k0 = int(math.floor((y[0] - y0) * d))
     k1 = int(math.ceil((y[1] - y0) * d))
-    x = j0 / d + x0, j1 / d + x0
-    y = k0 / d + y0, k1 / d + y0
+    r = 1.0 / d
+    x = j0 * r + x0, j1 * r + x0
+    y = k0 * r + y0, k1 * r + y0
     if downsample:
         z = etopo1(downsample)[j0:j1,k0:k1]
     else:
@@ -215,10 +233,12 @@ def topo(extent, scale=1.0, downsample=0):
         tile0 = j0 // n, k0 // n
         tile1 = j1 // n, k1 // n
         if tile0 != tile1:
-            print('Multiple tiles not implemented. Try downsample=1')
+            print('Multiple tiles not implemented.')
+            print('Try ETOPO1 (downsample=1) or manually assemble tiles.')
+            sys.exit()
         j0, j1 = j0 % n, j1 % n
         k0, k1 = k0 % n, k1 % n
-        z = globe30(tile0)[j0:j1,k0:k1]
+        z = globe30(tile0)[j0:j1+1,k0:k1+1]
     return scale * z, (x, y)
 
 
