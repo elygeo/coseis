@@ -1,17 +1,25 @@
 #!/usr/bin/env ipython --gui=wx
 """
 SCEC Community Fault Model Visualizer
+=====================================
 
-Arrow keys or mouse drag:                Rotate the view
-Shift-arrow keys or mouse drag:          Pan the view
-'-' and '+' keys or right mouse drag:    Zoom the view 
-',' and '.' keys:                        Left/right fault selection
-'<' and '>' keys:                        Up/down selection
-'/' key:                                 Reset the view
-'3' key:                                 Toggle stereo view
-'s' key:                                 Save a screen-shot
+Keyboard Controls
+-----------------
 
-Edit this script to select by fault name or bounding region (extent).
+Left/right fault selection        , .             
+Up/down fault selection           < >             
+Rotate the view                Arrows          
+Pan the view             Shift-Arrows    
+Zoom the view                     - =             
+Reset the view                      /               
+Toggle stereo view                  3               
+Save a screen-shot                  S               
+
+Note
+----
+
+Edit this script to select by fault
+name or bounding region (extent).
 """
 print __doc__
 import numpy as np
@@ -21,6 +29,8 @@ from enthought.mayavi import mlab
 import cst
 
 # parameters
+extent = (-121.5, -114.5), (30.5, 36.5)
+extent = (-119, -115), (32, 35)
 fault_extent = (-117.1, -116.1), (33.7, 34.1)
 faults = [
     ([0, 1], 'cfma_san_bernardino_W_san_andreas_complete'),
@@ -30,15 +40,13 @@ faults = [
 faults = None # everything
 combine = True
 resolution = 'high'
-resolution = 'low'
 view_azimuth = -90
 view_elevation = 55
-view_angle = 23
-opacity = 0.3
+view_angle = 20
+opacity = 0.25
 
 # projection
 scale = 0.001
-extent = (-121.5, -114.5), (30.5, 36.5)
 proj = pyproj.Proj(proj='tmerc', lon_0=-117.7, lat_0=34.1, k=scale)
 
 # CFM data
@@ -58,15 +66,18 @@ x, y = proj(x, y)
 topomesh = x, y
 
 # base map data
-if 0:
+if 1:
     x, y = np.c_[
-        cst.data.mapdata('coaslines', resolution, extent, 10.0),
-        [np.nan, np.nan],
-        cst.data.mapdata('boders', resolution, extent),
+        cst.data.mapdata('coaslines', resolution, extent, 10.0, delta=ddeg),
+        #[np.nan, np.nan],
+        #cst.data.mapdata('boders', resolution, extent, delta=ddeg),
     ]
     x -= 360.0
     z = cst.coord.interp2(extent, topo, (x, y))
     x, y = proj(x, y)
+    i = np.isnan(z)
+    x[i] = np.nan
+    y[i] = np.nan
     mapdata = x, y, z
 
 # setup figure
@@ -83,9 +94,10 @@ mlab.clf()
 fig.scene.disable_render = True
 
 # base map
-if 0: 
+if 1: 
     x, y = topomesh
     mlab.mesh(x, y, topo, color=(1,1,1), opacity=0.2)
+if 1: 
     x, y, z = mapdata
     mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
 
