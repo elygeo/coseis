@@ -98,6 +98,7 @@ x, y, z = mapdata
 mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
 
 # plot fault surfaces
+print '\nReading fault surfaces:'
 names = {}
 titles = {}
 coords = []

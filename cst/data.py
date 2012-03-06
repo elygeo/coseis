@@ -254,6 +254,9 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
     kind: 'coastlines', 'rivers', 'borders', or None
     resolution: 'crude', 'low', 'intermediate', 'high', or 'full'
     extent: (min_lon, max_lon), (min_lat, max_lat)
+    delta: densify line segments to given delta.
+    min_level, max_level: where levels 1-4 are (1) coastline, (2) lakeshore,
+        (3) island-in-lake shore, and (4) lake-in-island-in-lake shore.
 
     Returns
     -------
@@ -277,6 +280,7 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
         zipfile.ZipFile(f).extractall(repo)
     if not kind:
         return
+    name = {'c': 'GSHHS coastlines', 'r': 'WDB rivers', 'b': 'WDB borders'}[kind[0]]
     kind = {'c': 'gshhs', 'r': 'wdb_rivers', 'b': 'wdb_borders'}[kind[0]]
     filename = os.path.join(repo, 'gshhs/%s_%s.b' % (kind, resolution[0]))
     data = np.fromfile(filename, '>i')
@@ -286,6 +290,7 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
         lon, lat = extent
         lon = lon[0] % 360, lon[1] % 360
         extent = lon, lat
+    print 'Reading %s resolution %s.' % (resolution, name)
     xx = []
     yy = []
     ii = 0
@@ -321,7 +326,6 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
             x, y = densify(x, y, delta)
         xx += [x, [np.nan]]
         yy += [y, [np.nan]]
-    print('%s: selected %s of %s' % (filename, nkeep, ntotal))
     if nkeep:
         xx = np.concatenate(xx)[:-1]
         yy = np.concatenate(yy)[:-1]
