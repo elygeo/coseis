@@ -217,7 +217,7 @@ def stage(dictargs={}, **kwargs):
         stagein += 'debug/',
     if pm.itcheck != 0:
         stagein += 'checkpoint/',
-    stagein += 'out/', 'prof/', 'stats/'
+    stagein += 'prof/', 'stats/'
     stagein += tuple(job.stagein)
     if job.force == True and os.path.isdir(job.rundir):
         shutil.rmtree(job.rundir)

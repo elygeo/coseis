@@ -21,7 +21,6 @@ Note
 Edit this script to select by fault
 name or bounding region (extent).
 """
-print __doc__
 import numpy as np
 import pyproj
 from enthought.mayavi import mlab
@@ -66,19 +65,18 @@ x, y = proj(x, y)
 topomesh = x, y
 
 # base map data
-if 1:
-    x, y = np.c_[
-        cst.data.mapdata('coaslines', resolution, extent, 10.0, delta=ddeg),
-        #[np.nan, np.nan],
-        #cst.data.mapdata('boders', resolution, extent, delta=ddeg),
-    ]
-    x -= 360.0
-    z = cst.coord.interp2(extent, topo, (x, y))
-    x, y = proj(x, y)
-    i = np.isnan(z)
-    x[i] = np.nan
-    y[i] = np.nan
-    mapdata = x, y, z
+x, y = np.c_[
+    cst.data.mapdata('coaslines', resolution, extent, 10.0, delta=ddeg),
+    [np.nan, np.nan],
+    cst.data.mapdata('boders', resolution, extent, delta=ddeg),
+]
+x -= 360.0
+z = cst.coord.interp2(extent, topo, (x, y))
+x, y = proj(x, y)
+i = np.isnan(z)
+x[i] = np.nan
+y[i] = np.nan
+mapdata = x, y, z
 
 # setup figure
 engine = mlab.get_engine()
@@ -94,15 +92,12 @@ mlab.clf()
 fig.scene.disable_render = True
 
 # base map
-if 1: 
-    x, y = topomesh
-    mlab.mesh(x, y, topo, color=(1,1,1), opacity=0.2)
-if 1: 
-    x, y, z = mapdata
-    mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
+x, y = topomesh
+mlab.mesh(x, y, topo, color=(1,1,1), opacity=0.2)
+x, y, z = mapdata
+mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
 
 # plot fault surfaces
-print 'Reading CFM surfaces:'
 names = {}
 titles = {}
 coords = []

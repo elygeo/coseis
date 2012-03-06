@@ -62,7 +62,7 @@ faultopening = 0		# 0=not allowed, 1=allowed
 slipvector = 1.0, 0.0, 0.0	# shear traction direction for ts1
 vrup = -1.0			# nucleation rupture velocity, negative = no nucleation
 rcrit = 1000.0			# nucleation critical radius
-trelax = 0.07			# nucleation relaxation time
+trelax = 10 * delta[3] 		# nucleation relaxation time
 svtol = 0.001			# slip velocity considered rupturing
 
 # Finite source parameters

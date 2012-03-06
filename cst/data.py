@@ -63,6 +63,8 @@ def densify(x, y, delta):
     Piecewise up-sample line segments with spacing delta.
     """
     x, y = np.array([x, y])
+    if x.size <= 1:
+        return np.array([x, y])
     dx = np.diff(x)
     dy = np.diff(y)
     r = np.sqrt(dx * dx + dy * dy)
