@@ -6,14 +6,15 @@ SCEC Community Fault Model Visualizer
 Keyboard Controls
 -----------------
 
-Left/right fault selection        , .             
-Up/down fault selection           < >             
+Fault selection                   [ ]
+Reset fault selection               \\
 Rotate the view                Arrows          
 Pan the view             Shift-Arrows    
 Zoom the view                     - =             
-Reset the view                      /               
+Reset the view                 Delete               
 Toggle stereo view                  3               
 Save a screen-shot                  S               
+Help                              h ?
 
 Note
 ----
@@ -24,10 +25,11 @@ name or bounding region (extent).
 import numpy as np
 import pyproj
 from enthought.mayavi import mlab
-#from enthought.tvtk.api import tvtk
 import cst
 
 # parameters
+fig_name = __doc__.splitlines()[1]
+print '\n%s\n' % fig_name
 extent = (-121.5, -114.5), (30.5, 36.5)
 extent = (-119, -115), (32, 35)
 fault_extent = (-117.1, -116.1), (33.7, 34.1)
@@ -83,7 +85,7 @@ engine = mlab.get_engine()
 fig = engine.current_scene
 if fig is None:
     pixels = 1280, 720
-    fig = mlab.figure('CFM Visualizer', (1,1,1), (0,0,0), engine, pixels)
+    fig = mlab.figure(fig_name, (1,1,1), (0,0,0), engine, pixels)
     new_fig = True
 else:
     fig = mlab.gcf()
@@ -98,7 +100,7 @@ x, y, z = mapdata
 mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
 
 # plot fault surfaces
-print '\nReading fault surfaces:'
+print '\nReading fault surfaces:\n'
 names = {}
 titles = {}
 coords = []
@@ -110,53 +112,51 @@ for segments, fault in faults:
     name = hdr['name']
     title = name.replace('cfma_', '').replace('cfm_',  '')
     title = title.replace('_', ' ').replace('-', ' ').title()
-    print title
+    print '    %s' % name
     x, y, z = xyz
     x, y = proj(x, y)
     z *= scale
     if combine:
         tri = [np.hstack(tri)]
     for t in tri:
-        s = mlab.triangular_mesh(
-            x, y, z, t.T,
-            representation='surface',
-            opacity = opacity,
-        )
+        s = mlab.triangular_mesh(x, y, z, t.T, representation='surface')
         a = s.actor.actor
         names[a] = name
         titles[a] = title
         coords += [[x.mean(), y.mean(), z.mean(), a]]
 
-# sort faults by location
-fig.name = titles[a]
-a.property.opacity = 1.0
-current_fault = a
-
 # handle key press
-def on_key_press(obj, event):
-    global current_fault
+def on_key_press(obj, event, current=[None]):
     k = obj.GetKeyCode()
-    if k == '/':
+    fig.scene.disable_render = True
+    if k in '[]':
+        m = fig.scene.camera.view_transform_matrix.to_array()
+        mx, my, mz, mt = m[0]
+        actors = [(mx*x + my*y + mz*z + mt, a) for x, y, z, a in coords]
+        actors = [a for r, a in sorted(actors)]
+        if current[0]:
+            d = {'[': -1, ']': 1}[k]
+            i = (actors.index(current[0]) + d) % len(actors)
+            current[0].property.opacity = opacity
+        else:
+            i = len(actors) // 2
+            for a in names.keys():
+                a.property.opacity = opacity
+        a = actors[i]
+        a.property.opacity = 1.0
+        fig.name = titles[a]
+        current[0] = a
+    elif k == '\\' and current[0]:
+        current[0] = None
+        fig.name = fig_name
+        for a in names.keys():
+            a.property.opacity = 1.0
+    elif ord(k) == 8: # delete key
         mlab.view(view_azimuth, view_elevation)
         fig.scene.camera.view_angle = view_angle
-        return
-    m = fig.scene.camera.view_transform_matrix.to_array()
-    if k in ',.':
-        mx, my, mz, mt = m[0]
-        d = {',': -1, '.': 1}[k]
-    elif k in '<>':
-        mx, my, mz, mt = m[1]
-        d = {'<': -1, '>': 1}[k]
-    else:
-        return
-    a = sorted((mx*x + my*y + mz*z + mt, a) for x, y, z, a in coords)
-    a = [a for r, a in a]
-    i = (a.index(current_fault) + d) % len(a)
-    a = a[i]
-    fig.name = titles[a]
-    a.property.opacity = 1.0
-    current_fault.property.opacity = opacity
-    current_fault = a
+    elif k in '/?h':
+        print __doc__
+    fig.scene.disable_render = False
     return
 
 # finish up
@@ -166,4 +166,5 @@ mlab.view(view_azimuth, view_elevation)
 fig.scene.camera.view_angle = view_angle
 fig.scene.disable_render = False
 mlab.show()
+print "\nPress H in the figure window for help."
 
