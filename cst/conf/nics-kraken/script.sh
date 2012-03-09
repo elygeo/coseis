@@ -8,7 +8,6 @@
 #PBS -e {rundir}/{name}-err
 #PBS -o {rundir}/{name}-out
 #PBS -m abe
-#PBS -V
 
 cd "{rundir}"
 set > env

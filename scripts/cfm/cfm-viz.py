@@ -31,7 +31,8 @@ import cst
 fig_name = __doc__.splitlines()[1]
 print '\n%s\n' % fig_name
 extent = (-121.5, -114.5), (30.5, 36.5)
-extent = (-119, -115), (32, 35)
+extent = (-118, -115), (32.5, 35)
+extent = (-119, -114), (32, 36)
 fault_extent = (-117.1, -116.1), (33.7, 34.1)
 faults = [
     ([0, 1], 'cfma_san_bernardino_W_san_andreas_complete'),

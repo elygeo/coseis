@@ -37,7 +37,7 @@ def dreger(prop, depth):
         (16.0, 2.8,  6.7, 3.87),
         (35.0, 2.8,  6.7, 3.87),
         (35.0, 3.0,  7.8, 4.5),
-    ])
+    ]).T
     f = {'rho': rho, 'vp': vp, 'vs': vs}[prop]
     f = np.interp(depth, z, f)
     return f
