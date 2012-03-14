@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.8.1: http://docutils.sourceforge.net/" />
 <title>SORD</title>
 <style type="text/css">
 
@@ -174,7 +174,7 @@ td {
 <h1 class="title">SORD</h1>
 <h2 class="subtitle" id="support-operator-rupture-dynamics">Support Operator Rupture Dynamics</h2>
 
-<a class="reference external image-reference" href="http://earth.usc.edu/~gely/ely-saf-surface.mov"><img alt="ely-saf-surface.jpg" src="ely-saf-surface.jpg" /></a>
+<img alt="ely-saf-surface.jpg" src="ely-saf-surface.jpg" />
 <div class="contents topic" id="contents">
 <p class="topic-title first">Contents</p>
 <ul class="simple">
@@ -224,22 +224,21 @@ variety of Fortran 95 compilers, MPI implementations, and operating systems
 respectively) the formulation, numerical algorithm, and verification of the
 SORD method. The third paper presents an application to simulating earthquakes
 in southern California.</p>
-<p class="ref">Ely, G. P., S. M. Day, and J.-B. Minster (2008),
-<em>A support-operator method for visco-elastic wave modeling in 3D heterogeneous media</em>,
-Geophys. J. Int., <a class="reference external" href="http://www.blackwell-synergy.com/doi/abs/10.1111/j.1365-246X.2007.03633.x">172(1), 331-344</a>,
-doi: 10.1111/j.1365-246X.2007.03633.x.
-<a class="reference external" href="http://earth.usc.edu/~gely/pub/Ely2008-GJI.pdf">[PDF]</a></p>
-<p class="ref">Ely, G. P., S. M. Day, and J.-B. Minster (2009),
-<em>A support-operator method for 3D rupture dynamics</em>,
-Geophys. J. Int.,
-<a class="reference external" href="http://www3.interscience.wiley.com/journal/122267744/abstract">177(3), 1140-1150</a>,
-doi:10.1111/j.1365-246X.2009.04117.x.
-<a class="reference external" href="http://earth.usc.edu/~gely/pub/Ely2009-GJI.pdf">[PDF]</a></p>
-<p class="ref">Ely, G. P., S. M. Day, and J.-B. Minster (2010),
-<em>Dynamic rupture models for the southern San Andreas fault</em>,
-BSSA, 100(1).
-<a class="reference external" href="http://earth.usc.edu/~gely/pub/Ely2010-BSSA.pdf">[PDF]</a>
-<a class="reference external" href="http://earth.usc.edu/~gely/ely-saf-esupp.html">[Electronic supplement]</a></p>
+<ol class="arabic simple">
+<li>Ely, G. P., S. M. Day, and J.-B. Minster (2008),
+<a class="reference external" href="http://www.alcf.anl.gov/~gely/pub/Ely2008-GJI.pdf">A support-operator method for visco-elastic wave modeling in 3D
+heterogeneous media</a>,
+<em>Geophys. J. Int.</em>, <em>172</em> (1), 331-344,
+<a class="reference external" href="http://dx.doi.org/10.1111/j.1365-246X.2007.03633.x">doi:10.1111/j.1365-246X.2007.03633.x</a>.</li>
+<li>Ely, G. P., S. M. Day, and J.-B. Minster (2009),
+<a class="reference external" href="http://www.alcf.anl.gov/~gely/pub/Ely2009-GJI.pdf">A support-operator method for 3D rupture dynamics</a>,
+<em>Geophys. J. Int.</em>, <em>177</em> (3), 1140-1150,
+<a class="reference external" href="http://dx.doi.org/10.1111/j.1365-246X.2009.04117.x">doi:10.1111/j.1365-246X.2009.04117.x</a>.</li>
+<li>Ely, G. P., S. M. Day, and J.-B. Minster (2010),
+<a class="reference external" href="http://www.alcf.anl.gov/~gely/pub/Ely2010-BSSA.pdf">Dynamic rupture models for the southern San Andreas fault</a>,
+<em>Bull. Seism. Soc.  Am.</em>, <em>100</em> (1), 131-150,
+<a class="reference external" href="http://dx.doi.org/10.1785/0120090187">doi:10.1785/0120090187</a>.</li>
+</ol>
 </div>
 <div class="section" id="user-guide">
 <h3>User Guide</h3>
@@ -271,8 +270,8 @@ fieldio = [                                 # field variable input and output
     ('=',  'vp',  [], 6000.0),              # material P-wave velocity
     ('=',  'vs',  [], 3464.0),              # material S-wave velocity
     ('=',  'gam', [], 0.3),                 # material viscosity
-    ('=w', 'v1', s_[:,:,31,-1], 'vx.bin'),  # write X velocity slice output
-    ('=w', 'v2', s_[:,:,31,-1], 'vy.bin'),  # write Y velocity slice output
+    ('=w', 'v1',  s_[:,:,31,-1], 'vx.bin'), # write X velocity slice output
+    ('=w', 'v2',  s_[:,:,31,-1], 'vy.bin'), # write Y velocity slice output
 ]
 ihypo = 31.0, 31.0, 31.0                    # source location
 source = 'potency'                          # source type

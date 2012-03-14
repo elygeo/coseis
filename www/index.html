@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.8.1: http://docutils.sourceforge.net/" />
 <title>Coseis</title>
 <style type="text/css">
 
@@ -188,7 +188,7 @@ td {
 <li>The Support Operator Rupture Dynamics (<a class="reference external" href="sord.html">SORD</a>) code for modeling spontaneous
 rupture and 3D wave propagation.</li>
 <li>SCEC Community Velocity Models (CVM) codes, with MPI parallelization for
-<a class="reference external" href="http://www.data.scec.org/3Dvelocity/">Magistrale version</a> (CVM-S), and new <a class="reference external" href="http://earth.usc.edu/~gely/vs30gtl/">geotechnical layer
+<a class="reference external" href="http://www.data.scec.org/3Dvelocity/">Magistrale version</a> (CVM-S), and new <a class="reference external" href="http://www.alcf.anl.gov/~gely/vs30gtl/">geotechnical layer
 implementation</a> for the <a class="reference external" href="http://structure.harvard.edu/cvm-h/">Harvard version</a> (CVM-H).</li>
 <li><a class="reference external" href="http://scec.usc.edu/websims">WebSims</a> web application for cataloging, exploring, and disseminating large
 numerical simulations data sets.</li>
@@ -196,7 +196,7 @@ numerical simulations data sets.</li>
 </ul>
 <p>The primary interface is through a Python module which (for high-performance
 components) wraps Fortran parallelized with MPI.</p>
-<p>Coseis is written by <a class="reference external" href="http://earth.usc.edu/~gely/">Geoffrey Ely</a> with contributions from Steven Day,
+<p>Coseis is written by <a class="reference external" href="http://www.alcf.anl.gov/~gely/">Geoffrey Ely</a> with contributions from Steven Day,
 Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
 <a class="reference external" href="http://www.gnu.org/licenses/gpl-3.0.html">GPLv3</a>.</p>
 <p class="warning"><strong>WARNING</strong>: Coseis is a research code under active development.  Changes
@@ -231,15 +231,11 @@ sudo yum install gfortran
 <pre class="literal-block">
 sudo apt-get install gfortran
 </pre>
-<p>Mac OS X:</p>
+<p>For Mac OS X, first install <a class="reference external" href="http://itunes.apple.com/us/app/xcode/id497799835">Xcode</a> and <a class="reference external" href="http://mxcl.github.com/homebrew/">Homebrew</a>, and then do:</p>
+<pre class="literal-block">
+brew install gfortran
+</pre>
 </li>
-</ol>
-<p>GNU Fortran versions from MacPorts and Fink are not recommended.  Instead,
-download the latest gfortran package in the <em>Apple Xcode gcc-42 add-ons</em>
-section of the <a class="reference external" href="http://r.research.att.com/tools/">R for Mac OS X</a> Developer's Page along with and the
-corresponding version of <a class="reference external" href="http://developer.apple.com/technology/xcode.html">Xcode</a> (either iPhone or Mac-only) available from
-<a class="reference external" href="http://connect.apple.com/">Apple Developer</a> Connection (free membership required).  Install Xcode fir</p>
-<ol class="arabic" start="2">
 <li><p class="first"><a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a> is recommended if you need MPI.  The included script
 <a class="reference external" href="../util/install-mpich.sh">install-mpich.sh</a> can install MPICH2 for you.</p>
 </li>
@@ -248,19 +244,13 @@ The included script <a class="reference external" href="../util/install-python.s
 Enthought Python Distribution (<a class="reference external" href="http://www.enthought.com/products/epddownload.php">EPD</a>) is another option that includes many
 bells and whistles such as the <a class="reference external" href="http://code.enthought.com/projects/mayavi/">Mayavi</a> visualization package.</p>
 </li>
-<li><p class="first">Download the source code.  The best option is to use the <a class="reference external" href="http://github.com/gely/coseis">Coseis GitHub
-repository</a> with <a class="reference external" href="http://git-scm.com/">Git</a> version control, which
-facilitates applying code updates, and merging local modifications:</p>
+<li><p class="first">Clone the source code from the <a class="reference external" href="http://github.com/gely/coseis">Coseis GitHub repository</a> using <a class="reference external" href="http://git-scm.com/">Git</a>:</p>
 <pre class="literal-block">
 git clone git://github.com/gely/coseis.git
 </pre>
 <p>Update to the latest changes anytime with:</p>
 <pre class="literal-block">
 git pull
-</pre>
-<p>Alternatively, download and unpack the source tar archive:</p>
-<pre class="literal-block">
-curl http://earth.usc.edu/~gely/coseis/download/coseis.tgz | tar zx
 </pre>
 </li>
 <li><p class="first">For laptop and workstation installations, the default system configuration

@@ -217,10 +217,11 @@ def topo(extent, scale=1.0, downsample=0):
     x, y = extent
     if downsample:
         d = 60 // downsample
-        x0, y0 = -180, -90
+        x0, y0 = -180.0, -90.0
     else:
         d = 120
-        x0, y0 = -179.75, -89.75
+        x0 = -180.0 + 0.5 / d
+        y0 =  -90.0 + 0.5 / d
     j0 = int(math.floor((x[0] - x0) % 360 * d))
     j1 = int(math.ceil((x[1] - x0) % 360 * d))
     k0 = int(math.floor((y[0] - y0) * d))
@@ -241,7 +242,9 @@ def topo(extent, scale=1.0, downsample=0):
         j0, j1 = j0 % n, j1 % n
         k0, k1 = k0 % n, k1 % n
         z = globe30(tile0)[j0:j1+1,k0:k1+1]
-    return scale * z, (x, y)
+        if scale != 1.0:
+            z *= scale
+    return z, (x, y)
 
 
 def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0, max_level=4, delta=None, clip=1):

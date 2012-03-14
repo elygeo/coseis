@@ -34,7 +34,7 @@ Coseis is an open-source toolkit for earthquake simulation featuring:
 *   Utilities for mesh generation, coordinate projection, and visualization.
 
 __ http://www.data.scec.org/3Dvelocity/
-__ http://earth.usc.edu/~gely/vs30gtl/
+__ http://www.alcf.anl.gov/~gely/vs30gtl/
 __ http://structure.harvard.edu/cvm-h/
 
 The primary interface is through a Python module which (for high-performance
@@ -44,7 +44,7 @@ Coseis is written by `Geoffrey Ely`_ with contributions from Steven Day,
 Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
 GPLv3_.
 
-.. _Geoffrey Ely: http://earth.usc.edu/~gely/
+.. _Geoffrey Ely: http://www.alcf.anl.gov/~gely/
 .. _GPLv3:        http://www.gnu.org/licenses/gpl-3.0.html
 
 .. class:: warning
@@ -91,13 +91,10 @@ libraries.
 
         sudo apt-get install gfortran
 
-    Mac OS X:
+    For Mac OS X, first install Xcode_ and Homebrew_, and then do:
+    ::
 
-GNU Fortran versions from MacPorts and Fink are not recommended.  Instead,
-download the latest gfortran package in the *Apple Xcode gcc-42 add-ons*
-section of the `R for Mac OS X`_ Developer's Page along with and the
-corresponding version of Xcode_ (either iPhone or Mac-only) available from
-`Apple Developer`_ Connection (free membership required).  Install Xcode fir
+        brew install gfortran
 
 2.  MPICH2_ is recommended if you need MPI.  The included script
     install-mpich.sh_ can install MPICH2 for you.
@@ -107,9 +104,8 @@ corresponding version of Xcode_ (either iPhone or Mac-only) available from
     Enthought Python Distribution (EPD_) is another option that includes many
     bells and whistles such as the Mayavi_ visualization package.
 
-4.  Download the source code.  The best option is to use the `Coseis GitHub
-    repository <http://github.com/gely/coseis>`__ with Git_ version control, which
-    facilitates applying code updates, and merging local modifications::
+4.  Clone the source code from the `Coseis GitHub repository
+    <http://github.com/gely/coseis>`__ using Git_::
 
         git clone git://github.com/gely/coseis.git
 
@@ -117,11 +113,6 @@ corresponding version of Xcode_ (either iPhone or Mac-only) available from
     ::
 
         git pull
-
-    Alternatively, download and unpack the source tar archive:
-    ::
-
-        curl http://earth.usc.edu/~gely/coseis/download/coseis.tgz | tar zx
 
 5.  For laptop and workstation installations, the default system configuration
     is usually be adequate.  To test the default configuration::
@@ -161,15 +152,15 @@ corresponding version of Xcode_ (either iPhone or Mac-only) available from
 .. _install-mpich.sh:  ../util/install-mpich.sh
 .. _Git:               http://git-scm.com/
 .. _MPICH2:            http://www.mcs.anl.gov/research/projects/mpich2/
-.. _Xcode:             http://developer.apple.com/technology/xcode.html
-.. _Apple Developer:   http://connect.apple.com/
-.. _R for Mac OS X:    http://r.research.att.com/tools/
+.. _Xcode:             http://itunes.apple.com/us/app/xcode/id497799835
+.. _Homebrew:          http://mxcl.github.com/homebrew/
 .. _EPD:               http://www.enthought.com/products/epddownload.php
 .. _Python:            http://www.python.org/
 .. _NumPy:             http://numpy.scipy.org/
 .. _SciPy:             http://www.scipy.org/
 .. _Mayavi:            http://code.enthought.com/projects/mayavi/
 .. _Matplotlib:        http://matplotlib.sourceforge.net/
+.. _R for Mac OS X:    http://r.research.att.com/tools/
 
 
 Examples
