@@ -10,7 +10,7 @@ read confirm
 if [ "${OSTYPE}" = 'darwin10.0' ]; then
 
 # Max OS X
-url='http://www.python.org/ftp/python/2.7.2/python-2.7-macosx10.6.dmg'
+url='http://www.python.org/ftp/python/2.7.2/python-2.7.2-macosx10.6.dmg'
 tag=$( basename "$url" )
 cd "${prefix}"
 curl -LO "${url}"
@@ -32,12 +32,4 @@ make install
 export PATH="${prefix}/bin:${PATH}"
 
 fi
-
-# package managers: Distribute and PIP
-cd "${prefix}"
-#curl -LO http://python-distribute.org/distribute_setup.py
-#python distribute_setup.py
-#easy_install pip
-
-cd "${pwd}"
 

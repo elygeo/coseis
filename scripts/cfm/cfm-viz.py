@@ -45,7 +45,8 @@ resolution = 'high'
 view_azimuth = -90
 view_elevation = 55
 view_angle = 20
-opacity = 0.25
+opacity = 1.0
+zscale = 3.0
 
 # projection
 scale = 0.001
@@ -58,6 +59,7 @@ if faults == None:
 
 # topography
 topo, extent = cst.data.topo(extent, scale=scale)
+topo *= zscale
 lon, lat = extent
 ddeg = 0.5 / 60.0
 n = topo.shape
@@ -96,7 +98,7 @@ fig.scene.disable_render = True
 
 # base map
 x, y = topomesh
-mlab.mesh(x, y, topo, color=(1,1,1), opacity=0.2)
+mlab.mesh(x, y, topo, color=(1,1,1), opacity=opacity)
 x, y, z = mapdata
 mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
 
@@ -116,7 +118,7 @@ for segments, fault in faults:
     print '    %s' % name
     x, y, z = xyz
     x, y = proj(x, y)
-    z *= scale
+    z *= scale * zscale
     if combine:
         tri = [np.hstack(tri)]
     for t in tri:

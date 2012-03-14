@@ -58,6 +58,8 @@ System requirements
 
 *   Python_, and NumPy_ (Numerical Python).
 
+*   Git_ version control system.
+
 *   (+) Fortran 95 compiler.  Required only for SORD and CVM-S modules.
 
 *   (+) Message Passing Interface (MPI) library.  Required only for
@@ -65,9 +67,6 @@ System requirements
 
 *   (+) Matplotlib_, SciPy_, and Pyproj Python packages.  Required only for
     supplemental plotting, signal processing, and mesh generation utilities.
-
-*   (+) Git_ version control system.  Useful for development and staying updated
-    with the latest code version.
 
 (+) Optional
 
@@ -84,17 +83,17 @@ libraries.
     Fedora/Red Hat Linux:
     ::
 
-        sudo yum install gfortran
+        sudo yum install gfortran git
 
     Ubuntu Linux:
     ::
 
-        sudo apt-get install gfortran
+        sudo apt-get install gfortran git
 
     For Mac OS X, first install Xcode_ and Homebrew_, and then do:
     ::
 
-        brew install gfortran
+        brew install gfortran git
 
 2.  MPICH2_ is recommended if you need MPI.  The included script
     install-mpich.sh_ can install MPICH2 for you.

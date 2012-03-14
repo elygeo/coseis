@@ -206,13 +206,12 @@ are frequent and it has known bugs!</p>
 <h3>System requirements</h3>
 <ul class="simple">
 <li><a class="reference external" href="http://www.python.org/">Python</a>, and <a class="reference external" href="http://numpy.scipy.org/">NumPy</a> (Numerical Python).</li>
+<li><a class="reference external" href="http://git-scm.com/">Git</a> version control system.</li>
 <li>(+) Fortran 95 compiler.  Required only for SORD and CVM-S modules.</li>
 <li>(+) Message Passing Interface (MPI) library.  Required only for
 multiprocessing with SORD and CVM-S.</li>
 <li>(+) <a class="reference external" href="http://matplotlib.sourceforge.net/">Matplotlib</a>, <a class="reference external" href="http://www.scipy.org/">SciPy</a>, and Pyproj Python packages.  Required only for
 supplemental plotting, signal processing, and mesh generation utilities.</li>
-<li>(+) <a class="reference external" href="http://git-scm.com/">Git</a> version control system.  Useful for development and staying updated
-with the latest code version.</li>
 </ul>
 <p>(+) Optional</p>
 </div>
@@ -225,15 +224,15 @@ libraries.</p>
 <li><p class="first">GNU Fortran is recommended if you don't already have a Fortran 95 compiler.</p>
 <p>Fedora/Red Hat Linux:</p>
 <pre class="literal-block">
-sudo yum install gfortran
+sudo yum install gfortran git
 </pre>
 <p>Ubuntu Linux:</p>
 <pre class="literal-block">
-sudo apt-get install gfortran
+sudo apt-get install gfortran git
 </pre>
 <p>For Mac OS X, first install <a class="reference external" href="http://itunes.apple.com/us/app/xcode/id497799835">Xcode</a> and <a class="reference external" href="http://mxcl.github.com/homebrew/">Homebrew</a>, and then do:</p>
 <pre class="literal-block">
-brew install gfortran
+brew install gfortran git
 </pre>
 </li>
 <li><p class="first"><a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a> is recommended if you need MPI.  The included script

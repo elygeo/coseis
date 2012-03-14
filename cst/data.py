@@ -242,8 +242,7 @@ def topo(extent, scale=1.0, downsample=0):
         j0, j1 = j0 % n, j1 % n
         k0, k1 = k0 % n, k1 % n
         z = globe30(tile0)[j0:j1+1,k0:k1+1]
-        if scale != 1.0:
-            z *= scale
+    z = z * scale # always do this to convert to float
     return z, (x, y)
 
 
