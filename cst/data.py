@@ -195,7 +195,7 @@ def globe30(tile=(0, 1), fill=True):
     return z
 
 
-def topo(extent, scale=1.0, downsample=0):
+def topo(extent, scale=1.0, downsample=0, mesh=False):
     """
     Extract digital elevation model for given region.
 
@@ -207,10 +207,11 @@ def topo(extent, scale=1.0, downsample=0):
         0: GLOBE 30 sec, with missing data filled by ETOPO1
         1: ETOPO1 60 sec
         >1: Down-sample factor for ETOPO1
+    mesh: if True return lon and lat mesh with z
 
     Returns
     -------
-    z: Elevation array
+    topo: Elevation array z or if mesh == True (lon, lat, z) arrays.
     extent: Extent of z array possibly larger than requested extent.
     """
     import math
@@ -229,6 +230,7 @@ def topo(extent, scale=1.0, downsample=0):
     r = 1.0 / d
     x = j0 * r + x0, j1 * r + x0
     y = k0 * r + y0, k1 * r + y0
+    extent = x, y
     if downsample:
         z = etopo1(downsample)[j0:j1,k0:k1]
     else:
@@ -243,7 +245,15 @@ def topo(extent, scale=1.0, downsample=0):
         k0, k1 = k0 % n, k1 % n
         z = globe30(tile0)[j0:j1+1,k0:k1+1]
     z = z * scale # always do this to convert to float
-    return z, (x, y)
+    if mesh:
+        ddeg = 1.0 / d
+        n = z.shape
+        x = x[0] + ddeg * np.arange(n[0])
+        y = y[0] + ddeg * np.arange(n[1])
+        y, x = np.meshgrid(y, x)
+        return (x, y, z), extent
+    else:
+        return z, extent
 
 
 def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0, max_level=4, delta=None, clip=1):
@@ -455,28 +465,40 @@ class scec_cfm():
 
         return
 
-    def __call__(self, fault, segments=None, extent=None, geographic=True):
+    def __call__(self, fault, segments=None, extent=None, geographic=True, cull=True):
 
         # read GOCAD TSurf file
         f = os.path.join(self.path, fault + '.ts')
-        tsurf = gocad.tsurf(f)[0]
+        hdr, phdr, xyz, tri, border, bstone = gocad.tsurf(f)[0]
 
         # select segments
         if segments is not None:
-            tsurf[3] = [tsurf[3][i] for i in segments]
+            tri = [tri[i] for i in segments]
+
+        # remove unused points
+        if cull:
+            t = np.hstack(tri)
+            i, j = np.unique(t, return_inverse=True)
+            xyz = xyz[:,i]
+            t = np.arange(t.size)[j].reshape(t.shape)
+            m = 0
+            for i in range(len(tri)):
+                n = tri[i].shape[-1]
+                tri[i] = t[:,m:m+n]
+                m += n
 
         # project to geographic coordinates
         if geographic:
             import pyproj
             proj = pyproj.Proj(**self.projection)
-            x, y, z = tsurf[2]
+            x, y, z = xyz
             x, y = proj(x, y, inverse=True)
-            tsurf[2] = np.array([x, y, z], z.dtype)
+            xyz = np.array([x, y, z], z.dtype)
 
         # exclude if outside range
         if extent:
             xlim, ylim = extent
-            x, y, z = tsurf[2]
+            x, y, z = xyz
             if (
                 x.max() < xlim[0] or
                 x.min() > xlim[1] or
@@ -485,7 +507,7 @@ class scec_cfm():
             ):
                 return None
 
-        return tsurf
+        return hdr, phdr, xyz, tri, border, bstone
 
 
 def cybershake(isrc, irup, islip, ihypo, name=None):

@@ -44,9 +44,9 @@ combine = True
 resolution = 'high'
 view_azimuth = -90
 view_elevation = 55
-view_angle = 20
-opacity = 1.0
-zscale = 3.0
+view_angle = 15
+opacity = 0.3
+zscale = 1.0
 
 # projection
 scale = 0.001
@@ -58,25 +58,20 @@ if faults == None:
     faults = [(None, f) for f in cfm.faults]
 
 # topography
-topo, extent = cst.data.topo(extent, scale=scale)
-topo *= zscale
-lon, lat = extent
-ddeg = 0.5 / 60.0
-n = topo.shape
-x = lon[0] + ddeg * np.arange(n[0])
-y = lat[0] + ddeg * np.arange(n[1])
-y, x = np.meshgrid(y, x)
+topo, extent = cst.data.topo(extent, scale=scale, mesh=True)
+x, y, z = topo
 x, y = proj(x, y)
-topomesh = x, y
+topo = x, y, z
 
 # base map data
+ddeg = 0.5 / 60.0
 x, y = np.c_[
     cst.data.mapdata('coaslines', resolution, extent, 10.0, delta=ddeg),
     [np.nan, np.nan],
     cst.data.mapdata('boders', resolution, extent, delta=ddeg),
 ]
 x -= 360.0
-z = cst.coord.interp2(extent, topo, (x, y))
+z = cst.coord.interp2(extent, topo[2], (x, y))
 x, y = proj(x, y)
 i = np.isnan(z)
 x[i] = np.nan
@@ -97,8 +92,8 @@ mlab.clf()
 fig.scene.disable_render = True
 
 # base map
-x, y = topomesh
-mlab.mesh(x, y, topo, color=(1,1,1), opacity=opacity)
+x, y, z = topo
+mlab.mesh(x, y, z, color=(1,1,1), opacity=opacity)
 x, y, z = mapdata
 mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
 

@@ -1,6 +1,7 @@
 """
 Coordinate conversions
 """
+import math
 import numpy as np
 
 rearth = 6370000.0
@@ -563,6 +564,62 @@ def slip_vectors(strike, dip, rake, dtype=None):
     c, s = np.cos(C), np.sin(C)
     C = np.array([[s, c, z], [-c, s, z], [z, z, u]])
     return dot2(dot2(A, B), C)
+
+
+def plane_misfit(orientation, x, y, z):
+    """
+    Return the misfit of a specified plane orientation to a set of normal vectors.
+    This function can be optimized to find the best-fit plane.  The normal vectors
+    may be weighted by the area patch they represent as occurs naturally when when
+    taking the cross-product of two vector sides of a triangle (for example).
+
+    orientation: (strike, dip)
+    x, y, z: surface normal components in (east, north, up) coordinates
+    """
+    stk, dip = orientation
+    stk *= math.pi / 180.0
+    dip *= math.pi / 180.0
+    a =  math.cos(stk) * math.sin(dip)
+    b = -math.sin(stk) * math.sin(dip)
+    c =  math.cos(dip)
+    m = -abs(a * x + b * y + c * z).sum()
+    return m
+
+
+def tsurf_plane(xyz, tri, plane=None):
+    """
+    Find the best-fit plane and total surface area of a triangulated surface.
+
+    Parameters
+    ----------
+    xyz: vertices in (east, north, up) coordinates
+    tri: triangle indices
+    plane: initial orientation (strike, dip)
+
+    Returns
+    -------
+    stk: fault strike in degrees (0-360)
+    dip: fault dip in degrees (0-90) to the right of the strike vector
+    area: fault area in squared units of the vertices
+    """
+    import scipy.optimize
+    if plane == None:
+        plane = 0.0, 0.0
+    xyz = np.asarray(xyz)
+    j, k, l = np.asarray(tri)
+    ux, uy, uz = xyz[:,k] - xyz[:,j]
+    vx, vy, vz = xyz[:,l] - xyz[:,j]
+    wx = uy * vz - uz * vy
+    wy = uz * vx - ux * vz
+    wz = ux * vy - uy * vx
+    area = 0.5 * np.sqrt(wx * wx + wy * wy + wz * wz).sum()
+    stk, dip = scipy.optimize.fmin(plane_misfit, plane, (wx, wy, wz))
+    dip %= 180.0
+    if dip > 90.0:
+        dip = 180.0 - dip
+        stk = 180.0 + stk
+    stk %= 360.0
+    return stk, dip, area
 
 
 def potency_tensor(normal, slip):
