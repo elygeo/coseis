@@ -2,9 +2,6 @@
 ALCF Cetus
 
 /cetus-fs0/
-
--O3 -qnohot -qsimd=noauto -qsmp=omp:noauto
-
 """
 login = hostname = '*.alcf.anl.gov'
 maxcores = 4
@@ -24,7 +21,7 @@ fortran_flags = {
     'g': '-C -qflttrap -O0 -g',
     't': '-C -qflttrap',
     'p': '-O -p',
-    'O': '-O4 -qarch=450d -qtune=450',
+    'O': '-O3 -qsmp=omp:noauto',
     '8': '-qrealsize=8',
 }
 launch = {

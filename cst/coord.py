@@ -39,10 +39,61 @@ def solve2(A, b):
     Vectorized 2x2 linear equation solver
     """
     A = np.asarray(A)
-    b = np.asarray(b)
     A /= (A[0,0] * A[1,1] - A[0,1] * A[1,0])
-    return np.array([ b[0] * A[1,1] - b[1] * A[0,1],
-                      b[1] * A[0,0] - b[0] * A[1,0] ])
+    x = [
+        A[1,1] * b[0] - A[0,1] * b[1],
+        A[0,0] * b[1] - A[1,0] * b[0],
+    ]
+    return x
+
+
+def interptri(x, f, tri, xi):
+    """
+    2D linear interpolation of function values specified on triangular mesh.
+  
+    Parameters
+    ----------
+    x: M x 2 array of vertex coordinates.
+    f: M length array of function values at the vertices.
+    tri: N x 3 array of vertex indices for the triangles.
+    xi: Array of coordinates for the interpolation points.
+
+    Returns
+    -------
+    fi: Array of interpolated values, same shape as `xi`.
+    """
+    # prepare arrays
+    x  = np.asarray(x)
+    f  = np.asarray(f)
+    xi = np.asarray(xi)
+    fi = np.empty_like(xi[0])
+    fi.fill(np.nan)
+
+    # loop over triangles
+    for j, k, l in tri.T:
+
+        # barycentric coordinates
+        x0, y0 = x[:,j]
+        x1, y1 = x[:,k]
+        x2, y2 = x[:,l]
+        A = (x1 - x0, x2 - x0), (y1 - y0, y2 - y0)
+        b = xi[0] - x0, xi[1] - y0
+        l1, l2 = solve2(A, b)
+        l0 = 1.0 - l1 - l2
+
+        # find points inside triangle
+        lmin = -10.0 * np.finfo('f').eps
+        lmax = 1.0 - lmin
+        i = (
+            (l0 > lmin) & (l0 < lmax) &
+            (l1 > lmin) & (l1 < lmax) &
+            (l2 > lmin) & (l2 < lmax)
+        )
+
+        # interpolate points
+        fi[i] = (f[j] * l0 + f[k] * l1 + f[l] * l2)[i]
+
+    return fi
 
 
 def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
@@ -306,7 +357,8 @@ def ibilinear(xx, yy, xi, yi):
         b = [ xi - j1[0,0]*x[0] - j1[0,1]*x[1] - j2[0]*x[0]*x[1],
               yi - j1[1,0]*x[0] - j1[1,1]*x[1] - j2[1]*x[0]*x[1] ]
         dx = solve2(j, b)
-        x  = x + dx
+        x[0] += dx[0]
+        x[1] += dx[1]
     return x
 
 
@@ -613,7 +665,7 @@ def tsurf_plane(xyz, tri, plane=None):
     wy = uz * vx - ux * vz
     wz = ux * vy - uy * vx
     area = 0.5 * np.sqrt(wx * wx + wy * wy + wz * wz).sum()
-    stk, dip = scipy.optimize.fmin(plane_misfit, plane, (wx, wy, wz))
+    stk, dip = scipy.optimize.fmin(plane_misfit, plane, (wx, wy, wz), disp=False)
     dip %= 180.0
     if dip > 90.0:
         dip = 180.0 - dip
