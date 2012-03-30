@@ -114,7 +114,8 @@ do k = 1, kug
             if (c(l) .gt. z(l)) z(l) = c(l)
             x(1,l) = x(2,l)
         end do
-    g = g + dug
+        g = g + dug
+    end do
 end do
 end subroutine
 

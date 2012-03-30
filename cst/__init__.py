@@ -16,6 +16,11 @@ except ImportError:
     pass
 
 try:
+    from . import interpolate
+except ImportError:
+    pass
+
+try:
     from . import rspectra
 except ImportError:
     pass
