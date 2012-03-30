@@ -47,7 +47,7 @@ def solve2(A, b):
     return x
 
 
-def interptri(x, f, tri, xi):
+def trinterp(x, f, t, xi):
     """
     2D linear interpolation of function values specified on triangular mesh.
   
@@ -55,7 +55,7 @@ def interptri(x, f, tri, xi):
     ----------
     x: M x 2 array of vertex coordinates.
     f: M length array of function values at the vertices.
-    tri: N x 3 array of vertex indices for the triangles.
+    t: N x 3 array of vertex indices for the triangles.
     xi: Array of coordinates for the interpolation points.
 
     Returns
@@ -63,35 +63,37 @@ def interptri(x, f, tri, xi):
     fi: Array of interpolated values, same shape as `xi`.
     """
     # prepare arrays
-    x  = np.asarray(x)
-    f  = np.asarray(f)
-    xi = np.asarray(xi)
-    fi = np.empty_like(xi[0])
+    x, y = x
+    xi, yi = xi
+    fi = np.empty_like(xi)
     fi.fill(np.nan)
 
+    # tolerance
+    lmin = -0.000001
+    lmax =  1.000001
+
     # loop over triangles
-    for j, k, l in tri.T:
+    for i0, i1, i2 in t.T:
 
         # barycentric coordinates
-        x0, y0 = x[:,j]
-        x1, y1 = x[:,k]
-        x2, y2 = x[:,l]
-        A = (x1 - x0, x2 - x0), (y1 - y0, y2 - y0)
-        b = xi[0] - x0, xi[1] - y0
-        l1, l2 = solve2(A, b)
+        A00 = x[i1] - x[i0]
+        A01 = x[i2] - x[i0]
+        A10 = y[i1] - y[i0]
+        A11 = y[i2] - y[i0]
+        b0 = xi - x[i0]
+        b1 = yi - y[i0]
+        d  = 1.0 / (A00 * A11 - A01 * A10)
+        l1 = d * A11 * b0 - d * A01 * b1
+        l2 = d * A00 * b1 - d * A10 * b0
         l0 = 1.0 - l1 - l2
 
-        # find points inside triangle
-        lmin = -10.0 * np.finfo('f').eps
-        lmax = 1.0 - lmin
+        # interpolate points inside triangle
         i = (
             (l0 > lmin) & (l0 < lmax) &
             (l1 > lmin) & (l1 < lmax) &
             (l2 > lmin) & (l2 < lmax)
         )
-
-        # interpolate points
-        fi[i] = (f[j] * l0 + f[k] * l1 + f[l] * l2)[i]
+        fi[i] = f[i0] * l0[i] + f[i1] * l1[i] + f[i2] * l2[i]
 
     return fi
 
