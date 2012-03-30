@@ -44,12 +44,10 @@ for target in args:
         f = os.path.join(path, 'cst', 'build')
         if os.path.exists(f):
             shutil.rmtree(f)
-        f = os.path.join(path, 'cst', 'rspectra.so')
-        if os.path.exists(f):
-            os.unlink(f)
-        f = os.path.join(path, 'cst', 'interpolate.so')
-        if os.path.exists(f):
-            os.unlink(f)
+        for f in 'rspectra.so', 'interpolate.so':
+            f = os.path.join(path, 'cst', f)
+            if os.path.exists(f):
+                os.unlink(f)
     elif target == 'data':
         cst.data.mapdata()
         cst.data.etopo1()
