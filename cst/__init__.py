@@ -26,11 +26,21 @@ except ImportError:
     pass
 
 def _build():
+    import shlex
+    import numpy
+    from numpy.distutils.core import setup, Extension
     cwd = os.getcwd()
     os.chdir(path)
-    import setup
-    setup.build_ext_cython()
-    setup.build_ext_fortran()
+    include_dirs = [numpy.get_include()]
+    f2py_options = ['--quiet'] + shlex.split(conf.configure()[0].f2py_flags)
+    ext_modules = [
+        Extension('interpolate', ['interpolate.c'], include_dirs = include_dirs),
+        Extension('rspectra', ['rspectra.f90'], f2py_options = f2py_options),
+    ]
+    setup(
+        ext_modules = ext_modules,
+        script_args = ['build_ext', '--inplace'],
+    )
     os.chdir(cwd)
 
 def _archive():
@@ -43,7 +53,7 @@ def _archive():
    else:
         open('tmp.log', 'w').write(repo.git.log())
         repo.archive(open('tmp.tar', 'w'), prefix='coseis/')
-        tarfile.open('tmp.tar', 'a').add('tmp.log', 'coseis/changelog')
+        tarfile.open('tmp.tar', 'a').add('tmp.log', 'coseis/changelog.txt')
         tar = open('tmp.tar', 'rb').read()
         os.remove('tmp.tar')
         os.remove('tmp.log')
