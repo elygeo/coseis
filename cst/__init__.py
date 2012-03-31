@@ -1,7 +1,7 @@
 """
 Computational Seismology Tools
 """
-import os, subprocess, shlex
+import os
 path = os.path.dirname(__file__)
 from . import util, conf
 from . import coord, signal
@@ -26,21 +26,19 @@ except ImportError:
     pass
 
 def _build():
-    import shlex
-    import numpy
-    from numpy.distutils.core import setup, Extension
     cwd = os.getcwd()
     os.chdir(path)
-    include_dirs = [numpy.get_include()]
-    f2py_options = ['--quiet'] + shlex.split(conf.configure()[0].f2py_flags)
-    ext_modules = [
-        Extension('interpolate', ['interpolate.c'], include_dirs = include_dirs),
-        Extension('rspectra', ['rspectra.f90'], f2py_options = f2py_options),
-    ]
-    setup(
-        ext_modules = ext_modules,
-        script_args = ['build_ext', '--inplace'],
-    )
+    if not os.path.exists('interpolate.so'):
+        import shlex, numpy
+        from numpy.distutils.core import setup, Extension
+        i = [numpy.get_include()]
+        f = ['--quiet'] + shlex.split(conf.configure()[0].f2py_flags)
+        e = [
+            Extension('interpolate', ['interpolate.c'], include_dirs=i),
+            Extension('rspectra', ['rspectra.f90'], f2py_options=f),
+        ]
+        s = ['build_ext', '--inplace']
+        setup(ext_modules=e, script_args=s)
     os.chdir(cwd)
 
 def _archive():
