@@ -34,6 +34,7 @@ extent = (-121.5, -114.5), (30.5, 36.5)
 extent = (-118, -115), (32.5, 35)
 extent = (-119, -114), (32, 36)
 fault_extent = (-117.1, -116.1), (33.7, 34.1)
+fault_extent = (-118, -115), (33, 35)
 faults = [
     ([0, 1], 'cfma_san_bernardino_W_san_andreas_complete'),
     ([0, 1], 'cfma_san_andreas_coachella_alt3_complete'),

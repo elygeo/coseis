@@ -327,6 +327,8 @@ class Extraction():
             if vm.prop == 'vp':
                 v0 = brocher_vp(v0)
             vt = vm(x, y, z0 - zt, interpolation=interpolation)
+            if 0: # FIXME add option for this
+                v0 = np.maximum(vt, v0)
             if np.isnan(vt).any():
                 print('WARNING: NaNs in GTL')
             self.gtl = v0, vt

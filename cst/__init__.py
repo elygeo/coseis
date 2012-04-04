@@ -31,14 +31,13 @@ def _build():
     if not os.path.exists('interpolate.so'):
         import shlex, numpy
         from numpy.distutils.core import setup, Extension
-        i = [numpy.get_include()]
-        f = ['--quiet'] + shlex.split(conf.configure()[0].f2py_flags)
-        e = [
-            Extension('interpolate', ['interpolate.c'], include_dirs=i),
-            Extension('rspectra', ['rspectra.f90'], f2py_options=f),
+        incl = [numpy.get_include()]
+        fopt = shlex.split(conf.configure()[0].f2py_flags)
+        ext = [
+            Extension('interpolate', ['interpolate.c'], include_dirs=incl),
+            Extension('rspectra', ['rspectra.f90'], f2py_options=fopt),
         ]
-        s = ['build_ext', '--inplace']
-        setup(ext_modules=e, script_args=s)
+        setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
     os.chdir(cwd)
 
 def _archive():
@@ -61,5 +60,4 @@ def _archive():
 class s_(object):
     def __getitem__(self, item):
         return item
-
 
