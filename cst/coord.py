@@ -589,6 +589,7 @@ def cmu(x, y, inverse=False):
         extent = (0.0, 600000.0), (0.0, 300000.0)
         x, y = interp2(extent, (xx, yy), (x, y), extrapolate=True)
     else:
+        # FIXME?
         x, y = ibilinear(xx, yy, x, y)
         x = (x + 1.0) * 300000.0
         y = (y + 1.0) * 150000.0
