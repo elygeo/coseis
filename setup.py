@@ -19,6 +19,10 @@ for k, v in opts:
 # configure
 cf = cst.conf.configure(None, machine, save_site=True)[0]
 
+# machine notes
+if machine:
+    print(cf.__doc__)
+
 # verbose
 if cf.verbose:
     print(cf.__doc__)

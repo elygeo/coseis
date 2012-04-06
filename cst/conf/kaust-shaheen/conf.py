@@ -2,7 +2,9 @@
 KAUST Shaheen
 http://www.hpc.kaust.edu.sa/
 
+Requirements:
 module load GNU
+module load numpy
 """
 login = hostname = 'shaheen.hpc.kaust.edu.sa'
 maxcores = 4
