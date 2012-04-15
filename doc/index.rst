@@ -14,7 +14,7 @@ Computational Seismology Tools
 
 .. _SORD:         sord.html
 .. _WebSims:      http://scec.usc.edu/websims
-.. _Source Code:  http://github.com/gely/coseis/
+.. _Source Code:  https://github.com/gely/coseis/
 
 Summary
 =======

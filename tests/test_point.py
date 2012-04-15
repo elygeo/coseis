@@ -42,7 +42,7 @@ def test_point():
 
     # output
     for f in cst.sord.fieldnames.volume:
-        fieldio += [('=w', f, [], 'out/' + f + '.bin')]
+        fieldio += [('=w', f, [], f + '.bin')]
 
     # single process
     rundir = 'tmp/s'
@@ -55,8 +55,8 @@ def test_point():
         cst.sord.run(locals())
         max_err_ = 0.0
         for f in cst.sord.fieldnames.volume:
-            f1 = 'tmp/s/out/%s.bin' % f
-            f2 = 'tmp/%s/out/%s.bin' % (i, f)
+            f1 = 'tmp/s/%s.bin' % f
+            f2 = 'tmp/%s/%s.bin' % (i, f)
             v1 = np.fromfile(f1, dtype)
             v2 = np.fromfile(f2, dtype)
             dv = v1 - v2

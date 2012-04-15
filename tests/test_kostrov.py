@@ -53,10 +53,10 @@ def test_kostrov():
 
     # recievers
     fieldio += [
-        ('=w', 'svm', [ -1,-21,-1,-1], 'out/p20a.bin'),
-        ('=w', 'svm', [-13,-17,-1,-1], 'out/p20b.bin'),
-        ('=w', 'svm', [-17,-13,-1,-1], 'out/p20c.bin'),
-        ('=w', 'svm', [-21, -1,-1,-1], 'out/p20d.bin'),
+        ('=w', 'svm', [ -1,-21,-1,-1], 'p20a.bin'),
+        ('=w', 'svm', [-13,-17,-1,-1], 'p20b.bin'),
+        ('=w', 'svm', [-17,-13,-1,-1], 'p20c.bin'),
+        ('=w', 'svm', [-21, -1,-1,-1], 'p20d.bin'),
     ]
 
     # run SORD
@@ -71,7 +71,7 @@ def test_kostrov():
     except:
         v = cst.kostrov.slip_rate(rho_, vp_, vs_, vrup, dtau_, r, t, 0.82)
     for p in 'abcd':
-        dv = v - np.fromfile(rundir + '/out/p20%s.bin' % p, dtype)[-1]
+        dv = v - np.fromfile(rundir + '/p20%s.bin' % p, dtype)[-1]
         err = dv / v
         print(v, err)
         assert abs(err) < 0.015

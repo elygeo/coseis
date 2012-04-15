@@ -1,101 +1,81 @@
 """
 Coordinate conversions
 """
-import math
+import sys, math
 import numpy as np
 
 rearth = 6370000.0
 
-def dot2(A, B):
+def dotvv(a, b, check=True):
     """
-    Vectorized 2d dot product (matrix multiplication).
-
-    The first two dimensions index the matrix rows and columns. The remaining
-    dimensions index multiple matrices for which dot products are computed
-    separately. This differs from np.dot, where the higher dimensions index
-    N-dimensional 'matrices.' Also, broadcasting is effectively reversed by using
-    the transpose, so that ones are appended to the shape if necessary, rather than
-    prepended.
-
-    This could be made more general with arbitrary maximum matrix dimension, at
-    the cost of code clarity.
+    Vector-vector dot product, optimized for small number of components containing
+    large arrays. For large numbers of components use numpy.dot instead. Unlike
+    numpy.dot, broadcasting rules only apply component-wise, so components may be a
+    mix of scalars and numpy arrays of any shape compatible for broadcasting.
     """
-    A = np.asarray(A).T
-    B = np.asarray(B).T
-    i = -min(A.ndim, 2)
-    if A.shape[i] != B.shape[-1]:
-        raise Exception('Incompatible arrays for dot product')
-    elif A.ndim == 1:
-        C = (A * B).T.sum(axis=0)
-    elif B.ndim == 1:
-        C = (A * B[...,None]).T.sum(axis=1)
-    else:
-        C = (A[...,None,:,:] * B[...,None]).T.sum(axis=1)
+    n = len(a)
+    if check and n > 8:
+        sys.exit('Too large. Use numpy.dot')
+    c = 0.0
+    for i in range(n):
+        c += a[i] * b[i]
+    return c
+
+
+def dotmv(A, b, check=True):
+    """
+    Matrix-vector dot product, optimized for small number of components containing
+    large arrays. For large numbers of components use numpy.dot instead. Unlike
+    numpy.dot, broadcasting rules only apply component-wise, so components may be a
+    mix of scalars and numpy arrays of any shape compatible for broadcasting.
+    """
+    m = len(A)
+    n = len(A[0])
+    if check and m * n > 64:
+        sys.exit('Too large. Use numpy.dot')
+    C = []
+    for j in range(m):
+        c = 0.0
+        for i in range(n):
+            c += A[j][i] * b[i]
+        C.append(c)
     return C
+
+
+def dotmm(A, B, check=True):
+    """
+    Matrix-matrix dot product, optimized for small number of components containing
+    large arrays. For large numbers of components use numpy.dot instead. Unlike
+    numpy.dot, broadcasting rules only apply component-wise, so components may be a
+    mix of scalars and numpy arrays of any shape compatible for broadcasting.
+    """
+    m = len(A)
+    n = len(B[0])
+    p = len(B)
+    if check and m * n * p > 512:
+        sys.exit('Too large. Use numpy.dot')
+    D = []
+    for j in range(m):
+        C = []
+        for k in range(n):
+            c = 0.0
+            for i in range(p):
+                c += A[j][i] * B[i][k]
+            C.append(c)
+        D.append(C)
+    return D
 
 
 def solve2(A, b):
     """
-    Vectorized 2x2 linear equation solver
+    2 by 2 linear equation solver. Components may be scalars or numpy arrays.
     """
-    A = np.asarray(A)
-    A /= (A[0,0] * A[1,1] - A[0,1] * A[1,0])
+    d = 1.0 / (A[0,0] * A[1,1] - A[0,1] * A[1,0])
     x = [
-        A[1,1] * b[0] - A[0,1] * b[1],
-        A[0,0] * b[1] - A[1,0] * b[0],
+        d * A[1,1] * b[0] - d * A[0,1] * b[1],
+        d * A[0,0] * b[1] - d * A[1,0] * b[0],
     ]
     return x
-
-
-def trinterp(x, f, t, xi):
-    """
-    2D linear interpolation of function values specified on triangular mesh.
-  
-    Parameters
-    ----------
-    x: M x 2 array of vertex coordinates.
-    f: M length array of function values at the vertices.
-    t: N x 3 array of vertex indices for the triangles.
-    xi: Array of coordinates for the interpolation points.
-
-    Returns
-    -------
-    fi: Array of interpolated values, same shape as `xi`.
-    """
-    # prepare arrays
-    x, y = x
-    xi, yi = xi
-    fi = np.empty_like(xi)
-    fi.fill(np.nan)
-
-    # tolerance
-    lmin = -0.000001
-    lmax =  1.000001
-
-    # loop over triangles
-    for i0, i1, i2 in t.T:
-
-        # barycentric coordinates
-        A00 = x[i1] - x[i0]
-        A01 = x[i2] - x[i0]
-        A10 = y[i1] - y[i0]
-        A11 = y[i2] - y[i0]
-        b0 = xi - x[i0]
-        b1 = yi - y[i0]
-        d  = 1.0 / (A00 * A11 - A01 * A10)
-        l1 = d * A11 * b0 - d * A01 * b1
-        l2 = d * A00 * b1 - d * A10 * b0
-        l0 = 1.0 - l1 - l2
-
-        # interpolate points inside triangle
-        i = (
-            (l0 > lmin) & (l0 < lmax) &
-            (l1 > lmin) & (l1 < lmax) &
-            (l2 > lmin) & (l2 < lmax)
-        )
-        fi[i] = f[i0] * l0[i] + f[i1] * l1[i] + f[i2] * l2[i]
-
-    return fi
 
 
 def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
@@ -336,6 +316,61 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
     return fi
 
 
+def trinterp(x, f, t, xi, fi=None):
+    """
+    2D linear interpolation of function values specified on triangular mesh.
+  
+    **NOTE** A faster compiled version here: cst.interpolate.trinterp
+
+    Parameters
+    ----------
+    x:  shape (2, M) array of vertex coordinates.
+    f:  shape (M) array of function values at the vertices.
+    t:  shape (3, N) array of vertex indices for the triangles.
+    xi: shape (2, ...) array of coordinates for the interpolation points.
+
+    Returns
+    -------
+    fi: Array of interpolated values, same shape as `xi[0]`.
+    """
+  
+    # prepare arrays
+    x, y = x
+    xi, yi = xi
+    if fi == None:
+        fi = np.empty_like(xi)
+        fi.fill(np.nan)
+
+    # tolerance
+    lmin = -0.000001
+    lmax =  1.000001
+
+    # loop over triangles
+    for i0, i1, i2 in t.T:
+
+        # barycentric coordinates
+        A00 = x[i1] - x[i0]
+        A01 = x[i2] - x[i0]
+        A10 = y[i1] - y[i0]
+        A11 = y[i2] - y[i0]
+        b0 = xi - x[i0]
+        b1 = yi - y[i0]
+        d  = 1.0 / (A00 * A11 - A01 * A10)
+        l1 = d * A11 * b0 - d * A01 * b1
+        l2 = d * A00 * b1 - d * A10 * b0
+        l0 = 1.0 - l1 - l2
+
+        # interpolate points inside triangle
+        i = (
+            (l0 > lmin) & (l0 < lmax) &
+            (l1 > lmin) & (l1 < lmax) &
+            (l2 > lmin) & (l2 < lmax)
+        )
+        fi[i] = f[i0] * l0[i] + f[i1] * l1[i] + f[i2] * l2[i]
+
+    return fi
+
+
 def ibilinear(xx, yy, xi, yi):
     """
     Vectorized inverse bilinear interpolation
@@ -382,7 +417,7 @@ def rot_sym_tensor(w1, w2, rot):
     m = np.diag(w1)
     m.flat[[5, 6, 1]] = w2
     m.flat[[7, 2, 3]] = w2
-    m = dot2(dot2(rot, m), rot.T)
+    m = dotmm(dotmm(rot, m), rot.T)
     w1 = np.diag(m)
     w2 = m.flat[[5, 6, 1]]
     return w1, w2
@@ -427,27 +462,61 @@ def rotmat(x, origin=(0, 0, 0), upvector=(0, 0, 1)):
 
 def llr2xyz(x, y, z, inverse=False):
     """
-    Geographic to rectangular coordinate conversion.
+    Approximate Geodetic to Earth-Centered, Earth-Fixed (ECEF) Cartesian
+    coordinates. Spherical Earth assumed.
 
     x <-> lon, y <-> lat, z <-> r
     """
-    x = np.asarray(x)
-    y = np.asarray(y)
-    z = np.asarray(z)
     if inverse:
         r = np.sqrt(x * x + y * y + z * z)
         x = np.arctan2(y, x)
         y = np.arcsin(z / r)
         x = 180.0 / np.pi * x
         y = 180.0 / np.pi * y
-        return np.array([x, y, r])
+        return x, y, r
     else:
         x  = np.pi / 180.0 * x
         y  = np.pi / 180.0 * y
         x_ = np.cos(x) * np.cos(y) * z
         y_ = np.sin(x) * np.cos(y) * z
         z  = np.sin(y) * z
-        return np.array([x_, y_, z])
+        return x_, y_, z
+
+
+def euler_rotation(phi=0.0, theta=0.0, psi=0.0):
+    """
+    Compute rotation matrix from Euler angles (Z-X-Z convention).
+
+    http://mathworld.wolfram.com/EulerAngles.html
+
+    ECEF Cartesian to East, North, Up transform:
+    m = euler_rotation(lon + 90, 90 - lat)
+
+    East, North, Up to fault surface coordinates:
+    m = euler_rotation(90 - strike, dip, rake)
+    """
+    A = np.pi / 180.0 * phi
+    B = np.pi / 180.0 * theta
+    C = np.pi / 180.0 * psi
+    del(phi, theta, psi)
+    c, s = np.cos(A), np.sin(A); A = [c, s, 0], [-s, c, 0], [0,  0, 1]
+    c, s = np.cos(B), np.sin(B); B = [1, 0, 0], [ 0, c, s], [0, -s, c]
+    c, s = np.cos(C), np.sin(C); C = [c, s, 0], [-s, c, 0], [0,  0, 1]
+    return dotmm(dotmm(C, B), A)
+
+
+def slip_vectors(strike, dip, rake, dtype=None):
+    """
+    For given strike, dip, and rake (degrees), using the Aki & Richards convention
+    of dip to the right of the strike vector, find the rotation matrix R from world
+    coordinates (east, north, up) to fault local coordinates (slip1, slip2, normal).
+    The transpose R^T performs the reverse rotation from fault local coordinates to
+    world coordinates.  Columns of R are axis unit vectors of the world space in
+    fault local coordinates.  Rows of R are axis unit vectors of the fault local
+    space in world coordinates, that can be unpacked by:
+    n_slip1, n_slip2, n_normal = slipvectors(strike, dip, rake)
+    """
+    return euler_rotation(90 - strike, dip, rake)
 
 
 def rotation(lon, lat, projection, eps=100.0):
@@ -456,7 +525,7 @@ def rotation(lon, lat, projection, eps=100.0):
 
     Rotation matrix and clockwise rotation angle to transform components in the
     geographic coordinate system to components in the local system.
-    local_components = dot2(mat, components)
+    local_components = dotmv(mat, components)
     local_strike = strike + theta
     """
     dlon = eps * 180.0 / (np.pi * rearth) * np.cos(np.pi / 180.0 * lat)
@@ -485,7 +554,7 @@ def rotation3(lon, lat, dep, projection, eps=100.0):
 
     Rotation matrix to transform components in the
     geographic coordinate system to components in the local system.
-    local_components = dot2(mat, components)
+    local_components = dotmv(mat, components)
     """
     dlon = eps * 180.0 / (np.pi * rearth) * np.cos(np.pi / 180.0 * lat)
     dlat = eps * 180.0 / (np.pi * rearth)
@@ -567,7 +636,7 @@ class Transform():
         if kwarg.get('inverse') is not True:
             if proj != None:
                 x, y = proj(x, y, **kwarg)
-            x, y = dot2(self.mat[:2,:2], [x, y])
+            x, y = dotmv(self.mat[:2,:2], [x, y])
             x += self.mat[0,2]
             y += self.mat[1,2]
         else:
@@ -579,102 +648,66 @@ class Transform():
         return np.array([x, y])
 
 
-def cmu(x, y, inverse=False):
+def tsurf_plane(xyz, tri):
     """
-    CMU TeraShake coordinates projection
-    """
-    xx = [-121.0, -118.951292], [-116.032285, -113.943965]
-    yy = [  34.5,   36.621696], [  31.082920,   33.122341]
-    if inverse:
-        extent = (0.0, 600000.0), (0.0, 300000.0)
-        x, y = interp2(extent, (xx, yy), (x, y), extrapolate=True)
-    else:
-        # FIXME?
-        x, y = ibilinear(xx, yy, x, y)
-        x = (x + 1.0) * 300000.0
-        y = (y + 1.0) * 150000.0
-    return np.array([x, y])
-
-
-def slip_vectors(strike, dip, rake, dtype=None):
-    """
-    For given strike, dip, and rake (degrees), using the Aki & Richards convention
-    of dip to the right of the strike vector, find the rotation matrix R from world
-    coordinates (east, north, up) to fault local coordinates (slip1, slip2, normal).
-    The transpose R^T performs the reverse rotation from fault local coordinates to
-    world coordinates.  Columns of R are axis unit vectors of the world space in
-    fault local coordinates.  Rows of R are axis unit vectors of the fault local
-    space in world coordinates, that can be unpacked by:
-    n_slip1, n_slip2, n_normal = coord.slipvectors(strike, dip, rake)
-    """
-
-    A = np.pi / 180.0 * np.asarray(rake)
-    B = np.pi / 180.0 * np.asarray(dip)
-    C = np.pi / 180.0 * np.asarray(strike)
-    u, z = np.ones_like(A), np.zeros_like(A)
-    c, s = np.cos(A), np.sin(A)
-    A = np.array([[c, s, z], [-s, c, z], [z, z, u]])
-    c, s = np.cos(B), np.sin(B)
-    B = np.array([[u, z, z], [z, c, s], [z, -s, c]])
-    c, s = np.cos(C), np.sin(C)
-    C = np.array([[s, c, z], [-c, s, z], [z, z, u]])
-    return dot2(dot2(A, B), C)
-
-
-def plane_misfit(orientation, x, y, z):
-    """
-    Return the misfit of a specified plane orientation to a set of normal vectors.
-    This function can be optimized to find the best-fit plane.  The normal vectors
-    may be weighted by the area patch they represent as occurs naturally when when
-    taking the cross-product of two vector sides of a triangle (for example).
-
-    orientation: (strike, dip)
-    x, y, z: surface normal components in (east, north, up) coordinates
-    """
-    stk, dip = orientation
-    stk *= math.pi / 180.0
-    dip *= math.pi / 180.0
-    a =  math.cos(stk) * math.sin(dip)
-    b = -math.sin(stk) * math.sin(dip)
-    c =  math.cos(dip)
-    m = -abs(a * x + b * y + c * z).sum()
-    return m
-
-
-def tsurf_plane(xyz, tri, plane=None):
-    """
-    Find the best-fit plane and total surface area of a triangulated surface.
+    Find the center of mass, best-fit plane, and total surface area of a
+    triangulated surface.
 
     Parameters
     ----------
     xyz: vertices in (east, north, up) coordinates
     tri: triangle indices
-    plane: initial orientation (strike, dip)
 
     Returns
     -------
+    lon: longitude of the center of mass
+    lat: latitude of the center of mass
     stk: fault strike in degrees (0-360)
     dip: fault dip in degrees (0-90) to the right of the strike vector
     area: fault area in squared units of the vertices
     """
     import scipy.optimize
-    if plane == None:
-        plane = 0.0, 0.0
-    xyz = np.asarray(xyz)
-    j, k, l = np.asarray(tri)
-    ux, uy, uz = xyz[:,k] - xyz[:,j]
-    vx, vy, vz = xyz[:,l] - xyz[:,j]
+
+    # Cartesian coordinates
+    x, y, z = xyz
+    z += rearth
+    x, y, z = llr2xyz(x, y, z)
+
+    # area normals
+    j, k, l = tri
+    ux = x[k] - x[j]
+    uy = y[k] - y[j]
+    uz = z[k] - z[j]
+    vx = x[l] - x[j]
+    vy = y[l] - y[j]
+    vz = z[l] - z[j]
     wx = uy * vz - uz * vy
     wy = uz * vx - ux * vz
     wz = ux * vy - uy * vx
-    area = 0.5 * np.sqrt(wx * wx + wy * wy + wz * wz).sum()
-    stk, dip = scipy.optimize.fmin(plane_misfit, plane, (wx, wy, wz), disp=False)
-    dip %= 180.0
-    if dip > 90.0:
-        dip = 180.0 - dip
-        stk = 180.0 + stk
-    stk %= 360.0
-    return stk, dip, area
+
+    # center of mass
+    a = np.sqrt(wx * wx + wy * wy + wz * wz)
+    area = 0.5 * a.sum()
+    d = 1.0 / (3.0 * area)
+    x = d * ((x[j] + x[k] + x[l]) * a).sum()
+    y = d * ((y[j] + y[k] + y[l]) * a).sum()
+    z = d * ((z[j] + z[k] + z[l]) * a).sum()
+    lon, lat, dep = llr2xyz(x, y, z, inverse=True)
+
+    # best fit plane
+    def misfit(n):
+        return -abs(n[0] * wx + n[1] * wy + n[2] * wz).sum()
+    x, y, z = scipy.optimize.fmin(misfit, (1.0, 0.0, 0.0), disp=False)
+
+    # strike and dip
+    x, y, z = dotmv(euler_rotation(lon + 90, 90 - lat), (x, y, z))
+    if z < 0.0:
+        x, y, z = -x, -y, -z
+    r = math.sqrt(x * x + y * y)
+    stk = math.atan2(-y, x) / math.pi * 180.0
+    dip = math.atan(r / z)  / math.pi * 180.0
+
+    return lon, lat, stk, dip, area
 
 
 def potency_tensor(normal, slip):
@@ -688,24 +721,6 @@ def potency_tensor(normal, slip):
         0.5 * (normal[0] * slip[1] + slip[0] * normal[1]),
     ]])
     return p
-
-
-def viewmatrix(azimuth, elevation, up=None):
-    """
-    Compute transformation matrix from view azimuth and elevation.
-    """
-    if up is None:
-          if 5.0 < abs(elevation) < 175.0:
-              up = 0, 0, 1
-          else:
-              up = 0, 1, 0
-    z = llr2xyz([azimuth], [90.0 - elevation], [1]).T[0]
-    x = np.cross(up, z)
-    y = np.cross(z, x)
-    x = x / np.sqrt((x * x).sum())
-    y = y / np.sqrt((y * y).sum())
-    z = z / np.sqrt((z * z).sum())
-    return np.array([x, y, z]).T
 
 
 def compass(azimuth, radians=False):
