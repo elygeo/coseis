@@ -74,8 +74,6 @@ faults = [
     'WTRA-SBTS-PHLS-Puente_Hills_Thrust_fault-Richfield',
     'WTRA-SBTS-PHLS-Puente_Hills_Thrust_fault-SFS',
 ]
-faults = [
-]
 #faults = [[(k, [i])] for k in faults for i in range(nsegs[k])]
 patterns = [
 ]
