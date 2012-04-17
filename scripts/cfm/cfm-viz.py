@@ -26,25 +26,75 @@ import numpy as np
 import pyproj
 from enthought.mayavi import mlab
 import cst
+nsegs = cst.data.cfm()
 
 # parameters
 fig_name = 'SCEC Community Fault Model'
 print '\n%s\n' % fig_name
-extent = (-121.5, -114.5), (30.5, 36.5)
 extent = (-119, -114), (32, 36)
+extent = (-121.5, -114.5), (30.5, 36.5)
 fault_extent = (-118, -115), (33, 35)
 fault_extent = (-117.1, -116.1), (33.7, 34.1)
+fault_extent = extent
 faults = [
-    ('cfma_san_bernardino_W_san_andreas_complete', [0, 1]),
-    ('cfma_san_andreas_coachella_alt3_complete', [0, 1]),
-    ('banning_from_hypo_complete', [0, 1, 4]),
+    'SAFS-SAFZ-PARK-San_Andreas_fault',
+    'SAFS-SAFZ-CLCZ-San_Andreas_fault-CHLM',
+    'SAFS-SAFZ-CLCZ-San_Andreas_fault-CRRZ',
+    'SAFS-SAFZ-MJVS-San_Andreas_fault',
+    'SAFS-SAFZ-SBMT-San_Andreas_fault-alt1',
+    'SAFS-SAFZ-MULT-Banning_fault-alt1',
+    #('SAFS-SAFZ-MULT-Banning_fault-alt1', [0, 2]),
+    'SAFS-SAFZ-COAV-Banning_fault-alt1-south',
+    'SAFS-SAFZ-COAV-Southern_San_Andreas_fault-alt1',
+    'GRFS-GRFZ-EAST-Garlock_fault',
+    'GRFS-GRFZ-WEST-Garlock_fault',
+    'PNRA-SJFZ-SBRN-San_Jacinto-Claremont_fault-alt1',
+    'PNRA-SJFZ-SJCV-Claremont_fault',
+    'PNRA-SJFZ-ANZA-Clark_fault-alt1-north-alt2-upper2',
+    'PNRA-SJFZ-ANZA-Clark_fault-alt1-north-alt2-upper1',
+    'PNRA-SJFZ-ANZA-Clark_fault-alt1-north-alt2-lower',
+    'PNRA-SJFZ-ANZA-Clark_fault-alt1-south-main-alt1',
+    'PNRA-ELSZ-CHNO-chino_fault-alt1-Central_Ave',
+    'PNRA-ELSZ-CHNO-chino_fault-alt1-main',
+    'PNRA-ELSZ-CYMT-Elsinore_fault-CFMA',
+    'PNRA-ELSZ-GLIV-Glen_Ivy_fault-north-alt1',
+    'PNRA-ELSZ-GLIV-Glen_Ivy_fault-south',
+    'PNRA-ELSZ-JULN-Elsinore_fault-alt1-Wildomar-link',
+    'PNRA-ELSZ-JULN-Elsinore_fault-alt1-north',
+    'PNRA-ELSZ-JULN-Elsinore_fault-alt1-south',
+    'PNRA-ELSZ-TMCL-Wildomar_fault',
+    'PNRA-ELSZ-TMCL-Willard_fault-alt1',
+    'OCBA-PVFZ-MULT-Palos_Verdes_fault-CFM',
+    'WTRA-SCFZ-MULT-San_Cayetano_fault-CFM',
+    'WTRA-SMFZ-MULT-Sierra_Madre_fault-west-alt1',
+    'WTRA-SMFZ-MULT-Sierra_Madre_fault-east',
+    'WTRA-SMFZ-MULT-Sierra_Madre_fault-Cucamonga_Connector',
+    'WTRA-SBTS-PHLS-Puente_Hills_Thrust_fault-CH',
+    'WTRA-SBTS-PHLS-Puente_Hills_Thrust_fault-LA',
+    'WTRA-SBTS-PHLS-Puente_Hills_Thrust_fault-Richfield',
+    'WTRA-SBTS-PHLS-Puente_Hills_Thrust_fault-SFS',
 ]
-faults = cst.data.cfm().keys()
-combine = True
-combine = False
+faults = [
+]
+#faults = [[(k, [i])] for k in faults for i in range(nsegs[k])]
+patterns = [
+]
+patterns = [
+    'PNRA-NIRC-',
+]
+if 1:
+    faults = []
+    for f in sorted(nsegs):
+        for p in patterns:
+            if p in f:
+                faults.append(f)
+                break
 resolution = 'high'
+resolution = 'intermediate'
 view_azimuth = -90
+view_azimuth = 0
 view_elevation = 55
+view_elevation = 0
 view_angle = 15
 opacity = 0.3
 zscale = 1.0
@@ -97,17 +147,12 @@ mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
 # plot fault surfaces
 print '\nReading fault surfaces:\n'
 names = {}
-titles = {}
 coords = []
-if combine:
-    faults = [faults]
 for f in faults:
     f = cst.data.cfm(f, fault_extent)
     if f is None:
         continue
     print '    %s' % f.name
-    title = f.name.replace('cfma_', '').replace('cfm_',  '')
-    title = title.replace('_', ' ').replace('-', ' ')
     x, y, z = f.llz
     x, y = proj(x, y)
     z *= scale * zscale
@@ -115,7 +160,6 @@ for f in faults:
     s = mlab.triangular_mesh(x, y, z, t, representation='surface', vmin=vlim[0], vmax=vlim[1])
     a = s.actor.actor
     names[a] = f.name
-    titles[a] = title
     x, y = proj(f.lon, f.lat)
     z = f.dep * scale * zscale
     coords += [[x, y, z, a]]
@@ -139,7 +183,7 @@ def on_key_press(obj, event, current=[None]):
                 a.property.opacity = opacity
         a = actors[i]
         a.property.opacity = 1.0
-        fig.name = titles[a]
+        fig.name = names[a]
         current[0] = a
     elif k == '\\' and current[0]:
         current[0] = None

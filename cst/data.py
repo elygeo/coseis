@@ -416,7 +416,7 @@ def engdahlcat(path='engdahl-centennial-cat.npy'):
     return data
 
 
-def cfm(faults=None, extent=None):
+def cfm(faults=None, extent=None, version='CFM4-socal-primary'):
     """
     SCEC Community Fault Model (CFM) reader.  If faults in None, return the
     list of available fault names. Otherwise, read the requested faults.
@@ -449,39 +449,39 @@ def cfm(faults=None, extent=None):
 
     # paths
     repo = cst.site.repo
-    path = os.path.join(repo, 'scec-cfm4')
-    version = 'v40'
+    path = os.path.join(repo, 'scec-cfm4', version)
+    npy  = os.path.join(path, '%s-%04d-%s.npy')
+    fault_file = os.path.join(repo, 'scec-cfm4', 'fault-list.txt')
 
-    # download if not found
-    if not os.path.exists(path):
-        url = 'http://structure.harvard.edu/cfm/download/CFM_40.tar.gz'
-        print('Downloading %s' % url)
-        f = os.path.join(repo, os.path.basename(url))
-        urllib.urlretrieve(url, f)
-        subprocess.check_call(['tar', '-C', path, '-zxf', f])
-
-    # process faults
-    fault_file = os.path.join(path, 'fault-list.txt')
+    # prepare fault database
     dtype = [('name', 'S64'), ('nseg', 'i')]
     if os.path.exists(fault_file):
         nseg = dict(np.loadtxt(fault_file, dtype))
     else:
-        d0 = os.path.join(path, version, 'ts')
-        d1 = os.path.join(path, 'npy')
-        f0 = os.path.join(d0, '%s')
-        f1 = os.path.join(d1, '%s-%04d-%s.npy')
-        os.mkdir(d1)
+        url = 'http://opensha.usc.edu/apps/scec_vdo/SCEC_VDO.jar'
+        url = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
+        vdo = os.path.join(repo, 'SCEC_VDO')
+        src = os.path.join(vdo, 'data', 'Faults', version) + os.sep
+        if not os.path.exists(vdo):
+            print('Downloading %s' % url)
+            f = os.path.join(repo, os.path.basename(url))
+            urllib.urlretrieve(url, f)
+            os.mkdir(vdo)
+            zipfile.ZipFile(f).extractall(vdo)
+        os.makedirs(path)
         nseg = {}
-        for f in os.listdir(d0):
-            xyz, tri = gocad.tsurf(f0 % f)[0][2:4]
+        for f in os.listdir(src):
+            if not f.endswith('.ts'):
+                continue
+            xyz, tri = gocad.tsurf(src + f)[0][2:4]
             fault = f[:-3]
             nseg[fault] = len(tri)
             for k, t in enumerate(tri):
                 i, j = np.unique(t, return_inverse=True)
                 t = np.arange(t.size)[j].reshape(t.shape)
                 x = xyz[:,i]
-                np.save(f1 % (fault, k, 'xyz'), x)
-                np.save(f1 % (fault, k, 'tri'), t)
+                np.save(npy % (fault, k, 'xyz'), x)
+                np.save(npy % (fault, k, 'tri'), t)
         f = np.array(sorted(nseg.items()), dtype)
         np.savetxt(fault_file, f, '%s %s')
 
@@ -496,14 +496,14 @@ def cfm(faults=None, extent=None):
     xyz = []
     llz = []
     tri = []
-    f = os.path.join(path, 'npy', '%s-%04d-%s.npy')
+    name = []
     for fault in faults:
         if type(fault) in (list, tuple):
             fault, segments = fault
         else:
             segments = range(nseg[fault])
         for i in segments:
-            x, y, z = np.load(f % (fault, i, 'xyz'))
+            x, y, z = np.load(npy % (fault, i, 'xyz'))
             x_, y_ = proj(x, y, inverse=True)
             if extent:
                 xlim, ylim = extent
@@ -516,8 +516,10 @@ def cfm(faults=None, extent=None):
                     continue
             xyz.append([x, y, z])
             llz.append([x_, y_, z])
-            tri.append(np.load(f % (fault, i, 'tri')) + n)
+            t = np.load(npy % (fault, i, 'tri'))
+            tri.append(t + n)
             n += x.size
+        name.append('%s%s' % (fault, segments))
 
     # combine segments
     if len(xyz) == 0:
@@ -525,12 +527,7 @@ def cfm(faults=None, extent=None):
     xyz = np.hstack(xyz)
     llz = np.hstack(llz)
     tri = np.hstack(tri)
-
-    # name
-    if len(faults) > 1:
-        name = 'SCEC Community Fault Model'
-    else:
-        name = fault
+    name = os.path.commonprefix(name)
 
     # origin, strike, and dip
     ctr, nrm, area = coord.tsurf_plane(xyz, tri)

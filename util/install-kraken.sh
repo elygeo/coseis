@@ -9,7 +9,7 @@ read confirm
 [ "$confirm" = "y" ]
 
 # virtualenv
-url="http://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.6.1.tar.gz"
+url="http://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.7.1.2.tar.gz"
 tag=$( basename "$url" .tar.gz )
 cd "${prefix}"
 curl -L "${url}" | tar zx
