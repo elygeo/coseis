@@ -1,8 +1,5 @@
 #!/bin/bash
-
-# install prefix
-cd "${1:-.}"
-prefix="${PWD}/ucvm"
+prefix="${HOME}/ucvm"
 mkdir "${prefix}"
 
 # PROJ.4 Library
