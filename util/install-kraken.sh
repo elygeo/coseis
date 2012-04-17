@@ -1,24 +1,22 @@
 #!/bin/bash -e
+module load yt
 pwd="${PWD}"
-cd "${1:-.}"
-prefix="${PWD}"
+prefix="${SCRATCHDIR}/local"
 echo "Statically linked Python for Compute Node Linux on NICS Kraken"
 echo "See: http://yt.enzotools.org/wiki/KrakenCommunityInstallation"
 echo -n "Install in ${prefix}? [y/N]: "
 read confirm
 [ "$confirm" = "y" ]
+cd "${prefix}"
 
-# virtualenv
+# virtualenv yt Python version
 url="http://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.7.1.2.tar.gz"
 tag=$( basename "$url" .tar.gz )
-cd "${prefix}"
 curl -L "${url}" | tar zx
+python "${tag}/virtualenv.py" python
+. python/bin/activate
 
-# yt python version
-module load yt
-cd "${SCRATCHDIR}"
-python "${prefix}/local/${tag}/virtualenv.py" local
-. local/bin/activate
+# Python packages
 pip install pyproj
 pip install GitPython
 pip install readline
@@ -27,10 +25,6 @@ pip install docutils
 pip install PIL
 #pip install scipy
 #pip install ipython
-
-# Coseis
-cd coseis
-python setup.py path
 
 cd "${pwd}"
 
