@@ -31,11 +31,9 @@ import cst
 fig_name = 'SCEC Community Fault Model'
 print '\n%s\n' % fig_name
 extent = (-121.5, -114.5), (30.5, 36.5)
-extent = (-118, -115), (32.5, 35)
 extent = (-119, -114), (32, 36)
-fault_extent = (-117.1, -116.1), (33.7, 34.1)
 fault_extent = (-118, -115), (33, 35)
-fault_extent = extent
+fault_extent = (-117.1, -116.1), (33.7, 34.1)
 faults = [
     ('cfma_san_bernardino_W_san_andreas_complete', [0, 1]),
     ('cfma_san_andreas_coachella_alt3_complete', [0, 1]),
