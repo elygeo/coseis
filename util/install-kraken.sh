@@ -12,7 +12,7 @@ url="http://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.7.1.2.tar.
 tag=$( basename "$url" .tar.gz )
 curl -L "${url}" | tar zx
 python "${tag}/virtualenv.py" python
-. local/python/bin/activate
+. python/bin/activate
 
 # Python packages
 pip install pyproj
