@@ -5,9 +5,9 @@ Data utilities and sources
 # Quaternary Fault Database
 # ftp://hazards.cr.usgs.gov/maps/qfault/
 # http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
-import os, sys, urllib, gzip, zipfile, subprocess
+import os, sys, math, urllib, gzip, zipfile, subprocess
 import numpy as np
-from . import coord, source, gocad
+from . import coord, source, gocad, util
 
 
 def upsample(f):
@@ -214,7 +214,6 @@ def topo(extent, scale=1.0, downsample=0, mesh=False):
     topo: Elevation array z or if mesh == True (lon, lat, z) arrays.
     extent: Extent of z array possibly larger than requested extent.
     """
-    import math
     x, y = extent
     if downsample:
         d = 60 // downsample
@@ -417,97 +416,150 @@ def engdahlcat(path='engdahl-centennial-cat.npy'):
     return data
 
 
-class scec_cfm():
+def cfm(faults=None, extent=None):
     """
-    SCEC Community Fault Model (CFM) reader.
+    SCEC Community Fault Model (CFM) reader.  If faults in None, return the
+    list of available fault names. Otherwise, read the requested faults.
 
-    Call Parameters
-    ---------------
-
-    fault: Name of fault to read.
-    segments: List of segment indices (defatul None = all).
+    Parameters
+    ----------
+    faults: List of faults names, and (optionally) segment indices.
     extent: Return None if outside range (xmin, xmax), (ymin, ymax).
     geographic: Convert X/Y coordinates to Lon/Lat, default = True.
 
     Returns
     -------
-
-    header: dict of metadata.
-    property_header: dict of metadata.
-    vertices: M x 3 array of vertex coordinates.
-    triangles: List of N x 3 arrays of vertex indices.
-    border: 1d array of border vertex indices.
-    extrema: 1d array of border extremity vertex indices. 
+    tsurf: object with the following properties:
+        name: segment name
+        xyz: M x 3 array of vertex coordinates, Cartesian coords
+        llz: M x 3 array of vertex coordinates, geodetic coords
+        tri: List of N x 3 arrays of vertex indices
+        lon: Longitude of the center of mass
+        lat: Latitude of the center of mass
+        dep: Depth of the center of mass
+        stk: Fault strike
+        dip: Fault dip
+        area: Total surface area
     """
+    import pyproj
+    import cst
 
-    def __init__(self):
+    # projection: UTM zone 11, NAD 1927 datum (implies Clark 1866 geoid)
+    proj = pyproj.Proj(proj='utm', zone=11, datum='NAD27')
 
-        # projection: UTM zone 11, NAD 1927 datum (implies Clark 1866 geoid)
-        self.projection = dict(proj='utm', zone=11, datum='NAD27')
+    # paths
+    repo = cst.site.repo
+    path = os.path.join(repo, 'scec-cfm4')
+    version = 'v40'
 
-        # paths
-        import cst
-        repo = cst.site.repo
-        path = os.path.join(repo, 'scec-cfm4')
-        self.path = os.path.join(path, 'v40', 'ts')
+    # download if not found
+    if not os.path.exists(path):
+        url = 'http://structure.harvard.edu/cfm/download/CFM_40.tar.gz'
+        print('Downloading %s' % url)
+        f = os.path.join(repo, os.path.basename(url))
+        urllib.urlretrieve(url, f)
+        subprocess.check_call(['tar', '-C', path, '-zxf', f])
 
-        # download if not found
-        if not os.path.exists(path):
-            url = 'http://structure.harvard.edu/cfm/download/CFM_40.tar.gz'
-            print('Downloading %s' % url)
-            f = os.path.join(repo, os.path.basename(url))
-            urllib.urlretrieve(url, f)
-            os.mkdir(path)
-            subprocess.check_call(['tar', '-C', path, '-zxf', f])
+    # process faults
+    fault_file = os.path.join(path, 'fault-list.txt')
+    dtype = [('name', 'S64'), ('nseg', 'i')]
+    if os.path.exists(fault_file):
+        nseg = dict(np.loadtxt(fault_file, dtype))
+    else:
+        d0 = os.path.join(path, version, 'ts')
+        d1 = os.path.join(path, 'npy')
+        f0 = os.path.join(d0, '%s')
+        f1 = os.path.join(d1, '%s-%04d-%s.npy')
+        os.mkdir(d1)
+        nseg = {}
+        for f in os.listdir(d0):
+            xyz, tri = gocad.tsurf(f0 % f)[0][2:4]
+            fault = f[:-3]
+            nseg[fault] = len(tri)
+            for k, t in enumerate(tri):
+                i, j = np.unique(t, return_inverse=True)
+                t = np.arange(t.size)[j].reshape(t.shape)
+                x = xyz[:,i]
+                np.save(f1 % (fault, k, 'xyz'), x)
+                np.save(f1 % (fault, k, 'tri'), t)
+        f = np.array(sorted(nseg.items()), dtype)
+        np.savetxt(fault_file, f, '%s %s')
 
-        # fault list
-        self.faults = [s[:-3] for s in os.listdir(self.path)]
+    # If no faults requested, return the list
+    if faults == None:
+        return nseg
+    if isinstance(faults, basestring):
+        faults = [faults]
 
+    # read faults
+    n = 0
+    xyz = []
+    llz = []
+    tri = []
+    f = os.path.join(path, 'npy', '%s-%04d-%s.npy')
+    for fault in faults:
+        if type(fault) in (list, tuple):
+            fault, segments = fault
+        else:
+            segments = range(nseg[fault])
+        for i in segments:
+            x, y, z = np.load(f % (fault, i, 'xyz'))
+            x_, y_ = proj(x, y, inverse=True)
+            if extent:
+                xlim, ylim = extent
+                if (
+                    x_.max() < xlim[0] or
+                    x_.min() > xlim[1] or
+                    y_.max() < ylim[0] or
+                    y_.min() > ylim[1]
+                ):
+                    continue
+            xyz.append([x, y, z])
+            llz.append([x_, y_, z])
+            tri.append(np.load(f % (fault, i, 'tri')) + n)
+            n += x.size
+
+    # combine segments
+    if len(xyz) == 0:
         return
+    xyz = np.hstack(xyz)
+    llz = np.hstack(llz)
+    tri = np.hstack(tri)
 
-    def __call__(self, fault, segments=None, extent=None, geographic=True, cull=True):
+    # name
+    if len(faults) > 1:
+        name = 'SCEC Community Fault Model'
+    else:
+        name = fault
 
-        # read GOCAD TSurf file
-        f = os.path.join(self.path, fault + '.ts')
-        hdr, phdr, xyz, tri, border, bstone = gocad.tsurf(f)[0]
+    # origin, strike, and dip
+    ctr, nrm, area = coord.tsurf_plane(xyz, tri)
+    x0, y0, z0 = ctr
+    x, y, z = nrm
+    r = math.sqrt(x * x + y * y) / z
+    dip = math.atan(r) / math.pi * 180.0
+    x = x0, x0 - x, x0 + x
+    y = y0, y0 - y, y0 + y
+    x, y = proj(x, y, inverse=True)
+    lon, lat, dep = x[0], y[0], z0
+    x = 0.5 * (x[2] - x[1]) / math.cos(lat / 180.0 * math.pi)
+    y = 0.5 * (y[2] - y[1])
+    stk = (math.atan2(-y, x) / math.pi * 180.0) % 360.0
 
-        # select segments
-        if segments is not None:
-            tri = [tri[i] for i in segments]
-
-        # remove unused points
-        if cull:
-            t = np.hstack(tri)
-            i, j = np.unique(t, return_inverse=True)
-            xyz = xyz[:,i]
-            t = np.arange(t.size)[j].reshape(t.shape)
-            m = 0
-            for i in range(len(tri)):
-                n = tri[i].shape[-1]
-                tri[i] = t[:,m:m+n]
-                m += n
-
-        # project to geographic coordinates
-        if geographic:
-            import pyproj
-            proj = pyproj.Proj(**self.projection)
-            x, y, z = xyz
-            x, y = proj(x, y, inverse=True)
-            xyz = np.array([x, y, z], z.dtype)
-
-        # exclude if outside range
-        if extent:
-            xlim, ylim = extent
-            x, y, z = xyz
-            if (
-                x.max() < xlim[0] or
-                x.min() > xlim[1] or
-                y.max() < ylim[0] or
-                y.min() > ylim[1]
-            ):
-                return None
-
-        return hdr, phdr, xyz, tri, border, bstone
+    # data dictionary
+    data = dict(
+        name = name,
+        xyz = xyz,
+        llz = llz,
+        tri = tri,
+        area = area,
+        lon = lon,
+        lat = lat,
+        dep = dep,
+        stk = stk,
+        dip = dip,
+    )
+    return util.namespace(data)
 
 
 def cybershake(isrc, irup, islip, ihypo, name=None):

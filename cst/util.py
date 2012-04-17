@@ -62,6 +62,9 @@ def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
     """
     Write variables from a dict into a Python source file.
     """
+    if fh is not None:
+        if isinstance(fh, basestring):
+            fh = open(os.path.expanduser(fh), 'w')
     if type(d) is not dict:
         d = d.__dict__
     if expand is None:
@@ -74,7 +77,7 @@ def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
     has_array = False
     for k in sorted(d):
         if k not in expand and (keep is None or k in keep):
-            if type(d[k]) == np.ndarray:
+            if type(d[k]) == np.ndarray and fh is not None:
                 has_array = True
                 if d[k].size > n:
                     f = os.path.dirname(fh.name)
@@ -113,8 +116,6 @@ def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
             else:
                 raise Exception('Cannot expand %s type %s' % (k, type(d[k])))
     if fh is not None:
-        if isinstance(fh, basestring):
-            fh = open(os.path.expanduser(fh), 'w')
         fh.write(out)
     return out
 

@@ -462,8 +462,12 @@ def rotmat(x, origin=(0, 0, 0), upvector=(0, 0, 1)):
 
 def llr2xyz(x, y, z, inverse=False):
     """
-    Approximate Geodetic to Earth-Centered, Earth-Fixed (ECEF) Cartesian
-    coordinates. Spherical Earth assumed.
+    Spherical to Cartesian coordinate conversion. Spherical coordinates are
+    parameterized in degrees longitude and latitude. This approximates Geodetic to
+    Earth-Centered, Earth-Fixed (ECEF) Cartesian coordinates.
+    Cartesian X axis is at lon 0, lat 0.
+    Cartesian Y axis is at lon 90, lat 0.
+    Cartesian Z axis is at lat 90.
 
     x <-> lon, y <-> lat, z <-> r
     """
@@ -606,8 +610,10 @@ class Transform():
     >>> proj(0, 0, inverse=True)
     array([-121. ,   34.5])
     """
+
     def __init__(self, proj=None, origin=None, scale=1.0, rotate=0.0,
-        translate=(0.0, 0.0), matrix=((1,0,0),(0,1,0),(0,0,1))):
+        translate=(0.0, 0.0), matrix=((1,0,0), (0,1,0), (0,0,1))
+    ):
         phi = np.pi / 180.0 * rotate
         if origin == None:
             x, y = 0.0, 0.0
@@ -617,7 +623,8 @@ class Transform():
                 x, y = proj(x, y)
             if type(x) in (list, tuple):
                 phi -= np.arctan2(y[1] - y[0], x[1] - x[0])
-                x, y = 0.5 * (x[0] + x[1]), 0.5 * (y[0] + y[1])
+                x = 0.5 * (x[0] + x[1])
+                y = 0.5 * (y[0] + y[1])
         mat = [[1, 0, -x], [0, 1, -y], [0, 0, 1]]
         if hasattr(proj, 'mat'):
             mat = np.dot(mat, proj.mat)
@@ -629,6 +636,7 @@ class Transform():
         mat = np.dot(matrix, mat)
         self.mat = mat
         self.proj = proj
+
     def __call__(self, x, y, **kwarg):
         proj = self.proj
         x = np.asarray(x)
@@ -655,25 +663,19 @@ def tsurf_plane(xyz, tri):
 
     Parameters
     ----------
-    xyz: vertices in (east, north, up) coordinates
-    tri: triangle indices
+    xyz: vertex coordinates (x, y, z)
+    tri: triangle indices (j, k, l)
 
     Returns
     -------
-    lon: longitude of the center of mass
-    lat: latitude of the center of mass
-    stk: fault strike in degrees (0-360)
-    dip: fault dip in degrees (0-90) to the right of the strike vector
-    area: fault area in squared units of the vertices
+    center: center of mass (x, y, z)
+    normal: mean unit surface normal (nx, ny, nz)
+    area: total surface area
     """
     import scipy.optimize
 
-    # Cartesian coordinates
-    x, y, z = xyz
-    z += rearth
-    x, y, z = llr2xyz(x, y, z)
-
     # area normals
+    x, y, z = xyz
     j, k, l = tri
     ux = x[k] - x[j]
     uy = y[k] - y[j]
@@ -686,28 +688,30 @@ def tsurf_plane(xyz, tri):
     wz = ux * vy - uy * vx
 
     # center of mass
-    a = np.sqrt(wx * wx + wy * wy + wz * wz)
-    area = 0.5 * a.sum()
+    a = 0.5 * np.sqrt(wx * wx + wy * wy + wz * wz)
+    area = a.sum()
     d = 1.0 / (3.0 * area)
     x = d * ((x[j] + x[k] + x[l]) * a).sum()
     y = d * ((y[j] + y[k] + y[l]) * a).sum()
     z = d * ((z[j] + z[k] + z[l]) * a).sum()
-    lon, lat, dep = llr2xyz(x, y, z, inverse=True)
+    center = x, y, z
 
     # best fit plane
-    def misfit(n):
-        return -abs(n[0] * wx + n[1] * wy + n[2] * wz).sum()
-    x, y, z = scipy.optimize.fmin(misfit, (1.0, 0.0, 0.0), disp=False)
-
-    # strike and dip
-    x, y, z = dotmv(euler_rotation(lon + 90, 90 - lat), (x, y, z))
+    def misfit(plane):
+        phi, theta = plane
+        x = math.cos(theta) * math.cos(phi)
+        y = math.cos(theta) * math.sin(phi)
+        z = math.sin(theta)
+        return -abs(x * wx + y * wy + z * wz).sum()
+    phi, theta = scipy.optimize.fmin(misfit, (0.0, 0.0), disp=False)
+    x = math.cos(theta) * math.cos(phi)
+    y = math.cos(theta) * math.sin(phi)
+    z = math.sin(theta)
     if z < 0.0:
         x, y, z = -x, -y, -z
-    r = math.sqrt(x * x + y * y)
-    stk = math.atan2(-y, x) / math.pi * 180.0
-    dip = math.atan(r / z)  / math.pi * 180.0
+    normal = x, y, z
 
-    return lon, lat, stk, dip, area
+    return center, normal, area
 
 
 def potency_tensor(normal, slip):

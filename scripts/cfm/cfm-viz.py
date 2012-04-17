@@ -28,35 +28,33 @@ from enthought.mayavi import mlab
 import cst
 
 # parameters
-fig_name = __doc__.splitlines()[1]
+fig_name = 'SCEC Community Fault Model'
 print '\n%s\n' % fig_name
 extent = (-121.5, -114.5), (30.5, 36.5)
 extent = (-118, -115), (32.5, 35)
 extent = (-119, -114), (32, 36)
 fault_extent = (-117.1, -116.1), (33.7, 34.1)
 fault_extent = (-118, -115), (33, 35)
+fault_extent = extent
 faults = [
-    ([0, 1], 'cfma_san_bernardino_W_san_andreas_complete'),
-    ([0, 1], 'cfma_san_andreas_coachella_alt3_complete'),
-    ([0, 1, 4], 'banning_from_hypo_complete'),
+    ('cfma_san_bernardino_W_san_andreas_complete', [0, 1]),
+    ('cfma_san_andreas_coachella_alt3_complete', [0, 1]),
+    ('banning_from_hypo_complete', [0, 1, 4]),
 ]
-faults = None # everything
+faults = cst.data.cfm().keys()
 combine = True
+combine = False
 resolution = 'high'
 view_azimuth = -90
 view_elevation = 55
 view_angle = 15
 opacity = 0.3
 zscale = 1.0
+vlim = -12.0 * zscale, 0.0
 
 # projection
 scale = 0.001
 proj = pyproj.Proj(proj='tmerc', lon_0=-117.7, lat_0=34.1, k=scale)
-
-# CFM data
-cfm = cst.data.scec_cfm()
-if faults == None:
-    faults = [(None, f) for f in cfm.faults]
 
 # topography
 topo, extent = cst.data.topo(extent, scale=scale, mesh=True)
@@ -103,26 +101,26 @@ print '\nReading fault surfaces:\n'
 names = {}
 titles = {}
 coords = []
-for segments, fault in faults:
-    tsurf = cfm(fault, segments, fault_extent)
-    if tsurf is None:
+if combine:
+    faults = [faults]
+for f in faults:
+    f = cst.data.cfm(f, fault_extent)
+    if f is None:
         continue
-    hdr, phdr, xyz, tri, border, bstone = tsurf
-    name = hdr['name']
-    title = name.replace('cfma_', '').replace('cfm_',  '')
-    title = title.replace('_', ' ').replace('-', ' ').title()
-    print '    %s' % name
-    x, y, z = xyz
+    print '    %s' % f.name
+    title = f.name.replace('cfma_', '').replace('cfm_',  '')
+    title = title.replace('_', ' ').replace('-', ' ')
+    x, y, z = f.llz
     x, y = proj(x, y)
     z *= scale * zscale
-    if combine:
-        tri = [np.hstack(tri)]
-    for t in tri:
-        s = mlab.triangular_mesh(x, y, z, t.T, representation='surface')
-        a = s.actor.actor
-        names[a] = name
-        titles[a] = title
-        coords += [[x.mean(), y.mean(), z.mean(), a]]
+    t = f.tri.T
+    s = mlab.triangular_mesh(x, y, z, t, representation='surface', vmin=vlim[0], vmax=vlim[1])
+    a = s.actor.actor
+    names[a] = f.name
+    titles[a] = title
+    x, y = proj(f.lon, f.lat)
+    z = f.dep * scale * zscale
+    coords += [[x, y, z, a]]
 
 # handle key press
 def on_key_press(obj, event, current=[None]):
