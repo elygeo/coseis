@@ -6,8 +6,7 @@
 run
 tmp
 build
+publish.sh
 /dev
 /data
-/download
 /cst/conf/site.py
-*.tgz

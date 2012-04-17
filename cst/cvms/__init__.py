@@ -39,7 +39,7 @@ def _build(mode=None, optimize=None, version=None):
     ver = 'cvms-' + version
 
     # download source code
-    url = 'http://earth.usc.edu/~gely/coseis/download/%s.tgz' % ver
+    url = 'http://earth.usc.edu/~gely/cvm-data/%s.tgz' % ver
     tarball = os.path.join(cf.repo, os.path.basename(url))
     if not os.path.exists(tarball):
         if not os.path.exists(cf.repo):

@@ -73,7 +73,7 @@ def vs30_wills(rebuild=False):
     """
     import cst
     repo = cst.site.repo
-    url = 'http://earth.usc.edu/~gely/coseis/download/cvmh_vs30_wills.npy'
+    url = 'http://earth.usc.edu/~gely/cvm-data/cvmh_vs30_wills.npy'
     filename = os.path.join(repo, os.path.basename(url))
     if not rebuild:
         if not os.path.exists(filename):
