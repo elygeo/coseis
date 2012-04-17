@@ -6,8 +6,8 @@
 run
 tmp
 build
+/dev
 /data
-/cst/conf/site.py
-/changelog
 /download
+/cst/conf/site.py
 *.tgz

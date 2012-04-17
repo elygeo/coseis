@@ -95,13 +95,9 @@ libraries.
 
         brew install gfortran git
 
-2.  MPICH2_ is recommended if you need MPI.  The included script
-    install-mpich.sh_ can install MPICH2 for you.
+2.  If you need MPI, MPICH2_ is recommended.
 
-3.  It is recommended that you install a private copy of Python for Coseis.
-    The included script install-python.sh_ can install Python and NumPy for you.
-    Enthought Python Distribution (EPD_) is another option that includes many
-    bells and whistles such as the Mayavi_ visualization package.
+3.  FIXME: Python install
 
 4.  Clone the source code from the `Coseis GitHub repository
     <http://github.com/gely/coseis>`__ using Git_::
