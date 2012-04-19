@@ -215,7 +215,7 @@ def topo(extent, scale=1.0, downsample=0, mesh=False):
     extent: Extent of z array possibly larger than requested extent.
     """
     x, y = extent
-    if downsample:
+    if downsample > 0:
         d = 60 // downsample
         x0, y0 = -180.0, -90.0
     else:
@@ -230,7 +230,7 @@ def topo(extent, scale=1.0, downsample=0, mesh=False):
     x = j0 * r + x0, j1 * r + x0
     y = k0 * r + y0, k1 * r + y0
     extent = x, y
-    if downsample:
+    if downsample > 0:
         z = etopo1(downsample)[j0:j1,k0:k1]
     else:
         n = 10800
@@ -243,6 +243,9 @@ def topo(extent, scale=1.0, downsample=0, mesh=False):
         j0, j1 = j0 % n, j1 % n
         k0, k1 = k0 % n, k1 % n
         z = globe30(tile0)[j0:j1+1,k0:k1+1]
+        if downsample < 0:
+            z = upsample(z)
+            d *= 2
     z = z * scale # always do this to convert to float
     if mesh:
         ddeg = 1.0 / d
@@ -458,7 +461,6 @@ def cfm(faults=None, extent=None, version='CFM4-socal-primary'):
     if os.path.exists(fault_file):
         nseg = dict(np.loadtxt(fault_file, dtype))
     else:
-        url = 'http://opensha.usc.edu/apps/scec_vdo/SCEC_VDO.jar'
         url = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
         vdo = os.path.join(repo, 'SCEC_VDO')
         src = os.path.join(vdo, 'data', 'Faults', version) + os.sep

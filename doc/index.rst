@@ -42,10 +42,11 @@ components) wraps Fortran parallelized with MPI.
 
 Coseis is written by `Geoffrey Ely`_ with contributions from Steven Day,
 Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
-GPLv3_.
+BSD_ terms.
 
 .. _Geoffrey Ely: http://www.alcf.anl.gov/~gely/
 .. _GPLv3:        http://www.gnu.org/licenses/gpl-3.0.html
+.. _BSD:          http://opensource.org/licenses/BSD-2-Clause
 
 .. class:: warning
 
