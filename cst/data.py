@@ -487,16 +487,19 @@ def cfm(faults=None, extent=None, version='CFM4-socal-primary'):
         f = np.array(sorted(nseg.items()), dtype)
         np.savetxt(fault_file, f, '%s %s')
 
-    # If no faults requested, return the list
+    # requested faults
     if faults == None:
         return nseg
     if isinstance(faults, basestring):
-        faults = [faults]
+        pat = faults.lower()
+        faults = []
+        for f in nseg:
+            if pat in f.lower():
+                faults.append(f)
 
     # read faults
     n = 0
-    xyz = []
-    llz = []
+    vtx = []
     tri = []
     name = []
     for fault in faults:
@@ -516,23 +519,21 @@ def cfm(faults=None, extent=None, version='CFM4-socal-primary'):
                     y_.min() > ylim[1]
                 ):
                     continue
-            xyz.append([x, y, z])
-            llz.append([x_, y_, z])
+            vtx.append([x, y, z, x_, y_])
             t = np.load(npy % (fault, i, 'tri'))
             tri.append(t + n)
             n += x.size
         name.append('%s%s' % (fault, segments))
 
     # combine segments
-    if len(xyz) == 0:
+    if len(vtx) == 0:
         return
-    xyz = np.hstack(xyz)
-    llz = np.hstack(llz)
+    vtx = np.hstack(vtx)
     tri = np.hstack(tri)
     name = os.path.commonprefix(name)
 
     # origin, strike, and dip
-    ctr, nrm, area = coord.tsurf_plane(xyz, tri)
+    ctr, nrm, area = coord.tsurf_plane(vtx[:3], tri)
     x0, y0, z0 = ctr
     x, y, z = nrm
     r = math.sqrt(x * x + y * y) / z
@@ -540,23 +541,23 @@ def cfm(faults=None, extent=None, version='CFM4-socal-primary'):
     x = x0, x0 - x, x0 + x
     y = y0, y0 - y, y0 + y
     x, y = proj(x, y, inverse=True)
-    lon, lat, dep = x[0], y[0], z0
-    x = 0.5 * (x[2] - x[1]) / math.cos(lat / 180.0 * math.pi)
+    lon0, lat0 = x[0], y[0]
+    x = 0.5 * (x[2] - x[1]) / math.cos(lat0 / 180.0 * math.pi)
     y = 0.5 * (y[2] - y[1])
     stk = (math.atan2(-y, x) / math.pi * 180.0) % 360.0
 
     # data dictionary
     data = dict(
         name = name,
-        xyz = xyz,
-        llz = llz,
+        lon = vtx[3], lon0 = lon0,
+        lat = vtx[4], lat0 = lat0,
+        x = vtx[0], x0 = x0,
+        y = vtx[1], y0 = y0,
+        z = vtx[2], z0 = z0,
         tri = tri,
-        area = area,
-        lon = lon,
-        lat = lat,
-        dep = dep,
         stk = stk,
         dip = dip,
+        area = area,
     )
     return util.namespace(data)
 
