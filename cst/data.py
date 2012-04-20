@@ -435,7 +435,7 @@ def cfm(faults=None, extent=None, version='CFM4-socal-primary'):
     tsurf: object with the following properties:
         name: segment name
         xyz: M x 3 array of vertex coordinates, Cartesian coords
-        llz: M x 3 array of vertex coordinates, geodetic coords
+        llz: M x 3 array of vertex coordinates, geographic coords
         tri: List of N x 3 arrays of vertex indices
         lon: Longitude of the center of mass
         lat: Latitude of the center of mass
@@ -532,8 +532,10 @@ def cfm(faults=None, extent=None, version='CFM4-socal-primary'):
     tri = np.hstack(tri)
     name = os.path.commonprefix(name)
 
-    # origin, strike, and dip
-    ctr, nrm, area = coord.tsurf_plane(vtx[:3], tri)
+    # properties
+    x, y, z, lon, lat = vtx
+    extent = (lon.min(), lon.max()), (lat.min(), lat.max())
+    ctr, nrm, area = coord.tsurf_plane((x, y, z), tri)
     x0, y0, z0 = ctr
     x, y, z = nrm
     r = math.sqrt(x * x + y * y) / z
@@ -542,24 +544,26 @@ def cfm(faults=None, extent=None, version='CFM4-socal-primary'):
     y = y0, y0 - y, y0 + y
     x, y = proj(x, y, inverse=True)
     lon0, lat0 = x[0], y[0]
-    x = 0.5 * (x[2] - x[1]) / math.cos(lat0 / 180.0 * math.pi)
+    x = 0.5 * (x[2] - x[1]) * math.cos(lat0 / 180.0 * math.pi)
     y = 0.5 * (y[2] - y[1])
     stk = (math.atan2(-y, x) / math.pi * 180.0) % 360.0
 
     # data dictionary
-    data = dict(
+    x, y, z, lon, lat = vtx
+    data = util.namespace(dict(
         name = name,
-        lon = vtx[3], lon0 = lon0,
-        lat = vtx[4], lat0 = lat0,
-        x = vtx[0], x0 = x0,
-        y = vtx[1], y0 = y0,
-        z = vtx[2], z0 = z0,
+        lon = lon, lon0 = lon0,
+        lat = lat, lat0 = lat0,
+        extent = extent,
+        x = x, x0 = x0,
+        y = y, y0 = y0,
+        z = z, z0 = z0,
         tri = tri,
         stk = stk,
         dip = dip,
         area = area,
-    )
-    return util.namespace(data)
+    ))
+    return data
 
 
 def cybershake(isrc, irup, islip, ihypo, name=None):

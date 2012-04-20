@@ -463,7 +463,7 @@ def rotmat(x, origin=(0, 0, 0), upvector=(0, 0, 1)):
 def llr2xyz(x, y, z, inverse=False):
     """
     Spherical to Cartesian coordinate conversion. Spherical coordinates are
-    parameterized in degrees longitude and latitude. This approximates Geodetic to
+    parameterized in degrees longitude and latitude. This approximates Geographic to
     Earth-Centered, Earth-Fixed (ECEF) Cartesian coordinates.
     Cartesian X axis is at lon 0, lat 0.
     Cartesian Y axis is at lon 90, lat 0.
