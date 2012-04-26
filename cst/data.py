@@ -121,7 +121,9 @@ def etopo1(downsample=1):
 
     repo = site.repo
     filename = os.path.join(repo, 'etopo%02d-ice.npy' % downsample)
-    if not os.path.exists(filename):
+    if os.path.exists(filename):
+        z = np.load(filename, mmap_mode='c')
+    else:
         f1 = os.path.join(repo, 'etopo1_ice_g_i2.bin')
         if not os.path.exists(f1):
             url = 'http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
@@ -135,8 +137,6 @@ def etopo1(downsample=1):
         if downsample > 1:
             z = coord.downsample_sphere(z, downsample)
         np.save(filename, z)
-    else:
-        z = np.load(filename, mmap_mode='c')
     return z
 
 
@@ -164,7 +164,9 @@ def globe30(tile=(0, 1), fill=True):
     from . import site
     repo = site.repo
     filename = os.path.join(repo, 'topo%s%s.npy' % tile)
-    if not os.path.exists(filename):
+    if os.path.exists(filename):
+        z = np.load(filename, mmap_mode='c')
+    else:
         print('Creating %s' % filename)
         tiles = ('im', 'jn', 'ko', 'lp'), ('ae', 'bf', 'cg', 'dh')
         shape = 10800, 10800
@@ -197,8 +199,6 @@ def globe30(tile=(0, 1), fill=True):
             z[i] = y[i]
             del(y, i)
         np.save(filename, z)
-    else:
-        z = np.load(filename, mmap_mode='c')
     return z
 
 
@@ -298,8 +298,8 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
     from . import site
 
     repo = site.repo
-    filename = os.path.join(repo, 'gshhs')
-    if not os.path.exists(filename):
+    d = os.path.join(repo, 'gshhs')
+    if not os.path.exists(d):
         url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.0/gshhs_2.0.zip'
         print('Downloading %s' % url)
         f = os.path.join(repo, os.path.basename(url))

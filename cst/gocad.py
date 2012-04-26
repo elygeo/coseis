@@ -1,5 +1,7 @@
 """
-GOCAD (http://www.gocad.org) utilities
+Tools for reading GOCAD data
+
+http://www.gocad.org
 """
 
 def header(lines, counter=0, casters=None):
