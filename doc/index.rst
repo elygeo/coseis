@@ -135,11 +135,12 @@ libraries.
 
         python setup.py build
 
-7.  Finally, upate you paths. For bash shell, you may add something like this
-    to your ``.profile``::
+7.  Finally, set path variables for the Pyhon module and executables. For bash
+    shell, with the code located in your home directory (for example) add these
+    lines to ``.bash_profile``::
 
-        export PATH="$PATH:$HOME/coseis/bin"
         export PYTHONPATH="$HOME/coseis"
+        export PATH="$PATH:$HOME/coseis/bin"
 
 .. _Git:               http://git-scm.com/
 .. _MPICH2:            http://www.mcs.anl.gov/research/projects/mpich2/
