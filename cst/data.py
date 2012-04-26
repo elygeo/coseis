@@ -117,8 +117,7 @@ def etopo1(downsample=1):
     """
     import os, urllib, zipfile
     import numpy as np
-    from .conf import site
-    from . import coord
+    from . import site, coord
 
     repo = site.repo
     filename = os.path.join(repo, 'etopo%02d-ice.npy' % downsample)
@@ -162,7 +161,7 @@ def globe30(tile=(0, 1), fill=True):
     """
     import os, urllib, gzip
     import numpy as np
-    from .conf import site
+    from . import site
     repo = site.repo
     filename = os.path.join(repo, 'topo%s%s.npy' % tile)
     if not os.path.exists(filename):
@@ -296,7 +295,7 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
     """
     import os, urllib, zipfile
     import numpy as np
-    from .conf import site
+    from . import site
 
     repo = site.repo
     filename = os.path.join(repo, 'gshhs')
@@ -366,7 +365,7 @@ def us_place_names(kind=None, extent=None):
     """
     import os, urllib, zipfile
     import numpy as np
-    from .conf import site
+    from . import site
 
     repo = site.repo
     filename = os.path.join(repo, 'US_CONCISE.txt')
@@ -405,7 +404,7 @@ def engdahl_cat(path='engdahl-centennial-cat.npy'):
     """
     import os, urllib
     import numpy as np
-    from .conf import site
+    from . import site
 
     repo = site.repo
     f = os.path.join(repo, path)
@@ -446,7 +445,7 @@ def lsh_cat(path='lsh-catalog.npy'):
     """
     import os, urllib
     import numpy as np
-    from .conf import site
+    from . import site
 
     repo = site.repo
     f = os.path.join(repo, path)

@@ -9,4 +9,4 @@ build
 publish.sh
 /dev
 /data
-/cst/conf/site.py
+/cst/site.py

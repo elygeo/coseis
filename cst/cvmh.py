@@ -37,8 +37,7 @@ def vs30_wald(rebuild=False):
     """
     import os, urllib, gzip
     import numpy as np
-    from .conf import site
-    from . import coord
+    from . import site, coord
 
     repo = site.repo
     filename = os.path.join(repo, 'cvmh_vs30_wald.npy')
@@ -75,8 +74,7 @@ def vs30_wills(rebuild=False):
     """
     import os, sys, urllib, subprocess
     import numpy as np
-    from . import coord
-    from .conf import site
+    from . import site, coord
     repo = site.repo
     url = 'http://earth.usc.edu/~gely/cvm-data/cvmh_vs30_wills.npy'
     filename = os.path.join(repo, os.path.basename(url))
@@ -161,8 +159,7 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='vx63'):
     data: Array of properties
     """
     import os, urllib, subprocess
-    from .conf import site
-    from . import gocad
+    from . import site, gocad
     repo = site.repo
 
     # download if not found
