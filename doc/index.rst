@@ -98,7 +98,8 @@ libraries.
 
 2.  If you need MPI, MPICH2_ is recommended.
 
-3.  FIXME: Python install
+3.  For plotting and visualization, Enthought Python Distribution (EPD_) is
+    recommended.
 
 4.  Clone the source code from the `Coseis GitHub repository
     <http://github.com/gely/coseis>`__ using Git_::
@@ -134,18 +135,12 @@ libraries.
 
         python setup.py build
 
-7.  Configure the Python path:
-    ::
+7.  Finally, upate you paths. For bash shell, you may add something like this
+    to your ``.profile``::
 
-        python setup.py path
+        export PATH="$PATH:$HOME/coseis/bin"
+        export PYTHONPATH="$HOME/coseis"
 
-8.  Steps 5 through 7 can be combined as:
-    ::
-
-        python setup.py --machine=tacc-ranger build path
-
-.. _install-python.sh: ../util/install-python.sh
-.. _install-mpich.sh:  ../util/install-mpich.sh
 .. _Git:               http://git-scm.com/
 .. _MPICH2:            http://www.mcs.anl.gov/research/projects/mpich2/
 .. _Xcode:             http://itunes.apple.com/us/app/xcode/id497799835
@@ -156,7 +151,6 @@ libraries.
 .. _SciPy:             http://www.scipy.org/
 .. _Mayavi:            http://code.enthought.com/projects/mayavi/
 .. _Matplotlib:        http://matplotlib.sourceforge.net/
-.. _R for Mac OS X:    http://r.research.att.com/tools/
 
 
 Examples

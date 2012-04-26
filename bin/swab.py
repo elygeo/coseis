@@ -2,7 +2,7 @@
 """
 Byte swapping
 """
-from __future__ import division, absolute_import, print_function, unicode_literals
+from __future__ import division
 import os, sys
 import numpy as np
 
@@ -14,7 +14,7 @@ def swab(src, dst, verbose=False, dtype='f', block=64*1024*1024):
     n = os.path.getsize(src)
     if n == 0 or n % nb != 0:
         return
-    n /= nb
+    n //= nb
     f0 = open(src, 'rb')
     f1 = open(dst, 'wb')
     i = 0

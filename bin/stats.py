@@ -2,7 +2,6 @@
 """
 Print binary file statistics. Default data type is 4 byte floating point.
 """
-from __future__ import division, absolute_import, print_function, unicode_literals
 import os, sys
 import numpy as np
 

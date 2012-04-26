@@ -1,19 +1,17 @@
 """
 Support Operator Rupture Dynamics
 """
-import os, math, glob, shutil, shlex, pprint
-import numpy as np
-from ..conf import launch
 from . import fieldnames
-
-path = os.path.realpath(os.path.dirname(__file__))
+from ..util import launch
 
 def _build(mode=None, optimize=None, dtype=None):
     """
     Build SORD code.
     """
-    import cst
-    cf = cst.conf.configure()[0]
+    import os, shlex
+    import numpy as np
+    from .. import util
+    cf = util.configure()[0]
 
     # arguments
     if not optimize:
@@ -30,9 +28,10 @@ def _build(mode=None, optimize=None, dtype=None):
     new = False
 
     # setup build directory
-    cwd = os.getcwd()
+    path = os.path.dirname(__file__)
     src = os.path.join(path, 'src')
-    bld = os.path.join(os.path.dirname(path), 'build') + os.sep
+    bld = os.path.join(path, '..', 'build') + os.sep
+    cwd = os.getcwd()
     os.chdir(src)
     if not os.path.isdir(bld):
         os.mkdir(bld)
@@ -78,7 +77,7 @@ def _build(mode=None, optimize=None, dtype=None):
             )
             if dtype != cf.dtype_f:
                 cmd += shlex.split(cf.fortran_flags[dsize])
-            new |= cst.conf.make(cmd + ['-o'], object_, source)
+            new |= util.make(cmd + ['-o'], object_, source)
 
     # mpi compile
     if 'm' in mode and cf.fortran_mpi:
@@ -92,11 +91,11 @@ def _build(mode=None, optimize=None, dtype=None):
             )
             if dtype != cf.dtype_f:
                 cmd += shlex.split(cf.fortran_flags[dsize])
-            new |= cst.conf.make(cmd + ['-o'], object_, source)
+            new |= util.make(cmd + ['-o'], object_, source)
 
     # archive source code
     if new:
-        cst._archive()
+        util.archive()
 
     # finished
     os.chdir(cwd)
@@ -106,9 +105,10 @@ def stage(dictargs={}, **kwargs):
     """
     Stage job
     """
-    import cst
+    import os, glob, shutil, pprint
+    import numpy as np
+    from .. import util
 
-    # save start time
     print('\nSORD setup')
 
     # update inputs
@@ -135,7 +135,7 @@ def stage(dictargs={}, **kwargs):
         raise Exception()
 
     # configure
-    job, inputs = cst.conf.configure(**inputs)
+    job, inputs = util.configure(**inputs)
     job.dtype = np.dtype(job.dtype).str
     if not job.prepare:
         job.run = False
@@ -144,9 +144,10 @@ def stage(dictargs={}, **kwargs):
 
     # read parameters
     pm = {}
-    f = os.path.join(os.path.dirname(__file__), 'parameters.py')
+    path = os.path.dirname(__file__)
+    f = os.path.join(path, 'parameters.py')
     exec open(f) in pm
-    cst.util.prune(pm)
+    util.prune(pm)
     for k, v in inputs.copy().iteritems():
         if k in pm:
             pm[k] = v
@@ -156,8 +157,11 @@ def stage(dictargs={}, **kwargs):
         pprint.pprint(inputs)
         raise Exception()
 
-    pm = cst.util.namespace(pm)
-    pm = prepare_param(pm)
+    class obj:
+        pass
+    obj = obj()
+    obj.__dict__ = pm
+    pm = prepare_param(obj)
 
     # partition for parallelization
     nx, ny, nz = pm.shape[:3]
@@ -198,7 +202,7 @@ def stage(dictargs={}, **kwargs):
 
     # configure options
     job.command = os.path.join('.', 'sord-' + job.mode + job.optimize + job.dtype[-1])
-    job = cst.conf.prepare(job)
+    job = util.prepare(job)
 
     # compile code
     if not job.prepare:
@@ -206,8 +210,8 @@ def stage(dictargs={}, **kwargs):
     _build(job.mode, job.optimize, job.dtype)
 
     # create run directory
-    stagein = os.path.join(cst.path, 'build', job.command),
-    f = os.path.join(cst.path, 'build', 'coseis.tgz')
+    stagein = os.path.join(path, '..', 'build', job.command),
+    f = os.path.join(path, '..', 'build', 'coseis.tgz')
     if os.path.isfile(f):
         stagein += f,
     if job.optimize == 'g':
@@ -221,14 +225,14 @@ def stage(dictargs={}, **kwargs):
     stagein += tuple(job.stagein)
     if job.force == True and os.path.isdir(job.rundir):
         shutil.rmtree(job.rundir)
-    cst.conf.skeleton(job, stagein)
+    util.skeleton(job, stagein)
 
     # conf, parameter files
     cwd = os.path.realpath(os.getcwd())
     os.chdir(job.rundir)
     delattr(pm, 'itbuff')
-    cst.util.save('parameters.py', pm, expand=['fieldio'], header='# modelXX parameters\n')
-    cst.util.save('conf.py', job, header = '# configuration\n')
+    util.save('parameters.py', pm, expand=['fieldio'], header='# modelXX parameters\n')
+    util.save('conf.py', job, header = '# configuration\n')
 
     # metadata
     xis = {}
@@ -253,17 +257,17 @@ def stage(dictargs={}, **kwargs):
                 shapes[k] = [1]
 
     # save metadata
-    meta = cst.util.save(None,
+    meta = util.save(None,
         job,
         header = '# configuration\n',
         keep=['name', 'rundate', 'rundir', 'user', 'os_', 'dtype'],
     )
-    meta += cst.util.save(None,
+    meta += util.save(None,
         pm,
         header = '\n# model parameters\n',
         expand=['fieldio'],
     )
-    meta += cst.util.save(None,
+    meta += util.save(None,
         dict(shapes=shapes, deltas=deltas, xis=xis, indices=indices),
         header = '\n# output dimensions\n',
         expand=['indices', 'shapes', 'deltas', 'xis'],
@@ -390,6 +394,7 @@ def prepare_param(pm):
     """
     Prepare input parameters
     """
+    import os, math
 
     # checks
     if pm.source not in ('potency', 'moment', 'force', 'none'):
@@ -473,7 +478,7 @@ def prepare_param(pm):
                 fields, ii, val, pulse, tau, x1, x2 = line[1:]
             else:
                 raise Exception('Error: bad i/o mode: %r' % line)
-        except(ValueError):
+        except ValueError:
             print('Error: bad i/o spec: %r' % line)
             raise
 

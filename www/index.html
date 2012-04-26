@@ -237,7 +237,8 @@ brew install gfortran git
 </li>
 <li><p class="first">If you need MPI, <a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a> is recommended.</p>
 </li>
-<li><p class="first">FIXME: Python install</p>
+<li><p class="first">For plotting and visualization, Enthought Python Distribution (<a class="reference external" href="http://www.enthought.com/products/epddownload.php">EPD</a>) is
+recommended.</p>
 </li>
 <li><p class="first">Clone the source code from the <a class="reference external" href="http://github.com/gely/coseis">Coseis GitHub repository</a> using <a class="reference external" href="http://git-scm.com/">Git</a>:</p>
 <pre class="literal-block">
@@ -272,14 +273,11 @@ the supplied configurations.</p>
 python setup.py build
 </pre>
 </li>
-<li><p class="first">Configure the Python path:</p>
+<li><p class="first">Finally, upate you paths. For bash shell, you may add something like this
+to your <tt class="docutils literal">.profile</tt>:</p>
 <pre class="literal-block">
-python setup.py path
-</pre>
-</li>
-<li><p class="first">Steps 5 through 7 can be combined as:</p>
-<pre class="literal-block">
-python setup.py --machine=tacc-ranger build path
+export PATH=&quot;$PATH:$HOME/coseis/bin&quot;
+export PYTHONPATH=&quot;$HOME/coseis&quot;
 </pre>
 </li>
 </ol>

@@ -1,8 +1,6 @@
 """
 GOCAD (http://www.gocad.org) utilities
 """
-import os
-import numpy as np
 
 def header(lines, counter=0, casters=None):
     """
@@ -32,12 +30,12 @@ def header(lines, counter=0, casters=None):
             if len(f) > 1:
                 try:
                     header[k] = tuple(cast[k](x) for x in f)
-                except(ValueError):
+                except ValueError:
                     print('Warning: could not cast %s %s to %s' % (k, v, cast[k]))
             else:
                 try:
                     header[k] = cast[k](v)
-                except(ValueError):
+                except ValueError:
                     print('Warning: could not cast %s %s to %s' % (k, v, cast[k]))
     raise Exception('Error in header')
     return
@@ -46,6 +44,8 @@ def voxet(path, load_props=[], alternate='', no_data_value=None):
     """
     GOCAD voxet reader
     """
+    import os
+    import numpy as np
     lines = open(path).readlines()
     cast = {}
     casters = {
@@ -89,7 +89,7 @@ def voxet(path, load_props=[], alternate='', no_data_value=None):
                     dtype = '>f%s' % p['ESIZE']
                     data = np.fromfile(f, dtype)
                     if no_data_value in ('nan', 'NaN', 'NAN'):
-                        data[data==p['NO_DATA_VALUE']] = np.nan
+                        data[data==p['NO_DATA_VALUE']] = float('nan')
                     elif no_data_value is not None:
                         data[data==p['NO_DATA_VALUE']] = no_data_value
                     p['DATA'] = data.reshape(n[::-1]).T
@@ -100,6 +100,7 @@ def tsurf(path):
     """
     GOCAD triangulated surface reader
     """
+    import numpy as np
     lines = open(path).readlines()
     tsurf = []
     counter = 0

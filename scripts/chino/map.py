@@ -48,7 +48,7 @@ else:
     f = os.path.join('run', 'data', 'basins-cvms.txt')
     x, y = proj(*np.loadtxt(f).T)
     i = x == 1e30
-    x[i], y[i] = np.nan, np.nan
+    x[i], y[i] = float('nan'), float('nan')
     h = ax.plot(x, y, '-r')
     h[0].set_dashes((2,1))
 
@@ -56,7 +56,7 @@ else:
     f = os.path.join('run', 'data', 'basins-cvmh.txt')
     x, y = proj(*np.loadtxt(f).T)
     i = x == 1e30
-    x[i], y[i] = np.nan, np.nan
+    x[i], y[i] = float('nan'), float('nan')
     h = ax.plot(x, y, '-b')
     h[0].set_dashes((2,1))
 
@@ -64,14 +64,14 @@ else:
 f = os.path.join('run', 'data', 'mountains.txt')
 x, y = proj(*np.loadtxt(f).T)
 i = x == 1e30
-x[i], y[i] = np.nan, np.nan
+x[i], y[i] = float('nan'), float('nan')
 ax.plot(x, y, '-k')
 
 # coastlines and boarders
 f = os.path.join('run', 'data', 'coastlines.txt')
 x, y = proj(*np.loadtxt(f).T)
 i = x == 1e30
-x[i], y[i] = np.nan, np.nan
+x[i], y[i] = float('nan'), float('nan')
 ax.plot(x, y, 'k-', lw=1.0)
 
 # source

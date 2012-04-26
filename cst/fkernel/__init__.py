@@ -1,17 +1,15 @@
 """
 Frechet kernel computation
 """
-import os, shutil, shlex
-from ..conf import launch
-
-path = os.path.dirname(os.path.realpath(__file__))
+from ..util import launch
 
 def _build(optimize=None):
     """
     Build code
     """
-    import cst
-    cf = cst.conf.configure()[0]
+    import os, shlex
+    from .. import util
+    cf = util.configure()[0]
     if not optimize:
         optimize = cf.optimize
     mode = cf.mode
@@ -20,7 +18,8 @@ def _build(optimize=None):
     source = 'signal.f90', 'ker_utils.f90', 'cpt_ker.f90'
     new = False
     cwd = os.getcwd()
-    bld = os.path.join(os.path.dirname(path), 'build') + os.sep
+    path = os.path.dirname(__file__)
+    bld = os.path.join(path, '..', 'build') + os.sep
     os.chdir(path)
     if not os.path.isdir(bld):
         os.mkdir(bld)
@@ -33,9 +32,9 @@ def _build(optimize=None):
                 shlex.split(cf.fortran_flags[opt]) +
                 ['-o']
             )
-            new |= cst.conf.make(compiler, object_, source)
-    if new:
-        cst._archive()
+            new |= util.make(compiler, object_, source)
+    #if new:
+    #    cst._archive()
     os.chdir(cwd)
     return
 
@@ -43,7 +42,8 @@ def stage(inputs={}, **kwargs):
     """
     Stage job
     """
-    import cst
+    import os, shutil
+    from .. import util
 
     print('Frechet kernel setup')
 
@@ -52,7 +52,7 @@ def stage(inputs={}, **kwargs):
     inputs.update(kwargs)
 
     # configure
-    job, inputs = cst.conf.configure(**inputs)
+    job, inputs = util.configure(**inputs)
     if inputs:
         raise Exception('Unknown parameter: %s' % inputs)
     if not job.mode:
@@ -60,7 +60,7 @@ def stage(inputs={}, **kwargs):
     if job.mode != 'm':
         raise Exception('Must be MPI')
     job.command = os.path.join('.', 'cpt_ker-' + job.mode + job.optimize + ' in/input_files')
-    job = cst.conf.prepare(job)
+    job = util.prepare(job)
 
     # build
     if not job.prepare:
@@ -68,7 +68,7 @@ def stage(inputs={}, **kwargs):
     _build(job.mode, job.optimize)
 
     # create run directory
-    cst.conf.skeleton(job)
+    util.skeleton(job)
     shutil.copytree('tmp', os.path.join(job.rundir, 'in'))
     f = os.path.join(job.rundir, 'out')
     os.mkdir(f)

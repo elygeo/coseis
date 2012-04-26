@@ -1,8 +1,6 @@
 """
 Coordinate conversions
 """
-import sys, math
-import numpy as np
 
 rearth = 6370000.0
 
@@ -13,6 +11,7 @@ def dotvv(a, b, check=True):
     numpy.dot, broadcasting rules only apply component-wise, so components may be a
     mix of scalars and numpy arrays of any shape compatible for broadcasting.
     """
+    import sys
     n = len(a)
     if check and n > 8:
         sys.exit('Too large. Use numpy.dot')
@@ -29,6 +28,7 @@ def dotmv(A, b, check=True):
     numpy.dot, broadcasting rules only apply component-wise, so components may be a
     mix of scalars and numpy arrays of any shape compatible for broadcasting.
     """
+    import sys
     m = len(A)
     n = len(A[0])
     if check and m * n > 64:
@@ -49,6 +49,7 @@ def dotmm(A, B, check=True):
     numpy.dot, broadcasting rules only apply component-wise, so components may be a
     mix of scalars and numpy arrays of any shape compatible for broadcasting.
     """
+    import sys
     m = len(A)
     n = len(B[0])
     p = len(B)
@@ -97,6 +98,7 @@ def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     -------
     fi: Array of interpolated values, same shape as `xi`.
     """
+    import numpy as np
     # prepare arrays
     f = np.asarray(f)
     xi = np.asarray(xi)
@@ -105,7 +107,7 @@ def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     if f.size == 0:
         if fi is None:
             fi = np.empty_like(xi)
-            fi.fill(np.nan)
+            fi.fill(float('nan'))
         return fi
 
     # logical coordinates
@@ -141,13 +143,13 @@ def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     # apply mask
     if fi is None:
         nans = nans | mask
-        f[...,nans] = np.nan
+        f[...,nans] = float('nan')
         fi = f
     else:
         if mask_nan:
             mask = mask | nans | np.isnan(f)
         else:
-            f[...,nans] = np.nan
+            f[...,nans] = float('nan')
         if mask is False:
             fi[...] = f[...]
         else:
@@ -161,6 +163,8 @@ def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
 
     See 1D interp for documentation.
     """
+    import numpy as np
+
     # prepare arrays
     f = np.asarray(f)
     xi = np.asarray(xi)
@@ -169,7 +173,7 @@ def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
     if f.size == 0:
         if fi is None:
             fi = np.empty_like(xi)
-            fi.fill(np.nan)
+            fi.fill(float('nan'))
         return fi
 
     # logical coordinates
@@ -216,13 +220,13 @@ def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
     # apply mask
     if fi is None:
         nans = nans | mask
-        f[...,nans] = np.nan
+        f[...,nans] = float('nan')
         fi = f
     else:
         if mask_nan:
             mask = mask | nans | np.isnan(f)
         else:
-            f[...,nans] = np.nan
+            f[...,nans] = float('nan')
         if mask is False:
             fi[...] = f[...]
         else:
@@ -236,6 +240,8 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
 
     See 1D interp for documentation.
     """
+    import numpy as np
+
     # prepare arrays
     f = np.asarray(f)
     xi = np.asarray(xi)
@@ -244,7 +250,7 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
     if f.size == 0:
         if fi is None:
             fi = np.empty_like(xi)
-            fi.fill(np.nan)
+            fi.fill(float('nan'))
         return fi
 
     # logical coordinates
@@ -302,13 +308,13 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
     # apply mask
     if fi is None:
         nans = nans | mask
-        f[...,nans] = np.nan
+        f[...,nans] = float('nan')
         fi = f
     else:
         if mask_nan:
             mask = mask | nans | np.isnan(f)
         else:
-            f[...,nans] = np.nan
+            f[...,nans] = float('nan')
         if mask is False:
             fi[...] = f[...]
         else:
@@ -333,13 +339,14 @@ def trinterp(x, f, t, xi, fi=None):
     -------
     fi: Array of interpolated values, same shape as `xi[0]`.
     """
+    import numpy as np
   
     # prepare arrays
     x, y = x
     xi, yi = xi
     if fi == None:
         fi = np.empty_like(xi)
-        fi.fill(np.nan)
+        fi.fill(float('nan'))
 
     # tolerance
     lmin = -0.000001
@@ -375,6 +382,8 @@ def ibilinear(xx, yy, xi, yi):
     """
     Vectorized inverse bilinear interpolation
     """
+    import numpy as np
+
     xx = np.asarray(xx)
     yy = np.asarray(yy)
     xi = np.asarray(xi) - 0.25 * xx.sum(0).sum(0)
@@ -413,6 +422,8 @@ def rot_sym_tensor(w1, w2, rot):
     -------
     w1, w2: rotated tensor components
     """
+    import numpy as np
+
     rot = np.asarray(rot)
     m = np.diag(w1)
     m.flat[[5, 6, 1]] = w2
@@ -436,6 +447,7 @@ def eigvals_sym_tensor(w1, w2):
     -------
     w: eigenvalues
     """
+    import numpy as np
     m = np.diag(w1)
     m.flat[[5, 6, 1]] = w2
     m.flat[[7, 2, 3]] = w2
@@ -447,6 +459,7 @@ def rotmat(x, origin=(0, 0, 0), upvector=(0, 0, 1)):
     """
     Given a position vector x, find the rotation matrix to r,h,v coordinates.
     """
+    import numpy as np
     x = np.asarray(x) - np.asarray(origin)
     nr = x / np.sqrt((x * x).sum())
     nh = np.cross(upvector, nr)
@@ -471,16 +484,18 @@ def llr2xyz(x, y, z, inverse=False):
 
     x <-> lon, y <-> lat, z <-> r
     """
+    import math
+    import numpy as np
     if inverse:
         r = np.sqrt(x * x + y * y + z * z)
         x = np.arctan2(y, x)
         y = np.arcsin(z / r)
-        x = 180.0 / np.pi * x
-        y = 180.0 / np.pi * y
+        x = 180.0 / math.pi * x
+        y = 180.0 / math.pi * y
         return x, y, r
     else:
-        x  = np.pi / 180.0 * x
-        y  = np.pi / 180.0 * y
+        x  = math.pi / 180.0 * x
+        y  = math.pi / 180.0 * y
         x_ = np.cos(x) * np.cos(y) * z
         y_ = np.sin(x) * np.cos(y) * z
         z  = np.sin(y) * z
@@ -499,9 +514,11 @@ def euler_rotation(phi=0.0, theta=0.0, psi=0.0):
     East, North, Up to fault surface coordinates:
     m = euler_rotation(90 - strike, dip, rake)
     """
-    A = np.pi / 180.0 * phi
-    B = np.pi / 180.0 * theta
-    C = np.pi / 180.0 * psi
+    import math
+    import numpy as np
+    A = math.pi / 180.0 * phi
+    B = math.pi / 180.0 * theta
+    C = math.pi / 180.0 * psi
     del(phi, theta, psi)
     c, s = np.cos(A), np.sin(A); A = [c, s, 0], [-s, c, 0], [0,  0, 1]
     c, s = np.cos(B), np.sin(B); B = [1, 0, 0], [ 0, c, s], [0, -s, c]
@@ -532,8 +549,10 @@ def rotation(lon, lat, projection, eps=100.0):
     local_components = dotmv(mat, components)
     local_strike = strike + theta
     """
-    dlon = eps * 180.0 / (np.pi * rearth) * np.cos(np.pi / 180.0 * lat)
-    dlat = eps * 180.0 / (np.pi * rearth)
+    import math
+    import numpy as np
+    dlon = eps * 180.0 / (math.pi * rearth) * np.cos(math.pi / 180.0 * lat)
+    dlat = eps * 180.0 / (math.pi * rearth)
     lon = np.array([
         [lon - dlon, lon],
         [lon + dlon, lon],
@@ -547,7 +566,7 @@ def rotation(lon, lat, projection, eps=100.0):
     y = y[1] - y[0]
     s = 1.0 / np.sqrt(x * x + y * y)
     mat = np.array([s * x, s * y])
-    theta = 180.0 / np.pi * np.arctan2(mat[0], mat[1])
+    theta = 180.0 / math.pi * math.arctan2(mat[0], mat[1])
     theta = 0.5 * theta.sum(0) - 45.0
     return mat, theta
 
@@ -560,8 +579,10 @@ def rotation3(lon, lat, dep, projection, eps=100.0):
     geographic coordinate system to components in the local system.
     local_components = dotmv(mat, components)
     """
-    dlon = eps * 180.0 / (np.pi * rearth) * np.cos(np.pi / 180.0 * lat)
-    dlat = eps * 180.0 / (np.pi * rearth)
+    import math
+    import numpy as np
+    dlon = eps * 180.0 / (math.pi * rearth) * np.cos(math.pi / 180.0 * lat)
+    dlat = eps * 180.0 / (math.pi * rearth)
     lon = np.array([
         [lon - dlon, lon, lon],
         [lon + dlon, lon, lon],
@@ -614,7 +635,9 @@ class Transform():
     def __init__(self, proj=None, origin=None, scale=1.0, rotate=0.0,
         translate=(0.0, 0.0), matrix=((1,0,0), (0,1,0), (0,0,1))
     ):
-        phi = np.pi / 180.0 * rotate
+        import numpy as np
+        import math
+        phi = math.pi / 180.0 * rotate
         if origin == None:
             x, y = 0.0, 0.0
         else:
@@ -638,6 +661,7 @@ class Transform():
         self.proj = proj
 
     def __call__(self, x, y, **kwarg):
+        import numpy as np
         proj = self.proj
         x = np.asarray(x)
         y = np.asarray(y)
@@ -656,69 +680,12 @@ class Transform():
         return np.array([x, y])
 
 
-def tsurf_plane(xyz, tri):
-    """
-    Find the center of mass, best-fit plane, and total surface area of a
-    triangulated surface.
-
-    Parameters
-    ----------
-    xyz: vertex coordinates (x, y, z)
-    tri: triangle indices (j, k, l)
-
-    Returns
-    -------
-    center: center of mass (x, y, z)
-    normal: mean unit surface normal (nx, ny, nz)
-    area: total surface area
-    """
-    import scipy.optimize
-
-    # area normals
-    x, y, z = xyz
-    j, k, l = tri
-    ux = x[k] - x[j]
-    uy = y[k] - y[j]
-    uz = z[k] - z[j]
-    vx = x[l] - x[j]
-    vy = y[l] - y[j]
-    vz = z[l] - z[j]
-    wx = uy * vz - uz * vy
-    wy = uz * vx - ux * vz
-    wz = ux * vy - uy * vx
-
-    # center of mass
-    a = 0.5 * np.sqrt(wx * wx + wy * wy + wz * wz)
-    area = a.sum()
-    d = 1.0 / (3.0 * area)
-    x = d * ((x[j] + x[k] + x[l]) * a).sum()
-    y = d * ((y[j] + y[k] + y[l]) * a).sum()
-    z = d * ((z[j] + z[k] + z[l]) * a).sum()
-    center = x, y, z
-
-    # best fit plane
-    def misfit(plane):
-        phi, theta = plane
-        x = math.cos(theta) * math.cos(phi)
-        y = math.cos(theta) * math.sin(phi)
-        z = math.sin(theta)
-        return -abs(x * wx + y * wy + z * wz).sum()
-    phi, theta = scipy.optimize.fmin(misfit, (0.0, 0.0), disp=False)
-    x = math.cos(theta) * math.cos(phi)
-    y = math.cos(theta) * math.sin(phi)
-    z = math.sin(theta)
-    if z < 0.0:
-        x, y, z = -x, -y, -z
-    normal = x, y, z
-
-    return center, normal, area
-
-
 def potency_tensor(normal, slip):
     """
     Given a fault unit normal and a slip vector, return a symmetric potency tensor as
     volume components (W11, W22, W33), and shear components (W23, W31, W12).
     """
+    import numpy as np
     p = np.array([ normal * slip, [
         0.5 * (normal[1] * slip[2] + slip[1] * normal[2]),
         0.5 * (normal[2] * slip[0] + slip[2] * normal[0]),
@@ -731,8 +698,9 @@ def compass(azimuth, radians=False):
     """
     Get named direction from azimuth.
     """
+    import math
     if radians:
-        azimuth *= 180.0 / np.pi
+        azimuth *= 180.0 / math.pi
     names = (
         'N', 'NNE', 'NE', 'ENE',
         'E', 'ESE', 'SE', 'SSE',

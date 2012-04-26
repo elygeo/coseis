@@ -47,7 +47,7 @@ def trinterp(x, f, t, xi, fi=None):
     # output array
     if fi == None:
         fi_ = np.empty_like(xi_)
-        fi_.fill(np.nan)
+        fi_.fill(float('nan'))
     else:
         if fi.dtpe.char != 'd':
             raise ValueError('`fi` must be type double')

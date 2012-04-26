@@ -1,13 +1,12 @@
 """
 Visualization utilities
 """
-import subprocess, cStringIO
-import numpy as np
 
 def distill_eps(fh, mode=None):
     """
     Distill EPS to PDF using Ghostscript.
     """
+    import subprocess, cStringIO
     if type(fh) == str:
         fh = cStringIO.StringIO(fh)
     cmd = 'ps2pdf', '-dEPSCrop', '-dPDFSETTINGS=/prepress', '-', '-'
@@ -22,6 +21,7 @@ def pdf2png(path, dpi=72, mode=None):
     """
     Rasterize a PDF file using Ghostscript.
     """
+    import subprocess, cStringIO
     cmd = 'gs', '-q', '-r%s' % dpi, '-dNOPAUSE', '-dBATCH', '-sDEVICE=pngalpha', '-sOutputFile=-', path
     pid = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     out = pid.communicate()[0]
@@ -34,6 +34,7 @@ def img2pdf(img, dpi=150, mode=None):
     """
     Convert image array to PDF using PIL and ImageMagick.
     """
+    import subprocess, cStringIO
     import Image
     fh = cStringIO.StringIO()
     img = Image.fromarray(img)
@@ -50,6 +51,7 @@ def pdf_merge(layers):
     """
     Overlay multiple single page PDF file descriptors.
     """
+    import cStringIO
     import pyPdf
     out = cStringIO.StringIO()
     pdf = pyPdf.PdfFileWriter()
@@ -78,6 +80,8 @@ def colormap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True, invert=False
     upsample: Increase the number of samples if non-linear map (colorexp != 1)
     invert: Intert the order of colors.
     """
+    import math
+    import numpy as np
     if type(cmap) is str:
         cmap = colormap_library[cmap]
     cmap = np.array(cmap, 'f')
@@ -105,7 +109,7 @@ def colormap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True, invert=False
             b = np.interp(vi, v, b)
             a = np.interp(vi, v, a)
             v = vi
-        w1 = np.cos(np.pi * 2.0 * nmod * v) * modlim
+        w1 = np.cos(math.pi * 2.0 * nmod * v) * modlim
         w1 = 1.0 - np.maximum(w1, 0.0)
         w2 = 1.0 + np.minimum(w1, 0.0)
         r = (1.0 - w2 * (1.0 - w1 * r))

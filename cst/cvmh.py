@@ -1,9 +1,6 @@
 """
 SCEC Community Velocity Model (CVM-H) extraction tool
 """
-import os, sys, urllib, gzip, subprocess
-import numpy as np
-from . import coord, gocad
 
 # parameters
 projection = dict(proj='utm', zone=11, datum='NAD27', ellps='clrk66')
@@ -22,6 +19,7 @@ def gtl_coords(delta_gtl=250.0):
     """
     Create GTL lon/lat mesh coordinates.
     """
+    import numpy as np
     import pyproj
     proj = pyproj.Proj(**projection)
     d = 0.5 * delta_gtl
@@ -37,8 +35,12 @@ def vs30_wald(rebuild=False):
     """
     Wald, et al. Vs30 map.
     """
-    import cst
-    repo = cst.site.repo
+    import os, urllib, gzip
+    import numpy as np
+    from .conf import site
+    from . import coord
+
+    repo = site.repo
     filename = os.path.join(repo, 'cvmh_vs30_wald.npy')
     if not rebuild and os.path.exists(filename):
         data = np.load(filename)
@@ -71,8 +73,11 @@ def vs30_wills(rebuild=False):
     """
     Wills and Clahan Vs30 map.
     """
-    import cst
-    repo = cst.site.repo
+    import os, sys, urllib, subprocess
+    import numpy as np
+    from . import coord
+    from .conf import site
+    repo = site.repo
     url = 'http://earth.usc.edu/~gely/cvm-data/cvmh_vs30_wills.npy'
     filename = os.path.join(repo, os.path.basename(url))
     if not rebuild:
@@ -106,7 +111,7 @@ def vs30_wills(rebuild=False):
             extent = (x0, x1), (y1, y2)
             v = fh.read(nx * ny * bytes)
             v = np.fromstring(v, dtype).astype('f').reshape((ny, nx)).T
-            v[v<=0] = np.nan
+            v[v<=0] = float('nan')
             coord.interp2(extent, v, (x, y), data, bound=True, mask_nan=True)
         print('')
         np.save(filename, data)
@@ -117,6 +122,7 @@ def nafe_drake(f):
     """
     Density derived from V_p via Nafe-Drake curve, Brocher (2005) eqn 1.
     """
+    import numpy as np
     f = np.asarray(f) * 0.001
     f = f * (1.6612 - f * (0.4721 - f * (0.0671 - f * (0.0043 - f * 0.000106))))
     f = np.maximum(f, 1.0) * 1000.0
@@ -127,6 +133,7 @@ def brocher_vp(f):
     """
     V_p derived from V_s via Brocher (2005) eqn 9.
     """
+    import numpy as np
     f = np.asarray(f) * 0.001
     f = 0.9409 + f * (2.0947 - f * (0.8206 - f * (0.2683 - f * 0.0251)))
     f *= 1000.0
@@ -153,8 +160,10 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='vx63'):
     bound: (x0, x1), (y0, y1), (z0, z1)
     data: Array of properties
     """
-    import cst
-    repo = cst.site.repo
+    import os, urllib, subprocess
+    from .conf import site
+    from . import gocad
+    repo = site.repo
 
     # download if not found
     path = os.path.join(repo, version, 'bin')
@@ -268,9 +277,11 @@ class Model():
                 self.voxet += [cvmh_voxet(prop, vox, no_data_value, version)]
         return
     def __call__(self, x, y, z=None, out=None, interpolation='nearest'):
+        import numpy as np
+        from . import coord
         if out is None:
             out = np.empty_like(x)
-            out.fill(np.nan)
+            out.fill(float('nan'))
         for extent, bound, data in self.voxet:
             if z is None:
                 data = data.reshape(data.shape[:2])
@@ -304,8 +315,10 @@ class Extraction():
     -------
     out: Property samples at coordinates (x, y, z)
     """
+
     def __init__(self, x, y, vm, vs30='wills', topo='topo', interpolation='nearest',
         **kwargs):
+        import numpy as np
         x = np.asarray(x)
         y = np.asarray(y)
         if type(vm) is str:
@@ -335,13 +348,15 @@ class Extraction():
         self.x, self.y, self.z0, self.zt = x, y, z0, zt
         self.vm, self.interpolation = vm, interpolation
         return
+
     def __call__(self, z, out=None, min_depth=None, by_depth=True):
+        import numpy as np
         x, y, z0, zt = self.x, self.y, self.z0, self.zt
         vm, interpolation = self.vm, self.interpolation
         z = np.asarray(z)
         if out is None:
             out = np.empty_like(z)
-            out.fill(np.nan)
+            out.fill(float('nan'))
         if by_depth is False:
             vm(x, y, z, out, interpolation)
             z = z0 - z
@@ -379,12 +394,14 @@ def extract(x, y, z, vm=['rho', 'vp', 'vs'], geographic=True, by_depth=True, **k
     -------
     out: Property samples at coordinates (x, y, z)
     """
+    import numpy as np
+    import pyproj
+
     x = np.asarray(x)
     y = np.asarray(y)
     if type(vm) not in [list, tuple]:
         vm = [vm]
     if geographic:
-        import pyproj
         proj = pyproj.Proj(**projection)
         dtype = x.dtype
         x, y = proj(x, y)

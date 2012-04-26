@@ -1,7 +1,6 @@
 """
 Tools for working with waveform data
 """
-import numpy as np
 
 def csmip_vol2(filename, max_year=2050):
     """
@@ -10,6 +9,7 @@ def csmip_vol2(filename, max_year=2050):
     California Strong Motion Instrumentation Program:
     http://www.strongmotioncenter.org
     """
+    import numpy as np
 
     # read file
     ss = open(filename).readlines()

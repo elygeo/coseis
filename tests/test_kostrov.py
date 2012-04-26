@@ -66,10 +66,10 @@ def test_kostrov():
     # compare with analytical solution
     r = 2000.0
     t = (shape[-1] - 1.5) * delta[-1] - r / vrup
-    try:
-        v = cst.kostrov.slip_rate(rho_, vp_, vs_, vrup, dtau_, r, t)
-    except:
-        v = cst.kostrov.slip_rate(rho_, vp_, vs_, vrup, dtau_, r, t, 0.82)
+    #try:
+    v = cst.kostrov.slip_rate(rho_, vp_, vs_, vrup, dtau_, r, t)
+    #except:
+    #    v = cst.kostrov.slip_rate(rho_, vp_, vs_, vrup, dtau_, r, t, 0.82)
     for p in 'abcd':
         dv = v - np.fromfile(rundir + '/p20%s.bin' % p, dtype)[-1]
         err = dv / v

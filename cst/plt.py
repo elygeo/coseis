@@ -1,14 +1,12 @@
 """
 Matplotlib utilities
 """
-import os
-import numpy as np
-import viz
 
 def text(ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75, npmb=16, **kwargs):
     """
     Matplotlib text command augmented with poor man's bold.
     """
+    import math
     h = [ax.text(x, y, s, **kwargs)]
     h[0].zorder += 1
     if edgecolor is not None:
@@ -24,13 +22,13 @@ def text(ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75, npmb=16, **
         dy = edgewidth * (y2 - y1) / dy
         if aspect == 'equal':
             dx = dy
-        m = np.sqrt(0.5)
+        m = math.sqrt(0.5)
         dx = dx / m
         dy = dy / m
         for i in range(npmb):
-            phi = 2.0 * np.pi * (i + 0.5) / npmb
-            x_ = x + dx * np.cos(phi)
-            y_ = y + dy * np.sin(phi)
+            phi = 2.0 * math.pi * (i + 0.5) / npmb
+            x_ = x + dx * math.cos(phi)
+            y_ = y + dy * math.sin(phi)
             #x_ = x + dx * np.maximum(-m, np.minimum(m, np.cos(phi)))
             #y_ = y + dy * np.maximum(-m, np.minimum(m, np.sin(phi)))
             h += [ax.text(x_, y_, s, **kwargs)]
@@ -40,7 +38,9 @@ def colormap(*args, **kwargs):
     """
     Matplotlib colormap. See viz.colormap for details.
     """
+    import numpy as np
     from matplotlib.colors import LinearSegmentedColormap
+    from . import viz
     v, r, g, b, a = viz.colormap(*args, **kwargs)
     n = 2001
     cmap = { 'red':np.c_[v, r, r],
@@ -60,7 +60,7 @@ def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None, ticklabels=None
     x = axis[0], axis[0], axis[1], axis[1], axis[0]
     y = axis[2], axis[3], axis[3], axis[2], axis[2]
     ax.plot(x, y, '-', c=boxcolor, lw=boxwidth*2, alpha=boxalpha, clip_on=False)
-    ax.imshow([np.arange(1001)], cmap=cmap, extent=axis)
+    ax.imshow([range(1001)], cmap=cmap, extent=axis)
     ax.axis('off')
     ax.axis('tight')
     ax.axis(axis)
@@ -80,11 +80,13 @@ def lengthscale(ax, x, y, w=None, label='%s', style='k-', **kwargs):
     """
     Draw a length scale bar between the points (x[0], y[0]) and (x[1], y[1]).
     """
+    import math
+    import numpy as np
     x0 = 0.5 * (x[0] + x[1])
     y0 = 0.5 * (y[0] + y[1])
     dx = x[1] - x[0]
     dy = y[1] - y[0]
-    l = np.sqrt(dx*dx + dy*dy)
+    l = math.sqrt(dx*dx + dy*dy)
     if not w:
         x = ax.get_xlim()
         y = ax.get_ylim()
@@ -99,26 +101,29 @@ def lengthscale(ax, x, y, w=None, label='%s', style='k-', **kwargs):
     except TypeError:
         pass
     rot = (dx, -dy), (dy, dx)
-    x = -l, l, np.nan, -l, -l, np.nan,  l, l
-    y =  0, 0, np.nan, -w,  w, np.nan, -w, w
+    x = -l, l, float('nan'), -l, -l, float('nan'),  l, l
+    y =  0, 0, float('nan'), -w,  w, float('nan'), -w, w
     x, y = 0.5 / l * np.dot(rot, [x, y])
-    theta = np.arctan2(dy, dx) * 180.0 / np.pi
+    theta = math.arctan2(dy, dx) * 180.0 / math.pi
     h1 = ax.plot(x0 + x, y0 + y, style, clip_on=False)
     h2 = text(ax, x0, y0, label, ha='center', va='center', rotation=theta, **kwargs)
     return h1, h2
 
 def compass_rose(ax, x, y, r, style='k-', **kwargs):
+    import math
     theta = 0.0
     if 'rotation' in kwargs:
         theta = kwargs['rotation']
     kwargs.update(rotation_mode='anchor')
-    c  = np.cos(theta / 180.0 * np.pi)
-    s  = np.sin(theta / 180.0 * np.pi)
-    x_ = x + r * np.array([(c,  s), (-c, -s)])
-    y_ = y + r * np.array([(s, -c), (-s,  c)])
+    c  = r * math.cos(theta / 180.0 * math.pi)
+    s  = r * math.sin(theta / 180.0 * math.pi)
+    x_ = (x+c, x+s), (x-c, x-s)
+    y_ = (y+s, y-c), (y-s, y+c)
     h  = [ax.plot(x_, y_, style, clip_on=False)]
-    x_ = x + r * np.array([(c, -c), (s, -s)]) * 1.3
-    y_ = y + r * np.array([(s, -s), (-c,  c)]) * 1.3
+    c *= 1.3
+    s *= 1.3
+    x_ = (x+c, x-c), (x+s, x-s)
+    y_ = (y+s, y-s), (y-c, y+c)
     h += [
         text(ax, x_[0,0], y_[0,0], 'E', ha='left', va='center', **kwargs),
         text(ax, x_[0,1], y_[0,1], 'W', ha='right', va='center', **kwargs),
@@ -135,7 +140,9 @@ def savefig(fig, fh=None, format=None, distill=False, **kwargs):
     given. Otherwise return a StringIO file descriptor, or a numpy array.  PDF is
     distilled using Ghostscript to produce smaller files.
     """
-    import cStringIO
+    import os, cStringIO
+    import numpy as np
+    from . import viz
     if isinstance(fh, basestring):
         if format is None:
             format = fh.split('.')[-1]
@@ -170,7 +177,7 @@ def digitize(img, xlim=(-1, 1), ylim=(-1, 1), color='r'):
     Digitize points on an image and rectify to a rectangular coordinate system.
     """
     import matplotlib.pyplot as plt
-    import coord
+    from . import coord
     fig = plt.gcf()
     fig.clf()
     ax = fig.add_axes([0, 0, 1, 1])
@@ -223,6 +230,7 @@ def contour(*args, **kwargs):
     """
     Extract contour polygons using matplotlib.
     """
+    import numpy as np
     import matplotlib.pyplot as plt
     concat = True
     pp = []
@@ -232,7 +240,7 @@ def contour(*args, **kwargs):
         for cc in ax.contour(*args, **kwargs).collections:
             p = []
             for c in cc.get_paths():
-                p += c.to_polygons() + [[[np.nan, np.nan]]]
+                p += c.to_polygons() + [[[float('nan'), float('nan')]]]
             if p:
                 del p[-1]
                 pp += [np.concatenate(p).T]

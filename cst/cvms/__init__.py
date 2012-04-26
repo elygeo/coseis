@@ -3,11 +3,7 @@ SCEC Community Velocity Model - Magistrale version
 
 http://www.data.scec.org/3Dvelocity/
 """
-import os, sys, re, shutil, urllib, tarfile, subprocess, shlex
-import numpy as np
-from ..conf import launch
-
-path = os.path.dirname(os.path.realpath(__file__))
+from ..util import launch
 
 input_template = """\
 {nsample}
@@ -23,10 +19,11 @@ def _build(mode=None, optimize=None, version=None):
     """
     Build CVM-S code.
     """
-    import cst
+    import os, shlex, urllib, tarfile, subprocess
+    from .. import util
 
     # configure
-    cf = cst.conf.configure('cvms')[0]
+    cf = util.configure('cvms')[0]
     if not mode:
         mode = cf.mode
     if not mode:
@@ -48,8 +45,9 @@ def _build(mode=None, optimize=None, version=None):
         urllib.urlretrieve(url, tarball)
 
     # build directory
+    path = os.path.dirname(__file__)
+    bld = os.path.join(path, '..', 'build', ver)
     cwd = os.getcwd()
-    bld = os.path.join(os.path.dirname(path), 'build', ver) + os.sep
     if not os.path.isdir(bld):
         os.makedirs(bld)
         os.chdir(bld)
@@ -66,19 +64,19 @@ def _build(mode=None, optimize=None, version=None):
         for opt in optimize:
             compiler = [cf.fortran_serial] + shlex.split(cf.fortran_flags[opt]) + ['-o']
             object_ = 'cvms-a' + opt
-            new |= cst.conf.make(compiler, object_, source)
+            new |= util.make(compiler, object_, source)
     if 's' in mode:
         source = 'iobin.f', 'version%s.f' % version
         for opt in optimize:
             compiler = [cf.fortran_serial] + shlex.split(cf.fortran_flags[opt]) + ['-o']
             object_ = 'cvms-s' + opt
-            new |= cst.conf.make(compiler, object_, source)
+            new |= util.make(compiler, object_, source)
     if 'm' in mode and cf.fortran_mpi:
         source = 'iompi.f', 'version%s.f' % version
         for opt in optimize:
             compiler = [cf.fortran_mpi] + shlex.split(cf.fortran_flags[opt]) + ['-o']
             object_ = 'cvms-m' + opt
-            new |= cst.conf.make(compiler, object_, source)
+            new |= util.make(compiler, object_, source)
     os.chdir(cwd)
     return
 
@@ -86,7 +84,8 @@ def stage(inputs={}, **kwargs):
     """
     Stage job
     """
-    import cst
+    import os, sys, re, shutil
+    from .. import util
 
     print('CVM-S setup')
 
@@ -95,7 +94,7 @@ def stage(inputs={}, **kwargs):
     inputs.update(kwargs)
 
     # configure
-    job, inputs = cst.conf.configure('cvms', **inputs)
+    job, inputs = util.configure('cvms', **inputs)
     if inputs:
         sys.exit('Unknown parameter: %s' % inputs)
     if not job.mode:
@@ -103,7 +102,7 @@ def stage(inputs={}, **kwargs):
         if job.nproc > 1:
             job.mode = 'm'
     job.command = os.path.join('.', 'cvms-' + job.mode + job.optimize)
-    job = cst.conf.prepare(job)
+    job = util.prepare(job)
     ver = 'cvms-' + job.version
 
     # build
@@ -112,8 +111,9 @@ def stage(inputs={}, **kwargs):
     _build(job.mode, job.optimize, job.version)
 
     # check minimum processors needed for compiled memory size
-    file = os.path.join(cst.path, 'build', ver, 'in.h')
-    string = open(file).read()
+    path = os.path.dirname(__file__)
+    f = os.path.join(path, '..', 'build', ver, 'in.h')
+    string = open(f).read()
     pattern = 'ibig *= *([0-9]*)'
     n = int(re.search(pattern, string).groups()[0])
     minproc = int(job.nsample / n)
@@ -126,7 +126,7 @@ def stage(inputs={}, **kwargs):
     if job.force == True and os.path.isdir(job.rundir):
         shutil.rmtree(job.rundir)
     if not os.path.exists(job.rundir):
-        f = os.path.join(cst.path, 'build', ver)
+        f = os.path.join(path, '..', 'build', ver)
         shutil.copytree(f, job.rundir)
     else:
         for f in (
@@ -140,13 +140,13 @@ def stage(inputs={}, **kwargs):
                 os.remove(ff)
 
     # process machine templates
-    cst.conf.skeleton(job, stagein=job.stagein, new=False)
+    util.skeleton(job, stagein=job.stagein, new=False)
 
     # save input file and configuration
     f = os.path.join(job.rundir, 'cvms-input')
     open(f, 'w').write(input_template.format(**job.__dict__))
     f = os.path.join(job.rundir, 'conf.py')
-    cst.util.save(f, job.__dict__)
+    util.save(f, job.__dict__)
     return job
 
 def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
@@ -164,6 +164,8 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
     -------
     rho, vp, vs: Material arrays
     """
+    import os
+    import numpy as np
     lon = np.asarray(lon, 'f')
     lat = np.asarray(lat, 'f')
     dep = np.asarray(dep, 'f')

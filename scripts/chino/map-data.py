@@ -35,7 +35,7 @@ m = m['mzz'], m['mxx'], m['myy'], m['mxz'], -m['myz'], -m['mxy']
 b = beachball.Beach(m, width=200)
 p = []
 for c in b.get_paths():
-    p += c.to_polygons() + [[[np.nan, np.nan]]]
+    p += c.to_polygons() + [[[float('nan'), float('nan')]]]
 del p[-1]
 b = np.concatenate(p) * 0.005
 f = os.path.join('run', 'data', 'beachball.txt')

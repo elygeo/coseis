@@ -1,15 +1,12 @@
 """
 Source utilities
 """
-import os
-import numpy as np
-from . import util, coord
-
 
 def magarea(A):
     """
     Various earthquake magnitude area relations.
     """
+    import numpy as np
     A = np.array(A, copy=False, ndmin=1)
     i = A > 537.0
     Mw = 3.98 + np.log10(A)
@@ -27,6 +24,7 @@ def areamag(Mw):
     """
     Various inverse earthquake magnitude area relations.
     """
+    import numpy as np
     Mw = np.array(Mw, copy=False, ndmin=1)
     A = 10 ** (Mw - 3.98)
     i = A > 537.0
@@ -44,6 +42,7 @@ def mw(moment, units='mks'):
     """
     Moment magnitude
     """
+    import numpy as np
     if units=='mks':
         m = (np.log10(moment) - 9.05) / 1.5
     else:
@@ -56,9 +55,9 @@ def _open(fh, mode='r'):
     Open a regular or compressed file if not already opened.
     """
     if isinstance(fh, basestring):
+        import os, gzip
         fh = os.path.expanduser(fh)
         if fh.endswith('.gz'):
-            import gzip
             fh = gzip.open(fh, mode)
         else:
             fh = open(fh, mode)
@@ -75,6 +74,7 @@ class srf():
         """
         Read SRF file.
         """
+        import numpy as np
 
         # mks units
         u_km = 1000
@@ -180,6 +180,7 @@ class srf():
 
 
     def write_srf(self, filename):
+        import numpy as np
 
         # mks units
         u_km = 0.001
@@ -251,6 +252,7 @@ class srf():
         """
         Save SRF as a Python source file.
         """
+        from . import util
         util.save(path, self,
             expand=['plane'],
             prune_pattern='(^_)|(_$)',
@@ -270,6 +272,8 @@ class srf():
         proj: function to project lon/lat to logical model coordinates
         dbytes: 4 or 8
         """
+        import os
+        from . import coord
 
         # setup
         i_ = 'i%s' % dbytes
@@ -375,6 +379,8 @@ class srf():
         proj: Function to project lon/lat to logical model coordinates
         binary: If true, write AWP binary format, otherwise text format.
         """
+        import numpy as np
+        from . import coord
         if type(delta) not in (tuple, list):
             delta = delta, delta, delta
 
@@ -442,14 +448,17 @@ class srf():
         """
         Write Coulomb input file.
         """
+        import os, math
+        import numpy as np
+        from . import coord
 
         # output location
         path = os.path.expanduser(path)
 
         # slip components
         s1, s2  = self.slip1, self.slip2
-        s = np.sin(np.pi / 180.0 * self.rake)
-        c = np.cos(np.pi / 180.0 * self.rake)
+        s = np.sin(math.pi / 180.0 * self.rake)
+        c = np.cos(math.pi / 180.0 * self.rake)
         r1 = -c * s1 + s * s2
         r2 =  s * s1 + c * s2
 
@@ -461,9 +470,9 @@ class srf():
         y *= 0.001
         z *= 0.001
         delta = 0.0005 * self.plane[0]['delta'][0]
-        dx = delta * np.sin(np.pi / 180.0 * (self.stk + rot))
-        dy = delta * np.cos(np.pi / 180.0 * (self.stk + rot))
-        dz = delta * np.sin(np.pi / 180.0 * self.dip)
+        dx = delta * np.sin(math.pi / 180.0 * (self.stk + rot))
+        dy = delta * np.cos(math.pi / 180.0 * (self.stk + rot))
+        dz = delta * np.sin(math.pi / 180.0 * self.dip)
         x1, x2 = x - dx, x + dx
         y1, y2 = y - dy, y + dy
         z1, z2 = z - dz, z + dz

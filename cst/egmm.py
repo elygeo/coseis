@@ -2,7 +2,6 @@
 """
 EGMM - Empirical Ground Motion Model
 """
-import numpy as np
 
 def cbnga(T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb):
     """
@@ -33,6 +32,7 @@ def cbnga(T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb):
     ground motion parameters, Tech. Rep. PEER 2007/02, Pacific Earthquake
     Engineering Research Center.
     """
+    import numpy as np
     M     = np.array(M)
     R_RUP = np.array(R_RUP)
     R_JB  = np.array(R_JB)
@@ -146,6 +146,7 @@ def test():
     """
     Test CBNGA for comparison with OpenSHA Attenuation Relationship Plotter
     """
+    import numpy as np
     import matplotlib.pyplot as plt
 
     T = 10

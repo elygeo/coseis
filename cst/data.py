@@ -5,12 +5,9 @@ Data utilities and sources
 # Quaternary Fault Database
 # ftp://hazards.cr.usgs.gov/maps/qfault/
 # http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
-import os, sys, math, urllib, gzip, zipfile, subprocess
-import numpy as np
-from . import coord, source, gocad, util
-
 
 def upsample(f):
+    import numpy as np
     n = list(f.shape)
     n[:2] = [n[0] * 2 - 1, n[1] * 2 - 1]
     g = np.empty(n, f.dtype)
@@ -22,6 +19,7 @@ def upsample(f):
 
 
 def downsample(f, d):
+    import numpy as np
     n = f.shape
     n = (n[0] + 1) // d, (n[1] + 1) // d
     g = np.zeros(n, f.dtype)
@@ -44,7 +42,9 @@ def clipdata(x, y, extent, lines=1):
            1 = line segments, include one extra point past the boundary.
            -1 = line segments, do not include extra point past the boundary.
     """
-    x, y = np.array([x, y])
+    import numpy as np
+    x = np.asarray(x)
+    y = np.asarray(y)
     x1, x2 = extent[0]
     y1, y2 = extent[1]
     i = (x >= x1) & (x <= x2) & (y >= y1) & (y <= y2)
@@ -52,8 +52,8 @@ def clipdata(x, y, extent, lines=1):
         if lines > 0:
             i[:-1] = i[:-1] | i[1:]
             i[1:] = i[:-1] | i[1:]
-        x[~i] = np.nan
-        y[~i] = np.nan
+        x[~i] = float('nan')
+        y[~i] = float('nan')
         i[1:] = i[:-1] | i[1:]
     return x[i], y[i], i
 
@@ -62,6 +62,7 @@ def densify(x, y, delta):
     """
     Piecewise up-sample line segments with spacing delta.
     """
+    import numpy as np
     x, y = np.array([x, y])
     if x.size <= 1:
         return np.array([x, y])
@@ -90,6 +91,7 @@ def downsample_sphere(f, d):
     d is the decimation interval which should be odd to preserve nodal
     registration.
     """
+    import numpy as np
     n = f.shape
     i = np.arange(d) - (d - 1) / 2
     jj = np.arange(0, n[0], d)
@@ -113,8 +115,12 @@ def etopo1(downsample=1):
     ETOPO1 Global Relief Model.
     http://www.ngdc.noaa.gov/mgg/global/global.html
     """
-    import cst
-    repo = cst.site.repo
+    import os, urllib, zipfile
+    import numpy as np
+    from .conf import site
+    from . import coord
+
+    repo = site.repo
     filename = os.path.join(repo, 'etopo%02d-ice.npy' % downsample)
     if not os.path.exists(filename):
         f1 = os.path.join(repo, 'etopo1_ice_g_i2.bin')
@@ -137,7 +143,7 @@ def etopo1(downsample=1):
 
 def globe30(tile=(0, 1), fill=True):
     """
-    Global Land One-km Base Elevation Digital Elevation Model.
+    Global Land One-km Base Elevation DEM.
     Missing bathymetry is optionally filled with ETOPO1.
     http://www.ngdc.noaa.gov/mgg/topo/globe.html
 
@@ -154,8 +160,10 @@ def globe30(tile=(0, 1), fill=True):
         (3, 1): E Asia, W Pacific
     fill: Fill missing data (ocean basins) with ETOPO1 bathymetry.
     """
-    import cst
-    repo = cst.site.repo
+    import os, urllib, gzip
+    import numpy as np
+    from .conf import site
+    repo = site.repo
     filename = os.path.join(repo, 'topo%s%s.npy' % tile)
     if not os.path.exists(filename):
         print('Creating %s' % filename)
@@ -195,7 +203,7 @@ def globe30(tile=(0, 1), fill=True):
     return z
 
 
-def topo(extent, scale=1.0, downsample=0, mesh=False):
+def dem(extent, scale=1.0, downsample=0, mesh=False):
     """
     Extract digital elevation model for given region.
 
@@ -214,6 +222,8 @@ def topo(extent, scale=1.0, downsample=0, mesh=False):
     topo: Elevation array z or if mesh == True (lon, lat, z) arrays.
     extent: Extent of z array possibly larger than requested extent.
     """
+    import sys, math
+    import numpy as np
     x, y = extent
     if downsample > 0:
         d = 60 // downsample
@@ -256,6 +266,7 @@ def topo(extent, scale=1.0, downsample=0, mesh=False):
         return (x, y, z), extent
     else:
         return z, extent
+topo = dem
 
 
 def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0, max_level=4, delta=None, clip=1):
@@ -283,8 +294,11 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
     http://www.ngdc.noaa.gov/mgg/shorelines/gshhs.html
     http://www.soest.hawaii.edu/wessel/gshhs/index.html
     """
-    import cst
-    repo = cst.site.repo
+    import os, urllib, zipfile
+    import numpy as np
+    from .conf import site
+
+    repo = site.repo
     filename = os.path.join(repo, 'gshhs')
     if not os.path.exists(filename):
         url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.0/gshhs_2.0.zip'
@@ -338,8 +352,8 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
             x, y = clipdata(x, y, extent, clip)[:2]
         elif delta:
             x, y = densify(x, y, delta)
-        xx += [x, [np.nan]]
-        yy += [y, [np.nan]]
+        xx += [x, [float('nan')]]
+        yy += [y, [float('nan')]]
     if nkeep:
         xx = np.concatenate(xx)[:-1]
         yy = np.concatenate(yy)[:-1]
@@ -350,8 +364,11 @@ def us_place_names(kind=None, extent=None):
     """
     USGS place name database.
     """
-    import cst
-    repo = cst.site.repo
+    import os, urllib, zipfile
+    import numpy as np
+    from .conf import site
+
+    repo = site.repo
     filename = os.path.join(repo, 'US_CONCISE.txt')
     if not os.path.exists(filename):
         url = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
@@ -381,30 +398,33 @@ def us_place_names(kind=None, extent=None):
     return (lon, lat, elev, name)
 
 
-def engdahlcat(path='engdahl-centennial-cat.npy'):
+def engdahl_cat(path='engdahl-centennial-cat.npy'):
     """
     Engdahl Centennial Earthquake Catalog.
     http://earthquake.usgs.gov/research/data/centennial.php
     """
-    import cst
-    repo = cst.site.repo
+    import os, urllib
+    import numpy as np
+    from .conf import site
+
+    repo = site.repo
     f = os.path.join(repo, path)
     if not os.path.exists(f):
-        fmt = [
+        d = [
             6, ('icat',   'S6'),
             1, ('asol',   'S1'),
             5, ('isol',   'S5'),
-            4, ('year',   'i4'),
-            3, ('month',  'i4'),
-            3, ('day',    'i4'),
-            4, ('hour',   'i4'),
-            3, ('minute', 'i4'),
+            4, ('year',   'u2'),
+            3, ('month',  'u1'),
+            3, ('day',    'u1'),
+            4, ('hour',   'u1'),
+            3, ('minute', 'u1'),
             6, ('second', 'f4'),
             9, ('lat',    'f4'),
             8, ('lon',    'f4'),
             6, ('depth',  'f4'),
-            4, ('greg',   'i4'),
-            4, ('ntel',   'i4'),
+            4, ('greg',   'u2'),
+            4, ('ntel',   'u2'),
             4, ('mag',    'f4'),
             3, ('msc',    'S3'),
             6, ('mdo',    'S6'),
@@ -412,157 +432,57 @@ def engdahlcat(path='engdahl-centennial-cat.npy'):
         url = 'http://earthquake.usgs.gov/research/data/centennial.cat'
         print('Retrieving %s' % url)
         url = urllib.urlopen(url)
-        data = np.genfromtxt(url, dtype=fmt[1::2], delimiter=fmt[0::2])
+        data = np.genfromtxt(url, dtype=d[1::2], delimiter=d[0::2])
         np.save(f, data)
     else:
         data = np.load(f)
     return data
 
 
-def cfm(faults=None, extent=None, version='CFM4-socal-primary'):
+def lsh_cat(path='lsh-catalog.npy'):
     """
-    SCEC Community Fault Model (CFM) reader.  If faults in None, return the
-    list of available fault names. Otherwise, read the requested faults.
-
-    Parameters
-    ----------
-    faults: List of faults names, and (optionally) segment indices.
-    extent: Return None if outside range (xmin, xmax), (ymin, ymax).
-    geographic: Convert X/Y coordinates to Lon/Lat, default = True.
-
-    Returns
-    -------
-    tsurf: object with the following properties:
-        name: segment name
-        xyz: M x 3 array of vertex coordinates, Cartesian coords
-        llz: M x 3 array of vertex coordinates, geographic coords
-        tri: List of N x 3 arrays of vertex indices
-        lon: Longitude of the center of mass
-        lat: Latitude of the center of mass
-        dep: Depth of the center of mass
-        stk: Fault strike
-        dip: Fault dip
-        area: Total surface area
+    Lin, Shearer, Hauksson southern California seismicity catalog.
+    http://www.rsmas.miami.edu/personal/glin/LSH.html
     """
-    import pyproj
-    import cst
+    import os, urllib
+    import numpy as np
+    from .conf import site
 
-    # projection: UTM zone 11, NAD 1927 datum (implies Clark 1866 geoid)
-    proj = pyproj.Proj(proj='utm', zone=11, datum='NAD27')
-
-    # paths
-    repo = cst.site.repo
-    path = os.path.join(repo, 'scec-cfm4', version)
-    npy  = os.path.join(path, '%s-%04d-%s.npy')
-    fault_file = os.path.join(repo, 'scec-cfm4', 'fault-list.txt')
-
-    # prepare fault database
-    dtype = [('name', 'S64'), ('nseg', 'i')]
-    if os.path.exists(fault_file):
-        nseg = dict(np.loadtxt(fault_file, dtype))
+    repo = site.repo
+    f = os.path.join(repo, path)
+    if not os.path.exists(f):
+        dtype = [
+            ('year',    'u2'),
+            ('month',   'u1'),
+            ('day',     'u1'),
+            ('hour',    'u1'),
+            ('minute',  'u1'),
+            ('second',  'f4'),
+            ('cuspid',  'u4'),
+            ('lat',     'f4'),
+            ('lon',     'f4'),
+            ('depth',   'f4'),
+            ('mag',     'f4'),
+            ('np',      'u2'),
+            ('ns',      'u2'),
+            ('rms',     'f2'),
+            ('daytime', 'u1'),
+            ('clnum',   'u1'),
+            ('nclst',   'u2'),
+            ('ndif',    'u2'),
+            ('aer_h',   'f4'),
+            ('aer_z',   'f4'),
+            ('rer_h',   'f4'),
+            ('rer_z',   'f4'),
+            ('type',    'S2'),
+        ]
+        url="http://www.rsmas.miami.edu/personal/glin/LSH_files/LSH_1.12"
+        print('Retrieving %s' % url)
+        url = urllib.urlopen(url)
+        data = np.genfromtxt(url, dtype=dtype)
+        np.save(f, data)
     else:
-        url = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
-        vdo = os.path.join(repo, 'SCEC_VDO')
-        src = os.path.join(vdo, 'data', 'Faults', version) + os.sep
-        if not os.path.exists(vdo):
-            print('Downloading %s' % url)
-            f = os.path.join(repo, os.path.basename(url))
-            urllib.urlretrieve(url, f)
-            os.mkdir(vdo)
-            zipfile.ZipFile(f).extractall(vdo)
-        os.makedirs(path)
-        nseg = {}
-        for f in os.listdir(src):
-            if not f.endswith('.ts'):
-                continue
-            xyz, tri = gocad.tsurf(src + f)[0][2:4]
-            fault = f[:-3]
-            nseg[fault] = len(tri)
-            for k, t in enumerate(tri):
-                i, j = np.unique(t, return_inverse=True)
-                t = np.arange(t.size)[j].reshape(t.shape)
-                x = xyz[:,i]
-                np.save(npy % (fault, k, 'xyz'), x)
-                np.save(npy % (fault, k, 'tri'), t)
-        f = np.array(sorted(nseg.items()), dtype)
-        np.savetxt(fault_file, f, '%s %s')
-
-    # requested faults
-    if faults == None:
-        return nseg
-    if isinstance(faults, basestring):
-        pat = faults.lower()
-        faults = []
-        for f in nseg:
-            if pat in f.lower():
-                faults.append(f)
-
-    # read faults
-    n = 0
-    vtx = []
-    tri = []
-    name = []
-    for fault in faults:
-        if type(fault) in (list, tuple):
-            fault, segments = fault
-        else:
-            segments = range(nseg[fault])
-        for i in segments:
-            x, y, z = np.load(npy % (fault, i, 'xyz'))
-            x_, y_ = proj(x, y, inverse=True)
-            if extent:
-                xlim, ylim = extent
-                if (
-                    x_.max() < xlim[0] or
-                    x_.min() > xlim[1] or
-                    y_.max() < ylim[0] or
-                    y_.min() > ylim[1]
-                ):
-                    continue
-            vtx.append([x, y, z, x_, y_])
-            t = np.load(npy % (fault, i, 'tri'))
-            tri.append(t + n)
-            n += x.size
-        name.append('%s%s' % (fault, segments))
-
-    # combine segments
-    if len(vtx) == 0:
-        return
-    vtx = np.hstack(vtx)
-    tri = np.hstack(tri)
-    name = os.path.commonprefix(name)
-
-    # properties
-    x, y, z, lon, lat = vtx
-    extent = (lon.min(), lon.max()), (lat.min(), lat.max())
-    ctr, nrm, area = coord.tsurf_plane((x, y, z), tri)
-    x0, y0, z0 = ctr
-    x, y, z = nrm
-    r = math.sqrt(x * x + y * y) / z
-    dip = math.atan(r) / math.pi * 180.0
-    x = x0, x0 - x, x0 + x
-    y = y0, y0 - y, y0 + y
-    x, y = proj(x, y, inverse=True)
-    lon0, lat0 = x[0], y[0]
-    x = 0.5 * (x[2] - x[1]) * math.cos(lat0 / 180.0 * math.pi)
-    y = 0.5 * (y[2] - y[1])
-    stk = (math.atan2(-y, x) / math.pi * 180.0) % 360.0
-
-    # data dictionary
-    x, y, z, lon, lat = vtx
-    data = util.namespace(dict(
-        name = name,
-        lon = lon, lon0 = lon0,
-        lat = lat, lat0 = lat0,
-        extent = extent,
-        x = x, x0 = x0,
-        y = y, y0 = y0,
-        z = z, z0 = z0,
-        tri = tri,
-        stk = stk,
-        dip = dip,
-        area = area,
-    ))
+        data = np.load(f)
     return data
 
 
@@ -580,6 +500,9 @@ def cybershake(isrc, irup, islip, ihypo, name=None):
     ihypo: hypocenter ID
     name: optional name for the rupture
     """
+    import os, subprocess
+    import numpy as np
+    from . import source
 
     # get reports
     url = 'intensity.usc.edu:/home/scec-00/cybershk/reports/'

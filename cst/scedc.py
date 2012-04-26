@@ -3,9 +3,6 @@ Utilities for accessing the Southern California Earthquake Data Center (SCEDC).
 
 http://www.data.scec.org/
 """
-import os, sys, time, struct, socket, urllib
-from . import util
-
 
 class stp():
     """
@@ -53,6 +50,7 @@ class stp():
     }
 
     def __init__(self, waveserver='scedc', retry=60):
+        import time, struct, socket
         print 'init'
         self.sock = socket.socket()
         self.send = self.sock.send
@@ -100,6 +98,7 @@ class stp():
             return
 
     def receive(self, path=None, verbose=False):
+        import os, sys
         dirname = path
         buff = self.sock.recv(4096)
         line = ''
@@ -171,11 +170,13 @@ def mts(eventid, path='scsn-mts-%s.py'):
     source1 =  m['myy'],  m['mxx'],  m['mzz']
     source2 = -m['mxz'], -m['myz'],  m['mxy']
     """
+    import os, urllib
+    from . import util
     url = 'http://www.data.scec.org/MomentTensor/solutions/%s/' % eventid
     url = 'http://www.data.scec.org/MomentTensor/showMT.php?evid=%s' % eventid
     try:
         path = path % eventid
-    except:
+    except TypeError:
         pass
     if os.path.exists(path):
         mts = {}
