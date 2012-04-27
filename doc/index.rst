@@ -96,7 +96,7 @@ libraries.
 
         brew install gfortran git
 
-2.  If you need MPI, MPICH2_ is recommended.
+2.  If you need MPI (for SORD of CVMS), MPICH2_ is recommended.
 
 3.  For plotting and visualization, Enthought Python Distribution (EPD_) is
     recommended.
@@ -130,12 +130,17 @@ libraries.
     new custom configuration, make a new sub-directory following the example of
     the supplied configurations.
 
-6.  Compile component codes:
+6.  Build the components you need (options are: ``sord``, ``cvms``,
+    ``cvmh``, ``cfm``, ``rspectra``, ``mapdata``). For example::
+
+        python setup.py sord cvmh cfm mapdata
+
+7.  If building SORD, you may want to run the test suite:
     ::
 
-        python setup.py build
+        python setup.py test 
 
-7.  Finally, set path variables for the Pyhon module and executables. For bash
+8.  Finally, set path variables for the Pyhon module and executables. For bash
     shell, with the code located in your home directory (for example) add these
     lines to ``.bash_profile``::
 

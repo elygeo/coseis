@@ -1,4 +1,7 @@
 #!/usr/bin/env ipython --gui=wx -i
+import sys, getopt
 import cst
-cst.cfm.command_line()
+opts, faults = getopt.getopt(sys.argv, 's')
+split = '-s' in dict(opts)
+cst.cfm.explore(faults, split)
 

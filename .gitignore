@@ -5,8 +5,8 @@
 *.mod
 run
 tmp
-build
-publish.sh
+./publish.sh
 /dev
-/data
 /cst/site.py
+/cst/build
+/cst/data

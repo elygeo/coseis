@@ -15,7 +15,6 @@ except:
 # site specific
 machine = None
 account = None
-repo = '~/coseis/data'
 
 # job parameters
 name = 'cst'

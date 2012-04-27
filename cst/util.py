@@ -142,25 +142,6 @@ def load(fh, d=None, prune_pattern=None, prune_types=None):
     return obj
 
 
-def build():
-    import os, shlex
-    from numpy.distutils.core import setup, Extension
-    import numpy as np
-    from . import util
-    cwd = os.getcwd()
-    path = os.path.dirname(__file__)
-    os.chdir(path)
-    if not os.path.exists('interpolate.so'):
-        incl = [np.get_include()]
-        fopt = shlex.split(util.configure()[0].f2py_flags)
-        ext = [
-            Extension('interpolate', ['interpolate.c'], include_dirs=incl),
-            Extension('rspectra', ['rspectra.f90'], f2py_options=fopt),
-        ]
-        setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
-    os.chdir(cwd)
-
-
 def archive():
     import os, gzip, tarfile
     try:
@@ -187,7 +168,6 @@ Site specific configuration
 """
 machine = {machine!r}
 account = {account!r}
-repo = {repo!r}
 '''
 
 def configure(module=None, machine=None, save_site=False, **kwargs):
@@ -198,7 +178,7 @@ def configure(module=None, machine=None, save_site=False, **kwargs):
     ----------
     module: module name
     machine: machine name
-    save_site: save site specific parameters (machine, account, repo)
+    save_site: save site specific parameters (machine, account)
     **kwargs: override parameters supplied as keyword arguments
 
     Returns
@@ -235,7 +215,6 @@ def configure(module=None, machine=None, save_site=False, **kwargs):
     f = os.path.join(path, 'site.py')
     if os.path.isfile(f):
         exec open(f) in job
-    job['repo'] = os.path.expanduser(job['repo'])
 
     # machine parameters
     if machine:

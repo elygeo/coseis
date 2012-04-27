@@ -20,7 +20,7 @@ def _build(mode=None, optimize=None, version=None):
     Build CVM-S code.
     """
     import os, shlex, urllib, tarfile, subprocess
-    from .. import util
+    from .. import util, data
 
     # configure
     cf = util.configure('cvms')[0]
@@ -37,10 +37,10 @@ def _build(mode=None, optimize=None, version=None):
 
     # download source code
     url = 'http://earth.usc.edu/~gely/cvm-data/%s.tgz' % ver
-    tarball = os.path.join(cf.repo, os.path.basename(url))
+    tarball = os.path.join(data.repo, os.path.basename(url))
     if not os.path.exists(tarball):
-        if not os.path.exists(cf.repo):
-            os.makedirs(cf.repo)
+        if not os.path.exists(data.repo):
+            os.makedirs(data.repo)
         print('Downloading %s' % url)
         urllib.urlretrieve(url, tarball)
 

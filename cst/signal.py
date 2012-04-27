@@ -3,6 +3,28 @@
 Signal processing utilities
 """
 
+try:
+    from rspectra import rspectra
+except ImportError:
+    pass
+
+
+def build_ext():
+    """
+    Compile Fortran extentions
+    """
+    import os, shlex
+    from numpy.distutils.core import setup, Extension
+    cwd = os.getcwd()
+    path = os.path.dirname(__file__)
+    os.chdir(path)
+    if not os.path.exists('rspectra.so'):
+        fopt = shlex.split(configure()[0].f2py_flags)
+        ext = [Extension('rspectra', ['rspectra.f90'], f2py_options=fopt)]
+        setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
+    os.chdir(cwd)
+
+
 def time_function(pulse, t, tau=1.0):
     """
     Pulse time function with specified bandwidth.
@@ -94,6 +116,7 @@ def brune2gauss(x, dt, tau, sigma=None, mode='same'):
     x = np.apply_along_axis(np.convolve, -1, x, b, mode)
     return x
 
+
 def filter(x, dt, fcorner, btype='lowpass', order=2, repeat=0, mode='same'):
     """
     Apply Butterworth or Hann window filter to time series.
@@ -137,6 +160,7 @@ def filter(x, dt, fcorner, btype='lowpass', order=2, repeat=0, mode='same'):
         elif repeat:
             x = scipy.signal.lfilter(b, a, x)
     return x
+
 
 def spectrum(h, dt=1.0, shift=False, tzoom=10.0, db=None, legend=None, title='Forier spectrum', axes=None):
     """
@@ -209,6 +233,7 @@ def spectrum(h, dt=1.0, shift=False, tzoom=10.0, db=None, legend=None, title='Fo
     plt.draw()
 
     return axes
+
 
 def test():
     """
@@ -292,6 +317,7 @@ def test():
     spectrum(y, dt, shift=True, legend=leg,
         title='Deconvolution, fc = %.1f, T = 0.5 / (pi * fc)' % flp)
     return
+
 
 # continue if command line
 if __name__ == '__main__':

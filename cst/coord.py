@@ -2,7 +2,31 @@
 Coordinate conversions
 """
 
+try:
+    from .trinterp import trinterp as ctrinterp
+except ImportError:
+    pass
+
+
+def build_ext():
+    """
+    Compile C extensions
+    """
+    import os
+    from distutils.core import setup, Extension
+    import numpy as np
+    cwd = os.getcwd()
+    path = os.path.dirname(__file__)
+    os.chdir(path)
+    if not os.path.exists('trinterp.so'):
+        incl = [np.get_include()]
+        ext = [Extension('trinterp', ['trinterp.c'], include_dirs=incl)]
+        setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
+    os.chdir(cwd)
+
+
 rearth = 6370000.0
+
 
 def dotvv(a, b, check=True):
     """

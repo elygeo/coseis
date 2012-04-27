@@ -6,7 +6,13 @@ Data utilities and sources
 # ftp://hazards.cr.usgs.gov/maps/qfault/
 # http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
 
+# data repository location
+repo = os.path.join(os.dirname(__file__), 'data')
+
 def upsample(f):
+    """
+    Up-sample a 2D array by a factor of 2 by interpolation.
+    """
     import numpy as np
     n = list(f.shape)
     n[:2] = [n[0] * 2 - 1, n[1] * 2 - 1]
@@ -19,6 +25,9 @@ def upsample(f):
 
 
 def downsample(f, d):
+    """
+    Down-sample a 2D array by a factor d, with averaging.
+    """
     import numpy as np
     n = f.shape
     n = (n[0] + 1) // d, (n[1] + 1) // d
@@ -117,9 +126,8 @@ def etopo1(downsample=1):
     """
     import os, urllib, zipfile
     import numpy as np
-    from . import site, coord
+    from . import coord
 
-    repo = site.repo
     filename = os.path.join(repo, 'etopo%02d-ice.npy' % downsample)
     if os.path.exists(filename):
         z = np.load(filename, mmap_mode='c')
@@ -161,8 +169,7 @@ def globe30(tile=(0, 1), fill=True):
     """
     import os, urllib, gzip
     import numpy as np
-    from . import site
-    repo = site.repo
+
     filename = os.path.join(repo, 'topo%s%s.npy' % tile)
     if os.path.exists(filename):
         z = np.load(filename, mmap_mode='c')
@@ -295,9 +302,7 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
     """
     import os, urllib, zipfile
     import numpy as np
-    from . import site
 
-    repo = site.repo
     d = os.path.join(repo, 'gshhs')
     if not os.path.exists(d):
         url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.0/gshhs_2.0.zip'
@@ -365,9 +370,7 @@ def us_place_names(kind=None, extent=None):
     """
     import os, urllib, zipfile
     import numpy as np
-    from . import site
 
-    repo = site.repo
     filename = os.path.join(repo, 'US_CONCISE.txt')
     if not os.path.exists(filename):
         url = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
@@ -404,9 +407,7 @@ def engdahl_cat(path='engdahl-centennial-cat.npy'):
     """
     import os, urllib
     import numpy as np
-    from . import site
 
-    repo = site.repo
     f = os.path.join(repo, path)
     if not os.path.exists(f):
         d = [
@@ -445,9 +446,7 @@ def lsh_cat(path='lsh-catalog.npy'):
     """
     import os, urllib
     import numpy as np
-    from . import site
 
-    repo = site.repo
     f = os.path.join(repo, path)
     if not os.path.exists(f):
         dtype = [

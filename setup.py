@@ -28,10 +28,18 @@ if cf.verbose:
 
 # choose a task
 for target in args:
-    if target == 'build':
-        cst.util.build()
+    if target in ('sord', 'build'):
         cst.sord._build()
+    elif target == 'cvms':
         cst.cvms._build()
+    elif target == 'cvmh':
+        cst.cvmh.cvmh_voxet()
+    elif target == 'cfm':
+        cst.cvms.catalog()
+    elif target == 'mapdata':
+        cst.data.mapdata()
+        cst.data.etopo1()
+        cst.data.globe30()
     elif target in ('test', 'tests'):
         import nose
         argv = ['', '--verbose', '--with-doctest', '--all-modules', '--exe']

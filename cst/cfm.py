@@ -3,8 +3,59 @@
 SCEC Community Fault Model (CFM) utilities.
 """
 
+# data repository location
+repo = os.path.join(os.dirname(__file__), 'data')
+
 # projection: UTM zone 11, NAD 1927 datum (implies Clark 1866 geoid)
 projection = dict(proj='utm', zone=11, datum='NAD27')
+
+def catalog(version='CFM4-socal-primary'):
+    """
+    Return a dictionary of available faults. The dictionary key:value pair is
+    the fault name and number of segments. The CFM database is downloaded if not
+    already present.
+    """
+    import os, urllib, zipfile
+    import numpy as np
+    from . import gocad
+
+    # paths
+    fault_file = os.path.join(repo, 'scec-cfm4', 'fault-list.txt')
+    path = os.path.join(repo, 'scec-cfm4')
+    npy = os.path.join(path, '%s-%04d-%s.npy')
+
+    # prepare fault database
+    dtype = [('name', 'S64'), ('nseg', 'i')]
+    if os.path.exists(fault_file):
+        cat = dict(np.loadtxt(fault_file, dtype))
+    else:
+        url = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
+        vdo = os.path.join(repo, 'SCEC_VDO')
+        src = os.path.join(vdo, 'data', 'Faults', version) + os.sep
+        if not os.path.exists(vdo):
+            print('Downloading %s' % url)
+            f = os.path.join(repo, os.path.basename(url))
+            urllib.urlretrieve(url, f)
+            os.mkdir(vdo)
+            zipfile.ZipFile(f).extractall(vdo)
+        os.makedirs(path)
+        cat = {}
+        for f in os.listdir(src):
+            if not f.endswith('.ts'):
+                continue
+            xyz, tri = gocad.tsurf(src + f)[0][2:4]
+            f = f[:-3]
+            cat[f] = len(tri)
+            for k, t in enumerate(tri):
+                i, j = np.unique(t, return_inverse=True)
+                t = np.arange(t.size)[j].reshape(t.shape)
+                x = xyz[:,i]
+                np.save(npy % (f, k, 'xyz'), x)
+                np.save(npy % (f, k, 'tri'), t)
+        f = np.array(sorted(cat.items()), dtype)
+        np.savetxt(fault_file, f, '%s %s')
+    return cat
+
 
 def tsurf_plane(xyz, tri):
     """
@@ -65,62 +116,6 @@ def tsurf_plane(xyz, tri):
     return center, normal, area
 
 
-def catalog(search=None, version='CFM4-socal-primary'):
-    """
-    Return a dictionary of faults matching a search string or any of a list of
-    strings. Default search None returns the entire catalog. The dictionary
-    key:value pair is the fault name and number of segments. The CFM database is
-    downloaded if not already present.
-    """
-    import os, urllib, zipfile
-    import numpy as np
-    from . import site, gocad
-
-    # paths
-    repo = site.repo
-    fault_file = os.path.join(repo, 'scec-cfm4', 'fault-list.txt')
-    path = os.path.join(repo, 'scec-cfm4')
-    npy = os.path.join(path, '%s-%04d-%s.npy')
-
-    # prepare fault database
-    dtype = [('name', 'S64'), ('nseg', 'i')]
-    if os.path.exists(fault_file):
-        faults = dict(np.loadtxt(fault_file, dtype))
-    else:
-        url = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
-        vdo = os.path.join(repo, 'SCEC_VDO')
-        src = os.path.join(vdo, 'data', 'Faults', version) + os.sep
-        if not os.path.exists(vdo):
-            print('Downloading %s' % url)
-            f = os.path.join(repo, os.path.basename(url))
-            urllib.urlretrieve(url, f)
-            os.mkdir(vdo)
-            zipfile.ZipFile(f).extractall(vdo)
-        os.makedirs(path)
-        faults = {}
-        for f in os.listdir(src):
-            if not f.endswith('.ts'):
-                continue
-            xyz, tri = gocad.tsurf(src + f)[0][2:4]
-            f = f[:-3]
-            faults[f] = len(tri)
-            for k, t in enumerate(tri):
-                i, j = np.unique(t, return_inverse=True)
-                t = np.arange(t.size)[j].reshape(t.shape)
-                x = xyz[:,i]
-                np.save(npy % (f, k, 'xyz'), x)
-                np.save(npy % (f, k, 'tri'), t)
-        f = np.array(sorted(faults.items()), dtype)
-        np.savetxt(fault_file, f, '%s %s')
-
-    # search faults
-    if not search:
-        return faults
-    if isinstance(search, basestring):
-        search = [search]
-    faults = {f:faults[f] for f in faults for s in search if s.lower() in f.lower()}
-    return faults
-
 def read(faults=None, extent=None, version='CFM4-socal-primary'):
     """
     Read CFM triangulated surface data and compute various geometrical properties.
@@ -150,12 +145,10 @@ def read(faults=None, extent=None, version='CFM4-socal-primary'):
     import os, math
     import numpy as np
     import pyproj
-    from . import site
 
     # prep
-    nseg = catalog(version)
+    nseg = catalog(version=version)
     proj = pyproj.Proj(**projection)
-    repo = site.repo
     path = os.path.join(repo, 'scec-cfm4')
     npy = os.path.join(path, version, '%s-%04d-%s.npy')
 
@@ -232,7 +225,34 @@ def read(faults=None, extent=None, version='CFM4-socal-primary'):
     return obj
 
 
-def explore(faults=None):
+def search(cat, patterns, split=False):
+    """
+    Search a catalog for a list of string patterns.
+    Non-string patterns are passed through.
+    """
+    if not patterns:
+        match = sorted(cat)
+    elif isinstance(patterns, basestring):
+        p = patterns.lower()
+        match = sorted(k for k in cat if p in k.lower())
+        if split:
+            match = [(k, i) for k in match for i in range(cat[k])]
+    else:
+        match = []
+        for p in patterns:
+            if ~isinstance(p, basestring):
+                match.append(p)
+            else:
+                p = p.lower()
+                m = (k for k in cat if p in k.lower())
+                if split:
+                    m = ((k, i) for k in m for i in range(cat[k]))
+                match.extend(m)
+        match = sorted(match)
+    return match
+
+
+def explore(faults=None, split=False):
     """
     CFMX: Community Fault Model Explorer
     ====================================
@@ -266,13 +286,14 @@ def explore(faults=None):
     view_angle = 15
     opacity = 0.3
     opacity = 1.0
-    color_bg = 1.0, 0.0, 0.0
-    color_hl = 1.0, 1.0, 0.0
+    color_bg = 1.0, 1.0, 0.0
+    color_hl = 1.0, 0.0, 0.0
 
     # setup figure
     fig_name = 'CFMX: Community Fault Model Explorer'
     print '\n%s\n' % fig_name
-    fig = mlab.figure(fig_name, (1,1,1), (0,0,0), size=(1280, 720))
+    fig = mlab.figure(bgcolor=(1,1,1), fgcolor=(0,0,0), size=(1280, 720))
+    fig.name = fig_name
     fig.scene.disable_render = True
 
     # DEM
@@ -282,35 +303,30 @@ def explore(faults=None):
     mlab.mesh(x, y, z, color=(1,1,1), opacity=0.3)
 
     # base map
-    nan = float('nan')
     ddeg = 0.5 / 60.0
     x, y = np.c_[
         data.mapdata('coastlines', resolution, extent, 10.0, delta=ddeg),
-        [nan, nan],
+        [float('nan'), float('nan')],
         data.mapdata('borders', resolution, extent, delta=ddeg),
     ]
     x -= 360.0
     z = coord.interp2(extent, dem[2], (x, y))
     x, y = proj(x, y)
     i = np.isnan(z)
-    x[i] = nan
-    y[i] = nan
+    x[i] = float('nan')
+    y[i] = float('nan')
     mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
 
     # fault surfaces
     print '\nReading fault surfaces:\n'
     names = {}
     coords = []
-    if not faults:
-        faults = catalog()
-    elif isinstance(faults, basestring):
-        faults = [faults]
-    for f in faults:
+    for f in search(faults):
         print('    ' + repr(f))
         f = read(f)
         x, y = proj(f.lon, f.lat)
         z, t = f.z, f.tri.T
-        s = mlab.triangular_mesh(x, y, z, t, representation='surface', color=color_hl)
+        s = mlab.triangular_mesh(x, y, z, t, representation='surface', color=color_bg)
         x, y = proj(f.lon0, f.lat0)
         z = f.z0
         a = s.actor.actor
@@ -362,15 +378,4 @@ def explore(faults=None):
     fig.scene.disable_render = False
     mlab.show()
     print "\nPress H in the figure window for help."
-
-
-# command line execution
-def command_line():
-    import sys, getopt
-    opts, args = getopt.getopt(sys.argv, 's')
-    split = '-s' in dict(opts)
-    faults = sorted(list(catalog(args)))
-    if split:
-        faults = [(f, i) for f, n in faults for i in range(n)]
-    explore(faults)
 

@@ -3,6 +3,7 @@ SCEC Community Velocity Model (CVM-H) extraction tool
 """
 
 # parameters
+repo = os.path.join(os.dirname(__file__), 'data')
 projection = dict(proj='utm', zone=11, datum='NAD27', ellps='clrk66')
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
 extent_gtl = (-31000.0, 849000.0), (3410000.0, 4274000.0)
@@ -37,9 +38,8 @@ def vs30_wald(rebuild=False):
     """
     import os, urllib, gzip
     import numpy as np
-    from . import site, coord
+    from . import coord
 
-    repo = site.repo
     filename = os.path.join(repo, 'cvmh_vs30_wald.npy')
     if not rebuild and os.path.exists(filename):
         data = np.load(filename)
@@ -74,8 +74,8 @@ def vs30_wills(rebuild=False):
     """
     import os, sys, urllib, subprocess
     import numpy as np
-    from . import site, coord
-    repo = site.repo
+    from . import coord
+
     url = 'http://earth.usc.edu/~gely/cvm-data/cvmh_vs30_wills.npy'
     filename = os.path.join(repo, os.path.basename(url))
     if not rebuild:
@@ -159,8 +159,7 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='vx63'):
     data: Array of properties
     """
     import os, urllib, subprocess
-    from . import site, gocad
-    repo = site.repo
+    from . import gocad
 
     # download if not found
     path = os.path.join(repo, version, 'bin')
