@@ -552,8 +552,9 @@ def prepare_param(pm):
     pm.fieldio = fieldio
     return pm
 
-# testing
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+def test_fieldnames():
+    f = fieldnames.all
+    for i in range(len(f)):
+        if f[i] in f[:i]:
+            print('Error: duplicate field: %r' % f[i])
 

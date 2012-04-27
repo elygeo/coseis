@@ -1,10 +1,11 @@
-#!/usr/bin/env python
 """
 SCEC Community Fault Model (CFM) utilities.
 """
 
 # data repository location
-repo = os.path.join(os.dirname(__file__), 'data')
+import os
+repo = os.path.join(os.path.dirname(__file__), 'data')
+del(os)
 
 # projection: UTM zone 11, NAD 1927 datum (implies Clark 1866 geoid)
 projection = dict(proj='utm', zone=11, datum='NAD27')

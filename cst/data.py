@@ -7,7 +7,9 @@ Data utilities and sources
 # http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
 
 # data repository location
-repo = os.path.join(os.dirname(__file__), 'data')
+import os
+repo = os.path.join(os.path.dirname(__file__), 'data')
+del(os)
 
 def upsample(f):
     """

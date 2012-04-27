@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-"""
-Code tests
-"""
 import os, compiler
 
 def test_imports():

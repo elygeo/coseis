@@ -2,6 +2,57 @@
 Miscellaneous utilities
 """
 
+def build_ext():
+    """
+    Compile C extensions
+    """
+    import os
+    from distutils.core import setup, Extension
+    import numpy as np
+    cwd = os.getcwd()
+    os.chdir(os.path.dirname(__file__))
+    if not os.path.exists('trinterp.so'):
+        incl = [np.get_include()]
+        ext = [Extension('trinterp', ['trinterp.c'], include_dirs=incl)]
+        setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
+    os.chdir(cwd)
+
+
+def build_fext():
+    """
+    Compile Fortran extentions
+    """
+    import os, shlex
+    from numpy.distutils.core import setup, Extension
+    cwd = os.getcwd()
+    os.chdir(os.path.dirname(__file__))
+    if not os.path.exists('rspectra.so'):
+        fopt = shlex.split(configure()[0].f2py_flags)
+        ext = [Extension('rspectra', ['rspectra.f90'], f2py_options=fopt)]
+        setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
+    os.chdir(cwd)
+
+
+def archive():
+    import os, gzip, tarfile
+    try:
+        import git
+    except ImportError:
+        print('Warning: Source code not archived. To enable, use')
+        print('Git versioned source code and install GitPython.')
+    else:
+        path = os.path.dirname(__file__)
+        repo = git.Repo(path)
+        open('tmp.log', 'w').write(repo.git.log())
+        repo.archive(open('tmp.tar', 'w'), prefix='coseis/')
+        tarfile.open('tmp.tar', 'a').add('tmp.log', 'coseis/changelog.txt')
+        tar = open('tmp.tar', 'rb').read()
+        os.remove('tmp.tar')
+        os.remove('tmp.log')
+        f = os.path.join(path, 'build', 'coseis.tgz')
+        gzip.open(f, 'wb').write(tar)
+
+
 class s_(object):
     """
     This convenient for building slice objects
@@ -142,34 +193,6 @@ def load(fh, d=None, prune_pattern=None, prune_types=None):
     return obj
 
 
-def archive():
-    import os, gzip, tarfile
-    try:
-        import git
-    except ImportError:
-        print('Warning: Source code not archived. To enable, use')
-        print('Git versioned source code and install GitPython.')
-    else:
-        path = os.path.dirname(__file__)
-        repo = git.Repo(path)
-        open('tmp.log', 'w').write(repo.git.log())
-        repo.archive(open('tmp.tar', 'w'), prefix='coseis/')
-        tarfile.open('tmp.tar', 'a').add('tmp.log', 'coseis/changelog.txt')
-        tar = open('tmp.tar', 'rb').read()
-        os.remove('tmp.tar')
-        os.remove('tmp.log')
-        f = os.path.join(path, 'build', 'coseis.tgz')
-        gzip.open(f, 'wb').write(tar)
-
-
-_site_template = '''\
-"""
-Site specific configuration
-"""
-machine = {machine!r}
-account = {account!r}
-'''
-
 def configure(module=None, machine=None, save_site=False, **kwargs):
     """
     Merge module, machine, keyword, and command line parameters.
@@ -281,6 +304,15 @@ def configure(module=None, machine=None, save_site=False, **kwargs):
     obj.__dict__ = job
 
     return obj, kwargs
+
+
+_site_template = '''\
+"""
+Site specific configuration
+"""
+machine = {machine!r}
+account = {account!r}
+'''
 
 
 def make(compiler, object_, source):
@@ -539,33 +571,4 @@ def launch(job=None, stagein=(), new=True, **kwargs):
     os.chdir(cwd)
     return job
 
-
-# test
-def test_conf():
-    """
-    Test configuration modules and machines
-    """
-    import os, shutil, pprint
-    path = os.path.join(os.path.dirname(__file__), 'conf')
-    modules = None, 'cvms'
-    machines = [None] + os.listdir('.')
-    cwd = os.getcwd()
-    os.chdir(path)
-    for module in modules:
-        for machine in machines:
-            if machine is None or os.path.isdir(machine):
-                print(80 * '-')
-                job = configure(module=module, machine=machine)[0]
-                job = prepare(job, rundir='tmp', command='date', run='exec', mode='s')
-                skeleton(job)
-                print(job.__doc__)
-                del(job.__dict__['__doc__'])
-                pprint.pprint(job.__dict__)
-                shutil.rmtree('tmp')
-    os.chdir(cwd)
-
-
-# command line
-if __name__ == '__main__':
-    test_conf()
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Field variable information
 
@@ -110,17 +109,11 @@ table = [
     #('psi',   '\psi',            'State variable',                 'f'),
 ]
 
-map     = dict((f[0], f[1:]) for f in table)
+map     = {f[0]: f[1:] for f in table}
 all     = [f[0] for f in table]
 input   = [f[0] for f in table if '<' in f[-1]]
 initial = [f[0] for f in table if '0' in f[-1]]
 cell    = [f[0] for f in table if 'c' in f[-1]]
 fault   = [f[0] for f in table if 'f' in f[-1]]
 volume  = [f[0] for f in table if 'f' not in f[-1]]
-
-# If run from the command line, check for duplicates.
-if __name__ == '__main__':
-    for i in range(len(all)):
-        if all[i] in all[:i]:
-            print('Error: duplicate field: %r' % all[i])
 

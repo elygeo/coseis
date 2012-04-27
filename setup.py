@@ -28,7 +28,11 @@ if cf.verbose:
 
 # choose a task
 for target in args:
-    if target in ('sord', 'build'):
+    if target == 'build_ext':
+        cst.build_ext()
+    elif target == 'build_fext':
+        cst.build_fext()
+    elif target == 'sord':
         cst.sord._build()
     elif target == 'cvms':
         cst.cvms._build()

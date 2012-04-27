@@ -2,8 +2,12 @@
 SCEC Community Velocity Model (CVM-H) extraction tool
 """
 
+# data repository location
+import os
+repo = os.path.join(os.path.dirname(__file__), 'data')
+del(os)
+
 # parameters
-repo = os.path.join(os.dirname(__file__), 'data')
 projection = dict(proj='utm', zone=11, datum='NAD27', ellps='clrk66')
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
 extent_gtl = (-31000.0, 849000.0), (3410000.0, 4274000.0)

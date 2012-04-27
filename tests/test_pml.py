@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-"""
-SORD tests
-"""
 import shutil
 import numpy as np
 import cst

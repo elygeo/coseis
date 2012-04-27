@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Analytical solution for a circular crack expanding at a uniform rupture
 velocity.
