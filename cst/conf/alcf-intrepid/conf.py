@@ -16,8 +16,8 @@ maxnodes = 40960
 maxram = 1900
 queue = 'prod'
 queue_opts = [
-    {'queue': 'prod-devel', 'maxnodes': 512,   'maxtime': (1, 00)},
-    {'queue': 'prod',       'maxnodes': 32768, 'maxtime': (12, 00)},
+    ('prod-devel', {'maxnodes': 512,   'maxtime': (1, 00)}),
+    ('prod',       {'maxnodes': 32768, 'maxtime': (12, 00)}),
 ]
 fortran_serial = 'mpixlf90_r'
 fortran_mpi = 'mpixlf90_r'

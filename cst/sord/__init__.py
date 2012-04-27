@@ -30,7 +30,7 @@ def _build(mode=None, optimize=None, dtype=None):
     # setup build directory
     path = os.path.dirname(__file__)
     src = os.path.join(path, 'src')
-    bld = os.path.join(path, '..', 'build') + os.sep
+    bld = os.path.realpath(os.path.join(path, '..', 'build')) + os.sep
     cwd = os.getcwd()
     os.chdir(src)
     if not os.path.isdir(bld):

@@ -35,7 +35,7 @@ verbose = False
 host = hostname = os.uname()[1]
 system = os.uname()
 queue = None
-queue_opts = [{}]
+queue_opts = None
 maxnodes = 1
 maxcores = 0
 maxram = 0

@@ -33,13 +33,13 @@ maxram = 30000
 #rate = 21e5
 rate = 12e5
 queue_opts = [
-    {'queue': 'development', 'maxnodes': 16,   'maxtime':  (2, 00)},
-    {'queue': 'normal',      'maxnodes': 256,  'maxtime': (24, 00)},
-    {'queue': 'large',       'maxnodes': 1024, 'maxtime': (24, 00)},
-    {'queue': 'long',        'maxnodes': 256,  'maxtime': (48, 00)},
-    {'queue': 'serial',      'maxnodes': 1,    'maxtime':  (2, 00)},
-    {'queue': 'vis',         'maxnodes': 2,    'maxtime': (24, 00)},
-    {'queue': 'request'},
+    ('development', {'maxnodes': 16,   'maxtime':  (2, 00)}),
+    ('normal',      {'maxnodes': 256,  'maxtime': (24, 00)}),
+    ('large',       {'maxnodes': 1024, 'maxtime': (24, 00)}),
+    ('long',        {'maxnodes': 256,  'maxtime': (48, 00)}),
+    ('serial',      {'maxnodes': 1,    'maxtime':  (2, 00)}),
+    ('vis',         {'maxnodes': 2,    'maxtime': (24, 00)}),
+    ('request', {}),
 ]
 launch = {
     's_exec':  '{command}',

@@ -13,7 +13,6 @@ batch nodes:
 login = 'babieca.sdsu.edu'
 hostname = 'master'
 queue = 'workq'
-queue_opts = [{'queue': 'workq'}]
 maxnodes = 40
 maxcores = 2
 maxram = 1800

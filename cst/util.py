@@ -385,13 +385,16 @@ def prepare(job=None, **kwargs):
 
     # queue options
     opts = job.queue_opts
-    if job.queue is not None and opts[0] is not {}:
-        opts = [d for d in job.queue_opts if d['queue'] == job.queue]
+    if opts == None:
+        opts = [(job.queue, {})]
+    elif job.queue is not None:
+        opts = [d for d in opts if d[0] == job.queue]
         if len(opts) == 0:
             raise Exception('Error: unknown queue: %s' % job.queue)
 
     # loop over queue configurations
-    for d in opts:
+    for q, d in opts:
+        job.queue = q
         job.__dict__.update(d)
 
         # parallelization

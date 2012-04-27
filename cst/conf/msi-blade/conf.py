@@ -22,8 +22,8 @@ hostname = 'blade28[5678]'
 maxcores = 4;
 maxram = 7000
 queue_opts = [
-    {'queue': 'devel', 'maxnodes': 16,  'maxtime': (1, 00)},
-    {'queue': 'bc',    'maxnodes': 268, 'maxtime': (48, 00)},
+    ('devel', {'maxnodes': 16,  'maxtime': (1, 00)}),
+    ('bc',    {'maxnodes': 268, 'maxtime': (48, 00)}),
 ]
 launch = {
     's_exec':  '{command}',
