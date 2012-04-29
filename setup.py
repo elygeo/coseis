@@ -44,9 +44,9 @@ for target in args:
         cst.data.mapdata()
         cst.data.etopo1()
         cst.data.globe30()
-    elif target in ('test', 'tests'):
+    elif target in ('test', 'tests', 'tests/'):
         import nose
-        argv = ['', '--verbose', '--with-doctest', '--all-modules', '--exe']
+        argv = ['tests', '--verbose', '--exe']
         nose.run(argv=argv)
     elif target == 'clean':
         d = os.path.join(os.path.dirname(__file__), 'cst') + os.sep
