@@ -2,13 +2,15 @@
 ALCF Cetus
 
 /cetus-fs0/
+
+echo '+mpiwrapper-xl' >> .soft
 """
 login = hostname = '*.alcf.anl.gov'
 maxcores = 4
 maxnodes = 1024
 maxram = 1000
 fortran_serial = 'xlf2008_r'
-fortran_mpi = 'xlf2008_r'
+fortran_mpi = 'mpixlf2003_r'
 fortran_flags = {
     'f': '-u -qsuppress=cmpmsg -qlanglvl=2003pure -qsuffix=f=f90',
     'f': '-u -qsuppress=cmpmsg -qlanglvl=2003pure',
