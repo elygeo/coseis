@@ -130,8 +130,8 @@ libraries.
     new custom configuration, make a new sub-directory following the example of
     the supplied configurations.
 
-6.  Build the components you need (options are: ``sord``, ``cvms``,
-    ``cvmh``, ``cfm``, ``rspectra``, ``mapdata``). For example::
+6.  Build the components you need (options are: ``sord``, ``cvms``, ``cvmh``,
+    ``cfm``, ``mapdata``, ``build_ext``, ``build_fext``). For example::
 
         python setup.py sord cvmh cfm mapdata
 
