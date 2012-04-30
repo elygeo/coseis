@@ -46,7 +46,7 @@ for target in args:
         cst.data.globe30()
     elif target in ('test', 'tests', 'tests/'):
         import nose
-        argv = ['tests', '--verbose', '--exe']
+        argv = ['', '--where=tests', '--verbose', '--with-doctest', '--exe']
         nose.run(argv=argv)
     elif target == 'clean':
         d = os.path.join(os.path.dirname(__file__), 'cst') + os.sep

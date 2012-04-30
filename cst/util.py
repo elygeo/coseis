@@ -18,7 +18,7 @@ def build_ext():
     os.chdir(cwd)
 
 
-def build_fext():
+def build_fext(**kwargs):
     """
     Compile Fortran extentions
     """
@@ -27,7 +27,7 @@ def build_fext():
     cwd = os.getcwd()
     os.chdir(os.path.dirname(__file__))
     if not os.path.exists('rspectra.so'):
-        fopt = shlex.split(configure()[0].f2py_flags)
+        fopt = shlex.split(configure(**kwargs)[0].f2py_flags)
         ext = [Extension('rspectra', ['rspectra.f90'], f2py_options=fopt)]
         setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
     os.chdir(cwd)
@@ -59,6 +59,7 @@ class s_(object):
     """
     def __getitem__(self, item):
         return item
+s_ = s_()
 
 
 def prune(d, pattern=None, types=None):
@@ -213,13 +214,7 @@ def configure(module=None, machine=None, save_site=False, **kwargs):
     Module and machine names correspond to subdirectories of the conf folder
     that contain configuration parameters in a file conf.py.
     """
-    import os, sys, getopt
-
-    # command line arguments
-    if 'argv' in kwargs:
-        argv = kwargs['argv']
-    else:
-        argv = sys.argv[1:]
+    import os, getopt
 
     path = os.path.dirname(__file__)
     job = {'module': module}
@@ -256,9 +251,9 @@ def configure(module=None, machine=None, save_site=False, **kwargs):
 
     # function parameters
     kwargs = kwargs.copy()
-    for k, v in kwargs.copy().iteritems():
+    for k in kwargs.copy():
         if k in job:
-            job[k] = v
+            job[k] = kwargs[k]
             del(kwargs[k])
 
     # command line parameters
@@ -267,7 +262,7 @@ def configure(module=None, machine=None, save_site=False, **kwargs):
         short, long = zip(*options)[:2]
     else:
         short, long = [], []
-    opts = getopt.getopt(argv, ''.join(short), long)[0]
+    opts = getopt.getopt(job['argv'], ''.join(short), long)[0]
     short = [s.rstrip(':') for s in short]
     long = [l.rstrip('=') for l in long]
     for opt, val in opts:

@@ -4,26 +4,20 @@ Support Operator Rupture Dynamics
 from . import fieldnames
 from ..util import launch
 
-def _build(mode=None, optimize=None, dtype=None):
+def _build(job=None):
     """
     Build SORD code.
     """
     import os, shlex
     import numpy as np
     from .. import util
-    cf = util.configure()[0]
 
-    # arguments
-    if not optimize:
-        optimize = cf.optimize
-    if not mode:
-        mode = cf.mode
-    if not mode:
-        mode = 'sm'
-    if not dtype:
-        dtype = cf.dtype
-
-    dtype = np.dtype(dtype).str
+    # configure
+    if job == None:
+        job = util.configure()[0]
+    if not job.mode:
+        job.mode = 'sm'
+    dtype = np.dtype(job.dtype).str
     dsize = dtype[-1]
     new = False
 
@@ -66,31 +60,31 @@ def _build(mode=None, optimize=None, dtype=None):
     ]
 
     # serial compile
-    if 's' in mode:
+    if 's' in job.mode:
         source = base + ['serial.f90'] + common
-        for opt in optimize:
+        for opt in job.optimize:
             object_ = bld + 'sord-s' + opt + dsize
             cmd = (
-                [cf.fortran_serial] +
-                shlex.split(cf.fortran_flags['f']) +
-                shlex.split(cf.fortran_flags[opt])
+                [job.fortran_serial] +
+                shlex.split(job.fortran_flags['f']) +
+                shlex.split(job.fortran_flags[opt])
             )
-            if dtype != cf.dtype_f:
-                cmd += shlex.split(cf.fortran_flags[dsize])
+            if dtype != job.dtype_f:
+                cmd += shlex.split(job.fortran_flags[dsize])
             new |= util.make(cmd + ['-o'], object_, source)
 
     # mpi compile
-    if 'm' in mode and cf.fortran_mpi:
+    if 'm' in job.mode and job.fortran_mpi:
         source = base + ['mpi.f90'] + common
-        for opt in optimize:
+        for opt in job.optimize:
             object_ = bld + 'sord-m' + opt + dsize
             cmd = (
-                [cf.fortran_mpi] +
-                shlex.split(cf.fortran_flags['f']) +
-                shlex.split(cf.fortran_flags[opt])
+                [job.fortran_mpi] +
+                shlex.split(job.fortran_flags['f']) +
+                shlex.split(job.fortran_flags[opt])
             )
-            if dtype != cf.dtype_f:
-                cmd += shlex.split(cf.fortran_flags[dsize])
+            if dtype != job.dtype_f:
+                cmd += shlex.split(job.fortran_flags[dsize])
             new |= util.make(cmd + ['-o'], object_, source)
 
     # archive source code
@@ -207,7 +201,7 @@ def stage(dictargs={}, **kwargs):
     # compile code
     if not job.prepare:
         return job
-    _build(job.mode, job.optimize, job.dtype)
+    _build(job)
 
     # create run directory
     stagein = os.path.join(path, '..', 'build', job.command),

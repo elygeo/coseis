@@ -15,7 +15,7 @@ def test_conf():
             if machine is None or os.path.isdir(machine):
                 print(80 * '-')
                 print machine
-                job = cst.util.configure(module=module, machine=machine)[0]
+                job = cst.util.configure(module=module, machine=machine, argv=[])[0]
                 job = cst.util.prepare(job, rundir='tmp', command='date', run='exec', mode='s')
                 cst.util.skeleton(job)
                 print(job.__doc__)

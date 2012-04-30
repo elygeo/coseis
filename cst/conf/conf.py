@@ -1,7 +1,7 @@
 """
 Coseis configuration
 """
-import os, pwd
+import os, sys, pwd
 import numpy as np
 
 # email address
@@ -51,7 +51,7 @@ launch = {
 }
 
 # command line options
-argv = []
+argv = sys.argv[1:]
 options = [
     ('',  'machine=',    'machine',  ''),
     ('v', 'verbose',     'verbose',  True),
