@@ -24,7 +24,7 @@ launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
     'm_exec':  'cobalt-mpirun -np {nproc} {command}',
-    'submit':  'qsub -n {nnode} --proccount {nproc} --mode c16 -t {minutes} -A {project} --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE {name}.sh',
-    'submit2': 'qsub -n {nnode} --proccount {nproc} --mode c16 -t {minutes} -A {project} --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE --dependenices {depend} "{name}.sh"',
+    'submit':  'qsub -n {nnode} --proccount {nproc} --mode c16 -t {minutes} -A {project} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 {name}.sh',
+    'submit2': 'qsub -n {nnode} --proccount {nproc} --mode c16 -t {minutes} -A {project} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --dependenices {depend} "{name}.sh"',
 }
 

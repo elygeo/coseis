@@ -17,14 +17,14 @@ for k, v in opts:
         machine = os.path.basename(opts[0][1])
 
 # configure
-cf = cst.util.configure(None, machine, save_site=True)[0]
-if machine or cf.verbose:
-    print(cf.__doc__)
-if cf.verbose:
-    print(cf.__doc__)
-    cf = cf.__dict__
-    del cf['__doc__']
-    pprint.pprint(cf)
+job = cst.util.configure(None, machine, save_site=True)[0]
+if machine or job.verbose:
+    print(job.__doc__)
+if job.verbose:
+    print(job.__doc__)
+    job = job.__dict__
+    del job['__doc__']
+    pprint.pprint(job)
 
 # choose a task
 for target in args:
