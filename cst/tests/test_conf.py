@@ -1,11 +1,9 @@
-#!/usr/bin/env python
-import os, shutil, pprint
-import cst
-
 def test_conf():
     """
     Test configuration modules and machines
     """
+    import os, shutil, pprint
+    import cst
     cwd = os.getcwd()
     os.chdir(os.path.join(cst.path, 'conf'))
     modules = None, 'cvms'

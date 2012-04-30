@@ -1,5 +1,5 @@
 """
-Visualization utilities
+Visualization tools.
 """
 
 def distill_eps(fh, mode=None):

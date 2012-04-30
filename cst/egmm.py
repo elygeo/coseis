@@ -1,5 +1,5 @@
 """
-EGMM - Empirical Ground Motion Model
+Empirical Ground Motion Model (EGMM) tools.
 """
 
 def cbnga(T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb):

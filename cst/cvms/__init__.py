@@ -15,7 +15,7 @@ input_template = """\
 {file_vs}
 """
 
-def _build(mode=None, optimize=None, version=None):
+def _build(job=None):
     """
     Build CVM-S code.
     """
@@ -23,17 +23,12 @@ def _build(mode=None, optimize=None, version=None):
     from .. import util, data
 
     # configure
-    cf = util.configure('cvms')[0]
-    if not mode:
-        mode = cf.mode
-    if not mode:
-        mode = 'asm'
-    if not optimize:
-        optimize = cf.optimize
-    if not version:
-        version = cf.version
-    assert version in ('2.2', '3.0', '4.0')
-    ver = 'cvms-' + version
+    if job==None:
+        job = util.configure('cvms')[0]
+    if not job.mode:
+        job.mode = 'asm'
+    assert job.version in ('2.2', '3.0', '4.0')
+    ver = 'cvms-' + job.version
 
     # download source code
     url = 'http://earth.usc.edu/~gely/cvm-data/%s.tgz' % ver
@@ -59,22 +54,22 @@ def _build(mode=None, optimize=None, version=None):
 
     # compile ascii, binary, and MPI versions
     new = False
-    if 'a' in mode:
-        source = 'iotxt.f', 'version%s.f' % version
-        for opt in optimize:
-            compiler = [cf.fortran_serial] + shlex.split(cf.fortran_flags[opt]) + ['-o']
+    if 'a' in job.mode:
+        source = 'iotxt.f', 'version%s.f' % job.version
+        for opt in job.optimize:
+            compiler = [job.fortran_serial] + shlex.split(job.fortran_flags[opt]) + ['-o']
             object_ = 'cvms-a' + opt
             new |= util.make(compiler, object_, source)
-    if 's' in mode:
-        source = 'iobin.f', 'version%s.f' % version
-        for opt in optimize:
-            compiler = [cf.fortran_serial] + shlex.split(cf.fortran_flags[opt]) + ['-o']
+    if 's' in job.mode:
+        source = 'iobin.f', 'version%s.f' % job.version
+        for opt in job.optimize:
+            compiler = [job.fortran_serial] + shlex.split(job.fortran_flags[opt]) + ['-o']
             object_ = 'cvms-s' + opt
             new |= util.make(compiler, object_, source)
-    if 'm' in mode and cf.fortran_mpi:
-        source = 'iompi.f', 'version%s.f' % version
-        for opt in optimize:
-            compiler = [cf.fortran_mpi] + shlex.split(cf.fortran_flags[opt]) + ['-o']
+    if 'm' in job.mode and job.fortran_mpi:
+        source = 'iompi.f', 'version%s.f' % job.version
+        for opt in job.optimize:
+            compiler = [job.fortran_mpi] + shlex.split(job.fortran_flags[opt]) + ['-o']
             object_ = 'cvms-m' + opt
             new |= util.make(compiler, object_, source)
     os.chdir(cwd)
@@ -108,7 +103,7 @@ def stage(inputs={}, **kwargs):
     # build
     if not job.prepare:
         return job
-    _build(job.mode, job.optimize, job.version)
+    _build(job)
 
     # check minimum processors needed for compiled memory size
     path = os.path.dirname(__file__)

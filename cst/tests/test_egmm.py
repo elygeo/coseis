@@ -1,13 +1,11 @@
 #!/usr/bin/env ipython -i --gui=wx
-import os
-import numpy as np
-import matplotlib.pyplot as plt
-import cst
-
 def test_egmm():
     """
     Test CBNGA for comparison with OpenSHA Attenuation Relationship Plotter
     """
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import cst
 
     T = 10
     T = 1

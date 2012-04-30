@@ -1,8 +1,5 @@
 """
-Analytical solution for a circular crack expanding at a uniform rupture
-velocity.
-
-See ../scritps/kostrov/ for example usage.
+Kostrov circular expanding crack analytical solution.
 """
 
 def cee_integrand(x, a2, b2):

@@ -1,5 +1,5 @@
 """
-SCEC Community Velocity Model (CVM-H) extraction tool
+SCEC Community Velocity Model (CVM-H) tools.
 """
 
 # data repository location

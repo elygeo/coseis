@@ -1,13 +1,12 @@
 #!/usr/bin/env ipython -i --gui=wx
-import math
-import numpy as np
-import matplotlib.pyplot as plt
-from cst import signal
-
 def test_spectrum():
     """
     Test spectrum plot
     """
+    import math
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from cst import signal
 
     # parameters
     n = 3200

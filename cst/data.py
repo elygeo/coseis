@@ -1,6 +1,7 @@
 """
-Data utilities and sources
+Data retrieval and processing tools.
 """
+
 # TODO
 # Quaternary Fault Database
 # ftp://hazards.cr.usgs.gov/maps/qfault/

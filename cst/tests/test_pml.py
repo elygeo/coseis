@@ -1,12 +1,10 @@
-#!/usr/bin/env python
-import shutil
-import numpy as np
-import cst
-
-def test_point():
+def test_pml():
     """
-    Test SORD parallelization with point source
+    Test SORD parallelization with PML
     """
+    import shutil
+    import numpy as np
+    import cst
 
     # parameters
     dtype = 'f'
@@ -15,15 +13,14 @@ def test_point():
     force = True
     debug = 0
     itstats = 1
-    shape = 5, 4, 2, 2
+    shape = 21, 21, 21, 11
     delta = 100.0, 100.0, 100.0, 0.0075
-    bc1 = 0, 0, 0
-    bc2 = 0, 0, 0
+    bc1 = 10, 10, 10
+    bc2 = 10, 10, 10
 
     # source
     source = 'potency'
-    ihypo = 1.5, 1.5, 1.5
-    ihypo = 3.0, 1.5, 1.5
+    ihypo = 11, 11, 11
     source1 = 1e10, 1e10, 1e10
     source2 =  0.0,  0.0,  0.0
     pulse = 'delta'
@@ -47,7 +44,7 @@ def test_point():
 
     # multiple processes
     max_err_all_ = 0.0
-    for i, nproc3 in enumerate([(3, 1, 1), (2, 2, 1)]):
+    for i, nproc3 in enumerate([(4, 1, 1), (1, 2, 3)]):
         rundir = 'tmp/%s' % i
         cst.sord.run(locals())
         max_err_ = 0.0
@@ -71,5 +68,5 @@ def test_point():
 
 # continue if command line
 if __name__ == '__main__':
-    test_point()
+    test_pml()
 

@@ -1,7 +1,9 @@
-import doctest
-import cst
-
 def test_doctest():
+    """
+    Test with doctest.
+    """
+    import doctest
+    import cst
     doctest.testmod(cst.coord)
     doctest.testmod(cst.sord)
     doctest.testmod(cst.util)

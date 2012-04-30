@@ -1,7 +1,5 @@
 """
-Utilities for accessing the Southern California Earthquake Data Center (SCEDC).
-
-http://www.data.scec.org/
+Southern California Earthquake Data Center (SCEDC) tools.
 """
 
 class stp():

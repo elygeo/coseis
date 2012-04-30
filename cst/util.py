@@ -1,5 +1,5 @@
 """
-Miscellaneous utilities
+Miscellaneous tools.
 """
 
 def build_ext():

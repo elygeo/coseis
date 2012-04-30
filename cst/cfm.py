@@ -1,5 +1,5 @@
 """
-SCEC Community Fault Model (CFM) utilities.
+SCEC Community Fault Model (CFM) tools.
 """
 
 # data repository location

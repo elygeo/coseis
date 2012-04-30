@@ -1,5 +1,5 @@
 """
-Signal processing utilities
+Signal processing tools.
 """
 
 def time_function(pulse, t, tau=1.0):

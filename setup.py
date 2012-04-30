@@ -29,9 +29,9 @@ if cf.verbose:
 # choose a task
 for target in args:
     if target == 'build_ext':
-        cst.build_ext()
+        cst.util.build_ext()
     elif target == 'build_fext':
-        cst.build_fext()
+        cst.util.build_fext()
     elif target == 'sord':
         cst.sord._build()
     elif target == 'cvms':
@@ -44,17 +44,15 @@ for target in args:
         cst.data.mapdata()
         cst.data.etopo1()
         cst.data.globe30()
-    elif target in ('test', 'tests', 'tests/'):
-        import nose
-        argv = ['', '--where=tests', '--verbose', '--with-doctest', '--exe']
-        nose.run(argv=argv)
     elif target == 'clean':
-        d = os.path.join(os.path.dirname(__file__), 'cst') + os.sep
-        for f in os.listdir(d):
-            if f == 'build':
-                shutil.rmtree(d + f)
-            if f.endswith('.pyc') or f.endswith('.so'):
-                os.unlink(d + f)
+        try:
+            shutil.rmtree('cst/build')
+        except OSError:
+            pass
+        for d in 'cst/', 'cst/sord/', 'cst/cvms/', 'cst/tests/':
+            for f in os.listdir(d):
+                if f.endswith('.pyc') or f.endswith('.so'):
+                    os.unlink(d + f)
     else:
         sys.exit('Unknown target')
 

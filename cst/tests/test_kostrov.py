@@ -1,12 +1,10 @@
-#!/usr/bin/env python
-import shutil
-import numpy as np
-import cst
-
 def test_kostrov():
     """
     Kostrov circular crack test.
     """
+    import shutil
+    import numpy as np
+    import cst
 
     # parameters
     dtype = 'f'

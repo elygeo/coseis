@@ -235,7 +235,7 @@ sudo apt-get install gfortran git
 brew install gfortran git
 </pre>
 </li>
-<li><p class="first">If you need MPI, <a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a> is recommended.</p>
+<li><p class="first">If you need MPI (for SORD of CVMS), <a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a> is recommended.</p>
 </li>
 <li><p class="first">For plotting and visualization, Enthought Python Distribution (<a class="reference external" href="http://www.enthought.com/products/epddownload.php">EPD</a>) is
 recommended.</p>
@@ -268,9 +268,15 @@ Each custom configuration is located in a separate sub-directory.  To create a
 new custom configuration, make a new sub-directory following the example of
 the supplied configurations.</p>
 </li>
-<li><p class="first">Compile component codes:</p>
+<li><p class="first">Build the components you need (options are: <tt class="docutils literal">sord</tt>, <tt class="docutils literal">cvms</tt>,
+<tt class="docutils literal">cvmh</tt>, <tt class="docutils literal">cfm</tt>, <tt class="docutils literal">rspectra</tt>, <tt class="docutils literal">mapdata</tt>). For example:</p>
 <pre class="literal-block">
-python setup.py build
+python setup.py sord cvmh cfm mapdata
+</pre>
+</li>
+<li><p class="first">You may want to run the test suite (requires <a class="reference external" href="http://readthedocs.org/docs/nose/">nose</a> testing framework):</p>
+<pre class="literal-block">
+nosetests
 </pre>
 </li>
 <li><p class="first">Finally, set path variables for the Pyhon module and executables. For bash

@@ -1,5 +1,5 @@
 """
-Source utilities
+Seismic source tools.
 """
 
 def magarea(A):

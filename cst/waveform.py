@@ -1,5 +1,5 @@
 """
-Tools for working with waveform data
+Waveform data tools.
 """
 
 def csmip_vol2(filename, max_year=2050):

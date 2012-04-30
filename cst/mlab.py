@@ -1,5 +1,5 @@
 """
-Mayavi utilities
+Mayavi visualization tools.
 """
 
 def colormap(*args, **kwargs):

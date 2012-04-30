@@ -135,10 +135,10 @@ libraries.
 
         python setup.py sord cvmh cfm mapdata
 
-7.  If building SORD, you may want to run the test suite:
+7.  You may want to run the test suite (requires nose_ testing framework):
     ::
 
-        python setup.py test 
+        nosetests
 
 8.  Finally, set path variables for the Pyhon module and executables. For bash
     shell, with the code located in your home directory (for example) add these
@@ -157,6 +157,7 @@ libraries.
 .. _SciPy:             http://www.scipy.org/
 .. _Mayavi:            http://code.enthought.com/projects/mayavi/
 .. _Matplotlib:        http://matplotlib.sourceforge.net/
+.. _nose:              http://readthedocs.org/docs/nose/
 
 
 Examples

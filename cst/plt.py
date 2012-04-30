@@ -1,5 +1,5 @@
 """
-Matplotlib utilities
+Matplotlib plotting tools.
 """
 
 def text(ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75, npmb=16, **kwargs):

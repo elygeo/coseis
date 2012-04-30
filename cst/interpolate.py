@@ -1,5 +1,5 @@
 """
-Interpolation routines
+Interpolation tools.
 """
 
 def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):

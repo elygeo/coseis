@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-import os, compiler, glob
-import cst
+import os, glob
 
 exclude = 'ws-meta-in.py',
 include = (
@@ -17,12 +15,13 @@ include = (
 
 def test_syntax():
     """
-    Test code syntax
+    Test code syntax.
     """
+    incl = include + ('cst/tests/*.py',)
     cwd = os.getcwd()
-    top = os.path.join(os.path.dirname(__file__), '..')
+    top = os.path.join(os.path.dirname(__file__), '..', '..')
     os.chdir(top)
-    for p in include:
+    for p in incl:
         for f in glob.glob(p):
             if os.path.basename(f) in exclude:
                 continue
@@ -37,7 +36,7 @@ def test_with_pyflakes():
     """
     import _ast, pyflakes.checker
     cwd = os.getcwd()
-    top = os.path.join(os.path.dirname(__file__), '..')
+    top = os.path.join(os.path.dirname(__file__), '..', '..')
     os.chdir(top)
     msg = []
     for p in include:

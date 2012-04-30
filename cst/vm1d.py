@@ -1,5 +1,5 @@
 """
-1D velocity models
+1D velocity model tools.
 """
 
 def vs30gtl(vs30, vt, z, zt=350.0, a=0.5, b=2.0/3.0, c=1.5):

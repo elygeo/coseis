@@ -1,5 +1,5 @@
 """
-Coordinate conversions
+Coordinate conversion tools.
 """
 
 rearth = 6370000.0
