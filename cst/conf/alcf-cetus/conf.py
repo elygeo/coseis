@@ -6,7 +6,7 @@ ALCF Cetus
 echo '+mpiwrapper-xl' >> .soft
 """
 login = hostname = '*.alcf.anl.gov'
-maxcores = 4
+maxcores = 16
 maxnodes = 1024
 maxram = 1000
 fortran_serial = 'xlf2008_r'
