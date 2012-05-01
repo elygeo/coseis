@@ -25,8 +25,15 @@ fortran_flags = {
 launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
-    'm_exec':  'cobalt-mpirun -np {nproc} {command}',
-    'submit':  'qsub -n {nnode} --proccount {nproc} --mode c16 -t {minutes} -A {project} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 {name}.sh',
-    'submit2': 'qsub -n {nnode} --proccount {nproc} --mode c16 -t {minutes} -A {project} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --dependenices {depend} "{name}.sh"',
+    'm_exec': 'runjob -p {ppn} -n {nproc} --verbose 2 --block $COBALT_PARTNAME' + \
+        '  --envs BG_SHAREDMEMSIZE=32MB --envs PAMI_VERBOSE=1' + \
+        '  ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE' + \
+        '  : {command}',
+    'submit': 'qsub -t {minutes} -n {nnode} -A {project}' + \
+        '  --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1' + \
+        '  --mode script "{name}.sh"',
+    'submit2': 'qsub -t {minutes} -n {nnode} -A {project}' + \
+        '  --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1' + \
+        '  --mode script --dependenices "{name}.sh"',
 }
 
