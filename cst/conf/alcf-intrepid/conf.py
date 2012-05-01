@@ -10,7 +10,7 @@ partlist
 --env LD_LIBRARY_PATH=/bgsys/drivers/ppcfloor/gnu-linux/lib /bgsys/drivers/ppcfloor/gnu-linux/bin/python
 
 """
-login = hostname = '*.alcf.anl.gov'
+login = hostname = '.*.alcf.anl.gov'
 maxcores = 4
 maxnodes = 40960
 maxram = 1900
