@@ -412,13 +412,14 @@ def prepare(job=None, **kwargs):
         # SU estimate and wall time limit with extra allowance
         if hasattr(job, 'seconds'):
             seconds = job.seconds * job.ppn // job.cores
-            minutes = 10 + seconds // 30
+            minutes = 10 + int(seconds // 30)
         else:
             seconds = 3600
             minutes = 60
         if job.maxtime:
             maxminutes = 60 * job.maxtime[0] + job.maxtime[1]
             minutes = min(minutes, maxminutes)
+        job.minutes = minutes
         job.walltime = '%d:%02d:00' % (minutes // 60, minutes % 60)
         sus = seconds // 3600 * job.totalcores + 1
 

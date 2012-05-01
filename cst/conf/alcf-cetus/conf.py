@@ -8,7 +8,7 @@ echo '+mpiwrapper-xl' >> .soft
 login = hostname = '*.alcf.anl.gov'
 maxcores = 16
 maxnodes = 1024
-maxram = 1000
+maxram = 15000
 fortran_serial = 'xlf2008_r'
 fortran_mpi = 'mpixlf2003_r'
 fortran_flags = {
@@ -29,10 +29,10 @@ launch = {
         '  --envs BG_SHAREDMEMSIZE=32MB --envs PAMI_VERBOSE=1' + \
         '  ${{COBALT_CORNER:+--corner}} $COBALT_CORNER ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE' + \
         '  : {command}',
-    'submit': 'qsub -t {minutes} -n {nnode} -A {project}' + \
+    'submit': 'qsub -t {minutes} -n {nodes} -A {account}' + \
         '  --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1' + \
         '  --mode script "{name}.sh"',
-    'submit2': 'qsub -t {minutes} -n {nnode} -A {project}' + \
+    'submit2': 'qsub -t {minutes} -n {nodes} -A {account}' + \
         '  --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1' + \
         '  --mode script --dependenices "{name}.sh"',
 }
