@@ -1,13 +1,16 @@
 Install Notes
 -------------
 
+Set the install directory and add it to your path:
+::
+
     PREFIX="$HOME/local"
+    export PATH="${PREFIX}/bin:${PATH}"
 
 MPICH2
 ::
 
-    export PATH="${PREFIX}/bin:${PATH}"
-    cd "${PREFIX}"
+    cd "${PREFIX:?}"
     curl -L http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/1.4.1p1/mpich2-1.4.1p1.tar.gz | tar zx
     cd mpich2-1.4.1p1
     ./configure -prefix="$PREFIX" --with-pm=gforker 
@@ -16,8 +19,7 @@ MPICH2
 Python
 ::
 
-    export PATH="${PREFIX}/bin:${PATH}"
-    cd "${PREFIX}"
+    cd "${PREFIX:?}"
     curl http://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz | tar zx
     cd Python-2.7.3
     ./configure --prefix="${PREFIX}"
@@ -34,8 +36,7 @@ Python
 Enthought Python Distributions (EPD)
 ::
     
-    export PATH="${PREFIX}/python/bin:${PATH}"
-    cd "${PREFIX}"
+    cd "${PREFIX:?}"
     curo -O http://download.enthought.com/epd_7.2/epd-7.2-2-rh5-x86_64.sh
     bash epd-7.2-2-rh5-x86_64.sh
     ln -s epd-7.2-2-rh5-x86_64 python
@@ -48,7 +49,6 @@ Enthought Python Distributions (EPD) - Max OSX
     
     curl -O http://download.enthought.com/epd_7.2/epd-7.2-2-macosx-i386.dmg
     curl -O http://download.enthought.com/epd_7.2/epd-7.2-2-macosx-x86_64.dmg
-    export PATH="/Library/Frameworks/Python.framework/Versions/Current/bin:${PATH}"
 
 Analysis and plotting
 ::
@@ -71,10 +71,9 @@ Analysis and plotting
     pip install obspy.imaging
     pip install obspy.signal
 
-
 CMake
 ::
-    cd "${PREFIX}"
+    cd "${PREFIX:?}"
     curl http://www.cmake.org/files/v2.8/cmake-2.8.5.tar.gz | tar zx
     cd cmake-2.8.5
     bash bootstrap --prefix="${PREFIX}"
@@ -82,7 +81,7 @@ CMake
 
 VTK
 ::
-    cd "${PREFIX}"
+    cd "${PREFIX:?}"
     curl http://www.vtk.org/files/release/5.6/vtk-5.6.1.tar.gz | tar zx
     cd VTK
     mkdir build

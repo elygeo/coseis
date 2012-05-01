@@ -3,6 +3,7 @@ ALCF
 
 bg-listjobs
 partlist
+cbank
 
 /intrepid-fs0/
 
@@ -11,8 +12,8 @@ partlist
 
 """
 login = hostname = '.*.alcf.anl.gov'
-maxcores = 4
 maxnodes = 40960
+maxcores = 4
 maxram = 1900
 queue = 'prod'
 queue_opts = [
@@ -34,8 +35,8 @@ fortran_flags = {
 launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
-    'm_exec':  'cobalt-mpirun -np {nproc} {command}',
-    'submit':  'qsub -q {queue} -n {nproc} -t {minutes} {name}.sh',
-    'submit2': 'qsub -q {queue} -n {nproc} -t {minutes} --dependenices {depend} "{name}.sh"',
+    'm_exec':  'cobalt-mpirun --mode vn -np {nproc} --verbose 2 {command}',
+    'submit':  'qsub -q {queue} -n {nproc} -t {minutes} --mode script {name}.sh',
+    'submit2': 'qsub -q {queue} -n {nproc} -t {minutes} --mode script --dependenices {depend} "{name}.sh"',
 }
 
