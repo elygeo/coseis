@@ -2,7 +2,7 @@
 ALCF Cetus
 
 echo '+mpiwrapper-xl' >> .soft
-/cetus-fs0/
+/gpfs/veas-fs0/
 """
 login = 'cetus.alcf.anl.gov'
 hostname = 'cetuslac1'
