@@ -1,7 +1,5 @@
 #!/bin/sh
 
-# {queue} {name} {nodes} {walltime} {rundir} {email}
-
 cd "{rundir}"
 set > env
 

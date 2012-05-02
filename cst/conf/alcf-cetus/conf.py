@@ -3,6 +3,10 @@ ALCF Cetus
 
 echo '+mpiwrapper-xl' >> .soft
 /gpfs/veas-fs0/
+cbank
+
+VPROF_PROFILE=yes
+/home/morozov/fixes/libc.a
 """
 login = 'cetus.alcf.anl.gov'
 hostname = 'cetuslac1'
