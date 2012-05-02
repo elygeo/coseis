@@ -27,7 +27,7 @@ fortran_flags = {
     '8': '-qrealsize=8',
 }
 launch = {
-    's_exec':  '{command}',
+    's_exec': '{command}',
     's_debug': 'gdb {command}',
     'm_exec': 'runjob -p {ppn} -n {nproc} --verbose 2 --block $COBALT_PARTNAME' + \
         '  --envs BG_SHAREDMEMSIZE=32MB --envs PAMI_VERBOSE=1' + \
