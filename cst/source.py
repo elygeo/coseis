@@ -327,16 +327,17 @@ class srf():
         with open(path + 'w11.bin', 'wb') as f11:
          with open(path + 'w23.bin', 'wb') as f22:
           with open(path + 'w33.bin', 'wb') as f33:
-           with open(path + 'w23.bin', 'wb') as f23:
-            with open(path + 'w31.bin', 'wb') as f31:
-             with open(path + 'w12.bin', 'wb') as f12:
-                for p, i in (p1, i1), (p2, i2), (p3, i3):
-                    p[0,0,i].astype(f_).tofile(f11)
-                    p[0,1,i].astype(f_).tofile(f22)
-                    p[0,2,i].astype(f_).tofile(f33)
-                    p[1,0,i].astype(f_).tofile(f23)
-                    p[1,1,i].astype(f_).tofile(f31)
-                    p[1,2,i].astype(f_).tofile(f12)
+            for p, i in (p1, i1), (p2, i2), (p3, i3):
+                p[0,0,i].astype(f_).tofile(f11)
+                p[0,1,i].astype(f_).tofile(f22)
+                p[0,2,i].astype(f_).tofile(f33)
+        with open(path + 'w23.bin', 'wb') as f23:
+         with open(path + 'w31.bin', 'wb') as f31:
+          with open(path + 'w12.bin', 'wb') as f12:
+            for p, i in (p1, i1), (p2, i2), (p3, i3):
+                p[1,0,i].astype(f_).tofile(f23)
+                p[1,1,i].astype(f_).tofile(f31)
+                p[1,2,i].astype(f_).tofile(f12)
         del(p1, p2, p3)
 
         # time history
