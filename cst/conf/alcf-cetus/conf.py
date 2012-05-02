@@ -13,7 +13,7 @@ hostname = 'cetuslac1'
 maxcores = 16
 maxnodes = 1024
 maxram = 15000
-fortran_serial = 'xlf2008_r'
+fortran_serial = 'bgxlf2008_r'
 fortran_mpi = 'mpixlf2003_r'
 fortran_flags = {
     'f': '-u -qsuppress=cmpmsg -qlanglvl=2003pure -qsuffix=f=f90',
