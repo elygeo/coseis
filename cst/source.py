@@ -285,10 +285,9 @@ class srf():
         i1 = self.nt1 > 0
         i2 = self.nt2 > 0
         i3 = self.nt3 > 0
-        f1 = open(path + 'nt.bin', 'wb')
-        f2 = open(path + 'dt.bin', 'wb')
-        f3 = open(path + 't0.bin', 'wb')
-        with f1, f2, f3:
+        with open(path + 'nt.bin', 'wb') as f1:
+         with open(path + 'dt.bin', 'wb') as f2:
+          with open(path + 't0.bin', 'wb') as f3:
             self.nt1[i1].astype(i_).tofile(f1)
             self.nt2[i2].astype(i_).tofile(f1)
             self.nt3[i3].astype(i_).tofile(f1)
@@ -308,10 +307,9 @@ class srf():
         x = 1.0 + x / delta[0]
         y = 1.0 + y / delta[1]
         z = 1.0 + z / delta[2]
-        f1 = open(path + 'xi1.bin', 'wb')
-        f2 = open(path + 'xi2.bin', 'wb')
-        f3 = open(path + 'xi3.bin', 'wb')
-        with f1, f2, f3:
+        with open(path + 'xi1.bin', 'wb') as f1:
+         with open(path + 'xi2.bin', 'wb') as f2:
+          with open(path + 'xi3.bin', 'wb') as f3:
             for i in i1, i2, i3:
                 x[i].astype(f_).tofile(f1)
                 y[i].astype(f_).tofile(f2)
@@ -326,28 +324,26 @@ class srf():
         del(s1, s2, n)
 
         # tensor components
-        f11 = open(path + 'w11.bin', 'wb')
-        f22 = open(path + 'w23.bin', 'wb')
-        f33 = open(path + 'w33.bin', 'wb')
-        f23 = open(path + 'w23.bin', 'wb')
-        f31 = open(path + 'w31.bin', 'wb')
-        f12 = open(path + 'w12.bin', 'wb')
-        with f11, f22, f33, f23, f31, f12:
-            for p, i in (p1, i1), (p2, i2), (p3, i3):
-                p[0,0,i].astype(f_).tofile(f11)
-                p[0,1,i].astype(f_).tofile(f22)
-                p[0,2,i].astype(f_).tofile(f33)
-                p[1,0,i].astype(f_).tofile(f23)
-                p[1,1,i].astype(f_).tofile(f31)
-                p[1,2,i].astype(f_).tofile(f12)
+        with open(path + 'w11.bin', 'wb') as f11:
+         with open(path + 'w23.bin', 'wb') as f22:
+          with open(path + 'w33.bin', 'wb') as f33:
+           with open(path + 'w23.bin', 'wb') as f23:
+            with open(path + 'w31.bin', 'wb') as f31:
+             with open(path + 'w12.bin', 'wb') as f12:
+                for p, i in (p1, i1), (p2, i2), (p3, i3):
+                    p[0,0,i].astype(f_).tofile(f11)
+                    p[0,1,i].astype(f_).tofile(f22)
+                    p[0,2,i].astype(f_).tofile(f33)
+                    p[1,0,i].astype(f_).tofile(f23)
+                    p[1,1,i].astype(f_).tofile(f31)
+                    p[1,2,i].astype(f_).tofile(f12)
         del(p1, p2, p3)
 
         # time history
         i1 = 0
         i2 = 0
         i3 = 0
-        fh = open(path + 'history.bin', 'wb')
-        with fh:
+        with open(path + 'history.bin', 'wb') as fh:
             for i in range(self.nsource):
                 n = self.nt1[i]
                 s = self.sv1[i1:i1+n].cumsum() * self.dt[i]
