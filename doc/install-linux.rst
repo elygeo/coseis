@@ -7,15 +7,6 @@ Set the install directory and add it to your path:
     PREFIX="$HOME/local"
     export PATH="${PREFIX}/bin:${PATH}"
 
-MPICH2
-::
-
-    cd "${PREFIX:?}"
-    curl -L http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/1.4.1p1/mpich2-1.4.1p1.tar.gz | tar zx
-    cd mpich2-1.4.1p1
-    ./configure -prefix="$PREFIX" --with-pm=gforker 
-    make install
-
 Python
 ::
 
@@ -26,43 +17,18 @@ Python
     make install
     curl -O http://python-distribute.org/distribute_setup.py
     ./python distribute_setup.py
-    easty_install pip
+    easy_install pip
     pip install numpy
     pip install configobj
     pip install nose
     pip install GitPython
     pip install pyflakes
 
-Enthought Python Distributions (EPD)
-::
-    
-    cd "${PREFIX:?}"
-    curo -O http://download.enthought.com/epd_7.2/epd-7.2-2-rh5-x86_64.sh
-    bash epd-7.2-2-rh5-x86_64.sh
-    ln -s epd-7.2-2-rh5-x86_64 python
-    easty_install pip
-    pip install GitPython
-    pip install pyflakes
-
-Enthought Python Distributions (EPD) - Max OSX
-::
-    
-    curl -O http://download.enthought.com/epd_7.2/epd-7.2-2-macosx-i386.dmg
-    curl -O http://download.enthought.com/epd_7.2/epd-7.2-2-macosx-x86_64.dmg
-
 Analysis and plotting
 ::
 
-    ++ libjpeg
-    ++ wxpython
-    ++ pip install ipython
-    ++ pip install matplotlib
-    ++ pip install scipy
-    ++ pip install PIL
     + pip install pyproj
     + pip install 'Mayavi[app]'
-    + zlib
-    + vtk
     pip install pypdf
     pip install obspy.core
     pip install obspy.mseed

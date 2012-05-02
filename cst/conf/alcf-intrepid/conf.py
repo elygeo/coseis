@@ -29,7 +29,7 @@ fortran_flags = {
     'g': '-C -qflttrap -O0 -g',
     't': '-C -qflttrap',
     'p': '-O -p',
-    'O': '-O4 -qarch=450d -qtune=450',
+    'O': '-O -qarch=450d -qtune=450',
     '8': '-qrealsize=8',
 }
 launch = {
