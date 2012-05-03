@@ -1,1 +1,0 @@
-rundir = 'run'
