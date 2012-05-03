@@ -12,10 +12,9 @@ def dotvv(a, b, check=True):
     numpy.dot, broadcasting rules only apply component-wise, so components may be a
     mix of scalars and numpy arrays of any shape compatible for broadcasting.
     """
-    import sys
     n = len(a)
     if check and n > 8:
-        sys.exit('Too large. Use numpy.dot')
+        raise Exception('Too large. Use numpy.dot')
     c = 0.0
     for i in range(n):
         c += a[i] * b[i]
@@ -29,11 +28,10 @@ def dotmv(A, b, check=True):
     numpy.dot, broadcasting rules only apply component-wise, so components may be a
     mix of scalars and numpy arrays of any shape compatible for broadcasting.
     """
-    import sys
     m = len(A)
     n = len(A[0])
     if check and m * n > 64:
-        sys.exit('Too large. Use numpy.dot')
+        raise Exception('Too large. Use numpy.dot')
     C = []
     for j in range(m):
         c = 0.0
@@ -50,12 +48,11 @@ def dotmm(A, B, check=True):
     numpy.dot, broadcasting rules only apply component-wise, so components may be a
     mix of scalars and numpy arrays of any shape compatible for broadcasting.
     """
-    import sys
     m = len(A)
     n = len(B[0])
     p = len(B)
     if check and m * n * p > 512:
-        sys.exit('Too large. Use numpy.dot')
+        raise Exception('Too large. Use numpy.dot')
     D = []
     for j in range(m):
         C = []

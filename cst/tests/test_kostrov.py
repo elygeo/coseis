@@ -10,7 +10,6 @@ def test_kostrov():
     dtype = 'f'
     run = 'exec'
     argv = []
-    force = True
     nproc3 = 1, 1, 2
     delta = 100.0, 100.0, 100.0, 0.0075
     shape = 51, 51, 24, 200

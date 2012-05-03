@@ -231,7 +231,7 @@ def dem(extent, scale=1.0, downsample=0, mesh=False):
     topo: Elevation array z or if mesh == True (lon, lat, z) arrays.
     extent: Extent of z array possibly larger than requested extent.
     """
-    import sys, math
+    import math
     import numpy as np
     x, y = extent
     if downsample > 0:
@@ -258,7 +258,7 @@ def dem(extent, scale=1.0, downsample=0, mesh=False):
         if tile0 != tile1:
             print('Multiple tiles not implemented.')
             print('Try ETOPO1 (downsample=1) or manually assemble tiles.')
-            sys.exit()
+            raise Exception
         j0, j1 = j0 % n, j1 % n
         k0, k1 = k0 % n, k1 % n
         z = globe30(tile0)[j0:j1+1,k0:k1+1]

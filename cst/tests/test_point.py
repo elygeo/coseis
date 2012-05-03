@@ -10,7 +10,6 @@ def test_point():
     dtype = 'f'
     run = 'exec'
     argv = []
-    force = True
     debug = 0
     itstats = 1
     shape = 5, 4, 2, 2

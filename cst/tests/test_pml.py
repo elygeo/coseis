@@ -10,7 +10,6 @@ def test_pml():
     dtype = 'f'
     run = 'exec'
     argv = []
-    force = True
     debug = 0
     itstats = 1
     shape = 21, 21, 21, 11

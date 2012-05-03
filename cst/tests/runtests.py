@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 import cst
+import pprint
 
-command = "nosetests --where=%s/tests" % cst.path
-job = cst.util.prepare(command=command, seconds=600, nproc=6, rundir='.')
+script = "nosetests --where=%s/tests" % cst.path
+job = cst.util.prepare(script=script, seconds=600, nproc=6)
 job.mode = 's'
-cst.util.launch(job)
+pprint.pprint(job.__dict__)
+#cst.util.launch(job)
 
