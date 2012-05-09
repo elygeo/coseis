@@ -2,10 +2,9 @@
 """
 Tally benchmarks
 """
-import os, glob
+import os, imp, glob
 import numpy as np
 import matplotlib.pyplot as plt
-import cst
 
 normalize = 0
 procs = []
@@ -13,7 +12,7 @@ times = []
 
 for path in glob.glob('run/[0-9]*'):
     path += os.sep
-    meta = cst.util.load(path + 'meta.py')
+    meta = imp.load_source('meta', path + 'meta.py')
     n = np.array(meta.nproc3)
     t = np.fromfile(path + 'prof/8step', 'f')
     procs.append(n.prod())

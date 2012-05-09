@@ -2,7 +2,7 @@
 """
 2d Semicircular canyon mesh
 """
-import os
+import os, math
 import numpy as np
 
 # parameters
@@ -16,7 +16,7 @@ dy0 = 0.5 * np.pi * r0 / (n2 - 1)
 dy1 = L / n
 
 # semicircle canyon
-f = np.linspace(0.0, 0.5 * np.pi, n2)
+f = np.linspace(0.0, 0.5 * math.pi, n2)
 x = np.empty([n1, n2])
 y = np.empty([n1, n2])
 x[0,:] = np.cos(f) * r0
@@ -45,7 +45,7 @@ y.T.astype('f').tofile(path + 'y.bin')
 # print mesh properties
 vp = 2.0
 dy = y[0,1] - y[0,0]
-dt = dy * 1.5 / vp / np.sqrt(3.0)
+dt = dy * 1.5 / vp / math.sqrt(3.0)
 print 'nn = ', (n1, n2)
 print 'nt > ', L / vp / dt
 print 'dt < ', dt

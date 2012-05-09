@@ -1,11 +1,10 @@
 #!/usr/bin/env python
-import os
+import os, imp
 import numpy as np
 import matplotlib.pyplot as plt
-import cst
 
 path = os.path.join('run', 'mesh') + os.sep
-meta = cst.util.load(path + 'meta.py')
+meta = imp.load_source(path + 'meta.py')
 shape = meta.shape
 extent = meta.extent
 lon, lat = extent[:2]

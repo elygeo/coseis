@@ -30,8 +30,8 @@ launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
     'm_exec':  'runjob -p {ppn} -n {nproc} --verbose 2 --block $COBALT_PARTNAME --envs BG_SHAREDMEMSIZE=32MB --envs PAMI_VERBOSE=1 ${{COBALT_CORNER:+--corner}} $COBALT_CORNER ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE : {command}',
-    'submit':  'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script "{script}"',
-    'submit2': 'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script --dependenices "{script}"',
+    'submit':  'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script "{name}.sh"',
+    'submit2': 'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script --dependenices "{name}.sh"',
     'subbin':  'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode c{ppn} --proccount {nproc} "{command}"',
     'subbin2': 'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode c{ppn} --proccount {nproc} --dependenices "{command}"',
 }

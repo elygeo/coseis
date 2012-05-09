@@ -183,7 +183,7 @@ def mts(eventid, path='scsn-mts-%s.py'):
     print('Retrieving %s' % url)
     text = urllib.urlopen(url)
     mts = dict(
-        url=url,
+        url = url,
         mts_units = 'Newton-meters',
         mts_coordinates ='(x, y, z) = (north, east, down)',
     )

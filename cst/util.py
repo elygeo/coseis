@@ -53,15 +53,6 @@ def archive():
         gzip.open(f, 'wb').write(tar)
 
 
-class s_(object):
-    """
-    This convenient for building slice objects
-    """
-    def __getitem__(self, item):
-        return item
-s_ = s_()
-
-
 def prune(d, pattern=None, types=None):
     """
     Delete dictionary keys with specified name pattern or types
@@ -176,76 +167,61 @@ def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
     return out
 
 
-def load(fh, d=None, prune_pattern=None, prune_types=None):
+class load():
     """
     Load variables from Python source files.
     """
-    import os
-    if isinstance(fh, basestring):
-        fh = open(os.path.expanduser(fh))
-    if d is None:
-        d = {}
-    exec fh in d
-    prune(d, prune_pattern, prune_types)
-    class obj:
-        pass
-    obj = obj()
-    obj.__dict__ = d
-    return obj
+    def __init__(self, fh, d=None, prune_pattern=None, prune_types=None):
+        import os
+        if isinstance(fh, basestring):
+            fh = open(os.path.expanduser(fh))
+        if d is not None:
+            d = {}
+        exec fh in d
+        prune(d, prune_pattern, prune_types)
+        self.__dict__ = d
+        return
 
 
-def configure(module=None, machine=None, save_site=False, **kwargs):
+def configure(modules=None, machine=None, save_site=False, **kwargs):
     """
-    Merge module, machine, keyword, and command line parameters.
+    Merge module, keyword, and command line parameters.
 
     Parameters
     ----------
-    module: module name
-    machine: machine name
+    modules: list of module names.
+    machine: machine name.
     save_site: save site specific parameters (machine, account)
     **kwargs: override parameters supplied as keyword arguments
 
     Returns
     -------
-    job: job configuration object containing merged module, kwarg, and machine
-        configuration parameters as object attributes
+    job: object containing merged parameters as object attributes.
     kwarg: dictionary containing unmatched parameters
-
-    Module and machine names correspond to subdirectories of the conf folder
-    that contain configuration parameters in a file conf.py.
     """
-    import os, getopt
+    import os, copy, getopt
+    from . import conf
 
-    path = os.path.dirname(__file__)
-    job = {'module': module}
+    # defaults
+    job = copy.deepcopy(conf.__dict__)
+    try:
+        from . import site
+    except ImportError:
+        pass
+    else:
+        job.update(site.__dict__)
 
-    # default parameters
-    f = os.path.join(path, 'conf', 'conf.py')
-    exec open(f) in job
-
-    # module parameters
-    if module:
-        job['name'] = module
-        f = os.path.join(path, 'conf', module + '.py')
-        exec open(f) in job
-
-    # site parameters
-    f = os.path.join(path, 'site.py')
-    if os.path.isfile(f):
-        exec open(f) in job
-
-    # machine parameters
+    # modules
+    if modules == None:
+        modules = []
     if machine:
         job['machine'] = machine
-    else:
-        machine = job['machine']
-    if machine:
-        f = os.path.join(path, 'conf', machine, 'conf.py')
-        exec open(f) in job
-
-    # per machine module specific parameters
-    if module:
-        k = module + '_'
+    if job['machine']:
+        modules += [job['machine']]
+    for m in modules:
+        job.update(__import__('conf.' + m, level=1).__dict__)
+    for m in modules:
+        k = m + '_'
         if k in job:
             job.update(job[k])
 
@@ -260,22 +236,20 @@ def configure(module=None, machine=None, save_site=False, **kwargs):
     options = job['options']
     if options:
         short, long = zip(*options)[:2]
-    else:
-        short, long = [], []
-    opts = getopt.getopt(job['argv'], ''.join(short), long)[0]
-    short = [s.rstrip(':') for s in short]
-    long = [l.rstrip('=') for l in long]
-    for opt, val in opts:
-        key = opt.lstrip('-')
-        if opt.startswith('--'):
-            i = long.index(key)
-        else:
-            i = short.index(key)
-        opt, key, cast = options[i][1:]
-        if opt[-1] in ':=':
-            job[key] = type(cast)(val)
-        else:
-            job[key] = cast
+        opts = getopt.getopt(job['argv'], ''.join(short), long)[0]
+        short = [s.rstrip(':') for s in short]
+        long = [l.rstrip('=') for l in long]
+        for opt, val in opts:
+            key = opt.lstrip('-')
+            if opt.startswith('--'):
+                i = long.index(key)
+            else:
+                i = short.index(key)
+            opt, key, cast = options[i][1:]
+            if opt[-1] in ':=':
+                job[key] = type(cast)(val)
+            else:
+                job[key] = cast
 
     # fortran flags
     if 'fortran_flags_default_' in job:

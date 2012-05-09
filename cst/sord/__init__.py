@@ -1,8 +1,25 @@
 """
 Support Operator Rupture Dynamics
 """
-from . import fieldnames
 from ..util import launch
+from . import fieldnames
+from . import parameters as _parameters
+
+class parameters(object):
+    def __init__(self):
+        import copy
+        for name in dir(_parameters):
+            if name[0] != '_':
+                value = copy.deepcopy(getattr(_parameters, name))
+                object.__setattr__(self, name, value)
+        return
+    def __setattr__(self, name, value):
+        if not hasattr(self, name):
+            raise TypeError('Unknown parameter: %r' % name)
+        if type(value) != type(getattr(self, name)):
+            raise TypeError('Wrong type for parameter: %r' % name)
+        object.__setattr__(self, name, value)
+        return
 
 def _build(job=None):
     """
@@ -95,38 +112,22 @@ def _build(job=None):
     os.chdir(cwd)
     return
 
-def stage(dictargs={}, **kwargs):
+def stage(dictargs=None, **kwargs):
     """
     Stage job
     """
     import os, glob, shutil, pprint
     import numpy as np
     from .. import util
+    from . import parameters
 
     print('\nSORD setup')
 
     # update inputs
     inputs = {'name': 'sord'}
-    inputs.update(dictargs)
+    if dictargs != None:
+        inputs.update(dictargs)
     inputs.update(kwargs)
-
-    # test for deprecated parameters
-    deprecated = [
-        ('np3', "Parameter 'np3' is renamed to 'nproc3'."),
-        ('nn',  "Parameter 'nn' deprecated. Use: shape = nx, ny, nz, nt."),
-        ('nt',  "Parameter 'nn' deprecated. Use: shape = nx, ny, nz, nt."),
-        ('dx',  "Parameter 'dx' deprecated. Use: delta = dx, dy, dz, dt."),
-        ('dt',  "Parameter 'dt' deprecated. Use: delta = dx, dy, dz, dt."),
-        ('period', "Parameter 'period' renamed to 'tau'."),
-        ('timefunction', "Parameter 'timefunction' renamed to 'pulse'."),
-    ]
-    error = None
-    for k, msg in deprecated:
-        if k in inputs:
-            print(msg)
-            error = True
-    if error:
-        raise Exception()
 
     # configure
     job, inputs = util.configure(**inputs)
@@ -137,14 +138,11 @@ def stage(dictargs={}, **kwargs):
         job.optimize = 'g'
 
     # read parameters
-    pm = {}
-    path = os.path.dirname(__file__)
-    f = os.path.join(path, 'parameters.py')
-    exec open(f) in pm
-    util.prune(pm)
+    prm = copy.deepcopy(parameters)
+    util.prune(prm)
     for k, v in inputs.copy().iteritems():
-        if k in pm:
-            pm[k] = v
+        if k in prm:
+            prm[k] = v
             del(inputs[k])
     if inputs:
         print('Unknown parameters:')
@@ -154,15 +152,15 @@ def stage(dictargs={}, **kwargs):
     class obj:
         pass
     obj = obj()
-    obj.__dict__ = pm
-    pm = prepare_param(obj)
+    obj.__dict__ = prm
+    prm = prepare_param(obj)
 
     # partition for parallelization
-    nx, ny, nz = pm.shape[:3]
+    nx, ny, nz = prm.shape[:3]
     n = job.maxnodes * job.maxcores
     if not job.mode and n == 1:
         job.mode = 's'
-    j, k, l = pm.nproc3
+    j, k, l = prm.nproc3
     if job.mode == 's':
         j, k, l = 1, 1, 1
     nl = [
@@ -170,13 +168,13 @@ def stage(dictargs={}, **kwargs):
         (ny - 1) // k + 1,
         (nz - 1) // l + 1,
     ]
-    i = abs(pm.faultnormal) - 1
+    i = abs(prm.faultnormal) - 1
     if i >= 0:
         nl[i] = max(nl[i], 2)
     j = (nx - 1) // nl[0] + 1
     k = (ny - 1) // nl[1] + 1
     l = (nz - 1) // nl[2] + 1
-    pm.nproc3 = j, k, l
+    prm.nproc3 = j, k, l
     job.nproc = j * k * l
     if not job.mode:
         job.mode = 's'
@@ -184,15 +182,15 @@ def stage(dictargs={}, **kwargs):
             job.mode = 'm'
 
     # resources
-    if pm.oplevel in (1, 2):
+    if prm.oplevel in (1, 2):
         nvars = 20
-    elif pm.oplevel in (3, 4, 5):
+    elif prm.oplevel in (3, 4, 5):
         nvars = 23
     else:
         nvars = 44
     nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
     job.pmem = 32 + int(1.2 * nm * nvars * int(job.dtype[-1]) / 1024 / 1024)
-    job.seconds = (pm.shape[3] + 10) * nm / job.rate
+    job.seconds = (prm.shape[3] + 10) * nm / job.rate
 
     # configure options
     job.command = os.path.join('.', 'sord-' + job.mode + job.optimize + job.dtype[-1])
@@ -204,6 +202,7 @@ def stage(dictargs={}, **kwargs):
     _build(job)
 
     # create run directory
+    path = os.path.dirname(__file__)
     stagein = os.path.join(path, '..', 'build', job.command),
     f = os.path.join(path, '..', 'build', 'coseis.tgz')
     if os.path.isfile(f):
@@ -211,9 +210,9 @@ def stage(dictargs={}, **kwargs):
     if job.optimize == 'g':
         for f in glob.glob(path + '/src/*.f90'):
             stagein += f,
-    if pm.debug > 2:
+    if prm.debug > 2:
         stagein += 'debug/',
-    if pm.itcheck != 0:
+    if prm.itcheck != 0:
         stagein += 'checkpoint/',
     stagein += 'prof/', 'stats/'
     stagein += tuple(job.stagein)
@@ -224,8 +223,8 @@ def stage(dictargs={}, **kwargs):
     # conf, parameter files
     cwd = os.path.realpath(os.getcwd())
     os.chdir(job.rundir)
-    delattr(pm, 'itbuff')
-    util.save('parameters.py', pm, expand=['fieldio'], header='# modelXX parameters\n')
+    delattr(prm, 'itbuff')
+    util.save('parameters.py', prm, expand=['fieldio'], header='# modelXX parameters\n')
     util.save('conf.py', job, header = '# configuration\n')
 
     # metadata
@@ -233,7 +232,7 @@ def stage(dictargs={}, **kwargs):
     indices = {}
     shapes = {}
     deltas = {}
-    for f in pm.fieldio:
+    for f in prm.fieldio:
         op, k = f[0], f[8]
         if k != '-':
             if 'wi' in op:
@@ -243,7 +242,7 @@ def stage(dictargs={}, **kwargs):
             deltas[k] = []
             for i, ii in enumerate(indices[k]):
                 n = (ii[1] - ii[0]) // ii[2] + 1
-                d = pm.delta[i] * ii[2]
+                d = prm.delta[i] * ii[2]
                 if n > 1:
                     shapes[k] += [n]
                     deltas[k] += [d]
@@ -257,7 +256,7 @@ def stage(dictargs={}, **kwargs):
         keep=['name', 'rundate', 'rundir', 'user', 'os_', 'dtype'],
     )
     meta += util.save(None,
-        pm,
+        prm,
         header = '\n# model parameters\n',
         expand=['fieldio'],
     )
@@ -270,7 +269,7 @@ def stage(dictargs={}, **kwargs):
 
     # return to initial directory
     os.chdir(cwd)
-    job.__dict__.update(pm.__dict__)
+    job.__dict__.update(prm.__dict__)
     return job
 
 def run(job=None, **kwargs):
@@ -384,25 +383,25 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
 
     return slices
 
-def prepare_param(pm):
+def prepare_param(prm):
     """
     Prepare input parameters
     """
     import os, math
 
     # checks
-    if pm.source not in ('potency', 'moment', 'force', 'none'):
-        raise Exception('Error: unknown source type %r' % pm.source)
+    if prm.source not in ('potency', 'moment', 'force', 'none'):
+        raise Exception('Error: unknown source type %r' % prm.source)
 
     # intervals
-    nt = pm.shape[3]
-    pm.itio = max(1, min(pm.itio, nt))
-    if pm.itcheck % pm.itio != 0:
-        pm.itcheck = (pm.itcheck // pm.itio + 1) * pm.itio
+    nt = prm.shape[3]
+    prm.itio = max(1, min(prm.itio, nt))
+    if prm.itcheck % prm.itio != 0:
+        prm.itcheck = (prm.itcheck // prm.itio + 1) * prm.itio
 
     # hypocenter coordinates
-    nn = pm.shape[:3]
-    xi = list(pm.ihypo)
+    nn = prm.shape[:3]
+    xi = list(prm.ihypo)
     for i in range(3):
         xi[i] = 0.0 + xi[i]
         if xi[i] == 0.0:
@@ -411,13 +410,13 @@ def prepare_param(pm):
             xi[i] = xi[i] + nn[i] + 1
         if xi[i] < 1.0 or xi[i] > nn[i]:
             raise Exception('Error: ihypo %s out of bounds' % xi)
-    pm.ihypo = tuple(xi)
+    prm.ihypo = tuple(xi)
 
     # rupture boundary conditions
-    nn = pm.shape[:3]
-    i1 = list(pm.bc1)
-    i2 = list(pm.bc2)
-    i = abs(pm.faultnormal) - 1
+    nn = prm.shape[:3]
+    i1 = list(prm.bc1)
+    i2 = list(prm.bc2)
+    i = abs(prm.faultnormal) - 1
     if i >= 0:
         irup = int(xi[i])
         if irup == 1:
@@ -426,27 +425,27 @@ def prepare_param(pm):
             i2[i] = -2
         if irup < 1 or irup > (nn[i] - 1):
             raise Exception('Error: ihypo %s out of bounds' % xi)
-    pm.bc1 = tuple(i1)
-    pm.bc2 = tuple(i2)
+    prm.bc1 = tuple(i1)
+    prm.bc2 = tuple(i2)
 
     # pml region
-    nn = pm.shape[:3]
+    nn = prm.shape[:3]
     i1 = [0, 0, 0]
     i2 = [nn[0]+1, nn[1]+1, nn[2]+1]
-    if pm.npml > 0:
+    if prm.npml > 0:
         for i in range(3):
-            if pm.bc1[i] == 10:
-                i1[i] = pm.npml
-            if pm.bc2[i] == 10:
-                i2[i] = nn[i] - pm.npml + 1
+            if prm.bc1[i] == 10:
+                i1[i] = prm.npml
+            if prm.bc2[i] == 10:
+                i2[i] = nn[i] - prm.npml + 1
             if i1[i] > i2[i]:
                 raise Exception('Error: model too small for PML')
-    pm.i1pml = tuple(i1)
-    pm.i2pml = tuple(i2)
+    prm.i1pml = tuple(i1)
+    prm.i2pml = tuple(i2)
 
     # i/o sequence
     fieldio = []
-    for line in pm.fieldio:
+    for line in prm.fieldio:
         line = list(line)
         filename = '-'
         pulse, val, tau = 'const', 1.0, 1.0
@@ -492,7 +491,7 @@ def prepare_param(pm):
             if field in fieldnames.fault:
                 if fields[0] not in fieldnames.fault:
                     raise Exception('Error: cannot mix fault and non-fault i/o: %r' % line)
-                if pm.faultnormal == 0:
+                if prm.faultnormal == 0:
                     raise Exception('Error: field only for ruptures: %r' % line)
 
         # cell or node registration
@@ -503,8 +502,8 @@ def prepare_param(pm):
             base = 1
 
         # indices
-        nn = pm.shape[:3]
-        nt = pm.shape[3]
+        nn = prm.shape[:3]
+        nt = prm.shape[3]
         if 'i' in mode:
             x1 = expand_slices(nn, ii[:3], base, round=False)
             x1 = tuple(i[0] + 1 - base for i in x1)
@@ -517,18 +516,18 @@ def prepare_param(pm):
         if field in fieldnames.initial:
             ii[3] = 0, 0, 1
         if field in fieldnames.fault:
-            i = abs(pm.faultnormal) - 1
+            i = abs(prm.faultnormal) - 1
             ii[i] = 2 * (irup,) + (1,)
 
         # buffer size
         shape = [(i[1] - i[0]) // i[2] + 1 for i in ii]
-        nb = (min(pm.itio, nt) - 1) // ii[3][2] + 1
+        nb = (min(prm.itio, nt) - 1) // ii[3][2] + 1
         nb = max(1, min(nb, shape[3]))
         n = shape[0] * shape[1] * shape[2]
         if n > (nn[0] + nn[1] + nn[2]) ** 2:
             nb = 1
         elif n > 1:
-            nb = min(nb, pm.itbuff)
+            nb = min(nb, prm.itbuff)
         nc = len(fields)
 
         # append to list
@@ -543,8 +542,8 @@ def prepare_param(pm):
             raise Exception('Error: duplicate filename: %r' % f[i])
 
     # done
-    pm.fieldio = fieldio
-    return pm
+    prm.fieldio = fieldio
+    return prm
 
 def test_fieldnames():
     f = fieldnames.all

@@ -2,7 +2,7 @@
 """
 WebSims setup
 """
-import os, sys, glob
+import os, sys, imp, glob
 import numpy as np
 import pyproj
 import cst
@@ -26,7 +26,7 @@ for path in glob.glob(sims):
     print path
 
     # meta data
-    meta = cst.util.load(path + 'meta.py')
+    meta = imp.load_source('meta', path + 'meta.py')
     shape = meta.shape
     delta = meta.delta
     extent = meta.extent

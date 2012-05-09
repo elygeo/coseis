@@ -2,7 +2,7 @@
 """
 Material model extraction from CVM
 """
-import os
+import os, imp
 import numpy as np
 import pyproj
 import cst
@@ -24,7 +24,7 @@ label = 'ch'
 # moment tensor source
 eventid = 14383980
 mts = os.path.join('run', 'data', '%s.mts.py' % eventid)
-mts = cst.util.load(mts)
+mts = imp.load_source('mts', mts)
 
 # mesh parameters
 rotate = None

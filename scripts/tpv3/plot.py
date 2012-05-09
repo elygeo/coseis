@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-import os, glob
+import os, imp, glob
 import numpy as np
 import matplotlib.pyplot as plt
-import cst
 
 # parameters
 stations = 'P1a', 'P2a'
@@ -16,7 +15,7 @@ for path in glob.glob(runs):
 
     # metadata
     path += os.sep
-    meta = cst.util.load(path + 'meta.py')
+    meta = imp.load_source('meta', path + 'meta.py')
     shape = meta.shape
     delta = meta.delta
     ihypo = meta.ihypo

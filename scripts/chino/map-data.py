@@ -2,7 +2,7 @@
 """
 Map plot
 """
-import os
+import os, imp
 import numpy as np
 import matplotlib.pyplot as plt
 import pyproj
@@ -13,7 +13,7 @@ import cst
 eventid = 14383980
 bounds = (-80000.0, 48000.0), (-58000.0, 54000.0)
 mts = os.path.join('run', 'data', '%s.mts.py' % eventid)
-mts = cst.util.load(mts)
+mts = imp.load_source('mts', mts)
 origin = mts.longitude, mts.latitude, mts.depth
 proj = pyproj.Proj(proj='tmerc', lon_0=origin[0], lat_0=origin[1])
 

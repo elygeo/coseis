@@ -10,18 +10,20 @@ if __name__ != '__main__':
     sys.exit('Error, not a module: %s' % __file__)
 
 # command line options
-opts, args = getopt.getopt(sys.argv[1:], 'v', ['verbose', 'machine='])
+opts, args = getopt.getopt(sys.argv[1:], 'v', ['verbose', 'machine=', 'account='])
 machine = None
 for k, v in opts:
+    print k, v
     if k == '--machine':
-        machine = os.path.basename(opts[0][1])
+        machine = os.path.basename(v)
+print machine
+asdf
 
 # configure
-job = cst.util.configure(None, machine, save_site=True)[0]
+job = cst.util.configure([machine], save_site=True)[0]
 if machine or job.verbose:
     print(job.__doc__)
 if job.verbose:
-    print(job.__doc__)
     job = job.__dict__
     del job['__doc__']
     pprint.pprint(job)

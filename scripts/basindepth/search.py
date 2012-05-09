@@ -2,16 +2,15 @@
 """
 Locate the shallowest 2D isosurface in a volume.
 """
-import os
+import os, imp
 import numpy as np
-import cst
 
 # parameters
 val = 2500.0
 cell = 0
 up = 0
-meta = os.path.join('run', 'mesh', 'meta.py')
-meta = cst.util.load(meta)
+f = os.path.join('run', 'mesh', 'meta.py')
+meta = imp.load_source('meta', f)
 delta = meta.delta
 shape = meta.shape
 

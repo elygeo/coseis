@@ -2,50 +2,50 @@
 """
 SORD simulation
 """
-import os, sys
+import os, sys, imp
 import numpy as np
 import pyproj
 import cst
+prm = cst.sord.parameters()
 s_ = cst.sord.s_
 
 # resolution and parallelization
-dx_ = 50.0;   nproc3 = 1, 32, 480; nstripe = 32
-dx_ = 100.0;  nproc3 = 1, 4, 240;  nstripe = 16
-dx_ = 200.0;  nproc3 = 1, 1, 120;  nstripe = 8
-dx_ = 500.0;  nproc3 = 1, 1, 2;    nstripe = 2
-dx_ = 1000.0; nproc3 = 1, 1, 2;    nstripe = 1
-dx_ = 4000.0; nproc3 = 1, 1, 1;    nstripe = 1
+dx = 50.0;   prm.nproc3 = 1, 32, 480; nstripe = 32
+dx = 100.0;  prm.nproc3 = 1, 4, 240;  nstripe = 16
+dx = 200.0;  prm.nproc3 = 1, 1, 120;  nstripe = 8
+dx = 500.0;  prm.nproc3 = 1, 1, 2;    nstripe = 2
+dx = 1000.0; prm.nproc3 = 1, 1, 2;    nstripe = 1
+dx = 4000.0; prm.nproc3 = 1, 1, 1;    nstripe = 1
 
 # I/O
-itstats = 10
-itio = nstripe * 100
-surf_out_ = True
-surf_out_ = False
+prm.itstats = 10
+prm.itio = nstripe * 100
+surf_out = True
+surf_out = False
 
 # surface topography
-surf_ = 'topo'
-surf_ = 'flat'
+surf = 'topo'
+surf = 'flat'
 
 # align receivers to mesh nodes
-register_ = True
-register_ = False
+register = True
+register = False
 
 # cvm version
-for cvm_ in 'cvms', 'cvmh', 'cvmg':
+for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # locations
-    mesh_ = 'ch%04.0f%s' % (dx_, cvm_[-1])
-    name = mesh_ + surf_[0]
-    rundir = os.path.join('run', 'sim', name)
+    mesh = 'ch%04.0f%s' % (dx, cvm[-1])
+    name = mesh + surf[0]
 
     # mesh metadata
-    mesh_ = os.path.join('run', 'mesh', mesh_) + os.sep
-    meta = cst.util.load(mesh_ + 'meta.py')
+    mesh = os.path.join('run', 'mesh', mesh) + os.sep
+    meta = imp.load_source(mesh + 'meta.py')
     dtype = meta.dtype
     delta = meta.delta
     shape = meta.shape
-    npml = meta.npml
-    hypo_ = meta.origin
+    hypo = meta.origin
+    prm.npml = meta.npml
 
     # translate projection to lower left origin
     x, y = meta.bounds[:2]
@@ -53,60 +53,60 @@ for cvm_ in 'cvms', 'cvmh', 'cvmg':
     proj = cst.coord.Transform(proj, translate=(-x[0], -y[0]))
 
     # dimensions
-    dt_ = dx_ / 16000.0
-    dt_ = dx_ / 20000.0
-    nt_ = int(90.0 / dt_ + 1.00001)
-    delta += (dt_,)
-    shape += (nt_,)
+    dt = dx / 16000.0
+    dt = dx / 20000.0
+    nt = int(90.0 / dt + 1.00001)
+    prm.delta = delta + (dt,)
+    prm.shape = shape + (nt,)
 
     # material
-    hourglass = 1.0, 1.0
-    vp1 = 1500.0
-    vs1 = 500.0
-    vdamp = 400.0
-    gam2 = 0.8
-    fieldio = [
+    prm.hourglass = 1.0, 1.0
+    prm.vp1 = 1500.0
+    prm.vs1 = 500.0
+    prm.vdamp = 400.0
+    prm.gam2 = 0.8
+    prm.fieldio = [
         ('=r', 'rho', [], 'hold/rho.bin'),
         ('=r', 'vp',  [], 'hold/vp.bin'),
         ('=r', 'vs',  [], 'hold/vs.bin'),
     ]
 
     # topography
-    if surf_ == 'topo':
-        fieldio += [
+    if surf == 'topo':
+        prm.fieldio += [
             ('=r', 'x3',  [], 'hold/z3.bin')
         ]
 
     # boundary conditions
-    bc1 = 10, 10, 0
-    bc2 = 10, 10, 10
+    prm.bc1 = 10, 10, 0
+    prm.bc2 = 10, 10, 10
 
     # source
-    source = 'moment'
-    pulse = 'brune'
-    mts_ = os.path.join('run', 'data', '14383980.mts.py')
-    m = cst.util.load(mts_)
+    prm.source = 'moment'
+    prm.pulse = 'brune'
+    mts = os.path.join('run', 'data', '14383980.mts.py')
+    m = imp.load_source(mts)
     d = m.double_couple_clvd
-    source1 =  d['myy'],  d['mxx'],  d['mzz']
-    source2 = -d['mxz'], -d['myz'],  d['mxy']
+    prm.source1 =  d['myy'],  d['mxx'],  d['mzz']
+    prm.source2 = -d['mxz'], -d['myz'],  d['mxy']
 
     # scaling law: fcorner = (dsigma / moment) ^ 1/3 * 0.42 * Vs,
     # dsigma = 4 MPa, Vs = 3900 m/s, tau = 0.5 / (pi * fcorner)
-    tau = 6e-7 * m.moment ** (1.0 / 3.0) # ~0.32, fcorner = 0.5Hz
+    prm.tau = 6e-7 * m.moment ** (1.0 / 3.0) # ~0.32, fcorner = 0.5Hz
 
     # hypocenter location at x/y center
-    x, y, z = hypo_
+    x, y, z = hypo
     x, y = proj(x, y)
     j = abs(x / delta[0]) + 1.0
     k = abs(y / delta[1]) + 1.0
     l = abs(z / delta[2]) + 1.0
-    if register_:
+    if register:
         l = int(l) + 0.5
-    ihypo = j, k, l
+    prm.ihypo = j, k, l
 
     # receivers
     stagein = 'hold/',
-    if register_:
+    if register:
         m = '=w'
     else:
         m = '=wi'
@@ -116,7 +116,7 @@ for cvm_ in 'cvms', 'cvmh', 'cvmg':
         x, y = proj(float(x), float(y))
         j = x / delta[0] + 1.0
         k = y / delta[1] + 1.0
-        fieldio += [
+        prm.fieldio += [
             (m, 'vs', [j,k,1,()], 'out/' + s + '-vs.bin'),
             (m, 'v1', [j,k,1,()], 'out/' + s + '-v1.bin'),
             (m, 'v2', [j,k,1,()], 'out/' + s + '-v2.bin'),
@@ -124,12 +124,12 @@ for cvm_ in 'cvms', 'cvmh', 'cvmg':
         ]
 
     # surface output
-    if surf_out_:
+    if surf_out:
         ns = max(1, max(shape[:3]) / 1024)
         nh = 4 * ns
-        mh = max(1, int(0.025 / dt_ + 0.5))
-        ms = max(1, int(0.125 / (dt_ * mh) + 0.5))
-        fieldio += [
+        mh = max(1, int(0.025 / dt + 0.5))
+        ms = max(1, int(0.125 / (dt * mh) + 0.5))
+        prm.fieldio += [
             ('=w', 'v1', s_[::ns,::ns,1,::mh], 'hold/full-v1.bin'),
             ('=w', 'v2', s_[::ns,::ns,1,::mh], 'hold/full-v2.bin'),
             ('=w', 'v3', s_[::ns,::ns,1,::mh], 'hold/full-v3.bin'),
@@ -143,53 +143,56 @@ for cvm_ in 'cvms', 'cvmh', 'cvmg':
 
     # cross section output
     if 0:
-        j, k, l = ihypo
+        j, k, l = prm.ihypo
         for f in 'v1', 'v2', 'v3', 'rho', 'vp', 'vs', 'gam':
-            fieldio += [
+            prm.fieldio += [
                 ('=w', f, s_[j,:,:,::10], 'hold/xsec-ns-%s.bin' % f),
                 ('=w', f, s_[:,k,:,::10], 'hold/xsec-ew-%s.bin' % f),
             ]
 
     # stage job
-    if cst.conf.configure()[0].machine == 'usc-hpc':
-        mpout = 0
-    job = cst.sord.stage(locals(), post='rm hold/z3.bin hold/rho.bin hold/vp.bin hold/vs.bin')
+    if cst.site.machine == 'usc-hpc':
+        prm.mpout = 0
+    job = cst.sord.stage(prm,
+        rundir = os.path.join('run', 'sim', name),
+        post = 'rm hold/z3.bin hold/rho.bin hold/vp.bin hold/vs.bin',
+    )
     if not job.prepare:
         sys.exit()
 
     # save metadata
-    path_ = job.rundir + os.sep
+    path = job.rundir + os.sep
     s = '\n'.join((
-        open(mesh_ + 'meta.py').read(),
-        open(mts_).read(),
-        open(path_ + 'meta.py').read(),
+        open(mesh + 'meta.py').read(),
+        open(mts).read(),
+        open(path + 'meta.py').read(),
     ))
-    open(path_ + 'meta.py', 'w').write(s)
-    os.link(mesh_ + 'box.txt', path_ + 'box.txt')
+    open(path + 'meta.py', 'w').write(s)
+    os.link(mesh + 'box.txt', path + 'box.txt')
 
     # save decimated mesh
-    if surf_out_:
+    if surf_out:
         n = shape[:2]
         for f in 'lon.bin', 'lat.bin', 'topo.bin':
-            s = np.fromfile(mesh_ + f, dtype).reshape(n[::-1])
-            s[::ns,::ns].tofile(path_ + f)
+            s = np.fromfile(mesh + f, dtype).reshape(n[::-1])
+            s[::ns,::ns].tofile(path + f)
 
     # copy input files
     for f in 'z3.bin', 'rho.bin', 'vp.bin', 'vs.bin':
-        os.link(mesh_ + 'hold/' + f, path_ + 'hold/' + f)
+        os.link(mesh + 'hold/' + f, path + 'hold/' + f)
 
     # launch job
     job = cst.sord.launch(job)
 
     # post-process to compute pgv, pga
-    if surf_out_:
-        path_ = job.rundir + os.sep
-        meta = cst.util.load(path_ + 'meta.py')
+    if surf_out:
+        path = job.rundir + os.sep
+        meta = cst.util.load(path + 'meta.py')
         x, y, t = meta.shapes['hold/full-v1.bin']
         s = x * y * t / 1000000
         cst.conf.launch(
             new = False,
-            rundir = rundir,
+            rundir = job.rundir,
             name = 'cook',
             stagein = ['cook.py'],
             command = 'python cook.py',

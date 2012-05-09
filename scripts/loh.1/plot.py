@@ -2,7 +2,7 @@
 """
 LOH.1 - Plot FK/SOM comparison.
 """
-import os
+import os, imp
 import numpy as np
 import matplotlib.pyplot as plt
 import cst
@@ -10,7 +10,7 @@ import cst
 # parameters
 path = 'run' + os.sep
 meta = os.path.join(path, 'meta.py')
-meta = cst.util.load(meta)
+meta = imp.load_source('meta', meta)
 dt = meta.delta[-1]
 nt = meta.shape[-1]
 tau = meta.tau

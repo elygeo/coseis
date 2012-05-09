@@ -2,7 +2,7 @@
 """
 Explosion test plot
 """
-import os, glob
+import os, imp, glob
 import numpy as np
 import matplotlib.pyplot as plt
 import cst
@@ -18,7 +18,7 @@ for path in glob.glob(runs):
 
     # metadata
     meta = os.path.join(path, 'meta.py')
-    meta = cst.util.load(meta)
+    meta = imp.load_source('meta', meta)
     dtype = meta.dtype
     shape = meta.shape
     delta = meta.delta

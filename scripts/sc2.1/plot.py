@@ -2,7 +2,7 @@
 """
 PEER Lifelines program task 1A02, Problem SC2.1
 """
-import os
+import os, imp
 import numpy as np
 import matplotlib.pyplot as plt
 import cst
@@ -12,8 +12,7 @@ path = os.path.join('run', 'sim', '200') + os.sep
 path = os.path.join('run', 'sim', '2000') + os.sep
 path = os.path.join('run', 'sim', '500') + os.sep
 path = os.path.join('run', 'sim', '100') + os.sep
-meta = os.path.join(path, 'meta.py')
-meta = cst.util.load(meta)
+meta = imp.load_source('meta', path + 'meta.py')
 dt = meta.delta[-1]
 nt = meta.shape[-1]
 tau = meta.tau

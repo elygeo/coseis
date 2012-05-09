@@ -123,12 +123,11 @@ libraries.
     can use one of the included configurations.  For example, for the TeraGrid
     Ranger system at TACC::
 
-        python setup.py --machine=tacc-ranger
+        python setup.py --machine=tacc_ranger
 
     To see the list of included configurations look in the ``cst/conf/`` directory.
-    Each custom configuration is located in a separate sub-directory.  To create a
-    new custom configuration, make a new sub-directory following the example of
-    the supplied configurations.
+    To create a new custom configuration, follow the example of one of the supplied
+    configurations.
 
 6.  Build the components you need (options are: ``sord``, ``cvms``, ``cvmh``,
     ``cfm``, ``mapdata``, ``build_ext``, ``build_fext``). For example::

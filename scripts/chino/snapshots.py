@@ -2,10 +2,9 @@
 """
 Snapshot plots
 """
-import os
+import os, imp
 import numpy as np
 import matplotlib.pyplot as plt
-import cst
 
 # parameters
 file = 'hold/xsec-ew-vs.bin'
@@ -18,7 +17,7 @@ clim = None
 path = os.path.join('run', 'sim', 'ch1000gf') + os.sep
 
 # metadata
-meta = cst.util.load(path + 'meta.py')
+meta = imp.load_source('meta', path + 'meta.py')
 shape = meta.shapes[file]
 delta = meta.deltas[file]
 dtype = meta.dtype

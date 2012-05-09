@@ -3,19 +3,20 @@
 Kostrov circular crack test.
 """
 import cst
+prm = cst.sord.parameters()
 
 # parameters
-nproc3 = 1, 1, 2
-delta = 100.0, 100.0, 100.0, 0.0075
-shape = 101, 101, 32, 300
+prm.nproc3 = 1, 1, 2
+prm.delta = 100.0, 100.0, 100.0, 0.0075
+prm.shape = 101, 101, 32, 300
 
 # boundary conditions
-bc1 = 10, 10, 10
-bc2 = -1, 1, -2
+prm.bc1 = 10, 10, 10
+prm.bc2 = -1, 1, -2
 
 # material model
-hourglass = 1.0, 1.0
-fieldio = [
+prm.hourglass = 1.0, 1.0
+prm.fieldio = [
     ('=', 'rho', [], 2670.0),
     ('=', 'vp',  [], 6000.0),
     ('=', 'vs',  [], 3464.0),
@@ -23,12 +24,12 @@ fieldio = [
 ]
 
 # rupture parameters
-ihypo = -1, -1, -1.5
-faultnormal = 3
-vrup = 0.9 * 3464.0
-rcrit = 1e9
-trelax = 0.0
-fieldio += [
+prm.ihypo = -1, -1, -1.5
+prm.faultnormal = 3
+prm.vrup = 0.9 * 3464.0
+prm.rcrit = 1e9
+prm.trelax = 0.0
+prm.fieldio += [
     ('=', 'rho', [], 2670.0),
     ('=', 'vp',  [], 6000.0),
     ('=', 'vs',  [], 3464.0),
@@ -41,7 +42,7 @@ fieldio += [
 ]
 
 # receivers
-fieldio += [
+prm.fieldio += [
     ('=w', 'svm', [ -1,-21,-1,()], 'p20a.bin'),
     ('=w', 'svm', [-13,-17,-1,()], 'p20b.bin'),
     ('=w', 'svm', [-17,-13,-1,()], 'p20c.bin'),
@@ -53,5 +54,5 @@ fieldio += [
 ]
 
 # launch SORD
-cst.sord.run( locals() )
+cst.sord.run(prm)
 

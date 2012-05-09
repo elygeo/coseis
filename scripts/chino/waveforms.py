@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os
+import os, imp
 import numpy as np
 import pyproj
 import matplotlib.pyplot as plt
@@ -39,7 +39,7 @@ path = 'tmp'
 sims = 'ch0100sf', 'ch0100hf', 'ch0100gf'
 sims = 'ch0050sf', 'ch0050hf', 'ch0050gf'
 meta = os.path.join(path, sims[0], 'meta.py')
-meta = cst.util.load(meta)
+meta = imp.load_source('meta', meta)
 duration0 = meta.shape[-1] * meta.delta[-1]
 proj = pyproj.Proj(**meta.projection)
 t0 = obspy.core.utcdatetime.UTCDateTime(meta.origin_time)

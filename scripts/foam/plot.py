@@ -1,14 +1,13 @@
 #!/usr/bin/env python
-import os
+import os, imp
 import numpy as np
 import matplotlib.pyplot as plt
-import cst
 
 # metadata
 id_ = '00'
 id_ = '20'
 path = os.path.join('run', id_) + os.sep
-meta = cst.util.load(path + 'meta.py')
+meta = imp.load_source('meta', path + 'meta.py')
 dtype = meta.dtype
 
 # off-fault displacement plot

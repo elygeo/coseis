@@ -2,13 +2,12 @@
 """
 Prepare output for uploading to the SCEC Code Validation Workshop website.
 """
-import os
+import os, imp
 import numpy as np
-import cst
 
 # parameters
 path = 'run/'
-meta = cst.util.load(path + 'meta.py')
+meta = imp.load_source('meta', path + 'meta.py')
 meta.dx = meta.delta[0]
 meta.dt = meta.delta[3]
 meta.nt = meta.shape[3]

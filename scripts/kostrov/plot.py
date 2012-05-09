@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-import os
+import os, imp
 import numpy as np
 import matplotlib.pyplot as plt
 import cst
 
 # parameters
 path = 'run' + os.sep
-meta = cst.util.load(path + 'meta.py')
+meta = imp.load_source('meta', path + 'meta.py')
 shape = meta.shape
 delta = meta.delta
 dtype = meta.dtype

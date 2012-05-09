@@ -2,7 +2,7 @@
 """
 Visualization using Mayavi and Matplotlib
 """
-import os
+import os, imp
 import pyproj, Image
 import numpy as np
 import matplotlib.pyplot as plt
@@ -38,7 +38,7 @@ axis = -xlim, xlim, -ylim, ylim
 pixels = int(dpi * inches[0]), int(dpi * inches[1])
 point = dpi / 72.0
 ppi = 100
-meta = cst.util.load(path + 'meta.py')
+meta = imp.load_source('meta', path + 'meta.py')
 shape = meta.shape
 
 

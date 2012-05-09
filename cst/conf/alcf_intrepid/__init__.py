@@ -36,7 +36,7 @@ launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
     'm_exec':  'cobalt-mpirun --mode vn -np {nproc} --verbose 2 {command}',
-    'submit':  'qsub -q {queue} -n {nproc} -t {minutes} --mode script {script}',
-    'submit2': 'qsub -q {queue} -n {nproc} -t {minutes} --mode script --dependenices {depend} "{script}"',
+    'submit':  'qsub -q {queue} -n {nproc} -t {minutes} --mode script {name}.sh',
+    'submit2': 'qsub -q {queue} -n {nproc} -t {minutes} --mode script --dependenices {depend} "{name}.sh"',
 }
 

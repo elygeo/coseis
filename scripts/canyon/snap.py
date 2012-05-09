@@ -2,10 +2,9 @@
 """
 Snapshot plots
 """
-import os
+import os, imp
 import numpy as np
 import matplotlib.pyplot as plt
-import cst
 
 # parameters
 exp = 0.5
@@ -13,7 +12,7 @@ clim = 0.0, 0.000001
 path = 'run' + os.sep
 
 # metadata
-meta = cst.util.load(path + 'meta.py')
+meta = imp.load_source('meta', path + 'meta.py')
 shape = meta.shapes['snap-v1.bin']
 delta = meta.deltas['snap-v1.bin']
 dtype = meta.dtype
