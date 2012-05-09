@@ -4,6 +4,7 @@ ALCF Cetus
 echo '+mpiwrapper-xl' >> .soft
 /gpfs/veas-fs0/
 cbank
+partlist
 
 VPROF_PROFILE=yes
 /home/morozov/fixes/libc.a

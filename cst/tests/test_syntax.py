@@ -9,6 +9,7 @@ include = (
     'cst/cvms/*.py',
     'cst/conf/*.py',
     'cst/conf/*/*.py',
+    'cst/tests/*.py',
     'doc/*.py',
     'scripts/*/*.py',
 )
@@ -17,11 +18,10 @@ def test_syntax():
     """
     Test code syntax.
     """
-    incl = include + ('cst/tests/*.py',)
     cwd = os.getcwd()
     top = os.path.join(os.path.dirname(__file__), '..', '..')
     os.chdir(top)
-    for p in incl:
+    for p in include:
         for f in glob.glob(p):
             if os.path.basename(f) in exclude:
                 continue
