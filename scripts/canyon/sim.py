@@ -47,9 +47,7 @@ for c in '12':
     ]
 
 # stage job, copy mesh files, and run job
-job = cst.sord.stage(prm,
-    rundir = os.path.join('run', 'sim')
-)
+job = cst.sord.stage(prm, rundir='run/sim')
 for f in 'x.bin', 'y.bin':
     a = os.path.join('run', 'mesh', f)
     b = os.path.join('run', 'sim', f)

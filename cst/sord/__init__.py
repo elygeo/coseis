@@ -116,7 +116,7 @@ def stage(dictargs=None, **kwargs):
     """
     Stage job
     """
-    import os, glob, shutil, pprint
+    import os, glob, copy, shutil, pprint
     import numpy as np
     from .. import util
     from . import parameters

@@ -66,7 +66,8 @@ for i in range(8):
     ]
 
 # run job
-cst.sord.run(prm,
+cst.sord.run(
+    prm,
     rundir = os.path.join('run', 'sim', '%.0f' % dx),
     stagein = [mesh + v + '.bin' for v in 'rho', 'vp', 'vs'],
     post = 'rm rho.bin vp.bin vs.bin',

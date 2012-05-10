@@ -2,31 +2,29 @@
 """
 Setup Coseis
 """
-import os, sys, getopt, pprint, shutil
+import os, sys, pprint, shutil
 import cst
 
 # guard against importing since this directory is in the path.
 if __name__ != '__main__':
     sys.exit('Error, not a module: %s' % __file__)
 
-# command line options
-opts, args = getopt.getopt(sys.argv[1:], 'v', ['verbose', 'machine=', 'account='])
-machine = None
-for k, v in opts:
-    print k, v
-    if k == '--machine':
-        machine = os.path.basename(v)
-print machine
-asdf
+# site specific configuration
+cfg = cst.util.configure(sys.argv[1:])[0]
+f = os.path.join(cst.path, 'site.py')
+open(f, 'w').write("""
+machine = {machine!r}
+account = {account!r}
+""".format(**cfg))
+reload(cst.site)
 
-# configure
-job = cst.util.configure([machine], save_site=True)[0]
-if machine or job.verbose:
-    print(job.__doc__)
-if job.verbose:
-    job = job.__dict__
-    del job['__doc__']
-    pprint.pprint(job)
+# print configuration
+if sys.argv[1:]:
+    doc = cfg['__doc__']
+    del cfg['__doc__']
+    pprint.pprint(doc)
+    if cfg['verbose']:
+        pprint.pprint(cfg)
 
 # choose a task
 for target in args:
@@ -51,7 +49,8 @@ for target in args:
             shutil.rmtree('cst/build')
         except OSError:
             pass
-        for d in 'cst/', 'cst/sord/', 'cst/cvms/', 'cst/tests/':
+        for d in '', 'sord', 'cvms', 'tests':
+            d = os.path.join(cst.path, d)
             for f in os.listdir(d):
                 if f.endswith('.pyc') or f.endswith('.so'):
                     os.unlink(d + f)

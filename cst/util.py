@@ -183,7 +183,7 @@ class load():
         return
 
 
-def configure(modules=None, machine=None, save_site=False, **kwargs):
+def configure(modules=None, machine=None, **kwargs):
     """
     Merge module, keyword, and command line parameters.
 
@@ -257,11 +257,6 @@ def configure(modules=None, machine=None, save_site=False, **kwargs):
             k = job['fortran_serial']
             job['fortran_flags'] = job['fortran_flags_default_'][k]
 
-    # save site configuration
-    if save_site:
-        f = os.path.join(path, 'site.py')
-        open(f, 'w').write(_site_template.format(**job) )
-
     # prune unneeded variables and create configuration object
     d = job['__doc__']
     prune(job)
@@ -273,15 +268,6 @@ def configure(modules=None, machine=None, save_site=False, **kwargs):
     obj.__dict__ = job
 
     return obj, kwargs
-
-
-_site_template = '''\
-"""
-Site specific configuration
-"""
-machine = {machine!r}
-account = {account!r}
-'''
 
 
 def make(compiler, object_, source):

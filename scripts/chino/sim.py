@@ -18,10 +18,10 @@ dx = 1000.0; prm.nproc3 = 1, 1, 2;    nstripe = 1
 dx = 4000.0; prm.nproc3 = 1, 1, 1;    nstripe = 1
 
 # I/O
-prm.itstats = 10
-prm.itio = nstripe * 100
 surf_out = True
 surf_out = False
+prm.itstats = 10
+prm.itio = nstripe * 100
 
 # surface topography
 surf = 'topo'
@@ -153,7 +153,8 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     # stage job
     if cst.site.machine == 'usc-hpc':
         prm.mpout = 0
-    job = cst.sord.stage(prm,
+    job = cst.sord.stage(
+        prm,
         rundir = os.path.join('run', 'sim', name),
         post = 'rm hold/z3.bin hold/rho.bin hold/vp.bin hold/vs.bin',
     )
@@ -191,13 +192,13 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         x, y, t = meta.shapes['hold/full-v1.bin']
         s = x * y * t / 1000000
         cst.conf.launch(
-            new = False,
+            run = job.run,
+            depend = job.jobid,
             rundir = job.rundir,
             name = 'cook',
             stagein = ['cook.py'],
             command = 'python cook.py',
-            run = job.run,
             seconds = s,
-            depend = job.jobid,
+            new = False,
         )
 

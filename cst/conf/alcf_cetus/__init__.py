@@ -2,12 +2,18 @@
 ALCF Cetus
 
 echo '+mpiwrapper-xl' >> .soft
-/gpfs/veas-fs0/
-cbank
-partlist
 
-VPROF_PROFILE=yes
-/home/morozov/fixes/libc.a
+Run from GPFS: /gpfs/veas-fs0/
+
+Useful commands:
+    cbank
+    partlist
+
+debug:
+    bgq_stack <corefile>
+    coreprocessor <corefile>
+    VPROF_PROFILE=yes
+    /home/morozov/fixes/libc.a
 """
 login = 'cetus.alcf.anl.gov'
 hostname = 'cetuslac1'

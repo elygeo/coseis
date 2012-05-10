@@ -108,7 +108,8 @@ for dx, np in runs:
         ]
 
     # launch SORD code
-    cst.sord.run(prm,
-        rundir = 'run/tpv3/%03.0f' % dx
+    cst.sord.run(
+        prm,
+        rundir = 'run/tpv3/%03.0f' % dx,
     )
 

@@ -40,7 +40,8 @@ for np in nproc3:
     prm.shape = np[0] * npp, np[1] * npp, np[2] * npp, prm.itio
     n = np[0] * np[1] * np[2]
     print '\nBenchmark: %s, %s, %s, %s' % (np, math.log(n,2), n / 16, n)
-    cst.sord.run(prm,
+    cst.sord.run(
+        prm,
         rundir = 'run/%05d' % n,
         optimize = 'O',
         #optimize = 'p',
