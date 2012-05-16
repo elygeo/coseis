@@ -6,15 +6,6 @@ from . import conf, util, viz, plt, mlab
 from . import interpolate, coord, signal, source, egmm, waveform, kostrov
 from . import data, scedc, vm1d, gocad, cvmh, cfm, sord, cvms
 
-import os
-path = os.path.dirname(__file__)
-del(os)
-
-try:
-    from . import site
-except ImportError:
-    pass
-
 try:
     from .trinterp import trinterp
 except ImportError:

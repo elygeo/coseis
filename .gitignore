@@ -7,6 +7,6 @@ run
 tmp
 ./publish.sh
 /dev
-/cst/site.py
+/cst/conf/site.py
 /cst/build
 /cst/data

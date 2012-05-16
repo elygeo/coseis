@@ -12,10 +12,6 @@ try:
 except:
     email = pwd.getpwuid(os.geteuid())[0]
 
-# site specific
-machine = None
-account = None
-
 # job parameters
 name = 'cst'
 run = False      # 'exec': interactive, 'debug': debugger, 'submit': batch queue
@@ -30,6 +26,7 @@ nproc = 1
 pre = post = ''  # pre-processing and post-processing commands
 dtype = dtype_f = np.dtype('f').str # Numpy data type
 verbose = False
+account = None
 
 # machine specific
 host = hostname = os.uname()[1]
@@ -53,7 +50,6 @@ launch = {
 # command line options
 argv = sys.argv[1:]
 options = [
-    ('',  'machine=',    'machine',  ''),
     ('v', 'verbose',     'verbose',  True),
     ('f', 'force',       'force',    True),
     ('n', 'dry-run',     'prepare',  False),
@@ -82,8 +78,14 @@ fortran_serial = find('xlf95_r', 'ifort', 'gfortran', 'pathf95', 'pgf90', 'f95')
 fortran_mpi = find('mpxlf95_r', 'mpif90')
 f2py_flags = ''
 
+# site specific 
+try:
+    from .site import *
+except ImportError:
+    pass
+
 # Fortran compiler flags
-fortran_flags_default_ = {
+fortran_flags = {
     'gfortran': {
         #'f': '-fimplicit-none -Wall -std=f95 -pedantic',
         'f': '-fimplicit-none -Wall',
@@ -125,17 +127,14 @@ fortran_flags_default_ = {
         'p': '-O -p',
         'O': '-i8 -O3 -OPT:Ofast -fno-math-errno',
         '8':  'FIXME',
-    }
-}
-if os.uname()[0] == 'SunOS':
-    fortran_flags_default_.update({
-        'f95': {
-            'f': '-u',
-            'g': '-C -ftrap=common -w4 -g',
-            't': '-C -ftrap=common',
-            'p': '-O -pg',
-            'O': '-fast -fns',
-            '8':  'FIXME',
-        }
-    })
+    },
+    'f95': {
+        'f': '-u',
+        'g': '-C -ftrap=common -w4 -g',
+        't': '-C -ftrap=common',
+        'p': '-O -pg',
+        'O': '-fast -fns',
+        '8':  'FIXME',
+    },
+}[fortran_serial]
 

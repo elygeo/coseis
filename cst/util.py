@@ -24,10 +24,11 @@ def build_fext(**kwargs):
     """
     import os, shlex
     from numpy.distutils.core import setup, Extension
+    from . import conf
     cwd = os.getcwd()
     os.chdir(os.path.dirname(__file__))
     if not os.path.exists('rspectra.so'):
-        fopt = shlex.split(configure(**kwargs)[0].f2py_flags)
+        fopt = shlex.split(conf.f2py_flags)
         ext = [Extension('rspectra', ['rspectra.f90'], f2py_options=fopt)]
         setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
     os.chdir(cwd)
@@ -53,6 +54,20 @@ def archive():
         gzip.open(f, 'wb').write(tar)
 
 
+class storage(dict):
+    def __setitem__(self, key, val):
+        self[key]
+        if type(val) != type(self[key]):
+            raise TypeError
+        dict.__setitem__(self, key, val)
+        return
+    def __setattr__(self, key, val):
+        self[key] = val
+        return
+    def __getattr__(self, key):
+        return self[key]
+
+
 def prune(d, pattern=None, types=None):
     """
     Delete dictionary keys with specified name pattern or types
@@ -72,7 +87,7 @@ def prune(d, pattern=None, types=None):
     import re
     import numpy as np
     if pattern is None:
-        pattern = '(^_)|(_$)|(^.$)|(^..$)'
+        pattern = '^_'
 
     if types is None:
         types = set(
@@ -112,8 +127,6 @@ def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
     if fh is not None:
         if isinstance(fh, basestring):
             fh = open(os.path.expanduser(fh), 'w')
-    if type(d) is not dict:
-        d = d.__dict__
     if expand is None:
         expand = []
     prune(d, prune_pattern, prune_types)
@@ -167,76 +180,27 @@ def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
     return out
 
 
-class load():
-    """
-    Load variables from Python source files.
-    """
-    def __init__(self, fh, d=None, prune_pattern=None, prune_types=None):
-        import os
-        if isinstance(fh, basestring):
-            fh = open(os.path.expanduser(fh))
-        if d is not None:
-            d = {}
-        exec fh in d
-        prune(d, prune_pattern, prune_types)
-        self.__dict__ = d
-        return
+def configure(dictargs, **kwargs):
+    import getopt
 
+    # dict arguments
+    if type(dictargs != dict):
+        dictargs = dictargs.__dict__
+    job = {}
+    for k in dictargs:
+        if k[0] != '_':
+            job[k] = dictargs[k]
+    job = storage(**job)
 
-def configure(modules=None, machine=None, **kwargs):
-    """
-    Merge module, keyword, and command line parameters.
-
-    Parameters
-    ----------
-    modules: list of module names.
-    machine: machine name.
-    save_site: save site specific parameters (machine, account)
-    **kwargs: override parameters supplied as keyword arguments
-
-    Returns
-    -------
-    job: object containing merged parameters as object attributes.
-    kwarg: dictionary containing unmatched parameters
-    """
-    import os, copy, getopt
-    from . import conf
-
-    # defaults
-    job = copy.deepcopy(conf.__dict__)
-    try:
-        from . import site
-    except ImportError:
-        pass
-    else:
-        job.update(site.__dict__)
-
-    # modules
-    if modules == None:
-        modules = []
-    if machine:
-        job['machine'] = machine
-    if job['machine']:
-        modules += [job['machine']]
-    for m in modules:
-        job.update(__import__('conf.' + m, level=1).__dict__)
-    for m in modules:
-        k = m + '_'
-        if k in job:
-            job.update(job[k])
-
-    # function parameters
-    kwargs = kwargs.copy()
-    for k in kwargs.copy():
-        if k in job:
-            job[k] = kwargs[k]
-            del(kwargs[k])
+    # key-word arguments
+    for k in kwargs:
+        job[k] = kwargs[k]
+        del(kwargs[k])
 
     # command line parameters
-    options = job['options']
-    if options:
-        short, long = zip(*options)[:2]
-        opts = getopt.getopt(job['argv'], ''.join(short), long)[0]
+    if job.options:
+        short, long = zip(*job.options)[:2]
+        opts = getopt.getopt(job.argv, ''.join(short), long)[0]
         short = [s.rstrip(':') for s in short]
         long = [l.rstrip('=') for l in long]
         for opt, val in opts:
@@ -245,29 +209,17 @@ def configure(modules=None, machine=None, **kwargs):
                 i = long.index(key)
             else:
                 i = short.index(key)
-            opt, key, cast = options[i][1:]
+            opt, key, cast = job.options[i][1:]
             if opt[-1] in ':=':
                 job[key] = type(cast)(val)
             else:
                 job[key] = cast
+        if not job.prepare:
+            job.run = False
+        if job.run == 'debug':
+            job.optimize = 'g'
 
-    # fortran flags
-    if 'fortran_flags_default_' in job:
-        if 'fortran_flags' not in job:
-            k = job['fortran_serial']
-            job['fortran_flags'] = job['fortran_flags_default_'][k]
-
-    # prune unneeded variables and create configuration object
-    d = job['__doc__']
-    prune(job)
-    job['__doc__'] = d
-    prune(kwargs)
-    class obj:
-        pass
-    obj = obj()
-    obj.__dict__ = job
-
-    return obj, kwargs
+    return job, kwargs
 
 
 def make(compiler, object_, source):
@@ -321,18 +273,13 @@ def prepare(job=None, **kwargs):
     Compute and display resource usage
     """
     import os, time
-    import numpy as np
-
-    # configure job
-    if job is None:
-        job, kwargs = configure(**kwargs)
-    job.__dict__.update(kwargs)
-    job.jobid = None
+    from . import conf
 
     # misc
+    if job == None:
+        job = storage(**conf.__dict__)
+    job.jobid = None
     job.rundate = time.strftime('%Y %b %d')
-    if hasattr(job, 'dtype'):
-        job.dtype = np.dtype(job.dtype).str
 
     # number of processes
     if not hasattr(job, 'nproc') or job.mode == 's':
@@ -350,7 +297,7 @@ def prepare(job=None, **kwargs):
     # loop over queue configurations
     for q, d in opts:
         job.queue = q
-        job.__dict__.update(d)
+        job.update(d)
 
         # parallelization
         if job.maxcores and job.maxnodes:
@@ -433,7 +380,7 @@ def skeleton(job=None, stagein=(), new=True, **kwargs):
     if job is None:
         job = prepare(**kwargs)
     else:
-        job.__dict__.update(kwargs)
+        job.update(kwargs)
 
     # locations
     rundir = job.rundir
@@ -453,7 +400,7 @@ def skeleton(job=None, stagein=(), new=True, **kwargs):
                 if base == 'script.sh':
                     base = job.name + '.sh'
                 ff = os.path.join(dest, base)
-                out = open(f).read().format(**job.__dict__)
+                out = open(f).read().format(**job)
                 open(ff, 'w').write(out)
                 shutil.copymode(f, ff)
 
@@ -479,7 +426,7 @@ def launch(job=None, stagein=(), new=True, **kwargs):
     if job is None:
         job = skeleton(stagein=stagein, new=new, **kwargs)
     else:
-        job.__dict__.update(kwargs)
+        job.update(kwargs)
 
     # serial or mpi mode
     if not job.mode:
@@ -497,7 +444,7 @@ def launch(job=None, stagein=(), new=True, **kwargs):
     else:
         k = job.mode + '_' + k
     if k in job.launch:
-        cmd = job.launch[k].format(**job.__dict__)
+        cmd = job.launch[k].format(**job)
     else:
         raise Exception('Error: %s launch mode not supported.' % k)
     print(cmd)
@@ -519,7 +466,7 @@ def launch(job=None, stagein=(), new=True, **kwargs):
         if p.returncode:
             raise Exception('Submit failed')
         d = re.search(job.submit_pattern, stdout).groupdict()
-        job.__dict__.update(d)
+        job.update(d)
     else:
         if job.pre:
             subprocess.check_call(job.pre, shell=True)

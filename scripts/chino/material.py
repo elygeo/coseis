@@ -118,9 +118,9 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # python executable
     python = 'python'
-    if cst.site.machine == 'nics-kraken':
+    if 'kraken' in cst.conf.login:
         python = '/lustre/scratch/gely/local/bin/python'
-    elif cst.site.machine == 'usc-hpc':
+    elif 'hpc-login2' in cst.conf.login:
         python = '/home/rcf-11/gely/local/python/bin/python'
 
     # cvm-s

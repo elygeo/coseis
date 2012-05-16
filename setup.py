@@ -9,22 +9,13 @@ import cst
 if __name__ != '__main__':
     sys.exit('Error, not a module: %s' % __file__)
 
-# site specific configuration
-cfg = cst.util.configure(sys.argv[1:])[0]
-f = os.path.join(cst.path, 'site.py')
-open(f, 'w').write("""
-machine = {machine!r}
-account = {account!r}
-""".format(**cfg))
-reload(cst.site)
-
 # print configuration
 if sys.argv[1:]:
+    cfg = cst.util.configure()[0]
     doc = cfg['__doc__']
     del cfg['__doc__']
     pprint.pprint(doc)
-    if cfg['verbose']:
-        pprint.pprint(cfg)
+    pprint.pprint(cfg)
 
 # choose a task
 for target in args:

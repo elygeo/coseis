@@ -4,6 +4,7 @@ SCEC Community Velocity Model - Magistrale version
 http://www.data.scec.org/3Dvelocity/
 """
 from ..util import launch
+from ..conf import cvms as conf
 
 input_template = """\
 {nsample}
@@ -24,7 +25,7 @@ def _build(job=None):
 
     # configure
     if job==None:
-        job = util.configure('cvms')[0]
+        job = util.storage(**conf.__dict__)
     if not job.mode:
         job.mode = 'asm'
     assert job.version in ('2.2', '3.0', '4.0')
@@ -75,7 +76,7 @@ def _build(job=None):
     os.chdir(cwd)
     return
 
-def stage(inputs={}, **kwargs):
+def stage(**kwargs):
     """
     Stage job
     """
@@ -84,14 +85,10 @@ def stage(inputs={}, **kwargs):
 
     print('CVM-S setup')
 
-    # update inputs
-    inputs = inputs.copy()
-    inputs.update(kwargs)
-
     # configure
-    job, inputs = util.configure('cvms', **inputs)
-    if inputs:
-        sys.exit('Unknown parameter: %s' % inputs)
+    job, kwargs = util.configure(conf, **kwargs)
+    if kwargs:
+        sys.exit('Unknown parameter: %s' % kwargs)
     if not job.mode:
         job.mode = 's'
         if job.nproc > 1:
@@ -139,9 +136,9 @@ def stage(inputs={}, **kwargs):
 
     # save input file and configuration
     f = os.path.join(job.rundir, 'cvms-input')
-    open(f, 'w').write(input_template.format(**job.__dict__))
+    open(f, 'w').write(input_template.format(**job))
     f = os.path.join(job.rundir, 'conf.py')
-    util.save(f, job.__dict__)
+    util.save(f, job)
     return job
 
 def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):

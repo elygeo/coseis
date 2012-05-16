@@ -36,7 +36,7 @@ svres = []
 # loop over solutions
 for d in dirs[1:]:
     path = d + os.sep
-    meta = cst.util.load(path + 'meta.py')
+    meta = imp.load_source('meta', path + 'meta.py')
     path += 'out' + os.sep
     dx += [int(meta.delta[0] + 0.5)]
     n = meta.shapes['trup']

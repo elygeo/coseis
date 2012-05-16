@@ -54,7 +54,7 @@ y.astype('f').T.tofile(path + 'lon.bin')
 
 # python executable
 python = 'python'
-if cst.site.machine == 'nics-kraken':
+if 'kraken' in cst.conf.login:
     python = '/lustre/scratch/gely/local/bin/python'
 
 # stage cvms

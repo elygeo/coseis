@@ -1,25 +1,18 @@
 """
 Support Operator Rupture Dynamics
 """
-from ..util import launch
+from ..util import launch, storage
 from . import fieldnames
-from . import parameters as _parameters
+from . import parameters as parameters_default
+from ..conf import sord as conf
 
-class parameters(object):
-    def __init__(self):
-        import copy
-        for name in dir(_parameters):
-            if name[0] != '_':
-                value = copy.deepcopy(getattr(_parameters, name))
-                object.__setattr__(self, name, value)
-        return
-    def __setattr__(self, name, value):
-        if not hasattr(self, name):
-            raise TypeError('Unknown parameter: %r' % name)
-        if type(value) != type(getattr(self, name)):
-            raise TypeError('Wrong type for parameter: %r' % name)
-        object.__setattr__(self, name, value)
-        return
+def parameters():
+    return storage(**parameters_default.__dict__)
+
+class get_slices:
+    def __getitem__(self, item):
+        return item
+s_ = get_slices()
 
 def _build(job=None):
     """
@@ -31,7 +24,7 @@ def _build(job=None):
 
     # configure
     if job == None:
-        job = util.configure()[0]
+        job = util.storage(**conf.__dict__)
     if not job.mode:
         job.mode = 'sm'
     dtype = np.dtype(job.dtype).str
@@ -112,48 +105,33 @@ def _build(job=None):
     os.chdir(cwd)
     return
 
-def stage(dictargs=None, **kwargs):
+def stage(prm, **kwargs):
     """
     Stage job
     """
-    import os, glob, copy, shutil, pprint
-    import numpy as np
-    from .. import util
-    from . import parameters
+    import os, glob, shutil, pprint
+    from .. import util, conf
 
     print('\nSORD setup')
 
-    # update inputs
-    inputs = {'name': 'sord'}
-    if dictargs != None:
-        inputs.update(dictargs)
-    inputs.update(kwargs)
+    # old-style dictionary parameters
+    if type(prm) == dict:
+        print('Warning: using old-style parameters')
+        kwargs = util.prune(prm.copy(), '(^_)|(_$)|(^.$)|(^..$)').update(kwargs)
+        prm = parameters()
+        for k in kwargs:
+            if k in prm:
+                prm[k] = kwargs[k]
+                del(kwargs[k])
 
-    # configure
-    job, inputs = util.configure(**inputs)
-    job.dtype = np.dtype(job.dtype).str
-    if not job.prepare:
-        job.run = False
-    if job.run == 'g':
-        job.optimize = 'g'
-
-    # read parameters
-    prm = copy.deepcopy(parameters)
-    util.prune(prm)
-    for k, v in inputs.copy().iteritems():
-        if k in prm:
-            prm[k] = v
-            del(inputs[k])
-    if inputs:
+    # job configuration
+    job, kwargs = util.configure(conf, **kwargs)
+    if kwargs:
         print('Unknown parameters:')
-        pprint.pprint(inputs)
-        raise Exception()
+        pprint.pprint(kwargs)
+        raise Exception
 
-    class obj:
-        pass
-    obj = obj()
-    obj.__dict__ = prm
-    prm = prepare_param(obj)
+    prm = prepare_param(prm)
 
     # partition for parallelization
     nx, ny, nz = prm.shape[:3]
@@ -269,28 +247,16 @@ def stage(dictargs=None, **kwargs):
 
     # return to initial directory
     os.chdir(cwd)
-    job.__dict__.update(prm.__dict__)
+    job.update(prm)
     return job
 
-def run(job=None, **kwargs):
+def run(prm, **kwargs):
     """
-    Stage (if necessary) and launch job
+    Stage and launch job.
     """
-    if job is None:
-        job = stage(**kwargs)
-    elif type(job) == dict:
-        job.update(kwargs)
-        job = stage(job)
+    job = stage(prm, **kwargs)
     launch(job)
     return job
-
-class get_slices:
-    """
-    A nice way to specify indices, inspired by numpy.s_.
-    """
-    def __getitem__(self, item):
-        return item
-s_ = get_slices()
 
 def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
     """

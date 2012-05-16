@@ -4,8 +4,9 @@ def test_conf():
     """
     import os, shutil, pprint
     import cst
+XXX FIXME
     cwd = os.getcwd()
-    os.chdir(os.path.join(cst.path, 'conf'))
+    os.chdir(os.path.join(os.path.dirname(__file__), '..', 'conf'))
     modules = None, 'cvms'
     machines = [None] + os.listdir('.')
     for module in modules:

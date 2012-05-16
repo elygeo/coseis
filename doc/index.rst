@@ -54,97 +54,62 @@ BSD_ terms.
     are frequent and it has known bugs!
 
 
-System requirements
-===================
+OSX Install Requirements
+========================
 
-*   Python_, and NumPy_ (Numerical Python).
-
-*   Git_ version control system.
-
-*   (+) Fortran 95 compiler.  Required only for SORD and CVM-S modules.
-
-*   (+) Message Passing Interface (MPI) library.  Required only for
-    multiprocessing with SORD and CVM-S.
-
-*   (+) Matplotlib_, SciPy_, and Pyproj Python packages.  Required only for
-    supplemental plotting, signal processing, and mesh generation utilities.
-
-(+) Optional
-
-
-Install
-=======
-
-Fortran and MPI installation should only be necessary for personal computers.
-HPC systems generally supply specifically tuned Fortran compilers and MPI
-libraries.
-
-1.  GNU Fortran is recommended if you don't already have a Fortran 95 compiler.
-
-    Fedora/Red Hat Linux:
-    ::
-
-        sudo yum install gfortran git
-
-    Ubuntu Linux:
-    ::
-
-        sudo apt-get install gfortran git
-
-    For Mac OS X, first install Xcode_ and Homebrew_, and then do:
+1.  For Mac OS X, first install Xcode_ and Homebrew_, and then do:
     ::
 
         brew install gfortran git
 
-2.  If you need MPI (for SORD of CVMS), MPICH2_ is recommended.
+2.  For multiprocessing with MPI (for SORD or CVMS), MPICH2_ is recommended:
+    ::
+
+        PREFIX="$HOME/local"
+        export PATH="${PREFIX}/bin:${PATH}"
+        cd "${PREFIX:?}"
+        curl -L http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/1.4.1p1/mpich2-1.4.1p1.tar.gz | tar zx
+        cd mpich2-1.4.1p1
+        ./configure -prefix="$PREFIX" --with-pm=gforker 
+        make install
 
 3.  For plotting and visualization, Enthought Python Distribution (EPD_) is
     recommended.
 
-4.  Clone the source code from the `Coseis GitHub repository
+
+Coseis Installation
+===================
+
+1.  Clone the source code from the `Coseis GitHub repository
     <http://github.com/gely/coseis>`__ using Git_::
 
         git clone git://github.com/gely/coseis.git
 
-    Update to the latest changes anytime with:
-    ::
-
-        git pull
-
-5.  For laptop and workstation installations, the default system configuration
-    is usually be adequate.  To test the default configuration::
-
-        cd coseis/
-        python setup.py
-
-    Systems with batch schedulers (such as PBS or LoadLeveler) generally require
-    custom configuration to specify system resources, compiler options, and
-    scheduler scripts.  If Coseis has already been configured for your system you
-    can use one of the included configurations.  For example, for the TeraGrid
-    Ranger system at TACC::
-
-        python setup.py --machine=tacc_ranger
-
-    To see the list of included configurations look in the ``cst/conf/`` directory.
-    To create a new custom configuration, follow the example of one of the supplied
-    configurations.
-
-6.  Build the components you need (options are: ``sord``, ``cvms``, ``cvmh``,
-    ``cfm``, ``mapdata``, ``build_ext``, ``build_fext``). For example::
-
-        python setup.py sord cvmh cfm mapdata
-
-7.  You may want to run the test suite (requires nose_ testing framework):
-    ::
-
-        nosetests
-
-8.  Finally, set path variables for the Pyhon module and executables. For bash
-    shell, with the code located in your home directory (for example) add these
-    lines to ``.bash_profile``::
+2.  Set path variables for the Pyhon module and executables. For bash shell,
+    with the code located in your home directory (for example) add these lines to
+    ``.bash_profile``::
 
         export PYTHONPATH="$HOME/coseis"
         export PATH="$PATH:$HOME/coseis/bin"
+
+3.  For laptop and workstation installations, the default system configuration
+    is usually adequate.  Systems with batch schedulers (such as PBS or
+    LoadLeveler) require custom configuration to specify system resources, compiler
+    options, and scheduler scripts.  Custom configuration modules are located in the
+    ``cst/conf/`` directory.  You may create a new module following the
+    included examples.  To activate a configuration, create a site configuration
+    module ``cst/conf/site.py``, and set the  ``machine`` parameter to the name
+    of the configuration module. For example::
+
+        from tacc_ranger import *
+
+    Other useful options may be placed in your ``site.py`` module.  For example,
+    the account for billing of service units, and email address for notifications
+    may be specified in ``site.py`` module with::
+
+        from tacc_ranger import *
+        account = 'your_project_name_here'
+        email = 'your_email_address_here'
 
 .. _Git:               http://git-scm.com/
 .. _MPICH2:            http://www.mcs.anl.gov/research/projects/mpich2/

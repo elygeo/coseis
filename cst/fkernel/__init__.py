@@ -8,11 +8,11 @@ def _build(optimize=None):
     Build code
     """
     import os, shlex
-    from .. import util
-    cf = util.configure()[0]
+    from .. import util, conf
+    job = util.storage(**conf.__dict__)
     if not optimize:
-        optimize = cf.optimize
-    mode = cf.mode
+        optimize = job.optimize
+    mode = job.mode
     if not mode:
         mode = 'm'
     source = 'signal.f90', 'ker_utils.f90', 'cpt_ker.f90'
@@ -23,13 +23,13 @@ def _build(optimize=None):
     os.chdir(path)
     if not os.path.isdir(bld):
         os.mkdir(bld)
-    if 'm' in mode and cf.fortran_mpi:
+    if 'm' in mode and job.fortran_mpi:
         for opt in optimize:
             object_ = bld + 'cpt_ker-m' + opt
             compiler = (
-                [cf.fortran_mpi] +
-                shlex.split(cf.fortran_flags['f']) +
-                shlex.split(cf.fortran_flags[opt]) +
+                [job.fortran_mpi] +
+                shlex.split(job.fortran_flags['f']) +
+                shlex.split(job.fortran_flags[opt]) +
                 ['-o']
             )
             new |= util.make(compiler, object_, source)

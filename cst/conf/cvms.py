@@ -1,7 +1,7 @@
 """
 CVM configuration
 """
-import os
+from ..conf import *
 
 version = '4.0'
 seconds = 1200
@@ -28,7 +28,7 @@ options = [
 ]
 
 # Fortran compiler flags
-fortran_flags_default_ = {
+fortran_flags = {
     'gfortran': {
         'g': '-Wall -fbounds-check -ffpe-trap=invalid,zero,overflow -g',
         'O': '-Wall -O3',
@@ -53,12 +53,15 @@ fortran_flags_default_ = {
         'g': '-g',
         'O': '-i8 -O3 -OPT:Ofast -fno-math-errno',
     },
-}
-if os.uname()[0] == 'SunOS':
-    fortran_flags_default_.update({
-        'f95': {
-            'g': '-u -C -ftrap=common -w4 -g',
-            'O': '-u -O2 -w1', # anything higher than -O2 breaks it
-        }
-    })
+    'f95': {
+        'g': '-u -C -ftrap=common -w4 -g',
+        'O': '-u -O2 -w1', # anything higher than -O2 breaks it
+    },
+}[conf.fortran_serial]
+
+# site specific
+if 'cvms_' in conf:
+    locals().update(cvms_)
+    del(cvms_)
+del(conf)
 

@@ -151,7 +151,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
             ]
 
     # stage job
-    if cst.site.machine == 'usc-hpc':
+    if 'hpc-login' in cst.conf.login:
         prm.mpout = 0
     job = cst.sord.stage(
         prm,
@@ -188,7 +188,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     # post-process to compute pgv, pga
     if surf_out:
         path = job.rundir + os.sep
-        meta = cst.util.load(path + 'meta.py')
+        meta = imp.load_source('meta', path + 'meta.py')
         x, y, t = meta.shapes['hold/full-v1.bin']
         s = x * y * t / 1000000
         cst.conf.launch(
