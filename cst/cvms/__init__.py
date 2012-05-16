@@ -16,7 +16,7 @@ input_template = """\
 {file_vs}
 """
 
-def _build(job=None):
+def build(job=None):
     """
     Build CVM-S code.
     """

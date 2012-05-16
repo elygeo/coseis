@@ -367,40 +367,42 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
     return np.array([xx, yy], 'f')
 
 
-def us_place_names(kind=None, extent=None):
+def us_place_names(path='us-place-names.npy'):
     """
     USGS place name database.
     """
-    import os, urllib, zipfile
+    import os, urllib, zipfile, cStringIO
     import numpy as np
 
-    filename = os.path.join(repo, 'US_CONCISE.txt')
+    filename = os.path.join(repo, path)
     if not os.path.exists(filename):
+        dtype = [
+            ('name',   'S84'),
+            ('class',  'S15'),
+            ('state',  'S2'),
+            ('county', 'S26'),
+            ('lat',    'f'),
+            ('lon',    'f'),
+            ('elev',   'i'),
+        ]
         url = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
-        print('Downloading %s' % url)
-        f = os.path.join(repo, os.path.basename(url))
-        urllib.urlretrieve(url, f)
-        zipfile.ZipFile(f).extractall(repo)
-    data = open(filename).read()
-    name = np.genfromtxt(data, delimiter='|', skip_header=1, usecols=(1,), dtype='S64')
-    data.reset()
-    kind_ = np.genfromtxt(data, delimiter='|', skip_header=1, usecols=(2,), dtype='S64')
-    data.reset()
-    lat, lon, elev = np.genfromtxt(data, delimiter='|', skip_header=1, usecols=(9,10,15)).T
-    if kind is not None:
-        i = kind == kind_
-        lon = lon[i]
-        lat = lat[i]
-        elev = elev[i]
-        name = name[i]
-    if extent is not None:
-        x, y = extent
-        i = (lon >= x[0]) & (lon <= x[1]) & (lat >= y[0]) & (lat <= y[1])
-        lon = lon[i]
-        lat = lat[i]
-        elev = elev[i]
-        name = name[i]
-    return (lon, lat, elev, name)
+        print('Retrieving %s' % url)
+        data = urllib.urlopen(url).read()
+        data = cStringIO.StringIO(data)
+        data = zipfile.ZipFile(data)
+        data = data.read(data.namelist()[0])
+        data = cStringIO.StringIO(data)
+        data = np.genfromtxt(
+            data,
+            delimiter = '|',
+            skip_header = 1,
+            usecols = (1, 2, 3, 5, 9, 10, 15),
+            dtype = dtype,
+        )
+        np.save(filename, data)
+    else:
+        data = np.load(filename)
+    return data
 
 
 def engdahl_cat(path='engdahl-centennial-cat.npy'):
@@ -411,8 +413,8 @@ def engdahl_cat(path='engdahl-centennial-cat.npy'):
     import os, urllib
     import numpy as np
 
-    f = os.path.join(repo, path)
-    if not os.path.exists(f):
+    filename = os.path.join(repo, path)
+    if not os.path.exists(filename):
         d = [
             6, ('icat',   'S6'),
             1, ('asol',   'S1'),
@@ -436,9 +438,9 @@ def engdahl_cat(path='engdahl-centennial-cat.npy'):
         print('Retrieving %s' % url)
         url = urllib.urlopen(url)
         data = np.genfromtxt(url, dtype=d[1::2], delimiter=d[0::2])
-        np.save(f, data)
+        np.save(filename, data)
     else:
-        data = np.load(f)
+        data = np.load(filename)
     return data
 
 
@@ -450,8 +452,8 @@ def lsh_cat(path='lsh-catalog.npy'):
     import os, urllib
     import numpy as np
 
-    f = os.path.join(repo, path)
-    if not os.path.exists(f):
+    filename = os.path.join(repo, path)
+    if not os.path.exists(filename):
         dtype = [
             ('year',    'u2'),
             ('month',   'u1'),
@@ -481,9 +483,9 @@ def lsh_cat(path='lsh-catalog.npy'):
         print('Retrieving %s' % url)
         url = urllib.urlopen(url)
         data = np.genfromtxt(url, dtype=dtype)
-        np.save(f, data)
+        np.save(filename, data)
     else:
-        data = np.load(f)
+        data = np.load(filename)
     return data
 
 

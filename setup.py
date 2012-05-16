@@ -2,49 +2,45 @@
 """
 Setup Coseis
 """
-import os, sys, pprint, shutil
-import cst
 
 # guard against importing since this directory is in the path.
 if __name__ != '__main__':
-    sys.exit('Error, not a module: %s' % __file__)
+    raise Exception('Error, not a module: %s' % __file__)
 
-# print configuration
-if sys.argv[1:]:
-    cfg = cst.util.configure()[0]
+import os, shutil, pprint
+import cst
+
+target = sys.argv[1:]
+if target == []:
+    cfg = cst.conf.__dict__.copy()
     doc = cfg['__doc__']
-    del cfg['__doc__']
+    for k in cfg:
+        if k[0] == '_':
+            del cfg[k]
     pprint.pprint(doc)
     pprint.pprint(cfg)
-
-# choose a task
-for target in args:
-    if target == 'build_ext':
-        cst.util.build_ext()
-    elif target == 'build_fext':
-        cst.util.build_fext()
-    elif target == 'sord':
-        cst.sord._build()
-    elif target == 'cvms':
-        cst.cvms._build()
-    elif target == 'cvmh':
-        cst.cvmh.cvmh_voxet()
-    elif target == 'cfm':
-        cst.cvms.catalog()
-    elif target == 'mapdata':
-        cst.data.mapdata()
-        cst.data.etopo1()
-        cst.data.globe30()
-    elif target == 'clean':
-        try:
-            shutil.rmtree('cst/build')
-        except OSError:
-            pass
-        for d in '', 'sord', 'cvms', 'tests':
-            d = os.path.join(cst.path, d)
-            for f in os.listdir(d):
-                if f.endswith('.pyc') or f.endswith('.so'):
-                    os.unlink(d + f)
-    else:
-        sys.exit('Unknown target')
+elif target == ['build_all']:
+    cst.util.build_ext()
+    cst.util.build_fext()
+    cst.sord.build()
+    cst.cvms.build()
+    cst.cvmh.cvmh_voxet()
+    cst.cvms.catalog()
+    cst.data.mapdata()
+    cst.data.etopo1()
+    cst.data.globe30()
+    cst.data.lsh_cat()
+    cst.data.engdahl_cat()
+elif target == ['clean']:
+    path = os.path.dirname(cst.__file__)
+    d = os.path.join(path, 'build')
+    if os.path.exists(d):
+        shutil.rmtree(d)
+    for d in '', 'sord', 'cvms', 'tests':
+        d = os.path.join(path, d)
+        for f in os.listdir(d):
+            if f.endswith('.pyc') or f.endswith('.so'):
+                os.unlink(d + f)
+else:
+    raise Exception('Unknown target %s' % target)
 

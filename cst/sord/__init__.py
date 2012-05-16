@@ -14,7 +14,7 @@ class get_slices:
         return item
 s_ = get_slices()
 
-def _build(job=None):
+def build(job=None):
     """
     Build SORD code.
     """
