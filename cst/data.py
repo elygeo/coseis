@@ -127,28 +127,31 @@ def etopo1(downsample=1):
     ETOPO1 Global Relief Model.
     http://www.ngdc.noaa.gov/mgg/global/global.html
     """
-    import os, urllib, zipfile
+    import os, urllib, zipfile, cStringIO
     import numpy as np
     from . import coord
-
-    filename = os.path.join(repo, 'etopo%02d-ice.npy' % downsample)
-    if os.path.exists(filename):
-        z = np.load(filename, mmap_mode='c')
-    else:
-        f1 = os.path.join(repo, 'etopo1_ice_g_i2.bin')
-        if not os.path.exists(f1):
-            url = 'http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
-            print('Retrieving %s' % url)
-            f = os.path.join(repo, os.path.basename(url))
-            urllib.urlretrieve(url, f)
-            zipfile.ZipFile(f).extractall(repo)
+    filename1 = os.path.join(repo, 'etopo01-ice.npy')
+    filename  = os.path.join(repo, 'etopo%02d-ice.npy' % downsample)
+    url = 'http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
+    shape = 10801, 21601
+    if not os.path.exist(filename1):
+        print('Retrieving %s' % url)
+        #data = urllib.urlopen(url)
+        #data = cStringIO.StringIO(data.read())
+        print 111111111111111111
+        data = os.path.join(repo, os.path.basename(url))
+        data = zipfile.ZipFile(data)
+        data = data.read('etopo1_ice_g_i2.bin')
+        data = np.fromstring(data, '<i2').reshape(shape).T[:,::-1]
+        np.save(filename1, data)
+        del(data)
+    if not os.path.exist(filename):
         print('Creating %s' % filename)
-        n = 10801, 21601
-        z = np.fromfile(f1, '<i2').reshape(n).T[:,::-1]
-        if downsample > 1:
-            z = coord.downsample_sphere(z, downsample)
-        np.save(filename, z)
-    return z
+        data = np.load(filename1, mmap_mode='c')
+        data = coord.downsample_sphere(data, downsample)
+        np.save(filename, data)
+        del(data)
+    return np.load(filename, mmap_mode='c')
 
 
 def globe30(tile=(0, 1), fill=True):
@@ -172,11 +175,8 @@ def globe30(tile=(0, 1), fill=True):
     """
     import os, urllib, gzip
     import numpy as np
-
     filename = os.path.join(repo, 'topo%s%s.npy' % tile)
-    if os.path.exists(filename):
-        z = np.load(filename, mmap_mode='c')
-    else:
+    if not os.path.exist(filename):
         print('Creating %s' % filename)
         tiles = ('im', 'jn', 'ko', 'lp'), ('ae', 'bf', 'cg', 'dh')
         shape = 10800, 10800
@@ -209,7 +209,8 @@ def globe30(tile=(0, 1), fill=True):
             z[i] = y[i]
             del(y, i)
         np.save(filename, z)
-    return z
+        del(z)
+    return np.load(filename, mmap_mode='c')
 
 
 def dem(extent, scale=1.0, downsample=0, mesh=False):
@@ -303,16 +304,16 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
     http://www.ngdc.noaa.gov/mgg/shorelines/gshhs.html
     http://www.soest.hawaii.edu/wessel/gshhs/index.html
     """
-    import os, urllib, zipfile
+    import os, urllib, zipfile, cStringIO
     import numpy as np
 
+    url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.0/gshhs_2.0.zip'
     d = os.path.join(repo, 'gshhs')
     if not os.path.exists(d):
-        url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.0/gshhs_2.0.zip'
         print('Downloading %s' % url)
-        f = os.path.join(repo, os.path.basename(url))
-        urllib.urlretrieve(url, f)
-        zipfile.ZipFile(f).extractall(repo)
+        data = urllib.urlopen(url)
+        data = cStringIO.StringIO(data.read())
+        zipfile.ZipFile(data).extractall(repo)
     if not kind:
         return
     name = {'c': 'GSHHS coastlines', 'r': 'WDB rivers', 'b': 'WDB borders'}[kind[0]]
@@ -367,126 +368,115 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
     return np.array([xx, yy], 'f')
 
 
-def us_place_names(path='us-place-names.npy'):
+def us_place_names():
     """
     USGS place name database.
     """
     import os, urllib, zipfile, cStringIO
     import numpy as np
-
-    filename = os.path.join(repo, path)
-    if not os.path.exists(filename):
-        dtype = [
-            ('name',   'S84'),
-            ('class',  'S15'),
-            ('state',  'S2'),
-            ('county', 'S26'),
-            ('lat',    'f'),
-            ('lon',    'f'),
-            ('elev',   'i'),
-        ]
-        url = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
+    filename = os.path.join(repo, 'us-place-names.npy')
+    url = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
+    cols = 1, 2, 3, 5, 9, 10, 15
+    dtype = [
+        ('name',   'S84'),
+        ('class',  'S15'),
+        ('state',  'S2'),
+        ('county', 'S26'),
+        ('lat',    'f'),
+        ('lon',    'f'),
+        ('elev',   'i'),
+    ]
+    if not os.path.exist(filename):
         print('Retrieving %s' % url)
-        data = urllib.urlopen(url).read()
-        data = cStringIO.StringIO(data)
+        data = urllib.urlopen(url)
+        data = cStringIO.StringIO(data.read())
         data = zipfile.ZipFile(data)
-        data = data.read(data.namelist()[0])
-        data = cStringIO.StringIO(data)
-        data = np.genfromtxt(
-            data,
-            delimiter = '|',
-            skip_header = 1,
-            usecols = (1, 2, 3, 5, 9, 10, 15),
-            dtype = dtype,
-        )
+        data = data.open(data.namelist()[0])
+        data = np.genfromtxt(data, delimiter='|',
+            skip_header=1, usecols=cols, dtype=dtype)
         np.save(filename, data)
-    else:
-        data = np.load(filename)
-    return data
+        del(data)
+    return np.load(filename, memmap_mode='c')
 
 
-def engdahl_cat(path='engdahl-centennial-cat.npy'):
+def engdahl_cat():
     """
     Engdahl Centennial Earthquake Catalog.
     http://earthquake.usgs.gov/research/data/centennial.php
     """
     import os, urllib
     import numpy as np
-
-    filename = os.path.join(repo, path)
+    filename = os.path.join(repo, 'engdahl-centennial-cat.npy')
+    url = 'http://earthquake.usgs.gov/research/data/centennial.cat'
+    d = [
+        6, ('icat',   'S6'),
+        1, ('asol',   'S1'),
+        5, ('isol',   'S5'),
+        4, ('year',   'u2'),
+        3, ('month',  'u1'),
+        3, ('day',    'u1'),
+        4, ('hour',   'u1'),
+        3, ('minute', 'u1'),
+        6, ('second', 'f4'),
+        9, ('lat',    'f4'),
+        8, ('lon',    'f4'),
+        6, ('depth',  'f4'),
+        4, ('greg',   'u2'),
+        4, ('ntel',   'u2'),
+        4, ('mag',    'f4'),
+        3, ('msc',    'S3'),
+        6, ('mdo',    'S6'),
+    ]
     if not os.path.exists(filename):
-        d = [
-            6, ('icat',   'S6'),
-            1, ('asol',   'S1'),
-            5, ('isol',   'S5'),
-            4, ('year',   'u2'),
-            3, ('month',  'u1'),
-            3, ('day',    'u1'),
-            4, ('hour',   'u1'),
-            3, ('minute', 'u1'),
-            6, ('second', 'f4'),
-            9, ('lat',    'f4'),
-            8, ('lon',    'f4'),
-            6, ('depth',  'f4'),
-            4, ('greg',   'u2'),
-            4, ('ntel',   'u2'),
-            4, ('mag',    'f4'),
-            3, ('msc',    'S3'),
-            6, ('mdo',    'S6'),
-        ]
-        url = 'http://earthquake.usgs.gov/research/data/centennial.cat'
         print('Retrieving %s' % url)
-        url = urllib.urlopen(url)
-        data = np.genfromtxt(url, dtype=d[1::2], delimiter=d[0::2])
+        data = urllib.urlopen(url)
+        data = np.genfromtxt(data, dtype=d[1::2], delimiter=d[0::2])
         np.save(filename, data)
-    else:
-        data = np.load(filename)
-    return data
+        del(data)
+    return np.load(filename, memmap_mode='c')
 
 
-def lsh_cat(path='lsh-catalog.npy'):
+def lsh_cat():
     """
     Lin, Shearer, Hauksson southern California seismicity catalog.
     http://www.rsmas.miami.edu/personal/glin/LSH.html
     """
     import os, urllib
     import numpy as np
-
-    filename = os.path.join(repo, path)
+    filename = os.path.join(repo, 'lsh-catalog.npy')
+    url="http://www.rsmas.miami.edu/personal/glin/LSH_files/LSH_1.12"
+    dtype = [
+        ('year',    'u2'),
+        ('month',   'u1'),
+        ('day',     'u1'),
+        ('hour',    'u1'),
+        ('minute',  'u1'),
+        ('second',  'f4'),
+        ('cuspid',  'u4'),
+        ('lat',     'f4'),
+        ('lon',     'f4'),
+        ('depth',   'f4'),
+        ('mag',     'f4'),
+        ('np',      'u2'),
+        ('ns',      'u2'),
+        ('rms',     'f2'),
+        ('daytime', 'u1'),
+        ('clnum',   'u1'),
+        ('nclst',   'u2'),
+        ('ndif',    'u2'),
+        ('aer_h',   'f4'),
+        ('aer_z',   'f4'),
+        ('rer_h',   'f4'),
+        ('rer_z',   'f4'),
+        ('type',    'S2'),
+    ]
     if not os.path.exists(filename):
-        dtype = [
-            ('year',    'u2'),
-            ('month',   'u1'),
-            ('day',     'u1'),
-            ('hour',    'u1'),
-            ('minute',  'u1'),
-            ('second',  'f4'),
-            ('cuspid',  'u4'),
-            ('lat',     'f4'),
-            ('lon',     'f4'),
-            ('depth',   'f4'),
-            ('mag',     'f4'),
-            ('np',      'u2'),
-            ('ns',      'u2'),
-            ('rms',     'f2'),
-            ('daytime', 'u1'),
-            ('clnum',   'u1'),
-            ('nclst',   'u2'),
-            ('ndif',    'u2'),
-            ('aer_h',   'f4'),
-            ('aer_z',   'f4'),
-            ('rer_h',   'f4'),
-            ('rer_z',   'f4'),
-            ('type',    'S2'),
-        ]
-        url="http://www.rsmas.miami.edu/personal/glin/LSH_files/LSH_1.12"
         print('Retrieving %s' % url)
-        url = urllib.urlopen(url)
-        data = np.genfromtxt(url, dtype=dtype)
+        data = urllib.urlopen(url)
+        data = np.genfromtxt(data, dtype=dtype)
         np.save(filename, data)
-    else:
-        data = np.load(filename)
-    return data
+        del(data)
+    return np.load(filename, memmap_mode='c')
 
 
 def cybershake(isrc, irup, islip, ihypo, name=None):

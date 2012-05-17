@@ -57,11 +57,10 @@ fortran_flags = {
         'g': '-u -C -ftrap=common -w4 -g',
         'O': '-u -O2 -w1', # anything higher than -O2 breaks it
     },
-}[conf.fortran_serial]
+}[fortran_serial]
 
 # site specific
-if 'cvms_' in conf:
+if 'cvms_' in locals():
     locals().update(cvms_)
     del(cvms_)
-del(conf)
 

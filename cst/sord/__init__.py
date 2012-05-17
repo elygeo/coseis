@@ -2,9 +2,9 @@
 Support Operator Rupture Dynamics
 """
 from ..util import launch, storage
+from .. import conf
 from . import fieldnames
 from . import parameters as parameters_default
-from ..conf import sord as conf
 
 def parameters():
     return storage(**parameters_default.__dict__)
