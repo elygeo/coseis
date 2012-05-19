@@ -40,27 +40,21 @@ def vs30_wald(rebuild=False):
     """
     Wald, et al. Vs30 map.
     """
-    import os, urllib, gzip
+    import os, urllib, gzip, cStringIO
     import numpy as np
     from . import coord
 
-    filename = os.path.join(repo, 'cvmh_vs30_wald.npy')
+    filename = os.path.join(repo, 'cvmh-vs30-wald.npy')
+    url = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
     if not rebuild and os.path.exists(filename):
         data = np.load(filename)
     else:
-        f1 = os.path.join(repo, 'Western_US.grd')
-        if not os.path.exists(f1):
-            url = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
-            print('Downloading %s' % url)
-            f = os.path.join(repo, os.path.basename(url))
-            urllib.urlretrieve(url, f)
-            open(f1, 'wb').write(gzip.open(f).read())
-        fh = open(f1)
-        print('Resampling Wald Vs30')
+        print('Downloading %s' % url)
+        data = urllib.urlopen(url).read()
+        data = cStringIO.StringIO(data)
+        data = gzip.open(data).read()[19512:]
         dtype = '>f'
         nx, ny = 2280, 2400
-        fh.seek(19512)
-        data = fh.read()
         data = np.fromstring(data, dtype).reshape((ny, nx)).T
         delta = 0.25 / 60
         x = -125.0 + delta, -106.0 - delta
@@ -80,7 +74,7 @@ def vs30_wills(rebuild=False):
     import numpy as np
     from . import coord
 
-    url = 'http://earth.usc.edu/~gely/cvm-data/cvmh_vs30_wills.npy'
+    url = 'http://earth.usc.edu/~gely/cvm-data/cvmh-vs30-wills.npy'
     filename = os.path.join(repo, os.path.basename(url))
     if not rebuild:
         if not os.path.exists(filename):
