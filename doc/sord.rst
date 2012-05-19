@@ -70,7 +70,8 @@ Run a simple point source explosion test and plot a 2D slice of particle
 velocity::
 
     cd scripts/sord
-    python example.py -i
+    python sim.py -i
+    python plot.py
 
 Plotting requires Matplotlib, and the result should look like this:
 
@@ -80,34 +81,16 @@ Scripting with Python
 ---------------------
 
 For a simple example consider the above test,
-`sim.py <../scripts/sord/example.py>`__:
+`sim.py <../scripts/sord/sim.py>`__:
 
-.. include:: ../scripts/sord/example.py
+.. include:: ../scripts/sord/sim.py
    :literal:
 
-Every script starts by importing the ``cst`` module.  SORD parameters are
-specified as a dictionary and/or keyword arguments passed to the
-``cst.sord.run()`` function. The ``locals()`` built-in Python function is a
-convenient way to create the parameter dictionary from the local scope.  Any
-dictionary parameters 
-
-A complete list of possible SORD parameters and default values are specified in
-`parameters.py <../cst/sord/parameters.py>`_.
-
-FIXME: OUTDATED.
-
-The Python language gives a powerful way to construct SORD input.  For example,
-it may be desirable to specify the total simulation time, and divide by ``dt``
-to determine the number of time steps::
-
-    T = 100.0          # total time temporary variable
-    nt = int(T / dt)   # number of time steps
-
-The ``T`` variable is not a valid SORD parameter; it is only used for temporary
-storage.  Variables with single single character names or names ending with an
-underscore, are ignored by SORD, so may be safely used for temporary storage.
-More example scripts can be found in the ``scripts`` directory.
-
+The first thing to do is import the ``cst`` module and instantiate a parameter
+object from ``cst.sord.parameters()``.  The parameter object contains all of
+the simulation settings and then passed to ``cst.sord.run()``.  A complete list
+of possible SORD parameters and default values are specified in `parameters.py
+<../cst/sord/parameters.py>`_.
 
 Running jobs
 ------------
@@ -119,20 +102,6 @@ job interactively or through a batch processing system.  Step (2) only occurs
 as needed for a fresh install or when the source code has been modified.  By
 default, step (4) is skipped, giving the user an opportunity to inspect the
 run directory prior to launching the job.
-
-FIXME: UNFINISHED SECTION.
-
-has been done beforehand, so is skipped.  
-cop
-and
-called, a run directory is staged at the
-location set by the ``rundir`` parameter (``tmp/`` in this case).  The
-directory contains the executable and scripts to run the code, and will contain
-all of the generated output and metadata.  You may examine the run directory
-and manually launch the executable from there.  The job can be run automatically 
-
-Or, submit the job to the batch system
-
 
 Field I/O
 ---------

@@ -77,8 +77,8 @@ OSX Install Requirements
     recommended.
 
 
-Coseis Installation
-===================
+Install
+=======
 
 1.  Clone the source code from the `Coseis GitHub repository
     <http://github.com/gely/coseis>`__ using Git_::
@@ -101,15 +101,20 @@ Coseis Installation
     module ``cst/conf/site.py``, and set the  ``machine`` parameter to the name
     of the configuration module. For example::
 
-        from tacc_ranger import *
+        machine = 'tacc_ranger'
 
     Other useful options may be placed in your ``site.py`` module.  For example,
     the account for billing of service units, and email address for notifications
     may be specified in ``site.py`` module with::
 
-        from tacc_ranger import *
+        machine = 'tacc_ranger'
         account = 'your_project_name_here'
         email = 'your_email_address_here'
+
+6.  Run the ``setup.py`` script to test your configuration. This will display
+    all of the configuration parameters::
+
+        python setup.py
 
 .. _Git:               http://git-scm.com/
 .. _MPICH2:            http://www.mcs.anl.gov/research/projects/mpich2/

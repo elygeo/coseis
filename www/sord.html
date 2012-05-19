@@ -248,7 +248,8 @@ heterogeneous media</a>,
 velocity:</p>
 <pre class="literal-block">
 cd scripts/sord
-python example.py -i
+python sim.py -i
+python plot.py
 </pre>
 <p>Plotting requires Matplotlib, and the result should look like this:</p>
 <blockquote>
@@ -258,14 +259,15 @@ python example.py -i
 <div class="section" id="scripting-with-python">
 <h4>Scripting with Python</h4>
 <p>For a simple example consider the above test,
-<a class="reference external" href="../scripts/sord/example.py">sim.py</a>:</p>
+<a class="reference external" href="../scripts/sord/sim.py">sim.py</a>:</p>
 <pre class="literal-block">
 #!/usr/bin/env python
 import cst                                  # import the Coseis module
+prm = cst.sord.parameters()                 # for specifying SORD parameters
 s_ = cst.sord.s_                            # for specifying slices
-delta = 100.0, 100.0, 100.0, 0.0075         # step length in (x, y, z, t)
-shape = 61, 61, 61, 60                      # mesh size in (x, y, z, t)
-fieldio = [                                 # field variable input and output
+prm.delta = 100.0, 100.0, 100.0, 0.0075     # step length in (x, y, z, t)
+prm.shape = 61, 61, 61, 60                  # mesh size in (x, y, z, t)
+prm.fieldio = [                             # field variable input and output
     ('=',  'rho', [], 2670.0),              # material density
     ('=',  'vp',  [], 6000.0),              # material P-wave velocity
     ('=',  'vs',  [], 3464.0),              # material S-wave velocity
@@ -273,48 +275,19 @@ fieldio = [                                 # field variable input and output
     ('=w', 'v1',  s_[:,:,31,-1], 'vx.bin'), # write X velocity slice output
     ('=w', 'v2',  s_[:,:,31,-1], 'vy.bin'), # write Y velocity slice output
 ]
-ihypo = 31.0, 31.0, 31.0                    # source location
-source = 'potency'                          # source type
-source1 = 1e6, 1e6, 1e6                     # source normal components
-source2 = 0.0, 0.0, 0.0                     # source shear components
-pulse = 'integral_brune'                    # source time function
-tau = 6 * delta[3]                          # source characteristic time
-cst.sord.run(locals())                      # launch SORD job
-
-# plotting
-import numpy as np
-import matplotlib.pyplot as plt
-n  = shape[1], shape[0]
-vx = np.fromfile('run/vx.bin', 'f').reshape(n)
-vy = np.fromfile('run/vy.bin', 'f').reshape(n)
-vm = np.sqrt(vx * vx + vy * vy)
-fig = plt.figure(figsize=(3,3))
-ax = plt.gca()
-ax.imshow(vm, extent=(-3,3,-3,3), interpolation='nearest', vmax=1)
-ax.axis('image')
-fig.savefig('run/example.png', dpi=80)
-
+prm.ihypo = 31.0, 31.0, 31.0                # source location
+prm.source = 'potency'                      # source type
+prm.source1 = 1e6, 1e6, 1e6                 # source normal components
+prm.source2 = 0.0, 0.0, 0.0                 # source shear components
+prm.pulse = 'integral_brune'                # source time function
+prm.tau = 6 * prm.delta[3]                  # source characteristic time
+cst.sord.run(prm)                           # launch SORD job
 
 </pre>
-<p>Every script starts by importing the <tt class="docutils literal">cst</tt> module.  SORD parameters are
-specified as a dictionary and/or keyword arguments passed to the
-<tt class="docutils literal">cst.sord.run()</tt> function. The <tt class="docutils literal">locals()</tt> built-in Python function is a
-convenient way to create the parameter dictionary from the local scope.  Any
-dictionary parameters</p>
-<p>A complete list of possible SORD parameters and default values are specified in
-<a class="reference external" href="../cst/sord/parameters.py">parameters.py</a>.</p>
-<p>FIXME: OUTDATED.</p>
-<p>The Python language gives a powerful way to construct SORD input.  For example,
-it may be desirable to specify the total simulation time, and divide by <tt class="docutils literal">dt</tt>
-to determine the number of time steps:</p>
-<pre class="literal-block">
-T = 100.0          # total time temporary variable
-nt = int(T / dt)   # number of time steps
-</pre>
-<p>The <tt class="docutils literal">T</tt> variable is not a valid SORD parameter; it is only used for temporary
-storage.  Variables with single single character names or names ending with an
-underscore, are ignored by SORD, so may be safely used for temporary storage.
-More example scripts can be found in the <tt class="docutils literal">scripts</tt> directory.</p>
+<p>The first thing to do is import the <tt class="docutils literal">cst</tt> module and instantiate a parameter
+object from <tt class="docutils literal">cst.sord.parameters()</tt>.  The parameter object contains all of
+the simulation settings and then passed to <tt class="docutils literal">cst.sord.run()</tt>.  A complete list
+of possible SORD parameters and default values are specified in <a class="reference external" href="../cst/sord/parameters.py">parameters.py</a>.</p>
 </div>
 <div class="section" id="running-jobs">
 <h4>Running jobs</h4>
@@ -325,16 +298,6 @@ job interactively or through a batch processing system.  Step (2) only occurs
 as needed for a fresh install or when the source code has been modified.  By
 default, step (4) is skipped, giving the user an opportunity to inspect the
 run directory prior to launching the job.</p>
-<p>FIXME: UNFINISHED SECTION.</p>
-<p>has been done beforehand, so is skipped.
-cop
-and
-called, a run directory is staged at the
-location set by the <tt class="docutils literal">rundir</tt> parameter (<tt class="docutils literal">tmp/</tt> in this case).  The
-directory contains the executable and scripts to run the code, and will contain
-all of the generated output and metadata.  You may examine the run directory
-and manually launch the executable from there.  The job can be run automatically</p>
-<p>Or, submit the job to the batch system</p>
 </div>
 <div class="section" id="field-i-o">
 <h4>Field I/O</h4>
