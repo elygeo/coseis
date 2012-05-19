@@ -57,10 +57,13 @@ BSD_ terms.
 Install
 =======
 
-0.  If on Mac OS X, first install Xcode_, Homebrew_, MPICH2_, EPD_, and Fortran
-    with::
+0.  If on Mac OS X, first install Xcode_, Homebrew_, and then Fortran with:
+    ::
 
         brew install gfortran
+
+    Optionally, install MPICH2_ for multiprocessing, and EPD_ for visualization
+    and analysis.
 
 1.  Clone the source code from the `Coseis GitHub repository
     <http://github.com/gely/coseis>`__::
