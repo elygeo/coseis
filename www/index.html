@@ -202,34 +202,16 @@ Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
 <p class="warning"><strong>WARNING</strong>: Coseis is a research code under active development.  Changes
 are frequent and it has known bugs!</p>
 </div>
-<div class="section" id="osx-install-requirements">
-<h3>OSX Install Requirements</h3>
-<ol class="arabic">
-<li><p class="first">For Mac OS X, first install <a class="reference external" href="http://itunes.apple.com/us/app/xcode/id497799835">Xcode</a> and <a class="reference external" href="http://mxcl.github.com/homebrew/">Homebrew</a>, and then do:</p>
-<pre class="literal-block">
-brew install gfortran git
-</pre>
-</li>
-<li><p class="first">For multiprocessing with MPI (for SORD or CVMS), <a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a> is recommended:</p>
-<pre class="literal-block">
-PREFIX=&quot;$HOME/local&quot;
-export PATH=&quot;${PREFIX}/bin:${PATH}&quot;
-cd &quot;${PREFIX:?}&quot;
-curl -L http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/1.4.1p1/mpich2-1.4.1p1.tar.gz | tar zx
-cd mpich2-1.4.1p1
-./configure -prefix=&quot;$PREFIX&quot; --with-pm=gforker
-make install
-</pre>
-</li>
-<li><p class="first">For plotting and visualization, Enthought Python Distribution (<a class="reference external" href="http://www.enthought.com/products/epddownload.php">EPD</a>) is
-recommended.</p>
-</li>
-</ol>
-</div>
 <div class="section" id="install">
 <h3>Install</h3>
-<ol class="arabic">
-<li><p class="first">Clone the source code from the <a class="reference external" href="http://github.com/gely/coseis">Coseis GitHub repository</a> using <a class="reference external" href="http://git-scm.com/">Git</a>:</p>
+<ol class="arabic" start="0">
+<li><p class="first">If on Mac OS X, first install <a class="reference external" href="http://itunes.apple.com/us/app/xcode/id497799835">Xcode</a>, <a class="reference external" href="http://mxcl.github.com/homebrew/">Homebrew</a>, <a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a>, <a class="reference external" href="http://www.enthought.com/products/epddownload.php">EPD</a>, and Fortran
+with:</p>
+<pre class="literal-block">
+brew install gfortran
+</pre>
+</li>
+<li><p class="first">Clone the source code from the <a class="reference external" href="http://github.com/gely/coseis">Coseis GitHub repository</a>:</p>
 <pre class="literal-block">
 git clone git://github.com/gely/coseis.git
 </pre>
@@ -242,14 +224,14 @@ export PYTHONPATH=&quot;$HOME/coseis&quot;
 export PATH=&quot;$PATH:$HOME/coseis/bin&quot;
 </pre>
 </li>
-<li><p class="first">For laptop and workstation installations, the default system configuration
-is usually adequate.  Systems with batch schedulers (such as PBS or
+<li><p class="first">The default default system configuration is generally adequate for simple
+workstation installs.  Systems with batch schedulers (such as PBS or
 LoadLeveler) require custom configuration to specify system resources, compiler
-options, and scheduler scripts.  Custom configuration modules are located in the
-<tt class="docutils literal">cst/conf/</tt> directory.  You may create a new module following the
+options, and scheduler scripts.  Custom configuration modules are located in
+the <tt class="docutils literal">cst/conf/</tt> directory.  You may create a new module following the
 included examples.  To activate a configuration, create a site configuration
-module <tt class="docutils literal">cst/conf/site.py</tt>, and set the  <tt class="docutils literal">machine</tt> parameter to the name
-of the configuration module. For example:</p>
+module <tt class="docutils literal">cst/conf/site.py</tt>, and set the  <tt class="docutils literal">machine</tt> parameter to the name of
+the configuration module. For example, put the folling line in <tt class="docutils literal">site.py</tt>:</p>
 <pre class="literal-block">
 machine = 'tacc_ranger'
 </pre>
@@ -259,11 +241,9 @@ may be specified in <tt class="docutils literal">site.py</tt> module with:</p>
 <pre class="literal-block">
 machine = 'tacc_ranger'
 account = 'your_project_name_here'
-email = 'your_email_address_here'
+email = 'your.email&#64;address.here'
 </pre>
 </li>
-</ol>
-<ol class="arabic" start="6">
 <li><p class="first">Run the <tt class="docutils literal">setup.py</tt> script to test your configuration. This will display
 all of the configuration parameters:</p>
 <pre class="literal-block">

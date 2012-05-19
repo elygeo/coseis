@@ -54,34 +54,16 @@ BSD_ terms.
     are frequent and it has known bugs!
 
 
-OSX Install Requirements
-========================
-
-1.  For Mac OS X, first install Xcode_ and Homebrew_, and then do:
-    ::
-
-        brew install gfortran git
-
-2.  For multiprocessing with MPI (for SORD or CVMS), MPICH2_ is recommended:
-    ::
-
-        PREFIX="$HOME/local"
-        export PATH="${PREFIX}/bin:${PATH}"
-        cd "${PREFIX:?}"
-        curl -L http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/1.4.1p1/mpich2-1.4.1p1.tar.gz | tar zx
-        cd mpich2-1.4.1p1
-        ./configure -prefix="$PREFIX" --with-pm=gforker 
-        make install
-
-3.  For plotting and visualization, Enthought Python Distribution (EPD_) is
-    recommended.
-
-
 Install
 =======
 
+0.  If on Mac OS X, first install Xcode_, Homebrew_, MPICH2_, EPD_, and Fortran
+    with::
+
+        brew install gfortran
+
 1.  Clone the source code from the `Coseis GitHub repository
-    <http://github.com/gely/coseis>`__ using Git_::
+    <http://github.com/gely/coseis>`__::
 
         git clone git://github.com/gely/coseis.git
 
@@ -92,14 +74,14 @@ Install
         export PYTHONPATH="$HOME/coseis"
         export PATH="$PATH:$HOME/coseis/bin"
 
-3.  For laptop and workstation installations, the default system configuration
-    is usually adequate.  Systems with batch schedulers (such as PBS or
+3.  The default default system configuration is generally adequate for simple
+    workstation installs.  Systems with batch schedulers (such as PBS or
     LoadLeveler) require custom configuration to specify system resources, compiler
-    options, and scheduler scripts.  Custom configuration modules are located in the
-    ``cst/conf/`` directory.  You may create a new module following the
+    options, and scheduler scripts.  Custom configuration modules are located in
+    the ``cst/conf/`` directory.  You may create a new module following the
     included examples.  To activate a configuration, create a site configuration
-    module ``cst/conf/site.py``, and set the  ``machine`` parameter to the name
-    of the configuration module. For example::
+    module ``cst/conf/site.py``, and set the  ``machine`` parameter to the name of
+    the configuration module. For example, put the folling line in ``site.py``::
 
         machine = 'tacc_ranger'
 
@@ -109,24 +91,17 @@ Install
 
         machine = 'tacc_ranger'
         account = 'your_project_name_here'
-        email = 'your_email_address_here'
+        email = 'your.email@address.here'
 
-6.  Run the ``setup.py`` script to test your configuration. This will display
+4.  Run the ``setup.py`` script to test your configuration. This will display
     all of the configuration parameters::
 
         python setup.py
 
-.. _Git:               http://git-scm.com/
-.. _MPICH2:            http://www.mcs.anl.gov/research/projects/mpich2/
 .. _Xcode:             http://itunes.apple.com/us/app/xcode/id497799835
 .. _Homebrew:          http://mxcl.github.com/homebrew/
+.. _MPICH2:            http://www.mcs.anl.gov/research/projects/mpich2/
 .. _EPD:               http://www.enthought.com/products/epddownload.php
-.. _Python:            http://www.python.org/
-.. _NumPy:             http://numpy.scipy.org/
-.. _SciPy:             http://www.scipy.org/
-.. _Mayavi:            http://code.enthought.com/projects/mayavi/
-.. _Matplotlib:        http://matplotlib.sourceforge.net/
-.. _nose:              http://readthedocs.org/docs/nose/
 
 
 Examples
