@@ -26,6 +26,7 @@ module load gotoblas scalapack mkl
 export F77=pgf95
 export F90=pgf95
 """
+
 login = 'tg-login.ranger.tacc.teragrid.org'
 hostname = '.*.ranger.tacc.utexas.edu'
 maxcores = 16
@@ -60,3 +61,4 @@ fortran_flags = {
     '8': '-Mr8',
 }
 f2py_flags = '--fcompiler=pg'
+

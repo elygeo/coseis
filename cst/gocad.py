@@ -2,7 +2,7 @@
 GOCAD data tools.
 """
 
-def header(lines, counter=0, casters=None):
+def header(buff, counter=0, casters=None):
     """
     GOCAD header reader
     """
@@ -17,8 +17,8 @@ def header(lines, counter=0, casters=None):
         for k in casters[c]:
             cast[k] = c
     header = {}
-    while counter < len(lines):
-        line = lines[counter].strip()
+    while counter < len(buff):
+        line = buff[counter]
         counter += 1
         if '}' in line:
             return header, counter
@@ -40,13 +40,15 @@ def header(lines, counter=0, casters=None):
     raise Exception('Error in header')
     return
 
-def voxet(path, load_props=[], alternate='', no_data_value=None):
+def voxet(path, load_props=[], alternate='', no_data_value=None, buff=None):
     """
     GOCAD voxet reader
     """
     import os
     import numpy as np
-    lines = open(path).readlines()
+    if buff == None:
+        buff = open(path).read()
+    buff = buff.strip().split('\n')
     cast = {}
     casters = {
         str: ('NAME', 'FILE', 'TYPE', 'ETYPE', 'FORMAT', 'UNIT', 'ORIGINAL_UNIT'),
@@ -58,17 +60,15 @@ def voxet(path, load_props=[], alternate='', no_data_value=None):
             cast[k] = c
     voxet = {}
     counter = 0
-    while counter < len(lines):
-        line = lines[counter].strip()
+    while counter < len(buff):
+        line = buff[counter]
         counter += 1
         f = line.replace('"', '').split()
-        if len(f) == 0 or line.startswith('#'):
-            continue
-        elif line.startswith('GOCAD Voxet'):
+        if line.startswith('GOCAD Voxet'):
             id_ = f[2]
             axis, prop = {}, {}
         elif f[0] == 'HEADER':
-            hdr, counter = header(lines, counter)
+            hdr, counter = header(buff, counter)
         elif len(f) > 1:
             k = f[0].split('_', 1)
             if k[0] == 'AXIS':
@@ -96,23 +96,25 @@ def voxet(path, load_props=[], alternate='', no_data_value=None):
             voxet[id_] = {'HEADER': hdr, 'AXIS': axis, 'PROP': prop}
     return voxet
 
-def tsurf(path):
+def tsurf(buff):
     """
     GOCAD triangulated surface reader
     """
     import numpy as np
-    lines = open(path).readlines()
+    buff = buff.strip().split('\n')
     tsurf = []
     counter = 0
     #casters = {
     #    int: ('ATOM', 'PATOM', 'TRGL', 'BORDER', 'BSTONE'),
     #    float: ('VRTX', 'PVRTX'),
     #}
-    while counter < len(lines):
-        line = lines[counter].strip()
+    while counter < len(buff):
+        line = buff[counter]
         counter += 1
         f = line.split()
-        if line.startswith('GOCAD TSurf'):
+        if len(f) == 0 or line.startswith('#'):
+            continue
+        elif line.startswith('GOCAD TSurf'):
             hdr, phdr, tface, vrtx, trgl, border, bstone = None, {}, [], [], [], [], []
         elif f[0] in ('VRTX', 'PVRTX'):
             vrtx += [[float(f[2]), float(f[3]), float(f[4])]]
@@ -136,8 +138,8 @@ def tsurf(path):
             tface += [np.array(trgl, 'i').T]
             tsurf += [[hdr, phdr, vrtx, tface, border, bstone]]
         elif f[0] == 'PROPERTY_CLASS_HEADER':
-            phdr[f[1]], counter = header(lines, counter)
+            phdr[f[1]], counter = header(buff, counter)
         elif f[0] == 'HEADER':
-            hdr, counter = header(lines, counter)
+            hdr, counter = header(buff, counter)
     return tsurf
 

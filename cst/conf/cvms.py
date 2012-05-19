@@ -1,7 +1,6 @@
 """
 CVM configuration
 """
-from ..conf import *
 
 version = '4.0'
 seconds = 1200
@@ -57,10 +56,5 @@ fortran_flags = {
         'g': '-u -C -ftrap=common -w4 -g',
         'O': '-u -O2 -w1', # anything higher than -O2 breaks it
     },
-}[fortran_serial]
-
-# site specific
-if 'cvms_' in locals():
-    locals().update(cvms_)
-    del(cvms_)
+}
 

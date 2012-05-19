@@ -16,43 +16,41 @@ def catalog(version='CFM4-socal-primary'):
     the fault name and number of segments. The CFM database is downloaded if not
     already present.
     """
-    import os, urllib, zipfile
+    import os, urllib, zipfile, cStringIO
     import numpy as np
     from . import gocad
 
-    # paths
     fault_file = os.path.join(repo, 'scec-cfm4', 'fault-list.txt')
     path = os.path.join(repo, 'scec-cfm4')
     npy = os.path.join(path, '%s-%04d-%s.npy')
-
-    # prepare fault database
+    url = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
     dtype = [('name', 'S64'), ('nseg', 'i')]
+
     if os.path.exists(fault_file):
         cat = dict(np.loadtxt(fault_file, dtype))
     else:
-        url = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
-        vdo = os.path.join(repo, 'SCEC_VDO')
-        src = os.path.join(vdo, 'data', 'Faults', version) + os.sep
-        if not os.path.exists(vdo):
+        f = os.path.join(repo, os.path.basename(url))
+        if not os.path.exists(f):
             print('Downloading %s' % url)
-            f = os.path.join(repo, os.path.basename(url))
             urllib.urlretrieve(url, f)
-            os.mkdir(vdo)
-            zipfile.ZipFile(f).extractall(vdo)
+        zp = zipfile.ZipFile(f)
+        src = os.path.join('data', 'Faults', version)
         os.makedirs(path)
         cat = {}
-        for f in os.listdir(src):
-            if not f.endswith('.ts'):
+        for f in zp.namelist():
+            base, key = os.path.split(f)
+            if base != src or not key.endswith('.ts'):
                 continue
-            xyz, tri = gocad.tsurf(src + f)[0][2:4]
-            f = f[:-3]
-            cat[f] = len(tri)
+            key = key[:-3]
+            data = zp.read(f)
+            xyz, tri = gocad.tsurf(data)[0][2:4]
+            cat[key] = len(tri)
             for k, t in enumerate(tri):
                 i, j = np.unique(t, return_inverse=True)
                 t = np.arange(t.size)[j].reshape(t.shape)
                 x = xyz[:,i]
-                np.save(npy % (f, k, 'xyz'), x)
-                np.save(npy % (f, k, 'tri'), t)
+                np.save(npy % (key, k, 'xyz'), x)
+                np.save(npy % (key, k, 'tri'), t)
         f = np.array(sorted(cat.items()), dtype)
         np.savetxt(fault_file, f, '%s %s')
     return cat

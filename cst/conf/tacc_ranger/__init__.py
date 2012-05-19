@@ -27,6 +27,7 @@ module load gotoblas scalapack mkl
 export F77=ifort
 export F90=ifort
 """
+
 login = 'tg-login.ranger.tacc.teragrid.org'
 hostname = '.*.ranger.tacc.utexas.edu'
 maxcores = 16
@@ -61,3 +62,4 @@ fortran_flags = {
     '8': '-r8',
 }
 f2py_flags = '--fcompiler=intelem'
+

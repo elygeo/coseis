@@ -1,8 +1,7 @@
 """
 SDSU Altai
-
-Sun-Fire-880
 """
+
 login = 'altai.sdsu.edu'
 hostname = 'altai'
 maxcores = 8

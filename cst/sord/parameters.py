@@ -76,6 +76,6 @@ pulse = 'none'			# source pulse shape, see cst.signal.time_function
 tau = 4 * delta[3]		# source characteristic time
 
 # Placeholders
-i1pml = None
-i2pml = None
+i1pml = ()
+i2pml = ()
 

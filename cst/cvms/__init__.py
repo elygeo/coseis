@@ -4,7 +4,7 @@ SCEC Community Velocity Model - Magistrale version
 http://www.data.scec.org/3Dvelocity/
 """
 from ..util import launch
-from ..conf import cvms as conf
+from .. import conf
 
 input_template = """\
 {nsample}
@@ -25,7 +25,7 @@ def build(job=None):
 
     # configure
     if job==None:
-        job = util.storage(**conf.__dict__)
+        job = util.configure(conf.cvms, options=None)[0]
     if not job.mode:
         job.mode = 'asm'
     assert job.version in ('2.2', '3.0', '4.0')
@@ -86,7 +86,7 @@ def stage(**kwargs):
     print('CVM-S setup')
 
     # configure
-    job, kwargs = util.configure(conf, **kwargs)
+    job, kwargs = util.configure(conf.cvms, **kwargs)
     if kwargs:
         sys.exit('Unknown parameter: %s' % kwargs)
     if not job.mode:
@@ -100,7 +100,7 @@ def stage(**kwargs):
     # build
     if not job.prepare:
         return job
-    _build(job)
+    build(job)
 
     # check minimum processors needed for compiled memory size
     path = os.path.dirname(__file__)

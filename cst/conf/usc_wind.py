@@ -1,9 +1,10 @@
 """
 USC Wind
 
-Intel(R) Pentium(R) 4 CPU 3.20GHz
-1GB
+3.20 GHz Pentium 4
+1GB RAM
 """
+
 login = hostname = 'wind.usc.edu'
 maxcores = 2
 maxram = 800

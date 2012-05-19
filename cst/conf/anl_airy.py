@@ -1,12 +1,10 @@
 """
 ANL Airy
 
-MacBook Air
-Intel Core i7 1.8GHz
-4GB
+1.8 GHz Core i7
+4 GB RAM
 """
-login = 'airy.anl.gov'
-#hostname = 'airy.*'
+
 maxcores = 2
 maxram = 3800
 rate = 1.4e6

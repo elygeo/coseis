@@ -28,7 +28,7 @@ def build_fext(**kwargs):
     cwd = os.getcwd()
     os.chdir(os.path.dirname(__file__))
     if not os.path.exists('rspectra.so'):
-        fopt = shlex.split(conf.f2py_flags)
+        fopt = shlex.split(conf.default.f2py_flags)
         ext = [Extension('rspectra', ['rspectra.f90'], f2py_options=fopt)]
         setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
     os.chdir(cwd)
@@ -58,7 +58,7 @@ class storage(dict):
     def __setitem__(self, key, val):
         self[key]
         if type(val) != type(self[key]):
-            raise TypeError
+            raise TypeError(key, val)
         dict.__setitem__(self, key, val)
         return
     def __setattr__(self, key, val):
@@ -134,6 +134,8 @@ def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
     if n == None:
         n = np.get_printoptions()['threshold']
     out = ''
+    if '__doc__' in d:
+        out = '"""' + __doc__ + '"""'
     has_array = False
     for k in sorted(d):
         if k not in expand and (keep is None or k in keep):
@@ -193,7 +195,7 @@ def configure(dictargs, **kwargs):
     job = storage(**job)
 
     # key-word arguments
-    for k in kwargs:
+    for k in kwargs.copy():
         job[k] = kwargs[k]
         del(kwargs[k])
 
@@ -215,7 +217,7 @@ def configure(dictargs, **kwargs):
             else:
                 job[key] = cast
         if not job.prepare:
-            job.run = False
+            job.run = ''
         if job.run == 'debug':
             job.optimize = 'g'
 
@@ -273,13 +275,15 @@ def prepare(job=None, **kwargs):
     Compute and display resource usage
     """
     import os, time
-    from . import conf
+    from . import conf, util
 
     # misc
     if job == None:
-        job = storage(**conf.__dict__)
-    job.jobid = None
-    job.rundate = time.strftime('%Y %b %d')
+        job = util.configure(conf.default)[0]
+    job.update(dict(
+        jobid = '',
+        rundate = time.strftime('%Y %b %d'),
+    ))
 
     # number of processes
     if not hasattr(job, 'nproc') or job.mode == 's':
@@ -299,33 +303,36 @@ def prepare(job=None, **kwargs):
         job.queue = q
         job.update(d)
 
+        # addtional job parameters
+        job.update(dict(
+            nodes = 1,
+            ppn = job.nproc,
+            cores = job.nproc,
+            totalcores = job.nproc,
+            ram = 0,
+            minutes = 0,
+            walltime = '',
+        ))
+
         # parallelization
-        if job.maxcores and job.maxnodes:
+        if job.maxcores:
             job.nodes = min(job.maxnodes, (job.nproc - 1) // job.maxcores + 1)
             job.ppn = (job.nproc - 1) // job.nodes + 1
             job.cores = min(job.maxcores, job.ppn)
             job.totalcores = job.nodes * job.maxcores
-        else:
-            job.nodes = 1
-            job.ppn = job.nproc
-            job.cores = job.nproc
-            job.totalcores = job.nproc
 
         # memory
-        if not hasattr(job, 'pmem'):
+        if not job.pmem:
             job.pmem = job.maxram / job.ppn
         job.ram = job.pmem * job.ppn
 
         # SU estimate and wall time limit with extra allowance
-        if hasattr(job, 'seconds'):
-            seconds = job.seconds * job.ppn // job.cores
-            minutes = 10 + int(seconds // 30)
-        else:
-            seconds = 3600
-            minutes = 60
+        seconds = job.seconds * job.ppn // job.cores
+        minutes = 10 + int(seconds // 30)
         if job.maxtime:
             maxminutes = 60 * job.maxtime[0] + job.maxtime[1]
             minutes = min(minutes, maxminutes)
+            seconds = min(seconds * 60, maxminutes)
         job.minutes = minutes
         job.walltime = '%d:%02d:00' % (minutes // 60, minutes % 60)
         sus = seconds // 3600 * job.totalcores + 1
@@ -338,7 +345,7 @@ def prepare(job=None, **kwargs):
         break
 
     # messages
-    print('Machine: %s' % job.machine)
+    #print('Machine: %s' % job.machine)
     print('Cores: %s of %s' % (job.nproc, job.maxnodes * job.maxcores))
     print('Nodes: %s of %s' % (job.nodes, job.maxnodes))
     print('RAM: %sMb of %sMb per node' % (job.ram, job.maxram))
@@ -384,7 +391,6 @@ def skeleton(job=None, stagein=(), new=True, **kwargs):
 
     # locations
     rundir = job.rundir
-    path = os.path.join(os.path.dirname(__file__), 'conf')
     dest = os.path.realpath(os.path.expanduser(rundir)) + os.sep
 
     # create destination directory
@@ -392,11 +398,10 @@ def skeleton(job=None, stagein=(), new=True, **kwargs):
         os.makedirs(dest)
 
     # process machine templates
-    if job.machine:
-        d = os.path.join(path, job.machine)
-        for base in os.listdir(d):
-            if base != 'conf.py':
-                f = os.path.join(d, base)
+    if job.templates:
+        for base in os.listdir(job.templates):
+            if base[0] != '_':
+                f = os.path.join(job.templates, base)
                 if base == 'script.sh':
                     base = job.name + '.sh'
                 ff = os.path.join(dest, base)

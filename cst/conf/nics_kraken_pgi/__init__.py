@@ -15,6 +15,7 @@ showq
 showbf
 showusage
 """
+
 login = 'kraken-pwd.nics.utk.edu'
 hostname = 'kraken-pwd[1234]'
 maxram = 15000
@@ -40,7 +41,7 @@ fortran_flags = {
     'O': '-fast',
     '8': '-Mr8',
 }
-cvms_ = dict(
+cvms_opts = dict(
     fortran_flags = {
         'g': '-Ktrap=fp -Mbounds -Mchkptr -g',
         'O': '-fast',

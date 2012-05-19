@@ -24,7 +24,7 @@ def build(job=None):
 
     # configure
     if job == None:
-        job = util.storage(**conf.__dict__)
+        job = util.configure(conf.default, options=[])[0]
     if not job.mode:
         job.mode = 'sm'
     dtype = np.dtype(job.dtype).str
@@ -125,7 +125,7 @@ def stage(prm, **kwargs):
                 del(kwargs[k])
 
     # job configuration
-    job, kwargs = util.configure(conf, **kwargs)
+    job, kwargs = util.configure(conf.default, **kwargs)
     if kwargs:
         print('Unknown parameters:')
         pprint.pprint(kwargs)
@@ -168,7 +168,7 @@ def stage(prm, **kwargs):
         nvars = 44
     nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
     job.pmem = 32 + int(1.2 * nm * nvars * int(job.dtype[-1]) / 1024 / 1024)
-    job.seconds = (prm.shape[3] + 10) * nm / job.rate
+    job.seconds = int((prm.shape[3] + 10) * nm // job.rate)
 
     # configure options
     job.command = os.path.join('.', 'sord-' + job.mode + job.optimize + job.dtype[-1])
@@ -177,7 +177,7 @@ def stage(prm, **kwargs):
     # compile code
     if not job.prepare:
         return job
-    _build(job)
+    build(job)
 
     # create run directory
     path = os.path.dirname(__file__)
@@ -201,7 +201,7 @@ def stage(prm, **kwargs):
     # conf, parameter files
     cwd = os.path.realpath(os.getcwd())
     os.chdir(job.rundir)
-    delattr(prm, 'itbuff')
+    del(prm['itbuff'])
     util.save('parameters.py', prm, expand=['fieldio'], header='# modelXX parameters\n')
     util.save('conf.py', job, header = '# configuration\n')
 

@@ -7,18 +7,16 @@ Setup Coseis
 if __name__ != '__main__':
     raise Exception('Error, not a module: %s' % __file__)
 
-import os, shutil, pprint
+import os, sys, shutil, pprint
 import cst
+
+cst.cfm.catalog()
 
 target = sys.argv[1:]
 if target == []:
-    cfg = cst.conf.__dict__.copy()
-    doc = cfg['__doc__']
-    for k in cfg:
-        if k[0] == '_':
-            del cfg[k]
-    pprint.pprint(doc)
+    cfg = cst.util.configure(cst.conf.default)[0]
     pprint.pprint(cfg)
+    print(cst.conf.default.__doc__)
 elif target == ['build_all']:
     cst.util.build_ext()
     cst.util.build_fext()
@@ -37,10 +35,11 @@ elif target == ['clean']:
     if os.path.exists(d):
         shutil.rmtree(d)
     for d in '', 'sord', 'cvms', 'tests':
-        d = os.path.join(path, d)
+        d = os.path.join(path, d) 
         for f in os.listdir(d):
+            f = os.path.join(d, f)
             if f.endswith('.pyc') or f.endswith('.so'):
-                os.unlink(d + f)
+                os.unlink(f)
 else:
     raise Exception('Unknown target %s' % target)
 

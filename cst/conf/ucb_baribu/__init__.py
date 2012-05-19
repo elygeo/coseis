@@ -1,6 +1,7 @@
 """
 UCB Baribu cluster
 """
+
 login = hostname = 'baribu.geo.berkeley.edu'
 maxnodes = 7
 maxcores = 8

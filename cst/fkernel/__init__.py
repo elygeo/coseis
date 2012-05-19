@@ -9,7 +9,7 @@ def _build(optimize=None):
     """
     import os, shlex
     from .. import util, conf
-    job = util.storage(**conf.__dict__)
+    job = util.configure(conf.default)[0]
     if not optimize:
         optimize = job.optimize
     mode = job.mode

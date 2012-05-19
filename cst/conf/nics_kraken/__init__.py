@@ -27,6 +27,7 @@ Statically linked Python:
     pip install readline
     pip install nose
 """
+
 login = 'kraken-pwd.nics.utk.edu'
 hostname = 'kraken-pwd[1234]'
 maxram = 15000
@@ -52,7 +53,7 @@ fortran_flags = {
     'O': '-O3',
     '8': '-fdefault-real-8',
 }
-cvms_ = dict(
+cvms_opts = dict(
     fortran_flags = {
         'g': '-Wall -fbounds-check -ffpe-trap=invalid,zero,overflow -g',
         'O': '-Wall -O3',

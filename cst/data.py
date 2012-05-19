@@ -130,24 +130,23 @@ def etopo1(downsample=1):
     import os, urllib, zipfile, cStringIO
     import numpy as np
     from . import coord
-    filename1 = os.path.join(repo, 'etopo01-ice.npy')
-    filename  = os.path.join(repo, 'etopo%02d-ice.npy' % downsample)
+    filename0 = os.path.join(repo, 'dem0060-ice.npy')
+    filename  = os.path.join(repo, 'dem%04dm-ice.npy' % (60 * downsample))
     url = 'http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
     shape = 10801, 21601
-    if not os.path.exist(filename1):
+    if not os.path.exists(filename0):
         print('Retrieving %s' % url)
-        #data = urllib.urlopen(url)
-        #data = cStringIO.StringIO(data.read())
-        print 111111111111111111
-        data = os.path.join(repo, os.path.basename(url))
+        data = urllib.urlopen(url)
+        data = cStringIO.StringIO(data.read())
+        print('Creating %s' % filename0)
         data = zipfile.ZipFile(data)
         data = data.read('etopo1_ice_g_i2.bin')
         data = np.fromstring(data, '<i2').reshape(shape).T[:,::-1]
-        np.save(filename1, data)
+        np.save(filename0, data)
         del(data)
-    if not os.path.exist(filename):
+    if not os.path.exists(filename):
         print('Creating %s' % filename)
-        data = np.load(filename1, mmap_mode='c')
+        data = np.load(filename0, mmap_mode='c')
         data = coord.downsample_sphere(data, downsample)
         np.save(filename, data)
         del(data)
@@ -173,23 +172,23 @@ def globe30(tile=(0, 1), fill=True):
         (3, 1): E Asia, W Pacific
     fill: Fill missing data (ocean basins) with ETOPO1 bathymetry.
     """
-    import os, urllib, gzip
+    import os, urllib, gzip, cStringIO
     import numpy as np
-    filename = os.path.join(repo, 'topo%s%s.npy' % tile)
-    if not os.path.exist(filename):
-        print('Creating %s' % filename)
-        tiles = ('im', 'jn', 'ko', 'lp'), ('ae', 'bf', 'cg', 'dh')
-        shape = 10800, 10800
+    filename = os.path.join(repo, 'dem0030-%s%s.npy' % tile)
+    url = 'http://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/%s10g.gz'
+    tiles = ('im', 'jn', 'ko', 'lp'), ('ae', 'bf', 'cg', 'dh')
+    shape = 10800, 10800
+    if not os.path.exists(filename):
         z = ''
         j, k = tile
         for i in 0, 1:
             t = tiles[k][j][i]
-            u = 'http://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/%s10g.gz' % t
-            f = os.path.join(repo, 'globe30%s.bin.gz' % t)
-            if not os.path.exists(f):
-                print('Retrieving %s' % u)
-                urllib.urlretrieve(u, f)
-            z += gzip.open(f, mode='rb').read()
+            u = url % t
+            print('Retrieving %s' % u)
+            f = urllib.urlopen(u)
+            f = cStringIO.StringIO(f.read())
+            z += gzip.GzipFile(fileobj=f).read()
+        print('Creating %s' % filename)
         z = np.fromstring(z, '<i2').reshape(shape).T[:,::-1]
         if fill:
             n = shape[1] // 2

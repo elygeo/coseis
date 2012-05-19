@@ -1,10 +1,10 @@
 """
 Z Shi
 
-MacBook Pro
-Intel Core 2 Duo 3.06 GHz
-Memory 4 GB (2 x 2 GB)
+3.06 GHz Core 2 Duo
+4 GB Ram
 """
+
 login = 'sam-shis-macbook-pro.usc.edu'
 hostname = 'sam-shis-macbook-pro'
 maxcores = 2
