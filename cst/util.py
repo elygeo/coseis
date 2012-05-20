@@ -34,6 +34,52 @@ def build_fext(**kwargs):
     os.chdir(cwd)
 
 
+def make(compiler, object_, source):
+    """
+    An alternative Make that uses state files.
+    """
+    import os, glob, shlex, difflib, subprocess
+
+    object_ = os.path.expanduser(object_)
+    source = [os.path.expanduser(f) for f in source if f]
+    statedir = os.path.join(os.path.dirname(object_), 'build-state')
+    if not os.path.isdir(statedir):
+        os.mkdir(statedir)
+    statefile = os.path.join(statedir, os.path.basename(object_))
+    if isinstance(compiler, basestring):
+        compiler = shlex.split(compiler)
+    else:
+        compiler = list(compiler)
+    command = compiler + [object_] + source
+    state = [' '.join(command) + '\n']
+    for f in source:
+        state += open(f).readlines()
+    compile_ = True
+    if os.path.isfile(object_):
+        try:
+            oldstate = open(statefile).readlines()
+        except IOError:
+            pass
+        else:
+            diff = ''.join(difflib.unified_diff(oldstate, state, n=0))
+            if diff:
+                print(diff)
+            else:
+                compile_ = False
+    if compile_:
+        try:
+            os.unlink(statefile)
+        except OSError:
+            pass
+        print('\n' + ' '.join(command))
+        subprocess.check_call(command)
+        open(statefile, 'w').writelines(state)
+        for pat in '*.o', '*.mod', '*.ipo', '*.il', '*.stb':
+            for f in glob.glob(pat):
+                os.unlink(f)
+    return compile_
+
+
 def archive():
     import os, gzip, tarfile
     try:
@@ -58,7 +104,7 @@ class storage(dict):
     def __setitem__(self, key, val):
         self[key]
         if type(val) != type(self[key]):
-            raise TypeError(key, val)
+            raise TypeError(key, self[key], val)
         dict.__setitem__(self, key, val)
         return
     def __setattr__(self, key, val):
@@ -183,7 +229,8 @@ def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
 
 
 def configure(dictargs, **kwargs):
-    import getopt
+    import sys, getopt
+    from . import conf
 
     # dict arguments
     if type(dictargs != dict):
@@ -194,10 +241,32 @@ def configure(dictargs, **kwargs):
             job[k] = dictargs[k]
     job = storage(**job)
 
-    # key-word arguments
+    # merge site parameters
+    for k in dir(conf.site):
+        if k[0] != '_':
+            job[k] = getattr(conf.site, k)
+
+    # merge key-word arguments, 1st pass
+    for k in kwargs:
+        if k in job:
+            job[k] = kwargs[k]
+
+    # merge machine parameters
+    if job.machine:
+        m = conf.__name__ + '.' + job.machine
+        __import__(m)
+        m = sys.modules[m]
+        for k in dir(m):
+            if k[0] != '_':
+                job[k] = getattr(m, k)
+        if hasattr(m, '__path__'):
+            job.templates = m.__path__[0]
+
+    # key-word arguments, 2nd pass
     for k in kwargs.copy():
-        job[k] = kwargs[k]
-        del(kwargs[k])
+        if k in job:
+            job[k] = kwargs[k]
+            del(kwargs[k])
 
     # command line parameters
     if job.options:
@@ -221,65 +290,21 @@ def configure(dictargs, **kwargs):
         if job.run == 'debug':
             job.optimize = 'g'
 
+    # merge fortran flags
+    k = job.fortran_serial
+    if k in job.fortran_flags:
+        job.fortran_flags = job.fortran_flags[k]
+
     return job, kwargs
 
 
-def make(compiler, object_, source):
-    """
-    An alternative Make that uses state files.
-    """
-    import os, glob, shlex, difflib, subprocess
-
-    object_ = os.path.expanduser(object_)
-    source = [os.path.expanduser(f) for f in source if f]
-    statedir = os.path.join(os.path.dirname(object_), 'build-state')
-    if not os.path.isdir(statedir):
-        os.mkdir(statedir)
-    statefile = os.path.join(statedir, os.path.basename(object_))
-    if isinstance(compiler, basestring):
-        compiler = shlex.split(compiler)
-    else:
-        compiler = list(compiler)
-    command = compiler + [object_] + source
-    state = [' '.join(command) + '\n']
-    for f in source:
-        state += open(f).readlines()
-    compile_ = True
-    if os.path.isfile(object_):
-        try:
-            oldstate = open(statefile).readlines()
-        except IOError:
-            pass
-        else:
-            diff = ''.join(difflib.unified_diff(oldstate, state, n=0))
-            if diff:
-                print(diff)
-            else:
-                compile_ = False
-    if compile_:
-        try:
-            os.unlink(statefile)
-        except OSError:
-            pass
-        print('\n' + ' '.join(command))
-        subprocess.check_call(command)
-        open(statefile, 'w').writelines(state)
-        for pat in '*.o', '*.mod', '*.ipo', '*.il', '*.stb':
-            for f in glob.glob(pat):
-                os.unlink(f)
-    return compile_
-
-
-def prepare(job=None, **kwargs):
+def prepare(job):
     """
     Compute and display resource usage
     """
     import os, time
-    from . import conf, util
 
     # misc
-    if job == None:
-        job = util.configure(conf.default)[0]
     job.update(dict(
         jobid = '',
         rundate = time.strftime('%Y %b %d'),
@@ -291,9 +316,9 @@ def prepare(job=None, **kwargs):
 
     # queue options
     opts = job.queue_opts
-    if opts == None:
+    if opts == []:
         opts = [(job.queue, {})]
-    elif job.queue is not None:
+    elif job.queue:
         opts = [d for d in opts if d[0] == job.queue]
         if len(opts) == 0:
             raise Exception('Error: unknown queue: %s' % job.queue)

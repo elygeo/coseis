@@ -23,22 +23,23 @@ force = False    # overwrite previous run directory if present
 prepare = True   # True: compile code and setup run directory, False: dry run
 optimize = 'O'   # 'O': optimize, 'g': debug, 't': test, 'p': profile
 mode = ''        # 's': serial, 'm': MPI, '': guess
-depend = False   # wait for other job to finish. supply job ID to depend.
+depend = ''      # wait for other job to finish. supply job ID to depend.
 nproc = 1
 command = ''     # executable command
 pre = post = ''  # pre-processing and post-processing commands
 dtype = dtype_f = np.dtype('f').str # Numpy data type
 verbose = False
 seconds = 1500
+cvms = {}
 
 # machine specific
-machine = None
-account = None
+machine = ''
+account = ''
 templates = ''
 login = host = hostname = os.uname()[1]
 system = os.uname()
-queue = None
-queue_opts = None
+queue = ''
+queue_opts = []
 maxnodes = 1
 maxcores = 0
 maxram = 0

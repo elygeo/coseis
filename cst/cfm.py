@@ -16,7 +16,7 @@ def catalog(version='CFM4-socal-primary'):
     the fault name and number of segments. The CFM database is downloaded if not
     already present.
     """
-    import os, urllib, zipfile, cStringIO
+    import os, urllib, zipfile
     import numpy as np
     from . import gocad
 

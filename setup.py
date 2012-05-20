@@ -10,8 +10,6 @@ if __name__ != '__main__':
 import os, sys, shutil, pprint
 import cst
 
-cst.cfm.catalog()
-
 target = sys.argv[1:]
 if target == []:
     cfg = cst.util.configure(cst.conf.default)[0]

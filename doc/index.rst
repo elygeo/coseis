@@ -57,10 +57,11 @@ BSD_ terms.
 Install
 =======
 
-0.  If on Mac OS X, first install Xcode_, Homebrew_, and then Fortran with:
-    ::
+0.  If on Mac OS X, first install Xcode_ from the App Store. From the Xcode
+    preferences pane, install the Command Line Tools. Then install Homebrew_,
+    followed by Git_ and Fortran_ with::
 
-        brew install gfortran
+        brew install git gfortran
 
     Optionally, install MPICH2_ for multiprocessing, and EPD_ for visualization
     and analysis.
@@ -101,10 +102,12 @@ Install
 
         python setup.py
 
-.. _Xcode:             http://itunes.apple.com/us/app/xcode/id497799835
-.. _Homebrew:          http://mxcl.github.com/homebrew/
-.. _MPICH2:            http://www.mcs.anl.gov/research/projects/mpich2/
-.. _EPD:               http://www.enthought.com/products/epddownload.php
+.. _Xcode:       http://itunes.apple.com/us/app/xcode/id497799835
+.. _Homebrew:    http://mxcl.github.com/homebrew/
+.. _Git:         http://git-scm.com/
+.. _Fortran:     http://r.research.att.com/tools/
+.. _MPICH2:      http://www.mcs.anl.gov/research/projects/mpich2/
+.. _EPD:         http://www.enthought.com/products/epddownload.php
 
 
 Examples
