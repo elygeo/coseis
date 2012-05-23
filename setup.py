@@ -18,7 +18,7 @@ elif target == ['build_all']:
     cst.sord.build()
     cst.cvms.build()
     cst.cvmh.cvmh_voxet()
-    cst.cvms.catalog()
+    cst.cfm.catalog()
     cst.data.mapdata()
     cst.data.etopo1()
     cst.data.globe30()

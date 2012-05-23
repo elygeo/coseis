@@ -156,20 +156,32 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='vx63'):
     bound: (x0, x1), (y0, y1), (z0, z1)
     data: Array of properties
     """
-    import os, urllib, subprocess
+    import os, urllib, tarfile
     from . import gocad
 
+    path = os.path.join(repo, 'cvmh-%s' % version)
+    url = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2' % version
+
     # download if not found
-    path = os.path.join(repo, version, 'bin')
     if not os.path.exists(path):
-        url = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2' % version
-        print('Downloading %s' % url)
-        f = os.path.join(repo, os.path.basename(url))
-        urllib.urlretrieve(url, f)
-        subprocess.check_call(['tar', '-C', repo, '-jxf', f])
+        f = path + '.bztar'
+        if not os.path.exists(f):
+            print('Downloading %s' % url)
+            urllib.urlretrieve(url, f)
+        print('Extracting %s' % f)
+        d = '%s/bin' % version
+        tar = tarfile.open(f)
+        os.mkdir(path)
+        with tar as tar:
+            for t in tar:
+                if not t.name.startswith(d):
+                    continue
+                if t.name.endswith('.vo') or t.name.endswith('@@'):
+                    f = os.path.join(path, os.path.split(t.name)[1])
+                    open(f, 'wb').write(tar.extractfile(t).read())
 
     # fill 3d voxets
-    turd = os.path.join(path, '.filled')
+    turd = os.path.join(path, 'filled')
     if not os.path.exists(turd):
         for vox in voxet3d:
             print('Filling voxet %s %s' % (version, vox))

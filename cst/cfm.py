@@ -20,8 +20,8 @@ def catalog(version='CFM4-socal-primary'):
     import numpy as np
     from . import gocad
 
-    fault_file = os.path.join(repo, 'scec-cfm4', 'fault-list.txt')
-    path = os.path.join(repo, 'scec-cfm4')
+    fault_file = os.path.join(repo, 'cfm4', 'fault-list.txt')
+    path = os.path.join(repo, 'cfm4')
     npy = os.path.join(path, '%s-%04d-%s.npy')
     url = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
     dtype = [('name', 'S64'), ('nseg', 'i')]
@@ -29,7 +29,7 @@ def catalog(version='CFM4-socal-primary'):
     if os.path.exists(fault_file):
         cat = dict(np.loadtxt(fault_file, dtype))
     else:
-        f = os.path.join(repo, os.path.basename(url))
+        f = os.path.join(repo, 'scec-vdo.jar')
         if not os.path.exists(f):
             print('Downloading %s' % url)
             urllib.urlretrieve(url, f)
@@ -148,7 +148,7 @@ def read(faults=None, extent=None, version='CFM4-socal-primary'):
     # prep
     nseg = catalog(version=version)
     proj = pyproj.Proj(**projection)
-    path = os.path.join(repo, 'scec-cfm4')
+    path = os.path.join(repo, 'cfm4')
     npy = os.path.join(path, version, '%s-%04d-%s.npy')
 
     # read faults

@@ -130,8 +130,8 @@ def etopo1(downsample=1):
     import os, urllib, zipfile, cStringIO
     import numpy as np
     from . import coord
-    filename0 = os.path.join(repo, 'dem0060-ice.npy')
-    filename  = os.path.join(repo, 'dem%04dm-ice.npy' % (60 * downsample))
+    filename0 = os.path.join(repo, 'dem0060.npy')
+    filename  = os.path.join(repo, 'dem%04d.npy' % (60 * downsample))
     url = 'http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
     shape = 10801, 21601
     if not os.path.exists(filename0):
@@ -147,7 +147,7 @@ def etopo1(downsample=1):
     if not os.path.exists(filename):
         print('Creating %s' % filename)
         data = np.load(filename0, mmap_mode='c')
-        data = coord.downsample_sphere(data, downsample)
+        data = downsample_sphere(data, downsample)
         np.save(filename, data)
         del(data)
     return np.load(filename, mmap_mode='c')
@@ -395,7 +395,7 @@ def us_place_names():
             skip_header=1, usecols=cols, dtype=dtype)
         np.save(filename, data)
         del(data)
-    return np.load(filename, memmap_mode='c')
+    return np.load(filename, mmap_mode='c')
 
 
 def engdahl_cat():
@@ -432,7 +432,7 @@ def engdahl_cat():
         data = np.genfromtxt(data, dtype=d[1::2], delimiter=d[0::2])
         np.save(filename, data)
         del(data)
-    return np.load(filename, memmap_mode='c')
+    return np.load(filename, mmap_mode='c')
 
 
 def lsh_cat():
@@ -475,7 +475,7 @@ def lsh_cat():
         data = np.genfromtxt(data, dtype=dtype)
         np.save(filename, data)
         del(data)
-    return np.load(filename, memmap_mode='c')
+    return np.load(filename, mmap_mode='c')
 
 
 def cybershake(isrc, irup, islip, ihypo, name=None):
