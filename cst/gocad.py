@@ -61,10 +61,12 @@ def voxet(path, load_props=[], alternate='', no_data_value=None, buff=None):
     voxet = {}
     counter = 0
     while counter < len(buff):
-        line = buff[counter]
+        line = buff[counter].strip()
         counter += 1
         f = line.replace('"', '').split()
-        if line.startswith('GOCAD Voxet'):
+        if len(f) == 0 or line.startswith('#'):
+            continue
+        elif line.startswith('GOCAD Voxet'):
             id_ = f[2]
             axis, prop = {}, {}
         elif f[0] == 'HEADER':
@@ -109,7 +111,7 @@ def tsurf(buff):
     #    float: ('VRTX', 'PVRTX'),
     #}
     while counter < len(buff):
-        line = buff[counter]
+        line = buff[counter].strip()
         counter += 1
         f = line.split()
         if len(f) == 0 or line.startswith('#'):
