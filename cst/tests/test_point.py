@@ -41,7 +41,6 @@ def test_point():
         prm,
         rundir = 'tmp/s',
         run = 'exec',
-        dtype = 'f',
         argv = [],
     )
 
@@ -53,7 +52,6 @@ def test_point():
             prm,
             rundir = 'tmp/%s' % i,
             run = 'exec',
-            dtype = 'f',
             argv = [],
         )
         max_err_ = 0.0

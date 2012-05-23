@@ -24,11 +24,10 @@ def build_fext(**kwargs):
     """
     import os, shlex
     from numpy.distutils.core import setup, Extension
-    from . import conf
     cwd = os.getcwd()
     os.chdir(os.path.dirname(__file__))
     if not os.path.exists('rspectra.so'):
-        fopt = shlex.split(conf.default.f2py_flags)
+        fopt = shlex.split(configure()[0].f2py_flags)
         ext = [Extension('rspectra', ['rspectra.f90'], f2py_options=fopt)]
         setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
     os.chdir(cwd)
@@ -101,10 +100,11 @@ def archive():
 
 
 class storage(dict):
+    __doc__ = None
     def __setitem__(self, key, val):
-        self[key]
-        if type(val) != type(self[key]):
-            raise TypeError(key, self[key], val)
+        v = self[key]
+        if val != None and v != None and type(val) != type(v):
+            raise TypeError(key, v, val)
         dict.__setitem__(self, key, val)
         return
     def __setattr__(self, key, val):
@@ -228,23 +228,19 @@ def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
     return out
 
 
-def configure(dictargs, **kwargs):
+def configure(modules=None, **kwargs):
     import sys, getopt
     from . import conf
 
-    # dict arguments
-    if type(dictargs != dict):
-        dictargs = dictargs.__dict__
-    job = {}
-    for k in dictargs:
-        if k[0] != '_':
-            job[k] = dictargs[k]
+    # modules
+    if modules == None:
+        modules = conf.default, conf.site
+    job = {'doc': modules[0].__doc__}
+    for m in modules:
+        for k in dir(m):
+            if k[0] != '_':
+                job[k] = getattr(m, k)
     job = storage(**job)
-
-    # merge site parameters
-    for k in dir(conf.site):
-        if k[0] != '_':
-            job[k] = getattr(conf.site, k)
 
     # merge key-word arguments, 1st pass
     for k in kwargs:
@@ -256,6 +252,7 @@ def configure(dictargs, **kwargs):
         m = conf.__name__ + '.' + job.machine
         __import__(m)
         m = sys.modules[m]
+        job.doc = m.__doc__
         for k in dir(m):
             if k[0] != '_':
                 job[k] = getattr(m, k)

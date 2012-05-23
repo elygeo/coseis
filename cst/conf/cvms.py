@@ -11,7 +11,7 @@ file_dep = 'hold/dep.bin'
 file_rho = 'hold/rho.bin'
 file_vp = 'hold/vp.bin'
 file_vs = 'hold/vs.bin'
-stagein = 'hold/',
+stagein = ['hold/']
 
 # command line options: (short, long, parameter, value)
 options = [

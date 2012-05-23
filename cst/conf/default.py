@@ -30,7 +30,7 @@ pre = post = ''  # pre-processing and post-processing commands
 dtype = dtype_f = np.dtype('f').str # Numpy data type
 verbose = False
 seconds = 1500
-cvms = {}
+cvms_opts = {}
 
 # machine specific
 machine = ''
@@ -44,7 +44,7 @@ maxnodes = 1
 maxcores = 0
 maxram = 0
 pmem = 0
-maxtime = 0
+maxtime = 0, 0
 rate = 1.0e6
 nstripe = -2
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'

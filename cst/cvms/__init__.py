@@ -25,7 +25,7 @@ def build(job=None):
 
     # configure
     if job==None:
-        job = util.configure(conf.cvms, options=None)[0]
+        job = util.configure([conf.default, conf.cvms, conf.site], options=[])[0]
     if not job.mode:
         job.mode = 'asm'
     assert job.version in ('2.2', '3.0', '4.0')
@@ -86,7 +86,7 @@ def stage(**kwargs):
     print('CVM-S setup')
 
     # configure
-    job, kwargs = util.configure(conf.cvms, **kwargs)
+    job, kwargs = util.configure([conf.default, conf.cvms, conf.site], **kwargs)
     if kwargs:
         sys.exit('Unknown parameter: %s' % kwargs)
     if not job.mode:
@@ -121,10 +121,10 @@ def stage(**kwargs):
         f = os.path.join(path, '..', 'build', ver)
         shutil.copytree(f, job.rundir)
     else:
-        for f in (
+        for f in [
             job.file_lon, job.file_lat, job.file_dep,
             job.file_rho, job.file_vp, job.file_vs,
-        ) + job.stagein:
+        ] + job.stagein:
             ff = os.path.join(job.rundir, f)
             if os.path.isdir(ff):
                 shutil.rmtree(ff)

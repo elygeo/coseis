@@ -24,7 +24,7 @@ def build(job=None):
 
     # configure
     if job == None:
-        job = util.configure(conf.default, options=[])[0]
+        job = util.configure(options=[])[0]
     if not job.mode:
         job.mode = 'sm'
     dtype = np.dtype(job.dtype).str
@@ -110,7 +110,7 @@ def stage(prm, **kwargs):
     Stage job
     """
     import os, glob, shutil, pprint
-    from .. import util, conf
+    from .. import util
 
     print('\nSORD setup')
 
@@ -125,7 +125,7 @@ def stage(prm, **kwargs):
                 del(kwargs[k])
 
     # job configuration
-    job, kwargs = util.configure(conf.default, **kwargs)
+    job, kwargs = util.configure(**kwargs)
     if kwargs:
         print('Unknown parameters:')
         pprint.pprint(kwargs)

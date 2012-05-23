@@ -6,7 +6,6 @@ import os, imp, glob
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.interpolate.RectBivariateSpline as interp2d
-import cst
 
 # paramters
 degree = 1

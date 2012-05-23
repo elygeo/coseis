@@ -5,13 +5,15 @@ def test_conf():
     import os, shutil, pprint
     import cst
     path = os.path.dirname(cst.conf.__file__)
-    modules = cst.conf.default, cst.conf.cvms
     machines = ['default'] + os.listdir(path)
-    for module in modules:
+    for modules in [
+        (cst.conf.default, cst.conf.site),
+        (cst.conf.default, cst.conf.cvms, cst.conf.site),
+    ]:
         for machine in machines:
             if machine.endswith('.pyc'):
                 continue
-            if machine == 'default.py' or machine == 'cvms.py':
+            if machine in ['__init__.py', 'default.py', 'cvms.py']:
                 continue
             if machine.endswith('.py'):
                 machine = machine[:-3]
@@ -21,7 +23,7 @@ def test_conf():
             reload(cst.conf.default)
             reload(cst.conf)
             job = cst.util.configure(
-                module,
+                modules,
                 argv = [],
                 rundir = 'tmp',
                 command = 'date',
@@ -31,8 +33,9 @@ def test_conf():
             cst.util.prepare(job)
             cst.util.skeleton(job)
             shutil.rmtree('tmp')
+            print(job.doc)
+            del(job['doc'])
             pprint.pprint(job)
-            print(cst.conf.default.__doc__)
 
 # continue if command line
 if __name__ == '__main__':
