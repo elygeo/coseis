@@ -39,8 +39,6 @@ def test_pml():
         prm,
         rundir = 'tmp/s',
         run = 'exec',
-        dtype = 'f',
-        debug = 0,
         argv = [],
     )
 
@@ -52,8 +50,6 @@ def test_pml():
             prm,
             rundir = 'tmp/%s' % i,
             run = 'exec',
-            dtype = 'f',
-            debug = 0,
             argv = [],
         )
         max_err_ = 0.0

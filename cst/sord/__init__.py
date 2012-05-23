@@ -123,6 +123,8 @@ def stage(prm, **kwargs):
             if k in prm:
                 prm[k] = kwargs[k]
                 del(kwargs[k])
+    else:
+        prm = util.storage(**prm)
 
     # job configuration
     job, kwargs = util.configure(**kwargs)
@@ -201,7 +203,7 @@ def stage(prm, **kwargs):
     cwd = os.path.realpath(os.getcwd())
     os.chdir(job.rundir)
     del(prm['itbuff'])
-    util.save('parameters.py', prm, expand=['fieldio'], header='# modelXX parameters\n')
+    util.save('parameters.py', prm, expand=['fieldio'], header='# model parameters\n')
     util.save('conf.py', job, header = '# configuration\n')
 
     # metadata

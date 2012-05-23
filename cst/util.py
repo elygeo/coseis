@@ -128,7 +128,7 @@ def prune(d, pattern=None, types=None):
         Functions, classes, and modules are pruned by default.
 
     >>> prune({'aa': 0, 'aa_': 0, '_aa': 0, 'a_a': 0, 'b_b': prune})
-    {'a_a': 0}
+    {'aa': 0, 'aa_': 0, 'a_a': 0}
     """
     import re
     import numpy as np

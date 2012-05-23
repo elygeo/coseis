@@ -36,6 +36,7 @@ def test_conf():
             print(job.doc)
             del(job['doc'])
             pprint.pprint(job)
+    reload(cst.conf.site)
 
 # continue if command line
 if __name__ == '__main__':

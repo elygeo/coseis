@@ -54,7 +54,6 @@ def test_kostrov():
     # run SORD
     job = cst.sord.run(
         prm,
-        dtype = 'f',
         rundir = 'tmp',
         run = 'exec',
         argv = [],
