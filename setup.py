@@ -1,20 +1,17 @@
 #!/usr/bin/env python
-"""
-Setup Coseis
-"""
-
-# guard against importing since this directory is in the path.
 if __name__ != '__main__':
-    raise Exception('Error, not a module: %s' % __file__)
+    raise Exception('not a module')
 
 import os, sys, shutil, pprint
 import cst
 
 target = sys.argv[1:]
 if target == []:
-    cfg = cst.util.configure(cst.conf.default)[0]
+    cfg = cst.util.configure()[0]
+    doc = cfg.doc
+    del(cfg['doc'])
     pprint.pprint(cfg)
-    print(cst.conf.default.__doc__)
+    print(doc)
 elif target == ['build_all']:
     cst.util.build_ext()
     cst.util.build_fext()
@@ -39,5 +36,5 @@ elif target == ['clean']:
             if f.endswith('.pyc') or f.endswith('.so'):
                 os.unlink(f)
 else:
-    raise Exception('Unknown target %s' % target)
+    raise Exception(target)
 
