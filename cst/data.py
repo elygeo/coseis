@@ -129,7 +129,6 @@ def etopo1(downsample=1):
     """
     import os, urllib, zipfile, cStringIO
     import numpy as np
-    from . import coord
     filename0 = os.path.join(repo, 'dem0060.npy')
     filename  = os.path.join(repo, 'dem%04d.npy' % (60 * downsample))
     url = 'http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
