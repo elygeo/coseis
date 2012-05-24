@@ -12,10 +12,9 @@ Options
 -c <clim>   Set upper color scale limit to constant value.
 -s          For image series, step through with mouse clicks.
 """
-import os, sys, getopt
+import os, sys, imp, getopt
 import numpy as np
 import matplotlib.pyplot as plt
-import cst
 
 def stats(f, msg=''):
     """
@@ -79,7 +78,7 @@ def plot(*argv):
                 meta = os.path.join(path, 'meta.py')
                 if os.path.exists(meta):
                     try:
-                        meta = cst.util.load(meta)
+                        meta = imp.load_source('meta', meta)
                         shape = meta.shapes[tail]
                         delta = meta.deltas[tail]
                         dtype = meta.dtype

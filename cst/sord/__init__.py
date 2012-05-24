@@ -117,9 +117,10 @@ def stage(prm, **kwargs):
     # old-style dictionary parameters
     if type(prm) == dict:
         print('Warning: using old-style parameters')
-        kwargs = util.prune(prm.copy(), '(^_)|(_$)|(^.$)|(^..$)').update(kwargs)
+        kwargs = util.prune(prm.copy(), '(^_)|(_$)|(^.$)|(^..$)')
+        kwargs.update(kwargs)
         prm = parameters()
-        for k in kwargs:
+        for k in kwargs.copy():
             if k in prm:
                 prm[k] = kwargs[k]
                 del(kwargs[k])
