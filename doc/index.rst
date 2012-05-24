@@ -102,6 +102,8 @@ Install
 
         python setup.py
 
+    The component tools will compile just-in-time the first time you run them.
+
 .. _Xcode:       http://itunes.apple.com/us/app/xcode/id497799835
 .. _Homebrew:    http://mxcl.github.com/homebrew/
 .. _Git:         http://git-scm.com/

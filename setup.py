@@ -13,8 +13,6 @@ if target == []:
     pprint.pprint(cfg)
     print(doc)
 elif target == ['build_all']:
-    cst.util.build_ext()
-    cst.util.build_fext()
     cst.sord.build()
     cst.cvms.build()
     cst.cvmh.cvmh_voxet()
@@ -24,6 +22,8 @@ elif target == ['build_all']:
     cst.data.globe30()
     cst.data.lsh_cat()
     cst.data.engdahl_cat()
+    import cst.rspectra
+    import cst.trinterp
 elif target == ['clean']:
     path = os.path.dirname(cst.__file__)
     d = os.path.join(path, 'build')

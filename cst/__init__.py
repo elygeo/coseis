@@ -6,16 +6,6 @@ from . import conf, util, viz, plt, mlab
 from . import interpolate, coord, signal, source, egmm, waveform, kostrov
 from . import data, scedc, vm1d, gocad, cvmh, cfm, sord, cvms
 
-try:
-    from .trinterp import trinterp
-except ImportError:
-    pass
-
-try:
-    from .rspectra import rspectra
-except ImportError:
-    pass
-
 class obj(object):
     def __getitem__(self, item):
         return item

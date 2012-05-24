@@ -7,7 +7,7 @@ cimport numpy as np
 
 def trinterp(x, f, t, xi, fi=None):
     """
-    Definition: cst.interpolate.trinterp(x, f, t, xi, fi=None)
+    Definition: cst.trinterp.trinterp(x, f, t, xi, fi=None)
 
     2D linear interpolation of function values specified on triangular mesh.
   

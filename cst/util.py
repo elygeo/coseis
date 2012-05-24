@@ -2,37 +2,6 @@
 Miscellaneous tools.
 """
 
-def build_ext():
-    """
-    Compile C extensions
-    """
-    import os
-    from distutils.core import setup, Extension
-    import numpy as np
-    cwd = os.getcwd()
-    os.chdir(os.path.dirname(__file__))
-    if not os.path.exists('trinterp.so'):
-        incl = [np.get_include()]
-        ext = [Extension('trinterp', ['trinterp.c'], include_dirs=incl)]
-        setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
-    os.chdir(cwd)
-
-
-def build_fext(**kwargs):
-    """
-    Compile Fortran extentions
-    """
-    import os, shlex
-    from numpy.distutils.core import setup, Extension
-    cwd = os.getcwd()
-    os.chdir(os.path.dirname(__file__))
-    if not os.path.exists('rspectra.so'):
-        fopt = shlex.split(configure()[0].f2py_flags)
-        ext = [Extension('rspectra', ['rspectra.f90'], f2py_options=fopt)]
-        setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
-    os.chdir(cwd)
-
-
 def make(compiler, object_, source):
     """
     An alternative Make that uses state files.
