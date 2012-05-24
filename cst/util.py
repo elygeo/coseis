@@ -83,6 +83,13 @@ class storage(dict):
         return self[key]
 
 
+import numpy
+prune_types_default = (
+    [type(None), bool, str, unicode, int, long, float, tuple, list, dict] +
+    numpy.typeDict.values()
+)
+del(numpy)
+
 def prune(d, pattern=None, types=None):
     """
     Delete dictionary keys with specified name pattern or types
@@ -103,12 +110,8 @@ def prune(d, pattern=None, types=None):
     import numpy as np
     if pattern is None:
         pattern = '^_'
-
     if types is None:
-        types = set(
-            np.typeDict.values() +
-            [np.ndarray, type(None), bool, str, unicode, int, long, float, tuple, list, dict]
-        )
+        types = prune_types_default
     grep = re.compile(pattern)
     for k in d.keys():
         if grep.search(k) or type(d[k]) not in types:
@@ -144,6 +147,8 @@ def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
             fh = open(os.path.expanduser(fh), 'w')
     if expand is None:
         expand = []
+    if prune_types is None:
+        prune_types = prune_types_default + [np.ndarray]
     prune(d, prune_pattern, prune_types)
     n = ext_threshold
     if n == None:
