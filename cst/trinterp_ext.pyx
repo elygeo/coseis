@@ -1,3 +1,7 @@
+"""
+Triangular mesh interpolation
+"""
+
 #cython: boundscheck=False
 #cython: wraparound=False
 #cython: cdivision=True
