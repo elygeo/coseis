@@ -274,7 +274,7 @@ def explore(faults=None, split=False):
     import numpy as np
     import pyproj
     from enthought.mayavi import mlab
-    from . import coord, data
+    from . import coord, data, interpolate
 
     # parameters
     proj = pyproj.Proj(proj='tmerc', lon_0=-118.0, lat_0=34.5)
@@ -309,7 +309,7 @@ def explore(faults=None, split=False):
         data.mapdata('borders', resolution, extent, delta=ddeg),
     ]
     x -= 360.0
-    z = coord.interp2(extent, dem[2], (x, y))
+    z = interpolate.interp2(extent, dem[2], (x, y))
     x, y = proj(x, y)
     i = np.isnan(z)
     x[i] = float('nan')
@@ -320,7 +320,7 @@ def explore(faults=None, split=False):
     print '\nReading fault surfaces:\n'
     names = {}
     coords = []
-    for f in search(faults):
+    for f in search(catalog(), faults):
         print('    ' + repr(f))
         f = read(f)
         x, y = proj(f.lon, f.lat)
