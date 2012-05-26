@@ -328,8 +328,8 @@ def prepare(job=None, **kwargs):
         # SU estimate and wall time limit with extra allowance
         seconds = job.seconds * job.ppn // job.cores
         minutes = 10 + int(seconds // 30)
-        if job.maxtime:
-            maxminutes = 60 * job.maxtime[0] + job.maxtime[1]
+        maxminutes = 60 * job.maxtime[0] + job.maxtime[1]
+        if maxminutes:
             minutes = min(minutes, maxminutes)
             seconds = min(seconds * 60, maxminutes)
         job.minutes = minutes
@@ -339,7 +339,7 @@ def prepare(job=None, **kwargs):
         # if resources exceeded, try another queue
         if job.maxcores and job.ppn > job.maxcores:
             continue
-        if job.maxtime and minutes == maxminutes:
+        if maxminutes and minutes == maxminutes:
             continue
         break
 
@@ -356,7 +356,7 @@ def prepare(job=None, **kwargs):
         print('Warning: exceeding available cores per node (%s)' % job.maxcores)
     if job.ram and job.ram > job.maxram:
         print('Warning: exceeding available RAM per node (%sMb)' % job.maxram)
-    if job.maxtime and minutes == maxminutes:
+    if maxminutes and minutes == maxminutes:
         print('Warning: exceeding maximum time limit (%s:%02d:00)' % job.maxtime)
 
     # run directory
@@ -385,6 +385,8 @@ def skeleton(job=None, **kwargs):
 
     # create destination directory
     dest = os.path.realpath(os.path.expanduser(job.rundir)) + os.sep
+    if job.force == True and os.path.isdir(dest):
+        shutil.rmtree(dest)
     if job.new:
         os.makedirs(dest)
 

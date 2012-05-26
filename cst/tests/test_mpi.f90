@@ -1,5 +1,10 @@
 program main
 use mpi
-call mpi_init( i )
-call mpi_finalize( i )
+integer :: e, i, n
+call mpi_init(e)
+call mpi_comm_rank(mpi_comm_world, i, e)
+call mpi_comm_size(mpi_comm_world, n, e)
+print *, 'Process ', i, ' of ', n
+call mpi_finalize(e)
 end program
+

@@ -108,7 +108,7 @@ def stage(prm, **kwargs):
     """
     Stage job
     """
-    import os, glob, shutil
+    import os, glob
     from .. import util
 
     print('\nSORD setup')
@@ -187,8 +187,6 @@ def stage(prm, **kwargs):
         job.stagein += 'debug/',
     if prm.itcheck != 0:
         job.stagein += 'checkpoint/',
-    if job.force == True and os.path.isdir(job.rundir):
-        shutil.rmtree(job.rundir)
     util.skeleton(job)
 
     # conf, parameter files
