@@ -274,7 +274,7 @@ def explore(faults=None, split=False):
     import numpy as np
     import pyproj
     from enthought.mayavi import mlab
-    from . import coord, data, interpolate
+    from . import data, interpolate
 
     # parameters
     proj = pyproj.Proj(proj='tmerc', lon_0=-118.0, lat_0=34.5)

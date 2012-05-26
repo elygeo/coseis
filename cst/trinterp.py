@@ -4,6 +4,7 @@ Triangular mesh interpolation
 
 try:
     from trinterp_ext import trinterp
+    trinterp
 except ImportError:
     import os
     from distutils.core import setup, Extension
@@ -17,4 +18,5 @@ except ImportError:
     del(incl, ext, cwd)
     del(os, setup, Extension, np)
     from trinterp_ext import trinterp
+    trinterp
 

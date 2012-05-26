@@ -2,7 +2,6 @@
 Support Operator Rupture Dynamics
 """
 from ..util import launch, storage
-from .. import conf
 from . import fieldnames
 from . import parameters as parameters_default
 
@@ -24,7 +23,7 @@ def build(job=None):
 
     # configure
     if job == None:
-        job = util.configure(options=[])[0]
+        job = util.configure(options=[])
     if not job.mode:
         job.mode = 'sm'
     dtype = np.dtype(job.dtype).str
@@ -71,9 +70,9 @@ def build(job=None):
 
     # serial compile
     if 's' in job.mode:
-        source = base + ['serial.f90'] + common
+        src = base + ['serial.f90'] + common
         for opt in job.optimize:
-            object_ = bld + 'sord-s' + opt + dsize
+            obj = bld + 'sord-s' + opt + dsize
             cmd = (
                 [job.fortran_serial] +
                 shlex.split(job.fortran_flags['f']) +
@@ -81,13 +80,13 @@ def build(job=None):
             )
             if dtype != job.dtype_f:
                 cmd += shlex.split(job.fortran_flags[dsize])
-            new |= util.make(cmd + ['-o'], object_, source)
+            new |= util.make(cmd + ['-o'], obj, src)
 
     # mpi compile
     if 'm' in job.mode and job.fortran_mpi:
-        source = base + ['mpi.f90'] + common
+        src = base + ['mpi.f90'] + common
         for opt in job.optimize:
-            object_ = bld + 'sord-m' + opt + dsize
+            obj = bld + 'sord-m' + opt + dsize
             cmd = (
                 [job.fortran_mpi] +
                 shlex.split(job.fortran_flags['f']) +
@@ -95,7 +94,7 @@ def build(job=None):
             )
             if dtype != job.dtype_f:
                 cmd += shlex.split(job.fortran_flags[dsize])
-            new |= util.make(cmd + ['-o'], object_, source)
+            new |= util.make(cmd + ['-o'], obj, src)
 
     # archive source code
     if new:
@@ -109,12 +108,12 @@ def stage(prm, **kwargs):
     """
     Stage job
     """
-    import os, glob, shutil, pprint
+    import os, glob, shutil
     from .. import util
 
     print('\nSORD setup')
 
-    # old-style dictionary parameters
+    # parameters
     if type(prm) == dict:
         print('Warning: using old-style parameters')
         kwargs = util.prune(prm.copy(), '(^_)|(_$)|(^.$)|(^..$)')
@@ -126,15 +125,8 @@ def stage(prm, **kwargs):
                 del(kwargs[k])
     else:
         prm = util.storage(**prm)
-
-    # job configuration
-    job, kwargs = util.configure(**kwargs)
-    if kwargs:
-        print('Unknown parameters:')
-        pprint.pprint(kwargs)
-        raise Exception
-
     prm = prepare_param(prm)
+    job = util.configure(**kwargs)
 
     # partition for parallelization
     nx, ny, nz = prm.shape[:3]
@@ -184,21 +176,20 @@ def stage(prm, **kwargs):
 
     # create run directory
     path = os.path.dirname(__file__)
-    stagein = os.path.join(path, '..', 'build', job.command),
+    job.stagein += os.path.join(path, '..', 'build', job.command),
     f = os.path.join(path, '..', 'build', 'coseis.tgz')
     if os.path.isfile(f):
-        stagein += f,
+        job.stagein += f,
     if job.optimize == 'g':
         for f in glob.glob(path + '/src/*.f90'):
-            stagein += f,
+            job.stagein += f,
     if prm.debug > 2:
-        stagein += 'debug/',
+        job.stagein += 'debug/',
     if prm.itcheck != 0:
-        stagein += 'checkpoint/',
-    stagein += tuple(job.stagein)
+        job.stagein += 'checkpoint/',
     if job.force == True and os.path.isdir(job.rundir):
         shutil.rmtree(job.rundir)
-    util.skeleton(job, stagein)
+    util.skeleton(job)
 
     # conf, parameter files
     cwd = os.path.realpath(os.getcwd())

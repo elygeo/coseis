@@ -6,6 +6,13 @@ def test_conf():
     import cst
     path = os.path.dirname(cst.conf.__file__)
     machines = ['default'] + os.listdir(path)
+    kwargs = dict(
+        argv = [],
+        rundir = 'tmp',
+        command = 'date',
+        run = 'exec',
+        mode = 's',
+    )
     for modules in [
         (cst.conf.default, cst.conf.site),
         (cst.conf.default, cst.conf.cvms, cst.conf.site),
@@ -22,16 +29,9 @@ def test_conf():
             cst.conf.site.machine = machine
             reload(cst.conf.default)
             reload(cst.conf)
-            job = cst.util.configure(
-                modules,
-                argv = [],
-                rundir = 'tmp',
-                command = 'date',
-                run = 'exec',
-                mode = 's',
-            )[0]
-            cst.util.prepare(job)
-            cst.util.skeleton(job)
+            job = cst.util.configure(*modules, **kwargs)
+            job = cst.util.prepare(job)
+            job = cst.util.skeleton(job)
             shutil.rmtree('tmp')
             print(job.doc)
             del(job['doc'])

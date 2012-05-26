@@ -25,7 +25,7 @@ def build(job=None):
 
     # configure
     if job==None:
-        job = util.configure([conf.default, conf.cvms, conf.site], options=[])[0]
+        job = util.configure(conf.default, conf.cvms, conf.site, options=[])
     if not job.mode:
         job.mode = 'asm'
     assert job.version in ('2.2', '3.0', '4.0')
@@ -56,23 +56,23 @@ def build(job=None):
     # compile ascii, binary, and MPI versions
     new = False
     if 'a' in job.mode:
-        source = 'iotxt.f', 'version%s.f' % job.version
+        src = 'iotxt.f', 'version%s.f' % job.version
         for opt in job.optimize:
-            compiler = [job.fortran_serial] + shlex.split(job.fortran_flags[opt]) + ['-o']
-            object_ = 'cvms-a' + opt
-            new |= util.make(compiler, object_, source)
+            cmd = [job.fortran_serial] + shlex.split(job.fortran_flags[opt]) + ['-o']
+            obj = 'cvms-a' + opt
+            new |= util.make(cmd, obj, src)
     if 's' in job.mode:
-        source = 'iobin.f', 'version%s.f' % job.version
+        src = 'iobin.f', 'version%s.f' % job.version
         for opt in job.optimize:
-            compiler = [job.fortran_serial] + shlex.split(job.fortran_flags[opt]) + ['-o']
-            object_ = 'cvms-s' + opt
-            new |= util.make(compiler, object_, source)
+            cmd = [job.fortran_serial] + shlex.split(job.fortran_flags[opt]) + ['-o']
+            obj = 'cvms-s' + opt
+            new |= util.make(cmd, obj, src)
     if 'm' in job.mode and job.fortran_mpi:
-        source = 'iompi.f', 'version%s.f' % job.version
+        src = 'iompi.f', 'version%s.f' % job.version
         for opt in job.optimize:
-            compiler = [job.fortran_mpi] + shlex.split(job.fortran_flags[opt]) + ['-o']
-            object_ = 'cvms-m' + opt
-            new |= util.make(compiler, object_, source)
+            cmd = [job.fortran_mpi] + shlex.split(job.fortran_flags[opt]) + ['-o']
+            obj = 'cvms-m' + opt
+            new |= util.make(cmd, obj, src)
     os.chdir(cwd)
     return
 
@@ -86,9 +86,7 @@ def stage(**kwargs):
     print('CVM-S setup')
 
     # configure
-    job, kwargs = util.configure([conf.default, conf.cvms, conf.site], **kwargs)
-    if kwargs:
-        sys.exit('Unknown parameter: %s' % kwargs)
+    job = util.configure(conf.default, conf.cvms, conf.site, **kwargs)
     if not job.mode:
         job.mode = 's'
         if job.nproc > 1:
@@ -132,7 +130,7 @@ def stage(**kwargs):
                 os.remove(ff)
 
     # process machine templates
-    util.skeleton(job, stagein=job.stagein, new=False)
+    util.skeleton(job)
 
     # save input file and configuration
     f = os.path.join(job.rundir, 'cvms-input')

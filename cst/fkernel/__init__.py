@@ -2,14 +2,15 @@
 Frechet kernel computation
 """
 from ..util import launch
+launch
 
 def _build(optimize=None):
     """
     Build code
     """
     import os, shlex
-    from .. import util, conf
-    job = util.configure(conf.default)[0]
+    from .. import util
+    job = util.configure(options=[])
     if not optimize:
         optimize = job.optimize
     mode = job.mode
@@ -38,7 +39,7 @@ def _build(optimize=None):
     os.chdir(cwd)
     return
 
-def stage(inputs={}, **kwargs):
+def stage(**kwargs):
     """
     Stage job
     """
@@ -47,14 +48,8 @@ def stage(inputs={}, **kwargs):
 
     print('Frechet kernel setup')
 
-    # update inputs
-    inputs = inputs.copy()
-    inputs.update(kwargs)
-
     # configure
-    job, inputs = util.configure(**inputs)
-    if inputs:
-        raise Exception('Unknown parameter: %s' % inputs)
+    job = util.configure(**kwargs)
     if not job.mode:
         job.mode = 'm'
     if job.mode != 'm':

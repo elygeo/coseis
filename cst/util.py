@@ -107,7 +107,6 @@ def prune(d, pattern=None, types=None):
     {'aa': 0, 'aa_': 0, 'a_a': 0}
     """
     import re
-    import numpy as np
     if pattern is None:
         pattern = '^_'
     if types is None:
@@ -202,15 +201,15 @@ def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
     return out
 
 
-def configure(modules=None, **kwargs):
+def configure(*args, **kwargs):
     import sys, getopt
     from . import conf
 
     # modules
-    if modules == None:
-        modules = conf.default, conf.site
-    job = {'doc': modules[0].__doc__}
-    for m in modules:
+    if args == ():
+        args = conf.default, conf.site
+    job = {'doc': args[0].__doc__}
+    for m in args:
         for k in dir(m):
             if k[0] != '_':
                 job[k] = getattr(m, k)
@@ -218,8 +217,7 @@ def configure(modules=None, **kwargs):
 
     # merge key-word arguments, 1st pass
     for k in kwargs:
-        if k in job:
-            job[k] = kwargs[k]
+        job[k] = kwargs[k]
 
     # merge machine parameters
     if job.machine:
@@ -234,10 +232,8 @@ def configure(modules=None, **kwargs):
             job.templates = m.__path__[0]
 
     # key-word arguments, 2nd pass
-    for k in kwargs.copy():
-        if k in job:
-            job[k] = kwargs[k]
-            del(kwargs[k])
+    for k in kwargs:
+        job[k] = kwargs[k]
 
     # command line parameters
     if job.options:
@@ -266,14 +262,21 @@ def configure(modules=None, **kwargs):
     if k in job.fortran_flags:
         job.fortran_flags = job.fortran_flags[k]
 
-    return job, kwargs
+    return job
 
 
-def prepare(job):
+def prepare(job=None, **kwargs):
     """
     Compute and display resource usage
     """
     import os, time
+
+    # prepare job
+    if job is None:
+        job = configure(**kwargs)
+    else:
+        for k in kwargs:
+            job[k] = kwargs[k]
 
     # misc
     job.update(dict(
@@ -363,19 +366,9 @@ def prepare(job):
     return job
 
 
-def skeleton(job=None, stagein=(), new=True, **kwargs):
+def skeleton(job=None, **kwargs):
     """
     Create run directory tree from templates.
-
-    Parameters
-    ----------
-    job: job configuration object
-    stagein: list of files to copy into run directory
-    new: (True|False) create new directory, or use existing
-
-    Templates located in the configuration directory are processed with the given
-    keyword parameters.  Module specific templates are used if found, in addition
-    to machine specific templates.
     """
     import os, shutil
 
@@ -383,14 +376,16 @@ def skeleton(job=None, stagein=(), new=True, **kwargs):
     if job is None:
         job = prepare(**kwargs)
     else:
-        job.update(kwargs)
+        for k in kwargs:
+            job[k] = kwargs[k]
 
-    # locations
-    rundir = job.rundir
-    dest = os.path.realpath(os.path.expanduser(rundir)) + os.sep
+    # dry-run
+    if not job.prepare:
+        return job
 
     # create destination directory
-    if new:
+    dest = os.path.realpath(os.path.expanduser(job.rundir)) + os.sep
+    if job.new:
         os.makedirs(dest)
 
     # process machine templates
@@ -406,28 +401,29 @@ def skeleton(job=None, stagein=(), new=True, **kwargs):
                 shutil.copymode(f, ff)
 
     # stage directories and files
-    for f in stagein:
+    for f in job.stagein:
         if f.endswith(os.sep):
             if f.startswith(os.sep) or '..' in f:
                 raise Exception('Error: cannot stage %s outside rundir.' % f)
-            os.makedirs(os.path.join(rundir, f))
+            os.makedirs(os.path.join(job.rundir, f))
         else:
             shutil.copy2(f, dest)
 
     return job
 
 
-def launch(job=None, stagein=(), new=True, **kwargs):
+def launch(job=None, **kwargs):
     """
     Launch or submit job.
     """
     import os, re, shlex, subprocess
 
-    # create skeleton
+    # prepare job
     if job is None:
-        job = skeleton(stagein=stagein, new=new, **kwargs)
+        job = skeleton(**kwargs)
     else:
-        job.update(kwargs)
+        for k in kwargs:
+            job[k] = kwargs[k]
 
     # serial or mpi mode
     if not job.mode:

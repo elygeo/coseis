@@ -9,4 +9,5 @@ if not os.path.exists(f):
 del(os, f)
 
 from . import site, default, cvms
+site, default, cvms
 

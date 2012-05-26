@@ -47,10 +47,8 @@ def test_with_pyflakes():
             t = compile(c, f, 'exec', _ast.PyCF_ONLY_AST)
             c = pyflakes.checker.Checker(t, f)
             for m in c.messages:
-                if (not m.filename.endswith('__init__.py')
-                    or m.message != '%r imported but unused'):
-                    msg += [m]
-                    print m
+                msg += [m]
+                print m
     os.chdir(cwd)
     assert msg == []
     return

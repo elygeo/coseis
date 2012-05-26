@@ -15,22 +15,23 @@ except:
     email = pwd.getpwuid(os.geteuid())[0]
 
 # job parameters
-name = 'cst'
-run = ''         # 'exec': interactive, 'debug': debugger, 'submit': batch queue
-rundir = 'run'
-stagein = []     # files to copy into rundir
-force = False    # overwrite previous run directory if present
+name = 'cst'     # configuration name
 prepare = True   # True: compile code and setup run directory, False: dry run
+run = ''         # 'exec': interactive, 'debug': debugger, 'submit': batch queue
+rundir = 'run'   # name of the run directory
+new = True       # create new run directory
+force = False    # overwrite previous run directory if present
+stagein = []     # files to copy into run directory
 optimize = 'O'   # 'O': optimize, 'g': debug, 't': test, 'p': profile
 mode = ''        # 's': serial, 'm': MPI, '': guess
 depend = ''      # wait for other job to finish. supply job ID to depend.
-nproc = 1
+nproc = 1        # number of processors
 command = ''     # executable command
 pre = post = ''  # pre-processing and post-processing commands
 dtype = dtype_f = np.dtype('f').str # Numpy data type
-verbose = False
-seconds = 1500
-cvms_opts = {}
+verbose = False  # extra diagnostics
+seconds = 1500   # estimated run time
+cvms_opts = {}   # dictionary of special option for the CVM-S code
 
 # machine specific
 machine = ''

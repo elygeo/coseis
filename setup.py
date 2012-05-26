@@ -7,7 +7,7 @@ import cst
 
 target = sys.argv[1:]
 if target == []:
-    cfg = cst.util.configure()[0]
+    cfg = cst.util.configure(cst.conf, cst.conf.site)
     doc = cfg.doc
     del(cfg['doc'])
     pprint.pprint(cfg)
