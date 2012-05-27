@@ -6,6 +6,7 @@ code = """
     call mpi_comm_rank(mpi_comm_world, i, e)
     call mpi_comm_size(mpi_comm_world, n, e)
     print *, 'Process ', i, ' of ', n
+    call sleep(1)
     call mpi_finalize(e)
     end program
 """
@@ -14,19 +15,18 @@ def test_mpi():
     """
     Basic MPI test
     """
-    import os, shlex, shutil
+    import os, shlex, subprocess, shutil
     import cst
     job = cst.util.skeleton(command='./test', nproc=2, options=[])
-    src = os.path.join(job.rundir, 'test.f90'),
-    obj = os.path.join(job.rundir, 'test')
+    f = os.path.join(job.rundir, 'test')
+    open(f + '.f90', 'w').write(code)
     cmd = (
         [job.fortran_mpi] +
         shlex.split(job.fortran_flags['f']) +
         shlex.split(job.fortran_flags['O']) +
-        ['-o'] 
+        ['-o', f, f + '.f90'] 
     )
-    open(src[0], 'w').write(code)
-    cst.util.make(cmd, obj, src)
+    subprocess.check_call(cmd)
     cst.util.launch(job, run='exec')
     shutil.rmtree(job.rundir)
 
