@@ -1,10 +1,9 @@
 #!/usr/bin/env python
+import os
 import cst
-import pprint
 
-script = "nosetests --where=%s/tests" % cst.__path__[0]
-job = cst.util.prepare(script=script, seconds=600, nproc=6)
-job.mode = 's'
-pprint.pprint(job.__dict__)
-#cst.util.launch(job)
+rundir = os.path.join(cst.__path__[0], 'tests')
+command = "nosetests --where=%s" % rundir
+job = cst.util.prepare(nproc=6, seconds=600)
+cst.util.launch(job, command=command, rundir=rundir, mode='s')
 

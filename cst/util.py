@@ -476,4 +476,3 @@ def launch(job=None, **kwargs):
     os.chdir(cwd)
     return job
 
-
