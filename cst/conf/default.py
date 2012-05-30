@@ -37,7 +37,7 @@ cvms_opts = {}   # dictionary of special option for the CVM-S code
 script_header = ''
 script_pre = ''
 script_post = ''
-script_template = """
+script_template = """\
 {script_header}
 cd "{rundir}"
 echo "$( date ): {name} started" >> {name}-log
@@ -53,7 +53,6 @@ echo "$( date ): {name} finished" >> {name}-log
 # machine specific
 machine = ''
 account = ''
-templates = ''
 login = host = hostname = os.uname()[1]
 system = os.uname()
 queue = ''

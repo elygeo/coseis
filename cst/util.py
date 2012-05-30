@@ -228,8 +228,6 @@ def configure(*args, **kwargs):
         for k in dir(m):
             if k[0] != '_':
                 job[k] = getattr(m, k)
-        if hasattr(m, '__path__'):
-            job.templates = m.__path__[0]
 
     # key-word arguments, 2nd pass
     for k in kwargs:
@@ -368,7 +366,7 @@ def prepare(job=None, **kwargs):
 
 def skeleton(job=None, **kwargs):
     """
-    Create run directory tree from templates.
+    Create run directory
     """
     import os, shutil
 
@@ -390,17 +388,12 @@ def skeleton(job=None, **kwargs):
     if job.new:
         os.makedirs(dest)
 
-    # process machine templates
-    if job.templates:
-        for base in os.listdir(job.templates):
-            if base[0] != '_':
-                f = os.path.join(job.templates, base)
-                if base == 'script.sh':
-                    base = job.name + '.sh'
-                ff = os.path.join(dest, base)
-                out = open(f).read().format(**job)
-                open(ff, 'w').write(out)
-                shutil.copymode(f, ff)
+    # create script
+    if 'script' in job.launch:
+        job.script = job.launch['script']
+        out = job.script_template.format(**job).format(**job)
+        f = os.path.join(dest, job.name + '.sh')
+        open(f, 'w').write(out)
 
     # stage directories and files
     for f in job.stagein:

@@ -33,7 +33,7 @@ fortran_flags = {
 launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
-    'm_exec':  'cobalt-mpirun -np {nproc} {command}',
+    'script':  'cobalt-mpirun -np {nproc} {command}',
     'submit':  'qsub -q {queue} -n {nproc} -t {minutes} "{script}"',
     'submit2': 'qsub -q {queue} -n {nproc} -t {minutes} --dependenices {depend} "{script}"',
 }
