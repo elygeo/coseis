@@ -6,7 +6,7 @@ code = """
     call mpi_comm_rank(mpi_comm_world, i, e)
     call mpi_comm_size(mpi_comm_world, n, e)
     print *, 'Process ', i, ' of ', n
-    call sleep(1)
+    call sleep(3)
     call mpi_finalize(e)
     end program
 """
@@ -17,7 +17,7 @@ def test_mpi():
     """
     import os, shlex, subprocess, shutil
     import cst
-    job = cst.util.skeleton(command='./test', nproc=2, options=[])
+    job = cst.util.skeleton(command='./test', nproc=2, force=True, options=[])
     f = os.path.join(job.rundir, 'test')
     open(f + '.f90', 'w').write(code)
     cmd = (
@@ -28,7 +28,7 @@ def test_mpi():
     )
     subprocess.check_call(cmd)
     cst.util.launch(job, run='exec')
-    shutil.rmtree(job.rundir)
+    #shutil.rmtree(job.rundir)
 
 # continue if command line
 if __name__ == '__main__':

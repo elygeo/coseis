@@ -23,6 +23,7 @@ maxnodes = 1024
 maxram = 15000
 fortran_serial = 'bgxlf2008_r'
 fortran_mpi = 'mpixlf2003_r'
+
 fortran_flags = {
     'f': '-u -qsuppress=cmpmsg -qlanglvl=2003pure -qsuffix=f=f90',
     'f': '-u -qsuppress=cmpmsg -qlanglvl=2003pure',
@@ -34,13 +35,14 @@ fortran_flags = {
     'O': '-O3 -qsmp=omp:noauto',
     '8': '-qrealsize=8',
 }
+
 launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
     'm_exec':  'runjob -p {ppn} -n {nproc} --verbose 2 --block $COBALT_PARTNAME --envs BG_SHAREDMEMSIZE=32MB --envs PAMI_VERBOSE=1 ${{COBALT_CORNER:+--corner}} $COBALT_CORNER ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE : {command}',
     'submit':  'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script "{name}.sh"',
-    'submit2': 'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script --dependenices "{name}.sh"',
-    'subbin':  'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode c{ppn} --proccount {nproc} "{command}"',
-    'subbin2': 'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode c{ppn} --proccount {nproc} --dependenices "{command}"',
+    #'submit2': 'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script --dependenices "{name}.sh"',
+    #'subbin':  'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode c{ppn} --proccount {nproc} "{command}"',
+    #'subbin2': 'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode c{ppn} --proccount {nproc} --dependenices "{command}"',
 }
 

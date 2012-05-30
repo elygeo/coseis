@@ -33,6 +33,23 @@ verbose = False  # extra diagnostics
 seconds = 1500   # estimated run time
 cvms_opts = {}   # dictionary of special option for the CVM-S code
 
+# script templates
+script_header = ''
+script_pre = ''
+script_post = ''
+script_template = """
+{script_header}
+cd "{rundir}"
+echo "$( date ): {name} started" >> {name}-log
+env > {name}-env
+{pre}
+{script_pre}
+{script}
+{script_post}
+{post}
+echo "$( date ): {name} finished" >> {name}-log
+"""
+
 # machine specific
 machine = ''
 account = ''
