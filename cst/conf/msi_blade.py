@@ -62,7 +62,7 @@ launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
     'm_exec':  'mpirun -np {nproc} -hostfile $HOME/machinefile {command}',
-    'script':  'mpirun -np {nproc} -hostfile $PBS_NODEFILE {command}'
+    'script':  'mpirun -np {nproc} -hostfile $PBS_NODEFILE {command}',
     'submit':  'qsub "{name}.sh"',
     'submit2': 'qsub -W depend="afterok:{depend}" "{name}.sh"',
 }
