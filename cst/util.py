@@ -389,8 +389,7 @@ def skeleton(job=None, **kwargs):
         os.makedirs(dest)
 
     # create script
-    if 'script' in job.launch:
-        job.script = job.launch['script']
+    if 'submit' in job.launch:
         out = job.script_template.format(**job).format(**job)
         f = os.path.join(dest, job.name + '.sh')
         open(f, 'w').write(out)

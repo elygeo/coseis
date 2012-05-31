@@ -31,9 +31,9 @@ rate = 0.5e6
 launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
+    'm_exec':  'mpiexec -n {nproc} {command}',
+    'm_iexec': 'mpirun -machinefile $HOME/machinefile -np {nproc} {command}',
     'm_debug': 'mpirun -machinefile $HOME/machinefile -np {nproc} -dbg=gdb {command}',
-    'm_exec':  'mpirun -machinefile $HOME/machinefile -np {nproc} {command}',
-    'script':  'mpiexec -n {nproc} {command}',
     'submit':  'qsub "{name}.sh"',
     'submit2': 'qsub -W depend="afterok:{depend}" "{name}.sh"',
 }

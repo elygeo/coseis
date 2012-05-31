@@ -61,9 +61,9 @@ fortran_flags = {
 launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
+    'm_exec':  'ibrun {command}',
+    'm_iexec': 'ibrun -n {nproc} -o 0 {command}',
     'm_debug': 'ddt -start -once -n {nproc} -- {command}',
-    'm_exec':  'ibrun -n {nproc} -o 0 {command}',
-    'script':  'ibrun {command}',
     'submit':  'qsub "{name}.sh"',
     'submit2': 'qsub -hold_jid "{depend}" "{name}.sh"',
 }

@@ -45,8 +45,8 @@ cvms_opts = dict(
 launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
+    'm_exec':  'aprun -n {nproc} {command}',
     'm_debug': 'totalview aprun -n {nproc} {command}',
-    'script':  'aprun -n {nproc} {command}',
     'submit':  'qsub "{name}.sh"',
     'submit2': 'qsub -W depend="afterok:{depend}" "{name}.sh"',
 }

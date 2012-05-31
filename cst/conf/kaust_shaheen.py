@@ -25,7 +25,7 @@ queue_opts = [
 launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
-    'script':  'mpirun -mode VN -np {nproc} -exe {command}',
+    'm_exec':  'mpirun -mode VN -np {nproc} -exe {command}',
     'submit':  'llsubmit "{name}.sh"',
 }
 

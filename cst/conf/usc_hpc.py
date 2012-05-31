@@ -37,7 +37,7 @@ queue_opts = [
 launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
-    'script':  'mpiexec -n {nproc} {command}',
+    'm_exec':  'mpiexec -n {nproc} {command}',
     'submit':  'qsub "{name}.sh"',
     'submit2': 'qsub -W depend="afterok:{depend}" "{name}.sh"',
 }

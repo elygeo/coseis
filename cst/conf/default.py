@@ -39,6 +39,7 @@ script_pre = ''
 script_post = ''
 script_template = """\
 {script_header}
+# {launch[submit]}
 cd "{rundir}"
 echo "$( date ): {name} started" >> {name}-log
 env > {name}-env
