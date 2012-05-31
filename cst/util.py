@@ -390,7 +390,7 @@ def skeleton(job=None, **kwargs):
 
     # create script
     if 'submit' in job.launch:
-        out = job.script_template.format(**job).format(**job)
+        out = job.script_template.format(**job).format(**job).format(**job)
         f = os.path.join(dest, job.name + '.sh')
         open(f, 'w').write(out)
 

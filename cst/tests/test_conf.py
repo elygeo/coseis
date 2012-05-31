@@ -2,15 +2,16 @@ def test_conf():
     """
     Test configuration modules and machines
     """
-    import os, shutil, pprint
+    import os, pprint
     import cst
     path = os.path.dirname(cst.conf.__file__)
     machines = ['default'] + os.listdir(path)
     kwargs = dict(
         argv = [],
-        rundir = 'tmp',
+        rundir = 'run-conf',
         command = 'date',
         run = 'exec',
+        force = True,
         mode = 's',
     )
     for modules in [
@@ -32,7 +33,6 @@ def test_conf():
             job = cst.util.configure(*modules, **kwargs)
             job = cst.util.prepare(job)
             job = cst.util.skeleton(job)
-            shutil.rmtree('tmp')
             print(job.doc)
             del(job['doc'])
             pprint.pprint(job)

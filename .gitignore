@@ -4,6 +4,7 @@
 *.so
 *.mod
 run
+run-*
 tmp
 TODO
 ./publish.sh

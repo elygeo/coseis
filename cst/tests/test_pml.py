@@ -2,7 +2,7 @@ def test_pml():
     """
     Test SORD parallelization with PML
     """
-    import shutil
+    import os
     import numpy as np
     import cst
     prm = cst.sord.parameters()
@@ -37,8 +37,9 @@ def test_pml():
     # single process
     cst.sord.run(
         prm,
-        rundir = 'tmp/s',
+        rundir = 'run-pml',
         run = 'exec',
+        force = True,
         argv = [],
     )
 
@@ -48,14 +49,15 @@ def test_pml():
         prm.nproc3 = n
         job = cst.sord.run(
             prm,
-            rundir = 'tmp/%s' % i,
+            rundir = 'run-pml%s' % i,
             run = 'exec',
+            force = True,
             argv = [],
         )
         max_err_ = 0.0
         for f in cst.sord.fieldnames.volume:
-            f1 = 'tmp/s/%s.bin' % f
-            f2 = 'tmp/%s/%s.bin' % (i, f)
+            f1 = os.path.join('run-pml', '%s.bin' % f)
+            f2 = os.path.join('run-pml%s', '%s.bin' % (i, f))
             v1 = np.fromfile(f1, job.dtype)
             v2 = np.fromfile(f2, job.dtype)
             dv = v1 - v2
@@ -67,9 +69,6 @@ def test_pml():
         print('max error: ', max_err_)
         max_err_all_ = max(max_err_all_, max_err_)
     assert max_err_all_ == 0.0
-
-    # cleanup
-    shutil.rmtree('tmp')
 
 # continue if command line
 if __name__ == '__main__':

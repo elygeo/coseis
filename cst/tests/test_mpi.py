@@ -15,9 +15,15 @@ def test_mpi():
     """
     Basic MPI test
     """
-    import os, shlex, subprocess, shutil
+    import os, shlex, subprocess
     import cst
-    job = cst.util.skeleton(command='./test', nproc=2, force=True, options=[])
+    job = cst.util.skeleton(
+        rundir = 'run-mpi',
+        command = './test',
+        nproc = 2,
+        force = True,
+        options = [],
+    )
     f = os.path.join(job.rundir, 'test')
     open(f + '.f90', 'w').write(code)
     cmd = (
@@ -28,7 +34,6 @@ def test_mpi():
     )
     subprocess.check_call(cmd)
     cst.util.launch(job, run='exec')
-    #shutil.rmtree(job.rundir)
 
 # continue if command line
 if __name__ == '__main__':

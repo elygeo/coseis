@@ -2,7 +2,7 @@ def test_point():
     """
     Test SORD parallelization with point source
     """
-    import shutil
+    import os
     import numpy as np
     import cst
     prm = cst.sord.parameters()
@@ -39,8 +39,9 @@ def test_point():
     # single process
     cst.sord.run(
         prm,
-        rundir = 'tmp/s',
+        rundir = 'run-point',
         run = 'exec',
+        force = True,
         argv = [],
     )
 
@@ -50,14 +51,15 @@ def test_point():
         prm.nproc3 = n
         job = cst.sord.run(
             prm,
-            rundir = 'tmp/%s' % i,
+            rundir = 'run-point%s' % i,
             run = 'exec',
+            force = True,
             argv = [],
         )
         max_err_ = 0.0
         for f in cst.sord.fieldnames.volume:
-            f1 = 'tmp/s/%s.bin' % f
-            f2 = 'tmp/%s/%s.bin' % (i, f)
+            f1 = os.path.join('run-point', '%s.bin' % f)
+            f2 = os.path.join('run-point%s', '%s.bin' % (i, f))
             v1 = np.fromfile(f1, job.dtype)
             v2 = np.fromfile(f2, job.dtype)
             dv = v1 - v2
@@ -69,9 +71,6 @@ def test_point():
         print('max error: ', max_err_)
         max_err_all_ = max(max_err_all_, max_err_)
     assert max_err_all_ == 0.0
-
-    # cleanup
-    shutil.rmtree('tmp')
 
 # continue if command line
 if __name__ == '__main__':

@@ -2,7 +2,7 @@ def test_kostrov():
     """
     Kostrov circular crack test.
     """
-    import shutil
+    import os
     import numpy as np
     import cst
     prm = cst.sord.parameters()
@@ -54,8 +54,9 @@ def test_kostrov():
     # run SORD
     job = cst.sord.run(
         prm,
-        rundir = 'tmp',
+        rundir = 'run-kostrov',
         run = 'exec',
+        force = True,
         argv = [],
     )
 
@@ -67,13 +68,11 @@ def test_kostrov():
     #except:
     #    v = cst.kostrov.slip_rate(rho, vp, vs, prm.vrup, dtau, r, t, 0.82)
     for p in 'abcd':
-        dv = v - np.fromfile(job.rundir + '/p20%s.bin' % p, job.dtype)[-1]
+        f = os.path.join(job.rundir, 'p20%s.bin' % p)
+        dv = v - np.fromfile(f, job.dtype)[-1]
         err = dv / v
         print(v, err)
         assert abs(err) < 0.015
-
-    # cleanup
-    shutil.rmtree('tmp')
 
 # continue if command line
 if __name__ == '__main__':

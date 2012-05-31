@@ -27,29 +27,10 @@ mode = ''        # 's': serial, 'm': MPI, '': guess
 depend = ''      # wait for other job to finish. supply job ID to depend.
 nproc = 1        # number of processors
 command = ''     # executable command
-pre = post = ''  # pre-processing and post-processing commands
 dtype = dtype_f = np.dtype('f').str # Numpy data type
 verbose = False  # extra diagnostics
 seconds = 1500   # estimated run time
 cvms_opts = {}   # dictionary of special option for the CVM-S code
-
-# script templates
-script_header = ''
-script_pre = ''
-script_post = ''
-script_template = """\
-{script_header}
-# {launch[submit]}
-cd "{rundir}"
-echo "$( date ): {name} started" >> {name}-log
-env > {name}-env
-{pre}
-{script_pre}
-{script}
-{script_post}
-{post}
-echo "$( date ): {name} finished" >> {name}-log
-"""
 
 # machine specific
 machine = ''
@@ -71,7 +52,28 @@ launch = {
     's_debug': 'gdb {command}',
     'm_exec':  'mpiexec -np {nproc} {command}',
     'm_debug': 'mpiexec -np {nproc} -gdb {command}',
+    'submit': True,
 }
+
+# script templates
+pre = post = ''
+script_header = '#!/bin/bash -e'
+script_pre = ''
+script = '{launch[m_exec]}'
+script_post = ''
+script_template = """\
+{script_header}
+# {launch[submit]}
+cd "{rundir}"
+echo "$( date ): {name} started" >> {name}-log
+env > {name}-env
+{pre}
+{script_pre}
+{script}
+{script_post}
+{post}
+echo "$( date ): {name} finished" >> {name}-log
+"""
 
 # command line options
 argv = sys.argv[1:]

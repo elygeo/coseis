@@ -8,7 +8,6 @@ include = (
     'cst/sord/*.py',
     'cst/cvms/*.py',
     'cst/conf/*.py',
-    'cst/conf/*/*.py',
     'cst/tests/*.py',
     'doc/*.py',
     'scripts/*/*.py',
