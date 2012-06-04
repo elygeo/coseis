@@ -8,7 +8,7 @@ def test_conf():
     machines = ['default'] + os.listdir(path)
     kwargs = dict(
         argv = [],
-        rundir = 'run-conf',
+        name = 'conf',
         command = 'date',
         run = 'exec',
         force = True,
@@ -19,12 +19,11 @@ def test_conf():
         (cst.conf.default, cst.conf.cvms, cst.conf.site),
     ]:
         for machine in machines:
-            if machine.endswith('.pyc'):
+            if not machine.endswith('.py'):
                 continue
             if machine in ['__init__.py', 'default.py', 'cvms.py']:
                 continue
-            if machine.endswith('.py'):
-                machine = machine[:-3]
+            machine = machine[:-3]
             print(80 * '-')
             print(machine)
             cst.conf.site.machine = machine
@@ -36,6 +35,8 @@ def test_conf():
             print(job.doc)
             del(job['doc'])
             pprint.pprint(job)
+    reload(cst.conf.default)
+    reload(cst.conf.cvms)
     reload(cst.conf.site)
 
 # continue if command line

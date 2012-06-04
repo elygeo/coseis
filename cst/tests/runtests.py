@@ -8,8 +8,5 @@ import cst
 
 path = os.path.join(cst.__path__[0], 'tests')
 cmd = "nosetests -v --where=" + path
-cst.util.launch(
-    seconds = 600,
-    nproc = 6,
-)
+job = cst.util.launch(launch_command=cmd, nproc=6, seconds=600, force=True)
 

@@ -228,6 +228,12 @@ def configure(*args, **kwargs):
         for k in dir(m):
             if k[0] != '_':
                 job[k] = getattr(m, k)
+        if not hasattr(m, 'script'):
+            f = m.__file__.replace('.py', '.sh')
+            try:
+                job.script = open(f).read()
+            except IOError:
+                pass
 
     # key-word arguments, 2nd pass
     for k in kwargs:
@@ -267,7 +273,7 @@ def prepare(job=None, **kwargs):
     """
     Compute and display resource usage
     """
-    import os, time
+    import os, time, re
 
     # prepare job
     if job is None:
@@ -282,8 +288,14 @@ def prepare(job=None, **kwargs):
         rundate = time.strftime('%Y %b %d'),
     ))
 
+    # serial or mpi mode
+    if not job.mode:
+        job.mode = 's'
+        if job.nproc > 1:
+            job.mode = 'm'
+
     # number of processes
-    if not hasattr(job, 'nproc') or job.mode == 's':
+    if job.mode == 's':
         job.nproc = 1
 
     # queue options
@@ -356,10 +368,25 @@ def prepare(job=None, **kwargs):
         print('Warning: exceeding available RAM per node (%sMb)' % job.maxram)
     if maxminutes and minutes == maxminutes:
         print('Warning: exceeding maximum time limit (%s:%02d:00)' % job.maxtime)
+    if re.match(job.hostname, job.host) is None:
+        s = job.host, job.machine
+        print('Warning: hostname %r does not match configuration %r' % s)
 
     # run directory
-    print('Run directory: ' + job.rundir)
-    job.rundir = os.path.realpath(os.path.expanduser(job.rundir))
+    d = job.rundir.format(**job)
+    job.rundir = os.path.realpath(os.path.expanduser(d))
+    print('Run directory: ' + d)
+
+    # launch command
+    if not job.launch_command:
+        if job.run:
+            k = job.mode + '_' + job.run
+        else:
+            k = job.mode + '_exec'
+        if k in job.launch:
+            job.launch_command = job.launch[k].format(**job)
+        else:
+            raise Exception('Error: %s launch mode not supported.' % k)
 
     return job
 
@@ -388,9 +415,13 @@ def skeleton(job=None, **kwargs):
     if job.new:
         os.makedirs(dest)
 
+    # save job
+    f = os.path.join(dest, job.name + '-job.py')
+    save(f, job)
+
     # create script
     if 'submit' in job.launch:
-        out = job.script_template.format(**job).format(**job).format(**job)
+        out = job.script.format(**job)
         f = os.path.join(dest, job.name + '.sh')
         open(f, 'w').write(out)
 
@@ -419,38 +450,20 @@ def launch(job=None, **kwargs):
         for k in kwargs:
             job[k] = kwargs[k]
 
-    # serial or mpi mode
-    if not job.mode:
-        job.mode = 's'
-        if job.nproc > 1:
-            job.mode = 'm'
-
     # launch command
     if not job.run:
         return job
-    k = job.run
-    if job.run == 'submit':
-        if job.depend:
-            k += '2'
-    else:
-        k = job.mode + '_' + k
-    if k in job.launch:
-        cmd = job.launch[k].format(**job)
-    else:
-        raise Exception('Error: %s launch mode not supported.' % k)
-    print(cmd)
-
-    # check host
-    if re.match(job.hostname, job.host) is None:
-        s = job.host, job.machine
-        raise Exception('Error: hostname %r does not match configuration %r' % s)
 
     # run directory
     cwd = os.getcwd()
     os.chdir(job.rundir)
 
     # launch
-    if job.run.startswith('submit'):
+    if job.run == 'submit':
+        if job.depend:
+            cmd = job.launch['submit2'].format(**job)
+        else:
+            cmd = job.launch['submit'].format(**job)
         p = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
         stdout = p.communicate()[0]
         print(stdout)
@@ -459,11 +472,12 @@ def launch(job=None, **kwargs):
         d = re.search(job.submit_pattern, stdout).groupdict()
         job.update(d)
     else:
-        if job.pre:
-            subprocess.check_call(job.pre, shell=True)
-        subprocess.check_call(shlex.split(cmd))
-        if job.post:
-            subprocess.check_call(job.post, shell=True)
+        for cmd in job.pre, job.launch_command, job.post:
+            print(cmd)
+            if '\n' in cmd or ';' in cmd or '|' in cmd:
+                subprocess.check_call(cmd.format(**job), shell=True)
+            elif cmd:
+                subprocess.check_call(shlex.split(cmd.format(**job)))
 
     os.chdir(cwd)
     return job

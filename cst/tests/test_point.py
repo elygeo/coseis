@@ -37,9 +37,9 @@ def test_point():
         prm.fieldio += [('=w', f, [], f + '.bin')]
 
     # single process
-    cst.sord.run(
+    job = cst.sord.run(
         prm,
-        rundir = 'run-point',
+        name = 'point',
         run = 'exec',
         force = True,
         argv = [],
@@ -49,17 +49,17 @@ def test_point():
     max_err_all_ = 0.0
     for i, n in enumerate([(3, 1, 1), (2, 2, 1)]):
         prm.nproc3 = n
-        job = cst.sord.run(
+        job1 = cst.sord.run(
             prm,
-            rundir = 'run-point%s' % i,
+            name = 'point%s' % i,
             run = 'exec',
             force = True,
             argv = [],
         )
         max_err_ = 0.0
         for f in cst.sord.fieldnames.volume:
-            f1 = os.path.join('run-point', '%s.bin' % f)
-            f2 = os.path.join('run-point%s', '%s.bin' % (i, f))
+            f1 = os.path.join(job.rundir, '%s.bin' % f)
+            f2 = os.path.join(job1.rundir, '%s.bin' % f)
             v1 = np.fromfile(f1, job.dtype)
             v2 = np.fromfile(f2, job.dtype)
             dv = v1 - v2

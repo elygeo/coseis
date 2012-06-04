@@ -18,7 +18,7 @@ except:
 name = 'cst'     # configuration name
 prepare = True   # True: compile code and setup run directory, False: dry run
 run = ''         # 'exec': interactive, 'debug': debugger, 'submit': batch queue
-rundir = 'run'   # name of the run directory
+rundir = 'run/{name}' # name of the run directory
 new = True       # create new run directory
 force = False    # overwrite previous run directory if present
 stagein = []     # files to copy into run directory
@@ -31,6 +31,7 @@ dtype = dtype_f = np.dtype('f').str # Numpy data type
 verbose = False  # extra diagnostics
 seconds = 1500   # estimated run time
 cvms_opts = {}   # dictionary of special option for the CVM-S code
+pre = post = ''
 
 # machine specific
 machine = ''
@@ -47,6 +48,7 @@ maxtime = 0, 0
 rate = 1.0e6
 nstripe = -2
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
+launch_command = ''
 launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
@@ -55,22 +57,13 @@ launch = {
     'submit': True,
 }
 
-# script templates
-pre = post = ''
-script_header = '#!/bin/bash -e'
-script_pre = ''
-script = '{launch[m_exec]}'
-script_post = ''
-script_template = """\
-{script_header}
-# {launch[submit]}
+script = """\
+#!/bin/sh
 cd "{rundir}"
-echo "$( date ): {name} started" >> {name}-log
 env > {name}-env
+echo "$( date ): {name} started" >> {name}-log
 {pre}
-{script_pre}
-{script}
-{script_post}
+{launch_command}
 {post}
 echo "$( date ): {name} finished" >> {name}-log
 """

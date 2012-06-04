@@ -35,9 +35,9 @@ def test_pml():
         prm.fieldio += [('=w', f, [], f + '.bin')]
 
     # single process
-    cst.sord.run(
+    job = cst.sord.run(
         prm,
-        rundir = 'run-pml',
+        name = 'pml',
         run = 'exec',
         force = True,
         argv = [],
@@ -47,17 +47,17 @@ def test_pml():
     max_err_all_ = 0.0
     for i, n in enumerate([(4, 1, 1), (1, 2, 3)]):
         prm.nproc3 = n
-        job = cst.sord.run(
+        job1 = cst.sord.run(
             prm,
-            rundir = 'run-pml%s' % i,
+            name = 'pml%s' % i,
             run = 'exec',
             force = True,
             argv = [],
         )
         max_err_ = 0.0
         for f in cst.sord.fieldnames.volume:
-            f1 = os.path.join('run-pml', '%s.bin' % f)
-            f2 = os.path.join('run-pml%s', '%s.bin' % (i, f))
+            f1 = os.path.join(job.rundir, '%s.bin' % f)
+            f2 = os.path.join(job1.rundir, '%s.bin' % f)
             v1 = np.fromfile(f1, job.dtype)
             v2 = np.fromfile(f2, job.dtype)
             dv = v1 - v2

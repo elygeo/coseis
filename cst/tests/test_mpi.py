@@ -18,7 +18,7 @@ def test_mpi():
     import os, shlex, subprocess
     import cst
     job = cst.util.skeleton(
-        rundir = 'run-mpi',
+        name = 'mpi',
         command = './test',
         nproc = 2,
         force = True,

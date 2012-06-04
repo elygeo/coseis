@@ -7,6 +7,7 @@ module load GNU
 module load numpy
 """
 
+account = 'k33'
 login = hostname = 'shaheen.hpc.kaust.edu.sa'
 maxcores = 4
 maxnodes = 16384
@@ -28,21 +29,4 @@ launch = {
     'm_exec':  'mpirun -mode VN -np {nproc} -exe {command}',
     'submit':  'llsubmit "{name}.sh"',
 }
-
-script_header = """\
-#!/bin/sh
-# @ account_no = k33
-# @ class = {queue}
-# @ job_name = {name}
-# @ bg_size = {nodes}
-# @ wall_clock_limit = {walltime}
-# @ error = {name}-err
-# @ output = {name}-out
-# @ initialdir = {rundir}
-# @ notify_user = {email}
-# @ notification = never
-# @ job_type = bluegene
-# @ environment = COPY_ALL
-# @ queue
-"""
 
