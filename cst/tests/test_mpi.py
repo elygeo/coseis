@@ -22,18 +22,18 @@ def test_mpi():
         command = './test',
         nproc = 2,
         force = True,
+        run = 'exec',
         options = [],
     )
     f = os.path.join(job.rundir, 'test')
     open(f + '.f90', 'w').write(code)
-    cmd = (
+    subprocess.check_call(
         [job.fortran_mpi] +
         shlex.split(job.fortran_flags['f']) +
         shlex.split(job.fortran_flags['O']) +
         ['-o', f, f + '.f90'] 
     )
-    subprocess.check_call(cmd)
-    cst.util.launch(job, run='exec')
+    cst.util.launch(job)
 
 # continue if command line
 if __name__ == '__main__':

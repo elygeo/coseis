@@ -374,19 +374,24 @@ def prepare(job=None, **kwargs):
 
     # run directory
     d = job.rundir.format(**job)
-    job.rundir = os.path.realpath(os.path.expanduser(d))
     print('Run directory: ' + d)
+    job.rundir = os.path.realpath(os.path.expanduser(d))
 
-    # launch command
+    # launch commands
+    for k in job.launch:
+        job.launch[k] = job.launch[k].format(**job)
     if not job.launch_command:
         if job.run:
             k = job.mode + '_' + job.run
         else:
             k = job.mode + '_exec'
         if k in job.launch:
-            job.launch_command = job.launch[k].format(**job)
+            job.launch_command = job.launch[k]
         else:
             raise Exception('Error: %s launch mode not supported.' % k)
+
+    # batch script
+    job.script = job.script.format(**job)
 
     return job
 
@@ -421,9 +426,8 @@ def skeleton(job=None, **kwargs):
 
     # create script
     if 'submit' in job.launch:
-        out = job.script.format(**job)
         f = os.path.join(dest, job.name + '.sh')
-        open(f, 'w').write(out)
+        open(f, 'w').write(job.script)
 
     # stage directories and files
     for f in job.stagein:
@@ -461,10 +465,10 @@ def launch(job=None, **kwargs):
     # launch
     if job.run == 'submit':
         if job.depend:
-            cmd = job.launch['submit2'].format(**job)
+            c = job.launch['submit2']
         else:
-            cmd = job.launch['submit'].format(**job)
-        p = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
+            c = job.launch['submit']
+        p = subprocess.Popen(shlex.split(c), stdout=subprocess.PIPE)
         stdout = p.communicate()[0]
         print(stdout)
         if p.returncode:
@@ -472,12 +476,12 @@ def launch(job=None, **kwargs):
         d = re.search(job.submit_pattern, stdout).groupdict()
         job.update(d)
     else:
-        for cmd in job.pre, job.launch_command, job.post:
-            print(cmd)
-            if '\n' in cmd or ';' in cmd or '|' in cmd:
-                subprocess.check_call(cmd.format(**job), shell=True)
-            elif cmd:
-                subprocess.check_call(shlex.split(cmd.format(**job)))
+        for c in job.pre, job.launch_command, job.post:
+            print(c)
+            if '\n' in c or ';' in c or '|' in c:
+                subprocess.check_call(c, shell=True)
+            elif c:
+                subprocess.check_call(shlex.split(c))
 
     os.chdir(cwd)
     return job
