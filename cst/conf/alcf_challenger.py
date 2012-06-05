@@ -1,10 +1,10 @@
 """
-ALCF Surveyor
+ALCF Challenger
 """
 
 from .alcf_intrepid import *
 
-maxnodes = 1024
+maxnodes = 512
 maxtime = 1, 00
-queue = 'default'
+queue = 'prod-devel'
 

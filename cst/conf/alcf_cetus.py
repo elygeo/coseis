@@ -6,10 +6,11 @@ echo '+mpiwrapper-xl' >> .soft
 Run from GPFS: /gpfs/veas-fs0/
 
 Useful commands:
+    qstat
     cbank
     partlist
 
-debug:
+debug/profile:
     bgq_stack <corefile>
     coreprocessor <corefile>
     VPROF_PROFILE=yes
@@ -40,9 +41,8 @@ launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
     'm_exec':  'runjob -p {ppn} -n {nproc} --verbose 2 --block $COBALT_PARTNAME --envs BG_SHAREDMEMSIZE=32MB --envs PAMI_VERBOSE=1 ${{COBALT_CORNER:+--corner}} $COBALT_CORNER ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE : {command}',
-    'submit':  'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script "{name}.sh"',
-    'submit2': 'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script --dependenices {depend} "{name}.sh"',
-    #'bsubmit':  'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode c{ppn} --proccount {nproc} "{command}"',
-    #'bsubmit2': 'qsub -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode c{ppn} --proccount {nproc} --dependenices {depend} "{command}"',
+    #'submit':  'qsub -O {name}-out -t {minutes} -n {nodes} -A {account} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script "{name}.sh"',
+    'submit':  'qsub -O {name}-out -t {minutes} -n {nodes} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script "{name}.sh"',
+    'submit2': 'qsub -O {name}-out -t {minutes} -n {nodes} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script --dependenices {depend} "{name}.sh"',
 }
 

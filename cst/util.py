@@ -378,6 +378,7 @@ def prepare(job=None, **kwargs):
     job.rundir = os.path.realpath(os.path.expanduser(d))
 
     # launch commands
+    job.launch = job.launch.copy()
     for k in job.launch:
         job.launch[k] = job.launch[k].format(**job)
     if not job.launch_command:

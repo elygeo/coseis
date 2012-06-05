@@ -5,8 +5,8 @@ EPD version: rh3-x86_64
 mvapich2 supports MPI2, but not recommended for more than 2048 tasks.
 
 .profile_user
-module unload pgi
-module load intel git
+module load git
+module swap pgi intel
 
 .bashrc
 alias qme='showq -u'
@@ -26,6 +26,8 @@ lfs quota -u $USER $SCRATCH
 module load gotoblas scalapack mkl
 export F77=ifort
 export F90=ifort
+export F77=pgf95
+export F90=pgf95
 """
 
 login = 'tg-login.ranger.tacc.teragrid.org'
@@ -34,7 +36,6 @@ maxcores = 16
 maxram = 30000
 #rate = 21e5
 rate = 12e5
-f2py_flags = '--fcompiler=intelem'
 
 queue_opts = [
     ('development', {'maxnodes': 16,   'maxtime':  (2, 00)}),
@@ -46,16 +47,27 @@ queue_opts = [
     ('request', {}),
 ]
 
+f2py_flags = '--fcompiler=intelem'
 fortran_serial = 'ifort'
 fortran_mpi = 'mpif90'
 
 fortran_flags = {
-    'f': '-u -std95 -warn',
-    'g': '-CB -traceback -g',
-    't': '-CB -traceback',
-    'p': '-O -pg',
-    'O': '-O2 -xW',
-    '8': '-r8',
+    'ifort': {
+        'f': '-u -std95 -warn',
+        'g': '-CB -traceback -g',
+        't': '-CB -traceback',
+        'p': '-O -pg',
+        'O': '-O2 -xW',
+        '8': '-r8',
+    },
+    'pgf95' : {
+        'f': '-Mdclchk',
+        'g': '-Ktrap=fp -Mbounds -g',
+        't': '-Ktrap=fp -Mbounds',
+        'p': '-fast -tp barcelona-64 -Mprof=func',
+        'O': '-fast -tp barcelona-64',
+        '8': '-Mr8',
+    },
 }
 
 launch = {

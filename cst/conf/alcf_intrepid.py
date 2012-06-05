@@ -1,26 +1,25 @@
 """
 ALCF
 
-bg-listjobs
-partlist
-cbank
+/intrepid-fs0/ cross-mounted with Challenger and Eureka
 
-/intrepid-fs0/
+Useful:
+    projects
+    bg-listjobs
+    partlist
+    cbank
+    qalter
 
 /bgsys/drivers/ppcfloor/gnu-linux/bin
 --env LD_LIBRARY_PATH=/bgsys/drivers/ppcfloor/gnu-linux/lib /bgsys/drivers/ppcfloor/gnu-linux/bin/python
 """
 
 login = hostname = '.*.alcf.anl.gov'
-maxnodes = 40960
 maxcores = 4
 maxram = 1900
+maxnodes = 40960
+maxtime = 12, 00
 queue = 'prod'
-
-queue_opts = [
-    ('prod-devel', {'maxnodes': 512,   'maxtime': (1, 00)}),
-    ('prod',       {'maxnodes': 32768, 'maxtime': (12, 00)}),
-]
 
 fortran_serial = 'mpixlf90_r'
 fortran_mpi = 'mpixlf90_r'
@@ -32,15 +31,17 @@ fortran_flags = {
     'g': '-C -qflttrap -O0 -g',
     't': '-C -qflttrap',
     'p': '-O -p',
-    'O': '-O -qarch=450d -qtune=450',
+    'O': '-O4 -qarch=450d -qtune=450',
     '8': '-qrealsize=8',
 }
 
+# -A project -O name
 launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
-    'm_exec':  'cobalt-mpirun --mode vn -np {nproc} --verbose 2 {command}',
-    'submit':  'qsub -q {queue} -n {nproc} -t {minutes} --mode script {name}.sh',
-    'submit2': 'qsub -q {queue} -n {nproc} -t {minutes} --mode script --dependenices {depend} "{name}.sh"',
+    'm_exec':  'cobalt-mpirun -np {nproc} --mode vn --verbose 2 {command}',
+    #'submit':  'qsub -O {name}-out -q {queue} -n {nodes} -t {minutes} -A {account} --mode script {name}.sh',
+    'submit':  'qsub -O {name}-out -n {nodes} -t {minutes} --mode script {name}.sh',
+    'submit2': 'qsub -O {name}-out -n {nodes} -t {minutes} --mode script --dependenices {depend} "{name}.sh"',
 }
 

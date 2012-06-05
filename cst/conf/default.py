@@ -54,7 +54,6 @@ launch = {
     's_debug': 'gdb {command}',
     'm_exec':  'mpiexec -np {nproc} {command}',
     'm_debug': 'mpiexec -np {nproc} -gdb {command}',
-    'submit': True,
 }
 
 script = """\

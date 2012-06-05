@@ -7,12 +7,12 @@ def test_conf():
     path = os.path.dirname(cst.conf.__file__)
     machines = ['default'] + os.listdir(path)
     kwargs = dict(
-        argv = [],
-        name = 'conf',
-        command = 'date',
         run = 'exec',
-        force = True,
+        argv = [],
         mode = 's',
+        name = 'conf',
+        force = True,
+        command = 'COMMAND',
     )
     for modules in [
         (cst.conf.default, cst.conf.site),
@@ -35,9 +35,9 @@ def test_conf():
             print(job.doc)
             del(job['doc'])
             pprint.pprint(job)
-    reload(cst.conf.default)
-    reload(cst.conf.cvms)
-    reload(cst.conf.site)
+    #reload(cst.conf.default)
+    #reload(cst.conf.cvms)
+    #reload(cst.conf.site)
 
 # continue if command line
 if __name__ == '__main__':
