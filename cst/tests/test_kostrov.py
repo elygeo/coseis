@@ -1,4 +1,4 @@
-def test_kostrov():
+def test_kostrov(argv=[]):
     """
     Kostrov circular crack test.
     """
@@ -54,10 +54,10 @@ def test_kostrov():
     # run SORD
     job = cst.sord.run(
         prm,
-        name = 'kostrov',
         run = 'exec',
+        argv = argv,
+        name = 'kostrov',
         force = True,
-        argv = [],
     )
 
     # compare with analytical solution
@@ -76,5 +76,6 @@ def test_kostrov():
 
 # continue if command line
 if __name__ == '__main__':
-    test_kostrov()
+    import sys
+    test_kostrov(sys.argv[1:])
 

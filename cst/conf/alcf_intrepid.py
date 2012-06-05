@@ -10,6 +10,12 @@ Useful:
     cbank
     qalter
 
+
+.basshrc
+    PS1="[\u@${mybgp}:\w]\$ "
+    export LC_COLLATE=C
+    export PATH=${HOME}/local/${HOSTTYPE}/bin:${PATH}
+
 /bgsys/drivers/ppcfloor/gnu-linux/bin
 --env LD_LIBRARY_PATH=/bgsys/drivers/ppcfloor/gnu-linux/lib /bgsys/drivers/ppcfloor/gnu-linux/bin/python
 """

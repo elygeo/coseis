@@ -11,19 +11,19 @@ code = """
     end program
 """
 
-def test_mpi():
+def test_mpi(argv=[]):
     """
     Basic MPI test
     """
     import os, shlex, subprocess
     import cst
     job = cst.util.skeleton(
+        run = 'exec',
+        argv = argv,
         name = 'mpi',
-        command = './test',
         nproc = 2,
         force = True,
-        run = 'exec',
-        options = [],
+        command = './test',
     )
     f = os.path.join(job.rundir, 'test')
     open(f + '.f90', 'w').write(code)
@@ -37,5 +37,6 @@ def test_mpi():
 
 # continue if command line
 if __name__ == '__main__':
-    test_mpi()
+    import sys
+    test_mpi(sys.argv[1:])
 

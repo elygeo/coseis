@@ -1,4 +1,4 @@
-def test_pml():
+def test_pml(argv=[]):
     """
     Test SORD parallelization with PML
     """
@@ -37,10 +37,10 @@ def test_pml():
     # single process
     job = cst.sord.run(
         prm,
-        name = 'pml',
         run = 'exec',
+        argv = argv,
+        name = 'pml',
         force = True,
-        argv = [],
     )
 
     # multiple processes
@@ -49,10 +49,10 @@ def test_pml():
         prm.nproc3 = n
         job1 = cst.sord.run(
             prm,
-            name = 'pml%s' % i,
             run = 'exec',
+            argv = argv,
+            name = 'pml%s' % i,
             force = True,
-            argv = [],
         )
         max_err_ = 0.0
         for f in cst.sord.fieldnames.volume:
@@ -72,5 +72,6 @@ def test_pml():
 
 # continue if command line
 if __name__ == '__main__':
-    test_pml()
+    import sys
+    test_pml(sys.argv[1:])
 

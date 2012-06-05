@@ -1,4 +1,4 @@
-def test_point():
+def test_point(argv=[]):
     """
     Test SORD parallelization with point source
     """
@@ -39,10 +39,10 @@ def test_point():
     # single process
     job = cst.sord.run(
         prm,
-        name = 'point',
         run = 'exec',
+        argv = argv,
+        name = 'point',
         force = True,
-        argv = [],
     )
 
     # multiple processes
@@ -51,10 +51,10 @@ def test_point():
         prm.nproc3 = n
         job1 = cst.sord.run(
             prm,
-            name = 'point%s' % i,
             run = 'exec',
+            argv = argv,
+            name = 'point%s' % i,
             force = True,
-            argv = [],
         )
         max_err_ = 0.0
         for f in cst.sord.fieldnames.volume:
@@ -74,5 +74,6 @@ def test_point():
 
 # continue if command line
 if __name__ == '__main__':
-    test_point()
+    import sys
+    test_point(sys.argv[1:])
 

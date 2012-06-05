@@ -1,4 +1,4 @@
-def test_conf():
+def test_conf(argv=[]):
     """
     Test configuration modules and machines
     """
@@ -8,7 +8,7 @@ def test_conf():
     machines = ['default'] + os.listdir(path)
     kwargs = dict(
         run = 'exec',
-        argv = [],
+        argv = argv,
         mode = 's',
         name = 'conf',
         force = True,
@@ -35,11 +35,9 @@ def test_conf():
             print(job.doc)
             del(job['doc'])
             pprint.pprint(job)
-    #reload(cst.conf.default)
-    #reload(cst.conf.cvms)
-    #reload(cst.conf.site)
 
 # continue if command line
 if __name__ == '__main__':
-    test_conf()
+    import sys
+    test_conf(sys.argv[1:])
 
