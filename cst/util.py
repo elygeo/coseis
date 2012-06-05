@@ -382,10 +382,12 @@ def prepare(job=None, **kwargs):
     for k in job.launch:
         job.launch[k] = job.launch[k].format(**job)
     if not job.launch_command:
-        if job.run:
+        if job.run in ('exec', 'debug'):
             k = job.mode + '_' + job.run
-        else:
+        elif not job.run:
             k = job.mode + '_exec'
+        else:
+            k = job.run
         if k in job.launch:
             job.launch_command = job.launch[k]
         else:
