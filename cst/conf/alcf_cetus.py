@@ -38,7 +38,7 @@ fortran_flags = {
 launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
-    'm_exec':  'runjob -p {ppn} -n {nproc} --verbose 2 --block $COBALT_PARTNAME --envs BG_SHAREDMEMSIZE=32MB --envs PAMI_VERBOSE=1 ${{COBALT_CORNER:+--corner}} $COBALT_CORNER ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE : {command}',
+    'm_exec':  'runjob -p {ppn} -n {nproc} --verbose=INFO --block $COBALT_PARTNAME --envs BG_SHAREDMEMSIZE=32MB --envs PAMI_VERBOSE=1 ${{COBALT_CORNER:+--corner}} $COBALT_CORNER ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE : {command}',
     'submit':  'qsub -O {name} -t {minutes} -n {nodes} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script "{name}.sh"',
     'submit2': 'qsub -O {name} -t {minutes} -n {nodes} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script --dependenices {depend} "{name}.sh"',
 }
