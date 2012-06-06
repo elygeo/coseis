@@ -194,7 +194,6 @@ def stage(prm, **kwargs):
     os.chdir(job.rundir)
     del(prm['itbuff'])
     util.save('parameters.py', prm, expand=['fieldio'], header='# model parameters\n')
-    util.save('conf.py', job, header = '# configuration\n')
 
     # metadata
     xis = {}

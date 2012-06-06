@@ -135,8 +135,6 @@ def stage(**kwargs):
     # save input file and configuration
     f = os.path.join(job.rundir, 'cvms-input')
     open(f, 'w').write(input_template.format(**job))
-    f = os.path.join(job.rundir, 'conf.py')
-    util.save(f, job)
     return job
 
 def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
