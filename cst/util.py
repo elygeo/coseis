@@ -471,6 +471,7 @@ def launch(job=None, **kwargs):
             c = job.launch['submit2']
         else:
             c = job.launch['submit']
+        print(c)
         p = subprocess.Popen(shlex.split(c), stdout=subprocess.PIPE)
         stdout = p.communicate()[0]
         print(stdout)
@@ -484,7 +485,6 @@ def launch(job=None, **kwargs):
             if '\n' in c or ';' in c or '|' in c:
                 subprocess.check_call(c, shell=True)
             elif c:
-                print(c)
                 subprocess.check_call(shlex.split(c))
 
     os.chdir(cwd)
