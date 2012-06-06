@@ -143,14 +143,14 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
         # launch mesher
         x, y, z = shape
-        s = x * y * z / 2000000
+        m = x * y * z // 120000000
         job0 = cst.conf.launch(
             name = mesh_id + '-mesh',
             new = False,
             rundir = path,
             stagein = ['mesh.py'],
             command = '%s mesh.py' % python,
-            seconds = s,
+            minutes = m,
             nproc = min(4, nproc),
             nstripe = nstripe,
         )
@@ -169,8 +169,8 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
         # launch mesher
         x, y, z = shape
-        s = x * y * z / 600000 # linear
-        s = x * y * z / 2000000 # nearest
+        m = x * y * z // 36000000 # linear
+        m = x * y * z // 120000000 # nearest
         print 'CVM-H wall time estimate: %s' % s
         cst.conf.launch(
             name = mesh_id + '-cvmh',
@@ -178,7 +178,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
             rundir = path,
             stagein = ['mesh-cvmh.py'],
             command = '%s mesh-cvmh.py' % python,
-            seconds = s,
+            minutes = m,
             nproc = min(4, nproc),
             nstripe = nstripe,
         )

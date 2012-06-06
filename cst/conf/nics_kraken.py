@@ -33,7 +33,7 @@ hostname = 'kraken-pwd[1234]'
 maxram = 16 * 1024
 maxcores = 12
 maxnodes = 8 * 1024 + 64
-maxtime = 24, 00
+maxtime = 24 * 60
 rate = 1e6
 
 launch = {

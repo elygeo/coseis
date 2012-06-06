@@ -71,14 +71,14 @@ job = cst.cvms.stage(
 
 # launch mesher
 x, y, z = shape
-s = x * y * z / 2000000
+m = x * y * z // 120000000
 job0 = cst.conf.launch(
     name = 'mesh',
     new = False,
     rundir = path,
     stagein = ['mesh.py'],
     command = '%s mesh.py' % python,
-    seconds = s,
+    minutes = m,
     nproc = min(3, nproc),
 )
 

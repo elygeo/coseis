@@ -29,7 +29,7 @@ nproc = 1        # number of processors
 command = ''     # executable command
 dtype = dtype_f = np.dtype('f').str # Numpy data type
 verbose = False  # extra diagnostics
-seconds = 1500   # estimated run time
+minutes = 60     # estimated run time
 cvms_opts = {}   # dictionary of special option for the CVM-S code
 pre = post = ''
 
@@ -44,7 +44,7 @@ maxnodes = 1
 maxcores = 0
 maxram = 0
 pmem = 0
-maxtime = 0, 0
+maxtime = 0
 rate = 1.0e6
 nstripe = -2
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'

@@ -58,6 +58,7 @@ def test_kostrov(argv=[]):
         argv = argv,
         name = 'kostrov',
         force = True,
+        minutes = 10,
     )
 
     # compare with analytical solution

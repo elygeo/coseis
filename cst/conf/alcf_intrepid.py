@@ -28,7 +28,7 @@ hostname = 'login[0-9]'
 maxcores = 4
 maxram = 2 * 1024
 maxnodes = 40 * 1024
-maxtime = 12, 00
+maxtime = 12 * 60
 queue = 'prod'
 
 fortran_serial = '/bgsys/drivers/ppcfloor/comm/xl/bin/mpixlf2003_r'

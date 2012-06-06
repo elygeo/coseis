@@ -163,7 +163,7 @@ def stage(prm, **kwargs):
         nvars = 44
     nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
     job.pmem = 32 + int(1.2 * nm * nvars * int(job.dtype[-1]) / 1024 / 1024)
-    job.seconds = int((prm.shape[3] + 10) * nm // job.rate)
+    job.minutes = 10 + int((prm.shape[3] + 10) * nm // (40 * job.rate))
 
     # configure options
     job.command = os.path.join('.', 'sord-' + job.mode + job.optimize + job.dtype[-1])

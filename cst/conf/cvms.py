@@ -3,7 +3,7 @@ CVM configuration
 """
 
 version = '4.0'
-seconds = 1200
+minutes = 20
 nsample = None
 file_lon = 'hold/lon.bin'
 file_lat = 'hold/lat.bin'

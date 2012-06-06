@@ -335,21 +335,16 @@ def prepare(job=None, **kwargs):
             job.pmem = job.maxram / job.ppn
         job.ram = job.pmem * job.ppn
 
-        # SU estimate and wall time limit with extra allowance
-        seconds = job.seconds * job.ppn // job.cores
-        minutes = 10 + int(seconds // 30)
-        maxminutes = 60 * job.maxtime[0] + job.maxtime[1]
-        if maxminutes:
-            minutes = min(minutes, maxminutes)
-            seconds = min(seconds * 60, maxminutes)
-        job.minutes = minutes
-        job.walltime = '%d:%02d:00' % (minutes // 60, minutes % 60)
-        sus = seconds // 3600 * job.totalcores + 1
+        # SU estimate and wall time limit
+        if job.maxtime:
+            job.minutes = min(job.minutes, job.maxtime)
+        job.walltime = '%d:%02d:00' % (job.minutes // 60, job.minutes % 60)
+        sus = job.minutes // 60 * job.totalcores + 1
 
         # if resources exceeded, try another queue
         if job.maxcores and job.ppn > job.maxcores:
             continue
-        if maxminutes and minutes == maxminutes:
+        if job.maxtime and job.minutes >= job.maxtime:
             continue
         break
 
@@ -366,7 +361,7 @@ def prepare(job=None, **kwargs):
         print('Warning: exceeding available cores per node (%s)' % job.maxcores)
     if job.ram and job.ram > job.maxram:
         print('Warning: exceeding available RAM per node (%sMb)' % job.maxram)
-    if maxminutes and minutes == maxminutes:
+    if job.maxtime and job.minutes == job.maxtime:
         print('Warning: exceeding maximum time limit (%s:%02d:00)' % job.maxtime)
     if re.match(job.hostname, job.host) is None:
         s = job.host, job.machine
@@ -403,7 +398,7 @@ def skeleton(job=None, **kwargs):
     """
     Create run directory
     """
-    import os, stat, shutil
+    import os, shutil
 
     # prepare job
     if job is None:

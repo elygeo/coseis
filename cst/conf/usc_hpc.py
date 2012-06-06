@@ -28,10 +28,10 @@ rate = 1.1e6
 queue = 'default'
 
 queue_opts = [
-    ('default',  {'maxnodes': 256, 'maxcores': 8, 'maxram': 12 * 1024, 'maxtime':  (24, 00)}),
-    ('default',  {'maxnodes': 256, 'maxcores': 4, 'maxram':  4 * 1024, 'maxtime':  (24, 00)}),
-    ('largemem', {'maxnodes':   1, 'maxcores': 8, 'maxram': 64 * 1024, 'maxtime': (336, 00)}),
-    ('nbns',     {'maxnodes':  48, 'maxcores': 8, 'maxram': 12 * 1024, 'maxtime': (336, 00)}),
+    ('default',  {'maxnodes': 256, 'maxcores': 8, 'maxram': 12*1024, 'maxtime': 24*60}),
+    ('default',  {'maxnodes': 256, 'maxcores': 4, 'maxram':  4*1024, 'maxtime': 24*60}),
+    ('largemem', {'maxnodes':   1, 'maxcores': 8, 'maxram': 64*1024, 'maxtime': 14*24*60}),
+    ('nbns',     {'maxnodes':  48, 'maxcores': 8, 'maxram': 12*1024, 'maxtime': 14*24*60}),
 ]
 
 launch = {

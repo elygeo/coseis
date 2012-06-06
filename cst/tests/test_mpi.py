@@ -24,7 +24,7 @@ def test_mpi(argv=[]):
         nproc = 2,
         force = True,
         command = './test',
-        maxtime = (0, 10),
+        minutes = 10,
     )
     f = os.path.join(job.rundir, 'test')
     open(f + '.f90', 'w').write(code)

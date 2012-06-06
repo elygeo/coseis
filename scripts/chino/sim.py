@@ -190,7 +190,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         path = job.rundir + os.sep
         meta = imp.load_source('meta', path + 'meta.py')
         x, y, t = meta.shapes['hold/full-v1.bin']
-        s = x * y * t / 1000000
+        m = x * y * t // 60000000
         cst.conf.launch(
             run = job.run,
             depend = job.jobid,
@@ -198,7 +198,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
             name = 'cook',
             stagein = ['cook.py'],
             command = 'python cook.py',
-            seconds = s,
+            minutes = m,
             new = False,
         )
 
