@@ -33,7 +33,7 @@ def test_mpi(argv=[]):
         shlex.split(job.fortran_flags['O']) +
         ['-o', f, f + '.f90'] 
     )
-    print(c)
+    print(' '.join(c))
     subprocess.check_call(c)
     cst.util.launch(job)
 
