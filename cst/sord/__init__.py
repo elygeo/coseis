@@ -104,7 +104,7 @@ def build(job=None):
     os.chdir(cwd)
     return
 
-def stage(prm, **kwargs):
+def stage(prm, name='sord', **kwargs):
     """
     Stage job
     """
@@ -126,7 +126,7 @@ def stage(prm, **kwargs):
     else:
         prm = util.storage(**prm)
     prm = prepare_param(prm)
-    job = util.configure(**kwargs)
+    job = util.configure(name=name, **kwargs)
 
     # partition for parallelization
     nx, ny, nz = prm.shape[:3]
