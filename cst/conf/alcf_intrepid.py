@@ -10,11 +10,16 @@ Useful:
     cbank
     qalter
 
-
 .basshrc
     PS1="[\u@${mybgp}:\w]\$ "
     export LC_COLLATE=C
-    export PATH=${HOME}/local/${HOSTTYPE}/bin:${PATH}
+
+.softevnrc
+    PYTHONPATH += $HOME/coseis
+    PATH += $HOME/coseis/bin
+    PATH += /gpfs/home/gely/local/$HOSTTYPE/bin
+    PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
+    +git-1.7.6.4
 
 /bgsys/drivers/ppcfloor/gnu-linux/bin
 --env LD_LIBRARY_PATH=/bgsys/drivers/ppcfloor/gnu-linux/lib /bgsys/drivers/ppcfloor/gnu-linux/bin/python
