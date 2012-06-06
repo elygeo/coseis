@@ -25,7 +25,7 @@ hostname = 'master'
 queue = 'workq'
 maxnodes = 40
 maxcores = 2
-maxram = 1800
+maxram = 2 * 1024
 rate = 0.5e6
 
 launch = {

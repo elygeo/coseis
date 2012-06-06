@@ -10,8 +10,8 @@ module load numpy
 account = 'k33'
 login = hostname = 'shaheen.hpc.kaust.edu.sa'
 maxcores = 4
-maxnodes = 16384
-maxram = 3800
+maxnodes = 16 * 1024
+maxram = 4 * 1024
 fortran_serial = 'gfortran'
 fortran_mpi = 'mpif90'
 queue = 'default'

@@ -6,6 +6,6 @@ ANL Airy
 """
 
 maxcores = 2
-maxram = 3800
+maxram = 4 * 1024
 rate = 1.4e6
 

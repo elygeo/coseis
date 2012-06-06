@@ -10,7 +10,7 @@ export PATH="/opt/mpich2/gnu/bin:${PATH}"
 
 login = hostname = 'pisco.sdsu.edu'
 maxcores = 8
-maxram = 30000
+maxram = 32 * 1024
 fortran_serial = 'gfortran'
 fortran_mpi = 'mpif90'
 

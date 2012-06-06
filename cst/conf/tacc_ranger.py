@@ -33,7 +33,7 @@ export F90=pgf95
 login = 'tg-login.ranger.tacc.teragrid.org'
 hostname = '.*.ranger.tacc.utexas.edu'
 maxcores = 16
-maxram = 30000
+maxram = 32 * 1024
 #rate = 21e5
 rate = 12e5
 

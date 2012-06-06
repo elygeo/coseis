@@ -30,9 +30,9 @@ Statically linked Python:
 
 login = 'kraken-pwd.nics.utk.edu'
 hostname = 'kraken-pwd[1234]'
-maxram = 15000
+maxram = 16 * 1024
 maxcores = 12
-maxnodes = 8256
+maxnodes = 8 * 1024 + 64
 maxtime = 24, 00
 rate = 1e6
 

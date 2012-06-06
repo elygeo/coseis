@@ -7,7 +7,7 @@ USC Wind
 
 login = hostname = 'wind.usc.edu'
 maxcores = 2
-maxram = 800
+maxram = 1024
 rate = 1.0e6
 mode = 's'
 fortran_serial = 'gfortran'

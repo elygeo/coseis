@@ -26,8 +26,8 @@ Useful:
 login = 'intrepid.alcf.anl.gov'
 hostname = 'login[0-9]'
 maxcores = 4
-maxram = 1900
-maxnodes = 40960
+maxram = 2 * 1024
+maxnodes = 40 * 1024
 maxtime = 12, 00
 queue = 'prod'
 

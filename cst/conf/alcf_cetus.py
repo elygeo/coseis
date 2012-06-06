@@ -21,7 +21,7 @@ login = 'cetus.alcf.anl.gov'
 hostname = 'cetuslac1'
 maxcores = 16
 maxnodes = 1024
-maxram = 15000
+maxram = 16 * 1024
 fortran_serial = 'bgxlf2008_r'
 fortran_mpi = 'mpixlf2003_r'
 
