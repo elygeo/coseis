@@ -319,7 +319,6 @@ def prepare(job=None, **kwargs):
             cores = job.nproc,
             totalcores = job.nproc,
             ram = 0,
-            minutes = 0,
             walltime = '',
         ))
 
