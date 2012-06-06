@@ -41,7 +41,6 @@ def test_pml(argv=[]):
         argv = argv,
         name = 'pml',
         force = True,
-        minutes = 10,
     )
 
     # multiple processes
@@ -54,7 +53,6 @@ def test_pml(argv=[]):
             argv = argv,
             name = 'pml%s' % i,
             force = True,
-            minutes = 10,
         )
         max_err_ = 0.0
         for f in cst.sord.fieldnames.volume:

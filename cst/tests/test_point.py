@@ -43,7 +43,6 @@ def test_point(argv=[]):
         argv = argv,
         name = 'point',
         force = True,
-        minutes = 10,
     )
 
     # multiple processes
@@ -56,7 +55,6 @@ def test_point(argv=[]):
             argv = argv,
             name = 'point%s' % i,
             force = True,
-            minutes = 10,
         )
         max_err_ = 0.0
         for f in cst.sord.fieldnames.volume:
