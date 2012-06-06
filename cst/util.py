@@ -484,6 +484,7 @@ def launch(job=None, **kwargs):
             if '\n' in c or ';' in c or '|' in c:
                 subprocess.check_call(c, shell=True)
             elif c:
+                print(c)
                 subprocess.check_call(shlex.split(c))
 
     os.chdir(cwd)

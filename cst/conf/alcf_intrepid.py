@@ -20,7 +20,8 @@ Useful:
 --env LD_LIBRARY_PATH=/bgsys/drivers/ppcfloor/gnu-linux/lib /bgsys/drivers/ppcfloor/gnu-linux/bin/python
 """
 
-login = hostname = '.*.alcf.anl.gov'
+login = 'intrepid.alcf.anl.gov'
+hostname = 'login[0-9]'
 maxcores = 4
 maxram = 1900
 maxnodes = 40960

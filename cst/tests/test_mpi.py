@@ -27,12 +27,14 @@ def test_mpi(argv=[]):
     )
     f = os.path.join(job.rundir, 'test')
     open(f + '.f90', 'w').write(code)
-    subprocess.check_call(
+    c = (
         [job.fortran_mpi] +
         shlex.split(job.fortran_flags['f']) +
         shlex.split(job.fortran_flags['O']) +
         ['-o', f, f + '.f90'] 
     )
+    print(c)
+    subprocess.check_call(c)
     cst.util.launch(job)
 
 # continue if command line
