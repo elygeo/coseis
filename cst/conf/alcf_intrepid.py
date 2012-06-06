@@ -32,9 +32,8 @@ fortran_serial = '/bgsys/drivers/ppcfloor/comm/xl/bin/mpixlf2003_r'
 fortran_mpi = '/bgsys/drivers/ppcfloor/comm/xl/bin/mpixlf2003_r'
 
 fortran_flags = {
-    'f': '-u -qsuppress=cmpmsg -qlanglvl=2003pure -qsuffix=f=f90',
-    'f': '-u -qsuppress=cmpmsg -qlanglvl=2003pure',
-    'g': '-C -O0 -g',
+    'f': '-qlanglvl=2003pure',
+    'g': '-C -u -O0 -g',
     't': '-C',
     'p': '-O -p',
     'O': '-O -qarch=450d -qtune=450',
@@ -45,9 +44,8 @@ fortran_flags = {
 launch = {
     's_exec':  '{command}',
     's_debug': 'gdb {command}',
-    'm_exec':  'cobalt-mpirun -np {nproc} --mode vn --verbose 2 {command}',
-    #'submit':  'qsub -O {name}-out -q {queue} -n {nodes} -t {minutes} -A {account} --mode script {name}.sh',
-    'submit':  'qsub -O {name}-out -n {nodes} -t {minutes} --mode script {name}.sh',
-    'submit2': 'qsub -O {name}-out -n {nodes} -t {minutes} --mode script --dependenices {depend} "{name}.sh"',
+    'm_exec':  'cobalt-mpirun -np {nproc} -mode vn --verbose 2 {command}',
+    'submit':  'qsub -O {name} -n {nodes} -t {minutes} --mode script {name}.sh',
+    'submit2': 'qsub -O {name} -n {nodes} -t {minutes} --mode script --dependenices {depend} "{name}.sh"',
 }
 

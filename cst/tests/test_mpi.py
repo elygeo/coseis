@@ -30,7 +30,7 @@ def test_mpi(argv=[]):
     c = (
         [job.fortran_mpi] +
         shlex.split(job.fortran_flags['f']) +
-        shlex.split(job.fortran_flags['O']) +
+        shlex.split(job.fortran_flags['t']) +
         ['-o', f, f + '.f90'] 
     )
     print(' '.join(c))

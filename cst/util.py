@@ -403,7 +403,7 @@ def skeleton(job=None, **kwargs):
     """
     Create run directory
     """
-    import os, shutil
+    import os, stat, shutil
 
     # prepare job
     if job is None:
@@ -431,6 +431,7 @@ def skeleton(job=None, **kwargs):
     if 'submit' in job.launch:
         f = os.path.join(dest, job.name + '.sh')
         open(f, 'w').write(job.script)
+        os.chmod(f, 0755)
 
     # stage directories and files
     for f in job.stagein:
