@@ -4,11 +4,9 @@ ALCF
 /intrepid-fs0/ cross-mounted with Challenger and Eureka
 
 Useful:
+    cbank
     projects
     bg-listjobs
-    partlist
-    cbank
-    qalter
 
 .basshrc
     PS1="[\u@${mybgp}:\w]\$ "
