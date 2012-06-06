@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 """
-Run all tests using Nose for test discovery.
+Run all tests using Nose for discovery.
+
+Interactive: python nosetests.py -i 
+Batch queue: python nosetests.py -q 
 """
 
 import os
