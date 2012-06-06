@@ -382,16 +382,16 @@ def prepare(job=None, **kwargs):
     for k in job.launch:
         job.launch[k] = job.launch[k].format(**job)
     if not job.launch_command:
-        if job.run in ('exec', 'debug'):
-            k = job.mode + '_' + job.run
-        elif not job.run:
-            k = job.mode + '_exec'
-        else:
+        k = 'exec'
+        if job.run:
             k = job.run
-        if k in job.launch:
-            job.launch_command = job.launch[k]
-        else:
+        if k in ('exec', 'debug'):
+            k = job.mode + '_' + k
+        if k not in job.launch:
             raise Exception('Error: %s launch mode not supported.' % k)
+        if k == 'submit':
+            k = job.mode + '_exec'
+        job.launch_command = job.launch[k]
 
     # batch script
     job.script = job.script.format(**job)

@@ -28,17 +28,16 @@ maxnodes = 40960
 maxtime = 12, 00
 queue = 'prod'
 
-fortran_serial = 'mpixlf90_r'
-fortran_mpi = 'mpixlf90_r'
+fortran_serial = '/bgsys/drivers/ppcfloor/comm/xl/bin/mpixlf2003_r'
+fortran_mpi = '/bgsys/drivers/ppcfloor/comm/xl/bin/mpixlf2003_r'
 
 fortran_flags = {
     'f': '-u -qsuppress=cmpmsg -qlanglvl=2003pure -qsuffix=f=f90',
     'f': '-u -qsuppress=cmpmsg -qlanglvl=2003pure',
-    'g': '-C -qflttrap -qsigtrap -O0 -g',
-    'g': '-C -qflttrap -O0 -g',
-    't': '-C -qflttrap',
+    'g': '-C -O0 -g',
+    't': '-C',
     'p': '-O -p',
-    'O': '-O4 -qarch=450d -qtune=450',
+    'O': '-O -qarch=450d -qtune=450',
     '8': '-qrealsize=8',
 }
 
