@@ -12,10 +12,10 @@ import cst
 path = os.path.join(cst.__path__[0], 'tests')
 cst.sord.build()
 cst.util.launch(
-    launch_command = "nosetests -v --where=" + path
+    launch_command = "nosetests -v --where=" + path,
     name = 'nose',
     nproc = 6,
-    minutes = 20,
+    minutes = 10,
     force = True
 )
 
