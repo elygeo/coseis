@@ -8,7 +8,7 @@ ALCF
     PATH += $HOME/coseis/bin
     PATH += /gpfs/home/gely/$ARCH/bin
     MANPATH += /gpfs/home/gely/$ARCH/man
-    PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
+    #PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
     +git-1.7.6.4
 
 .basshrc
@@ -28,13 +28,14 @@ maxnodes = 40 * 1024
 maxtime = 12 * 60
 queue = 'prod'
 
-fortran_serial = fortran_mpi = 'mpixlf2003_r'
+#fortran_serial = fortran_mpi = 'mpixlf2003_r'
+fortran_serial = fortran_mpi = 'mpixlf95_r'
 
 fortran_flags = {
     'f': '-qlanglvl=2003pure',
     'g': '-C -u -O0 -g',
     't': '-C',
-    'p': '-O -p',
+    'p': '-O -p /home/morozov/lib/libmpihpm.a',
     'O': '-O -qarch=450d -qtune=450',
     '8': '-qrealsize=8',
 }
