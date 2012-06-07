@@ -1,24 +1,31 @@
 """
 ALCF Vesta
 
-echo '+mpiwrapper-xl' >> .soft
+/gpfs/vesta_scratch/projects/<ProjectName>
 
-Run from GPFS: /gpfs/veas-fs0/
+.soft:
+    PYTHONPATH += $HOME/coseis
+    PATH += $HOME/coseis/bin
+    PATH += /gpfs/vesta_home/gely/local/$ARCH/epd/bin
+    PATH += /gpfs/vesta_home/gely/local/$ARCH/bin
+    MANPATH += /gpfs/vesta_home/gely/local/$ARCH/man
+    +mpiwrapper-xl.legacy
+    @default
+
+Debug/profile:
+    bgq_stack <corefile>
+    coreprocessor <corefile>
+    VPROF_PROFILE=yes
+    /home/morozov/fixes/libc.a
 
 Useful commands:
     qstat
     cbank
     partlist
-
-debug/profile:
-    bgq_stack <corefile>
-    coreprocessor <corefile>
-    VPROF_PROFILE=yes
-    /home/morozov/fixes/libc.a
 """
 
 login = 'vesta.alcf.anl.gov'
-hostname = 'vesta'
+hostname = 'vestalac1'
 maxcores = 16
 maxnodes = 1024
 maxram = 16 * 1024
@@ -36,8 +43,8 @@ fortran_flags = {
 }
 
 launch = {
-    's_exec':  'runjob -p 1 -n 1 --verbose=INFO --block $COBALT_PARTNAME --envs BG_SHAREDMEMSIZE=32MB --envs PAMI_VERBOSE=1 ${{COBALT_CORNER:+--corner}} $COBALT_CORNER ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE : {command}',
-    'm_exec':  'runjob -p {ppn} -n {nproc} --verbose=INFO --block $COBALT_PARTNAME --envs BG_SHAREDMEMSIZE=32MB --envs PAMI_VERBOSE=1 ${{COBALT_CORNER:+--corner}} $COBALT_CORNER ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE : {command}',
+    's_exec':  'runjob --verbose=INFO --block $COBALT_PARTNAME --envs BG_SHAREDMEMSIZE=32MB --envs PAMI_VERBOSE=1 ${{COBALT_CORNER:+--corner}} $COBALT_CORNER ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE -p 1 -n 1 : {command}',
+    'm_exec':  'runjob --verbose=INFO --block $COBALT_PARTNAME --envs BG_SHAREDMEMSIZE=32MB --envs PAMI_VERBOSE=1 ${{COBALT_CORNER:+--corner}} $COBALT_CORNER ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE -p {ppn} -n {nproc} : {command}',
     'submit':  'qsub -O {name} -t {minutes} -n {nodes} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script "{name}.sh"',
     'submit2': 'qsub -O {name} -t {minutes} -n {nodes} --env BG_SHAREDMEMSIZE=32MB:PAMI_VERBOSE=1 --mode script --dependenices {depend} "{name}.sh"',
 }

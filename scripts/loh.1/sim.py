@@ -34,10 +34,11 @@ prm.fieldio = [
 ]
 
 # material properties of the layer
+i = 1000.0 / delta[2] + 0.5
 prm.fieldio += [
-    ('=', 'rho', s_[:,:,:20.5,:], 2600.0),
-    ('=', 'vp',  s_[:,:,:20.5,:], 4000.0),
-    ('=', 'vs',  s_[:,:,:20.5,:], 2000.0),
+    ('=', 'rho', s_[:,:,:i,:], 2600.0),
+    ('=', 'vp',  s_[:,:,:i,:], 4000.0),
+    ('=', 'vs',  s_[:,:,:i,:], 2000.0),
 ]
 
 # near side boundary conditions:

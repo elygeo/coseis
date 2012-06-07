@@ -1,26 +1,24 @@
 """
 ALCF
 
-/intrepid-fs0/ cross-mounted with Challenger and Eureka
-
-Useful:
-    cbank
-    projects
-    bg-listjobs
-
-.basshrc
-    PS1="[\u@${mybgp}:\w]\$ "
-    export LC_COLLATE=C
+/intrepid-fs0/ cross-mounted on Challenger and Eureka
 
 .softevnrc
     PYTHONPATH += $HOME/coseis
     PATH += $HOME/coseis/bin
-    PATH += /gpfs/home/gely/local/$HOSTTYPE/bin
+    PATH += /gpfs/home/gely/local/$ARCH/epd/bin
+    PATH += /gpfs/home/gely/local/$ARCH/bin
+    MANPATH += /gpfs/home/gely/local/$ARCH/man
     PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
     +git-1.7.6.4
 
-/bgsys/drivers/ppcfloor/gnu-linux/bin
---env LD_LIBRARY_PATH=/bgsys/drivers/ppcfloor/gnu-linux/lib /bgsys/drivers/ppcfloor/gnu-linux/bin/python
+.basshrc
+    PS1="[\u@${mybgp}:\w]\$ "
+
+Useful commands:
+    cbank
+    projects
+    bg-listjobs
 """
 
 login = 'intrepid.alcf.anl.gov'
@@ -31,8 +29,8 @@ maxnodes = 40 * 1024
 maxtime = 12 * 60
 queue = 'prod'
 
-fortran_serial = '/bgsys/drivers/ppcfloor/comm/xl/bin/mpixlf2003_r'
-fortran_mpi = '/bgsys/drivers/ppcfloor/comm/xl/bin/mpixlf2003_r'
+fortran_serial = 'mpixlf2003_r'
+fortran_mpi = 'mpixlf2003_r'
 
 fortran_flags = {
     'f': '-qlanglvl=2003pure',
