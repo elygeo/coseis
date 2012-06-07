@@ -13,7 +13,7 @@ class get_slices:
         return item
 s_ = get_slices()
 
-def build(job=None):
+def build(job=None, **kwargs):
     """
     Build SORD code.
     """
@@ -23,7 +23,7 @@ def build(job=None):
 
     # configure
     if job == None:
-        job = util.configure(options=[])
+        job = util.configure(options=[], **kwargs)
     if not job.mode:
         job.mode = 'sm'
     dtype = np.dtype(job.dtype).str

@@ -28,8 +28,7 @@ hostname = 'vestalac1'
 maxcores = 16
 maxnodes = 1024
 maxram = 16 * 1024
-fortran_serial = 'bgxlf2008_r'
-fortran_mpi = 'mpixlf2003_r'
+fortran_serial = fortran_mpi = 'mpixlf2003_r'
 
 fortran_flags = {
     'f': '-u -qlanglvl=2003pure',
