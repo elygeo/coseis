@@ -6,9 +6,8 @@ ALCF
 .softevnrc
     PYTHONPATH += $HOME/coseis
     PATH += $HOME/coseis/bin
-    PATH += /gpfs/home/gely/local/$ARCH/epd/bin
-    PATH += /gpfs/home/gely/local/$ARCH/bin
-    MANPATH += /gpfs/home/gely/local/$ARCH/man
+    PATH += /gpfs/home/gely/$ARCH/bin
+    MANPATH += /gpfs/home/gely/$ARCH/man
     PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
     +git-1.7.6.4
 
