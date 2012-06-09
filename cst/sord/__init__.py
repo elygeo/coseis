@@ -68,42 +68,45 @@ def build(job=None, **kwargs):
 
     # serial compile
     for opt in job.optimize:
-        fc = (
-            [job.fortran_serial] +
-            shlex.split(job.fortran_flags['f']) +
-            shlex.split(job.fortran_flags[opt])
-        )
+        cc = ' '.join([
+            job.c_serial,
+            job.c_flags['f'],
+            job.c_flags[opt],
+        ])
+        fc = ' '.join([
+            job.fortran_serial,
+            job.fortran_flags['f'],
+            job.fortran_flags[opt],
+        ])
         if dtype != job.dtype_f:
-            fc += shlex.split(job.fortran_flags[dsize])
-        cc = (
-            [job.c_serial] +
-            shlex.split(job.c_flags['f']) +
-            shlex.split(job.c_flags[opt])
-        )
+            fc += ' ' + job.fortran_flags[dsize]
         olib = []
         for s in slib:
             b, e = os.path.splitext(s)
-            o = b + '-' + opt + dsize + '.o'
             c = {'.f90': fc, '.c': cc}[e]
-            new |= util.make(c + ['-c', s], o, [s])
+            c = shlex.split(c) + ['-c', s]
+            o = b + '-' + opt + dsize + '.o'
+            new |= util.make(c, o, [s])
             olib.append(o)
         s = ['collective_s.f90'] + main
+        c = shlex.split(fc) + olib + s
         o = bld + 'sord-s' + opt + dsize
-        new |= util.make(fc + olib + s, o, slib + s)
+        new |= util.make(c, o, slib + s)
 
     # mpi compile
     if job.fortran_mpi:
         for opt in job.optimize:
-            fc = (
-                [job.fortran_mpi] +
-                shlex.split(job.fortran_flags['f']) +
-                shlex.split(job.fortran_flags[opt])
-            )
+            fc = ' '.join([
+                job.fortran_mpi,
+                job.fortran_flags['f'],
+                job.fortran_flags[opt],
+            ])
             if dtype != job.dtype_f:
-                fc += shlex.split(job.fortran_flags[dsize])
+                fc += ' ' + job.fortran_flags[dsize]
             s = ['collective_m.f90'] + main
+            c = shlex.split(fc) + olib + s
             o = bld + 'sord-m' + opt + dsize
-            new |= util.make(fc + olib + s, o, slib + s)
+            new |= util.make(c, o, slib + s)
 
     # finished
     os.chdir(cwd)
