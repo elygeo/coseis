@@ -100,7 +100,6 @@ end subroutine
 
 ! 2d real input/output
 subroutine rio2(fh, f2, mode, filename, mm, nn, oo, mpio, verb)
-use m_fio
 integer, intent(inout) :: fh
 real, intent(inout) :: f2(:,:)
 character(1), intent(in) :: mode
@@ -116,7 +115,6 @@ end subroutine
 
 ! 2d integer input/output
 subroutine iio2(fh, f2, mode, filename, mm, nn, oo, mpio, verb)
-use m_fio
 integer, intent(inout) :: fh
 integer, intent(inout) :: f2(:,:)
 character(1), intent(in) :: mode
@@ -132,7 +130,6 @@ end subroutine
 
 ! 1d real input/output
 subroutine rio1(fh, f1, mode, filename, m, o, mpio, verb)
-use m_fio
 integer, intent(inout) :: fh
 real, intent(inout) :: f1(:)
 character (1), intent(in) :: mode
@@ -149,7 +146,6 @@ end subroutine
 
 ! 1d integer input/output
 subroutine iio1(fh, f1, mode, filename, m, o, mpio, verb)
-use m_fio
 integer, intent(inout) :: fh
 integer, intent(inout) :: f1(:)
 character(1), intent(in) :: mode

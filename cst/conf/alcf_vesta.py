@@ -35,7 +35,7 @@ fortran_flags = {
     'g': '-C -qsmp=omp:noopts:noauto -qfloat=nofold -qflttrap -qsigtrap -g',
     'g': '-C -qsmp=omp:noopts:noauto -qfloat=nofold -qflttrap -g',
     't': '-C -qsmp=omp:noauto -qflttrap',
-    'p': '-O -qsmp=omp:noauto -p /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a /home/morozov/HPM/lib/libmpihpm.a',
+    'p': '-O3 -qsmp=omp:noauto -p /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a /home/morozov/HPM/lib/libmpihpm.a',
     'O': '-O3 -qsmp=omp:noauto',
     '8': '-qrealsize=8',
 }

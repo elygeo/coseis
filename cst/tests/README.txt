@@ -1,17 +1,26 @@
 Test Suite
 ----------
 
+To check syntax with Pyflakes do:
+
+    ./pyflakes.sh
+
 To run the test suite using nose_ do:
 ::
 
-    nosetests
+    nosetests -v
 
 To also include tests that require a GUI and plotting to the screen do:
 ::
 
-    nosetests --exe
+    nosetests -v --exe
 
-Or, to run individual tests:
+To submit nosetests to a batch queue do:
+::
+
+    ./nosetests.py
+
+To run individual tests:
 ::
 
     python test_name.py

@@ -56,23 +56,23 @@ def build(job=None):
     # compile ascii, binary, and MPI versions
     new = False
     if 'a' in job.mode:
-        src = 'iotxt.f', 'version%s.f' % job.version
+        s = ['iotxt.f', 'version%s.f' % job.version]
         for opt in job.optimize:
-            cmd = [job.fortran_serial] + shlex.split(job.fortran_flags[opt]) + ['-o']
-            obj = 'cvms-a' + opt
-            new |= util.make(cmd, obj, src)
+            c = [job.fortran_serial] + shlex.split(job.fortran_flags[opt]) + s
+            o = 'cvms-a' + opt
+            new |= util.make(c, o, s)
     if 's' in job.mode:
-        src = 'iobin.f', 'version%s.f' % job.version
+        s = ['iobin.f', 'version%s.f' % job.version]
         for opt in job.optimize:
-            cmd = [job.fortran_serial] + shlex.split(job.fortran_flags[opt]) + ['-o']
-            obj = 'cvms-s' + opt
-            new |= util.make(cmd, obj, src)
+            c = [job.fortran_serial] + shlex.split(job.fortran_flags[opt]) + s
+            o = 'cvms-s' + opt
+            new |= util.make(c, o, s)
     if 'm' in job.mode and job.fortran_mpi:
-        src = 'iompi.f', 'version%s.f' % job.version
+        s = ['iompi.f', 'version%s.f' % job.version]
         for opt in job.optimize:
-            cmd = [job.fortran_mpi] + shlex.split(job.fortran_flags[opt]) + ['-o']
-            obj = 'cvms-m' + opt
-            new |= util.make(cmd, obj, src)
+            c = [job.fortran_mpi] + shlex.split(job.fortran_flags[opt]) + s
+            o = 'cvms-m' + opt
+            new |= util.make(c, o, s)
     os.chdir(cwd)
     return
 

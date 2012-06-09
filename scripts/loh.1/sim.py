@@ -34,7 +34,7 @@ prm.fieldio = [
 ]
 
 # material properties of the layer
-i = 1000.0 / delta[2] + 0.5
+i = 1000.0 / prm.delta[2] + 0.5
 prm.fieldio += [
     ('=', 'rho', s_[:,:,:i,:], 2600.0),
     ('=', 'vp',  s_[:,:,:i,:], 4000.0),

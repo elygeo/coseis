@@ -3,6 +3,10 @@
 *.pyc
 *.so
 *.mod
+*.ipo
+*.il
+*.stb
+*.sha1
 run
 run-*
 tmp

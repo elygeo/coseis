@@ -28,7 +28,8 @@ maxnodes = 40 * 1024
 maxtime = 12 * 60
 queue = 'prod'
 
-fortran_serial = fortran_mpi = 'mpixlf2003_r'
+fortran_serial = 'mpixlf2003_r'
+fortran_mpi = 'mpixlf2003_r mpi.f90'
 
 fortran_flags = {
     'f': '-qlanglvl=2003pure',

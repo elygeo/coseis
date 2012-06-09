@@ -29,11 +29,12 @@ elif target == ['clean']:
     d = os.path.join(path, 'build')
     if os.path.exists(d):
         shutil.rmtree(d)
-    for d in '', 'sord', 'cvms', 'tests':
+    for d in '', 'sord', 'sord/src', 'cvms', 'tests':
         d = os.path.join(path, d) 
         for f in os.listdir(d):
-            f = os.path.join(d, f)
-            if f.endswith('.pyc') or f.endswith('.so'):
+            e = os.path.splitext(f)[-1]
+            if e in ('.pyc', '.so', '.o', '.mod', '.ipo', '.il', '.stb'):
+                f = os.path.join(d, f)
                 os.unlink(f)
 else:
     raise Exception(target)

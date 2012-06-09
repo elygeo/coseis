@@ -2,70 +2,48 @@
 Miscellaneous tools.
 """
 
-def make(compiler, object_, source):
-    """
-    An alternative Make that uses state files.
-    """
-    import os, glob, shlex, difflib, subprocess
-
-    object_ = os.path.expanduser(object_)
-    source = [os.path.expanduser(f) for f in source if f]
-    statedir = os.path.join(os.path.dirname(object_), 'build-state')
-    if not os.path.isdir(statedir):
-        os.mkdir(statedir)
-    statefile = os.path.join(statedir, os.path.basename(object_))
-    if isinstance(compiler, basestring):
-        compiler = shlex.split(compiler)
+def make(command, object_, sources):
+    import os, shlex, hashlib, subprocess
+    if isinstance(command, basestring):
+        c = shlex.split(command)
     else:
-        compiler = list(compiler)
-    command = compiler + [object_] + source
-    state = [' '.join(command) + '\n']
-    for f in source:
-        state += open(f).readlines()
-    compile_ = True
-    if os.path.isfile(object_):
-        try:
-            oldstate = open(statefile).readlines()
-        except IOError:
-            pass
-        else:
-            diff = ''.join(difflib.unified_diff(oldstate, state, n=0))
-            if diff:
-                print(diff)
-            else:
-                compile_ = False
-    if compile_:
-        try:
-            os.unlink(statefile)
-        except OSError:
-            pass
-        print('\n' + ' '.join(command))
-        subprocess.check_call(command)
-        open(statefile, 'w').writelines(state)
-        for pat in '*.o', '*.mod', '*.ipo', '*.il', '*.stb':
-            for f in glob.glob(pat):
-                os.unlink(f)
-    return compile_
+        c = list(command)
+    h = hashlib.sha1(' '.join(c))
+    for f in sources:
+        h.update(open(f).read())
+    h = h.hexdigest()
+    f = object_ + '.sha1'
+    if os.path.exists(f):
+        g = open(f).read()
+    else:
+        g = None
+    if h == g and os.path.exists(object_):
+        return False
+    else:
+        if os.path.exists(f):
+            os.unlink(f)
+        c += ['-o', object_]
+        print(' '.join(c))
+        subprocess.check_call(c)
+        open(f, 'w').write(h)
+        return True
 
 
 def archive():
-    import os, gzip, tarfile
+    import os, gzip, cStringIO
     try:
         import git
     except ImportError:
         print('Warning: Source code not archived. To enable, use')
         print('Git versioned source code and install GitPython.')
     else:
-        path = os.path.dirname(__file__)
-        repo = git.Repo(path)
-        open('tmp.log', 'w').write(repo.git.log())
-        repo.archive(open('tmp.tar', 'w'), prefix='coseis/')
-        tarfile.open('tmp.tar', 'a').add('tmp.log', 'coseis/changelog.txt')
-        tar = open('tmp.tar', 'rb').read()
-        os.remove('tmp.tar')
-        os.remove('tmp.log')
-        f = os.path.join(path, 'build', 'coseis.tgz')
-        gzip.open(f, 'wb').write(tar)
+        p = os.path.dirname(__file__)
+        f = os.path.join(p, 'build', 'coseis.tgz')
+        s = cStringIO.StringIO()
+        r = git.Repo(p)
+        r.archive(s, prefix='coseis/')
+        s.reset()
+        gzip.open(f, 'wb').write(s.read())
 
 
 class storage(dict):
@@ -261,10 +239,13 @@ def configure(*args, **kwargs):
         if job.run == 'debug':
             job.optimize = 'g'
 
-    # merge fortran flags
+    # merge compiler flags
     k = job.fortran_serial
     if k in job.fortran_flags:
         job.fortran_flags = job.fortran_flags[k]
+    k = job.c_serial
+    if k in job.c_flags:
+        job.c_flags = job.c_flags[k]
 
     return job
 

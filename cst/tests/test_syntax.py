@@ -3,13 +3,10 @@ import os, glob
 exclude = 'ws-meta-in.py',
 include = (
     'setup.py',
-    'bin/*.py',
-    'cst/*.py',
-    'cst/sord/*.py',
-    'cst/cvms/*.py',
-    'cst/conf/*.py',
-    'cst/tests/*.py',
+    'bin/*',
     'doc/*.py',
+    'cst/*.py',
+    'cst/*/*.py',
     'scripts/*/*.py',
 )
 

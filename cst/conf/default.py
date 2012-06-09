@@ -94,14 +94,30 @@ def find(*files):
             if os.path.isfile(os.path.join(d, f)):
                 return f
 
-# Fortran compiler
-fortran_serial = find('xlf95_r', 'ifort', 'gfortran', 'pathf95', 'pgf90', 'f95')
-fortran_mpi = find('mpxlf95_r', 'mpif90')
+# compilers
+c_serial = find('mpixlc_r', 'gcc')
+c_mpi = find('mpixlc_r', 'mpicc')
+fortran_serial = find('mpixlf2003_r', 'ifort', 'gfortran', 'pathf95', 'pgf90', 'f95')
+fortran_mpi = find('mpixlf2003_r', 'mpif90')
 f2py_flags = ''
 
 del(os, sys, pwd, np, find)
 
-# Fortran compiler flags
+# compiler flags
+c_flags = {
+    'mpixlc_r' : {
+        'f': '',
+        'g': '-g',
+        'p': '-O3 -p',
+        'O': '-O3',
+    },
+    'gcc' : {
+        'f': '-Wall',
+        'g': '-g',
+        'p': '-O3 -pg',
+        'O': '-O3',
+    },
+}
 fortran_flags = {
     'gfortran': {
         #'f': '-fimplicit-none -Wall -std=f95 -pedantic',
@@ -128,6 +144,14 @@ fortran_flags = {
         'p': '-O -Mprof=func',
         'O': '-fast',
         '8': '-Mr8',
+    },
+    'mpixlf2003_r': {
+        'f': '-qlanglvl=2003pure',
+        'g': '-C -u -O0 -g',
+        't': '-C',
+        'p': '-O3',
+        'O': '-O3 -qarch=450d -qtune=450',
+        '8': '-qrealsize=8',
     },
     'xlf95_r': {
         'f': '-u -q64 -qsuppress=cmpmsg -qlanglvl=2003pure -qsuffix=f=f90',

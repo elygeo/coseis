@@ -24,8 +24,6 @@ def build(job=None, **kwargs):
     # configure
     if job == None:
         job = util.configure(options=[], **kwargs)
-    if not job.mode:
-        job.mode = 'sm'
     dtype = np.dtype(job.dtype).str
     dsize = dtype[-1]
     new = False
@@ -40,7 +38,7 @@ def build(job=None, **kwargs):
         os.mkdir(bld)
 
     # source files
-    base = [
+    slib = [
         'globals.f90',
         'diffcn.f90',
         'diffnc.f90',
@@ -50,13 +48,13 @@ def build(job=None, **kwargs):
         'util.f90',
         'fio.f90',
     ]
-    common = [
+    main = [
         'arrays.f90',
         'fieldio.f90',
         'stats.f90',
         'parameters.f90',
         'setup.f90',
-        'gridgen.f90',
+        'grid_gen.f90',
         'material.f90',
         'source.f90',
         'rupture.f90',
@@ -69,39 +67,51 @@ def build(job=None, **kwargs):
     ]
 
     # serial compile
-    if 's' in job.mode:
-        src = base + ['serial.f90'] + common
-        for opt in job.optimize:
-            obj = bld + 'sord-s' + opt + dsize
-            cmd = (
-                [job.fortran_serial] +
-                shlex.split(job.fortran_flags['f']) +
-                shlex.split(job.fortran_flags[opt])
-            )
-            if dtype != job.dtype_f:
-                cmd += shlex.split(job.fortran_flags[dsize])
-            new |= util.make(cmd + ['-o'], obj, src)
+    for opt in job.optimize:
+        fc = (
+            [job.fortran_serial] +
+            shlex.split(job.fortran_flags['f']) +
+            shlex.split(job.fortran_flags[opt])
+        )
+        if dtype != job.dtype_f:
+            fc += shlex.split(job.fortran_flags[dsize])
+        cc = (
+            [job.c_serial] +
+            shlex.split(job.c_flags['f']) +
+            shlex.split(job.c_flags[opt])
+        )
+        olib = []
+        for s in slib:
+            b, e = os.path.splitext(s)
+            o = b + '-' + opt + dsize + '.o'
+            c = {'.f90': fc, '.c': cc}[e]
+            new |= util.make(c + ['-c', s], o, [s])
+            olib.append(o)
+        s = ['collective_s.f90'] + main
+        o = bld + 'sord-s' + opt + dsize
+        new |= util.make(fc + olib + s, o, slib + s)
 
     # mpi compile
-    if 'm' in job.mode and job.fortran_mpi:
-        src = base + ['mpi.f90'] + common
+    if job.fortran_mpi:
         for opt in job.optimize:
-            obj = bld + 'sord-m' + opt + dsize
-            cmd = (
+            fc = (
                 [job.fortran_mpi] +
                 shlex.split(job.fortran_flags['f']) +
                 shlex.split(job.fortran_flags[opt])
             )
             if dtype != job.dtype_f:
-                cmd += shlex.split(job.fortran_flags[dsize])
-            new |= util.make(cmd + ['-o'], obj, src)
+                fc += shlex.split(job.fortran_flags[dsize])
+            s = ['collective_m.f90'] + main
+            o = bld + 'sord-m' + opt + dsize
+            new |= util.make(fc + olib + s, o, slib + s)
+
+    # finished
+    os.chdir(cwd)
 
     # archive source code
     if new:
         util.archive()
 
-    # finished
-    os.chdir(cwd)
     return
 
 def stage(prm, name='sord', **kwargs):
