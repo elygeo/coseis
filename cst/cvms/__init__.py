@@ -58,19 +58,22 @@ def build(job=None):
     if 'a' in job.mode:
         s = ['iotxt.f', 'version%s.f' % job.version]
         for opt in job.optimize:
-            c = [job.fortran_serial] + shlex.split(job.fortran_flags[opt]) + s
+            c = job.fortran_serial, job.fortran_flags[opt]
+            c = shlex.split(' '.join(c)) + s
             o = 'cvms-a' + opt
             new |= util.make(c, o, s)
     if 's' in job.mode:
         s = ['iobin.f', 'version%s.f' % job.version]
         for opt in job.optimize:
-            c = [job.fortran_serial] + shlex.split(job.fortran_flags[opt]) + s
+            c = job.fortran_serial, job.fortran_flags[opt]
+            c = shlex.split(' '.join(c)) + s
             o = 'cvms-s' + opt
             new |= util.make(c, o, s)
     if 'm' in job.mode and job.fortran_mpi:
         s = ['iompi.f', 'version%s.f' % job.version]
         for opt in job.optimize:
-            c = [job.fortran_mpi] + shlex.split(job.fortran_flags[opt]) + s
+            c = job.fortran_mpi, job.fortran_flags[opt]
+            c = shlex.split(' '.join(c)) + s
             o = 'cvms-m' + opt
             new |= util.make(c, o, s)
     os.chdir(cwd)

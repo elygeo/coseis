@@ -12,6 +12,8 @@ if target == []:
     del(cfg['doc'])
     pprint.pprint(cfg)
     print(doc)
+elif target == ['sord']:
+    cst.sord.build()
 elif target == ['build_all']:
     cst.sord.build()
     cst.cvms.build()
