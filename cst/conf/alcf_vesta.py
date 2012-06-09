@@ -28,15 +28,16 @@ hostname = 'vestalac1'
 maxcores = 16
 maxnodes = 1024
 maxram = 16 * 1024
-fortran_serial = fortran_mpi = 'mpixlf2003_r'
+fortran_serial = 'mpixlf2003_r'
+fortran_mpi = 'mpixlf2003_r'
 
 fortran_flags = {
-    'f': '-u -qlanglvl=2003pure',
-    'g': '-C -qsmp=omp:noopts:noauto -qfloat=nofold -qflttrap -qsigtrap -g',
-    'g': '-C -qsmp=omp:noopts:noauto -qfloat=nofold -qflttrap -g',
-    't': '-C -qsmp=omp:noauto -qflttrap',
-    'p': '-O3 -qsmp=omp:noauto -p /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a /home/morozov/HPM/lib/libmpihpm.a',
-    'O': '-O3 -qsmp=omp:noauto',
+    'f': '-u -qlanglvl=2003pure -qnosmp',
+    'g': '-C -qfloat=nofold -qflttrap -qsigtrap -g',
+    'g': '-C -qfloat=nofold -qflttrap -g',
+    't': '-C -qflttrap',
+    'p': '-O3 -p /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a /home/morozov/HPM/lib/libmpihpm.a',
+    'O': '-O3',
     '8': '-qrealsize=8',
 }
 

@@ -29,11 +29,10 @@ maxtime = 12 * 60
 queue = 'prod'
 
 fortran_serial = 'mpixlf2003_r'
-#fortran_mpi = 'mpixlf2003_r mpi.f90'
 fortran_mpi = 'mpixlf2003_r'
 
 fortran_flags = {
-    'f': '-qlanglvl=2003pure -qsuppress=cmpmsg',
+    'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -qnosmp',
     'g': '-C -u -O0 -g',
     't': '-C',
     'p': '-O -p /home/morozov/lib/libmpihpm.a',
