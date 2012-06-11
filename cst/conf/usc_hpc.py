@@ -1,9 +1,9 @@
 """
-USC HPC
+USC HPC Linux Cluster
 
 http://www.usc.edu/hpcc/
 
-.login
+.login:
 source /usr/usc/globus/default/setup.csh
 #source /usr/usc/mpich/default/setup.csh
 source /usr/usc/mpich2/1.3.1..10/setup.csh

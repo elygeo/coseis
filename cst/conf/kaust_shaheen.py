@@ -1,5 +1,6 @@
 """
-KAUST Shaheen
+KAUST Shaheen: IBM Blue Gene/P
+
 http://www.hpc.kaust.edu.sa/
 
 Requirements:

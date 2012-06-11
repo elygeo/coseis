@@ -3,6 +3,7 @@
 *.pyc
 *.so
 *.o
+*.x
 *.mod
 *.ipo
 *.il

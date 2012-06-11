@@ -35,7 +35,7 @@ elif target == ['clean']:
         d = os.path.join(path, d) 
         for f in os.listdir(d):
             e = os.path.splitext(f)[-1]
-            if e in ('.pyc', '.so', '.o', '.mod', '.ipo', '.il', '.stb'):
+            if e in ('.pyc', '.so', '.o', '.x', '.mod', '.ipo', '.il', '.stb', '.sha1'):
                 f = os.path.join(d, f)
                 os.unlink(f)
 else:

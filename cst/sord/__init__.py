@@ -31,11 +31,8 @@ def build(job=None, **kwargs):
     # setup build directory
     path = os.path.dirname(__file__)
     src = os.path.join(path, 'src')
-    bld = os.path.realpath(os.path.join(path, '..', 'build')) + os.sep
     cwd = os.getcwd()
     os.chdir(src)
-    if not os.path.isdir(bld):
-        os.mkdir(bld)
 
     # source files
     slib = [
@@ -90,7 +87,7 @@ def build(job=None, **kwargs):
             olib.append(o)
         s = ['collective_s.f90'] + main
         c = shlex.split(fc) + olib + s
-        o = bld + 'sord-s' + opt + dsize
+        o = 'sord-s' + opt + dsize + '.x'
         new |= util.make(c, o, slib + s)
 
     # mpi compile
@@ -105,7 +102,7 @@ def build(job=None, **kwargs):
                 fc += ' ' + job.fortran_flags[dsize]
             s = ['collective_m.f90'] + main
             c = shlex.split(fc) + olib + s
-            o = bld + 'sord-m' + opt + dsize
+            o = 'sord-m' + opt + dsize + '.x'
             new |= util.make(c, o, slib + s)
 
     # finished
@@ -179,7 +176,7 @@ def stage(prm, name='sord', **kwargs):
     job.minutes = 10 + int((prm.shape[3] + 10) * nm // (40 * job.rate))
 
     # configure options
-    job.command = os.path.join('.', 'sord-' + job.mode + job.optimize + job.dtype[-1])
+    job.command = os.path.join('.', 'sord-' + job.mode + job.optimize + job.dtype[-1] + '.x')
     job = util.prepare(job)
 
     # compile code
@@ -189,7 +186,7 @@ def stage(prm, name='sord', **kwargs):
 
     # create run directory
     path = os.path.dirname(__file__)
-    job.stagein += os.path.join(path, '..', 'build', job.command),
+    job.stagein += os.path.join(path, 'src', job.command),
     f = os.path.join(path, '..', 'build', 'coseis.tgz')
     if os.path.isfile(f):
         job.stagein += f,

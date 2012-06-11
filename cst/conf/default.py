@@ -1,5 +1,5 @@
 """
-Coseis configuration
+Coseis Default Configuration
 """
 
 import os, sys, pwd

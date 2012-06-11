@@ -1,5 +1,5 @@
 """
-Z Shi
+Z Shi: Apple MacBook Pro
 
 3.06 GHz Core 2 Duo
 4 GB Ram

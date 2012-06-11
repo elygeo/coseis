@@ -1,14 +1,14 @@
 """
-TACC Ranger
+TACC Ranger: Sun Constellation Linux Cluster
 
 EPD version: rh3-x86_64
 mvapich2 supports MPI2, but not recommended for more than 2048 tasks.
 
-.profile_user
+.profile_user:
 module load git
 module swap pgi intel
 
-.bashrc
+.bashrc:
 alias qme='showq -u'
 alias qdev='idev -minutes 120'
 

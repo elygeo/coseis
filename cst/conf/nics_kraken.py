@@ -1,31 +1,31 @@
 """
-NICS Kraken
+NICS Kraken: Cray XT5
 
 Install under /lustre/scratch/
 CrayPAT is useful for profiling and collecting hardware performance data.
 
 .bashrc
-    module swap PrgEnv-pgi PrgEnv-gnu
-    module load git vim yt
-    alias qme='qstat -u $USER'
-    alias qdev='qsub -I -A account_string -l size=12,walltime=2:00:00'
+module swap PrgEnv-pgi PrgEnv-gnu
+module load git vim yt
+alias qme='qstat -u $USER'
+alias qdev='qsub -I -A account_string -l size=12,walltime=2:00:00'
 
-Useful:
-    showq
-    showbf
-    showusage
+Useful commands:
+showq
+showbf
+showusage
 
 Statically linked Python:
-    module load yt
-    cd "${SCRATCHDIR}/local"
-    url="http://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.7.1.2.tar.gz"
-    curl -L "${url}" | tar zx
-    python "virtualenv-1.7.1.2/virtualenv.py" python
-    . python/bin/activate
-    pip install pyproj
-    pip install GitPython
-    pip install readline
-    pip install nose
+module load yt
+cd "${SCRATCHDIR}/local"
+url="http://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.7.1.2.tar.gz"
+curl -L "${url}" | tar zx
+python "virtualenv-1.7.1.2/virtualenv.py" python
+. python/bin/activate
+pip install pyproj
+pip install GitPython
+pip install readline
+pip install nose
 """
 
 login = 'kraken-pwd.nics.utk.edu'

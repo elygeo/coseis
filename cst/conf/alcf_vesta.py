@@ -1,26 +1,27 @@
 """
-ALCF Vesta
+ALCF Mira, Vests, Cetus: IBM Blue Gene/Q
 
+File systems:
 /gpfs/vesta_scratch/projects/<ProjectName>
 
 .soft:
-    PYTHONPATH += $HOME/coseis
-    PATH += $HOME/coseis/bin
-    PATH += /gpfs/vesta_home/gely/$ARCH/bin
-    MANPATH += /gpfs/vesta_home/gely/$ARCH/man
-    +mpiwrapper-xl.legacy
-    @default
+PYTHONPATH += $HOME/coseis
+PATH += $HOME/coseis/bin
+PATH += /gpfs/vesta_home/gely/$ARCH/bin
+MANPATH += /gpfs/vesta_home/gely/$ARCH/man
++mpiwrapper-xl.legacy
+@default
 
 Debug/profile:
-    bgq_stack <corefile>
-    coreprocessor <corefile>
-    VPROF_PROFILE=yes
-    /home/morozov/fixes/libc.a
+bgq_stack <corefile>
+coreprocessor <corefile>
+VPROF_PROFILE=yes
+/home/morozov/fixes/libc.a
 
 Useful commands:
-    qstat
-    cbank
-    partlist
+qstat
+cbank
+partlist
 """
 
 login = 'vesta.alcf.anl.gov'

@@ -16,8 +16,8 @@ npp = 200
 npp = 100
 
 prm = cst.sord.parameters()
-prm.oplevel = 6
 prm.oplevel = 2
+prm.oplevel = 6
 prm.itstats = 1
 prm.itcheck = -1
 prm.itio = 16

@@ -1,14 +1,12 @@
 """
-SDSU CSRC Babieca cluster
+SDSU CSRC Babieca Linux Cluster
 
 http://www.csrc.sdsu.edu/csrc/
 http://babieca.sdsu.edu/
-interactive nodes:
-    8 x 2 Intel Xeon 2.4GHz
-    1GB
-batch nodes:
-    40 x 2 Intel Xeon 2.4GHz
-    2GB
+
+interactive nodes: 8 x 2 Intel Xeon 2.4GHz, 1GB
+batch nodes: 40 x 2 Intel Xeon 2.4GHz, 2GB
+
 machinefile:
 node41:4
 node42:4

@@ -1,7 +1,4 @@
-"""
-ALCF Surveyor
-"""
-
+from .alcf_intrepid import __doc__
 from .alcf_intrepid import *
 
 login = 'surveyor.alcf.anl.gov'

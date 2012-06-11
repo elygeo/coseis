@@ -1,7 +1,4 @@
-"""
-NICS Kraken
-"""
-
+from .nics_kraken import __doc__
 from .nics_kraken import *
 
 fortran_flags = {

@@ -38,6 +38,9 @@ def archive():
         print('Git versioned source code and install GitPython.')
     else:
         p = os.path.dirname(__file__)
+        f = os.path.join(p, 'build')
+        if not os.path.exists(f):
+            os.mkdir(f)
         f = os.path.join(p, 'build', 'coseis.tgz')
         s = cStringIO.StringIO()
         r = git.Repo(p)

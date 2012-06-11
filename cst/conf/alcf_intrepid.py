@@ -1,23 +1,28 @@
 """
-ALCF
+ALCF Intrepid, Challenger, Surveyor: IBM Blue Gene/P
 
-/intrepid-fs0/ cross-mounted on Challenger and Eureka
+File systems:
+/intrepid-fs0/:  Intrepid, Challenger, Eureka
+/pvfs-surveyor/: Surveyor, Gadzooks
 
-.softevnrc
-    PYTHONPATH += $HOME/coseis
-    PATH += $HOME/coseis/bin
-    PATH += /gpfs/home/gely/$ARCH/bin
-    MANPATH += /gpfs/home/gely/$ARCH/man
-    PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
-    +git-1.7.6.4
+.softevnrc:
+PYTHONPATH += $HOME/coseis
+PATH += $HOME/coseis/bin
+PATH += /gpfs/home/gely/$ARCH/bin
+MANPATH += /gpfs/home/gely/$ARCH/man
+PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
++git-1.7.6.4
++ddt
 
-.basshrc
-    PS1="[\u@${mybgp}:\w]\$ "
+.basshrc:
+PS1="[\u@${mybgp}:\w]\$ "
+alias qdev='isub -q default -n 16 -t 60'
 
 Useful commands:
-    cbank
-    projects
-    bg-listjobs
+qstat
+cbank
+projects
+bg-listjobs
 """
 
 login = 'intrepid.alcf.anl.gov'
