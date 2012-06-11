@@ -130,7 +130,7 @@ fortran_flags = {
         '8': '-fdefault-real-8',
     },
     'ifort': {
-        'f': '-u -std95 -warn',
+        'f': '-u -std03 -warn',
         'g': '-CB -traceback -g',
         't': '-CB -traceback',
         'p': '-O -pg',

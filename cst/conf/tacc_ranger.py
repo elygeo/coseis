@@ -53,7 +53,7 @@ fortran_mpi = 'mpif90'
 
 fortran_flags = {
     'ifort': {
-        'f': '-u -std95 -warn',
+        'f': '-u -std03 -warn',
         'g': '-CB -traceback -g',
         't': '-CB -traceback',
         'p': '-O -pg',
