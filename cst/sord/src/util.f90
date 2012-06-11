@@ -234,8 +234,8 @@ end function
 real function timer(i)
 integer, intent(in) :: i
 integer(8), save :: timers(8)
-integer(8), save :: clock0, clockrate, clockmax
-integer(8) :: clock1
+integer, save :: clock0, clockrate, clockmax
+integer :: clock1
 if (i == 0) then
     call system_clock(clock0, clockrate, clockmax)
     timer = 0.0
