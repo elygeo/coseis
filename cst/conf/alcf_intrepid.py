@@ -38,7 +38,7 @@ fortran_mpi = 'mpixlf2003_r'
 
 fortran_flags = {
     'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -qnosmp',
-    'g': '-C -u -O0 -g',
+    'g': '-C -O0 -g',
     't': '-C',
     'p': '-O -p /home/morozov/lib/libmpihpm.a',
     'O': '-O -qarch=450d -qtune=450',
