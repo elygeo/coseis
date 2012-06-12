@@ -1,6 +1,7 @@
 """
 SDSU CSRC Babieca Linux Cluster
 
+ssh babieca.sdsu.edu
 http://www.csrc.sdsu.edu/csrc/
 http://babieca.sdsu.edu/
 
@@ -18,8 +19,6 @@ node47:2
 node48:2
 """
 
-login = 'babieca.sdsu.edu'
-hostname = 'master'
 queue = 'workq'
 maxnodes = 40
 maxcores = 2

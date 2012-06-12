@@ -1,6 +1,8 @@
 """
 ALCF Mira, Vests, Cetus: IBM Blue Gene/Q
 
+ssh vesta.alcf.anl.gov
+
 File systems:
 /gpfs/vesta_scratch/projects/<ProjectName>
 
@@ -24,20 +26,18 @@ cbank
 partlist
 """
 
-login = 'vesta.alcf.anl.gov'
-hostname = 'vestalac1'
 maxcores = 16
 maxnodes = 1024
 maxram = 16 * 1024
-fortran_serial = 'mpixlf2003_r'
-fortran_mpi = 'mpixlf2003_r'
 
-fortran_flags = {
-    'f': '-u -qlanglvl=2003pure -qnosmp',
+compiler_c = 'mpixlcc_r'
+compiler_f = 'mpixlf2003_r'
+compiler_opts = {
+    'f': '-u -qlanglvl=2003pure',
     'g': '-C -qfloat=nofold -qflttrap -qsigtrap -g',
     'g': '-C -qfloat=nofold -qflttrap -g',
     't': '-C -qflttrap',
-    'p': '-O3 -p /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a /home/morozov/HPM/lib/libmpihpm.a',
+    'p': '-O3 /home/morozov/HPM/lib/libmpihpm.a',
     'O': '-O3',
     '8': '-qrealsize=8',
 }

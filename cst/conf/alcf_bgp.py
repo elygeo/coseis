@@ -25,19 +25,18 @@ projects
 bg-listjobs
 """
 
-login = 'intrepid.alcf.anl.gov'
-hostname = 'login[0-9]'
-maxcores = 4
 maxram = 2 * 1024
-maxnodes = 40 * 1024
-maxtime = 12 * 60
-queue = 'prod'
+maxcores = 4
+host_opts = {
+    'challenger': {'maxnodes': 512,       'maxtime': 60,      'queue': 'prod-devel'},
+    'surveyor':   {'maxnodes': 1024,      'maxtime': 60,      'queue': 'default'},
+    'intrepid':   {'maxnodes': 1024 * 40, 'maxtime': 60 * 12, 'queue': 'prod'},
+}
 
-fortran_serial = 'mpixlf2003_r'
-fortran_mpi = 'mpixlf2003_r'
-
-fortran_flags = {
-    'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -qnosmp',
+compiler_c = 'mpixlcc_r'
+compiler_f = 'mpixlf2003_r'
+compiler_opts = {
+    'f': '-qlanglvl=2003pure -qsuppress=cmpmsg',
     'g': '-C -O0 -g',
     't': '-C',
     'p': '-O -p /home/morozov/lib/libmpihpm.a',

@@ -1,6 +1,7 @@
 """
 TACC Ranger: Sun Constellation Linux Cluster
 
+ssh ranger.tacc.utexas.edu
 EPD version: rh3-x86_64
 mvapich2 supports MPI2, but not recommended for more than 2048 tasks.
 
@@ -30,8 +31,6 @@ export F77=pgf95
 export F90=pgf95
 """
 
-login = 'tg-login.ranger.tacc.teragrid.org'
-hostname = '.*.ranger.tacc.utexas.edu'
 maxcores = 16
 maxram = 32 * 1024
 #rate = 21e5
@@ -48,19 +47,11 @@ queue_opts = [
 ]
 
 f2py_flags = '--fcompiler=intelem'
-fortran_serial = 'ifort'
-fortran_mpi = 'mpif90'
-
-fortran_flags = {
-    'ifort': {
-        'f': '-u -std03 -warn',
-        'g': '-CB -traceback -g',
-        't': '-CB -traceback',
-        'p': '-O -pg',
-        'O': '-O2 -xW',
-        '8': '-r8',
-    },
-    'pgf95' : {
+compiler = 'pgi'
+compiler_c = 'mpicc'
+compiler_f = 'mpif90'
+compiler_opts = {
+    'pgi': {
         'f': '-Mdclchk',
         'g': '-Ktrap=fp -Mbounds -g',
         't': '-Ktrap=fp -Mbounds',
@@ -68,6 +59,21 @@ fortran_flags = {
         'O': '-fast -tp barcelona-64',
         '8': '-Mr8',
     },
+     'intel': {
+        'f': '-u -std03 -warn',
+        'g': '-CB -traceback -g',
+        't': '-CB -traceback',
+        'p': '-O -pg',
+        'O': '-O2 -xW',
+        '8': '-r8',
+    },
+    'sun': {
+        'f': '-u',
+        'g': '-C -ftrap=common -w4 -g',
+        't': '-C -ftrap=common',
+        'p': '-O -pg',
+        'O': '-fast -fns',
+    },  
 }
 
 launch = {

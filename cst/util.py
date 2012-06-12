@@ -346,9 +346,6 @@ def prepare(job=None, **kwargs):
         print('Warning: exceeding available RAM per node (%sMb)' % job.maxram)
     if job.maxtime and job.minutes == job.maxtime:
         print('Warning: exceeding maximum time limit (%02d:00)' % job.maxtime)
-    if re.match(job.hostname, job.host) is None:
-        s = job.host, job.machine
-        print('Warning: hostname %r does not match configuration %r' % s)
 
     # run directory
     d = job.rundir.format(**job)

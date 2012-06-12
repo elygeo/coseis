@@ -1,6 +1,7 @@
 """
 KAUST Shaheen: IBM Blue Gene/P
 
+ssh shaheen.hpc.kaust.edu.sa
 http://www.hpc.kaust.edu.sa/
 
 Requirements:
@@ -9,12 +10,8 @@ module load numpy
 """
 
 account = 'k33'
-login = hostname = 'shaheen.hpc.kaust.edu.sa'
 maxcores = 4
-maxnodes = 16 * 1024
 maxram = 4 * 1024
-fortran_serial = 'gfortran'
-fortran_mpi = 'mpif90'
 queue = 'default'
 
 queue_opts = [

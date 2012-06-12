@@ -1,6 +1,7 @@
 """
 NICS Kraken: Cray XT5
 
+gsissh kraken-pwd.nics.utk.edu
 Install under /lustre/scratch/
 CrayPAT is useful for profiling and collecting hardware performance data.
 
@@ -28,8 +29,6 @@ pip install readline
 pip install nose
 """
 
-login = 'kraken-pwd.nics.utk.edu'
-hostname = 'kraken-pwd[1234]'
 maxram = 16 * 1024
 maxcores = 12
 maxnodes = 8 * 1024 + 64
@@ -45,22 +44,39 @@ launch = {
     'submit2': 'qsub -W depend="afterok:{depend}" "{name}.sh"',
 }
 
-fortran_serial = 'ftn'
-fortran_mpi = 'ftn'
-
-fortran_flags = {
-    'f': '-fimplicit-none -Wall',
-    'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
-    't': '-fbounds-check -ffpe-trap=invalid,zero,overflow',
-    'p': '-O -pg',
-    'O': '-O3',
-    '8': '-fdefault-real-8',
+compiler = 'pgi'
+compiler_c = 'cc'
+compiler_f = 'ftn'
+compiler_mpi = True
+compiler_opts = {
+    'pgi': {
+        'f': '-Mdclchk',
+        'g': '-Ktrap=fp -Mbounds -Mchkptr -g',
+        't': '-Ktrap=fp -Mbounds',
+        'p': '-pg -Mprof=func',
+        'O': '-fast',
+        '8': '-Mr8',
+    },
+    'gnu': {
+        'f': '-fimplicit-none -Wall',
+        'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
+        't': '-fbounds-check -ffpe-trap=invalid,zero,overflow',
+        'p': '-O -pg',
+        'O': '-O3',
+        '8': '-fdefault-real-8',
+    },
 }
 
-cvms_opts = dict(
-    fortran_flags = {
-        'g': '-Wall -fbounds-check -ffpe-trap=invalid,zero,overflow -g',
-        'O': '-Wall -O3',
+cvms_opts = {
+    'compiler_opts': {
+        'gnu': {
+            'g': '-Wall -fbounds-check -ffpe-trap=invalid,zero,overflow -g',
+            'O': '-Wall -O3',
+        },
+        'pgi': {
+            'g': '-Ktrap=fp -Mbounds -Mchkptr -g',
+            'O': '-fast',
+        },
     },
-)
+}
 

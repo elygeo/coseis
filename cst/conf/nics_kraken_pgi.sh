@@ -1,1 +1,0 @@
-nics_kraken.sh

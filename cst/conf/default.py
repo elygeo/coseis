@@ -2,7 +2,7 @@
 Coseis Default Configuration
 """
 
-import os, sys, pwd
+import os, sys, pwd, socket
 import numpy as np
 
 # email address
@@ -36,7 +36,8 @@ pre = post = ''
 # machine specific
 machine = ''
 account = ''
-login = host = hostname = os.uname()[1]
+host = socket.getfqdn()
+host_opts = {}
 system = os.uname()
 queue = ''
 queue_opts = []
@@ -94,88 +95,19 @@ def find(*files):
             if os.path.isfile(os.path.join(d, f)):
                 return f
 
-# compilers
-c_serial = find('mpixlc_r', 'gcc')
-c_mpi = find('mpixlc_r', 'mpicc')
-fortran_serial = find('mpixlf2003_r', 'ifort', 'gfortran', 'pathf95', 'pgf90', 'f95')
-fortran_mpi = find('mpixlf2003_r', 'mpif90')
-f2py_flags = ''
+# GNU compiler
+compiler = ''
+compiler_c = find('mpicc', 'gcc'),
+compiler_f = find('mpif90', 'gfortran'),
+compiler_mpi = ''
+compiler_opts = {
+    'f': '-fimplicit-none -Wall',
+    'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
+    't': '-fbounds-check -ffpe-trap=invalid,zero,overflow',
+    'p': '-O -pg',
+    'O': '-O3',
+    '8': '-fdefault-real-8',
+}
 
 del(os, sys, pwd, np, find)
-
-# compiler flags
-c_flags = {
-    'mpixlc_r' : {
-        'f': '',
-        'g': '-g',
-        'p': '-O3 -p',
-        'O': '-O3',
-    },
-    'gcc' : {
-        'f': '-Wall',
-        'g': '-g',
-        'p': '-O3 -pg',
-        'O': '-O3',
-    },
-}
-fortran_flags = {
-    'gfortran': {
-        #'f': '-fimplicit-none -Wall -std=f95 -pedantic',
-        'f': '-fimplicit-none -Wall',
-        'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
-        't': '-fbounds-check -ffpe-trap=invalid,zero,overflow',
-        'p': '-O -pg',
-        #'O': '-O3 -fopenmp',
-        'O': '-O3',
-        '8': '-fdefault-real-8',
-    },
-    'ifort': {
-        'f': '-u -std03 -warn',
-        'g': '-CB -traceback -g',
-        't': '-CB -traceback',
-        'p': '-O -pg',
-        'O': '-O3',
-        '8': '-r8',
-    },
-    'pgf90': {
-        'f': '-Mdclchk',
-        'g': '-Ktrap=fp -Mbounds -g',
-        't': '-Ktrap=fp -Mbounds',
-        'p': '-O -Mprof=func',
-        'O': '-fast',
-        '8': '-Mr8',
-    },
-    'mpixlf2003_r': {
-        'f': '-qlanglvl=2003pure',
-        'g': '-C -u -O0 -g',
-        't': '-C',
-        'p': '-O3',
-        'O': '-O3 -qarch=450d -qtune=450',
-        '8': '-qrealsize=8',
-    },
-    'xlf95_r': {
-        'f': '-u -q64 -qsuppress=cmpmsg -qlanglvl=2003pure -qsuffix=f=f90',
-        'g': '-C -qflttrap -qsigtrap -g',
-        't': '-C -qflttrap -qsigtrap',
-        'p': '-O -p',
-        'O': '-O4',
-        '8': '-qrealsize=8',
-    },
-    'pathf95': {
-        'f': '',
-        'g': '-g',
-        't': '',
-        'p': '-O -p',
-        'O': '-i8 -O3 -OPT:Ofast -fno-math-errno',
-        '8':  'FIXME',
-    },
-    'f95': {
-        'f': '-u',
-        'g': '-C -ftrap=common -w4 -g',
-        't': '-C -ftrap=common',
-        'p': '-O -pg',
-        'O': '-fast -fns',
-        '8':  'FIXME',
-    },
-}
 
