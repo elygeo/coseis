@@ -11,7 +11,7 @@ use grid_generation
 use field_io_
 use material_model
 use kinematic_source
-use rupture
+use dynamic_rupture
 use material_resample
 use checkpoint
 use time_integration
@@ -29,7 +29,7 @@ iotimer = 0.0
 prof0(1) = timer(0)
 call initialize(np0, ip);        master = ip == 0; prof0(1)  = timer(6)
 call read_parameters;                              prof0(2)  = timer(6)
-call setup_dimentions;     if (sync) call barrier; prof0(3)  = timer(6)
+call setup_dimensions;     if (sync) call barrier; prof0(3)  = timer(6)
 if (master) write (*, '(a)') 'SORD - Support Operator Rupture Dynamics'
 call look_for_checkpoint;  if (sync) call barrier; prof0(4)  = timer(6)
 call allocate_arrays;      if (sync) call barrier; prof0(5)  = timer(6)

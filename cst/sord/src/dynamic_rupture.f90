@@ -71,7 +71,7 @@ i1 = i1core
 i2 = i2core
 i1(ifn) = irup
 i2(ifn) = irup
-call nodenormals(nhat, w1, dx, i1, i2, ifn)
+call node_normals(nhat, w1, dx, i1, i2, ifn)
 area = sign(1, faultnormal) * sqrt(sum(nhat * nhat, 4))
 f1 = area
 call invert(f1)

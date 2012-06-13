@@ -3,7 +3,7 @@ module grid_generation
 implicit none
 contains
 
-subroutine generate_grid
+subroutine init_grid
 use globals
 use collective
 use boundary_cond

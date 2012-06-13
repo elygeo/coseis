@@ -184,7 +184,7 @@ call field_io('<', 'f3', w1(:,:,:,3))
 call vector_bc(w1, bc1, bc2, i1bc, i2bc)
 
 ! spontaneous rupture
-call rupture
+call step_rupture
 
 ! swap halo
 rr = timer(2)

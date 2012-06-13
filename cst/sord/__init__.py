@@ -68,38 +68,38 @@ def build(job=None, **kwargs):
     ]
 
     # compile
-    for opt in job.optimize:
-        cc = shlex.split(' '.join([
-            job.compiler_c,
-            job.compiler_opts['f'],
-            job.compiler_opts[opt],
-        ]))
-        fc = shlex.split(' '.join([
-            job.compiler_f,
-            job.compiler_opts['f'],
-            job.compiler_opts[opt],
-        ]))
-        if dtype != job.dtype_f:
-            fc += ' ' + job.compiler_opts[dsize]
-        objects = []
-        for s in sources:
-            base, ext = os.path.splitext(s)
-            o = base + '_' + opt + '.o'
-            objects.append(o)
-            if ext == '.c':
-                c = cc
-                d = []
-            else:
-                c = fc
-                d = util.f90modules(s)[1]
-                d = [k[:-1] + opt + '.o' for k in d if k.endswith('_m')]
-                k = 'collective_%s.o' % opt
-                if k in d:
-                    del(d[d.index(k)])
-                    d += ['collective_s.f90', 'collective_m.f90']
-            new |= util.make(c + ['-c', s], o, d + [s])
-        x = 'sord-' + mode + opt + '.x'
-        new |= util.make(fc + objects, x, objects)
+    opt = job.optimize
+    cc = shlex.split(' '.join([
+        job.compiler_c,
+        job.compiler_opts['f'],
+        job.compiler_opts[opt],
+    ]))
+    fc = shlex.split(' '.join([
+        job.compiler_f,
+        job.compiler_opts['f'],
+        job.compiler_opts[opt],
+    ]))
+    if dtype != job.dtype_f:
+        fc += ' ' + job.compiler_opts[dsize]
+    objects = []
+    for s in sources:
+        base, ext = os.path.splitext(s)
+        o = base + '.o'
+        objects.append(o)
+        if ext == '.c':
+            c = cc
+            d = []
+        else:
+            c = fc
+            d = util.f90modules(s)[1]
+            d = [k + '.o' for k in d if k is not 'mpi']
+            k = 'collective.o'
+            if k in d:
+                del(d[d.index(k)])
+                d += ['collective_s.f90', 'collective_m.f90']
+        new |= util.make(c + ['-c', s], o, d + [s])
+    x = 'sord-' + mode + '.x'
+    new |= util.make(fc + objects, x, objects)
 
     # finished
     os.chdir(cwd)
