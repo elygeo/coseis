@@ -194,7 +194,7 @@ def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
 
 
 def configure(*args, **kwargs):
-    import sys, getopt
+    import os, sys, getopt
     from . import conf
 
     # modules
@@ -221,7 +221,7 @@ def configure(*args, **kwargs):
             if k[0] != '_':
                 job[k] = getattr(m, k)
         if not hasattr(m, 'script'):
-            f = m.__file__.replace('.py', '.sh')
+            f = os.path.splitext(m.__file__)[0] + '.sh'
             try:
                 job.script = open(f).read()
             except IOError:

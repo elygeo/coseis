@@ -111,5 +111,5 @@ compiler_opts = {
     '8': '-fdefault-real-8',
 }
 
-del(os, sys, pwd, np, find)
+del(os, sys, pwd, socket, np, find)
 
