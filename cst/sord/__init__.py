@@ -136,9 +136,6 @@ def stage(prm, name='sord', **kwargs):
 
     # partition for parallelization
     nx, ny, nz = prm.shape[:3]
-    n = job.maxnodes * job.maxcores
-    if not job.mode and n == 1:
-        job.mode = 's'
     j, k, l = prm.nproc3
     if job.mode == 's':
         j, k, l = 1, 1, 1
@@ -155,10 +152,6 @@ def stage(prm, name='sord', **kwargs):
     l = (nz - 1) // nl[2] + 1
     prm.nproc3 = j, k, l
     job.nproc = j * k * l
-    if not job.mode:
-        job.mode = 's'
-        if job.nproc > 1:
-            job.mode = 'm'
 
     # resources
     if prm.oplevel in (1, 2):
