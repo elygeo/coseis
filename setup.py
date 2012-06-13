@@ -13,7 +13,7 @@ if target == []:
     pprint.pprint(cfg)
     print(doc)
 elif target == ['sord']:
-    cst.sord.build()
+    cst.sord.build(mode='m')
 elif target == ['build_all']:
     cst.sord.build()
     cst.cvms.build()

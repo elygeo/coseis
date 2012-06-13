@@ -97,6 +97,7 @@ def find(*files):
                 return f
 
 # default compiler
+f2py_flags = ''
 compiler = 'gnu'
 compiler_c = find('mpicc', 'gcc')
 compiler_f = find('mpif90', 'gfortran')

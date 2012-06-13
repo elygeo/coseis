@@ -5,7 +5,7 @@ contains
 
 subroutine read_parameters
 use globals
-use field_io_
+use field_io_mod
 integer :: ios, i
 character(12) :: key
 character(1) :: op

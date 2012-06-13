@@ -7,7 +7,7 @@ subroutine init_material
 use globals
 use collective
 use utilities
-use field_io_
+use field_io_mod
 real :: max_l(14), max_g(14), vmin, vmax, cfl1, cfl2
 integer :: i1(3), i2(3), j1, k1, l1, j2, k2, l2
 

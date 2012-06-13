@@ -50,7 +50,7 @@ def build(job=None, **kwargs):
         'fortran_io.f90',
         'collective_%s.f90' % mode,
         'arrays.f90',
-        'field_io_.f90',
+        'field_io_mod.f90',
         'statistics.f90',
         'parameters.f90',
         'setup.f90',

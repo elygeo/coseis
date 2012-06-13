@@ -1,5 +1,5 @@
 ! field input and output
-module field_io_
+module field_io_mod
 implicit none
 integer, private :: itdebug = -1, idebug
 type t_io
