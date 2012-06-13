@@ -48,7 +48,6 @@ queue_opts = [
 ]
 
 f2py_flags = '--fcompiler=intelem'
-compiler = 'pgi'
 compiler_c = 'mpicc'
 compiler_f = 'mpif90'
 compiler_opts = {
