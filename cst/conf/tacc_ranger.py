@@ -11,6 +11,9 @@ module load intel mvapich
 module load git
 
 .bashrc:
+export PATH=/share/home/00967/gely/local/python/bin:${PATH}
+export PATH=${HOME}/coseis/bin:${PATH}
+export PYTHONPATH=${HOME}/coseis
 alias qme='showq -u'
 alias qdev='idev -minutes 120'
 
