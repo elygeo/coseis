@@ -1,5 +1,10 @@
 """
-ALCF Intrepid, Challenger, Surveyor: IBM Blue Gene/P
+ALCF IBM Blue Gene/P Systems
+
+Login:
+ssh intrepid.alcf.anl.gov
+ssh challenger.alcf.anl.gov
+ssh surveyor.alcf.anl.gov
 
 File systems:
 /intrepid-fs0/:  Intrepid, Challenger, Eureka
