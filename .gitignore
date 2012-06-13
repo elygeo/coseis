@@ -13,7 +13,6 @@ run
 run-*
 tmp
 TODO
-./publish.sh
 /dev
 /cst/conf/site.py
 /cst/build
