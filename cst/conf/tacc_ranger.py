@@ -6,8 +6,9 @@ EPD version: rh3-x86_64
 mvapich2 supports MPI2, but not recommended for more than 2048 tasks.
 
 .profile_user:
+module unload mvapich pgi
+module load intel mvapich
 module load git
-module swap pgi intel
 
 .bashrc:
 alias qme='showq -u'
