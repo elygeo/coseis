@@ -39,7 +39,6 @@ def build(job=None, **kwargs):
     os.chdir(os.path.join(os.path.dirname(__file__), 'src'))
 
     # source files
-    mode = 's'
     sources = [
         'globals.f90',
         'diff_cn_op.f90',
@@ -92,13 +91,13 @@ def build(job=None, **kwargs):
         else:
             c = fc
             d = util.f90modules(s)[1]
-            d = [k + '.o' for k in d if k is not 'mpi']
+            d = [k + '.o' for k in d if k != 'mpi']
             k = 'collective.o'
             if k in d:
                 del(d[d.index(k)])
                 d += ['collective_s.f90', 'collective_m.f90']
         new |= util.make(c + ['-c', s], o, d + [s])
-    x = 'sord-' + mode + '.x'
+    x = 'sord_' + mode + '.x'
     new |= util.make(fc + objects, x, objects)
 
     # finished
@@ -172,7 +171,7 @@ def stage(prm, name='sord', **kwargs):
     job.minutes = 10 + int((prm.shape[3] + 10) * nm // (40 * job.rate))
 
     # configure options
-    job.command = os.path.join('.', 'sord-' + job.mode + job.optimize + job.dtype[-1] + '.x')
+    job.command = os.path.join('.', 'sord_' + job.mode + '.x')
     job = util.prepare(job)
 
     # compile code
