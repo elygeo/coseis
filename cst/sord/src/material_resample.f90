@@ -1,13 +1,13 @@
 ! resample material arrays
-module m_resample
+module material_resample
 implicit none
 contains
 
-subroutine resample
-use m_globals
-use m_collective
-use m_bc
-use m_util
+subroutine resample_material
+use globals
+use collective
+use boundary_cond
+use utilities
 integer :: i1(3), i2(3), bc(3)
 
 if (master) write (*, '(a)') 'Resample material model'

@@ -1,5 +1,5 @@
 ! collect statistics
-module m_stats
+module statistics
 integer, dimension(3) :: &
     amaxloc, vmaxloc, umaxloc, wmaxloc
 real :: &
@@ -11,9 +11,9 @@ contains
 
 ! write statistics
 subroutine stats
-use m_globals
-use m_collective
-use m_util
+use globals
+use collective
+use utilities
 logical, save :: init = .true., dofault = .false.
 integer, save :: fh(16), j = 0
 integer :: m, o, i

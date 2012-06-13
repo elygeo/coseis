@@ -87,19 +87,20 @@ options = [
     ('8', 'realsize8',   'dtype',    'f8'),
 ]
 
-# search for file in PATH
+# search for files in PATH
 def find(*files):
     import os
-    for d in os.environ['PATH'].split(':'):
-        for f in files:
-            if os.path.isfile(os.path.join(d, f)):
+    path = os.environ['PATH'].split(':')
+    for f in files:
+        for p in path:
+            if os.path.isfile(os.path.join(p, f)):
                 return f
 
-# GNU compiler
-compiler = ''
-compiler_c = find('mpicc', 'gcc'),
-compiler_f = find('mpif90', 'gfortran'),
-compiler_mpi = ''
+# default compiler
+compiler = 'gnu'
+compiler_c = find('mpicc', 'gcc')
+compiler_f = find('mpif90', 'gfortran')
+compiler_mpi = 'mpi' in compiler_f
 compiler_opts = {
     'f': '-fimplicit-none -Wall',
     'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',

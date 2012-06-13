@@ -1,12 +1,12 @@
 ! setup model dimensions
-module m_setup
+module setup
 implicit none
 contains
 
-subroutine setup
-use m_globals
-use m_collective
-use m_util
+subroutine setup_dimensions
+use globals
+use collective
+use utilities
 integer :: nl(3)
 
 ! dimensions

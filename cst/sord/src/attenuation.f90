@@ -1,10 +1,10 @@
 ! attenuation
-module m_attenuation
+module attenuation
 implicit none
 contains
 
-subroutine attenuation
-use m_globals
+subroutine attenuation_init
+use globals
 integer :: i
 real :: tau1, tau2, omega
 

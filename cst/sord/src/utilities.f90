@@ -1,5 +1,5 @@
 ! miscellaneous utilities
-module m_util
+module utilities
 implicit none
 contains
 

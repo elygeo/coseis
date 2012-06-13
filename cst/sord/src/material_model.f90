@@ -1,13 +1,13 @@
 ! material model
-module m_material
+module material_model
 implicit none
 contains
 
-subroutine material
-use m_globals
-use m_collective
-use m_util
-use m_fieldio
+subroutine init_material
+use globals
+use collective
+use utilities
+use field_io_
 real :: max_l(14), max_g(14), vmin, vmax, cfl1, cfl2
 integer :: i1(3), i2(3), j1, k1, l1, j2, k2, l2
 
@@ -20,10 +20,10 @@ mu = 0.0
 gam = 0.0
 
 ! inputs
-call fieldio('<', 'rho', mr)
-call fieldio('<', 'vp',  lam)
-call fieldio('<', 'vs',  mu)
-call fieldio('<', 'gam', gam)
+call field_io('<', 'rho', mr)
+call field_io('<', 'vp',  lam)
+call field_io('<', 'vs',  mu)
+call field_io('<', 'gam', gam)
 s1 = lam
 s2 = mu
 
@@ -91,13 +91,13 @@ max_l(13) = maxval(mu(j1:j2,k1:k2,l1:l2))
 max_l(14) = maxval(yy(j1:j2,k1:k2,l1:l2))
 
 ! output
-call fieldio('>', 'rho', mr)
-call fieldio('>', 'vp',  s1)
-call fieldio('>', 'vs',  s2)
-call fieldio('>', 'gam', gam)
-call fieldio('>', 'lam', lam)
-call fieldio('>', 'mu',  mu)
-call fieldio('>', 'nu',  yy)
+call field_io('>', 'rho', mr)
+call field_io('>', 'vp',  s1)
+call field_io('>', 'vs',  s2)
+call field_io('>', 'gam', gam)
+call field_io('>', 'lam', lam)
+call field_io('>', 'mu',  mu)
+call field_io('>', 'nu',  yy)
 
 ! hourglass constant
 yy = 12.0 * (lam + 2.0 * mu)
@@ -141,8 +141,8 @@ end subroutine
 !------------------------------------------------------------------------------!
 
 ! calculate pml damping parameters
-subroutine pml
-use m_globals
+subroutine init_pml
+use globals
 integer :: i
 real :: c1, c2, c3, damp, dampn, dampc, tune
 

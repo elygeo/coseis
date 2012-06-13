@@ -1,5 +1,5 @@
 ! global variables
-module m_globals
+module globals
 implicit none
 
 ! input parameters, see parameters.py for documentation

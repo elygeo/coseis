@@ -12,7 +12,7 @@ def make(command, object_, sources):
     for f in sources:
         h.update(open(f).read())
     h = h.hexdigest()
-    f = object_ + '.sha1'
+    f = os.path.splitext(object_)[0] + '.sha1'
     if os.path.exists(f):
         g = open(f).read()
     else:
@@ -27,6 +27,19 @@ def make(command, object_, sources):
         subprocess.check_call(c)
         open(f, 'w').write(h)
         return True
+
+
+def f90modules(path):
+    mods = set()
+    deps = set()
+    for line in open(path):
+        tok = line.split()
+        if tok:
+            if tok[0] == 'module':
+                mods.update(tok[1:])
+            elif tok[0] == 'use':
+                deps.update(tok[1:])
+    return list(mods), list(deps)
 
 
 def archive():
@@ -242,13 +255,18 @@ def configure(*args, **kwargs):
         if job.run == 'debug':
             job.optimize = 'g'
 
-    # merge compiler flags
-    k = job.fortran_serial
-    if k in job.fortran_flags:
-        job.fortran_flags = job.fortran_flags[k]
-    k = job.c_serial
-    if k in job.c_flags:
-        job.c_flags = job.c_flags[k]
+    # host config:
+    for h, o in job.host_opts.items():
+        if h in job.host:
+            for k, v in o.items():
+                job[k] = v
+
+    # compiler config
+    if 'mpi' in job.compiler_f:
+        job.compiler_mpi = True
+    k = job.compiler
+    if k in job.compiler_opts:
+        job.compiler_opts = job.compiler_opts[k]
 
     return job
 
@@ -257,7 +275,7 @@ def prepare(job=None, **kwargs):
     """
     Compute and display resource usage
     """
-    import os, time, re
+    import os, time
 
     # prepare job
     if job is None:

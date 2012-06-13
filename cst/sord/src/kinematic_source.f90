@@ -1,5 +1,5 @@
 ! kinematic source
-module m_source
+module kinematic_source
 implicit none
 integer, private, allocatable :: src_nt(:)
 real, private, allocatable :: src_xi(:,:), src_dt(:), src_t0(:), &
@@ -7,10 +7,10 @@ real, private, allocatable :: src_xi(:,:), src_dt(:), src_t0(:), &
 contains
 
 ! initialize finite source
-subroutine finite_source_init
-use m_globals
-use m_collective
-use m_util
+subroutine init_finite_source
+use globals
+use collective
+use utilities
 integer :: n, i, fh
 if (nsource == 0) return
 if (master) write (*, '(a)') 'Finite source initialize'
@@ -63,7 +63,7 @@ end subroutine
 
 ! add finite source to force vector or strain/stress tensor
 subroutine finite_source
-use m_globals
+use globals
 integer :: i1(3), i2(3), i, j, k, l, isrc, itoff
 real :: xi(3), t, h, w
 if (nsource == 0) return
@@ -119,8 +119,8 @@ end subroutine
 
 ! add point source to vector
 subroutine vector_point_source
-use m_globals
-use m_util
+use globals
+use utilities
 integer :: i1(3), i2(3), i, j, k, l
 real :: xi(3), f, w
 if (pulse == 'none') return
@@ -147,8 +147,8 @@ end subroutine
 
 ! add point source to strain/stress tensor
 subroutine tensor_point_source
-use m_globals
-use m_util
+use globals
+use utilities
 integer :: i1(3), i2(3), i, j, k, l
 real :: xi(3), f, w
 if (pulse == 'none') return

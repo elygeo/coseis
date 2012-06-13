@@ -1,10 +1,10 @@
 ! hourglass corrections
-module m_hourglass
+module hourglass_op
 implicit none
 contains
 
 ! node to cell
-subroutine hourglassnc(df, f, iq, i, i1, i2)
+subroutine hourglass_nc(df, f, iq, i, i1, i2)
 real, intent(out) :: df(:,:,:)
 real, intent(in) :: f(:,:,:,:)
 integer, intent(in) :: iq, i, i1(3), i2(3)
@@ -76,7 +76,7 @@ end subroutine
 !------------------------------------------------------------------------------!
 
 ! cell to node
-subroutine hourglasscn(df, f, iq, i1, i2)
+subroutine hourglass_cn(df, f, iq, i1, i2)
 real, intent(out) :: df(:,:,:)
 real, intent(in) :: f(:,:,:)
 integer, intent(in) :: iq, i1(3), i2(3)

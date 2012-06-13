@@ -1,11 +1,11 @@
 ! read model parameters
-module m_parameters
+module parameters
 implicit none
 contains
 
 subroutine read_parameters
-use m_globals
-use m_fieldio
+use globals
+use field_io_
 integer :: ios, i
 character(12) :: key
 character(1) :: op

@@ -27,83 +27,79 @@ def build(job=None, **kwargs):
     dtype = np.dtype(job.dtype).str
     dsize = dtype[-1]
     new = False
+    mode = job.mode
+    if not mode:
+        if job.compiler_mpi:
+            mode = 'm'
+        else:
+            mode = 's'
 
-    # setup build directory
-    path = os.path.dirname(__file__)
-    src = os.path.join(path, 'src')
+    # src directory
     cwd = os.getcwd()
-    os.chdir(src)
+    os.chdir(os.path.join(os.path.dirname(__file__), 'src'))
 
     # source files
-    slib = [
+    mode = 's'
+    sources = [
         'globals.f90',
-        'diffcn.f90',
-        'diffnc.f90',
-        'hourglass.f90',
-        'bc.f90',
-        'surfnormals.f90',
-        'util.f90',
-        'fio.f90',
-    ]
-    main = [
+        'diff_cn_op.f90',
+        'diff_nc_op.f90',
+        'hourglass_op.f90',
+        'boundary_cond.f90',
+        'surf_normals.f90',
+        'utilities.f90',
+        'fortran_io.f90',
+        'collective_%s.f90' % mode,
         'arrays.f90',
-        'fieldio.f90',
-        'stats.f90',
+        'field_io_.f90',
+        'statistics.f90',
         'parameters.f90',
         'setup.f90',
-        'grid_gen.f90',
-        'material.f90',
-        'source.f90',
-        'rupture.f90',
-        'resample.f90',
+        'grid_generation.f90',
+        'material_model.f90',
+        'kinematic_source.f90',
+        'dynamic_rupture.f90',
+        'material_resample.f90',
         'checkpoint.f90',
-        'timestep.f90',
+        'time_integration.f90',
         'stress.f90',
         'acceleration.f90',
         'sord.f90',
     ]
 
-    # serial compile
+    # compile
     for opt in job.optimize:
-        cc = ' '.join([
-            job.c_serial,
-            job.c_flags['f'],
-            job.c_flags[opt],
-        ])
-        fc = ' '.join([
-            job.fortran_serial,
-            job.fortran_flags['f'],
-            job.fortran_flags[opt],
-        ])
+        cc = shlex.split(' '.join([
+            job.compiler_c,
+            job.compiler_opts['f'],
+            job.compiler_opts[opt],
+        ]))
+        fc = shlex.split(' '.join([
+            job.compiler_f,
+            job.compiler_opts['f'],
+            job.compiler_opts[opt],
+        ]))
         if dtype != job.dtype_f:
-            fc += ' ' + job.fortran_flags[dsize]
-        olib = []
-        for s in slib:
-            b, e = os.path.splitext(s)
-            c = {'.f90': fc, '.c': cc}[e]
-            c = shlex.split(c) + ['-c', s]
-            o = b + '-' + opt + dsize + '.o'
-            new |= util.make(c, o, [s])
-            olib.append(o)
-        s = ['collective_s.f90'] + main
-        c = shlex.split(fc) + olib + s
-        o = 'sord-s' + opt + dsize + '.x'
-        new |= util.make(c, o, slib + s)
-
-    # mpi compile
-    if job.fortran_mpi:
-        for opt in job.optimize:
-            fc = ' '.join([
-                job.fortran_mpi,
-                job.fortran_flags['f'],
-                job.fortran_flags[opt],
-            ])
-            if dtype != job.dtype_f:
-                fc += ' ' + job.fortran_flags[dsize]
-            s = ['collective_m.f90'] + main
-            c = shlex.split(fc) + olib + s
-            o = 'sord-m' + opt + dsize + '.x'
-            new |= util.make(c, o, slib + s)
+            fc += ' ' + job.compiler_opts[dsize]
+        objects = []
+        for s in sources:
+            base, ext = os.path.splitext(s)
+            o = base + '_' + opt + '.o'
+            objects.append(o)
+            if ext == '.c':
+                c = cc
+                d = []
+            else:
+                c = fc
+                d = util.f90modules(s)[1]
+                d = [k[:-1] + opt + '.o' for k in d if k.endswith('_m')]
+                k = 'collective_%s.o' % opt
+                if k in d:
+                    del(d[d.index(k)])
+                    d += ['collective_s.f90', 'collective_m.f90']
+            new |= util.make(c + ['-c', s], o, d + [s])
+        x = 'sord-' + mode + opt + '.x'
+        new |= util.make(fc + objects, x, objects)
 
     # finished
     os.chdir(cwd)

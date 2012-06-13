@@ -1,13 +1,13 @@
 ! time integration
-module m_timestep
+module time_integration
 implicit none
 contains
 
-subroutine timestep
-use m_globals
-use m_util
-use m_fieldio
-use m_stats
+subroutine step_time
+use globals
+use utilities
+use field_io_
+use statistics
 
 ! status
 if (master) then
@@ -32,30 +32,30 @@ end if
 ! velocity time integration
 tm = tm0 + dt * (it - 1) - dt * 0.5
 vv = vv + dt * w1
-call fieldio('<>', 'v1', vv(:,:,:,1))
-call fieldio('<>', 'v2', vv(:,:,:,2))
-call fieldio('<>', 'v3', vv(:,:,:,3))
+call field_io('<>', 'v1', vv(:,:,:,1))
+call field_io('<>', 'v2', vv(:,:,:,2))
+call field_io('<>', 'v3', vv(:,:,:,3))
 if (modulo(it, itstats) == 0) then
     call vector_norm(s1, vv, i1core, i2core, (/ 1, 1, 1 /))
     call set_halo(s1, -1.0, i1core, i2core)
     vmaxloc = maxloc(s1)
     vmax = s1(vmaxloc(1),vmaxloc(2),vmaxloc(3))
 end if
-call fieldio('>', 'vm2', s1)
+call field_io('>', 'vm2', s1)
 
 ! displacement time integration
 tm = tm0 + dt * (it - 1)
 uu = uu + dt * vv
-call fieldio('<>', 'u1', uu(:,:,:,1))
-call fieldio('<>', 'u2', uu(:,:,:,2))
-call fieldio('<>', 'u3', uu(:,:,:,3))
+call field_io('<>', 'u1', uu(:,:,:,1))
+call field_io('<>', 'u2', uu(:,:,:,2))
+call field_io('<>', 'u3', uu(:,:,:,3))
 if (modulo(it, itstats) == 0) then
     call vector_norm(s1, uu, i1core, i2core, (/ 1, 1, 1 /))
     call set_halo(s1, -1.0, i1core, i2core)
     umaxloc = maxloc(s1)
     umax = s1(umaxloc(1),umaxloc(2),umaxloc(3))
 end if
-call fieldio('>', 'um2', s1)
+call field_io('>', 'um2', s1)
 
 ! rupture time integration
 if (ifn /= 0) then
@@ -84,18 +84,18 @@ if (ifn /= 0) then
     case (3); t2(:,:,1,:) = uu(:,:,irup+1,:) - uu(:,:,irup,:)
     end select
     f2 = sqrt(sum(t2 * t2, 4))
-    call fieldio('>', 'sv1',  t1(:,:,:,1))
-    call fieldio('>', 'sv2',  t1(:,:,:,2))
-    call fieldio('>', 'sv3',  t1(:,:,:,3))
-    call fieldio('>', 'svm',  f1)
-    call fieldio('>', 'psv',  psv)
-    call fieldio('>', 'su1',  t2(:,:,:,1))
-    call fieldio('>', 'su2',  t2(:,:,:,2))
-    call fieldio('>', 'su3',  t2(:,:,:,3))
-    call fieldio('>', 'sum',  f2)
-    call fieldio('>', 'sl',   sl)
-    call fieldio('>', 'trup', trup)
-    call fieldio('>', 'tarr', tarr)
+    call field_io('>', 'sv1',  t1(:,:,:,1))
+    call field_io('>', 'sv2',  t1(:,:,:,2))
+    call field_io('>', 'sv3',  t1(:,:,:,3))
+    call field_io('>', 'svm',  f1)
+    call field_io('>', 'psv',  psv)
+    call field_io('>', 'su1',  t2(:,:,:,1))
+    call field_io('>', 'su2',  t2(:,:,:,2))
+    call field_io('>', 'su3',  t2(:,:,:,3))
+    call field_io('>', 'sum',  f2)
+    call field_io('>', 'sl',   sl)
+    call field_io('>', 'trup', trup)
+    call field_io('>', 'tarr', tarr)
     call set_halo(f1,   -1.0, i1core, i2core)
     call set_halo(f2,   -1.0, i1core, i2core)
     call set_halo(tarr, -1.0, i1core, i2core)

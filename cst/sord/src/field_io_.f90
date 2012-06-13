@@ -1,5 +1,5 @@
 ! field input and output
-module m_fieldio
+module field_io_
 implicit none
 integer, private :: itdebug = -1, idebug
 type t_io
@@ -32,11 +32,11 @@ io => ioprev
 end subroutine
 
 ! field i/o sequence
-subroutine fieldio(passes, field, f)
-use m_globals
-use m_util
-use m_collective
-use m_fio
+subroutine field_io(passes, field, f)
+use globals
+use utilities
+use collective
+use fortran_io
 character(*), intent(in) :: passes, field
 real, intent(inout) :: f(:,:,:)
 character(4) :: pass
@@ -112,9 +112,9 @@ if (field /= io%field) cycle loop
 val = io%val * time_function(io%pulse, tm, dt, io%tau)
 select case (io%mode)
 case ('=c', '+c')
-    call setcube(f, w1, i3, i4, di, io%x1, io%x2, val, io%mode)
+    call set_cube(f, w1, i3, i4, di, io%x1, io%x2, val, io%mode)
 case ('=C', '+C')
-    call setcube(f, w2, i3, i4, di, io%x1, io%x2, val, io%mode)
+    call set_cube(f, w2, i3, i4, di, io%x1, io%x2, val, io%mode)
 case ('=')
     do l = i1(3), i2(3), di(3)
     do k = i1(2), i2(2), di(2)
@@ -363,7 +363,7 @@ end subroutine
 
 !------------------------------------------------------------------------------!
 
-subroutine setcube(f, x, i1, i2, di, x1, x2, r, mode)
+subroutine set_cube(f, x, i1, i2, di, x1, x2, r, mode)
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: x(:,:,:,:), x1(3), x2(3), r
 integer, intent(in) :: i1(3), i2(3), di(3)

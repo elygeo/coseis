@@ -1,14 +1,14 @@
 ! checkpoint restart
-module m_checkpoint
+module checkpoint
 implicit none
 integer, private :: itcheck0
 contains
 
 ! look for checkpoint
 subroutine look_for_checkpoint
-use m_globals
-use m_collective
-use m_util
+use globals
+use collective
+use utilities
 integer :: i
 real :: r
 r = timer(2)
@@ -27,9 +27,9 @@ end subroutine
 
 ! read checkpoint
 subroutine read_checkpoint
-use m_globals
-use m_stats
-use m_util
+use globals
+use statistics
+use utilities
 integer :: i
 real :: r
 r = timer(2)
@@ -59,10 +59,10 @@ end subroutine
 
 ! write checkpoint
 subroutine write_checkpoint
-use m_globals
-use m_stats
-use m_util
-use m_collective
+use globals
+use statistics
+use utilities
+use collective
 integer :: i
 real :: r
 r = timer(2)

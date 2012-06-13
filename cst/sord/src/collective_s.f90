@@ -1,6 +1,6 @@
 ! collective routines - serial version
-module m_collective
-use m_fio
+module collective
+use fortran_io
 implicit none
 integer, parameter :: file_null = fio_file_null
 contains

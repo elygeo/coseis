@@ -1,19 +1,19 @@
 ! acceleration calculation
-module m_acceleration
+module acceleration
 implicit none
 contains
 
-subroutine acceleration
-use m_globals
-use m_diffcn
-use m_source
-use m_hourglass
-use m_bc
-use m_rupture
-use m_util
-use m_fieldio
-use m_stats
-use m_collective
+subroutine step_accel
+use globals
+use diff_cn_op
+use hourglass_op
+use kinematic_source
+use boundary_cond
+use dynamic_rupture
+use utilities
+use field_io_
+use statistics
+use collective
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq, p
 real :: rr
 
@@ -29,10 +29,10 @@ doid: do iid = 1, 3; id = modulo(ic + iid - 2, 3) + 1
 i1 = i1node
 i2 = i2node
 if (ic == id) then
-    call diffcn(s1, w1, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
+    call diff_cn(s1, w1, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
 else
     i = 6 - ic - id
-    call diffcn(s1, w2, i, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
+    call diff_cn(s1, w2, i, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
 end if
 
 ! pml region
@@ -123,17 +123,17 @@ do iq = 1, 4
 do ic = 1, 3
     i1 = max(i1pml,     i1cell)
     i2 = min(i2pml - 1, i2cell)
-    call hourglassnc(s1, w2, iq, ic, i1, i2)
+    call hourglass_nc(s1, w2, iq, ic, i1, i2)
     s1 = yy * s1
     i1 = max(i1pml + 1, i1node)
     i2 = min(i2pml - 1, i2node)
-    call hourglasscn(s2, s1, iq, i1, i2)
+    call hourglass_cn(s2, s1, iq, i1, i2)
     if (hourglass(2) > 0.0 .and. npml > 0) then
         do i = 1, 3
             i1 = i1cell
             i2 = i2cell
             i2(i) = min(i2(i), i1pml(i))
-            call hourglassnc(s1, vv, iq, ic, i1, i2)
+            call hourglass_nc(s1, vv, iq, ic, i1, i2)
             do l = i1(3), i2(3)
             do k = i1(2), i2(2)
             do j = i1(1), i2(1)
@@ -144,7 +144,7 @@ do ic = 1, 3
             i1 = i1cell
             i2 = i2cell
             i1(i) = max(i1(i), i2pml(i) - 1)
-            call hourglassnc(s1, vv, iq, ic, i1, i2)
+            call hourglass_nc(s1, vv, iq, ic, i1, i2)
             do l = i1(3), i2(3)
             do k = i1(2), i2(2)
             do j = i1(1), i2(1)
@@ -157,11 +157,11 @@ do ic = 1, 3
             i1 = i1node
             i2 = i2node
             i2(i) = min(i2(i), i1pml(i))
-            call hourglasscn(s2, s1, iq, i1, i2)
+            call hourglass_cn(s2, s1, iq, i1, i2)
             i1 = i1node
             i2 = i2node
             i1(i) = max(i1(i), i2pml(i))
-            call hourglasscn(s2, s1, iq, i1, i2)
+            call hourglass_cn(s2, s1, iq, i1, i2)
         end do
     end if
     w1(:,:,:,ic) = w1(:,:,:,ic) - s2
@@ -176,9 +176,9 @@ if (source == 'force') then
 end if
 
 ! nodal force input
-call fieldio('<', 'f1', w1(:,:,:,1))
-call fieldio('<', 'f2', w1(:,:,:,2))
-call fieldio('<', 'f3', w1(:,:,:,3))
+call field_io('<', 'f1', w1(:,:,:,1))
+call field_io('<', 'f2', w1(:,:,:,2))
+call field_io('<', 'f3', w1(:,:,:,3))
 
 ! boundary conditions
 call vector_bc(w1, bc1, bc2, i1bc, i2bc)
@@ -193,9 +193,9 @@ if (sync) call barrier
 mptimer = mptimer + timer(2)
 
 ! nodal force output
-call fieldio('>', 'f1', w1(:,:,:,1))
-call fieldio('>', 'f2', w1(:,:,:,2))
-call fieldio('>', 'f3', w1(:,:,:,3))
+call field_io('>', 'f1', w1(:,:,:,1))
+call field_io('>', 'f2', w1(:,:,:,2))
+call field_io('>', 'f3', w1(:,:,:,3))
 
 ! Newton's law: a_i = f_i / m
 do i = 1, 3
@@ -203,16 +203,16 @@ do i = 1, 3
 end do
 
 ! acceleration I/O
-call fieldio('<>', 'a1', w1(:,:,:,1))
-call fieldio('<>', 'a2', w1(:,:,:,2))
-call fieldio('<>', 'a3', w1(:,:,:,3))
+call field_io('<>', 'a1', w1(:,:,:,1))
+call field_io('<>', 'a2', w1(:,:,:,2))
+call field_io('<>', 'a3', w1(:,:,:,3))
 if (modulo(it, itstats) == 0) then
     call vector_norm(s1, w1, i1core, i2core, (/ 1, 1, 1 /))
     call set_halo(s1, -1.0, i1core, i2core)
     amaxloc = maxloc(s1)
     amax = s1(amaxloc(1),amaxloc(2),amaxloc(3))
 end if
-call fieldio('>', 'am2', s1)
+call field_io('>', 'am2', s1)
 
 end subroutine
 

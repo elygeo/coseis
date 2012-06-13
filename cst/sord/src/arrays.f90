@@ -1,10 +1,10 @@
 ! allocate arrays
-module m_arrays
+module arrays
 implicit none
 contains
 
-subroutine arrays
-use m_globals
+subroutine allocate_arrays
+use globals
 integer :: i1(3), i2(3), j, k, l, j1, k1, l1, j2, k2, l2
 
 ! 3d

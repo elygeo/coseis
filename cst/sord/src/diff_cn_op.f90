@@ -1,9 +1,9 @@
 ! difference operator, cell to node
-module m_diffcn
+module diff_cn_op
 implicit none
 contains
 
-subroutine diffcn(df, f, i, a, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx)
+subroutine diff_cn(df, f, i, a, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx)
 real, intent(out) :: df(:,:,:)
 real, intent(in) :: f(:,:,:,:), bb(:,:,:,:,:), x(:,:,:,:), &
     dx1(:), dx2(:), dx3(:), dx(3)

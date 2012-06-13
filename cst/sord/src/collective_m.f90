@@ -1,5 +1,5 @@
 ! collective routines - MPI version
-module m_collective
+module collective
 use mpi
 implicit none
 integer, parameter :: file_null = mpi_file_null
@@ -257,7 +257,7 @@ end subroutine
 
 ! 2d real input/output
 subroutine rio2(fh, f2, mode, filename, mm, nn, oo, mpio, verb)
-use m_fio
+use fortran_io
 integer, intent(inout) :: fh
 real, intent(inout) :: f2(:,:)
 character(1), intent(in) :: mode
@@ -302,7 +302,7 @@ end subroutine
 
 ! 2d integer input/output
 subroutine iio2(fh, f2, mode, filename, mm, nn, oo, mpio, verb)
-use m_fio
+use fortran_io
 integer, intent(inout) :: fh
 integer, intent(inout) :: f2(:,:)
 character(1), intent(in) :: mode

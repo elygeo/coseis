@@ -1,16 +1,16 @@
 ! grid generation
-module m_grid_gen
+module grid_generation
 implicit none
 contains
 
-subroutine grid_gen
-use m_globals
-use m_collective
-use m_bc
-use m_util
-use m_diffnc
-use m_fieldio
-use m_surfnormals
+subroutine generate_grid
+use globals
+use collective
+use boundary_cond
+use utilities
+use diff_nc_op
+use surf_normals
+use field_io_
 integer :: i1(3), i2(3), i3(3), i4(3), bc(3), &
     i, j, k, l, j1, k1, l1, j2, k2, l2, b, c
 real :: m(9), tol, h
@@ -36,9 +36,9 @@ if (faultnormal /= 0) then
 end if
 
 ! read grid
-call fieldio('<', 'x1', w1(:,:,:,1))
-call fieldio('<', 'x2', w1(:,:,:,2))
-call fieldio('<', 'x3', w1(:,:,:,3))
+call field_io('<', 'x1', w1(:,:,:,1))
+call field_io('<', 'x2', w1(:,:,:,2))
+call field_io('<', 'x3', w1(:,:,:,3))
 
 ! add random noise except at boundaries and in pml
 if (gridnoise > 0.0) then
@@ -135,12 +135,12 @@ call set_halo(w2(:,:,:,2), 0.0, i1cell, i2cell)
 call set_halo(w2(:,:,:,3), 0.0, i1cell, i2cell)
 
 ! output
-call fieldio('>', 'x1', w1(:,:,:,1))
-call fieldio('>', 'x2', w1(:,:,:,2))
-call fieldio('>', 'x3', w1(:,:,:,3))
-call fieldio('>', 'c1', w2(:,:,:,1))
-call fieldio('>', 'c2', w2(:,:,:,2))
-call fieldio('>', 'c3', w2(:,:,:,3))
+call field_io('>', 'x1', w1(:,:,:,1))
+call field_io('>', 'x2', w1(:,:,:,2))
+call field_io('>', 'x3', w1(:,:,:,3))
+call field_io('>', 'c1', w2(:,:,:,1))
+call field_io('>', 'c2', w2(:,:,:,2))
+call field_io('>', 'c3', w2(:,:,:,3))
 
 ! boundary surface normals
 !j = nm(1)
@@ -261,7 +261,7 @@ end select
 ! cell volume
 call set_halo(vc, 0.0, i1cell, i2cell)
 do i = 1, 3
-    call diffnc(vc, w1, i, i, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx)
+    call diff_nc(vc, w1, i, i, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx)
     select case (ifn)
     case (1); vc(irup,:,:) = 0.0
     case (2); vc(:,irup,:) = 0.0
@@ -269,7 +269,7 @@ do i = 1, 3
     end select
     err = minval(vc) < 0.0
 end do
-call fieldio('>', 'vc', vc)
+call field_io('>', 'vc', vc)
 if (err) then
     write (0, *) 'ERROR: negative cell volume. Wrong sign in dx or problem with mesh.'
     stop

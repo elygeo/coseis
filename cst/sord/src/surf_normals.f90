@@ -1,9 +1,9 @@
 ! find surface normals
-module m_surfnormals
+module surf_normals
 implicit none
 contains
 
-subroutine cellnormals(nhat, x, dx, i1, i2, ihat)
+subroutine cell_normals(nhat, x, dx, i1, i2, ihat)
 real, intent(out) :: nhat(:,:,:,:)
 real, intent(in) :: x(:,:,:,:), dx(3)
 integer, intent(in) :: i1(3), i2(3), ihat
@@ -50,7 +50,7 @@ end do
 
 end subroutine
 
-subroutine nodenormals(nhat, x, dx, i1, i2, ihat)
+subroutine node_normals(nhat, x, dx, i1, i2, ihat)
 real, intent(out) :: nhat(:,:,:,:)
 real, intent(in) :: x(:,:,:,:), dx(3)
 integer, intent(in) :: i1(3), i2(3), ihat

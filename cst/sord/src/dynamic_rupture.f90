@@ -1,16 +1,16 @@
 ! rupture boundary condition
-module m_rupture
+module dynamic_rupture
 implicit none
 contains
 
 ! rupture initialization
-subroutine rupture_init
-use m_globals
-use m_collective
-use m_surfnormals
-use m_util
-use m_fieldio
-use m_stats
+subroutine init_rupture
+use globals
+use collective
+use surf_normals
+use utilities
+use field_io_
+use statistics
 real :: rr, xhypo(3), xi(3), w
 integer :: i1(3), i2(3), i, j, k, l
 
@@ -33,26 +33,26 @@ t3 = 0.0
 !af = 0.0 ! [ZS]
 !bf = 0.0 ! [ZS]
 !psi = 0.0 ! [ZS]
-call fieldio('<>', 'mus', mus)
-call fieldio('<>', 'mud', mud)
-call fieldio('<>', 'dc',  dc)
-call fieldio('<>', 'co',  co)
-call fieldio('<>', 's11', t1(:,:,:,1))
-call fieldio('<>', 's22', t1(:,:,:,2))
-call fieldio('<>', 's33', t1(:,:,:,3))
-call fieldio('<>', 's23', t2(:,:,:,1))
-call fieldio('<>', 's31', t2(:,:,:,2))
-call fieldio('<>', 's12', t2(:,:,:,3))
-call fieldio('<>', 'ts',  t3(:,:,:,1))
-call fieldio('<>', 'td',  t3(:,:,:,2))
-call fieldio('<>', 'tn',  t3(:,:,:,3))
-!call fieldio('<>', 'f0',  f0) ! [ZS]
-!call fieldio('<>', 'v0',  v0) ! [ZS]
-!call fieldio('<>', 'fw',  fw) ! [ZS]
-!call fieldio('<>', 'vw',  vw) ! [ZS]
-!call fieldio('<>', 'll',  ll) ! [ZS]
-!call fieldio('<>', 'af',  af) ! [ZS]
-!call fieldio('<>', 'bf',  bf) ! [ZS]
+call field_io('<>', 'mus', mus)
+call field_io('<>', 'mud', mud)
+call field_io('<>', 'dc',  dc)
+call field_io('<>', 'co',  co)
+call field_io('<>', 's11', t1(:,:,:,1))
+call field_io('<>', 's22', t1(:,:,:,2))
+call field_io('<>', 's33', t1(:,:,:,3))
+call field_io('<>', 's23', t2(:,:,:,1))
+call field_io('<>', 's31', t2(:,:,:,2))
+call field_io('<>', 's12', t2(:,:,:,3))
+call field_io('<>', 'ts',  t3(:,:,:,1))
+call field_io('<>', 'td',  t3(:,:,:,2))
+call field_io('<>', 'tn',  t3(:,:,:,3))
+!call field_io('<>', 'f0',  f0) ! [ZS]
+!call field_io('<>', 'v0',  v0) ! [ZS]
+!call field_io('<>', 'fw',  fw) ! [ZS]
+!call field_io('<>', 'vw',  vw) ! [ZS]
+!call field_io('<>', 'll',  ll) ! [ZS]
+!call field_io('<>', 'af',  af) ! [ZS]
+!call field_io('<>', 'bf',  bf) ! [ZS]
 
 ! normal traction check
 i1 = maxloc(t3(:,:,:,3))
@@ -78,9 +78,9 @@ call invert(f1)
 do i = 1, 3
     nhat(:,:,:,i) = nhat(:,:,:,i) * f1
 end do
-call fieldio('>', 'nhat1', nhat(:,:,:,1))
-call fieldio('>', 'nhat2', nhat(:,:,:,2))
-call fieldio('>', 'nhat3', nhat(:,:,:,3))
+call field_io('>', 'nhat1', nhat(:,:,:,1))
+call field_io('>', 'nhat2', nhat(:,:,:,2))
+call field_io('>', 'nhat3', nhat(:,:,:,3))
 
 ! resolve prestress onto fault
 do i = 1, 3
@@ -188,13 +188,13 @@ end subroutine
 !------------------------------------------------------------------------------!
 
 ! rupture boundary condition
-subroutine rupture
-use m_globals
-use m_collective
-use m_bc
-use m_util
-use m_fieldio
-use m_stats
+subroutine step_rupture
+use globals
+use collective
+use boundary_cond
+use utilities
+use field_io_
+use statistics
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
 if (ifn == 0) return
@@ -284,16 +284,16 @@ end do
 call vector_bc(w1, bc1, bc2, i1bc, i2bc)
 
 ! output
-!call fieldio('>', 'psi', psi) ! [ZS]
-call fieldio('>', 't1',  t1(:,:,:,1))
-call fieldio('>', 't2',  t1(:,:,:,2))
-call fieldio('>', 't3',  t1(:,:,:,3))
-call fieldio('>', 'ts1', t3(:,:,:,1))
-call fieldio('>', 'ts2', t3(:,:,:,2))
-call fieldio('>', 'ts3', t3(:,:,:,3))
-call fieldio('>', 'tsm', ts)
-call fieldio('>', 'tnm', tn)
-call fieldio('>', 'fr',  f1)
+!call field_io('>', 'psi', psi) ! [ZS]
+call field_io('>', 't1',  t1(:,:,:,1))
+call field_io('>', 't2',  t1(:,:,:,2))
+call field_io('>', 't3',  t1(:,:,:,3))
+call field_io('>', 'ts1', t3(:,:,:,1))
+call field_io('>', 'ts2', t3(:,:,:,2))
+call field_io('>', 'ts3', t3(:,:,:,3))
+call field_io('>', 'tsm', ts)
+call field_io('>', 'tnm', tn)
+call field_io('>', 'fr',  f1)
 call set_halo(ts,      -1.0, i1core, i2core); tsmax = maxval(ts)
 call set_halo(tn,  huge(dt), i1core, i2core); tnmin = minval(tn)
 call set_halo(tn, -huge(dt), i1core, i2core); tnmax = maxval(tn)
@@ -323,10 +323,10 @@ do i = 1, 3
         w1(j1:j2,k1:k2,l1:l2,i) * mr(j1:j2,k1:k2,l1:l2)
 end do
 f2 = sqrt(sum(t2 * t2, 4))
-call fieldio('>', 'sa1', t2(:,:,:,1))
-call fieldio('>', 'sa2', t2(:,:,:,2))
-call fieldio('>', 'sa3', t2(:,:,:,3))
-call fieldio('>', 'sam', f2)
+call field_io('>', 'sa1', t2(:,:,:,1))
+call field_io('>', 'sa2', t2(:,:,:,2))
+call field_io('>', 'sa3', t2(:,:,:,3))
+call field_io('>', 'sam', f2)
 call set_halo(f2, -1.0, i1core, i2core)
 samax = maxval(f2)
 
