@@ -29,9 +29,9 @@ def test_mpi(argv=[]):
     f = os.path.join(job.rundir, 'test')
     open(f + '.f90', 'w').write(code)
     c = (
-        [job.fortran_mpi] +
-        shlex.split(job.fortran_flags['f']) +
-        shlex.split(job.fortran_flags['O']) +
+        [job.compiler_f] +
+        shlex.split(job.compiler_opts['f']) +
+        shlex.split(job.compiler_opts['O']) +
         ['-o', f, f + '.f90'] 
     )
     print(' '.join(c))
