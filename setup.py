@@ -13,7 +13,7 @@ if target == []:
     pprint.pprint(cfg)
     print(doc)
 elif target == ['sord']:
-    cst.sord.build(mode='m')
+    cst.sord.build()
 elif target == ['build_all']:
     cst.sord.build()
     cst.cvms.build()
@@ -28,10 +28,14 @@ elif target == ['build_all']:
     import cst.trinterp
 elif target == ['clean']:
     path = os.path.dirname(cst.__file__)
-    d = os.path.join(path, 'build')
-    if os.path.exists(d):
-        shutil.rmtree(d)
-    for d in '', 'sord', 'sord/src', 'cvms', 'tests':
+    for d in [
+        os.path.join(path, 'build'),
+        os.path.join(path, 'sord', 'src', 'build_s'),
+        os.path.join(path, 'sord', 'src', 'build_m'),
+    ]:
+        if os.path.exists(d):
+            shutil.rmtree(d)
+    for d in '', 'sord', 'cvms', 'tests':
         d = os.path.join(path, d) 
         for f in os.listdir(d):
             e = os.path.splitext(f)[-1]

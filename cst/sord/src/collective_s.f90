@@ -1,13 +1,14 @@
 ! collective routines - serial version
 module collective
-use fortran_io
 implicit none
-integer, parameter :: file_null = fio_file_null
+integer :: file_null
 contains
 
 ! initialize
 subroutine initialize(np0, ip)
+use fortran_io
 integer, intent(out) :: np0, ip
+file_null = fio_file_null
 ip = 0
 np0 = 1
 end subroutine
@@ -100,6 +101,7 @@ end subroutine
 
 ! 2d real input/output
 subroutine rio2(fh, f2, mode, filename, mm, nn, oo, mpio, verb)
+use fortran_io
 integer, intent(inout) :: fh
 real, intent(inout) :: f2(:,:)
 character(1), intent(in) :: mode
@@ -115,6 +117,7 @@ end subroutine
 
 ! 2d integer input/output
 subroutine iio2(fh, f2, mode, filename, mm, nn, oo, mpio, verb)
+use fortran_io
 integer, intent(inout) :: fh
 integer, intent(inout) :: f2(:,:)
 character(1), intent(in) :: mode
@@ -130,6 +133,7 @@ end subroutine
 
 ! 1d real input/output
 subroutine rio1(fh, f1, mode, filename, m, o, mpio, verb)
+use fortran_io
 integer, intent(inout) :: fh
 real, intent(inout) :: f1(:)
 character (1), intent(in) :: mode
@@ -146,6 +150,7 @@ end subroutine
 
 ! 1d integer input/output
 subroutine iio1(fh, f1, mode, filename, m, o, mpio, verb)
+use fortran_io
 integer, intent(inout) :: fh
 integer, intent(inout) :: f1(:)
 character(1), intent(in) :: mode

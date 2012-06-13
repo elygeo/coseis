@@ -2,31 +2,29 @@
 Miscellaneous tools.
 """
 
-def make(command, object_, sources):
-    import os, shlex, hashlib, subprocess
-    if isinstance(command, basestring):
-        c = shlex.split(command)
-    else:
-        c = list(command)
-    h = hashlib.sha1(' '.join(c))
-    for f in sources:
-        h.update(open(f).read())
-    h = h.hexdigest()
-    f = os.path.splitext(object_)[0] + '.sha1'
+def make(command, objects, sources):
+    import os, hashlib, subprocess
+    g = hashlib.sha1(' '.join(command))
+    for s in sources:
+        g.update(open(s).read())
+    f = objects[0] + '.sha1'
     if os.path.exists(f):
-        g = open(f).read()
-    else:
-        g = None
-    if h == g and os.path.exists(object_):
-        return False
-    else:
-        if os.path.exists(f):
-            os.unlink(f)
-        c += ['-o', object_]
-        print(' '.join(c))
-        subprocess.check_call(c)
-        open(f, 'w').write(h)
-        return True
+        h = g.copy()
+        for o in objects:
+            if not os.path.exists(o):
+                h = None
+                break
+            h.update(open(o).read())
+        if h != None and h.hexdigest() == open(f).read():
+            return False
+        os.unlink(f)
+    command += ['-o', objects[0]]
+    print(' '.join(command))
+    subprocess.check_call(command)
+    for o in objects:
+        g.update(open(o).read())
+    open(f, 'w').write(g.hexdigest())
+    return True
 
 
 def f90modules(path):
@@ -293,7 +291,7 @@ def prepare(job=None, **kwargs):
     # serial or mpi mode
     if not job.mode:
         job.mode = 's'
-        if job.nproc > 1:
+        if job.compiler_mpi:
             job.mode = 'm'
 
     # number of processes

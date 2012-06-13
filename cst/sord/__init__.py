@@ -36,11 +36,16 @@ def build(job=None, **kwargs):
 
     # src directory
     cwd = os.getcwd()
-    os.chdir(os.path.join(os.path.dirname(__file__), 'src'))
+    path = os.path.dirname(__file__)
+    path = os.path.join(path, 'src', 'build_' + mode)
+    if not os.path.exists(path):
+        os.mkdir(path)
+    os.chdir(path)
 
     # source files
     sources = [
         'globals.f90',
+        'arrays.f90',
         'diff_cn_op.f90',
         'diff_nc_op.f90',
         'hourglass_op.f90',
@@ -48,8 +53,7 @@ def build(job=None, **kwargs):
         'surf_normals.f90',
         'utilities.f90',
         'fortran_io.f90',
-        'collective_%s.f90' % mode,
-        'arrays.f90',
+        'collective.f90',
         'field_io_mod.f90',
         'statistics.f90',
         'parameters.f90',
@@ -67,38 +71,35 @@ def build(job=None, **kwargs):
     ]
 
     # compile
-    opt = job.optimize
     cc = shlex.split(' '.join([
         job.compiler_c,
         job.compiler_opts['f'],
-        job.compiler_opts[opt],
+        job.compiler_opts[job.optimize],
     ]))
     fc = shlex.split(' '.join([
         job.compiler_f,
         job.compiler_opts['f'],
-        job.compiler_opts[opt],
+        job.compiler_opts[job.optimize],
     ]))
     if dtype != job.dtype_f:
         fc += ' ' + job.compiler_opts[dsize]
     objects = []
     for s in sources:
         base, ext = os.path.splitext(s)
+        if base == 'collective':
+            s = base + '_' + mode + '.f90'
+        s = os.path.join('..', s)
         o = base + '.o'
-        objects.append(o)
         if ext == '.c':
             c = cc
-            d = []
+            m, d = [], []
         else:
             c = fc
             d = util.f90modules(s)[1]
             d = [k + '.o' for k in d if k != 'mpi']
-            k = 'collective.o'
-            if k in d:
-                del(d[d.index(k)])
-                d += ['collective_s.f90', 'collective_m.f90']
-        new |= util.make(c + ['-c', s], o, d + [s])
-    x = 'sord_' + mode + '.x'
-    new |= util.make(fc + objects, x, objects)
+        new |= util.make(c + ['-c', s], [o], [s] + d)
+        objects.append(o)
+    new |= util.make(fc + objects, ['sord.x'], objects)
 
     # finished
     os.chdir(cwd)
@@ -171,7 +172,7 @@ def stage(prm, name='sord', **kwargs):
     job.minutes = 10 + int((prm.shape[3] + 10) * nm // (40 * job.rate))
 
     # configure options
-    job.command = os.path.join('.', 'sord_' + job.mode + '.x')
+    job.command = os.path.join('.', 'sord.x')
     job = util.prepare(job)
 
     # compile code
@@ -181,7 +182,7 @@ def stage(prm, name='sord', **kwargs):
 
     # create run directory
     path = os.path.dirname(__file__)
-    job.stagein += os.path.join(path, 'src', job.command),
+    job.stagein += os.path.join(path, 'src', 'build_' + job.mode, job.command),
     f = os.path.join(path, '..', 'build', 'coseis.tgz')
     if os.path.isfile(f):
         job.stagein += f,

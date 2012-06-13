@@ -2,7 +2,6 @@
 import cst                                  # import the Coseis module
 prm = cst.sord.parameters()                 # for specifying SORD parameters
 s_ = cst.sord.s_                            # for specifying slices
-prm.nproc3 = 1,1,2
 prm.delta = 100.0, 100.0, 100.0, 0.0075     # step length in (x, y, z, t)
 prm.shape = 61, 61, 61, 60                  # mesh size in (x, y, z, t)
 prm.fieldio = [                             # field variable input and output
