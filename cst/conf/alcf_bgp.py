@@ -22,6 +22,7 @@ PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
 .basshrc:
 PS1="[\u@${mybgp}:\w]\$ "
 alias qdev='isub -q default -n 16 -t 60'
+alias quota='/usr/lpp/mmfs/bin/mmlsquota'
 
 Useful commands:
 qstat
