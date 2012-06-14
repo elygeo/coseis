@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-"""
-Submit test runner to batch queue
-"""
 
 import os
 import cst
@@ -14,6 +11,6 @@ cst.util.launch(
     name = 'test_suite',
     force = True,
     nproc = 6,
-    minutes = 30,
+    minutes = 40,
 )
 

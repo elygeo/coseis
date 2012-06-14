@@ -111,6 +111,20 @@ Install
 .. _MPICH2:      http://www.mcs.anl.gov/research/projects/mpich2/
 .. _EPD:         http://www.enthought.com/products/epddownload.php
 
+Test
+====
+
+Run the test suite interactively:
+::
+
+    cd cst/tests
+    python test_runner.py -i
+
+Or, submit the test suite for batch processing:
+::
+
+    python test_runner.py -q
+
 
 Examples
 ========
