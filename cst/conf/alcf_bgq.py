@@ -10,8 +10,8 @@ File systems:
 .soft:
 PYTHONPATH += $HOME/coseis
 PATH += $HOME/coseis/bin
-PATH += /gpfs/vesta_home/gely/$ARCH/bin
-MANPATH += /gpfs/vesta_home/gely/$ARCH/man
+PATH += /gpfs/vesta_home/gely/local-${ARCH##*-}/bin
+MANPATH += /gpfs/vesta_home/gely/local-${ARCH##*-}/man
 +mpiwrapper-xl.legacy
 @default
 

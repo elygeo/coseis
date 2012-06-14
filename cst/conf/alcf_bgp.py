@@ -13,8 +13,8 @@ File systems:
 .softevnrc:
 PYTHONPATH += $HOME/coseis
 PATH += $HOME/coseis/bin
-PATH += /gpfs/home/gely/$ARCH/bin
-MANPATH += /gpfs/home/gely/$ARCH/man
+PATH += /gpfs/home/gely/local-$HOSTTYPE/bin
+MANPATH += /gpfs/home/gely/local-$HOSTTYPE/man
 PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
 +git-1.7.6.4
 +ddt
