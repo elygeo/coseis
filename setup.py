@@ -35,7 +35,7 @@ elif target == ['clean']:
     ]:
         if os.path.exists(d):
             shutil.rmtree(d)
-    for d in '', 'sord', 'cvms', 'tests':
+    for d in '', 'conf', 'tests', 'sord', 'cvms':
         d = os.path.join(path, d) 
         for f in os.listdir(d):
             e = os.path.splitext(f)[-1]
