@@ -19,7 +19,6 @@ def test(argv=[]):
     """
     import os, shlex, subprocess
     import cst
-    print 111111, __file__
     job = cst.util.skeleton(
         run = 'exec',
         argv = argv,

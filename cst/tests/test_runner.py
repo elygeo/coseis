@@ -11,6 +11,6 @@ cst.util.launch(
     name = 'test_suite',
     force = True,
     nproc = 6,
-    minutes = 40,
+    minutes = 60,
 )
 
