@@ -17,7 +17,6 @@ PATH += /gpfs/home/gely/local-$HOSTTYPE/bin
 MANPATH += /gpfs/home/gely/local-$HOSTTYPE/man
 PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
 +git-1.7.6.4
-+ddt
 
 .basshrc:
 PS1="[\u@${mybgp}:\w]\$ "
