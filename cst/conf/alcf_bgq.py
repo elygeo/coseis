@@ -25,6 +25,8 @@ Useful commands:
 qstat
 cbank
 partlist
+myquota
+myprojectquota
 """
 
 maxcores = 16
