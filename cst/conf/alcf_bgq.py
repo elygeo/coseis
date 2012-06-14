@@ -37,10 +37,10 @@ compiler_c = 'mpixlcc_r'
 compiler_f = 'mpixlf2003_r'
 compiler_opts = {
     'f': '-qlanglvl=2003pure -qsuppress=cmpmsg',
-    'g': '-C -O0 -g',
+    'g': '-C -O0 ‐qfloat=nofold -g',
     't': '-C',
-    'p': '-O3 -p /home/morozov/HPM/lib/libmpihpm.a',
-    'O': '-O3',
+    'p': '-O3 -qstrict -p -pg /home/morozov/HPM/lib/libmpihpm.a',
+    'O': '-O3 -qstrict',
     '8': '-qrealsize=8',
 }
 
