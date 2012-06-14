@@ -7,9 +7,15 @@ def test(argv=[]):
     import os
     import numpy as np
     import cst
-    prm = cst.sord.parameters()
+
+    # analytical solution
+    r = 2000.0
+    t = (prm.shape[-1] - 1.5) * prm.delta[-1] - r / prm.vrup
+    #v = cst.kostrov.slip_rate(rho, vp, vs, prm.vrup, dtau, r, t, 0.82)
+    v = cst.kostrov.slip_rate(rho, vp, vs, prm.vrup, dtau, r, t)
 
     # parameters
+    prm = cst.sord.parameters()
     prm.nproc3 = 1, 1, 2
     prm.delta = 100.0, 100.0, 100.0, 0.0075
     prm.shape = 51, 51, 24, 200
@@ -63,12 +69,6 @@ def test(argv=[]):
     )
 
     # compare with analytical solution
-    r = 2000.0
-    t = (prm.shape[-1] - 1.5) * prm.delta[-1] - r / prm.vrup
-    #try:
-    v = cst.kostrov.slip_rate(rho, vp, vs, prm.vrup, dtau, r, t)
-    #except:
-    #    v = cst.kostrov.slip_rate(rho, vp, vs, prm.vrup, dtau, r, t, 0.82)
     for p in 'abcd':
         f = os.path.join(job.rundir, 'p20%s.bin' % p)
         dv = v - np.fromfile(f, job.dtype)[-1]
