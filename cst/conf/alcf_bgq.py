@@ -34,11 +34,10 @@ maxram = 16 * 1024
 compiler_c = 'mpixlcc_r'
 compiler_f = 'mpixlf2003_r'
 compiler_opts = {
-    'f': '-u -qlanglvl=2003pure',
-    'g': '-C -qfloat=nofold -qflttrap -qsigtrap -g',
-    'g': '-C -qfloat=nofold -qflttrap -g',
-    't': '-C -qflttrap',
-    'p': '-O3 /home/morozov/HPM/lib/libmpihpm.a',
+    'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -u',
+    'g': '-C -O0 -g',
+    't': '-C',
+    'p': '-O3 -p /home/morozov/HPM/lib/libmpihpm.a',
     'O': '-O3',
     '8': '-qrealsize=8',
 }
