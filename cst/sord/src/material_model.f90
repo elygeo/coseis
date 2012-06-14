@@ -28,23 +28,23 @@ s1 = lam
 s2 = mu
 
 ! limits
-if (rho1 > 0.0) mr = max(mr, rho1)
-if (rho2 > 0.0) mr = min(mr, rho2)
-if (vp1  > 0.0) s1 = max(s1, vp1)
-if (vp2  > 0.0) s1 = min(s1, vp2)
-if (vs1  > 0.0) s2 = max(s2, vs1)
-if (vs2  > 0.0) s2 = min(s2, vs2)
+if (rho1 > 0.0) call r30max(mr, rho1)
+if (rho2 > 0.0) call r30min(mr, rho2)
+if (vp1  > 0.0) call r30max(s1, vp1)
+if (vp2  > 0.0) call r30min(s1, vp2)
+if (vs1  > 0.0) call r30max(s2, vs1)
+if (vs2  > 0.0) call r30min(s2, vs2)
 
 ! velocity dependent viscosity
 if (vdamp > 0.0) then
     gam = s2
-    call invert(gam)
+    call r3invert(gam)
     gam = gam * vdamp
 end if
 
 ! limits
-if (gam1 > 0.0) gam = max(gam, gam1)
-if (gam2 > 0.0) gam = min(gam, gam2)
+if (gam1 > 0.0) call r30max(gam, gam1)
+if (gam2 > 0.0) call r30min(gam, gam2)
 
 ! halos
 call scalar_swap_halo(mr,  nhalo)
@@ -62,7 +62,7 @@ lam = mr * s1 * s1 - 2.0 * mu
 
 ! Poisson ratio
 yy = lam + mu
-call invert(yy)
+call r3invert(yy)
 yy = 0.5 * lam * yy
 
 ! non-overlapping cell indices
@@ -101,7 +101,7 @@ call field_io('>', 'nu',  yy)
 
 ! hourglass constant
 yy = 12.0 * (lam + 2.0 * mu)
-call invert(yy)
+call r3invert(yy)
 yy = yy * sqrt(sum(dx * dx) / 3.0) * mu * (lam + mu)
 !yy = 0.3 / 16.0 * (lam + 2.0 * mu) * sqrt(sum(dx * dx) / 3.0) ! like Ma & Liu, 2006
 

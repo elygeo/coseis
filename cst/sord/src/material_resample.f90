@@ -15,12 +15,12 @@ if (master) write (*, '(a)') 'Resample material model'
 ! mass ratio
 s2 = mr * vc
 call average(mr, s2, i1node, i2node, -1)
-call invert(mr)
+call r3invert(mr)
 call scalar_swap_halo(mr, nhalo)
 call scalar_bc(mr, bc1, bc2, i1bc, i2bc)
 
 ! invert cell volume
-call invert(vc)
+call r3invert(vc)
 
 ! viscosity, bc=4 means copy into halo for resampling at the node
 bc = 4

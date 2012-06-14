@@ -4,7 +4,7 @@ implicit none
 contains
 
 ! array reciprocal
-subroutine invert(f)
+subroutine r3invert(f)
 real, intent(inout) :: f(:,:,:)
 integer :: n(3), j, k, l
 n = (/ size(f,1), size(f,2), size(f,3) /)
@@ -12,6 +12,36 @@ do l = 1, n(3)
 do k = 1, n(2)
 do j = 1, n(1)
     if (f(j,k,l) /= 0.0) f(j,k,l) = 1.0 / f(j,k,l)
+end do
+end do
+end do
+end subroutine
+
+! minimum
+subroutine r30min(f, r)
+real, intent(inout) :: f(:,:,:)
+real, intent(in) :: r
+integer :: n(3), j, k, l
+n = (/ size(f,1), size(f,2), size(f,3) /)
+do l = 1, n(3)
+do k = 1, n(2)
+do j = 1, n(1)
+    f(j,k,l) = min(f(j,k,l), r)
+end do
+end do
+end do
+end subroutine
+
+! maximum
+subroutine r30max(f, r)
+real, intent(inout) :: f(:,:,:)
+real, intent(in) :: r
+integer :: n(3), j, k, l
+n = (/ size(f,1), size(f,2), size(f,3) /)
+do l = 1, n(3)
+do k = 1, n(2)
+do j = 1, n(1)
+    f(j,k,l) = max(f(j,k,l), r)
 end do
 end do
 end do

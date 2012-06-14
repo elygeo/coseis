@@ -42,11 +42,11 @@ host_opts = {
 compiler_c = 'mpixlcc_r'
 compiler_f = 'mpixlf2003_r'
 compiler_opts = {
-    'f': '-qlanglvl=2003pure -qsuppress=cmpmsg',
+    'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -qmaxmem=-1',
     'g': '-C -O0 -g',
     't': '-C',
-    'p': '-O3 -p /home/morozov/lib/libmpihpm.a',
-    'O': '-O3 -qarch=450d -qtune=450',
+    'p': '-O -p /home/morozov/lib/libmpihpm.a',
+    'O': '-O -qarch=450d -qtune=450',
     '8': '-qrealsize=8',
 }
 
