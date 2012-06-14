@@ -41,7 +41,7 @@ def test(argv=[]):
         prm,
         run = 'exec',
         argv = argv,
-        name = 'pml',
+        name = 'sord_pml',
         force = True,
     )
 
@@ -53,7 +53,7 @@ def test(argv=[]):
             prm,
             run = 'exec',
             argv = argv,
-            name = 'pml%s' % i,
+            name = 'sord_pml%s' % i,
             force = True,
         )
         max_err_ = 0.0

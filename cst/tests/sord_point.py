@@ -43,7 +43,7 @@ def test(argv=[]):
         prm,
         run = 'exec',
         argv = argv,
-        name = 'point',
+        name = 'sord_point',
         force = True,
     )
 
@@ -55,7 +55,7 @@ def test(argv=[]):
             prm,
             run = 'exec',
             argv = argv,
-            name = 'point%s' % i,
+            name = 'sord_point%s' % i,
             force = True,
         )
         max_err_ = 0.0

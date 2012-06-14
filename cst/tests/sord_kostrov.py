@@ -58,7 +58,7 @@ def test(argv=[]):
         prm,
         run = 'exec',
         argv = argv,
-        name = 'kostrov',
+        name = 'sord_kostrov',
         force = True,
     )
 

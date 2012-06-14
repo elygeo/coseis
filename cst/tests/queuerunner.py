@@ -12,7 +12,7 @@ cst.util.launch(
     stagein = ['testrunner.py'],
     launch_command = "python ./testrunner.py",
     run = 'submit',
-    name = 'tests',
+    name = 'testrunner',
     force = True,
     nproc = 6,
     minutes = 10,

@@ -18,7 +18,6 @@ def test():
     cwd = os.getcwd()
     top = os.path.join(os.path.dirname(__file__), '..', '..')
     os.chdir(top)
-    errors = []
     for p in include:
         for f in glob.glob(p):
             if os.path.basename(f) in exclude:
