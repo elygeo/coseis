@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 code = """
 program main
 use mpi
@@ -11,12 +13,13 @@ call mpi_finalize(e)
 end program
 """
 
-def test_mpi(argv=[]):
+def test(argv=[]):
     """
     Basic MPI test
     """
     import os, shlex, subprocess
     import cst
+    print 111111, __file__
     job = cst.util.skeleton(
         run = 'exec',
         argv = argv,
@@ -41,5 +44,5 @@ def test_mpi(argv=[]):
 # continue if command line
 if __name__ == '__main__':
     import sys
-    test_mpi(sys.argv[1:])
+    test(sys.argv[1:])
 

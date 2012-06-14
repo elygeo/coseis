@@ -1,4 +1,6 @@
-def test_kostrov(argv=[]):
+#!/usr/bin/env python
+
+def test(argv=[]):
     """
     Kostrov circular crack test.
     """
@@ -77,5 +79,5 @@ def test_kostrov(argv=[]):
 # continue if command line
 if __name__ == '__main__':
     import sys
-    test_kostrov(sys.argv[1:])
+    test(sys.argv[1:])
 

@@ -1,6 +1,8 @@
-def test_point(argv=[]):
+#!/usr/bin/env python
+
+def test(argv=[]):
     """
-    Test SORD parallelization with point source
+    Test SORD parallelization with PML
     """
     import os
     import numpy as np
@@ -8,17 +10,15 @@ def test_point(argv=[]):
     prm = cst.sord.parameters()
 
     # parameters
-    prm.debug = 0
     prm.itstats = 1
-    prm.shape = 5, 4, 2, 2
+    prm.shape = 21, 21, 21, 11
     prm.delta = 100.0, 100.0, 100.0, 0.0075
-    prm.bc1 = 0, 0, 0
-    prm.bc2 = 0, 0, 0
+    prm.bc1 = 10, 10, 10
+    prm.bc2 = 10, 10, 10
 
     # source
     prm.source = 'potency'
-    prm.ihypo = 1.5, 1.5, 1.5
-    prm.ihypo = 3.0, 1.5, 1.5
+    prm.ihypo = 11, 11, 11
     prm.source1 = 1e10, 1e10, 1e10
     prm.source2 =  0.0,  0.0,  0.0
     prm.pulse = 'delta'
@@ -41,19 +41,19 @@ def test_point(argv=[]):
         prm,
         run = 'exec',
         argv = argv,
-        name = 'point',
+        name = 'pml',
         force = True,
     )
 
     # multiple processes
     max_err_all_ = 0.0
-    for i, n in enumerate([(3, 1, 1), (2, 2, 1)]):
+    for i, n in enumerate([(4, 1, 1), (1, 2, 3)]):
         prm.nproc3 = n
         job1 = cst.sord.run(
             prm,
             run = 'exec',
             argv = argv,
-            name = 'point%s' % i,
+            name = 'pml%s' % i,
             force = True,
         )
         max_err_ = 0.0
@@ -70,10 +70,10 @@ def test_point(argv=[]):
                 max_err_ = max(max_err_, e)
         print('max error: ', max_err_)
         max_err_all_ = max(max_err_all_, max_err_)
-    assert max_err_all_ == 0.0
+    assert max_err_all_ == 0.0, 'SORD parallelization breaks PML'
 
 # continue if command line
 if __name__ == '__main__':
     import sys
-    test_point(sys.argv[1:])
+    test(sys.argv[1:])
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env ipython -i --gui=wx
-def test_egmm():
+
+def test():
     """
     Test CBNGA for comparison with OpenSHA Attenuation Relationship Plotter
     """
@@ -79,5 +80,5 @@ def test_egmm():
 
 # command line
 if __name__ == '__main__':
-    test_egmm()
+    test()
 

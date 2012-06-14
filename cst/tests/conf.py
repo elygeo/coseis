@@ -1,4 +1,6 @@
-def test_conf(argv=[]):
+#!/usr/bin/env python
+
+def test(argv=[]):
     """
     Test configuration modules and machines
     """
@@ -36,5 +38,5 @@ def test_conf(argv=[]):
 # continue if command line
 if __name__ == '__main__':
     import sys
-    test_conf(sys.argv[1:])
+    test(sys.argv[1:])
 

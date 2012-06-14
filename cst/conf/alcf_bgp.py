@@ -8,7 +8,7 @@ ssh surveyor.alcf.anl.gov
 
 File systems:
 /intrepid-fs0/:  Intrepid, Challenger, Eureka
-/pvfs-surveyor/: Surveyor, Gadzooks
+/gpfs/home: Surveyor, Gadzooks
 
 .softevnrc:
 PYTHONPATH += $HOME/coseis

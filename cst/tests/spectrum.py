@@ -1,5 +1,6 @@
 #!/usr/bin/env ipython -i --gui=wx
-def test_spectrum():
+
+def test():
     """
     Test spectrum plot
     """
@@ -89,5 +90,5 @@ def test_spectrum():
 
 # continue if command line
 if __name__ == '__main__':
-    test_spectrum()
+    test()
 

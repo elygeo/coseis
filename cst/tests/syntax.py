@@ -1,4 +1,4 @@
-import os, glob
+#!/usr/bin/env python
 
 exclude = 'ws-meta-in.py',
 include = (
@@ -10,13 +10,15 @@ include = (
     'scripts/*/*.py',
 )
 
-def test_syntax():
+def test():
     """
     Test code syntax.
     """
+    import os, glob
     cwd = os.getcwd()
     top = os.path.join(os.path.dirname(__file__), '..', '..')
     os.chdir(top)
+    errors = []
     for p in include:
         for f in glob.glob(p):
             if os.path.basename(f) in exclude:
@@ -28,5 +30,5 @@ def test_syntax():
 
 # continue if command line
 if __name__ == '__main__':
-    test_syntax()
+    test()
 

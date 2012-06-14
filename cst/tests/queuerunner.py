@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Sumbit nosetest to batch queue
+Submit test runner to batch queue
 """
 
 import os
@@ -9,9 +9,10 @@ import cst
 path = os.path.join(cst.__path__[0], 'tests')
 cst.sord.build()
 cst.util.launch(
-    launch_command = "nosetests -v --where=" + path,
+    stagein = ['testrunner.py'],
+    launch_command = "python ./testrunner.py",
     run = 'submit',
-    name = 'nose',
+    name = 'tests',
     force = True,
     nproc = 6,
     minutes = 10,
