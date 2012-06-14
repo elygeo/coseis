@@ -15,6 +15,6 @@ cst.util.launch(
     name = 'testrunner',
     force = True,
     nproc = 6,
-    minutes = 10,
+    minutes = 30,
 )
 
