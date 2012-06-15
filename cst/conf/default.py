@@ -60,12 +60,12 @@ launch = {
 script = """\
 #!/bin/sh
 cd "{rundir}"
-env > {name}-env
-echo "$( date ): {name} started" >> {name}-log
+env >> {name}.env
+echo "$( date ): {name} started" >> {name}.log
 {pre}
 {launch_command}
 {post}
-echo "$( date ): {name} finished" >> {name}-log
+echo "$( date ): {name} finished" >> {name}.log
 """
 
 # command line options

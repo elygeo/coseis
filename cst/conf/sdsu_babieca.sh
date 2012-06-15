@@ -5,17 +5,17 @@
 #PBS -q {queue}
 #PBS -l nodes={nodes}:ppn={ppn}:mpi
 #PBS -l walltime={walltime}
-#PBS -e {rundir}/{name}-err
-#PBS -o {rundir}/{name}-out
+#PBS -e {rundir}/{name}.error
+#PBS -o {rundir}/{name}.output
 #PBS -m abe
 #PBS -V
 
 cd "{rundir}"
-env > {name}-env
+env > {name}.env
 
-echo "$( date ): {name} started" >> {name}-log
+echo "$( date ): {name} started" >> {name}.log
 {pre}
 {launch_command}
 {post}
-echo "$( date ): {name} finished" >> {name}-log
+echo "$( date ): {name} finished" >> {name}.log
 

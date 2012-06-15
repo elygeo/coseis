@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 def build():
-    import os, shlex, subprocess
+    import os, shlex
     import cst
     job = cst.util.configure()
     c = shlex.split(' '.join([
@@ -13,7 +13,7 @@ def build():
     f = os.path.join(f, 'hello_mpi')
     s = f + '.f90'
     o = f + '.x'
-    cst.util.make(c + [s], [f + '.x'], [f + '.f90'])
+    cst.util.make(c + [s], [o], [s])
     return
 
 def test(argv=[]):
@@ -21,7 +21,7 @@ def test(argv=[]):
     import cst
     f = os.path.dirname(__file__)
     f = os.path.join(f, 'hello_mpi.x')
-    job = cst.util.launch(
+    cst.util.launch(
         name = 'hello_mpi',
         command = './hello_mpi.x',
         stagein = [f],

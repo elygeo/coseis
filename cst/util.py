@@ -415,7 +415,7 @@ def skeleton(job=None, **kwargs):
         os.makedirs(dest)
 
     # save job
-    f = os.path.join(dest, job.name + '-job.py')
+    f = os.path.join(dest, job.name + '.job.py')
     save(f, job)
 
     # create script
