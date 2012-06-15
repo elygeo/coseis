@@ -82,7 +82,7 @@ def build(job=None, **kwargs):
         job.compiler_opts[job.optimize],
     ]))
     if dtype != job.dtype_f:
-        fc += ' ' + job.compiler_opts[dsize]
+        fc += [job.compiler_opts[dsize]]
     objects = []
     for s in sources:
         base, ext = os.path.splitext(s)

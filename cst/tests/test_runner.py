@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
 import os
-import cst
+import cst, hello_mpi
 
 path = os.path.join(cst.__path__[0], 'tests')
+hello_mpi.build()
 cst.sord.build()
 cst.util.launch(
     stagein = ['test_suite.py'],
