@@ -3,7 +3,7 @@ if __name__ != '__main__':
     raise Exception('not a module')
 
 import os, sys, shutil, pprint
-import cst
+import cst.tests
 
 target = sys.argv[1:]
 if target == []:
@@ -14,6 +14,8 @@ if target == []:
     print(doc)
 elif target == ['sord']:
     cst.sord.build()
+elif target == ['test']:
+    cst.tests.test_suite.test()
 elif target == ['build_all']:
     cst.sord.build()
     cst.cvms.build()

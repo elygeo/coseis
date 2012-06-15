@@ -29,6 +29,7 @@ myquota
 myprojectquota
 """
 
+cores_allowed = 1, 2, 4, 8, 16, 32, 64
 maxcores = 16
 maxnodes = 1024
 maxram = 16 * 1024

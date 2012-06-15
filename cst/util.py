@@ -331,6 +331,13 @@ def prepare(job=None, **kwargs):
             job.cores = min(job.maxcores, job.ppn)
             job.totalcores = job.nodes * job.maxcores
 
+        # minimum allowed cores
+        if job.cores_allowed:
+            for i in job.cores_allowed:
+                if i >= job.cores:
+                    job.cores = i
+                    break
+
         # memory
         if not job.pmem:
             job.pmem = job.maxram / job.ppn

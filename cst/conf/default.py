@@ -43,6 +43,7 @@ queue = ''
 queue_opts = []
 maxnodes = 1
 maxcores = 0
+cores_allowed = ()
 maxram = 0
 pmem = 0
 maxtime = 0
