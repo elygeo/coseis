@@ -120,10 +120,23 @@ Run the test suite interactively:
     cd cst/tests
     python test_runner.py -i
 
-Or, submit the test suite for batch processing:
+Or, submit a job for batch processing:
 ::
 
     python test_runner.py -q
+
+After completion, a report is printed to the screen (or saved in
+run/test_suite/test_suite.output)::
+
+    PASSED: doctest.testmod(cst.util)
+    PASSED: doctest.testmod(cst.coord)
+    PASSED: doctest.testmod(cst.sord)
+    PASSED: syntax.test()
+    PASSED: configure.test()
+    PASSED: hello_mpi.test()
+    PASSED: point_source.test()
+    PASSED: pml_boundary.test()
+    PASSED: kostrov.test()
 
 
 Examples

@@ -263,9 +263,22 @@ python setup.py
 cd cst/tests
 python test_runner.py -i
 </pre>
-<p>Or, submit the test suite for batch processing:</p>
+<p>Or, submit a job for batch processing:</p>
 <pre class="literal-block">
 python test_runner.py -q
+</pre>
+<p>After completion, a report is printed to the screen (or saved in
+run/test_suite/test_suite.output):</p>
+<pre class="literal-block">
+PASSED: doctest.testmod(cst.util)
+PASSED: doctest.testmod(cst.coord)
+PASSED: doctest.testmod(cst.sord)
+PASSED: syntax.test()
+PASSED: configure.test()
+PASSED: hello_mpi.test()
+PASSED: point_source.test()
+PASSED: pml_boundary.test()
+PASSED: kostrov.test()
 </pre>
 </div>
 <div class="section" id="examples">

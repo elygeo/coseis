@@ -471,9 +471,9 @@ def launch(job=None, **kwargs):
             raise Exception('Submit failed')
         d = re.search(job.submit_pattern, stdout).groupdict()
         job.update(d)
-        save(job.name + '-job.py', job)
+        save(job.name + '.job.py', job)
     else:
-        save(job.name + '-job.py', job)
+        save(job.name + '.job.py', job)
         for c in job.pre, job.launch_command, job.post:
             print(c)
             if '\n' in c or ';' in c or '|' in c:
