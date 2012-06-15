@@ -15,16 +15,14 @@ def test():
     Test code syntax.
     """
     import os, glob
-    cwd = os.getcwd()
-    top = os.path.join(os.path.dirname(__file__), '..', '..')
-    os.chdir(top)
+    import cst
+    path = os.path.dirname(cst.__file__) + '../'
     for p in include:
-        for f in glob.glob(p):
+        for f in glob.glob(path + p):
             if os.path.basename(f) in exclude:
                 continue
             c = open(f, 'U').read()
             compile(c, f, 'exec')
-    os.chdir(cwd)
     return
 
 # continue if command line

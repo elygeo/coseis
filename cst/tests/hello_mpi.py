@@ -19,6 +19,7 @@ def build():
 def test(argv=[]):
     import os
     import cst
+    build()
     f = os.path.dirname(__file__)
     f = os.path.join(f, 'hello_mpi.x')
     cst.util.launch(
