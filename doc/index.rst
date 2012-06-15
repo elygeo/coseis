@@ -131,12 +131,12 @@ run/test_suite/test_suite.output)::
     PASSED: doctest.testmod(cst.util)
     PASSED: doctest.testmod(cst.coord)
     PASSED: doctest.testmod(cst.sord)
-    PASSED: syntax.test()
-    PASSED: configure.test()
-    PASSED: hello_mpi.test()
-    PASSED: point_source.test()
-    PASSED: pml_boundary.test()
-    PASSED: kostrov.test()
+    PASSED: cst.tests.syntax.test()
+    PASSED: cst.tests.configure.test()
+    PASSED: cst.tests.hello_mpi.test()
+    PASSED: cst.tests.point_source.test()
+    PASSED: cst.tests.pml_boundary.test()
+    PASSED: cst.tests.kostrov.test()
 
 
 Examples
