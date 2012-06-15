@@ -9,8 +9,7 @@ cst.util.launch(
     stagein = ['test_suite.py'],
     launch_command = "python ./test_suite.py",
     name = 'test_suite',
-    force = True,
     nproc = 6,
-    minutes = 60,
+    minutes = 30,
 )
 

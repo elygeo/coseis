@@ -13,15 +13,17 @@ def test():
         cst.coord,
         cst.sord,
         'syntax',
-        'conf',
+        'configure',
         'hello_mpi',
-        'sord_point',
-        'sord_pml',
-        'sord_kostrov',
+        'point_source',
+        'pml_boundary',
+        'kostrov',
     ]:
         # import test
+        print('-' * 80)
         if isinstance(m, basestring):
             msg = 'import ' + m
+            print('>>> ' + msg)
             try:
                 m = imp.load_source(m, m + '.py')
             except Exception as e:
@@ -32,6 +34,7 @@ def test():
         # unit test
         if hasattr(m, 'test'):
             msg = name + '.test()'
+            print('>>> ' + msg)
             try:
                 m.test()
             except Exception as e:
@@ -42,13 +45,12 @@ def test():
         # doc test
         if m.__doc__:
             msg = 'doctest.testmod(%s)' % name
+            print('>>> ' + msg)
             f, t = doctest.testmod(m)
             if f:
                 failed.append('FAILED: ' + msg)
             elif t:
                 passed.append('PASSED: ' + msg)
-
-        print('-' * 80)
 
     print('\n' + '\n'.join(passed))
     print('\n' + '\n'.join(failed))

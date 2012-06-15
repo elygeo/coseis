@@ -78,8 +78,6 @@ options = [
     ('d', 'debug',       'run',      'debug'),
     ('b', 'batch',       'run',      'submit'),
     ('q', 'queue',       'run',      'submit'),
-    ('s', 'serial',      'mode',     's'),
-    ('m', 'mpi',         'mode',     'm'),
     ('g', 'debugging',   'optimize', 'g'),
     ('t', 'testing',     'optimize', 't'),
     ('p', 'profiling',   'optimize', 'p'),

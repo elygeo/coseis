@@ -15,15 +15,13 @@ stagein = ['hold/']
 
 # command line options: (short, long, parameter, value)
 options = [
-    ('',  'machine=',    'machine',  ''),
+    ('v', 'verbose',     'verbose',  True),
     ('n', 'dry-run',     'prepare',  False),
     ('f', 'force',       'force',    True),
     ('i', 'interactive', 'run',      'exec'),
     ('d', 'debug',       'run',      'debug'),
     ('b', 'batch',       'run',      'submit'),
     ('q', 'queue',       'run',      'submit'),
-    ('s', 'serial',      'mode',     's'),
-    ('m', 'mpi',         'mode',     'm'),
 ]
 
 compiler_opts = {
