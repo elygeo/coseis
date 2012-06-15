@@ -163,6 +163,8 @@ def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
                         f = os.path.join(f, k + '.npy')
                         np.save(f, d[k])
                         out += "%s = load('%s.npy', mmap_mode='c')\n" % (k, k)
+            if isinstance(d[k], basestring) and '\n' in d[k]:
+                out += k + ' = """' + d[k] + '"""\n'
             else:
                 out += '%s = %r\n' % (k, d[k])
     if has_array:
