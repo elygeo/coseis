@@ -35,18 +35,18 @@ export F77=pgf95
 export F90=pgf95
 """
 
-maxcores = 16
-maxram = 32 * 1024
+core_range = [1, 2, 4, 8, 12, 15, 16]
+maxram = 32768
 #rate = 21e5
 rate = 12e5
 
 queue_opts = [
-    ('development', {'maxnodes': 16,   'maxtime':  2 * 60}),
-    ('normal',      {'maxnodes': 256,  'maxtime': 24 * 60}),
-    ('large',       {'maxnodes': 1024, 'maxtime': 24 * 60}),
-    ('long',        {'maxnodes': 256,  'maxtime': 48 * 60}),
-    ('serial',      {'maxnodes': 1,    'maxtime':  2 * 60}),
-    ('vis',         {'maxnodes': 2,    'maxtime': 24 * 60}),
+    ('development', {'maxnodes': 16,   'maxtime':  120}),
+    ('normal',      {'maxnodes': 256,  'maxtime': 1440}),
+    ('large',       {'maxnodes': 1024, 'maxtime': 1440}),
+    ('long',        {'maxnodes': 256,  'maxtime': 2880}),
+    ('serial',      {'maxnodes': 1,    'maxtime':  120}),
+    ('vis',         {'maxnodes': 2,    'maxtime': 1440}),
     ('request', {}),
 ]
 

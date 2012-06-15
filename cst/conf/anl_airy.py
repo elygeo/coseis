@@ -2,7 +2,7 @@
 ANL Airy: Apple MacBook Air
 """
 
-maxcores = 2
-maxram = 4 * 1024
+core_range = [1, 2]
+maxram = 4096
 rate = 1.4e6
 

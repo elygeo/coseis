@@ -4,7 +4,7 @@
 #$ -N {name}
 #$ -M {email}
 #$ -q {queue}
-#$ -pe {maxcores}way {totalcores}
+#$ -pe {cores}way {totalcores}
 #$ -l h_rt={walltime}
 #$ -e {rundir}/{name}.error
 #$ -o {rundir}/{name}.output

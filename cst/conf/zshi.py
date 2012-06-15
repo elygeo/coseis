@@ -2,7 +2,7 @@
 Z Shi: Apple MacBook Pro
 """
 
-maxcores = 2
-maxram = 4 * 1024
+core_range = [1, 2]
+maxram = 4096
 rate = 1.4e6
 

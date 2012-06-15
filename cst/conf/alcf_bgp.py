@@ -30,12 +30,12 @@ projects
 bg-listjobs
 """
 
-maxram = 2 * 1024
-maxcores = 4
+core_range = [1, 2, 4]
+maxram = 2048
 host_opts = {
-    'challenger': {'maxnodes': 512,       'maxtime': 60,      'queue': 'prod-devel'},
-    'surveyor':   {'maxnodes': 1024,      'maxtime': 60,      'queue': 'default'},
-    'intrepid':   {'maxnodes': 1024 * 40, 'maxtime': 60 * 12, 'queue': 'prod'},
+    'challenger': {'maxnodes': 512,   'maxtime': 60,  'queue': 'prod-devel'},
+    'surveyor':   {'maxnodes': 1024,  'maxtime': 60,  'queue': 'default'},
+    'intrepid':   {'maxnodes': 40960, 'maxtime': 720, 'queue': 'prod'},
 }
 
 compiler_c = 'mpixlcc_r'

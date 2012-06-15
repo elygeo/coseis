@@ -8,6 +8,6 @@ Use MPICH instead of OpenMPI:
 export PATH="/opt/mpich2/gnu/bin:${PATH}"
 """
 
-maxcores = 8
-maxram = 32 * 1024
+core_range = range(1, 9)
+maxram = 32768
 

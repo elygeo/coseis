@@ -29,10 +29,10 @@ pip install readline
 pip install nose
 """
 
-maxram = 16 * 1024
-maxcores = 12
-maxnodes = 8 * 1024 + 64
-maxtime = 24 * 60
+maxram = 16384
+core_range = [12]
+maxnodes = 64 * 129
+maxtime = 1440
 rate = 1e6
 
 launch = {
