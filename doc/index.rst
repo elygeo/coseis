@@ -111,10 +111,10 @@ Install
 .. _MPICH2:      http://www.mcs.anl.gov/research/projects/mpich2/
 .. _EPD:         http://www.enthought.com/products/epddownload.php
 
-Test
-====
+Testing
+=======
 
-Run the test suite interactively:
+To run the test suite interactively:
 ::
 
     cd cst/tests
