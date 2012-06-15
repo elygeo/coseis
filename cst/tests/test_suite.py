@@ -22,35 +22,35 @@ def test():
         # import test
         print('-' * 80)
         if isinstance(m, basestring):
-            msg = 'import ' + m
-            print('>>> ' + msg)
+            c = 'import ' + m
+            print('>>> ' + c)
             try:
                 m = imp.load_source(m, m + '.py')
             except Exception as e:
-                failed.append('FAILED: %s: %s' % (msg, e.message))
+                failed.append('FAILED: %s: %s' % (c, e.message))
                 continue
         name = m.__name__
 
         # unit test
         if hasattr(m, 'test'):
-            msg = name + '.test()'
-            print('>>> ' + msg)
+            c = name + '.test()'
+            print('>>> ' + c)
             try:
                 m.test()
             except Exception as e:
-                failed.append('FAILED: %s: %s' % (msg, e.message))
+                failed.append('FAILED: %s: %s' % (c, e.message))
             else:
-                passed.append('PASSED: ' + msg)
+                passed.append('PASSED: ' + c)
 
         # doc test
         if m.__doc__:
-            msg = 'doctest.testmod(%s)' % name
-            print('>>> ' + msg)
+            c = 'doctest.testmod(%s)' % name
+            print('>>> ' + c)
             f, t = doctest.testmod(m)
             if f:
-                failed.append('FAILED: ' + msg)
+                failed.append('FAILED: ' + c)
             elif t:
-                passed.append('PASSED: ' + msg)
+                passed.append('PASSED: ' + c)
 
     print('\n' + '\n'.join(passed))
     print('\n' + '\n'.join(failed))
