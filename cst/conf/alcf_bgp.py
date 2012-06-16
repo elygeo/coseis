@@ -39,7 +39,8 @@ compiler_opts = {
     'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -qmaxmem=-1',
     'g': '-C -O0 -g',
     't': '-C',
-    'p': '-O -p -pg /home/morozov/lib/libmpihpm.a',
+    'p': '-O -p -pg',
+    'h': '-O /home/morozov/lib/libmpihpm.a',
     'O': '-O -qarch=450d -qtune=450',
     '8': '-qrealsize=8',
 }

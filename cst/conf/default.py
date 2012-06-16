@@ -83,6 +83,7 @@ options = [
     ('t', 'testing',     'optimize', 't'),
     ('p', 'profiling',   'optimize', 'p'),
     ('O', 'optimized',   'optimize', 'O'),
+    ('h', 'optimized',   'optimize', 'h'),
     ('8', 'realsize8',   'dtype',    'f8'),
 ]
 

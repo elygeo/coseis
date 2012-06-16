@@ -32,7 +32,8 @@ compiler_opts = {
     'f': '-qlanglvl=2003pure -qsuppress=cmpmsg',
     'g': '-C -O0 -qfloat=nofold -g',
     't': '-C',
-    'p': '-O3 -qstrict -p -pg /home/morozov/HPM/lib/libmpihpm.a',
+    'p': '-O3 -qstrict -p -pg',
+    'h': '-O3 -qstrict /home/morozov/HPM/lib/libmpihpm.a',
     'O': '-O3 -qstrict',
     '8': '-qrealsize=8',
 }
