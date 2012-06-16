@@ -32,7 +32,7 @@ prm.fieldio = [
     ('=s', 'v3', [(),(),(),1], 1.0),
 ]
 
-for i in power:
+for i in power[::-1]:
     n = 2 ** i
     prm.nproc3 = 1, n, n
     prm.shape = points, n * points, n * points, prm.itio
