@@ -5,18 +5,16 @@ Benchmarks
 import math
 import cst
 
-nproc3 = (1,1,1),
-nproc3 = (1,1,1), (1,2,2), (1,4,4)
-nproc3 = (1,1,1), (1,2,2), (1,4,4), (1,8,8), (1,16,16), (1,32,32), (1,64,64)
-nproc3 = (1,1,1), (1,1,2)
-nproc3 = (1,16,128),
-nproc3 = (8,16,16),
-npp = 20
-npp = 200
-npp = 100
+power = 0 # Serial
+power = 9 # Mira
+power = 8 # Intrepid
+power = 7 # Vesta, Ranger
+power = 5 # Challenger
+power = 6 # Surveyor
+points = 100
 
 prm = cst.sord.parameters()
-prm.oplevel = 2
+prm.oplevel = 5
 prm.oplevel = 6
 prm.itstats = 1
 prm.itcheck = -1
@@ -35,16 +33,9 @@ prm.fieldio = [
     ('=s', 'v3', [(),(),(),1], 1.0),
 ]
 
-for np in nproc3:
-    prm.nproc3 = np
-    prm.shape = np[0] * npp, np[1] * npp, np[2] * npp, prm.itio
-    n = np[0] * np[1] * np[2]
-    print '\nBenchmark: %s, %s, %s, %s' % (np, math.log(n,2), n / 16, n)
-    cst.sord.run(
-        prm,
-        rundir = 'run/%05d' % n,
-        optimize = 'O',
-        #optimize = 'p',
-        mode = 'm',
-    )
+for i in range(power + 1):
+    n = 2 ** i
+    prm.nproc3 = 1, n, n
+    prm.shape = points, n * points, n * points, prm.itio
+    cst.sord.run(prm, name='%02d' % i, optimize='p')
 

@@ -14,7 +14,7 @@ for path in glob.glob('run/[0-9]*'):
     path += os.sep
     meta = imp.load_source('meta', path + 'meta.py')
     n = np.array(meta.nproc3)
-    t = np.fromfile(path + 'prof/8step', 'f')
+    t = np.fromfile(path + 'prof-8step.bin', meta.dtype)
     procs.append(n.prod())
     times.append(t[1:-1].mean())
 

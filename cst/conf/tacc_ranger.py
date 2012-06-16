@@ -1,7 +1,9 @@
 """
 TACC Ranger: Sun Constellation Linux Cluster
 
-ssh ranger.tacc.utexas.edu
+ranger.tacc.utexas.edu
+http://www.tacc.utexas.edu/services/userguides/ranger/
+
 EPD version: rh3-x86_64
 mvapich2 supports MPI2, but not recommended for more than 2048 tasks.
 
@@ -17,17 +19,15 @@ export PYTHONPATH=${HOME}/coseis
 alias qme='showq -u'
 alias qdev='idev -minutes 120'
 
+useful:
 gsiftp://gridftp.ranger.tacc.teragrid.org:2811/
-http://www.tacc.utexas.edu/services/userguides/ranger/
-ppn must be one of (1, 2, 4, 8, 12, 15, 16)
-
 cat /share/sge/default/tacc/sge_esub_control
 qconf -sql
 lfs quota -u $USER $HOME
 lfs quota -u $USER $WORK
 lfs quota -u $USER $SCRATCH
 
-# needed?
+needed?
 module load gotoblas scalapack mkl
 export F77=ifort
 export F90=ifort

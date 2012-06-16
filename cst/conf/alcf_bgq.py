@@ -22,7 +22,7 @@ coreprocessor
 VPROF_PROFILE=yes
 """
 
-core_range = [1, 2, 4, 8, 16, 32]
+core_range = [1, 2, 4, 8, 16]
 maxnodes = 1024
 maxram = 16384
 

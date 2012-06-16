@@ -1,10 +1,10 @@
 """
 KAUST Shaheen: IBM Blue Gene/P
 
-ssh shaheen.hpc.kaust.edu.sa
+shaheen.hpc.kaust.edu.sa
 http://www.hpc.kaust.edu.sa/
 
-Requirements:
+requirements:
 module load GNU
 module load numpy
 """

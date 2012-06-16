@@ -1,7 +1,7 @@
 """
 USC HPC Linux Cluster
 
-ssh hpc-login2.usc.edu
+hpc-login2.usc.edu
 http://www.usc.edu/hpcc/
 
 .login:
@@ -11,8 +11,9 @@ source /usr/usc/mpich2/1.3.1..10/setup.csh
 setenv F77 gfortran
 setenv F90 gfortran
 
-Do not add to the front of your path.
+Do not prepend PATH
 
+useful:
 alias qme='qstat -u $USER"'
 alias qdev='qsub -I -l nodes=1,walltime=1:00:00'
 pbsnodes -a | grep main | sort | uniq -c
