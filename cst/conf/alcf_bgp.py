@@ -41,7 +41,7 @@ compiler_opts = {
     'g': '-C -O0 -g',
     'O': '-O -qarch=450d -qtune=450',
     'p': '-O -qarch=450d -qtune=450 -p -pg',
-    'h': '-O -qarch=450d -qtune=450 /home/morozov/libmpihpm.a',
+    'h': '-O -qarch=450d -qtune=450 /home/morozov/lib/libmpihpm.a',
     '8': '-qrealsize=8',
 }
 

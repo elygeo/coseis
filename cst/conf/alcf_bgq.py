@@ -34,7 +34,7 @@ compiler_opts = {
     'g': '-C -O0 -qfloat=nofold -g',
     'O': '-O3 -qstrict',
     'p': '-O3 -qstrict -p -pg',
-    'h': '-O3 -qstrict /home/morozov/HPM/libmpihpm.a',
+    'h': '-O3 -qstrict /home/morozov/HPM/lib/libmpihpm.a',
     '8': '-qrealsize=8',
 }
 
