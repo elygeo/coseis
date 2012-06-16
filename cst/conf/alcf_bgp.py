@@ -40,7 +40,7 @@ compiler_opts = {
     'g': '-C -O0 -g',
     't': '-C',
     'p': '-O -p -pg',
-    'h': '-O /home/morozov/lib/libmpihpm.a',
+    'h': '-O -L/home/morozov/lib -lmpihpm',
     'O': '-O -qarch=450d -qtune=450',
     '8': '-qrealsize=8',
 }
