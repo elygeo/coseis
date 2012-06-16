@@ -36,5 +36,5 @@ if 1:
     ax.set_ylabel('Time/step (s)')
     h = 2 * int(np.mean(times) + 0.5)
     ax.axis([0, n-1, 0, h])
-    fig.savefig('sord-benchmark.pdf', format='pdf')
+    fig.savefig('run/sord-benchmark.pdf', format='pdf')
 
