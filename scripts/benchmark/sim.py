@@ -8,9 +8,9 @@ import cst
 power = 0 # Serial
 power = 9 # Mira
 power = 8 # Intrepid
-power = 7 # Vesta, Ranger
 power = 5 # Challenger
 power = 6 # Surveyor
+power = 7 # Vesta, Ranger
 points = 100
 
 prm = cst.sord.parameters()
@@ -33,7 +33,7 @@ prm.fieldio = [
     ('=s', 'v3', [(),(),(),1], 1.0),
 ]
 
-for i in range(power + 1):
+for i in range(power, -1, -1):
     n = 2 ** i
     prm.nproc3 = 1, n, n
     prm.shape = points, n * points, n * points, prm.itio
