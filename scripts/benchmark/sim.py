@@ -4,12 +4,12 @@ Benchmarks
 """
 import cst
 
-power = 0 # Serial
-power = 9 # Mira
-power = 8 # Intrepid
-power = 5 # Challenger
-power = 6 # Surveyor
-power = 7 # Vesta, Ranger
+power = range(7, 10) # Mira
+power = range(6, 9)  # Intrepid
+power = range(8)     # Vesta, Ranger
+power = range(7)     # Surveyor
+power = range(6)     # Challenger
+power = range(1)     # Serial
 points = 100
 
 prm = cst.sord.parameters()
@@ -32,7 +32,7 @@ prm.fieldio = [
     ('=s', 'v3', [(),(),(),1], 1.0),
 ]
 
-for i in range(power, -1, -1):
+for i in power:
     n = 2 ** i
     prm.nproc3 = 1, n, n
     prm.shape = points, n * points, n * points, prm.itio
