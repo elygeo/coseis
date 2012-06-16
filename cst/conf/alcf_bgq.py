@@ -1,11 +1,7 @@
 """
-ALCF IBM Blue Gene/Q Systems
+ALCF IBM Blue Gene/Q
 
-Login:
-ssh vesta.alcf.anl.gov
-
-File systems:
-/gpfs/vesta_scratch/projects/<ProjectName>
+vesta.alcf.anl.gov /gpfs/vesta_scratch/projects/
 
 .soft:
 PYTHONPATH += $HOME/coseis
@@ -15,18 +11,15 @@ MANPATH += /gpfs/vesta_home/gely/local-${ARCH##*-}/man
 +mpiwrapper-xl.legacy
 @default
 
-Debug/profile:
-bgq_stack <corefile>
-coreprocessor <corefile>
-VPROF_PROFILE=yes
-/home/morozov/fixes/libc.a
-
-Useful commands:
+useful:
 qstat
 cbank
 partlist
 myquota
 myprojectquota
+bgq_stack
+coreprocessor
+VPROF_PROFILE=yes
 """
 
 core_range = [1, 2, 4, 8, 16, 32]

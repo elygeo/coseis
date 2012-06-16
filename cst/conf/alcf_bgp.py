@@ -1,14 +1,9 @@
 """
-ALCF IBM Blue Gene/P Systems
+ALCF IBM Blue Gene/P
 
-Login:
-ssh intrepid.alcf.anl.gov
-ssh challenger.alcf.anl.gov
-ssh surveyor.alcf.anl.gov
-
-File systems:
-/intrepid-fs0/:  Intrepid, Challenger, Eureka
-/gpfs/home: Surveyor, Gadzooks
+intrepid.alcf.anl.gov   /intrepid-fs0/
+challenger.alcf.anl.gov /intrepid-fs0/
+surveyor.alcf.anl.gov   /gpfs/home
 
 .softevnrc:
 PYTHONPATH += $HOME/coseis
@@ -23,7 +18,7 @@ PS1="[\u@${mybgp}:\w]\$ "
 alias qdev='isub -q default -n 16 -t 60'
 alias quota='/usr/lpp/mmfs/bin/mmlsquota'
 
-Useful commands:
+useful:
 qstat
 cbank
 projects
@@ -44,7 +39,7 @@ compiler_opts = {
     'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -qmaxmem=-1',
     'g': '-C -O0 -g',
     't': '-C',
-    'p': '-O -p /home/morozov/lib/libmpihpm.a',
+    'p': '-O -p -pg /home/morozov/lib/libmpihpm.a',
     'O': '-O -qarch=450d -qtune=450',
     '8': '-qrealsize=8',
 }
