@@ -2,7 +2,6 @@
 """
 Benchmarks
 """
-import math
 import cst
 
 power = 0 # Serial

@@ -48,18 +48,18 @@ compiler_mpi = True
 compiler_opts = {
     'pgi': {
         'f': '-Mdclchk',
-        'g': '-Ktrap=fp -Mbounds -Mchkptr -g',
         't': '-Ktrap=fp -Mbounds',
-        'p': '-pg -Mprof=func',
+        'g': '-Ktrap=fp -Mbounds -Mchkptr -g',
         'O': '-fast',
+        'p': '-fast -pg -Mprof=func',
         '8': '-Mr8',
     },
     'gnu': {
         'f': '-fimplicit-none -Wall',
-        'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
         't': '-fbounds-check -ffpe-trap=invalid,zero,overflow',
-        'p': '-O -pg',
+        'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
         'O': '-O3',
+        'p': '-O3 -pg',
         '8': '-fdefault-real-8',
     },
 }

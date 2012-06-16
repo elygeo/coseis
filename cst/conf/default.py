@@ -104,10 +104,10 @@ compiler_f = find('mpif90', 'gfortran')
 compiler_mpi = 'mpi' in compiler_f
 compiler_opts = {
     'f': '-fimplicit-none -Wall',
-    'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
     't': '-fbounds-check -ffpe-trap=invalid,zero,overflow',
-    'p': '-O -pg',
+    'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
     'O': '-O3',
+    'p': '-O3 -pg',
     '8': '-fdefault-real-8',
 }
 

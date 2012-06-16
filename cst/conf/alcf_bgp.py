@@ -37,11 +37,11 @@ compiler_c = 'mpixlcc_r'
 compiler_f = 'mpixlf2003_r'
 compiler_opts = {
     'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -qmaxmem=-1',
-    'g': '-C -O0 -g',
     't': '-C',
-    'p': '-O -p -pg',
-    'h': '-O -L/home/morozov/lib -lmpihpm',
+    'g': '-C -O0 -g',
     'O': '-O -qarch=450d -qtune=450',
+    'p': '-O -qarch=450d -qtune=450 -p -pg',
+    'h': '-O -qarch=450d -qtune=450 /home/morozov/libmpihpm.a',
     '8': '-qrealsize=8',
 }
 

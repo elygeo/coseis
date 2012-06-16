@@ -56,26 +56,26 @@ compiler_f = 'mpif90'
 compiler_opts = {
     'pgi': {
         'f': '-Mdclchk',
-        'g': '-Ktrap=fp -Mbounds -g',
         't': '-Ktrap=fp -Mbounds',
-        'p': '-fast -tp barcelona-64 -Mprof=func',
+        'g': '-Ktrap=fp -Mbounds -g',
         'O': '-fast -tp barcelona-64',
+        'p': '-fast -tp barcelona-64 -Mprof=func',
         '8': '-Mr8',
     },
      'intel': {
         'f': '-u -std03 -warn',
-        'g': '-CB -traceback -g',
         't': '-CB -traceback',
-        'p': '-O -pg',
+        'g': '-CB -traceback -g',
         'O': '-O2 -xW',
+        'p': '-O2 -xW -pg',
         '8': '-r8',
     },
     'sun': {
         'f': '-u',
-        'g': '-C -ftrap=common -w4 -g',
         't': '-C -ftrap=common',
-        'p': '-O -pg',
+        'g': '-C -ftrap=common -w4 -g',
         'O': '-fast -fns',
+        'p': '-fast -fns -pg',
     },  
 }
 

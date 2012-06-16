@@ -2,7 +2,7 @@
 if __name__ != '__main__':
     raise Exception('not a module')
 
-import os, sys, shutil, pprint
+import os, sys, shutil, pprint, glob
 import cst.tests
 
 target = sys.argv[1:]
@@ -31,11 +31,13 @@ elif target == ['build_all']:
 elif target == ['clean']:
     path = os.path.dirname(cst.__file__)
     for d in [
-        os.path.join(path, 'build'),
-        os.path.join(path, 'sord', 'src', 'build_s'),
-        os.path.join(path, 'sord', 'src', 'build_m'),
+        'cst/build',
+        'cst/tests/run',
+        'cst/sord/src/build_*',
+        'scripts/*/run',
     ]:
-        if os.path.exists(d):
+        for d in glob.glob(d):
+            print('removing %s' % d)
             shutil.rmtree(d)
     for d in '', 'conf', 'tests', 'sord', 'cvms':
         d = os.path.join(path, d) 

@@ -53,7 +53,7 @@ def build(job=None, **kwargs):
         'surf_normals.f90',
         'utilities.f90',
         'fortran_io.f90',
-        'collective.f90',
+        'collective_%s.f90' % mode,
         'field_io_mod.f90',
         'statistics.f90',
         'parameters.f90',
@@ -71,35 +71,30 @@ def build(job=None, **kwargs):
     ]
 
     # compile
-    cc = shlex.split(' '.join([
-        job.compiler_c,
-        job.compiler_opts['f'],
-        job.compiler_opts[job.optimize],
-    ]))
-    fc = shlex.split(' '.join([
-        job.compiler_f,
-        job.compiler_opts['f'],
-        job.compiler_opts[job.optimize],
-    ]))
-    if dtype != job.dtype_f:
-        fc += [job.compiler_opts[dsize]]
     objects = []
     for s in sources:
         base, ext = os.path.splitext(s)
-        if base == 'collective':
-            s = base + '_' + mode + '.f90'
         s = os.path.join('..', s)
         o = base + '.o'
         if ext == '.c':
-            c = cc
-            m, d = [], []
+            c = shlex.split(job.compiler_c)
+            d = []
         else:
-            c = fc
+            c = shlex.split(job.compiler_f)
+            if dtype != job.dtype_f:
+                c += shlex.split(job.compiler_opts[dsize])
             d = util.f90modules(s)[1]
-            d = [k + '.o' for k in d if k != 'mpi']
-        new |= util.make(c + ['-c', s], [o], [s] + d)
+            d = [k + '.mod' for k in d if k != 'mpi']
+        c += shlex.split(job.compiler_opts['f'])
+        c += shlex.split(job.compiler_opts[job.optimize])
+        c += ['-c', s]
+        new |= util.make(c, [o], [s] + d)
         objects.append(o)
-    new |= util.make(fc + objects, ['sord.x'], objects)
+    c  = shlex.split(job.compiler_f)
+    c += shlex.split(job.compiler_opts['f'])
+    c += objects
+    c += shlex.split(job.compiler_opts[job.optimize])
+    new |= util.make(c, ['sord.x'], objects)
 
     # finished
     os.chdir(cwd)

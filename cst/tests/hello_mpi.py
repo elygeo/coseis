@@ -3,17 +3,15 @@
 def build():
     import os, shlex
     import cst
-    job = cst.util.configure()
-    c = shlex.split(' '.join([
-        job.compiler_f,
-        job.compiler_opts['f'],
-        job.compiler_opts['O'],
-    ]))
     f = os.path.dirname(__file__)
     f = os.path.join(f, 'hello_mpi')
     s = f + '.f90'
     o = f + '.x'
-    cst.util.make(c + [s], [o], [s])
+    job = cst.util.configure()
+    c  = shlex.split(job.compiler_f)
+    c += shlex.split(job.compiler_opts['f']) + [s]
+    c += shlex.split(job.compiler_opts['O'])
+    cst.util.make(c, [o], [s])
     return
 
 def test(argv=[]):
