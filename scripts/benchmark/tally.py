@@ -22,7 +22,7 @@ print 'cores time'
 for nt in zip(procs, times):
     print('%5d %4.2f' % nt)
 
-if 1:
+if 0:
     import matplotlib.pyplot as plt
     n = len(times)
     fig = plt.figure()
