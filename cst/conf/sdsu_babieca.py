@@ -29,7 +29,7 @@ launch = {
     'exec': 'mpiexec -n {nproc} {command}',
     'iexec': 'mpirun -machinefile $HOME/machinefile -np {nproc} {command}',
     'debug': 'mpirun -machinefile $HOME/machinefile -np {nproc} -dbg=gdb {command}',
-    'submit':  'qsub "{name}.sh"',
+    'submit': 'qsub "{name}.sh"',
     'submit2': 'qsub -W depend="afterok:{depend}" "{name}.sh"',
 }
 

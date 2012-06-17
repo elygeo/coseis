@@ -87,7 +87,7 @@ compiler_opts = {
     't': '-fbounds-check -ffpe-trap=invalid,zero,overflow',
     'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
     'O': '-O3',
-    'p': '-O3 -pg',
+    'p': '-O3 -g -pg',
     '8': '-fdefault-real-8',
 }
 
