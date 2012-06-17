@@ -79,9 +79,9 @@ def find(*files):
 # default compiler
 f2py_flags = ''
 compiler = 'gnu'
-compiler_c = find('mpicc', 'gcc')
-compiler_f = find('mpif90', 'gfortran')
-compiler_mpi = 'mpi' in compiler_f
+compiler_cc = find('mpicc', 'gcc')
+compiler_f90 = find('mpif90', 'gfortran')
+compiler_mpi = 'mpi' in compiler_f90
 compiler_opts = {
     'f': '-fimplicit-none -Wall',
     't': '-fbounds-check -ffpe-trap=invalid,zero,overflow',
@@ -92,8 +92,6 @@ compiler_opts = {
 }
 
 # launch commands
-submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
-launch_command = ''
 if compiler_mpi:
     launch = {
         'exec':  'mpiexec -np {nproc} {command}',
@@ -104,6 +102,8 @@ else:
         'exec':  '{command}',
         'debug': 'gdb {command}',
     }
+launch_command = ''
+submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
 
 script = """\
 #!/bin/sh

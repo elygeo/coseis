@@ -262,7 +262,7 @@ def configure(*args, **kwargs):
                 job[k] = v
 
     # compiler config
-    if 'mpi' in job.compiler_f:
+    if 'mpi' in job.compiler_f90:
         job.compiler_mpi = True
     k = job.compiler
     if k in job.compiler_opts:

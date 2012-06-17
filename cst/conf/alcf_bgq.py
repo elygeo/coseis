@@ -26,8 +26,8 @@ core_range = [1, 2, 4, 8, 16]
 maxnodes = 1024
 maxram = 16384
 
-compiler_c = 'mpixlcc_r'
-compiler_f = 'mpixlf2003_r'
+compiler_cc = 'mpixlcc_r'
+compiler_f90 = 'mpixlf2003_r'
 compiler_opts = {
     'f': '-qlanglvl=2003pure -qsuppress=cmpmsg',
     't': '-C',

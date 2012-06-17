@@ -33,8 +33,8 @@ host_opts = {
     'intrepid':   {'maxnodes': 40960, 'maxtime': 720, 'queue': 'prod'},
 }
 
-compiler_c = 'mpixlcc_r'
-compiler_f = 'mpixlf2003_r'
+compiler_cc = 'mpixlcc_r'
+compiler_f90 = 'mpixlf2003_r'
 compiler_opts = {
     'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -qmaxmem=-1',
     't': '-C',

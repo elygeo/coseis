@@ -40,8 +40,8 @@ launch = {
     'submit2': 'qsub -W depend="afterok:{depend}" "{name}.sh"',
 }
 
-compiler_c = 'cc'
-compiler_f = 'ftn'
+compiler_cc = 'cc'
+compiler_f90 = 'ftn'
 compiler_mpi = True
 compiler_opts = {
     'pgi': {

@@ -72,10 +72,10 @@ def build(job=None, **kwargs):
         s = os.path.join('..', s)
         o = base + '.o'
         if ext == '.c':
-            c = shlex.split(job.compiler_c)
+            c = shlex.split(job.compiler_cc)
             d = []
         else:
-            c = shlex.split(job.compiler_f)
+            c = shlex.split(job.compiler_f90)
             if dtype != job.dtype_f:
                 c += shlex.split(job.compiler_opts[dsize])
             d = util.f90modules(s)[1]
@@ -85,7 +85,7 @@ def build(job=None, **kwargs):
         c += ['-c', s]
         new |= util.make(c, [o], [s] + d)
         objects.append(o)
-    c  = shlex.split(job.compiler_f)
+    c  = shlex.split(job.compiler_f90)
     c += shlex.split(job.compiler_opts['f'])
     c += objects
     c += shlex.split(job.compiler_opts[job.optimize])
@@ -170,9 +170,6 @@ def stage(prm, name='sord', **kwargs):
     f = os.path.join(path, '..', 'build', 'coseis.tgz')
     if os.path.isfile(f):
         job.stagein += f,
-    if job.optimize == 'g':
-        for f in glob.glob(path + '/src/*.f90'):
-            job.stagein += f,
     if prm.debug > 2:
         job.stagein += 'debug/',
     if prm.itcheck != 0:

@@ -51,8 +51,8 @@ queue_opts = [
 ]
 
 f2py_flags = '--fcompiler=intelem'
-compiler_c = 'mpicc'
-compiler_f = 'mpif90'
+compiler_cc = 'mpicc'
+compiler_f90 = 'mpif90'
 compiler_opts = {
     'pgi': {
         'f': '-Mdclchk',
