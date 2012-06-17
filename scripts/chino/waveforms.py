@@ -179,7 +179,7 @@ for igroup, group in enumerate(station_groups):
                 ax1.set_ylim([cvmz[-1], 0])
                 ax3.set_xlim([0.02, 2.0])
                 ax3.set_ylim([1e-6, 1.0])
-               
+
                 if ichan == 2:
                    ax1.set_xlabel('Wave speed (km/s)')
                    ax2.set_xlabel('Ground velocity (m/s)')

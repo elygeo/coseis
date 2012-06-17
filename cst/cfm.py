@@ -263,12 +263,12 @@ def explore(faults=None, split=False):
 
     Fault selection                  [ ]
     Reset fault selection              \\
-    Rotate the view               Arrows          
-    Pan the view            Shift-Arrows    
-    Zoom the view                    - =             
-    Reset the view                Delete               
-    Toggle stereo view                 3               
-    Save a screen-shot                 S               
+    Rotate the view               Arrows
+    Pan the view            Shift-Arrows
+    Zoom the view                    - =
+    Reset the view                Delete
+    Toggle stereo view                 3
+    Save a screen-shot                 S
     Help                             h ?
     """
     import numpy as np

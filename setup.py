@@ -40,7 +40,7 @@ elif target == ['clean']:
             print('removing %s' % d)
             shutil.rmtree(d)
     for d in '', 'conf', 'tests', 'sord', 'cvms':
-        d = os.path.join(path, d) 
+        d = os.path.join(path, d)
         for f in os.listdir(d):
             e = os.path.splitext(f)[-1]
             if e in ('.pyc', '.so', '.o', '.x', '.mod', '.ipo', '.il', '.stb', '.sha1'):

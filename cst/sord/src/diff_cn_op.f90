@@ -22,10 +22,17 @@ do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
     df(j,k,l) = &
-    - bb(j,k,l,5,a) * f(j,k,l,i) - f(j-1,k-1,l-1,i) * bb(j-1,k-1,l-1,1,a) &
-    - bb(j,k-1,l-1,6,a) * f(j,k-1,l-1,i) - f(j-1,k,l,i) * bb(j-1,k,l,2,a) &
-    - bb(j-1,k,l-1,7,a) * f(j-1,k,l-1,i) - f(j,k-1,l,i) * bb(j,k-1,l,3,a) &
-    - bb(j-1,k-1,l,8,a) * f(j-1,k-1,l,i) - f(j,k,l-1,i) * bb(j,k,l-1,4,a)
+    - bb(j-1,k-1,l-1,1,a) * f(j-1,k-1,l-1,i) &
+    - bb(j,  k-1,l-1,6,a) * f(j,  k-1,l-1,i) &
+    - bb(j-1,k,l-1,7,a) * f(j-1,k,l-1,i) &
+    - bb(j,  k,l-1,4,a) * f(j,  k,l-1,i)
+end do
+do j = i1(1), i2(1)
+    df(j,k,l) = df(j,k,l) &
+    - bb(j-1,k-1,l,8,a) * f(j-1,k-1,l,i) &
+    - bb(j,  k-1,l,3,a) * f(j,  k-1,l,i) &
+    - bb(j-1,k,l,2,a) * f(j-1,k,l,i) &
+    - bb(j,  k,l,5,a) * f(j,  k,l,i)
 end do
 end do
 end do
@@ -234,43 +241,56 @@ c = modulo(a + 1, 3) + 1
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
-b1 = &
-( (x(j+1,k,l,b) - x(j,k+1,l+1,b)) * (x(j,k+1,l,c) - x(j,k,l+1,c)) + x(j+1,k,l,b) * (x(j+1,k+1,l,c) - x(j+1,k,l+1,c)) &
-+ (x(j,k+1,l,b) - x(j+1,k,l+1,b)) * (x(j,k,l+1,c) - x(j+1,k,l,c)) + x(j,k+1,l,b) * (x(j,k+1,l+1,c) - x(j+1,k+1,l,c)) &
-+ (x(j,k,l+1,b) - x(j+1,k+1,l,b)) * (x(j+1,k,l,c) - x(j,k+1,l,c)) + x(j,k,l+1,b) * (x(j+1,k,l+1,c) - x(j,k+1,l+1,c)) )
-b2 = &
-( (x(j+1,k,l,b) - x(j,k-1,l-1,b)) * (x(j,k-1,l,c) - x(j,k,l-1,c)) + x(j+1,k,l,b) * (x(j+1,k-1,l,c) - x(j+1,k,l-1,c)) &
-+ (x(j,k-1,l,b) - x(j+1,k,l-1,b)) * (x(j,k,l-1,c) - x(j+1,k,l,c)) + x(j,k-1,l,b) * (x(j,k-1,l-1,c) - x(j+1,k-1,l,c)) &
-+ (x(j,k,l-1,b) - x(j+1,k-1,l,b)) * (x(j+1,k,l,c) - x(j,k-1,l,c)) + x(j,k,l-1,b) * (x(j+1,k,l-1,c) - x(j,k-1,l-1,c)) )
-b3 = &
-( (x(j,k+1,l,b) - x(j-1,k,l-1,b)) * (x(j,k,l-1,c) - x(j-1,k,l,c)) + x(j,k+1,l,b) * (x(j,k+1,l-1,c) - x(j-1,k+1,l,c)) &
-+ (x(j,k,l-1,b) - x(j-1,k+1,l,b)) * (x(j-1,k,l,c) - x(j,k+1,l,c)) + x(j,k,l-1,b) * (x(j-1,k,l-1,c) - x(j,k+1,l-1,c)) &
-+ (x(j-1,k,l,b) - x(j,k+1,l-1,b)) * (x(j,k+1,l,c) - x(j,k,l-1,c)) + x(j-1,k,l,b) * (x(j-1,k+1,l,c) - x(j-1,k,l-1,c)) )
-b4 = &
-( (x(j,k,l+1,b) - x(j-1,k-1,l,b)) * (x(j-1,k,l,c) - x(j,k-1,l,c)) + x(j,k,l+1,b) * (x(j-1,k,l+1,c) - x(j,k-1,l+1,c)) &
-+ (x(j-1,k,l,b) - x(j,k-1,l+1,b)) * (x(j,k-1,l,c) - x(j,k,l+1,c)) + x(j-1,k,l,b) * (x(j-1,k-1,l,c) - x(j-1,k,l+1,c)) &
-+ (x(j,k-1,l,b) - x(j-1,k,l+1,b)) * (x(j,k,l+1,c) - x(j-1,k,l,c)) + x(j,k-1,l,b) * (x(j,k-1,l+1,c) - x(j-1,k-1,l,c)) )
 b5 = &
 ( (x(j-1,k,l,b) - x(j,k-1,l-1,b)) * (x(j,k,l-1,c) - x(j,k-1,l,c)) + x(j-1,k,l,b) * (x(j-1,k,l-1,c) - x(j-1,k-1,l,c)) &
 + (x(j,k-1,l,b) - x(j-1,k,l-1,b)) * (x(j-1,k,l,c) - x(j,k,l-1,c)) + x(j,k-1,l,b) * (x(j-1,k-1,l,c) - x(j,k-1,l-1,c)) &
 + (x(j,k,l-1,b) - x(j-1,k-1,l,b)) * (x(j,k-1,l,c) - x(j-1,k,l,c)) + x(j,k,l-1,b) * (x(j,k-1,l-1,c) - x(j-1,k,l-1,c)) )
-b6 = &
-( (x(j-1,k,l,b) - x(j,k+1,l+1,b)) * (x(j,k,l+1,c) - x(j,k+1,l,c)) + x(j-1,k,l,b) * (x(j-1,k,l+1,c) - x(j-1,k+1,l,c)) &
-+ (x(j,k+1,l,b) - x(j-1,k,l+1,b)) * (x(j-1,k,l,c) - x(j,k,l+1,c)) + x(j,k+1,l,b) * (x(j-1,k+1,l,c) - x(j,k+1,l+1,c)) &
-+ (x(j,k,l+1,b) - x(j-1,k+1,l,b)) * (x(j,k+1,l,c) - x(j-1,k,l,c)) + x(j,k,l+1,b) * (x(j,k+1,l+1,c) - x(j-1,k,l+1,c)) )
+b2 = &
+( (x(j+1,k,l,b) - x(j,k-1,l-1,b)) * (x(j,k-1,l,c) - x(j,k,l-1,c)) + x(j+1,k,l,b) * (x(j+1,k-1,l,c) - x(j+1,k,l-1,c)) &
++ (x(j,k-1,l,b) - x(j+1,k,l-1,b)) * (x(j,k,l-1,c) - x(j+1,k,l,c)) + x(j,k-1,l,b) * (x(j,k-1,l-1,c) - x(j+1,k-1,l,c)) &
++ (x(j,k,l-1,b) - x(j+1,k-1,l,b)) * (x(j+1,k,l,c) - x(j,k-1,l,c)) + x(j,k,l-1,b) * (x(j+1,k,l-1,c) - x(j,k-1,l-1,c)) )
+df(j,k,l) = h * &
+( b5 * f(j-1,k-1,l-1,i) &
++ b2 * f(j,  k-1,l-1,i) )
+end do
+do j = i1(1), i2(1)
+b4 = &
+( (x(j,k,l+1,b) - x(j-1,k-1,l,b)) * (x(j-1,k,l,c) - x(j,k-1,l,c)) + x(j,k,l+1,b) * (x(j-1,k,l+1,c) - x(j,k-1,l+1,c)) &
++ (x(j-1,k,l,b) - x(j,k-1,l+1,b)) * (x(j,k-1,l,c) - x(j,k,l+1,c)) + x(j-1,k,l,b) * (x(j-1,k-1,l,c) - x(j-1,k,l+1,c)) &
++ (x(j,k-1,l,b) - x(j-1,k,l+1,b)) * (x(j,k,l+1,c) - x(j-1,k,l,c)) + x(j,k-1,l,b) * (x(j,k-1,l+1,c) - x(j-1,k-1,l,c)) )
 b7 = &
 ( (x(j,k-1,l,b) - x(j+1,k,l+1,b)) * (x(j+1,k,l,c) - x(j,k,l+1,c)) + x(j,k-1,l,b) * (x(j+1,k-1,l,c) - x(j,k-1,l+1,c)) &
 + (x(j,k,l+1,b) - x(j+1,k-1,l,b)) * (x(j,k-1,l,c) - x(j+1,k,l,c)) + x(j,k,l+1,b) * (x(j,k-1,l+1,c) - x(j+1,k,l+1,c)) &
 + (x(j+1,k,l,b) - x(j,k-1,l+1,b)) * (x(j,k,l+1,c) - x(j,k-1,l,c)) + x(j+1,k,l,b) * (x(j+1,k,l+1,c) - x(j+1,k-1,l,c)) )
+df(j,k,l) = df(j,k,l) + h * &
+( b4 * f(j-1,k-1,l,i) &
++ b7 * f(j,  k-1,l,i) )
+end do
+do j = i1(1), i2(1)
+b3 = &
+( (x(j,k+1,l,b) - x(j-1,k,l-1,b)) * (x(j,k,l-1,c) - x(j-1,k,l,c)) + x(j,k+1,l,b) * (x(j,k+1,l-1,c) - x(j-1,k+1,l,c)) &
++ (x(j,k,l-1,b) - x(j-1,k+1,l,b)) * (x(j-1,k,l,c) - x(j,k+1,l,c)) + x(j,k,l-1,b) * (x(j-1,k,l-1,c) - x(j,k+1,l-1,c)) &
++ (x(j-1,k,l,b) - x(j,k+1,l-1,b)) * (x(j,k+1,l,c) - x(j,k,l-1,c)) + x(j-1,k,l,b) * (x(j-1,k+1,l,c) - x(j-1,k,l-1,c)) )
 b8 = &
 ( (x(j,k,l-1,b) - x(j+1,k+1,l,b)) * (x(j,k+1,l,c) - x(j+1,k,l,c)) + x(j,k,l-1,b) * (x(j,k+1,l-1,c) - x(j+1,k,l-1,c)) &
 + (x(j+1,k,l,b) - x(j,k+1,l-1,b)) * (x(j,k,l-1,c) - x(j,k+1,l,c)) + x(j+1,k,l,b) * (x(j+1,k,l-1,c) - x(j+1,k+1,l,c)) &
 + (x(j,k+1,l,b) - x(j+1,k,l-1,b)) * (x(j+1,k,l,c) - x(j,k,l-1,c)) + x(j,k+1,l,b) * (x(j+1,k+1,l,c) - x(j,k+1,l-1,c)) )
-df(j,k,l) = h * &
-( b1 * f(j,k,l,i) + f(j-1,k-1,l-1,i) * b5 &
-+ b2 * f(j,k-1,l-1,i) + f(j-1,k,l,i) * b6 &
-+ b3 * f(j-1,k,l-1,i) + f(j,k-1,l,i) * b7 &
-+ b4 * f(j-1,k-1,l,i) + f(j,k,l-1,i) * b8 )
+df(j,k,l) = df(j,k,l) + h * &
+( b3 * f(j-1,k,l-1,i) &
++ b8 * f(j,  k,l-1,i) )
+end do
+do j = i1(1), i2(1)
+b6 = &
+( (x(j-1,k,l,b) - x(j,k+1,l+1,b)) * (x(j,k,l+1,c) - x(j,k+1,l,c)) + x(j-1,k,l,b) * (x(j-1,k,l+1,c) - x(j-1,k+1,l,c)) &
++ (x(j,k+1,l,b) - x(j-1,k,l+1,b)) * (x(j-1,k,l,c) - x(j,k,l+1,c)) + x(j,k+1,l,b) * (x(j-1,k+1,l,c) - x(j,k+1,l+1,c)) &
++ (x(j,k,l+1,b) - x(j-1,k+1,l,b)) * (x(j,k+1,l,c) - x(j-1,k,l,c)) + x(j,k,l+1,b) * (x(j,k+1,l+1,c) - x(j-1,k,l+1,c)) )
+b1 = &
+( (x(j+1,k,l,b) - x(j,k+1,l+1,b)) * (x(j,k+1,l,c) - x(j,k,l+1,c)) + x(j+1,k,l,b) * (x(j+1,k+1,l,c) - x(j+1,k,l+1,c)) &
++ (x(j,k+1,l,b) - x(j+1,k,l+1,b)) * (x(j,k,l+1,c) - x(j+1,k,l,c)) + x(j,k+1,l,b) * (x(j,k+1,l+1,c) - x(j+1,k+1,l,c)) &
++ (x(j,k,l+1,b) - x(j+1,k+1,l,b)) * (x(j+1,k,l,c) - x(j,k+1,l,c)) + x(j,k,l+1,b) * (x(j+1,k,l+1,c) - x(j,k+1,l+1,c)) )
+df(j,k,l) = df(j,k,l) + h * &
+( b6 * f(j-1,k,l,i) &
++ b1 * f(j,  k,l,i) )
 end do
 end do
 end do

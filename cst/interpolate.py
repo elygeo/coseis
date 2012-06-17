@@ -248,7 +248,7 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
 def trinterp(x, f, t, xi, fi=None):
     """
     2D linear interpolation of function values specified on triangular mesh.
-  
+
     **NOTE** A faster compiled version here: cst.interpolate.trinterp
 
     Parameters
@@ -263,7 +263,7 @@ def trinterp(x, f, t, xi, fi=None):
     fi: Array of interpolated values, same shape as `xi[0]`.
     """
     import numpy as np
-  
+
     # prepare arrays
     x, y = x
     xi, yi = xi

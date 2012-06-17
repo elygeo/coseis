@@ -76,7 +76,7 @@ compiler_opts = {
         'g': '-C -ftrap=common -w4 -g',
         'O': '-fast -fns',
         'p': '-fast -fns -pg',
-    },  
+    },
 }
 
 launch = {
