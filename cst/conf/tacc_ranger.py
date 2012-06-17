@@ -80,12 +80,10 @@ compiler_opts = {
 }
 
 launch = {
-    's_exec':  '{command}',
-    's_debug': 'gdb {command}',
-    'm_exec':  'ibrun {command}',
-    'm_iexec': 'ibrun -n {nproc} -o 0 {command}',
-    'm_debug': 'ddt -start -once -n {nproc} -- {command}',
-    'submit':  'qsub "{name}.sh"',
+    'exec': 'ibrun {command}',
+    'iexec': 'ibrun -n {nproc} -o 0 {command}',
+    'debug': 'ddt -start -once -n {nproc} -- {command}',
+    'submit': 'qsub "{name}.sh"',
     'submit2': 'qsub -hold_jid "{depend}" "{name}.sh"',
 }
 

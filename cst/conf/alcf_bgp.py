@@ -46,8 +46,7 @@ compiler_opts = {
 }
 
 launch = {
-    's_exec':  'cobalt-mpirun -mode vn -verbose 2 -np 1 {command}',
-    'm_exec':  'cobalt-mpirun -mode vn -verbose 2 -np {nproc} {command}',
+    'exec': 'cobalt-mpirun -mode vn -verbose 2 -np {nproc} {command}',
     'submit':  'qsub -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script {name}.sh',
     'submit2': 'qsub -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script --dependenices {depend} "{name}.sh"',
 }

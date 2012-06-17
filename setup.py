@@ -33,7 +33,7 @@ elif target == ['clean']:
     for d in [
         'cst/build',
         'cst/tests/run',
-        'cst/sord/src/build_*',
+        'cst/sord/src/build',
         'scripts/*/run',
     ]:
         for d in glob.glob(d):

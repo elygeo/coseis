@@ -87,13 +87,13 @@ Install
     module ``cst/conf/site.py``, and set the  ``machine`` parameter to the name of
     the configuration module. For example, put the folling line in ``site.py``::
 
-        machine = 'tacc_ranger'
+        machine = 'alcf_bgp'
 
     Other useful options may be placed in your ``site.py`` module.  For example,
     the account for billing of service units, and email address for notifications
     may be specified in ``site.py`` module with::
 
-        machine = 'tacc_ranger'
+        machine = 'alcf_bgp'
         account = 'your_project_name_here'
         email = 'your.email@address.here'
 

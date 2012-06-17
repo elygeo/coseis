@@ -23,13 +23,12 @@ new = True       # create new run directory
 force = False    # overwrite previous run directory if present
 stagein = []     # files to copy into run directory
 optimize = 'O'   # 'O': optimize, 'g': debug, 't': test, 'p': profile
-mode = ''        # 's': serial, 'm': MPI, '': guess
 depend = ''      # wait for other job to finish. supply job ID to depend.
 nproc = 1        # number of processors
 command = ''     # executable command
 dtype = dtype_f = np.dtype('f').str # Numpy data type
 verbose = False  # extra diagnostics
-minutes = 60     # estimated run time
+minutes = 0      # estimated run time
 cvms_opts = {}   # dictionary of special option for the CVM-S code
 pre = post = ''
 
@@ -49,25 +48,6 @@ pmem = 0
 maxtime = 0
 rate = 1.0e6
 nstripe = -2
-submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
-launch_command = ''
-launch = {
-    's_exec':  '{command}',
-    's_debug': 'gdb {command}',
-    'm_exec':  'mpiexec -np {nproc} {command}',
-    'm_debug': 'mpiexec -np {nproc} -gdb {command}',
-}
-
-script = """\
-#!/bin/sh
-cd "{rundir}"
-env >> {name}.env
-echo "$( date ): {name} started" >> {name}.log
-{pre}
-{launch_command}
-{post}
-echo "$( date ): {name} finished" >> {name}.log
-"""
 
 # command line options
 argv = sys.argv[1:]
@@ -110,6 +90,31 @@ compiler_opts = {
     'p': '-O3 -pg',
     '8': '-fdefault-real-8',
 }
+
+# launch commands
+submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
+launch_command = ''
+if compiler_mpi:
+    launch = {
+        'exec':  'mpiexec -np {nproc} {command}',
+        'debug': 'mpiexec -np {nproc} -gdb {command}',
+    }
+else:
+    launch = {
+        'exec':  '{command}',
+        'debug': 'gdb {command}',
+    }
+
+script = """\
+#!/bin/sh
+cd "{rundir}"
+env >> {name}.env
+echo "$( date ): {name} started" >> {name}.log
+{pre}
+{launch_command}
+{post}
+echo "$( date ): {name} finished" >> {name}.log
+"""
 
 del(os, sys, pwd, socket, np, find)
 

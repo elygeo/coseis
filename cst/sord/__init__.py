@@ -21,26 +21,21 @@ def build(job=None, **kwargs):
     import numpy as np
     from .. import util
 
+    # src directory
+    cwd = os.getcwd()
+    path = os.path.dirname(__file__)
+    path = os.path.join(path, 'src', 'build')
+    if not os.path.exists(path):
+        os.mkdir(path)
+    os.chdir(path)
+
     # configure
     if job == None:
         job = util.configure(options=[], **kwargs)
     dtype = np.dtype(job.dtype).str
     dsize = dtype[-1]
     new = False
-    mode = job.mode
-    if not mode:
-        if job.compiler_mpi:
-            mode = 'm'
-        else:
-            mode = 's'
-
-    # src directory
-    cwd = os.getcwd()
-    path = os.path.dirname(__file__)
-    path = os.path.join(path, 'src', 'build_' + mode)
-    if not os.path.exists(path):
-        os.mkdir(path)
-    os.chdir(path)
+    mode = {True: 'mpi', False: 'serial'}[job.compiler_mpi]
 
     # source files
     sources = [
@@ -132,7 +127,7 @@ def stage(prm, name='sord', **kwargs):
     # partition for parallelization
     nx, ny, nz = prm.shape[:3]
     j, k, l = prm.nproc3
-    if job.mode == 's':
+    if not job.compiler_mpi:
         j, k, l = 1, 1, 1
     nl = [
         (nx - 1) // j + 1,
@@ -157,7 +152,8 @@ def stage(prm, name='sord', **kwargs):
         nvars = 44
     nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
     job.pmem = 32 + int(1.2 * nm * nvars * int(job.dtype[-1]) / 1024 / 1024)
-    job.minutes = 10 + int((prm.shape[3] + 10) * nm // (40 * job.rate))
+    if not job.minutes:
+        job.minutes = 10 + int((prm.shape[3] + 10) * nm // (40 * job.rate))
 
     # configure options
     job.command = os.path.join('.', 'sord.x')
@@ -170,7 +166,7 @@ def stage(prm, name='sord', **kwargs):
 
     # create run directory
     path = os.path.dirname(__file__)
-    job.stagein += os.path.join(path, 'src', 'build_' + job.mode, job.command),
+    job.stagein += os.path.join(path, 'src', 'build', job.command),
     f = os.path.join(path, '..', 'build', 'coseis.tgz')
     if os.path.isfile(f):
         job.stagein += f,

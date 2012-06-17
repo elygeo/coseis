@@ -11,7 +11,6 @@ def test(argv=[]):
     kwargs = dict(
         run = 'exec',
         argv = argv,
-        mode = 's',
         name = 'configure',
         force = True,
         command = 'COMMAND',

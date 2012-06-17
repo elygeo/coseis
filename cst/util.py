@@ -290,14 +290,8 @@ def prepare(job=None, **kwargs):
         rundate = time.strftime('%Y %b %d'),
     ))
 
-    # serial or mpi mode
-    if not job.mode:
-        job.mode = 's'
-        if job.compiler_mpi:
-            job.mode = 'm'
-
     # number of processes
-    if job.mode == 's':
+    if not job.compiler_mpi:
         job.nproc = 1
 
     # queue options
@@ -381,12 +375,8 @@ def prepare(job=None, **kwargs):
         k = 'exec'
         if job.run:
             k = job.run
-        if k in ('exec', 'debug'):
-            k = job.mode + '_' + k
         if k not in job.launch:
             raise Exception('Error: %s launch mode not supported.' % k)
-        if k == 'submit':
-            k = job.mode + '_exec'
         job.launch_command = job.launch[k]
 
     # batch script
