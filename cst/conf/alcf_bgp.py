@@ -1,9 +1,8 @@
 """
 ALCF IBM Blue Gene/P
 
-intrepid.alcf.anl.gov   /intrepid-fs0/
-challenger.alcf.anl.gov /intrepid-fs0/
-surveyor.alcf.anl.gov   /gpfs/home
+install location:
+challenger.alcf.anl.gov:/intrepid-fs0/$USER/persistent
 
 .softevnrc:
 PYTHONPATH += $HOME/coseis
@@ -12,17 +11,6 @@ PATH += /gpfs/home/gely/local-$HOSTTYPE/bin
 MANPATH += /gpfs/home/gely/local-$HOSTTYPE/man
 PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
 +git-1.7.6.4
-
-.basshrc:
-PS1="[\u@${mybgp}:\w]\$ "
-alias qdev='isub -q default -n 16 -t 60'
-alias quota='/usr/lpp/mmfs/bin/mmlsquota'
-
-useful:
-qstat
-cbank
-projects
-bg-listjobs
 """
 
 core_range = [1, 2, 4]
@@ -36,12 +24,12 @@ host_opts = {
 compiler_cc = 'mpixlcc_r'
 compiler_f90 = 'mpixlf2003_r'
 compiler_opts = {
-    'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -qmaxmem=-1',
-    't': '-C',
-    'g': '-C -O0 -g',
-    'O': '-O -qarch=450d -qtune=450 /home/morozov/lib/libmpihpm.a',
-    'h': '-O -qarch=450d -qtune=450 /home/morozov/lib/libmpihpm.a',
-    'p': '-O -qarch=450d -qtune=450 /home/morozov/lib/libmpihpm.a -g -pg',
+    'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -qmaxmem=-1 -qreport',
+    'g': '-O0 -g -C',
+    'O': '-O5',
+    'O': '-O5 -g /home/morozov/lib/libmpihpm.a',
+    'p': '-O5 -g -pg /home/morozov/lib/libmpihpm.a',
+    'm': '-qsmp=noauto',
     '8': '-qrealsize=8',
 }
 

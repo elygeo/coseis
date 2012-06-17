@@ -1,12 +1,10 @@
 """
 SDSU CSRC Babieca Linux Cluster
 
-ssh babieca.sdsu.edu
 http://www.csrc.sdsu.edu/csrc/
 http://babieca.sdsu.edu/
 
-interactive nodes: 8 x 2 Intel Xeon 2.4GHz, 1GB
-batch nodes: 40 x 2 Intel Xeon 2.4GHz, 2GB
+babieca.sdsu.edu
 
 machinefile:
 node41:4
@@ -28,7 +26,6 @@ rate = 0.5e6
 launch = {
     'exec': 'mpiexec -n {nproc} {command}',
     'iexec': 'mpirun -machinefile $HOME/machinefile -np {nproc} {command}',
-    'debug': 'mpirun -machinefile $HOME/machinefile -np {nproc} -dbg=gdb {command}',
     'submit': 'qsub "{name}.sh"',
     'submit2': 'qsub -W depend="afterok:{depend}" "{name}.sh"',
 }

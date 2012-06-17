@@ -19,8 +19,6 @@ options = [
     ('n', 'dry-run',     'prepare',  False),
     ('f', 'force',       'force',    True),
     ('i', 'interactive', 'run',      'exec'),
-    ('d', 'debug',       'run',      'debug'),
-    ('b', 'batch',       'run',      'submit'),
     ('q', 'queue',       'run',      'submit'),
 ]
 

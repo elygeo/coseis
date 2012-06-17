@@ -252,8 +252,6 @@ def configure(*args, **kwargs):
                 job[key] = cast
         if not job.prepare:
             job.run = ''
-        if job.run == 'debug':
-            job.optimize = 'g'
 
     # host config:
     for h, o in job.host_opts.items():

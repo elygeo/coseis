@@ -1,8 +1,8 @@
 """
 KAUST Shaheen: IBM Blue Gene/P
 
-shaheen.hpc.kaust.edu.sa
 http://www.hpc.kaust.edu.sa/
+shaheen.hpc.kaust.edu.sa
 
 requirements:
 module load GNU

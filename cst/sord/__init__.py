@@ -80,6 +80,8 @@ def build(job=None, **kwargs):
                 c += shlex.split(job.compiler_opts[dsize])
             d = util.f90modules(s)[1]
             d = [k + '.mod' for k in d if k != 'mpi']
+        if job.openmp:
+            c = shlex.split(job.compiler_opts['m'])
         c += shlex.split(job.compiler_opts['f'])
         c += shlex.split(job.compiler_opts[job.optimize])
         c += ['-c', s]

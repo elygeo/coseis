@@ -17,12 +17,12 @@ except:
 # job parameters
 name = 'cst'     # configuration name
 prepare = True   # True: compile code and setup run directory, False: dry run
-run = ''         # 'exec': interactive, 'debug': debugger, 'submit': batch queue
+run = ''         # 'exec': interactive, 'submit': batch queue
 rundir = 'run/{name}' # name of the run directory
 new = True       # create new run directory
 force = False    # overwrite previous run directory if present
 stagein = []     # files to copy into run directory
-optimize = 'O'   # 'O': optimize, 'g': debug, 't': test, 'p': profile
+optimize = 'O'   # 'O': optimize, 'g': debug, 'p': profile
 depend = ''      # wait for other job to finish. supply job ID to depend.
 nproc = 1        # number of processors
 command = ''     # executable command
@@ -30,6 +30,7 @@ dtype = dtype_f = np.dtype('f').str # Numpy data type
 verbose = False  # extra diagnostics
 minutes = 0      # estimated run time
 cvms_opts = {}   # dictionary of special option for the CVM-S code
+openmp = False   # 
 pre = post = ''
 
 # machine specific
@@ -56,14 +57,11 @@ options = [
     ('f', 'force',       'force',    True),
     ('n', 'dry-run',     'prepare',  False),
     ('i', 'interactive', 'run',      'exec'),
-    ('d', 'debug',       'run',      'debug'),
-    ('b', 'batch',       'run',      'submit'),
     ('q', 'queue',       'run',      'submit'),
+    ('m', 'openmp',      'openmp',   True),
     ('g', 'debugging',   'optimize', 'g'),
-    ('t', 'testing',     'optimize', 't'),
     ('p', 'profiling',   'optimize', 'p'),
     ('O', 'optimized',   'optimize', 'O'),
-    ('h', 'optimized',   'optimize', 'h'),
     ('8', 'realsize8',   'dtype',    'f8'),
 ]
 
@@ -82,26 +80,21 @@ compiler = 'gnu'
 compiler_cc = find('mpicc', 'gcc')
 compiler_f90 = find('mpif90', 'gfortran')
 compiler_mpi = 'mpi' in compiler_f90
+compiler_openmp = False
 compiler_opts = {
     'f': '-fimplicit-none -Wall',
-    't': '-fbounds-check -ffpe-trap=invalid,zero,overflow',
     'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
     'O': '-O3',
     'p': '-O3 -g -pg',
+    'm': '-fopenmp',
     '8': '-fdefault-real-8',
 }
 
 # launch commands
 if compiler_mpi:
-    launch = {
-        'exec':  'mpiexec -np {nproc} {command}',
-        'debug': 'mpiexec -np {nproc} -gdb {command}',
-    }
+    launch = {'exec': 'mpiexec -np {nproc} {command}'}
 else:
-    launch = {
-        'exec':  '{command}',
-        'debug': 'gdb {command}',
-    }
+    launch = {'exec': '{command}'}
 launch_command = ''
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
 

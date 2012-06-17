@@ -1,7 +1,8 @@
 """
 ALCF IBM Blue Gene/Q
 
-vesta.alcf.anl.gov /gpfs/vesta_scratch/projects/
+install location:
+vesta.alcf.anl.gov:/gpfs/vesta_scratch/projects/
 
 .soft:
 PYTHONPATH += $HOME/coseis
@@ -10,16 +11,6 @@ PATH += /gpfs/vesta_home/gely/local-${ARCH##*-}/bin
 MANPATH += /gpfs/vesta_home/gely/local-${ARCH##*-}/man
 +mpiwrapper-xl.legacy
 @default
-
-useful:
-qstat
-cbank
-partlist
-myquota
-myprojectquota
-bgq_stack
-coreprocessor
-VPROF_PROFILE=yes
 """
 
 core_range = [1, 2, 4, 8, 16]
@@ -29,13 +20,12 @@ maxram = 16384
 compiler_cc = 'mpixlcc_r'
 compiler_f90 = 'mpixlf2003_r'
 compiler_opts = {
-    'f': '-qlanglvl=2003pure -qsuppress=cmpmsg',
-    't': '-C',
-    'g': '-C -O0 -qfloat=nofold -g',
-    'O': '-O3 -qstrict -lbgpm -lmpihpm',
-    'O': '-O3 -qstrict -lbgpm -lSPI_upci_cnk -lmpihpm',
-    'h': '-O3 -qstrict /home/morozov/HPM/lib/libmpihpm.a',
-    'p': '-O3 -qstrict /home/morozov/HPM/lib/libmpihpm.a -g -pg',
+    'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -qreport',
+    'g': '-C -g -O0 -qfloat=nofold',
+    'O': '-O3 -qsimd=auto',
+    'O': '-O3 /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a /home/morozov/HPM/lib/libmpihpm.a -g',
+    'p': '-O3 /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a /home/morozov/HPM/lib/libmpihpm.a -g -pg',
+    'm': '-qsmp=noauto',
     '8': '-qrealsize=8',
 }
 
