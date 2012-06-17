@@ -22,10 +22,17 @@ do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
     df(j,k,l) = &
-    ( bb(j,k,l,1,a) * f(j+1,k+1,l+1,i) + f(j,k,l,i) * bb(j,k,l,5,a) &
-    + bb(j,k,l,2,a) * f(j+1,k,l,i) + f(j,k+1,l+1,i) * bb(j,k,l,6,a) &
-    + bb(j,k,l,3,a) * f(j,k+1,l,i) + f(j+1,k,l+1,i) * bb(j,k,l,7,a) &
-    + bb(j,k,l,4,a) * f(j,k,l+1,i) + f(j+1,k+1,l,i) * bb(j,k,l,8,a) )
+    bb(j,k,l,5,a) * f(j,  k,l,i) + &
+    bb(j,k,l,2,a) * f(j+1,k,l,i) + &
+    bb(j,k,l,3,a) * f(j,  k+1,l,i) + &
+    bb(j,k,l,8,a) * f(j+1,k+1,l,i)
+end do
+do j = i1(1), i2(1)
+    df(j,k,l) = df(j,k,l) + &
+    bb(j,k,l,4,a) * f(j,  k,l+1,i) + &
+    bb(j,k,l,7,a) * f(j+1,k,l+1,i) + &
+    bb(j,k,l,6,a) * f(j,  k+1,l+1,i) + &
+    bb(j,k,l,1,a) * f(j+1,k+1,l+1,i)
 end do
 end do
 end do
