@@ -10,10 +10,10 @@
 *.stb
 *.sha1
 run
-run-*
 tmp
 TODO
 /dev
 /cst/conf/site.py
-/cst/build
 /cst/data
+/cst/build
+/cst/sord/src/build
