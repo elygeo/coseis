@@ -23,8 +23,8 @@ compiler_opts = {
     'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -qlist -qreport',
     'g': '-C -g -O0 -qfloat=nofold',
     'O': '-O3',
-    'O': '-O3 -g -lSPI_upci_cnk /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a /home/morozov/HPM/lib/libmpihpm.a',
-    'p': '-O3 -g -lSPI_upci_cnk /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a /home/morozov/HPM/lib/libmpihpm.a -pg',
+    'O': '-O3 -g -lSPI_upci_cnk /home/morozov/HPM/lib/libmpihpm.a /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a',
+    'p': '-O3 -g -lSPI_upci_cnk /home/morozov/HPM/lib/libmpihpm.a /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a -pg',
     'm': '-qsmp=omp',
     '8': '-qrealsize=8',
 }
