@@ -11,7 +11,7 @@ times = []
 
 for path in glob.glob('run/[0-9]*'):
     meta = os.path.join(path, 'meta.py')
-    meta = imp.load_source('meta', path + 'meta.py')
+    meta = imp.load_source('meta', meta)
     f = os.path.join(path, 'prof-8step.bin')
     if os.path.exists(f):
         t = np.fromfile(f, meta.dtype)
