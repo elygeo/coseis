@@ -24,17 +24,18 @@ host_opts = {
 compiler_cc = 'mpixlcc_r'
 compiler_f90 = 'mpixlf2003_r'
 compiler_opts = {
-    'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -qmaxmem=-1 -qreport',
+    'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -qmaxmem=-1 -qlist -qreport',
     'g': '-O0 -g -C',
     'O': '-O5',
     'O': '-O5 -g /home/morozov/lib/libmpihpm.a',
     'p': '-O5 -g -pg /home/morozov/lib/libmpihpm.a',
-    'm': '-qsmp=noauto',
+    'm': '-qsmp=omp',
     '8': '-qrealsize=8',
 }
 
 launch = {
     'exec': 'cobalt-mpirun -mode vn -verbose 2 -np {nproc} {command}',
+    'omp': 'cobalt-mpirun -mode smp -verbose 2 -np {nproc} -env OMP_NUM_THREADS={cores} {command}',
     'submit':  'qsub -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script {name}.sh',
     'submit2': 'qsub -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script --dependenices {depend} "{name}.sh"',
 }

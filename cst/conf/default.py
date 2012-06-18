@@ -15,22 +15,22 @@ except:
     email = pwd.getpwuid(os.geteuid())[0]
 
 # job parameters
-name = 'cst'     # configuration name
-prepare = True   # True: compile code and setup run directory, False: dry run
-run = ''         # 'exec': interactive, 'submit': batch queue
+name = 'cst'          # configuration name
+prepare = True        # True: compile code and setup run directory, False: dry run
+run = ''              # 'exec': interactive, 'submit': batch queue
 rundir = 'run/{name}' # name of the run directory
-new = True       # create new run directory
-force = False    # overwrite previous run directory if present
-stagein = []     # files to copy into run directory
-optimize = 'O'   # 'O': optimize, 'g': debug, 'p': profile
-depend = ''      # wait for other job to finish. supply job ID to depend.
-nproc = 1        # number of processors
-command = ''     # executable command
+new = True            # create new run directory
+force = False         # overwrite previous run directory if present
+stagein = []          # files to copy into run directory
+optimize = 'O'        # 'O': optimize, 'g': debug, 'p': profile
+depend = ''           # wait for other job to finish. supply job ID to depend.
+nproc = 1             # number of processors
+openmp = False        # compile with OpenMP
+command = ''          # executable command
 dtype = dtype_f = np.dtype('f').str # Numpy data type
-verbose = False  # extra diagnostics
-minutes = 0      # estimated run time
-cvms_opts = {}   # dictionary of special option for the CVM-S code
-openmp = False   # 
+verbose = False       # extra diagnostics
+minutes = 0           # estimated run time
+cvms_opts = {}        # dictionary of special option for the CVM-S code
 pre = post = ''
 
 # machine specific
@@ -92,9 +92,9 @@ compiler_opts = {
 
 # launch commands
 if compiler_mpi:
-    launch = {'exec': 'mpiexec -np {nproc} {command}'}
+    launch = {'exec': 'OMP_NUM_THREADS={cores} mpiexec -np {nproc} {command}'}
 else:
-    launch = {'exec': '{command}'}
+    launch = {'exec': 'OMP_NUM_THREADS={cores} {command}'}
 launch_command = ''
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
 

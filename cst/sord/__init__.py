@@ -106,7 +106,7 @@ def stage(prm, name='sord', **kwargs):
     """
     Stage job
     """
-    import os, glob
+    import os
     from .. import util
 
     print('\nSORD setup')
