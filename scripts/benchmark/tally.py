@@ -21,7 +21,7 @@ for path in glob.glob('run/[0-9]*'):
         times.append(t[1:-1].mean())
 
 print 'time cores'
-for i in np.argsort(procs)
+for i in np.argsort(procs):
     print('%4.2f %5d' % (times[i], cores[i]))
 
 if 0:
