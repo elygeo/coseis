@@ -30,8 +30,11 @@ build_debug = '-g -O0 -C'
 build_real8 = '-qrealsize=8'
 build_libs = '/home/morozov/lib/libmpihpm.a'
 
-launch = 'cobalt-mpirun -mode vn -verbose 2 -np {nproc} {command}'
 launch = 'cobalt-mpirun -mode smp -verbose 2 -np {nproc} -env OMP_NUM_THREADS={cores} {command}'
+
+launch = 'cobalt-mpirun -mode vn -verbose 2 -np {nproc} {command}'
+
 submit = 'qsub -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script {name}.sh'
+
 submit2 = 'qsub -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script --dependenices {depend} "{name}.sh"'
  
