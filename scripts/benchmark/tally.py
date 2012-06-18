@@ -22,7 +22,7 @@ for path in glob.glob('run/[0-9]*'):
 
 print 'time cores'
 for i in np.argsort(procs):
-    print('%4.2f %5d' % (times[i], cores[i]))
+    print('%4.2f %5d' % (times[i], procs[i]))
 
 if 0:
     import matplotlib.pyplot as plt
