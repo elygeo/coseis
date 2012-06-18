@@ -23,7 +23,7 @@ host_opts = {
 
 build_cc = 'mpixlcc_r -g -O5 -qlist -qreport -qsuppress=cmpmsg -qmaxmem=-1'
 build_f90 = 'mpixlf2003_r -g -O5 -qlist -qreport -qsuppress=cmpmsg -qmaxmem=-1 -qlanglvl=2003pure'
-build_ld = 'mpixlf2003_r -g -O3'
+build_ld = 'mpixlf2003_r -g -O'
 build_omp = '-qsmp=omp'
 build_prof = '-g -pg'
 build_debug = '-g -O0 -C'
