@@ -1,8 +1,6 @@
 """
 TACC Ranger: Sun Constellation
 
-ranger.tacc.utexas.edu
-
 .bashrc:
 export PATH=/share/home/00967/gely/local/python/bin:${PATH}
 export PATH=${HOME}/coseis/bin:${PATH}
@@ -28,36 +26,28 @@ queue_opts = [
     ('request', {}),
 ]
 
-f2py_flags = '--fcompiler=intelem'
-compiler_cc = 'mpicc'
-compiler_f90 = 'mpif90'
-compiler_opts = {
-    'pgi': {
-        'f': '-Mdclchk',
-        'g': '-Ktrap=fp -Mbounds -g',
-        'O': '-fast -tp barcelona-64',
-        'p': '-fast -tp barcelona-64 -g -Mprof=func',
-        '8': '-Mr8',
-    },
-     'intel': {
-        'f': '-u -std03 -warn',
-        'g': '-CB -traceback -g',
-        'O': '-O2 -xW',
-        'p': '-O2 -xW -g -pg',
-        '8': '-r8',
-    },
-    'sun': {
-        'f': '-u',
-        'g': '-C -ftrap=common -w4 -g',
-        'O': '-fast -fns',
-        'p': '-fast -fns -g -pg',
-    },
-}
+# PGI compilers
+f2py_flags = ''
+build_cc = 'mpicc -Mdclchk -fast -tp barcelona-64'
+build_f90 = 'mpif90 -Mdclchk -fast -tp barcelona-64'
+build_ld = 'mpif90 -Mdclchk -fast -tp barcelona-64'
+build_omp = 'FIXME'
+build_prof = '-g -Mprof=func'
+build_debug = '-g -Ktrap=fp -Mbounds'
+build_real8 = '-Mr8'
 
-launch = {
-    'exec': 'ibrun {command}',
-    'iexec': 'ibrun -n {nproc} -o 0 {command}',
-    'submit': 'qsub "{name}.sh"',
-    'submit2': 'qsub -hold_jid "{depend}" "{name}.sh"',
-}
+# intel compilers
+f2py_flags = '--fcompiler=intelem'
+build_cc = 'mpicc -warn-O2 -xW'
+build_f90 = 'mpif90 -warn -O2 -xW -u -std03'
+build_ld = 'mpif90 -warn -O2 -xW -u -std03'
+build_omp = 'FIXME'
+build_prof = '-g -pg'
+build_debug = '-g -CB -traceback'
+build_real8 = '-r8'
+
+launch = 'ibrun -n {nproc} -o 0 {command}'
+launch = 'ibrun {command}'
+submit = 'qsub "{name}.sh"'
+submit2 = 'qsub -hold_jid "{depend}" "{name}.sh"'
 

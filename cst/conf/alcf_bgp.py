@@ -21,22 +21,17 @@ host_opts = {
     'intrepid':   {'maxnodes': 40960, 'maxtime': 720, 'queue': 'prod'},
 }
 
-compiler_cc = 'mpixlcc_r'
-compiler_f90 = 'mpixlf2003_r'
-compiler_opts = {
-    'f': '-qlanglvl=2003pure -qsuppress=cmpmsg -qmaxmem=-1 -qlist -qreport',
-    'g': '-O0 -g -C',
-    'O': '-O5',
-    'O': '-O5 -g /home/morozov/lib/libmpihpm.a',
-    'p': '-O5 -g -pg /home/morozov/lib/libmpihpm.a',
-    'm': '-qsmp=omp',
-    '8': '-qrealsize=8',
-}
+build_cc = 'mpixlcc_r -g -O5 -qlist -qreport -qsuppress=cmpmsg -qmaxmem=-1'
+build_f90 = 'mpixlf2003_r -g -O5 -qlist -qreport -qsuppress=cmpmsg -qmaxmem=-1 -qlanglvl=2003pure'
+build_ld = 'mpixlf2003_r -g -O3'
+build_omp = '-qsmp=omp'
+build_prof = '-g -pg'
+build_debug = '-g -O0 -C'
+build_real8 = '-qrealsize=8'
+build_libs = '/home/morozov/lib/libmpihpm.a'
 
-launch = {
-    'exec': 'cobalt-mpirun -mode vn -verbose 2 -np {nproc} {command}',
-    'omp': 'cobalt-mpirun -mode smp -verbose 2 -np {nproc} -env OMP_NUM_THREADS={cores} {command}',
-    'submit':  'qsub -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script {name}.sh',
-    'submit2': 'qsub -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script --dependenices {depend} "{name}.sh"',
-}
-
+launch = 'cobalt-mpirun -mode vn -verbose 2 -np {nproc} {command}'
+launch = 'cobalt-mpirun -mode smp -verbose 2 -np {nproc} -env OMP_NUM_THREADS={cores} {command}'
+submit = 'qsub -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script {name}.sh'
+submit2 = 'qsub -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script --dependenices {depend} "{name}.sh"'
+ 

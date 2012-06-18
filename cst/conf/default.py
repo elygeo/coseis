@@ -53,16 +53,11 @@ nstripe = -2
 # command line options
 argv = sys.argv[1:]
 options = [
-    ('v', 'verbose',     'verbose',  True),
-    ('f', 'force',       'force',    True),
-    ('n', 'dry-run',     'prepare',  False),
-    ('i', 'interactive', 'run',      'exec'),
-    ('q', 'queue',       'run',      'submit'),
-    ('m', 'openmp',      'openmp',   True),
-    ('g', 'debugging',   'optimize', 'g'),
-    ('p', 'profiling',   'optimize', 'p'),
-    ('O', 'optimized',   'optimize', 'O'),
-    ('8', 'realsize8',   'dtype',    'f8'),
+    ('v', 'verbose',     'verbose', True),
+    ('f', 'force',       'force',   True),
+    ('n', 'dry-run',     'prepare', False),
+    ('i', 'interactive', 'run',     'exec'),
+    ('q', 'queue',       'run',     'submit'),
 ]
 
 # search for files in PATH
@@ -74,28 +69,27 @@ def find(*files):
             if os.path.isfile(os.path.join(p, f)):
                 return f
 
-# default compiler
+# build options
 f2py_flags = ''
-compiler = 'gnu'
-compiler_cc = find('mpicc', 'gcc')
-compiler_f90 = find('mpif90', 'gfortran')
-compiler_mpi = 'mpi' in compiler_f90
-compiler_openmp = False
-compiler_opts = {
-    'f': '-fimplicit-none -Wall',
-    'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
-    'O': '-O3',
-    'p': '-O3 -g -pg',
-    'm': '-fopenmp',
-    '8': '-fdefault-real-8',
-}
+build_cc  = find('mpicc', 'gcc') + ' -03 -Wall'
+build_f90 = find('mpif90', 'gfortran') + ' -03 -Wall -fimplicit-none'
+build_ld  = find('mpif90', 'gfortran') + ' -O -Wall'
+build_mpi = 'mpi' in build_ld
+build_omp = '-fopenmp'
+build_prof = '-g -pg'
+build_debug = '-g -fbounds-check -ffpe-trap=invalid,zero,overflow'
+build_real8 = '-fdefault-real-8'
+build_libs = ''
 
 # launch commands
-if compiler_mpi:
-    launch = {'exec': 'OMP_NUM_THREADS={cores} mpiexec -np {nproc} {command}'}
+if build_mpi:
+    #launch = 'OMP_NUM_THREADS={cores} mpiexec -np {nproc} {command}'
+    launch = 'mpiexec -np {nproc} {command}'
 else:
-    launch = {'exec': 'OMP_NUM_THREADS={cores} {command}'}
-launch_command = ''
+    #launch = 'OMP_NUM_THREADS={cores} {command}'
+    launch = '{command}'
+submit = ''
+submit2 = ''
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
 
 script = """\
@@ -104,7 +98,7 @@ cd "{rundir}"
 env >> {name}.env
 echo "$( date ): {name} started" >> {name}.log
 {pre}
-{launch_command}
+{launch}
 {post}
 echo "$( date ): {name} finished" >> {name}.log
 """

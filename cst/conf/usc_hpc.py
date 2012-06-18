@@ -1,10 +1,6 @@
 """
 USC HPC Linux Cluster
 
-http://www.usc.edu/hpcc/
-
-hpc-login2.usc.edu
-
 .login:
 source /usr/usc/globus/default/setup.csh
 #source /usr/usc/mpich/default/setup.csh
@@ -23,9 +19,7 @@ queue_opts = [
     ('nbns',     {'maxnodes':  48, 'core_range': [8], 'maxram': 12*1024, 'maxtime': 14*1440}),
 ]
 
-launch = {
-    'exec': 'mpiexec -n {nproc} {command}',
-    'submit': 'qsub "{name}.sh"',
-    'submit2': 'qsub -W depend="afterok:{depend}" "{name}.sh"',
-}
+launch = 'mpiexec -n {nproc} {command}'
+submit = 'qsub "{name}.sh"'
+submit2 = 'qsub -W depend="afterok:{depend}" "{name}.sh"'
 

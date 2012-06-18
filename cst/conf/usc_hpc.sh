@@ -30,7 +30,7 @@ chmod u+x sync.sh
 rsync -rlpt . /scratch/job
 cd /scratch/job
 
-{launch_command}
+{launch}
 
 cd "{rundir}"
 rsync -rlpt --delete /scratch/job/ .

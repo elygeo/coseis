@@ -1,10 +1,6 @@
 """
 KAUST Shaheen: IBM Blue Gene/P
 
-http://www.hpc.kaust.edu.sa/
-shaheen.hpc.kaust.edu.sa
-
-requirements:
 module load GNU
 module load numpy
 """
@@ -21,8 +17,6 @@ queue_opts = [
     ('default',     {'maxnodes': 16 * 1024, 'maxtime': 1440}),
 ]
 
-launch = {
-    'exec': 'mpirun -mode VN -np {nproc} -exe {command}',
-    'submit': 'llsubmit "{name}.sh"',
-}
+launch = 'mpirun -mode VN -np {nproc} -exe {command}'
+submit = 'llsubmit "{name}.sh"'
 

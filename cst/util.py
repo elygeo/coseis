@@ -259,13 +259,6 @@ def configure(*args, **kwargs):
             for k, v in o.items():
                 job[k] = v
 
-    # compiler config
-    if 'mpi' in job.compiler_f90:
-        job.compiler_mpi = True
-    k = job.compiler
-    if k in job.compiler_opts:
-        job.compiler_opts = job.compiler_opts[k]
-
     return job
 
 
@@ -289,7 +282,7 @@ def prepare(job=None, **kwargs):
     ))
 
     # number of processes
-    if not job.compiler_mpi:
+    if not job.build_mpi:
         job.nproc = 1
 
     # queue options
@@ -365,16 +358,13 @@ def prepare(job=None, **kwargs):
     print('Run directory: ' + d)
     job.rundir = os.path.realpath(os.path.expanduser(d))
 
-    # launch commands
-    job.launch = job.launch.copy()
-    for k in job.launch:
-        job.launch[k] = job.launch[k].format(**job)
-    if not job.launch_command:
-        #FIXME: handle OpenMP
-        job.launch_command = job.launch['exec']
-
-    # batch script
+    # luanch commands
+    job.launch = job.launch.format(**job)
     job.script = job.script.format(**job)
+    if job.submit:
+        job.submit = job.submit.format(**job)
+    if job.submit2:
+        job.submit2 = job.submit2.format(**job)
 
     return job
 
@@ -408,7 +398,7 @@ def skeleton(job=None, **kwargs):
     save(f, job)
 
     # create script
-    if 'submit' in job.launch:
+    if job.submit:
         f = os.path.join(dest, job.name + '.sh')
         open(f, 'w').write(job.script)
         os.chmod(f, 0755)
@@ -449,9 +439,9 @@ def launch(job=None, **kwargs):
     # launch
     if job.run == 'submit':
         if job.depend:
-            c = job.launch['submit2']
+            c = job.submit2
         else:
-            c = job.launch['submit']
+            c = job.submit
         print(c)
         p = subprocess.Popen(shlex.split(c), stdout=subprocess.PIPE)
         stdout = p.communicate()[0]
@@ -463,7 +453,7 @@ def launch(job=None, **kwargs):
         save(job.name + '.job.py', job)
     else:
         save(job.name + '.job.py', job)
-        for c in job.pre, job.launch_command, job.post:
+        for c in job.pre, job.launch, job.post:
             print(c)
             if '\n' in c or ';' in c or '|' in c:
                 subprocess.check_call(c, shell=True)

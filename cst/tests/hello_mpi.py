@@ -8,9 +8,8 @@ def build():
     s = f + '.f90'
     o = f + '.x'
     job = cst.util.configure()
-    c  = shlex.split(job.compiler_f90)
-    c += shlex.split(job.compiler_opts['f']) + [s]
-    c += shlex.split(job.compiler_opts['O'])
+    c  = shlex.split(job.build_f90) + [s]
+    c += shlex.split(job.build_libs)
     cst.util.make(c, [o], [s])
     return
 

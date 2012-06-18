@@ -23,7 +23,7 @@ lfs setstripe -c 1 .
 
 echo "$( date ): {name} started" >> {name}.log
 {pre}
-{launch_command}
+{launch}
 {post}
 echo "$( date ): {name} finished" >> {name}.log
 

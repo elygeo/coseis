@@ -4,8 +4,6 @@ SDSU CSRC Babieca Linux Cluster
 http://www.csrc.sdsu.edu/csrc/
 http://babieca.sdsu.edu/
 
-babieca.sdsu.edu
-
 machinefile:
 node41:4
 node42:4
@@ -23,10 +21,8 @@ core_range = [1, 2]
 maxram = 2048
 rate = 0.5e6
 
-launch = {
-    'exec': 'mpiexec -n {nproc} {command}',
-    'iexec': 'mpirun -machinefile $HOME/machinefile -np {nproc} {command}',
-    'submit': 'qsub "{name}.sh"',
-    'submit2': 'qsub -W depend="afterok:{depend}" "{name}.sh"',
-}
+launch  = 'mpirun -machinefile $HOME/machinefile -np {nproc} {command}'
+launch  = 'mpiexec -n {nproc} {command}'
+submit  = 'qsub "{name}.sh"'
+submit2 = 'qsub -W depend="afterok:{depend}" "{name}.sh"'
 

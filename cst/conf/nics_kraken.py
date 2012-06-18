@@ -1,23 +1,5 @@
 """
 NICS Kraken: Cray XT5
-
-install location:
-kraken-pwd.nics.utk.edu:/lustre/scratch/
-
-.bashrc
-module swap PrgEnv-pgi PrgEnv-gnu
-module load git vim yt
-
-Statically linked Python:
-module load yt
-cd "${SCRATCHDIR}/local"
-url="http://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.7.1.2.tar.gz"
-curl -L "${url}" | tar zx
-python "virtualenv-1.7.1.2/virtualenv.py" python
-. python/bin/activate
-pip install pyproj
-pip install GitPython
-pip install readline
 """
 
 maxram = 16384
@@ -26,42 +8,16 @@ maxnodes = 64 * 129
 maxtime = 1440
 rate = 1e6
 
-launch = {
-    'exec': 'aprun -n {nproc} {command}',
-    'submit': 'qsub "{name}.sh"',
-    'submit2': 'qsub -W depend="afterok:{depend}" "{name}.sh"',
-}
+build_cc = 'cc -fast -Mdclchk'
+build_f90 = 'ftn -fast -Mdclchk'
+build_ld =  'ftn -fast -Mdclchk'
+build_mpi = True
+build_omp = ''
+build_prof = '-g -pg -Mprof=func'
+build_debug = '-g -Ktrap=fp -Mbounds -Mchkptr'
+build_real8 = '-Mr8'
 
-compiler_cc = 'cc'
-compiler_f90 = 'ftn'
-compiler_mpi = True
-compiler_opts = {
-    'pgi': {
-        'f': '-Mdclchk',
-        'g': '-Ktrap=fp -Mbounds -Mchkptr -g',
-        'O': '-fast',
-        'p': '-fast -g -pg -Mprof=func',
-        '8': '-Mr8',
-    },
-    'gnu': {
-        'f': '-fimplicit-none -Wall',
-        'g': '-fbounds-check -ffpe-trap=invalid,zero,overflow -g',
-        'O': '-O3',
-        'p': '-O3 -g -pg',
-        '8': '-fdefault-real-8',
-    },
-}
-
-cvms_opts = {
-    'compiler_opts': {
-        'gnu': {
-            'g': '-Wall -fbounds-check -ffpe-trap=invalid,zero,overflow -g',
-            'O': '-Wall -O3',
-        },
-        'pgi': {
-            'g': '-Ktrap=fp -Mbounds -Mchkptr -g',
-            'O': '-fast',
-        },
-    },
-}
+launch = 'aprun -n {nproc} {command}'
+submit = 'qsub "{name}.sh"'
+submit2 = 'qsub -W depend="afterok:{depend}" "{name}.sh"'
 

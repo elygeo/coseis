@@ -35,7 +35,7 @@ def build(job=None, **kwargs):
     dtype = np.dtype(job.dtype).str
     dsize = dtype[-1]
     new = False
-    mode = {True: 'mpi', False: 'serial'}[job.compiler_mpi]
+    mode = {True: 'mpi', False: 'serial'}[job.build_mpi]
 
     # source files
     sources = [
@@ -72,25 +72,31 @@ def build(job=None, **kwargs):
         s = os.path.join('..', s)
         o = base + '.o'
         if ext == '.c':
-            c = shlex.split(job.compiler_cc)
+            c = shlex.split(job.build_cc)
             d = []
         else:
-            c = shlex.split(job.compiler_f90)
+            c = shlex.split(job.build_f90)
             if dtype != job.dtype_f:
-                c += shlex.split(job.compiler_opts[dsize])
+                c += shlex.split(job.build_real8)
             d = util.f90modules(s)[1]
             d = [k + '.mod' for k in d if k != 'mpi']
         if job.openmp:
-            c = shlex.split(job.compiler_opts['m'])
-        c += shlex.split(job.compiler_opts['f'])
-        c += shlex.split(job.compiler_opts[job.optimize])
+            c += shlex.split(job.build_omp)
+        if 'p' in job.optimize:
+            c += shlex.split(job.build_prof)
+        if 'g' in job.optimize:
+            c += shlex.split(job.build_debug)
         c += ['-c', s]
         new |= util.make(c, [o], [s] + d)
         objects.append(o)
-    c  = shlex.split(job.compiler_f90)
-    c += shlex.split(job.compiler_opts['f'])
-    c += objects
-    c += shlex.split(job.compiler_opts[job.optimize])
+    c  = shlex.split(job.build_ld)
+    if job.openmp:
+        c += shlex.split(job.build_omp)
+    if 'p' in job.optimize:
+        c += shlex.split(job.build_prof)
+    if 'g' in job.optimize:
+        c += shlex.split(job.build_debug)
+    c += objects + shlex.split(job.build_libs)
     new |= util.make(c, ['sord.x'], objects)
 
     # finished
@@ -129,7 +135,7 @@ def stage(prm, name='sord', **kwargs):
     # partition for parallelization
     nx, ny, nz = prm.shape[:3]
     j, k, l = prm.nproc3
-    if not job.compiler_mpi:
+    if not job.build_mpi:
         j, k, l = 1, 1, 1
     nl = [
         (nx - 1) // j + 1,
