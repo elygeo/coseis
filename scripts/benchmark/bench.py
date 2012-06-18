@@ -10,6 +10,7 @@ power = range(8)     # Vesta, Ranger
 power = range(7)     # Surveyor
 power = range(6)     # Challenger
 power = range(1)     # Serial
+power = 5,
 points = 100
 
 prm = cst.sord.parameters()
