@@ -18,7 +18,6 @@ def make(command, objects, sources):
         if h != None and h.hexdigest() == open(f).read():
             return False
         os.unlink(f)
-    command += ['-o', objects[0]]
     print(' '.join(command))
     subprocess.check_call(command)
     for o in objects:

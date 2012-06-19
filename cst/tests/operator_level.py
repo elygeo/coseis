@@ -2,7 +2,7 @@
 
 def test(argv=[]):
     """
-    Test SORD parallelization with PML
+    Test SORD operators
     """
     import os
     import numpy as np
@@ -10,15 +10,17 @@ def test(argv=[]):
     prm = cst.sord.parameters()
 
     # parameters
+    prm.debug = 0
     prm.itstats = 1
-    prm.shape = 21, 21, 21, 11
+    prm.shape = 5, 4, 2, 2
     prm.delta = 100.0, 100.0, 100.0, 0.0075
-    prm.bc1 = 10, 10, 10
-    prm.bc2 = 10, 10, 10
+    prm.bc1 = 0, 0, 0
+    prm.bc2 = 0, 0, 0
 
     # source
     prm.source = 'potency'
-    prm.ihypo = 11, 11, 11
+    prm.ihypo = 1.5, 1.5, 1.5
+    prm.ihypo = 3.0, 1.5, 1.5
     prm.source1 = 1e10, 1e10, 1e10
     prm.source2 =  0.0,  0.0,  0.0
     prm.pulse = 'delta'
@@ -37,24 +39,32 @@ def test(argv=[]):
         prm.fieldio += [('=w', f, [], f + '.bin')]
 
     # master
+    dtype = 'f'
+    prm.nproc3 = 2, 1, 1
+    prm.nproc3 = 1, 1, 1
+    prm.oplevel = 5
     job = cst.sord.run(
         prm,
         run = 'exec',
         argv = argv,
-        name = 'pml_boundary',
+        name = 'oplevel%s' % prm.oplevel,
         force = True,
+        dtype_f = dtype,
+        build_mpi = False,
     )
 
     # variations
     max_err_all_ = 0.0
-    for i, n in enumerate([(4, 1, 1), (1, 2, 3)]):
-        prm.nproc3 = n
+    for i in 6,:
+        prm.oplevel = i
         job1 = cst.sord.run(
             prm,
             run = 'exec',
             argv = argv,
-            name = 'pml_boundary%s' % i,
+            name = 'oplevel%s' % prm.oplevel,
             force = True,
+            dtype_f = dtype,
+            build_mpi = False,
         )
         max_err_ = 0.0
         for f in cst.sord.fieldnames.volume:

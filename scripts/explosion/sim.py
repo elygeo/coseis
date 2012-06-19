@@ -6,7 +6,7 @@ import os, math
 import numpy as np
 import cst
 prm = cst.sord.parameters()
-s_ = cst.sor.s_
+s_ = cst.sord.s_
 
 # parameters
 prm.nproc3 = 1, 1, 2
@@ -22,12 +22,12 @@ sources = [
 ]
 
 # dimensions
-prm.shape = [
+prm.shape = (
     int(6000.0 / prm.delta[0] + 1.0001),
     int(6000.0 / prm.delta[1] + 1.0001),
     int(6000.0 / prm.delta[2] + 1.0001),
     int(   3.0 / prm.delta[3] + 1.0001),
-]
+)
 
 # material
 rho, vp, vs = 2670.0, 6000.0, 3464.0

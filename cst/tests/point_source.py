@@ -38,7 +38,7 @@ def test(argv=[]):
     for f in cst.sord.fieldnames.volume:
         prm.fieldio += [('=w', f, [], f + '.bin')]
 
-    # single process
+    # master
     job = cst.sord.run(
         prm,
         run = 'exec',
@@ -47,7 +47,7 @@ def test(argv=[]):
         force = True,
     )
 
-    # multiple processes
+    # variations
     max_err_all_ = 0.0
     for i, n in enumerate([(3, 1, 1), (2, 2, 1)]):
         prm.nproc3 = n

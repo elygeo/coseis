@@ -86,7 +86,7 @@ def build(job=None, **kwargs):
             c += shlex.split(job.build_prof)
         if 'g' in job.optimize:
             c += shlex.split(job.build_debug)
-        c += ['-c', s]
+        c += ['-c', '-o', o, s]
         new |= util.make(c, [o], [s] + d)
         objects.append(o)
     c  = shlex.split(job.build_ld)
@@ -96,8 +96,9 @@ def build(job=None, **kwargs):
         c += shlex.split(job.build_prof)
     if 'g' in job.optimize:
         c += shlex.split(job.build_debug)
-    c += objects + shlex.split(job.build_libs)
-    new |= util.make(c, ['sord.x'], objects)
+    o = 'sord.x'
+    c += ['-o', o] + objects + shlex.split(job.build_libs)
+    new |= util.make(c, [o], objects)
 
     # finished
     os.chdir(cwd)
