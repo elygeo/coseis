@@ -13,7 +13,7 @@ MANPATH += /gpfs/vesta_home/gely/local-${ARCH##*-}/man
 @default
 """
 
-core_range = [1, 2, 4, 8, 16]
+core_range = [1, 2, 4, 8, 16, 32]
 maxnodes = 1024
 maxram = 16384
 

@@ -5,7 +5,7 @@ Print binary file statistics. Default data type is 4 byte floating point.
 import os, sys
 import numpy as np
 
-block = 64*1024*1024
+block = 64 * 1024 * 1024
 dtype = 'f'
 args = []
 for a in sys.argv[1:]:
