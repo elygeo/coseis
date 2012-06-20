@@ -24,7 +24,7 @@ new = True            # create new run directory
 force = False         # overwrite previous run directory if present
 stagein = []          # files to copy into run directory
 optimize = 'O'        # 'O': optimize, 'g': debug, 'p': profile
-openmp = False        # compile with OpenMP
+openmp = True         # compile with OpenMP
 dtype = dtype_f = np.dtype('f').str # Numpy data type
 nproc = 1             # number of processes
 nthread = 1           # number of threads per process
@@ -71,11 +71,12 @@ def find(*files):
 
 # build options
 f2py_flags = ''
-build_cc  = find('mpicc', 'gcc') + ' -03 -Wall'
-build_f90 = find('mpif90', 'gfortran') + ' -03 -Wall -fimplicit-none'
-build_ld  = find('mpif90', 'gfortran') + ' -O -Wall'
+build_cc  = find('mpicc', 'gcc')
+build_fc = find('mpif90', 'gfortran') + ' -fimplicit-none'
+build_ld  = find('mpif90', 'gfortran')
 build_mpi = 'mpi' in build_ld
 build_omp = '-fopenmp'
+build_flags = '-O3 -Wall'
 build_prof = '-g -pg'
 build_debug = '-g -fbounds-check -ffpe-trap=invalid,zero,overflow'
 build_real8 = '-fdefault-real-8'
@@ -83,11 +84,11 @@ build_libs = ''
 
 # launch commands
 if build_mpi:
-    #launch = 'OMP_NUM_THREADS={cores} mpiexec -np {nproc} {command}'
-    launch = 'mpiexec -np {nproc} {command}'
+    launch = 'OMP_NUM_THREADS={nthread} mpiexec -np {nproc} {command}\n'
+    #launch = 'mpiexec -np {nproc} {command}'
 else:
-    #launch = 'OMP_NUM_THREADS={cores} {command}'
-    launch = '{command}'
+    launch = 'OMP_NUM_THREADS={nthread} {command}\n'
+    #launch = '{command}'
 submit = ''
 submit2 = ''
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'

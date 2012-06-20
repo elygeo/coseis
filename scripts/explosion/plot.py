@@ -51,7 +51,7 @@ for path in glob.glob(runs):
         r = np.sqrt(x[0] * x[0] + x[1] * x[1] + x[2] * x[2])
 
         # rotation to radial coordinates
-        v = cst.coord.dot2(cst.coord.rotmat(x), v)
+        v = cst.coord.dotmv(cst.coord.rotmat(x), v)
 
         # analytical solution
         n = shape[-1]

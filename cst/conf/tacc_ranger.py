@@ -28,9 +28,10 @@ queue_opts = [
 
 # PGI compilers
 f2py_flags = ''
-build_cc = 'mpicc -Mdclchk -fast -tp barcelona-64'
-build_f90 = 'mpif90 -Mdclchk -fast -tp barcelona-64'
-build_ld = 'mpif90 -Mdclchk -fast -tp barcelona-64'
+build_cc = 'mpicc'
+build_fc = 'mpif90 -Mdclchk'
+build_ld = 'mpif90'
+build_flags = '-fast -tp barcelona-64'
 build_omp = 'FIXME'
 build_prof = '-g -Mprof=func'
 build_debug = '-g -Ktrap=fp -Mbounds'
@@ -38,9 +39,10 @@ build_real8 = '-Mr8'
 
 # intel compilers
 f2py_flags = '--fcompiler=intelem'
-build_cc = 'mpicc -warn-O2 -xW'
-build_f90 = 'mpif90 -warn -O2 -xW -u -std03'
-build_ld = 'mpif90 -warn -O2 -xW -u -std03'
+build_cc = 'mpicc'
+build_fc = 'mpif90 -u -std03'
+build_ld = 'mpif90'
+build_flags = '-warn -O2 -xW'
 build_omp = 'FIXME'
 build_prof = '-g -pg'
 build_debug = '-g -CB -traceback'

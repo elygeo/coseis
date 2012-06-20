@@ -17,7 +17,7 @@ def build(job=None, **kwargs):
     """
     Build SORD code.
     """
-    import os, shlex
+    import os, subprocess
     import numpy as np
     from .. import util
 
@@ -34,7 +34,6 @@ def build(job=None, **kwargs):
         job = util.configure(options=[], **kwargs)
     dtype = np.dtype(job.dtype).str
     dsize = dtype[-1]
-    new = False
     mode = {True: 'mpi', False: 'serial'}[job.build_mpi]
 
     # source files
@@ -65,47 +64,45 @@ def build(job=None, **kwargs):
         'sord.f90',
     ]
 
-    # compile
+    # rules
+    rules = []
     objects = []
     for s in sources:
         base, ext = os.path.splitext(s)
         s = os.path.join('..', s)
         o = base + '.o'
         if ext == '.c':
-            c = shlex.split(job.build_cc)
-            d = []
+            rules += [o + ' : ' + s + '\n	$(cc) $<']
+        elif ext == '.f90':
+            m, d = util.f90modules(s)
+            m = ''.join(' ' + k + '.mod' for k in m)
+            d = ''.join(' ' + k + '.mod' for k in d if k != 'mpi')
+            rules += [o + m + ' : ' + s + d + '\n	$(fc) $<']
         else:
-            c = shlex.split(job.build_f90)
-            if dtype != job.dtype_f:
-                c += shlex.split(job.build_real8)
-            d = util.f90modules(s)[1]
-            d = [k + '.mod' for k in d if k != 'mpi']
-        if job.openmp:
-            c += shlex.split(job.build_omp)
-        if 'p' in job.optimize:
-            c += shlex.split(job.build_prof)
-        if 'g' in job.optimize:
-            c += shlex.split(job.build_debug)
-        c += ['-c', '-o', o, s]
-        new |= util.make(c, [o], [s] + d)
+            raise Exception
         objects.append(o)
-    c  = shlex.split(job.build_ld)
+
+    # make
+    flags = job.build_flags
     if job.openmp:
-        c += shlex.split(job.build_omp)
+        flags += ' ' + job.build_omp
     if 'p' in job.optimize:
-        c += shlex.split(job.build_prof)
+        flags += ' ' + job.build_prof
     if 'g' in job.optimize:
-        c += shlex.split(job.build_debug)
-    o = 'sord.x'
-    c += ['-o', o] + objects + shlex.split(job.build_libs)
-    new |= util.make(c, [o], objects)
+        flags += ' ' + job.build_debug
+    objects = ' \\\n        '.join(objects)
+    m = open('../Makefile.in').read() + '\n\n'.join(rules)
+    m = m.format(
+        image = 'sord.x',
+        objects = objects,
+        flags = flags,
+        **job
+    )
+    open('Makefile', 'w').write(m)
+    subprocess.check_call(['make'])
 
     # finished
     os.chdir(cwd)
-
-    # archive source code
-    if new:
-        util.archive()
 
     return
 
@@ -176,6 +173,7 @@ def stage(prm, name='sord', **kwargs):
     # create run directory
     path = os.path.dirname(__file__)
     job.stagein += os.path.join(path, 'src', 'build', job.command),
+    util.archive()
     f = os.path.join(path, '..', 'build', 'coseis.tgz')
     if os.path.isfile(f):
         job.stagein += f,

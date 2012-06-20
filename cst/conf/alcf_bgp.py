@@ -21,10 +21,11 @@ host_opts = {
     'intrepid':   {'maxnodes': 40960, 'maxtime': 720, 'queue': 'prod'},
 }
 
-build_cc = 'mpixlcc_r -g -O5 -qlist -qreport -qsuppress=cmpmsg -qmaxmem=-1'
-build_f90 = 'mpixlf2003_r -g -O5 -qlist -qreport -qsuppress=cmpmsg -qmaxmem=-1 -qlanglvl=2003pure'
-build_ld = 'mpixlf2003_r -g -O3'
+build_cc = 'mpixlcc_r -qlist -qreport -qsuppress=cmpmsg'
+build_fc = 'mpixlf2003_r -qlist -qreport -qsuppress=cmpmsg -qlanglvl=2003pure'
+build_ld = 'mpixlf2003_r'
 build_omp = '-qsmp=omp'
+build_flags = '-g -O3'
 build_prof = '-g -pg'
 build_debug = '-g -O0 -C'
 build_real8 = '-qrealsize=8'

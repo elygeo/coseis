@@ -39,7 +39,6 @@ def test(argv=[]):
         prm.fieldio += [('=w', f, [], f + '.bin')]
 
     # master
-    dtype = 'f'
     prm.nproc3 = 2, 1, 1
     prm.nproc3 = 1, 1, 1
     prm.oplevel = 5
@@ -49,7 +48,6 @@ def test(argv=[]):
         argv = argv,
         name = 'oplevel%s' % prm.oplevel,
         force = True,
-        dtype_f = dtype,
         build_mpi = False,
     )
 
@@ -63,7 +61,6 @@ def test(argv=[]):
             argv = argv,
             name = 'oplevel%s' % prm.oplevel,
             force = True,
-            dtype_f = dtype,
             build_mpi = False,
         )
         max_err_ = 0.0
@@ -75,7 +72,7 @@ def test(argv=[]):
             dv = v1 - v2
             e = np.abs(dv).max()
             if e:
-                e /= np.abs(v1).max()
+                e = 0.5 * e / (np.abs(v1).max() + np.abs(v2).max())
                 print('%s error: %s' % (f, e))
                 max_err_ = max(max_err_, e)
         print('max error: ', max_err_)

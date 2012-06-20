@@ -9,13 +9,16 @@ prm = cst.sord.parameters()
 s_ = cst.sord.s_
 
 # parameters
+prm.oplevel = 6
 prm.nproc3 = 1, 1, 2
-prm.delta = 200.0, 200.0, 200.0, 0.03
+prm.delta = 50.0, 50.0, 50.0, 0.004
 prm.delta = 100.0, 100.0, 100.0, 0.015
-prm.delta = 50.0, 50.0, 50.0, 0.0075
+prm.delta = 200.0, 200.0, 200.0, 0.03
+prm.delta = 200.0, 200.0, 200.0, 0.016
 prm.bc1 = 1, 1, 1; prm.ihypo = 1.0, 1.0, 1.0
 prm.bc1 = 2, 2, 2; prm.ihypo = 1.5, 1.5, 1.5
 prm.bc2 = 10, 10, 10
+rho, vp, vs = 2670.0, 6000.0, 3464.0
 sources = [
     ('potency', 1.0),
     #('moment', 3*rho*vp*vp - 4*rho*vs*vs),
@@ -30,7 +33,6 @@ prm.shape = (
 )
 
 # material
-rho, vp, vs = 2670.0, 6000.0, 3464.0
 prm.hourglass = 1.0, 1.0
 prm.fieldio = [
     ('=', 'rho', [], rho),
