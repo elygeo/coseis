@@ -37,17 +37,5 @@ for i in power[::-1]:
     n = 2 ** i
     prm.nproc3 = 1, n, n
     prm.shape = points, n * points, n * points, prm.itio
-
-    if 1:
-        prm.shape = points, points, points, prm.itio
-        prm.nproc3 = 1, 1, 1
-        cst.sord.run(prm, name='%s' % i, openmp=False)
-    elif 1:
-        prm.shape = points, points, 2 * points, prm.itio
-        prm.nproc3 = 1, 1, 2
-        cst.sord.run(prm, name='%s' % i, openmp=False)
-    else:
-        prm.shape = points, points, 2 * points, prm.itio
-        prm.nproc3 = 1, 1, 1
-        cst.sord.run(prm, name='%s' % i, openmp=True, nthread=2)
+    cst.sord.run(prm, name='%s' % i, nthread=nthread)
 

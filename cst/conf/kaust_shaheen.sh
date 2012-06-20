@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# @ account_no = k33
+# @ account_no = {account}
 # @ class = {queue}
 # @ job_name = {name}
 # @ bg_size = {nodes}

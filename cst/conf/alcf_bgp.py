@@ -13,7 +13,8 @@ PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
 +git-1.7.6.4
 """
 
-core_range = [1, 2, 4]
+# machine properties
+maxcores = 4
 maxram = 2048
 host_opts = {
     'challenger': {'maxnodes': 512,   'maxtime': 60,  'queue': 'prod-devel'},
@@ -21,21 +22,28 @@ host_opts = {
     'intrepid':   {'maxnodes': 40960, 'maxtime': 720, 'queue': 'prod'},
 }
 
+# compiler options
 build_cc = 'mpixlcc_r -qlist -qreport -qsuppress=cmpmsg'
 build_fc = 'mpixlf2003_r -qlist -qreport -qsuppress=cmpmsg'
 build_ld = 'mpixlf2003_r'
-build_omp = '-qsmp=omp'
-build_flags = '-g -O3'
-build_prof = '-g -pg -qlanglvl=2003pure'
-build_debug = '-g -O0 -C'
+build_prof = '-pg'
+build_debug = '-O0 -C -qlanglvl=2003pure'
 build_real8 = '-qrealsize=8'
 build_libs = '/home/morozov/lib/libmpihpm.a'
 
-launch = 'cobalt-mpirun -mode smp -verbose 2 -np {nproc} -env OMP_NUM_THREADS={nthread} {command}'
-
+# MPI
+nthread = 1
+ppn_range = [1, 2, 4]
+build_flags = '-g -O3'
 launch = 'cobalt-mpirun -mode vn -verbose 2 -np {nproc} {command}'
 
-submit = 'qsub -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script {name}.sh'
+# MPI + OpenMP
+nthread = 4
+ppn_range = [1]
+build_flags = '-g -O3 -qsmp=omp'
+launch = 'cobalt-mpirun -mode smp -verbose 2 -np {nproc} -env OMP_NUM_THREADS={nthread} {command}'
 
+# job submission
+submit = 'qsub -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script {name}.sh'
 submit2 = 'qsub -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script --dependenices {depend} "{name}.sh"'
  

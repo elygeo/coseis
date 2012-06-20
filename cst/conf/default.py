@@ -24,10 +24,9 @@ new = True            # create new run directory
 force = False         # overwrite previous run directory if present
 stagein = []          # files to copy into run directory
 optimize = 'O'        # 'O': optimize, 'g': debug, 'p': profile
-openmp = True         # compile with OpenMP
 dtype = dtype_f = np.dtype('f').str # Numpy data type
 nproc = 1             # number of processes
-nthread = 1           # number of threads per process
+nthread = 0           # number of threads per process
 command = ''          # executable command
 pre = post = ''       # pre and post-processing commands
 depend = ''           # wait for other job to finish. supply job ID to depend.
@@ -41,9 +40,9 @@ host_opts = {}
 system = os.uname()
 queue = ''
 queue_opts = []
-core_range = []
-node_range = []
+ppn_range = []
 maxnodes = 1
+maxcores = 1
 maxram = 0
 pmem = 0
 maxtime = 0
@@ -69,30 +68,28 @@ def find(*files):
             if os.path.isfile(os.path.join(p, f)):
                 return f
 
-# build options
+# compiler options
 f2py_flags = ''
 build_cc  = find('mpicc', 'gcc')
 build_fc = find('mpif90', 'gfortran') + ' -fimplicit-none'
 build_ld  = find('mpif90', 'gfortran')
 build_mpi = 'mpi' in build_ld
-build_omp = '-fopenmp'
-build_flags = '-O3 -Wall'
-build_prof = '-g -pg'
-build_debug = '-g -fbounds-check -ffpe-trap=invalid,zero,overflow'
+build_flags = '-g -O3 -Wall -fopenmp'
+build_prof = '-pg'
+build_debug = '-fbounds-check -ffpe-trap=invalid,zero,overflow'
 build_real8 = '-fdefault-real-8'
 build_libs = ''
 
-# launch commands
+# job submission
 if build_mpi:
-    launch = 'OMP_NUM_THREADS={nthread} mpiexec -np {nproc} {command}\n'
-    #launch = 'mpiexec -np {nproc} {command}'
+    launch = 'mpiexec -np {nproc} {command}'
 else:
-    launch = 'OMP_NUM_THREADS={nthread} {command}\n'
-    #launch = '{command}'
+    launch = '{command}'
 submit = ''
 submit2 = ''
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
 
+# batch script
 script = """\
 #!/bin/sh
 cd "{rundir}"

@@ -1,4 +1,7 @@
-flags = {flags}
+flags = {build_flags} {build_debug}
+flags = {build_flags} {build_real8}
+flags = {build_flags} {build_prof}
+flags = {build_flags}
 cc = {build_cc} $(flags) -c
 fc = {build_fc} $(flags) -c
 ld = {build_ld} $(flags) -o
@@ -7,4 +10,7 @@ objects = {objects}
 
 {image}: $(objects)
 	$(ld) $@ $^ $(libs)
+
+clean:
+	rm -f *.o *.mod *.x *.lst
 

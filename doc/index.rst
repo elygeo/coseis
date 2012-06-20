@@ -38,7 +38,7 @@ __ http://earth.usc.edu/~gely/vs30gtl/
 __ http://structure.harvard.edu/cvm-h/
 
 The primary interface is through a Python module which (for high-performance
-components) wraps Fortran parallelized with MPI.
+components) wraps Fortran parallelized with hybrid OpenMP and MPI.
 
 Coseis is written by `Geoffrey Ely`_ with contributions from Steven Day,
 Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
@@ -63,8 +63,7 @@ Install
 
         brew install git gfortran
 
-    Optionally, install MPICH2_ for multiprocessing, and EPD_ for visualization
-    and analysis.
+    Optionally, install and EPD_ for visualization and analysis. 
 
 1.  Clone the source code from the `Coseis GitHub repository
     <http://github.com/gely/coseis>`__::
@@ -79,7 +78,7 @@ Install
         export PATH="$PATH:$HOME/coseis/bin"
 
 3.  The default default system configuration is generally adequate for simple
-    workstation installs.  Systems with batch schedulers (such as PBS or
+    workstation installs.  Systems with batch schedulers (such as Cobalt, PBS or
     LoadLeveler) require custom configuration to specify system resources, compiler
     options, and scheduler scripts.  Custom configuration modules are located in
     the ``cst/conf/`` directory.  You may create a new module following the
@@ -108,7 +107,6 @@ Install
 .. _Homebrew:    http://mxcl.github.com/homebrew/
 .. _Git:         http://git-scm.com/
 .. _Fortran:     http://r.research.att.com/tools/
-.. _MPICH2:      http://www.mcs.anl.gov/research/projects/mpich2/
 .. _EPD:         http://www.enthought.com/products/epddownload.php
 
 Testing

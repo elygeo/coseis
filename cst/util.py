@@ -301,22 +301,24 @@ def prepare(job=None, **kwargs):
         # addtional job parameters
         job.update(dict(
             nodes = 1,
-            ppn = job.nproc,
             cores = job.nproc,
+            ppn = job.nproc,
             totalcores = job.nproc,
             ram = 0,
             walltime = '',
         ))
 
-        # parallelization
-        if job.core_range:
-            job.nodes = min(job.maxnodes, (job.nproc - 1) // job.core_range[-1] + 1)
-            job.ppn = (job.nproc - 1) // job.nodes + 1
-            for i in job.core_range:
-                job.cores = i
-                if i >= job.ppn:
-                    break
-            job.totalcores = job.nodes * job.core_range[-1]
+        # MPI parallelization
+        r = job.ppn_range
+        if not r:
+            r = range(1, job.maxcores + 1)
+        job.nodes = min(job.maxnodes, (job.nproc - 1) // r[-1] + 1)
+        job.ppn = (job.nproc - 1) // job.nodes + 1
+        for i in r:
+            if i >= job.ppn:
+                break
+        job.ppn = i
+        job.totalcores = job.nodes * job.maxcores
 
         # memory
         if not job.pmem:
@@ -330,7 +332,7 @@ def prepare(job=None, **kwargs):
         sus = job.minutes // 60 * job.totalcores + 1
 
         # if resources exceeded, try another queue
-        if job.core_range and job.ppn > job.cores:
+        if job.ppn_range and job.ppn > job.ppn_range[-1]:
             continue
         if job.maxtime and job.minutes >= job.maxtime:
             continue
@@ -338,15 +340,13 @@ def prepare(job=None, **kwargs):
 
     # messages
     print('Machine: %s' % job.machine)
-    print('Cores: %s of %s' % (job.nproc, job.maxnodes * job.core_range[-1]))
+    print('Cores: %s of %s' % (job.nproc, job.maxnodes * job.maxcores))
     print('Nodes: %s of %s' % (job.nodes, job.maxnodes))
     print('RAM: %sMb of %sMb per node' % (job.ram, job.maxram))
     print('SUs: %s' % sus)
     print('Time limit: ' + job.walltime)
 
     # warnings
-    if job.core_range and job.ppn > job.cores:
-        print('Warning: exceeding available cores per node (%s)' % job.core_range[-1])
     if job.ram and job.ram > job.maxram:
         print('Warning: exceeding available RAM per node (%sMb)' % job.maxram)
     if job.maxtime and job.minutes == job.maxtime:

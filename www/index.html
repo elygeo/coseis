@@ -195,7 +195,7 @@ numerical simulations data sets.</li>
 <li>Utilities for mesh generation, coordinate projection, and visualization.</li>
 </ul>
 <p>The primary interface is through a Python module which (for high-performance
-components) wraps Fortran parallelized with MPI.</p>
+components) wraps Fortran parallelized with hybrid OpenMP and MPI.</p>
 <p>Coseis is written by <a class="reference external" href="http://www.alcf.anl.gov/~gely/">Geoffrey Ely</a> with contributions from Steven Day,
 Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
 <a class="reference external" href="http://opensource.org/licenses/BSD-2-Clause">BSD</a> terms.</p>
@@ -211,8 +211,7 @@ followed by <a class="reference external" href="http://git-scm.com/">Git</a> and
 <pre class="literal-block">
 brew install git gfortran
 </pre>
-<p>Optionally, install <a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH2</a> for multiprocessing, and <a class="reference external" href="http://www.enthought.com/products/epddownload.php">EPD</a> for visualization
-and analysis.</p>
+<p>Optionally, install and <a class="reference external" href="http://www.enthought.com/products/epddownload.php">EPD</a> for visualization and analysis.</p>
 </li>
 <li><p class="first">Clone the source code from the <a class="reference external" href="http://github.com/gely/coseis">Coseis GitHub repository</a>:</p>
 <pre class="literal-block">
@@ -228,7 +227,7 @@ export PATH=&quot;$PATH:$HOME/coseis/bin&quot;
 </pre>
 </li>
 <li><p class="first">The default default system configuration is generally adequate for simple
-workstation installs.  Systems with batch schedulers (such as PBS or
+workstation installs.  Systems with batch schedulers (such as Cobalt, PBS or
 LoadLeveler) require custom configuration to specify system resources, compiler
 options, and scheduler scripts.  Custom configuration modules are located in
 the <tt class="docutils literal">cst/conf/</tt> directory.  You may create a new module following the

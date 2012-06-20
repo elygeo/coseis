@@ -5,11 +5,12 @@ module load GNU
 module load numpy
 """
 
-account = 'k33'
-core_range = [1, 2, 4]
+maxcores = 4
 maxram = 4096
-queue = 'default'
+ppn_range = [1, 2, 4]
 
+account = 'k33'
+queue = 'default'
 queue_opts = [
     ('development', {'maxnodes':  8 * 1024, 'maxtime':   30}),
     ('pset64',      {'maxnodes':  4 * 1024, 'maxtime': 1440}),

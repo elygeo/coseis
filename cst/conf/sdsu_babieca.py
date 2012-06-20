@@ -17,7 +17,7 @@ node48:2
 
 queue = 'workq'
 maxnodes = 40
-core_range = [1, 2]
+maxcores = 2
 maxram = 2048
 rate = 0.5e6
 
