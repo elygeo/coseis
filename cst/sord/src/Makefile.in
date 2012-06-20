@@ -1,0 +1,10 @@
+flags = {flags}
+cc = {build_cc} $(flags) -c
+fc = {build_fc} $(flags) -c
+ld = {build_ld} $(flags) -o
+libs = {build_libs}
+objects = {objects}
+
+{image}: $(objects)
+	$(ld) $@ $^ $(libs)
+
