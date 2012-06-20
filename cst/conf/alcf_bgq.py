@@ -18,12 +18,12 @@ maxnodes = 1024
 maxram = 16384
 
 build_cc = 'mpixlcc_r -qlist -qreport -qsuppress=cmpmsg'
-build_fc = 'mpixlf2003_r -qlist -qreport -qsuppress=cmpmsg -qlanglvl=2003pure'
+build_fc = 'mpixlf2003_r -qlist -qreport -qsuppress=cmpmsg'
 build_ld = 'mpixlf2003_r'
 build_omp = '-qsmp=omp'
 build_flags = '-g -O3'
 build_prof = '-g -pg'
-build_debug = '-g -O0 -qfloat=nofold'
+build_debug = '-g -O0 -qfloat=nofold -qlanglvl=2003pure'
 build_real8 = '-qrealsize=8'
 build_libs = '-lSPI_upci_cnk /home/morozov/HPM/lib/libmpihpm.a /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a'
 

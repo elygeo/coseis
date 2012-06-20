@@ -22,11 +22,11 @@ host_opts = {
 }
 
 build_cc = 'mpixlcc_r -qlist -qreport -qsuppress=cmpmsg'
-build_fc = 'mpixlf2003_r -qlist -qreport -qsuppress=cmpmsg -qlanglvl=2003pure'
+build_fc = 'mpixlf2003_r -qlist -qreport -qsuppress=cmpmsg'
 build_ld = 'mpixlf2003_r'
 build_omp = '-qsmp=omp'
 build_flags = '-g -O3'
-build_prof = '-g -pg'
+build_prof = '-g -pg -qlanglvl=2003pure'
 build_debug = '-g -O0 -C'
 build_real8 = '-qrealsize=8'
 build_libs = '/home/morozov/lib/libmpihpm.a'
