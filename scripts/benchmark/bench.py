@@ -38,5 +38,5 @@ for i in power[::-1]:
     n = 2 ** i
     prm.nproc3 = 1, n, n
     prm.shape = points, n * points, n * points, prm.itio
-    cst.sord.run(prm, name='%s' % i)
+    cst.sord.run(prm, name='%s' % i, minute=20)
 
