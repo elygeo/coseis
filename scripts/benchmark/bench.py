@@ -12,7 +12,7 @@ power = range(6)     # Challenger
 power = range(1)     # Serial
 power = 3,
 points = 100
-points = 200
+points = 250
 
 prm = cst.sord.parameters()
 prm.oplevel = 5
@@ -36,7 +36,7 @@ prm.fieldio = [
 
 for i in power[::-1]:
     n = 2 ** i
-    prm.nproc3 = 1, n, n
+    prm.nproc3 = 2, n, n
     prm.shape = points, n * points, n * points, prm.itio
     cst.sord.run(prm, name='%s' % i, minute=20)
 
