@@ -36,10 +36,10 @@ launch = 'cobalt-mpirun -mode vn -verbose 2 -np {nproc} -env "TAU_METRICS=BGPTIM
 build_cc = 'mpixlcc_r -qlist -qreport -qsuppress=cmpmsg'
 build_fc = 'mpixlf2003_r -qlist -qreport -qsuppress=cmpmsg'
 build_ld = 'mpixlf2003_r'
-build_libs = '/home/morozov/lib/libmpihpm.a'
 
 # MPI
 build_flags = '-g -O3'
+build_libs = '/home/morozov/lib/libmpihpm.a'
 ppn_range = [1, 2, 4]
 nthread = 1
 launch = 'cobalt-mpirun -mode vn -verbose 2 -np {nproc} {command}'
@@ -48,6 +48,7 @@ launch = 'cobalt-mpirun -mode vn -verbose 2 -np {nproc} {command}'
 build_flags = '-g -O0 -qsmp=omp -C -qlanglvl=2003pure'
 build_flags = '-g -O3 -qsmp=omp -qrealsize=8'
 build_flags = '-g -O3 -qsmp=omp'
+build_libs = '/home/morozov/lib/libmpihpm_smp.a'
 ppn_range = [1]
 nthread = 4
 launch = 'cobalt-mpirun -mode smp -verbose 2 -np {nproc} -env OMP_NUM_THREADS={nthread} {command}'
