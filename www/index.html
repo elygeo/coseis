@@ -218,7 +218,7 @@ brew install git gfortran
 git clone git://github.com/gely/coseis.git
 </pre>
 </li>
-<li><p class="first">Set path variables for the Pyhon module and executables. For bash shell,
+<li><p class="first">Set path variables for the Python module and executables. For bash shell,
 with the code located in your home directory (for example) add these lines to
 <tt class="docutils literal">.bash_profile</tt>:</p>
 <pre class="literal-block">
@@ -226,32 +226,19 @@ export PYTHONPATH=&quot;$HOME/coseis&quot;
 export PATH=&quot;$PATH:$HOME/coseis/bin&quot;
 </pre>
 </li>
-<li><p class="first">The default default system configuration is generally adequate for simple
-workstation installs.  Systems with batch schedulers (such as Cobalt, PBS or
-LoadLeveler) require custom configuration to specify system resources, compiler
-options, and scheduler scripts.  Custom configuration modules are located in
-the <tt class="docutils literal">cst/conf/</tt> directory.  You may create a new module following the
-included examples.  To activate a configuration, create a site configuration
-module <tt class="docutils literal">cst/conf/site.py</tt>, and set the  <tt class="docutils literal">machine</tt> parameter to the name of
-the configuration module. For example, put the folling line in <tt class="docutils literal">site.py</tt>:</p>
-<pre class="literal-block">
-machine = 'alcf_bgp'
-</pre>
-<p>Other useful options may be placed in your <tt class="docutils literal">site.py</tt> module.  For example,
-the account for billing of service units, and email address for notifications
-may be specified in <tt class="docutils literal">site.py</tt> module with:</p>
-<pre class="literal-block">
-machine = 'alcf_bgp'
-account = 'your_project_name_here'
-email = 'your.email&#64;address.here'
-</pre>
-</li>
 <li><p class="first">Run the <tt class="docutils literal">setup.py</tt> script to test your configuration. This will display
 all of the configuration parameters:</p>
 <pre class="literal-block">
 python setup.py
 </pre>
-<p>The component tools will compile just-in-time the first time you run them.</p>
+</li>
+<li><p class="first">These parameters may be customized by creating a file <tt class="docutils literal">cst/conf/site.py</tt>.
+For example, the account for billing of service units, and email address for
+notifications may be specified in <tt class="docutils literal">site.py</tt> module with:</p>
+<pre class="literal-block">
+account = 'your_project_name_here'
+email = 'your.email&#64;address.here'
+</pre>
 </li>
 </ol>
 </div>

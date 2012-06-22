@@ -104,5 +104,23 @@ echo "$( date ): {name} started" >> {name}.log
 echo "$( date ): {name} finished" >> {name}.log
 """
 
+# detect machine from the hostname
+for m, h in [
+    ('aclf_bgq', 'vesta.alcf.anl.gov'),
+    ('aclf_bgq', 'cetus.alcf.anl.gov'),
+    ('aclf_bgq', 'mira.alcf.anl.gov'),
+    ('aclf_bgp', 'surveyor.alcf.anl.gov'),
+    ('aclf_bgp', 'challenger.alcf.anl.gov'),
+    ('aclf_bgp', 'intreplid.alcf.anl.gov'),
+    ('usc_hpc', 'hpc-login1.usc.edu'),
+    ('usc_hpc', 'hpc-login2-l.usc.edu'),
+    ('tacc_ranger', 'ranger.tacc.utexas.edu'),
+]:
+    if h in host:
+        machine = m
+        break
+
+# clean up the namespace
+del(m, h)
 del(os, sys, pwd, socket, np, find)
 

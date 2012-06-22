@@ -70,38 +70,24 @@ Install
 
         git clone git://github.com/gely/coseis.git
 
-2.  Set path variables for the Pyhon module and executables. For bash shell,
+2.  Set path variables for the Python module and executables. For bash shell,
     with the code located in your home directory (for example) add these lines to
     ``.bash_profile``::
 
         export PYTHONPATH="$HOME/coseis"
         export PATH="$PATH:$HOME/coseis/bin"
 
-3.  The default default system configuration is generally adequate for simple
-    workstation installs.  Systems with batch schedulers (such as Cobalt, PBS or
-    LoadLeveler) require custom configuration to specify system resources, compiler
-    options, and scheduler scripts.  Custom configuration modules are located in
-    the ``cst/conf/`` directory.  You may create a new module following the
-    included examples.  To activate a configuration, create a site configuration
-    module ``cst/conf/site.py``, and set the  ``machine`` parameter to the name of
-    the configuration module. For example, put the folling line in ``site.py``::
-
-        machine = 'alcf_bgp'
-
-    Other useful options may be placed in your ``site.py`` module.  For example,
-    the account for billing of service units, and email address for notifications
-    may be specified in ``site.py`` module with::
-
-        machine = 'alcf_bgp'
-        account = 'your_project_name_here'
-        email = 'your.email@address.here'
-
-4.  Run the ``setup.py`` script to test your configuration. This will display
+3.  Run the ``setup.py`` script to test your configuration. This will display
     all of the configuration parameters::
 
         python setup.py
 
-    The component tools will compile just-in-time the first time you run them.
+4.  These parameters may be customized by creating a file ``cst/conf/site.py``.
+    For example, the account for billing of service units, and email address for
+    notifications may be specified in ``site.py`` module with::
+
+        account = 'your_project_name_here'
+        email = 'your.email@address.here'
 
 .. _Xcode:       http://itunes.apple.com/us/app/xcode/id497799835
 .. _Homebrew:    http://mxcl.github.com/homebrew/
