@@ -18,7 +18,6 @@ def build(job=None, **kwargs):
     Build SORD code.
     """
     import os, subprocess
-    import numpy as np
     from .. import util
 
     # src directory
@@ -35,34 +34,32 @@ def build(job=None, **kwargs):
         # configure
         if job == None:
             job = util.configure(options=[], **kwargs)
-        dtype = np.dtype(job.dtype).str
-        dsize = dtype[-1]
         mode = {True: 'mpi', False: 'serial'}[job.build_mpi]
 
         # source files
         sources = [
             'globals.f90',
-            'arrays.f90',
             'diff_cn_op.f90',
             'diff_nc_op.f90',
             'hourglass_op.f90',
             'boundary_cond.f90',
             'surf_normals.f90',
             'utilities.f90',
+            'arrays.f90',
             'fortran_io.f90',
             'collective_%s.f90' % mode,
             'field_io_mod.f90',
-            'statistics.f90',
             'parameters.f90',
+            'statistics.f90',
             'setup.f90',
             'grid_generation.f90',
             'material_model.f90',
             'kinematic_source.f90',
-            'dynamic_rupture.f90',
             'material_resample.f90',
             'checkpoint.f90',
             'time_integration.f90',
             'stress.f90',
+            'dynamic_rupture.f90',
             'acceleration.f90',
             'sord.f90',
         ]
@@ -78,9 +75,11 @@ def build(job=None, **kwargs):
                 rules += [o + ' : ' + s + '\n	$(cc) $<']
             elif ext == '.f90':
                 m, d = util.f90modules(s)
-                m = ''.join(' ' + k + '.mod' for k in m)
-                d = ''.join(' ' + k + '.mod' for k in d if k != 'mpi')
-                rules += [o + m + ' : ' + s + d + '\n	$(fc) $<']
+                m = [o] + [k + '.mod' for k in m]
+                d = [s] + [k + '.mod' for k in d if k != 'mpi']
+                m = ' '.join(m)
+                d = ' \\\n        '.join(d)
+                rules += [m + ' : ' + d + '\n	$(fc) $<']
             else:
                 raise Exception
             objects.append(o)

@@ -7,7 +7,7 @@
 #PBS -l walltime={walltime}
 #PBS -e {rundir}/{name}.error
 #PBS -o {rundir}/{name}.output
-#PBS -m abe
+#PBS -m n
 #PBS -V
 
 cd "{rundir}"

@@ -23,7 +23,6 @@ rundir = 'run/{name}' # name of the run directory
 new = True            # create new run directory
 force = False         # overwrite previous run directory if present
 stagein = []          # files to copy into run directory
-optimize = 'O'        # 'O': optimize, 'g': debug, 'p': profile
 dtype = dtype_f = np.dtype('f').str # Numpy data type
 nproc = 1             # number of processes
 nthread = 0           # number of threads per process
@@ -68,26 +67,29 @@ def find(*files):
             if os.path.isfile(os.path.join(p, f)):
                 return f
 
-# compiler options
+# default compiler: GNU
 f2py_flags = ''
 build_cc  = find('mpicc', 'gcc')
 build_fc = find('mpif90', 'gfortran') + ' -fimplicit-none'
 build_ld  = find('mpif90', 'gfortran')
 build_mpi = 'mpi' in build_ld
-build_flags = '-g -O3 -Wall -fopenmp'
-build_prof = '-pg'
-build_debug = '-fbounds-check -ffpe-trap=invalid,zero,overflow'
-build_real8 = '-fdefault-real-8'
 build_libs = ''
+build_flags = '-g -O3 -Wall -fopenmp -fbounds-check -ffpe-trap=invalid,zero,overflow'
+build_flags = '-g -O3 -Wall -fopenmp -fdefault-real-8'
+build_flags = '-g -O3 -Wall -fopenmp -pg'
+build_flags = '-g -O3 -Wall -fopenmp'
 
-# job submission
+# default scheduler: PBS
 if build_mpi:
     launch = 'mpiexec -np {nproc} {command}'
 else:
     launch = '{command}'
-submit = ''
-submit2 = ''
+notify_threshold = 4096
+notify = '-m abe'
+submit_flags = ''
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
+submit = 'qsub {notify} {submit_flags} "{name}.sh"'
+submit2 = 'qsub {notify} -W depend="afterok:{depend}" {submit_flags} "{name}.sh"'
 
 # batch script
 script = """\

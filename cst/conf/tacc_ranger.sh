@@ -8,7 +8,7 @@
 #$ -l h_rt={walltime}
 #$ -e {rundir}/{name}.error
 #$ -o {rundir}/{name}.output
-#$ -m abe
+#$ -m n
 #$ -V
 #$ -wd {rundir}
 

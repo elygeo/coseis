@@ -21,8 +21,6 @@ maxcores = 2
 maxram = 2048
 rate = 0.5e6
 
-launch  = 'mpirun -machinefile $HOME/machinefile -np {nproc} {command}'
-launch  = 'mpiexec -n {nproc} {command}'
-submit  = 'qsub "{name}.sh"'
-submit2 = 'qsub -W depend="afterok:{depend}" "{name}.sh"'
+launch = 'mpirun -machinefile $HOME/machinefile -np {nproc} {command}'
+launch = 'mpiexec -n {nproc} {command}'
 

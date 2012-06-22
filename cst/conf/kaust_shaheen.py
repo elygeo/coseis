@@ -19,5 +19,5 @@ queue_opts = [
 ]
 
 launch = 'mpirun -mode VN -np {nproc} -exe {command}'
-submit = 'llsubmit "{name}.sh"'
+submit = 'llsubmit {submit_flags} "{name}.sh"'
 

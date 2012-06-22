@@ -258,6 +258,12 @@ def configure(*args, **kwargs):
             for k, v in o.items():
                 job[k] = v
 
+    # notification
+    if job.nproc > job.notify_threshold:
+        job.notify = job.notify.format(email=job.email)
+    else:
+        job.notify = ''
+
     return job
 
 
