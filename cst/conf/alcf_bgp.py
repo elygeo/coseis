@@ -11,6 +11,9 @@ PATH += /gpfs/home/gely/local-$HOSTTYPE/bin
 MANPATH += /gpfs/home/gely/local-$HOSTTYPE/man
 PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
 +git-1.7.6.4
++tau-latest
+TAU_MAKEFILE = /soft/apps/tau/tau_latest/bgp/lib/Makefile.tau-bgptimers-mpi-pdt
+TAU_OPTIONS = '-optVerbose -optNoRevert -optCompInst'
 """
 
 # machine properties
@@ -22,7 +25,14 @@ host_opts = {
     'intrepid':   {'maxnodes': 40960, 'maxtime': 720, 'queue': 'prod'},
 }
 
-# compilers
+# TAU
+build_cc = 'tau_cc.sh -qlist -qreport -qsuppress=cmpmsg'
+build_fc = 'tau_f90.sh -qlist -qreport -qsuppress=cmpmsg'
+build_ld = 'tau_f90.sh'
+build_libs = ''
+launch = 'cobalt-mpirun -mode vn -verbose 2 -np {nproc} -env "TAU_METRICS=BGPTIMERS" {command}'
+
+# HPM
 build_cc = 'mpixlcc_r -qlist -qreport -qsuppress=cmpmsg'
 build_fc = 'mpixlf2003_r -qlist -qreport -qsuppress=cmpmsg'
 build_ld = 'mpixlf2003_r'
