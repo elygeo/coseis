@@ -14,6 +14,9 @@ MANPATH += /gpfs/vesta_home/gely/local-${ARCH##*-}/man
 @default
 """
 
+# account name (override in site.py if needed).
+account = 'GroundMotion_esp'
+
 # machine properties
 maxnodes = 1024
 maxcores = 16
