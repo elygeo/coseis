@@ -5,19 +5,19 @@
 #PBS -M {email}
 #PBS -l size={totalcores}
 #PBS -l walltime={walltime}
-#PBS -e {rundir}/{name}.error
-#PBS -o {rundir}/{name}.output
+#PBS -e {rundir}/{code}.error
+#PBS -o {rundir}/{code}.output
 #PBS -m n
 
 cd "{rundir}"
-env >> {name}.env
+env >> {code}.env
 
 lfs setstripe -c 1 .
 [ {nstripe} -ge -1 -a -d hold ] && lfs setstripe -c {nstripe} hold
 
-echo "$( date ): {name} started" >> {name}.log
+echo "$( date ): {code} started" >> {code}.log
 {pre}
 {launch}
 {post}
-echo "$( date ): {name} finished" >> {name}.log
+echo "$( date ): {code} finished" >> {code}.log
 

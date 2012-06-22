@@ -399,12 +399,12 @@ def skeleton(job=None, **kwargs):
         os.makedirs(dest)
 
     # save job
-    f = os.path.join(dest, job.name + '.job.py')
+    f = os.path.join(dest, job.code + '.job.py')
     save(f, job)
 
     # create script
     if job.submit:
-        f = os.path.join(dest, job.name + '.sh')
+        f = os.path.join(dest, job.code + '.sh')
         open(f, 'w').write(job.script)
         os.chmod(f, 0755)
 
@@ -455,9 +455,9 @@ def launch(job=None, **kwargs):
             raise Exception('Submit failed')
         d = re.search(job.submit_pattern, stdout).groupdict()
         job.update(d)
-        save(job.name + '.job.py', job)
+        save(job.code + '.job.py', job)
     else:
-        save(job.name + '.job.py', job)
+        save(job.code + '.job.py', job)
         for c in job.pre, job.launch, job.post:
             print(c)
             if '\n' in c or ';' in c or '|' in c:

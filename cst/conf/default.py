@@ -15,21 +15,22 @@ except:
     email = pwd.getpwuid(os.geteuid())[0]
 
 # job parameters
-name = 'cst'          # configuration name
-verbose = False       # extra diagnostics
-prepare = True        # True: compile code and setup run directory, False: dry run
-run = ''              # 'exec': interactive, 'submit': batch queue
-rundir = 'run/{name}' # name of the run directory
-new = True            # create new run directory
-force = False         # overwrite previous run directory if present
-stagein = []          # files to copy into run directory
-dtype = dtype_f = np.dtype('f').str # Numpy data type
-nproc = 1             # number of processes
-nthread = 0           # number of threads per process
-command = ''          # executable command
-pre = post = ''       # pre and post-processing commands
-depend = ''           # wait for other job to finish. supply job ID to depend.
-minutes = 0           # estimated run time
+code = 'cst'              # code name
+name = 'cst'              # job name
+verbose = False           # extra diagnostics
+prepare = True            # True: setup run directory, False: dry run
+run = ''                  # 'exec': interactive, 'submit': batch queue
+rundir = 'run/{name}'     # name of the run directory
+new = True                # create new run directory
+force = False             # overwrite previous run directory
+stagein = []              # files to copy into run directory
+dtype = np.dtype('f').str # Numpy data type
+nproc = 1                 # number of processes
+nthread = 0               # number of threads per process
+command = ''              # executable command
+pre = post = ''           # pre and post-processing commands
+depend = ''               # job ID to wait for
+minutes = 0               # estimated run time
 
 # machine specific
 machine = ''

@@ -5,14 +5,14 @@
 #PBS -q {queue}
 #PBS -l nodes={nodes}:ppn={ppn}:myri
 #PBS -l walltime={walltime}
-#PBS -e {rundir}/{name}.error
-#PBS -o {rundir}/{name}.output
+#PBS -e {rundir}/{code}.error
+#PBS -o {rundir}/{code}.output
 #PBS -m n
 #PBS -V
 
 cd "{rundir}"
-env > {name}.env
-echo "$( date ): {name} started" >> {name}.log
+env > {code}.env
+echo "$( date ): {code} started" >> {code}.log
 {pre}
 
 export ROMIO_HINTS="{rundir}/romio-hints"
@@ -37,5 +37,5 @@ rsync -rlpt --delete /scratch/job/ .
 rm sync.sh
 
 {post}
-echo "$( date ): {name} finished" >> {name}.log
+echo "$( date ): {code} finished" >> {code}.log
 

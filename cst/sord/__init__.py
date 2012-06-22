@@ -102,7 +102,7 @@ def build(job=None, **kwargs):
 
     return
 
-def stage(prm, name='sord', **kwargs):
+def stage(prm, code='sord', name='sord', **kwargs):
     """
     Stage job
     """
@@ -124,7 +124,7 @@ def stage(prm, name='sord', **kwargs):
     else:
         prm = util.storage(**prm)
     prm = prepare_param(prm)
-    job = util.configure(name=name, **kwargs)
+    job = util.configure(code=code, name=name, **kwargs)
 
     # partition for parallelization
     nx, ny, nz = prm.shape[:3]

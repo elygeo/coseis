@@ -5,11 +5,11 @@ Tally benchmarks
 import os, imp, glob
 import numpy as np
 
-machine = 'ACLF BG/Q'
+label = 'ACLF BG/Q'
 procs = []
 times = []
 
-for path in glob.glob('run/[0-9]*'):
+for path in glob.glob('run/bench[0-9]*'):
     meta = os.path.join(path, 'meta.py')
     meta = imp.load_source('meta', meta)
     f = os.path.join(path, 'prof-8step.bin')
@@ -33,7 +33,7 @@ if 0:
     ax.plot([0, n], [times[0], times[0]], 'k--')[0].set_dashes((4,2))
     ax.set_xticks(range(n))
     ax.set_xticklabels(procs)
-    ax.set_title('SORD weak scaling benchmark - ' + machine)
+    ax.set_title('SORD weak scaling benchmark - ' + label)
     ax.set_xlabel('Cores')
     ax.set_ylabel('Time/step (s)')
     h = 2 * int(np.mean(times) + 0.5)
