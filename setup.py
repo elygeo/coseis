@@ -2,7 +2,7 @@
 if __name__ != '__main__':
     raise Exception('not a module')
 
-import os, sys, shutil, pprint, glob
+import os, sys, pprint, subprocess
 import cst.tests
 
 target = sys.argv[1:]
@@ -28,24 +28,8 @@ elif target == ['build_all']:
     cst.data.engdahl_cat()
     import cst.rspectra
     import cst.trinterp
-elif target == ['clean']:
-    path = os.path.dirname(cst.__file__)
-    for d in [
-        'cst/build',
-        'cst/tests/run',
-        'cst/sord/src/build',
-        'scripts/*/run',
-    ]:
-        for d in glob.glob(d):
-            print('removing %s' % d)
-            shutil.rmtree(d)
-    for d in '', 'conf', 'tests', 'sord', 'cvms':
-        d = os.path.join(path, d)
-        for f in os.listdir(d):
-            e = os.path.splitext(f)[-1]
-            if e in ('.pyc', '.so', '.o', '.x', '.mod', '.ipo', '.il', '.stb', '.sha1'):
-                f = os.path.join(d, f)
-                os.unlink(f)
+elif target == ['realclean']:
+    subprocess.check_call(['git', 'clean', '-xdf'])
 else:
     raise Exception(target)
 

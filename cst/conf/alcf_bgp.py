@@ -16,6 +16,9 @@ TAU_MAKEFILE = /soft/apps/tau/tau_latest/bgp/lib/Makefile.tau-bgptimers-mpi-pdt
 TAU_OPTIONS = '-optVerbose -optNoRevert -optCompInst'
 """
 
+# account name (override in site.py if needed).
+acount = 'GroundMotion_esp'
+
 # machine properties
 maxcores = 4
 maxram = 2048
