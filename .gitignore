@@ -3,12 +3,13 @@
 *.pyc
 *.so
 *.o
-*.x
 *.mod
+*.lst
 *.ipo
 *.il
 *.stb
 *.sha1
+*.x
 run
 tmp
 TODO
