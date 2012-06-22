@@ -42,6 +42,6 @@ launch = 'runjob --exe {command} -n {nproc} -p {ppn} --verbose=INFO --block $COB
 
 # job submission
 notify = '-M {email}'
-submit =  'qsub {notify} -O {name} -A {account} -n {nodes} -t {minutes} --mode script --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes {submit_flags} "{name}.sh"'
-submit2 = 'qsub {notify} -O {name} -A {account} -n {nodes} -t {minutes} --mode script --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes --dependenices {depend} {submit_flags} "{name}.sh"'
+submit =  'qsub {notify} -O {code} -A {account} -n {nodes} -t {minutes} --mode script --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes {submit_flags} "{code}.sh"'
+submit2 = 'qsub {notify} -O {code} -A {account} -n {nodes} -t {minutes} --mode script --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes --dependenices {depend} {submit_flags} "{code}.sh"'
 

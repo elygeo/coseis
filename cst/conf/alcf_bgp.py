@@ -55,6 +55,6 @@ launch = 'cobalt-mpirun -mode smp -verbose 2 -np {nproc} -env OMP_NUM_THREADS={n
 
 # job submission
 notify = '-M {email}'
-submit = 'qsub {notify} -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script {submit_flags} {name}.sh'
-submit2 = 'qsub {notify} -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script --dependenices {depend} {submit_flags} "{name}.sh"'
+submit = 'qsub {notify} -O {code} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script {submit_flags} {code}.sh'
+submit2 = 'qsub {notify} -O {code} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script --dependenices {depend} {submit_flags} "{code}.sh"'
  

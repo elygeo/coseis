@@ -89,19 +89,19 @@ notify_threshold = 4096
 notify = '-m abe'
 submit_flags = ''
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
-submit = 'qsub {notify} {submit_flags} "{name}.sh"'
-submit2 = 'qsub {notify} -W depend="afterok:{depend}" {submit_flags} "{name}.sh"'
+submit = 'qsub {notify} {submit_flags} "{code}.sh"'
+submit2 = 'qsub {notify} -W depend="afterok:{depend}" {submit_flags} "{code}.sh"'
 
 # batch script
 script = """\
 #!/bin/sh
 cd "{rundir}"
-env >> {name}.env
-echo "$( date ): {name} started" >> {name}.log
+env >> {code}.env
+echo "$( date ): {code} started" >> {code}.log
 {pre}
 {launch}
 {post}
-echo "$( date ): {name} finished" >> {name}.log
+echo "$( date ): {code} finished" >> {code}.log
 """
 
 # detect machine from the hostname
