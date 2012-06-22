@@ -8,8 +8,9 @@ vesta.alcf.anl.gov:/gpfs/vesta_scratch/projects/
 PYTHONPATH += $HOME/coseis
 PATH += $HOME/coseis/bin
 PATH += /gpfs/vesta_home/gely/local-${ARCH##*-}/bin
+PATH += /gpfs/vesta_home/gely/local-${ARCH##*-}/epd/bin
 MANPATH += /gpfs/vesta_home/gely/local-${ARCH##*-}/man
-+mpiwrapper-xl.legacy
++mpiwrapper-xl
 @default
 """
 
@@ -31,9 +32,9 @@ nthread = 1
 launch = 'runjob --exe {command} -n {nproc} -p {ppn} --verbose=INFO --block $COBALT_PARTNAME --envs BG_SHAREDMEMSIZE=32MB PAMID_VERBOSE=1 ${{COBALT_CORNER:+--corner}} $COBALT_CORNER ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE VPROF_PROFILE=yes\n'
 
 # MPI + OpenMP
-build_flags = '-g -O0 -qsmp=omp -qfloat=nofold -qlanglvl=2003pure'
-build_flags = '-g -O3 -qsmp=omp -qrealsize=8'
-build_flags = '-g -O3 -qsmp=omp'
+build_flags = '-g -O0 -qsmp=omp:noauto -qfloat=nofold -qlanglvl=2003pure'
+build_flags = '-g -O3 -qsmp=omp:noauto -qrealsize=8'
+build_flags = '-g -O3 -qsmp=omp:noauto'
 build_libs = '-lSPI_upci_cnk /home/morozov/fixes/libc.a /home/morozov/HPM/lib/libmpihpm_smp.a /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a'
 ppn_range = [1]
 nthread = 32
