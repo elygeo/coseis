@@ -4,15 +4,18 @@ Benchmarks
 """
 import cst
 
+# MPI
 power = range(7, 10) # Mira
 power = range(6, 9)  # Intrepid
 power = range(8)     # Vesta, Ranger
 power = range(7)     # Surveyor
 power = range(6)     # Challenger
 power = range(1)     # Serial
-power = 3,
 points = 100
-points = 250
+
+# MPI + OpenMP
+power = 3, # Vesta 128 nodes, 1 ppn, 32 threads
+points = 400
 
 prm = cst.sord.parameters()
 prm.oplevel = 5
