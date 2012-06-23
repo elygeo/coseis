@@ -346,9 +346,11 @@ def prepare(job=None, **kwargs):
 
     # messages
     print('Machine: %s' % job.machine)
-    print('Cores: %s of %s' % (job.nproc, job.maxnodes * job.maxcores))
-    print('Nodes: %s of %s' % (job.nodes, job.maxnodes))
-    print('RAM: %sMb of %sMb per node' % (job.ram, job.maxram))
+    print('Nodes: %s' % job.nodes)
+    print('PPN: %s' % job.ppn)
+    if 'OMP' in job.launch:
+        print('Threads: %s' % job.nthread)
+    print('RAM: %sMb' % job.ram)
     print('SUs: %s' % sus)
     print('Time limit: ' + job.walltime)
 
