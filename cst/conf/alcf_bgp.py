@@ -17,7 +17,7 @@ TAU_OPTIONS = '-optVerbose -optNoRevert -optCompInst'
 """
 
 # account name (override in site.py if needed).
-acount = 'GroundMotion_esp'
+account = 'GroundMotion_esp'
 
 # machine properties
 maxcores = 4
