@@ -55,6 +55,7 @@ options = [
     ('v', 'verbose',     'verbose', True),
     ('f', 'force',       'force',   True),
     ('n', 'dry-run',     'prepare', False),
+    ('s', 'setup',       'run',     ''),
     ('i', 'interactive', 'run',     'exec'),
     ('q', 'queue',       'run',     'submit'),
 ]
@@ -112,6 +113,7 @@ for m, h in [
     ('usc_hpc', 'hpc-login1.usc.edu'),
     ('usc_hpc', 'hpc-login2-l.usc.edu'),
     ('tacc_ranger', 'ranger.tacc.utexas.edu'),
+    ('airy', 'airy'),
 ]:
     if h in host:
         machine = m

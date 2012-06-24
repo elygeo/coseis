@@ -345,14 +345,10 @@ def prepare(job=None, **kwargs):
         break
 
     # messages
-    print('Machine: %s' % job.machine)
-    print('Nodes: %s' % job.nodes)
-    print('PPN: %s' % job.ppn)
-    if 'OMP' in job.launch:
-        print('Threads: %s' % job.nthread)
+    print('Concurrency: %s * %s * %s' % (job.nodes, job.ppn, job.nthread))
     print('RAM: %sMb' % job.ram)
     print('SUs: %s' % sus)
-    print('Time limit: ' + job.walltime)
+    print('Time: ' + job.walltime)
 
     # warnings
     if job.ram and job.ram > job.maxram:
