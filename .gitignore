@@ -10,6 +10,7 @@
 *.stb
 *.sha1
 *.x
+*.dSYM
 run
 tmp
 TODO
