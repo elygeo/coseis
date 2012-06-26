@@ -18,4 +18,4 @@ TODO
 /cst/conf/site.py
 /cst/data
 /cst/build
-/cst/sord/src/build
+/cst/sord/src/Makefile

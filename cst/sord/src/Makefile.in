@@ -4,12 +4,9 @@ LD = {build_ld}
 CFLAGS = {build_cflags}
 FFLAGS = {build_fflags}
 LDFLAGS = {build_ldflags}
-
 LIBS = {build_libs}
-OBJECTS = {objects}
 
-{image}: $(OBJECTS)
-	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+{rules}
 
 clean:
 	rm -f *.o *.mod *.x *.lst

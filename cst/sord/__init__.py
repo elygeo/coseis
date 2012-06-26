@@ -23,9 +23,7 @@ def build(job=None, **kwargs):
     # src directory
     cwd = os.getcwd()
     path = os.path.dirname(__file__)
-    path = os.path.join(path, 'src', 'build')
-    if not os.path.exists(path):
-        os.mkdir(path)
+    path = os.path.join(path, 'src')
     os.chdir(path)
 
     # makefile
@@ -69,7 +67,6 @@ def build(job=None, **kwargs):
         objects = []
         for s in sources:
             base, ext = os.path.splitext(s)
-            s = os.path.join('..', s)
             o = base + '.o'
             if ext == '.c':
                 rules += [o + ' : ' + s + '\n	$(CC) $(CFLAGS) -c $<']
@@ -84,14 +81,12 @@ def build(job=None, **kwargs):
                 raise Exception
             objects.append(o)
         objects = ' \\\n        '.join(objects)
+        rules = ['sord.x : ' + objects + '\n	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)'] + rules
+        rules = '\n\n'.join(rules)
 
         # makefile
-        m = open('../Makefile.in').read() + '\n\n'.join(rules)
-        m = m.format(
-            image = 'sord.x',
-            objects = objects,
-            **job
-        )
+        m = open('Makefile.in').read()
+        m = m.format(rules=rules, **job)
         open('Makefile', 'w').write(m)
 
     # make
@@ -168,7 +163,7 @@ def stage(prm, code='sord', name='sord', **kwargs):
 
     # create run directory
     path = os.path.dirname(__file__)
-    job.stagein += os.path.join(path, 'src', 'build', job.command),
+    job.stagein += os.path.join(path, 'src', job.command),
     util.archive()
     f = os.path.join(path, '..', 'build', 'coseis.tgz')
     if os.path.isfile(f):
