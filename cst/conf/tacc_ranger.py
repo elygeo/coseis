@@ -26,28 +26,30 @@ queue_opts = [
     ('request', {}),
 ]
 
-# compilers
-f2py_flags = '--fcompiler=intelem'
-build_cc = 'mpicc'
-build_fc = 'mpif90 -u -std03'
-build_ld = 'mpif90'
-
 # MPI
-build_flags = '-warn -O2 -xW'
+build_ldflags = '-warn -O2 -xW'
 ppn_range = [1, 2, 4, 8, 12, 15, 16]
 nthread = 1
 launch = 'ibrun -n {nproc} -o 0 {command}'
 launch = 'ibrun {command}'
 
 # MPI + OpenMP
-build_flags = '-warn -O2 -xW -openmp -g -CB -traceback'
-build_flags = '-warn -O2 -xW -openmp -g -pg'
-build_flags = '-warn -O2 -xW -openmp -r8'
-build_flags = '-warn -O2 -xW -openmp'
+build_ldflags = '-warn -O2 -xW -openmp -g -CB -traceback'
+build_ldflags = '-warn -O2 -xW -openmp -g -pg'
+build_ldflags = '-warn -O2 -xW -openmp'
 ppn_range = [1]
 nthread = 16
 launch = 'ibrun -n {nproc} -o 0 {command}'
 launch = 'ibrun {command}'
+
+# compilers
+build_cc = 'mpicc'
+build_fc = 'mpif90'
+build_ld = 'mpif90'
+build_cflags = build_ldflags
+build_fflags = build_ldflags + ' -u -std03 -r8'
+build_fflags = build_ldflags + ' -u -std03'
+f2py_flags = '--fcompiler=intelem'
 
 # job submission
 notify = '-m abe'

@@ -211,7 +211,9 @@ followed by <a class="reference external" href="http://git-scm.com/">Git</a> and
 <pre class="literal-block">
 brew install git gfortran
 </pre>
-<p>Optionally, install and <a class="reference external" href="http://www.enthought.com/products/epddownload.php">EPD</a> for visualization and analysis.</p>
+<p>OpenMP is broken in GCC 4.3 on Lion, so if you need multiprocessing speed-up,
+install either <a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH</a> or a newer <a class="reference external" href="http://gcc.gnu.org/">GCC</a> version.  Optionally, install and <a class="reference external" href="http://www.enthought.com/products/epddownload.php">EPD</a>
+for visualization and analysis.</p>
 </li>
 <li><p class="first">Clone the source code from the <a class="reference external" href="http://github.com/gely/coseis">Coseis GitHub repository</a>:</p>
 <pre class="literal-block">

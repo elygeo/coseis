@@ -70,15 +70,17 @@ def find(*files):
 
 # default compiler: GNU
 f2py_flags = ''
-build_cc  = find('mpicc', 'gcc')
-build_fc = find('mpif90', 'gfortran') + ' -fimplicit-none'
-build_ld  = find('mpif90', 'gfortran')
-build_mpi = 'mpi' in build_ld
+build_cc = find('mpicc', 'gcc')
+build_fc = find('mpif90', 'gfortran')
+build_ld = build_fc
+build_mpi = 'mpi' in build_cc
 build_libs = ''
-build_flags = '-g -O3 -Wall -fopenmp -fbounds-check -ffpe-trap=invalid,zero,overflow'
-build_flags = '-g -O3 -Wall -fopenmp -fdefault-real-8'
-build_flags = '-g -O3 -Wall -fopenmp -pg'
-build_flags = '-g -O3 -Wall -fopenmp'
+build_ldflags = '-g -O3 -Wall -fopenmp -fbounds-check -ffpe-trap=invalid,zero,overflow'
+build_ldflags = '-g -O3 -Wall -fopenmp -pg'
+build_ldflags = '-g -O3 -Wall -fopenmp'
+build_cflags = build_ldflags
+build_fflags = build_ldflags + ' -fimplicit-none -fdefault-real-8'
+build_fflags = build_ldflags + ' -fimplicit-none'
 
 # default scheduler: PBS
 if build_mpi:

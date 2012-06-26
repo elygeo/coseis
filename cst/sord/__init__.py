@@ -72,14 +72,14 @@ def build(job=None, **kwargs):
             s = os.path.join('..', s)
             o = base + '.o'
             if ext == '.c':
-                rules += [o + ' : ' + s + '\n	$(cc) $<']
+                rules += [o + ' : ' + s + '\n	$(CC) $(CFLAGS) -c $<']
             elif ext == '.f90':
                 m, d = util.f90modules(s)
                 m = [o] + [k + '.mod' for k in m]
                 d = [s] + [k + '.mod' for k in d if k != 'mpi']
                 m = ' '.join(m)
                 d = ' \\\n        '.join(d)
-                rules += [m + ' : ' + d + '\n	$(fc) $<']
+                rules += [m + ' : ' + d + '\n	$(FC) $(FFLAGS) -c $<']
             else:
                 raise Exception
             objects.append(o)

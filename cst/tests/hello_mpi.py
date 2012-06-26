@@ -9,7 +9,7 @@ def build():
     o = f + '.x'
     job = cst.util.configure()
     c  = shlex.split(job.build_fc)
-    c += shlex.split(job.build_flags) + ['-o', o, s]
+    c += shlex.split(job.build_fflags) + ['-o', o, s]
     c += shlex.split(job.build_libs)
     cst.util.make(c, [o], [s])
     return

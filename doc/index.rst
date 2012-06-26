@@ -63,7 +63,9 @@ Install
 
         brew install git gfortran
 
-    Optionally, install and EPD_ for visualization and analysis. 
+    OpenMP is broken in GCC 4.3 on Lion, so if you need multiprocessing speed-up,
+    install either MPICH_ or a newer GCC_ version.  Optionally, install and EPD_
+    for visualization and analysis. 
 
 1.  Clone the source code from the `Coseis GitHub repository
     <http://github.com/gely/coseis>`__::
@@ -93,6 +95,8 @@ Install
 .. _Homebrew:    http://mxcl.github.com/homebrew/
 .. _Git:         http://git-scm.com/
 .. _Fortran:     http://r.research.att.com/tools/
+.. _MPICH:       http://www.mcs.anl.gov/research/projects/mpich2/
+.. _GCC:         http://gcc.gnu.org/
 .. _EPD:         http://www.enthought.com/products/epddownload.php
 
 Testing
