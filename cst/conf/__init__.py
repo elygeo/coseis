@@ -2,7 +2,7 @@
 Configuration modules
 """
 
-from . import default, cvms
+from . import default
 
 try:
     from . import site
@@ -13,5 +13,5 @@ except ImportError:
     del(os, f)
     from . import site
 
-site, default, cvms
+site, default
 

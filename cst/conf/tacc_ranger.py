@@ -30,8 +30,6 @@ queue_opts = [
 build_ldflags = '-warn -O2 -xW'
 ppn_range = [1, 2, 4, 8, 12, 15, 16]
 nthread = 1
-launch = 'ibrun -n {nproc} -o 0 {command}'
-launch = 'ibrun {command}'
 
 # MPI + OpenMP
 build_ldflags = '-warn -O2 -xW -openmp -g -CB -traceback'
@@ -39,8 +37,6 @@ build_ldflags = '-warn -O2 -xW -openmp -g -pg'
 build_ldflags = '-warn -O2 -xW -openmp'
 ppn_range = [1]
 nthread = 16
-launch = 'ibrun -n {nproc} -o 0 {command}'
-launch = 'ibrun {command}'
 
 # compilers
 build_cc = 'mpicc'
@@ -52,6 +48,8 @@ build_fflags = build_ldflags + ' -u -std03'
 f2py_flags = '--fcompiler=intelem'
 
 # job submission
+launch = 'ibrun -n {nproc} -o 0 {command}'
+launch = 'ibrun {command}'
 notify = '-m abe'
 submit = 'qsub {notify} {submit_flags} "{code}.sh"'
 submit2 = 'qsub {notify} -hold_jid "{depend}" {submit_flags} "{code}.sh"'

@@ -1,0 +1,8 @@
+FC = {build_fc}
+FFLAGS = {build_fflags}
+LIBS = {build_libs}
+VPATH = ../..
+
+cvms.x : io{mode}.f version{version}.f
+	$(FC) $(FFLAGS) -o $@ $^ $(LIBS)
+

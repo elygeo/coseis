@@ -28,8 +28,8 @@ elif target == ['build_all']:
     cst.data.engdahl_cat()
     import cst.rspectra
     import cst.trinterp
-elif target == ['realclean']:
-    subprocess.check_call(['git', 'clean', '-xdf'])
+elif target[0] == 'clean':
+    subprocess.call(['git', 'clean', '-x'] + target[1:])
 else:
     raise Exception(target)
 

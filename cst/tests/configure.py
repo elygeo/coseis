@@ -2,7 +2,7 @@
 
 def test(argv=[]):
     """
-    Test configuration modules and machines
+    Test configurations
     """
     import os, pprint
     import cst
@@ -15,25 +15,24 @@ def test(argv=[]):
         force = True,
         command = 'COMMAND',
     )
-    for modules in [], [cst.conf.cvms]:
-        for machine in machines:
-            if not machine.endswith('.py'):
-                continue
-            if machine in ['__init__.py', 'default.py', 'site.py', 'cvms.py']:
-                continue
-            machine = machine[:-3]
-            print(80 * '-')
-            print('Machine: ' + machine)
-            cst.conf.default.machine = machine
-            job = cst.util.configure(cst.conf.default, *modules, **kwargs)
-            job = cst.util.prepare(job)
-            job = cst.util.skeleton(job)
-            if job.verbose:
-                print(job.doc)
-                del(job['doc'])
-                pprint.pprint(job)
-                reload(cst.conf.cvms)
-                reload(cst.conf.default)
+    for machine in machines:
+        if not machine.endswith('.py'):
+            continue
+        if machine in ['__init__.py', 'default.py', 'site.py', 'cvms.py']:
+            continue
+        machine = machine[:-3]
+        print(80 * '-')
+        print('Machine: ' + machine)
+        cst.conf.default.machine = machine
+        job = cst.util.configure(cst.conf.default, **kwargs)
+        job = cst.util.prepare(job)
+        job = cst.util.skeleton(job)
+        if job.verbose:
+            print(job.doc)
+            del(job['doc'])
+            pprint.pprint(job)
+            reload(cst.conf.cvms)
+            reload(cst.conf.default)
 
 # continue if command line
 if __name__ == '__main__':
