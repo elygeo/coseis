@@ -15,17 +15,43 @@ input_template = """\
 {file_vs}
 """
 
-def build(job=None, version='4.0', **kwargs):
+def configure(**kwargs):
+    from .. import util
+    job = util.configure(**kwargs)
+    job.update(dict(
+        nsample = 0,
+        minutes = 20,
+        version = '4.0',
+        code = 'cvms',
+        name = 'cvms',
+        stagein = ['hold/'],
+        file_lon = 'hold/lon.bin',
+        file_lat = 'hold/lat.bin',
+        file_dep = 'hold/dep.bin',
+        file_rho = 'hold/rho.bin',
+        file_vp = 'hold/vp.bin',
+        file_vs = 'hold/vs.bin',
+    ))
+    if job.machine.startswith('alcf_bg'):
+        job.build_fflags = '-O3 -qfixed -qsuppress=cmpmsg'
+    elif job.machine == 'tacc_ranger':
+        job.build_fflags = '-O3 -warn -std08'
+    elif job.machine == 'nics_kraken':
+        job.build_fflags = '-fast -Mdclchk'
+    else:
+        job.build_fflags = '-O3 -Wall',
+    return job
+
+def build(**kwargs):
     """
     Build CVM-S code.
     """
-    import os, shlex, urllib, tarfile, subprocess
-    from .. import util, data
+    import os, urllib, tarfile, subprocess
+    from .. import data
 
     # configure
-    if job==None:
-        job = util.configure(options=[], **kwargs)
-    assert version in ('2.2', '3.0', '4.0')
+    job = configure(options=[], **kwargs)
+    assert job.version in ('2.2', '3.0', '4.0')
     ver = 'cvms-' + job.version
 
     # download source code
@@ -56,7 +82,7 @@ def build(job=None, version='4.0', **kwargs):
             mode = 'bin'
         m = os.path.join('..', '..', 'Makefile.in')
         m = open(m).read()
-        m = m.format(version=version, mode=mode, **job)
+        m = m.format(mode=mode, **job)
         open('Makefile', 'w').write(m)
 
     # make
@@ -66,7 +92,7 @@ def build(job=None, version='4.0', **kwargs):
     os.chdir(cwd)
     return
 
-def stage(**kwargs):
+def stage(nsample, **kwargs):
     """
     Stage job
     """
@@ -76,7 +102,7 @@ def stage(**kwargs):
     print('CVM-S setup')
 
     # configure
-    job = util.configure(code='cvms', name='cvms', **kwargs)
+    job = configure(**kwargs)
     job.command = os.path.join('.', 'cvms.x')
     job = util.prepare(job)
     ver = 'cvms-' + job.version
@@ -92,8 +118,8 @@ def stage(**kwargs):
     string = open(f).read()
     pattern = 'ibig *= *([0-9]*)'
     n = int(re.search(pattern, string).groups()[0])
-    minproc = int(job.nsample / n)
-    if job.nsample % n != 0:
+    minproc = int(nsample / n)
+    if nsample % n != 0:
         minproc += 1
     if minproc > job.nproc:
         sys.exit('Need at lease %s processors for this mesh size' % minproc)

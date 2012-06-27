@@ -62,6 +62,7 @@ options = [
 
 # search for files in PATH
 def find(*files):
+    import os
     path = os.environ['PATH'].split(':')
     for f in files:
         for p in path:

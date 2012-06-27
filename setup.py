@@ -2,7 +2,7 @@
 if __name__ != '__main__':
     raise Exception('not a module')
 
-import os, sys, pprint, subprocess
+import sys, pprint, subprocess
 import cst.tests
 
 target = sys.argv[1:]
@@ -28,6 +28,7 @@ elif target == ['build_all']:
     cst.data.engdahl_cat()
     import cst.rspectra
     import cst.trinterp
+    cst
 elif target[0] == 'clean':
     subprocess.call(['git', 'clean', '-x'] + target[1:])
 else:
