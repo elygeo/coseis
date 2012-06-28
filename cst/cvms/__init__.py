@@ -39,54 +39,53 @@ def configure(**kwargs):
     elif job.machine == 'nics_kraken':
         job.build_fflags = '-fast -Mdclchk'
     else:
-        job.build_fflags = '-O3 -Wall',
+        job.build_fflags = '-O3 -Wall'
     return job
 
 def build(**kwargs):
     """
     Build CVM-S code.
     """
-    import os, urllib, tarfile, subprocess
-    from .. import data
+    import os, urllib, tarfile, shutil, subprocess
 
     # configure
     job = configure(options=[], **kwargs)
     assert job.version in ('2.2', '3.0', '4.0')
     ver = 'cvms-' + job.version
 
-    # download source code
-    url = 'http://earth.usc.edu/~gely/cvm-data/%s.tgz' % ver
-    tarball = os.path.join(data.repo, os.path.basename(url))
-    if not os.path.exists(tarball):
-        if not os.path.exists(data.repo):
-            os.makedirs(data.repo)
-        print('Downloading %s' % url)
-        urllib.urlretrieve(url, tarball)
-
     # build directory
     path = os.path.dirname(__file__)
-    bld = os.path.join(path, 'build', ver)
     cwd = os.getcwd()
-    if os.path.isdir(bld):
-        os.chdir(bld)
-    else:
-        os.makedirs(bld)
-        os.chdir(bld)
-        f = tarfile.open(tarball, 'r:gz')
-        f.extractall(bld)
+    d = os.path.join(path, 'build')
+    if not os.path.exists(d):
+        os.mkdir(d)
+    os.chdir(d)
+
+    # download source code
+    u = 'http://earth.usc.edu/~gely/cvm-data/%s.tgz' % ver
+    f = os.path.basename(u)
+    if not os.path.exists(f):
+        print('Downloading %s' % u)
+        urllib.urlretrieve(u, f)
+
+    # build
+    if not os.path.exists(ver):
+        os.mkdir(ver)
+        os.chdir(ver)
+        f = os.path.join(path, 'build', f)
+        tarfile.open(f, 'r:gz').extractall()
         f = os.path.join(path, ver + '.patch')
         subprocess.check_call(['patch', '-p1', '-i', f])
         if job.build_mpi:
             mode = 'mpi'
         else:
             mode = 'bin'
-        m = os.path.join('..', '..', 'Makefile.in')
-        m = open(m).read()
-        m = m.format(mode=mode, **job)
+        f = os.path.join(path, 'io%s.f' % mode)
+        shutil.copy2(f, '.')
+        m = os.path.join(path, 'Makefile.in')
+        m = open(m).read().format(mode=mode, **job)
         open('Makefile', 'w').write(m)
-
-    # make
-    subprocess.check_call(['make'])
+        subprocess.check_call(['make'])
 
     # finished
     os.chdir(cwd)
