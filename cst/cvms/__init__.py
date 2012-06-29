@@ -16,40 +16,23 @@ input_template = """\
 """
 
 def configure(**kwargs):
-    from .. import util
-    job = util.configure(**kwargs)
-    job.update(dict(
-        nsample = 0,
-        minutes = 20,
-        version = '4.0',
-        code = 'cvms',
-        name = 'cvms',
-        stagein = ['hold/'],
-        file_lon = 'hold/lon.bin',
-        file_lat = 'hold/lat.bin',
-        file_dep = 'hold/dep.bin',
-        file_rho = 'hold/rho.bin',
-        file_vp = 'hold/vp.bin',
-        file_vs = 'hold/vs.bin',
-    ))
-    if job.machine.startswith('alcf_bg'):
-        job.build_fflags = '-O3 -qfixed -qsuppress=cmpmsg'
-    elif job.machine == 'tacc_ranger':
-        job.build_fflags = '-O3 -warn -std08'
-    elif job.machine == 'nics_kraken':
-        job.build_fflags = '-fast -Mdclchk'
-    else:
-        job.build_fflags = '-O3 -Wall'
+    from .. import util, conf
+    from . import conf as conf_local
+    job = util.configure(conf.default, conf.site, conf_local, **kwargs)
+    for k, v in job.build_cvms.items():
+        if k in job.host:
+            job.build_fflags = v
     return job
 
-def build(**kwargs):
+def build(job=None, **kwargs):
     """
     Build CVM-S code.
     """
     import os, urllib, tarfile, shutil, subprocess
 
     # configure
-    job = configure(options=[], **kwargs)
+    if job == None:
+        job = configure(options=[], **kwargs)
     assert job.version in ('2.2', '3.0', '4.0')
     ver = 'cvms-' + job.version
 
@@ -91,7 +74,7 @@ def build(**kwargs):
     os.chdir(cwd)
     return
 
-def stage(nsample, **kwargs):
+def stage(**kwargs):
     """
     Stage job
     """
@@ -117,8 +100,8 @@ def stage(nsample, **kwargs):
     string = open(f).read()
     pattern = 'ibig *= *([0-9]*)'
     n = int(re.search(pattern, string).groups()[0])
-    minproc = int(nsample / n)
-    if nsample % n != 0:
+    minproc = int(job.nsample / n)
+    if job.nsample % n != 0:
         minproc += 1
     if minproc > job.nproc:
         sys.exit('Need at lease %s processors for this mesh size' % minproc)
@@ -140,8 +123,8 @@ def stage(nsample, **kwargs):
             elif os.path.exists(ff):
                 os.remove(ff)
 
-    # process machine templates
-    util.skeleton(job)
+    # set up job
+    util.skeleton(job, force=False, new=False)
 
     # save input file and configuration
     f = os.path.join(job.rundir, 'cvms-input')
