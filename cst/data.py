@@ -10,6 +10,8 @@ Data retrieval and processing tools.
 # data repository location
 import os
 repo = os.path.join(os.path.dirname(__file__), 'data')
+if not os.path.exists(repo):
+    os.mkdir(repo)
 del(os)
 
 def upsample(f):
@@ -305,7 +307,7 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
     import os, urllib, zipfile, cStringIO
     import numpy as np
 
-    url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.0/gshhs_2.0.zip'
+    url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.2.0/gshhs+wdbii_2.2.0.zip'
     d = os.path.join(repo, 'gshhs')
     if not os.path.exists(d):
         print('Downloading %s' % url)

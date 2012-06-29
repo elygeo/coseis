@@ -1,5 +1,4 @@
 #!/usr/bin/env ipython -i --gui=wx
-#!/usr/bin/env python
 """
 Reproduce Magistrale (2000) Fig. 10 fence diagram.
 """
@@ -76,7 +75,7 @@ if transpose:
 if model == 'cvmh':
     ss = cst.cvmh.extract(xx, yy, zz, prop)
 else:
-    ss = cst.cvms.extract(xx, yy, zz, prop, version=version)
+    ss = cst.cvms.extract(xx, yy, zz, prop, version=version)[0]
 if transpose:
     xx, yy, zz, ss = xx.T, yy.T, zz.T, ss.T
 xx, yy = proj(xx, yy)
@@ -110,7 +109,10 @@ for n in nn:
 # plot coastline
 extent = (-120.0, -117.0), (33.0, 35.0)
 x, y = cst.data.mapdata('coastlines', 'high', extent, 10.0)
+i = np.isnan(x)
 x, y = proj(x, y)
+x[i] = np.nan
+y[i] = np.nan
 z = np.zeros_like(x)
 mlab.plot3d(x, y, z, color=(0,0,0), line_width=0.5, tube_radius=None)
 
@@ -124,4 +126,6 @@ if not os.path.exists('run'):
 f = os.path.join('run', '%s-%s-fence.png' % (model, prop))
 print f
 mlab.savefig(f, magnification=1)
+fig.scene.disable_render = False
+mlab.show()
 
