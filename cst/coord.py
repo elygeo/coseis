@@ -204,7 +204,7 @@ def slip_vectors(strike, dip, rake, dtype=None):
     world coordinates.  Columns of R are axis unit vectors of the world space in
     fault local coordinates.  Rows of R are axis unit vectors of the fault local
     space in world coordinates, that can be unpacked by:
-    n_slip1, n_slip2, n_normal = slipvectors(strike, dip, rake)
+    n_slip1, n_slip2, n_normal = slip_vectors(strike, dip, rake)
     """
     return euler_rotation(90 - strike, dip, rake)
 
@@ -354,13 +354,17 @@ def potency_tensor(normal, slip):
     Given a fault unit normal and a slip vector, return a symmetric potency tensor as
     volume components (W11, W22, W33), and shear components (W23, W31, W12).
     """
-    import numpy as np
-    p = np.array([ normal * slip, [
-        0.5 * (normal[1] * slip[2] + slip[1] * normal[2]),
-        0.5 * (normal[2] * slip[0] + slip[2] * normal[0]),
-        0.5 * (normal[0] * slip[1] + slip[0] * normal[1]),
-    ]])
-    return p
+    v = [
+        normal[0] * slip[0],
+        normal[1] * slip[1],
+        normal[2] * slip[2],
+    ]
+    s = [
+        0.5 * (normal[1] * slip[2] + normal[2] * slip[1]),
+        0.5 * (normal[2] * slip[0] + normal[0] * slip[2]),
+        0.5 * (normal[0] * slip[1] + normal[1] * slip[0]),
+    ]
+    return [v, s]
 
 
 def compass(azimuth, radians=False):
