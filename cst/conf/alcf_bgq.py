@@ -7,9 +7,8 @@ vesta.alcf.anl.gov:/gpfs/vesta_scratch/projects/
 .soft:
 PYTHONPATH += $HOME/coseis
 PATH += $HOME/coseis/bin
-PATH += /gpfs/vesta_home/gely/local-${ARCH##*-}/bin
-PATH += /gpfs/vesta_home/gely/local-${ARCH##*-}/epd/bin
-MANPATH += /gpfs/vesta_home/gely/local-${ARCH##*-}/man
+PATH += /gpfs/vesta_home/gely/local/${ARCH##*-}/bin
+MANPATH += /gpfs/vesta_home/gely/local/${ARCH##*-}/man
 +mpiwrapper-xl
 @default
 """

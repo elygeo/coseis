@@ -7,8 +7,9 @@ challenger.alcf.anl.gov:/intrepid-fs0/$USER/persistent
 .softevnrc:
 PYTHONPATH += $HOME/coseis
 PATH += $HOME/coseis/bin
-PATH += /gpfs/home/gely/local-$HOSTTYPE/bin
-MANPATH += /gpfs/home/gely/local-$HOSTTYPE/man
+PATH += /gpfs/home/projects/epd/$HOSTTYPE/bin
+PATH += /gpfs/home/gely/local/$HOSTTYPE/bin
+MANPATH += /gpfs/home/gely/local/$HOSTTYPE/man
 PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
 +git-1.7.6.4
 +tau-latest
