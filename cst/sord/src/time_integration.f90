@@ -8,6 +8,7 @@ use globals
 use utilities
 use field_io_mod
 use statistics
+integer :: i, j, k, l
 
 ! status
 if (master) then
@@ -31,7 +32,16 @@ end if
 
 ! velocity time integration
 tm = tm0 + dt * (it - 1) - dt * 0.5
-vv = vv + dt * w1
+do i = 1, 3
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 1, nm(3)
+    do k = 1, nm(2)
+    do j = 1, nm(1)
+        vv(j,k,l,i) = vv(j,k,l,i) + dt * w1(j,k,l,i)
+    end do
+    end do
+    end do
+end do
 call field_io('<>', 'v1', vv(:,:,:,1))
 call field_io('<>', 'v2', vv(:,:,:,2))
 call field_io('<>', 'v3', vv(:,:,:,3))
@@ -45,7 +55,16 @@ call field_io('>', 'vm2', s1)
 
 ! displacement time integration
 tm = tm0 + dt * (it - 1)
-uu = uu + dt * vv
+do i = 1, 3
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 1, nm(3)
+    do k = 1, nm(2)
+    do j = 1, nm(1)
+        uu(j,k,l,i) = uu(j,k,l,i) + dt * vv(j,k,l,i)
+    end do
+    end do
+    end do
+end do
 call field_io('<>', 'u1', uu(:,:,:,1))
 call field_io('<>', 'u2', uu(:,:,:,2))
 call field_io('<>', 'u3', uu(:,:,:,3))

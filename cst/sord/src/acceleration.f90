@@ -106,9 +106,23 @@ end select
 
 ! add contribution to force vector
 if (ic == id) then
-    w1(:,:,:,ic) = s1
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 1, nm(3)
+    do k = 1, nm(2)
+    do j = 1, nm(1)
+        w1(j,k,l,ic) = s1(j,k,l)
+    end do
+    end do
+    end do
 else
-    w1(:,:,:,ic) = w1(:,:,:,ic) + s1
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 1, nm(3)
+    do k = 1, nm(2)
+    do j = 1, nm(1)
+        w1(j,k,l,ic) = w1(j,k,l,ic) + s1(j,k,l)
+    end do
+    end do
+    end do
 end if
 
 end do doid
@@ -118,7 +132,16 @@ end do doic
 if (any(hourglass > 0.0)) then
 call set_halo(s1, 0.0, i1cell, i2cell)
 call set_halo(s2, 0.0, i1node, i2node)
-w2 = hourglass(1) * uu + dt * hourglass(2) * vv
+do i = 1, 3
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 1, nm(3)
+    do k = 1, nm(2)
+    do j = 1, nm(1)
+        w2(j,k,l,i) = hourglass(1) * uu(j,k,l,i) + dt * hourglass(2) * vv(j,k,l,i)
+    end do
+    end do
+    end do
+end do
 do iq = 1, 4
 do ic = 1, 3
     i1 = max(i1pml,     i1cell)
@@ -164,7 +187,14 @@ do ic = 1, 3
             call hourglass_cn(s2, s1, iq, i1, i2)
         end do
     end if
-    w1(:,:,:,ic) = w1(:,:,:,ic) - s2
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 1, nm(3)
+    do k = 1, nm(2)
+    do j = 1, nm(1)
+        w1(j,k,l,ic) = w1(j,k,l,ic) - s2(j,k,l)
+    end do
+    end do
+    end do
 end do
 end do
 end if
@@ -199,7 +229,14 @@ call field_io('>', 'f3', w1(:,:,:,3))
 
 ! Newton's law: a_i = f_i / m
 do i = 1, 3
-    w1(:,:,:,i) = w1(:,:,:,i) * mr
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 1, nm(3)
+    do k = 1, nm(2)
+    do j = 1, nm(1)
+        w1(j,k,l,i) = w1(j,k,l,i) * mr(j,k,l)
+    end do
+    end do
+    end do
 end do
 
 ! acceleration I/O

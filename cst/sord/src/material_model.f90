@@ -8,24 +8,24 @@ use globals
 use collective
 use utilities
 use field_io_mod
-real :: max_l(14), max_g(14), vmin, vmax, cfl1, cfl2
-integer :: i1(3), i2(3), j1, k1, l1, j2, k2, l2
+real :: max_l(14), max_g(14), vmin, vmax, cfl1, cfl2, r, s
+integer :: i1(3), i2(3), j1, k1, l1, j2, k2, l2, j, k, l
 
 if (master) write (*, '(a)') 'Material model'
 
 ! init
-mr = 0.0
-lam = 0.0
-mu = 0.0
-gam = 0.0
+call r3fill(mr, 0.0)
+call r3fill(lam, 0.0)
+call r3fill(mu, 0.0)
+call r3fill(gam, 0.0)
 
 ! inputs
 call field_io('<', 'rho', mr)
 call field_io('<', 'vp',  lam)
 call field_io('<', 'vs',  mu)
 call field_io('<', 'gam', gam)
-s1 = lam
-s2 = mu
+call r3copy(lam, s1)
+call r3copy(mu, s2)
 
 ! limits
 if (rho1 > 0.0) call r30max(mr, rho1)
@@ -37,9 +37,18 @@ if (vs2  > 0.0) call r30min(s2, vs2)
 
 ! velocity dependent viscosity
 if (vdamp > 0.0) then
-    gam = s2
-    call r3invert(gam)
-    gam = gam * vdamp
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 1, nm(3)
+    do k = 1, nm(2)
+    do j = 1, nm(1)
+        if (s2(j,k,l) == 0.0) then
+            gam(j,k,l) = 0.0
+        else
+            gam(j,k,l) = vdamp / s2(j,k,l)
+        end if
+    end do
+    end do
+    end do
 end if
 
 ! limits
@@ -57,13 +66,21 @@ call set_halo(s2,  0.0, i1cell, i2cell)
 call set_halo(gam, 0.0, i1cell, i2cell)
 
 ! elastic moduli
-mu  = mr * s2 * s2
-lam = mr * s1 * s1 - 2.0 * mu
-
-! Poisson ratio
-yy = lam + mu
-call r3invert(yy)
-yy = 0.5 * lam * yy
+!$omp parallel do schedule(static) private(j, k, l)
+do l = 1, nm(3)
+do k = 1, nm(2)
+do j = 1, nm(1)
+    mu(j,k,l)  = mr(j,k,l) * s2(j,k,l) * s2(j,k,l)
+    lam(j,k,l) = mr(j,k,l) * s1(j,k,l) * s1(j,k,l) - 2.0 * mu(j,k,l)
+    r = lam(j,k,l) + mu(j,k,l)
+    if (r == 0.0) then
+        yy(j,k,l) = 0.0
+    else
+        yy(j,k,l) = 0.5 * lam(j,k,l) / r
+    end if
+end do
+end do
+end do
 
 ! non-overlapping cell indices
 i1 = max(i1core, i1bc)
@@ -100,10 +117,20 @@ call field_io('>', 'mu',  mu)
 call field_io('>', 'nu',  yy)
 
 ! hourglass constant
-yy = 12.0 * (lam + 2.0 * mu)
-call r3invert(yy)
-yy = yy * sqrt(sum(dx * dx) / 3.0) * mu * (lam + mu)
-!yy = 0.3 / 16.0 * (lam + 2.0 * mu) * sqrt(sum(dx * dx) / 3.0) ! like Ma & Liu, 2006
+s = sqrt((dx(1) * dx(1) + dx(2) * dx(2) + dx(3) * dx(3)) / 3.0) / 12.0
+!$omp parallel do schedule(static) private(j, k, l)
+do l = 1, nm(3)
+do k = 1, nm(2)
+do j = 1, nm(1)
+    r = lam(j,k,l) + 2.0 * mu(j,k,l)
+    if (r == 0.0) then
+        yy(j,k,l) = 0.0
+    else
+        yy(j,k,l) = mu(j,k,l) * (lam(j,k,l) + mu(j,k,l)) * s / r
+    end if
+end do
+end do
+end do
 
 ! global maxima
 call rreduce1(max_g, max_l, 'allmax', (/0, 0, 0/))
@@ -117,8 +144,9 @@ end if
 
 ! Courant condition
 vmax = max_g(9)
-cfl1 = dt * vmax * sqrt(3.0 / sum(dx * dx))
-cfl2 = dt * vmax * 3.0 / sqrt(sum(dx * dx))
+r = dx(1) * dx(1) + dx(2) * dx(2) + dx(3) * dx(3)
+cfl1 = dt * vmax * sqrt(3.0 / r)
+cfl2 = dt * vmax * 3.0 / sqrt(r)
 
 ! output statistics
 if (master) then
@@ -144,14 +172,15 @@ end subroutine
 subroutine init_pml
 use globals
 integer :: i
-real :: c1, c2, c3, damp, dampn, dampc, tune
+real :: c1, c2, c3, damp, dampn, dampc, tune, r
 
 if (npml < 1) return
 c1 =  8.0 / 15.0
 c2 = -3.0 / 100.0
 c3 =  1.0 / 1500.0
 tune = 3.5
-damp = tune * vpml / sqrt(sum(dx * dx) / 3.0) * (c1 + (c2 + c3 * npml) * npml) / npml ** ppml
+r = dx(1) * dx(1) + dx(2) * dx(2) + dx(3) * dx(3)
+damp = tune * vpml / sqrt(r / 3.0) * (c1 + (c2 + c3 * npml) * npml) / npml ** ppml
 do i = 1, npml
     dampn = damp *  i ** ppml
     dampc = damp * (i ** ppml + (i - 1) ** ppml) * 0.5

@@ -3,11 +3,60 @@ module utilities
 implicit none
 contains
 
+! array copy
+subroutine r3copy(f, g)
+real, intent(in) :: f(:,:,:)
+real, intent(out) :: g(:,:,:)
+integer :: n(3), j, k, l
+n = (/ size(f,1), size(f,2), size(f,3) /)
+!$omp parallel do schedule(static) private(j, k, l)
+do l = 1, n(3)
+do k = 1, n(2)
+do j = 1, n(1)
+    g(j,k,l) = f(j,k,l)
+end do
+end do
+end do
+end subroutine
+
+! array fill
+subroutine r3fill(f, r)
+real, intent(inout) :: f(:,:,:)
+real, intent(in) :: r
+integer :: n(3), j, k, l
+n = (/ size(f,1), size(f,2), size(f,3) /)
+!$omp parallel do schedule(static) private(j, k, l)
+do l = 1, n(3)
+do k = 1, n(2)
+do j = 1, n(1)
+    f(j,k,l) = r
+end do
+end do
+end do
+end subroutine
+
+! array scale
+subroutine r3scale(f, r)
+real, intent(inout) :: f(:,:,:)
+real, intent(in) :: r
+integer :: n(3), j, k, l
+n = (/ size(f,1), size(f,2), size(f,3) /)
+!$omp parallel do schedule(static) private(j, k, l)
+do l = 1, n(3)
+do k = 1, n(2)
+do j = 1, n(1)
+    f(j,k,l) = f(j,k,l) * r
+end do
+end do
+end do
+end subroutine
+
 ! array reciprocal
 subroutine r3invert(f)
 real, intent(inout) :: f(:,:,:)
 integer :: n(3), j, k, l
 n = (/ size(f,1), size(f,2), size(f,3) /)
+!$omp parallel do schedule(static) private(j, k, l)
 do l = 1, n(3)
 do k = 1, n(2)
 do j = 1, n(1)
@@ -23,6 +72,7 @@ real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
 integer :: n(3), j, k, l
 n = (/ size(f,1), size(f,2), size(f,3) /)
+!$omp parallel do schedule(static) private(j, k, l)
 do l = 1, n(3)
 do k = 1, n(2)
 do j = 1, n(1)
@@ -38,6 +88,7 @@ real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
 integer :: n(3), j, k, l
 n = (/ size(f,1), size(f,2), size(f,3) /)
+!$omp parallel do schedule(static) private(j, k, l)
 do l = 1, n(3)
 do k = 1, n(2)
 do j = 1, n(1)
@@ -55,6 +106,7 @@ integer, intent(in) :: i1(3), i2(3)
 integer :: n(3), j, k, l
 n = (/ size(r,1), size(r,2), size(r,3) /)
 if (any(i1 < 1 .or. i2 > n)) stop 'error in radius'
+!$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
@@ -75,6 +127,7 @@ integer, intent(in) :: i1(3), i2(3), d
 integer :: n(3), j, k, l
 n = (/ size(f1,1), size(f1,2), size(f1,3) /)
 if (any(i1 < 1 .or. i2 > n)) stop 'error in average'
+!$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
@@ -114,6 +167,7 @@ integer, intent(in) :: i1(3), i2(3), di(3)
 integer :: n(3), j, k, l
 n = (/ size(f,1), size(f,2), size(f,3) /)
 if (any(i1 < 1 .or. i2 > n)) stop 'error in vector_norm'
+!$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3), di(3)
 do k = i1(2), i2(2), di(2)
 do j = i1(1), i2(1), di(1)
@@ -134,6 +188,7 @@ integer, intent(in) :: i1(3), i2(3), di(3)
 integer :: n(3), j, k, l
 n = (/ size(f,1), size(f,2), size(f,3) /)
 if (any(i1 < 1 .or. i2 > n)) stop 'error in tensor_norm'
+!$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3), di(3)
 do k = i1(2), i2(2), di(2)
 do j = i1(1), i2(1), di(1)
@@ -165,6 +220,7 @@ d = di(1)
 do i = 1, d - 1
     h1 = 1.0 / d * i
     h2 = 1.0 / d * (d - i)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3), di(3)
     do k = i1(2), i2(2), di(2)
     do j = i1(1), i2(1) - d, d
@@ -177,6 +233,7 @@ d = di(2)
 do i = 1, d - 1
     h1 = 1.0 / d * i
     h2 = 1.0 / d * (d - i)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3), di(1)
     do k = i1(2), i2(2) - d, d
     do j = i1(1), i2(1)
@@ -189,6 +246,7 @@ d = di(3)
 do i = 1, d - 1
     h1 = 1.0 / d * i
     h2 = 1.0 / d * (d - i)
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = i1(3), i2(3) - d, d
     do k = i1(2), i2(2)
     do j = i1(1), i2(1)

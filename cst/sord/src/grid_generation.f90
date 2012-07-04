@@ -108,6 +108,7 @@ end if
 
 ! affine grid transformation
 m = affine
+!$omp parallel do schedule(static) private(j, k, l)
 do l = 1, nm(3)
 do k = 1, nm(2)
 do j = 1, nm(1)
@@ -216,6 +217,7 @@ case (6)
     h = sign(1.0 / 12.0, product(dx))
     b = modulo(i, 3) + 1
     c = modulo(i + 1, 3) + 1
+    !$omp parallel do schedule(static) private(j, k, l)
     do l = 1, nm(3)-1
     do k = 1, nm(2)-1
     do j = 1, nm(1)-1
