@@ -345,8 +345,10 @@ def prepare(job=None, **kwargs):
         break
 
     # messages
-    print('Concurrency: %s * %s * %s' % (job.nodes, job.ppn, job.nthread))
-    print('RAM: %sMb' % job.ram)
+    print('Nodes: %s' % job.nodes)
+    print('Procs per node: %s' % job.ppn)
+    print('Threads per node: %s' % job.nthread)
+    print('RAM per node: %sMb' % job.ram)
     print('SUs: %s' % sus)
     print('Time: ' + job.walltime)
 
