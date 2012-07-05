@@ -65,32 +65,29 @@ def build(job=None, **kwargs):
         # rules
         rules = []
         objects = []
-        for s in sources:
+        for s in sources[::-1]:
             base, ext = os.path.splitext(s)
             o = base + '.o'
             if ext == '.c':
                 rules += [o + ' : ' + s + '\n	$(CC) $(CFLAGS) -c $<']
             elif ext == '.f90':
-                m, d = util.f90modules(s)
-                m = [o] + [k + '.mod' for k in m]
+                d = util.f90modules(s)[1]
                 d = [s] + [k + '.mod' for k in d if k != 'mpi']
-                m = ' '.join(m)
                 d = ' \\\n        '.join(d)
-                rules += [m + ' : ' + d + '\n	$(FC) $(FFLAGS) -c $<']
+                rules += [o + ' : ' + d + '\n	$(FC) $(FFLAGS) -c $<']
             else:
                 raise Exception
             objects.append(o)
         objects = ' \\\n        '.join(objects)
-        rules = ['sord.x : ' + objects + '\n	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)'] + rules
-        rules = '\n\n'.join(rules)
+        rules = '	\n\n'.join(rules)
 
         # makefile
         m = open('Makefile.in').read()
-        m = m.format(rules=rules, **job)
+        m = m.format(objects=objects, rules=rules, mode=mode, **job)
         open('Makefile', 'w').write(m)
 
     # make
-    subprocess.check_call(['make'])
+    subprocess.check_call(['make', '-j', '2'])
 
     # finished
     os.chdir(cwd)

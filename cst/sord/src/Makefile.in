@@ -6,8 +6,17 @@ FFLAGS = {build_fflags}
 LDFLAGS = {build_ldflags}
 LIBS = {build_libs}
 
+sord.x : {objects}
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+
 {rules}
 
-clean:
+collective.mod : collective_{mode}.o
+	@true   
+
+%.mod : %.o
+	@true
+
+clean :
 	rm -f *.o *.mod *.x *.lst
 

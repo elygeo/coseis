@@ -16,7 +16,14 @@ if (verb) write (*, '(a)') 'Stress'
 
 ! modified displacement
 do i = 1, 3
-    w1(:,:,:,i) = uu(:,:,:,i) + gam * vv(:,:,:,i)
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 1, nm(3)
+    do k = 1, nm(2)
+    do j = 1, nm(1)
+        w1(j,k,l,i) = uu(j,k,l,i) + gam(j,k,l) * vv(j,k,l,i)
+    end do
+    end do
+    end do
 end do
 call set_halo(s1, 0.0, i1cell, i2cell)
 
@@ -137,11 +144,32 @@ end select
 ! add contribution to potency
 i = 6 - ic - id
 if (ic < id) then
-    w2(:,:,:,i) = 0.5 * s1
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 1, nm(3)
+    do k = 1, nm(2)
+    do j = 1, nm(1)
+        w2(j,k,l,i) = 0.5 * s1(j,k,l)
+    end do
+    end do
+    end do
 elseif (ic > id) then
-    w2(:,:,:,i) = w2(:,:,:,i) + 0.5 * s1
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 1, nm(3)
+    do k = 1, nm(2)
+    do j = 1, nm(1)
+        w2(j,k,l,i) = w2(j,k,l,i) + 0.5 * s1(j,k,l)
+    end do
+    end do
+    end do
 else
-    w1(:,:,:,ic) = s1
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 1, nm(3)
+    do k = 1, nm(2)
+    do j = 1, nm(1)
+        w1(j,k,l,ic) = s1(j,k,l)
+    end do
+    end do
+    end do
 end if
 
 end do doid
@@ -149,8 +177,15 @@ end do doic
 
 ! strain
 do i = 1, 3
-    w1(:,:,:,i) = w1(:,:,:,i) * vc
-    w2(:,:,:,i) = w2(:,:,:,i) * vc
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 1, nm(3)
+    do k = 1, nm(2)
+    do j = 1, nm(1)
+        w1(j,k,l,i) = w1(j,k,l,i) * vc(j,k,l)
+        w2(j,k,l,i) = w2(j,k,l,i) * vc(j,k,l)
+    end do
+    end do
+    end do
 end do
 
 ! add potency source to strain
@@ -179,10 +214,24 @@ call field_io('<>', 'e12', w2(:,:,:,3))
 !end do
 
 ! Hook's law: w_ij = lam*g_ij*delta_ij + mu*(g_ij + g_ji)
-s1 = lam * (w1(:,:,:,1) + w1(:,:,:,2) + w1(:,:,:,3))
+!$omp parallel do schedule(static) private(j, k, l)
+do l = 1, nm(3)
+do k = 1, nm(2)
+do j = 1, nm(1)
+    s1(j,k,l) = lam(j,k,l) * (w1(j,k,l,1) + w1(j,k,l,2) + w1(j,k,l,3))
+end do
+end do
+end do
 do i = 1, 3
-    w1(:,:,:,i) = 2.0 * mu * w1(:,:,:,i) + s1
-    w2(:,:,:,i) = 2.0 * mu * w2(:,:,:,i)
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 1, nm(3)
+    do k = 1, nm(2)
+    do j = 1, nm(1)
+        w1(j,k,l,i) = 2.0 * mu(j,k,l) * w1(j,k,l,i) + s1(j,k,l)
+        w2(j,k,l,i) = 2.0 * mu(j,k,l) * w2(j,k,l,i)
+    end do
+    end do
+    end do
 end do
 
 ! add moment source to stress
