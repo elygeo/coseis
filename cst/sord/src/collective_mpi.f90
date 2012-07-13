@@ -83,7 +83,7 @@ elseif (n == 2) then
     ii = minloc(coords)
     i = ii(1)
     comm = comm2d(i)
-    coords2 = (/ coords(:i-1), coords(i+1:) /)
+    coords2 = (/coords(:i-1), coords(i+1:)/)
     call mpi_cart_rank(comm, coords2, rank, e)
 elseif (n == 1) then
     ii = maxloc(coords)
@@ -202,7 +202,7 @@ use mpi
 real, intent(inout) :: f3(:,:,:)
 integer, intent(in) :: nh(3)
 integer :: i, e, prev, next, nm(3), n(3), isend(3), irecv(3), tsend, trecv, comm
-nm = (/ size(f3,1), size(f3,2), size(f3,3) /)
+nm = (/size(f3,1), size(f3,2), size(f3,3)/)
 do i = 1, 3
 if (np3(i) > 1 .and. nm(i) > 1) then
     comm = comm3d
@@ -238,7 +238,7 @@ use mpi
 real, intent(inout) :: f4(:,:,:,:)
 integer, intent(in) :: nh(3)
 integer :: i, e, prev, next, nm(4), n(4), isend(4), irecv(4), tsend, trecv, comm
-nm = (/ size(f4,1), size(f4,2), size(f4,3), size(f4,4) /)
+nm = (/size(f4,1), size(f4,2), size(f4,3), size(f4,4)/)
 do i = 1, 3
 if (np3(i) > 1 .and. nm(i) > 1) then
     comm = comm3d
@@ -371,9 +371,9 @@ logical, intent(in) :: verb
 integer :: mm(2), nn(2), oo(2)
 real :: f2(1,size(f1))
 if (mode == 'w') f2(1,:) = f1
-mm = (/ 1, m /)
-nn = (/ 1, size(f1) /)
-oo = (/ 0, o /)
+mm = (/1, m/)
+nn = (/1, size(f1)/)
+oo = (/0, o/)
 call rio2(fh, f2, mode, filename, mm, nn, oo, mpio, verb)
 if (mode == 'r') f1 = f2(1,:)
 end subroutine
@@ -389,9 +389,9 @@ logical, intent(in) :: verb
 integer :: mm(2), nn(2), oo(2)
 integer :: f2(1,size(f1))
 if (mode == 'w') f2(1,:) = f1
-mm = (/ 1, m /)
-nn = (/ 1, size(f1) /)
-oo = (/ 0, o /)
+mm = (/1, m/)
+nn = (/1, size(f1)/)
+oo = (/0, o/)
 call iio2(fh, f2, mode, filename, mm, nn, oo, mpio, verb)
 if (mode == 'r') f1 = f2(1,:)
 end subroutine

@@ -46,11 +46,8 @@ for c in '12':
         ('=w', 'u' + c, s_[:,:,1,::10],  'snap-u%s.bin' % c),
     ]
 
-# stage job, copy mesh files, and run job
-job = cst.sord.stage(prm, rundir='run/sim')
-for f in 'x.bin', 'y.bin':
-    a = os.path.join('run', 'mesh', f)
-    b = os.path.join('run', 'sim', f)
-    os.link(a, b)
-cst.sord.run(job)
+# run job
+x = os.path.join('run', 'mesh', 'x.bin')
+y = os.path.join('run', 'mesh', 'y.bin')
+cst.sord.run(prm, stagein=[x, y])
 

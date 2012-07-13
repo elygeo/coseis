@@ -8,7 +8,7 @@ subroutine scalar_bc(f, bc1, bc2, i1, i2)
 real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: bc1(3), bc2(3), i1(3), i2(3)
 integer :: b1(3), b2(3), nm(3), j1, k1, l1, j2, k2, l2
-nm = (/ size(f,1), size(f,2), size(f,3) /)
+nm = (/size(f,1), size(f,2), size(f,3)/)
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
@@ -32,7 +32,7 @@ implicit none
 real, intent(inout) :: f(:,:,:,:)
 integer, intent(in) :: bc1(3), bc2(3), i1(3), i2(3)
 integer :: nm(3), b1(3), b2(3), s1(3), s2(3), j1, k1, l1, j2, k2, l2
-nm = (/ size(f,1), size(f,2), size(f,3) /)
+nm = (/size(f,1), size(f,2), size(f,3)/)
 j1 = i1(1); j2 = i2(1)
 k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
