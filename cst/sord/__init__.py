@@ -37,6 +37,7 @@ def build(job=None, **kwargs):
         # source files
         sources = [
             'globals.f90',
+            'kernels.f90',
             'diff_cn_op.f90',
             'diff_nc_op.f90',
             'hourglass_op.f90',
