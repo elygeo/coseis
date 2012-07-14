@@ -114,6 +114,7 @@ if (ic == id) then
     end do
     end do
     end do
+    !$omp end parallel do
 else
     !$omp parallel do schedule(static) private(j, k, l)
     do l = 1, nm(3)
@@ -123,6 +124,7 @@ else
     end do
     end do
     end do
+    !$omp end parallel do
 end if
 
 end do doid
@@ -141,13 +143,22 @@ do i = 1, 3
     end do
     end do
     end do
+    !$omp end parallel do
 end do
 do iq = 1, 4
 do ic = 1, 3
     i1 = max(i1pml,     i1cell)
     i2 = min(i2pml - 1, i2cell)
     call hourglass_nc(s1, w2, iq, ic, i1, i2)
-    s1 = yy * s1
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 1, nm(3)
+    do k = 1, nm(2)
+    do j = 1, nm(1)
+        s1(j,k,l) = s1(j,k,l) * yy(j,k,l)
+    end do
+    end do
+    end do
+    !$omp end parallel do
     i1 = max(i1pml + 1, i1node)
     i2 = min(i2pml - 1, i2node)
     call hourglass_cn(s2, s1, iq, i1, i2)
@@ -195,6 +206,7 @@ do ic = 1, 3
     end do
     end do
     end do
+    !$omp end parallel do
 end do
 end do
 end if
@@ -237,6 +249,7 @@ do i = 1, 3
     end do
     end do
     end do
+    !$omp end parallel do
 end do
 
 ! acceleration I/O

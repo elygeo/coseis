@@ -49,6 +49,7 @@ if (vdamp > 0.0) then
     end do
     end do
     end do
+    !$omp end parallel do
 end if
 
 ! limits
@@ -81,6 +82,7 @@ do j = 1, nm(1)
 end do
 end do
 end do
+!$omp end parallel do
 
 ! non-overlapping cell indices
 i1 = max(i1core, i1bc)
@@ -131,6 +133,7 @@ do j = 1, nm(1)
 end do
 end do
 end do
+!$omp end parallel do
 
 ! global maxima
 call rreduce1(max_g, max_l, 'allmax', (/0, 0, 0/))

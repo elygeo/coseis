@@ -30,18 +30,23 @@ if (ifn /= 0) then
     f2 = sqrt(sum(t2 * t2, 4))
 end if
 
-! velocity time integration
-tm = tm0 + dt * (it - 1) - dt * 0.5
+! time integration
+tm = tm0 + dt * (it - 1)
 do i = 1, 3
     !$omp parallel do schedule(static) private(j, k, l)
     do l = 1, nm(3)
     do k = 1, nm(2)
     do j = 1, nm(1)
         vv(j,k,l,i) = vv(j,k,l,i) + dt * w1(j,k,l,i)
+        uu(j,k,l,i) = uu(j,k,l,i) + dt * vv(j,k,l,i)
+        w1(j,k,l,i) = uu(j,k,l,i) + gam(j,k,l) * vv(j,k,l,i)
     end do
     end do
     end do
+    !$omp end parallel do
 end do
+
+! velocity I/O
 call field_io('<>', 'v1', vv(:,:,:,1))
 call field_io('<>', 'v2', vv(:,:,:,2))
 call field_io('<>', 'v3', vv(:,:,:,3))
@@ -53,18 +58,7 @@ if (modulo(it, itstats) == 0) then
 end if
 call field_io('>', 'vm2', s1)
 
-! displacement time integration
-tm = tm0 + dt * (it - 1)
-do i = 1, 3
-    !$omp parallel do schedule(static) private(j, k, l)
-    do l = 1, nm(3)
-    do k = 1, nm(2)
-    do j = 1, nm(1)
-        uu(j,k,l,i) = uu(j,k,l,i) + dt * vv(j,k,l,i)
-    end do
-    end do
-    end do
-end do
+! displacement I/O
 call field_io('<>', 'u1', uu(:,:,:,1))
 call field_io('<>', 'u2', uu(:,:,:,2))
 call field_io('<>', 'u3', uu(:,:,:,3))

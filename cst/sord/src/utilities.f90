@@ -17,6 +17,7 @@ do j = 1, n(1)
 end do
 end do
 end do
+!$omp end parallel do
 end subroutine
 
 ! array fill
@@ -33,6 +34,7 @@ do j = 1, n(1)
 end do
 end do
 end do
+!$omp end parallel do
 end subroutine
 
 ! array scale
@@ -49,6 +51,7 @@ do j = 1, n(1)
 end do
 end do
 end do
+!$omp end parallel do
 end subroutine
 
 ! array reciprocal
@@ -64,6 +67,7 @@ do j = 1, n(1)
 end do
 end do
 end do
+!$omp end parallel do
 end subroutine
 
 ! minimum
@@ -80,6 +84,7 @@ do j = 1, n(1)
 end do
 end do
 end do
+!$omp end parallel do
 end subroutine
 
 ! maximum
@@ -96,6 +101,7 @@ do j = 1, n(1)
 end do
 end do
 end do
+!$omp end parallel do
 end subroutine
 
 ! squared distance to x0
@@ -117,6 +123,7 @@ do j = i1(1), i2(1)
 end do
 end do
 end do
+!$omp end parallel do
 end subroutine
 
 ! average of local eight values
@@ -139,6 +146,7 @@ do j = i1(1), i2(1)
 end do
 end do
 end do
+!$omp end parallel do
 call set_halo(f2, 0.0, i1, i2)
 end subroutine
 
@@ -178,6 +186,7 @@ do j = i1(1), i2(1), di(1)
 end do
 end do
 end do
+!$omp end parallel do
 end subroutine
 
 ! Frobenius tensor norm - much faster than L2 norm for tensors
@@ -203,6 +212,7 @@ do j = i1(1), i2(1), di(1)
 end do
 end do
 end do
+!$omp end parallel do
 end subroutine
 
 ! in-place linear interpolation
@@ -228,6 +238,7 @@ do i = 1, d - 1
     end do
     end do
     end do
+    !$omp end parallel do
 end do
 d = di(2)
 do i = 1, d - 1
@@ -241,6 +252,7 @@ do i = 1, d - 1
     end do
     end do
     end do
+    !$omp end parallel do
 end do
 d = di(3)
 do i = 1, d - 1
@@ -254,6 +266,7 @@ do i = 1, d - 1
     end do
     end do
     end do
+    !$omp end parallel do
 end do
 end subroutine
 

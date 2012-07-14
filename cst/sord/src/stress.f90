@@ -14,20 +14,8 @@ integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, p
 
 if (verb) write (*, '(a)') 'Stress'
 
-! modified displacement
-do i = 1, 3
-    !$omp parallel do schedule(static) private(j, k, l)
-    do l = 1, nm(3)
-    do k = 1, nm(2)
-    do j = 1, nm(1)
-        w1(j,k,l,i) = uu(j,k,l,i) + gam(j,k,l) * vv(j,k,l,i)
-    end do
-    end do
-    end do
-end do
-call set_halo(s1, 0.0, i1cell, i2cell)
-
 ! loop over component and derivative direction
+call set_halo(s1, 0.0, i1cell, i2cell)
 doic: do ic  = 1, 3
 doid: do iid = 1, 3; id = modulo(ic + iid - 1, 3) + 1
 
@@ -152,6 +140,7 @@ if (ic < id) then
     end do
     end do
     end do
+    !$omp end parallel do
 elseif (ic > id) then
     !$omp parallel do schedule(static) private(j, k, l)
     do l = 1, nm(3)
@@ -161,6 +150,7 @@ elseif (ic > id) then
     end do
     end do
     end do
+    !$omp end parallel do
 else
     !$omp parallel do schedule(static) private(j, k, l)
     do l = 1, nm(3)
@@ -170,6 +160,7 @@ else
     end do
     end do
     end do
+    !$omp end parallel do
 end if
 
 end do doid
@@ -186,6 +177,7 @@ do i = 1, 3
     end do
     end do
     end do
+    !$omp end parallel do
 end do
 
 ! add potency source to strain
@@ -222,6 +214,7 @@ do j = 1, nm(1)
 end do
 end do
 end do
+!$omp end parallel do
 do i = 1, 3
     !$omp parallel do schedule(static) private(j, k, l)
     do l = 1, nm(3)
@@ -232,6 +225,7 @@ do i = 1, 3
     end do
     end do
     end do
+    !$omp end parallel do
 end do
 
 ! add moment source to stress

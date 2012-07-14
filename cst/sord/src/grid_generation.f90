@@ -118,6 +118,7 @@ do j = 1, nm(1)
 end do
 end do
 end do
+!$omp end parallel do
 w1 = w2
 
 ! fill halo, bc=4 means copy into halo, need this for nhat
@@ -256,6 +257,7 @@ case (6)
     end do
     end do
     end do
+    !$omp end parallel do
     end do
 case default; stop 'illegal operator'
 end select
