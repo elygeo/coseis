@@ -129,14 +129,14 @@ case (3)
     end do
 end select
 
-! add contribution to potency
+! add contribution to strain
 i = 6 - ic - id
 if (ic < id) then
     !$omp parallel do schedule(static) private(j, k, l)
     do l = 1, nm(3)
     do k = 1, nm(2)
     do j = 1, nm(1)
-        w2(j,k,l,i) = 0.5 * s1(j,k,l)
+        w2(j,k,l,i) = 0.5 * s1(j,k,l) * vc(j,k,l)
     end do
     end do
     end do
@@ -146,7 +146,7 @@ elseif (ic > id) then
     do l = 1, nm(3)
     do k = 1, nm(2)
     do j = 1, nm(1)
-        w2(j,k,l,i) = w2(j,k,l,i) + 0.5 * s1(j,k,l)
+        w2(j,k,l,i) = w2(j,k,l,i) + 0.5 * s1(j,k,l) * vc(j,k,l)
     end do
     end do
     end do
@@ -156,7 +156,7 @@ else
     do l = 1, nm(3)
     do k = 1, nm(2)
     do j = 1, nm(1)
-        w1(j,k,l,ic) = s1(j,k,l)
+        w1(j,k,l,ic) = s1(j,k,l) * vc(j,k,l)
     end do
     end do
     end do
@@ -166,21 +166,7 @@ end if
 end do doid
 end do doic
 
-! strain
-do i = 1, 3
-    !$omp parallel do schedule(static) private(j, k, l)
-    do l = 1, nm(3)
-    do k = 1, nm(2)
-    do j = 1, nm(1)
-        w1(j,k,l,i) = w1(j,k,l,i) * vc(j,k,l)
-        w2(j,k,l,i) = w2(j,k,l,i) * vc(j,k,l)
-    end do
-    end do
-    end do
-    !$omp end parallel do
-end do
-
-! add potency source to strain
+! aZd potency source to strain
 if (source == 'potency') then
     call finite_source
     call tensor_point_source

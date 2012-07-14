@@ -9,6 +9,7 @@ use utilities
 use field_io_mod
 use statistics
 integer :: i, j, k, l
+real :: u, v
 
 ! status
 if (master) then
@@ -33,13 +34,15 @@ end if
 ! time integration
 tm = tm0 + dt * (it - 1)
 do i = 1, 3
-    !$omp parallel do schedule(static) private(j, k, l)
+    !$omp parallel do schedule(static) private(j, k, l, u, v)
     do l = 1, nm(3)
     do k = 1, nm(2)
     do j = 1, nm(1)
-        vv(j,k,l,i) = vv(j,k,l,i) + dt * w1(j,k,l,i)
-        uu(j,k,l,i) = uu(j,k,l,i) + dt * vv(j,k,l,i)
-        w1(j,k,l,i) = uu(j,k,l,i) + gam(j,k,l) * vv(j,k,l,i)
+        v = vv(j,k,l,i) + dt * w1(j,k,l,i)
+        u = uu(j,k,l,i) + dt * v
+        vv(j,k,l,i) = v
+        uu(j,k,l,i) = u
+        w1(j,k,l,i) = u + gam(j,k,l) * v
     end do
     end do
     end do
