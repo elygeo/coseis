@@ -113,6 +113,7 @@ for m, h in [
     ('alcf_bgp', 'surveyor.alcf.anl.gov'),
     ('alcf_bgp', 'challenger.alcf.anl.gov'),
     ('alcf_bgp', 'intreplid.alcf.anl.gov'),
+    ('wat2q',   'grotius.watson.ibm.com'),
     ('usc_hpc', 'hpc-login1.usc.edu'),
     ('usc_hpc', 'hpc-login2-l.usc.edu'),
     ('tacc_ranger', 'ranger.tacc.utexas.edu'),
