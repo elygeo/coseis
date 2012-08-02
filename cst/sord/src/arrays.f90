@@ -19,6 +19,7 @@ allocate ( &
 !   z1(j,k,l,3), &
 !   z2(j,k,l,3), &
     w1(j,k,l,3), &
+    ws1(j,k,l,3), &
     w2(j,k,l,3))
 
 ! 3d scalars

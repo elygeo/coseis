@@ -18,7 +18,22 @@ integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq, p
 real :: rr
 
 if (verb) write (*, '(a)') 'Acceleration'
+
+!do i = 1, 3
+!    !$omp parallel do schedule(static) private(j, k, l)
+!    do l = 1, nm(3)
+!    do k = 1, nm(2)
+!    do j = 1, nm(1)
+!        ws1(j,k,l,i) = w1(j,k,l,i)
+!    end do
+!    end do
+!    end do
+!end do
+
 call set_halo(s1, 0.0, i1node, i2node)
+call set_halo(w1(:,:,:,1), 0.0, i1node, i2node)
+call set_halo(w1(:,:,:,2), 0.0, i1node, i2node)
+call set_halo(w1(:,:,:,3), 0.0, i1node, i2node)
 
 ! loop over component and derivative direction
 doic: do ic  = 1, 3
@@ -29,11 +44,86 @@ doid: do iid = 1, 3; id = modulo(ic + iid - 2, 3) + 1
 i1 = i1node
 i2 = i2node
 if (ic == id) then
-    call diff_cn(s1, w1, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
+    call diff_cn(w1(:,:,:,ic), ws1, ic, id, i1, i2, oplevel, bb_cn, xx, dx1, dx2, dx3, dx)
+
+! pml region
+! p'_ij + d_j*p_ij = w_ij,j (no summation convention)
+! f_i = sum_j(p_ij')
+select case (id)
+case (1)
+    do j = i1(1), min(i2(1), i1pml(1))
+        i = j - i1(1) + 1
+        p = j + nnoff(1)
+        do l = i1(3), i2(3)
+        do k = i1(2), i2(2)
+            w1(j,k,l,ic) = dn2(p) * w1(j,k,l,ic) + dn1(p) * p1(i,k,l,ic)
+            p1(i,k,l,ic) = p1(i,k,l,ic) + dt * w1(j,k,l,ic)
+        end do
+        end do
+    end do
+    do j = max(i1(1), i2pml(1)), i2(1)
+        i = i2(1) - j + 1
+        p = nn(1) - j - nnoff(1) + 1
+        do l = i1(3), i2(3)
+        do k = i1(2), i2(2)
+            w1(j,k,l,ic) = dn2(p) * w1(j,k,l,ic) + dn1(p) * p4(i,k,l,ic)
+            p4(i,k,l,ic) = p4(i,k,l,ic) + dt * w1(j,k,l,ic)
+        end do
+        end do
+    end do
+case (2)
+    do k = i1(2), min(i2(2), i1pml(2))
+        i = k - i1(2) + 1
+        p = k + nnoff(2)
+        do l = i1(3), i2(3)
+        do j = i1(1), i2(1)
+            w1(j,k,l,ic) = dn2(p) * w1(j,k,l,ic) + dn1(p) * p2(j,i,l,ic)
+            p2(j,i,l,ic) = p2(j,i,l,ic) + dt * w1(j,k,l,ic)
+        end do
+        end do
+    end do
+    do k = max(i1(2), i2pml(2)), i2(2)
+        i = i2(2) - k + 1
+        p = nn(2) - k - nnoff(2) + 1
+        do l = i1(3), i2(3)
+        do j = i1(1), i2(1)
+            w1(j,k,l,ic) = dn2(p) * w1(j,k,l,ic) + dn1(p) * p5(j,i,l,ic)
+            p5(j,i,l,ic) = p5(j,i,l,ic) + dt * w1(j,k,l,ic)
+        end do
+        end do
+    end do
+case (3)
+    do l = i1(3), min(i2(3), i1pml(3))
+        i = l - i1(3) + 1
+        p = l + nnoff(3)
+        do k = i1(2), i2(2)
+        do j = i1(1), i2(1)
+            w1(j,k,l,ic) = dn2(p) * w1(j,k,l,ic) + dn1(p) * p3(j,k,i,ic)
+            p3(j,k,i,ic) = p3(j,k,i,ic) + dt * w1(j,k,l,ic)
+        end do
+        end do
+    end do
+    do l = max(i1(3), i2pml(3)), i2(3)
+        i = i2(3) - l + 1
+        p = nn(3) - l - nnoff(3) + 1
+        do k = i1(2), i2(2)
+        do j = i1(1), i2(1)
+            w1(j,k,l,ic) = dn2(p) * w1(j,k,l,ic) + dn1(p) * p6(j,k,i,ic)
+            p6(j,k,i,ic) = p6(j,k,i,ic) + dt * w1(j,k,l,ic)
+        end do
+        end do
+    end do
+end select
+
+! ##########################################################################
 else
+
+! elastic region
+! f_i = w_ij,j
+i1 = i1node
+i2 = i2node
     i = 6 - ic - id
-    call diff_cn(s1, w2, i, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
-end if
+    call diff_cn(s1, w2, i, id, i1, i2, oplevel, bb_cn, xx, dx1, dx2, dx3, dx)
 
 ! pml region
 ! p'_ij + d_j*p_ij = w_ij,j (no summation convention)
@@ -105,17 +195,6 @@ case (3)
 end select
 
 ! add contribution to force vector
-if (ic == id) then
-    !$omp parallel do schedule(static) private(j, k, l)
-    do l = 1, nm(3)
-    do k = 1, nm(2)
-    do j = 1, nm(1)
-        w1(j,k,l,ic) = s1(j,k,l)
-    end do
-    end do
-    end do
-    !$omp end parallel do
-else
     !$omp parallel do schedule(static) private(j, k, l)
     do l = 1, nm(3)
     do k = 1, nm(2)
@@ -133,7 +212,6 @@ end do doic
 ! hourglass control. only viscous in pml
 if (any(hourglass > 0.0)) then
 call set_halo(s1, 0.0, i1cell, i2cell)
-call set_halo(s2, 0.0, i1node, i2node)
 do i = 1, 3
     !$omp parallel do schedule(static) private(j, k, l)
     do l = 1, nm(3)
@@ -149,19 +227,10 @@ do iq = 1, 4
 do ic = 1, 3
     i1 = max(i1pml,     i1cell)
     i2 = min(i2pml - 1, i2cell)
-    call hourglass_nc(s1, w2, iq, ic, i1, i2)
-    !$omp parallel do schedule(static) private(j, k, l)
-    do l = 1, nm(3)
-    do k = 1, nm(2)
-    do j = 1, nm(1)
-        s1(j,k,l) = s1(j,k,l) * yy(j,k,l)
-    end do
-    end do
-    end do
-    !$omp end parallel do
+    call hourglass_nc_yy(s1, w2, yy, iq, ic, i1, i2)
     i1 = max(i1pml + 1, i1node)
     i2 = min(i2pml - 1, i2node)
-    call hourglass_cn(s2, s1, iq, i1, i2)
+    call hourglass_cn_subtract(w1(:,:,:,ic), s1, iq, i1, i2)
     if (hourglass(2) > 0.0 .and. npml > 0) then
         do i = 1, 3
             i1 = i1cell
@@ -191,22 +260,13 @@ do ic = 1, 3
             i1 = i1node
             i2 = i2node
             i2(i) = min(i2(i), i1pml(i))
-            call hourglass_cn(s2, s1, iq, i1, i2)
+            call hourglass_cn_subtract(w1(:,:,:,ic), s1, iq, i1, i2)
             i1 = i1node
             i2 = i2node
             i1(i) = max(i1(i), i2pml(i))
-            call hourglass_cn(s2, s1, iq, i1, i2)
+            call hourglass_cn_subtract(w1(:,:,:,ic), s1, iq, i1, i2)
         end do
     end if
-    !$omp parallel do schedule(static) private(j, k, l)
-    do l = 1, nm(3)
-    do k = 1, nm(2)
-    do j = 1, nm(1)
-        w1(j,k,l,ic) = w1(j,k,l,ic) - s2(j,k,l)
-    end do
-    end do
-    end do
-    !$omp end parallel do
 end do
 end do
 end if

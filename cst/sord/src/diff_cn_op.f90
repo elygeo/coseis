@@ -3,9 +3,9 @@ module diff_cn_op
 implicit none
 contains
 
-subroutine diff_cn(df, f, i, a, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx)
+subroutine diff_cn(df, f, i, a, i1, i2, oplevel, bb_cn, x, dx1, dx2, dx3, dx)
 real, intent(out) :: df(:,:,:)
-real, intent(in) :: f(:,:,:,:), bb(:,:,:,:,:), x(:,:,:,:), &
+real, intent(in) :: f(:,:,:,:), bb_cn(:,:,:,:,:), x(:,:,:,:), &
     dx1(:), dx2(:), dx3(:), dx(3)
 integer, intent(in) :: i, a, i1(3), i2(3), oplevel
 real :: h, b1, b2, b3, b4, b5, b6, b7, b8
@@ -22,17 +22,15 @@ do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
     df(j,k,l) = &
-    - bb(j-1,k-1,l-1,1,a) * f(j-1,k-1,l-1,i) &
-    - bb(j,  k-1,l-1,6,a) * f(j,  k-1,l-1,i) &
-    - bb(j-1,k,l-1,7,a) * f(j-1,k,l-1,i) &
-    - bb(j,  k,l-1,4,a) * f(j,  k,l-1,i)
-end do
-do j = i1(1), i2(1)
-    df(j,k,l) = df(j,k,l) &
-    - bb(j-1,k-1,l,8,a) * f(j-1,k-1,l,i) &
-    - bb(j,  k-1,l,3,a) * f(j,  k-1,l,i) &
-    - bb(j-1,k,l,2,a) * f(j-1,k,l,i) &
-    - bb(j,  k,l,5,a) * f(j,  k,l,i)
+    - bb_cn(1,j,k,l,a) * f(j-1,k-1,l-1,i) &
+    - bb_cn(6,j,k,l,a) * f(j,  k-1,l-1,i) &
+    - bb_cn(7,j,k,l,a) * f(j-1,k  ,l-1,i) &
+    - bb_cn(4,j,k,l,a) * f(j,  k  ,l-1,i) &
+    - bb_cn(8,j,k,l,a) * f(j-1,k-1,l  ,i) &
+    - bb_cn(3,j,k,l,a) * f(j,  k-1,l  ,i) &
+    - bb_cn(2,j,k,l,a) * f(j-1,k  ,l  ,i) &
+    - bb_cn(5,j,k,l,a) * f(j,  k  ,l  ,i)
+
 end do
 end do
 end do
@@ -291,6 +289,48 @@ b1 = &
 df(j,k,l) = df(j,k,l) + h * &
 ( b6 * f(j-1,k,l,i) &
 + b1 * f(j,  k,l,i) )
+end do
+end do
+end do
+!$omp end parallel do
+
+case default; stop 'illegal operator'
+
+end select
+
+end subroutine
+
+
+subroutine diff_cn_update(ss1, df, f, i, a, i1, i2, oplevel, bb_cn, x, dx1, dx2, dx3, dx)
+real, intent(out) :: ss1(:,:,:)
+real, intent(inout) :: df(:,:,:)
+real, intent(in) :: f(:,:,:,:), bb_cn(:,:,:,:,:), x(:,:,:,:), &
+    dx1(:), dx2(:), dx3(:), dx(3)
+integer, intent(in) :: i, a, i1(3), i2(3), oplevel
+real :: h, b1, b2, b3, b4, b5, b6, b7, b8
+integer :: j, k, l, b, c
+
+if (any(i1 > i2)) return
+
+select case (oplevel)
+
+! saved b matrix, flops: 8* 7+
+case (6)
+!$omp parallel do schedule(static) private(j, k, l)
+do l = i1(3), i2(3)
+do k = i1(2), i2(2)
+do j = i1(1), i2(1)
+    ss1(j,k,l) = &
+    - bb_cn(1,j,k,l,a) * f(j-1,k-1,l-1,i) &
+    - bb_cn(6,j,k,l,a) * f(j,  k-1,l-1,i) &
+    - bb_cn(7,j,k,l,a) * f(j-1,k  ,l-1,i) &
+    - bb_cn(4,j,k,l,a) * f(j,  k  ,l-1,i) &
+    - bb_cn(8,j,k,l,a) * f(j-1,k-1,l  ,i) &
+    - bb_cn(3,j,k,l,a) * f(j,  k-1,l  ,i) &
+    - bb_cn(2,j,k,l,a) * f(j-1,k  ,l  ,i) &
+    - bb_cn(5,j,k,l,a) * f(j,  k  ,l  ,i)
+
+    df(j,k,l) = df(j,k,l) + ss1(j,k,l)
 end do
 end do
 end do

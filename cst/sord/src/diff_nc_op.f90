@@ -22,17 +22,14 @@ do l = i1(3), i2(3)
 do k = i1(2), i2(2)
 do j = i1(1), i2(1)
     df(j,k,l) &
-    = bb(j,k,l,5,a) * f(j,  k,l,i) &
-    + bb(j,k,l,2,a) * f(j+1,k,l,i) &
-    + bb(j,k,l,3,a) * f(j,  k+1,l,i) &
-    + bb(j,k,l,8,a) * f(j+1,k+1,l,i)
-end do
-do j = i1(1), i2(1)
-    df(j,k,l) = df(j,k,l) &
-    + bb(j,k,l,4,a) * f(j,  k,l+1,i) &
-    + bb(j,k,l,7,a) * f(j+1,k,l+1,i) &
-    + bb(j,k,l,6,a) * f(j,  k+1,l+1,i) &
-    + bb(j,k,l,1,a) * f(j+1,k+1,l+1,i)
+    = bb(5,j,k,l,a) * f(j,  k,l,i) &
+    + bb(2,j,k,l,a) * f(j+1,k,l,i) &
+    + bb(3,j,k,l,a) * f(j,  k+1,l,i) &
+    + bb(8,j,k,l,a) * f(j+1,k+1,l,i) &
+    + bb(4,j,k,l,a) * f(j,  k,l+1,i) &
+    + bb(7,j,k,l,a) * f(j+1,k,l+1,i) &
+    + bb(6,j,k,l,a) * f(j,  k+1,l+1,i) &
+    + bb(1,j,k,l,a) * f(j+1,k+1,l+1,i)
 end do
 end do
 end do
@@ -275,6 +272,95 @@ case default; stop 'illegal operator'
 end select
 
 end subroutine
+
+
+
+! df = 0.5 * stencil_op
+subroutine diff_nc_scale_p5(ss1, df, f, i, a, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx)
+real, intent(out) ::  ss1(:,:,:), df(:,:,:)
+real, intent(in) :: f(:,:,:,:), bb(:,:,:,:,:), x(:,:,:,:), &
+    dx1(:), dx2(:), dx3(:), dx(3)
+integer, intent(in) :: i, a, i1(3), i2(3), oplevel
+real :: h, b1, b2, b3, b4, b5, b6, b7, b8
+integer :: j, k, l, b, c
+
+if (any(i1 > i2)) return
+
+select case (oplevel)
+
+! saved b matrix, flops: 8* 7+
+case (6)
+!$omp parallel do schedule(static) private(j, k, l)
+do l = i1(3), i2(3)
+do k = i1(2), i2(2)
+do j = i1(1), i2(1)
+    ss1(j,k,l) &
+    = bb(5,j,k,l,a) * f(j,  k,l,i) &
+    + bb(2,j,k,l,a) * f(j+1,k,l,i) &
+    + bb(3,j,k,l,a) * f(j,  k+1,l,i) &
+    + bb(8,j,k,l,a) * f(j+1,k+1,l,i) &
+    + bb(4,j,k,l,a) * f(j,  k,l+1,i) &
+    + bb(7,j,k,l,a) * f(j+1,k,l+1,i) &
+    + bb(6,j,k,l,a) * f(j,  k+1,l+1,i) &
+    + bb(1,j,k,l,a) * f(j+1,k+1,l+1,i) 
+
+    df(j,k,l) = 0.5 * ss1(j,k,l)
+end do
+end do
+end do
+!$omp end parallel do
+
+case default; stop 'illegal operator'
+
+end select
+
+end subroutine
+
+
+
+! df = df + 0.5 * stencil_op
+subroutine diff_nc_update_scale_p5(ss1, df, f, i, a, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx)
+real, intent(out) :: ss1(:,:,:)
+real, intent(inout) :: df(:,:,:)
+real, intent(in) :: f(:,:,:,:), bb(:,:,:,:,:), x(:,:,:,:), &
+    dx1(:), dx2(:), dx3(:), dx(3)
+integer, intent(in) :: i, a, i1(3), i2(3), oplevel
+real :: h, b1, b2, b3, b4, b5, b6, b7, b8
+integer :: j, k, l, b, c
+
+if (any(i1 > i2)) return
+
+select case (oplevel)
+
+! saved b matrix, flops: 8* 7+
+case (6)
+!$omp parallel do schedule(static) private(j, k, l)
+do l = i1(3), i2(3)
+do k = i1(2), i2(2)
+do j = i1(1), i2(1)
+    ss1(j,k,l) &
+    = bb(5,j,k,l,a) * f(j,  k,l,i) &
+    + bb(2,j,k,l,a) * f(j+1,k,l,i) &
+    + bb(3,j,k,l,a) * f(j,  k+1,l,i) &
+    + bb(8,j,k,l,a) * f(j+1,k+1,l,i) &
+    + bb(4,j,k,l,a) * f(j,  k,l+1,i) &
+    + bb(7,j,k,l,a) * f(j+1,k,l+1,i) &
+    + bb(6,j,k,l,a) * f(j,  k+1,l+1,i) &
+    + bb(1,j,k,l,a) * f(j+1,k+1,l+1,i)
+
+df(j,k,l) = df(j,k,l) + 0.5 * ss1(j,k,l)  
+end do
+end do
+end do
+!$omp end parallel do
+
+
+case default; stop 'illegal operator'
+
+end select
+
+end subroutine
+
 
 end module
 

@@ -65,7 +65,7 @@ real, allocatable, dimension(:,:,:,:) :: &
     g4, g5, g6        ! pml gradient far side
 
 ! b matrix
-real, allocatable, dimension(:,:,:,:,:) :: bb
+real, allocatable, dimension(:,:,:,:,:) :: bb, bb_cn
 
 ! volume fields
 real, allocatable, target, dimension(:,:,:) :: &
@@ -81,7 +81,7 @@ real, allocatable, target, dimension(:,:,:,:) :: &
     vv,             & ! velocity
     uu,             & ! displacement
     z1, z2,         & ! anelastic memory variables
-    w1, w2            ! temporary storage
+    w1, w2, ws1       ! temporary storage
 
 ! fault surface fields
 real, allocatable, target, dimension(:,:,:) :: &

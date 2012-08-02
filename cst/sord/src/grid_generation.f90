@@ -213,7 +213,8 @@ case (3:5)
     allocate (xx(nm(1),nm(2),nm(3),3))
     xx = w1
 case (6)
-    allocate (bb(nm(1),nm(2),nm(3),8,3))
+    allocate (bb(8,nm(1),nm(2),nm(3),3))
+    allocate (bb_cn(8,nm(1),nm(2),nm(3),3))
     do i = 1, 3
     h = sign(1.0 / 12.0, product(dx))
     b = modulo(i, 3) + 1
@@ -222,38 +223,58 @@ case (6)
     do l = 1, nm(3)-1
     do k = 1, nm(2)-1
     do j = 1, nm(1)-1
-    bb(j,k,l,1,i) = h * &
+    bb(1,j,k,l,i) = h * &
     ( (w1(j+1,k,l,b) - w1(j,k+1,l+1,b)) * (w1(j+1,k+1,l,c) - w1(j+1,k,l+1,c)) + w1(j,k+1,l+1,b) * (w1(j,k,l+1,c) - w1(j,k+1,l,c)) &
     + (w1(j,k+1,l,b) - w1(j+1,k,l+1,b)) * (w1(j,k+1,l+1,c) - w1(j+1,k+1,l,c)) + w1(j+1,k,l+1,b) * (w1(j+1,k,l,c) - w1(j,k,l+1,c)) &
     + (w1(j,k,l+1,b) - w1(j+1,k+1,l,b)) * (w1(j+1,k,l+1,c) - w1(j,k+1,l+1,c)) + w1(j+1,k+1,l,b) * (w1(j,k+1,l,c) - w1(j+1,k,l,c)) )
-    bb(j,k,l,2,i) = h * &
+    bb(2,j,k,l,i) = h * &
     ( (w1(j+1,k+1,l+1,b) - w1(j,k,l,b)) * (w1(j+1,k,l+1,c) - w1(j+1,k+1,l,c)) + w1(j,k,l,b) * (w1(j,k+1,l,c) - w1(j,k,l+1,c)) &
     + (w1(j,k+1,l,b) - w1(j+1,k,l+1,b)) * (w1(j+1,k+1,l,c) - w1(j,k,l,c)) + w1(j+1,k,l+1,b) * (w1(j,k,l+1,c) - w1(j+1,k+1,l+1,c)) &
     + (w1(j,k,l+1,b) - w1(j+1,k+1,l,b)) * (w1(j,k,l,c) - w1(j+1,k,l+1,c)) + w1(j+1,k+1,l,b) * (w1(j+1,k+1,l+1,c) - w1(j,k+1,l,c)) )
-    bb(j,k,l,3,i) = h * &
+    bb(3,j,k,l,i) = h * &
     ( (w1(j+1,k+1,l+1,b) - w1(j,k,l,b)) * (w1(j+1,k+1,l,c) - w1(j,k+1,l+1,c)) + w1(j,k,l,b) * (w1(j,k,l+1,c) - w1(j+1,k,l,c)) &
     + (w1(j+1,k,l,b) - w1(j,k+1,l+1,b)) * (w1(j,k,l,c) - w1(j+1,k+1,l,c)) + w1(j,k+1,l+1,b) * (w1(j+1,k+1,l+1,c) - w1(j,k,l+1,c)) &
     + (w1(j,k,l+1,b) - w1(j+1,k+1,l,b)) * (w1(j,k+1,l+1,c) - w1(j,k,l,c)) + w1(j+1,k+1,l,b) * (w1(j+1,k,l,c) - w1(j+1,k+1,l+1,c)) )
-    bb(j,k,l,4,i) = h * &
+    bb(4,j,k,l,i) = h * &
     ( (w1(j+1,k+1,l+1,b) - w1(j,k,l,b)) * (w1(j,k+1,l+1,c) - w1(j+1,k,l+1,c)) + w1(j,k,l,b) * (w1(j+1,k,l,c) - w1(j,k+1,l,c)) &
     + (w1(j+1,k,l,b) - w1(j,k+1,l+1,b)) * (w1(j+1,k,l+1,c) - w1(j,k,l,c)) + w1(j,k+1,l+1,b) * (w1(j,k+1,l,c) - w1(j+1,k+1,l+1,c)) &
     + (w1(j,k+1,l,b) - w1(j+1,k,l+1,b)) * (w1(j,k,l,c) - w1(j,k+1,l+1,c)) + w1(j+1,k,l+1,b) * (w1(j+1,k+1,l+1,c) - w1(j+1,k,l,c)) )
-    bb(j,k,l,5,i) = h * &
+    bb(5,j,k,l,i) = h * &
     ( (w1(j,k+1,l+1,b) - w1(j+1,k,l,b)) * (w1(j,k+1,l,c) - w1(j,k,l+1,c)) + w1(j+1,k,l,b) * (w1(j+1,k,l+1,c) - w1(j+1,k+1,l,c)) &
     + (w1(j+1,k,l+1,b) - w1(j,k+1,l,b)) * (w1(j,k,l+1,c) - w1(j+1,k,l,c)) + w1(j,k+1,l,b) * (w1(j+1,k+1,l,c) - w1(j,k+1,l+1,c)) &
     + (w1(j+1,k+1,l,b) - w1(j,k,l+1,b)) * (w1(j+1,k,l,c) - w1(j,k+1,l,c)) + w1(j,k,l+1,b) * (w1(j,k+1,l+1,c) - w1(j+1,k,l+1,c)) )
-    bb(j,k,l,6,i) = h * &
+    bb(6,j,k,l,i) = h * &
     ( (w1(j,k,l,b) - w1(j+1,k+1,l+1,b)) * (w1(j,k,l+1,c) - w1(j,k+1,l,c)) + w1(j+1,k+1,l+1,b) * (w1(j+1,k+1,l,c) - w1(j+1,k,l+1,c))&
     + (w1(j+1,k,l+1,b) - w1(j,k+1,l,b)) * (w1(j+1,k+1,l+1,c) - w1(j,k,l+1,c)) + w1(j,k+1,l,b) * (w1(j,k,l,c) - w1(j+1,k+1,l,c)) &
     + (w1(j+1,k+1,l,b) - w1(j,k,l+1,b)) * (w1(j,k+1,l,c) - w1(j+1,k+1,l+1,c)) + w1(j,k,l+1,b) * (w1(j+1,k,l+1,c) - w1(j,k,l,c)) )
-    bb(j,k,l,7,i) = h * &
+    bb(7,j,k,l,i) = h * &
     ( (w1(j,k,l,b) - w1(j+1,k+1,l+1,b)) * (w1(j+1,k,l,c) - w1(j,k,l+1,c)) + w1(j+1,k+1,l+1,b) * (w1(j,k+1,l+1,c) - w1(j+1,k+1,l,c))&
     + (w1(j,k+1,l+1,b) - w1(j+1,k,l,b)) * (w1(j,k,l+1,c) - w1(j+1,k+1,l+1,c)) + w1(j+1,k,l,b) * (w1(j+1,k+1,l,c) - w1(j,k,l,c)) &
     + (w1(j+1,k+1,l,b) - w1(j,k,l+1,b)) * (w1(j+1,k+1,l+1,c) - w1(j+1,k,l,c)) + w1(j,k,l+1,b) * (w1(j,k,l,c) - w1(j,k+1,l+1,c)) )
-    bb(j,k,l,8,i) = h * &
+    bb(8,j,k,l,i) = h * &
     ( (w1(j,k,l,b) - w1(j+1,k+1,l+1,b)) * (w1(j,k+1,l,c) - w1(j+1,k,l,c)) + w1(j+1,k+1,l+1,b) * (w1(j+1,k,l+1,c) - w1(j,k+1,l+1,c))&
     + (w1(j,k+1,l+1,b) - w1(j+1,k,l,b)) * (w1(j+1,k+1,l+1,c) - w1(j,k+1,l,c)) + w1(j+1,k,l,b) * (w1(j,k,l,c) - w1(j+1,k,l+1,c)) &
     + (w1(j+1,k,l+1,b) - w1(j,k+1,l,b)) * (w1(j+1,k,l,c) - w1(j+1,k+1,l+1,c)) + w1(j,k+1,l,b) * (w1(j,k+1,l+1,c) - w1(j,k,l,c)) )
+    end do
+    end do
+    end do
+    !$omp end parallel do
+    end do
+
+
+    do i = 1, 3
+    !$omp parallel do schedule(static) private(j, k, l)
+    do l = 2, nm(3)
+    do k = 2, nm(2)
+    do j = 2, nm(1) 
+    bb_cn(1,j,k,l,i) = bb(1,j-1,k-1,l-1,i)
+    bb_cn(2,j,k,l,i) = bb(2,j-1,k  ,l  ,i)
+    bb_cn(3,j,k,l,i) = bb(3,j  ,k-1,l  ,i)
+    bb_cn(4,j,k,l,i) = bb(4,j  ,k  ,l-1,i)
+    bb_cn(5,j,k,l,i) = bb(5,j  ,k  ,l  ,i)
+    bb_cn(6,j,k,l,i) = bb(6,j  ,k-1,l-1,i)
+    bb_cn(7,j,k,l,i) = bb(7,j-1,k  ,l-1,i)
+    bb_cn(8,j,k,l,i) = bb(8,j-1,k-1,l  ,i)
     end do
     end do
     end do
