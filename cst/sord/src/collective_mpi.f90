@@ -232,39 +232,166 @@ end if
 end do
 end subroutine
 
-! vector swap halo
+! vector swap halo with OpenP multithreading
 subroutine vector_swap_halo(f4, nh)
 use mpi
+use globals
 real, intent(inout) :: f4(:,:,:,:)
 integer, intent(in) :: nh(3)
-integer :: i, e, prev, next, nm(4), n(4), isend(4), irecv(4), tsend, trecv, comm
-nm = (/size(f4,1), size(f4,2), size(f4,3), size(f4,4)/)
+integer :: i, e, prev, next, nm1(4), n(4), isend1(4), irecv1(4), isend2(4), irecv2(4), tsend, trecv, comm
+nm1 = (/size(f4,1), size(f4,2), size(f4,3), size(f4,4)/)
 do i = 1, 3
-if (np3(i) > 1 .and. nm(i) > 1) then
-    comm = comm3d
-    call mpi_cart_shift(comm, i-1, 1, prev, next, e)
-    n = nm
-    n(i) = nh(i)
-    isend = 0
-    irecv = 0
-    isend(i) = nm(i) - 2 * nh(i)
-    call mpi_type_create_subarray(4, nm, n, isend, mpi_order_fortran, rtype, tsend, e)
-    call mpi_type_create_subarray(4, nm, n, irecv, mpi_order_fortran, rtype, trecv, e)
-    call mpi_type_commit(tsend, e)
-    call mpi_type_commit(trecv, e)
-    call mpi_sendrecv(f4(1,1,1,1), 1, tsend, next, 0, f4(1,1,1,1), 1, trecv, prev, 0, comm, mpi_status_ignore, e)
-    call mpi_type_free(tsend, e)
-    call mpi_type_free(trecv, e)
-    isend(i) = nh(i)
-    irecv(i) = nm(i) - nh(i)
-    call mpi_type_create_subarray(4, nm, n, isend, mpi_order_fortran, rtype, tsend, e)
-    call mpi_type_create_subarray(4, nm, n, irecv, mpi_order_fortran, rtype, trecv, e)
-    call mpi_type_commit(tsend, e)
-    call mpi_type_commit(trecv, e)
-    call mpi_sendrecv(f4(1,1,1,1), 1, tsend, prev, 1, f4(1,1,1,1), 1, trecv, next, 1, comm, mpi_status_ignore, e)
-    call mpi_type_free(tsend, e)
-    call mpi_type_free(trecv, e)
-end if
+    if (np3(i) > 1 .and. nm1(i) > 1) then
+        comm = comm3d
+        call mpi_cart_shift(comm, i-1, 1, prev, next, e)
+        n = nm1
+        n(i) = nh(i)
+        isend1 = 0
+        irecv1 = 0
+        isend2 = 0
+        irecv2 = 0
+        isend1(i) = nm1(i) - 2 * nh(i)
+        isend2(i) = nh(i)
+        irecv2(i) = nm1(i) - nh(i)
+        select case (i)
+        case (1)
+            if (next.gt.-1) call copy_to_buffer_across_j(sh1(:,1), f4, n, isend1)
+            call mpi_sendrecv(sh1(:,1), nsh(1), rtype, next, 0, sh1(:,2), nsh(1), rtype, prev, 0, comm, mpi_status_ignore, e)
+            if (prev.gt.-1) call copy_from_buffer_across_j(f4, sh1(:,2), n, irecv1)
+            if (prev.gt.-1) call copy_to_buffer_across_j(sh1(:,1), f4, n, isend2)
+            call mpi_sendrecv(sh1(:,1), nsh(1), rtype, prev, 0, sh1(:,2), nsh(1), rtype, next, 0, comm, mpi_status_ignore, e)
+            if (next.gt.-1) call copy_from_buffer_across_j(f4, sh1(:,2), n, irecv2)
+        case (2)
+            if (next.gt.-1) call copy_to_buffer_across_k(sh2(:,1), f4, n, isend1)
+            call mpi_sendrecv(sh2(:,1), nsh(2), rtype, next, 0, sh2(:,2), nsh(2), rtype, prev, 0, comm, mpi_status_ignore, e)
+            if (prev.gt.-1) call copy_from_buffer_across_k(f4, sh2(:,2), n, irecv1)
+            if (prev.gt.-1) call copy_to_buffer_across_k(sh2(:,1), f4, n, isend2)
+            call mpi_sendrecv(sh2(:,1), nsh(2), rtype, prev, 0, sh2(:,2), nsh(2), rtype, next, 0, comm, mpi_status_ignore, e)
+            if (next.gt.-1) call copy_from_buffer_across_k(f4, sh2(:,2), n, irecv2)
+      case (3)
+            if (next.gt.-1) call copy_to_buffer_across_l(sh3(:,1), f4, n, isend1)
+            call mpi_sendrecv(sh3(:,1), nsh(3), rtype, next, 0, sh3(:,2), nsh(3), rtype, prev, 0, comm, mpi_status_ignore, e)
+            if (prev.gt.-1) call copy_from_buffer_across_l(f4, sh3(:,2), n, irecv1)
+            if (prev.gt.-1) call copy_to_buffer_across_l(sh3(:,1), f4, n, isend2)
+            call mpi_sendrecv(sh3(:,1), nsh(3), rtype, prev, 0, sh3(:,2), nsh(3), rtype, next, 0, comm, mpi_status_ignore, e)
+            if (next.gt.-1) call copy_from_buffer_across_l(f4, sh3(:,2), n, irecv2)
+      end select
+    end if
+  end do
+end subroutine
+
+! Copy subarray with similar arguments to mpi_type_create_subarray
+subroutine copy_to_buffer_across_j(s, f, n, start)
+real, intent(in) :: f(:,:,:,:)
+real, intent(out) :: s(:)
+integer, intent(in) :: n(4), start(4)
+integer :: i, j, k, l, m
+do i = start(4) + 1, start(4) + n(4)
+    !$omp parallel do schedule(static) private(j, k, l, m)
+    do l = start(3) + 1, start(3) + n(3)
+    do k = start(2) + 1, start(2) + n(2)
+    do j = start(1) + 1, start(1) + n(1)
+        m = j - start(1) + n(1) * (k - start(2) - 1 + n(2) * (l - start(3) - 1 + n(3) * (i - start(4) - 1)))
+        s(m) = f(j,k,l,i)
+    end do
+    end do
+    end do
+    !$omp end parallel do
+end do
+end subroutine
+
+subroutine copy_from_buffer_across_j(f, s, n, start)
+real, intent(in) :: s(:)
+real, intent(out) :: f(:,:,:,:)
+integer, intent(in) :: n(4), start(4)
+integer :: i, j, k, l, m
+do i = start(4) + 1, start(4) + n(4)
+    !$omp parallel do schedule(static) private(j, k, l, m)
+    do l = start(3) + 1, (start(3) + n(3))
+    do k = start(2) + 1, (start(2) + n(2))
+    do j = start(1) + 1, (start(1) + n(1))
+        m = j - start(1) + n(1) * (k - start(2) - 1 + n(2) * (l - start(3) - 1 + n(3) * (i - start(4) - 1)))
+        f(j,k,l,i) = s(m)
+    end do
+    end do
+    end do
+    !$omp end parallel do
+end do
+end subroutine
+
+subroutine copy_to_buffer_across_k(s, f, n, start)
+real, intent(in) :: f(:,:,:,:)
+real, intent(out) :: s(:)
+integer, intent(in) :: n(4), start(4)
+integer :: i, j, k, l, m
+do i = start(4) + 1, start(4) + n(4)
+    !$omp parallel do schedule(static) private(j, k, l, m)
+    do l = start(3) + 1, start(3) + n(3)
+    do k = start(2) + 1, start(2) + n(2)
+    do j = start(1) + 1, start(1) + n(1)
+        m = j - start(1) + n(1) * (k - start(2) - 1 + n(2) * (l - start(3) - 1 + n(3) * (i - start(4) - 1)))
+        s(m) = f(j,k,l,i)
+    end do
+    end do
+    end do
+    !$omp end parallel do
+end do
+end subroutine
+
+subroutine copy_from_buffer_across_k(f, s, n, start)
+real, intent(in) :: s(:)
+real, intent(out) :: f(:,:,:,:)
+integer, intent(in) :: n(4), start(4)
+integer :: i, j, k, l, m
+do i = start(4) + 1, start(4) + n(4)
+    !$omp parallel do schedule(static) private(j, k, l, m)
+    do l = start(3) + 1, start(3) + n(3)
+    do k = start(2) + 1, start(2) + n(2)
+    do j = start(1) + 1, start(1) + n(1)
+          m = j - start(1) + n(1) * (k - start(2) - 1 + n(2) * (l - start(3) - 1 + n(3) * (i - start(4) - 1)))
+          f(j,k,l,i) = s(m)
+    end do
+    end do
+    end do
+    !$omp end parallel do
+end do
+end subroutine
+
+subroutine copy_to_buffer_across_l(s, f, n, start)
+real, intent(in) :: f(:,:,:,:)
+real, intent(out) :: s(:)
+integer, intent(in) :: n(4), start(4)
+integer :: i, j, k, l, m
+do i = start(4) + 1, start(4) + n(4)
+do l = start(3) + 1, start(3) + n(3)
+    !$omp parallel do schedule(static) private(j, k, m)
+    do k = start(2) + 1, start(2) + n(2)
+    do j = start(1) + 1, start(1) + n(1)
+        m = j - start(1) + n(1) * (k - start(2) - 1 + n(2) * (l - start(3) - 1 + n(3) * (i - start(4) - 1)))
+        s(m) = f(j,k,l,i)
+    end do
+    end do
+    !$omp end parallel do
+end do
+end do
+end subroutine
+
+subroutine copy_from_buffer_across_l(f, s, n, start)
+real, intent(in) :: s(:)
+real, intent(out) :: f(:,:,:,:)
+integer, intent(in) :: n(4), start(4)
+integer :: i, j, k, l, m
+do i = start(4) + 1, start(4) + n(4)
+do l = start(3) + 1, start(3) + n(3)
+    !$omp parallel do schedule(static) private(j, k, m)
+    do k = start(2) + 1, start(2) + n(2)
+    do j = start(1) + 1, start(1) + n(1)
+        m = j - start(1) + n(1) * (k - start(2) - 1 + n(2) * (l - start(3) - 1 + n(3) * (i - start(4) - 1)))
+        f(j,k,l,i) = s(m)
+    end do
+    end do
+    !$omp end parallel do
+end do
 end do
 end subroutine
 

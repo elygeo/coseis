@@ -19,13 +19,16 @@ real :: &
     dt,             & ! time step length
     dx(3),          & ! spatial step lengths
     tm                ! time
+
 integer :: &
     nt,             & ! number of time steps
     it,             & ! current time step
     ifn,            & ! fault normal component=abs(faultnormal)
     ip,             & ! process rank
     ipid,           & ! processor Id
-    np0               ! number of processes available
+    np0,            & ! number of processes available
+    nsh(3)            ! swap halo buffers' sizes
+
 integer, dimension(3) :: &
     nn,             & ! shape of global mesh
     nm,             & ! shape of local 3D arrays
@@ -54,6 +57,12 @@ real, allocatable, dimension(:) :: &
     dn2,            & ! pml node damping  2       / (2+d*dt)
     dc1,            & ! pml cell damping (2-d*dt) / (2+d*dt)
     dc2               ! pml cell damping  2*dt    / (2+d*dt)
+
+! 2d dynamic arrays for halo swap
+real, allocatable, dimension(:,:) :: &
+    sh1,            & ! halo swap buffer across dim 1
+    sh2,            & ! halo swap buffer across dim 2
+    sh3               ! halo swap buffer across dim 3
 
 ! pml state
 real, allocatable, dimension(:,:,:,:) :: &

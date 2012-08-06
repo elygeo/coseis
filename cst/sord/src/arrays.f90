@@ -66,6 +66,12 @@ allocate ( &
 ! pml damping
 allocate (dn1(npml), dn2(npml), dc1(npml), dc2(npml))
 
+! halo swap
+nsh(1) = nhalo(1)*k*l * 3
+nsh(2) = j*nhalo(2)*l * 3
+nsh(3) = j*k*nhalo(3) * 3
+allocate (sh1(nsh(1),2), sh2(nsh(2),2), sh3(nsh(3),2))
+
 ! rupture
 if (ifn /= 0) then
     i1 = nm
