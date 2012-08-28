@@ -16,6 +16,7 @@ points = 100
 # MPI + OpenMP
 power = 3, # Vesta 128 nodes, 1 ppn, 32 threads
 points = 400
+power = range(6)     # Challenger
 
 prm = cst.sord.parameters()
 prm.oplevel = 5

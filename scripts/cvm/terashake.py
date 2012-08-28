@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-TeraShake mesh generation and CVM extraction.
+Mesh generation and CVM-S extraction.
 """
 import os
 import numpy as np
@@ -8,41 +8,61 @@ import pyproj
 import cst
 
 # parameters
-nproc = 512
-dx =    200.0,    200.0,   200.0
-x0 =      0.0,      0.0,     0.0
-x1 = 600000.0, 300000.0, 80000.0
-
-# node locations
-x = np.arange(x0[0], x1[0] + dx[0]/2, dx[0])
-y = np.arange(x0[1], x1[1] + dx[1]/2, dx[1])
-z = np.arange(x0[2], x1[2] + dx[2]/2, dx[2])
-nn = x.size, y.size, z.size
+delta = 200.0; nproc = 512
+delta = 2000.0; nproc = 2
+x, y, z = 600000.0, 300000.0, 80000.0
 
 # projection
 proj = pyproj.Proj(proj='utm', zone=11, ellps='WGS84')
 proj = cst.coord.Transform(proj, origin=(-121.0, 34.5), rotate=40.0)
 
+# node locations
+d = 0.5 * delta
+x = np.arange(d, x, delta)
+y = np.arange(d, y, delta)
+z = np.arange(d, z, delta)
+nn = x.size, y.size, z.size
+
 # create mesh
-xx, yy = np.meshgrid(x, y)
-xx, yy = proj(xx, yy, inverse=True)
-xx = np.array(xx, 'f')
-yy = np.array(yy, 'f')
-zz = np.empty_like(xx)
+x, y = np.meshgrid(x, y)
+x, y = proj(x, y, inverse=True)
+x = x.astype('f')
+y = y.astype('f')
 
 # CVM setup
 n = nn[0] * nn[1] * nn[2]
-cfg = cst.cvms.stage(nsample=n, nproc=nproc)
-path = cfg.rundir
+job = cst.cvms.stage(nsample=n, nproc=nproc)
+path = job.rundir + os.sep + 'hold' + os.sep
+mode = os.O_WRONLY | os.O_CREAT | os.O_EXCL
 
-# write CVM input files
-f1 = open(os.path.join(path, 'lon.bin'), 'wb')
-f2 = open(os.path.join(path, 'lat.bin'), 'wb')
-f3 = open(os.path.join(path, 'dep.bin'), 'wb')
-with f1, f2, f3:
-    for z in z:
-        xx.tofile(f1)
-        yy.tofile(f2)
-        zz.fill(z)
-        zz.tofile(f3)
+# write lon file
+try:
+    fh = os.fdopen(os.open(path + 'lon.bin', mode), 'wb')
+except OSError:
+    pass
+else:
+    with fh:
+        for i in range(z.size):
+            x.tofile(fh)
+
+# write lat file
+try:
+    fh = os.fdopen(os.open(path + 'lat.bin', mode), 'wb')
+except OSError:
+    pass
+else:
+    with fh:
+        for i in range(z.size):
+            y.tofile(fh)
+
+# write dep file
+try:
+    fh = os.fdopen(os.open(path + 'dep.bin', mode), 'wb')
+except OSError:
+    pass
+else:
+    with fh:
+        for i in range(z.size):
+            x.fill(z[i])
+            x.tofile(fh)
 

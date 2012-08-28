@@ -161,7 +161,7 @@ def stage(prm, code='sord', name='sord', **kwargs):
 
     # create run directory
     path = os.path.dirname(__file__)
-    job.stagein += os.path.join(path, 'src', job.command),
+    job.stagein = job.stagein + [os.path.join(path, 'src', job.command)]
     util.archive()
     f = os.path.join(path, '..', 'build', 'coseis.tgz')
     if os.path.isfile(f):

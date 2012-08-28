@@ -109,22 +109,6 @@ def prune(d, pattern=None, types=None):
     return d
 
 
-def open_excl(filename, *args):
-    """
-    Thread-safe exclusive file open. Silent return if exists.
-    """
-    import os
-    if os.path.exists(filename):
-        return
-    try:
-        os.mkdir(filename + '.lock')
-    except OSError:
-        return
-    fh = open(filename, *args)
-    os.rmdir(filename + '.lock')
-    return fh
-
-
 def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
     prune_types=None, ext_threshold=None, ext_raw=False):
     """

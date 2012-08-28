@@ -39,8 +39,12 @@ n = shape[2] - ntop - npml
 w = 1.0 - np.r_[np.zeros(ntop), 1.0 / (n - 1) * np.arange(n), np.ones(npml)]
 
 # node elevation mesh
-fh = cst.util.open_excl(hold + 'z3.bin', 'wb')
-if fh:
+m = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+try:
+    fh = os.fdopen(os.open(hold + 'z3.bin', m), 'wb')
+except OSError:
+    pass
+else:
     with fh:
         for i in range(dep.size):
             (dep[i] + z0 + w[i] * z).T.tofile(fh)
@@ -56,22 +60,31 @@ n = shape[2] - ntop - npml
 w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 
 # write dep file
-fh = cst.util.open_excl(hold + 'dep.bin', 'wb')
-if fh:
+try:
+    fh = os.fdopen(os.open(hold + 'dep.bin', m), 'wb')
+except OSError:
+    pass
+else:
     with fh:
         for i in range(dep.size):
             (w[i] * z - dep[i]).astype('f').T.tofile(fh)
 
 # write lon file
-fh = cst.util.open_excl(hold + 'lon.bin', 'wb')
-if fh:
+try:
+    fh = os.fdopen(os.open(hold + 'lon.bin', m), 'wb')
+except OSError:
+    pass
+else:
     with fh:
         for i in range(dep.size):
             x.T.tofile(fh)
 
 # write lat file
-fh = cst.util.open_excl(hold + 'lat.bin', 'wb')
-if fh:
+try:
+    fh = os.fdopen(os.open(hold + 'lat.bin', m), 'wb')
+except OSError:
+    pass
+else:
     with fh:
         for i in range(dep.size):
             y.T.tofile(fh)
