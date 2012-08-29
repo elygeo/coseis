@@ -144,7 +144,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         # launch mesher
         x, y, z = shape
         m = x * y * z // 120000000
-        job0 = cst.conf.launch(
+        job0 = cst.util.launch(
             name = mesh_id + '-mesh',
             new = False,
             rundir = path,

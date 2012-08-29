@@ -191,7 +191,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         meta = imp.load_source('meta', path + 'meta.py')
         x, y, t = meta.shapes['hold/full-v1.bin']
         m = x * y * t // 60000000
-        cst.conf.launch(
+        cst.util.launch(
             run = job.run,
             depend = job.jobid,
             rundir = job.rundir,
