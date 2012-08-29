@@ -44,9 +44,9 @@ n = shape[2] - ntop - npml
 w = 1.0 - np.r_[np.zeros(ntop), 1.0 / (n - 1) * np.arange(n), np.ones(npml)]
 
 # node elevation mesh
-m = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+mode = os.O_WRONLY | os.O_CREAT | os.O_EXCL
 try:
-    fh = os.fdopen(os.open(hold + 'z3.bin', m), 'wb')
+    fh = os.fdopen(os.open(hold + 'z3.bin', mode), 'wb')
 except OSError:
     pass
 else:
@@ -66,7 +66,7 @@ w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 
 # rho extraction
 try:
-    fh = os.fdopen(os.open(hold + 'rho.bin', m), 'wb')
+    fh = os.fdopen(os.open(hold + 'rho.bin', mode), 'wb')
 except OSError:
     pass
 else:
@@ -83,7 +83,7 @@ else:
 
 # vp extraction
 try:
-    fh = os.fdopen(os.open(hold + 'vp.bin', m), 'wb')
+    fh = os.fdopen(os.open(hold + 'vp.bin', mode), 'wb')
 except OSError:
     pass
 else:
@@ -100,7 +100,7 @@ else:
 
 # vs extraction
 try:
-    fh = os.fdopen(os.open(hold + 'vs.bin', m), 'wb')
+    fh = os.fdopen(os.open(hold + 'vs.bin', mode), 'wb')
 except OSError:
     pass
 else:

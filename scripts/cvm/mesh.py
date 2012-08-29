@@ -1,0 +1,68 @@
+#!/usr/bin/env python
+"""
+Mesh generation and CVM-S extraction.
+"""
+import os, subprocess
+import numpy as np
+import pyproj
+import cst
+
+# parameters
+delta = 200.0;  nproc = 512; nstripe = 32;
+delta = 2000.0; nproc = 2;   nstripe = 1;
+x, y, z = 600000.0, 300000.0, 80000.0
+
+# projection
+proj = pyproj.Proj(proj='utm', zone=11, ellps='WGS84')
+proj = cst.coord.Transform(proj, origin=(-121.0, 34.5), rotate=40.0)
+
+# node locations
+d = 0.5 * delta
+x = np.arange(d, x, delta)
+y = np.arange(d, y, delta)
+z = np.arange(d, z, delta)
+shape = x.size, y.size, z.size
+
+# create mesh
+x, y = np.meshgrid(x, y)
+x, y = proj(x, y, inverse=True)
+x = x.astype('f')
+y = y.astype('f')
+
+# stage cvms
+n = shape[0] * shape[1] * shape[2]
+job = cst.cvms.stage(nsample=n, nproc=nproc)
+
+# save data
+path = job.rundir + os.sep
+x.astype('f').T.tofile(path + 'lon.bin')
+y.astype('f').T.tofile(path + 'lat.bin')
+
+# build mesher
+m = open('mesh.mk.in').read()
+m = m.format(
+    shape_x = shape[0],
+    shape_z = shape[2],
+    delta = delta,
+    z_start = 0.5 * delta,
+    **job
+)
+open('mesh.mk', 'w').write(m)
+subprocess.check_call(['make', '-f', 'mesh.mk'])
+
+# launch mesher
+s = shape[0] * shape[1] * shape[2] / 2000000
+job0 = cst.conf.launch(
+    name = 'mesh',
+    new = False,
+    rundir = path,
+    stagein = ['mesh.x'],
+    command = 'mesh.x',
+    seconds = s,
+    nproc = min(3, nproc),
+    nstripe = nstripe,
+)
+
+# launch cvms, wait for mesher
+cst.cvms.launch(job, depend=job0.jobid)
+

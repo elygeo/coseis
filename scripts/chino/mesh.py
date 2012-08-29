@@ -4,7 +4,6 @@ Mesh generation
 """
 import os
 import numpy as np
-import cst
 import meta
 
 # metedata
@@ -39,9 +38,9 @@ n = shape[2] - ntop - npml
 w = 1.0 - np.r_[np.zeros(ntop), 1.0 / (n - 1) * np.arange(n), np.ones(npml)]
 
 # node elevation mesh
-m = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+mode = os.O_WRONLY | os.O_CREAT | os.O_EXCL
 try:
-    fh = os.fdopen(os.open(hold + 'z3.bin', m), 'wb')
+    fh = os.fdopen(os.open(hold + 'z3.bin', mode), 'wb')
 except OSError:
     pass
 else:
@@ -61,7 +60,7 @@ w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 
 # write dep file
 try:
-    fh = os.fdopen(os.open(hold + 'dep.bin', m), 'wb')
+    fh = os.fdopen(os.open(hold + 'dep.bin', mode), 'wb')
 except OSError:
     pass
 else:
@@ -71,7 +70,7 @@ else:
 
 # write lon file
 try:
-    fh = os.fdopen(os.open(hold + 'lon.bin', m), 'wb')
+    fh = os.fdopen(os.open(hold + 'lon.bin', mode), 'wb')
 except OSError:
     pass
 else:
@@ -81,7 +80,7 @@ else:
 
 # write lat file
 try:
-    fh = os.fdopen(os.open(hold + 'lat.bin', m), 'wb')
+    fh = os.fdopen(os.open(hold + 'lat.bin', mode), 'wb')
 except OSError:
     pass
 else:

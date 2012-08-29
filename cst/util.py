@@ -2,30 +2,6 @@
 Miscellaneous tools.
 """
 
-def make(command, objects, sources):
-    import os, hashlib, subprocess
-    g = hashlib.sha1(' '.join(command))
-    for s in sources:
-        g.update(open(s).read())
-    f = objects[0] + '.sha1'
-    if os.path.exists(f):
-        h = g.copy()
-        for o in objects:
-            if not os.path.exists(o):
-                h = None
-                break
-            h.update(open(o).read())
-        if h != None and h.hexdigest() == open(f).read():
-            return False
-        os.unlink(f)
-    print(' '.join(command))
-    subprocess.check_call(command)
-    for o in objects:
-        g.update(open(o).read())
-    open(f, 'w').write(g.hexdigest())
-    return True
-
-
 def f90modules(path):
     mods = set()
     deps = set()
@@ -347,7 +323,7 @@ def prepare(job=None, **kwargs):
     print('Run directory: ' + d)
     job.rundir = os.path.realpath(os.path.expanduser(d))
 
-    # luanch commands
+    # launch commands
     job.launch = job.launch.format(**job)
     job.script = job.script.format(**job)
     if job.submit:

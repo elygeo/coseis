@@ -1,0 +1,11 @@
+CC = {build_cc}
+LIBS = {build_libs}
+CFLAGS = {build_cflags} \
+    -DSHAPE_X={shape_x} \
+    -DSHAPE_Z={shape_z} \
+    -DDELTA={delta} \
+    -DZ_START={z_start}
+
+mesh.x : mesh.c
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+

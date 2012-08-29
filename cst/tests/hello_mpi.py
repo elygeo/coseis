@@ -1,17 +1,15 @@
 #!/usr/bin/env python
 
 def build():
-    import os, shlex
+    import os, subprocess
     import cst
-    f = os.path.dirname(__file__)
-    f = os.path.join(f, 'hello_mpi')
-    s = f + '.f90'
-    o = f + '.x'
-    job = cst.util.configure()
-    c  = shlex.split(job.build_fc)
-    c += shlex.split(job.build_fflags) + ['-o', o, s]
-    c += shlex.split(job.build_libs)
-    cst.util.make(c, [o], [s])
+    cwd = os.getcwd()
+    os.chdir(os.path.dirname(__file__))
+    d = cst.util.configure()
+    m = open('hello_mpi.mk.in').read().format(**d)
+    open('hello_mpi.mk', 'w').write(m)
+    subprocess.check_call(['make', '-f', 'hello_mpi.mk'])
+    os.chdir(cwd)
     return
 
 def test(argv=[]):
@@ -35,6 +33,5 @@ def test(argv=[]):
 # continue if command line
 if __name__ == '__main__':
     import sys
-    build()
     test(sys.argv[1:])
 

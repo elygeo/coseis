@@ -1,0 +1,7 @@
+FC = {build_fc}
+LIBS = {build_libs}
+FFLAGS = {build_fflags}
+
+hello_mpi.x : hello_mpi.f90
+	$(FC) $(FFLAGS) -o $@ $^ $(LIBS)
+

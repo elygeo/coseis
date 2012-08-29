@@ -11,6 +11,7 @@
 *.sha1
 *.x
 *.dSYM
+*.mk
 run
 tmp
 TODO
