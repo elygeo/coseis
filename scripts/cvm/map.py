@@ -24,8 +24,8 @@ z = np.empty_like(x)
 z.fill(depth)
 
 # CVM extractions
-vss = cst.cvms.extract(x, y, z, prop)
-vsh = cst.cvmh.extract(x, y, z, prop)
+vss = cst.cvms.extract(x, y, z, prop)[0]
+vsh = cst.cvmh.extract(x, y, z, prop)[0]
 
 # map data
 x, y = cst.data.mapdata('coastlines', 'high', (lon, lat), 100.0)
@@ -41,7 +41,7 @@ for vs, tag in (vss, 'S'), (vsh, 'H'):
     ax.set_aspect(1.0 / np.cos(33.75 / 180.0 * np.pi))
     ax.set_title('CVM%s %.0f m depth' % (tag, depth))
     ax.axis(lon + lat)
-    f = os.path.join('run', 'cvm%s-%s%.0f.png' % (tag.lower(), prop, depth))
+    f = os.path.join('run', 'map-cvm%s-%s%.0f.png' % (tag.lower(), prop, depth))
     print f
     fig.savefig(f)
 

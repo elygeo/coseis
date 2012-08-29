@@ -10,8 +10,8 @@ import cst
 
 # parameters
 model = 'cvms'; version = '2.2'
-model = 'cvmh'
 model = 'cvms'; version = '4.0'
+model = 'cvmh'
 prop, vmin, vmax = 'vs', 500, 4000
 prop, vmin, vmax = 'vp', 1600, 6400
 dx = 200.0; dz = 50.0; nz = 201
@@ -73,7 +73,7 @@ zz, yy = np.meshgrid(z, yy)
 if transpose:
     xx, yy, zz = xx.T, yy.T, zz.T
 if model == 'cvmh':
-    ss = cst.cvmh.extract(xx, yy, zz, prop)
+    ss = cst.cvmh.extract(xx, yy, zz, prop)[0]
 else:
     ss = cst.cvms.extract(xx, yy, zz, prop, version=version)[0]
 if transpose:
@@ -123,7 +123,7 @@ fig.scene.light_manager.lights[3].activate = True
 fig.scene.disable_render = False
 if not os.path.exists('run'):
     os.mkdir('run')
-f = os.path.join('run', '%s-%s-fence.png' % (model, prop))
+f = os.path.join('run', 'fence-%s-%s.png' % (model, prop))
 print f
 mlab.savefig(f, magnification=1)
 fig.scene.disable_render = False

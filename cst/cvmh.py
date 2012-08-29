@@ -42,7 +42,7 @@ def vs30_wald(rebuild=False):
     """
     import os, urllib, gzip, cStringIO
     import numpy as np
-    from . import coord
+    from . import interpolate
 
     filename = os.path.join(repo, 'cvmh-vs30-wald.npy')
     url = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
@@ -61,7 +61,7 @@ def vs30_wald(rebuild=False):
         y =   30.0 + delta,   50.0 - delta
         extent = x, y
         x, y = gtl_coords()
-        data = coord.interp2(extent, data, (x, y), method='linear').astype('f')
+        data = interpolate.interp2(extent, data, (x, y), method='linear').astype('f')
         np.save(filename, data)
     return extent_gtl, None, data
 
@@ -72,7 +72,7 @@ def vs30_wills(rebuild=False):
     """
     import os, sys, urllib, subprocess
     import numpy as np
-    from . import coord
+    from . import interpolate
 
     url = 'http://earth.usc.edu/~gely/cvm-data/cvmh-vs30-wills.npy'
     filename = os.path.join(repo, os.path.basename(url))
@@ -108,7 +108,7 @@ def vs30_wills(rebuild=False):
             v = fh.read(nx * ny * bytes)
             v = np.fromstring(v, dtype).astype('f').reshape((ny, nx)).T
             v[v<=0] = float('nan')
-            coord.interp2(extent, v, (x, y), data, bound=True, mask_nan=True)
+            interpolate.interp2(extent, v, (x, y), data, bound=True, mask_nan=True)
         print('')
         np.save(filename, data)
     return extent_gtl, None, data
@@ -136,7 +136,7 @@ def brocher_vp(f):
     return f
 
 
-def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='vx63'):
+def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='11.9.0'):
     """
     Download and read SCEC CVM-H voxet.
 
@@ -148,7 +148,7 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='vx63'):
     voxet:
         3d voxet: 'mantle', 'crust', or 'lab'
     no_data_value: None, 'nan', or float value. None = filled from below.
-    version: 'vx62', or 'vx63'
+    version: 'vx62', 'vx63', '11.2.0', or '11.9.0'
 
     Returns
     -------
@@ -160,21 +160,26 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='vx63'):
     from . import gocad
 
     path = os.path.join(repo, 'cvmh-%s' % version)
-    url = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2' % version
+    if version[:2] == 'vx':
+        url = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2' % version
+        base = '%s/bin' % version
+        f = path + '.bztar'
+    else:
+        url = 'http://hypocenter.usc.edu/research/cvmh/11.9.0/cvmh-%s.tar.gz' % version
+        base = 'cvmh-%s/model' % version
+        f = path + '.tgz'
 
     # download if not found
     if not os.path.exists(path):
-        f = path + '.bztar'
         if not os.path.exists(f):
             print('Downloading %s' % url)
             urllib.urlretrieve(url, f)
         print('Extracting %s' % f)
-        d = '%s/bin' % version
         tar = tarfile.open(f)
         os.mkdir(path)
         with tar as tar:
             for t in tar:
-                if not t.name.startswith(d):
+                if not t.name.startswith(base):
                     continue
                 if t.name.endswith('.vo') or t.name.endswith('@@'):
                     f = os.path.join(path, os.path.split(t.name)[1])
@@ -257,7 +262,7 @@ class Model():
     voxet:
         3d voxet list: ['mantle', 'crust', 'lab']
     no_data_value: None, 'nan', or float value. None = filled from below.
-    version: 'vx62', or 'vx63'
+    version: 'vx62', 'vx63', '11.2.0', or '11.9.0'
 
     Call parameters
     ---------------
@@ -269,7 +274,7 @@ class Model():
     -------
     out: Property samples at coordinates (x, y, z)
     """
-    def __init__(self, prop, voxet=['mantle', 'crust'], no_data_value=None, version='vx63'):
+    def __init__(self, prop, voxet=['mantle', 'crust'], no_data_value=None, version='11.9.0'):
         self.prop = prop
         if prop == 'wald':
             self.voxet = [vs30_wald()]
@@ -284,16 +289,16 @@ class Model():
         return
     def __call__(self, x, y, z=None, out=None, interpolation='nearest'):
         import numpy as np
-        from . import coord
+        from . import interpolate
         if out is None:
             out = np.empty_like(x)
             out.fill(float('nan'))
         for extent, bound, data in self.voxet:
             if z is None:
                 data = data.reshape(data.shape[:2])
-                coord.interp2(extent[:2], data, (x, y), out, interpolation, bound)
+                interpolate.interp2(extent[:2], data, (x, y), out, interpolation, bound)
             else:
-                coord.interp3(extent, data, (x, y, z), out, interpolation, bound)
+                interpolate.interp3(extent, data, (x, y, z), out, interpolation, bound)
         return out
 
 

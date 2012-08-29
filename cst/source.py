@@ -417,9 +417,9 @@ class srf():
                 t1 = self.t0[i], self.t0[i] + self.dt[i] * (n1 - 1)
                 t2 = self.t0[i], self.t0[i] + self.dt[i] * (n2 - 1)
                 t3 = self.t0[i], self.t0[i] + self.dt[i] * (n3 - 1)
-                s1 = coord.interp(t1, s1, t, s(t), interp, bound=True)
-                s2 = coord.interp(t2, s2, t, s(t), interp, bound=True)
-                s3 = coord.interp(t3, s3, t, s(t), interp, bound=True)
+                s1 = interpolate.interp(t1, s1, t, s(t), interp, bound=True)
+                s2 = interpolate.interp(t2, s2, t, s(t), interp, bound=True)
+                s3 = interpolate.interp(t3, s3, t, s(t), interp, bound=True)
                 ii = np.array([[jj[i], kk[i], ll[i]]], 'i')
                 mm = np.array([
                     m1[0,0,i] * s1 + m2[0,0,i] * s2 + m3[0,0,i] * s3,
