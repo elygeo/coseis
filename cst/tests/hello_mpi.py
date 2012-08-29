@@ -17,10 +17,22 @@ def test(argv=[]):
     import cst
     build()
     f = os.path.dirname(__file__)
-    f = os.path.join(f, 'hello_mpi.x')
+    f = os.path.join(f, 'hello_mpic.x')
     cst.util.launch(
-        name = 'hello_mpi',
-        command = './hello_mpi.x',
+        name = 'hello_mpic',
+        command = './hello_mpic.x',
+        stagein = [f],
+        run = 'exec',
+        argv = argv,
+        nproc = 2,
+        force = True,
+        minutes = 10,
+    )
+    f = os.path.dirname(__file__)
+    f = os.path.join(f, 'hello_mpif.x')
+    cst.util.launch(
+        name = 'hello_mpif',
+        command = './hello_mpif.x',
         stagein = [f],
         run = 'exec',
         argv = argv,

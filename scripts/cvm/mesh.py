@@ -51,18 +51,18 @@ open('mesh.mk', 'w').write(m)
 subprocess.check_call(['make', '-f', 'mesh.mk'])
 
 # launch mesher
-s = shape[0] * shape[1] * shape[2] / 2000000
-job0 = cst.conf.launch(
+m = shape[0] * shape[1] * shape[2] // 100000000
+job0 = cst.util.launch(
     name = 'mesh',
     new = False,
     rundir = path,
     stagein = ['mesh.x'],
-    command = 'mesh.x',
-    seconds = s,
+    command = './mesh.x',
+    minutes = m,
     nproc = min(3, nproc),
     nstripe = nstripe,
 )
 
 # launch cvms, wait for mesher
-cst.cvms.launch(job, depend=job0.jobid)
+#cst.cvms.launch(job, depend=job0.jobid)
 

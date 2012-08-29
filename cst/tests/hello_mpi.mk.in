@@ -1,7 +1,14 @@
+CC = {build_cc}
 FC = {build_fc}
 LIBS = {build_libs}
+CFLAGS = {build_cflags}
 FFLAGS = {build_fflags}
 
-hello_mpi.x : hello_mpi.f90
+all: hello_mpic.x hello_mpif.x
+
+hello_mpic.x : hello_mpi.c
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+
+hello_mpif.x : hello_mpi.f90
 	$(FC) $(FFLAGS) -o $@ $^ $(LIBS)
 
