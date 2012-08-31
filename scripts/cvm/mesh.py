@@ -35,7 +35,7 @@ job = cst.cvms.stage(nsample=n, nproc=nproc)
 
 # save data
 path = job.rundir + os.sep
-#x.astype('f').T.tofile(path + 'lon.bin')
+x.astype('f').T.tofile(path + 'lon.bin')
 y.astype('f').T.tofile(path + 'lat.bin')
 
 # build mesher
@@ -44,7 +44,7 @@ m = m.format(
     shape_x = shape[0],
     shape_z = shape[2],
     delta = delta,
-    z_start = 0.5 * delta,
+    z_start = 0.0,
     **job
 )
 open('Makefile', 'w').write(m)

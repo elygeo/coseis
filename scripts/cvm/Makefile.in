@@ -8,5 +8,8 @@ CFLAGS = {build_cflags} \
 
 mesh.x : mesh.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
-	rm -rf $@.dSYM
+	[ -d $@.dSYM ] && rm -rf $@.dSYM
+
+clean :
+	rm -rf mesh.x Makefile run
 
