@@ -7,14 +7,18 @@ import numpy as np
 import pyproj
 import cst
 
-# parameters
-delta = 200.0;  nproc = 512; nstripe = 32;
-delta = 2000.0; nproc = 2;   nstripe = 1;
+# TeraShake
+delta = 200.0; nproc = 512; nstripe = 32;
+delta = 20000.0; nproc = 2; nstripe = 1;
 x, y, z = 600000.0, 300000.0, 80000.0
-
-# projection
 proj = pyproj.Proj(proj='utm', zone=11, ellps='WGS84')
 proj = cst.coord.Transform(proj, origin=(-121.0, 34.5), rotate=40.0)
+
+# CH5Hz, Olsen, 2012 Aug 31
+delta = 8.0; nproc = 512; nstripe = 32;
+delta = 800.0; nproc = 2; nstripe = 1;
+x, y, z = 56000.0, 40000.0, 32000.0
+proj = pyproj.Proj(proj='tmerc', lon_0=-118.3, lat_0=33.75)
 
 # node locations
 d = 0.5 * delta
@@ -35,8 +39,8 @@ job = cst.cvms.stage(nsample=n, nproc=nproc)
 
 # save data
 path = job.rundir + os.sep
-x.astype('f').T.tofile(path + 'lon.bin')
-y.astype('f').T.tofile(path + 'lat.bin')
+x.astype('f').tofile(path + 'lon.bin')
+y.astype('f').tofile(path + 'lat.bin')
 
 # build mesher
 m = open('Makefile.in').read()
