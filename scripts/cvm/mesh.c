@@ -1,5 +1,5 @@
 // CVM-S Mesher
-// Reads 2D mesh files and fills them out to 3D.
+// Reads 2D mesh files and extends them to 3D.
 // Can be run concurrently for each file (3 processes).
 
 #include <stdio.h>

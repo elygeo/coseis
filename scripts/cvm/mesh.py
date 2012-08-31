@@ -10,9 +10,7 @@ import cst
 # parameters
 delta = 200.0;  nproc = 512; nstripe = 32;
 delta = 2000.0; nproc = 2;   nstripe = 1;
-delta = 500.0; nproc = 2;   nstripe = 1;
 x, y, z = 600000.0, 300000.0, 80000.0
-x, y, z = 600000.0, 300000.0, 1000.0
 
 # projection
 proj = pyproj.Proj(proj='utm', zone=11, ellps='WGS84')
@@ -43,7 +41,7 @@ y.astype('f').T.tofile(path + 'lat.bin')
 # build mesher
 m = open('Makefile.in').read()
 m = m.format(
-    shape_x = shape[0],
+    shape_x = shape[0] * shape[1],
     shape_z = shape[2],
     delta = delta,
     z_start = 0.0,
