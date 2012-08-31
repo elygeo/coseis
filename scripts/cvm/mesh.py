@@ -17,7 +17,7 @@ proj = cst.coord.Transform(proj, origin=(-121.0, 34.5), rotate=40.0)
 # CH5Hz, Olsen, 2012 Aug 31
 delta = 8.0; nproc = 512; nstripe = 32;
 delta = 800.0; nproc = 2; nstripe = 1;
-x, y, z = 56000.0, 40000.0, 32000.0
+x, y, z = 56000.0, 40000.0, 28000.0
 proj = pyproj.Proj(proj='tmerc', lon_0=-118.3, lat_0=33.75)
 
 # node locations
