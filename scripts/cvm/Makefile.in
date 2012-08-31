@@ -8,4 +8,5 @@ CFLAGS = {build_cflags} \
 
 mesh.x : mesh.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+	rm -rf $@.dSYM
 

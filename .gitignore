@@ -21,3 +21,4 @@ TODO
 /cst/build
 /cst/cvms/build
 /cst/sord/src/Makefile
+/scripts/cvm/Makefile

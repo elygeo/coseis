@@ -35,11 +35,11 @@ job = cst.cvms.stage(nsample=n, nproc=nproc)
 
 # save data
 path = job.rundir + os.sep
-x.astype('f').T.tofile(path + 'lon.bin')
+#x.astype('f').T.tofile(path + 'lon.bin')
 y.astype('f').T.tofile(path + 'lat.bin')
 
 # build mesher
-m = open('mesh.mk.in').read()
+m = open('Makefile.in').read()
 m = m.format(
     shape_x = shape[0],
     shape_z = shape[2],
@@ -47,8 +47,8 @@ m = m.format(
     z_start = 0.5 * delta,
     **job
 )
-open('mesh.mk', 'w').write(m)
-subprocess.check_call(['make', '-f', 'mesh.mk'])
+open('Makefile', 'w').write(m)
+subprocess.check_call(['make'])
 
 # launch mesher
 m = shape[0] * shape[1] * shape[2] // 100000000

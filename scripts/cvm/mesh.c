@@ -1,10 +1,16 @@
 // CVM-S Mesher
-// May be run concurrently for each file (3 processes).
+// Can be run concurrently for each file (3 processes).
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
 
-int main(void) {
+void error(char *message) {
+    printf("Error: %s\n", message);
+    exit(1);
+}
+
+int main(int argc, char *argv[]) {
 
 const float z_start = Z_START, delta = DELTA;
 const size_t m = SHAPE_X, n = SHAPE_Z;
@@ -16,66 +22,60 @@ size_t i, j;
 int fh;
 FILE *f;
 
-// write longitude file
-if ((fh = open("hold/lon.bin", flags, mode)) > 0) {
-    f = fopen("lon.bin", "r");
-    if (f == NULL) {
-        perror("lon open error");
-        return 1;
-    }
-    i = fread(x, b, m, f);
-    fclose(f);
-    if (f == NULL || i != m) {
-        perror("lon read error");
-        return 1;
-    }
-    f = fdopen(fh, "w");
+// longitude
+if ((fh = open("hold/lon.bin", flags, mode)) >= 0) {
+
+    // read 2D
+    if ((f = fopen("lon.bin", "r")) == NULL)
+        error("lon fopen");
+    if (fread(x, b, m, f) != m)
+        error("lon fread");
+    if (fclose(f))
+        error("lon fclose");
+
+    // write 3D
+    if ((f = fdopen(fh, "w")) == NULL)
+        error("lon fdopen");
     for (j = 0; j < n; j++)
-        if (f == NULL || fwrite(x, b, m, f) != m) {
-            perror("lon write error");
-            return 1;
-        }
-    sleep(5);
+        if (fwrite(x, b, m, f) != m)
+            error("lon fwrite");
+    if (fclose(f))
+        error("lon fclose");
 }
 
-// write latitude file
-if ((fh = open("hold/lat.bin", flags, mode)) > 0) {
-    f = fopen("lat.bin", "r");
-    if (f == NULL) {
-        perror("lat open error");
-        return 1;
-    }
-    i = fread(x, b, m, f);
-    fclose(f);
-    if (f == NULL || i != m) {
-        perror("lat read error");
-        return 1;
-    }
-    f = fdopen(fh, "w");
+// latitude
+if ((fh = open("hold/lat.bin", flags, mode)) >= 0) {
+
+    // read 2D
+    if ((f = fopen("lat.bin", "r")) == NULL)
+         error("lat fopen");
+    if (fread(x, b, m, f) != m)
+         error("lat fread");
+    if (fclose(f))
+         error("lat fclose");
+
+    // write 3D
+    if ((f = fdopen(fh, "w")) == NULL)
+         error("lat fdopen");
     for (j = 0; j < n; j++)
-        if (f == NULL || fwrite(x, b, m, f) != m) {
-            perror("lat write error");
-            return 1;
-        }
-    sleep(5);
+        if (fwrite(x, b, m, f) != m)
+            error("lat fwrite");
+    if (fclose(f))
+         error("lat fclose");
 }
 
-// write depth file
-if ((fh = open("hold/dep.bin", flags, mode)) > 0) {
-    f = fdopen(fh, "w");
-    if (f == NULL) {
-        perror("dep open error");
-        return 1;
-    }
+// depth
+if ((fh = open("hold/dep.bin", flags, mode)) >= 0) {
+    if ((f = fdopen(fh, "w")) == NULL)
+        error("dep fdopen");
     for (j = 0; j < n; j++) {
         for (i = 0; i < m; i++)
             x[i] = z_start + j * delta;
-        if (f == NULL || fwrite(x, b, m, f) != m) {
-            perror("dep write error");
-            return 1;
-        }
+        if (fwrite(x, b, m, f) != m)
+            error("dep fwrite");
     }
-    sleep(5);
+    if (fclose(f))
+        error("dep fclose");
 }
 
 // all done
