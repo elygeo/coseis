@@ -15,24 +15,21 @@ def f90modules(path):
     return list(mods), list(deps)
 
 
-def archive():
+def archive(path):
     import os, gzip, cStringIO
     try:
         import git
     except ImportError:
-        print('Warning: Source code not archived. To enable, use')
+        print('Warning: Source code not archived. Source archiving')
+        print('improves reproducibility by storing the exact code')
+        print('version with the simulations results. To enable, use')
         print('Git versioned source code and install GitPython.')
     else:
-        p = os.path.dirname(__file__)
-        f = os.path.join(p, 'build')
-        if not os.path.exists(f):
-            os.mkdir(f)
-        f = os.path.join(p, 'build', 'coseis.tgz')
         s = cStringIO.StringIO()
         r = git.Repo(p)
         r.archive(s, prefix='coseis/')
         s.reset()
-        gzip.open(f, 'wb').write(s.read())
+        gzip.open(path, 'wb').write(s.read())
 
 
 class storage(dict):

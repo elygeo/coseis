@@ -160,12 +160,7 @@ def stage(prm, code='sord', name='sord', **kwargs):
     build(job)
 
     # create run directory
-    path = os.path.dirname(__file__)
     job.stagein = job.stagein + [os.path.join(path, 'src', job.command)]
-    util.archive()
-    f = os.path.join(path, '..', 'build', 'coseis.tgz')
-    if os.path.isfile(f):
-        job.stagein += f,
     if prm.debug > 2:
         job.stagein += 'debug/',
     if prm.itcheck != 0:
@@ -177,6 +172,7 @@ def stage(prm, code='sord', name='sord', **kwargs):
     os.chdir(job.rundir)
     del(prm['itbuff'])
     util.save('parameters.py', prm, expand=['fieldio'], header='# model parameters\n')
+    util.archive('coseis.tgz')
 
     # metadata
     xis = {}

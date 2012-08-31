@@ -10,7 +10,9 @@ import cst
 # parameters
 delta = 200.0;  nproc = 512; nstripe = 32;
 delta = 2000.0; nproc = 2;   nstripe = 1;
+delta = 500.0; nproc = 2;   nstripe = 1;
 x, y, z = 600000.0, 300000.0, 80000.0
+x, y, z = 600000.0, 300000.0, 1000.0
 
 # projection
 proj = pyproj.Proj(proj='utm', zone=11, ellps='WGS84')
@@ -64,5 +66,5 @@ job0 = cst.util.launch(
 )
 
 # launch cvms, wait for mesher
-#cst.cvms.launch(job, depend=job0.jobid)
+cst.cvms.launch(job, depend=job0.jobid)
 

@@ -18,7 +18,6 @@ TODO
 /dev
 /cst/conf/site.py
 /cst/data
-/cst/build
 /cst/cvms/build
 /cst/sord/src/Makefile
 /scripts/cvm/Makefile
