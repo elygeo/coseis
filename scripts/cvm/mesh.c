@@ -3,6 +3,7 @@
 // Can be run concurrently for each file (3 processes).
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <fcntl.h>
 
 int main(int argc, char *argv[]) {
@@ -12,8 +13,8 @@ const int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 const float z_start = Z_START, delta = DELTA;
 const size_t m = SHAPE_X, n = SHAPE_Z;
 const size_t b = sizeof(float);
+float *x = (float *)malloc(m * b);
 int fh, e;
-float x[m];
 size_t i, j;
 FILE *f;
 
