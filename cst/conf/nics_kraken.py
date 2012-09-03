@@ -3,6 +3,7 @@ NICS Kraken: Cray XT5
 """
 
 # machine properties
+account = 'TG-MCA03S012'
 maxnodes = 64 * 129
 maxcores = 12
 maxram = 16384
