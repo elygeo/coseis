@@ -35,7 +35,7 @@ minutes = 0               # estimated run time
 # machine specific
 machine = ''
 account = ''
-host = socket.getfqdn()
+host = socket.getfqdn() + '-' + os.uname()[1]
 host_opts = {}
 system = os.uname()
 queue = ''
@@ -117,6 +117,7 @@ for m, h in [
     ('usc_hpc', 'hpc-login1.usc.edu'),
     ('usc_hpc', 'hpc-login2-l.usc.edu'),
     ('tacc_ranger', 'ranger.tacc.utexas.edu'),
+    ('nics_kraken', 'kraken'),
     ('airy', 'airy'),
 ]:
     if h in host:
