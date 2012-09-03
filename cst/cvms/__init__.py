@@ -35,11 +35,15 @@ def build(job=None, **kwargs):
         job = configure(options=[], **kwargs)
     assert job.version in ('2.2', '3.0', '4.0')
     ver = 'cvms-' + job.version
+    if job.build_mpi:
+        mode = 'mpi'
+    else:
+        mode = 'bin'
 
     # build directory
-    path = os.path.dirname(__file__)
     cwd = os.getcwd()
-    d = os.path.join(path, 'build')
+    d = os.path.dirname(__file__)
+    d = os.path.join(d, 'build')
     if not os.path.exists(d):
         os.mkdir(d)
     os.chdir(d)
@@ -51,24 +55,24 @@ def build(job=None, **kwargs):
         print('Downloading %s' % u)
         urllib.urlretrieve(u, f)
 
-    # build
-    if not os.path.exists(ver):
+    # unpack and patch files
+    if os.path.exists(ver):
+        os.chdir(ver)
+    else:
         os.mkdir(ver)
         os.chdir(ver)
-        f = os.path.join(path, 'build', f)
+        f = os.path.join('..', f)
         tarfile.open(f, 'r:gz').extractall()
-        f = os.path.join(path, ver + '.patch')
+        f = os.path.join('..', '..', ver + '.patch')
         subprocess.check_call(['patch', '-p1', '-i', f])
-        if job.build_mpi:
-            mode = 'mpi'
-        else:
-            mode = 'bin'
-        f = os.path.join(path, 'io%s.f' % mode)
+        f = os.path.join('..', '..', 'io%s.f' % mode)
         shutil.copy2(f, '.')
-        m = os.path.join(path, 'Makefile.in')
-        m = open(m).read().format(mode=mode, **job)
-        open('Makefile', 'w').write(m)
-        subprocess.check_call(['make'])
+
+    # build
+    m = os.path.join('..', '..', 'Makefile.in')
+    m = open(m).read().format(mode=mode, **job)
+    open('Makefile', 'w').write(m)
+    subprocess.check_call(['make'])
 
     # finished
     os.chdir(cwd)

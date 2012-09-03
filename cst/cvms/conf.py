@@ -11,7 +11,7 @@ build_fflags = '-O3 -Wall'
 build_cvms = {
    'alcf_bg': '-O3 -qfixed -qsuppress=cmpmsg',
    'tacc_ranger': '-O3 -warn -std08',
-   'nics_kraken': '-fast -Mdclchk',
+   'nics_kraken': '-fast',
 }
 
 nsample = 0
