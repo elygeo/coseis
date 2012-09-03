@@ -35,7 +35,8 @@ minutes = 0               # estimated run time
 # machine specific
 machine = ''
 account = ''
-host = socket.getfqdn() + '-' + os.uname()[1]
+host = os.uname()
+host = '-'.join((host[0], host[4], host[1], socket.getfqdn()))
 host_opts = {}
 system = os.uname()
 queue = ''
