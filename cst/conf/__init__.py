@@ -9,7 +9,7 @@ try:
 except ImportError:
     import os
     f = os.path.join(os.path.dirname(__file__), 'site.py')
-    open(f, 'a').write('machine = %r' % default.machine)
+    open(f, 'a').write('machine = %r\n' % default.machine)
     from . import site
     del(os, f)
 
