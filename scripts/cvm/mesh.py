@@ -35,7 +35,7 @@ y = y.astype('f')
 
 # stage cvms
 n = shape[0] * shape[1] * shape[2]
-job = cst.cvms.stage(nsample=n, nproc=nproc)
+job = cst.cvms.stage(nsample=n, nproc=nproc, nthread=1)
 
 # save data
 path = job.rundir + os.sep
@@ -65,6 +65,7 @@ job0 = cst.util.launch(
     minutes = m,
     nproc = min(3, nproc),
     nstripe = nstripe,
+    nthread = 1,
 )
 
 # launch cvms, wait for mesher
