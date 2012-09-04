@@ -22,7 +22,7 @@ build_ldflags = '-mp -fast -g -pg -Mprof=func'
 build_ldflags = '-mp -fast'
 ppn_range = [1]
 nthread = 12
-launch = 'OMP_NUM_THREAD={nthread} aprun -d {nthread} n {nproc} {command}\n'
+launch = 'OMP_NUM_THREAD={nthread} aprun -d {nthread} -n {nproc} {command}\n'
 
 # compilers
 build_cc = 'cc'
