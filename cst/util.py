@@ -208,6 +208,7 @@ def configure(*args, **kwargs):
                 job[key] = cast
         if not job.prepare:
             job.run = ''
+    del(job['options'])
 
     # host config:
     for h, o in job.host_opts.items():
@@ -323,10 +324,11 @@ def prepare(job=None, **kwargs):
     # launch commands
     job.launch = job.launch.format(**job)
     job.script = job.script.format(**job)
-    if job.submit:
+    if job.depend:
+        job.submit = job.submit2.format(**job)
+    else:
         job.submit = job.submit.format(**job)
-    if job.submit2:
-        job.submit2 = job.submit2.format(**job)
+    del(job['submit2'])
 
     return job
 
@@ -350,10 +352,12 @@ def skeleton(job=None, **kwargs):
 
     # create destination directory
     dest = os.path.realpath(os.path.expanduser(job.rundir)) + os.sep
-    if job.force == True and os.path.isdir(dest):
-        shutil.rmtree(dest)
     if job.new:
+        if job.force == True and os.path.isdir(dest):
+            shutil.rmtree(dest)
         os.makedirs(dest)
+    elif not os.path.isdir(dest):
+        raise Exception('Not found: %s' % dest)
 
     # save job
     f = os.path.join(dest, job.code + '.job.py')
@@ -400,12 +404,9 @@ def launch(job=None, **kwargs):
 
     # launch
     if job.run == 'submit':
-        if job.depend:
-            c = job.submit2
-        else:
-            c = job.submit
-        print(c)
-        p = subprocess.Popen(shlex.split(c), stdout=subprocess.PIPE)
+        print(job.submit)
+        c = shlex.split(job.submit)
+        p = subprocess.Popen(c, stdout=subprocess.PIPE)
         stdout = p.communicate()[0]
         print(stdout)
         if p.returncode:

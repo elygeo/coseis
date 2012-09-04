@@ -3,7 +3,6 @@ SCEC Community Velocity Model - Magistrale version
 
 http://www.data.scec.org/3Dvelocity/
 """
-from ..util import launch
 
 input_template = """\
 {nsample}
@@ -133,6 +132,21 @@ def stage(**kwargs):
     # save input file and configuration
     f = os.path.join(job.rundir, 'cvms-input')
     open(f, 'w').write(input_template.format(**job))
+    return job
+
+def launch(job=None, **kwargs):
+    """
+    Launch or submit job.
+    """
+    import os, re, shlex, subprocess
+    from .. import util
+
+    if job is None:
+        job = stage(**kwargs)
+    else:
+        for k in kwargs:
+            job[k] = kwargs[k]
+    job = util.launch(job)
     return job
 
 def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):

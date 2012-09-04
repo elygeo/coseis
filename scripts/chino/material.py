@@ -126,6 +126,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     # cvm-s
     if cvm == 'cvms':
 
+        FIXME
         # stage cvms
         job = cst.cvms.stage(
             name = mesh_id + '-cvms',

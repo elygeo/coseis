@@ -26,6 +26,7 @@ x = np.arange(d, x, delta)
 y = np.arange(d, y, delta)
 z = np.arange(d, z, delta)
 shape = x.size, y.size, z.size
+nsample = x.size * y.size * z.size
 
 # create mesh
 x, y = np.meshgrid(x, y)
@@ -33,41 +34,51 @@ x, y = proj(x, y, inverse=True)
 x = x.astype('f')
 y = y.astype('f')
 
-# stage cvms
-n = shape[0] * shape[1] * shape[2]
-job = cst.cvms.stage(nsample=n, nproc=nproc, nthread=1)
-
-# save data
-path = job.rundir + os.sep
-x.astype('f').tofile(path + 'lon.bin')
-y.astype('f').tofile(path + 'lat.bin')
-
 # build mesher
+cfg = cst.util.configure()
 m = open('Makefile.in').read()
 m = m.format(
     shape_x = shape[0] * shape[1],
     shape_z = shape[2],
     delta = delta,
     z_start = 0.0,
-    **job
+    **cfg
 )
 open('Makefile', 'w').write(m)
 subprocess.check_call(['make'])
 
+# save 2D mesh
+d = 'run/mesh/hold'
+if not os.path.isdir(d):
+    os.makedirs('run/mesh/hold')
+x.astype('f').tofile('run/mesh/lon.bin')
+y.astype('f').tofile('run/mesh/lat.bin')
+
 # launch mesher
-m = shape[0] * shape[1] * shape[2] // 100000000
 job0 = cst.util.launch(
-    new = False,
-    rundir = path,
+    name = 'mesh',
     code = 'mesh',
     stagein = ['mesh.x'],
     command = './mesh.x',
-    minutes = m,
+    new = False,
+    minutes = nsample // 100000000,
     nproc = min(3, nproc),
-    nstripe = nstripe,
     nthread = 1,
+    nstripe = nstripe,
 )
 
-# launch cvms, wait for mesher
-cst.cvms.launch(job, depend=job0.jobid)
+# launch cvms
+cst.cvms.launch(
+    depend = job0.jobid,
+    nproc = nproc,
+    nthread = 1,
+    nstripe = nstripe,
+    nsample = nsample,
+    file_lon = '../mesh/hold/lon.bin',
+    file_lat = '../mesh/hold/lat.bin',
+    file_dep = '../mesh/hold/dep.bin',
+    file_rho = '../mesh/hold/rho.bin',
+    file_vp = '../mesh/hold/vp.bin',
+    file_vs = '../mesh/hold/vs.bin',
+)
 
