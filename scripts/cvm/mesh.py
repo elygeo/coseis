@@ -57,9 +57,9 @@ subprocess.check_call(['make'])
 # launch mesher
 m = shape[0] * shape[1] * shape[2] // 100000000
 job0 = cst.util.launch(
-    name = 'mesh',
     new = False,
     rundir = path,
+    code = 'mesh',
     stagein = ['mesh.x'],
     command = './mesh.x',
     minutes = m,
