@@ -6,8 +6,8 @@
 #$ -q {queue}
 #$ -pe {ppn}way {totalcores}
 #$ -l h_rt={walltime}
-#$ -e {rundir}/{code}.error
-#$ -o {rundir}/{code}.output
+#$ -e {rundir}/{name}.error
+#$ -o {rundir}/{name}.output
 #$ -m n
 #$ -V
 #$ -wd {rundir}
@@ -15,15 +15,15 @@
 export MY_NSLOTS={nproc}
 
 cd "{rundir}"
-env >> {code}.env
+env >> {name}.env
 
 lfs setstripe -c 1 .
-[ {nstripe} -ge -1 -a -d hold ] && lfs setstripe -c {nstripe} hold
+[ {nstripe} -ge -1 -a -d {iodir} ] && lfs setstripe -c {nstripe} {iodir}
 [ {nproc} -gt 4000 ] && cache_binary $PWD {command}
 
-echo "$( date ): {code} started" >> {code}.log
+echo "$( date ): {name} started" >> {name}.log
 {pre}
 {launch}
 {post}
-echo "$( date ): {code} finished" >> {code}.log
+echo "$( date ): {name} finished" >> {name}.log
 

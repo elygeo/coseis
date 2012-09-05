@@ -6,12 +6,12 @@ http://www.data.scec.org/3Dvelocity/
 
 input_template = """\
 {nsample}
-{file_lon}
-{file_lat}
-{file_dep}
-{file_rho}
-{file_vp}
-{file_vs}
+{iodir}/{file_lon}
+{iodir}/{file_lat}
+{iodir}/{file_dep}
+{iodir}/{file_rho}
+{iodir}/{file_vp}
+{iodir}/{file_vs}
 """
 
 def configure(**kwargs):
@@ -110,35 +110,26 @@ def stage(**kwargs):
         sys.exit('Need at lease %s processors for this mesh size' % minproc)
 
     # create run directory
-    if job.force == True and os.path.isdir(job.rundir):
-        shutil.rmtree(job.rundir)
     if not os.path.exists(job.rundir):
         f = os.path.join(path, 'build', ver)
         shutil.copytree(f, job.rundir)
-    else:
-        for f in [
-            job.file_lon, job.file_lat, job.file_dep,
-            job.file_rho, job.file_vp, job.file_vs,
-        ] + job.stagein:
-            ff = os.path.join(job.rundir, f)
-            if os.path.isdir(ff):
-                shutil.rmtree(ff)
-            elif os.path.exists(ff):
-                os.remove(ff)
 
-    # set up job
-    util.skeleton(job, force=False, new=False)
+    # input files
+    util.skeleton(job)
+    open('cvms-input', 'w').write(input_template.format(**job))
+    for f in [
+        job.file_rho, job.file_vp, job.file_vs,
+    ]:
+        f = os.path.join(job.iodir, f)
+        if os.path.exists(f):
+            os.remove(f)
 
-    # save input file and configuration
-    f = os.path.join(job.rundir, 'cvms-input')
-    open(f, 'w').write(input_template.format(**job))
     return job
 
 def launch(job=None, **kwargs):
     """
     Launch or submit job.
     """
-    import os, re, shlex, subprocess
     from .. import util
 
     if job is None:

@@ -9,6 +9,7 @@ setenv F77 gfortran
 setenv F90 gfortran
 """
 
+python = '/home/rcf-11/gely/local/python/bin/python'
 rate = 1.1e6
 queue = 'default'
 

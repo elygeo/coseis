@@ -1,14 +1,23 @@
 #!/usr/bin/env python
 
+import os, shutil
 import cst.tests
 
-cst.tests.hello_mpi.build()
+cst.tests.hello.build()
 cst.sord.build()
+
+cwd = os.getcwd()
+os.chdir(os.path.dirname(__file__))
+d = 'run/test_suite'
+os.makedirs(d)
+shutil.copy2('test_suite.py', d)
+
 cst.util.launch(
-    stagein = ['test_suite.py'],
+    rundir = d,
     launch = "python ./test_suite.py",
-    name = 'test_suite',
     nproc = 6,
     minutes = 30,
 )
+
+os.chdir(cwd)
 

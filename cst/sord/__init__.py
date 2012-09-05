@@ -95,11 +95,11 @@ def build(job=None, **kwargs):
 
     return
 
-def stage(prm, code='sord', name='sord', **kwargs):
+def stage(prm, **kwargs):
     """
     Stage job
     """
-    import os
+    import os, shutil
     from .. import util
 
     print('\nSORD setup')
@@ -117,7 +117,7 @@ def stage(prm, code='sord', name='sord', **kwargs):
     else:
         prm = util.storage(**prm)
     prm = prepare_param(prm)
-    job = util.configure(code=code, name=name, **kwargs)
+    job = util.configure(**kwargs)
 
     # partition for parallelization
     nx, ny, nz = prm.shape[:3]
@@ -150,29 +150,29 @@ def stage(prm, code='sord', name='sord', **kwargs):
     if not job.minutes:
         job.minutes = 10 + int((prm.shape[3] + 10) * nm // (40 * job.rate))
 
-    # configure options
+    # configure and build
     job.command = os.path.join('.', 'sord.x')
     job = util.prepare(job)
-
-    # compile code
-    if not job.prepare:
-        return job
     build(job)
 
-    # create run directory
-    job.stagein = job.stagein + [os.path.join(path, 'src', job.command)]
-    if prm.debug > 2:
-        job.stagein += 'debug/',
-    if prm.itcheck != 0:
-        job.stagein += 'checkpoint/',
-    util.skeleton(job)
-
-    # conf, parameter files
+    # goto run directory
     cwd = os.path.realpath(os.getcwd())
     os.chdir(job.rundir)
+
+    # create input files
+    if os.path.exists('meta.py'):
+        raise Exception('Error: previous run found in this location')
+    d = os.path.dirname(__file__)
+    f = os.path.join(d, 'src', 'sord.x')
+    shutil.copy2(f, '.')
+    if prm.debug > 2:
+        os.mkdir('debug')
+    if prm.itcheck != 0:
+        os.mkdir('checkpoint')
     del(prm['itbuff'])
     util.save('parameters.py', prm, expand=['fieldio'], header='# model parameters\n')
     util.archive('coseis.tgz')
+    util.skeleton(job)
 
     # metadata
     xis = {}

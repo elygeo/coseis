@@ -3,6 +3,7 @@ NICS Kraken: Cray XT5
 """
 
 # machine properties
+python = '/lustre/scratch/gely/local/bin/python'
 account = 'TG-MCA03S012'
 maxnodes = 64 * 129
 maxcores = 12

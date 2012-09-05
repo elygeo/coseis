@@ -27,7 +27,7 @@ def test():
     for m in [
         cst.tests.syntax,
         cst.tests.configure,
-        cst.tests.hello_mpi,
+        cst.tests.hello,
         cst.tests.point_source,
         cst.tests.pml_boundary,
         cst.tests.kostrov,
@@ -42,7 +42,7 @@ def test():
         except Exception as e:
             failed.append('FAILED: %s: %s' % (c, e.message))
 
-    # report
+    # finished
     print('\n' + '\n'.join(passed))
     print('\n' + '\n'.join(failed))
 

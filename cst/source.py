@@ -376,7 +376,7 @@ class srf():
         binary: If true, write AWP binary format, otherwise text format.
         """
         import numpy as np
-        from . import coord
+        from . import coord, interpolate
         if type(delta) not in (tuple, list):
             delta = delta, delta, delta
 

@@ -51,6 +51,6 @@ f2py_flags = '--fcompiler=intelem'
 launch = 'ibrun -n {nproc} -o 0 {command}'
 launch = 'ibrun {command}'
 notify = '-m abe'
-submit = 'qsub {notify} {submit_flags} "{code}.sh"'
-submit2 = 'qsub {notify} -hold_jid "{depend}" {submit_flags} "{code}.sh"'
+submit = 'qsub {notify} {submit_flags} "{name}.sh"'
+submit2 = 'qsub {notify} -hold_jid "{depend}" {submit_flags} "{name}.sh"'
 

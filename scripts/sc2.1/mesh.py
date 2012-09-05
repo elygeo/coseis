@@ -4,7 +4,6 @@ Mesh generation
 """
 import os
 import numpy as np
-import cst
 import meta
 
 # metedata

@@ -25,8 +25,9 @@ def archive(path):
         print('version with the simulations results. To enable, use')
         print('Git versioned source code and install GitPython.')
     else:
-        s = cStringIO.StringIO()
+        p = os.path.dirname(__file__)
         r = git.Repo(p)
+        s = cStringIO.StringIO()
         r.archive(s, prefix='coseis/')
         s.reset()
         gzip.open(path, 'wb').write(s.read())
@@ -206,11 +207,8 @@ def configure(*args, **kwargs):
                 job[key] = type(cast)(val)
             else:
                 job[key] = cast
-        if not job.prepare:
-            job.run = ''
-    del(job['options'])
 
-    # host config:
+    # host configuration:
     for h, o in job.host_opts.items():
         if h in job.host:
             for k, v in o.items():
@@ -262,7 +260,7 @@ def prepare(job=None, **kwargs):
         job.queue = q
         job.update(d)
 
-        # addtional job parameters
+        # additional job parameters
         job.update(dict(
             nodes = 1,
             cores = job.nproc,
@@ -316,12 +314,13 @@ def prepare(job=None, **kwargs):
     if job.maxtime and job.minutes == job.maxtime:
         print('Warning: exceeding maximum time limit (%02d:00)' % job.maxtime)
 
-    # run directory
-    d = job.rundir.format(**job)
-    print('Run directory: ' + d)
-    job.rundir = os.path.realpath(os.path.expanduser(d))
+    # directories
+    print('Run directory: ' + job.rundir)
+    job.rundir = os.path.realpath(os.path.expanduser(job.rundir))
+    job.iodir = os.path.expanduser(job.iodir)
 
     # launch commands
+    job.command = job.command.format(**job)
     job.launch = job.launch.format(**job)
     job.script = job.script.format(**job)
     if job.depend:
@@ -337,7 +336,7 @@ def skeleton(job=None, **kwargs):
     """
     Create run directory
     """
-    import os, shutil
+    import os
 
     # prepare job
     if job is None:
@@ -346,37 +345,18 @@ def skeleton(job=None, **kwargs):
         for k in kwargs:
             job[k] = kwargs[k]
 
-    # dry-run
-    if not job.prepare:
-        return job
-
-    # create destination directory
-    dest = os.path.realpath(os.path.expanduser(job.rundir)) + os.sep
-    if job.new:
-        if job.force == True and os.path.isdir(dest):
-            shutil.rmtree(dest)
-        os.makedirs(dest)
-    elif not os.path.isdir(dest):
-        raise Exception('Not found: %s' % dest)
-
-    # save job
-    f = os.path.join(dest, job.code + '.job.py')
-    save(f, job)
-
-    # create script
+    # create submit script
     if job.submit:
-        f = os.path.join(dest, job.code + '.sh')
+        f = os.path.join(job.rundir, job.name + '.sh')
         open(f, 'w').write(job.script)
         os.chmod(f, 0755)
 
-    # stage directories and files
-    for f in job.stagein:
-        if f.endswith(os.sep):
-            if f.startswith(os.sep) or '..' in f:
-                raise Exception('Error: cannot stage %s outside rundir.' % f)
-            os.makedirs(os.path.join(job.rundir, f))
-        else:
-            shutil.copy2(f, dest)
+    # save configuration
+    f = os.path.join(job.rundir, job.name + '.conf.py')
+    if not job.force and os.path.exists(f):
+        raise Exception('Existing job found. Use --force to overwrite')
+    del(job['options'], job['script'])
+    save(f, job)
 
     return job
 
@@ -413,9 +393,9 @@ def launch(job=None, **kwargs):
             raise Exception('Submit failed')
         d = re.search(job.submit_pattern, stdout).groupdict()
         job.update(d)
-        save(job.code + '.job.py', job)
+        save(job.name + '.conf.py', job)
     else:
-        save(job.code + '.job.py', job)
+        save(job.name + '.conf.py', job)
         for c in job.pre, job.launch, job.post:
             print(c)
             if '\n' in c or ';' in c or '|' in c:

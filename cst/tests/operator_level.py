@@ -42,12 +42,13 @@ def test(argv=[]):
     prm.nproc3 = 2, 1, 1
     prm.nproc3 = 1, 1, 1
     prm.oplevel = 5
+    d = 'run/oplevel%s' % prm.oplevel
+    os.makedirs(d)
     job = cst.sord.run(
         prm,
+        rundir = d,
         run = 'exec',
         argv = argv,
-        name = 'oplevel%s' % prm.oplevel,
-        force = True,
         build_mpi = False,
     )
 
@@ -55,12 +56,13 @@ def test(argv=[]):
     max_err_all_ = 0.0
     for i in 6,:
         prm.oplevel = i
+        d = 'run/oplevel%s' % prm.oplevel
+        os.makedirs(d)
         job1 = cst.sord.run(
             prm,
+            rundir = d,
             run = 'exec',
             argv = argv,
-            name = 'oplevel%s' % prm.oplevel,
-            force = True,
             build_mpi = False,
         )
         max_err_ = 0.0

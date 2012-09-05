@@ -37,24 +37,26 @@ def test(argv=[]):
         prm.fieldio += [('=w', f, [], f + '.bin')]
 
     # master
+    d = 'run/pml_boundary'
+    os.makedirs(d)
     job = cst.sord.run(
         prm,
+        rundir = d,
         run = 'exec',
         argv = argv,
-        name = 'pml_boundary',
-        force = True,
     )
 
     # variations
     max_err_all_ = 0.0
     for i, n in enumerate([(4, 1, 1), (1, 2, 3)]):
         prm.nproc3 = n
+        d = 'run/pml_boundary%s' % i
+        os.makedirs(d)
         job1 = cst.sord.run(
             prm,
+            rundir = d,
             run = 'exec',
             argv = argv,
-            name = 'pml_boundary%s' % i,
-            force = True,
         )
         max_err_ = 0.0
         for f in cst.sord.fieldnames.volume:

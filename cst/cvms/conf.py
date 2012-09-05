@@ -5,7 +5,6 @@ name = 'cvms'
 code = 'cvms'
 version = '4.0'
 minutes = 20
-stagein = ['hold/']
 
 build_fflags = '-O3 -Wall'
 build_cvms = {
@@ -15,10 +14,10 @@ build_cvms = {
 }
 
 nsample = 0
-file_lon = 'hold/lon.bin'
-file_lat = 'hold/lat.bin'
-file_dep = 'hold/dep.bin'
-file_rho = 'hold/rho.bin'
-file_vp = 'hold/vp.bin'
-file_vs = 'hold/vs.bin'
+file_lon = 'lon.bin'
+file_lat = 'lat.bin'
+file_dep = 'dep.bin'
+file_rho = 'rho.bin'
+file_vp = 'vp.bin'
+file_vs = 'vs.bin'
 

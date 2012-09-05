@@ -5,8 +5,8 @@
 # @ job_name = {name}
 # @ bg_size = {nodes}
 # @ wall_clock_limit = {walltime}
-# @ error = {code}.error
-# @ output = {code}.output
+# @ error = {name}.error
+# @ output = {name}.output
 # @ initialdir = {rundir}
 # @ notify_user = {email}
 # @ notification = never
@@ -15,11 +15,11 @@
 # @ queue
 
 cd "{rundir}"
-env >> {code}.env
+env >> {name}.env
 
-echo "$( date ): {code} started" >> {code}.log
+echo "$( date ): {name} started" >> {name}.log
 {pre}
 {launch}
 {post}
-echo "$( date ): {code} finished" >> {code}.log
+echo "$( date ): {name} finished" >> {name}.log
 

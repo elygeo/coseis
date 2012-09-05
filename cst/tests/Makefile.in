@@ -4,11 +4,13 @@ LIBS = {build_libs}
 CFLAGS = {build_cflags}
 FFLAGS = {build_fflags}
 
-all: hello_mpic.x hello_mpif.x
+all: hello.c.x hello.f.x
 
-hello_mpic.x : hello_mpi.c
+hello.c.x : hello.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
-hello_mpif.x : hello_mpi.f90
+hello.f.x : hello.f90
 	$(FC) $(FFLAGS) -o $@ $^ $(LIBS)
 
+clean:
+	rm -rf *.pyc run hello.?.x hello.?.x.dSYM

@@ -85,7 +85,7 @@ def boore_hard_rock(depth):
     vs: Array of S-wave velocities in m/s
     """
     import numpy as np
-    from . import coord
+    from . import interpolate
     depth = np.asarray(depth)
     v = [
         2768.0, 2808.0, 2847.0, 2885.0, 2922.0, 2958.0, 2993.0, 3026.0,

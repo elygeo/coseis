@@ -15,24 +15,21 @@ except:
     email = pwd.getpwuid(os.geteuid())[0]
 
 # job parameters
-code = 'cst'              # code name
-name = 'cst'              # job name
-verbose = False           # extra diagnostics
-prepare = True            # True: setup run directory, False: dry run
-run = ''                  # 'exec': interactive, 'submit': batch queue
-rundir = 'run/{name}'     # name of the run directory
-new = True                # create new run directory
-force = False             # overwrite previous run directory
-stagein = []              # files to copy into run directory
-dtype = np.dtype('f').str # Numpy data type
+name = 'job'              # job name
+rundir = 'run'            # name of the run directory
+iodir = 'hold'            # name of directory for large io
 nproc = 1                 # number of processes
 nthread = 0               # number of threads per process
+minutes = 0               # estimated run time
+run = ''                  # 'exec': interactive, 'submit': batch queue
+depend = ''               # job ID to wait for
 command = ''              # executable command
 pre = post = ''           # pre and post-processing commands
-depend = ''               # job ID to wait for
-minutes = 0               # estimated run time
+force = False             # overwrite existing
+dtype = np.dtype('f').str # Numpy data type
 
 # machine specific
+python = 'python'
 machine = ''
 account = ''
 host = os.uname()
@@ -52,12 +49,9 @@ nstripe = -2
 # command line options
 argv = sys.argv[1:]
 options = [
-    ('v', 'verbose',     'verbose', True),
-    ('f', 'force',       'force',   True),
-    ('n', 'dry-run',     'prepare', False),
-    ('s', 'setup',       'run',     ''),
-    ('i', 'interactive', 'run',     'exec'),
-    ('q', 'queue',       'run',     'submit'),
+    ('i', 'interactive', 'run',   'exec'),
+    ('q', 'queue',       'run',   'submit'),
+    ('f', 'force',       'force', 'true'),
 ]
 
 # search for files in PATH
@@ -92,19 +86,19 @@ notify_threshold = 4096
 notify = '-m abe'
 submit_flags = ''
 submit_pattern = r'(?P<jobid>\d+\S*)\D*$'
-submit = 'qsub {notify} {submit_flags} "{code}.sh"'
-submit2 = 'qsub {notify} -W depend="afterok:{depend}" {submit_flags} "{code}.sh"'
+submit = 'qsub {notify} {submit_flags} "{name}.sh"'
+submit2 = 'qsub {notify} -W depend="afterok:{depend}" {submit_flags} "{name}.sh"'
 
 # batch script
 script = """\
 #!/bin/sh
 cd "{rundir}"
-env >> {code}.env
-echo "$( date ): {code} started" >> {code}.log
+env >> {name}.env
+echo "$( date ): {name} started" >> {name}.log
 {pre}
 {launch}
 {post}
-echo "$( date ): {code} finished" >> {code}.log
+echo "$( date ): {name} finished" >> {name}.log
 """
 
 # detect machine from the hostname

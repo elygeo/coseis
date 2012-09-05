@@ -20,4 +20,5 @@ TODO
 /cst/data
 /cst/cvms/build
 /cst/sord/src/Makefile
+/cst/tests/Makefile
 /scripts/cvm/Makefile

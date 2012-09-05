@@ -39,24 +39,26 @@ def test(argv=[]):
         prm.fieldio += [('=w', f, [], f + '.bin')]
 
     # master
+    d = 'run/point_source'
+    os.makedirs(d)
     job = cst.sord.run(
         prm,
+        rundir = d,
         run = 'exec',
         argv = argv,
-        name = 'point_source',
-        force = True,
     )
 
     # variations
     max_err_all_ = 0.0
     for i, n in enumerate([(3, 1, 1), (2, 2, 1)]):
         prm.nproc3 = n
+        d = 'run/point_source%s' % i
+        os.makedirs(d)
         job1 = cst.sord.run(
             prm,
+            rundir = d,
             run = 'exec',
             argv = argv,
-            name = 'point_source%s' % i,
-            force = True,
         )
         max_err_ = 0.0
         for f in cst.sord.fieldnames.volume:

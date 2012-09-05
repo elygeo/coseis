@@ -2,7 +2,7 @@
 """
 Material model extraction from CVM
 """
-import os, imp
+import os, imp, shutil
 import numpy as np
 import pyproj
 import cst
@@ -35,13 +35,6 @@ origin = mts.longitude, mts.latitude, mts.depth
 # loop over cvm versions
 for cvm in 'cvms', 'cvmh', 'cvmg':
 
-    # path
-    mesh_id = '%s%04.f%s' % (label, dx, cvm[-1])
-    path = os.path.join('run', 'mesh', mesh_id)
-    path = os.path.realpath(path) + os.sep
-    hold = path + 'hold' + os.sep
-    os.makedirs(hold)
-
     # projection
     projection = dict(proj='tmerc', lon_0=origin[0], lat_0=origin[1])
     proj = pyproj.Proj(**projection)
@@ -61,6 +54,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         int(abs(y / delta[1]) + 1.5),
         int(abs(z / delta[2]) + 1.5),
     )
+    ncell = (x - 1) * (y - 1) * (z - 1),
 
     # corners
     x, y, z = bounds
@@ -92,6 +86,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     z = cst.coord.interp2(topo_extent, topo, (x, y))
 
     # metadata
+    mesh_id = '%s%04.f%s' % (label, dx, cvm[-1])
     meta = dict(
         cvm = cvm,
         mesh_id = mesh_id,
@@ -110,30 +105,34 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     )
 
     # save data
+    path = os.path.join('run', 'mesh', mesh_id)
+    path = os.path.realpath(path) + os.sep
+    hold = path + 'hold' + os.sep
+    os.makedirs(hold)
     cst.util.save(path + 'meta.py', meta, header='# mesh parameters\n')
     np.savetxt(path + 'box.txt', np.array(box, 'f').T)
     x.astype('f').T.tofile(path + 'lon.bin')
     y.astype('f').T.tofile(path + 'lat.bin')
     z.astype('f').T.tofile(path + 'topo.bin')
 
-    # python executable
-    python = 'python'
-    if 'kraken' in cst.conf.login:
-        python = '/lustre/scratch/gely/local/bin/python'
-    elif 'hpc-login2' in cst.conf.login:
-        python = '/home/rcf-11/gely/local/python/bin/python'
-
     # cvm-s
     if cvm == 'cvms':
 
-        FIXME
-        # stage cvms
+        # launch mesher
+        shutil.copy2('mesh.py', path)
+        job0 = cst.util.launch(
+            name = mesh_id + '-mesh',
+            command = '{python} mesh.py',
+            minutes = ncell // 120000000,
+            nproc = min(4, nproc),
+            nstripe = nstripe,
+        )
+
+        # launch cvms
         job = cst.cvms.stage(
-            name = mesh_id + '-cvms',
-            rundir = path + 'cvms',
-            nsample = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1),
-            post = 'rm %slon.bin\nrm %slat.bin\nrm %sdep.bin' % (hold, hold, hold),
+            depend = job0.jobid,
             nproc = nproc,
+            nsample = ncell,
             file_lon = hold + 'lon.bin',
             file_lat = hold + 'lat.bin',
             file_dep = hold + 'dep.bin',
@@ -141,23 +140,6 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
             file_vp = hold + 'vp.bin',
             file_vs = hold + 'vs.bin',
         )
-
-        # launch mesher
-        x, y, z = shape
-        m = x * y * z // 120000000
-        job0 = cst.util.launch(
-            name = mesh_id + '-mesh',
-            new = False,
-            rundir = path,
-            stagein = ['mesh.py'],
-            command = '%s mesh.py' % python,
-            minutes = m,
-            nproc = min(4, nproc),
-            nstripe = nstripe,
-        )
-
-        # launch cvms, wait for mesher
-        cst.cvms.launch(job, depend=job0.jobid)
 
     # cvm-h
     else:
@@ -169,17 +151,15 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         y.astype('f').T.tofile(path + 'y.bin')
 
         # launch mesher
-        x, y, z = shape
-        m = x * y * z // 36000000 # linear
-        m = x * y * z // 120000000 # nearest
         print 'CVM-H wall time estimate: %s' % s
         cst.conf.launch(
             name = mesh_id + '-cvmh',
             new = False,
             rundir = path,
             stagein = ['mesh-cvmh.py'],
-            command = '%s mesh-cvmh.py' % python,
-            minutes = m,
+            command = '{python} mesh-cvmh.py',
+            #minutes = ncell // 36000000, # linear
+            minutes = ncell // 120000000, # nearest
             nproc = min(4, nproc),
             nstripe = nstripe,
         )

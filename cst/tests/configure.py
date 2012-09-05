@@ -6,14 +6,16 @@ def test(argv=[]):
     """
     import os, pprint
     import cst
-    path = os.path.dirname(cst.conf.__file__)
-    machines = ['default'] + os.listdir(path)
+    p = os.path.dirname(cst.conf.__file__)
+    machines = ['default'] + os.listdir(p)
+    d = 'run/configure'
+    os.makedirs(d)
     kwargs = dict(
+        rundir = d,
         run = 'exec',
         argv = argv,
-        name = 'configure',
-        force = True,
         command = 'COMMAND',
+        force = True,
     )
     for machine in machines:
         if not machine.endswith('.py'):
@@ -27,7 +29,7 @@ def test(argv=[]):
         job = cst.util.configure(cst.conf.default, **kwargs)
         job = cst.util.prepare(job)
         job = cst.util.skeleton(job)
-        if job.verbose:
+        if 0:
             print(job.doc)
             del(job['doc'])
             pprint.pprint(job)

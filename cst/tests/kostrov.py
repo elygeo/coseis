@@ -60,12 +60,13 @@ def test(argv=[]):
     v = cst.kostrov.slip_rate(rho, vp, vs, prm.vrup, dtau, r, t)
 
     # run SORD
+    d = 'run/kostrov'
+    os.makedirs(d)
     job = cst.sord.run(
         prm,
+        rundir = d,
         run = 'exec',
         argv = argv,
-        name = 'kostrov',
-        force = True,
     )
 
     # compare with analytical solution
