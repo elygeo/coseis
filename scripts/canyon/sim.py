@@ -2,7 +2,6 @@
 """
 Semi-cylindrical canyon with vertically incident P-wave.
 """
-import os
 import cst
 prm = cst.sord.parameters()
 s_ = cst.sord.s_
@@ -47,7 +46,5 @@ for c in '12':
     ]
 
 # run job
-x = os.path.join('run', 'mesh', 'x.bin')
-y = os.path.join('run', 'mesh', 'y.bin')
-cst.sord.run(prm, stagein=[x, y])
+cst.sord.run(prm)
 

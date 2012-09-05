@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os                                   # import O/S untilities
 import cst                                  # import the Coseis module
 prm = cst.sord.parameters()                 # for specifying SORD parameters
 s_ = cst.sord.s_                            # for specifying slices
@@ -18,4 +19,5 @@ prm.source1 = 1e6, 1e6, 1e6                 # source normal components
 prm.source2 = 0.0, 0.0, 0.0                 # source shear components
 prm.pulse = 'integral_brune'                # source time function
 prm.tau = 6 * prm.delta[3]                  # source characteristic time
+os.mkdir('run')                             # create run directory
 cst.sord.run(prm)                           # launch SORD job

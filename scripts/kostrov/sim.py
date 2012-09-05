@@ -2,6 +2,7 @@
 """
 Kostrov circular crack test.
 """
+import os
 import cst
 prm = cst.sord.parameters()
 
@@ -54,5 +55,6 @@ prm.fieldio += [
 ]
 
 # launch SORD
+os.mkdir('run')
 cst.sord.run(prm)
 

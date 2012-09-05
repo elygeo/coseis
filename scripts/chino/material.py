@@ -104,11 +104,11 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         dtype = np.dtype('f').str,
     )
 
+    # create run directory
+    path = os.path.join('run', 'mesh', mesh_id) + os.sep
+    os.makedirs(path + 'hold')
+
     # save data
-    path = os.path.join('run', 'mesh', mesh_id)
-    path = os.path.realpath(path) + os.sep
-    hold = path + 'hold' + os.sep
-    os.makedirs(hold)
     cst.util.save(path + 'meta.py', meta, header='# mesh parameters\n')
     np.savetxt(path + 'box.txt', np.array(box, 'f').T)
     x.astype('f').T.tofile(path + 'lon.bin')
@@ -121,46 +121,39 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         # launch mesher
         shutil.copy2('mesh.py', path)
         job0 = cst.util.launch(
-            name = mesh_id + '-mesh',
-            command = '{python} mesh.py',
-            minutes = ncell // 120000000,
+            rundir = path,
             nproc = min(4, nproc),
             nstripe = nstripe,
+            command = '{python} mesh.py',
+            minutes = ncell // 120000000,
         )
 
         # launch cvms
         job = cst.cvms.stage(
-            depend = job0.jobid,
+            rundir = path,
+            iodir = path + 'hold',
             nproc = nproc,
+            nstripe = nstripe,
+            minutes = 30,
+            depend = job0.jobid,
             nsample = ncell,
-            file_lon = hold + 'lon.bin',
-            file_lat = hold + 'lat.bin',
-            file_dep = hold + 'dep.bin',
-            file_rho = hold + 'rho.bin',
-            file_vp = hold + 'vp.bin',
-            file_vs = hold + 'vs.bin',
         )
 
     # cvm-h
     else:
 
-        # stage cvmh
-        cvm_proj = pyproj.Proj(**cst.cvmh.projection)
-        x, y = cvm_proj(x, y)
+        # launch mesher + cvmh
+        shutil.copy2('mesh-cvmh.py', path)
+        proj_cvmh = pyproj.Proj(**cst.cvmh.projection)
+        x, y = proj_cvmh(x, y)
         x.astype('f').T.tofile(path + 'x.bin')
         y.astype('f').T.tofile(path + 'y.bin')
-
-        # launch mesher
-        print 'CVM-H wall time estimate: %s' % s
         cst.conf.launch(
-            name = mesh_id + '-cvmh',
-            new = False,
             rundir = path,
-            stagein = ['mesh-cvmh.py'],
-            command = '{python} mesh-cvmh.py',
-            #minutes = ncell // 36000000, # linear
-            minutes = ncell // 120000000, # nearest
             nproc = min(4, nproc),
             nstripe = nstripe,
+            command = '{python} mesh-cvmh.py',
+            minutes = ncell // 120000000, # nearest
+            #minutes = ncell // 36000000, # linear
         )
 

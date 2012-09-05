@@ -46,10 +46,11 @@ w = 1.0 - np.r_[np.zeros(ntop), 1.0 / (n - 1) * np.arange(n), np.ones(npml)]
 # node elevation mesh
 mode = os.O_WRONLY | os.O_CREAT | os.O_EXCL
 try:
-    fh = os.fdopen(os.open(hold + 'z3.bin', mode), 'wb')
+    fd = os.open(hold + 'z3.bin', mode)
 except OSError:
     pass
 else:
+    fh = os.fdopen(fd, 'wb')
     with fh:
         for i in range(dep.size):
             (dep[i] + z0 + w[i] * z).T.tofile(fh)
@@ -66,10 +67,11 @@ w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 
 # rho extraction
 try:
-    fh = os.fdopen(os.open(hold + 'rho.bin', mode), 'wb')
+    fd = os.open(hold + 'rho.bin', mode)
 except OSError:
     pass
 else:
+    fh = os.fdopen(fd, 'wb')
     with fh:
         vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
         vmin, vmax = np.inf, -np.inf
@@ -83,10 +85,11 @@ else:
 
 # vp extraction
 try:
-    fh = os.fdopen(os.open(hold + 'vp.bin', mode), 'wb')
+    fd = os.open(hold + 'vp.bin', mode)
 except OSError:
     pass
 else:
+    fh = os.fdopen(fd, 'wb')
     with fh:
         vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
         vmin, vmax = np.inf, -np.inf
@@ -100,10 +103,11 @@ else:
 
 # vs extraction
 try:
-    fh = os.fdopen(os.open(hold + 'vs.bin', mode), 'wb')
+    fd = os.open(hold + 'vs.bin', mode)
 except OSError:
     pass
 else:
+    fh = os.fdopen(fd, 'wb')
     with fh:
         vm = cst.cvmh.Extraction(x, y, 'vs', vs30)
         vmin, vmax = np.inf, -np.inf

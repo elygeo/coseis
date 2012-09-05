@@ -2,7 +2,7 @@
 """
 Material model extraction from CVM
 """
-import os
+import os, shutil
 import numpy as np
 import cst
 
@@ -25,6 +25,7 @@ shape = (
     int(abs(y / delta[1]) + 1.5),
     int(abs(z / delta[2]) + 1.5),
 )
+nsample = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
 
 # mesh
 x, y = extent
@@ -42,46 +43,31 @@ meta = dict(
     dtype = np.dtype('f').str,
 )
 
-# path
-path = os.path.join('run', 'mesh', '%.0f' % dx)
-path = os.path.realpath(path) + os.sep
+# create run directory
+path = os.path.join('run', 'mesh', '%.0f' % dx) + os.sep
 os.makedirs(path)
 
 # save data
+shutil.copy2('mesh.py', path)
 cst.util.save(path + 'meta.py', meta)
 x.astype('f').T.tofile(path + 'lat.bin')
 y.astype('f').T.tofile(path + 'lon.bin')
 
-# python executable
-python = 'python'
-if 'kraken' in cst.conf.login:
-    python = '/lustre/scratch/gely/local/bin/python'
-
-# stage cvms
-rundir = os.path.join(path, 'cvms')
-post = 'rm lon.bin lat.bin dep.bin\nmv rho.bin vp.bin vs.bin %r' % path
-n = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
-job = cst.cvms.stage(
-    rundir = rundir,
-    nproc = nproc,
-    nsample = n,
-    post = post,
-    version = '2.2',
-)
-
 # launch mesher
-x, y, z = shape
-m = x * y * z // 120000000
-job0 = cst.util.launch(
-    name = 'mesh',
-    new = False,
+job = cst.util.launch(
     rundir = path,
-    stagein = ['mesh.py'],
-    command = '%s mesh.py' % python,
-    minutes = m,
     nproc = min(3, nproc),
+    command = '{python} mesh.py',
+    minutes = nsample // 120000000,
 )
 
-# launch cvms, wait for mesher
-cst.cvms.launch(job, depend=job0.jobid)
+# launch CVM-S
+cst.cvms.launch(
+    rundir = path,
+    nproc = nproc,
+    depend = job.jobid,
+    nsample = nsample,
+    version = '2.2',
+    iodir = path,
+)
 

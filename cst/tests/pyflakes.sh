@@ -8,7 +8,8 @@ pyflakes cst/*.py
 pyflakes cst/tests/*.py
 pyflakes cst/sord/*.py
 pyflakes cst/cvms/*.py
-pyflakes cst/conf/*.py
+pyflakes cst/conf/*.py \
+    | grep -v "redefinition of unused 'site'"
 pyflakes scripts/*/*.py \
     | grep -v 'ws-meta-in.py'
 

@@ -48,35 +48,32 @@ open('Makefile', 'w').write(m)
 subprocess.check_call(['make'])
 
 # create run directory
-cwd = os.getcwd()
-d = 'run/mesh/hold'
-if not os.path.isdir(d):
-    os.makedirs('run/mesh/hold')
-os.chdir('run/mesh')
+path = os.path.join('run', 'mesh') + os.sep
+os.makedirs(path + 'hold')
 
 # save files
-x.astype('f').tofile('lon.bin')
-y.astype('f').tofile('lat.bin')
-f = os.path.join(cwd, 'mesh.x')
-shutil.copy2(f, '.')
+shutil.copy2('mesh.x', path)
+x.astype('f').tofile(path + 'lon.bin')
+y.astype('f').tofile(path + 'lat.bin')
 
 # launch mesher
-job0 = cst.util.launch(
-    name = 'mesh',
-    command = './mesh.x',
-    minutes = int(nsample // 100000000),
+job = cst.util.launch(
+    rundir = path,
+    iodir = path + 'hold',
     nproc = min(3, nproc),
     nthread = 1,
     nstripe = nstripe,
+    command = './mesh.x',
+    minutes = int(nsample // 100000000),
 )
 
 # launch cvms
-os.chdir('..')
 cst.cvms.launch(
-    depend = job0.jobid,
-    iodir = job0.iodir,
+    rundir = path,
+    iodir = path + 'hold',
     nproc = nproc,
     nthread = 1,
+    depend = job.jobid,
     nstripe = nstripe,
     nsample = nsample,
 )

@@ -20,7 +20,7 @@ n1 = shape[0] * shape[1]
 n2 = shape[2]
 
 # iterate over depth planes looking for vertical isosurface crossings
-f = os.path.join('run', 'cvms', 'vs.bin')
+f = os.path.join('run', 'mesh', 'hold', 'vs.bin')
 f = open(f, 'rb')
 v2 = np.fromfile(f, 'f', n1)
 if up:

@@ -32,19 +32,13 @@ meta = dict(
 
 # save data
 path = os.path.join('run', 'mesh') + os.sep
-if not os.path.exists(path):
-    os.mkdir(path)
+os.makedirs(path + 'hold')
 cst.util.save(path + 'meta.py', meta)
 x.tofile(path + 'lon.bin')
 y.tofile(path + 'lat.bin')
 
-# CVM-S setup
-path = os.path.join('run', 'cvms') + os.sep
-print 'shape = %s' % (shape,)
-n = shape[0] * shape[1] * shape[2]
-job = cst.cvms.stage(nsample=n, nproc=nproc, rundir=path)
-
-# write CVM-S input files
+# write input files
+path = os.path.join('run', 'mesh', 'hold') + os.sep
 f1 = open(path + 'lon.bin', 'wb')
 f2 = open(path + 'lat.bin', 'wb')
 f3 = open(path + 'dep.bin', 'wb')
@@ -57,6 +51,7 @@ with f3:
         x.fill(z[i])
         x.tofile(f3)
 
-# launch
-cst.cvms.launch(job)
+# launch CVM-S
+n = shape[0] * shape[1] * shape[2]
+cst.cvms.launch(nsample=n, nproc=nproc, iodir=path)
 

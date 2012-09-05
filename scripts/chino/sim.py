@@ -2,7 +2,7 @@
 """
 SORD simulation
 """
-import os, sys, imp
+import os, sys, imp, shutil
 import numpy as np
 import pyproj
 import cst
@@ -150,19 +150,8 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
                 ('=w', f, s_[:,k,:,::10], 'hold/xsec-ew-%s.bin' % f),
             ]
 
-    # stage job
-    if 'hpc-login' in cst.conf.login:
-        prm.mpout = 0
-    job = cst.sord.stage(
-        prm,
-        rundir = os.path.join('run', 'sim', name),
-        post = 'rm hold/z3.bin hold/rho.bin hold/vp.bin hold/vs.bin',
-    )
-    if not job.prepare:
-        sys.exit()
-
     # save metadata
-    path = job.rundir + os.sep
+    path = os.path.join('run', 'sim', name) + os.sep
     s = '\n'.join((
         open(mesh + 'meta.py').read(),
         open(mts).read(),
@@ -178,27 +167,25 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
             s = np.fromfile(mesh + f, dtype).reshape(n[::-1])
             s[::ns,::ns].tofile(path + f)
 
-    # copy input files
+    # link input files
     for f in 'z3.bin', 'rho.bin', 'vp.bin', 'vs.bin':
         os.link(mesh + 'hold/' + f, path + 'hold/' + f)
 
-    # launch job
-    job = cst.sord.launch(job)
+    # run SORD
+    job = cst.sord.run(prm, rundir=path)
 
     # post-process to compute pgv, pga
     if surf_out:
-        path = job.rundir + os.sep
         meta = imp.load_source('meta', path + 'meta.py')
         x, y, t = meta.shapes['hold/full-v1.bin']
         m = x * y * t // 60000000
+        shutil.copy2('cook.py', path)
         cst.util.launch(
-            run = job.run,
             depend = job.jobid,
-            rundir = job.rundir,
+            rundir = path,
+            run = job.run,
             name = 'cook',
-            stagein = ['cook.py'],
-            command = 'python cook.py',
+            command = '{python} cook.py',
             minutes = m,
-            new = False,
         )
 

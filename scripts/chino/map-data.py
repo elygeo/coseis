@@ -73,7 +73,7 @@ zz.fill(0.0)
 for cvm, vv in [
     ('cvmg', cst.cvmh.extract(xx, yy, zz, 'vs')),
     ('cvmh', cst.cvmh.extract(xx, yy, zz, 'vs', vs30=None)),
-    ('cvms', cst.cvms.extract(xx, yy, zz, 'vs', rundir='run/cvms')),
+    ('cvms', cst.cvms.extract(xx, yy, zz, 'vs')),
 ]:
     f = os.path.join('run', 'data', 'surface-vs-%s.npy' % cvm)
     np.save(f, vv[0].astype('f'))
@@ -82,7 +82,7 @@ for cvm, vv in [
 zz.fill(1000.0)
 for cvm, vv in [
     ('cvmh', cst.cvmh.extract(xx, yy, zz, 'vs', vs30=None)),
-    ('cvms', cst.cvms.extract(xx, yy, zz, 'vs', rundir='run/cvms')),
+    ('cvms', cst.cvms.extract(xx, yy, zz, 'vs')),
 ]:
     v = 2500,
     x, y = cst.plt.contour(xx, yy, vv[0], v)[0]

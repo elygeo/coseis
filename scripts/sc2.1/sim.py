@@ -66,10 +66,10 @@ for i in range(8):
     ]
 
 # run job
-cst.sord.run(
-    prm,
-    rundir = os.path.join('run', 'sim', '%.0f' % dx),
-    stagein = [mesh + v + '.bin' for v in 'rho', 'vp', 'vs'],
-    post = 'rm rho.bin vp.bin vs.bin',
-)
+d = os.path.join('run', 'sim', '%.0f' % dx)
+h = os.path.join(d, 'hold') + os.sep
+os.makedirs(h)
+for f in 'rho', 'vp', 'vs':
+    os.link(mesh + v + '.bin', h + v + 'bin')
+cst.sord.run(prm, rundir=d, iodir=h)
 

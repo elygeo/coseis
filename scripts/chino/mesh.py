@@ -40,10 +40,11 @@ w = 1.0 - np.r_[np.zeros(ntop), 1.0 / (n - 1) * np.arange(n), np.ones(npml)]
 # node elevation mesh
 mode = os.O_WRONLY | os.O_CREAT | os.O_EXCL
 try:
-    fh = os.fdopen(os.open(hold + 'z3.bin', mode), 'wb')
+    fd = os.open(hold + 'z3.bin', mode)
 except OSError:
     pass
 else:
+    fh = os.fdopen(fd, 'wb')
     with fh:
         for i in range(dep.size):
             (dep[i] + z0 + w[i] * z).T.tofile(fh)
@@ -60,30 +61,33 @@ w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 
 # write dep file
 try:
-    fh = os.fdopen(os.open(hold + 'dep.bin', mode), 'wb')
+    fd = os.open(hold + 'dep.bin', mode)
 except OSError:
     pass
 else:
+    fh = os.fdopen(fd, 'wb')
     with fh:
         for i in range(dep.size):
             (w[i] * z - dep[i]).astype('f').T.tofile(fh)
 
 # write lon file
 try:
-    fh = os.fdopen(os.open(hold + 'lon.bin', mode), 'wb')
+    fd = os.open(hold + 'lon.bin', mode)
 except OSError:
     pass
 else:
+    fh = os.fdopen(fd, 'wb')
     with fh:
         for i in range(dep.size):
             x.T.tofile(fh)
 
 # write lat file
 try:
-    fh = os.fdopen(os.open(hold + 'lat.bin', mode), 'wb')
+    fd = os.open(hold + 'lat.bin', mode)
 except OSError:
     pass
 else:
+    fh = os.fdopen(fd, 'wb')
     with fh:
         for i in range(dep.size):
             y.T.tofile(fh)

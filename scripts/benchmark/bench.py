@@ -18,6 +18,8 @@ power = 3, # Vesta 128 nodes, 1 ppn, 32 threads
 points = 400
 power = range(6)     # Challenger
 
+XXX FIXME random noise
+
 prm = cst.sord.parameters()
 prm.oplevel = 5
 prm.oplevel = 6
@@ -42,5 +44,7 @@ for i in power[::-1]:
     n = 2 ** i
     prm.nproc3 = 2, n, n
     prm.shape = points, n * points, n * points, prm.itio
-    cst.sord.run(prm, name='bench%s' % i, minutes=20)
+    d = 'run/bench%s' % i
+    os.makedirs(d)
+    cst.sord.run(prm, rundir=d, minutes=20)
 

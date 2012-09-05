@@ -32,7 +32,7 @@ for n in 20, 40:
     print( 'radius %s' % r)
     for a, color in zip('abcd', 'mrgb'):
         s = 'p%s%s.bin' % (n, a)
-        f = os.path.join('run', s)
+        f = os.path.join(path, s)
         v = np.fromfile(f, dtype)
         ax.plot(t - dt, v, color)
         err = (v[-1] - vf) / vf * 100.0
@@ -42,6 +42,6 @@ for n in 20, 40:
 ax.set_xlim(0.0, t[-1])
 ax.set_xlabel('Time (s)')
 ax.set_ylabel('Slip velocity (m/s)')
-f = os.path.join('run', 'kostrov.pdf')
+f = os.path.join(path, 'kostrov.pdf')
 fig.savefig(f)
 

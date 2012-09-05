@@ -33,35 +33,38 @@ y = 0.25 * (y[:-1,:-1] + y[1:,:-1] + y[:-1,1:] + y[1:,1:])
 z = np.zeros_like(x)
 
 # thread safe exclusive open
-p = 'cvm' + os.sep
-m = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+mode = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+hold = 'hold' + os.sep
 
 # write dep file
 try:
-    fh = os.fdopen(os.open(p + 'dep.bin', m), 'wb')
+    fd = os.open(hold + 'dep.bin', mode)
 except OSError:
     pass
 else:
+    fh = os.fdopen(fd, 'wb')
     with fh:
         for i in range(dep.size):
             (z + dep[i]).astype('f').T.tofile(fh)
 
 # write lon file
 try:
-    fh = os.fdopen(os.open(p + 'lat.bin', m), 'wb')
+    fd = os.open(hold + 'lat.bin', mode)
 except OSError:
     pass
 else:
+    fh = os.fdopen(fd, 'wb')
     with fh:
         for i in range(dep.size):
             x.T.tofile(fh)
 
 # write lat file
 try:
-    fh = os.fdopen(os.open(p + 'lon.bin', m), 'wb')
+    fd = os.open(hold + 'lon.bin', mode)
 except OSError:
     pass
 else:
+    fh = os.fdopen(fd, 'wb')
     with fh:
         for i in range(dep.size):
             y.T.tofile(fh)

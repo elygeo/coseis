@@ -10,5 +10,5 @@ mesh.x : mesh.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
 clean :
-	rm -rf mesh.x run mesh.x.dSYM Makefile
+	rm -rf run mesh.x mesh.x.dSYM
 

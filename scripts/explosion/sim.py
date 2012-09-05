@@ -75,24 +75,21 @@ for source, s in sources:
     if 1:
         prm.nsource = 0
         prm.pulse = 'integral_brune'
-        cst.sord.run(
-            prm,
-            rundir = os.path.join('run', 'point-' + source),
-        )
+        p = os.path.join('run', 'point-' + source)
+        os.mkdir(p)
+        cst.sord.run(prm, rundir=p)
 
     # finite source
     if 0:
         prm.nsource = 1
         prm.pulse = 'none'
+        p = os.path.join('run', 'finite-' + source)
+        q = os.path.join(p, 'source')
+        os.makedirs(q)
         d = prm.delta[-1]
         n = prm.shape[-1]
         t = d * np.arange(n)
         f = 1.0 - math.exp(-t / prm.tau) / prm.tau * (t + prm.tau)
-        job = cst.sord.stage(
-            prm,
-            rundir = os.path.join('run', 'finite-' + source),
-        )
-        p = os.path.join(job.rundir, 'source')
-        cst.source.write(f, n, d, 0.0, prm.ihypo, prm.source1, prm.source2, p)
-        cst.sord.run(job)
+        cst.source.write(f, n, d, 0.0, prm.ihypo, prm.source1, prm.source2, q)
+        cst.sord.run(prm, rundir=p)
 

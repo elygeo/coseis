@@ -7,6 +7,7 @@ http://peer.berkeley.edu/lifelines/lifelines_pre_2006/lifelines_princ_invest_y-7
 http://peer.berkeley.edu/lifelines/lifelines_pre_2006/final_reports/1A01-FR.pdf
 http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A01.pdf
 """
+import os
 import cst
 prm = cst.sord.parameters()
 s_ = cst.sord.s_
@@ -69,5 +70,6 @@ for i in range(10):
     ]
 
 # run job
+os.mkdir('run')
 cst.sord.run(prm)
 
