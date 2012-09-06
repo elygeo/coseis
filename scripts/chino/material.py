@@ -122,7 +122,9 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         shutil.copy2('mesh.py', path)
         job0 = cst.util.launch(
             rundir = path,
-            nproc = min(4, nproc),
+            nthread = 1,
+            nproc = 4,
+            ppn_range = [4],
             nstripe = nstripe,
             command = '{python} mesh.py',
             minutes = ncell // 120000000,
@@ -150,7 +152,9 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         y.astype('f').T.tofile(path + 'y.bin')
         cst.util.launch(
             rundir = path,
-            nproc = min(4, nproc),
+            nthread = 1,
+            nproc = 4,
+            ppn_range = [4],
             nstripe = nstripe,
             command = '{python} mesh-cvmh.py',
             minutes = ncell // 120000000, # nearest

@@ -59,8 +59,9 @@ y.astype('f').tofile(path + 'lat.bin')
 # launch mesher
 job = cst.util.launch(
     rundir = path,
-    nproc = min(3, nproc),
     nthread = 1,
+    nproc = 4),
+    ppn_range = [4],
     nstripe = nstripe,
     command = os.path.join('.', 'mesh.x'),
     minutes = int(nsample // 100000000),
@@ -70,8 +71,9 @@ job = cst.util.launch(
 cst.cvms.launch(
     rundir = os.path.join('run', 'cvms'),
     iodir = os.path.join('..', 'mesh', 'hold'),
-    nproc = nproc,
     nthread = 1,
+    nproc = nproc,
+    ppn_range = [],
     depend = job.jobid,
     nstripe = nstripe,
     nsample = nsample,

@@ -21,7 +21,9 @@ def test(argv=[]):
         run = 'exec',
         argv = argv,
         command = './hello.c.x',
+        nthread = 2,
         nproc = 2,
+        ppn_range = [2],
         minutes = 10,
     )
     d = 'run/hello-f'
@@ -32,7 +34,9 @@ def test(argv=[]):
         run = 'exec',
         argv = argv,
         command = './hello.f.x',
+        nthread = 2,
         nproc = 2,
+        ppn_range = [2],
         minutes = 10,
     )
     return
